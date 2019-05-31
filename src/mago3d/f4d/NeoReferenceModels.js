@@ -422,6 +422,9 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 	}
 	// End check color or texture of reference object.-----------------------------------------------------------------------------
 	
+	//Now erase the aditional information (aditionalColor & moveVector).***
+	this.aditionalColor = undefined;
+	
 	// Test external alpha.***
 	if (magoManager.isTrailRender === undefined || magoManager.isTrailRender === false) // check if mago is not rendering special effects.***
 	{
@@ -940,8 +943,8 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 
 			var objectIdLength = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed +=1;
 			var objectId = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+objectIdLength)));
-			if (objectId === "noObjectId")
-			{ objectId = neoRef._id; }
+			if (objectId === "noObjectId" || objectId.length === 0)
+			{ objectId = neoRef._id.toString(); }
 		
 			neoRef.objectId = objectId;
 			bytes_readed += objectIdLength;
@@ -1624,6 +1627,7 @@ NeoReferencesMotherAndIndices.prototype.render = function(magoManager, neoBuildi
 
 		// Swap renderingFase.***
 		neoReference.swapRenderingFase();
+		
 		
 		if (renderType === 1)
 		{

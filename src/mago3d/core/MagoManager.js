@@ -1359,8 +1359,8 @@ MagoManager.prototype.renderMagoGeometries = function(ssao_idx)
 		pMesh.profile = new Profile2D(); // provisional.***
 		var profileAux = pMesh.profile; // provisional.***
 		
-		//profileAux.TEST__setFigureHole_2();
-		profileAux.TEST__setFigure_1();
+		profileAux.TEST__setFigureHole_2();
+		//profileAux.TEST__setFigure_1();
 		
 		if (pMesh.vboKeyContainer === undefined)
 		{ pMesh.vboKeyContainer = new VBOVertexIdxCacheKeysContainer(); }
@@ -1967,12 +1967,12 @@ MagoManager.prototype.keyDown = function(key)
 	}
 	else if (key === 80) // 80 = 'p'.***
 	{
-		var projectId = "AutonomousVehicle";
+		var projectId = "AutonomousBus";
 		var dataKey = "AutonomousBus_0";
 			
 		// Do a test.***
-		//var projectId = "3ds.json";
-		//var dataKey = "GyeomjaeJeongSeon_del";
+		var projectId = "3ds.json";
+		var dataKey = "GyeomjaeJeongSeon_del";
 		
 		var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
 		node.data.isTrailRender = true; // test.***
@@ -1988,6 +1988,7 @@ MagoManager.prototype.keyDown = function(key)
 		var latitude = currLat + 0.0002 * 10*(Math.random()*2-1);
 		var longitude = currLon + 0.0002 * 10*(Math.random()*2-1);
 		var elevation = currAlt + 10.0 * 10*(Math.random()*2-1);
+		elevation = currAlt;
 		
 		
 		var heading;
@@ -2012,6 +2013,15 @@ MagoManager.prototype.keyDown = function(key)
 			tunnel.makeMesh(this);
 			
 		}
+		
+		// Another test: Change color by projectId & objectId.***
+		var api = new API();
+		api.apiName = "changeColor";
+		api.setProjectId("AutonomousBus");
+		api.setDataKey("AutonomousBus_0");
+		api.setObjectIds("13");
+		api.setColor("220,150,20");
+		this.callAPI(api);
 	}
 	else if (key === 89) // 89 = 'y'.***
 	{
@@ -2061,9 +2071,9 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			
 		//this.modeler.mode = CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_PLANEGRID;
-		this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
+		//this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_TUNNELPOINTS;
-		//this.modeler.mode = CODE.modelerMode.DRAWING_STATICGEOMETRY;
+		this.modeler.mode = CODE.modelerMode.DRAWING_STATICGEOMETRY;
 		
 		// Calculate the geographicCoord of the click position.****
 		var geoCoord;
@@ -2140,7 +2150,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		else if (this.modeler.mode === CODE.modelerMode.DRAWING_STATICGEOMETRY)
 		{
 			// create a "node" & insert into smartTile.***
-			var projectId = "AutonomousVehicle";
+			var projectId = "AutonomousBus";
 			var attributes = {
 				"isPhysical"         : true,
 				"nodeType"           : "TEST",
@@ -2163,7 +2173,27 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 				
 			attributes.pitch = 90.0;
 			*/
-			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+			if (!this.isExistStaticModel('AutonomousBus'))
+			{
+				this.addStaticModel({
+					projectId          : 'AutonomousBus',
+					projectFolderName  : 'staticModels',
+					buildingFolderName : 'F4D_AutonomousBus'
+				});
+			}
+			
+			var nodesMap = this.hierarchyManager.getNodesMap(projectId, undefined);
+			var existentNodesCount = Object.keys(nodesMap).length;
+			var buildingId = "AutonomousBus_" + existentNodesCount.toString();
+			
+			this.instantiateStaticModel({
+				projectId  : 'AutonomousBus',
+				instanceId : buildingId,
+				longitude  : geoCoord.longitude,
+				latitude   : geoCoord.latitude,
+				height     : geoCoord.altitude+1
+			});
+			/*var geoLocDataManager = geoCoord.getGeoLocationDataManager();
 			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
 			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+1, attributes.heading, attributes.pitch, attributes.roll, geoLocData, this);
 			
@@ -2193,7 +2223,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			
 			// Now, insert node into smartTile.***
 			var targetDepth = this.smartTileManager.targetDepth;
-			this.smartTileManager.putNode(targetDepth, node, this);
+			this.smartTileManager.putNode(targetDepth, node, this);*/
 		}
 		
 	}
@@ -3190,6 +3220,8 @@ MagoManager.prototype.checkChangesHistoryMovements = function(nodesArray)
 		moveHistoryMap = MagoConfig.getMovingHistoryObjects(projectId, dataKey);
 		if (moveHistoryMap)
 		{
+			node.data.moveHistoryMap = moveHistoryMap;
+			/*
 			neoBuilding = node.data.neoBuilding;
 			///for (var changeHistory of moveHistoryMap.values()) 
 			for (var key in moveHistoryMap)
@@ -3221,6 +3253,7 @@ MagoManager.prototype.checkChangesHistoryMovements = function(nodesArray)
 					//refObject.moveVectorRelToBuilding.set(moveVectorRelToBuilding.x, moveVectorRelToBuilding.y, moveVectorRelToBuilding.z);	
 				}
 			}
+			*/
 		}
 	}
 };
@@ -3312,68 +3345,9 @@ MagoManager.prototype.checkChangesHistoryColors = function(nodesArray)
 		if (colorChangedHistoryMap)
 		{
 			var data = node.data;
-			//neoBuilding = node.data.neoBuilding;
-			for (var key in colorChangedHistoryMap)
-			{
-				if (Object.prototype.hasOwnProperty.call(colorChangedHistoryMap, key)) 
-				{
-					var changeHistory = colorChangedHistoryMap[key];
-					if (changeHistory.objectId === null || changeHistory.objectId === undefined || changeHistory.objectId === "" )
-					{
-						if (changeHistory.property === null || changeHistory.property === undefined || changeHistory.property === "" )
-						{
-							// change color for all node.
-							data.isColorChanged = true;
-							if (data.aditionalColor === undefined)
-							{ data.aditionalColor = new Color(); }
-							
-							data.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
-						}
-						else 
-						{
-							// there are properties.
-							var nodesArray = [];
-							node.extractNodes(nodesArray);
-							var nodesCount = nodesArray.length;
-							var aNode;
-							for (var i=0; i<nodesCount; i++)
-							{
-								aNode = nodesArray[i];
-								var propertyKey = changeHistory.propertyKey;
-								var propertyValue = changeHistory.propertyValue;
-								// 1rst, check if this has the same "key" and same "value".
-								if (aNode.data.attributes[propertyKey] !== undefined && aNode.data.attributes[propertyKey].toString() === propertyValue)
-								{
-									data.isColorChanged = true;
-									if (data.aditionalColor === undefined)
-									{ data.aditionalColor = new Color(); }
-									
-									data.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
-								}
-							}
-						}
-					}
-					else 
-					{
-						// change color for an object.
-						neoBuilding = node.data.neoBuilding;
-						var objectId = changeHistory.objectId;
-						var objectsArray = neoBuilding.getReferenceObjectsArrayByObjectId(objectId);
-						if (objectsArray)
-						{
-							var objectsCount = objectsArray.length;
-							for (var j=0; j<objectsCount; j++)
-							{
-								var object = objectsArray[j];
-								if (object.aditionalColor === undefined)
-								{ object.aditionalColor = new Color(); }
-								
-								object.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
-							}
-						}
-					}	
-				}
-			}
+			
+			// Set the colorChangedHistoryMap into data of the node.***
+			data.colorChangedHistoryMap = colorChangedHistoryMap;
 		}
 	}
 	
@@ -4946,7 +4920,8 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 				
 				
 				
-				//neoBuilding.distToCam = distToCamera;
+				if (node.data.nodeId === "GyeomjaeJeongSeon_del")
+				{ var hola = 0; }
 				
 				if (data.distToCam < lod0Dist)
 				{ data.currentLod = 0; }

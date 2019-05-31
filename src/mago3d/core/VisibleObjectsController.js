@@ -17,7 +17,6 @@ var VisibleObjectsController = function()
 	this.currentVisibles3 = []; //frustum 3
 	this.currentVisiblesAux = [];
 };
-
 VisibleObjectsController.prototype.initArrays = function() 
 {
 	this.currentVisibles0 = [];
@@ -109,8 +108,8 @@ VisibleObjectsController.prototype.getObjectIdxSortedByDist = function(objectsAr
 
 /**
  * Put the object by distance from camera
- * @param objectsArray
- * @param object 
+ * @param {VisibleObjectsController}objectsArray
+ * @param {Octree}object 
  */
 VisibleObjectsController.prototype.putObjectToArraySortedByDist = function(objectsArray, object) 
 {
