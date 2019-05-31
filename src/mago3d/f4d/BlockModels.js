@@ -268,13 +268,15 @@ BlocksList.prototype.deleteGlObjects = function(gl, vboMemManager)
 };
 
 /**
- * 블록리스트 버퍼를 파싱(비대칭적)
+ * 사용하지 않는 부분들 계산하기 위한 파싱과정. stepOver
+ * 파싱을 위한 파싱..
+ * 블록리스트 버퍼를 파싱(비대칭적)하는 과정.
  * F4D 버전이 0.0.1일 경우 사용
  * This function parses the geometry data from binary arrayBuffer.
  * 
  * @param {ArrayBuffer} arrayBuffer Binary data to parse.
  * @param {Number} bytesReaded readed bytes.
- * @param {ReadWriter} readWriter Helper to read inside of the arrayBuffer.
+ * @param {ReaderWriter} readWriter Helper to read inside of the arrayBuffer.
  */
 BlocksList.prototype.stepOverBlockVersioned = function(arrayBuffer, bytesReaded, readWriter) 
 {
@@ -285,11 +287,19 @@ BlocksList.prototype.stepOverBlockVersioned = function(arrayBuffer, bytesReaded,
 	var sizeLevels;
 	//var startBuff, endBuff;
 	
+	/**
+	 * Spec document Table 3-1
+	 * vboCount
+	 */
 	var vboDatasCount = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 	bytesReaded += 4;
 	for ( var j = 0; j < vboDatasCount; j++ ) 
 	{
 		// 1) Positions array.
+		/**
+		 * Spec document Table 3-2
+		 * vertexCount
+		 */
 		vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);bytesReaded += 4;
 		verticesFloatValuesCount = vertexCount * 3;
 		startBuff = bytesReaded;
@@ -297,11 +307,19 @@ BlocksList.prototype.stepOverBlockVersioned = function(arrayBuffer, bytesReaded,
 		bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
 
 		// 2) Normals.
+		/**
+		 * Spec document Table 3-2
+		 * normalCount
+		 */
 		vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);bytesReaded += 4;
 		normalByteValuesCount = vertexCount * 3;
 		bytesReaded = bytesReaded + 1 * normalByteValuesCount; // updating data.***
 
 		// 3) Indices.
+		/**
+		 * Spec document Table 3-2
+		 * indexCount
+		 */
 		shortIndicesValuesCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);bytesReaded += 4;
 		sizeLevels = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1);bytesReaded += 1;
 		bytesReaded = bytesReaded + sizeLevels * 4;
@@ -314,11 +332,17 @@ BlocksList.prototype.stepOverBlockVersioned = function(arrayBuffer, bytesReaded,
 
 /**
  * 블록리스트 버퍼를 파싱(비대칭적)
+ * vboData 파싱 부분
+ * Spec document Table 3-1
  * This function parses the geometry data from binary arrayBuffer.
  * 
- * @param {arrayBuffer} arrayBuffer Binary data to parse.
- * @param {ReadWriter} readWriter Helper to read inside of the arrayBuffer.
- * @param {Array} motherBlocksArray Global blocks array.
+ * @param {ArrayBuffer} arrayBuffer Binary data to parse.
+ * @param {Number} bytesReaded 지금까지 읽은 바이트 길이
+ * @param {Block} block 정보를 담을 block.
+ * @param {ReaderWriter} readWriter
+ * @param {MagoManager} magoManager
+ * 
+ * @see VBOVertexIdxCacheKey#readPosNorIdx
  */
 BlocksList.prototype.parseBlockVersioned = function(arrayBuffer, bytesReaded, block, readWriter, magoManager) 
 {
@@ -350,7 +374,7 @@ BlocksList.prototype.parseBlockVersioned = function(arrayBuffer, bytesReaded, bl
  * This function parses the geometry data from binary arrayBuffer.
  * 
  * @param {ArrayBuffer} arrayBuffer Binary data to parse.
- * @param {ReadWriter} readWriter Helper to read inside of the arrayBuffer.
+ * @param {ReaderWriter} readWriter Helper to read inside of the arrayBuffer.
  * @param {Array.<Block>} motherBlocksArray Global blocks array.
  * @param {MagoManager} magoManager
  */
@@ -370,9 +394,15 @@ BlocksList.prototype.parseBlocksListVersioned_v001 = function(arrayBuffer, readW
 	//var version = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+versionLength)));
 	bytesReaded += versionLength;
 	
+	/**
+	 * modelCount
+	 */
 	var blocksCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4); bytesReaded += 4;
 	for ( var i = 0; i< blocksCount; i++ ) 
 	{
+		/**
+		 * modelIndex
+		 */
 		var blockIdx = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 		
 		// Check if block exist.
@@ -439,11 +469,12 @@ BlocksList.prototype.parseBlocksListVersioned_v001 = function(arrayBuffer, readW
 
 /**
  * 블록리스트 버퍼를 파싱(비대칭적)
- * This function parses the geometry data from binary arrayBuffer.
+ * F4D 버전이 0.0.2일 경우 사용
+ * 매개변수로 arrayBuffer 전달받지 않고 blocksArrayPartition에 있는 arrayBuffer를 이용.
  * 
- * @param {arrayBuffer} arrayBuffer Binary data to parse.
- * @param {ReadWriter} readWriter Helper to read inside of the arrayBuffer.
- * @param {Array} motherBlocksArray Global blocks array.
+ * @param {ReaderWriter} readWriter Helper to read inside of the arrayBuffer.
+ * @param {Array.<Block>} motherBlocksArray Global blocks array.
+ * @param {MagoManager} magoManager
  */
 BlocksList.prototype.parseBlocksListVersioned_v002 = function(readWriter, motherBlocksArray, magoManager) 
 {
@@ -553,10 +584,11 @@ BlocksList.prototype.parseBlocksListVersioned_v002 = function(readWriter, mother
 /**
  * 블록리스트 버퍼를 파싱(비대칭적)
  * This function parses the geometry data from binary arrayBuffer.
+ * @deprecated f4d 0.0.1 이전 버전에서 사용
  * 
- * @param {arrayBuffer} arrayBuffer Binary data to parse.
- * @param {ReadWriter} readWriter Helper to read inside of the arrayBuffer.
- * @param {Array} motherBlocksArray Global blocks array.
+ * @param {ArrayBuffer} arrayBuffer Binary data to parse.
+ * @param {ReaderWriter} readWriter Helper to read inside of the arrayBuffer.
+ * @param {Array.<Block>} motherBlocksArray Global blocks array.
  */
 BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherBlocksArray, magoManager) 
 {
@@ -656,6 +688,11 @@ BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherB
 };
 
 /**
+ * 블록리스트의 blocksArrayPartition정보를 할당 및 체크.
+ * F4D 버전이 0.0.2일 경우 사용
+ * 
+ * @param {MagoManager} magoManager
+ * @param {MagoManager} octreeOwner
  */
 BlocksList.prototype.prepareData = function(magoManager, octreeOwner) 
 {

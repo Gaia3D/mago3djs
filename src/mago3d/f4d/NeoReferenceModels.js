@@ -1,10 +1,17 @@
 'use strict';
 
 /**
+ * Reference 파일에 대한 객체
+ * lod1일 경우 model과 Reference파일을 참조.
+ * 
  * Geometry object. The real geometry data is a model, and this referenceObject has the model's index.
+ * @exception {Error} Messages.CONSTRUCT_ERROR
  * 
  * @class NeoReference
  * @constructor 
+ * 
+ * 아래 문서 1.4 Reference Folder 참조
+ * @link https://github.com/Gaia3D/F4DConverter/blob/master/doc/F4D_SpecificationV1.pdf
  */
 var NeoReference = function() 
 {
@@ -16,7 +23,7 @@ var NeoReference = function()
 	/**
 	 * The object's index on motherReferenceArray.
 	 * @type {Number}
-	 * @default undefined
+	 * @default 0
 	 */
 	this._id = 0;
 
@@ -188,7 +195,8 @@ NeoReference.prototype.getBlendAlpha = function(currTime)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * _originalMatrix4와 파라미터로 받은 matrix를 4차원 행렬의 곱셈을 계산한 결과를 _matrix4에 할당
+ * @param {Matrix4} matrix
  */
 NeoReference.prototype.multiplyTransformMatrix = function(matrix) 
 {
