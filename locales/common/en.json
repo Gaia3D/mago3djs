@@ -1,0 +1,45 @@
+{
+  "language": {
+    "title": "Language",
+    "english": "English",
+    "korean": "Korean"
+  },
+  "menu": {
+    "issue": {
+      "title": "Issue",
+      "tooltip": "Shows the latest 10 issues sorted chronologically from the entire Issue List."
+    },
+    "search": {
+      "title": "Search",
+      "tooltip": "Searching such as issue, object, and spatial information."
+    },
+    "api": {
+      "title": "API",
+      "tooltip": "APIs to control various functions of mago3D."
+    },
+    "regist": {
+      "title": "Regist",
+      "tooltip": "Issue registration for Object."
+    },
+    "tree": {
+      "title": "Tree",
+      "tooltip": "Display data hierarchy and Attributes by project."
+    },
+    "chart": {
+      "title": "Chart",
+      "tooltip": "Display statistical data by project."
+    },
+    "log": {
+      "title": "Log",
+      "tooltip": "Displays the data change log."
+    },
+    "attribute": {
+      "title": "Attribute",
+      "tooltip": "Supports data attribute retrieval."
+    },
+    "settings": {
+      "title": "Settings",
+      "tooltip": "Settings related to rendering."
+    }
+  }
+}

@@ -11,13 +11,12 @@ var VisibleObjectsController = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	// This object works with FrustumVolumeControl.***
-	this.currentVisibles0 = [];
-	this.currentVisibles1 = [];
-	this.currentVisibles2 = [];
-	this.currentVisibles3 = [];
+	this.currentVisibles0 = []; //frustum 0
+	this.currentVisibles1 = []; //frustum 1
+	this.currentVisibles2 = []; //frustum 2
+	this.currentVisibles3 = []; //frustum 3
 	this.currentVisiblesAux = [];
 };
-
 VisibleObjectsController.prototype.initArrays = function() 
 {
 	this.currentVisibles0 = [];
@@ -26,6 +25,7 @@ VisibleObjectsController.prototype.initArrays = function()
 	this.currentVisibles3 = [];
 	this.currentVisiblesAux = [];
 };
+/**Clear all of the volumn's data */
 
 VisibleObjectsController.prototype.clear = function() 
 {
@@ -37,6 +37,7 @@ VisibleObjectsController.prototype.clear = function()
 };
 
 /**
+ * Make all volumns visible
  */
 VisibleObjectsController.prototype.getAllVisibles = function() 
 {
@@ -45,6 +46,7 @@ VisibleObjectsController.prototype.getAllVisibles = function()
 };
 
 /**
+ * Make two volumns : 0, 1
  */
 VisibleObjectsController.prototype.get01Visibles = function() 
 {
@@ -53,6 +55,7 @@ VisibleObjectsController.prototype.get01Visibles = function()
 };
 
 /**
+ * 
  */
 VisibleObjectsController.prototype.getObjectIdxSortedByDist = function(objectsArray, startIdx, endIdx, object) 
 {
@@ -104,6 +107,9 @@ VisibleObjectsController.prototype.getObjectIdxSortedByDist = function(objectsAr
 };
 
 /**
+ * Put the object by distance from camera
+ * @param {VisibleObjectsController}objectsArray
+ * @param {Octree}object 
  */
 VisibleObjectsController.prototype.putObjectToArraySortedByDist = function(objectsArray, object) 
 {
@@ -123,6 +129,11 @@ VisibleObjectsController.prototype.putObjectToArraySortedByDist = function(objec
 };
 
 /**
+ * Get the index of the node which is in nodesArray
+ * @param nodesArray
+ * @param {Number} startIdx
+ * @param {Number} endIdx
+ * @param node
  */
 VisibleObjectsController.prototype.getNodeIdxSortedByDist = function(nodesArray, startIdx, endIdx, node) 
 {
@@ -176,6 +187,9 @@ VisibleObjectsController.prototype.getNodeIdxSortedByDist = function(nodesArray,
 };
 
 /**
+ * Put the node to given node array
+ * @param nodesArray
+ * @param node
  */
 VisibleObjectsController.prototype.putNodeToArraySortedByDist = function(nodesArray, node) 
 {
