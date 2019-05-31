@@ -20,6 +20,10 @@ ColorAPI.changeColor = function(api, magoManager)
 		propertyKey = properties[0];
 		propertyValue = properties[1];
 	}
+	var colorString = api.getColor();
+	if (colorString === undefined || colorString === 0)
+	{ return; }
+	
 	var color = api.getColor().split(",");
 	var rgbColor = [ color[0]/255, color[1]/255, color[2]/255 ] ;
 	
