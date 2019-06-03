@@ -1,85 +1,6 @@
 'use strict';
 
 /**
- * 블럭 모델
- * @class Block
- */
-var Block = function() 
-{
-	if (!(this instanceof Block)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-
-	// This has "VertexIdxVBOArraysContainer" because the "indices" cannot to be greater than 65000, because indices are short type.
-	this.vBOVertexIdxCacheKeysContainer = new VBOVertexIdxCacheKeysContainer(); // Change this for "vbo_VertexIdx_CacheKeys_Container__idx".
-	this.mIFCEntityType = -1;
-	this.isSmallObj = false;
-	this.radius = 10;
-	this.vertexCount = 0; // only for test. delete this.
-
-	this.lego; // legoBlock.
-};
-
-/**
- * 블럭이 가지는 데이터 삭제
- * @returns block
- */
-Block.prototype.deleteObjects = function(gl, vboMemManager) 
-{
-
-	this.vBOVertexIdxCacheKeysContainer.deleteGlObjects(gl, vboMemManager);
-	this.vBOVertexIdxCacheKeysContainer = undefined;
-	this.mIFCEntityType = undefined;
-	this.isSmallObj = undefined;
-	this.radius = undefined;
-	this.vertexCount = undefined; // only for test. delete this.
-
-	if (this.lego) { this.lego.deleteGlObjects(gl); }
-
-	this.lego = undefined;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param 
-  * @returns {boolean} returns if the Block is ready to render.
- */
-Block.prototype.isReadyToRender = function(neoReference, magoManager, maxSizeToRender) 
-{
-	if (maxSizeToRender && (this.radius < maxSizeToRender))
-	{ return false; }
-	
-	if (magoManager.isCameraMoving && this.radius < magoManager.smallObjectSize && magoManager.objectSelected !== neoReference)
-	{ return false; }
-
-	return true;
-};
-
-//*
-//*
-
-/**
- * 블록 목록
- * @class BlocksList
- */
-var BlocksArrayPartition = function(version) 
-{
-	if (!(this instanceof BlocksArrayPartition)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-
-	// 0 = no started to load. 1 = started loading. 2 = finished loading. 3 = parse started. 4 = parse finished.
-	this.fileLoadState = CODE.fileLoadState.READY;
-	this.dataArraybuffer; // file loaded data, that is no parsed yet.
-
-};
-
-//*
-//*
-
-/**
  * 블록 목록
  * @class BlocksList
  */
@@ -95,7 +16,7 @@ var BlocksList = function(version)
 	this.version;
 	this.blocksArray;
 	// 0 = no started to load. 1 = started loading. 2 = finished loading. 3 = parse started. 4 = parse finished.
-	this.fileLoadState = CODE.fileLoadState.READY;
+	this.fileLoadState = Code.fileLoadState.READY;
 	this.dataArraybuffer; // file loaded data, that is no parsed yet.
 	this.xhr; // file request.
 	
@@ -264,7 +185,7 @@ BlocksList.prototype.parseBlockVersioned = function(arrayBuffer, bytesReaded, bl
  */
 BlocksList.prototype.parseBlocksListVersioned_v001 = function(arrayBuffer, readWriter, motherBlocksArray, magoManager) 
 {
-	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
+	this.fileLoadState = Code.fileLoadState.PARSE_STARTED;
 	var bytesReaded = 0;
 	var startBuff, endBuff;
 	var posByteSize, norByteSize, idxByteSize;
@@ -341,7 +262,7 @@ BlocksList.prototype.parseBlocksListVersioned_v001 = function(arrayBuffer, readW
 		}
 
 	}
-	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
+	this.fileLoadState = Code.fileLoadState.PARSE_FINISHED;
 	return succesfullyGpuDataBinded;
 };
 
@@ -358,11 +279,11 @@ BlocksList.prototype.parseBlocksListVersioned_v002 = function(readWriter, mother
 	// 1rst, find the blocksArrayPartition to parse.
 	var blocksArrayPartitionsCount = this.blocksArrayPartitionsArray.length;
 	var blocksArrayPartition = this.blocksArrayPartitionsArray[blocksArrayPartitionsCount-1];
-	if (blocksArrayPartition.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
+	if (blocksArrayPartition.fileLoadState !== Code.fileLoadState.LOADING_FINISHED)
 	{ return; }
 	
 	var arrayBuffer = blocksArrayPartition.dataArraybuffer;
-	blocksArrayPartition.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
+	blocksArrayPartition.fileLoadState = Code.fileLoadState.PARSE_STARTED;
 	var bytesReaded = 0;
 	var startBuff, endBuff;
 	var posByteSize, norByteSize, idxByteSize;
@@ -452,8 +373,8 @@ BlocksList.prototype.parseBlocksListVersioned_v002 = function(readWriter, mother
 		//}
 
 	}
-	blocksArrayPartition.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
-	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED; // test.
+	blocksArrayPartition.fileLoadState = Code.fileLoadState.PARSE_FINISHED;
+	this.fileLoadState = Code.fileLoadState.PARSE_FINISHED; // test.
 	return succesfullyGpuDataBinded;
 };
 
@@ -468,7 +389,7 @@ BlocksList.prototype.parseBlocksListVersioned_v002 = function(readWriter, mother
  */
 BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherBlocksArray, magoManager) 
 {
-	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
+	this.fileLoadState = Code.fileLoadState.PARSE_STARTED;
 	var bytesReaded = 0;
 	var blocksCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4); bytesReaded += 4;
 	
@@ -559,7 +480,7 @@ BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherB
 
 		// Pendent to load the block's lego.
 	}
-	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
+	this.fileLoadState = Code.fileLoadState.PARSE_FINISHED;
 	return succesfullyGpuDataBinded;
 };
 
@@ -592,7 +513,7 @@ BlocksList.prototype.prepareData = function(magoManager, octreeOwner)
 		{
 			// Check the last partition.
 			var lastBlocksArrayPartition = this.blocksArrayPartitionsArray[currPartitionsCount-1];
-			if (lastBlocksArrayPartition.fileLoadState === CODE.fileLoadState.PARSE_FINISHED)
+			if (lastBlocksArrayPartition.fileLoadState === Code.fileLoadState.PARSE_FINISHED)
 			{
 				if (currPartitionsCount < this.blocksArrayPartitionsCount)
 				{
