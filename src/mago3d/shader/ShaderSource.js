@@ -401,7 +401,7 @@ void main() {\n\
 ";
 ShaderSource.draw_vert3D = "precision mediump float;\n\
 \n\
-	// This shader draws windParticles in 3d directly from positions on u_particles image.\n\
+	// This shader draws windParticles in 3d directly from positions on u_particles image.***\n\
 attribute float a_index;\n\
 \n\
 uniform sampler2D u_particles;\n\
@@ -452,14 +452,14 @@ void main() {\n\
     gl_PointSize = 1.0;\n\
     vec4 pos2d = vec4(2.0 * v_particle_pos.x - 1.0, 1.0 - 2.0 * v_particle_pos.y, 0, 1);\n\
 	\n\
-	// Now, must calculate geographic coords of the pos2d.\n\
+	// Now, must calculate geographic coords of the pos2d.***\n\
 	float longitudeDeg = -180.0 + pos2d.x * 360.0;\n\
 	float latitudeDeg = 90.0 - pos2d.y * 180.0;\n\
 	float altitude = 0.0;\n\
-	// Now, calculate worldPosition of the geographicCoords (lon, lat, alt).\n\
+	// Now, calculate worldPosition of the geographicCoords (lon, lat, alt).***\n\
 	vec4 worldPos = geographicToWorldCoord(longitudeDeg, latitudeDeg, altitude);\n\
 	\n\
-	// Now calculate the position on camCoord.\n\
+	// Now calculate the position on camCoord.***\n\
 	\n\
 	gl_Position = ModelViewProjectionMatrix * worldPos;\n\
 }";
@@ -857,7 +857,7 @@ void main()\n\
 		occlusion = 1.0;\n\
 	}\n\
 \n\
-    // Do specular lighting.\n\
+    // Do specular lighting.***\n\
 	float lambertian;\n\
 	float specular;\n\
 		\n\
@@ -1099,13 +1099,13 @@ void main()\n\
 	float z_b = gl_Position.z/gl_Position.w;\n\
 	float z_n = 2.0 * z_b - 1.0;\n\
     float z_e = 2.0 * near * far / (far + near - z_n * (far - near));\n\
-	gl_PointSize = 1.0 + 40.0/z_e; // Original.\n\
+	gl_PointSize = 1.0 + 40.0/z_e; // Original.***\n\
 	if(gl_PointSize > 10.0)\n\
 		gl_PointSize = 10.0;\n\
 	if(gl_PointSize < 2.0)\n\
 		gl_PointSize = 2.0;\n\
 		\n\
-	depth = (modelViewMatrixRelToEye * pos).z/far; // original.\n\
+	depth = (modelViewMatrixRelToEye * pos).z/far; // original.***\n\
 }";
 ShaderSource.PointCloudFS = "	precision lowp float;\n\
 	varying vec4 vColor;\n\
@@ -1267,7 +1267,7 @@ void main()\n\
 	float z_b = gl_Position.z/gl_Position.w;\n\
 	float z_n = 2.0 * z_b - 1.0;\n\
     float z_e = 2.0 * near * far / (far + near - z_n * (far - near));\n\
-	gl_PointSize = 1.0 + 40.0/z_e; // Original.\n\
+	gl_PointSize = 1.0 + 40.0/z_e; // Original.***\n\
 	if(gl_PointSize > 10.0)\n\
 		gl_PointSize = 10.0;\n\
 	if(gl_PointSize < 2.0)\n\
@@ -1349,7 +1349,7 @@ void main()\n\
     vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
     \n\
     //linear depth in camera space (0..far)\n\
-    depth = (modelViewMatrixRelToEye * pos4).z/far; // original.\n\
+    depth = (modelViewMatrixRelToEye * pos4).z/far; // original.***\n\
 \n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 	gl_PointSize = 2.0;\n\
@@ -2060,7 +2060,7 @@ varying vec3 vPosObjectCoord;\n\
 varying vec3 vPosCameraCoord;\n\
 varying vec3 vPosWorldCoord;\n\
 \n\
-// Render a fullScreen quad (2 triangles).\n\
+// Render a fullScreen quad (2 triangles).***\n\
 void main()\n\
 {\n\
 	vec4 rotatedPos = buildingRotMatrix * vec4(position.xyz + aditionalPosition.xyz, 1.0);\n\
@@ -2092,7 +2092,7 @@ uniform float far;\n\
 uniform float fovyRad;\n\
 uniform float tanHalfFovy;\n\
 \n\
-// volume tex definition.\n\
+// volume tex definition.***\n\
 uniform int texNumCols;\n\
 uniform int texNumRows;\n\
 uniform int texNumSlices;\n\
@@ -2137,7 +2137,7 @@ void intersectionLineSphere(float radius, vec3 rayPos, vec3 rayDir, out int inte
 	// line:\n\
 	vec3 p1 = rayPos;\n\
 	vec3 lineDir = rayDir;\n\
-	float dist = 1000.0;// any value is ok.\n\
+	float dist = 1000.0;// any value is ok.***\n\
 	vec3 p2 = vec3(p1.x + lineDir.x * dist, p1.y + lineDir.y * dist, p1.z + lineDir.z * dist);\n\
 	float x1 = p1.x;\n\
 	float y1 = p1.y;\n\
@@ -2171,12 +2171,12 @@ void intersectionLineSphere(float radius, vec3 rayPos, vec3 rayDir, out int inte
 	\n\
 	if (discriminant < 0.0)\n\
 	{\n\
-		// no intersection.\n\
+		// no intersection.***\n\
 		intersectType = 0;\n\
 	}\n\
 	else if (discriminant == 0.0)\n\
 	{\n\
-		// this is tangent.\n\
+		// this is tangent.***\n\
 		intersectType = 1;\n\
 		\n\
 		float t1 = (-b)/(2.0*a);\n\
@@ -2186,12 +2186,12 @@ void intersectionLineSphere(float radius, vec3 rayPos, vec3 rayDir, out int inte
 	{\n\
 		intersectType = 2;\n\
 		\n\
-		// find the nearest to p1.\n\
+		// find the nearest to p1.***\n\
 		float sqrtDiscriminant = sqrt(discriminant);\n\
 		float t1 = (-b + sqrtDiscriminant)/(2.0*a);\n\
 		float t2 = (-b - sqrtDiscriminant)/(2.0*a);\n\
 		\n\
-		// solution 1.\n\
+		// solution 1.***\n\
 		vec3 intersectPoint1 = vec3(x1 + (x2 - x1)*t1, y1 + (y2 - y1)*t1, z1 + (z2 - z1)*t1);\n\
 		vec3 intersectPoint2 = vec3(x1 + (x2 - x1)*t2, y1 + (y2 - y1)*t2, z1 + (z2 - z1)*t2);\n\
 		\n\
@@ -2239,26 +2239,26 @@ float atan2(float y, float x) \n\
 			return -M_PI/2.0;\n\
 		}\n\
 		else{\n\
-			return 0.0; // return undefined.\n\
+			return 0.0; // return undefined.***\n\
 		}\n\
 	}\n\
 }\n\
 \n\
 void cartesianToGeographicWgs84(vec3 point, out vec3 result) \n\
 {\n\
-	// From WebWorldWind.\n\
+	// From WebWorldWind.***\n\
 	// According to H. Vermeille, An analytical method to transform geocentric into geodetic coordinates\n\
 	// http://www.springerlink.com/content/3t6837t27t351227/fulltext.pdf\n\
 	\n\
 	float firstEccentricitySquared = 6.69437999014E-3;\n\
 	float equatorialRadius = 6378137.0;\n\
 \n\
-	// wwwind coord type.\n\
+	// wwwind coord type.***\n\
 	// X = point.z;\n\
 	// Y = point.x;\n\
 	// Z = point.y;\n\
 \n\
-	// magoWorld coord type.\n\
+	// magoWorld coord type.***\n\
 	float X = point.x;\n\
 	float Y = point.y;\n\
 	float Z = point.z;\n\
@@ -2360,7 +2360,7 @@ void cartesianToGeographicWgs84(vec3 point, out vec3 result) \n\
 	}\n\
 \n\
 	float factor = 180.0 / M_PI;\n\
-	result = vec3(factor * lambda, factor * phi, h); // (longitude, latitude, altitude).\n\
+	result = vec3(factor * lambda, factor * phi, h); // (longitude, latitude, altitude).***\n\
 }\n\
 \n\
 bool isPointRearCamera(vec3 point, vec3 camPos, vec3 camDir)\n\
@@ -2396,13 +2396,13 @@ float distPointToPlane(vec3 point, vec4 plane)\n\
 \n\
 bool getValue(vec3 geoLoc, out vec4 value)\n\
 {\n\
-	// geoLoc = (longitude, latitude, altitude).\n\
+	// geoLoc = (longitude, latitude, altitude).***\n\
 	float lon = geoLoc.x;\n\
 	float lat = geoLoc.y;\n\
 	float alt = geoLoc.z;\n\
 	\n\
-	// 1rst, check if geoLoc intersects the volume.\n\
-	// Note: minLon, maxLon, minLat, maxLat, minAlt & maxAlt are uniforms.\n\
+	// 1rst, check if geoLoc intersects the volume.***\n\
+	// Note: minLon, maxLon, minLat, maxLat, minAlt & maxAlt are uniforms.***\n\
 	if(lon < minLon || lon > maxLon)\n\
 		return false;\n\
 	else if(lat < minLat || lat > maxLat)\n\
@@ -2415,11 +2415,11 @@ bool getValue(vec3 geoLoc, out vec4 value)\n\
 	float altRange = maxAlt - minAlt;\n\
 	float col = (lon - minLon)/lonRange * float(slicesNumCols); \n\
 	float row = (lat - minLat)/latRange * float(slicesNumRows); \n\
-	float slice = (alt - minAlt)/altRange * float(texNumSlices); // slice if texture has only one stack.\n\
+	float slice = (alt - minAlt)/altRange * float(texNumSlices); // slice if texture has only one stack.***\n\
 	float sliceDown = floor(slice);\n\
 	float sliceUp = ceil(slice);\n\
 	float sliceDownDist = slice - sliceDown;\n\
-	//slice = 18.0; // test. force slice to nearest to ground.\n\
+	//slice = 18.0; // test. force slice to nearest to ground.***\n\
 	\n\
 	float stackDown = floor(sliceDown/float(numSlicesPerStacks));\n\
 	float realSliceDown = sliceDown - stackDown * float(numSlicesPerStacks);\n\
@@ -2449,7 +2449,7 @@ bool getValue(vec3 geoLoc, out vec4 value)\n\
 \n\
 void main() {\n\
 	vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
-	float linearDepth = 1.0; // the quad is 1m of dist of the camera.          \n\
+	float linearDepth = 1.0; // the quad is 1m of dist of the camera.***          \n\
     vec3 rayCamCoord = getViewRay(screenPos) * linearDepth;  \n\
 	rayCamCoord = normalize(rayCamCoord);\n\
 	\n\
@@ -2459,12 +2459,12 @@ void main() {\n\
 	vec3 camDirWorld = camTargetWorld.xyz - camPosWorld.xyz;\n\
 	camDirWorld = normalize(camDirWorld);\n\
 \n\
-	// now, must find sampling points.\n\
+	// now, must find sampling points.***\n\
 	int intersectType = 0;\n\
 	vec3 nearP;\n\
 	vec3 farP;\n\
-	float radius = 6378137.0 + maxAlt; // equatorial radius.\n\
-	//radius = 6250000.0 + maxAlt; // test radius.\n\
+	float radius = 6378137.0 + maxAlt; // equatorial radius.***\n\
+	//radius = 6250000.0 + maxAlt; // test radius.***\n\
 	\n\
 	intersectionLineSphere(radius, camPosWorld.xyz, camDirWorld, intersectType, nearP, farP);\n\
 	\n\
@@ -2475,11 +2475,11 @@ void main() {\n\
 		\n\
 	if(intersectType == 1)\n\
 	{\n\
-		// provisionally discard.\n\
+		// provisionally discard.***\n\
 		discard;	\n\
 	}\n\
 	\n\
-	// check if nearP is rear of the camera.\n\
+	// check if nearP is rear of the camera.***\n\
 	if(isPointRearCamera(nearP, camPosWorld.xyz, camDirWorld.xyz))\n\
 	{\n\
 		nearP = vec3(camPosWorld.xyz);\n\
@@ -2489,9 +2489,9 @@ void main() {\n\
 	if(dist > 1500000.0)\n\
 		testDist = 1500000.0;\n\
 	\n\
-	// now calculate the geographicCoords of 2 points.\n\
-	// now, depending the dist(nearP, endPoint), determine numSmples.\n\
-	// provisionally take 16 samples.\n\
+	// now calculate the geographicCoords of 2 points.***\n\
+	// now, depending the dist(nearP, endPoint), determine numSmples.***\n\
+	// provisionally take 16 samples.***\n\
 	float numSamples = 512.0;\n\
 	vec4 color = vec4(0.0, 0.0, 0.0, 0.0);\n\
 	float alpha = 0.8/numSamples;\n\
@@ -2507,7 +2507,7 @@ void main() {\n\
 	{\n\
 		vec3 currGeoLoc;\n\
 		vec3 currPosWorld = vec3(nearP.x + camDirWorld.x * increDist*float(c), nearP.y + camDirWorld.y * increDist*float(c), nearP.z + camDirWorld.z * increDist*float(c));\n\
-		// Check if the currPosWorld is in front or rear of planes (if exist planes).\n\
+		// Check if the currPosWorld is in front or rear of planes (if exist planes).***\n\
 		int planesCounter = 0;\n\
 		for(int j=0; j<6; j++)\n\
 		{\n\
