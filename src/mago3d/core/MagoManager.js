@@ -804,6 +804,11 @@ MagoManager.prototype.load_testTextures = function()
  */
 MagoManager.prototype.getCurrentTime = function() 
 {
+	if (this.currTime === undefined) 
+	{
+		this.dateSC = new Date();
+		this.currTime = this.dateSC.getTime();
+	}
 	return this.currTime;
 };
 
@@ -933,6 +938,7 @@ MagoManager.prototype.managePickingProcess = function()
 			// this is the closest frustum.***
 			this.bPicking = false;
 			this.arrayAuxSC.length = 0;
+			this.selectionManager.clearCurrents();
 			this.objectSelected = this.getSelectedObjects(gl, this.mouse_x, this.mouse_y, this.arrayAuxSC);
 			this.buildingSelected = this.arrayAuxSC[0];
 			this.octreeSelected = this.arrayAuxSC[1];
@@ -1165,7 +1171,6 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	//this.renderFilter();
 };
 
-
 /**
  * Main loop function. This function contains all Mago3D Pipe-Line.
  * @param {boolean} isLastFrustum Indicates if this is the last frustum in the render pipe-line.
@@ -1177,15 +1182,6 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 	// Update the current frame's frustums count.
 	this.numFrustums = numFrustums;
 	this.isLastFrustum = isLastFrustum;
-	
-	if (frustumIdx === 0)
-	{ var hola = 0; }
-	else if (frustumIdx === 1)
-	{ var hola = 0; }
-	else if (frustumIdx === 2)
-	{ var hola = 0; }
-	else if (frustumIdx === 3)
-	{ var hola = 0; }
 
 	var gl = this.getGl();
 	this.upDateSceneStateMatrices(this.sceneState);
@@ -1195,8 +1191,11 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 		this.dateSC = new Date();
 		this.currTime = this.dateSC.getTime();
 		
-		//테스트코드 주석처리.
-		//this.load_testTextures(); 
+		//test code delelte
+		//this.load_testTextures();
+		// Before of multiFrustumCullingSmartTile, do animation check, bcos during animation some object can change smartTile-owner.***
+		if (this.animationManager !== undefined)
+		{ this.animationManager.checkAnimation(this); }
 
 		if (this.myCameraSCX === undefined) 
 		{ this.myCameraSCX = new Camera(); }
@@ -1209,9 +1208,6 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 		
 		gl.clearStencil(0); // provisionally here.***
 		gl.clear(gl.STENCIL_BUFFER_BIT);
-		
-		if (this.animationManager !== undefined)
-		{ this.animationManager.checkAnimation(this); }
 
 		// If mago camera has track node, camera look track node.
 		this.sceneState.camera.doTrack(this);
@@ -1241,19 +1237,9 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 		this.prepareNeoBuildingsAsimetricVersion(gl, visibleNodes); 
 
 	}
-	
 
 	var currentShader = undefined;
 	this.visibleObjControlerNodes = visibleNodes; // set the current visible nodes.***
-	
-	if (frustumIdx === 0)
-	{ var hola = 0; }
-	else if (frustumIdx === 1)
-	{ var hola = 0; }
-	else if (frustumIdx === 2)
-	{ var hola = 0; }
-	else if (frustumIdx === 3)
-	{ var hola = 0; }
 
 	// prepare data if camera is no moving.***
 	if (!this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
@@ -1261,7 +1247,6 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 		this.loadAndPrepareData();
 		this.managePickingProcess();
 	}
-	
 	
 	if (this.bPicking === true && isLastFrustum)
 	{
@@ -1292,13 +1277,10 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 			ManagerUtils.calculateGeoLocationDataByAbsolutePoint(pixelPos.x, pixelPos.y, pixelPos.z, this.objMarkerSC.geoLocationData, this);
 		}
 	}
-	
-	
 	// lightDepthRender: TODO.***
 
 	// Render process.***
 	this.doRender(frustumVolumenObject);
-	
 	
 	// test. Draw the buildingNames.***
 	if (this.magoPolicy.getShowLabelInfo())
@@ -1326,10 +1308,6 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 	for (var i=0; i<lowLodNodesCount; i++) 
 	{
 		node = lowLodNodesArray[i];
-		
-		// debug.***
-		if (node.data.attributes.isReference !== undefined)
-		{ var hola = 0; }
 		
 		neoBuilding = node.data.neoBuilding;
 		
@@ -1675,7 +1653,7 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, resultSe
 	gl.readPixels(pixelX, pixelY, mosaicWidth, mosaicHeight, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null); // unbind framebuffer.***
 	
-	this.selectionManager.clearCurrents();
+	//this.selectionManager.clearCurrents();
 
 	// now, select the object.***
 	// The center pixel of the selection is 12, 13, 14.***
@@ -1971,8 +1949,8 @@ MagoManager.prototype.keyDown = function(key)
 		var dataKey = "AutonomousBus_0";
 			
 		// Do a test.***
-		var projectId = "3ds.json";
-		var dataKey = "GyeomjaeJeongSeon_del";
+		//var projectId = "3ds.json";
+		//var dataKey = "GyeomjaeJeongSeon_del";
 		
 		var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
 		node.data.isTrailRender = true; // test.***
@@ -1985,16 +1963,19 @@ MagoManager.prototype.keyDown = function(key)
 		var currAlt = geoCoords.altitude;
 
 		// Move a little.***
-		var latitude = currLat + 0.0002 * 10*(Math.random()*2-1);
-		var longitude = currLon + 0.0002 * 10*(Math.random()*2-1);
+		var latitude = currLat + 0.001 * 10*(Math.random()*2-1);
+		var longitude = currLon + 0.001 * 10*(Math.random()*2-1);
 		var elevation = currAlt + 10.0 * 10*(Math.random()*2-1);
+		
+		latitude = currLat + 0.01;
+		longitude = currLon + 0.01;
 		elevation = currAlt;
 		
 		
 		var heading;
 		var pitch;
 		var roll;
-		var durationTimeInSeconds = 10;
+		var durationTimeInSeconds = 100;
 		this.changeLocationAndRotation(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll, durationTimeInSeconds);
 	}
 	else if (key === 84) // 84 = 't'.***
@@ -3615,15 +3596,6 @@ MagoManager.prototype.renderGeometry = function(gl, cameraPosition, shader, rend
 			gl.enableVertexAttribArray(currentShader.normal3_loc);
 			if (currentShader.color4_loc !== -1){ gl.disableVertexAttribArray(currentShader.color4_loc); }
 			
-			if (this.currentFrustumIdx === 0)
-			{ var hola = 0; }
-			else if (this.currentFrustumIdx === 1)
-			{ var hola = 0; }
-			else if (this.currentFrustumIdx === 2)
-			{ var hola = 0; }
-			else if (this.currentFrustumIdx === 3)
-			{ var hola = 0; }
-			
 			currentShader.bindUniformGenerals();
 			gl.uniform1f(currentShader.externalAlpha_loc, 1.0);
 			gl.uniform1i(currentShader.textureFlipYAxis_loc, this.sceneState.textureFlipYAxis);
@@ -4900,8 +4872,6 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 				}
 				neoBuilding = node.data.neoBuilding;
 				
-				
-				
 				if (neoBuilding === undefined)
 				{
 					// This node is a reference node.***
@@ -4918,10 +4888,6 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 				data.currentLod;
 				data.distToCam = distToCamera;
 				
-				
-				
-				if (node.data.nodeId === "GyeomjaeJeongSeon_del")
-				{ var hola = 0; }
 				
 				if (data.distToCam < lod0Dist)
 				{ data.currentLod = 0; }

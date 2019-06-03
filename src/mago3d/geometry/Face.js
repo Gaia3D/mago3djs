@@ -44,8 +44,8 @@ var Face = function()
 
 /**
  * delete all member.
- * Note: "Face" is NO-Owner of vertices, so, don't delete vertices. Only set as "undefined".***
- * Note: "Face" is NO-Owner of hEdge, so, don't delete hEdge. Only set as "undefined".***
+ * Note: "Face" is NO-Owner of vertices, so, don't delete vertices. Only set as "undefined".
+ * Note: "Face" is NO-Owner of hEdge, so, don't delete hEdge. Only set as "undefined".
  */
 Face.prototype.deleteObjects = function()
 {
@@ -159,7 +159,7 @@ Face.prototype.getPlaneNormal = function()
  */
 Face.calculatePlaneNormal = function(vertexArray, resultPlaneNormal)
 {
-	// Note: the vertexArray must be planar.***
+	// Note: the vertexArray must be planar.
 	if (resultPlaneNormal === undefined)
 	{ resultPlaneNormal = new Point3D(); }
 
@@ -184,7 +184,7 @@ Face.calculatePlaneNormal = function(vertexArray, resultPlaneNormal)
 	
 		var scalarProd = startVec.scalarProduct(endVec);
 		
-		var cosAlfa = scalarProd; // Bcos startVec & endVec are unitaries.***
+		var cosAlfa = scalarProd; // Bcos startVec & endVec are unitaries.
 		if (cosAlfa > 1.0)
 		{ cosAlfa = 1.0; }
 		else if (cosAlfa < -1.0)
@@ -206,7 +206,7 @@ Face.calculatePlaneNormal = function(vertexArray, resultPlaneNormal)
  */
 Face.prototype.calculatePlaneNormal = function()
 {
-	// Note: face must be planar.***
+	// Note: face must be planar.
 	this.planeNormal = Face.calculatePlaneNormal(this.vertexArray, this.planeNormal);
 	return this.planeNormal;
 };
@@ -219,8 +219,8 @@ Face.prototype.calculatePlaneNormal = function()
  */
 Face.prototype.calculateVerticesNormals = function(bForceRecalculatePlaneNormal)
 {
-	// This function calculates normals for concave faces.***
-	// Provisionally calculate the plane normal and assign to the vertices.***
+	// This function calculates normals for concave faces.
+	// Provisionally calculate the plane normal and assign to the vertices.
 	var verticesCount = this.vertexArray.length;
 
 	if (bForceRecalculatePlaneNormal !== undefined && bForceRecalculatePlaneNormal)
@@ -242,16 +242,16 @@ Face.prototype.calculateVerticesNormals = function(bForceRecalculatePlaneNormal)
 
 /**
  * 시작점과 끝점이 매우 가까울 경우 (거의 같은, 0.1mm보다 가까울때.) 끝점을 삭제.
- * "Uroborus" is an archaic motif of a snake biting its own tail.***
+ * "Uroborus" is an archaic motif of a snake biting its own tail.
  * "Uroborus"는 뱀이 자기 꼬리 먹고 있는 모양.
- * This function checks if the 1rst vertex & the last vertex are coincident. If are coincident then remove last one.***
+ * This function checks if the 1rst vertex & the last vertex are coincident. If are coincident then remove last one.
  * 
  * @see Point3D#isCoincidentToPoint
  */
 Face.prototype.solveUroborus = function()
 {
-	// "Uroborus" is an archaic motif of a snake biting its own tail.***
-	// This function checks if the 1rst vertex & the last vertex are coincident. If are coincident then remove last one.***
+	// "Uroborus" is an archaic motif of a snake biting its own tail.
+	// This function checks if the 1rst vertex & the last vertex are coincident. If are coincident then remove last one.
 	var verticesCount = this.getVerticesCount();
 	if (verticesCount < 3)
 	{ return; }
@@ -261,11 +261,11 @@ Face.prototype.solveUroborus = function()
 	
 	var pos_str = vertex_str.point3d;
 	var pos_end = vertex_end.point3d;
-	var distError = 0.0001; // 0.1mm of error.***
+	var distError = 0.0001; // 0.1mm of error.
 	
 	if (pos_str.isCoincidentToPoint(pos_end, distError))
 	{
-		// remove the last vertex.***
+		// remove the last vertex.
 		this.vertexArray.pop();
 	}
 };
@@ -310,7 +310,7 @@ Face.getBestFacePlaneToProject = function(normal)
  */
 Face.getProjectedPolygon2D = function(vertexArray, normal, resultProjectedPolygon2d)
 {
-	// Create a temp polygon2d.***
+	// Create a temp polygon2d.
 	if (resultProjectedPolygon2d === undefined)
 	{ resultProjectedPolygon2d = new Polygon2D(); }
 	
@@ -337,28 +337,28 @@ Face.prototype.getTessellatedTriangles = function(resultTrianglesArray)
 	var verticesCount = this.getVerticesCount();
 	if (verticesCount <= 3)
 	{
-		// This is a triangle, so no need to tessellate.***
+		// This is a triangle, so no need to tessellate.
 		resultTrianglesArray = this.getTrianglesConvex(resultTrianglesArray);
 		return resultTrianglesArray;
 	}
 
-	// 1rst, must project the face to a plane and process to tessellate in 2d.***
+	// 1rst, must project the face to a plane and process to tessellate in 2d.
 	var normal = this.getPlaneNormal();
 	
 	var bestPlaneToProject = Face.getBestFacePlaneToProject(normal);
 	
-	// Create a temp polygon2d.***
+	// Create a temp polygon2d.
 	var polygon2d = Face.getProjectedPolygon2D(this.vertexArray, normal, undefined);
 	
-	// Now, tessellate the polygon2D.***
-	// Before tessellate, we must know if there are concavePoints.***
+	// Now, tessellate the polygon2D.
+	// Before tessellate, we must know if there are concavePoints.
 	var resultConcavePointsIdxArray;
 	resultConcavePointsIdxArray = polygon2d.calculateNormal(resultConcavePointsIdxArray);
 	
 	var convexPolygonsArray = [];
 	polygon2d.tessellate(resultConcavePointsIdxArray, convexPolygonsArray);
 	
-	// inside of "convexPolygonsArray" there are 1 or more convexPolygons result of tessellation of the polygon2d.***
+	// inside of "convexPolygonsArray" there are 1 or more convexPolygons result of tessellation of the polygon2d.
 
 	this.calculateVerticesNormals();
 	var convexPolygonsCount = convexPolygonsArray.length;
@@ -398,7 +398,7 @@ Face.prototype.getTessellatedTriangles = function(resultTrianglesArray)
  */
 Face.prototype.getTrianglesConvex = function(resultTrianglesArray)
 {
-	// To call this method, the face MUST be convex.***
+	// To call this method, the face MUST be convex.
 	if (this.vertexArray === undefined || this.vertexArray.length === 0)
 	{ return resultTrianglesArray; }
 	
@@ -536,7 +536,7 @@ Face.prototype.createHalfEdges = function(resultHalfEdgesArray)
 	var hedge;
 	var verticesCount = this.getVerticesCount();
 	
-	// 1rst, create the half edges.***
+	// 1rst, create the half edges.
 	for (var i=0; i<verticesCount; i++)
 	{
 		vertex = this.getVertex(i);
@@ -546,7 +546,7 @@ Face.prototype.createHalfEdges = function(resultHalfEdgesArray)
 		resultHalfEdgesArray.push(hedge);
 	}
 	
-	// now, for all half edges, set the nextHalfEdge.***
+	// now, for all half edges, set the nextHalfEdge.
 	var nextHedge;
 	var nextIdx;
 	for (var i=0; i<verticesCount; i++)
@@ -557,7 +557,7 @@ Face.prototype.createHalfEdges = function(resultHalfEdgesArray)
 		hedge.setNext(nextHedge);
 	}
 	
-	// set a hedge for this face.***
+	// set a hedge for this face.
 	this.hEdge = resultHalfEdgesArray[0];
 	
 	return resultHalfEdgesArray;

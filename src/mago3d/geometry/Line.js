@@ -34,7 +34,7 @@ var Line = function(point, direction)
  */
 Line.prototype.setPointAndDir = function(px, py, pz, dx, dy, dz) 
 {
-	// Note: dx, dy, dz must be unitary.***
+	// Note: dx, dy, dz must be unitary.
 	this.point.set(px, py, pz);
 	this.direction.set(dx, dy, dz);
 	this.direction.unitary();

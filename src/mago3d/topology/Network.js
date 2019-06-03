@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * Network.***
+ * Network.
  * 
  * @alias Network
  * @class Network
@@ -17,14 +17,14 @@ var Network = function(owner)
 	if (owner)
 	{ this.nodeOwner = owner; }
 	
-	this.id; // network id.***
+	this.id; // network id.
 	this.nodesArray;
 	this.edgesArray;
 	this.spacesArray;
 	
 	this.attributes;
-	this.edgesVboKeysContainer; // to draw edges with an unique vbo.***
-	this.nodesVboKeysContainer; // to draw nodes with an unique vbo.***
+	this.edgesVboKeysContainer; // to draw edges with an unique vbo.
+	this.nodesVboKeysContainer; // to draw nodes with an unique vbo.
 	
 	this.renderSpaces = true;
 	this.spacesAlpha = 0.2;
@@ -74,8 +74,8 @@ Network.prototype.newSpace = function()
  */
 Network.prototype.test__makeVbos = function(magoManager)
 {
-	// Here makes meshes and vbos.***
-	// For edges, make an unique vbo for faster rendering.***
+	// Here makes meshes and vbos.
+	// For edges, make an unique vbo for faster rendering.
 	var edgesCount = 0;
 	if (this.edgesArray)
 	{ edgesCount = this.edgesArray.length; }
@@ -125,8 +125,8 @@ Network.prototype.parseTopologyData = function(magoManager, gmlDataContainer)
 	// gmlDataContainer.cellSpaceMembers
 	// gmlDataContainer.edges
 	// gmlDataContainer.nodes
-	// cityGML Lower point (78.02094, -82.801873, 18).***
-	// cityGML Upper point (152.17466, 19.03087, 39).***
+	// cityGML Lower point (78.02094, -82.801873, 18).
+	// cityGML Upper point (152.17466, 19.03087, 39).
 	// cityGML Center point {x=115.09780549999999 y=-31.885501999999999 z=28.500000000000000 ...}
 	
 	var bbox = new BoundingBox();
@@ -146,7 +146,7 @@ Network.prototype.parseTopologyData = function(magoManager, gmlDataContainer)
 	
 	var offsetVector = new Point3D();
 	var zOffset = 0.1;
-	offsetVector.set(-115.0978055, 31.885502, -28.5); // cityGML ORIGINAL Center point inversed.***
+	offsetVector.set(-115.0978055, 31.885502, -28.5); // cityGML ORIGINAL Center point inversed.
 	
 	var nodesMap = {};
 	var nodesCount = gmlDataContainer.nodes.length;
@@ -157,8 +157,8 @@ Network.prototype.parseTopologyData = function(magoManager, gmlDataContainer)
 		networkNode.id = "#" + node.id;
 		
 		networkNode.position = new Point3D(node.coordinates[0], node.coordinates[1], node.coordinates[2]);
-		networkNode.position.addPoint(offsetVector); // rest bbox centerPoint.***
-		networkNode.position.add(0.0, 0.0, zOffset); // aditional pos.***
+		networkNode.position.addPoint(offsetVector); // rest bbox centerPoint.
+		networkNode.position.add(0.0, 0.0, zOffset); // aditional pos.
 		networkNode.box = new Box(0.6, 0.6, 0.6);
 		
 		nodesMap[networkNode.id] = networkNode;
@@ -173,7 +173,7 @@ Network.prototype.parseTopologyData = function(magoManager, gmlDataContainer)
 		var id = cellSpace.href;
 		var networkSpace = this.newSpace();
 		var mesh = new Mesh();
-		networkSpace.mesh = mesh; // assign mesh to networkSpace provisionally.***
+		networkSpace.mesh = mesh; // assign mesh to networkSpace provisionally.
 		var vertexList = mesh.getVertexList();
 		
 		var surfacesMembersCount = cellSpace.surfaceMember.length;
@@ -197,11 +197,11 @@ Network.prototype.parseTopologyData = function(magoManager, gmlDataContainer)
 				
 				var vertex = vertexList.newVertex();
 				vertex.setPosition(x, y, z);
-				vertex.point3d.addPoint(offsetVector); // rest bbox centerPoint.***
+				vertex.point3d.addPoint(offsetVector); // rest bbox centerPoint.
 				face.addVertex(vertex);
 				
 			}
-			face.solveUroborus(); // Check & solve if the last point is coincident with the 1rst point.***
+			face.solveUroborus(); // Check & solve if the last point is coincident with the 1rst point.
 			face.calculateVerticesNormals();
 			var hola = 0;
 		}
@@ -221,12 +221,12 @@ Network.prototype.parseTopologyData = function(magoManager, gmlDataContainer)
 		var vertex2 = new Vertex();
 		vertex1.setPosition(point1[0], point1[1], point1[2]);
 		vertex2.setPosition(point2[0], point2[1], point2[2]);
-		vertex1.point3d.addPoint(offsetVector); // rest bbox centerPoint.***
-		vertex1.point3d.add(0.0, 0.0, zOffset); // aditional pos.***
-		vertex2.point3d.addPoint(offsetVector); // rest bbox centerPoint.***
-		vertex2.point3d.add(0.0, 0.0, zOffset); // aditional pos.***
+		vertex1.point3d.addPoint(offsetVector); // rest bbox centerPoint.
+		vertex1.point3d.add(0.0, 0.0, zOffset); // aditional pos.
+		vertex2.point3d.addPoint(offsetVector); // rest bbox centerPoint.
+		vertex2.point3d.add(0.0, 0.0, zOffset); // aditional pos.
 		var vtxSegment = new VtxSegment(vertex1, vertex2);
-		networkEdge.vtxSegment = vtxSegment; // assign vtxSegment to networkEdge provisionally.***
+		networkEdge.vtxSegment = vtxSegment; // assign vtxSegment to networkEdge provisionally.
 		
 		var connect_1_id = edge.connects[0];
 		var connect_2_id = edge.connects[1];
@@ -234,7 +234,7 @@ Network.prototype.parseTopologyData = function(magoManager, gmlDataContainer)
 		networkEdge.strNodeId = connect_1_id;
 		networkEdge.endNodeId = connect_2_id;
 		
-		// Test.***
+		// Test.
 		var cellSpace_1 = cellSpaceMap[connect_1_id];
 		var cellSpace_2 = cellSpaceMap[connect_2_id];
 		var hola = 0;
@@ -248,12 +248,12 @@ Network.prototype.parseTopologyData = function(magoManager, gmlDataContainer)
  */
 Network.prototype.renderColorCoding = function(magoManager, shader, renderType)
 {
-	// Provisional function.***
-	// render nodes & edges.***
+	// Provisional function.
+	// render nodes & edges.
 	var selectionColor = magoManager.selectionColor;
 	//selectionColor.init(); 
 	
-	// Check if exist selectionFamilies.***
+	// Check if exist selectionFamilies.
 	var selFamilyNameNodes = "networkNodes";
 	var selManager = magoManager.selectionManager;
 	var selCandidateNodes = selManager.getSelectionCandidatesFamily(selFamilyNameNodes);
@@ -276,32 +276,32 @@ Network.prototype.renderColorCoding = function(magoManager, shader, renderType)
 	
 	shader.disableVertexAttribArray(shader.texCoord2_loc); 
 	shader.enableVertexAttribArray(shader.normal3_loc); 
-	gl.uniform1i(shader.hasTexture_loc, false); //.***
+	gl.uniform1i(shader.hasTexture_loc, false); //.
 	gl.uniform4fv(shader.oneColor4_loc, [0.8, 0.8, 0.8, 1.0]);
 	
 	if (!shader.last_isAditionalMovedZero)
 	{
 		gl.uniform1i(shader.hasAditionalMov_loc, false);
-		gl.uniform3fv(shader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
+		gl.uniform3fv(shader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.
 		shader.last_isAditionalMovedZero = true;
 	}
 	
-	// Nodes.**************************************************************
+	// Nodes.**
 	var nodesCount = 0;
 	if (this.nodesArray)
 	{ nodesCount = this.nodesArray.length; }
 	
 	if (nodesCount > 0 )//&& !magoManager.isCameraMoving)
 	{
-		var refMatrixType = 1; // translation-type.***
+		var refMatrixType = 1; // translation-type.
 		gl.uniform1i(shader.refMatrixType_loc, refMatrixType);
 		//gl.uniform4fv(shader.oneColor4_loc, [0.3, 0.3, 0.9, 1.0]);
-		var nodeMaster = this.nodesArray[0]; // render all with an unique box.***
+		var nodeMaster = this.nodesArray[0]; // render all with an unique box.
 		for (var i=0; i<nodesCount; i++)
 		{
 			var node = this.nodesArray[i];
 			
-			// nodes has a position, so render a point or a box.***
+			// nodes has a position, so render a point or a box.
 			gl.uniform3fv(shader.refTranslationVec_loc, [node.position.x, node.position.y, node.position.z]); 
 			
 			var selColor4 = selectionColor.getAvailableColor(undefined); // new.
@@ -314,8 +314,8 @@ Network.prototype.renderColorCoding = function(magoManager, shader, renderType)
 		}
 	}
 	
-	// Edges.**************************************************************
-	// Render with a unique vbo.***
+	// Edges.**
+	// Render with a unique vbo.
 	if (this.edgesVboKeysContainer)
 	{
 		var vboKey = this.edgesVboKeysContainer.vboCacheKeysArray[0];
@@ -326,7 +326,7 @@ Network.prototype.renderColorCoding = function(magoManager, shader, renderType)
 			refMatrixType = 0;
 			gl.uniform1i(shader.refMatrixType_loc, refMatrixType);
 			
-			// Positions.***
+			// Positions.
 			if (vboKey.meshVertexCacheKey !== shader.last_vboPos_binded)
 			{
 				gl.bindBuffer(gl.ARRAY_BUFFER, vboKey.meshVertexCacheKey);
@@ -360,11 +360,11 @@ Network.prototype.render = function(magoManager, shader, renderType)
 		return;
 	}
 	
-	// Check if ready smallBox and bigBox.***
+	// Check if ready smallBox and bigBox.
 	var selectionColor = magoManager.selectionColor;
 	selectionColor.init(); 
 	
-	// Check if exist selectionFamilies.***
+	// Check if exist selectionFamilies.
 	var selFamilyNameNodes = "networkNodes";
 	var selManager = magoManager.selectionManager;
 	var selCandidateNodes = selManager.getSelectionCandidatesFamily(selFamilyNameNodes);
@@ -381,8 +381,8 @@ Network.prototype.render = function(magoManager, shader, renderType)
 		selCandidateEdges = selManager.newCandidatesFamily(selFamilyNameEdges);
 	}
 	
-	// Provisional function.***
-	// render nodes & edges.***
+	// Provisional function.
+	// render nodes & edges.
 	var vboMemManager = magoManager.vboMemoryManager;
 	var gl = magoManager.sceneState.gl;
 	var vboKey;
@@ -390,43 +390,43 @@ Network.prototype.render = function(magoManager, shader, renderType)
 	shader.disableVertexAttribArray(shader.texCoord2_loc); 
 	shader.enableVertexAttribArray(shader.normal3_loc); 
 	
-	gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
+	gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 	gl.uniform4fv(shader.oneColor4_loc, [0.8, 0.8, 0.8, 1.0]);
 	
 	if (!shader.last_isAditionalMovedZero)
 	{
 		gl.uniform1i(shader.hasAditionalMov_loc, false);
-		gl.uniform3fv(shader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
+		gl.uniform3fv(shader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.
 		shader.last_isAditionalMovedZero = true;
 	}
 	
-	// Nodes.**************************************************************
+	// Nodes.**
 	var nodesCount = 0;
 	if (this.nodesArray)
 	{ nodesCount = this.nodesArray.length; }
 	
 	if (nodesCount > 0 )//&& !magoManager.isCameraMoving)
 	{
-		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
-		var refMatrixType = 1; // translation-type.***
+		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
+		var refMatrixType = 1; // translation-type.
 		gl.uniform1i(shader.refMatrixType_loc, refMatrixType);
 		gl.uniform4fv(shader.oneColor4_loc, [0.3, 0.3, 0.9, 1.0]);
-		var nodeMaster = this.nodesArray[0]; // render all with an unique box.***
+		var nodeMaster = this.nodesArray[0]; // render all with an unique box.
 		for (var i=0; i<nodesCount; i++)
 		{
 			var node = this.nodesArray[i];
 			
-			// check if is selected.***
+			// check if is selected.
 			if (node === selCandidateNodes.currentSelected)
 			{
 				gl.uniform4fv(shader.oneColor4_loc, [0.9, 0.5, 0.1, 1.0]);
 			}
 			
-			// nodes has a position, so render a point or a box.***
+			// nodes has a position, so render a point or a box.
 			gl.uniform3fv(shader.refTranslationVec_loc, [node.position.x, node.position.y, node.position.z]); 
 			nodeMaster.box.render(magoManager, shader, renderType);
 			
-			// restore defaultColor.***
+			// restore defaultColor.
 			if (node === selCandidateNodes.currentSelected)
 			{
 				gl.uniform4fv(shader.oneColor4_loc, [0.3, 0.3, 0.9, 1.0]);
@@ -434,8 +434,8 @@ Network.prototype.render = function(magoManager, shader, renderType)
 		}
 	}
 	
-	// Edges.**************************************************************
-	// Render with a unique vbo.***
+	// Edges.**
+	// Render with a unique vbo.
 	if (this.edgesVboKeysContainer)
 	{
 		var vboKey = this.edgesVboKeysContainer.vboCacheKeysArray[0];
@@ -443,12 +443,12 @@ Network.prototype.render = function(magoManager, shader, renderType)
 		{ 
 			shader.disableVertexAttribArray(shader.texCoord2_loc); 
 			shader.disableVertexAttribArray(shader.normal3_loc); 
-			gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
+			gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 			refMatrixType = 0;
 			gl.uniform1i(shader.refMatrixType_loc, refMatrixType);
 			gl.uniform4fv(shader.oneColor4_loc, [0.1, 0.1, 0.6, 1.0]);
 	
-			// Positions.***
+			// Positions.
 			if (vboKey.meshVertexCacheKey !== shader.last_vboPos_binded)
 			{
 				gl.bindBuffer(gl.ARRAY_BUFFER, vboKey.meshVertexCacheKey);
@@ -468,7 +468,7 @@ Network.prototype.render = function(magoManager, shader, renderType)
 				}
 				gl.drawArrays(gl.LINES, i*2, 2);
 				
-				// restore default color.***
+				// restore default color.
 				if (edge === selCandidateEdges.currentSelected)
 				{
 					gl.uniform4fv(shader.oneColor4_loc, [0.1, 0.1, 0.6, 1.0]);
@@ -477,7 +477,7 @@ Network.prototype.render = function(magoManager, shader, renderType)
 		}
 	}
 	
-	// Spaces.************************************************
+	// Spaces.
 	this.renderSpaces = magoManager.tempSettings.renderSpaces;
 	this.spacesAlpha = magoManager.tempSettings.spacesAlpha;
 	
@@ -486,7 +486,7 @@ Network.prototype.render = function(magoManager, shader, renderType)
 	
 	if (this.renderSpaces)
 	{
-		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
+		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 		refMatrixType = 0;
 		gl.uniform1i(shader.refMatrixType_loc, refMatrixType);
 		gl.uniform4fv(shader.oneColor4_loc, [0.8, 0.8, 0.8, this.spacesAlpha]);

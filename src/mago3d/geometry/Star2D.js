@@ -13,12 +13,12 @@ var Star2D = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	// this is a closed element.***
+	// this is a closed element.
 	/**
 	 * center of star
 	 * @type {Point2D}
 	 */
-	this.centerPoint; // Point3D.***
+	this.centerPoint; // Point3D.
 
 	/**
 	 * interior radius
@@ -85,7 +85,7 @@ Star2D.prototype.setRadiusCount = function(radiusCount)
  */
 Star2D.prototype.getPoints = function(resultPointsArray)
 {
-	// star has an arrow to up.***
+	// star has an arrow to up.
 	var increAngDeg = 360 / this.radiusCount;
 	var increAngRad = increAngDeg * Math.PI/180;
 	var halfIncreAngRad = increAngRad / 2;
@@ -99,18 +99,18 @@ Star2D.prototype.getPoints = function(resultPointsArray)
 	
 	for (var i=0; i<this.radiusCount; i++)
 	{
-		// exterior.***
+		// exterior.
 		x = this.centerPoint.x + this.exteriorRadius * Math.cos(currAngRad);
 		y = this.centerPoint.y + this.exteriorRadius * Math.sin(currAngRad);
 		point = new Point2D(x, y);
-		point.pointType = 1; // mark as "important point".***
+		point.pointType = 1; // mark as "important point".
 		resultPointsArray.push(point);
 		
-		// interior.***
+		// interior.
 		x = this.centerPoint.x + this.interiorRadius * Math.cos(currAngRad + halfIncreAngRad);
 		y = this.centerPoint.y + this.interiorRadius * Math.sin(currAngRad + halfIncreAngRad);
 		point = new Point2D(x, y);
-		point.pointType = 1; // mark as "important point".***
+		point.pointType = 1; // mark as "important point".
 		resultPointsArray.push(point);
 		
 		currAngRad += increAngRad;

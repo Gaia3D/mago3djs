@@ -172,7 +172,7 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 	if (resultGeoLocationData === undefined)
 	{ resultGeoLocationData = new GeoLocationData(); }
 
-	// 0) Position.********************************************************************************************
+	// 0) Position.**
 	if (resultGeoLocationData.geographicCoord === undefined)
 	{ resultGeoLocationData.geographicCoord = new GeographicCoord(); }
 
@@ -207,15 +207,15 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 	{ return; }
 
 	resultGeoLocationData.position = this.geographicCoordToWorldPoint(longitude, latitude, altitude, resultGeoLocationData.position, magoManager);
-	
-	// High and Low values of the position.********************************************************************
+
+	// High and Low values of the position.**
 	if (resultGeoLocationData.positionHIGH === undefined)
 	{ resultGeoLocationData.positionHIGH = new Float32Array([0.0, 0.0, 0.0]); }
 	if (resultGeoLocationData.positionLOW === undefined)
 	{ resultGeoLocationData.positionLOW = new Float32Array([0.0, 0.0, 0.0]); }
 	this.calculateSplited3fv([resultGeoLocationData.position.x, resultGeoLocationData.position.y, resultGeoLocationData.position.z], resultGeoLocationData.positionHIGH, resultGeoLocationData.positionLOW);
 
-	// Determine the elevation of the position.***********************************************************
+	// Determine the elevation of the position.**
 	//var cartographic = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
 	//var height = cartographic.height;
 	// End Determine the elevation of the position.-------------------------------------------------------
@@ -234,10 +234,10 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 	else
 	{ resultGeoLocationData.rotMatrix.Identity(); }
 
-	// Set inverseMatrices as undefined.***
-	resultGeoLocationData.tMatrixInv = undefined; // reset. is calculated when necessary.***
-	resultGeoLocationData.rotMatrixInv = undefined; // reset. is calculated when necessary.***
-	resultGeoLocationData.geoLocMatrixInv = undefined; // reset. is calculated when necessary.***
+	// Set inverseMatrices as undefined.
+	resultGeoLocationData.tMatrixInv = undefined; // reset. is calculated when necessary.
+	resultGeoLocationData.rotMatrixInv = undefined; // reset. is calculated when necessary.
+	resultGeoLocationData.geoLocMatrixInv = undefined; // reset. is calculated when necessary.
 
 	// 1rst, calculate the transformation matrix for the location.
 	resultGeoLocationData.tMatrix = ManagerUtils.calculateTransformMatrixAtWorldPosition(resultGeoLocationData.position, resultGeoLocationData.heading, resultGeoLocationData.pitch, resultGeoLocationData.roll, 
@@ -247,7 +247,7 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 	resultGeoLocationData.rotMatrix._floatArrays[13] = 0;
 	resultGeoLocationData.rotMatrix._floatArrays[14] = 0;
 	
-	// finally assing the pivotPoint.***
+	// finally assing the pivotPoint.
 	if (resultGeoLocationData.pivotPoint === undefined)
 	{ resultGeoLocationData.pivotPoint = new Point3D(); }
 
@@ -272,7 +272,7 @@ ManagerUtils.calculateGeoLocationDataByAbsolutePoint = function(absoluteX, absol
 	if (resultGeoLocationData === undefined)
 	{ resultGeoLocationData = new GeoLocationData(); }
 
-	// 0) Position.********************************************************************************************
+	// 0) Position.**
 	if (resultGeoLocationData.geographicCoord === undefined)
 	{ resultGeoLocationData.geographicCoord = new GeographicCoord(); }
 	
@@ -291,7 +291,7 @@ ManagerUtils.calculateGeoLocationDataByAbsolutePoint = function(absoluteX, absol
 	{
 		// *if this in Cesium:
 		//resultGeoLocationData.position = Cesium.Cartesian3.fromDegrees(resultGeoLocationData.geographicCoord.longitude, resultGeoLocationData.geographicCoord.latitude, resultGeoLocationData.geographicCoord.altitude);
-		// must find cartographic data.***
+		// must find cartographic data.
 		var cartographic = new Cesium.Cartographic();
 		var cartesian = new Cesium.Cartesian3();
 		cartesian.x = absoluteX;
@@ -303,14 +303,14 @@ ManagerUtils.calculateGeoLocationDataByAbsolutePoint = function(absoluteX, absol
 		resultGeoLocationData.geographicCoord.altitude = cartographic.height;
 	}
 
-	// High and Low values of the position.********************************************************************
+	// High and Low values of the position.**
 	if (resultGeoLocationData.positionHIGH === undefined)
 	{ resultGeoLocationData.positionHIGH = new Float32Array([0.0, 0.0, 0.0]); }
 	if (resultGeoLocationData.positionLOW === undefined)
 	{ resultGeoLocationData.positionLOW = new Float32Array([0.0, 0.0, 0.0]); }
 	this.calculateSplited3fv([resultGeoLocationData.position.x, resultGeoLocationData.position.y, resultGeoLocationData.position.z], resultGeoLocationData.positionHIGH, resultGeoLocationData.positionLOW);
 
-	// Determine the elevation of the position.***********************************************************
+	// Determine the elevation of the position.**
 	//var cartographic = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
 	//var height = cartographic.height;
 	// End Determine the elevation of the position.-------------------------------------------------------
@@ -346,9 +346,9 @@ ManagerUtils.calculateGeoLocationDataByAbsolutePoint = function(absoluteX, absol
 	else
 	{ resultGeoLocationData.rotMatrixInv.Identity(); }
 
-	var xRotMatrix = new Matrix4();  // created as identity matrix.***
-	var yRotMatrix = new Matrix4();  // created as identity matrix.***
-	var zRotMatrix = new Matrix4();  // created as identity matrix.***
+	var xRotMatrix = new Matrix4();  // created as identity matrix.
+	var yRotMatrix = new Matrix4();  // created as identity matrix.
+	var zRotMatrix = new Matrix4();  // created as identity matrix.
 
 	if (resultGeoLocationData.heading !== undefined && resultGeoLocationData.heading !== 0)
 	{
@@ -369,14 +369,14 @@ ManagerUtils.calculateGeoLocationDataByAbsolutePoint = function(absoluteX, absol
 	{
 		// *if this in Cesium:
 		Cesium.Transforms.eastNorthUpToFixedFrame(resultGeoLocationData.position, undefined, resultGeoLocationData.tMatrix._floatArrays);
-		resultGeoLocationData.geoLocMatrix.copyFromMatrix4(resultGeoLocationData.tMatrix);// "geoLocMatrix" is the pure transformation matrix, without heading or pitch or roll.***
+		resultGeoLocationData.geoLocMatrix.copyFromMatrix4(resultGeoLocationData.tMatrix);// "geoLocMatrix" is the pure transformation matrix, without heading or pitch or roll.
 
 		var zRotatedTMatrix = zRotMatrix.getMultipliedByMatrix(resultGeoLocationData.tMatrix, zRotatedTMatrix);
 		var zxRotatedTMatrix = xRotMatrix.getMultipliedByMatrix(zRotatedTMatrix, zxRotatedTMatrix);
 		var zxyRotatedTMatrix = yRotMatrix.getMultipliedByMatrix(zxRotatedTMatrix, zxyRotatedTMatrix);
 		resultGeoLocationData.tMatrix = zxyRotatedTMatrix;
 		
-		// test.***
+		// test.
 		//var yRotatedTMatrix = yRotMatrix.getMultipliedByMatrix(resultGeoLocationData.tMatrix, yRotatedTMatrix);
 		//var yxRotatedTMatrix = xRotMatrix.getMultipliedByMatrix(yRotatedTMatrix, yxRotatedTMatrix);
 		//var yxzRotatedTMatrix = zRotMatrix.getMultipliedByMatrix(yxRotatedTMatrix, yxzRotatedTMatrix);
@@ -388,13 +388,13 @@ ManagerUtils.calculateGeoLocationDataByAbsolutePoint = function(absoluteX, absol
 		resultGeoLocationData.rotMatrix._floatArrays[13] = 0;
 		resultGeoLocationData.rotMatrix._floatArrays[14] = 0;
 
-		// now, calculates the inverses.***
+		// now, calculates the inverses.
 		Cesium.Matrix4.inverse(resultGeoLocationData.tMatrix._floatArrays, resultGeoLocationData.tMatrixInv._floatArrays);
 		Cesium.Matrix4.inverse(resultGeoLocationData.rotMatrix._floatArrays, resultGeoLocationData.rotMatrixInv._floatArrays);
 		Cesium.Matrix4.inverse(resultGeoLocationData.geoLocMatrix._floatArrays, resultGeoLocationData.geoLocMatrixInv._floatArrays);
 	}
 
-	// finally assing the pivotPoint.***
+	// finally assing the pivotPoint.
 	if (resultGeoLocationData.pivotPoint === undefined)
 	{ resultGeoLocationData.pivotPoint = new Point3D(); }
 
@@ -490,11 +490,11 @@ ManagerUtils.calculatePixelLinearDepth = function(gl, pixelX, pixelY, depthFbo, 
 	}
 
 	// Now, read the pixel and find the pixel position.
-	var depthPixels = new Uint8Array(4 * 1 * 1); // 4 x 1x1 pixel.***
+	var depthPixels = new Uint8Array(4 * 1 * 1); // 4 x 1x1 pixel.
 	gl.readPixels(pixelX, magoManager.sceneState.drawingBufferHeight - pixelY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, depthPixels);
 	
-	var zDepth = depthPixels[0]/(256.0*256.0*256.0) + depthPixels[1]/(256.0*256.0) + depthPixels[2]/256.0 + depthPixels[3]; // 0 to 256 range depth.***
-	var linearDepth = zDepth / 256.0; // LinearDepth. Convert to [0.0, 1.0] range depth.***
+	var zDepth = depthPixels[0]/(256.0*256.0*256.0) + depthPixels[1]/(256.0*256.0) + depthPixels[2]/256.0 + depthPixels[3]; // 0 to 256 range depth.
+	var linearDepth = zDepth / 256.0; // LinearDepth. Convert to [0.0, 1.0] range depth.
 	return linearDepth;
 };
 
@@ -513,9 +513,9 @@ ManagerUtils.calculatePixelPositionCamCoord = function(gl, pixelX, pixelY, resul
 	{ frustumFar = magoManager.sceneState.camera.frustum.far; }
 	
 	var linearDepth = ManagerUtils.calculatePixelLinearDepth(gl, pixelX, pixelY, depthFbo, magoManager);
-	var realZDepth = linearDepth*frustumFar; // original.***
+	var realZDepth = linearDepth*frustumFar; // original.
 
-	// now, find the 3d position of the pixel in camCoord.****
+	// now, find the 3d position of the pixel in camCoord.*
 	magoManager.resultRaySC = ManagerUtils.getRayCamSpace(pixelX, pixelY, magoManager.resultRaySC, magoManager);
 	if (resultPixelPos === undefined)
 	{ resultPixelPos = new Point3D(); }
@@ -533,7 +533,7 @@ ManagerUtils.calculatePixelPositionCamCoord = function(gl, pixelX, pixelY, resul
  */
 ManagerUtils.cameraCoordPositionToWorldCoord = function(camCoordPos, resultWorldPos, magoManager) 
 {
-	// now, must transform this pixelCamCoord to world coord.***
+	// now, must transform this pixelCamCoord to world coord.
 	var mv_inv = magoManager.sceneState.getModelViewMatrixInv();
 	if (resultWorldPos === undefined)
 	{ var resultWorldPos = new Point3D(); }
@@ -632,9 +632,9 @@ ManagerUtils.calculateWorldPositionToScreenCoord = function(gl, worldCoordX, wor
  */
 ManagerUtils.getRayCamSpace = function(pixelX, pixelY, resultRay, magoManager) 
 {
-	// in this function "ray" is a vector.***
+	// in this function "ray" is a vector.
 	var sceneState = magoManager.sceneState;
-	var frustum_far = 1.0; // unitary frustum far.***
+	var frustum_far = 1.0; // unitary frustum far.
 	var frustum = sceneState.camera.frustum;
 	var aspectRatio = frustum.aspectRatio;
 	var tangentOfHalfFovy = frustum.tangentOfHalfFovy; 
@@ -661,7 +661,7 @@ ManagerUtils.getRayCamSpace = function(pixelX, pixelY, resultRay, magoManager)
  */
 ManagerUtils.getRayWorldSpace = function(gl, pixelX, pixelY, resultRay, magoManager) 
 {
-	// in this function the "ray" is a line.***
+	// in this function the "ray" is a line.
 	if (resultRay === undefined) 
 	{ resultRay = new Line(); }
 	
@@ -678,10 +678,10 @@ ManagerUtils.getRayWorldSpace = function(gl, pixelX, pixelY, resultRay, magoMana
 	
 	pointSC.set(rayCamSpace[0], rayCamSpace[1], rayCamSpace[2]);
 
-	// now, must transform this posCamCoord to world coord.***
-	pointSC2 = magoManager.sceneState.modelViewMatrixInv.rotatePoint3D(pointSC, pointSC2); // rayWorldSpace.***
-	pointSC2.unitary(); // rayWorldSpace.***
-	resultRay.setPointAndDir(camPos.x, camPos.y, camPos.z,       pointSC2.x, pointSC2.y, pointSC2.z);// original.***
+	// now, must transform this posCamCoord to world coord.
+	pointSC2 = magoManager.sceneState.modelViewMatrixInv.rotatePoint3D(pointSC, pointSC2); // rayWorldSpace.
+	pointSC2.unitary(); // rayWorldSpace.
+	resultRay.setPointAndDir(camPos.x, camPos.y, camPos.z,       pointSC2.x, pointSC2.y, pointSC2.z);// original.
 
 	return resultRay;
 };

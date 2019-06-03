@@ -10,11 +10,11 @@ var Circle2D = function()
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	// sweeping in CounterClockWise is positive.***
-	// zero startAngle is in "X" axis positive.***
-	this.centerPoint; // Point2D.***
+	// sweeping in CounterClockWise is positive.
+	// zero startAngle is in "X" axis positive.
+	this.centerPoint; // Point2D.
 	this.radius;
-	this.numPointsFor360Deg; // interpolation param.***
+	this.numPointsFor360Deg; // interpolation param.
 };
 
 /**
@@ -52,7 +52,7 @@ Circle2D.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 	if (this.numPointsFor360Deg === undefined)
 	{ this.numPointsFor360Deg = 36; }
 	
-	// use an arc to make points.***
+	// use an arc to make points.
 	if (this.centerPoint === undefined || this.radius === undefined)
 	{ return resultPointsArray; }
 	
