@@ -171,11 +171,7 @@ Lego.prototype.isReadyToRender = function()
 /**
  * lego 초기화. gl에서 해당 lego 삭제
  * 
-<<<<<<< HEAD
  * @param {WebGLRenderingContext} gl WebGL Rendering Context.
-=======
- * @param {WebGLRenderingContext} gl 
->>>>>>> develop
  * @param {VboManager} vboMemManager 
  */
 Lego.prototype.deleteObjects = function(gl, vboMemManager)
