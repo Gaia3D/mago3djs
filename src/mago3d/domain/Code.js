@@ -9,7 +9,7 @@ CODE.magoManagerState = {
 	"READY"   : 2
 };
 
-//0 = no started to load. 1 = started loading. 2 = finished loading. 3 = parse started. 4 = parse finished.***
+//0 = no started to load. 1 = started loading. 2 = finished loading. 3 = parse started. 4 = parse finished.
 CODE.fileLoadState = {
 	"READY"            : 0,
 	"LOADING_STARTED"  : 1,

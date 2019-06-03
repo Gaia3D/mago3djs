@@ -36,12 +36,13 @@ TriPolyhedron.prototype.invertTrianglesSenses = function()
 
 /**
  * Get the information of the VBO key of the triangles which consist of the TriPolyhedron
- * @param resultVBOVertexIdxCacheKey the array which will hold the VBO key of the triangular meshes
- * @param vboMemManager 
+ * @param {VBOVertexIdxCacheKey} resultVBOVertexIdxCacheKey the array which will hold the VBO key of the triangular meshes
+ * @param {VBOMemoryManager} vboMemManager 
+ * @returns {VBOVertexIdxCacheKey}
  */
 TriPolyhedron.prototype.getVBOArrayModePosNorCol = function(resultVBOVertexIdxCacheKey, vboMemManager) 
 {
-	// there are "arrayMode" and the "elementMode". "elementMode" uses indices.***
+	// there are "arrayMode" and the "elementMode". "elementMode" uses indices.
 	if (resultVBOVertexIdxCacheKey === undefined)
 	{ resultVBOVertexIdxCacheKey = new VBOVertexIdxCacheKey(); }
 
@@ -76,7 +77,7 @@ TriPolyhedron.prototype.getVBOArrayModePosNorCol = function(resultVBOVertexIdxCa
 			if (triangle.normal === undefined)
 			{ triangle.calculatePlaneNormal(); }
 
-			// position.***
+			// position.
 			vertex0 = triangle.vertex0;
 			vertex1 = triangle.vertex1;
 			vertex2 = triangle.vertex2;
@@ -93,7 +94,7 @@ TriPolyhedron.prototype.getVBOArrayModePosNorCol = function(resultVBOVertexIdxCa
 			positionArray.push(vertex2.point3d.y);
 			positionArray.push(vertex2.point3d.z);
 
-			// normal (use planeNormal).***
+			// normal (use planeNormal).
 			normalsArray.push(triangle.normal.x);
 			normalsArray.push(triangle.normal.y);
 			normalsArray.push(triangle.normal.z);
@@ -106,7 +107,7 @@ TriPolyhedron.prototype.getVBOArrayModePosNorCol = function(resultVBOVertexIdxCa
 			normalsArray.push(triangle.normal.y);
 			normalsArray.push(triangle.normal.z);
 
-			// colors.***
+			// colors.
 			if (vertex0.color4 === undefined) 
 			{
 				colorsArray.push(200);
@@ -157,16 +158,16 @@ TriPolyhedron.prototype.getVBOArrayModePosNorCol = function(resultVBOVertexIdxCa
 	var uint8ColArray = new Uint8Array(vertexCount*4);
 	uint8ColArray.set(colorsArray);
 	
-	///******************************************************************************
-	// Positions.***
+	////////////////////////////////////////////////////////////////////////////////
+	// Positions
 	resultVBOVertexIdxCacheKey.setDataArrayPos(float32PosArray, vboMemManager);
 	
-	// Normals.***
+	// Normals.
 	resultVBOVertexIdxCacheKey.setDataArrayNor(int8NorArray, vboMemManager);
 	
-	// Colors.***
+	// Colors.
 	resultVBOVertexIdxCacheKey.setDataArrayCol(uint8ColArray, vboMemManager);
-	///******************************************************************************
+	////////////////////////////////////////////////////////////////////////////////
 
 	return resultVBOVertexIdxCacheKey;
 };

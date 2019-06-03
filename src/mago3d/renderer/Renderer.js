@@ -11,14 +11,14 @@ var CurrentObjectsRendering = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	// General objects rendering, as currNode, currBuilding, currOctree, currRefObject.***
+	// General objects rendering, as currNode, currBuilding, currOctree, currRefObject.
 	this.curNode = undefined;
 	this.curBuilding = undefined;
 	this.curOctree = undefined;
 	this.curObject = undefined;
 };
 
-// Renderer.***************************************************************************
+// Renderer.
 /**
  * 어떤 일을 하고 있습니까?
  * @class Renderer
@@ -37,7 +37,7 @@ var Renderer = function()
 	this.vbo_vi_cacheKey_aux;
 	this.byteColorAux = new ByteColor();
 
-	// SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.***
+	// SCRATCH. SCRATCH. SCRATCH. SCRATCH. SCRATCH. SCRATCH. SCRATCH. SCRATCH. SCRATCH. SCRATCH. SCRATCH. SCRATCH.
 
 	this.currentTimeSC;
 	this.dateSC;
@@ -56,11 +56,11 @@ Renderer.prototype.renderVboContainer = function(gl, vboContainer, magoManager, 
 	{ return; }
 	
 	var cacheKeys_count = vboContainer.vboCacheKeysArray.length;
-	// Must applicate the transformMatrix of the reference object.***
+	// Must applicate the transformMatrix of the reference object.
 	
 	var indicesCount;
 
-	for (var n=0; n<cacheKeys_count; n++) // Original.***
+	for (var n=0; n<cacheKeys_count; n++) // Original.
 	{
 		//var mesh_array = block.viArraysContainer._meshArrays[n];
 		this.vbo_vi_cacheKey_aux = vboContainer.vboCacheKeysArray[n];
@@ -90,7 +90,7 @@ Renderer.prototype.renderVboContainer = function(gl, vboContainer, magoManager, 
 		}
 		*/
 
-		// Indices.***
+		// Indices.
 		if (magoManager.isCameraMoving)
 		{
 			indicesCount = this.vbo_vi_cacheKey_aux.indicesCount;
@@ -102,12 +102,12 @@ Renderer.prototype.renderVboContainer = function(gl, vboContainer, magoManager, 
 		
 		if (renderWireframe)
 		{
-			gl.drawElements(gl.LINES, this.vbo_vi_cacheKey_aux.indicesCount, gl.UNSIGNED_SHORT, 0); // Wireframe.***
+			gl.drawElements(gl.LINES, this.vbo_vi_cacheKey_aux.indicesCount, gl.UNSIGNED_SHORT, 0); // Wireframe.
 
 		}
 		else 
 		{
-			gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
+			gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.
 		}
 	}
 };
@@ -142,7 +142,7 @@ Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, sh
 	var minSize = 0.0;
 	var lowestOctreesCount;
 	var lowestOctree;
-	var isInterior = false; // no used.***
+	var isInterior = false; // no used.
 	
 	// set webgl options.
 	gl.enable(gl.DEPTH_TEST);
@@ -188,7 +188,7 @@ Renderer.prototype.getPointsCountForDistance = function(distToCam, realPointsCou
 		
 	if (distToCam <= 10)
 	{
-		// Render all points.***
+		// Render all points.
 	}
 	else if (distToCam < 100)
 	{
@@ -231,14 +231,14 @@ Renderer.prototype.getPointsCountForDistance = function(distToCam, realPointsCou
  */
 Renderer.prototype.renderPCloud = function(gl, pCloud, magoManager, shader, ssao_idx, distToCam, lod) 
 {
-	// Note: "pCloud" is "Lego" class.***
+	// Note: "pCloud" is "Lego" class.
 	if (pCloud.vbo_vicks_container.vboCacheKeysArray.length === 0) 
 	{
 		return;
 	}
 	gl.frontFace(gl.CCW);
 	
-	var vbo_vicky = pCloud.vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.***
+	var vbo_vicky = pCloud.vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.
 	var vertices_count = vbo_vicky.vertexCount;
 	
 	if (vertices_count === 0) 
@@ -254,15 +254,15 @@ Renderer.prototype.renderPCloud = function(gl, pCloud, magoManager, shader, ssao
 	if (pointsCountToDraw <= 0)
 	{ return; }
 
-	if (ssao_idx === 0) // depth.***
+	if (ssao_idx === 0) // depth.
 	{
-		// 1) Position.*********************************************
+		// 1) Position.
 		if (!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
 		{ return false; }
 		
 		gl.drawArrays(gl.POINTS, 0, pointsCountToDraw);
 	}
-	else if (ssao_idx === 1) // color.***
+	else if (ssao_idx === 1) // color.
 	{
 		if (!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
 		{ return false; }
@@ -291,7 +291,7 @@ Renderer.prototype.renderNeoBuildingsPCloud = function(gl, visibleNodesArray, ma
 	var lowestOctree;
 	var lastExtureId;
 	
-	// Do some gl settings.***
+	// Do some gl settings.
 	//gl.uniform1i(shader.bUse1Color_loc, false);
 	gl.uniform1f(shader.fixPointSize_loc, 1.0);
 	gl.uniform1i(shader.bUseFixPointSize_loc, false);
@@ -320,7 +320,7 @@ Renderer.prototype.renderNeoBuildingsPCloud = function(gl, visibleNodesArray, ma
 		
 		if (projectDataType !== undefined && projectDataType === 4)
 		{
-			// Old.***
+			// Old.
 			/*
 			for (var j=0; j<lowestOctreesCount; j++) 
 			{
@@ -338,7 +338,7 @@ Renderer.prototype.renderNeoBuildingsPCloud = function(gl, visibleNodesArray, ma
 				{ continue; }
 
 			
-				// data compression.***
+				// data compression.
 				var posCompressed = false;
 				if (lowestOctree.lego.bPositionsCompressed !== undefined)
 				{
@@ -346,12 +346,12 @@ Renderer.prototype.renderNeoBuildingsPCloud = function(gl, visibleNodesArray, ma
 				}
 				gl.uniform1i(shader.bPositionCompressed_loc, posCompressed);
 				
-				// If data is compressed, then set uniforms.***
+				// If data is compressed, then set uniforms.
 				//gl.uniform1i(shader.posDataByteSize_loc, 2);
 				//gl.uniform1i(shader.texCoordByteSize_loc, 2);
 				var bbox = lowestOctree.lego.bbox;
-				gl.uniform3fv(shader.bboxSize_loc, [bbox.getXLength(), bbox.getYLength(), bbox.getZLength()]); //.***
-				gl.uniform3fv(shader.minPosition_loc, [bbox.minX, bbox.minY, bbox.minZ]); //.***
+				gl.uniform3fv(shader.bboxSize_loc, [bbox.getXLength(), bbox.getYLength(), bbox.getZLength()]); //.
+				gl.uniform3fv(shader.minPosition_loc, [bbox.minX, bbox.minY, bbox.minZ]); //.
 				var lod = 2;
 				var distToCam = lowestOctree.distToCamera;
 				if (distToCam < 100)
@@ -372,7 +372,7 @@ Renderer.prototype.renderNeoBuildingsPCloud = function(gl, visibleNodesArray, ma
 			relativeCam.frustum.copyParametersFrom(magoManager.myCameraSCX.bigFrustum);
 			relativeCam = buildingGeoLocation.getTransformedRelativeCamera(magoManager.sceneState.camera, relativeCam);
 			relativeCam.calculateFrustumsPlanes();
-			var renderType = ssao_idx;// testing.***
+			var renderType = ssao_idx;// testing.
 			var bPrepareData = true;
 			
 			neoBuilding.octree.test__renderPCloud(magoManager, neoBuilding, renderType, shader, relativeCam, bPrepareData);
@@ -388,7 +388,7 @@ Renderer.prototype.enableStencilBuffer = function(gl)
 	gl.enable(gl.STENCIL_TEST);
 	
 	gl.stencilFunc(gl.ALWAYS, 1, 1);
-	// (stencil-fail: replace), (stencil-pass & depth-fail: replace), (stencil-pass & depth-pass: replace).***
+	// (stencil-fail: replace), (stencil-pass & depth-fail: replace), (stencil-pass & depth-pass: replace).
 	//gl.stencilOp(gl.REPLACE, gl.REPLACE, gl.REPLACE);
 	gl.stencilOp(gl.KEEP, gl.REPLACE, gl.REPLACE);
 	gl.enable(gl.POLYGON_OFFSET_FILL);
@@ -428,8 +428,8 @@ Renderer.prototype.renderObject = function(gl, renderable, magoManager, shader, 
 	var vbosCount = vbo_vicks_container.getVbosCount();
 	for (var i=0; i<vbosCount; i++)
 	{
-		// 1) Position.*********************************************
-		var vbo_vicky = vbo_vicks_container.vboCacheKeysArray[i]; // there are only one.***
+		// 1) Position.
+		var vbo_vicky = vbo_vicks_container.vboCacheKeysArray[i]; // there are only one.
 
 		var vertices_count = vbo_vicky.vertexCount;
 		if (vertices_count === 0) 
@@ -438,7 +438,7 @@ Renderer.prototype.renderObject = function(gl, renderable, magoManager, shader, 
 		if (!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
 		{ return false; }
 
-		if (ssao_idx === 1) // ssao.***
+		if (ssao_idx === 1) // ssao.
 		{
 			if (!vbo_vicky.bindDataNormal(shader, magoManager.vboMemoryManager))
 			{ return false; }
@@ -456,7 +456,7 @@ Renderer.prototype.renderObject = function(gl, renderable, magoManager, shader, 
 				if (!vbo_vicky.bindDataIndice(shader, magoManager.vboMemoryManager))
 				{ return false; }
 
-				gl.drawElements(gl.TRIANGLES, vbo_vicky.indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
+				gl.drawElements(gl.TRIANGLES, vbo_vicky.indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.
 			}
 			else 
 			{

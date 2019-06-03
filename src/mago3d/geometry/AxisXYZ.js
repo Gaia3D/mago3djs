@@ -42,7 +42,7 @@ AxisXYZ.prototype.makeMesh = function(length)
 	pMesh.profile = new Profile2D(); 
 	var profileAux = pMesh.profile; 
 	
-	// create a halfArrow profile.***
+	// create a halfArrow profile.
 	var outerRing = profileAux.newOuterRing();
 	var arrowLength = this.length;
 	var arrowWidth  = this.length*0.1;
@@ -58,36 +58,36 @@ AxisXYZ.prototype.makeMesh = function(length)
 	var revolveAngDeg, revolveSegmentsCount, revolveSegment2d;
 	revolveAngDeg = 360.0;
 	
-	// create a rotation axis by a segment.***
+	// create a rotation axis by a segment.
 	revolveSegment2d = new Segment2D();
 	var strPoint2d = new Point2D(0, -10);
 	var endPoint2d = new Point2D(0, 10);
 	revolveSegment2d.setPoints(strPoint2d, endPoint2d);
 	revolveSegmentsCount = 8;
 	
-	// rotate the profile and create the Y axis.***
+	// rotate the profile and create the Y axis.
 	pMesh.revolve(profileAux, revolveAngDeg, revolveSegmentsCount, revolveSegment2d);
 	
 	bIncludeBottomCap = false;
 	bIncludeTopCap = false;
 	var mesh = pMesh.getSurfaceIndependentMesh(undefined, bIncludeBottomCap, bIncludeTopCap);
-	mesh.setColor(0.1, 1.0, 0.1, 1.0); // set the color.***
+	mesh.setColor(0.1, 1.0, 0.1, 1.0); // set the color.
 	mesh.reverseSense();
 	
-	// copy & rotate the mesh and create the X axis.***
+	// copy & rotate the mesh and create the X axis.
 	var tMatTest = new Matrix4();
 	var mesh2 = mesh.getCopy(undefined);
 	tMatTest.rotationAxisAngDeg(-90.0, 0, 0, 1);
 	mesh2.transformByMatrix4(tMatTest);
-	mesh2.setColor(1.0, 0.1, 0.1, 1.0); // set the color.***
+	mesh2.setColor(1.0, 0.1, 0.1, 1.0); // set the color.
 	
-	// copy & rotate the mesh and create the Z axis.***
+	// copy & rotate the mesh and create the Z axis.
 	var mesh3 = mesh.getCopy(undefined);
 	tMatTest.rotationAxisAngDeg(90.0, 1, 0, 0);
 	mesh3.transformByMatrix4(tMatTest);
-	mesh3.setColor(0.1, 0.1, 1.0, 1.0); // set the color.***
+	mesh3.setColor(0.1, 0.1, 1.0, 1.0); // set the color.
 
-	// Merge all meshes into a one mesh and make a unique vbo.***
+	// Merge all meshes into a one mesh and make a unique vbo.
 	mesh.mergeMesh(mesh2);
 	mesh.mergeMesh(mesh3);
 	return mesh;

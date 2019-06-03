@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * NetworkEdge.***
+ * NetworkEdge.
  * 
  * @alias NetworkEdge
  * @class NetworkEdge

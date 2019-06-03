@@ -57,7 +57,7 @@ Box.prototype.render = function(magoManager, shader, renderType)
  */
 Box.prototype.makeMesh = function(width, length, height)
 {
-	// check dimensions of the box.***
+	// check dimensions of the box.
 	if (width !== undefined)
 	{ this.width = width; }
 	
@@ -85,20 +85,20 @@ Box.prototype.makeMesh = function(width, length, height)
 	if (this.vbo_vicks_containerEdges === undefined)
 	{ this.vbo_vicks_containerEdges = new VBOVertexIdxCacheKeysContainer(); }
 	
-	// Create a parametric mesh.***
+	// Create a parametric mesh.
 	var pMesh = new ParametricMesh();
 		
-	// Create a Profile2d.***
+	// Create a Profile2d.
 	pMesh.profile = new Profile2D(); 
 	var profileAux = pMesh.profile; 
 	
-	// Create a outer ring in the Profile2d.***
+	// Create a outer ring in the Profile2d.
 	var outerRing = profileAux.newOuterRing();
 	var rect = outerRing.newElement("RECTANGLE");
 	rect.setCenterPosition(this.centerPoint.x, this.centerPoint.y);
 	rect.setDimensions(this.width, this.length);
 	
-	// Extrude the Profile.***
+	// Extrude the Profile.
 	var extrudeSegmentsCount = 1;
 	var extrusionVector = undefined;
 	pMesh.extrude(profileAux, this.height, extrudeSegmentsCount, extrusionVector);
@@ -107,7 +107,7 @@ Box.prototype.makeMesh = function(width, length, height)
 	var bIncludeTopCap = true;
 	var mesh = pMesh.getSurfaceIndependentMesh(undefined, bIncludeBottomCap, bIncludeTopCap);
 	
-	// translate the box bcos center the origen to the center of the box.***
+	// translate the box bcos center the origen to the center of the box.
 	mesh.translate(0, 0, -this.height/2);
 
 	return mesh;

@@ -1,61 +1,6 @@
 'use strict';
 
 /**
- * SelectionCandidateFamily
- * 
- * @alias SelectionCandidateFamily
- * @class SelectionCandidateFamily
- */
-var SelectionCandidateFamily = function() 
-{
-	if (!(this instanceof SelectionCandidateFamily)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-	this.familyTypeName;
-	this.candidatesMap = {};
-	this.currentSelected;
-};
-
-/**
- */
-SelectionCandidateFamily.prototype.setCandidate = function(idxKey, candidate)
-{
-	if (idxKey !== undefined && candidate)
-	{
-		this.candidatesMap[idxKey] = candidate;
-	}
-};
-
-/**
- * SelectionCandidateFamily
- */
-SelectionCandidateFamily.prototype.clearCandidate = function()
-{
-	this.candidatesMap = {};
-	this.currentSelected = undefined;
-};
-
-/**
- * SelectionCandidateFamily
- */
-SelectionCandidateFamily.prototype.clearCurrentSelected = function()
-{
-	this.currentSelected = undefined;
-};
-
-/**
- * SelectionCandidateFamily
- */
-SelectionCandidateFamily.prototype.selectObject = function(idxKey)
-{
-	this.currentSelected = this.candidatesMap[idxKey];
-	return this.currentSelected;
-};
-
-//**
-
-/**
  * SelectionManager
  * 
  * @alias SelectionManager
@@ -68,7 +13,7 @@ var SelectionManager = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	// Default f4d objectsMap.
+	// Default f4d objectsMap.***
 	this.referencesMap = {};
 	this.octreesMap = {};
 	this.buildingsMap = {};
@@ -79,10 +24,10 @@ var SelectionManager = function()
 	this.currentBuildingSelected;
 	this.currentNodeSelected;
 	
-	// Custom candidates.
+	// Custom candidates.***
 	this.selCandidatesFamilyMap = {};
 	
-	// General candidates.
+	// General candidates.***
 	this.selCandidatesMap = {};
 	this.currentGeneralObjectSelected;
 	
@@ -215,7 +160,7 @@ SelectionManager.prototype.clearCandidates = function()
 
 	}
 	
-	// General selection candidates map.
+	// General selection candidates map.***
 	this.selCandidatesMap = {};
 };
 
@@ -268,45 +213,3 @@ SelectionManager.prototype.clearCurrents = function(idxKey)
 	
 	this.currentGeneralObjectSelected = undefined;
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

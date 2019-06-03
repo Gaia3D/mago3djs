@@ -56,7 +56,7 @@ var GeoLocationData = function(geoLocationDataName)
 	 * @type {Date}
 	 * @default undefined
 	 */
-	this.date; // year - month - day - hour - min - seg - miliseg.***
+	this.date; // year - month - day - hour - min - seg - miliseg.
 	
 	/**
 	 * The position in world coordinates (x, y, z) of this geoLocationData.
@@ -204,7 +204,7 @@ GeoLocationData.prototype.deleteObjects = function(vboMemManager)
 	{ this.pivotPoint.deleteObjects(); }  
 	this.pivotPoint = undefined;
 	
-	// F4D Matrix4.****
+	// F4D Matrix4.*
 	if (this.geoLocMatrix)
 	{ this.geoLocMatrix.deleteObjects(); }
 	if (this.geoLocMatrixInv)
@@ -225,7 +225,7 @@ GeoLocationData.prototype.deleteObjects = function(vboMemManager)
 	this.rotMatrix = undefined;   
 	this.rotMatrixInv = undefined; 
 	
-	// Aditional.***
+	// Aditional.
 	if (this.pivotPointTraslationLC)
 	{ this.pivotPointTraslationLC.deleteObjects(); }
 	this.pivotPointTraslationLC = undefined;
@@ -275,14 +275,14 @@ GeoLocationData.prototype.copyFrom = function(geoLocData)
 		if (this.geographicCoord === undefined)
 		{ this.geographicCoord = new GeographicCoord(); }
 		
-		this.geographicCoord.copyFrom(geoLocData.geographicCoord); // longitude, latitude, altitude.***
+		this.geographicCoord.copyFrom(geoLocData.geographicCoord); // longitude, latitude, altitude.
 	}
 	
 	this.heading = geoLocData.heading;
 	this.pitch = geoLocData.pitch;
 	this.roll = geoLocData.roll;
 	
-	this.date = geoLocData.date; // year - month - day - hour - min - seg - miliseg.***
+	this.date = geoLocData.date; // year - month - day - hour - min - seg - miliseg.
 	
 	if (geoLocData.position)
 	{
@@ -316,7 +316,7 @@ GeoLocationData.prototype.copyFrom = function(geoLocData)
 		this.pivotPoint.copyFrom(geoLocData.pivotPoint);
 	}
 	
-	// F4D Matrix4.****
+	// F4D Matrix4.*
 	if (geoLocData.geoLocMatrix)
 	{
 		if (this.geoLocMatrix === undefined)
@@ -584,9 +584,9 @@ GeoLocationData.prototype.bindGeoLocationUniforms = function(gl, shader)
 	gl.uniform3fv(shader.buildingPosLOW_loc, [this.positionLOW[0], this.positionLOW[1], this.positionLOW[2]]);
 };
 
-//**********************************************************************************************************************************************************
-//**********************************************************************************************************************************************************
-//**********************************************************************************************************************************************************
+//*
+//*
+//*
 
 /**
  * GeoLocationDataManager is a class object that contains GeoLocationData objects in an array.
