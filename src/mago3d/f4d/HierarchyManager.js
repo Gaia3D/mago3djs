@@ -73,7 +73,7 @@ HierarchyManager.prototype.getStaticModelsManager = function()
  */
 HierarchyManager.prototype.getNodeByDataName = function(projectId, dataName, dataNameValue) 
 {
-	// note: here "dataName" refers "nodeId", or other datas that can be inside of"data".***
+	// note: here "dataName" refers "nodeId", or other datas that can be inside of"data".
 	var nodesMap = this.getNodesMap(projectId);
 	
 	if (nodesMap === undefined)

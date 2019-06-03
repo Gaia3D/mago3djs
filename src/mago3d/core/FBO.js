@@ -64,7 +64,7 @@ var FBO = function(gl, width, height)
 	 */
 	this.dirty = true;
 	
-	// Init process.***
+	// Init process.
 	this.width[0] = width;
 	this.height[0] = height;
   

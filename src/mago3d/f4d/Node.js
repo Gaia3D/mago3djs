@@ -62,10 +62,10 @@ Node.prototype.deleteObjects = function(gl, vboMemoryManager)
 	var data = this.data;
 	if (data !== undefined)
 	{
-		// Check if this is a reference node.***
+		// Check if this is a reference node.
 		var isReference = this.isReferenceNode();
 		
-		// No delete neoBuilding if this node is a reference node.***
+		// No delete neoBuilding if this node is a reference node.
 		if (isReference)
 		{ return; }
 
@@ -93,7 +93,7 @@ Node.prototype.deleteObjects = function(gl, vboMemoryManager)
 			data.bbox = undefined;
 		}
 		
-		// Delete geoLocationDataManager, etc. TODO.***
+		// Delete geoLocationDataManager, etc. TODO.
 		
 		this.data = undefined;
 	}
@@ -117,7 +117,7 @@ Node.prototype.deleteObjects = function(gl, vboMemoryManager)
  */
 Node.prototype.calculateGeoLocData = function(magoManager) 
 {
-	// This function creates the geoLocationData of "node".***
+	// This function creates the geoLocationData of "node".
 	// Called from magomanager.tilesMultiFrustumCullingFinished(...), flyToBuilding(...)
 	var nodeRoot = this.getRoot();
 
@@ -153,7 +153,7 @@ Node.prototype.calculateGeoLocData = function(magoManager)
 		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, heading, pitch, roll, geoLoc, magoManager);
 		this.pointSC = this.data.bbox.getCenterPoint(this.pointSC);
 
-		// check if use "centerOfBoundingBoxAsOrigin".***
+		// check if use "centerOfBoundingBoxAsOrigin".
 		if (this.data.mapping_type !== undefined && this.data.mapping_type.toLowerCase() === "boundingboxcenter")
 		{
 			var rootNode = this.getRoot();
@@ -218,7 +218,7 @@ Node.prototype.checkChangesHistoryMovements = function()
 };
 
 /**
- * Checks if there are some objects that was changed the color.***
+ * Checks if there are some objects that was changed the color.
  */
 Node.prototype.checkChangesHistoryColors = function() 
 {
@@ -306,10 +306,10 @@ Node.prototype.checkChangesHistoryColors = function()
  */
 Node.prototype.renderContent = function(magoManager, shader, renderType, refMatrixIdxKey) 
 {
-	// This function renders the neoBuilding if exist in "data".***
-	// renderType = 0 -> depth render.***
-	// renderType = 1 -> normal render.***
-	// renderType = 2 -> colorSelection render.***
+	// This function renders the neoBuilding if exist in "data".
+	// renderType = 0 -> depth render.
+	// renderType = 1 -> normal render.
+	// renderType = 2 -> colorSelection render.
 	//--------------------------------------------
 	var data = this.data;
 	if (data === undefined)
@@ -322,7 +322,7 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	if (this.data.nodeId === "GyeomjaeJeongSeon_del")
 	{ var hola = 0; }
 
-	// Check if we are under selected data structure.***
+	// Check if we are under selected data structure.
 	var selectionManager = magoManager.selectionManager;
 	if (selectionManager.currentNodeSelected === this)
 	{ selectionManager.parentSelected = true; }
@@ -330,8 +330,8 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	{ selectionManager.parentSelected = false; }
 	
 
-	// Update visibleOctreesControler of the neoBuilding & the relativeCurrentCamera.***
-	// Note: currentVisibleOctreesControler & myCameraRelative are calculated on MagoManager.getRenderablesDetailedNeoBuildingAsimetricVersion(...).***
+	// Update visibleOctreesControler of the neoBuilding & the relativeCurrentCamera.
+	// Note: currentVisibleOctreesControler & myCameraRelative are calculated on MagoManager.getRenderablesDetailedNeoBuildingAsimetricVersion(...).
 	neoBuilding.currentVisibleOctreesControler = data.currentVisibleOctreesControler;
 	neoBuilding.myCameraRelative = data.myCameraRelative;
 	neoBuilding.isColorChanged = data.isColorChanged;
@@ -340,7 +340,7 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	this.checkChangesHistoryColors();
 	this.checkChangesHistoryMovements();
 
-	// Check projectType.*************************
+	// Check projectType.*
 	var metaData = neoBuilding.metaData;
 	var projectsType = metaData.projectDataType;
 	//--------------------------------------------
@@ -348,10 +348,10 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	var rootNode = this.getRoot();
 	var geoLocDataManager = rootNode.data.geoLocDataManager;
 
-	// 1rst, determine the shader.***
+	// 1rst, determine the shader.
 	var gl = magoManager.sceneState.gl;
 	
-	// check attributes of the project.************************************************
+	// check attributes of the project.
 	var project = magoManager.hierarchyManager.getNodesMap(data.projectId);
 	if (project.attributes !== undefined && project.attributes.specularLighting !== undefined && shader.bApplySpecularLighting_loc !== undefined)
 	{
@@ -363,7 +363,7 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	}
 	// end check attributes of the project.----------------------------------------
 	
-	// set the currentObjectsRendering.***
+	// set the currentObjectsRendering.
 	magoManager.renderer.currentObjectsRendering.curNode = this;
 	
 	var flipYTexCoord = false;
@@ -372,17 +372,17 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 
 	gl.uniform1i(shader.textureFlipYAxis_loc, flipYTexCoord);
 	
-	// Check the geoLocationDatasCount & check if is a ghost-trail-render (trail as ghost).***
+	// Check the geoLocationDatasCount & check if is a ghost-trail-render (trail as ghost).
 	var currRenderingFase = magoManager.renderingFase;
 	if (this.isReferenceNode())
-	{ magoManager.renderingFase = -10; } // set a strange value to skip avoiding rendering fase of references objects.***
+	{ magoManager.renderingFase = -10; } // set a strange value to skip avoiding rendering fase of references objects.
 	
-	// Check if is trail-render.*************************************************************************************************************
+	// Check if is trail-render.*
 	var isTrailRender = this.data.isTrailRender;
 	if (isTrailRender !== undefined && isTrailRender === true)
 	{
 		magoManager.isTrailRender = true;
-		gl.depthRange(0.1, 1); // reduce depthRange to minimize blending flickling.***
+		gl.depthRange(0.1, 1); // reduce depthRange to minimize blending flickling.
 		var geoLocDatasCount = geoLocDataManager.getGeoLocationDatasCount();
 		//for(var i=geoLocDatasCount - 1; i>0; i--)
 		if (geoLocDatasCount >= geoLocDataManager.geoLocationDataArrayMaxLengthAllowed - 1)
@@ -395,8 +395,8 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 			var externalAlpha = (geoLocDatasCount - i)/(geoLocDatasCount*7);
 			gl.uniform1f(shader.externalAlpha_loc, externalAlpha);
 
-			// If this node is a referenceNode type, then, must render all references avoiding the renderingFase.***
-			neoBuilding.currentLod = data.currentLod; // update currentLod.***
+			// If this node is a referenceNode type, then, must render all references avoiding the renderingFase.
+			neoBuilding.currentLod = data.currentLod; // update currentLod.
 			neoBuilding.render(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord, data.currentLod);
 
 		}
@@ -412,18 +412,18 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	var buildingGeoLocation = geoLocDataManager.getGeoLocationData(geoLocDataIdx);
 	buildingGeoLocation.bindGeoLocationUniforms(gl, shader);
 
-	// magoManager.tempSettings.renderWithTopology === 0 -> render only Building.***
-	// magoManager.tempSettings.renderWithTopology === 1 -> render only Topology.***
-	// magoManager.tempSettings.renderWithTopology === 2 -> render both.***
+	// magoManager.tempSettings.renderWithTopology === 0 -> render only Building.
+	// magoManager.tempSettings.renderWithTopology === 1 -> render only Topology.
+	// magoManager.tempSettings.renderWithTopology === 2 -> render both.
 
-	// If this node is a referenceNode type, then, must render all references avoiding the renderingFase.***
+	// If this node is a referenceNode type, then, must render all references avoiding the renderingFase.
 	gl.uniform1f(shader.externalAlpha_loc, 1.0);
-	neoBuilding.currentLod = data.currentLod; // update currentLod.***
+	neoBuilding.currentLod = data.currentLod; // update currentLod.
 	neoBuilding.render(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord, data.currentLod);
 	
-	magoManager.renderingFase = currRenderingFase; // Return to current renderingFase.***
+	magoManager.renderingFase = currRenderingFase; // Return to current renderingFase.
 	
-	// Finally, if there are no animationData, then delete the trailEfect.***
+	// Finally, if there are no animationData, then delete the trailEfect.
 	if (this.data.animationData !== undefined && this.data.animationData.finished === true)
 	{
 		if (geoLocDataManager.getGeoLocationDatasCount() > 1)
@@ -434,7 +434,7 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 		}
 	}
 	
-	// Test.***
+	// Test.
 	/*
 	if (neoBuilding.network)
 	{
@@ -449,20 +449,20 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	
 	if (neoBuilding.network)
 	{
-		// Note: topology data is loaded (if exist) when loads the metaData in "prepareNeoBuildingsAsimetricVersion" in magoManager.***
+		// Note: topology data is loaded (if exist) when loads the metaData in "prepareNeoBuildingsAsimetricVersion" in magoManager.
 		if(magoManager.tempSettings.renderWithTopology === 1 || magoManager.tempSettings.renderWithTopology === 2)
 		{
-			// render the topology.***
+			// render the topology.
 			if (renderType !== 0)
 			{
-				gl.uniform1i(shader.bApplySsao_loc, false); // no apply ssao.***
-				gl.uniform1i(shader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.***
+				gl.uniform1i(shader.bApplySsao_loc, false); // no apply ssao.
+				gl.uniform1i(shader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.
 				var network = neoBuilding.network;
 				if (network)
 				{
 					network.render(magoManager, shader, renderType);
 				}
-				gl.uniform1i(shader.bApplySsao_loc, true); // apply ssao default.***
+				gl.uniform1i(shader.bApplySsao_loc, true); // apply ssao default.
 			}
 		}
 	}
@@ -560,12 +560,12 @@ Node.prototype.getBBox = function()
 	var data = this.data;
 	if (data.bbox === undefined)
 	{
-		// 1rst, check if exist neoBuilding's metaData.***
+		// 1rst, check if exist neoBuilding's metaData.
 		var neoBuilding = data.neoBuilding;
 		if (neoBuilding !== undefined && neoBuilding.metaData !== undefined)
 		{
 			var metaData = neoBuilding.metaData;
-			data.bbox = new BoundingBox(); // Only create a node's bbox when exist neoBuilding's metaData.***
+			data.bbox = new BoundingBox(); // Only create a node's bbox when exist neoBuilding's metaData.
 			data.bbox.copyFrom(metaData.bbox);
 		}
 		else if (data.buildingSeed !== undefined)
@@ -613,7 +613,7 @@ Node.prototype.calculateBBoxCenterPositionWorldCoord = function(geoLoc)
 	var bboxAbsoluteCenterPosAux;
 	if (this.data.bbox !== undefined)
 	{
-		// this.data.bbox is the most important bbox.***
+		// this.data.bbox is the most important bbox.
 		bboxCenterPoint = this.data.bbox.getCenterPoint(bboxCenterPoint); // local bbox.
 	}
 	else if (this.data.neoBuilding !== undefined)
@@ -651,13 +651,13 @@ Node.prototype.getDistToCamera = function(cameraPosition, boundingSphere_Aux)
 	var geoLocDataManager = nodeRoot.data.geoLocDataManager;
 	var geoLoc = geoLocDataManager.getCurrentGeoLocationData();
 	
-	// To calculate realBuildingPosition, we need this.data.bbox.***
-	// If this.data.bbox no exist, then calculate a provisional value.***
+	// To calculate realBuildingPosition, we need this.data.bbox.
+	// If this.data.bbox no exist, then calculate a provisional value.
 	if (this.bboxAbsoluteCenterPos === undefined) 
 	{
 		if (this.data.bbox !== undefined)
 		{
-			// this.data.bbox is the most important bbox.***
+			// this.data.bbox is the most important bbox.
 			var bboxCenterPoint = this.data.bbox.getCenterPoint(bboxCenterPoint); // local bbox.
 			this.bboxAbsoluteCenterPos = geoLoc.tMatrix.transformPoint3D(bboxCenterPoint, this.bboxAbsoluteCenterPos);
 		}
@@ -675,8 +675,8 @@ Node.prototype.getDistToCamera = function(cameraPosition, boundingSphere_Aux)
 	var projectsType = metaData.projectDataType;
 	if (projectsType && (projectsType === 4 || projectsType === 5))
 	{
-		// This is pointsCloud projectType.***
-		// Calculate the distance to camera with lowestOctrees.***
+		// This is pointsCloud projectType.
+		// Calculate the distance to camera with lowestOctrees.
 		var octree = neoBuilding.octree;
 		if (octree === undefined)
 		{ return undefined; }
@@ -691,7 +691,7 @@ Node.prototype.getDistToCamera = function(cameraPosition, boundingSphere_Aux)
 	}
 	else 
 	{
-		// This is mesh projectType.***
+		// This is mesh projectType.
 		data.distToCam = cameraPosition.distToSphere(boundingSphere_Aux);
 	}
 
@@ -725,18 +725,18 @@ Node.prototype.finishedAnimation = function(magoManager)
 	if (animData === undefined)
 	{ return true; }
 	
-	// calculate the currentLocation and currentRotation.***
+	// calculate the currentLocation and currentRotation.
 	var currTime = magoManager.getCurrentTime();
 	if (animData.lastTime === undefined)
 	{ animData.lastTime = animData.birthTime; }
 	
-	var totalDeltaTime = (currTime - animData.birthTime)/1000.0; // in seconds.***
+	var totalDeltaTime = (currTime - animData.birthTime)/1000.0; // in seconds.
 
 	var nextLongitude;
 	var nextLatitude;
 	var nextAltitude;
 	
-	// calculate velocity.***
+	// calculate velocity.
 	var velocityLon = (animData.targetLongitude - animData.startLongitude)/(animData.durationInSeconds);
 	var velocityLat = (animData.targetLatitude - animData.startLatitude)/(animData.durationInSeconds);
 	var velocityAlt = (animData.targetAltitude - animData.startAltitude)/(animData.durationInSeconds);
@@ -751,13 +751,13 @@ Node.prototype.finishedAnimation = function(magoManager)
 		nextLatitude = animData.targetLatitude;
 		nextAltitude = animData.targetAltitude;
 		
-		// finish the process.***
+		// finish the process.
 		finished = true;
 		this.data.animationData.finished = true;
 	}
 	else
 	{
-		// calculate by durationInSeconds.***
+		// calculate by durationInSeconds.
 		var targetLongitude = animData.targetLongitude;
 		var targetLatitude = animData.targetLatitude;
 		var targetAltitude = animData.targetAltitude;
@@ -766,7 +766,7 @@ Node.prototype.finishedAnimation = function(magoManager)
 		nextLatitude = animData.startLatitude + velocityLat * totalDeltaTime;
 		nextAltitude = animData.startAltitude + velocityAlt * totalDeltaTime;
 		
-		// finally update "lastTime".***
+		// finally update "lastTime".
 		animData.lastTime = currTime;
 		finished = false;
 	}
@@ -782,7 +782,7 @@ Node.prototype.finishedAnimation = function(magoManager)
  
 Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude, elevation, heading, pitch, roll, magoManager, animationOption) 
 {
-	// Provisionally set a geoLocationData target.************************************
+	// Provisionally set a geoLocationData target.
 	if (this.data.animationData === undefined)
 	{ this.data.animationData = new AnimationData(); }
 	
@@ -794,22 +794,22 @@ Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude,
 	var geoLocData = geoLocDataManager.getCurrentGeoLocationData();
 	var geoCoords = geoLocData.getGeographicCoords();
 	
-	// start location.***
+	// start location.
 	animData.startLongitude = geoCoords.longitude;
 	animData.startLatitude = geoCoords.latitude;
 	animData.startAltitude = geoCoords.altitude;
 	
-	// target location.***
+	// target location.
 	animData.targetLongitude = longitude;
 	animData.targetLatitude = latitude;
 	animData.targetAltitude = elevation;
 	
-	// calculate rotation (heading & pitch).***
+	// calculate rotation (heading & pitch).
 	var currLongitude = geoCoords.longitude;
 	var currLatitude = geoCoords.latitude;
 	var currAltitude = geoCoords.altitude;
 
-	// target rotation.***
+	// target rotation.
 	animData.targetHeading = heading;
 	animData.targetPitch = pitch;
 	animData.targetRoll = roll;
@@ -834,7 +834,7 @@ Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude,
 			var relativeNextPos;
 			relativeNextPos = geoLocData.getTransformedRelativePositionNoApplyHeadingPitchRoll(nextPoint3d, relativeNextPos);
 			
-			// calculate heading (initially yAxis to north).***
+			// calculate heading (initially yAxis to north).
 			var nextHeading = Math.atan(-relativeNextPos.x/relativeNextPos.y)*180.0/Math.PI;
 			var nextPosModule2d = Math.sqrt(relativeNextPos.x*relativeNextPos.x + relativeNextPos.y*relativeNextPos.y);
 			var nextPitch = Math.atan(relativeNextPos.z/nextPosModule2d)*180.0/Math.PI;
@@ -852,10 +852,10 @@ Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude,
 	//if (durationInSeconds === undefined)
 	//{ durationInSeconds = 3.0; }
 	animData.durationInSeconds = durationInSeconds;
-	// linear velocity in m/s.***
+	// linear velocity in m/s.
 	//animData.linearVelocityInMetersSecond = 40.0;
 				
-	// angular velocity deg/s.***
+	// angular velocity deg/s.
 	//animData.headingAngDegSecondVelocity = 10.0;
 	//animData.pitchAngDegSecondVelocity = 0.0;
 	//animData.rollAngDegSecondVelocity = 0.0;
@@ -872,7 +872,7 @@ Node.prototype.changeLocationAndRotation = function(latitude, longitude, elevati
 {
 	
 	var nodeRoot;
-	//nodeRoot = this.getRoot(); // original.***
+	//nodeRoot = this.getRoot(); // original.
 	nodeRoot = this.getClosestParentWithData("geoLocDataManager");
 	// 126.60625627706231
 	
@@ -901,7 +901,7 @@ Node.prototype.changeLocationAndRotation = function(latitude, longitude, elevati
 		}
 		else 
 		{
-			geoLocationData = geoLocDatamanager.getCurrentGeoLocationData(); // original.***
+			geoLocationData = geoLocDatamanager.getCurrentGeoLocationData(); // original.
 		}
 		if (geoLocationData === undefined)
 		{ continue; }
@@ -913,39 +913,39 @@ Node.prototype.changeLocationAndRotation = function(latitude, longitude, elevati
 		if (geoLocationData.geographicCoord === undefined)
 		{ continue; } 
 	
-		// Change the geoCoords of the buildingSeed.***
+		// Change the geoCoords of the buildingSeed.
 		var buildingSeed = aNode.data.buildingSeed;
 		buildingSeed.geographicCoordOfBBox.longitude = longitude;
 		buildingSeed.geographicCoordOfBBox.latitude = latitude;
 
 		
-		// now, must change the keyMatrix of the references of the octrees of all buildings of this node.***
+		// now, must change the keyMatrix of the references of the octrees of all buildings of this node.
 		var neoBuilding = aNode.data.neoBuilding;
 		if (neoBuilding.octree)
 		{
 			neoBuilding.octree.multiplyKeyTransformMatrix(0, geoLocationData.rotMatrix);
 		}
 		neoBuilding.calculateBBoxCenterPositionWorldCoord(geoLocationData);
-		nodeRoot.bboxAbsoluteCenterPos = undefined; // provisional.***
-		nodeRoot.calculateBBoxCenterPositionWorldCoord(geoLocationData); // provisional.***
+		nodeRoot.bboxAbsoluteCenterPos = undefined; // provisional.
+		nodeRoot.calculateBBoxCenterPositionWorldCoord(geoLocationData); // provisional.
 		
-		aNode.bboxAbsoluteCenterPos = undefined; // provisional.***
-		aNode.calculateBBoxCenterPositionWorldCoord(geoLocationData); // provisional.***
+		aNode.bboxAbsoluteCenterPos = undefined; // provisional.
+		aNode.calculateBBoxCenterPositionWorldCoord(geoLocationData); // provisional.
 		
-		// Now, calculate the geoCoords of the bbox.***
+		// Now, calculate the geoCoords of the bbox.
 		if (nodeRoot.data.bbox.geographicCoord === undefined)
 		{ nodeRoot.data.bbox.geographicCoord = new GeographicCoord(); }
 		
 		nodeRoot.data.bbox.geographicCoord.setLonLatAlt(longitude, latitude, elevation); // provisional. Must calculate the ... TODO:
 		
-		// aNode was moved, so, check if is out of the smartTileOwner.***
-		// If aNode is out of the smartTileOwner, then, erase the node from the smartTileOwner, and then put the node in the corresponent smartTile.***
+		// aNode was moved, so, check if is out of the smartTileOwner.
+		// If aNode is out of the smartTileOwner, then, erase the node from the smartTileOwner, and then put the node in the corresponent smartTile.
 		var smartTileOwner = aNode.data.smartTileOwner;
 		if (!smartTileOwner.intersectsNode(aNode))
 		{
 			smartTileOwner.eraseNode(aNode);
 					
-			// Now, put the node in the corresponent smartTile.***
+			// Now, put the node in the corresponent smartTile.
 			var targetDepth = smartTileOwner.targetDepth;
 			magoManager.smartTileManager.putNode(targetDepth, aNode, magoManager);
 		}

@@ -35,7 +35,7 @@ var IndexData = function()
  */
 IndexData.prototype.deleteObjects = function() 
 {
-	// Don't delete objects. Only assign as undefined.***
+	// Don't delete objects. Only assign as undefined.
 	this.owner = undefined;
 	this.idx = undefined;
 };
