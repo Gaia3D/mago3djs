@@ -13,16 +13,16 @@ var SceneState = function()
 	
 	this.gl;
 
-	// this contains the model matrices and camera position.***
-	this.modelViewProjRelToEyeMatrix = new Matrix4(); // created as identity matrix.***
-	this.modelViewRelToEyeMatrix = new Matrix4(); // created as identity matrix.***
-	this.modelViewRelToEyeMatrixInv = new Matrix4(); // created as identity matrix.***
-	this.modelViewMatrix = new Matrix4(); // created as identity matrix.***
-	this.modelViewMatrixInv = new Matrix4(); // created as identity matrix.***
-	this.projectionMatrix = new Matrix4(); // created as identity matrix.***
-	this.modelViewProjMatrix = new Matrix4(); // created as identity matrix.***
-	this.normalMatrix4 = new Matrix4(); // created as identity matrix.***
-	this.identityMatrix4 = new Matrix4(); // created as identity matrix.***
+	// this contains the model matrices and camera position.
+	this.modelViewProjRelToEyeMatrix = new Matrix4(); // created as identity matrix.
+	this.modelViewRelToEyeMatrix = new Matrix4(); // created as identity matrix.
+	this.modelViewRelToEyeMatrixInv = new Matrix4(); // created as identity matrix.
+	this.modelViewMatrix = new Matrix4(); // created as identity matrix.
+	this.modelViewMatrixInv = new Matrix4(); // created as identity matrix.
+	this.projectionMatrix = new Matrix4(); // created as identity matrix.
+	this.modelViewProjMatrix = new Matrix4(); // created as identity matrix.
+	this.normalMatrix4 = new Matrix4(); // created as identity matrix.
+	this.identityMatrix4 = new Matrix4(); // created as identity matrix.
 
 	this.encodedCamPosHigh = new Float32Array([0.0, 0.0, 0.0]);
 	this.encodedCamPosLow = new Float32Array([0.0, 0.0, 0.0]);
@@ -32,7 +32,7 @@ var SceneState = function()
 	this.drawingBufferHeight = new Int32Array([1000]);
 	this.mouseAction = new MouseAction();
 	
-	// lighting & ssao.***
+	// lighting & ssao.
 	this.ambientReflectionCoef = new Float32Array([0.45]); // 0.2.
 	this.diffuseReflectionCoef = new Float32Array([0.75]); // 1.0
 	this.specularReflectionCoef = new Float32Array([0.6]); // 0.7
@@ -93,16 +93,16 @@ var SceneState = function()
 		
 	this.bMust = false;
 	
-	// webWorldWind vars.***
+	// webWorldWind vars.
 	this.dc;
 	
-	// insertIssue states.***
-	this.insertIssueState = 0; // 0 = no started. 1 = started.***
+	// insertIssue states.
+	this.insertIssueState = 0; // 0 = no started. 1 = started.
 	
-	// provisionally.***
+	// provisionally.
 	this.textureFlipYAxis = false;
 	
-	// mouse.***
+	// mouse.
 	this.mouseButton = -1;
 	
 };

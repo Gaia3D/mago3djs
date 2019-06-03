@@ -84,7 +84,7 @@ var Lego = function()
 	 * @deprecated
 	 * @type {String}
 	 */
-	this.renderableType; // triangles, lines, points, etc.***
+	this.renderableType; // triangles, lines, points, etc.
 
 	/**
 	 * 칼라값 유무
@@ -221,16 +221,12 @@ Lego.prototype.deleteObjects = function(gl, vboMemManager)
  * normal, texCoord는 없음
  * 
  * @param {ArrayBuffer} dataArraybuffer 
-<<<<<<< HEAD
- * @param {WebGLRenderingContext} gl WebGL Rendering Context.
-=======
  * @param {WebGLRenderingContext} gl not use
->>>>>>> develop
  * @param {MagoManager} magoManager 
  */
 Lego.prototype.parsePointsCloudData = function(buffer, gl, magoManager)
 {
-	// Provisional.***
+	// Provisional.
 	if (this.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)	{ return; }
 	var stream = new DataStream(buffer, 0, DataStream.LITTLE_ENDIAN);
 	
@@ -243,7 +239,7 @@ Lego.prototype.parsePointsCloudData = function(buffer, gl, magoManager)
 	var bbox = this.bbox;
 	var vboCacheKey = this.vbo_vicks_container.newVBOVertexIdxCacheKey();
 
-	// BoundingBox in float values.***
+	// BoundingBox in float values.
 	bbox.minX = stream.readFloat32();
 	bbox.minY = stream.readFloat32();
 	bbox.minZ = stream.readFloat32();
@@ -251,8 +247,8 @@ Lego.prototype.parsePointsCloudData = function(buffer, gl, magoManager)
 	bbox.maxY = stream.readFloat32();
 	bbox.maxZ = stream.readFloat32();
 	
-	// positionsBuffer.***
-	// read bPositionsCompressed. If this var is true -> positions is in uShort).***
+	// positionsBuffer.
+	// read bPositionsCompressed. If this var is true -> positions is in uShort).
 	this.bPositionsCompressed = stream.readInt8();
 	var posByteSize = verticesCount * 3;
 	var positionBuffer;
@@ -267,14 +263,14 @@ Lego.prototype.parsePointsCloudData = function(buffer, gl, magoManager)
 		vboCacheKey.setDataArrayPos(stream.readFloat32Array(verticesCount * 3), vboMemManager);
 	}
 
-	// normals.***
+	// normals.
 	this.hasNormals = stream.readInt8();
 	if (this.hasNormals)
 	{
 		// todo:
 	}
 	
-	// colors.***
+	// colors.
 	this.hasColors = stream.readInt8();
 	if (this.hasColors)
 	{
@@ -282,14 +278,14 @@ Lego.prototype.parsePointsCloudData = function(buffer, gl, magoManager)
 		vboCacheKey.setDataArrayCol(stream.readUint8Array(numColors * 4), vboMemManager);
 	}
 	
-	// texCoords.***
+	// texCoords.
 	this.hasTexCoords = stream.readInt8();
 	if (this.hasTexCoords)
 	{
 		// todo:
 	}
 	
-	// indices.***
+	// indices.
 	this.hasIndices = stream.readInt8();
 	if (this.hasIndices)
 	{
@@ -305,11 +301,7 @@ Lego.prototype.parsePointsCloudData = function(buffer, gl, magoManager)
  * LOADING_FINISHED 상태일때 실행.
  * 
  * @param {ArrayBuffer} dataArraybuffer 
-<<<<<<< HEAD
- * @param {WebGLRenderingContext} gl WebGL Rendering Context.
-=======
  * @param {WebGLRenderingContext} gl not use
->>>>>>> develop
  * @param {MagoManager} magoManager 
  */
 Lego.prototype.parseLegoData = function(buffer, gl, magoManager)
@@ -391,12 +383,12 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader)
 	}
 	gl.frontFace(gl.CCW);
 	
-	// renderType = 0 -> depth render.***
-	// renderType = 1 -> normal render.***
-	// renderType = 2 -> colorSelection render.***
+	// renderType = 0 -> depth render.
+	// renderType = 1 -> normal render.
+	// renderType = 2 -> colorSelection render.
 	//--------------------------------------------
 	
-	var vbo_vicky = this.vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.***
+	var vbo_vicky = this.vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.
 
 	var vertices_count = vbo_vicky.vertexCount;
 	if (vertices_count === 0) 
@@ -404,13 +396,13 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader)
 		return false;
 	}
 
-	if (renderType === 0 || renderType === 2) // depth or colorSelection.***
+	if (renderType === 0 || renderType === 2) // depth or colorSelection.
 	{
 		shader.disableVertexAttribArray(shader.texCoord2_loc);
 		shader.disableVertexAttribArray(shader.normal3_loc);
 		shader.disableVertexAttribArray(shader.color4_loc);
 		
-		// 1) Position.*********************************************
+		// 1) Position.
 		if (!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
 		{ return false; }
 
@@ -418,17 +410,17 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader)
 		rendered = true;
 		
 	}
-	else if (renderType === 1) // color.***
+	else if (renderType === 1) // color.
 	{
-		// Test external alpha.***
-		if (magoManager.isTrailRender === undefined || magoManager.isTrailRender === false) // check if mago is not rendering special effects.***
+		// Test external alpha.
+		if (magoManager.isTrailRender === undefined || magoManager.isTrailRender === false) // check if mago is not rendering special effects.
 		{
 			var blendAlpha = this.getBlendAlpha(magoManager.currTime);
 			gl.uniform1f(shader.externalAlpha_loc, blendAlpha);
 		}
 		// End test.---
 	
-		// 4) Texcoord.*********************************************
+		// 4) Texcoord.
 		if (renderTexture)
 		{
 			if (!vbo_vicky.bindDataTexCoord(shader, magoManager.vboMemoryManager))
@@ -456,7 +448,7 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader)
 		
 		if (renderTexture && vbo_vicky.vboBufferTCoord !== undefined)
 		{
-			// Provisionally flip tex coords here.***************************************
+			// Provisionally flip tex coords here.
 			if (magoManager.configInformation.geo_view_library === Constant.CESIUM)
 			{ gl.uniform1i(shader.textureFlipYAxis_loc, false); }//.ppp
 			else

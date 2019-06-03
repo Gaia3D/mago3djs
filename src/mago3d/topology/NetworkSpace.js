@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * NetworkSpace.***
+ * NetworkSpace.
  * 
  * @alias NetworkSpace
  * @class NetworkSpace

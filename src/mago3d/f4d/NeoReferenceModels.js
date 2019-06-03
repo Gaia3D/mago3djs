@@ -192,7 +192,7 @@ NeoReference.prototype.getBlendAlpha = function(currTime)
  */
 NeoReference.prototype.multiplyTransformMatrix = function(matrix) 
 {
-	this._matrix4 = this._originalMatrix4.getMultipliedByMatrix(matrix); // Original.***
+	this._matrix4 = this._originalMatrix4.getMultipliedByMatrix(matrix); // Original.
 };
 
 /**
@@ -200,7 +200,7 @@ NeoReference.prototype.multiplyTransformMatrix = function(matrix)
  */
 NeoReference.prototype.multiplyKeyTransformMatrix = function(idxKey, matrix) 
 {
-	// this function multiplies the originalMatrix by "matrix" and stores it in the "idxKey" position.***
+	// this function multiplies the originalMatrix by "matrix" and stores it in the "idxKey" position.
 	if (this.tMatrixAuxArray === undefined)
 	{ this.tMatrixAuxArray = []; }
 
@@ -235,7 +235,7 @@ NeoReference.prototype.isReadyToRender = function()
 	if (this.tMatrixAuxArray === undefined)
 	{
 		//this.multiplyKeyTransformMatrix(refMatrixIdxKey, neoBuilding.geoLocationDataAux.rotMatrix);
-		// we must collect all the neoReferences that has no tMatrixAuxArray and make it.***
+		// we must collect all the neoReferences that has no tMatrixAuxArray and make it.
 		return false;
 	}
 	
@@ -249,7 +249,7 @@ NeoReference.prototype.solveReferenceColorOrTexture = function(magoManager, neoB
 {
 	var gl = magoManager.sceneState.gl;
 	
-	// Check if we are under a selected data structure.***
+	// Check if we are under a selected data structure.
 	var selectionManager = magoManager.selectionManager;
 	var referenceObjectIsSelected = false;
 	if (selectionManager.parentSelected && magoManager.objectSelected === this)
@@ -260,12 +260,12 @@ NeoReference.prototype.solveReferenceColorOrTexture = function(magoManager, neoB
 	// Check the color or texture of reference object.
 	if (neoBuilding.isHighLighted)
 	{
-		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
+		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 		gl.uniform4fv(shader.oneColor4_loc, magoManager.highLightColor4);
 	}
 	else if (neoBuilding.isColorChanged)
 	{
-		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
+		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 		if (referenceObjectIsSelected) 
 		{
 			gl.uniform4fv(shader.oneColor4_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
@@ -277,7 +277,7 @@ NeoReference.prototype.solveReferenceColorOrTexture = function(magoManager, neoB
 	}
 	else if (this.aditionalColor)
 	{
-		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
+		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 		if (referenceObjectIsSelected) 
 		{
 			gl.uniform4fv(shader.oneColor4_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
@@ -292,7 +292,7 @@ NeoReference.prototype.solveReferenceColorOrTexture = function(magoManager, neoB
 		// Normal rendering.
 		if (magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.OBJECT && referenceObjectIsSelected) 
 		{
-			gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
+			gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 			gl.uniform4fv(shader.oneColor4_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
 			
 			// Active stencil if the object is selected.
@@ -300,7 +300,7 @@ NeoReference.prototype.solveReferenceColorOrTexture = function(magoManager, neoB
 		}
 		else if (magoManager.magoPolicy.colorChangedObjectId === this.objectId)
 		{
-			gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
+			gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 			gl.uniform4fv(shader.oneColor4_loc, [magoManager.magoPolicy.color[0], magoManager.magoPolicy.color[1], magoManager.magoPolicy.color[2], 1.0]);
 		}
 		else
@@ -309,7 +309,7 @@ NeoReference.prototype.solveReferenceColorOrTexture = function(magoManager, neoB
 			{
 				if (this.texture !== undefined && this.texture.texId !== undefined) 
 				{
-					gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.***
+					gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
 					if (shader.last_tex_id !== this.texture.texId) 
 					{
 						gl.bindTexture(gl.TEXTURE_2D, this.texture.texId);
@@ -320,22 +320,22 @@ NeoReference.prototype.solveReferenceColorOrTexture = function(magoManager, neoB
 				}
 				else 
 				{
-					gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
+					gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 					gl.uniform4fv(shader.oneColor4_loc, [0.8, 0.0, 0.8, 1.0]);
 				}
 			}
 			else 
 			{
-				// if no render texture, then use a color.***
-				gl.uniform1i(shader.bUse1Color_loc, true); //.***
+				// if no render texture, then use a color.
+				gl.uniform1i(shader.bUse1Color_loc, true); //.
 				if (this.color4) 
 				{
-					gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
+					gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 					gl.uniform4fv(shader.oneColor4_loc, [this.color4.r/255.0, this.color4.g/255.0, this.color4.b/255.0, this.color4.a/255.0]);
 				}
 				else
 				{
-					gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
+					gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 					gl.uniform4fv(shader.oneColor4_loc, [0.8, 0.8, 0.8, 1.0]);
 				}
 			}
@@ -371,7 +371,7 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 		{ return false; }
 	}
 	
-	// vars.***
+	// vars.
 	if (shader.name === undefined)
 	{ var hola = 0; }
 	
@@ -385,7 +385,7 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 	{
 		selectionManager = magoManager.selectionManager;
 		selectionColor = magoManager.selectionColor;
-		renderTexture = false; // reassign value for this var.***
+		renderTexture = false; // reassign value for this var.
 		currentNode = currentObjectsRendering.curNode;
 		currentOctree = currentObjectsRendering.curOctree;
 	}
@@ -404,7 +404,7 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 	if (!block.isReadyToRender(neoReference, magoManager, minSizeToRender))
 	{ return false; }
 
-	// Check the color or texture of reference object.***************************************************************************
+	// Check the color or texture of reference object.
 	if (renderType === 1)
 	{
 		neoReference.solveReferenceColorOrTexture(magoManager, neoBuilding, shader, currentObjectsRendering);
@@ -422,11 +422,11 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 	}
 	// End check color or texture of reference object.-----------------------------------------------------------------------------
 	
-	//Now erase the aditional information (aditionalColor & moveVector).***
+	//Now erase the aditional information (aditionalColor & moveVector).
 	this.aditionalColor = undefined;
 	
-	// Test external alpha.***
-	if (magoManager.isTrailRender === undefined || magoManager.isTrailRender === false) // check if mago is not rendering special effects.***
+	// Test external alpha.
+	if (magoManager.isTrailRender === undefined || magoManager.isTrailRender === false) // check if mago is not rendering special effects.
 	{
 		var blendAlpha = neoReference.getBlendAlpha(magoManager.currTime);
 		gl.uniform1f(shader.externalAlpha_loc, blendAlpha);
@@ -435,7 +435,7 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 	// End test.---
 	
 	var cacheKeys_count = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray.length;
-	// Must applicate the transformMatrix of the reference object.***
+	// Must applicate the transformMatrix of the reference object.
 
 	gl.uniform1i(shader.refMatrixType_loc, neoReference.refMatrixType);
 
@@ -448,7 +448,7 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 	if (neoReference.moveVector !== undefined) 
 	{
 		gl.uniform1i(shader.hasAditionalMov_loc, true);
-		gl.uniform3fv(shader.aditionalMov_loc, [neoReference.moveVector.x, neoReference.moveVector.y, neoReference.moveVector.z]); //.***
+		gl.uniform3fv(shader.aditionalMov_loc, [neoReference.moveVector.x, neoReference.moveVector.y, neoReference.moveVector.z]); //.
 		shader.last_isAditionalMovedZero = false;
 	}
 	else 
@@ -456,32 +456,32 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 		if (!shader.last_isAditionalMovedZero)
 		{
 			gl.uniform1i(shader.hasAditionalMov_loc, false);
-			gl.uniform3fv(shader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
+			gl.uniform3fv(shader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.
 			shader.last_isAditionalMovedZero = true;
 		}
 	}
 	
-	// Test check.***
+	// Test check.
 	if (magoManager.objectSelected === this)
 	{ var hola = 0; }
 	
 	var vboKey;
-	for (var n=0; n<cacheKeys_count; n++) // Original.***
+	for (var n=0; n<cacheKeys_count; n++) // Original.
 	{
 		//var mesh_array = block.viArraysContainer._meshaderrays[n];
 		vboKey = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray[n];
 		
-		// Positions.***
+		// Positions.
 		if (!vboKey.bindDataPosition(shader, magoManager.vboMemoryManager))
 		{ return false; }
 
 		if (renderType === 1)
 		{
-			// Normals.***
+			// Normals.
 			if (!vboKey.bindDataNormal(shader, magoManager.vboMemoryManager))
 			{ return false; }
 
-			// TexCoords.***
+			// TexCoords.
 			if (renderTexture && neoReference.hasTexture) 
 			{
 				if (block.vertexCount <= neoReference.vertexCount) 
@@ -501,7 +501,7 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 			}
 		}
 
-		// Indices.***
+		// Indices.
 		var indicesCount;
 		if (magoManager.isCameraMoving)// && !isInterior && magoManager.isCameraInsideBuilding)
 		{
@@ -533,9 +533,9 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 		if (!vboKey.bindDataIndice(shader, magoManager.vboMemoryManager))
 		{ return false; }
 		//gl.disable(gl.CULL_FACE);
-		gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.***
-		//gl.drawElements(gl.LINES, indicesCount, gl.UNSIGNED_SHORT, 0); // Wireframe.***
-		//gl.drawElements(gl.POINTS, indicesCount, gl.UNSIGNED_SHORT, 0); // Wireframe.***
+		gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.
+		//gl.drawElements(gl.LINES, indicesCount, gl.UNSIGNED_SHORT, 0); // Wireframe.
+		//gl.drawElements(gl.POINTS, indicesCount, gl.UNSIGNED_SHORT, 0); // Wireframe.
 		
 	}
 		
@@ -547,37 +547,37 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
  */
 NeoReference.prototype.deleteObjects = function(gl, vboMemManager) 
 {
-	// 1) Object ID.***
+	// 1) Object ID.
 	this._id = undefined;
 
-	// 2) Block Idx.***
+	// 2) Block Idx.
 	this._block_idx = undefined;
 
-	// 3) Transformation Matrix.***
+	// 3) Transformation Matrix.
 	this._matrix4._floatArrays = undefined;
 	this._matrix4 = undefined;
 	this._originalMatrix4._floatArrays = undefined;
 	this._originalMatrix4 = undefined; //
 
-	// 5) The texture image.***
+	// 5) The texture image.
 	this.hasTexture = undefined;
 	// no delete the texture, only break the referencing.
 	this.texture = undefined; // Texture
 
-	// 6) 1 color.***
+	// 6) 1 color.
 	if (this.color4)
 	{ this.color4.deleteObjects(); }
 	this.color4 = undefined; //new Color();
 
-	// 7) selection color.***
+	// 7) selection color.
 	if (this.selColor4)
 	{ this.selColor4.deleteObjects(); }
-	this.selColor4 = undefined; //new Color(); // use for selection only.***
+	this.selColor4 = undefined; //new Color(); // use for selection only.
 
-	// 8) movement of the object.***
+	// 8) movement of the object.
 	if (this.moveVector)
 	{ this.moveVector.deleteObjects(); }
-	this.moveVector = undefined; // Point3D.***
+	this.moveVector = undefined; // Point3D.
 
 	this.bRendered = undefined;
 	
@@ -588,9 +588,9 @@ NeoReference.prototype.deleteObjects = function(gl, vboMemManager)
 	}
 };
 
-//*************************************************************************************************************************************************************
-//*************************************************************************************************************************************************************
-//*************************************************************************************************************************************************************
+//*
+//*
+//*
 /**
  * 어떤 일을 하고 있습니까?
  * @class NeoReferencesMotherAndIndices
@@ -602,7 +602,7 @@ var NeoReferencesMotherAndIndices = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	this.motherNeoRefsList; // this is a NeoReferencesList pointer.***
+	this.motherNeoRefsList; // this is a NeoReferencesList pointer.
 	this.neoRefsIndices = []; // All objects(references) of this class.
 	this.modelReferencedGroupsList; // (for new format. No used yet).
 	this.blocksList;
@@ -637,7 +637,7 @@ NeoReferencesMotherAndIndices.prototype.updateCurrentVisibleIndices = function(e
 	if (applyOcclusionCulling === undefined)
 	{ applyOcclusionCulling = true; }
 
-	// check if is interior.***
+	// check if is interior.
 	var isExterior = false;
 	if (this.interior_ocCullOctree !== undefined)
 	{
@@ -719,7 +719,7 @@ NeoReferencesMotherAndIndices.prototype.deleteObjects = function(gl, vboMemManag
 		this.xhr = undefined;
 	}
 	
-	this.motherNeoRefsList = undefined; // this is a NeoReferencesList pointer.***
+	this.motherNeoRefsList = undefined; // this is a NeoReferencesList pointer.
 	this.neoRefsIndices = undefined;
 	
 	if (this.blocksList !== undefined && this.blocksList.xhr !== undefined && this.fileLoadState !== CODE.fileLoadState.READY)
@@ -817,14 +817,14 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 	{
 		var neoRef = new NeoReference();
 
-		// 1) Id.***
+		// 1) Id.
 		var ref_ID =  readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		neoRef._id = ref_ID;
 
 		this.motherNeoRefsList = neoBuilding.motherNeoReferencesArray;
 		if (this.motherNeoRefsList[neoRef._id] !== undefined)
 		{
-			// pass this neoReference because exist in the motherNeoReferencesArray.***
+			// pass this neoReference because exist in the motherNeoReferencesArray.
 			neoRef = this.motherNeoRefsList[neoRef._id];
 			if (this.neoRefsIndices === undefined)
 			{ this.neoRefsIndices = []; }
@@ -837,10 +837,10 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 			//neoRef.objectId = objectId;
 			bytes_readed += objectIdLength;
 
-			// 2) Block's Idx.***
+			// 2) Block's Idx.
 			var blockIdx =   readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 
-			// 3) Transform Matrix4.***
+			// 3) Transform Matrix4.
 			// in versioned mode read the matrixType first.
 			var matrixType = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 			if (matrixType === 0)
@@ -858,7 +858,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 				bytes_readed += 4 * 16;
 			}
 
-			// Float mode.**************************************************************
+			// Float mode.**
 			var has_1_color = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 			if (has_1_color) 
 			{
@@ -904,7 +904,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 						var verticesFloatValuesCount = vertexCount * dim;
 						startBuff = bytes_readed;
 						endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
-						bytes_readed += daya_bytes * verticesFloatValuesCount; // updating data.***
+						bytes_readed += daya_bytes * verticesFloatValuesCount; // updating data.
 					}
 					
 					if (has_texCoords)
@@ -917,7 +917,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 						else if (data_type === 5126) { daya_bytes = 4; }
 						
 						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-						var verticesFloatValuesCount = vertexCount * 2; // 2 = dimension of texCoord.***
+						var verticesFloatValuesCount = vertexCount * 2; // 2 = dimension of texCoord.
 						startBuff = bytes_readed;
 						endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
 						bytes_readed += daya_bytes * verticesFloatValuesCount;
@@ -925,7 +925,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 				}
 			}
 			
-			// 4) short texcoords. OLD. Change this for Materials.***
+			// 4) short texcoords. OLD. Change this for Materials.
 			var materialIdAux = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			
 			// do the stadistic recount.
@@ -951,11 +951,11 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 			
 			neoBuilding.putReferenceObject(neoRef, neoRef._id);
 
-			// 2) Block's Idx.***
+			// 2) Block's Idx.
 			var blockIdx =   readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			neoRef._block_idx = blockIdx;
 
-			// 3) Transform Matrix4.***
+			// 3) Transform Matrix4.
 			neoRef.refMatrixType = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 			if (neoRef.refMatrixType === 0)
 			{ 
@@ -998,7 +998,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 				stadistic_refMat_Transforms_count +=1;
 			}
 
-			// Float mode.**************************************************************
+			// Float mode.**
 			var has_1_color = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 			if (has_1_color) 
 			{
@@ -1057,15 +1057,15 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 						colByteSize = verticesFloatValuesCount;
 						classifiedColByteSize = vboMemManager.getClassifiedBufferSize(colByteSize);
 						
-						neoRef.vertexCount = vertexCount; // no necessary.***
+						neoRef.vertexCount = vertexCount; // no necessary.
 						startBuff = bytes_readed;
 						endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
-						//vboViCacheKey.colVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff)); // original.***
-						// TODO: Float32Array or UintArray depending of dataType.***
+						//vboViCacheKey.colVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff)); // original.
+						// TODO: Float32Array or UintArray depending of dataType.
 						var colVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
 						vboViCacheKey.setDataArrayColor(colVboDataArray, vboMemManager);
 
-						bytes_readed += daya_bytes * verticesFloatValuesCount; // updating data.***
+						bytes_readed += daya_bytes * verticesFloatValuesCount; // updating data.
 						
 						// send data to gpu.
 						if (!vboViCacheKey.isReadyColors(gl, magoManager.vboMemoryManager))
@@ -1084,9 +1084,9 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 						else if (data_type === 5126) { daya_bytes = 4; }
 						
 						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-						var verticesFloatValuesCount = vertexCount * 2; // 2 = dimension of texCoord.***
+						var verticesFloatValuesCount = vertexCount * 2; // 2 = dimension of texCoord.
 
-						neoRef.vertexCount = vertexCount; // no necessary.***
+						neoRef.vertexCount = vertexCount; // no necessary.
 						startBuff = bytes_readed;
 						endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
 
@@ -1130,15 +1130,15 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 	//this.createModelReferencedGroups(); // test for stadistics.
 	
 
-	// Now occlusion cullings.***
-	// Occlusion culling octree data.*****
+	// Now occlusion cullings.
+	// Occlusion culling octree data.**
 	if (this.exterior_ocCullOctree === undefined)
 	{ this.exterior_ocCullOctree = new OcclusionCullingOctreeCell(); }
 
 	var infiniteOcCullBox = this.exterior_ocCullOctree;
-	//bytes_readed = this.readOcclusionCullingOctreeCell(arrayBuffer, bytes_readed, infiniteOcCullBox); // old.***
+	//bytes_readed = this.readOcclusionCullingOctreeCell(arrayBuffer, bytes_readed, infiniteOcCullBox); // old.
 	bytes_readed = this.exterior_ocCullOctree.parseArrayBuffer(arrayBuffer, bytes_readed, readWriter);
-	infiniteOcCullBox.expandBox(1000); // Only for the infinite box.***
+	infiniteOcCullBox.expandBox(1000); // Only for the infinite box.
 	infiniteOcCullBox.setSizesSubBoxes();
 	infiniteOcCullBox.createModelReferencedGroups(this.motherNeoRefsList);
 
@@ -1146,7 +1146,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 	{ this.interior_ocCullOctree = new OcclusionCullingOctreeCell(); }
 
 	var ocCullBox = this.interior_ocCullOctree;
-	//bytes_readed = this.readOcclusionCullingOctreeCell(arrayBuffer, bytes_readed, ocCullBox); // old.***
+	//bytes_readed = this.readOcclusionCullingOctreeCell(arrayBuffer, bytes_readed, ocCullBox); // old.
 	bytes_readed = this.interior_ocCullOctree.parseArrayBuffer(arrayBuffer, bytes_readed, readWriter);
 	ocCullBox.setSizesSubBoxes();
 	ocCullBox.createModelReferencedGroups(this.motherNeoRefsList);
@@ -1183,7 +1183,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 	{
 		var neoRef = new NeoReference();
 
-		// 1) Id.***
+		// 1) Id.
 		var ref_ID =  readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		neoRef._id = ref_ID;
 		
@@ -1191,7 +1191,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 		this.motherNeoRefsList = neoBuilding.motherNeoReferencesArray;
 		if (this.motherNeoRefsList[neoRef._id] !== undefined)
 		{
-			// pass this neoReference because exist in the motherNeoReferencesArray.***
+			// pass this neoReference because exist in the motherNeoReferencesArray.
 			neoRef = this.motherNeoRefsList[neoRef._id];
 			if (this.neoRefsIndices === undefined)
 			{ this.neoRefsIndices = []; }
@@ -1202,11 +1202,11 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 			var objectId = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+objectIdLength)));
 			bytes_readed += objectIdLength;
 
-			// 2) Block's Idx.***
+			// 2) Block's Idx.
 			var blockIdx =   readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			neoRef._block_idx = blockIdx;
 
-			// 3) Transform Matrix4.***
+			// 3) Transform Matrix4.
 			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
@@ -1227,8 +1227,8 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 
-			// Float mode.**************************************************************
-			// New modifications for xxxx 20161013.*****************************
+			// Float mode.**
+			// New modifications for xxxx 20161013.**
 			var has_1_color = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 			if (has_1_color) 
 			{
@@ -1274,7 +1274,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 						var verticesFloatValuesCount = vertexCount * dim;
 						startBuff = bytes_readed;
 						endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
-						bytes_readed += daya_bytes * verticesFloatValuesCount; // updating data.***
+						bytes_readed += daya_bytes * verticesFloatValuesCount; // updating data.
 					}
 					
 					if (has_texCoords)
@@ -1287,7 +1287,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 						else if (data_type === 5126) { daya_bytes = 4; }
 						
 						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-						var verticesFloatValuesCount = vertexCount * 2; // 2 = dimension of texCoord.***
+						var verticesFloatValuesCount = vertexCount * 2; // 2 = dimension of texCoord.
 						startBuff = bytes_readed;
 						endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
 						bytes_readed += daya_bytes * verticesFloatValuesCount;
@@ -1295,16 +1295,16 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 				}
 			}
 			
-			// 4) short texcoords. OLD. Change this for Materials.***
-			var textures_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // this is only indicative that there are a texcoords.***
+			// 4) short texcoords. OLD. Change this for Materials.
+			var textures_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // this is only indicative that there are a texcoords.
 			if (textures_count > 0) 
 			{
 
-				// Now, read the texture_type and texture_file_name.***
+				// Now, read the texture_type and texture_file_name.
 				var texture_type_nameLegth = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 				for (var j=0; j<texture_type_nameLegth; j++) 
 				{
-					bytes_readed += 1; // for example "diffuse".***
+					bytes_readed += 1; // for example "diffuse".
 				}
 
 				var texture_fileName_Legth = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
@@ -1336,11 +1336,11 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 			
 			neoBuilding.putReferenceObject(neoRef, neoRef._id);
 
-			// 2) Block's Idx.***
+			// 2) Block's Idx.
 			var blockIdx =   readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			neoRef._block_idx = blockIdx;
 
-			// 3) Transform Matrix4.***
+			// 3) Transform Matrix4.
 			neoRef._originalMatrix4._floatArrays[0] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			neoRef._originalMatrix4._floatArrays[1] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 			neoRef._originalMatrix4._floatArrays[2] =  readWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
@@ -1371,8 +1371,8 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 			}
 			if (neoRef.refMatrixType === 2){ stadistic_refMat_Transforms_count +=1; }
 
-			// Float mode.**************************************************************
-			// New modifications for xxxx 20161013.*****************************
+			// Float mode.**
+			// New modifications for xxxx 20161013.**
 			var has_1_color = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 			if (has_1_color) 
 			{
@@ -1430,15 +1430,15 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 						colByteSize = daya_bytes * verticesFloatValuesCount;
 						classifiedColByteSize = vboMemManager.getClassifiedBufferSize(colByteSize);
 						
-						neoRef.vertexCount = vertexCount; // no necessary.***
+						neoRef.vertexCount = vertexCount; // no necessary.
 						startBuff = bytes_readed;
 						endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
-						//vboViCacheKey.colVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff)); // original.***
-						// TODO: Float32Array or UintArray depending of dataType.***
+						//vboViCacheKey.colVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff)); // original.
+						// TODO: Float32Array or UintArray depending of dataType.
 						vboViCacheKey.colVboDataArray = new Float32Array(classifiedColByteSize);
 						vboViCacheKey.colVboDataArray.set(new Float32Array(arrayBuffer.slice(startBuff, endBuff)));
 						vboViCacheKey.colArrayByteSize = classifiedColByteSize;
-						bytes_readed += daya_bytes * verticesFloatValuesCount; // updating data.***
+						bytes_readed += daya_bytes * verticesFloatValuesCount; // updating data.
 						
 						// send data to gpu.
 						if (!vboViCacheKey.isReadyColors(gl, magoManager.vboMemoryManager))
@@ -1457,15 +1457,15 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 						else if (data_type === 5126) { daya_bytes = 4; }
 						
 						var vertexCount = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-						var verticesFloatValuesCount = vertexCount * 2; // 2 = dimension of texCoord.***
+						var verticesFloatValuesCount = vertexCount * 2; // 2 = dimension of texCoord.
 						// example: posByteSize = 4 * verticesFloatValuesCount;
 						tCoordByteSize = daya_bytes * verticesFloatValuesCount;
 						classifiedTCoordByteSize = vboMemManager.getClassifiedBufferSize(tCoordByteSize);
 						
-						neoRef.vertexCount = vertexCount; // no necessary.***
+						neoRef.vertexCount = vertexCount; // no necessary.
 						startBuff = bytes_readed;
 						endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
-						//vboViCacheKey.tcoordVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff)); // original.***
+						//vboViCacheKey.tcoordVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff)); // original.
 						vboViCacheKey.tcoordVboDataArray = new Float32Array(classifiedTCoordByteSize);
 						vboViCacheKey.tcoordVboDataArray.set(new Float32Array(arrayBuffer.slice(startBuff, endBuff)));
 						vboViCacheKey.tcoordArrayByteSize = classifiedTCoordByteSize;
@@ -1475,23 +1475,23 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 				}
 			}
 
-			// 4) short texcoords. OLD. Change this for Materials.***
-			var textures_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // this is only indicative that there are a texcoords.***
+			// 4) short texcoords. OLD. Change this for Materials.
+			var textures_count = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4; // this is only indicative that there are a texcoords.
 			if (textures_count > 0) 
 			{
 				var textureTypeName = "";
 				var textureImageFileName = "";
 
-				// Now, read the texture_type and texture_file_name.***
+				// Now, read the texture_type and texture_file_name.
 				var texture_type_nameLegth = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 				for (var j=0; j<texture_type_nameLegth; j++) 
 				{
-					textureTypeName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1; // for example "diffuse".***
+					textureTypeName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1)));bytes_readed += 1; // for example "diffuse".
 				}
 
 				var texture_fileName_Legth = readWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 				
-				// utf8.***
+				// utf8.
 				var charArray = new Uint8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ texture_fileName_Legth)); bytes_readed += texture_fileName_Legth;
 				var decoder = new TextDecoder('utf-8');
 				textureImageFileName = decoder.decode(charArray);
@@ -1510,7 +1510,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 				}
 
 				/*
-				// 1pixel texture, wait for texture to load.********************************************
+				// 1pixel texture, wait for texture to load.**
 				if(neoRef.texture.texId === undefined)
 					neoRef.texture.texId = gl.createTexture();
 				gl.bindTexture(gl.TEXTURE_2D, neoRef.texture.texId);
@@ -1534,15 +1534,15 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 	//this.createModelReferencedGroups(); // test for new format.
 	
 
-	// Now occlusion cullings.***
-	// Occlusion culling octree data.*****
+	// Now occlusion cullings.
+	// Occlusion culling octree data.**
 	if (this.exterior_ocCullOctree === undefined)
 	{ this.exterior_ocCullOctree = new OcclusionCullingOctreeCell(); }
 
 	var infiniteOcCullBox = this.exterior_ocCullOctree;
-	//bytes_readed = this.readOcclusionCullingOctreeCell(arrayBuffer, bytes_readed, infiniteOcCullBox); // old.***
+	//bytes_readed = this.readOcclusionCullingOctreeCell(arrayBuffer, bytes_readed, infiniteOcCullBox); // old.
 	bytes_readed = this.exterior_ocCullOctree.parseArrayBuffer(arrayBuffer, bytes_readed, readWriter);
-	infiniteOcCullBox.expandBox(1000); // Only for the infinite box.***
+	infiniteOcCullBox.expandBox(1000); // Only for the infinite box.
 	infiniteOcCullBox.setSizesSubBoxes();
 	infiniteOcCullBox.createModelReferencedGroups(this.motherNeoRefsList);
 
@@ -1550,7 +1550,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 	{ this.interior_ocCullOctree = new OcclusionCullingOctreeCell(); }
 
 	var ocCullBox = this.interior_ocCullOctree;
-	//bytes_readed = this.readOcclusionCullingOctreeCell(arrayBuffer, bytes_readed, ocCullBox); // old.***
+	//bytes_readed = this.readOcclusionCullingOctreeCell(arrayBuffer, bytes_readed, ocCullBox); // old.
 	bytes_readed = this.interior_ocCullOctree.parseArrayBuffer(arrayBuffer, bytes_readed, readWriter);
 	ocCullBox.setSizesSubBoxes();
 	ocCullBox.createModelReferencedGroups(this.motherNeoRefsList);
@@ -1571,7 +1571,7 @@ NeoReferencesMotherAndIndices.prototype.render = function(magoManager, neoBuildi
 	
 	if (renderType === 2)
 	{
-		renderTexture = false; // reassign value for this var.***
+		renderTexture = false; // reassign value for this var.
 	}
 	
 	var gl = magoManager.sceneState.gl;
@@ -1590,10 +1590,10 @@ NeoReferencesMotherAndIndices.prototype.render = function(magoManager, neoBuildi
 	
 	if (renderTexture) 
 	{
-		gl.activeTexture(gl.TEXTURE2); // ...***
+		gl.activeTexture(gl.TEXTURE2); // ...
 		if (renderType === 1) 
 		{ 
-			gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.***
+			gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
 		} 
 	}
 
@@ -1602,30 +1602,30 @@ NeoReferencesMotherAndIndices.prototype.render = function(magoManager, neoBuildi
 	gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
 	shader.last_tex_id = textureAux1x1;
 
-	// New version. Use occlussion indices.***
-	//var visibleIndices_count = this.neoRefsIndices.length; // no occludeCulling mode.***
+	// New version. Use occlussion indices.
+	//var visibleIndices_count = this.neoRefsIndices.length; // no occludeCulling mode.
 	var visibleIndices_count = this.currentVisibleIndices.length;
 	var noRenderedsCount = 0;
 
 	for (var k=0; k<visibleIndices_count; k++) 
 	{
-		//var neoReference = this.motherNeoRefsList[this.neoRefsIndices[k]]; // no occludeCulling mode.***
+		//var neoReference = this.motherNeoRefsList[this.neoRefsIndices[k]]; // no occludeCulling mode.
 		var neoReference = this.motherNeoRefsList[this.currentVisibleIndices[k]];
 		
 		if (neoReference === undefined)
 		{ continue; }
 		
-		// Check renderingFase.***
+		// Check renderingFase.
 		if (neoReference.renderingFase === magoManager.renderingFase)
 		{ continue; }
 		
-		// Render the referenceObject.***
+		// Render the referenceObject.
 		if (!neoReference.render(magoManager, neoBuilding, renderType, renderTexture, shader, refMatrixIdxKey, maxSizeToRender))
 		{
 			noRenderedsCount ++;
 		}
 
-		// Swap renderingFase.***
+		// Swap renderingFase.
 		neoReference.swapRenderingFase();
 		
 		

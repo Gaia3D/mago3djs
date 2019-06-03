@@ -12,28 +12,28 @@ var AnimationData = function()
 	}
 	
 	this.birthTime;
-	this.lastTime; // the last update time.***
+	this.lastTime; // the last update time.
 	this.durationInSeconds;
 	
-	// start location.***
+	// start location.
 	this.startLongitude;
 	this.startLatitude;
 	this.startAltitude;
 	
-	// target location.***
+	// target location.
 	this.targetLongitude;
 	this.targetLatitude;
 	this.targetAltitude;
 	
-	// target rotation.***
+	// target rotation.
 	this.targetHeading;
 	this.targetPitch;
 	this.targetRoll;
 	
-	// linear velocity in m/s.***
+	// linear velocity in m/s.
 	this.linearVelocityInMetersSecond;
 	
-	// angular velocity deg/s.***
+	// angular velocity deg/s.
 	this.headingAngDegSecondVelocity;
 	this.pitchAngDegSecondVelocity;
 	this.rollAngDegSecondVelocity;

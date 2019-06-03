@@ -185,22 +185,22 @@ var PostFxShader = function(gl)
 	}
 	this.gl = gl;
 	this.name;
-	this.attribLocationCacheObj = {}; // old.***
-	this.uniformsArrayGeneral = []; // this array has the same uniforms that "uniformsCacheObj".***
-	this.uniformsMapGeneral = {}; // this object has the same uniforms that "uniformsArray".***
+	this.attribLocationCacheObj = {}; // old.
+	this.uniformsArrayGeneral = []; // this array has the same uniforms that "uniformsCacheObj".
+	this.uniformsMapGeneral = {}; // this object has the same uniforms that "uniformsArray".
 	
-	this.uniformsArrayLocal = []; // this array has the same uniforms that "uniformsCacheObj".***
-	this.uniformsMapLocal = {}; // this object has the same uniforms that "uniformsArray".***
+	this.uniformsArrayLocal = []; // this array has the same uniforms that "uniformsCacheObj".
+	this.uniformsMapLocal = {}; // this object has the same uniforms that "uniformsArray".
 	
-	// No general objects.***
+	// No general objects.
 	this.camera;
 	
-	// shader program.***
+	// shader program.
 	this.program;
 	this.shader_vertex;
 	this.shader_fragment;
 	
-	// current buffers binded.***
+	// current buffers binded.
 	this.last_vboPos_binded;
 	this.last_vboNor_binded;
 	this.last_vboCol_binded;
@@ -209,7 +209,7 @@ var PostFxShader = function(gl)
 	this.last_isAditionalMovedZero = false;
 	this.last_vboTexCoord_binded; 
 	
-	// attribLocations state management.***
+	// attribLocations state management.
 	this.attribLocationStateArray = [];
 };
 
@@ -223,8 +223,8 @@ PostFxShader.prototype.resetLastBuffersBinded = function()
 	this.last_vboPos_binded = undefined;
 	this.last_vboNor_binded = undefined;
 	this.last_vboIdx_binded = undefined;
-	this.last_vboTexCoord_binded = undefined; // no used.***
-	this.last_tex_id = undefined; // todo: must distinguish by channel.***
+	this.last_vboTexCoord_binded = undefined; // no used.
+	this.last_tex_id = undefined; // todo: must distinguish by channel.
 	this.last_isAditionalMovedZero = false;
 	
 	this.disableVertexAttribArrayAll();
@@ -340,7 +340,7 @@ PostFxShader.prototype.bindUniformGenerals = function()
 		this.uniformsArrayGeneral[i].bindUniform();
 	}
 	
-	// Bind camera uniforms.***
+	// Bind camera uniforms.
 	if (this.camera)
 	{ this.camera.bindCameraUniforms(this.gl, this); }
 };
@@ -447,11 +447,11 @@ PostFxShader.prototype.newUniformDataPairLocal = function(uniformType, uniformNa
  */
 PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 {
-	// Here create all generals uniforms, if exist, of the shader.***
+	// Here create all generals uniforms, if exist, of the shader.
 	var uniformDataPair;
 	var uniformLocation;
 
-	// 1. ModelViewProjectionMatrixRelToEye.***              
+	// 1. ModelViewProjectionMatrixRelToEye.              
 	uniformLocation = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
 	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
@@ -460,7 +460,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 		uniformDataPair.matrix4fv = sceneState.modelViewProjRelToEyeMatrix._floatArrays;
 	}
 	
-	// 1. ModelViewProjectionMatrix.***
+	// 1. ModelViewProjectionMatrix.
 	uniformLocation = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrix");
 	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
@@ -469,7 +469,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 		uniformDataPair.matrix4fv = sceneState.modelViewProjMatrix._floatArrays;
 	}
 	
-	// 2. modelViewMatrixRelToEye.***
+	// 2. modelViewMatrixRelToEye.
 	uniformLocation = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
 	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
@@ -478,7 +478,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 		uniformDataPair.matrix4fv = sceneState.modelViewRelToEyeMatrix._floatArrays;
 	}
 	
-	// 3. modelViewMatrix.***
+	// 3. modelViewMatrix.
 	uniformLocation = gl.getUniformLocation(shader.program, "modelViewMatrix");
 	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
@@ -487,7 +487,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 		uniformDataPair.matrix4fv = sceneState.modelViewMatrix._floatArrays;
 	}
 	
-	// 4. projectionMatrix.***
+	// 4. projectionMatrix.
 	uniformLocation = gl.getUniformLocation(shader.program, "projectionMatrix");
 	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
@@ -496,7 +496,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 		uniformDataPair.matrix4fv = sceneState.projectionMatrix._floatArrays;
 	}
 	
-	// 5. normalMatrix4.***
+	// 5. normalMatrix4.
 	uniformLocation = gl.getUniformLocation(shader.program, "normalMatrix4");
 	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
@@ -505,7 +505,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 		uniformDataPair.matrix4fv = sceneState.normalMatrix4._floatArrays;
 	}
 	
-	// 6. encodedCameraPositionMCHigh.***
+	// 6. encodedCameraPositionMCHigh.
 	uniformLocation = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
 	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
@@ -514,7 +514,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 		uniformDataPair.vec3fv = sceneState.encodedCamPosHigh;
 	}
 	
-	// 7. encodedCameraPositionMCLow.***
+	// 7. encodedCameraPositionMCLow.
 	uniformLocation = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
 	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
@@ -523,7 +523,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 		uniformDataPair.vec3fv = sceneState.encodedCamPosLow;
 	}
 	
-	// 10. fovy.***
+	// 10. fovy.
 	uniformLocation = gl.getUniformLocation(shader.program, "fov");
 	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
@@ -532,7 +532,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 		uniformDataPair.floatValue = sceneState.camera.frustum.fovyRad;
 	}
 	
-	// 11. aspectRatio.***
+	// 11. aspectRatio.
 	uniformLocation = gl.getUniformLocation(shader.program, "aspectRatio");
 	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
@@ -541,7 +541,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 		uniformDataPair.floatValue = sceneState.camera.frustum.aspectRatio;
 	}
 	
-	// 12. drawBuffWidht.***
+	// 12. drawBuffWidht.
 	uniformLocation = gl.getUniformLocation(shader.program, "screenWidth");
 	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
@@ -550,7 +550,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 		uniformDataPair.floatValue = sceneState.drawingBufferWidth;
 	}
 	
-	// 13. drawBuffHeight.***
+	// 13. drawBuffHeight.
 	uniformLocation = gl.getUniformLocation(shader.program, "screenHeight");
 	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
@@ -559,7 +559,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 		uniformDataPair.floatValue = sceneState.drawingBufferHeight;
 	}
 	
-	// 14. depthTex.***
+	// 14. depthTex.
 	uniformLocation = gl.getUniformLocation(shader.program, "depthTex");
 	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
@@ -568,7 +568,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 		uniformDataPair.intValue = 0;
 	}
 	
-	// 15. noiseTex.***
+	// 15. noiseTex.
 	uniformLocation = gl.getUniformLocation(shader.program, "noiseTex");
 	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
@@ -577,7 +577,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 		uniformDataPair.intValue = 1;
 	}
 	
-	// 16. diffuseTex.***
+	// 16. diffuseTex.
 	uniformLocation = gl.getUniformLocation(shader.program, "diffuseTex");
 	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
@@ -586,7 +586,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 		uniformDataPair.intValue = 2;
 	}
 	
-	// 17. specularColor.***
+	// 17. specularColor.
 	uniformLocation = gl.getUniformLocation(shader.program, "specularColor");
 	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
@@ -595,7 +595,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 		uniformDataPair.vec3fv = sceneState.specularColor;
 	}
 	
-	// 18. ssaoRadius.***
+	// 18. ssaoRadius.
 	uniformLocation = gl.getUniformLocation(shader.program, "radius");
 	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
@@ -604,7 +604,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 		uniformDataPair.floatValue = sceneState.ssaoRadius;
 	}
 	
-	// 19. ambientReflectionCoef.***
+	// 19. ambientReflectionCoef.
 	uniformLocation = gl.getUniformLocation(shader.program, "ambientReflectionCoef");
 	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
@@ -613,7 +613,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 		uniformDataPair.floatValue = sceneState.ambientReflectionCoef;
 	}
 	
-	// 20. diffuseReflectionCoef.***
+	// 20. diffuseReflectionCoef.
 	uniformLocation = gl.getUniformLocation(shader.program, "diffuseReflectionCoef");
 	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
@@ -622,7 +622,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 		uniformDataPair.floatValue = sceneState.diffuseReflectionCoef;
 	}
 	
-	// 21. specularReflectionCoef.***
+	// 21. specularReflectionCoef.
 	uniformLocation = gl.getUniformLocation(shader.program, "specularReflectionCoef");
 	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
@@ -631,7 +631,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 		uniformDataPair.floatValue = sceneState.specularReflectionCoef;
 	}
 	
-	// 22. shininessValue.***
+	// 22. shininessValue.
 	uniformLocation = gl.getUniformLocation(shader.program, "shininessValue");
 	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
@@ -640,7 +640,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 		uniformDataPair.floatValue = sceneState.shininessValue;
 	}
 	
-	// 23. ssaoNoiseScale2.***
+	// 23. ssaoNoiseScale2.
 	uniformLocation = gl.getUniformLocation(shader.program, "noiseScale");
 	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
@@ -649,7 +649,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 		uniformDataPair.vec2fv = sceneState.ssaoNoiseScale2;
 	}
 	
-	// 24. ssaoKernel16.***
+	// 24. ssaoKernel16.
 	uniformLocation = gl.getUniformLocation(shader.program, "kernel");
 	if (uniformLocation !== null && uniformLocation !== undefined)
 	{
@@ -658,7 +658,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 		uniformDataPair.vec3fv = sceneState.ssaoKernel16;
 	}
 	
-	// Set the camera.***
+	// Set the camera.
 	this.camera = sceneState.camera;
 };
 
@@ -668,7 +668,7 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
  */
 PostFxShader.prototype.createUniformLocals = function(gl, shader, sceneState)
 {
-	// Here create all local uniforms, if exist, of the shader.***
+	// Here create all local uniforms, if exist, of the shader.
 	var uniformDataPair;
 	var uniformLocation;
 	
@@ -686,7 +686,7 @@ PostFxShader.prototype.createUniformLocals = function(gl, shader, sceneState)
 	shader.kernel16_loc = gl.getUniformLocation(shader.program, "kernel");
 	shader.noiseScale2_loc = gl.getUniformLocation(shader.program, "noiseScale");
 	
-	// Attributtes.****
+	// Attributtes.*
 	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
 	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
 	shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
@@ -696,8 +696,8 @@ PostFxShader.prototype.createUniformLocals = function(gl, shader, sceneState)
 	shader.oneColor4_loc = gl.getUniformLocation(shader.program, "oneColor4");
 	shader.bApplySsao_loc = gl.getUniformLocation(shader.program, "bApplySsao");
 	
-	// compression data, for shaders with data compressed.***
-	// compressionMaxPoint & compressionMinPoint: for refObjects, this is the octree's size.***
+	// compression data, for shaders with data compressed.
+	// compressionMaxPoint & compressionMinPoint: for refObjects, this is the octree's size.
 	shader.posDataByteSize_loc = gl.getUniformLocation(shader.program, "posDataByteSize");
 	shader.texCoordByteSize_loc = gl.getUniformLocation(shader.program, "texCoordByteSize");
 	shader.compressionMaxPoint_loc = gl.getUniformLocation(shader.program, "compressionMaxPoint");
@@ -712,17 +712,17 @@ PostFxShader.prototype.createUniformLocals = function(gl, shader, sceneState)
 	shader.fixPointSize_loc = gl.getUniformLocation(shader.program, "fixPointSize");
 	shader.bUseFixPointSize_loc = gl.getUniformLocation(shader.program, "bUseFixPointSize");
 	
-	// Camera frustum near & far.***
-	// frustumNear.***
+	// Camera frustum near & far.
+	// frustumNear.
 	shader.frustumNear_loc = gl.getUniformLocation(shader.program, "near");
 
-	// frustumFar.***
+	// frustumFar.
 	shader.frustumFar_loc = gl.getUniformLocation(shader.program, "far");
 
 	
 };
 
-//*********************************************************************************************************************
+//
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -735,10 +735,10 @@ var PostFxShadersManager = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	this.gl;
-	this.pFx_shaders_array = []; // old.***
+	this.pFx_shaders_array = []; // old.
 	this.shadersMap = {};
 	
-	// preCreated shaders.***
+	// preCreated shaders.
 	this.modelRefShader;
 	this.modelRefSilhouetteShader;
 	this.lodBuildingShader;
@@ -780,7 +780,7 @@ PostFxShadersManager.prototype.getShader = function(shaderName)
  */
 PostFxShadersManager.prototype.createShader = function(gl, source, type, typeString) 
 {
-	// Source from internet.***
+	// Source from internet.
 	var shader = gl.createShader(type);
 	gl.shaderSource(shader, source);
 	gl.compileShader(shader);
@@ -798,11 +798,11 @@ PostFxShadersManager.prototype.createShader = function(gl, source, type, typeStr
  */
 PostFxShadersManager.prototype.createDefaultShaders = function(gl, sceneState) 
 {
-	this.pngImageShader = this.createPngImageShader(gl); // 13.***
-	this.modelRefSilhouetteShader = this.createSilhouetteShaderModelRef(gl); // 14.***
-	this.triPolyhedronShader = this.createSsaoShaderBox(gl); // 12.***
+	this.pngImageShader = this.createPngImageShader(gl); // 13.
+	this.modelRefSilhouetteShader = this.createSilhouetteShaderModelRef(gl); // 14.
+	this.triPolyhedronShader = this.createSsaoShaderBox(gl); // 12.
 	
-	//this.invertedBoxShader = this.createInvertedBoxShader(gl); // TEST.***
+	//this.invertedBoxShader = this.createInvertedBoxShader(gl); // TEST.
 };
 
 /**
@@ -837,16 +837,16 @@ PostFxShadersManager.prototype.getInvertedBoxShader = function()
 	return this.invertedBoxShader;
 };
 
-// PNG images shader.**************************************************************************************************
-// PNG images shader.**************************************************************************************************
-// PNG images shader.**************************************************************************************************
+// PNG images shader.**
+// PNG images shader.**
+// PNG images shader.**
 /**
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
 PostFxShadersManager.prototype.createPngImageShader = function(gl) 
 {
-	// 13.***
+	// 13.
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 
@@ -877,16 +877,16 @@ PostFxShadersManager.prototype.createPngImageShader = function(gl)
 	
 };
 
-// 14) Silhouette shader.***********************************************************************************************************************
-// 14) Silhouette shader.***********************************************************************************************************************
-// 14) Silhouette shader.***********************************************************************************************************************
+// 14) Silhouette shader.**
+// 14) Silhouette shader.**
+// 14) Silhouette shader.**
 /**
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
 PostFxShadersManager.prototype.createSilhouetteShaderModelRef = function(gl) 
 {
-	// 14.***
+	// 14.
 	var shader = new PostFxShader(this.gl);
 	shader.name = "SilhouetteShaderModelRef";
 	this.pFx_shaders_array.push(undefined);
@@ -927,16 +927,16 @@ PostFxShadersManager.prototype.createSilhouetteShaderModelRef = function(gl)
 	return shader;
 };
 
-// box Shader.***********************************************************************************************************************
-// box Shader.***********************************************************************************************************************
-// box Shader.***********************************************************************************************************************
+// box Shader.**
+// box Shader.**
+// box Shader.**
 /**
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  */
 PostFxShadersManager.prototype.createSsaoShaderBox = function(gl) 
 {
-	// 8.***
+	// 8.
 	var shader = new PostFxShader(this.gl);
 	this.pFx_shaders_array.push(shader);
 
@@ -978,14 +978,14 @@ PostFxShadersManager.prototype.createSsaoShaderBox = function(gl)
 	shader.attribLocationCacheObj.normal = gl.getAttribLocation(shader.program, "normal");
 	shader.attribLocationCacheObj.color4 = gl.getAttribLocation(shader.program, "color4");
 
-	//*********************************************************************************
+	//
 	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
 
-	// ssao uniforms.**********************************************************************
+	// ssao uniforms.*
 	shader.noiseScale2_loc = gl.getUniformLocation(shader.program, "noiseScale");
 	shader.kernel16_loc = gl.getUniformLocation(shader.program, "kernel");
 
-	// uniform values.***
+	// uniform values.
 	shader.near_loc = gl.getUniformLocation(shader.program, "near");
 	shader.far_loc = gl.getUniformLocation(shader.program, "far");
 	shader.fov_loc = gl.getUniformLocation(shader.program, "fov");
@@ -997,12 +997,12 @@ PostFxShadersManager.prototype.createSsaoShaderBox = function(gl)
 	shader.hasTexture_loc = gl.getUniformLocation(shader.program, "hasTexture");
 	shader.color4Aux_loc = gl.getUniformLocation(shader.program, "vColor4Aux");
 
-	// uniform samplers.***
+	// uniform samplers.
 	shader.depthTex_loc = gl.getUniformLocation(shader.program, "depthTex");
 	shader.noiseTex_loc = gl.getUniformLocation(shader.program, "noiseTex");
 	shader.diffuseTex_loc = gl.getUniformLocation(shader.program, "diffuseTex");
 
-	// ModelReference.****
+	// ModelReference.*
 	shader.useRefTransfMatrix_loc = gl.getUniformLocation(shader.program, "useRefTransfMatrix");
 	shader.useTexture_loc = gl.getUniformLocation(shader.program, "useTexture");
 	shader.invertNormals_loc  = gl.getUniformLocation(shader.program, "invertNormals");
@@ -1010,9 +1010,9 @@ PostFxShadersManager.prototype.createSsaoShaderBox = function(gl)
 	return shader;
 };
 
-// InvertedBox.***********************************************************************************************************************
-// InvertedBox.***********************************************************************************************************************
-// InvertedBox.***********************************************************************************************************************
+// InvertedBox.**
+// InvertedBox.**
+// InvertedBox.**
 /**
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
@@ -1020,7 +1020,7 @@ PostFxShadersManager.prototype.createSsaoShaderBox = function(gl)
 PostFxShadersManager.prototype.createInvertedBoxShader = function(gl) 
 {
 	var shader = new PostFxShader(this.gl);
-	this.pFx_shaders_array.push(undefined); // old.***
+	this.pFx_shaders_array.push(undefined); // old.
 
 	var ssao_vs_source = ShaderSource.InvertedBoxVS;
 	var ssao_fs_source = ShaderSource.InvertedBoxFS;
@@ -1033,15 +1033,15 @@ PostFxShadersManager.prototype.createInvertedBoxShader = function(gl)
 	gl.attachShader(shader.program, shader.shader_fragment);
 	gl.linkProgram(shader.program);
 
-	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh"); // sceneState.***
-	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow"); // sceneState.***
+	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh"); // sceneState.
+	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow"); // sceneState.
 	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
 	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
 
-	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye"); // sceneState.***
-	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye"); // sceneState.***
-	shader.normalMatrix4_loc = gl.getUniformLocation(shader.program, "normalMatrix4"); // sceneState.***
-	shader.projectionMatrix4_loc = gl.getUniformLocation(shader.program, "projectionMatrix"); // sceneState.***
+	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye"); // sceneState.
+	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye"); // sceneState.
+	shader.normalMatrix4_loc = gl.getUniformLocation(shader.program, "normalMatrix4"); // sceneState.
+	shader.projectionMatrix4_loc = gl.getUniformLocation(shader.program, "projectionMatrix"); // sceneState.
 	shader.refMatrix_loc = gl.getUniformLocation(shader.program, "RefTransfMatrix");
 	
 	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
@@ -1055,21 +1055,21 @@ PostFxShadersManager.prototype.createInvertedBoxShader = function(gl)
 	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
 	shader.attribLocationCacheObj.texCoord = gl.getAttribLocation(shader.program, "texCoord");
 	shader.attribLocationCacheObj.normal = gl.getAttribLocation(shader.program, "normal");
-	//*********************************************************************************
+	//
 	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
 
-	// ssao uniforms.**********************************************************************
+	// ssao uniforms.*
 	shader.noiseScale2_loc = gl.getUniformLocation(shader.program, "noiseScale");
 	shader.kernel16_loc = gl.getUniformLocation(shader.program, "kernel");
 
-	// uniform values.***
-	shader.near_loc = gl.getUniformLocation(shader.program, "near"); // sceneState.***
-	shader.far_loc = gl.getUniformLocation(shader.program, "far"); // sceneState.***
-	shader.fov_loc = gl.getUniformLocation(shader.program, "fov"); // sceneState.***
-	shader.aspectRatio_loc = gl.getUniformLocation(shader.program, "aspectRatio"); // sceneState.***
+	// uniform values.
+	shader.near_loc = gl.getUniformLocation(shader.program, "near"); // sceneState.
+	shader.far_loc = gl.getUniformLocation(shader.program, "far"); // sceneState.
+	shader.fov_loc = gl.getUniformLocation(shader.program, "fov"); // sceneState.
+	shader.aspectRatio_loc = gl.getUniformLocation(shader.program, "aspectRatio"); // sceneState.
 
-	shader.screenWidth_loc = gl.getUniformLocation(shader.program, "screenWidth"); // sceneState.***
-	shader.screenHeight_loc = gl.getUniformLocation(shader.program, "screenHeight"); // sceneState.***
+	shader.screenWidth_loc = gl.getUniformLocation(shader.program, "screenWidth"); // sceneState.
+	shader.screenHeight_loc = gl.getUniformLocation(shader.program, "screenHeight"); // sceneState.
 	
 	shader.shininessValue_loc = gl.getUniformLocation(shader.program, "shininessValue");
 
@@ -1077,7 +1077,7 @@ PostFxShadersManager.prototype.createInvertedBoxShader = function(gl)
 	shader.color4Aux_loc = gl.getUniformLocation(shader.program, "vColor4Aux");
 	shader.textureFlipYAxis_loc = gl.getUniformLocation(shader.program, "textureFlipYAxis");
 
-	// uniform samplers.***
+	// uniform samplers.
 	shader.depthTex_loc = gl.getUniformLocation(shader.program, "depthTex");
 	shader.noiseTex_loc = gl.getUniformLocation(shader.program, "noiseTex");
 	shader.diffuseTex_loc = gl.getUniformLocation(shader.program, "diffuseTex"); 

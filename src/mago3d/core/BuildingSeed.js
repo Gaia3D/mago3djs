@@ -141,7 +141,7 @@ BuildingSeedList.prototype.parseBuildingSeedArrayBuffer = function()
 		buildingSeed.bBox.maxY = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4))[0]; bytesReaded += 4;
 		buildingSeed.bBox.maxZ = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4))[0]; bytesReaded += 4;
 
-		// create a building and set the location.***
+		// create a building and set the location.
 		buildingSeed.buildingId = buildingName.substr(4, buildingNameLength-4);
 		buildingSeed.buildingFileName = buildingName;
 		buildingSeed.geographicCoord.setLonLatAlt(longitude, latitude, altitude);

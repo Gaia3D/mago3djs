@@ -12,16 +12,16 @@ var Arc2D = function()
 	}
 	
 	
-	this.centerPoint; // Point2D.***
+	this.centerPoint; // Point2D.
 	this.radius;
 	this.startAngleDeg; // zero startAngle is in "X" axis positive.
 	this.sweepAngleDeg; // sweeping in CounterClockWise is positive.
 	this.numPointsFor360Deg; // interpolation param.
 	
-	// Alternative vars.***
-	this.startPoint; // if no exist radius, then startPoint define the radius.***
+	// Alternative vars.
+	this.startPoint; // if no exist radius, then startPoint define the radius.
 	this.endPoint;
-	this.sweepSense; // 1=CCW, -1=CW.***
+	this.sweepSense; // 1=CCW, -1=CW.
 };
 
 /**
@@ -31,7 +31,7 @@ var Arc2D = function()
 Arc2D.prototype.deleteObjects = function()
 {
 	if (this.centerPoint !== undefined)
-	{ this.centerPoint.deleteObjects(); } // Point3D.***
+	{ this.centerPoint.deleteObjects(); } // Point3D.
 	this.centerPoint = undefined;
 	this.radius = undefined;
 	this.startAngleDeg = undefined;
@@ -47,7 +47,7 @@ Arc2D.prototype.deleteObjects = function()
 	{ this.endPoint.deleteObjects(); } 
 	
 	this.endPoint = undefined;
-	this.sweepSense = undefined; // 1=CCW, -1=CW.***
+	this.sweepSense = undefined; // 1=CCW, -1=CW.
 };
 
 /**
@@ -88,7 +88,7 @@ Arc2D.prototype.setStartAngleDegree = function(startAngleDegree)
  */
 Arc2D.prototype.setStartPoint = function(x, y)
 {
-	// If no exist startAngle, then use this to calculate startAngle.***
+	// If no exist startAngle, then use this to calculate startAngle.
 	if (this.startPoint === undefined)
 	{ this.startPoint = new Point2D(); }
 	
@@ -101,7 +101,7 @@ Arc2D.prototype.setStartPoint = function(x, y)
  */
 Arc2D.prototype.setEndPoint = function(x, y)
 {
-	// If no exist sweepAngle, then use this to calculate sweepAngle.***
+	// If no exist sweepAngle, then use this to calculate sweepAngle.
 	if (this.endPoint === undefined)
 	{ this.endPoint = new Point2D(); }
 	
@@ -114,7 +114,7 @@ Arc2D.prototype.setEndPoint = function(x, y)
  */
 Arc2D.prototype.setSense = function(sense)
 {
-	this.sweepSense = sense; // 1=CCW, -1=CW.***
+	this.sweepSense = sense; // 1=CCW, -1=CW.
 };
 
 /**
@@ -142,7 +142,7 @@ Arc2D.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 	if (this.numPointsFor360Deg === undefined)
 	{ this.numPointsFor360Deg = 36; }
 
-	// Check if exist strAng.*********************************************************************************
+	// Check if exist strAng.
 	var strVector, endVector;
 	var strVectorModul;
 	if (this.startAngleDeg === undefined)
@@ -163,10 +163,10 @@ Arc2D.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 		this.startAngleDeg = angRad * 180.0/Math.PI;
 	}
 	
-	// Check if exist radius.*********************************************************************************
+	// Check if exist radius.
 	if (this.radius === undefined)
 	{
-		// calculate by startPoint.***
+		// calculate by startPoint.
 		if (this.startPoint === undefined)
 		{ return resultPointsArray; }
 		
@@ -183,7 +183,7 @@ Arc2D.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 		this.radius = strVectorModul;
 	}
 	
-	// check if exist sweepAng.*********************************************************************************
+	// check if exist sweepAng.
 	if (this.sweepAngleDeg === undefined)
 	{
 		if (this.endPoint === undefined || this.sweepSense === undefined)
@@ -239,7 +239,7 @@ Arc2D.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 		}
 	}
 	
-	// once finished, mark the 1rst point and the last point as"important point".***
+	// once finished, mark the 1rst point and the last point as"important point".
 	var pointsCount = pointsArray.length;
 	if (pointsCount > 0)
 	{
@@ -247,8 +247,8 @@ Arc2D.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 		pointsArray[pointsCount-1].pointType = 1;
 	}
 	
-	// now merge points into "resultPointsArray".***
-	var errorDist = 0.0001; // 0.1mm.***
+	// now merge points into "resultPointsArray".
+	var errorDist = 0.0001; // 0.1mm.
 	var resultExistentPointsCount = resultPointsArray.length;
 	for (var i=0; i<pointsCount; i++)
 	{
@@ -256,7 +256,7 @@ Arc2D.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 		{
 			if (resultExistentPointsCount > 0)
 			{
-				// check if the last point of "resultPointsArray" and the 1rst point of "this" is coincident.***
+				// check if the last point of "resultPointsArray" and the 1rst point of "this" is coincident.
 				var lastExistentPoint = resultPointsArray[resultExistentPointsCount-1];
 				point = pointsArray[i];
 				if (!lastExistentPoint.isCoincidentToPoint(point, errorDist))
@@ -275,11 +275,11 @@ Arc2D.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 		}
 	}
 	
-	// Last check: finally, in case of sweepAngle = 360 degrees, or is closed pointsArray, then pop the last insertedPoint.***
+	// Last check: finally, in case of sweepAngle = 360 degrees, or is closed pointsArray, then pop the last insertedPoint.
 	resultExistentPointsCount = resultPointsArray.length;
 	if (resultExistentPointsCount > 0)
 	{
-		// check if the last point of "resultPointsArray" and the 1rst point of "this" is coincident.***
+		// check if the last point of "resultPointsArray" and the 1rst point of "this" is coincident.
 		var lastPoint = resultPointsArray[resultExistentPointsCount-1];
 		var firstPoint = resultPointsArray[0];
 		if (lastPoint.isCoincidentToPoint(firstPoint, errorDist))
