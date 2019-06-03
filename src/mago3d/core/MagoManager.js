@@ -5199,6 +5199,8 @@ MagoManager.prototype.flyToBuilding = function(apiName, projectId, dataKey)
 	if (realBuildingPos === undefined)
 	{ return; }
 
+	if(!nodeRoot.data.bbox)
+	{ return; }
 	this.radiusAprox_aux = nodeRoot.data.bbox.getRadiusAprox();
 
 	if (this.boundingSphere_Aux === undefined)
@@ -6394,8 +6396,17 @@ MagoManager.prototype.callAPI = function(api)
 			throw new Error("This node is not exist.");
 		}
 
-		this.flyToBuilding(undefined, node.data.projectId, node.data.nodeId);
-		this.sceneState.camera.setTrack(node);
+		if(node.isReadyToRender){
+			var geoLocDataManager = node.getNodeGeoLocDataManager();
+			var geoLocData = geoLocDataManager.getCurrentGeoLocationData();
+			var geoCoords = geoLocData.getGeographicCoords();
+
+			var currLon = geoCoords.longitude;
+			var currLat = geoCoords.latitude;
+
+			this.flyTo(currLon, currLat, 100, 0);
+			this.sceneState.camera.setTrack(node);
+		}
 	}
 	else if (apiName === "stopTrack")
 	{
@@ -6422,10 +6433,33 @@ MagoManager.prototype.callAPI = function(api)
 		{
 			return true;
 		}
-		else
+
+		return false;
+		
+	}
+	else if (apiName === "isDataReadyToRender")
+	{
+		var projectId = api.getProjectId();
+		var dataKey = api.getDataKey();
+		if (!defined(projectId))
 		{
-			return false;
+			throw new Error("projectId is required.");
 		}
+		if (!defined(dataKey))
+		{
+			throw new Error("dataKey is required.");
+		}
+		var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
+
+		if (node !== undefined)
+		{
+			if(node.isReadyToRender())
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 };
 

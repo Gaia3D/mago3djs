@@ -54,6 +54,30 @@ Node.prototype.isReferenceNode = function()
 };
 
 /**
+ * get node state of rander
+ * @return {boolean} return this node is ready to render
+ */
+Node.prototype.isReadyToRender = function()
+{
+	var geoLocDataManager = this.getNodeGeoLocDataManager();
+	if (geoLocDataManager === undefined)
+	{ return false; }
+	var geoLocData = geoLocDataManager.getCurrentGeoLocationData();
+	if (geoLocData === undefined)
+	{ return false; }
+	var geoCoords = geoLocData.getGeographicCoords();
+	if (geoCoords === undefined)
+	{ return false; } 
+	
+	if (geoCoords.longitude === undefined || geoCoords.latitude === undefined || geoCoords.altitude === undefined)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+/**
  * Deletes all datas and all datas of children.
  */
 Node.prototype.deleteObjects = function(gl, vboMemoryManager) 
@@ -806,10 +830,6 @@ Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude,
 	if (geoCoords === undefined)
 	{ return; } 
 	
-	if (!geoCoords.longitude || !geoCoords.latitude || !geoCoords.altitude)
-	{
-		return;
-	}
 	if (geoCoords.longitude === undefined || geoCoords.latitude === undefined || geoCoords.altitude === undefined)
 	{
 		return;
@@ -1003,18 +1023,3 @@ Node.prototype.test__octreeModelRefAndIndices_changed = function()
 	return false;
 };
 */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

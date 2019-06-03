@@ -768,3 +768,19 @@ function isExistDataAPI(managerFactoryInstance, projectId, dataKey)
 	api.setDataKey(dataKey);
 	return managerFactoryInstance.callAPI(api);
 }
+
+/**
+ * check data is ready to render
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {string} projectId project primary key
+ * @param {string} dataKey data key
+ * @return {Boolean} is ready to render 
+ */
+function isDataReadyToRenderAPI(managerFactoryInstance, projectId, dataKey)
+{
+	var api = new API("isDataReadyToRender");
+	api.setReturnable(true);
+	api.setProjectId(projectId);
+	api.setDataKey(dataKey);
+	return managerFactoryInstance.callAPI(api);
+}
