@@ -933,6 +933,7 @@ MagoManager.prototype.managePickingProcess = function()
 			// this is the closest frustum.***
 			this.bPicking = false;
 			this.arrayAuxSC.length = 0;
+			this.selectionManager.clearCurrents();
 			this.objectSelected = this.getSelectedObjects(gl, this.mouse_x, this.mouse_y, this.arrayAuxSC);
 			this.buildingSelected = this.arrayAuxSC[0];
 			this.octreeSelected = this.arrayAuxSC[1];
@@ -1674,7 +1675,7 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, resultSe
 	gl.readPixels(pixelX, pixelY, mosaicWidth, mosaicHeight, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null); // unbind framebuffer.***
 	
-	this.selectionManager.clearCurrents();
+	//this.selectionManager.clearCurrents();
 
 	// now, select the object.***
 	// The center pixel of the selection is 12, 13, 14.***

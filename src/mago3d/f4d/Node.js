@@ -324,7 +324,7 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 
 	// Check if we are under selected data structure.***
 	var selectionManager = magoManager.selectionManager;
-	if (selectionManager.currentNodeSelected === this)
+	if (magoManager.nodeSelected === this)
 	{ selectionManager.parentSelected = true; }
 	else 
 	{ selectionManager.parentSelected = false; }
