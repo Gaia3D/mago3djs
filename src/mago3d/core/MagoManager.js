@@ -1192,6 +1192,10 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 		this.currTime = this.dateSC.getTime();
 		
 		this.load_testTextures();
+		
+		// Before of multiFrustumCullingSmartTile, do animation check, bcos during animation some object can change smartTile-owner.***
+		if (this.animationManager !== undefined)
+		{ this.animationManager.checkAnimation(this); }
 
 		if (this.myCameraSCX === undefined) 
 		{ this.myCameraSCX = new Camera(); }
@@ -1204,9 +1208,6 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 		
 		gl.clearStencil(0); // provisionally here.***
 		gl.clear(gl.STENCIL_BUFFER_BIT);
-		
-		if (this.animationManager !== undefined)
-		{ this.animationManager.checkAnimation(this); }
 
 		// If mago camera has track node, camera look track node.
 		this.sceneState.camera.doTrack(this);
@@ -1948,8 +1949,8 @@ MagoManager.prototype.keyDown = function(key)
 		var dataKey = "AutonomousBus_0";
 			
 		// Do a test.***
-		var projectId = "3ds.json";
-		var dataKey = "GyeomjaeJeongSeon_del";
+		//var projectId = "3ds.json";
+		//var dataKey = "GyeomjaeJeongSeon_del";
 		
 		var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
 		node.data.isTrailRender = true; // test.***
@@ -1962,16 +1963,19 @@ MagoManager.prototype.keyDown = function(key)
 		var currAlt = geoCoords.altitude;
 
 		// Move a little.***
-		var latitude = currLat + 0.0002 * 10*(Math.random()*2-1);
-		var longitude = currLon + 0.0002 * 10*(Math.random()*2-1);
+		var latitude = currLat + 0.001 * 10*(Math.random()*2-1);
+		var longitude = currLon + 0.001 * 10*(Math.random()*2-1);
 		var elevation = currAlt + 10.0 * 10*(Math.random()*2-1);
+		
+		latitude = currLat + 0.01;
+		longitude = currLon + 0.01;
 		elevation = currAlt;
 		
 		
 		var heading;
 		var pitch;
 		var roll;
-		var durationTimeInSeconds = 10;
+		var durationTimeInSeconds = 100;
 		this.changeLocationAndRotation(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll, durationTimeInSeconds);
 	}
 	else if (key === 84) // 84 = 't'.***
