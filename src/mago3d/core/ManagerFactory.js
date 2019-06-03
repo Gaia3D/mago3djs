@@ -174,7 +174,6 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 	{
 		//var viewport = manager.wwd.viewport;
 		//manager.selection.init(gl, viewport.width, viewport.height);
-		manager.shadersManager.createDefaultShader(gl);
 		manager.postFxShadersManager.gl = gl;
 		manager.postFxShadersManager.createDefaultShaders(gl); // A1-OLD.***
 		manager.createDefaultShaders(gl);// A1-Use this.***
@@ -201,7 +200,6 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 	{
 		var gl = viewer.scene.context._gl;
 		//viewer.scene.magoManager.selection.init(gl, viewer.scene.drawingBufferWidth, viewer.scene.drawingBufferHeight);
-		viewer.scene.magoManager.shadersManager.createDefaultShader(gl);
 		viewer.scene.magoManager.postFxShadersManager.gl = gl;
 		viewer.scene.magoManager.postFxShadersManager.createDefaultShaders(gl); // A1-OLD.***
 		viewer.scene.magoManager.createDefaultShaders(gl);// A1-Use this.***
@@ -242,7 +240,6 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		var gl = viewer.magoManager.sceneState.gl;
 		var manager = viewer.magoManager;
 		manager.vboMemoryManager.gl = gl;
-		manager.shadersManager.createDefaultShader(gl);
 		manager.postFxShadersManager.gl = gl;
 		manager.postFxShadersManager.createDefaultShaders(gl); // A1-OLD.***
 		manager.createDefaultShaders(gl);// A1-Use this.***
