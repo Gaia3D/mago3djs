@@ -12,8 +12,8 @@ var NeoTexture = function()
 	}
 	
 	this.lod;
-	this.textureId; // texture id in gl.***
-	this.texImage; // image. delete this once upload to gl.***
+	this.textureId; // texture id in gl.
+	this.texImage; // image. delete this once upload to gl.
 	this.loadStarted = false;
 	this.loadFinished = false;
 };

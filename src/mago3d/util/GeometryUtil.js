@@ -164,7 +164,7 @@ var TTrianglesMatrix = function()
 	}
 
 	this.tTrianglesListsArray = [];
-	// SCRATX.*********************
+	// SCRATX.
 	this.totalTTrianglesArraySC = [];
 };
 

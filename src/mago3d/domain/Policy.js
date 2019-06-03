@@ -53,7 +53,7 @@ var Policy = function()
 	// 이미지 경로
 	this.imagePath = "";
 	
-	// provisional.***
+	// provisional.
 	this.colorChangedObjectId;
 	
 	// LOD1
@@ -73,7 +73,7 @@ var Policy = function()
 	
 	this.ssaoRadius = 0.15;
 	
-	// PointsCloud.***
+	// PointsCloud.
 	this.pointsCloudSettings = {};
 	this.pointsCloudSettings.maxPartitionsLod0 = 8;
 	this.pointsCloudSettings.maxPartitionsLod1 = 4;

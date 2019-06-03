@@ -10,7 +10,7 @@ var Ellipsoid = function(radiusX, radiusY, radiusZ)
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	// Ellipsoid: x^2/a^2 + y^2/b^2 + z^2/c^2 = 1, (a, b, c) = (radiusX, radiusY, radiusZ).***
+	// Ellipsoid: x^2/a^2 + y^2/b^2 + z^2/c^2 = 1, (a, b, c) = (radiusX, radiusY, radiusZ).
 	
 	this.radiusX;
 	this.radiusY;
