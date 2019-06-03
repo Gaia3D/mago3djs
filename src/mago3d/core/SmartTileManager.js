@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * 4분할 타일링 수행 및 타일 객체 보관 객체
  * 인스턴스 생성 시 mother tile 생성
@@ -13,14 +15,14 @@ var SmartTileManager = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
     
-    /**
+	/**
      * 타일 배열
      * has 2 tiles (Asia side and America side).
      * @type {Array.<SmartTile>}
      */
-    this.tilesArray = []; 
+	this.tilesArray = []; 
     
-    /**
+	/**
      * mother 타일 생성
      */
 	this.createMainTiles();
