@@ -255,6 +255,12 @@ NeoReference.prototype.solveReferenceColorOrTexture = function(magoManager, neoB
 	if (selectionManager.parentSelected && magoManager.objectSelected === this)
 	{
 		referenceObjectIsSelected = true;
+		
+		if (magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.OBJECT) 
+		{
+			// Active stencil if the object is selected.
+			magoManager.renderer.enableStencilBuffer(gl);
+		}
 	}
 	
 	// Check the color or texture of reference object.
@@ -294,9 +300,6 @@ NeoReference.prototype.solveReferenceColorOrTexture = function(magoManager, neoB
 		{
 			gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 			gl.uniform4fv(shader.oneColor4_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
-			
-			// Active stencil if the object is selected.
-			magoManager.renderer.enableStencilBuffer(gl);
 		}
 		else if (magoManager.magoPolicy.colorChangedObjectId === this.objectId)
 		{
@@ -450,6 +453,7 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 		gl.uniform1i(shader.hasAditionalMov_loc, true);
 		gl.uniform3fv(shader.aditionalMov_loc, [neoReference.moveVector.x, neoReference.moveVector.y, neoReference.moveVector.z]); //.
 		shader.last_isAditionalMovedZero = false;
+	
 	}
 	else 
 	{
