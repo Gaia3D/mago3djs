@@ -1,7 +1,8 @@
 'use strict';
 
 /**
- * buildings seed
+ * buildings seed.
+ * Represent single building feature.
  * @class BuildingSeed
  */
 var BuildingSeed = function() 
@@ -22,7 +23,7 @@ var BuildingSeed = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * clear this instance
  */
 BuildingSeed.prototype.deleteObjects = function() 
 {
