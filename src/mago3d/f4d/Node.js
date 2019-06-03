@@ -740,12 +740,12 @@ Node.prototype.finishedAnimation = function(magoManager)
 	var velocityAlt = (animData.targetAltitude - animData.startAltitude)/(animData.durationInSeconds);
 
 	var geoLocDatamanager = this.getNodeGeoLocDataManager();
-	if(geoLocDatamanager === undefined)
+	if (geoLocDatamanager === undefined)
 	{
 		return true;
 	}
 	var geoLocationData = geoLocDatamanager.getCurrentGeoLocationData();
-	if(geoLocationData === undefined)
+	if (geoLocationData === undefined)
 	{
 		return true;
 	}
@@ -806,11 +806,11 @@ Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude,
 	if (geoCoords === undefined)
 	{ return; } 
 	
-	if(!geoCoords.longitude || !geoCoords.latitude || !geoCoords.altitude)
+	if (!geoCoords.longitude || !geoCoords.latitude || !geoCoords.altitude)
 	{
 		return;
 	}
-	if(geoCoords.longitude === undefined || geoCoords.latitude === undefined || geoCoords.altitude === undefined)
+	if (geoCoords.longitude === undefined || geoCoords.latitude === undefined || geoCoords.altitude === undefined)
 	{
 		return;
 	}

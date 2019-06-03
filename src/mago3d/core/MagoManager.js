@@ -804,7 +804,7 @@ MagoManager.prototype.load_testTextures = function()
  */
 MagoManager.prototype.getCurrentTime = function() 
 {
-	if(this.currTime === undefined) 
+	if (this.currTime === undefined) 
 	{
 		this.dateSC = new Date();
 		this.currTime = this.dateSC.getTime();
