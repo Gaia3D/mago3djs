@@ -182,8 +182,6 @@ var MagoManager = function()
 	// End ssao.------------------------------------------------
 	
 	// var to delete.*********************************************
-	this.shadersManager = new ShadersManager(); // Old. delete.***
-	// var to delete.*********************************************
 	this.loadQueue = new LoadQueue(this); // Old. delete.***
 
 	// Vars.****************************************************************
@@ -1087,7 +1085,6 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		this.sceneState.camera.frustum.dirty = true;
 	}
 	this.depthFboNeo = frustumVolumenObject.depthFbo;
-	
 	this.depthFboNeo.bind(); 
 
 	gl.clearColor(1, 1, 1, 1);

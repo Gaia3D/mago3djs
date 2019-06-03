@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
+ * This class contains the current objects that are rendering. 
  * @class CurrentObjectsRendering
  */
 var CurrentObjectsRendering = function() 
@@ -12,44 +12,87 @@ var CurrentObjectsRendering = function()
 	}
 	
 	// General objects rendering, as currNode, currBuilding, currOctree, currRefObject.
+	// This class contains the current objects that are rendering. 
+	
+	/**
+	 * The current node that is in rendering process.
+	 * @type {Node}
+	 * @default undefined
+	 */
 	this.curNode = undefined;
+	
+	/**
+	 * The current building that is in rendering process.
+	 * @type {NeoBuilding}
+	 * @default undefined
+	 */
 	this.curBuilding = undefined;
+	
+	/**
+	 * The current octree (octree of a building) that is in rendering process.
+	 * @type {Octree}
+	 * @default undefined
+	 */
 	this.curOctree = undefined;
+	
+	/**
+	 * The current object that is in rendering process.
+	 * @type {NeoReference}
+	 * @default undefined
+	 */
 	this.curObject = undefined;
 };
 
-// Renderer.
+
 /**
- * 어떤 일을 하고 있습니까?
+ * This class manages the rendering of all classes.
  * @class Renderer
  */
-var Renderer = function() 
+var Renderer = function(manoManager) 
 {
 	if (!(this instanceof Renderer)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
+	/**
+	 * The current objects that is in rendering process.
+	 * @type {CurrentObjectsRendering}
+	 * @default CurrentObjectsRendering
+	 */
 	this.currentObjectsRendering = new CurrentObjectsRendering();
+	
+	/**
+	 * This parameter indicates that if is using normals in the shader.
+	 * @type {Boolean}
+	 * @default true
+	 */
 	this.renderNormals = true;
+	
+	/**
+	 * This parameter indicates that if is using textures in the shader.
+	 * @type {Boolean}
+	 * @default true
+	 */
 	this.renderTexture = true;
-
-	this.vbo_vi_cacheKey_aux;
-	this.byteColorAux = new ByteColor();
-
-	// SCRATCH. SCRATCH. SCRATCH. SCRATCH. SCRATCH. SCRATCH. SCRATCH. SCRATCH. SCRATCH. SCRATCH. SCRATCH. SCRATCH.
-
-	this.currentTimeSC;
-	this.dateSC;
-	this.startTimeSC;
-	this.simpObj_scratch;
+	
+	/**
+	 * The main mago3d class. This object manages the main pipe-line of the Mago3D.
+	 * @type {ManoManager}
+	 * @default ManoManager
+	 */
+	this.magoManager = manoManager;
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
+ * This function renders a vboContainer.
+ * @param {WebGLRenderingContext} gl WebGL rendering context.
+ * @param {VBOVertexIdxCacheKeysContainer} vboContainer This object contains "VBOVertexIdxCacheKey" objects.
+ * @param {ManoManager} magoManager The main mago3d class. This object manages the main pipe-line of the Mago3D.
+ * @param {PostFxShader} shader Shader.
+ * @param {Boolean} renderWireframe Parameter that indicates if render in wireframe mode.
  */
- 
+
 Renderer.prototype.renderVboContainer = function(gl, vboContainer, magoManager, shader, renderWireframe) 
 {
 	if (vboContainer === undefined)
@@ -63,25 +106,25 @@ Renderer.prototype.renderVboContainer = function(gl, vboContainer, magoManager, 
 	for (var n=0; n<cacheKeys_count; n++) // Original.
 	{
 		//var mesh_array = block.viArraysContainer._meshArrays[n];
-		this.vbo_vi_cacheKey_aux = vboContainer.vboCacheKeysArray[n];
+		var vbo_vi_cacheKey_aux = vboContainer.vboCacheKeysArray[n];
 		
-		if (!this.vbo_vi_cacheKey_aux.bindDataPosition(shader, magoManager.vboMemoryManager))
+		if (!vbo_vi_cacheKey_aux.bindDataPosition(shader, magoManager.vboMemoryManager))
 		{ return false; }
 		
-		if (!this.vbo_vi_cacheKey_aux.bindDataNormal(shader, magoManager.vboMemoryManager))
+		if (!vbo_vi_cacheKey_aux.bindDataNormal(shader, magoManager.vboMemoryManager))
 		{ return false; }
 		
-		if (!this.vbo_vi_cacheKey_aux.bindDataIndice(shader, magoManager.vboMemoryManager))
+		if (!vbo_vi_cacheKey_aux.bindDataIndice(shader, magoManager.vboMemoryManager))
 		{ return false; }
 
 		/*
 		if (shader.texCoord2_loc !== -1 && this.renderTexture) 
 		{
-			if (!this.vbo_vi_cacheKey_aux.isReadyTexCoords(gl, magoManager.vboMemoryManager))
+			if (!vbo_vi_cacheKey_aux.isReadyTexCoords(gl, magoManager.vboMemoryManager))
 			{ continue; }
 
 			gl.enableVertexAttribArray(shader.texCoord2_loc);
-			gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo_vi_cacheKey_aux.meshTexcoordsCacheKey);
+			gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vi_cacheKey_aux.meshTexcoordsCacheKey);
 			gl.vertexAttribPointer(shader.texCoord2_loc, 2, gl.FLOAT, false, 0, 0);
 		}
 		else 
@@ -93,16 +136,16 @@ Renderer.prototype.renderVboContainer = function(gl, vboContainer, magoManager, 
 		// Indices.
 		if (magoManager.isCameraMoving)
 		{
-			indicesCount = this.vbo_vi_cacheKey_aux.indicesCount;
+			indicesCount = vbo_vi_cacheKey_aux.indicesCount;
 		}
 		else
 		{
-			indicesCount = this.vbo_vi_cacheKey_aux.indicesCount;
+			indicesCount = vbo_vi_cacheKey_aux.indicesCount;
 		}
 		
 		if (renderWireframe)
 		{
-			gl.drawElements(gl.LINES, this.vbo_vi_cacheKey_aux.indicesCount, gl.UNSIGNED_SHORT, 0); // Wireframe.
+			gl.drawElements(gl.LINES, vbo_vi_cacheKey_aux.indicesCount, gl.UNSIGNED_SHORT, 0); // Wireframe.
 
 		}
 		else 
