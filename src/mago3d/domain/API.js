@@ -107,7 +107,7 @@ function API(apiName)
 	// result x, y, z
 	this.resultPoint = null;
 	
-	// General magoMode.***
+	// General magoMode.
 	this.magoMode = CODE.magoMode.NORMAL;
 
 	//position unit

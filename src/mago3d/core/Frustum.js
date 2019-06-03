@@ -20,7 +20,7 @@ var Frustum = function()
 	this.planesArray = [];
 	this.dirty = true;
 	
-	// plane[0] = near, plane[1] = far.***
+	// plane[0] = near, plane[1] = far.
 	for (var i=0; i<6; i++)
 	{
 		var plane = new Plane();

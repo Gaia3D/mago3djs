@@ -1,6 +1,6 @@
 'use strict';
 
-// CCTVList.*********************************************************************************
+// CCTVList.
 /**
  * 카메라
  * @class CCTVList
@@ -99,10 +99,10 @@ CCTVList.prototype.render = function(magoManager, shader)
 	shader.bindUniformGenerals();
 	gl.uniform1i(shader.textureFlipYAxis_loc, magoManager.sceneState.textureFlipYAxis);
 	
-	gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
+	gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 
 	gl.activeTexture(gl.TEXTURE0);
-	gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);  // original.***
+	gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);  // original.
 	gl.activeTexture(gl.TEXTURE1);
 	gl.bindTexture(gl.TEXTURE_2D, magoManager.noiseTexture);
 	gl.activeTexture(gl.TEXTURE2);
