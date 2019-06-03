@@ -455,7 +455,7 @@ Camera.prototype.doTrack = function(magoManager)
 			var geoLocationData = geoLocDatamanager.getCurrentGeoLocationData();
 			if (geoLocationData === undefined)
 			{ return; }
-			
+
 			var prevGeoLocationData = geoLocDatamanager.getGeoLocationData(1);
 			if (defined(prevGeoLocationData))
 			{
@@ -470,11 +470,9 @@ Camera.prototype.doTrack = function(magoManager)
 				movedCamPos.y = position.y + dy;
 				movedCamPos.z = position.z + dz;
 			}
-
 			var targetGeographicCoords = geoLocationData.getGeographicCoords();
 			if (targetGeographicCoords === undefined)
 			{ return; }
-
 			var target = Cesium.Cartesian3.fromDegrees(targetGeographicCoords.longitude, targetGeographicCoords.latitude, targetGeographicCoords.altitude);
 			var range = Cesium.Cartesian3.distance(movedCamPos ? movedCamPos : position, target);
 			var hpr = new Cesium.HeadingPitchRange(camera.heading, camera.pitch, range);

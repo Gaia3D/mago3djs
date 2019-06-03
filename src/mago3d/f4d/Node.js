@@ -319,9 +319,6 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	if (neoBuilding === undefined)
 	{ return; }
 
-	if (this.data.nodeId === "GyeomjaeJeongSeon_del")
-	{ var hola = 0; }
-
 	// Check if we are under selected data structure.***
 	var selectionManager = magoManager.selectionManager;
 	if (selectionManager.currentNodeSelected === this)
@@ -385,8 +382,6 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 		gl.depthRange(0.1, 1); // reduce depthRange to minimize blending flickling.***
 		var geoLocDatasCount = geoLocDataManager.getGeoLocationDatasCount();
 		//for(var i=geoLocDatasCount - 1; i>0; i--)
-		if (geoLocDatasCount >= geoLocDataManager.geoLocationDataArrayMaxLengthAllowed - 1)
-		{ var hola = 0; }
 		for (var i=1; i<geoLocDatasCount; i++ )
 		{
 			var buildingGeoLocation = geoLocDataManager.getGeoLocationData(i);
@@ -724,6 +719,9 @@ Node.prototype.finishedAnimation = function(magoManager)
 	
 	if (animData === undefined)
 	{ return true; }
+
+	if (animData.startLongitude === undefined || animData.startLatitude === undefined || animData.startAltitude === undefined)
+	{ return true; }
 	
 	// calculate the currentLocation and currentRotation.***
 	var currTime = magoManager.getCurrentTime();
@@ -742,7 +740,15 @@ Node.prototype.finishedAnimation = function(magoManager)
 	var velocityAlt = (animData.targetAltitude - animData.startAltitude)/(animData.durationInSeconds);
 
 	var geoLocDatamanager = this.getNodeGeoLocDataManager();
+	if(geoLocDatamanager === undefined)
+	{
+		return true;
+	}
 	var geoLocationData = geoLocDatamanager.getCurrentGeoLocationData();
+	if(geoLocationData === undefined)
+	{
+		return true;
+	}
 	var geographicCoord = geoLocationData.geographicCoord;
 
 	if (totalDeltaTime > animData.durationInSeconds)
@@ -791,9 +797,23 @@ Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude,
 	animData.birthTime = magoManager.getCurrentTime();
 	
 	var geoLocDataManager = this.getNodeGeoLocDataManager();
+	if (geoLocDataManager === undefined)
+	{ return; }
 	var geoLocData = geoLocDataManager.getCurrentGeoLocationData();
+	if (geoLocData === undefined)
+	{ return; }
 	var geoCoords = geoLocData.getGeographicCoords();
+	if (geoCoords === undefined)
+	{ return; } 
 	
+	if(!geoCoords.longitude || !geoCoords.latitude || !geoCoords.altitude)
+	{
+		return;
+	}
+	if(geoCoords.longitude === undefined || geoCoords.latitude === undefined || geoCoords.altitude === undefined)
+	{
+		return;
+	}
 	// start location.***
 	animData.startLongitude = geoCoords.longitude;
 	animData.startLatitude = geoCoords.latitude;
@@ -894,6 +914,8 @@ Node.prototype.changeLocationAndRotation = function(latitude, longitude, elevati
 	{
 		aNode = nodesArray[i];
 		var geoLocDatamanager = aNode.getNodeGeoLocDataManager();
+		if (geoLocDatamanager === undefined)
+		{ continue; }
 		var geoLocationData;
 		if (this.data.animationData !== undefined)
 		{
