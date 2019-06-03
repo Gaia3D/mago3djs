@@ -373,6 +373,7 @@ SmartTile.prototype.putNode = function(targetDepth, node, magoManager)
 		// todo: Must recalculate the smartTile sphereExtent.***
 		//this.makeSphereExtent(magoManager);
 		
+		
 		return true;
 	}
 };
