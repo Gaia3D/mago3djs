@@ -208,11 +208,6 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 
 	resultGeoLocationData.position = this.geographicCoordToWorldPoint(longitude, latitude, altitude, resultGeoLocationData.position, magoManager);
 
-	
-	if(resultGeoLocationData.position.isNAN()){
-		var hola = 0;
-	}
-	
 	// High and Low values of the position.**
 	if (resultGeoLocationData.positionHIGH === undefined)
 	{ resultGeoLocationData.positionHIGH = new Float32Array([0.0, 0.0, 0.0]); }
