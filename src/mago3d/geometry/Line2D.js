@@ -30,8 +30,10 @@ Line2D.prototype.setPointAndDir = function(px, py, dx, dy)
 	this.direction.unitary();
 };
 
-/**
- * 
+/** 
+ * Get the perpendicular direction of the line in right-handed coordinate system
+ * @param {Point2D} point target point
+ * @return {Line2D} perpendicular the perpendicular direction 
  */
 Line2D.prototype.getPerpendicularRight = function(point) 
 {
@@ -48,8 +50,8 @@ Line2D.prototype.getPerpendicularRight = function(point)
 
 /**
  * Get the perpendicular direction of the line in left-handed coordinate system
- * @param point target point
- * @return perpendicular the perpendicular direction 
+ * @param {Point2D} pointt target point
+ * @return {Line2D} perpendicular the perpendicular direction 
  */
 Line2D.prototype.getPerpendicularLeft = function(point) 
 {

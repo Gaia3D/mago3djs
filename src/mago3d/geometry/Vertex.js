@@ -291,10 +291,10 @@ Vertex.getProjectedOntoPlane = function(vertex, plane, projectionDirection, resu
 	if (resultVertex === undefined)
 	{ resultVertex = new Vertex(); }
 	
-	// 1rst, copy from the original vertex.***
+	// 1rst, copy from the original vertex.
 	resultVertex.copyFrom(vertex);
 	
-	// Now, change only the position.***
+	// Now, change only the position.
 	resultVertex.setPosition(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z);
 	
 	return resultVertex;
