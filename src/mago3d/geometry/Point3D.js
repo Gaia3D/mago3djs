@@ -3,9 +3,9 @@
 /**
  * a point feature which will be used at three degree world
  * @class Point3D 
- * @param {Float} x 
- * @param {Float} y 
- * @param {Float} z 
+ * @param {Number} x 
+ * @param {Number} y 
+ * @param {Number} z 
  */
 
 var Point3D = function(x, y, z) 
@@ -57,7 +57,7 @@ Point3D.prototype.copyFrom = function(point3d)
 
 /**
  * Calculate [this.x*this.x + this.y*this.y + this.z*this.z] to prepare squared module 
- * @returns {Float}
+ * @returns {Number}
  */
 Point3D.prototype.getSquaredModul = function() 
 {
@@ -66,7 +66,7 @@ Point3D.prototype.getSquaredModul = function()
 
 /**
  * Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z );
- * @returns {Float}
+ * @returns {Number}
  */
 Point3D.prototype.getModul = function() 
 {
@@ -118,7 +118,7 @@ Point3D.prototype.crossProduct = function(point, resultPoint)
 /**
  * Calculate scalar production of vector
  * @param {Point3D} point the point which will be used at this calculate.
- * @returns {Float} calculated result
+ * @returns {Number} calculated result
  */
 Point3D.prototype.scalarProduct = function(point) 
 {

@@ -120,7 +120,7 @@ Mesh.prototype.getSurfacesCount = function()
 
 Mesh.prototype.getCopySurfaceIndependentMesh = function(resultMesh)
 {
-	// In a surfaceIndependentMesh, the surfaces are disconex.***
+	// In a surfaceIndependentMesh, the surfaces are disconex.
 	if (resultMesh === undefined)
 	{ resultMesh = new Mesh(); }
 	
@@ -157,7 +157,7 @@ Mesh.prototype.getTriangles = function(resultTrianglesArray)
 
 Mesh.prototype.getTrianglesConvex = function(resultTrianglesArray)
 {
-	// To call this method, the faces must be CONVEX.***
+	// To call this method, the faces must be CONVEX.
 	if (this.surfacesArray === undefined || this.surfacesArray.length === 0)
 	{ return resultTrianglesArray; }
 	
@@ -185,7 +185,7 @@ Mesh.prototype.getNoRepeatedVerticesArray = function(resultVerticesArray)
 	if (resultVerticesArray === undefined)
 	{ resultVerticesArray = []; }
 	
-	// 1rst, assign vertex-IdxInList for all used vertices.***
+	// 1rst, assign vertex-IdxInList for all used vertices.
 	var facesCount;
 	var face;
 	var surface;
@@ -210,7 +210,7 @@ Mesh.prototype.getNoRepeatedVerticesArray = function(resultVerticesArray)
 		}
 	}
 	
-	// now, make a map of unique vertices map using "idxInList" of vertices.***
+	// now, make a map of unique vertices map using "idxInList" of vertices.
 	var verticesMap = {};
 	var surfacesCount = this.getSurfacesCount();
 	for (var i=0; i<surfacesCount; i++)
@@ -229,7 +229,7 @@ Mesh.prototype.getNoRepeatedVerticesArray = function(resultVerticesArray)
 		}
 	}
 	
-	// finally make the unique vertices array.***
+	// finally make the unique vertices array.
 	var vertex;
 	for (var key in verticesMap)
 	{
@@ -263,7 +263,7 @@ Mesh.prototype.transformByMatrix4 = function(tMat4)
 	
 	this.vertexList.transformPointsByMatrix4(tMat4);
 	
-	// If rotate a mesh, must recalculate normals.***
+	// If rotate a mesh, must recalculate normals.
 	var bForceRecalculatePlaneNormal = true;
 	this.calculateVerticesNormals(bForceRecalculatePlaneNormal);
 };
@@ -281,7 +281,7 @@ Mesh.prototype.translate = function(x, y, z)
 
 Mesh.prototype.calculateVerticesNormals = function(bForceRecalculatePlaneNormal)
 {
-	// PROVISIONAL.***
+	// PROVISIONAL.
 	var surface;
 	var surfacesCount = this.getSurfacesCount();
 	for (var i=0; i<surfacesCount; i++)
@@ -359,17 +359,17 @@ Mesh.prototype.getCopy = function(resultMeshCopy)
 	if (resultMeshCopy === undefined)
 	{ resultMeshCopy = new Mesh(); }
 	
-	// 1rst copy vertexList.***
+	// 1rst copy vertexList.
 	if (resultMeshCopy.vertexList === undefined)
 	{ resultMeshCopy.vertexList = new VertexList(); }
 	
 	resultMeshCopy.vertexList.copyFrom(this.vertexList);
 	
-	// set idxInList both vertexLists.***
+	// set idxInList both vertexLists.
 	this.vertexList.setIdxInList();
 	resultMeshCopy.vertexList.setIdxInList();
 	
-	// now copy surfaces.***
+	// now copy surfaces.
 	var surface, facesCount, face, verticesCount;
 	var vtxIdx;
 	var surfaceCopy, faceCopy, vtxCopy;
@@ -405,7 +405,7 @@ Mesh.prototype.getTrianglesListsArrayBy2ByteSize = function(trianglesArray, resu
 	if (resultTrianglesListsArray === undefined)
 	{ resultTrianglesListsArray = []; }
 	
-	// This function returns trianglesListsArray. Each trianglesList's vertices count is lower than 65535.***
+	// This function returns trianglesListsArray. Each trianglesList's vertices count is lower than 65535.
 	var shortSize = 65535;
 	var trianglesList = new TrianglesList();
 	resultTrianglesListsArray.push(trianglesList);
@@ -417,7 +417,7 @@ Mesh.prototype.getTrianglesListsArrayBy2ByteSize = function(trianglesArray, resu
 		return resultTrianglesListsArray;
 	}
 	
-	// 1rst, make global vertices array.***
+	// 1rst, make global vertices array.
 	var globalVerticesArray = TrianglesList.getNoRepeatedVerticesArray(trianglesArray, undefined);
 	var verticesCount = globalVerticesArray.length;
 	
@@ -472,11 +472,11 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 	{
 		var vboKey = this.vboKeysContainer.vboCacheKeysArray[i];
 		
-		// Positions.***
+		// Positions.
 		if (!vboKey.bindDataPosition(shader, magoManager.vboMemoryManager))
 		{ return false; }
 		
-		// Normals.***
+		// Normals.
 		if (vboKey.vboBufferNor)
 		{
 			if (!vboKey.bindDataNormal(shader, magoManager.vboMemoryManager))
@@ -487,7 +487,7 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 			shader.disableVertexAttribArray(shader.normal3_loc);
 		}
 		
-		// Colors.***
+		// Colors.
 		if (vboKey.vboBufferCol)
 		{
 			if (!vboKey.bindDataColor(shader, magoManager.vboMemoryManager))
@@ -498,7 +498,7 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 			shader.disableVertexAttribArray(shader.color4_loc);
 		}
 		
-		// TexCoords.***
+		// TexCoords.
 		if (vboKey.vboBufferTCoord)
 		{
 			if (!vboKey.bindDataTexCoord(shader, magoManager.vboMemoryManager))
@@ -509,7 +509,7 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 			shader.disableVertexAttribArray(shader.texCoord2_loc);
 		}
 		
-		// Indices.***
+		// Indices.
 		if (!vboKey.bindDataIndice(shader, magoManager.vboMemoryManager))
 		{ return false; }
 		
@@ -527,11 +527,11 @@ Mesh.prototype.getVbo = function(resultVboContainer, vboMemManager)
 	if (resultVboContainer === undefined)
 	{ resultVboContainer = new VBOVertexIdxCacheKeysContainer(); }
 
-	// make global triangles array.***
+	// make global triangles array.
 	var trianglesArray = this.getTriangles(undefined);
 	var trianglesCount = trianglesArray.length;
 	
-	// If vertices count > shortSize(65535), then must split the mesh.***
+	// If vertices count > shortSize(65535), then must split the mesh.
 	var trianglesListsArray = this.getTrianglesListsArrayBy2ByteSize(trianglesArray, undefined);
 	var trianglesList;
 	var verticesArray;
@@ -556,11 +556,11 @@ Mesh.prototype.getVboTrianglesConvex = function(resultVboContainer, vboMemManage
 	if (resultVboContainer === undefined)
 	{ resultVboContainer = new VBOVertexIdxCacheKeysContainer(); }
 
-	// make global triangles array.***
-	var trianglesArray = this.getTrianglesConvex(undefined); // for convex faces (faster).***
+	// make global triangles array.
+	var trianglesArray = this.getTrianglesConvex(undefined); // for convex faces (faster).
 	var trianglesCount = trianglesArray.length;
 	
-	// If vertices count > shortSize(65535), then must split the mesh.***
+	// If vertices count > shortSize(65535), then must split the mesh.
 	var trianglesListsArray = this.getTrianglesListsArrayBy2ByteSize(trianglesArray, undefined);
 	var trianglesList;
 	var verticesArray;
@@ -585,7 +585,7 @@ Mesh.prototype.getVboEdges = function(resultVboContainer, vboMemManager)
 	if (resultVboContainer === undefined)
 	{ return; }
 	
-	// provisionally make edges by this.***
+	// provisionally make edges by this.
 	var frontierHedgesArray = this.getFrontierHalfEdges(undefined);
 	var hedgesCount = frontierHedgesArray.length;
 	var hedge;

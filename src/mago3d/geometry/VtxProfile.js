@@ -157,8 +157,8 @@ VtxProfile.prototype.getProjectedProfile2D = function(resultProfile2d)
 	if (this.outerVtxRing === undefined)
 	{ return resultProfile2d; }
 	
-	// 1rst, calculate the normal of this vtxProfile. Use the this.outerVtxRing.***
-	// The normal is used co calculate the bestFace to project.***
+	// 1rst, calculate the normal of this vtxProfile. Use the this.outerVtxRing.
+	// The normal is used co calculate the bestFace to project.
 	var normal = this.outerVtxRing.calculatePlaneNormal(undefined);
 
 	if (normal === undefined)
@@ -167,10 +167,10 @@ VtxProfile.prototype.getProjectedProfile2D = function(resultProfile2d)
 	if (resultProfile2d === undefined)
 	{ resultProfile2d = new Profile2D(); }
 	
-	// OuterVtxRing.***
+	// OuterVtxRing.
 	resultProfile2d.outerRing = this.outerVtxRing.getProjectedPolyLineBasedRing2D(resultProfile2d.outerRing, normal);
 	
-	// InnerVtxRings.***
+	// InnerVtxRings.
 	if (this.innerVtxRingsList !== undefined)
 	{
 		var innerVtxRingsCount = this.innerVtxRingsList.getVtxRingsCount();
@@ -203,13 +203,13 @@ VtxProfile.prototype.makeByPoints3DArray = function(outerPoints3dArray, innerPoi
 	if (outerPoints3dArray === undefined)
 	{ return; }
 	
-	// outer.***************************************
+	// outer.
 	if (this.outerVtxRing === undefined)
 	{ this.outerVtxRing = new VtxRing(); }
 
 	this.outerVtxRing.makeByPoints3DArray(outerPoints3dArray);
 	
-	// inners.***************************************
+	// inners.
 	// todo:
 };
 
@@ -225,13 +225,13 @@ VtxProfile.prototype.updateByPoints3DArray = function(outerPoints3dArray, innerP
 	if (outerPoints3dArray === undefined)
 	{ return; }
 	
-	// outer.***************************************
+	// outer.
 	if (this.outerVtxRing === undefined)
 	{ return; }
 
 	this.outerVtxRing.updateByPoints3DArray(outerPoints3dArray);
 	
-	// inners.***************************************
+	// inners.
 	// todo:
 };
 
@@ -251,7 +251,7 @@ VtxProfile.prototype.makeByProfile2D = function(profile2d)
 	if (outerRing.polygon === undefined)
 	{ outerRing.makePolygon(); }
 	
-	// outer.***************************************
+	// outer.
 	if (this.outerVtxRing === undefined)
 	{ this.outerVtxRing = new VtxRing(); }
 	
@@ -260,7 +260,7 @@ VtxProfile.prototype.makeByProfile2D = function(profile2d)
 	var point2dList = outerPolygon.point2dList;
 	this.outerVtxRing.makeByPoint2DList(point2dList, z);
 
-	// inners.***************************************
+	// inners.
 	if (profile2d.innerRingsList === undefined)
 	{ return; } 
 	
@@ -323,10 +323,10 @@ VtxProfile.getProjectedOntoPlane = function(vtxProfile, plane, projectionDirecti
 	if (resultvtxProfile === undefined)
 	{ resultvtxProfile = new VtxProfile(); }
 	
-	// OuterVtxRing.***
+	// OuterVtxRing.
 	resultvtxProfile.outerVtxRing = VtxRing.getProjectedOntoPlane(vtxProfile.outerVtxRing, plane, projectionDirection, resultvtxProfile.outerVtxRing);
 				
-	// InnerVtxRings.***
+	// InnerVtxRings.
 	if (vtxProfile.innerVtxRingsList !== undefined)
 	{
 		resultvtxProfile.innerVtxRingsList = VtxRingsList.getProjectedOntoPlane(vtxProfile.innerVtxRingsList, plane, projectionDirection, resultvtxProfile.innerVtxRingsList);
