@@ -13,10 +13,10 @@ var Tunnel = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	// This is a loft object, so need a path & a profile.***
+	// This is a loft object, so need a path & a profile.
 	
-	this.geoCoordsListPath; // class : GeographicCoordsList.***
-	this.geoCoordsListProfile; // class : GeographicCoordsList.***
+	this.geoCoordsListPath; // class : GeographicCoordsList.
+	this.geoCoordsListProfile; // class : GeographicCoordsList.
 	this.geoLocDataManager;
 	
 	this.vtxProfilesList;
@@ -121,34 +121,34 @@ Tunnel.prototype.renderTunnel = function(magoManager, shader, renderType)
 	shader.enableVertexAttribArray(shader.position3_loc);
 	shader.disableVertexAttribArray(shader.color4_loc);
 	shader.enableVertexAttribArray(shader.normal3_loc); 
-	shader.disableVertexAttribArray(shader.texCoord2_loc); // provisionally has no texCoords.***
+	shader.disableVertexAttribArray(shader.texCoord2_loc); // provisionally has no texCoords.
 	
 	shader.bindUniformGenerals();
 
 	
-	gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
-	gl.uniform4fv(shader.oneColor4_loc, [1.0, 1.0, 0.1, 0.0]); //.***
+	gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
+	gl.uniform4fv(shader.oneColor4_loc, [1.0, 1.0, 0.1, 0.0]); //.
 	
-	gl.uniform1i(shader.bApplySsao_loc, false); // apply ssao.***
-	gl.uniform1i(shader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.***
-	gl.uniform1i(shader.colorType_loc, 1); // 0= oneColor, 1= attribColor, 2= texture.***
-	gl.uniform1i(shader.bApplySpecularLighting_loc, true); // turn on/off specular lighting.***
+	gl.uniform1i(shader.bApplySsao_loc, false); // apply ssao.
+	gl.uniform1i(shader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.
+	gl.uniform1i(shader.colorType_loc, 1); // 0= oneColor, 1= attribColor, 2= texture.
+	gl.uniform1i(shader.bApplySpecularLighting_loc, true); // turn on/off specular lighting.
 	
 	gl.enable(gl.DEPTH_TEST);
 	gl.depthFunc(gl.LEQUAL);
 	gl.depthRange(0, 1);
 	
 	var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
-	buildingGeoLocation.bindGeoLocationUniforms(gl, shader); // rotMatrix, positionHIGH, positionLOW.***
+	buildingGeoLocation.bindGeoLocationUniforms(gl, shader); // rotMatrix, positionHIGH, positionLOW.
 		
 	
-	// STENCIL SETTINGS.**********************************************************************************
+	// STENCIL SETTINGS.*
 	gl.colorMask(false, false, false, false);
 	gl.depthMask(false);
 	gl.enable(gl.CULL_FACE);
 	gl.enable(gl.STENCIL_TEST);
 	//gl.enable(gl.POLYGON_OFFSET_FILL);
-	//gl.polygonOffset(1.0, 2.0); // Original.***
+	//gl.polygonOffset(1.0, 2.0); // Original.
 	//gl.polygonOffset(0.0, 0.0); 
 	
 	gl.clearStencil(0);
@@ -157,8 +157,8 @@ Tunnel.prototype.renderTunnel = function(magoManager, shader, renderType)
 	
 	//if(magoManager.currentFrustumIdx !== 5)
 	{
-		// First pass.****************************************************************************************************
-		gl.cullFace(gl.FRONT); // 1rstPass.***
+		// First pass.*
+		gl.cullFace(gl.FRONT); // 1rstPass.
 		gl.stencilFunc(gl.ALWAYS, 0x0, 0xff);
 		//gl.stencilOp(gl.KEEP, gl.INCR, gl.KEEP); // stencilOp(fail, zfail, zpass)
 		gl.stencilOp(gl.KEEP, gl.INCR, gl.KEEP); // stencilOp(fail, zfail, zpass)
@@ -168,24 +168,24 @@ Tunnel.prototype.renderTunnel = function(magoManager, shader, renderType)
 	
 	//if(magoManager.currentFrustumIdx === 5)
 	{
-		// Second pass.****************************************************************************************************
-		gl.cullFace(gl.BACK); // 2ndPass.***
+		// Second pass.*
+		gl.cullFace(gl.BACK); // 2ndPass.
 		gl.stencilFunc(gl.ALWAYS, 0x0, 0xff);
 		//gl.stencilOp(gl.KEEP, gl.DECR, gl.KEEP); // stencilOp(fail, zfail, zpass)
 		gl.stencilOp(gl.KEEP, gl.DECR, gl.KEEP); // stencilOp(fail, zfail, zpass)
-		this.meshPositive.render(magoManager, shader, renderType, glPrimitive);// Original.***
+		this.meshPositive.render(magoManager, shader, renderType, glPrimitive);// Original.
 	}
 	
 
-	// Render the hole.*********************************************************************************************
+	// Render the hole.
 	//shader.bindUniformGenerals();
-	gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
-	gl.uniform4fv(shader.oneColor4_loc, [222/255, 184/255, 135/255, 1.0]); //.***
+	gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
+	gl.uniform4fv(shader.oneColor4_loc, [222/255, 184/255, 135/255, 1.0]); //.
 	
 	//gl.disable(gl.POLYGON_OFFSET_FILL);
 	//gl.disable(gl.CULL_FACE);
 	gl.colorMask(true, true, true, true);
-	//gl.depthMask(false); // original.***
+	//gl.depthMask(false); // original.
 	gl.depthMask(true);
 	gl.stencilMask(0x00);
 
@@ -214,7 +214,7 @@ Tunnel.prototype.renderTunnel = function(magoManager, shader, renderType)
 	
 	//gl.disable(gl.STENCIL_TEST);
 	//gl.depthFunc(gl.LEQUAL);
-	//this.meshPositive.render(magoManager, shader, renderType, glPrimitive);// Original.***
+	//this.meshPositive.render(magoManager, shader, renderType, glPrimitive);// Original.
 
 
 	gl.enable(gl.DEPTH_TEST);
@@ -223,10 +223,10 @@ Tunnel.prototype.renderTunnel = function(magoManager, shader, renderType)
 	gl.disable(gl.STENCIL_TEST);
 	gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP); // stencilOp(fail, zfail, zpass)
 	gl.disable(gl.POLYGON_OFFSET_FILL);
-	gl.depthRange(0, 1);// return to the normal value.***
+	gl.depthRange(0, 1);// return to the normal value.
 	gl.useProgram(null);
 	
-	gl.depthMask(true); //sets whether writing into the depth buffer is enabled or disabled. Default value: true, meaning that writing is enabled.***
+	gl.depthMask(true); //sets whether writing into the depth buffer is enabled or disabled. Default value: true, meaning that writing is enabled.
 	gl.stencilMask(0xff);
 };
 
@@ -238,30 +238,30 @@ Tunnel.prototype.makeMesh = function(magoManager)
 	if (this.geoCoordsListPath === undefined || this.geoCoordsListProfile === undefined)
 	{ return false; }
 	
-	// 1rst, set position of this extrude object. Take as position the 1rst geoCoord absolute position.***
-	// Another possibility is calculate the average point of geoCoords.***
+	// 1rst, set position of this extrude object. Take as position the 1rst geoCoord absolute position.
+	// Another possibility is calculate the average point of geoCoords.
 	var geoLoc = this.getGeoLocationData();
 
-	// Take the 1rst geographicCoord's geoLocation of the path.***
+	// Take the 1rst geographicCoord's geoLocation of the path.
 	var geoCoord = this.geoCoordsListPath.getGeoCoord(0);
 	var geoLocDataManagerFirst = geoCoord.getGeoLocationDataManager();
 	var geoLocFirst = geoLocDataManagerFirst.getCurrentGeoLocationData();
 	geoLoc.copyFrom(geoLocFirst);
 
-	// Now, make the profiles ( 1 vtxProfile for each point of the path).***
+	// Now, make the profiles ( 1 vtxProfile for each point of the path).
 	if (this.vtxProfilesList === undefined)
 	{ this.vtxProfilesList = new VtxProfilesList(); }
 	
-	// Transform pathGeoCoordsList to cartesianPath(points3DList).***
+	// Transform pathGeoCoordsList to cartesianPath(points3DList).
 	var wgs84Point3DArray = this.geoCoordsListPath.getWgs84Points3D(undefined);
 	var relativePoints3dArray = geoLoc.getTransformedRelativePositionsArray(wgs84Point3DArray, undefined);
 	
 	var pathPoints3dList = new Point3DList(relativePoints3dArray);
-	var bLoop = false; // this is a stringTypePath, no loopTypePath.***
+	var bLoop = false; // this is a stringTypePath, no loopTypePath.
 	
-	// Provisionally make an circular profile in the 1rst point3d-plane.***
+	// Provisionally make an circular profile in the 1rst point3d-plane.
 	var bisectionPlane = pathPoints3dList.getBisectionPlane(0, undefined, bLoop);
-	// Note: "bisectionPlane" is in local coordinate "geoLoc".***
+	// Note: "bisectionPlane" is in local coordinate "geoLoc".
 			
 	var profile2d = new Profile2D();
 	//profile2d.TEST__setFigureHole_2();
@@ -276,19 +276,19 @@ Tunnel.prototype.makeMesh = function(magoManager)
 	var pointsCountFor360Deg = 24;
 	ring.getPoints(resultPoints2dArray, pointsCountFor360Deg);
 
-	// Now, calculate the rotMatrix of the bisectionPlane, & calculate points3ds of the circle points2d.***
+	// Now, calculate the rotMatrix of the bisectionPlane, & calculate points3ds of the circle points2d.
 	var rotMat4 = bisectionPlane.getRotationMatrix(undefined);
 	var firstPoint3d = pathPoints3dList.getPoint(0);
 	rotMat4.setTranslation(firstPoint3d.x, firstPoint3d.y, firstPoint3d.z);
 
-	// Make the loft vtxProfilesList.***
+	// Make the loft vtxProfilesList.
 	//bLoop = true;
 	
 	if (this.meshPositive === undefined)
 	{
 		this.vtxProfilesList.makeLoft(profile2d, pathPoints3dList, bLoop);
 		
-		// positive mesh.***
+		// positive mesh.
 		var bIncludeBottomCap = true;
 		var bIncludeTopCap = true;
 		var meshAux = this.vtxProfilesList.getMesh(undefined, bIncludeBottomCap, bIncludeTopCap, bLoop);
@@ -297,9 +297,9 @@ Tunnel.prototype.makeMesh = function(magoManager)
 		this.meshPositive.calculateVerticesNormals(bForceRecalculatePlaneNormal);
 		this.meshPositive.setColor(0.1, 0.5, 0.5, 1.0);
 		
-		// negative mesh.***
+		// negative mesh.
 		this.meshNegative = meshAux.getCopySurfaceIndependentMesh(this.meshNegative);
-		this.meshNegative.reverseSense(); // here calculates vertices normals.***
+		this.meshNegative.reverseSense(); // here calculates vertices normals.
 		this.meshNegative.setColor(0.1, 0.5, 0.5, 1.0);
 		this.meshNegative.getVbo(this.vboKeysContainer, magoManager.vboMemoryManager);
 		this.meshNegative.getVboEdges(this.vboKeysContainerEdges, magoManager.vboMemoryManager);
@@ -314,28 +314,28 @@ Tunnel.prototype.remakeMesh = function(magoManager)
 	if (this.vtxProfilesList === undefined)
 	{ return false; }
 	
-	// 1rst, set position of this extrude object. Take as position the 1rst geoCoord absolute position.***
-	// Another possibility is calculate the average point of geoCoords.***
+	// 1rst, set position of this extrude object. Take as position the 1rst geoCoord absolute position.
+	// Another possibility is calculate the average point of geoCoords.
 	var geoLoc = this.getGeoLocationData();
 
-	// Take the 1rst geographicCoord's geoLocation of the path.***
+	// Take the 1rst geographicCoord's geoLocation of the path.
 	var geoCoord = this.geoCoordsListPath.getGeoCoord(0);
 	var geoLocDataManagerFirst = geoCoord.getGeoLocationDataManager();
 	var geoLocFirst = geoLocDataManagerFirst.getCurrentGeoLocationData();
 	geoLoc.copyFrom(geoLocFirst);
 
-	// Now, make the profiles ( 1 vtxProfile for each point of the path).***
+	// Now, make the profiles ( 1 vtxProfile for each point of the path).
 	
-	// Transform pathGeoCoordsList to cartesianPath(points3DList).***
+	// Transform pathGeoCoordsList to cartesianPath(points3DList).
 	var wgs84Point3DArray = this.geoCoordsListPath.getWgs84Points3D(undefined);
 	var relativePoints3dArray = geoLoc.getTransformedRelativePositionsArray(wgs84Point3DArray, undefined);
 	
 	var pathPoints3dList = new Point3DList(relativePoints3dArray);
-	var bLoop = false; // this is a stringTypePath, no loopTypePath.***
+	var bLoop = false; // this is a stringTypePath, no loopTypePath.
 	
-	// Provisionally make an circular profile in the 1rst point3d-plane.***
+	// Provisionally make an circular profile in the 1rst point3d-plane.
 	var bisectionPlane = pathPoints3dList.getBisectionPlane(0, undefined, bLoop);
-	// Note: "bisectionPlane" is in local coordinate "geoLoc".***
+	// Note: "bisectionPlane" is in local coordinate "geoLoc".
 			
 	var profile2d = new Profile2D();
 	//profile2d.TEST__setFigureHole_2();
@@ -350,12 +350,12 @@ Tunnel.prototype.remakeMesh = function(magoManager)
 	var pointsCountFor360Deg = 24;
 	ring.getPoints(resultPoints2dArray, pointsCountFor360Deg);
 
-	// Now, calculate the rotMatrix of the bisectionPlane, & calculate points3ds of the circle points2d.***
+	// Now, calculate the rotMatrix of the bisectionPlane, & calculate points3ds of the circle points2d.
 	var rotMat4 = bisectionPlane.getRotationMatrix(undefined);
 	var firstPoint3d = pathPoints3dList.getPoint(0);
 	rotMat4.setTranslation(firstPoint3d.x, firstPoint3d.y, firstPoint3d.z);
 
-	// Make the loft vtxProfilesList.***
+	// Make the loft vtxProfilesList.
 	//bLoop = true;
 	this.meshPositive = undefined;
 	this.meshNegative = undefined;
@@ -367,7 +367,7 @@ Tunnel.prototype.remakeMesh = function(magoManager)
 	{
 		this.vtxProfilesList.makeLoft(profile2d, pathPoints3dList, bLoop);
 		
-		// positive mesh.***
+		// positive mesh.
 		var bIncludeBottomCap = true;
 		var bIncludeTopCap = true;
 		var meshAux = this.vtxProfilesList.getMesh(undefined, bIncludeBottomCap, bIncludeTopCap, bLoop);
@@ -376,9 +376,9 @@ Tunnel.prototype.remakeMesh = function(magoManager)
 		this.meshPositive.calculateVerticesNormals(bForceRecalculatePlaneNormal);
 		this.meshPositive.setColor(0.1, 0.5, 0.5, 1.0);
 		
-		// negative mesh.***
+		// negative mesh.
 		this.meshNegative = meshAux.getCopySurfaceIndependentMesh(this.meshNegative);
-		this.meshNegative.reverseSense(); // here calculates vertices normals.***
+		this.meshNegative.reverseSense(); // here calculates vertices normals.
 		this.meshNegative.setColor(0.1, 0.5, 0.5, 1.0);
 		this.meshNegative.getVbo(this.vboKeysContainer, magoManager.vboMemoryManager);
 		this.meshNegative.getVboEdges(this.vboKeysContainerEdges, magoManager.vboMemoryManager);

@@ -180,8 +180,8 @@ var VBOKeysWorld = function()
 VBOKeysWorld.prototype.getClassifiedBufferKey = function(gl, bufferSize) 
 {
 	// check gpuMemory limit.
-	// If current totalBytesUsed is greater than bytesLimit, then enters in mode "onlyReuse".***
-	// "onlyReuse" = no allocate GPU memory, only use the existent***
+	// If current totalBytesUsed is greater than bytesLimit, then enters in mode "onlyReuse".
+	// "onlyReuse" = no allocate GPU memory, only use the existent
 	var onlyReuse = false;
 	if (this.totalBytesUsed > this.bytesLimit)
 	{

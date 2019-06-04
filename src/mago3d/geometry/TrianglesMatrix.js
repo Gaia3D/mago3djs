@@ -70,7 +70,7 @@ TrianglesMatrix.prototype.assignVerticesIdx = function()
 
 TrianglesMatrix.prototype.getVboFaceDataArray = function(resultVbo)
 {
-	// PROVISIONAL.***
+	// PROVISIONAL.
 	if (this.trianglesListsArray === undefined)
 	{ return resultVbo; }
 	

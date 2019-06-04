@@ -13,10 +13,10 @@ var ParametricMesh = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	this.vtxProfilesList; // class: VtxProfilesList.***
-	this.profile; // class: Profile. is a 2d object.***
-	this.vboKeyContainer; // class: VBOVertexIdxCacheKeyContainer.***
-	this.vboKeyContainerEdges; // class: VBOVertexIdxCacheKeyContainer.***
+	this.vtxProfilesList; // class: VtxProfilesList.
+	this.profile; // class: Profile. is a 2d object.
+	this.vboKeyContainer; // class: VBOVertexIdxCacheKeyContainer.
+	this.vboKeyContainerEdges; // class: VBOVertexIdxCacheKeyContainer.
 };
 
 /**
@@ -51,7 +51,7 @@ ParametricMesh.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bIncl
 	if (resultMesh === undefined)
 	{ resultMesh = new Mesh(); }
 
-	// must separate vbo groups by surfaces.***
+	// must separate vbo groups by surfaces.
 	resultMesh = this.vtxProfilesList.getMesh(resultMesh, bIncludeBottomCap, bIncludeTopCap);
 	resultMesh.calculateVerticesNormals();
 	
@@ -70,7 +70,7 @@ ParametricMesh.prototype.getSurfaceIndependentMesh = function(resultMesh, bInclu
 	if (resultMesh === undefined)
 	{ resultMesh = new Mesh(); }
 
-	// must separate vbo groups by surfaces.***
+	// must separate vbo groups by surfaces.
 	this.mesh = this.vtxProfilesList.getMesh(undefined, bIncludeBottomCap, bIncludeTopCap);
 	resultMesh = this.mesh.getCopySurfaceIndependentMesh(resultMesh);
 	resultMesh.calculateVerticesNormals();
@@ -88,24 +88,24 @@ ParametricMesh.prototype.getSurfaceIndependentMesh = function(resultMesh, bInclu
  */
 ParametricMesh.prototype.revolve = function(profile2d, revolveAngDeg, revolveSegmentsCount, revolveSegment2d) 
 {
-	// Note: move this function into "VtxProfilesList" class.***
+	// Note: move this function into "VtxProfilesList" class.
 	if (profile2d === undefined)
 	{ return undefined; }
 	
 	if (this.vtxProfilesList === undefined)
 	{ this.vtxProfilesList = new VtxProfilesList(); }
 	
-	// if want caps in the extruded mesh, must calculate "ConvexFacesIndicesData" of the profile2d before creating vtxProfiles.***
+	// if want caps in the extruded mesh, must calculate "ConvexFacesIndicesData" of the profile2d before creating vtxProfiles.
 	this.vtxProfilesList.convexFacesIndicesData = profile2d.getConvexFacesIndicesData(undefined);
 	//profile2d.checkNormals();
-	// create vtxProfiles.***
-	// make the base-vtxProfile.***
+	// create vtxProfiles.
+	// make the base-vtxProfile.
 	var baseVtxProfile = this.vtxProfilesList.newVtxProfile();
 	baseVtxProfile.makeByProfile2D(profile2d);
 	
 	var increAngDeg = revolveAngDeg/revolveSegmentsCount;
 	
-	// calculate the translation.***
+	// calculate the translation.
 	var line2d = revolveSegment2d.getLine();
 	var origin2d = new Point2D(0, 0);
 	var translationVector = line2d.getProjectedPoint(origin2d);
@@ -119,11 +119,11 @@ ParametricMesh.prototype.revolve = function(profile2d, revolveAngDeg, revolveSeg
 	
 	for (var i=0; i<revolveSegmentsCount; i++)
 	{
-		// calculate rotation.***
+		// calculate rotation.
 		quaternion.rotationAngDeg(increAngDeg*(i+1), rotAxis.x, rotAxis.y, rotAxis.z);
 		rotMat.rotationByQuaternion(quaternion);
 		
-		// test top profile.***
+		// test top profile.
 		var nextVtxProfile = this.vtxProfilesList.newVtxProfile();
 		nextVtxProfile.copyFrom(baseVtxProfile);
 		nextVtxProfile.translate(translationVector.x, translationVector.y, 0);
@@ -141,7 +141,7 @@ ParametricMesh.prototype.revolve = function(profile2d, revolveAngDeg, revolveSeg
  */
 ParametricMesh.prototype.extrude = function(profile2d, extrusionDist, extrudeSegmentsCount, extrusionVector) 
 {
-	// Note: move this function into "VtxProfilesList" class.***
+	// Note: move this function into "VtxProfilesList" class.
 	if (profile2d === undefined || extrusionDist === undefined)
 	{ return undefined; }
 	
@@ -149,11 +149,11 @@ ParametricMesh.prototype.extrude = function(profile2d, extrusionDist, extrudeSeg
 	{ this.vtxProfilesList = new VtxProfilesList(); }
 	
 
-	// if want caps in the extruded mesh, must calculate "ConvexFacesIndicesData" of the profile2d before creating vtxProfiles.***
+	// if want caps in the extruded mesh, must calculate "ConvexFacesIndicesData" of the profile2d before creating vtxProfiles.
 	this.vtxProfilesList.convexFacesIndicesData = profile2d.getConvexFacesIndicesData(undefined);
 	
-	// create vtxProfiles.***
-	// make the base-vtxProfile.***
+	// create vtxProfiles.
+	// make the base-vtxProfile.
 	var baseVtxProfile = this.vtxProfilesList.newVtxProfile();
 	baseVtxProfile.makeByProfile2D(profile2d);
 	
@@ -163,7 +163,7 @@ ParametricMesh.prototype.extrude = function(profile2d, extrusionDist, extrudeSeg
 	var increDist = extrusionDist/extrudeSegmentsCount;
 	for (var i=0; i<extrudeSegmentsCount; i++)
 	{
-		// test with a 1 segment extrusion.***
+		// test with a 1 segment extrusion.
 		var nextVtxProfile = this.vtxProfilesList.newVtxProfile();
 		nextVtxProfile.copyFrom(baseVtxProfile);
 		nextVtxProfile.translate(0, 0, increDist*(i+1));

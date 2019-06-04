@@ -10,7 +10,7 @@ var Globe = function()
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	//WGS 84.***************************************************
+	//WGS 84.
 	// Extracted from WikiPedia "Geodetic datum".
 	// WGS 84 Defining Parameters
 	// semi-major axis	a	6378137.0 m
@@ -56,8 +56,8 @@ Globe.polarRadiusSquared = function()
 Globe.radiusAtLatitudeDeg = function(latDeg)
 {
 
-	// a = equatorialRadius, b = polarRadius.***************
-	// r = a*b / sqrt(a2*sin2(lat) + b2*cos2(lat)).*********
+	// a = equatorialRadius, b = polarRadius.
+	// r = a*b / sqrt(a2*sin2(lat) + b2*cos2(lat)).
 	//------------------------------------------------------
 	
 	var latRad = latDeg * Math.PI/180.0;
@@ -106,17 +106,17 @@ Globe.prototype.transformMatrixAtCartesianPointWgs84 = function(x, y, z, float32
 	
 	zAxis = this.normalAtCartesianPointWgs84(x, y, z, zAxis);
 	
-	// Check if zAxis is vertical vector. PENDENT.***
+	// Check if zAxis is vertical vector. PENDENT.
 	
 	// now, calculate the east direction. 
-	// project zAxis to plane XY and calculate the left perpendicular.***
+	// project zAxis to plane XY and calculate the left perpendicular.
 	xAxis = new Float32Array(3);
 	xAxis[0] = -y;
 	xAxis[1] = x;
 	xAxis[2] = 0.0;
 	xAxis = this.normalizeCartesian(xAxis);
 	
-	// finally calculate the north direction.***
+	// finally calculate the north direction.
 	var xAxisVector = new Point3D(xAxis[0], xAxis[1], xAxis[2]);
 	var yAxisVector = new Point3D();
 	var zAxisVector = new Point3D(zAxis[0], zAxis[1], zAxis[2]);
@@ -156,14 +156,14 @@ Globe.prototype.transformMatrixAtCartesianPointWgs84 = function(x, y, z, float32
  */
 Globe.prototype.intersectionLineWgs84 = function(line, resultCartesian, radius)
 {
-	// ***
+	// 
 	// line: (x, y, z) = x1 + t(x2 - x1), y1 + t(y2 - y1), z1 + t(z2 - z1)
 	// sphere: (x - x3)^2 + (y - y3)^2 + (z - z3)^2 = r^2, where x3, y3, z3 is the center of the sphere.
 	
 	// line:
 	var p1 = line.point;
 	var lineDir = line.direction;
-	var dist = 1000.0;// any value is ok.***
+	var dist = 1000.0;// any value is ok.
 	var p2 = new Point3D(p1.x + lineDir.x * dist, p1.y + lineDir.y * dist, p1.z + lineDir.z * dist);
 	var x1 = p1.x;
 	var y1 = p1.y;
@@ -176,7 +176,7 @@ Globe.prototype.intersectionLineWgs84 = function(line, resultCartesian, radius)
 	var x3 = 0;
 	var y3 = 0;
 	var z3 = 0;
-	var r = this.equatorialRadius; // provisionally.***
+	var r = this.equatorialRadius; // provisionally.
 	if (radius !== undefined)
 	{ r = radius; }
 	
@@ -199,14 +199,14 @@ Globe.prototype.intersectionLineWgs84 = function(line, resultCartesian, radius)
 	
 	if (discriminant < 0)
 	{
-		// no intersection.***
+		// no intersection.
 		return undefined;
 	}
 	else if (discriminant === 0)
 	{
-		// this is tangent.***
+		// this is tangent.
 		if (resultCartesian === undefined)
-		{ resultCartesian = []; } // Float32Array has no enough precision.***
+		{ resultCartesian = []; } // Float32Array has no enough precision.
 		
 		var t1 = (-b)/(2*a);
 		var intersectPoint1 = new Point3D(x1 + (x2 - x1)*t1, y1 + (y2 - y1)*t1, z1 + (z2 - z1)*t1);
@@ -217,12 +217,12 @@ Globe.prototype.intersectionLineWgs84 = function(line, resultCartesian, radius)
 	}
 	else
 	{
-		// find the nearest to p1.***
+		// find the nearest to p1.
 		var sqrtDiscriminant = Math.sqrt(discriminant);
 		var t1 = (-b + sqrtDiscriminant)/(2*a);
 		var t2 = (-b - sqrtDiscriminant)/(2*a);
 		
-		// solution 1.***
+		// solution 1.
 		var intersectPoint1 = new Point3D(x1 + (x2 - x1)*t1, y1 + (y2 - y1)*t1, z1 + (z2 - z1)*t1);
 		var intersectPoint2 = new Point3D(x1 + (x2 - x1)*t2, y1 + (y2 - y1)*t2, z1 + (z2 - z1)*t2);
 		
@@ -230,7 +230,7 @@ Globe.prototype.intersectionLineWgs84 = function(line, resultCartesian, radius)
 		var dist2 = p1.squareDistToPoint(intersectPoint2);
 		
 		if (resultCartesian === undefined)
-		{ resultCartesian = []; } // Float32Array has no enough precision.***
+		{ resultCartesian = []; } // Float32Array has no enough precision.
 		
 		if (dist1 < dist2)
 		{
@@ -266,7 +266,7 @@ Globe.prototype.normalAtCartesianPointWgs84 = function(x, y, z, resultNormal)
 	resultNormal[1] = y / equatorialRadiusSquared;
 	resultNormal[2] = z / polarRadiusSquared;
 	
-	// Normalize cartesian.***
+	// Normalize cartesian.
 	resultNormal = this.normalizeCartesian(resultNormal);
 	
 	return resultNormal;
@@ -302,14 +302,14 @@ Globe.atan2Test = function(y, x)
 		}
 		else 
 		{
-			return 0.0; // return undefined.***
+			return 0.0; // return undefined.
 		}
 	}
 };
 
 Globe.CartesianToGeographicWgs84 = function (x, y, z, result, bStoreAbsolutePosition) 
 {
-	// From WebWorldWind.***
+	// From WebWorldWind.
 	// According to H. Vermeille, "An analytical method to transform geocentric into geodetic coordinates"
 	// http://www.springerlink.com/content/3t6837t27t351227/fulltext.pdf
 	// Journal of Geodesy, accepted 10/2010, not yet published
@@ -442,7 +442,7 @@ Globe.CartesianToGeographicWgs84 = function (x, y, z, result, bStoreAbsolutePosi
 	
 	if (bStoreAbsolutePosition !== undefined && bStoreAbsolutePosition === true)
 	{
-		// In this case, store into result_geographicCoord the x, y, z values.***
+		// In this case, store into result_geographicCoord the x, y, z values.
 		if (result.absolutePoint === undefined)
 		{ result.absolutePoint = new Point3D(x, y, z); }
 		else
@@ -461,8 +461,8 @@ Globe.CartesianToGeographicWgs84 = function (x, y, z, result, bStoreAbsolutePosi
  */
 Globe.geographicToMercatorProjection = function(longitude, latitude, resultPoint2d) 
 {
-	// longitude = [-180, 180].***
-	// latitude = [-90, 90].***
+	// longitude = [-180, 180].
+	// latitude = [-90, 90].
 	var degToRadFactor = Math.PI/180.0;
 	var lonRad = longitude * degToRadFactor;
 	var latRad = latitude * degToRadFactor;
@@ -479,8 +479,8 @@ Globe.geographicToMercatorProjection = function(longitude, latitude, resultPoint
  */
 Globe.geographicRadianToMercatorProjection = function(lonRad, latRad, resultPoint2d) 
 {
-	// longitude = [-pi, pi].***
-	// latitude = [-pi/2, pi/2].***
+	// longitude = [-pi, pi].
+	// latitude = [-pi/2, pi/2].
 	var equatorialRadius = Globe.equatorialRadius();
 	if (resultPoint2d === undefined)
 	{ resultPoint2d = new Point2D(); }

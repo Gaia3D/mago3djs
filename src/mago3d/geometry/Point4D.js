@@ -35,5 +35,5 @@ var Point4D = function(x, y, z, w)
 	else
 	{ this.w = 0.0; }
 	
-	this.pointType; // 1 = important point.***
+	this.pointType; // 1 = important point.
 };

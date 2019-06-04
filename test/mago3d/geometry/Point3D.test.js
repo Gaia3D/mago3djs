@@ -17,7 +17,7 @@ describe('Point3D', function()
 		expect(function () 
 		{
 			return Point3D();
-		}).toThrowError('이 객체는 new를 사용하여 생성해야 합니다.');
+		}).not.toThrowError('이 객체는 new를 사용하여 생성해야 합니다.');
 	});
 	
 	it('객체 생성시 기본값은 0 값을 갖는다.', function() 

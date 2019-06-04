@@ -12,7 +12,7 @@ var PlaneGrid = function(width, height, numCols, numRows)
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	//this.plane; // plane 3d.***
+	//this.plane; // plane 3d.
 	this.geoLocDataManager;
 	this.width;
 	this.height;
@@ -53,34 +53,34 @@ PlaneGrid.prototype.render = function(magoManager, shader)
 	var gl = magoManager.sceneState.gl;
 	var vboMemManager = magoManager.vboMemoryManager;
 	
-	// Set uniforms.***
+	// Set uniforms.
 	var geoLoc = this.geoLocDataManager.getCurrentGeoLocationData();
 	gl.uniformMatrix4fv(shader.buildingRotMatrix_loc, false, geoLoc.rotMatrix._floatArrays);
 	gl.uniform3fv(shader.buildingPosHIGH_loc, geoLoc.positionHIGH);
 	gl.uniform3fv(shader.buildingPosLOW_loc, geoLoc.positionLOW);
 	
-	gl.uniform1i(shader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.***
+	gl.uniform1i(shader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.
 	gl.uniform1i(shader.hasAditionalMov_loc, false);
-	shader.disableVertexAttribArray(shader.texCoord2_loc); // Grid has no texCoords.***
+	shader.disableVertexAttribArray(shader.texCoord2_loc); // Grid has no texCoords.
 	
-	gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
+	gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 	gl.uniform4fv(shader.oneColor4_loc, [1.0, 1.0, 1.0, 1.0]);
 	
-	gl.uniform1i(shader.bApplySpecularLighting_loc, false); // turn off specular lighting.***
+	gl.uniform1i(shader.bApplySpecularLighting_loc, false); // turn off specular lighting.
 	
-	// disable All AttribPointer.***
-	shader.disableVertexAttribArrayAll(); // init.***
+	// disable All AttribPointer.
+	shader.disableVertexAttribArrayAll(); // init.
 	
 	var vboKeysCount = this.vboKeysContainer.vboCacheKeysArray.length;
 	for (var i=0; i<vboKeysCount; i++)
 	{
 		var vboKey = this.vboKeysContainer.vboCacheKeysArray[i];
 
-		// Positions.***
+		// Positions.
 		if (vboKey.vboBufferPos!== undefined && !vboKey.bindDataPosition(shader, magoManager.vboMemoryManager))
 		{ return false; }
 
-		// Normals.***
+		// Normals.
 		if (vboKey.vboBufferNor!== undefined)
 		{
 			if (!vbo_vicky.bindDataNormal(shader, magoManager.vboMemoryManager))
@@ -91,7 +91,7 @@ PlaneGrid.prototype.render = function(magoManager, shader)
 			shader.disableVertexAttribArray(shader.normal3_loc);
 		}
 
-		// Colors.***
+		// Colors.
 		if (vboKey.vboBufferCol!== undefined)
 		{
 			if (!vbo_vicky.bindDataColor(shader, magoManager.vboMemoryManager))
@@ -102,7 +102,7 @@ PlaneGrid.prototype.render = function(magoManager, shader)
 			shader.disableVertexAttribArray(shader.color4_loc);
 		}
 		
-		// TexCoords.***
+		// TexCoords.
 		if (vboKey.vboBufferTCoord!== undefined)
 		{
 			if (!vbo_vicky.bindDataTexCoord(shader, magoManager.vboMemoryManager))
@@ -123,7 +123,7 @@ PlaneGrid.prototype.render = function(magoManager, shader)
  */
 PlaneGrid.prototype.makeVbo = function(vboMemManager) 
 {
-	// Calculate positions.***
+	// Calculate positions.
 	var halfWidth = this.width/2;
 	var halfHeight = this.height/2;
 	var alt = this.altitude;
@@ -139,14 +139,14 @@ PlaneGrid.prototype.makeVbo = function(vboMemManager)
 	var pointsCount = this.numCols * 2 + this.numRows * 2;
 	var positionsArray = new Float32Array(pointsCount*3);
 	
-	// Now, calculate all lines points.***
+	// Now, calculate all lines points.
 	var x1, y1, z1;
 	var x2, y2, z2;
 	var idx = 0;
 	
-	// Vertical lines. "y" are constant.***
-	y1 = leftDownPoint.y; // down.***
-	y2 = leftUpPoint.y; // up.***
+	// Vertical lines. "y" are constant.
+	y1 = leftDownPoint.y; // down.
+	y2 = leftUpPoint.y; // up.
 	for (var col = 0; col < this.numCols; col++)
 	{
 		x1 = leftDownPoint.x + col * increX;
@@ -159,9 +159,9 @@ PlaneGrid.prototype.makeVbo = function(vboMemManager)
 		positionsArray[idx] = alt; idx++;
 	}
 	
-	// Horizontal lines.***
-	x1 = leftDownPoint.x; // left.***
-	x2 = rightDownPoint.x; // right.***
+	// Horizontal lines.
+	x1 = leftDownPoint.x; // left.
+	x2 = rightDownPoint.x; // right.
 	for (var row = 0; row < this.numRows; row++)
 	{
 		y1 = leftDownPoint.y + row * increY;
