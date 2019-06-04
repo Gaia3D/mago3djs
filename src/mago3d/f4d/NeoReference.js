@@ -290,7 +290,7 @@ NeoReference.prototype.solveReferenceColorOrTexture = function(magoManager, neoB
 	else
 	{
 		// Normal rendering.
-		if (magoManager.magoPolicy.getObjectMoveMode() === Code.moveMode.OBJECT && referenceObjectIsSelected) 
+		if (magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.OBJECT && referenceObjectIsSelected) 
 		{
 			gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 			gl.uniform4fv(shader.oneColor4_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
@@ -361,7 +361,7 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 	{
 		// note: in the future use only "neoReference.materialId".
 		var texFileLoadState = neoBuilding.manageNeoReferenceTexture(neoReference, magoManager);
-		if (texFileLoadState !== Code.fileLoadState.LOADING_FINISHED)
+		if (texFileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
 		{ return false; }
 	
 		if (neoReference.texture === undefined)

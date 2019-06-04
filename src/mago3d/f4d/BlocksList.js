@@ -16,7 +16,7 @@ var BlocksList = function(version)
 	this.version;
 	this.blocksArray;
 	// 0 = no started to load. 1 = started loading. 2 = finished loading. 3 = parse started. 4 = parse finished.
-	this.fileLoadState = Code.fileLoadState.READY;
+	this.fileLoadState = CODE.fileLoadState.READY;
 	this.dataArraybuffer; // file loaded data, that is no parsed yet.
 	this.xhr; // file request.
 	
@@ -185,7 +185,7 @@ BlocksList.prototype.parseBlockVersioned = function(arrayBuffer, bytesReaded, bl
  */
 BlocksList.prototype.parseBlocksListVersioned_v001 = function(arrayBuffer, readWriter, motherBlocksArray, magoManager) 
 {
-	this.fileLoadState = Code.fileLoadState.PARSE_STARTED;
+	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 	var bytesReaded = 0;
 	var startBuff, endBuff;
 	var posByteSize, norByteSize, idxByteSize;
@@ -262,7 +262,7 @@ BlocksList.prototype.parseBlocksListVersioned_v001 = function(arrayBuffer, readW
 		}
 
 	}
-	this.fileLoadState = Code.fileLoadState.PARSE_FINISHED;
+	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 	return succesfullyGpuDataBinded;
 };
 
@@ -279,11 +279,11 @@ BlocksList.prototype.parseBlocksListVersioned_v002 = function(readWriter, mother
 	// 1rst, find the blocksArrayPartition to parse.
 	var blocksArrayPartitionsCount = this.blocksArrayPartitionsArray.length;
 	var blocksArrayPartition = this.blocksArrayPartitionsArray[blocksArrayPartitionsCount-1];
-	if (blocksArrayPartition.fileLoadState !== Code.fileLoadState.LOADING_FINISHED)
+	if (blocksArrayPartition.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
 	{ return; }
 	
 	var arrayBuffer = blocksArrayPartition.dataArraybuffer;
-	blocksArrayPartition.fileLoadState = Code.fileLoadState.PARSE_STARTED;
+	blocksArrayPartition.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 	var bytesReaded = 0;
 	var startBuff, endBuff;
 	var posByteSize, norByteSize, idxByteSize;
@@ -373,8 +373,8 @@ BlocksList.prototype.parseBlocksListVersioned_v002 = function(readWriter, mother
 		//}
 
 	}
-	blocksArrayPartition.fileLoadState = Code.fileLoadState.PARSE_FINISHED;
-	this.fileLoadState = Code.fileLoadState.PARSE_FINISHED; // test.
+	blocksArrayPartition.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
+	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED; // test.
 	return succesfullyGpuDataBinded;
 };
 
@@ -389,7 +389,7 @@ BlocksList.prototype.parseBlocksListVersioned_v002 = function(readWriter, mother
  */
 BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherBlocksArray, magoManager) 
 {
-	this.fileLoadState = Code.fileLoadState.PARSE_STARTED;
+	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 	var bytesReaded = 0;
 	var blocksCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4); bytesReaded += 4;
 	
@@ -480,7 +480,7 @@ BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherB
 
 		// Pendent to load the block's lego.
 	}
-	this.fileLoadState = Code.fileLoadState.PARSE_FINISHED;
+	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 	return succesfullyGpuDataBinded;
 };
 
@@ -513,7 +513,7 @@ BlocksList.prototype.prepareData = function(magoManager, octreeOwner)
 		{
 			// Check the last partition.
 			var lastBlocksArrayPartition = this.blocksArrayPartitionsArray[currPartitionsCount-1];
-			if (lastBlocksArrayPartition.fileLoadState === Code.fileLoadState.PARSE_FINISHED)
+			if (lastBlocksArrayPartition.fileLoadState === CODE.fileLoadState.PARSE_FINISHED)
 			{
 				if (currPartitionsCount < this.blocksArrayPartitionsCount)
 				{

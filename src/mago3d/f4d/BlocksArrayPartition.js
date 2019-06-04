@@ -12,7 +12,7 @@ var BlocksArrayPartition = function(version)
 	}
 
 	// 0 = no started to load. 1 = started loading. 2 = finished loading. 3 = parse started. 4 = parse finished.
-	this.fileLoadState = Code.fileLoadState.READY;
+	this.fileLoadState = CODE.fileLoadState.READY;
 	this.dataArraybuffer; // file loaded data, that is no parsed yet.
 
 };

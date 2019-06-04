@@ -131,7 +131,7 @@ NeoReferencesMotherAndIndices.prototype.deleteObjects = function(gl, vboMemManag
 	this.motherNeoRefsList = undefined; // this is a NeoReferencesList pointer.
 	this.neoRefsIndices = undefined;
 	
-	if (this.blocksList !== undefined && this.blocksList.xhr !== undefined && this.fileLoadState !== Code.fileLoadState.READY)
+	if (this.blocksList !== undefined && this.blocksList.xhr !== undefined && this.fileLoadState !== CODE.fileLoadState.READY)
 	{
 		this.blocksList.xhr.abort();
 		this.blocksList.xhr = undefined;
@@ -157,7 +157,7 @@ NeoReferencesMotherAndIndices.prototype.isReadyToRender = function()
 	if (this.blocksList === undefined)
 	{ return false; }
 
-	if (this.blocksList.fileLoadState !== Code.fileLoadState.PARSE_FINISHED) 
+	if (this.blocksList.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED) 
 	{ return false; }
 
 	return true;
@@ -201,7 +201,7 @@ NeoReferencesMotherAndIndices.prototype.createModelReferencedGroups = function()
  */
 NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = function(gl, arrayBuffer, readWriter, neoBuilding, tMatrix4, magoManager) 
 {
-	this.fileLoadState = Code.fileLoadState.PARSE_STARTED;
+	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 
 	var startBuff;
 	var endBuff;
@@ -560,7 +560,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 	ocCullBox.setSizesSubBoxes();
 	ocCullBox.createModelReferencedGroups(this.motherNeoRefsList);
 
-	this.fileLoadState = Code.fileLoadState.PARSE_FINISHED;
+	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 	return this.succesfullyGpuDataBinded;
 };
 
@@ -573,7 +573,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
  */
 NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl, arrayBuffer, readWriter, neoBuilding, tMatrix4, magoManager) 
 {
-	this.fileLoadState = Code.fileLoadState.PARSE_STARTED;
+	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 
 	var startBuff;
 	var endBuff;
@@ -964,7 +964,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl
 	ocCullBox.setSizesSubBoxes();
 	ocCullBox.createModelReferencedGroups(this.motherNeoRefsList);
 
-	this.fileLoadState = Code.fileLoadState.PARSE_FINISHED;
+	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 	return this.succesfullyGpuDataBinded;
 };
 
@@ -1040,7 +1040,7 @@ NeoReferencesMotherAndIndices.prototype.render = function(magoManager, neoBuildi
 		
 		if (renderType === 1)
 		{
-			if (magoManager.magoPolicy.getObjectMoveMode() === Code.moveMode.OBJECT && magoManager.objectSelected === neoReference)
+			if (magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.OBJECT && magoManager.objectSelected === neoReference)
 			{
 				magoManager.renderer.disableStencilBuffer(gl);
 				gl.disable(gl.POLYGON_OFFSET_FILL);
