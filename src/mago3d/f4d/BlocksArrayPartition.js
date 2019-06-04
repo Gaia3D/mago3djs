@@ -1,8 +1,11 @@
 'use strict';
 
 /**
- * 블록 목록
- * @class BlocksList
+ * 블록의 내용이 엄청 많아서 나눠서 받아야 할 경우 사용하기 위한 객체. 현재는 미구현 상태. 추후 f4d v0.0.2 이상부터 적용 될 예정
+ * 
+ * @class BlocksArrayPartition
+ * 
+ * @exception {Error} Messages.CONSTRUCT_ERROR
  */
 var BlocksArrayPartition = function(version) 
 {
