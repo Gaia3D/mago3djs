@@ -579,25 +579,25 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		
 		// projection.***
 		// considere near as zero provisionally.***
-		sceneState.projectionMatrix._floatArrays = mat4.perspective(sceneState.projectionMatrix._floatArrays, frustum0.fovyRad[0], frustum0.aspectRatio, 0.0, frustum0.far[0]);
+		sceneState.projectionMatrix._floatArrays = glMatrix.mat4.perspective(sceneState.projectionMatrix._floatArrays, frustum0.fovyRad[0], frustum0.aspectRatio, 0.0, frustum0.far[0]);
 		
 		// modelView.***
 		//sceneState.modelViewMatrix._floatArrays; 
-		sceneState.modelViewMatrixInv._floatArrays = mat4.invert(sceneState.modelViewMatrixInv._floatArrays, sceneState.modelViewMatrix._floatArrays);
+		sceneState.modelViewMatrixInv._floatArrays = glMatrix.mat4.invert(sceneState.modelViewMatrixInv._floatArrays, sceneState.modelViewMatrix._floatArrays);
 	
 		// normalMat.***
-		sceneState.normalMatrix4._floatArrays = mat4.transpose(sceneState.normalMatrix4._floatArrays, sceneState.modelViewMatrixInv._floatArrays);
+		sceneState.normalMatrix4._floatArrays = glMatrix.mat4.transpose(sceneState.normalMatrix4._floatArrays, sceneState.modelViewMatrixInv._floatArrays);
 		
 		// modelViewRelToEye.***
-		sceneState.modelViewRelToEyeMatrix._floatArrays = mat4.copy(sceneState.modelViewRelToEyeMatrix._floatArrays, sceneState.modelViewMatrix._floatArrays);
+		sceneState.modelViewRelToEyeMatrix._floatArrays = glMatrix.mat4.copy(sceneState.modelViewRelToEyeMatrix._floatArrays, sceneState.modelViewMatrix._floatArrays);
 		sceneState.modelViewRelToEyeMatrix._floatArrays[12] = 0;
 		sceneState.modelViewRelToEyeMatrix._floatArrays[13] = 0;
 		sceneState.modelViewRelToEyeMatrix._floatArrays[14] = 0;
 		sceneState.modelViewRelToEyeMatrix._floatArrays[15] = 1;
-		sceneState.modelViewRelToEyeMatrixInv._floatArrays = mat4.invert(sceneState.modelViewRelToEyeMatrixInv._floatArrays, sceneState.modelViewRelToEyeMatrix._floatArrays);
+		sceneState.modelViewRelToEyeMatrixInv._floatArrays = glMatrix.mat4.invert(sceneState.modelViewRelToEyeMatrixInv._floatArrays, sceneState.modelViewRelToEyeMatrix._floatArrays);
 		
 		// modelViewProjection.***
-		sceneState.modelViewProjMatrix._floatArrays = mat4.multiply(sceneState.modelViewProjMatrix._floatArrays, sceneState.projectionMatrix._floatArrays, sceneState.modelViewMatrix._floatArrays);
+		sceneState.modelViewProjMatrix._floatArrays = glMatrix.mat4.multiply(sceneState.modelViewProjMatrix._floatArrays, sceneState.projectionMatrix._floatArrays, sceneState.modelViewMatrix._floatArrays);
 
 		// modelViewProjectionRelToEye.***
 		sceneState.modelViewProjRelToEyeMatrix.copyFromMatrix4(sceneState.modelViewProjMatrix);

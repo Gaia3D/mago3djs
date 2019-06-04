@@ -4,7 +4,7 @@ describe('AxisXYZ', function()
 {
 	var testAxisXYZ;
 	var test2AxisXYZ;
-    var length = 10.0;
+	var length = 10.0;
 
 	beforeEach(function()
 	{
@@ -30,13 +30,13 @@ describe('AxisXYZ', function()
 		expect(test2AxisXYZ.length).toEqual(70);
 	});
     
-    describe('setDimension(length)', function()
-    {
-        if('입력된 값으로 설정 ', function()
-        {
-            testAxisXYZ.setDimension(10);
-            expect(testAxisXYZ.length).toEqual(10);
-        });
+	describe('setDimension(length)', function()
+	{
+		if ('입력된 값으로 설정 ', function()
+		{
+			testAxisXYZ.setDimension(10);
+			expect(testAxisXYZ.length).toEqual(10);
+		}){ ; }
 	});
 
 });

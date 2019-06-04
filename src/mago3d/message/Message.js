@@ -8,7 +8,7 @@
 var Message = function(i18next, message) 
 {
 	this.handle  = i18next;
-	this.message = message || {};
+	this.message = message || MessageSource;
 };
 
 /**
@@ -23,7 +23,7 @@ Message.prototype.init = function (callback)
 		.use(i18nextBrowserLanguageDetector)
 		.init({
 			// Useful for debuging, displays which key is missing
-			debug: true,
+			debug: false,
 
 			detection: {
 				// keys or params to lookup language from

@@ -135,9 +135,9 @@ Camera.prototype.getCameraRight = function()
  */
 Camera.prototype.transformPoint3DByMatrix4 = function(point, mat)
 {
-	var pos = vec3.clone([point.x, point.y, point.z]);
-	var tPos = vec3.create();
-	tPos = vec3.transformMat4(tPos, pos, mat);
+	var pos = glMatrix.vec3.clone([point.x, point.y, point.z]);
+	var tPos = glMatrix.vec3.create();
+	tPos = glMatrix.vec3.transformMat4(tPos, pos, mat);
 	point.set(tPos[0], tPos[1], tPos[2]);
 	
 	return point;
@@ -151,9 +151,9 @@ Camera.prototype.transformPoint3DByMatrix4 = function(point, mat)
  */
 Camera.prototype.rotatePoint3DByMatrix3 = function(point, mat)
 {
-	var pos = vec3.clone([point.x, point.y, point.z]);
-	var tPos = vec3.create();
-	tPos = vec3.transformMat3(tPos, pos, mat);
+	var pos = glMatrix.vec3.clone([point.x, point.y, point.z]);
+	var tPos = glMatrix.vec3.create();
+	tPos = glMatrix.vec3.transformMat3(tPos, pos, mat);
 	point.set(tPos[0], tPos[1], tPos[2]);
 	
 	return point;

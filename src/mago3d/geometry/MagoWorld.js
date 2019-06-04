@@ -59,7 +59,7 @@ MagoWorld.prototype.goto = function(longitude, latitude, altitude)
 	this.updateModelViewMatrixByCamera(camera);
 	
 	//var modelViewMatrix = this.magoManager.sceneState.modelViewMatrix;
-	//modelViewMatrix._floatArrays = mat4.lookAt(modelViewMatrix._floatArrays, [camPos.x, camPos.y, camPos.z], [0.0, 0.0, 0.0], [camUp.x, camUp.y, camUp.z]);
+	//modelViewMatrix._floatArrays = glMatrix.mat4.lookAt(modelViewMatrix._floatArrays, [camPos.x, camPos.y, camPos.z], [0.0, 0.0, 0.0], [camUp.x, camUp.y, camUp.z]);
 	
 	var hola = 0;
 	
@@ -109,8 +109,8 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 	// copy modelViewMatrix.***
 	var modelViewMatrix = magoManager.sceneState.modelViewMatrix;
 	var modelViewMatrixInv = magoManager.sceneState.modelViewMatrixInv;
-	mouseAction.strModelViewMatrix._floatArrays = mat4.copy(mouseAction.strModelViewMatrix._floatArrays, modelViewMatrix._floatArrays);
-	mouseAction.strModelViewMatrixInv._floatArrays = mat4.copy(mouseAction.strModelViewMatrixInv._floatArrays, modelViewMatrixInv._floatArrays);
+	mouseAction.strModelViewMatrix._floatArrays = glMatrix.mat4.copy(mouseAction.strModelViewMatrix._floatArrays, modelViewMatrix._floatArrays);
+	mouseAction.strModelViewMatrixInv._floatArrays = glMatrix.mat4.copy(mouseAction.strModelViewMatrixInv._floatArrays, modelViewMatrixInv._floatArrays);
 
 	// save the sphere pick.***
 	if (magoManager.globe !== undefined)
