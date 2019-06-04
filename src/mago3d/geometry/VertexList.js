@@ -197,7 +197,7 @@ VertexList.getProjectedOntoPlane = function(vertexList, plane, projectionDirecti
  */
 VertexList.getProjectedPoints2DArray = function(vertexArray, normal, resultPoints2dArray)
 {
-	// This function projects the vertices on to planes xy, yz or xz.***
+	// This function projects the vertices on to planes xy, yz or xz.
 	if (vertexArray === undefined)
 	{ return resultPoints2dArray; }
 	
@@ -208,10 +208,10 @@ VertexList.getProjectedPoints2DArray = function(vertexArray, normal, resultPoint
 	
 	var point2d;
 	var verticesCount = vertexArray.length;
-	// Project this face into the bestPlane.***
-	if (bestPlaneToProject === 0) // plane-xy.***
+	// Project this face into the bestPlane.
+	if (bestPlaneToProject === 0) // plane-xy.
 	{
-		// project this face into a xy plane.***
+		// project this face into a xy plane.
 		for (var i=0; i<verticesCount; i++)
 		{
 			var vertex = vertexArray[i];
@@ -220,13 +220,13 @@ VertexList.getProjectedPoints2DArray = function(vertexArray, normal, resultPoint
 			{ point2d = new Point2D(point3d.x, point3d.y); }
 			else
 			{ point2d = new Point2D(point3d.x, -point3d.y); }
-			point2d.ownerVertex3d = vertex; // with this we can reconvert polygon2D to face3D.***
+			point2d.ownerVertex3d = vertex; // with this we can reconvert polygon2D to face3D.
 			resultPoints2dArray.push(point2d);
 		}
 	}
-	else if (bestPlaneToProject === 1) // plane-yz.***
+	else if (bestPlaneToProject === 1) // plane-yz.
 	{
-		// project this face into a yz plane.***
+		// project this face into a yz plane.
 		for (var i=0; i<verticesCount; i++)
 		{
 			var vertex = vertexArray[i];
@@ -235,13 +235,13 @@ VertexList.getProjectedPoints2DArray = function(vertexArray, normal, resultPoint
 			{ point2d = new Point2D(point3d.y, point3d.z); }
 			else
 			{ point2d = new Point2D(-point3d.y, point3d.z); }
-			point2d.ownerVertex3d = vertex; // with this we can reconvert polygon2D to face3D.***
+			point2d.ownerVertex3d = vertex; // with this we can reconvert polygon2D to face3D.
 			resultPoints2dArray.push(point2d);
 		}
 	}
-	else if (bestPlaneToProject === 2) // plane-xz.***
+	else if (bestPlaneToProject === 2) // plane-xz.
 	{
-		// project this face into a xz plane.***
+		// project this face into a xz plane.
 		for (var i=0; i<verticesCount; i++)
 		{
 			var vertex = vertexArray[i];
@@ -250,7 +250,7 @@ VertexList.getProjectedPoints2DArray = function(vertexArray, normal, resultPoint
 			{ point2d = new Point2D(-point3d.x, point3d.z); }
 			else
 			{ point2d = new Point2D(point3d.x, point3d.z); }
-			point2d.ownerVertex3d = vertex; // with this we can reconvert polygon2D to face3D.***
+			point2d.ownerVertex3d = vertex; // with this we can reconvert polygon2D to face3D.
 			resultPoints2dArray.push(point2d);
 		}
 	}
@@ -557,7 +557,7 @@ VertexList.prototype.getVboDataArrays = function(resultVbo, vboMemManager)
  */
 VertexList.getVboDataArrays = function(vertexArray, resultVbo, vboMemManager) 
 {
-	// returns positions, and if exist, normals, colors, texCoords.***
+	// returns positions, and if exist, normals, colors, texCoords.
 	var verticesCount = vertexArray.length;
 	if (verticesCount === 0)
 	{ return resultVbo; }
@@ -567,12 +567,12 @@ VertexList.getVboDataArrays = function(vertexArray, resultVbo, vboMemManager)
 	
 	var vertex, position, normal, color, texCoord;
 	
-	// 1rst, check if exist normals, colors & texCoords.***
+	// 1rst, check if exist normals, colors & texCoords.
 	var hasNormals = false;
 	var hasColors = false;
 	var hasTexCoords = false;
 	
-	// Take the 1rst vertex.***
+	// Take the 1rst vertex.
 	vertex = vertexArray[0];
 	if (vertex.point3d === undefined)
 	{ return resultVbo; }
@@ -586,10 +586,10 @@ VertexList.getVboDataArrays = function(vertexArray, resultVbo, vboMemManager)
 	if (vertex.texCoord !== undefined)
 	{ hasTexCoords = true; }
 	
-	// Make dataArrays. Use vboMemManager to determine classified memorySize( if use memory pool).***
+	// Make dataArrays. Use vboMemManager to determine classified memorySize( if use memory pool).
 	var posVboDataArray, norVboDataArray, colVboDataArray, tcoordVboDataArray;
 	
-	// Positions.***
+	// Positions.
 	var posByteSize = verticesCount * 3;
 	posVboDataArray = new Float32Array(posByteSize);
 	

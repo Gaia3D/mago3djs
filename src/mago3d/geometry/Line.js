@@ -3,6 +3,8 @@
 /**
  * This represents a line which can be shown as linear equation
  * @class Line
+ * @param {Point3D} point the point which decides line
+ * @param {Point3D} direction the vector of the direction which decides line
  */
 var Line = function(point, direction) 
 {

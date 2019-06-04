@@ -149,7 +149,7 @@ Point3DList.prototype.getPointsCount = function()
  */
 Point3DList.prototype.getPrevIdx = function(idx)
 {
-	// Note: This function is used when this is a point3dLoop.***
+	// Note: This function is used when this is a point3dLoop.
 	var pointsCount = this.pointsArray.length;
 	var prevIdx;
 	
@@ -188,8 +188,8 @@ Point3DList.prototype.getNextIdx = function(idx)
  */
 Point3DList.prototype.getSegment3D = function(idx, resultSegment3d, bLoop)
 {
-	// If "bLoop" = true, then this points3dList is a loop.***
-	// If "bLoop" = false, then this points3dList is a string.***
+	// If "bLoop" = true, then this points3dList is a loop.
+	// If "bLoop" = false, then this points3dList is a string.
 	if (bLoop === undefined)
 	{ bLoop = false; }
 	
@@ -240,8 +240,8 @@ Point3DList.prototype.getBisectionPlane = function(idx, resultBisectionPlane, bL
 	{
 		if (idx === pointsCount-1)
 		{
-			// The last point is an exception in string mode.***
-			// Take the previous segment.***
+			// The last point is an exception in string mode.
+			// Take the previous segment.
 			var idxPrev = idx-1;
 			segment3d_A = this.getSegment3D(idxPrev, undefined, bLoop);	
 			segment3d_B = this.getSegment3D(idxPrev, undefined, bLoop);	
@@ -270,7 +270,7 @@ Point3DList.prototype.getBisectionPlane = function(idx, resultBisectionPlane, bL
 	dirA.addPoint(dirB);
 	dirA.unitary;
 	
-	// Now, with "point3d" & "dir" make the plane.***
+	// Now, with "point3d" & "dir" make the plane.
 	resultBisectionPlane.setPointAndNormal(point3d.x, point3d.y, point3d.z, dirA.x, dirA.y, dirA.z);
 	
 	return resultBisectionPlane;
@@ -327,7 +327,7 @@ Point3DList.prototype.renderLines = function(magoManager, shader, renderType, bL
 	
 	gl.uniform1i(shader.bPositionCompressed_loc, false);
 	gl.uniform1i(shader.bUse1Color_loc, true);
-	gl.uniform4fv(shader.oneColor4_loc, [1.0, 1.0, 0.1, 1.0]); //.***
+	gl.uniform4fv(shader.oneColor4_loc, [1.0, 1.0, 0.1, 1.0]); //.
 	gl.uniform1f(shader.fixPointSize_loc, 5.0);
 	gl.uniform1i(shader.bUseFixPointSize_loc, true);
 	
@@ -339,7 +339,7 @@ Point3DList.prototype.renderLines = function(magoManager, shader, renderType, bL
 	else
 	{ gl.disable(gl.DEPTH_TEST); }
 
-	// Render the line.***
+	// Render the line.
 	var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
 	buildingGeoLocation.bindGeoLocationUniforms(gl, shader);
 	
@@ -355,18 +355,18 @@ Point3DList.prototype.renderLines = function(magoManager, shader, renderType, bL
 		gl.uniform4fv(shader.oneColor4_loc, [selColor.r/255.0, selColor.g/255.0, selColor.b/255.0, 1.0]);
 	}
 	
-	var vbo_vicky = this.vboKeysContainer.vboCacheKeysArray[0]; // there are only one.***
+	var vbo_vicky = this.vboKeysContainer.vboCacheKeysArray[0]; // there are only one.
 	if (!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
 	{ return false; }
 
 	gl.drawArrays(gl.LINE_STRIP, 0, vbo_vicky.vertexCount);
 	
-	// Check if exist selectedGeoCoord.***
+	// Check if exist selectedGeoCoord.
 	/*
 	var currSelected = magoManager.selectionManager.getSelectedGeneral();
 	if(currSelected !== undefined && currSelected.constructor.name === "GeographicCoord")
 	{
-		gl.uniform4fv(shader.oneColor4_loc, [1.0, 0.1, 0.1, 1.0]); //.***
+		gl.uniform4fv(shader.oneColor4_loc, [1.0, 0.1, 0.1, 1.0]); //.
 		gl.uniform1f(shader.fixPointSize_loc, 10.0);
 		currSelected.renderPoint(magoManager, shader, gl, renderType);
 	}
