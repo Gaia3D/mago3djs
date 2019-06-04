@@ -46,7 +46,7 @@ Texture.prototype.deleteObjects = function(gl)
  */
 Texture.createTexture = function(gl, filter, data, width, height) 
 {
-	// static function.***
+	// static function.
 	// example of filter: gl.NEAREST
 	var texture = gl.createTexture();
 	gl.bindTexture(gl.TEXTURE_2D, texture);

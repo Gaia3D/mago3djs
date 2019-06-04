@@ -284,8 +284,8 @@ Point2DList.prototype.getPointsIdxSortedByDistToPoint = function(thePoint, resul
 	if (this.pointsArray === undefined)
 	{ return resultSortedPointsIdxArray; }
 	
-	// Static function.***
-	// Sorting minDist to maxDist.***
+	// Static function.
+	// Sorting minDist to maxDist.
 	if (resultSortedPointsIdxArray === undefined)
 	{ resultSortedPointsIdxArray = []; }
 	

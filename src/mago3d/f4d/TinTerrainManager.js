@@ -11,21 +11,21 @@ var TinTerrainManager = function()
 	}
 	
 	this.maxDepth = 17;
-	this.currentVisibles_terrName_geoCoords_map = {}; // current visible terrains map[terrainPathName, geographicCoords].***
-	this.currentTerrainsMap = {}; // current terrains (that was created) map[terrainPathName, tinTerrain].***
+	this.currentVisibles_terrName_geoCoords_map = {}; // current visible terrains map[terrainPathName, geographicCoords].
+	this.currentTerrainsMap = {}; // current terrains (that was created) map[terrainPathName, tinTerrain].
 	
 	this.visibleTilesArray = [];
 	this.noVisibleTilesArray = [];
 	
-	// TinTerrainQuadTrees.****************************
-	this.tinTerrainsQuadTreeAsia; // Main object.***
-	this.tinTerrainsQuadTreeAmerica; // Main object.***
+	// TinTerrainQuadTrees.
+	this.tinTerrainsQuadTreeAsia; // Main object.
+	this.tinTerrainsQuadTreeAmerica; // Main object.
 	
 	this.geoServURL = "http://192.168.10.57:9090/geoserver/gwc/service/wmts";
 	
-	// Elevation model or plain ellipsoid.***
-	// terrainType = 0 -> terrainPlainModel.***
-	// terrainType = 1 -> terrainElevationModel.***
+	// Elevation model or plain ellipsoid.
+	// terrainType = 0 -> terrainPlainModel.
+	// terrainType = 1 -> terrainElevationModel.
 	this.terrainType = 0; 
 	
 	this.init();
@@ -33,11 +33,11 @@ var TinTerrainManager = function()
 
 TinTerrainManager.prototype.init = function()
 {
-	this.tinTerrainsQuadTreeAsia = new TinTerrain(undefined); // Main object.***
-	this.tinTerrainsQuadTreeAmerica = new TinTerrain(undefined); // Main object.***
+	this.tinTerrainsQuadTreeAsia = new TinTerrain(undefined); // Main object.
+	this.tinTerrainsQuadTreeAmerica = new TinTerrain(undefined); // Main object.
 	//1.4844222297453322
 	//var latDeg = 1.4844222297453322 *180/Math.PI;
-	// Asia side.***
+	// Asia side.
 	var minLon = 0;
 	var minLat = -90;
 	var minAlt = 0;
@@ -59,13 +59,13 @@ TinTerrainManager.prototype.init = function()
 	this.tinTerrainsQuadTreeAmerica.X = 0;
 	this.tinTerrainsQuadTreeAmerica.Y = 0;
 	
-	// do imagery test.***
-	// set imagery initial geoExtent (in mercator coords).***
+	// do imagery test.
+	// set imagery initial geoExtent (in mercator coords).
 	/*
 	// https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer
 	Initial Extent:
 	XMin: -2.7680880158351306E7
-	YMin: -195164.8424795773 // error.***
+	YMin: -195164.8424795773 // error.
 	XMax: 2.7680880158351306E7
 	YMax: 1.9971868880408563E7
 	Spatial Reference: 102100 
@@ -88,7 +88,7 @@ TinTerrainManager.prototype.init = function()
 	*/
 	
 	
-	// Full extent.***
+	// Full extent.
 	var initImageryMercatorMinX = -2.003750722959434E7;
 	var initImageryMercatorMinY = -1.997186888040859E7;
 	var initImageryMercatorMaxX = 2.003750722959434E7;
@@ -99,19 +99,19 @@ TinTerrainManager.prototype.init = function()
 	var north = eqRadius*1.48352986419518;
 	var north2 = eqRadius*Math.PI/2;
 	
-	// Initial extent.***
+	// Initial extent.
 	//var initImageryMercatorMinX = -2.7680880158351306E7;
 	//var initImageryMercatorMinY = -195164.8424795773;
 	//var initImageryMercatorMaxX = 2.7680880158351306E7;
 	//var initImageryMercatorMaxY = 1.9971868880408563E7;
 	
-	// Level 0 extent.***
+	// Level 0 extent.
 	//var initImageryMercatorMinX = -2.0028669624423463E7;
 	//var initImageryMercatorMinY = -7679113.797548824;
 	//var initImageryMercatorMaxX = 2.001627433615794E7;
 	//var initImageryMercatorMaxY = 1.7924177384518914E7;
 	
-	// my extent.***
+	// my extent.
 	
 	var initImageryMercatorMinX = -2.003750722959434E7;
 	var initImageryMercatorMinY = -north2;
@@ -138,16 +138,16 @@ TinTerrainManager.prototype.doFrustumCulling = function(frustum, camPos, magoMan
 };
 
 /**
- * Prepare tinTerrains.***
+ * Prepare tinTerrains.
  */
 TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager) 
 {
 	var tinTerrain;
 	
-	// For the visible tinTerrains prepare its.***
-	// Preparing rule: First prepare the tinTerrain-owner if the owner is no prepared yet.***
+	// For the visible tinTerrains prepare its.
+	// Preparing rule: First prepare the tinTerrain-owner if the owner is no prepared yet.
 	var visiblesTilesCount = this.visibleTilesArray.length;
-	if (this.terrainType === 0) // PlainTerrain.***
+	if (this.terrainType === 0) // PlainTerrain.
 	{
 		for (var i=0; i<visiblesTilesCount; i++)
 		{
@@ -155,7 +155,7 @@ TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager)
 			tinTerrain.prepareTinTerrainPlain(magoManager, this);
 		}
 	}
-	else if (this.terrainType === 1)// ElevationTerrain.***
+	else if (this.terrainType === 1)// ElevationTerrain.
 	{
 		for (var i=0; i<visiblesTilesCount; i++)
 		{
@@ -164,8 +164,8 @@ TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager)
 		}
 	}
 	
-	// 2nd, for all terrains that exist, if there are not in the visiblesMap, then delete its.***
-	// Deleting rule: If a tinTerrain has children, then delete first the children.***
+	// 2nd, for all terrains that exist, if there are not in the visiblesMap, then delete its.
+	// Deleting rule: If a tinTerrain has children, then delete first the children.
 	var deletedCount = 0;
 	var noVisiblesTilesCount = this.noVisibleTilesArray.length;
 	for (var i=0; i<visiblesTilesCount; i++)
@@ -204,18 +204,18 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth)
 	
 	currentShader.bindUniformGenerals();
 
-	var tex = magoManager.pin.texturesArray[4]; // provisional.***
+	var tex = magoManager.pin.texturesArray[4]; // provisional.
 	gl.activeTexture(gl.TEXTURE2); 
 	gl.bindTexture(gl.TEXTURE_2D, tex.texId);
 	
-	gl.uniform1i(currentShader.bIsMakingDepth_loc, bDepth); //.***
-	gl.uniform1i(currentShader.hasTexture_loc, true); //.***
+	gl.uniform1i(currentShader.bIsMakingDepth_loc, bDepth); //.
+	gl.uniform1i(currentShader.hasTexture_loc, true); //.
 	gl.uniform4fv(currentShader.oneColor4_loc, [0.5, 0.5, 0.5, 1.0]);
 	
 	var flipTexCoordY = true;
 	if (magoManager.configInformation.geo_view_library === Constant.CESIUM)
 	{ flipTexCoordY = false; }
-	gl.uniform1i(currentShader.textureFlipYAxis_loc, flipTexCoordY); // false for cesium, true for magoWorld.***
+	gl.uniform1i(currentShader.textureFlipYAxis_loc, flipTexCoordY); // false for cesium, true for magoWorld.
 	
 	//gl.enable(gl.POLYGON_OFFSET_FILL);
 	//gl.polygonOffset(1, 3);

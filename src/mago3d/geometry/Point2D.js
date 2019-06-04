@@ -176,8 +176,8 @@ Point2D.prototype.isCoincidentToPoint = function(point, errorDist)
 
 /**
  * @param {Point2D} targetPoint this returns a vector that points to "targetPoint" from "this" 
- * @param resultVector the "resultVector" has the direction from "this" to "targetPoint", but is NOT normalized.
- * @returns resultVector
+ * @param {Point3D} resultVector the "resultVector" has the direction from "this" to "targetPoint", but is NOT normalized.
+ * @returns {Point3D} resultVector
  */
 Point2D.prototype.getVectorToPoint = function(targetPoint, resultVector) 
 {
