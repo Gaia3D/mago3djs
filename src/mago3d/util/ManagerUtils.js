@@ -17,7 +17,7 @@ var ManagerUtils = function()
  * @param {Point3D} point world coordinate.
  * @param {GeographicCoord|undefined} resultGeographicCoord Optional. result geographicCoord. if undefined, create GeographicCoord instance.
  * @param {MagoManager} magoManager worldwind mode removed, this args is not need. 
- * @return {GeographicCoord} geographic coordinate object.
+ * @returns {GeographicCoord} geographic coordinate object.
  */
 ManagerUtils.pointToGeographicCoord = function(point, resultGeographicCoord, magoManager) 
 {
@@ -37,7 +37,7 @@ ManagerUtils.pointToGeographicCoord = function(point, resultGeographicCoord, mag
  * @param {number} altitude altitude.
  * @param {Point3D|undefined} resultWorldPoint Optional. result worldCoord. if undefined, create Point3D instance.
  * @param {MagoManager} magoManager worldwind mode removed, this args is not need. 
- * @return {Point3D} world coordinate object.
+ * @returns {Point3D} world coordinate object.
  */
 ManagerUtils.geographicCoordToWorldPoint = function(longitude, latitude, altitude, resultWorldPoint, magoManager) 
 {
@@ -75,7 +75,7 @@ ManagerUtils.translatePivotPointGeoLocationData = function(geoLocationData, newP
  * this function calculates the transformation matrix for (x, y, z) coordinate, that has NO heading, pitch or roll rotations.
  * @param {Point3D} worldPosition worldPosition.
  * @param {Matrix4|undefined} resultGeoLocMatrix. Optional. result geolocation matrix. if undefined, create Matrix4 instance.
- * @return {Matrix4} resultGeoLocMatrix. this matrix has NO heading, pitch or roll rotations.
+ * @returns {Matrix4} resultGeoLocMatrix. this matrix has NO heading, pitch or roll rotations.
  */
 ManagerUtils.calculateGeoLocationMatrixAtWorldPosition = function(worldPosition, resultGeoLocMatrix, magoManager) 
 {
@@ -95,7 +95,7 @@ ManagerUtils.calculateGeoLocationMatrixAtWorldPosition = function(worldPosition,
  * @param {number} latitude latitude.
  * @param {number} altitude altitude.
  * @param {Matrix4|undefined} resultGeoLocMatrix. Optional. result geolocation matrix. if undefined, create Matrix4 instance.
- * @return {Matrix4} resultGeoLocMatrix. this matrix has NO heading, pitch or roll rotations.
+ * @returns {Matrix4} resultGeoLocMatrix. this matrix has NO heading, pitch or roll rotations.
  */
 ManagerUtils.calculateGeoLocationMatrixAtLonLatAlt = function(longitude, latitude, altitude, resultGeoLocMatrix, magoManager) 
 {
@@ -116,7 +116,7 @@ ManagerUtils.calculateGeoLocationMatrixAtLonLatAlt = function(longitude, latitud
  * @param {number} roll roll.
  * @param {Matrix4|undefined} resultGeoLocMatrix. Optional. result geolocation matrix. if undefined, create Matrix4 instance. this transformMatrix without the heading, pitch, roll rotations.
  * @param {Matrix4|undefined} resultTransformMatrix. Optional. result transform matrix. if undefined, create Matrix4 instance. this matrix including the heading, pitch, roll rotations.
- * @return {Matrix4} resultTransformMatrix.
+ * @returns {Matrix4} resultTransformMatrix.
  */
 ManagerUtils.calculateTransformMatrixAtWorldPosition = function(worldPosition, heading, pitch, roll, resultGeoLocMatrix, resultTransformMatrix, magoManager) 
 {
@@ -165,7 +165,7 @@ ManagerUtils.calculateTransformMatrixAtWorldPosition = function(worldPosition, h
  * @param {number} roll roll. Unit is degree.
  * @param {GeoLocationData|undefined} resultGeoLocationData Optional. result geolocation matrix. if undefined, create GeoLocationData instance.
  * @param {MagoManager} magoManager for magoManager.globe
- * @return {GeoLocationData} resultGeoLocationData.
+ * @returns {GeoLocationData} resultGeoLocationData.
  */
 ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, heading, pitch, roll, resultGeoLocationData, magoManager) 
 {
@@ -265,7 +265,7 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
  * @param {number} absoluteZ absoluteZ.
  * @param {GeoLocationData|undefined} resultGeoLocationData Optional. result geolocation matrix. if undefined, create GeoLocationData instance.
  * @param {MagoManager} magoManager
- * @return {GeoLocationData} resultGeoLocationData.
+ * @returns {GeoLocationData} resultGeoLocationData.
  */
 ManagerUtils.calculateGeoLocationDataByAbsolutePoint = function(absoluteX, absoluteY, absoluteZ, resultGeoLocationData, magoManager) 
 {
@@ -411,7 +411,7 @@ ManagerUtils.calculateGeoLocationDataByAbsolutePoint = function(absoluteX, absol
  * resultSplitValue.low = 51957.5985745606 // 4049653.5985745606 - 3997696;
  * @param {number} value Required. coordinate x or y or z.
  * @param {SplitValue} resultSplitValue Optional. result split value. if undefined, create SplitValue instance.
- * @return {SplitValue} resultSplitValue.
+ * @returns {SplitValue} resultSplitValue.
  */
 ManagerUtils.calculateSplitedValues = function(value, resultSplitValue)
 {
@@ -477,7 +477,7 @@ ManagerUtils.calculateSplited3fv = function(point3fv, resultSplitPoint3fvHigh, r
  * @param {Number} pixelY Screen y position of the pixel.
  * @param {FBO} depthFbo Depth frameBuffer object.
  * @param {MagoManager} magoManager Mago3D main manager.
- * @return {Number} linearDepth Returns the linear depth [0.0, 1.0] ranged value.
+ * @returns {Number} linearDepth Returns the linear depth [0.0, 1.0] ranged value.
  */
 ManagerUtils.calculatePixelLinearDepth = function(gl, pixelX, pixelY, depthFbo, magoManager) 
 {
@@ -505,7 +505,7 @@ ManagerUtils.calculatePixelLinearDepth = function(gl, pixelX, pixelY, depthFbo, 
  * @param {Number} pixelY Screen y position of the pixel.
  * @param {Point3D} resultPixelPos The result of the calculation.
  * @param {MagoManager} magoManager Mago3D main manager.
- * @return {Point3D} resultPixelPos The result of the calculation.
+ * @returns {Point3D} resultPixelPos The result of the calculation.
  */
 ManagerUtils.calculatePixelPositionCamCoord = function(gl, pixelX, pixelY, resultPixelPos, depthFbo, frustumFar, magoManager) 
 {
@@ -529,7 +529,7 @@ ManagerUtils.calculatePixelPositionCamCoord = function(gl, pixelX, pixelY, resul
  * Calculates the cameraCoord position in world coordinates.
  * @param {Point3D} cameraCoord Camera coordinate position.
  * @param {MagoManager} magoManager Mago3D main manager.
- * @return {Point3D} resultPixelPos The result of the calculation.
+ * @returns {Point3D} resultPixelPos The result of the calculation.
  */
 ManagerUtils.cameraCoordPositionToWorldCoord = function(camCoordPos, resultWorldPos, magoManager) 
 {
@@ -548,7 +548,7 @@ ManagerUtils.cameraCoordPositionToWorldCoord = function(camCoordPos, resultWorld
  * @param {Number} pixelY Screen y position of the pixel.
  * @param {Point3D} resultPixelPos The result of the calculation.
  * @param {MagoManager} magoManager Mago3D main manager.
- * @return {Point3D} resultPixelPos The result of the calculation.
+ * @returns {Point3D} resultPixelPos The result of the calculation.
  */
 ManagerUtils.calculatePixelPositionWorldCoord = function(gl, pixelX, pixelY, resultPixelPos, depthFbo, frustumFar, magoManager) 
 {
@@ -577,7 +577,7 @@ ManagerUtils.calculatePixelPositionWorldCoord = function(gl, pixelX, pixelY, res
  * @param {Number} worldCoordZ z value of the point in world coordinate.
  * @param {Point3D} resultPixelPos The result of the calculation.
  * @param {MagoManager} magoManager Mago3D main manager.
- * @return {Point3D} resultPixelPos The result of the calculation.
+ * @returns {Point3D} resultPixelPos The result of the calculation.
  */
 ManagerUtils.calculateWorldPositionToScreenCoord = function(gl, worldCoordX, worldCoordY, worldCoordZ, resultScreenCoord, magoManager)
 {

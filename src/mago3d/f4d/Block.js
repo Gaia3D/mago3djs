@@ -71,7 +71,6 @@ var Block = function()
  */
 Block.prototype.deleteObjects = function(gl, vboMemManager) 
 {
-
 	this.vBOVertexIdxCacheKeysContainer.deleteGlObjects(gl, vboMemManager);
 	this.vBOVertexIdxCacheKeysContainer = undefined;
 	this.mIFCEntityType = undefined;
@@ -87,10 +86,11 @@ Block.prototype.deleteObjects = function(gl, vboMemManager)
 
 /**
  * render할 준비가 됬는지 체크
+ * 
  * @param {NeoReference} neoReference magoManager의 objectSelected와 비교 하기 위한 neoReference 객체
  * @param {MagoManager} magoManager 
  * @param {Number} maxSizeToRender block의 radius와 비교하기 위한 ref number.
- * @return {Boolean} block의 radius가 maxSizeToRender보다 크고, block의 radius가 magoManager의 보다 크고, 카메라가 움직이고 있지 않고, magoManager의 objectSelected와 neoReference가 같을 경우 true 반환
+ * @returns {Boolean} block의 radius가 maxSizeToRender보다 크고, block의 radius가 magoManager의 보다 크고, 카메라가 움직이고 있지 않고, magoManager의 objectSelected와 neoReference가 같을 경우 true 반환
  */ 
 Block.prototype.isReadyToRender = function(neoReference, magoManager, maxSizeToRender) 
 {

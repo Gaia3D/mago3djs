@@ -39,7 +39,7 @@ TrianglesMatrix.prototype.deleteObjects = function()
  * 주어진 인덱스에 있는 TrianglesList를 가져온다.
  * 
  * @param {Number} index 가져올 Triangle 리스트의 인덱스 값
- * @return {TrianglesList} 주어진 인덱스 위치의 TrianglesList
+ * @returns {TrianglesList} 주어진 인덱스 위치의 TrianglesList
  */
 TrianglesMatrix.prototype.getTrianglesList = function(index)
 {
@@ -49,7 +49,7 @@ TrianglesMatrix.prototype.getTrianglesList = function(index)
 /**
  * TrianglesList 배열의 개수를 구한다.
  * 
- * @return {Number} 배열의 개수
+ * @returns {Number} 배열의 개수
  */
 TrianglesMatrix.prototype.getTrianglesListsCount = function()
 {
@@ -59,7 +59,7 @@ TrianglesMatrix.prototype.getTrianglesListsCount = function()
 /**
  * Triangle 객체의 리스트를 추가하고, 배열에 추가한다.
  *
- * @return {TrianglesList} Triangle 객체의 리스트
+ * @returns {TrianglesList} Triangle 객체의 리스트
  */
 TrianglesMatrix.prototype.newTrianglesList = function()
 {
@@ -85,7 +85,7 @@ TrianglesMatrix.prototype.assignVerticesIdx = function()
  * 주어진 trianglesArray을 VBO face 형태의 버텍스 배열로 설정한다.
  * 
  * @param {} result 
- * @return vertexArray[idx] VBO face 형태의 버텍스 배열
+ * @returns vertexArray[idx] VBO face 형태의 버텍스 배열
  */
 TrianglesMatrix.prototype.getVboFaceDataArray = function(result)
 {

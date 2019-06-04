@@ -92,7 +92,7 @@ Vertex.prototype.deleteObjects = function()
 
 /**
  * get vertexList index
- * @return {Number}
+ * @returns {Number}
  */
 Vertex.prototype.getIdxInList = function() 
 {
@@ -155,7 +155,7 @@ Vertex.prototype.copyFrom = function(vertex)
 
 /**
  * get this vertex point.
- * @return {Point3D}
+ * @returns {Point3D}
  */
 Vertex.prototype.getPosition = function() 
 {
@@ -231,7 +231,7 @@ Vertex.prototype.setNormal = function(nx, ny, nz)
 
 /**
  * get this vertex normal
- * @return {Point3D} normal
+ * @returns {Point3D} normal
  */
 Vertex.prototype.getNormal = function() 
 {
@@ -256,7 +256,7 @@ Vertex.prototype.translate = function(dx, dy, dz)
  * get vertex outinghedges. 
  * @deprecated
  * @param {Array} resultHedgesArray
- * @return {Array} resultHedgesArray
+ * @returns {Array} resultHedgesArray
  */
 Vertex.prototype.getOutingHEdges = function(resultHedgesArray) 
 {
@@ -275,7 +275,7 @@ Vertex.prototype.getOutingHEdges = function(resultHedgesArray)
  * @param {Plane} plane. 
  * @param {Point3D} projectionDirection projectionDirection must be unitary.
  * @param {Vertex} resultVertex Optional. 
- * @return {Vertex} resultVertex
+ * @returns {Vertex} resultVertex
  */
 Vertex.getProjectedOntoPlane = function(vertex, plane, projectionDirection, resultVertex)
 {

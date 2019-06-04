@@ -2,15 +2,17 @@
 
 /**
  * 블록 리스트 객체
+ * - 이 클래스는 Octree 클래스의 prepareModelReferencesListData 호출 통해 생성된다
  * 
  * @class BlocksList
- * @exception {Error} Messages.CONSTRUCT_ERROR
  * 
  * @param {String} version
+ * @exception {Error} Messages.CONSTRUCT_ERROR
+ * 
+ * @see Octree#prepareModelReferencesListData
  */
 var BlocksList = function(version) 
 {
-	// This class is created in "Octree.prototype.prepareModelReferencesListData = function(magoManager) ".
 	if (!(this instanceof BlocksList)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
@@ -18,22 +20,20 @@ var BlocksList = function(version)
 
 	/**
 	 * 블록 리스트 명
-	 * @type {string}
+	 * @type {String}
 	 * @default ''
 	 */
 	this.name = "";
 
 	/**
 	 * f4d 버전
-	 * @type {string}
-	 * @default ''
+	 * @type {String}
 	 */
-	this.version;
+	this.version = version || "";
 
 	/**
 	 * 블락 리스트
-	 * @type {Array.<Block>}
-	 * @default ''
+	 * @type {Block[]}
 	 */
 	this.blocksArray;
 
@@ -47,6 +47,8 @@ var BlocksList = function(version)
 	 * "IN_QUEUE"         : 5,
 	 * "LOAD_FAILED"      : 6
 	 * @type {Number}
+	 * 
+	 * @see CODE#fileLoadState
 	 */
 	this.fileLoadState = CODE.fileLoadState.READY;
 
@@ -61,9 +63,6 @@ var BlocksList = function(version)
 	 * file request.
 	 */
 	this.xhr;
-	
-	if (version !== undefined)
-	{ this.version = version; }
 	
 	/**
 	 * BlocksArrayPartition 리스트 관련 변수들.
@@ -161,13 +160,16 @@ BlocksList.prototype.stepOverBlockVersioned = function(arrayBuffer, bytesReaded,
 	var normalByteValuesCount;
 	var shortIndicesValuesCount;
 	var sizeLevels;
-	var startBuff, endBuff;
 	
+	// Spec document Table 3-1
+	// vboCount
 	var vboDatasCount = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 	bytesReaded += 4;
 	for ( var j = 0; j < vboDatasCount; j++ ) 
 	{
 		// 1) Positions array.
+		// Spec document Table 3-2
+		// vertexCount
 		vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);bytesReaded += 4;
 		verticesFloatValuesCount = vertexCount * 3;
 		startBuff = bytesReaded;
@@ -175,11 +177,15 @@ BlocksList.prototype.stepOverBlockVersioned = function(arrayBuffer, bytesReaded,
 		bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.
 
 		// 2) Normals.
+		// Spec document Table 3-2
+		// normalCount
 		vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);bytesReaded += 4;
 		normalByteValuesCount = vertexCount * 3;
 		bytesReaded = bytesReaded + 1 * normalByteValuesCount; // updating data.
 
 		// 3) Indices.
+		// Spec document Table 3-2
+		// indexCount
 		shortIndicesValuesCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);bytesReaded += 4;
 		sizeLevels = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1);bytesReaded += 1;
 		bytesReaded = bytesReaded + sizeLevels * 4;
@@ -206,26 +212,13 @@ BlocksList.prototype.stepOverBlockVersioned = function(arrayBuffer, bytesReaded,
  */
 BlocksList.prototype.parseBlockVersioned = function(arrayBuffer, bytesReaded, block, readWriter, magoManager) 
 {
-	var posByteSize;
-	var norByteSize;
-	var idxByteSize;
-	var classifiedPosByteSize;
-	var classifiedNorByteSize;
-	var classifiedIdxByteSize;
-	var startBuff, endBuff;
 	var vboMemManager = magoManager.vboMemoryManager;
-	
 	var vboDatasCount = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-	// test.
-	if (vboDatasCount > 12)
-	{ var hola = 0; }
-	
 	for ( var j = 0; j < vboDatasCount; j++ ) 
 	{
 		var vboViCacheKey = block.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
 		bytesReaded = vboViCacheKey.readPosNorIdx(arrayBuffer, readWriter, vboMemManager, bytesReaded);
 		block.vertexCount = vboViCacheKey.vertexCount;
-
 	}
 	
 	return bytesReaded;
@@ -245,21 +238,18 @@ BlocksList.prototype.parseBlocksListVersioned_v001 = function(arrayBuffer, readW
 {
 	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 	var bytesReaded = 0;
-	var startBuff, endBuff;
-	var posByteSize, norByteSize, idxByteSize;
-	var vboMemManager = magoManager.vboMemoryManager;
-	var classifiedPosByteSize = 0, classifiedNorByteSize = 0, classifiedIdxByteSize = 0;
-	var gl = magoManager.sceneState.gl;
 	var succesfullyGpuDataBinded = true;
 	
 	// read the version.
 	var versionLength = 5;
-	var version = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+versionLength)));
 	bytesReaded += versionLength;
 	
+	
+	// modelCount
 	var blocksCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4); bytesReaded += 4;
 	for ( var i = 0; i< blocksCount; i++ ) 
 	{
+		// modelIndex
 		var blockIdx = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 		
 		// Check if block exist.
@@ -301,9 +291,6 @@ BlocksList.prototype.parseBlocksListVersioned_v001 = function(arrayBuffer, readW
 
 		block.radius = maxLength/2.0;
 
-		//bbox.deleteObjects();
-		//bbox = undefined;
-		
 		bytesReaded = this.parseBlockVersioned(arrayBuffer, bytesReaded, block, readWriter, magoManager) ;
 		
 		// parse lego if exist.
@@ -315,10 +302,8 @@ BlocksList.prototype.parseBlocksListVersioned_v001 = function(arrayBuffer, readW
 				// TODO : this is no used. delete this.
 				block.lego = new Lego(); 
 			}
-			
 			bytesReaded = this.parseBlockVersioned(arrayBuffer, bytesReaded, block.lego, readWriter, magoManager) ;
 		}
-
 	}
 	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 	return succesfullyGpuDataBinded;
@@ -344,17 +329,8 @@ BlocksList.prototype.parseBlocksListVersioned_v002 = function(readWriter, mother
 	var arrayBuffer = blocksArrayPartition.dataArraybuffer;
 	blocksArrayPartition.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 	var bytesReaded = 0;
-	var startBuff, endBuff;
-	var posByteSize, norByteSize, idxByteSize;
 	var vboMemManager = magoManager.vboMemoryManager;
-	var classifiedPosByteSize = 0, classifiedNorByteSize = 0, classifiedIdxByteSize = 0;
-	var gl = magoManager.sceneState.gl;
 	var succesfullyGpuDataBinded = true;
-	
-	// read the version.
-	//var versionLength = 5;
-	//var version = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+versionLength)));
-	//bytesReaded += versionLength;
 	
 	var blocksCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4); bytesReaded += 4;
 	for ( var i = 0; i< blocksCount; i++ ) 
@@ -389,6 +365,7 @@ BlocksList.prototype.parseBlocksListVersioned_v002 = function(readWriter, mother
 			bbox.maxX = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
 			bbox.maxY = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
 			bbox.maxZ = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
+
 			var maxLength = bbox.getMaxLength();
 			if (maxLength < 0.5) { block.isSmallObj = true; }
 			else { block.isSmallObj = false; }
@@ -412,25 +389,6 @@ BlocksList.prototype.parseBlocksListVersioned_v002 = function(readWriter, mother
 			if (blocksCount > 1)
 			{ bytesReaded = vboViCacheKey.stepOverPosNorIdx(arrayBuffer, readWriter, vboMemManager, bytesReaded); }
 		}
-
-		//bbox.deleteObjects();
-		//bbox = undefined;
-		
-		//bytesReaded = this.parseBlockVersioned(arrayBuffer, bytesReaded, block, readWriter, magoManager) ;
-		
-		// parse lego if exist.
-		//var existLego = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
-		//if (existLego)
-		//{
-		//	if (block.lego === undefined)
-		//	{ 
-		//		// TODO : this is no used. delete this.
-		//		block.lego = new Lego(); 
-		//	}
-		//	
-		//	bytesReaded = this.parseBlockVersioned(arrayBuffer, bytesReaded, block.lego, readWriter, magoManager) ;
-		//}
-
 	}
 	blocksArrayPartition.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED; // test.
@@ -452,11 +410,7 @@ BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherB
 	var bytesReaded = 0;
 	var blocksCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4); bytesReaded += 4;
 	
-	var startBuff, endBuff;
-	var posByteSize, norByteSize, idxByteSize;
 	var vboMemManager = magoManager.vboMemoryManager;
-	var classifiedPosByteSize = 0, classifiedNorByteSize = 0, classifiedIdxByteSize = 0;
-	var gl = magoManager.sceneState.gl;
 	var succesfullyGpuDataBinded = true;
 
 	for ( var i = 0; i< blocksCount; i++ ) 
@@ -536,7 +490,6 @@ BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherB
 			bytesReaded = vboViCacheKey.readPosNorIdx(arrayBuffer, readWriter, vboMemManager, bytesReaded);
 			block.vertexCount = vboViCacheKey.vertexCount;
 		}
-
 		// Pendent to load the block's lego.
 	}
 	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
@@ -552,7 +505,6 @@ BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherB
  */
 BlocksList.prototype.prepareData = function(magoManager, octreeOwner) 
 {
-	
 	if (this.version === "0.0.1")
 	{
 		// Provisionally this function is into octree.prepareModelReferencesListData(...).

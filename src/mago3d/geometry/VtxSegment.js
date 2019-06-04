@@ -49,7 +49,7 @@ VtxSegment.prototype.setVertices = function(startVertex, endVertex)
 /**
  * get direction between start vertex and end vertex.
  * @param {Point3d} resultDirection if undefined , set new Point3D instance.
- * @return {Point3d} resultDirection
+ * @returns {Point3d} resultDirection
  */
 VtxSegment.prototype.getDirection = function(resultDirection)
 {
@@ -66,7 +66,7 @@ VtxSegment.prototype.getDirection = function(resultDirection)
 /**
  * get vector point between start vertex and end vertex.
  * @param {Point3d} resultVector if undefined , set new Point3D instance.
- * @return {Point3d} resultVector
+ * @returns {Point3d} resultVector
  */
 VtxSegment.prototype.getVector = function(resultVector)
 {
@@ -86,7 +86,7 @@ VtxSegment.prototype.getVector = function(resultVector)
 /**
  * get line between start vertex and end vertex.
  * @param {Line} resultLine if undefined , set new Line instance.
- * @return {Line} resultLine
+ * @returns {Line} resultLine
  */
 VtxSegment.prototype.getLine = function(resultLine)
 {
@@ -101,7 +101,7 @@ VtxSegment.prototype.getLine = function(resultLine)
 
 /**
  * get squared length.
- * @return {Number} squared length
+ * @returns {Number} squared length
  * 
  * @see Point3D#squareDistToPoint
  */
@@ -112,7 +112,7 @@ VtxSegment.prototype.getSquaredLength = function()
 
 /**
  * get length. 
- * @return {Number} square root of squared length
+ * @returns {Number} square root of squared length
  */
 VtxSegment.prototype.getLength = function()
 {
@@ -123,7 +123,7 @@ VtxSegment.prototype.getLength = function()
  * get intersection info with point. 
  * @param {Point3D} point
  * @param {Number} error default is 10E-8.
- * @return {Number} Constant.INTERSECTION_*
+ * @returns {Number} Constant.INTERSECTION_*
  * Constant.INTERSECTION_OUTSIDE = 0
  * Constant.INTERSECTION_INTERSECT= 1
  * Constant.INTERSECTION_INSIDE = 2

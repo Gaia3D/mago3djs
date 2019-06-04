@@ -39,7 +39,7 @@ Polygon2D.prototype.getBoundingRectangle = function(resultBRect)
 /**
  * get the direction of the specific line segment of the edge
  * @param {Number} idx the index of the specific line segment
- * @return direction	
+ * @returns direction	
  */
 Polygon2D.prototype.getEdgeDirection = function(idx)
 {
@@ -52,7 +52,7 @@ Polygon2D.prototype.getEdgeDirection = function(idx)
 /**
  * get the vector of the specigic line segement of the edge
  * @param {Number} index the index of the specific line segment
- * @return vector
+ * @returns vector
  */
 Polygon2D.prototype.getEdgeVector = function(idx)
 {
@@ -73,7 +73,7 @@ Polygon2D.prototype.reverseSense = function()
 /**
  * copy the information of the other polygon to this polygon
  * @param {Polygon2D} resultCopyPolygon
- * @return {Polygon2D} resultCopyPolygon
+ * @returns {Polygon2D} resultCopyPolygon
  */
 Polygon2D.prototype.getCopy = function(resultCopyPolygon)
 {
@@ -98,7 +98,7 @@ Polygon2D.prototype.getCopy = function(resultCopyPolygon)
 /**
  * Calculate the normal vector of this polygon
  * @param resultConcavePointsIdxArray save the index of the points which make concave at the border
- * @return resultFConcavePointsIdxArray the list of the index which make concave at the border
+ * @returns resultFConcavePointsIdxArray the list of the index which make concave at the border
  */
 Polygon2D.prototype.calculateNormal = function(resultConcavePointsIdxArray)
 {
@@ -390,7 +390,7 @@ Polygon2D.prototype.getPointsIdxSortedByDistToPoint = function(thePoint, resultS
 /**
  * Make the list of triangles at the convex polygon
  * @param resultTrianglesArray the list of triangles made from the polygon
- * @return resultTrianglesArray
+ * @returns resultTrianglesArray
  */
 Polygon2D.prototype.getTrianglesConvexPolygon = function(resultTrianglesArray)
 {

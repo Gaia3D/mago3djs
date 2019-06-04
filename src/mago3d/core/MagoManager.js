@@ -1170,7 +1170,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 
 /**
  * Main loop function. This function contains all Mago3D Pipe-Line.
- * @param {boolean} isLastFrustum Indicates if this is the last frustum in the render pipe-line.
+ * @param {Boolean} isLastFrustum Indicates if this is the last frustum in the render pipe-line.
  * @param {Number} frustumIdx Current frustum indice.
  * @param {Number} numFrustums Total frustums count in current rendering pipe-line.
  */
@@ -1467,7 +1467,7 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, resultSe
  * @param {GL} gl 변수
  * @param {int} pixelX Screen x position of the pixel.
  * @param {int} pixelY Screen y position of the pixel.
- * @return {Plane} resultSelObjMovePlane Calculated plane.
+ * @returns {Plane} resultSelObjMovePlane Calculated plane.
  */
 MagoManager.prototype.calculateSelObjMovePlaneAsimetricMode = function(gl, pixelX, pixelY, resultSelObjMovePlane) 
 {
@@ -1793,14 +1793,6 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 {
 	// Note: the "mouseActionLeftClick" runs after "mouseActionLeftDown" & "mouseActionLeftUp".***
 	//--------------------------------------------------------------------------------------------
-	
-	//if (this.currentFrustumIdx === 0)
-	//	var hola = 0;
-	//else if (this.currentFrustumIdx > 0)
-	//	var hola = 0;
-	
-	// Test for drawing mode.******************************************************************
-	//this.magoMode = CODE.magoMode.DRAWING;
 	if (this.magoMode === CODE.magoMode.DRAWING)// then process to draw.***// Test code.***// Test code.***
 	{
 		// Test code.***
@@ -4603,7 +4595,7 @@ MagoManager.prototype.addStaticModel = function(attribute)
 /**
  * check static model is exist
  * @param {string} projectId
- * @return {Boolean} isExist
+ * @returns {Boolean} isExist
  */
 MagoManager.prototype.isExistStaticModel = function(projectId)
 {
@@ -5089,7 +5081,7 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "changeMagoMode") 
 	{
-		var hola = 0;
+		console.log("changeMagoMode");
 	}
 	else if (apiName === "getCameraCurrentPosition")
 	{

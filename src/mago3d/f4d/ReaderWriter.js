@@ -809,11 +809,6 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 			neoBuilding.octree.neoBuildingOwnerId = neoBuilding.buildingId;
 			neoBuilding.octree.octreeKey = neoBuilding.buildingId + "_" + neoBuilding.octree.octree_number_name;
 			
-			//if(neoBuilding.buildingId == "KSJ_100")
-			//{
-			//	var hola = 0;
-			//}
-			
 			// now, parse octreeAsimetric or octreePyramid (check metadata.projectDataType).***
 			if (metaData.projectDataType === 5)
 			{ bytesReaded = neoBuilding.octree.parsePyramidVersion(arrayBuffer, readerWriter, bytesReaded, neoBuilding); }
@@ -1129,11 +1124,6 @@ ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer,
 						gl.generateMipmap(gl.TEXTURE_2D);
 						texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED; // file load finished.***
 						gl.bindTexture(gl.TEXTURE_2D, null);
-					}
-					else 
-					{
-						var hola = 0;
-
 					}
 				}
 			}
@@ -1463,7 +1453,7 @@ ReaderWriter.prototype.loadWMSImage = function(gl, filePath_inServer, texture, m
 		}
 	}).fail(function(status) 
 	{
-		var hola = 0;
+		console.log(status);
 		
 	}).always(function() 
 	{

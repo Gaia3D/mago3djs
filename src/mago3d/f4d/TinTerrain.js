@@ -424,10 +424,6 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth)
 			else
 			{
 				gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.
-				
-				//var glError = gl.getError();
-				//if(glError !== gl.NO_ERROR)
-				//	var hola = 0;
 			}
 
 		}
@@ -700,8 +696,6 @@ TinTerrain.prototype.calculateTextureCoordinateTranslationAndScale = function()
 	var translateY = scaleY *(terrainMercatorMinPoint2d.y - imageryMercatorMinPoint2d.y)/ terrainHeight;
 	
 	this.textureTranslateAndScale = new Point4D(translateX, translateY, scaleX, scaleY);
-	var hola = 0;
-	
 };
 
 TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, altitude, altitudesSlice)
@@ -770,9 +764,6 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 			
 			this.texCoordsArray[idx*2] = s;
 			this.texCoordsArray[idx*2+1] = t;
-			
-			if (this.texCoordsArray[idx*2] > 1.0 || this.texCoordsArray[idx*2+1] > 1.0)
-			{ var hola = 0; }
 			
 			// actualize current values.
 			currLon += lonIncreDeg;
@@ -953,15 +944,6 @@ TinTerrain.prototype.decodeData = function()
 		latArray[i] = minLat + vValues[i]*latRangeDivShortMax;
 		altArray[i] = minHeight + hValues[i]*heightRangeDivShortMax;
 		
-		// hardCoding.
-		//altArray[i] *= 0.5;
-		//altArray[i] += 80.0;
-		
-		// debug.
-		var debugAlt = altArray[i];
-		if (debugAlt > 257)
-		{ var hola = 0; }
-		
 		// make texcoords.
 		this.texCoordsArray[i*2] = uValues[i]/shortMax;
 		this.texCoordsArray[i*2+1] = vValues[i]/shortMax;
@@ -1022,10 +1004,6 @@ TinTerrain.prototype.parseData = function(dataArrayBuffer)
 		this.uValues[i] = u;
 		this.vValues[i] = v;
 		this.hValues[i] = height;
-		
-		// debug.
-		if (height > 0)
-		{ var hola = 0; }
 	}
 	
 	// 3. indices.

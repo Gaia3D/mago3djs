@@ -39,7 +39,7 @@ HalfEdgesList.prototype.deleteObjects = function()
 
 /**
  * 새로 HalfEdge 인스턴스를 생성하여 hEdgesArray에 추가한다.
- * @return {HalfEdge} 새로 생성된 HalfEdge인스턴스를 반환.
+ * @returns {HalfEdge} 새로 생성된 HalfEdge인스턴스를 반환.
  */
 HalfEdgesList.prototype.newHalfEdge = function()
 {

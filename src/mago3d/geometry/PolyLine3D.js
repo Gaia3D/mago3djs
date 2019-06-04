@@ -21,7 +21,7 @@ var PolyLine3D = function()
  * @param {Number} x
  * @param {Number} y
  * @param {Number} z
- * @return point3d
+ * @returns point3d
  */
 PolyLine3D.prototype.newPoint3d = function(x, y, z)
 {
@@ -50,7 +50,7 @@ PolyLine3D.prototype.addPoint3dArray = function(points3dArray)
 
 /**
  * Return the coordinate contained at geoLocDataManager
- * @return geoLoc
+ * @returns geoLoc
  */
 PolyLine3D.prototype.getGeographicLocation = function()
 {

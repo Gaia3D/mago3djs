@@ -115,8 +115,8 @@ FirstPersonView.prototype.move = function (vector)
 	var position = glMatrix.vec3.fromValues(this._position.x, this._position.y, this.position.z);
 	var matrix = glMatrix.mat4.create();
 	glMatrix.mat4.rotateY(matrix, matrix, this._rotation.y);
-	vec3.transformMat4(vector, vector, matrix);
-	vec3.add(position, position, vector);
+	glMatrix.vec3.transformMat4(vector, vector, matrix);
+	glMatrix.vec3.add(position, position, vector);
 	this._position.set(position[0], position[1], position[2]);
 };
 FirstPersonView.prototype.update = function(manager)

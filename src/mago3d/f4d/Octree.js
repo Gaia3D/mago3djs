@@ -773,7 +773,7 @@ Octree.prototype.getPartitionsCountsForLod = function(lod, realPartitionsCount, 
 /**
  * 어떤 일을 하고 있습니까?
  * @param {MagoManager} magoManager Main mago3d manager.
- * @returns {boolean} Returns if requested the points cloud data.
+ * @returns {Boolean} Returns if requested the points cloud data.
  */
 Octree.prototype.preparePCloudData = function(magoManager) 
 {

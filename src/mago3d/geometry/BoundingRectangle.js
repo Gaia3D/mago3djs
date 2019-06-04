@@ -82,7 +82,7 @@ BoundingRectangle.prototype.addRectangle = function(bRect)
 /**
  * Check whether this rectangle is intersected with the given bounding rectangle
  * @param {BoundingRectangle} bRect
- * @return {Boolean}
+ * @returns {Boolean}
  */
 BoundingRectangle.prototype.intersectsWithRectangle = function(bRect)
 {

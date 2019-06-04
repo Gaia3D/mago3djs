@@ -147,7 +147,7 @@ NeoReferencesMotherAndIndices.prototype.deleteObjects = function(gl, vboMemManag
 
 /**
  * 어떤 일을 하고 있습니까?
-  * @returns {boolean} returns if the neoReferencesMotherAndIndices is ready to render.
+  * @returns {Boolean} returns if the neoReferencesMotherAndIndices is ready to render.
  */
 NeoReferencesMotherAndIndices.prototype.isReadyToRender = function() 
 {

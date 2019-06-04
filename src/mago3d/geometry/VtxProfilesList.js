@@ -142,7 +142,7 @@ VtxProfilesList.prototype.addVtxProfile = function(vtxProfile)
 
 /**
  * VtxProfile 생성하여 vtxProfileArray에 추가 후 반환.
- * @return {VtxProfile} vtxProfile
+ * @returns {VtxProfile} vtxProfile
  */
 VtxProfilesList.prototype.newVtxProfile = function()
 {
@@ -156,7 +156,7 @@ VtxProfilesList.prototype.newVtxProfile = function()
 
 /**
  * vtxProfileArray length 반환.
- * @return {Number}
+ * @returns {Number}
  */
 VtxProfilesList.prototype.getVtxProfilesCount = function()
 {
@@ -168,7 +168,7 @@ VtxProfilesList.prototype.getVtxProfilesCount = function()
 
 /**
  * 인덱스에 해당하는 vtxProfile 반환
- * @return {VtxProfile}
+ * @returns {VtxProfile}
  */
 VtxProfilesList.prototype.getVtxProfile = function(idx)
 {
@@ -181,7 +181,7 @@ VtxProfilesList.prototype.getVtxProfile = function(idx)
 /**
  * vtxProfileArray에 있는 모든 vertex를 배열에 담아 반환
  * @param {Array.<Vertex>|undefined} resultVerticesArray 비어있을 시 배열 초기화.
- * @return {Array.<Vertex>}
+ * @returns {Array.<Vertex>}
  */
 VtxProfilesList.prototype.getAllVertices = function(resultVerticesArray)
 {
@@ -206,7 +206,7 @@ VtxProfilesList.prototype.getAllVertices = function(resultVerticesArray)
  * @param {Boolean} bIncludeBottomCap Mesh의 바닥 surface 추가 유무, true 일시 getTransversalSurface
  * @param {Boolean} bIncludeTopCap Mesh의 위쪽(뚜껑) surface 추가 유무, true 일시 getTransversalSurface
  * @param {Boolean} bLoop 기본값은 false. true로 선언 시, bIncludeBottomCap, bIncludeTopCap 는 false로 변경
- * @return {Mesh}
+ * @returns {Mesh}
  * 
  * @see VtxProfilesList#getTransversalSurface
  */
@@ -405,7 +405,7 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
  * @param {VtxProfile} vtxProfile
  * @param {Array.<IndexData>} convexFacesIndicesData
  * @param {Surface} resultSurface 비어있을 시 Surface 인스턴스 선언.
- * @return {Surface}
+ * @returns {Surface}
  */
 VtxProfilesList.getTransversalSurface = function(vtxProfile, convexFacesIndicesData, resultSurface)
 {
@@ -457,7 +457,7 @@ VtxProfilesList.getTransversalSurface = function(vtxProfile, convexFacesIndicesD
  * @method VtxProfilesList.makeLoft
  * @param {Profile2D} profile2d
  * @param {Points3DList} pathPoints3dList
- * @param {boolean} bLoop 기본값은 false.
+ * @param {Boolean} bLoop 기본값은 false.
  * 
  * @see Point3DList#getBisectionPlane
  * @see Point3DList#getSegment3D

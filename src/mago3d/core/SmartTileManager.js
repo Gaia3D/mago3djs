@@ -138,7 +138,7 @@ SmartTileManager.prototype.resetTiles = function()
 /**
  * 새로운 스마트타일을 생성하여 tilesArray에 넣고 반환.
  * @param {String} smartTileName tile name\
- * @return {SmartTile}
+ * @returns {SmartTile}
  */
 SmartTileManager.prototype.newSmartTile = function(smartTileName) 
 {

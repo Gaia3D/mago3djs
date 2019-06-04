@@ -129,7 +129,7 @@ Point3D.prototype.scalarProduct = function(point)
 /**
  * get the spherical coordinates
  * @param {GeographicCoord}resultGeographicCoords the target that will be canged
- * @return {GeographicCoord} resultGeographicCoords
+ * @returns {GeographicCoord} resultGeographicCoords
  */
 Point3D.prototype.getSphericalCoords = function(resultGeographicCoords) 
 {
@@ -140,9 +140,6 @@ Point3D.prototype.getSphericalCoords = function(resultGeographicCoords)
 	var xyProjectedPoint = new Point2D(this.x, this.y);
 	var longitudeVectorRef = new Point2D(1.0, 0.0);
 	var headingDeg = xyProjectedPoint.angleDegToVector(longitudeVectorRef);
-	
-	if (headingDeg > 90)
-	{ var hola = 0; }
 	
 	if (this.y < 0.0)
 	{
@@ -183,7 +180,7 @@ Point3D.prototype.getRelativeOrientationToVector = function(vector, radError)
 /**
  * Calculate the radian value of the angle of the two vectors
  * @param vector the target vector
- * @return the angle of two vector
+ * @returns the angle of two vector
  */
 Point3D.prototype.angleRadToVector = function(vector) 
 {

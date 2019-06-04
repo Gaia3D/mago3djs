@@ -110,7 +110,7 @@ Globe.prototype.normalizeCartesian = function(cartesian)
  * @param {Number} y
  * @param {Number} z 
  * @param {Float32Array} float32Array
- * @return {Float32Array} float32Array
+ * @returns {Float32Array} float32Array
  * 
  */
 Globe.prototype.transformMatrixAtCartesianPointWgs84 = function(x, y, z, float32Array)
@@ -492,7 +492,7 @@ Globe.CartesianToGeographicWgs84 = function (x, y, z, result, bStoreAbsolutePosi
  * @param {Number} longitude
  * @param {Number} latitude
  * @param {Point2D} resultPoint2d
- * @return {Point2D} 
+ * @returns {Point2D} 
  */
 Globe.geographicToMercatorProjection = function(longitude, latitude, resultPoint2d) 
 {
@@ -510,7 +510,7 @@ Globe.geographicToMercatorProjection = function(longitude, latitude, resultPoint
  * @param {Number} lonRad
  * @param {Number} latRad
  * @param {Point2D} resultPoint2d
- * @return {Point2D}
+ * @returns {Point2D}
  */
 Globe.geographicRadianToMercatorProjection = function(lonRad, latRad, resultPoint2d) 
 {
@@ -533,7 +533,7 @@ Globe.geographicRadianToMercatorProjection = function(lonRad, latRad, resultPoin
  * @param {Number} latitude
  * @param {Number} altitude
  * @param {Float32Array} resultCartesian
- * @return {Float32Array} resultCartesian
+ * @returns {Float32Array} resultCartesian
  */
 Globe.geographicToCartesianWgs84 = function(longitude, latitude, altitude, resultCartesian)
 {
@@ -572,7 +572,7 @@ Globe.geographicToCartesianWgs84 = function(longitude, latitude, altitude, resul
  * @param {Number} latitude
  * @param {Number} altitude
  * @param {Float32Array} resultCartesian
- * @return {Float32Array} resultCartesian
+ * @returns {Float32Array} resultCartesian
  */
 
 Globe.geographicRadianArrayToFloat32ArrayWgs84 = function(lonArray, latArray, altArray, resultCartesianArray)

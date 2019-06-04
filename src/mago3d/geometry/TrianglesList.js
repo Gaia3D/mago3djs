@@ -24,7 +24,7 @@ var TrianglesList = function()
  * @param {Vertex} vertex0 1번 버텍스
  * @param {Vertex} vertex1 2번 버텍스
  * @param {Vertex} vertex2 3번 버텍스
- * @return {Triangle} 생성된 Triangle 객체
+ * @returns {Triangle} 생성된 Triangle 객체
  */
 TrianglesList.prototype.newTriangle = function(vertex0, vertex1, vertex2) 
 {
@@ -61,7 +61,7 @@ TrianglesList.prototype.deleteObjects = function()
 /**
  * Triangle 배열의 개수를 구한다.
  * 
- * @return {Number} 배열의 개수
+ * @returns {Number} 배열의 개수
  */
 TrianglesList.prototype.getTrianglesCount = function() 
 {
@@ -72,7 +72,7 @@ TrianglesList.prototype.getTrianglesCount = function()
  * 주어진 인덱스에 있는 Triangle 객체를 가져온다.
  * 
  * @param {Number} index 가져올 Triangle 객체의 인덱스 값
- * @return {Triangle} 주어진 인덱스 위치의 Triangle 객체
+ * @returns {Triangle} 주어진 인덱스 위치의 Triangle 객체
  */
 TrianglesList.prototype.getTriangle = function(index) 
 {
@@ -110,7 +110,7 @@ TrianglesList.assignVerticesIdx = function(triangles)
  * 
  * @param {Triangle[]} triangles 삼각형 클래스 배열
  * @param {Uint16Array[]}  indices 버텍스 인덱스 배열
- * @return {Uint16Array[]}  버텍스 인덱스 배열
+ * @returns {Uint16Array[]}  버텍스 인덱스 배열
  */
 TrianglesList.getTrianglesIndicesArray = function(triangles, indices) 
 {
@@ -134,7 +134,7 @@ TrianglesList.getTrianglesIndicesArray = function(triangles, indices)
  * 삼각형 클래스 배열의 반복되지 않는 인덱스들을 주어진 인텍스 배열에 설정한다.
  * 
  * @param {Vertex[]} vertices 버텍스 배열
- * @return {Vertex[]} 버텍스 배열
+ * @returns {Vertex[]} 버텍스 배열
  */
 TrianglesList.prototype.getNoRepeatedVerticesArray = function(vertices) 
 {
@@ -147,7 +147,7 @@ TrianglesList.prototype.getNoRepeatedVerticesArray = function(vertices)
  * 
  * @param {Triangle[]} triangles 
  * @param {Vertex[]} vertices 버텍스 배열
- * @return {Vertex[]} 버텍스 배열
+ * @returns {Vertex[]} 버텍스 배열
  */
 TrianglesList.getNoRepeatedVerticesArray = function(triangles, vertices) 
 {
@@ -209,7 +209,7 @@ TrianglesList.getNoRepeatedVerticesArray = function(triangles, vertices)
  * @param {Triangle[]} triangles 삼각형 클래스 배열
  * @param {VBOVertexIdxCacheKey} result 
  * @param {VboMemoryManager} vboMemManager 
- * @return {VBOVertexIdxCacheKey}
+ * @returns {VBOVertexIdxCacheKey}
  */
 TrianglesList.getVboFaceDataArray = function(triangles, result, vboMemManager) 
 {

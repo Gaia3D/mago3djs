@@ -133,7 +133,7 @@ FBO.prototype.deleteObjects = function(gl)
  * Returns a new WebGL buffer.
  * @param {WebGLRenderingContext} gl WebGL Rendering Context.
  * @param {TypedArray} data Data array to bind.
- * @return {WebGLBuffer} WebGL Buffer.
+ * @returns {WebGLBuffer} WebGL Buffer.
  */
 FBO.createBuffer = function(gl, data) 
 {
