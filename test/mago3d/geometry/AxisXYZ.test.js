@@ -32,11 +32,11 @@ describe('AxisXYZ', function()
     
 	describe('setDimension(length)', function()
 	{
-		if ('입력된 값으로 설정 ', function()
+		it('입력된 값으로 설정 ', function()
 		{
 			testAxisXYZ.setDimension(10);
 			expect(testAxisXYZ.length).toEqual(10);
-		}){ ; }
+		});
 	});
 
 });
