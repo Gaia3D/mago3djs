@@ -51,7 +51,7 @@ var VboBuffer = function(dataTarget)
 	if (dataTarget !== undefined)
 	{ this.dataTarget = dataTarget; }
 	else 
-	{ this.dataTarget = 34962; } // 34962 = gl.ARRAY_BUFFER. Default value.***
+	{ this.dataTarget = 34962; } // 34962 = gl.ARRAY_BUFFER. Default value.
 };
 
 /**
@@ -90,7 +90,7 @@ VboBuffer.prototype.setDataArray = function(dataArray, vboMemManager)
 	this.dataGlType = VboBuffer.getGlTypeOfArray(dataArray);
 	
 	var arrayElemsCount = dataArray.length;
-	var classifiedPosByteSize = arrayElemsCount; // Init value.***
+	var classifiedPosByteSize = arrayElemsCount; // Init value.
 	if (vboMemManager.enableMemoryManagement)
 	{
 		classifiedPosByteSize = vboMemManager.getClassifiedBufferSize(arrayElemsCount);
@@ -136,15 +136,15 @@ VboBuffer.getGlTypeOfArray = function(dataArray)
 {
 	var glType = -1;
 	if (dataArray.constructor === Float32Array)
-	{ glType = 5126; } // gl.FLOAT.***
+	{ glType = 5126; } // gl.FLOAT.
 	else if (dataArray.constructor === Int16Array)
-	{ glType = 5122; } // gl.SHORT.***
+	{ glType = 5122; } // gl.SHORT.
 	else if (dataArray.constructor === Uint16Array)
-	{ glType = 5123; } // gl.UNSIGNED_SHORT.***
+	{ glType = 5123; } // gl.UNSIGNED_SHORT.
 	else if (dataArray.constructor === Int8Array)
-	{ glType = 5120; } // gl.BYTE.***
+	{ glType = 5120; } // gl.BYTE.
 	else if (dataArray.constructor === Uint8Array)
-	{ glType = 5121; } // gl.UNSIGNED_BYTE.***
+	{ glType = 5121; } // gl.UNSIGNED_BYTE.
 	
 	return glType;
 };
@@ -155,15 +155,15 @@ VboBuffer.getGlTypeOfArray = function(dataArray)
 VboBuffer.newTypedArray = function(arrayLength, glType) 
 {
 	var typedArray;
-	if (glType === 5126)// gl.FLOAT.***
+	if (glType === 5126)// gl.FLOAT.
 	{ typedArray = new Float32Array(arrayLength); }
-	else if (glType === 5122)// gl.SHORT.***
+	else if (glType === 5122)// gl.SHORT.
 	{ typedArray = new Int16Array(arrayLength); }
-	else if (glType === 5123)// gl.UNSIGNED_SHORT.***
+	else if (glType === 5123)// gl.UNSIGNED_SHORT.
 	{ typedArray = new Uint16Array(arrayLength); }
-	else if (glType === 5120)// gl.BYTE.***
+	else if (glType === 5120)// gl.BYTE.
 	{ typedArray = new Int8Array(arrayLength); }
-	else if (glType === 5121)// gl.UNSIGNED_BYTE.***
+	else if (glType === 5121)// gl.UNSIGNED_BYTE.
 	{ typedArray = new Uint8Array(arrayLength); }
 		
 	return typedArray;

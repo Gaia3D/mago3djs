@@ -53,7 +53,7 @@ VtxSegment.prototype.setVertices = function(startVertex, endVertex)
  */
 VtxSegment.prototype.getDirection = function(resultDirection)
 {
-	// the direction is an unitary vector.***
+	// the direction is an unitary vector.
 	var resultDirection = this.getVector();
 	
 	if (resultDirection === undefined)
@@ -93,7 +93,7 @@ VtxSegment.prototype.getLine = function(resultLine)
 	if (resultLine === undefined)
 	{ resultLine = new Line(); }
 	
-	var dir = this.getDirection(); // unitary direction.***
+	var dir = this.getDirection(); // unitary direction.
 	var strPoint = this.startVertex.point3d;
 	resultLine.setPointAndDir(strPoint.x, strPoint.y, strPoint.z, dir.x, dir.y, dir.z);
 	return resultLine;
@@ -136,16 +136,16 @@ VtxSegment.prototype.getLength = function()
  */
 VtxSegment.prototype.intersectionWithPoint = function(point, error)
 {
-	// check if the point intersects the vtxSegment's line.***
+	// check if the point intersects the vtxSegment's line.
 	var line = this.getLine();
 	
 	if (error === undefined)
 	{ error = 10E-8; }
 	
 	if (!line.isCoincidentPoint(point, error))
-	{ return Constant.INTERSECTION_OUTSIDE; } // no intersection.***
+	{ return Constant.INTERSECTION_OUTSIDE; } // no intersection.
 	
-	// now, check if is inside of the segment or if is coincident with any vertex of segment.***
+	// now, check if is inside of the segment or if is coincident with any vertex of segment.
 	var distA = this.startVertex.point3d.distToPoint(point);
 	var distB = this.endVertex.point3d.distToPoint(point);
 	var distTotal = this.getLength();

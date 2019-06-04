@@ -115,7 +115,7 @@ TrianglesList.assignVerticesIdx = function(trianglesArray)
  */
 TrianglesList.getTrianglesIndicesArray = function(trianglesArray, indicesArray) 
 {
-	// 1rst, calculate indices count.***
+	// 1rst, calculate indices count.
 	var trianglesCount = trianglesArray.length;
 	var indicesCount = trianglesCount * 3;
 	
@@ -155,7 +155,7 @@ TrianglesList.getNoRepeatedVerticesArray = function(trianglesArray, resultVertic
 	if (resultVerticesArray === undefined)
 	{ resultVerticesArray = []; }
 	
-	// 1rst, assign vertexIdxInList for all used vertives.***
+	// 1rst, assign vertexIdxInList for all used vertives.
 	var trianglesCount = trianglesArray.length;
 	var triangle;
 	var idxAux = 0;
@@ -175,7 +175,7 @@ TrianglesList.getNoRepeatedVerticesArray = function(trianglesArray, resultVertic
 		idxAux++;
 	}
 	
-	// now, make a map of unique vertices map using "idxInList" of vertices.***
+	// now, make a map of unique vertices map using "idxInList" of vertices.
 	var verticesMap = {};
 	for (var i=0; i<trianglesCount; i++)
 	{
@@ -189,7 +189,7 @@ TrianglesList.getNoRepeatedVerticesArray = function(trianglesArray, resultVertic
 		verticesMap[vtx_2.getIdxInList().toString()] = vtx_2;
 	}
 	
-	// finally make the unique vertices array.***
+	// finally make the unique vertices array.
 	var vertex;
 	for (var key in verticesMap)
 	{

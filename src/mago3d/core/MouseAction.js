@@ -151,10 +151,10 @@ MouseAction.prototype.claculateStartPositionsAux = function(magoManager)
 {
 	var strLinDepth = this.strLinealDepth;
 					
-	// calculate the strWorldPos.***
+	// calculate the strWorldPos.
 	var frustumFar = 100000000.0;
 	var strRealDepth = strLinDepth*frustumFar;
-	// now, find the 3d position of the pixel in camCoord.****
+	// now, find the 3d position of the pixel in camCoord.*
 	magoManager.resultRaySC = magoManager.getRayCamSpace(this.strX, this.strY, magoManager.resultRaySC);
 	var strCamPos = new Point3D();
 	strCamPos.set(magoManager.resultRaySC[0] * strRealDepth, magoManager.resultRaySC[1] * strRealDepth, magoManager.resultRaySC[2] * strRealDepth);
@@ -170,7 +170,7 @@ MouseAction.prototype.saveCurrentToStart = function()
 	this.strX = this.curX;
 	this.strY = this.curY;
 	
-	// world point.***
+	// world point.
 	if (this.strWorldPoint === undefined)
 	{ this.strWorldPoint = new Point3D(); }
 	
@@ -179,7 +179,7 @@ MouseAction.prototype.saveCurrentToStart = function()
 		this.strWorldPoint.copyFrom(this.curWorldPoint);
 	}
 	
-	// camCoord point.***
+	// camCoord point.
 	if (this.strCamCoordPoint === undefined)
 	{ this.strCamCoordPoint = new Point3D(); }
 	

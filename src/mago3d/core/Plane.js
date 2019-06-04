@@ -12,7 +12,7 @@ var Plane = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	// ax+by+cz+d = 0 plane.***
+	// ax+by+cz+d = 0 plane.
 	this.a = 0.0;
 	this.b = 0.0;
 	this.c = 0.0;
@@ -81,34 +81,34 @@ Plane.prototype.getNormal = function(resultNormal)
  */
 Plane.prototype.getRotationMatrix = function(resultTMatrix) 
 {
-	// The initial normal is (0, 0, 1), & the planeNormal is the transformed normal, so, calculate the rotationMatrix.***
+	// The initial normal is (0, 0, 1), & the planeNormal is the transformed normal, so, calculate the rotationMatrix.
 	var initialNormal = new Point3D(0.0, 0.0, 1.0);
 	var transformedNormal = this.getNormal(undefined);
 	
-	// Calculate rotation axis. CrossProduct between initialNormal and the transformedNormal.***
-	// Check if the "initialNormal & the transformedNormal are parallels.***
+	// Calculate rotation axis. CrossProduct between initialNormal and the transformedNormal.
+	// Check if the "initialNormal & the transformedNormal are parallels.
 	var radError = 10E-10;
 	var relativeOrientation = initialNormal.getRelativeOrientationToVector(transformedNormal, radError);
-	// relativeOrientation = 0 -> // there are parallels & the same sense.***
-	// relativeOrientation = 1 -> // there are parallels & opposite sense.***
-	// relativeOrientation = 2 -> // there are NO parallels.***
-	var matrixAux = glMatrix.mat4.create(); // creates as identityMatrix.***
+	// relativeOrientation = 0 -> // there are parallels & the same sense.
+	// relativeOrientation = 1 -> // there are parallels & opposite sense.
+	// relativeOrientation = 2 -> // there are NO parallels.
+	var matrixAux = glMatrix.mat4.create(); // creates as identityMatrix.
 	if (relativeOrientation === 0)
 	{
-		// there are parallels & the same sense.***
-		// In this case, the resultMatrix is a identityMatrix, so do nothing.***
+		// there are parallels & the same sense.
+		// In this case, the resultMatrix is a identityMatrix, so do nothing.
 	}
 	else if (relativeOrientation === 1)
 	{
-		// there are parallels & opposite sense.***
-		// Rotate 180 degree in xAxis.***
+		// there are parallels & opposite sense.
+		// Rotate 180 degree in xAxis.
 		var identityMat = glMatrix.mat4.create();
 		matrixAux = glMatrix.mat4.rotateX(matrixAux, identityMat, Math.PI);
 	}
 	else if (relativeOrientation === 2)
 	{
-		// there are NO parallels.***
-		// Calculate rotation axis. CrossProduct between initialNormal and the transformedNormal.***
+		// there are NO parallels.
+		// Calculate rotation axis. CrossProduct between initialNormal and the transformedNormal.
 		var rotAxis = initialNormal.crossProduct(transformedNormal, undefined);
 		rotAxis.unitary();
 		var angRad = initialNormal.angleRadToVector(transformedNormal);
@@ -116,7 +116,7 @@ Plane.prototype.getRotationMatrix = function(resultTMatrix)
 		var quaternion = quat.create();
 		quaternion = quat.setAxisAngle(quaternion, axis, angRad);
 		
-		// Now, make matrix4 from quaternion.***
+		// Now, make matrix4 from quaternion.
 		var identityMat = glMatrix.mat4.create();
 		matrixAux = glMatrix.mat4.fromQuat(identityMat, quaternion);
 	}
@@ -169,9 +169,9 @@ Plane.prototype.intersectionSphere = function(sphere)
 	
 	var sphereCenter = sphere.centerPoint;
 	
-	// calculate the distance by dotProduct.***
+	// calculate the distance by dotProduct.
 	// sphere centerPoint = (x1, y1, z1), distance = |ax1 + by1 + cz1 + d|/sqrt(a*a +b*b + c*c*).
-	// note: the module sqrt(a*a +b*b + c*c*) = 1, so no necessary divide distance by module.***
+	// note: the module sqrt(a*a +b*b + c*c*) = 1, so no necessary divide distance by module.
 	var distance = sphereCenter.x * this.a + sphereCenter.y * this.b + sphereCenter.z * this.c + this.d;
 
 	if (distance < -sphere.r)

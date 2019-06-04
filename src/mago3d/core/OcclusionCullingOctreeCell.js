@@ -19,7 +19,7 @@ var OcclusionCullingOctreeCell = function(occlusionCullingOctree_Cell_Owner)
 	this.maxY = 0.0;
 	this.minZ = 0.0;
 	this.maxZ = 0.0;
-	this._indicesArray = []; // Visible objects indices.***
+	this._indicesArray = []; // Visible objects indices.
 	this._subBoxesArray = [];
 	this.modelReferencedGroupsList; // undefined initially.
 };
@@ -167,7 +167,7 @@ OcclusionCullingOctreeCell.prototype.getIntersectedSubBoxByPoint3D = function(x,
 {
 	if (this._ocCulling_Cell_owner === undefined) 
 	{
-		// This is the mother_cell.***
+		// This is the mother_cell.
 		if (!this.intersectsWithPoint3D(x, y, z)) 
 		{
 			return undefined;
@@ -186,32 +186,32 @@ OcclusionCullingOctreeCell.prototype.getIntersectedSubBoxByPoint3D = function(x,
 		var intersectedSubBox_idx;
 		if (x<center_x) 
 		{
-			// Here are the boxes number 0, 3, 4, 7.***
+			// Here are the boxes number 0, 3, 4, 7.
 			if (y<center_y) 
 			{
-				// Here are 0, 4.***
+				// Here are 0, 4.
 				if (z<center_z) { intersectedSubBox_idx = 0; }
 				else { intersectedSubBox_idx = 4; }
 			}
 			else 
 			{
-				// Here are 3, 7.***
+				// Here are 3, 7.
 				if (z<center_z) { intersectedSubBox_idx = 3; }
 				else { intersectedSubBox_idx = 7; }
 			}
 		}
 		else 
 		{
-			// Here are the boxes number 1, 2, 5, 6.***
+			// Here are the boxes number 1, 2, 5, 6.
 			if (y<center_y) 
 			{
-				// Here are 1, 5.***
+				// Here are 1, 5.
 				if (z<center_z) { intersectedSubBox_idx = 1; }
 				else { intersectedSubBox_idx = 5; }
 			}
 			else 
 			{
-				// Here are 2, 6.***
+				// Here are 2, 6.
 				if (z<center_z) { intersectedSubBox_idx = 2; }
 				else { intersectedSubBox_idx = 6; }
 			}
@@ -276,13 +276,13 @@ OcclusionCullingOctreeCell.prototype.expandBox = function(expansionDist)
  */
 OcclusionCullingOctreeCell.prototype.parseArrayBuffer = function(arrayBuffer, bytes_readed, f4dReaderWriter) 
 {
-	// Important note: this is the version of neoGeometry.***
-	// Important note: this is the version of neoGeometry.***
-	// Important note: this is the version of neoGeometry.***
+	// Important note: this is the version of neoGeometry.
+	// Important note: this is the version of neoGeometry.
+	// Important note: this is the version of neoGeometry.
 	var is_mother_cell = f4dReaderWriter.readInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 	if (is_mother_cell) 
 	{
-		// read the mother dimensions.***
+		// read the mother dimensions.
 		var minX = f4dReaderWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		var maxX = f4dReaderWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		var minY = f4dReaderWriter.readFloat32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;

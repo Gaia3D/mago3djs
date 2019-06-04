@@ -175,7 +175,7 @@ VtxRing.prototype.transformPointsByMatrix4 = function(tMat4)
  */
 VtxRing.prototype.getProjectedPolyLineBasedRing2D = function(resultRing2d, normal)
 {
-	// This function returns a ring2d made by polylines2d.***
+	// This function returns a ring2d made by polylines2d.
 	if (this.vertexList === undefined)
 	{ return resultRing2d; }
 	
@@ -217,7 +217,7 @@ VtxRing.prototype.makeByPoints3DArray = function(point3dArray)
  */
 VtxRing.prototype.updateByPoints3DArray = function(point3dArray)
 {
-	// Note: point3dCount must be equal to this.verticesCount.***
+	// Note: point3dCount must be equal to this.verticesCount.
 	if (point3dArray === undefined)
 	{ return; }
 	
@@ -230,7 +230,7 @@ VtxRing.prototype.updateByPoints3DArray = function(point3dArray)
 	var points3dCount = point3dArray.length;
 	for (var i=0; i<points3dCount; i++)
 	{
-		point3d = point3dArray[i]; // the original point3d.***
+		point3d = point3dArray[i]; // the original point3d.
 		vertex = this.vertexList.getVertex(i);
 		if (vertex === undefined)
 		{ vertex = this.vertexList.newVertex(); }
@@ -243,7 +243,7 @@ VtxRing.prototype.updateByPoints3DArray = function(point3dArray)
 	
 	this.vertexList.copyFromPoint3DArray(point3dArray);
 	
-	// Do no modify elementsIndexRanges.***
+	// Do no modify elementsIndexRanges.
 	//this.calculateElementsIndicesRange();
 };
 
@@ -270,7 +270,7 @@ VtxRing.prototype.makeByPoint2DList = function(point2dList, z)
 
 /**
  * calculate plane normal.
- * Note: this ring must be planar (or almost planar).***
+ * Note: this ring must be planar (or almost planar).
  * @param {Point3D} resultPlaneNormal not use.
  * @return {Point3D} planeNormal
  * @see Face#calculatePlaneNormal
@@ -289,7 +289,7 @@ VtxRing.prototype.calculateElementsIndicesRange = function()
 	if (this.vertexList === undefined)
 	{ return false; }
 
-	// 1rst, delete all existent indexRanges.***
+	// 1rst, delete all existent indexRanges.
 	this.deleteElementIndexRanges();
 	this.elemsIndexRangesArray = [];
 	

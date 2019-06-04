@@ -29,23 +29,23 @@ VBOVertexIdxCacheKey.prototype.stepOverPosNorIdx = function(arrayBuffer, readWri
 {
 	var startBuff, endBuff;
 	
-	// 1) Positions array.***
+	// 1) Positions array.
 	var vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 	bytesReaded += 4;
 	var verticesFloatValuesCount = vertexCount * 3;
 	startBuff = bytesReaded;
 	endBuff = bytesReaded + 4 * verticesFloatValuesCount;
-	bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
+	bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.
 	
-	// 2) Normals.***
+	// 2) Normals.
 	vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 	bytesReaded += 4;
 	var normalByteValuesCount = vertexCount * 3;
 	startBuff = bytesReaded;
 	endBuff = bytesReaded + 1 * normalByteValuesCount;
-	bytesReaded = bytesReaded + 1 * normalByteValuesCount; // updating data.***
+	bytesReaded = bytesReaded + 1 * normalByteValuesCount; // updating data.
 	
-	// 3) Indices.***
+	// 3) Indices.
 	var shortIndicesValuesCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 
 	bytesReaded += 4;
@@ -70,7 +70,7 @@ VBOVertexIdxCacheKey.prototype.stepOverPosNorIdx = function(arrayBuffer, readWri
 	//var idxDataArray = new Uint16Array(arrayBuffer.slice(startBuff, endBuff));
 	//this.setDataArrayIdx(idxDataArray, vboMemManager);
 
-	bytesReaded = bytesReaded + 2 * shortIndicesValuesCount; // updating data.***
+	bytesReaded = bytesReaded + 2 * shortIndicesValuesCount; // updating data.
 	return bytesReaded;
 };
 
@@ -81,7 +81,7 @@ VBOVertexIdxCacheKey.prototype.readPosNorIdx = function(arrayBuffer, readWriter,
 {
 	var startBuff, endBuff;
 	
-	// 1) Positions array.***
+	// 1) Positions array.
 	var vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 	this.vertexCount = vertexCount;
 	bytesReaded += 4;
@@ -92,9 +92,9 @@ VBOVertexIdxCacheKey.prototype.readPosNorIdx = function(arrayBuffer, readWriter,
 	var posDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
 	this.setDataArrayPos(posDataArray, vboMemManager);
 
-	bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.***
+	bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.
 	
-	// 2) Normals.***
+	// 2) Normals.
 	vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 	bytesReaded += 4;
 	var normalByteValuesCount = vertexCount * 3;
@@ -103,9 +103,9 @@ VBOVertexIdxCacheKey.prototype.readPosNorIdx = function(arrayBuffer, readWriter,
 	var norDataArray = new Int8Array(arrayBuffer.slice(startBuff, endBuff));
 	this.setDataArrayNor(norDataArray, vboMemManager);
 	
-	bytesReaded = bytesReaded + 1 * normalByteValuesCount; // updating data.***
+	bytesReaded = bytesReaded + 1 * normalByteValuesCount; // updating data.
 	
-	// 3) Indices.***
+	// 3) Indices.
 	var shortIndicesValuesCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 
 	bytesReaded += 4;
@@ -130,7 +130,7 @@ VBOVertexIdxCacheKey.prototype.readPosNorIdx = function(arrayBuffer, readWriter,
 	var idxDataArray = new Uint16Array(arrayBuffer.slice(startBuff, endBuff));
 	this.setDataArrayIdx(idxDataArray, vboMemManager);
 
-	bytesReaded = bytesReaded + 2 * shortIndicesValuesCount; // updating data.***
+	bytesReaded = bytesReaded + 2 * shortIndicesValuesCount; // updating data.
 	return bytesReaded;
 };
 
@@ -174,7 +174,7 @@ VBOVertexIdxCacheKey.prototype.bindDataNormal = function(shader, vboMemManager)
 	if (vboBufferNor === undefined)
 	{
 		shader.disableVertexAttribArray(shader.normal3_loc);
-		return true; // Return "true" bcos there are no "normal" data, that is different that having "normal" data and not prepared yet.***
+		return true; // Return "true" bcos there are no "normal" data, that is different that having "normal" data and not prepared yet.
 	}
 	
 	var gl = shader.gl;
@@ -208,7 +208,7 @@ VBOVertexIdxCacheKey.prototype.bindDataTexCoord = function(shader, vboMemManager
 	if (vboBufferTCoord === undefined)
 	{
 		shader.disableVertexAttribArray(shader.texCoord2_loc);
-		return true; // Return "true" bcos there are no "tCoord" data, that is different that having "tCoord" data and not prepared yet.***
+		return true; // Return "true" bcos there are no "tCoord" data, that is different that having "tCoord" data and not prepared yet.
 	}
 	
 	var gl = shader.gl;
@@ -240,7 +240,7 @@ VBOVertexIdxCacheKey.prototype.bindDataColor = function(shader, vboMemManager)
 	if (vboBufferCol === undefined)
 	{
 		shader.disableVertexAttribArray(shader.color4_loc);
-		return true; // Return "true" bcos there are no "color" data, that is different that having "color" data and not prepared yet.***
+		return true; // Return "true" bcos there are no "color" data, that is different that having "color" data and not prepared yet.
 	}
 	
 	var gl = shader.gl;
