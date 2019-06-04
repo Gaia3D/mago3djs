@@ -7,7 +7,7 @@
  */
 var Profiles2DList = function() 
 {
-	// Class no used.***
+	// Class no used.
 	if (!(this instanceof Profiles2DList)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);

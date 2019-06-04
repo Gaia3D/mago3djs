@@ -15,7 +15,7 @@ var Point2D = function(x, y)
 	if (y) { this.y = y; }
 	else { this.y = 0.0; }
 	
-	this.ownerVertex3d; // Aux var.*** This will be used for this : this Point2D is the projected ownerVertex3d into 2D
+	this.ownerVertex3d; // Aux var. This will be used for this : this Point2D is the projected ownerVertex3d into 2D
 	
 	/**associated this property will be used to save topologic information */
 	this.associated;
@@ -36,7 +36,7 @@ Point2D.prototype.deleteObjects = function()
  */
 Point2D.prototype.setAssociated = function(associated) 
 {
-	// aux test.***
+	// aux test.
 	this.associated.x = associated.x;
 	this.associated.y = associated.y;
 };
@@ -47,7 +47,7 @@ Point2D.prototype.setAssociated = function(associated)
  */
 Point2D.prototype.getAssociated = function() 
 {
-	// aux test.***
+	// aux test.
 	return this.associated;	
 };
 
@@ -153,8 +153,8 @@ Point2D.prototype.isCoincidentToPoint = function(point, errorDist)
 
 /**
  * @param {Point2D} targetPoint this returns a vector that points to "targetPoint" from "this" 
- * @param resultVector the "resultVector" has the direction from "this" to "targetPoint", but is NOT normalized.
- * @returns resultVector
+ * @param {Point3D} resultVector the "resultVector" has the direction from "this" to "targetPoint", but is NOT normalized.
+ * @returns {Point3D} resultVector
  */
 Point2D.prototype.getVectorToPoint = function(targetPoint, resultVector) 
 {
@@ -200,12 +200,12 @@ Point2D.prototype.angleRadToVector = function(vector)
 	if (vector === undefined)
 	{ return undefined; }
 	
-	//******************************************************
+	//
 	//var scalarProd = this.scalarProduct(vector);
 	var myModul = this.getModul();
 	var vecModul = vector.getModul();
 	
-	// calcule by cos.***
+	// calcule by cos.
 	//var cosAlfa = scalarProd / (myModul * vecModul); 
 	//var angRad = Math.acos(cosAlfa);
 	//var angDeg = alfa * 180.0/Math.PI;
