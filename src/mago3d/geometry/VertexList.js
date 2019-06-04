@@ -28,7 +28,7 @@ var VertexList = function()
  * @static
  * @param {Number} idx index must bigger than 0, less than vertexArray length.
  * @param {Array.<Vertex>} vertexArray
- * @return {Number} prevIdx. if idx is 0, return vertexArray.length - 1.
+ * @returns {Number} prevIdx. if idx is 0, return vertexArray.length - 1.
  */
 VertexList.getPrevIdx = function(idx, vertexArray)
 {
@@ -52,7 +52,7 @@ VertexList.getPrevIdx = function(idx, vertexArray)
  * @static
  * @param {Number} idx index must bigger than 0, less than vertexArray length.
  * @param {Array.<Vertex>} vertexArray
- * @return {Number} nextIdx. if idx is equal vertexArray.length - 1, return 0.
+ * @returns {Number} nextIdx. if idx is equal vertexArray.length - 1, return 0.
  */
 VertexList.getNextIdx = function(idx, vertexArray)
 {
@@ -77,7 +77,7 @@ VertexList.getNextIdx = function(idx, vertexArray)
  * @param {Number} idx index
  * @param {Array.<Vertex>} vertexArray
  * @param {VtxSegment} resultVtxSegment if resultVtxSegment is undefined, resultVtxSegment set new VtxSegemnt instance.
- * @return {VtxSegment} resultVtxSegment
+ * @returns {VtxSegment} resultVtxSegment
  */
 VertexList.getVtxSegment = function(idx, vertexArray, resultVtxSegment)
 {
@@ -101,7 +101,7 @@ VertexList.getVtxSegment = function(idx, vertexArray, resultVtxSegment)
  * @param {Number} idx index
  * @param {Array.<Vertex>} vertexArray
  * @param {Point3D} resultVector if resultVector is undefined, resultVector set new Point3D instance.
- * @return {Point3D} resultVector
+ * @returns {Point3D} resultVector
  */
 VertexList.getVector = function(idx, vertexArray, resultVector)
 {
@@ -128,7 +128,7 @@ VertexList.getVector = function(idx, vertexArray, resultVector)
  * @param {Number} idx index
  * @param {Array.<Vertex>} vertexArray
  * @param {Point3D} resultDir point3d unitary.
- * @return {Point3D} 
+ * @returns {Point3D} 
  */
 VertexList.getDirection = function(idx, vertexArray, resultDir)
 {
@@ -144,7 +144,7 @@ VertexList.getDirection = function(idx, vertexArray, resultDir)
  * @param {Number} idx index
  * @param {Array.<Vertex>} vertexArray
  * @param {Point3D} resultCrossProduct
- * @return {Point3D} 
+ * @returns {Point3D} 
  */
 VertexList.getCrossProduct = function(idx, vertexArray, resultCrossProduct)
 {
@@ -163,7 +163,7 @@ VertexList.getCrossProduct = function(idx, vertexArray, resultCrossProduct)
  * @param {Plane} plane. 
  * @param {Point3D} projectionDirection projectionDirection must be unitary.
  * @param {VertexList} resultVertexList if resultVertexList is undefined, resultVector set new VertexList instance.
- * @return {VertexList} 
+ * @returns {VertexList} 
  * 
  * @see Vertex#getProjectedOntoPlane
  */
@@ -193,7 +193,7 @@ VertexList.getProjectedOntoPlane = function(vertexList, plane, projectionDirecti
  * @param {Array.<Vertex>} vertexArray if vertexArray is undefined, return resultPoints2dArray
  * @param {Point3D} normal. 
  * @param {Array.<Point2D>} resultPoints2dArray array.
- * @return {Array.<Point2D>} resultPoints2dArray
+ * @returns {Array.<Point2D>} resultPoints2dArray
  */
 VertexList.getProjectedPoints2DArray = function(vertexArray, normal, resultPoints2dArray)
 {
@@ -254,9 +254,6 @@ VertexList.getProjectedPoints2DArray = function(vertexArray, normal, resultPoint
 			resultPoints2dArray.push(point2d);
 		}
 	}
-	
-	if (resultPoints2dArray.length === 0)
-	{ var hola = 0; }
 	
 	return resultPoints2dArray;
 };
@@ -370,7 +367,7 @@ VertexList.prototype.setNormal = function(nx, ny, nz)
 
 /**
  * add vertex and return.
- * @return {Vertex}
+ * @returns {Vertex}
  */
 VertexList.prototype.newVertex = function() 
 {
@@ -535,7 +532,7 @@ VertexList.setIdxInList = function(vertexArray)
  * @deprecated only used static method.
  * @param {VBOVertexIdxCacheKey} resultVbo.
  * @param {VBOMemoryManager} vboMemManager.
- * @return {VBOVertexIdxCacheKey}
+ * @returns {VBOVertexIdxCacheKey}
  * 
  * @see VertexList#getVboDataArrays
  */
@@ -551,7 +548,7 @@ VertexList.prototype.getVboDataArrays = function(resultVbo, vboMemManager)
  * @param {VertexList} vertexArray if this length 0, return argument resultVbo.
  * @param {VBOVertexIdxCacheKey} resultVbo. if this is undefined, set new VBOVertexIdxCacheKey Instance.
  * @param {VBOMemoryManager} vboMemManager.
- * @return {VBOVertexIdxCacheKey}
+ * @returns {VBOVertexIdxCacheKey}
  * 
  * @see VBOManager
  */

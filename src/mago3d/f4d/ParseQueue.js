@@ -358,24 +358,16 @@ ParseQueue.prototype.parseArrayOctreesLod0Models = function(gl, octreesArray, ma
 			// Temp code.******************************************
 			neoBuilding = lowestOctree.neoBuildingOwner;
 			headerVersion = neoBuilding.getHeaderVersion();
-			
-			if (neoBuilding.buildingId === "KSJ_100")
-			{ var hola = 0; }
 			// End temp code.---------------------------------------
 			
 			if (this.eraseOctreeLod0ModelsToParse(lowestOctree))
 			{
-				if (neoBuilding.buildingId === "KSJ_100")
-				{ var hola = 0; }
-			
 				if (lowestOctree.neoReferencesMotherAndIndices === undefined)
 				{ continue; }
 				
 				var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
 				if (blocksList === undefined)
 				{ continue; }
-				
-				
 				
 				neoBuilding = lowestOctree.neoBuildingOwner;
 				headerVersion = neoBuilding.getHeaderVersion();

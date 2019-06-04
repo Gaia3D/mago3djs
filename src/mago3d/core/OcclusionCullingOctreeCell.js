@@ -1,4 +1,5 @@
 'use strict';
+
 /**
  * 어떤 일을 하고 있습니까?
  * @class
@@ -301,9 +302,6 @@ OcclusionCullingOctreeCell.prototype.parseArrayBuffer = function(arrayBuffer, by
 		for (var i=0; i<objects_count; i++) 
 		{
 			var objects_idxInList = f4dReaderWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			if (objects_idxInList < 0)
-			{ var hola = 0; }
-			
 			this._indicesArray.push(objects_idxInList);
 		}
 	}

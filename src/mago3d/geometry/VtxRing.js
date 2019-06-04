@@ -64,7 +64,7 @@ VtxRing.prototype.deleteElementIndexRanges = function()
 
 /**
  * add new index range and return.
- * @return {IndexRange}
+ * @returns {IndexRange}
  */
 VtxRing.prototype.newElementIndexRange = function()
 {
@@ -79,7 +79,7 @@ VtxRing.prototype.newElementIndexRange = function()
 /**
  * get IndexRange
  * @param {number}
- * @return {IndexRange|undefined}
+ * @returns {IndexRange|undefined}
  */
 VtxRing.prototype.getElementIndexRange = function(idx)
 {
@@ -92,7 +92,7 @@ VtxRing.prototype.getElementIndexRange = function(idx)
 /**
  * get all vertex. 
  * @param {Array} resultVerticesArray
- * @return {Array.<Vertex>|undefined} if this.vertexList is undefined or this.vertexList.vertexArray is undefined, return resultVerticesArray.
+ * @returns {Array.<Vertex>|undefined} if this.vertexList is undefined or this.vertexList.vertexArray is undefined, return resultVerticesArray.
  */
 VtxRing.prototype.getAllVertices = function(resultVerticesArray)
 {
@@ -169,7 +169,7 @@ VtxRing.prototype.transformPointsByMatrix4 = function(tMat4)
  * get projected poly line. this line based ring2d.
  * @param {Ring2D|undefined} resultRing2d if undefined, set new Ring2D instance.
  * @param {Point3D} normal
- * @return {Ring2D}
+ * @returns {Ring2D}
  * 
  * @see VertexList#getProjectedPoints2DArray
  */
@@ -272,7 +272,7 @@ VtxRing.prototype.makeByPoint2DList = function(point2dList, z)
  * calculate plane normal.
  * Note: this ring must be planar (or almost planar).
  * @param {Point3D} resultPlaneNormal not use.
- * @return {Point3D} planeNormal
+ * @returns {Point3D} planeNormal
  * @see Face#calculatePlaneNormal
  */
 VtxRing.prototype.calculatePlaneNormal = function(resultPlaneNormal)
@@ -334,7 +334,7 @@ VtxRing.prototype.calculateElementsIndicesRange = function()
  * @param {Plane} plane. 
  * @param {Point3D} projectionDirection projectionDirection must be unitary.
  * @param {VtxRing} resultVtxRing Optional. if undefined, set new VtxRing instance.
- * @return {VtxRing} resultVertex
+ * @returns {VtxRing} resultVertex
  */
 VtxRing.getProjectedOntoPlane = function(vtxRing, plane, projectionDirection, resultVtxRing)
 {

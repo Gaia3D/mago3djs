@@ -131,7 +131,7 @@ Camera.prototype.getCameraRight = function()
  * Transforms the vector "point" by given matrix4
  * @param point
  * @param {Mat4} mat
- * @return {Vec3} 
+ * @returns {Vec3} 
  */
 Camera.prototype.transformPoint3DByMatrix4 = function(point, mat)
 {
@@ -147,7 +147,7 @@ Camera.prototype.transformPoint3DByMatrix4 = function(point, mat)
  * Transforms the vector "point" by given matrix4
  * @param point
  * @param {Mat3} mat
- * @return {Vec3} 
+ * @returns {Vec3} 
  */
 Camera.prototype.rotatePoint3DByMatrix3 = function(point, mat)
 {
@@ -189,7 +189,7 @@ Camera.prototype.getDirty = function()
  * @param {Number} newUpX
  * @param {Number} newUpY
  * @param {Number} newUpZ
- * @return {Boolean} 
+ * @returns {Boolean} 
  * 
  */
 Camera.prototype.isCameraMoved = function(newPosX, newPosY, newPosZ, newDirX, newDirY, newDirZ, newUpX, newUpY, newUpZ )

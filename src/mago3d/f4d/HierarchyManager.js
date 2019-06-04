@@ -53,7 +53,7 @@ HierarchyManager.prototype.deleteNodes = function(gl, vboMemoryManager)
 
 /**
  * StaticModelsManager 반환
- * @return {StaticModelsManager} 선언된 StaticModelsManager가 없을 시 인스턴스 생성하여 등록 후 반환.
+ * @returns {StaticModelsManager} 선언된 StaticModelsManager가 없을 시 인스턴스 생성하여 등록 후 반환.
  */
 HierarchyManager.prototype.getStaticModelsManager = function() 
 {
@@ -69,7 +69,7 @@ HierarchyManager.prototype.getStaticModelsManager = function()
  * @param {String} dataName attribute 이름, 보통 nodeId 사용.
  * @param {String} dataNameValue attribute 값
  * 
- * @return {Node}
+ * @returns {Node}
  */
 HierarchyManager.prototype.getNodeByDataName = function(projectId, dataName, dataNameValue) 
 {
@@ -103,7 +103,7 @@ HierarchyManager.prototype.getNodeByDataName = function(projectId, dataName, dat
  * @param {String} projectId
  * @param {String} dataKey
  * 
- * @return {Node|undefined} nodesMap이 선언되지 않았을 경우 undefined반환.
+ * @returns {Node|undefined} nodesMap이 선언되지 않았을 경우 undefined반환.
  */
 HierarchyManager.prototype.getNodeByDataKey = function(projectId, dataKey) 
 {
@@ -120,7 +120,7 @@ HierarchyManager.prototype.getNodeByDataKey = function(projectId, dataKey)
 /**
  * node의 parent 속성이 비어있는 root node들을 반환.
  * @param {Array.<Node>} resultRootNodesArray
- * @return {Array.<Node>}
+ * @returns {Array.<Node>}
  */
 HierarchyManager.prototype.getRootNodes = function(resultRootNodesArray) 
 {
@@ -145,7 +145,7 @@ HierarchyManager.prototype.getRootNodes = function(resultRootNodesArray)
 /**
  * 넘겨받은 projectId에 해당하는 project가 projectMap에 등록되있는지 유무 반환.
  * @param {String} projectId
- * @return {Boolean}
+ * @returns {Boolean}
  */
 HierarchyManager.prototype.existProject = function(projectId) 
 {
@@ -156,7 +156,7 @@ HierarchyManager.prototype.existProject = function(projectId)
  * 넘겨받은 projectId에 해당하는 nodesMap을 반환.
  * @param {String} projectId
  * @param {Object} attributes undefined가 아닐 경우 해당 nodesMap에 등록.
- * @return {Object} projectId에 해당하는 nodesMap 없으면 생성 후 반환.
+ * @returns {Object} projectId에 해당하는 nodesMap 없으면 생성 후 반환.
  */
 HierarchyManager.prototype.getNodesMap = function(projectId, attributes) 
 {
@@ -183,7 +183,7 @@ HierarchyManager.prototype.getNodesMap = function(projectId, attributes)
  * @param {String} id datakey
  * @param {String} projectId
  * @param {Object} attributes undefined가 아닐 경우 해당 nodesMap에 등록.
- * @return {Node}
+ * @returns {Node}
  */
 HierarchyManager.prototype.newNode = function(id, projectId, attributes) 
 {

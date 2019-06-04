@@ -49,7 +49,7 @@ Segment3D.prototype.setPoints = function(strPoint3D, endPoint3D)
  * 시작 포인트에서 종료 포인트까지의 벡터를 구한다.
  *
  * @param {Point3D} result 벡터 결과값
- * @return {Point3D} 벡터 결과값
+ * @returns {Point3D} 벡터 결과값
  */
 Segment3D.prototype.getVector = function(result)
 {
@@ -71,7 +71,7 @@ Segment3D.prototype.getVector = function(result)
  * 선분의 방향값을 계산한다.
  *
  * @param {Point3D} result 선분이 나타내는 방향값
- * @return {Point3D} 선분이 나타내는 방향값
+ * @returns {Point3D} 선분이 나타내는 방향값
  */
 Segment3D.prototype.getDirection = function(result)
 {

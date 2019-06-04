@@ -54,7 +54,7 @@ Surface.prototype.deleteObjects = function()
 /**
  * 페이스 객체를 생성하고 배열에 추가한다.
  *
- * @return {Face} 새로 생성된 Face 객체
+ * @returns {Face} 새로 생성된 Face 객체
  * 
  * @see Face
  */
@@ -69,7 +69,7 @@ Surface.prototype.newFace = function()
 /**
  * Surface 가 가지고 있는 Face 의 총 개수를 구한다.
  *
- * @return {Number} 생성된 Face 의 총 개수
+ * @returns {Number} 생성된 Face 의 총 개수
  */
 Surface.prototype.getFacesCount = function()
 {
@@ -81,7 +81,7 @@ Surface.prototype.getFacesCount = function()
  * 주어진 인덱스값의 위치에 있는 Face 객체를 가져온다.
  *
  * @param {Number} index 검색하기 위한 인덱스값
- * @return {Face} 해당 Face
+ * @returns {Face} 해당 Face
  */
 Surface.prototype.getFace = function(index)
 {
@@ -124,7 +124,7 @@ Surface.prototype.addFacesArray = function(faces)
  * 전체 Face 에 대한 Frontier Half Edge 를 구한다.
  *
  * @param {HalfEdge[]} result Frontier Half Edges
- * @return {HalfEdge[]} Frontier Half Edges
+ * @returns {HalfEdge[]} Frontier Half Edges
  * 
  * @see HalfEdge
  */
@@ -146,7 +146,7 @@ Surface.prototype.getFrontierHalfEdges = function(result)
  * 전체 Face 에 대한 Half Edge 를 구한다.
  *
  * @param {HalfEdge[]} result Half Edges
- * @return {HalfEdge[]} Half Edges
+ * @returns {HalfEdge[]} Half Edges
  * 
  * @see HalfEdge
  */
@@ -168,7 +168,7 @@ Surface.prototype.getHalfEdges = function(result)
  * 현재 서피스 정보의 복사본을 제공한다.
  *
  * @param {Surface} result 서피스
- * @return {Surface}
+ * @returns {Surface}
  */
 Surface.prototype.getCopyIndependentSurface = function(result)
 {
@@ -232,7 +232,7 @@ Surface.prototype.getCopyIndependentSurface = function(result)
  * @param {Face} face 찾을 Face 대상
  * @param {Face[]} facesArray Face 배열
  * @param {Boolean} bIsRegularQuadGrid 정규쿼드격자 여부
- * @return {Boolean} 동일한 Face 존재 여부.
+ * @returns {Boolean} 동일한 Face 존재 여부.
  * 					 동일한 Face 가 존재하면 <code>true</code>
  * 					 동일한 Face 가 존재하지 않으면 <code>false</code>
  */
@@ -269,7 +269,7 @@ Surface.setTwinsFacesBetweenFaceAndFacesArrays = function(face, facesArray, bIsR
  *
  * @param {Face[]} facesA 비교할 Face 배열
  * @param {Face[]} facesB 비교할 Face 배열
- * @return {Boolean} 동일한 Face 존재 여부.
+ * @returns {Boolean} 동일한 Face 존재 여부.
  * 					 동일한 Face 가 존재하면 <code>true</code>
  * 					 동일한 Face 가 존재하지 않으면 <code>false</code>
  */
@@ -337,7 +337,7 @@ Surface.prototype.setTwinsFaces = function()
  * 전체 Face 로부터 반복되지 않는 버텍스 배열을 구한다.
  *
  * @param {Vertex[]} result 버텍스 배열 결과를 저장
- * @return {Vertex[]} 버텍스 배열
+ * @returns {Vertex[]} 버텍스 배열
  */
 Surface.prototype.getNoRepeatedVerticesArray = function(result)
 {
@@ -390,7 +390,7 @@ Surface.prototype.getNoRepeatedVerticesArray = function(result)
  * - To call this method, the faces must be convex.
  *
  * @param {Triangle[]} result  Face 배열로부터 생성한 삼각형 배열
- * @return {Triangle[]} Face 배열로부터 생성한 삼각형 배열
+ * @returns {Triangle[]} Face 배열로부터 생성한 삼각형 배열
  */
 Surface.prototype.getTrianglesConvex = function(result)
 {
@@ -410,7 +410,7 @@ Surface.prototype.getTrianglesConvex = function(result)
  * 전체 Face 에 대해 테슬레이트된 삼각형을 생성하고 배열로 제공한다.
  *
  * @param {Triangle[]} result  Face 배열로부터 생성한 삼각형 배열
- * @return {Triangle[]} Face 배열로부터 생성한 삼각형 배열
+ * @returns {Triangle[]} Face 배열로부터 생성한 삼각형 배열
  */
 Surface.prototype.getTriangles = function(result)
 {

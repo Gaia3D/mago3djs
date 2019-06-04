@@ -25,7 +25,7 @@ var Color = function()
  * Match gray scale to RGB scale
  * @param gray the percentage of the gray color. normalize the value from 0.0 to 1.0
  * @param {Color} resultColor
- * @return {Color} 
+ * @returns {Color} 
  */
 Color.grayToRGB_MagoStyle = function(gray, resultColor) 
 {
@@ -186,7 +186,7 @@ SelectionColor.prototype.getAvailableColor = function(resultColor)
  * @param {Number} r
  * @param {Number} g
  * @param {Number} b
- * @return Color code
+ * @returns Color code
  */
 SelectionColor.prototype.decodeColor3 = function(r, g, b) 
 {

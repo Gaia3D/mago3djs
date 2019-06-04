@@ -69,7 +69,7 @@ StaticModelsManager.prototype.addStaticModel = function(guid, staticModel)
  * 고유아이디를 가진 정적모델데이터를 가져온다.
  *
  * @param {String} guid 고유아이디
- * @return {StaticModel} 정적모델데이터
+ * @returns {StaticModel} 정적모델데이터
  */
 StaticModelsManager.prototype.getStaticModel = function(guid)
 {

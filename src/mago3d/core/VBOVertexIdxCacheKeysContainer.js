@@ -63,8 +63,8 @@ VBOVertexIdxCacheKeysContainer.prototype.getVbosCount = function()
 /**
  * Get the VBO key by the index
  * @param {Number} idx
- * @return {VBOVertexIdxCacheKey}
- *  */
+ * @returns {VBOVertexIdxCacheKey}
+ */
 VBOVertexIdxCacheKeysContainer.prototype.getVboKey = function(idx) 
 {
 	if (this.vboCacheKeysArray === undefined)

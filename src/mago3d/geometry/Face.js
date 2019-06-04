@@ -62,7 +62,7 @@ Face.prototype.deleteObjects = function()
 };
 /**
  * get vertex array length
- * @return {number} length of this vertexArray.
+ * @returns {number} length of this vertexArray.
  */
 Face.prototype.getVerticesCount = function()
 {
@@ -99,7 +99,7 @@ Face.prototype.addVerticesArray = function(verticesArray)
 /**
  * get vertex
  * @param {number} idx array index.
- * @return {Vertex|undefined}
+ * @returns {Vertex|undefined}
  */
 Face.prototype.getVertex = function(idx)
 {
@@ -137,7 +137,7 @@ Face.prototype.setColor = function(r, g, b, a)
 
 /**
  * get plane normal point. if this plane normal is undefined or not a number, calculate plane normal.
- * @return {Point3D} this plane normal point.
+ * @returns {Point3D} this plane normal point.
  */
 Face.prototype.getPlaneNormal = function()
 {
@@ -155,7 +155,7 @@ Face.prototype.getPlaneNormal = function()
  * @static
  * @param {Array.<Vertex>} vertexArray
  * @param {Point3D} resultPlaneNormal if this is undefined, set new Point3D instance.
- * @return {Point3D}
+ * @returns {Point3D}
  */
 Face.calculatePlaneNormal = function(vertexArray, resultPlaneNormal)
 {
@@ -200,7 +200,7 @@ Face.calculatePlaneNormal = function(vertexArray, resultPlaneNormal)
 
 /**
  * calculate plane normal and set this plane normal.
- * @return {Point3D} this plane normal point.
+ * @returns {Point3D} this plane normal point.
  * 
  * @see Face#calculatePlaneNormal
  */
@@ -213,7 +213,7 @@ Face.prototype.calculatePlaneNormal = function()
 
 /**
  * 각 버텍스들의 normal point를 face의 plane normal로 일괄 적용.
- * @param {boolean} bForceRecalculatePlaneNormal if true, force execute calculatePlaneNormal.
+ * @param {Boolean} bForceRecalculatePlaneNormal if true, force execute calculatePlaneNormal.
  * 
  * @see Face#calculatePlaneNormal
  */
@@ -274,7 +274,7 @@ Face.prototype.solveUroborus = function()
  * 표출하기 위해 최적의 plane 타입을 반환.
  * @static
  * @param {Point3D} normal
- * @return {Number} 0 : plane-xy, 1 : plane-yz, 2: plane-xz
+ * @returns {Number} 0 : plane-xy, 1 : plane-yz, 2: plane-xz
  */
 Face.getBestFacePlaneToProject = function(normal)
 {
@@ -306,7 +306,7 @@ Face.getBestFacePlaneToProject = function(normal)
  * @param {Array.<Vertex>} vertexArray
  * @param {Point3D} normal
  * @param {Polygon2D} resultProjectedPolygon2d
- * @return {Polygon2D}
+ * @returns {Polygon2D}
  */
 Face.getProjectedPolygon2D = function(vertexArray, normal, resultProjectedPolygon2d)
 {
@@ -327,7 +327,7 @@ Face.getProjectedPolygon2D = function(vertexArray, normal, resultProjectedPolygo
  * 오목 폴리곤들을 볼록 폴리곤들로 분리 후 반환.
  * concave to convex list.
  * @param {Array.<Triangle>} resultTrianglesArray
- * @return {Array.<Triangle>}
+ * @returns {Array.<Triangle>}
  */
 Face.prototype.getTessellatedTriangles = function(resultTrianglesArray)
 {
@@ -394,7 +394,7 @@ Face.prototype.getTessellatedTriangles = function(resultTrianglesArray)
 /**
  * 버텍스 배열의 첫번째 배열을 기준으로 삼각형 convex(Triangle)을 생성 후 배열에 담아 반환
  * @param {Array.<Triangle>} resultTrianglesArray undefined일 때, 배열로 초기화.
- * @return {Array.<Triangle>|undefined} 기존 버텍스 배열이 undefined거나 비어있으면 매개변수 resultTrianglesArray 상태 그대로 반환.
+ * @returns {Array.<Triangle>|undefined} 기존 버텍스 배열이 undefined거나 비어있으면 매개변수 resultTrianglesArray 상태 그대로 반환.
  */
 Face.prototype.getTrianglesConvex = function(resultTrianglesArray)
 {
@@ -423,7 +423,7 @@ Face.prototype.getTrianglesConvex = function(resultTrianglesArray)
 /**
  * Face의 hedge 중 매개변수 hedge와 twin인 것이 있는지 유무 반환.
  * @param {HalfEdge} hedge 
- * @return {boolean}
+ * @returns {Boolean}
  * 
  * @see HalfEdge#setTwin
  */
@@ -448,7 +448,7 @@ Face.prototype.setTwinHalfEdge = function(hedge)
 /**
  * Face의 frontier hedge 배열 반환.
  * @param {Array.<HalfEdge>} resultHedgesArray 
- * @return {Array.<HalfEdge>}
+ * @returns {Array.<HalfEdge>}
  * 
  * @see HalfEdge#getHalfEdgesLoop
  * @see HalfEdge#isFrontier
@@ -478,7 +478,7 @@ Face.prototype.getFrontierHalfEdges = function(resultHedgesArray)
 /**
  * Face의 hedge 배열 반환.
  * @param {Array.<HalfEdge>} resultHedgesArray 
- * @return {Array.<HalfEdge>}
+ * @returns {Array.<HalfEdge>}
  * 
  * @see HalfEdge#getHalfEdgesLoop
  */
@@ -494,7 +494,7 @@ Face.prototype.getHalfEdgesLoop = function(resultHedgesArray)
 /**
  * 현재 Face와 매개변수 Face의 각각 hedge를 이용하여 twin hedge를 찾아서 twin 유무 반환
  * @param {Face} face Required. Must contain hEdge.
- * @return {Boolean} is twin face.
+ * @returns {Boolean} is twin face.
  */
 Face.prototype.setTwinFace = function(face)
 {
@@ -522,7 +522,7 @@ Face.prototype.setTwinFace = function(face)
  * 버텍스 배열의 각각 버텍스의 hedge를 설정(next hedge도 설정) 후 배열에 담아서 반환. 
  * 반환배열의 첫번째 요소(HalfEdge, resultHalfEdgesArray[0])는 this.hEdge로 설정
  * @param {Array.<HalfEdge>|undefined} resultHalfEdgesArray
- * @return {Array.<HalfEdge>}
+ * @returns {Array.<HalfEdge>}
  */
 Face.prototype.createHalfEdges = function(resultHalfEdgesArray)
 {

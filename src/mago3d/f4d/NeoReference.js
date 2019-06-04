@@ -1,10 +1,17 @@
 'use strict';
 
 /**
+ * Reference 파일에 대한 객체
+ * lod1일 경우 model과 Reference파일을 참조.
+ * 
  * Geometry object. The real geometry data is a model, and this referenceObject has the model's index.
  * 
  * @class NeoReference
- * @constructor 
+ * 
+ * @exception {Error} Messages.CONSTRUCT_ERROR
+ * 
+ * 아래 문서 1.4 Reference Folder 참조
+ * @link https://github.com/Gaia3D/F4DConverter/blob/master/doc/F4D_SpecificationV1.pdf
  */
 var NeoReference = function() 
 {
@@ -16,7 +23,7 @@ var NeoReference = function()
 	/**
 	 * The object's index on motherReferenceArray.
 	 * @type {Number}
-	 * @default undefined
+	 * @default 0
 	 */
 	this._id = 0;
 
@@ -127,7 +134,7 @@ var NeoReference = function()
 
 	/**
 	 * Object's current rendering phase. Parameter to avoid duplicated render on scene.
-	 * @type {boolean}
+	 * @type {Boolean}
 	 * @default false
 	 */
 	this.renderingFase = false;
@@ -164,6 +171,7 @@ NeoReference.prototype.swapRenderingFase = function()
 
 /**
  * Returns the blending alpha value in current time.
+ * 
  * @param {Number} currTime The current time.
  */
 NeoReference.prototype.getBlendAlpha = function(currTime) 
@@ -188,7 +196,9 @@ NeoReference.prototype.getBlendAlpha = function(currTime)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * _originalMatrix4와 파라미터로 받은 matrix를 4차원 행렬의 곱셈을 계산한 결과를 _matrix4에 할당
+ * 
+ * @param {Matrix4} matrix
  */
 NeoReference.prototype.multiplyTransformMatrix = function(matrix) 
 {
@@ -226,9 +236,10 @@ NeoReference.prototype.hasKeyMatrix = function(idxKey)
 	{ return true; }
 };
 
-/**
+/**{Boolean}
  * 어떤 일을 하고 있습니까?
-  * @returns {boolean} returns if the neoReference is ready to render.
+ * 
+  * @returns {Boolean} returns if the neoReference is ready to render.
  */
 NeoReference.prototype.isReadyToRender = function() 
 {
@@ -255,6 +266,12 @@ NeoReference.prototype.solveReferenceColorOrTexture = function(magoManager, neoB
 	if (selectionManager.parentSelected && magoManager.objectSelected === this)
 	{
 		referenceObjectIsSelected = true;
+		
+		if (magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.OBJECT) 
+		{
+			// Active stencil if the object is selected.
+			magoManager.renderer.enableStencilBuffer(gl);
+		}
 	}
 	
 	// Check the color or texture of reference object.
@@ -294,9 +311,6 @@ NeoReference.prototype.solveReferenceColorOrTexture = function(magoManager, neoB
 		{
 			gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 			gl.uniform4fv(shader.oneColor4_loc, [255.0/255.0, 0/255.0, 0/255.0, 255.0/255.0]);
-			
-			// Active stencil if the object is selected.
-			magoManager.renderer.enableStencilBuffer(gl);
 		}
 		else if (magoManager.magoPolicy.colorChangedObjectId === this.objectId)
 		{
@@ -315,8 +329,6 @@ NeoReference.prototype.solveReferenceColorOrTexture = function(magoManager, neoB
 						gl.bindTexture(gl.TEXTURE_2D, this.texture.texId);
 						shader.last_tex_id = this.texture.texId;
 					}
-					else
-					{ var hola = 0; }
 				}
 				else 
 				{
@@ -345,8 +357,9 @@ NeoReference.prototype.solveReferenceColorOrTexture = function(magoManager, neoB
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param magoManager.
-  * @returns {boolean} returns if the neoReference was rendered.
+ * 
+ * @param mag{Boolean}
+ * @returns {Boolean} returns if the neoReference was rendered.
  */
 NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, renderTexture, shader, refMatrixIdxKey, minSizeToRender) 
 {
@@ -370,10 +383,6 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 		if (neoReference.texture.texId === undefined)
 		{ return false; }
 	}
-	
-	// vars.
-	if (shader.name === undefined)
-	{ var hola = 0; }
 	
 	var currentObjectsRendering = magoManager.renderer.currentObjectsRendering;
 	var selectionManager;
@@ -461,10 +470,6 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 		}
 	}
 	
-	// Test check.
-	if (magoManager.objectSelected === this)
-	{ var hola = 0; }
-	
 	var vboKey;
 	for (var n=0; n<cacheKeys_count; n++) // Original.
 	{
@@ -506,16 +511,6 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 		if (magoManager.isCameraMoving)// && !isInterior && magoManager.isCameraInsideBuilding)
 		{
 			indicesCount = vboKey.indicesCount;
-			
-			////if (magoManager.objectSelected === neoReference)
-			////{ indicesCount = this.vbo_vi_cacheKey_aux.indicesCount; }
-			////else
-			////{
-			////	indicesCount = this.vbo_vi_cacheKey_aux.bigTrianglesIndicesCount;
-			////	if (indicesCount > this.vbo_vi_cacheKey_aux.indicesCount)
-			////	{ indicesCount = this.vbo_vi_cacheKey_aux.indicesCount; }
-			////}
-			
 		}
 		else
 		{
@@ -532,11 +527,7 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 		}
 		if (!vboKey.bindDataIndice(shader, magoManager.vboMemoryManager))
 		{ return false; }
-		//gl.disable(gl.CULL_FACE);
 		gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.
-		//gl.drawElements(gl.LINES, indicesCount, gl.UNSIGNED_SHORT, 0); // Wireframe.
-		//gl.drawElements(gl.POINTS, indicesCount, gl.UNSIGNED_SHORT, 0); // Wireframe.
-		
 	}
 		
 	return true;

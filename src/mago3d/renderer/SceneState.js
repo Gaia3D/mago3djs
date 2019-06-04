@@ -109,7 +109,7 @@ var SceneState = function()
 
 /**
  * Returns the modelViewMatrixInverse.
- * @return {Matrix4} modelViewMatrixInv.
+ * @returns {Matrix4} modelViewMatrixInv.
  */
 SceneState.prototype.getModelViewMatrixInv = function() 
 {

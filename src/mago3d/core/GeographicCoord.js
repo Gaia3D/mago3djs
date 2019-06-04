@@ -126,7 +126,7 @@ GeographicCoord.prototype.setLonLatAlt = function(longitude, latitude, altitude)
  * @param {GeographicCoord} geographicCoordA
  * @param {GeographicCoord} geographicCoordB
  * @param {GeographicCoord} resultGeographicCoord
- * @return {GeographicCoord}
+ * @returns {GeographicCoord}
  */
 GeographicCoord.getMidPoint = function(geographicCoordA, geographicCoordB, resultGeographicCoord) 
 {
@@ -245,7 +245,7 @@ GeographicCoordsList.prototype.getGeoCoord = function(idx)
 
 /**
  * Get the number of the point in this list
- * @return {Number} the number of the points
+ * @returns {Number} the number of the points
  */
 GeographicCoordsList.prototype.getGeoCoordsCount = function() 
 {

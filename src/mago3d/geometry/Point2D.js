@@ -43,7 +43,7 @@ Point2D.prototype.setAssociated = function(associated)
 
 /**
  * get the value of the property 'associated'
- * @return {Point2D} this.associated
+ * @returns {Point2D} this.associated
  */
 Point2D.prototype.getAssociated = function() 
 {
@@ -137,7 +137,7 @@ Point2D.prototype.distToPoint = function(point)
  * Check whether this point and the other point are overlapped(coincident) or not 
  * @param {Point2D} point the point which will be checked whether the two points are coincident or not
  * @param {Number} errorDist allowed error range value of calculating distance. It can be from 0.1mm to 10E-8
- * @returns {boolean} the flag which let us know whether they are coincident or not 
+ * @returns {Boolean} the flag which let us know whether they are coincident or not 
  */
 Point2D.prototype.isCoincidentToPoint = function(point, errorDist) 
 {
@@ -193,7 +193,7 @@ Point2D.prototype.scalarProduct = function(point)
 /**
  * Calculate the radian value of the angle of the two vectors
  * @param vector the target vector
- * @return the angle of two vector
+ * @returns the angle of two vector
  */
 Point2D.prototype.angleRadToVector = function(vector) 
 {

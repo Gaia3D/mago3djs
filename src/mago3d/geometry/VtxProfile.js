@@ -47,7 +47,7 @@ VtxProfile.prototype.deleteObjects = function()
 
 /**
  * get inner vertex ring's count
- * @return {Number} 
+ * @returns {Number} 
  */
 VtxProfile.prototype.getInnerVtxRingsCount = function()
 {
@@ -60,7 +60,7 @@ VtxProfile.prototype.getInnerVtxRingsCount = function()
 /**
  * get inner vertex ring
  * @param {Number} idx
- * @return {VtxRing} 
+ * @returns {VtxRing} 
  */
 VtxProfile.prototype.getInnerVtxRing = function(idx)
 {
@@ -147,7 +147,7 @@ VtxProfile.prototype.transformPointsByMatrix4 = function(tMat4)
  * Note: this makes a projected profile2d ONLY conformed by polyLines2D.
  * This function is used when necessary to tessellate this vtxProfile.
  * @param {Profile2D|undefined} resultProfile2d if undefined, set new Profile2D instance.
- * @return {Profile2D} when this.outerVtxRing is undefined or normal is undefined. return original resultProfile2d.
+ * @returns {Profile2D} when this.outerVtxRing is undefined or normal is undefined. return original resultProfile2d.
  * 
  * @see VtxRing#calculatePlaneNormal
  * @see VtxRing#getProjectedPolyLineBasedRing2D
@@ -293,7 +293,7 @@ VtxProfile.prototype.makeByProfile2D = function(profile2d)
 /**
  * get all vertex in outer vertex ring and inner vertex ring list. 
  * @param {Array} resultVerticesArray
- * @return {Array.<Vertex>|undefined}
+ * @returns {Array.<Vertex>|undefined}
  */
 VtxProfile.prototype.getAllVertices = function(resultVerticesArray)
 {
@@ -313,7 +313,7 @@ VtxProfile.prototype.getAllVertices = function(resultVerticesArray)
  * @param {Plane} plane. 
  * @param {Point3D} projectionDirection projectionDirection must be unitary.
  * @param {VtxProfile} resultvtxProfile Optional. if undefined, set new VtxProfile instance.
- * @return {VtxProfile} resultvtxProfile
+ * @returns {VtxProfile} resultvtxProfile
  */
 VtxProfile.getProjectedOntoPlane = function(vtxProfile, plane, projectionDirection, resultvtxProfile)
 {

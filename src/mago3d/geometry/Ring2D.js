@@ -47,7 +47,7 @@ Ring2D.prototype.deleteObjects = function()
  * 폴리곤을 생성하고 elemsArray 에 추가한다.
  * 
  * @param {String} type 폴리곤의 형태
- * @return {Object} 지정된 형태로 생성한 폴리곤 객체
+ * @returns {Object} 지정된 형태로 생성한 폴리곤 객체
  */
 Ring2D.prototype.newElement = function(type)
 {
@@ -67,7 +67,7 @@ Ring2D.prototype.newElement = function(type)
 /**
  * 폴리곤을 생성한다.
  * 
- * @return {Polygon2D} 폴리곤
+ * @returns {Polygon2D} 폴리곤
  */
 Ring2D.prototype.makePolygon = function()
 {
@@ -79,7 +79,7 @@ Ring2D.prototype.makePolygon = function()
  * 폴리곤을 생성한다.
  * 
  * @param {Polygon2D} resultPolygon 결과값을 저장할 폴리곤
- * @return {Polygon2D} 수정되거나 새로 생성된 폴리곤
+ * @returns {Polygon2D} 수정되거나 새로 생성된 폴리곤
  */
 Ring2D.prototype.getPolygon = function(resultPolygon)
 {
@@ -115,7 +115,7 @@ Ring2D.prototype.getPolygon = function(resultPolygon)
  * 다양한 폴리곤 배열에서 포인트를 구한다.
  * 
  * @param {Point2D[]} resultPointsArray 결과값을 저장할 포인트 배열
- * @return {Point2D[]} 포인트 배열
+ * @returns {Point2D[]} 포인트 배열
  */
 Ring2D.prototype.getPoints = function(resultPointsArray)
 {

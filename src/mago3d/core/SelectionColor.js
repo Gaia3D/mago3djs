@@ -62,7 +62,7 @@ SelectionColor.prototype.getAvailableColor = function(resultColor)
  * @param {Number} r
  * @param {Number} g
  * @param {Number} b
- * @return Color code
+ * @returns Color code
  */
 SelectionColor.prototype.decodeColor3 = function(r, g, b) 
 {

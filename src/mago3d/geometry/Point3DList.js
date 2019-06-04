@@ -78,7 +78,7 @@ Point3DList.prototype.addPoint = function(point3d)
 };
 /**
  * Return the coordinate contained at geoLocDataManager
- * @return geoLoc
+ * @returns geoLoc
  */
 Point3DList.prototype.getGeographicLocation = function()
 {
@@ -109,7 +109,7 @@ Point3DList.prototype.addPoint3dArray = function(points3dArray)
  * @param {Number} x the x coordi of the point
  * @param {Number} y the y coordi of the point
  * @param {Number} z the z coordi of the point
- * @return {Point3D} return the created point
+ * @returns {Point3D} return the created point
  */
 Point3DList.prototype.newPoint = function(x, y, z)
 {
@@ -131,7 +131,7 @@ Point3DList.prototype.getPoint = function(idx)
 };
 /**
  * Return the length of this.pointArray
- * @return {Number}
+ * @returns {Number}
  */
 Point3DList.prototype.getPointsCount = function()
 {
@@ -145,7 +145,7 @@ Point3DList.prototype.getPointsCount = function()
  * This function is used when this feature is a point3DRing.
  * Return the previous index of the given index.
  * @param {Number} idx the target index
- * @return {Number} prevIdx
+ * @returns {Number} prevIdx
  */
 Point3DList.prototype.getPrevIdx = function(idx)
 {
@@ -163,7 +163,7 @@ Point3DList.prototype.getPrevIdx = function(idx)
 /**
  * This function is used when this is a point3dLoop.
  * @param {Number} idx the index of the target point at this.pointArray
-  * @return {Number} prevIdx
+  * @returns {Number} prevIdx
  */
 Point3DList.prototype.getNextIdx = function(idx)
 {
@@ -183,7 +183,7 @@ Point3DList.prototype.getNextIdx = function(idx)
  * get the segement with the index of the segment
  * @param {Number} idx the index of start point of segment
  * @param {Segment3D} resultSegment the segement which will store the result segment
- * @return {Segment3D} resultSegment 
+ * @returns {Segment3D} resultSegment 
  * 
  */
 Point3DList.prototype.getSegment3D = function(idx, resultSegment3d, bLoop)

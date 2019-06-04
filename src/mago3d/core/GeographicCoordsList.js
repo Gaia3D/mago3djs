@@ -43,7 +43,7 @@ GeographicCoordsList.prototype.getGeoCoord = function(idx)
 
 /**
  * Get the number of the point in this list
- * @return {Number} the number of the points
+ * @returns {Number} the number of the points
  */
 GeographicCoordsList.prototype.getGeoCoordsCount = function() 
 {

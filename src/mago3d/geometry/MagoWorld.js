@@ -83,12 +83,6 @@ MagoWorld.prototype.goto = function(longitude, latitude, altitude)
 	camUp.set(matrixAux[4], matrixAux[5], matrixAux[6]); // tangent north direction.
 	
 	this.updateModelViewMatrixByCamera(camera);
-	
-	//var modelViewMatrix = this.magoManager.sceneState.modelViewMatrix;
-	//modelViewMatrix._floatArrays = glMatrix.mat4.lookAt(modelViewMatrix._floatArrays, [camPos.x, camPos.y, camPos.z], [0.0, 0.0, 0.0], [camUp.x, camUp.y, camUp.z]);
-	
-	var hola = 0;
-	
 };
 
 /**
@@ -181,14 +175,6 @@ MagoWorld.prototype.updateModelViewMatrixByCamera = function(camera)
 	var tergetY = camPos.y + camDir.y * far;
 	var tergetZ = camPos.z + camDir.z * far;
 	
-	// test comprovation (posModul must be small than tergetModul).
-	var posModul = camPos.getModul();
-	var targetModul = Math.sqrt(tergetX*tergetX, tergetY*tergetY, tergetZ*tergetZ);
-	
-	if (posModul < targetModul)
-	{ var hola = 0; }
-	// End test comprobation.-------------------------------------------
-
 	var modelViewMatrix = this.magoManager.sceneState.modelViewMatrix;																	
 	modelViewMatrix._floatArrays = Matrix4.lookAt(modelViewMatrix._floatArrays, [camPos.x, camPos.y, camPos.z], 
 		[tergetX, tergetY, tergetZ], 
@@ -389,10 +375,16 @@ MagoWorld.prototype.mousemove = function(event)
 		this.updateModelViewMatrixByCamera(camera);
 	}
 };
-/**@TODO : need to be implemented. */
+
+/**
+ *
+ *
+ * @param {*} event
+ */
 MagoWorld.prototype.keydown = function(event)
 {
-	var hola = 0;
+	// TODO: keydown()
+	console.log("keydown");
 };
 
 

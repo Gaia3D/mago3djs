@@ -81,7 +81,7 @@ Star2D.prototype.setRadiusCount = function(radiusCount)
 /**
  * star의 꼭지점 배열 반환
  * @param {Array.<Point2D>} resultPointsArray
- * @return {Array.<Point2D>} 
+ * @returns {Array.<Point2D>} 
  */
 Star2D.prototype.getPoints = function(resultPointsArray)
 {

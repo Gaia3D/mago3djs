@@ -35,7 +35,7 @@ var Node = function()
 
 /**
  * Returns true if this node is a "reference" type node. "Reference" type nodes uses StaticModels geometry.
- * @return {Boolean} true if this node is a "reference" type node.
+ * @returns {Boolean} true if this node is a "reference" type node.
  */
 Node.prototype.isReferenceNode = function() 
 {
@@ -113,7 +113,7 @@ Node.prototype.deleteObjects = function(gl, vboMemoryManager)
 /**
  * Calculates the geographicLocationData of the node.
  * @param {MagoManager} magoManager Main class object of Mago3D.
- * @return {GeoLocationData} geoLoc The calculated geoLocationData of this node.
+ * @returns {GeoLocationData} geoLoc The calculated geoLocationData of this node.
  */
 Node.prototype.calculateGeoLocData = function(magoManager) 
 {
@@ -635,7 +635,7 @@ Node.prototype.calculateBBoxCenterPositionWorldCoord = function(geoLoc)
 
 /**
  * 어떤 일을 하고 있습니까?
- * @returns {boolean} applyOcclusionCulling
+ * @returns {Boolean} applyOcclusionCulling
  */
 Node.prototype.getDistToCamera = function(cameraPosition, boundingSphere_Aux) 
 {

@@ -56,7 +56,7 @@ var NeoBuilding = function()
 
 /**
  * 어떤 일을 하고 있습니까?
- * @returns {boolean} applyOcclusionCulling
+ * @returns {Boolean} applyOcclusionCulling
  */
 NeoBuilding.prototype.getImageFileNameForLOD = function(lod) 
 {
@@ -70,7 +70,7 @@ NeoBuilding.prototype.getImageFileNameForLOD = function(lod)
 
 /**
  * 어떤 일을 하고 있습니까?
- * @returns {boolean} applyOcclusionCulling
+ * @returns {Boolean} applyOcclusionCulling
  */
 NeoBuilding.prototype.getReferenceObject = function(refObjectIndex) 
 {
@@ -81,7 +81,7 @@ NeoBuilding.prototype.getReferenceObject = function(refObjectIndex)
 
 /**
  * 어떤 일을 하고 있습니까?
- * @returns {boolean} applyOcclusionCulling
+ * @returns {Boolean} applyOcclusionCulling
  */
 NeoBuilding.prototype.getReferenceObjectsArrayByObjectId = function(objectId) 
 {
@@ -94,7 +94,7 @@ NeoBuilding.prototype.getReferenceObjectsArrayByObjectId = function(objectId)
 
 /**
  * 어떤 일을 하고 있습니까?
- * @returns {boolean} applyOcclusionCulling
+ * @returns {Boolean} applyOcclusionCulling
  */
 NeoBuilding.prototype.putReferenceObject = function(refObject, refObjectIdx) 
 {
@@ -119,7 +119,7 @@ NeoBuilding.prototype.putReferenceObject = function(refObject, refObjectIdx)
 
 /**
  * 어떤 일을 하고 있습니까?
- * @returns {boolean} applyOcclusionCulling
+ * @returns {Boolean} applyOcclusionCulling
  */
 NeoBuilding.prototype.getRenderSettingApplyOcclusionCulling = function() 
 {
@@ -128,7 +128,7 @@ NeoBuilding.prototype.getRenderSettingApplyOcclusionCulling = function()
 
 /**
  * 어떤 일을 하고 있습니까?
- * @returns {boolean} applyOcclusionCulling
+ * @returns {Boolean} applyOcclusionCulling
  */
 NeoBuilding.prototype.setRenderSettingApplyOcclusionCulling = function(applyOcclusionCulling) 
 {

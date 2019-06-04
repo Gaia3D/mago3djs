@@ -8,7 +8,7 @@
 /**
  * mago3d 활성화/비활성화
  * @param {ManagerFactory} managerFactoryInstance 
- * @param {boolean} isShow true = show, false = hide
+ * @param {Boolean} isShow true = show, false = hide
  */
 function changeMagoStateAPI(managerFactoryInstance, isShow) 
 {
@@ -22,7 +22,7 @@ function changeMagoStateAPI(managerFactoryInstance, isShow)
 /**
  * Label show/hide
  * @param {ManagerFactory} managerFactoryInstance 
- * @param {boolean} isShow true = show, false = hide
+ * @param {Boolean} isShow true = show, false = hide
  */
 function changeLabelAPI(managerFactoryInstance, isShow) 
 {
@@ -36,7 +36,7 @@ function changeLabelAPI(managerFactoryInstance, isShow)
 /**
  * Origin show/hide
  * @param {ManagerFactory} managerFactoryInstance
- * @param {boolean} isShow true = show, false = hide
+ * @param {Boolean} isShow true = show, false = hide
  */
 function changeOriginAPI(managerFactoryInstance, isShow)
 {
@@ -50,7 +50,7 @@ function changeOriginAPI(managerFactoryInstance, isShow)
 /**
  * boundingBox show/hide
  * @param {ManagerFactory} managerFactoryInstance
- * @param {boolean} isShow true = show, false = hide
+ * @param {Boolean} isShow true = show, false = hide
  */
 function changeBoundingBoxAPI(managerFactoryInstance, isShow) 
 {
@@ -65,7 +65,7 @@ function changeBoundingBoxAPI(managerFactoryInstance, isShow)
  * 속성값에 의한 가시화 유무설정
  * 삭제 예정
  * @param {ManagerFactory} managerFactoryInstance
- * @param {boolean} isShow true = 표시, false = 비표시
+ * @param {Boolean} isShow true = 표시, false = 비표시
  */
 function changePropertyRenderingAPI(managerFactoryInstance, isShow, projectId, property) 
 {
@@ -81,7 +81,7 @@ function changePropertyRenderingAPI(managerFactoryInstance, isShow, projectId, p
 /**
  * 그림자 표시/비표시
  * @param {ManagerFactory} managerFactoryInstance
- * @param {boolean} isShow true = 활성화, false = 비활성화
+ * @param {Boolean} isShow true = 활성화, false = 비활성화
  */
 function changeShadowAPI(managerFactoryInstance, isShow) 
 {
@@ -118,7 +118,7 @@ function changeColorAPI(managerFactoryInstance, projectId, dataKey, objectIds, p
  * Object literal with change Location And Rotation animation option.
  * @typedef {Object} animationOption
  * @property {string} dutaion optional. 
- * @property {boolean} autoChangeRotation optional. If this option is true, your heading, pitch will be ignore, Heading and pitch changes according to the direction.
+ * @property {Boolean} autoChangeRotation optional. If this option is true, your heading, pitch will be ignore, Heading and pitch changes according to the direction.
  */
 
 /**
@@ -208,7 +208,7 @@ function deleteAllChangeColorAPI(managerFactoryInstance)
 /**
  * 이슈 등록 활성화 유무
  * @param {ManagerFactory} managerFactoryInstance
- * @param {boolean} flag true = 활성화, false = 비활성화
+ * @param {Boolean} flag true = 활성화, false = 비활성화
  */
 function changeInsertIssueModeAPI(managerFactoryInstance, flag) 
 {
@@ -222,7 +222,7 @@ function changeInsertIssueModeAPI(managerFactoryInstance, flag)
 /**
  * object 정보 표시 활성화 유무
  * @param {ManagerFactory} managerFactoryInstance
- * @param {boolean} flag true = 활성화, false = 비활성화
+ * @param {Boolean} flag true = 활성화, false = 비활성화
  */
 function changeObjectInfoViewModeAPI(managerFactoryInstance, flag) 
 {
@@ -236,7 +236,7 @@ function changeObjectInfoViewModeAPI(managerFactoryInstance, flag)
 /**
  * Object Occlusion culling
  * @param {ManagerFactory} managerFactoryInstance
- * @param {boolean} flag true = 활성화, false = 비활성화
+ * @param {Boolean} flag true = 활성화, false = 비활성화
  * @param {string} dataKey
  */
 function changeOcclusionCullingAPI(managerFactoryInstance, flag, dataKey) 
@@ -252,7 +252,7 @@ function changeOcclusionCullingAPI(managerFactoryInstance, flag, dataKey)
 /**
  * 1인칭, 3인칭 모드 개발중...
  * @param {ManagerFactory} managerFactoryInstance
- * @param {boolean} flag true = 활성화, false = 비활성화
+ * @param {Boolean} flag true = 활성화, false = 비활성화
  */
 function changeFPVModeAPI(managerFactoryInstance, flag)
 {
@@ -266,7 +266,7 @@ function changeFPVModeAPI(managerFactoryInstance, flag)
 /**
  * 1인칭, 3인칭 모드 개발중...
  * @param {ManagerFactory} managerFactoryInstance
- * @param {boolean} flag true = 활성화, false = 비활성화
+ * @param {Boolean} flag true = 활성화, false = 비활성화
  */
 function changeMagoModeAPI(managerFactoryInstance, flag)
 {
@@ -281,7 +281,7 @@ function changeMagoModeAPI(managerFactoryInstance, flag)
  * 현재 위치 근처 issue list. false인 경우 clear
  * 삭제 예정
  * @param {ManagerFactory} managerFactoryInstance
- * @param {boolean} flag true = 활성화, false = 비활성화
+ * @param {Boolean} flag true = 활성화, false = 비활성화
  */
 function changeNearGeoIssueListViewModeAPI(managerFactoryInstance, flag) 
 {
@@ -448,8 +448,8 @@ function gotoIssueAPI(managerFactoryInstance, projectId, projectData, projectDat
 {
 	if (managerFactoryInstance === null) { return; } 
 	
-	MagoConfig.setData(Mago3D.CODE.PROJECT_ID_PREFIX + projectId, projectData);
-	MagoConfig.setProjectDataFolder(Mago3D.CODE.PROJECT_DATA_FOLDER_PREFIX + projectDataFolder, projectDataFolder);
+	Mago3D.MagoConfig.setData(Mago3D.CODE.PROJECT_ID_PREFIX + projectId, projectData);
+	Mago3D.MagoConfig.setProjectDataFolder(Mago3D.CODE.PROJECT_DATA_FOLDER_PREFIX + projectDataFolder, projectDataFolder);
 	
 	var api = new Mago3D.API("gotoIssue");
 	api.setProjectId(projectId);
@@ -619,8 +619,8 @@ function getAbsoluteCoodinateOfBuildingPointAPI(managerFactoryInstance, projectI
 /**
  * get current camera position
  * @param {ManagerFactory} managerFactoryInstance
- * @param {number} unit position unit. if not define, default value is CODE.units.DEGREE. 0 : CODE.units.METRE, 1 : CODE.units.DEGREE, 2 : CODE.units.RADIAN
- * @return {Object|Cartesian3|Cartographic}
+ * @param {Number} unit position unit. if not define, default value is Mago3D.CODE.units.DEGREE. 0 : Mago3D.CODE.units.METRE, 1 : Mago3D.CODE.units.DEGREE, 2 : Mago3D.CODE.units.RADIAN
+ * @returns {Object|Cartesian3|Cartographic}
  */
 function getCameraCurrentPositionAPI(managerFactoryInstance, unit)
 {
@@ -635,7 +635,7 @@ function getCameraCurrentPositionAPI(managerFactoryInstance, unit)
 /**
  * get current camera orientaion
  * @param {ManagerFactory} managerFactoryInstance
- * @return {Object}
+ * @returns {Object}
  */
 function getCameraCurrentOrientaionAPI(managerFactoryInstance)
 {
@@ -743,7 +743,7 @@ function stopTrackAPI(managerFactoryInstance)
  * check static model is exist
  * @param {ManagerFactory} managerFactoryInstance
  * @param {string} projectId
- * @return {Boolean} isExist
+ * @returns {Boolean} isExist
  */
 function isExistStaticModelAPI(managerFactoryInstance, projectId)
 {
@@ -758,7 +758,7 @@ function isExistStaticModelAPI(managerFactoryInstance, projectId)
  * @param {ManagerFactory} managerFactoryInstance
  * @param {string} projectId project primary key
  * @param {string} dataKey data key
- * @return {Boolean} isExist
+ * @returns {Boolean} isExist
  */
 function isExistDataAPI(managerFactoryInstance, projectId, dataKey)
 {
