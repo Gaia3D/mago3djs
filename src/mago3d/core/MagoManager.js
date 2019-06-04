@@ -1325,7 +1325,7 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 	ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
 	// lod2.
-	var gl = this.getGL();
+	var gl = this.getGl();
 	var node;
 	var nodeRoot;
 	var geoLocDataManager;
