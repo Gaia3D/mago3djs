@@ -287,7 +287,7 @@ BlocksList.prototype.stepOverBlockVersioned = function(arrayBuffer, bytesReaded,
 	var normalByteValuesCount;
 	var shortIndicesValuesCount;
 	var sizeLevels;
-	//var startBuff, endBuff;
+	var startBuff, endBuff;
 	
 	/**
 	 * Spec document Table 3-1
@@ -384,8 +384,8 @@ BlocksList.prototype.parseBlocksListVersioned_v001 = function(arrayBuffer, readW
 {
 	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 	var bytesReaded = 0;
-	/*var vboMemManager = magoManager.vboMemoryManager;
-	var startBuff, endBuff;
+	/*var startBuff, endBuff;
+	var vboMemManager = magoManager.vboMemoryManager;
 	var posByteSize, norByteSize, idxByteSize;
 	var classifiedPosByteSize = 0, classifiedNorByteSize = 0, classifiedIdxByteSize = 0;
 	var gl = magoManager.sceneState.gl;*/
@@ -599,8 +599,8 @@ BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherB
 	var blocksCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4); bytesReaded += 4;
 	
 	var vboMemManager = magoManager.vboMemoryManager;
-	/*var startBuff, endBuff;
-	var posByteSize, norByteSize, idxByteSize;
+	var startBuff, endBuff;
+	/*var posByteSize, norByteSize, idxByteSize;
 	var classifiedPosByteSize = 0, classifiedNorByteSize = 0, classifiedIdxByteSize = 0;
 	var gl = magoManager.sceneState.gl;*/
 	var succesfullyGpuDataBinded = true;
