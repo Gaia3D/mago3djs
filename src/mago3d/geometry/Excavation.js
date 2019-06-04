@@ -96,7 +96,7 @@ Excavation.prototype.renderExcavation = function(magoManager, shader, renderType
 	
 	// By Perspective.
 	var projectionMatrix2 = new Matrix4();
-	projectionMatrix2._floatArrays = mat4.perspective(projectionMatrix2._floatArrays, fovyRad, aspectRatio, near, far);
+	projectionMatrix2._floatArrays = glMatrix.mat4.perspective(projectionMatrix2._floatArrays, fovyRad, aspectRatio, near, far);
 	
 	// By Frustum.
 	var cesiumOffCenterFrustum = scene.camera.frustum._offCenterFrustum;
@@ -125,7 +125,7 @@ Excavation.prototype.renderExcavation = function(magoManager, shader, renderType
 	//if(magoManager.currentFrustumIdx !== 0)
 	//	near *= 0.9;
 
-	projectionMatrix._floatArrays = mat4.frustum(projectionMatrix._floatArrays, nearLeft, nearRight, nearBottom, nearTop, near, far);
+	projectionMatrix._floatArrays = glMatrix.mat4.frustum(projectionMatrix._floatArrays, nearLeft, nearRight, nearBottom, nearTop, near, far);
 	
 	
 	
@@ -154,7 +154,7 @@ Excavation.prototype.renderExcavation = function(magoManager, shader, renderType
 		[tergetX, tergetY, tergetZ], 
 		[camUp.x, camUp.y, camUp.z]);
 		
-	//mat4.invert(modelViewMatrix._floatArrays, modelViewMatrix._floatArrays);
+	//glMatrix.mat4.invert(modelViewMatrix._floatArrays, modelViewMatrix._floatArrays);
 		
 	var modelViewRelToEyeMatrix = new Matrix4();	
 	modelViewRelToEyeMatrix.copyFromMatrix4(modelViewMatrix);
@@ -164,7 +164,7 @@ Excavation.prototype.renderExcavation = function(magoManager, shader, renderType
 	modelViewRelToEyeMatrix._floatArrays[15] = 1.0;
 	
 	var modelViewProjectionRelToEyeMat = new Matrix4();
-	modelViewProjectionRelToEyeMat._floatArrays = mat4.multiply(modelViewProjectionRelToEyeMat._floatArrays, projectionMatrix._floatArrays, modelViewRelToEyeMatrix._floatArrays);
+	modelViewProjectionRelToEyeMat._floatArrays = glMatrix.mat4.multiply(modelViewProjectionRelToEyeMat._floatArrays, projectionMatrix._floatArrays, modelViewRelToEyeMatrix._floatArrays);
 	
 	if(magoManager.currentFrustumIdx === 0)
 	{

@@ -356,7 +356,7 @@ Matrix4.lookAt = function(out, eye, center, up)
 
 	if (Math.abs(eyex - centerx) < glMatrix.EPSILON && Math.abs(eyey - centery) < glMatrix.EPSILON && Math.abs(eyez - centerz) < glMatrix.EPSILON) 
 	{
-		return mat4.identity(out);
+		return glMatrix.mat4.identity(out);
 	}
 
 	z0 = eyex - centerx;

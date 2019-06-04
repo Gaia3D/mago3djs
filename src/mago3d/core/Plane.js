@@ -92,7 +92,7 @@ Plane.prototype.getRotationMatrix = function(resultTMatrix)
 	// relativeOrientation = 0 -> // there are parallels & the same sense.***
 	// relativeOrientation = 1 -> // there are parallels & opposite sense.***
 	// relativeOrientation = 2 -> // there are NO parallels.***
-	var matrixAux = mat4.create(); // creates as identityMatrix.***
+	var matrixAux = glMatrix.mat4.create(); // creates as identityMatrix.***
 	if (relativeOrientation === 0)
 	{
 		// there are parallels & the same sense.***
@@ -102,8 +102,8 @@ Plane.prototype.getRotationMatrix = function(resultTMatrix)
 	{
 		// there are parallels & opposite sense.***
 		// Rotate 180 degree in xAxis.***
-		var identityMat = mat4.create();
-		matrixAux = mat4.rotateX(matrixAux, identityMat, Math.PI);
+		var identityMat = glMatrix.mat4.create();
+		matrixAux = glMatrix.mat4.rotateX(matrixAux, identityMat, Math.PI);
 	}
 	else if (relativeOrientation === 2)
 	{
@@ -112,13 +112,13 @@ Plane.prototype.getRotationMatrix = function(resultTMatrix)
 		var rotAxis = initialNormal.crossProduct(transformedNormal, undefined);
 		rotAxis.unitary();
 		var angRad = initialNormal.angleRadToVector(transformedNormal);
-		var axis = vec3.fromValues(rotAxis.x, rotAxis.y, rotAxis.z);
+		var axis = glMatrix.vec3.fromValues(rotAxis.x, rotAxis.y, rotAxis.z);
 		var quaternion = quat.create();
 		quaternion = quat.setAxisAngle(quaternion, axis, angRad);
 		
 		// Now, make matrix4 from quaternion.***
-		var identityMat = mat4.create();
-		matrixAux = mat4.fromQuat(identityMat, quaternion);
+		var identityMat = glMatrix.mat4.create();
+		matrixAux = glMatrix.mat4.fromQuat(identityMat, quaternion);
 	}
 	
 	if (resultTMatrix === undefined)
