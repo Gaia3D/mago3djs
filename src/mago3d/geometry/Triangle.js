@@ -36,7 +36,7 @@ var Triangle= function(vertex0, vertex1, vertex2)
  */
 Triangle.prototype.deleteObjects = function() 
 {
-	// the triangle no deletes vertices.***
+	// the triangle no deletes vertices.
 	if (this.vertex0)
 	{
 		this.vertex0 = undefined;

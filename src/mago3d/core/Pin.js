@@ -11,7 +11,7 @@ var Pin = function()
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	this.texture; // default.***
+	this.texture; // default.
 	this.texturesArray = [];
 	this.positionBuffer;
 	this.texcoordBuffer;

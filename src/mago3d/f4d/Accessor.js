@@ -18,7 +18,7 @@ var Accessor = function ()
 	}
 
 	this.bufferId;
-	// 0= position, 1= normal, 2= color, 3= texcoord.***
+	// 0= position, 1= normal, 2= color, 3= texcoord.
 	this.accesorType;
 	this.bufferStart;
 	// 버퍼의 시작 시점

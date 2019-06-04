@@ -113,7 +113,7 @@ PolyLine3D.prototype.renderLines = function(magoManager, shader, renderType, bLo
 	
 	gl.uniform1i(shader.bPositionCompressed_loc, false);
 	gl.uniform1i(shader.bUse1Color_loc, true);
-	gl.uniform4fv(shader.oneColor4_loc, [1.0, 1.0, 0.1, 1.0]); //.***
+	gl.uniform4fv(shader.oneColor4_loc, [1.0, 1.0, 0.1, 1.0]); //.
 	gl.uniform1f(shader.fixPointSize_loc, 5.0);
 	gl.uniform1i(shader.bUseFixPointSize_loc, true);
 	
@@ -125,7 +125,7 @@ PolyLine3D.prototype.renderLines = function(magoManager, shader, renderType, bLo
 	else
 	{ gl.disable(gl.DEPTH_TEST); }
 
-	// Render the line.***
+	// Render the line.
 	var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
 	buildingGeoLocation.bindGeoLocationUniforms(gl, shader);
 	
@@ -141,18 +141,18 @@ PolyLine3D.prototype.renderLines = function(magoManager, shader, renderType, bLo
 		gl.uniform4fv(shader.oneColor4_loc, [selColor.r/255.0, selColor.g/255.0, selColor.b/255.0, 1.0]);
 	}
 	
-	var vbo_vicky = this.vboKeysContainer.vboCacheKeysArray[0]; // there are only one.***
+	var vbo_vicky = this.vboKeysContainer.vboCacheKeysArray[0]; // there are only one.
 	if (!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
 	{ return false; }
 
 	gl.drawArrays(gl.LINE_STRIP, 0, vbo_vicky.vertexCount);
 	
-	// Check if exist selectedGeoCoord.***
+	// Check if exist selectedGeoCoord.
 	/*
 	var currSelected = magoManager.selectionManager.getSelectedGeneral();
 	if(currSelected !== undefined && currSelected.constructor.name === "GeographicCoord")
 	{
-		gl.uniform4fv(shader.oneColor4_loc, [1.0, 0.1, 0.1, 1.0]); //.***
+		gl.uniform4fv(shader.oneColor4_loc, [1.0, 0.1, 0.1, 1.0]); //.
 		gl.uniform1f(shader.fixPointSize_loc, 10.0);
 		currSelected.renderPoint(magoManager, shader, gl, renderType);
 	}

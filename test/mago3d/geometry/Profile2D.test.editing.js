@@ -3,7 +3,7 @@
  */
 Profile2D.prototype.TEST__setFigure_1 = function() 
 {
-	// complicated polygon with multiple holes.***
+	// complicated polygon with multiple holes.
 	var polyLine;
 	var arc;
 	var circle;
@@ -11,7 +11,7 @@ Profile2D.prototype.TEST__setFigure_1 = function()
 	var point3d;
 	var star;
 	
-	// Outer ring.**************************************
+	// Outer ring.
 	var outerRing = this.newOuterRing();
 	polyLine = outerRing.newElement("POLYLINE");
 	point3d = polyLine.newPoint2d(7, 7); // 0
@@ -26,7 +26,7 @@ Profile2D.prototype.TEST__setFigure_1 = function()
 	arc.setSweepAngleDegree(180.0);
 	arc.numPointsFor360Deg = 24;
 	
-	// hole.***
+	// hole.
 	var innerRing = this.newInnerRing();
 	rect = innerRing.newElement("RECTANGLE");
 	rect.setCenterPosition(3, 3);
@@ -38,7 +38,7 @@ Profile2D.prototype.TEST__setFigure_1 = function()
  */
 Profile2D.prototype.TEST__setFigure_2holes = function() 
 {
-	// complicated polygon with multiple holes.***
+	// complicated polygon with multiple holes.
 	var polyLine;
 	var arc;
 	var circle;
@@ -46,7 +46,7 @@ Profile2D.prototype.TEST__setFigure_2holes = function()
 	var point3d;
 	var star;
 	
-	// Outer ring.**************************************
+	// Outer ring.**
 	var outerRing = this.newOuterRing();
 	polyLine = outerRing.newElement("POLYLINE");
 	point3d = polyLine.newPoint2d(7, 7); // 0
@@ -61,13 +61,13 @@ Profile2D.prototype.TEST__setFigure_2holes = function()
 	arc.setSweepAngleDegree(180.0);
 	arc.numPointsFor360Deg = 24;
 	
-	// hole 1.***
+	// hole 1.
 	var innerRing = this.newInnerRing();
 	rect = innerRing.newElement("RECTANGLE");
 	rect.setCenterPosition(3, 3);
 	rect.setDimensions(2, 2);
 	
-	// hole 2.***
+	// hole 2.
 	innerRing = this.newInnerRing();
 	circle = innerRing.newElement("CIRCLE");
 	circle.setCenterPosition(7, 3);
@@ -79,7 +79,7 @@ Profile2D.prototype.TEST__setFigure_2holes = function()
  */
 Profile2D.prototype.TEST__setFigureHole_2 = function() 
 {
-	// complicated polygon with multiple holes.***
+	// complicated polygon with multiple holes.
 	var polyLine;
 	var arc;
 	var circle;
@@ -87,7 +87,7 @@ Profile2D.prototype.TEST__setFigureHole_2 = function()
 	var point3d;
 	var star;
 	
-	// Outer ring.**************************************
+	// Outer ring.**
 	var outerRing = this.newOuterRing();
 	
 	polyLine = outerRing.newElement("POLYLINE");
@@ -188,8 +188,8 @@ Profile2D.prototype.TEST__setFigureHole_2 = function()
 	arc.setSweepAngleDegree(90.0);
 	arc.numPointsFor360Deg = 24;
 	
-	// Holes.**************************************************
-	// Hole 1.*************************************************
+	// Holes.**
+	// Hole 1.*
 	var innerRing = this.newInnerRing();
 	
 	polyLine = innerRing.newElement("POLYLINE");
@@ -234,13 +234,13 @@ Profile2D.prototype.TEST__setFigureHole_2 = function()
 	
 	
 		
-	// Hole 2.*************************************************
+	// Hole 2.*
 	innerRing = this.newInnerRing();
 	circle = innerRing.newElement("CIRCLE");
 	circle.setCenterPosition(-10, -13);
 	circle.setRadius(1);
 	
-	// Hole 3.*************************************************
+	// Hole 3.*
 	innerRing = this.newInnerRing();
 	star = innerRing.newElement("STAR");
 	star.setCenterPosition(-6.5, -14);
@@ -248,7 +248,7 @@ Profile2D.prototype.TEST__setFigureHole_2 = function()
 	star.setInteriorRadius(0.6);
 	star.setExteriorRadius(2);
 
-	// Hole 4.*************************************************
+	// Hole 4.*
 	innerRing = this.newInnerRing();
 	star = innerRing.newElement("STAR");
 	star.setCenterPosition(-9, 14);
@@ -256,19 +256,19 @@ Profile2D.prototype.TEST__setFigureHole_2 = function()
 	star.setInteriorRadius(0.5);
 	star.setExteriorRadius(1.5);
 	
-	// Hole 5.*************************************************
+	// Hole 5.*
 	innerRing = this.newInnerRing();
 	rect = innerRing.newElement("RECTANGLE");
 	rect.setCenterPosition(-4.5, 1.5);
 	rect.setDimensions(3, 3);
 	
-	// Hole 6.*************************************************
+	// Hole 6.*
 	innerRing = this.newInnerRing();
 	circle = innerRing.newElement("CIRCLE");
 	circle.setCenterPosition(-4.5, -2.5);
 	circle.setRadius(2);
 	
-	// Hole 7.*************************************************
+	// Hole 7.*
 	innerRing = this.newInnerRing();
 	star = innerRing.newElement("STAR");
 	star.setCenterPosition(0, 0);
@@ -276,13 +276,13 @@ Profile2D.prototype.TEST__setFigureHole_2 = function()
 	star.setInteriorRadius(1);
 	star.setExteriorRadius(2.5);
 	
-	// Hole 8.*************************************************
+	// Hole 8.*
 	innerRing = this.newInnerRing();
 	circle = innerRing.newElement("CIRCLE");
 	circle.setCenterPosition(-6, 14);
 	circle.setRadius(1.5);
 	
-	// Hole 9.*************************************************
+	// Hole 9.*
 	innerRing = this.newInnerRing();
 	star = innerRing.newElement("STAR");
 	star.setCenterPosition(-1.5, 11);
@@ -290,7 +290,7 @@ Profile2D.prototype.TEST__setFigureHole_2 = function()
 	star.setInteriorRadius(0.6);
 	star.setExteriorRadius(2);
 	
-	// Hole 10.*************************************************
+	// Hole 10.*
 	innerRing = this.newInnerRing();
 	star = innerRing.newElement("STAR");
 	star.setCenterPosition(13.5, 5);
@@ -298,7 +298,7 @@ Profile2D.prototype.TEST__setFigureHole_2 = function()
 	star.setInteriorRadius(0.4);
 	star.setExteriorRadius(1.5);
 	
-	// Hole 11.*************************************************
+	// Hole 11.*
 	innerRing = this.newInnerRing();
 	star = innerRing.newElement("STAR");
 	star.setCenterPosition(9, -13);
@@ -306,7 +306,7 @@ Profile2D.prototype.TEST__setFigureHole_2 = function()
 	star.setInteriorRadius(0.4);
 	star.setExteriorRadius(1.5);
 	
-	// Hole 12.*************************************************
+	// Hole 12.*
 	innerRing = this.newInnerRing();
 	star = innerRing.newElement("STAR");
 	star.setCenterPosition(5.5, 1.5);
