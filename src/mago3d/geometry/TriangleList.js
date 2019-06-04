@@ -1,7 +1,8 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Triangle 객체의 리스트
+ * 
  * @class TrianglesList
  */
 var TrianglesList = function() 
@@ -10,14 +11,20 @@ var TrianglesList = function()
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-
+	/**
+	 * trianglesArray
+	 * @type {Triangle[]}
+	 */
 	this.trianglesArray;
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param idx 변수
- * @returns vertexArray[idx]
+ * Triangle을 생성하고, 배열에 추가한다.
+ * 
+ * @param {Vertex} vertex0
+ * @param {Vertex} vertex1
+ * @param {Vertex} vertex2
+ * @returns {Triangle} triangle 생성된 Triangle 객체
  */
 TrianglesList.prototype.newTriangle = function(vertex0, vertex1, vertex2) 
 {
@@ -30,9 +37,9 @@ TrianglesList.prototype.newTriangle = function(vertex0, vertex1, vertex2)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param idx 변수
- * @returns vertexArray[idx]
+ * 주어진 Triangle을 배열에 추가한다.
+ * 
+ * @param {Triangle} triangle 추가할 Triangle 객체
  */
 TrianglesList.prototype.addTriangle = function(triangle) 
 {
@@ -43,9 +50,7 @@ TrianglesList.prototype.addTriangle = function(triangle)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param idx 변수
- * @returns vertexArray[idx]
+ * 생성된 객체가 있다면 삭제하고, 초기화한다.
  */
 TrianglesList.prototype.deleteObjects = function() 
 {
@@ -61,6 +66,11 @@ TrianglesList.prototype.deleteObjects = function()
 	this.trianglesArray = undefined;
 };
 
+/**
+ * Triangle 배열의 개수를 구한다.
+ * 
+ * @return {Number} 배열의 개수
+ */
 TrianglesList.prototype.getTrianglesCount = function() 
 {
 	if (this.trianglesArray === undefined)
@@ -69,6 +79,12 @@ TrianglesList.prototype.getTrianglesCount = function()
 	return this.trianglesArray.length;
 };
 
+/**
+ * 주어진 인덱스에 있는 Triangle 객체를 가져온다.
+ * 
+ * @param {number} idx 가져올 Triangle 객체의 인덱스 값
+ * @return {Triangle} 주어진 인덱스 위치의 Triangle 객체
+ */
 TrianglesList.prototype.getTriangle = function(idx) 
 {
 	if (this.trianglesArray === undefined)
@@ -78,9 +94,7 @@ TrianglesList.prototype.getTriangle = function(idx)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param idx 변수
- * @returns vertexArray[idx]
+ * 버텍스 인덱스를 할당한다.
  */
 TrianglesList.prototype.assignVerticesIdx = function() 
 {
@@ -91,9 +105,9 @@ TrianglesList.prototype.assignVerticesIdx = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param idx 변수
- * @returns vertexArray[idx]
+ * 버텍스 인덱스를 할당한다.
+ * 
+ * @param {TraiangleArray[]}  Triangle 배열
  */
 TrianglesList.assignVerticesIdx = function(trianglesArray) 
 {
@@ -109,9 +123,11 @@ TrianglesList.assignVerticesIdx = function(trianglesArray)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param idx 변수
- * @returns vertexArray[idx]
+ * 주어진 trianglesArray 배열을 인텍스 배열에 설정한다.
+ * 
+ * @param {trianglesArray[]} trianglesArray
+ * @param {indicesArray[]}  인덱스 배열
+ * @returns {indicesArray[]}  인덱스 배열
  */
 TrianglesList.getTrianglesIndicesArray = function(trianglesArray, indicesArray) 
 {
@@ -135,9 +151,10 @@ TrianglesList.getTrianglesIndicesArray = function(trianglesArray, indicesArray)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param idx 변수
- * @returns vertexArray[idx]
+ * Triangle 배열을 Vertex 배열로 설정한다.
+ * 
+ * @param {trianglesArray[]} trianglesArray 
+ * @returns {Vertex[]} 버텍스 배열
  */
 TrianglesList.prototype.getNoRepeatedVerticesArray = function(resultVerticesArray) 
 {
@@ -146,9 +163,11 @@ TrianglesList.prototype.getNoRepeatedVerticesArray = function(resultVerticesArra
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param idx 변수
- * @returns vertexArray[idx]
+* 주어진 Triangle 배열을 Vertex 배열로 설정한다.
+
+ * @param {trianglesArray[]} trianglesArray 
+ * @param {Vertex[]} 버텍스 배열
+ * @returns {Vertex[]} 버텍스 배열
  */
 TrianglesList.getNoRepeatedVerticesArray = function(trianglesArray, resultVerticesArray) 
 {
@@ -204,8 +223,11 @@ TrianglesList.getNoRepeatedVerticesArray = function(trianglesArray, resultVertic
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param idx 변수
+ * 주어진 trianglesArray을 VBO face 형태의 버텍스 배열로 설정한다.
+ * 
+ * @param {} trianglesArray
+ * @param {} resultVbo 
+ * @param {VboMemoryManager} vboMemManager 
  * @returns vertexArray[idx]
  */
 TrianglesList.getVboFaceDataArray = function(trianglesArray, resultVbo, vboMemManager) 
@@ -225,43 +247,3 @@ TrianglesList.getVboFaceDataArray = function(trianglesArray, resultVbo, vboMemMa
 	
 	return resultVbo;
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

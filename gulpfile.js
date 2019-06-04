@@ -211,7 +211,7 @@ gulp.task('karma', function (done)
 // eslint
 gulp.task('lint', function() 
 {
-	var list = paths.source_js;
+	var list = paths.source_js.slice(0);
 	list.push('!./src/mago3d/extern/*.js');
 	list = list.concat(paths.test);
 	return gulp.src(list)
