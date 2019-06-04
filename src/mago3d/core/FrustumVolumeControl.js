@@ -21,7 +21,7 @@ var FrustumVolumeControl = function()
  */
 FrustumVolumeControl.prototype.getFrustumVolumeCulling = function(key)
 {
-	// 1rst, check if exist. If no exist create it.***
+	// 1rst, check if exist. If no exist create it.
 	if (!this.frustumVolumensMap.hasOwnProperty(key))
 	{
 		this.frustumVolumensMap[key] = {};

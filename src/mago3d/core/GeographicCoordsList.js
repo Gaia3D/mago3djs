@@ -15,8 +15,8 @@ var GeographicCoordsList = function()
 	this.vboKeysContainer;
 	this.owner;
 	
-	// Aux vars.***
-	this.points3dList; // used to render.***
+	// Aux vars.
+	this.points3dList; // used to render.
 };
 
 /**
@@ -113,13 +113,13 @@ GeographicCoordsList.prototype.makeLines = function(magoManager)
 	if (this.geographicCoordsArray === undefined || this.geographicCoordsArray.length === 0)
 	{ return false; }
 	
-	// To render lines, use Point3DList class object.***
+	// To render lines, use Point3DList class object.
 	if (this.points3dList === undefined)
 	{ this.points3dList = new Point3DList(); }
 	
 	var geoLoc = this.points3dList.getGeographicLocation();
 	
-	// Take the 1rst geographicCoord's geoLocation.***
+	// Take the 1rst geographicCoord's geoLocation.
 	var geoCoord = this.getGeoCoord(0);
 	var geoLocDataManagerFirst = geoCoord.getGeoLocationDataManager();
 	var geoLocFirst = geoLocDataManagerFirst.getCurrentGeoLocationData();
@@ -186,7 +186,7 @@ GeographicCoordsList.prototype.renderPoints = function(magoManager, shader, rend
 	
 	gl.uniform1i(shader.bPositionCompressed_loc, false);
 	gl.uniform1i(shader.bUse1Color_loc, true);
-	gl.uniform4fv(shader.oneColor4_loc, [1.0, 1.0, 0.1, 1.0]); //.***
+	gl.uniform4fv(shader.oneColor4_loc, [1.0, 1.0, 0.1, 1.0]); //.
 	gl.uniform1f(shader.fixPointSize_loc, 15.0);
 	gl.uniform1i(shader.bUseFixPointSize_loc, true);
 	
@@ -198,7 +198,7 @@ GeographicCoordsList.prototype.renderPoints = function(magoManager, shader, rend
 	else
 	{ gl.disable(gl.DEPTH_TEST); }
 
-	// Render pClouds.***
+	// Render pClouds.
 	var geoCoord;
 	var geoCoordsCount = this.geographicCoordsArray.length;
 	for (var i=0; i<geoCoordsCount; i++)
@@ -207,11 +207,11 @@ GeographicCoordsList.prototype.renderPoints = function(magoManager, shader, rend
 		geoCoord.renderPoint(magoManager, shader, gl, renderType);
 	}
 	
-	// Check if exist selectedGeoCoord.***
+	// Check if exist selectedGeoCoord.
 	var currSelected = magoManager.selectionManager.getSelectedGeneral();
 	if (currSelected !== undefined && currSelected.constructor.name === "GeographicCoord")
 	{
-		gl.uniform4fv(shader.oneColor4_loc, [1.0, 0.1, 0.1, 1.0]); //.***
+		gl.uniform4fv(shader.oneColor4_loc, [1.0, 0.1, 0.1, 1.0]); //.
 		gl.uniform1f(shader.fixPointSize_loc, 10.0);
 		currSelected.renderPoint(magoManager, shader, gl, renderType);
 	}
@@ -219,7 +219,7 @@ GeographicCoordsList.prototype.renderPoints = function(magoManager, shader, rend
 	shader.disableVertexAttribArrayAll();
 	gl.enable(gl.DEPTH_TEST);
 	
-	// Write coords.***
+	// Write coords.
 	var canvas = magoManager.getObjectLabel();
 	var ctx = canvas.getContext("2d");
 	ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);

@@ -24,7 +24,7 @@ var VertexMatrix = function()
 	 * @type {Array.<VertexList>}
 	 */
 	this.vertexListsArray = [];
-	// SCTRATXH.******************
+	// SCTRATXH.
 
 	/**
 	 * All Vertex array
@@ -267,9 +267,9 @@ VertexMatrix.prototype.translateVertices = function(dx, dy, dz)
 
 /**
  * set TTrianglesMatrix using vertexMatrix.
- * OLD function. Used for shadow blending cube. OLD.***
- * TTriangles provisional is in geometryUtils.*********	
- * condition: all the vertex lists must have the same number of vertex.***
+ * OLD function. Used for shadow blending cube. OLD.
+ * TTriangles provisional is in geometryUtils.	
+ * condition: all the vertex lists must have the same number of vertex.
  * @param {TTrianglesMatrix} tTrianglesMatrix
  */
 VertexMatrix.prototype.makeTTrianglesLateralSidesLOOP = function(tTrianglesMatrix) 
@@ -377,7 +377,7 @@ VertexMatrix.makeMatrixByDataArray = function(positions3Array, normals3Array, te
 
 /**
  * make face array between two vertex lists.
- * condition: all the vertex lists must have the same number of vertex.***
+ * condition: all the vertex lists must have the same number of vertex.
  *	 3   3-------------2  +   +-------------+  +   +-------------+  +   +-------------+
  *	 | \   \           |  | \   \           |  | \   \           |  | \   \           |
  *	 |   \   \  face_B |  |   \   \  face_B |  |   \   \  face_B |  |   \   \  face_B |
@@ -438,13 +438,13 @@ VertexMatrix.makeFacesBetweenVertexLists = function(vertexListDown, vertexListUp
 				
 				face_A.addVerticesArray([vertex_0, vertex_3, vertex_1]);
 				//resultHalfEdgesArray_A = face_A.createHalfEdges(resultHalfEdgesArray_A);
-				//hedge_A = resultHalfEdgesArray_A[1]; // Diagonal hedge of face_A.***
+				//hedge_A = resultHalfEdgesArray_A[1]; // Diagonal hedge of face_A.
 				
 				face_B.addVerticesArray([vertex_1, vertex_3, vertex_2]);
 				//resultHalfEdgesArray_B = face_B.createHalfEdges(resultHalfEdgesArray_B);
-				//hedge_B = resultHalfEdgesArray_B[2]; // Diagonal hedge of face_B.***
+				//hedge_B = resultHalfEdgesArray_B[2]; // Diagonal hedge of face_B.
 				
-				// Now, set twins between face_A & face_B.***
+				// Now, set twins between face_A & face_B.
 				//hedge_A.setTwin(hedge_B);
 				resultFacesArray.push(face_A);
 				resultFacesArray.push(face_B);
@@ -463,13 +463,13 @@ VertexMatrix.makeFacesBetweenVertexLists = function(vertexListDown, vertexListUp
 					
 					face_A.addVerticesArray([vertex_0, vertex_3, vertex_1]);
 					//resultHalfEdgesArray_A = face_A.createHalfEdges(resultHalfEdgesArray_A);
-					//hedge_A = resultHalfEdgesArray_A[1]; // Diagonal hedge of face_A.***
+					//hedge_A = resultHalfEdgesArray_A[1]; // Diagonal hedge of face_A.
 					
 					face_B.addVerticesArray([vertex_1, vertex_3, vertex_2]);
 					//resultHalfEdgesArray_B = face_B.createHalfEdges(resultHalfEdgesArray_B);
-					//hedge_B = resultHalfEdgesArray_B[2]; // Diagonal hedge of face_B.***
+					//hedge_B = resultHalfEdgesArray_B[2]; // Diagonal hedge of face_B.
 					
-					// Now, set twins between face_A & face_B.***
+					// Now, set twins between face_A & face_B.
 					//hedge_A.setTwin(hedge_B);
 					resultFacesArray.push(face_A);
 					resultFacesArray.push(face_B);
@@ -506,13 +506,13 @@ VertexMatrix.makeFacesBetweenVertexLists = function(vertexListDown, vertexListUp
 				
 				face_A.addVerticesArray([vertex_0, vertex_1, vertex_3]);
 				//resultHalfEdgesArray_A = face_A.createHalfEdges(resultHalfEdgesArray_A);
-				//hedge_A = resultHalfEdgesArray_A[1]; // Diagonal hedge of face_A.***
+				//hedge_A = resultHalfEdgesArray_A[1]; // Diagonal hedge of face_A.
 				
 				face_B.addVerticesArray([vertex_1, vertex_2, vertex_3]);
 				//resultHalfEdgesArray_B = face_B.createHalfEdges(resultHalfEdgesArray_B);
-				//hedge_B = resultHalfEdgesArray_B[2]; // Diagonal hedge of face_B.***
+				//hedge_B = resultHalfEdgesArray_B[2]; // Diagonal hedge of face_B.
 				
-				// Now, set twins between face_A & face_B.***
+				// Now, set twins between face_A & face_B.
 				//hedge_A.setTwin(hedge_B);
 				
 				resultFacesArray.push(face_A);
@@ -532,13 +532,13 @@ VertexMatrix.makeFacesBetweenVertexLists = function(vertexListDown, vertexListUp
 					
 					face_A.addVerticesArray([vertex_0, vertex_1, vertex_3]);
 					//resultHalfEdgesArray_A = face_A.createHalfEdges(resultHalfEdgesArray_A);
-					//hedge_A = resultHalfEdgesArray_A[1]; // Diagonal hedge of face_A.***
+					//hedge_A = resultHalfEdgesArray_A[1]; // Diagonal hedge of face_A.
 					
 					face_B.addVerticesArray([vertex_1, vertex_2, vertex_3]);
 					//resultHalfEdgesArray_B = face_B.createHalfEdges(resultHalfEdgesArray_B);
-					//hedge_B = resultHalfEdgesArray_B[2]; // Diagonal hedge of face_B.***
+					//hedge_B = resultHalfEdgesArray_B[2]; // Diagonal hedge of face_B.
 					
-					// Now, set twins between face_A & face_B.***
+					// Now, set twins between face_A & face_B.
 					//hedge_A.setTwin(hedge_B);
 					
 					resultFacesArray.push(face_A);
@@ -564,7 +564,7 @@ VertexMatrix.makeFacesBetweenVertexLists = function(vertexListDown, vertexListUp
 
 /**
 * make Surface
-* condition: all the vertex lists must have the same number of vertex.***
+* condition: all the vertex lists must have the same number of vertex.
 * @deprecated
 * @static
 * @param {VertexMatrix} vertexMatrix
@@ -609,9 +609,9 @@ VertexMatrix.makeSurface = function(vertexMatrix, resultSurface, bLoop, bClockWi
 
 /**
  * set TTrianglesMatrix using vertexMatrix.
- * OLD function. Used for shadow blending cube. OLD.***
- * TTriangles provisional is in geometryUtils.*********	
- * condition: all the vertex lists must have the same number of vertex.***
+ * OLD function. Used for shadow blending cube. OLD.
+ * TTriangles provisional is in geometryUtils.	
+ * condition: all the vertex lists must have the same number of vertex.
  * @deprecated
  * @param {TTrianglesMatrix} trianglesMatrix
  * @param {boolean} bLoop if true, include last vertex triangle
@@ -666,7 +666,7 @@ VertexMatrix.prototype.makeTrianglesLateralSides = function(trianglesMatrix, bLo
 */
 VertexMatrix.getIndexOfArray = function(numCols, numRows, col, row) 
 {
-	// static function.***
+	// static function.
 	var idx = col + row * numCols;
 	return idx;
 };

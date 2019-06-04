@@ -15,13 +15,13 @@ var Camera = function()
 	this.direction = new Point3D(); 
 	this.up = new Point3D();
 	this.right = new Point3D();
-	this.frustum = new Frustum(); // current frustum.***
-	this.bigFrustum = new Frustum(); // sum of all frustums.***
+	this.frustum = new Frustum(); // current frustum.
+	this.bigFrustum = new Frustum(); // sum of all frustums.
 	this.dirty = true;
 	this.frustumsArray = [];
 	this.frustumsArray.push(this.frustum);
 	
-	// frustum points.***
+	// frustum points.
 	this.nearCenterPoint = new Point3D();
 	this.farCenterPoint = new Point3D();
 	
@@ -67,7 +67,7 @@ Camera.prototype.translate = function(translationVec)
  */
 Camera.prototype.transformByMatrix4 = function(mat)
 {
-	// transform position, direction and up.***
+	// transform position, direction and up.
 	/*
 	this.position = this.transformPoint3DByMatrix4(this.position, mat);
 	
@@ -79,7 +79,7 @@ Camera.prototype.transformByMatrix4 = function(mat)
 	this.direction = this.rotatePoint3DByMatrix3(this.direction, this.rotMat);
 	this.up = this.rotatePoint3DByMatrix3(this.up, this.rotMat);
 	*/
-	// Calculate with our matrix4.***
+	// Calculate with our matrix4.
 	this.position = mat.transformPoint3D(this.position, this.position);
 	this.direction = mat.rotatePoint3D(this.direction, this.direction);
 	this.up = mat.rotatePoint3D(this.up, this.up);
@@ -298,7 +298,7 @@ Camera.prototype.setCurrentFrustum = function(frustumIdx)
  */
 Camera.prototype.bindCameraUniforms = function(gl, shader) 
 {
-	// Bind frustum near & far.***
+	// Bind frustum near & far.
 	var frustum = this.frustum;
 	gl.uniform1f(shader.frustumNear_loc, frustum.near[0]);
 	gl.uniform1f(shader.frustumFar_loc, frustum.far[0]);
@@ -311,7 +311,7 @@ Camera.prototype.bindCameraUniforms = function(gl, shader)
 Camera.prototype.calculateFrustumsPlanes = function()
 {
 	var plane;
-	var frustum0; // the 1rst frustum.***
+	var frustum0; // the 1rst frustum.
 	
 	// Use the frustum0 to calculate nearWidth, nearHeight, farWidth & farHeight.
 	frustum0 = this.getFrustum(0);
@@ -359,7 +359,7 @@ Camera.prototype.calculateFrustumsPlanes = function()
 	plane = frustum0.planesArray[1];
 	plane.setPointAndNormal(this.farCenterPoint.x, this.farCenterPoint.y, this.farCenterPoint.z, -dx, -dy, -dz);
 
-	// The 4 lateral planes are the same for all frustum0s.***
+	// The 4 lateral planes are the same for all frustum0s.
 	// left plane.
 	this.leftNormal = this.leftBottomDir.crossProduct(this.up, this.leftNormal);
 	this.leftNormal.unitary();
@@ -384,7 +384,7 @@ Camera.prototype.calculateFrustumsPlanes = function()
 	plane = frustum0.planesArray[5];
 	plane.setPointAndNormal(px, py, pz, this.topNormal.x, this.topNormal.y, this.topNormal.z);
 	
-	// once finished, calculate the rest of frustums.***
+	// once finished, calculate the rest of frustums.
 	var frustum;
 	var frustumsCount = this.frustumsArray.length;
 	for (var i=1; i<frustumsCount; i++)
@@ -403,14 +403,14 @@ Camera.prototype.calculateFrustumsPlanes = function()
 		plane = frustum.planesArray[1];
 		plane.setPointAndNormal(this.farCenterPoint.x, this.farCenterPoint.y, this.farCenterPoint.z, -dx, -dy, -dz);
 		
-		// the lateral planes.***
+		// the lateral planes.
 		for (var j=2; j<6; j++)
 		{
 			frustum.planesArray[j] = frustum0.planesArray[j];
 		}
 	}
 	
-	// finally calculate the totalFrustum(BigFrustum).***
+	// finally calculate the totalFrustum(BigFrustum).
 	// calculate the near and far points.
 	this.nearCenterPoint.set(px + dx * this.bigFrustum.near, py + dy * this.bigFrustum.near, pz + dz * this.bigFrustum.near);
 	this.farCenterPoint.set(px + dx * this.bigFrustum.far, py + dy * this.bigFrustum.far, pz + dz * this.bigFrustum.far);
@@ -424,9 +424,9 @@ Camera.prototype.calculateFrustumsPlanes = function()
 	plane.setPointAndNormal(this.farCenterPoint.x, this.farCenterPoint.y, this.farCenterPoint.z, -dx, -dy, -dz);
 		
 	var lastFrustum = this.getLastFrustum();
-	for (var j=2; j<6; j++) // starting in i==2.***
+	for (var j=2; j<6; j++) // starting in i==2.
 	{
-		// the bigFrustum is esqual to frustum0 except in the "far".***
+		// the bigFrustum is esqual to frustum0 except in the "far".
 		this.bigFrustum.planesArray[j] = frustum0.planesArray[j];
 	}
 };
@@ -439,7 +439,7 @@ Camera.prototype.doTrack = function(magoManager)
 {
 	if (this.tracked)
 	{
-		// Set camera position.****************************************
+		// Set camera position.*
 		var trackNode = this.tracked;
 		if (MagoConfig.getPolicy().geo_view_library === Constant.CESIUM)
 		{
@@ -449,7 +449,13 @@ Camera.prototype.doTrack = function(magoManager)
 
 			var geoLocDatamanager = trackNode.getNodeGeoLocDataManager();
 			//var geoLocationData = geoLocDatamanager.getTrackGeoLocationData();
+			if (geoLocDatamanager === undefined)
+			{ return; }
+			
 			var geoLocationData = geoLocDatamanager.getCurrentGeoLocationData();
+			if (geoLocationData === undefined)
+			{ return; }
+
 			var prevGeoLocationData = geoLocDatamanager.getGeoLocationData(1);
 			if (defined(prevGeoLocationData))
 			{
@@ -464,10 +470,9 @@ Camera.prototype.doTrack = function(magoManager)
 				movedCamPos.y = position.y + dy;
 				movedCamPos.z = position.z + dz;
 			}
-			
-
 			var targetGeographicCoords = geoLocationData.getGeographicCoords();
-
+			if (targetGeographicCoords === undefined)
+			{ return; }
 			var target = Cesium.Cartesian3.fromDegrees(targetGeographicCoords.longitude, targetGeographicCoords.latitude, targetGeographicCoords.altitude);
 			var range = Cesium.Cartesian3.distance(movedCamPos ? movedCamPos : position, target);
 			var hpr = new Cesium.HeadingPitchRange(camera.heading, camera.pitch, range);

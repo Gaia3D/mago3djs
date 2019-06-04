@@ -44,7 +44,7 @@ var HalfEdge = function()
 
 /**
  * delete all member.
- * Note: "HalfEdge" is NO-Owner of the contents, so, don't delete contents. Only set as "undefined".***|
+ * Note: "HalfEdge" is NO-Owner of the contents, so, don't delete contents. Only set as "undefined".|
  */
 HalfEdge.prototype.deleteObjects = function()
 {
@@ -161,7 +161,7 @@ HalfEdge.prototype.getPrev = function()
  */
 HalfEdge.areTwinables = function(hedgeA, hedgeB)
 {
-	// check if "hedgeA" is twinable with "hedgeB".***
+	// check if "hedgeA" is twinable with "hedgeB".
 	if (hedgeA.startVertex === hedgeB.getEndVertex())
 	{
 		if (hedgeA.getEndVertex() === hedgeB.startVertex)
@@ -186,7 +186,7 @@ HalfEdge.getHalfEdgesLoop = function(hedge, resultHedgesArray)
 	if (resultHedgesArray === undefined)
 	{ resultHedgesArray = []; }
 	
-	resultHedgesArray.length = 0; // init the array.***
+	resultHedgesArray.length = 0; // init the array.
 	
 	var startHedge = hedge;
 	var currHedge = hedge;

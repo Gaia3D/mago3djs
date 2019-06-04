@@ -107,6 +107,58 @@ define(function() {\n\
 	});
 }
 
+function jsonToJavaScript(minify, minifyStateFilePath) 
+{
+	fs.writeFileSync(minifyStateFilePath, minify);
+	var minifyStateFileLastModified = fs.existsSync(minifyStateFilePath) ? fs.statSync(minifyStateFilePath).mtime.getTime() : 0;
+
+	// collect all currently existing JS files into a set, later we will remove the ones
+	// we still are using from the set, then delete any files remaining in the set.
+	var leftOverJsFiles = {};
+	var messageContents = "'use strict';\nvar MessageSource = {};\n";
+
+	globby.sync(['src/mago3d/message/i18n/**/*.js']).forEach(function(file) 
+	{
+		leftOverJsFiles[path.normalize(file)] = true;
+	});
+
+	var jsonFiles = globby.sync(['src/mago3d/message/i18n/**/*.json']);
+	jsonFiles.forEach(function(jsonFile) 
+	{
+		jsonFile = path.normalize(jsonFile);
+		var baseName = path.basename(jsonFile, '.json');
+		var jsFile = path.join(path.dirname(jsonFile), baseName) + '.js';
+
+		delete leftOverJsFiles[jsFile];
+
+		var jsFileExists = fs.existsSync(jsFile);
+		var jsFileModified = jsFileExists ? fs.statSync(jsFile).mtime.getTime() : 0;
+		var glslFileModified = fs.statSync(jsonFile).mtime.getTime();
+
+		if (jsFileExists && jsFileModified > glslFileModified && jsFileModified > minifyStateFileLastModified) 
+		{
+			return;
+		}
+
+		var contents = fs.readFileSync(jsonFile, 'utf8');
+		if (minify) 
+		{
+			contents = contents.replace(/\s+$/gm, '').replace(/^\s+/gm, '').replace(/\n+/gm, '\n');
+		}
+
+		//contents = contents.replace(/\n/gm, '\\n\\\n');
+		messageContents += 'MessageSource.' + baseName + ' = ' + contents + ';\n';
+	});
+
+	fs.writeFileSync('src/mago3d/message/MessageSource.js', messageContents);
+
+	// delete any left over JS files from old shaders
+	Object.keys(leftOverJsFiles).forEach(function(filepath) 
+	{
+		rimraf.sync(filepath);
+	});
+}
+
 // 삭제가 필요한 디렉토리가 있는 경우
 gulp.task('clean', function() 
 {
@@ -118,6 +170,7 @@ gulp.task('build', function(done)
 	mkdirp.sync(paths.build);
 	mkdirp.sync(paths.dest_js);
 	glslToJavaScript(false, path.join(path.normalize(paths.build), 'minifyShaders.state'));
+	jsonToJavaScript(false, path.join(path.normalize(paths.build), 'minifyShaders.state'));
 	done();
 });
 
@@ -158,7 +211,7 @@ gulp.task('karma', function (done)
 // eslint
 gulp.task('lint', function() 
 {
-	var list = paths.source_js;
+	var list = paths.source_js.slice(0);
 	list.push('!./src/mago3d/extern/*.js');
 	list = list.concat(paths.test);
 	return gulp.src(list)

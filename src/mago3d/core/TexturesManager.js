@@ -1,7 +1,105 @@
 'use strict';
 
 /**
+ * Manages textures of the Mago3D.
+ * @class TexturesManager
+ */
+var TexturesManager = function(magoManager) 
+{
+	if (!(this instanceof TexturesManager)) 
+	{
+		throw new Error(Messages.CONSTRUCT_ERROR);
+	}
+	
+	/**
+	 * Main Mago3D manager.
+	 * @type {MagoManager}
+	 * @default undefined.
+	 */
+	this._magoManager = magoManager;
+	
+	/**
+	 * WebGL rendering context.
+	 * @type {WebGLRenderingContext}
+	 * @default undefined.
+	 */
+	this._gl = this._magoManager.getGl();
+
+	/**
+	 * Auxiliar texture 1x1 pixel.
+	 * @type {WebGLTexture}
+	 * @default undefined.
+	 */
+	this._textureAux_1x1;
+	
+	/**
+	 * Noise texture 4x4 pixels used for ssao.
+	 * @type {WebGLTexture}
+	 * @default undefined.
+	 */
+	this._noiseTexture_4x4;
+};
+
+/**
+ * Returns WebGL Rendering Context.
+ */
+TexturesManager.prototype.getGl = function()
+{
+	if (this._gl === undefined)
+	{
+		this._gl = this._magoManager.getGl();
+	}
+	
+	return this._gl;
+};
+
+
+/**
+ * Handles the loaded image.
+ * 
+ * @param {WebGLRenderingContext} gl WebGL rendering context.
+ * @param {image} image 
+ * @param {WebGLTexture} texture 
+ * @param {Boolean} flip_y_texCoords //if need vertical mirror of the image
+ */
+function handleTextureLoaded(gl, image, texture, flip_y_texCoords) 
+{
+	if (flip_y_texCoords === undefined)
+	{ flip_y_texCoords = true; }
+	
+	gl.bindTexture(gl.TEXTURE_2D, texture);
+	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, flip_y_texCoords); // if need vertical mirror of the image.
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image); // Original.
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+	gl.generateMipmap(gl.TEXTURE_2D);
+	gl.bindTexture(gl.TEXTURE_2D, null);
+};
+
+
+/**
+ * Returns the auxiliar texture 1x1 pixel. If is undefined, then creates it.
+ */
+TexturesManager.prototype.getTextureAux1x1 = function() 
+{
+	if (this._textureAux_1x1 === undefined)
+	{
+		var gl = this.getGl();
+		this._textureAux_1x1 = gl.createTexture();
+		gl.bindTexture(gl.TEXTURE_2D, this._textureAux_1x1);
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([150, 150, 150, 255])); // clear grey
+		gl.bindTexture(gl.TEXTURE_2D, null);
+	}
+	
+	return this._textureAux_1x1;
+};
+
+
+
+
+/**
  * Generates a noise texture.
+ * It detects the coner or the area which need to be shaded by the distance to camera
  * @param {WebGLRenderingContext} gl WebGL rendering context.
  * @param {Number} w The width of the texture.
  * @param {Number} h The height of the texture.
@@ -112,83 +210,7 @@ function genNoiseTextureRGBA(gl, w, h, pixels)
 };
 
 /**
- * Handles the loaded image.
- * 
- * @param {WebGLRenderingContext} gl WebGL rendering context.
- * @param {image} image 
- * @param {WebGLTexture} texture 
- * @param {Boolean} flip_y_texCoords 
- */
-function handleTextureLoaded(gl, image, texture, flip_y_texCoords) 
-{
-	if (flip_y_texCoords === undefined)
-	{ flip_y_texCoords = true; }
-	
-	gl.bindTexture(gl.TEXTURE_2D, texture);
-	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, flip_y_texCoords); // if need vertical mirror of the image.***
-	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image); // Original.***
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
-	gl.generateMipmap(gl.TEXTURE_2D);
-	gl.bindTexture(gl.TEXTURE_2D, null);
-};
-
-
-/**
- * Manages textures of the Mago3D.
- * @class TexturesManager
- */
-var TexturesManager = function(magoManager) 
-{
-	if (!(this instanceof TexturesManager)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-	
-	/**
-	 * Main Mago3D manager.
-	 * @type {MagoManager}
-	 * @default undefined.
-	 */
-	this._magoManager = magoManager;
-	
-	/**
-	 * WebGL rendering context.
-	 * @type {WebGLRenderingContext}
-	 * @default undefined.
-	 */
-	this._gl = this._magoManager.getGl();
-
-	/**
-	 * Auxiliar texture 1x1.
-	 * @type {WebGLTexture}
-	 * @default undefined.
-	 */
-	this._textureAux_1x1;
-	
-	/**
-	 * Noise texture 4x4 used for ssao.
-	 * @type {WebGLTexture}
-	 * @default undefined.
-	 */
-	this._noiseTexture_4x4;
-};
-
-/**
- * Returns WebGL Rendering Context.
- */
-TexturesManager.prototype.getGl = function()
-{
-	if (this._gl === undefined)
-	{
-		this._gl = this._magoManager.getGl();
-	}
-	
-	return this._gl;
-};
-
-/**
- * Returns the noise texture 4x4. If is undefined, then creates it. This texture is used when ssao.
+ * Returns the noise texture 4x4 pixels. If is undefined, then creates it. This texture is used when ssao.
  */
 TexturesManager.prototype.getNoiseTexture4x4 = function() 
 {
@@ -200,24 +222,6 @@ TexturesManager.prototype.getNoiseTexture4x4 = function()
 	
 	return this._noiseTexture_4x4;
 };
-
-/**
- * Returns the auxiliar texture 1x1. If is undefined, then creates it.
- */
-TexturesManager.prototype.getTextureAux1x1 = function() 
-{
-	if (this._textureAux_1x1 === undefined)
-	{
-		var gl = this.getGl();
-		this._textureAux_1x1 = gl.createTexture();
-		gl.bindTexture(gl.TEXTURE_2D, this._textureAux_1x1);
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([150, 150, 150, 255])); // clear grey
-		gl.bindTexture(gl.TEXTURE_2D, null);
-	}
-	
-	return this._textureAux_1x1;
-};
-
 
 
 

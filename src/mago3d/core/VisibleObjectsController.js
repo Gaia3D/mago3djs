@@ -10,14 +10,13 @@ var VisibleObjectsController = function()
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	// This object works with FrustumVolumeControl.***
+	// This object works with FrustumVolumeControl.
 	this.currentVisibles0 = []; //frustum 0
 	this.currentVisibles1 = []; //frustum 1
 	this.currentVisibles2 = []; //frustum 2
 	this.currentVisibles3 = []; //frustum 3
 	this.currentVisiblesAux = [];
 };
-
 VisibleObjectsController.prototype.initArrays = function() 
 {
 	this.currentVisibles0 = [];
@@ -109,8 +108,8 @@ VisibleObjectsController.prototype.getObjectIdxSortedByDist = function(objectsAr
 
 /**
  * Put the object by distance from camera
- * @param objectsArray
- * @param object 
+ * @param {VisibleObjectsController}objectsArray
+ * @param {Octree}object 
  */
 VisibleObjectsController.prototype.putObjectToArraySortedByDist = function(objectsArray, object) 
 {
@@ -138,7 +137,7 @@ VisibleObjectsController.prototype.putObjectToArraySortedByDist = function(objec
  */
 VisibleObjectsController.prototype.getNodeIdxSortedByDist = function(nodesArray, startIdx, endIdx, node) 
 {
-	// Note: Function exclusive to use with Node class objects.***
+	// Note: Function exclusive to use with Node class objects.
 	// this do a dicotomic search of idx in a ordered table.
 	// 1rst, check the range.
 	var neoBuilding = node.data.neoBuilding;
@@ -194,7 +193,7 @@ VisibleObjectsController.prototype.getNodeIdxSortedByDist = function(nodesArray,
  */
 VisibleObjectsController.prototype.putNodeToArraySortedByDist = function(nodesArray, node) 
 {
-	// Note: Function exclusive to use with Node class objects.***
+	// Note: Function exclusive to use with Node class objects.
 	if (nodesArray.length > 0)
 	{
 		var startIdx = 0;

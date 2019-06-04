@@ -45,5 +45,5 @@ var LodBuildingData = function()
 	 * @example mosaicTextureLod0.jpg
 	 */
 	this.textureFileName;
-	//this.dataType; // no used yet.***
+	//this.dataType; // no used yet.
 };

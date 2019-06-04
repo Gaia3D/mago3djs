@@ -121,7 +121,7 @@ Line2D.prototype.isParallelToLine = function(line)
 	var zero = 10E-10;
 	var angRad = this.direction.angleRadToVector(line.direction);
 	
-	// if angle is zero or 180 degree, then this is parallel to "line".***
+	// if angle is zero or 180 degree, then this is parallel to "line".
 	if (angRad < zero || Math.abs(angRad - Math.PI) < zero)
 	{ return true; }
 	
@@ -139,18 +139,18 @@ Line2D.prototype.intersectionWithLine = function(line, resultIntersectPoint)
 	if (line === undefined)
 	{ return undefined; }
 	
-	// 1rst, check that this is not parallel to "line".***
+	// 1rst, check that this is not parallel to "line".
 	if (this.isParallelToLine(line))
 	{ return undefined; }
 	
-	// now, check if this or "line" are vertical or horizontal.***
+	// now, check if this or "line" are vertical or horizontal.
 	var intersectX;
 	var intersectY;
 	
 	var zero = 10E-10;
 	if (Math.abs(this.direction.x) < zero)
 	{
-		// this is a vertical line.***
+		// this is a vertical line.
 		var slope = line.direction.y / line.direction.x;
 		var b = line.point.y - slope * line.point.x;
 		
@@ -159,11 +159,11 @@ Line2D.prototype.intersectionWithLine = function(line, resultIntersectPoint)
 	}
 	else if (Math.abs(this.direction.y) < zero)
 	{
-		// this is a horizontal line.***
-		// must check if the "line" is vertical.***
+		// this is a horizontal line.
+		// must check if the "line" is vertical.
 		if (Math.abs(line.direction.x) < zero)
 		{
-			// "line" is vertical.***
+			// "line" is vertical.
 			intersectX = line.point.x;
 			intersectY = this.point.y;
 		}
@@ -178,10 +178,10 @@ Line2D.prototype.intersectionWithLine = function(line, resultIntersectPoint)
 	}
 	else 
 	{
-		// this is oblique.***
+		// this is oblique.
 		if (Math.abs(line.direction.x) < zero)
 		{
-			// "line" is vertical.***
+			// "line" is vertical.
 			var mySlope = this.direction.y / this.direction.x;
 			var myB = this.point.y - mySlope * this.point.x;
 			intersectX = line.point.x;

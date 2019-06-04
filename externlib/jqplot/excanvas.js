@@ -1336,7 +1336,7 @@ if (!document.createElement('canvas').getContext) {
     return {width: this.textMeasureEl_.offsetWidth};
   };
 
-  /******** STUBS ********/
+  /** STUBS **/
   contextPrototype.clip = function() {
     // TODO: Implement
   };

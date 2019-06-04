@@ -76,14 +76,14 @@ PolyLine2D.prototype.getPoints = function(resultPointsArray)
 		{
 			if (resultExistentPointsCount > 0)
 			{
-				// check if the last point of "resultPointsArray" and the 1rst point of "this" is coincident.***
+				// check if the last point of "resultPointsArray" and the 1rst point of "this" is coincident.
 				var lastExistentPoint = resultPointsArray[resultExistentPointsCount-1];
 				var point0 = this.point2dArray[i];
 				if (!lastExistentPoint.isCoincidentToPoint(point0, errorDist))
 				{
 					point = new Point2D();
 					point.copyFrom(this.point2dArray[i]); 
-					point.pointType = 1; // mark as "important point".***
+					point.pointType = 1; // mark as "important point".
 					resultPointsArray.push(point);
 				}
 			}
@@ -91,7 +91,7 @@ PolyLine2D.prototype.getPoints = function(resultPointsArray)
 			{
 				point = new Point2D();
 				point.copyFrom(this.point2dArray[i]); 
-				point.pointType = 1; // mark as "important point".***
+				point.pointType = 1; // mark as "important point".
 				resultPointsArray.push(point);
 			}
 		}
@@ -99,7 +99,7 @@ PolyLine2D.prototype.getPoints = function(resultPointsArray)
 		{
 			point = new Point2D();
 			point.copyFrom(this.point2dArray[i]); 
-			point.pointType = 1; // mark as "important point".***
+			point.pointType = 1; // mark as "important point".
 			resultPointsArray.push(point);
 		}
 	}

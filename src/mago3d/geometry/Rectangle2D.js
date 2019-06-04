@@ -72,21 +72,21 @@ Rectangle2D.prototype.getPoints = function(resultPointsArray)
 	var halfWidth = this.width / 2;
 	var halfHeight = this.height / 2;
 	
-	// starting in left-down corner, go in CCW.***
+	// starting in left-down corner, go in CCW.
 	point = new Point2D(this.centerPoint.x - halfWidth, this.centerPoint.y - halfHeight);
-	point.pointType = 1; // mark as "important point".***
+	point.pointType = 1; // mark as "important point".
 	resultPointsArray.push(point);
 	
 	point = new Point2D(this.centerPoint.x + halfWidth, this.centerPoint.y - halfHeight);
-	point.pointType = 1; // mark as "important point".***
+	point.pointType = 1; // mark as "important point".
 	resultPointsArray.push(point);
 	
 	point = new Point2D(this.centerPoint.x + halfWidth, this.centerPoint.y + halfHeight);
-	point.pointType = 1; // mark as "important point".***
+	point.pointType = 1; // mark as "important point".
 	resultPointsArray.push(point);
 	
 	point = new Point2D(this.centerPoint.x - halfWidth, this.centerPoint.y + halfHeight);
-	point.pointType = 1; // mark as "important point".***
+	point.pointType = 1; // mark as "important point".
 	resultPointsArray.push(point);
 	
 	return resultPointsArray;

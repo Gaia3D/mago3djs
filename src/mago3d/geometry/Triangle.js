@@ -1,8 +1,13 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Triangle(삼각형)를 생성하기 위한 클래스
+ * 
  * @class Triangle
+ *  
+ * @param {Vertex} vertex0
+ * @param {Vertex} vertex1
+ * @param {Vertex} vertex2
  */
 var Triangle= function(vertex0, vertex1, vertex2) 
 {
@@ -10,14 +15,48 @@ var Triangle= function(vertex0, vertex1, vertex2)
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-
+	/**
+	 * vertex0
+	 * @type {Vertex}
+	 * @default vertex0.
+	 */
 	this.vertex0;
+	/**
+	 * vertex1
+	 * @type {Vertex}
+	 * @default vertex1.
+	 */
 	this.vertex1;
+	/**
+	 * vertex2
+	 * @type {Vertex}
+	 * @default vertex2.
+	 */
 	this.vertex2;
+	/**
+	 * vtxIdx0
+	 * @type {number}
+	 * @default undefined.
+	 */
 	this.vtxIdx0;
+	/**
+	 * vtxIdx1
+	 * @type {number}
+	 * @default undefined.
+	 */
 	this.vtxIdx1;
+	/**
+	 * vtxIdx2
+	 * @type {number}
+	 * @default undefined.
+	 */
 	this.vtxIdx2;
-	this.normal; // plainNormal.
+	/**
+	 * plainNormal
+	 * @type {Point3D}
+	 * @default undefined.
+	 */	
+	this.normal; 
 	
 	if (vertex0 !== undefined)
 	{ this.vertex0 = vertex0; }
@@ -32,11 +71,11 @@ var Triangle= function(vertex0, vertex1, vertex2)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- */
+* 생성된 객체가 있다면 삭제하고 초기화 한다.
+*/
 Triangle.prototype.deleteObjects = function() 
 {
-	// the triangle no deletes vertices.***
+	// the triangle no deletes vertices.
 	if (this.vertex0)
 	{
 		this.vertex0 = undefined;
@@ -61,10 +100,11 @@ Triangle.prototype.deleteObjects = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param vertex0 변수
- * @param vertex1 변수
- * @param vertex2 변수
+ * Triangle의 각각의 Vertex 설정
+ * 
+ * @param {Vertex} vertex0
+ * @param {Vertex} vertex1
+ * @param {Vertex} vertex2
  */
 Triangle.prototype.setVertices = function(vertex0, vertex1, vertex2) 
 {
@@ -74,10 +114,7 @@ Triangle.prototype.setVertices = function(vertex0, vertex1, vertex2)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param vertex0 변수
- * @param vertex1 변수
- * @param vertex2 변수
+ * Vertex의 vertexList index를 가지고 와서 Vertex index 설정
  */
 Triangle.prototype.assignVerticesIdx = function() 
 {
@@ -89,6 +126,12 @@ Triangle.prototype.assignVerticesIdx = function()
 	this.vtxIdx2 = this.vertex2.getIdxInList();
 };
 
+/**
+ * Triangle의 Vertex index를 인덱스 배열에 추가한다.
+ * 
+ * @param {indicesArray[]} 인덱스 배열
+ * @return {indicesArray[]} 인덱스 배열 
+ */
 Triangle.prototype.getIndicesArray = function(indicesArray)
 {
 	if (indicesArray === undefined)
@@ -105,7 +148,7 @@ Triangle.prototype.getIndicesArray = function(indicesArray)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * invert triangle을 구한다.
  */
 Triangle.prototype.invertSense = function() 
 {
@@ -117,7 +160,7 @@ Triangle.prototype.invertSense = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * PlaneNormal을 계산한다.
  */
 Triangle.prototype.calculatePlaneNormal = function() 
 {
@@ -129,10 +172,11 @@ Triangle.prototype.calculatePlaneNormal = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param idxVertex 변수
- * @param resultCrossProduct 변수
- * @returns resultCrossProduct
+ * CrossProduct(벡터의 외적)를 계산한다.
+ * 
+ * @param {Number} idxVertex 
+ * @param {Number} resultCrossProduct 
+ * @returns {Number} resultCrossProduct
  */
 Triangle.prototype.getCrossProduct = function(idxVertex, resultCrossProduct) 
 {
@@ -173,34 +217,3 @@ Triangle.prototype.getCrossProduct = function(idxVertex, resultCrossProduct)
 
 	return resultCrossProduct;
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
