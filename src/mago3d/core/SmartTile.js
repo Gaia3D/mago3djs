@@ -1,8 +1,12 @@
 'use strict';
 
 /**
+ * 4분할 타일링 수행 시 타일 객체.
  * Quadtree based tile with thickness.
  * @class SmartTile
+ * 
+ * @exception {Error} Messages.CONSTRUCT_ERROR
+ * @param {String} smartTileName tile name;
  */
 var SmartTile = function(smartTileName) 
 {
@@ -284,8 +288,10 @@ SmartTile.prototype.TEST__hasLowestTiles_nodesArray = function()
 
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param geoLocData 변수
+ * 타일의 min max coord를 이용하여 타원체를 생성 후 this.sphereExtent에 할당
+ * @param {MagoManager} magoManager
+ * 
+ * @see SmartTile#computeSphereExtent
  */
 SmartTile.prototype.makeSphereExtent = function(magoManager) 
 {
@@ -293,8 +299,14 @@ SmartTile.prototype.makeSphereExtent = function(magoManager)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param geoLocData 변수
+ * Sphere에 반지름과 중심점을 담아서 반환.
+ * @static
+ * @param {MagoManager} magoManager
+ * @param {GeographicCoord} minGeographicCoord
+ * @param {GeographicCoord} maxGeographicCoord
+ * @param {Sphere} resultSphereExtent
+ * 
+ * @return {Sphere} resultSphereExtent
  */
 SmartTile.computeSphereExtent = function(magoManager, minGeographicCoord, maxGeographicCoord, resultSphereExtent) 
 {
@@ -379,8 +391,9 @@ SmartTile.prototype.putNode = function(targetDepth, node, magoManager)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param geoLocData 변수
+ * 목표레벨까지 각 타일의 SUB타일 생성 및 노드의 위치와 교점이 있는지 파악 후 노드를 보관.
+ * @param {Number} targetDepth
+ * @param {MagoManager} magoManager
  */
 SmartTile.prototype.makeTreeByDepth = function(targetDepth, magoManager) 
 {
@@ -959,184 +972,3 @@ SmartTile.prototype.getLatitudeRangeDegree = function()
 {
 	return this.maxGeographicCoord.latitude - this.minGeographicCoord.latitude;
 };
-
-
-/**
- * Quadtree based tile with thickness.
- * @class SmartTileManager
- */
-var SmartTileManager = function() 
-{
-	if (!(this instanceof SmartTileManager)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-	
-	this.tilesArray = []; // has 2 tiles (Asia side and America side).
-	this.createMainTiles();
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @class GeoLocationData
- * @param geoLocData 변수
- */
-SmartTileManager.prototype.createMainTiles = function() 
-{
-	// tile 1 : longitude {-180, 0}, latitude {-90, 90}
-	// tile 2 : longitude {0, 180},  latitude {-90, 90}
-	
-	// America side.
-	var tile1 = this.newSmartTile("AmericaSide");
-	if (tile1.minGeographicCoord === undefined)
-	{ tile1.minGeographicCoord = new GeographicCoord(); }
-	if (tile1.maxGeographicCoord === undefined)
-	{ tile1.maxGeographicCoord = new GeographicCoord(); }
-	
-	tile1.depth = 0; // mother tile.
-	tile1.minGeographicCoord.setLonLatAlt(-180, -90, 0);
-	tile1.maxGeographicCoord.setLonLatAlt(0, 90, 0);
-	
-	// Asia side.
-	var tile2 = this.newSmartTile("AsiaSide");
-	if (tile2.minGeographicCoord === undefined)
-	{ tile2.minGeographicCoord = new GeographicCoord(); }
-	if (tile2.maxGeographicCoord === undefined)
-	{ tile2.maxGeographicCoord = new GeographicCoord(); }
-	
-	tile2.depth = 0; // mother tile.
-	tile2.minGeographicCoord.setLonLatAlt(0, -90, 0);
-	tile2.maxGeographicCoord.setLonLatAlt(180, 90, 0);
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- */
-SmartTileManager.prototype.makeTreeByDepth = function(targetDepth, physicalNodesArray, magoManager) 
-{
-	if (targetDepth === undefined)
-	{ targetDepth = 17; }
-	
-	this.targetDepth = targetDepth;
-	
-	var smartTilesCount = this.tilesArray.length; // In this point, "smartTilesCount" = 2 always.
-	for (var a=0; a<smartTilesCount; a++)
-	{
-		var smartTile = this.tilesArray[a];
-		if (smartTile.nodeSeedsArray === undefined)
-		{ smartTile.nodeSeedsArray = []; }
-		
-		smartTile.nodeSeedsArray = physicalNodesArray;
-		smartTile.makeTreeByDepth(targetDepth, magoManager); // default depth = 17.
-	}
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- */
-SmartTileManager.prototype.putNode = function(targetDepth, node, magoManager) 
-{
-	targetDepth = defaultValue(targetDepth, 17);
-	if (this.tilesArray !== undefined)
-	{
-		var tilesCount = this.tilesArray.length; // allways tilesCount = 2. (Asia & America sides).
-		for (var i=0; i<tilesCount; i++)
-		{
-			this.tilesArray[i].putNode(targetDepth, node, magoManager);
-		}
-	}
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @class GeoLocationData
- * @param geoLocData 변수
- */
-SmartTileManager.prototype.deleteTiles = function() 
-{
-	// this function deletes all children tiles.
-	if (this.tilesArray)
-	{
-		var tilesCount = this.tilesArray.length; // allways tilesCount = 2. (Asia & America sides).
-		for (var i=0; i<tilesCount; i++)
-		{
-			this.tilesArray[i].deleteObjects();
-			this.tilesArray[i] = undefined;
-		}
-		this.tilesArray.length = 0;
-	}
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @class GeoLocationData
- * @param geoLocData 변수
- */
-SmartTileManager.prototype.resetTiles = function() 
-{
-	this.deleteTiles();
-	
-	// now create the main tiles.
-	this.createMainTiles();
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @class GeoLocationData
- * @param geoLocData 변수
- */
-SmartTileManager.prototype.newSmartTile = function(smartTileName) 
-{
-	if (this.tilesArray === undefined)
-	{ this.tilesArray = []; }
-	
-	var smartTile = new SmartTile(smartTileName);
-	this.tilesArray.push(smartTile);
-	return smartTile;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- */
-SmartTileManager.prototype.getNeoBuildingById = function(buildingType, buildingId) 
-{
-	var resultNeoBuilding;
-	var i = 0;
-	var smartTilesCount = this.tilesArray.length;
-	while (resultNeoBuilding === undefined && i<smartTilesCount)
-	{
-		resultNeoBuilding = this.tilesArray[i].getNeoBuildingById(buildingType, buildingId); 
-		i++;
-	}
-	
-	return resultNeoBuilding;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- */
-SmartTileManager.prototype.getBuildingSeedById = function(buildingType, buildingId) 
-{
-	var resultNeoBuilding;
-	var i = 0;
-	var smartTilesCount = this.tilesArray.length;
-	while (resultNeoBuilding === undefined && i<smartTilesCount)
-	{
-		resultNeoBuilding = this.tilesArray[i].getBuildingSeedById(buildingType, buildingId);
-		i++;
-	}
-	
-	return resultNeoBuilding;
-};
-
-
-
-
-
-
-
-
-
-
-
-
