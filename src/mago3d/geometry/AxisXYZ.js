@@ -3,6 +3,8 @@
 /**
  * This show x, y ,z axises of the given feature to visualize them
  * @class AxisXYZ
+ * 
+ * @param {number} length
  */
 var AxisXYZ = function(length) 
 {
@@ -15,6 +17,10 @@ var AxisXYZ = function(length)
 	{ this.length = 60; }
 	else { this.length = length; }
 	
+	/**
+	 * Container which holds the VBO Cache Keys
+	 * @type {VBOVertexIdxCacheKeysContainer}
+	 */
 	this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer();
 	//this.vboKey = this.vbo_vicks_container.newVBOVertexIdxCacheKey();
 };
@@ -31,6 +37,7 @@ AxisXYZ.prototype.setDimension = function(length)
 /**
  * Visualize the axises at the feature
  * @param {Number} length the length of the axis to set the length of the axises
+ * @returns {Mesh} mesh
  */
 AxisXYZ.prototype.makeMesh = function(length)
 {
@@ -93,41 +100,11 @@ AxisXYZ.prototype.makeMesh = function(length)
 	return mesh;
 };
 
+/**
+ * Get the container which holds the VBO Cache Keys
+ * @returns {VBOVertexIdxCacheKeysContainer} vbo_vicks_container
+ */
 AxisXYZ.prototype.getVboKeysContainer = function()
 {
 	return this.vbo_vicks_container;
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
