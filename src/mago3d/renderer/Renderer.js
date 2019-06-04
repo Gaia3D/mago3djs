@@ -626,7 +626,6 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 	if (renderType === 0 ) 
 	{
 		gl.disable(gl.BLEND);
-		//magoManager.renderGeometryDepth(gl, renderType, visibleObjControlerNodes);
 		magoManager.renderer.renderGeometryDepth(gl, renderType, visibleObjControlerNodes);
 		
 		// Draw the axis.***
