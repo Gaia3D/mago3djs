@@ -275,6 +275,22 @@ PostFxShader.prototype.enableVertexAttribArray = function(attribLocation)
  * @param shaderName 변수
  * @returns shader
  */
+PostFxShader.prototype.disableTextureImagesUnitsAll = function()
+{
+	var gl = this.gl;
+	var textureImagesUnitsCount = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
+	for (var i = 0; i<textureImagesUnitsCount; i++)
+	{ 
+		gl.activeTexture(gl.TEXTURE0 + i);
+		gl.bindTexture(gl.TEXTURE_2D, null);
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param shaderName 변수
+ * @returns shader
+ */
 PostFxShader.prototype.disableVertexAttribArrayAll = function()
 {
 	var gl = this.gl;
@@ -666,6 +682,18 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
  * 어떤 일을 하고 있습니까?
  * @param shaderName 변수
  */
+PostFxShader.prototype.bindAttribLocations = function(gl, shader)
+{
+	gl.bindAttribLocation(shader.program, 0, "position");
+	gl.bindAttribLocation(shader.program, 1, "normal");
+	gl.bindAttribLocation(shader.program, 2, "texCoord");
+	gl.bindAttribLocation(shader.program, 3, "color4");
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param shaderName 변수
+ */
 PostFxShader.prototype.createUniformLocals = function(gl, shader, sceneState)
 {
 	// Here create all local uniforms, if exist, of the shader.
@@ -691,6 +719,8 @@ PostFxShader.prototype.createUniformLocals = function(gl, shader, sceneState)
 	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
 	shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
 	shader.color4_loc = gl.getAttribLocation(shader.program, "color4");
+	
+	
 	
 	shader.bUse1Color_loc = gl.getUniformLocation(shader.program, "bUse1Color");
 	shader.oneColor4_loc = gl.getUniformLocation(shader.program, "oneColor4");
