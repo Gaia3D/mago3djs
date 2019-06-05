@@ -10,7 +10,10 @@ var SelectionColor = function()
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+	/**
+	 * Color
+	 * @type {Color}
+	 */
 	this.color = new Color();
 };
 
