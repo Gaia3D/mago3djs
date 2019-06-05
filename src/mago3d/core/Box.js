@@ -36,7 +36,7 @@ var Box = function(width, length, height)
 Box.prototype.getVboKeysContainer = function()
 {
 	return this.vbo_vicks_container;
-};s;
+};
 
 /**
  * Render this box feature
