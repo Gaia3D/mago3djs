@@ -44,7 +44,7 @@ Frustum.prototype.copyParametersFrom = function(frustum)
 
 /**
  * Set the near of frustum by distance
- * @param near
+ * @param {Float32} near
  */
 Frustum.prototype.setNear = function(near) 
 {
@@ -53,7 +53,7 @@ Frustum.prototype.setNear = function(near)
 
 /**
  * Set the fart of frustum by distance
- * @param far
+ * @param {Float32} far
  */
 Frustum.prototype.setFar = function(far) 
 {
