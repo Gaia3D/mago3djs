@@ -1,7 +1,8 @@
 'use strict';
 
 /**
- * buildings seed
+ * buildings seed.
+ * Represent single building feature.
  * @class BuildingSeed
  */
 var BuildingSeed = function() 
@@ -18,10 +19,11 @@ var BuildingSeed = function()
 	this.rotationsDegree; // class : Point3D. (heading, pitch, roll).
 	this.bBox;            // class : BoundingBox.
 	this.geographicCoordOfBBox; // class : GeographicCoord.
+	this.smartTileOwner;
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * clear this instance
  */
 BuildingSeed.prototype.deleteObjects = function() 
 {
@@ -139,7 +141,7 @@ BuildingSeedList.prototype.parseBuildingSeedArrayBuffer = function()
 		buildingSeed.bBox.maxY = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4))[0]; bytesReaded += 4;
 		buildingSeed.bBox.maxZ = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4))[0]; bytesReaded += 4;
 
-		// create a building and set the location.***
+		// create a building and set the location.
 		buildingSeed.buildingId = buildingName.substr(4, buildingNameLength-4);
 		buildingSeed.buildingFileName = buildingName;
 		buildingSeed.geographicCoord.setLonLatAlt(longitude, latitude, altitude);

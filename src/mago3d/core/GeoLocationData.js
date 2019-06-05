@@ -1,9 +1,11 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
+ * GeoLocationData is a class object that contains axis information about the location on "geographicCoord".
+ * 
  * @class GeoLocationData
- * @param geoLocationDataName 변수
+ * @constructor 
+ * @param {string} geoLocationDataName The name of the geoLocationData.
  */
 var GeoLocationData = function(geoLocationDataName) 
 {
@@ -11,40 +13,174 @@ var GeoLocationData = function(geoLocationDataName)
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
+	/**
+	 * The name of this geographicLocationData.
+	 * @type {String}
+	 * @default "noName"
+	 */
 	this.name;
 	
 	if (geoLocationDataName === undefined) { this.name = "noName"; }
 	else { this.name = geoLocationDataName; }
 	
-	this.geographicCoord; // longitude, latitude, altitude.***
+	/**
+	 * The geographic location (Longitude, Latitude, Altitude). This is the main data of this class.
+	 * @type {GeographicCoord}
+	 * @default undefined
+	 */
+	this.geographicCoord; 
 	
+	/**
+	 * The z-axis rotation.
+	 * @type {Number}
+	 * @default 0
+	 */
 	this.heading;
+	
+	/**
+	 * The x-axis rotation.
+	 * @type {Number}
+	 * @default 0
+	 */
 	this.pitch;
+	
+	/**
+	 * The y-axis rotation.
+	 * @type {Number}
+	 * @default 0
+	 */
 	this.roll;
 	
-	this.date; // year - month - day - hour - min - seg - miliseg.***
+	/**
+	 * The date relationed with this geoLocationData.
+	 * @type {Date}
+	 * @default undefined
+	 */
+	this.date; // year - month - day - hour - min - seg - miliseg.
 	
-	this.position;   // Point3D().***
-	this.positionHIGH; // Float32Array[3].***
-	this.positionLOW; // Float32Array[3].***
-	this.pivotPoint; // Point3D().*** // Actual position = pivotPoint.
+	/**
+	 * The position in world coordinates (x, y, z) of this geoLocationData.
+	 * @type {Point3D}
+	 * @default (0,0,0).
+	 */
+	this.position;   
 	
-	// F4D Matrix4.****
-	this.geoLocMatrix; // this is just the cartographic transformation matrix determined by (lon, lat, elev). No contains heading-pitch-roll rotations.***
-	this.geoLocMatrixInv; // this is just the cartographic transformation matrixInv determined by (lon, lat, elev). No contains heading-pitch-roll rotations.***
-	this.tMatrix;      // this contains translation & rotations (heading-pitch-roll).***
-	this.tMatrixInv;   // this contains translation & rotations (heading-pitch-roll).***
-	this.rotMatrix;    // this contains only rotation.***
-	this.rotMatrixInv; // this contains only rotation.***
+	/**
+	 * The high part of the splitted position.
+	 * @type {Float32Array(3)}
+	 * @default [0,0,0]
+	 */
+	this.positionHIGH; 
 	
-	// Aditional.***
-	this.pivotPointTraslation; // made when translate the pivot point.***
+	/**
+	 * The low part of the splitted position.
+	 * @type {Float32Array(3)}
+	 * @default [0,0,0]
+	 */
+	this.positionLOW; 
+	
+	/**
+	 * The effective absoluteCoord (x, y, z) of this geoLocationData.
+	 * @type {Point3D}
+	 * @default (0,0,0).
+	 */
+	this.pivotPoint; // Actual position = pivotPoint.
+	
+	/**
+	 * The transformation matrix of the geographicCoord. This matrix no includes Heading, Pitch or Roll rotations.
+	 * @type {Matrix4}
+	 * @default Identity matrix.
+	 */
+	this.geoLocMatrix; 
+	
+	/**
+	 * The inverse of the transformation matrix of the geographicCoord. This matrix no includes Heading, Pitch or Roll rotations.
+	 * @type {Matrix4}
+	 * @default Identity matrix.
+	 */
+	this.geoLocMatrixInv; 
+	
+	/**
+	 * The transformation matrix of the geographicCoord. This matrix includes Heading, Pitch or Roll rotations.
+	 * @type {Matrix4}
+	 * @default Identity matrix.
+	 */
+	this.tMatrix;      
+	
+	/**
+	 * The inverse of the transformation matrix of the geographicCoord. This matrix includes Heading, Pitch or Roll rotations.
+	 * @type {Matrix4}
+	 * @default Identity matrix.
+	 */
+	this.tMatrixInv;   
+	
+	/**
+	 * The rotation matrix of the geographicCoord. This matrix includes Heading, Pitch or Roll rotations.
+	 * @type {Matrix4}
+	 * @default Identity matrix.
+	 */
+	this.rotMatrix;    
+	
+	/**
+	 * The inverse of the rotation matrix of the geographicCoord. This matrix includes Heading, Pitch or Roll rotations.
+	 * @type {Matrix4}
+	 * @default Identity matrix.
+	 */
+	this.rotMatrixInv; 
+	
+	/**
+	 * The translation in local coordinates(x, y, z) of this geoLocationData.
+	 * @type {Point3D}
+	 * @default undefined
+	 */
+	this.pivotPointTraslationLC; 
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @class GeoLocationData
- * @param geoLocData 변수
+ * Sets the parameters Heading, pitch and Roll.
+ * @param {Number} heading The heading value in degrees.
+ * @param {Number} pitch The pitch value in degrees.
+ * @param {Number} roll The roll value in degrees.
+ */
+GeoLocationData.prototype.setRotationHeadingPitchRoll = function(heading, pitch, roll) 
+{
+	// Note: Sets the parameters if exist argument.
+	if (heading !== undefined)
+	{ this.heading = heading; }
+	
+	if (pitch !== undefined)
+	{ this.pitch = pitch; }
+
+	if (roll !== undefined)
+	{ this.roll = roll; }
+};
+
+/**
+ * Returns the geographic coordinates.
+ * @Returns {GeographicCoord} this.geographicCoord
+ */
+GeoLocationData.prototype.getGeographicCoords = function() 
+{
+	return this.geographicCoord;
+};
+
+/**
+ * Sets the parameters Longitude, Latitude and Altitude of the geographic coordinates.
+ * @param {Number} longitude The longitude in degrees.
+ * @param {Number} latitude The latitude in degrees.
+ * @param {Number} altitude The altitude in meters.
+ */
+GeoLocationData.prototype.setGeographicCoordsLonLatAlt = function(longitude, latitude, altitude) 
+{
+	if (this.geographicCoord === undefined)
+	{ this.geographicCoord = new GeographicCoord(); }
+	
+	this.geographicCoord.setLonLatAlt(longitude, latitude, altitude);
+};
+
+/**
+ * Deletes all objects of this class.
+ @param {VboMemoryManager} vboMemManager The manager and controller of the gpu memory.
  */
 GeoLocationData.prototype.deleteObjects = function(vboMemManager) 
 {
@@ -68,7 +204,7 @@ GeoLocationData.prototype.deleteObjects = function(vboMemManager)
 	{ this.pivotPoint.deleteObjects(); }  
 	this.pivotPoint = undefined;
 	
-	// F4D Matrix4.****
+	// F4D Matrix4.*
 	if (this.geoLocMatrix)
 	{ this.geoLocMatrix.deleteObjects(); }
 	if (this.geoLocMatrixInv)
@@ -89,26 +225,25 @@ GeoLocationData.prototype.deleteObjects = function(vboMemManager)
 	this.rotMatrix = undefined;   
 	this.rotMatrixInv = undefined; 
 	
-	// Aditional.***
-	if (this.pivotPointTraslation)
-	{ this.pivotPointTraslation.deleteObjects(); }
-	this.pivotPointTraslation = undefined;
+	// Aditional.
+	if (this.pivotPointTraslationLC)
+	{ this.pivotPointTraslationLC.deleteObjects(); }
+	this.pivotPointTraslationLC = undefined;
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @class GeoLocationData
- * @param geoLocData 변수
+ * Adds the translation vector into position.
  */
 GeoLocationData.prototype.doEffectivePivotPointTranslation = function() 
 {
 	// this function adds the "pivotPointTraslation" to the positions.
 	// this function is not for move the building on the globe. This function is only for translate the pivot point of the building.
-	if (this.pivotPointTraslation === undefined)
+	// Note: the translation vector only must be added into "this.pivotPoint". TODO:
+	if (this.pivotPointTraslationLC === undefined)
 	{ return; }
 	
 	var traslationVector;
-	traslationVector = this.tMatrix.rotatePoint3D(this.pivotPointTraslation, traslationVector );
+	traslationVector = this.tMatrix.rotatePoint3D(this.pivotPointTraslationLC, traslationVector );
 	
 	this.position.x += traslationVector.x;
 	this.position.y += traslationVector.y;
@@ -126,9 +261,8 @@ GeoLocationData.prototype.doEffectivePivotPointTranslation = function()
 
 
 /**
- * 어떤 일을 하고 있습니까?
- * @class GeoLocationData
- * @param geoLocData 변수
+ * Copies all data of this class into the return geoLoctationData.
+ *@param {GeoLocationData} 
  */
 GeoLocationData.prototype.copyFrom = function(geoLocData) 
 {
@@ -141,14 +275,14 @@ GeoLocationData.prototype.copyFrom = function(geoLocData)
 		if (this.geographicCoord === undefined)
 		{ this.geographicCoord = new GeographicCoord(); }
 		
-		this.geographicCoord.copyFrom(geoLocData.geographicCoord); // longitude, latitude, altitude.***
+		this.geographicCoord.copyFrom(geoLocData.geographicCoord); // longitude, latitude, altitude.
 	}
 	
 	this.heading = geoLocData.heading;
 	this.pitch = geoLocData.pitch;
 	this.roll = geoLocData.roll;
 	
-	this.date = geoLocData.date; // year - month - day - hour - min - seg - miliseg.***
+	this.date = geoLocData.date; // year - month - day - hour - min - seg - miliseg.
 	
 	if (geoLocData.position)
 	{
@@ -182,7 +316,7 @@ GeoLocationData.prototype.copyFrom = function(geoLocData)
 		this.pivotPoint.copyFrom(geoLocData.pivotPoint);
 	}
 	
-	// F4D Matrix4.****
+	// F4D Matrix4.*
 	if (geoLocData.geoLocMatrix)
 	{
 		if (this.geoLocMatrix === undefined)
@@ -275,14 +409,32 @@ GeoLocationData.prototype.worldCoordToLocalCoord = function(worldCoord, resultLo
 
 /**
  * 
+ * @returns this.locMatrixInv.
+ */
+GeoLocationData.prototype.getLocMatrixInv = function() 
+{
+	if (this.geoLocMatrixInv === undefined)
+	{
+		var locMatrixInv = glMatrix.mat4.create();
+		locMatrixInv = glMatrix.mat4.invert(locMatrixInv, this.geoLocMatrix._floatArrays );
+		
+		this.geoLocMatrixInv = new Matrix4();
+		this.geoLocMatrixInv.setByFloat32Array(locMatrixInv);
+	}
+	
+	return this.geoLocMatrixInv;
+};
+
+/**
+ * 
  * @returns this.rotMatrixInv.
  */
 GeoLocationData.prototype.getRotMatrixInv = function() 
 {
 	if (this.rotMatrixInv === undefined)
 	{
-		var rotMatrixInv = mat4.create();
-		rotMatrixInv = mat4.invert(rotMatrixInv, this.rotMatrix._floatArrays );
+		var rotMatrixInv = glMatrix.mat4.create();
+		rotMatrixInv = glMatrix.mat4.invert(rotMatrixInv, this.rotMatrix._floatArrays );
 		
 		this.rotMatrixInv = new Matrix4();
 		this.rotMatrixInv.setByFloat32Array(rotMatrixInv);
@@ -299,8 +451,8 @@ GeoLocationData.prototype.getTMatrixInv = function()
 {
 	if (this.tMatrixInv === undefined)
 	{
-		var tMatrixInv = mat4.create();
-		tMatrixInv = mat4.invert(tMatrixInv, this.tMatrix._floatArrays);
+		var tMatrixInv = glMatrix.mat4.create();
+		tMatrixInv = glMatrix.mat4.invert(tMatrixInv, this.tMatrix._floatArrays);
 		
 		this.tMatrixInv = new Matrix4();
 		this.tMatrixInv.setByFloat32Array(tMatrixInv);
@@ -317,8 +469,8 @@ GeoLocationData.prototype.getGeoLocationMatrixInv = function()
 {
 	if (this.geoLocMatrixInv === undefined)
 	{
-		var geoLocMatrixInv = mat4.create();
-		geoLocMatrixInv = mat4.invert(geoLocMatrixInv, this.geoLocMatrix._floatArrays  );
+		var geoLocMatrixInv = glMatrix.mat4.create();
+		geoLocMatrixInv = glMatrix.mat4.invert(geoLocMatrixInv, this.geoLocMatrix._floatArrays  );
 		
 		this.geoLocMatrixInv = new Matrix4();
 		this.geoLocMatrixInv.setByFloat32Array(geoLocMatrixInv);
@@ -363,10 +515,28 @@ GeoLocationData.prototype.getTransformedRelativeCamera = function(absoluteCamera
 };
 
 /**
- * This function transforms an absolute camera (world coord) into a relative camera (local coord) for this geoLocation.
- * @param absoluteCamera instance of Camera. 
- * @param resultCamera instance of Camera. This is the transformed camera.
- * @returns resultCamera
+ * 
+ */
+GeoLocationData.prototype.getTransformedRelativePositionNoApplyHeadingPitchRoll = function(absolutePosition, resultRelativePosition) 
+{
+	if (resultRelativePosition === undefined)
+	{ resultRelativePosition = new Point3D(); }
+	
+	var pointAux = new Point3D();
+	
+	pointAux.set(absolutePosition.x, 
+		absolutePosition.y, 
+		absolutePosition.z);
+	var locMatInv = this.getLocMatrixInv();
+	resultRelativePosition = locMatInv.transformPoint3D(pointAux, resultRelativePosition);
+	
+	return resultRelativePosition;
+};
+
+/**
+ * Change the absolute coordinate feature to relative coordinate feature
+ * @param absolutePosition
+ * @param {Point3D} resultRelativePosition
  */
 GeoLocationData.prototype.getTransformedRelativePosition = function(absolutePosition, resultRelativePosition) 
 {
@@ -384,13 +554,45 @@ GeoLocationData.prototype.getTransformedRelativePosition = function(absolutePosi
 	return resultRelativePosition;
 };
 
-//**********************************************************************************************************************************************************
-//**********************************************************************************************************************************************************
-//**********************************************************************************************************************************************************
+/**
+ * This function transforms an absolute camera (world coord) into a relative camera (local coord) for this geoLocation.
+ */
+GeoLocationData.prototype.getTransformedRelativePositionsArray = function(absolutePositionsArray, resultRelativePositionsArray) 
+{
+	if (absolutePositionsArray === undefined)
+	{ return resultRelativePositionsArray; }
+	
+	if (resultRelativePositionsArray === undefined)
+	{ resultRelativePositionsArray = []; }
+	
+	var absolutePoints3dCount = absolutePositionsArray.length;
+	for (var i=0; i<absolutePoints3dCount; i++)
+	{
+		var relPoint3d = this.getTransformedRelativePosition(absolutePositionsArray[i], undefined);
+		resultRelativePositionsArray.push(relPoint3d);
+	}
+	
+	return resultRelativePositionsArray;
+};
 
 /**
- * 어떤 일을 하고 있습니까?
+ */
+GeoLocationData.prototype.bindGeoLocationUniforms = function(gl, shader) 
+{
+	gl.uniformMatrix4fv(shader.buildingRotMatrix_loc, false, this.rotMatrix._floatArrays);
+	gl.uniform3fv(shader.buildingPosHIGH_loc, [this.positionHIGH[0], this.positionHIGH[1], this.positionHIGH[2]]);
+	gl.uniform3fv(shader.buildingPosLOW_loc, [this.positionLOW[0], this.positionLOW[1], this.positionLOW[2]]);
+};
+
+//*
+//*
+//*
+
+/**
+ * GeoLocationDataManager is a class object that contains GeoLocationData objects in an array.
+ * 
  * @class GeoLocationDataManager
+ * @constructor 
  */
 var GeoLocationDataManager = function() 
 {
@@ -400,13 +602,11 @@ var GeoLocationDataManager = function()
 	}
 	
 	this.geoLocationDataArray = [];
+	this.geoLocationDataArrayMaxLengthAllowed = 15;
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @class GeoLocationData
- * @param geoLocationName 변수
- * @returns geoLocationData
+ * Clear all object of GeoLocationDataManager
  */
 GeoLocationDataManager.prototype.deleteObjects = function() 
 {
@@ -417,30 +617,51 @@ GeoLocationDataManager.prototype.deleteObjects = function()
 			this.geoLocationDataArray[i].deleteObjects();
 			this.geoLocationDataArray[i] = undefined;
 		}
-		this.geoLocationDataArray = undefined;
+		this.geoLocationDataArray = [];
 	}
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @class GeoLocationData
+ * Remove the latest GeoLocationData instance
+ */
+GeoLocationDataManager.prototype.popGeoLocationData = function() 
+{
+	this.geoLocationDataArray.pop();
+};
+
+/**
+ * put the geoLocationData from this.geoLocationDataArray
  * @param geoLocationName 변수
- * @returns geoLocationData
  */
 GeoLocationDataManager.prototype.newGeoLocationData = function(geoLocationName) 
 {
 	if (geoLocationName === undefined)
 	{ geoLocationName = "noName" + this.geoLocationDataArray.length.toString(); }
 	var geoLocationData = new GeoLocationData(geoLocationName);
-	this.geoLocationDataArray.push(geoLocationData);
-	//this.geoLocationDataCache[geoLocationName] = geoLocationData;
+	this.geoLocationDataArray.unshift(geoLocationData);
+	
+	if (this.geoLocationDataArray.length > this.geoLocationDataArrayMaxLengthAllowed)
+	{
+		this.geoLocationDataArray.pop();
+		// delete extracted geoLocdata. TODO:
+	}
+
 	return geoLocationData;
+};
+
+/**
+ * return the length of this geoLocationDataArray
+ * @returns {Number} the length of this geoLocationDataArray
+ */
+GeoLocationDataManager.prototype.getGeoLocationDatasCount = function() 
+{
+	return this.geoLocationDataArray.length;
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  * @class GeoLocationData
- * @param idx
+ * @param {Number} idx
  * @returns this.geoLoactionDataArray[idx]
  */
 GeoLocationDataManager.prototype.getGeoLocationData = function(idx) 
@@ -451,10 +672,10 @@ GeoLocationDataManager.prototype.getGeoLocationData = function(idx)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * provisionally return the first data of GeoLocationDataArray
  * @class GeoLocationData
- * @param idx
- * @returns this.geoLoactionDataArray[idx]
+ * @param {Number}idx
+ * @returns {GeoLocationData}this.geoLoactionDataArray[idx]
  */
 GeoLocationDataManager.prototype.getCurrentGeoLocationData = function() 
 {
@@ -464,32 +685,3 @@ GeoLocationDataManager.prototype.getCurrentGeoLocationData = function()
 	}
 	return this.geoLocationDataArray[0]; // provisionally return the 1rst.
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

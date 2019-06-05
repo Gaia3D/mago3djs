@@ -1,7 +1,14 @@
 'use strict';
 /**
-* 어떤 일을 하고 있습니까?
+* Vertex Profile List
+* @exception {Error} Messages.CONSTRUCT_ERROR
+
 * @class VtxProfilesList
+
+* @param {number} x not used
+* @param {number} y not used
+*
+* @see VtxProfile
 */
 var VtxProfilesList = function(x, y) 
 {
@@ -10,13 +17,75 @@ var VtxProfilesList = function(x, y)
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
+	/**
+	 * VtxProfile Array
+	 * @type {Array.<VtxProfile>}
+	 */
 	this.vtxProfilesArray;
+
+	
+	/**
+	 * convex index data array
+	 * @type {Array.<Array.<IndexData>>}
+	 */
 	this.convexFacesIndicesData;
 };
 
+
+/**
+ * delete vertex profile and convex array.
+ */
+VtxProfilesList.prototype.deleteObjects = function()
+{
+	if (this.vtxProfilesArray !== undefined)
+	{
+		var vtxProfilesCount = this.vtxProfilesArray.length;
+		for (var i=0; i<vtxProfilesCount; i++)
+		{
+			this.vtxProfilesArray[i].deleteObjects();
+			this.vtxProfilesArray[i] = undefined;
+		}
+		this.vtxProfilesArray = undefined;
+	}
+	
+	if (this.convexFacesIndicesData !== undefined)
+	{
+		/*
+		var idxDatasCount = this.convexFacesIndicesData.length;
+		for(var i=0; i<idxDatasCount; i++)
+		{
+			for(var key in this.convexFacesIndicesData[i])
+			{
+				var value = this.convexFacesIndicesData[i][key];
+				value.deleteObjects();
+				value = undefined;
+			}
+			this.convexFacesIndicesData[i] = undefined;
+		}
+		*/
+		this.convexFacesIndicesData = undefined;
+	}
+};
+
+/**
+ * 페이스 목록 생성 및 반환. 메쉬의 hedgelist 업데이트
+ * 
+ * @static
+ * @param {VtxRing} bottomVtxRing
+ * @param {VtxRing} topVtxRing
+ * @param {Array.<Face>} resultFacesArray
+ * @param {Mesh} resultMesh
+ * @param {IndexRange} elemIndexRange
+ * 
+ * @see VtxProfilesList#getMesh
+ * @see Mesh#getHalfEdgesList
+ * @see Face#createHalfEdges
+ * @see Face#setTwinFace
+ * @see HalfEdgesList#addHalfEdgesArray
+ */
 VtxProfilesList.getLateralFaces = function(bottomVtxRing, topVtxRing, resultFacesArray, resultMesh, elemIndexRange)
 {
-	// This returns a lateral surface between "bottomVtxRing" & "topVtxRing" limited by "elemIndexRange".***
+	// This returns a lateral surface between "bottomVtxRing" & "topVtxRing" limited by "elemIndexRange".
 	if (resultFacesArray === undefined)
 	{ resultFacesArray = []; }
 	
@@ -41,14 +110,14 @@ VtxProfilesList.getLateralFaces = function(bottomVtxRing, topVtxRing, resultFace
 		vtx3 = topVtxRing.vertexList.getVertex(currIdx);
 		Array.prototype.push.apply(face.vertexArray, [vtx0, vtx1, vtx2, vtx3]);
 		
-		// now create hedges of the face.***
+		// now create hedges of the face.
 		hedgesArray.length = 0;
 		hedgesArray = face.createHalfEdges(hedgesArray);
 		hedgesList.addHalfEdgesArray(hedgesArray);
 		
 		if (prevFace !== undefined)
 		{
-			// set twins between face and prevFace.***
+			// set twins between face and prevFace.
 			face.setTwinFace(prevFace);
 		}
 		prevFace = face;
@@ -59,6 +128,22 @@ VtxProfilesList.getLateralFaces = function(bottomVtxRing, topVtxRing, resultFace
 	return resultFacesArray;
 };
 
+/**
+ * VtxProfile 추가
+ * @param {VtxProfile} vtxProfile
+ */
+VtxProfilesList.prototype.addVtxProfile = function(vtxProfile)
+{
+	if (this.vtxProfilesArray === undefined)
+	{ this.vtxProfilesArray = []; }
+	
+	this.vtxProfilesArray.push(vtxProfile);
+};
+
+/**
+ * VtxProfile 생성하여 vtxProfileArray에 추가 후 반환.
+ * @returns {VtxProfile} vtxProfile
+ */
 VtxProfilesList.prototype.newVtxProfile = function()
 {
 	if (this.vtxProfilesArray === undefined)
@@ -69,6 +154,10 @@ VtxProfilesList.prototype.newVtxProfile = function()
 	return vtxProfile;
 };
 
+/**
+ * vtxProfileArray length 반환.
+ * @returns {Number}
+ */
 VtxProfilesList.prototype.getVtxProfilesCount = function()
 {
 	if (this.vtxProfilesArray === undefined)
@@ -77,6 +166,10 @@ VtxProfilesList.prototype.getVtxProfilesCount = function()
 	return this.vtxProfilesArray.length;
 };
 
+/**
+ * 인덱스에 해당하는 vtxProfile 반환
+ * @returns {VtxProfile}
+ */
 VtxProfilesList.prototype.getVtxProfile = function(idx)
 {
 	if (this.vtxProfilesArray === undefined)
@@ -85,9 +178,14 @@ VtxProfilesList.prototype.getVtxProfile = function(idx)
 	return this.vtxProfilesArray[idx];
 };
 
+/**
+ * vtxProfileArray에 있는 모든 vertex를 배열에 담아 반환
+ * @param {Array.<Vertex>|undefined} resultVerticesArray 비어있을 시 배열 초기화.
+ * @returns {Array.<Vertex>}
+ */
 VtxProfilesList.prototype.getAllVertices = function(resultVerticesArray)
 {
-	// collect all vertices of all vtxProfiles.***
+	// collect all vertices of all vtxProfiles.
 	if (resultVerticesArray === undefined)
 	{ resultVerticesArray = []; }
 	
@@ -102,9 +200,19 @@ VtxProfilesList.prototype.getAllVertices = function(resultVerticesArray)
 	return resultVerticesArray;
 };
 
-VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bIncludeTopCap)
+/**
+ * vtxProfileList로 부터 Mesh 생성 후 반환
+ * @param {Mesh} resultMesh 비어있을 시 new Mesh 인스턴스 선언.
+ * @param {Boolean} bIncludeBottomCap Mesh의 바닥 surface 추가 유무, true 일시 getTransversalSurface
+ * @param {Boolean} bIncludeTopCap Mesh의 위쪽(뚜껑) surface 추가 유무, true 일시 getTransversalSurface
+ * @param {Boolean} bLoop 기본값은 false. true로 선언 시, bIncludeBottomCap, bIncludeTopCap 는 false로 변경
+ * @returns {Mesh}
+ * 
+ * @see VtxProfilesList#getTransversalSurface
+ */
+VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bIncludeTopCap, bLoop)
 {
-	// face's vertex order.***
+	// face's vertex order.
 	// 3-------2
 	// |       |
 	// |       |
@@ -113,8 +221,18 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 	
 	if (this.vtxProfilesArray === undefined)
 	{ return resultTriangleMatrix; }
+
+	if (bLoop === undefined)
+	{ bLoop = false; }
 	
-	// outerLateral.***************************************************
+	if (bLoop === true)
+	{
+		// To make a safe mesh, if loop, then there are no caps in the extrems.
+		bIncludeBottomCap = false;
+		bIncludeTopCap = false;
+	}
+	
+	// outerLateral.
 	var vtxProfilesCount = this.getVtxProfilesCount();
 	
 	if (vtxProfilesCount < 2)
@@ -126,7 +244,7 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 	if (resultMesh.vertexList === undefined)
 	{ resultMesh.vertexList = new VertexList(); }
 	
-	// 1rst, get all vertices and put it into the resultMesh.***
+	// 1rst, get all vertices and put it into the resultMesh.
 	resultMesh.vertexList.vertexArray = this.getAllVertices(resultMesh.vertexList.vertexArray);
 		
 	var bottomVtxProfile, topVtxProfile;
@@ -149,10 +267,22 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 		surface = resultMesh.newSurface();
 		prevFacesArray = undefined;
 		elemIndexRange = outerVtxRing.getElementIndexRange(i);
-		for (var j=0; j<vtxProfilesCount-1; j++)
+		for (var j=0; j<vtxProfilesCount; j++)
 		{
-			bottomVtxProfile = this.getVtxProfile(j);
-			topVtxProfile = this.getVtxProfile(j+1);
+			if (j === vtxProfilesCount-1 )
+			{
+				if (bLoop)
+				{
+					bottomVtxProfile = this.getVtxProfile(j);
+					topVtxProfile = this.getVtxProfile(0);
+				}
+				else { break; }
+			}
+			else 
+			{
+				bottomVtxProfile = this.getVtxProfile(j);
+				topVtxProfile = this.getVtxProfile(j+1);
+			}
 			
 			bottomVtxRing = bottomVtxProfile.outerVtxRing;
 			topVtxRing = topVtxProfile.outerVtxRing;
@@ -163,7 +293,7 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 			
 			if (prevFacesArray !== undefined && prevFacesArray.length > 0)
 			{
-				// set twins between "prevFacesArray" & "facesArray".***
+				// set twins between "prevFacesArray" & "facesArray".
 				var currFace, prevFace;
 				var facesCount = facesArray.length;
 				for (var k=0; k<facesCount; k++)
@@ -176,11 +306,10 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 			
 			prevFacesArray = [];
 			Array.prototype.push.apply(prevFacesArray, facesArray);
-			
 		}
 	}
 	
-	// Inner laterals.************************************************************************
+	// Inner laterals.
 	var innerVtxRing;
 	var innerRinsCount = bottomVtxProfile.getInnerVtxRingsCount();
 	for (var k=0; k<innerRinsCount; k++)
@@ -192,11 +321,23 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 			surface = resultMesh.newSurface();
 			prevFacesArray = undefined;
 			elemIndexRange = innerVtxRing.getElementIndexRange(i);
-			for (var j=0; j<vtxProfilesCount-1; j++)
+			for (var j=0; j<vtxProfilesCount; j++)
 			{
-				bottomVtxProfile = this.getVtxProfile(j);
-				topVtxProfile = this.getVtxProfile(j+1);
-				
+				if (j === vtxProfilesCount-1 )
+				{
+					if (bLoop)
+					{
+						bottomVtxProfile = this.getVtxProfile(j);
+						topVtxProfile = this.getVtxProfile(0);
+					}
+					else { break; }
+				}
+				else 
+				{
+					bottomVtxProfile = this.getVtxProfile(j);
+					topVtxProfile = this.getVtxProfile(j+1);
+				}
+
 				bottomVtxRing = bottomVtxProfile.getInnerVtxRing(k);
 				topVtxRing = topVtxProfile.getInnerVtxRing(k);
 				
@@ -206,7 +347,7 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 				
 				if (prevFacesArray !== undefined && prevFacesArray.length>0)
 				{
-					// set twins between "prevFacesArray" & "facesArray".***
+					// set twins between "prevFacesArray" & "facesArray".
 					var currFace, prevFace;
 					var facesCount = facesArray.length;
 					for (var a=0; a<facesCount; a++)
@@ -224,21 +365,19 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 		}
 	}
 	
-	// Caps (bottom and top).***
+	// Caps (bottom and top).
 	if (this.convexFacesIndicesData === undefined)
 	{ 
-		// Calculate the convexFacesIndicesData.***
+		// Calculate the convexFacesIndicesData.
 		var vtxProfileFirst = this.getVtxProfile(0);
 		var profile2d = vtxProfileFirst.getProjectedProfile2D(profile2d);
 		this.convexFacesIndicesData = profile2d.getConvexFacesIndicesData(this.convexFacesIndicesData);
-		
-		//return resultMesh; 
 	}
 	
 	var resultSurface;
 	
-	// Top profile.***********************************************************************
-	// in this case, there are a surface with multiple convex faces.***
+	// Top profile.**
+	// in this case, there are a surface with multiple convex faces.
 	if (bIncludeTopCap === undefined || bIncludeTopCap === true)
 	{
 		topVtxProfile = this.getVtxProfile(vtxProfilesCount-1);
@@ -246,20 +385,28 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 		resultSurface = VtxProfilesList.getTransversalSurface(topVtxProfile, this.convexFacesIndicesData, resultSurface);
 	}
 
-	// Bottom profile.***********************************************************************
+	// Bottom profile.**
 	if (bIncludeBottomCap === undefined || bIncludeBottomCap === true)
 	{
 		bottomVtxProfile = this.getVtxProfile(0);
 		resultSurface = resultMesh.newSurface();
 		resultSurface = VtxProfilesList.getTransversalSurface(bottomVtxProfile, this.convexFacesIndicesData, resultSurface);
 		
-		// in bottomSurface inverse sense of faces.***
+		// in bottomSurface inverse sense of faces.
 		resultSurface.reverseSense();
 	}
 	
 	return resultMesh;
 };
 
+/**
+ * 위쪽이나 아랫쪽 surface 생성.
+ * @static
+ * @param {VtxProfile} vtxProfile
+ * @param {Array.<IndexData>} convexFacesIndicesData
+ * @param {Surface} resultSurface 비어있을 시 Surface 인스턴스 선언.
+ * @returns {Surface}
+ */
 VtxProfilesList.getTransversalSurface = function(vtxProfile, convexFacesIndicesData, resultSurface)
 {
 	if (resultSurface === undefined)
@@ -289,7 +436,7 @@ VtxProfilesList.getTransversalSurface = function(vtxProfile, convexFacesIndicesD
 			
 			if (ringIdx === -1)
 			{
-				// is the outerRing.***
+				// is the outerRing.
 				currVtxRing = vtxProfile.outerVtxRing;
 			}
 			else 
@@ -304,6 +451,64 @@ VtxProfilesList.getTransversalSurface = function(vtxProfile, convexFacesIndicesD
 	
 	return resultSurface;
 };
+
+/**
+ * profile2d와 경로 point3d 리스트를 이용하여 vtxProfile 생성 후 vtxProfilesArray에 추가
+ * @method VtxProfilesList.makeLoft
+ * @param {Profile2D} profile2d
+ * @param {Points3DList} pathPoints3dList
+ * @param {Boolean} bLoop 기본값은 false.
+ * 
+ * @see Point3DList#getBisectionPlane
+ * @see Point3DList#getSegment3D
+ */
+VtxProfilesList.prototype.makeLoft = function(profile2d, pathPoints3dList, bLoop)
+{
+	// 1rst, make the base vtxProfile.
+	// if want caps in the extruded mesh, must calculate "ConvexFacesIndicesData" of the profile2d before creating vtxProfiles.
+	this.convexFacesIndicesData = profile2d.getConvexFacesIndicesData(undefined);
+	
+	// create vtxProfiles.
+	// make the base-vtxProfile.
+	var baseVtxProfile = new VtxProfile();
+	baseVtxProfile.makeByProfile2D(profile2d);
+	
+	// Now, transform the baseVtxProfile to coplanar into the 1rstPlane.
+	if (bLoop === undefined) { bLoop = false; } // Is important to set "bLoop" = false to obtain a perpendicular plane respect to the segment.
+	var bisectionPlane1rst = pathPoints3dList.getBisectionPlane(0, undefined, bLoop);
+	var point3d1rst = pathPoints3dList.getPoint(0);
+	var tMatrix = bisectionPlane1rst.getRotationMatrix(undefined);
+	tMatrix.setTranslation(point3d1rst.x, point3d1rst.y, point3d1rst.z);
+	
+	// Now rotate&translate vtxProfile onto the bisectionPlane1rst.
+	baseVtxProfile.transformPointsByMatrix4(tMatrix);
+	
+	// Now, project the vtxProfile onto the bisectionPlanes of each vertex.
+	var pathPoint3d;
+	var bisectionPlane;
+	var segment3d;
+	var projectionDirection;
+	var pathPointsCount = pathPoints3dList.getPointsCount();
+	for (var i=0; i<pathPointsCount; i++)
+	{
+		pathPoint3d = pathPoints3dList.getPoint(i);
+		bisectionPlane = pathPoints3dList.getBisectionPlane(i, undefined, bLoop);
+		if (i === 0)
+		{
+			segment3d = pathPoints3dList.getSegment3D(i, undefined, bLoop);
+		}
+		else
+		{ segment3d = pathPoints3dList.getSegment3D(i-1, undefined, bLoop); }
+		
+		projectionDirection = segment3d.getDirection(undefined);
+		
+		var projectedVtxProfile = VtxProfile.getProjectedOntoPlane(baseVtxProfile, bisectionPlane, projectionDirection, undefined);
+		this.addVtxProfile(projectedVtxProfile);
+		// finally update the baseVtxProfile.
+		baseVtxProfile = projectedVtxProfile;
+	}
+};
+
 
 
 

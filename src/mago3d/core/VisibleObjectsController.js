@@ -10,14 +10,13 @@ var VisibleObjectsController = function()
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	// This object works with FrustumVolumeControl.***
-	this.currentVisibles0 = [];
-	this.currentVisibles1 = [];
-	this.currentVisibles2 = [];
-	this.currentVisibles3 = [];
+	// This object works with FrustumVolumeControl.
+	this.currentVisibles0 = []; //frustum 0
+	this.currentVisibles1 = []; //frustum 1
+	this.currentVisibles2 = []; //frustum 2
+	this.currentVisibles3 = []; //frustum 3
 	this.currentVisiblesAux = [];
 };
-
 VisibleObjectsController.prototype.initArrays = function() 
 {
 	this.currentVisibles0 = [];
@@ -26,6 +25,7 @@ VisibleObjectsController.prototype.initArrays = function()
 	this.currentVisibles3 = [];
 	this.currentVisiblesAux = [];
 };
+/**Clear all of the volumn's data */
 
 VisibleObjectsController.prototype.clear = function() 
 {
@@ -37,6 +37,7 @@ VisibleObjectsController.prototype.clear = function()
 };
 
 /**
+ * Make all volumns visible
  */
 VisibleObjectsController.prototype.getAllVisibles = function() 
 {
@@ -45,6 +46,7 @@ VisibleObjectsController.prototype.getAllVisibles = function()
 };
 
 /**
+ * Make two volumns : 0, 1
  */
 VisibleObjectsController.prototype.get01Visibles = function() 
 {
@@ -53,12 +55,12 @@ VisibleObjectsController.prototype.get01Visibles = function()
 };
 
 /**
+ * 
  */
-VisibleObjectsController.prototype.getNodeIdxSortedByDist = function(nodesArray, startIdx, endIdx, node) 
+VisibleObjectsController.prototype.getObjectIdxSortedByDist = function(objectsArray, startIdx, endIdx, object) 
 {
 	// this do a dicotomic search of idx in a ordered table.
 	// 1rst, check the range.
-	var neoBuilding = node.data.neoBuilding;
 	var range = endIdx - startIdx;
 	if (range < 6)
 	{
@@ -69,8 +71,8 @@ VisibleObjectsController.prototype.getNodeIdxSortedByDist = function(nodesArray,
 
 		while (!finished && i<=endIdx)
 		{
-			var aNeoBuilding = nodesArray[i].data.neoBuilding;
-			if (neoBuilding.distToCam < aNeoBuilding.distToCam)
+			var anObject = objectsArray[i];
+			if (object.distToCamera < anObject.distToCamera)
 			{
 				idx = i;
 				finished = true;
@@ -89,8 +91,88 @@ VisibleObjectsController.prototype.getNodeIdxSortedByDist = function(nodesArray,
 		var middleIdx = startIdx + Math.floor(range/2);
 		var newStartIdx;
 		var newEndIdx;
-		var middleNeoBuilding = nodesArray[middleIdx].data.neoBuilding;
-		if (middleNeoBuilding.distToCam > neoBuilding.distToCam)
+		var middleObject = objectsArray[middleIdx];
+		if (middleObject.distToCamera > object.distToCamera)
+		{
+			newStartIdx = startIdx;
+			newEndIdx = middleIdx;
+		}
+		else 
+		{
+			newStartIdx = middleIdx;
+			newEndIdx = endIdx;
+		}
+		return this.getObjectIdxSortedByDist(objectsArray, newStartIdx, newEndIdx, object);
+	}
+};
+
+/**
+ * Put the object by distance from camera
+ * @param {VisibleObjectsController}objectsArray
+ * @param {Octree}object 
+ */
+VisibleObjectsController.prototype.putObjectToArraySortedByDist = function(objectsArray, object) 
+{
+	if (objectsArray.length > 0)
+	{
+		var startIdx = 0;
+		var endIdx = objectsArray.length - 1;
+		var idx = this.getObjectIdxSortedByDist(objectsArray, startIdx, endIdx, object);
+		               
+		
+		objectsArray.splice(idx, 0, object);
+	}
+	else 
+	{
+		objectsArray.push(object);
+	}
+};
+
+/**
+ * Get the index of the node which is in nodesArray
+ * @param nodesArray
+ * @param {Number} startIdx
+ * @param {Number} endIdx
+ * @param node
+ */
+VisibleObjectsController.prototype.getNodeIdxSortedByDist = function(nodesArray, startIdx, endIdx, node) 
+{
+	// Note: Function exclusive to use with Node class objects.
+	// this do a dicotomic search of idx in a ordered table.
+	// 1rst, check the range.
+	var neoBuilding = node.data.neoBuilding;
+	var range = endIdx - startIdx;
+	if (range < 6)
+	{
+		// in this case do a lineal search.
+		var finished = false;
+		var i = startIdx;
+		var idx;
+
+		while (!finished && i<=endIdx)
+		{
+			var aNode = nodesArray[i];
+			if (node.data.distToCam < aNode.data.distToCam)
+			{
+				idx = i;
+				finished = true;
+			}
+			i++;
+		}
+		
+		if (finished)
+		{ return idx; }
+		else 
+		{ return endIdx+1; }
+	}
+	else 
+	{
+		// in this case do the dicotomic search.
+		var middleIdx = startIdx + Math.floor(range/2);
+		var newStartIdx;
+		var newEndIdx;
+		var middleNode = nodesArray[middleIdx];
+		if (middleNode.data.distToCam > node.data.distToCam)
 		{
 			newStartIdx = startIdx;
 			newEndIdx = middleIdx;
@@ -105,9 +187,13 @@ VisibleObjectsController.prototype.getNodeIdxSortedByDist = function(nodesArray,
 };
 
 /**
+ * Put the node to given node array
+ * @param nodesArray
+ * @param node
  */
 VisibleObjectsController.prototype.putNodeToArraySortedByDist = function(nodesArray, node) 
 {
+	// Note: Function exclusive to use with Node class objects.
 	if (nodesArray.length > 0)
 	{
 		var startIdx = 0;

@@ -45,7 +45,7 @@ var ShadowBlendingCube = function()
  */
 ShadowBlendingCube.prototype.init = function(vtxMat, tTriMat) 
 {
-	// create a blending cube, with faces inverted.***
+	// create a blending cube, with faces inverted.
 	var cubeSideSemiLength = 150.5;
 
 	var r = 0.1;
@@ -53,7 +53,7 @@ ShadowBlendingCube.prototype.init = function(vtxMat, tTriMat)
 	var b = 0.1;
 	var alpha = 0.6;
 
-	// Center Bottom of the cube.***
+	// Center Bottom of the cube.
 	var vertexList = vtxMat.newVertexList();
 	var vertex = vertexList.newVertex();
 	vertex.setPosition(0.0, 0.0, -cubeSideSemiLength);
@@ -71,7 +71,7 @@ ShadowBlendingCube.prototype.init = function(vtxMat, tTriMat)
 	vertex.setPosition(0.0, 0.0, -cubeSideSemiLength);
 	vertex.setColorRGBA(r, g, b, alpha);
 
-	// Bottom of the cube.***
+	// Bottom of the cube.
 	vertexList = vtxMat.newVertexList();
 	vertex = vertexList.newVertex();
 	vertex.setPosition(-cubeSideSemiLength, -cubeSideSemiLength,
@@ -93,7 +93,7 @@ ShadowBlendingCube.prototype.init = function(vtxMat, tTriMat)
 		-cubeSideSemiLength);
 	vertex.setColorRGBA(r, g, b, alpha);
 
-	// Top of the cube.***
+	// Top of the cube.
 	vertexList = vtxMat.newVertexList();
 	vertex = vertexList.newVertex();
 	vertex.setPosition(-cubeSideSemiLength, -cubeSideSemiLength,
@@ -115,7 +115,7 @@ ShadowBlendingCube.prototype.init = function(vtxMat, tTriMat)
 		cubeSideSemiLength);
 	vertex.setColorRGBA(r, g, b, alpha);
 
-	// Center Top of the cube.***
+	// Center Top of the cube.
 	vertexList = vtxMat.newVertexList();
 	vertex = vertexList.newVertex();
 	vertex.setPosition(0.0, 0.0, cubeSideSemiLength);
@@ -133,7 +133,7 @@ ShadowBlendingCube.prototype.init = function(vtxMat, tTriMat)
 	vertex.setPosition(0.0, 0.0, cubeSideSemiLength);
 	vertex.setColorRGBA(r, g, b, alpha);
 
-	// Now, make the tTrianglesMatrix.***
+	// Now, make the tTrianglesMatrix.
 	vtxMat.makeTTrianglesLateralSidesLOOP(tTriMat);
 	// tTriMat.invert_trianglesSense();
 };
@@ -231,10 +231,10 @@ var CircularCloud = function()
 	this.vboShadowIndexCacheKey;
 	this.indicesCount = 0;
 
-	this.rendered = false; // Test.***
+	this.rendered = false; // Test.
 
-	// SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.*** SCRATCH.***
-	// SCRATCH.*** SCRATCH.***
+	// SCRATCH. SCRATCH. SCRATCH. SCRATCH. SCRATCH. SCRATCH.
+	// SCRATCH. SCRATCH.
 	this.point3dSC = new Point3D();
 	this.vertexSC = new Vertex();
 };
@@ -299,14 +299,14 @@ CircularCloud.prototype.getVBOShadowIndicesShortArray = function()
  */
 CircularCloud.prototype.rotateMeshByLocation = function(vtxMat) 
 {
-	// we rotate the cloud mesh by longitude, latitude.***
+	// we rotate the cloud mesh by longitude, latitude.
 	var matrix = new Matrix4();
 
-	// 1) Rotation Z. Longitude.***
+	// 1) Rotation Z. Longitude.
 	matrix.rotationAxisAngDeg(-this.longitude, 0.0, 0.0, 1.0);
 	vtxMat.transformPointsByMatrix4(matrix);
 
-	// 2) Rotation X'. Latitude.***
+	// 2) Rotation X'. Latitude.
 	var longitudeRad = this.longitude * Math.PI / 180.0;
 
 	var cloudEquatorialPos = new Point3D();
@@ -331,17 +331,17 @@ CircularCloud.prototype.doShadowMeshWithSunDirection = function()
 {
 	var distance = 3000.0;
 	var vertexList = this.shadowVertexMatrix.getVertexList(5); // Bottom radius
-	// zero ring.***
+	// zero ring.
 	vertexList.translateVertices(this.sunLightDirection.x,
 		this.sunLightDirection.y, this.sunLightDirection.z, distance);
 
 	vertexList = this.shadowVertexMatrix.getVertexList(4); // Bottom minor
-	// ring.***
+	// ring.
 	vertexList.translateVertices(this.sunLightDirection.x,
 		this.sunLightDirection.y, this.sunLightDirection.z, distance);
 
 	vertexList = this.shadowVertexMatrix.getVertexList(3); // Bottom major
-	// ring.***
+	// ring.
 	vertexList.translateVertices(this.sunLightDirection.x,
 		this.sunLightDirection.y, this.sunLightDirection.z, distance);
 };
@@ -418,8 +418,8 @@ CircularCloud.prototype.createCloud = function(longitude, latitude, altitude,
 CircularCloud.prototype.makeMesh = function(vtxMat, tTriMat, shadowVtxMat,
 	shadowTTriMat) 
 {
-	// use vertex_matrix.***
-	// our cloud has 6 rings. Top ring and the bottom ring has radius zero.***
+	// use vertex_matrix.
+	// our cloud has 6 rings. Top ring and the bottom ring has radius zero.
 	var numPointsForRing = 16;
 	var increAngRad = (2.0 * Math.PI) / numPointsForRing;
 	var angRad = 0.0;
@@ -431,7 +431,7 @@ CircularCloud.prototype.makeMesh = function(vtxMat, tTriMat, shadowVtxMat,
 	var randomValue = 0;
 	// var cloudWhite = 0.98;
 
-	// 1) Top ring. radius zero.***
+	// 1) Top ring. radius zero.
 	var vertexList = vtxMat.newVertexList();
 	var shadowVertexList = shadowVtxMat.newVertexList();
 	randomValue = 0.9 + 0.3 * Math.random();
@@ -444,14 +444,14 @@ CircularCloud.prototype.makeMesh = function(vtxMat, tTriMat, shadowVtxMat,
 		vertex.setColorRGB(randomValue, randomValue, randomValue);
 	}
 
-	// 2) Top menor_ring.***
+	// 2) Top menor_ring.
 	angRad = 0.0;
 	var menorRingRadius = this.radius * 0.7;
 	vertexList = vtxMat.newVertexList();
 	shadowVertexList = shadowVtxMat.newVertexList();
 	for (var i = 0; i < numPointsForRing; i++) 
 	{
-		// Math.random(); // returns from 0.0 to 1.0.***
+		// Math.random(); // returns from 0.0 to 1.0.
 		randomValue = (2 + Math.random()) / 2;
 		vertex = vertexList.newVertex();
 		shadowVertex = shadowVertexList.newVertex();
@@ -464,7 +464,7 @@ CircularCloud.prototype.makeMesh = function(vtxMat, tTriMat, shadowVtxMat,
 		angRad += increAngRad;
 	}
 
-	// 3) Top major_ring.***
+	// 3) Top major_ring.
 	angRad = 0.0;
 	vertexList = vtxMat.newVertexList();
 	shadowVertexList = shadowVtxMat.newVertexList();
@@ -483,7 +483,7 @@ CircularCloud.prototype.makeMesh = function(vtxMat, tTriMat, shadowVtxMat,
 		angRad += increAngRad;
 	}
 
-	// 4) Bottom major_ring.***
+	// 4) Bottom major_ring.
 	angRad = 0.0;
 	vertexList = vtxMat.newVertexList();
 	shadowVertexList = shadowVtxMat.newVertexList();
@@ -501,7 +501,7 @@ CircularCloud.prototype.makeMesh = function(vtxMat, tTriMat, shadowVtxMat,
 		angRad += increAngRad;
 	}
 
-	// 5) Bottom menor_ring.***
+	// 5) Bottom menor_ring.
 	angRad = 0.0;
 	menorRingRadius = this.radius * 0.7;
 	vertexList = vtxMat.newVertexList();
@@ -522,7 +522,7 @@ CircularCloud.prototype.makeMesh = function(vtxMat, tTriMat, shadowVtxMat,
 		angRad += increAngRad;
 	}
 
-	// 6) Bottom ring. radius zero.***
+	// 6) Bottom ring. radius zero.
 	vertexList = vtxMat.newVertexList();
 	shadowVertexList = shadowVtxMat.newVertexList();
 	randomValue = 0.6 + 0.3 * Math.random();
@@ -538,10 +538,10 @@ CircularCloud.prototype.makeMesh = function(vtxMat, tTriMat, shadowVtxMat,
 		// vertex.setColorRGB(0.58, 0.58, 0.58);
 	}
 
-	// Now, make the tTrianglesMatrix.***
+	// Now, make the tTrianglesMatrix.
 	vtxMat.makeTTrianglesLateralSidesLOOP(tTriMat);
 	shadowVtxMat.makeTTrianglesLateralSidesLOOP(shadowTTriMat);
-	// tTriMat.invertTrianglesSense(); // No.***
+	// tTriMat.invertTrianglesSense(); // No.
 
-	// Now, calculate the culling bbox.***
+	// Now, calculate the culling bbox.
 };

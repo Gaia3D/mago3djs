@@ -3,7 +3,7 @@
 
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Now under implementation
  * @class Modeler
  */
 var Modeler = function() 
@@ -13,13 +13,14 @@ var Modeler = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	this.mode = CODE.modelerMode.INACTIVE; // test for the moment.***
-	this.drawingState = CODE.modelerDrawingState.NO_STARTED; // test for the moment.***
-	this.drawingElement = CODE.modelerDrawingElement.NOTHING; // test for the moment.***
-	this.planeGrid; // sketch plane.***
-	this.polyLine2d; // current polyline2D to sketch.***
-	this.geoCoordsList; // class: GeographicCoordsList. geographic polyline.***
-	this.excavation; // class : Excavation.***
+	this.mode = CODE.modelerMode.INACTIVE; // test for the moment.
+	this.drawingState = CODE.modelerDrawingState.NO_STARTED; // test for the moment.
+	this.drawingElement = CODE.modelerDrawingElement.NOTHING; // test for the moment.
+	this.planeGrid; // sketch plane.
+	this.polyLine2d; // current polyline2D to sketch.
+	this.geoCoordsList; // class: GeographicCoordsList. geographic polyline.
+	this.excavation; // class : Excavation.
+	this.tunnel; // class : Tunnel.
 };
 
 /**
@@ -47,6 +48,17 @@ Modeler.prototype.getExcavation = function()
 /**
  * 어떤 일을 하고 있습니까?
  */
+Modeler.prototype.getTunnel = function() 
+{
+	if (this.tunnel === undefined)
+	{ this.tunnel = new Tunnel(); }
+	
+	return this.tunnel;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 Modeler.prototype.addPointToPolyline = function(point2d) 
 {
 	if (this.polyLine2d === undefined)
@@ -61,7 +73,7 @@ Modeler.prototype.addPointToPolyline = function(point2d)
  */
 Modeler.prototype.render = function(magoManager, shader, renderType) 
 {
-	// 1rst, render the planeGrid if exist.***
+	// 1rst, render the planeGrid if exist.
 	if (this.planeGrid !== undefined)
 	{
 		this.planeGrid.render(magoManager, shader);
@@ -69,20 +81,25 @@ Modeler.prototype.render = function(magoManager, shader, renderType)
 	
 	if (this.polyLine2d !== undefined)
 	{
-		// Provisionally render the polyLine2d on the sketch plane here.***
+		// Provisionally render the polyLine2d on the sketch plane here.
 		var points2dCount = this.polyLine2d.getPointsCount();
 		
 	}
 	
 	if (this.geoCoordsList !== undefined)
 	{
-		// Provisionally render geographicPoints.***
-		this.geoCoordsList.renderPoints(magoManager, shader);
+		// Provisionally render geographicPoints.
+		this.geoCoordsList.renderPoints(magoManager, shader, renderType);
 	}
 	
 	if (this.excavation !== undefined)
 	{
 		this.excavation.renderPoints(magoManager, shader, renderType);
+	}
+	
+	if (this.tunnel !== undefined)
+	{
+		this.tunnel.renderPoints(magoManager, shader, renderType);
 	}
 };
 
@@ -91,7 +108,7 @@ Modeler.prototype.render = function(magoManager, shader, renderType)
  */
 Modeler.prototype.createPlaneGrid = function(width, height, numCols, numRows) 
 {
-	// Test function.***
+	// Test function.
 	if (width === undefined)
 	{ width = 500.0; }
 	

@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * 카메라
+ * Manage the objects which is shown at each volume of this frustum
  * @class FrustumVolumeControl
  */
 var FrustumVolumeControl = function() 
@@ -14,9 +14,14 @@ var FrustumVolumeControl = function()
 	this.frustumVolumensMap = {};
 };
 
+/**
+ * Find the specific volumn by the key of this.frustumVolumensMap
+ * @param {Number} key
+ * @returns {Frustum} 
+ */
 FrustumVolumeControl.prototype.getFrustumVolumeCulling = function(key)
 {
-	// 1rst, check if exist. If no exist create it.***
+	// 1rst, check if exist. If no exist create it.
 	if (!this.frustumVolumensMap.hasOwnProperty(key))
 	{
 		this.frustumVolumensMap[key] = {};
@@ -28,6 +33,9 @@ FrustumVolumeControl.prototype.getFrustumVolumeCulling = function(key)
 	return this.frustumVolumensMap[key];
 };
 
+/**
+ * Initiate and clear all the objects in the array
+ */
 FrustumVolumeControl.prototype.initArrays = function()
 {
 	var frustumVolumeObject;

@@ -1,0 +1,45 @@
+{
+  "language": {
+    "title": "언어",
+    "english": "영어",
+    "korean": "한국어"
+  },
+  "menu": {
+    "issue": {
+      "title": "이슈",
+      "tooltip": "전체 이슈 목록에서 시간순으로 정렬된 최신 10 가지 이슈를 보여줍니다."
+    },
+    "search": {
+      "title": "검색",
+      "tooltip": "이슈, 객체 및 공간 정보와 같은 정보를 검색합니다."
+    },
+    "api": {
+      "title": "API",
+      "tooltip": "mago3D 를 조절하기 위한 다양한 API 함수들이 있습니다."
+    },
+    "regist": {
+      "title": "등록",
+      "tooltip": "이슈를 등록합니다."
+    },
+    "tree": {
+      "title": "목록",
+      "tooltip": "프로젝트별로 데이터 계층 및 속성을 표시합니다."
+    },
+    "chart": {
+      "title": "차트",
+      "tooltip": "프로젝트별로 통계 데이터를 표시합니다."
+    },
+    "log": {
+      "title": "로그",
+      "tooltip": "데이터 변경 로그를 표시합니다."
+    },
+    "attribute": {
+      "title": "속성",
+      "tooltip": "데이터 속성 검색을 지원합니다."
+    },
+    "settings": {
+      "title": "설정",
+      "tooltip": "렌더링과 관련된 설정을 합니다."
+    }
+  }
+}

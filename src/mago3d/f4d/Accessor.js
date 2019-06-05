@@ -2,6 +2,9 @@
 
 /**
  * 버퍼 안의 데이터를 어떻게 읽어야 할지 키가 되는 객체
+ * @deprecated NeoSimpleBuilding에서 인스턴스 생성하는 부분이 있으나 NeoSimpleBuilding도 사용하지 않고 있음
+ * 
+ * @exception {Error} Messages.CONSTRUCT_ERROR
  * 
  * @alias Accessor
  * @class Accessor
@@ -15,7 +18,7 @@ var Accessor = function ()
 	}
 
 	this.bufferId;
-	// 0= position, 1= normal, 2= color, 3= texcoord.***
+	// 0= position, 1= normal, 2= color, 3= texcoord.
 	this.accesorType;
 	this.bufferStart;
 	// 버퍼의 시작 시점

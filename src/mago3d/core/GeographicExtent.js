@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * GeographicExtent
+ * Bouonding box which has vertexs represented as lon,lat,alt.
  * @class GeographicExtent
  */
 var GeographicExtent = function() 
@@ -16,7 +16,7 @@ var GeographicExtent = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Clear the value of this instance
  */
 GeographicExtent.prototype.deleteObjects = function() 
 {
@@ -34,7 +34,13 @@ GeographicExtent.prototype.deleteObjects = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * set the value of this instance
+ * @param minLon the value of lon of the lower bound
+ * @param minLat the value of lat of the lower bound
+ * @param minAlt the value of alt of the lower bound
+ * @param maxLon the value of lon of the lower bound
+ * @param maxLat the value of lat of the lower bound
+ * @param maxAlt the value of alt of the lower bound
  */
 GeographicExtent.prototype.setExtent = function(minLon, minLat, minAlt, maxLon, maxLat, maxAlt) 
 {
@@ -47,6 +53,16 @@ GeographicExtent.prototype.setExtent = function(minLon, minLat, minAlt, maxLon, 
 	{ this.maxGeographicCoord = new GeographicCoord(); }
 	
 	this.maxGeographicCoord.setLonLatAlt(maxLon, maxLat, maxAlt);
+};
+
+/**
+ * Get the middle point of the lower bound point and uppper bound point
+ * @param resultGeographicCoord the point which will save the result
+ * @returns {GeographicCoord}
+ */
+GeographicExtent.prototype.getMidPoint = function(resultGeographicCoord) 
+{
+	return GeographicCoord.getMidPoint(this.minGeographicCoord, this.maxGeographicCoord, resultGeographicCoord);
 };
 
 

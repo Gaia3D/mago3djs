@@ -2,7 +2,7 @@
 
 /**
  * LoadData
- * 
+ * @deprecated 삭제예정
  * @alias LoadData
  * @class LoadData
  */
@@ -31,7 +31,7 @@ var LoadData = function()
 
 LoadData.prototype.deleteObjects = function()
 {
-	// here deletes deletable objects.***
+	// here deletes deletable objects.
 	this.dataType = undefined;
 	this.distToCam = undefined;
 	this.lod = undefined;
@@ -44,6 +44,7 @@ LoadData.prototype.deleteObjects = function()
 
 /**
  * LoadQueue
+ * @deprecated 삭제예정
  * 
  * @alias LoadQueue
  * @class LoadQueue
@@ -67,7 +68,7 @@ var LoadQueue = function(magoManager)
 
 LoadQueue.prototype.putLod2PCloudData = function(octree, filePath, texture, texFilePath, aValue)
 {
-	// "aValue" no used yet.***
+	// "aValue" no used yet.
 	octree.lego.fileLoadState = CODE.fileLoadState.IN_QUEUE;
 	var loadData = new LoadData();
 	loadData.filePath = filePath;
@@ -107,13 +108,13 @@ LoadQueue.prototype.manageQueue = function()
 
 
 	
-	// Lod2 meshes, 1rst load texture.***.***
+	// Lod2 meshes, 1rst load texture..
 	if (this.magoManager.fileRequestControler.isFullPlusLowLodImages())	
 	{ 
 		return; 
 	}
 	
-	// pCloud data.***
+	// pCloud data.
 	counter = 0;
 	for (var key in this.lod2PCloudDataMap)
 	{

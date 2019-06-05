@@ -15,14 +15,13 @@ var Camera = function()
 	this.direction = new Point3D(); 
 	this.up = new Point3D();
 	this.right = new Point3D();
-	this.frustum = new Frustum(); // current frustum.***
-	this.bigFrustum = new Frustum(); // sum of all frustums.***
+	this.frustum = new Frustum(); // current frustum.
+	this.bigFrustum = new Frustum(); // sum of all frustums.
 	this.dirty = true;
 	this.frustumsArray = [];
 	this.frustumsArray.push(this.frustum);
 	
-	// auxiliar vars.
-	// points.
+	// frustum points.
 	this.nearCenterPoint = new Point3D();
 	this.farCenterPoint = new Point3D();
 	
@@ -38,11 +37,12 @@ var Camera = function()
 	this.rightNormal = new Point3D();
 	this.bottomNormal = new Point3D();
 	this.topNormal = new Point3D();
+	this.tracked;
 };
 
 /**
- * 카메라
- * @class Camera
+ * Copy the position and the direction and up point of the other camera
+ * @param {Camera} camera
  */
 Camera.prototype.copyPosDirUpFrom = function(camera)
 {
@@ -52,8 +52,9 @@ Camera.prototype.copyPosDirUpFrom = function(camera)
 };
 
 /**
- * 카메라
- * @class Camera
+ * 
+ * Translate this camera with translation vector
+ * @param translationVec
  */
 Camera.prototype.translate = function(translationVec)
 {
@@ -66,7 +67,7 @@ Camera.prototype.translate = function(translationVec)
  */
 Camera.prototype.transformByMatrix4 = function(mat)
 {
-	// transform position, direction and up.***
+	// transform position, direction and up.
 	/*
 	this.position = this.transformPoint3DByMatrix4(this.position, mat);
 	
@@ -78,7 +79,7 @@ Camera.prototype.transformByMatrix4 = function(mat)
 	this.direction = this.rotatePoint3DByMatrix3(this.direction, this.rotMat);
 	this.up = this.rotatePoint3DByMatrix3(this.up, this.rotMat);
 	*/
-	// Calculate with our matrix4.***
+	// Calculate with our matrix4.
 	this.position = mat.transformPoint3D(this.position, this.position);
 	this.direction = mat.rotatePoint3D(this.direction, this.direction);
 	this.up = mat.rotatePoint3D(this.up, this.up);
@@ -100,12 +101,11 @@ Camera.prototype.getCameraDirectionLine = function(resultLine)
 };
 
 /**
- * 카메라
+ * determine camHeight
  * @class Camera
  */
 Camera.prototype.getCameraElevation = function()
 {
-	// determine camHeight.***
 	var geographicCoords;
 	geographicCoords = Globe.CartesianToGeographicWgs84(this.position.x, this.position.y, this.position.z, geographicCoords);
 	var latDeg = geographicCoords.latitude;
@@ -115,7 +115,7 @@ Camera.prototype.getCameraElevation = function()
 };
 
 /**
- * 카메라
+ * Get the right(up)
  * @class Camera
  */
 Camera.prototype.getCameraRight = function()
@@ -128,35 +128,40 @@ Camera.prototype.getCameraRight = function()
 };
 
 /**
- * 카메라
- * @class Camera
+ * Transforms the vector "point" by given matrix4
+ * @param point
+ * @param {Mat4} mat
+ * @returns {Vec3} 
  */
 Camera.prototype.transformPoint3DByMatrix4 = function(point, mat)
 {
-	var pos = vec3.clone([point.x, point.y, point.z]);
-	var tPos = vec3.create();
-	tPos = vec3.transformMat4(tPos, pos, mat);
+	var pos = glMatrix.vec3.clone([point.x, point.y, point.z]);
+	var tPos = glMatrix.vec3.create();
+	tPos = glMatrix.vec3.transformMat4(tPos, pos, mat);
 	point.set(tPos[0], tPos[1], tPos[2]);
 	
 	return point;
 };
 
 /**
- * 카메라
- * @class Camera
+ * Transforms the vector "point" by given matrix4
+ * @param point
+ * @param {Mat3} mat
+ * @returns {Vec3} 
  */
 Camera.prototype.rotatePoint3DByMatrix3 = function(point, mat)
 {
-	var pos = vec3.clone([point.x, point.y, point.z]);
-	var tPos = vec3.create();
-	tPos = vec3.transformMat3(tPos, pos, mat);
+	var pos = glMatrix.vec3.clone([point.x, point.y, point.z]);
+	var tPos = glMatrix.vec3.create();
+	tPos = glMatrix.vec3.transformMat3(tPos, pos, mat);
 	point.set(tPos[0], tPos[1], tPos[2]);
 	
 	return point;
 };
 
 /**
- * 카메라
+ * set dirty flag of the object
+ * -dirty flag : Avoid unnecessary work by deferring it until the result is needed.
  * @class Camera
  */
 Camera.prototype.setDirty = function(cameraIsDirty)
@@ -165,7 +170,7 @@ Camera.prototype.setDirty = function(cameraIsDirty)
 };
 
 /**
- * 카메라
+ * get dirty flag of the object
  * @class Camera
  */
 Camera.prototype.getDirty = function()
@@ -174,8 +179,18 @@ Camera.prototype.getDirty = function()
 };
 
 /**
- * 카메라
- * @class Camera
+ * Check whether this camera is moved or not
+ * @param {Number} newPosX
+ * @param {Number} newPosY
+ * @param {Number} newPosZ
+ * @param {Number} newDirX
+ * @param {Number} newDirY
+ * @param {Number} newDirZ
+ * @param {Number} newUpX
+ * @param {Number} newUpY
+ * @param {Number} newUpZ
+ * @returns {Boolean} 
+ * 
  */
 Camera.prototype.isCameraMoved = function(newPosX, newPosY, newPosZ, newDirX, newDirY, newDirZ, newUpX, newUpY, newUpZ )
 {
@@ -188,7 +203,7 @@ Camera.prototype.isCameraMoved = function(newPosX, newPosY, newPosZ, newDirX, ne
 };
 
 /**
- * 카메라
+ * get the small Frustum in big frustum
  * @class Camera
  */
 Camera.prototype.getFrustum = function(idx)
@@ -206,8 +221,7 @@ Camera.prototype.getFrustum = function(idx)
 };
 
 /**
- * 카메라
- * @class Camera
+ * Get the lastest frustum of this camera
  */
 Camera.prototype.getLastFrustum = function()
 {
@@ -215,8 +229,7 @@ Camera.prototype.getLastFrustum = function()
 };
 
 /**
- * 카메라
- * @class Camera
+ * The list of the distance between the divided frustum of visualization volume using each small frustum's near and far
  */
 Camera.prototype.setFrustumsDistances = function(numFrustums, distancesArray)
 {
@@ -240,7 +253,10 @@ Camera.prototype.setFrustumsDistances = function(numFrustums, distancesArray)
 };
 
 /**
- * 카메라
+ * 
+ * Calculate the value of fovyRad and aspectRatio of each small frustum
+ * @param aspectRatio aspect ratio
+ * @param fovyRad the radian of FOV(Field Of View) y
  * @class Camera
  */
 Camera.prototype.setAspectRatioAndFovyRad = function(aspectRatio, fovyRad)
@@ -270,12 +286,22 @@ Camera.prototype.setAspectRatioAndFovyRad = function(aspectRatio, fovyRad)
 };
 
 /**
- * 카메라
+ * Set the current frustum in bigFrustum
  * @class Camera
  */
 Camera.prototype.setCurrentFrustum = function(frustumIdx)
 {
 	this.frustum = this.getFrustum(frustumIdx);
+};
+
+/**
+ */
+Camera.prototype.bindCameraUniforms = function(gl, shader) 
+{
+	// Bind frustum near & far.
+	var frustum = this.frustum;
+	gl.uniform1f(shader.frustumNear_loc, frustum.near[0]);
+	gl.uniform1f(shader.frustumFar_loc, frustum.far[0]);
 };
 
 /**
@@ -285,7 +311,7 @@ Camera.prototype.setCurrentFrustum = function(frustumIdx)
 Camera.prototype.calculateFrustumsPlanes = function()
 {
 	var plane;
-	var frustum0; // the 1rst frustum.***
+	var frustum0; // the 1rst frustum.
 	
 	// Use the frustum0 to calculate nearWidth, nearHeight, farWidth & farHeight.
 	frustum0 = this.getFrustum(0);
@@ -333,7 +359,7 @@ Camera.prototype.calculateFrustumsPlanes = function()
 	plane = frustum0.planesArray[1];
 	plane.setPointAndNormal(this.farCenterPoint.x, this.farCenterPoint.y, this.farCenterPoint.z, -dx, -dy, -dz);
 
-	// The 4 lateral planes are the same for all frustum0s.***
+	// The 4 lateral planes are the same for all frustum0s.
 	// left plane.
 	this.leftNormal = this.leftBottomDir.crossProduct(this.up, this.leftNormal);
 	this.leftNormal.unitary();
@@ -358,7 +384,7 @@ Camera.prototype.calculateFrustumsPlanes = function()
 	plane = frustum0.planesArray[5];
 	plane.setPointAndNormal(px, py, pz, this.topNormal.x, this.topNormal.y, this.topNormal.z);
 	
-	// once finished, calculate the rest of frustums.***
+	// once finished, calculate the rest of frustums.
 	var frustum;
 	var frustumsCount = this.frustumsArray.length;
 	for (var i=1; i<frustumsCount; i++)
@@ -377,14 +403,14 @@ Camera.prototype.calculateFrustumsPlanes = function()
 		plane = frustum.planesArray[1];
 		plane.setPointAndNormal(this.farCenterPoint.x, this.farCenterPoint.y, this.farCenterPoint.z, -dx, -dy, -dz);
 		
-		// the lateral planes.***
+		// the lateral planes.
 		for (var j=2; j<6; j++)
 		{
 			frustum.planesArray[j] = frustum0.planesArray[j];
 		}
 	}
 	
-	// finally calculate the totalFrustum(BigFrustum).***
+	// finally calculate the totalFrustum(BigFrustum).
 	// calculate the near and far points.
 	this.nearCenterPoint.set(px + dx * this.bigFrustum.near, py + dy * this.bigFrustum.near, pz + dz * this.bigFrustum.near);
 	this.farCenterPoint.set(px + dx * this.bigFrustum.far, py + dy * this.bigFrustum.far, pz + dz * this.bigFrustum.far);
@@ -398,32 +424,99 @@ Camera.prototype.calculateFrustumsPlanes = function()
 	plane.setPointAndNormal(this.farCenterPoint.x, this.farCenterPoint.y, this.farCenterPoint.z, -dx, -dy, -dz);
 		
 	var lastFrustum = this.getLastFrustum();
-	for (var j=2; j<6; j++) // starting in i==2.***
+	for (var j=2; j<6; j++) // starting in i==2.
 	{
-		// the bigFrustum is esqual to frustum0 except in the "far".***
+		// the bigFrustum is esqual to frustum0 except in the "far".
 		this.bigFrustum.planesArray[j] = frustum0.planesArray[j];
 	}
 };
 
+/**
+ * if track node exist, do track.
+ * @param {Object} magoManager
+ */
+Camera.prototype.doTrack = function(magoManager)
+{
+	if (this.tracked)
+	{
+		// Set camera position.*
+		var trackNode = this.tracked;
+		if (MagoConfig.getPolicy().geo_view_library === Constant.CESIUM)
+		{
+			var camera = magoManager.scene.camera;
+			var position = camera.positionWC;
+			var movedCamPos;
 
+			var geoLocDatamanager = trackNode.getNodeGeoLocDataManager();
+			//var geoLocationData = geoLocDatamanager.getTrackGeoLocationData();
+			if (geoLocDatamanager === undefined)
+			{ return; }
+			
+			var geoLocationData = geoLocDatamanager.getCurrentGeoLocationData();
+			if (geoLocationData === undefined)
+			{ return; }
 
+			var prevGeoLocationData = geoLocDatamanager.getGeoLocationData(1);
+			if (defined(prevGeoLocationData))
+			{
+				var currentPos = geoLocationData.position;
+				var prevPos =  prevGeoLocationData.position;
 
+				var dx = currentPos.x - prevPos.x;
+				var dy = currentPos.y - prevPos.y;
+				var dz  = currentPos.z - prevPos.z;
+				movedCamPos = new Cesium.Cartesian3();
+				movedCamPos.x = position.x + dx;
+				movedCamPos.y = position.y + dy;
+				movedCamPos.z = position.z + dz;
+			}
+			var targetGeographicCoords = geoLocationData.getGeographicCoords();
+			if (targetGeographicCoords === undefined)
+			{ return; }
+			var target = Cesium.Cartesian3.fromDegrees(targetGeographicCoords.longitude, targetGeographicCoords.latitude, targetGeographicCoords.altitude);
+			var range = Cesium.Cartesian3.distance(movedCamPos ? movedCamPos : position, target);
+			var hpr = new Cesium.HeadingPitchRange(camera.heading, camera.pitch, range);
 
+			camera.lookAt(target, hpr); //How To lookAt off : use camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
+			
+			/*var sphere = new Sphere();
+			var radiusAprox_aux = trackNode.data.bbox.getRadiusAprox();
+			sphere.radius = radiusAprox_aux;
+			sphere.center = target;
 
+			camera.viewBoundingSphere(sphere, hpr);*/
+		}
+		else
+		{
+			//this.lookAt() -> we must develope lookAt function in magoworld.
+		}
+	}
+};
 
+/**
+ * stop track 
+ * @param {Object} magoManager
+ */
+Camera.prototype.stopTrack = function(magoManager)
+{
+	this.tracked = undefined;
+	if (MagoConfig.getPolicy().geo_view_library === Constant.CESIUM)
+	{
+		magoManager.scene.camera.lookAtTransform(Cesium.Matrix4.IDENTITY); //set camera transform
+	}
+	else
+	{
+		//this.lookAtStop() -> we must develope lookAtStop function in magoworld.
+	}
+};
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/**
+ * set track node.
+ * Node is a single feature at F4D specification
+ * Implement this function for tracking moving objects such as automatically moving vehicle
+ * @param {Object} node
+ */
+Camera.prototype.setTrack = function(node)
+{
+	this.tracked = node;
+};

@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * 영역 박스
+ * This class is needed to be implemented more, but it will be used at the future.
  * @class Box
  */
 var Box = function(width, length, height) 
@@ -31,7 +31,7 @@ var Box = function(width, length, height)
 };
 
 /**
- * box
+ * Get the VBO key container
  */
 Box.prototype.getVboKeysContainer = function()
 {
@@ -39,7 +39,10 @@ Box.prototype.getVboKeysContainer = function()
 };
 
 /**
- * box
+ * Render this box feature
+ * @param {MagoManager} magoManager
+ * @param {Shader} shader
+ * @param {Number} renderType
  */
 Box.prototype.render = function(magoManager, shader, renderType)
 {
@@ -53,11 +56,14 @@ Box.prototype.render = function(magoManager, shader, renderType)
 };
 
 /**
- * box
+ * Set the width,length, height of this feature
+ * @param {Number} width
+ * @param {Number} length
+ * @param {Number} height 
  */
 Box.prototype.makeMesh = function(width, length, height)
 {
-	// check dimensions of the box.***
+	// check dimensions of the box.
 	if (width !== undefined)
 	{ this.width = width; }
 	
@@ -85,20 +91,20 @@ Box.prototype.makeMesh = function(width, length, height)
 	if (this.vbo_vicks_containerEdges === undefined)
 	{ this.vbo_vicks_containerEdges = new VBOVertexIdxCacheKeysContainer(); }
 	
-	// Create a parametric mesh.***
+	// Create a parametric mesh.
 	var pMesh = new ParametricMesh();
 		
-	// Create a Profile2d.***
+	// Create a Profile2d.
 	pMesh.profile = new Profile2D(); 
 	var profileAux = pMesh.profile; 
 	
-	// Create a outer ring in the Profile2d.***
+	// Create a outer ring in the Profile2d.
 	var outerRing = profileAux.newOuterRing();
 	var rect = outerRing.newElement("RECTANGLE");
 	rect.setCenterPosition(this.centerPoint.x, this.centerPoint.y);
 	rect.setDimensions(this.width, this.length);
 	
-	// Extrude the Profile.***
+	// Extrude the Profile.
 	var extrudeSegmentsCount = 1;
 	var extrusionVector = undefined;
 	pMesh.extrude(profileAux, this.height, extrudeSegmentsCount, extrusionVector);
@@ -107,7 +113,7 @@ Box.prototype.makeMesh = function(width, length, height)
 	var bIncludeTopCap = true;
 	var mesh = pMesh.getSurfaceIndependentMesh(undefined, bIncludeBottomCap, bIncludeTopCap);
 	
-	// translate the box bcos center the origen to the center of the box.***
+	// translate the box bcos center the origen to the center of the box.
 	mesh.translate(0, 0, -this.height/2);
 
 	return mesh;

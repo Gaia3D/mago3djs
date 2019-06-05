@@ -1,14 +1,19 @@
 'use strict';
 
 /**
- * 3차원 정보
- * @class Point3D
+ * a point feature which will be used at three degree world
+ * @class Point3D 
+ * @param {Number} x 
+ * @param {Number} y 
+ * @param {Number} z 
  */
+
 var Point3D = function(x, y, z) 
 {
 	if (!(this instanceof Point3D)) 
 	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
+		// throw new Error(Messages.CONSTRUCT_ERROR);
+		throw new Error(i18next.t('error.construct.create'));
 	}
 
 	if (x !== undefined)
@@ -26,12 +31,11 @@ var Point3D = function(x, y, z)
 	else
 	{ this.z = 0.0; }
 	
-	this.pointType; // 1 = important point.***
+	this.pointType; // 1 = important point.
 };
 
 /**
- * 포인트값 삭제
- * 어떤 일을 하고 있습니까?
+ * delete the value of x,y,z coordi
  */
 Point3D.prototype.deleteObjects = function() 
 {
@@ -41,8 +45,8 @@ Point3D.prototype.deleteObjects = function()
 };
 
 /**
- * 포인트값 삭제
- * 어떤 일을 하고 있습니까?
+ * copy the value of other point
+ * @param {Point3D} point3d
  */
 Point3D.prototype.copyFrom = function(point3d) 
 {
@@ -52,8 +56,8 @@ Point3D.prototype.copyFrom = function(point3d)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @returns this.x*this.x + this.y*this.y + this.z*this.z;
+ * Calculate [this.x*this.x + this.y*this.y + this.z*this.z] to prepare squared module 
+ * @returns {Number}
  */
 Point3D.prototype.getSquaredModul = function() 
 {
@@ -61,8 +65,8 @@ Point3D.prototype.getSquaredModul = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @returns Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z );
+ * Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z );
+ * @returns {Number}
  */
 Point3D.prototype.getModul = function() 
 {
@@ -71,7 +75,7 @@ Point3D.prototype.getModul = function()
 
 /**
  * 
- * 어떤 일을 하고 있습니까?
+ * get the unitary value
  */
 Point3D.prototype.unitary = function() 
 {
@@ -83,7 +87,8 @@ Point3D.prototype.unitary = function()
 
 /**
  * 
- * 어떤 일을 하고 있습니까?
+ * check whether each value of the coordi is null or not
+ * @returns {Boolean}
  */
 Point3D.prototype.isNAN = function() 
 {
@@ -94,10 +99,10 @@ Point3D.prototype.isNAN = function()
 };
 
 /**
- * nomal 계산
- * @param point 변수
- * @param resultPoint 변수
- * @returns resultPoint
+ * Calculate vector product
+ * @param {Point3D} point the point which will be used at this calculate.
+ * @param {Point3D} resultPoint the point which will save the calculated value.
+ * @returns {Number} calculated result
  */
 Point3D.prototype.crossProduct = function(point, resultPoint) 
 {
@@ -111,10 +116,9 @@ Point3D.prototype.crossProduct = function(point, resultPoint)
 };
 
 /**
- * nomal 계산
- * @param point 변수
- * @param resultPoint 변수
- * @returns resultPoint
+ * Calculate scalar production of vector
+ * @param {Point3D} point the point which will be used at this calculate.
+ * @returns {Number} calculated result
  */
 Point3D.prototype.scalarProduct = function(point) 
 {
@@ -123,29 +127,26 @@ Point3D.prototype.scalarProduct = function(point)
 };
 
 /**
- * nomal 계산
- * @param point 변수
- * @returns resultPoint
+ * get the spherical coordinates
+ * @param {GeographicCoord}resultGeographicCoords the target that will be canged
+ * @returns {GeographicCoord} resultGeographicCoords
  */
 Point3D.prototype.getSphericalCoords = function(resultGeographicCoords) 
 {
 	if (resultGeographicCoords === undefined)
 	{ resultGeographicCoords = new GeographicCoord(); }
 	
-	// heading.***
+	// heading.
 	var xyProjectedPoint = new Point2D(this.x, this.y);
 	var longitudeVectorRef = new Point2D(1.0, 0.0);
 	var headingDeg = xyProjectedPoint.angleDegToVector(longitudeVectorRef);
-	
-	if (headingDeg > 90)
-	{ var hola = 0; }
 	
 	if (this.y < 0.0)
 	{
 		headingDeg = 360.0 - headingDeg;
 	}
 	
-	// azimutal.***
+	// azimutal.meridian angle
 	var projectedModul = xyProjectedPoint.getModul();
 	var azimutRad = Math.atan(this.z/projectedModul);
 	var azimutDeg = azimutRad * 180.0 / Math.PI;
@@ -162,22 +163,36 @@ Point3D.prototype.getSphericalCoords = function(resultGeographicCoords)
 };
 
 /**
- * nomal 계산
- * @param point 변수
- * @param resultPoint 변수
- * @returns resultPoint
+ * Check whether those of two vectors are parallel or not
+ * If parallel then check whether the direction sense is same or not 
+ */
+Point3D.prototype.getRelativeOrientationToVector = function(vector, radError) 
+{
+	var angRad = this.angleRadToVector(vector);
+	if (angRad < radError)
+	{ return 0; } // there are parallel & the same direction sense.
+	else if (Math.abs(Math.PI - angRad) < radError)
+	{ return 1; } // there are parallel & opposite direction sense.
+	else
+	{ return 2; } // there are NO parallels.
+};
+
+/**
+ * Calculate the radian value of the angle of the two vectors
+ * @param vector the target vector
+ * @returns the angle of two vector
  */
 Point3D.prototype.angleRadToVector = function(vector) 
 {
 	if (vector === undefined)
 	{ return undefined; }
 	
-	//******************************************************
+	//
 	//var scalarProd = this.scalarProd(vector);
 	var myModul = this.getModul();
 	var vecModul = vector.getModul();
 	
-	// calcule by cos.***
+	// calculate by cos.
 	//var cosAlfa = scalarProd / (myModul * vecModul); 
 	//var angRad = Math.acos(cosAlfa);
 	//var angDeg = alfa * 180.0/Math.PI;
@@ -190,7 +205,7 @@ Point3D.prototype.angleRadToVector = function(vector)
 };
 
 /**
- * nomal 계산
+ * Calculate the degree value of the angle of the two vectors
  * @param point 변수
  * @param resultPoint 변수
  * @returns resultPoint
@@ -366,8 +381,8 @@ Point3D.prototype.aproxDistTo = function(pointB, sqrtTable)
  */
 Point3D.prototype.getVectorToPoint = function(targetPoint, resultVector) 
 {
-	// this returns a vector that points to "targetPoint" from "this".***
-	// the "resultVector" has the direction from "this" to "targetPoint", but is NOT normalized.***
+	// this returns a vector that points to "targetPoint" from "this".
+	// the "resultVector" has the direction from "this" to "targetPoint", but is NOT normalized.
 	if (targetPoint === undefined)
 	{ return undefined; }
 	
@@ -424,11 +439,6 @@ Point3D.prototype.scale = function(scaleFactor)
 };
 
 
-//********************************************************************************************************************************
-//********************************************************************************************************************************
-//********************************************************************************************************************************
-
-
 /**
  * 3차원 정보
  * @class Point3DList
@@ -482,7 +492,7 @@ Point3DList.calculateBBox = function(points3DArray, resultBBox)
 	if (resultBBox === undefined)
 	{ resultBBox = new BoundingBox(); }
 	
-	resultBBox.init(points3DArray[0]); // init the box.***
+	resultBBox.init(points3DArray[0]); // init the box.
 	for (var i=1; i<pointCount; i++)
 	{
 		resultBBox.addPoint(points3DArray[i]);

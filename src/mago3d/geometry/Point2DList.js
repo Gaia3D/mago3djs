@@ -1,9 +1,9 @@
 'use strict';
 /**
-* 어떤 일을 하고 있습니까?
+* Contain the list of the features of Point2D
 * @class Point2DList
 */
-var Point2DList = function(x, y) 
+var Point2DList = function() 
 {
 	if (!(this instanceof Point2DList)) 
 	{
@@ -13,6 +13,9 @@ var Point2DList = function(x, y)
 	this.pointsArray;
 };
 
+/**
+ * Clear this.pointsArray of this feature
+ */
 Point2DList.prototype.deleteObjects = function()
 {
 	if (this.pointsArray === undefined)
@@ -27,6 +30,10 @@ Point2DList.prototype.deleteObjects = function()
 	this.pointsArray = undefined;
 };
 
+/**
+ * Add a feature of Point2D at the last of this.pointsArray
+ * @param {Point2D} point2d the point that will be pushed at this.pointsArray
+ */
 Point2DList.prototype.addPoint = function(point2d)
 {
 	if (point2d === undefined)
@@ -38,6 +45,12 @@ Point2DList.prototype.addPoint = function(point2d)
 	this.pointsArray.push(point2d);
 };
 
+/**
+ * Create a new feature of Point2D
+ * @param {Number} x the x coordi of the point
+ * @param {Number} y the y coordi of the point
+ * @returns {Point2D} return the created point
+ */
 Point2DList.prototype.newPoint = function(x, y)
 {
 	if (this.pointsArray === undefined)
@@ -48,11 +61,20 @@ Point2DList.prototype.newPoint = function(x, y)
 	return point;
 };
 
+/**
+ * Search and return the specific feature of Point2D with the index that has at this.pointArray
+ * @param {Number} idx the index of the target point at this.pointArray
+ * 
+ */
 Point2DList.prototype.getPoint = function(idx)
 {
 	return this.pointsArray[idx];
 };
 
+/**
+ * Return the length of this.pointArray
+ * @returns {Number}
+ */
 Point2DList.prototype.getPointsCount = function()
 {
 	if (this.pointsArray === undefined)
@@ -61,6 +83,12 @@ Point2DList.prototype.getPointsCount = function()
 	return this.pointsArray.length;
 };
 
+/**
+ * This function is used when this feature is a point2DRing.
+ * Return the previous index of the given index.
+ * @param {Number} idx the target index
+ * @param {Number} prevIdx
+ */
 Point2DList.prototype.getPrevIdx = function(idx)
 {
 	var pointsCount = this.pointsArray.length;
@@ -74,6 +102,12 @@ Point2DList.prototype.getPrevIdx = function(idx)
 	return prevIdx;
 };
 
+/**
+ * This function is used when this feature is a point2DRing.
+ * Return the next index of the given index
+ * @param {Number} idx the target index
+ * @param {Number} nexIndx
+ */
 Point2DList.prototype.getNextIdx = function(idx)
 {
 	var pointsCount = this.pointsArray.length;
@@ -87,6 +121,11 @@ Point2DList.prototype.getNextIdx = function(idx)
 	return nextIdx;
 };
 
+/**
+ * Get the index of the given point
+ * @param {Point2D} point
+ * @returns {Number} idx the index of the target point at this.pointArray
+ */
 Point2DList.prototype.getIdxOfPoint = function(point)
 {
 	var pointsCount = this.pointsArray.length;
@@ -106,6 +145,13 @@ Point2DList.prototype.getIdxOfPoint = function(point)
 	return idx;
 };
 
+/**
+ * get the segement with the index of the segment
+ * @param {Number} idx the index of start point of segment
+ * @param {Segment2D} resultSegment the segement which will store the result segment
+ * @returns {Segment2D} resultSegment 
+ * 
+ */
 Point2DList.prototype.getSegment = function(idx, resultSegment)
 {
 	var currPoint = this.getPoint(idx);
@@ -122,6 +168,9 @@ Point2DList.prototype.getSegment = function(idx, resultSegment)
 	return resultSegment;
 };
 
+/**
+ * 
+ */
 Point2DList.prototype.setIdxInList = function()
 {
 	var pointsCount = this.pointsArray.length;
@@ -132,7 +181,7 @@ Point2DList.prototype.setIdxInList = function()
 };
 
 /**
- * nomal 계산
+ * Copy the target Point2dList from this.arrayList
  */
 Point2DList.prototype.getCopy = function(resultPoint2dList) 
 {
@@ -153,37 +202,36 @@ Point2DList.prototype.getCopy = function(resultPoint2dList)
 };
 
 /**
- * nomal 계산
- * @param point 변수
- * @param resultPoint 변수
- * @returns resultPoint
+ * Calculate the bounding box of this point2DList
+ * @param {BoundingRectangle} resultBoundingRectangle the BoundingRectangle which will be calculated
+ * @returns {BoundingRectanble} resultPoint
  */
-Point2DList.prototype.getBoundingRectangle = function(resultBRect) 
+Point2DList.prototype.getBoundingRectangle = function(resultBoundingRectangle) 
 {
 	var pointsCount = this.getPointsCount();
 	if (pointsCount === 0)
-	{ return resultBRect; }
+	{ return resultBoundingRectangle; }
 	
-	if (resultBRect === undefined)
-	{ resultBRect = new BoundingRectangle(); }
+	if (resultBoundingRectangle === undefined)
+	{ resultBoundingRectangle = new BoundingRectangle(); }
 	
 	var point;
 	for (var i=0; i<pointsCount; i++)
 	{
 		if (i === 0)
-		{ resultBRect.setInit(this.getPoint(i)); }
+		{ resultBoundingRectangle.setInit(this.getPoint(i)); }
 		else
-		{ resultBRect.addPoint(this.getPoint(i)); }
+		{ resultBoundingRectangle.addPoint(this.getPoint(i)); }
 	}
 	
-	return resultBRect;
+	return resultBoundingRectangle;
 };
 
 /**
- * nomal 계산
- * @param point 변수
- * @param resultPoint 변수
- * @returns resultPoint
+ * Calculate and return the point in this.pointArray which is the nearest point of the target point
+ * @param point the target point
+ * @param resultPoint the nearest point from the target point
+ * @returns {Point2D} resultPoint
  */
 Point2DList.prototype.getNearestPointIdxToPoint = function(point) 
 {
@@ -216,10 +264,7 @@ Point2DList.prototype.getNearestPointIdxToPoint = function(point)
 };
 
 /**
- * nomal 계산
- * @param point 변수
- * @param resultPoint 변수
- * @returns resultPoint
+ * Reverse the order of this.pointArray
  */
 Point2DList.prototype.reverse = function() 
 {
@@ -227,13 +272,20 @@ Point2DList.prototype.reverse = function()
 	{ this.pointsArray.reverse(); }
 };
 
+/**
+ * Sort the points in this.pointArray as the distance from thePoint
+ * @param {Point2D} thePoint the target point
+ * @param resultSortedPointsIndxArray the target pointArray
+ * @TODO : need to change the name of this function. So confused.
+ * @result resultSortedPointsIdexArray sorted array
+ */
 Point2DList.prototype.getPointsIdxSortedByDistToPoint = function(thePoint, resultSortedPointsIdxArray)
 {
 	if (this.pointsArray === undefined)
 	{ return resultSortedPointsIdxArray; }
 	
-	// Static function.***
-	// Sorting minDist to maxDist.***
+	// Static function.
+	// Sorting minDist to maxDist.
 	if (resultSortedPointsIdxArray === undefined)
 	{ resultSortedPointsIdxArray = []; }
 	
@@ -273,12 +325,17 @@ Point2DList.prototype.getPointsIdxSortedByDistToPoint = function(thePoint, resul
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @returns result_idx
+ * this do a dicotomic search of idx in a ordered table.
+ * @param objectsArray 
+ * @param {Point2D} object the target point
+ * @param {Number} startIdx the start index of objectsArray
+ * @param {Number} endIdx the end index of objectsArray
+ * @returns {Number} result_idx the index of object in objectsArray
+ * 
  */
 Point2DList.prototype.getIndexToInsertBySquaredDist = function(objectsArray, object, startIdx, endIdx) 
 {
-	// this do a dicotomic search of idx in a ordered table.
+	// 
 	// 1rst, check the range.
 	
 	var range = endIdx - startIdx;
@@ -312,9 +369,8 @@ Point2DList.prototype.getIndexToInsertBySquaredDist = function(objectsArray, obj
 			return endIdx+1;
 		}
 	}
-	else 
-	{
-		// in this case do the dicotomic search.
+	else // in this case do the dicotomic search. (Binary search)
+	{		
 		var middleIdx = startIdx + Math.floor(range/2);
 		var newStartIdx;
 		var newEndIdx;

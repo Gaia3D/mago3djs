@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * NetworkNode.***
+ * NetworkNode.
  * 
  * @alias NetworkNode
  * @class NetworkNode
@@ -17,5 +17,5 @@ var NetworkNode = function(owner)
 	this.edgesArray;
 	this.attributes;
 	this.box;
-	//this.mesh; // if display as a box, cilinder, etc.***
+	//this.mesh; // if display as a box, cilinder, etc.
 };

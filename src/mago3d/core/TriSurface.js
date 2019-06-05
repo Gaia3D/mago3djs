@@ -1,7 +1,8 @@
 'use strict';
 
 /**
- * 영역 박스
+ * This feature consists of TriPolyhedron
+ * Using this feature, we can save the lid, bottom, and side surface.
  * @class TriSurface
  */
 var TriSurface = function() 
@@ -12,8 +13,8 @@ var TriSurface = function()
 	}
 
 	this.vertexList;
-	this.trianglesArray;
-	this.trianglesList;
+	this.trianglesArray; //The array of triangles which consist of the surface
+	this.trianglesList; 
 };
 
 TriSurface.prototype.newTriangle = function() 
