@@ -606,7 +606,6 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		// Test Modeler Rendering.********************************************************************
 		if (magoManager.modeler !== undefined)
 		{
-
 			currentShader = magoManager.postFxShadersManager.getShader("modelRefSsao"); 
 			currentShader.useProgram();
 			gl.uniform1i(currentShader.bApplySsao_loc, false); // apply ssao default.***
@@ -644,7 +643,6 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			
 			currentShader.disableVertexAttribArrayAll();
 			gl.useProgram(null);
-
 		}
 		
 		// check changesHistory.
@@ -1295,7 +1293,7 @@ Renderer.prototype.renderBoundingBoxesNodes = function(nodesArray, color, bRende
 		magoManager.pointSC = bbox.getCenterPoint(magoManager.pointSC);
 		gl.uniform3fv(currentShader.aditionalMov_loc, [magoManager.pointSC.x, magoManager.pointSC.y, magoManager.pointSC.z]); //.***
 		//gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
-		magoManager.renderer.renderObject(gl, magoManager.unitaryBoxSC, magoManager, currentShader, ssao_idx, bRenderLines);
+		this.renderObject(gl, magoManager.unitaryBoxSC, magoManager, currentShader, ssao_idx, bRenderLines);
 	}
 
 	currentShader.resetLastBuffersBinded();

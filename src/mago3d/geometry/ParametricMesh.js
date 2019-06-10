@@ -42,8 +42,8 @@ ParametricMesh.prototype.getVboKeysContainer = function()
 /**
  * Get mesh of this instance
  * @param {Mesh} resultMesh
- * @param {Boolean} bIncludeBottomCap Chech whether include the bottom of this revolved mesh ex) pipeline doesn't have bottom and top cap
- * @param {Boolean} bIncludeTopCap Chech whether include the top of this revolved mesh ex) pipeline doesn't have bottom and top cap
+ * @param {Boolean} bIncludeBottomCap Check whether include the bottom of this revolved mesh ex) pipeline doesn't have bottom and top cap
+ * @param {Boolean} bIncludeTopCap Check whether include the top of this revolved mesh ex) pipeline doesn't have bottom and top cap
  * @returns {Mesh}
  */
 ParametricMesh.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bIncludeTopCap)
@@ -61,8 +61,8 @@ ParametricMesh.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bIncl
 /**
  * Change the unified mesh to the group of surfaces for drawing the mesh with WebGL
  * @param {Mesh} resultMesh
- * @param {Boolean} bIncludeBottomCap Chech whether include the bottom of this revolved mesh ex) pipeline doesn't have bottom and top cap
- * @param {Boolean} bIncludeTopCap Chech whether include the top of this revolved mesh ex) pipeline doesn't have bottom and top cap
+ * @param {Boolean} bIncludeBottomCap Check whether include the bottom of this revolved mesh ex) pipeline doesn't have bottom and top cap
+ * @param {Boolean} bIncludeTopCap Check whether include the top of this revolved mesh ex) pipeline doesn't have bottom and top cap
  * 
  */
 ParametricMesh.prototype.getSurfaceIndependentMesh = function(resultMesh, bIncludeBottomCap, bIncludeTopCap)
