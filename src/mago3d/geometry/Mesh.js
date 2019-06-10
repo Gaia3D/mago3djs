@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
+ * This draws the outer shell of the feature as triangular mesh
  * @class Mesh
  */
 var Mesh = function() 
@@ -10,13 +10,21 @@ var Mesh = function()
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
+
 	this.vertexList;
+	
+	//the list of the Surface features
 	this.surfacesArray;
+
 	this.hedgesList;
 	
 	this.vboKeysContainer;
 };
 
+/**
+ * Clear the data of this feature
+ * @param {VBOMemManager} vboMemManager 
+ */
 Mesh.prototype.deleteObjects = function(vboMemManager)
 {
 	if (this.vertexList !== undefined)
@@ -48,6 +56,10 @@ Mesh.prototype.deleteObjects = function(vboMemManager)
 	}
 };
 
+/**
+ * Delete the VBO cache key of this feature from VBOMemManager
+ * @param {VBOMemManager} vboMemManager 
+ */
 Mesh.prototype.deleteVbos = function(vboMemManager)
 {
 	if (this.vboKeysContainer !== undefined)
@@ -57,6 +69,9 @@ Mesh.prototype.deleteVbos = function(vboMemManager)
 	}
 };
 
+/**
+ * Add new surface at the surface array
+ */
 Mesh.prototype.newSurface = function()
 {
 	if (this.surfacesArray === undefined)
@@ -67,6 +82,10 @@ Mesh.prototype.newSurface = function()
 	return surface;
 };
 
+/**
+ * Get the list of the half edges that this mesh has
+ * @returns {HalfEdgesList}
+ */
 Mesh.prototype.getHalfEdgesList = function()
 {
 	if (this.hedgesList === undefined)
@@ -75,6 +94,11 @@ Mesh.prototype.getHalfEdgesList = function()
 	return this.hedgesList;
 };
 
+/**
+ * Get the specific surface of this mesh by index
+ * @param {Number} idx 
+ * @returns {Surface}
+ */
 Mesh.prototype.getSurface = function(idx)
 {
 	if (this.surfacesArray === undefined)
@@ -83,6 +107,10 @@ Mesh.prototype.getSurface = function(idx)
 	return this.surfacesArray[idx];
 };
 
+/**
+ * Add a surface at this mesh
+ * @param {Surface} surface
+ */
 Mesh.prototype.addSurface = function(surface)
 {
 	if (surface === undefined)
@@ -94,6 +122,10 @@ Mesh.prototype.addSurface = function(surface)
 	this.surfacesArray.push(surface);
 };
 
+/**
+ * Merge the other mesh at this feature
+ * @param {Mesh} mesh
+ */
 Mesh.prototype.mergeMesh = function(mesh)
 {
 	if (mesh === undefined)
@@ -110,6 +142,10 @@ Mesh.prototype.mergeMesh = function(mesh)
 	mesh.surfacesArray = undefined;
 };
 
+/**
+ * Return the number of the surfaces that this feature holds.
+ * @returns {Number} 
+ */
 Mesh.prototype.getSurfacesCount = function()
 {
 	if (this.surfacesArray === undefined)
@@ -117,6 +153,12 @@ Mesh.prototype.getSurfacesCount = function()
 	
 	return this.surfacesArray.length;
 };
+
+/**
+ * Copy the mesh.
+ * @param {Mesh} resultMesh this will copy this feature 
+ * @returns {Mesh} resultMesh
+ */
 
 Mesh.prototype.getCopySurfaceIndependentMesh = function(resultMesh)
 {
@@ -136,6 +178,11 @@ Mesh.prototype.getCopySurfaceIndependentMesh = function(resultMesh)
 	return resultMesh;
 };
 
+/**
+ * Get the array of the triangles which consist of this mesh
+ * @param {TrianglesList} resultTrianglesArray The array which will hold the result of this function
+ * @return {TrianglesList}
+ */
 Mesh.prototype.getTriangles = function(resultTrianglesArray)
 {
 	if (this.surfacesArray === undefined || this.surfacesArray.length === 0)
@@ -155,9 +202,16 @@ Mesh.prototype.getTriangles = function(resultTrianglesArray)
 	return resultTrianglesArray;
 };
 
+
+/**
+ * To call this method, the faces must be CONVEX.
+ * Get the trianlgesArray from the surfaces array which have only convex faces. 
+ * @param {TrianglesList} resultTrianglesArray
+ * @returns {TrianglesList} resultTrianglesArray
+ */
 Mesh.prototype.getTrianglesConvex = function(resultTrianglesArray)
 {
-	// To call this method, the faces must be CONVEX.
+	
 	if (this.surfacesArray === undefined || this.surfacesArray.length === 0)
 	{ return resultTrianglesArray; }
 	
@@ -176,9 +230,9 @@ Mesh.prototype.getTrianglesConvex = function(resultTrianglesArray)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param idx 변수
- * @returns vertexArray[idx]
+ * Get the vertices of this mesh without any repeatation
+ * @param {VertexList} resultVerticesArray the array which will hold all vertices of this mesh
+ * @returns {VertexLis}
  */
 Mesh.prototype.getNoRepeatedVerticesArray = function(resultVerticesArray) 
 {
@@ -243,6 +297,10 @@ Mesh.prototype.getNoRepeatedVerticesArray = function(resultVerticesArray)
 	return resultVerticesArray;
 };
 
+/**
+ *	Get the list of the vertices which consist of this mesh
+ *  @return {VertexList}
+ */
 Mesh.prototype.getVertexList = function()
 {
 	if (this.vertexList === undefined)
@@ -253,6 +311,10 @@ Mesh.prototype.getVertexList = function()
 	return this.vertexList;
 };
 
+/**
+ * Transformate this mesh by the input 4x4 matrix
+ * @param {Matrix4} transformByMatrix4
+ */
 Mesh.prototype.transformByMatrix4 = function(tMat4)
 {
 	if (this.vertexList === undefined)
@@ -268,6 +330,12 @@ Mesh.prototype.transformByMatrix4 = function(tMat4)
 	this.calculateVerticesNormals(bForceRecalculatePlaneNormal);
 };
 
+/**
+ * Translate this mesh to the given location
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} z
+ */
 Mesh.prototype.translate = function(x, y, z)
 {
 	if (this.vertexList === undefined)
@@ -279,6 +347,10 @@ Mesh.prototype.translate = function(x, y, z)
 	this.vertexList.translateVertices(x, y, z);
 };
 
+/**
+ * Calculate the normal vectors of the vertices
+ * @param {Boolean} bForceRecalculatePlaneNormal If the mesh is only moved by translating, then it will be false.
+ */
 Mesh.prototype.calculateVerticesNormals = function(bForceRecalculatePlaneNormal)
 {
 	// PROVISIONAL.
@@ -291,6 +363,9 @@ Mesh.prototype.calculateVerticesNormals = function(bForceRecalculatePlaneNormal)
 	}
 };
 
+/**
+ * Get the texture coordinate by spherical projection
+ */
 Mesh.prototype.calculateTexCoordsSpherical = function()
 {
 	var sphericalCoords = new GeographicCoord();
@@ -311,6 +386,13 @@ Mesh.prototype.calculateTexCoordsSpherical = function()
 	}
 };
 
+/**
+ * Set the color of the mesh
+ * @param {Number} r
+ * @param {Number} g
+ * @param {Number} b 
+ * @param {Number} a
+ */
 Mesh.prototype.setColor = function(r, g, b, a)
 {
 	var surface;
@@ -322,6 +404,9 @@ Mesh.prototype.setColor = function(r, g, b, a)
 	}
 };
 
+/**
+ * Reverse the direction of the sense of this mesh
+ */
 Mesh.prototype.reverseSense = function()
 {
 	var surface;
@@ -335,19 +420,29 @@ Mesh.prototype.reverseSense = function()
 	this.calculateVerticesNormals();
 };
 
-Mesh.prototype.getFrontierHalfEdges = function(resultHedgesArray)
+/**
+ * Get the frontier half edges of half edges
+ * @param {HalfEdgesList} resultHalfEdgesArray the list of the half edges which will hold the result of this operation
+ * @return {HalfEdgesList}
+ */
+Mesh.prototype.getFrontierHalfEdges = function(resultHalfEdgesArray)
 {
 	var surface;
 	var surfacesCount = this.getSurfacesCount();
 	for (var i=0; i<surfacesCount; i++)
 	{
 		surface = this.getSurface(i);
-		resultHedgesArray = surface.getFrontierHalfEdges(resultHedgesArray);
+		resultHalfEdgesArray = surface.getFrontierHalfEdges(resultHalfEdgesArray);
 	}
 	
-	return resultHedgesArray;
+	return resultHalfEdgesArray;
 };
 
+/**
+ * Copy the mesh to the parameter mesh
+ * @param {Mesh} resultMeshCopy this will be the copy of this mesh
+ * @return {Mesh} return the copied mesh
+ */
 Mesh.prototype.getCopy = function(resultMeshCopy)
 {
 	if (this.vertexList === undefined)
@@ -400,6 +495,11 @@ Mesh.prototype.getCopy = function(resultMeshCopy)
 	return resultMeshCopy;
 };
 
+/**
+ * WebGL's array index range is short number. So if the length of the trianglesArray is over short, then rearrange the list.
+ * @param {TrianglesList} trianglesArray the target triangle array
+ * @param {Array} resultTrianglesListsArray the array of the TrianglesLis divided into WebGL's index range.
+ */
 Mesh.prototype.getTrianglesListsArrayBy2ByteSize = function(trianglesArray, resultTrianglesListsArray)
 {
 	if (resultTrianglesListsArray === undefined)
@@ -453,7 +553,14 @@ Mesh.prototype.getTrianglesListsArrayBy2ByteSize = function(trianglesArray, resu
 	
 	return resultTrianglesListsArray;
 };
-
+/**
+ * Render the mesh
+ * @param {MagoManager}magoManager
+ * @param {Shader} shader
+ * @param {Number} renderType
+ * @param glPrimitive
+ * @TODO : 누가 이 gl primitive의 type 정체를 안다면 좀 달아주세요ㅠㅠ 세슘 쪽인거 같은데ㅠㅠ
+ */
 Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 {
 	var vboMemManager = magoManager.vboMemoryManager;
@@ -521,7 +628,12 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 		gl.drawElements(primitive, vboKey.indicesCount, gl.UNSIGNED_SHORT, 0);
 	}
 };
-
+/**
+ * Get the VBO keys of this mesh
+ * @param {VBOVertexIdxCacheKeysContainer} resultVboContainer 
+ * @param {VBOMemManager} vboMemManager
+ * @return {VBOVertexIdxCacheKeysContainer}
+ */
 Mesh.prototype.getVbo = function(resultVboContainer, vboMemManager)
 {
 	if (resultVboContainer === undefined)
@@ -551,6 +663,12 @@ Mesh.prototype.getVbo = function(resultVboContainer, vboMemManager)
 	return resultVboContainer;
 };
 
+/**
+ * Get the VBO keys of the convex triangles
+ * @param {VBOVertexIdxCacheKeysContainer} resultVboContainer 
+ * @param {VBOMemManager} vboMemManager
+ * @return {VBOVertexIdxCacheKeysContainer} 
+ */
 Mesh.prototype.getVboTrianglesConvex = function(resultVboContainer, vboMemManager)
 {
 	if (resultVboContainer === undefined)
@@ -580,6 +698,12 @@ Mesh.prototype.getVboTrianglesConvex = function(resultVboContainer, vboMemManage
 	return resultVboContainer;
 };
 
+/**
+ * Register the VBO cache keys of the half edges of this mesh to VBOMemManager.
+ * @param {VBOVertexIdxCacheKeysContainer} resultVboContainer 
+ * @param {VBOMemManager} vboMemManager
+ * @TODO : Need to change name! Not Getter!
+ */
 Mesh.prototype.getVboEdges = function(resultVboContainer, vboMemManager)
 {
 	if (resultVboContainer === undefined)
