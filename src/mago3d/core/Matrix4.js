@@ -60,7 +60,7 @@ Matrix4.prototype.deleteObjects = function()
 /**
  * 행우선 배열 방식의 4차원 행렬을 제공한다.
  *
- * @return {Float32Array} 행우선 4차원 행렬
+ * @returns {Float32Array} 행우선 4차원 행렬
  * 
  * @see Matrix4#get
  */
@@ -98,7 +98,7 @@ Matrix4.prototype.getRowMajorMatrix = function()
  * @param {Number} xRotDeg x축에 대한 회전양(Degree)
  * @param {Number} yRotDeg y축에 대한 회전양(Degree)
  * @param {Matrix4} result 회전된 4차원 행렬
- * @return {Matrix4} 회전된 4차원 행렬
+ * @returns {Matrix4} 회전된 4차원 행렬
  * 
  * @see Matrix4#rotationAxisAngDeg
  * @see Matrix4#getMultipliedByMatrix
@@ -229,7 +229,7 @@ Matrix4.prototype.setByFloat32Array = function(float32array)
  * 
  * @param {Number} col 열의 위치
  * @param {Number} row 행의 위치
- * @return {Number} 행렬의 인덱스
+ * @returns {Number} 행렬의 인덱스
  */
 Matrix4.prototype.getIndexOfArray = function(col, row) 
 {
@@ -244,7 +244,7 @@ Matrix4.prototype.getIndexOfArray = function(col, row)
  *
  * @param {Number} col 열의 위치
  * @param {Number} row 행의 위치
- * @return {Number} 행렬값
+ * @returns {Number} 행렬값
  */
 Matrix4.prototype.get = function(col, row) 
 {
@@ -283,7 +283,7 @@ Matrix4.prototype.set = function(col, row, value)
  *
  * @param {Point3D} point3d 입력 포인트
  * @param {Point3D} result 출력 포인트
- * @return {Point3D} 출력 포인트
+ * @returns {Point3D} 출력 포인트
  */
 Matrix4.prototype.transformPoint3D = function(point3d, result) 
 {
@@ -305,7 +305,7 @@ Matrix4.prototype.transformPoint3D = function(point3d, result)
  *
  * @param {Point3D} point3d 입력 포인트
  * @param {Point3D} result 출력 포인트
- * @return {Point3D} 출력 포인트
+ * @returns {Point3D} 출력 포인트
  */
 Matrix4.prototype.rotatePoint3D = function(point3d, result) 
 {
@@ -330,7 +330,7 @@ Matrix4.prototype.rotatePoint3D = function(point3d, result)
  * @param {vec3} eye Position of the viewer
  * @param {vec3} center Point the viewer is looking at
  * @param {vec3} up vec3 pointing up
- * @return {mat4} out
+ * @returns {mat4} out
  */
 Matrix4.lookAt = function(out, eye, center, up) 
 {
@@ -356,7 +356,7 @@ Matrix4.lookAt = function(out, eye, center, up)
 
 	if (Math.abs(eyex - centerx) < glMatrix.EPSILON && Math.abs(eyey - centery) < glMatrix.EPSILON && Math.abs(eyez - centerz) < glMatrix.EPSILON) 
 	{
-		return mat4.identity(out);
+		return glMatrix.mat4.identity(out);
 	}
 
 	z0 = eyex - centerx;
@@ -431,7 +431,7 @@ Matrix4.lookAt = function(out, eye, center, up)
  * 
  * @param {Matrix4} matrix 입력 행렬(Am)
  * @param {Matrix4} result 결과 행렬(Rm)
- * @return {Matrix4} 결과 행렬(Rm)
+ * @returns {Matrix4} 결과 행렬(Rm)
  */
 Matrix4.prototype.getMultipliedByMatrix = function(matrix, result) 
 {
@@ -509,7 +509,7 @@ Matrix4.prototype.copyFromFloatArray = function(floatArrays)
 /**
  * 행렬의 타입을 알려준다.
  *
- * @return {Number} 행렬의 타입
+ * @returns {Number} 행렬의 타입
  */
 Matrix4.prototype.computeMatrixType = function() 
 {
@@ -564,7 +564,7 @@ Matrix4.prototype.computeMatrixType = function()
  * @param {Number} value 비교값
  * @param {Number} valueToCompare 비교값
  * @param {Number} error 오차율
- * @return {Boolean} 비교값의 일치여부
+ * @returns {Boolean} 비교값의 일치여부
  */
 Matrix4.prototype.aproxEqual = function(value, valueToCompare, error) 
 {
@@ -590,7 +590,7 @@ Matrix4.prototype.aproxEqual = function(value, valueToCompare, error)
  *
  * @param {Object[]} arrayA
  * @param {Object[]} arrayB
- * @return {Boolean} 두 배열의 일치여부
+ * @returns {Boolean} 두 배열의 일치여부
  */
 Matrix4.areEqualArrays = function(arrayA, arrayB) 
 {
@@ -612,7 +612,7 @@ Matrix4.areEqualArrays = function(arrayA, arrayB)
  * 회전/이동을 위한 단위행렬 여부를 확인한다.
  *
  * @param {Number} error
- * @return {Boolean}
+ * @returns {Boolean}
  */
 Matrix4.prototype.isRotationIdentity = function(error) 
 {

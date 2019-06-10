@@ -2,8 +2,9 @@
 
 /**
  * 어떤 일을 하고 있습니까?
- * @class OcclusionCullingOctreeCell
- * @param occlusionCullingOctree_Cell_Owner 변수
+ * @class
+ * 
+ * @param occlusionCullingOctree_Cell_Owner OcclusionCullingOctreeCell 소유자
  */
 var OcclusionCullingOctreeCell = function(occlusionCullingOctree_Cell_Owner) 
 {
@@ -301,9 +302,6 @@ OcclusionCullingOctreeCell.prototype.parseArrayBuffer = function(arrayBuffer, by
 		for (var i=0; i<objects_count; i++) 
 		{
 			var objects_idxInList = f4dReaderWriter.readUInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-			if (objects_idxInList < 0)
-			{ var hola = 0; }
-			
 			this._indicesArray.push(objects_idxInList);
 		}
 	}
@@ -317,19 +315,4 @@ OcclusionCullingOctreeCell.prototype.parseArrayBuffer = function(arrayBuffer, by
 	}
 	
 	return bytes_readed;
-};
-	
-/**
- * 어떤 일을 하고 있습니까?
- * @class OcclusionCullingOctree
- */
-var OcclusionCullingOctree = function() 
-{
-	if (!(this instanceof OcclusionCullingOctree)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-	
-	this._ocCulling_box = new OcclusionCullingOctreeCell(null);
-	this._infinite_ocCulling_box = new OcclusionCullingOctreeCell(null);
 };

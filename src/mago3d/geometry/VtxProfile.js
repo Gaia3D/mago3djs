@@ -47,7 +47,7 @@ VtxProfile.prototype.deleteObjects = function()
 
 /**
  * get inner vertex ring's count
- * @return {Number} 
+ * @returns {Number} 
  */
 VtxProfile.prototype.getInnerVtxRingsCount = function()
 {
@@ -60,7 +60,7 @@ VtxProfile.prototype.getInnerVtxRingsCount = function()
 /**
  * get inner vertex ring
  * @param {Number} idx
- * @return {VtxRing} 
+ * @returns {VtxRing} 
  */
 VtxProfile.prototype.getInnerVtxRing = function(idx)
 {
@@ -147,7 +147,7 @@ VtxProfile.prototype.transformPointsByMatrix4 = function(tMat4)
  * Note: this makes a projected profile2d ONLY conformed by polyLines2D.
  * This function is used when necessary to tessellate this vtxProfile.
  * @param {Profile2D|undefined} resultProfile2d if undefined, set new Profile2D instance.
- * @return {Profile2D} when this.outerVtxRing is undefined or normal is undefined. return original resultProfile2d.
+ * @returns {Profile2D} when this.outerVtxRing is undefined or normal is undefined. return original resultProfile2d.
  * 
  * @see VtxRing#calculatePlaneNormal
  * @see VtxRing#getProjectedPolyLineBasedRing2D
@@ -157,8 +157,8 @@ VtxProfile.prototype.getProjectedProfile2D = function(resultProfile2d)
 	if (this.outerVtxRing === undefined)
 	{ return resultProfile2d; }
 	
-	// 1rst, calculate the normal of this vtxProfile. Use the this.outerVtxRing.***
-	// The normal is used co calculate the bestFace to project.***
+	// 1rst, calculate the normal of this vtxProfile. Use the this.outerVtxRing.
+	// The normal is used co calculate the bestFace to project.
 	var normal = this.outerVtxRing.calculatePlaneNormal(undefined);
 
 	if (normal === undefined)
@@ -167,10 +167,10 @@ VtxProfile.prototype.getProjectedProfile2D = function(resultProfile2d)
 	if (resultProfile2d === undefined)
 	{ resultProfile2d = new Profile2D(); }
 	
-	// OuterVtxRing.***
+	// OuterVtxRing.
 	resultProfile2d.outerRing = this.outerVtxRing.getProjectedPolyLineBasedRing2D(resultProfile2d.outerRing, normal);
 	
-	// InnerVtxRings.***
+	// InnerVtxRings.
 	if (this.innerVtxRingsList !== undefined)
 	{
 		var innerVtxRingsCount = this.innerVtxRingsList.getVtxRingsCount();
@@ -203,13 +203,13 @@ VtxProfile.prototype.makeByPoints3DArray = function(outerPoints3dArray, innerPoi
 	if (outerPoints3dArray === undefined)
 	{ return; }
 	
-	// outer.***************************************
+	// outer.
 	if (this.outerVtxRing === undefined)
 	{ this.outerVtxRing = new VtxRing(); }
 
 	this.outerVtxRing.makeByPoints3DArray(outerPoints3dArray);
 	
-	// inners.***************************************
+	// inners.
 	// todo:
 };
 
@@ -225,13 +225,13 @@ VtxProfile.prototype.updateByPoints3DArray = function(outerPoints3dArray, innerP
 	if (outerPoints3dArray === undefined)
 	{ return; }
 	
-	// outer.***************************************
+	// outer.
 	if (this.outerVtxRing === undefined)
 	{ return; }
 
 	this.outerVtxRing.updateByPoints3DArray(outerPoints3dArray);
 	
-	// inners.***************************************
+	// inners.
 	// todo:
 };
 
@@ -251,7 +251,7 @@ VtxProfile.prototype.makeByProfile2D = function(profile2d)
 	if (outerRing.polygon === undefined)
 	{ outerRing.makePolygon(); }
 	
-	// outer.***************************************
+	// outer.
 	if (this.outerVtxRing === undefined)
 	{ this.outerVtxRing = new VtxRing(); }
 	
@@ -260,7 +260,7 @@ VtxProfile.prototype.makeByProfile2D = function(profile2d)
 	var point2dList = outerPolygon.point2dList;
 	this.outerVtxRing.makeByPoint2DList(point2dList, z);
 
-	// inners.***************************************
+	// inners.
 	if (profile2d.innerRingsList === undefined)
 	{ return; } 
 	
@@ -293,7 +293,7 @@ VtxProfile.prototype.makeByProfile2D = function(profile2d)
 /**
  * get all vertex in outer vertex ring and inner vertex ring list. 
  * @param {Array} resultVerticesArray
- * @return {Array.<Vertex>|undefined}
+ * @returns {Array.<Vertex>|undefined}
  */
 VtxProfile.prototype.getAllVertices = function(resultVerticesArray)
 {
@@ -313,7 +313,7 @@ VtxProfile.prototype.getAllVertices = function(resultVerticesArray)
  * @param {Plane} plane. 
  * @param {Point3D} projectionDirection projectionDirection must be unitary.
  * @param {VtxProfile} resultvtxProfile Optional. if undefined, set new VtxProfile instance.
- * @return {VtxProfile} resultvtxProfile
+ * @returns {VtxProfile} resultvtxProfile
  */
 VtxProfile.getProjectedOntoPlane = function(vtxProfile, plane, projectionDirection, resultvtxProfile)
 {
@@ -323,10 +323,10 @@ VtxProfile.getProjectedOntoPlane = function(vtxProfile, plane, projectionDirecti
 	if (resultvtxProfile === undefined)
 	{ resultvtxProfile = new VtxProfile(); }
 	
-	// OuterVtxRing.***
+	// OuterVtxRing.
 	resultvtxProfile.outerVtxRing = VtxRing.getProjectedOntoPlane(vtxProfile.outerVtxRing, plane, projectionDirection, resultvtxProfile.outerVtxRing);
 				
-	// InnerVtxRings.***
+	// InnerVtxRings.
 	if (vtxProfile.innerVtxRingsList !== undefined)
 	{
 		resultvtxProfile.innerVtxRingsList = VtxRingsList.getProjectedOntoPlane(vtxProfile.innerVtxRingsList, plane, projectionDirection, resultvtxProfile.innerVtxRingsList);

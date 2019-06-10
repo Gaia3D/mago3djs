@@ -186,9 +186,6 @@ Network.prototype.parseTopologyData = function(magoManager, gmlDataContainer)
 			var coordinatedCount = coordinates.length;
 			var pointsCount = coordinatedCount/3;
 			
-			if (pointsCount > 10)
-			{ var hola = 0; }
-			
 			for (var k=0; k<pointsCount; k++)
 			{
 				var x = coordinates[k * 3];
@@ -203,7 +200,6 @@ Network.prototype.parseTopologyData = function(magoManager, gmlDataContainer)
 			}
 			face.solveUroborus(); // Check & solve if the last point is coincident with the 1rst point.
 			face.calculateVerticesNormals();
-			var hola = 0;
 		}
 		
 		cellSpaceMap[cellSpace.href] = cellSpace;
@@ -233,11 +229,6 @@ Network.prototype.parseTopologyData = function(magoManager, gmlDataContainer)
 		
 		networkEdge.strNodeId = connect_1_id;
 		networkEdge.endNodeId = connect_2_id;
-		
-		// Test.
-		var cellSpace_1 = cellSpaceMap[connect_1_id];
-		var cellSpace_2 = cellSpaceMap[connect_2_id];
-		var hola = 0;
 	}
 	
 	this.test__makeVbos(magoManager);

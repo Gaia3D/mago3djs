@@ -1,116 +1,82 @@
 'use strict';
 
 /**
- * 블럭 모델
- * @class Block
- */
-var Block = function() 
-{
-	if (!(this instanceof Block)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-
-	// This has "VertexIdxVBOArraysContainer" because the "indices" cannot to be greater than 65000, because indices are short type.
-	this.vBOVertexIdxCacheKeysContainer = new VBOVertexIdxCacheKeysContainer(); // Change this for "vbo_VertexIdx_CacheKeys_Container__idx".
-	this.mIFCEntityType = -1;
-	this.isSmallObj = false;
-	this.radius = 10;
-	this.vertexCount = 0; // only for test. delete this.
-
-	this.lego; // legoBlock.
-};
-
-/**
- * 블럭이 가지는 데이터 삭제
- * @returns block
- */
-Block.prototype.deleteObjects = function(gl, vboMemManager) 
-{
-
-	this.vBOVertexIdxCacheKeysContainer.deleteGlObjects(gl, vboMemManager);
-	this.vBOVertexIdxCacheKeysContainer = undefined;
-	this.mIFCEntityType = undefined;
-	this.isSmallObj = undefined;
-	this.radius = undefined;
-	this.vertexCount = undefined; // only for test. delete this.
-
-	if (this.lego) { this.lego.deleteGlObjects(gl); }
-
-	this.lego = undefined;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param 
-  * @returns {boolean} returns if the Block is ready to render.
- */
-Block.prototype.isReadyToRender = function(neoReference, magoManager, maxSizeToRender) 
-{
-	if (maxSizeToRender && (this.radius < maxSizeToRender))
-	{ return false; }
-	
-	if (magoManager.isCameraMoving && this.radius < magoManager.smallObjectSize && magoManager.objectSelected !== neoReference)
-	{ return false; }
-
-	return true;
-};
-
-//*
-//*
-
-/**
- * 블록 목록
+ * 블록 리스트 객체
+ * - 이 클래스는 Octree 클래스의 prepareModelReferencesListData 호출 통해 생성된다
+ * 
  * @class BlocksList
- */
-var BlocksArrayPartition = function(version) 
-{
-	if (!(this instanceof BlocksArrayPartition)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-
-	// 0 = no started to load. 1 = started loading. 2 = finished loading. 3 = parse started. 4 = parse finished.
-	this.fileLoadState = CODE.fileLoadState.READY;
-	this.dataArraybuffer; // file loaded data, that is no parsed yet.
-
-};
-
-//*
-//*
-
-/**
- * 블록 목록
- * @class BlocksList
+ * 
+ * @param {String} version
+ * @exception {Error} Messages.CONSTRUCT_ERROR
+ * 
+ * @see Octree#prepareModelReferencesListData
  */
 var BlocksList = function(version) 
 {
-	// This class is created in "Octree.prototype.prepareModelReferencesListData = function(magoManager) ".
 	if (!(this instanceof BlocksList)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
+	/**
+	 * 블록 리스트 명
+	 * @type {String}
+	 * @default ''
+	 */
 	this.name = "";
-	this.version;
+
+	/**
+	 * f4d 버전
+	 * @type {String}
+	 */
+	this.version = version || "";
+
+	/**
+	 * 블락 리스트
+	 * @type {Block[]}
+	 */
 	this.blocksArray;
-	// 0 = no started to load. 1 = started loading. 2 = finished loading. 3 = parse started. 4 = parse finished.
+
+	/**
+	 *  block file load state. Default is 0(READY)
+	 * "READY"            : 0,
+	 * "LOADING_STARTED"  : 1,
+	 * "LOADING_FINISHED" : 2,
+	 * "PARSE_STARTED"    : 3,
+	 * "PARSE_FINISHED"   : 4,
+	 * "IN_QUEUE"         : 5,
+	 * "LOAD_FAILED"      : 6
+	 * @type {Number}
+	 * 
+	 * @see CODE#fileLoadState
+	 */
 	this.fileLoadState = CODE.fileLoadState.READY;
-	this.dataArraybuffer; // file loaded data, that is no parsed yet.
-	this.xhr; // file request.
+
+	/**
+	 * block data array buffer.
+	 * file loaded data, that is no parsed yet.
+	 * @type {ArrayBuffer}
+	 */
+	this.dataArraybuffer;
+
+	/**
+	 * file request.
+	 */
+	this.xhr;
 	
-	if (version !== undefined)
-	{ this.version = version; }
-	
-	// v002.
+	/**
+	 * BlocksArrayPartition 리스트 관련 변수들.
+	 * f4d 버전 0.0.2 이후 부터 사용 계획있음 현재는 개발중
+	 */
 	this.blocksArrayPartitionsCount;
 	this.blocksArrayPartitionsArray;
 	this.blocksArrayPartitionsMasterPathName;
 };
 
 /**
- * 새 블록 생성
- * @returns block
+ * 새 블록 생성 후 blocksArray에 푸쉬 및 반환
+ * 
+ * @returns {Block}
  */
 BlocksList.prototype.newBlock = function() 
 {
@@ -122,9 +88,9 @@ BlocksList.prototype.newBlock = function()
 };
 
 /**
- * 블록 획득
- * @param idx 변수
- * @returns block
+ * 인덱스에 해당하는 블록 획득
+ * @param {Number} idx
+ * @returns {Block|null}
  */
 BlocksList.prototype.getBlock = function(idx) 
 {
@@ -138,9 +104,10 @@ BlocksList.prototype.getBlock = function(idx)
 };
 
 /**
- * 블록을 삭제
- * @param idx 변수
- * @returns block
+ * 블록 리스트 초기화. gl에서 해당 블록 리스트의 블록 및 lego 삭제
+ * 
+ * @param {WebGLRenderingContext} gl 
+ * @param {VboManager} vboMemManager 
  */
 BlocksList.prototype.deleteGlObjects = function(gl, vboMemManager) 
 {
@@ -176,12 +143,15 @@ BlocksList.prototype.deleteGlObjects = function(gl, vboMemManager)
 };
 
 /**
- * 블록리스트 버퍼를 파싱(비대칭적)
+ * 사용하지 않는 부분들 계산하기 위한 파싱과정. stepOver
+ * 파싱을 위한 파싱..
+ * 블록리스트 버퍼를 파싱(비대칭적)하는 과정.
+ * F4D 버전이 0.0.1일 경우 사용
  * This function parses the geometry data from binary arrayBuffer.
  * 
- * @param {arrayBuffer} arrayBuffer Binary data to parse.
- * @param {ReadWriter} readWriter Helper to read inside of the arrayBuffer.
- * @param {Array} motherBlocksArray Global blocks array.
+ * @param {ArrayBuffer} arrayBuffer Binary data to parse.
+ * @param {Number} bytesReaded readed bytes.
+ * @param {ReaderWriter} readWriter Helper to read inside of the arrayBuffer.
  */
 BlocksList.prototype.stepOverBlockVersioned = function(arrayBuffer, bytesReaded, readWriter) 
 {
@@ -190,13 +160,16 @@ BlocksList.prototype.stepOverBlockVersioned = function(arrayBuffer, bytesReaded,
 	var normalByteValuesCount;
 	var shortIndicesValuesCount;
 	var sizeLevels;
-	var startBuff, endBuff;
 	
+	// Spec document Table 3-1
+	// vboCount
 	var vboDatasCount = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4);
 	bytesReaded += 4;
 	for ( var j = 0; j < vboDatasCount; j++ ) 
 	{
 		// 1) Positions array.
+		// Spec document Table 3-2
+		// vertexCount
 		vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);bytesReaded += 4;
 		verticesFloatValuesCount = vertexCount * 3;
 		startBuff = bytesReaded;
@@ -204,11 +177,15 @@ BlocksList.prototype.stepOverBlockVersioned = function(arrayBuffer, bytesReaded,
 		bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.
 
 		// 2) Normals.
+		// Spec document Table 3-2
+		// normalCount
 		vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);bytesReaded += 4;
 		normalByteValuesCount = vertexCount * 3;
 		bytesReaded = bytesReaded + 1 * normalByteValuesCount; // updating data.
 
 		// 3) Indices.
+		// Spec document Table 3-2
+		// indexCount
 		shortIndicesValuesCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);bytesReaded += 4;
 		sizeLevels = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1);bytesReaded += 1;
 		bytesReaded = bytesReaded + sizeLevels * 4;
@@ -221,34 +198,27 @@ BlocksList.prototype.stepOverBlockVersioned = function(arrayBuffer, bytesReaded,
 
 /**
  * 블록리스트 버퍼를 파싱(비대칭적)
+ * vboData 파싱 부분
+ * Spec document Table 3-1
  * This function parses the geometry data from binary arrayBuffer.
  * 
- * @param {arrayBuffer} arrayBuffer Binary data to parse.
- * @param {ReadWriter} readWriter Helper to read inside of the arrayBuffer.
- * @param {Array} motherBlocksArray Global blocks array.
+ * @param {ArrayBuffer} arrayBuffer Binary data to parse.
+ * @param {Number} bytesReaded 지금까지 읽은 바이트 길이
+ * @param {Block} block 정보를 담을 block.
+ * @param {ReaderWriter} readWriter
+ * @param {MagoManager} magoManager
+ * 
+ * @see VBOVertexIdxCacheKey#readPosNorIdx
  */
 BlocksList.prototype.parseBlockVersioned = function(arrayBuffer, bytesReaded, block, readWriter, magoManager) 
 {
-	var posByteSize;
-	var norByteSize;
-	var idxByteSize;
-	var classifiedPosByteSize;
-	var classifiedNorByteSize;
-	var classifiedIdxByteSize;
-	var startBuff, endBuff;
 	var vboMemManager = magoManager.vboMemoryManager;
-	
 	var vboDatasCount = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-	// test.
-	if (vboDatasCount > 12)
-	{ var hola = 0; }
-	
 	for ( var j = 0; j < vboDatasCount; j++ ) 
 	{
 		var vboViCacheKey = block.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
 		bytesReaded = vboViCacheKey.readPosNorIdx(arrayBuffer, readWriter, vboMemManager, bytesReaded);
 		block.vertexCount = vboViCacheKey.vertexCount;
-
 	}
 	
 	return bytesReaded;
@@ -256,31 +226,30 @@ BlocksList.prototype.parseBlockVersioned = function(arrayBuffer, bytesReaded, bl
 
 /**
  * 블록리스트 버퍼를 파싱(비대칭적)
+ * F4D 버전이 0.0.1일 경우 사용
  * This function parses the geometry data from binary arrayBuffer.
  * 
- * @param {arrayBuffer} arrayBuffer Binary data to parse.
- * @param {ReadWriter} readWriter Helper to read inside of the arrayBuffer.
- * @param {Array} motherBlocksArray Global blocks array.
+ * @param {ArrayBuffer} arrayBuffer Binary data to parse.
+ * @param {ReaderWriter} readWriter Helper to read inside of the arrayBuffer.
+ * @param {Array.<Block>} motherBlocksArray Global blocks array.
+ * @param {MagoManager} magoManager
  */
 BlocksList.prototype.parseBlocksListVersioned_v001 = function(arrayBuffer, readWriter, motherBlocksArray, magoManager) 
 {
 	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 	var bytesReaded = 0;
-	var startBuff, endBuff;
-	var posByteSize, norByteSize, idxByteSize;
-	var vboMemManager = magoManager.vboMemoryManager;
-	var classifiedPosByteSize = 0, classifiedNorByteSize = 0, classifiedIdxByteSize = 0;
-	var gl = magoManager.sceneState.gl;
 	var succesfullyGpuDataBinded = true;
 	
 	// read the version.
 	var versionLength = 5;
-	var version = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+versionLength)));
 	bytesReaded += versionLength;
 	
+	
+	// modelCount
 	var blocksCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4); bytesReaded += 4;
 	for ( var i = 0; i< blocksCount; i++ ) 
 	{
+		// modelIndex
 		var blockIdx = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 		
 		// Check if block exist.
@@ -322,9 +291,6 @@ BlocksList.prototype.parseBlocksListVersioned_v001 = function(arrayBuffer, readW
 
 		block.radius = maxLength/2.0;
 
-		//bbox.deleteObjects();
-		//bbox = undefined;
-		
 		bytesReaded = this.parseBlockVersioned(arrayBuffer, bytesReaded, block, readWriter, magoManager) ;
 		
 		// parse lego if exist.
@@ -336,10 +302,8 @@ BlocksList.prototype.parseBlocksListVersioned_v001 = function(arrayBuffer, readW
 				// TODO : this is no used. delete this.
 				block.lego = new Lego(); 
 			}
-			
 			bytesReaded = this.parseBlockVersioned(arrayBuffer, bytesReaded, block.lego, readWriter, magoManager) ;
 		}
-
 	}
 	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 	return succesfullyGpuDataBinded;
@@ -347,11 +311,12 @@ BlocksList.prototype.parseBlocksListVersioned_v001 = function(arrayBuffer, readW
 
 /**
  * 블록리스트 버퍼를 파싱(비대칭적)
- * This function parses the geometry data from binary arrayBuffer.
+ * F4D 버전이 0.0.2일 경우 사용
+ * 매개변수로 arrayBuffer 전달받지 않고 blocksArrayPartition에 있는 arrayBuffer를 이용.
  * 
- * @param {arrayBuffer} arrayBuffer Binary data to parse.
- * @param {ReadWriter} readWriter Helper to read inside of the arrayBuffer.
- * @param {Array} motherBlocksArray Global blocks array.
+ * @param {ReaderWriter} readWriter Helper to read inside of the arrayBuffer.
+ * @param {Array.<Block>} motherBlocksArray Global blocks array.
+ * @param {MagoManager} magoManager
  */
 BlocksList.prototype.parseBlocksListVersioned_v002 = function(readWriter, motherBlocksArray, magoManager) 
 {
@@ -364,17 +329,8 @@ BlocksList.prototype.parseBlocksListVersioned_v002 = function(readWriter, mother
 	var arrayBuffer = blocksArrayPartition.dataArraybuffer;
 	blocksArrayPartition.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 	var bytesReaded = 0;
-	var startBuff, endBuff;
-	var posByteSize, norByteSize, idxByteSize;
 	var vboMemManager = magoManager.vboMemoryManager;
-	var classifiedPosByteSize = 0, classifiedNorByteSize = 0, classifiedIdxByteSize = 0;
-	var gl = magoManager.sceneState.gl;
 	var succesfullyGpuDataBinded = true;
-	
-	// read the version.
-	//var versionLength = 5;
-	//var version = String.fromCharCode.apply(null, new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+versionLength)));
-	//bytesReaded += versionLength;
 	
 	var blocksCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4); bytesReaded += 4;
 	for ( var i = 0; i< blocksCount; i++ ) 
@@ -409,6 +365,7 @@ BlocksList.prototype.parseBlocksListVersioned_v002 = function(readWriter, mother
 			bbox.maxX = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
 			bbox.maxY = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
 			bbox.maxZ = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
+
 			var maxLength = bbox.getMaxLength();
 			if (maxLength < 0.5) { block.isSmallObj = true; }
 			else { block.isSmallObj = false; }
@@ -432,39 +389,20 @@ BlocksList.prototype.parseBlocksListVersioned_v002 = function(readWriter, mother
 			if (blocksCount > 1)
 			{ bytesReaded = vboViCacheKey.stepOverPosNorIdx(arrayBuffer, readWriter, vboMemManager, bytesReaded); }
 		}
-
-		//bbox.deleteObjects();
-		//bbox = undefined;
-		
-		//bytesReaded = this.parseBlockVersioned(arrayBuffer, bytesReaded, block, readWriter, magoManager) ;
-		
-		// parse lego if exist.
-		//var existLego = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1;
-		//if (existLego)
-		//{
-		//	if (block.lego === undefined)
-		//	{ 
-		//		// TODO : this is no used. delete this.
-		//		block.lego = new Lego(); 
-		//	}
-		//	
-		//	bytesReaded = this.parseBlockVersioned(arrayBuffer, bytesReaded, block.lego, readWriter, magoManager) ;
-		//}
-
 	}
 	blocksArrayPartition.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED; // test.
 	return succesfullyGpuDataBinded;
 };
 
-
 /**
  * 블록리스트 버퍼를 파싱(비대칭적)
  * This function parses the geometry data from binary arrayBuffer.
+ * @deprecated f4d 0.0.1 이전 버전에서 사용
  * 
- * @param {arrayBuffer} arrayBuffer Binary data to parse.
- * @param {ReadWriter} readWriter Helper to read inside of the arrayBuffer.
- * @param {Array} motherBlocksArray Global blocks array.
+ * @param {ArrayBuffer} arrayBuffer Binary data to parse.
+ * @param {ReaderWriter} readWriter Helper to read inside of the arrayBuffer.
+ * @param {Array.<Block>} motherBlocksArray Global blocks array.
  */
 BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherBlocksArray, magoManager) 
 {
@@ -472,11 +410,7 @@ BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherB
 	var bytesReaded = 0;
 	var blocksCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded + 4); bytesReaded += 4;
 	
-	var startBuff, endBuff;
-	var posByteSize, norByteSize, idxByteSize;
 	var vboMemManager = magoManager.vboMemoryManager;
-	var classifiedPosByteSize = 0, classifiedNorByteSize = 0, classifiedIdxByteSize = 0;
-	var gl = magoManager.sceneState.gl;
 	var succesfullyGpuDataBinded = true;
 
 	for ( var i = 0; i< blocksCount; i++ ) 
@@ -556,7 +490,6 @@ BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherB
 			bytesReaded = vboViCacheKey.readPosNorIdx(arrayBuffer, readWriter, vboMemManager, bytesReaded);
 			block.vertexCount = vboViCacheKey.vertexCount;
 		}
-
 		// Pendent to load the block's lego.
 	}
 	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
@@ -564,10 +497,14 @@ BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherB
 };
 
 /**
+ * 블록리스트의 blocksArrayPartition정보를 할당 및 체크.
+ * F4D 버전이 0.0.2일 경우 사용
+ * 
+ * @param {MagoManager} magoManager
+ * @param {MagoManager} octreeOwner
  */
 BlocksList.prototype.prepareData = function(magoManager, octreeOwner) 
 {
-	
 	if (this.version === "0.0.1")
 	{
 		// Provisionally this function is into octree.prepareModelReferencesListData(...).
@@ -608,50 +545,3 @@ BlocksList.prototype.prepareData = function(magoManager, octreeOwner)
 	
 	}
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

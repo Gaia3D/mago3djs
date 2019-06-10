@@ -7,7 +7,7 @@
  * @alias Lego
  * @class Lego
  * 
- * blick
+ * 아래 문서의 Table 2 (Overall Structure of LOD2 file) 참조
  * @link https://github.com/Gaia3D/F4DConverter/blob/master/doc/F4D_SpecificationV1.pdf
  */
 var Lego = function() 
@@ -128,7 +128,7 @@ Lego.prototype.parseArrayBuffer = function(gl, dataArraybuffer, magoManager)
  * BlendAlpha 반환
  * 
  * @param {Date} currTime not use
- * @return {Number} always return 1.0
+ * @returns {Number} always return 1.0
  */
 Lego.prototype.getBlendAlpha = function(currTime) 
 {
@@ -155,7 +155,7 @@ Lego.prototype.getBlendAlpha = function(currTime)
 
 /**
  * render할 준비가 됬는지 체크
- * @return {Boolean} this.fileLoadState가 CODE.fileLoadState.PARSE_FINISHED(4)이거나 this.texture, this.texture.texId가 존재할때 true 반환
+ * @returns {Boolean} this.fileLoadState가 CODE.fileLoadState.PARSE_FINISHED(4)이거나 this.texture, this.texture.texId가 존재할때 true 반환
  */
 Lego.prototype.isReadyToRender = function()
 {

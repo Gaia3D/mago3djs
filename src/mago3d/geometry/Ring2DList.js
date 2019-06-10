@@ -25,7 +25,7 @@ var Ring2DList = function()
 /**
  * Ring2D 를 생성하고 배열에 추가한다.
  * 
- * @return {Ring2D} 생성된 Ring2D 의 객체
+ * @returns {Ring2D} 생성된 Ring2D 의 객체
  */
 Ring2DList.prototype.newRing = function() 
 {
@@ -61,7 +61,7 @@ Ring2DList.prototype.deleteObjects = function()
 /**
  * Ring2D 배열의 개수를 구한다.
  * 
- * @return {Number} 배열의 개수
+ * @returns {Number} 배열의 개수
  */
 Ring2DList.prototype.getRingsCount = function() 
 {
@@ -72,7 +72,7 @@ Ring2DList.prototype.getRingsCount = function()
  * 주어진 객체의 인덱스값을 찾는다.
  * 
  * @param {Ring2D} ring Ring2D 객체
- * @return {Number} 인덱스값
+ * @returns {Number} 인덱스값
  */
 Ring2DList.prototype.getRingIndex = function(ring) 
 {
@@ -83,7 +83,7 @@ Ring2DList.prototype.getRingIndex = function(ring)
  * 주어진 인덱스에 있는 Ring2D 객체를 가져온다.
  * 
  * @param {Number} index 가져올 Ring2D 객체의 인덱스값.
- * @return {Ring2D} <code>index</code> 위치의 Ring2D 객체
+ * @returns {Ring2D} <code>index</code> 위치의 Ring2D 객체
  * 
  * @see Ring2DList#getRingsCount
  */
@@ -97,7 +97,7 @@ Ring2DList.prototype.getRing = function(index)
  * 
  * @param {Ring2D[]} ringsArray Ring2D 배열
  * @param {BoundingRectangle} resultBRect 폴리곤들을 포함하는 경계 사각형
- * @return {BoundingRectangle} 폴리곤들을 포함하는 경계 사각형 결과값
+ * @returns {BoundingRectangle} 폴리곤들을 포함하는 경계 사각형 결과값
  */
 Ring2DList.getBoundingRectangle = function(ringsArray, resultBRect) 
 {
@@ -165,7 +165,7 @@ Ring2DList.prototype.intersectionWithSegment = function(segment)
  * @param {Point2D} point 거리를 구하기 위해 주어진 포인트
  * @param {Ring2D[]} ringsArray 정렬을 하기 위한 Ring2D 배열
  * @param {Object[]} resultSortedObjectsArray 거리 기준으로 정렬된 결과값
- * @return {Object[]} 거리 기준으로 정렬된 결과값
+ * @returns {Object[]} 거리 기준으로 정렬된 결과값
  */
 Ring2DList.getSortedRingsByDistToPoint = function(point, ringsArray, resultSortedObjectsArray) 
 {
@@ -222,7 +222,7 @@ Ring2DList.getSortedRingsByDistToPoint = function(point, ringsArray, resultSorte
  * @param {Object} object 탐색 대상
  * @param {Number} startIdx 시작 인덱스값
  * @param {Number} endIdx 종료 인덱스값
- * @return {Number} 탐색 결과 인덱스
+ * @returns {Number} 탐색 결과 인덱스
  */
 Ring2DList.getIndexToInsertBySquaredDist = function(objectsArray, object, startIdx, endIdx) 
 {
@@ -289,7 +289,7 @@ Ring2DList.getIndexToInsertBySquaredDist = function(objectsArray, object, startI
  * @param {Object[]} arr 탐색하기 위한 배열
  * @param {Object} x 탐색 대상
  * @param {Function} func 탐색 비교값
- * @return {Number} 탐색 결과 인덱스
+ * @returns {Number} 탐색 결과 인덱스
  */
 Ring2DList.getBinarySearchIndex = function (arr, x, func)
 {

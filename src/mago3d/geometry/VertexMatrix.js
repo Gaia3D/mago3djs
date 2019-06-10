@@ -318,7 +318,7 @@ VertexMatrix.prototype.makeTTrianglesLateralSidesLOOP = function(tTrianglesMatri
  * @param {Number} numCols
  * @param {Number} numRows
  * @param {VertexMatrix} resultVertexMatrix if undefined, set new VertexMatrix instance.
- * @return {VertexMatrix} 
+ * @returns {VertexMatrix} 
  */
 VertexMatrix.makeMatrixByDataArray = function(positions3Array, normals3Array, texCoords2Array, colors4Array, numCols, numRows, resultVertexMatrix) 
 {
@@ -399,9 +399,9 @@ VertexMatrix.makeMatrixByDataArray = function(positions3Array, normals3Array, te
  * @param {VertexList} vertexListDown Required.
  * @param {VertexList} vertexListUp
  * @param {Array.<Face>} resultFacesArray
- * @param {boolean} bLoop
- * @param {boolean} bClockWise
- * @return {VertexMatrix} 
+ * @param {Boolean} bLoop
+ * @param {Boolean} bClockWise
+ * @returns {VertexMatrix} 
  */
 VertexMatrix.makeFacesBetweenVertexLists = function(vertexListDown, vertexListUp, resultFacesArray, bLoop, bClockWise) 
 {
@@ -569,9 +569,9 @@ VertexMatrix.makeFacesBetweenVertexLists = function(vertexListDown, vertexListUp
 * @static
 * @param {VertexMatrix} vertexMatrix
 * @param {Surface} resultSurface  if undefined, set new Surface instance.
-* @param {boolean} bLoop
-* @param {boolean} bClockWise
-* @return {Surface} 
+* @param {Boolean} bLoop
+* @param {Boolean} bClockWise
+* @returns {Surface} 
 */
 VertexMatrix.makeSurface = function(vertexMatrix, resultSurface, bLoop, bClockWise) 
 {
@@ -614,7 +614,7 @@ VertexMatrix.makeSurface = function(vertexMatrix, resultSurface, bLoop, bClockWi
  * condition: all the vertex lists must have the same number of vertex.
  * @deprecated
  * @param {TTrianglesMatrix} trianglesMatrix
- * @param {boolean} bLoop if true, include last vertex triangle
+ * @param {Boolean} bLoop if true, include last vertex triangle
  */
 VertexMatrix.prototype.makeTrianglesLateralSides = function(trianglesMatrix, bLoop) 
 {
@@ -662,7 +662,7 @@ VertexMatrix.prototype.makeTrianglesLateralSides = function(trianglesMatrix, bLo
 * @param {Number} numRows not used.
 * @param {Number} col
 * @param {Number} row
-* @return {Number} 
+* @returns {Number} 
 */
 VertexMatrix.getIndexOfArray = function(numCols, numRows, col, row) 
 {

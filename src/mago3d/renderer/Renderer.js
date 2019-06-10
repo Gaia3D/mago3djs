@@ -289,52 +289,7 @@ Renderer.prototype.renderNeoBuildingsPCloud = function(gl, visibleNodesArray, ma
 		gl.uniform3fv(shader.buildingPosHIGH_loc, buildingGeoLocation.positionHIGH);
 		gl.uniform3fv(shader.buildingPosLOW_loc, buildingGeoLocation.positionLOW);
 		
-		if (projectDataType !== undefined && projectDataType === 4)
-		{
-			// Old.
-			/*
-			for (var j=0; j<lowestOctreesCount; j++) 
-			{
-				lowestOctree = allVisibles[j];
-
-				if (lowestOctree.lego === undefined) 
-				{
-					lowestOctree.lego = new Lego();
-					lowestOctree.lego.fileLoadState = CODE.fileLoadState.READY;
-					lowestOctree.lego.legoKey = lowestOctree.octreeKey + "_lego";
-					continue;
-				}
-				
-				if (lowestOctree.lego.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
-				{ continue; }
-
-			
-				// data compression.
-				var posCompressed = false;
-				if (lowestOctree.lego.bPositionsCompressed !== undefined)
-				{
-					posCompressed = lowestOctree.lego.bPositionsCompressed;
-				}
-				gl.uniform1i(shader.bPositionCompressed_loc, posCompressed);
-				
-				// If data is compressed, then set uniforms.
-				//gl.uniform1i(shader.posDataByteSize_loc, 2);
-				//gl.uniform1i(shader.texCoordByteSize_loc, 2);
-				var bbox = lowestOctree.lego.bbox;
-				gl.uniform3fv(shader.bboxSize_loc, [bbox.getXLength(), bbox.getYLength(), bbox.getZLength()]); //.
-				gl.uniform3fv(shader.minPosition_loc, [bbox.minX, bbox.minY, bbox.minZ]); //.
-				var lod = 2;
-				var distToCam = lowestOctree.distToCamera;
-				if (distToCam < 100)
-				{ var hola = 0; }
-				
-				this.renderPCloud(gl, lowestOctree.lego, magoManager, shader, renderType, distToCam, lod);
-
-				gl.bindBuffer(gl.ARRAY_BUFFER, null);
-			}
-			*/
-		}
-		else if (projectDataType !== undefined && projectDataType === 5)
+		if (projectDataType !== undefined && projectDataType === 5)
 		{
 			if (magoManager.myCameraRelative === undefined)
 			{ magoManager.myCameraRelative = new Camera(); }

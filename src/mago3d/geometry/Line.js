@@ -3,6 +3,8 @@
 /**
  * This represents a line which can be shown as linear equation
  * @class Line
+ * @param {Point3D} point the point which decides line
+ * @param {Point3D} direction the vector of the direction which decides line
  */
 var Line = function(point, direction) 
 {
@@ -44,7 +46,7 @@ Line.prototype.setPointAndDir = function(px, py, pz, dx, dy, dz)
  * get the point which is projected as 2d plane(the plane which is represented by using x,y axis)
  * @param point the target point 
  * @param projectedPoint the projected point of the target point
- * @return projetedPoint
+ * @returns projetedPoint
  */
 Line.prototype.getProjectedPoint = function(point, projectedPoint) 
 {
@@ -62,7 +64,7 @@ Line.prototype.getProjectedPoint = function(point, projectedPoint)
  * Check whether the given point is on this line or not
  * @param {Point3D} point the given point
  * @param {Number} error the error rate which can be handdled
- * @return {Boolean} 
+ * @returns {Boolean} 
  */
 Line.prototype.isCoincidentPoint = function(point, error) 
 {

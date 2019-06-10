@@ -130,7 +130,7 @@ Triangle.prototype.assignVerticesIdx = function()
  * Triangle의 Vertex index를 인덱스 배열에 추가한다.
  * 
  * @param {indicesArray[]} 인덱스 배열
- * @return {indicesArray[]} 인덱스 배열 
+ * @returns {indicesArray[]} 인덱스 배열 
  */
 Triangle.prototype.getIndicesArray = function(indicesArray)
 {

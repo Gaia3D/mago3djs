@@ -306,7 +306,7 @@ SmartTile.prototype.makeSphereExtent = function(magoManager)
  * @param {GeographicCoord} maxGeographicCoord
  * @param {Sphere} resultSphereExtent
  * 
- * @return {Sphere} resultSphereExtent
+ * @returns {Sphere} resultSphereExtent
  */
 SmartTile.computeSphereExtent = function(magoManager, minGeographicCoord, maxGeographicCoord, resultSphereExtent) 
 {

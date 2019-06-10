@@ -102,7 +102,7 @@ HalfEdge.prototype.setFace = function(face)
 
 /**
  * get end vertex.
- * @return {Vertex|undefined} if this next is undefined, can't get end vertex. so return undefined.
+ * @returns {Vertex|undefined} if this next is undefined, can't get end vertex. so return undefined.
  */
 HalfEdge.prototype.getEndVertex = function()
 {
@@ -114,7 +114,7 @@ HalfEdge.prototype.getEndVertex = function()
 
 /**
  * is this hedge frontier?
- * @return {boolean} if this twin is undefined or null, return true;
+ * @returns {Boolean} if this twin is undefined or null, return true;
  */
 HalfEdge.prototype.isFrontier = function()
 {
@@ -128,7 +128,7 @@ HalfEdge.prototype.isFrontier = function()
  * get prev hedge.
  * half edge의 next를 계속 찾아서 현재 edge와 특정 테두리의 next가 일치할때 특정테두리를 반환.
  * @deprecated not use
- * @return {HalfEdge|undefined}  if next is not define, return undefined.
+ * @returns {HalfEdge|undefined}  if next is not define, return undefined.
  */
 HalfEdge.prototype.getPrev = function()
 {
@@ -157,7 +157,7 @@ HalfEdge.prototype.getPrev = function()
  * @static
  * @param {HalfEdge} hedgeA
  * @param {HalfEdge} hedgeB
- * @return {boolean}  각각의 시작 vertex와 마지막 vertex가 동일한지 비교하여 둘다 동일 할 경우 true 반환.
+ * @returns {Boolean}  각각의 시작 vertex와 마지막 vertex가 동일한지 비교하여 둘다 동일 할 경우 true 반환.
  */
 HalfEdge.areTwinables = function(hedgeA, hedgeB)
 {
@@ -176,7 +176,7 @@ HalfEdge.areTwinables = function(hedgeA, hedgeB)
  * @static
  * @param {HalfEdge} hedge Required. if undefined, return original resultHedgesArray.
  * @param {Array|undefined} resultHedgesArray
- * @return {Array.<HalfEdge>}
+ * @returns {Array.<HalfEdge>}
  */
 HalfEdge.getHalfEdgesLoop = function(hedge, resultHedgesArray)
 {

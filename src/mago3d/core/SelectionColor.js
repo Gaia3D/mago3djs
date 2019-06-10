@@ -10,7 +10,10 @@ var SelectionColor = function()
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+	/**
+	 * Color
+	 * @type {Color}
+	 */
 	this.color = new Color();
 };
 
@@ -62,7 +65,7 @@ SelectionColor.prototype.getAvailableColor = function(resultColor)
  * @param {Number} r
  * @param {Number} g
  * @param {Number} b
- * @return Color code
+ * @returns Color code
  */
 SelectionColor.prototype.decodeColor3 = function(r, g, b) 
 {

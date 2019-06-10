@@ -39,7 +39,7 @@ VtxRingsList.prototype.deleteObjects = function()
 
 /**
  * get vtxRing count.
- * @return {Number} 
+ * @returns {Number} 
  */
 VtxRingsList.prototype.getVtxRingsCount = function()
 {
@@ -52,7 +52,7 @@ VtxRingsList.prototype.getVtxRingsCount = function()
 /**
  * get vtxRing.
  * @param {Number} idx.
- * @return {VtxRing|undefined} 
+ * @returns {VtxRing|undefined} 
  */
 VtxRingsList.prototype.getVtxRing = function(idx)
 {
@@ -64,7 +64,7 @@ VtxRingsList.prototype.getVtxRing = function(idx)
 
 /**
  * add new vtxRing and return.
- * @return {IndexRange}
+ * @returns {IndexRange}
  */
 VtxRingsList.prototype.newVtxRing = function()
 {
@@ -130,7 +130,7 @@ VtxRingsList.prototype.transformPointsByMatrix4 = function(tMat4)
 /**
  * get all vertex. 
  * @param {Array} resultVerticesArray
- * @return {Array.<Vertex>|undefined} if this.vtxRingsArray is undefined, return resultVerticesArray.
+ * @returns {Array.<Vertex>|undefined} if this.vtxRingsArray is undefined, return resultVerticesArray.
  */
 VtxRingsList.prototype.getAllVertices = function(resultVerticesArray)
 {
@@ -169,7 +169,7 @@ VtxRingsList.prototype.setVerticesIdxInList = function()
  * @param {Plane} plane. 
  * @param {Point3D} projectionDirection projectionDirection must be unitary.
  * @param {VtxRingList} resultVtxRingList Optional. if undefined, set new VtxRingList instance.
- * @return {VtxRingList} resultVtxRingList
+ * @returns {VtxRingList} resultVtxRingList
  */
 VtxRingsList.getProjectedOntoPlane = function(vtxRingList, plane, projectionDirection, resultVtxRingList)
 {

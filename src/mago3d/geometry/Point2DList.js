@@ -49,7 +49,7 @@ Point2DList.prototype.addPoint = function(point2d)
  * Create a new feature of Point2D
  * @param {Number} x the x coordi of the point
  * @param {Number} y the y coordi of the point
- * @return {Point2D} return the created point
+ * @returns {Point2D} return the created point
  */
 Point2DList.prototype.newPoint = function(x, y)
 {
@@ -73,7 +73,7 @@ Point2DList.prototype.getPoint = function(idx)
 
 /**
  * Return the length of this.pointArray
- * @return {Number}
+ * @returns {Number}
  */
 Point2DList.prototype.getPointsCount = function()
 {
@@ -124,7 +124,7 @@ Point2DList.prototype.getNextIdx = function(idx)
 /**
  * Get the index of the given point
  * @param {Point2D} point
- * @return {Number} idx the index of the target point at this.pointArray
+ * @returns {Number} idx the index of the target point at this.pointArray
  */
 Point2DList.prototype.getIdxOfPoint = function(point)
 {
@@ -149,7 +149,7 @@ Point2DList.prototype.getIdxOfPoint = function(point)
  * get the segement with the index of the segment
  * @param {Number} idx the index of start point of segment
  * @param {Segment2D} resultSegment the segement which will store the result segment
- * @return {Segment2D} resultSegment 
+ * @returns {Segment2D} resultSegment 
  * 
  */
 Point2DList.prototype.getSegment = function(idx, resultSegment)

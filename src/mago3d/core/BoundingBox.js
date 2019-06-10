@@ -223,7 +223,7 @@ BoundingBox.prototype.getCenterPoint = function(result)
  * 
  * 영역박스의 중심점을 구한다.
  * 
- * @returns {float} apriximately radius.
+ * @returns {Number} apriximately radius.
  */
 BoundingBox.prototype.getRadiusAprox = function() 
 {

@@ -31,7 +31,7 @@ var Box = function(width, length, height)
 };
 
 /**
- * box
+ * Get the VBO key container
  */
 Box.prototype.getVboKeysContainer = function()
 {
@@ -39,7 +39,10 @@ Box.prototype.getVboKeysContainer = function()
 };
 
 /**
- * box
+ * Render this box feature
+ * @param {MagoManager} magoManager
+ * @param {Shader} shader
+ * @param {Number} renderType
  */
 Box.prototype.render = function(magoManager, shader, renderType)
 {
@@ -53,7 +56,10 @@ Box.prototype.render = function(magoManager, shader, renderType)
 };
 
 /**
- * box
+ * Set the width,length, height of this feature
+ * @param {Number} width
+ * @param {Number} length
+ * @param {Number} height 
  */
 Box.prototype.makeMesh = function(width, length, height)
 {

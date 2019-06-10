@@ -112,27 +112,16 @@ FirstPersonView.prototype.release = function ()
 
 FirstPersonView.prototype.move = function (vector)
 {
-	var position = vec3.fromValues(this._position.x, this._position.y, this.position.z);
-	var matrix = mat4.create();
-	mat4.rotateY(matrix, matrix, this._rotation.y);
-	vec3.transformMat4(vector, vector, matrix);
-	vec3.add(position, position, vector);
+	var position = glMatrix.vec3.fromValues(this._position.x, this._position.y, this.position.z);
+	var matrix = glMatrix.mat4.create();
+	glMatrix.mat4.rotateY(matrix, matrix, this._rotation.y);
+	glMatrix.vec3.transformMat4(vector, vector, matrix);
+	glMatrix.vec3.add(position, position, vector);
 	this._position.set(position[0], position[1], position[2]);
 };
 FirstPersonView.prototype.update = function(manager)
 {
 	if (this._camera === undefined)	{ return; }
-	/*
-	var scratchLookAtMatrix4 = new Cesium.Matrix4();
-	var scratchFlyToBoundingSphereCart4 = new Cesium.Cartesian4();
-	var transform = Cesium.Transforms.eastNorthUpToFixedFrame(this._camera.position, Cesium.Ellipsoid.WGS84, scratchLookAtMatrix4);
-	Cesium.Cartesian3.fromCartesian4(Cesium.Matrix4.getColumn(transform, 1, scratchFlyToBoundingSphereCart4), this._camera.direction);
-	Cesium.Cartesian3.fromCartesian4(Cesium.Matrix4.getColumn(transform, 2, scratchFlyToBoundingSphereCart4), this._camera.up);
-	
-	var pos1 = Cesium.Cartesian3.fromDegrees(126.60795289318042, 37.58281268636716, 28.0);
-	var pos2 = Cesium.Cartesian3.fromDegrees(126.60795243349536, 37.58283027052396, 28.0);
-	console.log(Cesium.Cartesian3.distance(pos1, pos2));
-	*/
 	if (keyFlags.moveForward)
 	{
 		//var isBlocked = manager.checkCollision(this._camera.position, this._camera.direction);

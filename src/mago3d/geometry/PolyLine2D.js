@@ -19,7 +19,7 @@ var PolyLine2D = function()
  * Creates a new Point2D.
  * @param {Number} x
  * @param {Number} y
- * @return point2d
+ * @returns point2d
  */
 PolyLine2D.prototype.newPoint2d = function(x, y)
 {
@@ -59,7 +59,7 @@ PolyLine2D.prototype.deleteObjects = function()
 /**
  * Copy the point from this.point2dArray to resultPointsArray
  * @param resultPointsArray
- * @return resultPointsArray 
+ * @returns resultPointsArray 
  */
 PolyLine2D.prototype.getPoints = function(resultPointsArray)
 {

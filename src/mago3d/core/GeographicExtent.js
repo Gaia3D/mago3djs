@@ -58,7 +58,7 @@ GeographicExtent.prototype.setExtent = function(minLon, minLat, minAlt, maxLon, 
 /**
  * Get the middle point of the lower bound point and uppper bound point
  * @param resultGeographicCoord the point which will save the result
- * @return {GeographicCoord}
+ * @returns {GeographicCoord}
  */
 GeographicExtent.prototype.getMidPoint = function(resultGeographicCoord) 
 {

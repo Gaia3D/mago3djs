@@ -28,7 +28,7 @@ var VertexList = function()
  * @static
  * @param {Number} idx index must bigger than 0, less than vertexArray length.
  * @param {Array.<Vertex>} vertexArray
- * @return {Number} prevIdx. if idx is 0, return vertexArray.length - 1.
+ * @returns {Number} prevIdx. if idx is 0, return vertexArray.length - 1.
  */
 VertexList.getPrevIdx = function(idx, vertexArray)
 {
@@ -52,7 +52,7 @@ VertexList.getPrevIdx = function(idx, vertexArray)
  * @static
  * @param {Number} idx index must bigger than 0, less than vertexArray length.
  * @param {Array.<Vertex>} vertexArray
- * @return {Number} nextIdx. if idx is equal vertexArray.length - 1, return 0.
+ * @returns {Number} nextIdx. if idx is equal vertexArray.length - 1, return 0.
  */
 VertexList.getNextIdx = function(idx, vertexArray)
 {
@@ -77,7 +77,7 @@ VertexList.getNextIdx = function(idx, vertexArray)
  * @param {Number} idx index
  * @param {Array.<Vertex>} vertexArray
  * @param {VtxSegment} resultVtxSegment if resultVtxSegment is undefined, resultVtxSegment set new VtxSegemnt instance.
- * @return {VtxSegment} resultVtxSegment
+ * @returns {VtxSegment} resultVtxSegment
  */
 VertexList.getVtxSegment = function(idx, vertexArray, resultVtxSegment)
 {
@@ -101,7 +101,7 @@ VertexList.getVtxSegment = function(idx, vertexArray, resultVtxSegment)
  * @param {Number} idx index
  * @param {Array.<Vertex>} vertexArray
  * @param {Point3D} resultVector if resultVector is undefined, resultVector set new Point3D instance.
- * @return {Point3D} resultVector
+ * @returns {Point3D} resultVector
  */
 VertexList.getVector = function(idx, vertexArray, resultVector)
 {
@@ -128,7 +128,7 @@ VertexList.getVector = function(idx, vertexArray, resultVector)
  * @param {Number} idx index
  * @param {Array.<Vertex>} vertexArray
  * @param {Point3D} resultDir point3d unitary.
- * @return {Point3D} 
+ * @returns {Point3D} 
  */
 VertexList.getDirection = function(idx, vertexArray, resultDir)
 {
@@ -144,7 +144,7 @@ VertexList.getDirection = function(idx, vertexArray, resultDir)
  * @param {Number} idx index
  * @param {Array.<Vertex>} vertexArray
  * @param {Point3D} resultCrossProduct
- * @return {Point3D} 
+ * @returns {Point3D} 
  */
 VertexList.getCrossProduct = function(idx, vertexArray, resultCrossProduct)
 {
@@ -163,7 +163,7 @@ VertexList.getCrossProduct = function(idx, vertexArray, resultCrossProduct)
  * @param {Plane} plane. 
  * @param {Point3D} projectionDirection projectionDirection must be unitary.
  * @param {VertexList} resultVertexList if resultVertexList is undefined, resultVector set new VertexList instance.
- * @return {VertexList} 
+ * @returns {VertexList} 
  * 
  * @see Vertex#getProjectedOntoPlane
  */
@@ -193,11 +193,11 @@ VertexList.getProjectedOntoPlane = function(vertexList, plane, projectionDirecti
  * @param {Array.<Vertex>} vertexArray if vertexArray is undefined, return resultPoints2dArray
  * @param {Point3D} normal. 
  * @param {Array.<Point2D>} resultPoints2dArray array.
- * @return {Array.<Point2D>} resultPoints2dArray
+ * @returns {Array.<Point2D>} resultPoints2dArray
  */
 VertexList.getProjectedPoints2DArray = function(vertexArray, normal, resultPoints2dArray)
 {
-	// This function projects the vertices on to planes xy, yz or xz.***
+	// This function projects the vertices on to planes xy, yz or xz.
 	if (vertexArray === undefined)
 	{ return resultPoints2dArray; }
 	
@@ -208,10 +208,10 @@ VertexList.getProjectedPoints2DArray = function(vertexArray, normal, resultPoint
 	
 	var point2d;
 	var verticesCount = vertexArray.length;
-	// Project this face into the bestPlane.***
-	if (bestPlaneToProject === 0) // plane-xy.***
+	// Project this face into the bestPlane.
+	if (bestPlaneToProject === 0) // plane-xy.
 	{
-		// project this face into a xy plane.***
+		// project this face into a xy plane.
 		for (var i=0; i<verticesCount; i++)
 		{
 			var vertex = vertexArray[i];
@@ -220,13 +220,13 @@ VertexList.getProjectedPoints2DArray = function(vertexArray, normal, resultPoint
 			{ point2d = new Point2D(point3d.x, point3d.y); }
 			else
 			{ point2d = new Point2D(point3d.x, -point3d.y); }
-			point2d.ownerVertex3d = vertex; // with this we can reconvert polygon2D to face3D.***
+			point2d.ownerVertex3d = vertex; // with this we can reconvert polygon2D to face3D.
 			resultPoints2dArray.push(point2d);
 		}
 	}
-	else if (bestPlaneToProject === 1) // plane-yz.***
+	else if (bestPlaneToProject === 1) // plane-yz.
 	{
-		// project this face into a yz plane.***
+		// project this face into a yz plane.
 		for (var i=0; i<verticesCount; i++)
 		{
 			var vertex = vertexArray[i];
@@ -235,13 +235,13 @@ VertexList.getProjectedPoints2DArray = function(vertexArray, normal, resultPoint
 			{ point2d = new Point2D(point3d.y, point3d.z); }
 			else
 			{ point2d = new Point2D(-point3d.y, point3d.z); }
-			point2d.ownerVertex3d = vertex; // with this we can reconvert polygon2D to face3D.***
+			point2d.ownerVertex3d = vertex; // with this we can reconvert polygon2D to face3D.
 			resultPoints2dArray.push(point2d);
 		}
 	}
-	else if (bestPlaneToProject === 2) // plane-xz.***
+	else if (bestPlaneToProject === 2) // plane-xz.
 	{
-		// project this face into a xz plane.***
+		// project this face into a xz plane.
 		for (var i=0; i<verticesCount; i++)
 		{
 			var vertex = vertexArray[i];
@@ -250,13 +250,10 @@ VertexList.getProjectedPoints2DArray = function(vertexArray, normal, resultPoint
 			{ point2d = new Point2D(-point3d.x, point3d.z); }
 			else
 			{ point2d = new Point2D(point3d.x, point3d.z); }
-			point2d.ownerVertex3d = vertex; // with this we can reconvert polygon2D to face3D.***
+			point2d.ownerVertex3d = vertex; // with this we can reconvert polygon2D to face3D.
 			resultPoints2dArray.push(point2d);
 		}
 	}
-	
-	if (resultPoints2dArray.length === 0)
-	{ var hola = 0; }
 	
 	return resultPoints2dArray;
 };
@@ -370,7 +367,7 @@ VertexList.prototype.setNormal = function(nx, ny, nz)
 
 /**
  * add vertex and return.
- * @return {Vertex}
+ * @returns {Vertex}
  */
 VertexList.prototype.newVertex = function() 
 {
@@ -535,7 +532,7 @@ VertexList.setIdxInList = function(vertexArray)
  * @deprecated only used static method.
  * @param {VBOVertexIdxCacheKey} resultVbo.
  * @param {VBOMemoryManager} vboMemManager.
- * @return {VBOVertexIdxCacheKey}
+ * @returns {VBOVertexIdxCacheKey}
  * 
  * @see VertexList#getVboDataArrays
  */
@@ -551,13 +548,13 @@ VertexList.prototype.getVboDataArrays = function(resultVbo, vboMemManager)
  * @param {VertexList} vertexArray if this length 0, return argument resultVbo.
  * @param {VBOVertexIdxCacheKey} resultVbo. if this is undefined, set new VBOVertexIdxCacheKey Instance.
  * @param {VBOMemoryManager} vboMemManager.
- * @return {VBOVertexIdxCacheKey}
+ * @returns {VBOVertexIdxCacheKey}
  * 
  * @see VBOManager
  */
 VertexList.getVboDataArrays = function(vertexArray, resultVbo, vboMemManager) 
 {
-	// returns positions, and if exist, normals, colors, texCoords.***
+	// returns positions, and if exist, normals, colors, texCoords.
 	var verticesCount = vertexArray.length;
 	if (verticesCount === 0)
 	{ return resultVbo; }
@@ -567,12 +564,12 @@ VertexList.getVboDataArrays = function(vertexArray, resultVbo, vboMemManager)
 	
 	var vertex, position, normal, color, texCoord;
 	
-	// 1rst, check if exist normals, colors & texCoords.***
+	// 1rst, check if exist normals, colors & texCoords.
 	var hasNormals = false;
 	var hasColors = false;
 	var hasTexCoords = false;
 	
-	// Take the 1rst vertex.***
+	// Take the 1rst vertex.
 	vertex = vertexArray[0];
 	if (vertex.point3d === undefined)
 	{ return resultVbo; }
@@ -586,10 +583,10 @@ VertexList.getVboDataArrays = function(vertexArray, resultVbo, vboMemManager)
 	if (vertex.texCoord !== undefined)
 	{ hasTexCoords = true; }
 	
-	// Make dataArrays. Use vboMemManager to determine classified memorySize( if use memory pool).***
+	// Make dataArrays. Use vboMemManager to determine classified memorySize( if use memory pool).
 	var posVboDataArray, norVboDataArray, colVboDataArray, tcoordVboDataArray;
 	
-	// Positions.***
+	// Positions.
 	var posByteSize = verticesCount * 3;
 	posVboDataArray = new Float32Array(posByteSize);
 	

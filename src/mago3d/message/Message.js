@@ -8,7 +8,7 @@
 var Message = function(i18next, message) 
 {
 	this.handle  = i18next;
-	this.message = message || {};
+	this.message = message || MessageSource;
 };
 
 /**
@@ -23,7 +23,7 @@ Message.prototype.init = function (callback)
 		.use(i18nextBrowserLanguageDetector)
 		.init({
 			// Useful for debuging, displays which key is missing
-			debug: true,
+			debug: false,
 
 			detection: {
 				// keys or params to lookup language from
@@ -61,7 +61,7 @@ Message.prototype.init = function (callback)
 /**
  * 메세지 핸들러를 가져온다.
  *
- * @return {i18next} message handler
+ * @returns {i18next} message handler
  */
 Message.prototype.getHandle = function ()
 {
@@ -71,7 +71,7 @@ Message.prototype.getHandle = function ()
 /**
  * 메세지를 가져온다.
  *
- * @return {Object} message
+ * @returns {Object} message
  */
 Message.prototype.getMessage = function ()
 {

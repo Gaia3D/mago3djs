@@ -8,13 +8,13 @@
 /**
  * mago3d 활성화/비활성화
  * @param {ManagerFactory} managerFactoryInstance 
- * @param {boolean} isShow true = show, false = hide
+ * @param {Boolean} isShow true = show, false = hide
  */
 function changeMagoStateAPI(managerFactoryInstance, isShow) 
 {
 	if (managerFactoryInstance === null) { return; } 
 	
-	var api = new API("changeMagoState");
+	var api = new Mago3D.API("changeMagoState");
 	api.setMagoEnable(isShow);
 	managerFactoryInstance.callAPI(api);
 };
@@ -22,13 +22,13 @@ function changeMagoStateAPI(managerFactoryInstance, isShow)
 /**
  * Label show/hide
  * @param {ManagerFactory} managerFactoryInstance 
- * @param {boolean} isShow true = show, false = hide
+ * @param {Boolean} isShow true = show, false = hide
  */
 function changeLabelAPI(managerFactoryInstance, isShow) 
 {
 	if (managerFactoryInstance === null) { return; } 
 	
-	var api = new API("changeLabel");
+	var api = new Mago3D.API("changeLabel");
 	api.setShowLabelInfo(isShow);
 	managerFactoryInstance.callAPI(api);
 }
@@ -36,13 +36,13 @@ function changeLabelAPI(managerFactoryInstance, isShow)
 /**
  * Origin show/hide
  * @param {ManagerFactory} managerFactoryInstance
- * @param {boolean} isShow true = show, false = hide
+ * @param {Boolean} isShow true = show, false = hide
  */
 function changeOriginAPI(managerFactoryInstance, isShow)
 {
 	if (managerFactoryInstance === null) { return; }
 
-	var api = new API("changeOrigin");
+	var api = new Mago3D.API("changeOrigin");
 	api.setShowOrigin(isShow);
 	managerFactoryInstance.callAPI(api);
 }
@@ -50,13 +50,13 @@ function changeOriginAPI(managerFactoryInstance, isShow)
 /**
  * boundingBox show/hide
  * @param {ManagerFactory} managerFactoryInstance
- * @param {boolean} isShow true = show, false = hide
+ * @param {Boolean} isShow true = show, false = hide
  */
 function changeBoundingBoxAPI(managerFactoryInstance, isShow) 
 {
 	if (managerFactoryInstance === null) { return; } 
 	
-	var api = new API("changeBoundingBox");
+	var api = new Mago3D.API("changeBoundingBox");
 	api.setShowBoundingBox(isShow);
 	managerFactoryInstance.callAPI(api);
 }
@@ -65,13 +65,13 @@ function changeBoundingBoxAPI(managerFactoryInstance, isShow)
  * 속성값에 의한 가시화 유무설정
  * 삭제 예정
  * @param {ManagerFactory} managerFactoryInstance
- * @param {boolean} isShow true = 표시, false = 비표시
+ * @param {Boolean} isShow true = 표시, false = 비표시
  */
 function changePropertyRenderingAPI(managerFactoryInstance, isShow, projectId, property) 
 {
 	if (managerFactoryInstance === null) { return; } 
 		
-	var api = new API("changePropertyRendering");
+	var api = new Mago3D.API("changePropertyRendering");
 	api.setShowShadow(isShow);
 	api.setProjectId(projectId);
 	api.setProperty(property);
@@ -81,13 +81,13 @@ function changePropertyRenderingAPI(managerFactoryInstance, isShow, projectId, p
 /**
  * 그림자 표시/비표시
  * @param {ManagerFactory} managerFactoryInstance
- * @param {boolean} isShow true = 활성화, false = 비활성화
+ * @param {Boolean} isShow true = 활성화, false = 비활성화
  */
 function changeShadowAPI(managerFactoryInstance, isShow) 
 {
 	if (managerFactoryInstance === null) { return; } 
 	
-	var api = new API("changeShadow");
+	var api = new Mago3D.API("changeShadow");
 	api.setShowShadow(isShow);
 	managerFactoryInstance.callAPI(api);
 }
@@ -105,7 +105,7 @@ function changeColorAPI(managerFactoryInstance, projectId, dataKey, objectIds, p
 {
 	if (managerFactoryInstance === null) { return; } 
 	
-	var api = new API("changeColor");
+	var api = new Mago3D.API("changeColor");
 	api.setProjectId(projectId);
 	api.setDataKey(dataKey);
 	api.setObjectIds(objectIds);
@@ -118,7 +118,7 @@ function changeColorAPI(managerFactoryInstance, projectId, dataKey, objectIds, p
  * Object literal with change Location And Rotation animation option.
  * @typedef {Object} animationOption
  * @property {string} dutaion optional. 
- * @property {boolean} autoChangeRotation optional. If this option is true, your heading, pitch will be ignore, Heading and pitch changes according to the direction.
+ * @property {Boolean} autoChangeRotation optional. If this option is true, your heading, pitch will be ignore, Heading and pitch changes according to the direction.
  */
 
 /**
@@ -138,7 +138,7 @@ function changeLocationAndRotationAPI(managerFactoryInstance, projectId, dataKey
 {
 	if (managerFactoryInstance === null) { return; } 
 	
-	var api = new API("changeLocationAndRotation");
+	var api = new Mago3D.API("changeLocationAndRotation");
 	api.setProjectId(projectId);
 	api.setDataKey(dataKey);
 	api.setLatitude(latitude);
@@ -160,7 +160,7 @@ function changeObjectMoveAPI(managerFactoryInstance, objectMoveMode)
 {
 	if (managerFactoryInstance === null) { return; } 
 	
-	var api = new API("changeObjectMove");
+	var api = new Mago3D.API("changeObjectMove");
 	api.setObjectMoveMode(objectMoveMode);
 	managerFactoryInstance.callAPI(api);
 }
@@ -174,7 +174,7 @@ function saveObjectMoveAPI(managerFactoryInstance, objectMoveMode)
 {
 	if (managerFactoryInstance === null) { return; } 
 	
-	var api = new API("saveObjectMove");
+	var api = new Mago3D.API("saveObjectMove");
 	api.setObjectMoveMode(objectMoveMode);
 	managerFactoryInstance.callAPI(api);
 }
@@ -188,7 +188,7 @@ function deleteAllObjectMoveAPI(managerFactoryInstance, objectMoveMode)
 {
 	if (managerFactoryInstance === null) { return; } 
 	
-	var api = new API("deleteAllObjectMove");
+	var api = new Mago3D.API("deleteAllObjectMove");
 	api.setObjectMoveMode(objectMoveMode);
 	managerFactoryInstance.callAPI(api);
 }
@@ -201,20 +201,20 @@ function deleteAllChangeColorAPI(managerFactoryInstance)
 {
 	if (managerFactoryInstance === null) { return; } 
 	
-	var api = new API("deleteAllChangeColor");
+	var api = new Mago3D.API("deleteAllChangeColor");
 	managerFactoryInstance.callAPI(api);
 }
 
 /**
  * 이슈 등록 활성화 유무
  * @param {ManagerFactory} managerFactoryInstance
- * @param {boolean} flag true = 활성화, false = 비활성화
+ * @param {Boolean} flag true = 활성화, false = 비활성화
  */
 function changeInsertIssueModeAPI(managerFactoryInstance, flag) 
 {
 	if (managerFactoryInstance === null) { return; } 
 	
-	var api = new API("changeInsertIssueMode");
+	var api = new Mago3D.API("changeInsertIssueMode");
 	api.setIssueInsertEnable(flag);
 	managerFactoryInstance.callAPI(api);
 }
@@ -222,13 +222,13 @@ function changeInsertIssueModeAPI(managerFactoryInstance, flag)
 /**
  * object 정보 표시 활성화 유무
  * @param {ManagerFactory} managerFactoryInstance
- * @param {boolean} flag true = 활성화, false = 비활성화
+ * @param {Boolean} flag true = 활성화, false = 비활성화
  */
 function changeObjectInfoViewModeAPI(managerFactoryInstance, flag) 
 {
 	if (managerFactoryInstance === null) { return; } 
 	
-	var api = new API("changeObjectInfoViewMode");
+	var api = new Mago3D.API("changeObjectInfoViewMode");
 	api.setObjectInfoViewEnable(flag);
 	managerFactoryInstance.callAPI(api);
 }
@@ -236,14 +236,14 @@ function changeObjectInfoViewModeAPI(managerFactoryInstance, flag)
 /**
  * Object Occlusion culling
  * @param {ManagerFactory} managerFactoryInstance
- * @param {boolean} flag true = 활성화, false = 비활성화
+ * @param {Boolean} flag true = 활성화, false = 비활성화
  * @param {string} dataKey
  */
 function changeOcclusionCullingAPI(managerFactoryInstance, flag, dataKey) 
 {
 	if (managerFactoryInstance === null) { return; } 
 	
-	var api = new API("changeOcclusionCulling");
+	var api = new Mago3D.API("changeOcclusionCulling");
 	api.setOcclusionCullingEnable(flag);
 	api.setDataKey(dataKey);
 	managerFactoryInstance.callAPI(api);
@@ -252,13 +252,13 @@ function changeOcclusionCullingAPI(managerFactoryInstance, flag, dataKey)
 /**
  * 1인칭, 3인칭 모드 개발중...
  * @param {ManagerFactory} managerFactoryInstance
- * @param {boolean} flag true = 활성화, false = 비활성화
+ * @param {Boolean} flag true = 활성화, false = 비활성화
  */
 function changeFPVModeAPI(managerFactoryInstance, flag)
 {
 	if (managerFactoryInstance === null) { return; } 
 	
-	var api = new API("changeFPVMode");
+	var api = new Mago3D.API("changeFPVMode");
 	api.setFPVMode(flag);
 	managerFactoryInstance.callAPI(api);
 }
@@ -266,13 +266,13 @@ function changeFPVModeAPI(managerFactoryInstance, flag)
 /**
  * 1인칭, 3인칭 모드 개발중...
  * @param {ManagerFactory} managerFactoryInstance
- * @param {boolean} flag true = 활성화, false = 비활성화
+ * @param {Boolean} flag true = 활성화, false = 비활성화
  */
 function changeMagoModeAPI(managerFactoryInstance, flag)
 {
 	if (managerFactoryInstance === null) { return; } 
 	
-	var api = new API("changeMagoMode");
+	var api = new Mago3D.API("changeMagoMode");
 	api.setMagoMode(flag);
 	managerFactoryInstance.callAPI(api);
 }
@@ -281,13 +281,13 @@ function changeMagoModeAPI(managerFactoryInstance, flag)
  * 현재 위치 근처 issue list. false인 경우 clear
  * 삭제 예정
  * @param {ManagerFactory} managerFactoryInstance
- * @param {boolean} flag true = 활성화, false = 비활성화
+ * @param {Boolean} flag true = 활성화, false = 비활성화
  */
 function changeNearGeoIssueListViewModeAPI(managerFactoryInstance, flag) 
 {
 	if (managerFactoryInstance === null) { return; } 
 	
-	var api = new API("changeNearGeoIssueListViewMode");
+	var api = new Mago3D.API("changeNearGeoIssueListViewMode");
 	api.setNearGeoIssueListEnable(flag);
 	managerFactoryInstance.callAPI(api);
 }
@@ -303,7 +303,7 @@ function changeInsertIssueStateAPI(managerFactoryInstance, insertIssueState)
 {
 	if (managerFactoryInstance === null) { return; } 
 	
-	var api = new API("changeInsertIssueState");
+	var api = new Mago3D.API("changeInsertIssueState");
 	api.setInsertIssueState(insertIssueState);
 	managerFactoryInstance.callAPI(api);
 }
@@ -322,7 +322,7 @@ function changeLodAPI(managerFactoryInstance, lod0DistInMeters, lod1DistInMeters
 {
 	if (managerFactoryInstance === null) { return; } 
 	
-	var api = new API("changeLod");
+	var api = new Mago3D.API("changeLod");
 	api.setLod0DistInMeters(lod0DistInMeters);
 	api.setLod1DistInMeters(lod1DistInMeters);
 	api.setLod2DistInMeters(lod2DistInMeters);
@@ -345,7 +345,7 @@ function changeLightingAPI(managerFactoryInstance, ambientReflectionCoef, diffus
 {
 	if (managerFactoryInstance === null) { return; } 
 	
-	var api = new API("changeLighting");
+	var api = new Mago3D.API("changeLighting");
 	api.setAmbientReflectionCoef(ambientReflectionCoef);
 	api.setDiffuseReflectionCoef(diffuseReflectionCoef);
 	api.setSpecularReflectionCoef(specularReflectionCoef);
@@ -363,7 +363,7 @@ function changeSsaoRadiusAPI(managerFactoryInstance, ssaoRadius)
 {
 	if (managerFactoryInstance === null) { return; } 
 	
-	var api = new API("changeSsaoRadius");
+	var api = new Mago3D.API("changeSsaoRadius");
 	api.setSsaoRadius(ssaoRadius);
 	managerFactoryInstance.callAPI(api);
 }
@@ -376,8 +376,8 @@ function clearAllDataAPI(managerFactoryInstance)
 {	
 	if (managerFactoryInstance === null) { return; } 
 	
-	var api = new API("clearAllData");
-	MagoConfig.clearAllData();
+	var api = new Mago3D.API("clearAllData");
+	Mago3D.MagoConfig.clearAllData();
 	managerFactoryInstance.callAPI(api);
 }
 
@@ -396,7 +396,7 @@ function drawInsertIssueImageAPI(managerFactoryInstance, drawType, issue_id, iss
 {
 	if (managerFactoryInstance === null) { return; } 
 	
-	var api = new API("drawInsertIssueImage");
+	var api = new Mago3D.API("drawInsertIssueImage");
 	api.setDrawType(drawType);
 	api.setIssueId(issue_id);
 	api.setIssueId(issue_type);
@@ -420,10 +420,10 @@ function gotoProjectAPI(managerFactoryInstance, projectId, projectData, projectD
 {
 	if (managerFactoryInstance === null) { return; } 
 	
-	MagoConfig.setData(CODE.PROJECT_ID_PREFIX + projectId, projectData);
-	MagoConfig.setProjectDataFolder(CODE.PROJECT_DATA_FOLDER_PREFIX + projectDataFolder, projectDataFolder);
+	Mago3D.MagoConfig.setData(Mago3D.CODE.PROJECT_ID_PREFIX + projectId, projectData);
+	Mago3D.MagoConfig.setProjectDataFolder(Mago3D.CODE.PROJECT_DATA_FOLDER_PREFIX + projectDataFolder, projectDataFolder);
 	
-	var api = new API("gotoProject");
+	var api = new Mago3D.API("gotoProject");
 	api.setProjectId(projectId);
 	api.setProjectDataFolder(projectDataFolder);
 	api.setLatitude(latitude);
@@ -448,10 +448,10 @@ function gotoIssueAPI(managerFactoryInstance, projectId, projectData, projectDat
 {
 	if (managerFactoryInstance === null) { return; } 
 	
-	MagoConfig.setData(CODE.PROJECT_ID_PREFIX + projectId, projectData);
-	MagoConfig.setProjectDataFolder(CODE.PROJECT_DATA_FOLDER_PREFIX + projectDataFolder, projectDataFolder);
+	Mago3D.MagoConfig.setData(Mago3D.CODE.PROJECT_ID_PREFIX + projectId, projectData);
+	Mago3D.MagoConfig.setProjectDataFolder(Mago3D.CODE.PROJECT_DATA_FOLDER_PREFIX + projectDataFolder, projectDataFolder);
 	
-	var api = new API("gotoIssue");
+	var api = new Mago3D.API("gotoIssue");
 	api.setProjectId(projectId);
 	api.setProjectDataFolder(projectDataFolder);
 	api.setIssueId(issueId);
@@ -470,7 +470,7 @@ function gotoFlyAPI(managerFactoryInstance, longitude, latitude, height, duratio
 {
 	if (managerFactoryInstance === null) { return; } 
 	
-	var api = new API("gotoFly");
+	var api = new Mago3D.API("gotoFly");
 	api.setLongitude(longitude);
 	api.setLatitude(latitude);
 	api.setElevation(height);
@@ -501,7 +501,7 @@ function searchDataAPI(managerFactoryInstance, projectId, dataKey)
 {
 	if (managerFactoryInstance === null) { return; } 
 	
-	var api = new API("searchData");
+	var api = new Mago3D.API("searchData");
 	api.setProjectId(projectId);
 	api.setDataKey(dataKey);
 	managerFactoryInstance.callAPI(api);
@@ -514,7 +514,7 @@ function searchDataAPI(managerFactoryInstance, projectId, dataKey)
  */
 function isDataExistAPI(key) 
 {
-	if (MagoConfig.isDataExist(key)) { return true; }
+	if (Mago3D.MagoConfig.isDataExist(key)) { return true; }
 	else { return false; }
 }
 
@@ -525,7 +525,7 @@ function isDataExistAPI(key)
  */
 function getDataAPI(key) 
 {
-	return MagoConfig.getData(key);
+	return Mago3D.MagoConfig.getData(key);
 }
 
 /**
@@ -539,7 +539,7 @@ function getDataInfoByDataKeyAPI(managerFactoryInstance, projectId, dataKey)
 {
 	if (managerFactoryInstance === null) { return; }
 
-	var api = new API("getDataInfoByDataKey");
+	var api = new Mago3D.API("getDataInfoByDataKey");
 	api.setProjectId(projectId);
 	api.setDataKey(dataKey);
 	managerFactoryInstance.callAPI(api);
@@ -559,12 +559,12 @@ function drawAppendDataAPI(managerFactoryInstance, projectIdArray, projectDataAr
 	
 	if (projectIdArray.length <= 0) { return; }
 	
-	var api = new API("drawAppendData");
+	var api = new Mago3D.API("drawAppendData");
 	projectIdArray.forEach(function(dataName, index) 
 	{
 			
-		MagoConfig.setData(CODE.PROJECT_ID_PREFIX + dataName, projectDataArray[index]);
-		MagoConfig.setProjectDataFolder(CODE.PROJECT_DATA_FOLDER_PREFIX + projectDataFolderArray[index], projectDataFolderArray[index]);
+		Mago3D.MagoConfig.setData(Mago3D.CODE.PROJECT_ID_PREFIX + dataName, projectDataArray[index]);
+		Mago3D.MagoConfig.setProjectDataFolder(Mago3D.CODE.PROJECT_DATA_FOLDER_PREFIX + projectDataFolderArray[index], projectDataFolderArray[index]);
 		
 		api.setProjectId(dataName);
 		api.setProjectDataFolder(projectDataFolderArray[index]);
@@ -584,7 +584,7 @@ function getCoordinateRelativeToBuildingAPI(managerFactoryInstance, projectId, d
 {
 	if (managerFactoryInstance === null) { return; }
 
-	var api = new API("getCoordinateRelativeToBuilding");
+	var api = new Mago3D.API("getCoordinateRelativeToBuilding");
 	api.setReturnable(true);
 	api.setProjectId(projectId);
 	api.setDataKey(dataKey);
@@ -606,7 +606,7 @@ function getAbsoluteCoodinateOfBuildingPointAPI(managerFactoryInstance, projectI
 {
 	if (managerFactoryInstance === null) { return; }
 
-	var api = new API("getAbsoluteCoodinateOfBuildingPoint");
+	var api = new Mago3D.API("getAbsoluteCoodinateOfBuildingPoint");
 	api.setReturnable(true);
 	api.setProjectId(projectId);
 	api.setDataKey(dataKey);
@@ -619,12 +619,12 @@ function getAbsoluteCoodinateOfBuildingPointAPI(managerFactoryInstance, projectI
 /**
  * get current camera position
  * @param {ManagerFactory} managerFactoryInstance
- * @param {number} unit position unit. if not define, default value is CODE.units.DEGREE. 0 : CODE.units.METRE, 1 : CODE.units.DEGREE, 2 : CODE.units.RADIAN
- * @return {Object|Cartesian3|Cartographic}
+ * @param {Number} unit position unit. if not define, default value is Mago3D.CODE.units.DEGREE. 0 : Mago3D.CODE.units.METRE, 1 : Mago3D.CODE.units.DEGREE, 2 : Mago3D.CODE.units.RADIAN
+ * @returns {Object|Cartesian3|Cartographic}
  */
 function getCameraCurrentPositionAPI(managerFactoryInstance, unit)
 {
-	var api = new API("getCameraCurrentPosition");
+	var api = new Mago3D.API("getCameraCurrentPosition");
 	
 	api.setReturnable(true);
 	api.setUnit(unit);
@@ -635,11 +635,11 @@ function getCameraCurrentPositionAPI(managerFactoryInstance, unit)
 /**
  * get current camera orientaion
  * @param {ManagerFactory} managerFactoryInstance
- * @return {Object}
+ * @returns {Object}
  */
 function getCameraCurrentOrientaionAPI(managerFactoryInstance)
 {
-	var api = new API("getCameraCurrentOrientaion");
+	var api = new Mago3D.API("getCameraCurrentOrientaion");
 	
 	api.setReturnable(true);
 	return managerFactoryInstance.callAPI(api);
@@ -655,7 +655,7 @@ function getCameraCurrentOrientaionAPI(managerFactoryInstance)
  */
 function changeCameraOrientationAPI(managerFactoryInstance, heading, pitch, roll, duration)
 {
-	var api = new API("changeCameraOrientation");
+	var api = new Mago3D.API("changeCameraOrientation");
 
 	api.setHeading(heading);
 	api.setPitch(pitch);
@@ -686,7 +686,7 @@ function changeCameraOrientationAPI(managerFactoryInstance, heading, pitch, roll
  */
 function instantiateStaticModelAPI(managerFactoryInstance, attributes)
 {
-	var api = new API("instantiateStaticModel");
+	var api = new Mago3D.API("instantiateStaticModel");
 	
 	api.setInstantiateObj(attributes);
 	managerFactoryInstance.callAPI(api);
@@ -707,7 +707,7 @@ function instantiateStaticModelAPI(managerFactoryInstance, attributes)
  */
 function addStaticModelAPI(managerFactoryInstance, attributes)
 {
-	var api = new API("addStaticModel");
+	var api = new Mago3D.API("addStaticModel");
 	
 	api.setStaticModelAttributeObj(attributes);
 	managerFactoryInstance.callAPI(api);
@@ -721,7 +721,7 @@ function addStaticModelAPI(managerFactoryInstance, attributes)
  */
 function setTrackNodeAPI(managerFactoryInstance, projectId, dataKey)
 {
-	var api = new API("setTrackNode");
+	var api = new Mago3D.API("setTrackNode");
 	
 	api.setProjectId(projectId);
 	api.setDataKey(dataKey);
@@ -734,7 +734,7 @@ function setTrackNodeAPI(managerFactoryInstance, projectId, dataKey)
  */
 function stopTrackAPI(managerFactoryInstance)
 {
-	var api = new API("stopTrack");
+	var api = new Mago3D.API("stopTrack");
 	
 	managerFactoryInstance.callAPI(api);
 }
@@ -743,11 +743,11 @@ function stopTrackAPI(managerFactoryInstance)
  * check static model is exist
  * @param {ManagerFactory} managerFactoryInstance
  * @param {string} projectId
- * @return {Boolean} isExist
+ * @returns {Boolean} isExist
  */
 function isExistStaticModelAPI(managerFactoryInstance, projectId)
 {
-	var api = new API("isExistStaticModel");
+	var api = new Mago3D.API("isExistStaticModel");
 	api.setReturnable(true);
 	api.setProjectId(projectId);
 	return managerFactoryInstance.callAPI(api);
@@ -758,11 +758,11 @@ function isExistStaticModelAPI(managerFactoryInstance, projectId)
  * @param {ManagerFactory} managerFactoryInstance
  * @param {string} projectId project primary key
  * @param {string} dataKey data key
- * @return {Boolean} isExist
+ * @returns {Boolean} isExist
  */
 function isExistDataAPI(managerFactoryInstance, projectId, dataKey)
 {
-	var api = new API("isExistData");
+	var api = new Mago3D.API("isExistData");
 	api.setReturnable(true);
 	api.setProjectId(projectId);
 	api.setDataKey(dataKey);

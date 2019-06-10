@@ -34,7 +34,7 @@ CCTVList.prototype.new_CCTV = function(name)
 /**
  * Get single CCTV instance as the index of the instance in this CCTV list
  * @param {Number} idx
- * @return {CCTV}
+ * @returns {CCTV}
  */
 CCTVList.prototype.getCCTV = function(idx)
 {
@@ -67,7 +67,7 @@ CCTVList.prototype.getCCTVByName = function(cameraName)
 
 /**
  * Get the number of the CCTV in this list 
- * @return {Number} count
+ * @returns {Number} count
  */
 CCTVList.prototype.getCCTVCount = function()
 {

@@ -34,9 +34,9 @@ BoxAux.prototype.getVboKeysContainer = function()
 
 /**
  * make Axis Aligned Bounding Box(Aux)
- * @param {float} xLength 
- * @param {float} yLength
- * @param {float} zLength
+ * @param {Number} xLength 
+ * @param {Number} yLength
+ * @param {Number} zLength
  */
 BoxAux.prototype.makeAABB = function(xLength, yLength, zLength)
 {

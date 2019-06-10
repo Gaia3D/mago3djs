@@ -415,8 +415,8 @@ GeoLocationData.prototype.getLocMatrixInv = function()
 {
 	if (this.geoLocMatrixInv === undefined)
 	{
-		var locMatrixInv = mat4.create();
-		locMatrixInv = mat4.invert(locMatrixInv, this.geoLocMatrix._floatArrays );
+		var locMatrixInv = glMatrix.mat4.create();
+		locMatrixInv = glMatrix.mat4.invert(locMatrixInv, this.geoLocMatrix._floatArrays );
 		
 		this.geoLocMatrixInv = new Matrix4();
 		this.geoLocMatrixInv.setByFloat32Array(locMatrixInv);
@@ -433,8 +433,8 @@ GeoLocationData.prototype.getRotMatrixInv = function()
 {
 	if (this.rotMatrixInv === undefined)
 	{
-		var rotMatrixInv = mat4.create();
-		rotMatrixInv = mat4.invert(rotMatrixInv, this.rotMatrix._floatArrays );
+		var rotMatrixInv = glMatrix.mat4.create();
+		rotMatrixInv = glMatrix.mat4.invert(rotMatrixInv, this.rotMatrix._floatArrays );
 		
 		this.rotMatrixInv = new Matrix4();
 		this.rotMatrixInv.setByFloat32Array(rotMatrixInv);
@@ -451,8 +451,8 @@ GeoLocationData.prototype.getTMatrixInv = function()
 {
 	if (this.tMatrixInv === undefined)
 	{
-		var tMatrixInv = mat4.create();
-		tMatrixInv = mat4.invert(tMatrixInv, this.tMatrix._floatArrays);
+		var tMatrixInv = glMatrix.mat4.create();
+		tMatrixInv = glMatrix.mat4.invert(tMatrixInv, this.tMatrix._floatArrays);
 		
 		this.tMatrixInv = new Matrix4();
 		this.tMatrixInv.setByFloat32Array(tMatrixInv);
@@ -469,8 +469,8 @@ GeoLocationData.prototype.getGeoLocationMatrixInv = function()
 {
 	if (this.geoLocMatrixInv === undefined)
 	{
-		var geoLocMatrixInv = mat4.create();
-		geoLocMatrixInv = mat4.invert(geoLocMatrixInv, this.geoLocMatrix._floatArrays  );
+		var geoLocMatrixInv = glMatrix.mat4.create();
+		geoLocMatrixInv = glMatrix.mat4.invert(geoLocMatrixInv, this.geoLocMatrix._floatArrays  );
 		
 		this.geoLocMatrixInv = new Matrix4();
 		this.geoLocMatrixInv.setByFloat32Array(geoLocMatrixInv);
@@ -685,32 +685,3 @@ GeoLocationDataManager.prototype.getCurrentGeoLocationData = function()
 	}
 	return this.geoLocationDataArray[0]; // provisionally return the 1rst.
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

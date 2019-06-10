@@ -956,11 +956,10 @@
 			</pre>
 	</div>
 </div>
-
 <script type="text/javascript" src="../src/engine/cesium/Cesium.js"></script>
 <script type="text/javascript" src="../build/mago3d/mago3d.js"></script>
 <script>
-	var message = new Message(i18next, MessageSource);
+	var message = new Mago3D.Message(i18next);
 
 	function changeLang(lang) 
 	{
@@ -1012,7 +1011,7 @@
 
 	function startMogoUI() {
 		intervalCount++;
-		if(managerFactory != null && managerFactory.getMagoManagerState() === CODE.magoManagerState.READY) {
+		if(managerFactory != null && managerFactory.getMagoManagerState() === Mago3D.CODE.magoManagerState.READY) {
 			initJqueryCalendar();
 			// Label 표시
 			changeLabel(false);
@@ -1054,7 +1053,7 @@
 		
 	function loadData(viewer, renderDivId, serverPolicy) {
 		if(serverPolicy.geo_data_default_projects === null || serverPolicy.geo_data_default_projects.length < 1) {
-			managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, null, null, null, imagePath);
+			managerFactory = new Mago3D.ManagerFactory(viewer, renderDivId, serverPolicy, null, null, null, imagePath);
 						
 		} else {
 			var defaultProjectArray = serverPolicy.geo_data_default_projects;
@@ -1090,7 +1089,7 @@
 	}
 	
 	function createManagerFactory(viewer, renderDivId, serverPolicy, projectIdArray, projectDataArray, projectDataFolderArray, imagePath) {
-		managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, projectIdArray, projectDataArray, projectDataFolderArray, imagePath);
+		managerFactory = new Mago3D.ManagerFactory(viewer, renderDivId, serverPolicy, projectIdArray, projectDataArray, projectDataFolderArray, imagePath);
 		
 		// If want use gpu_memoryPool.******************************
 		//var magoManager = managerFactory.getMagoManager();
@@ -1099,7 +1098,7 @@
 	}
 	
 	function gotoProject(projectId, longitude, latitude, height, duration) {
-		var projectData = getDataAPI(CODE.PROJECT_ID_PREFIX + projectId);
+		var projectData = getDataAPI(Mago3D.CODE.PROJECT_ID_PREFIX + projectId);
 		if (projectData === null || projectData === undefined) {
 			$.ajax({
 				url: dataInformationUrl + projectId,
@@ -1121,7 +1120,7 @@
 	}
 	
 	function gotoIssue(projectId, issueId, issueType, longitude, latitude, height, duration) {
-		var projectData = getDataAPI(CODE.PROJECT_ID_PREFIX + projectId);
+		var projectData = getDataAPI(Mago3D.CODE.PROJECT_ID_PREFIX + projectId);
 		if (projectData === null || projectData === undefined) {
 			$.ajax({
 				url: dataInformationUrl + projectId,
@@ -1600,7 +1599,7 @@
 
 	function initDataTree() {
         var projectId = $("#treeProjectId").val();
-		var projectData = getDataAPI(CODE.PROJECT_ID_PREFIX + projectId);
+		var projectData = getDataAPI(Mago3D.CODE.PROJECT_ID_PREFIX + projectId);
         if (projectData === null || projectData === undefined) {
             $.ajax({
                 url: dataInformationUrl + projectId,

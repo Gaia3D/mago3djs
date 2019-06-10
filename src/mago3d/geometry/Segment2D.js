@@ -49,7 +49,7 @@ Segment2D.prototype.setPoints = function(strPoint2D, endPoint2D)
  * 시작 포인트에서 종료 포인트까지의 벡터를 구한다.
  *
  * @param {Point2D} result 벡터 결과값
- * @return {Point2D} 벡터 결과값
+ * @returns {Point2D} 벡터 결과값
  */
 Segment2D.prototype.getVector = function(result)
 {
@@ -72,7 +72,7 @@ Segment2D.prototype.getVector = function(result)
  * 선분의 방향값을 계산한다.
  *
  * @param {Point2D} result 선분이 나타내는 방향값
- * @return {Point2D} 선분이 나타내는 방향값
+ * @returns {Point2D} 선분이 나타내는 방향값
  */
 Segment2D.prototype.getDirection = function(result)
 {
@@ -92,7 +92,7 @@ Segment2D.prototype.getDirection = function(result)
  * 선분의 경계 사각형을 구한다.
  *
  * @param {BoundaryRectangle} result 선분을 포함하는 경계 사각형
- * @return {BoundaryRectangle} 선분을 포함하는 경계 사각형
+ * @returns {BoundaryRectangle} 선분을 포함하는 경계 사각형
  */
 Segment2D.prototype.getBoundaryRectangle = function(result)
 {
@@ -112,7 +112,7 @@ Segment2D.prototype.getBoundaryRectangle = function(result)
  * 선분을 지나는 직선을 구한다.
  *
  * @param {Line2D} result 주어진 선분을 지나는 직선
- * @return {Line2D} 주어진 선분을 지나는 직선
+ * @returns {Line2D} 주어진 선분을 지나는 직선
  */
 Segment2D.prototype.getLine = function(result)
 {
@@ -131,7 +131,7 @@ Segment2D.prototype.getLine = function(result)
 /**
  * 선분의 제곱된 길이를 구한다.
  *
- * @return {Number} 선분의 제곱된 길이
+ * @returns {Number} 선분의 제곱된 길이
  */
 Segment2D.prototype.getSquaredLength = function()
 {
@@ -142,7 +142,7 @@ Segment2D.prototype.getSquaredLength = function()
 /**
  * 선분의 길이를 구한다.
  *
- * @return {Number} 선분의 길이
+ * @returns {Number} 선분의 길이
  */
 Segment2D.prototype.getLength = function()
 {
@@ -155,7 +155,7 @@ Segment2D.prototype.getLength = function()
  *
  * @param {Point2D} point 포인트
  * @param {Number} error 오차율
- * @return 교차 판단 결과값
+ * @returns 교차 판단 결과값
  */
 Segment2D.prototype.intersectionWithPointByDistances = function(point, error)
 {
@@ -202,7 +202,7 @@ Segment2D.prototype.intersectionWithPointByDistances = function(point, error)
  *
  * @param {Point2D} point 포인트
  * @param {Number} error 오차율
- * @return 교차 판단 결과값
+ * @returns 교차 판단 결과값
  */
 Segment2D.prototype.intersectionWithPoint = function(point, error)
 {
@@ -231,7 +231,7 @@ Segment2D.prototype.intersectionWithPoint = function(point, error)
  *
  * @param {Segment2D} segment 선분
  * @param {Number} error 오차율
- * @return 교차 판단 결과값
+ * @returns 교차 판단 결과값
  */
 Segment2D.prototype.intersectionWithSegment = function(segment, error)
 {
@@ -276,7 +276,7 @@ Segment2D.prototype.intersectionWithSegment = function(segment, error)
  * returns if this segment has "point" as startPoint or endPoint.
  *
  * @param {Point2D} point 포인트
- * @return {Boolean} 시작/종료 포인트 존재 여부
+ * @returns {Boolean} 시작/종료 포인트 존재 여부
  */
 Segment2D.prototype.hasPoint = function(point)
 {
@@ -298,7 +298,7 @@ Segment2D.prototype.hasPoint = function(point)
  * 주어진 선분이 해당 선분과 공유 포인트를 갖는지 판단한다.
  *
  * @param {Segment2D} segment 선분
- * @return {Boolean} 공유 포인트 존재 여부
+ * @returns {Boolean} 공유 포인트 존재 여부
  */
 Segment2D.prototype.sharesPointsWithSegment = function(segment)
 {
