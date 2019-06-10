@@ -1,3 +1,4 @@
+![Build Status](https://travis-ci.org/Gaia3D/mago3djs.svg?branch=master)
 [![License](https://img.shields.io/badge/License-Apache%202.0-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 [![Greenkeeper badge](https://badges.greenkeeper.io/Gaia3D/mago3djs.svg)](https://greenkeeper.io/)
 

@@ -579,25 +579,25 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		
 		// projection.***
 		// considere near as zero provisionally.***
-		sceneState.projectionMatrix._floatArrays = mat4.perspective(sceneState.projectionMatrix._floatArrays, frustum0.fovyRad[0], frustum0.aspectRatio, 0.0, frustum0.far[0]);
+		sceneState.projectionMatrix._floatArrays = glMatrix.mat4.perspective(sceneState.projectionMatrix._floatArrays, frustum0.fovyRad[0], frustum0.aspectRatio, 0.0, frustum0.far[0]);
 		
 		// modelView.***
 		//sceneState.modelViewMatrix._floatArrays; 
-		sceneState.modelViewMatrixInv._floatArrays = mat4.invert(sceneState.modelViewMatrixInv._floatArrays, sceneState.modelViewMatrix._floatArrays);
+		sceneState.modelViewMatrixInv._floatArrays = glMatrix.mat4.invert(sceneState.modelViewMatrixInv._floatArrays, sceneState.modelViewMatrix._floatArrays);
 	
 		// normalMat.***
-		sceneState.normalMatrix4._floatArrays = mat4.transpose(sceneState.normalMatrix4._floatArrays, sceneState.modelViewMatrixInv._floatArrays);
+		sceneState.normalMatrix4._floatArrays = glMatrix.mat4.transpose(sceneState.normalMatrix4._floatArrays, sceneState.modelViewMatrixInv._floatArrays);
 		
 		// modelViewRelToEye.***
-		sceneState.modelViewRelToEyeMatrix._floatArrays = mat4.copy(sceneState.modelViewRelToEyeMatrix._floatArrays, sceneState.modelViewMatrix._floatArrays);
+		sceneState.modelViewRelToEyeMatrix._floatArrays = glMatrix.mat4.copy(sceneState.modelViewRelToEyeMatrix._floatArrays, sceneState.modelViewMatrix._floatArrays);
 		sceneState.modelViewRelToEyeMatrix._floatArrays[12] = 0;
 		sceneState.modelViewRelToEyeMatrix._floatArrays[13] = 0;
 		sceneState.modelViewRelToEyeMatrix._floatArrays[14] = 0;
 		sceneState.modelViewRelToEyeMatrix._floatArrays[15] = 1;
-		sceneState.modelViewRelToEyeMatrixInv._floatArrays = mat4.invert(sceneState.modelViewRelToEyeMatrixInv._floatArrays, sceneState.modelViewRelToEyeMatrix._floatArrays);
+		sceneState.modelViewRelToEyeMatrixInv._floatArrays = glMatrix.mat4.invert(sceneState.modelViewRelToEyeMatrixInv._floatArrays, sceneState.modelViewRelToEyeMatrix._floatArrays);
 		
 		// modelViewProjection.***
-		sceneState.modelViewProjMatrix._floatArrays = mat4.multiply(sceneState.modelViewProjMatrix._floatArrays, sceneState.projectionMatrix._floatArrays, sceneState.modelViewMatrix._floatArrays);
+		sceneState.modelViewProjMatrix._floatArrays = glMatrix.mat4.multiply(sceneState.modelViewProjMatrix._floatArrays, sceneState.projectionMatrix._floatArrays, sceneState.modelViewMatrix._floatArrays);
 
 		// modelViewProjectionRelToEye.***
 		sceneState.modelViewProjRelToEyeMatrix.copyFromMatrix4(sceneState.modelViewProjMatrix);
@@ -1170,7 +1170,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 
 /**
  * Main loop function. This function contains all Mago3D Pipe-Line.
- * @param {boolean} isLastFrustum Indicates if this is the last frustum in the render pipe-line.
+ * @param {Boolean} isLastFrustum Indicates if this is the last frustum in the render pipe-line.
  * @param {Number} frustumIdx Current frustum indice.
  * @param {Number} numFrustums Total frustums count in current rendering pipe-line.
  */
@@ -1467,7 +1467,7 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, resultSe
  * @param {GL} gl 변수
  * @param {int} pixelX Screen x position of the pixel.
  * @param {int} pixelY Screen y position of the pixel.
- * @return {Plane} resultSelObjMovePlane Calculated plane.
+ * @returns {Plane} resultSelObjMovePlane Calculated plane.
  */
 MagoManager.prototype.calculateSelObjMovePlaneAsimetricMode = function(gl, pixelX, pixelY, resultSelObjMovePlane) 
 {
@@ -1793,14 +1793,6 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 {
 	// Note: the "mouseActionLeftClick" runs after "mouseActionLeftDown" & "mouseActionLeftUp".***
 	//--------------------------------------------------------------------------------------------
-	
-	//if (this.currentFrustumIdx === 0)
-	//	var hola = 0;
-	//else if (this.currentFrustumIdx > 0)
-	//	var hola = 0;
-	
-	// Test for drawing mode.******************************************************************
-	//this.magoMode = CODE.magoMode.DRAWING;
 	if (this.magoMode === CODE.magoMode.DRAWING)// then process to draw.***// Test code.***// Test code.***
 	{
 		// Test code.***
@@ -4616,7 +4608,7 @@ MagoManager.prototype.addStaticModel = function(attribute)
 /**
  * check static model is exist
  * @param {string} projectId
- * @return {Boolean} isExist
+ * @returns {Boolean} isExist
  */
 MagoManager.prototype.isExistStaticModel = function(projectId)
 {
@@ -5102,7 +5094,7 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "changeMagoMode") 
 	{
-		var hola = 0;
+		console.log("changeMagoMode");
 	}
 	else if (apiName === "getCameraCurrentPosition")
 	{
