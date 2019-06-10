@@ -160,6 +160,7 @@ BlocksList.prototype.stepOverBlockVersioned = function(arrayBuffer, bytesReaded,
 	var normalByteValuesCount;
 	var shortIndicesValuesCount;
 	var sizeLevels;
+	var startBuff, endBuff;
 	
 	// Spec document Table 3-1
 	// vboCount
