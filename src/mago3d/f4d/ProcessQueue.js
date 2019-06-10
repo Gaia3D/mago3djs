@@ -18,10 +18,10 @@ var ProcessQueue = function()
 	this.nodesToDeleteLessThanLod3Map = {};
 	this.nodesToDeleteLessThanLod4Map = {};
 	this.nodesToDeleteLessThanLod5Map = {};
-	this.nodesToDeleteLodMeshMap = {}; // no used.***
+	this.nodesToDeleteLodMeshMap = {}; // no used.
 	this.tinTerrainsToDeleteMap = {};
 	
-	// Test.***
+	// Test.
 	this.octreeToDeletePCloudsMap = {};
 };
 
@@ -36,6 +36,19 @@ ProcessQueue.prototype.putOctreeToDeletePCloud = function(octree, aValue)
 	
 	var key = octree.octreeKey;
 	this.octreeToDeletePCloudsMap[key] = octree;
+};
+
+ProcessQueue.prototype.existOctreeToDeletePCloud = function(octree)
+{
+	if (octree === undefined)
+	{ return false; }
+	
+	var key = octree.octreeKey;
+	if (this.octreeToDeletePCloudsMap.hasOwnProperty(key)) 
+	{
+		return true;
+	}
+	return false;
 };
 
 ProcessQueue.prototype.eraseOctreeToDeletePCloud = function(octree)
@@ -210,7 +223,7 @@ ProcessQueue.prototype.eraseNodeToDeleteLessThanLod5 = function(node)
 
 ProcessQueue.prototype.putNodeToDeleteModelReferences = function(node, aValue)
 {
-	// In this case check if the node is reference node type.***
+	// In this case check if the node is reference node type.
 	if (node.isReferenceNode())
 	{ return; }
 	
@@ -316,7 +329,7 @@ ProcessQueue.prototype.clearAll = function()
  */
 ProcessQueue.prototype.deleteNeoBuilding = function(gl, neoBuilding, magoManager) 
 {
-	// check if the neoBuilding id the selected building.***
+	// check if the neoBuilding id the selected building.
 	var vboMemoryManager = magoManager.vboMemoryManager;
 	if (neoBuilding === magoManager.buildingSelected)
 	{
@@ -499,8 +512,8 @@ ProcessQueue.prototype.manageDeleteQueue = function(magoManager)
 	}
 	
 	
-	// now, delete lod0, lod1, lod2.***
-	// now, delete tinTerrains.*****
+	// now, delete lod0, lod1, lod2.
+	// now, delete tinTerrains.
 	var deletedCount = 0;
 	for (var key in this.tinTerrainsToDeleteMap)
 	{
@@ -522,7 +535,7 @@ ProcessQueue.prototype.manageDeleteQueue = function(magoManager)
 		}
 	}
 	
-	// PointsCloud.***
+	// PointsCloud.
 	var deletedCount = 0;
 	for (var key in this.octreeToDeletePCloudsMap)
 	{

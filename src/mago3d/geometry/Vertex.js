@@ -1,12 +1,12 @@
-
-
-
 'use strict';
 
-  
 /**
- * 어떤 일을 하고 있습니까?
+ * Data structure with vertex information
+ * @exception {Error} Messages.CONSTRUCT_ERROR
+ * 
  * @class Vertex
+ * 
+ * @param {Point3D} position vertex postion.
  */
 var Vertex = function(position) 
 {
@@ -15,16 +15,52 @@ var Vertex = function(position)
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
+	/**
+	 * vertex 3d coordinate.
+	 * @type {Point3D}
+	 */
 	this.point3d;
-	this.normal; // class: Point3D.
-	this.texCoord; // class: Point2D.
+
+	/**
+	 * vertex noraml.
+	 * @type {Point3D}
+	 */
+	this.normal;
+
+	/**
+	 * 2d coordinate
+	 * @type {Point2D}
+	 */
+	this.texCoord;
+
+	/**
+	 * vertex color
+	 * @type {Color}
+	 */
 	this.color4; // class: Color.
 	
+	/**
+	 * outingHedge
+	 * @type {HalfEdge}
+	 */
 	this.outingHedge; // class: HalfEdge
 	//this.outingHalfEdgesArray; // Array [class: HalfEdge]. 
-	this.vertexType; // 1 = important vertex.***
-	this.idxInList; // auxiliar var.***
+
+	/**
+	 * vertex type. 1 is important vertex.
+	 * @type {Number}
+	 */
+	this.vertexType;
+
+	/**
+	 *  vertexList index
+	 * @type {Number}
+	 * 
+	 * @see VertexList
+	 */
+	this.idxInList;
 	
+
 	if (position)
 	{ this.point3d = position; }
 	else
@@ -34,10 +70,8 @@ var Vertex = function(position)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param x 변수
- * @param y 변수
- * @param z 변수
+ * vertex init.
+ * all member set undifined;
  */
 Vertex.prototype.deleteObjects = function() 
 {
@@ -57,10 +91,8 @@ Vertex.prototype.deleteObjects = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param x 변수
- * @param y 변수
- * @param z 변수
+ * get vertexList index
+ * @returns {Number}
  */
 Vertex.prototype.getIdxInList = function() 
 {
@@ -68,10 +100,8 @@ Vertex.prototype.getIdxInList = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param x 변수
- * @param y 변수
- * @param z 변수
+ * set vertexList index
+ * @param {Number} idx index
  */
 Vertex.prototype.setIdxInList = function(idx) 
 {
@@ -79,10 +109,8 @@ Vertex.prototype.setIdxInList = function(idx)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param x 변수
- * @param y 변수
- * @param z 변수
+ * make vertex copy from another vertex. like clone.
+ * @param {Vertex} vertex 
  */
 Vertex.prototype.copyFrom = function(vertex) 
 {
@@ -126,10 +154,8 @@ Vertex.prototype.copyFrom = function(vertex)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param x 변수
- * @param y 변수
- * @param z 변수
+ * get this vertex point.
+ * @returns {Point3D}
  */
 Vertex.prototype.getPosition = function() 
 {
@@ -137,10 +163,10 @@ Vertex.prototype.getPosition = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param x 변수
- * @param y 변수
- * @param z 변수
+ * set this vertex point. if this point3d undefined, set new Point3D instance.
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} z
  */
 Vertex.prototype.setPosition = function(x, y, z) 
 {
@@ -151,9 +177,9 @@ Vertex.prototype.setPosition = function(x, y, z)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param s 변수
- * @param t 변수
+ * set this vertex texCoord. if this texCoord undefined, set new Point2D instance.
+ * @param {Number} s
+ * @param {Number} t
  */
 Vertex.prototype.setTexCoord = function(s, t) 
 {
@@ -164,7 +190,10 @@ Vertex.prototype.setTexCoord = function(s, t)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * set this vertex color exclude alpha. if this color4 undefined, set new Color instance.
+ * @param {Number} r
+ * @param {Number} g
+ * @param {Number} b
  */
 Vertex.prototype.setColorRGB = function(r, g, b) 
 {
@@ -174,7 +203,11 @@ Vertex.prototype.setColorRGB = function(r, g, b)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * set this vertex color include alpha. if this color4 undefined, set new Color instance.
+ * @param {Number} r
+ * @param {Number} g
+ * @param {Number} b
+ * @param {Number} alpha
  */
 Vertex.prototype.setColorRGBA = function(r, g, b, alpha) 
 {
@@ -184,7 +217,10 @@ Vertex.prototype.setColorRGBA = function(r, g, b, alpha)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * set this vertex normal. if this normal undefined, set new Point3D instance.
+ * @param {Number} nx
+ * @param {Number} ny
+ * @param {Number} nz
  */
 Vertex.prototype.setNormal = function(nx, ny, nz) 
 {
@@ -194,7 +230,8 @@ Vertex.prototype.setNormal = function(nx, ny, nz)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * get this vertex normal
+ * @returns {Point3D} normal
  */
 Vertex.prototype.getNormal = function() 
 {
@@ -204,7 +241,11 @@ Vertex.prototype.getNormal = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * vertex point translate. use add method.
+ * @param {Number} dx
+ * @param {Number} dy
+ * @param {Number} dz
+ * @see Point3D#add
  */
 Vertex.prototype.translate = function(dx, dy, dz) 
 {
@@ -212,7 +253,10 @@ Vertex.prototype.translate = function(dx, dy, dz)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * get vertex outinghedges. 
+ * @deprecated
+ * @param {Array} resultHedgesArray
+ * @returns {Array} resultHedgesArray
  */
 Vertex.prototype.getOutingHEdges = function(resultHedgesArray) 
 {
@@ -224,9 +268,17 @@ Vertex.prototype.getOutingHEdges = function(resultHedgesArray)
 	return resultHedgesArray;
 };
 
+/**
+ * get vertex intersected with plane. 
+ * @static
+ * @param {Vertex} vertex Required. 
+ * @param {Plane} plane. 
+ * @param {Point3D} projectionDirection projectionDirection must be unitary.
+ * @param {Vertex} resultVertex Optional. 
+ * @returns {Vertex} resultVertex
+ */
 Vertex.getProjectedOntoPlane = function(vertex, plane, projectionDirection, resultVertex)
 {
-	// Note: projectionDirection must be unitary.***
 	if (vertex === undefined)
 	{ return resultVertex; }
 	
@@ -239,58 +291,11 @@ Vertex.getProjectedOntoPlane = function(vertex, plane, projectionDirection, resu
 	if (resultVertex === undefined)
 	{ resultVertex = new Vertex(); }
 	
-	// 1rst, copy from the original vertex.***
+	// 1rst, copy from the original vertex.
 	resultVertex.copyFrom(vertex);
 	
-	// Now, change only the position.***
+	// Now, change only the position.
 	resultVertex.setPosition(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z);
 	
 	return resultVertex;
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

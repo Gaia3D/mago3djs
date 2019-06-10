@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
+ * This is the pin which is created to be placed on the map
  * @class Pin
  *
  */
@@ -11,7 +11,7 @@ var Pin = function()
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	this.texture; // default.***
+	this.texture; // default.
 	this.texturesArray = [];
 	this.positionBuffer;
 	this.texcoordBuffer;
@@ -48,6 +48,9 @@ Pin.prototype.createPin = function(gl)
 	
 };
 
+/**
+ * draw the bottom pick of the pin
+ */
 Pin.prototype.createPinCenterBottom = function(gl)
 {
 	this.positionBuffer = gl.createBuffer();

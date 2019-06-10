@@ -1,19 +1,24 @@
 attribute vec3 position;
+attribute vec3 normal;
+attribute vec2 texCoord;
+attribute vec4 color4;
 uniform mat4 ModelViewProjectionMatrixRelToEye;
 uniform vec3 buildingPosHIGH;
 uniform vec3 buildingPosLOW;
 uniform mat4 buildingRotMatrix;
 uniform vec3 encodedCameraPositionMCHigh;
 uniform vec3 encodedCameraPositionMCLow;
+uniform float near;
+uniform float far;
 uniform bool bPositionCompressed;
 uniform vec3 minPosition;
 uniform vec3 bboxSize;
-attribute vec4 color4;
 uniform bool bUse1Color;
 uniform vec4 oneColor4;
 uniform float fixPointSize;
 uniform bool bUseFixPointSize;
 varying vec4 vColor;
+varying float glPointSize;
 
 void main()
 {
@@ -43,10 +48,14 @@ void main()
 		vColor=color4;
 	
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;
-	//gl_PointSize = 1.0 + 50.0/gl_Position.z; // Original.***
-	gl_PointSize = 1.0 + gl_Position.z/300.0;
+	float z_b = gl_Position.z/gl_Position.w;
+	float z_n = 2.0 * z_b - 1.0;
+    float z_e = 2.0 * near * far / (far + near - z_n * (far - near));
+	gl_PointSize = 1.0 + 40.0/z_e; // Original.***
 	if(gl_PointSize > 10.0)
 		gl_PointSize = 10.0;
-	if(gl_PointSize < 3.0)
-		gl_PointSize = 3.0;
+	if(gl_PointSize < 2.0)
+		gl_PointSize = 2.0;
+		
+	glPointSize = gl_PointSize;
 }

@@ -2,7 +2,7 @@
 
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Under implementation
  * @class MagoNativeProject
  */
 var MagoNativeProject = function() 
@@ -12,7 +12,7 @@ var MagoNativeProject = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	// This is a "ParametricMeshes" composition.***
+	// This is a "ParametricMeshes" composition.
 	this.meshesArray;
 	this.geoLocDataManager;
 	this.vboKeysContainer; // class: VBOVertexIdxCacheKeysContainer

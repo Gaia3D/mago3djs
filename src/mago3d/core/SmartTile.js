@@ -1,8 +1,12 @@
 'use strict';
 
 /**
+ * 4분할 타일링 수행 시 타일 객체.
  * Quadtree based tile with thickness.
  * @class SmartTile
+ * 
+ * @exception {Error} Messages.CONSTRUCT_ERROR
+ * @param {String} smartTileName tile name;
  */
 var SmartTile = function(smartTileName) 
 {
@@ -284,8 +288,10 @@ SmartTile.prototype.TEST__hasLowestTiles_nodesArray = function()
 
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param geoLocData 변수
+ * 타일의 min max coord를 이용하여 타원체를 생성 후 this.sphereExtent에 할당
+ * @param {MagoManager} magoManager
+ * 
+ * @see SmartTile#computeSphereExtent
  */
 SmartTile.prototype.makeSphereExtent = function(magoManager) 
 {
@@ -293,8 +299,14 @@ SmartTile.prototype.makeSphereExtent = function(magoManager)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param geoLocData 변수
+ * Sphere에 반지름과 중심점을 담아서 반환.
+ * @static
+ * @param {MagoManager} magoManager
+ * @param {GeographicCoord} minGeographicCoord
+ * @param {GeographicCoord} maxGeographicCoord
+ * @param {Sphere} resultSphereExtent
+ * 
+ * @returns {Sphere} resultSphereExtent
  */
 SmartTile.computeSphereExtent = function(magoManager, minGeographicCoord, maxGeographicCoord, resultSphereExtent) 
 {
@@ -370,16 +382,18 @@ SmartTile.prototype.putNode = function(targetDepth, node, magoManager)
 		this.nodeSeedsArray.push(node);
 		this.nodesArray.push(node);
 		
-		// todo: Must recalculate the smartTile sphereExtent.***
+		// todo: Must recalculate the smartTile sphereExtent.
 		//this.makeSphereExtent(magoManager);
+		
 		
 		return true;
 	}
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param geoLocData 변수
+ * 목표레벨까지 각 타일의 SUB타일 생성 및 노드의 위치와 교점이 있는지 파악 후 노드를 보관.
+ * @param {Number} targetDepth
+ * @param {MagoManager} magoManager
  */
 SmartTile.prototype.makeTreeByDepth = function(targetDepth, magoManager) 
 {
@@ -417,8 +431,6 @@ SmartTile.prototype.makeTreeByDepth = function(targetDepth, magoManager)
 		}
 		
 	}
-	//else
-	//	var hola = 0;
 };
 
 /**
@@ -469,8 +481,9 @@ SmartTile.prototype.intersectsNode = function(node)
 	var buildingSeed = node.data.buildingSeed;
 	var rootNode = node.getRoot();
 	
-	// Find geographicCoords as is possible.***
+	// Find geographicCoords as is possible.
 	var longitude, latitude;
+	
 	if (rootNode.data.bbox !== undefined && rootNode.data.bbox.geographicCoord !== undefined)
 	{
 		longitude = rootNode.data.bbox.geographicCoord.longitude;
@@ -478,7 +491,7 @@ SmartTile.prototype.intersectsNode = function(node)
 	}
 	else if (buildingSeed !== undefined)
 	{
-		// in this case take the data from buildingSeed.***
+		// in this case take the data from buildingSeed.
 		longitude = buildingSeed.geographicCoordOfBBox.longitude;
 		latitude = buildingSeed.geographicCoordOfBBox.latitude;
 	}
@@ -510,7 +523,6 @@ SmartTile.prototype.takeIntersectedBuildingSeeds = function(nodeSeedsArray)
 	for (var i=0; i<buildingSeedsCount; i++)
 	{
 		node = nodeSeedsArray[i];
-		
 		if (this.intersectsNode(node))
 		{
 			nodeSeedsArray.splice(i, 1);
@@ -520,7 +532,7 @@ SmartTile.prototype.takeIntersectedBuildingSeeds = function(nodeSeedsArray)
 			if (this.nodeSeedsArray === undefined)
 			{ this.nodeSeedsArray = []; }
 		
-			// Set the smartTileOwner, for fast move of the node between smartTiles.***
+			// Set the smartTileOwner, for fast move of the node between smartTiles.
 			node.data.smartTileOwner = this;
 			
 			this.nodeSeedsArray.push(node);
@@ -597,7 +609,7 @@ SmartTile.prototype.eraseNode = function(node)
 	//this.nodeSeedsArray;
 	//this.nodesArray;
 	
-	// Erase from this.nodeSeedsArray & this.nodesArray.***
+	// Erase from this.nodeSeedsArray & this.nodesArray.
 	if (this.nodeSeedsArray !== undefined)
 	{
 		var nodeSeedsCount = this.nodeSeedsArray.length;
@@ -800,8 +812,8 @@ SmartTile.getFrustumIntersectedTilesNames = function(frustum, maxDepth, camPos, 
  
 SmartTile.getFrustumIntersectedTilesNamesForGeographicExtent = function(frustum, maxDepth, currDepth, camPos, currMinGeographicCoords, currMaxGeographicCoords, magoManager, sphereExtentAux, resultFullyIntersectedTilesNamesMap) 
 {
-	// STATIC FUNCTION.***
-	// 1rst, make a sphereExtent.***
+	// STATIC FUNCTION.
+	// 1rst, make a sphereExtent.
 	
 	sphereExtentAux = SmartTile.computeSphereExtent(magoManager, currMinGeographicCoords, currMaxGeographicCoords, sphereExtentAux);
 
@@ -822,7 +834,7 @@ SmartTile.getFrustumIntersectedTilesNamesForGeographicExtent = function(frustum,
 	}
 	else if (intersectionType === Constant.INTERSECTION_INTERSECT)
 	{
-		// check distance to camera.***
+		// check distance to camera.
 		var distToCam = camPos.distToSphere(sphereExtentAux);
 		if (distToCam > 2000)
 		{
@@ -838,7 +850,7 @@ SmartTile.getFrustumIntersectedTilesNamesForGeographicExtent = function(frustum,
 		
 		if (currDepth < maxDepth)
 		{
-			// must descend.***
+			// must descend.
 			currDepth += 1;
 			var minLon = currMinGeographicCoords.longitude;
 			var minLat = currMinGeographicCoords.latitude;
@@ -849,21 +861,21 @@ SmartTile.getFrustumIntersectedTilesNamesForGeographicExtent = function(frustum,
 			var midLon = (minLon + maxLon)/ 2;
 			var midLat = (minLat + maxLat)/ 2;
 			
-			// subTile 1.***
+			// subTile 1.
 			currMaxGeographicCoords.setLonLatAlt(midLon, midLat, maxAlt);
 			this.getFrustumIntersectedTilesNamesForGeographicExtent(frustum, maxDepth, currDepth, camPos, currMinGeographicCoords, currMaxGeographicCoords, magoManager, sphereExtentAux, resultFullyIntersectedTilesNamesMap);
 			
-			// subTile 2.***
+			// subTile 2.
 			currMinGeographicCoords.setLonLatAlt(midLon, minLat, minAlt);
 			currMaxGeographicCoords.setLonLatAlt(maxLon, midLat, maxAlt);
 			this.getFrustumIntersectedTilesNamesForGeographicExtent(frustum, maxDepth, currDepth, camPos, currMinGeographicCoords, currMaxGeographicCoords, magoManager, sphereExtentAux, resultFullyIntersectedTilesNamesMap);
 			
-			// subTile 3.***
+			// subTile 3.
 			currMinGeographicCoords.setLonLatAlt(midLon, midLat, minAlt);
 			currMaxGeographicCoords.setLonLatAlt(maxLon, maxLat, maxAlt);
 			this.getFrustumIntersectedTilesNamesForGeographicExtent(frustum, maxDepth, currDepth, camPos, currMinGeographicCoords, currMaxGeographicCoords, magoManager, sphereExtentAux, resultFullyIntersectedTilesNamesMap);
 			
-			// subTile 4.***
+			// subTile 4.
 			currMinGeographicCoords.setLonLatAlt(minLon, midLat, minAlt);
 			currMaxGeographicCoords.setLonLatAlt(midLon, maxLat, maxAlt);
 			this.getFrustumIntersectedTilesNamesForGeographicExtent(frustum, maxDepth, currDepth, camPos, currMinGeographicCoords, currMaxGeographicCoords, magoManager, sphereExtentAux, resultFullyIntersectedTilesNamesMap);
@@ -960,183 +972,3 @@ SmartTile.prototype.getLatitudeRangeDegree = function()
 {
 	return this.maxGeographicCoord.latitude - this.minGeographicCoord.latitude;
 };
-
-
-/**
- * Quadtree based tile with thickness.
- * @class SmartTileManager
- */
-var SmartTileManager = function() 
-{
-	if (!(this instanceof SmartTileManager)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-	
-	this.tilesArray = []; // has 2 tiles (Asia side and America side).
-	this.createMainTiles();
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @class GeoLocationData
- * @param geoLocData 변수
- */
-SmartTileManager.prototype.createMainTiles = function() 
-{
-	// tile 1 : longitude {-180, 0}, latitude {-90, 90}
-	// tile 2 : longitude {0, 180},  latitude {-90, 90}
-	
-	// America side.
-	var tile1 = this.newSmartTile("AmericaSide");
-	if (tile1.minGeographicCoord === undefined)
-	{ tile1.minGeographicCoord = new GeographicCoord(); }
-	if (tile1.maxGeographicCoord === undefined)
-	{ tile1.maxGeographicCoord = new GeographicCoord(); }
-	
-	tile1.depth = 0; // mother tile.
-	tile1.minGeographicCoord.setLonLatAlt(-180, -90, 0);
-	tile1.maxGeographicCoord.setLonLatAlt(0, 90, 0);
-	
-	// Asia side.
-	var tile2 = this.newSmartTile("AsiaSide");
-	if (tile2.minGeographicCoord === undefined)
-	{ tile2.minGeographicCoord = new GeographicCoord(); }
-	if (tile2.maxGeographicCoord === undefined)
-	{ tile2.maxGeographicCoord = new GeographicCoord(); }
-	
-	tile2.depth = 0; // mother tile.
-	tile2.minGeographicCoord.setLonLatAlt(0, -90, 0);
-	tile2.maxGeographicCoord.setLonLatAlt(180, 90, 0);
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- */
-SmartTileManager.prototype.makeTreeByDepth = function(targetDepth, physicalNodesArray, magoManager) 
-{
-	if (targetDepth === undefined)
-	{ targetDepth = 17; }
-	
-	this.targetDepth = targetDepth;
-	
-	var smartTilesCount = this.tilesArray.length; // In this point, "smartTilesCount" = 2 always.
-	for (var a=0; a<smartTilesCount; a++)
-	{
-		var smartTile = this.tilesArray[a];
-		if (smartTile.nodeSeedsArray === undefined)
-		{ smartTile.nodeSeedsArray = []; }
-		
-		smartTile.nodeSeedsArray = physicalNodesArray;
-		smartTile.makeTreeByDepth(targetDepth, magoManager); // default depth = 17.
-	}
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- */
-SmartTileManager.prototype.putNode = function(targetDepth, node, magoManager) 
-{
-	if (this.tilesArray !== undefined)
-	{
-		var tilesCount = this.tilesArray.length; // allways tilesCount = 2. (Asia & America sides).
-		for (var i=0; i<tilesCount; i++)
-		{
-			this.tilesArray[i].putNode(targetDepth, node, magoManager);
-		}
-	}
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @class GeoLocationData
- * @param geoLocData 변수
- */
-SmartTileManager.prototype.deleteTiles = function() 
-{
-	// this function deletes all children tiles.
-	if (this.tilesArray)
-	{
-		var tilesCount = this.tilesArray.length; // allways tilesCount = 2. (Asia & America sides).
-		for (var i=0; i<tilesCount; i++)
-		{
-			this.tilesArray[i].deleteObjects();
-			this.tilesArray[i] = undefined;
-		}
-		this.tilesArray.length = 0;
-	}
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @class GeoLocationData
- * @param geoLocData 변수
- */
-SmartTileManager.prototype.resetTiles = function() 
-{
-	this.deleteTiles();
-	
-	// now create the main tiles.
-	this.createMainTiles();
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @class GeoLocationData
- * @param geoLocData 변수
- */
-SmartTileManager.prototype.newSmartTile = function(smartTileName) 
-{
-	if (this.tilesArray === undefined)
-	{ this.tilesArray = []; }
-	
-	var smartTile = new SmartTile(smartTileName);
-	this.tilesArray.push(smartTile);
-	return smartTile;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- */
-SmartTileManager.prototype.getNeoBuildingById = function(buildingType, buildingId) 
-{
-	var resultNeoBuilding;
-	var i = 0;
-	var smartTilesCount = this.tilesArray.length;
-	while (resultNeoBuilding === undefined && i<smartTilesCount)
-	{
-		resultNeoBuilding = this.tilesArray[i].getNeoBuildingById(buildingType, buildingId); 
-		i++;
-	}
-	
-	return resultNeoBuilding;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- */
-SmartTileManager.prototype.getBuildingSeedById = function(buildingType, buildingId) 
-{
-	var resultNeoBuilding;
-	var i = 0;
-	var smartTilesCount = this.tilesArray.length;
-	while (resultNeoBuilding === undefined && i<smartTilesCount)
-	{
-		resultNeoBuilding = this.tilesArray[i].getBuildingSeedById(buildingType, buildingId);
-		i++;
-	}
-	
-	return resultNeoBuilding;
-};
-
-
-
-
-
-
-
-
-
-
-
-

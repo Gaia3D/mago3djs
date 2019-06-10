@@ -1,8 +1,12 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
- * @class TrianglesMatrix
+ * Triangle 리스트의 배열
+ * 
+ * @class
+ * 
+ * @see TrianglesMatrix
+ * @see TrianglesList
  */
 var TrianglesMatrix= function() 
 {
@@ -10,54 +14,63 @@ var TrianglesMatrix= function()
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-
-	this.trianglesListsArray;
+	/**
+	 * Triangle 리스트의 배열
+	 * @type {TrianglesList[]}
+	 */
+	this.trianglesListsArray = [];
 };
 
+/**
+ * 생성된 객체가 있다면 삭제하고, 초기화한다.
+ */
 TrianglesMatrix.prototype.deleteObjects = function()
 {
-	if (this.trianglesListsArray === undefined)
-	{ return; }
-	
 	var trianglesListsCount = this.trianglesListsArray.length;
 	for (var i=0; i<trianglesListsCount; i++)
 	{
 		this.trianglesListsArray[i].deleteObjects();
 		this.trianglesListsArray[i] = undefined;
 	}
-	this.trianglesListsArray = undefined;
+	this.trianglesListsArray = [];
 };
 
-TrianglesMatrix.prototype.getTrianglesList = function(idx)
+/**
+ * 주어진 인덱스에 있는 TrianglesList를 가져온다.
+ * 
+ * @param {Number} index 가져올 Triangle 리스트의 인덱스 값
+ * @returns {TrianglesList} 주어진 인덱스 위치의 TrianglesList
+ */
+TrianglesMatrix.prototype.getTrianglesList = function(index)
 {
-	if (this.trianglesListsArray === undefined)
-	{ return undefined; }
-	
-	return this.trianglesListsArray[idx];
+	return this.trianglesListsArray[index];
 };
 
+/**
+ * TrianglesList 배열의 개수를 구한다.
+ * 
+ * @returns {Number} 배열의 개수
+ */
 TrianglesMatrix.prototype.getTrianglesListsCount = function()
 {
-	if (this.trianglesListsArray === undefined)
-	{ return 0; }
-	
 	return this.trianglesListsArray.length;
 };
 
+/**
+ * Triangle 객체의 리스트를 추가하고, 배열에 추가한다.
+ *
+ * @returns {TrianglesList} Triangle 객체의 리스트
+ */
 TrianglesMatrix.prototype.newTrianglesList = function()
 {
-	if (this.trianglesListsArray === undefined)
-	{ this.trianglesListsArray = []; }
-	
 	var trianglesList = new TrianglesList();
 	this.trianglesListsArray.push(trianglesList);
+
 	return trianglesList;
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param idx 변수
- * @returns vertexArray[idx]
+ * 버텍스 인덱스를 할당한다.
  */
 TrianglesMatrix.prototype.assignVerticesIdx = function() 
 {
@@ -68,24 +81,26 @@ TrianglesMatrix.prototype.assignVerticesIdx = function()
 	}
 };
 
-TrianglesMatrix.prototype.getVboFaceDataArray = function(resultVbo)
+/**
+ * 주어진 trianglesArray을 VBO face 형태의 버텍스 배열로 설정한다.
+ * 
+ * @param {} result 
+ * @returns vertexArray[idx] VBO face 형태의 버텍스 배열
+ */
+TrianglesMatrix.prototype.getVboFaceDataArray = function(result)
 {
-	// PROVISIONAL.***
-	if (this.trianglesListsArray === undefined)
-	{ return resultVbo; }
-	
+	// TODO: 정확한 입출력 결과 타입을 알 수 없음.
 	var indicesArray = [];
-	
 	var trianglesListsCount = this.trianglesListsArray.length;
 	for (var i=0; i<trianglesListsCount; i++)
 	{
 		indicesArray = this.trianglesListsArray[i].getTrianglesIndicesArray(indicesArray);
 	}
 	
-	resultVbo.idxVboDataArray = Int16Array.from(indicesArray);
-	resultVbo.indicesCount = resultVbo.idxVboDataArray.length;
+	result.idxVboDataArray = Int16Array.from(indicesArray);
+	result.indicesCount = result.idxVboDataArray.length;
 	
-	return resultVbo;
+	return result;
 };
 
 

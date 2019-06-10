@@ -1,6 +1,7 @@
 'use strict';
 
 /**
+ * The plane which can be represented as linear equation
  * Plane on 3D space. Plane equation ax+by+cz+d = 0.
  * @class Plane
  */
@@ -11,7 +12,7 @@ var Plane = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	// ax+by+cz+d = 0 plane.***
+	// ax+by+cz+d = 0 plane.
 	this.a = 0.0;
 	this.b = 0.0;
 	this.c = 0.0;
@@ -19,13 +20,13 @@ var Plane = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param px 변수
- * @param py 변수
- * @param pz 변수
- * @param nx 변수
- * @param ny 변수
- * @param nz 변수p
+ * set the point and the vector which determine this plane
+ * @param px the x coordi of the point that determine this plane
+ * @param py the y coordi of the point that determine this plane
+ * @param pz the z coordi of the point that determine this plane
+ * @param nx the x coordi of the normal vector
+ * @param ny the y coordi of the normal vector
+ * @param nz the z coordi of the normal vector
  */
 Plane.prototype.setPointAndNormal = function(px, py, pz, nx, ny, nz) 
 {
@@ -36,10 +37,10 @@ Plane.prototype.setPointAndNormal = function(px, py, pz, nx, ny, nz)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param px 변수
- * @param py 변수
- * @param pz 변수
+ * set the point which determine this plane
+ * @param px the x coordi of the point that determine this plane
+ * @param py the y coordi of the point that determine this plane
+ * @param pz the z coordi of the point that determine this plane
  */
 Plane.prototype.setPoint = function(px, py, pz) 
 {
@@ -47,11 +48,11 @@ Plane.prototype.setPoint = function(px, py, pz)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * determine this plane as normal vector and the distance from the point which determine normal vector
  * @param dist
- * @param nx 변수
- * @param ny 변수
- * @param nz 변수p
+ * @param nx the x coordi of the normal vector
+ * @param ny the y coordi of the normal vector
+ * @param nz the z coordi of the normal vector
  */
 Plane.prototype.setNormalAndDistance = function(nx, ny, nz, dist) 
 {
@@ -62,7 +63,7 @@ Plane.prototype.setNormalAndDistance = function(nx, ny, nz, dist)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * get the point of normal vector
  */
 Plane.prototype.getNormal = function(resultNormal) 
 {
@@ -75,48 +76,49 @@ Plane.prototype.getNormal = function(resultNormal)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Calculate the matrix which can rotate this plane
+ * @param resultMatrix the matrix which will hold the result
  */
 Plane.prototype.getRotationMatrix = function(resultTMatrix) 
 {
-	// The initial normal is (0, 0, 1), & the planeNormal is the transformed normal, so, calculate the rotationMatrix.***
+	// The initial normal is (0, 0, 1), & the planeNormal is the transformed normal, so, calculate the rotationMatrix.
 	var initialNormal = new Point3D(0.0, 0.0, 1.0);
 	var transformedNormal = this.getNormal(undefined);
 	
-	// Calculate rotation axis. CrossProduct between initialNormal and the transformedNormal.***
-	// Check if the "initialNormal & the transformedNormal are parallels.***
+	// Calculate rotation axis. CrossProduct between initialNormal and the transformedNormal.
+	// Check if the "initialNormal & the transformedNormal are parallels.
 	var radError = 10E-10;
 	var relativeOrientation = initialNormal.getRelativeOrientationToVector(transformedNormal, radError);
-	// relativeOrientation = 0 -> // there are parallels & the same sense.***
-	// relativeOrientation = 1 -> // there are parallels & opposite sense.***
-	// relativeOrientation = 2 -> // there are NO parallels.***
-	var matrixAux = mat4.create(); // creates as identityMatrix.***
+	// relativeOrientation = 0 -> // there are parallels & the same sense.
+	// relativeOrientation = 1 -> // there are parallels & opposite sense.
+	// relativeOrientation = 2 -> // there are NO parallels.
+	var matrixAux = glMatrix.mat4.create(); // creates as identityMatrix.
 	if (relativeOrientation === 0)
 	{
-		// there are parallels & the same sense.***
-		// In this case, the resultMatrix is a identityMatrix, so do nothing.***
+		// there are parallels & the same sense.
+		// In this case, the resultMatrix is a identityMatrix, so do nothing.
 	}
 	else if (relativeOrientation === 1)
 	{
-		// there are parallels & opposite sense.***
-		// Rotate 180 degree in xAxis.***
-		var identityMat = mat4.create();
-		matrixAux = mat4.rotateX(matrixAux, identityMat, Math.PI);
+		// there are parallels & opposite sense.
+		// Rotate 180 degree in xAxis.
+		var identityMat = glMatrix.mat4.create();
+		matrixAux = glMatrix.mat4.rotateX(matrixAux, identityMat, Math.PI);
 	}
 	else if (relativeOrientation === 2)
 	{
-		// there are NO parallels.***
-		// Calculate rotation axis. CrossProduct between initialNormal and the transformedNormal.***
+		// there are NO parallels.
+		// Calculate rotation axis. CrossProduct between initialNormal and the transformedNormal.
 		var rotAxis = initialNormal.crossProduct(transformedNormal, undefined);
 		rotAxis.unitary();
 		var angRad = initialNormal.angleRadToVector(transformedNormal);
-		var axis = vec3.fromValues(rotAxis.x, rotAxis.y, rotAxis.z);
+		var axis = glMatrix.vec3.fromValues(rotAxis.x, rotAxis.y, rotAxis.z);
 		var quaternion = quat.create();
 		quaternion = quat.setAxisAngle(quaternion, axis, angRad);
 		
-		// Now, make matrix4 from quaternion.***
-		var identityMat = mat4.create();
-		matrixAux = mat4.fromQuat(identityMat, quaternion);
+		// Now, make matrix4 from quaternion.
+		var identityMat = glMatrix.mat4.create();
+		matrixAux = glMatrix.mat4.fromQuat(identityMat, quaternion);
 	}
 	
 	if (resultTMatrix === undefined)
@@ -128,7 +130,7 @@ Plane.prototype.getRotationMatrix = function(resultTMatrix)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Get the point of the intersecting point of line and this plane
  * @param line 변수
  * @param intersectionPoint 변수
  */
@@ -157,9 +159,8 @@ Plane.prototype.intersectionLine = function(line, intersectionPoint)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param line 변수
- * @param intersectionPoint 변수
+ * Check whether the given sphere is intersected with this plane or not
+ * @param sphere sphere
  */
 Plane.prototype.intersectionSphere = function(sphere) 
 {
@@ -168,9 +169,9 @@ Plane.prototype.intersectionSphere = function(sphere)
 	
 	var sphereCenter = sphere.centerPoint;
 	
-	// calculate the distance by dotProduct.***
+	// calculate the distance by dotProduct.
 	// sphere centerPoint = (x1, y1, z1), distance = |ax1 + by1 + cz1 + d|/sqrt(a*a +b*b + c*c*).
-	// note: the module sqrt(a*a +b*b + c*c*) = 1, so no necessary divide distance by module.***
+	// note: the module sqrt(a*a +b*b + c*c*) = 1, so no necessary divide distance by module.
 	var distance = sphereCenter.x * this.a + sphereCenter.y * this.b + sphereCenter.z * this.c + this.d;
 
 	if (distance < -sphere.r)

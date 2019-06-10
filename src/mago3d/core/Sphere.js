@@ -14,7 +14,7 @@ var Sphere = function()
 	this.r = 0.0;
 	this.centerPoint = new Point3D();
 	
-	this.vboKeyContainer; // class: VBOVertexIdxCacheKeyContainer.***
+	this.vboKeyContainer; // class: VBOVertexIdxCacheKeyContainer.
 };
 
 /**
@@ -55,14 +55,14 @@ Sphere.prototype.getVbo = function(resultVboContainer, bTexCoords)
 
 	var pMesh;
 
-	// make vbo.***
+	// make vbo.
 	pMesh = this.makePMesh(pMesh);
 	var bIncludeBottomCap = false;
 	var bIncludeTopCap = false;
 	
 	var surfIndepMesh = pMesh.getSurfaceIndependentMesh(undefined, bIncludeBottomCap, bIncludeTopCap);
 	
-	// now rotate in X axis.***
+	// now rotate in X axis.
 	var rotMatAux = new Matrix4();
 	rotMatAux.rotationAxisAngDeg(90.0, 1.0, 0.0, 0.0);
 	surfIndepMesh.transformByMatrix4(rotMatAux);
@@ -71,7 +71,7 @@ Sphere.prototype.getVbo = function(resultVboContainer, bTexCoords)
 	surfIndepMesh.calculateVerticesNormals();
 	if (bTexCoords !== undefined && bTexCoords === true)
 	{
-		// calculate spherical texCoords.***
+		// calculate spherical texCoords.
 		surfIndepMesh.calculateTexCoordsSpherical();
 	}
 	surfIndepMesh.getVbo(resultVboContainer);
@@ -91,7 +91,7 @@ Sphere.prototype.makePMesh = function(resultPMesh)
 	resultPMesh.profile = new Profile(); 
 	var profileAux = resultPMesh.profile; 
 	
-	// Outer ring.**************************************
+	// Outer ring.**
 	var outerRing = profileAux.newOuterRing();
 	var polyLine, point3d, arc;
 	
@@ -109,7 +109,7 @@ Sphere.prototype.makePMesh = function(resultPMesh)
 	arc.setSweepAngleDegree(endAngDeg - startAngDeg);
 	arc.numPointsFor360Deg = 48;
 	
-	// now revolve.***
+	// now revolve.
 	var revolveAngDeg, revolveSegmentsCount, revolveSegment2d;
 	revolveAngDeg = 360;
 	revolveSegment2d = new Segment2D();

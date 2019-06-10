@@ -589,6 +589,212 @@
 				"flipYTexCoords": true
 			},
 			"children": [],
+			"data_key": "ER1",
+			"data_name": "ER1",
+			"mapping_type":"origin",
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
+			"height": 40.5,
+			"heading": 0.000000,
+			"pitch": 0.000000,
+			"roll": 0.000000
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "default",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "bs1",
+			"data_name": "bs1",
+			"mapping_type":"origin",
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
+			"height": 40.5,
+			"heading": 0.000000,
+			"pitch": 0.000000,
+			"roll": 0.000000
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "default",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "bs2",
+			"data_name": "bs2",
+			"mapping_type":"origin",
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
+			"height": 40.5,
+			"heading": 0.000000,
+			"pitch": 0.000000,
+			"roll": 0.000000
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "default",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "R1",
+			"data_name": "R1",
+			"mapping_type":"origin",
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
+			"height": 40.5,
+			"heading": 0.000000,
+			"pitch": 0.000000,
+			"roll": 0.000000
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "default",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "R2",
+			"data_name": "R2",
+			"mapping_type":"origin",
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
+			"height": 40.5,
+			"heading": 0.000000,
+			"pitch": 0.000000,
+			"roll": 0.000000
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "default",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "ts1",
+			"data_name": "ts1",
+			"mapping_type":"origin",
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
+			"height": 40.5,
+			"heading": 0.000000,
+			"pitch": 0.000000,
+			"roll": 0.000000
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "default",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "R3",
+			"data_name": "R3",
+			"mapping_type":"origin",
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
+			"height": 40.5,
+			"heading": 0.000000,
+			"pitch": 0.000000,
+			"roll": 0.000000
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "default",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "ts2",
+			"data_name": "ts2",
+			"mapping_type":"origin",
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
+			"height": 40.5,
+			"heading": 0.000000,
+			"pitch": 0.000000,
+			"roll": 0.000000
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "default",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "ts3",
+			"data_name": "ts3",
+			"mapping_type":"origin",
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
+			"height": 40.5,
+			"heading": 0.000000,
+			"pitch": 0.000000,
+			"roll": 0.000000
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "default",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "ts4",
+			"data_name": "ts4",
+			"mapping_type":"origin",
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
+			"height": 40.5,
+			"heading": 0.000000,
+			"pitch": 0.000000,
+			"roll": 0.000000
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "default",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "ts5",
+			"data_name": "ts5",
+			"mapping_type":"origin",
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
+			"height": 40.5,
+			"heading": 0.000000,
+			"pitch": 0.000000,
+			"roll": 0.000000
+		}
+		,
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "default",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "ts6",
+			"data_name": "ts6",
+			"mapping_type":"origin",
+			"latitude": 37.700715068898106,
+			"longitude": 127.17898509286478,
+			"height": 40.5,
+			"heading": 0.000000,
+			"pitch": 0.000000,
+			"roll": 0.000000
+		}
+		,
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "default",
+				"flipYTexCoords": true
+			},
+			"children": [],
 			"data_key": "00 BunYangBeSuJang",
 			"data_name": "00 문양배수장_FG",
 			"mapping_type":"origin",
