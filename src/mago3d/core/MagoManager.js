@@ -1807,9 +1807,9 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			
 		//this.modeler.mode = CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_PLANEGRID;
-		//this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
+		this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_TUNNELPOINTS;
-		this.modeler.mode = CODE.modelerMode.DRAWING_STATICGEOMETRY;
+		//this.modeler.mode = CODE.modelerMode.DRAWING_STATICGEOMETRY;
 		
 		// Calculate the geographicCoord of the click position.****
 		var geoCoord;
