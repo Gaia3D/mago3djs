@@ -162,6 +162,7 @@ void main()\n\
 ";
 ShaderSource.BoxSsaoVS = "attribute vec3 position;\n\
 attribute vec3 normal;\n\
+attribute vec2 texCoord;\n\
 attribute vec4 color4;\n\
 \n\
 uniform mat4 projectionMatrix;  \n\
@@ -1217,6 +1218,9 @@ void main()\n\
     gl_FragColor = finalColor; \n\
 }";
 ShaderSource.PointCloudVS = "attribute vec3 position;\n\
+attribute vec3 normal;\n\
+attribute vec2 texCoord;\n\
+attribute vec4 color4;\n\
 uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
 uniform vec3 buildingPosHIGH;\n\
 uniform vec3 buildingPosLOW;\n\
@@ -1228,7 +1232,6 @@ uniform float far;\n\
 uniform bool bPositionCompressed;\n\
 uniform vec3 minPosition;\n\
 uniform vec3 bboxSize;\n\
-attribute vec4 color4;\n\
 uniform bool bUse1Color;\n\
 uniform vec4 oneColor4;\n\
 uniform float fixPointSize;\n\

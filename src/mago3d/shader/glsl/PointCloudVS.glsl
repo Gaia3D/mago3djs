@@ -1,4 +1,7 @@
 attribute vec3 position;
+attribute vec3 normal;
+attribute vec2 texCoord;
+attribute vec4 color4;
 uniform mat4 ModelViewProjectionMatrixRelToEye;
 uniform vec3 buildingPosHIGH;
 uniform vec3 buildingPosLOW;
@@ -10,7 +13,6 @@ uniform float far;
 uniform bool bPositionCompressed;
 uniform vec3 minPosition;
 uniform vec3 bboxSize;
-attribute vec4 color4;
 uniform bool bUse1Color;
 uniform vec4 oneColor4;
 uniform float fixPointSize;

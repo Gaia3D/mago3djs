@@ -3289,6 +3289,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
 	gl.linkProgram(shader.program);
 			
 	shader.createUniformGenerals(gl, shader, this.sceneState);
@@ -3305,6 +3306,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.shader_fragment = this.postFxShadersManager.createShader(gl, showDepth_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
 	gl.linkProgram(shader.program);
 			
 	shader.createUniformGenerals(gl, shader, this.sceneState);
@@ -3321,6 +3323,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.shader_fragment = this.postFxShadersManager.createShader(gl, showDepth_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
 	gl.linkProgram(shader.program);
 			
 	shader.createUniformGenerals(gl, shader, this.sceneState);
@@ -3338,6 +3341,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
 	gl.linkProgram(shader.program);
 			
 	shader.createUniformGenerals(gl, shader, this.sceneState);
@@ -3356,6 +3360,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
 	gl.linkProgram(shader.program);
 			
 	shader.createUniformGenerals(gl, shader, this.sceneState);
@@ -3378,6 +3383,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
 	gl.linkProgram(shader.program);
 			
 	shader.createUniformGenerals(gl, shader, this.sceneState);
@@ -3395,6 +3401,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
 	gl.linkProgram(shader.program);
 			
 	shader.createUniformGenerals(gl, shader, this.sceneState);
@@ -3412,6 +3419,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
 	gl.linkProgram(shader.program);
 			
 	shader.createUniformGenerals(gl, shader, this.sceneState);
@@ -3428,12 +3436,17 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	ssao_vs_source = ShaderSource.PointCloudVS;
 	ssao_fs_source = ShaderSource.PointCloudSsaoFS;
 	
+	//shader.position3_loc = 0;
+	//shader.normal3_loc = 1;
+	//shader.color4_loc = 3;
+	
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.postFxShadersManager.createShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
 	shader.shader_fragment = this.postFxShadersManager.createShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
 
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
 	gl.linkProgram(shader.program);
 			
 	shader.createUniformGenerals(gl, shader, this.sceneState);

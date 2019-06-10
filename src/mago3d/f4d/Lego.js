@@ -433,6 +433,9 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader)
 		
 		if (!vbo_vicky.bindDataNormal(shader, magoManager.vboMemoryManager))
 		{ return false; }
+	
+		//if (!vbo_vicky.bindDataColor(shader, magoManager.vboMemoryManager))
+		//{ return false; }
 
 		// TODO:
 		//if (vbo_vicky.meshColorCacheKey !== undefined )

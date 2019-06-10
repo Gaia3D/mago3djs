@@ -363,6 +363,8 @@ Renderer.prototype.renderObject = function(gl, renderable, magoManager, shader, 
 	var vbosCount = vbo_vicks_container.getVbosCount();
 	for (var i=0; i<vbosCount; i++)
 	{
+		
+		
 		// 1) Position.
 		var vbo_vicky = vbo_vicks_container.vboCacheKeysArray[i]; // there are only one.
 
@@ -403,6 +405,12 @@ Renderer.prototype.renderObject = function(gl, renderable, magoManager, shader, 
 			gl.drawArrays(gl.LINE_STRIP, 0, vertices_count);
 			//gl.drawArrays(gl.TRIANGLES, 0, vertices_count);
 		}
+		
+		
+		
+		var glError = gl.getError();
+		if (glError !== gl.NO_ERROR)
+		{ var hola = 0; }
 	}
 };
 
@@ -421,6 +429,8 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 	
 	var magoManager = this.magoManager;
 	
+	
+	
 	// Test Modeler Rendering.********************************************************************
 	// Test Modeler Rendering.********************************************************************
 	// Test Modeler Rendering.********************************************************************
@@ -431,10 +441,8 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 		shaderProgram = currentShader.program;
 
 		currentShader.useProgram();
+		currentShader.disableVertexAttribArrayAll();
 		currentShader.enableVertexAttribArray(currentShader.position3_loc);
-		currentShader.disableVertexAttribArray(currentShader.texCoord2_loc);
-		currentShader.disableVertexAttribArray(currentShader.normal3_loc);
-		currentShader.disableVertexAttribArray(currentShader.color4_loc);
 
 		currentShader.bindUniformGenerals();
 
@@ -459,10 +467,9 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 		shaderProgram = currentShader.program;
 
 		currentShader.useProgram();
+		currentShader.disableVertexAttribArrayAll();
 		currentShader.enableVertexAttribArray(currentShader.position3_loc);
-		currentShader.disableVertexAttribArray(currentShader.texCoord2_loc);
-		currentShader.disableVertexAttribArray(currentShader.normal3_loc);
-		currentShader.disableVertexAttribArray(currentShader.color4_loc);
+
 		currentShader.bindUniformGenerals();
 
 		// RenderDepth for all buildings.***
@@ -486,11 +493,8 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 		currentShader.useProgram();
 		
 		currentShader.resetLastBuffersBinded();
-
+		currentShader.disableVertexAttribArrayAll();
 		currentShader.enableVertexAttribArray(currentShader.position3_loc);
-		currentShader.disableVertexAttribArray(currentShader.color4_loc);
-		currentShader.disableVertexAttribArray(currentShader.normal3_loc); // provisionally has no normals.***
-		currentShader.disableVertexAttribArray(currentShader.texCoord2_loc); // provisionally has no texCoords.***
 		
 		currentShader.bindUniformGenerals();
 		
@@ -924,12 +928,19 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		
 		
 		// 3) now render bboxes.*******************************************************************************************************************
-		if (magoManager.magoPolicy.getShowBoundingBox())
+		var nodesPcloudCount = magoManager.visibleObjControlerNodes.currentVisiblesAux.length;
+		if (nodesLOD0Count > 0 || nodesLOD2Count > 0 || nodesLOD3Count > 0 || nodesPcloudCount > 0)
 		{
-			var bRenderLines = true;
-			this.renderBoundingBoxesNodes(magoManager.visibleObjControlerNodes.currentVisibles0, undefined, bRenderLines);
-			this.renderBoundingBoxesNodes(magoManager.visibleObjControlerNodes.currentVisibles2, undefined, bRenderLines);
-			this.renderBoundingBoxesNodes(magoManager.visibleObjControlerNodes.currentVisibles3, undefined, bRenderLines);
+			if (magoManager.magoPolicy.getShowBoundingBox())
+			{
+				
+				var bRenderLines = true;
+				//var currentVisiblesArray = visibleObjControlerNodes.currentVisibles0.concat(visibleObjControlerNodes.currentVisibles2,);
+				this.renderBoundingBoxesNodes(magoManager.visibleObjControlerNodes.currentVisibles0, undefined, bRenderLines);
+				this.renderBoundingBoxesNodes(magoManager.visibleObjControlerNodes.currentVisibles2, undefined, bRenderLines);
+				this.renderBoundingBoxesNodes(magoManager.visibleObjControlerNodes.currentVisibles3, undefined, bRenderLines);
+				this.renderBoundingBoxesNodes(magoManager.visibleObjControlerNodes.currentVisiblesAux, undefined, bRenderLines);
+			}
 		}
 		
 		// 4) Render ObjectMarkers.********************************************************************************************************
@@ -1062,15 +1073,6 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 
 		}
 		
-		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		currentShader = magoManager.postFxShadersManager.getShader("modelRefSsao"); 
-		currentShader.disableVertexAttribArrayAll();
-		
-		currentShader = magoManager.postFxShadersManager.getShader("modelRefColorCoding");  // color selection shader.***
-		currentShader.disableVertexAttribArrayAll();
-		
-		currentShader = magoManager.postFxShadersManager.getModelRefSilhouetteShader(); // silhouette shader.***
-		currentShader.disableVertexAttribArrayAll();
 		
 		// Test TinTerrain.**************************************************************************
 		// Test TinTerrain.**************************************************************************
@@ -1081,19 +1083,8 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			var bDepthRender = false; // magoManager is no depth render.***
 			magoManager.tinTerrainManager.render(magoManager, bDepthRender);
 		}
-		
-		
 
 	}
-	
-	currentShader = magoManager.postFxShadersManager.getShader("modelRefSsao"); 
-	currentShader.disableVertexAttribArrayAll();
-	
-	currentShader = magoManager.postFxShadersManager.getShader("modelRefColorCoding");  // color selection shader.***
-	currentShader.disableVertexAttribArrayAll();
-	
-	currentShader = magoManager.postFxShadersManager.getModelRefSilhouetteShader(); // silhouette shader.***
-	currentShader.disableVertexAttribArrayAll();
 
 	
 	gl.disable(gl.BLEND);
@@ -1235,6 +1226,7 @@ Renderer.prototype.renderBoundingBoxesNodes = function(nodesArray, color, bRende
 	gl.frontFace(gl.CCW);
 	gl.useProgram(shaderProgram);
 	currentShader.disableVertexAttribArrayAll();
+	currentShader.disableTextureImagesUnitsAll();
 
 	gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, magoManager.sceneState.modelViewProjRelToEyeMatrix._floatArrays);
 	gl.uniformMatrix4fv(currentShader.modelViewMatrix4RelToEye_loc, false, magoManager.sceneState.modelViewRelToEyeMatrix._floatArrays); // original.***
@@ -1280,6 +1272,8 @@ Renderer.prototype.renderBoundingBoxesNodes = function(nodesArray, color, bRende
 	gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);  // original.***
 	gl.activeTexture(gl.TEXTURE1);
 	gl.bindTexture(gl.TEXTURE_2D, noiseTexture);
+	
+	
 
 	var neoBuilding;
 	var bbox;
@@ -1306,13 +1300,7 @@ Renderer.prototype.renderBoundingBoxesNodes = function(nodesArray, color, bRende
 
 	currentShader.resetLastBuffersBinded();
 	currentShader.disableVertexAttribArrayAll();
-	
-	gl.activeTexture(gl.TEXTURE0);
-	gl.bindTexture(gl.TEXTURE_2D, null);  // original.***
-	gl.activeTexture(gl.TEXTURE1);
-	gl.bindTexture(gl.TEXTURE_2D, null);
-	gl.activeTexture(gl.TEXTURE2); 
-	gl.bindTexture(gl.TEXTURE_2D, null);
+	currentShader.disableTextureImagesUnitsAll();
 	
 	gl.disable(gl.BLEND);
 };
