@@ -28,15 +28,15 @@ var CCTV = function(name)
 	
 	this.rotMat = new Matrix4();
 	this.camera = new Camera();
-	this.vboKeyContainer; // class: VBOVertexIdxCacheKeyContainer.***
-	this.vboKeyContainerEdges; // class: VBOVertexIdxCacheKeyContainer.***
+	this.vboKeyContainer; // class: VBOVertexIdxCacheKeyContainer.
+	this.vboKeyContainerEdges; // class: VBOVertexIdxCacheKeyContainer.
 	this.color = new Color();
 	this.color.setRGBA(0.0, 0.5, 0.9, 0.3);
 	this.greenFactorSpeed = 1.0;
 	this.blueFactorSpeed = 2.0;
 	this.alphaFactorSpeed = 2.0;
 	
-	this.headingAngularSpeed = 25.0; // deg per second.***
+	this.headingAngularSpeed = 25.0; // deg per second.
 	this.pitchAngularSpeed;
 	this.rollAngularSpeed; 
 	this.lastTime;
@@ -47,6 +47,8 @@ var CCTV = function(name)
 };
 
 /**
+ * Update time as current time
+ * @param currTime current time
  */
 CCTV.prototype.updateTime = function(currTime)
 {
@@ -54,6 +56,12 @@ CCTV.prototype.updateTime = function(currTime)
 };
 
 /**
+ * Calculate the angularSpped to rotate the CCTV with the three direction : heading, pitch, roll
+ * @param headingDeg
+ * @param pitchDeg
+ * @param rollDeg
+ * @param transitionTimeSec
+ * 
  */
 CCTV.prototype.setOrientation = function(headingDeg, pitchDeg, rollDeg, transitionTimeSec)
 {
@@ -61,8 +69,8 @@ CCTV.prototype.setOrientation = function(headingDeg, pitchDeg, rollDeg, transiti
 	this.targetPitch = pitchDeg;
 	this.targetRoll = rollDeg;
 	
-	// Now, calculate angularSpeeds.***
-	// Heading.***
+	// Now, calculate angularSpeeds.
+	// Heading.
 	if (this.targetHeading !== undefined)
 	{
 		var increHeading = this.targetHeading - this.heading;
@@ -75,7 +83,7 @@ CCTV.prototype.setOrientation = function(headingDeg, pitchDeg, rollDeg, transiti
 		}
 	}
 	
-	// Pitch.***
+	// Pitch.
 	if (this.targetPitch !== undefined)
 	{
 		var increPitch = this.targetPitch - this.pitch;
@@ -88,7 +96,7 @@ CCTV.prototype.setOrientation = function(headingDeg, pitchDeg, rollDeg, transiti
 		}
 	}
 	
-	// Roll.***
+	// Roll.
 	if (this.targetRoll !== undefined)
 	{
 		var increRoll = this.targetRoll - this.roll;
@@ -103,10 +111,12 @@ CCTV.prototype.setOrientation = function(headingDeg, pitchDeg, rollDeg, transiti
 };
 
 /**
+ * Rotate the CCTV with current time and pre-calculated angular speed
+ * @param currTime current time 
  */
 CCTV.prototype.updateOrientation = function(currTime)
 {
-	// Check if camera is rotating.***
+	// Check if camera is rotating.
 	if (this.targetHeading === undefined && this.targetPitch === undefined && this.targetRoll === undefined)
 	{ return; }
 	
@@ -115,14 +125,14 @@ CCTV.prototype.updateOrientation = function(currTime)
 
 	var timeAmount = (currTime - this.lastTime)/1000;
 	
-	// Heading.***
+	// Heading.
 	if (this.headingAngularSpeed !== undefined)
 	{
 		this.heading += timeAmount * this.headingAngularSpeed;
-		// Check if heading arrived to targetHeading.***
+		// Check if heading arrived to targetHeading.
 		if (this.headingAngularSpeed > 0)
 		{
-			// Camera is rotating ccw.***
+			// Camera is rotating ccw.
 			if (this.heading >= this.targetHeading)
 			{
 				this.heading = this.targetHeading;
@@ -131,7 +141,7 @@ CCTV.prototype.updateOrientation = function(currTime)
 		}
 		else 
 		{
-			// Camera is rotating cw.***
+			// Camera is rotating cw.
 			if (this.heading <= this.targetHeading)
 			{
 				this.heading = this.targetHeading;
@@ -146,15 +156,15 @@ CCTV.prototype.updateOrientation = function(currTime)
 		}
 	}
 	
-	// Pitch.***
+	// Pitch.
 	if (this.pitchAngularSpeed !== undefined)
 	{
 		this.pitch += timeAmount * this.pitchAngularSpeed;
 		
-		// Check if pitch arrived to targetPitch.***
+		// Check if pitch arrived to targetPitch.
 		if (this.pitchAngularSpeed > 0)
 		{
-			// Camera is rotating ccw.***
+			// Camera is rotating ccw.
 			if (this.pitch >= this.targetPitch)
 			{
 				this.pitch = this.targetPitch;
@@ -163,7 +173,7 @@ CCTV.prototype.updateOrientation = function(currTime)
 		}
 		else
 		{
-			// Camera is rotating cw.***
+			// Camera is rotating cw.
 			if (this.pitch <= this.targetPitch)
 			{
 				this.pitch = this.targetPitch;
@@ -178,14 +188,14 @@ CCTV.prototype.updateOrientation = function(currTime)
 		}
 	}
 	
-	// Roll.***
+	// Roll.
 	if (this.rollAngularSpeed !== undefined)
 	{
 		this.roll += timeAmount * this.rollAngularSpeed;
-		// Check if pitch arrived to targetPitch.***
+		// Check if pitch arrived to targetPitch.
 		if (this.rollAngularSpeed > 0)
 		{
-			// Camera is rotating ccw.***
+			// Camera is rotating ccw.
 			if (this.roll >= this.targetRoll)
 			{
 				this.roll = this.targetRoll;
@@ -194,7 +204,7 @@ CCTV.prototype.updateOrientation = function(currTime)
 		}
 		else 
 		{
-			// Camera is rotating cw.***
+			// Camera is rotating cw.
 			if (this.roll <= this.targetRoll)
 			{
 				this.roll = this.targetRoll;
@@ -213,10 +223,12 @@ CCTV.prototype.updateOrientation = function(currTime)
 };
 
 /**
+ * only rotating with the heading direction
+ * @param currTime current time
  */
 CCTV.prototype.updateHeading = function(currTime)
 {
-	// Old function.***
+	// Old function.
 	if (this.lastTime === undefined)
 	{ this.lastTime = currTime; }
 
@@ -238,6 +250,8 @@ CCTV.prototype.updateHeading = function(currTime)
 };
 
 /**
+ * Update the color of the screen shown at the CCTV
+ * @param currTime
  */
 CCTV.prototype.updateColor = function(currTime)
 {
@@ -246,7 +260,7 @@ CCTV.prototype.updateColor = function(currTime)
 
 	var timeAmount = (currTime - this.lastTime)/1000;
 	
-	// change color.***
+	// change color.
 	if (this.greenFactor === undefined)
 	{ this.greenFactor = 1.0; }
 	
@@ -300,6 +314,7 @@ CCTV.prototype.updateColor = function(currTime)
 };
 
 /**
+ * Calculate the matrix when update the orientation of the matrix
  */
 CCTV.prototype.calculateRotationMatrix = function()
 {
@@ -309,6 +324,10 @@ CCTV.prototype.calculateRotationMatrix = function()
 };
 
 /**
+ * get the Vbo of the mesh which consist of the frustum of this CCTV
+ * @param resultVboContainer
+ * @param resultVboContainerEdges
+ * @param vboMemManager
  */
 CCTV.prototype.getVbo = function(resultVboContainer, resultVboContainerEdges, vboMemManager)
 {
@@ -320,12 +339,12 @@ CCTV.prototype.getVbo = function(resultVboContainer, resultVboContainerEdges, vb
 
 	var frustumMesh;
 	
-	// make vbo.***
+	// make vbo.
 	frustumMesh = this.makeFrustumGeometry_2(frustumMesh);
 	var bIncludeBottomCap = true;
 	var bIncludeTopCap = true;
 	
-	// now rotate in X axis.***
+	// now rotate in X axis.
 	var rotMatAux = new Matrix4();
 	var frustum = this.camera.bigFrustum;
 	var halfFovyRad = frustum.fovyRad / 2.0;
@@ -342,6 +361,7 @@ CCTV.prototype.getVbo = function(resultVboContainer, resultVboContainerEdges, vb
 };
 
 /**
+ * 
  */
 CCTV.prototype.render = function(gl, magoManager, shader)
 {
@@ -352,12 +372,12 @@ CCTV.prototype.render = function(gl, magoManager, shader)
 	
 	//gl.uniform1i(shader.bApplySpecularLighting_loc, false);
 	
-	// Must applicate the transformMatrix.***
+	// Must applicate the transformMatrix.
 	gl.uniformMatrix4fv(shader.buildingRotMatrix_loc, false, this.geoLocationData.rotMatrix._floatArrays);
 	gl.uniform3fv(shader.buildingPosHIGH_loc, this.geoLocationData.positionHIGH);
 	gl.uniform3fv(shader.buildingPosLOW_loc, this.geoLocationData.positionLOW);
 	
-	gl.uniform1i(shader.hasTexture_loc, false); //.***
+	gl.uniform1i(shader.hasTexture_loc, false); //.
 	
 	gl.enable(gl.POLYGON_OFFSET_FILL);
 	gl.polygonOffset(1, 3);
@@ -370,13 +390,13 @@ CCTV.prototype.render = function(gl, magoManager, shader)
 	
 	var renderer = magoManager.renderer;
 	
-	// render wireframe.***
+	// render wireframe.
 	renderWireframe = true;
 	renderer.renderNormals = false;
 	gl.uniform4fv(shader.oneColor4_loc, [0.0, 0.0, 0.0, 1.0]);
 	renderer.renderVboContainer(gl, this.vboKeyContainerEdges, magoManager, shader, renderWireframe);
 	
-	// now render fill.***
+	// now render fill.
 	gl.enable(gl.BLEND);
 	renderWireframe = false;
 	renderer.renderNormals = true;
@@ -389,17 +409,19 @@ CCTV.prototype.render = function(gl, magoManager, shader)
 };
 
 /**
+ * Make Frustum Geometry for this CCTV
+ * @param resultMesh the frustum
  */
 CCTV.prototype.makeFrustumGeometry_2 = function(resultMesh)
 {
-	// 1rst, make the profile: icecream shape.***
+	// 1rst, make the profile: icecream shape.
 	if (resultMesh === undefined)
 	{ resultMesh = new ParametricMesh(); }
 
 	resultMesh.profile = new Profile2D(); 
 	var profileAux = resultMesh.profile; 
 	
-	// camera geometry values.***
+	// camera geometry values.
 	var frustum = this.camera.bigFrustum;
 	var far = frustum.far;
 	var halfFovyRad = frustum.fovyRad / 2.0;
@@ -410,7 +432,7 @@ CCTV.prototype.makeFrustumGeometry_2 = function(resultMesh)
 	var top = far * Math.tan(halfFovyRad);
 	var bottom = -top;
 	
-	// Outer ring.**************************************
+	// Outer ring.**
 	var outerRing = profileAux.newOuterRing();
 	var polyLine, point3d, arc;
 	
@@ -431,7 +453,7 @@ CCTV.prototype.makeFrustumGeometry_2 = function(resultMesh)
 	arc.setSweepAngleDegree(endAngDeg - startAngDeg);
 	arc.numPointsFor360Deg = 36;
 	
-	// now revolve.***
+	// now revolve.
 	var revolveAngDeg, revolveSegmentsCount, revolveSegment2d;
 	revolveAngDeg = (halfFovyRad * 2) * 180.0 / Math.PI;
 	revolveSegment2d = new Segment2D();
@@ -445,17 +467,19 @@ CCTV.prototype.makeFrustumGeometry_2 = function(resultMesh)
 };
 
 /**
+ * Make Frustum Geometry for this CCTV
+ * @param resultMesh the frustum
  */
 CCTV.prototype.makeFrustumGeometry = function(resultMesh)
 {
-	// make a frustum mesh.***
+	// make a frustum mesh.
 	if (resultMesh === undefined)
 	{ resultMesh = new Mesh(); }
 
 	if (resultMesh.hedgesList === undefined)
 	{ resultMesh.hedgesList = new HalfEdgesList(); }
 	
-	// 1rst, calculate the positions of 5 vertices.***
+	// 1rst, calculate the positions of 5 vertices.
 	var focusPosition = new Point3D(0.0, 0.0, 0.0);
 	
 	var frustum = this.camera.bigFrustum;
@@ -473,30 +497,30 @@ CCTV.prototype.makeFrustumGeometry = function(resultMesh)
 	var farRightTop = new Point3D(right, top, -far);
 	var farLeftTop = new Point3D(left, top, -far);
 	
-	// now make vertices. 5 vertices in total.***
+	// now make vertices. 5 vertices in total.
 	var focusVertex = new Vertex(focusPosition);
 	var farLeftDownVertex = new Vertex(farLeftDown);
 	var farRightDownVertex = new Vertex(farRightDown);
 	var farRightTopVertex = new Vertex(farRightTop);
 	var farLeftTopVertex = new Vertex(farLeftTop);
 	
-	// provisionally make wireframe here.***
+	// provisionally make wireframe here.
 	if (this.vboKeyContainerEdges === undefined)
 	{ this.vboKeyContainerEdges = new VBOVertexIdxCacheKeysContainer(); }
 
 	var face;
 	
-	// there are no near polygon.***
-	// 1- far polygon.***
+	// there are no near polygon.
+	// 1- far polygon.
 	var farSurface = resultMesh.newSurface();
 	face = farSurface.newFace();
-	// ad vertices in ccw order.***
+	// ad vertices in ccw order.
 	face.addVertex(farLeftDownVertex);
 	face.addVertex(farLeftTopVertex);
 	face.addVertex(farRightTopVertex);
 	face.addVertex(farRightDownVertex);
 	
-	// make wireframe vbo.************************************************
+	// make wireframe vbo.
 	var vertex_1, vertex_2, pos_1, pos_2;
 	var next_idx;
 	var curr_edge_idx = 0;
@@ -526,15 +550,15 @@ CCTV.prototype.makeFrustumGeometry = function(resultMesh)
 	}
 	// end make wireframe vbo.--------------------------------------------
 	
-	// 2- top polygon.***
+	// 2- top polygon.
 	var topSurface = resultMesh.newSurface();
 	face = topSurface.newFace();
-	// ad vertices in ccw order.***
+	// ad vertices in ccw order.
 	face.addVertex(focusVertex);
 	face.addVertex(farRightTopVertex);
 	face.addVertex(farLeftTopVertex);
 	
-	// make wireframe vbo.************************************************
+	// make wireframe vbo.
 	vertexCount = face.vertexArray.length;
 	for (var i=0; i<vertexCount; i++)
 	{
@@ -558,15 +582,15 @@ CCTV.prototype.makeFrustumGeometry = function(resultMesh)
 	}
 	// end make wireframe vbo.--------------------------------------------
 	
-	// 3- left polygon.***
+	// 3- left polygon.
 	var leftSurface = resultMesh.newSurface();
 	face = leftSurface.newFace();
-	// ad vertices in ccw order.***
+	// ad vertices in ccw order.
 	face.addVertex(focusVertex);
 	face.addVertex(farLeftTopVertex);
 	face.addVertex(farLeftDownVertex);
 	
-	// make wireframe vbo.************************************************
+	// make wireframe vbo.
 	vertexCount = face.vertexArray.length;
 	for (var i=0; i<vertexCount; i++)
 	{
@@ -590,15 +614,15 @@ CCTV.prototype.makeFrustumGeometry = function(resultMesh)
 	}
 	// end make wireframe vbo.--------------------------------------------
 	
-	// 4- bottom polygon.***
+	// 4- bottom polygon.
 	var bottomSurface = resultMesh.newSurface();
 	face = bottomSurface.newFace();
-	// ad vertices in ccw order.***
+	// ad vertices in ccw order.
 	face.addVertex(focusVertex);
 	face.addVertex(farLeftDownVertex);
 	face.addVertex(farRightDownVertex);
 	
-	// make wireframe vbo.************************************************
+	// make wireframe vbo.
 	vertexCount = face.vertexArray.length;
 	for (var i=0; i<vertexCount; i++)
 	{
@@ -622,15 +646,15 @@ CCTV.prototype.makeFrustumGeometry = function(resultMesh)
 	}
 	// end make wireframe vbo.--------------------------------------------
 	
-	// 5- right polygon.***
+	// 5- right polygon.
 	var rightSurface = resultMesh.newSurface();
 	face = rightSurface.newFace();
-	// ad vertices in ccw order.***
+	// ad vertices in ccw order.
 	face.addVertex(focusVertex);
 	face.addVertex(farRightDownVertex);
 	face.addVertex(farRightTopVertex);
 	
-	// make wireframe vbo.************************************************
+	// make wireframe vbo.
 	vertexCount = face.vertexArray.length;
 	for (var i=0; i<vertexCount; i++)
 	{
@@ -663,7 +687,7 @@ CCTV.prototype.makeFrustumGeometry = function(resultMesh)
 	return resultMesh;
 };
 
-// CCTVList.*********************************************************************************
+// CCTVList.
 /**
  * 카메라
  * @class CCTVList
@@ -681,6 +705,8 @@ var CCTVList = function()
 };
 
 /**
+ * Create CCTV with name
+ * @param {String} name
  */
 CCTVList.prototype.new_CCTV = function(name)
 {
@@ -693,6 +719,9 @@ CCTVList.prototype.new_CCTV = function(name)
 };
 
 /**
+ * Get single CCTV instance as the index of the instance in this CCTV list
+ * @param {Number} idx
+ * @returns {CCTV}
  */
 CCTVList.prototype.getCCTV = function(idx)
 {
@@ -700,6 +729,8 @@ CCTVList.prototype.getCCTV = function(idx)
 };
 
 /**
+ * Get single CCTV instance as the name of the instance
+ * @param {String} cameraName the name of that CCTV
  */
 CCTVList.prototype.getCCTVByName = function(cameraName)
 {
@@ -722,6 +753,8 @@ CCTVList.prototype.getCCTVByName = function(cameraName)
 };
 
 /**
+ * Get the number of the CCTV in this list 
+ * @returns {Number} count
  */
 CCTVList.prototype.getCCTVCount = function()
 {
@@ -729,6 +762,9 @@ CCTVList.prototype.getCCTVCount = function()
 };
 
 /**
+ * Update the properties of the list of CCTV with current time and render the view that each CCTV show
+ * @param {MagoManager} magoManager
+ * @param shader
  */
 CCTVList.prototype.render = function(magoManager, shader)
 {
@@ -750,10 +786,10 @@ CCTVList.prototype.render = function(magoManager, shader)
 	shader.bindUniformGenerals();
 	gl.uniform1i(shader.textureFlipYAxis_loc, magoManager.sceneState.textureFlipYAxis);
 	
-	gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
+	gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 
 	gl.activeTexture(gl.TEXTURE0);
-	gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);  // original.***
+	gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);  // original.
 	gl.activeTexture(gl.TEXTURE1);
 	gl.bindTexture(gl.TEXTURE_2D, magoManager.noiseTexture);
 	gl.activeTexture(gl.TEXTURE2);

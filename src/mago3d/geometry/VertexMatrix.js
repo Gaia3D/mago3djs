@@ -3,7 +3,12 @@
 
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Vertex Matrix (Array of VertexList)
+ * @see Vertex
+ * @see VertexList
+ * 
+ * @exception {Error} Messages.CONSTRUCT_ERROR
+ * 
  * @class VertexMatrix
  */
 var VertexMatrix = function() 
@@ -13,14 +18,24 @@ var VertexMatrix = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
+	/**
+	 * VertexList Array
+	 * @instance
+	 * @type {Array.<VertexList>}
+	 */
 	this.vertexListsArray = [];
-	// SCTRATXH.******************
+	// SCTRATXH.
+
+	/**
+	 * All Vertex array
+	 * @instance
+	 * @type {Array.<Vertex>}
+	 */
 	this.totalVertexArraySC = [];
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @returns vertexList
+ * delete all vertex.
  */
 VertexMatrix.prototype.deleteObjects = function() 
 {
@@ -33,8 +48,8 @@ VertexMatrix.prototype.deleteObjects = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @returns vertexList
+ * add vertex list and return.
+ * @returns {VertexList}}
  */
 VertexMatrix.prototype.newVertexList = function() 
 {
@@ -44,9 +59,9 @@ VertexMatrix.prototype.newVertexList = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param idx 변수
- * @returns vertexListArray[idx]
+ * get vertex list
+ * @param {Number }idx
+ * @returns {VertextList|undefined} if invalid idx, return undefined
  */
 VertexMatrix.prototype.getVertexList = function(idx) 
 {
@@ -61,8 +76,8 @@ VertexMatrix.prototype.getVertexList = function(idx)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param vertexMatrix 변수
+ * copy from another vertex matrix.
+ * @param {VertexMatrix} vertexMatrix Required.
  */
 VertexMatrix.prototype.copyFrom = function(vertexMatrix) 
 {
@@ -80,9 +95,10 @@ VertexMatrix.prototype.copyFrom = function(vertexMatrix)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param resultBox
- * @returns resultBox
+ * get bounding box this matrix.
+ * init totalVertexArraySC and get bounding box
+ * @param {BoundingBox} resultBox if this is undefined, set new BoundingBox instance.
+ * @returns {BoundingBox}
  */
 VertexMatrix.prototype.getBoundingBox = function(resultBox) 
 {
@@ -99,7 +115,10 @@ VertexMatrix.prototype.getBoundingBox = function(resultBox)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * set vertex index number in list
+ * mIdxInList is maybe wrong. 
+ * 
+ * @see Atmosphere
  */
 VertexMatrix.prototype.setVertexIdxInList = function() 
 {
@@ -117,8 +136,8 @@ VertexMatrix.prototype.setVertexIdxInList = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @returns vertexCount
+ * get total vertex count
+ * @returns {number}}
  */
 VertexMatrix.prototype.getVertexCount = function() 
 {
@@ -132,9 +151,9 @@ VertexMatrix.prototype.getVertexCount = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param resultTotalVertexArray 변수
- * @returns resultTotalVertexArray
+ * get total vertex array.
+ * @param {Array} resultTotalVertexArray 변수
+ * @returns {Array.<Vertex>}
  */
 VertexMatrix.prototype.getTotalVertexArray = function(resultTotalVertexArray) 
 {
@@ -152,9 +171,9 @@ VertexMatrix.prototype.getTotalVertexArray = function(resultTotalVertexArray)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param resultFloatArray 변수
- * @returns resultFloatArray
+ * get vertex color float array.
+ * @param {Float32Array} resultFloatArray if this is undefined, set new Float32Array instance. length = this.totalVertexArraySC.length*6
+ * @returns {Float32Array}
  */
 VertexMatrix.prototype.getVBOVertexColorFloatArray = function(resultFloatArray) 
 {
@@ -180,9 +199,9 @@ VertexMatrix.prototype.getVBOVertexColorFloatArray = function(resultFloatArray)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param resultFloatArray 변수
- * @returns resultFloatArray
+ * get vertex color with alpha float array.
+ * @param {Float32Array} resultFloatArray if this is undefined, set new Float32Array instance. length = this.totalVertexArraySC.length*7
+ * @returns {Float32Array}
  */
 VertexMatrix.prototype.getVBOVertexColorRGBAFloatArray = function(resultFloatArray) 
 {
@@ -209,9 +228,9 @@ VertexMatrix.prototype.getVBOVertexColorRGBAFloatArray = function(resultFloatArr
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param resultFloatArray 변수
- * @returns resultFloatArray
+ * get vertex basic float array.
+ * @param {Float32Array} resultFloatArray if this is undefined, set new Float32Array instance. length = this.totalVertexArraySC.length*3
+ * @returns {Float32Array}
  */
 VertexMatrix.prototype.getVBOVertexFloatArray = function(resultFloatArray) 
 {
@@ -233,11 +252,10 @@ VertexMatrix.prototype.getVBOVertexFloatArray = function(resultFloatArray)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param dirX 변수
- * @param dirY 변수
- * @param dirZ 변수
- * @param distance 변수
+ * translate vertex in vertex matrix
+ * @param {Number} dx
+ * @param {Number} dy
+ * @param {Number} dz
  */
 VertexMatrix.prototype.translateVertices = function(dx, dy, dz) 
 {
@@ -248,15 +266,15 @@ VertexMatrix.prototype.translateVertices = function(dx, dy, dz)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param tTrianglesMatrix 변수
+ * set TTrianglesMatrix using vertexMatrix.
+ * OLD function. Used for shadow blending cube. OLD.
+ * TTriangles provisional is in geometryUtils.	
+ * condition: all the vertex lists must have the same number of vertex.
+ * @param {TTrianglesMatrix} tTrianglesMatrix
  */
 VertexMatrix.prototype.makeTTrianglesLateralSidesLOOP = function(tTrianglesMatrix) 
 {
-	// OLD function. Used for shadow blending cube. OLD.***
-	// TTriangles provisional is in geometryUtils.*********
-	//-----------------------------------------------------
-	// condition: all the vertex lists must have the same number of vertex.***
+	// 
 	var vtxList1;
 	var vtxList2;
 	var tTrianglesList;
@@ -290,7 +308,17 @@ VertexMatrix.prototype.makeTTrianglesLateralSidesLOOP = function(tTrianglesMatri
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * get vertex matrix. using data array.
+ * @deprecated
+ * @static
+ * @param {Array.<Number>} positions3Array Required.
+ * @param {Array.<Number>} normals3Array
+ * @param {Array.<Number>} texCoords2Array
+ * @param {Array.<Number>} colors4Array
+ * @param {Number} numCols
+ * @param {Number} numRows
+ * @param {VertexMatrix} resultVertexMatrix if undefined, set new VertexMatrix instance.
+ * @returns {VertexMatrix} 
  */
 VertexMatrix.makeMatrixByDataArray = function(positions3Array, normals3Array, texCoords2Array, colors4Array, numCols, numRows, resultVertexMatrix) 
 {
@@ -348,33 +376,37 @@ VertexMatrix.makeMatrixByDataArray = function(positions3Array, normals3Array, te
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param resultSurface 변수
+ * make face array between two vertex lists.
+ * condition: all the vertex lists must have the same number of vertex.
+ *	 3   3-------------2  +   +-------------+  +   +-------------+  +   +-------------+
+ *	 | \   \           |  | \   \           |  | \   \           |  | \   \           |
+ *	 |   \   \  face_B |  |   \   \  face_B |  |   \   \  face_B |  |   \   \  face_B |
+ *	 |     \   \       |  |     \   \       |  |     \   \       |  |     \   \       |
+ *	 |       \   \     |  |       \   \     |  |       \   \     |  |       \   \     |
+ *	 | face_A  \   \   |  | face_A  \   \   |  | face_A  \   \   |  | face_A  \   \   |
+ *	 |           \   \ |  |           \   \ |  |           \   \ |  |           \   \ |
+ *	 0-------------1   1  +-------------+   +  +-------------+   +  +-------------+   +
+ *	
+ *	 +   +-------------+  +   +-------------+  +   +-------------+  +   +-------------+
+ *	 | \   \           |  | \   \           |  | \   \           |  | \   \           |
+ *	 |   \   \  face_B |  |   \   \  face_B |  |   \   \  face_B |  |   \   \  face_B |
+ *	 |     \   \       |  |     \   \       |  |     \   \       |  |     \   \       |
+ *	 |       \   \     |  |       \   \     |  |       \   \     |  |       \   \     |
+ *	 | face_A  \   \   |  | face_A  \   \   |  | face_A  \   \   |  | face_A  \   \   |
+ *	 |           \   \ |  |           \   \ |  |           \   \ |  |           \   \ |
+ *	 +-------------+   +  +-------------+   +  +-------------+   +  +-------------+   +
+ * @static
+ * @param {VertexList} vertexListDown Required.
+ * @param {VertexList} vertexListUp
+ * @param {Array.<Face>} resultFacesArray
+ * @param {Boolean} bLoop
+ * @param {Boolean} bClockWise
+ * @returns {VertexMatrix} 
  */
 VertexMatrix.makeFacesBetweenVertexLists = function(vertexListDown, vertexListUp, resultFacesArray, bLoop, bClockWise) 
 {
 	if (resultFacesArray === undefined)
 	{ resultFacesArray = []; }
-	
-	// condition: all the vertex lists must have the same number of vertex.***
-	
-	//  3   3-------------2  +   +-------------+  +   +-------------+  +   +-------------+
-	//  | \   \           |  | \   \           |  | \   \           |  | \   \           |
-	//  |   \   \  face_B |  |   \   \  face_B |  |   \   \  face_B |  |   \   \  face_B |
-	//  |     \   \       |  |     \   \       |  |     \   \       |  |     \   \       |
-	//  |       \   \     |  |       \   \     |  |       \   \     |  |       \   \     |
-	//  | face_A  \   \   |  | face_A  \   \   |  | face_A  \   \   |  | face_A  \   \   |
-	//  |           \   \ |  |           \   \ |  |           \   \ |  |           \   \ |
-	//  0-------------1   1  +-------------+   +  +-------------+   +  +-------------+   +
-	
-	//  +   +-------------+  +   +-------------+  +   +-------------+  +   +-------------+
-	//  | \   \           |  | \   \           |  | \   \           |  | \   \           |
-	//  |   \   \  face_B |  |   \   \  face_B |  |   \   \  face_B |  |   \   \  face_B |
-	//  |     \   \       |  |     \   \       |  |     \   \       |  |     \   \       |
-	//  |       \   \     |  |       \   \     |  |       \   \     |  |       \   \     |
-	//  | face_A  \   \   |  | face_A  \   \   |  | face_A  \   \   |  | face_A  \   \   |
-	//  |           \   \ |  |           \   \ |  |           \   \ |  |           \   \ |
-	//  +-------------+   +  +-------------+   +  +-------------+   +  +-------------+   +
 	
 	var face_A, face_B;
 	var hedge_A, hedge_B;
@@ -406,13 +438,13 @@ VertexMatrix.makeFacesBetweenVertexLists = function(vertexListDown, vertexListUp
 				
 				face_A.addVerticesArray([vertex_0, vertex_3, vertex_1]);
 				//resultHalfEdgesArray_A = face_A.createHalfEdges(resultHalfEdgesArray_A);
-				//hedge_A = resultHalfEdgesArray_A[1]; // Diagonal hedge of face_A.***
+				//hedge_A = resultHalfEdgesArray_A[1]; // Diagonal hedge of face_A.
 				
 				face_B.addVerticesArray([vertex_1, vertex_3, vertex_2]);
 				//resultHalfEdgesArray_B = face_B.createHalfEdges(resultHalfEdgesArray_B);
-				//hedge_B = resultHalfEdgesArray_B[2]; // Diagonal hedge of face_B.***
+				//hedge_B = resultHalfEdgesArray_B[2]; // Diagonal hedge of face_B.
 				
-				// Now, set twins between face_A & face_B.***
+				// Now, set twins between face_A & face_B.
 				//hedge_A.setTwin(hedge_B);
 				resultFacesArray.push(face_A);
 				resultFacesArray.push(face_B);
@@ -431,13 +463,13 @@ VertexMatrix.makeFacesBetweenVertexLists = function(vertexListDown, vertexListUp
 					
 					face_A.addVerticesArray([vertex_0, vertex_3, vertex_1]);
 					//resultHalfEdgesArray_A = face_A.createHalfEdges(resultHalfEdgesArray_A);
-					//hedge_A = resultHalfEdgesArray_A[1]; // Diagonal hedge of face_A.***
+					//hedge_A = resultHalfEdgesArray_A[1]; // Diagonal hedge of face_A.
 					
 					face_B.addVerticesArray([vertex_1, vertex_3, vertex_2]);
 					//resultHalfEdgesArray_B = face_B.createHalfEdges(resultHalfEdgesArray_B);
-					//hedge_B = resultHalfEdgesArray_B[2]; // Diagonal hedge of face_B.***
+					//hedge_B = resultHalfEdgesArray_B[2]; // Diagonal hedge of face_B.
 					
-					// Now, set twins between face_A & face_B.***
+					// Now, set twins between face_A & face_B.
 					//hedge_A.setTwin(hedge_B);
 					resultFacesArray.push(face_A);
 					resultFacesArray.push(face_B);
@@ -474,13 +506,13 @@ VertexMatrix.makeFacesBetweenVertexLists = function(vertexListDown, vertexListUp
 				
 				face_A.addVerticesArray([vertex_0, vertex_1, vertex_3]);
 				//resultHalfEdgesArray_A = face_A.createHalfEdges(resultHalfEdgesArray_A);
-				//hedge_A = resultHalfEdgesArray_A[1]; // Diagonal hedge of face_A.***
+				//hedge_A = resultHalfEdgesArray_A[1]; // Diagonal hedge of face_A.
 				
 				face_B.addVerticesArray([vertex_1, vertex_2, vertex_3]);
 				//resultHalfEdgesArray_B = face_B.createHalfEdges(resultHalfEdgesArray_B);
-				//hedge_B = resultHalfEdgesArray_B[2]; // Diagonal hedge of face_B.***
+				//hedge_B = resultHalfEdgesArray_B[2]; // Diagonal hedge of face_B.
 				
-				// Now, set twins between face_A & face_B.***
+				// Now, set twins between face_A & face_B.
 				//hedge_A.setTwin(hedge_B);
 				
 				resultFacesArray.push(face_A);
@@ -500,13 +532,13 @@ VertexMatrix.makeFacesBetweenVertexLists = function(vertexListDown, vertexListUp
 					
 					face_A.addVerticesArray([vertex_0, vertex_1, vertex_3]);
 					//resultHalfEdgesArray_A = face_A.createHalfEdges(resultHalfEdgesArray_A);
-					//hedge_A = resultHalfEdgesArray_A[1]; // Diagonal hedge of face_A.***
+					//hedge_A = resultHalfEdgesArray_A[1]; // Diagonal hedge of face_A.
 					
 					face_B.addVerticesArray([vertex_1, vertex_2, vertex_3]);
 					//resultHalfEdgesArray_B = face_B.createHalfEdges(resultHalfEdgesArray_B);
-					//hedge_B = resultHalfEdgesArray_B[2]; // Diagonal hedge of face_B.***
+					//hedge_B = resultHalfEdgesArray_B[2]; // Diagonal hedge of face_B.
 					
-					// Now, set twins between face_A & face_B.***
+					// Now, set twins between face_A & face_B.
 					//hedge_A.setTwin(hedge_B);
 					
 					resultFacesArray.push(face_A);
@@ -531,15 +563,21 @@ VertexMatrix.makeFacesBetweenVertexLists = function(vertexListDown, vertexListUp
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param resultSurface 변수
- */
+* make Surface
+* condition: all the vertex lists must have the same number of vertex.
+* @deprecated
+* @static
+* @param {VertexMatrix} vertexMatrix
+* @param {Surface} resultSurface  if undefined, set new Surface instance.
+* @param {Boolean} bLoop
+* @param {Boolean} bClockWise
+* @returns {Surface} 
+*/
 VertexMatrix.makeSurface = function(vertexMatrix, resultSurface, bLoop, bClockWise) 
 {
 	if (resultSurface === undefined)
 	{ resultSurface = new Surface(); }
 	
-	// condition: all the vertex lists must have the same number of vertex.***
 	var vtxList1;
 	var vtxList2;
 	var vertexListDown, vertexListUp;
@@ -570,12 +608,16 @@ VertexMatrix.makeSurface = function(vertexMatrix, resultSurface, bLoop, bClockWi
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param trianglesMatrix 변수
+ * set TTrianglesMatrix using vertexMatrix.
+ * OLD function. Used for shadow blending cube. OLD.
+ * TTriangles provisional is in geometryUtils.	
+ * condition: all the vertex lists must have the same number of vertex.
+ * @deprecated
+ * @param {TTrianglesMatrix} trianglesMatrix
+ * @param {Boolean} bLoop if true, include last vertex triangle
  */
 VertexMatrix.prototype.makeTrianglesLateralSides = function(trianglesMatrix, bLoop) 
 {
-	// condition: all the vertex lists must have the same number of vertex.***
 	var vtxList1;
 	var vtxList2;
 	var trianglesList;
@@ -613,19 +655,26 @@ VertexMatrix.prototype.makeTrianglesLateralSides = function(trianglesMatrix, bLo
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param trianglesMatrix 변수
- */
+* get index of array
+* return col + row * numCols;
+* @static
+* @param {Number} numCols
+* @param {Number} numRows not used.
+* @param {Number} col
+* @param {Number} row
+* @returns {Number} 
+*/
 VertexMatrix.getIndexOfArray = function(numCols, numRows, col, row) 
 {
-	// static function.***
+	// static function.
 	var idx = col + row * numCols;
 	return idx;
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param transformMatrix
+ * vertex point transform by matrix4
+ * @param {Matrix4} transformMatrix
+ * @see Matrix4#transformPoint3D
  */
 VertexMatrix.prototype.transformPointsByMatrix4 = function(transformMatrix) 
 {

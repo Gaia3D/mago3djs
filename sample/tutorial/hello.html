@@ -27,7 +27,7 @@
 
 	function startMogoUI() {
 		intervalCount++;
-		if(managerFactory != null && managerFactory.getMagoManagerState() === CODE.magoManagerState.READY) {
+		if(managerFactory != null && managerFactory.getMagoManagerState() === Mago3D.CODE.magoManagerState.READY) {
 			clearInterval(timerId);
 			console.log(" managerFactory != null, managerFactory.getMagoManagerState() = " + managerFactory.getMagoManagerState() + ", intervalCount = " + intervalCount);
 			return;
@@ -53,7 +53,7 @@
 	// init project load
 	function loadData(viewer, renderDivId, serverPolicy) {
 		if(serverPolicy.geo_data_default_projects === null || serverPolicy.geo_data_default_projects.length < 1) {
-			managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, null, null, null, imagePath);
+			managerFactory = new Mago3D.ManagerFactory(viewer, renderDivId, serverPolicy, null, null, null, imagePath);
 		} else {
 			var defaultProjectArray = serverPolicy.geo_data_default_projects;
 			var projectIdArray = new Array(defaultProjectArray.length);
@@ -86,7 +86,7 @@
 	}
 
 	function createManagerFactory(viewer, renderDivId, serverPolicy, projectIdArray, projectDataArray, projectDataFolderArray, imagePath) {
-		managerFactory = new ManagerFactory(viewer, renderDivId, serverPolicy, projectIdArray, projectDataArray, projectDataFolderArray, imagePath);
+		managerFactory = new Mago3D.ManagerFactory(viewer, renderDivId, serverPolicy, projectIdArray, projectDataArray, projectDataFolderArray, imagePath);
 	}
 </script>
 </body>

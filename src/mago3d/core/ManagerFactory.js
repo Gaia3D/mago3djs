@@ -11,7 +11,7 @@
  * @param projectDataArray data json object
  * @param projectDataFolderArray f4d data folder path
  * @param imagePath 이미지 경로
- * @return api
+ * @returns api
  */
 var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray, projectDataArray, projectDataFolderArray, imagePath) 
 {
@@ -83,54 +83,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 			}
 			
 		}, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
-		/*
-		// disable wheel for cesium.
-		var handler = magoManager.scene.screenSpaceCameraController._aggregator._eventHandler;
-        handler.removeInputAction(Cesium.ScreenSpaceEventType.WHEEL);
-        for ( var modifierName in Cesium.KeyboardEventModifier) 
-        {
-            if (Cesium.KeyboardEventModifier.hasOwnProperty(modifierName)) 
-            {
-                var modifier = Cesium.KeyboardEventModifier[modifierName];
-                if (modifier !== undefined) 
-                {
-                    handler.removeInputAction(Cesium.ScreenSpaceEventType.WHEEL, modifier);
-                }
-            }
-        }
-		
-		// make mago wheel.
-		magoManager.handler.setInputAction(function (wheelZoomAmount) {
-			var cameraHeight, directionToZoom, zoomAmount;
-			if (mousePosition) {
-				cameraHeight = viewer.scene.globe.ellipsoid.cartesianToCartographic(viewer.camera.position).height || Number.MAX_VALUE;
-				directionToZoom = viewer.camera.getPickRay(mousePosition).direction;
-				zoomAmount = wheelZoomAmount * cameraHeight / 1000;
-				
-				if(wheelZoomAmount > magoManager.TEST_maxWheelZoomAmount)
-					magoManager.TEST_maxWheelZoomAmount = wheelZoomAmount;
-				
-				if(zoomAmount > magoManager.TEST_maxZoomAmount)
-					magoManager.TEST_maxZoomAmount = zoomAmount;
-				
-				if(cameraHeight < 1000)
-				{
-					if(wheelZoomAmount > 100)
-						wheelZoomAmount = 100;
-					
-					if(zoomAmount > 80)
-						zoomAmount = 80;
-				}
-				if(directionToZoom.x > 1 || directionToZoom.y > 1 || directionToZoom.z > 1 )
-					var hola =0;
-				
-				viewer.camera.position.x = viewer.camera.position.x + directionToZoom.x * zoomAmount;
-				viewer.camera.position.y = viewer.camera.position.y + directionToZoom.y * zoomAmount;
-				viewer.camera.position.z = viewer.camera.position.z + directionToZoom.z * zoomAmount;
-				//viewer.camera.move(directionToZoom, zoomAmount);
-			}
-		}, Cesium.ScreenSpaceEventType.WHEEL);
-		*/
+
 		magoManager.handler.setInputAction(function(movement) 
 		{
 			magoManager.mouseActionLeftUp(movement.position.x, movement.position.y);
@@ -174,7 +127,6 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 	{
 		//var viewport = manager.wwd.viewport;
 		//manager.selection.init(gl, viewport.width, viewport.height);
-		manager.shadersManager.createDefaultShader(gl);
 		manager.postFxShadersManager.gl = gl;
 		manager.postFxShadersManager.createDefaultShaders(gl); // A1-OLD.***
 		manager.createDefaultShaders(gl);// A1-Use this.***
@@ -186,7 +138,12 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		{
 			for (var i=0; i<projectIdArray.length; i++) 
 			{
-				manager.getObjectIndexFile(projectIdArray[i], projectDataFolderArray[i]);
+				var projectDataFolder = projectDataFolderArray[i];
+				var projectData = projectDataArray[i];
+				if (!(projectData.data_key === projectDataFolder && projectData.attributes.isReference))
+				{
+					manager.getObjectIndexFile(projectIdArray[i], projectDataFolder);
+				}
 			}
 		}
 	}
@@ -196,7 +153,6 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 	{
 		var gl = viewer.scene.context._gl;
 		//viewer.scene.magoManager.selection.init(gl, viewer.scene.drawingBufferWidth, viewer.scene.drawingBufferHeight);
-		viewer.scene.magoManager.shadersManager.createDefaultShader(gl);
 		viewer.scene.magoManager.postFxShadersManager.gl = gl;
 		viewer.scene.magoManager.postFxShadersManager.createDefaultShaders(gl); // A1-OLD.***
 		viewer.scene.magoManager.createDefaultShaders(gl);// A1-Use this.***
@@ -215,7 +171,12 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		{
 			for (var i=0; i<projectIdArray.length; i++) 
 			{
-				viewer.scene.magoManager.getObjectIndexFile(projectIdArray[i], projectDataFolderArray[i]);
+				var projectDataFolder = projectDataFolderArray[i];
+				var projectData = projectDataArray[i];
+				if (!(projectData.data_key === projectDataFolder && projectData.attributes.isReference))
+				{
+					viewer.scene.magoManager.getObjectIndexFile(projectIdArray[i], projectDataFolder);
+				}
 			}
 		}
 		viewer.scene.magoManager.handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
@@ -232,7 +193,6 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		var gl = viewer.magoManager.sceneState.gl;
 		var manager = viewer.magoManager;
 		manager.vboMemoryManager.gl = gl;
-		manager.shadersManager.createDefaultShader(gl);
 		manager.postFxShadersManager.gl = gl;
 		manager.postFxShadersManager.createDefaultShaders(gl); // A1-OLD.***
 		manager.createDefaultShaders(gl);// A1-Use this.***
@@ -399,7 +359,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		  console.log(e); 
 		}, false);
 		//-------------------------------------------------------------
-
+		
 		if (serverPolicy.geo_server_enable === "true" && serverPolicy.geo_server_url !== null && serverPolicy.geo_server_url !== '') 
 		{
 			var imageryProvider = new Cesium.WebMapServiceImageryProvider({
@@ -727,7 +687,8 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		
 		canvas.addEventListener('resize', function(event)
 		{
-			var hola = 0; // no works.***
+			// TODO:
+			console.log("resize");
 		}, false);
 		
 		canvas.addEventListener('keydown', function(event) // no works.***

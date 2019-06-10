@@ -1,8 +1,9 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
- * @class StaticModel
+ * 정적모델데이터
+ * 
+ * @class
  */
 var StaticModel = function() 
 {
@@ -10,15 +11,37 @@ var StaticModel = function()
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
+
+	/**
+	 * 고유 아이디
+	 * @type {String}
+	 */
+	this.guid = "";
 	
-	this.guid;
-	this.modelFullPath;
-	this.neoBuilding; // F4D type data.***
+	/**
+	 * 건물 이름
+	 * @type {String}
+	 */
+	this.buildingFolderName = "";
+
+	/**
+	 * 프로젝트 이름
+	 * @type {String}
+	 */
+	this.projectFolderName= "";
+
+	/**
+	 * 건물 객체
+	 * @type {F4D}
+	 */
+	this.neoBuilding = undefined;
 };
 
+
 /**
- * 어떤 일을 하고 있습니까?
- * @class StaticModelsManager
+ * 정적모델데이터 관리자
+ * 
+ * @class
  */
 var StaticModelsManager = function() 
 {
@@ -27,41 +50,35 @@ var StaticModelsManager = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	this.staticModelsMap;
+	this.staticModelsMap = {};
 };
 
 /**
- * @class StaticModelsManager
+ * 고유아이디를 가진 정적모델데이터를 추가한다.
+ * 
+ * @param {String} guid 고유아이디
+ * @param {StaticModel} staticModel 정적모델데이터
  */
-/*
 StaticModelsManager.prototype.addStaticModel = function(guid, staticModel)
 {
-	if(this.staticModelsMap === undefined)
-		this.staticModelsMap = {};
-	
 	this.staticModelsMap[guid] = staticModel;
 };
-*/
+
 
 /**
- * @class StaticModelsManager
+ * 고유아이디를 가진 정적모델데이터를 가져온다.
+ *
+ * @param {String} guid 고유아이디
+ * @returns {StaticModel} 정적모델데이터
  */
-StaticModelsManager.prototype.getStaticModel = function(modelFullPath)
+StaticModelsManager.prototype.getStaticModel = function(guid)
 {
-	var neoBuilding;
-	
-	if (this.staticModelsMap === undefined)
-	{ this.staticModelsMap = {}; }
-	
-	neoBuilding = this.staticModelsMap[modelFullPath];
-	if (neoBuilding === undefined)
+	var staticModel = this.staticModelsMap[guid];
+	if (staticModel === undefined)
 	{
-		// Create the neoBuilding.***
-		neoBuilding = new NeoBuilding();
-		this.staticModelsMap[modelFullPath] = neoBuilding;
+		throw new Error('StaticModel is not exist.');
 	}
-	
-	return neoBuilding;
+	return staticModel;
 };
 
 

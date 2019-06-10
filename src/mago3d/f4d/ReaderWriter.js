@@ -25,6 +25,7 @@ var ReaderWriter = function()
 	this.blocksListPartitioned_requested = 0;
 	this.octreesSkinLegos_requested = 0;
 	this.skinLegos_requested = 0;
+	this.pCloudPartitionsMother_requested = 0;
 	this.pCloudPartitions_requested = 0;
 
 	this.gl;
@@ -506,7 +507,11 @@ ReaderWriter.prototype.getOctreePCloudArraybuffer = function(fileName, lowestOct
 ReaderWriter.prototype.getOctreePCloudPartitionArraybuffer = function(fileName, lowestOctree, pCloudPartitionLego, magoManager) 
 {
 	pCloudPartitionLego.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
-	magoManager.readerWriter.pCloudPartitions_requested++;
+	var octreeDepth = lowestOctree.octree_level;
+	if (octreeDepth === 0)
+	{ magoManager.readerWriter.pCloudPartitionsMother_requested++; }
+	else
+	{ magoManager.readerWriter.pCloudPartitions_requested ++; }
 	
 	loadWithXhr(fileName).done(function(response) 
 	{
@@ -532,9 +537,23 @@ ReaderWriter.prototype.getOctreePCloudPartitionArraybuffer = function(fileName, 
 		else { pCloudPartitionLego.fileLoadState = status; }
 	}).always(function() 
 	{
-		magoManager.readerWriter.pCloudPartitions_requested--;
-		if (magoManager.readerWriter.pCloudPartitions_requested < 0)
-		{ magoManager.readerWriter.pCloudPartitions_requested = 0; }
+		if (octreeDepth === 0)
+		{
+			magoManager.readerWriter.pCloudPartitionsMother_requested --;
+			if (magoManager.readerWriter.pCloudPartitionsMother_requested < 0)
+			{ magoManager.readerWriter.pCloudPartitionsMother_requested = 0; }
+		}
+		else
+		{
+			
+			magoManager.readerWriter.pCloudPartitions_requested--;
+			if (magoManager.readerWriter.pCloudPartitions_requested < 0)
+			{ magoManager.readerWriter.pCloudPartitions_requested = 0; }
+		}
+	
+		//magoManager.readerWriter.pCloudPartitions_requested--;
+		//if (magoManager.readerWriter.pCloudPartitions_requested < 0)
+		//{ magoManager.readerWriter.pCloudPartitions_requested = 0; }
 	});
 };
 
@@ -789,11 +808,6 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 			if (neoBuilding.octree === undefined) { neoBuilding.octree = new Octree(undefined); }
 			neoBuilding.octree.neoBuildingOwnerId = neoBuilding.buildingId;
 			neoBuilding.octree.octreeKey = neoBuilding.buildingId + "_" + neoBuilding.octree.octree_number_name;
-			
-			//if(neoBuilding.buildingId == "KSJ_100")
-			//{
-			//	var hola = 0;
-			//}
 			
 			// now, parse octreeAsimetric or octreePyramid (check metadata.projectDataType).***
 			if (metaData.projectDataType === 5)
@@ -1110,11 +1124,6 @@ ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer,
 						gl.generateMipmap(gl.TEXTURE_2D);
 						texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED; // file load finished.***
 						gl.bindTexture(gl.TEXTURE_2D, null);
-					}
-					else 
-					{
-						var hola = 0;
-
 					}
 				}
 			}
@@ -1444,7 +1453,7 @@ ReaderWriter.prototype.loadWMSImage = function(gl, filePath_inServer, texture, m
 		}
 	}).fail(function(status) 
 	{
-		var hola = 0;
+		console.log(status);
 		
 	}).always(function() 
 	{

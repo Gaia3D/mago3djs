@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * AnimationData
+ * manage AnimationData
  * @class AnimationData
  */
 var AnimationData = function() 
@@ -12,27 +12,31 @@ var AnimationData = function()
 	}
 	
 	this.birthTime;
-	this.lastTime; // the last update time.***
+	this.lastTime; // the last update time.
 	this.durationInSeconds;
 	
-	// target location.***
+	// start location.
+	this.startLongitude;
+	this.startLatitude;
+	this.startAltitude;
+	
+	// target location.
 	this.targetLongitude;
 	this.targetLatitude;
 	this.targetAltitude;
 	
-	// target rotation.***
+	// target rotation.
 	this.targetHeading;
 	this.targetPitch;
 	this.targetRoll;
 	
-	// linear velocity in m/s.***
+	// linear velocity in m/s.
 	this.linearVelocityInMetersSecond;
 	
-	// angular velocity deg/s.***
+	// angular velocity deg/s.
 	this.headingAngDegSecondVelocity;
 	this.pitchAngDegSecondVelocity;
 	this.rollAngDegSecondVelocity;
-	
 };
 
 /**
@@ -51,7 +55,7 @@ var AnimationManager = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * put the node which will move
  */
 AnimationManager.prototype.putNode = function(node) 
 {
@@ -63,7 +67,8 @@ AnimationManager.prototype.putNode = function(node)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Check whether this node already moved or not
+ * @param {MagoManager} magoManager
  */
 AnimationManager.prototype.checkAnimation = function(magoManager) 
 {
@@ -83,57 +88,3 @@ AnimationManager.prototype.checkAnimation = function(magoManager)
 		}
 	}
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

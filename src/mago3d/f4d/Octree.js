@@ -1,10 +1,9 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
+ * Octree class object. The octree contains detailed geometry data (meshes, points cloud, etc.).
  * @class Octree
- *
- * @param octreeOwner 변수
+ * @param {Octree} octreeOwner If octreeOwner is undefined, then this octree is the mother octree.
  */
 var Octree = function(octreeOwner) 
 {
@@ -13,48 +12,167 @@ var Octree = function(octreeOwner)
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	// Note: an octree is a cube, not a box.***
+	/**
+	 * The center position in local coordinates of the octree.
+	 * @type {Point3D}
+	 * @default (0,0,0)
+	 */
 	this.centerPos = new Point3D();
-	this.half_dx = 0.0; // half width.***
-	this.half_dy = 0.0; // half length.***
-	this.half_dz = 0.0; // half height.***
+	
+	/**
+	 * The half width of the octree in x-axis.
+	 * @type {Number}
+	 * @default 0.0
+	 */
+	this.half_dx = 0.0; 
+	
+	/**
+	 * The half width of the octree in y-axis.
+	 * @type {Number}
+	 * @default 0.0
+	 */
+	this.half_dy = 0.0; 
+	
+	/**
+	 * The half width of the octree in z-axis.
+	 * @type {Number}
+	 * @default 0.0
+	 */
+	this.half_dz = 0.0; 
 
+	/**
+	 * The octree's owner. If octree_owner is undefined, then this octree is the mother octree.
+	 * @type {Octree}
+	 * @default undefined
+	 */
 	this.octree_owner;
-	this.octree_level = 0;
-	this.octree_number_name = 0;
-	this.neoBuildingOwnerId;
-	this.neoBuildingOwner;
-	this.octreeKey; // ownerBuilding_ID + octreeNumberName, so is unique.***
-	this.lod; // lod can be 0, 1 or 2...***
-	this.distToCamera;
-	this.triPolyhedronsCount = 0; // no calculated. Readed when parsing.***
-	this.fileLoadState = CODE.fileLoadState.READY;
-
 	if (octreeOwner) 
 	{
 		this.octree_owner = octreeOwner;
 		this.octree_level = octreeOwner.octree_level + 1;
 	}
-
-	this.subOctrees_array = [];
-	this.neoReferencesMotherAndIndices; // Asimetric mode.***
-	this.lowestOctrees_array; // pre extract lowestOctrees for speedUp, if this is motherOctree.***
-
-	// now, for legoStructure.***
-	this.lego; // NetSurfaceMesh or pCloud.***
 	
-	// PointsCloud pyramidOctree data.***
-	this.pCloudPartitionsCount; // pointsCloud-pyramid-tree mode.***
+	/**
+	 * The octree's depth level. Mother octree's depth level is zero.
+	 * @type {Number}
+	 * @default 0
+	 */
+	this.octree_level = 0;
+	
+	// Octree number name.**
+	// Bottom           Top              Y
+	// +-----+-----+   +-----+-----+     ^
+	// |  4  |  3  |   |  8  |  7  |     |
+	// +-----+-----+   +-----+-----+     |
+	// |  1  |  2  |   |  5  |  6  |     |------> X
+	// +-----+-----+   +-----+-----+
+	
+	/**
+	 * The octree's identifier. Accumulative number, starting from mother octree.
+	 * @type {Number}
+	 * @default 0
+	 */
+	this.octree_number_name = 0;
+	
+	/**
+	 * The octree's neoBuildingOwner identifier.
+	 * @type {String}
+	 * @default undefined
+	 */
+	this.neoBuildingOwnerId;
+	
+	/**
+	 * The octree's neoBuildingOwner.
+	 * @type {NeoBuilding}
+	 * @default undefined
+	 */
+	this.neoBuildingOwner;
+	
+	/**
+	 * The octree's global unique identifier. It is compost by neoBuildingOwnerId + octree_number_name.
+	 * @type {String}
+	 * @default undefined
+	 */
+	this.octreeKey; 
+	
+	/**
+	 * The octree's current LOD. Assigned by distance to camera when frustumCulling.
+	 * @type {Number}
+	 * @default undefined
+	 */
+	this.lod; 
+	
+	/**
+	 * The octree's current distance to camera.
+	 * @type {Number}
+	 * @default undefined
+	 */
+	this.distToCamera;
+	
+	/**
+	 * The octree's meshes count. Readed when parsing.
+	 * @type {Number}
+	 * @default 0
+	 */
+	this.triPolyhedronsCount = 0; 
+	
+	/**
+	 * The octree's current fileLoadState.
+	 * @type {Number}
+	 * @default 0
+	 */
+	this.fileLoadState = CODE.fileLoadState.READY;
+
+	/**
+	 * The octree's children array. Array length must be 8.
+	 * @type {Array}
+	 * @default 0
+	 */
+	this.subOctrees_array = [];
+	
+	/**
+	 * The octree's meshes. The meshes of the octree are referenced by an indice.
+	 * @type {NeoReferencesMotherAndIndices}
+	 * @default undefined
+	 */
+	this.neoReferencesMotherAndIndices; 
+	
+	/**
+	 * Pre-extracted leaf octrees, to speedUp.
+	 * @type {Array}
+	 * @default undefined
+	 */
+	this.lowestOctrees_array; // pre extract lowestOctrees for speedUp, if this is motherOctree.
+
+	/**
+	 * Can be a mesh or poitsCloudPartition. Generally used to contain LOD2 meshes.
+	 * @type {Lego}
+	 * @default undefined
+	 */
+	this.lego; 
+	
+	/**
+	 * PointsCloudPartitions count.
+	 * @type {Number}
+	 * @default undefined
+	 */
+	this.pCloudPartitionsCount; // pointsCloud-pyramid-tree mode.
+	
+	/**
+	 * PointsCloudPartitions.
+	 * @type {Array}
+	 * @default undefined
+	 */
 	this.pCloudPartitionsArray;
 	
-	// v002.***
-	this.blocksListsPartitionsCount;
-	this.blocksListsPartitionsParsedCount;
+	// v002.
+	//this.blocksListsPartitionsCount;
+	//this.blocksListsPartitionsParsedCount;
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @returns subOctree 변수
+ * Creates a child octree.
+ * @returns {Octree} subOctree Returns the created child octree.
  */
 Octree.prototype.new_subOctree = function() 
 {
@@ -75,20 +193,6 @@ Octree.prototype.deleteObjectsModelReferences = function(gl, vboMemManager)
 
 	this.neoReferencesMotherAndIndices = undefined;
 
-	// delete the blocksList.***
-	if (this.neoRefsList_Array !== undefined) 
-	{
-		for (var i=0, neoRefListsCount = this.neoRefsList_Array.length; i<neoRefListsCount; i++) 
-		{
-			if (this.neoRefsList_Array[i]) 
-			{
-				this.neoRefsList_Array[i].deleteObjects(gl, vboMemManager);
-			}
-			this.neoRefsList_Array[i] = undefined;
-		}
-		this.neoRefsList_Array = undefined;
-	}
-
 	if (this.subOctrees_array !== undefined) 
 	{
 		for (var i=0, subOctreesCount = this.subOctrees_array.length; i<subOctreesCount; i++) 
@@ -106,7 +210,7 @@ Octree.prototype.deleteObjectsLego = function(gl, vboMemManager)
 {
 	if (this.lego !== undefined) 
 	{
-		// deletes the geometry and the texture.***
+		// deletes the geometry and the texture.
 		this.lego.deleteObjects(gl, vboMemManager);
 		this.lego = undefined;
 	}
@@ -138,16 +242,16 @@ Octree.prototype.deleteObjects = function(gl, vboMemManager)
 	if (this.centerPos)
 	{ this.centerPos.deleteObjects(); }
 	this.centerPos = undefined;
-	this.half_dx = undefined; // half width.***
-	this.half_dy = undefined; // half length.***
-	this.half_dz = undefined; // half height.***
+	this.half_dx = undefined; // half width.
+	this.half_dy = undefined; // half length.
+	this.half_dz = undefined; // half height.
 
 	this.octree_owner = undefined;
 	this.octree_level = undefined;
 	this.octree_number_name = undefined;
 	this.distToCamera = undefined;
-	this.triPolyhedronsCount = undefined; // no calculated. Readed when parsing.***
-	this.fileLoadState = undefined; // 0 = no started to load. 1 = started loading. 2 = finished loading. 3 = parse started. 4 = parse finished.***
+	this.triPolyhedronsCount = undefined; // no calculated. Readed when parsing.
+	this.fileLoadState = undefined; // 0 = no started to load. 1 = started loading. 2 = finished loading. 3 = parse started. 4 = parse finished.
 
 	this.neoBuildingOwner = undefined;
 
@@ -155,20 +259,6 @@ Octree.prototype.deleteObjects = function(gl, vboMemManager)
 	{ this.neoReferencesMotherAndIndices.deleteObjects(gl, vboMemManager); }
 
 	this.neoReferencesMotherAndIndices = undefined;
-
-	// delete the blocksList.***
-	if (this.neoRefsList_Array !== undefined) 
-	{
-		for (var i=0, neoRefListsCount = this.neoRefsList_Array.length; i<neoRefListsCount; i++) 
-		{
-			if (this.neoRefsList_Array[i]) 
-			{
-				this.neoRefsList_Array[i].deleteObjects(gl, vboMemManager);
-			}
-			this.neoRefsList_Array[i] = undefined;
-		}
-		this.neoRefsList_Array = undefined;
-	}
 	
 	// before deleteting child:
 	this.deletePCloudObjects(gl, vboMemManager);
@@ -193,7 +283,7 @@ Octree.prototype.deleteObjects = function(gl, vboMemManager)
  */
 Octree.prototype.deletePCloudObjects = function(gl, vboMemManager) 
 {
-	//this.pCloudPartitionsCount; // pointsCloud-pyramid-tree mode.***
+	//this.pCloudPartitionsCount; // pointsCloud-pyramid-tree mode.
 	//this.pCloudPartitionsArray;
 	
 	if (this.pCloudPartitionsArray !== undefined)
@@ -203,14 +293,14 @@ Octree.prototype.deletePCloudObjects = function(gl, vboMemManager)
 		for (var i=0; i<pCloudPartitionsCount; i++)
 		{
 			var pCloudPartition = this.pCloudPartitionsArray[i];
-			// Note: provisionally "pCloudPartition" is a lego class object.***
+			// Note: provisionally "pCloudPartition" is a lego class object.
 			pCloudPartition.deleteObjects(gl, vboMemManager);
 		}
 		
 		this.pCloudPartitionsArray = undefined;
 	}
 	
-	// Now, delete child.***
+	// Now, delete child.
 	if (this.subOctrees_array !== undefined)
 	{
 		var childsCount = this.subOctrees_array.length;
@@ -294,16 +384,16 @@ Octree.prototype.makeTree = function(treeDepth)
  */
 Octree.prototype.prepareData = function(magoManager) 
 {
-	// Function no used. Under construction.***
-	// This function prepares data in function of the current lod.***
+	// Function no used. Under construction.
+	// This function prepares data in function of the current lod.
 	if (this.lod < 2)
 	{
-		// Must prepare modelRefList data.***
+		// Must prepare modelRefList data.
 		this.prepareModelReferencesListData(magoManager);
 	}
 	else if (this.lod >= 2)
 	{
-		// Must prepare skin data.***
+		// Must prepare skin data.
 		this.prepareSkinData(magoManager);
 	}
 };
@@ -337,17 +427,17 @@ Octree.prototype.prepareSkinData = function(magoManager)
 
 	if (this.lego.fileLoadState === CODE.fileLoadState.READY)
 	{
-		// must load the legoStructure of the lowestOctree.***
+		// must load the legoStructure of the lowestOctree.
 		var subOctreeNumberName = this.octree_number_name.toString();
 		var bricks_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/Bricks";
 		var filePathInServer = bricks_folderPath + "/" + subOctreeNumberName + "_Brick";
 
-		// finally check if there are legoSimpleBuildingTexture.***
+		// finally check if there are legoSimpleBuildingTexture.
 		if (headerVersion[0] === "v")
 		{
 			if (this.lego.vbo_vicks_container.vboCacheKeysArray[0] && this.lego.vbo_vicks_container.vboCacheKeysArray[0].meshTexcoordsCacheKey)
 			{
-				// this is the old version.***
+				// this is the old version.
 				if (neoBuilding.simpleBuilding3x3Texture === undefined)
 				{
 					neoBuilding.simpleBuilding3x3Texture = new Texture();
@@ -355,7 +445,7 @@ Octree.prototype.prepareSkinData = function(magoManager)
 					var texFilePath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/SimpleBuildingTexture3x3.png";
 				}
 				
-				// Direct loading.***
+				// Direct loading.
 				if (neoBuilding.simpleBuilding3x3Texture !== undefined && neoBuilding.simpleBuilding3x3Texture.fileLoadState === CODE.fileLoadState.READY)
 				{ 
 					magoManager.readerWriter.readLegoSimpleBuildingTexture(gl, texFilePath, neoBuilding.simpleBuilding3x3Texture, magoManager); 
@@ -366,14 +456,14 @@ Octree.prototype.prepareSkinData = function(magoManager)
 			}
 			else 
 			{
-				// there are no texture in this project.***
+				// there are no texture in this project.
 				magoManager.readerWriter.getOctreeLegoArraybuffer(filePathInServer, this, magoManager);
 				
 			}
 		}
 		else 
 		{
-			// This is the version 001.***
+			// This is the version 001.
 			if (neoBuilding.simpleBuilding3x3Texture === undefined)
 			{
 				neoBuilding.simpleBuilding3x3Texture = new Texture();
@@ -382,7 +472,7 @@ Octree.prototype.prepareSkinData = function(magoManager)
 			var imageFilaName = neoBuilding.getImageFileNameForLOD(2);
 			var texFilePath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + imageFilaName;
 
-			// Direct loading.***
+			// Direct loading.
 			if (neoBuilding.simpleBuilding3x3Texture !== undefined && neoBuilding.simpleBuilding3x3Texture.fileLoadState === CODE.fileLoadState.READY)
 			{ 
 				magoManager.readerWriter.readLegoSimpleBuildingTexture(gl, texFilePath, neoBuilding.simpleBuilding3x3Texture, magoManager); 
@@ -400,7 +490,7 @@ Octree.prototype.prepareModelReferencesListData = function(magoManager)
 {
 	var neoBuilding = this.neoBuildingOwner;
 		
-	// 1rst check possibles errors.***
+	// 1rst check possibles errors.
 	if (neoBuilding === undefined)
 	{ return; }
 	
@@ -410,7 +500,7 @@ Octree.prototype.prepareModelReferencesListData = function(magoManager)
 	if (this.octree_number_name === undefined)
 	{ return; }
 
-	// Check the version.***
+	// Check the version.
 	var version = neoBuilding.getHeaderVersion();
 	if (version === "0.0.2")
 	{
@@ -440,14 +530,14 @@ Octree.prototype.prepareModelReferencesListData = function(magoManager)
 	}
 	
 	
-	// 4 = parsed.***
-	// now, check if the blocksList is loaded & parsed.***
+	// 4 = parsed.
+	// now, check if the blocksList is loaded & parsed.
 	var blocksList = this.neoReferencesMotherAndIndices.blocksList;
 	if (blocksList === undefined)
 	{ return; }
 	if (blocksList.fileLoadState === CODE.fileLoadState.READY) 
 	{
-		// must read blocksList.***
+		// must read blocksList.
 		var subOctreeNumberName = this.octree_number_name.toString();
 		var blocks_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/Models";
 		var filePathInServer = blocks_folderPath + "/" + subOctreeNumberName + "_Model";
@@ -463,7 +553,7 @@ Octree.prototype.prepareModelReferencesListData_v002 = function(magoManager)
 {
 	var neoBuilding = this.neoBuildingOwner;
 		
-	// 1rst check possibles errors.***
+	// 1rst check possibles errors.
 	if (neoBuilding === undefined)
 	{ return; }
 	
@@ -490,7 +580,7 @@ Octree.prototype.prepareModelReferencesListData_v002 = function(magoManager)
 			var blocksList = new BlocksList("0.0.2"); 
 			this.neoReferencesMotherAndIndices.blocksList = blocksList; 
 			
-			// Set blocksList partitionData.***
+			// Set blocksList partitionData.
 			blocksList.blocksArrayPartitionsCount = this.blocksListsPartitionsCount;
 
 			var subOctreeNumberName = this.octree_number_name.toString();
@@ -505,15 +595,15 @@ Octree.prototype.prepareModelReferencesListData_v002 = function(magoManager)
 		magoManager.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, this, magoManager);
 	}
 	
-	// BlocksList: must distinguish v001 to v002.***
-	// In v002, the blocksList is conformed by partitions.***
+	// BlocksList: must distinguish v001 to v002.
+	// In v002, the blocksList is conformed by partitions.
 	var blocksList = this.neoReferencesMotherAndIndices.blocksList;
 	if (blocksList === undefined)
 	{ return; }
 
 	// if (blocksList.fileLoadState === CODE.fileLoadState.READY) 
 	
-	// Load blocksListsPartition.***
+	// Load blocksListsPartition.
 
 	//if(this.blocksListsPartitionsParsedCount === undefined)
 	//	this.blocksListsPartitionsParsedCount = 0;
@@ -552,22 +642,22 @@ Octree.prototype.renderSkin = function(magoManager, neoBuilding, renderType, ren
 	if (this.lego.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
 	{ return false; }
 
-	// if the building is highlighted, the use highlight oneColor4.*********************
+	// if the building is highlighted, the use highlight oneColor4.
 	renderTexture = true;
-	gl.uniform1i(shader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.***
+	gl.uniform1i(shader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.
 	if (renderType === 1)
 	{
-		// Solve the color or texture of the skin.***
+		// Solve the color or texture of the skin.
 		if (neoBuilding.isHighLighted)
 		{
-			gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
-			gl.uniform4fv(shader.oneColor4_loc, this.highLightColor4); //.***
+			gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
+			gl.uniform4fv(shader.oneColor4_loc, this.highLightColor4); //.
 			renderTexture = false;
 		}
 		else if (neoBuilding.isColorChanged)
 		{
-			gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
-			gl.uniform4fv(shader.oneColor4_loc, [neoBuilding.aditionalColor.r, neoBuilding.aditionalColor.g, neoBuilding.aditionalColor.b, neoBuilding.aditionalColor.a]); //.***
+			gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
+			gl.uniform4fv(shader.oneColor4_loc, [neoBuilding.aditionalColor.r, neoBuilding.aditionalColor.g, neoBuilding.aditionalColor.b, neoBuilding.aditionalColor.a]); //.
 			renderTexture = false;
 		}
 
@@ -575,9 +665,9 @@ Octree.prototype.renderSkin = function(magoManager, neoBuilding, renderType, ren
 		
 		if (neoBuilding.simpleBuilding3x3Texture !== undefined && neoBuilding.simpleBuilding3x3Texture.texId && renderTexture)
 		{
-			// Provisionally flip tex coords here.***
+			// Provisionally flip tex coords here.
 			gl.uniform1i(shader.textureFlipYAxis_loc, false);//.ppp
-			gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.***
+			gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
 			if (shader.last_tex_id !== neoBuilding.simpleBuilding3x3Texture.texId)
 			{
 				//gl.activeTexture(gl.TEXTURE2); 
@@ -587,19 +677,19 @@ Octree.prototype.renderSkin = function(magoManager, neoBuilding, renderType, ren
 		}
 		else 
 		{
-			// Todo: If this building lod2 has no texture, then render with colors.***
-			//gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
+			// Todo: If this building lod2 has no texture, then render with colors.
+			//gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 			//shader.disableVertexAttribArray(shader.texCoord2_loc);
 			//renderTexture = false;
 			//-------------------------------------------------------------------------
 			
-			// If texture is no ready then return.***
+			// If texture is no ready then return.
 			return false;
 		}
 	}
 	else if (renderType === 2)
 	{
-		// Color selction mode.***
+		// Color selction mode.
 		var colorAux;
 		colorAux = magoManager.selectionColor.getAvailableColor(colorAux);
 		var idxKey = magoManager.selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
@@ -607,7 +697,7 @@ Octree.prototype.renderSkin = function(magoManager, neoBuilding, renderType, ren
 		var currentNode = currentObjectsRendering.curNode;
 		magoManager.selectionManager.setCandidates(idxKey, undefined, this, neoBuilding, currentNode);
 		
-		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
+		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 		gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
 	}
 	
@@ -623,27 +713,27 @@ Octree.prototype.renderSkin = function(magoManager, neoBuilding, renderType, ren
  */
 Octree.prototype.renderContent = function(magoManager, neoBuilding, renderType, renderTexture, shader, minSizeToRender, refMatrixIdxKey, flipYTexCoord) 
 {
-	// the content of the octree is "neoReferencesMotherAndIndices" & the netSurfaceMesh called "lego".***
-	// This function renders the "neoReferencesMotherAndIndices" or the lego.***
+	// the content of the octree is "neoReferencesMotherAndIndices" & the netSurfaceMesh called "lego".
+	// This function renders the "neoReferencesMotherAndIndices" or the lego.
 	var rendered = false;
 	var gl = magoManager.sceneState.gl;
 
 	if (this.lod < 2)
 	{
-		// 1rst check if the "neoReferencesMotherAndIndices" is ready to be rendered.***
+		// 1rst check if the "neoReferencesMotherAndIndices" is ready to be rendered.
 		if (this.neoReferencesMotherAndIndices === undefined)
 		{ return; }
 		gl.uniform1i(shader.textureFlipYAxis_loc, flipYTexCoord);//.ppp
 		rendered = this.neoReferencesMotherAndIndices.render(magoManager, neoBuilding, renderType, renderTexture, shader, minSizeToRender, refMatrixIdxKey);
 		if (!rendered)
 		{
-			// render the skinLego.***
+			// render the skinLego.
 			rendered = this.renderSkin(magoManager, neoBuilding, renderType, renderTexture, shader);
 		}
 	}
 	else if (this.lod === 2)
 	{
-		// Render the skinLego.***
+		// Render the skinLego.
 		rendered = this.renderSkin(magoManager, neoBuilding, renderType, renderTexture, shader);
 	}
 	
@@ -651,74 +741,106 @@ Octree.prototype.renderContent = function(magoManager, neoBuilding, renderType, 
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param intNumber 변수
- * @returns numDigits
+ * Returns the pointsCloud-PartitionsData count to consider for the "lod".
+ * @param {Number} lod Level of Detail.
+ * @param {Number} realPartitionsCount The real pointsCloud-PartitionsData count.
+ * @param {MagoManager} magoManager The main class manager.
+ * @returns {Number} pCloudPartitionsCount The pointsCloud-PartitionsData count to consider for the "lod".
  */
-Octree.prototype.preparePCloudData = function(magoManager, neoBuilding) 
+Octree.prototype.getPartitionsCountsForLod = function(lod, realPartitionsCount, magoManager) 
+{
+	var pCloudPartitionsCount =1;
+	if (lod === 0)
+	{ 
+		var pCloudSettings = magoManager.magoPolicy.getPointsCloudSettings();
+		pCloudPartitionsCount = realPartitionsCount; 
+		if (pCloudPartitionsCount > pCloudSettings.maxPartitionsLod0)
+		{ pCloudPartitionsCount = pCloudSettings.maxPartitionsLod0; }
+	}
+	else if (lod === 1)
+	{ 
+		var pCloudSettings = magoManager.magoPolicy.getPointsCloudSettings();
+		pCloudPartitionsCount = Math.ceil(realPartitionsCount/4); 
+		if (pCloudPartitionsCount > pCloudSettings.maxPartitionsLod1)
+		{ pCloudPartitionsCount = pCloudSettings.maxPartitionsLod1; }
+	}
+	else if (lod > 1)
+	{ pCloudPartitionsCount = 1; }
+
+	return pCloudPartitionsCount;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param {MagoManager} magoManager Main mago3d manager.
+ * @returns {Boolean} Returns if requested the points cloud data.
+ */
+Octree.prototype.preparePCloudData = function(magoManager) 
 {
 	if (this.pCloudPartitionsCount === undefined && this.pCloudPartitionsCount === 0)
-	{ return; }
+	{ return false; }
+
+	var neoBuilding = this.neoBuildingOwner;
+	if (neoBuilding === undefined)
+	{ return false; }
+
+	if (magoManager.processQueue.existOctreeToDeletePCloud(this))
+	{ return false; }
 	
 	if (this.pCloudPartitionsArray === undefined)
 	{ this.pCloudPartitionsArray = []; }
 	
-	var pCloudPartitionsCount = this.pCloudPartitionsCount;
-		
-	if (this.lod === 1)
-	{ 
-		pCloudPartitionsCount = Math.ceil(pCloudPartitionsCount/4); 
-		if (pCloudPartitionsCount > 10)
-		{ pCloudPartitionsCount = 10; }
-	}
-	else if (this.lod > 1)
-	{ pCloudPartitionsCount = 1; }
-
-	// Temporary total limiting:
-	//if(pCloudPartitionsCount > 15)
-	//	pCloudPartitionsCount = 15;
+	var pCloudPartitionsCount = this.getPartitionsCountsForLod(this.lod, this.pCloudPartitionsCount, magoManager);
 	
 	for (var i=0; i<pCloudPartitionsCount; i++)
 	{
-		if ( i < this.pCloudPartitionsArray.length )
+		var pCloudPartition = this.pCloudPartitionsArray[i];
+		if ( i < this.pCloudPartitionsArray.length)
 		{
-			// Note: "pCloudPartition" is a Lego class object provisionally.***
-			var pCloudPartition = this.pCloudPartitionsArray[i];
+			// Note: "pCloudPartition" is a Lego class object provisionally.
 			if (pCloudPartition !== undefined && pCloudPartition.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
 			{
-				// Parse data.***
-				if (magoManager.parseQueue.pCloudPartitionsParsed < 2)
+				// Parse data.
+				if (magoManager.parseQueue.pCloudPartitionsParsed < 4)
 				{
 					var gl = magoManager.sceneState.gl;
 					pCloudPartition.parsePointsCloudData(pCloudPartition.dataArrayBuffer, gl, magoManager);
 					magoManager.parseQueue.pCloudPartitionsParsed++;
-					return true;
 				}
-				if (magoManager.parseQueue.pCloudPartitionsParsed >= 2)
-				{ return true; }
 			}
-			
 		}
 		else
 		{
-			// Create the pCloudPartition.***
-			var readWriter = magoManager.readerWriter;
-
-			if (readWriter.pCloudPartitions_requested < 1 && magoManager.vboMemoryManager.currentMemoryUsage < magoManager.vboMemoryManager.buffersKeyWorld.bytesLimit/1.5)
+			if (pCloudPartition === undefined )//&& pCloudPartition.fileLoadState === CODE.fileLoadState.READY)
 			{
-				var pCloudPartitionLego = new Lego();
-				this.pCloudPartitionsArray.push(pCloudPartitionLego);
-				pCloudPartitionLego.legoKey = this.octreeKey + "_" + i.toString();
-					
-				var projectFolderName = neoBuilding.projectFolderName;
-				var buildingFolderName = neoBuilding.buildingFileName;
-				var geometryDataPath = magoManager.readerWriter.geometryDataPath;
-				var subOctreeNumberName = this.octree_number_name.toString();
-				var references_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/References";
-				var filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref_" + i.toString(); // in this case the fileName is fixed.***
-					
-				readWriter.getOctreePCloudPartitionArraybuffer(filePath, this, pCloudPartitionLego, magoManager);
-				return true;
+				// Create the pCloudPartition.
+				var readWriter = magoManager.readerWriter;
+				var pCloudPartitions_requested = 0;
+				if (this.octree_level === 0)
+				{
+					pCloudPartitions_requested = readWriter.pCloudPartitionsMother_requested;
+				}
+				else 
+				{
+					pCloudPartitions_requested = readWriter.pCloudPartitions_requested;
+				}
+				if (pCloudPartitions_requested < 3 && magoManager.vboMemoryManager.currentMemoryUsage < magoManager.vboMemoryManager.buffersKeyWorld.bytesLimit/1.5)
+				{
+					//var pCloudPartition = this.pCloudPartitionsArray[i];
+					var pCloudPartitionLego = new Lego();
+					this.pCloudPartitionsArray.push(pCloudPartitionLego);
+					pCloudPartitionLego.legoKey = this.octreeKey + "_" + i.toString();
+						
+					var projectFolderName = neoBuilding.projectFolderName;
+					var buildingFolderName = neoBuilding.buildingFileName;
+					var geometryDataPath = magoManager.readerWriter.geometryDataPath;
+					var subOctreeNumberName = this.octree_number_name.toString();
+					var references_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/References";
+					var filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref_" + i.toString(); // in this case the fileName is fixed.
+						
+					readWriter.getOctreePCloudPartitionArraybuffer(filePath, this, pCloudPartitionLego, magoManager);
+					return true;
+				}
 			}
 			
 		}
@@ -736,84 +858,65 @@ Octree.prototype.preparePCloudData = function(magoManager, neoBuilding)
  */
 Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderType, shader, relativeCam, bPrepareData) 
 {
-	// Test function to render octreePyramid-pointsCloud.***
-	// 1rst, check the number of partitions of data.***
+	// Test function to render octreePyramid-pointsCloud.
+	// 1rst, check the number of partitions of data.
 	var partitionsCount = this.pCloudPartitionsCount;
 	
 	if (partitionsCount === undefined || partitionsCount === 0)
 	{ return; }
 	
-	// Determine the distance from camera.***
+	// Determine the distance from camera.
 	var magoPolicy = magoManager.magoPolicy;
 	var camera = magoManager.sceneState.camera;
 	var cullingVolume = relativeCam.bigFrustum;
 	
-	// To calculate distToCamera use the relativeCamera.***
+	// To calculate distToCamera use the relativeCamera.
 	var cameraPosition = relativeCam.position;
-	var distToCamera = this.centerPos.distToPoint(cameraPosition) - this.getRadiusAprox();
+	var distCenterToCamera = this.centerPos.distToPoint(cameraPosition);
+	var distToCamera = distCenterToCamera - this.getRadiusAprox();
+	this.distToCamera = distToCamera; // distCenterToCamera.
 	
-	// Provisionally, determine the LOD level by "distToCam".***
+	// Put this octree into magoManager.visibleObjControlerPCloudOctrees, to load after. 
+	if (renderType === 0) // Note: It can be "renderType === 0" or "renderType === 1". The important is do this only once a frame.
+	{
+		var vocPCloudOctrees = magoManager.visibleObjControlerPCloudOctrees;
+		vocPCloudOctrees.putObjectToArraySortedByDist(vocPCloudOctrees.currentVisibles0, this);
+	}
+	
+	// Provisionally, determine the LOD level by "distToCam".
 	this.lod = magoPolicy.getLod(distToCamera);
 	
-	// Provisionally compare "this.lod" with "this.octreeLevel".***
-	
-	
+	// Provisionally compare "this.lod" with "this.octreeLevel".
 	var gl = magoManager.sceneState.gl;
 	var ssao_idx = 1;
 	
 	var frustumCull = this.intersectionFrustum(cullingVolume, magoManager.boundingSphere_Aux);
 	if (frustumCull !== Constant.INTERSECTION_OUTSIDE ) 
 	{
-		// Check if pCloud data is loaded.***
-		if (bPrepareData)
-		{
-			if (!magoManager.isCameraMoving && !magoManager.mouseLeftDown && !magoManager.mouseMiddleDown)
-			{
-				if (this.preparePCloudData(magoManager, neoBuilding))
-				{
-					bPrepareData = false;
-				}
-			}
-		}
-		
-		// Erase from deleting queue.***
+		// Erase from deleting queue.
 		magoManager.processQueue.eraseOctreeToDeletePCloud(this);
 		
 		var ssao_idx = 1;
 		if (this.pCloudPartitionsArray === undefined)
 		{ return; }
 		
-		var pCloudPartitionsCount = this.pCloudPartitionsArray.length;
-		
-		if (this.lod === 1)
-		{
-			pCloudPartitionsCount = Math.ceil(pCloudPartitionsCount/2);
-			if (pCloudPartitionsCount > 10)
-			{ pCloudPartitionsCount = 10; }
-		}
-		else if (this.lod > 1)
-		{ 
-			pCloudPartitionsCount = 1; 
-		}
+		var pCloudPartitionsCount = this.getPartitionsCountsForLod(this.lod, this.pCloudPartitionsCount, magoManager);
 
-		
 		for (var i=0; i<pCloudPartitionsCount; i++)
 		{
 			var pCloudPartition = this.pCloudPartitionsArray[i];
 			if (pCloudPartition !== undefined && pCloudPartition.fileLoadState === CODE.fileLoadState.PARSE_FINISHED)
 			{
-				// render.***
+				// render.
 				var posCompressed = pCloudPartition.bPositionsCompressed;
 				gl.uniform1i(shader.bPositionCompressed_loc, posCompressed);
 				var bbox = pCloudPartition.bbox;
-				gl.uniform3fv(shader.bboxSize_loc, [bbox.getXLength(), bbox.getYLength(), bbox.getZLength()]); //.***
-				gl.uniform3fv(shader.minPosition_loc, [bbox.minX, bbox.minY, bbox.minZ]); //.***
+				gl.uniform3fv(shader.bboxSize_loc, [bbox.getXLength(), bbox.getYLength(), bbox.getZLength()]); //.
+				gl.uniform3fv(shader.minPosition_loc, [bbox.minX, bbox.minY, bbox.minZ]); //.
 				
-				magoManager.renderer.renderPCloud(gl, pCloudPartition, magoManager, shader, ssao_idx, distToCamera, this.lod);
+				magoManager.renderer.renderPCloud(gl, pCloudPartition, magoManager, shader, renderType, distToCamera, this.lod);
 			}
-
 		}
-		
 		
 		for (var i=0, subOctreesArrayLength = this.subOctrees_array.length; i<subOctreesArrayLength; i++ ) 
 		{
@@ -821,13 +924,15 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 			subOctree.test__renderPCloud(magoManager, neoBuilding, renderType, shader, relativeCam, bPrepareData);
 		}
 		
+		magoManager.processQueue.eraseOctreeToDeletePCloud(this);
+		
 	}
 	else
 	{
-		// Delete unnecessary objects if ditToCam is big.***
+		// Delete unnecessary objects if ditToCam is big.
 		if (distToCamera > 50.0)
 		{
-			// Put octree to delete pCloud, but before, delete from the parseQueue.***
+			// Put octree to delete pCloud, but before, delete from the parseQueue.
 			if (this.pCloudPartitionsArray !== undefined)
 			{
 				var pCloudPartitionsCount = this.pCloudPartitionsArray.length;
@@ -838,7 +943,7 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 				}
 			}
 			
-			// Put octree to delete pCloud.***
+			// Put octree to delete pCloud.
 			magoManager.processQueue.putOctreeToDeletePCloud(this);
 		}
 	}
@@ -888,7 +993,7 @@ Octree.prototype.getOctree = function(octreeNumberName, numDigits)
 		else { return this.subOctrees_array[octreeNumberName-1]; }
 	}
 
-	// determine the next level octree.***
+	// determine the next level octree.
 	var exp = numDigits-1;
 	var denominator = Math.pow(10, exp);
 	var idx = Math.floor(octreeNumberName /denominator) % 10;
@@ -913,7 +1018,7 @@ Octree.prototype.getOctreeByNumberName = function(octreeNumberName)
 
 	if (motherOctree.subOctrees_array.length === 0) { return undefined; }
 
-	// determine the next level octree.***
+	// determine the next level octree.
 	var exp = numDigits-1;
 	var denominator = Math.pow(10, exp);
 	var idx = Math.floor(octreeNumberName /denominator) % 10;
@@ -926,7 +1031,7 @@ Octree.prototype.getOctreeByNumberName = function(octreeNumberName)
  */
 Octree.prototype.setSizesSubBoxes = function() 
 {
-	// Octree number name.********************************
+	// Octree number name.**
 	// Bottom                      Top
 	// |---------|---------|     |---------|---------|
 	// |         |         |     |         |         |       Y
@@ -984,9 +1089,9 @@ Octree.prototype.setBoxSize = function(Min_X, Max_X, Min_Y, Max_Y, Min_Z, Max_Z)
 	this.centerPos.y = (Max_Y + Min_Y)/2.0;
 	this.centerPos.z = (Max_Z + Min_Z)/2.0;
 
-	this.half_dx = (Max_X - Min_X)/2.0; // half width.***
-	this.half_dy = (Max_Y - Min_Y)/2.0; // half length.***
-	this.half_dz = (Max_Z - Min_Z)/2.0; // half height.***
+	this.half_dx = (Max_X - Min_X)/2.0; // half width.
+	this.half_dy = (Max_Y - Min_Y)/2.0; // half length.
+	this.half_dz = (Max_Z - Min_Z)/2.0; // half height.
 };
 
 /**
@@ -1009,32 +1114,6 @@ Octree.prototype.getRadiusAprox = function()
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param result_NeoRefListsArray 변수
- */
-Octree.prototype.getNeoRefListArray = function(result_NeoRefListsArray) 
-{
-	if (result_NeoRefListsArray === undefined) { result_NeoRefListsArray = []; }
-
-	var subOctreesArrayLength = this.subOctrees_array.length;
-	if (subOctreesArrayLength > 0) 
-	{
-		for (var i=0; i<subOctreesArrayLength; i++) 
-		{
-			this.subOctrees_array[i].getNeoRefListArray(result_NeoRefListsArray);
-		}
-	}
-	else 
-	{
-		if (this.neoRefsList_Array.length>0) // original.***
-		//if(this.triPolyhedronsCount>0)
-		{
-			result_NeoRefListsArray.push(this.neoRefsList_Array[0]); // there are only 1.***
-		}
-	}
-};
-
-/**
- * 어떤 일을 하고 있습니까?
  * @param cullingVolume 변수
  * @param result_NeoRefListsArray 변수
  * @param boundingSphere_scratch 변수
@@ -1048,10 +1127,10 @@ Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cullingVolume, v
 	var visibleOctreesArray = [];
 	var find = false;
 
-	//this.getAllSubOctrees(visibleOctreesArray); // Test.***
-	visibleOctreesArray = this.getFrustumVisibleOctreesNeoBuildingAsimetricVersion(cullingVolume, visibleOctreesArray, boundingSphere_scratch); // Original.***
+	//this.getAllSubOctrees(visibleOctreesArray); // Test.
+	visibleOctreesArray = this.getFrustumVisibleOctreesNeoBuildingAsimetricVersion(cullingVolume, visibleOctreesArray, boundingSphere_scratch); // Original.
 
-	// Now, we must sort the subOctrees near->far from eye.***
+	// Now, we must sort the subOctrees near->far from eye.
 	var visibleOctrees_count = visibleOctreesArray.length;
 	for (var i=0; i<visibleOctrees_count; i++) 
 	{
@@ -1120,9 +1199,9 @@ Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cullingVolume, v
 Octree.prototype.intersectsWithPoint3D = function(x, y, z) 
 {
 	//this.centerPos = new Point3D();
-	//this.half_dx = 0.0; // half width.***
-	//this.half_dy = 0.0; // half length.***
-	//this.half_dz = 0.0; // half height.***
+	//this.half_dx = 0.0; // half width.
+	//this.half_dy = 0.0; // half length.
+	//this.half_dz = 0.0; // half height.
 	var minX = this.centerPos.x - this.half_dx;
 	var minY = this.centerPos.y - this.half_dz;
 	var minZ = this.centerPos.z - this.half_dz;
@@ -1156,7 +1235,7 @@ Octree.prototype.getIntersectedSubBoxByPoint3D = function(x, y, z)
 {
 	if (this.octree_owner === undefined) 
 	{
-		// This is the mother_cell.***
+		// This is the mother_cell.
 		if (!this.intersectsWithPoint3D(x, y, z)) 
 		{
 			return false;
@@ -1175,32 +1254,32 @@ Octree.prototype.getIntersectedSubBoxByPoint3D = function(x, y, z)
 		var intersectedSubBox_idx;
 		if (x<center_x) 
 		{
-			// Here are the boxes number 0, 3, 4, 7.***
+			// Here are the boxes number 0, 3, 4, 7.
 			if (y<center_y) 
 			{
-				// Here are 0, 4.***
+				// Here are 0, 4.
 				if (z<center_z) { intersectedSubBox_idx = 0; }
 				else { intersectedSubBox_idx = 4; }
 			}
 			else 
 			{
-				// Here are 3, 7.***
+				// Here are 3, 7.
 				if (z<center_z) { intersectedSubBox_idx = 3; }
 				else { intersectedSubBox_idx = 7; }
 			}
 		}
 		else 
 		{
-			// Here are the boxes number 1, 2, 5, 6.***
+			// Here are the boxes number 1, 2, 5, 6.
 			if (y<center_y) 
 			{
-				// Here are 1, 5.***
+				// Here are 1, 5.
 				if (z<center_z) { intersectedSubBox_idx = 1; }
 				else { intersectedSubBox_idx = 5; }
 			}
 			else 
 			{
-				// Here are 2, 6.***
+				// Here are 2, 6.
 				if (z<center_z) { intersectedSubBox_idx = 2; }
 				else { intersectedSubBox_idx = 6; }
 			}
@@ -1223,10 +1302,10 @@ Octree.prototype.getIntersectedSubBoxByPoint3D = function(x, y, z)
  */
 Octree.prototype.getMinDistToCamera = function(cameraPosition)
 {
-	// Old function. dont use this function.***
-	// Old function. dont use this function.***
-	// Old function. dont use this function.***
-	// this function returns the minDistToCamera of the lowestOctrees.***
+	// Old function. dont use this function.
+	// Old function. dont use this function.
+	// Old function. dont use this function.
+	// this function returns the minDistToCamera of the lowestOctrees.
 	var minDistToCam = 1000000.0;
 	
 	if (this.lowestOctrees_array === undefined)
@@ -1273,7 +1352,7 @@ Octree.prototype.extractLowestOctreesByLOD = function(visibleObjControlerOctrees
 		this.extractLowestOctreesIfHasTriPolyhedrons(this.lowestOctrees_array);
 	}
 	
-	// Now, we must sort the subOctrees near->far from eye.***
+	// Now, we must sort the subOctrees near->far from eye.
 	var visibleOctrees_count = this.lowestOctrees_array.length;
 	for (var i=0; i<visibleOctrees_count; i++) 
 	{
@@ -1359,7 +1438,7 @@ Octree.prototype.intersectionFrustum = function(cullingVolume, boundingSphere_sc
  */
 Octree.prototype.getFrustumVisibleOctreesNeoBuildingAsimetricVersion = function(cullingVolume, result_octreesArray, boundingSphere_scratch) 
 {
-	// cullingVolume: Frustum class.***
+	// cullingVolume: Frustum class.
 	if (this.subOctrees_array === undefined) { return; }
 
 	if (this.subOctrees_array.length === 0 && this.triPolyhedronsCount === 0)
@@ -1511,7 +1590,7 @@ Octree.prototype.getIndexToInsertBySquaredDistToEye = function(octreesArray, oct
  */
 Octree.prototype.putOctreeInEyeDistanceSortedArray = function(result_octreesArray, octree) 
 {
-	// sorting is from minDist to maxDist.***
+	// sorting is from minDist to maxDist.
 	if (result_octreesArray.length > 0)
 	{
 		var startIdx = 0;
@@ -1545,8 +1624,7 @@ Octree.prototype.getAllSubOctreesIfHasRefLists = function(result_octreesArray)
 	}
 	else 
 	{
-		//if(this.neoRefsList_Array.length > 0)
-		if (this.triPolyhedronsCount > 0) { result_octreesArray.push(this); } // there are only 1.***
+		if (this.triPolyhedronsCount > 0) { result_octreesArray.push(this); } // there are only 1.
 	}
 };
 
@@ -1567,7 +1645,7 @@ Octree.prototype.getAllSubOctrees = function(result_octreesArray)
 	}
 	else 
 	{
-		result_octreesArray.push(this); // there are only 1.***
+		result_octreesArray.push(this); // there are only 1.
 	}
 };
 
@@ -1623,7 +1701,7 @@ Octree.prototype.multiplyKeyTransformMatrix = function(idxKey, matrix)
  */
 Octree.prototype.parseAsimetricVersion = function(arrayBuffer, readerWriter, bytesReaded, neoBuildingOwner) 
 {
-	// Check the metaData version.***
+	// Check the metaData version.
 	var version = neoBuildingOwner.getHeaderVersion();
 	
 	
@@ -1631,7 +1709,7 @@ Octree.prototype.parseAsimetricVersion = function(arrayBuffer, readerWriter, byt
 
 	if (octreeLevel === 0) 
 	{
-		// this is the mother octree, so read the mother octree's size.***
+		// this is the mother octree, so read the mother octree's size.
 		var minX = readerWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 		var maxX = readerWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 		var minY = readerWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
@@ -1643,18 +1721,18 @@ Octree.prototype.parseAsimetricVersion = function(arrayBuffer, readerWriter, byt
 		this.octree_number_name = 0;
 	}
 
-	var subOctreesCount = readerWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1; // this must be 0 or 8.***
+	var subOctreesCount = readerWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1; // this must be 0 or 8.
 	this.triPolyhedronsCount = readerWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 	if (this.triPolyhedronsCount > 0)
 	{ this.neoBuildingOwner = neoBuildingOwner; }
 
 	if (version === "0.0.2")
 	{
-		// Read ModelLists partitions count.***
+		// Read ModelLists partitions count.
 		this.blocksListsPartitionsCount = readerWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 	}
 
-	// 1rst, create the 8 subOctrees.***
+	// 1rst, create the 8 subOctrees.
 	for (var i=0; i<subOctreesCount; i++) 
 	{
 		var subOctree = this.new_subOctree();
@@ -1663,7 +1741,7 @@ Octree.prototype.parseAsimetricVersion = function(arrayBuffer, readerWriter, byt
 		subOctree.octreeKey = this.neoBuildingOwnerId + "_" + subOctree.octree_number_name;
 	}
 
-	// now, set size of subOctrees.***
+	// now, set size of subOctrees.
 	this.setSizesSubBoxes();
 
 	for (var i=0; i<subOctreesCount; i++) 
@@ -1685,7 +1763,7 @@ Octree.prototype.parsePyramidVersion = function(arrayBuffer, readerWriter, bytes
 
 	if (octreeLevel === 0) 
 	{
-		// this is the mother octree, so read the mother octree's size.***
+		// this is the mother octree, so read the mother octree's size.
 		var minX = readerWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 		var maxX = readerWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 		var minY = readerWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
@@ -1697,15 +1775,15 @@ Octree.prototype.parsePyramidVersion = function(arrayBuffer, readerWriter, bytes
 		this.octree_number_name = 0;
 	}
 
-	var subOctreesCount = readerWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1; // this must be 0 or 8.***
+	var subOctreesCount = readerWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1; // this must be 0 or 8.
 	this.triPolyhedronsCount = readerWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 	if (this.triPolyhedronsCount > 0)
 	{ this.neoBuildingOwner = neoBuildingOwner; }
 
-	// Now, read verticesArray partitions count.***
+	// Now, read verticesArray partitions count.
 	this.pCloudPartitionsCount = readerWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 
-	// 1rst, create the 8 subOctrees.***
+	// 1rst, create the 8 subOctrees.
 	for (var i=0; i<subOctreesCount; i++) 
 	{
 		var subOctree = this.new_subOctree();
@@ -1714,7 +1792,7 @@ Octree.prototype.parsePyramidVersion = function(arrayBuffer, readerWriter, bytes
 		subOctree.octreeKey = this.neoBuildingOwnerId + "_" + subOctree.octree_number_name;
 	}
 
-	// now, set size of subOctrees.***
+	// now, set size of subOctrees.
 	this.setSizesSubBoxes();
 
 	for (var i=0; i<subOctreesCount; i++) 
@@ -1741,19 +1819,19 @@ Octree.prototype.getDistToCamera = function(cameraPosition, boundingSphere_Aux)
  */
 Octree.prototype.getMinDistToCameraInTree = function(cameraPosition, boundingSphere_Aux, octreesMaxSize) 
 {
-	// If this octree size > octreesMaxSize -> down in tree.***
+	// If this octree size > octreesMaxSize -> down in tree.
 	var octreeSize = this.getRadiusAprox();
 	var subOctreesCount = this.subOctrees_array.length;
 	var dist;
 	if (octreeSize > octreesMaxSize && subOctreesCount > 0)
 	{
-		// Calculate the nearest subOctree to camera.***
+		// Calculate the nearest subOctree to camera.
 		var currDist;
 		var distCandidate;
 		var subOctreeCandidate;
 		for (var i=0; i<subOctreesCount; i++)
 		{
-			// Check if subOctree has content.***
+			// Check if subOctree has content.
 			var hasContent = false;
 			var subOctree = this.subOctrees_array[i];
 			if (subOctree.pCloudPartitionsCount && subOctree.pCloudPartitionsCount > 0)
@@ -1764,8 +1842,8 @@ Octree.prototype.getMinDistToCameraInTree = function(cameraPosition, boundingSph
 			if (!hasContent)
 			{ continue; }
 			
-			//currDist = subOctree.getDistToCamera(cameraPosition, boundingSphere_Aux); // original.***
-			currDist = subOctree.centerPos.squareDistToPoint(cameraPosition); // test.***
+			//currDist = subOctree.getDistToCamera(cameraPosition, boundingSphere_Aux); // original.
+			currDist = subOctree.centerPos.squareDistToPoint(cameraPosition); // test.
 			if (distCandidate === undefined) 
 			{
 				distCandidate = currDist;
@@ -1788,8 +1866,8 @@ Octree.prototype.getMinDistToCameraInTree = function(cameraPosition, boundingSph
 	}
 	else 
 	{
-		//dist = this.getDistToCamera(cameraPosition, boundingSphere_Aux); // original.***
-		dist = this.centerPos.distToPoint(cameraPosition); // test.***
+		//dist = this.getDistToCamera(cameraPosition, boundingSphere_Aux); // original.
+		dist = this.centerPos.distToPoint(cameraPosition); // test.
 	}
 	
 	return dist;

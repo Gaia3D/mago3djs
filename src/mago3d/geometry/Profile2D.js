@@ -13,12 +13,12 @@ var Profile2D = function()
 	}
 
 	this.outerRing; // one Ring2D. 
-	this.innerRingsList; // class: Rings2DList. 
+	this.innerRingsList; // class: Ring2DList. 
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @returns vertexList
+ * Set new outer border of this polygon as outerRing
+ * @returns {Ring2D} outerRing
  */
 Profile2D.prototype.newOuterRing = function() 
 {
@@ -33,13 +33,13 @@ Profile2D.prototype.newOuterRing = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @returns vertexList
+ * set new inner border of this polygon as innerRing
+ * @returns {Ring2D} innerRing
  */
 Profile2D.prototype.newInnerRing = function() 
 {
 	if (this.innerRingsList === undefined)
-	{ this.innerRingsList = new Rings2DList(); }
+	{ this.innerRingsList = new Ring2DList(); }
 	
 	var innerRing = this.innerRingsList.newRing();
 	
@@ -47,13 +47,13 @@ Profile2D.prototype.newInnerRing = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @returns vertexList
+ * Get the list of innerRings
+ * @returns {}
  */
 Profile2D.prototype.getInnerRingsList = function() 
 {
 	if (this.innerRingsList === undefined)
-	{ this.innerRingsList = new Rings2DList(); }
+	{ this.innerRingsList = new Ring2DList(); }
 
 	return this.innerRingsList;
 };
@@ -119,7 +119,7 @@ Profile2D.prototype.getConvexFacesIndicesData = function(resultGeneralIndicesDat
 	if (resultGeneralIndicesData === undefined)
 	{ resultGeneralIndicesData = []; }
 	
-	// 1rst, set idxInList all points.***
+	// 1rst, set idxInList all points.
 	this.outerRing.polygon.point2dList.setIdxInList();
 	
 	if (this.innerRingsList !== undefined)
@@ -152,11 +152,11 @@ Profile2D.prototype.getConvexFacesIndicesData = function(resultGeneralIndicesDat
 			indexData.idxInList = point.idxInList;
 			if (currRing === this.outerRing)
 			{
-				ringIdxInList = -1; // Set idx of outerRing as -1.***
+				ringIdxInList = -1; // Set idx of outerRing as -1.
 			}
 			else 
 			{
-				ringIdxInList = this.innerRingsList.getRingIdx(currRing);
+				ringIdxInList = this.innerRingsList.getRingIndex(currRing);
 			}
 			indexData.ownerIdx = ringIdxInList;
 			convexDatas.push(indexData);
@@ -175,12 +175,12 @@ Profile2D.prototype.getConvexFacesIndicesData = function(resultGeneralIndicesDat
  
 Profile2D.prototype.getGeneralPolygon = function(generalPolygon) 
 {
-	// this returns a holesTessellatedPolygon, and inside it has convexPolygons.***
-	this.checkNormals(); // here makes outer & inner's polygons.***
+	// this returns a holesTessellatedPolygon, and inside it has convexPolygons.
+	this.checkNormals(); // here makes outer & inner's polygons.
 	
 	if (!this.hasHoles())
 	{
-		// Simply, put all points of outerPolygon into generalPolygon(computingPolygon).***
+		// Simply, put all points of outerPolygon into generalPolygon(computingPolygon).
 		if (generalPolygon === undefined)
 		{ generalPolygon = new Polygon2D(); }
 		
@@ -198,7 +198,7 @@ Profile2D.prototype.getGeneralPolygon = function(generalPolygon)
 	}
 	else 
 	{
-		// 1rst, check normals congruences.***
+		// 1rst, check normals congruences.
 		generalPolygon = this.tessellateHoles(generalPolygon);
 	}
 	
@@ -221,7 +221,7 @@ Profile2D.prototype.eliminateHolePolygonBySplitPoints = function(outerPolygon, i
 	if (resultPolygon.point2dList === undefined)
 	{ resultPolygon.point2dList = new Point2DList(); }
 	
-	// 1rst, copy in newPolygon the outerPolygon.***
+	// 1rst, copy in newPolygon the outerPolygon.
 	var outerPointsCount = outerPolygon.point2dList.getPointsCount();
 	var finished = false;
 	var i=0;
@@ -239,14 +239,14 @@ Profile2D.prototype.eliminateHolePolygonBySplitPoints = function(outerPolygon, i
 		{
 			finished = true;
 			
-			// must add the firstPoint point.***
+			// must add the firstPoint point.
 			outerPoint = outerPolygon.point2dList.getPoint(currIdx);
 			resultPolygon.point2dList.addPoint(outerPoint);
 		}
 		
 		i++;
 	}
-	// now add innerPolygon's points.***
+	// now add innerPolygon's points.
 	var innerPointsCount = innerPolygon.point2dList.getPointsCount();
 	finished = false;
 	i=0;
@@ -262,7 +262,7 @@ Profile2D.prototype.eliminateHolePolygonBySplitPoints = function(outerPolygon, i
 		if (currIdx === innerPointIdx)
 		{
 			finished = true;
-			// must add the firstPoint point.***
+			// must add the firstPoint point.
 			innerPoint = innerPolygon.point2dList.getPoint(currIdx);
 			resultPolygon.point2dList.addPoint(innerPoint);
 		}
@@ -279,7 +279,7 @@ Profile2D.prototype.eliminateHolePolygonBySplitPoints = function(outerPolygon, i
  */
 Profile2D.prototype.eliminateHolePolygon = function(computingPolygon, innerRing, innerPointIdx, resultPolygon) 
 {
-	// 1rst, make a sorted by dist of points of outer to "innerPoint".***
+	// 1rst, make a sorted by dist of points of outer to "innerPoint".
 	var resultSortedPointsIdxArray = [];
 	var innerPolygon = innerRing.polygon;
 	var innerPoint = innerPolygon.point2dList.getPoint(innerPointIdx);
@@ -297,7 +297,7 @@ Profile2D.prototype.eliminateHolePolygon = function(computingPolygon, innerRing,
 		outPoint = computingPolygon.point2dList.getPoint(outPointIdx);
 		splitSegment.setPoints(outPoint, innerPoint);
 		
-		// check if splitSegment intersects the computingPolygon or any innerPolygons.***
+		// check if splitSegment intersects the computingPolygon or any innerPolygons.
 		if (computingPolygon.intersectionWithSegment(splitSegment) || innerPolygon.intersectionWithSegment(splitSegment))
 		{
 			i++;
@@ -338,14 +338,14 @@ Profile2D.prototype.tessellateHoles = function(resultHolesEliminatedPolygon)
 	var innerPointIdx;
 	var innersBRect;
 	
-	// prepare outerRing if necessary.***
+	// prepare outerRing if necessary.
 	var outerRing = this.outerRing;
 	if (outerRing.polygon === undefined)
 	{ outerRing.makePolygon(); }
 	var outerPolygon = outerRing.polygon;
 	var concavePointsIndices = outerPolygon.calculateNormal(concavePointsIndices);
 	
-	// make a innerRingsArray copy.***
+	// make a innerRingsArray copy.
 	var innerRingsArray = [];
 	var innerRingsCount = this.innerRingsList.getRingsCount();
 	for (var i=0; i<innerRingsCount; i++)
@@ -357,7 +357,7 @@ Profile2D.prototype.tessellateHoles = function(resultHolesEliminatedPolygon)
 	var computingPolygon = new Polygon2D();
 	computingPolygon.point2dList = new Point2DList();
 	
-	// put all points of outerPolygon into computingPolygon.***
+	// put all points of outerPolygon into computingPolygon.
 	var indexData;
 	var point;
 	var outerPointsCount = outerPolygon.point2dList.getPointsCount();
@@ -370,18 +370,18 @@ Profile2D.prototype.tessellateHoles = function(resultHolesEliminatedPolygon)
 	var innersBRectLeftDownPoint = new Point2D();
 	var objectsArray = [];
 	
-	// now, for each innerRing, try to merge to outerRing by splitSegment.***
+	// now, for each innerRing, try to merge to outerRing by splitSegment.
 	var innerRingsCount = innerRingsArray.length;
 	var i=0;
 	var finished = false;
 	while (!finished && i<innerRingsCount)
 	{
-		// calculate the most left-down innerRing.***
-		innersBRect = Rings2DList.getBoundingRectangle(innerRingsArray, innersBRect);
+		// calculate the most left-down innerRing.
+		innersBRect = Ring2DList.getBoundingRectangle(innerRingsArray, innersBRect);
 		innersBRectLeftDownPoint.set(innersBRect.minX, innersBRect.minY);
 		
-		objectsArray.length = 0; // init.***
-		objectsArray = Rings2DList.getSortedRingsByDistToPoint(innersBRectLeftDownPoint, innerRingsArray, objectsArray);
+		objectsArray.length = 0; // init.
+		objectsArray = Ring2DList.getSortedRingsByDistToPoint(innersBRectLeftDownPoint, innerRingsArray, objectsArray);
 	
 		objectAux = objectsArray[0];
 		hole = objectAux.ring;
@@ -399,7 +399,7 @@ Profile2D.prototype.tessellateHoles = function(resultHolesEliminatedPolygon)
 				finished = true;
 				break;
 			}
-			// erase the hole from innerRingsArray.***
+			// erase the hole from innerRingsArray.
 			innerRingsArray.splice(holeIdx, 1);
 			resultPolygon = new Polygon2D();
 		}
@@ -418,7 +418,7 @@ Profile2D.prototype.checkNormals = function()
 	if (this.outerRing === undefined)
 	{ return; }
 	
-	// 1rst, calculate the outerNormal.***
+	// 1rst, calculate the outerNormal.
 	var outerRing = this.outerRing;
 	if (outerRing.polygon === undefined)
 	{ outerRing.makePolygon(); }
@@ -429,7 +429,7 @@ Profile2D.prototype.checkNormals = function()
 	if (this.innerRingsList === undefined)
 	{ return; }
 	
-	// if there are inners, the innerNormals must be inverse of the outerNormal.***
+	// if there are inners, the innerNormals must be inverse of the outerNormal.
 	var innerRing;
 	var innerPolygon;
 	var innerNormal;
@@ -445,7 +445,7 @@ Profile2D.prototype.checkNormals = function()
 		
 		if (innerNormal === outerNormal)
 		{
-			// then reverse innerPolygon.***
+			// then reverse innerPolygon.
 			innerPolygon.reverseSense();
 			innerPolygon.normal = -innerNormal;
 		}
@@ -458,7 +458,7 @@ Profile2D.prototype.checkNormals = function()
  */
 Profile2D.prototype.TEST__setFigure_1 = function() 
 {
-	// complicated polygon with multiple holes.***
+	// complicated polygon with multiple holes.
 	var polyLine;
 	var arc;
 	var circle;
@@ -466,7 +466,7 @@ Profile2D.prototype.TEST__setFigure_1 = function()
 	var point3d;
 	var star;
 	
-	// Outer ring.**************************************
+	// Outer ring.**
 	var outerRing = this.newOuterRing();
 	polyLine = outerRing.newElement("POLYLINE");
 	point3d = polyLine.newPoint2d(7, 7); // 0
@@ -481,7 +481,7 @@ Profile2D.prototype.TEST__setFigure_1 = function()
 	arc.setSweepAngleDegree(180.0);
 	arc.numPointsFor360Deg = 24;
 	
-	// hole.***
+	// hole.
 	var innerRing = this.newInnerRing();
 	rect = innerRing.newElement("RECTANGLE");
 	rect.setCenterPosition(3, 3);
@@ -493,7 +493,7 @@ Profile2D.prototype.TEST__setFigure_1 = function()
  */
 Profile2D.prototype.TEST__setFigure_2holes = function() 
 {
-	// complicated polygon with multiple holes.***
+	// complicated polygon with multiple holes.
 	var polyLine;
 	var arc;
 	var circle;
@@ -501,7 +501,7 @@ Profile2D.prototype.TEST__setFigure_2holes = function()
 	var point3d;
 	var star;
 	
-	// Outer ring.**************************************
+	// Outer ring.**
 	var outerRing = this.newOuterRing();
 	polyLine = outerRing.newElement("POLYLINE");
 	point3d = polyLine.newPoint2d(7, 7); // 0
@@ -516,13 +516,13 @@ Profile2D.prototype.TEST__setFigure_2holes = function()
 	arc.setSweepAngleDegree(180.0);
 	arc.numPointsFor360Deg = 24;
 	
-	// hole 1.***
+	// hole 1.
 	var innerRing = this.newInnerRing();
 	rect = innerRing.newElement("RECTANGLE");
 	rect.setCenterPosition(3, 3);
 	rect.setDimensions(2, 2);
 	
-	// hole 2.***
+	// hole 2.
 	innerRing = this.newInnerRing();
 	circle = innerRing.newElement("CIRCLE");
 	circle.setCenterPosition(7, 3);
@@ -534,7 +534,7 @@ Profile2D.prototype.TEST__setFigure_2holes = function()
  */
 Profile2D.prototype.TEST__setFigureHole_2 = function() 
 {
-	// complicated polygon with multiple holes.***
+	// complicated polygon with multiple holes.
 	var polyLine;
 	var arc;
 	var circle;
@@ -542,7 +542,7 @@ Profile2D.prototype.TEST__setFigureHole_2 = function()
 	var point3d;
 	var star;
 	
-	// Outer ring.**************************************
+	// Outer ring.**
 	var outerRing = this.newOuterRing();
 	
 	polyLine = outerRing.newElement("POLYLINE");
@@ -643,8 +643,8 @@ Profile2D.prototype.TEST__setFigureHole_2 = function()
 	arc.setSweepAngleDegree(90.0);
 	arc.numPointsFor360Deg = 24;
 	
-	// Holes.**************************************************
-	// Hole 1.*************************************************
+	// Holes.**
+	// Hole 1.*
 	var innerRing = this.newInnerRing();
 	
 	polyLine = innerRing.newElement("POLYLINE");
@@ -689,13 +689,13 @@ Profile2D.prototype.TEST__setFigureHole_2 = function()
 	
 	
 		
-	// Hole 2.*************************************************
+	// Hole 2.*
 	innerRing = this.newInnerRing();
 	circle = innerRing.newElement("CIRCLE");
 	circle.setCenterPosition(-10, -13);
 	circle.setRadius(1);
 	
-	// Hole 3.*************************************************
+	// Hole 3.*
 	innerRing = this.newInnerRing();
 	star = innerRing.newElement("STAR");
 	star.setCenterPosition(-6.5, -14);
@@ -703,7 +703,7 @@ Profile2D.prototype.TEST__setFigureHole_2 = function()
 	star.setInteriorRadius(0.6);
 	star.setExteriorRadius(2);
 
-	// Hole 4.*************************************************
+	// Hole 4.*
 	innerRing = this.newInnerRing();
 	star = innerRing.newElement("STAR");
 	star.setCenterPosition(-9, 14);
@@ -711,19 +711,19 @@ Profile2D.prototype.TEST__setFigureHole_2 = function()
 	star.setInteriorRadius(0.5);
 	star.setExteriorRadius(1.5);
 	
-	// Hole 5.*************************************************
+	// Hole 5.*
 	innerRing = this.newInnerRing();
 	rect = innerRing.newElement("RECTANGLE");
 	rect.setCenterPosition(-4.5, 1.5);
 	rect.setDimensions(3, 3);
 	
-	// Hole 6.*************************************************
+	// Hole 6.*
 	innerRing = this.newInnerRing();
 	circle = innerRing.newElement("CIRCLE");
 	circle.setCenterPosition(-4.5, -2.5);
 	circle.setRadius(2);
 	
-	// Hole 7.*************************************************
+	// Hole 7.*
 	innerRing = this.newInnerRing();
 	star = innerRing.newElement("STAR");
 	star.setCenterPosition(0, 0);
@@ -731,13 +731,13 @@ Profile2D.prototype.TEST__setFigureHole_2 = function()
 	star.setInteriorRadius(1);
 	star.setExteriorRadius(2.5);
 	
-	// Hole 8.*************************************************
+	// Hole 8.*
 	innerRing = this.newInnerRing();
 	circle = innerRing.newElement("CIRCLE");
 	circle.setCenterPosition(-6, 14);
 	circle.setRadius(1.5);
 	
-	// Hole 9.*************************************************
+	// Hole 9.*
 	innerRing = this.newInnerRing();
 	star = innerRing.newElement("STAR");
 	star.setCenterPosition(-1.5, 11);
@@ -745,7 +745,7 @@ Profile2D.prototype.TEST__setFigureHole_2 = function()
 	star.setInteriorRadius(0.6);
 	star.setExteriorRadius(2);
 	
-	// Hole 10.*************************************************
+	// Hole 10.*
 	innerRing = this.newInnerRing();
 	star = innerRing.newElement("STAR");
 	star.setCenterPosition(13.5, 5);
@@ -753,7 +753,7 @@ Profile2D.prototype.TEST__setFigureHole_2 = function()
 	star.setInteriorRadius(0.4);
 	star.setExteriorRadius(1.5);
 	
-	// Hole 11.*************************************************
+	// Hole 11.*
 	innerRing = this.newInnerRing();
 	star = innerRing.newElement("STAR");
 	star.setCenterPosition(9, -13);
@@ -761,7 +761,7 @@ Profile2D.prototype.TEST__setFigureHole_2 = function()
 	star.setInteriorRadius(0.4);
 	star.setExteriorRadius(1.5);
 	
-	// Hole 12.*************************************************
+	// Hole 12.*
 	innerRing = this.newInnerRing();
 	star = innerRing.newElement("STAR");
 	star.setCenterPosition(5.5, 1.5);

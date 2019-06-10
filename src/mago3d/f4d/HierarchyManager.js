@@ -1,9 +1,9 @@
 'use strict';
-
-
-
 /**
- * 블럭 모델
+ * 프로젝트와 노드 목록 관리 객체.
+ * 실질적으로 화면에 표출될 프로젝트와 노드들을 보관하고 있음.
+ * @exception {Error} Messages.CONSTRUCT_ERROR
+ * 
  * @class HierarchyManager
  */
 var HierarchyManager = function() 
@@ -13,15 +13,27 @@ var HierarchyManager = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	// lowest nodes array. initial array to create tiles global distribution.
+	/**
+	 * lowest nodes array. initial array to create tiles global distribution.
+	 * @type {Array.<Node>}
+	 */
 	this.nodesArray = [];
+
+	/**
+	 * 프로젝트 보관 객체
+	 * @type {Object}
+	 */
 	this.projectsMap = {};
 	
+	/**
+	 * StaticModelManager
+	 * @type {StaticModelManager}
+	 */
 	this.staticModelsManager;
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * node array와 prjectMap을 초기화. gl Context에서 그려진 내용들 제거
  */
 HierarchyManager.prototype.deleteNodes = function(gl, vboMemoryManager) 
 {
@@ -40,7 +52,8 @@ HierarchyManager.prototype.deleteNodes = function(gl, vboMemoryManager)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * StaticModelsManager 반환
+ * @returns {StaticModelsManager} 선언된 StaticModelsManager가 없을 시 인스턴스 생성하여 등록 후 반환.
  */
 HierarchyManager.prototype.getStaticModelsManager = function() 
 {
@@ -51,11 +64,16 @@ HierarchyManager.prototype.getStaticModelsManager = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * nodesMap에 있는 Node의 data의 attribute에 해당하는 값을 가진 Node를 반환.
+ * @param {String} projectId
+ * @param {String} dataName attribute 이름, 보통 nodeId 사용.
+ * @param {String} dataNameValue attribute 값
+ * 
+ * @returns {Node}
  */
 HierarchyManager.prototype.getNodeByDataName = function(projectId, dataName, dataNameValue) 
 {
-	// note: here "dataName" refers "nodeId", or other datas that can be inside of"data".***
+	// note: here "dataName" refers "nodeId", or other datas that can be inside of"data".
 	var nodesMap = this.getNodesMap(projectId);
 	
 	if (nodesMap === undefined)
@@ -81,7 +99,11 @@ HierarchyManager.prototype.getNodeByDataName = function(projectId, dataName, dat
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * projectId와 dataKey를 이용하여 nodesMap에 있는 Node를 반환.
+ * @param {String} projectId
+ * @param {String} dataKey
+ * 
+ * @returns {Node|undefined} nodesMap이 선언되지 않았을 경우 undefined반환.
  */
 HierarchyManager.prototype.getNodeByDataKey = function(projectId, dataKey) 
 {
@@ -96,7 +118,9 @@ HierarchyManager.prototype.getNodeByDataKey = function(projectId, dataKey)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * node의 parent 속성이 비어있는 root node들을 반환.
+ * @param {Array.<Node>} resultRootNodesArray
+ * @returns {Array.<Node>}
  */
 HierarchyManager.prototype.getRootNodes = function(resultRootNodesArray) 
 {
@@ -119,7 +143,9 @@ HierarchyManager.prototype.getRootNodes = function(resultRootNodesArray)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 넘겨받은 projectId에 해당하는 project가 projectMap에 등록되있는지 유무 반환.
+ * @param {String} projectId
+ * @returns {Boolean}
  */
 HierarchyManager.prototype.existProject = function(projectId) 
 {
@@ -127,7 +153,10 @@ HierarchyManager.prototype.existProject = function(projectId)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 넘겨받은 projectId에 해당하는 nodesMap을 반환.
+ * @param {String} projectId
+ * @param {Object} attributes undefined가 아닐 경우 해당 nodesMap에 등록.
+ * @returns {Object} projectId에 해당하는 nodesMap 없으면 생성 후 반환.
  */
 HierarchyManager.prototype.getNodesMap = function(projectId, attributes) 
 {
@@ -150,7 +179,11 @@ HierarchyManager.prototype.getNodesMap = function(projectId, attributes)
 
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 넘겨받은 projectId와 id, attribute로 Node를 생성 후 반환. Node 생성 후 nodesArray와 nodesMap에 등록
+ * @param {String} id datakey
+ * @param {String} projectId
+ * @param {Object} attributes undefined가 아닐 경우 해당 nodesMap에 등록.
+ * @returns {Node}
  */
 HierarchyManager.prototype.newNode = function(id, projectId, attributes) 
 {

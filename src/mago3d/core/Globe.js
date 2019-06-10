@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
+ * This class is used to assume the real globe of earth as ellipsoid
  * @class Globe
  */
 var Globe = function() 
@@ -10,7 +10,7 @@ var Globe = function()
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	//WGS 84.***************************************************
+	//WGS 84.
 	// Extracted from WikiPedia "Geodetic datum".
 	// WGS 84 Defining Parameters
 	// semi-major axis	a	6378137.0 m
@@ -29,31 +29,47 @@ var Globe = function()
 	this.degToRadFactor = Math.PI/180.0;
 };
 
+/**
+ * @returns {Number} equatorial Radius
+ */
 Globe.equatorialRadius = function()
 {
 	return 6378137.0;
 };
 
+/**
+ * @returns {Number}
+ */
 Globe.equatorialRadiusSquared = function()
 {
 	return 40680631590769.0;
 };
 
+/**
+ * @returns {Number}
+ */
 Globe.polarRadius = function()
 {
 	return 6356752.3142;
 };
 
+/**
+ * @returns {Number}
+ */
 Globe.polarRadiusSquared = function()
 {
 	return 40408299984087.05552164;
 };
-
+/**
+ * This function returns the radius of earth at the latitude "latDeg".
+ * @param latDeg the latitude
+ * @returns {Number}
+ */
 Globe.radiusAtLatitudeDeg = function(latDeg)
 {
-	// This function returns the radius of earth at the latitude "latDeg".***
-	// a = equatorialRadius, b = polarRadius.***************
-	// r = a*b / sqrt(a2*sin2(lat) + b2*cos2(lat)).*********
+
+	// a = equatorialRadius, b = polarRadius.
+	// r = a*b / sqrt(a2*sin2(lat) + b2*cos2(lat)).
 	//------------------------------------------------------
 	
 	var latRad = latDeg * Math.PI/180.0;
@@ -70,7 +86,11 @@ Globe.radiusAtLatitudeDeg = function(latDeg)
 	var radius = (a*b)/(Math.sqrt(a2*sin2 + b2*cos2));
 	return radius;
 };
-
+/**
+ * Normalize the elements of the 3D feature
+ * @param {Float32Array} cartesian this can be any feature such as a point or a axis to make unitary
+ * 
+ */
 Globe.prototype.normalizeCartesian = function(cartesian)
 {
 	if (cartesian === undefined)
@@ -84,23 +104,32 @@ Globe.prototype.normalizeCartesian = function(cartesian)
 	return cartesian;
 };
 
+/**
+ * Return the transformation matrix which transform the cartesian point to wgs84
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} z 
+ * @param {Float32Array} float32Array
+ * @returns {Float32Array} float32Array
+ * 
+ */
 Globe.prototype.transformMatrixAtCartesianPointWgs84 = function(x, y, z, float32Array)
 {
 	var xAxis, yAxis, zAxis;
 	
 	zAxis = this.normalAtCartesianPointWgs84(x, y, z, zAxis);
 	
-	// Check if zAxis is vertical vector. PENDENT.***
+	// Check if zAxis is vertical vector. PENDENT.
 	
 	// now, calculate the east direction. 
-	// project zAxis to plane XY and calculate the left perpendicular.***
+	// project zAxis to plane XY and calculate the left perpendicular.
 	xAxis = new Float32Array(3);
 	xAxis[0] = -y;
 	xAxis[1] = x;
 	xAxis[2] = 0.0;
 	xAxis = this.normalizeCartesian(xAxis);
 	
-	// finally calculate the north direction.***
+	// finally calculate the north direction.
 	var xAxisVector = new Point3D(xAxis[0], xAxis[1], xAxis[2]);
 	var yAxisVector = new Point3D();
 	var zAxisVector = new Point3D(zAxis[0], zAxis[1], zAxis[2]);
@@ -132,17 +161,23 @@ Globe.prototype.transformMatrixAtCartesianPointWgs84 = function(x, y, z, float32
 	
 	return float32Array;
 };
-
+/**
+ * function used by "MagoWorld" to paning & rotate the globe by dragging mouse.
+ * @param {Line} line
+ * @param {Float32Array} resultCartesian
+ * @param {Number} radius
+ * @returns {Float32Array} resultCartesian
+ */
 Globe.prototype.intersectionLineWgs84 = function(line, resultCartesian, radius)
 {
-	// function used by "MagoWorld" to paning & rotate the globe by dragging mouse.***
+	// 
 	// line: (x, y, z) = x1 + t(x2 - x1), y1 + t(y2 - y1), z1 + t(z2 - z1)
 	// sphere: (x - x3)^2 + (y - y3)^2 + (z - z3)^2 = r^2, where x3, y3, z3 is the center of the sphere.
 	
 	// line:
 	var p1 = line.point;
 	var lineDir = line.direction;
-	var dist = 1000.0;// any value is ok.***
+	var dist = 1000.0;// any value is ok.
 	var p2 = new Point3D(p1.x + lineDir.x * dist, p1.y + lineDir.y * dist, p1.z + lineDir.z * dist);
 	var x1 = p1.x;
 	var y1 = p1.y;
@@ -155,7 +190,7 @@ Globe.prototype.intersectionLineWgs84 = function(line, resultCartesian, radius)
 	var x3 = 0;
 	var y3 = 0;
 	var z3 = 0;
-	var r = this.equatorialRadius; // provisionally.***
+	var r = this.equatorialRadius; // provisionally.
 	if (radius !== undefined)
 	{ r = radius; }
 	
@@ -178,14 +213,14 @@ Globe.prototype.intersectionLineWgs84 = function(line, resultCartesian, radius)
 	
 	if (discriminant < 0)
 	{
-		// no intersection.***
+		// no intersection.
 		return undefined;
 	}
 	else if (discriminant === 0)
 	{
-		// this is tangent.***
+		// this is tangent.
 		if (resultCartesian === undefined)
-		{ resultCartesian = []; } // Float32Array has no enough precision.***
+		{ resultCartesian = []; } // Float32Array has no enough precision.
 		
 		var t1 = (-b)/(2*a);
 		var intersectPoint1 = new Point3D(x1 + (x2 - x1)*t1, y1 + (y2 - y1)*t1, z1 + (z2 - z1)*t1);
@@ -196,12 +231,12 @@ Globe.prototype.intersectionLineWgs84 = function(line, resultCartesian, radius)
 	}
 	else
 	{
-		// find the nearest to p1.***
+		// find the nearest to p1.
 		var sqrtDiscriminant = Math.sqrt(discriminant);
 		var t1 = (-b + sqrtDiscriminant)/(2*a);
 		var t2 = (-b - sqrtDiscriminant)/(2*a);
 		
-		// solution 1.***
+		// solution 1.
 		var intersectPoint1 = new Point3D(x1 + (x2 - x1)*t1, y1 + (y2 - y1)*t1, z1 + (z2 - z1)*t1);
 		var intersectPoint2 = new Point3D(x1 + (x2 - x1)*t2, y1 + (y2 - y1)*t2, z1 + (z2 - z1)*t2);
 		
@@ -209,7 +244,7 @@ Globe.prototype.intersectionLineWgs84 = function(line, resultCartesian, radius)
 		var dist2 = p1.squareDistToPoint(intersectPoint2);
 		
 		if (resultCartesian === undefined)
-		{ resultCartesian = []; } // Float32Array has no enough precision.***
+		{ resultCartesian = []; } // Float32Array has no enough precision.
 		
 		if (dist1 < dist2)
 		{
@@ -229,6 +264,15 @@ Globe.prototype.intersectionLineWgs84 = function(line, resultCartesian, radius)
 	
 };
 
+
+/**
+ * Change cartesian point to WGS84 and nromalize that.
+ * @param {Number} x the x coordi value of input cartesian point
+ * @param {Number} y the y coordi value of input cartesian point
+ * @param {Number} z the z coordi value of input cartesian point
+ * @param {Float32Array} resultNormal the cartesian point which will hold the calculated result
+ * @returns {Float32Array} resultNormal
+ */
 Globe.prototype.normalAtCartesianPointWgs84 = function(x, y, z, resultNormal)
 {
 	if (resultNormal === undefined)
@@ -241,14 +285,18 @@ Globe.prototype.normalAtCartesianPointWgs84 = function(x, y, z, resultNormal)
 	resultNormal[1] = y / equatorialRadiusSquared;
 	resultNormal[2] = z / polarRadiusSquared;
 	
-	// Normalize cartesian.***
+	// Normalize cartesian.
 	resultNormal = this.normalizeCartesian(resultNormal);
 	
 	return resultNormal;
 };
 
-
-
+/**
+ * Calculate atan
+ * @param {Number} y
+ * @param {Number} x
+ * @returns {Number} 
+ */
 Globe.atan2Test = function(y, x) 
 {
 	var M_PI = Math.PI;
@@ -279,14 +327,24 @@ Globe.atan2Test = function(y, x)
 		}
 		else 
 		{
-			return 0.0; // return undefined.***
+			return 0.0; // return undefined.
 		}
 	}
 };
 
+/**
+ * Change absolute coordinate to WGS84 coordinate 
+ * @param {Number} x the x coordi of the point of absolute coordinate
+ * @param {Number} y the y coordi of the point of absolute coordinate
+ * @param {Number} z the z coordi of the point of absolute coordinate
+ * @param {Float32Array} result the cartesian point which will contain the calculated point
+ * @param {Boolean} bStoreAbsolutePosition This decide whether store absolute value at the 'result' point or not as the property
+ * @param {Float32Array} result
+ * 
+ */
 Globe.CartesianToGeographicWgs84 = function (x, y, z, result, bStoreAbsolutePosition) 
 {
-	// From WebWorldWind.***
+	// From WebWorldWind.
 	// According to H. Vermeille, "An analytical method to transform geocentric into geodetic coordinates"
 	// http://www.springerlink.com/content/3t6837t27t351227/fulltext.pdf
 	// Journal of Geodesy, accepted 10/2010, not yet published
@@ -419,7 +477,7 @@ Globe.CartesianToGeographicWgs84 = function (x, y, z, result, bStoreAbsolutePosi
 	
 	if (bStoreAbsolutePosition !== undefined && bStoreAbsolutePosition === true)
 	{
-		// In this case, store into result_geographicCoord the x, y, z values.***
+		// In this case, store into result_geographicCoord the x, y, z values.
 		if (result.absolutePoint === undefined)
 		{ result.absolutePoint = new Point3D(x, y, z); }
 		else
@@ -429,10 +487,17 @@ Globe.CartesianToGeographicWgs84 = function (x, y, z, result, bStoreAbsolutePosi
 	return result;
 };
 
+/**
+ * This change the GeographicCoord feature to Point2D feature
+ * @param {Number} longitude
+ * @param {Number} latitude
+ * @param {Point2D} resultPoint2d
+ * @returns {Point2D} 
+ */
 Globe.geographicToMercatorProjection = function(longitude, latitude, resultPoint2d) 
 {
-	// longitude = [-180, 180].***
-	// latitude = [-90, 90].***
+	// longitude = [-180, 180].
+	// latitude = [-90, 90].
 	var degToRadFactor = Math.PI/180.0;
 	var lonRad = longitude * degToRadFactor;
 	var latRad = latitude * degToRadFactor;
@@ -440,10 +505,17 @@ Globe.geographicToMercatorProjection = function(longitude, latitude, resultPoint
 	return Globe.geographicRadianToMercatorProjection(lonRad, latRad, resultPoint2d);
 };
 
+/**
+ * This change the GeographicCoord feature to Point2D feature using Mercator projection
+ * @param {Number} lonRad
+ * @param {Number} latRad
+ * @param {Point2D} resultPoint2d
+ * @returns {Point2D}
+ */
 Globe.geographicRadianToMercatorProjection = function(lonRad, latRad, resultPoint2d) 
 {
-	// longitude = [-pi, pi].***
-	// latitude = [-pi/2, pi/2].***
+	// longitude = [-pi, pi].
+	// latitude = [-pi/2, pi/2].
 	var equatorialRadius = Globe.equatorialRadius();
 	if (resultPoint2d === undefined)
 	{ resultPoint2d = new Point2D(); }
@@ -453,10 +525,18 @@ Globe.geographicRadianToMercatorProjection = function(lonRad, latRad, resultPoin
 	return resultPoint2d;
 };
 
+/**
+ * This change the GeographicCoord feature to the cartesian WGS84 point using the blow method.
+ * defined in the LINZ standard LINZS25000 (Standard for New Zealand Geodetic Datum 2000)
+ * https://www.linz.govt.nz/data/geodetic-system/coordinate-conversion/geodetic-datum-conversions/equations-used-datum
+ * @param {Number} longitude
+ * @param {Number} latitude
+ * @param {Number} altitude
+ * @param {Float32Array} resultCartesian
+ * @returns {Float32Array} resultCartesian
+ */
 Globe.geographicToCartesianWgs84 = function(longitude, latitude, altitude, resultCartesian)
 {
-	// defined in the LINZ standard LINZS25000 (Standard for New Zealand Geodetic Datum 2000)
-	// https://www.linz.govt.nz/data/geodetic-system/coordinate-conversion/geodetic-datum-conversions/equations-used-datum
 	// a = semi-major axis.
 	// e2 = firstEccentricitySquared.
 	// v = a / sqrt(1 - e2 * sin2(lat)).
@@ -486,6 +566,14 @@ Globe.geographicToCartesianWgs84 = function(longitude, latitude, altitude, resul
 	
 	return resultCartesian;
 };
+/**
+ * This change the array of the absolute coordinates represented as the angle to the array of WGS84
+ * @param {Number} longitude
+ * @param {Number} latitude
+ * @param {Number} altitude
+ * @param {Float32Array} resultCartesian
+ * @returns {Float32Array} resultCartesian
+ */
 
 Globe.geographicRadianArrayToFloat32ArrayWgs84 = function(lonArray, latArray, altArray, resultCartesianArray)
 {

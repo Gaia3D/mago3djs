@@ -1,8 +1,10 @@
 'use strict';
 /**
-* 어떤 일을 하고 있습니까?
-* @class Segment3D
-*/
+ * 선분 생성을 위한 클래스
+ *
+ * @param {Point3D} strPoint2D 시작 포인트
+ * @param {Point3D} endPoint2D 종료 포인트
+ */
 var Segment3D = function(strPoint3D, endPoint3D) 
 {
 	if (!(this instanceof Segment3D)) 
@@ -14,47 +16,82 @@ var Segment3D = function(strPoint3D, endPoint3D)
 	this.endPoint3d;
 	
 	if (strPoint3D)
-	{ this.startPoint3d = strPoint3D; }
+	{
+		this.startPoint3d = strPoint3D;
+	}
 	
 	if (endPoint3D)
-	{ this.endPoint3d = endPoint3D; }
+	{
+		this.endPoint3d = endPoint3D;
+	}
 };
 
+/**
+ * 선분에 포인트를 설정한다.
+ *
+ * @param {Point3D} strPoint3D 시작 포인트
+ * @param {Point3D} endPoint3D 종료 포인트
+ */
 Segment3D.prototype.setPoints = function(strPoint3D, endPoint3D)
 {
 	if (strPoint3D)
-	{ this.startPoint3d = strPoint3D; }
+	{
+		this.startPoint3d = strPoint3D;
+	}
 	
 	if (endPoint3D)
-	{ this.endPoint3d = endPoint3D; }
+	{
+		this.endPoint3d = endPoint3D;
+	}
 };
 
-Segment3D.prototype.getVector = function(resultVector)
+/**
+ * 시작 포인트에서 종료 포인트까지의 벡터를 구한다.
+ *
+ * @param {Point3D} result 벡터 결과값
+ * @returns {Point3D} 벡터 결과값
+ */
+Segment3D.prototype.getVector = function(result)
 {
 	if (this.startPoint3d === undefined || this.endPoint3d === undefined)
-	{ return undefined; }
+	{
+		return undefined;
+	}
 	
-	if (resultVector === undefined)
-	{ resultVector = new Point3D(); }
+	if (result === undefined)
+	{
+		result = new Point3D();
+	}
 	
-	resultVector = this.startPoint3d.getVectorToPoint(this.endPoint3d, resultVector);
-	return resultVector;
+	result = this.startPoint3d.getVectorToPoint(this.endPoint3d, result);
+	return result;
 };
 
-Segment3D.prototype.getDirection = function(resultDir)
+/**
+ * 선분의 방향값을 계산한다.
+ *
+ * @param {Point3D} result 선분이 나타내는 방향값
+ * @returns {Point3D} 선분이 나타내는 방향값
+ */
+Segment3D.prototype.getDirection = function(result)
 {
-	if (resultDir === undefined)
-	{ resultDir = new Point3D(); }
+	if (result === undefined)
+	{
+		result = new Point3D();
+	}
 	
-	resultDir = this.getVector(resultDir);
-	resultDir.unitary();
+	result = this.getVector(result);
+	result.unitary();
 	
-	return resultDir;
+	return result;
 };
 
+/**
+ * 시작 포인트와 종료 포인트를 맞바꾼다.
+ * interchange strPoint & endPoint.
+ */
 Segment3D.prototype.invertSense = function()
 {
-	// interchange strPoint & endPoint.***
 	var point3dAux = this.startPoint3d;
 	this.startPoint3d = this.endPoint3d;
 	this.endPoint3d = point3dAux;

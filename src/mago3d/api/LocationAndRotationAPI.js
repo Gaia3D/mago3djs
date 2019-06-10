@@ -29,7 +29,9 @@ LocationAndRotationAPI.changeLocationAndRotation = function(api, magoManager)
 		parseFloat(api.getElevation()),
 		parseFloat(api.getHeading()),
 		parseFloat(api.getPitch()),
-		parseFloat(api.getRoll()));
+		parseFloat(api.getRoll()),
+		api.getAnimationOption()
+	);
 	
 	// MagoConfig에 저장......?
 };

@@ -17,11 +17,11 @@ var Line2D = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param px 변수
- * @param py 변수
- * @param dx 변수
- * @param dy 변수
+ * set the needed value of this line with a point and a direction value
+ * @param px the value of x coordi of this line
+ * @param py the value of y coordi of this line
+ * @param dx the value of x direction of this line
+ * @param dy the value of y direction of this line
  */
 Line2D.prototype.setPointAndDir = function(px, py, dx, dy) 
 {
@@ -30,9 +30,10 @@ Line2D.prototype.setPointAndDir = function(px, py, dx, dy)
 	this.direction.unitary();
 };
 
-/**
- * 어떤 일을 하고 있습니까?
- * @param px 변수
+/** 
+ * Get the perpendicular direction of the line in right-handed coordinate system
+ * @param {Point2D} point target point
+ * @returns {Line2D} perpendicular the perpendicular direction 
  */
 Line2D.prototype.getPerpendicularRight = function(point) 
 {
@@ -48,8 +49,9 @@ Line2D.prototype.getPerpendicularRight = function(point)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param px 변수
+ * Get the perpendicular direction of the line in left-handed coordinate system
+ * @param {Point2D} pointt target point
+ * @returns {Line2D} perpendicular the perpendicular direction 
  */
 Line2D.prototype.getPerpendicularLeft = function(point) 
 {
@@ -65,8 +67,11 @@ Line2D.prototype.getPerpendicularLeft = function(point)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param px 변수
+ * Return the point which is projected as perpendicular way to the line
+ * @param {Point2D} point the given point
+ * @param {Point2D} projectedPoint the result of the projection to the line
+ * @returns {Point2D} projectedPoint
+ * 
  */
 Line2D.prototype.getProjectedPoint = function(point, projectedPoint) 
 {
@@ -83,8 +88,10 @@ Line2D.prototype.getProjectedPoint = function(point, projectedPoint)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param px 변수
+ * Check whether the given point is on this line or not
+ * @param {Point2D} point the given point
+ * @param {Number} error the error rate which can be handdled
+ * @returns {Boolean} 
  */
 Line2D.prototype.isCoincidentPoint = function(point, error) 
 {
@@ -104,8 +111,9 @@ Line2D.prototype.isCoincidentPoint = function(point, error)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param px 변수
+ * Check whether the given line is parallel to this line or not
+ * @param {Line2D} line
+ * @returns {Boolean}
  */
 Line2D.prototype.isParallelToLine = function(line) 
 {
@@ -115,7 +123,7 @@ Line2D.prototype.isParallelToLine = function(line)
 	var zero = 10E-10;
 	var angRad = this.direction.angleRadToVector(line.direction);
 	
-	// if angle is zero or 180 degree, then this is parallel to "line".***
+	// if angle is zero or 180 degree, then this is parallel to "line".
 	if (angRad < zero || Math.abs(angRad - Math.PI) < zero)
 	{ return true; }
 	
@@ -123,26 +131,28 @@ Line2D.prototype.isParallelToLine = function(line)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param px 변수
+ * Get the intersection point with given line
+ * @param {Line2D} line
+ * @param {Point2D} resultIntersectPoint
+ * @returns {Point2D} resultIntersectPoint
  */
 Line2D.prototype.intersectionWithLine = function(line, resultIntersectPoint) 
 {
 	if (line === undefined)
 	{ return undefined; }
 	
-	// 1rst, check that this is not parallel to "line".***
+	// 1rst, check that this is not parallel to "line".
 	if (this.isParallelToLine(line))
 	{ return undefined; }
 	
-	// now, check if this or "line" are vertical or horizontal.***
+	// now, check if this or "line" are vertical or horizontal.
 	var intersectX;
 	var intersectY;
 	
 	var zero = 10E-10;
 	if (Math.abs(this.direction.x) < zero)
 	{
-		// this is a vertical line.***
+		// this is a vertical line.
 		var slope = line.direction.y / line.direction.x;
 		var b = line.point.y - slope * line.point.x;
 		
@@ -151,11 +161,11 @@ Line2D.prototype.intersectionWithLine = function(line, resultIntersectPoint)
 	}
 	else if (Math.abs(this.direction.y) < zero)
 	{
-		// this is a horizontal line.***
-		// must check if the "line" is vertical.***
+		// this is a horizontal line.
+		// must check if the "line" is vertical.
 		if (Math.abs(line.direction.x) < zero)
 		{
-			// "line" is vertical.***
+			// "line" is vertical.
 			intersectX = line.point.x;
 			intersectY = this.point.y;
 		}
@@ -170,10 +180,10 @@ Line2D.prototype.intersectionWithLine = function(line, resultIntersectPoint)
 	}
 	else 
 	{
-		// this is oblique.***
+		// this is oblique.
 		if (Math.abs(line.direction.x) < zero)
 		{
-			// "line" is vertical.***
+			// "line" is vertical.
 			var mySlope = this.direction.y / this.direction.x;
 			var myB = this.point.y - mySlope * this.point.x;
 			intersectX = line.point.x;

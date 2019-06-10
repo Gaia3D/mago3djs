@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * 어떤 일을 하고 있습니까?
+ * This is similar with Point23List, but this one represents real polyline geometry feature.
  * @class PolyLine3D
  */
 var PolyLine3D = function() 
@@ -18,7 +18,10 @@ var PolyLine3D = function()
 
 /**
  * Creates a new Point3D.
- * @class PolyLine3D
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} z
+ * @returns point3d
  */
 PolyLine3D.prototype.newPoint3d = function(x, y, z)
 {
@@ -31,7 +34,8 @@ PolyLine3D.prototype.newPoint3d = function(x, y, z)
 };
 
 /**
- * @class PolyLine3D
+ * Add a list of Point3D at the last of this.pointsArray
+ * @param point3dArray the point that will be pushed at this.pointsArray
  */
 PolyLine3D.prototype.addPoint3dArray = function(points3dArray)
 {
@@ -45,7 +49,8 @@ PolyLine3D.prototype.addPoint3dArray = function(points3dArray)
 };
 
 /**
- * @class PolyLine3D
+ * Return the coordinate contained at geoLocDataManager
+ * @returns geoLoc
  */
 PolyLine3D.prototype.getGeographicLocation = function()
 {
@@ -62,7 +67,8 @@ PolyLine3D.prototype.getGeographicLocation = function()
 };
 
 /**
- * @class PolyLine3D
+ * Make the vbo of this point3DList
+ * @param magoManager
  */
 PolyLine3D.prototype.makeVbo = function(magoManager)
 {
@@ -86,7 +92,12 @@ PolyLine3D.prototype.makeVbo = function(magoManager)
 };
 
 /**
- * @class PolyLine3D
+ * Render this point3dlist using vbo of this list. 
+ * @param magoManager
+ * @param shader 
+ * @param renderType
+ * @param bLoop 
+ * @param bEnableDepth if this is turned off, then the last-drawing feature will be shown at the top
  */
 PolyLine3D.prototype.renderLines = function(magoManager, shader, renderType, bLoop, bEnableDepth)
 {
@@ -102,7 +113,7 @@ PolyLine3D.prototype.renderLines = function(magoManager, shader, renderType, bLo
 	
 	gl.uniform1i(shader.bPositionCompressed_loc, false);
 	gl.uniform1i(shader.bUse1Color_loc, true);
-	gl.uniform4fv(shader.oneColor4_loc, [1.0, 1.0, 0.1, 1.0]); //.***
+	gl.uniform4fv(shader.oneColor4_loc, [1.0, 1.0, 0.1, 1.0]); //.
 	gl.uniform1f(shader.fixPointSize_loc, 5.0);
 	gl.uniform1i(shader.bUseFixPointSize_loc, true);
 	
@@ -114,7 +125,7 @@ PolyLine3D.prototype.renderLines = function(magoManager, shader, renderType, bLo
 	else
 	{ gl.disable(gl.DEPTH_TEST); }
 
-	// Render the line.***
+	// Render the line.
 	var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
 	buildingGeoLocation.bindGeoLocationUniforms(gl, shader);
 	
@@ -130,18 +141,18 @@ PolyLine3D.prototype.renderLines = function(magoManager, shader, renderType, bLo
 		gl.uniform4fv(shader.oneColor4_loc, [selColor.r/255.0, selColor.g/255.0, selColor.b/255.0, 1.0]);
 	}
 	
-	var vbo_vicky = this.vboKeysContainer.vboCacheKeysArray[0]; // there are only one.***
+	var vbo_vicky = this.vboKeysContainer.vboCacheKeysArray[0]; // there are only one.
 	if (!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
 	{ return false; }
 
 	gl.drawArrays(gl.LINE_STRIP, 0, vbo_vicky.vertexCount);
 	
-	// Check if exist selectedGeoCoord.***
+	// Check if exist selectedGeoCoord.
 	/*
 	var currSelected = magoManager.selectionManager.getSelectedGeneral();
 	if(currSelected !== undefined && currSelected.constructor.name === "GeographicCoord")
 	{
-		gl.uniform4fv(shader.oneColor4_loc, [1.0, 0.1, 0.1, 1.0]); //.***
+		gl.uniform4fv(shader.oneColor4_loc, [1.0, 0.1, 0.1, 1.0]); //.
 		gl.uniform1f(shader.fixPointSize_loc, 10.0);
 		currSelected.renderPoint(magoManager, shader, gl, renderType);
 	}

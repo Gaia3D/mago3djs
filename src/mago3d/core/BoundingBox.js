@@ -1,6 +1,7 @@
 'use strict';
 
 /**
+ * Bounding box
  * 영역박스
  * 
  * @alias BoundingBox
@@ -23,8 +24,7 @@ var BoundingBox = function()
 };
 
 /**
- * 영역박스 초기화
- * 
+ * Initiate the value of the bounding box
  * @param {Point3D} point 3차원 점
  */
 BoundingBox.prototype.init = function(point) 
@@ -41,6 +41,7 @@ BoundingBox.prototype.init = function(point)
 };
 
 /**
+ * Delete bounding box
  * 영역박스 삭제
  * 
  */
@@ -56,9 +57,9 @@ BoundingBox.prototype.deleteObjects = function()
 };
 
 /**
- * 영역박스 확대
- * 
- * @param {Number} distance
+ *
+ * Copy other box
+ * @param bbox box
  */
 BoundingBox.prototype.copyFrom = function(bbox) 
 {
@@ -72,8 +73,7 @@ BoundingBox.prototype.copyFrom = function(bbox)
 };
 
 /**
- * 영역박스 확대
- * 
+ * Move the center of the box to the origin
  */
 BoundingBox.prototype.translateToOrigin = function() 
 {
@@ -91,6 +91,7 @@ BoundingBox.prototype.translateToOrigin = function()
 };
 
 /**
+ * Expane the size of the box as double of the given distance
  * 영역박스 확대
  * 
  * @param {Number} distance
@@ -129,6 +130,7 @@ BoundingBox.prototype.addPoint = function(point)
 };
 
 /**
+ * Set the range of the box which contain given box
  * 주어진 영역박스를 포함하는 영역으로 영역박스 크기를 변경
  * 
  * @param {BoundingBox} box 영역박스
@@ -148,6 +150,7 @@ BoundingBox.prototype.addBox = function(box)
 };
 
 /**
+ * Get the minimum length among x, y, z edges' lengths
  * 영역박스의 가로, 세로, 높이 중에서 최소값
  * 
  * @returns {Number} 최소값
@@ -158,8 +161,7 @@ BoundingBox.prototype.getMinLength = function()
 };
 
 /**
- * 영역박스의 가로, 세로, 높이 중에서 최대값
- * 
+ * Get the maximum length among x, y, z edges' lengths
  * @returns {Number} 최대값
  */
 BoundingBox.prototype.getMaxLength = function() 
@@ -168,6 +170,7 @@ BoundingBox.prototype.getMaxLength = function()
 };
 
 /**
+ * Get the length of the edge which is parallel to x axis
  * 영역박스의 X축 방향의 길이
  * 
  * @returns {Number} 길이값
@@ -178,6 +181,7 @@ BoundingBox.prototype.getXLength = function()
 };
 
 /**
+ * Get the length of the edge which is parallel to y axis
  * 영역박스의 Y축 방향의 길이
  * 
  * @returns {Number} 길이값
@@ -188,6 +192,7 @@ BoundingBox.prototype.getYLength = function()
 };
 
 /**
+ * Get the length of the edge which is parallel to z axis
  * 영역박스의 Z축 방향의 길이
  * 
  * @returns {Number} 길이값
@@ -198,6 +203,7 @@ BoundingBox.prototype.getZLength = function()
 };
 
 /**
+ * Get the center point of this box
  * 영역박스의 중심점을 구한다.
  * 
  * @param {Point3D} result 영역박스의 중심점
@@ -214,9 +220,10 @@ BoundingBox.prototype.getCenterPoint = function(result)
 };
 
 /**
+ * 
  * 영역박스의 중심점을 구한다.
  * 
- * @returns {float} apriximately radius.
+ * @returns {Number} apriximately radius.
  */
 BoundingBox.prototype.getRadiusAprox = function() 
 {
@@ -247,6 +254,7 @@ BoundingBox.prototype.intersectWithPoint = function(point)
 };
 
 /**
+ * Check whether the given point is contained or intersected with this box
  * 영역박스와 점과의 교차 여부를 판단
  * 
  * @param {Number} x x성분
@@ -293,10 +301,11 @@ BoundingBox.prototype.intersectWithBox = function(box)
 };
 
 /**
+ * Check whether this box and the given box are intersected by each others.
  * 영역박스와 주어진 영역박스와의 교차 여부를 판단
  * 
- * @param {BoundingBox} box 영역박스
- * @returns {Boolean} 교차 여부
+ * @param {BoundingBox} box Bounding box 영역박스
+ * @returns {Boolean} the flag whether they are intersected or not 교차 여부 
  */
 BoundingBox.prototype.intersectsWithBBox = function(box) 
 {
