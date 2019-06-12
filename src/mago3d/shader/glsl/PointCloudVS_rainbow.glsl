@@ -17,9 +17,9 @@ uniform bool bUse1Color;
 uniform vec4 oneColor4;
 uniform float fixPointSize;
 uniform bool bUseFixPointSize;
-uniform bool bUseColorCodingByHeight;
 varying vec4 vColor;
 varying float glPointSize;
+varying float realHeigh;
 
 void main()
 {
@@ -34,6 +34,7 @@ void main()
 	{
 		realPos = position;
 	}
+	realHeigh = realPos.z;
 	rotatedPos = buildingRotMatrix * vec4(realPos.xyz, 1.0);
     vec3 objPosHigh = buildingPosHIGH;
     vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;

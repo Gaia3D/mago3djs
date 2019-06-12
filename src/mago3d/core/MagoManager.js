@@ -1726,20 +1726,24 @@ MagoManager.prototype.keyDown = function(key)
 		var currAlt = geoCoords.altitude;
 
 		// Move a little.***
-		var latitude = currLat + 0.001 * 10*(Math.random()*2-1);
-		var longitude = currLon + 0.001 * 10*(Math.random()*2-1);
-		var elevation = currAlt + 10.0 * 10*(Math.random()*2-1);
+		var latitude = currLat + 0.0001 * 10*(Math.random()*2-1);
+		var longitude = currLon + 0.0001 * 10*(Math.random()*2-1);
+		var elevation = currAlt + 2.0 * 10*(Math.random()*2-1);
 		
-		latitude = currLat + 0.01;
-		longitude = currLon + 0.01;
-		elevation = currAlt;
+		//latitude = currLat + 0.0001;
+		//longitude = currLon + 0.0001;
+		//elevation = currAlt;
 		
 		
 		var heading;
 		var pitch;
 		var roll;
-		var durationTimeInSeconds = 100;
-		this.changeLocationAndRotation(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll, durationTimeInSeconds);
+		//var durationTimeInSeconds = 5;
+		var animationOption = {
+			autoChangeRotation : true,
+			duration           : 5
+		};
+		this.changeLocationAndRotation(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll, animationOption);
 	}
 	else if (key === 84) // 84 = 't'.***
 	{
@@ -1807,8 +1811,9 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			
 		//this.modeler.mode = CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_PLANEGRID;
-		this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
+		//this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_TUNNELPOINTS;
+		this.modeler.mode = CODE.modelerMode.DRAWING_STATICGEOMETRY;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_STATICGEOMETRY;
 		
 		// Calculate the geographicCoord of the click position.****
@@ -1927,7 +1932,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 				instanceId : buildingId,
 				longitude  : geoCoord.longitude,
 				latitude   : geoCoord.latitude,
-				height     : geoCoord.altitude+1
+				height     : geoCoord.altitude+20
 			});
 			/*var geoLocDataManager = geoCoord.getGeoLocationDataManager();
 			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
@@ -3436,9 +3441,28 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	ssao_vs_source = ShaderSource.PointCloudVS;
 	ssao_fs_source = ShaderSource.PointCloudSsaoFS;
 	
-	//shader.position3_loc = 0;
-	//shader.normal3_loc = 1;
-	//shader.color4_loc = 3;
+	shader.program = gl.createProgram();
+	shader.shader_vertex = this.postFxShadersManager.createShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.postFxShadersManager.createShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+
+	gl.attachShader(shader.program, shader.shader_vertex);
+	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
+	gl.linkProgram(shader.program);
+			
+	shader.createUniformGenerals(gl, shader, this.sceneState);
+	shader.createUniformLocals(gl, shader, this.sceneState);
+	
+	// pointsCloud shader locals.***
+	shader.bPositionCompressed_loc = gl.getUniformLocation(shader.program, "bPositionCompressed");
+	shader.minPosition_loc = gl.getUniformLocation(shader.program, "minPosition");
+	shader.bboxSize_loc = gl.getUniformLocation(shader.program, "bboxSize");
+	
+	// 9) PointsCloud shader RAINBOW.****************************************************************************************
+	shaderName = "pointsCloudSsao_rainbow";
+	shader = this.postFxShadersManager.newShader(shaderName);
+	ssao_vs_source = ShaderSource.PointCloudVS_rainbow;
+	ssao_fs_source = ShaderSource.PointCloudSsaoFS_rainbow;
 	
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.postFxShadersManager.createShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
@@ -3456,6 +3480,9 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.bPositionCompressed_loc = gl.getUniformLocation(shader.program, "bPositionCompressed");
 	shader.minPosition_loc = gl.getUniformLocation(shader.program, "minPosition");
 	shader.bboxSize_loc = gl.getUniformLocation(shader.program, "bboxSize");
+	shader.bUseColorCodingByHeight_loc = gl.getUniformLocation(shader.program, "bUseColorCodingByHeight");
+	shader.minHeight_rainbow_loc = gl.getUniformLocation(shader.program, "minHeight_rainbow");
+	shader.maxHeight_rainbow_loc = gl.getUniformLocation(shader.program, "maxHeight_rainbow");
 };
 
 /**

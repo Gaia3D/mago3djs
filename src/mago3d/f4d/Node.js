@@ -853,9 +853,18 @@ Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude,
 			var nextPoint3d = new Point3D(nextPos[0], nextPos[1], nextPos[2]);
 			var relativeNextPos;
 			relativeNextPos = geoLocData.getTransformedRelativePositionNoApplyHeadingPitchRoll(nextPoint3d, relativeNextPos);
+			relativeNextPos.unitary();
+			var yAxis = new Point2D(0, 1);
+			var nextPos2d = new Point2D(relativeNextPos.x, relativeNextPos.y);
+			
+			var headingAngle = yAxis.angleDegToVector(nextPos2d);
+			if (relativeNextPos.x > 0.0)
+			{
+				headingAngle *= -1;
+			}
 			
 			// calculate heading (initially yAxis to north).
-			var nextHeading = Math.atan(-relativeNextPos.x/relativeNextPos.y)*180.0/Math.PI;
+			var nextHeading = headingAngle;
 			var nextPosModule2d = Math.sqrt(relativeNextPos.x*relativeNextPos.x + relativeNextPos.y*relativeNextPos.y);
 			var nextPitch = Math.atan(relativeNextPos.z/nextPosModule2d)*180.0/Math.PI;
 			
