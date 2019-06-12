@@ -1217,7 +1217,265 @@ void main()\n\
 	//finalColor = vec4(vec3(0.8, 0.8, 0.8) * occlusion, externalAlpha);\n\
     gl_FragColor = finalColor; \n\
 }";
+ShaderSource.PointCloudSsaoFS_rainbow = "#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+uniform sampler2D depthTex;\n\
+uniform mat4 projectionMatrix;\n\
+uniform float near;\n\
+uniform float far;            \n\
+uniform float fov;\n\
+uniform float aspectRatio;    \n\
+uniform float screenWidth;    \n\
+uniform float screenHeight;    \n\
+uniform vec3 kernel[16];   \n\
+uniform vec4 oneColor4;\n\
+uniform bool bUseColorCodingByHeight;\n\
+uniform float minHeight_rainbow;   \n\
+uniform float maxHeight_rainbow;  \n\
+varying vec4 aColor4; // color from attributes\n\
+varying vec4 vColor;\n\
+varying float glPointSize;\n\
+varying float realHeigh;\n\
+\n\
+const int kernelSize = 16;  \n\
+uniform float radius;      \n\
+\n\
+uniform bool bApplySsao;\n\
+uniform float externalAlpha;\n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+    const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);\n\
+    float depth = dot(rgba_depth, bit_shift);\n\
+    return depth;\n\
+}                \n\
+\n\
+vec3 getViewRay(vec2 tc)\n\
+{\n\
+    float hfar = 2.0 * tan(fov/2.0) * far;\n\
+    float wfar = hfar * aspectRatio;    \n\
+    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    \n\
+    return ray;                      \n\
+}         \n\
+            \n\
+//linear view space depth\n\
+float getDepth(vec2 coord)\n\
+{\n\
+    return unpackDepth(texture2D(depthTex, coord.xy));\n\
+}  \n\
+\n\
+vec3 getRainbowColor_byHeight(float height)\n\
+{\n\
+	float gray = (height - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);\n\
+	if (gray > 1.0){ gray = 1.0; }\n\
+	else if (gray<0.0){ gray = 0.0; }\n\
+	\n\
+	float r, g, b;\n\
+	\n\
+	if(gray < 0.16666)\n\
+	{\n\
+		b = 0.0;\n\
+		g = gray*6.0;\n\
+		r = 1.0;\n\
+	}\n\
+	else if(gray >= 0.16666 && gray < 0.33333)\n\
+	{\n\
+		b = 0.0;\n\
+		g = 1.0;\n\
+		r = 2.0 - gray*6.0;\n\
+	}\n\
+	else if(gray >= 0.33333 && gray < 0.5)\n\
+	{\n\
+		b = -2.0 + gray*6.0;\n\
+		g = 1.0;\n\
+		r = 0.0;\n\
+	}\n\
+	else if(gray >= 0.5 && gray < 0.66666)\n\
+	{\n\
+		b = 1.0;\n\
+		g = 4.0 - gray*6.0;\n\
+		r = 0.0;\n\
+	}\n\
+	else if(gray >= 0.66666 && gray < 0.83333)\n\
+	{\n\
+		b = 1.0;\n\
+		g = 0.0;\n\
+		r = -4.0 + gray*6.0;\n\
+	}\n\
+	else if(gray >= 0.83333)\n\
+	{\n\
+		b = 6.0 - gray*6.0;\n\
+		g = 0.0;\n\
+		r = 1.0;\n\
+	}\n\
+	\n\
+	float aux = r;\n\
+	r = b;\n\
+	b = aux;\n\
+	\n\
+	//b = -gray + 1.0;\n\
+	//if (gray > 0.5)\n\
+	//{\n\
+	//	g = -gray*2.0 + 2.0; \n\
+	//}\n\
+	//else \n\
+	//{\n\
+	//	g = gray*2.0;\n\
+	//}\n\
+	//r = gray;\n\
+	vec3 resultColor = vec3(r, g, b);\n\
+    return resultColor;\n\
+}   \n\
+\n\
+void main()\n\
+{\n\
+	float occlusion = 0.0;\n\
+	if(bApplySsao)\n\
+	{          \n\
+		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
+		float linearDepth = getDepth(screenPos);\n\
+		vec3 origin = getViewRay(screenPos) * linearDepth;\n\
+		float radiusAux = glPointSize/1.9;\n\
+		radiusAux = 1.5;\n\
+		vec2 screenPosAdjacent;\n\
+		\n\
+		for(int j = 0; j < 1; ++j)\n\
+		{\n\
+			radiusAux = 1.5 *(float(j)+1.0);\n\
+			for(int i = 0; i < 8; ++i)\n\
+			{    	 \n\
+				if(i == 0)\n\
+					screenPosAdjacent = vec2((gl_FragCoord.x - radiusAux)/ screenWidth, (gl_FragCoord.y - radiusAux) / screenHeight);\n\
+				else if(i == 1)\n\
+					screenPosAdjacent = vec2((gl_FragCoord.x)/ screenWidth, (gl_FragCoord.y - radiusAux) / screenHeight);\n\
+				else if(i == 2)\n\
+					screenPosAdjacent = vec2((gl_FragCoord.x + radiusAux)/ screenWidth, (gl_FragCoord.y - radiusAux) / screenHeight);\n\
+				else if(i == 3)\n\
+					screenPosAdjacent = vec2((gl_FragCoord.x + radiusAux)/ screenWidth, (gl_FragCoord.y) / screenHeight);\n\
+				else if(i == 4)\n\
+					screenPosAdjacent = vec2((gl_FragCoord.x + radiusAux)/ screenWidth, (gl_FragCoord.y + radiusAux) / screenHeight);\n\
+				else if(i == 5)\n\
+					screenPosAdjacent = vec2((gl_FragCoord.x)/ screenWidth, (gl_FragCoord.y + radiusAux) / screenHeight);\n\
+				else if(i == 6)\n\
+					screenPosAdjacent = vec2((gl_FragCoord.x - radiusAux)/ screenWidth, (gl_FragCoord.y + radiusAux) / screenHeight);\n\
+				else if(i == 7)\n\
+					screenPosAdjacent = vec2((gl_FragCoord.x - radiusAux)/ screenWidth, (gl_FragCoord.y) / screenHeight);\n\
+				float depthBufferValue = getDepth(screenPosAdjacent);\n\
+				float range_check = abs(linearDepth - depthBufferValue)*far;\n\
+				if (range_check > 1.5 && depthBufferValue > linearDepth)\n\
+				{\n\
+					if (range_check < 20.0)\n\
+						occlusion +=  1.0;\n\
+				}\n\
+			}   \n\
+		}   \n\
+			\n\
+		if(occlusion > 6.0)\n\
+			occlusion = 8.0;\n\
+		//else occlusion = 0.0;\n\
+		occlusion = 1.0 - occlusion / 8.0;\n\
+	}\n\
+	else{\n\
+		occlusion = 1.0;\n\
+	}\n\
+\n\
+    vec4 finalColor;\n\
+	if(bUseColorCodingByHeight)\n\
+	{\n\
+		float rainbow = 0.5;\n\
+		float texCol = 0.5;\n\
+		vec3 rainbowColor3 = getRainbowColor_byHeight(realHeigh);\n\
+		vec3 blendedColor3 = vec3(vColor.x * texCol + rainbowColor3.r * rainbow, vColor.y * texCol + rainbowColor3.g * rainbow, vColor.z * texCol + rainbowColor3.b * rainbow);\n\
+		finalColor = vec4(blendedColor3 * occlusion, externalAlpha);\n\
+	}\n\
+	else\n\
+		finalColor = vec4((vColor.xyz) * occlusion, externalAlpha);\n\
+	//finalColor = vec4(vec3(0.8, 0.8, 0.8) * occlusion, externalAlpha);\n\
+    gl_FragColor = finalColor; \n\
+}\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+";
 ShaderSource.PointCloudVS = "attribute vec3 position;\n\
+attribute vec3 normal;\n\
+attribute vec2 texCoord;\n\
+attribute vec4 color4;\n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform mat4 buildingRotMatrix;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+uniform float near;\n\
+uniform float far;\n\
+uniform bool bPositionCompressed;\n\
+uniform vec3 minPosition;\n\
+uniform vec3 bboxSize;\n\
+uniform bool bUse1Color;\n\
+uniform vec4 oneColor4;\n\
+uniform float fixPointSize;\n\
+uniform bool bUseFixPointSize;\n\
+uniform bool bUseColorCodingByHeight;\n\
+varying vec4 vColor;\n\
+varying float glPointSize;\n\
+\n\
+void main()\n\
+{\n\
+	vec3 realPos;\n\
+	vec4 rotatedPos;\n\
+	if(bPositionCompressed)\n\
+	{\n\
+		float maxShort = 65535.0;\n\
+		realPos = vec3(float(position.x)/maxShort*bboxSize.x + minPosition.x, float(position.y)/maxShort*bboxSize.y + minPosition.y, float(position.z)/maxShort*bboxSize.z + minPosition.z);\n\
+	}\n\
+	else\n\
+	{\n\
+		realPos = position;\n\
+	}\n\
+	rotatedPos = buildingRotMatrix * vec4(realPos.xyz, 1.0);\n\
+    vec3 objPosHigh = buildingPosHIGH;\n\
+    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
+    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+	\n\
+    if(bUse1Color)\n\
+	{\n\
+		vColor=oneColor4;\n\
+	}\n\
+	else\n\
+		vColor=color4;\n\
+	\n\
+    gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
+	float z_b = gl_Position.z/gl_Position.w;\n\
+	float z_n = 2.0 * z_b - 1.0;\n\
+    float z_e = 2.0 * near * far / (far + near - z_n * (far - near));\n\
+	gl_PointSize = 1.0 + 40.0/z_e; // Original.***\n\
+	if(gl_PointSize > 10.0)\n\
+		gl_PointSize = 10.0;\n\
+	if(gl_PointSize < 2.0)\n\
+		gl_PointSize = 2.0;\n\
+		\n\
+	glPointSize = gl_PointSize;\n\
+}";
+ShaderSource.PointCloudVS_rainbow = "attribute vec3 position;\n\
 attribute vec3 normal;\n\
 attribute vec2 texCoord;\n\
 attribute vec4 color4;\n\
@@ -1238,6 +1496,7 @@ uniform float fixPointSize;\n\
 uniform bool bUseFixPointSize;\n\
 varying vec4 vColor;\n\
 varying float glPointSize;\n\
+varying float realHeigh;\n\
 \n\
 void main()\n\
 {\n\
@@ -1252,6 +1511,7 @@ void main()\n\
 	{\n\
 		realPos = position;\n\
 	}\n\
+	realHeigh = realPos.z;\n\
 	rotatedPos = buildingRotMatrix * vec4(realPos.xyz, 1.0);\n\
     vec3 objPosHigh = buildingPosHIGH;\n\
     vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\

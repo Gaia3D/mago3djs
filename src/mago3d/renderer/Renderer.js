@@ -1033,7 +1033,10 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			{ magoManager.pointsCloudSsao = true; }
 			
 			if (magoManager.pointsCloudSsao)
-			{ currentShader = magoManager.postFxShadersManager.getShader("pointsCloudSsao"); }
+			{ 
+				//currentShader = magoManager.postFxShadersManager.getShader("pointsCloudSsao"); 
+				currentShader = magoManager.postFxShadersManager.getShader("pointsCloudSsao_rainbow"); 
+			}
 			else
 			{ currentShader = magoManager.postFxShadersManager.getShader("pointsCloud"); }
 			currentShader.useProgram();
@@ -1055,6 +1058,10 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			{
 				gl.uniform1i(currentShader.bUse1Color_loc, false);
 			}
+			
+			gl.uniform1i(currentShader.bUseColorCodingByHeight_loc, true);
+			gl.uniform1f(currentShader.minHeight_rainbow_loc, 40.0);
+			gl.uniform1f(currentShader.maxHeight_rainbow_loc, 75.0);
 	
 			gl.activeTexture(gl.TEXTURE0);
 			gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);
