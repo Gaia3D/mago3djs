@@ -157,7 +157,7 @@ Renderer.prototype.getPointsCountForDistance = function(distToCam, realPointsCou
 	}
 	else if (distToCam < 100)
 	{
-		vertices_count =  Math.floor(pCloudSettings.MaxPerUnitPointsRenderDistToCam100m * realPointsCount);
+		vertices_count = Math.floor(pCloudSettings.MaxPerUnitPointsRenderDistToCam100m * realPointsCount);
 	}
 	else if (distToCam < 200)
 	{
