@@ -18,6 +18,7 @@ var Lego = function()
 	}
 
 	/**
+	 * This class is the container which holds the VBO Cache Keys.
 	 * @type {VBOVertexIdxCacheKeysContainer}
 	 */
 	this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer();
