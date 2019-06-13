@@ -271,6 +271,12 @@ var MagoManager = function()
 	this.tempSettings.renderSpaces = true;
 	this.tempSettings.spacesAlpha = 0.6;
 	
+	/**
+	 * This class contains general settings.
+	 * @type {Settings}
+	 */
+	this._settings = new Settings();
+	
 	//this.tinTerrainManager = new TinTerrainManager();
 };
 
@@ -1668,15 +1674,9 @@ MagoManager.prototype.keyDown = function(key)
 {
 	if (key === 32) // 32 = 'space'.***
 	{
-		if (this.pointsCloudSsao === undefined)
-		{ this.pointsCloudSsao = true; }
-		
-		if (this.pointsCloudSsao)
-		{ this.pointsCloudSsao = false; }
-		else
-		{ this.pointsCloudSsao = true; }
-	
-	
+		var renderingSettings = this._settings.getRenderingSettings();
+		var pointsCloudColorRamp = renderingSettings.getPointsCloudInColorRamp();
+		renderingSettings.setPointsCloudInColorRamp(!pointsCloudColorRamp);
 	}
 	/*
 	else if (key === 37) // 37 = 'left'.***

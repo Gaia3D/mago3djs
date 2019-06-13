@@ -11,9 +11,6 @@ var CurrentObjectsRendering = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	// General objects rendering, as currNode, currBuilding, currOctree, currRefObject.
-	// This class contains the current objects that are rendering. 
-	
 	/**
 	 * The current node that is in rendering process.
 	 * @type {Node}
@@ -579,6 +576,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 	var rootNode;
 	var geoLocDataManager;
 	var magoManager = this.magoManager;
+	var renderingSettings = magoManager._settings.getRenderingSettings();
 
 	var renderTexture = false;
 	
@@ -1027,18 +1025,21 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			var frustumIdx = magoManager.currentFrustumIdx;
 			magoManager.sceneState.camera.frustum.near[0] = magoManager.sceneState.camera.frustumsArray[frustumIdx].near[0];
 			magoManager.sceneState.camera.frustum.far[0] = magoManager.sceneState.camera.frustumsArray[frustumIdx].far[0];
-
-					
-			if (magoManager.pointsCloudSsao === undefined)
-			{ magoManager.pointsCloudSsao = true; }
 			
-			if (magoManager.pointsCloudSsao)
+			if (renderingSettings.getApplySsao())
 			{ 
-				//currentShader = magoManager.postFxShadersManager.getShader("pointsCloudSsao"); 
-				currentShader = magoManager.postFxShadersManager.getShader("pointsCloudSsao_rainbow"); 
+				if (renderingSettings.getPointsCloudInColorRamp())
+				{ currentShader = magoManager.postFxShadersManager.getShader("pointsCloudSsao_rainbow"); } 
+				else
+				{ currentShader = magoManager.postFxShadersManager.getShader("pointsCloudSsao"); } 
 			}
 			else
-			{ currentShader = magoManager.postFxShadersManager.getShader("pointsCloud"); }
+			{ 
+				if (renderingSettings.getPointsCloudInColorRamp())
+				{ currentShader = magoManager.postFxShadersManager.getShader("pointsCloudSsao_rainbow"); } // change this for "pointsCloud_rainbow" todo:
+				else
+				{ currentShader = magoManager.postFxShadersManager.getShader("pointsCloud"); } 
+			}
 			currentShader.useProgram();
 			currentShader.resetLastBuffersBinded();
 			currentShader.enableVertexAttribArray(currentShader.position3_loc);

@@ -907,6 +907,9 @@ Node.prototype.changeLocationAndRotation = function(latitude, longitude, elevati
 	
 	if (nodeRoot === undefined)
 	{ return; }
+
+	if (nodeRoot.data.bbox === undefined)
+	{ return; }
 	
 	// now, extract all buildings of the nodeRoot.
 	var nodesArray = [];

@@ -17,8 +17,7 @@ var Block = function()
 	}
 
 	/**
-	 * This has "VertexIdxVBOArraysContainer" because the "indices" cannot to be greater than 65000, because indices are short type.
-	 * Change this for "vbo_VertexIdx_CacheKeys_Container__idx"
+	 * This class is the container which holds the VBO Cache Keys.
 	 * @type {VBOVertexIdxCacheKeysContainer}
 	 */
 	this.vBOVertexIdxCacheKeysContainer = new VBOVertexIdxCacheKeysContainer();
