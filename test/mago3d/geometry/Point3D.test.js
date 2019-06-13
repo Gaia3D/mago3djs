@@ -12,7 +12,8 @@ describe('Point3D', function()
 		testPoint = new Point3D();
 	});
 
-	describe('객체 생성시', function() {
+	describe('객체 생성시', function() 
+	{
 		it('new 키워드 없이 생성할 경우 예외를 던져야 한다.', function() 
 		{
 			expect(function () 
@@ -27,7 +28,7 @@ describe('Point3D', function()
 			expect(testPoint.y).toEqual(0.0);
 			expect(testPoint.z).toEqual(0.0);
 		});
-	})
+	});
 	/*
 	describe('destroy()', function() 
 	{

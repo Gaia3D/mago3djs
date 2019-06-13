@@ -137,7 +137,7 @@ FBO.prototype.deleteObjects = function(gl)
  */
 FBO.createBuffer = function(gl, data) 
 {
-	const buffer = gl.createBuffer();
+	var buffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
 	gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
 	return buffer;

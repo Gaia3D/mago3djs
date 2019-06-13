@@ -22,9 +22,11 @@ var gulpIf = require('gulp-if');
 var jsdoc = require('gulp-jsdoc3');
 var Server = require('karma').Server;
 
+
+//source_js : [ './src/mago3d/*.js', './src/mago3d/**/*.js', '!./src/engine/cesium', '!./src/mago3d/Demo*.js', '!./src/mago3d/test/Test*.js', '!./src/mago3d/avent/*.js', '!./src/mago3d/core/ManagerFactory2.js', '!./src/mago3d/util/Ajax.js', '!./src/mago3d/extern/textEncoding/*.js' ],
 var paths = {
 	data      : './data',
-	source_js : [ './src/mago3d/*.js', './src/mago3d/**/*.js', '!./src/engine/cesium', '!./src/mago3d/Demo*.js' ],
+	source_js : [ './src/mago3d/*.js', './src/mago3d/**/*.js', '!./src/engine/cesium', '!./src/mago3d/Demo*.js', '!./src/mago3d/test/Test*.js', '!./src/mago3d/avent/*.js', '!./src/mago3d/core/ManagerFactory2.js', '!./src/mago3d/util/Ajax.js', '!./src/mago3d/extern/textEncoding/*.js'],
 	//	source_images : './images/*',
 	//	source_css : './src/css/*',
 	dest_js   : './build/mago3d',
@@ -212,7 +214,7 @@ gulp.task('karma', function (done)
 gulp.task('lint', function() 
 {
 	var list = paths.source_js.slice(0);
-	list.push('!./src/mago3d/extern/*.js');
+	//list.push('!./src/mago3d/extern/*.js');
 	list = list.concat(paths.test);
 	return gulp.src(list)
 		.pipe(eslint({fix: true}))

@@ -50,15 +50,16 @@ describe('Ring2DList', function()
 		});
 	});
 
-	describe('getIndexToInsertBySquaredDist', function (){
+	describe('getIndexToInsertBySquaredDist', function ()
+	{
 		it('특정 인덱스의 값을 입력값으로 주었을때 동일한 위치의 인덱스를 구한다.', function() 
 		{
-			var test = [{name: "A", squaredDist: 10}, {name: "B", squaredDist: 20}, {name: "C", squaredDist: 30}, {name: "D", squaredDist: 40},
-			{name: "A", squaredDist: 50}, {name: "B", squaredDist: 60}, {name: "C", squaredDist: 70}, {name: "D", squaredDist: 80}];
-			var length = test.length;
+			var testArray = [{name: "A", squaredDist: 10}, {name: "B", squaredDist: 20}, {name: "C", squaredDist: 30}, {name: "D", squaredDist: 40},
+				{name: "A", squaredDist: 50}, {name: "B", squaredDist: 60}, {name: "C", squaredDist: 70}, {name: "D", squaredDist: 80}];
+			var length = testArray.length;
 			for (var i=0; i<length; i++)
 			{
-				expect(Ring2DList.getIndexToInsertBySquaredDist(test, test[i], 0, length-1)).toEqual(i+1);
+				expect(Ring2DList.getIndexToInsertBySquaredDist(testArray, testArray[i], 0, length-1)).toEqual(i+1);
 			}
 		});
 	});

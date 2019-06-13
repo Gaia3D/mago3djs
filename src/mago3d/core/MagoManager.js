@@ -272,6 +272,16 @@ var MagoManager = function()
 	this.tempSettings.spacesAlpha = 0.6;
 	
 	//this.tinTerrainManager = new TinTerrainManager();
+
+	//Math.cbrt polyfill
+	if (!Math.cbrt) 
+	{
+		Math.cbrt = function(x) 
+		{
+			var y = Math.pow(Math.abs(x), 1/3);
+			return x < 0 ? -y : y;
+		};
+	}
 };
 
 /**
@@ -3297,11 +3307,12 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
 	gl.linkProgram(shader.program);
-			
+
 	shader.createUniformGenerals(gl, shader, this.sceneState);
 	shader.createUniformLocals(gl, shader, this.sceneState);
-	
+
 	// 1.1) ModelReferences depthShader.******************************************************************************
 	var shaderName = "modelRefDepth";
 	var shader = this.postFxShadersManager.newShader(shaderName);
@@ -3313,11 +3324,12 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.shader_fragment = this.postFxShadersManager.createShader(gl, showDepth_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
 	gl.linkProgram(shader.program);
-			
+
 	shader.createUniformGenerals(gl, shader, this.sceneState);
 	shader.createUniformLocals(gl, shader, this.sceneState);
-	
+
 	// 2) ModelReferences colorCoding shader.***********************************************************************
 	var shaderName = "modelRefColorCoding";
 	var shader = this.postFxShadersManager.newShader(shaderName);
@@ -3329,128 +3341,161 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.shader_fragment = this.postFxShadersManager.createShader(gl, showDepth_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
 	gl.linkProgram(shader.program);
-			
+
 	shader.createUniformGenerals(gl, shader, this.sceneState);
 	shader.createUniformLocals(gl, shader, this.sceneState);
-	
+
 	// 3) TinTerrain shader.****************************************************************************************
 	shaderName = "tinTerrain";
 	shader = this.postFxShadersManager.newShader(shaderName);
 	ssao_vs_source = ShaderSource.TinTerrainVS;
 	ssao_fs_source = ShaderSource.TinTerrainFS;
-	
+
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.postFxShadersManager.createShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
 	shader.shader_fragment = this.postFxShadersManager.createShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
 
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
 	gl.linkProgram(shader.program);
-			
+
 	shader.createUniformGenerals(gl, shader, this.sceneState);
 	shader.createUniformLocals(gl, shader, this.sceneState);
 	shader.bIsMakingDepth_loc = gl.getUniformLocation(shader.program, "bIsMakingDepth");
-	
+
 	// 4) PointsCloud shader.****************************************************************************************
 	shaderName = "pointsCloud";
 	shader = this.postFxShadersManager.newShader(shaderName);
 	ssao_vs_source = ShaderSource.PointCloudVS;
 	ssao_fs_source = ShaderSource.PointCloudFS;
-	
+
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.postFxShadersManager.createShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
 	shader.shader_fragment = this.postFxShadersManager.createShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
 
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
 	gl.linkProgram(shader.program);
-			
+
 	shader.createUniformGenerals(gl, shader, this.sceneState);
 	shader.createUniformLocals(gl, shader, this.sceneState);
-	
+
 	// pointsCloud shader locals.***
 	shader.bPositionCompressed_loc = gl.getUniformLocation(shader.program, "bPositionCompressed");
 	shader.minPosition_loc = gl.getUniformLocation(shader.program, "minPosition");
 	shader.bboxSize_loc = gl.getUniformLocation(shader.program, "bboxSize");
-	
+
 	// 5) Test Quad shader.****************************************************************************************
 	shaderName = "testQuad"; // used by temperatura layer.***
 	shader = this.postFxShadersManager.newShader(shaderName);
 	ssao_vs_source = ShaderSource.Test_QuadVS;
 	ssao_fs_source = ShaderSource.Test_QuadFS;
-	
+
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.postFxShadersManager.createShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
 	shader.shader_fragment = this.postFxShadersManager.createShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
 
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
 	gl.linkProgram(shader.program);
-			
+
 	shader.createUniformGenerals(gl, shader, this.sceneState);
 	shader.createUniformLocals(gl, shader, this.sceneState);
-	
+
 	// 6) Filter silhouette shader.*************************************************************************************
 	shaderName = "filterSilhouette"; 
 	shader = this.postFxShadersManager.newShader(shaderName);
 	ssao_vs_source = ShaderSource.wgs84_volumVS; // simple screen quad v-shader.***
 	ssao_fs_source = ShaderSource.filterSilhouetteFS;
-	
+
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.postFxShadersManager.createShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
 	shader.shader_fragment = this.postFxShadersManager.createShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
 
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
 	gl.linkProgram(shader.program);
-			
+
 	shader.createUniformGenerals(gl, shader, this.sceneState);
 	shader.createUniformLocals(gl, shader, this.sceneState);
-	
+
 	// 7) PointsCloud Depth shader.****************************************************************************************
 	shaderName = "pointsCloudDepth";
 	shader = this.postFxShadersManager.newShader(shaderName);
 	ssao_vs_source = ShaderSource.PointCloudDepthVS;
 	ssao_fs_source = ShaderSource.RenderShowDepthFS;
-	
+
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.postFxShadersManager.createShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
 	shader.shader_fragment = this.postFxShadersManager.createShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
 
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
 	gl.linkProgram(shader.program);
-			
+
 	shader.createUniformGenerals(gl, shader, this.sceneState);
 	shader.createUniformLocals(gl, shader, this.sceneState);
-	
+
 	// pointsCloud shader locals.***
 	shader.bPositionCompressed_loc = gl.getUniformLocation(shader.program, "bPositionCompressed");
 	shader.minPosition_loc = gl.getUniformLocation(shader.program, "minPosition");
 	shader.bboxSize_loc = gl.getUniformLocation(shader.program, "bboxSize");
-	
+
 	// 8) PointsCloud shader.****************************************************************************************
 	shaderName = "pointsCloudSsao";
 	shader = this.postFxShadersManager.newShader(shaderName);
 	ssao_vs_source = ShaderSource.PointCloudVS;
 	ssao_fs_source = ShaderSource.PointCloudSsaoFS;
-	
+
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.postFxShadersManager.createShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
 	shader.shader_fragment = this.postFxShadersManager.createShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
 
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
 	gl.linkProgram(shader.program);
-			
+
 	shader.createUniformGenerals(gl, shader, this.sceneState);
 	shader.createUniformLocals(gl, shader, this.sceneState);
-	
+
 	// pointsCloud shader locals.***
 	shader.bPositionCompressed_loc = gl.getUniformLocation(shader.program, "bPositionCompressed");
 	shader.minPosition_loc = gl.getUniformLocation(shader.program, "minPosition");
 	shader.bboxSize_loc = gl.getUniformLocation(shader.program, "bboxSize");
+
+	// 9) PointsCloud shader RAINBOW.****************************************************************************************
+	shaderName = "pointsCloudSsao_rainbow";
+	shader = this.postFxShadersManager.newShader(shaderName);
+	ssao_vs_source = ShaderSource.PointCloudVS_rainbow;
+	ssao_fs_source = ShaderSource.PointCloudSsaoFS_rainbow;
+
+	shader.program = gl.createProgram();
+	shader.shader_vertex = this.postFxShadersManager.createShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.postFxShadersManager.createShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+
+	gl.attachShader(shader.program, shader.shader_vertex);
+	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
+	gl.linkProgram(shader.program);
+
+	shader.createUniformGenerals(gl, shader, this.sceneState);
+	shader.createUniformLocals(gl, shader, this.sceneState);
+
+	// pointsCloud shader locals.***
+	shader.bPositionCompressed_loc = gl.getUniformLocation(shader.program, "bPositionCompressed");
+	shader.minPosition_loc = gl.getUniformLocation(shader.program, "minPosition");
+	shader.bboxSize_loc = gl.getUniformLocation(shader.program, "bboxSize");
+	shader.bUseColorCodingByHeight_loc = gl.getUniformLocation(shader.program, "bUseColorCodingByHeight");
+	shader.minHeight_rainbow_loc = gl.getUniformLocation(shader.program, "minHeight_rainbow");
+	shader.maxHeight_rainbow_loc = gl.getUniformLocation(shader.program, "maxHeight_rainbow");
 };
 
 /**
@@ -3980,7 +4025,7 @@ MagoManager.prototype.flyToBuilding = function(apiName, projectId, dataKey)
 	if (realBuildingPos === undefined)
 	{ return; }
 
-	if(!nodeRoot.data.bbox)
+	if (!nodeRoot.data.bbox)
 	{ return; }
 	this.radiusAprox_aux = nodeRoot.data.bbox.getRadiusAprox();
 
@@ -5177,7 +5222,8 @@ MagoManager.prototype.callAPI = function(api)
 			throw new Error("This node is not exist.");
 		}
 
-		if(node.isReadyToRender){
+		if (node.isReadyToRender)
+		{
 			var geoLocDataManager = node.getNodeGeoLocDataManager();
 			var geoLocData = geoLocDataManager.getCurrentGeoLocationData();
 			var geoCoords = geoLocData.getGeographicCoords();
@@ -5234,7 +5280,7 @@ MagoManager.prototype.callAPI = function(api)
 
 		if (node !== undefined)
 		{
-			if(node.isReadyToRender())
+			if (node.isReadyToRender())
 			{
 				return true;
 			}

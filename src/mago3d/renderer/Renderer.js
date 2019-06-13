@@ -448,6 +448,9 @@ Renderer.prototype.renderObject = function(gl, renderable, magoManager, shader, 
 			gl.drawArrays(gl.LINE_STRIP, 0, vertices_count);
 			//gl.drawArrays(gl.TRIANGLES, 0, vertices_count);
 		}
+		var glError = gl.getError();
+		if (glError !== gl.NO_ERROR)
+		{ var hola = 0; }
 	}
 };
 
@@ -476,10 +479,8 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 		shaderProgram = currentShader.program;
 
 		currentShader.useProgram();
+		currentShader.disableVertexAttribArrayAll();
 		currentShader.enableVertexAttribArray(currentShader.position3_loc);
-		currentShader.disableVertexAttribArray(currentShader.texCoord2_loc);
-		currentShader.disableVertexAttribArray(currentShader.normal3_loc);
-		currentShader.disableVertexAttribArray(currentShader.color4_loc);
 
 		currentShader.bindUniformGenerals();
 
@@ -504,10 +505,8 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 		shaderProgram = currentShader.program;
 
 		currentShader.useProgram();
+		currentShader.disableVertexAttribArrayAll();
 		currentShader.enableVertexAttribArray(currentShader.position3_loc);
-		currentShader.disableVertexAttribArray(currentShader.texCoord2_loc);
-		currentShader.disableVertexAttribArray(currentShader.normal3_loc);
-		currentShader.disableVertexAttribArray(currentShader.color4_loc);
 		currentShader.bindUniformGenerals();
 
 		// RenderDepth for all buildings.***
@@ -532,10 +531,8 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 		
 		currentShader.resetLastBuffersBinded();
 
+		currentShader.disableVertexAttribArrayAll();
 		currentShader.enableVertexAttribArray(currentShader.position3_loc);
-		currentShader.disableVertexAttribArray(currentShader.color4_loc);
-		currentShader.disableVertexAttribArray(currentShader.normal3_loc); // provisionally has no normals.***
-		currentShader.disableVertexAttribArray(currentShader.texCoord2_loc); // provisionally has no texCoords.***
 		
 		currentShader.bindUniformGenerals();
 		
@@ -969,12 +966,19 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		
 		
 		// 3) now render bboxes.*******************************************************************************************************************
-		if (magoManager.magoPolicy.getShowBoundingBox())
+		var nodesPcloudCount = magoManager.visibleObjControlerNodes.currentVisiblesAux.length;
+		if (nodesLOD0Count > 0 || nodesLOD2Count > 0 || nodesLOD3Count > 0 || nodesPcloudCount > 0)
 		{
-			var bRenderLines = true;
-			this.renderBoundingBoxesNodes(magoManager.visibleObjControlerNodes.currentVisibles0, undefined, bRenderLines);
-			this.renderBoundingBoxesNodes(magoManager.visibleObjControlerNodes.currentVisibles2, undefined, bRenderLines);
-			this.renderBoundingBoxesNodes(magoManager.visibleObjControlerNodes.currentVisibles3, undefined, bRenderLines);
+			if (magoManager.magoPolicy.getShowBoundingBox())
+			{
+                
+				var bRenderLines = true;
+				//var currentVisiblesArray = visibleObjControlerNodes.currentVisibles0.concat(visibleObjControlerNodes.currentVisibles2,);
+				this.renderBoundingBoxesNodes(magoManager.visibleObjControlerNodes.currentVisibles0, undefined, bRenderLines);
+				this.renderBoundingBoxesNodes(magoManager.visibleObjControlerNodes.currentVisibles2, undefined, bRenderLines);
+				this.renderBoundingBoxesNodes(magoManager.visibleObjControlerNodes.currentVisibles3, undefined, bRenderLines);
+				this.renderBoundingBoxesNodes(magoManager.visibleObjControlerNodes.currentVisiblesAux, undefined, bRenderLines);
+			}
 		}
 		
 		// 4) Render ObjectMarkers.********************************************************************************************************
@@ -1069,7 +1073,11 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			{ magoManager.pointsCloudSsao = true; }
 			
 			if (magoManager.pointsCloudSsao)
-			{ currentShader = magoManager.postFxShadersManager.getShader("pointsCloudSsao"); }
+			//{ currentShader = magoManager.postFxShadersManager.getShader("pointsCloudSsao"); }
+			{ 
+				//currentShader = magoManager.postFxShadersManager.getShader("pointsCloudSsao"); 
+				currentShader = magoManager.postFxShadersManager.getShader("pointsCloudSsao_rainbow"); 
+			}
 			else
 			{ currentShader = magoManager.postFxShadersManager.getShader("pointsCloud"); }
 			currentShader.useProgram();
@@ -1091,7 +1099,11 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			{
 				gl.uniform1i(currentShader.bUse1Color_loc, false);
 			}
-	
+
+			gl.uniform1i(currentShader.bUseColorCodingByHeight_loc, true);
+			gl.uniform1f(currentShader.minHeight_rainbow_loc, 40.0);
+			gl.uniform1f(currentShader.maxHeight_rainbow_loc, 75.0);
+			
 			gl.activeTexture(gl.TEXTURE0);
 			gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);
 			

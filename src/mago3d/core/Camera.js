@@ -473,11 +473,42 @@ Camera.prototype.doTrack = function(magoManager)
 			var targetGeographicCoords = geoLocationData.getGeographicCoords();
 			if (targetGeographicCoords === undefined)
 			{ return; }
-			var target = Cesium.Cartesian3.fromDegrees(targetGeographicCoords.longitude, targetGeographicCoords.latitude, targetGeographicCoords.altitude);
+
+			var rotMatInv = geoLocationData.rotMatrix;
+			var rotPointTarget  = rotMatInv.rotatePoint3D(new Point3D(0, 10, 0));
+			var rotPointCamPos = rotMatInv.rotatePoint3D(new Point3D(0, -0.5, 12));
+
+			var target = Cesium.Cartesian3.fromDegrees(targetGeographicCoords.longitude, targetGeographicCoords.latitude, targetGeographicCoords.altitude+20);
+
+			rotPointCamPos.x = target.x + rotPointCamPos.x;
+			rotPointCamPos.y = target.y + rotPointCamPos.y;
+			rotPointCamPos.z = target.z + rotPointCamPos.z;
+
+			rotPointTarget.x = target.x + rotPointTarget.x;
+			rotPointTarget.y = target.y + rotPointTarget.y;
+			rotPointTarget.z = target.z + rotPointTarget.z;
+
+			var direction = new Point3D();
+			direction.set(rotPointTarget.x - rotPointCamPos.x, rotPointTarget.y - rotPointCamPos.y, rotPointTarget.z - rotPointCamPos.z);
+			direction.unitary();
+
+			var geoLocMat = geoLocationData.geoLocMatrix;
+			var earthNormal = new Point3D(geoLocMat[8], geoLocMat[9], geoLocMat[10]);
+			var right = direction.crossProduct(earthNormal);
+			var up = right.crossProduct(direction);
+
 			var range = Cesium.Cartesian3.distance(movedCamPos ? movedCamPos : position, target);
 			var hpr = new Cesium.HeadingPitchRange(camera.heading, camera.pitch, range);
 
-			camera.lookAt(target, hpr); //How To lookAt off : use camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
+			camera.setView({
+				destination : rotPointCamPos,
+				orientation : {
+					direction : new Cesium.Cartesian3(direction.x, direction.y, direction.z),
+					up        : new Cesium.Cartesian3(up.x, up.y, up.z)
+				}
+			});
+
+			//camera.lookAt(target, hpr); //How To lookAt off : use camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
 			
 			/*var sphere = new Sphere();
 			var radiusAprox_aux = trackNode.data.bbox.getRadiusAprox();

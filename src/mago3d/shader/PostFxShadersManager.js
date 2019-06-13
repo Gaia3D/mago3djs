@@ -133,6 +133,7 @@ PostFxShadersManager.prototype.createPngImageShader = function(gl)
 
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
 	gl.linkProgram(shader.program);
 
 	shader.texture_loc = gl.getUniformLocation(shader.program, "u_texture"); 
@@ -172,6 +173,7 @@ PostFxShadersManager.prototype.createSilhouetteShaderModelRef = function(gl)
 
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
 	gl.linkProgram(shader.program);
 
 	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
@@ -219,6 +221,7 @@ PostFxShadersManager.prototype.createSsaoShaderBox = function(gl)
 
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
 	gl.linkProgram(shader.program);
 
 	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
@@ -239,7 +242,11 @@ PostFxShadersManager.prototype.createSsaoShaderBox = function(gl)
 	shader.bScale_loc = gl.getUniformLocation(shader.program, "bScale");
 	shader.scale_loc = gl.getUniformLocation(shader.program, "scale");
 
-
+	gl.bindAttribLocation(shader.program, 0, "position");
+	gl.bindAttribLocation(shader.program, 1, "normal");
+	gl.bindAttribLocation(shader.program, 2, "texCoord");
+	gl.bindAttribLocation(shader.program, 3, "color4");
+	
 	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
 	//shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
 	shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
@@ -299,6 +306,7 @@ PostFxShadersManager.prototype.createInvertedBoxShader = function(gl)
 
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
 	gl.linkProgram(shader.program);
 
 	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh"); // sceneState.

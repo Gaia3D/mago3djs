@@ -269,9 +269,10 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 	function addImageryLayers() 
 	{
 		var provider = new Cesium.WebMapServiceImageryProvider({
-			url        : MagoConfig.getPolicy().geo_server_add_url,
-			layers     : MagoConfig.getPolicy().geo_server_add_layers,
-			parameters : {
+			url                : MagoConfig.getPolicy().geo_server_add_url,
+			layers             : MagoConfig.getPolicy().geo_server_add_layers,
+			enablePickFeatures : false,
+			parameters         : {
 				service     : MagoConfig.getPolicy().geo_server_add_parameters_service,
 				version     : MagoConfig.getPolicy().geo_server_add_parameters_version,
 				request     : MagoConfig.getPolicy().geo_server_add_parameters_request,
@@ -410,9 +411,10 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		if (serverPolicy.geo_server_enable === "true" && serverPolicy.geo_server_url !== null && serverPolicy.geo_server_url !== '') 
 		{
 			var imageryProvider = new Cesium.WebMapServiceImageryProvider({
-				url        : serverPolicy.geo_server_url,
-				layers     : serverPolicy.geo_server_layers,
-				parameters : {
+				url                : serverPolicy.geo_server_url,
+				layers             : serverPolicy.geo_server_layers,
+				enablePickFeatures : false,
+				parameters         : {
 					service     : serverPolicy.geo_server_parameters_service,
 					version     : serverPolicy.geo_server_parameters_version,
 					request     : serverPolicy.geo_server_parameters_request,
