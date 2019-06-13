@@ -37,7 +37,35 @@ var Camera = function()
 	this.rightNormal = new Point3D();
 	this.bottomNormal = new Point3D();
 	this.topNormal = new Point3D();
+
+	/**
+	 * @type {Node} track target node;
+	 */
 	this.tracked;
+
+	/**
+	 * @type {number} track mode
+	 * @default CODE.trackMode.TRACKING 0
+	 */
+	this.trackType = CODE.trackMode.TRACKING;
+	
+	/**
+	 * @type {number} targetOffset
+	 * @default 10.0
+	 */
+	this.targetOffset = 10.0;
+
+	/**
+	 * @type {number} trackCameraOffsetY
+	 * @default -1
+	 */
+	this.trackCameraOffsetY = -1;
+	
+	/**
+	* @type {number} trackCameraOffsetZ
+	* @default 12
+	*/
+	this.trackCameraOffsetZ = 12;
 };
 
 /**
@@ -473,49 +501,34 @@ Camera.prototype.doTrack = function(magoManager)
 			var targetGeographicCoords = geoLocationData.getGeographicCoords();
 			if (targetGeographicCoords === undefined)
 			{ return; }
-
-			var rotMatInv = geoLocationData.rotMatrix;
-			var rotPointTarget  = rotMatInv.rotatePoint3D(new Point3D(0, 10, 0));
-			var rotPointCamPos = rotMatInv.rotatePoint3D(new Point3D(0, -0.5, 12));
-
 			var target = Cesium.Cartesian3.fromDegrees(targetGeographicCoords.longitude, targetGeographicCoords.latitude, targetGeographicCoords.altitude+20);
 
-			rotPointCamPos.x = target.x + rotPointCamPos.x;
-			rotPointCamPos.y = target.y + rotPointCamPos.y;
-			rotPointCamPos.z = target.z + rotPointCamPos.z;
+			if (this.trackType === CODE.trackMode.TRACKING)
+			{
+				var range = Cesium.Cartesian3.distance(movedCamPos ? movedCamPos : position, target);
+				var hpr = new Cesium.HeadingPitchRange(camera.heading, camera.pitch, range);
 
-			rotPointTarget.x = target.x + rotPointTarget.x;
-			rotPointTarget.y = target.y + rotPointTarget.y;
-			rotPointTarget.z = target.z + rotPointTarget.z;
+				camera.lookAt(target, hpr);
+			}
+			//CODE.trackMode.DRIVER
+			else
+			{
+				var rotMat = geoLocationData.rotMatrix;
+				var rotPointTarget  = rotMat.rotatePoint3D(new Point3D(0, this.targetOffset, 0));
+				var rotPointCamPos = rotMat.rotatePoint3D(new Point3D(0, this.trackCameraOffsetY, this.trackCameraOffsetZ));
 
-			var direction = new Point3D();
-			direction.set(rotPointTarget.x - rotPointCamPos.x, rotPointTarget.y - rotPointCamPos.y, rotPointTarget.z - rotPointCamPos.z);
-			direction.unitary();
+				rotPointCamPos.x = target.x + rotPointCamPos.x;
+				rotPointCamPos.y = target.y + rotPointCamPos.y;
+				rotPointCamPos.z = target.z + rotPointCamPos.z;
 
-			var geoLocMat = geoLocationData.geoLocMatrix;
-			var earthNormal = new Point3D(geoLocMat[8], geoLocMat[9], geoLocMat[10]);
-			var right = direction.crossProduct(earthNormal);
-			var up = right.crossProduct(direction);
+				rotPointTarget.x = target.x + rotPointTarget.x;
+				rotPointTarget.y = target.y + rotPointTarget.y;
+				rotPointTarget.z = target.z + rotPointTarget.z;
 
-			var range = Cesium.Cartesian3.distance(movedCamPos ? movedCamPos : position, target);
-			var hpr = new Cesium.HeadingPitchRange(camera.heading, camera.pitch, range);
-
-			camera.setView({
-				destination : rotPointCamPos,
-				orientation : {
-					direction : new Cesium.Cartesian3(direction.x, direction.y, direction.z),
-					up        : new Cesium.Cartesian3(up.x, up.y, up.z)
-				}
-			});
-
-			//camera.lookAt(target, hpr); //How To lookAt off : use camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
-			
-			/*var sphere = new Sphere();
-			var radiusAprox_aux = trackNode.data.bbox.getRadiusAprox();
-			sphere.radius = radiusAprox_aux;
-			sphere.center = target;
-
-			camera.viewBoundingSphere(sphere, hpr);*/
+				var geoLocMat = geoLocationData.geoLocMatrix;
+				var earthNormal = new Point3D(geoLocMat[8], geoLocMat[9], geoLocMat[10]);
+				Camera.setByPositionAndTarget(camera, rotPointTarget, rotPointCamPos, earthNormal);
+			}
 		}
 		else
 		{
@@ -546,8 +559,69 @@ Camera.prototype.stopTrack = function(magoManager)
  * Node is a single feature at F4D specification
  * Implement this function for tracking moving objects such as automatically moving vehicle
  * @param {Object} node
+ * @param {trackOption} option Optional. 비어있을 시 TRACKING 모드로 설정
  */
-Camera.prototype.setTrack = function(node)
+Camera.prototype.setTrack = function(node, option)
 {
+	this.initTrackOption();
+
 	this.tracked = node;
+	if (option)
+	{
+		this.trackType = defaultValue(option.type, this.trackType);
+		this.targetOffset = defaultValue(option.targetOffset, this.targetOffset);
+
+		if (option.trackCameraOffset)
+		{
+			this.trackCameraOffsetY = defaultValue(option.trackCameraOffset.y, this.trackCameraOffsetY);
+			this.trackCameraOffsetZ = defaultValue(option.trackCameraOffset.z, this.trackCameraOffsetZ);
+		}
+	}
 };
+
+/**
+ * 카메라 트래킹 옵션 기본값으로 초기화
+ */
+Camera.prototype.initTrackOption = function()
+{
+	this.trackType = CODE.trackMode.TRACKING;
+	this.targetOffset = 10.0;
+	this.trackCameraOffsetY = -1;
+	this.trackCameraOffsetZ = 12;
+}
+
+/**
+ * 두 점을 이용하여 디렉션 정보 계산
+ */
+Camera.prototype.getDirection = function()
+{
+
+}
+
+/**
+ * set position and orientation ( direction, up) of the camera
+ * only cesium
+ * 
+ * @static
+ * @param {Cesium.Camera} camera cesium camera object.
+ * @param {Point3D} camTarget
+ * @param {Point3D} camPos
+ * @param {Point3D} aproxCamUp
+ */
+Camera.setByPositionAndTarget = function (camera, camTarget, camPos, aproxCamUp) 
+{
+	var direction = new Point3D();
+	direction.set(camTarget.x - camPos.x, camTarget.y - camPos.y, camTarget.z - camPos.z);
+	direction.unitary();
+
+	var right = direction.crossProduct(aproxCamUp);
+	var up = right.crossProduct(direction);
+
+	camera.setView({
+		destination : camPos,
+		orientation : {
+			direction : new Cesium.Cartesian3(direction.x, direction.y, direction.z),
+			up        : new Cesium.Cartesian3(up.x, up.y, up.z)
+		}
+	});
+}

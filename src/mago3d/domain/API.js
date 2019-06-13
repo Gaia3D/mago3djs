@@ -121,6 +121,11 @@ function API(apiName)
 
 	//animation option. 
 	this.animationOption = null;
+
+	/**
+	 * @type {trackOption}
+	 */
+	this.trackOption = null;
 };
 
 API.prototype.getMagoEnable = function() 
@@ -576,4 +581,13 @@ API.prototype.getAnimationOption = function()
 API.prototype.setAnimationOption = function(animationOption)
 {
 	this.animationOption = animationOption;
+};
+
+API.prototype.getTrackOption = function()
+{
+	return this.trackOption;
+};
+API.prototype.setTrackOption = function(trackOption)
+{
+	this.trackOption = trackOption;
 };

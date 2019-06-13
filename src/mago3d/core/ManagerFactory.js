@@ -423,7 +423,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 				}//,
 				//proxy: new Cesium.DefaultProxy('/proxy/')
 			});
-			var options = {imageryProvider: imageryProvider, baseLayerPicker: false};
+			var options = {imageryProvider: imageryProvider, baseLayerPicker: false, fullscreenButton: false, geocoder: false, homeButton : false, sceneModePicker : false, navigationHelpButton : false};
 			if (viewer === null) { viewer = new Cesium.Viewer(containerId, options); }
 		}
 		else 
@@ -433,7 +433,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 				Cesium.Ion.defaultAccessToken = serverPolicy.geo_cesium_ion_token;
 				DEFALUT_TERRAIN = "Cesium World Terrain";
 			}
-			if (viewer === null) { viewer = new Cesium.Viewer(containerId, {shouldAnimate: true}); }
+			if (viewer === null) { viewer = new Cesium.Viewer(containerId, {shouldAnimate: true, fullscreenButton: false, geocoder: false, homeButton : false, sceneModePicker : false, navigationHelpButton : false}); }
 			// 기본 지도 설정
 			setDefaultDataset();
 		}

@@ -3388,6 +3388,9 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.bPositionCompressed_loc = gl.getUniformLocation(shader.program, "bPositionCompressed");
 	shader.minPosition_loc = gl.getUniformLocation(shader.program, "minPosition");
 	shader.bboxSize_loc = gl.getUniformLocation(shader.program, "bboxSize");
+	shader.maxPointSize_loc = gl.getUniformLocation(shader.program, "maxPointSize");
+	shader.minPointSize_loc = gl.getUniformLocation(shader.program, "minPointSize");
+	shader.pendentPointSize_loc = gl.getUniformLocation(shader.program, "pendentPointSize");
 
 	// 5) Test Quad shader.****************************************************************************************
 	shaderName = "testQuad"; // used by temperatura layer.***
@@ -3447,6 +3450,9 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.bPositionCompressed_loc = gl.getUniformLocation(shader.program, "bPositionCompressed");
 	shader.minPosition_loc = gl.getUniformLocation(shader.program, "minPosition");
 	shader.bboxSize_loc = gl.getUniformLocation(shader.program, "bboxSize");
+	shader.maxPointSize_loc = gl.getUniformLocation(shader.program, "maxPointSize");
+	shader.minPointSize_loc = gl.getUniformLocation(shader.program, "minPointSize");
+	shader.pendentPointSize_loc = gl.getUniformLocation(shader.program, "pendentPointSize");
 
 	// 8) PointsCloud shader.****************************************************************************************
 	shaderName = "pointsCloudSsao";
@@ -3470,6 +3476,9 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.bPositionCompressed_loc = gl.getUniformLocation(shader.program, "bPositionCompressed");
 	shader.minPosition_loc = gl.getUniformLocation(shader.program, "minPosition");
 	shader.bboxSize_loc = gl.getUniformLocation(shader.program, "bboxSize");
+	shader.maxPointSize_loc = gl.getUniformLocation(shader.program, "maxPointSize");
+	shader.minPointSize_loc = gl.getUniformLocation(shader.program, "minPointSize");
+	shader.pendentPointSize_loc = gl.getUniformLocation(shader.program, "pendentPointSize");
 
 	// 9) PointsCloud shader RAINBOW.****************************************************************************************
 	shaderName = "pointsCloudSsao_rainbow";
@@ -3496,6 +3505,9 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.bUseColorCodingByHeight_loc = gl.getUniformLocation(shader.program, "bUseColorCodingByHeight");
 	shader.minHeight_rainbow_loc = gl.getUniformLocation(shader.program, "minHeight_rainbow");
 	shader.maxHeight_rainbow_loc = gl.getUniformLocation(shader.program, "maxHeight_rainbow");
+	shader.maxPointSize_loc = gl.getUniformLocation(shader.program, "maxPointSize");
+	shader.minPointSize_loc = gl.getUniformLocation(shader.program, "minPointSize");
+	shader.pendentPointSize_loc = gl.getUniformLocation(shader.program, "pendentPointSize");
 };
 
 /**
@@ -5232,7 +5244,9 @@ MagoManager.prototype.callAPI = function(api)
 			var currLat = geoCoords.latitude;
 
 			this.flyTo(currLon, currLat, 100, 0);
-			this.sceneState.camera.setTrack(node);
+			var camera = this.sceneState.camera;
+			camera.stopTrack(this);
+			camera.setTrack(node, api.getTrackOption());
 		}
 	}
 	else if (apiName === "stopTrack")

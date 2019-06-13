@@ -901,7 +901,7 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 		{ return; }
 		
 		var pCloudPartitionsCount = this.getPartitionsCountsForLod(this.lod, this.pCloudPartitionsCount, magoManager);
-
+		var renderChildren = true;
 		for (var i=0; i<pCloudPartitionsCount; i++)
 		{
 			var pCloudPartition = this.pCloudPartitionsArray[i];
@@ -916,12 +916,19 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 				
 				magoManager.renderer.renderPCloud(gl, pCloudPartition, magoManager, shader, renderType, distToCamera, this.lod);
 			}
+			else 
+            { 
+                renderChildren = false;
+                break; 
+            }
 		}
-		
-		for (var i=0, subOctreesArrayLength = this.subOctrees_array.length; i<subOctreesArrayLength; i++ ) 
+		if (renderChildren)
 		{
-			var subOctree = this.subOctrees_array[i];
-			subOctree.test__renderPCloud(magoManager, neoBuilding, renderType, shader, relativeCam, bPrepareData);
+			for (var i=0, subOctreesArrayLength = this.subOctrees_array.length; i<subOctreesArrayLength; i++ ) 
+            {
+                var subOctree = this.subOctrees_array[i];
+                subOctree.test__renderPCloud(magoManager, neoBuilding, renderType, shader, relativeCam, bPrepareData);
+            }
 		}
 		
 		magoManager.processQueue.eraseOctreeToDeletePCloud(this);
