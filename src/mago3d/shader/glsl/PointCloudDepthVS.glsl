@@ -15,6 +15,7 @@ attribute vec4 color4;
 uniform bool bUse1Color;
 uniform vec4 oneColor4;
 uniform float fixPointSize;
+uniform float maxPointSize;
 uniform bool bUseFixPointSize;
 varying vec4 vColor;
 //varying float glPointSize;
@@ -52,8 +53,8 @@ void main()
 	float z_n = 2.0 * z_b - 1.0;
     float z_e = 2.0 * near * far / (far + near - z_n * (far - near));
 	gl_PointSize = 1.0 + 40.0/z_e; // Original.***
-	if(gl_PointSize > 10.0)
-		gl_PointSize = 10.0;
+	if(gl_PointSize > maxPointSize)
+		gl_PointSize = maxPointSize;
 	if(gl_PointSize < 2.0)
 		gl_PointSize = 2.0;
 		

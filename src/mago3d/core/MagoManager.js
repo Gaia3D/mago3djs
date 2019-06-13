@@ -3434,6 +3434,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.bPositionCompressed_loc = gl.getUniformLocation(shader.program, "bPositionCompressed");
 	shader.minPosition_loc = gl.getUniformLocation(shader.program, "minPosition");
 	shader.bboxSize_loc = gl.getUniformLocation(shader.program, "bboxSize");
+	shader.maxPointSize_loc = gl.getUniformLocation(shader.program, "maxPointSize");
 	
 	// 8) PointsCloud shader.****************************************************************************************
 	shaderName = "pointsCloudSsao";
@@ -3457,6 +3458,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.bPositionCompressed_loc = gl.getUniformLocation(shader.program, "bPositionCompressed");
 	shader.minPosition_loc = gl.getUniformLocation(shader.program, "minPosition");
 	shader.bboxSize_loc = gl.getUniformLocation(shader.program, "bboxSize");
+	shader.maxPointSize_loc = gl.getUniformLocation(shader.program, "maxPointSize");
 	
 	// 9) PointsCloud shader RAINBOW.****************************************************************************************
 	shaderName = "pointsCloudSsao_rainbow";
@@ -3483,6 +3485,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.bUseColorCodingByHeight_loc = gl.getUniformLocation(shader.program, "bUseColorCodingByHeight");
 	shader.minHeight_rainbow_loc = gl.getUniformLocation(shader.program, "minHeight_rainbow");
 	shader.maxHeight_rainbow_loc = gl.getUniformLocation(shader.program, "maxHeight_rainbow");
+	shader.maxPointSize_loc = gl.getUniformLocation(shader.program, "maxPointSize");
 };
 
 /**

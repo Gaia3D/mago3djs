@@ -494,6 +494,8 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 		currentShader.enableVertexAttribArray(currentShader.position3_loc);
 		
 		currentShader.bindUniformGenerals();
+		var pCloudSettings = magoManager.magoPolicy.getPointsCloudSettings();
+		gl.uniform1f(currentShader.maxPointSize_loc, pCloudSettings.maxPointSize);
 		
 		// Test to load pCloud.***
 		if (magoManager.visibleObjControlerPCloudOctrees === undefined)
@@ -1059,10 +1061,11 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			{
 				gl.uniform1i(currentShader.bUse1Color_loc, false);
 			}
-			
+			var pCloudSettings = magoManager.magoPolicy.getPointsCloudSettings();
 			gl.uniform1i(currentShader.bUseColorCodingByHeight_loc, true);
 			gl.uniform1f(currentShader.minHeight_rainbow_loc, 40.0);
 			gl.uniform1f(currentShader.maxHeight_rainbow_loc, 75.0);
+			gl.uniform1f(currentShader.maxPointSize_loc, pCloudSettings.maxPointSize);
 	
 			gl.activeTexture(gl.TEXTURE0);
 			gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);
