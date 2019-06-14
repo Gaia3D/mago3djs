@@ -55,6 +55,18 @@ Rectangle2D.prototype.setDimensions = function(width, height)
 	this.height = height;
 };
 
+Rectangle2D.prototype.getCenterPosition = function(){
+	return this.centerPoint;
+};
+
+Rectangle2D.prototype.getWidth = function(){
+	return this.width;
+};
+
+Rectangle2D.prototype.getHeight = function(){
+	return this.height;
+};
+
 /**
  * Returns the points of the Rectangle.
  * @param {Array.<Point3D>|undefined} resultPointsArray if this undefined, set new Array. []
