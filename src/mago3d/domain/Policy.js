@@ -85,6 +85,8 @@ var Policy = function()
 	this.pointsCloudSettings.MaxPerUnitPointsRenderDistToCam800m = 1.0/48.0;
 	this.pointsCloudSettings.MaxPerUnitPointsRenderDistToCam1600m = 1.0/128.0;
 	this.pointsCloudSettings.MaxPerUnitPointsRenderDistToCamMoreThan1600m = 1.0/256.0;
+	this.pointsCloudSettings.maxPointSize = 10.0;
+	
 	
 };
 
