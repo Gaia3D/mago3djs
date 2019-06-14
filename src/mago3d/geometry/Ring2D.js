@@ -24,6 +24,13 @@ var Ring2D = function()
 	this.polygon = undefined;
 };
 
+Ring2D.prototype.getElement = function(index){
+	if(this.elemsArray.length == 0){
+		return null;
+	}
+	return this.elemsArray[index];
+};
+
 /**
  * 생성된 객체가 있다면 삭제하고 초기화 한다.
  */
