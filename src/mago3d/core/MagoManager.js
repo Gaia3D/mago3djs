@@ -4144,6 +4144,8 @@ MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, l
 
 /**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
+ * @param {string} projectId policy 사용 시 geo_data_default_projects 배열에 있는 값.
+ * @param {string} projectDataFolder 해당 프로젝트의 data_key를 의미.
  */
 MagoManager.prototype.getObjectIndexFile = function(projectId, projectDataFolder) 
 {

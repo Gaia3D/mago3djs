@@ -10,10 +10,25 @@ var BuildingSeedList = function()
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
+
+	/**
+	 * @type {Array.<BuildingSeed>}
+	 */
 	this.buildingSeedArray = [];
-	this.minGeographicCoord; // longitude, latitude, altitude.
-	this.maxGeographicCoord; // longitude, latitude, altitude.
+
+	/**
+	 * @type {GeographicCoord}
+	 */
+	this.minGeographicCoord;
+
+	/**
+	 * @type {GeographicCoord}
+	 */
+	this.maxGeographicCoord;
 	
+	/**
+	 * @type {ArrayBuffer}
+	 */
 	this.dataArrayBuffer; // binary data.
 };
 
@@ -44,6 +59,7 @@ BuildingSeedList.prototype.deleteObjects = function()
 
 /**
  * Create new buildingSeed feature
+ * 빌딩시드를 생성 후 buildingSeedArray에 넣은 뒤 반환
  * @returns {BuildingSeed}
  */
 BuildingSeedList.prototype.newBuildingSeed = function() 
@@ -55,6 +71,7 @@ BuildingSeedList.prototype.newBuildingSeed = function()
 
 /**
  * Parse the binary data sent from server to save the data as building seed 
+ * readerwriter를 통해 입력된 ArrayBuffer를 파싱하여 빌딩시드들을 생성
  */
 BuildingSeedList.prototype.parseBuildingSeedArrayBuffer = function() 
 {
@@ -108,6 +125,31 @@ BuildingSeedList.prototype.parseBuildingSeedArrayBuffer = function()
 	return true;
 };
 
+/**
+ * 빌딩시드 갯수 반환
+ * @return {Number}
+ */
+BuildingSeedList.prototype.getBuildingSeedLength = function() 
+{
+	return this.buildingSeedArray.length;
+};
 
+/**
+ * 빌딩시드 반환
+ * @param {String|Number} idx
+ * @return {BuildingSeed}
+ */
+BuildingSeedList.prototype.getBuildingSeed = function(idx) 
+{
 
+	if (typeof idx !== 'string' && typeof idx !== 'number') 
+	{
+		throw new Error('idx is required to be a string or number.');
+	}
+	if (!this.buildingSeedArray[idx]) 
+	{
+		throw new Error('range over.');
+	}
 
+	return this.buildingSeedArray[idx];
+};

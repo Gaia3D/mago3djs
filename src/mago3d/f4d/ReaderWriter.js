@@ -216,7 +216,7 @@ ReaderWriter.prototype.readInt8ByteColor = function(buffer, start, end)
 	return int8_value;
 };
 
-function loadWithXhr(fileName, xhr, timeOut) 
+function loadWithXhr_deprecated(fileName, xhr, timeOut) 
 {
 	// 1) 사용될 jQuery Deferred 객체를 생성한다.
 	var deferred = $.Deferred();
@@ -278,7 +278,7 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, lowestOctree
 	
 	this.blocksList_requested++;
 	
-	loadWithXhr(fileName, xhr).done(function(response) 
+	loadWithXhr(fileName, xhr).then(function(response) 
 	{	
 		var arrayBuffer = response;
 		if (arrayBuffer) 
@@ -294,13 +294,14 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, lowestOctree
 		{
 			blocksList.fileLoadState = 500;
 		}
-	}).fail(function(status) 
+	}, 
+	function(status) 
 	{
 		console.log("Invalid XMLHttpRequest status = " + status);
 		if (status === 0) { blocksList.fileLoadState = 500; }
 		else if (status === -1) { blocksList.fileLoadState = CODE.fileLoadState.READY; }
 		else { blocksList.fileLoadState = status; }
-	}).always(function() 
+	}).finally(function() 
 	{
 		magoManager.readerWriter.blocksList_requested--;
 		magoManager.fileRequestControler.modelRefFilesRequestedCount -= 1;
@@ -316,7 +317,7 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer_partition = function(fileName, lo
 	
 	this.blocksListPartitioned_requested++;
 	
-	loadWithXhr(fileName, xhr).done(function(response) 
+	loadWithXhr(fileName, xhr).then(function(response) 
 	{	
 		var arrayBuffer = response;
 		if (arrayBuffer) 
@@ -332,13 +333,14 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer_partition = function(fileName, lo
 		{
 			blocksArrayPartition.fileLoadState = 500;
 		}
-	}).fail(function(status) 
+	},
+	function(status) 
 	{
 		console.log("Invalid XMLHttpRequest status = " + status);
 		if (status === 0) { blocksArrayPartition.fileLoadState = 500; }
 		else if (status === -1) { blocksArrayPartition.fileLoadState = CODE.fileLoadState.READY; }
 		else { blocksArrayPartition.fileLoadState = status; }
-	}).always(function() 
+	}).finally(function() 
 	{
 		magoManager.readerWriter.blocksListPartitioned_requested--;
 		//magoManager.fileRequestControler.modelRefFilesRequestedCount -= 1;
@@ -364,7 +366,7 @@ ReaderWriter.prototype.getNeoReferencesArraybuffer = function(fileName, lowestOc
 	lowestOctree.neoReferencesMotherAndIndices.xhr = xhr;
 	
 	this.referencesList_requested++;
-	loadWithXhr(fileName, xhr).done(function(response) 
+	loadWithXhr(fileName, xhr).then(function(response) 
 	{
 		var arrayBuffer = response;
 		if (arrayBuffer) 
@@ -383,7 +385,8 @@ ReaderWriter.prototype.getNeoReferencesArraybuffer = function(fileName, lowestOc
 		{
 			lowestOctree.neoReferencesMotherAndIndices.fileLoadState = CODE.fileLoadState.LOAD_FAILED;
 		}
-	}).fail(function(status) 
+	},
+	function(status) 
 	{
 		console.log("xhr status = " + status);
 		if (status === 0) 
@@ -392,7 +395,7 @@ ReaderWriter.prototype.getNeoReferencesArraybuffer = function(fileName, lowestOc
 		{ lowestOctree.neoReferencesMotherAndIndices.fileLoadState = CODE.fileLoadState.READY; }
 		else 
 		{ lowestOctree.neoReferencesMotherAndIndices.fileLoadState = status; }
-	}).always(function() 
+	}).finally(function() 
 	{
 		magoManager.readerWriter.referencesList_requested--;
 		magoManager.fileRequestControler.modelRefFilesRequestedCount -= 1;
@@ -417,7 +420,7 @@ ReaderWriter.prototype.getOctreeLegoArraybuffer = function(fileName, lowestOctre
 	var xhr = new XMLHttpRequest();
 	lowestOctree.lego.xhr = xhr;
 	
-	loadWithXhr(fileName, xhr).done(function(response) 
+	loadWithXhr(fileName, xhr).then(function(response) 
 	{
 		var arrayBuffer = response;
 		if (arrayBuffer) 
@@ -438,12 +441,13 @@ ReaderWriter.prototype.getOctreeLegoArraybuffer = function(fileName, lowestOctre
 		{
 			lowestOctree.lego.fileLoadState = 500;
 		}
-	}).fail(function(status) 
+	},
+	function(status) 
 	{
 		console.log("xhr status = " + status);
 		if (status === 0) { lowestOctree.lego.fileLoadState = 500; }
 		else { lowestOctree.lego.fileLoadState = status; }
-	}).always(function() 
+	}).finally(function() 
 	{
 		magoManager.readerWriter.octreesSkinLegos_requested --;
 		magoManager.fileRequestControler.filesRequestedCount -= 1;
@@ -465,7 +469,7 @@ ReaderWriter.prototype.getOctreePCloudArraybuffer = function(fileName, lowestOct
 	magoManager.fileRequestControler.filesRequestedCount += 1;
 	lowestOctree.lego.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	
-	loadWithXhr(fileName).done(function(response) 
+	loadWithXhr(fileName).then(function(response) 
 	{
 		var arrayBuffer = response;
 		if (arrayBuffer) 
@@ -486,12 +490,13 @@ ReaderWriter.prototype.getOctreePCloudArraybuffer = function(fileName, lowestOct
 		{
 			lowestOctree.lego.fileLoadState = 500;
 		}
-	}).fail(function(status) 
+	},
+	function(status) 
 	{
 		console.log("xhr status = " + status);
 		if (status === 0) { lowestOctree.lego.fileLoadState = 500; }
 		else { lowestOctree.lego.fileLoadState = status; }
-	}).always(function() 
+	}).finally(function() 
 	{
 		magoManager.fileRequestControler.filesRequestedCount -= 1;
 		if (magoManager.fileRequestControler.filesRequestedCount < 0) { magoManager.fileRequestControler.filesRequestedCount = 0; }
@@ -513,7 +518,7 @@ ReaderWriter.prototype.getOctreePCloudPartitionArraybuffer = function(fileName, 
 	else
 	{ magoManager.readerWriter.pCloudPartitions_requested ++; }
 	
-	loadWithXhr(fileName).done(function(response) 
+	loadWithXhr(fileName).then(function(response) 
 	{
 		var arrayBuffer = response;
 		if (arrayBuffer) 
@@ -530,12 +535,13 @@ ReaderWriter.prototype.getOctreePCloudPartitionArraybuffer = function(fileName, 
 		{
 			pCloudPartitionLego.fileLoadState = 500;
 		}
-	}).fail(function(status) 
+	},
+	function(status) 
 	{
 		console.log("xhr status = " + status);
 		if (status === 0) { pCloudPartitionLego.fileLoadState = 500; }
 		else { pCloudPartitionLego.fileLoadState = status; }
-	}).always(function() 
+	}).finally(function() 
 	{
 		if (octreeDepth === 0)
 		{
@@ -575,7 +581,7 @@ ReaderWriter.prototype.getLegoArraybuffer = function(fileName, legoMesh, magoMan
 	//xhr = new XMLHttpRequest();
 	legoMesh.xhr = xhr;
 	
-	loadWithXhr(fileName, xhr).done(function(response) 
+	loadWithXhr(fileName, xhr).then(function(response) 
 	{
 		var arrayBuffer = response;
 		if (arrayBuffer) 
@@ -592,7 +598,8 @@ ReaderWriter.prototype.getLegoArraybuffer = function(fileName, legoMesh, magoMan
 		{
 			legoMesh.fileLoadState = 500;
 		}
-	}).fail(function(status) 
+	},
+	function(status) 
 	{
 		console.log("xhr status = " + status);
 		if (status === 0) { legoMesh.fileLoadState = 500; }
@@ -601,7 +608,7 @@ ReaderWriter.prototype.getLegoArraybuffer = function(fileName, legoMesh, magoMan
 		{ 
 			legoMesh.fileLoadState = -1; 
 		}
-	}).always(function() 
+	}).finally(function() 
 	{
 		magoManager.readerWriter.skinLegos_requested--;
 		//magoManager.fileRequestControler.filesRequestedCount -= 1;
@@ -614,14 +621,15 @@ ReaderWriter.prototype.getLegoArraybuffer = function(fileName, legoMesh, magoMan
 /**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
  * @param gl gl context
- * @param fileName 파일명
- * @param readerWriter 파일 처리를 담당
- * @param neoBuildingsList object index 파일을 파싱한 정보를 저장할 배열
+ * @param {string} fileName 파일명
+ * @param {MagoManager} magoManager 파일 처리를 담당
+ * @param {BuildingSeedList} buildingSeedList 빌딩 씨앗 리스트
+ * @param {string} projectId 프로젝트 아이디.
  */
 ReaderWriter.prototype.getObjectIndexFileForSmartTile = function(fileName, magoManager, buildingSeedList, projectId) 
 {
-	loadWithXhr(fileName).done(function(response) 
-	{
+	loadWithXhr(fileName).then(function(response) 
+	{	
 		var arrayBuffer = response;
 		if (arrayBuffer) 
 		{
@@ -636,12 +644,13 @@ ReaderWriter.prototype.getObjectIndexFileForSmartTile = function(fileName, magoM
 		{
 			// blocksList.fileLoadState = 500;
 		}
-	}).fail(function(status) 
+	},
+	function(status) 
 	{
 		console.log("xhr status = " + status);
 		//		if(status === 0) blocksList.fileLoadState = 500;
 		//		else blocksList.fileLoadState = status;
-	}).always(function() 
+	}).finally(function() 
 	{
 		//		magoManager.fileRequestControler.filesRequestedCount -= 1;
 		//		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
@@ -657,7 +666,7 @@ ReaderWriter.prototype.getObjectIndexFileForSmartTile = function(fileName, magoM
  */
 ReaderWriter.prototype.getObjectIndexFile = function(fileName, readerWriter, neoBuildingsList, magoManager) 
 {
-	loadWithXhr(fileName).done(function(response) 
+	loadWithXhr(fileName).then(function(response) 
 	{
 		var arrayBuffer = response;
 		if (arrayBuffer) 
@@ -670,12 +679,13 @@ ReaderWriter.prototype.getObjectIndexFile = function(fileName, readerWriter, neo
 		{
 			//			blocksList.fileLoadState = 500;
 		}
-	}).fail(function(status) 
+	},
+	function(status) 
 	{
 		console.log("xhr status = " + status);
 		//		if(status === 0) blocksList.fileLoadState = 500;
 		//		else blocksList.fileLoadState = status;
-	}).always(function() 
+	}).finally(function() 
 	{
 		//		magoManager.fileRequestControler.filesRequestedCount -= 1;
 		//		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
@@ -791,7 +801,7 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 	magoManager.fileRequestControler.headerFilesRequestedCount += 1;
 	neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 
-	loadWithXhr(fileName).done(function(response) 
+	loadWithXhr(fileName).then(function(response) 
 	{
 		var arrayBuffer = response;
 		if (arrayBuffer) 
@@ -918,12 +928,13 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 			neoBuilding.metaData.fileLoadState = 500;
 			arrayBuffer = undefined;
 		}
-	}).fail(function(status) 
+	},
+	function(status) 
 	{
 		console.log("xhr status = " + status);
 		if (status === 0) { neoBuilding.metaData.fileLoadState = 500; }
 		else { neoBuilding.metaData.fileLoadState = status; }
-	}).always(function() 
+	}).finally(function() 
 	{
 		magoManager.fileRequestControler.headerFilesRequestedCount -= 1;
 		if (magoManager.fileRequestControler.headerFilesRequestedCount < 0) { magoManager.fileRequestControler.headerFilesRequestedCount = 0; }
@@ -1027,7 +1038,7 @@ ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer,
 	if (extension === "tga" || extension === "TGA" || extension === "Tga")
 	{
 		texture.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
-		loadWithXhr(filePath_inServer).done(function(response) 
+		loadWithXhr(filePath_inServer).then(function(response) 
 		{
 			var arrayBuffer = response;
 			if (arrayBuffer) 
@@ -1127,7 +1138,8 @@ ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer,
 					}
 				}
 			}
-		}).fail(function(status) 
+		},
+		function(status) 
 		{
 			if (neoBuilding)
 			{
@@ -1135,7 +1147,7 @@ ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer,
 				if (status === 0) { neoBuilding.metaData.fileLoadState = 500; }
 				else { neoBuilding.metaData.fileLoadState = status; }
 			}
-		}).always(function() 
+		}).finally(function() 
 		{
 			magoManager.backGround_fileReadings_count -= 1;
 			if (magoManager.backGround_fileReadings_count < 0) { magoManager.backGround_fileReadings_count = 0; }
@@ -1176,7 +1188,7 @@ ReaderWriter.loadBinaryData = function(fileName, dataContainer, weatherLayer)
 {
 	dataContainer.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	
-	loadWithXhr(fileName).done(function(response) 
+	loadWithXhr(fileName).then(function(response) 
 	{	
 		var arrayBuffer = response;
 		if (arrayBuffer) 
@@ -1191,12 +1203,13 @@ ReaderWriter.loadBinaryData = function(fileName, dataContainer, weatherLayer)
 		{
 			dataContainer.fileLoadState = 500;
 		}
-	}).fail(function(status) 
+	},
+	function(status) 
 	{
 		console.log("Invalid XMLHttpRequest status = " + status);
 		if (status === 0) { dataContainer.fileLoadState = 500; }
 		else { dataContainer.fileLoadState = status; }
-	}).always(function() 
+	}).finally(function() 
 	{
 		
 	});
@@ -1326,7 +1339,7 @@ ReaderWriter.prototype.getTileArrayBuffer = function(gl, fileName, terranTile, r
 	//	magoManager.fileRequestControler.backGround_fileReadings_count += 1;
 	//	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 
-	loadWithXhr(fileName).done(function(response) 
+	loadWithXhr(fileName).then(function(response) 
 	{
 		var arrayBuffer = response;
 		if (arrayBuffer) 
@@ -1344,12 +1357,13 @@ ReaderWriter.prototype.getTileArrayBuffer = function(gl, fileName, terranTile, r
 		{
 			//			blocksList.fileLoadState = 500;
 		}
-	}).fail(function(status) 
+	},
+	function(status) 
 	{
 		console.log("xhr status = " + status);
 		//		if(status === 0) blocksList.fileLoadState = 500;
 		//		else blocksList.fileLoadState = status;
-	}).always(function() 
+	}).finally(function() 
 	{
 		//		magoManager.fileRequestControler.filesRequestedCount -= 1;
 		//		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
@@ -1368,7 +1382,7 @@ ReaderWriter.prototype.loadTINTerrain = function(fileName, tinTerrain, magoManag
 	//magoManager.fileRequestControler.modelRefFilesRequestedCount += 1;
 	tinTerrain.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	
-	loadWithXhr(fileName).done(function(response) 
+	loadWithXhr(fileName).then(function(response) 
 	{
 		var arrayBuffer = response;
 		if (arrayBuffer) 
@@ -1382,13 +1396,13 @@ ReaderWriter.prototype.loadTINTerrain = function(fileName, tinTerrain, magoManag
 		{
 			tinTerrain.fileLoadState = 500;
 		}
-	}).fail(function(status) 
+	}, function(status) 
 	{
 		tinTerrain.fileLoadState = CODE.fileLoadState.LOAD_FAILED;
 		//console.log("xhr status = " + status);
 		//if (status === 0) { lowestOctree.neoReferencesMotherAndIndices.fileLoadState = 500; }
 		//else { lowestOctree.neoReferencesMotherAndIndices.fileLoadState = status; }
-	}).always(function() 
+	}).finally(function() 
 	{
 		//magoManager.fileRequestControler.modelRefFilesRequestedCount -= 1;
 		//if (magoManager.fileRequestControler.modelRefFilesRequestedCount < 0) { magoManager.fileRequestControler.modelRefFilesRequestedCount = 0; }
@@ -1440,7 +1454,7 @@ ReaderWriter.prototype.loadWMSImage = function(gl, filePath_inServer, texture, m
 {
 	texture.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	var readWriter = this;
-	loadWithXhr(filePath_inServer).done(function(response) 
+	loadWithXhr(filePath_inServer).then(function(response) 
 	{
 		var arrayBuffer = response;
 		if (arrayBuffer) 
@@ -1451,11 +1465,11 @@ ReaderWriter.prototype.loadWMSImage = function(gl, filePath_inServer, texture, m
 			readWriter.imageFromArrayBuffer(gl, arrayBuffer, texture, magoManager, flip_y_texCoords);
 			texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 		}
-	}).fail(function(status) 
+	}, function(status) 
 	{
 		console.log(status);
 		
-	}).always(function() 
+	}).finally(function() 
 	{
 		magoManager.backGround_fileReadings_count -= 1;
 		if (magoManager.backGround_fileReadings_count < 0) { magoManager.backGround_fileReadings_count = 0; }
@@ -1481,4 +1495,3 @@ ReaderWriter.prototype.handleTextureLoaded = function(gl, image, texture)
 	gl.generateMipmap(gl.TEXTURE_2D);
 	gl.bindTexture(gl.TEXTURE_2D, null);
 };
-

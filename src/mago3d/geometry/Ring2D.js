@@ -24,8 +24,10 @@ var Ring2D = function()
 	this.polygon = undefined;
 };
 
-Ring2D.prototype.getElement = function(index){
-	if(this.elemsArray.length == 0){
+Ring2D.prototype.getElement = function(index)
+{
+	if (this.elemsArray.length === 0)
+	{
 		return null;
 	}
 	return this.elemsArray[index];
