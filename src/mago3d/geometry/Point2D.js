@@ -81,6 +81,13 @@ Point2D.prototype.set = function(x, y)
 	this.y = y;
 };
 
+Point2D.prototype.getX = function(){
+	return this.x;
+};
+Point2D.prototype.getY = function(){
+	return this.y;
+};
+
 /**
  * return the result of calculating (this.x*this.x + this.y*this.y) 
  * @returns this.x*this.x + this.y*this.y;

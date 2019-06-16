@@ -15,8 +15,10 @@ var Camera = function()
 	this.direction = new Point3D(); 
 	this.up = new Point3D();
 	this.right = new Point3D();
-	this.frustum = new Frustum(); // current frustum.
-	this.bigFrustum = new Frustum(); // sum of all frustums.
+	// current frustum.
+	this.frustum = new Frustum(); 
+	// sum of all frustums.
+	this.bigFrustum = new Frustum();
 	this.dirty = true;
 	this.frustumsArray = [];
 	this.frustumsArray.push(this.frustum);
@@ -52,9 +54,8 @@ Camera.prototype.copyPosDirUpFrom = function(camera)
 };
 
 /**
- * 
  * Translate this camera with translation vector
- * @param translationVec
+ * @param {Point3D} translationVec
  */
 Camera.prototype.translate = function(translationVec)
 {
@@ -62,8 +63,8 @@ Camera.prototype.translate = function(translationVec)
 };
 
 /**
- * 카메라
- * @class Camera
+ * Transfrom posion, direction and up of the camera
+ * @param {Matrix4} mat
  */
 Camera.prototype.transformByMatrix4 = function(mat)
 {
@@ -86,8 +87,9 @@ Camera.prototype.transformByMatrix4 = function(mat)
 };
 
 /**
- * 카메라
- * @class Camera
+ * Get the Camera direction line
+ * @param {Line} resultLine 
+ * @returns {Line} resultLine Camera direction line
  */
 Camera.prototype.getCameraDirectionLine = function(resultLine)
 {
@@ -102,7 +104,7 @@ Camera.prototype.getCameraDirectionLine = function(resultLine)
 
 /**
  * determine camHeight
- * @class Camera
+ * @returns {number} camera Height
  */
 Camera.prototype.getCameraElevation = function()
 {
@@ -116,7 +118,7 @@ Camera.prototype.getCameraElevation = function()
 
 /**
  * Get the right(up)
- * @class Camera
+ * @returns {Point3D} Camera right
  */
 Camera.prototype.getCameraRight = function()
 {
@@ -129,9 +131,9 @@ Camera.prototype.getCameraRight = function()
 
 /**
  * Transforms the vector "point" by given matrix4
- * @param point
- * @param {Mat4} mat
- * @returns {Vec3} 
+ * @param {point3D} point
+ * @param {Matrix4} mat
+ * @returns {point3D} point 
  */
 Camera.prototype.transformPoint3DByMatrix4 = function(point, mat)
 {
@@ -145,9 +147,9 @@ Camera.prototype.transformPoint3DByMatrix4 = function(point, mat)
 
 /**
  * Transforms the vector "point" by given matrix4
- * @param point
- * @param {Mat3} mat
- * @returns {Vec3} 
+ * @param {point3D} point
+ * @param {Matrix4} mat
+ * @returns {point3D} point 
  */
 Camera.prototype.rotatePoint3DByMatrix3 = function(point, mat)
 {
@@ -162,7 +164,7 @@ Camera.prototype.rotatePoint3DByMatrix3 = function(point, mat)
 /**
  * set dirty flag of the object
  * -dirty flag : Avoid unnecessary work by deferring it until the result is needed.
- * @class Camera
+ * @param {Boolean} cameraIsDirty
  */
 Camera.prototype.setDirty = function(cameraIsDirty)
 {
@@ -171,7 +173,7 @@ Camera.prototype.setDirty = function(cameraIsDirty)
 
 /**
  * get dirty flag of the object
- * @class Camera
+ * @returns {Boolean} dirty
  */
 Camera.prototype.getDirty = function()
 {
@@ -204,7 +206,8 @@ Camera.prototype.isCameraMoved = function(newPosX, newPosY, newPosZ, newDirX, ne
 
 /**
  * get the small Frustum in big frustum
- * @class Camera
+ * @param {Number} idx 배열 인덱스
+ * @returns {Frustum} 해당하는 배열 인덱스의 frustrum
  */
 Camera.prototype.getFrustum = function(idx)
 {
@@ -222,6 +225,7 @@ Camera.prototype.getFrustum = function(idx)
 
 /**
  * Get the lastest frustum of this camera
+ * @returns {frustum} lastest frustum of this camera
  */
 Camera.prototype.getLastFrustum = function()
 {
@@ -230,6 +234,8 @@ Camera.prototype.getLastFrustum = function()
 
 /**
  * The list of the distance between the divided frustum of visualization volume using each small frustum's near and far
+ * @param {Number} numFrustums total of Frustum
+ * @param {distancesArray[]} distancesArray
  */
 Camera.prototype.setFrustumsDistances = function(numFrustums, distancesArray)
 {
@@ -255,9 +261,8 @@ Camera.prototype.setFrustumsDistances = function(numFrustums, distancesArray)
 /**
  * 
  * Calculate the value of fovyRad and aspectRatio of each small frustum
- * @param aspectRatio aspect ratio
- * @param fovyRad the radian of FOV(Field Of View) y
- * @class Camera
+ * @param {Float32Array[]} aspectRatio aspect ratio
+ * @param {Float32Array[]} fovyRad the radian of FOV(Field Of View) y
  */
 Camera.prototype.setAspectRatioAndFovyRad = function(aspectRatio, fovyRad)
 {
@@ -287,7 +292,7 @@ Camera.prototype.setAspectRatioAndFovyRad = function(aspectRatio, fovyRad)
 
 /**
  * Set the current frustum in bigFrustum
- * @class Camera
+ * @param {Number} frustumIdx
  */
 Camera.prototype.setCurrentFrustum = function(frustumIdx)
 {
@@ -295,23 +300,27 @@ Camera.prototype.setCurrentFrustum = function(frustumIdx)
 };
 
 /**
+ * Bind the Camera uniforms
+ * @param {gl} GL 
+ * @param {shader} shader 
  */
 Camera.prototype.bindCameraUniforms = function(gl, shader) 
 {
-	// Bind frustum near & far.
+	// Bind frustum near & far. far.
 	var frustum = this.frustum;
 	gl.uniform1f(shader.frustumNear_loc, frustum.near[0]);
 	gl.uniform1f(shader.frustumFar_loc, frustum.far[0]);
 };
 
 /**
- * 카메라
- * @class Camera
+ * Calculate the Frustums planes
+ * 
  */
 Camera.prototype.calculateFrustumsPlanes = function()
 {
 	var plane;
-	var frustum0; // the 1rst frustum.
+	// the 1rst frustum.
+	var frustum0; 
 	
 	// Use the frustum0 to calculate nearWidth, nearHeight, farWidth & farHeight.
 	frustum0 = this.getFrustum(0);
@@ -433,7 +442,7 @@ Camera.prototype.calculateFrustumsPlanes = function()
 
 /**
  * if track node exist, do track.
- * @param {Object} magoManager
+ * @param {MagoManager} magoManager
  */
 Camera.prototype.doTrack = function(magoManager)
 {
@@ -495,7 +504,7 @@ Camera.prototype.doTrack = function(magoManager)
 
 /**
  * stop track 
- * @param {Object} magoManager
+ * @param {MagoManager} magoManager
  */
 Camera.prototype.stopTrack = function(magoManager)
 {
@@ -514,7 +523,7 @@ Camera.prototype.stopTrack = function(magoManager)
  * set track node.
  * Node is a single feature at F4D specification
  * Implement this function for tracking moving objects such as automatically moving vehicle
- * @param {Object} node
+ * @param {Node} node
  */
 Camera.prototype.setTrack = function(node)
 {
