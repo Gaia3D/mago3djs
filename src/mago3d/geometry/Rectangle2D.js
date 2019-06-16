@@ -55,15 +55,18 @@ Rectangle2D.prototype.setDimensions = function(width, height)
 	this.height = height;
 };
 
-Rectangle2D.prototype.getCenterPosition = function(){
+Rectangle2D.prototype.getCenterPosition = function()
+{
 	return this.centerPoint;
 };
 
-Rectangle2D.prototype.getWidth = function(){
+Rectangle2D.prototype.getWidth = function()
+{
 	return this.width;
 };
 
-Rectangle2D.prototype.getHeight = function(){
+Rectangle2D.prototype.getHeight = function()
+{
 	return this.height;
 };
 

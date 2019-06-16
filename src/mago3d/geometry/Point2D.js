@@ -81,10 +81,12 @@ Point2D.prototype.set = function(x, y)
 	this.y = y;
 };
 
-Point2D.prototype.getX = function(){
+Point2D.prototype.getX = function()
+{
 	return this.x;
 };
-Point2D.prototype.getY = function(){
+Point2D.prototype.getY = function()
+{
 	return this.y;
 };
 

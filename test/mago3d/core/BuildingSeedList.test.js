@@ -11,7 +11,7 @@ describe("특정 데이터(vehicle, F4D_AutonomousBus)를 대상으로 BuildingS
 
 	beforeAll(function()
 	{
-		return getXhrPromise(fileName).then(function(res) 
+		return loadWithXhr(fileName).then(function(res) 
 		{
 			seedList = new BuildingSeedList();
 			//Promise 정상 수행됬을 때 ArrayBuffer 할당.
