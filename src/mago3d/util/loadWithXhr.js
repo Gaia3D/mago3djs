@@ -11,11 +11,11 @@
  * @returns {Promise} Promise.js object
  *
  * @example
- * getXhrPromise('url', undefined, , undefined, 'json', 'GET').done(function(res) {
+ * loadWithXhr('url', undefined, , undefined, 'json', 'GET').done(function(res) {
  * 	TODO
  * });
  */
-function getXhrPromise(url, xhr, timeOut, responseType, method) 
+function loadWithXhr(url, xhr, timeOut, responseType, method) 
 {
 	if (!defined(url))
 	{

@@ -216,7 +216,7 @@ ReaderWriter.prototype.readInt8ByteColor = function(buffer, start, end)
 	return int8_value;
 };
 
-function loadWithXhr(fileName, xhr, timeOut) 
+function loadWithXhr_deprecated(fileName, xhr, timeOut) 
 {
 	// 1) 사용될 jQuery Deferred 객체를 생성한다.
 	var deferred = $.Deferred();
@@ -278,7 +278,7 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, lowestOctree
 	
 	this.blocksList_requested++;
 	
-	getXhrPromise(fileName, xhr).then(function(response) 
+	loadWithXhr(fileName, xhr).then(function(response) 
 	{	
 		var arrayBuffer = response;
 		if (arrayBuffer) 
@@ -317,7 +317,7 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer_partition = function(fileName, lo
 	
 	this.blocksListPartitioned_requested++;
 	
-	getXhrPromise(fileName, xhr).then(function(response) 
+	loadWithXhr(fileName, xhr).then(function(response) 
 	{	
 		var arrayBuffer = response;
 		if (arrayBuffer) 
@@ -366,7 +366,7 @@ ReaderWriter.prototype.getNeoReferencesArraybuffer = function(fileName, lowestOc
 	lowestOctree.neoReferencesMotherAndIndices.xhr = xhr;
 	
 	this.referencesList_requested++;
-	getXhrPromise(fileName, xhr).then(function(response) 
+	loadWithXhr(fileName, xhr).then(function(response) 
 	{
 		var arrayBuffer = response;
 		if (arrayBuffer) 
@@ -420,7 +420,7 @@ ReaderWriter.prototype.getOctreeLegoArraybuffer = function(fileName, lowestOctre
 	var xhr = new XMLHttpRequest();
 	lowestOctree.lego.xhr = xhr;
 	
-	getXhrPromise(fileName, xhr).then(function(response) 
+	loadWithXhr(fileName, xhr).then(function(response) 
 	{
 		var arrayBuffer = response;
 		if (arrayBuffer) 
@@ -469,7 +469,7 @@ ReaderWriter.prototype.getOctreePCloudArraybuffer = function(fileName, lowestOct
 	magoManager.fileRequestControler.filesRequestedCount += 1;
 	lowestOctree.lego.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	
-	getXhrPromise(fileName).then(function(response) 
+	loadWithXhr(fileName).then(function(response) 
 	{
 		var arrayBuffer = response;
 		if (arrayBuffer) 
@@ -518,7 +518,7 @@ ReaderWriter.prototype.getOctreePCloudPartitionArraybuffer = function(fileName, 
 	else
 	{ magoManager.readerWriter.pCloudPartitions_requested ++; }
 	
-	getXhrPromise(fileName).then(function(response) 
+	loadWithXhr(fileName).then(function(response) 
 	{
 		var arrayBuffer = response;
 		if (arrayBuffer) 
@@ -581,7 +581,7 @@ ReaderWriter.prototype.getLegoArraybuffer = function(fileName, legoMesh, magoMan
 	//xhr = new XMLHttpRequest();
 	legoMesh.xhr = xhr;
 	
-	getXhrPromise(fileName, xhr).then(function(response) 
+	loadWithXhr(fileName, xhr).then(function(response) 
 	{
 		var arrayBuffer = response;
 		if (arrayBuffer) 
@@ -628,7 +628,7 @@ ReaderWriter.prototype.getLegoArraybuffer = function(fileName, legoMesh, magoMan
  */
 ReaderWriter.prototype.getObjectIndexFileForSmartTile = function(fileName, magoManager, buildingSeedList, projectId) 
 {
-	getXhrPromise(fileName).then(function(response) 
+	loadWithXhr(fileName).then(function(response) 
 	{	
 		var arrayBuffer = response;
 		if (arrayBuffer) 
@@ -666,7 +666,7 @@ ReaderWriter.prototype.getObjectIndexFileForSmartTile = function(fileName, magoM
  */
 ReaderWriter.prototype.getObjectIndexFile = function(fileName, readerWriter, neoBuildingsList, magoManager) 
 {
-	getXhrPromise(fileName).then(function(response) 
+	loadWithXhr(fileName).then(function(response) 
 	{
 		var arrayBuffer = response;
 		if (arrayBuffer) 
@@ -801,7 +801,7 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 	magoManager.fileRequestControler.headerFilesRequestedCount += 1;
 	neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 
-	getXhrPromise(fileName).then(function(response) 
+	loadWithXhr(fileName).then(function(response) 
 	{
 		var arrayBuffer = response;
 		if (arrayBuffer) 
@@ -1038,7 +1038,7 @@ ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer,
 	if (extension === "tga" || extension === "TGA" || extension === "Tga")
 	{
 		texture.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
-		getXhrPromise(filePath_inServer).then(function(response) 
+		loadWithXhr(filePath_inServer).then(function(response) 
 		{
 			var arrayBuffer = response;
 			if (arrayBuffer) 
@@ -1188,7 +1188,7 @@ ReaderWriter.loadBinaryData = function(fileName, dataContainer, weatherLayer)
 {
 	dataContainer.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	
-	getXhrPromise(fileName).then(function(response) 
+	loadWithXhr(fileName).then(function(response) 
 	{	
 		var arrayBuffer = response;
 		if (arrayBuffer) 
@@ -1339,7 +1339,7 @@ ReaderWriter.prototype.getTileArrayBuffer = function(gl, fileName, terranTile, r
 	//	magoManager.fileRequestControler.backGround_fileReadings_count += 1;
 	//	blocksList.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 
-	getXhrPromise(fileName).then(function(response) 
+	loadWithXhr(fileName).then(function(response) 
 	{
 		var arrayBuffer = response;
 		if (arrayBuffer) 
@@ -1382,7 +1382,7 @@ ReaderWriter.prototype.loadTINTerrain = function(fileName, tinTerrain, magoManag
 	//magoManager.fileRequestControler.modelRefFilesRequestedCount += 1;
 	tinTerrain.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	
-	getXhrPromise(fileName).then(function(response) 
+	loadWithXhr(fileName).then(function(response) 
 	{
 		var arrayBuffer = response;
 		if (arrayBuffer) 
@@ -1454,7 +1454,7 @@ ReaderWriter.prototype.loadWMSImage = function(gl, filePath_inServer, texture, m
 {
 	texture.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	var readWriter = this;
-	getXhrPromise(filePath_inServer).then(function(response) 
+	loadWithXhr(filePath_inServer).then(function(response) 
 	{
 		var arrayBuffer = response;
 		if (arrayBuffer) 
