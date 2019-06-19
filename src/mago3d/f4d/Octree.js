@@ -917,18 +917,18 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 				magoManager.renderer.renderPCloud(gl, pCloudPartition, magoManager, shader, renderType, distToCamera, this.lod);
 			}
 			else 
-            { 
-                renderChildren = false;
-                break; 
-            }
+			{ 
+				renderChildren = false;
+				break; 
+			}
 		}
 		if (renderChildren)
 		{
 			for (var i=0, subOctreesArrayLength = this.subOctrees_array.length; i<subOctreesArrayLength; i++ ) 
-            {
-                var subOctree = this.subOctrees_array[i];
-                subOctree.test__renderPCloud(magoManager, neoBuilding, renderType, shader, relativeCam, bPrepareData);
-            }
+			{
+				var subOctree = this.subOctrees_array[i];
+				subOctree.test__renderPCloud(magoManager, neoBuilding, renderType, shader, relativeCam, bPrepareData);
+			}
 		}
 		
 		magoManager.processQueue.eraseOctreeToDeletePCloud(this);

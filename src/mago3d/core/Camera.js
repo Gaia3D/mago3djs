@@ -588,7 +588,7 @@ Camera.prototype.initTrackOption = function()
 	this.targetOffset = 10.0;
 	this.trackCameraOffsetY = -1;
 	this.trackCameraOffsetZ = 12;
-}
+};
 
 /**
  * 두 점을 이용하여 디렉션 정보 계산
@@ -596,7 +596,7 @@ Camera.prototype.initTrackOption = function()
 Camera.prototype.getDirection = function()
 {
 
-}
+};
 
 /**
  * set position and orientation ( direction, up) of the camera
@@ -624,4 +624,4 @@ Camera.setByPositionAndTarget = function (camera, camTarget, camPos, aproxCamUp)
 			up        : new Cesium.Cartesian3(up.x, up.y, up.z)
 		}
 	});
-}
+};
