@@ -805,6 +805,7 @@ Octree.prototype.preparePCloudData = function(magoManager)
 				{
 					var gl = magoManager.sceneState.gl;
 					pCloudPartition.parsePointsCloudData(pCloudPartition.dataArrayBuffer, gl, magoManager);
+					pCloudPartition.dataArrayBuffer = undefined;
 					magoManager.parseQueue.pCloudPartitionsParsed++;
 				}
 			}
