@@ -837,6 +837,18 @@ Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude,
 	{
 		return;
 	}
+	
+	// Check if the target location is equal to the current location.***
+	var geoCoordError = 10E-8;
+	var altitudeError = 0.05;
+	if(Math.abs(geoCoords.longitude - longitude) < geoCoordError &&
+		Math.abs(geoCoords.latitude - latitude) < geoCoordError &&
+		Math.abs(geoCoords.altitude - elevation) < altitudeError )
+	{
+		return;
+	}
+	
+	
 	// start location.***
 	animData.startLongitude = geoCoords.longitude;
 	animData.startLatitude = geoCoords.latitude;
