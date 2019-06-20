@@ -296,7 +296,7 @@ Camera.prototype.setCurrentFrustum = function(frustumIdx)
 
 /**
  */
-Camera.prototype.bindCameraUniforms = function(gl, shader) 
+Camera.prototype.bindUniforms = function(gl, shader) 
 {
 	// Bind frustum near & far.
 	var frustum = this.frustum;

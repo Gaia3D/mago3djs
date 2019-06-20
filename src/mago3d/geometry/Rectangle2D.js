@@ -29,6 +29,30 @@ var Rectangle2D = function()
 	 * @type {Number}
 	 */
 	this.height;
+	
+	/**
+	 * minimum x position of rectangle
+	 * @type {Number}
+	 */
+	this.minX;
+	
+	/**
+	 * minimum y position of rectangle
+	 * @type {Number}
+	 */
+	this.minY;
+	
+	/**
+	 * maximum x position of rectangle
+	 * @type {Number}
+	 */
+	this.maxX;
+	
+	/**
+	 * maximum y position of rectangle
+	 * @type {Number}
+	 */
+	this.maxY;
 };
 
 /**
@@ -42,6 +66,21 @@ Rectangle2D.prototype.setCenterPosition = function(cx, cy)
 	{ this.centerPoint = new Point2D(); }
 	
 	this.centerPoint.set(cx, cy);
+};
+
+/**
+ * rectangle의 가로,세로 길이 설정
+ * @param {number} minX
+ * @param {number} minY
+ * @param {number} maxX
+ * @param {number} maxY
+ */
+Rectangle2D.prototype.setExtension = function(minX, minY, maxX, maxY)
+{
+	this.minX = minX;
+	this.minY = minY;
+	this.maxX = maxX;
+	this.maxY = maxY;
 };
 
 /**
