@@ -501,7 +501,7 @@ Camera.prototype.doTrack = function(magoManager)
 			var targetGeographicCoords = geoLocationData.getGeographicCoords();
 			if (targetGeographicCoords === undefined)
 			{ return; }
-			var target = Cesium.Cartesian3.fromDegrees(targetGeographicCoords.longitude, targetGeographicCoords.latitude, targetGeographicCoords.altitude+20);
+			var target = Cesium.Cartesian3.fromDegrees(targetGeographicCoords.longitude, targetGeographicCoords.latitude, targetGeographicCoords.altitude);
 
 			if (this.trackType === CODE.trackMode.TRACKING)
 			{

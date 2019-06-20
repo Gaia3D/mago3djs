@@ -328,6 +328,11 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 			destination: Cesium.Cartesian3.fromDegrees(parseFloat(MagoConfig.getPolicy().geo_init_longitude),
 				parseFloat(MagoConfig.getPolicy().geo_init_latitude),
 				parseFloat(MagoConfig.getPolicy().geo_init_height)),
+			orientation: {
+				heading : 5.3709654327713,
+				pitch   : -1.4216763570073954,
+				roll    : 0
+			},
 			duration: parseInt(MagoConfig.getPolicy().geo_init_duration)
 		});
 	}
