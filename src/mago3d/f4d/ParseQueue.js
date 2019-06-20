@@ -235,6 +235,7 @@ ParseQueue.prototype.parseArrayOctreesPCloudPartition = function(gl, octreesArra
 				if (this.eraseOctreePCloudPartitionToParse(pCloudPartition))
 				{
 					pCloudPartition.parsePointsCloudData(gl, pCloudPartition.dataArrayBuffer, magoManager);
+					pCloudPartition.dataArrayBuffer = undefined;
 					octreesParsedCount++;
 				}
 			}
@@ -266,9 +267,8 @@ ParseQueue.prototype.parseArrayOctreesPCloudPartition = function(gl, octreesArra
 						//{ continue; }
 						
 						pCloudPartition.parsePointsCloudData(gl, pCloudPartition.dataArrayBuffer, magoManager);
+						pCloudPartition.dataArrayBuffer = undefined;
 						octreesParsedCount++;
-						
-						//octreesParsedCount++;
 					}
 					if (octreesParsedCount > maxParsesCount)
 					{ break; }	
