@@ -14,7 +14,7 @@
     "chai": "^4.2.0",
     "compression": "^1.7.4",
     "del": "^4.1.0",
-    "eslint": "^5.16.0",
+    "eslint": "^6.0.0",
     "eslint-plugin-react": "^7.12.4",
     "express": "^4.16.4",
     "globby": "^9.2.0",
