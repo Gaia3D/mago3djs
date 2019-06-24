@@ -126,6 +126,11 @@ function API(apiName)
 	 * @type {trackOption}
 	 */
 	this.trackOption = null;
+
+	/**
+	 * @type {nodeAttribute}
+	 */
+	this.nodeAttribute = null;
 };
 
 API.prototype.getMagoEnable = function() 
@@ -590,4 +595,13 @@ API.prototype.getTrackOption = function()
 API.prototype.setTrackOption = function(trackOption)
 {
 	this.trackOption = trackOption;
+};
+
+API.prototype.getNodeAttribute = function()
+{
+	return this.nodeAttribute;
+};
+API.prototype.setNodeAttribute = function(nodeAttribute)
+{
+	this.nodeAttribute = nodeAttribute;
 };

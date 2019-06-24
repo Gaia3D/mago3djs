@@ -525,7 +525,7 @@ Camera.prototype.doTrack = function(magoManager)
 				rotPointTarget.y = target.y + rotPointTarget.y;
 				rotPointTarget.z = target.z + rotPointTarget.z;
 
-				var geoLocMat = geoLocationData.geoLocMatrix;
+				var geoLocMat = geoLocationData.geoLocMatrix._floatArrays;
 				var earthNormal = new Point3D(geoLocMat[8], geoLocMat[9], geoLocMat[10]);
 				Camera.setByPositionAndTarget(camera, rotPointTarget, rotPointCamPos, earthNormal);
 			}
@@ -616,7 +616,7 @@ Camera.setByPositionAndTarget = function (camera, camTarget, camPos, aproxCamUp)
 
 	var right = direction.crossProduct(aproxCamUp);
 	var up = right.crossProduct(direction);
-
+	up.unitary();
 	camera.setView({
 		destination : camPos,
 		orientation : {

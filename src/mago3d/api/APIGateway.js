@@ -801,3 +801,19 @@ function isDataReadyToRenderAPI(managerFactoryInstance, projectId, dataKey)
 	api.setDataKey(dataKey);
 	return managerFactoryInstance.callAPI(api);
 }
+
+/**
+ * check data is ready to render
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {string} projectId project primary key
+ * @param {string} dataKey data key
+ * @param {nodeAttribute} option data key
+ */
+function setNodeAttributeAPI(managerFactoryInstance, projectId, dataKey, option)
+{
+	var api = new API("setNodeAttribute");
+	api.setProjectId(projectId);
+	api.setDataKey(dataKey);
+	api.setNodeAttribute(option);
+	managerFactoryInstance.callAPI(api);
+}

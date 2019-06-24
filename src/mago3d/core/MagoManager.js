@@ -5302,6 +5302,44 @@ MagoManager.prototype.callAPI = function(api)
 
 		return false;
 	}
+	else if (apiName === "setNodeAttribute")
+	{
+		var projectId = api.getProjectId();
+		var dataKey = api.getDataKey();
+		var attribute = api.getNodeAttribute();
+		if (!defined(projectId))
+		{
+			throw new Error("projectId is required.");
+		}
+		if (!defined(dataKey))
+		{
+			throw new Error("dataKey is required.");
+		}
+		var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
+
+		if (node !== undefined)
+		{
+			if (node.data) 
+			{
+				var nodeData = node.data;
+				if (!nodeData.attributes) 
+				{
+					nodeData.attributes = {};
+				}
+				var myAttribute = nodeData.attributes;
+
+				for (var key in attribute)
+				{
+					if (attribute.hasOwnProperty(key)) 
+					{
+						myAttribute[key] = attribute[key];
+					}
+				}
+			}
+		}
+
+		return false;
+	}
 };
 
 MagoManager.prototype.deleteAll = function ()
