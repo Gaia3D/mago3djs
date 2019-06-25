@@ -1,6 +1,8 @@
 attribute vec3 position;
+attribute vec3 normal;
+attribute vec2 texCoord;
+attribute vec4 color4;
 uniform mat4 ModelViewProjectionMatrixRelToEye;
-uniform mat4 modelViewMatrixRelToEye; 
 uniform vec3 buildingPosHIGH;
 uniform vec3 buildingPosLOW;
 uniform mat4 buildingRotMatrix;
@@ -11,15 +13,14 @@ uniform float far;
 uniform bool bPositionCompressed;
 uniform vec3 minPosition;
 uniform vec3 bboxSize;
-attribute vec4 color4;
 uniform bool bUse1Color;
 uniform vec4 oneColor4;
 uniform float fixPointSize;
 uniform float maxPointSize;
 uniform bool bUseFixPointSize;
 varying vec4 vColor;
-//varying float glPointSize;
-varying float depth;  
+varying float glPointSize;
+varying float realHeigh;
 
 void main()
 {
@@ -34,6 +35,7 @@ void main()
 	{
 		realPos = position;
 	}
+	realHeigh = realPos.z;
 	rotatedPos = buildingRotMatrix * vec4(realPos.xyz, 1.0);
     vec3 objPosHigh = buildingPosHIGH;
     vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;
@@ -58,5 +60,5 @@ void main()
 	if(gl_PointSize < 2.0)
 		gl_PointSize = 2.0;
 		
-	depth = (modelViewMatrixRelToEye * pos).z/far; // original.***
+	glPointSize = gl_PointSize;
 }

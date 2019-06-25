@@ -271,6 +271,12 @@ var MagoManager = function()
 	this.tempSettings.renderSpaces = true;
 	this.tempSettings.spacesAlpha = 0.6;
 	
+	/**
+	 * This class contains general settings.
+	 * @type {Settings}
+	 */
+	this._settings = new Settings();
+	
 	//this.tinTerrainManager = new TinTerrainManager();
 };
 
@@ -934,9 +940,10 @@ MagoManager.prototype.managePickingProcess = function()
 		if ( this.bPicking === true)
 		{
 			// this is the closest frustum.***
+			var selectionManager = this.selectionManager;
 			this.bPicking = false;
 			this.arrayAuxSC.length = 0;
-			this.selectionManager.clearCurrents();
+			selectionManager.clearCurrents();
 			this.objectSelected = this.getSelectedObjects(gl, this.mouse_x, this.mouse_y, this.arrayAuxSC);
 			this.buildingSelected = this.arrayAuxSC[0];
 			this.octreeSelected = this.arrayAuxSC[1];
@@ -962,8 +969,8 @@ MagoManager.prototype.managePickingProcess = function()
 			
 
 			// Test flyTo by topology.******************************************************************************
-			var selCandidatesEdges = this.selectionManager.getSelectionCandidatesFamily("networkEdges");
-			var selCandidatesNodes = this.selectionManager.getSelectionCandidatesFamily("networkNodes");
+			var selCandidatesEdges = selectionManager.getSelectionCandidatesFamily("networkEdges");
+			var selCandidatesNodes = selectionManager.getSelectionCandidatesFamily("networkNodes");
 			var flyed = false;
 			if (selCandidatesEdges)
 			{
@@ -1668,15 +1675,9 @@ MagoManager.prototype.keyDown = function(key)
 {
 	if (key === 32) // 32 = 'space'.***
 	{
-		if (this.pointsCloudSsao === undefined)
-		{ this.pointsCloudSsao = true; }
-		
-		if (this.pointsCloudSsao)
-		{ this.pointsCloudSsao = false; }
-		else
-		{ this.pointsCloudSsao = true; }
-	
-	
+		var renderingSettings = this._settings.getRenderingSettings();
+		var pointsCloudColorRamp = renderingSettings.getPointsCloudInColorRamp();
+		renderingSettings.setPointsCloudInColorRamp(!pointsCloudColorRamp);
 	}
 	/*
 	else if (key === 37) // 37 = 'left'.***
@@ -1726,20 +1727,24 @@ MagoManager.prototype.keyDown = function(key)
 		var currAlt = geoCoords.altitude;
 
 		// Move a little.***
-		var latitude = currLat + 0.001 * 10*(Math.random()*2-1);
-		var longitude = currLon + 0.001 * 10*(Math.random()*2-1);
-		var elevation = currAlt + 10.0 * 10*(Math.random()*2-1);
+		var latitude = currLat + 0.0001 * 10*(Math.random()*2-1);
+		var longitude = currLon + 0.0001 * 10*(Math.random()*2-1);
+		var elevation = currAlt + 2.0 * 10*(Math.random()*2-1);
 		
-		latitude = currLat + 0.01;
-		longitude = currLon + 0.01;
-		elevation = currAlt;
+		//latitude = currLat + 0.0001;
+		//longitude = currLon + 0.0001;
+		//elevation = currAlt;
 		
 		
 		var heading;
 		var pitch;
 		var roll;
-		var durationTimeInSeconds = 100;
-		this.changeLocationAndRotation(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll, durationTimeInSeconds);
+		//var durationTimeInSeconds = 5;
+		var animationOption = {
+			autoChangeRotation : true,
+			duration           : 5
+		};
+		this.changeLocationAndRotation(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll, animationOption);
 	}
 	else if (key === 84) // 84 = 't'.***
 	{
@@ -1810,6 +1815,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		//this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_TUNNELPOINTS;
 		this.modeler.mode = CODE.modelerMode.DRAWING_STATICGEOMETRY;
+		//this.modeler.mode = CODE.modelerMode.DRAWING_BSPLINE;
 		
 		// Calculate the geographicCoord of the click position.****
 		var geoCoord;
@@ -1882,6 +1888,12 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			geoCoordsList.makeLines(this);
 		}
 		
+		// BSpline.***
+		//else if (this.modeler.mode === CODE.modelerMode.DRAWING_BSPLINE)
+		//{
+		//	
+		//}
+		
 		// StaticGeometries.***
 		else if (this.modeler.mode === CODE.modelerMode.DRAWING_STATICGEOMETRY)
 		{
@@ -1927,7 +1939,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 				instanceId : buildingId,
 				longitude  : geoCoord.longitude,
 				latitude   : geoCoord.latitude,
-				height     : geoCoord.altitude+1
+				height     : geoCoord.altitude+20
 			});
 			/*var geoLocDataManager = geoCoord.getGeoLocationDataManager();
 			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
@@ -3289,6 +3301,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
 	gl.linkProgram(shader.program);
 			
 	shader.createUniformGenerals(gl, shader, this.sceneState);
@@ -3305,6 +3318,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.shader_fragment = this.postFxShadersManager.createShader(gl, showDepth_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
 	gl.linkProgram(shader.program);
 			
 	shader.createUniformGenerals(gl, shader, this.sceneState);
@@ -3321,6 +3335,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.shader_fragment = this.postFxShadersManager.createShader(gl, showDepth_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
 	gl.linkProgram(shader.program);
 			
 	shader.createUniformGenerals(gl, shader, this.sceneState);
@@ -3338,6 +3353,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
 	gl.linkProgram(shader.program);
 			
 	shader.createUniformGenerals(gl, shader, this.sceneState);
@@ -3356,6 +3372,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
 	gl.linkProgram(shader.program);
 			
 	shader.createUniformGenerals(gl, shader, this.sceneState);
@@ -3378,6 +3395,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
 	gl.linkProgram(shader.program);
 			
 	shader.createUniformGenerals(gl, shader, this.sceneState);
@@ -3395,6 +3413,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
 	gl.linkProgram(shader.program);
 			
 	shader.createUniformGenerals(gl, shader, this.sceneState);
@@ -3412,6 +3431,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
 	gl.linkProgram(shader.program);
 			
 	shader.createUniformGenerals(gl, shader, this.sceneState);
@@ -3421,6 +3441,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.bPositionCompressed_loc = gl.getUniformLocation(shader.program, "bPositionCompressed");
 	shader.minPosition_loc = gl.getUniformLocation(shader.program, "minPosition");
 	shader.bboxSize_loc = gl.getUniformLocation(shader.program, "bboxSize");
+	shader.maxPointSize_loc = gl.getUniformLocation(shader.program, "maxPointSize");
 	
 	// 8) PointsCloud shader.****************************************************************************************
 	shaderName = "pointsCloudSsao";
@@ -3434,6 +3455,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 
 	gl.attachShader(shader.program, shader.shader_vertex);
 	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
 	gl.linkProgram(shader.program);
 			
 	shader.createUniformGenerals(gl, shader, this.sceneState);
@@ -3443,6 +3465,34 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.bPositionCompressed_loc = gl.getUniformLocation(shader.program, "bPositionCompressed");
 	shader.minPosition_loc = gl.getUniformLocation(shader.program, "minPosition");
 	shader.bboxSize_loc = gl.getUniformLocation(shader.program, "bboxSize");
+	shader.maxPointSize_loc = gl.getUniformLocation(shader.program, "maxPointSize");
+	
+	// 9) PointsCloud shader RAINBOW.****************************************************************************************
+	shaderName = "pointsCloudSsao_rainbow";
+	shader = this.postFxShadersManager.newShader(shaderName);
+	ssao_vs_source = ShaderSource.PointCloudVS_rainbow;
+	ssao_fs_source = ShaderSource.PointCloudSsaoFS_rainbow;
+	
+	shader.program = gl.createProgram();
+	shader.shader_vertex = this.postFxShadersManager.createShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.postFxShadersManager.createShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+
+	gl.attachShader(shader.program, shader.shader_vertex);
+	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
+	gl.linkProgram(shader.program);
+			
+	shader.createUniformGenerals(gl, shader, this.sceneState);
+	shader.createUniformLocals(gl, shader, this.sceneState);
+	
+	// pointsCloud shader locals.***
+	shader.bPositionCompressed_loc = gl.getUniformLocation(shader.program, "bPositionCompressed");
+	shader.minPosition_loc = gl.getUniformLocation(shader.program, "minPosition");
+	shader.bboxSize_loc = gl.getUniformLocation(shader.program, "bboxSize");
+	shader.bUseColorCodingByHeight_loc = gl.getUniformLocation(shader.program, "bUseColorCodingByHeight");
+	shader.minHeight_rainbow_loc = gl.getUniformLocation(shader.program, "minHeight_rainbow");
+	shader.maxHeight_rainbow_loc = gl.getUniformLocation(shader.program, "maxHeight_rainbow");
+	shader.maxPointSize_loc = gl.getUniformLocation(shader.program, "maxPointSize");
 };
 
 /**
@@ -4101,6 +4151,8 @@ MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, l
 
 /**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
+ * @param {string} projectId policy 사용 시 geo_data_default_projects 배열에 있는 값.
+ * @param {string} projectDataFolder 해당 프로젝트의 data_key를 의미.
  */
 MagoManager.prototype.getObjectIndexFile = function(projectId, projectDataFolder) 
 {

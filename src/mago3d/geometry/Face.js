@@ -228,6 +228,7 @@ Face.prototype.calculateVerticesNormals = function(bForceRecalculatePlaneNormal)
 	
 	if (this.planeNormal === undefined)
 	{ this.calculatePlaneNormal(); }
+	//@TODO: Add dirty-flag not to copy the normal vector twice.
 	
 	var normal;
 	var verticesCount = this.getVerticesCount();

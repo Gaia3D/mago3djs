@@ -18,6 +18,7 @@ var Lego = function()
 	}
 
 	/**
+	 * This class is the container which holds the VBO Cache Keys.
 	 * @type {VBOVertexIdxCacheKeysContainer}
 	 */
 	this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer();
@@ -433,6 +434,9 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader)
 		
 		if (!vbo_vicky.bindDataNormal(shader, magoManager.vboMemoryManager))
 		{ return false; }
+	
+		//if (!vbo_vicky.bindDataColor(shader, magoManager.vboMemoryManager))
+		//{ return false; }
 
 		// TODO:
 		//if (vbo_vicky.meshColorCacheKey !== undefined )

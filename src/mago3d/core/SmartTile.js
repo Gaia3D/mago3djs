@@ -95,10 +95,16 @@ SmartTile.prototype.deleteObjects = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 타일에 자식 타일 생성 및 반환.
+ * @param {SmartTile} parentTile 부모타일
+ * @return {SmartTile} subTile 생성된 자식타일 반환
  */
 SmartTile.prototype.newSubTile = function(parentTile) 
 {
+	if (!(parentTile instanceof SmartTile))
+	{
+		return;
+	}
 	if (this.subTiles === undefined)
 	{ this.subTiles = []; }
 	
@@ -421,7 +427,7 @@ SmartTile.prototype.makeTreeByDepth = function(targetDepth, magoManager)
 		// intercept buildingSeeds for each subTiles.
 		for (var i=0; i<4; i++)
 		{
-			this.subTiles[i].takeIntersectedBuildingSeeds(this.nodeSeedsArray, magoManager);
+			this.subTiles[i].takeIntersectedBuildingSeeds(this.nodeSeedsArray);
 		}
 		
 		// for each subTile that has intercepted buildingSeeds -> makeTree.
@@ -472,8 +478,11 @@ SmartTile.prototype.getLowestTileWithNodeInside = function(node)
 */
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param geoLocData 변수
+ * 타일과 노드의 포함유무 체크
+ * @param {Node} node 포함유무를 체크할 
+ * @return {Boolean}
+ * 
+ * @see this#intersectPoint
  */
 SmartTile.prototype.intersectsNode = function(node) 
 {
@@ -510,8 +519,11 @@ SmartTile.prototype.intersectsNode = function(node)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param geoLocData 변수
+ * 해당 타일에 속하는 Node를 찾아서 nodeseedsArray에 추가.
+ * Node의 smartTileOwner에 해당 SmartTile 인스턴스를 할당.
+ * @param {Array.<Node>} nodeSeedsArray Node Array
+ * 
+ * @see this#intersectsNode
  */
 SmartTile.prototype.takeIntersectedBuildingSeeds = function(nodeSeedsArray) 
 {
@@ -586,8 +598,11 @@ SmartTile.prototype.calculateAltitudeLimits = function()
 */
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param geographicCoord 변수
+ * 위경도를 받아서 현재 타일인스턴스와의 포함유무 반환.
+ * @param {Number} longitude
+ * @param {Number} latitude
+ * 
+ * @return {boolean}
  */
 SmartTile.prototype.intersectPoint = function(longitude, latitude) 
 {
@@ -896,7 +911,6 @@ SmartTile.getFrustumIntersectedTilesNamesForGeographicExtent = function(frustum,
 	
 };
 
-
 /**
  * 어떤 일을 하고 있습니까?
  * Extent(범위)
@@ -908,7 +922,13 @@ SmartTile.prototype.getSphereExtent = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 각각 민맥스 좌표들로 타일의 사이즈 세팅.
+ * @param {number} minLon
+ * @param {number} minLat
+ * @param {number} minAlt
+ * @param {number} maxLon
+ * @param {number} maxLat
+ * @param {number} maxAlt
  */
 SmartTile.prototype.setSize = function(minLon, minLat, minAlt, maxLon, maxLat, maxAlt) 
 {
@@ -922,7 +942,7 @@ SmartTile.prototype.setSize = function(minLon, minLat, minAlt, maxLon, maxLat, m
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 생성된 4개의 subtile에 각각의 좌표를 할당
  */
 SmartTile.prototype.setSizesToSubTiles = function() 
 {
@@ -931,7 +951,10 @@ SmartTile.prototype.setSizesToSubTiles = function()
 	//       +-----+-----+
 	//       |  0  |  1  |
 	//       +-----+-----+
-	
+	if (this.subTiles.length < 4)
+	{
+		throw new Error('When subTiles length is 4, setSizesToSubTiles is ok.'); 
+	}
 	var minLon = this.minGeographicCoord.longitude;
 	var maxLon = this.maxGeographicCoord.longitude;
 	var minLat = this.minGeographicCoord.latitude;
