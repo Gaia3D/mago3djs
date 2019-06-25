@@ -94,6 +94,21 @@ Rectangle2D.prototype.setDimensions = function(width, height)
 	this.height = height;
 };
 
+Rectangle2D.prototype.getCenterPosition = function()
+{
+	return this.centerPoint;
+};
+
+Rectangle2D.prototype.getWidth = function()
+{
+	return this.width;
+};
+
+Rectangle2D.prototype.getHeight = function()
+{
+	return this.height;
+};
+
 /**
  * Returns the right up point.
  * @param {Point2D|undefined} resultPoint if this undefined, then create new Point2D.
