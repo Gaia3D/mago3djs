@@ -940,9 +940,10 @@ MagoManager.prototype.managePickingProcess = function()
 		if ( this.bPicking === true)
 		{
 			// this is the closest frustum.***
+			var selectionManager = this.selectionManager;
 			this.bPicking = false;
 			this.arrayAuxSC.length = 0;
-			this.selectionManager.clearCurrents();
+			selectionManager.clearCurrents();
 			this.objectSelected = this.getSelectedObjects(gl, this.mouse_x, this.mouse_y, this.arrayAuxSC);
 			this.buildingSelected = this.arrayAuxSC[0];
 			this.octreeSelected = this.arrayAuxSC[1];
@@ -968,8 +969,8 @@ MagoManager.prototype.managePickingProcess = function()
 			
 
 			// Test flyTo by topology.******************************************************************************
-			var selCandidatesEdges = this.selectionManager.getSelectionCandidatesFamily("networkEdges");
-			var selCandidatesNodes = this.selectionManager.getSelectionCandidatesFamily("networkNodes");
+			var selCandidatesEdges = selectionManager.getSelectionCandidatesFamily("networkEdges");
+			var selCandidatesNodes = selectionManager.getSelectionCandidatesFamily("networkNodes");
 			var flyed = false;
 			if (selCandidatesEdges)
 			{

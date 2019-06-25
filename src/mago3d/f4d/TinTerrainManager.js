@@ -78,7 +78,7 @@ TinTerrainManager.prototype.init = function()
 	}
 	this.tinTerrainsQuadTreeAmerica.setGeographicExtent(minLon, minLat, minAlt, maxLon, maxLat, maxAlt);
 	//this.tinTerrainsQuadTreeAmerica.setWebMercatorExtent(0, 0, 0.5, 1); // ori.***
-	this.tinTerrainsQuadTreeAmerica.setWebMercatorExtent(-1.0, -1.0, 0, 1); // unitary extension.***
+	this.tinTerrainsQuadTreeAmerica.setWebMercatorExtent(-1, -1, 0, 1); // unitary extension.***
 	this.tinTerrainsQuadTreeAmerica.X = 0;
 	this.tinTerrainsQuadTreeAmerica.Y = 0;
 	this.tinTerrainsQuadTreeAmerica.indexName = "LU";
@@ -244,7 +244,7 @@ TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager)
 	
 };
 
-TinTerrainManager.prototype.render = function(magoManager, bDepth) 
+TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType) 
 {
 	
 	var gl = magoManager.sceneState.gl;
@@ -267,7 +267,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth)
 	gl.bindTexture(gl.TEXTURE_2D, tex.texId);
 	
 	gl.uniform1i(currentShader.bIsMakingDepth_loc, bDepth); //.
-	gl.uniform1i(currentShader.hasTexture_loc, true); //.
+	gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture. Initially set as texture color type.***
 	gl.uniform4fv(currentShader.oneColor4_loc, [0.5, 0.5, 0.5, 1.0]);
 	
 	var flipTexCoordY = true;
@@ -289,7 +289,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth)
 		if (tinTerrain === undefined)
 		{ continue; }
 	
-		tinTerrain.render(currentShader, magoManager, bDepth);
+		tinTerrain.render(currentShader, magoManager, bDepth, renderType);
 	}
 
 	currentShader.disableVertexAttribArray(currentShader.texCoord2_loc); 

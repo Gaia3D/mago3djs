@@ -250,6 +250,9 @@ TinTerrain.prototype.prepareTexture = function(magoManager, tinTerrainManager)
 	{ xDef = 0; }
 		
 	var textureFilePath = "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/" + L + "/" + Y + "/" + xDef + ".png";
+	
+	// Provisionally, for debug, save textureFilePath.***
+	this.texFilePath__TEST = textureFilePath;
 
 	magoManager.readerWriter.loadWMSImage(gl, textureFilePath, this.texture, magoManager, false);
 	
@@ -394,10 +397,10 @@ TinTerrain.prototype.deleteTinTerrain = function(magoManager)
 
 TinTerrain.prototype.renderBorder = function(currentShader, magoManager)
 {
-	
+	// TODO:
 };
 
-TinTerrain.prototype.render = function(currentShader, magoManager, bDepth)
+TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, renderType)
 {
 	if (this.owner === undefined || this.owner.isPrepared())
 	{
@@ -408,9 +411,33 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth)
 			
 			if (this.texture.texId === undefined)
 			{ return; }
+		
+			var gl = magoManager.getGl();
+		
+			if (renderType === 2)
+			{
+				var colorAux;
+				colorAux = magoManager.selectionColor.getAvailableColor(colorAux);
+				var idxKey = magoManager.selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
+				magoManager.selectionManager.setCandidateGeneral(idxKey, this);
+				
+				gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
+				gl.uniform4fv(currentShader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
+			}
+			
+			// Test.********************
+			if (renderType === 1)
+			{
+				gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
+				var currSelObject = magoManager.selectionManager.getSelectedGeneral();
+				if (currSelObject === this)
+				{
+					gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
+					gl.uniform4fv(currentShader.oneColor4_loc, [0.8, 0.3, 0.1, 1.0]);
+				}
+			}
 			
 			// render this tinTerrain.
-			var gl = magoManager.sceneState.gl;
 			var renderWireframe = false;
 			
 			gl.bindTexture(gl.TEXTURE_2D, this.texture.texId);
@@ -764,6 +791,15 @@ TinTerrain.prototype.calculateTextureCoordinateTranslationAndScale = function()
 	terrainMercatorMinPoint2d = this.geographicExtent.minGeographicCoord.getMercatorProjection(terrainMercatorMinPoint2d);
 	terrainMercatorMaxPoint2d = this.geographicExtent.maxGeographicCoord.getMercatorProjection(terrainMercatorMaxPoint2d);
 	
+	////terrainMercatorMinPoint2d = this.webMercatorExtent.getMinPoint(terrainMercatorMinPoint2d);
+	////terrainMercatorMaxPoint2d = this.webMercatorExtent.getMaxPoint(terrainMercatorMaxPoint2d);
+	
+	// test.**********************************
+	var equatorialRadius = Globe.equatorialRadius();
+	//var lonRad = 
+	//resultPoint2d.set(equatorialRadius * lonRad, equatorialRadius * latRad);
+	
+	
 	// Calculate imagery mercator extension.
 	var imageryMercatorMinPoint2d, imageryMercatorMaxPoint2d;
 	// Imagery coords are just mercator.
@@ -790,9 +826,19 @@ TinTerrain.prototype.getMidLatitudeRadWebMercator = function()
 {
 	if (this.webMercatorExtent === undefined)
 	{ return undefined; }
+	/*
+	var R = Globe.equatorialRadius();
+	var minLat = this.imageryGeoExtent.minGeographicCoord.latitude; // web mercator coord, so is in meters, no degrees.***
+	var maxLat = this.imageryGeoExtent.maxGeographicCoord.latitude; // web mercator coord, so is in meters, no degrees.***
+	
+	var midMercatorY = (maxLat + minLat)/2.0;
+	var latRad = 2*Math.atan(Math.pow(Math.E, midMercatorY/R)) - Math.PI/2;
+	*/
+	
 	
 	var midMercatorY = (this.webMercatorExtent.maxY + this.webMercatorExtent.minY)/2.0;
 	var latRad = 2*Math.atan(Math.pow(Math.E, midMercatorY)) - Math.PI/2;
+	
 	
 	if (isNaN(latRad))
 	{ var hola = 0; }
@@ -815,6 +861,9 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 	var lonIncreDeg = lonRange/lonSegments;
 	var latIncreDeg = latRange/latSegments;
 	
+	if (lonIncreDeg <= 0 || latIncreDeg <= 0)
+	{ var hola = 0; }
+	
 	// use a vertexMatrix to make the regular net.
 	var vertexMatrix;
 	
@@ -835,6 +884,7 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 	var tanLatRange = tanMaxLat - tanMinLat;
 	var PI = Math.PI;
 	var aConst = (1.0/(2.0*PI))*Math.pow(2.0, depth);
+	//var aConst = (1.0/(2.0*PI));
 	
 	// check if exist altitude.
 	var alt = 0;
@@ -850,7 +900,22 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 	
 	if (depth === 2)
 	{
-		if (this.X === 0 && this.Y === 3)
+		if (this.Y === 0)
+		{ var hola = 0; }
+	
+		if (this.Y === 1)
+		{ var hola = 0; }
+	
+		if (this.Y === 2)
+		{ var hola = 0; }
+	
+		if (this.Y === 3)
+		{ var hola = 0; }
+	}
+	
+	if (depth === 3)
+	{
+		if (this.X === 0 && this.Y === 2)
 		{ var hola = 0; }
 	}
 	
@@ -862,8 +927,12 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 	this.calculateTextureCoordinateTranslationAndScale();
 	// End test.-------------------------------------------------------------------------------
 	
-	var minT = aConst*(PI-Math.log(Math.tan(PI/4+minLat/2)));
-	var maxT = aConst*(PI-Math.log(Math.tan(PI/4+maxLat/2)));
+	var PI_DIV_4 = PI/4;
+	var minT = aConst*(PI-Math.log(Math.tan(PI_DIV_4+minLat/2)));
+	var maxT = aConst*(PI-Math.log(Math.tan(PI_DIV_4+maxLat/2)));
+	
+	var minT2 = aConst*(Math.log(Math.tan(PI_DIV_4+minLat/2)));
+	var maxT2 = aConst*(Math.log(Math.tan(PI_DIV_4+maxLat/2)));
 	
 	var tRange = maxT - minT;
 	var realMinT, realMaxT;
@@ -886,13 +955,13 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 			// make texcoords.
 			// https://en.wikipedia.org/wiki/Web_Mercator_projection
 			s = aConst*(currLon+PI);
-			t = aConst*(PI-Math.log(Math.tan(PI/4+currLat/2)));
-			
-			// Test.***
-			//t = (t-minT)/tRange;
-			// End test.---
-			
+			t = aConst*(PI-Math.log(Math.tan(PI_DIV_4+currLat/2)));
 			//t = 1.0 - t;
+			
+			var currLatDeg = currLat*180/PI;
+			var testLatRad = 0;
+			var testT = aConst*(PI-Math.log(Math.tan(PI_DIV_4+testLatRad/2)));
+
 			
 			this.texCoordsArray[idx*2] = s;
 			this.texCoordsArray[idx*2+1] = t;
@@ -942,7 +1011,7 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 	for (var i=0; i<texCoordsCount; i++)
 	{
 		var currT = this.texCoordsArray[i*2+1];
-		this.texCoordsArray[i*2+1] = (currT - realMinT)/realTRange;
+		//this.texCoordsArray[i*2+1] = (currT - realMinT)/realTRange;
 		this.texCoordsArray[i*2+1] = 1.0 - this.texCoordsArray[i*2+1];
 	}
 	
@@ -1043,8 +1112,8 @@ TinTerrain.prototype.makeVbo = function(vboMemManager)
 			//this.texCoordsArray[i*2+1] *= this.textureTranslateAndScale.w;
 			
 			// translate.
-			this.texCoordsArray[i*2] += this.textureTranslateAndScale.x;
-			this.texCoordsArray[i*2+1] += this.textureTranslateAndScale.y;
+			//this.texCoordsArray[i*2] += this.textureTranslateAndScale.x;
+			//this.texCoordsArray[i*2+1] += this.textureTranslateAndScale.y;
 			
 			// Latitude correction.
 			/*

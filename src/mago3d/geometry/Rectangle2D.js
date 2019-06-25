@@ -95,9 +95,37 @@ Rectangle2D.prototype.setDimensions = function(width, height)
 };
 
 /**
+ * Returns the right up point.
+ * @param {Point2D|undefined} resultPoint if this undefined, then create new Point2D.
+ * @returns {Point2D|undefined} resultPoint
+ */
+Rectangle2D.prototype.getMaxPoint = function(resultPoint)
+{
+	if (resultPoint === undefined)
+	{ resultPoint = new Point2D(); }
+	
+	resultPoint.set(this.maxX, this.maxY);
+	return resultPoint;
+};
+
+/**
+ * Returns the left down point.
+ * @param {Point2D|undefined} resultPoint if this undefined, then create new Point2D.
+ * @returns {Point2D|undefined} resultPoint
+ */
+Rectangle2D.prototype.getMinPoint = function(resultPoint)
+{
+	if (resultPoint === undefined)
+	{ resultPoint = new Point2D(); }
+	
+	resultPoint.set(this.minX, this.minY);
+	return resultPoint;
+};
+
+/**
  * Returns the points of the Rectangle.
- * @param {Array.<Point3D>|undefined} resultPointsArray if this undefined, set new Array. []
- * @returns {Array.<Point3D>} resultPointsArray rectangle의 꼭지점 반환, 중심점으로부터 가로,세로의 절반 만큼 떨어진 4점을 반환
+ * @param {Array.<Point2D>|undefined} resultPointsArray if this undefined, set new Array. []
+ * @returns {Array.<Point2D>} resultPointsArray rectangle의 꼭지점 반환, 중심점으로부터 가로,세로의 절반 만큼 떨어진 4점을 반환
  */
 Rectangle2D.prototype.getPoints = function(resultPointsArray)
 {

@@ -1095,7 +1095,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		if (magoManager.tinTerrainManager !== undefined)
 		{
 			var bDepthRender = false; // magoManager is no depth render.***
-			magoManager.tinTerrainManager.render(magoManager, bDepthRender);
+			magoManager.tinTerrainManager.render(magoManager, bDepthRender, renderType);
 		}
 
 	}
@@ -1445,6 +1445,14 @@ Renderer.prototype.renderGeometryColorCoding = function(visibleObjControlerNodes
 			gl.disable(gl.CULL_FACE);
 			magoManager.modeler.render(magoManager, shader, renderType);
 		}
+	}
+	
+	// tin terrain.***
+	if (magoManager.tinTerrainManager !== undefined)
+	{
+		var bDepth = false;
+		magoManager.tinTerrainManager.render(magoManager, bDepth, renderType);
+		gl.useProgram(null);
 	}
 };
 

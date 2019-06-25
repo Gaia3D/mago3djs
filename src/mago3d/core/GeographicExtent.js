@@ -56,13 +56,61 @@ GeographicExtent.prototype.setExtent = function(minLon, minLat, minAlt, maxLon, 
 };
 
 /**
- * Get the middle point of the lower bound point and uppper bound point
+ * Returns the middle point of the lower bound point and uppper bound point
  * @param resultGeographicCoord the point which will save the result
  * @returns {GeographicCoord}
  */
 GeographicExtent.prototype.getMidPoint = function(resultGeographicCoord) 
 {
 	return GeographicCoord.getMidPoint(this.minGeographicCoord, this.maxGeographicCoord, resultGeographicCoord);
+};
+
+/**
+ * Returns the minimum latitude in radians.
+ * @returns {Number}
+ */
+GeographicExtent.prototype.getMinLatitudeRad = function() 
+{
+	if (this.minGeographicCoord === undefined)
+	{ return; }
+	
+	return this.minGeographicCoord.getLatitudeRad();
+};
+
+/**
+ * Returns the minimum longitude in radians.
+ * @returns {Number}
+ */
+GeographicExtent.prototype.getMinLongitudeRad = function() 
+{
+	if (this.minGeographicCoord === undefined)
+	{ return; }
+	
+	return this.minGeographicCoord.getLongitudeRad();
+};
+
+/**
+ * Returns the maximum latitude in radians.
+ * @returns {Number}
+ */
+GeographicExtent.prototype.getMaxLatitudeRad = function() 
+{
+	if (this.maxGeographicCoord === undefined)
+	{ return; }
+	
+	return this.maxGeographicCoord.getLatitudeRad();
+};
+
+/**
+ * Returns the maximum longitude in radians.
+ * @returns {Number}
+ */
+GeographicExtent.prototype.getMaxLongitudeRad = function() 
+{
+	if (this.maxGeographicCoord === undefined)
+	{ return; }
+	
+	return this.maxGeographicCoord.getLongitudeRad();
 };
 
 

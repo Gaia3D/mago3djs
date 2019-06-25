@@ -76,7 +76,7 @@ SelectionManager.prototype.setCandidateCustom = function(idxKey, familyName, obj
 };
 
 /**
- * SelectionManager
+ * SelectionManager. Recomended. Use this for all selection process.
  * 
  * @alias SelectionManager
  * @class SelectionManager
