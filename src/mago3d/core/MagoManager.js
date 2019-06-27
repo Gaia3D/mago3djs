@@ -547,8 +547,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		if (frustumCommandsList === undefined)
 		{ frustumCommandsList = this.scene.frustumCommandsList; }
 		
-		// Update sceneState camera.***
-		this.upDateCamera(sceneState.camera);
+		
 		
 		var camPosX = this.scene.camera.positionWC.x;
 		var camPosY = this.scene.camera.positionWC.y;
@@ -563,6 +562,9 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		{
 			this.isCameraMoved = true;
 		}
+		
+		// Update sceneState camera.***
+		this.upDateCamera(sceneState.camera);
 					
 		sceneState.drawingBufferWidth[0] = scene.drawingBufferWidth;
 		sceneState.drawingBufferHeight[0] = scene.drawingBufferHeight;

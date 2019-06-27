@@ -225,6 +225,8 @@ BasicFactory.prototype.makeMesh = function()
 	// Now translate the roof to front.***
 	mesh.translate(0, this.length*0.5, 0);
 	
+	mesh.setColor(0.2, 0.8, 0.5, 1.0);
+	
 	this.dirty = false;
 };
 
