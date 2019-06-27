@@ -186,7 +186,7 @@ PostFxShader.prototype.bindUniformGenerals = function()
 	
 	// Bind camera uniforms.
 	if (this.camera)
-	{ this.camera.bindCameraUniforms(this.gl, this); }
+	{ this.camera.bindUniforms(this.gl, this); }
 };
 
 /**

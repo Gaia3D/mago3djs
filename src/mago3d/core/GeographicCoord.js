@@ -164,6 +164,30 @@ GeographicCoord.prototype.setLonLatAlt = function(longitude, latitude, altitude)
 };
 
 /**
+ * Returns the latitude in radians.
+ * @returns {Number}
+ */
+GeographicCoord.prototype.getLatitudeRad = function() 
+{
+	if (this.latitude === undefined)
+	{ return; }
+	
+	return this.latitude *Math.PI/180;
+};
+
+/**
+ * Returns the longitude in radians.
+ * @returns {Number}
+ */
+GeographicCoord.prototype.getLongitudeRad = function() 
+{
+	if (this.longitude === undefined)
+	{ return; }
+	
+	return this.longitude *Math.PI/180;
+};
+
+/**
  * get the middle point between two GeopraphicCoord features
  * @param {GeographicCoord} geographicCoordA
  * @param {GeographicCoord} geographicCoordB

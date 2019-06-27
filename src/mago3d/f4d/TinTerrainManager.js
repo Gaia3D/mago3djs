@@ -27,6 +27,7 @@ var TinTerrainManager = function()
 	// terrainType = 0 -> terrainPlainModel.
 	// terrainType = 1 -> terrainElevationModel.
 	this.terrainType = 0; 
+	this.imageryType = CODE.imageryType.WEB_MERCATOR; // Test.***
 	
 	this.init();
 };
@@ -37,6 +38,12 @@ TinTerrainManager.prototype.init = function()
 	this.tinTerrainsQuadTreeAmerica = new TinTerrain(undefined); // Main object.
 	//1.4844222297453322
 	//var latDeg = 1.4844222297453322 *180/Math.PI;
+	//https://en.wikipedia.org/wiki/Web_Mercator_projection
+	//https://en.wikipedia.org/wiki/Mercator_projection
+	var webMercatorMaxLatRad = 2*Math.atan(Math.pow(Math.E, Math.PI)) - (Math.PI/2);
+	var webMercatorMaxLatDeg = webMercatorMaxLatRad * 180/Math.PI; // = 85.0511287798...
+
+	
 	// Asia side.
 	var minLon = 0;
 	var minLat = -90;
@@ -44,9 +51,18 @@ TinTerrainManager.prototype.init = function()
 	var maxLon = 180;
 	var maxLat = 90;
 	var maxAlt = 0;
+	if (this.imageryType === CODE.imageryType.WEB_MERCATOR)
+	{
+		minLat = -webMercatorMaxLatDeg; 
+		maxLat = webMercatorMaxLatDeg; 
+	}
+	
 	this.tinTerrainsQuadTreeAsia.setGeographicExtent(minLon, minLat, minAlt, maxLon, maxLat, maxAlt);
+	this.tinTerrainsQuadTreeAsia.setWebMercatorExtent(0, -Math.PI, 1, Math.PI); // unitary extension.***
 	this.tinTerrainsQuadTreeAsia.X = 1;
 	this.tinTerrainsQuadTreeAsia.Y = 0;
+	this.tinTerrainsQuadTreeAsia.indexName = "RU";
+	this.tinTerrainsQuadTreeAsia.tinTerrainManager = this;
 	
 	// America side.
 	minLon = -180;
@@ -55,61 +71,31 @@ TinTerrainManager.prototype.init = function()
 	maxLon = 0;
 	maxLat = 90;
 	maxAlt = 0;
+	if (this.imageryType === CODE.imageryType.WEB_MERCATOR)
+	{
+		minLat = -webMercatorMaxLatDeg; 
+		maxLat = webMercatorMaxLatDeg; 
+	}
 	this.tinTerrainsQuadTreeAmerica.setGeographicExtent(minLon, minLat, minAlt, maxLon, maxLat, maxAlt);
+	this.tinTerrainsQuadTreeAmerica.setWebMercatorExtent(-1, -Math.PI, 0, Math.PI); // unitary extension.***
 	this.tinTerrainsQuadTreeAmerica.X = 0;
 	this.tinTerrainsQuadTreeAmerica.Y = 0;
+	this.tinTerrainsQuadTreeAmerica.indexName = "LU";
+	this.tinTerrainsQuadTreeAmerica.tinTerrainManager = this;
 	
 	// do imagery test.
 	// set imagery initial geoExtent (in mercator coords).
-	/*
-	// https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer
-	Initial Extent:
-	XMin: -2.7680880158351306E7
-	YMin: -195164.8424795773 // error.
-	XMax: 2.7680880158351306E7
-	YMax: 1.9971868880408563E7
-	Spatial Reference: 102100 
-
-	Full Extent:
-	XMin: -2.003750722959434E7
-	YMin: -1.997186888040859E7
-	XMax: 2.003750722959434E7
-	YMax: 1.9971868880408563E7
-	Spatial Reference: 102100 
 	
-	//https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/0
-	Level 0 Extent:
-	XMin: -2.0028669624423463E7
-	YMin: -7679113.797548824
-	XMax: 2.001627433615794E7
-	YMax: 1.7924177384518914E7
-	Spatial Reference: 102100  (3857) 
-
-	*/
-	
-	
-	// Full extent.
+	// Full extent. https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer
 	var initImageryMercatorMinX = -2.003750722959434E7;
 	var initImageryMercatorMinY = -1.997186888040859E7;
 	var initImageryMercatorMaxX = 2.003750722959434E7;
 	var initImageryMercatorMaxY = 1.9971868880408563E7;
-	
+	/*
 	//north: 1.4844222297453322
 	var eqRadius = Globe.equatorialRadius();
 	var north = eqRadius*1.48352986419518;
 	var north2 = eqRadius*Math.PI/2;
-	
-	// Initial extent.
-	//var initImageryMercatorMinX = -2.7680880158351306E7;
-	//var initImageryMercatorMinY = -195164.8424795773;
-	//var initImageryMercatorMaxX = 2.7680880158351306E7;
-	//var initImageryMercatorMaxY = 1.9971868880408563E7;
-	
-	// Level 0 extent.
-	//var initImageryMercatorMinX = -2.0028669624423463E7;
-	//var initImageryMercatorMinY = -7679113.797548824;
-	//var initImageryMercatorMaxX = 2.001627433615794E7;
-	//var initImageryMercatorMaxY = 1.7924177384518914E7;
 	
 	// my extent.
 	
@@ -117,13 +103,84 @@ TinTerrainManager.prototype.init = function()
 	var initImageryMercatorMinY = -north2;
 	var initImageryMercatorMaxX = 2.003750722959434E7;
 	var initImageryMercatorMaxY = north2;
-	
+	*/
 	
 	this.tinTerrainsQuadTreeAsia.imageryGeoExtent = new GeographicExtent();
 	this.tinTerrainsQuadTreeAsia.imageryGeoExtent.setExtent(initImageryMercatorMinX, initImageryMercatorMinY, 0.0, initImageryMercatorMaxX, initImageryMercatorMaxY, 0.0);
 	
 	this.tinTerrainsQuadTreeAmerica.imageryGeoExtent = new GeographicExtent();
 	this.tinTerrainsQuadTreeAmerica.imageryGeoExtent.setExtent(initImageryMercatorMinX, initImageryMercatorMinY, 0.0, initImageryMercatorMaxX, initImageryMercatorMaxY, 0.0);
+	
+	// Test code:
+	var PI = Math.PI;
+	var latRad = -webMercatorMaxLatRad;
+	var x = Math.log(Math.tan(PI/4+latRad/2));
+	
+	latRad = -45*PI/180;
+	var x2 = Math.log(Math.tan(PI/4+latRad/2));
+	
+	latRad = 0;
+	var x3 = Math.log(Math.tan(PI/4+latRad/2));
+	
+	latRad = 45*PI/180;
+	var x4 = Math.log(Math.tan(PI/4+latRad/2));
+	
+	latRad = webMercatorMaxLatRad;
+	var x5 = Math.log(Math.tan(PI/4+latRad/2));
+	
+	// test code 2:
+	var depth = 0;
+	var aConst = (1.0/(2.0*PI))*Math.pow(2.0, depth);
+	latRad = -webMercatorMaxLatRad;
+	var y = aConst*(PI-Math.log(Math.tan(PI/4+latRad/2)));
+	
+	latRad = -45*PI/180;
+	var y2 = aConst*(PI-Math.log(Math.tan(PI/4+latRad/2)));
+	
+	latRad = 0;
+	var y3 = aConst*(PI-Math.log(Math.tan(PI/4+latRad/2)));
+	
+	latRad = 45*PI/180;
+	var y4 = aConst*(PI-Math.log(Math.tan(PI/4+latRad/2)));
+	
+	latRad = webMercatorMaxLatRad;
+	var y5 = aConst*(PI-Math.log(Math.tan(PI/4+latRad/2)));
+	
+	// test code 3:
+	depth = 1;
+	aConst = (1.0/(2.0*PI))*Math.pow(2.0, depth);
+	latRad = -webMercatorMaxLatRad;
+	var z = aConst*(PI-Math.log(Math.tan(PI/4+latRad/2)));
+	
+	latRad = -45*PI/180;
+	var z2 = aConst*(PI-Math.log(Math.tan(PI/4+latRad/2)));
+	
+	latRad = 0;
+	var z3 = aConst*(PI-Math.log(Math.tan(PI/4+latRad/2)));
+	
+	latRad = 45*PI/180;
+	var z4 = aConst*(PI-Math.log(Math.tan(PI/4+latRad/2)));
+	
+	latRad = webMercatorMaxLatRad;
+	var z5 = aConst*(PI-Math.log(Math.tan(PI/4+latRad/2)));
+	
+	// test code 4:
+	depth = 2;
+	aConst = (1.0/(2.0*PI))*Math.pow(2.0, depth);
+	latRad = -webMercatorMaxLatRad;
+	var w = aConst*(PI-Math.log(Math.tan(PI/4+latRad/2)));
+	
+	latRad = -45*PI/180;
+	var w2 = aConst*(PI-Math.log(Math.tan(PI/4+latRad/2)));
+	
+	latRad = 0;
+	var w3 = aConst*(PI-Math.log(Math.tan(PI/4+latRad/2)));
+	
+	latRad = 45*PI/180;
+	var w4 = aConst*(PI-Math.log(Math.tan(PI/4+latRad/2)));
+	
+	latRad = webMercatorMaxLatRad;
+	var w5 = aConst*(PI-Math.log(Math.tan(PI/4+latRad/2)));
 };
 
 TinTerrainManager.prototype.doFrustumCulling = function(frustum, camPos, magoManager, maxDepth)
@@ -186,7 +243,7 @@ TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager)
 	
 };
 
-TinTerrainManager.prototype.render = function(magoManager, bDepth) 
+TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType) 
 {
 	
 	var gl = magoManager.sceneState.gl;
@@ -209,7 +266,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth)
 	gl.bindTexture(gl.TEXTURE_2D, tex.texId);
 	
 	gl.uniform1i(currentShader.bIsMakingDepth_loc, bDepth); //.
-	gl.uniform1i(currentShader.hasTexture_loc, true); //.
+	gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture. Initially set as texture color type.***
 	gl.uniform4fv(currentShader.oneColor4_loc, [0.5, 0.5, 0.5, 1.0]);
 	
 	var flipTexCoordY = true;
@@ -231,7 +288,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth)
 		if (tinTerrain === undefined)
 		{ continue; }
 	
-		tinTerrain.render(currentShader, magoManager, bDepth);
+		tinTerrain.render(currentShader, magoManager, bDepth, renderType);
 	}
 
 	currentShader.disableVertexAttribArray(currentShader.texCoord2_loc); 

@@ -1886,7 +1886,6 @@ ShaderSource.TinTerrainFS = "#ifdef GL_ES\n\
 uniform sampler2D depthTex;\n\
 uniform sampler2D noiseTex;  \n\
 uniform sampler2D diffuseTex;\n\
-uniform bool hasTexture;\n\
 uniform bool textureFlipYAxis;\n\
 uniform bool bIsMakingDepth;\n\
 varying vec3 vNormal;\n\
@@ -1901,7 +1900,9 @@ uniform float screenWidth;    \n\
 uniform float screenHeight;    \n\
 uniform float shininessValue;\n\
 uniform vec3 kernel[16];   \n\
-uniform vec4 vColor4Aux;\n\
+\n\
+uniform vec4 oneColor4;\n\
+uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
 \n\
 varying vec2 vTexCoord;   \n\
 varying vec3 vLightWeighting;\n\
@@ -1956,7 +1957,16 @@ void main()\n\
 	}\n\
 	else{\n\
 		vec4 textureColor;\n\
-		if(hasTexture)\n\
+		if(colorType == 0)\n\
+		{\n\
+			textureColor = oneColor4;\n\
+			\n\
+			if(textureColor.w == 0.0)\n\
+			{\n\
+				discard;\n\
+			}\n\
+		}\n\
+		else if(colorType == 2)\n\
 		{\n\
 			if(textureFlipYAxis)\n\
 			{\n\
@@ -1972,7 +1982,7 @@ void main()\n\
 			}\n\
 		}\n\
 		else{\n\
-			textureColor = vColor4Aux;\n\
+			textureColor = oneColor4;\n\
 		}\n\
 		//vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);\n\
 		gl_FragColor = vec4(textureColor.xyz, 1.0); \n\

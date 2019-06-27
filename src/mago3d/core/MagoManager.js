@@ -940,9 +940,10 @@ MagoManager.prototype.managePickingProcess = function()
 		if ( this.bPicking === true)
 		{
 			// this is the closest frustum.***
+			var selectionManager = this.selectionManager;
 			this.bPicking = false;
 			this.arrayAuxSC.length = 0;
-			this.selectionManager.clearCurrents();
+			selectionManager.clearCurrents();
 			this.objectSelected = this.getSelectedObjects(gl, this.mouse_x, this.mouse_y, this.arrayAuxSC);
 			this.buildingSelected = this.arrayAuxSC[0];
 			this.octreeSelected = this.arrayAuxSC[1];
@@ -968,8 +969,8 @@ MagoManager.prototype.managePickingProcess = function()
 			
 
 			// Test flyTo by topology.******************************************************************************
-			var selCandidatesEdges = this.selectionManager.getSelectionCandidatesFamily("networkEdges");
-			var selCandidatesNodes = this.selectionManager.getSelectionCandidatesFamily("networkNodes");
+			var selCandidatesEdges = selectionManager.getSelectionCandidatesFamily("networkEdges");
+			var selCandidatesNodes = selectionManager.getSelectionCandidatesFamily("networkNodes");
 			var flyed = false;
 			if (selCandidatesEdges)
 			{
@@ -1813,8 +1814,9 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		//this.modeler.mode = CODE.modelerMode.DRAWING_PLANEGRID;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_TUNNELPOINTS;
-		this.modeler.mode = CODE.modelerMode.DRAWING_STATICGEOMETRY;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_STATICGEOMETRY;
+		//this.modeler.mode = CODE.modelerMode.DRAWING_BSPLINE;
+		this.modeler.mode = CODE.modelerMode.DRAWING_BASICFACTORY;
 		
 		// Calculate the geographicCoord of the click position.****
 		var geoCoord;
@@ -1886,6 +1888,12 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			geoCoordsList.addGeoCoord(geoCoord);
 			geoCoordsList.makeLines(this);
 		}
+		
+		// BSpline.***
+		//else if (this.modeler.mode === CODE.modelerMode.DRAWING_BSPLINE)
+		//{
+		//	
+		//}
 		
 		// StaticGeometries.***
 		else if (this.modeler.mode === CODE.modelerMode.DRAWING_STATICGEOMETRY)
@@ -1966,7 +1974,16 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			var targetDepth = this.smartTileManager.targetDepth;
 			this.smartTileManager.putNode(targetDepth, node, this);*/
 		}
-		
+		// Basic Factory. This is a factory shaped object.***
+		else if (this.modeler.mode === CODE.modelerMode.DRAWING_BASICFACTORY)
+		{
+			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+10, undefined, undefined, undefined, geoLocData, this);
+			
+			var factory = this.modeler.newBasicFactory();
+			factory.geoLocDataManager = geoLocDataManager;
+		}
 	}
 	
 };

@@ -136,7 +136,7 @@ ParametricMesh.prototype.revolve = function(profile2d, revolveAngDeg, revolveSeg
  * Make new instance which consist of the part of the extruded segment(The number of the segments is extrudeSegmentsCount) by extruding profile2D
  * @param {profile2D} profile2d the feature which will be extruded
  * @param {Number} extrusionDist the height of extruded feature
- * @param {Number} extrudeSegmentsCount the number of the segement which consist of extruded feature
+ * @param {Number} extrudeSegmentsCount the number of the segment which consist of extruded feature
  * @param {Point3D} extrusionVector the direction of extrusion
  */
 ParametricMesh.prototype.extrude = function(profile2d, extrusionDist, extrudeSegmentsCount, extrusionVector) 
