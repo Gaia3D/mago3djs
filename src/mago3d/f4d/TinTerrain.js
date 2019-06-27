@@ -425,7 +425,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 				gl.uniform4fv(currentShader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
 			}
 			
-			// Test.********************
+			// Test.******************************************************************************************
 			if (renderType === 1)
 			{
 				gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
@@ -436,6 +436,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 					gl.uniform4fv(currentShader.oneColor4_loc, [0.8, 0.3, 0.1, 1.0]);
 				}
 			}
+			// End test.--------------------------------------------------------------------------------------
 			
 			// render this tinTerrain.
 			var renderWireframe = false;
@@ -482,6 +483,20 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			{
 				gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.
 			}
+			
+			// Test Render wireframe if selected.*************************************************************
+			if (renderType === 1)
+			{
+				gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
+				var currSelObject = magoManager.selectionManager.getSelectedGeneral();
+				if (currSelObject === this)
+				{
+					gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
+					gl.uniform4fv(currentShader.oneColor4_loc, [0.0, 0.9, 0.9, 1.0]);
+					gl.drawElements(gl.LINE_LOOP, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.
+				}
+			}
+			// End test.--------------------------------------------------------------------------------------
 
 		}
 		else 
@@ -531,7 +546,7 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 	{
 		// check distance to camera.
 		var distToCam = camPos.distToSphere(sphereExtentAux);
-		if (distToCam > 5000)// && this.depth > 1)
+		if (distToCam > 10000)// && this.depth > 1)
 		{
 			// finish the process.
 			this.visible = true;
@@ -569,11 +584,8 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 			
 			if (this.tinTerrainManager.imageryType === CODE.imageryType.WEB_MERCATOR)
 			{
-
 				midLat = this.getMidLatitudeRadWebMercator()*180/Math.PI;
 			}
-
-			
 
 			var imageryMercatorMinX = this.imageryGeoExtent.minGeographicCoord.longitude;
 			var imageryMercatorMinY = this.imageryGeoExtent.minGeographicCoord.latitude;

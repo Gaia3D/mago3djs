@@ -42,6 +42,7 @@ TinTerrainManager.prototype.init = function()
 	//https://en.wikipedia.org/wiki/Mercator_projection
 	var webMercatorMaxLatRad = 2*Math.atan(Math.pow(Math.E, Math.PI)) - (Math.PI/2);
 	var webMercatorMaxLatDeg = webMercatorMaxLatRad * 180/Math.PI; // = 85.0511287798...
+
 	
 	// Asia side.
 	var minLon = 0;
@@ -57,8 +58,7 @@ TinTerrainManager.prototype.init = function()
 	}
 	
 	this.tinTerrainsQuadTreeAsia.setGeographicExtent(minLon, minLat, minAlt, maxLon, maxLat, maxAlt);
-	//this.tinTerrainsQuadTreeAsia.setWebMercatorExtent(0.5, 0, 1, 1); // ori.***
-	this.tinTerrainsQuadTreeAsia.setWebMercatorExtent(0, -1, 1, 1); // unitary extension.***
+	this.tinTerrainsQuadTreeAsia.setWebMercatorExtent(0, -Math.PI, 1, Math.PI); // unitary extension.***
 	this.tinTerrainsQuadTreeAsia.X = 1;
 	this.tinTerrainsQuadTreeAsia.Y = 0;
 	this.tinTerrainsQuadTreeAsia.indexName = "RU";
@@ -77,8 +77,7 @@ TinTerrainManager.prototype.init = function()
 		maxLat = webMercatorMaxLatDeg; 
 	}
 	this.tinTerrainsQuadTreeAmerica.setGeographicExtent(minLon, minLat, minAlt, maxLon, maxLat, maxAlt);
-	//this.tinTerrainsQuadTreeAmerica.setWebMercatorExtent(0, 0, 0.5, 1); // ori.***
-	this.tinTerrainsQuadTreeAmerica.setWebMercatorExtent(-1, -1, 0, 1); // unitary extension.***
+	this.tinTerrainsQuadTreeAmerica.setWebMercatorExtent(-1, -Math.PI, 0, Math.PI); // unitary extension.***
 	this.tinTerrainsQuadTreeAmerica.X = 0;
 	this.tinTerrainsQuadTreeAmerica.Y = 0;
 	this.tinTerrainsQuadTreeAmerica.indexName = "LU";

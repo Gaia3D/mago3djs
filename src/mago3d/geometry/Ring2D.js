@@ -53,6 +53,16 @@ Ring2D.prototype.deleteObjects = function()
 };
 
 /**
+ * Adds a curve.
+ * 
+ * @param {Curve} elem Some curve (ARC, CIRCLE, POLYLINE, RECTANGLE, STAR, etc).
+ */
+Ring2D.prototype.addElement = function(elem)
+{
+	this.elemsArray.push(elem);
+};
+
+/**
  * 폴리곤을 생성하고 elemsArray 에 추가한다.
  * 
  * @param {String} type 폴리곤의 형태

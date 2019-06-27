@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * This class is needed to be implemented more, but it will be used at the future.
+ * Box geometry.
  * @class Box
  */
 var Box = function(width, length, height) 
@@ -10,14 +10,14 @@ var Box = function(width, length, height)
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+	// Initially, box centered at the center of the bottom.***
 	this.mesh;
-	this.vbo_vicks_container;
-	this.vbo_vicks_containerEdges;
-	this.centerPoint;
+	this.centerPoint; // Usually (0,0,0).***
 	this.width;
 	this.length;
 	this.height;
+	this.owner;
+	this.geoLocDataManager;
 	
 	if (width !== undefined)
 	{ this.width = width; }
@@ -31,32 +31,39 @@ var Box = function(width, length, height)
 };
 
 /**
- * Get the VBO key container
- */
-Box.prototype.getVboKeysContainer = function()
-{
-	return this.vbo_vicks_container;
-};
-
-/**
  * Render this box feature
  * @param {MagoManager} magoManager
  * @param {Shader} shader
  * @param {Number} renderType
  */
-Box.prototype.render = function(magoManager, shader, renderType)
+Box.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 {
 	if (this.mesh === undefined)
 	{
 		this.mesh = this.makeMesh(this.width, this.length, this.height);
 		return;
 	}
-
+	
+	// If exist geoLocDataManager, then set uniforms. TODO:.***
+	
 	this.mesh.render(magoManager, shader, renderType);
 };
 
 /**
- * Set the width,length, height of this feature
+ * Returns the mesh.
+ */
+Box.prototype.getMesh = function()
+{
+	if (this.mesh === undefined)
+	{
+		this.mesh = this.makeMesh(this.width, this.length, this.height);
+	}
+	
+	return this.mesh;
+};
+
+/**
+ * Makes the box mesh.
  * @param {Number} width
  * @param {Number} length
  * @param {Number} height 
@@ -84,19 +91,9 @@ Box.prototype.makeMesh = function(width, length, height)
 	
 	if (this.centerPoint === undefined)
 	{ this.centerPoint = new Point3D(0, 0, 0); }
+
 	
-	if (this.vbo_vicks_container === undefined)
-	{ this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer(); }
-	
-	if (this.vbo_vicks_containerEdges === undefined)
-	{ this.vbo_vicks_containerEdges = new VBOVertexIdxCacheKeysContainer(); }
-	
-	// Create a parametric mesh.
-	var pMesh = new ParametricMesh();
-		
-	// Create a Profile2d.
-	pMesh.profile = new Profile2D(); 
-	var profileAux = pMesh.profile; 
+	var profileAux = new Profile2D();
 	
 	// Create a outer ring in the Profile2d.
 	var outerRing = profileAux.newOuterRing();
@@ -107,15 +104,11 @@ Box.prototype.makeMesh = function(width, length, height)
 	// Extrude the Profile.
 	var extrudeSegmentsCount = 1;
 	var extrusionVector = undefined;
-	pMesh.extrude(profileAux, this.height, extrudeSegmentsCount, extrusionVector);
-	
+	var extrusionDist = this.height;
 	var bIncludeBottomCap = true;
 	var bIncludeTopCap = true;
-	var mesh = pMesh.getSurfaceIndependentMesh(undefined, bIncludeBottomCap, bIncludeTopCap);
-	
-	// translate the box bcos center the origen to the center of the box.
-	mesh.translate(0, 0, -this.height/2);
 
+	var mesh = Modeler.getExtrudedMesh(profileAux, extrusionDist, extrudeSegmentsCount, extrusionVector, bIncludeBottomCap, bIncludeTopCap, undefined);
 	return mesh;
 };
 

@@ -15,6 +15,7 @@ var Mesh = function()
 	
 	//the list of the Surface features
 	this.surfacesArray;
+	this.color4;
 
 	this.hedgesList;
 	
@@ -309,6 +310,30 @@ Mesh.prototype.getVertexList = function()
 	}
 	
 	return this.vertexList;
+};
+
+/**
+ * Rotates this mesh specified angle by "angDeg" in (axisX, axisY, axisZ) axis.
+ * @param {Number} angDeg Angle in degrees to rotate this mesh.
+ * @param {Number} axisX X component of the rotation axis.
+ * @param {Number} axisY Y component of the rotation axis.
+ * @param {Number} axisZ Z component of the rotation axis.
+ */
+Mesh.prototype.rotate = function(angDeg, axisX, axisY, axisZ)
+{
+	var rotMat = new Matrix4();
+	var quaternion = new Quaternion();
+	
+	// Note: the axisX, axisY, axisZ must be unitary, but to be safe process, force rotationAxis to be unitary.*** 
+	var rotAxis = new Point3D(axisX, axisY, axisZ);
+	rotAxis.unitary();
+
+	// calculate rotation.
+	quaternion.rotationAngDeg(angDeg, rotAxis.x, rotAxis.y, rotAxis.z);
+	rotMat.rotationByQuaternion(quaternion);
+	
+	this.transformByMatrix4(rotMat);
+	
 };
 
 /**

@@ -1814,8 +1814,9 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		//this.modeler.mode = CODE.modelerMode.DRAWING_PLANEGRID;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_TUNNELPOINTS;
-		this.modeler.mode = CODE.modelerMode.DRAWING_STATICGEOMETRY;
+		//this.modeler.mode = CODE.modelerMode.DRAWING_STATICGEOMETRY;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_BSPLINE;
+		this.modeler.mode = CODE.modelerMode.DRAWING_BASICFACTORY;
 		
 		// Calculate the geographicCoord of the click position.****
 		var geoCoord;
@@ -1973,7 +1974,16 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			var targetDepth = this.smartTileManager.targetDepth;
 			this.smartTileManager.putNode(targetDepth, node, this);*/
 		}
-		
+		// Basic Factory. This is a factory shaped object.***
+		else if (this.modeler.mode === CODE.modelerMode.DRAWING_BASICFACTORY)
+		{
+			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+10, undefined, undefined, undefined, geoLocData, this);
+			
+			var factory = this.modeler.newBasicFactory();
+			factory.geoLocDataManager = geoLocDataManager;
+		}
 	}
 	
 };

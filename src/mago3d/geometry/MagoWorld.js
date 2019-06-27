@@ -206,8 +206,9 @@ MagoWorld.prototype.mouseup = function(event)
 	var durationTime = currTime - mouseAction.strTime;
 	if (durationTime < 200)
 	{
-		magoManager.bPicking = true;
-		magoManager.managePickingProcess();
+		// Considere as "click".***
+		//magoManager.bPicking = true;
+		//magoManager.managePickingProcess();
 	}
 };
 
@@ -253,7 +254,11 @@ MagoWorld.prototype.mousewheel = function(event)
 	delta *= (camHeght*camHeght) * 0.00001 + camHeght * 0.001;
 	delta += 1;
 	
-	var maxDelta = 200000;
+	//var maxDelta = 200000;
+	var maxDelta = 0.5*camHeght;
+	if (maxDelta > 200000)
+	{ maxDelta = 200000; }
+	
 	if (delta < -maxDelta)
 	{ delta = -maxDelta; }
 	
