@@ -420,6 +420,7 @@ Mesh.prototype.calculateTexCoordsSpherical = function()
  */
 Mesh.prototype.setColor = function(r, g, b, a)
 {
+	// This function sets vertices colors.***
 	var surface;
 	var surfacesCount = this.getSurfacesCount();
 	for (var i=0; i<surfacesCount; i++)
@@ -427,6 +428,22 @@ Mesh.prototype.setColor = function(r, g, b, a)
 		surface = this.getSurface(i);
 		surface.setColor(r, g, b, a);
 	}
+};
+
+/**
+ * Set the unique one color of the mesh
+ * @param {Number} r
+ * @param {Number} g
+ * @param {Number} b 
+ * @param {Number} a
+ */
+Mesh.prototype.setOneColor = function(r, g, b, a)
+{
+	// This function sets the unique one color of the mesh.***
+	if (this.color4 === undefined)
+	{ this.color4 = new Color(); }
+	
+	this.color4.setRGBA(r, g, b, a);
 };
 
 /**
@@ -598,6 +615,9 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 	
 	var gl = magoManager.sceneState.gl;
 	var primitive;
+	
+	if (this.color4)
+	{ gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 1.0]); }
 	
 	var vboKeysCount = this.vboKeysContainer.vboCacheKeysArray.length;
 	for (var i=0; i<vboKeysCount; i++)

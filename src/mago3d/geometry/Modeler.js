@@ -36,9 +36,15 @@ var Modeler = function()
 Modeler.prototype.newBasicFactory = function(attributes) 
 {
 	var factoryWidth = 30; 
-	var factoryLength = 120;
-	var factoryHeight = 20;
-	var basicFactory = new BasicFactory(factoryWidth, factoryLength, factoryHeight);
+	var factoryLength = 50;
+	var factoryHeight = 15;
+	var options = {
+		"hasGround"       : true,
+		"roofMinHeight"   : 13,
+		"frontDoorWidth"  : 26,
+		"frontDoorHeight" : 12
+	};
+	var basicFactory = new BasicFactory(factoryWidth, factoryLength, factoryHeight, options);
 	basicFactory.bHasGround = true;
 	
 	if (this.basicFactorysArray === undefined)
@@ -189,6 +195,7 @@ Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive
 		}
 		
 	}
+	
 };
 
 /**

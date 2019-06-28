@@ -380,6 +380,9 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 		
 		// Check if the node is a referenceNode.***
 		var attributes = node.data.attributes;
+		if (attributes === undefined)
+		{ continue; }
+		
 		if (attributes.projectId !== undefined && attributes.isReference !== undefined && attributes.isReference === true)
 		{
 			// check if has neoBuilding.***
@@ -1985,6 +1988,26 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			
 			var factory = this.modeler.newBasicFactory();
 			factory.geoLocDataManager = geoLocDataManager;
+			/*
+			// Create a node and insert into smartTile.***
+			var projectId = "ParametricMeshes";
+			var instanceId = "Factory_" + this.modeler.basicFactorysArray.length;
+			var node = this.hierarchyManager.newNode(instanceId, projectId, undefined);
+			node.data.renderable = factory;
+
+
+			// Now, create the geoLocdataManager of node.***
+			node.data.projectId = projectId;
+			//node.data.attributes = attributes;
+			node.data.geographicCoord = geoCoord;
+			var pitch = 0, roll = 0, heading = 0;
+			node.data.rotationsDegree = new Point3D(pitch, roll, heading);
+			node.data.geoLocDataManager = geoLocDataManager;
+
+			// Now, insert node into smartTile.***
+			var targetDepth = defaultValue(this.smartTileManager.targetDepth, 17);
+			this.smartTileManager.putNode(targetDepth, node, this);
+			*/
 		}
 	}
 	
@@ -3669,6 +3692,7 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 	var buildingSeedsCount;
 	var buildingSeed;
 	var neoBuilding;
+	var renderable;
 	var node;
 	var nodeRoot;
 	var nodeBbox;
@@ -3705,6 +3729,51 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 					geoLoc = node.calculateGeoLocData(this);
 					continue;
 				}
+				
+				// Check if the 3dData is neoBuilding or renderable.***
+				/*
+				renderable = node.data.renderable;
+				if (renderable)
+				{
+					// TODO:
+					distToCamera = node.getDistToCamera(cameraPosition, this.boundingSphere_Aux);
+					var data = node.data;
+					data.currentLod;
+					data.distToCam = distToCamera;
+					
+					
+					if (data.distToCam < lod0Dist)
+					{ data.currentLod = 0; }
+					else if (data.distToCam < lod1Dist)
+					{ data.currentLod = 1; }
+					else if (data.distToCam < lod2Dist)
+					{ data.currentLod = 2; }
+					else if (data.distToCam < lod3Dist)
+					{ data.currentLod = 3; }
+					else if (data.distToCam < lod4Dist)
+					{ data.currentLod = 4; }
+					else if (data.distToCam < lod5Dist)
+					{ data.currentLod = 5; }
+				
+					if (distToCamera < lod0_minDist) 
+					{
+						visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles0, node);
+					}
+					else if (distToCamera < lod1_minDist) 
+					{
+						visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles1, node);
+					}
+					else if (distToCamera < lod2_minDist) 
+					{
+						visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles2, node);
+					}
+					else if (distToCamera < lod5_minDist) 
+					{
+						visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles3, node);
+					}
+				}
+				*/
+				
 				neoBuilding = node.data.neoBuilding;
 				
 				if (neoBuilding === undefined)
@@ -3809,42 +3878,15 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 					{
 						if (distToCamera < lod0_minDist) 
 						{
-							// check if the lod0, lod1, lod2 are modelReference type.***
-							var lodBuildingData = neoBuilding.getLodBuildingData(0);
-							if (lodBuildingData && lodBuildingData.isModelRef)
-							{ 
-								visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles0, node);
-							}
-							else
-							{ 
-								//visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles3, node);
-								visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles0, node);
-							}
+							visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles0, node);
 						}
 						else if (distToCamera < lod1_minDist) 
 						{
-							var lodBuildingData = neoBuilding.getLodBuildingData(1);
-							if (lodBuildingData && lodBuildingData.isModelRef)
-							{ 
-								visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles1, node);
-							}
-							else
-							{ 
-								//visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles3, node);
-								visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles1, node);
-							}
+							visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles1, node);
 						}
 						else if (distToCamera < lod2_minDist) 
 						{
-							var lodBuildingData = neoBuilding.getLodBuildingData(2);
-							if (lodBuildingData && lodBuildingData.isModelRef)
-							{ 
-								visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles2, node);
-							}
-							else
-							{ 
-								visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles3, node);
-							}
+							visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles2, node);
 						}
 						else if (distToCamera < lod5_minDist) 
 						{

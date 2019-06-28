@@ -18,6 +18,7 @@ var Box = function(width, length, height)
 	this.height;
 	this.owner;
 	this.geoLocDataManager;
+	this.color4;
 	
 	if (width !== undefined)
 	{ this.width = width; }
@@ -28,6 +29,22 @@ var Box = function(width, length, height)
 	if (height !== undefined)
 	{ this.height = height; }
 
+};
+
+/**
+ * Set the unique one color of the box
+ * @param {Number} r
+ * @param {Number} g
+ * @param {Number} b 
+ * @param {Number} a
+ */
+Box.prototype.setOneColor = function(r, g, b, a)
+{
+	// This function sets the unique one color of the mesh.***
+	if (this.color4 === undefined)
+	{ this.color4 = new Color(); }
+	
+	this.color4.setRGBA(r, g, b, a);
 };
 
 /**
@@ -45,7 +62,11 @@ Box.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 	}
 	
 	// If exist geoLocDataManager, then set uniforms. TODO:.***
-	
+	if (this.color4)
+	{ 
+		var gl = magoManager.getGl();
+		gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 1.0]); 
+	}
 	this.mesh.render(magoManager, shader, renderType);
 };
 

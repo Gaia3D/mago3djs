@@ -245,7 +245,6 @@ TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager)
 
 TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType) 
 {
-	
 	var gl = magoManager.sceneState.gl;
 	var currentShader = magoManager.postFxShadersManager.getShader("tinTerrain");
 	var shaderProgram = currentShader.program;
@@ -261,7 +260,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType)
 	
 	currentShader.bindUniformGenerals();
 
-	var tex = magoManager.pin.texturesArray[4]; // provisional.
+	var tex = magoManager.texturesManager.getTextureAux1x1(); // provisional.
 	gl.activeTexture(gl.TEXTURE2); 
 	gl.bindTexture(gl.TEXTURE_2D, tex.texId);
 	

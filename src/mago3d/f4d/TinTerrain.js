@@ -64,6 +64,13 @@ var TinTerrain = function(owner)
 	
 	// Test vars. Delete after test.
 	this.imageryGeoExtent;
+	
+	/**
+	 * Object's current rendering phase. Parameter to avoid duplicated render on scene.
+	 * @type {Boolean}
+	 * @default false
+	 */
+	this.renderingFase = false;
 };
 
 TinTerrain.prototype.deleteObjects = function(magoManager)
@@ -253,8 +260,8 @@ TinTerrain.prototype.prepareTexture = function(magoManager, tinTerrainManager)
 	
 	// Provisionally, for debug, save textureFilePath.***
 	this.texFilePath__TEST = textureFilePath;
-
-	magoManager.readerWriter.loadWMSImage(gl, textureFilePath, this.texture, magoManager, false);
+	var flip_y_texCoords = false;
+	magoManager.readerWriter.loadWMSImage(gl, textureFilePath, this.texture, magoManager, flip_y_texCoords);
 	
 	// For elevation3D data.
 	//http://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer/tile/0/0/0
@@ -408,7 +415,8 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 		{
 			if (this.fileLoadState === CODE.fileLoadState.LOAD_FAILED) // provisional solution.
 			{ return; }
-			
+
+		
 			if (this.texture.texId === undefined)
 			{ return; }
 		
@@ -544,9 +552,52 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 	//}
 	else if (intersectionType === Constant.INTERSECTION_INTERSECT || intersectionType === Constant.INTERSECTION_INSIDE)
 	{
+		var currDepth = this.depth;
+		
 		// check distance to camera.
 		var distToCam = camPos.distToSphere(sphereExtentAux);
-		if (distToCam > 10000)// && this.depth > 1)
+		var distLimit = 10000;
+		
+		// For each depth, there are a limit distance.***
+		if (currDepth === 0)
+		{ distLimit = 50000000; }
+		else if (currDepth === 1)
+		{ distLimit = 10000000; }
+		else if (currDepth === 2)
+		{ distLimit = 5000000; }
+		else if (currDepth === 3)
+		{ distLimit = 2000000; }
+		else if (currDepth === 4)
+		{ distLimit = 1000000; }
+		else if (currDepth === 5)
+		{ distLimit = 500000; }
+		else if (currDepth === 6)
+		{ distLimit = 100000; }
+		else if (currDepth === 7)
+		{ distLimit = 50000; }
+		else if (currDepth === 8)
+		{ distLimit = 20000; }
+		else if (currDepth === 9)
+		{ distLimit = 9000; }
+		else if (currDepth === 10)
+		{ distLimit = 5000; }
+		else if (currDepth === 11)
+		{ distLimit = 4000; }
+		else if (currDepth === 12)
+		{ distLimit = 3000; }
+		else if (currDepth === 13)
+		{ distLimit = 2000; }
+		else if (currDepth === 14)
+		{ distLimit = 1000; }
+		else if (currDepth === 15)
+		{ distLimit = 900; }
+		else if (currDepth === 16)
+		{ distLimit = 800; }
+		else if (currDepth === 17)
+		{ distLimit = 700; }
+	
+		
+		if (distToCam > distLimit)// && this.depth > 1)
 		{
 			// finish the process.
 			this.visible = true;
@@ -554,7 +605,6 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 			return;
 		}
 		
-		var currDepth = this.depth;
 		if (currDepth < maxDepth)
 		{
 			// must descend.
@@ -873,12 +923,6 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 	var lonIncreDeg = lonRange/lonSegments;
 	var latIncreDeg = latRange/latSegments;
 	
-	if (lonIncreDeg <= 0 || latIncreDeg <= 0)
-	{ var hola = 0; }
-	
-	// use a vertexMatrix to make the regular net.
-	var vertexMatrix;
-	
 	// calculate total verticesCount.
 	var vertexCount = (lonSegments + 1)*(latSegments + 1);
 	var lonArray = new Float32Array(vertexCount);
@@ -890,13 +934,9 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 	var currLat = minLat; // init startLat.
 	var idx = 0;
 	var s, t;
-	//var tanMaxLat = Math.tan(85.0511287798*Math.PI/180.0);
-	var tanMaxLat = Math.tan(maxLat);
-	var tanMinLat = Math.tan(minLat);
-	var tanLatRange = tanMaxLat - tanMinLat;
+
 	var PI = Math.PI;
 	var aConst = (1.0/(2.0*PI))*Math.pow(2.0, depth);
-	//var aConst = (1.0/(2.0*PI));
 	
 	// check if exist altitude.
 	var alt = 0;
@@ -904,56 +944,60 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 	{ alt = altitude; }
 
 	// Note: If exist "altitudesSlice", then use it.
-	if (depth === 1)
-	{
-		if (this.X === 0 && this.Y === 1)
-		{ var hola = 0; }
-	}
-	
-	if (depth === 2)
-	{
-		if (this.Y === 0)
-		{ var hola = 0; }
-	
-		if (this.Y === 1)
-		{ var hola = 0; }
-	
-		if (this.Y === 2)
-		{ var hola = 0; }
-	
-		if (this.Y === 3)
-		{ var hola = 0; }
-	}
-	
-	if (depth === 3)
-	{
-		if (this.X === 0 && this.Y === 2)
-		{ var hola = 0; }
-	}
 	
 	// Test.**
-	// _calculateTextureTranslationAndScale
-	var minMercator, maxMercator;
-	minMercator = Globe.geographicRadianToMercatorProjection(minLon, minLat, minMercator);
-	maxMercator = Globe.geographicRadianToMercatorProjection(maxLon, maxLat, maxMercator);
-	this.calculateTextureCoordinateTranslationAndScale();
+	//var minMercator, maxMercator;
+	//minMercator = Globe.geographicRadianToMercatorProjection(minLon, minLat, minMercator);
+	//maxMercator = Globe.geographicRadianToMercatorProjection(maxLon, maxLat, maxMercator);
+	//this.calculateTextureCoordinateTranslationAndScale();
 	// End test.-------------------------------------------------------------------------------
 	
+	// https://en.wikipedia.org/wiki/Web_Mercator_projection
 	var PI_DIV_4 = PI/4;
 	var minT = aConst*(PI-Math.log(Math.tan(PI_DIV_4+minLat/2)));
 	var maxT = aConst*(PI-Math.log(Math.tan(PI_DIV_4+maxLat/2)));
+	var minS = aConst*(minLon+PI);
+	var maxS = aConst*(maxLon+PI);
+	var floorMinS = Math.floor(minS);
 	
-	var minT2 = aConst*(Math.log(Math.tan(PI_DIV_4+minLat/2)));
-	var maxT2 = aConst*(Math.log(Math.tan(PI_DIV_4+maxLat/2)));
+	// Flip texCoordY for minT & maxT.***
+	minT = 1.0 - minT;
+	maxT = 1.0 - maxT;
 	
-	var tRange = maxT - minT;
-	var realMinT, realMaxT;
+	//var texCorrectionFactor = 0.0005;
+	var texCorrectionFactor = 0.0028 + (depth * 0.000005);
 	
 	for (var currLatSeg = 0; currLatSeg<latSegments+1; currLatSeg++)
 	{
-		currLon = minLon;
+		currLat = minLat + latIncreDeg * currLatSeg;
+		if (currLat > maxLat)
+		{ currLat = maxLat; }
+	
+		var currLatDeg = currLat*180/PI; // Test debug.***
+		
+		t = aConst*(PI-Math.log(Math.tan(PI_DIV_4+currLat/2)));
+		t = 1.0 - t;
+			
+		// Substract minT to "t" to make range [0 to 1].***
+		t -= minT; 
+		
+		// Texture correction in borders.***
+		if (currLatSeg === 0)
+		{
+			t = (texCorrectionFactor);
+		}
+		else if (currLatSeg === latSegments)
+		{
+			t = (1-texCorrectionFactor);
+		}
+		
 		for (var currLonSeg = 0; currLonSeg<lonSegments+1; currLonSeg++)
 		{
+			currLon = minLon + lonIncreDeg * currLonSeg;
+			
+			if (currLon > maxLon)
+			{ currLon = maxLon; }
+			
 			lonArray[idx] = currLon;
 			latArray[idx] = currLat;
 			// Now set the altitude.
@@ -964,45 +1008,24 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 			else
 			{ altArray[idx] = alt; }
 
-			// make texcoords.
-			// https://en.wikipedia.org/wiki/Web_Mercator_projection
 			s = aConst*(currLon+PI);
-			t = aConst*(PI-Math.log(Math.tan(PI_DIV_4+currLat/2)));
-			//t = 1.0 - t;
+			s -= floorMinS;
 			
-			var currLatDeg = currLat*180/PI;
-			var testLatRad = 0;
-			var testT = aConst*(PI-Math.log(Math.tan(PI_DIV_4+testLatRad/2)));
-
+			// Texture correction in borders.***
+			if (currLonSeg === 0)
+			{
+				s += texCorrectionFactor;
+			}
+			else if (currLonSeg === lonSegments)
+			{
+				s += -texCorrectionFactor;
+			}
 			
 			this.texCoordsArray[idx*2] = s;
 			this.texCoordsArray[idx*2+1] = t;
-			
-			if (t<0 || t>1)
-			{ var hola = 0; }
-		
-			if (realMinT === undefined)
-			{
-				realMinT = t;
-			}
-			else 
-			{
-				if (t < realMinT)
-				{ realMinT = t; }
-			}
-			
-			if (realMaxT === undefined)
-			{
-				realMaxT = t;
-			}
-			else 
-			{
-				if (t > realMaxT)
-				{ realMaxT = t; }
-			}
-			
+
 			/*
-			// make texcoords.
+			// make texcoords CRS84.***
 			s = (currLon - minLon)/lonRange;
 			t = (currLat - minLat)/latRange;
 			
@@ -1011,20 +1034,8 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 			*/
 			
 			// actualize current values.
-			currLon += lonIncreDeg;
 			idx++;
 		}
-		currLat += latIncreDeg;
-	}
-	
-	// TexCoords correction.***
-	var realTRange = realMaxT - realMinT;
-	var texCoordsCount = vertexCount;
-	for (var i=0; i<texCoordsCount; i++)
-	{
-		var currT = this.texCoordsArray[i*2+1];
-		//this.texCoordsArray[i*2+1] = (currT - realMinT)/realTRange;
-		this.texCoordsArray[i*2+1] = 1.0 - this.texCoordsArray[i*2+1];
 	}
 	
 	this.cartesiansArray = Globe.geographicRadianArrayToFloat32ArrayWgs84(lonArray, latArray, altArray, this.cartesiansArray);
@@ -1033,6 +1044,7 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 	var numCols = lonSegments + 1;
 	var numRows = latSegments + 1;
 	this.indices = this.getIndicesTrianglesRegularNet(numCols, numRows, undefined);
+	this.calculateCenterPosition();
 };
 
 TinTerrain.prototype.getIndicesTrianglesRegularNet = function(numCols, numRows, resultIndicesArray)
