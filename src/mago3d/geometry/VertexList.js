@@ -116,7 +116,7 @@ VertexList.getVector = function(idx, vertexArray, resultVector)
 	{ resultVector = new Point3D(nextPoint.x - currPoint.x, nextPoint.y - currPoint.y, nextPoint.z - currPoint.z); }
 	else 
 	{
-		resultVector.setVertices(nextPoint.x - currPoint.x, nextPoint.y - currPoint.y, nextPoint.z - currPoint.z);
+		resultVector.set(nextPoint.x - currPoint.x, nextPoint.y - currPoint.y, nextPoint.z - currPoint.z);
 	}
 
 	return resultVector;

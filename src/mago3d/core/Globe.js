@@ -86,12 +86,13 @@ Globe.radiusAtLatitudeDeg = function(latDeg)
 	var radius = (a*b)/(Math.sqrt(a2*sin2 + b2*cos2));
 	return radius;
 };
+
 /**
  * Normalize the elements of the 3D feature
  * @param {Float32Array} cartesian this can be any feature such as a point or a axis to make unitary
  * 
  */
-Globe.prototype.normalizeCartesian = function(cartesian)
+Globe.normalizeCartesian = function(cartesian)
 {
 	if (cartesian === undefined)
 	{ return; }
@@ -102,6 +103,113 @@ Globe.prototype.normalizeCartesian = function(cartesian)
 	cartesian[2] /= modul;
 	
 	return cartesian;
+};
+
+/**
+ * Change cartesian point to WGS84 and nromalize that.
+ * @param {Number} x the x coordi value of input cartesian point
+ * @param {Number} y the y coordi value of input cartesian point
+ * @param {Number} z the z coordi value of input cartesian point
+ * @param {Float32Array} resultNormal the cartesian point which will hold the calculated result
+ * @returns {Float32Array} resultNormal
+ */
+Globe.normalAtCartesianPointWgs84 = function(x, y, z, resultNormal)
+{
+	if (resultNormal === undefined)
+	{ resultNormal = new Float32Array(3); }
+	
+	var eqRad = Globe.equatorialRadius();
+	var polRad = Globe.polarRadius();
+	var equatorialRadiusSquared = eqRad * eqRad;
+	var polarRadiusSquared = polRad * polRad;
+
+	resultNormal[0] = x / equatorialRadiusSquared;
+	resultNormal[1] = y / equatorialRadiusSquared;
+	resultNormal[2] = z / polarRadiusSquared;
+	
+	// Normalize cartesian.
+	resultNormal = Globe.normalizeCartesian(resultNormal);
+	
+	return resultNormal;
+};
+
+/**
+ * Return the transformation matrix which transform the cartesian point to wgs84
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} z 
+ * @param {Float32Array} float32Array
+ * @returns {Float32Array} float32Array
+ * 
+ */
+Globe.transformMatrixAtCartesianPointWgs84 = function(x, y, z, float32Array)
+{
+	var xAxis, yAxis, zAxis;
+	
+	zAxis = Globe.normalAtCartesianPointWgs84(x, y, z, zAxis);
+	
+	// Check if zAxis is vertical vector. PENDENT.
+	
+	// now, calculate the east direction. 
+	// project zAxis to plane XY and calculate the left perpendicular.
+	xAxis = new Float32Array(3);
+	xAxis[0] = -y;
+	xAxis[1] = x;
+	xAxis[2] = 0.0;
+	xAxis = Globe.normalizeCartesian(xAxis);
+	
+	// finally calculate the north direction.
+	var xAxisVector = new Point3D(xAxis[0], xAxis[1], xAxis[2]);
+	var yAxisVector = new Point3D();
+	var zAxisVector = new Point3D(zAxis[0], zAxis[1], zAxis[2]);
+	
+	yAxisVector = zAxisVector.crossProduct(xAxisVector, yAxisVector);
+	
+	if (float32Array === undefined)
+	{ float32Array = new Float32Array(16); }
+	
+	float32Array[0] = xAxisVector.x;
+	float32Array[1] = xAxisVector.y;
+	float32Array[2] = xAxisVector.z;
+	float32Array[3] = 0.0;
+	
+	float32Array[4] = yAxisVector.x;
+	float32Array[5] = yAxisVector.y;
+	float32Array[6] = yAxisVector.z;
+	float32Array[7] = 0.0;
+	
+	float32Array[8] = zAxisVector.x;
+	float32Array[9] = zAxisVector.y;
+	float32Array[10] = zAxisVector.z;
+	float32Array[11] = 0.0;
+	
+	float32Array[12] = x;
+	float32Array[13] = y;
+	float32Array[14] = z;
+	float32Array[15] = 1.0;
+	
+	return float32Array;
+};
+
+/**
+ * Normalize the elements of the 3D feature
+ * @param {Float32Array} cartesian this can be any feature such as a point or a axis to make unitary
+ * 
+ */
+Globe.prototype.normalizeCartesian = function(cartesian)
+{
+	return Globe.normalizeCartesian(cartesian);
+	/*
+	if (cartesian === undefined)
+	{ return; }
+
+	var modul = Math.sqrt(cartesian[0]*cartesian[0] + cartesian[1]*cartesian[1] + cartesian[2]*cartesian[2] );
+	cartesian[0] /= modul;
+	cartesian[1] /= modul;
+	cartesian[2] /= modul;
+	
+	return cartesian;
+	*/
 };
 
 /**

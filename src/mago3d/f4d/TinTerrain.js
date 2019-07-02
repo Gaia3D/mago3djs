@@ -965,7 +965,7 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 	maxT = 1.0 - maxT;
 	
 	//var texCorrectionFactor = 0.0005;
-	var texCorrectionFactor = 0.0028 + (depth * 0.000005);
+	var texCorrectionFactor = 0.003 + (depth * 0.0000001);
 	
 	for (var currLatSeg = 0; currLatSeg<latSegments+1; currLatSeg++)
 	{
@@ -1014,11 +1014,11 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 			// Texture correction in borders.***
 			if (currLonSeg === 0)
 			{
-				s += texCorrectionFactor;
+				s += texCorrectionFactor/2;
 			}
 			else if (currLonSeg === lonSegments)
 			{
-				s += -texCorrectionFactor;
+				s += -texCorrectionFactor/2;
 			}
 			
 			this.texCoordsArray[idx*2] = s;

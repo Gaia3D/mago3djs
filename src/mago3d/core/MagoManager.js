@@ -1776,6 +1776,15 @@ MagoManager.prototype.keyDown = function(key)
 		api.setObjectIds("13");
 		api.setColor("220,150,20");
 		this.callAPI(api);
+		
+		// Another test: BSplineCubic3d.***
+		var bSplineCubic3d = this.modeler.bSplineCubic3d;
+		if (bSplineCubic3d !== undefined)
+		{
+			// Make the controlPoints.***
+			bSplineCubic3d.makeControlPoints();
+			bSplineCubic3d.makeInterpolatedPoints();
+		}
 	}
 	else if (key === 89) // 89 = 'y'.***
 	{
@@ -1820,8 +1829,8 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		//this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_TUNNELPOINTS;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_STATICGEOMETRY;
-		//this.modeler.mode = CODE.modelerMode.DRAWING_BSPLINE;
-		this.modeler.mode = CODE.modelerMode.DRAWING_BASICFACTORY;
+		this.modeler.mode = CODE.modelerMode.DRAWING_BSPLINE;
+		//this.modeler.mode = CODE.modelerMode.DRAWING_BASICFACTORY;
 		
 		// Calculate the geographicCoord of the click position.****
 		var geoCoord;
@@ -1895,10 +1904,23 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		}
 		
 		// BSpline.***
-		//else if (this.modeler.mode === CODE.modelerMode.DRAWING_BSPLINE)
-		//{
-		//	
-		//}
+		else if (this.modeler.mode === CODE.modelerMode.DRAWING_BSPLINE)
+		{
+			// Testing bSpline.***
+			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+1, undefined, undefined, undefined, geoLocData, this);
+			
+			
+			if (this.modeler.bSplineCubic3d === undefined)
+			{ this.modeler.bSplineCubic3d = new BSplineCubic3D(); }
+			
+			var bSplineCubic = this.modeler.bSplineCubic3d;
+			var geoCoordsList = bSplineCubic.getGeographicCoordsList();
+			geoCoordsList.addGeoCoord(geoCoord);
+			geoCoordsList.makeLines(this);
+			
+		}
 		
 		// StaticGeometries.***
 		else if (this.modeler.mode === CODE.modelerMode.DRAWING_STATICGEOMETRY)

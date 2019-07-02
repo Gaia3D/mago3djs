@@ -123,6 +123,11 @@ GeographicCoordsList.prototype.makeLines = function(magoManager)
 	var geoCoord = this.getGeoCoord(0);
 	var geoLocDataManagerFirst = geoCoord.getGeoLocationDataManager();
 	var geoLocFirst = geoLocDataManagerFirst.getCurrentGeoLocationData();
+	
+	// If has no geoLocationData, then create it.***
+	if (geoLocFirst === undefined)
+	{ geoLocFirst = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude, undefined, undefined, undefined, geoLocFirst, magoManager); }
+	
 	geoLoc.copyFrom(geoLocFirst);
 	
 	var points3dArray = this.getPointsRelativeToGeoLocation(geoLoc, undefined);
@@ -149,6 +154,13 @@ GeographicCoordsList.prototype.renderLines = function(magoManager, shader, rende
 	shader.resetLastBuffersBinded();
 	shader.enableVertexAttribArray(shader.position3_loc);
 	shader.bindUniformGenerals();
+	
+	var gl = magoManager.sceneState.gl;
+	gl.uniform1i(shader.bPositionCompressed_loc, false);
+	gl.uniform1i(shader.bUse1Color_loc, true);
+	gl.uniform4fv(shader.oneColor4_loc, [1.0, 1.0, 0.1, 1.0]); //.
+	gl.uniform1f(shader.fixPointSize_loc, 5.0);
+	gl.uniform1i(shader.bUseFixPointSize_loc, true);
 	
 	this.points3dList.renderLines(magoManager, shader, renderType, bLoop, bEnableDepth);
 	

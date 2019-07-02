@@ -22,12 +22,14 @@ var Modeler = function()
 	this.drawingState = CODE.modelerDrawingState.NO_STARTED; // test for the moment.
 	this.drawingElement = CODE.modelerDrawingElement.NOTHING; // test for the moment.
 	
+	// Test objects.***
 	this.planeGrid; // sketch plane.
 	this.polyLine2d; // current polyline2D to sketch.
 	this.geoCoordsList; // class: GeographicCoordsList. geographic polyline.
 	this.excavation; // class : Excavation.
 	this.tunnel; // class : Tunnel.
 	this.basicFactorysArray; // class : BasicFactory.
+	this.bSplineCubic3d;
 };
 
 /**
@@ -194,6 +196,11 @@ Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive
 			this.basicFactorysArray[i].render(magoManager, shader, renderType, glPrimitive);
 		}
 		
+	}
+	
+	if (this.bSplineCubic3d !== undefined)
+	{
+		this.bSplineCubic3d.renderPoints(magoManager, shader, renderType);
 	}
 	
 };
