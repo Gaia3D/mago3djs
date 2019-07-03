@@ -272,6 +272,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType)
 	if (magoManager.configInformation.geo_view_library === Constant.CESIUM)
 	{ flipTexCoordY = false; }
 	gl.uniform1i(currentShader.textureFlipYAxis_loc, flipTexCoordY); // false for cesium, true for magoWorld.
+	gl.uniform1f(currentShader.externalAlpha_loc, 1.0);
 	
 	//gl.enable(gl.POLYGON_OFFSET_FILL);
 	//gl.polygonOffset(1, 3);

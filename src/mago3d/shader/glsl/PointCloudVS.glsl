@@ -50,14 +50,20 @@ void main()
 		vColor=color4;
 	
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;
-	float z_b = gl_Position.z/gl_Position.w;
-	float z_n = 2.0 * z_b - 1.0;
-    float z_e = 2.0 * near * far / (far + near - z_n * (far - near));
-	gl_PointSize = 1.0 + 40.0/z_e; // Original.***
-	if(gl_PointSize > maxPointSize)
-		gl_PointSize = maxPointSize;
-	if(gl_PointSize < 2.0)
-		gl_PointSize = 2.0;
-		
+	if(bUseFixPointSize)
+	{
+		gl_PointSize = fixPointSize;
+	}
+	else{
+		float z_b = gl_Position.z/gl_Position.w;
+		float z_n = 2.0 * z_b - 1.0;
+		float z_e = 2.0 * near * far / (far + near - z_n * (far - near));
+		gl_PointSize = 1.0 + 40.0/z_e; // Original.***
+		if(gl_PointSize > maxPointSize)
+			gl_PointSize = maxPointSize;
+		if(gl_PointSize < 2.0)
+			gl_PointSize = 2.0;
+	}
+	
 	glPointSize = gl_PointSize;
 }

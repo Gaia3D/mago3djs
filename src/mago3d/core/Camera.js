@@ -336,8 +336,8 @@ Camera.prototype.calculateFrustumsPlanes = function()
 	frustum0 = this.getFrustum(0);
 	var nearHeight = frustum0.tangentOfHalfFovy * frustum0.near * 2;
 	var farHeight = frustum0.tangentOfHalfFovy * frustum0.far * 2;
-	var nearWidth = nearHeight * frustum0.aspectRatio;
-	var farWidht = farHeight * frustum0.aspectRatio;
+	var nearWidth = nearHeight * frustum0.aspectRatio[0];
+	var farWidht = farHeight * frustum0.aspectRatio[0];
 	
 	var px = this.position.x;
 	var py = this.position.y;

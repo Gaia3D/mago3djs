@@ -37,6 +37,7 @@ uniform float radius;
 uniform float ambientReflectionCoef;
 uniform float diffuseReflectionCoef;  
 uniform float specularReflectionCoef; 
+uniform float externalAlpha;
 
 float unpackDepth(const in vec4 rgba_depth)
 {
@@ -104,6 +105,6 @@ void main()
 			textureColor = oneColor4;
 		}
 		//vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);
-		gl_FragColor = vec4(textureColor.xyz, 1.0); 
+		gl_FragColor = vec4(textureColor.xyz, externalAlpha); 
 	}
 }

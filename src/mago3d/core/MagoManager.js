@@ -10,7 +10,7 @@ var MagoManager = function()
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-
+	//// http://dj.gaia3d.com:10080
 	/**
 	 * Auxiliary renderer.
 	 * @type {Renderer}
@@ -577,7 +577,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		var camera = sceneState.camera;
 		var camPos = camera.position;
 		var frustum0 = camera.getFrustum(0);
-		sceneState.camera.frustum.aspectRatio = sceneState.drawingBufferWidth / sceneState.drawingBufferHeight;
+		sceneState.camera.frustum.aspectRatio[0] = sceneState.drawingBufferWidth / sceneState.drawingBufferHeight;
 		// determine frustum near & far.***
 		var camHeight = camera.getCameraElevation();
 		var eqRadius = Globe.equatorialRadius();
@@ -590,7 +590,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		
 		// projection.***
 		// considere near as zero provisionally.***
-		sceneState.projectionMatrix._floatArrays = glMatrix.mat4.perspective(sceneState.projectionMatrix._floatArrays, frustum0.fovyRad[0], frustum0.aspectRatio, 0.0, frustum0.far[0]);
+		sceneState.projectionMatrix._floatArrays = glMatrix.mat4.perspective(sceneState.projectionMatrix._floatArrays, frustum0.fovyRad[0], frustum0.aspectRatio[0], 0.0, frustum0.far[0]);
 		
 		// modelView.***
 		//sceneState.modelViewMatrix._floatArrays; 
@@ -708,7 +708,7 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
 		resultCamera.direction.set(camDirX, camDirY, camDirZ);
 		resultCamera.up.set(camUpX, camUpY, camUpZ);
 		
-		var aspectRatio = frustum.aspectRatio;
+		var aspectRatio = frustum.aspectRatio[0];
 		var fovy = frustum.fovyRad;	
 		
 		frustum = resultCamera.getFrustum(frustumIdx);
@@ -727,16 +727,15 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
 		var frustumIdx = 0;
 		var camera = this.sceneState.camera;
 		var frustum = camera.getFrustum(frustumIdx);
-		var aspectRatio = frustum.aspectRatio;
+		var aspectRatio = frustum.aspectRatio[0];
 		var fovy = frustum.fovyRad;
-		//frustum.far[0] = this.scene._frustumCommandsList[frustumIdx].far; 
-		//frustum.near[0] = this.scene._frustumCommandsList[frustumIdx].near;
-		var currentFrustumFar = frustum.far;
-		var currentFrustumNear = frustum.near;
+
+		var currentFrustumFar = frustum.far[0];
+		var currentFrustumNear = frustum.near[0];
 		
 		this.sceneState.camera.frustum.near[0] = currentFrustumNear;
 		this.sceneState.camera.frustum.far[0] = currentFrustumFar;
-		this.sceneState.camera.frustum.aspectRatio = aspectRatio;
+		this.sceneState.camera.frustum.aspectRatio[0] = aspectRatio;
 		
 		// take all frustums near-far distances.***
 		var numFrustums = 1;
@@ -753,6 +752,7 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
 		frustum = resultCamera.getFrustum(frustumIdx);
 		frustum.near[0] = currentFrustumNear;
 		frustum.far[0] = currentFrustumFar;
+		
 		resultCamera.setFrustumsDistances(numFrustums, distancesArray);
 		resultCamera.setAspectRatioAndFovyRad(aspectRatio, fovy);
 		resultCamera.calculateFrustumsPlanes();

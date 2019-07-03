@@ -346,8 +346,6 @@ Face.prototype.getTessellatedTriangles = function(resultTrianglesArray)
 	// 1rst, must project the face to a plane and process to tessellate in 2d.
 	var normal = this.getPlaneNormal();
 	
-	var bestPlaneToProject = Face.getBestFacePlaneToProject(normal);
-	
 	// Create a temp polygon2d.
 	var polygon2d = Face.getProjectedPolygon2D(this.vertexArray, normal, undefined);
 	

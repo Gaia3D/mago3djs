@@ -834,7 +834,7 @@ void main()\n\
 		vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
 		vec3 bitangent = cross(normal2, tangent);\n\
 		mat3 tbn = mat3(tangent, bitangent, normal2);        \n\
-		\n\
+\n\
 		for(int i = 0; i < kernelSize; ++i)\n\
 		{    	 \n\
 			vec3 sample = origin + (tbn * kernel[i]) * radius;\n\
@@ -842,11 +842,18 @@ void main()\n\
 			offset.xy /= offset.w;\n\
 			offset.xy = offset.xy * 0.5 + 0.5;        \n\
 			float sampleDepth = -sample.z/far;\n\
+			float realLinearDepth = linearDepth * far;\n\
+			\n\
 			if(sampleDepth > 0.49)\n\
 				continue;\n\
-			float depthBufferValue = getDepth(offset.xy);				              \n\
-			float range_check = abs(linearDepth - depthBufferValue)+radius*0.998;\n\
-			if (range_check < radius*1.001 && depthBufferValue <= sampleDepth)\n\
+			float depthBufferValue = getDepth(offset.xy);	\n\
+			\n\
+			float range_check = abs(linearDepth - depthBufferValue);\n\
+			if(range_check > 0.000000001 && range_check < 0.00000007)\n\
+			{\n\
+				continue;\n\
+			}\n\
+			else if (depthBufferValue <= sampleDepth)\n\
 			{\n\
 				occlusion +=  1.0;\n\
 			}\n\
@@ -1466,15 +1473,21 @@ void main()\n\
 		vColor=color4;\n\
 	\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
-	float z_b = gl_Position.z/gl_Position.w;\n\
-	float z_n = 2.0 * z_b - 1.0;\n\
-    float z_e = 2.0 * near * far / (far + near - z_n * (far - near));\n\
-	gl_PointSize = 1.0 + 40.0/z_e; // Original.***\n\
-	if(gl_PointSize > maxPointSize)\n\
-		gl_PointSize = maxPointSize;\n\
-	if(gl_PointSize < 2.0)\n\
-		gl_PointSize = 2.0;\n\
-		\n\
+	if(bUseFixPointSize)\n\
+	{\n\
+		gl_PointSize = fixPointSize;\n\
+	}\n\
+	else{\n\
+		float z_b = gl_Position.z/gl_Position.w;\n\
+		float z_n = 2.0 * z_b - 1.0;\n\
+		float z_e = 2.0 * near * far / (far + near - z_n * (far - near));\n\
+		gl_PointSize = 1.0 + 40.0/z_e; // Original.***\n\
+		if(gl_PointSize > maxPointSize)\n\
+			gl_PointSize = maxPointSize;\n\
+		if(gl_PointSize < 2.0)\n\
+			gl_PointSize = 2.0;\n\
+	}\n\
+	\n\
 	glPointSize = gl_PointSize;\n\
 }";
 ShaderSource.PointCloudVS_rainbow = "attribute vec3 position;\n\
@@ -1918,6 +1931,7 @@ uniform float radius;      \n\
 uniform float ambientReflectionCoef;\n\
 uniform float diffuseReflectionCoef;  \n\
 uniform float specularReflectionCoef; \n\
+uniform float externalAlpha;\n\
 \n\
 float unpackDepth(const in vec4 rgba_depth)\n\
 {\n\
@@ -1985,7 +1999,7 @@ void main()\n\
 			textureColor = oneColor4;\n\
 		}\n\
 		//vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);\n\
-		gl_FragColor = vec4(textureColor.xyz, 1.0); \n\
+		gl_FragColor = vec4(textureColor.xyz, externalAlpha); \n\
 	}\n\
 }";
 ShaderSource.TinTerrainVS = "attribute vec3 position;\n\

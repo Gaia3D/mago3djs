@@ -124,11 +124,11 @@ Polygon2D.prototype.calculateNormal = function(resultConcavePointsIdxArray)
 		var prevIdx = this.point2dList.getPrevIdx(i);
 		
 		// get unitari directions of the vertex.
-		var startVec = this.getEdgeDirection(prevIdx); // Point3D.
-		var endVec = this.getEdgeDirection(i); // Point3D.
+		var startVec = this.getEdgeDirection(prevIdx); // Point2D.
+		var endVec = this.getEdgeDirection(i); // Point2D.
 		
 		// calculate the cross product.
-		var crossProd = startVec.crossProduct(endVec, crossProd); // Point3D.
+		var crossProd = startVec.crossProduct(endVec, crossProd); // Point2D.
 		var scalarProd = startVec.scalarProduct(endVec);
 		
 		if (crossProd < 0.0) 

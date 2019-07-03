@@ -65,6 +65,9 @@ var TinTerrain = function(owner)
 	// Test vars. Delete after test.
 	this.imageryGeoExtent;
 	
+	this.isAdult = false;
+	this.birthTime;
+	
 	/**
 	 * Object's current rendering phase. Parameter to avoid duplicated render on scene.
 	 * @type {Boolean}
@@ -171,6 +174,36 @@ TinTerrain.prototype.getPathName = function()
 	// this returns a string as: L//X//Y.
 	// example: "14//4567//516".
 	return this.depth.toString() + "\\" + this.X.toString() + "\\" + this.Y.toString();
+};
+
+/**
+ * Returns the blending alpha value in current time.
+ * 
+ * @param {Number} currTime The current time.
+ */
+TinTerrain.prototype.getBlendAlpha = function(currTime) 
+{
+	if (!this.isAdult)
+	{
+		if (this.birthTime === undefined)
+		{ this.birthTime = currTime; }
+	
+		if (this.blendAlpha === undefined)
+		{ this.blendAlpha = 0.1; }
+		
+		var increAlpha = (currTime - this.birthTime)*0.0001;
+		this.blendAlpha += increAlpha;
+		
+		if (this.blendAlpha >= 1.0)
+		{
+			this.blendAlpha = 1.0;
+			this.isAdult = true;
+		}
+	}
+	else
+	{ return 1.0; }
+	
+	return this.blendAlpha;
 };
 
 TinTerrain.prototype.setWebMercatorExtent = function(minX, minY, maxX, maxY)
@@ -437,6 +470,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			if (renderType === 1)
 			{
 				gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
+				//gl.uniform1f(currentShader.externalAlpha_loc, this.getBlendAlpha(magoManager.getCurrentTime()));
 				var currSelObject = magoManager.selectionManager.getSelectedGeneral();
 				if (currSelObject === this)
 				{
@@ -966,6 +1000,7 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 	
 	//var texCorrectionFactor = 0.0005;
 	var texCorrectionFactor = 0.003 + (depth * 0.0000001);
+	//var texCorrectionFactor = 0.002 + (1/(depth+1) * 0.008);
 	
 	for (var currLatSeg = 0; currLatSeg<latSegments+1; currLatSeg++)
 	{

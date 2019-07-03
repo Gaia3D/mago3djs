@@ -1454,7 +1454,7 @@ Renderer.prototype.renderGeometryColorCoding = function(visibleObjControlerNodes
 		magoManager.tinTerrainManager.render(magoManager, bDepth, renderType);
 		gl.useProgram(null);
 	}
-};
+}; 
 
 
 /**

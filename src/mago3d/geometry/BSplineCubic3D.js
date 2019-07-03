@@ -50,10 +50,11 @@ BSplineCubic3D.prototype.renderPoints = function(magoManager, shader, renderType
 	this.geoCoordsList.renderPoints(magoManager, shader, renderType, bEnableDepth);
 	this.geoCoordsList.renderLines(magoManager, shader, renderType, bLoop, bEnableDepth);
 	
+	var gl = magoManager.sceneState.gl;
+	
 	// Render interpolated points.***
 	if (this.interpolatedPoints3dList !== undefined)
 	{
-		var gl = magoManager.sceneState.gl;
 		var shader = magoManager.postFxShadersManager.getShader("pointsCloud");
 		shader.useProgram();
 		shader.disableVertexAttribArrayAll();
@@ -78,6 +79,7 @@ BSplineCubic3D.prototype.renderPoints = function(magoManager, shader, renderType
 	if (this.controlPoints3dMap !== undefined)
 	{
 		// Check if exist control points.***
+		//var lineWidthRange = gl.getParameter(gl.ALIASED_LINE_WIDTH_RANGE);
 		
 	}
 };
@@ -85,7 +87,7 @@ BSplineCubic3D.prototype.renderPoints = function(magoManager, shader, renderType
 /**
  * 어떤 일을 하고 있습니까?
  */
-BSplineCubic3D.prototype.makeControlPoints = function() 
+BSplineCubic3D.prototype.makeControlPoints = function(controlPointArmLength) 
 {
 	// This function makes the controlPoints automatically for the geographicsPoints.***
 	// There are 2 controlPoints for each point3d : InningControlPoint & OutingControlPoint.***
@@ -114,6 +116,9 @@ BSplineCubic3D.prototype.makeControlPoints = function()
 	var currSegment;
 	var inningDist; // the inningControlPoint length.***
 	var outingDist; // the outingControlPoint length.***
+	
+	if (controlPointArmLength === undefined)
+	{ controlPointArmLength = 0.2; }
 		
 	var pointsCount = this.knotPoints3dList.getPointsCount();
 	for (var i=0; i<pointsCount; i++)
@@ -126,7 +131,7 @@ BSplineCubic3D.prototype.makeControlPoints = function()
 		{
 			// In this case there are no inningControlPoint.***
 			nextPoint = this.knotPoints3dList.getPoint(i+1);
-			outingDist = 0.3;
+			outingDist = controlPointArmLength;
 			
 			// The outingControlPoint is in the segment, to the 30% of the currentPoint.***
 			var outingControlPoint = new Point3D();
@@ -138,7 +143,7 @@ BSplineCubic3D.prototype.makeControlPoints = function()
 		{
 			// In this case there are no outingControlPoint.***
 			prevPoint = this.knotPoints3dList.getPoint(i-1);
-			inningDist = 0.3;
+			inningDist = controlPointArmLength;
 			
 			var inningControlPoint = new Point3D();
 			inningControlPoint.set(currPoint.x * (1-inningDist) + prevPoint.x * inningDist, currPoint.y * (1-inningDist) + prevPoint.y * inningDist, currPoint.z * (1-inningDist) + prevPoint.z * inningDist);
@@ -155,12 +160,12 @@ BSplineCubic3D.prototype.makeControlPoints = function()
 			var dir = tangentLine3d.direction;
 			
 			// InningControlPoint.***
-			inningDist = currPoint.distToPoint(prevPoint) * 0.3;
+			inningDist = currPoint.distToPoint(prevPoint) * controlPointArmLength;
 			var inningControlPoint = new Point3D();
 			inningControlPoint.set(currPoint.x - dir.x * inningDist, currPoint.y - dir.y * inningDist, currPoint.z - dir.z * inningDist);
 			
 			// OutingControlPoint.***
-			outingDist = currPoint.distToPoint(nextPoint) * 0.3;
+			outingDist = currPoint.distToPoint(nextPoint) * controlPointArmLength;
 			var outingControlPoint = new Point3D();
 			outingControlPoint.set(currPoint.x + dir.x * outingDist, currPoint.y + dir.y * outingDist, currPoint.z + dir.z * outingDist);
 			
@@ -253,6 +258,7 @@ BSplineCubic3D.makeForSegment = function(strPoint, strControlPoint, endControlPo
 	//
 	//           T = (1-t)^3*K + (1-t)^2*t*L + 2*(1-t)^2*t*L + 2*(1-t)*t^2*M + (1-t)*t^2*M + t^3*N 
 	//
+	//           T = (1-t)^3*K + 3*(1-t)^2*t*L + 3*(1-t)*t^2*M + t^3*N 
 	
 	if (resultInterpolatedPointsArray === undefined)
 	{ resultInterpolatedPointsArray = []; }
@@ -260,18 +266,37 @@ BSplineCubic3D.makeForSegment = function(strPoint, strControlPoint, endControlPo
 	var increT = 1/interpolationsCount;
 	var t = increT;
 	
-	for (var i=0; i<interpolationsCount; i++)
+	var strX = strPoint.x;
+	var strY = strPoint.y;
+	var strZ = strPoint.z;
+	
+	var strCpX = strControlPoint.x;
+	var strCpY = strControlPoint.y;
+	var strCpZ = strControlPoint.z;
+	
+	var endCpX = endControlPoint.x;
+	var endCpY = endControlPoint.y;
+	var endCpZ = endControlPoint.z;
+	
+	var endX = endPoint.x;
+	var endY = endPoint.y;
+	var endZ = endPoint.z;
+	
+	
+	for (var i=0; i<interpolationsCount+1; i++)
 	{
-		t = (i+1)*increT;
+		t = (i)*increT;
 		var oneMinusT = 1-t;
 		var oneMinusT2 = Math.pow(oneMinusT, 2);
 		var oneMinusT3 = Math.pow(oneMinusT, 3);
 		var t2 = t*t;
 		var t3 = t2*t;
+		var oneMinusT2_t_3 = 3*oneMinusT2*t;
+		var oneMinusT_t2_3 = 3*oneMinusT*t2;
 
-		var x = oneMinusT3*strPoint.x + 3*oneMinusT2*t*strControlPoint.x + 3*oneMinusT*t2*endControlPoint.x + t3*endPoint.x;
-		var y = oneMinusT3*strPoint.y + 3*oneMinusT2*t*strControlPoint.y + 3*oneMinusT*t2*endControlPoint.y + t3*endPoint.y;
-		var z = oneMinusT3*strPoint.z + 3*oneMinusT2*t*strControlPoint.z + 3*oneMinusT*t2*endControlPoint.z + t3*endPoint.z;
+		var x = oneMinusT3*strX + oneMinusT2_t_3*strCpX + oneMinusT_t2_3*endCpX + t3*endX;
+		var y = oneMinusT3*strY + oneMinusT2_t_3*strCpY + oneMinusT_t2_3*endCpY + t3*endY;
+		var z = oneMinusT3*strZ + oneMinusT2_t_3*strCpZ + oneMinusT_t2_3*endCpZ + t3*endZ;
 		var point = new Point3D(x, y, z);
 		resultInterpolatedPointsArray.push(point);
 	}
