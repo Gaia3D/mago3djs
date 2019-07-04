@@ -1078,43 +1078,9 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 	// finally make indicesArray.
 	var numCols = lonSegments + 1;
 	var numRows = latSegments + 1;
-	this.indices = this.getIndicesTrianglesRegularNet(numCols, numRows, undefined);
-	this.calculateCenterPosition();
-};
 
-TinTerrain.prototype.getIndicesTrianglesRegularNet = function(numCols, numRows, resultIndicesArray)
-{
-	// given a regular net this function returns triangles indices of the net.
-	var verticesCount = numCols * numRows;
-	var trianglesCount = (numCols-1) * (numRows-1) * 2;
-	if (resultIndicesArray === undefined)
-	{ resultIndicesArray = new Uint16Array(trianglesCount * 3); }
-	
-	var idx_1, idx_2, idx_3;
-	var idxCounter = 0;
-	
-	for (var row = 0; row<numRows-1; row++)
-	{
-		for (var col=0; col<numCols-1; col++)
-		{
-			// there are 2 triangles: triA, triB.
-			idx_1 = VertexMatrix.getIndexOfArray(numCols, numRows, col, row);
-			idx_2 = VertexMatrix.getIndexOfArray(numCols, numRows, col+1, row);
-			idx_3 = VertexMatrix.getIndexOfArray(numCols, numRows, col, row+1);
-			resultIndicesArray[idxCounter] = idx_1; idxCounter++;
-			resultIndicesArray[idxCounter] = idx_2; idxCounter++;
-			resultIndicesArray[idxCounter] = idx_3; idxCounter++;
-			
-			idx_1 = VertexMatrix.getIndexOfArray(numCols, numRows, col+1, row);
-			idx_2 = VertexMatrix.getIndexOfArray(numCols, numRows, col+1, row+1);
-			idx_3 = VertexMatrix.getIndexOfArray(numCols, numRows, col, row+1);
-			resultIndicesArray[idxCounter] = idx_1; idxCounter++;
-			resultIndicesArray[idxCounter] = idx_2; idxCounter++;
-			resultIndicesArray[idxCounter] = idx_3; idxCounter++;
-		}
-	}
-	
-	return resultIndicesArray;
+	this.indices = GeometryUtils.getIndicesTrianglesRegularNet(numCols, numRows, undefined);
+	this.calculateCenterPosition();
 };
 
 TinTerrain.prototype.zigZagDecode = function(value)
@@ -1155,6 +1121,7 @@ TinTerrain.prototype.makeVbo = function(vboMemManager)
 	if (this.texCoordsArray)
 	{
 		// Test modify texCoords here.
+		/*
 		var minLat = this.geographicExtent.minGeographicCoord.latitude;
 		var maxLat = this.geographicExtent.maxGeographicCoord.latitude;
 		var latRange = maxLat - minLat;
@@ -1174,16 +1141,8 @@ TinTerrain.prototype.makeVbo = function(vboMemManager)
 			//this.texCoordsArray[i*2] += this.textureTranslateAndScale.x;
 			//this.texCoordsArray[i*2+1] += this.textureTranslateAndScale.y;
 			
-			// Latitude correction.
-			/*
-			var tCoordY = this.texCoordsArray[i*2+1];
-			var curLat = minLat + tCoordY * latRange;
-			var tan = Math.tan(curLat * Math.PI/180.0);
-			var correctedTexCoordY = (minTan - tan)/tanRange;
-			
-			this.texCoordsArray[i*2+1] = correctedTexCoordY;
-			*/
 		}
+		*/
 		vboKey.setDataArrayTexCoord(this.texCoordsArray, vboMemManager);
 	}
 		

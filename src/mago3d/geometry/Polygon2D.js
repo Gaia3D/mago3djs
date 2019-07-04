@@ -292,7 +292,9 @@ Polygon2D.prototype.intersectionWithSegment = function(segment)
 			continue;
 		}
 		
-		if (segment.intersectionWithSegment(mySegment, error))
+		var intersectionType = segment.intersectionWithSegment(mySegment, error);
+		
+		if (intersectionType === Constant.INTERSECTION_INTERSECT)
 		{
 			return true;
 		}

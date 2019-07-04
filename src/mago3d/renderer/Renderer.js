@@ -1096,6 +1096,11 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		{
 			var bDepthRender = false; // magoManager is no depth render.***
 			magoManager.tinTerrainManager.render(magoManager, bDepthRender, renderType);
+			
+			if (magoManager.sky === undefined)
+			{ magoManager.sky = new Sky(); }
+			
+			magoManager.sky.render(magoManager, bDepthRender, renderType);
 		}
 
 	}
