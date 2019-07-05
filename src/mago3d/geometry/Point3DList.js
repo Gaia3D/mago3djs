@@ -211,14 +211,40 @@ Point3DList.prototype.getSegment3D = function(idx, resultSegment3d, bLoop)
 	
 	return resultSegment3d;
 };
+
+/**
+ * This function returns a line3d that is tangent of a point(idx). 
+ * The tangentLine has the same angle with prevSegment & currSegment.
+ * The tangentLine is coincident with the plane defined by prevSegment & currSegment.
+ * If "bLoop" = true, then this points3dList is a loop.
+ * If "bLoop" = false, then this points3dList is a string.
+ * @param {Number} idx index of the point3D which will define the tangentLine3d
+ * @param {Line} resultTangentLine3d
+ * @param {Boolean} bLoop save the information whether this point3DList is ring or not
+ * @result {Line} resultTangentLine3d a line3d that is tangent of a point(idx).
+ */
+Point3DList.prototype.getTangentLine3D = function(idx, resultTangentLine3d, bLoop)
+{
+	// The tangentLine has the same direction that the normal of the BisectionPlane.***
+	if (resultTangentLine3d === undefined)
+	{ resultTangentLine3d = new Line(); }
+	
+	var point3d = this.getPoint(idx);
+	var bisectionPlane = this.getBisectionPlane(idx, undefined, bLoop);
+	var direction = bisectionPlane.getNormal();
+	resultTangentLine3d.setPointAndDir( point3d.x, point3d.y, point3d.z, direction.x, direction.y, direction.z );
+	
+	return resultTangentLine3d;
+};
+
 /**
  * This function returns a plane that has the same angle with the 2 segments of a point(idx).
  * If "bLoop" = true, then this points3dList is a loop.
  * If "bLoop" = false, then this points3dList is a string.
- * @param idx index of the point3D which will define bisection plane
- * @param resultBisectionPlane
- * @param bLoop save the information whether this point3DList is ring or not
- * @result resultBisectionPlane a plane that has the same angle with the 2 segments of a point
+ * @param {Number} idx index of the point3D which will define bisection plane
+ * @param {Plane} resultBisectionPlane
+ * @param {Boolean} bLoop save the information whether this point3DList is ring or not
+ * @result {Plane} resultBisectionPlane a plane that has the same angle with the 2 segments of a point
  */
 Point3DList.prototype.getBisectionPlane = function(idx, resultBisectionPlane, bLoop)
 {
@@ -324,12 +350,6 @@ Point3DList.prototype.renderLines = function(magoManager, shader, renderType, bL
 	}
 
 	shader.enableVertexAttribArray(shader.position3_loc);
-	
-	gl.uniform1i(shader.bPositionCompressed_loc, false);
-	gl.uniform1i(shader.bUse1Color_loc, true);
-	gl.uniform4fv(shader.oneColor4_loc, [1.0, 1.0, 0.1, 1.0]); //.
-	gl.uniform1f(shader.fixPointSize_loc, 5.0);
-	gl.uniform1i(shader.bUseFixPointSize_loc, true);
 	
 	if (bEnableDepth === undefined)
 	{ bEnableDepth = true; }

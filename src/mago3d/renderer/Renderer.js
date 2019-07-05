@@ -154,6 +154,7 @@ Renderer.prototype.getPointsCountForDistance = function(distToCam, realPointsCou
 	if (distToCam <= 10)
 	{
 		// Render all points.
+		vertices_count =  Math.floor(pCloudSettings.MaxPerUnitPointsRenderDistToCam0m * realPointsCount);
 	}
 	else if (distToCam < 100)
 	{
@@ -498,6 +499,8 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 		currentShader.bindUniformGenerals();
 		var pCloudSettings = magoManager.magoPolicy.getPointsCloudSettings();
 		gl.uniform1f(currentShader.maxPointSize_loc, pCloudSettings.maxPointSize);
+		gl.uniform1f(currentShader.minPointSize_loc, pCloudSettings.minPointSize);
+		gl.uniform1f(currentShader.pendentPointSize_loc, pCloudSettings.pendentPointSize);
 		
 		// Test to load pCloud.***
 		if (magoManager.visibleObjControlerPCloudOctrees === undefined)
@@ -1071,7 +1074,9 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			gl.uniform1f(currentShader.minHeight_rainbow_loc, 40.0);
 			gl.uniform1f(currentShader.maxHeight_rainbow_loc, 75.0);
 			gl.uniform1f(currentShader.maxPointSize_loc, pCloudSettings.maxPointSize);
-	
+			gl.uniform1f(currentShader.minPointSize_loc, pCloudSettings.minPointSize);
+			gl.uniform1f(currentShader.pendentPointSize_loc, pCloudSettings.pendentPointSize);
+			
 			gl.activeTexture(gl.TEXTURE0);
 			gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);
 			
@@ -1096,6 +1101,11 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		{
 			var bDepthRender = false; // magoManager is no depth render.***
 			magoManager.tinTerrainManager.render(magoManager, bDepthRender, renderType);
+			
+			if (magoManager.sky === undefined)
+			{ magoManager.sky = new Sky(); }
+			
+			magoManager.sky.render(magoManager, bDepthRender, renderType);
 		}
 
 	}
@@ -1454,7 +1464,7 @@ Renderer.prototype.renderGeometryColorCoding = function(visibleObjControlerNodes
 		magoManager.tinTerrainManager.render(magoManager, bDepth, renderType);
 		gl.useProgram(null);
 	}
-};
+}; 
 
 
 /**

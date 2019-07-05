@@ -42,6 +42,7 @@ TinTerrainManager.prototype.init = function()
 	//https://en.wikipedia.org/wiki/Mercator_projection
 	var webMercatorMaxLatRad = 2*Math.atan(Math.pow(Math.E, Math.PI)) - (Math.PI/2);
 	var webMercatorMaxLatDeg = webMercatorMaxLatRad * 180/Math.PI; // = 85.0511287798...
+
 	
 	// Asia side.
 	var minLon = 0;
@@ -57,8 +58,7 @@ TinTerrainManager.prototype.init = function()
 	}
 	
 	this.tinTerrainsQuadTreeAsia.setGeographicExtent(minLon, minLat, minAlt, maxLon, maxLat, maxAlt);
-	//this.tinTerrainsQuadTreeAsia.setWebMercatorExtent(0.5, 0, 1, 1); // ori.***
-	this.tinTerrainsQuadTreeAsia.setWebMercatorExtent(0, -1, 1, 1); // unitary extension.***
+	this.tinTerrainsQuadTreeAsia.setWebMercatorExtent(0, -Math.PI, 1, Math.PI); // unitary extension.***
 	this.tinTerrainsQuadTreeAsia.X = 1;
 	this.tinTerrainsQuadTreeAsia.Y = 0;
 	this.tinTerrainsQuadTreeAsia.indexName = "RU";
@@ -77,8 +77,7 @@ TinTerrainManager.prototype.init = function()
 		maxLat = webMercatorMaxLatDeg; 
 	}
 	this.tinTerrainsQuadTreeAmerica.setGeographicExtent(minLon, minLat, minAlt, maxLon, maxLat, maxAlt);
-	//this.tinTerrainsQuadTreeAmerica.setWebMercatorExtent(0, 0, 0.5, 1); // ori.***
-	this.tinTerrainsQuadTreeAmerica.setWebMercatorExtent(-1, -1, 0, 1); // unitary extension.***
+	this.tinTerrainsQuadTreeAmerica.setWebMercatorExtent(-1, -Math.PI, 0, Math.PI); // unitary extension.***
 	this.tinTerrainsQuadTreeAmerica.X = 0;
 	this.tinTerrainsQuadTreeAmerica.Y = 0;
 	this.tinTerrainsQuadTreeAmerica.indexName = "LU";
@@ -246,7 +245,6 @@ TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager)
 
 TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType) 
 {
-	
 	var gl = magoManager.sceneState.gl;
 	var currentShader = magoManager.postFxShadersManager.getShader("tinTerrain");
 	var shaderProgram = currentShader.program;
@@ -262,7 +260,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType)
 	
 	currentShader.bindUniformGenerals();
 
-	var tex = magoManager.pin.texturesArray[4]; // provisional.
+	var tex = magoManager.texturesManager.getTextureAux1x1(); // provisional.
 	gl.activeTexture(gl.TEXTURE2); 
 	gl.bindTexture(gl.TEXTURE_2D, tex.texId);
 	
@@ -274,6 +272,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType)
 	if (magoManager.configInformation.geo_view_library === Constant.CESIUM)
 	{ flipTexCoordY = false; }
 	gl.uniform1i(currentShader.textureFlipYAxis_loc, flipTexCoordY); // false for cesium, true for magoWorld.
+	gl.uniform1f(currentShader.externalAlpha_loc, 1.0);
 	
 	//gl.enable(gl.POLYGON_OFFSET_FILL);
 	//gl.polygonOffset(1, 3);

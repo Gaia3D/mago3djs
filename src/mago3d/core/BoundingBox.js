@@ -41,6 +41,26 @@ BoundingBox.prototype.init = function(point)
 };
 
 /**
+ * Sets the values of the bounding box
+ * @param {Number} minX Minimum value of the boundingBox in x axis.
+ * @param {Number} minY Minimum value of the boundingBox in y axis.
+ * @param {Number} minZ Minimum value of the boundingBox in z axis.
+ * @param {Number} maxX Maximum value of the boundingBox in x axis.
+ * @param {Number} maxY Maximum value of the boundingBox in y axis.
+ * @param {Number} maxZ Maximum value of the boundingBox in z axis.
+ */
+BoundingBox.prototype.set = function(minX, minY, minZ, maxX, maxY, maxZ) 
+{
+	this.minX = minX;
+	this.minY = minY;
+	this.minZ = minZ;
+
+	this.maxX = maxX;
+	this.maxY = maxY;
+	this.maxZ = maxZ;
+};
+
+/**
  * Delete bounding box
  * 영역박스 삭제
  * 

@@ -10,7 +10,7 @@ var MagoManager = function()
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-
+	//// http://dj.gaia3d.com:10080
 	/**
 	 * Auxiliary renderer.
 	 * @type {Renderer}
@@ -380,6 +380,9 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 		
 		// Check if the node is a referenceNode.***
 		var attributes = node.data.attributes;
+		if (attributes === undefined)
+		{ continue; }
+		
 		if (attributes.projectId !== undefined && attributes.isReference !== undefined && attributes.isReference === true)
 		{
 			// check if has neoBuilding.***
@@ -547,8 +550,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		if (frustumCommandsList === undefined)
 		{ frustumCommandsList = this.scene.frustumCommandsList; }
 		
-		// Update sceneState camera.***
-		this.upDateCamera(sceneState.camera);
+		
 		
 		var camPosX = this.scene.camera.positionWC.x;
 		var camPosY = this.scene.camera.positionWC.y;
@@ -563,6 +565,9 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		{
 			this.isCameraMoved = true;
 		}
+		
+		// Update sceneState camera.***
+		this.upDateCamera(sceneState.camera);
 					
 		sceneState.drawingBufferWidth[0] = scene.drawingBufferWidth;
 		sceneState.drawingBufferHeight[0] = scene.drawingBufferHeight;
@@ -572,7 +577,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		var camera = sceneState.camera;
 		var camPos = camera.position;
 		var frustum0 = camera.getFrustum(0);
-		sceneState.camera.frustum.aspectRatio = sceneState.drawingBufferWidth / sceneState.drawingBufferHeight;
+		sceneState.camera.frustum.aspectRatio[0] = sceneState.drawingBufferWidth / sceneState.drawingBufferHeight;
 		// determine frustum near & far.***
 		var camHeight = camera.getCameraElevation();
 		var eqRadius = Globe.equatorialRadius();
@@ -585,7 +590,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		
 		// projection.***
 		// considere near as zero provisionally.***
-		sceneState.projectionMatrix._floatArrays = glMatrix.mat4.perspective(sceneState.projectionMatrix._floatArrays, frustum0.fovyRad[0], frustum0.aspectRatio, 0.0, frustum0.far[0]);
+		sceneState.projectionMatrix._floatArrays = glMatrix.mat4.perspective(sceneState.projectionMatrix._floatArrays, frustum0.fovyRad[0], frustum0.aspectRatio[0], 0.0, frustum0.far[0]);
 		
 		// modelView.***
 		//sceneState.modelViewMatrix._floatArrays; 
@@ -703,7 +708,7 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
 		resultCamera.direction.set(camDirX, camDirY, camDirZ);
 		resultCamera.up.set(camUpX, camUpY, camUpZ);
 		
-		var aspectRatio = frustum.aspectRatio;
+		var aspectRatio = frustum.aspectRatio[0];
 		var fovy = frustum.fovyRad;	
 		
 		frustum = resultCamera.getFrustum(frustumIdx);
@@ -722,16 +727,15 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
 		var frustumIdx = 0;
 		var camera = this.sceneState.camera;
 		var frustum = camera.getFrustum(frustumIdx);
-		var aspectRatio = frustum.aspectRatio;
+		var aspectRatio = frustum.aspectRatio[0];
 		var fovy = frustum.fovyRad;
-		//frustum.far[0] = this.scene._frustumCommandsList[frustumIdx].far; 
-		//frustum.near[0] = this.scene._frustumCommandsList[frustumIdx].near;
-		var currentFrustumFar = frustum.far;
-		var currentFrustumNear = frustum.near;
+
+		var currentFrustumFar = frustum.far[0];
+		var currentFrustumNear = frustum.near[0];
 		
 		this.sceneState.camera.frustum.near[0] = currentFrustumNear;
 		this.sceneState.camera.frustum.far[0] = currentFrustumFar;
-		this.sceneState.camera.frustum.aspectRatio = aspectRatio;
+		this.sceneState.camera.frustum.aspectRatio[0] = aspectRatio;
 		
 		// take all frustums near-far distances.***
 		var numFrustums = 1;
@@ -748,6 +752,7 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
 		frustum = resultCamera.getFrustum(frustumIdx);
 		frustum.near[0] = currentFrustumNear;
 		frustum.far[0] = currentFrustumFar;
+		
 		resultCamera.setFrustumsDistances(numFrustums, distancesArray);
 		resultCamera.setAspectRatioAndFovyRad(aspectRatio, fovy);
 		resultCamera.calculateFrustumsPlanes();
@@ -1195,8 +1200,8 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 		this.dateSC = new Date();
 		this.currTime = this.dateSC.getTime();
 		
-		this.load_testTextures();
-		
+		//test code delelte
+		//this.load_testTextures();
 		// Before of multiFrustumCullingSmartTile, do animation check, bcos during animation some object can change smartTile-owner.***
 		if (this.animationManager !== undefined)
 		{ this.animationManager.checkAnimation(this); }
@@ -1675,9 +1680,15 @@ MagoManager.prototype.keyDown = function(key)
 {
 	if (key === 32) // 32 = 'space'.***
 	{
-		var renderingSettings = this._settings.getRenderingSettings();
-		var pointsCloudColorRamp = renderingSettings.getPointsCloudInColorRamp();
-		renderingSettings.setPointsCloudInColorRamp(!pointsCloudColorRamp);
+		if (this.pointsCloudSsao === undefined)
+		{ this.pointsCloudSsao = true; }
+		
+		if (this.pointsCloudSsao)
+		{ this.pointsCloudSsao = false; }
+		else
+		{ this.pointsCloudSsao = true; }
+	
+	
 	}
 	/*
 	else if (key === 37) // 37 = 'left'.***
@@ -1771,6 +1782,15 @@ MagoManager.prototype.keyDown = function(key)
 		api.setObjectIds("13");
 		api.setColor("220,150,20");
 		this.callAPI(api);
+		
+		// Another test: BSplineCubic3d.***
+		var bSplineCubic3d = this.modeler.bSplineCubic3d;
+		if (bSplineCubic3d !== undefined)
+		{
+			// Make the controlPoints.***
+			bSplineCubic3d.makeControlPoints();
+			bSplineCubic3d.makeInterpolatedPoints();
+		}
 	}
 	else if (key === 89) // 89 = 'y'.***
 	{
@@ -1814,8 +1834,9 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		//this.modeler.mode = CODE.modelerMode.DRAWING_PLANEGRID;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_TUNNELPOINTS;
-		this.modeler.mode = CODE.modelerMode.DRAWING_STATICGEOMETRY;
-		//this.modeler.mode = CODE.modelerMode.DRAWING_BSPLINE;
+		//this.modeler.mode = CODE.modelerMode.DRAWING_STATICGEOMETRY;
+		this.modeler.mode = CODE.modelerMode.DRAWING_BSPLINE;
+		//this.modeler.mode = CODE.modelerMode.DRAWING_BASICFACTORY;
 		
 		// Calculate the geographicCoord of the click position.****
 		var geoCoord;
@@ -1889,10 +1910,23 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		}
 		
 		// BSpline.***
-		//else if (this.modeler.mode === CODE.modelerMode.DRAWING_BSPLINE)
-		//{
-		//	
-		//}
+		else if (this.modeler.mode === CODE.modelerMode.DRAWING_BSPLINE)
+		{
+			// Testing bSpline.***
+			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+1, undefined, undefined, undefined, geoLocData, this);
+			
+			
+			if (this.modeler.bSplineCubic3d === undefined)
+			{ this.modeler.bSplineCubic3d = new BSplineCubic3D(); }
+			
+			var bSplineCubic = this.modeler.bSplineCubic3d;
+			var geoCoordsList = bSplineCubic.getGeographicCoordsList();
+			geoCoordsList.addGeoCoord(geoCoord);
+			geoCoordsList.makeLines(this);
+			
+		}
 		
 		// StaticGeometries.***
 		else if (this.modeler.mode === CODE.modelerMode.DRAWING_STATICGEOMETRY)
@@ -1973,7 +2007,36 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			var targetDepth = this.smartTileManager.targetDepth;
 			this.smartTileManager.putNode(targetDepth, node, this);*/
 		}
-		
+		// Basic Factory. This is a factory shaped object.***
+		else if (this.modeler.mode === CODE.modelerMode.DRAWING_BASICFACTORY)
+		{
+			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+10, undefined, undefined, undefined, geoLocData, this);
+			
+			var factory = this.modeler.newBasicFactory();
+			factory.geoLocDataManager = geoLocDataManager;
+			/*
+			// Create a node and insert into smartTile.***
+			var projectId = "ParametricMeshes";
+			var instanceId = "Factory_" + this.modeler.basicFactorysArray.length;
+			var node = this.hierarchyManager.newNode(instanceId, projectId, undefined);
+			node.data.renderable = factory;
+
+
+			// Now, create the geoLocdataManager of node.***
+			node.data.projectId = projectId;
+			//node.data.attributes = attributes;
+			node.data.geographicCoord = geoCoord;
+			var pitch = 0, roll = 0, heading = 0;
+			node.data.rotationsDegree = new Point3D(pitch, roll, heading);
+			node.data.geoLocDataManager = geoLocDataManager;
+
+			// Now, insert node into smartTile.***
+			var targetDepth = defaultValue(this.smartTileManager.targetDepth, 17);
+			this.smartTileManager.putNode(targetDepth, node, this);
+			*/
+		}
 	}
 	
 };
@@ -3382,7 +3445,10 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.bPositionCompressed_loc = gl.getUniformLocation(shader.program, "bPositionCompressed");
 	shader.minPosition_loc = gl.getUniformLocation(shader.program, "minPosition");
 	shader.bboxSize_loc = gl.getUniformLocation(shader.program, "bboxSize");
-	
+	shader.maxPointSize_loc = gl.getUniformLocation(shader.program, "maxPointSize");
+	shader.minPointSize_loc = gl.getUniformLocation(shader.program, "minPointSize");
+	shader.pendentPointSize_loc = gl.getUniformLocation(shader.program, "pendentPointSize");
+
 	// 5) Test Quad shader.****************************************************************************************
 	shaderName = "testQuad"; // used by temperatura layer.***
 	shader = this.postFxShadersManager.newShader(shaderName);
@@ -3442,7 +3508,9 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.minPosition_loc = gl.getUniformLocation(shader.program, "minPosition");
 	shader.bboxSize_loc = gl.getUniformLocation(shader.program, "bboxSize");
 	shader.maxPointSize_loc = gl.getUniformLocation(shader.program, "maxPointSize");
-	
+	shader.minPointSize_loc = gl.getUniformLocation(shader.program, "minPointSize");
+	shader.pendentPointSize_loc = gl.getUniformLocation(shader.program, "pendentPointSize");
+
 	// 8) PointsCloud shader.****************************************************************************************
 	shaderName = "pointsCloudSsao";
 	shader = this.postFxShadersManager.newShader(shaderName);
@@ -3466,7 +3534,9 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.minPosition_loc = gl.getUniformLocation(shader.program, "minPosition");
 	shader.bboxSize_loc = gl.getUniformLocation(shader.program, "bboxSize");
 	shader.maxPointSize_loc = gl.getUniformLocation(shader.program, "maxPointSize");
-	
+	shader.minPointSize_loc = gl.getUniformLocation(shader.program, "minPointSize");
+	shader.pendentPointSize_loc = gl.getUniformLocation(shader.program, "pendentPointSize");
+
 	// 9) PointsCloud shader RAINBOW.****************************************************************************************
 	shaderName = "pointsCloudSsao_rainbow";
 	shader = this.postFxShadersManager.newShader(shaderName);
@@ -3493,6 +3563,8 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.minHeight_rainbow_loc = gl.getUniformLocation(shader.program, "minHeight_rainbow");
 	shader.maxHeight_rainbow_loc = gl.getUniformLocation(shader.program, "maxHeight_rainbow");
 	shader.maxPointSize_loc = gl.getUniformLocation(shader.program, "maxPointSize");
+	shader.minPointSize_loc = gl.getUniformLocation(shader.program, "minPointSize");
+	shader.pendentPointSize_loc = gl.getUniformLocation(shader.program, "pendentPointSize");
 };
 
 /**
@@ -3657,6 +3729,7 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 	var buildingSeedsCount;
 	var buildingSeed;
 	var neoBuilding;
+	var renderable;
 	var node;
 	var nodeRoot;
 	var nodeBbox;
@@ -3693,6 +3766,51 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 					geoLoc = node.calculateGeoLocData(this);
 					continue;
 				}
+				
+				// Check if the 3dData is neoBuilding or renderable.***
+				/*
+				renderable = node.data.renderable;
+				if (renderable)
+				{
+					// TODO:
+					distToCamera = node.getDistToCamera(cameraPosition, this.boundingSphere_Aux);
+					var data = node.data;
+					data.currentLod;
+					data.distToCam = distToCamera;
+					
+					
+					if (data.distToCam < lod0Dist)
+					{ data.currentLod = 0; }
+					else if (data.distToCam < lod1Dist)
+					{ data.currentLod = 1; }
+					else if (data.distToCam < lod2Dist)
+					{ data.currentLod = 2; }
+					else if (data.distToCam < lod3Dist)
+					{ data.currentLod = 3; }
+					else if (data.distToCam < lod4Dist)
+					{ data.currentLod = 4; }
+					else if (data.distToCam < lod5Dist)
+					{ data.currentLod = 5; }
+				
+					if (distToCamera < lod0_minDist) 
+					{
+						visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles0, node);
+					}
+					else if (distToCamera < lod1_minDist) 
+					{
+						visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles1, node);
+					}
+					else if (distToCamera < lod2_minDist) 
+					{
+						visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles2, node);
+					}
+					else if (distToCamera < lod5_minDist) 
+					{
+						visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles3, node);
+					}
+				}
+				*/
+				
 				neoBuilding = node.data.neoBuilding;
 				
 				if (neoBuilding === undefined)
@@ -3797,42 +3915,15 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 					{
 						if (distToCamera < lod0_minDist) 
 						{
-							// check if the lod0, lod1, lod2 are modelReference type.***
-							var lodBuildingData = neoBuilding.getLodBuildingData(0);
-							if (lodBuildingData && lodBuildingData.isModelRef)
-							{ 
-								visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles0, node);
-							}
-							else
-							{ 
-								//visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles3, node);
-								visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles0, node);
-							}
+							visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles0, node);
 						}
 						else if (distToCamera < lod1_minDist) 
 						{
-							var lodBuildingData = neoBuilding.getLodBuildingData(1);
-							if (lodBuildingData && lodBuildingData.isModelRef)
-							{ 
-								visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles1, node);
-							}
-							else
-							{ 
-								//visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles3, node);
-								visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles1, node);
-							}
+							visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles1, node);
 						}
 						else if (distToCamera < lod2_minDist) 
 						{
-							var lodBuildingData = neoBuilding.getLodBuildingData(2);
-							if (lodBuildingData && lodBuildingData.isModelRef)
-							{ 
-								visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles2, node);
-							}
-							else
-							{ 
-								visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles3, node);
-							}
+							visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles2, node);
 						}
 						else if (distToCamera < lod5_minDist) 
 						{
@@ -4022,6 +4113,8 @@ MagoManager.prototype.flyToBuilding = function(apiName, projectId, dataKey)
 	if (realBuildingPos === undefined)
 	{ return; }
 
+	if (!nodeRoot.data.bbox)
+	{ return; }
 	this.radiusAprox_aux = nodeRoot.data.bbox.getRadiusAprox();
 
 	if (this.boundingSphere_Aux === undefined)
@@ -5219,8 +5312,20 @@ MagoManager.prototype.callAPI = function(api)
 			throw new Error("This node is not exist.");
 		}
 
-		this.flyToBuilding(undefined, node.data.projectId, node.data.nodeId);
-		this.sceneState.camera.setTrack(node);
+		if (node.isReadyToRender)
+		{
+			var geoLocDataManager = node.getNodeGeoLocDataManager();
+			var geoLocData = geoLocDataManager.getCurrentGeoLocationData();
+			var geoCoords = geoLocData.getGeographicCoords();
+
+			var currLon = geoCoords.longitude;
+			var currLat = geoCoords.latitude;
+
+			this.flyTo(currLon, currLat, 100, 0);
+			var camera = this.sceneState.camera;
+			camera.stopTrack(this);
+			camera.setTrack(node, api.getTrackOption());
+		}
 	}
 	else if (apiName === "stopTrack")
 	{
@@ -5247,10 +5352,71 @@ MagoManager.prototype.callAPI = function(api)
 		{
 			return true;
 		}
-		else
+
+		return false;
+		
+	}
+	else if (apiName === "isDataReadyToRender")
+	{
+		var projectId = api.getProjectId();
+		var dataKey = api.getDataKey();
+		if (!defined(projectId))
 		{
-			return false;
+			throw new Error("projectId is required.");
 		}
+		if (!defined(dataKey))
+		{
+			throw new Error("dataKey is required.");
+		}
+		var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
+
+		if (node !== undefined)
+		{
+			if (node.isReadyToRender())
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+	else if (apiName === "setNodeAttribute")
+	{
+		var projectId = api.getProjectId();
+		var dataKey = api.getDataKey();
+		var attribute = api.getNodeAttribute();
+		if (!defined(projectId))
+		{
+			throw new Error("projectId is required.");
+		}
+		if (!defined(dataKey))
+		{
+			throw new Error("dataKey is required.");
+		}
+		var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
+
+		if (node !== undefined)
+		{
+			if (node.data) 
+			{
+				var nodeData = node.data;
+				if (!nodeData.attributes) 
+				{
+					nodeData.attributes = {};
+				}
+				var myAttribute = nodeData.attributes;
+
+				for (var key in attribute)
+				{
+					if (attribute.hasOwnProperty(key)) 
+					{
+						myAttribute[key] = attribute[key];
+					}
+				}
+			}
+		}
+
+		return false;
 	}
 };
 

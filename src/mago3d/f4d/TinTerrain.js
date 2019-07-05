@@ -64,6 +64,16 @@ var TinTerrain = function(owner)
 	
 	// Test vars. Delete after test.
 	this.imageryGeoExtent;
+	
+	this.isAdult = false;
+	this.birthTime;
+	
+	/**
+	 * Object's current rendering phase. Parameter to avoid duplicated render on scene.
+	 * @type {Boolean}
+	 * @default false
+	 */
+	this.renderingFase = false;
 };
 
 TinTerrain.prototype.deleteObjects = function(magoManager)
@@ -166,6 +176,36 @@ TinTerrain.prototype.getPathName = function()
 	return this.depth.toString() + "\\" + this.X.toString() + "\\" + this.Y.toString();
 };
 
+/**
+ * Returns the blending alpha value in current time.
+ * 
+ * @param {Number} currTime The current time.
+ */
+TinTerrain.prototype.getBlendAlpha = function(currTime) 
+{
+	if (!this.isAdult)
+	{
+		if (this.birthTime === undefined)
+		{ this.birthTime = currTime; }
+	
+		if (this.blendAlpha === undefined)
+		{ this.blendAlpha = 0.1; }
+		
+		var increAlpha = (currTime - this.birthTime)*0.0001;
+		this.blendAlpha += increAlpha;
+		
+		if (this.blendAlpha >= 1.0)
+		{
+			this.blendAlpha = 1.0;
+			this.isAdult = true;
+		}
+	}
+	else
+	{ return 1.0; }
+	
+	return this.blendAlpha;
+};
+
 TinTerrain.prototype.setWebMercatorExtent = function(minX, minY, maxX, maxY)
 {
 	if (this.webMercatorExtent === undefined)
@@ -253,8 +293,8 @@ TinTerrain.prototype.prepareTexture = function(magoManager, tinTerrainManager)
 	
 	// Provisionally, for debug, save textureFilePath.***
 	this.texFilePath__TEST = textureFilePath;
-
-	magoManager.readerWriter.loadWMSImage(gl, textureFilePath, this.texture, magoManager, false);
+	var flip_y_texCoords = false;
+	magoManager.readerWriter.loadWMSImage(gl, textureFilePath, this.texture, magoManager, flip_y_texCoords);
 	
 	// For elevation3D data.
 	//http://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer/tile/0/0/0
@@ -408,7 +448,8 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 		{
 			if (this.fileLoadState === CODE.fileLoadState.LOAD_FAILED) // provisional solution.
 			{ return; }
-			
+
+		
 			if (this.texture.texId === undefined)
 			{ return; }
 		
@@ -425,10 +466,11 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 				gl.uniform4fv(currentShader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
 			}
 			
-			// Test.********************
+			// Test.******************************************************************************************
 			if (renderType === 1)
 			{
 				gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
+				//gl.uniform1f(currentShader.externalAlpha_loc, this.getBlendAlpha(magoManager.getCurrentTime()));
 				var currSelObject = magoManager.selectionManager.getSelectedGeneral();
 				if (currSelObject === this)
 				{
@@ -436,6 +478,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 					gl.uniform4fv(currentShader.oneColor4_loc, [0.8, 0.3, 0.1, 1.0]);
 				}
 			}
+			// End test.--------------------------------------------------------------------------------------
 			
 			// render this tinTerrain.
 			var renderWireframe = false;
@@ -482,6 +525,20 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			{
 				gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.
 			}
+			
+			// Test Render wireframe if selected.*************************************************************
+			if (renderType === 1)
+			{
+				gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
+				var currSelObject = magoManager.selectionManager.getSelectedGeneral();
+				if (currSelObject === this)
+				{
+					gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
+					gl.uniform4fv(currentShader.oneColor4_loc, [0.0, 0.9, 0.9, 1.0]);
+					gl.drawElements(gl.LINE_LOOP, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.
+				}
+			}
+			// End test.--------------------------------------------------------------------------------------
 
 		}
 		else 
@@ -529,9 +586,52 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 	//}
 	else if (intersectionType === Constant.INTERSECTION_INTERSECT || intersectionType === Constant.INTERSECTION_INSIDE)
 	{
+		var currDepth = this.depth;
+		
 		// check distance to camera.
 		var distToCam = camPos.distToSphere(sphereExtentAux);
-		if (distToCam > 5000)// && this.depth > 1)
+		var distLimit = 10000;
+		
+		// For each depth, there are a limit distance.***
+		if (currDepth === 0)
+		{ distLimit = 50000000; }
+		else if (currDepth === 1)
+		{ distLimit = 10000000; }
+		else if (currDepth === 2)
+		{ distLimit = 5000000; }
+		else if (currDepth === 3)
+		{ distLimit = 2000000; }
+		else if (currDepth === 4)
+		{ distLimit = 1000000; }
+		else if (currDepth === 5)
+		{ distLimit = 500000; }
+		else if (currDepth === 6)
+		{ distLimit = 100000; }
+		else if (currDepth === 7)
+		{ distLimit = 50000; }
+		else if (currDepth === 8)
+		{ distLimit = 20000; }
+		else if (currDepth === 9)
+		{ distLimit = 9000; }
+		else if (currDepth === 10)
+		{ distLimit = 5000; }
+		else if (currDepth === 11)
+		{ distLimit = 4000; }
+		else if (currDepth === 12)
+		{ distLimit = 3000; }
+		else if (currDepth === 13)
+		{ distLimit = 2000; }
+		else if (currDepth === 14)
+		{ distLimit = 1000; }
+		else if (currDepth === 15)
+		{ distLimit = 900; }
+		else if (currDepth === 16)
+		{ distLimit = 800; }
+		else if (currDepth === 17)
+		{ distLimit = 700; }
+	
+		
+		if (distToCam > distLimit)// && this.depth > 1)
 		{
 			// finish the process.
 			this.visible = true;
@@ -539,7 +639,6 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 			return;
 		}
 		
-		var currDepth = this.depth;
 		if (currDepth < maxDepth)
 		{
 			// must descend.
@@ -569,11 +668,8 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 			
 			if (this.tinTerrainManager.imageryType === CODE.imageryType.WEB_MERCATOR)
 			{
-
 				midLat = this.getMidLatitudeRadWebMercator()*180/Math.PI;
 			}
-
-			
 
 			var imageryMercatorMinX = this.imageryGeoExtent.minGeographicCoord.longitude;
 			var imageryMercatorMinY = this.imageryGeoExtent.minGeographicCoord.latitude;
@@ -861,12 +957,6 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 	var lonIncreDeg = lonRange/lonSegments;
 	var latIncreDeg = latRange/latSegments;
 	
-	if (lonIncreDeg <= 0 || latIncreDeg <= 0)
-	{ var hola = 0; }
-	
-	// use a vertexMatrix to make the regular net.
-	var vertexMatrix;
-	
 	// calculate total verticesCount.
 	var vertexCount = (lonSegments + 1)*(latSegments + 1);
 	var lonArray = new Float32Array(vertexCount);
@@ -878,13 +968,9 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 	var currLat = minLat; // init startLat.
 	var idx = 0;
 	var s, t;
-	//var tanMaxLat = Math.tan(85.0511287798*Math.PI/180.0);
-	var tanMaxLat = Math.tan(maxLat);
-	var tanMinLat = Math.tan(minLat);
-	var tanLatRange = tanMaxLat - tanMinLat;
+
 	var PI = Math.PI;
 	var aConst = (1.0/(2.0*PI))*Math.pow(2.0, depth);
-	//var aConst = (1.0/(2.0*PI));
 	
 	// check if exist altitude.
 	var alt = 0;
@@ -892,56 +978,61 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 	{ alt = altitude; }
 
 	// Note: If exist "altitudesSlice", then use it.
-	if (depth === 1)
-	{
-		if (this.X === 0 && this.Y === 1)
-		{ var hola = 0; }
-	}
-	
-	if (depth === 2)
-	{
-		if (this.Y === 0)
-		{ var hola = 0; }
-	
-		if (this.Y === 1)
-		{ var hola = 0; }
-	
-		if (this.Y === 2)
-		{ var hola = 0; }
-	
-		if (this.Y === 3)
-		{ var hola = 0; }
-	}
-	
-	if (depth === 3)
-	{
-		if (this.X === 0 && this.Y === 2)
-		{ var hola = 0; }
-	}
 	
 	// Test.**
-	// _calculateTextureTranslationAndScale
-	var minMercator, maxMercator;
-	minMercator = Globe.geographicRadianToMercatorProjection(minLon, minLat, minMercator);
-	maxMercator = Globe.geographicRadianToMercatorProjection(maxLon, maxLat, maxMercator);
-	this.calculateTextureCoordinateTranslationAndScale();
+	//var minMercator, maxMercator;
+	//minMercator = Globe.geographicRadianToMercatorProjection(minLon, minLat, minMercator);
+	//maxMercator = Globe.geographicRadianToMercatorProjection(maxLon, maxLat, maxMercator);
+	//this.calculateTextureCoordinateTranslationAndScale();
 	// End test.-------------------------------------------------------------------------------
 	
+	// https://en.wikipedia.org/wiki/Web_Mercator_projection
 	var PI_DIV_4 = PI/4;
 	var minT = aConst*(PI-Math.log(Math.tan(PI_DIV_4+minLat/2)));
 	var maxT = aConst*(PI-Math.log(Math.tan(PI_DIV_4+maxLat/2)));
+	var minS = aConst*(minLon+PI);
+	var maxS = aConst*(maxLon+PI);
+	var floorMinS = Math.floor(minS);
 	
-	var minT2 = aConst*(Math.log(Math.tan(PI_DIV_4+minLat/2)));
-	var maxT2 = aConst*(Math.log(Math.tan(PI_DIV_4+maxLat/2)));
+	// Flip texCoordY for minT & maxT.***
+	minT = 1.0 - minT;
+	maxT = 1.0 - maxT;
 	
-	var tRange = maxT - minT;
-	var realMinT, realMaxT;
+	//var texCorrectionFactor = 0.0005;
+	var texCorrectionFactor = 0.003 + (depth * 0.0000001);
+	//var texCorrectionFactor = 0.002 + (1/(depth+1) * 0.008);
 	
 	for (var currLatSeg = 0; currLatSeg<latSegments+1; currLatSeg++)
 	{
-		currLon = minLon;
+		currLat = minLat + latIncreDeg * currLatSeg;
+		if (currLat > maxLat)
+		{ currLat = maxLat; }
+	
+		var currLatDeg = currLat*180/PI; // Test debug.***
+		
+		t = aConst*(PI-Math.log(Math.tan(PI_DIV_4+currLat/2)));
+		t = 1.0 - t;
+			
+		// Substract minT to "t" to make range [0 to 1].***
+		t -= minT; 
+		
+		// Texture correction in borders.***
+		if (currLatSeg === 0)
+		{
+			t = (texCorrectionFactor);
+		}
+		else if (currLatSeg === latSegments)
+		{
+			t = (1-texCorrectionFactor);
+		}
+		
 		for (var currLonSeg = 0; currLonSeg<lonSegments+1; currLonSeg++)
 		{
+			currLon = minLon + lonIncreDeg * currLonSeg;
+			
+			if (currLon > maxLon)
+			{ currLon = maxLon; }
+			
 			lonArray[idx] = currLon;
 			latArray[idx] = currLat;
 			// Now set the altitude.
@@ -952,45 +1043,24 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 			else
 			{ altArray[idx] = alt; }
 
-			// make texcoords.
-			// https://en.wikipedia.org/wiki/Web_Mercator_projection
 			s = aConst*(currLon+PI);
-			t = aConst*(PI-Math.log(Math.tan(PI_DIV_4+currLat/2)));
-			//t = 1.0 - t;
+			s -= floorMinS;
 			
-			var currLatDeg = currLat*180/PI;
-			var testLatRad = 0;
-			var testT = aConst*(PI-Math.log(Math.tan(PI_DIV_4+testLatRad/2)));
-
+			// Texture correction in borders.***
+			if (currLonSeg === 0)
+			{
+				s += texCorrectionFactor/2;
+			}
+			else if (currLonSeg === lonSegments)
+			{
+				s += -texCorrectionFactor/2;
+			}
 			
 			this.texCoordsArray[idx*2] = s;
 			this.texCoordsArray[idx*2+1] = t;
-			
-			if (t<0 || t>1)
-			{ var hola = 0; }
-		
-			if (realMinT === undefined)
-			{
-				realMinT = t;
-			}
-			else 
-			{
-				if (t < realMinT)
-				{ realMinT = t; }
-			}
-			
-			if (realMaxT === undefined)
-			{
-				realMaxT = t;
-			}
-			else 
-			{
-				if (t > realMaxT)
-				{ realMaxT = t; }
-			}
-			
+
 			/*
-			// make texcoords.
+			// make texcoords CRS84.***
 			s = (currLon - minLon)/lonRange;
 			t = (currLat - minLat)/latRange;
 			
@@ -999,20 +1069,8 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 			*/
 			
 			// actualize current values.
-			currLon += lonIncreDeg;
 			idx++;
 		}
-		currLat += latIncreDeg;
-	}
-	
-	// TexCoords correction.***
-	var realTRange = realMaxT - realMinT;
-	var texCoordsCount = vertexCount;
-	for (var i=0; i<texCoordsCount; i++)
-	{
-		var currT = this.texCoordsArray[i*2+1];
-		//this.texCoordsArray[i*2+1] = (currT - realMinT)/realTRange;
-		this.texCoordsArray[i*2+1] = 1.0 - this.texCoordsArray[i*2+1];
 	}
 	
 	this.cartesiansArray = Globe.geographicRadianArrayToFloat32ArrayWgs84(lonArray, latArray, altArray, this.cartesiansArray);
@@ -1020,42 +1078,9 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 	// finally make indicesArray.
 	var numCols = lonSegments + 1;
 	var numRows = latSegments + 1;
-	this.indices = this.getIndicesTrianglesRegularNet(numCols, numRows, undefined);
-};
 
-TinTerrain.prototype.getIndicesTrianglesRegularNet = function(numCols, numRows, resultIndicesArray)
-{
-	// given a regular net this function returns triangles indices of the net.
-	var verticesCount = numCols * numRows;
-	var trianglesCount = (numCols-1) * (numRows-1) * 2;
-	if (resultIndicesArray === undefined)
-	{ resultIndicesArray = new Uint16Array(trianglesCount * 3); }
-	
-	var idx_1, idx_2, idx_3;
-	var idxCounter = 0;
-	
-	for (var row = 0; row<numRows-1; row++)
-	{
-		for (var col=0; col<numCols-1; col++)
-		{
-			// there are 2 triangles: triA, triB.
-			idx_1 = VertexMatrix.getIndexOfArray(numCols, numRows, col, row);
-			idx_2 = VertexMatrix.getIndexOfArray(numCols, numRows, col+1, row);
-			idx_3 = VertexMatrix.getIndexOfArray(numCols, numRows, col, row+1);
-			resultIndicesArray[idxCounter] = idx_1; idxCounter++;
-			resultIndicesArray[idxCounter] = idx_2; idxCounter++;
-			resultIndicesArray[idxCounter] = idx_3; idxCounter++;
-			
-			idx_1 = VertexMatrix.getIndexOfArray(numCols, numRows, col+1, row);
-			idx_2 = VertexMatrix.getIndexOfArray(numCols, numRows, col+1, row+1);
-			idx_3 = VertexMatrix.getIndexOfArray(numCols, numRows, col, row+1);
-			resultIndicesArray[idxCounter] = idx_1; idxCounter++;
-			resultIndicesArray[idxCounter] = idx_2; idxCounter++;
-			resultIndicesArray[idxCounter] = idx_3; idxCounter++;
-		}
-	}
-	
-	return resultIndicesArray;
+	this.indices = GeometryUtils.getIndicesTrianglesRegularNet(numCols, numRows, undefined);
+	this.calculateCenterPosition();
 };
 
 TinTerrain.prototype.zigZagDecode = function(value)
@@ -1096,6 +1121,7 @@ TinTerrain.prototype.makeVbo = function(vboMemManager)
 	if (this.texCoordsArray)
 	{
 		// Test modify texCoords here.
+		/*
 		var minLat = this.geographicExtent.minGeographicCoord.latitude;
 		var maxLat = this.geographicExtent.maxGeographicCoord.latitude;
 		var latRange = maxLat - minLat;
@@ -1115,16 +1141,8 @@ TinTerrain.prototype.makeVbo = function(vboMemManager)
 			//this.texCoordsArray[i*2] += this.textureTranslateAndScale.x;
 			//this.texCoordsArray[i*2+1] += this.textureTranslateAndScale.y;
 			
-			// Latitude correction.
-			/*
-			var tCoordY = this.texCoordsArray[i*2+1];
-			var curLat = minLat + tCoordY * latRange;
-			var tan = Math.tan(curLat * Math.PI/180.0);
-			var correctedTexCoordY = (minTan - tan)/tanRange;
-			
-			this.texCoordsArray[i*2+1] = correctedTexCoordY;
-			*/
 		}
+		*/
 		vboKey.setDataArrayTexCoord(this.texCoordsArray, vboMemManager);
 	}
 		

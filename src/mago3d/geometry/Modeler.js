@@ -13,14 +13,100 @@ var Modeler = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
+	/**
+	 * Current modeler's mode. 
+	 * @type {Enumeration}
+	 * @default CODE.modelerMode.INACTIVE
+	 */
 	this.mode = CODE.modelerMode.INACTIVE; // test for the moment.
 	this.drawingState = CODE.modelerDrawingState.NO_STARTED; // test for the moment.
 	this.drawingElement = CODE.modelerDrawingElement.NOTHING; // test for the moment.
+	
+	// Test objects.***
 	this.planeGrid; // sketch plane.
 	this.polyLine2d; // current polyline2D to sketch.
 	this.geoCoordsList; // class: GeographicCoordsList. geographic polyline.
 	this.excavation; // class : Excavation.
 	this.tunnel; // class : Tunnel.
+	this.basicFactorysArray; // class : BasicFactory.
+	this.bSplineCubic3d;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+Modeler.prototype.newBasicFactory = function(attributes) 
+{
+	var factoryWidth = 30; 
+	var factoryLength = 50;
+	var factoryHeight = 15;
+	var options = {
+		"hasGround"       : true,
+		"roofMinHeight"   : 13,
+		"frontDoorWidth"  : 26,
+		"frontDoorHeight" : 12
+	};
+	var basicFactory = new BasicFactory(factoryWidth, factoryLength, factoryHeight, options);
+	basicFactory.bHasGround = true;
+	
+	if (this.basicFactorysArray === undefined)
+	{ this.basicFactorysArray = []; }
+	
+	this.basicFactorysArray.push(basicFactory);
+	
+	return basicFactory;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+Modeler.getExtrudedSolidMesh = function(profile2d, extrusionDist, extrudeSegmentsCount, extrusionVector, bIncludeBottomCap, bIncludeTopCap, resultMesh) 
+{
+	if (profile2d === undefined || extrusionDist === undefined)
+	{ return undefined; }
+	
+	var vtxProfilesList = new VtxProfilesList();
+	
+	// if want caps in the extruded mesh, must calculate "ConvexFacesIndicesData" of the profile2d before creating vtxProfiles.
+	vtxProfilesList.convexFacesIndicesData = profile2d.getConvexFacesIndicesData(undefined);
+	
+	// create vtxProfiles.
+	// make the base-vtxProfile.
+	var baseVtxProfile = vtxProfilesList.newVtxProfile();
+	baseVtxProfile.makeByProfile2D(profile2d);
+	
+	if (extrusionVector === undefined)
+	{ extrusionVector = new Point3D(0, 0, 1); }
+	
+	var increDist = extrusionDist/extrudeSegmentsCount;
+	for (var i=0; i<extrudeSegmentsCount; i++)
+	{
+		// test with a 1 segment extrusion.
+		var nextVtxProfile = vtxProfilesList.newVtxProfile();
+		nextVtxProfile.copyFrom(baseVtxProfile);
+		nextVtxProfile.translate(0, 0, increDist*(i+1));
+	}
+	
+	// must separate vbo groups by surfaces.
+	resultMesh = vtxProfilesList.getMesh(resultMesh, bIncludeBottomCap, bIncludeTopCap);
+	resultMesh.calculateVerticesNormals();
+	
+	return resultMesh;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+Modeler.getExtrudedMesh = function(profile2d, extrusionDist, extrudeSegmentsCount, extrusionVector, bIncludeBottomCap, bIncludeTopCap, resultMesh) 
+{
+	if (profile2d === undefined || extrusionDist === undefined)
+	{ return undefined; }
+
+	var solidMesh = Modeler.getExtrudedSolidMesh(profile2d, extrusionDist, extrudeSegmentsCount, extrusionVector, undefined);
+	resultMesh = solidMesh.getCopySurfaceIndependentMesh(resultMesh);
+	resultMesh.calculateVerticesNormals();
+	
+	return resultMesh;
 };
 
 /**
@@ -71,7 +157,7 @@ Modeler.prototype.addPointToPolyline = function(point2d)
 /**
  * 어떤 일을 하고 있습니까?
  */
-Modeler.prototype.render = function(magoManager, shader, renderType) 
+Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive) 
 {
 	// 1rst, render the planeGrid if exist.
 	if (this.planeGrid !== undefined)
@@ -101,6 +187,22 @@ Modeler.prototype.render = function(magoManager, shader, renderType)
 	{
 		this.tunnel.renderPoints(magoManager, shader, renderType);
 	}
+	
+	if (this.basicFactorysArray !== undefined)
+	{
+		var factoriesCount = this.basicFactorysArray.length;
+		for (var i=0; i<factoriesCount; i++)
+		{
+			this.basicFactorysArray[i].render(magoManager, shader, renderType, glPrimitive);
+		}
+		
+	}
+	
+	if (this.bSplineCubic3d !== undefined)
+	{
+		this.bSplineCubic3d.renderPoints(magoManager, shader, renderType);
+	}
+	
 };
 
 /**

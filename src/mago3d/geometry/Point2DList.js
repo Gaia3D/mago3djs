@@ -388,6 +388,141 @@ Point2DList.prototype.getIndexToInsertBySquaredDist = function(objectsArray, obj
 	}
 };
 
+/**
+ * This function expands a point2dString or point2dRing.
+ * @param {Array} originalPoints2dArray The points2d array that want to expand.
+ * @param {Array} resultPoints2dArray The result points2d array.
+ * @param {Number} leftExpandDist The expansion distance in the left side.
+ * @param {Number} rightExpandDist The expansion distance in the right side.
+ * @param {Boolean} bLoop If true, the points2dArray is a ring, else is a string.
+ * 
+ */
+Point2DList.getExpandedPoints = function(originalPoints2dArray, resultPoints2dArray, leftExpandDist, rightExpandDist, bLoop) 
+{
+	if (originalPoints2dArray === undefined)
+	{ return; }
+
+	if (resultPoints2dArray === undefined)
+	{ resultPoints2dArray = []; }
+	
+	var leftSidePointsArray = [];
+	var rightSidePointsArray = [];
+	
+	var pointsCount = originalPoints2dArray.length;
+	var prevSegment = new Segment2D(undefined, undefined);
+	var currSegment = new Segment2D(undefined, undefined);
+
+	var currIdx;
+	var nextIdx;
+	var prevIdx;
+	
+	var currPoint;
+	var nextPoint;
+	var prevPoint;
+	
+	var currLine;
+	var prevLine;
+	
+	var currLeftLine;
+	var prevLeftLine;
+	
+	var currRightLine;
+	var prevRightLine;
+	
+	var perpendicularLeftLine;
+	
+	if (bLoop === undefined)
+	{ bLoop = false; }
+	
+	if (bLoop)
+	{
+		for (var i=0; i<pointsCount; i++)
+		{
+			// TODO:
+		}
+	}
+	else 
+	{
+		for (var i=0; i<pointsCount; i++)
+		{
+			currPoint = originalPoints2dArray[i];
+			currIdx = i;
+			
+			if (currIdx === 0)
+			{
+				// In this case, translate perpendicularly the original point to left & right side.***
+				nextIdx = GeometryUtils.getNextIdx(currIdx, pointsCount);
+				nextPoint = originalPoints2dArray[nextIdx];
+
+				currSegment.setPoints(currPoint, nextPoint);
+				currLine = currSegment.getLine(currLine);
+				perpendicularLeftLine = currLine.getPerpendicularLeft(); // Must be perpendicular.***
+				
+				// Left side point.***
+				var leftPoint = new Point2D(currPoint.x + perpendicularLeftLine.direction.x*leftExpandDist, currPoint.y + perpendicularLeftLine.direction.y*leftExpandDist);
+				leftSidePointsArray.push(leftPoint);
+				
+				// Right side point.***
+				var rightPoint = new Point2D(currPoint.x - perpendicularLeftLine.direction.x*rightExpandDist, currPoint.y - perpendicularLeftLine.direction.y*rightExpandDist);
+				rightSidePointsArray.push(rightPoint);
+			}
+			else if (currIdx === pointsCount-1)
+			{
+				// In this case, translate perpendicularly the original point to left & right side.***
+				prevIdx = GeometryUtils.getPrevIdx(currIdx, pointsCount);
+				prevPoint = originalPoints2dArray[prevIdx];
+				
+				currSegment.setPoints(prevPoint, currPoint);
+				currLine = currSegment.getLine(currLine);
+				perpendicularLeftLine = currLine.getPerpendicularLeft(); // Must be perpendicular.***
+				
+				// Left side point.***
+				var leftPoint = new Point2D(currPoint.x + perpendicularLeftLine.direction.x*leftExpandDist, currPoint.y + perpendicularLeftLine.direction.y*leftExpandDist);
+				leftSidePointsArray.push(leftPoint);
+				
+				// Right side point.***
+				var rightPoint = new Point2D(currPoint.x - perpendicularLeftLine.direction.x*rightExpandDist, currPoint.y - perpendicularLeftLine.direction.y*rightExpandDist);
+				rightSidePointsArray.push(rightPoint);
+			}
+			else 
+			{
+				nextIdx = GeometryUtils.getNextIdx(currIdx, pointsCount);
+				prevIdx = GeometryUtils.getPrevIdx(currIdx, pointsCount);
+				
+				nextPoint = originalPoints2dArray[nextIdx];
+				prevPoint = originalPoints2dArray[prevIdx];
+				
+				prevSegment.setPoints(prevPoint, currPoint);
+				currSegment.setPoints(currPoint, nextPoint);
+				
+				prevLine = prevSegment.getLine(prevLine);
+				currLine = currSegment.getLine(currLine);
+				
+				// Left side point.***
+				prevLeftLine = prevLine.getParallelLeft(leftExpandDist);
+				currLeftLine = currLine.getParallelLeft(leftExpandDist);
+				
+				var leftPoint = prevLeftLine.intersectionWithLine(currLeftLine, undefined);
+				leftSidePointsArray.push(leftPoint);
+				
+				// Right side point.***
+				prevRightLine = prevLine.getParallelRight(rightExpandDist);
+				currRightLine = currLine.getParallelRight(rightExpandDist);
+				
+				var rightPoint = prevRightLine.intersectionWithLine(currRightLine, undefined);
+				rightSidePointsArray.push(rightPoint);
+			}
+			
+		}
+		
+		// Now, reverse leftSidePointsArray.***
+		leftSidePointsArray.reverse();
+		resultPoints2dArray = leftSidePointsArray.concat(rightSidePointsArray);
+	}
+	
+	return resultPoints2dArray;
+};
+
 
 
 

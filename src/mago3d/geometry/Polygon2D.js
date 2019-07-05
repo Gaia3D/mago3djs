@@ -39,7 +39,7 @@ Polygon2D.prototype.getBoundingRectangle = function(resultBRect)
 /**
  * get the direction of the specific line segment of the edge
  * @param {Number} idx the index of the specific line segment
- * @returns direction	
+ * @returns {Point2D} direction	
  */
 Polygon2D.prototype.getEdgeDirection = function(idx)
 {
@@ -124,11 +124,11 @@ Polygon2D.prototype.calculateNormal = function(resultConcavePointsIdxArray)
 		var prevIdx = this.point2dList.getPrevIdx(i);
 		
 		// get unitari directions of the vertex.
-		var startVec = this.getEdgeDirection(prevIdx); // Point3D.
-		var endVec = this.getEdgeDirection(i); // Point3D.
+		var startVec = this.getEdgeDirection(prevIdx); // Point2D.
+		var endVec = this.getEdgeDirection(i); // Point2D.
 		
 		// calculate the cross product.
-		var crossProd = startVec.crossProduct(endVec, crossProd); // Point3D.
+		var crossProd = startVec.crossProduct(endVec, crossProd); // Point2D.
 		var scalarProd = startVec.scalarProduct(endVec);
 		
 		if (crossProd < 0.0) 
@@ -265,7 +265,7 @@ Polygon2D.prototype.tessellate = function(concaveVerticesIndices, convexPolygons
 };
 /**
  * Check whether the given segment cut a polygon edges or is coincident with a polygon's vertex 
- * @param segment the target segement
+ * @param {Segment2D} segment the target segement
  * */
 Polygon2D.prototype.intersectionWithSegment = function(segment)
 {
@@ -292,13 +292,15 @@ Polygon2D.prototype.intersectionWithSegment = function(segment)
 			continue;
 		}
 		
-		if (segment.intersectionWithSegment(mySegment, error))
+		var intersectionType = segment.intersectionWithSegment(mySegment, error);
+		
+		if (intersectionType === Constant.INTERSECTION_INTERSECT)
 		{
 			return true;
 		}
 	}
 	
-	return false;
+	return false; 
 };
 
 /**

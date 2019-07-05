@@ -15,6 +15,20 @@ var MagoWorld = function(magoManager)
 	}
 	
 	this.magoManager = magoManager;
+	
+	// Set the start position of the camera.***
+	/*
+	var camera = this.magoManager.sceneState.camera;
+	var rotMat = new Matrix4();
+	var angRad = 45 * Math.PI/180;
+	var rotAxis = new Point3D();
+	rotAxis.set(1, 0, 1);
+	rotAxis.unitary();
+	rotMat.rotationAxisAngRad(angRad, rotAxis.x, rotAxis.y, rotAxis.z);
+	camera.transformByMatrix4(rotMat);
+
+	this.updateModelViewMatrixByCamera(camera);
+	*/
 };
 
 /**
@@ -200,15 +214,30 @@ MagoWorld.prototype.mouseup = function(event)
 	magoManager.isCameraMoving = false;
 	
 	// Check time to check if is a "click".***
+	/*
 	var date = new Date();
 	var currTime = date.getTime();
 	var mouseAction = magoManager.sceneState.mouseAction;
 	var durationTime = currTime - mouseAction.strTime;
 	if (durationTime < 200)
 	{
+		// Check if mouse moved.***
+		var mouseAction = this.magoManager.sceneState.mouseAction;
+
+		// now, calculate the angle and the rotationAxis.
+		var xMoved = event.clientX - mouseAction.strX;
+		if (Math.abs(xMoved) > 2)
+		{ return; }
+		
+		var yMoved = event.clientY - mouseAction.strY;
+		if (Math.abs(yMoved) > 2)
+		{ return; }
+		
+		// Considere as "click".***
 		magoManager.bPicking = true;
 		magoManager.managePickingProcess();
 	}
+	*/
 };
 
 /**
@@ -253,7 +282,11 @@ MagoWorld.prototype.mousewheel = function(event)
 	delta *= (camHeght*camHeght) * 0.00001 + camHeght * 0.001;
 	delta += 1;
 	
-	var maxDelta = 200000;
+	//var maxDelta = 200000;
+	var maxDelta = 0.5*camHeght;
+	if (maxDelta > 200000)
+	{ maxDelta = 200000; }
+	
 	if (delta < -maxDelta)
 	{ delta = -maxDelta; }
 	

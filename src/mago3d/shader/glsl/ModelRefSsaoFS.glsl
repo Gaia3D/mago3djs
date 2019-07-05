@@ -75,7 +75,7 @@ void main()
 		vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));
 		vec3 bitangent = cross(normal2, tangent);
 		mat3 tbn = mat3(tangent, bitangent, normal2);        
-		
+
 		for(int i = 0; i < kernelSize; ++i)
 		{    	 
 			vec3 sample = origin + (tbn * kernel[i]) * radius;
@@ -83,11 +83,18 @@ void main()
 			offset.xy /= offset.w;
 			offset.xy = offset.xy * 0.5 + 0.5;        
 			float sampleDepth = -sample.z/far;
+			float realLinearDepth = linearDepth * far;
+			
 			if(sampleDepth > 0.49)
 				continue;
-			float depthBufferValue = getDepth(offset.xy);				              
-			float range_check = abs(linearDepth - depthBufferValue)+radius*0.998;
-			if (range_check < radius*1.001 && depthBufferValue <= sampleDepth)
+			float depthBufferValue = getDepth(offset.xy);	
+			
+			float range_check = abs(linearDepth - depthBufferValue);
+			if(range_check > 0.000000001 && range_check < 0.00000007)
+			{
+				continue;
+			}
+			else if (depthBufferValue <= sampleDepth)
 			{
 				occlusion +=  1.0;
 			}
