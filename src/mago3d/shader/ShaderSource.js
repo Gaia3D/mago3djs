@@ -1488,8 +1488,7 @@ void main()\n\
 		gl_PointSize = 2.0;\n\
 		\n\
 	glPointSize = gl_PointSize;\n\
-}\n\
-";
+}";
 ShaderSource.PointCloudVS_rainbow = "attribute vec3 position;\n\
 attribute vec3 normal;\n\
 attribute vec2 texCoord;\n\

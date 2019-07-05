@@ -67,7 +67,7 @@ CODE.units = {
 CODE.trackMode = {
 	"TRACKING" : 0,
 	"DRIVER"   : 1
-}
+};
 
 CODE.imageryType = {
 	"UNKNOWN"      : 0,
