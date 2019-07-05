@@ -1065,6 +1065,8 @@ uniform bool bUse1Color;\n\
 uniform vec4 oneColor4;\n\
 uniform float fixPointSize;\n\
 uniform float maxPointSize;\n\
+uniform float minPointSize;\n\
+uniform float pendentPointSize;\n\
 uniform bool bUseFixPointSize;\n\
 varying vec4 vColor;\n\
 //varying float glPointSize;\n\
@@ -1101,14 +1103,15 @@ void main()\n\
 	float z_b = gl_Position.z/gl_Position.w;\n\
 	float z_n = 2.0 * z_b - 1.0;\n\
     float z_e = 2.0 * near * far / (far + near - z_n * (far - near));\n\
-	gl_PointSize = 1.0 + 40.0/z_e; // Original.***\n\
-	if(gl_PointSize > maxPointSize)\n\
-		gl_PointSize = maxPointSize;\n\
+	gl_PointSize = minPointSize + pendentPointSize/z_e; // Original.***\n\
+    if(gl_PointSize > maxPointSize)\n\
+        gl_PointSize = maxPointSize;\n\
 	if(gl_PointSize < 2.0)\n\
 		gl_PointSize = 2.0;\n\
 		\n\
 	depth = (modelViewMatrixRelToEye * pos).z/far; // original.***\n\
-}";
+}\n\
+";
 ShaderSource.PointCloudFS = "	precision lowp float;\n\
 	varying vec4 vColor;\n\
 \n\
@@ -1433,6 +1436,8 @@ uniform bool bUse1Color;\n\
 uniform vec4 oneColor4;\n\
 uniform float fixPointSize;\n\
 uniform float maxPointSize;\n\
+uniform float minPointSize;\n\
+uniform float pendentPointSize;\n\
 uniform bool bUseFixPointSize;\n\
 uniform bool bUseColorCodingByHeight;\n\
 varying vec4 vColor;\n\
@@ -1469,14 +1474,15 @@ void main()\n\
 	float z_b = gl_Position.z/gl_Position.w;\n\
 	float z_n = 2.0 * z_b - 1.0;\n\
     float z_e = 2.0 * near * far / (far + near - z_n * (far - near));\n\
-	gl_PointSize = 1.0 + 40.0/z_e; // Original.***\n\
-	if(gl_PointSize > maxPointSize)\n\
-		gl_PointSize = maxPointSize;\n\
+	gl_PointSize = minPointSize + pendentPointSize/z_e; // Original.***\n\
+    if(gl_PointSize > maxPointSize)\n\
+        gl_PointSize = maxPointSize;\n\
 	if(gl_PointSize < 2.0)\n\
 		gl_PointSize = 2.0;\n\
 		\n\
 	glPointSize = gl_PointSize;\n\
-}";
+}\n\
+";
 ShaderSource.PointCloudVS_rainbow = "attribute vec3 position;\n\
 attribute vec3 normal;\n\
 attribute vec2 texCoord;\n\
@@ -1496,6 +1502,8 @@ uniform bool bUse1Color;\n\
 uniform vec4 oneColor4;\n\
 uniform float fixPointSize;\n\
 uniform float maxPointSize;\n\
+uniform float minPointSize;\n\
+uniform float pendentPointSize;\n\
 uniform bool bUseFixPointSize;\n\
 varying vec4 vColor;\n\
 varying float glPointSize;\n\
@@ -1533,14 +1541,15 @@ void main()\n\
 	float z_b = gl_Position.z/gl_Position.w;\n\
 	float z_n = 2.0 * z_b - 1.0;\n\
     float z_e = 2.0 * near * far / (far + near - z_n * (far - near));\n\
-	gl_PointSize = 1.0 + 40.0/z_e; // Original.***\n\
-	if(gl_PointSize > maxPointSize)\n\
-		gl_PointSize = maxPointSize;\n\
-	if(gl_PointSize < 2.0)\n\
-		gl_PointSize = 2.0;\n\
-		\n\
-	glPointSize = gl_PointSize;\n\
-}";
+    gl_PointSize = minPointSize + pendentPointSize/z_e; // Original.***\n\
+    if(gl_PointSize > maxPointSize)\n\
+        gl_PointSize = maxPointSize;\n\
+    if(gl_PointSize < 2.0)\n\
+        gl_PointSize = 2.0;\n\
+        \n\
+    glPointSize = gl_PointSize;\n\
+}\n\
+";
 ShaderSource.quad_vert = "precision mediump float;\n\
 \n\
 attribute vec2 a_pos;\n\

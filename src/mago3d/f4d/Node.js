@@ -54,6 +54,30 @@ Node.prototype.isReferenceNode = function()
 };
 
 /**
+ * get node state of rander
+ * @return {boolean} return this node is ready to render
+ */
+Node.prototype.isReadyToRender = function()
+{
+	var geoLocDataManager = this.getNodeGeoLocDataManager();
+	if (geoLocDataManager === undefined)
+	{ return false; }
+	var geoLocData = geoLocDataManager.getCurrentGeoLocationData();
+	if (geoLocData === undefined)
+	{ return false; }
+	var geoCoords = geoLocData.getGeographicCoords();
+	if (geoCoords === undefined)
+	{ return false; } 
+	
+	if (geoCoords.longitude === undefined || geoCoords.latitude === undefined || geoCoords.altitude === undefined)
+	{
+		return false;
+	}
+
+	return true;
+};
+
+/**
  * Deletes all datas and all datas of children.
  */
 Node.prototype.deleteObjects = function(gl, vboMemoryManager) 
@@ -318,6 +342,11 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	var neoBuilding = this.data.neoBuilding;
 	if (neoBuilding === undefined)
 	{ return; }
+
+	if (data.attributes && data.attributes.isVisible !== undefined && data.attributes.isVisible === false) 
+	{
+		return;
+	}
 
 	// Check if we are under selected data structure.***
 	var selectionManager = magoManager.selectionManager;
@@ -720,6 +749,10 @@ Node.prototype.finishedAnimation = function(magoManager)
 	if (animData === undefined)
 	{ return true; }
 
+	//애니메이션 종료시 true 반환. 
+	if (animData.finished)
+	{ return true; }
+
 	if (animData.startLongitude === undefined || animData.startLatitude === undefined || animData.startAltitude === undefined)
 	{ return true; }
 	
@@ -730,9 +763,13 @@ Node.prototype.finishedAnimation = function(magoManager)
 	
 	var totalDeltaTime = (currTime - animData.birthTime)/1000.0; // in seconds.
 
+	//최종 위치 및 회전
 	var nextLongitude;
 	var nextLatitude;
 	var nextAltitude;
+	var nextHeading;
+	var nextPitch;
+	var nextRoll;
 	
 	// calculate velocity.
 	var velocityLon = (animData.targetLongitude - animData.startLongitude)/(animData.durationInSeconds);
@@ -756,6 +793,10 @@ Node.prototype.finishedAnimation = function(magoManager)
 		nextLongitude = animData.targetLongitude;
 		nextLatitude = animData.targetLatitude;
 		nextAltitude = animData.targetAltitude;
+
+		nextHeading = animData.targetHeading;
+		nextPitch = animData.targetPitch;
+		nextRoll = animData.targetRoll;
 		
 		// finish the process.
 		finished = true;
@@ -763,6 +804,23 @@ Node.prototype.finishedAnimation = function(magoManager)
 	}
 	else
 	{
+		var ratio = totalDeltaTime/animData.durationInSeconds;
+		var completeHeadingRatio = 0.3;
+		if (ratio > completeHeadingRatio)
+		{
+			nextHeading = animData.targetHeading;
+			nextPitch = animData.targetPitch;
+			nextRoll = animData.targetRoll;
+		}
+		else 
+		{
+			var diffHeading = (animData.targetHeading - animData.startHeading);
+			nextHeading = animData.startHeading + diffHeading * ratio / completeHeadingRatio;
+			nextPitch = animData.startPitch;
+			nextRoll = animData.startRoll;
+		}
+
+
 		// calculate by durationInSeconds.
 		var targetLongitude = animData.targetLongitude;
 		var targetLatitude = animData.targetLatitude;
@@ -776,8 +834,7 @@ Node.prototype.finishedAnimation = function(magoManager)
 		animData.lastTime = currTime;
 		finished = false;
 	}
-
-	this.changeLocationAndRotation(nextLatitude, nextLongitude, nextAltitude, geoLocationData.heading, geoLocationData.pitch, geoLocationData.roll, magoManager);
+	this.changeLocationAndRotation(nextLatitude, nextLongitude, nextAltitude, nextHeading, nextPitch, nextRoll, magoManager);
 	
 	return finished;
 };
@@ -794,7 +851,6 @@ Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude,
 	
 	var animData = this.data.animationData;
 	animData.finished = false;
-	animData.birthTime = magoManager.getCurrentTime();
 	
 	var geoLocDataManager = this.getNodeGeoLocDataManager();
 	if (geoLocDataManager === undefined)
@@ -802,22 +858,51 @@ Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude,
 	var geoLocData = geoLocDataManager.getCurrentGeoLocationData();
 	if (geoLocData === undefined)
 	{ return; }
+	var prevGeoLocData = geoLocDataManager.getGeoLocationData(1);
+	if (prevGeoLocData === undefined)
+	{ prevGeoLocData = geoLocDataManager.getCurrentGeoLocationData(); }
 	var geoCoords = geoLocData.getGeographicCoords();
 	if (geoCoords === undefined)
 	{ return; } 
 	
-	if (!geoCoords.longitude || !geoCoords.latitude || !geoCoords.altitude)
-	{
-		return;
-	}
 	if (geoCoords.longitude === undefined || geoCoords.latitude === undefined || geoCoords.altitude === undefined)
 	{
 		return;
 	}
+	
+	// Check if the target location is equal to the current location.***
+	// 대상 정지 시 gps 신호가 고르지 않아 일정 길이 이하의 차이 일 시 움직이지 않는다.
+	var lonDiff = geoCoords.longitude - longitude;
+	var latDiff = geoCoords.latitude - latitude; 
+	var altDiff = geoCoords.altitude - elevation;
+
+	var geoDist = Math.sqrt(lonDiff*lonDiff + latDiff*latDiff);
+	var errTolerance = 0.000065;//0.000056;	
+	if (geoDist < errTolerance)
+	{
+		animData.finished = true;
+		return;
+	}
+	animData.birthTime = magoManager.getCurrentTime();
 	// start location.***
 	animData.startLongitude = geoCoords.longitude;
 	animData.startLatitude = geoCoords.latitude;
 	animData.startAltitude = geoCoords.altitude;
+
+
+	while (geoLocData.heading > 360) 
+	{
+		geoLocData.heading -= 360;
+	}
+
+	while (geoLocData.heading < -360) 
+	{
+		geoLocData.heading += 360;
+	}
+
+	animData.startHeading = geoLocData.heading;
+	animData.startPitch = geoLocData.pitch;
+	animData.startRoll = geoLocData.roll;
 	
 	// target location.
 	animData.targetLongitude = longitude;
@@ -830,13 +915,13 @@ Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude,
 	var currAltitude = geoCoords.altitude;
 
 	// target rotation.
-	animData.targetHeading = heading;
+	animData.targetHeading = heading*1;
 	animData.targetPitch = pitch;
 	animData.targetRoll = roll;
 
-	geoLocData.heading = animData.targetHeading;
-	geoLocData.pitch = animData.targetPitch;
-	geoLocData.roll = animData.targetRoll;
+	//geoLocData.heading = animData.targetHeading;
+	//geoLocData.pitch = animData.targetPitch;
+	//geoLocData.roll = animData.targetRoll;
 
 	//Duration For compatibility with lower versions, lower version parameter is just duratiuon(number).
 	var isAnimOption = typeof animationOption === 'object' && isNaN(animationOption);
@@ -852,25 +937,87 @@ Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude,
 			var nextPos = Globe.geographicToCartesianWgs84(animData.targetLongitude, animData.targetLatitude, animData.targetAltitude, undefined);
 			var nextPoint3d = new Point3D(nextPos[0], nextPos[1], nextPos[2]);
 			var relativeNextPos;
-			relativeNextPos = geoLocData.getTransformedRelativePositionNoApplyHeadingPitchRoll(nextPoint3d, relativeNextPos);
+			relativeNextPos = prevGeoLocData.getTransformedRelativePositionNoApplyHeadingPitchRoll(nextPoint3d, relativeNextPos);
+
 			relativeNextPos.unitary();
 			var yAxis = new Point2D(0, 1);
-			var nextPos2d = new Point2D(relativeNextPos.x, relativeNextPos.y);
+
+
+			var relNextPos2D = new Point2D(relativeNextPos.x, relativeNextPos.y);
+			relNextPos2D.unitary();
 			
-			var headingAngle = yAxis.angleDegToVector(nextPos2d);
-			if (relativeNextPos.x > 0.0)
+			
+			var headingAngle = yAxis.angleDegToVector(relNextPos2D);
+			if (relativeNextPos.x > 0)
 			{
 				headingAngle *= -1;
 			}
+			//if (headingAngle < 0) { headingAngle += 360; }
+
+			//var diffAngle = headingAngle - animData.startHeading;
+			if (headingAngle > 180)
+			{ headingAngle -= 360; }
+			else if (headingAngle < 180)
+			{ headingAngle += 360; }
 			
 			// calculate heading (initially yAxis to north).
-			var nextHeading = headingAngle;
+			var nextHeading = headingAngle;//Math.atan(-relativeNextPos.x/relativeNextPos.y)*180.0/Math.PI;
 			var nextPosModule2d = Math.sqrt(relativeNextPos.x*relativeNextPos.x + relativeNextPos.y*relativeNextPos.y);
-			var nextPitch = Math.atan(relativeNextPos.z/nextPosModule2d)*180.0/Math.PI;
-			
-			geoLocData.heading = nextHeading;
-			geoLocData.pitch = nextPitch;
-			geoLocData.roll = animData.targetRoll;
+			var nextPitch = 0;//Math.atan(relativeNextPos.z/nextPosModule2d)*180.0/Math.PI;
+
+
+			while (nextHeading > 360) 
+			{
+				nextHeading -= 360;
+			}
+
+			while (nextHeading < -360) 
+			{
+				nextHeading += 360;
+			}
+
+			var diffHeading = (nextHeading - animData.startHeading);
+			if (diffHeading > 180) 
+			{
+				nextHeading -= 360;
+			}
+			else if (diffHeading < -180) 
+			{
+				nextHeading += 360;
+			}
+
+			if (geoDist < errTolerance*1.5 && relNextPos2D.y < 0.1)
+			{
+				nextHeading = animData.startHeading;
+			}
+
+			animData.targetHeading = nextHeading;
+			animData.targetPitch = nextPitch;
+			// roll is always zero.
+			animData.targetRoll = roll;  
+		}
+		else 
+		{
+			while (heading > 360) 
+			{
+				heading -= 360;
+			}
+
+			while (heading < -360) 
+			{
+				heading += 360;
+			}
+
+			var diffHeading = (heading - animData.startHeading);
+			if (diffHeading > 180) 
+			{
+				heading -= 360;
+			}
+			else if (diffHeading < -180) 
+			{
+				heading += 360;
+			}
+			animData.targetHeading = heading*1;
 		}
 	}
 	else
@@ -907,10 +1054,11 @@ Node.prototype.changeLocationAndRotation = function(latitude, longitude, elevati
 	
 	if (nodeRoot === undefined)
 	{ return; }
-
-	if (nodeRoot.data.bbox === undefined)
-	{ return; }
 	
+	if (!nodeRoot.data.bbox)
+	{
+		return;
+	}
 	// now, extract all buildings of the nodeRoot.
 	var nodesArray = [];
 	nodeRoot.extractNodesByDataName(nodesArray, "neoBuilding");
