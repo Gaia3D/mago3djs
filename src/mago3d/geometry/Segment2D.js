@@ -257,8 +257,7 @@ Segment2D.prototype.intersectionWithSegment = function(segment, error)
 	
 	var intersectionTypeA = this.intersectionWithPointByDistances(intersectionPoint);
 	var intersectionTypeB = segment.intersectionWithPointByDistances(intersectionPoint);
-	//TODO : change the logic. The return value of intersectionWithPointByDistance has four enum type
-	//But the value really used is only one or two. 
+	
 	if (intersectionTypeA === Constant.INTERSECTION_OUTSIDE)
 	{
 		return Constant.INTERSECTION_OUTSIDE;
