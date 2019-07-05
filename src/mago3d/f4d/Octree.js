@@ -448,7 +448,7 @@ Octree.prototype.prepareSkinData = function(magoManager)
 				// Direct loading.
 				if (neoBuilding.simpleBuilding3x3Texture !== undefined && neoBuilding.simpleBuilding3x3Texture.fileLoadState === CODE.fileLoadState.READY)
 				{ 
-					magoManager.readerWriter.readLegoSimpleBuildingTexture(gl, texFilePath, neoBuilding.simpleBuilding3x3Texture, magoManager); 
+					magoManager.readerWriter.readLegoSimpleBuildingTexture(gl, texFilePath, neoBuilding.simpleBuilding3x3Texture, magoManager);  
 				}
 				
 				magoManager.readerWriter.getOctreeLegoArraybuffer(filePathInServer, this, magoManager);
@@ -463,6 +463,10 @@ Octree.prototype.prepareSkinData = function(magoManager)
 		}
 		else 
 		{
+			var flip_y_texCoords = true;
+			if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
+			{ flip_y_texCoords = false; }
+		
 			// This is the version 001.
 			if (neoBuilding.simpleBuilding3x3Texture === undefined)
 			{
@@ -475,7 +479,7 @@ Octree.prototype.prepareSkinData = function(magoManager)
 			// Direct loading.
 			if (neoBuilding.simpleBuilding3x3Texture !== undefined && neoBuilding.simpleBuilding3x3Texture.fileLoadState === CODE.fileLoadState.READY)
 			{ 
-				magoManager.readerWriter.readLegoSimpleBuildingTexture(gl, texFilePath, neoBuilding.simpleBuilding3x3Texture, magoManager); 
+				magoManager.readerWriter.readLegoSimpleBuildingTexture(gl, texFilePath, neoBuilding.simpleBuilding3x3Texture, magoManager, flip_y_texCoords); 
 			}
 			
 			magoManager.readerWriter.getOctreeLegoArraybuffer(filePathInServer, this, magoManager);
@@ -805,6 +809,7 @@ Octree.prototype.preparePCloudData = function(magoManager)
 				{
 					var gl = magoManager.sceneState.gl;
 					pCloudPartition.parsePointsCloudData(pCloudPartition.dataArrayBuffer, gl, magoManager);
+					pCloudPartition.dataArrayBuffer = undefined;
 					magoManager.parseQueue.pCloudPartitionsParsed++;
 				}
 			}

@@ -48,6 +48,40 @@ Line2D.prototype.getPerpendicularRight = function(point)
 	return perpendicular;
 };
 
+/** 
+ * Get a parallel line, in the right side, separated a dist.
+ * @param {Number} dist Distance 
+ * @returns {Line2D} Parallel line.
+ */
+Line2D.prototype.getParallelRight = function(dist) 
+{
+	var perpendicularRight = this.getPerpendicularRight();
+	var perpendicularDir = perpendicularRight.direction;
+	
+	var parallelRight = new Line2D();
+	var point = parallelRight.point;
+	point.set(this.point.x + perpendicularDir.x*dist, this.point.y + perpendicularDir.y*dist);
+	parallelRight.direction.copyFrom(this.direction);
+	return parallelRight;
+};
+
+/** 
+ * Get a parallel line, in the left side, separated a dist.
+ * @param {Number} dist Distance 
+ * @returns {Line2D} Parallel line.
+ */
+Line2D.prototype.getParallelLeft = function(dist) 
+{
+	var perpendicularLeft = this.getPerpendicularLeft();
+	var perpendicularDir = perpendicularLeft.direction;
+	
+	var parallelLeft = new Line2D();
+	var point = parallelLeft.point;
+	point.set(this.point.x + perpendicularDir.x*dist, this.point.y + perpendicularDir.y*dist);
+	parallelLeft.direction.copyFrom(this.direction);
+	return parallelLeft;
+};
+
 /**
  * Get the perpendicular direction of the line in left-handed coordinate system
  * @param {Point2D} pointt target point

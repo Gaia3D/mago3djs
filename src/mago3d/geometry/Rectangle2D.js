@@ -29,6 +29,30 @@ var Rectangle2D = function()
 	 * @type {Number}
 	 */
 	this.height;
+	
+	/**
+	 * minimum x position of rectangle
+	 * @type {Number}
+	 */
+	this.minX;
+	
+	/**
+	 * minimum y position of rectangle
+	 * @type {Number}
+	 */
+	this.minY;
+	
+	/**
+	 * maximum x position of rectangle
+	 * @type {Number}
+	 */
+	this.maxX;
+	
+	/**
+	 * maximum y position of rectangle
+	 * @type {Number}
+	 */
+	this.maxY;
 };
 
 /**
@@ -46,6 +70,21 @@ Rectangle2D.prototype.setCenterPosition = function(cx, cy)
 
 /**
  * rectangle의 가로,세로 길이 설정
+ * @param {number} minX
+ * @param {number} minY
+ * @param {number} maxX
+ * @param {number} maxY
+ */
+Rectangle2D.prototype.setExtension = function(minX, minY, maxX, maxY)
+{
+	this.minX = minX;
+	this.minY = minY;
+	this.maxX = maxX;
+	this.maxY = maxY;
+};
+
+/**
+ * rectangle의 가로,세로 길이 설정
  * @param {number} width
  * @param {number} height
  */
@@ -55,22 +94,53 @@ Rectangle2D.prototype.setDimensions = function(width, height)
 	this.height = height;
 };
 
-Rectangle2D.prototype.getCenterPosition = function(){
+Rectangle2D.prototype.getCenterPosition = function()
+{
 	return this.centerPoint;
 };
 
-Rectangle2D.prototype.getWidth = function(){
+Rectangle2D.prototype.getWidth = function()
+{
 	return this.width;
 };
 
-Rectangle2D.prototype.getHeight = function(){
+Rectangle2D.prototype.getHeight = function()
+{
 	return this.height;
 };
 
 /**
+ * Returns the right up point.
+ * @param {Point2D|undefined} resultPoint if this undefined, then create new Point2D.
+ * @returns {Point2D|undefined} resultPoint
+ */
+Rectangle2D.prototype.getMaxPoint = function(resultPoint)
+{
+	if (resultPoint === undefined)
+	{ resultPoint = new Point2D(); }
+	
+	resultPoint.set(this.maxX, this.maxY);
+	return resultPoint;
+};
+
+/**
+ * Returns the left down point.
+ * @param {Point2D|undefined} resultPoint if this undefined, then create new Point2D.
+ * @returns {Point2D|undefined} resultPoint
+ */
+Rectangle2D.prototype.getMinPoint = function(resultPoint)
+{
+	if (resultPoint === undefined)
+	{ resultPoint = new Point2D(); }
+	
+	resultPoint.set(this.minX, this.minY);
+	return resultPoint;
+};
+
+/**
  * Returns the points of the Rectangle.
- * @param {Array.<Point3D>|undefined} resultPointsArray if this undefined, set new Array. []
- * @returns {Array.<Point3D>} resultPointsArray rectangle의 꼭지점 반환, 중심점으로부터 가로,세로의 절반 만큼 떨어진 4점을 반환
+ * @param {Array.<Point2D>|undefined} resultPointsArray if this undefined, set new Array. []
+ * @returns {Array.<Point2D>} resultPointsArray rectangle의 꼭지점 반환, 중심점으로부터 가로,세로의 절반 만큼 떨어진 4점을 반환
  */
 Rectangle2D.prototype.getPoints = function(resultPointsArray)
 {

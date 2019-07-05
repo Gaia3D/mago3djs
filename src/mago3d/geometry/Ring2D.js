@@ -24,8 +24,10 @@ var Ring2D = function()
 	this.polygon = undefined;
 };
 
-Ring2D.prototype.getElement = function(index){
-	if(this.elemsArray.length == 0){
+Ring2D.prototype.getElement = function(index)
+{
+	if (this.elemsArray.length === 0)
+	{
 		return null;
 	}
 	return this.elemsArray[index];
@@ -48,6 +50,16 @@ Ring2D.prototype.deleteObjects = function()
 	}
 	
 	this.polygon = undefined;
+};
+
+/**
+ * Adds a curve.
+ * 
+ * @param {Curve} elem Some curve (ARC, CIRCLE, POLYLINE, RECTANGLE, STAR, etc).
+ */
+Ring2D.prototype.addElement = function(elem)
+{
+	this.elemsArray.push(elem);
 };
 
 /**

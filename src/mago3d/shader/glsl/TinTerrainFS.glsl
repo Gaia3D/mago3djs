@@ -5,7 +5,6 @@
 uniform sampler2D depthTex;
 uniform sampler2D noiseTex;  
 uniform sampler2D diffuseTex;
-uniform bool hasTexture;
 uniform bool textureFlipYAxis;
 uniform bool bIsMakingDepth;
 varying vec3 vNormal;
@@ -20,7 +19,9 @@ uniform float screenWidth;
 uniform float screenHeight;    
 uniform float shininessValue;
 uniform vec3 kernel[16];   
-uniform vec4 vColor4Aux;
+
+uniform vec4 oneColor4;
+uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.
 
 varying vec2 vTexCoord;   
 varying vec3 vLightWeighting;
@@ -36,6 +37,7 @@ uniform float radius;
 uniform float ambientReflectionCoef;
 uniform float diffuseReflectionCoef;  
 uniform float specularReflectionCoef; 
+uniform float externalAlpha;
 
 float unpackDepth(const in vec4 rgba_depth)
 {
@@ -75,7 +77,16 @@ void main()
 	}
 	else{
 		vec4 textureColor;
-		if(hasTexture)
+		if(colorType == 0)
+		{
+			textureColor = oneColor4;
+			
+			if(textureColor.w == 0.0)
+			{
+				discard;
+			}
+		}
+		else if(colorType == 2)
 		{
 			if(textureFlipYAxis)
 			{
@@ -91,9 +102,9 @@ void main()
 			}
 		}
 		else{
-			textureColor = vColor4Aux;
+			textureColor = oneColor4;
 		}
 		//vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);
-		gl_FragColor = vec4(textureColor.xyz, 1.0); 
+		gl_FragColor = vec4(textureColor.xyz, externalAlpha); 
 	}
 }

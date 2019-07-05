@@ -5,9 +5,17 @@ describe("SmartTile 테스트", function ()
 	var smartTile;
 	var testTileName = 'testTile';
 	var magoManager = new MagoManager();
-	var minGeographicCoord = new GeographicCoord(-180, -90, 0);
-	var maxGeographicCoord = new GeographicCoord(0, 90, 0);
 
+	var minLongitude = -180;
+	var minLatitude = -90;
+	var minAltitude = 0;
+
+	var maxLongitude = 0;
+	var maxLatitude = 90;
+	var maxAltitude = 0;
+
+	var minGeographicCoord = new GeographicCoord(minLongitude, minLatitude, minAltitude);
+	var maxGeographicCoord = new GeographicCoord(maxLongitude, maxLatitude, maxAltitude);
 
 	var midLongitude = -90; //(maxGeographicCoord.longitude + minGeographicCoord.longitude)/2;
 	var midLatitude = 0;//(maxGeographicCoord.latitude + minGeographicCoord.latitude)/2;
@@ -71,6 +79,74 @@ describe("SmartTile 테스트", function ()
 					expect(resultSphereExtent.r).toEqual(expectR);
 				});
 			});
+		});
+
+		describe('newSubTile(parentTile)', function ()
+		{
+			beforeEach(function()
+			{
+				smartTile = new SmartTile(testTileName);
+				smartTile.depth = 0;
+			});
+			describe('서브타일 생성 시', function() 
+			{
+				it('정상적인 부모타일이 들어왔을 때, depth가  정상적으로 추가되는지 체크', function ()
+				{
+					var subTile = smartTile.newSubTile(smartTile);
+					expect(subTile.depth).toEqual(smartTile.depth+1);
+				});
+
+				it('비정상적인 부모타일(SmartTile형태가 아닌)이 들어왔을 때, 밸리데이션이 작동하는지?', function ()
+				{
+					var garbage = [undefined, null, 'a', 1, {}, []];
+					for (var i=0, len = garbage.length; i<len; i++)
+					{
+						expect(function()
+						{
+							smartTile.newSubTile(garbage[i]);
+						}).withContext('밸리데이션 코드 추가.').not.toThrowError(TypeError);
+					}
+				});
+				// TODO : 
+				// it('비정상적인 부모타일(depth가 없음)이 들어왔을 때, 밸리데이션이 작동하는지?', function ()
+				// {});
+				// it('비정상적인 부모타일(targetDepth가 없음)이 들어왔을 때, 밸리데이션이 작동하는지?', function ()
+				// {});
+			});
+		});
+
+		describe('setSizesToSubTiles()', function ()
+		{
+			beforeEach(function()
+			{
+				smartTile = new SmartTile(testTileName);
+				smartTile.depth = 0;
+				smartTile.targetDepth = 17;
+				smartTile.setSize(minLongitude, minLatitude, minAltitude, maxLongitude, maxLatitude, maxAltitude);
+
+				smartTile.newSubTile(smartTile);
+				smartTile.newSubTile(smartTile);
+			});
+			describe('서브타일 영역 계산 시', function() 
+			{
+				it('서브타일의 갯수가 4개가 아닐 시, 밸리데이션이 존재하는지?', function ()
+				{
+					expect(function()
+					{
+						smartTile.setSizesToSubTiles();
+					}).toThrowError(Error, 'When subTiles length is 4, setSizesToSubTiles is ok.');
+				});
+			});
+		});
+
+		describe('intersectsNode()', function ()
+		{
+			
+		});
+
+		describe('intersectPoint()', function ()
+		{
+			
 		});
 	});
 });

@@ -39,7 +39,9 @@ CODE.modelerMode = {
 	"DRAWING_GEOGRAPHICPOINTS" : 3,
 	"DRAWING_EXCAVATIONPOINTS" : 4,
 	"DRAWING_TUNNELPOINTS"     : 5,
-	"DRAWING_STATICGEOMETRY"   : 6
+	"DRAWING_BSPLINE"          : 6,
+	"DRAWING_BASICFACTORY"     : 7,
+	"DRAWING_STATICGEOMETRY"   : 8
 };
 
 CODE.modelerDrawingState = {
@@ -59,6 +61,18 @@ CODE.units = {
 	"METRE"  : 0,
 	"DEGREE" : 1,
 	"RADIAN" : 2
+};
+
+
+CODE.trackMode = {
+	"TRACKING" : 0,
+	"DRIVER"   : 1
+};
+
+CODE.imageryType = {
+	"UNKNOWN"      : 0,
+	"CRS84"        : 1,
+	"WEB_MERCATOR" : 2
 };
 
 CODE.PROJECT_ID_PREFIX = "projectId_";

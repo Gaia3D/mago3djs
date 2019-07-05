@@ -472,7 +472,385 @@
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
+},
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "Sangam_Testbed_ Supplement_1",
+    "data_name": "Sangam_Testbed_ Supplement_1",
+    "mapping_type":"origin",
+    "longitude": 126.881483,
+    "latitude": 37.583204,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
 }
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "Sangam_Testbed_ Supplement_10",
+    "data_name": "Sangam_Testbed_ Supplement_10",
+    "mapping_type":"origin",
+    "longitude": 126.890369,
+    "latitude": 37.577877,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "Sangam_Testbed_ Supplement_11",
+    "data_name": "Sangam_Testbed_ Supplement_11",
+    "mapping_type":"origin",
+    "longitude": 126.890975,
+    "latitude": 37.578524,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "Sangam_Testbed_ Supplement_12",
+    "data_name": "Sangam_Testbed_ Supplement_12",
+    "mapping_type":"origin",
+    "longitude": 126.892707,
+    "latitude": 37.577428,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "Sangam_Testbed_ Supplement_13",
+    "data_name": "Sangam_Testbed_ Supplement_13",
+    "mapping_type":"origin",
+    "longitude": 126.892185,
+    "latitude": 37.576846,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "Sangam_Testbed_ Supplement_14",
+    "data_name": "Sangam_Testbed_ Supplement_14",
+    "mapping_type":"origin",
+    "longitude": 126.894104,
+    "latitude": 37.576455,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "Sangam_Testbed_ Supplement_15",
+    "data_name": "Sangam_Testbed_ Supplement_15",
+    "mapping_type":"origin",
+    "longitude": 126.894536,
+    "latitude": 37.575489,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "Sangam_Testbed_ Supplement_16",
+    "data_name": "Sangam_Testbed_ Supplement_16",
+    "mapping_type":"origin",
+    "longitude": 126.895711,
+    "latitude": 37.575536,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "Sangam_Testbed_ Supplement_17",
+    "data_name": "Sangam_Testbed_ Supplement_17",
+    "mapping_type":"origin",
+    "longitude": 126.897362,
+    "latitude": 37.574519,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "Sangam_Testbed_ Supplement_18",
+    "data_name": "Sangam_Testbed_ Supplement_18",
+    "mapping_type":"origin",
+    "longitude": 126.898199,
+    "latitude": 37.573384,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "Sangam_Testbed_ Supplement_19",
+    "data_name": "Sangam_Testbed_ Supplement_19",
+    "mapping_type":"origin",
+    "longitude": 126.898978,
+    "latitude": 37.573027,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "Sangam_Testbed_ Supplement_2",
+    "data_name": "Sangam_Testbed_ Supplement_2",
+    "mapping_type":"origin",
+    "longitude": 126.882206,
+    "latitude": 37.583543,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "Sangam_Testbed_ Supplement_20",
+    "data_name": "Sangam_Testbed_ Supplement_20",
+    "mapping_type":"origin",
+    "longitude": 126.899407,
+    "latitude": 37.573438,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "Sangam_Testbed_ Supplement_21",
+    "data_name": "Sangam_Testbed_ Supplement_21",
+    "mapping_type":"origin",
+    "longitude": 126.898772,
+    "latitude": 37.573697,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "Sangam_Testbed_ Supplement_3",
+    "data_name": "Sangam_Testbed_ Supplement_3",
+    "mapping_type":"origin",
+    "longitude": 126.884198,
+    "latitude": 37.582405,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "Sangam_Testbed_ Supplement_4",
+    "data_name": "Sangam_Testbed_ Supplement_4",
+    "mapping_type":"origin",
+    "longitude": 126.885285,
+    "latitude": 37.581781,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "Sangam_Testbed_ Supplement_5",
+    "data_name": "Sangam_Testbed_ Supplement_5",
+    "mapping_type":"origin",
+    "longitude": 126.884687,
+    "latitude": 37.581235,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "Sangam_Testbed_ Supplement_6",
+    "data_name": "Sangam_Testbed_ Supplement_6",
+    "mapping_type":"origin",
+    "longitude": 126.886268,
+    "latitude": 37.581141,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "Sangam_Testbed_ Supplement_7",
+    "data_name": "Sangam_Testbed_ Supplement_7",
+    "mapping_type":"origin",
+    "longitude": 126.887170,
+    "latitude": 37.580617,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "Sangam_Testbed_ Supplement_8",
+    "data_name": "Sangam_Testbed_ Supplement_8",
+    "mapping_type":"origin",
+    "longitude": 126.888154,
+    "latitude": 37.580053,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "Sangam_Testbed_ Supplement_9",
+    "data_name": "Sangam_Testbed_ Supplement_9",
+    "mapping_type":"origin",
+    "longitude": 126.887661,
+    "latitude": 37.579521,
+    "height": 0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+
 
 
 

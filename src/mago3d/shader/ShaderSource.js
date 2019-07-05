@@ -834,7 +834,7 @@ void main()\n\
 		vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
 		vec3 bitangent = cross(normal2, tangent);\n\
 		mat3 tbn = mat3(tangent, bitangent, normal2);        \n\
-		\n\
+\n\
 		for(int i = 0; i < kernelSize; ++i)\n\
 		{    	 \n\
 			vec3 sample = origin + (tbn * kernel[i]) * radius;\n\
@@ -842,11 +842,18 @@ void main()\n\
 			offset.xy /= offset.w;\n\
 			offset.xy = offset.xy * 0.5 + 0.5;        \n\
 			float sampleDepth = -sample.z/far;\n\
+			float realLinearDepth = linearDepth * far;\n\
+			\n\
 			if(sampleDepth > 0.49)\n\
 				continue;\n\
-			float depthBufferValue = getDepth(offset.xy);				              \n\
-			float range_check = abs(linearDepth - depthBufferValue)+radius*0.998;\n\
-			if (range_check < radius*1.001 && depthBufferValue <= sampleDepth)\n\
+			float depthBufferValue = getDepth(offset.xy);	\n\
+			\n\
+			float range_check = abs(linearDepth - depthBufferValue);\n\
+			if(range_check > 0.000000001 && range_check < 0.00000007)\n\
+			{\n\
+				continue;\n\
+			}\n\
+			else if (depthBufferValue <= sampleDepth)\n\
 			{\n\
 				occlusion +=  1.0;\n\
 			}\n\
@@ -1065,6 +1072,8 @@ uniform bool bUse1Color;\n\
 uniform vec4 oneColor4;\n\
 uniform float fixPointSize;\n\
 uniform float maxPointSize;\n\
+uniform float minPointSize;\n\
+uniform float pendentPointSize;\n\
 uniform bool bUseFixPointSize;\n\
 varying vec4 vColor;\n\
 //varying float glPointSize;\n\
@@ -1101,14 +1110,15 @@ void main()\n\
 	float z_b = gl_Position.z/gl_Position.w;\n\
 	float z_n = 2.0 * z_b - 1.0;\n\
     float z_e = 2.0 * near * far / (far + near - z_n * (far - near));\n\
-	gl_PointSize = 1.0 + 40.0/z_e; // Original.***\n\
-	if(gl_PointSize > maxPointSize)\n\
-		gl_PointSize = maxPointSize;\n\
+	gl_PointSize = minPointSize + pendentPointSize/z_e; // Original.***\n\
+    if(gl_PointSize > maxPointSize)\n\
+        gl_PointSize = maxPointSize;\n\
 	if(gl_PointSize < 2.0)\n\
 		gl_PointSize = 2.0;\n\
 		\n\
 	depth = (modelViewMatrixRelToEye * pos).z/far; // original.***\n\
-}";
+}\n\
+";
 ShaderSource.PointCloudFS = "	precision lowp float;\n\
 	varying vec4 vColor;\n\
 \n\
@@ -1433,6 +1443,8 @@ uniform bool bUse1Color;\n\
 uniform vec4 oneColor4;\n\
 uniform float fixPointSize;\n\
 uniform float maxPointSize;\n\
+uniform float minPointSize;\n\
+uniform float pendentPointSize;\n\
 uniform bool bUseFixPointSize;\n\
 uniform bool bUseColorCodingByHeight;\n\
 varying vec4 vColor;\n\
@@ -1469,9 +1481,9 @@ void main()\n\
 	float z_b = gl_Position.z/gl_Position.w;\n\
 	float z_n = 2.0 * z_b - 1.0;\n\
     float z_e = 2.0 * near * far / (far + near - z_n * (far - near));\n\
-	gl_PointSize = 1.0 + 40.0/z_e; // Original.***\n\
-	if(gl_PointSize > maxPointSize)\n\
-		gl_PointSize = maxPointSize;\n\
+	gl_PointSize = minPointSize + pendentPointSize/z_e; // Original.***\n\
+    if(gl_PointSize > maxPointSize)\n\
+        gl_PointSize = maxPointSize;\n\
 	if(gl_PointSize < 2.0)\n\
 		gl_PointSize = 2.0;\n\
 		\n\
@@ -1496,6 +1508,8 @@ uniform bool bUse1Color;\n\
 uniform vec4 oneColor4;\n\
 uniform float fixPointSize;\n\
 uniform float maxPointSize;\n\
+uniform float minPointSize;\n\
+uniform float pendentPointSize;\n\
 uniform bool bUseFixPointSize;\n\
 varying vec4 vColor;\n\
 varying float glPointSize;\n\
@@ -1533,14 +1547,15 @@ void main()\n\
 	float z_b = gl_Position.z/gl_Position.w;\n\
 	float z_n = 2.0 * z_b - 1.0;\n\
     float z_e = 2.0 * near * far / (far + near - z_n * (far - near));\n\
-	gl_PointSize = 1.0 + 40.0/z_e; // Original.***\n\
-	if(gl_PointSize > maxPointSize)\n\
-		gl_PointSize = maxPointSize;\n\
-	if(gl_PointSize < 2.0)\n\
-		gl_PointSize = 2.0;\n\
-		\n\
-	glPointSize = gl_PointSize;\n\
-}";
+    gl_PointSize = minPointSize + pendentPointSize/z_e; // Original.***\n\
+    if(gl_PointSize > maxPointSize)\n\
+        gl_PointSize = maxPointSize;\n\
+    if(gl_PointSize < 2.0)\n\
+        gl_PointSize = 2.0;\n\
+        \n\
+    glPointSize = gl_PointSize;\n\
+}\n\
+";
 ShaderSource.quad_vert = "precision mediump float;\n\
 \n\
 attribute vec2 a_pos;\n\
@@ -1886,7 +1901,6 @@ ShaderSource.TinTerrainFS = "#ifdef GL_ES\n\
 uniform sampler2D depthTex;\n\
 uniform sampler2D noiseTex;  \n\
 uniform sampler2D diffuseTex;\n\
-uniform bool hasTexture;\n\
 uniform bool textureFlipYAxis;\n\
 uniform bool bIsMakingDepth;\n\
 varying vec3 vNormal;\n\
@@ -1901,7 +1915,9 @@ uniform float screenWidth;    \n\
 uniform float screenHeight;    \n\
 uniform float shininessValue;\n\
 uniform vec3 kernel[16];   \n\
-uniform vec4 vColor4Aux;\n\
+\n\
+uniform vec4 oneColor4;\n\
+uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
 \n\
 varying vec2 vTexCoord;   \n\
 varying vec3 vLightWeighting;\n\
@@ -1917,6 +1933,7 @@ uniform float radius;      \n\
 uniform float ambientReflectionCoef;\n\
 uniform float diffuseReflectionCoef;  \n\
 uniform float specularReflectionCoef; \n\
+uniform float externalAlpha;\n\
 \n\
 float unpackDepth(const in vec4 rgba_depth)\n\
 {\n\
@@ -1956,7 +1973,16 @@ void main()\n\
 	}\n\
 	else{\n\
 		vec4 textureColor;\n\
-		if(hasTexture)\n\
+		if(colorType == 0)\n\
+		{\n\
+			textureColor = oneColor4;\n\
+			\n\
+			if(textureColor.w == 0.0)\n\
+			{\n\
+				discard;\n\
+			}\n\
+		}\n\
+		else if(colorType == 2)\n\
 		{\n\
 			if(textureFlipYAxis)\n\
 			{\n\
@@ -1972,10 +1998,10 @@ void main()\n\
 			}\n\
 		}\n\
 		else{\n\
-			textureColor = vColor4Aux;\n\
+			textureColor = oneColor4;\n\
 		}\n\
 		//vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);\n\
-		gl_FragColor = vec4(textureColor.xyz, 1.0); \n\
+		gl_FragColor = vec4(textureColor.xyz, externalAlpha); \n\
 	}\n\
 }";
 ShaderSource.TinTerrainVS = "attribute vec3 position;\n\
