@@ -714,17 +714,34 @@ function addStaticModelAPI(managerFactoryInstance, attributes)
 }
 
 /**
+ * 트래킹 옵션.
+ * @typedef {Object} trackOption
+ * @property {number} type Required.  if not define, default value is CODE.trackMode.TRACKING. 0 : CODE.trackMode.TRACKING, 1 : CODE.trackMode.DRIVER
+ * @property {number} targetOffset if type is 1 (CODE.trackMode.DRIVER), use this offset. Default is 10.0;
+ * @property {trackCameraOffset} trackCameraOffset if type is 1 (CODE.trackMode.DRIVER), use this.
+ */
+
+/**
+ * 트래킹 카메라 옵셋 
+ * @typedef {Object} trackCameraOffset
+ * @property {number} y Default is -1;
+ * @property {number} z Default is 12;
+ */
+
+/**
  * set track target node.
  * @param {ManagerFactory} managerFactoryInstance
  * @param {string} projectId project primary key
  * @param {string} dataKey data key
+ * @param {trackOption} option Optional. 비어있을 시 TRACKING 모드로 설정
  */
-function setTrackNodeAPI(managerFactoryInstance, projectId, dataKey)
+function setTrackNodeAPI(managerFactoryInstance, projectId, dataKey, option)
 {
 	var api = new Mago3D.API("setTrackNode");
 	
 	api.setProjectId(projectId);
 	api.setDataKey(dataKey);
+	api.setTrackOption(option);
 	managerFactoryInstance.callAPI(api);
 }
 
@@ -767,4 +784,36 @@ function isExistDataAPI(managerFactoryInstance, projectId, dataKey)
 	api.setProjectId(projectId);
 	api.setDataKey(dataKey);
 	return managerFactoryInstance.callAPI(api);
+}
+
+/**
+ * check data is ready to render
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {string} projectId project primary key
+ * @param {string} dataKey data key
+ * @return {Boolean} is ready to render 
+ */
+function isDataReadyToRenderAPI(managerFactoryInstance, projectId, dataKey)
+{
+	var api = new Mago3D.API("isDataReadyToRender");
+	api.setReturnable(true);
+	api.setProjectId(projectId);
+	api.setDataKey(dataKey);
+	return managerFactoryInstance.callAPI(api);
+}
+
+/**
+ * check data is ready to render
+ * @param {ManagerFactory} managerFactoryInstance
+ * @param {string} projectId project primary key
+ * @param {string} dataKey data key
+ * @param {nodeAttribute} option data key
+ */
+function setNodeAttributeAPI(managerFactoryInstance, projectId, dataKey, option)
+{
+	var api = new Mago3D.API("setNodeAttribute");
+	api.setProjectId(projectId);
+	api.setDataKey(dataKey);
+	api.setNodeAttribute(option);
+	managerFactoryInstance.callAPI(api);
 }
