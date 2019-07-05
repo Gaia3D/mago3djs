@@ -77,14 +77,12 @@ ManagerUtils.translatePivotPointGeoLocationData = function(geoLocationData, newP
  * @param {Matrix4|undefined} resultGeoLocMatrix. Optional. result geolocation matrix. if undefined, create Matrix4 instance.
  * @returns {Matrix4} resultGeoLocMatrix. this matrix has NO heading, pitch or roll rotations.
  */
-ManagerUtils.calculateGeoLocationMatrixAtWorldPosition = function(worldPosition, resultGeoLocMatrix, magoManager) 
+ManagerUtils.calculateGeoLocationMatrixAtWorldPosition = function(worldPosition, resultGeoLocMatrix) 
 {
 	if (resultGeoLocMatrix === undefined)
 	{ resultGeoLocMatrix = new Matrix4(); }
 
-	if (magoManager.globe === undefined)
-	{ magoManager.globe = new Globe(); }
-	magoManager.globe.transformMatrixAtCartesianPointWgs84(worldPosition.x, worldPosition.y, worldPosition.z, resultGeoLocMatrix._floatArrays);
+	Globe.transformMatrixAtCartesianPointWgs84(worldPosition.x, worldPosition.y, worldPosition.z, resultGeoLocMatrix._floatArrays);
 	
 	return resultGeoLocMatrix;
 };
@@ -97,13 +95,13 @@ ManagerUtils.calculateGeoLocationMatrixAtWorldPosition = function(worldPosition,
  * @param {Matrix4|undefined} resultGeoLocMatrix. Optional. result geolocation matrix. if undefined, create Matrix4 instance.
  * @returns {Matrix4} resultGeoLocMatrix. this matrix has NO heading, pitch or roll rotations.
  */
-ManagerUtils.calculateGeoLocationMatrixAtLonLatAlt = function(longitude, latitude, altitude, resultGeoLocMatrix, magoManager) 
+ManagerUtils.calculateGeoLocationMatrixAtLonLatAlt = function(longitude, latitude, altitude, resultGeoLocMatrix) 
 {
 	if (resultGeoLocMatrix === undefined)
 	{ resultGeoLocMatrix = new Matrix4(); }
 	
-	var worldPosition = this.geographicCoordToWorldPoint(longitude, latitude, altitude, worldPosition, magoManager);
-	resultGeoLocMatrix = ManagerUtils.calculateGeoLocationMatrixAtWorldPosition(worldPosition, resultGeoLocMatrix, magoManager);
+	var worldPosition = this.geographicCoordToWorldPoint(longitude, latitude, altitude, worldPosition);
+	resultGeoLocMatrix = ManagerUtils.calculateGeoLocationMatrixAtWorldPosition(worldPosition, resultGeoLocMatrix);
 	
 	return resultGeoLocMatrix;
 };
@@ -118,7 +116,7 @@ ManagerUtils.calculateGeoLocationMatrixAtLonLatAlt = function(longitude, latitud
  * @param {Matrix4|undefined} resultTransformMatrix. Optional. result transform matrix. if undefined, create Matrix4 instance. this matrix including the heading, pitch, roll rotations.
  * @returns {Matrix4} resultTransformMatrix.
  */
-ManagerUtils.calculateTransformMatrixAtWorldPosition = function(worldPosition, heading, pitch, roll, resultGeoLocMatrix, resultTransformMatrix, magoManager) 
+ManagerUtils.calculateTransformMatrixAtWorldPosition = function(worldPosition, heading, pitch, roll, resultGeoLocMatrix, resultTransformMatrix) 
 {
 	var xRotMatrix = new Matrix4();  // created as identity matrix.
 	var yRotMatrix = new Matrix4();  // created as identity matrix.
@@ -140,7 +138,7 @@ ManagerUtils.calculateTransformMatrixAtWorldPosition = function(worldPosition, h
 	{ resultTransformMatrix = new Matrix4(); }  // created as identity matrix.
 
 	// 1rst, calculate the transformation matrix for the location.
-	resultGeoLocMatrix = ManagerUtils.calculateGeoLocationMatrixAtWorldPosition(worldPosition, resultGeoLocMatrix, magoManager);
+	resultGeoLocMatrix = ManagerUtils.calculateGeoLocationMatrixAtWorldPosition(worldPosition, resultGeoLocMatrix);
 	
 	resultTransformMatrix.copyFromMatrix4(resultGeoLocMatrix);
 	var zRotatedTMatrix;
@@ -206,7 +204,7 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 	if (magoManager.configInformation === undefined)
 	{ return; }
 
-	resultGeoLocationData.position = this.geographicCoordToWorldPoint(longitude, latitude, altitude, resultGeoLocationData.position, magoManager);
+	resultGeoLocationData.position = this.geographicCoordToWorldPoint(longitude, latitude, altitude, resultGeoLocationData.position);
 
 	// High and Low values of the position.**
 	if (resultGeoLocationData.positionHIGH === undefined)
@@ -241,7 +239,7 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 
 	// 1rst, calculate the transformation matrix for the location.
 	resultGeoLocationData.tMatrix = ManagerUtils.calculateTransformMatrixAtWorldPosition(resultGeoLocationData.position, resultGeoLocationData.heading, resultGeoLocationData.pitch, resultGeoLocationData.roll, 
-		resultGeoLocationData.geoLocMatrix, resultGeoLocationData.tMatrix, magoManager);
+		resultGeoLocationData.geoLocMatrix, resultGeoLocationData.tMatrix);
 	resultGeoLocationData.rotMatrix.copyFromMatrix4(resultGeoLocationData.tMatrix);
 	resultGeoLocationData.rotMatrix._floatArrays[12] = 0;
 	resultGeoLocationData.rotMatrix._floatArrays[13] = 0;

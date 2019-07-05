@@ -229,12 +229,22 @@ Camera.prototype.getDirty = function()
  */
 Camera.prototype.isCameraMoved = function(newPosX, newPosY, newPosZ, newDirX, newDirY, newDirZ, newUpX, newUpY, newUpZ )
 {
-	if (this.position.x === newPosX && this.position.y === newPosY && this.position.z === newPosZ && 
-		this.direction.x === newDirX && this.direction.y === newDirY && this.direction.z === newDirZ && 
-		this.up.x === newUpX && this.up.y === newUpY && this.up.z === newUpZ)
-	{ return false; }
-	else
+	var positionError = 10E-4;
+	var pos = this.position;
+	if (Math.abs(pos.x - newPosX) > positionError || Math.abs(pos.y - newPosY) > positionError || Math.abs(pos.z - newPosZ) > positionError )
 	{ return true; }
+	
+	var directionError = 10E-6;
+	var dir = this.direction;
+	if (Math.abs(dir.x - newDirX) > positionError || Math.abs(dir.y - newDirY) > positionError || Math.abs(dir.z - newDirZ) > directionError )
+	{ return true; }
+	
+	var up = this.up;
+	if (Math.abs(up.x - newUpX) > positionError || Math.abs(up.y - newUpY) > positionError || Math.abs(up.z - newUpZ) > directionError )
+	{ return true; }
+	
+	return false;
+	
 };
 
 /**
@@ -337,7 +347,7 @@ Camera.prototype.setCurrentFrustum = function(frustumIdx)
  * @param {gl} GL 
  * @param {shader} shader 
  */
-Camera.prototype.bindCameraUniforms = function(gl, shader) 
+Camera.prototype.bindUniforms = function(gl, shader) 
 {
 	// Bind frustum near & far. far.
 	var frustum = this.frustum;
@@ -359,8 +369,8 @@ Camera.prototype.calculateFrustumsPlanes = function()
 	frustum0 = this.getFrustum(0);
 	var nearHeight = frustum0.tangentOfHalfFovy * frustum0.near * 2;
 	var farHeight = frustum0.tangentOfHalfFovy * frustum0.far * 2;
-	var nearWidth = nearHeight * frustum0.aspectRatio;
-	var farWidht = farHeight * frustum0.aspectRatio;
+	var nearWidth = nearHeight * frustum0.aspectRatio[0];
+	var farWidht = farHeight * frustum0.aspectRatio[0];
 	
 	var px = this.position.x;
 	var py = this.position.y;

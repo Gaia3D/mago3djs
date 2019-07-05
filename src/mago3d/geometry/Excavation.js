@@ -3,7 +3,7 @@
 
 
 /**
- * 어떤 일을 하고 있습니까?
+ * This class draws an excavation on the grown.
  * @class Excavation
  */
 var Excavation = function() 
@@ -13,7 +13,13 @@ var Excavation = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	this.geoCoordsList; // class : GeographicCoordsList.
+	/**
+	 * The geographic points that conforms the excavation border.
+	 * @type {GeographicCoordsList}
+	 * @default undefined
+	 */
+	this.geoCoordsList; 
+	
 	this.geoLocDataManager;
 	this.excavationDepthInMeters;
 	

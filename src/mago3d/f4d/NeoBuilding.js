@@ -914,7 +914,11 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 			lowLodMesh.texture = new Texture();
 			var filePath_inServer = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + textureFileName;
 			var gl = magoManager.sceneState.gl;
-			magoManager.readerWriter.readLegoSimpleBuildingTexture(gl, filePath_inServer, lowLodMesh.texture, magoManager); 
+			var flip_y_texCoords = true;
+			if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
+			{ flip_y_texCoords = false; }
+		
+			magoManager.readerWriter.readLegoSimpleBuildingTexture(gl, filePath_inServer, lowLodMesh.texture, magoManager, flip_y_texCoords); 
 		}
 	}
 	

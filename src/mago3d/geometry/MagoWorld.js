@@ -15,6 +15,20 @@ var MagoWorld = function(magoManager)
 	}
 	
 	this.magoManager = magoManager;
+	
+	// Set the start position of the camera.***
+	/*
+	var camera = this.magoManager.sceneState.camera;
+	var rotMat = new Matrix4();
+	var angRad = 45 * Math.PI/180;
+	var rotAxis = new Point3D();
+	rotAxis.set(1, 0, 1);
+	rotAxis.unitary();
+	rotMat.rotationAxisAngRad(angRad, rotAxis.x, rotAxis.y, rotAxis.z);
+	camera.transformByMatrix4(rotMat);
+
+	this.updateModelViewMatrixByCamera(camera);
+	*/
 };
 
 /**
@@ -94,6 +108,8 @@ MagoWorld.prototype.mousedown = function(event)
 	this.magoManager.sceneState.mouseButton = event.button;
 	MagoWorld.updateMouseStartClick(event.clientX, event.clientY, this.magoManager);
 	this.magoManager.isCameraMoving = true;
+	this.magoManager.mouse_x = event.clientX;
+	this.magoManager.mouse_y = event.clientY;
 	
 };
 
@@ -124,6 +140,9 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 	var mouseAction = magoManager.sceneState.mouseAction;
 	
 	MagoWorld.updateMouseClick(mouseX, mouseY, magoManager);
+	
+	var date = new Date();
+	mouseAction.strTime = date.getTime();
 	
 	// if button = 1 (middleButton), then rotate camera.
 	mouseAction.strX = mouseX;
@@ -189,9 +208,36 @@ MagoWorld.prototype.updateModelViewMatrixByCamera = function(camera)
  */
 MagoWorld.prototype.mouseup = function(event)
 {
-	this.magoManager.sceneState.mouseButton = -1;
-	this.magoManager.bPicking = false;
-	this.magoManager.isCameraMoving = false;
+	var magoManager = this.magoManager;
+	magoManager.sceneState.mouseButton = -1;
+	magoManager.bPicking = false;
+	magoManager.isCameraMoving = false;
+	
+	// Check time to check if is a "click".***
+	/*
+	var date = new Date();
+	var currTime = date.getTime();
+	var mouseAction = magoManager.sceneState.mouseAction;
+	var durationTime = currTime - mouseAction.strTime;
+	if (durationTime < 200)
+	{
+		// Check if mouse moved.***
+		var mouseAction = this.magoManager.sceneState.mouseAction;
+
+		// now, calculate the angle and the rotationAxis.
+		var xMoved = event.clientX - mouseAction.strX;
+		if (Math.abs(xMoved) > 2)
+		{ return; }
+		
+		var yMoved = event.clientY - mouseAction.strY;
+		if (Math.abs(yMoved) > 2)
+		{ return; }
+		
+		// Considere as "click".***
+		magoManager.bPicking = true;
+		magoManager.managePickingProcess();
+	}
+	*/
 };
 
 /**
@@ -236,7 +282,11 @@ MagoWorld.prototype.mousewheel = function(event)
 	delta *= (camHeght*camHeght) * 0.00001 + camHeght * 0.001;
 	delta += 1;
 	
-	var maxDelta = 200000;
+	//var maxDelta = 200000;
+	var maxDelta = 0.5*camHeght;
+	if (maxDelta > 200000)
+	{ maxDelta = 200000; }
+	
 	if (delta < -maxDelta)
 	{ delta = -maxDelta; }
 	

@@ -102,5 +102,18 @@
   "site_name": "Mago3D",
   "site_admin_mobile_phone": "000-0000-0000",
   "site_admin_email": "test@test.com",
-  "insert_date": "2017-06-07 10:31:03.049862"
+  "insert_date": "2017-06-07 10:31:03.049862",
+  "max_partitions_lod0": 8,
+	"max_partitions_lod1": 4,
+	"max_partitions_lod2_or_less": 1,
+	"max_per_unit_points_render_dist_to_cam_0m": 5,
+	"max_per_unit_points_render_dist_to_cam_100m": 120,
+	"max_per_unit_points_render_dist_to_cam_200m": 240,
+	"max_per_unit_points_render_dist_to_cam_400m": 480,
+	"max_per_unit_points_render_dist_to_cam_800m": 960,
+	"max_per_unit_points_render_dist_to_cam_1600m": 1920,
+	"max_per_unit_points_render_dist_to_cam_more_than_1600m": 3840,
+	"max_point_size_for_pc": 40.0,
+	"min_point_size_for_pc": 2.0,
+	"pendent_point_size_for_pc": 40.0
 }

@@ -110,6 +110,13 @@ var MouseAction = function()
 	this.camRotAxis = new Point3D();
 	
 	/**
+	 * Time in the start moment.
+	 * @type {Number}
+	 * @default undefined.
+	 */
+	this.strTime;
+	
+	/**
 	 * Aux var. Start click point in world coordinates.
 	 * @type {Point3D}
 	 * @default (0,0,0).

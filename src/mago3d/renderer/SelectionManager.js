@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * SelectionManager
+ * SelectionManager. This class manages the selection process and the selection candidates.
  * 
  * @alias SelectionManager
  * @class SelectionManager
@@ -13,24 +13,24 @@ var SelectionManager = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	// Default f4d objectsMap.
-	this.referencesMap = {};
-	this.octreesMap = {};
-	this.buildingsMap = {};
-	this.nodesMap = {};
-	
-	this.currentReferenceSelected;
-	this.currentOctreeSelected;
-	this.currentBuildingSelected;
-	this.currentNodeSelected;
-	
-	// Custom candidates.
-	this.selCandidatesFamilyMap = {};
-	
-	// General candidates.
+	// General candidates. 
 	this.selCandidatesMap = {};
 	this.currentGeneralObjectSelected;
 	
+	// Default f4d objectsMap. // Deprecated.
+	this.referencesMap = {}; // Deprecated.
+	this.octreesMap = {}; // Deprecated.
+	this.buildingsMap = {}; // Deprecated.
+	this.nodesMap = {}; // Deprecated.
+	
+	this.currentReferenceSelected; // Deprecated.
+	this.currentOctreeSelected; // Deprecated.
+	this.currentBuildingSelected; // Deprecated.
+	this.currentNodeSelected; // Deprecated.
+	
+	// Custom candidates.
+	this.selCandidatesFamilyMap = {};
+
 	// Parameter that indicates that we are rendering selected data structure.
 	this.parentSelected = false;
 };
@@ -76,7 +76,7 @@ SelectionManager.prototype.setCandidateCustom = function(idxKey, familyName, obj
 };
 
 /**
- * SelectionManager
+ * SelectionManager. Recomended. Use this for all selection process.
  * 
  * @alias SelectionManager
  * @class SelectionManager

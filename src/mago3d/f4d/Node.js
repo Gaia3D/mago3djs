@@ -338,8 +338,16 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	var data = this.data;
 	if (data === undefined)
 	{ return; }
+
+	// Check if there are renderables.***
+	var renderable = data.renderable;
+	if (renderable)
+	{
+		renderable.render(magoManager, shader, renderType);
+		return;
+	}
 	
-	var neoBuilding = this.data.neoBuilding;
+	var neoBuilding = data.neoBuilding;
 	if (neoBuilding === undefined)
 	{ return; }
 
@@ -591,6 +599,7 @@ Node.prototype.getBBox = function()
 			var metaData = neoBuilding.metaData;
 			data.bbox = new BoundingBox(); // Only create a node's bbox when exist neoBuilding's metaData.
 			data.bbox.copyFrom(metaData.bbox);
+			bbox = data.bbox;
 		}
 		else if (data.buildingSeed !== undefined)
 		{
@@ -603,7 +612,7 @@ Node.prototype.getBBox = function()
 		bbox = data.bbox;
 	}
 	
-	return data.bbox;
+	return bbox;
 };
 
 /**

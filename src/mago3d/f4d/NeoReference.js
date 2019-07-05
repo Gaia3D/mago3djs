@@ -180,6 +180,9 @@ NeoReference.prototype.getBlendAlpha = function(currTime)
 	{
 		if (this.birthTime === undefined)
 		{ this.birthTime = currTime; }
+	
+		if (this.blendAlpha === undefined)
+		{ this.blendAlpha = 0.0; }
 		
 		var increAlpha = (currTime - this.birthTime)*0.0001;
 		this.blendAlpha += increAlpha;

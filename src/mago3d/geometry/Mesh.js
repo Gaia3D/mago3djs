@@ -15,6 +15,7 @@ var Mesh = function()
 	
 	//the list of the Surface features
 	this.surfacesArray;
+	this.color4;
 
 	this.hedgesList;
 	
@@ -312,6 +313,30 @@ Mesh.prototype.getVertexList = function()
 };
 
 /**
+ * Rotates this mesh specified angle by "angDeg" in (axisX, axisY, axisZ) axis.
+ * @param {Number} angDeg Angle in degrees to rotate this mesh.
+ * @param {Number} axisX X component of the rotation axis.
+ * @param {Number} axisY Y component of the rotation axis.
+ * @param {Number} axisZ Z component of the rotation axis.
+ */
+Mesh.prototype.rotate = function(angDeg, axisX, axisY, axisZ)
+{
+	var rotMat = new Matrix4();
+	var quaternion = new Quaternion();
+	
+	// Note: the axisX, axisY, axisZ must be unitary, but to be safe process, force rotationAxis to be unitary.*** 
+	var rotAxis = new Point3D(axisX, axisY, axisZ);
+	rotAxis.unitary();
+
+	// calculate rotation.
+	quaternion.rotationAngDeg(angDeg, rotAxis.x, rotAxis.y, rotAxis.z);
+	rotMat.rotationByQuaternion(quaternion);
+	
+	this.transformByMatrix4(rotMat);
+	
+};
+
+/**
  * Transformate this mesh by the input 4x4 matrix
  * @param {Matrix4} transformByMatrix4
  */
@@ -395,6 +420,7 @@ Mesh.prototype.calculateTexCoordsSpherical = function()
  */
 Mesh.prototype.setColor = function(r, g, b, a)
 {
+	// This function sets vertices colors.***
 	var surface;
 	var surfacesCount = this.getSurfacesCount();
 	for (var i=0; i<surfacesCount; i++)
@@ -402,6 +428,22 @@ Mesh.prototype.setColor = function(r, g, b, a)
 		surface = this.getSurface(i);
 		surface.setColor(r, g, b, a);
 	}
+};
+
+/**
+ * Set the unique one color of the mesh
+ * @param {Number} r
+ * @param {Number} g
+ * @param {Number} b 
+ * @param {Number} a
+ */
+Mesh.prototype.setOneColor = function(r, g, b, a)
+{
+	// This function sets the unique one color of the mesh.***
+	if (this.color4 === undefined)
+	{ this.color4 = new Color(); }
+	
+	this.color4.setRGBA(r, g, b, a);
 };
 
 /**
@@ -573,6 +615,9 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 	
 	var gl = magoManager.sceneState.gl;
 	var primitive;
+	
+	if (this.color4)
+	{ gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 1.0]); }
 	
 	var vboKeysCount = this.vboKeysContainer.vboCacheKeysArray.length;
 	for (var i=0; i<vboKeysCount; i++)
