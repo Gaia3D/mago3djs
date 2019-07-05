@@ -187,7 +187,7 @@ Line2D.prototype.intersectionWithLine = function(line, resultIntersectPoint)
 			var mySlope = this.direction.y / this.direction.x;
 			var myB = this.point.y - mySlope * this.point.x;
 			intersectX = line.point.x;
-			intersectY = line.point.x * mySlope + myB;
+			intersectY = intersectX * mySlope + myB;
 		}
 		else 
 		{
