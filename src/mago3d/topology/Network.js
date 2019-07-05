@@ -2,7 +2,7 @@
 
 /**
  * Network.
- * IndoorGML의 네트워크를 파싱하고 그리는 데 사용합니다.
+ * 
  * @alias Network
  * @class Network
  */
@@ -116,10 +116,9 @@ Network.prototype.test__makeVbos = function(magoManager)
 };
 
 /**
- * Make triangle from IndoorGML data
- * @param magoManager
- * @param gmlDataContainer 
- * 
+ * start rendering.
+ * @param scene 변수
+ * @param isLastFrustum 변수
  */
 Network.prototype.parseTopologyData = function(magoManager, gmlDataContainer) 
 {
