@@ -1075,6 +1075,19 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 	
 	this.cartesiansArray = Globe.geographicRadianArrayToFloat32ArrayWgs84(lonArray, latArray, altArray, this.cartesiansArray);
 	
+	// Make normals using the cartesians.***
+	this.normalsArray = new Int8Array(vertexCount*3);
+	var point = new Point3D();
+	for (var i=0; i<vertexCount; i++)
+	{
+		point.set(this.cartesiansArray[i*3], this.cartesiansArray[i*3+1], this.cartesiansArray[i*3+2]);
+		point.unitary();
+		
+		this.normalsArray[i*3] = point.x*255;
+		this.normalsArray[i*3+1] = point.y*255;
+		this.normalsArray[i*3+2] = point.z*255;
+	}
+	
 	// finally make indicesArray.
 	var numCols = lonSegments + 1;
 	var numRows = latSegments + 1;
@@ -1092,7 +1105,7 @@ TinTerrain.prototype.makeVbo = function(vboMemManager)
 {
 	if (this.cartesiansArray === undefined)
 	{ return; }
-	
+
 	// rest the CenterPosition to the this.cartesiansArray.
 	var coordsCount = this.cartesiansArray.length/3;
 	for (var i=0; i<coordsCount; i++)
@@ -1116,6 +1129,12 @@ TinTerrain.prototype.makeVbo = function(vboMemManager)
 	
 	// Positions.
 	vboKey.setDataArrayPos(this.cartesiansArray, vboMemManager);
+	
+	// Normals.
+	if (this.normalsArray)
+	{
+		vboKey.setDataArrayNor(this.normalsArray, vboMemManager);
+	}
 	
 	// TexCoords.
 	if (this.texCoordsArray)
@@ -1148,22 +1167,7 @@ TinTerrain.prototype.makeVbo = function(vboMemManager)
 		
 	// Indices.
 	vboKey.setDataArrayIdx(this.indices, vboMemManager);
-		
-	/*
-	// Todo:
-	if (normal)
-	{ vboKey.norVboDataArray = Int8Array.from(norArray); }
-	
-	if (color)
-	{ vboKey.colVboDataArray = Uint8Array.from(colArray); }
-	this.cartesiansArray;
-	this.normalsArray;
-	this.texCoordsArray;
-	this.colorsArray;
-	this.indices;
-	*/
-	
-	
+
 };
 
 TinTerrain.prototype.decodeData = function()

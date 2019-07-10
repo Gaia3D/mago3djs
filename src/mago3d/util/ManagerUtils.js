@@ -67,7 +67,7 @@ ManagerUtils.translatePivotPointGeoLocationData = function(geoLocationData, newP
 	var rawTranslation = new Point3D();
 	rawTranslation.set(-newPivotPoint.x, -newPivotPoint.y, -newPivotPoint.z);
 
-	geoLocationData.pivotPointTraslation = rawTranslation;
+	geoLocationData.pivotPointTraslationLC = rawTranslation;
 	geoLocationData.doEffectivePivotPointTranslation();
 };
 

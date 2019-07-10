@@ -60,10 +60,14 @@ GeometryUtils.getIndicesTrianglesRegularNet = function(numCols, numRows, resultI
 	var idxCounter = 0;
 	
 	var bLoopColumns = false; // Default.***
+	var bTrianglesSenseCCW = true;
 	if (options !== undefined)
 	{
 		if (options.bLoopColumns !== undefined)
 		{ bLoopColumns = options.bLoopColumns; }
+	
+		if (options.bTrianglesSenseCCW !== undefined)
+		{ bTrianglesSenseCCW = options.bTrianglesSenseCCW; }
 	}
 	
 	for (var row = 0; row<numRows-1; row++)
@@ -74,16 +78,36 @@ GeometryUtils.getIndicesTrianglesRegularNet = function(numCols, numRows, resultI
 			idx_1 = VertexMatrix.getIndexOfArray(numCols, numRows, col, row);
 			idx_2 = VertexMatrix.getIndexOfArray(numCols, numRows, col+1, row);
 			idx_3 = VertexMatrix.getIndexOfArray(numCols, numRows, col, row+1);
-			resultIndicesArray[idxCounter] = idx_1; idxCounter++;
-			resultIndicesArray[idxCounter] = idx_2; idxCounter++;
-			resultIndicesArray[idxCounter] = idx_3; idxCounter++;
+			
+			if (bTrianglesSenseCCW)
+			{
+				resultIndicesArray[idxCounter] = idx_1; idxCounter++;
+				resultIndicesArray[idxCounter] = idx_2; idxCounter++;
+				resultIndicesArray[idxCounter] = idx_3; idxCounter++;
+			}
+			else
+			{
+				resultIndicesArray[idxCounter] = idx_1; idxCounter++;
+				resultIndicesArray[idxCounter] = idx_3; idxCounter++;
+				resultIndicesArray[idxCounter] = idx_2; idxCounter++;
+			}
 			
 			idx_1 = VertexMatrix.getIndexOfArray(numCols, numRows, col+1, row);
 			idx_2 = VertexMatrix.getIndexOfArray(numCols, numRows, col+1, row+1);
 			idx_3 = VertexMatrix.getIndexOfArray(numCols, numRows, col, row+1);
-			resultIndicesArray[idxCounter] = idx_1; idxCounter++;
-			resultIndicesArray[idxCounter] = idx_2; idxCounter++;
-			resultIndicesArray[idxCounter] = idx_3; idxCounter++;
+			
+			if (bTrianglesSenseCCW)
+			{
+				resultIndicesArray[idxCounter] = idx_1; idxCounter++;
+				resultIndicesArray[idxCounter] = idx_2; idxCounter++;
+				resultIndicesArray[idxCounter] = idx_3; idxCounter++;
+			}
+			else 
+			{
+				resultIndicesArray[idxCounter] = idx_1; idxCounter++;
+				resultIndicesArray[idxCounter] = idx_3; idxCounter++;
+				resultIndicesArray[idxCounter] = idx_2; idxCounter++;
+			}
 		}
 	}
 	
@@ -98,16 +122,34 @@ GeometryUtils.getIndicesTrianglesRegularNet = function(numCols, numRows, resultI
 			idx_1 = VertexMatrix.getIndexOfArray(numCols, numRows, endCol, row);
 			idx_2 = VertexMatrix.getIndexOfArray(numCols, numRows, firstCol, row);
 			idx_3 = VertexMatrix.getIndexOfArray(numCols, numRows, endCol, row+1);
-			resultIndicesArray[idxCounter] = idx_1; idxCounter++;
-			resultIndicesArray[idxCounter] = idx_2; idxCounter++;
-			resultIndicesArray[idxCounter] = idx_3; idxCounter++;
+			if (bTrianglesSenseCCW)
+			{
+				resultIndicesArray[idxCounter] = idx_1; idxCounter++;
+				resultIndicesArray[idxCounter] = idx_2; idxCounter++;
+				resultIndicesArray[idxCounter] = idx_3; idxCounter++;
+			}
+			else 
+			{
+				resultIndicesArray[idxCounter] = idx_1; idxCounter++;
+				resultIndicesArray[idxCounter] = idx_3; idxCounter++;
+				resultIndicesArray[idxCounter] = idx_2; idxCounter++;
+			}
 			
 			idx_1 = VertexMatrix.getIndexOfArray(numCols, numRows, firstCol, row);
 			idx_2 = VertexMatrix.getIndexOfArray(numCols, numRows, firstCol, row+1);
 			idx_3 = VertexMatrix.getIndexOfArray(numCols, numRows, endCol, row+1);
-			resultIndicesArray[idxCounter] = idx_1; idxCounter++;
-			resultIndicesArray[idxCounter] = idx_2; idxCounter++;
-			resultIndicesArray[idxCounter] = idx_3; idxCounter++;
+			if (bTrianglesSenseCCW)
+			{
+				resultIndicesArray[idxCounter] = idx_1; idxCounter++;
+				resultIndicesArray[idxCounter] = idx_2; idxCounter++;
+				resultIndicesArray[idxCounter] = idx_3; idxCounter++;
+			}
+			else 
+			{
+				resultIndicesArray[idxCounter] = idx_1; idxCounter++;
+				resultIndicesArray[idxCounter] = idx_3; idxCounter++;
+				resultIndicesArray[idxCounter] = idx_2; idxCounter++;
+			}
 		}
 	}
 	

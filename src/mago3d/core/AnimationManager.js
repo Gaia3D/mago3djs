@@ -49,3 +49,93 @@ AnimationManager.prototype.checkAnimation = function(magoManager)
 		}
 	}
 };
+
+/**
+ * This function returns the next position & rotation, depending the animationData type.
+ */
+AnimationManager.getNextPosition = function(animationData, currTime) 
+{
+	if (animationData === undefined)
+	{ return true; }
+
+	// Check animationType.***
+	var animType = animationData.animationType;
+	if (animType === CODE.animationType.PATH)
+	{
+		return AnimationManager.getNextPositionByPath(animationData, currTime);
+	}
+};
+
+/**
+ * This function returns the next position & rotation, for the path-animationData type.
+ */
+AnimationManager.getNextPositionByPath = function(animationData, currTime) 
+{
+	if (animationData === undefined)
+	{ return true; }
+
+	var path = animationData.path;
+	if (path === undefined)
+	{ return true; }
+	
+	// Test for bSplineCubic3D path.***
+	if (animationData.linearVelocityInMetersSecond === undefined)
+	{ animationData.linearVelocityInMetersSecond = 20; } // 4m/s.***
+	
+	var speed = animationData.linearVelocityInMetersSecond;
+	var increTimeSec = (currTime - animationData.birthTime)/1000;
+	
+	var linearPos = speed*increTimeSec;
+	
+	if (BSplineCubic3D.prototype.isPrototypeOf(path))
+	{
+		var tangentLine = BSplineCubic3D.getTangent(path, linearPos, undefined);
+		
+		return tangentLine;
+	}
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
