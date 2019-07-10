@@ -14,11 +14,17 @@ module.exports = function(config) {
 
 
     // list of files / patterns to load in the browser
+    // resource 경로추가
     files: [
-		"src/mago3d/**/*.js",
-		"test/mago3d/**/*.test.js"
+    "src/mago3d/**/*.js",
+    {pattern : "test/mago3d/resource/**", included : false},
+    "test/mago3d/**/*.test.js"
     ],
 
+    // 샘플 데이터들은 ./resource로 접근
+    proxies : {
+      '/resource' :  '/base/test/mago3d/resource'
+    },
 
     // list of files / patterns to exclude
     exclude: [

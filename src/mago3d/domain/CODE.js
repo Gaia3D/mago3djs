@@ -63,6 +63,12 @@ CODE.units = {
 	"RADIAN" : 2
 };
 
+
+CODE.trackMode = {
+	"TRACKING" : 0,
+	"DRIVER"   : 1
+};
+
 CODE.imageryType = {
 	"UNKNOWN"      : 0,
 	"CRS84"        : 1,

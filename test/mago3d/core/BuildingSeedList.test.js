@@ -3,12 +3,11 @@
 describe("특정 데이터(vehicle, F4D_AutonomousBus)를 대상으로 BuildingSeedList 테스트, 사전작업으로 objectIndexFile 로드", function () 
 {
 	var seedList;
-
-	var path = 'http://localhost';
+	
+	var path = './resource/f4d_sample/';
 	var geometrySubDataPath = 'vehicle';
 	var dummyCacheVersion = undefined;
-	var fileName = path + "/f4d/" + geometrySubDataPath + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + dummyCacheVersion;
-
+	var fileName = path + geometrySubDataPath + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + dummyCacheVersion;
 	beforeAll(function()
 	{
 		return loadWithXhr(fileName).then(function(res) 

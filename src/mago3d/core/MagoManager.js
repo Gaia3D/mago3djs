@@ -1200,8 +1200,8 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 		this.dateSC = new Date();
 		this.currTime = this.dateSC.getTime();
 		
-		this.load_testTextures();
-		
+		//test code delelte
+		//this.load_testTextures();
 		// Before of multiFrustumCullingSmartTile, do animation check, bcos during animation some object can change smartTile-owner.***
 		if (this.animationManager !== undefined)
 		{ this.animationManager.checkAnimation(this); }
@@ -1680,9 +1680,15 @@ MagoManager.prototype.keyDown = function(key)
 {
 	if (key === 32) // 32 = 'space'.***
 	{
-		var renderingSettings = this._settings.getRenderingSettings();
-		var pointsCloudColorRamp = renderingSettings.getPointsCloudInColorRamp();
-		renderingSettings.setPointsCloudInColorRamp(!pointsCloudColorRamp);
+		if (this.pointsCloudSsao === undefined)
+		{ this.pointsCloudSsao = true; }
+		
+		if (this.pointsCloudSsao)
+		{ this.pointsCloudSsao = false; }
+		else
+		{ this.pointsCloudSsao = true; }
+	
+	
 	}
 	else if (key === 37) // 37 = 'left'.***
 	{
@@ -3466,7 +3472,10 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.bPositionCompressed_loc = gl.getUniformLocation(shader.program, "bPositionCompressed");
 	shader.minPosition_loc = gl.getUniformLocation(shader.program, "minPosition");
 	shader.bboxSize_loc = gl.getUniformLocation(shader.program, "bboxSize");
-	
+	shader.maxPointSize_loc = gl.getUniformLocation(shader.program, "maxPointSize");
+	shader.minPointSize_loc = gl.getUniformLocation(shader.program, "minPointSize");
+	shader.pendentPointSize_loc = gl.getUniformLocation(shader.program, "pendentPointSize");
+
 	// 5) Test Quad shader.****************************************************************************************
 	shaderName = "testQuad"; // used by temperatura layer.***
 	shader = this.postFxShadersManager.newShader(shaderName);
@@ -3526,7 +3535,9 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.minPosition_loc = gl.getUniformLocation(shader.program, "minPosition");
 	shader.bboxSize_loc = gl.getUniformLocation(shader.program, "bboxSize");
 	shader.maxPointSize_loc = gl.getUniformLocation(shader.program, "maxPointSize");
-	
+	shader.minPointSize_loc = gl.getUniformLocation(shader.program, "minPointSize");
+	shader.pendentPointSize_loc = gl.getUniformLocation(shader.program, "pendentPointSize");
+
 	// 8) PointsCloud shader.****************************************************************************************
 	shaderName = "pointsCloudSsao";
 	shader = this.postFxShadersManager.newShader(shaderName);
@@ -3550,7 +3561,9 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.minPosition_loc = gl.getUniformLocation(shader.program, "minPosition");
 	shader.bboxSize_loc = gl.getUniformLocation(shader.program, "bboxSize");
 	shader.maxPointSize_loc = gl.getUniformLocation(shader.program, "maxPointSize");
-	
+	shader.minPointSize_loc = gl.getUniformLocation(shader.program, "minPointSize");
+	shader.pendentPointSize_loc = gl.getUniformLocation(shader.program, "pendentPointSize");
+
 	// 9) PointsCloud shader RAINBOW.****************************************************************************************
 	shaderName = "pointsCloudSsao_rainbow";
 	shader = this.postFxShadersManager.newShader(shaderName);
@@ -3577,6 +3590,8 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.minHeight_rainbow_loc = gl.getUniformLocation(shader.program, "minHeight_rainbow");
 	shader.maxHeight_rainbow_loc = gl.getUniformLocation(shader.program, "maxHeight_rainbow");
 	shader.maxPointSize_loc = gl.getUniformLocation(shader.program, "maxPointSize");
+	shader.minPointSize_loc = gl.getUniformLocation(shader.program, "minPointSize");
+	shader.pendentPointSize_loc = gl.getUniformLocation(shader.program, "pendentPointSize");
 };
 
 /**
@@ -4092,6 +4107,8 @@ MagoManager.prototype.flyToBuilding = function(apiName, projectId, dataKey)
 	if (realBuildingPos === undefined)
 	{ return; }
 
+	if (!nodeRoot.data.bbox)
+	{ return; }
 	this.radiusAprox_aux = nodeRoot.data.bbox.getRadiusAprox();
 
 	if (this.boundingSphere_Aux === undefined)
@@ -5304,8 +5321,20 @@ MagoManager.prototype.callAPI = function(api)
 			throw new Error("This node is not exist.");
 		}
 
-		this.flyToBuilding(undefined, node.data.projectId, node.data.nodeId);
-		this.sceneState.camera.setTrack(node);
+		if (node.isReadyToRender)
+		{
+			var geoLocDataManager = node.getNodeGeoLocDataManager();
+			var geoLocData = geoLocDataManager.getCurrentGeoLocationData();
+			var geoCoords = geoLocData.getGeographicCoords();
+
+			var currLon = geoCoords.longitude;
+			var currLat = geoCoords.latitude;
+
+			this.flyTo(currLon, currLat, 100, 0);
+			var camera = this.sceneState.camera;
+			camera.stopTrack(this);
+			camera.setTrack(node, api.getTrackOption());
+		}
 	}
 	else if (apiName === "stopTrack")
 	{
@@ -5332,10 +5361,71 @@ MagoManager.prototype.callAPI = function(api)
 		{
 			return true;
 		}
-		else
+
+		return false;
+		
+	}
+	else if (apiName === "isDataReadyToRender")
+	{
+		var projectId = api.getProjectId();
+		var dataKey = api.getDataKey();
+		if (!defined(projectId))
 		{
-			return false;
+			throw new Error("projectId is required.");
 		}
+		if (!defined(dataKey))
+		{
+			throw new Error("dataKey is required.");
+		}
+		var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
+
+		if (node !== undefined)
+		{
+			if (node.isReadyToRender())
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+	else if (apiName === "setNodeAttribute")
+	{
+		var projectId = api.getProjectId();
+		var dataKey = api.getDataKey();
+		var attribute = api.getNodeAttribute();
+		if (!defined(projectId))
+		{
+			throw new Error("projectId is required.");
+		}
+		if (!defined(dataKey))
+		{
+			throw new Error("dataKey is required.");
+		}
+		var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
+
+		if (node !== undefined)
+		{
+			if (node.data) 
+			{
+				var nodeData = node.data;
+				if (!nodeData.attributes) 
+				{
+					nodeData.attributes = {};
+				}
+				var myAttribute = nodeData.attributes;
+
+				for (var key in attribute)
+				{
+					if (attribute.hasOwnProperty(key)) 
+					{
+						myAttribute[key] = attribute[key];
+					}
+				}
+			}
+		}
+
+		return false;
 	}
 };
 

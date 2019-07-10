@@ -39,7 +39,7 @@ Polygon2D.prototype.getBoundingRectangle = function(resultBRect)
 /**
  * get the direction of the specific line segment of the edge
  * @param {Number} idx the index of the specific line segment
- * @returns direction	
+ * @returns {Point2D} direction	
  */
 Polygon2D.prototype.getEdgeDirection = function(idx)
 {
@@ -265,7 +265,7 @@ Polygon2D.prototype.tessellate = function(concaveVerticesIndices, convexPolygons
 };
 /**
  * Check whether the given segment cut a polygon edges or is coincident with a polygon's vertex 
- * @param segment the target segement
+ * @param {Segment2D} segment the target segement
  * */
 Polygon2D.prototype.intersectionWithSegment = function(segment)
 {
@@ -300,7 +300,7 @@ Polygon2D.prototype.intersectionWithSegment = function(segment)
 		}
 	}
 	
-	return false;
+	return false; 
 };
 
 /**

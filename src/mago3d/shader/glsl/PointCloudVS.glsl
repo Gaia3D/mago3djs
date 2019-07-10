@@ -17,6 +17,8 @@ uniform bool bUse1Color;
 uniform vec4 oneColor4;
 uniform float fixPointSize;
 uniform float maxPointSize;
+uniform float minPointSize;
+uniform float pendentPointSize;
 uniform bool bUseFixPointSize;
 uniform bool bUseColorCodingByHeight;
 varying vec4 vColor;
@@ -50,20 +52,14 @@ void main()
 		vColor=color4;
 	
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;
-	if(bUseFixPointSize)
-	{
-		gl_PointSize = fixPointSize;
-	}
-	else{
-		float z_b = gl_Position.z/gl_Position.w;
-		float z_n = 2.0 * z_b - 1.0;
-		float z_e = 2.0 * near * far / (far + near - z_n * (far - near));
-		gl_PointSize = 1.0 + 40.0/z_e; // Original.***
-		if(gl_PointSize > maxPointSize)
-			gl_PointSize = maxPointSize;
-		if(gl_PointSize < 2.0)
-			gl_PointSize = 2.0;
-	}
-	
+	float z_b = gl_Position.z/gl_Position.w;
+	float z_n = 2.0 * z_b - 1.0;
+    float z_e = 2.0 * near * far / (far + near - z_n * (far - near));
+	gl_PointSize = minPointSize + pendentPointSize/z_e; // Original.***
+    if(gl_PointSize > maxPointSize)
+        gl_PointSize = maxPointSize;
+	if(gl_PointSize < 2.0)
+		gl_PointSize = 2.0;
+		
 	glPointSize = gl_PointSize;
 }
