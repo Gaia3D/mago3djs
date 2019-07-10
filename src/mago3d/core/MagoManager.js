@@ -1684,24 +1684,33 @@ MagoManager.prototype.keyDown = function(key)
 		var pointsCloudColorRamp = renderingSettings.getPointsCloudInColorRamp();
 		renderingSettings.setPointsCloudInColorRamp(!pointsCloudColorRamp);
 	}
-	/*
 	else if (key === 37) // 37 = 'left'.***
 	{
-		
+		if (this.modeler === undefined)
+		{ this.modeler = new Modeler(); }
+		//this.modeler.mode = CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS;
+		//this.modeler.mode = CODE.modelerMode.DRAWING_PLANEGRID;
+		this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
+		//this.modeler.mode = CODE.modelerMode.DRAWING_TUNNELPOINTS;
 	}
 	else if (key === 38) // 38 = 'up'.***
 	{
-		
+		if (this.modeler === undefined)
+		{ this.modeler = new Modeler(); }
+		this.modeler.mode = CODE.modelerMode.DRAWING_STATICGEOMETRY;
 	}
 	else if (key === 39) // 39 = 'right'.***
 	{
-		
+		if (this.modeler === undefined)
+		{ this.modeler = new Modeler(); }
+		this.modeler.mode = CODE.modelerMode.DRAWING_BSPLINE;
 	}
 	else if (key === 40) // 40 = 'down'.***
 	{
-		
+		if (this.modeler === undefined)
+		{ this.modeler = new Modeler(); }
+		this.modeler.mode = CODE.modelerMode.DRAWING_BASICFACTORY;
 	}
-	*/
 	else if (key === 49) // 49 = '1'.***
 	{
 		if (this.pointsCloudWhite === undefined)
@@ -1730,16 +1739,20 @@ MagoManager.prototype.keyDown = function(key)
 		var currLon = geoCoords.longitude;
 		var currLat = geoCoords.latitude;
 		var currAlt = geoCoords.altitude;
-
+		
+		var latitude;
+		var longitude;
+		var elevation;
+		
+		var heading;
+		var pitch;
+		var roll;
+		
+		/*
 		// Move a little.***
 		var latitude = currLat + 0.0001 * 10*(Math.random()*2-1);
 		var longitude = currLon + 0.0001 * 10*(Math.random()*2-1);
 		var elevation = currAlt + 2.0 * 10*(Math.random()*2-1);
-		
-		//latitude = currLat + 0.0001;
-		//longitude = currLon + 0.0001;
-		//elevation = currAlt;
-		
 		
 		var heading;
 		var pitch;
@@ -1750,6 +1763,20 @@ MagoManager.prototype.keyDown = function(key)
 			duration           : 5
 		};
 		this.changeLocationAndRotation(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll, animationOption);
+		*/
+
+		// Test 2: moving by a path.***
+		var bSplineCubic3d = this.modeler.bSplineCubic3d;
+		if (bSplineCubic3d !== undefined)
+		{
+			// do animation by path.***
+			var animationOption = {
+				animationType                : CODE.animationType.PATH,
+				path                         : bSplineCubic3d,
+				linearVelocityInMetersSecond : 30
+			};
+			this.changeLocationAndRotation(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll, animationOption);
+		}
 	}
 	else if (key === 84) // 84 = 't'.***
 	{
@@ -1829,7 +1856,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		//this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_TUNNELPOINTS;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_STATICGEOMETRY;
-		this.modeler.mode = CODE.modelerMode.DRAWING_BSPLINE;
+		//this.modeler.mode = CODE.modelerMode.DRAWING_BSPLINE;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_BASICFACTORY;
 		
 		// Calculate the geographicCoord of the click position.****
@@ -3744,6 +3771,11 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 				// determine LOD for each building.
 				node = lowestTile.nodesArray[j];
 				nodeRoot = node.getRoot();
+				
+				if (node.data.nodeId === "G15_0002")
+				{
+					var hola = 0;
+				}
 
 				// now, create a geoLocDataManager for node if no exist.
 				if (nodeRoot.data.geoLocDataManager === undefined)
@@ -3751,50 +3783,6 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 					geoLoc = node.calculateGeoLocData(this);
 					continue;
 				}
-				
-				// Check if the 3dData is neoBuilding or renderable.***
-				/*
-				renderable = node.data.renderable;
-				if (renderable)
-				{
-					// TODO:
-					distToCamera = node.getDistToCamera(cameraPosition, this.boundingSphere_Aux);
-					var data = node.data;
-					data.currentLod;
-					data.distToCam = distToCamera;
-					
-					
-					if (data.distToCam < lod0Dist)
-					{ data.currentLod = 0; }
-					else if (data.distToCam < lod1Dist)
-					{ data.currentLod = 1; }
-					else if (data.distToCam < lod2Dist)
-					{ data.currentLod = 2; }
-					else if (data.distToCam < lod3Dist)
-					{ data.currentLod = 3; }
-					else if (data.distToCam < lod4Dist)
-					{ data.currentLod = 4; }
-					else if (data.distToCam < lod5Dist)
-					{ data.currentLod = 5; }
-				
-					if (distToCamera < lod0_minDist) 
-					{
-						visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles0, node);
-					}
-					else if (distToCamera < lod1_minDist) 
-					{
-						visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles1, node);
-					}
-					else if (distToCamera < lod2_minDist) 
-					{
-						visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles2, node);
-					}
-					else if (distToCamera < lod5_minDist) 
-					{
-						visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles3, node);
-					}
-				}
-				*/
 				
 				neoBuilding = node.data.neoBuilding;
 				
@@ -3836,7 +3824,10 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 					continue; 
 				}
 				
-				
+				if (node.data.nodeId === "G15_0002")
+				{
+					var hola = 0;
+				}
 				
 				// If necessary do frustum culling.*************************************************************************
 				if (doFrustumCullingToBuildings)
@@ -3855,7 +3846,10 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 				
 				//-------------------------------------------------------------------------------------------
 				
-				
+				if (node.data.nodeId === "G15_0002")
+				{
+					var hola = 0;
+				}
 				
 				// provisionally fork versions.***
 				var version = neoBuilding.getHeaderVersion();
@@ -4188,7 +4182,6 @@ MagoManager.prototype.selectedObjectNotice = function(neoBuilding)
 /**
  * 변환 행렬
  */
-//MagoManager.prototype.changeLocationAndRotation = function(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll, durationTimeInSeconds)
 MagoManager.prototype.changeLocationAndRotation = function(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll, animationOption) 
 {
 	var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
@@ -4200,7 +4193,6 @@ MagoManager.prototype.changeLocationAndRotation = function(projectId, dataKey, l
 /**
  * 변환 행렬
  */
-//MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, longitude, elevation, heading, pitch, roll, durationTimeInSeconds) 
 MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, longitude, elevation, heading, pitch, roll, animationOption) 
 {
 	if (node === undefined)
@@ -4298,6 +4290,15 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 		mapping_type = jasonObject.mapping_type;
 	}
 	
+	if (heading === undefined)
+	{ heading = 0; }
+	
+	if (pitch === undefined)
+	{ pitch = 0; }
+	
+	if (roll === undefined)
+	{ roll = 0; }
+	
 	// now make the node.
 	var buildingId;
 	var buildingSeed;
@@ -4320,7 +4321,10 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 			node.data.mapping_type = mapping_type;
 			var tMatrix;
 			
-			
+			if (node.data.nodeId === "G15_0002")
+			{
+				var hola = 0;
+			}
 			
 			if (attributes.isPhysical)
 			{
@@ -4370,8 +4374,13 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 					var bboxCenterPoint;
 
 					bboxCenterPoint = buildingSeed.bBox.getCenterPoint(bboxCenterPoint);
+					
 					var bboxCenterPointWorldCoord = tMatrix.transformPoint3D(bboxCenterPoint, bboxCenterPointWorldCoord);
 					buildingSeed.geographicCoordOfBBox = ManagerUtils.pointToGeographicCoord(bboxCenterPointWorldCoord, buildingSeed.geographicCoordOfBBox, this); // original.
+					
+					// Set the altitude as the original. This method has little error.***
+					buildingSeed.geographicCoordOfBBox.altitude = buildingSeed.geographicCoord.altitude;
+					
 				}
 			}
 

@@ -17,6 +17,8 @@ var BSplineCubic3D = function()
 	this.interpolatedPoints3dList;
 	this.controlPoints3dMap; // idxPoint : {prevCPoint, nextCPoint}
 	
+	this.segmentLengthArray; // Length for each segment.***
+	this.dirty = true;
 	
 	this.vtxProfilesList;
 	this.vboKeysContainer;
@@ -222,9 +224,182 @@ BSplineCubic3D.prototype.makeInterpolatedPoints = function()
 };
 
 /**
+ * This function returns the length of the splineSegment at the unitaryPosition.
+ */
+BSplineCubic3D.getLengthForSegment = function(strPoint, strControlPoint, endControlPoint, endPoint, unitaryPosition, interpolationsCount) 
+{
+	if (unitaryPosition === undefined)
+	{ unitaryPosition = 1; }
+	
+	if (interpolationsCount === undefined)
+	{ interpolationsCount = 10; }
+	
+	// 1rst, make the interpolated curve.***
+	var resultInterpolatedPointsArray = BSplineCubic3D.makeForSegmentPartial(strPoint, strControlPoint, endControlPoint, endPoint, unitaryPosition, interpolationsCount, undefined);
+	
+	// Now, calculate the total length of "N" segments.***
+	var resultLength = 0;
+	var pointA, pointB;
+	var pointsCount = resultInterpolatedPointsArray.length;
+	for (var i=0; i<pointsCount-1; i++)
+	{
+		pointA = resultInterpolatedPointsArray[i];
+		pointB = resultInterpolatedPointsArray[i+1];
+		resultLength += pointA.distToPoint(pointB);
+	}
+	
+	return resultLength;
+};
+
+/**
+ * This function returns the tangent line of the splineSegment at the unitaryPosition.
+ */
+BSplineCubic3D.getTangent = function(bSpline, position, resultTangentLine) 
+{
+	// "position" is a length measurement.***
+	var kNotsCount = bSpline.knotPoints3dList.getPointsCount();
+	
+	if (bSpline.segmentLengthArray === undefined)
+	{
+		// Calculate all segments length of the bSpline.***
+		bSpline.segmentLengthArray = [];
+		var interpolationsCount = 20;
+		var unitaryPosition = 1;
+		var bLoop; // undefined.
+		for (var i=0; i<kNotsCount-1; i++)
+		{
+			var currSegment = bSpline.knotPoints3dList.getSegment3D(i, undefined, bLoop);
+			var strPoint = currSegment.startPoint3d;
+			var endPoint = currSegment.endPoint3d;
+			
+			var strControlPoint = bSpline.controlPoints3dMap[i].outingControlPoint;
+			var endControlPoint = bSpline.controlPoints3dMap[i+1].inningControlPoint;
+			
+			var length = BSplineCubic3D.getLengthForSegment(strPoint, strControlPoint, endControlPoint, endPoint, unitaryPosition, interpolationsCount);
+			bSpline.segmentLengthArray[i] = length;
+		}
+	}
+	
+	// 1rst, find the segment that contains the "position".***
+	var find = false;
+	var i = 0;
+	var lengthAux = 0;
+	var prevLengthAux = 0;
+	var segmentIdx = -1;
+	while (!find && i<kNotsCount)
+	{
+		lengthAux += bSpline.segmentLengthArray[i];
+		if (lengthAux >= position)
+		{
+			find = true;
+			segmentIdx = i;
+			
+			var localPosition = position - prevLengthAux;
+			var unitaryPosition = localPosition/bSpline.segmentLengthArray[segmentIdx];
+			
+			var currSegment = bSpline.knotPoints3dList.getSegment3D(segmentIdx, undefined, bLoop);
+			var strPoint = currSegment.startPoint3d;
+			var endPoint = currSegment.endPoint3d;
+			
+			var strControlPoint = bSpline.controlPoints3dMap[segmentIdx].outingControlPoint;
+			var endControlPoint = bSpline.controlPoints3dMap[segmentIdx+1].inningControlPoint;
+			
+			resultTangentLine = BSplineCubic3D.getTangentForSegment(strPoint, strControlPoint, endControlPoint, endPoint, unitaryPosition, resultTangentLine);
+		}
+		prevLengthAux = lengthAux;
+		i++;
+	}
+	
+	return resultTangentLine;
+};
+
+/**
+ * This function returns the tangent line of the splineSegment at the unitaryPosition.
+ */
+BSplineCubic3D.getTangentForSegment = function(strPoint, strControlPoint, endControlPoint, endPoint, unitaryPosition, resultTangentLine) 
+{
+	//                                 T = (1-t)*P + t*Q
+	//                     P = (1-t)*A + t*B             Q = (1-t)*B + t*C  
+	//                  T = (1-t)*(1-t)*A + (1-t)*t*B + t*(1-t)*B + t*t*C
+	//                A = (1-t)*K + t*L         B = (1-t)*L + t*M          C = (1-t)*M + t*N
+	//           T = (1-t)^3*K + (1-t)^2*t*L + 2*(1-t)^2*t*L + 2*(1-t)*t^2*M + (1-t)*t^2*M + t^3*N 
+	//           T = (1-t)^3*K + 3*(1-t)^2*t*L + 3*(1-t)*t^2*M + t^3*N 
+	
+	// "unitaryPosition" range = [0.0, 1.0].***
+	var t = unitaryPosition;
+	var oneMinusT = 1-t;
+	var oneMinusT2 = oneMinusT*oneMinusT;
+	var t2 = t*t;
+	var oneMinusT_2_t = 2*oneMinusT*t;
+	
+	// K.***
+	var strX = strPoint.x;
+	var strY = strPoint.y;
+	var strZ = strPoint.z;
+	
+	// L.***
+	var strCpX = strControlPoint.x;
+	var strCpY = strControlPoint.y;
+	var strCpZ = strControlPoint.z;
+	
+	// M.***
+	var endCpX = endControlPoint.x;
+	var endCpY = endControlPoint.y;
+	var endCpZ = endControlPoint.z;
+	
+	// N.***
+	var endX = endPoint.x;
+	var endY = endPoint.y;
+	var endZ = endPoint.z;
+	
+	// Calculate points P & Q.***
+	//                     P = (1-t)*A + t*B             Q = (1-t)*B + t*C  
+	//                A = (1-t)*K + t*L         B = (1-t)*L + t*M          C = (1-t)*M + t*N
+	// P = (1-t)*((1-t)*K + t*L) + t*((1-t)*L + t*M)
+	// P = (1-t)^2*K + (1-t)*t*L + (1-t)*t*L + t^2*M
+	// P = (1-t)^2*K + 2*(1-t)*t*L + t^2*M
+	//
+	// Q = (1-t)*((1-t)*L + t*M) + t*((1-t)*M + t*N)
+	// Q = (1-t)^2*L + (1-t)*t*M + (1-t)*t*M + t^2*N
+	// Q = (1-t)^2*L + 2*(1-t)*t*M + t^2*N
+	
+	var Px = oneMinusT2 * strX + oneMinusT_2_t*strCpX + t2*endCpX;
+	var Py = oneMinusT2 * strY + oneMinusT_2_t*strCpY + t2*endCpY;
+	var Pz = oneMinusT2 * strZ + oneMinusT_2_t*strCpZ + t2*endCpZ;
+	
+	var Qx = oneMinusT2 * strCpX + oneMinusT_2_t*endCpX + t2*endX;
+	var Qy = oneMinusT2 * strCpY + oneMinusT_2_t*endCpY + t2*endY;
+	var Qz = oneMinusT2 * strCpZ + oneMinusT_2_t*endCpZ + t2*endZ;
+	
+	var pointP = new Point3D(Px, Py, Pz);
+	var pointQ = new Point3D(Qx, Qy, Qz);
+	
+	// Calculate T = (1-t)*P + t*Q.***
+	// T = (oneMinusT*Px + t*Qx, oneMinusT*Py + t*Qy, oneMinusT*Pz + t*Qz);
+
+	if (resultTangentLine === undefined)
+	{ resultTangentLine = new Line(); }
+	
+	var direction = pointP.getVectorToPoint(pointQ, undefined);
+	direction.unitary();
+	resultTangentLine.setPointAndDir(oneMinusT*Px + t*Qx, oneMinusT*Py + t*Qy, oneMinusT*Pz + t*Qz, direction.x, direction.y, direction.z);
+	
+	return resultTangentLine;
+};
+
+/**
  * 어떤 일을 하고 있습니까?
  */
 BSplineCubic3D.makeForSegment = function(strPoint, strControlPoint, endControlPoint, endPoint, interpolationsCount, resultInterpolatedPointsArray) 
+{
+	var unitaryPosition = 1;
+	return BSplineCubic3D.makeForSegmentPartial(strPoint, strControlPoint, endControlPoint, endPoint, unitaryPosition, interpolationsCount, resultInterpolatedPointsArray);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+BSplineCubic3D.makeForSegmentPartial = function(strPoint, strControlPoint, endControlPoint, endPoint, unitaryPosition, interpolationsCount, resultInterpolatedPointsArray) 
 {
 	// Bezier from del Casteljau.***
 	// Bezier curve defined by 2 points (K & N) & 2 control points (L & M).***
@@ -263,7 +438,7 @@ BSplineCubic3D.makeForSegment = function(strPoint, strControlPoint, endControlPo
 	if (resultInterpolatedPointsArray === undefined)
 	{ resultInterpolatedPointsArray = []; }
 	
-	var increT = 1/interpolationsCount;
+	var increT = unitaryPosition/interpolationsCount;
 	var t = increT;
 	
 	var strX = strPoint.x;

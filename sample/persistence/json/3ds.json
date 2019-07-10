@@ -906,6 +906,22 @@
 			"longitude": 126.6155,
 			"pitch": 0.0,
 			"roll": 0.0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "songpa"
+			},
+			"children": [],
+			"data_key": "G15_0002", 
+			"data_name": "잠실학생체육관", 
+			"heading": 0.0, 
+			"height": 29.875000190734863, 
+			"latitude": 37.51219049892924, 
+			"longitude": 127.07533182599111,
+			"mapping_type": "boundingboxcenter",
+			"pitch": 0.0, 
+			"roll": 0.0
 		}
 	],
 	"parent": 0,
