@@ -100,10 +100,6 @@ Path3D.insertPointsOnLargeSegments = function(geographicCoordsArray, maxLengthDe
 		{
 			var midGeoCoord = GeographicCoord.getMidPoint(geoCoordA, geoCoordB, undefined);
 			
-			//var geoLocDataManager = midGeoCoord.getGeoLocationDataManager();
-			//var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-			//geoLocData = ManagerUtils.calculateGeoLocationData(midGeoCoord.longitude, midGeoCoord.latitude, midGeoCoord.altitude, undefined, undefined, undefined, geoLocData, magoManager);
-			
 			geographicCoordsArray.splice(i+1, 0, midGeoCoord);
 			geoCoordsCount = geographicCoordsArray.length;
 			i--;

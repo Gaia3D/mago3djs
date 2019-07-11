@@ -1816,8 +1816,23 @@ MagoManager.prototype.keyDown = function(key)
 		var bSplineCubic3d = this.modeler.bSplineCubic3d;
 		if (bSplineCubic3d !== undefined)
 		{
+			if (bSplineCubic3d.geoCoordsList === undefined)
+			{ bSplineCubic3d.geoCoordsList = new GeographicCoordsList(); }
+			
 			var maxLengthDegree = 0.001;
 			Path3D.insertPointsOnLargeSegments(bSplineCubic3d.geoCoordsList.geographicCoordsArray, maxLengthDegree, this);
+			
+			var coordsCount = bSplineCubic3d.geoCoordsList.geographicCoordsArray.length;
+			for (var i=0; i<coordsCount; i++)
+			{
+				var geoCoord = bSplineCubic3d.geoCoordsList.geographicCoordsArray[i];
+				var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+				var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+				geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude, undefined, undefined, undefined, geoLocData, this);
+			}
+			
+			var geoCoordsList = bSplineCubic3d.getGeographicCoordsList();
+			geoCoordsList.makeLines(this);
 		
 			// Make the controlPoints.***
 			var controlPointArmLength = 0.2;
