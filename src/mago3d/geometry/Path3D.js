@@ -37,6 +37,15 @@ Path3D.prototype.getTangent = function(linearPosition, resultTangentLine, magoMa
 		var maxLengthDegree = 0.001;
 		Path3D.insertPointsOnLargeSegments(this.geoCoordsList.geographicCoordsArray, maxLengthDegree, magoManager);
 		
+		var coordsCount = this.geoCoordsList.geographicCoordsArray.length;
+		for (var i=0; i<coordsCount; i++)
+		{
+			var geoCoord = this.geoCoordsList.geographicCoordsArray[i];
+			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude, undefined, undefined, undefined, geoLocData, magoManager);
+		}
+		
 		// Make bSpline.***
 		var bSplineCubic3d = new BSplineCubic3D();
 		this.curvesArray.push(bSplineCubic3d);
@@ -91,9 +100,9 @@ Path3D.insertPointsOnLargeSegments = function(geographicCoordsArray, maxLengthDe
 		{
 			var midGeoCoord = GeographicCoord.getMidPoint(geoCoordA, geoCoordB, undefined);
 			
-			var geoLocDataManager = midGeoCoord.getGeoLocationDataManager();
-			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-			geoLocData = ManagerUtils.calculateGeoLocationData(midGeoCoord.longitude, midGeoCoord.latitude, midGeoCoord.altitude, undefined, undefined, undefined, geoLocData, magoManager);
+			//var geoLocDataManager = midGeoCoord.getGeoLocationDataManager();
+			//var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+			//geoLocData = ManagerUtils.calculateGeoLocationData(midGeoCoord.longitude, midGeoCoord.latitude, midGeoCoord.altitude, undefined, undefined, undefined, geoLocData, magoManager);
 			
 			geographicCoordsArray.splice(i+1, 0, midGeoCoord);
 			geoCoordsCount = geographicCoordsArray.length;
