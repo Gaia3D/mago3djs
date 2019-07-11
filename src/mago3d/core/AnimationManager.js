@@ -53,7 +53,7 @@ AnimationManager.prototype.checkAnimation = function(magoManager)
 /**
  * This function returns the next position & rotation, depending the animationData type.
  */
-AnimationManager.getNextPosition = function(animationData, currTime) 
+AnimationManager.getNextPosition = function(animationData, currTime, magoManager) 
 {
 	if (animationData === undefined)
 	{ return true; }
@@ -62,14 +62,14 @@ AnimationManager.getNextPosition = function(animationData, currTime)
 	var animType = animationData.animationType;
 	if (animType === CODE.animationType.PATH)
 	{
-		return AnimationManager.getNextPositionByPath(animationData, currTime);
+		return AnimationManager.getNextPositionByPath(animationData, currTime, magoManager);
 	}
 };
 
 /**
  * This function returns the next position & rotation, for the path-animationData type.
  */
-AnimationManager.getNextPositionByPath = function(animationData, currTime) 
+AnimationManager.getNextPositionByPath = function(animationData, currTime, magoManager) 
 {
 	if (animationData === undefined)
 	{ return true; }
@@ -80,16 +80,16 @@ AnimationManager.getNextPositionByPath = function(animationData, currTime)
 	
 	// Test for bSplineCubic3D path.***
 	if (animationData.linearVelocityInMetersSecond === undefined)
-	{ animationData.linearVelocityInMetersSecond = 20; } // 4m/s.***
+	{ animationData.linearVelocityInMetersSecond = 20; } // 20m/s.***
 	
 	var speed = animationData.linearVelocityInMetersSecond;
 	var increTimeSec = (currTime - animationData.birthTime)/1000;
 	
 	var linearPos = speed*increTimeSec;
 	
-	if (BSplineCubic3D.prototype.isPrototypeOf(path))
+	if (Path3D.prototype.isPrototypeOf(path))
 	{
-		var tangentLine = BSplineCubic3D.getTangent(path, linearPos, undefined);
+		var tangentLine = path.getTangent(linearPos, undefined, magoManager);
 		
 		return tangentLine;
 	}

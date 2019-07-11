@@ -89,7 +89,7 @@ BSplineCubic3D.prototype.renderPoints = function(magoManager, shader, renderType
 /**
  * 어떤 일을 하고 있습니까?
  */
-BSplineCubic3D.prototype.makeControlPoints = function(controlPointArmLength) 
+BSplineCubic3D.prototype.makeControlPoints = function(controlPointArmLength, magoManager) 
 {
 	// This function makes the controlPoints automatically for the geographicsPoints.***
 	// There are 2 controlPoints for each point3d : InningControlPoint & OutingControlPoint.***
@@ -97,6 +97,9 @@ BSplineCubic3D.prototype.makeControlPoints = function(controlPointArmLength)
 	// 1rst, make knotPoints if no exist.***
 	if (this.knotPoints3dList === undefined)
 	{
+		if (this.geoCoordsList.points3dList === undefined)
+		{ this.geoCoordsList.makeLines(magoManager); }
+		
 		this.knotPoints3dList = new Point3DList();
 		this.knotPoints3dList.pointsArray = this.geoCoordsList.points3dList.pointsArray;
 		
@@ -120,7 +123,7 @@ BSplineCubic3D.prototype.makeControlPoints = function(controlPointArmLength)
 	var outingDist; // the outingControlPoint length.***
 	
 	if (controlPointArmLength === undefined)
-	{ controlPointArmLength = 0.2; }
+	{ controlPointArmLength = 0.1; }
 		
 	var pointsCount = this.knotPoints3dList.getPointsCount();
 	for (var i=0; i<pointsCount; i++)
@@ -135,7 +138,7 @@ BSplineCubic3D.prototype.makeControlPoints = function(controlPointArmLength)
 			nextPoint = this.knotPoints3dList.getPoint(i+1);
 			outingDist = controlPointArmLength;
 			
-			// The outingControlPoint is in the segment, to the 30% of the currentPoint.***
+			// The outingControlPoint is in the segment, to the 20% of the currentPoint.***
 			var outingControlPoint = new Point3D();
 			outingControlPoint.set(currPoint.x * (1-outingDist) + nextPoint.x * outingDist, currPoint.y * (1-outingDist) + nextPoint.y * outingDist, currPoint.z * (1-outingDist) + nextPoint.z * outingDist);
 			this.controlPoints3dMap[i] = {"inningControlPoint" : undefined, 
@@ -252,11 +255,82 @@ BSplineCubic3D.getLengthForSegment = function(strPoint, strControlPoint, endCont
 };
 
 /**
+ * This function returns the unitaryPosition of the splineSegment at the linearPosition.
+ */
+BSplineCubic3D.getUnitaryPositionForSegmentAtLinearPosition = function(strPoint, strControlPoint, endControlPoint, endPoint, linearPosition, interpolationsCount) 
+{
+	// "linearPosition" is length.***
+	var increT = 1/interpolationsCount;
+	var t = increT;
+	
+	var strX = strPoint.x;
+	var strY = strPoint.y;
+	var strZ = strPoint.z;
+	
+	var strCpX = strControlPoint.x;
+	var strCpY = strControlPoint.y;
+	var strCpZ = strControlPoint.z;
+	
+	var endCpX = endControlPoint.x;
+	var endCpY = endControlPoint.y;
+	var endCpZ = endControlPoint.z;
+	
+	var endX = endPoint.x;
+	var endY = endPoint.y;
+	var endZ = endPoint.z;
+	
+	var point = new Point3D(0, 0, 0);
+	var prevPoint = new Point3D(0, 0, 0);
+	var acumLength = 0;
+	var resultUnitaryPosition;
+	
+	// Must find the interpolatedSegment that contains the "linearPosition".***
+	for (var i=0; i<interpolationsCount+1; i++)
+	{
+		t = (i)*increT;
+		var oneMinusT = 1-t;
+		var oneMinusT2 = Math.pow(oneMinusT, 2);
+		var oneMinusT3 = Math.pow(oneMinusT, 3);
+		var t2 = t*t;
+		var t3 = t2*t;
+		var oneMinusT2_t_3 = 3*oneMinusT2*t;
+		var oneMinusT_t2_3 = 3*oneMinusT*t2;
+
+		var x = oneMinusT3*strX + oneMinusT2_t_3*strCpX + oneMinusT_t2_3*endCpX + t3*endX;
+		var y = oneMinusT3*strY + oneMinusT2_t_3*strCpY + oneMinusT_t2_3*endCpY + t3*endY;
+		var z = oneMinusT3*strZ + oneMinusT2_t_3*strCpZ + oneMinusT_t2_3*endCpZ + t3*endZ;
+		point.set(x, y, z);
+		
+		if (i > 0)
+		{
+			var currLength = prevPoint.distToPoint(point);
+			acumLength += currLength;
+			
+			if (acumLength > linearPosition)
+			{
+				// Calculate "resultUnitaryPosition" by interpolation.***
+				var prevT = (i-1)*increT;
+				var currT = t;
+				var diffLength = currLength - (acumLength - linearPosition);
+				var unitaryDiffLength = diffLength/currLength;
+				unitaryDiffLength /= interpolationsCount;
+				resultUnitaryPosition = prevT + unitaryDiffLength;
+				return resultUnitaryPosition;
+			}
+		}
+		
+		prevPoint.set(x, y, z);
+	}
+	
+	return resultUnitaryPosition;
+};
+
+/**
  * This function returns the tangent line of the splineSegment at the unitaryPosition.
  */
-BSplineCubic3D.getTangent = function(bSpline, position, resultTangentLine) 
+BSplineCubic3D.getTangent = function(bSpline, linearPosition, resultTangentLine) 
 {
-	// "position" is a length measurement.***
+	// "linearPosition" is a length measurement.***
 	var kNotsCount = bSpline.knotPoints3dList.getPointsCount();
 	
 	if (bSpline.segmentLengthArray === undefined)
@@ -280,7 +354,7 @@ BSplineCubic3D.getTangent = function(bSpline, position, resultTangentLine)
 		}
 	}
 	
-	// 1rst, find the segment that contains the "position".***
+	// 1rst, find the segment that contains the "linearPosition".***
 	var find = false;
 	var i = 0;
 	var lengthAux = 0;
@@ -289,22 +363,26 @@ BSplineCubic3D.getTangent = function(bSpline, position, resultTangentLine)
 	while (!find && i<kNotsCount)
 	{
 		lengthAux += bSpline.segmentLengthArray[i];
-		if (lengthAux >= position)
+		if (lengthAux >= linearPosition)
 		{
 			find = true;
 			segmentIdx = i;
 			
-			var localPosition = position - prevLengthAux;
+			var localPosition = linearPosition - prevLengthAux;
 			var unitaryPosition = localPosition/bSpline.segmentLengthArray[segmentIdx];
 			
+			// Must find the realUnitaryPosition.******************************************
 			var currSegment = bSpline.knotPoints3dList.getSegment3D(segmentIdx, undefined, bLoop);
 			var strPoint = currSegment.startPoint3d;
 			var endPoint = currSegment.endPoint3d;
 			
 			var strControlPoint = bSpline.controlPoints3dMap[segmentIdx].outingControlPoint;
 			var endControlPoint = bSpline.controlPoints3dMap[segmentIdx+1].inningControlPoint;
-			
-			resultTangentLine = BSplineCubic3D.getTangentForSegment(strPoint, strControlPoint, endControlPoint, endPoint, unitaryPosition, resultTangentLine);
+			var interpolationsCount = 20;
+			var realUnitaryPos = BSplineCubic3D.getUnitaryPositionForSegmentAtLinearPosition(strPoint, strControlPoint, endControlPoint, endPoint, localPosition, interpolationsCount);
+			// End find the realUnitaryPosition.---------------------------------------------
+
+			resultTangentLine = BSplineCubic3D.getTangentForSegment(strPoint, strControlPoint, endControlPoint, endPoint, realUnitaryPos, resultTangentLine);
 		}
 		prevLengthAux = lengthAux;
 		i++;

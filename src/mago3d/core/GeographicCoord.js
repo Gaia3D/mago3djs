@@ -188,7 +188,7 @@ GeographicCoord.prototype.getLongitudeRad = function()
 };
 
 /**
- * get the middle point between two GeopraphicCoord features
+ * Returns the middle point between two GeopraphicCoord features
  * @param {GeographicCoord} geographicCoordA
  * @param {GeographicCoord} geographicCoordB
  * @param {GeographicCoord} resultGeographicCoord
@@ -208,6 +208,21 @@ GeographicCoord.getMidPoint = function(geographicCoordA, geographicCoordB, resul
 	}
 	
 	return resultGeographicCoord;
+};
+
+/**
+ * Returns the module of the vector of geographicCoordA to geographicCoordB, without altitude.
+ * @param {GeographicCoord} geographicCoordA
+ * @param {GeographicCoord} geographicCoordB
+ * @returns {Number}
+ */
+GeographicCoord.getAngleBetweenCoords = function(geographicCoordA, geographicCoordB) 
+{
+	var lonDiff = geographicCoordB.longitude - geographicCoordA.longitude;
+	var latDiff = geographicCoordB.latitude - geographicCoordA.latitude;
+	var result = Math.sqrt(lonDiff*lonDiff + latDiff*latDiff);
+	
+	return result;
 };
 
 /**

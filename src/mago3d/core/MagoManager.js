@@ -1773,12 +1773,14 @@ MagoManager.prototype.keyDown = function(key)
 
 		// Test 2: moving by a path.***
 		var bSplineCubic3d = this.modeler.bSplineCubic3d;
+		var geographicCoordsArray = bSplineCubic3d.geoCoordsList.geographicCoordsArray;
+		var path3d = new Path3D(geographicCoordsArray);
 		if (bSplineCubic3d !== undefined)
 		{
 			// do animation by path.***
 			var animationOption = {
 				animationType                : CODE.animationType.PATH,
-				path                         : bSplineCubic3d,
+				path                         : path3d,
 				linearVelocityInMetersSecond : 30
 			};
 			this.changeLocationAndRotation(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll, animationOption);
@@ -1814,8 +1816,12 @@ MagoManager.prototype.keyDown = function(key)
 		var bSplineCubic3d = this.modeler.bSplineCubic3d;
 		if (bSplineCubic3d !== undefined)
 		{
+			var maxLengthDegree = 0.001;
+			Path3D.insertPointsOnLargeSegments(bSplineCubic3d.geoCoordsList.geographicCoordsArray, maxLengthDegree, this);
+		
 			// Make the controlPoints.***
-			bSplineCubic3d.makeControlPoints();
+			var controlPointArmLength = 0.2;
+			bSplineCubic3d.makeControlPoints(controlPointArmLength, this);
 			bSplineCubic3d.makeInterpolatedPoints();
 		}
 	}

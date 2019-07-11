@@ -4,14 +4,17 @@
  * 어떤 일을 하고 있습니까?
  * @class GeographicCoordsList
  */
-var GeographicCoordsList = function() 
+var GeographicCoordsList = function(geographicCoordsArray) 
 {
 	if (!(this instanceof GeographicCoordsList)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	this.geographicCoordsArray = [];
+	if (geographicCoordsArray !== undefined)
+	{ this.geographicCoordsArray = geographicCoordsArray; }
+	else
+	{ this.geographicCoordsArray = []; }
 	this.vboKeysContainer;
 	this.owner;
 	

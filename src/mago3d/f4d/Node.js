@@ -775,7 +775,7 @@ Node.prototype.finishedAnimation = function(magoManager)
 	if (animType === CODE.animationType.PATH)
 	{
 		// Test.***
-		var nextPosLine = AnimationManager.getNextPosition(animData, currTime);
+		var nextPosLine = AnimationManager.getNextPosition(animData, currTime, magoManager);
 		
 		if (nextPosLine === undefined)
 		{ 
@@ -784,7 +784,7 @@ Node.prototype.finishedAnimation = function(magoManager)
 		}
 	
 		var path = animData.path;
-		var pathGeoLocDataManager = path.knotPoints3dList.geoLocDataManager;
+		var pathGeoLocDataManager = path.getGeoLocationDataManager();
 		var pathGeoLocData = pathGeoLocDataManager.getCurrentGeoLocationData();
 		
 		// Now, calculate the geographic coords of the position.***
