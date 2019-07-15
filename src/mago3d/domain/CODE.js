@@ -75,5 +75,11 @@ CODE.imageryType = {
 	"WEB_MERCATOR" : 2
 };
 
+CODE.animationType = {
+	"UNKNOWN"         : 0,
+	"REALTIME_POINTS" : 1,
+	"PATH"            : 2
+};
+
 CODE.PROJECT_ID_PREFIX = "projectId_";
 CODE.PROJECT_DATA_FOLDER_PREFIX = "projectDataFolder_";

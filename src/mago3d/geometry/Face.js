@@ -345,9 +345,6 @@ Face.prototype.getTessellatedTriangles = function(resultTrianglesArray)
 
 	// 1rst, must project the face to a plane and process to tessellate in 2d.
 	var normal = this.getPlaneNormal();
-	
-
-	//var bestPlaneToProject = Face.getBestFacePlaneToProject(normal);
 
 	// Create a temp polygon2d.
 	var polygon2d = Face.getProjectedPolygon2D(this.vertexArray, normal, undefined);
@@ -400,6 +397,7 @@ Face.prototype.getTessellatedTriangles = function(resultTrianglesArray)
  */
 Face.prototype.getTrianglesConvex = function(resultTrianglesArray)
 {
+	// To call this method, the face MUST be convex.
 	// To call this method, the face MUST be convex.
 	if (this.vertexArray === undefined || this.vertexArray.length === 0)
 	{ return resultTrianglesArray; }

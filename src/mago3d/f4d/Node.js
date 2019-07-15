@@ -183,6 +183,9 @@ Node.prototype.calculateGeoLocData = function(magoManager)
 			var rootNode = this.getRoot();
 			if (rootNode)
 			{
+				if (this.data.nodeId === "G15_0002")
+				{ var hola = 0; }
+				
 				// now, calculate the root center of bbox.
 				var buildingSeed = this.data.buildingSeed;
 				var buildingSeedBBox = buildingSeed.bBox;
@@ -758,28 +761,76 @@ Node.prototype.finishedAnimation = function(magoManager)
 	if (animData === undefined)
 	{ return true; }
 
-	//애니메이션 종료시 true 반환. 
-	if (animData.finished)
-	{ return true; }
-
-	if (animData.startLongitude === undefined || animData.startLatitude === undefined || animData.startAltitude === undefined)
-	{ return true; }
-	
-	// calculate the currentLocation and currentRotation.
 	var currTime = magoManager.getCurrentTime();
-	if (animData.lastTime === undefined)
-	{ animData.lastTime = animData.birthTime; }
 	
-	var totalDeltaTime = (currTime - animData.birthTime)/1000.0; // in seconds.
-
-	//최종 위치 및 회전
 	var nextLongitude;
 	var nextLatitude;
 	var nextAltitude;
 	var nextHeading;
 	var nextPitch;
 	var nextRoll;
+
+	// Check animationType.***
+	var animType = animData.animationType;
+	if (animType === CODE.animationType.PATH)
+	{
+		// Test.***
+		var nextPosLine = AnimationManager.getNextPosition(animData, currTime, magoManager);
+		
+		if (nextPosLine === undefined)
+		{ 
+			animData.finished = true;
+			return true; 
+		}
 	
+		var path = animData.path;
+		var pathGeoLocDataManager = path.getGeoLocationDataManager();
+		var pathGeoLocData = pathGeoLocDataManager.getCurrentGeoLocationData();
+		
+		// Now, calculate the geographic coords of the position.***
+		var posLocal = nextPosLine.point;
+		var dir = nextPosLine.direction;
+		
+		// calculate worldPos.***
+		var tMat = pathGeoLocData.tMatrix;
+		var posWC = tMat.transformPoint3D(posLocal, undefined);
+		
+		var geographicCoords = Globe.CartesianToGeographicWgs84(posWC.x, posWC.y, posWC.z, undefined);
+		nextLatitude = geographicCoords.latitude;
+		nextLongitude = geographicCoords.longitude;
+		nextAltitude = geographicCoords.altitude;
+		
+		// now calculate heading, pitch & roll.***
+		var yAxis = new Point2D(0, 1);
+		var dir2d = new Point2D(dir.x, dir.y);
+		dir2d.unitary();
+		var headingAngle = yAxis.angleDegToVector(dir2d);
+		if (dir2d.x > 0.0)
+		{
+			headingAngle *= -1;
+		}
+		
+		this.changeLocationAndRotation(nextLatitude, nextLongitude, nextAltitude, headingAngle, undefined, undefined, magoManager);
+		
+		// finally update "lastTime".
+		animData.lastTime = currTime;
+		return finished;
+	}
+
+	//애니메이션 종료시 true 반환. 
+	if (animData.finished)
+	{ return true; }
+
+
+	if (animData.startLongitude === undefined || animData.startLatitude === undefined || animData.startAltitude === undefined)
+	{ return true; }
+	
+	// calculate the currentLocation and currentRotation.
+	if (animData.lastTime === undefined)
+	{ animData.lastTime = animData.birthTime; }
+	
+	var totalDeltaTime = (currTime - animData.birthTime)/1000.0; // in seconds.
+
 	// calculate velocity.
 	var velocityLon = (animData.targetLongitude - animData.startLongitude)/(animData.durationInSeconds);
 	var velocityLat = (animData.targetLatitude - animData.startLatitude)/(animData.durationInSeconds);
@@ -861,6 +912,12 @@ Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude,
 	var animData = this.data.animationData;
 	animData.finished = false;
 	
+	// New for animation by path.***
+	animData.animationType = animationOption.animationType;
+	animData.path = animationOption.path;
+	animData.linearVelocityInMetersSecond = animationOption.linearVelocityInMetersSecond;
+	// End animation by path.***
+	
 	var geoLocDataManager = this.getNodeGeoLocDataManager();
 	if (geoLocDataManager === undefined)
 	{ return; }
@@ -932,7 +989,7 @@ Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude,
 	//geoLocData.pitch = animData.targetPitch;
 	//geoLocData.roll = animData.targetRoll;
 
-	//Duration For compatibility with lower versions, lower version parameter is just duratiuon(number).
+	//Duration For compatibility with lower versions, lower version parameter is just duration(number).
 	var isAnimOption = typeof animationOption === 'object' && isNaN(animationOption);
 	var durationInSeconds = 3.0;
 	if (isAnimOption)
@@ -1047,6 +1104,27 @@ Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude,
 	// end setting geoLocDataTarget.--------------------------------------------------
 	
 	
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+Node.prototype.nodeMoved = function(node) 
+{
+	// node was moved, so, check if is out of the smartTileOwner.
+	// If node is out of the smartTileOwner, then, erase the node from the smartTileOwner, and then put the node in the corresponent smartTile.
+	if (node === undefined)
+	{ return; }
+	
+	var smartTileOwner = node.data.smartTileOwner;
+	if (!smartTileOwner.intersectsNode(node))
+	{
+		smartTileOwner.eraseNode(node);
+				
+		// Now, put the node in the corresponent smartTile.
+		var targetDepth = smartTileOwner.targetDepth;
+		magoManager.smartTileManager.putNode(targetDepth, node, magoManager);
+	}
 };
 
 

@@ -10,12 +10,15 @@ var AnimationData = function()
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	this.animationType; // No used yet.***
+	this.animationType = CODE.animationType.UNKNOWN;
 	
 	// Linear translation animation.***
 	this.birthTime; //the first update time
 	this.lastTime; // the last update time.
 	this.durationInSeconds;
+	
+	// Path.***
+	this.path; 
 	
 	// start location.
 	this.startLongitude;
