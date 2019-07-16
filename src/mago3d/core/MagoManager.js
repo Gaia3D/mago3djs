@@ -1680,15 +1680,9 @@ MagoManager.prototype.keyDown = function(key)
 {
 	if (key === 32) // 32 = 'space'.***
 	{
-		if (this.pointsCloudSsao === undefined)
-		{ this.pointsCloudSsao = true; }
-		
-		if (this.pointsCloudSsao)
-		{ this.pointsCloudSsao = false; }
-		else
-		{ this.pointsCloudSsao = true; }
-	
-	
+		var renderingSettings = this._settings.getRenderingSettings();
+		var pointsCloudColorRamp = renderingSettings.getPointsCloudInColorRamp();
+		renderingSettings.setPointsCloudInColorRamp(!pointsCloudColorRamp);
 	}
 	else if (key === 37) // 37 = 'left'.***
 	{
@@ -3613,6 +3607,25 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.maxPointSize_loc = gl.getUniformLocation(shader.program, "maxPointSize");
 	shader.minPointSize_loc = gl.getUniformLocation(shader.program, "minPointSize");
 	shader.pendentPointSize_loc = gl.getUniformLocation(shader.program, "pendentPointSize");
+	
+	// 10) Atmosphere shader.****************************************************************************************
+	shaderName = "atmosphere";
+	shader = this.postFxShadersManager.newShader(shaderName);
+	ssao_vs_source = ShaderSource.atmosphereVS;
+	ssao_fs_source = ShaderSource.atmosphereFS;
+	
+	shader.program = gl.createProgram();
+	shader.shader_vertex = this.postFxShadersManager.createShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.postFxShadersManager.createShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+
+	gl.attachShader(shader.program, shader.shader_vertex);
+	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
+	gl.linkProgram(shader.program);
+			
+	shader.createUniformGenerals(gl, shader, this.sceneState);
+	shader.createUniformLocals(gl, shader, this.sceneState);
+	shader.bIsMakingDepth_loc = gl.getUniformLocation(shader.program, "bIsMakingDepth");
 };
 
 /**

@@ -470,7 +470,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			if (renderType === 1)
 			{
 				gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
-				//gl.uniform1f(currentShader.externalAlpha_loc, this.getBlendAlpha(magoManager.getCurrentTime()));
+				gl.uniform1f(currentShader.externalAlpha_loc, this.getBlendAlpha(magoManager.getCurrentTime()));
 				var currSelObject = magoManager.selectionManager.getSelectedGeneral();
 				if (currSelObject === this)
 				{

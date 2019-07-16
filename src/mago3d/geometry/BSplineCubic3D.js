@@ -10,14 +10,27 @@ var BSplineCubic3D = function()
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-
-	this.geoCoordsList; // class : GeographicCoordsList.
+	
+	/**
+	 * The geographic points that represents the knotPoints.
+	 * @type {GeographicCoordsList}
+	 * @default undefined
+	 */
+	this.geoCoordsList; 
+	
+	/**
+	 * GeoLocationDataManager is a class object that contains GeoLocationData objects in an array.
+	 * @type {GeoLocationDataManager}
+	 * @default undefined
+	 */
 	this.geoLocDataManager;
+	
+	
 	this.knotPoints3dList;
 	this.interpolatedPoints3dList;
 	this.controlPoints3dMap; // idxPoint : {prevCPoint, nextCPoint}
 	
-	this.segmentLengthArray; // Length for each segment.***
+	this.segmentLengthArray; // Length for each segment (on the interpolated).***
 	this.dirty = true;
 	
 	this.vtxProfilesList;

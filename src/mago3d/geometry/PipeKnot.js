@@ -12,6 +12,7 @@ var PipeKnot = function()
 	}
 	
 	// Position & curvatureRadius.***
-	
+	this.position;
+	this.radius;
 	
 };

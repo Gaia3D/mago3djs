@@ -11,7 +11,12 @@ var PipePath = function(points3dArray)
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-
+	this.pipeKnotsArray;
 	this.dirty = true;
+	
+};
+
+PipePath.make = function()
+{
 	
 };
