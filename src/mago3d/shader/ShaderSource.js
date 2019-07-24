@@ -33,6 +33,7 @@ uniform vec3 specularColor;\n\
 varying vec3 vertexPos;\n\
 varying float depthValue;\n\
 varying vec3 v3Pos;\n\
+varying vec3 camPos;\n\
 \n\
 const int kernelSize = 16;  \n\
 uniform float radius;      \n\
@@ -41,6 +42,11 @@ uniform float ambientReflectionCoef;\n\
 uniform float diffuseReflectionCoef;  \n\
 uniform float specularReflectionCoef; \n\
 uniform float externalAlpha;\n\
+const float equatorialRadius = 6378137.0;\n\
+const float polarRadius = 6356752.3142;\n\
+const float PI = 3.1415926535897932384626433832795;\n\
+const float PI_2 = 1.57079632679489661923; \n\
+const float PI_4 = 0.785398163397448309616;\n\
 \n\
 float unpackDepth(const in vec4 rgba_depth)\n\
 {\n\
@@ -73,7 +79,11 @@ float getDepth(vec2 coord)\n\
 }    \n\
 \n\
 void main()\n\
-{           \n\
+{  \n\
+	float camElevation = length(camPos) - equatorialRadius;\n\
+	if(v3Pos.z > equatorialRadius + camElevation - 1400000.0)\n\
+		discard;\n\
+	\n\
 	if(bIsMakingDepth)\n\
 	{\n\
 		gl_FragColor = packDepth(-depthValue);\n\
@@ -108,10 +118,30 @@ void main()\n\
 			textureColor = oneColor4;\n\
 		}\n\
 		// Calculate the angle between camDir & vNormal.***\n\
-		vec3 camDir = normalize(v3Pos);\n\
-		float alpha = (far - v3Pos.z)/far;\n\
-		\n\
-		//vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);\n\
+		//vec3 camDir = normalize(v3Pos);\n\
+		vec3 normal = normalize(-v3Pos);\n\
+		vec3 camDir = normalize(v3Pos - camPos);\n\
+		float alpha = 1.0 - (far - v3Pos.z)/far;\n\
+		alpha = 1.0;\n\
+		float angRad = acos(dot(camDir, normal));\n\
+		float angDeg = angRad*180.0/PI;\n\
+		textureColor.xyz *= (equatorialRadius + 500.0)/equatorialRadius;\n\
+		if(angDeg > 160.0)\n\
+			textureColor = vec4(1.0, 0.0, 0.0, 1.0);\n\
+		float pixelElevation = length(v3Pos) - equatorialRadius;\n\
+		float maxAngDeg = 120.0;\n\
+		if(camElevation > 200000.0)\n\
+		{\n\
+			//float factor = 1.0/(maxAngDeg-90.0)*angDeg - 90.0*(1.0/maxAngDeg-90.0);\n\
+			//if(factor < 0.0)\n\
+			//factor = 0.0;\n\
+			//alpha *= factor;\n\
+			\n\
+		}\n\
+		else{\n\
+			\n\
+		}\n\
+\n\
 		gl_FragColor = vec4(textureColor.xyz, alpha); \n\
 	}\n\
 }";
@@ -148,6 +178,7 @@ varying vec3 vLightWeighting;\n\
 varying vec4 vcolor4;\n\
 varying vec3 vertexPos;\n\
 varying float depthValue;\n\
+varying vec3 camPos;\n\
 \n\
 void main()\n\
 {	\n\
@@ -157,7 +188,9 @@ void main()\n\
     vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
     vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
 	\n\
-	vNormal = (normalMatrix4 * vec4(normal.x, normal.y, normal.z, 1.0)).xyz;\n\
+	//vNormal = (normalMatrix4 * vec4(normal.x, normal.y, normal.z, 1.0)).xyz;\n\
+	vNormal = normal;\n\
+	v3Pos = pos4.xyz;\n\
 \n\
 	if(bIsMakingDepth)\n\
 	{\n\
@@ -168,7 +201,8 @@ void main()\n\
 		vTexCoord = texCoord;\n\
 	}\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
-	v3Pos = gl_Position.xyz;\n\
+	//v3Pos = gl_Position.xyz;\n\
+	camPos = encodedCameraPositionMCHigh.xyz + encodedCameraPositionMCLow.xyz;\n\
 }";
 ShaderSource.BlendingCubeFS = "	precision lowp float;\n\
 	varying vec4 vColor;\n\

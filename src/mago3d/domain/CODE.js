@@ -41,7 +41,8 @@ CODE.modelerMode = {
 	"DRAWING_TUNNELPOINTS"     : 5,
 	"DRAWING_BSPLINE"          : 6,
 	"DRAWING_BASICFACTORY"     : 7,
-	"DRAWING_STATICGEOMETRY"   : 8
+	"DRAWING_STATICGEOMETRY"   : 8,
+	"DRAWING_PIPE"             : 9
 };
 
 CODE.modelerDrawingState = {

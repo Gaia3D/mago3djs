@@ -30,28 +30,33 @@ var Modeler = function()
 	this.tunnel; // class : Tunnel.
 	this.basicFactorysArray; // class : BasicFactory.
 	this.bSplineCubic3d;
+	
+	this.objectsArray; // put here all objects.***
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  */
-Modeler.prototype.newBasicFactory = function(attributes) 
+Modeler.prototype.newPipe = function(options) 
 {
-	var min = 10;
-	var max = 50;
-	var minHeight = 2;
-	var maxHeight = 8;
-	var factoryWidth = 20 + Math.random() * (max - min) + min; 
-	var factoryLength = 40 + Math.random() * (max - min) + min;
-	var factoryHeight = 13 + Math.random() * (maxHeight - minHeight) + minHeight;
+	var interiorRadius = options.interiorRadius;
+	var exteriorRadius = options.exteriorRadius;
+	var height = options.height;
 	
-	var doorWidth = factoryWidth * 0.8;
-	var options = {
-		"hasGround"       : true,
-		"roofMinHeight"   : 13,
-		"frontDoorWidth"  : doorWidth,
-		"frontDoorHeight" : 12
-	};
+	var pipe = new Pipe(interiorRadius, exteriorRadius, height, options);
+	
+	if (this.objectsArray === undefined)
+	{ this.objectsArray = []; }
+	
+	this.objectsArray.push(pipe);
+	return pipe;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+Modeler.prototype.newBasicFactory = function(factoryWidth, factoryLength, factoryHeight, options) 
+{
 	var basicFactory = new BasicFactory(factoryWidth, factoryLength, factoryHeight, options);
 	basicFactory.bHasGround = true;
 	
@@ -165,6 +170,17 @@ Modeler.prototype.addPointToPolyline = function(point2d)
  */
 Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive) 
 {
+	// Generic objects.***
+	if (this.objectsArray !== undefined)
+	{
+		var objectsCount = this.objectsArray.length;
+		for (var i=0; i<objectsCount; i++)
+		{
+			this.objectsArray[i].render(magoManager, shader, renderType, glPrimitive);
+		}
+		
+	}
+	
 	// 1rst, render the planeGrid if exist.
 	if (this.planeGrid !== undefined)
 	{

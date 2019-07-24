@@ -659,6 +659,9 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		viewer.updateModelViewMatrixByCamera(sceneState.camera);
 		//magoManager.upDateSceneStateMatrices(sceneState);
 		
+		// Create the tinTerrains(MagoEarth).***
+		magoManager.tinTerrainManager = new TinTerrainManager();
+		
 		// event listener.***
 		canvas.addEventListener('mousedown', function(event)
 		{

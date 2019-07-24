@@ -58,10 +58,10 @@ var Ellipsoid = function(radiusX, radiusY, radiusZ)
 	if (this.endLatRad === undefined)
 	{ this.endLatRad = Math.PI/2; }	
 
-	this.strLonRad = 0.0;
-	this.endLonRad = Math.PI/8;
-	this.strLatRad = 0.0;
-	this.endLatRad = Math.PI/8;
+	//this.strLonRad = 0.0;
+	//this.endLonRad = Math.PI/8;
+	//this.strLatRad = 0.0;
+	//this.endLatRad = Math.PI/8;
 
 };
 
