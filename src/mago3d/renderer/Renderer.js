@@ -698,7 +698,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		{
 			currentShader = magoManager.postFxShadersManager.getShader("modelRefSsao"); 
 			currentShader.useProgram();
-			gl.uniform1i(currentShader.bApplySsao_loc, false); // apply ssao default.***
+			gl.uniform1i(currentShader.bApplySsao_loc, true); // apply ssao default.***
 			
 			gl.uniform1i(currentShader.bApplySpecularLighting_loc, true);
 			gl.enableVertexAttribArray(currentShader.texCoord2_loc);
@@ -1552,7 +1552,7 @@ Renderer.prototype.renderMagoGeometries = function(renderType)
 	var magoManager = this.magoManager;
 	
 	// 1rst, make the test object if no exist.***
-	return;
+	//return;
 	
 	if (magoManager.nativeProjectsArray === undefined)
 	{

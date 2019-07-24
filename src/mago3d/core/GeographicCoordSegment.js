@@ -55,3 +55,36 @@ GeographicCoordSegment.calculateHeadingAngRadToNorthOfSegment = function(geoCoor
 	
 	return headingAngleRad;
 };
+
+/**
+ * Returns the angle to North in radians of the segment.
+ * @param {GeographicCoordSegment} geoCoordSegment.
+ * @param {MagoManager} magoManager worldwind mode removed, this args is not need. 
+ * @returns {Number} Length of the segments.
+ */
+GeographicCoordSegment.getLengthInMeters = function(geoCoordSegment, magoManager) 
+{
+	var strGeoCoord = geoCoordSegment.strGeoCoord;
+	var endGeoCoord = geoCoordSegment.endGeoCoord;
+	
+	var strPointWC = ManagerUtils.geographicCoordToWorldPoint(strGeoCoord.longitude, strGeoCoord.latitude, strGeoCoord.altitude, undefined, magoManager);
+	var endPointWC = ManagerUtils.geographicCoordToWorldPoint(endGeoCoord.longitude, endGeoCoord.latitude, endGeoCoord.altitude, undefined, magoManager);
+	var length = strPointWC.distToPoint(endPointWC);
+	return length;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
