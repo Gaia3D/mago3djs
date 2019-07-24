@@ -41,7 +41,7 @@ GeographicCoordSegment.calculateHeadingAngRadToNorthOfSegment = function(geoCoor
 	geoLocMatrixInv.setByFloat32Array(matrixInv);
 	
 	// Now calculate the relative position of the endPoint respect the startPoint.***
-	var endPointLC = Matrix4.transformPoint3D(endPointWC, undefined);
+	var endPointLC = geoLocMatrixInv.transformPoint3D(endPointWC, undefined);
 	
 	// Finally calculate heading angle to north.***
 	var yAxis = new Point2D(0, 1);
