@@ -31,6 +31,7 @@ varying vec3 vLightWeighting;
 varying vec4 vcolor4;
 varying vec3 vertexPos;
 varying float depthValue;
+varying vec3 camPos;
 
 void main()
 {	
@@ -40,7 +41,9 @@ void main()
     vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;
     vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);
 	
-	vNormal = (normalMatrix4 * vec4(normal.x, normal.y, normal.z, 1.0)).xyz;
+	//vNormal = (normalMatrix4 * vec4(normal.x, normal.y, normal.z, 1.0)).xyz;
+	vNormal = normal;
+	v3Pos = pos4.xyz;
 
 	if(bIsMakingDepth)
 	{
@@ -51,5 +54,6 @@ void main()
 		vTexCoord = texCoord;
 	}
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;
-	v3Pos = gl_Position.xyz;
+	//v3Pos = gl_Position.xyz;
+	camPos = encodedCameraPositionMCHigh.xyz + encodedCameraPositionMCLow.xyz;
 }

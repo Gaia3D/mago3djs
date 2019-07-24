@@ -441,6 +441,8 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 		currentShader.enableVertexAttribArray(currentShader.position3_loc);
 
 		currentShader.bindUniformGenerals();
+		
+		gl.uniform1i(currentShader.bApplySsao_loc, false); // apply ssao.***
 
 		var refTMatrixIdxKey = 0;
 		var minSizeToRender = 0.0;
@@ -704,8 +706,12 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			gl.enableVertexAttribArray(currentShader.normal3_loc);
 			if (currentShader.color4_loc !== -1){ gl.disableVertexAttribArray(currentShader.color4_loc); }
 			
-			currentShader.bindUniformGenerals();
+			gl.uniform1f(currentShader.externalAlpha_loc, 1.0);
 			gl.uniform1i(currentShader.textureFlipYAxis_loc, magoManager.sceneState.textureFlipYAxis);
+			gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
+			gl.uniform4fv(currentShader.oneColor4_loc, [1.0, 1.0, 1.0, 1.0]);
+			
+			currentShader.bindUniformGenerals();
 
 			gl.activeTexture(gl.TEXTURE0);
 			gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);  // original.***
@@ -1154,7 +1160,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			}
 			var pCloudSettings = magoManager.magoPolicy.getPointsCloudSettings();
 			gl.uniform1i(currentShader.bUseColorCodingByHeight_loc, true);
-			gl.uniform1f(currentShader.minHeight_rainbow_loc, 40.0);
+			gl.uniform1f(currentShader.minHeight_rainbow_loc, 6.0);
 			gl.uniform1f(currentShader.maxHeight_rainbow_loc, 75.0);
 			gl.uniform1f(currentShader.maxPointSize_loc, pCloudSettings.maxPointSize);
 			gl.uniform1f(currentShader.minPointSize_loc, pCloudSettings.minPointSize);

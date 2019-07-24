@@ -30,12 +30,32 @@ var Modeler = function()
 	this.tunnel; // class : Tunnel.
 	this.basicFactorysArray; // class : BasicFactory.
 	this.bSplineCubic3d;
+	
+	this.objectsArray; // put here all objects.***
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  */
-Modeler.prototype.newBasicFactory = function(attributes) 
+Modeler.prototype.newPipe = function(options) 
+{
+	var interiorRadius = options.interiorRadius;
+	var exteriorRadius = options.exteriorRadius;
+	var height = options.height;
+	
+	var pipe = new Pipe(interiorRadius, exteriorRadius, height, options);
+	
+	if (this.objectsArray === undefined)
+	{ this.objectsArray = []; }
+	
+	this.objectsArray.push(pipe);
+	return pipe;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+Modeler.prototype.newBasicFactory = function() 
 {
 	var min = 10;
 	var max = 50;
@@ -165,6 +185,17 @@ Modeler.prototype.addPointToPolyline = function(point2d)
  */
 Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive) 
 {
+	// Generic objects.***
+	if (this.objectsArray !== undefined)
+	{
+		var objectsCount = this.objectsArray.length;
+		for (var i=0; i<objectsCount; i++)
+		{
+			this.objectsArray[i].render(magoManager, shader, renderType, glPrimitive);
+		}
+		
+	}
+	
 	// 1rst, render the planeGrid if exist.
 	if (this.planeGrid !== undefined)
 	{

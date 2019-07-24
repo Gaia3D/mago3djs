@@ -277,7 +277,7 @@ var MagoManager = function()
 	 */
 	this._settings = new Settings();
 	
-	//this.tinTerrainManager = new TinTerrainManager();
+	this.tinTerrainManager;
 };
 
 /**
@@ -583,7 +583,10 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		var eqRadius = Globe.equatorialRadius();
 		frustum0.far[0] = (eqRadius + camHeight);
 		//frustum0.far[0] = 30000000.0;
-		frustum0.near[0] = 0.1 + camHeight / 10000000;
+		if (camHeight > eqRadius*1.2)
+		{ frustum0.near[0] = 0.1 + camHeight; }
+		else
+		{ frustum0.near[0] = 0.1 + camHeight / 10000000; }
 		
 		
 		ManagerUtils.calculateSplited3fv([camPos.x, camPos.y, camPos.z], sceneState.encodedCamPosHigh, sceneState.encodedCamPosLow);
@@ -620,7 +623,19 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 
 		frustum0.tangentOfHalfFovy[0] = Math.tan(frustum0.fovyRad[0]/2);
 		
+		
+		
 	}
+	
+	// Test.***
+	for (var i=0; i<16; i++)
+	{
+		sceneState.normalMatrix4._floatArrays[i] = sceneState.modelViewMatrix._floatArrays[i];
+	}
+	sceneState.normalMatrix4._floatArrays[12] = 0;
+	sceneState.normalMatrix4._floatArrays[13] = 0;
+	sceneState.normalMatrix4._floatArrays[14] = 0;
+	sceneState.normalMatrix4._floatArrays[15] = 1;
 	
 	if (this.depthFboNeo !== undefined)
 	{
@@ -1690,8 +1705,9 @@ MagoManager.prototype.keyDown = function(key)
 		{ this.modeler = new Modeler(); }
 		//this.modeler.mode = CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_PLANEGRID;
-		this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
+		//this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_TUNNELPOINTS;
+		this.modeler.mode = CODE.modelerMode.DRAWING_PIPE;
 	}
 	else if (key === 38) // 38 = 'up'.***
 	{
@@ -2017,37 +2033,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 				latitude   : geoCoord.latitude,
 				height     : geoCoord.altitude+20
 			});
-			/*var geoLocDataManager = geoCoord.getGeoLocationDataManager();
-			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+1, attributes.heading, attributes.pitch, attributes.roll, geoLocData, this);
-			
-			// test to insert an staticGeometry AutonomousBus.***
-			var staticGeometryFilePath = "";
 
-			var nodesMap = this.hierarchyManager.getNodesMap(projectId, undefined);
-			var existentNodesCount = Object.keys(nodesMap).length;
-			var buildingId = "AutonomousBus_" + existentNodesCount.toString();
-			
-			// Do a test.***
-			//var projectId = "3ds.json";
-			//buildingId = "GyeomjaeJeongSeon_del";
-		
-			var node = this.hierarchyManager.newNode(buildingId, projectId, undefined);
-			
-			// Now, create the geoLocdataManager of node.***
-			node.data.attributes = attributes;
-			node.data.geographicCoord = geoCoord;
-			node.data.rotationsDegree = new Point3D(attributes.pitch, attributes.roll, attributes.heading);
-			node.data.geoLocDataManager = geoLocDataManager;
-			node.data.rotationsDegree.set(attributes.pitch, attributes.roll, attributes.heading);
-			var geoLocDataManager = node.data.geoLocDataManager;
-			var geoLocData = geoLocDataManager.getCurrentGeoLocationData();
-			
-			geoLocData.setRotationHeadingPitchRoll(attributes.heading, attributes.pitch, attributes.roll);
-			
-			// Now, insert node into smartTile.***
-			var targetDepth = this.smartTileManager.targetDepth;
-			this.smartTileManager.putNode(targetDepth, node, this);*/
 		}
 		// Basic Factory. This is a factory shaped object.***
 		else if (this.modeler.mode === CODE.modelerMode.DRAWING_BASICFACTORY)
@@ -2058,26 +2044,29 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			
 			var factory = this.modeler.newBasicFactory();
 			factory.geoLocDataManager = geoLocDataManager;
-			/*
-			// Create a node and insert into smartTile.***
-			var projectId = "ParametricMeshes";
-			var instanceId = "Factory_" + this.modeler.basicFactorysArray.length;
-			var node = this.hierarchyManager.newNode(instanceId, projectId, undefined);
-			node.data.renderable = factory;
 
-
-			// Now, create the geoLocdataManager of node.***
-			node.data.projectId = projectId;
-			//node.data.attributes = attributes;
-			node.data.geographicCoord = geoCoord;
-			var pitch = 0, roll = 0, heading = 0;
-			node.data.rotationsDegree = new Point3D(pitch, roll, heading);
-			node.data.geoLocDataManager = geoLocDataManager;
-
-			// Now, insert node into smartTile.***
-			var targetDepth = defaultValue(this.smartTileManager.targetDepth, 17);
-			this.smartTileManager.putNode(targetDepth, node, this);
-			*/
+		}
+		else if (this.modeler.mode === CODE.modelerMode.DRAWING_PIPE)
+		{
+			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+10, undefined, undefined, undefined, geoLocData, this);
+			
+			// Create a Pipe object.***
+			var options = {
+				"interiorRadius" : 10,
+				"exteriorRadius" : 20,
+				"height"         : 5,
+				"color"          : {
+					"r" : 0.2,
+					"g" : 0.8, 
+					"b" : 0.8,
+					"a" : 0.4
+				}
+			};
+			
+			var pipe = this.modeler.newPipe(options);
+			pipe.geoLocDataManager = geoLocDataManager;
 		}
 	}
 	
@@ -3626,6 +3615,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.createUniformGenerals(gl, shader, this.sceneState);
 	shader.createUniformLocals(gl, shader, this.sceneState);
 	shader.bIsMakingDepth_loc = gl.getUniformLocation(shader.program, "bIsMakingDepth");
+	shader.equatorialRadius_loc = gl.getUniformLocation(shader.program, "equatorialRadius");
 };
 
 /**

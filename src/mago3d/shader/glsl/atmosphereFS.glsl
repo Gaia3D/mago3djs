@@ -31,6 +31,7 @@ uniform vec3 specularColor;
 varying vec3 vertexPos;
 varying float depthValue;
 varying vec3 v3Pos;
+varying vec3 camPos;
 
 const int kernelSize = 16;  
 uniform float radius;      
@@ -39,6 +40,11 @@ uniform float ambientReflectionCoef;
 uniform float diffuseReflectionCoef;  
 uniform float specularReflectionCoef; 
 uniform float externalAlpha;
+const float equatorialRadius = 6378137.0;
+const float polarRadius = 6356752.3142;
+const float PI = 3.1415926535897932384626433832795;
+const float PI_2 = 1.57079632679489661923; 
+const float PI_4 = 0.785398163397448309616;
 
 float unpackDepth(const in vec4 rgba_depth)
 {
@@ -71,7 +77,11 @@ float getDepth(vec2 coord)
 }    
 
 void main()
-{           
+{  
+	float camElevation = length(camPos) - equatorialRadius;
+	if(v3Pos.z > equatorialRadius + camElevation - 1400000.0)
+		discard;
+	
 	if(bIsMakingDepth)
 	{
 		gl_FragColor = packDepth(-depthValue);
@@ -106,10 +116,30 @@ void main()
 			textureColor = oneColor4;
 		}
 		// Calculate the angle between camDir & vNormal.***
-		vec3 camDir = normalize(v3Pos);
-		float alpha = (far - v3Pos.z)/far;
-		
-		//vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);
+		//vec3 camDir = normalize(v3Pos);
+		vec3 normal = normalize(-v3Pos);
+		vec3 camDir = normalize(v3Pos - camPos);
+		float alpha = 1.0 - (far - v3Pos.z)/far;
+		alpha = 1.0;
+		float angRad = acos(dot(camDir, normal));
+		float angDeg = angRad*180.0/PI;
+		textureColor.xyz *= (equatorialRadius + 500.0)/equatorialRadius;
+		if(angDeg > 160.0)
+			textureColor = vec4(1.0, 0.0, 0.0, 1.0);
+		float pixelElevation = length(v3Pos) - equatorialRadius;
+		float maxAngDeg = 120.0;
+		if(camElevation > 200000.0)
+		{
+			//float factor = 1.0/(maxAngDeg-90.0)*angDeg - 90.0*(1.0/maxAngDeg-90.0);
+			//if(factor < 0.0)
+			//factor = 0.0;
+			//alpha *= factor;
+			
+		}
+		else{
+			
+		}
+
 		gl_FragColor = vec4(textureColor.xyz, alpha); 
 	}
 }
