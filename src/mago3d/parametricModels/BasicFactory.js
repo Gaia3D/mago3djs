@@ -124,6 +124,58 @@ BasicFactory.prototype.getBoundingBox = function()
 };
 
 /**
+ * Returns the bbox.
+ */
+BasicFactory.getFactoryDimensionsByGeoCoordsArray = function(geoCoordsArray, edgeIdxOfDoor, magoManager)
+{
+	if (geoCoordsArray === undefined || geoCoordsArray.length < 4)
+	{ return undefined; }
+	
+	var geoCoord_0 = geoCoordsArray[0];
+	var geoCoord_1 = geoCoordsArray[1];
+	var geoCoord_2 = geoCoordsArray[2];
+	var geoCoord_3 = geoCoordsArray[3];
+	var fWidth, fLength, headingAngDeg;
+	
+	if (edgeIdxOfDoor === 0)
+	{
+		var geoCoordSegment = new GeographicCoordSegment(geoCoord_0, geoCoord_1);
+		var geoCoordSegment2 = new GeographicCoordSegment(geoCoord_1, geoCoord_2);
+	}
+	else if (edgeIdxOfDoor === 1)
+	{
+		var geoCoordSegment = new GeographicCoordSegment(geoCoord_1, geoCoord_2);
+		var geoCoordSegment2 = new GeographicCoordSegment(geoCoord_2, geoCoord_3);
+	}
+	else if (edgeIdxOfDoor === 2)
+	{
+		var geoCoordSegment = new GeographicCoordSegment(geoCoord_2, geoCoord_3);
+		var geoCoordSegment2 = new GeographicCoordSegment(geoCoord_3, geoCoord_0);
+	}
+	else if (edgeIdxOfDoor === 3)
+	{
+		var geoCoordSegment = new GeographicCoordSegment(geoCoord_3, geoCoord_0);
+		var geoCoordSegment2 = new GeographicCoordSegment(geoCoord_0, geoCoord_1);
+	}
+	
+	fWidth = GeographicCoordSegment.getLengthInMeters(geoCoordSegment, magoManager);
+	fLength = GeographicCoordSegment.getLengthInMeters(geoCoordSegment2, magoManager);
+	headingAngDeg = GeographicCoordSegment.calculateHeadingAngRadToNorthOfSegment(geoCoordSegment2, magoManager)*180/Math.PI;
+	
+	var lon = (geoCoord_0.longitude + geoCoord_0.longitude + geoCoord_0.longitude + geoCoord_0.longitude )/4;
+	var lat = (geoCoord_0.latitude + geoCoord_0.latitude + geoCoord_0.latitude + geoCoord_0.latitude )/4;
+	
+	var result = {
+		factoryWidth  : fWidth,
+		factoryLength : fLength,
+		headingDeg    : headingAngDeg,
+		longitude     : lon,
+		latitude      : lat
+	};
+	return result;
+};
+
+/**
  * Makes the geometry mesh.
  */
 BasicFactory.prototype.makeMesh = function()
