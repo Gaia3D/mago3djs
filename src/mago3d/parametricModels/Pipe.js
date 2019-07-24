@@ -98,6 +98,7 @@ Pipe.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 	gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
 	gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, this.color4.a]);
 			
+	//gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
 	gl.enable(gl.BLEND);
 
 	this.mesh.render(magoManager, shader, renderType, glPrimitive);

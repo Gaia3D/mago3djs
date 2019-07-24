@@ -2038,11 +2038,28 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		// Basic Factory. This is a factory shaped object.***
 		else if (this.modeler.mode === CODE.modelerMode.DRAWING_BASICFACTORY)
 		{
+			var min = 10;
+			var max = 50;
+			var minHeight = 2;
+			var maxHeight = 8;
+			var factoryWidth = 20 + Math.random() * (max - min) + min; 
+			var factoryLength = 40 + Math.random() * (max - min) + min;
+			var factoryHeight = 13 + Math.random() * (maxHeight - minHeight) + minHeight;
+			
+			var doorWidth = factoryWidth * 0.8;
+			var options = {
+				"hasGround"       : true,
+				"roofMinHeight"   : factoryHeight*0.75,
+				"frontDoorWidth"  : doorWidth,
+				"frontDoorHeight" : factoryHeight*0.65
+			};
+	
+			var testHeading = 45;
 			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
 			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+10, undefined, undefined, undefined, geoLocData, this);
+			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+10, testHeading, undefined, undefined, geoLocData, this);
 			
-			var factory = this.modeler.newBasicFactory();
+			var factory = this.modeler.newBasicFactory(factoryWidth, factoryLength, factoryHeight, options);
 			factory.geoLocDataManager = geoLocDataManager;
 
 		}
@@ -2056,7 +2073,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			var options = {
 				"interiorRadius" : 10,
 				"exteriorRadius" : 20,
-				"height"         : 5,
+				"height"         : 50,
 				"color"          : {
 					"r" : 0.2,
 					"g" : 0.8, 

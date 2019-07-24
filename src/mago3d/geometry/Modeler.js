@@ -55,23 +55,8 @@ Modeler.prototype.newPipe = function(options)
 /**
  * 어떤 일을 하고 있습니까?
  */
-Modeler.prototype.newBasicFactory = function() 
+Modeler.prototype.newBasicFactory = function(factoryWidth, factoryLength, factoryHeight, options) 
 {
-	var min = 10;
-	var max = 50;
-	var minHeight = 2;
-	var maxHeight = 8;
-	var factoryWidth = 20 + Math.random() * (max - min) + min; 
-	var factoryLength = 40 + Math.random() * (max - min) + min;
-	var factoryHeight = 13 + Math.random() * (maxHeight - minHeight) + minHeight;
-	
-	var doorWidth = factoryWidth * 0.8;
-	var options = {
-		"hasGround"       : true,
-		"roofMinHeight"   : 13,
-		"frontDoorWidth"  : doorWidth,
-		"frontDoorHeight" : 12
-	};
 	var basicFactory = new BasicFactory(factoryWidth, factoryLength, factoryHeight, options);
 	basicFactory.bHasGround = true;
 	
