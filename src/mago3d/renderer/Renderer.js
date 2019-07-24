@@ -564,6 +564,14 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 };
 
 /**
+ * This function renders the atmosphere.
+ */
+Renderer.prototype.renderAtmosphere = function() 
+{
+	
+};
+
+/**
  * This function renders provisional ParametricMesh objects that has no self render function.
  * @param {WebGLRenderingContext} gl WebGL Rendering Context.
  * @param {Number} renderType If renderType = 0 (depth render), renderType = 1 (color render), renderType = 2 (colorCoding render).
@@ -606,6 +614,8 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		var textureAux1x1 = magoManager.texturesManager.getTextureAux1x1();
 		var noiseTexture = magoManager.texturesManager.getNoiseTexture4x4();
 		
+		// Atmosphere.*******************************************************************************
+		
 		
 		
 		// Test TinTerrain.**************************************************************************
@@ -614,6 +624,8 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		
 		if (magoManager.tinTerrainManager !== undefined)
 		{
+			gl.enable(gl.BLEND);
+			gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
 			var bDepthRender = false; // magoManager is no depth render.***
 			magoManager.tinTerrainManager.render(magoManager, bDepthRender, renderType);
 			
@@ -621,8 +633,8 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			if (magoManager.sky === undefined)
 			{ magoManager.sky = new Sky(); }
 			
-			gl.enable(gl.BLEND);
-			currentShader = magoManager.postFxShadersManager.getShader("modelRefSsao"); 
+			
+			currentShader = magoManager.postFxShadersManager.getShader("atmosphere"); 
 			currentShader.useProgram();
 			var bApplySsao = false;
 			
@@ -631,46 +643,18 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			gl.uniform1i(currentShader.bApplySpecularLighting_loc, false);
 			gl.disableVertexAttribArray(currentShader.texCoord2_loc);
 			gl.enableVertexAttribArray(currentShader.position3_loc);
-			gl.disableVertexAttribArray(currentShader.normal3_loc);
-			gl.disableVertexAttribArray(currentShader.color4_loc); 
+			//gl.disableVertexAttribArray(currentShader.normal3_loc);
+			//gl.disableVertexAttribArray(currentShader.color4_loc); 
 			
 			currentShader.bindUniformGenerals();
 			gl.uniform1f(currentShader.externalAlpha_loc, 1.0);
-			gl.uniform1i(currentShader.textureFlipYAxis_loc, magoManager.sceneState.textureFlipYAxis);
 			gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 			gl.uniform4fv(currentShader.oneColor4_loc, [0.1, 0.8, 0.99, 1.0]); //.***
-			var refMatrixType = 0;
-			gl.uniform1i(currentShader.refMatrixType_loc, refMatrixType);
 			
-			if (this.auxMatIdentity === undefined)
-			{
-				this.auxMatIdentity = new Float32Array(16);
-				this.auxMatIdentity[0] = 1.0;		// I(1,1)
-				this.auxMatIdentity[1] = 0.0;		// I(2,1)
-				this.auxMatIdentity[2] = 0.0;		// I(3,1)
-				this.auxMatIdentity[3] = 0.0;		// I(4,1)
-				
-				this.auxMatIdentity[4] = 0.0;		// I(1,2)
-				this.auxMatIdentity[5] = 1.0;		// I(2,2)
-				this.auxMatIdentity[6] = 0.0;		// I(3,2)
-				this.auxMatIdentity[7] = 0.0;		// I(4,2)
-				
-				this.auxMatIdentity[8] = 0.0;		// I(1,3)
-				this.auxMatIdentity[9] = 0.0;		// I(2,3)
-				this.auxMatIdentity[10] = 1.0;	// I(3,3)
-				this.auxMatIdentity[11] = 0.0;	// I(4,3)
-				
-				this.auxMatIdentity[12] = 0.0;	// I(1,4)
-				this.auxMatIdentity[13] = 0.0;	// I(2,4)
-				this.auxMatIdentity[14] = 0.0;	// I(3,4)
-				this.auxMatIdentity[15] = 1.0;	// I(4,4)
-
-			}
-			
-			gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, this.auxMatIdentity);
 			gl.uniform3fv(currentShader.buildingPosHIGH_loc, [0.0, 0.0, 0.0]);
 			gl.uniform3fv(currentShader.buildingPosLOW_loc, [0.0, 0.0, 0.0]);
 
+			
 			gl.activeTexture(gl.TEXTURE0);
 			gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);  // original.***
 			gl.activeTexture(gl.TEXTURE1);

@@ -37,13 +37,19 @@ var Modeler = function()
  */
 Modeler.prototype.newBasicFactory = function(attributes) 
 {
-	var factoryWidth = 30; 
-	var factoryLength = 50;
-	var factoryHeight = 15;
+	var min = 10;
+	var max = 50;
+	var minHeight = 2;
+	var maxHeight = 8;
+	var factoryWidth = 20 + Math.random() * (max - min) + min; 
+	var factoryLength = 40 + Math.random() * (max - min) + min;
+	var factoryHeight = 13 + Math.random() * (maxHeight - minHeight) + minHeight;
+	
+	var doorWidth = factoryWidth * 0.8;
 	var options = {
 		"hasGround"       : true,
 		"roofMinHeight"   : 13,
-		"frontDoorWidth"  : 26,
+		"frontDoorWidth"  : doorWidth,
 		"frontDoorHeight" : 12
 	};
 	var basicFactory = new BasicFactory(factoryWidth, factoryLength, factoryHeight, options);
