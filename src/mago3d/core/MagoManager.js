@@ -2046,6 +2046,24 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			var factoryLength = 40 + Math.random() * (max - min) + min;
 			var factoryHeight = 13 + Math.random() * (maxHeight - minHeight) + minHeight;
 			
+			// Test.***
+			var strGeoCoord = new GeographicCoord(127.567, 38.123, 0);
+			var endGeoCoord = new GeographicCoord(128.567, 39.123, 0);
+			var geoCoordSegment = new GeographicCoordSegment(strGeoCoord, endGeoCoord);
+			
+			var testHeading = GeographicCoordSegment.calculateHeadingAngRadToNorthOfSegment(geoCoordSegment, this)*180/Math.PI;
+			var length = GeographicCoordSegment.getLengthInMeters(geoCoordSegment, this);
+			var hola = 0;
+			
+			// Test.******************
+			var geoCoord_0 = new GeographicCoord(129.3995, 35.5076, 0);
+			var geoCoord_1 = new GeographicCoord(129.3995, 35.5073, 0);
+			var geoCoord_2 = new GeographicCoord(129.3986, 35.5075, 0);
+			var geoCoord_3 = new GeographicCoord(129.3987, 35.5077, 0);
+			var geoCoordsArray = [geoCoord_0, geoCoord_1, geoCoord_2, geoCoord_3];
+			var edgeIdxOfDoor = 0;
+			var resultObj = BasicFactory.getFactoryDimensionsByGeoCoordsArray(geoCoordsArray, edgeIdxOfDoor, this);
+			
 			var doorWidth = factoryWidth * 0.8;
 			var options = {
 				"hasGround"       : true,
@@ -2054,7 +2072,6 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 				"frontDoorHeight" : factoryHeight*0.65
 			};
 	
-			var testHeading = 45;
 			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
 			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
 			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+10, testHeading, undefined, undefined, geoLocData, this);
@@ -2062,14 +2079,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			var factory = this.modeler.newBasicFactory(factoryWidth, factoryLength, factoryHeight, options);
 			factory.geoLocDataManager = geoLocDataManager;
 			
-			// Test.***
-			var strGeoCoord = new GeographicCoord(127.567, 38.123, 0);
-			var endGeoCoord = new GeographicCoord(128.567, 39.123, 0);
-			var geoCoordSegment = new GeographicCoordSegment(strGeoCoord, endGeoCoord);
 			
-			var headingDeg = GeographicCoordSegment.calculateHeadingAngRadToNorthOfSegment(geoCoordSegment, this)*180/Math.PI;
-			var length = GeographicCoordSegment.getLengthInMeters(geoCoordSegment, this);
-			var hola = 0;
 		}
 		else if (this.modeler.mode === CODE.modelerMode.DRAWING_PIPE)
 		{
