@@ -41,7 +41,7 @@ GeographicCoordSegment.calculateHeadingAngRadToNorthOfSegment = function(geoCoor
 	geoLocMatrixInv.setByFloat32Array(matrixInv);
 	
 	// Now calculate the relative position of the endPoint respect the startPoint.***
-	var endPointLC = Matrix4.transformPoint3D(endPointWC, undefined);
+	var endPointLC = geoLocMatrixInv.transformPoint3D(endPointWC, undefined);
 	
 	// Finally calculate heading angle to north.***
 	var yAxis = new Point2D(0, 1);
@@ -55,3 +55,36 @@ GeographicCoordSegment.calculateHeadingAngRadToNorthOfSegment = function(geoCoor
 	
 	return headingAngleRad;
 };
+
+/**
+ * Returns the angle to North in radians of the segment.
+ * @param {GeographicCoordSegment} geoCoordSegment.
+ * @param {MagoManager} magoManager worldwind mode removed, this args is not need. 
+ * @returns {Number} Length of the segments.
+ */
+GeographicCoordSegment.getLengthInMeters = function(geoCoordSegment, magoManager) 
+{
+	var strGeoCoord = geoCoordSegment.strGeoCoord;
+	var endGeoCoord = geoCoordSegment.endGeoCoord;
+	
+	var strPointWC = ManagerUtils.geographicCoordToWorldPoint(strGeoCoord.longitude, strGeoCoord.latitude, strGeoCoord.altitude, undefined, magoManager);
+	var endPointWC = ManagerUtils.geographicCoordToWorldPoint(endGeoCoord.longitude, endGeoCoord.latitude, endGeoCoord.altitude, undefined, magoManager);
+	var length = strPointWC.distToPoint(endPointWC);
+	return length;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

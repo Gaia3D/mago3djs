@@ -2061,7 +2061,15 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			
 			var factory = this.modeler.newBasicFactory(factoryWidth, factoryLength, factoryHeight, options);
 			factory.geoLocDataManager = geoLocDataManager;
-
+			
+			// Test.***
+			var strGeoCoord = new GeographicCoord(127.567, 38.123, 0);
+			var endGeoCoord = new GeographicCoord(128.567, 39.123, 0);
+			var geoCoordSegment = new GeographicCoordSegment(strGeoCoord, endGeoCoord);
+			
+			var headingDeg = GeographicCoordSegment.calculateHeadingAngRadToNorthOfSegment(geoCoordSegment, this)*180/Math.PI;
+			var length = GeographicCoordSegment.getLengthInMeters(geoCoordSegment, this);
+			var hola = 0;
 		}
 		else if (this.modeler.mode === CODE.modelerMode.DRAWING_PIPE)
 		{
