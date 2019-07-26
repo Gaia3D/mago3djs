@@ -1552,7 +1552,7 @@ Renderer.prototype.renderMagoGeometries = function(renderType)
 	var magoManager = this.magoManager;
 	
 	// 1rst, make the test object if no exist.***
-	//return;
+	return;
 	
 	if (magoManager.nativeProjectsArray === undefined)
 	{

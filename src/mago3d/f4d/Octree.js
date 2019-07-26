@@ -506,11 +506,13 @@ Octree.prototype.prepareModelReferencesListData = function(magoManager)
 
 	// Check the version.
 	var version = neoBuilding.getHeaderVersion();
+	/*
 	if (version === "0.0.2")
 	{
 		this.prepareModelReferencesListData_v002(magoManager);
 		return;
 	}
+	*/
 
 	var geometryDataPath = magoManager.readerWriter.geometryDataPath;
 	var buildingFolderName = neoBuilding.buildingFileName;
@@ -1739,11 +1741,11 @@ Octree.prototype.parseAsimetricVersion = function(arrayBuffer, readerWriter, byt
 	if (this.triPolyhedronsCount > 0)
 	{ this.neoBuildingOwner = neoBuildingOwner; }
 
-	if (version === "0.0.2")
-	{
-		// Read ModelLists partitions count.
-		this.blocksListsPartitionsCount = readerWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-	}
+	//if (version === "0.0.2")
+	//{
+	// Read ModelLists partitions count.
+	//this.blocksListsPartitionsCount = readerWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+	//}
 
 	// 1rst, create the 8 subOctrees.
 	for (var i=0; i<subOctreesCount; i++) 

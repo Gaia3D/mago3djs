@@ -383,7 +383,7 @@ ParseQueue.prototype.parseArrayOctreesLod0Models = function(gl, octreesArray, ma
 					// parse the beta version.***
 					blocksList.parseBlocksList(blocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray, magoManager);
 				}
-				else if (headerVersion === "0.0.1")
+				else if (headerVersion === "0.0.1" || headerVersion === "0.0.2")
 				{
 					if (blocksList.dataArraybuffer === undefined)
 					{ continue; }
@@ -393,11 +393,6 @@ ParseQueue.prototype.parseArrayOctreesLod0Models = function(gl, octreesArray, ma
 				
 					// parse versioned.***
 					blocksList.parseBlocksListVersioned_v001(blocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray, magoManager);
-				}
-				else if (headerVersion === "0.0.2")
-				{
-					// parse partitioned.***
-					blocksList.parseBlocksListVersioned_v002(magoManager.readerWriter, neoBuilding.motherBlocksArray, magoManager);
 				}
 				blocksList.dataArraybuffer = undefined;
 				octreesParsedCount++;
