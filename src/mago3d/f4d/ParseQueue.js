@@ -372,6 +372,9 @@ ParseQueue.prototype.parseArrayOctreesLod0Models = function(gl, octreesArray, ma
 				neoBuilding = lowestOctree.neoBuildingOwner;
 				headerVersion = neoBuilding.getHeaderVersion();
 				
+				if (neoBuilding.buildingId === "AutonomousBus_0")
+				{ var hola = 0; }
+				
 				if (headerVersion[0] === "v")
 				{
 					if (blocksList.dataArraybuffer === undefined)

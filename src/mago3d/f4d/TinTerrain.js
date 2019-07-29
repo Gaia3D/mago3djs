@@ -480,6 +480,15 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			}
 			// End test.--------------------------------------------------------------------------------------
 			
+			// Before render, if this is not adult, then render owner first to blend with this.***
+			if (!this.isAdult)
+			{
+				if (this.owner !== undefined)
+				{ 
+					this.owner.render(currentShader, magoManager, bDepth); 
+				}
+			}
+			
 			// render this tinTerrain.
 			var renderWireframe = false;
 			

@@ -79,8 +79,15 @@ float getDepth(vec2 coord)
 void main()
 {  
 	float camElevation = length(camPos) - equatorialRadius;
-	if(v3Pos.z > equatorialRadius + camElevation - 1400000.0)
+	if(v3Pos.z > (camElevation + equatorialRadius))
 		discard;
+		
+	vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);	
+	float linearDepth = getDepth(screenPos);
+	if(linearDepth < 1.0)
+	discard;
+	
+	float distToCam = length(vec3(v3Pos));
 	
 	if(bIsMakingDepth)
 	{
@@ -116,29 +123,37 @@ void main()
 			textureColor = oneColor4;
 		}
 		// Calculate the angle between camDir & vNormal.***
-		//vec3 camDir = normalize(v3Pos);
-		vec3 normal = normalize(-v3Pos);
-		vec3 camDir = normalize(v3Pos - camPos);
-		float alpha = 1.0 - (far - v3Pos.z)/far;
-		alpha = 1.0;
+		vec3 camDir = normalize(vec3(v3Pos.x, v3Pos.y*0.5, -v3Pos.z));
+		vec3 normal = vNormal;
 		float angRad = acos(dot(camDir, normal));
 		float angDeg = angRad*180.0/PI;
-		textureColor.xyz *= (equatorialRadius + 500.0)/equatorialRadius;
-		if(angDeg > 160.0)
+
+		if(angDeg > 130.0)
 			textureColor = vec4(1.0, 0.0, 0.0, 1.0);
-		float pixelElevation = length(v3Pos) - equatorialRadius;
-		float maxAngDeg = 120.0;
-		if(camElevation > 200000.0)
-		{
-			//float factor = 1.0/(maxAngDeg-90.0)*angDeg - 90.0*(1.0/maxAngDeg-90.0);
-			//if(factor < 0.0)
-			//factor = 0.0;
-			//alpha *= factor;
+		else if(angDeg > 120.0)
+			textureColor = vec4(0.0, 1.0, 0.0, 1.0);
+		else if(angDeg > 110.0)
+			textureColor = vec4(0.0, 0.0, 1.0, 1.0);
+		else if(angDeg > 100.0)
+			textureColor = vec4(1.0, 1.0, 0.0, 1.0);
+		else if(angDeg > 90.0)
+			textureColor = vec4(1.0, 0.0, 1.0, 1.0);
 			
-		}
-		else{
-			
-		}
+		//textureColor = vec4(vNormal, 1.0);
+		
+		float maxAngDeg = 105.0;
+		float A = 1.0/(maxAngDeg-95.0);
+		float B = -A*95.0;
+		float alpha = A*angDeg+B;
+		if(alpha < 0.0 )
+		alpha = 0.0;
+		
+		float alphaPlusPerDist = 4.0*(distToCam/equatorialRadius);
+		if(alphaPlusPerDist > 1.0)
+		alphaPlusPerDist = 1.0;
+
+		textureColor = vec4(alpha*0.6*alphaPlusPerDist, alpha*0.9*alphaPlusPerDist, alpha, 1.0);
+
 
 		gl_FragColor = vec4(textureColor.xyz, alpha); 
 	}

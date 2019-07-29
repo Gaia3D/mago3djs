@@ -33,6 +33,12 @@ varying vec3 vertexPos;
 varying float depthValue;
 varying vec3 camPos;
 
+const float equatorialRadius = 6378137.0;
+const float polarRadius = 6356752.3142;
+const float PI = 3.1415926535897932384626433832795;
+const float PI_2 = 1.57079632679489661923; 
+const float PI_4 = 0.785398163397448309616;
+
 void main()
 {	
     vec3 objPosHigh = buildingPosHIGH;
@@ -41,9 +47,7 @@ void main()
     vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;
     vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);
 	
-	//vNormal = (normalMatrix4 * vec4(normal.x, normal.y, normal.z, 1.0)).xyz;
-	vNormal = normal;
-	v3Pos = pos4.xyz;
+	vNormal = (normalMatrix4 * vec4(normal, 0.0)).xyz;
 
 	if(bIsMakingDepth)
 	{
@@ -54,6 +58,7 @@ void main()
 		vTexCoord = texCoord;
 	}
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;
-	//v3Pos = gl_Position.xyz;
 	camPos = encodedCameraPositionMCHigh.xyz + encodedCameraPositionMCLow.xyz;
+	v3Pos = gl_Position.xyz;
+	
 }
