@@ -74,7 +74,6 @@ var Policy = function()
 	this.ssaoRadius = 0.15;
 	
 	var policy = MagoConfig.getPolicy();
-	
 	// PointsCloud.
 	this.pointsCloudSettings = {};
 	if (defined(policy)) 
@@ -92,6 +91,8 @@ var Policy = function()
 		this.pointsCloudSettings.maxPointSize = defaultValue(policy.max_point_size_for_pc, 40.0);
 		this.pointsCloudSettings.minPointSize = defaultValue(policy.min_point_size_for_pc, 3.0);
 		this.pointsCloudSettings.pendentPointSize = defaultValue(policy.pendent_point_size_for_pc, 60.0);
+		this.pointsCloudSettings.minHeightRainbow = defaultValue(policy.minHeight_rainbow_loc, 0.0);
+		this.pointsCloudSettings.maxHeightRainbow = defaultValue(policy.maxHeight_rainbow_loc, 100.0);
 	}
 	else 
 	{
@@ -108,6 +109,8 @@ var Policy = function()
 		this.pointsCloudSettings.maxPointSize = 40.0;
 		this.pointsCloudSettings.minPointSize = 3.0;
 		this.pointsCloudSettings.pendentPointSize = 60.0;
+		this.pointsCloudSettings.minHeightRainbow = 0.0;
+		this.pointsCloudSettings.maxHeightRainbow = 100.0;
 	}
 };
 
