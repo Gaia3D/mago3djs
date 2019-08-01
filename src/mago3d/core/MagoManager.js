@@ -5486,6 +5486,12 @@ MagoManager.prototype.callAPI = function(api)
 
 		return false;
 	}
+	else if (apiName === 'togglePointCloudColor') 
+	{
+		var renderingSettings = this._settings.getRenderingSettings();
+		var pointsCloudColorRamp = renderingSettings.getPointsCloudInColorRamp();
+		renderingSettings.setPointsCloudInColorRamp(!pointsCloudColorRamp);
+	}
 };
 
 MagoManager.prototype.deleteAll = function ()
