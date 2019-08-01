@@ -1114,7 +1114,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	this.depthFboNeo = frustumVolumenObject.depthFbo;
 	this.depthFboNeo.bind(); 
 
-	gl.clearColor(1, 1, 1, 1);
+	gl.clearColor(0, 0, 0, 1);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
@@ -1349,7 +1349,9 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 {
 	var canvas = this.getObjectLabel();
 	var ctx = canvas.getContext("2d");
-	ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+	
+	if (this.isFarestFrustum())
+	{ ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); }
 
 	// lod2.
 	var gl = this.getGl();
@@ -1363,13 +1365,16 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 	
 	// 1rst, collect rootNodes.
 	var rootNodesMap = {};
-	var currentVisiblesArray = visibleObjControlerNodes.currentVisibles2.concat(visibleObjControlerNodes.currentVisibles3);
+	var currentVisiblesArray = visibleObjControlerNodes.currentVisibles1.concat(visibleObjControlerNodes.currentVisibles2, visibleObjControlerNodes.currentVisibles3);
 	var nodesCount = currentVisiblesArray.length;
 	for (var i=0; i<nodesCount; i++)
 	{
 		node = currentVisiblesArray[i];
 		nodeRoot = node.getRoot();
 		if (node.data === undefined || node.data.neoBuilding === undefined)
+		{ continue; }
+	
+		if (node.data.distToCam > 1500.0)
 		{ continue; }
 		
 		var key = node.data.neoBuilding.buildingId;
@@ -1403,7 +1408,7 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 	
 	rootNodesMap = {};
 
-	ctx.restore();
+	ctx.restore(); 
 };
 
 /**
@@ -2674,7 +2679,7 @@ MagoManager.prototype.test_renderDepth_objectSelected = function(currObjectSelec
 	
 	if (this.isFarestFrustum())
 	{
-		gl.clearColor(1, 1, 1, 1);
+		gl.clearColor(0, 0, 0, 1);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	}
 	gl.disable(gl.BLEND);

@@ -175,5 +175,6 @@ void main()
 	else{
 		finalColor = vec4((textureColor.xyz) * occlusion, alfa);
 	}
+	//finalColor = vec4(vNormal, 1.0); // test to render normal color coded.***
     gl_FragColor = finalColor; 
 }
