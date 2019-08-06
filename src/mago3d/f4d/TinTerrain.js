@@ -442,16 +442,26 @@ TinTerrain.prototype.renderBorder = function(currentShader, magoManager)
 
 TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, renderType)
 {
+	/*
+	if (this.owner !== undefined)
+	{
+		if (!this.owner.isPrepared())
+		{
+			this.owner.render(currentShader, magoManager, bDepth, renderType);
+		}
+		return false;
+	}
+	*/
+			
 	if (this.owner === undefined || this.owner.isPrepared())
 	{
 		if (this.isPrepared())
 		{
 			if (this.fileLoadState === CODE.fileLoadState.LOAD_FAILED) // provisional solution.
-			{ return; }
-
+			{ return false; }
 		
 			if (this.texture.texId === undefined)
-			{ return; }
+			{ return false; }
 		
 			var gl = magoManager.getGl();
 		
@@ -470,7 +480,8 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			if (renderType === 1)
 			{
 				gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
-				gl.uniform1f(currentShader.externalAlpha_loc, this.getBlendAlpha(magoManager.getCurrentTime()));
+				//gl.uniform1f(currentShader.externalAlpha_loc, this.getBlendAlpha(magoManager.getCurrentTime()));
+				gl.uniform1f(currentShader.externalAlpha_loc, 1);
 				var currSelObject = magoManager.selectionManager.getSelectedGeneral();
 				if (currSelObject === this)
 				{
@@ -479,15 +490,6 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 				}
 			}
 			// End test.--------------------------------------------------------------------------------------
-			
-			// Before render, if this is not adult, then render owner first to blend with this.***
-			if (!this.isAdult)
-			{
-				if (this.owner !== undefined)
-				{ 
-					this.owner.render(currentShader, magoManager, bDepth); 
-				}
-			}
 			
 			// render this tinTerrain.
 			var renderWireframe = false;
@@ -501,13 +503,21 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			
 			// Positions.
 			if (!vboKey.bindDataPosition(currentShader, magoManager.vboMemoryManager))
-			{ return false; }
+			{ 
+				if (this.owner !== undefined)
+				{ this.owner.render(currentShader, magoManager, bDepth); }
+				return false; 
+			}
 		
 			// TexCoords (No necessary for depth rendering).
 			if (!bDepth)
 			{
 				if (!vboKey.bindDataTexCoord(currentShader, magoManager.vboMemoryManager))
-				{ return false; }
+				{
+					if (this.owner !== undefined)
+					{ this.owner.render(currentShader, magoManager, bDepth); }					
+					return false; 
+				}
 			}
 			
 			// Normals.
@@ -518,7 +528,11 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			
 			// Indices.
 			if (!vboKey.bindDataIndice(currentShader, magoManager.vboMemoryManager))
-			{ return false; }
+			{ 
+				if (this.owner !== undefined)
+				{ this.owner.render(currentShader, magoManager, bDepth); }
+				return false; 
+			}
 			
 			var indicesCount = vboKey.indicesCount;
 			
@@ -562,6 +576,29 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 		// render the owner tinTerrain.
 		this.owner.render(currentShader, magoManager, bDepth);
 	}
+	
+	return true;
+};
+
+TinTerrain.prototype.extractLowestTinTerrains = function(resultLowestTilesArray)
+{
+	if (hasChildren())
+	{
+		for (var key in this.childMap)
+		{
+			if (Object.prototype.hasOwnProperty.call(this.childMap, key))
+			{
+				var child = this.childMap[key];
+				child.visible = false;
+				//child.extractLowestTinTerrains(resultLowestTilesArray);
+				resultLowestTilesArray.push(child);
+			}
+		}
+	}
+	else 
+	{
+		//resultLowestTilesArray.push(this);
+	}
 };
 
 TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum, maxDepth, camPos, magoManager, visibleTilesArray, noVisibleTilesArray)
@@ -578,6 +615,7 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 	}
 	
 	var sphereExtentAux = this.sphereExtent;
+	/*
 	var intersectionType = frustum.intersectionSphere(sphereExtentAux);
 	
 	if (intersectionType === Constant.INTERSECTION_OUTSIDE)
@@ -586,6 +624,7 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 		noVisibleTilesArray.push(this); // collect no visible tiles to delete it.
 		return; 
 	}
+	*/
 	//else if (intersectionType === Constant.INTERSECTION_INSIDE)
 	//{
 	//	// finish the process.
@@ -593,7 +632,7 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 	//	visibleTilesArray.push(this);
 	//	return;
 	//}
-	else if (intersectionType === Constant.INTERSECTION_INTERSECT || intersectionType === Constant.INTERSECTION_INSIDE)
+	//else if (intersectionType === Constant.INTERSECTION_INTERSECT || intersectionType === Constant.INTERSECTION_INSIDE)
 	{
 		var currDepth = this.depth;
 		
@@ -645,6 +684,17 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 			// finish the process.
 			this.visible = true;
 			visibleTilesArray.push(this);
+			
+			// Now, extract all lowest-child and put into "noVisibleTilesArray".***
+			if (this.hasChildren())
+			{
+				//this.extractLowestTinTerrains(noVisibleTilesArray);
+				noVisibleTilesArray.push(this.childMap.LU);
+				noVisibleTilesArray.push(this.childMap.LD);
+				noVisibleTilesArray.push(this.childMap.RU);
+				noVisibleTilesArray.push(this.childMap.RD);
+			}
+			//noVisibleTilesArray.push(this); // collect no visible tiles to delete it.
 			return;
 		}
 		

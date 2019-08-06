@@ -625,13 +625,13 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 		var vboKey = this.vboKeysContainer.vboCacheKeysArray[i];
 		
 		// Positions.
-		if (!vboKey.bindDataPosition(shader, magoManager.vboMemoryManager))
+		if (!vboKey.bindDataPosition(shader, vboMemManager))
 		{ return false; }
 		
 		// Normals.
 		if (vboKey.vboBufferNor)
 		{
-			if (!vboKey.bindDataNormal(shader, magoManager.vboMemoryManager))
+			if (!vboKey.bindDataNormal(shader, vboMemManager))
 			{ return false; }
 		}
 		else 
@@ -642,7 +642,7 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 		// Colors.
 		if (vboKey.vboBufferCol)
 		{
-			if (!vboKey.bindDataColor(shader, magoManager.vboMemoryManager))
+			if (!vboKey.bindDataColor(shader, vboMemManager))
 			{ return false; }
 		}
 		else 
@@ -653,7 +653,7 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 		// TexCoords.
 		if (vboKey.vboBufferTCoord)
 		{
-			if (!vboKey.bindDataTexCoord(shader, magoManager.vboMemoryManager))
+			if (!vboKey.bindDataTexCoord(shader, vboMemManager))
 			{ return false; }
 		}
 		else 
@@ -662,7 +662,7 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 		}
 		
 		// Indices.
-		if (!vboKey.bindDataIndice(shader, magoManager.vboMemoryManager))
+		if (!vboKey.bindDataIndice(shader, vboMemManager))
 		{ return false; }
 		
 		if (glPrimitive)

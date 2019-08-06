@@ -5,6 +5,7 @@
 uniform sampler2D depthTex;
 uniform sampler2D noiseTex;  
 uniform sampler2D diffuseTex;
+uniform sampler2D shadowMapTex;
 uniform bool textureFlipYAxis;
 varying vec3 vNormal;
 uniform mat4 projectionMatrix;
@@ -23,12 +24,7 @@ varying vec4 aColor4; // color from attributes
 uniform bool bApplyScpecularLighting;
 uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.
 
-varying vec2 vTexCoord;   
-varying vec3 vLightWeighting;
-
-varying vec3 diffuseColor;
 uniform vec3 specularColor;
-varying vec3 vertexPos;
 
 const int kernelSize = 16;  
 uniform float radius;      
@@ -36,16 +32,29 @@ uniform float radius;
 uniform float ambientReflectionCoef;
 uniform float diffuseReflectionCoef;  
 uniform float specularReflectionCoef; 
-varying float applySpecLighting;
 uniform bool bApplySsao;
 uniform float externalAlpha;
+uniform bool bApplyShadow;
+
+varying vec2 vTexCoord;   
+varying vec3 vLightWeighting;
+varying vec3 diffuseColor;
+varying vec3 vertexPos;
+varying float applySpecLighting;
+varying vec4 vPosRelToLight; 
 
 float unpackDepth(const in vec4 rgba_depth)
 {
     const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);
     float depth = dot(rgba_depth, bit_shift);
     return depth;
-}                
+}  
+
+float UnpackDepth32( in vec4 pack )
+{
+    float depth = dot( pack, 1.0 / vec4(1.0, 256.0, 256.0*256.0, 16777216.0) );// 256.0*256.0*256.0 = 16777216.0
+    return depth * (16777216.0) / (16777216.0 - 1.0);
+}              
 
 vec3 getViewRay(vec2 tc)
 {
@@ -59,7 +68,12 @@ vec3 getViewRay(vec2 tc)
 float getDepth(vec2 coord)
 {
     return unpackDepth(texture2D(depthTex, coord.xy));
-}    
+}   
+
+float getDepthShadowMap(vec2 coord)
+{
+    return UnpackDepth32(texture2D(shadowMapTex, coord.xy));
+}  
 
 void main()
 {
@@ -137,6 +151,25 @@ void main()
 			lambertian = 0.5;
 		}
 
+	}
+	
+	if(bApplyShadow)
+	{
+		vec3 posRelToLight = vPosRelToLight.xyz / vPosRelToLight.w;
+		posRelToLight = posRelToLight * 0.5 + 0.5;
+		if(posRelToLight.x >= 0.0 && posRelToLight.x <= 1.0)
+		{
+			if(posRelToLight.y >= 0.0 && posRelToLight.y <= 1.0)
+			{
+				float depthRelToLight = getDepthShadowMap(posRelToLight.xy);
+
+				if(posRelToLight.z > depthRelToLight )
+				{
+					if(occlusion > 0.4)
+						occlusion = 0.4;
+				}
+			}
+		}
 	}
 
     vec4 textureColor;

@@ -243,18 +243,23 @@ TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager)
 	
 };
 
-TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType) 
+TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, shader) 
 {
 	var gl = magoManager.sceneState.gl;
-	var currentShader = magoManager.postFxShadersManager.getShader("tinTerrain");
+	var currentShader;
+	if (shader)
+	{ currentShader = shader; }
+	else
+	{ currentShader = magoManager.postFxShadersManager.getShader("tinTerrain"); }
 	var shaderProgram = currentShader.program;
 	
 	gl.useProgram(shaderProgram);
-	gl.enableVertexAttribArray(currentShader.position3_loc);
+	//gl.enableVertexAttribArray(currentShader.position3_loc);
+	currentShader.enableVertexAttribArray(currentShader.position3_loc);
 	if (bDepth)
-	{ gl.disableVertexAttribArray(currentShader.texCoord2_loc); }
+	{ currentShader.disableVertexAttribArray(currentShader.texCoord2_loc); }
 	else
-	{ gl.enableVertexAttribArray(currentShader.texCoord2_loc); }
+	{ currentShader.enableVertexAttribArray(currentShader.texCoord2_loc); }
 	//gl.disableVertexAttribArray(currentShader.normal3_loc);
 	//gl.disableVertexAttribArray(currentShader.color4_loc);
 	

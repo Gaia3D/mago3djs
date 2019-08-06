@@ -676,7 +676,7 @@ Octree.prototype.renderSkin = function(magoManager, neoBuilding, renderType, ren
 			gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
 			if (shader.last_tex_id !== neoBuilding.simpleBuilding3x3Texture.texId)
 			{
-				//gl.activeTexture(gl.TEXTURE2); 
+				gl.activeTexture(gl.TEXTURE2); 
 				gl.bindTexture(gl.TEXTURE_2D, neoBuilding.simpleBuilding3x3Texture.texId);
 				shader.last_tex_id = neoBuilding.simpleBuilding3x3Texture.texId;
 			}
