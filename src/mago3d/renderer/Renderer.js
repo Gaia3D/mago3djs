@@ -1361,8 +1361,8 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			}
 			var pCloudSettings = magoManager.magoPolicy.getPointsCloudSettings();
 			gl.uniform1i(currentShader.bUseColorCodingByHeight_loc, true);
-			gl.uniform1f(currentShader.minHeight_rainbow_loc, 6.0);
-			gl.uniform1f(currentShader.maxHeight_rainbow_loc, 75.0);
+			gl.uniform1f(currentShader.minHeight_rainbow_loc, pCloudSettings.minHeightRainbow);
+			gl.uniform1f(currentShader.maxHeight_rainbow_loc, pCloudSettings.maxHeightRainbow);
 			gl.uniform1f(currentShader.maxPointSize_loc, pCloudSettings.maxPointSize);
 			gl.uniform1f(currentShader.minPointSize_loc, pCloudSettings.minPointSize);
 			gl.uniform1f(currentShader.pendentPointSize_loc, pCloudSettings.pendentPointSize);

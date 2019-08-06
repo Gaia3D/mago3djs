@@ -2,11 +2,13 @@
 'use strict';
 
 /**
- * An API that interacts with the on-screen UI. Class name to be modified by APIGateWay or API class
- * @class MagoFacade
+ * 
+ * @module APIGateway
  */
+
 /**
  * mago3d 활성화/비활성화
+ * @namespace
  * @param {ManagerFactory} managerFactoryInstance 
  * @param {Boolean} isShow true = show, false = hide
  */
@@ -815,5 +817,15 @@ function setNodeAttributeAPI(managerFactoryInstance, projectId, dataKey, option)
 	api.setProjectId(projectId);
 	api.setDataKey(dataKey);
 	api.setNodeAttribute(option);
+	managerFactoryInstance.callAPI(api);
+}
+
+/**
+ * toggle point cloud color mode.
+ * @param {ManagerFactory} managerFactoryInstance
+ */
+function togglePointCloudColorAPI(managerFactoryInstance)
+{
+	var api = new Mago3D.API("togglePointCloudColor");
 	managerFactoryInstance.callAPI(api);
 }
