@@ -1051,6 +1051,7 @@ NeoBuilding.prototype.renderSkin = function(magoManager, shader, renderType)
 			gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
 			if (shader.last_tex_id !== skinLego.texture.texId)
 			{
+				gl.activeTexture(gl.TEXTURE2);
 				gl.bindTexture(gl.TEXTURE_2D, skinLego.texture.texId);
 				shader.last_tex_id = skinLego.texture.texId;
 			}
@@ -1062,6 +1063,7 @@ NeoBuilding.prototype.renderSkin = function(magoManager, shader, renderType)
 			{
 				shader.enableVertexAttribArray(shader.texCoord2_loc);
 				gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
+				gl.activeTexture(gl.TEXTURE2);
 				gl.bindTexture(gl.TEXTURE_2D, magoManager.textureAux_1x1);
 			}
 			else 

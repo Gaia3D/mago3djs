@@ -26,7 +26,7 @@ var SmartTile = function(smartTileName)
 	this.depth; // mother tile depth = 0.
 	this.minGeographicCoord; // longitude, latitude, altitude.
 	this.maxGeographicCoord; // longitude, latitude, altitude.
-	this.sphereExtent; // cartesian position sphere in worldCoord.
+	this.sphereExtent; // Cartesian position sphere in worldCoord.
 	this.subTiles; // array.
 	
 	this.nodeSeedsArray;
@@ -493,9 +493,6 @@ SmartTile.prototype.intersectsNode = function(node)
 	// Find geographicCoords as is possible.
 	var longitude, latitude;
 	
-	if (node.data.nodeId === "G15_0002")
-	{ var hola = 0; }
-	
 	if (rootNode.data.bbox !== undefined && rootNode.data.bbox.geographicCoord !== undefined)
 	{
 		longitude = rootNode.data.bbox.geographicCoord.longitude;
@@ -554,15 +551,18 @@ SmartTile.prototype.takeIntersectedBuildingSeeds = function(nodeSeedsArray)
 			
 			// now, redefine the altitude limits of this tile.
 			var buildingSeed = node.data.buildingSeed;
-			var altitude = buildingSeed.geographicCoordOfBBox.altitude;
-			var bboxRadius = buildingSeed.bBox.getRadiusAprox();
-			if (altitude-bboxRadius < this.minGeographicCoord.altitude)
+			if (buildingSeed !== undefined)
 			{
-				this.minGeographicCoord.altitude = altitude-bboxRadius;
-			}
-			if (altitude+bboxRadius > this.maxGeographicCoord.altitude)
-			{
-				this.maxGeographicCoord.altitude = altitude+bboxRadius;
+				var altitude = buildingSeed.geographicCoordOfBBox.altitude;
+				var bboxRadius = buildingSeed.bBox.getRadiusAprox();
+				if (altitude-bboxRadius < this.minGeographicCoord.altitude)
+				{
+					this.minGeographicCoord.altitude = altitude-bboxRadius;
+				}
+				if (altitude+bboxRadius > this.maxGeographicCoord.altitude)
+				{
+					this.maxGeographicCoord.altitude = altitude+bboxRadius;
+				}
 			}
 		}
 	}
@@ -776,6 +776,18 @@ SmartTile.selectTileAngleRangeByDepth = function(depth)
 	{ return 0.010986328; }
 	if (depth === 15)
 	{ return 0.010986328/2.0; }
+	if (depth === 16)
+	{ return 0.010986328 / 4.0; }
+	if (depth === 17)
+	{ return 0.010986328 / 8.0; }
+	if (depth === 18)
+	{ return 0.010986328 / 16.0; }
+	if (depth === 19)
+	{ return 0.010986328 / 32.0; }
+	if (depth === 20)
+	{ return 0.010986328 / 64.0; }
+	if (depth === 21)
+	{ return 0.010986328 / 128.0; }
 };
 
 /**

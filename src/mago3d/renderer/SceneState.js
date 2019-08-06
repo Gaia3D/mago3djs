@@ -32,6 +32,11 @@ var SceneState = function()
 	this.drawingBufferHeight = new Int32Array([1000]);
 	this.mouseAction = new MouseAction();
 	
+	// Sun.***
+	// omni = 0, spot = 1, directional = 2, area = 3, volume = 4.
+	var lightType = 2;
+	this.sunLight = new LightSource(lightType);
+	
 	// lighting & ssao.
 	this.ambientReflectionCoef = new Float32Array([0.45]); // 0.2.
 	this.diffuseReflectionCoef = new Float32Array([0.75]); // 1.0

@@ -498,7 +498,7 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 		{
 			projectFolderName = neoBuilding.projectFolderName;
 			if (this.fileRequestControler.isFullHeaders())	{ return; }
-			var neoBuildingHeaderPath = geometryDataPath + "/"  + projectFolderName + "/"  + neoBuilding.buildingFileName + "/HeaderAsimetric.hed";
+			var neoBuildingHeaderPath = geometryDataPath + "/" + projectFolderName + "/" + neoBuilding.buildingFileName + "/HeaderAsimetric.hed";
 			
 			this.readerWriter.getNeoHeaderAsimetricVersion(gl, neoBuildingHeaderPath, neoBuilding, this.readerWriter, this); // Here makes the tree of octree.***
 		}
@@ -592,7 +592,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		ManagerUtils.calculateSplited3fv([camPos.x, camPos.y, camPos.z], sceneState.encodedCamPosHigh, sceneState.encodedCamPosLow);
 		
 		// projection.***
-		// considere near as zero provisionally.***
+		// consider near as zero provisionally.***
 		sceneState.projectionMatrix._floatArrays = glMatrix.mat4.perspective(sceneState.projectionMatrix._floatArrays, frustum0.fovyRad[0], frustum0.aspectRatio[0], 0.0, frustum0.far[0]);
 		
 		// modelView.***
@@ -620,11 +620,8 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		sceneState.modelViewProjRelToEyeMatrix._floatArrays[14] = 0;
 		sceneState.modelViewProjRelToEyeMatrix._floatArrays[15] = 1;
 		
-
 		frustum0.tangentOfHalfFovy[0] = Math.tan(frustum0.fovyRad[0]/2);
-		
-		
-		
+
 	}
 	
 	// Test.***
@@ -1103,19 +1100,33 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	var renderTexture = false;
 	
 	// Take the depFrameBufferObject of the current frustumVolume.***
-	if (frustumVolumenObject.depthFbo === undefined) { frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
-	if (this.sceneState.drawingBufferWidth[0] !== frustumVolumenObject.depthFbo.width[0] || this.sceneState.drawingBufferHeight[0] !== frustumVolumenObject.depthFbo.height[0])
+	//if (frustumVolumenObject.depthFbo === undefined) { frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
+	//if (this.sceneState.drawingBufferWidth[0] !== frustumVolumenObject.depthFbo.width[0] || this.sceneState.drawingBufferHeight[0] !== frustumVolumenObject.depthFbo.height[0])
+	//{
+	//	// move this to onResize.***
+	//	frustumVolumenObject.depthFbo.deleteObjects(gl);
+	//	frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
+	//	this.sceneState.camera.frustum.dirty = true;
+	//}
+	//this.depthFboNeo = frustumVolumenObject.depthFbo;
+	
+	// Test.***
+	if (this.depthFboNeo === undefined) { this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
+	if (this.sceneState.drawingBufferWidth[0] !== this.depthFboNeo.width[0] || this.sceneState.drawingBufferHeight[0] !== this.depthFboNeo.height[0])
 	{
 		// move this to onResize.***
-		frustumVolumenObject.depthFbo.deleteObjects(gl);
-		frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
+		this.depthFboNeo.deleteObjects(gl);
+		this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
 		this.sceneState.camera.frustum.dirty = true;
 	}
-	this.depthFboNeo = frustumVolumenObject.depthFbo;
+	//this.depthFboNeo = frustumVolumenObject.depthFbo;
 	this.depthFboNeo.bind(); 
-
-	gl.clearColor(0, 0, 0, 1);
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	if (this.isFarestFrustum())
+	{
+		gl.clearColor(0, 0, 0, 1);
+		gl.clearDepth(1);
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	}
 	
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
 	this.renderer.renderGeometry(gl, ssao_idx, this.visibleObjControlerNodes);
@@ -1130,6 +1141,10 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		var scene = this.scene;
 		scene._context._currentFramebuffer._bind();
 	}
+	
+	//gl.clearColor(0, 0, 0, 1);
+	//gl.clearDepth(1);
+	//gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	
 	ssao_idx = 1;
 	this.renderType = 1;
@@ -1215,7 +1230,7 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 		this.dateSC = new Date();
 		this.currTime = this.dateSC.getTime();
 		
-		//test code delelte
+		//test code delete
 		//this.load_testTextures();
 		// Before of multiFrustumCullingSmartTile, do animation check, bcos during animation some object can change smartTile-owner.***
 		if (this.animationManager !== undefined)
@@ -1804,55 +1819,76 @@ MagoManager.prototype.keyDown = function(key)
 	else if (key === 84) // 84 = 't'.***
 	{
 		// do test.***
-		var excavation = this.modeler.getExcavation();
-		if (excavation !== undefined)
+		if (this.modeler !== undefined)
 		{
-			excavation.makeExtrudeObject(this);
-		}
-		
-		var tunnel = this.modeler.getTunnel();
-		if (tunnel !== undefined)
-		{
-			tunnel.getProfileGeographicCoordsList(); // executed this only to create the profile.*** TEST.***
-			tunnel.makeMesh(this);
-			
-		}
-		
-		// Another test: Change color by projectId & objectId.***
-		var api = new API();
-		api.apiName = "changeColor";
-		api.setProjectId("AutonomousBus");
-		api.setDataKey("AutonomousBus_0");
-		api.setObjectIds("13");
-		api.setColor("220,150,20");
-		this.callAPI(api);
-		
-		// Another test: BSplineCubic3d.***
-		var bSplineCubic3d = this.modeler.bSplineCubic3d;
-		if (bSplineCubic3d !== undefined)
-		{
-			if (bSplineCubic3d.geoCoordsList === undefined)
-			{ bSplineCubic3d.geoCoordsList = new GeographicCoordsList(); }
-			
-			var maxLengthDegree = 0.001;
-			Path3D.insertPointsOnLargeSegments(bSplineCubic3d.geoCoordsList.geographicCoordsArray, maxLengthDegree, this);
-			
-			var coordsCount = bSplineCubic3d.geoCoordsList.geographicCoordsArray.length;
-			for (var i=0; i<coordsCount; i++)
+			var excavation = this.modeler.getExcavation();
+			if (excavation !== undefined)
 			{
-				var geoCoord = bSplineCubic3d.geoCoordsList.geographicCoordsArray[i];
-				var geoLocDataManager = geoCoord.getGeoLocationDataManager();
-				var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-				geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude, undefined, undefined, undefined, geoLocData, this);
+				excavation.makeExtrudeObject(this);
 			}
 			
-			var geoCoordsList = bSplineCubic3d.getGeographicCoordsList();
-			geoCoordsList.makeLines(this);
+			var tunnel = this.modeler.getTunnel();
+			if (tunnel !== undefined)
+			{
+				tunnel.getProfileGeographicCoordsList(); // executed this only to create the profile.*** TEST.***
+				tunnel.makeMesh(this);
+				
+			}
+			
+			// Another test: Change color by projectId & objectId.***
+			var api = new API();
+			api.apiName = "changeColor";
+			api.setProjectId("AutonomousBus");
+			api.setDataKey("AutonomousBus_0");
+			api.setObjectIds("13");
+			api.setColor("220,150,20");
+			this.callAPI(api);
+			
+			// Another test: BSplineCubic3d.***
+			var bSplineCubic3d = this.modeler.bSplineCubic3d;
+			if (bSplineCubic3d !== undefined)
+			{
+				if (bSplineCubic3d.geoCoordsList === undefined)
+				{ bSplineCubic3d.geoCoordsList = new GeographicCoordsList(); }
+				
+				var maxLengthDegree = 0.001;
+				Path3D.insertPointsOnLargeSegments(bSplineCubic3d.geoCoordsList.geographicCoordsArray, maxLengthDegree, this);
+				
+				var coordsCount = bSplineCubic3d.geoCoordsList.geographicCoordsArray.length;
+				for (var i=0; i<coordsCount; i++)
+				{
+					var geoCoord = bSplineCubic3d.geoCoordsList.geographicCoordsArray[i];
+					var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+					var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+					geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude, undefined, undefined, undefined, geoLocData, this);
+				}
+				
+				var geoCoordsList = bSplineCubic3d.getGeographicCoordsList();
+				geoCoordsList.makeLines(this);
+			
+				// Make the controlPoints.***
+				var controlPointArmLength = 0.2;
+				bSplineCubic3d.makeControlPoints(controlPointArmLength, this);
+				bSplineCubic3d.makeInterpolatedPoints();
+			}
+		}
 		
-			// Make the controlPoints.***
-			var controlPointArmLength = 0.2;
-			bSplineCubic3d.makeControlPoints(controlPointArmLength, this);
-			bSplineCubic3d.makeInterpolatedPoints();
+		// Another test.***
+		if (this.smartTile_multibuilding_tested === undefined)
+		{
+			this.smartTile_multibuilding_tested = true;
+			
+			if (this.configInformation === undefined)
+			{
+				this.configInformation = MagoConfig.getPolicy();
+			}
+			
+			this.buildingSeedList = new BuildingSeedList();
+			var fileName;
+			var geometrySubDataPath = "smartTile_multiBuildings";
+			fileName = this.readerWriter.geometryDataPath + "/" + geometrySubDataPath + "/" + "smartTile_multibuildings_indexFile.ist";
+			
+			this.readerWriter.getObjectIndexFileMultiBuildings(fileName, this);
 		}
 	}
 	else if (key === 89) // 89 = 'y'.***
@@ -3656,6 +3692,52 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.createUniformLocals(gl, shader, this.sceneState);
 	shader.bIsMakingDepth_loc = gl.getUniformLocation(shader.program, "bIsMakingDepth");
 	shader.equatorialRadius_loc = gl.getUniformLocation(shader.program, "equatorialRadius");
+	
+	// 11) ImageViewerRectangle Shader.******************************************************************************
+	var shaderName = "imageViewerRectangle";
+	var shader = this.postFxShadersManager.newShader(shaderName);
+	var ssao_vs_source = ShaderSource.ImageViewerRectangleShaderVS;
+	var ssao_fs_source = ShaderSource.ImageViewerRectangleShaderFS;
+
+	shader.program = gl.createProgram();
+	shader.shader_vertex = this.postFxShadersManager.createShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.postFxShadersManager.createShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+
+	gl.attachShader(shader.program, shader.shader_vertex);
+	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
+	gl.linkProgram(shader.program);
+			
+	shader.createUniformGenerals(gl, shader, this.sceneState);
+	shader.createUniformLocals(gl, shader, this.sceneState);
+	
+	// 12) OrthogonalDepth Shader.******************************************************************************
+	var shaderName = "orthogonalDepth";
+	var shader = this.postFxShadersManager.newShader(shaderName);
+	var ssao_vs_source = ShaderSource.OrthogonalDepthShaderVS;
+	var ssao_fs_source = ShaderSource.OrthogonalDepthShaderFS;
+
+	shader.program = gl.createProgram();
+	shader.shader_vertex = this.postFxShadersManager.createShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.postFxShadersManager.createShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+
+	gl.attachShader(shader.program, shader.shader_vertex);
+	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
+	gl.linkProgram(shader.program);
+			
+	shader.createUniformGenerals(gl, shader, this.sceneState);
+	shader.createUniformLocals(gl, shader, this.sceneState);
+	
+	// OrthogonalShader locations.***
+	shader.modelViewProjectionMatrixRelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
+	shader.encodedCameraPositionMCHigh_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
+	shader.encodedCameraPositionMCLow_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
+	shader.fov_loc = gl.getUniformLocation(shader.program, "fov");
+	shader.aspectRatio_loc = gl.getUniformLocation(shader.program, "aspectRatio");
+	shader.screenWidth_loc = gl.getUniformLocation(shader.program, "screenWidth");
+	shader.screenHeight_loc = gl.getUniformLocation(shader.program, "screenHeight");
+	
 };
 
 /**
@@ -3798,7 +3880,6 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 	var magoPolicy = this.magoPolicy;
 	
 	
-	
 	var lod0_minDist = magoPolicy.getLod1DistInMeters();
 	var lod1_minDist = 1;
 	var lod2_minDist = magoPolicy.getLod2DistInMeters();
@@ -3850,11 +3931,6 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 				// determine LOD for each building.
 				node = lowestTile.nodesArray[j];
 				nodeRoot = node.getRoot();
-				
-				if (node.data.nodeId === "G15_0002")
-				{
-					var hola = 0;
-				}
 
 				// now, create a geoLocDataManager for node if no exist.
 				if (nodeRoot.data.geoLocDataManager === undefined)
@@ -3881,7 +3957,6 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 				data.currentLod;
 				data.distToCam = distToCamera;
 				
-				
 				if (data.distToCam < lod0Dist)
 				{ data.currentLod = 0; }
 				else if (data.distToCam < lod1Dist)
@@ -3903,11 +3978,6 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 					continue; 
 				}
 				
-				if (node.data.nodeId === "G15_0002")
-				{
-					var hola = 0;
-				}
-				
 				// If necessary do frustum culling.*************************************************************************
 				if (doFrustumCullingToBuildings)
 				{
@@ -3924,11 +3994,6 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 				
 				
 				//-------------------------------------------------------------------------------------------
-				
-				if (node.data.nodeId === "G15_0002")
-				{
-					var hola = 0;
-				}
 				
 				// provisionally fork versions.***
 				var version = neoBuilding.getHeaderVersion();
@@ -4336,6 +4401,14 @@ MagoManager.prototype.getObjectIndexFile_xxxx = function()
 /**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
  */
+MagoManager.prototype.makeNodeGeneric = function(resultPhysicalNodesArray, buildingSeedMap, projectFolderName, projectId) 
+{
+	
+};
+
+/**
+ * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
+ */
 MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray, buildingSeedMap, projectFolderName, projectId) 
 {
 	var attributes = undefined;
@@ -4401,11 +4474,6 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 			node.data.attributes = attributes;
 			node.data.mapping_type = mapping_type;
 			var tMatrix;
-			
-			if (node.data.nodeId === "G15_0002")
-			{
-				var hola = 0;
-			}
 			
 			if (attributes.isPhysical)
 			{
@@ -4663,7 +4731,6 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList, projectId)
 	//var realTimeLocBlocksList = MagoConfig.getData().alldata; // original.***
 	// "projectId" = json file name.
 	var realTimeLocBlocksList = MagoConfig.getData(CODE.PROJECT_ID_PREFIX + projectId);
-	var buildingSeedsCount;
 	var buildingSeed;
 	var buildingId;
 	var newLocation;
@@ -4689,7 +4756,36 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList, projectId)
 	this.smartTileManager.makeTreeByDepth(targetDepth, physicalNodesArray, this);
 
 	this.buildingSeedList.buildingSeedArray.length = 0; // init.
+};
 
+/**
+ * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
+ */
+MagoManager.prototype.makeSmartTileGeneric = function(objectsArray, attributes) 
+{
+	var object;
+	var buildingId;
+	var newLocation;
+
+	// now, read all hierarchyJason and make the hierarchy tree.
+	var physicalNodesArray = []; // put here the nodes that has geometry data.
+	// make a buildingSeedMap.
+	var buildingSeedMap = {};
+	var objectsCount = objectsArray.length;
+	for (var i=0; i<buildingSeedsCount; i++)
+	{
+		object = objectsArray[i];
+		buildingId = object.buildingId;
+		buildingSeedMap[buildingId] = object;
+	}
+	var projectFolderName = attributes.projectFolderName;
+	this.makeNodeGeneric(physicalNodesArray, buildingSeedMap, projectFolderName, projectId);
+	this.calculateBoundingBoxesNodes();
+	
+	// now, make smartTiles.
+	// there are 2 general smartTiles: AsiaSide & AmericaSide.
+	//var targetDepth = 17;
+	//this.smartTileManager.makeTreeByDepth(targetDepth, physicalNodesArray, this);
 };
 
 /**

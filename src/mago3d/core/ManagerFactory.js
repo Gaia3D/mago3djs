@@ -621,7 +621,9 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 	if (serverPolicy.geo_view_library === Constant.MAGOWORLD) 
 	{
 		var canvas = document.getElementById(containerId);
-		var glAttrs = {antialias: false, stencil: true};
+		var glAttrs = {antialias          : true, 
+			stencil            : true,
+			premultipliedAlpha : false};
 		var gl = canvas.getContext("webgl", glAttrs);
 		if (!gl)
 		{ gl = canvas.getContext("experimental-webgl", glAttrs); }
