@@ -25,8 +25,8 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 	var scene = null;
 	var magoManagerState = CODE.magoManagerState.INIT;
 	var _options = options || {};
-	//var startMousePosition = null;
-	//var nowMousePosition = null;
+	_options.animation = _options.animation || false;
+	_options.timeline = _options.timeline || false;
 
 	// 환경 설정
 	MagoConfig.init(serverPolicy, projectIdArray, projectDataArray);
