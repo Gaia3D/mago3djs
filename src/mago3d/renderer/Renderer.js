@@ -601,8 +601,8 @@ Renderer.prototype.renderDepthSunPointOfView = function(gl, visibleObjControlerN
 	var realPosWC = Globe.geographicToCartesianWgs84(realLon, realLat, altitude, undefined);
 	
 	var ortho = new Matrix4();
-	var nRange = 100.0;
-	var left = -nRange, right = nRange, bottom = -nRange, top = nRange, near = -500.0, far = 500.0;
+	var nRange = 200.0;
+	var left = -nRange, right = nRange, bottom = -nRange, top = nRange, near = -800.0, far = 800.0;
 	ortho._floatArrays = glMatrix.mat4.ortho(ortho._floatArrays, left, right, bottom, top, near, far);
 	
 	sunLight.tMatrix = sunTMatrix.getMultipliedByMatrix(ortho, sunLight.tMatrix);
@@ -699,12 +699,18 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
 		{
 			// Test sunLight.***
+			if (magoManager.sceneState.sunLight === undefined)
+			{
+				var lightType = 2;
+				magoManager.sceneState.sunLight = new LightSource(lightType);
+			}
+			
+			var sunLight = magoManager.sceneState.sunLight;
+			var imageWidth = sunLight.targetTextureWidth;
+			var imageHeight = sunLight.targetTextureHeight;
+				
 			if (magoManager.sunDepthFbo === undefined) 
 			{ 
-				//var imageWidth = new Int32Array([2048]);
-				//var imageHeight = new Int32Array([2048]);
-				var imageWidth = magoManager.sceneState.drawingBufferWidth;
-				var imageHeight = magoManager.sceneState.drawingBufferHeight;
 				magoManager.sunDepthFbo = new FBO(gl, imageWidth, imageHeight ); 
 			}
 			
@@ -717,9 +723,11 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 				gl.clearColor(1, 1, 1, 1);
 				gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 			}
+			gl.viewport(0, 0, imageWidth, imageHeight);
 			this.renderDepthSunPointOfView(gl, visibleObjControlerNodes);
 			magoManager.sunDepthFbo.unbind();
 			magoManager.depthFboNeo.bind(); 
+			gl.viewport(0, 0, magoManager.sceneState.drawingBufferWidth[0], magoManager.sceneState.drawingBufferHeight[0]);
 			
 			gl.clearColor(0, 0, 0, 1);
 		}
@@ -880,7 +888,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			currentShader.useProgram();
 			gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
 			gl.uniform1i(currentShader.bApplySpecularLighting_loc, true);
-			gl.uniform1i(shader.bApplyShadow_loc, bApplyShadow);
+			gl.uniform1i(currentShader.bApplyShadow_loc, bApplyShadow);
 			
 			if (bApplyShadow)
 			{
@@ -899,8 +907,6 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			gl.uniform4fv(currentShader.oneColor4_loc, [1.0, 1.0, 1.0, 1.0]);
 			
 			currentShader.bindUniformGenerals();
-			
-			
 
 			gl.activeTexture(gl.TEXTURE0);
 			gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);  // original.***
@@ -920,9 +926,6 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 				gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
 			}
 			
-			
-			var refTMatrixIdxKey = 0;
-			var minSizeToRender = 0.0;
 			var renderType = 1;
 			var refMatrixIdxKey =0; // provisionally set magoManager var here.***
 			magoManager.modeler.render(magoManager, currentShader, renderType);
@@ -1683,6 +1686,27 @@ Renderer.prototype.renderGeometryColorCoding = function(visibleObjControlerNodes
 	var gl = magoManager.getGl();
 	var renderType = 2; // 0 = depthRender, 1= colorRender, 2 = selectionRender.***
 	
+	// Render mago modeler objects.***
+	if (magoManager.modeler !== undefined)
+	{
+		currentShader = magoManager.postFxShadersManager.getShader("modelRefColorCoding"); 
+		currentShader.useProgram();
+
+		currentShader.enableVertexAttribArray(currentShader.position3_loc);
+		currentShader.disableVertexAttribArray(currentShader.texCoord2_loc);
+		currentShader.disableVertexAttribArray(currentShader.normal3_loc);
+		
+		currentShader.bindUniformGenerals();
+		
+		var refTMatrixIdxKey = 0;
+		gl.uniform1i(currentShader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.
+		magoManager.modeler.render(magoManager, currentShader, renderType);
+
+		currentShader.disableVertexAttribArrayAll();
+		gl.useProgram(null);
+	}
+	
+	// Render f4d objects.***
 	//if (magoManager.selectionFbo.dirty) // todo.
 	{
 		var refTMatrixIdxKey = 0;
@@ -1699,7 +1723,6 @@ Renderer.prototype.renderGeometryColorCoding = function(visibleObjControlerNodes
 		gl.disable(gl.CULL_FACE);
 		// do the colorCoding render.***
 		var minSizeToRender = 0.0;
-		var renderType = 2;
 		magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 		magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 		magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
