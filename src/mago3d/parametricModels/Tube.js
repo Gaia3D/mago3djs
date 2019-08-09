@@ -98,32 +98,7 @@ Tube.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 	gl.uniform1i(shader.refMatrixType_loc, 0); // in magoManager case, there are not referencesMatrix.***
 	gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
 	*/
-	
-	if (renderType === 0)
-	{
-		// Depth render.***
-	}
-	else if (renderType === 1)
-	{
-		// Color render.***
-		//gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
-		gl.enable(gl.BLEND);
-		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
-		
-		// Check if is selected.***
-		var selectionManager = magoManager.selectionManager;
-		if (selectionManager.isObjectSelected(this))
-		{
-			gl.disable(gl.BLEND);
-			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 1.0]);
-		}
-		else 
-		{
-			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, this.color4.a]);
-		}
-		
-	}
-	else if (renderType === 2)
+	if (renderType === 2)
 	{
 		// Selection render.***
 		var selectionColor = magoManager.selectionColor;
@@ -156,6 +131,31 @@ Tube.prototype.renderRaw = function(magoManager, shader, renderType, glPrimitive
 	var gl = magoManager.getGl();
 	var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
 	buildingGeoLocation.bindGeoLocationUniforms(gl, shader); // rotMatrix, positionHIGH, positionLOW.
+	
+	if (renderType === 0)
+	{
+		// Depth render.***
+	}
+	else if (renderType === 1)
+	{
+		// Color render.***
+		//gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
+		gl.enable(gl.BLEND);
+		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
+		
+		// Check if is selected.***
+		var selectionManager = magoManager.selectionManager;
+		if (selectionManager.isObjectSelected(this))
+		{
+			gl.disable(gl.BLEND);
+			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 1.0]);
+		}
+		else 
+		{
+			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, this.color4.a]);
+		}
+		
+	}
 
 	this.mesh.render(magoManager, shader, renderType, glPrimitive);
 

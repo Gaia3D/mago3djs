@@ -2690,6 +2690,8 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 				}
 			}
 		}
+		var selectionManager = magoManager.selectionManager;
+		//var generalObjectSelected this.selectionManager.
 	}
 };
 
