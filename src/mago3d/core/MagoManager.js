@@ -2128,6 +2128,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
 			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+10, undefined, undefined, undefined, geoLocData, this);
 			
+			/*
 			// Create a Pipe object.***
 			var options = {
 				"interiorRadius" : 10,
@@ -2143,6 +2144,43 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			
 			var pipe = this.modeler.newPipe(options);
 			pipe.geoLocDataManager = geoLocDataManager;
+			*/
+			var options = {
+				height    : 50,
+				tubeInfos : [
+					{
+						"interiorRadius" : 5,
+						"exteriorRadius" : 10,
+						"color"          : {
+							"r" : 0.2,
+							"g" : 0.8, 
+							"b" : 0.8,
+							"a" : 0.4
+						}
+					}, {
+						"interiorRadius" : 10,
+						"exteriorRadius" : 15,
+						"color"          : {
+							"r" : 0.6,
+							"g" : 0.3, 
+							"b" : 0.8,
+							"a" : 0.4
+						}
+					}, {
+						"interiorRadius" : 15,
+						"exteriorRadius" : 20,
+						"color"          : {
+							"r" : 0.4,
+							"g" : 0.2, 
+							"b" : 0.8,
+							"a" : 0.4
+						}
+					}
+				]
+			};
+			
+			var concentricTubes = new ConcentricTubes(options, geoLocDataManager);
+			this.modeler.addObject(concentricTubes);
 		}
 	}
 	
@@ -2690,8 +2728,13 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 				}
 			}
 		}
-		var selectionManager = magoManager.selectionManager;
-		//var generalObjectSelected this.selectionManager.
+		var selectionManager = this.selectionManager;
+		var generalObjectSelected = selectionManager.getSelectedGeneral();
+		if (generalObjectSelected)
+		{
+			// Move the object.***
+			
+		}
 	}
 };
 

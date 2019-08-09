@@ -138,6 +138,8 @@ ConcentricTubes.prototype.getGeoLocDataManager = function()
  */
 ConcentricTubes.prototype.render = function (magoManager, shader, renderType, glPrimitive) 
 {
+	var gl = magoManager.getGl();
+	var isSelected = false;
 	if (renderType === 0)
 	{
 		// Depth render.***
@@ -145,6 +147,9 @@ ConcentricTubes.prototype.render = function (magoManager, shader, renderType, gl
 	else if (renderType === 1)
 	{
 		// Color render.***
+		var selectionManager = magoManager.selectionManager;
+		if (selectionManager.isObjectSelected(this))
+		{ isSelected = true; }
 	}
 	else if (renderType === 2)
 	{
@@ -164,7 +169,7 @@ ConcentricTubes.prototype.render = function (magoManager, shader, renderType, gl
 		var tube = this.getTube(i);
 
 		if (!tube.geoLocDataManager) { tube.geoLocDataManager = geoLocManager; }
-		tube.renderRaw(magoManager, shader, renderType, glPrimitive);
+		tube.renderRaw(magoManager, shader, renderType, glPrimitive, isSelected);
 	}
 };
 

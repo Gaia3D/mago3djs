@@ -119,7 +119,7 @@ Tube.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 /**
  * Renders the factory.
  */
-Tube.prototype.renderRaw = function(magoManager, shader, renderType, glPrimitive)
+Tube.prototype.renderRaw = function(magoManager, shader, renderType, glPrimitive, bIsSelected)
 {
 	if (this.dirty)
 	{ this.makeMesh(); }
@@ -145,7 +145,12 @@ Tube.prototype.renderRaw = function(magoManager, shader, renderType, glPrimitive
 		
 		// Check if is selected.***
 		var selectionManager = magoManager.selectionManager;
-		if (selectionManager.isObjectSelected(this))
+		if (bIsSelected !== undefined && bIsSelected)
+		{
+			gl.disable(gl.BLEND);
+			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 1.0]);
+		}
+		else if (selectionManager.isObjectSelected(this))
 		{
 			gl.disable(gl.BLEND);
 			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 1.0]);
