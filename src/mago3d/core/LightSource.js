@@ -27,4 +27,6 @@ var LightSource = function(lightType)
 	this.positionLOW;
 	this.tMatrix;
 	
+	this.targetTextureWidth = new Int32Array([2048]);
+	this.targetTextureHeight = new Int32Array([2048]);
 };

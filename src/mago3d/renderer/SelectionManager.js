@@ -191,6 +191,29 @@ SelectionManager.prototype.selectObjects = function(idxKey)
 
 /**
  * SelectionManager
+ */
+SelectionManager.prototype.isObjectSelected = function(object)
+{
+	if (object === undefined)
+	{ return false; }
+	
+	if (this.currentReferenceSelected === object)
+	{ return true; }
+	
+	if (this.currentBuildingSelected === object)
+	{ return true; }
+	
+	if (this.currentNodeSelected === object)
+	{ return true; }
+	
+	if (this.currentGeneralObjectSelected === object)
+	{ return true; }
+	
+	return false;
+};
+
+/**
+ * SelectionManager
  * 
  * @alias SelectionManager
  * @class SelectionManager

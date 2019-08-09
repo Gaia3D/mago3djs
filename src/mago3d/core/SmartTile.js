@@ -24,6 +24,8 @@ var SmartTile = function(smartTileName)
 	if (smartTileName)
 	{ this.name = smartTileName; }
 	this.depth; // mother tile depth = 0.
+	this.X;
+	this.Y;
 	this.minGeographicCoord; // longitude, latitude, altitude.
 	this.maxGeographicCoord; // longitude, latitude, altitude.
 	this.sphereExtent; // Cartesian position sphere in worldCoord.
@@ -798,7 +800,7 @@ SmartTile.selectTileName = function(depth, longitude, latitude, resultTileName)
 {
 	var xMin = -180.0;
 	var yMin = 90.0;
-	var angRange = SmartTile.selectTileAngleRangeByDepth(depth) ;
+	var angRange = SmartTile.selectTileAngleRangeByDepth(depth);
 	
 	var xIndex = Math.floor((longitude - xMin)/angRange);
 	// with yMin = -90.0;
@@ -806,6 +808,25 @@ SmartTile.selectTileName = function(depth, longitude, latitude, resultTileName)
 	var yIndex = Math.floor((yMin - latitude)/angRange);
 	resultTileName = depth.toString() + "\\" + xIndex.toString() + "\\" + yIndex.toString();
 	return resultTileName;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param frustum 변수
+ */
+SmartTile.getGeographicExtentOfTileLXY = function(L, X, Y, resultGeoExtend) 
+{
+	var angRange = SmartTile.selectTileAngleRangeByDepth(L);
+	var minLon = angRange*X;
+	var maxLon = angRange*(X+1);
+	var minLat = 90.0 - angRange*(Y+1);
+	var maxLat = 90.0 - angRange*(Y);
+	
+	if (resultGeoExtend === undefined)
+	{ resultGeoExtend = new GeographicExtent(); }
+	
+	resultGeoExtend.setExtent(minLon, minLat, 0, maxLon, maxLat, 0);
+	return resultGeoExtend;
 };
 
 

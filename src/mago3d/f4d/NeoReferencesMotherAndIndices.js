@@ -1006,10 +1006,11 @@ NeoReferencesMotherAndIndices.prototype.render = function(magoManager, neoBuildi
 		} 
 	}
 
-	var texturesManager = magoManager.texturesManager;
-	var textureAux1x1 = texturesManager.getTextureAux1x1();
-	gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
-	shader.last_tex_id = textureAux1x1;
+	//var texturesManager = magoManager.texturesManager;
+	//var textureAux1x1 = texturesManager.getTextureAux1x1();
+	//gl.activeTexture(gl.TEXTURE2);
+	//gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
+	//shader.last_tex_id = textureAux1x1;
 
 	// New version. Use occlussion indices.
 	//var visibleIndices_count = this.neoRefsIndices.length; // no occludeCulling mode.

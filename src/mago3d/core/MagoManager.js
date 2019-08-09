@@ -3916,8 +3916,6 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 		if (lowestTile.sphereExtent === undefined)
 		{ continue; }
 	
-	
-	
 		distToCamera = cameraPosition.distToSphere(lowestTile.sphereExtent);
 		if (distToCamera > Number(lod5_minDist))
 		{ continue; }
