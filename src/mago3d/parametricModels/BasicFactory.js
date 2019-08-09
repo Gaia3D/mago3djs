@@ -372,10 +372,33 @@ BasicFactory.prototype.render = function(magoManager, shader, renderType, glPrim
 	var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
 	buildingGeoLocation.bindGeoLocationUniforms(gl, shader); // rotMatrix, positionHIGH, positionLOW.
 	
-	gl.uniform1i(shader.bApplySsao_loc, true); // apply ssao.***
+	
 	gl.uniform1i(shader.refMatrixType_loc, 0); // in magoManager case, there are not referencesMatrix.***
-	gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
-	gl.enable(gl.BLEND);
+	
+	if (renderType === 0)
+	{
+		// Depth render.***
+	}
+	else if (renderType === 1)
+	{
+		// Color render.***
+		//gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
+		gl.enable(gl.BLEND);
+		gl.uniform1i(shader.bApplySsao_loc, true); // apply ssao.***
+		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
+	}
+	else if (renderType === 2)
+	{
+		// Selection render.***
+		var selectionColor = magoManager.selectionColor;
+		var colorAux = magoManager.selectionColor.getAvailableColor(undefined);
+		var idxKey = magoManager.selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
+		magoManager.selectionManager.setCandidateGeneral(idxKey, this);
+		
+		gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
+		gl.disable(gl.BLEND);
+	}
+	
 	var objectsCount = this.objectsArray.length;
 	for (var i=0; i<objectsCount; i++)
 	{

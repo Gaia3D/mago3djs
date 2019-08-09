@@ -1297,14 +1297,14 @@ void main()\n\
 	if(bApplyShadow)\n\
 	{\n\
 		vec3 posRelToLight = vPosRelToLight.xyz / vPosRelToLight.w;\n\
-		posRelToLight = posRelToLight * 0.5 + 0.5;\n\
-		if(posRelToLight.x >= 0.0 && posRelToLight.x <= 1.0)\n\
+		\n\
+		if(posRelToLight.x >= -0.5 && posRelToLight.x <= 0.5)\n\
 		{\n\
-			if(posRelToLight.y >= 0.0 && posRelToLight.y <= 1.0)\n\
+			if(posRelToLight.y >= -0.5 && posRelToLight.y <= 0.5)\n\
 			{\n\
+				posRelToLight = posRelToLight * 0.5 + 0.5;\n\
 				float depthRelToLight = getDepthShadowMap(posRelToLight.xy);\n\
-\n\
-				if(posRelToLight.z > depthRelToLight )\n\
+				if(posRelToLight.z > depthRelToLight*0.9963 )\n\
 				{\n\
 					if(occlusion > 0.4)\n\
 						occlusion = 0.4;\n\
