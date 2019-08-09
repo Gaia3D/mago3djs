@@ -138,12 +138,64 @@ ConcentricTubes.prototype.getGeoLocDataManager = function()
  */
 ConcentricTubes.prototype.render = function (magoManager, shader, renderType, glPrimitive) 
 {
+	if (renderType === 0)
+	{
+		// Depth render.***
+	}
+	else if (renderType === 1)
+	{
+		// Color render.***
+		//gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
+		gl.enable(gl.BLEND);
+		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
+		
+		// Check if is selected.***
+		var selectionManager = magoManager.selectionManager;
+		if (selectionManager.isObjectSelected(this))
+		{
+			gl.disable(gl.BLEND);
+			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 1.0]);
+		}
+		else 
+		{
+			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, this.color4.a]);
+		}
+		
+	}
+	else if (renderType === 2)
+	{
+		// Selection render.***
+		var selectionColor = magoManager.selectionColor;
+		var colorAux = magoManager.selectionColor.getAvailableColor(undefined);
+		var idxKey = magoManager.selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
+		magoManager.selectionManager.setCandidateGeneral(idxKey, this);
+		
+		gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
+		gl.disable(gl.BLEND);
+	}
+	
 	var geoLocManager = this.getGeoLocDataManager();
 	for (var i=0, len=this.getSize(); i<len; i++) 
 	{
 		var tube = this.getTube(i);
 
 		if (!tube.geoLocDataManager) { tube.geoLocDataManager = geoLocManager; }
-		tube.render(magoManager, shader, renderType, glPrimitive);
+		tube.renderRaw(magoManager, shader, renderType, glPrimitive);
 	}
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
