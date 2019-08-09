@@ -55,6 +55,36 @@ Modeler.prototype.newPipe = function(options)
 /**
  * 어떤 일을 하고 있습니까?
  */
+Modeler.prototype.newTube = function(options) 
+{
+	var interiorRadius = options.interiorRadius;
+	var exteriorRadius = options.exteriorRadius;
+	var height = options.height;
+	
+	var tube = new Tube(interiorRadius, exteriorRadius, height, options);
+	
+	if (this.objectsArray === undefined)
+	{ this.objectsArray = []; }
+	
+	this.objectsArray.push(tube);
+	return tube;
+};
+
+/**
+ * 모델러에 콘센트릭튜브 추가
+ * @param {Object}
+ */
+Modeler.prototype.addObject = function(object) 
+{
+	if (this.objectsArray === undefined)
+	{ this.objectsArray = []; }
+
+	this.objectsArray.push(object);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 Modeler.prototype.newBasicFactory = function(factoryWidth, factoryLength, factoryHeight, options) 
 {
 	var basicFactory = new BasicFactory(factoryWidth, factoryLength, factoryHeight, options);

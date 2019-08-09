@@ -880,7 +880,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			currentShader.useProgram();
 			gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
 			gl.uniform1i(currentShader.bApplySpecularLighting_loc, true);
-			gl.uniform1i(shader.bApplyShadow_loc, bApplyShadow);
+			gl.uniform1i(currentShader.bApplyShadow_loc, bApplyShadow);
 			
 			if (bApplyShadow)
 			{
