@@ -1853,7 +1853,8 @@ MagoManager.prototype.keyDown = function(key)
 	{
 		if (this.modeler === undefined)
 		{ this.modeler = new Modeler(); }
-		this.modeler.mode = CODE.modelerMode.DRAWING_BSPLINE;
+		//this.modeler.mode = CODE.modelerMode.DRAWING_BSPLINE;
+		this.modeler.mode = CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS;
 	}
 	else if (key === 40) // 40 = 'down'.***
 	{
@@ -1933,6 +1934,7 @@ MagoManager.prototype.keyDown = function(key)
 	else if (key === 84) // 84 = 't'.***
 	{
 		// do test.***
+		/*
 		if (this.modeler !== undefined)
 		{
 			var excavation = this.modeler.getExcavation();
@@ -2004,6 +2006,37 @@ MagoManager.prototype.keyDown = function(key)
 			
 			this.readerWriter.getObjectIndexFileMultiBuildings(fileName, this);
 		}
+		*/
+		
+		// Moviment restriction test.***
+		if (this.modeler !== undefined)
+		{
+			
+			var geoCoordsList = this.modeler.getGeographicCoordsList();
+			var geoCoordSegment = geoCoordsList.getGeoCoordSegment(0);
+			
+			
+			var className = "ConcentricTubes";
+			var objectsArray = this.modeler.extractObjectsByClassName(className);
+			if (objectsArray.length > 0)
+			{
+				var concentricTubes = objectsArray[0];
+				if (concentricTubes.attributes === undefined)
+				{ concentricTubes.attributes = {}; }
+				
+				var attributes = concentricTubes.attributes;
+				if (attributes.movementRestriction === undefined)
+				{ attributes.movementRestriction = {}; }
+				
+				
+				if (attributes.movementRestriction.element === undefined)
+				{
+					attributes.movementRestriction.element = geoCoordSegment;
+				}
+				
+			}
+		}
+		
 	}
 	else if (key === 89) // 89 = 'y'.***
 	{
@@ -2665,9 +2698,38 @@ MagoManager.prototype.moveSelectedObjectGeneral = function(gl, object)
 
 		var newLongitude = geoLocationData.geographicCoord.longitude - difX;
 		var newlatitude = geoLocationData.geographicCoord.latitude - difY;
-
-		//this.changeLocationAndRotationNode(this.selectionManager.currentNodeSelected, newlatitude, newLongitude, undefined, undefined, undefined, undefined);
-		//this.displayLocationAndRotation(this.buildingSelected);
+		
+		// Must check if there are restrictions.***
+		var attributes = object.attributes;
+		if (attributes)
+		{
+			var movementRestriction = attributes.movementRestriction;
+			var movementRestrictionType = movementRestriction.restrictionType;
+			var movRestrictionElem = movementRestriction.element;
+			if (movRestrictionElem && movRestrictionElem.constructor.name === "GeographicCoordSegment")
+			{
+				// restriction.***
+				var geoCoordSegment = movRestrictionElem;
+				var newGeoCoord = new GeographicCoord(newLongitude, newlatitude, 0.0);
+				var projectedCoord = GeographicCoordSegment.getProjectedCoordToLine(geoCoordSegment, newGeoCoord, undefined);
+				
+				// check if is inside.***
+				if (!GeographicCoordSegment.intersectionWithGeoCoord(geoCoordSegment, projectedCoord))
+				{
+					var nearestGeoCoord = GeographicCoordSegment.getNearestGeoCoord(geoCoordSegment, projectedCoord);
+					newLongitude = nearestGeoCoord.longitude;
+					newlatitude = nearestGeoCoord.latitude;
+				}
+				else 
+				{
+					newLongitude = projectedCoord.longitude;
+					newlatitude = projectedCoord.latitude;
+				}
+			}
+		}
+		
+		difX = geoLocationData.geographicCoord.longitude - newLongitude;
+		difY = geoLocationData.geographicCoord.latitude - newlatitude;
 		geoLocationData = ManagerUtils.calculateGeoLocationData(newLongitude, newlatitude, undefined, undefined, undefined, undefined, geoLocationData, this);
 		
 		this.startMovPoint.x -= difX;

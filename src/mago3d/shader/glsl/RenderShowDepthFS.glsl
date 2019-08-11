@@ -25,5 +25,4 @@ vec4 PackDepth32( in float depth )
 void main()
 {     
     gl_FragData[0] = packDepth(-depth);
-	//gl_FragData[0].r = -depth/far;
 }

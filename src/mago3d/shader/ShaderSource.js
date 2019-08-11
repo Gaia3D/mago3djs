@@ -2110,7 +2110,6 @@ vec4 PackDepth32( in float depth )\n\
 void main()\n\
 {     \n\
     gl_FragData[0] = packDepth(-depth);\n\
-	//gl_FragData[0].r = -depth/far;\n\
 }";
 ShaderSource.RenderShowDepthVS = "attribute vec3 position;\n\
 \n\
