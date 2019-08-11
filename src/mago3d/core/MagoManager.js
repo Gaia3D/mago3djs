@@ -2634,6 +2634,14 @@ MagoManager.prototype.moveSelectedObjectGeneral = function(gl, object)
 {
 	if (object === undefined)
 	{ return; }
+
+	var attributes = object.attributes;
+	if (attributes === undefined)
+	{ return; }
+
+	var isMovable = attributes.isMovable;
+	if (isMovable === undefined || isMovable === false)
+	{ return; }
 	
 	var geoLocDataManager = object.getGeoLocDataManager();
 	if (geoLocDataManager === undefined)
