@@ -138,6 +138,11 @@ ConcentricTubes.prototype.getGeoLocDataManager = function()
  */
 ConcentricTubes.prototype.render = function (magoManager, shader, renderType, glPrimitive) 
 {
+	if (this.attributes && this.attributes.isVisible !== undefined && this.attributes.isVisible === false) 
+	{
+		return;
+	}
+
 	var gl = magoManager.getGl();
 	var isSelected = false;
 	if (renderType === 0)
