@@ -218,7 +218,7 @@ SelectionManager.prototype.isObjectSelected = function(object)
  * @alias SelectionManager
  * @class SelectionManager
  */
-SelectionManager.prototype.clearCurrents = function(idxKey)
+SelectionManager.prototype.clearCurrents = function()
 {
 	this.currentReferenceSelected = undefined;
 	this.currentOctreeSelected = undefined;
@@ -235,4 +235,18 @@ SelectionManager.prototype.clearCurrents = function(idxKey)
 	}
 	
 	this.currentGeneralObjectSelected = undefined;
+};
+
+/**
+ * SelectionManager
+ * 
+ * @alias SelectionManager
+ * @class SelectionManager
+ */
+SelectionManager.prototype.TEST__CurrGeneralObjSel = function()
+{
+	if (this.currentGeneralObjectSelected)
+	{ return true; }
+	else
+	{ return false; }
 };

@@ -1008,7 +1008,8 @@ MagoManager.prototype.managePickingProcess = function()
 			this.bPicking = false;
 			this.arrayAuxSC.length = 0;
 			selectionManager.clearCurrents();
-			this.objectSelected = this.getSelectedObjects(gl, this.mouse_x, this.mouse_y, this.arrayAuxSC);
+			var bSelectObjects = true;
+			this.objectSelected = this.getSelectedObjects(gl, this.mouse_x, this.mouse_y, this.arrayAuxSC, bSelectObjects);
 			this.buildingSelected = this.arrayAuxSC[0];
 			this.octreeSelected = this.arrayAuxSC[1];
 			this.nodeSelected = this.arrayAuxSC[3];
@@ -1016,7 +1017,6 @@ MagoManager.prototype.managePickingProcess = function()
 			{ this.rootNodeSelected = this.nodeSelected.getRoot(); }
 			else
 			{ this.rootNodeSelected = undefined; }
-				
 				
 			this.arrayAuxSC.length = 0;
 			if (this.buildingSelected !== undefined) 
@@ -1030,8 +1030,7 @@ MagoManager.prototype.managePickingProcess = function()
 				//this.selectedObjectNotice(currentSelectedBuilding);
 				//console.log("objectId = " + selectedObject.objectId);
 			}
-			
-
+	
 			// Test flyTo by topology.******************************************************************************
 			var selCandidatesEdges = selectionManager.getSelectionCandidatesFamily("networkEdges");
 			var selCandidatesNodes = selectionManager.getSelectionCandidatesFamily("networkNodes");
@@ -1147,33 +1146,39 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	var renderTexture = false;
 	
 	// Take the depFrameBufferObject of the current frustumVolume.***
-	//if (frustumVolumenObject.depthFbo === undefined) { frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
-	//if (this.sceneState.drawingBufferWidth[0] !== frustumVolumenObject.depthFbo.width[0] || this.sceneState.drawingBufferHeight[0] !== frustumVolumenObject.depthFbo.height[0])
+	if (frustumVolumenObject.depthFbo === undefined) { frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
+	if (this.sceneState.drawingBufferWidth[0] !== frustumVolumenObject.depthFbo.width[0] || this.sceneState.drawingBufferHeight[0] !== frustumVolumenObject.depthFbo.height[0])
+	{
+		// move this to onResize.***
+		frustumVolumenObject.depthFbo.deleteObjects(gl);
+		frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
+		this.sceneState.camera.frustum.dirty = true;
+	}
+	this.depthFboNeo = frustumVolumenObject.depthFbo;
+	
+	// Test.*************************************************************************************************************************************************
+	//if (this.depthFboNeo === undefined) { this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
+	//if (this.sceneState.drawingBufferWidth[0] !== this.depthFboNeo.width[0] || this.sceneState.drawingBufferHeight[0] !== this.depthFboNeo.height[0])
 	//{
 	//	// move this to onResize.***
-	//	frustumVolumenObject.depthFbo.deleteObjects(gl);
-	//	frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
+	//	this.depthFboNeo.deleteObjects(gl);
+	//	this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
 	//	this.sceneState.camera.frustum.dirty = true;
 	//}
 	//this.depthFboNeo = frustumVolumenObject.depthFbo;
+	//if (this.isFarestFrustum())
+	//{
+	//	gl.clearColor(0, 0, 0, 1);
+	//	gl.clearDepth(1);
+	//	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	//}
+	// End test.----------------------------------------------------------------------------------------------------------------------------------------------
 	
-	// Test.***
-	if (this.depthFboNeo === undefined) { this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
-	if (this.sceneState.drawingBufferWidth[0] !== this.depthFboNeo.width[0] || this.sceneState.drawingBufferHeight[0] !== this.depthFboNeo.height[0])
-	{
-		// move this to onResize.***
-		this.depthFboNeo.deleteObjects(gl);
-		this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
-		this.sceneState.camera.frustum.dirty = true;
-	}
-	//this.depthFboNeo = frustumVolumenObject.depthFbo;
 	this.depthFboNeo.bind(); 
-	if (this.isFarestFrustum())
-	{
-		gl.clearColor(0, 0, 0, 1);
-		gl.clearDepth(1);
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	}
+
+	gl.clearColor(0, 0, 0, 1);
+	gl.clearDepth(1);
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
 	this.renderer.renderGeometry(gl, ssao_idx, this.visibleObjControlerNodes);
@@ -1299,7 +1304,6 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 		this.sceneState.camera.doTrack(this);
 	}
 	
-	
 	var cameraPosition = this.sceneState.camera.position;
 	
 	// Take the current frustumVolumenObject.***
@@ -1337,7 +1341,7 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 	if (this.bPicking === true && isLastFrustum)
 	{
 		var pixelPos;
-		
+
 		if (this.magoPolicy.issueInsertEnable === true)
 		{
 			if (this.objMarkerSC === undefined)
@@ -1348,7 +1352,7 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 			var objMarker = this.objMarkerManager.newObjectMarker();
 			ManagerUtils.calculateGeoLocationDataByAbsolutePoint(pixelPos.x, pixelPos.y, pixelPos.z, objMarker.geoLocationData, this);
 		}
-		
+
 		if (this.magoPolicy.objectInfoViewEnable === true)
 		{
 			if (this.objMarkerSC === undefined)
@@ -1367,7 +1371,7 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 
 	// Render process.***
 	this.doRender(frustumVolumenObject);
-	
+
 	// test. Draw the buildingNames.***
 	if (this.magoPolicy.getShowLabelInfo())
 	{
@@ -1487,16 +1491,18 @@ MagoManager.prototype.cameraMoved = function()
 };
 
 /**
- * Selects an object of the current visible objects that's under mouse.
- * @param {GL} gl.
- * @param {int} mouseX Screen x position of the mouse.
- * @param {int} mouseY Screen y position of the mouse.
- * @param {VisibleObjectsControler} visibleObjControlerBuildings Contains the current visible objects clasified by LOD.
- * @returns {Array} resultSelectedArray 
  */
-MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, resultSelectedArray) 
+MagoManager.prototype.TEST__SelectionBuffer = function() 
 {
-	// Read the picked pixel and find the object.*********************************************************
+	if (this.selectionFbo === undefined)
+	{ return; }
+	
+	var gl = this.getGl();
+	
+	this.selectionFbo.bind(); // framebuffer for color selection.***
+	///////////////////////////////////////////////////////////////////////
+	var mouseX = 500;
+	var mouseY = 500;
 	var mosaicWidth = 9;
 	var mosaicHeight = 9;
 	var totalPixelsCount = mosaicWidth*mosaicHeight;
@@ -1516,17 +1522,66 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, resultSe
 	// The center pixel of the selection is 12, 13, 14.***
 	var centerPixel = Math.floor(totalPixelsCount/2);
 	var idx = this.selectionColor.decodeColor3(pixels[centerPixel*3], pixels[centerPixel*3+1], pixels[centerPixel*3+2]);
-	this.selectionManager.selectObjects(idx);
-	
-	var selectedObject = this.selectionManager.currentReferenceSelected;
+	if (idx === 0)
+	{ var hola = 0; }
+	//////////////////////////////////////////////////////////////////////////////
+	this.selectionFbo.unbind();
+};
 
-	resultSelectedArray[0] = this.selectionManager.currentBuildingSelected;
-	resultSelectedArray[1] = this.selectionManager.currentOctreeSelected;
-	resultSelectedArray[2] = this.selectionManager.currentReferenceSelected;
-	resultSelectedArray[3] = this.selectionManager.currentNodeSelected;
+/**
+ * Selects an object of the current visible objects that's under mouse.
+ * @param {GL} gl.
+ * @param {int} mouseX Screen x position of the mouse.
+ * @param {int} mouseY Screen y position of the mouse.
+ * @param {VisibleObjectsControler} visibleObjControlerBuildings Contains the current visible objects clasified by LOD.
+ * @returns {Array} resultSelectedArray 
+ */
+MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, resultSelectedArray, bSelectObjects) 
+{
+	if (bSelectObjects === undefined)
+	{ bSelectObjects = false; }
+	
+	// Read the picked pixel and find the object.*********************************************************
+	var mosaicWidth = 9;
+	var mosaicHeight = 9;
+	var totalPixelsCount = mosaicWidth*mosaicHeight;
+	var pixels = new Uint8Array(4 * mosaicWidth * mosaicHeight); // 4 x 3x3 pixel, total 9 pixels select.***
+	var pixelX = mouseX - Math.floor(mosaicWidth/2);
+	var pixelY = this.sceneState.drawingBufferHeight - mouseY - Math.floor(mosaicHeight/2); // origin is bottom.***
+	
+	if (pixelX < 0){ pixelX = 0; }
+	if (pixelY < 0){ pixelY = 0; }
+	
+	gl.readPixels(pixelX, pixelY, mosaicWidth, mosaicHeight, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+	gl.bindFramebuffer(gl.FRAMEBUFFER, null); // unbind framebuffer.***
+	
+	var selectionManager = this.selectionManager;
+
+	// now, select the object.***
+	// The center pixel of the selection is 12, 13, 14.***
+	var centerPixel = Math.floor(totalPixelsCount/2);
+	var idx = this.selectionColor.decodeColor3(pixels[centerPixel*3], pixels[centerPixel*3+1], pixels[centerPixel*3+2]);
+	
+	// Provisionally.***
+	if (bSelectObjects)
+	{ selectionManager.selectObjects(idx); }
+	else 
+	{
+		selectionManager.currentReferenceSelected = selectionManager.referencesMap[idx];
+		selectionManager.currentOctreeSelected = selectionManager.octreesMap[idx];
+		selectionManager.currentBuildingSelected = selectionManager.buildingsMap[idx];
+		selectionManager.currentNodeSelected = selectionManager.nodesMap[idx];
+	}
+	
+	var selectedObject = selectionManager.currentReferenceSelected;
+
+	resultSelectedArray[0] = selectionManager.currentBuildingSelected;
+	resultSelectedArray[1] = selectionManager.currentOctreeSelected;
+	resultSelectedArray[2] = selectionManager.currentReferenceSelected;
+	resultSelectedArray[3] = selectionManager.currentNodeSelected;
 	
 	// Aditionally check if selected an edge of topology.***
-	var selNetworkEdges = this.selectionManager.getSelectionCandidatesFamily("networkEdges");
+	var selNetworkEdges = selectionManager.getSelectionCandidatesFamily("networkEdges");
 	if (selNetworkEdges)
 	{
 		var currEdgeSelected = selNetworkEdges.currentSelected;
@@ -1540,7 +1595,7 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, resultSe
 	}
 	
 	// TEST: Check if selected a cuttingPlane.***
-	var selGeneralObjects = this.selectionManager.getSelectionCandidatesFamily("general");
+	var selGeneralObjects = selectionManager.getSelectionCandidatesFamily("general");
 	if (selGeneralObjects)
 	{
 		var currObjectSelected = selGeneralObjects.currentSelected;
@@ -1555,7 +1610,7 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, resultSe
 	
 	// Check general objects.***
 	if (selectedObject === undefined)
-	{ selectedObject = this.selectionManager.selCandidatesMap[idx]; }
+	{ selectedObject = selectionManager.selCandidatesMap[idx]; }
 	
 	return selectedObject;
 };
@@ -1700,6 +1755,8 @@ MagoManager.prototype.isDragging = function()
 	{
 		this.selectionManager.clearCandidates();
 	}
+	
+	this.selectionFbo.unbind();
 
 	return bIsDragging;
 };
@@ -1997,6 +2054,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		// Calculate the geographicCoord of the click position.****
 		var geoCoord;
 		var strWorldPoint;
+		
 		if (this.configInformation.geo_view_library === Constant.CESIUM)
 		{
 			var camera = this.scene.frameState.camera;
@@ -2610,6 +2668,7 @@ MagoManager.prototype.moveSelectedObjectGeneral = function(gl, object)
 
 		//this.changeLocationAndRotationNode(this.selectionManager.currentNodeSelected, newlatitude, newLongitude, undefined, undefined, undefined, undefined);
 		//this.displayLocationAndRotation(this.buildingSelected);
+		geoLocationData = ManagerUtils.calculateGeoLocationData(newLongitude, newlatitude, undefined, undefined, undefined, undefined, geoLocationData, this);
 		
 		this.startMovPoint.x -= difX;
 		this.startMovPoint.y -= difY;
@@ -2880,7 +2939,7 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 		if (generalObjectSelected)
 		{
 			// Move the object.***
-			
+			this.moveSelectedObjectGeneral(gl, generalObjectSelected);
 		}
 	}
 };

@@ -152,15 +152,35 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 		magoManager.bPicking = true;
 	}
 	
+	var camera = magoManager.sceneState.camera;
+	
+	// Must find the frustum on pick(mouseX, mouseY) detected depth value.***
+	var currentDepthFbo;
+	var currentFrustumFar;
+	var currentLinearDepth;
+	var frustumsCount = magoManager.numFrustums;
+	for (var i = frustumsCount-1; i >= 0; i--)
+	{
+		var frustumVolume = magoManager.frustumVolumeControl.getFrustumVolumeCulling(i); 
+		var depthFbo = frustumVolume.depthFbo;
+
+		currentLinearDepth = ManagerUtils.calculatePixelLinearDepth(gl, mouseAction.strX, mouseAction.strY, depthFbo, magoManager);
+		if (currentLinearDepth < 0.996) // maxDepth/255 = 0.99607...
+		{ 
+			currentDepthFbo = depthFbo;
+			var frustum = camera.getFrustum(i);
+			currentFrustumFar = frustum.far[0];
+			break;
+		}
+	}
+	
 	// determine world position of the X,Y.
-	mouseAction.strLinealDepth = ManagerUtils.calculatePixelLinearDepth(gl, mouseAction.strX, mouseAction.strY, magoManager.depthFboAux, magoManager);
-	mouseAction.strCamCoordPoint = ManagerUtils.calculatePixelPositionCamCoord(gl, mouseAction.strX, mouseAction.strY, mouseAction.strCamCoordPoint, magoManager.depthFboAux, undefined, magoManager);
+	mouseAction.strLinealDepth = currentLinearDepth;
+	mouseAction.strCamCoordPoint = ManagerUtils.calculatePixelPositionCamCoord(gl, mouseAction.strX, mouseAction.strY, mouseAction.strCamCoordPoint, currentDepthFbo, currentFrustumFar, magoManager);
 	mouseAction.strWorldPoint = ManagerUtils.cameraCoordPositionToWorldCoord(mouseAction.strCamCoordPoint, mouseAction.strWorldPoint, magoManager);
 	
 	// now, copy camera to curCamera.
-	var camera = magoManager.sceneState.camera;
 	var strCamera = mouseAction.strCamera;
-	
 	strCamera.copyPosDirUpFrom(camera);
 	
 	// copy modelViewMatrix.
