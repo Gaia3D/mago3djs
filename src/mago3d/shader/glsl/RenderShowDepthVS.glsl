@@ -43,4 +43,5 @@ void main()
     depth = (modelViewMatrixRelToEye * pos4).z/far; // original.***
 
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;
+	//depth = gl_Position.z*0.5+0.5;
 }

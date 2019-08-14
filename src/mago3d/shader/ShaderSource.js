@@ -1472,7 +1472,6 @@ vec4 PackDepth32( in float depth )\n\
 void main()\n\
 {     \n\
     gl_FragData[0] = PackDepth32(depth);\n\
-	//gl_FragData[0].r = -depth/far;\n\
 }";
 ShaderSource.OrthogonalDepthShaderVS = "attribute vec3 position;\n\
 \n\
@@ -2110,6 +2109,7 @@ vec4 PackDepth32( in float depth )\n\
 void main()\n\
 {     \n\
     gl_FragData[0] = packDepth(-depth);\n\
+	//gl_FragData[0] = PackDepth32(depth);\n\
 }";
 ShaderSource.RenderShowDepthVS = "attribute vec3 position;\n\
 \n\
@@ -2156,6 +2156,7 @@ void main()\n\
     depth = (modelViewMatrixRelToEye * pos4).z/far; // original.***\n\
 \n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+	//depth = gl_Position.z*0.5+0.5;\n\
 }";
 ShaderSource.screen_frag = "precision mediump float;\n\
 \n\

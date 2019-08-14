@@ -157,9 +157,10 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 	// Must find the frustum on pick(mouseX, mouseY) detected depth value.***
 	var currentDepthFbo;
 	var currentFrustumFar;
+	var currentFrustumNear;
 	var currentLinearDepth;
 	var frustumsCount = magoManager.numFrustums;
-	for (var i = frustumsCount-1; i >= 0; i--)
+	for (var i = 0; i < frustumsCount; i++)
 	{
 		var frustumVolume = magoManager.frustumVolumeControl.getFrustumVolumeCulling(i); 
 		var depthFbo = frustumVolume.depthFbo;
@@ -170,13 +171,14 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 			currentDepthFbo = depthFbo;
 			var frustum = camera.getFrustum(i);
 			currentFrustumFar = frustum.far[0];
+			currentFrustumNear = frustum.near[0];
 			break;
 		}
 	}
 	
 	// determine world position of the X,Y.
 	mouseAction.strLinealDepth = currentLinearDepth;
-	mouseAction.strCamCoordPoint = ManagerUtils.calculatePixelPositionCamCoord(gl, mouseAction.strX, mouseAction.strY, mouseAction.strCamCoordPoint, currentDepthFbo, currentFrustumFar, magoManager);
+	mouseAction.strCamCoordPoint = ManagerUtils.calculatePixelPositionCamCoord(gl, mouseAction.strX, mouseAction.strY, mouseAction.strCamCoordPoint, currentDepthFbo, currentFrustumNear, currentFrustumFar, magoManager);
 	mouseAction.strWorldPoint = ManagerUtils.cameraCoordPositionToWorldCoord(mouseAction.strCamCoordPoint, mouseAction.strWorldPoint, magoManager);
 	
 	// now, copy camera to curCamera.
