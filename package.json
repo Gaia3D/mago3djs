@@ -44,7 +44,7 @@
     "mocha": "^6.1.4",
     "request": "^2.88.0",
     "requirejs": "^2.3.6",
-    "rimraf": "^2.6.3",
+    "rimraf": "^3.0.0",
     "uglify-es": "^3.3.9",
     "watchify": "^3.11.1",
     "yargs": "^13.2.4"
