@@ -176,6 +176,9 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 		}
 	}
 	
+	if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
+	{ currentFrustumNear = 0.0; }
+	
 	// determine world position of the X,Y.
 	mouseAction.strLinealDepth = currentLinearDepth;
 	mouseAction.strCamCoordPoint = ManagerUtils.calculatePixelPositionCamCoord(gl, mouseAction.strX, mouseAction.strY, mouseAction.strCamCoordPoint, currentDepthFbo, currentFrustumNear, currentFrustumFar, magoManager);

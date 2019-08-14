@@ -33,6 +33,8 @@
 	varying float applySpecLighting;
 	varying vec4 aColor4; // color from attributes
 	varying vec4 vPosRelToLight; 
+	varying vec3 vLightDir; 
+	varying vec3 vNormalWC; 
 	
 	void main()
     {	
@@ -59,6 +61,7 @@
 		vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;
 		vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;
 		vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);
+		vec3 rotatedNormal = currentTMat * normal;
 		
 		if(bApplyShadow)
 		{
@@ -68,10 +71,11 @@
 			vec4 pos4Sun = vec4(highDifferenceSun.xyz + lowDifferenceSun.xyz, 1.0);
 		
 			vPosRelToLight = sunMatrix * pos4Sun;
+			vLightDir = vec3(-sunMatrix[2][0], -sunMatrix[2][1], -sunMatrix[2][2]);
+			vNormalWC = rotatedNormal;
 		}
 
-		//vertexPos = vec3(modelViewMatrixRelToEye * pos4);
-		vec3 rotatedNormal = currentTMat * normal;
+		
 		vLightWeighting = vec3(1.0, 1.0, 1.0);
 		uAmbientColor = vec3(0.8);
 		vec3 uLightingDirection = vec3(0.6, 0.6, 0.6);

@@ -541,7 +541,7 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 	if (magoManager.tinTerrainManager !== undefined)
 	{
 		var bDepth = true;
-		magoManager.tinTerrainManager.render(magoManager, bDepth);
+		magoManager.tinTerrainManager.render(magoManager, bDepth, renderType);
 		gl.useProgram(null);
 	}
 	
@@ -911,6 +911,10 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 				// Set sunMatrix uniform.***
 				var sunLight = magoManager.sceneState.sunLight;
 				gl.uniformMatrix4fv(currentShader.sunMatrix_loc, false, sunLight.tMatrix._floatArrays);
+				gl.uniform3fv(currentShader.sunPosHigh_loc, sunLight.positionHIGH);
+				gl.uniform3fv(currentShader.sunPosLow_loc, sunLight.positionLOW);
+				gl.uniform1f(currentShader.shadowMapWidth_loc, sunLight.targetTextureWidth);
+				gl.uniform1f(currentShader.shadowMapHeight_loc, sunLight.targetTextureHeight);
 			}
 			gl.enableVertexAttribArray(currentShader.texCoord2_loc);
 			gl.enableVertexAttribArray(currentShader.position3_loc);
@@ -980,6 +984,8 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 				gl.uniformMatrix4fv(currentShader.sunMatrix_loc, false, sunLight.tMatrix._floatArrays);
 				gl.uniform3fv(currentShader.sunPosHigh_loc, sunLight.positionHIGH);
 				gl.uniform3fv(currentShader.sunPosLow_loc, sunLight.positionLOW);
+				gl.uniform1f(currentShader.shadowMapWidth_loc, sunLight.targetTextureWidth);
+				gl.uniform1f(currentShader.shadowMapHeight_loc, sunLight.targetTextureHeight);
 			}
 			
 			gl.enableVertexAttribArray(currentShader.texCoord2_loc);

@@ -16,7 +16,9 @@ uniform float far;
 uniform float fov;
 uniform float aspectRatio;    
 uniform float screenWidth;    
-uniform float screenHeight;    
+uniform float screenHeight;   
+uniform float shadowMapWidth;    
+uniform float shadowMapHeight; 
 uniform float shininessValue;
 uniform vec3 kernel[16];   
 uniform vec4 oneColor4;
@@ -42,6 +44,8 @@ varying vec3 diffuseColor;
 varying vec3 vertexPos;
 varying float applySpecLighting;
 varying vec4 vPosRelToLight; 
+varying vec3 vLightDir; 
+varying vec3 vNormalWC;
 
 float unpackDepth(const in vec4 rgba_depth)
 {
@@ -77,7 +81,7 @@ float getDepthShadowMap(vec2 coord)
 
 void main()
 {
-	float occlusion = 0.0;
+	float occlusion = 1.0;
 	vec3 normal2 = vNormal;
 	if(bApplySsao)
 	{          
@@ -156,20 +160,47 @@ void main()
 	if(bApplyShadow)
 	{
 		vec3 posRelToLight = vPosRelToLight.xyz / vPosRelToLight.w;
-		
 		if(posRelToLight.x >= -0.5 && posRelToLight.x <= 0.5)
 		{
 			if(posRelToLight.y >= -0.5 && posRelToLight.y <= 0.5)
 			{
-				posRelToLight = posRelToLight * 0.5 + 0.5;
-				float depthRelToLight = getDepthShadowMap(posRelToLight.xy);
-				if(posRelToLight.z > depthRelToLight*0.9963 )
+				float ligthAngle = dot(vLightDir, vNormalWC);
+				if(ligthAngle > 0.0)
 				{
+					// The angle between the light direction & face normal is less than 90 degree, so, the face is in shadow.***
 					if(occlusion > 0.4)
 						occlusion = 0.4;
 				}
+				else{
+					float pixelWidth = 1.0 / shadowMapWidth;
+					float pixelHeight = 1.0 / shadowMapHeight;
+					posRelToLight = posRelToLight * 0.5 + 0.5;
+					
+					float depthRelToLight = getDepthShadowMap(posRelToLight.xy);
+					if(posRelToLight.z > depthRelToLight*0.9963 )
+					{
+						if(occlusion > 0.4)
+							occlusion = 0.4;
+					}
+					/*
+					for(int horit = -1; horit<2; horit++)
+					{
+						for(int vert = -1; vert < 2; vert++)
+						{
+							vec2 shadowMapTexCoord = vec2(posRelToLight.x+float(horit)*pixelWidth, posRelToLight.y+float(vert)*pixelHeight);
+							float depthRelToLight = getDepthShadowMap(shadowMapTexCoord);
+							if(posRelToLight.z > depthRelToLight*0.9963 )
+							{
+								if(occlusion > 0.4)
+									occlusion -= (0.4/9.0);
+							}
+						}
+					}
+					*/
+				}
 			}
 		}
+		
 	}
 
     vec4 textureColor;
