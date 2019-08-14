@@ -82,6 +82,10 @@ Tube.prototype.makeMesh = function()
  */
 Tube.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 {
+	if (this.attributes && this.attributes.isVisible !== undefined && this.attributes.isVisible === false) 
+	{
+		return;
+	}
 	if (this.dirty)
 	{ this.makeMesh(); }
 	
