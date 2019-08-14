@@ -506,13 +506,16 @@ ManagerUtils.calculatePixelLinearDepth = function(gl, pixelX, pixelY, depthFbo, 
  * @param {MagoManager} magoManager Mago3D main manager.
  * @returns {Point3D} resultPixelPos The result of the calculation.
  */
-ManagerUtils.calculatePixelPositionCamCoord = function(gl, pixelX, pixelY, resultPixelPos, depthFbo, frustumFar, magoManager) 
+ManagerUtils.calculatePixelPositionCamCoord = function(gl, pixelX, pixelY, resultPixelPos, depthFbo, frustumNear, frustumFar, magoManager) 
 {
 	if (frustumFar === undefined)
 	{ frustumFar = magoManager.sceneState.camera.frustum.far; }
+
+	if (frustumNear === undefined)
+	{ frustumNear = 0.0; }
 	
 	var linearDepth = ManagerUtils.calculatePixelLinearDepth(gl, pixelX, pixelY, depthFbo, magoManager);
-	var realZDepth = linearDepth*frustumFar; // original.
+	var realZDepth = frustumNear + linearDepth*frustumFar; // original.
 
 	// now, find the 3d position of the pixel in camCoord.*
 	magoManager.resultRaySC = ManagerUtils.getRayCamSpace(pixelX, pixelY, magoManager.resultRaySC, magoManager);
@@ -549,17 +552,20 @@ ManagerUtils.cameraCoordPositionToWorldCoord = function(camCoordPos, resultWorld
  * @param {MagoManager} magoManager Mago3D main manager.
  * @returns {Point3D} resultPixelPos The result of the calculation.
  */
-ManagerUtils.calculatePixelPositionWorldCoord = function(gl, pixelX, pixelY, resultPixelPos, depthFbo, frustumFar, magoManager) 
+ManagerUtils.calculatePixelPositionWorldCoord = function(gl, pixelX, pixelY, resultPixelPos, depthFbo, frustumNear, frustumFar, magoManager) 
 {
 	var pixelPosCamCoord = new Point3D();
 	
 	if (frustumFar === undefined)
 	{ frustumFar = magoManager.sceneState.camera.frustum.far; }
+
+	if (frustumNear === undefined)
+	{ frustumNear = 0.0; }
 	
 	if (depthFbo === undefined)
 	{ depthFbo = magoManager.depthFboNeo; }
 	
-	pixelPosCamCoord = ManagerUtils.calculatePixelPositionCamCoord(gl, pixelX, pixelY, pixelPosCamCoord, depthFbo, frustumFar, magoManager);
+	pixelPosCamCoord = ManagerUtils.calculatePixelPositionCamCoord(gl, pixelX, pixelY, pixelPosCamCoord, depthFbo, frustumNear, frustumFar, magoManager);
 
 	if (resultPixelPos === undefined)
 	{ var resultPixelPos = new Point3D(); }
