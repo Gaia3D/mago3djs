@@ -26,6 +26,9 @@ var SmartTileManager = function()
      * mother 타일 생성
      */
 	this.createMainTiles();
+	
+	this.smartTilesMultiBuildingsMap;
+	this.smartTilesMultiBuildingsDataBuffer;
 };
 
 /**
@@ -44,6 +47,8 @@ SmartTileManager.prototype.createMainTiles = function()
 	{ tile1.maxGeographicCoord = new GeographicCoord(); }
 	
 	tile1.depth = 0; // mother tile.
+	tile1.X = 0; 
+	tile1.Y = 0; 
 	tile1.minGeographicCoord.setLonLatAlt(-180, -90, 0);
 	tile1.maxGeographicCoord.setLonLatAlt(0, 90, 0);
 	
@@ -55,8 +60,46 @@ SmartTileManager.prototype.createMainTiles = function()
 	{ tile2.maxGeographicCoord = new GeographicCoord(); }
 	
 	tile2.depth = 0; // mother tile.
+	tile1.X = 1; // Asia side tile X coord = 1.***
+	tile1.Y = 0; 
 	tile2.minGeographicCoord.setLonLatAlt(0, -90, 0);
 	tile2.maxGeographicCoord.setLonLatAlt(180, 90, 0);
+};
+
+/**
+ */
+SmartTileManager.prototype.parseSmartTilesMultiBuildingsIndexFile = function(dataBuffer, magoManager) 
+{
+	var bytes_readed = 0;
+	var readWriter = magoManager.readerWriter;
+	
+	if (this.smartTilesMultiBuildingsMap === undefined)
+	{ this.smartTilesMultiBuildingsMap = {}; }
+
+	var smartTilesMBCount = readWriter.readInt32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+	for (var i=0; i<smartTilesMBCount; i++)
+	{
+		var nameLength = readWriter.readInt32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		var name = "";
+		for (var j=0; j<nameLength; j++)
+		{
+			name += String.fromCharCode(new Int8Array(dataBuffer.slice(bytes_readed, bytes_readed+ 1))[0]);bytes_readed += 1;
+		}
+		
+		var L = readWriter.readInt32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		var X = readWriter.readInt32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		var Y = readWriter.readInt32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		var geoExtent = SmartTile.getGeographicExtentOfTileLXY(L, X, Y, undefined);
+		var centerGeoCoord = geoExtent.getMidPoint();
+		
+		this.smartTilesMultiBuildingsMap[name] = {"L"              : L,
+			"X"              : X,
+			"Y"              : Y,
+			"centerGeoCoord" : centerGeoCoord};
+
+	}
+	
+	var hola = 0;
 };
 
 /**

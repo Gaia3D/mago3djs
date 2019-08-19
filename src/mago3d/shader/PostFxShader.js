@@ -430,6 +430,15 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 		uniformDataPair.intValue = 2;
 	}
 	
+	// 16.1 shadowMapTex.
+	uniformLocation = gl.getUniformLocation(shader.program, "shadowMapTex");
+	if (uniformLocation !== null && uniformLocation !== undefined)
+	{
+		uniformDataPair = shader.newUniformDataPair("1i", "shadowMapTex");
+		uniformDataPair.uniformLocation = uniformLocation;
+		uniformDataPair.intValue = 3;
+	}
+	
 	// 17. specularColor.
 	uniformLocation = gl.getUniformLocation(shader.program, "specularColor");
 	if (uniformLocation !== null && uniformLocation !== undefined)
@@ -531,6 +540,7 @@ PostFxShader.prototype.createUniformLocals = function(gl, shader, sceneState)
 	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
 	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
 	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
+	shader.sunMatrix_loc = gl.getUniformLocation(shader.program, "sunMatrix");
 	
 	shader.refMatrixType_loc = gl.getUniformLocation(shader.program, "refMatrixType");
 	shader.refMatrix_loc = gl.getUniformLocation(shader.program, "RefTransfMatrix");
@@ -541,6 +551,12 @@ PostFxShader.prototype.createUniformLocals = function(gl, shader, sceneState)
 	shader.textureFlipYAxis_loc = gl.getUniformLocation(shader.program, "textureFlipYAxis");
 	shader.kernel16_loc = gl.getUniformLocation(shader.program, "kernel");
 	shader.noiseScale2_loc = gl.getUniformLocation(shader.program, "noiseScale");
+	
+	shader.sunPosHigh_loc = gl.getUniformLocation(shader.program, "sunPosHIGH");
+	shader.sunPosLow_loc = gl.getUniformLocation(shader.program, "sunPosLOW");
+	
+	shader.shadowMapWidth_loc = gl.getUniformLocation(shader.program, "shadowMapWidth");
+	shader.shadowMapHeight_loc = gl.getUniformLocation(shader.program, "shadowMapHeight");
 	
 	// Attributtes.*
 	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
@@ -553,6 +569,7 @@ PostFxShader.prototype.createUniformLocals = function(gl, shader, sceneState)
 	shader.bUse1Color_loc = gl.getUniformLocation(shader.program, "bUse1Color");
 	shader.oneColor4_loc = gl.getUniformLocation(shader.program, "oneColor4");
 	shader.bApplySsao_loc = gl.getUniformLocation(shader.program, "bApplySsao");
+	shader.bApplyShadow_loc = gl.getUniformLocation(shader.program, "bApplyShadow");
 	
 	// compression data, for shaders with data compressed.
 	// compressionMaxPoint & compressionMinPoint: for refObjects, this is the octree's size.

@@ -204,6 +204,9 @@ Ellipsoid.prototype.makeMesh = function(options)
 	var radiusX = this.radiusX;
 	var radiusY = this.radiusY;
 	var radiusZ = this.radiusZ;
+	var radiusX2 = radiusX*radiusX;
+	var radiusY2 = radiusY*radiusY;
+	var radiusZ2 = radiusZ*radiusZ;
 	
 	var totalPointsCount = (this.lonSegments+1)*(this.latSegments+1);
 	this.cartesiansArray = new Float32Array(totalPointsCount*3); // Init.***
@@ -234,7 +237,7 @@ Ellipsoid.prototype.makeMesh = function(options)
 			
 			// Normal.***
 			var point = new Point3D(x, y, z);
-			
+
 			// Calculate bbox before of normalizing the point.***
 			if (idx === 0)
 			{
@@ -245,19 +248,20 @@ Ellipsoid.prototype.makeMesh = function(options)
 				bbox.addPoint(point);
 			}
 			
+			point.set(x/radiusX2, y/radiusY2, z/radiusZ2);
 			point.unitary();
 			
 			if (bTrianglesSenseCCW)
 			{
-				this.normalsArray[idx*3] = point.x*255;
-				this.normalsArray[idx*3+1] = point.y*255;
-				this.normalsArray[idx*3+2] = point.z*255;
+				this.normalsArray[idx*3] = point.x*127;
+				this.normalsArray[idx*3+1] = point.y*127;
+				this.normalsArray[idx*3+2] = point.z*127;
 			}
 			else 
 			{
-				this.normalsArray[idx*3] = -point.x*255;
-				this.normalsArray[idx*3+1] = -point.y*255;
-				this.normalsArray[idx*3+2] = -point.z*255;
+				this.normalsArray[idx*3] = -point.x*127;
+				this.normalsArray[idx*3+1] = -point.y*127;
+				this.normalsArray[idx*3+2] = -point.z*127;
 			}
 			
 			

@@ -47,7 +47,7 @@ MagoWorld.prototype.renderScene = function()
 {
 	//this.renderTest();
 	var gl = this.magoManager.sceneState.gl;
-	gl.clearColor(0.0, 0.0, 0.0, 1.0);
+	//gl.clearColor(0, 0, 0, 1);
 	gl.enable(gl.DEPTH_TEST);
 	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -152,15 +152,40 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 		magoManager.bPicking = true;
 	}
 	
+	var camera = magoManager.sceneState.camera;
+	
+	// Must find the frustum on pick(mouseX, mouseY) detected depth value.***
+	var currentDepthFbo;
+	var currentFrustumFar;
+	var currentFrustumNear;
+	var currentLinearDepth;
+	var frustumsCount = magoManager.numFrustums;
+	for (var i = 0; i < frustumsCount; i++)
+	{
+		var frustumVolume = magoManager.frustumVolumeControl.getFrustumVolumeCulling(i); 
+		var depthFbo = frustumVolume.depthFbo;
+
+		currentLinearDepth = ManagerUtils.calculatePixelLinearDepth(gl, mouseAction.strX, mouseAction.strY, depthFbo, magoManager);
+		if (currentLinearDepth < 0.996) // maxDepth/255 = 0.99607...
+		{ 
+			currentDepthFbo = depthFbo;
+			var frustum = camera.getFrustum(i);
+			currentFrustumFar = frustum.far[0];
+			currentFrustumNear = frustum.near[0];
+			break;
+		}
+	}
+	
+	if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
+	{ currentFrustumNear = 0.0; }
+	
 	// determine world position of the X,Y.
-	mouseAction.strLinealDepth = ManagerUtils.calculatePixelLinearDepth(gl, mouseAction.strX, mouseAction.strY, magoManager.depthFboAux, magoManager);
-	mouseAction.strCamCoordPoint = ManagerUtils.calculatePixelPositionCamCoord(gl, mouseAction.strX, mouseAction.strY, mouseAction.strCamCoordPoint, magoManager.depthFboAux, undefined, magoManager);
+	mouseAction.strLinealDepth = currentLinearDepth;
+	mouseAction.strCamCoordPoint = ManagerUtils.calculatePixelPositionCamCoord(gl, mouseAction.strX, mouseAction.strY, mouseAction.strCamCoordPoint, currentDepthFbo, currentFrustumNear, currentFrustumFar, magoManager);
 	mouseAction.strWorldPoint = ManagerUtils.cameraCoordPositionToWorldCoord(mouseAction.strCamCoordPoint, mouseAction.strWorldPoint, magoManager);
 	
 	// now, copy camera to curCamera.
-	var camera = magoManager.sceneState.camera;
 	var strCamera = mouseAction.strCamera;
-	
 	strCamera.copyPosDirUpFrom(camera);
 	
 	// copy modelViewMatrix.

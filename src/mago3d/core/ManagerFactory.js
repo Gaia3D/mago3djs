@@ -11,9 +11,10 @@
  * @param projectDataArray data json object
  * @param projectDataFolderArray f4d data folder path
  * @param imagePath 이미지 경로
+ * @param options View 생성을 위한 기타 옵션
  * @returns api
  */
-var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray, projectDataArray, projectDataFolderArray, imagePath) 
+var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray, projectDataArray, projectDataFolderArray, imagePath, options) 
 {
 	if (!(this instanceof ManagerFactory)) 
 	{
@@ -23,9 +24,9 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 	var magoManager = null;
 	var scene = null;
 	var magoManagerState = CODE.magoManagerState.INIT;
-	
-	//var startMousePosition = null;
-	//var nowMousePosition = null;
+	var _options = options || {};
+	_options.animation = _options.animation || false;
+	_options.timeline = _options.timeline || false;
 
 	// 환경 설정
 	MagoConfig.init(serverPolicy, projectIdArray, projectDataArray);
@@ -290,13 +291,13 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		var api = new API("renderMode");
 		magoManager.callAPI(api);
 
-		if (MagoConfig.getPolicy().geo_time_line_enable === "false") 
-		{
-			// visible <---> hidden
-			$(viewer._animation.container).css("visibility", "hidden");
-			$(viewer._timeline.container).css("visibility", "hidden");
-			viewer.forceResize();
-		}
+		// if (MagoConfig.getPolicy().geo_time_line_enable === "false") 
+		// {
+		// 	// visible <---> hidden
+		// 	$(viewer._animation.container).css("visibility", "hidden");
+		// 	$(viewer._timeline.container).css("visibility", "hidden");
+		// 	viewer.forceResize();
+		// }
 	}
 	
 	var DEFALUT_IMAGE = "ESRI World Imagery";
@@ -311,6 +312,8 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 			DEFALUT_TERRAIN = MagoConfig.getPolicy().geo_init_default_terrain;
 		}
 		
+		if (viewer === undefined || viewer.baseLayerPicker === undefined)  { return; }
+
 		// search default imageryProvider from baseLayerPicker
 		var imageryProvider = null;
 		var imageryProviderViewModels = viewer.baseLayerPicker.viewModel.imageryProviderViewModels; 
@@ -374,8 +377,10 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 				}//,
 				//proxy: new Cesium.DefaultProxy('/proxy/')
 			});
-			var options = {imageryProvider: imageryProvider, baseLayerPicker: false};
-			if (viewer === null) { viewer = new Cesium.Viewer(containerId, options); }
+			// var options = {imageryProvider: imageryProvider, baseLayerPicker: false};
+			_options.imageryProvider = imageryProvider;
+			_options.baseLayerPicker = false;
+			if (viewer === null) { viewer = new Cesium.Viewer(containerId, _options); }
 		}
 		else 
 		{
@@ -384,7 +389,9 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 				Cesium.Ion.defaultAccessToken = serverPolicy.geo_cesium_ion_token;
 				DEFALUT_TERRAIN = "Cesium World Terrain";
 			}
-			if (viewer === null) { viewer = new Cesium.Viewer(containerId, {shouldAnimate: true}); }
+
+			_options.shouldAnimate = true;
+			if (viewer === null) { viewer = new Cesium.Viewer(containerId, _options); }
 			// 기본 지도 설정
 			setDefaultDataset();
 		}
@@ -392,7 +399,6 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		viewer.scene.magoManager = new MagoManager();
 		viewer.scene.magoManager.sceneState.textureFlipYAxis = false;
 		viewer.camera.frustum.fov = Cesium.Math.PI_OVER_THREE*1.8;
-		//viewer.camera.frustum.near = 0.1;
 		if (MagoConfig.getPolicy().geo_init_default_fov > 0) 
 		{
 			viewer.camera.frustum.fov = Cesium.Math.PI_OVER_THREE * MagoConfig.getPolicy().geo_init_default_fov;
@@ -615,7 +621,9 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 	if (serverPolicy.geo_view_library === Constant.MAGOWORLD) 
 	{
 		var canvas = document.getElementById(containerId);
-		var glAttrs = {antialias: false, stencil: true};
+		var glAttrs = {antialias          : true, 
+			stencil            : true,
+			premultipliedAlpha : false};
 		var gl = canvas.getContext("webgl", glAttrs);
 		if (!gl)
 		{ gl = canvas.getContext("experimental-webgl", glAttrs); }

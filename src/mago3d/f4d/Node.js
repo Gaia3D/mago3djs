@@ -183,9 +183,6 @@ Node.prototype.calculateGeoLocData = function(magoManager)
 			var rootNode = this.getRoot();
 			if (rootNode)
 			{
-				if (this.data.nodeId === "G15_0002")
-				{ var hola = 0; }
-				
 				// now, calculate the root center of bbox.
 				var buildingSeed = this.data.buildingSeed;
 				var buildingSeedBBox = buildingSeed.bBox;

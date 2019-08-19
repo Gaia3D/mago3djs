@@ -38,6 +38,10 @@ uniform float ambientReflectionCoef;
 uniform float diffuseReflectionCoef;  
 uniform float specularReflectionCoef; 
 uniform float externalAlpha;
+varying vec3 v3Pos;
+
+const float equatorialRadius = 6378137.0;
+const float polarRadius = 6356752.3142;
 
 float unpackDepth(const in vec4 rgba_depth)
 {
@@ -104,7 +108,14 @@ void main()
 		else{
 			textureColor = oneColor4;
 		}
+		
 		//vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);
-		gl_FragColor = vec4(textureColor.xyz, externalAlpha); 
+		//gl_FragColor = vec4(textureColor.xyz, externalAlpha); 
+		textureColor.w = externalAlpha;
+		vec4 fogColor = vec4(0.9, 0.9, 0.9, 1.0);
+		float fogParam = v3Pos.z/(far - 100000.0);
+		float fogParam2 = fogParam*fogParam;
+		float fogAmount = fogParam2*fogParam2;
+		gl_FragColor = mix(textureColor, fogColor, fogAmount); 
 	}
 }

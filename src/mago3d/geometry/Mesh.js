@@ -616,8 +616,20 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 	var gl = magoManager.sceneState.gl;
 	var primitive;
 	
-	if (this.color4)
-	{ gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 1.0]); }
+	if (renderType === 0)
+	{
+		// Depth render.***
+	}
+	else if (renderType === 1)
+	{
+		// Color render.***
+		if (this.color4)
+		{ gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 1.0]); }
+	}
+	else if (renderType === 2)
+	{
+		// Selection render.***
+	}
 	
 	var vboKeysCount = this.vboKeysContainer.vboCacheKeysArray.length;
 	for (var i=0; i<vboKeysCount; i++)
@@ -625,44 +637,52 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 		var vboKey = this.vboKeysContainer.vboCacheKeysArray[i];
 		
 		// Positions.
-		if (!vboKey.bindDataPosition(shader, magoManager.vboMemoryManager))
+		if (!vboKey.bindDataPosition(shader, vboMemManager))
 		{ return false; }
 		
-		// Normals.
-		if (vboKey.vboBufferNor)
+		
+		if (renderType === 1)
 		{
-			if (!vboKey.bindDataNormal(shader, magoManager.vboMemoryManager))
-			{ return false; }
-		}
-		else 
-		{
-			shader.disableVertexAttribArray(shader.normal3_loc);
+			// Normals.
+			if (vboKey.vboBufferNor)
+			{
+				if (!vboKey.bindDataNormal(shader, vboMemManager))
+				{ return false; }
+			}
+			else 
+			{
+				shader.disableVertexAttribArray(shader.normal3_loc);
+			}
+			
+			// TexCoords.
+			if (vboKey.vboBufferTCoord)
+			{
+				if (!vboKey.bindDataTexCoord(shader, vboMemManager))
+				{ return false; }
+			}
+			else 
+			{
+				shader.disableVertexAttribArray(shader.texCoord2_loc);
+			}
 		}
 		
-		// Colors.
-		if (vboKey.vboBufferCol)
+		if (renderType === 1 || renderType === 2)
 		{
-			if (!vboKey.bindDataColor(shader, magoManager.vboMemoryManager))
-			{ return false; }
-		}
-		else 
-		{
-			shader.disableVertexAttribArray(shader.color4_loc);
+			// Colors.
+			if (vboKey.vboBufferCol)
+			{
+				if (!vboKey.bindDataColor(shader, vboMemManager))
+				{ return false; }
+			}
+			else 
+			{
+				shader.disableVertexAttribArray(shader.color4_loc);
+			}
 		}
 		
-		// TexCoords.
-		if (vboKey.vboBufferTCoord)
-		{
-			if (!vboKey.bindDataTexCoord(shader, magoManager.vboMemoryManager))
-			{ return false; }
-		}
-		else 
-		{
-			shader.disableVertexAttribArray(shader.texCoord2_loc);
-		}
 		
 		// Indices.
-		if (!vboKey.bindDataIndice(shader, magoManager.vboMemoryManager))
+		if (!vboKey.bindDataIndice(shader, vboMemManager))
 		{ return false; }
 		
 		if (glPrimitive)

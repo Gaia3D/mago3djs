@@ -506,11 +506,13 @@ Octree.prototype.prepareModelReferencesListData = function(magoManager)
 
 	// Check the version.
 	var version = neoBuilding.getHeaderVersion();
+	/*
 	if (version === "0.0.2")
 	{
 		this.prepareModelReferencesListData_v002(magoManager);
 		return;
 	}
+	*/
 
 	var geometryDataPath = magoManager.readerWriter.geometryDataPath;
 	var buildingFolderName = neoBuilding.buildingFileName;
@@ -674,7 +676,7 @@ Octree.prototype.renderSkin = function(magoManager, neoBuilding, renderType, ren
 			gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
 			if (shader.last_tex_id !== neoBuilding.simpleBuilding3x3Texture.texId)
 			{
-				//gl.activeTexture(gl.TEXTURE2); 
+				gl.activeTexture(gl.TEXTURE2); 
 				gl.bindTexture(gl.TEXTURE_2D, neoBuilding.simpleBuilding3x3Texture.texId);
 				shader.last_tex_id = neoBuilding.simpleBuilding3x3Texture.texId;
 			}
@@ -1739,11 +1741,11 @@ Octree.prototype.parseAsimetricVersion = function(arrayBuffer, readerWriter, byt
 	if (this.triPolyhedronsCount > 0)
 	{ this.neoBuildingOwner = neoBuildingOwner; }
 
-	if (version === "0.0.2")
-	{
-		// Read ModelLists partitions count.
-		this.blocksListsPartitionsCount = readerWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-	}
+	//if (version === "0.0.2")
+	//{
+	// Read ModelLists partitions count.
+	//this.blocksListsPartitionsCount = readerWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+	//}
 
 	// 1rst, create the 8 subOctrees.
 	for (var i=0; i<subOctreesCount; i++) 

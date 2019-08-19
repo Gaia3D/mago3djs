@@ -96,3 +96,34 @@ Segment3D.prototype.invertSense = function()
 	this.startPoint3d = this.endPoint3d;
 	this.endPoint3d = point3dAux;
 };
+
+/**
+ * 시작 포인트와 종료 포인트를 맞바꾼다.
+ * interchange strPoint & endPoint.
+ */
+Segment3D.prototype.getLength = function()
+{
+	return this.startPoint3d.distToPoint(this.endPoint3d);
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

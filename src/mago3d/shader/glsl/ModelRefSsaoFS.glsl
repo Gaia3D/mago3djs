@@ -5,6 +5,7 @@
 uniform sampler2D depthTex;
 uniform sampler2D noiseTex;  
 uniform sampler2D diffuseTex;
+uniform sampler2D shadowMapTex;
 uniform bool textureFlipYAxis;
 varying vec3 vNormal;
 uniform mat4 projectionMatrix;
@@ -15,7 +16,9 @@ uniform float far;
 uniform float fov;
 uniform float aspectRatio;    
 uniform float screenWidth;    
-uniform float screenHeight;    
+uniform float screenHeight;   
+uniform float shadowMapWidth;    
+uniform float shadowMapHeight; 
 uniform float shininessValue;
 uniform vec3 kernel[16];   
 uniform vec4 oneColor4;
@@ -23,12 +26,7 @@ varying vec4 aColor4; // color from attributes
 uniform bool bApplyScpecularLighting;
 uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.
 
-varying vec2 vTexCoord;   
-varying vec3 vLightWeighting;
-
-varying vec3 diffuseColor;
 uniform vec3 specularColor;
-varying vec3 vertexPos;
 
 const int kernelSize = 16;  
 uniform float radius;      
@@ -36,16 +34,31 @@ uniform float radius;
 uniform float ambientReflectionCoef;
 uniform float diffuseReflectionCoef;  
 uniform float specularReflectionCoef; 
-varying float applySpecLighting;
 uniform bool bApplySsao;
 uniform float externalAlpha;
+uniform bool bApplyShadow;
+
+varying vec2 vTexCoord;   
+varying vec3 vLightWeighting;
+varying vec3 diffuseColor;
+varying vec3 vertexPos;
+varying float applySpecLighting;
+varying vec4 vPosRelToLight; 
+varying vec3 vLightDir; 
+varying vec3 vNormalWC;
 
 float unpackDepth(const in vec4 rgba_depth)
 {
     const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);
     float depth = dot(rgba_depth, bit_shift);
     return depth;
-}                
+}  
+
+float UnpackDepth32( in vec4 pack )
+{
+    float depth = dot( pack, 1.0 / vec4(1.0, 256.0, 256.0*256.0, 16777216.0) );// 256.0*256.0*256.0 = 16777216.0
+    return depth * (16777216.0) / (16777216.0 - 1.0);
+}              
 
 vec3 getViewRay(vec2 tc)
 {
@@ -59,11 +72,16 @@ vec3 getViewRay(vec2 tc)
 float getDepth(vec2 coord)
 {
     return unpackDepth(texture2D(depthTex, coord.xy));
-}    
+}   
+
+float getDepthShadowMap(vec2 coord)
+{
+    return UnpackDepth32(texture2D(shadowMapTex, coord.xy));
+}  
 
 void main()
 {
-	float occlusion = 0.0;
+	float occlusion = 1.0;
 	vec3 normal2 = vNormal;
 	if(bApplySsao)
 	{          
@@ -138,6 +156,52 @@ void main()
 		}
 
 	}
+	
+	if(bApplyShadow)
+	{
+		vec3 posRelToLight = vPosRelToLight.xyz / vPosRelToLight.w;
+		if(posRelToLight.x >= -0.5 && posRelToLight.x <= 0.5)
+		{
+			if(posRelToLight.y >= -0.5 && posRelToLight.y <= 0.5)
+			{
+				float ligthAngle = dot(vLightDir, vNormalWC);
+				if(ligthAngle > 0.0)
+				{
+					// The angle between the light direction & face normal is less than 90 degree, so, the face is in shadow.***
+					if(occlusion > 0.4)
+						occlusion = 0.4;
+				}
+				else{
+					float pixelWidth = 1.0 / shadowMapWidth;
+					float pixelHeight = 1.0 / shadowMapHeight;
+					posRelToLight = posRelToLight * 0.5 + 0.5;
+					
+					float depthRelToLight = getDepthShadowMap(posRelToLight.xy);
+					if(posRelToLight.z > depthRelToLight*0.9963 )
+					{
+						if(occlusion > 0.4)
+							occlusion = 0.4;
+					}
+					/*
+					for(int horit = -1; horit<2; horit++)
+					{
+						for(int vert = -1; vert < 2; vert++)
+						{
+							vec2 shadowMapTexCoord = vec2(posRelToLight.x+float(horit)*pixelWidth, posRelToLight.y+float(vert)*pixelHeight);
+							float depthRelToLight = getDepthShadowMap(shadowMapTexCoord);
+							if(posRelToLight.z > depthRelToLight*0.9963 )
+							{
+								if(occlusion > 0.4)
+									occlusion -= (0.4/9.0);
+							}
+						}
+					}
+					*/
+				}
+			}
+		}
+		
+	}
 
     vec4 textureColor;
     if(colorType == 2)
@@ -175,5 +239,6 @@ void main()
 	else{
 		finalColor = vec4((textureColor.xyz) * occlusion, alfa);
 	}
+	//finalColor = vec4(vNormal, 1.0); // test to render normal color coded.***
     gl_FragColor = finalColor; 
 }

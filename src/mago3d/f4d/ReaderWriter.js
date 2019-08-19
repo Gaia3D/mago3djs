@@ -620,6 +620,43 @@ ReaderWriter.prototype.getLegoArraybuffer = function(fileName, legoMesh, magoMan
 
 /**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
+ * @param {string} fileName 파일명
+ * @param {MagoManager} magoManager 파일 처리를 담당
+ */
+ReaderWriter.prototype.getObjectIndexFileMultiBuildings = function(fileName, magoManager) 
+{
+	loadWithXhr(fileName).then(function(response) 
+	{	
+		var arrayBuffer = response;
+		if (arrayBuffer) 
+		{
+			if (magoManager.smartTileManager === undefined)
+			{
+				magoManager.smartTileManager = new SmartTileManager();
+			}
+			var smartTileManager = magoManager.smartTileManager;
+			smartTileManager.smartTilesMultiBuildingsDataBuffer = arrayBuffer;
+			smartTileManager.parseSmartTilesMultiBuildingsIndexFile(arrayBuffer, magoManager);
+
+			//magoManager.makeSmartTile(buildingSeedList, projectId);
+			arrayBuffer = undefined;
+		}
+		else 
+		{
+			// Error.***
+		}
+	},
+	function(status) 
+	{
+		console.log("xhr status = " + status);
+	}).finally(function() 
+	{
+		//	For the moment, do nothing.***
+	});
+};
+
+/**
+ * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
  * @param gl gl context
  * @param {string} fileName 파일명
  * @param {MagoManager} magoManager 파일 처리를 담당
@@ -638,7 +675,6 @@ ReaderWriter.prototype.getObjectIndexFileForSmartTile = function(fileName, magoM
 			
 			magoManager.makeSmartTile(buildingSeedList, projectId);
 			arrayBuffer = null;
-			//MagoConfig.setObjectIndex("append", );
 		}
 		else 
 		{

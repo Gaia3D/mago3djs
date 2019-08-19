@@ -204,14 +204,14 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 	if (magoManager.configInformation === undefined)
 	{ return; }
 
-	resultGeoLocationData.position = this.geographicCoordToWorldPoint(longitude, latitude, altitude, resultGeoLocationData.position);
+	resultGeoLocationData.position = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, altitude, resultGeoLocationData.position);
 
 	// High and Low values of the position.**
 	if (resultGeoLocationData.positionHIGH === undefined)
 	{ resultGeoLocationData.positionHIGH = new Float32Array([0.0, 0.0, 0.0]); }
 	if (resultGeoLocationData.positionLOW === undefined)
 	{ resultGeoLocationData.positionLOW = new Float32Array([0.0, 0.0, 0.0]); }
-	this.calculateSplited3fv([resultGeoLocationData.position.x, resultGeoLocationData.position.y, resultGeoLocationData.position.z], resultGeoLocationData.positionHIGH, resultGeoLocationData.positionLOW);
+	ManagerUtils.calculateSplited3fv([resultGeoLocationData.position.x, resultGeoLocationData.position.y, resultGeoLocationData.position.z], resultGeoLocationData.positionHIGH, resultGeoLocationData.positionLOW);
 
 	// Determine the elevation of the position.**
 	//var cartographic = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
@@ -493,6 +493,7 @@ ManagerUtils.calculatePixelLinearDepth = function(gl, pixelX, pixelY, depthFbo, 
 	
 	var zDepth = depthPixels[0]/(256.0*256.0*256.0) + depthPixels[1]/(256.0*256.0) + depthPixels[2]/256.0 + depthPixels[3]; // 0 to 256 range depth.
 	var linearDepth = zDepth / 256.0; // LinearDepth. Convert to [0.0, 1.0] range depth.
+
 	return linearDepth;
 };
 
@@ -505,13 +506,16 @@ ManagerUtils.calculatePixelLinearDepth = function(gl, pixelX, pixelY, depthFbo, 
  * @param {MagoManager} magoManager Mago3D main manager.
  * @returns {Point3D} resultPixelPos The result of the calculation.
  */
-ManagerUtils.calculatePixelPositionCamCoord = function(gl, pixelX, pixelY, resultPixelPos, depthFbo, frustumFar, magoManager) 
+ManagerUtils.calculatePixelPositionCamCoord = function(gl, pixelX, pixelY, resultPixelPos, depthFbo, frustumNear, frustumFar, magoManager) 
 {
 	if (frustumFar === undefined)
 	{ frustumFar = magoManager.sceneState.camera.frustum.far; }
+
+	if (frustumNear === undefined)
+	{ frustumNear = 0.0; }
 	
 	var linearDepth = ManagerUtils.calculatePixelLinearDepth(gl, pixelX, pixelY, depthFbo, magoManager);
-	var realZDepth = linearDepth*frustumFar; // original.
+	var realZDepth = frustumNear + linearDepth*frustumFar; // original.
 
 	// now, find the 3d position of the pixel in camCoord.*
 	magoManager.resultRaySC = ManagerUtils.getRayCamSpace(pixelX, pixelY, magoManager.resultRaySC, magoManager);
@@ -548,17 +552,20 @@ ManagerUtils.cameraCoordPositionToWorldCoord = function(camCoordPos, resultWorld
  * @param {MagoManager} magoManager Mago3D main manager.
  * @returns {Point3D} resultPixelPos The result of the calculation.
  */
-ManagerUtils.calculatePixelPositionWorldCoord = function(gl, pixelX, pixelY, resultPixelPos, depthFbo, frustumFar, magoManager) 
+ManagerUtils.calculatePixelPositionWorldCoord = function(gl, pixelX, pixelY, resultPixelPos, depthFbo, frustumNear, frustumFar, magoManager) 
 {
 	var pixelPosCamCoord = new Point3D();
 	
 	if (frustumFar === undefined)
 	{ frustumFar = magoManager.sceneState.camera.frustum.far; }
+
+	if (frustumNear === undefined)
+	{ frustumNear = 0.0; }
 	
 	if (depthFbo === undefined)
 	{ depthFbo = magoManager.depthFboNeo; }
 	
-	pixelPosCamCoord = ManagerUtils.calculatePixelPositionCamCoord(gl, pixelX, pixelY, pixelPosCamCoord, depthFbo, frustumFar, magoManager);
+	pixelPosCamCoord = ManagerUtils.calculatePixelPositionCamCoord(gl, pixelX, pixelY, pixelPosCamCoord, depthFbo, frustumNear, frustumFar, magoManager);
 
 	if (resultPixelPos === undefined)
 	{ var resultPixelPos = new Point3D(); }

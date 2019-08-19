@@ -24,9 +24,11 @@ var SmartTile = function(smartTileName)
 	if (smartTileName)
 	{ this.name = smartTileName; }
 	this.depth; // mother tile depth = 0.
+	this.X;
+	this.Y;
 	this.minGeographicCoord; // longitude, latitude, altitude.
 	this.maxGeographicCoord; // longitude, latitude, altitude.
-	this.sphereExtent; // cartesian position sphere in worldCoord.
+	this.sphereExtent; // Cartesian position sphere in worldCoord.
 	this.subTiles; // array.
 	
 	this.nodeSeedsArray;
@@ -493,9 +495,6 @@ SmartTile.prototype.intersectsNode = function(node)
 	// Find geographicCoords as is possible.
 	var longitude, latitude;
 	
-	if (node.data.nodeId === "G15_0002")
-	{ var hola = 0; }
-	
 	if (rootNode.data.bbox !== undefined && rootNode.data.bbox.geographicCoord !== undefined)
 	{
 		longitude = rootNode.data.bbox.geographicCoord.longitude;
@@ -554,15 +553,18 @@ SmartTile.prototype.takeIntersectedBuildingSeeds = function(nodeSeedsArray)
 			
 			// now, redefine the altitude limits of this tile.
 			var buildingSeed = node.data.buildingSeed;
-			var altitude = buildingSeed.geographicCoordOfBBox.altitude;
-			var bboxRadius = buildingSeed.bBox.getRadiusAprox();
-			if (altitude-bboxRadius < this.minGeographicCoord.altitude)
+			if (buildingSeed !== undefined)
 			{
-				this.minGeographicCoord.altitude = altitude-bboxRadius;
-			}
-			if (altitude+bboxRadius > this.maxGeographicCoord.altitude)
-			{
-				this.maxGeographicCoord.altitude = altitude+bboxRadius;
+				var altitude = buildingSeed.geographicCoordOfBBox.altitude;
+				var bboxRadius = buildingSeed.bBox.getRadiusAprox();
+				if (altitude-bboxRadius < this.minGeographicCoord.altitude)
+				{
+					this.minGeographicCoord.altitude = altitude-bboxRadius;
+				}
+				if (altitude+bboxRadius > this.maxGeographicCoord.altitude)
+				{
+					this.maxGeographicCoord.altitude = altitude+bboxRadius;
+				}
 			}
 		}
 	}
@@ -776,6 +778,18 @@ SmartTile.selectTileAngleRangeByDepth = function(depth)
 	{ return 0.010986328; }
 	if (depth === 15)
 	{ return 0.010986328/2.0; }
+	if (depth === 16)
+	{ return 0.010986328 / 4.0; }
+	if (depth === 17)
+	{ return 0.010986328 / 8.0; }
+	if (depth === 18)
+	{ return 0.010986328 / 16.0; }
+	if (depth === 19)
+	{ return 0.010986328 / 32.0; }
+	if (depth === 20)
+	{ return 0.010986328 / 64.0; }
+	if (depth === 21)
+	{ return 0.010986328 / 128.0; }
 };
 
 /**
@@ -786,7 +800,7 @@ SmartTile.selectTileName = function(depth, longitude, latitude, resultTileName)
 {
 	var xMin = -180.0;
 	var yMin = 90.0;
-	var angRange = SmartTile.selectTileAngleRangeByDepth(depth) ;
+	var angRange = SmartTile.selectTileAngleRangeByDepth(depth);
 	
 	var xIndex = Math.floor((longitude - xMin)/angRange);
 	// with yMin = -90.0;
@@ -794,6 +808,25 @@ SmartTile.selectTileName = function(depth, longitude, latitude, resultTileName)
 	var yIndex = Math.floor((yMin - latitude)/angRange);
 	resultTileName = depth.toString() + "\\" + xIndex.toString() + "\\" + yIndex.toString();
 	return resultTileName;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param frustum 변수
+ */
+SmartTile.getGeographicExtentOfTileLXY = function(L, X, Y, resultGeoExtend) 
+{
+	var angRange = SmartTile.selectTileAngleRangeByDepth(L);
+	var minLon = angRange*X;
+	var maxLon = angRange*(X+1);
+	var minLat = 90.0 - angRange*(Y+1);
+	var maxLat = 90.0 - angRange*(Y);
+	
+	if (resultGeoExtend === undefined)
+	{ resultGeoExtend = new GeographicExtent(); }
+	
+	resultGeoExtend.setExtent(minLon, minLat, 0, maxLon, maxLat, 0);
+	return resultGeoExtend;
 };
 
 

@@ -57,6 +57,43 @@ GeographicCoordsList.prototype.getGeoCoordsCount = function()
 };
 
 /**
+ * get single point
+ * @param {Number} idx the index of target
+ * @param {GeographicCoordSegment} resultGeoCoordSegment.
+ */
+GeographicCoordsList.prototype.getGeoCoordSegment = function(idx, resultGeoCoordSegment) 
+{
+	if (this.geographicCoordsArray === undefined)
+	{ return resultGeoCoordSegment; }
+	
+	var geoCoordsCount = this.geographicCoordsArray.length;
+	
+	if (geoCoordsCount <= 1)
+	{ return resultGeoCoordSegment; }
+	
+	if (idx > geoCoordsCount - 1)
+	{ return resultGeoCoordSegment; }
+	
+	var nextIdx;
+	
+	if (idx === geoCoordsCount - 1)
+	{ nextIdx = 0; }
+	else
+	{ nextIdx = idx + 1; }
+
+	var geoCoord1 = this.getGeoCoord(idx);
+	var geoCoord2 = this.getGeoCoord(nextIdx);
+	
+	if (resultGeoCoordSegment === undefined)
+	{ resultGeoCoordSegment = new GeographicCoordSegment(); }
+	
+	resultGeoCoordSegment.strGeoCoord = geoCoord1;
+	resultGeoCoordSegment.endGeoCoord = geoCoord2;
+	
+	return resultGeoCoordSegment;
+};
+
+/**
  * This function returns points3dArray relative to the geoLocIn.
  * @param {GeoLocationData} geoLocIn the information about the axis of this GeographicCoord
  * @param resultPoint3dArray

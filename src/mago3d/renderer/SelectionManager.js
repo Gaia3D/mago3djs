@@ -191,11 +191,34 @@ SelectionManager.prototype.selectObjects = function(idxKey)
 
 /**
  * SelectionManager
+ */
+SelectionManager.prototype.isObjectSelected = function(object)
+{
+	if (object === undefined)
+	{ return false; }
+	
+	if (this.currentReferenceSelected === object)
+	{ return true; }
+	
+	if (this.currentBuildingSelected === object)
+	{ return true; }
+	
+	if (this.currentNodeSelected === object)
+	{ return true; }
+	
+	if (this.currentGeneralObjectSelected === object)
+	{ return true; }
+	
+	return false;
+};
+
+/**
+ * SelectionManager
  * 
  * @alias SelectionManager
  * @class SelectionManager
  */
-SelectionManager.prototype.clearCurrents = function(idxKey)
+SelectionManager.prototype.clearCurrents = function()
 {
 	this.currentReferenceSelected = undefined;
 	this.currentOctreeSelected = undefined;
@@ -212,4 +235,18 @@ SelectionManager.prototype.clearCurrents = function(idxKey)
 	}
 	
 	this.currentGeneralObjectSelected = undefined;
+};
+
+/**
+ * SelectionManager
+ * 
+ * @alias SelectionManager
+ * @class SelectionManager
+ */
+SelectionManager.prototype.TEST__CurrGeneralObjSel = function()
+{
+	if (this.currentGeneralObjectSelected)
+	{ return true; }
+	else
+	{ return false; }
 };

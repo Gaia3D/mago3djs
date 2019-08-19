@@ -28,7 +28,7 @@ varying vec2 vTexCoord;
 varying vec3 uAmbientColor;
 varying vec3 vLightWeighting;
 varying vec4 vcolor4;
-varying vec3 vertexPos;
+varying vec3 v3Pos;
 varying float depthValue;
 
 void main()
@@ -48,5 +48,5 @@ void main()
 		vTexCoord = texCoord;
 	}
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;
-	
+	v3Pos = gl_Position.xyz;
 }

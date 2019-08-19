@@ -42,12 +42,6 @@ Sky.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 		return; 
 	}
 	
-	//var camera = this.magoManager.sceneState.camera;
-	//var camPos = camera.position;
-	//var camDir = camera.direction;
-	//var camUp = camera.up;
-	//var camHeght = camera.getCameraElevation();
-	
 	var gl = magoManager.getGl();
 	gl.uniform3fv(shader.buildingPosHIGH_loc, this.ellipsoid.terrainPositionHIGH);
 	gl.uniform3fv(shader.buildingPosLOW_loc, this.ellipsoid.terrainPositionLOW);

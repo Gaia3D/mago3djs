@@ -329,6 +329,7 @@ NeoReference.prototype.solveReferenceColorOrTexture = function(magoManager, neoB
 					gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
 					if (shader.last_tex_id !== this.texture.texId) 
 					{
+						gl.activeTexture(gl.TEXTURE2);
 						gl.bindTexture(gl.TEXTURE_2D, this.texture.texId);
 						shader.last_tex_id = this.texture.texId;
 					}

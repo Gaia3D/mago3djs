@@ -15,7 +15,15 @@ vec4 packDepth(const in float depth)
     return res;  
 }
 
+vec4 PackDepth32( in float depth )
+{
+    depth *= (16777216.0 - 1.0) / (16777216.0);
+    vec4 encode = fract( depth * vec4(1.0, 256.0, 256.0*256.0, 16777216.0) );// 256.0*256.0*256.0 = 16777216.0
+    return vec4( encode.xyz - encode.yzw / 256.0, encode.w ) + 1.0/512.0;
+}
+
 void main()
 {     
     gl_FragData[0] = packDepth(-depth);
+	//gl_FragData[0] = PackDepth32(depth);
 }
