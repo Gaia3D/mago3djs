@@ -38,12 +38,21 @@ var ConcentricTubes = function(option, geoLocDataManager)
 
 /**
  * 초기 튜브 정보를 가지고 튜브들을 초기화 함.
+ */
+ConcentricTubes.prototype.clear = function() 
+{
+	this.tubes = [];
+};
+
+/**
+ * 초기 튜브 정보를 가지고 튜브들을 초기화 함.
  * @param {Array.<Object>} tubeInfos
  */
 ConcentricTubes.prototype.initTube = function(tubeInfos) 
 {
 	if (defined(tubeInfos))
-	{
+	{	
+		this.clear();
 		for (var i=0, len=tubeInfos.length;i<len;i++) 
 		{
 			this.makeTube(tubeInfos[i]);

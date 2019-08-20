@@ -187,6 +187,12 @@ SelectionManager.prototype.selectObjects = function(idxKey)
 	}
 	
 	this.currentGeneralObjectSelected = this.selCandidatesMap[idxKey];
+
+	//임시로 추가한 코드, 다시 구상해야함.
+	if (this.currentGeneralObjectSelected && this.currentGeneralObjectSelected.testCall && typeof this.currentGeneralObjectSelected.testCall === 'function') 
+	{
+		this.currentGeneralObjectSelected.testCall.call(this.currentGeneralObjectSelected);
+	}
 };
 
 /**
@@ -234,6 +240,12 @@ SelectionManager.prototype.clearCurrents = function()
 		}
 	}
 	
+	//임시로 추가한 코드, 다시 구상해야함.
+	if (this.currentGeneralObjectSelected && this.currentGeneralObjectSelected.endCall && typeof this.currentGeneralObjectSelected.endCall === 'function') 
+	{
+		this.currentGeneralObjectSelected.endCall.call(this.currentGeneralObjectSelected);
+	}
+
 	this.currentGeneralObjectSelected = undefined;
 };
 

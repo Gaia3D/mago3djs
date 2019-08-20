@@ -2709,7 +2709,7 @@ MagoManager.prototype.moveSelectedObjectGeneral = function(gl, object)
 		
 		// Must check if there are restrictions.***
 		var attributes = object.attributes;
-		if (attributes)
+		if (attributes && attributes.movementRestriction)
 		{
 			var movementRestriction = attributes.movementRestriction;
 			var movementRestrictionType = movementRestriction.restrictionType;
