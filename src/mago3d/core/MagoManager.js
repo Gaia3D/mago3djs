@@ -1348,7 +1348,7 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 			{ this.objMarkerSC = new ObjectMarker(); }
 			
 			pixelPos = new Point3D();
-			pixelPos = ManagerUtils.calculatePixelPositionWorldCoord(gl, this.mouse_x, this.mouse_y, pixelPos, undefined, undefined, this);
+			pixelPos = ManagerUtils.calculatePixelPositionWorldCoord(gl, this.mouse_x, this.mouse_y, pixelPos, undefined, undefined, undefined, this);
 			var objMarker = this.objMarkerManager.newObjectMarker();
 			ManagerUtils.calculateGeoLocationDataByAbsolutePoint(pixelPos.x, pixelPos.y, pixelPos.z, objMarker.geoLocationData, this);
 		}
@@ -1361,7 +1361,7 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 			if (pixelPos === undefined)
 			{
 				pixelPos = new Point3D();
-				pixelPos = ManagerUtils.calculatePixelPositionWorldCoord(gl, this.mouse_x, this.mouse_y, pixelPos, undefined, undefined, this);
+				pixelPos = ManagerUtils.calculatePixelPositionWorldCoord(gl, this.mouse_x, this.mouse_y, pixelPos, undefined, undefined, undefined, this);
 			}
 			
 			ManagerUtils.calculateGeoLocationDataByAbsolutePoint(pixelPos.x, pixelPos.y, pixelPos.z, this.objMarkerSC.geoLocationData, this);
@@ -1632,7 +1632,7 @@ MagoManager.prototype.calculateSelObjMovePlaneAsimetricMode = function(gl, pixel
 	
 	var geoLocDataManager = this.nodeSelected.getNodeGeoLocDataManager();
 	
-	ManagerUtils.calculatePixelPositionWorldCoord(gl, pixelX, pixelY, this.pointSC2, undefined, undefined, this);
+	ManagerUtils.calculatePixelPositionWorldCoord(gl, pixelX, pixelY, this.pointSC2, undefined, undefined, undefined, this);
 	var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
 	var tMatrixInv = buildingGeoLocation.getTMatrixInv();
 	this.pointSC = tMatrixInv.transformPoint3D(this.pointSC2, this.pointSC); // buildingSpacePoint.***
@@ -1670,7 +1670,7 @@ MagoManager.prototype.isDragging = function()
 		}
 		this.arrayAuxSC.length = 0;
 
-		if (currentRootNodeSelected === this.rootNodeSelected) 
+		if (currentRootNodeSelected !== undefined && currentRootNodeSelected === this.rootNodeSelected) 
 		{
 			bIsDragging = true;
 		}
@@ -2328,6 +2328,9 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			};
 			
 			var concentricTubes = new ConcentricTubes(options, geoLocDataManager);
+			concentricTubes.attributes = {isMovable: true};
+			
+			
 			this.modeler.addObject(concentricTubes);
 		}
 	}
@@ -2712,26 +2715,29 @@ MagoManager.prototype.moveSelectedObjectGeneral = function(gl, object)
 		if (attributes && attributes.movementRestriction)
 		{
 			var movementRestriction = attributes.movementRestriction;
-			var movementRestrictionType = movementRestriction.restrictionType;
-			var movRestrictionElem = movementRestriction.element;
-			if (movRestrictionElem && movRestrictionElem.constructor.name === "GeographicCoordSegment")
+			if (movementRestriction)
 			{
-				// restriction.***
-				var geoCoordSegment = movRestrictionElem;
-				var newGeoCoord = new GeographicCoord(newLongitude, newlatitude, 0.0);
-				var projectedCoord = GeographicCoordSegment.getProjectedCoordToLine(geoCoordSegment, newGeoCoord, undefined);
-				
-				// check if is inside.***
-				if (!GeographicCoordSegment.intersectionWithGeoCoord(geoCoordSegment, projectedCoord))
+				var movementRestrictionType = movementRestriction.restrictionType;
+				var movRestrictionElem = movementRestriction.element;
+				if (movRestrictionElem && movRestrictionElem.constructor.name === "GeographicCoordSegment")
 				{
-					var nearestGeoCoord = GeographicCoordSegment.getNearestGeoCoord(geoCoordSegment, projectedCoord);
-					newLongitude = nearestGeoCoord.longitude;
-					newlatitude = nearestGeoCoord.latitude;
-				}
-				else 
-				{
-					newLongitude = projectedCoord.longitude;
-					newlatitude = projectedCoord.latitude;
+					// restriction.***
+					var geoCoordSegment = movRestrictionElem;
+					var newGeoCoord = new GeographicCoord(newLongitude, newlatitude, 0.0);
+					var projectedCoord = GeographicCoordSegment.getProjectedCoordToLine(geoCoordSegment, newGeoCoord, undefined);
+					
+					// check if is inside.***
+					if (!GeographicCoordSegment.intersectionWithGeoCoord(geoCoordSegment, projectedCoord))
+					{
+						var nearestGeoCoord = GeographicCoordSegment.getNearestGeoCoord(geoCoordSegment, projectedCoord);
+						newLongitude = nearestGeoCoord.longitude;
+						newlatitude = nearestGeoCoord.latitude;
+					}
+					else 
+					{
+						newLongitude = projectedCoord.longitude;
+						newlatitude = projectedCoord.latitude;
+					}
 				}
 			}
 		}
@@ -5960,9 +5966,9 @@ MagoManager.prototype.checkCollision = function (position, direction)
 	var collisionPosition = new Point3D();
 	var bottomPosition = new Point3D();
 
-	ManagerUtils.calculatePixelPositionWorldCoord(gl, posX, posY, collisionPosition, undefined, undefined, this);
+	ManagerUtils.calculatePixelPositionWorldCoord(gl, posX, posY, collisionPosition, undefined, undefined, undefined, this);
 	this.swapRenderingFase();
-	ManagerUtils.calculatePixelPositionWorldCoord(gl, posX, this.sceneState.drawingBufferHeight, undefined, undefined, this);
+	ManagerUtils.calculatePixelPositionWorldCoord(gl, posX, this.sceneState.drawingBufferHeight, undefined, undefined, undefined, this);
 
 	this.buildingSelected = current_building;
 	var distance = collisionPosition.squareDistTo(position.x, position.y, position.z);

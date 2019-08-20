@@ -1157,7 +1157,9 @@ uniform float far;            \n\
 uniform float fov;\n\
 uniform float aspectRatio;    \n\
 uniform float screenWidth;    \n\
-uniform float screenHeight;    \n\
+uniform float screenHeight;   \n\
+uniform float shadowMapWidth;    \n\
+uniform float shadowMapHeight; \n\
 uniform float shininessValue;\n\
 uniform vec3 kernel[16];   \n\
 uniform vec4 oneColor4;\n\
@@ -1183,6 +1185,8 @@ varying vec3 diffuseColor;\n\
 varying vec3 vertexPos;\n\
 varying float applySpecLighting;\n\
 varying vec4 vPosRelToLight; \n\
+varying vec3 vLightDir; \n\
+varying vec3 vNormalWC;\n\
 \n\
 float unpackDepth(const in vec4 rgba_depth)\n\
 {\n\
@@ -1218,7 +1222,7 @@ float getDepthShadowMap(vec2 coord)\n\
 \n\
 void main()\n\
 {\n\
-	float occlusion = 0.0;\n\
+	float occlusion = 1.0;\n\
 	vec3 normal2 = vNormal;\n\
 	if(bApplySsao)\n\
 	{          \n\
@@ -1297,20 +1301,47 @@ void main()\n\
 	if(bApplyShadow)\n\
 	{\n\
 		vec3 posRelToLight = vPosRelToLight.xyz / vPosRelToLight.w;\n\
-		\n\
 		if(posRelToLight.x >= -0.5 && posRelToLight.x <= 0.5)\n\
 		{\n\
 			if(posRelToLight.y >= -0.5 && posRelToLight.y <= 0.5)\n\
 			{\n\
-				posRelToLight = posRelToLight * 0.5 + 0.5;\n\
-				float depthRelToLight = getDepthShadowMap(posRelToLight.xy);\n\
-				if(posRelToLight.z > depthRelToLight*0.9963 )\n\
+				float ligthAngle = dot(vLightDir, vNormalWC);\n\
+				if(ligthAngle > 0.0)\n\
 				{\n\
+					// The angle between the light direction & face normal is less than 90 degree, so, the face is in shadow.***\n\
 					if(occlusion > 0.4)\n\
 						occlusion = 0.4;\n\
 				}\n\
+				else{\n\
+					float pixelWidth = 1.0 / shadowMapWidth;\n\
+					float pixelHeight = 1.0 / shadowMapHeight;\n\
+					posRelToLight = posRelToLight * 0.5 + 0.5;\n\
+					\n\
+					float depthRelToLight = getDepthShadowMap(posRelToLight.xy);\n\
+					if(posRelToLight.z > depthRelToLight*0.9963 )\n\
+					{\n\
+						if(occlusion > 0.4)\n\
+							occlusion = 0.4;\n\
+					}\n\
+					/*\n\
+					for(int horit = -1; horit<2; horit++)\n\
+					{\n\
+						for(int vert = -1; vert < 2; vert++)\n\
+						{\n\
+							vec2 shadowMapTexCoord = vec2(posRelToLight.x+float(horit)*pixelWidth, posRelToLight.y+float(vert)*pixelHeight);\n\
+							float depthRelToLight = getDepthShadowMap(shadowMapTexCoord);\n\
+							if(posRelToLight.z > depthRelToLight*0.9963 )\n\
+							{\n\
+								if(occlusion > 0.4)\n\
+									occlusion -= (0.4/9.0);\n\
+							}\n\
+						}\n\
+					}\n\
+					*/\n\
+				}\n\
 			}\n\
 		}\n\
+		\n\
 	}\n\
 \n\
     vec4 textureColor;\n\
@@ -1387,6 +1418,8 @@ ShaderSource.ModelRefSsaoVS = "	attribute vec3 position;\n\
 	varying float applySpecLighting;\n\
 	varying vec4 aColor4; // color from attributes\n\
 	varying vec4 vPosRelToLight; \n\
+	varying vec3 vLightDir; \n\
+	varying vec3 vNormalWC; \n\
 	\n\
 	void main()\n\
     {	\n\
@@ -1413,6 +1446,7 @@ ShaderSource.ModelRefSsaoVS = "	attribute vec3 position;\n\
 		vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
 		vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
 		vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+		vec3 rotatedNormal = currentTMat * normal;\n\
 		\n\
 		if(bApplyShadow)\n\
 		{\n\
@@ -1422,10 +1456,11 @@ ShaderSource.ModelRefSsaoVS = "	attribute vec3 position;\n\
 			vec4 pos4Sun = vec4(highDifferenceSun.xyz + lowDifferenceSun.xyz, 1.0);\n\
 		\n\
 			vPosRelToLight = sunMatrix * pos4Sun;\n\
+			vLightDir = vec3(-sunMatrix[2][0], -sunMatrix[2][1], -sunMatrix[2][2]);\n\
+			vNormalWC = rotatedNormal;\n\
 		}\n\
 \n\
-		//vertexPos = vec3(modelViewMatrixRelToEye * pos4);\n\
-		vec3 rotatedNormal = currentTMat * normal;\n\
+		\n\
 		vLightWeighting = vec3(1.0, 1.0, 1.0);\n\
 		uAmbientColor = vec3(0.8);\n\
 		vec3 uLightingDirection = vec3(0.6, 0.6, 0.6);\n\
@@ -1472,7 +1507,6 @@ vec4 PackDepth32( in float depth )\n\
 void main()\n\
 {     \n\
     gl_FragData[0] = PackDepth32(depth);\n\
-	//gl_FragData[0].r = -depth/far;\n\
 }";
 ShaderSource.OrthogonalDepthShaderVS = "attribute vec3 position;\n\
 \n\
@@ -2110,6 +2144,7 @@ vec4 PackDepth32( in float depth )\n\
 void main()\n\
 {     \n\
     gl_FragData[0] = packDepth(-depth);\n\
+	//gl_FragData[0] = PackDepth32(depth);\n\
 }";
 ShaderSource.RenderShowDepthVS = "attribute vec3 position;\n\
 \n\
@@ -2156,6 +2191,7 @@ void main()\n\
     depth = (modelViewMatrixRelToEye * pos4).z/far; // original.***\n\
 \n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+	//depth = gl_Position.z*0.5+0.5;\n\
 }";
 ShaderSource.screen_frag = "precision mediump float;\n\
 \n\

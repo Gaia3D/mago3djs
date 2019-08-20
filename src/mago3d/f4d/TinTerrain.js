@@ -231,23 +231,30 @@ TinTerrain.prototype.setGeographicExtent = function(minLon, minLat, minAlt, maxL
 	geoExtent.maxGeographicCoord.setLonLatAlt(maxLon, maxLat, maxAlt);
 };
 
+TinTerrain.prototype.isChildrenPrepared = function()
+{
+	if (this.childMap === undefined)
+	{ return false; }
+	
+	if (this.childMap.length < 4)
+	{ return false; }
+	
+	if (this.childMap.LU.isPrepared() && this.childMap.LD.isPrepared() && this.childMap.RU.isPrepared() &&  this.childMap.RD.isPrepared())
+	{ return true; }
+	else
+	{ return false; }
+};
+
 TinTerrain.prototype.isPrepared = function()
 {
 	// a tinTerrain is prepared if this is parsed and vbo maked and texture binded.
-	
-	// Provisional solution.*
-	// Provisional solution.*
-	// Provisional solution.*
-	if (this.fileLoadState === CODE.fileLoadState.LOAD_FAILED)
-	{ return true; }
-	// End provisional solution.------------------------------
-	// End provisional solution.------------------------------
-	// End provisional solution.------------------------------
-	
 	if (this.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
 	{ return false; }
 	
 	if (this.texture === undefined || this.texture.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
+	{ return false; }
+
+	if (this.texture.texId === undefined)
 	{ return false; }
 	
 	if (this.vboKeyContainer === undefined || 
@@ -453,7 +460,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 	}
 	*/
 			
-	if (this.owner === undefined || this.owner.isPrepared())
+	if (this.owner === undefined || (this.owner.isPrepared() && this.owner.isChildrenPrepared()))
 	{
 		if (this.isPrepared())
 		{
@@ -505,7 +512,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			if (!vboKey.bindDataPosition(currentShader, magoManager.vboMemoryManager))
 			{ 
 				if (this.owner !== undefined)
-				{ this.owner.render(currentShader, magoManager, bDepth); }
+				{ this.owner.render(currentShader, magoManager, bDepth, renderType); }
 				return false; 
 			}
 		
@@ -515,7 +522,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 				if (!vboKey.bindDataTexCoord(currentShader, magoManager.vboMemoryManager))
 				{
 					if (this.owner !== undefined)
-					{ this.owner.render(currentShader, magoManager, bDepth); }					
+					{ this.owner.render(currentShader, magoManager, bDepth, renderType); }					
 					return false; 
 				}
 			}
@@ -530,7 +537,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			if (!vboKey.bindDataIndice(currentShader, magoManager.vboMemoryManager))
 			{ 
 				if (this.owner !== undefined)
-				{ this.owner.render(currentShader, magoManager, bDepth); }
+				{ this.owner.render(currentShader, magoManager, bDepth, renderType); }
 				return false; 
 			}
 			
@@ -568,13 +575,14 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 		{
 			// render the owner tinTerrain.
 			if (this.owner !== undefined)
-			{ this.owner.render(currentShader, magoManager, bDepth); }
+			{ this.owner.render(currentShader, magoManager, bDepth, renderType); }
 		}
 	}
 	else 
 	{
 		// render the owner tinTerrain.
-		this.owner.render(currentShader, magoManager, bDepth);
+		if (this.owner !== undefined)
+		{ this.owner.render(currentShader, magoManager, bDepth, renderType); }
 	}
 	
 	return true;

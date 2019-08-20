@@ -460,30 +460,27 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 	var nodesLOD3Count = visibleObjControlerNodes.currentVisibles3.length;
 	if (nodesLOD0Count > 0 || nodesLOD2Count > 0 || nodesLOD3Count > 0)
 	{
-		// Make depth buffer only for closest frustum.
-		if (magoManager.currentFrustumIdx === 0)
-		{
-			currentShader = magoManager.postFxShadersManager.getShader("modelRefDepth"); 
-			currentShader.resetLastBuffersBinded();
-			shaderProgram = currentShader.program;
+		// Make depth for all visible objects.***
+		currentShader = magoManager.postFxShadersManager.getShader("modelRefDepth"); 
+		currentShader.resetLastBuffersBinded();
+		shaderProgram = currentShader.program;
 
-			currentShader.useProgram();
-			currentShader.disableVertexAttribArrayAll();
-			currentShader.enableVertexAttribArray(currentShader.position3_loc);
+		currentShader.useProgram();
+		currentShader.disableVertexAttribArrayAll();
+		currentShader.enableVertexAttribArray(currentShader.position3_loc);
 
-			currentShader.bindUniformGenerals();
+		currentShader.bindUniformGenerals();
 
-			// RenderDepth for all buildings.***
-			var refTMatrixIdxKey = 0;
-			var minSize = 0.0;
+		// RenderDepth for all buildings.***
+		var refTMatrixIdxKey = 0;
+		var minSize = 0.0;
 
-			magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
-			magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
-			magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
-			
-			currentShader.disableVertexAttribArray(currentShader.position3_loc); 
-			gl.useProgram(null);
-		}
+		magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
+		magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
+		magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
+		
+		currentShader.disableVertexAttribArray(currentShader.position3_loc); 
+		gl.useProgram(null);
 	}
 	
 	// PointsCloud.****************************************************************************************
@@ -544,7 +541,7 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 	if (magoManager.tinTerrainManager !== undefined)
 	{
 		var bDepth = true;
-		magoManager.tinTerrainManager.render(magoManager, bDepth);
+		magoManager.tinTerrainManager.render(magoManager, bDepth, renderType);
 		gl.useProgram(null);
 	}
 	
@@ -656,6 +653,71 @@ Renderer.prototype.renderDepthSunPointOfView = function(gl, visibleObjControlerN
 
 	currentShader.disableVertexAttribArrayAll();
 	gl.useProgram(null);
+};
+
+/**
+ * Test function.
+ */
+Renderer.prototype.renderImageViewRectangle = function(gl, magoManager, depthFbo) 
+{
+	// Render a test quad to render created textures.***
+	if (magoManager.imageViewerRectangle === undefined)
+	{
+		magoManager.imageViewerRectangle = new ImageViewerRectangle(100, 100);
+		magoManager.imageViewerRectangle.geoLocDataManager = new GeoLocationDataManager();
+		var geoLocDataManager = magoManager.imageViewerRectangle.geoLocDataManager;
+		var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+		geoLocData = ManagerUtils.calculateGeoLocationData(126.61673801297405, 37.580105647225956, 50, undefined, undefined, undefined, geoLocData, magoManager);
+	}
+
+		
+	if (depthFbo !== undefined)
+	{
+		var shaderName = "imageViewerRectangle";
+		var currentShader = magoManager.postFxShadersManager.getShader(shaderName); 
+		currentShader.useProgram();
+		var bApplySsao = false;
+			
+		gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
+		gl.uniform1i(currentShader.bApplySpecularLighting_loc, false);
+		gl.uniform1i(currentShader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.
+			
+		gl.enableVertexAttribArray(currentShader.texCoord2_loc);
+		gl.enableVertexAttribArray(currentShader.position3_loc);
+		//gl.disableVertexAttribArray(currentShader.normal3_loc);
+		//gl.disableVertexAttribArray(currentShader.color4_loc); 
+			
+		currentShader.bindUniformGenerals();
+		gl.uniform1f(currentShader.externalAlpha_loc, 1.0);
+		gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
+		gl.uniform4fv(currentShader.oneColor4_loc, [0.1, 0.8, 0.99, 1.0]); //.***
+			
+		gl.uniform3fv(currentShader.buildingPosHIGH_loc, [0.0, 0.0, 0.0]);
+		gl.uniform3fv(currentShader.buildingPosLOW_loc, [0.0, 0.0, 0.0]);
+
+			
+		gl.activeTexture(gl.TEXTURE0);
+		gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);  // original.***
+		gl.activeTexture(gl.TEXTURE1);
+		gl.bindTexture(gl.TEXTURE_2D, null);
+		gl.activeTexture(gl.TEXTURE2); 
+		gl.bindTexture(gl.TEXTURE_2D, depthFbo.colorBuffer);
+		currentShader.last_tex_id = depthFbo.colorBuffer;
+			
+		magoManager.imageViewerRectangle.render(magoManager, currentShader);
+			
+		gl.activeTexture(gl.TEXTURE0);
+		gl.bindTexture(gl.TEXTURE_2D, null);  // original.***
+		gl.activeTexture(gl.TEXTURE1);
+		gl.bindTexture(gl.TEXTURE_2D, null);
+		gl.activeTexture(gl.TEXTURE2);
+		gl.bindTexture(gl.TEXTURE_2D, null);
+			
+		currentShader.disableVertexAttribArrayAll();
+		gl.useProgram(null);
+	}
+		
+	
 };
 
 /**
@@ -810,66 +872,20 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			gl.useProgram(null);
 			
 			// Render a test quad to render created textures.***
-			if (magoManager.imageViewerRectangle === undefined)
+			if (magoManager.sunDepthFbo !== undefined)
 			{
-				magoManager.imageViewerRectangle = new ImageViewerRectangle(100, 100);
-				magoManager.imageViewerRectangle.geoLocDataManager = new GeoLocationDataManager();
-				var geoLocDataManager = magoManager.imageViewerRectangle.geoLocDataManager;
-				var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-				geoLocData = ManagerUtils.calculateGeoLocationData(126.61673801297405, 37.580105647225956, 50, undefined, undefined, undefined, geoLocData, magoManager);
-			}
-			else 
-			{
-				
-				if (magoManager.sunDepthFbo !== undefined)
-				{
-					var shaderName = "imageViewerRectangle";
-					currentShader = magoManager.postFxShadersManager.getShader(shaderName); 
-					currentShader.useProgram();
-					var bApplySsao = false;
-						
-					gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
-					gl.uniform1i(currentShader.bApplySpecularLighting_loc, false);
-					gl.uniform1i(currentShader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.
-						
-					gl.enableVertexAttribArray(currentShader.texCoord2_loc);
-					gl.enableVertexAttribArray(currentShader.position3_loc);
-					//gl.disableVertexAttribArray(currentShader.normal3_loc);
-					//gl.disableVertexAttribArray(currentShader.color4_loc); 
-						
-					currentShader.bindUniformGenerals();
-					gl.uniform1f(currentShader.externalAlpha_loc, 1.0);
-					gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
-					gl.uniform4fv(currentShader.oneColor4_loc, [0.1, 0.8, 0.99, 1.0]); //.***
-						
-					gl.uniform3fv(currentShader.buildingPosHIGH_loc, [0.0, 0.0, 0.0]);
-					gl.uniform3fv(currentShader.buildingPosLOW_loc, [0.0, 0.0, 0.0]);
-
-						
-					gl.activeTexture(gl.TEXTURE0);
-					gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);  // original.***
-					gl.activeTexture(gl.TEXTURE1);
-					gl.bindTexture(gl.TEXTURE_2D, noiseTexture);
-					gl.activeTexture(gl.TEXTURE2); 
-					gl.bindTexture(gl.TEXTURE_2D, magoManager.sunDepthFbo.colorBuffer);
-					currentShader.last_tex_id = magoManager.sunDepthFbo.colorBuffer;
-						
-					magoManager.imageViewerRectangle.render(magoManager, currentShader);
-						
-					gl.activeTexture(gl.TEXTURE0);
-					gl.bindTexture(gl.TEXTURE_2D, null);  // original.***
-					gl.activeTexture(gl.TEXTURE1);
-					gl.bindTexture(gl.TEXTURE_2D, null);
-					gl.activeTexture(gl.TEXTURE2);
-					gl.bindTexture(gl.TEXTURE_2D, null);
-						
-					currentShader.disableVertexAttribArrayAll();
-					gl.useProgram(null);
-				}
-				
+				this.renderImageViewRectangle(gl, magoManager, magoManager.sunDepthFbo);
 			}
 		}
 		
+		// Test render depthBuffer on scene.***
+		// Render a test quad to render created textures.***
+		//var frustumVolumenObject = magoManager.frustumVolumeControl.getFrustumVolumeCulling(1); 
+		//var depthFboNeo = frustumVolumenObject.depthFbo;
+		//if (depthFboNeo !== undefined)
+		//{
+		//	this.renderImageViewRectangle(gl, magoManager, depthFboNeo);
+		//}
 
 		var bApplySsao = false;
 		var bApplyShadow = false;
@@ -895,6 +911,10 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 				// Set sunMatrix uniform.***
 				var sunLight = magoManager.sceneState.sunLight;
 				gl.uniformMatrix4fv(currentShader.sunMatrix_loc, false, sunLight.tMatrix._floatArrays);
+				gl.uniform3fv(currentShader.sunPosHigh_loc, sunLight.positionHIGH);
+				gl.uniform3fv(currentShader.sunPosLow_loc, sunLight.positionLOW);
+				gl.uniform1f(currentShader.shadowMapWidth_loc, sunLight.targetTextureWidth);
+				gl.uniform1f(currentShader.shadowMapHeight_loc, sunLight.targetTextureHeight);
 			}
 			gl.enableVertexAttribArray(currentShader.texCoord2_loc);
 			gl.enableVertexAttribArray(currentShader.position3_loc);
@@ -964,6 +984,8 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 				gl.uniformMatrix4fv(currentShader.sunMatrix_loc, false, sunLight.tMatrix._floatArrays);
 				gl.uniform3fv(currentShader.sunPosHigh_loc, sunLight.positionHIGH);
 				gl.uniform3fv(currentShader.sunPosLow_loc, sunLight.positionLOW);
+				gl.uniform1f(currentShader.shadowMapWidth_loc, sunLight.targetTextureWidth);
+				gl.uniform1f(currentShader.shadowMapHeight_loc, sunLight.targetTextureHeight);
 			}
 			
 			gl.enableVertexAttribArray(currentShader.texCoord2_loc);
