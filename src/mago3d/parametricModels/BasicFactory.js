@@ -113,6 +113,8 @@ var BasicFactory = function(factoryWidth, factoryLength, factoryHeight, options)
 	// After check the option values, set the boundingBox.***
 	this.bbox = new BoundingBox();
 	this.bbox.set(-this.width/2, -this.length/2, 0, this.width/2, this.length/2, this.height);
+	
+	this.attributes = {isVisible: true};
 };
 
 /**
@@ -361,6 +363,10 @@ BasicFactory.prototype.makeMesh = function()
  */
 BasicFactory.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 {
+	if (this.attributes && this.attributes.isVisible !== undefined && this.attributes.isVisible === false) 
+	{
+		return;
+	}
 	if (this.dirty)
 	{ this.makeMesh(); }
 	
