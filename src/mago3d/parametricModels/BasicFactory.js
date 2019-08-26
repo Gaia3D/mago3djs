@@ -136,26 +136,30 @@ BasicFactory.getFactoryDimensionsByGeoCoordsArray = function(geoCoordsArray, edg
 	var geoCoord_2 = geoCoordsArray[2];
 	var geoCoord_3 = geoCoordsArray[3];
 	var fWidth, fLength, headingAngDeg;
-	
+	var centerOfDoor;
 	if (edgeIdxOfDoor === 0)
 	{
 		var geoCoordSegment = new GeographicCoordSegment(geoCoord_0, geoCoord_1);
 		var geoCoordSegment2 = new GeographicCoordSegment(geoCoord_1, geoCoord_2);
+		centerOfDoor = GeographicCoord.getMidPoint(geoCoord_0, geoCoord_2);
 	}
 	else if (edgeIdxOfDoor === 1)
 	{
 		var geoCoordSegment = new GeographicCoordSegment(geoCoord_1, geoCoord_2);
 		var geoCoordSegment2 = new GeographicCoordSegment(geoCoord_2, geoCoord_3);
+		centerOfDoor = GeographicCoord.getMidPoint(geoCoord_1, geoCoord_3);
 	}
 	else if (edgeIdxOfDoor === 2)
 	{
 		var geoCoordSegment = new GeographicCoordSegment(geoCoord_2, geoCoord_3);
 		var geoCoordSegment2 = new GeographicCoordSegment(geoCoord_3, geoCoord_0);
+		centerOfDoor = GeographicCoord.getMidPoint(geoCoord_2, geoCoord_0);
 	}
 	else if (edgeIdxOfDoor === 3)
 	{
 		var geoCoordSegment = new GeographicCoordSegment(geoCoord_3, geoCoord_0);
 		var geoCoordSegment2 = new GeographicCoordSegment(geoCoord_0, geoCoord_1);
+		centerOfDoor = GeographicCoord.getMidPoint(geoCoord_3, geoCoord_1);
 	}
 	
 	fWidth = GeographicCoordSegment.getLengthInMeters(geoCoordSegment, magoManager);
@@ -170,7 +174,8 @@ BasicFactory.getFactoryDimensionsByGeoCoordsArray = function(geoCoordsArray, edg
 		factoryLength : fLength,
 		headingDeg    : headingAngDeg,
 		longitude     : lon,
-		latitude      : lat
+		latitude      : lat,
+		centerOfDoor  : centerOfDoor
 	};
 	return result;
 };
@@ -406,44 +411,3 @@ BasicFactory.prototype.render = function(magoManager, shader, renderType, glPrim
 	}
 	gl.disable(gl.BLEND);
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

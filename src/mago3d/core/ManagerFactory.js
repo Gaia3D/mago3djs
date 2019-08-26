@@ -374,7 +374,8 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 					request     : serverPolicy.geo_server_parameters_request,
 					transparent : serverPolicy.geo_server_parameters_transparent,
 					format      : serverPolicy.geo_server_parameters_format
-				}//,
+				},
+				enablePickFeatures: false//,
 				//proxy: new Cesium.DefaultProxy('/proxy/')
 			});
 			// var options = {imageryProvider: imageryProvider, baseLayerPicker: false};
