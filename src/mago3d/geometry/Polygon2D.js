@@ -245,6 +245,7 @@ Polygon2D.prototype.tessellate = function(concaveVerticesIndices, convexPolygons
 				// polygon_B.
 				if (concavePoints_B.length > 0)
 				{
+					//TODO : If the tessellation is used later, then please push the result to convexPolygonsArray, not initialized by the result.
 					convexPolygonsArray = polygon_B.tessellate(concavePoints_B, convexPolygonsArray);
 				}
 				else 

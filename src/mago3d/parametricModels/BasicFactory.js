@@ -367,7 +367,7 @@ BasicFactory.prototype.render = function(magoManager, shader, renderType, glPrim
 	{
 		return;
 	}
-	
+
 	if (this.dirty)
 	{ this.makeMesh(); }
 	
