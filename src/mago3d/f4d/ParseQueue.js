@@ -13,6 +13,10 @@ var ParseQueue = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
+	// General objects.
+	this.objectsToParseMap = {};
+	
+	// Particular objects.
 	this.octreesLod0ReferencesToParseMap = {};
 	this.octreesLod0ModelsToParseMap = {};
 	this.octreesLod2LegosToParseMap = {};
@@ -20,11 +24,36 @@ var ParseQueue = function()
 	this.octreesPCloudPartitionToParseMap = {}; 
 	this.skinLegosToParseMap = {};
 	this.tinTerrainsToParseMap = {};
+	this.multiBuildingsToParseMap = {};
 	
 	this.maxNumParses = 1; // default 1.***
 	
 	// Test for pCloudPartitions.***
 	this.pCloudPartitionsParsed = 0;
+
+};
+
+ParseQueue.prototype.putMultiBuildingsToParse = function(multiBuildings, aValue)
+{
+	// provisionally "aValue" can be anything.
+	if (aValue === undefined)
+	{ aValue = 0; }
+	
+	this.multiBuildingsToParseMap[multiBuildings.id] = multiBuildings;
+};
+
+ParseQueue.prototype.eraseMultiBuildingsToParse = function(multiBuildings)
+{
+	if (multiBuildings === undefined)
+	{ return; }
+	
+	var key = multiBuildings.id;
+	if (this.multiBuildingsToParseMap.hasOwnProperty(key)) 
+	{
+		delete this.multiBuildingsToParseMap[key];
+		return true;
+	}
+	return false;
 };
 
 
@@ -49,6 +78,25 @@ ParseQueue.prototype.eraseTinTerrainToParse = function(tinTerrain)
 		return true;
 	}
 	return false;
+};
+
+ParseQueue.prototype.parseMultiBuildings = function(gl, nodesArray, magoManager)
+{
+	if (Object.keys(this.multiBuildingsToParseMap).length > 0)
+	{
+		var node;
+		var maxParsesCount = this.maxNumParses;
+		var nodesCount = nodesArray.length;
+		for (var i=0; i<nodesCount; i++)
+		{
+			node = nodesArray[i];
+			var multiBuildings = node.data.multiBuildings;
+			if (this.eraseMultiBuildingsToParse(multiBuildings))
+			{
+				multiBuildings.parseData(magoManager);
+			}
+		}
+	}
 };
 
 ParseQueue.prototype.parseArraySkins = function(gl, nodesArray, magoManager)
@@ -372,28 +420,19 @@ ParseQueue.prototype.parseArrayOctreesLod0Models = function(gl, octreesArray, ma
 				neoBuilding = lowestOctree.neoBuildingOwner;
 				headerVersion = neoBuilding.getHeaderVersion();
 				
-				if (neoBuilding.buildingId === "AutonomousBus_0")
-				{ var hola = 0; }
+				if (blocksList.dataArraybuffer === undefined)
+				{ continue; }
+			
+				if (blocksList.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
+				{ continue; }
 				
 				if (headerVersion[0] === "v")
 				{
-					if (blocksList.dataArraybuffer === undefined)
-					{ continue; }
-				
-					if (blocksList.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
-					{ continue; }
-				
 					// parse the beta version.***
 					blocksList.parseBlocksList(blocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray, magoManager);
 				}
 				else if (headerVersion === "0.0.1" || headerVersion === "0.0.2")
 				{
-					if (blocksList.dataArraybuffer === undefined)
-					{ continue; }
-				
-					if (blocksList.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
-					{ continue; }
-				
 					// parse versioned.***
 					blocksList.parseBlocksListVersioned_v001(blocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray, magoManager);
 				}

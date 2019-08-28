@@ -11,6 +11,7 @@ var Camera = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
+	this.id = "camera";
 	this.position = new Point3D(); 
 	this.direction = new Point3D(); 
 	this.up = new Point3D();
@@ -559,6 +560,11 @@ Camera.prototype.doTrack = function(magoManager)
 			//this.lookAt() -> we must develope lookAt function in magoworld.
 		}
 	}
+	else if (this.gotoAnimation !== undefined)
+	{
+		// Do goto-animation.
+		
+	}
 };
 
 /**
@@ -648,4 +654,95 @@ Camera.setByPositionAndTarget = function (camera, camTarget, camPos, aproxCamUp)
 			up        : new Cesium.Cartesian3(up.x, up.y, up.z)
 		}
 	});
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+Camera.prototype.calculateUp = function(aproxCamUp) 
+{
+	this.right = this.direction.crossProduct(aproxCamUp, this.right);
+	this.right.unitary();
+	this.up = this.right.crossProduct(this.direction, this.up);
+	this.up.unitary();
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+Camera.prototype.finishedAnimation = function(magoManager) 
+{
+	var finished = false;
+	var animData = this.animationData;
+	
+	if (animData === undefined)
+	{ return true; }
+
+	var currTime = magoManager.getCurrentTime();
+	
+	var nextLongitude;
+	var nextLatitude;
+	var nextAltitude;
+	var nextHeading;
+	var nextPitch;
+	var nextRoll;
+
+	// Check animationType.***
+	var animType = animData.animationType;
+	if (animType === CODE.animationType.PATH)
+	{
+		// Test.***
+		var nextPosLine = AnimationManager.getNextPosition(animData, currTime, magoManager);
+		
+		if (nextPosLine === undefined)
+		{ 
+			animData.finished = true;
+			return true; 
+		}
+	
+		var path = animData.path;
+		var pathGeoLocDataManager = path.getGeoLocationDataManager();
+		var pathGeoLocData = pathGeoLocDataManager.getCurrentGeoLocationData();
+		
+		// Now, calculate the geographic coords of the position.***
+		var posLocal = nextPosLine.point;
+		var dir = nextPosLine.direction;
+
+		// calculate worldPos.***
+		var tMat = pathGeoLocData.tMatrix;
+		var posWC = tMat.transformPoint3D(posLocal, undefined);
+		
+		this.position.copyFrom(posWC); 
+		//this.direction.copyFrom(dir);
+		
+		// now, must calculate camera-Up by earth normal.***
+		var normalEarth = Globe.normalAtCartesianPointWgs84(posWC.x, posWC.y, posWC.z, undefined);
+		this.calculateUp(new Point3D(normalEarth[0], normalEarth[1], normalEarth[2]));
+		//this.direction; 
+		//this.up;
+		/*
+		var geographicCoords = Globe.CartesianToGeographicWgs84(posWC.x, posWC.y, posWC.z, undefined);
+		nextLatitude = geographicCoords.latitude;
+		nextLongitude = geographicCoords.longitude;
+		nextAltitude = geographicCoords.altitude;
+		
+		// now calculate heading, pitch & roll.***
+		var yAxis = new Point2D(0, 1);
+		var dir2d = new Point2D(dir.x, dir.y);
+		dir2d.unitary();
+		var headingAngle = yAxis.angleDegToVector(dir2d);
+		if (dir2d.x > 0.0)
+		{
+			headingAngle *= -1;
+		}
+		*/
+		var magoWorld = magoManager.magoWorld;
+		magoWorld.updateModelViewMatrixByCamera(this);
+		
+		// finally update "lastTime".
+		animData.lastTime = currTime;
+		return finished;
+	}
+
+	return finished;
 };

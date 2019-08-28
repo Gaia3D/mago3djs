@@ -623,7 +623,7 @@ ReaderWriter.prototype.getLegoArraybuffer = function(fileName, legoMesh, magoMan
  * @param {string} fileName 파일명
  * @param {MagoManager} magoManager 파일 처리를 담당
  */
-ReaderWriter.prototype.getObjectIndexFileMultiBuildings = function(fileName, magoManager) 
+ReaderWriter.prototype.getObjectIndexFileMultiBuildings = function(fileName, projectFolderName, magoManager) 
 {
 	loadWithXhr(fileName).then(function(response) 
 	{	
@@ -635,10 +635,8 @@ ReaderWriter.prototype.getObjectIndexFileMultiBuildings = function(fileName, mag
 				magoManager.smartTileManager = new SmartTileManager();
 			}
 			var smartTileManager = magoManager.smartTileManager;
-			smartTileManager.smartTilesMultiBuildingsDataBuffer = arrayBuffer;
-			smartTileManager.parseSmartTilesMultiBuildingsIndexFile(arrayBuffer, magoManager);
-
-			//magoManager.makeSmartTile(buildingSeedList, projectId);
+			var smartTilesMultiBuildingsMap = smartTileManager.parseSmartTilesMultiBuildingsIndexFile(arrayBuffer, projectFolderName, magoManager);
+			
 			arrayBuffer = undefined;
 		}
 		else 
@@ -652,6 +650,52 @@ ReaderWriter.prototype.getObjectIndexFileMultiBuildings = function(fileName, mag
 	}).finally(function() 
 	{
 		//	For the moment, do nothing.***
+	});
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param fileName 파일명
+ * @param magoManager 변수
+ */
+ReaderWriter.prototype.getMultiBuildingsDataArrayBuffer = function(fileName, multiBuildings, magoManager) 
+{
+	// Function to load multiBuildings data.
+	this.skinLegos_requested++;
+	magoManager.fileRequestControler.multiBuildingsDataRequestedCount += 1;
+	multiBuildings.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
+	var xhr;
+	loadWithXhr(fileName, xhr).then(function(response) 
+	{
+		var arrayBuffer = response;
+		if (arrayBuffer) 
+		{
+			if (multiBuildings)
+			{
+				multiBuildings.dataArrayBuffer = arrayBuffer;
+				multiBuildings.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+				magoManager.parseQueue.putMultiBuildingsToParse(multiBuildings, 0);
+			}
+			arrayBuffer = null;
+		}
+		else 
+		{
+			multiBuildings.fileLoadState = 500;
+		}
+	},
+	function(status) 
+	{
+		console.log("xhr status = " + status);
+		if (status === 0) { multiBuildings.fileLoadState = 500; }
+		else 
+		{ 
+			multiBuildings.fileLoadState = -1; 
+		}
+	}).finally(function() 
+	{
+		magoManager.fileRequestControler.multiBuildingsDataRequestedCount -= 1;
+		if (magoManager.fileRequestControler.multiBuildingsDataRequestedCount < 0) { magoManager.fileRequestControler.multiBuildingsDataRequestedCount = 0; }
 	});
 };
 

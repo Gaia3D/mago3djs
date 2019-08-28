@@ -201,8 +201,8 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 	if (resultGeoLocationData.geographicCoord.longitude === undefined || resultGeoLocationData.geographicCoord.latitude === undefined)
 	{ return; }
 	
-	if (magoManager.configInformation === undefined)
-	{ return; }
+	//if (magoManager.configInformation === undefined)
+	//{ return; }
 
 	resultGeoLocationData.position = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, altitude, resultGeoLocationData.position);
 

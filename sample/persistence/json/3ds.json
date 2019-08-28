@@ -922,6 +922,39 @@
 			"mapping_type": "boundingboxcenter",
 			"pitch": 0.0, 
 			"roll": 0.0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "songpa"
+			},
+			"children": [],
+			"data_key": "PIPEZONE", 
+			"data_name": "PIPEZONE", 
+			"heading": 0.0, 
+			"height": 2.0, 
+			"latitude": 37.576166975093976, 
+			"longitude": 126.6096856088224,
+			"mapping_type": "origin",
+			"pitch": 0.0, 
+			"roll": 0.0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "singapore",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "JibCrane",
+			"data_name": "JibCrane",
+			"mapping_type":"origin",
+			"latitude": 37.576166975093976, 
+			"longitude": 126.6096856088224,
+			"height": 0.000000,
+			"heading": 0.000000,
+			"pitch": 0.000000,
+			"roll": 0.000000
 		}
 	],
 	"parent": 0,

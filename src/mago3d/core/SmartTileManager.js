@@ -27,8 +27,8 @@ var SmartTileManager = function()
      */
 	this.createMainTiles();
 	
-	this.smartTilesMultiBuildingsMap;
-	this.smartTilesMultiBuildingsDataBuffer;
+	// objectSeedsMap created to process multiBuildings.
+	this.objectSeedsMap;
 };
 
 /**
@@ -68,13 +68,61 @@ SmartTileManager.prototype.createMainTiles = function()
 
 /**
  */
-SmartTileManager.prototype.parseSmartTilesMultiBuildingsIndexFile = function(dataBuffer, magoManager) 
+SmartTileManager.prototype.doPendentProcess = function(magoManager) 
+{
+	// This function does pendent process.
+	if (this.objectSeedsMap !== undefined)
+	{
+		var hierarchyManager = magoManager.hierarchyManager;
+		var tilesCount = this.tilesArray.length; // allways tilesCount = 2. (Asia & America sides).
+		for (var key in this.objectSeedsMap)
+		{
+			if (Object.prototype.hasOwnProperty.call(this.objectSeedsMap, key))
+			{
+				var objectSeed = this.objectSeedsMap[key];
+				var targetDepth = objectSeed.L;
+				var projectId = objectSeed.objectType;
+				var nodesMap = hierarchyManager.getNodesMap(projectId, undefined);
+				
+				var multiBuildingId = objectSeed.id;
+				if (multiBuildingId === "")
+				{
+					// Assign a default id.
+					var existNodesCount = Object.keys(nodesMap).length; 
+					multiBuildingId = objectSeed.objectType + "_" + existNodesCount;
+				}
+				
+				var node = magoManager.hierarchyManager.newNode(multiBuildingId, projectId, undefined);
+				
+				// Now, create the basic node data.
+				node.data.attributes = {objectType: "multiBuildingsTile"};
+				node.data.geographicCoord = objectSeed.geographicCoord;
+				node.data.bbox = objectSeed.boundingBox;
+				node.data.projectFolderName = objectSeed.projectFolderName;
+				node.data.multiBuildingsFolderName = objectSeed.multiBuildingsFolderName;
+				
+				for (var i=0; i<tilesCount; i++)
+				{
+					//this.tilesArray[i].putObjectSeed(targetDepth, objectSeed, magoManager);
+					this.tilesArray[i].putNode(targetDepth, node, magoManager);
+				}
+			}
+		}
+		
+		// finally clear the this.objectSeedsMap.
+		this.objectSeedsMap = undefined;
+	}
+};
+
+/**
+ */
+SmartTileManager.prototype.parseSmartTilesMultiBuildingsIndexFile = function(dataBuffer, projectFolderName, magoManager) 
 {
 	var bytes_readed = 0;
 	var readWriter = magoManager.readerWriter;
 	
-	if (this.smartTilesMultiBuildingsMap === undefined)
-	{ this.smartTilesMultiBuildingsMap = {}; }
+	if (this.objectSeedsMap === undefined)
+	{ this.objectSeedsMap = {}; }
 
 	var smartTilesMBCount = readWriter.readInt32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 	for (var i=0; i<smartTilesMBCount; i++)
@@ -89,17 +137,34 @@ SmartTileManager.prototype.parseSmartTilesMultiBuildingsIndexFile = function(dat
 		var L = readWriter.readInt32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		var X = readWriter.readInt32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		var Y = readWriter.readInt32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		
+		// Now read bbox.
+		var bbox = new BoundingBox();
+		bbox.minX = readWriter.readFloat32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		bbox.minY = readWriter.readFloat32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		bbox.minZ = readWriter.readFloat32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+
+		bbox.maxX = readWriter.readFloat32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		bbox.maxY = readWriter.readFloat32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		bbox.maxZ = readWriter.readFloat32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		
 		var geoExtent = SmartTile.getGeographicExtentOfTileLXY(L, X, Y, undefined);
 		var centerGeoCoord = geoExtent.getMidPoint();
-		
-		this.smartTilesMultiBuildingsMap[name] = {"L"              : L,
-			"X"              : X,
-			"Y"              : Y,
-			"centerGeoCoord" : centerGeoCoord};
+		var multiBuildingId = "";
+		this.objectSeedsMap[name] = {
+			"L"                        : L,
+			"X"                        : X,
+			"Y"                        : Y,
+			"geographicCoord"          : centerGeoCoord,
+			"objectType"               : "MultiBuildingsTile",
+			"id"                       : multiBuildingId,
+			"boundingBox"              : bbox,
+			"multiBuildingsFolderName" : name,
+			"projectFolderName"        : projectFolderName};
 
 	}
 	
-	var hola = 0;
+	return this.objectSeedsMap;
 };
 
 /**

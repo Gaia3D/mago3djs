@@ -17,6 +17,7 @@ var FileRequestControler = function()
 	this.modelRefFilesRequestedCount = 0;
 	this.lowLodDataRequestedCount = 0;
 	this.lowLodImagesRequestedCount = 0;
+	this.multiBuildingsDataRequestedCount = 0;
 };
 
 FileRequestControler.prototype.isFull = function ()

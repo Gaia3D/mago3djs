@@ -855,9 +855,10 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 	{ return false; }
 	
 	if (headerVersion[0] !== "0")
-	{
-		return false;
-	}
+	{ return false; }
+
+	if (this.buildingId === "JibCrane")
+	{ var hola = 0; }
 
 	if (this.lodMeshesMap === undefined)
 	{ this.lodMeshesMap = {}; } 
