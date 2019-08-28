@@ -41,6 +41,22 @@ BoundingBox.prototype.init = function(point)
 };
 
 /**
+ * Reads the boundingBox from an arrayBuffer.
+ * @param {typedArray} arrayBuffer
+ * @param {Number} bytesReaded current bytesReaded on the arrayBuffer.
+ */
+BoundingBox.prototype.readData = function(arrayBuffer, bytesReaded) 
+{
+	this.minX = (new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+	this.minY = (new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+	this.minZ = (new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+	this.maxX = (new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+	this.maxY = (new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+	this.maxZ = (new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+	return bytesReaded;
+};
+
+/**
  * Sets the values of the bounding box
  * @param {Number} minX Minimum value of the boundingBox in x axis.
  * @param {Number} minY Minimum value of the boundingBox in y axis.

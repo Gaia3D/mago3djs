@@ -295,8 +295,13 @@ TinTerrain.prototype.prepareTexture = function(magoManager, tinTerrainManager)
 	
 	if (xDef < 0)
 	{ xDef = 0; }
+
+	//https://a.tile.openstreetmap.org/${z}/${x}/${y}.png 
+	//https://b.tile.openstreetmap.org/${z}/${x}/${y}.png 
+	//https://c.tile.openstreetmap.org/${z}/${x}/${y}.png
 		
 	var textureFilePath = "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/" + L + "/" + Y + "/" + xDef + ".png";
+	//var textureFilePath = "http://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer/tile/" + L + "/" + Y + "/" + xDef + ".jpg";
 	
 	// Provisionally, for debug, save textureFilePath.***
 	this.texFilePath__TEST = textureFilePath;

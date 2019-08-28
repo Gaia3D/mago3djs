@@ -319,11 +319,11 @@ Network.prototype.renderColorCoding = function(magoManager, shader, renderType)
 			gl.uniform1i(shader.refMatrixType_loc, refMatrixType);
 			
 			// Positions.
-			if (vboKey.meshVertexCacheKey !== shader.last_vboPos_binded)
+			if (vboKey.meshVertexCacheKey !== shader.lastVboKeyBindedMap[shader.position3_loc])
 			{
 				gl.bindBuffer(gl.ARRAY_BUFFER, vboKey.meshVertexCacheKey);
 				gl.vertexAttribPointer(shader.position3_loc, 3, gl.FLOAT, false, 0, 0);
-				shader.last_vboPos_binded = vboKey.meshVertexCacheKey;
+				shader.lastVboKeyBindedMap[shader.position3_loc] = vboKey.meshVertexCacheKey;
 			}
 				
 			var edgesCount = this.edgesArray.length;
@@ -441,11 +441,11 @@ Network.prototype.render = function(magoManager, shader, renderType)
 			gl.uniform4fv(shader.oneColor4_loc, [0.1, 0.1, 0.6, 1.0]);
 	
 			// Positions.
-			if (vboKey.meshVertexCacheKey !== shader.last_vboPos_binded)
+			if (vboKey.meshVertexCacheKey !== shader.lastVboKeyBindedMap[shader.position3_loc])
 			{
 				gl.bindBuffer(gl.ARRAY_BUFFER, vboKey.meshVertexCacheKey);
 				gl.vertexAttribPointer(shader.position3_loc, 3, gl.FLOAT, false, 0, 0);
-				shader.last_vboPos_binded = vboKey.meshVertexCacheKey;
+				shader.lastVboKeyBindedMap[shader.position3_loc] = vboKey.meshVertexCacheKey;
 			}
 			
 			//gl.drawArrays(gl.LINES, 0, vboKey.segmentsCount*2);

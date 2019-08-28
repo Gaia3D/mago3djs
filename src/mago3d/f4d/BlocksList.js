@@ -218,7 +218,7 @@ BlocksList.prototype.parseBlockVersioned = function(arrayBuffer, bytesReaded, bl
 	for ( var j = 0; j < vboDatasCount; j++ ) 
 	{
 		var vboViCacheKey = block.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
-		bytesReaded = vboViCacheKey.readPosNorIdx(arrayBuffer, readWriter, vboMemManager, bytesReaded);
+		bytesReaded = vboViCacheKey.readPosNorIdx(arrayBuffer, vboMemManager, bytesReaded);
 		block.vertexCount = vboViCacheKey.vertexCount;
 	}
 	
@@ -488,7 +488,7 @@ BlocksList.prototype.parseBlocksList = function(arrayBuffer, readWriter, motherB
 		for ( var j = 0; j < vboDatasCount; j++ ) 
 		{
 			var vboViCacheKey = block.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
-			bytesReaded = vboViCacheKey.readPosNorIdx(arrayBuffer, readWriter, vboMemManager, bytesReaded);
+			bytesReaded = vboViCacheKey.readPosNorIdx(arrayBuffer, vboMemManager, bytesReaded);
 			block.vertexCount = vboViCacheKey.vertexCount;
 		}
 		// Pendent to load the block's lego.

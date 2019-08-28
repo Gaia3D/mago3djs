@@ -373,7 +373,10 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 	if (this.headersRequestedCounter === undefined)
 	{ this.headersRequestedCounter = 0; }
 
-	var currentVisibleNodes = [].concat(visibleObjControlerNodes.currentVisibles0, visibleObjControlerNodes.currentVisibles2, visibleObjControlerNodes.currentVisibles3, visibleObjControlerNodes.currentVisiblesAux);
+	var currentVisibleNodes = [].concat(visibleObjControlerNodes.currentVisibles0, 
+		visibleObjControlerNodes.currentVisibles2, 
+		visibleObjControlerNodes.currentVisibles3, 
+		visibleObjControlerNodes.currentVisiblesAux);
 	for (var i=0, length = currentVisibleNodes.length; i<length; i++) 
 	{
 		node = currentVisibleNodes[i];
@@ -382,11 +385,23 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 		var attributes = node.data.attributes;
 		if (attributes === undefined)
 		{ continue; }
+	
+		neoBuilding = currentVisibleNodes[i].data.neoBuilding;
+		
+		/*
+		if (attributes.objectType === "basicF4d")
+		{
+			
+		}
+		else if (attributes.objectType === "multiBuildingsTile")
+		{
+			
+		}
+		*/
 		
 		if (attributes.projectId !== undefined && attributes.isReference !== undefined && attributes.isReference === true)
 		{
 			// check if has neoBuilding.***
-			neoBuilding = currentVisibleNodes[i].data.neoBuilding;
 			if (neoBuilding === undefined)
 			{
 				var neoBuildingFolderName = attributes.buildingFolderName;
@@ -444,17 +459,11 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 				neoBuilding.buildingId = neoBuildingFolderName;
 			
 				neoBuilding.buildingType = "basicBuilding";
-				//nodeBbox.copyFrom(buildingSeed.bBox); // initially copy from building.
 				if (neoBuilding.bbox === undefined)
 				{ neoBuilding.bbox = new BoundingBox(); }
 				neoBuilding.bbox.copyFrom(buildingSeed.bBox);
 				neoBuilding.projectFolderName = node.data.projectFolderName;
 			}
-		}
-		else 
-		{
-			projectFolderName = node.data.projectFolderName;
-			neoBuilding = currentVisibleNodes[i].data.neoBuilding;
 		}
 		
 		// Check if this node has topologyData.***
@@ -492,15 +501,18 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 		*/
 
 		// check if this building is ready to render.***
-		// 1) MetaData
-		var metaData = neoBuilding.metaData;
-		if (metaData.fileLoadState === CODE.fileLoadState.READY) 
+		if (neoBuilding)
 		{
-			projectFolderName = neoBuilding.projectFolderName;
-			if (this.fileRequestControler.isFullHeaders())	{ return; }
-			var neoBuildingHeaderPath = geometryDataPath + "/" + projectFolderName + "/" + neoBuilding.buildingFileName + "/HeaderAsimetric.hed";
-			
-			this.readerWriter.getNeoHeaderAsimetricVersion(gl, neoBuildingHeaderPath, neoBuilding, this.readerWriter, this); // Here makes the tree of octree.***
+			// 1) MetaData
+			var metaData = neoBuilding.metaData;
+			if (metaData.fileLoadState === CODE.fileLoadState.READY) 
+			{
+				projectFolderName = neoBuilding.projectFolderName;
+				if (this.fileRequestControler.isFullHeaders())	{ return; }
+				var neoBuildingHeaderPath = geometryDataPath + "/" + projectFolderName + "/" + neoBuilding.buildingFileName + "/HeaderAsimetric.hed";
+				
+				this.readerWriter.getNeoHeaderAsimetricVersion(gl, neoBuildingHeaderPath, neoBuilding, this.readerWriter, this); // Here makes the tree of octree.***
+			}
 		}
 		
 	}
@@ -901,9 +913,7 @@ MagoManager.prototype.loadAndPrepareData = function()
 	// 1) LOD 0.***********************************************************************************
 	this.visibleObjControlerOctrees.initArrays(); // init.******
 
-	var neoBuilding;
 	var node;
-	var octree;
 	// lod 0 & lod 1.
 	this.checkPropertyFilters(this.visibleObjControlerNodes.currentVisibles0);
 	this.checkPropertyFilters(this.visibleObjControlerNodes.currentVisibles2);
@@ -911,13 +921,22 @@ MagoManager.prototype.loadAndPrepareData = function()
 	for (var i=0; i<nodesCount; i++) 
 	{
 		node = this.visibleObjControlerNodes.currentVisibles0[i];
-		if (!this.getRenderablesDetailedNeoBuildingAsimetricVersion(gl, node, this.visibleObjControlerOctrees, 0))
+		var attributes = node.data.attributes;
+		if (attributes.objectType === "basicF4d")
 		{
-			// any octree is visible.
-			this.visibleObjControlerNodes.currentVisibles0.splice(i, 1);
-			i--;
-			nodesCount = this.visibleObjControlerNodes.currentVisibles0.length;
+			if (!this.getRenderablesDetailedNeoBuildingAsimetricVersion(gl, node, this.visibleObjControlerOctrees, 0))
+			{
+				// any octree is visible.
+				this.visibleObjControlerNodes.currentVisibles0.splice(i, 1);
+				i--;
+				nodesCount = this.visibleObjControlerNodes.currentVisibles0.length;
+			}
 		}
+		//else if (attributes.objectType === "multiBuildingsTile")
+		//{
+		//	// Load data if necessary.
+		//	var hola = 0;
+		//}
 	}
 	
 	this.prepareVisibleOctreesSortedByDistance(gl, this.visibleObjControlerOctrees); 
@@ -932,12 +951,16 @@ MagoManager.prototype.loadAndPrepareData = function()
 		for (var i=0; i<nodesCount; i++) 
 		{
 			node = this.visibleObjControlerNodes.currentVisibles2[i];
-			if (!this.getRenderablesDetailedNeoBuildingAsimetricVersion(gl, node, this.visibleObjControlerOctrees, 2))
+			var attributes = node.data.attributes;
+			if (attributes.objectType === "basicF4d")
 			{
-				// any octree is visible.
-				this.visibleObjControlerNodes.currentVisibles2.splice(i, 1);
-				i--;
-				nodesCount = this.visibleObjControlerNodes.currentVisibles2.length;
+				if (!this.getRenderablesDetailedNeoBuildingAsimetricVersion(gl, node, this.visibleObjControlerOctrees, 2))
+				{
+					// any octree is visible.
+					this.visibleObjControlerNodes.currentVisibles2.splice(i, 1);
+					i--;
+					nodesCount = this.visibleObjControlerNodes.currentVisibles2.length;
+				}
 			}
 		}
 
@@ -1295,6 +1318,7 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 		{
 			this.upDateCamera(this.myCameraSCX);
 			this.doMultiFrustumCullingSmartTiles(this.myCameraSCX);
+			this.smartTileManager.doPendentProcess(this);
 		}
 		
 		gl.clearStencil(0); // provisionally here.***
@@ -1399,9 +1423,20 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 	{
 		node = lowLodNodesArray[i];
 		
-		neoBuilding = node.data.neoBuilding;
-		
-		neoBuilding.prepareSkin(this);
+		var attributes = node.data.attributes;
+		if (attributes.objectType === "basicF4d")
+		{
+			neoBuilding = node.data.neoBuilding;
+			neoBuilding.prepareSkin(this);
+		}
+		else if (attributes.objectType === "multiBuildingsTile")
+		{
+			// Load data if necessary.
+			var multiBuildings = node.data.multiBuildings;
+			
+			if (multiBuildings)
+			{ multiBuildings.prepareData(this); }
+		}
 		
 		if (this.readerWriter.skinLegos_requested > 5)
 		{ return; }
@@ -1853,8 +1888,8 @@ MagoManager.prototype.keyDown = function(key)
 	{
 		if (this.modeler === undefined)
 		{ this.modeler = new Modeler(); }
-		//this.modeler.mode = CODE.modelerMode.DRAWING_BSPLINE;
-		this.modeler.mode = CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS;
+		this.modeler.mode = CODE.modelerMode.DRAWING_BSPLINE;
+		//this.modeler.mode = CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS;
 	}
 	else if (key === 40) // 40 = 'down'.***
 	{
@@ -1934,7 +1969,7 @@ MagoManager.prototype.keyDown = function(key)
 	else if (key === 84) // 84 = 't'.***
 	{
 		// do test.***
-		/*
+		
 		if (this.modeler !== undefined)
 		{
 			var excavation = this.modeler.getExcavation();
@@ -1990,6 +2025,7 @@ MagoManager.prototype.keyDown = function(key)
 		}
 		
 		// Another test.***
+		
 		if (this.smartTile_multibuilding_tested === undefined)
 		{
 			this.smartTile_multibuilding_tested = true;
@@ -2001,12 +2037,12 @@ MagoManager.prototype.keyDown = function(key)
 			
 			this.buildingSeedList = new BuildingSeedList();
 			var fileName;
-			var geometrySubDataPath = "smartTile_multiBuildings";
-			fileName = this.readerWriter.geometryDataPath + "/" + geometrySubDataPath + "/" + "smartTile_multibuildings_indexFile.ist";
+			var projectFolderName = "smartTile_multiBuildings";
+			fileName = this.readerWriter.geometryDataPath + "/" + projectFolderName + "/" + "smartTile_multibuildings_indexFile.ist";
 			
-			this.readerWriter.getObjectIndexFileMultiBuildings(fileName, this);
+			this.readerWriter.getObjectIndexFileMultiBuildings(fileName, projectFolderName, this);
 		}
-		*/
+		
 		
 		// Moviment restriction test.***
 		if (this.modeler !== undefined)
@@ -2018,7 +2054,7 @@ MagoManager.prototype.keyDown = function(key)
 			
 			var className = "ConcentricTubes";
 			var objectsArray = this.modeler.extractObjectsByClassName(className);
-			if (objectsArray.length > 0)
+			if (objectsArray !== undefined && objectsArray.length > 0)
 			{
 				var concentricTubes = objectsArray[0];
 				if (concentricTubes.attributes === undefined)
@@ -2122,9 +2158,10 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		// For each "click" add geographicPoint to the modeler's geographicPointsList.***
 		else if (this.modeler.mode === CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS)
 		{
-			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
-			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+1, undefined, undefined, undefined, geoLocData, this);
+			geoCoord.makeDefaultGeoLocationData();
+			//var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+			//var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+			//geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+1, undefined, undefined, undefined, geoLocData, this);
 			
 			var geoCoordsList = this.modeler.getGeographicCoordsList();
 			geoCoordsList.addGeoCoord(geoCoord);
@@ -2133,9 +2170,10 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		// Excavation.***
 		else if (this.modeler.mode === CODE.modelerMode.DRAWING_EXCAVATIONPOINTS)
 		{
-			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
-			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+1, undefined, undefined, undefined, geoLocData, this);
+			geoCoord.makeDefaultGeoLocationData();
+			//var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+			//var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+			//geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+1, undefined, undefined, undefined, geoLocData, this);
 			
 			var excavation = this.modeler.getExcavation();
 			var geoCoordsList = excavation.getGeographicCoordsList();
@@ -2146,9 +2184,10 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		// Tunnel.***
 		else if (this.modeler.mode === CODE.modelerMode.DRAWING_TUNNELPOINTS)
 		{
-			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
-			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+1, undefined, undefined, undefined, geoLocData, this);
+			geoCoord.makeDefaultGeoLocationData();
+			//var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+			//var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+			//geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+1, undefined, undefined, undefined, geoLocData, this);
 			
 			var tunnel = this.modeler.getTunnel();
 			var geoCoordsList = tunnel.getPathGeographicCoordsList();
@@ -2159,10 +2198,11 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		// BSpline.***
 		else if (this.modeler.mode === CODE.modelerMode.DRAWING_BSPLINE)
 		{
+			geoCoord.makeDefaultGeoLocationData();
 			// Testing bSpline.***
-			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
-			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+1, undefined, undefined, undefined, geoLocData, this);
+			//var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+			//var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+			//geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+1, undefined, undefined, undefined, geoLocData, this);
 			
 			
 			if (this.modeler.bSplineCubic3d === undefined)
@@ -3181,8 +3221,6 @@ MagoManager.prototype.manageQueue = function()
 	var gl = this.sceneState.gl;
 	
 	
-	
-	
 	// 1rst, manage deleting queue.***************
 	this.processQueue.manageDeleteQueue(this);
 	
@@ -3196,13 +3234,11 @@ MagoManager.prototype.manageQueue = function()
 	// parse octrees lod0 & lod1 references.***
 	this.parseQueue.parseArrayOctreesLod0References(gl, this.visibleObjControlerOctrees.currentVisibles0, this);
 	this.parseQueue.parseArrayOctreesLod0References(gl, this.visibleObjControlerOctrees.currentVisibles1, this);
-	
-	
+
 
 	// parse octrees lod0 & lod1 models.***
 	this.parseQueue.parseArrayOctreesLod0Models(gl, this.visibleObjControlerOctrees.currentVisibles0, this);
 	this.parseQueue.parseArrayOctreesLod0Models(gl, this.visibleObjControlerOctrees.currentVisibles1, this);
-	
 	
 	
 	// parse octrees lod2 (lego).***
@@ -3217,7 +3253,10 @@ MagoManager.prototype.manageQueue = function()
 	this.parseQueue.parseArraySkins(gl, this.visibleObjControlerNodes.currentVisibles2, this);
 	this.parseQueue.parseArraySkins(gl, this.visibleObjControlerNodes.currentVisibles3, this);
 	
-	
+	// parse multiBuildings.
+	this.parseQueue.parseMultiBuildings(gl, this.visibleObjControlerNodes.currentVisibles0, this);
+	this.parseQueue.parseMultiBuildings(gl, this.visibleObjControlerNodes.currentVisibles2, this);
+	this.parseQueue.parseMultiBuildings(gl, this.visibleObjControlerNodes.currentVisibles3, this);
 
 	// parse TinTerrain.***
 	var tinTerrain;
@@ -4206,23 +4245,8 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 	var distToCamera;
 	var magoPolicy = this.magoPolicy;
 	
-	
-	var lod0_minDist = magoPolicy.getLod1DistInMeters();
-	var lod1_minDist = 1;
-	var lod2_minDist = magoPolicy.getLod2DistInMeters();
+	// The max distance to render in mago.
 	var lod5_minDist = magoPolicy.getLod5DistInMeters();
-	var lod3_minDist;
-	
-	// get lodDistances for determine the real lod of the building.***
-	var lod0Dist = magoPolicy.getLod0DistInMeters();
-	var lod1Dist = magoPolicy.getLod1DistInMeters();
-	var lod2Dist = magoPolicy.getLod2DistInMeters();
-	var lod3Dist = magoPolicy.getLod3DistInMeters();
-	var lod4Dist = magoPolicy.getLod4DistInMeters();
-	var lod5Dist = magoPolicy.getLod5DistInMeters();
-
-	var maxNumberOfCalculatingPositions = 100;
-	var currentCalculatingPositionsCount = 0;
 	
 	var lowestTile;
 	var buildingSeedsCount;
@@ -4236,17 +4260,29 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 	var geoLocDataManager;
 	var realBuildingPos;
 	var longitude, latitude, altitude, heading, pitch, roll;
+	
+	if (this.boundingSphere_Aux === undefined)
+	{ this.boundingSphere_Aux = new Sphere(); }
 
 	for (var i=0; i<tilesCount; i++)
 	{
 		lowestTile = intersectedLowestTilesArray[i];
+		
+		if (lowestTile.depth === 14)
+		{ var hola = 0; }
+		
 		if (lowestTile.sphereExtent === undefined)
 		{ continue; }
 	
 		distToCamera = cameraPosition.distToSphere(lowestTile.sphereExtent);
 		if (distToCamera > Number(lod5_minDist))
 		{ continue; }
-
+	
+		if (lowestTile.depth === 14)
+		{ var hola = 0; }
+		
+		// Check the smartTile state: (1- is all updated), (2- need make geometries from objectsSeeds).
+		
 		if (lowestTile.nodesArray && lowestTile.nodesArray.length > 0)
 		{
 			// the neoBuildings are made.
@@ -4256,6 +4292,7 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 				// determine LOD for each building.
 				node = lowestTile.nodesArray[j];
 				nodeRoot = node.getRoot();
+				var attributes = node.data.attributes;
 
 				// now, create a geoLocDataManager for node if no exist.
 				if (nodeRoot.data.geoLocDataManager === undefined)
@@ -4264,212 +4301,122 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 					continue;
 				}
 				
-				neoBuilding = node.data.neoBuilding;
-				
-				if (neoBuilding === undefined)
-				{
-					// This node is a reference node.***
-					visibleNodes.currentVisiblesAux.push(node);
-					continue;
-				}
-				
-				if (this.boundingSphere_Aux === undefined)
-				{ this.boundingSphere_Aux = new Sphere(); }
-			
-				distToCamera = node.getDistToCamera(cameraPosition, this.boundingSphere_Aux);
-				
 				var data = node.data;
-				data.currentLod;
-				data.distToCam = distToCamera;
-				
-				if (data.distToCam < lod0Dist)
-				{ data.currentLod = 0; }
-				else if (data.distToCam < lod1Dist)
-				{ data.currentLod = 1; }
-				else if (data.distToCam < lod2Dist)
-				{ data.currentLod = 2; }
-				else if (data.distToCam < lod3Dist)
-				{ data.currentLod = 3; }
-				else if (data.distToCam < lod4Dist)
-				{ data.currentLod = 4; }
-				else if (data.distToCam < lod5Dist)
-				{ data.currentLod = 5; }
-				
-				var frustumFar = magoPolicy.getFrustumFarDistance();
-				if (distToCamera > frustumFar)
-				{ 
-					// put this node to delete into queue.***
-					this.processQueue.putNodeToDelete(node, 0);
-					continue; 
-				}
-				
-				// If necessary do frustum culling.*************************************************************************
-				if (doFrustumCullingToBuildings)
-				{
-					var frustumCull = frustumVolume.intersectionSphere(this.boundingSphere_Aux); // cesium.***
-					// intersect with Frustum
-					if (frustumCull === Constant.INTERSECTION_OUTSIDE) 
+					
+				if (attributes.objectType === "basicF4d")
+				{					
+					neoBuilding = node.data.neoBuilding;
+					if (neoBuilding === undefined) // attributes.isReference === true
 					{
-						// put this node to delete into queue.***
-						//this.processQueue.putNodeToDeleteModelReferences(node, 0);
-						this.processQueue.putNodeToDeleteLessThanLod3(node, 0);
+						// This node is a reference node.***
+						visibleNodes.currentVisiblesAux.push(node);
 						continue;
 					}
+
+					distToCamera = node.getDistToCamera(cameraPosition, this.boundingSphere_Aux);
+					var lodByDist = magoPolicy.getLod(distToCamera);
+					
+					// Set the current LOD of node.
+					data.distToCam = distToCamera;
+					data.currentLod = magoPolicy.getLod(data.distToCam);
+					
+					var frustumFar = magoPolicy.getFrustumFarDistance();
+					if (distToCamera > frustumFar)
+					{ 
+						// put this node to delete into queue.***
+						this.processQueue.putNodeToDelete(node, 0);
+						continue; 
+					}
+					
+					// If necessary do frustum culling.**********************************************************
+					if (doFrustumCullingToBuildings)
+					{
+						var frustumCull = frustumVolume.intersectionSphere(this.boundingSphere_Aux); // cesium.***
+						// intersect with Frustum
+						if (frustumCull === Constant.INTERSECTION_OUTSIDE) 
+						{
+							// put this node to delete into queue.***
+							//this.processQueue.putNodeToDeleteModelReferences(node, 0);
+							this.processQueue.putNodeToDeleteLessThanLod3(node, 0);
+							continue;
+						}
+					}
+					//-------------------------------------------------------------------------------------------
+					
+					// provisionally fork versions.***
+					var version = neoBuilding.getHeaderVersion();
+					if (version === undefined)
+					{ continue; }
+					
+					if (version[0] === 'v')
+					{
+						visibleNodes.putNodeByLod(node, lodByDist);
+					}
+					else 
+					{
+						// provisional test for pointsCloud data.************
+						var metaData = neoBuilding.metaData;
+						var projectsType = metaData.projectDataType;
+						if (projectsType && (projectsType === 4 || projectsType === 5))
+						{
+							// Project_data_type (new in version 002).***
+							// 1 = 3d model data type (normal 3d with interior & exterior data).***
+							// 2 = single building skin data type (as vWorld or googleEarth data).***
+							// 3 = multi building skin data type (as Shibuya & Odaiba data).***
+							// 4, 5 = pointsCloud data type.***
+							visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisiblesAux, node);
+						}
+						// end provisional test.-----------------------------
+						else
+						{
+							visibleNodes.putNodeByLod(node, lodByDist);
+						}
+					}
+				
 				}
-				
-				
-				//-------------------------------------------------------------------------------------------
-				
-				// provisionally fork versions.***
-				var version = neoBuilding.getHeaderVersion();
-				if (version === undefined)
-				{ continue; }
-				
-				if (version[0] === 'v')
+				else if (attributes.objectType === "multiBuildingsTile")
 				{
-					if (distToCamera < lod0_minDist) 
-					{
-						visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles0, node);
+					// Put node into visibleNodes.
+					distToCamera = node.getDistToCamera(cameraPosition, this.boundingSphere_Aux);
+					var lodByDist = magoPolicy.getLod(distToCamera);
+					
+					// Set the current LOD of node.
+					data.distToCam = distToCamera;
+					data.currentLod = magoPolicy.getLod(data.distToCam);
+					
+					var frustumFar = magoPolicy.getFrustumFarDistance();
+					if (distToCamera > frustumFar)
+					{ 
+						// put this node to delete into queue.***
+						this.processQueue.putNodeToDelete(node, 0);
+						continue; 
 					}
-					else if (distToCamera < lod1_minDist) 
+					
+					// If necessary do frustum culling.**********************************************************
+					if (doFrustumCullingToBuildings)
 					{
-						visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles1, node);
-					}
-					else if (distToCamera < lod2_minDist) 
-					{
-						visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles2, node);
-					}
-					else if (distToCamera < lod5_minDist) 
-					{
-						visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles3, node);
-					}
-				}
-				else 
-				{
-					// provisional test for pointsCloud data.************
-					var metaData = neoBuilding.metaData;
-					var projectsType = metaData.projectDataType;
-					if (projectsType && (projectsType === 4 || projectsType === 5))
-					{
-						// Project_data_type (new in version 002).***
-						// 1 = 3d model data type (normal 3d with interior & exterior data).***
-						// 2 = single building skin data type (as vWorld or googleEarth data).***
-						// 3 = multi building skin data type (as Shibuya & Odaiba data).***
-						// 4 = pointsCloud data type.***
-						visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisiblesAux, node);
-					}
-					// end provisional test.-----------------------------
-					else
-					{
-						if (distToCamera < lod0_minDist) 
+						var frustumCull = frustumVolume.intersectionSphere(this.boundingSphere_Aux); // cesium.***
+						// intersect with Frustum
+						if (frustumCull === Constant.INTERSECTION_OUTSIDE) 
 						{
-							visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles0, node);
-						}
-						else if (distToCamera < lod1_minDist) 
-						{
-							visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles1, node);
-						}
-						else if (distToCamera < lod2_minDist) 
-						{
-							visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles2, node);
-						}
-						else if (distToCamera < lod5_minDist) 
-						{
-							visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisibles3, node);
+							// put this node to delete into queue.***
+							//this.processQueue.putNodeToDeleteLessThanLod3(node, 0);
+							continue;
 						}
 					}
+					//-------------------------------------------------------------------------------------------
+					
+					visibleNodes.putNodeByLod(node, lodByDist);
 				}
 			}
-			
-			if (lowestTile.nodesArray.length !== lowestTile.nodeSeedsArray.length)
-			{
-				// create the buildings by buildingSeeds.
-				this.createBuildingsByBuildingSeedsOnLowestTile(lowestTile);
-				
-			}
-			
-			
 		}
-		else
+		
+		if (lowestTile.isNeededToCreateGeometriesFromSeeds())
 		{
-			// create the buildings by buildingSeeds.
-			this.createBuildingsByBuildingSeedsOnLowestTile(lowestTile);
-			
+			lowestTile.createGeometriesFromSeeds(this);
 		}
-		
-		
 	}
 	
-};
-
-
-/**
- */
-MagoManager.prototype.createBuildingsByBuildingSeedsOnLowestTile = function(lowestTile) 
-{
-	// create the buildings by buildingSeeds.
-	var node;
-	var neoBuilding;
-	var nodeBbox;
-	var buildingSeed;
-	var startIndex = 0;
-	
-	// if exist nodesArray (there are buildings) and add a nodeSeed, we must make nodes of the added nodeSeeds.***
-	if (lowestTile.nodesArray)
-	{ startIndex = lowestTile.nodesArray.length; }
-
-	if (lowestTile.nodesArray === undefined)
-	{ lowestTile.nodesArray = []; }
-	
-	var nodeSeedsCount = lowestTile.nodeSeedsArray.length;
-	for (var j=startIndex; j<nodeSeedsCount; j++)
-	{
-		node = lowestTile.nodeSeedsArray[j];
-		
-		if (node.data.neoBuilding !== undefined)
-		{
-			lowestTile.nodesArray.push(node);
-			continue;
-		}
-		
-		neoBuilding = new NeoBuilding();
-		
-		neoBuilding.nodeOwner = node;
-		node.data.neoBuilding = neoBuilding;
-		if (node.data.bbox === undefined)
-		{ node.data.bbox = new BoundingBox(); }
-		nodeBbox = node.data.bbox;
-		buildingSeed = node.data.buildingSeed;
-		
-		lowestTile.nodesArray.push(node);
-		
-		if (neoBuilding.metaData === undefined) 
-		{ neoBuilding.metaData = new MetaData(); }
-
-		if (neoBuilding.metaData.geographicCoord === undefined)
-		{ neoBuilding.metaData.geographicCoord = new GeographicCoord(); }
-
-		if (neoBuilding.metaData.bbox === undefined) 
-		{ neoBuilding.metaData.bbox = new BoundingBox(); }
-
-		// create a building and set the location.***
-		neoBuilding.name = buildingSeed.name;
-		neoBuilding.buildingId = buildingSeed.buildingId;
-	
-		neoBuilding.buildingType = "basicBuilding";
-		neoBuilding.buildingFileName = buildingSeed.buildingFileName;
-		neoBuilding.metaData.geographicCoord.setLonLatAlt(buildingSeed.geographicCoord.longitude, buildingSeed.geographicCoord.latitude, buildingSeed.geographicCoord.altitude);
-		neoBuilding.metaData.bbox.copyFrom(buildingSeed.bBox);
-		nodeBbox.copyFrom(buildingSeed.bBox); // initially copy from building.
-		if (neoBuilding.bbox === undefined)
-		{ neoBuilding.bbox = new BoundingBox(); }
-		neoBuilding.bbox.copyFrom(buildingSeed.bBox);
-		neoBuilding.metaData.heading = buildingSeed.rotationsDegree.z;
-		neoBuilding.metaData.pitch = buildingSeed.rotationsDegree.x;
-		neoBuilding.metaData.roll = buildingSeed.rotationsDegree.y;
-		neoBuilding.projectFolderName = node.data.projectFolderName;
-		
-	}
 };
 
 /**
@@ -4723,13 +4670,6 @@ MagoManager.prototype.getObjectIndexFile_xxxx = function()
 		
 };
 
-/**
- * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
- */
-MagoManager.prototype.makeNodeGeneric = function(resultPhysicalNodesArray, buildingSeedMap, projectFolderName, projectId) 
-{
-	
-};
 
 /**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
@@ -4790,6 +4730,7 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 	{
 		if (!attributes.isReference)
 		{
+			attributes.objectType = "basicF4d";
 			buildingId = data_key;
 			node = this.hierarchyManager.newNode(buildingId, projectId, attributes);
 			// set main data of the node.
@@ -5083,35 +5024,6 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList, projectId)
 	this.buildingSeedList.buildingSeedArray.length = 0; // init.
 };
 
-/**
- * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
- */
-MagoManager.prototype.makeSmartTileGeneric = function(objectsArray, attributes) 
-{
-	var object;
-	var buildingId;
-	var newLocation;
-
-	// now, read all hierarchyJason and make the hierarchy tree.
-	var physicalNodesArray = []; // put here the nodes that has geometry data.
-	// make a buildingSeedMap.
-	var buildingSeedMap = {};
-	var objectsCount = objectsArray.length;
-	for (var i=0; i<buildingSeedsCount; i++)
-	{
-		object = objectsArray[i];
-		buildingId = object.buildingId;
-		buildingSeedMap[buildingId] = object;
-	}
-	var projectFolderName = attributes.projectFolderName;
-	this.makeNodeGeneric(physicalNodesArray, buildingSeedMap, projectFolderName, projectId);
-	this.calculateBoundingBoxesNodes();
-	
-	// now, make smartTiles.
-	// there are 2 general smartTiles: AsiaSide & AmericaSide.
-	//var targetDepth = 17;
-	//this.smartTileManager.makeTreeByDepth(targetDepth, physicalNodesArray, this);
-};
 
 /**
  * instantiate static model
@@ -5156,6 +5068,8 @@ MagoManager.prototype.instantiateStaticModel = function(attributes)
 	{
 		attributes.nodeType = "TEST";
 	}
+	
+	attributes.objectType = "basicF4d";
 
 	//var nodesMap = this.hierarchyManager.getNodesMap(projectId, undefined);
 	//var existentNodesCount = Object.keys(nodesMap).length;

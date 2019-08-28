@@ -168,6 +168,9 @@ Node.prototype.calculateGeoLocData = function(magoManager)
 			rotationsDegree = this.data.rotationsDegree;
 		}
 		
+		if (rotationsDegree === undefined)
+		{ rotationsDegree = new Point3D(0.0, 0.0, 0.0); }
+		
 		var longitude = geographicCoord.longitude;
 		var latitude = geographicCoord.latitude;
 		var altitude = geographicCoord.altitude;
@@ -175,7 +178,6 @@ Node.prototype.calculateGeoLocData = function(magoManager)
 		var pitch = rotationsDegree.x;
 		var roll = rotationsDegree.y;
 		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, heading, pitch, roll, geoLoc, magoManager);
-		this.pointSC = this.data.bbox.getCenterPoint(this.pointSC);
 
 		// check if use "centerOfBoundingBoxAsOrigin".
 		if (this.data.mapping_type !== undefined && this.data.mapping_type.toLowerCase() === "boundingboxcenter")
@@ -347,10 +349,6 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 		return;
 	}
 	
-	var neoBuilding = data.neoBuilding;
-	if (neoBuilding === undefined)
-	{ return; }
-
 	if (data.attributes && data.attributes.isVisible !== undefined && data.attributes.isVisible === false) 
 	{
 		return;
@@ -363,6 +361,9 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	else 
 	{ selectionManager.parentSelected = false; }
 	
+	var neoBuilding = data.neoBuilding;
+	if (neoBuilding === undefined)
+	{ return; }
 
 	// Update visibleOctreesControler of the neoBuilding & the relativeCurrentCamera.
 	// Note: currentVisibleOctreesControler & myCameraRelative are calculated on MagoManager.getRenderablesDetailedNeoBuildingAsimetricVersion(...).
@@ -403,6 +404,9 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	var flipYTexCoord = false;
 	if (data.attributes.flipYTexCoords !== undefined)
 	{ flipYTexCoord = data.attributes.flipYTexCoords; }
+
+	if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
+	{ flipYTexCoord = false; }
 
 	gl.uniform1i(shader.textureFlipYAxis_loc, flipYTexCoord);
 	
@@ -660,7 +664,7 @@ Node.prototype.calculateBBoxCenterPositionWorldCoord = function(geoLoc)
 
 	bboxAbsoluteCenterPosAux = geoLoc.tMatrix.transformPoint3D(bboxCenterPoint, bboxAbsoluteCenterPosAux);
 	
-	// Now, must applicate the aditional translation vector. Aditional translation is made when we translate the pivot point.
+	// Now, must applicate the additional translation vector. Additional translation is made when we translate the pivot point.
 	if (geoLoc.pivotPointTraslation)
 	{
 		var traslationVector;
@@ -678,7 +682,18 @@ Node.prototype.calculateBBoxCenterPositionWorldCoord = function(geoLoc)
 Node.prototype.getDistToCamera = function(cameraPosition, boundingSphere_Aux) 
 {
 	var data = this.data;
-	var neoBuilding = data.neoBuilding;
+	var attributes = data.attributes;
+	
+	if (attributes.objectType === "basicF4d")
+	{
+		// Traditional f4d data.
+	}
+	else if (attributes.objectType === "multiBuildingsTile")
+	{
+		// MultiBuildingsTile from cityGML style data.
+	}
+	
+	
 	
 	var nodeRoot = this.getRoot();
 	var geoLocDataManager = nodeRoot.data.geoLocDataManager;
@@ -703,30 +718,39 @@ Node.prototype.getDistToCamera = function(cameraPosition, boundingSphere_Aux)
 	
 	boundingSphere_Aux.setCenterPoint(realBuildingPos.x, realBuildingPos.y, realBuildingPos.z);
 	boundingSphere_Aux.setRadius(radiusAprox);
-		
-	var metaData = neoBuilding.metaData;
-	var projectsType = metaData.projectDataType;
-	if (projectsType && (projectsType === 4 || projectsType === 5))
+	
+	// Special treatment for point-cloud data. 
+	if (attributes.objectType === "basicF4d")
 	{
-		// This is pointsCloud projectType.
-		// Calculate the distance to camera with lowestOctrees.
-		var octree = neoBuilding.octree;
-		if (octree === undefined)
-		{ return undefined; }
-		
-		var relativeCamPos;
-		relativeCamPos = geoLoc.getTransformedRelativePosition(cameraPosition, relativeCamPos);
-		//relativeCam = neoBuilding.getTransformedRelativeEyePositionToBuilding(cameraPosition.x, cameraPosition.y, cameraPosition.z, relativeCam);
-		var octreesMaxSize = 120;
-		data.distToCam = octree.getMinDistToCameraInTree(relativeCamPos, boundingSphere_Aux, octreesMaxSize);
-		boundingSphere_Aux.setCenterPoint(realBuildingPos.x, realBuildingPos.y, realBuildingPos.z);
-		boundingSphere_Aux.setRadius(neoBuilding.bbox.getRadiusAprox());
+		var neoBuilding = data.neoBuilding;
+		var metaData = neoBuilding.metaData;
+		var projectsType = metaData.projectDataType;
+		if (projectsType && (projectsType === 4 || projectsType === 5))
+		{
+			// This is pointsCloud projectType.
+			// Calculate the distance to camera with lowestOctrees.
+			var octree = neoBuilding.octree;
+			if (octree === undefined)
+			{ return undefined; }
+			
+			var relativeCamPos;
+			relativeCamPos = geoLoc.getTransformedRelativePosition(cameraPosition, relativeCamPos);
+			//relativeCam = neoBuilding.getTransformedRelativeEyePositionToBuilding(cameraPosition.x, cameraPosition.y, cameraPosition.z, relativeCam);
+			var octreesMaxSize = 120;
+			data.distToCam = octree.getMinDistToCameraInTree(relativeCamPos, boundingSphere_Aux, octreesMaxSize);
+			boundingSphere_Aux.setCenterPoint(realBuildingPos.x, realBuildingPos.y, realBuildingPos.z);
+			boundingSphere_Aux.setRadius(neoBuilding.bbox.getRadiusAprox());
+		}
+		/*
+		else 
+		{
+			// This is mesh projectType.
+			data.distToCam = cameraPosition.distToSphere(boundingSphere_Aux);
+		}
+		*/
 	}
-	else 
-	{
-		// This is mesh projectType.
-		data.distToCam = cameraPosition.distToSphere(boundingSphere_Aux);
-	}
+	
+	data.distToCam = cameraPosition.distToSphere(boundingSphere_Aux);
 
 	return data.distToCam;
 };
@@ -876,7 +900,6 @@ Node.prototype.finishedAnimation = function(magoManager)
 			nextPitch = animData.startPitch;
 			nextRoll = animData.startRoll;
 		}
-
 
 		// calculate by durationInSeconds.
 		var targetLongitude = animData.targetLongitude;

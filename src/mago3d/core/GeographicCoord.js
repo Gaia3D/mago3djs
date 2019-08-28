@@ -128,6 +128,22 @@ GeographicCoord.prototype.getMercatorProjection = function(resultPoint2d)
 /**
  * get the GeoLocationDataManager of this feature
  */
+GeographicCoord.prototype.makeDefaultGeoLocationData = function() 
+{
+	if (this.geoLocDataManager === undefined)
+	{ this.geoLocDataManager = new GeoLocationDataManager(); }
+	
+	var geoLocData = this.geoLocDataManager.getCurrentGeoLocationData();
+	if (geoLocData === undefined)
+	{
+		geoLocData = this.geoLocDataManager.newGeoLocationData("default");
+		geoLocData = ManagerUtils.calculateGeoLocationData(this.longitude, this.latitude, this.altitude, undefined, undefined, undefined, geoLocData);
+	}
+};
+
+/**
+ * get the GeoLocationDataManager of this feature
+ */
 GeographicCoord.prototype.getGeoLocationDataManager = function() 
 {
 	if (this.geoLocDataManager === undefined)

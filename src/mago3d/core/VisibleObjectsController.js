@@ -208,6 +208,31 @@ VisibleObjectsController.prototype.putNodeToArraySortedByDist = function(nodesAr
 	}
 };
 
+/**
+ * Put the node to given node array
+ * @param nodesArray
+ * @param node
+ */
+VisibleObjectsController.prototype.putNodeByLod = function(node, lod) 
+{
+	if (lod === 0) 
+	{
+		this.putNodeToArraySortedByDist(this.currentVisibles0, node);
+	}
+	//else if (lod === 1) 
+	//{
+	//	this.putNodeToArraySortedByDist(this.currentVisibles1, node);
+	//}
+	else if (lod === 1 || lod === 2) 
+	{
+		this.putNodeToArraySortedByDist(this.currentVisibles2, node);
+	}
+	else if (lod > 2) 
+	{
+		this.putNodeToArraySortedByDist(this.currentVisibles3, node);
+	}
+};
+
 
 
 

@@ -669,12 +669,13 @@ SmartTile.prototype.eraseNode = function(node)
  */
 SmartTile.prototype.extractLowestTiles = function(resultLowestTilesArray) 
 {
+	if (this.hasRenderables())
+	{
+		resultLowestTilesArray.push(this);
+	}
+		
 	if (this.subTiles === undefined)
 	{
-		if (this.nodeSeedsArray && this.nodeSeedsArray.length > 0)
-		{
-			resultLowestTilesArray.push(this);
-		}
 		return;
 	}
 		
@@ -731,10 +732,132 @@ SmartTile.prototype.getFrustumIntersectedTiles = function(frustum, resultFullyIn
 		}
 		else
 		{ 
-			if (this.nodeSeedsArray &&  this.nodeSeedsArray.length > 0)
+			if (this.hasRenderables())
 			{ resultPartiallyIntersectedTilesArray.push(this); } 
 		}
 	}
+};
+
+/**
+ * This function returns true if this smartTile has renderables objects.
+ */
+SmartTile.prototype.hasRenderables = function() 
+{
+	var hasObjects = false;
+	
+	if (this.nodeSeedsArray &&  this.nodeSeedsArray.length > 0)
+	{ return true; }
+	
+	return hasObjects;
+};
+
+/**
+ * This function returns true if this smartTile needs create geometries from sedds.
+ */
+SmartTile.prototype.isNeededToCreateGeometriesFromSeeds = function() 
+{
+	var isNeeded = false;
+	
+	if (this.nodeSeedsArray !== undefined)
+	{
+		if (this.nodesArray === undefined)
+		{ return true; }
+		
+		if (this.nodesArray.length !== this.nodeSeedsArray.length)
+		{ return true; }
+	}
+	
+	return isNeeded;
+};
+
+/**
+ */
+SmartTile.prototype.createGeometriesFromSeeds = function(magoManager) 
+{
+	// create the buildings by buildingSeeds.
+	var node;
+	var neoBuilding;
+	var nodeBbox;
+	var buildingSeed;
+	var startIndex = 0;
+	
+	// if exist nodesArray (there are buildings) and add a nodeSeed, we must make nodes of the added nodeSeeds.***
+	if (this.nodeSeedsArray !== undefined)
+	{
+		if (this.nodesArray)
+		{ startIndex = this.nodesArray.length; }
+
+		if (this.nodesArray === undefined)
+		{ this.nodesArray = []; }
+
+		var nodeSeedsCount = this.nodeSeedsArray.length;
+		for (var j=startIndex; j<nodeSeedsCount; j++)
+		{
+			node = this.nodeSeedsArray[j];
+			var attributes = node.data.attributes;
+			if (attributes.objectType === "basicF4d")
+			{
+				if (node.data.neoBuilding !== undefined)
+				{
+					this.nodesArray.push(node);
+					continue;
+				}
+				
+				neoBuilding = new NeoBuilding();
+				
+				neoBuilding.nodeOwner = node;
+				node.data.neoBuilding = neoBuilding;
+				if (node.data.bbox === undefined)
+				{ node.data.bbox = new BoundingBox(); }
+				nodeBbox = node.data.bbox;
+				buildingSeed = node.data.buildingSeed;
+				
+				this.nodesArray.push(node);
+				
+				if (neoBuilding.metaData === undefined) 
+				{ neoBuilding.metaData = new MetaData(); }
+
+				if (neoBuilding.metaData.geographicCoord === undefined)
+				{ neoBuilding.metaData.geographicCoord = new GeographicCoord(); }
+
+				if (neoBuilding.metaData.bbox === undefined) 
+				{ neoBuilding.metaData.bbox = new BoundingBox(); }
+
+				// create a building and set the location.***
+				neoBuilding.name = buildingSeed.name;
+				neoBuilding.buildingId = buildingSeed.buildingId;
+			
+				neoBuilding.buildingType = "basicBuilding";
+				neoBuilding.buildingFileName = buildingSeed.buildingFileName;
+				neoBuilding.metaData.geographicCoord.setLonLatAlt(buildingSeed.geographicCoord.longitude, buildingSeed.geographicCoord.latitude, buildingSeed.geographicCoord.altitude);
+				neoBuilding.metaData.bbox.copyFrom(buildingSeed.bBox);
+				nodeBbox.copyFrom(buildingSeed.bBox); // initially copy from building.
+				if (neoBuilding.bbox === undefined)
+				{ neoBuilding.bbox = new BoundingBox(); }
+				neoBuilding.bbox.copyFrom(buildingSeed.bBox);
+				neoBuilding.metaData.heading = buildingSeed.rotationsDegree.z;
+				neoBuilding.metaData.pitch = buildingSeed.rotationsDegree.x;
+				neoBuilding.metaData.roll = buildingSeed.rotationsDegree.y;
+				neoBuilding.projectFolderName = node.data.projectFolderName;
+			}
+			else if (attributes.objectType === "multiBuildingsTile")
+			{
+				if (node.data.multiBuildings !== undefined)
+				{
+					this.nodesArray.push(node);
+					continue;
+				}
+				
+				var multiBuildings = new MultiBuildings();
+				multiBuildings.nodeOwner = node;
+				multiBuildings.attributes = attributes;
+				node.data.multiBuildings = multiBuildings;
+				
+				
+			}
+		}
+	}
+
 };
 
 /**
@@ -817,8 +940,8 @@ SmartTile.selectTileName = function(depth, longitude, latitude, resultTileName)
 SmartTile.getGeographicExtentOfTileLXY = function(L, X, Y, resultGeoExtend) 
 {
 	var angRange = SmartTile.selectTileAngleRangeByDepth(L);
-	var minLon = angRange*X;
-	var maxLon = angRange*(X+1);
+	var minLon = angRange*X - 180.0;
+	var maxLon = angRange*(X+1) - 180.0;
 	var minLat = 90.0 - angRange*(Y+1);
 	var maxLat = 90.0 - angRange*(Y);
 	

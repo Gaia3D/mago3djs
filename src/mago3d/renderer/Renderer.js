@@ -105,16 +105,7 @@ Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, sh
 	
 	// set webgl options.
 	gl.enable(gl.DEPTH_TEST);
-	if (MagoConfig.getPolicy().geo_cull_face_enable === "true") 
-	{
-		gl.enable(gl.CULL_FACE);
-	}
-	else 
-	{
-		gl.disable(gl.CULL_FACE);
-	}
 
-	gl.enable(gl.CULL_FACE);
 	gl.frontFace(gl.CCW);
 	
 	if (renderType === 2)
@@ -575,8 +566,8 @@ Renderer.prototype.renderDepthSunPointOfView = function(gl, visibleObjControlerN
 	var sunLight = magoManager.sceneState.sunLight;
 	
 	// Sun direction.***
-	var sunLongitude = 105.31586919332165;
-	var sunLatitude = 0.0;
+	var sunLongitude = 115.31586919332165;
+	var sunLatitude = 10.0;
 	var sunAltitude = 0.0; // No important.***
 	var sunPosWC = Globe.geographicToCartesianWgs84(sunLongitude, sunLatitude, sunAltitude, undefined);
 	
@@ -598,8 +589,8 @@ Renderer.prototype.renderDepthSunPointOfView = function(gl, visibleObjControlerN
 	var realPosWC = Globe.geographicToCartesianWgs84(realLon, realLat, altitude, undefined);
 	
 	var ortho = new Matrix4();
-	var nRange = 200.0;
-	var left = -nRange, right = nRange, bottom = -nRange, top = nRange, near = -800.0, far = 800.0;
+	var nRange = 500.0;
+	var left = -nRange, right = nRange, bottom = -nRange, top = nRange, near = -2*nRange, far = 2*nRange;
 	ortho._floatArrays = glMatrix.mat4.ortho(ortho._floatArrays, left, right, bottom, top, near, far);
 	
 	sunLight.tMatrix = sunTMatrix.getMultipliedByMatrix(ortho, sunLight.tMatrix);
@@ -631,7 +622,7 @@ Renderer.prototype.renderDepthSunPointOfView = function(gl, visibleObjControlerN
 
 	
 	gl.uniform1i(currentShader.bApplySsao_loc, false); // apply ssao.***
-
+	gl.disable(gl.CULL_FACE);
 	var renderType = 0;
 	
 	// Do render.***
@@ -650,7 +641,8 @@ Renderer.prototype.renderDepthSunPointOfView = function(gl, visibleObjControlerN
 		//magoManager.tinTerrainManager.render(magoManager, bDepth, renderType, currentShader);
 		//gl.useProgram(null);
 	}
-
+	
+	gl.enable(gl.CULL_FACE);
 	currentShader.disableVertexAttribArrayAll();
 	gl.useProgram(null);
 };
@@ -763,7 +755,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			// Test sunLight.***
 			if (magoManager.sceneState.sunLight === undefined)
 			{
-				var lightType = 2;
+				var lightType = 2; // 2 = directional light.
 				magoManager.sceneState.sunLight = new LightSource(lightType);
 			}
 			
@@ -1015,7 +1007,13 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 				gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
 			}
 
-
+			/*
+			if (MagoConfig.getPolicy().geo_cull_face_enable === "true") 
+			{ gl.enable(gl.CULL_FACE); }
+			else 
+			{ gl.disable(gl.CULL_FACE); }
+			*/
+			gl.enable(gl.CULL_FACE);
 			var refTMatrixIdxKey = 0;
 			var minSizeToRender = 0.0;
 			var renderType = 1;

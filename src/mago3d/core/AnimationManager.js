@@ -11,7 +11,11 @@ var AnimationManager = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
+	// Nodes animation. Executed if the node is visible.
 	this.nodesMap;	
+	
+	// General animations array. Executed every time.
+	this.objectsMap;
 };
 
 /**
@@ -28,23 +32,53 @@ AnimationManager.prototype.putNode = function(node)
 };
 
 /**
+ * put the node which will move
+ * @param {Node} node
+ */
+AnimationManager.prototype.putObject = function(object) 
+{
+	if (this.objectsMap === undefined)
+	{ this.objectsMap = {}; }
+	
+	var objectId = object.id;
+	this.objectsMap[objectId] = object;
+};
+
+/**
  * Check whether this node already moved or not
  * @param {MagoManager} magoManager
  */
 AnimationManager.prototype.checkAnimation = function(magoManager) 
 {
-	if (this.nodesMap === undefined)
-	{ return; }
-	
-	var node;
-	for (var key in this.nodesMap)
+	if (this.nodesMap !== undefined)
 	{
-		if (Object.prototype.hasOwnProperty.call(this.nodesMap, key))
+		var node;
+		for (var key in this.nodesMap)
 		{
-			node = this.nodesMap[key];
-			if (node.finishedAnimation(magoManager))
+			if (Object.prototype.hasOwnProperty.call(this.nodesMap, key))
 			{
-				delete this.nodesMap[key];
+				node = this.nodesMap[key];
+				if (node.finishedAnimation(magoManager))
+				{
+					delete this.nodesMap[key];
+				}
+			}
+		}
+	}
+	
+	// Now, for general objects.***
+	if (this.objectsMap !== undefined)
+	{
+		var object;
+		for (var key in this.objectsMap)
+		{
+			if (Object.prototype.hasOwnProperty.call(this.objectsMap, key))
+			{
+				object = this.objectsMap[key];
+				if (object.finishedAnimation(magoManager))
+				{
+					delete this.objectsMap[key];
+				}
 			}
 		}
 	}
@@ -92,6 +126,34 @@ AnimationManager.getNextPositionByPath = function(animationData, currTime, magoM
 		var tangentLine = path.getTangent(linearPos, undefined, magoManager);
 		
 		return tangentLine;
+	}
+	else if (BSplineCubic3D.prototype.isPrototypeOf(path))
+	{
+		// If exist animationData.durationInSeconds, then use it.***
+		if (animationData.durationInSeconds)
+		{
+			if (animationData.currentLinearPos && animationData.currentLinearPos >= animationData.totalLinearLength)
+			{ return undefined; }
+			
+			var interpolationsCount = 20;
+			if (animationData.totalLinearLength === undefined)
+			{ 
+				if (path.knotPoints3dList === undefined)
+				{
+					var controlPointArmLength = 0.3;
+					path.makeControlPoints(controlPointArmLength, magoManager);
+				}
+				animationData.totalLinearLength = BSplineCubic3D.getLength(path, interpolationsCount); 
+			}
+			
+			var totalLinearLength = animationData.totalLinearLength;
+			var percentualTime = increTimeSec/animationData.durationInSeconds;
+			linearPos = totalLinearLength*percentualTime;
+			animationData.currentLinearPos = linearPos;
+			if (linearPos > totalLinearLength)
+			{ linearPos = totalLinearLength; }
+		}
+		return BSplineCubic3D.getTangent(path, linearPos, undefined, magoManager);
 	}
 };
 

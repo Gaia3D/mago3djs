@@ -672,7 +672,7 @@ Octree.prototype.renderSkin = function(magoManager, neoBuilding, renderType, ren
 		if (neoBuilding.simpleBuilding3x3Texture !== undefined && neoBuilding.simpleBuilding3x3Texture.texId && renderTexture)
 		{
 			// Provisionally flip tex coords here.
-			gl.uniform1i(shader.textureFlipYAxis_loc, false);//.ppp
+			//gl.uniform1i(shader.textureFlipYAxis_loc, false);//.ppp
 			gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
 			if (shader.last_tex_id !== neoBuilding.simpleBuilding3x3Texture.texId)
 			{
@@ -929,6 +929,14 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 				break; 
 			}
 		}
+		
+		// If lod is higher, the restringe the octree's depth:
+		if (this.lod > 2)
+		{ renderChildren = false; }
+		
+		if (this.lod === 2 && this.octree_level > 0)
+		{ renderChildren = false; }
+		// End restringe rendering by lod distance.-----------------------
 		
 		if (renderChildren)
 		{

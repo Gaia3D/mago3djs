@@ -29,13 +29,11 @@ var PostFxShader = function(gl)
 	this.shader_fragment;
 	
 	// current buffers binded.
-	this.last_vboPos_binded;
-	this.last_vboNor_binded;
-	this.last_vboCol_binded;
-	this.last_vboIdx_binded;
 	this.last_tex_id;
 	this.last_isAditionalMovedZero = false;
-	this.last_vboTexCoord_binded; 
+	
+	this.lastVboKeyBindedMap = {};
+	
 	
 	// attribLocations state management.
 	this.attribLocationStateArray = [];
@@ -48,12 +46,10 @@ var PostFxShader = function(gl)
  */
 PostFxShader.prototype.resetLastBuffersBinded = function()
 {
-	this.last_vboPos_binded = undefined;
-	this.last_vboNor_binded = undefined;
-	this.last_vboIdx_binded = undefined;
-	this.last_vboTexCoord_binded = undefined; // no used.
 	this.last_tex_id = undefined; // todo: must distinguish by channel.
 	this.last_isAditionalMovedZero = false;
+	
+	this.lastVboKeyBindedMap = {};
 	
 	this.disableVertexAttribArrayAll();
 	
@@ -81,7 +77,7 @@ PostFxShader.prototype.resetLastBuffersBinded = function()
 PostFxShader.prototype.enableVertexAttribArray = function(attribLocation)
 {
 	if (attribLocation === undefined || attribLocation < 0)
-	{ return; }
+	{ return false; }
 	
 	var attribLocationState = this.attribLocationStateArray[attribLocation];
 	if (attribLocationState === undefined)
@@ -96,6 +92,8 @@ PostFxShader.prototype.enableVertexAttribArray = function(attribLocation)
 		this.gl.enableVertexAttribArray(attribLocation);
 		attribLocationState.attribLocationEnabled = true;
 	}
+	
+	return true;
 };
 
 /**

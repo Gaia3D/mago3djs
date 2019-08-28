@@ -52,6 +52,11 @@ var VboBuffer = function(dataTarget)
 	{ this.dataTarget = dataTarget; }
 	else 
 	{ this.dataTarget = 34962; } // 34962 = gl.ARRAY_BUFFER. Default value.
+
+	this.dataDimensions;
+	this.dataStride = 0;
+	this.dataOffSet = 0;
+	this.normalized = false;
 };
 
 /**
@@ -82,7 +87,7 @@ VboBuffer.prototype.deleteGlObjects = function(vboMemManager)
  * @param {TypedArray} dataArray The heading value in degrees.
  * @param {VboMemoryManager} vboMemManager.
  */
-VboBuffer.prototype.setDataArray = function(dataArray, vboMemManager) 
+VboBuffer.prototype.setDataArray = function(dataArray, dimensions, normalized, vboMemManager) 
 {
 	if (dataArray === undefined)
 	{ return; }
@@ -102,6 +107,36 @@ VboBuffer.prototype.setDataArray = function(dataArray, vboMemManager)
 		this.dataArray = dataArray;
 	}
 	this.dataLength = arrayElemsCount;
+	this.dataDimensions = dimensions;
+	this.normalized = normalized;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+
+VboBuffer.prototype.bindData = function(shader, vertexAttribIndex, vboMemManager) 
+{
+	if (shader === undefined)
+	{ return false; }
+	
+	var gl = shader.gl;
+	if (!this.isReady(gl, vboMemManager))
+	{ return false; }
+	
+	if (shader.enableVertexAttribArray(vertexAttribIndex))
+	{
+		if (this.key !== shader.lastVboKeyBindedMap[vertexAttribIndex])
+		{
+			gl.bindBuffer(this.dataTarget, this.key);
+			gl.vertexAttribPointer(vertexAttribIndex, this.dataDimensions, this.dataGlType, this.normalized, this.dataStride, this.dataOffSet);
+			shader.lastVboKeyBindedMap[vertexAttribIndex] = this.key;
+		}
+
+		return true;
+	}
+	else { shader.disableVertexAttribArray(vertexAttribIndex); }
+	return false;
 };
 
 
@@ -168,3 +203,41 @@ VboBuffer.newTypedArray = function(arrayLength, glType)
 		
 	return typedArray;
 };
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+VboBuffer.getByteSizeByGlType = function(glType) 
+{
+	if (glType === 5126)// gl.FLOAT.
+	{ return 4; }
+	else if (glType === 5122)// gl.SHORT.
+	{ return 2; }
+	else if (glType === 5123)// gl.UNSIGNED_SHORT.
+	{ return 2; }
+	else if (glType === 5120)// gl.BYTE.
+	{ return 1; }
+	else if (glType === 5121)// gl.UNSIGNED_BYTE.
+	{ return 1; }
+		
+	return undefined;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
