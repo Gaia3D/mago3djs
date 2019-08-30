@@ -140,16 +140,11 @@ SmartTileManager.prototype.parseSmartTilesMultiBuildingsIndexFile = function(dat
 		
 		// Now read bbox.
 		var bbox = new BoundingBox();
-		bbox.minX = readWriter.readFloat32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		bbox.minY = readWriter.readFloat32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		bbox.minZ = readWriter.readFloat32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-
-		bbox.maxX = readWriter.readFloat32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		bbox.maxY = readWriter.readFloat32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
-		bbox.maxZ = readWriter.readFloat32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		bytes_readed = bbox.readData(dataBuffer, bytes_readed);
 		
 		var geoExtent = SmartTile.getGeographicExtentOfTileLXY(L, X, Y, undefined);
 		var centerGeoCoord = geoExtent.getMidPoint();
+		centerGeoCoord.altitude += 20.0;// test. delete!!!
 		var multiBuildingId = "";
 		this.objectSeedsMap[name] = {
 			"L"                        : L,

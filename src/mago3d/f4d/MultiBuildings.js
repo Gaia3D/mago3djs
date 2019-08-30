@@ -17,6 +17,7 @@ var MultiBuildings = function()
 	this.dataArrayBuffer;
 	
 	this.bbox;
+	this.geoCoords;
 	this.vboKeysContainer; // class: VBOVertexIdxCacheKeysContainer.
 	
 	this.multiBuildingsElementsArray = [];
@@ -45,7 +46,7 @@ MultiBuildings.prototype.prepareData = function(magoManager)
  * This function renders the multiBuilding.
  * @param {ManoManager} magoManager The main mago3d class. This object manages the main pipe-line of the Mago3D.
  */
-MultiBuildings.prototype.render = function(magoManager) 
+MultiBuildings.prototype.render = function(magoManager, shader) 
 {
 	// 1rst, check if data is ready to render.
 	if (!this.isReadyToRender())
@@ -53,7 +54,42 @@ MultiBuildings.prototype.render = function(magoManager)
 		return false; 
 	}
 	
-	var hola = 0;
+	if (this.vboKeysContainer === undefined)
+	{ return false; }
+	
+	var gl = magoManager.getGl();
+	var nodeOwner = this.nodeOwner;
+	var geoLocDataManager = nodeOwner.data.geoLocDataManager;
+	var geoLoc = geoLocDataManager.getCurrentGeoLocationData();
+	
+	geoLoc.bindGeoLocationUniforms(gl, shader);
+	
+	// Bind the vbo.
+	var vboMemManager = magoManager.vboMemoryManager;
+	var vboKeysCount = this.vboKeysContainer.getVbosCount();
+	
+	if (vboKeysCount === 0)
+	{ return false; }
+
+	// Note: there are only one vboKey.
+	var vboKey = this.vboKeysContainer.getVboKey(0);
+	if (!vboKey.bindDataPosition(shader, vboMemManager))
+	{ return false; }
+	
+	if (!vboKey.bindDataNormal(shader, vboMemManager))
+	{ return false; }
+	
+	if (!vboKey.bindDataTexCoord(shader, vboMemManager))
+	{ return false; }
+		
+	var multiBuildingElemsCount = this.multiBuildingsElementsArray.length;
+	for (var i=0; i<multiBuildingElemsCount; i++)
+	{
+		var multiBuildingsElem = this.multiBuildingsElementsArray[i];
+		multiBuildingsElem.render(magoManager, shader);
+	}
+	
+
 };
 
 /**
@@ -108,6 +144,14 @@ MultiBuildings.prototype.parseData = function(magoManager)
 	
 	bytesReaded = this.bbox.readData(arrayBuffer, bytesReaded);
 	
+	// Read geographic coords.
+	if (this.geoCoords === undefined)
+	{ this.geoCoords = new GeographicCoord(); }
+	
+	this.geoCoords.longitude = (new Float64Array(arrayBuffer.slice(bytesReaded, bytesReaded+8)))[0]; bytesReaded += 8;
+	this.geoCoords.latitude = (new Float64Array(arrayBuffer.slice(bytesReaded, bytesReaded+8)))[0]; bytesReaded += 8;
+	this.geoCoords.altitude = (new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+	
 	// VBO.
 	// Read positions dataType.
 	bytesReaded = vboKeys.readPositions(arrayBuffer, vboMemManager, bytesReaded);
@@ -145,12 +189,17 @@ MultiBuildings.prototype.parseData = function(magoManager)
 	{
 		var multiBuildingsElement = new MultiBuildingsElement();
 		bytesReaded = multiBuildingsElement.parseData(arrayBuffer, bytesReaded);
+		multiBuildingsElement.multiBuildingsOwner = this;
 		
 		this.multiBuildingsElementsArray.push(multiBuildingsElement);
 	}
 	
 	// Now read LOD5-textures. The LOD5-textures is embedded.
 	var imagesCount = (new Int32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+	
+	if (imagesCount > 0 && this.texturesManager === undefined)
+	{ this.texturesManager = new TexturesManager(); }
+
 	for (var i=0; i<imagesCount; i++)
 	{
 		// read imageId (material id).
@@ -169,11 +218,18 @@ MultiBuildings.prototype.parseData = function(magoManager)
 		var startBuff = bytesReaded;
 		var byteSize = 1;
 		var endBuff = bytesReaded + byteSize * imageLength;
-		var imageData = arrayBuffer.slice(startBuff, endBuff);
+		var imageBinaryData = arrayBuffer.slice(startBuff, endBuff);
 		bytesReaded = bytesReaded + byteSize * imageLength; // updating data.
+		
+		// now create texture of the image.
+		var texture = this.texturesManager.getOrNewTexture(imageId);
+		texture.textureTypeName = "diffuse";
+		texture.textureImageFileName = imageFileName;
+		texture.imageBinaryData = imageBinaryData;
+		texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 	}
 	
-	this.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 };
 
 

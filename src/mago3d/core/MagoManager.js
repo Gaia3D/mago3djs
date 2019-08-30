@@ -55,10 +55,10 @@ var MagoManager = function()
 	
 	/**
 	 * Manages & controls all the textures.
-	 * @type {TexturesManager}
-	 * @default TexturesManager.
+	 * @type {texturesStore}
+	 * @default texturesStore.
 	 */
-	this.texturesManager = new TexturesManager(this);
+	this.texturesStore = new TexturesStore(this);
 	
 	/**
 	 * Manages & controls the tiles.
@@ -695,7 +695,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 	
 	if (this.depthFboNeo !== undefined)
 	{
-		var noiseTexture = this.texturesManager.getNoiseTexture4x4();
+		var noiseTexture = this.texturesStore.getNoiseTexture4x4();
 		sceneState.ssaoNoiseScale2[0] = this.depthFboNeo.width[0]/noiseTexture.width;
 		sceneState.ssaoNoiseScale2[1] = this.depthFboNeo.height[0]/noiseTexture.height;
 	}
@@ -1177,26 +1177,8 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
 		this.sceneState.camera.frustum.dirty = true;
 	}
+	
 	this.depthFboNeo = frustumVolumenObject.depthFbo;
-	
-	// Test.*************************************************************************************************************************************************
-	//if (this.depthFboNeo === undefined) { this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
-	//if (this.sceneState.drawingBufferWidth[0] !== this.depthFboNeo.width[0] || this.sceneState.drawingBufferHeight[0] !== this.depthFboNeo.height[0])
-	//{
-	//	// move this to onResize.***
-	//	this.depthFboNeo.deleteObjects(gl);
-	//	this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
-	//	this.sceneState.camera.frustum.dirty = true;
-	//}
-	//this.depthFboNeo = frustumVolumenObject.depthFbo;
-	//if (this.isFarestFrustum())
-	//{
-	//	gl.clearColor(0, 0, 0, 1);
-	//	gl.clearDepth(1);
-	//	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	//}
-	// End test.----------------------------------------------------------------------------------------------------------------------------------------------
-	
 	this.depthFboNeo.bind(); 
 
 	gl.clearColor(0, 0, 0, 1);
@@ -1238,8 +1220,8 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 			gl.uniform1i(currentShader.bApplySsao_loc, true); // apply ssao default.***
 			gl.enable(gl.BLEND);
 			
-			var noiseTexture = this.texturesManager.getNoiseTexture4x4();
-			var textureAux_1x1 = this.texturesManager.getTextureAux1x1();
+			var noiseTexture = this.texturesStore.getNoiseTexture4x4();
+			var textureAux_1x1 = this.texturesStore.getTextureAux1x1();
 			
 			gl.uniform1i(currentShader.bApplySpecularLighting_loc, true);
 			gl.enableVertexAttribArray(currentShader.texCoord2_loc);

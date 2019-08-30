@@ -332,7 +332,7 @@ Node.prototype.checkChangesHistoryColors = function()
  */
 Node.prototype.renderContent = function(magoManager, shader, renderType, refMatrixIdxKey) 
 {
-	// This function renders the neoBuilding if exist in "data".
+	// This function renders the renderables that exists in "data".
 	// renderType = 0 -> depth render.
 	// renderType = 1 -> normal render.
 	// renderType = 2 -> colorSelection render.
@@ -351,6 +351,15 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	
 	if (data.attributes && data.attributes.isVisible !== undefined && data.attributes.isVisible === false) 
 	{
+		return;
+	}
+	
+	// check if this is a multiBuildings.
+	//if(data.attributes.objectType === "multiBuildingsTile")
+	var multiBuildings = data.multiBuildings;
+	if (multiBuildings)
+	{
+		multiBuildings.render(magoManager, shader);
 		return;
 	}
 

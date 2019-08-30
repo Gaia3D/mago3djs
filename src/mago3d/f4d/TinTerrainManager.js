@@ -265,7 +265,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	
 	currentShader.bindUniformGenerals();
 
-	var tex = magoManager.texturesManager.getTextureAux1x1(); // provisional.
+	var tex = magoManager.texturesStore.getTextureAux1x1(); // provisional.
 	gl.activeTexture(gl.TEXTURE2); 
 	gl.bindTexture(gl.TEXTURE_2D, tex.texId);
 	

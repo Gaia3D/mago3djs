@@ -32,7 +32,9 @@ var NeoBuilding = function()
 	this.aditionalColor; // use for colorChanged.
 
 	// Textures loaded.
-	this.texturesLoaded; // material textures.
+	this.texturesLoaded; // material textures. OLD.
+	this.texturesManager;
+	
 
 	// The octree.**
 	this.octree; // f4d_octree. 
@@ -689,9 +691,12 @@ NeoBuilding.prototype.getCurrentSkin = function()
  */
 NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoManager) 
 {
-	var texture = undefined;
+	if (this.texturesManager === undefined)
+	{ this.texturesManager = new TexturesManager(); }
 	
-	if (this.metaData.version[0] === "v")
+	var texture = undefined;
+	var version = this.metaData.version;
+	if (version[0] === "v")
 	{
 		// this is the version beta.
 		if (neoReference.texture === undefined)
@@ -734,7 +739,7 @@ NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoMan
 		
 		return neoReference.texture.fileLoadState;
 	}
-	else if (this.metaData.version[0] === '0' && this.metaData.version[2] === '0' && this.metaData.version[4] === '1' )
+	else if (version[0] === '0' && version[2] === '0' && version[4] === '1' )
 	{
 		if (neoReference.texture === undefined || neoReference.texture.fileLoadState === CODE.fileLoadState.READY)
 		{
@@ -765,7 +770,7 @@ NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoMan
 		
 		return neoReference.texture.fileLoadState;
 	}
-	else if (this.metaData.version[0] === '0' && this.metaData.version[2] === '0' && this.metaData.version[4] === '2' )
+	else if (version[0] === '0' && version[2] === '0' && version[4] === '2' )
 	{
 		// Project_data_type (new in version 002).
 		// 1 = 3d model data type (normal 3d with interior & exterior data).
