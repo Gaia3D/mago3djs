@@ -670,8 +670,6 @@ Renderer.prototype.renderImageViewRectangle = function(gl, magoManager, depthFbo
 		currentShader.useProgram();
 		var bApplySsao = false;
 			
-		gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
-		gl.uniform1i(currentShader.bApplySpecularLighting_loc, false);
 		gl.uniform1i(currentShader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.
 			
 		gl.enableVertexAttribArray(currentShader.texCoord2_loc);
@@ -788,8 +786,8 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 	}
 	if (renderType === 1) 
 	{
-		var textureAux1x1 = magoManager.texturesManager.getTextureAux1x1();
-		var noiseTexture = magoManager.texturesManager.getNoiseTexture4x4();
+		var textureAux1x1 = magoManager.texturesStore.getTextureAux1x1();
+		var noiseTexture = magoManager.texturesStore.getNoiseTexture4x4();
 		
 
 		// Test TinTerrain.**************************************************************************
@@ -965,7 +963,6 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			gl.enable(gl.BLEND);
 			currentShader = magoManager.postFxShadersManager.getShader("modelRefSsao"); 
 			currentShader.useProgram();
-		
 			gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
 			gl.uniform1i(currentShader.bApplyShadow_loc, bApplyShadow);
 			gl.uniform1i(currentShader.bApplySpecularLighting_loc, true);
@@ -1018,13 +1015,13 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			var minSizeToRender = 0.0;
 			var renderType = 1;
 			var refMatrixIdxKey =0; // provisionally set magoManager var here.***
-			magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
+			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 			
 			//bApplySsao = false;
 			//gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); 
 
-			magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
-			magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
+			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
+			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 			
 			currentShader.disableVertexAttribArrayAll();
 			gl.useProgram(null);
@@ -1443,7 +1440,7 @@ Renderer.prototype.renderAxisNodes = function(nodesArray, renderType)
 		gl.enable(gl.BLEND);
 	}
 	
-	var noiseTexture = magoManager.texturesManager.getNoiseTexture4x4();
+	var noiseTexture = magoManager.texturesStore.getNoiseTexture4x4();
 	
 	// Test rendering by modelRefShader.****
 	currentShader.useProgram();
@@ -1461,7 +1458,7 @@ Renderer.prototype.renderAxisNodes = function(nodesArray, renderType)
 		
 	if (renderType === 1)
 	{
-		var textureAux1x1 = magoManager.texturesManager.getTextureAux1x1();
+		var textureAux1x1 = magoManager.texturesStore.getTextureAux1x1();
 		
 		// provisionally render all native projects.***
 		gl.enableVertexAttribArray(currentShader.normal3_loc);
@@ -1586,7 +1583,7 @@ Renderer.prototype.renderBoundingBoxesNodes = function(nodesArray, color, bRende
 	gl.uniform1f(currentShader.screenWidth_loc, magoManager.sceneState.drawingBufferWidth);	
 	gl.uniform1f(currentShader.screenHeight_loc, magoManager.sceneState.drawingBufferHeight);
 
-	var noiseTexture = magoManager.texturesManager.getNoiseTexture4x4();
+	var noiseTexture = magoManager.texturesStore.getNoiseTexture4x4();
 	gl.uniform2fv(currentShader.noiseScale2_loc, [magoManager.depthFboNeo.width/noiseTexture.width, magoManager.depthFboNeo.height/noiseTexture.height]);
 	gl.uniform3fv(currentShader.kernel16_loc, magoManager.kernel);
 	gl.activeTexture(gl.TEXTURE0);
@@ -1660,7 +1657,7 @@ Renderer.prototype.renderFilter = function()
 	currentShader.useProgram();
 	gl.uniform1i(currentShader.bApplySsao_loc, true); // apply ssao default.***
 	
-	var noiseTexture = magoManager.texturesManager.getNoiseTexture4x4();
+	var noiseTexture = magoManager.texturesStore.getNoiseTexture4x4();
 	
 	gl.enable(gl.BLEND);
 	gl.disable(gl.DEPTH_TEST);
@@ -1891,8 +1888,8 @@ Renderer.prototype.renderMagoGeometries = function(renderType)
 		
 	if (renderType === 1)
 	{
-		var textureAux1x1 = magoManager.texturesManager.getTextureAux1x1();
-		var noiseTexture = magoManager.texturesManager.getNoiseTexture4x4();
+		var textureAux1x1 = magoManager.texturesStore.getTextureAux1x1();
+		var noiseTexture = magoManager.texturesStore.getNoiseTexture4x4();
 		
 		// provisionally render all native projects.***
 		gl.enableVertexAttribArray(currentShader.normal3_loc);

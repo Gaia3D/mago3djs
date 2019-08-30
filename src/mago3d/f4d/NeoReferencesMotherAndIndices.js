@@ -526,7 +526,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 
 			if (tMatrix4)
 			{
-				// multiply the building transformation matrix with the reference matrix, then we save aditional multiplications inside the shader.
+				// multiply the building transformation matrix with the reference matrix, then we save additional multiplications inside the shader.
 				neoRef.multiplyTransformMatrix(tMatrix4);
 			}
 		}

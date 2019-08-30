@@ -11,6 +11,7 @@ var MultiBuildingsElement = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
+	this.multiBuildingsOwner;
 	this.name;
 	this.id;
 	this.bbox;
@@ -18,6 +19,58 @@ var MultiBuildingsElement = function()
 	this.indexRange;
 	this.localIndexRangesArray;
 	
+};
+
+/**
+ * This function renders the multiBuildingsElement.
+ * @param {ManoManager} magoManager The main mago3d class. This object manages the main pipe-line of the Mago3D.
+ */
+MultiBuildingsElement.prototype.render = function(magoManager, shader) 
+{
+	if (this.localIndexRangesArray === undefined)
+	{ return false; }
+
+	var gl = magoManager.getGl();
+	
+	var localIndexRangesCount = this.localIndexRangesArray.length;
+	for (var i=0; i<localIndexRangesCount; i++)
+	{
+		var localIndexRange = this.localIndexRangesArray[i];
+		var first = localIndexRange.strIdx;
+		var end = localIndexRange.endIdx;
+		var verticesCount = end - first + 1; // must add +1 bcos "end" & "first" are indexes.
+		
+		var materialId = localIndexRange.attributes.materialId;
+		if (materialId !== undefined && materialId >= 0)
+		{
+			var texturesManager = this.multiBuildingsOwner.texturesManager;
+			var tex = texturesManager.getTexture(materialId);
+			
+			if (tex !== undefined && tex.texId === undefined)
+			{
+				// bind texture data.
+				TexturesManager.newWebGlTextureByEmbeddedImage(gl, tex.imageBinaryData, tex);
+				var flip_y_texCoords = false;
+				//tex.texId = TexturesManager.handleTextureLoaded(gl, tex.imageBinaryData, flip_y_texCoords);
+			}
+			
+			if (tex !== undefined && tex.texId !== undefined)
+			{
+				// bind texture.
+				gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
+				if (shader.last_tex_id !== tex.texId) 
+				{
+					gl.activeTexture(gl.TEXTURE2);
+					gl.bindTexture(gl.TEXTURE_2D, tex.texId);
+					shader.last_tex_id = tex.texId;
+				}
+			}
+		}
+		
+		gl.drawArrays(gl.TRIANGLES, first, verticesCount);
+	}
+	
+	return true;
 };
 
 /**
