@@ -974,8 +974,23 @@ NeoBuilding.prototype.render = function(magoManager, shader, renderType, refMatr
 				var lowestOctreesCount2 = this.currentVisibleOctreesControler.currentVisibles2.length;
 				
 				// If octreesRenderedsCount is minor than 60% of total of visibleOctrees, then render the buildingSkin.
-				if (octreesRenderedCount < (lowestOctreesCount0 + lowestOctreesCount1 + lowestOctreesCount2)*0.4)
-				{ this.renderSkin(magoManager, shader, renderType); }
+				// Project_data_type (new in version 002).
+				// 1 = 3d model data type (normal 3d with interior & exterior data).
+				// 2 = single building skin data type (as vWorld or googleEarth data).
+				// 3 = multi building skin data type (as Shibuya & Odaiba data).
+				// 4 = pointsCloud data type.
+				// 5 = pointsCloud data type pyramidOctree test.
+
+				if (this.metaData.projectDataType === 2)
+				{
+					if (octreesRenderedCount <= 0 )
+					{ this.renderSkin(magoManager, shader, renderType); }
+				}
+				else 
+				{
+					if (octreesRenderedCount < (lowestOctreesCount0 + lowestOctreesCount1 + lowestOctreesCount2)*0.4)
+					{ this.renderSkin(magoManager, shader, renderType); }
+				}
 			}
 		}
 		

@@ -28,6 +28,9 @@ var ParseQueue = function()
 	
 	this.maxNumParses = 1; // default 1.***
 	
+	// parse counters.***
+	this.smartTileF4dParsesCount = 0;
+	
 	// Test for pCloudPartitions.***
 	this.pCloudPartitionsParsed = 0;
 
@@ -744,6 +747,7 @@ ParseQueue.prototype.eraseAny = function(octree)
 
 ParseQueue.prototype.initCounters = function()
 {
+	this.smartTileF4dParsesCount = 0;
 	this.pCloudPartitionsParsed = 0;
 };
 

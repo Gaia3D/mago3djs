@@ -266,6 +266,8 @@ MetaData.prototype.parseFileHeaderAsimetricVersion = function(arrayBuffer, readW
 		this.isSmall = true;
 	}
 	
+	this.projectDataType = 0; // Init a value.
+	
 	// if header version is "0.0.2", then must read extra parameters.
 	if (this.version === "0.0.2")
 	{

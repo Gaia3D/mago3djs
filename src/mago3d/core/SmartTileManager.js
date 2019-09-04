@@ -112,6 +112,27 @@ SmartTileManager.prototype.doPendentProcess = function(magoManager)
 		// finally clear the this.objectSeedsMap.
 		this.objectSeedsMap = undefined;
 	}
+	
+	if (this.smartTileF4dSeedMap !== undefined)
+	{
+		var tilesCount = this.tilesArray.length; // allways tilesCount = 2. (Asia & America sides).
+		
+		// insert into smartTiles the smartTileF4d.***
+		for (var key in this.smartTileF4dSeedMap)
+		{
+			if (Object.prototype.hasOwnProperty.call(this.smartTileF4dSeedMap, key))
+			{
+				var smartTileF4dSeed = this.smartTileF4dSeedMap[key];
+				var targetDepth = smartTileF4dSeed.L;
+				for (var i=0; i<tilesCount; i++)
+				{
+					this.tilesArray[i].putSmartTileF4dSeed(targetDepth, smartTileF4dSeed, magoManager);
+				}
+			}
+		}
+		
+		this.smartTileF4dSeedMap = undefined;
+	}
 };
 
 /**
@@ -160,6 +181,53 @@ SmartTileManager.prototype.parseSmartTilesMultiBuildingsIndexFile = function(dat
 	}
 	
 	return this.objectSeedsMap;
+};
+
+/**
+ */
+SmartTileManager.prototype.parseSmartTilesF4dIndexFile = function(dataBuffer, projectFolderName, magoManager) 
+{
+	var bytes_readed = 0;
+	var readWriter = magoManager.readerWriter;
+	
+	if (this.smartTileF4dSeedMap === undefined)
+	{ this.smartTileF4dSeedMap = {}; }
+
+	var smartTilesMBCount = readWriter.readInt32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+	for (var i=0; i<smartTilesMBCount; i++)
+	{
+		var nameLength = readWriter.readInt32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		var name = "";
+		for (var j=0; j<nameLength; j++)
+		{
+			name += String.fromCharCode(new Int8Array(dataBuffer.slice(bytes_readed, bytes_readed+ 1))[0]);bytes_readed += 1;
+		}
+		
+		var L = readWriter.readInt32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		var X = readWriter.readInt32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		var Y = readWriter.readInt32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		
+		// Now read bbox.
+		//var bbox = new BoundingBox();
+		//bytes_readed = bbox.readData(dataBuffer, bytes_readed);
+		
+		var geoExtent = SmartTile.getGeographicExtentOfTileLXY(L, X, Y, undefined);
+		var centerGeoCoord = geoExtent.getMidPoint();
+		centerGeoCoord.altitude += 20.0;// test. delete!!!
+		var f4dTileId = "";
+		this.smartTileF4dSeedMap[name] = {
+			"L"                 : L,
+			"X"                 : X,
+			"Y"                 : Y,
+			"geographicCoord"   : centerGeoCoord,
+			"objectType"        : "F4dTile",
+			"id"                : f4dTileId,
+			"tileName"          : name,
+			"projectFolderName" : projectFolderName};
+
+	}
+	
+	return this.smartTileF4dSeedMap;
 };
 
 /**

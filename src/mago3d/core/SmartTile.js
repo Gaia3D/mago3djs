@@ -343,6 +343,55 @@ SmartTile.computeSphereExtent = function(magoManager, minGeographicCoord, maxGeo
  * 어떤 일을 하고 있습니까?
  * @param geoLocData 변수
  */
+SmartTile.prototype.putSmartTileF4dSeed = function(targetDepth, smartTileF4dSeed, magoManager) 
+{
+	if (this.sphereExtent === undefined)
+	{ this.makeSphereExtent(magoManager); }
+	
+	// now, if the current depth < targetDepth, then descend.
+	if (this.depth < targetDepth)
+	{
+		// create 4 child smartTiles.
+		if (this.subTiles === undefined || this.subTiles.length === 0)
+		{
+			for (var i=0; i<4; i++)
+			{ this.newSubTile(this); }
+		}
+		
+		// set the sizes to subTiles (The minLongitude, MaxLongitude, etc. is constant, but the minAlt & maxAlt can will be modified every time that insert new buildingSeeds).
+		this.setSizesToSubTiles();
+
+		// intercept buildingSeeds for each subTiles.
+		var geoCoord = smartTileF4dSeed.geographicCoord;
+		var subSmartTile;
+		var finish = false;
+		var i=0;
+		while (!finish && i<4)
+		{
+			subSmartTile = this.subTiles[i];
+			if (subSmartTile.intersectPoint(geoCoord.longitude, geoCoord.latitude) )
+			{
+				subSmartTile.putSmartTileF4dSeed(targetDepth, smartTileF4dSeed, magoManager);
+				finish = true;
+			}
+			
+			i++;
+		}
+	}
+	else if (this.depth === targetDepth)
+	{
+		if (this.smartTileF4dSeedArray === undefined)
+		{ this.smartTileF4dSeedArray = []; }
+
+		this.smartTileF4dSeedArray.push(smartTileF4dSeed);
+		return true;
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param geoLocData 변수
+ */
 SmartTile.prototype.putNode = function(targetDepth, node, magoManager) 
 {
 	if (this.sphereExtent === undefined)
@@ -747,6 +796,10 @@ SmartTile.prototype.hasRenderables = function()
 	
 	if (this.nodeSeedsArray &&  this.nodeSeedsArray.length > 0)
 	{ return true; }
+
+	// check if has smartTileF4dSeeds.***
+	if (this.smartTileF4dSeedArray !== undefined && this.smartTileF4dSeedArray.length > 0)
+	{ return true; }
 	
 	return hasObjects;
 };
@@ -857,7 +910,77 @@ SmartTile.prototype.createGeometriesFromSeeds = function(magoManager)
 			}
 		}
 	}
+	
+	// Now, check if exist smartTileF4dSeeds.***
+	if (this.smartTileF4dSeedArray !== undefined)
+	{
+		var smartTileF4dSeedsCount = this.smartTileF4dSeedArray.length;
+		for (var i=0; i<smartTileF4dSeedsCount; i++)
+		{
+			var smartTileF4dSeed = this.smartTileF4dSeedArray[i];
+			if (smartTileF4dSeed.fileLoadState === undefined)
+			{ smartTileF4dSeed.fileLoadState = CODE.fileLoadState.READY; }
+			
+			if (smartTileF4dSeed.fileLoadState === CODE.fileLoadState.READY)
+			{
+				//this.smartTileF4dSeedMap[name] = {
+				//"L"                 : L,
+				//"X"                 : X,
+				//"Y"                 : Y,
+				//"geographicCoord"   : centerGeoCoord,
+				//"objectType"        : "F4dTile",
+				//"id"                : f4dTileId,
+				//"tileName"          : name,
+				//"projectFolderName" : projectFolderName};
+				
+				var readerWriter = magoManager.readerWriter;
+				var projectFolderName = smartTileF4dSeed.projectFolderName;
+				var tilename = smartTileF4dSeed.tileName;
+				var smartTileOwner = this;
+				var geometryDataPath = readerWriter.geometryDataPath; // default geometryDataPath = "/f4d".***
+				var fileName = geometryDataPath + "/" + projectFolderName + "/" + tilename;
+				
+				readerWriter.getSmartTileF4d(fileName, smartTileF4dSeed, smartTileOwner, magoManager);
+			}
+			else if (smartTileF4dSeed.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
+			{
+				// parse the dataArrayBuffer.***
+				var parseQueue = magoManager.parseQueue;
+				if (parseQueue.smartTileF4dParsesCount < 2)
+				{
+					// proceed to parse the dataArrayBuffer.***
+					var dataArrayBuffer = smartTileF4dSeed.dataArrayBuffer;
+					this.parseSmartTileF4d(dataArrayBuffer, magoManager);
+					parseQueue.smartTileF4dParsesCount++; // increment counter.
+				}
+			}
+		}
+	}
 
+};
+
+/**
+ */
+SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager) 
+{
+	var hierarchyManager = magoManager.hierarchyManager;
+	// parse smartTileF4d.***
+	var bytesReaded = 0;
+	var buildingsCount = (new Int32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+	for (var i=0; i<buildingsCount; i++)
+	{
+		var metadataByteSize = (new Int32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+		var byteSize = 1;
+		var startBuff = bytesReaded;
+		var endBuff = bytesReaded + byteSize * metadataByteSize;
+		var dataBuffer = new Uint8Array(arrayBuffer.slice(startBuff, endBuff));
+		bytesReaded = bytesReaded + byteSize * metadataByteSize; // updating data.
+		
+		// Create a node for each building.
+		//var node = hierarchyManager.newNode(buildingId, projectId, attributes);
+	}
+	
+	var hola = 0;
 };
 
 /**

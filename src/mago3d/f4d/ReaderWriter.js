@@ -654,6 +654,75 @@ ReaderWriter.prototype.getObjectIndexFileMultiBuildings = function(fileName, pro
 };
 
 /**
+ * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
+ * @param {string} fileName 파일명
+ * @param {MagoManager} magoManager 파일 처리를 담당
+ */
+ReaderWriter.prototype.getObjectIndexFileSmartTileF4d = function(fileName, projectFolderName, magoManager) 
+{
+	loadWithXhr(fileName).then(function(response) 
+	{	
+		var arrayBuffer = response;
+		if (arrayBuffer) 
+		{
+			if (magoManager.smartTileManager === undefined)
+			{
+				magoManager.smartTileManager = new SmartTileManager();
+			}
+			var smartTileManager = magoManager.smartTileManager;
+			smartTileManager.parseSmartTilesF4dIndexFile(arrayBuffer, projectFolderName, magoManager);
+			
+			arrayBuffer = undefined;
+		}
+		else 
+		{
+			// Error.***
+		}
+	},
+	function(status) 
+	{
+		console.log("xhr status = " + status);
+	}).finally(function() 
+	{
+		//	For the moment, do nothing.***
+	});
+};
+
+/**
+ * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
+ * @param {string} fileName 파일명
+ * @param {MagoManager} magoManager 파일 처리를 담당
+ */
+ReaderWriter.prototype.getSmartTileF4d = function(fileName, smartTileF4dSeed, smartTileOwner, magoManager) 
+{
+	smartTileF4dSeed.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
+	loadWithXhr(fileName).then(function(response) 
+	{	
+		var arrayBuffer = response;
+		if (arrayBuffer) 
+		{
+			smartTileF4dSeed.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+			// put smartTileOwner into parse queue.***
+			smartTileF4dSeed.dataArrayBuffer = arrayBuffer;
+			//smartTileOwner.parseSmartTileF4d(arrayBuffer);
+			arrayBuffer = undefined;
+		}
+		else 
+		{
+			// Error.***
+			smartTileF4dSeed.fileLoadState = CODE.fileLoadState.LOAD_FAILED;
+		}
+	},
+	function(status) 
+	{
+		console.log("xhr status = " + status);
+	}).finally(function() 
+	{
+		//	For the moment, do nothing.***
+	});
+};
+
+/**
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
  * @param fileName 파일명

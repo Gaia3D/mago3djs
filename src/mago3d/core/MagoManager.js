@@ -2008,9 +2008,9 @@ MagoManager.prototype.keyDown = function(key)
 		
 		// Another test.***
 		
-		if (this.smartTile_multibuilding_tested === undefined)
+		if (this.smartTile_f4d_tested === undefined)
 		{
-			this.smartTile_multibuilding_tested = true;
+			this.smartTile_f4d_tested = true;
 			
 			if (this.configInformation === undefined)
 			{
@@ -2019,10 +2019,10 @@ MagoManager.prototype.keyDown = function(key)
 			
 			this.buildingSeedList = new BuildingSeedList();
 			var fileName;
-			var projectFolderName = "smartTile_multiBuildings";
-			fileName = this.readerWriter.geometryDataPath + "/" + projectFolderName + "/" + "smartTile_multibuildings_indexFile.ist";
+			var projectFolderName = "smartTile_f4d";
+			fileName = this.readerWriter.geometryDataPath + "/" + projectFolderName + "/" + "smartTile_f4d_indexFile.sii";
 			
-			this.readerWriter.getObjectIndexFileMultiBuildings(fileName, projectFolderName, this);
+			this.readerWriter.getObjectIndexFileSmartTileF4d(fileName, projectFolderName, this);
 		}
 		
 		

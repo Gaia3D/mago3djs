@@ -95,6 +95,9 @@ var BasicFactory = function(factoryWidth, factoryLength, factoryHeight, options)
 	 */
 	this.dirty = true;
 	
+	this.roofColor4 = new Color();
+	this.roofColor4.setRGBA(98/256, 233/256, 134/256, 0.3);
+	
 	if (options)
 	{
 		if (options.hasGround)
@@ -108,6 +111,9 @@ var BasicFactory = function(factoryWidth, factoryLength, factoryHeight, options)
 	
 		if (options.frontDoorHeight)
 		{ this.frontDoorHeight = options.frontDoorHeight; }
+	
+		if (options.roofColor4 !== undefined)
+		{ this.roofColor4 = options.roofColor4; }
 	}
 	
 	// After check the option values, set the boundingBox.***
