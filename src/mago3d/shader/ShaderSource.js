@@ -1245,15 +1245,23 @@ void main()\n\
 			//float realLinearDepth = linearDepth * far;\n\
 			\n\
 			if(sampleDepth > 0.49)\n\
+			{\n\
 				continue;\n\
+			}\n\
 \n\
 			float depthBufferValue = getDepth(offset.xy);	\n\
 			\n\
 			float range_check = abs(linearDepth - depthBufferValue);\n\
-			if(range_check > 0.000000001 && range_check < 0.00000007)\n\
+			if(depthBufferValue < 0.005)\n\
 			{\n\
-				continue;\n\
+				occlusion = 0.0;\n\
+				break;\n\
+				//continue;\n\
 			}\n\
+			//else if(range_check > 0.000000001 && range_check < 0.00000007)\n\
+			//{\n\
+			//	continue;\n\
+			//}\n\
 			else if (depthBufferValue <= sampleDepth)\n\
 			{\n\
 				occlusion +=  1.0;\n\

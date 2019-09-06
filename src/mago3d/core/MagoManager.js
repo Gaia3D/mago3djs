@@ -1018,8 +1018,6 @@ MagoManager.prototype.managePickingProcess = function()
 		{
 			this.isCameraMoved = false;
 		}
-		
-		
 	}
 	
 	if (this.currentFrustumIdx === 0)
@@ -1150,6 +1148,7 @@ MagoManager.prototype.managePickingProcess = function()
 		
 		this.selectionColor.init(); // selection colors manager.***
 	}
+	
 	this.selectionFbo.unbind();
 	gl.enable(gl.CULL_FACE);
 };
@@ -1748,7 +1747,6 @@ MagoManager.prototype.isDragging = function()
 				}
 				else 
 				{
-					
 					bIsDragging = false;
 				}
 			}
@@ -2287,10 +2285,13 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
 			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+10, testHeading, undefined, undefined, geoLocData, this);
 			
-			var factory = this.modeler.newBasicFactory(factoryWidth, factoryLength, factoryHeight, options);
+			//var factory = this.modeler.newBasicFactory(factoryWidth, factoryLength, factoryHeight, options);
+			var factory = new BasicFactory(factoryWidth, factoryLength, factoryHeight, options);
+			factory.bHasGround = true;
 			factory.geoLocDataManager = geoLocDataManager;
 			
-			
+			var targetDepth = 17;
+			this.smartTileManager.putObject(targetDepth, factory, this);
 		}
 		else if (this.modeler.mode === CODE.modelerMode.DRAWING_PIPE)
 		{
@@ -2352,8 +2353,9 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			var concentricTubes = new ConcentricTubes(options, geoLocDataManager);
 			concentricTubes.attributes = {isMovable: true};
 			
-			
-			this.modeler.addObject(concentricTubes);
+			var targetDepth = 17;
+			this.smartTileManager.putObject(targetDepth, concentricTubes, this);
+			//this.modeler.addObject(concentricTubes);
 		}
 	}
 	
@@ -4393,10 +4395,36 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 			}
 		}
 		
+		// Now, check parametric objects created natively in mago.
+		if (lowestTile.objectsArray !== undefined && lowestTile.objectsArray.length > 0)
+		{
+			// check parametric objects.
+			var objectsCount = lowestTile.objectsArray.length;
+			for (var j=0; j<objectsCount; j++)
+			{
+				var object = lowestTile.objectsArray[j];
+				visibleNodes.currentVisibleNativeObjects.push(object);
+				
+				//var bbox = object.getBoundingBox();
+				//this.boundingSphere_Aux = bbox.getBoundingSphere(this.boundingSphere_Aux);
+				
+				//// do frustumCulling.
+				//var frustumCull = frustumVolume.intersectionSphere(this.boundingSphere_Aux); // cesium.***
+				//// intersect with Frustum
+				//if (frustumCull !== Constant.INTERSECTION_OUTSIDE) 
+				//{
+				//	visibleNodes.currentVisibleNativeObjects.push(object);
+				//}
+				
+			}
+		}
+		
+		
 		if (lowestTile.isNeededToCreateGeometriesFromSeeds())
 		{
 			lowestTile.createGeometriesFromSeeds(this);
 		}
+		
 	}
 	
 };
@@ -4716,11 +4744,12 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 			buildingId = data_key;
 			node = this.hierarchyManager.newNode(buildingId, projectId, attributes);
 			// set main data of the node.
-			node.data.projectFolderName = projectFolderName;
-			node.data.projectId = projectId;
-			node.data.data_name = data_name;
-			node.data.attributes = attributes;
-			node.data.mapping_type = mapping_type;
+			var data = node.data;
+			data.projectFolderName = projectFolderName;
+			data.projectId = projectId;
+			data.data_name = data_name;
+			data.attributes = attributes;
+			data.mapping_type = mapping_type;
 			var tMatrix;
 			
 			if (attributes.isPhysical)
@@ -4729,7 +4758,7 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 				buildingSeed = buildingSeedMap[buildingId];
 				if (buildingSeed)
 				{
-					node.data.buildingSeed = buildingSeed;
+					data.buildingSeed = buildingSeed;
 					resultPhysicalNodesArray.push(node);
 				}
 			}
@@ -4740,12 +4769,12 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 				if (height === undefined)
 				{ height = 0; }
 				
-				node.data.geographicCoord = new GeographicCoord();
-				node.data.geographicCoord.setLonLatAlt(longitude, latitude, height);
+				data.geographicCoord = new GeographicCoord();
+				data.geographicCoord.setLonLatAlt(longitude, latitude, height);
 				
-				if (node.data.rotationsDegree === undefined)
-				{ node.data.rotationsDegree = new Point3D(); }
-				node.data.rotationsDegree.set(pitch, roll, heading);
+				if (data.rotationsDegree === undefined)
+				{ data.rotationsDegree = new Point3D(); }
+				data.rotationsDegree.set(pitch, roll, heading);
 				
 				
 				if (buildingSeed !== undefined)
@@ -4782,22 +4811,22 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 			}
 
 			// now, calculate the bbox.***
-			node.data.bbox = new BoundingBox();
+			data.bbox = new BoundingBox();
 			
-			if (node.data.buildingSeed && node.data.buildingSeed.bBox)
-			{ node.data.bbox.copyFrom(buildingSeed.bBox); }
+			if (data.buildingSeed && data.buildingSeed.bBox)
+			{ data.bbox.copyFrom(buildingSeed.bBox); }
 			
-			if (node.data.mapping_type && node.data.mapping_type.toLowerCase() === "boundingboxcenter")
+			if (data.mapping_type && data.mapping_type.toLowerCase() === "boundingboxcenter")
 			{
-				node.data.bbox.translateToOrigin();
+				data.bbox.translateToOrigin();
 			}
 			
 			// calculate the geographicCoordOfTheBBox.***
 			if (tMatrix !== undefined)
 			{
-				bboxCenterPoint = node.data.bbox.getCenterPoint(bboxCenterPoint);
+				bboxCenterPoint = data.bbox.getCenterPoint(bboxCenterPoint);
 				var bboxCenterPointWorldCoord = tMatrix.transformPoint3D(bboxCenterPoint, bboxCenterPointWorldCoord);
-				node.data.bbox.geographicCoord = ManagerUtils.pointToGeographicCoord(bboxCenterPointWorldCoord, node.data.bbox.geographicCoord, this);
+				data.bbox.geographicCoord = ManagerUtils.pointToGeographicCoord(bboxCenterPointWorldCoord, data.bbox.geographicCoord, this);
 			}
 
 			//bbox = node.data.bbox;

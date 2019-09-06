@@ -94,35 +94,8 @@ var Renderer = function(manoManager)
  */
 Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, shader, renderTexture, renderType, maxSizeToRender, refMatrixIdxKey) 
 {
-	var node;
-	var rootNode;
-	var geoLocDataManager;
-	var neoBuilding;
-	var minSize = 0.0;
-	var lowestOctreesCount;
-	var lowestOctree;
-	var isInterior = false; // no used.
-	
-	// set webgl options.
-	gl.enable(gl.DEPTH_TEST);
-
-	gl.frontFace(gl.CCW);
-	
-	if (renderType === 2)
-	{
-		shader.disableVertexAttribArray(shader.texCoord2_loc);
-		shader.disableVertexAttribArray(shader.normal3_loc);
-	}
-	if (renderType === 0)
-	{
-		shader.disableVertexAttribArray(shader.texCoord2_loc);
-		shader.disableVertexAttribArray(shader.normal3_loc);
-		shader.disableVertexAttribArray(shader.color4_loc);
-	}
-	
-	var flipYTexCoord = false;
-	
 	// do render.
+	var node;
 	var nodesCount = visibleNodesArray.length;
 	for (var i=0; i<nodesCount; i++)
 	{
@@ -344,16 +317,12 @@ Renderer.prototype.renderObject = function(gl, renderable, magoManager, shader, 
 	if (vbo_vicks_container.vboCacheKeysArray.length === 0) 
 	{ return; }
 	
-
 	if (bRenderLines === undefined)
 	{ bRenderLines = false; }
-
 
 	var vbosCount = vbo_vicks_container.getVbosCount();
 	for (var i=0; i<vbosCount; i++)
 	{
-		
-		
 		// 1) Position.
 		var vbo_vicky = vbo_vicks_container.vboCacheKeysArray[i]; // there are only one.
 
@@ -395,8 +364,6 @@ Renderer.prototype.renderObject = function(gl, renderable, magoManager, shader, 
 			//gl.drawArrays(gl.TRIANGLES, 0, vertices_count);
 		}
 		
-		
-		
 		var glError = gl.getError();
 		if (glError !== gl.NO_ERROR)
 		{ var hola = 0; }
@@ -421,6 +388,7 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 	// Test Modeler Rendering.********************************************************************
 	// Test Modeler Rendering.********************************************************************
 	// Test Modeler Rendering.********************************************************************
+	/*
 	if (magoManager.modeler !== undefined)
 	{
 		currentShader = magoManager.postFxShadersManager.getShader("modelRefDepth"); 
@@ -445,11 +413,12 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 		gl.useProgram(null);
 
 	}
+	*/
 	
-	var nodesLOD0Count = visibleObjControlerNodes.currentVisibles0.length;
-	var nodesLOD2Count = visibleObjControlerNodes.currentVisibles2.length;
-	var nodesLOD3Count = visibleObjControlerNodes.currentVisibles3.length;
-	if (nodesLOD0Count > 0 || nodesLOD2Count > 0 || nodesLOD3Count > 0)
+	//var nodesLOD0Count = visibleObjControlerNodes.currentVisibles0.length;
+	//var nodesLOD2Count = visibleObjControlerNodes.currentVisibles2.length;
+	//var nodesLOD3Count = visibleObjControlerNodes.currentVisibles3.length;
+	if (visibleObjControlerNodes.hasRenderables())
 	{
 		// Make depth for all visible objects.***
 		currentShader = magoManager.postFxShadersManager.getShader("modelRefDepth"); 
@@ -469,7 +438,13 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 		magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
 		magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
 		magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
-		
+		// native objects.
+		var glPrimitive = undefined;
+		var nativeObjectsCount = visibleObjControlerNodes.currentVisibleNativeObjects.length;
+		for (var i=0; i<nativeObjectsCount; i++)
+		{
+			visibleObjControlerNodes.currentVisibleNativeObjects[i].render(magoManager, currentShader, renderType, glPrimitive);
+		}
 		currentShader.disableVertexAttribArray(currentShader.position3_loc); 
 		gl.useProgram(null);
 	}
@@ -879,8 +854,10 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 
 		var bApplySsao = false;
 		var bApplyShadow = false;
-		if (magoManager.currentFrustumIdx === 0)
+		if (magoManager.currentFrustumIdx < 2)
 		{ bApplySsao = true; }
+	
+		//bApplySsao = true;
 	
 		if (magoManager.sunDepthFbo !== undefined)
 		{ bApplyShadow = true; }
@@ -888,6 +865,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		// Test Modeler Rendering.********************************************************************
 		// Test Modeler Rendering.********************************************************************
 		// Test Modeler Rendering.********************************************************************
+		/*
 		if (magoManager.modeler !== undefined)
 		{
 			currentShader = magoManager.postFxShadersManager.getShader("modelRefSsao"); 
@@ -943,6 +921,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			currentShader.disableVertexAttribArrayAll();
 			gl.useProgram(null);
 		}
+		*/
 		
 		// check changesHistory.
 		magoManager.checkChangesHistoryMovements(visibleObjControlerNodes.currentVisibles0);
@@ -955,10 +934,8 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		magoManager.checkChangesHistoryColors(visibleObjControlerNodes.currentVisibles3);
 			
 		// ssao render.************************************************************************************************************
-		var nodesLOD0Count = visibleObjControlerNodes.currentVisibles0.length;
-		var nodesLOD2Count = visibleObjControlerNodes.currentVisibles2.length;
-		var nodesLOD3Count = visibleObjControlerNodes.currentVisibles3.length;
-		if (nodesLOD0Count > 0 || nodesLOD2Count > 0 || nodesLOD3Count > 0)
+		var visibleObjectControllerHasRenderables = visibleObjControlerNodes.hasRenderables();
+		if (visibleObjectControllerHasRenderables)
 		{
 			gl.enable(gl.BLEND);
 			currentShader = magoManager.postFxShadersManager.getShader("modelRefSsao"); 
@@ -1023,9 +1000,17 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 			
+			// native objects.
+			var nativeObjectsCount = visibleObjControlerNodes.currentVisibleNativeObjects.length;
+			for (var i=0; i<nativeObjectsCount; i++)
+			{
+				visibleObjControlerNodes.currentVisibleNativeObjects[i].render(magoManager, currentShader, renderType, glPrimitive);
+			}
+			
 			currentShader.disableVertexAttribArrayAll();
 			gl.useProgram(null);
 		}
+		
 		
 		// If there are an object selected, then there are a stencilBuffer.******************************************
 		if (magoManager.nodeSelected) // if there are an object selected then there are a building selected.***
@@ -1244,8 +1229,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		
 		
 		// 3) now render bboxes.*******************************************************************************************************************
-		var nodesPcloudCount = magoManager.visibleObjControlerNodes.currentVisiblesAux.length;
-		if (nodesLOD0Count > 0 || nodesLOD2Count > 0 || nodesLOD3Count > 0 || nodesPcloudCount > 0)
+		if (visibleObjectControllerHasRenderables)
 		{
 			if (magoManager.magoPolicy.getShowBoundingBox())
 			{
@@ -1704,6 +1688,7 @@ Renderer.prototype.renderGeometryColorCoding = function(visibleObjControlerNodes
 	var renderType = 2; // 0 = depthRender, 1= colorRender, 2 = selectionRender.***
 	
 	// Render mago modeler objects.***
+	/*
 	if (magoManager.modeler !== undefined)
 	{
 		currentShader = magoManager.postFxShadersManager.getShader("modelRefColorCoding"); 
@@ -1722,6 +1707,7 @@ Renderer.prototype.renderGeometryColorCoding = function(visibleObjControlerNodes
 		currentShader.disableVertexAttribArrayAll();
 		gl.useProgram(null);
 	}
+	*/
 	
 	// Render f4d objects.***
 	//if (magoManager.selectionFbo.dirty) // todo.
@@ -1743,6 +1729,13 @@ Renderer.prototype.renderGeometryColorCoding = function(visibleObjControlerNodes
 		magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 		magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 		magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
+		// native objects.
+		var glPrimitive = undefined;
+		var nativeObjectsCount = visibleObjControlerNodes.currentVisibleNativeObjects.length;
+		for (var i=0; i<nativeObjectsCount; i++)
+		{
+			visibleObjControlerNodes.currentVisibleNativeObjects[i].render(magoManager, currentShader, renderType, glPrimitive);
+		}
 
 		gl.enable(gl.CULL_FACE);
 		currentShader.disableVertexAttribArray(currentShader.position3_loc);
@@ -1752,7 +1745,6 @@ Renderer.prototype.renderGeometryColorCoding = function(visibleObjControlerNodes
 		if (magoManager.weatherStation)
 		{ magoManager.weatherStation.test_renderCuttingPlanes(magoManager, renderType); }
 	}
-	
 	if (magoManager.magoPolicy.objectMoveMode === CODE.moveMode.GEOGRAPHICPOINTS)
 	{
 		// render geographicCoords of the modeler.***
@@ -1778,6 +1770,7 @@ Renderer.prototype.renderGeometryColorCoding = function(visibleObjControlerNodes
 		magoManager.tinTerrainManager.render(magoManager, bDepth, renderType);
 		gl.useProgram(null);
 	}
+	
 }; 
 
 

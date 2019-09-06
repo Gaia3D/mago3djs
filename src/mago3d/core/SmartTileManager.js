@@ -275,6 +275,22 @@ SmartTileManager.prototype.putNode = function(targetDepth, node, magoManager)
 
 /**
  * 어떤 일을 하고 있습니까?
+ */
+SmartTileManager.prototype.putObject = function(targetDepth, object, magoManager) 
+{
+	targetDepth = defaultValue(targetDepth, 17);
+	if (this.tilesArray !== undefined)
+	{
+		var tilesCount = this.tilesArray.length; // allways tilesCount = 2. (Asia & America sides).
+		for (var i=0; i<tilesCount; i++)
+		{
+			this.tilesArray[i].putObject(targetDepth, object, magoManager);
+		}
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  * @class GeoLocationData
  * @param geoLocData 변수
  */

@@ -20,6 +20,7 @@ var Mesh = function()
 	this.hedgesList;
 	
 	this.vboKeysContainer;
+	this.bbox;
 };
 
 /**
@@ -313,6 +314,20 @@ Mesh.prototype.getVertexList = function()
 };
 
 /**
+ * Returns the bbox.
+ */
+Mesh.prototype.getBoundingBox = function()
+{
+	if (this.bbox === undefined)
+	{
+		this.bbox = new BoundingBox();
+		this.bbox = this.vertexList.getBoundingBox(this.bbox);
+	}
+	
+	return this.bbox;
+};
+
+/**
  * Rotates this mesh specified angle by "angDeg" in (axisX, axisY, axisZ) axis.
  * @param {Number} angDeg Angle in degrees to rotate this mesh.
  * @param {Number} axisX X component of the rotation axis.
@@ -603,7 +618,7 @@ Mesh.prototype.getTrianglesListsArrayBy2ByteSize = function(trianglesArray, resu
  * @param glPrimitive
  * @TODO : 누가 이 gl primitive의 type 정체를 안다면 좀 달아주세요ㅠㅠ 세슘 쪽인거 같은데ㅠㅠ
  */
-Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive)
+Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive, isSelected)
 {
 	var vboMemManager = magoManager.vboMemoryManager;
 	
@@ -622,9 +637,12 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 	}
 	else if (renderType === 1)
 	{
-		// Color render.***
-		if (this.color4)
-		{ gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 1.0]); }
+		if (!isSelected)
+		{
+			// Color render.***
+			if (this.color4)
+			{ gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 1.0]); }
+		}
 	}
 	else if (renderType === 2)
 	{

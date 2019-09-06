@@ -53,7 +53,7 @@ Box.prototype.setOneColor = function(r, g, b, a)
  * @param {Shader} shader
  * @param {Number} renderType
  */
-Box.prototype.render = function(magoManager, shader, renderType, glPrimitive)
+Box.prototype.render = function(magoManager, shader, renderType, glPrimitive, isSelected)
 {
 	if (this.mesh === undefined)
 	{
@@ -61,12 +61,19 @@ Box.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 		return;
 	}
 	
-	// If exist geoLocDataManager, then set uniforms. TODO:.***
-	if (this.color4)
-	{ 
-		var gl = magoManager.getGl();
-		gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 1.0]); 
+	if (renderType === 1)
+	{
+		if (!isSelected)
+		{
+			// If exist geoLocDataManager, then set uniforms. TODO:.***
+			if (this.color4)
+			{ 
+				var gl = magoManager.getGl();
+				gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 1.0]); 
+			}
+		}
 	}
+	
 	this.mesh.render(magoManager, shader, renderType);
 };
 
