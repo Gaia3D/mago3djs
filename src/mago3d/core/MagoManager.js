@@ -2272,11 +2272,79 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			var resultObj = BasicFactory.getFactoryDimensionsByGeoCoordsArray(geoCoordsArray, edgeIdxOfDoor, this);
 			
 			var doorWidth = factoryWidth * 0.8;
+			var roofMinHeight = factoryHeight*0.75;
+			
+			// Front wall.
+			var frontWallOptions = {
+				"hasOpening"    : true,
+				"openingWidth"  : factoryWidth * 0.8,
+				"openingHeight" : factoryHeight*0.65
+			};
+			
+			// Rear wall.
+			var rearWallOptions = {
+				"hasOpening"    : true,
+				"openingWidth"  : factoryWidth * 0.8,
+				"openingHeight" : factoryHeight*0.65
+			};
+			
+			
+	
+			// Right wall.
+			var rightWallOptions = {};
+			rightWallOptions.openingsDataArray = [];
+			
+			// opening 1.
+			var openingData = {
+				"offSet" : 2,
+				"height" : roofMinHeight*0.8,
+				"width"  : 8
+			};
+			rightWallOptions.openingsDataArray.push(openingData);
+			
+			// opening 2.
+			var openingData = {
+				"offSet" : 2,
+				"height" : roofMinHeight*0.8,
+				"width"  : 8
+			};
+			rightWallOptions.openingsDataArray.push(openingData);
+			
 			var options = {
-				"hasGround"       : true,
-				"roofMinHeight"   : factoryHeight*0.75,
-				"frontDoorWidth"  : doorWidth,
-				"frontDoorHeight" : factoryHeight*0.65
+				"hasGround"        : true,
+				"roofMinHeight"    : factoryHeight*0.75,
+				"frontWallOptions" : frontWallOptions,
+				"rearWallOptions"  : rearWallOptions,
+				"rightWallOptions" : rightWallOptions
+			};
+			
+			// Left wall.
+			var leftWallOptions = {};
+			leftWallOptions.openingsDataArray = [];
+			
+			// opening 1.
+			var openingData = {
+				"offSet" : 2,
+				"height" : roofMinHeight*0.8,
+				"width"  : 8
+			};
+			leftWallOptions.openingsDataArray.push(openingData);
+			
+			// opening 2.
+			var openingData = {
+				"offSet" : 2,
+				"height" : roofMinHeight*0.8,
+				"width"  : 8
+			};
+			leftWallOptions.openingsDataArray.push(openingData);
+			
+			var options = {
+				"hasGround"        : true,
+				"roofMinHeight"    : factoryHeight*0.75,
+				"frontWallOptions" : frontWallOptions,
+				"rearWallOptions"  : rearWallOptions,
+				"rightWallOptions" : rightWallOptions,
+				"leftWallOptions"  : leftWallOptions
 			};
 	
 			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
@@ -2291,7 +2359,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			{ 
 				material.diffuseTexture = new Texture(); 
 				material.diffuseTexture.textureTypeName = "diffuse";
-				material.diffuseTexture.textureImageFileName = "factoryRoof.jpg"; // Gaia3dLogo.png
+				material.diffuseTexture.textureImageFileName = "mipoFactoryRoof.jpg"; // Gaia3dLogo.png
 				var imagesPath = materialsManager.imagesPath + "//" + material.diffuseTexture.textureImageFileName;
 				var flipYTexCoord = true;
 				TexturesManager.loadTexture(imagesPath, material.diffuseTexture, this, flipYTexCoord);
@@ -2301,7 +2369,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			if (options === undefined)
 			{ options = {}; }
 			
-			options.roof = {
+			options.roofOptions = {
 				"material": material
 			};
 	

@@ -3040,6 +3040,40 @@
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
+},
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "2B11",
+    "data_name": "2B11",
+    "mapping_type":"origin",
+    "longitude": 126.61184070587682,
+    "latitude": 37.575030180124045,
+    "height": 8.445000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+},
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "2E31",
+    "data_name": "2E31",
+    "mapping_type":"origin",
+    "longitude": 126.60974295229192,
+    "latitude": 37.574483275474975,
+    "height": 8.445000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
 }
 
 

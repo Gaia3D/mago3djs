@@ -10,6 +10,98 @@ var BasicFactory = function(factoryWidth, factoryLength, factoryHeight, options)
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
+	/**
+	// Usage example.
+	// Front wall.**********************************************************************
+	var frontWallOptions = {
+		"hasOpening"    : true,
+		"openingWidth"  : factoryWidth * 0.8,
+		"openingHeight" : factoryHeight*0.65
+	};
+	
+	// Rear wall.**********************************************************************
+	var rearWallOptions = {
+		"hasOpening"    : true,
+		"openingWidth"  : factoryWidth * 0.8,
+		"openingHeight" : factoryHeight*0.65
+	};
+	
+
+	// Right wall.**********************************************************************
+	var rightWallOptions = {};
+	rightWallOptions.openingsDataArray = [];
+	
+	// opening 1.
+	var openingData = {
+		"offSet" : 2,
+		"height" : roofMinHeight*0.8,
+		"width"  : 8
+	};
+	rightWallOptions.openingsDataArray.push(openingData);
+	
+	// opening 2.
+	var openingData = {
+		"offSet" : 2,
+		"height" : roofMinHeight*0.8,
+		"width"  : 8
+	};
+	rightWallOptions.openingsDataArray.push(openingData);
+	
+
+	
+	// Left wall.**********************************************************************
+	var leftWallOptions = {};
+	leftWallOptions.openingsDataArray = [];
+	
+	// opening 1.
+	var openingData = {
+		"offSet" : 2,
+		"height" : roofMinHeight*0.8,
+		"width"  : 8
+	};
+	leftWallOptions.openingsDataArray.push(openingData);
+	
+	// opening 2.
+	var openingData = {
+		"offSet" : 2,
+		"height" : roofMinHeight*0.8,
+		"width"  : 8
+	};
+	leftWallOptions.openingsDataArray.push(openingData);
+	
+	// Factory options.
+	var options = {
+		"hasGround"        : true,
+		"roofMinHeight"    : factoryHeight*0.75,
+		"frontWallOptions" : frontWallOptions,
+		"rearWallOptions"  : rearWallOptions,
+		"rightWallOptions" : rightWallOptions,
+		"leftWallOptions"  : leftWallOptions
+	};
+
+	var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+	var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+	geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+10, testHeading, undefined, undefined, geoLocData, this);
+	
+	// set material for the roof of the factory.**********************************************************************
+	var materialsManager = this.materialsManager;
+	var materialName = "basicFactoryRoof";
+	var material = materialsManager.getOrNewMaterial(materialName);
+	if (material.diffuseTexture === undefined)
+	{ 
+		material.diffuseTexture = new Texture(); 
+		material.diffuseTexture.textureTypeName = "diffuse";
+		material.diffuseTexture.textureImageFileName = "mipoFactoryRoof.jpg"; // Gaia3dLogo.png
+		var imagesPath = materialsManager.imagesPath + "//" + material.diffuseTexture.textureImageFileName;
+		var flipYTexCoord = true;
+		TexturesManager.loadTexture(imagesPath, material.diffuseTexture, this, flipYTexCoord);
+	}
+	
+	// add options.
+	options.roofOptions = {
+		"material": material
+	};
+	*/	
 	
 	/**
 	 * The name of the factory.
@@ -53,33 +145,6 @@ var BasicFactory = function(factoryWidth, factoryLength, factoryHeight, options)
 	 */
 	this.roofMinHeight;
 	
-	/**
-	 * This front wall door width.
-	 * @type {Number}
-	 * @default undefined
-	 */
-	this.frontDoorWidth;
-	
-	/**
-	 * This front wall door height.
-	 * @type {Number}
-	 * @default undefined
-	 */
-	this.frontDoorHeight;
-	
-	/**
-	 * This rear wall door width.
-	 * @type {Number}
-	 * @default undefined
-	 */
-	this.rearDoorWidth;
-	
-	/**
-	 * This rear wall door height.
-	 * @type {Number}
-	 * @default undefined
-	 */
-	this.rearDoorHeight;
 	
 	/**
 	 * The geographic location of the factory.
@@ -115,31 +180,7 @@ var BasicFactory = function(factoryWidth, factoryLength, factoryHeight, options)
 	this.roofColor4.setRGBA(98/256, 233/256, 134/256, 0.3);
 	
 	this.options = options;
-	
-	if (options)
-	{
-		if (options.hasGround)
-		{ this.bHasGround = options.hasGround; }
-	
-		if (options.roofMinHeight)
-		{ this.roofMinHeight = options.roofMinHeight; }
-		
-		if (options.frontDoorWidth)
-		{ this.frontDoorWidth = options.frontDoorWidth; }
-	
-		if (options.frontDoorHeight)
-		{ this.frontDoorHeight = options.frontDoorHeight; }
-	
-		if (options.roofColor4 !== undefined)
-		{ this.roofColor4 = options.roofColor4; }
-	
-		if (options.rearDoorWidth)
-		{ this.rearDoorWidth = options.rearDoorWidth; }
-	
-		if (options.rearDoorHeight)
-		{ this.rearDoorHeight = options.rearDoorHeight; }
-	}
-	
+
 	// After check the option values, set the boundingBox.***
 	this.bbox = new BoundingBox();
 	this.bbox.set(-this.width/2, -this.length/2, 0, this.width/2, this.length/2, this.height);
@@ -269,11 +310,6 @@ BasicFactory.getTriangularWallProfile2d = function(options, resultProfile2d)
 	
 	var halfWidth = width * 0.5;
 	
-	// Wall thickness.
-	var wallThickness = options.wallThickness;
-	if (wallThickness === undefined)
-	{ wallThickness = 0.4; }
-	
 	if (hasOpening)
 	{
 		// opening dimensions.
@@ -402,7 +438,7 @@ BasicFactory.prototype.makeMesh = function()
 		var groundHeight = this.height * 0.02;
 		
 		var groundMesh = new Box(groundWidth, groundLength, groundHeight, "ground");
-		groundMesh.setOneColor(0.1, 0.3, 0.3, 1.0);
+		groundMesh.setOneColor(0.2, 0.3, 0.3, 1.0);
 		this.objectsArray.push(groundMesh);
 		this.objectsMap[groundMesh.name] = groundMesh;
 	}
@@ -425,16 +461,36 @@ BasicFactory.prototype.makeMesh = function()
 	//          0--1     +      4--5-------> X
 	//
 	
+	this.roofMinHeight = this.options.roofMinHeight;
+	var frontWallOptions = this.options.frontWallOptions;
 	var options = {};
-	
 	options.width = this.width;
 	options.height = this.height;
-	options.hasOpening = true;
 	options.roofMinHeight = this.roofMinHeight;
+	if (frontWallOptions !== undefined)
+	{
+		options.hasOpening = frontWallOptions.hasOpening;
+		if (options.hasOpening)
+		{
+			options.openingWidth = frontWallOptions.openingWidth;
+			if (options.openingWidth === undefined)
+			{ options.openingWidth = this.width * 0.8; }
+			
+			options.openingHeight = frontWallOptions.openingHeight;
+			if (options.openingHeight === undefined)
+			{ options.openingHeight = this.height * 0.6; }
+		}
+		
+		this.frontWallThickness = frontWallOptions.frontWallThickness;
+	}
+	else
+	{
+		options.hasOpening = false;
+	}
+	
 	if (this.frontWallThickness === undefined)
 	{ this.frontWallThickness = 0.4; }
-	options.wallThickness = this.frontWallThickness;
-	
+
 	var profileAux = BasicFactory.getTriangularWallProfile2d(options, undefined);
 	
 	// Extrude the Profile.
@@ -456,10 +512,38 @@ BasicFactory.prototype.makeMesh = function()
 	mesh.setOneColor(0.9, 0.9, 0.9, 1.0);
 
 	// Rear wall without opening.******************************************************************************************************
-	options.hasOpening = false;
+	var rearWallOptions = this.options.rearWallOptions;
+	var options = {};
+	options.width = this.width;
+	options.height = this.height;
+	options.roofMinHeight = this.roofMinHeight;
+	if (rearWallOptions !== undefined)
+	{
+		options.hasOpening = rearWallOptions.hasOpening;
+		if (options.hasOpening)
+		{
+			options.openingWidth = rearWallOptions.openingWidth;
+			if (options.openingWidth === undefined)
+			{ options.openingWidth = this.width * 0.8; }
+			
+			options.openingHeight = rearWallOptions.openingHeight;
+			if (options.openingHeight === undefined)
+			{ options.openingHeight = this.height * 0.6; }
+		}
+		
+		this.rearWallThickness = rearWallOptions.frontWallThickness;
+	}
+	else
+	{
+		options.hasOpening = false;
+	}
+	
+	if (this.rearWallThickness === undefined)
+	{ this.rearWallThickness = 0.4; }
 	var profileAux = BasicFactory.getTriangularWallProfile2d(options, undefined);
 
 	// Extrude the Profile.
+	extrusionDist = this.rearWallThickness;
 	var mesh = Modeler.getExtrudedMesh(profileAux, extrusionDist, extrudeSegmentsCount, extrusionVector, bIncludeBottomCap, bIncludeTopCap, undefined);
 	mesh.name = "rearWall";
 	this.objectsArray.push(mesh);
@@ -486,30 +570,14 @@ BasicFactory.prototype.makeMesh = function()
 	//
 	//   offset,width,height    offset,width,height    offset,width,height ...
 	
-	options = {}; // init.
-	options.length = this.length;
-	options.height = this.roofMinHeight; // the lateral wall height is the factory minRoofHeight.
+	var leftWallOptions = this.options.leftWallOptions;
+	if (leftWallOptions === undefined)
+	{ leftWallOptions = {}; }
+
+	leftWallOptions.length = this.length;
+	leftWallOptions.height = this.roofMinHeight; // the lateral wall height is the factory minRoofHeight.
 	
-	// put openings into lateral wall.
-	options.openingsDataArray = [];
-	
-	// opening 1.
-	var openingData = {
-		"offSet" : 2,
-		"height" : this.roofMinHeight*0.8,
-		"width"  : 4
-	};
-	options.openingsDataArray.push(openingData);
-	
-	// opening 2.
-	var openingData = {
-		"offSet" : 2,
-		"height" : this.roofMinHeight*0.8,
-		"width"  : 4
-	};
-	options.openingsDataArray.push(openingData);
-	
-	var profileAux = BasicFactory.getLateralWallProfile2d(options, undefined);
+	var profileAux = BasicFactory.getLateralWallProfile2d(leftWallOptions, undefined);
 	
 	// Extrude the Profile.
 	var mesh = Modeler.getExtrudedMesh(profileAux, extrusionDist, extrudeSegmentsCount, extrusionVector, bIncludeBottomCap, bIncludeTopCap, undefined);
@@ -524,30 +592,14 @@ BasicFactory.prototype.makeMesh = function()
 	mesh.setOneColor(0.9, 0.9, 0.9, 1.0);
 	
 	// Right lateral wall.*****************************************************************************************************************
-	options = {}; // init.
-	options.length = this.length;
-	options.height = this.roofMinHeight; // the lateral wall height is the factory minRoofHeight.
+	var rightWallOptions = this.options.rightWallOptions;
+	if (rightWallOptions === undefined)
+	{ rightWallOptions = {}; }
+
+	rightWallOptions.length = this.length;
+	rightWallOptions.height = this.roofMinHeight; // the lateral wall height is the factory minRoofHeight.
 	
-	// put openings into lateral wall.
-	options.openingsDataArray = [];
-	
-	// opening 1.
-	var openingData = {
-		"offSet" : 2,
-		"height" : this.roofMinHeight*0.8,
-		"width"  : 4
-	};
-	options.openingsDataArray.push(openingData);
-	
-	// opening 2.
-	var openingData = {
-		"offSet" : 2,
-		"height" : this.roofMinHeight*0.8,
-		"width"  : 4
-	};
-	options.openingsDataArray.push(openingData);
-	
-	var profileAux = BasicFactory.getLateralWallProfile2d(options, undefined);
+	var profileAux = BasicFactory.getLateralWallProfile2d(rightWallOptions, undefined);
 	
 	// Extrude the Profile.
 	var mesh = Modeler.getExtrudedMesh(profileAux, extrusionDist, extrudeSegmentsCount, extrusionVector, bIncludeBottomCap, bIncludeTopCap, undefined);
@@ -593,7 +645,7 @@ BasicFactory.prototype.makeMesh = function()
 	
 	// Check if there are roof's material.
 	var roofMaterial;
-	var roofOptions = this.options.roof;
+	var roofOptions = this.options.roofOptions;
 	if (roofOptions !== undefined)
 	{
 		roofMaterial = roofOptions.material;
@@ -606,8 +658,10 @@ BasicFactory.prototype.makeMesh = function()
 				//Mesh.prototype.calculateTexCoordsBox = function(texCoordsBoundingBox)
 				// the difusse texture represents aprox 4x4 meters in the roofTexture.jpg image.
 				var texCoordsBBox = new BoundingBox();
-				var length = 15;
-				texCoordsBBox.set(-length, -length, -length, length, length, length);
+				var length = 60;
+				var width = this.width;
+				var height = 20;
+				texCoordsBBox.set(-width, -length, -height, width, length, height);
 				mesh.calculateTexCoordsBox(texCoordsBBox);
 				mesh.material = roofMaterial;
 			}
