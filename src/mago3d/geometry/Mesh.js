@@ -11,6 +11,8 @@ var Mesh = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
+	this.name;
+	this.id;
 	this.vertexList;
 	
 	//the list of the Surface features
@@ -21,6 +23,7 @@ var Mesh = function()
 	
 	this.vboKeysContainer;
 	this.bbox;
+	this.material;// class Material.
 };
 
 /**
@@ -56,6 +59,8 @@ Mesh.prototype.deleteObjects = function(vboMemManager)
 		this.vboKeysContainer.deleteGlObjects(vboMemManager.gl, vboMemManager);
 		this.vboKeysContainer = undefined;
 	}
+	
+	// No delete material if exist. This mesh is no owner of the material.
 };
 
 /**
@@ -404,6 +409,20 @@ Mesh.prototype.calculateVerticesNormals = function(bForceRecalculatePlaneNormal)
 };
 
 /**
+ * Get the texture coordinate by box projection
+ */
+Mesh.prototype.calculateTexCoordsBox = function(texCoordsBoundingBox)
+{
+	var surface;
+	var surfacesCount = this.getSurfacesCount();
+	for (var i=0; i<surfacesCount; i++)
+	{
+		surface = this.getSurface(i);
+		surface.calculateTexCoordsBox(texCoordsBoundingBox);
+	}
+};
+
+/**
  * Get the texture coordinate by spherical projection
  */
 Mesh.prototype.calculateTexCoordsSpherical = function()
@@ -459,6 +478,15 @@ Mesh.prototype.setOneColor = function(r, g, b, a)
 	{ this.color4 = new Color(); }
 	
 	this.color4.setRGBA(r, g, b, a);
+};
+
+/**
+ * Set the material of the mesh.
+ * @param {Material} material
+ */
+Mesh.prototype.setMaterial = function(material)
+{
+	this.material = material;
 };
 
 /**
@@ -640,8 +668,22 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive, i
 		if (!isSelected)
 		{
 			// Color render.***
-			if (this.color4)
-			{ gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 1.0]); }
+			if (this.material !== undefined && this.material.diffuseTexture !== undefined && this.material.diffuseTexture.texId !== undefined)
+			{
+				var texture = this.material.diffuseTexture;
+				gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
+				if (shader.last_tex_id !== texture.texId) 
+				{
+					gl.activeTexture(gl.TEXTURE2);
+					gl.bindTexture(gl.TEXTURE_2D, texture.texId);
+					shader.last_tex_id = texture.texId;
+				}
+			}
+			else if (this.color4)
+			{ 
+				gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
+				gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 1.0]); 
+			}
 		}
 	}
 	else if (renderType === 2)

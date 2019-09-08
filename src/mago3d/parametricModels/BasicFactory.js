@@ -95,6 +95,8 @@ var BasicFactory = function(factoryWidth, factoryLength, factoryHeight, options)
 	 */
 	this.objectsArray;
 	
+	this.objectsMap;
+	
 	/**
 	 * The bounding box of the fatory.
 	 * @type {BoundingBox}
@@ -112,7 +114,7 @@ var BasicFactory = function(factoryWidth, factoryLength, factoryHeight, options)
 	this.roofColor4 = new Color();
 	this.roofColor4.setRGBA(98/256, 233/256, 134/256, 0.3);
 	
-	
+	this.options = options;
 	
 	if (options)
 	{
@@ -388,6 +390,9 @@ BasicFactory.prototype.makeMesh = function()
 	
 	if (this.objectsArray === undefined)
 	{ this.objectsArray = []; }
+
+	if (this.objectsMap === undefined)
+	{ this.objectsMap = {}; }
 	
 	if (this.bHasGround)
 	{
@@ -396,9 +401,10 @@ BasicFactory.prototype.makeMesh = function()
 		var groundLength = this.length;
 		var groundHeight = this.height * 0.02;
 		
-		var groundMesh = new Box(groundWidth, groundLength, groundHeight);
-		groundMesh.setOneColor(0.2, 0.3, 0.4, 1.0);
+		var groundMesh = new Box(groundWidth, groundLength, groundHeight, "ground");
+		groundMesh.setOneColor(0.1, 0.3, 0.3, 1.0);
 		this.objectsArray.push(groundMesh);
+		this.objectsMap[groundMesh.name] = groundMesh;
 	}
 	
 	// Walls.***
@@ -438,7 +444,9 @@ BasicFactory.prototype.makeMesh = function()
 	var bIncludeBottomCap = true;
 	var bIncludeTopCap = true;
 	var mesh = Modeler.getExtrudedMesh(profileAux, extrusionDist, extrudeSegmentsCount, extrusionVector, bIncludeBottomCap, bIncludeTopCap, undefined);
+	mesh.name = "frontWall";
 	this.objectsArray.push(mesh);
+	this.objectsMap[mesh.name] = mesh;
 	
 	// Now rotate the front wall.***
 	mesh.rotate(90, 1, 0, 0);
@@ -453,7 +461,9 @@ BasicFactory.prototype.makeMesh = function()
 
 	// Extrude the Profile.
 	var mesh = Modeler.getExtrudedMesh(profileAux, extrusionDist, extrudeSegmentsCount, extrusionVector, bIncludeBottomCap, bIncludeTopCap, undefined);
+	mesh.name = "rearWall";
 	this.objectsArray.push(mesh);
+	this.objectsMap[mesh.name] = mesh;
 	
 	// Now rotate the front wall.***
 	mesh.rotate(90, 1, 0, 0);
@@ -503,7 +513,9 @@ BasicFactory.prototype.makeMesh = function()
 	
 	// Extrude the Profile.
 	var mesh = Modeler.getExtrudedMesh(profileAux, extrusionDist, extrudeSegmentsCount, extrusionVector, bIncludeBottomCap, bIncludeTopCap, undefined);
+	mesh.name = "leftWall";
 	this.objectsArray.push(mesh);
+	this.objectsMap[mesh.name] = mesh;
 	
 	// Now rotate the left wall.***
 	mesh.rotate(90, 1, 0, 0);
@@ -539,7 +551,9 @@ BasicFactory.prototype.makeMesh = function()
 	
 	// Extrude the Profile.
 	var mesh = Modeler.getExtrudedMesh(profileAux, extrusionDist, extrudeSegmentsCount, extrusionVector, bIncludeBottomCap, bIncludeTopCap, undefined);
+	mesh.name = "rightWall";
 	this.objectsArray.push(mesh);
+	this.objectsMap[mesh.name] = mesh;
 	
 	// Now rotate the left wall.***
 	mesh.rotate(90, 1, 0, 0);
@@ -565,7 +579,10 @@ BasicFactory.prototype.makeMesh = function()
 	outerRing.addElement(polyline);
 	extrusionDist = this.length;
 	var mesh = Modeler.getExtrudedMesh(profileAux, extrusionDist, extrudeSegmentsCount, extrusionVector, bIncludeBottomCap, bIncludeTopCap, undefined);
+	mesh.name = "roof";
 	this.objectsArray.push(mesh);
+	this.objectsMap[mesh.name] = mesh;
+	
 	
 	// Now rotate the roof.***
 	mesh.rotate(90, 1, 0, 0);
@@ -574,7 +591,39 @@ BasicFactory.prototype.makeMesh = function()
 	mesh.translate(0, this.length*0.5, 0);
 	mesh.setOneColor(98/256, 233/256, 134/256, 0.3);
 	
+	// Check if there are roof's material.
+	var roofMaterial;
+	var roofOptions = this.options.roof;
+	if (roofOptions !== undefined)
+	{
+		roofMaterial = roofOptions.material;
+		if (roofMaterial !== undefined)
+		{
+			// check if there are texture. If exist texture then calculate texCoord for the roofMesh.
+			if (roofMaterial.diffuseTexture !== undefined)
+			{
+				// Calculate texCoords for the roofMesh.
+				//Mesh.prototype.calculateTexCoordsBox = function(texCoordsBoundingBox)
+				// the difusse texture represents aprox 4x4 meters in the roofTexture.jpg image.
+				var texCoordsBBox = new BoundingBox();
+				var length = 15;
+				texCoordsBBox.set(-length, -length, -length, length, length, length);
+				mesh.calculateTexCoordsBox(texCoordsBBox);
+				mesh.material = roofMaterial;
+			}
+			
+		}
+	}
+	
 	this.dirty = false;
+};
+
+/**
+ * Renders the factory.
+ */
+BasicFactory.prototype.getObjectByName = function(objectName)
+{
+	return this.objectsMap[objectName];
 };
 
 /**

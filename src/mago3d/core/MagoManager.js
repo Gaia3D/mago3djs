@@ -278,6 +278,9 @@ var MagoManager = function()
 	this._settings = new Settings();
 	
 	this.tinTerrainManager;
+	
+	this.modeler = new Modeler(this);
+	this.materialsManager = new MaterialsManager(this);
 };
 
 /**
@@ -1842,6 +1845,9 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
  */
 MagoManager.prototype.keyDown = function(key) 
 {
+	if (this.modeler === undefined)
+	{ this.modeler = new Modeler(this); }
+	
 	if (key === 32) // 32 = 'space'.***
 	{
 		var renderingSettings = this._settings.getRenderingSettings();
@@ -1850,8 +1856,6 @@ MagoManager.prototype.keyDown = function(key)
 	}
 	else if (key === 37) // 37 = 'left'.***
 	{
-		if (this.modeler === undefined)
-		{ this.modeler = new Modeler(); }
 		//this.modeler.mode = CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_PLANEGRID;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
@@ -1860,21 +1864,15 @@ MagoManager.prototype.keyDown = function(key)
 	}
 	else if (key === 38) // 38 = 'up'.***
 	{
-		if (this.modeler === undefined)
-		{ this.modeler = new Modeler(); }
 		this.modeler.mode = CODE.modelerMode.DRAWING_STATICGEOMETRY;
 	}
 	else if (key === 39) // 39 = 'right'.***
 	{
-		if (this.modeler === undefined)
-		{ this.modeler = new Modeler(); }
 		this.modeler.mode = CODE.modelerMode.DRAWING_BSPLINE;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS;
 	}
 	else if (key === 40) // 40 = 'down'.***
 	{
-		if (this.modeler === undefined)
-		{ this.modeler = new Modeler(); }
 		this.modeler.mode = CODE.modelerMode.DRAWING_BASICFACTORY;
 	}
 	else if (key === 49) // 49 = '1'.***
@@ -2085,7 +2083,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		// Test code.***
 		// Test code.***// Test code.***// Test code.***// Test code.***// Test code.***// Test code.***// Test code.***
 		if (this.modeler === undefined)
-		{ this.modeler = new Modeler(); }
+		{ this.modeler = new Modeler(this); }
 		//	CODE.modelerMode = {
 		//	"INACTIVE"                 : 0,
 		//	"DRAWING_POLYLINE"         : 1,
@@ -2285,13 +2283,33 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
 			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+10, testHeading, undefined, undefined, geoLocData, this);
 			
-			//var factory = this.modeler.newBasicFactory(factoryWidth, factoryLength, factoryHeight, options);
+			// set material for the roof of the factory.
+			var materialsManager = this.materialsManager;
+			var materialName = "basicFactoryRoof";
+			var material = materialsManager.getOrNewMaterial(materialName);
+			if (material.diffuseTexture === undefined)
+			{ 
+				material.diffuseTexture = new Texture(); 
+				material.diffuseTexture.textureTypeName = "diffuse";
+				material.diffuseTexture.textureImageFileName = "factoryRoof.jpg"; // Gaia3dLogo.png
+				var imagesPath = materialsManager.imagesPath + "//" + material.diffuseTexture.textureImageFileName;
+				var flipYTexCoord = true;
+				TexturesManager.loadTexture(imagesPath, material.diffuseTexture, this, flipYTexCoord);
+			}
+			
+			// add options.
+			if (options === undefined)
+			{ options = {}; }
+			
+			options.roof = {
+				"material": material
+			};
+	
 			var factory = new BasicFactory(factoryWidth, factoryLength, factoryHeight, options);
 			factory.bHasGround = true;
 			factory.geoLocDataManager = geoLocDataManager;
 			
-			var targetDepth = 17;
-			this.smartTileManager.putObject(targetDepth, factory, this);
+			this.modeler.addObject(factory);
 		}
 		else if (this.modeler.mode === CODE.modelerMode.DRAWING_PIPE)
 		{
@@ -2352,10 +2370,8 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			
 			var concentricTubes = new ConcentricTubes(options, geoLocDataManager);
 			concentricTubes.attributes = {isMovable: true};
-			
-			var targetDepth = 17;
-			this.smartTileManager.putObject(targetDepth, concentricTubes, this);
-			//this.modeler.addObject(concentricTubes);
+
+			this.modeler.addObject(concentricTubes);
 		}
 	}
 	

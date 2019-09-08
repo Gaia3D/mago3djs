@@ -38,6 +38,8 @@ var TexturesStore = function(magoManager)
 	 * @default undefined.
 	 */
 	this._noiseTexture_4x4;
+	
+	this.texturesManager;
 };
 
 /**

@@ -399,6 +399,24 @@ Point2DList.prototype.getIndexToInsertBySquaredDist = function(objectsArray, obj
  */
 Point2DList.getExpandedPoints = function(originalPoints2dArray, resultPoints2dArray, leftExpandDist, rightExpandDist, bLoop) 
 {
+	// Function used by basicFactory to make roof profile, for example.
+	
+	//                                                                        
+	//                                                                        
+	//                                                           4            
+	//                                                         /    \                        
+	//                                                       /        \                      
+	//                                                     /            \               
+	//                                                   /                \            
+	//                  1               ==>            /         1          \                       
+	//                /   \                          /         /   \          \             
+	//              /       \                      /         /       \          \           
+	//            /           \                  5         /           \          3
+	//          /               \                \       /               \      /
+	//        /                   \                \   /                   \  /
+	//      2                       0                0                       2
+	//
+	
 	if (originalPoints2dArray === undefined)
 	{ return; }
 

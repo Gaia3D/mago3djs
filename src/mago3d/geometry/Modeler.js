@@ -6,12 +6,14 @@
  * Now under implementation
  * @class Modeler
  */
-var Modeler = function() 
+var Modeler = function(magoManager) 
 {
 	if (!(this instanceof Modeler)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
+	
+	this.magoManager = magoManager;
 	
 	/**
 	 * Current modeler's mode. 
@@ -104,6 +106,10 @@ Modeler.prototype.addObject = function(object)
 	{ this.objectsArray = []; }
 
 	this.objectsArray.push(object);
+	
+	var smartTileManager = this.magoManager.smartTileManager;
+	var targetDepth = 17;
+	smartTileManager.putObject(targetDepth, object, this);
 };
 
 /**
@@ -111,6 +117,30 @@ Modeler.prototype.addObject = function(object)
  */
 Modeler.prototype.newBasicFactory = function(factoryWidth, factoryLength, factoryHeight, options) 
 {
+	// set material for the roof of the factory.
+	var magoManager = this.magoManager;
+	var materialsManager = magoManager.materialsManager;
+	var materialName = "basicFactoryRoof";
+	var material = materialsManager.getOrNewMaterial(materialName);
+	if (material.diffuseTexture === undefined)
+	{ 
+		material.diffuseTexture = new Texture(); 
+		material.diffuseTexture.textureTypeName = "diffuse";
+		material.diffuseTexture.textureImageFileName = "factoryRoof.jpg"; // Gaia3dLogo.png
+		var imagesPath = materialsManager.imagesPath + "//" + material.diffuseTexture.textureImageFileName;
+		var flipYTexCoord = true;
+		TexturesManager.loadTexture(imagesPath, material.diffuseTexture, magoManager, flipYTexCoord);
+	}
+	
+	// add options.
+	if (options === undefined)
+	{ options = {}; }
+	
+	options.roof = {
+		"material": material
+	};
+	
+	
 	var basicFactory = new BasicFactory(factoryWidth, factoryLength, factoryHeight, options);
 	basicFactory.bHasGround = true;
 	
@@ -118,6 +148,10 @@ Modeler.prototype.newBasicFactory = function(factoryWidth, factoryLength, factor
 	{ this.objectsArray = []; }
 	
 	this.objectsArray.push(basicFactory);
+	
+	
+
+	
 	
 	return basicFactory;
 };

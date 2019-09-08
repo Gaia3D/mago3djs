@@ -6,6 +6,7 @@
  */
 var TexturesManager = function(magoManager) 
 {
+	// class used by "neoBuilding" class.
 	if (!(this instanceof TexturesManager)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
@@ -15,7 +16,8 @@ var TexturesManager = function(magoManager)
 	 * Textures loaded array.
 	 * @type {Array}
 	 */
-	this._texturesLoaded = [];
+	this._texturesLoaded = []; 
+	this.texturesMap = {};// map<textureName, Texture>
 };
 
 
@@ -75,6 +77,38 @@ TexturesManager.prototype.getOrNewTexture = function(textureIdx)
 	}
 
 	return this._texturesLoaded[textureIdx];
+};
+
+TexturesManager.prototype.getTextureByName = function(textureName)
+{
+	return texturesMap[textureName];
+};
+
+TexturesManager.loadTexture = function(imagePath, texture, magoManager, flip_y_texCoord)
+{
+	var imageToLoad = new Image();
+	texture.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
+
+	imageToLoad.onload = function() 
+	{
+		var gl = magoManager.getGl();
+		
+		if (texture.texId === undefined) 
+		{ texture.texId = gl.createTexture(); }
+		
+		if (flip_y_texCoord === undefined)
+		{ flip_y_texCoord = false; }
+		
+		handleTextureLoaded(gl, imageToLoad, texture.texId, flip_y_texCoord);
+		texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+	};
+
+	imageToLoad.onerror = function() 
+	{
+		texture.fileLoadState = CODE.fileLoadState.LOAD_FAILED;
+	};
+
+	imageToLoad.src = imagePath;
 };
 
 TexturesManager.newWebGlTextureByEmbeddedImage = function(gl, embeddedImage, texture)

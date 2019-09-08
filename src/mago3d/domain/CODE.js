@@ -45,6 +45,16 @@ CODE.modelerMode = {
 	"DRAWING_PIPE"             : 9
 };
 
+CODE.boxFace = {
+	"UNKNOWN" : 0,
+	"LEFT"    : 1,
+	"RIGHT"   : 2,
+	"FRONT"   : 3,
+	"REAR"    : 4,
+	"TOP"     : 5,
+	"BOTTOM"  : 6
+};
+
 CODE.modelerDrawingState = {
 	"NO_STARTED" : 0,
 	"STARTED"    : 1

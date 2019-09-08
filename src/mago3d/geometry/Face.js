@@ -242,6 +242,130 @@ Face.prototype.calculateVerticesNormals = function(bForceRecalculatePlaneNormal)
 };
 
 /**
+ * Get the texture coordinate by box projection
+ */
+Face.prototype.calculateTexCoordsBox = function(texCoordsBoundingBox)
+{
+	//CODE.boxFace = { "UNKNOWN" : 0, "LEFT" : 1, "RIGHT" : 2, "FRONT" : 3, "REAR"  : 4, "TOP" : 5, "BOTTOM" : 6 };
+	// 1rst, must know the bestBoxFaceToProject of this face.
+	var normal = this.getPlaneNormal();
+	var bestBoxFaceToProject = Face.getBestCubeFaceToProject(normal);
+	
+	var minX = texCoordsBoundingBox.minX;
+	var maxX = texCoordsBoundingBox.maxX;
+	var minY = texCoordsBoundingBox.minY;
+	var maxY = texCoordsBoundingBox.maxY;
+	var minZ = texCoordsBoundingBox.minZ;
+	var maxZ = texCoordsBoundingBox.maxZ;
+	
+	var xRange = maxX - minX;
+	var yRange = maxY - minY;
+	var zRange = maxZ - minZ;
+	
+	var vertexCount = this.getVerticesCount();
+	
+	if (bestBoxFaceToProject === CODE.boxFace.TOP)
+	{
+		for (var i=0; i<vertexCount; i++)
+		{
+			var vertex = this.getVertex(i);
+			var position = vertex.getPosition();
+			var texCoord = vertex.getTexCoord();
+			
+			var x = position.x;
+			var y = position.y;
+			var s = (x - minX) / xRange;
+			var t = (y - minY) / yRange;
+
+			texCoord.set(s, t);
+		}
+	}
+	else if (bestBoxFaceToProject === CODE.boxFace.BOTTOM)
+	{
+		for (var i=0; i<vertexCount; i++)
+		{
+			var vertex = this.getVertex(i);
+			var position = vertex.getPosition();
+			var texCoord = vertex.getTexCoord();
+			
+			var x = position.x;
+			var y = position.y;
+			var s = (x - minX) / xRange;
+			var t = (y - minY) / yRange;
+			t = 1.0 - t;
+
+			texCoord.set(s, t);
+		}
+	}
+	else if (bestBoxFaceToProject === CODE.boxFace.FRONT)
+	{
+		for (var i=0; i<vertexCount; i++)
+		{
+			var vertex = this.getVertex(i);
+			var position = vertex.getPosition();
+			var texCoord = vertex.getTexCoord();
+			
+			var x = position.x;
+			var z = position.z;
+			var s = (x - minX) / xRange;
+			var t = (z - minZ) / zRange;
+
+			texCoord.set(s, t);
+		}
+	}
+	else if (bestBoxFaceToProject === CODE.boxFace.REAR)
+	{
+		for (var i=0; i<vertexCount; i++)
+		{
+			var vertex = this.getVertex(i);
+			var position = vertex.getPosition();
+			var texCoord = vertex.getTexCoord();
+			
+			var x = position.x;
+			var z = position.z;
+			var s = (x - minX) / xRange;
+			var t = (z - minZ) / zRange;
+			t = 1.0 - t;
+
+			texCoord.set(s, t);
+		}
+	}
+	else if (bestBoxFaceToProject === CODE.boxFace.LEFT)
+	{
+		for (var i=0; i<vertexCount; i++)
+		{
+			var vertex = this.getVertex(i);
+			var position = vertex.getPosition();
+			var texCoord = vertex.getTexCoord();
+			
+			var y = position.y;
+			var z = position.z;
+			var t = (y - minY) / yRange;
+			var s = (z - minZ) / zRange;
+
+			texCoord.set(s, t);
+		}
+	}
+	else if (bestBoxFaceToProject === CODE.boxFace.RIGHT)
+	{
+		for (var i=0; i<vertexCount; i++)
+		{
+			var vertex = this.getVertex(i);
+			var position = vertex.getPosition();
+			var texCoord = vertex.getTexCoord();
+			
+			var y = position.y;
+			var z = position.z;
+			var t = (y - minY) / yRange;
+			var s = (z - minZ) / zRange;
+			s = 1.0 - s;
+
+			texCoord.set(s, t);
+		}
+	}
+};
+
+/**
  * 시작점과 끝점이 매우 가까울 경우 (거의 같은, 0.1mm보다 가까울때.) 끝점을 삭제.
  * "Uroborus" is an archaic motif of a snake biting its own tail.
  * "Uroborus"는 뱀이 자기 꼬리 먹고 있는 모양.
@@ -300,6 +424,37 @@ Face.getBestFacePlaneToProject = function(normal)
 
 	return best_plane;
 };
+
+Face.getBestCubeFaceToProject = function(normal)
+{
+	var cubeface = CODE.boxFace.UNKNOWN;
+	var bestFacePlane = Face.getBestFacePlaneToProject(normal);
+
+	if (bestFacePlane === 0) // xy.
+	{
+		// TOP or BOTTOM.***
+		var nz = normal.z;
+		if (nz > 0.0){ cubeface = CODE.boxFace.TOP; }
+		else { cubeface = CODE.boxFace.BOTTOM; }
+	}
+	else if (bestFacePlane === 1) // yz.
+	{
+		// LEFT or RIGHT.***
+		var nx = normal.x;
+		if (nx > 0.0){ cubeface = CODE.boxFace.RIGHT; }
+		else { cubeface = CODE.boxFace.LEFT; }
+	}
+	else if (bestFacePlane === 2) // xz.
+	{
+		// FRONT or REAR.***
+		var ny = normal.y;
+		if (ny > 0.0){ cubeface = CODE.boxFace.REAR; }
+		else { cubeface = CODE.boxFace.FRONT; }
+	}
+
+	return cubeface;
+};
+
 
 /**
  * 버텍스 배열을 plane normal에 따라 polygon2d 형식으로 변환 후 반환.

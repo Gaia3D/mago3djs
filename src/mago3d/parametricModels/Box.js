@@ -4,13 +4,15 @@
  * Box geometry.
  * @class Box
  */
-var Box = function(width, length, height) 
+var Box = function(width, length, height, name) 
 {
 	if (!(this instanceof Box)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	// Initially, box centered at the center of the bottom.***
+	this.name;
+	this.id;
 	this.mesh;
 	this.centerPoint; // Usually (0,0,0).***
 	this.width;
@@ -19,6 +21,8 @@ var Box = function(width, length, height)
 	this.owner;
 	this.geoLocDataManager;
 	this.color4;
+	if (name !== undefined)
+	{ this.name = name; }
 	
 	if (width !== undefined)
 	{ this.width = width; }
