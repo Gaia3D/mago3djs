@@ -1242,21 +1242,31 @@ void main()\n\
 			offset.xy /= offset.w;\n\
 			offset.xy = offset.xy * 0.5 + 0.5;        \n\
 			float sampleDepth = -sample.z/far;\n\
-			float realLinearDepth = linearDepth * far;\n\
+			//float realLinearDepth = linearDepth * far;\n\
 			\n\
 			if(sampleDepth > 0.49)\n\
-				continue;\n\
-			float depthBufferValue = getDepth(offset.xy);	\n\
-			\n\
-			float range_check = abs(linearDepth - depthBufferValue);\n\
-			if(range_check > 0.000000001 && range_check < 0.00000007)\n\
 			{\n\
 				continue;\n\
 			}\n\
+\n\
+			float depthBufferValue = getDepth(offset.xy);	\n\
+			\n\
+			float range_check = abs(linearDepth - depthBufferValue);\n\
+			if(depthBufferValue < 0.005)\n\
+			{\n\
+				occlusion = 0.0;\n\
+				break;\n\
+				//continue;\n\
+			}\n\
+			//else if(range_check > 0.000000001 && range_check < 0.00000007)\n\
+			//{\n\
+			//	continue;\n\
+			//}\n\
 			else if (depthBufferValue <= sampleDepth)\n\
 			{\n\
 				occlusion +=  1.0;\n\
 			}\n\
+			\n\
 		}   \n\
 			\n\
 		occlusion = 1.0 - occlusion / float(kernelSize);\n\
@@ -1264,6 +1274,9 @@ void main()\n\
 	else{\n\
 		occlusion = 1.0;\n\
 	}\n\
+	\n\
+	if(occlusion > 0.93)\n\
+	occlusion = 1.0;\n\
 \n\
     // Do specular lighting.***\n\
 	float lambertian;\n\
@@ -1300,6 +1313,7 @@ void main()\n\
 	\n\
 	if(bApplyShadow)\n\
 	{\n\
+	\n\
 		vec3 posRelToLight = vPosRelToLight.xyz / vPosRelToLight.w;\n\
 		if(posRelToLight.x >= -0.5 && posRelToLight.x <= 0.5)\n\
 		{\n\
@@ -1323,21 +1337,21 @@ void main()\n\
 						if(occlusion > 0.4)\n\
 							occlusion = 0.4;\n\
 					}\n\
-					/*\n\
-					for(int horit = -1; horit<2; horit++)\n\
-					{\n\
-						for(int vert = -1; vert < 2; vert++)\n\
-						{\n\
-							vec2 shadowMapTexCoord = vec2(posRelToLight.x+float(horit)*pixelWidth, posRelToLight.y+float(vert)*pixelHeight);\n\
-							float depthRelToLight = getDepthShadowMap(shadowMapTexCoord);\n\
-							if(posRelToLight.z > depthRelToLight*0.9963 )\n\
-							{\n\
-								if(occlusion > 0.4)\n\
-									occlusion -= (0.4/9.0);\n\
-							}\n\
-						}\n\
-					}\n\
-					*/\n\
+					\n\
+					//for(int horit = -1; horit<2; horit++)\n\
+					//{\n\
+					//	for(int vert = -1; vert < 2; vert++)\n\
+					//	{\n\
+					//		vec2 shadowMapTexCoord = vec2(posRelToLight.x+float(horit)*pixelWidth, posRelToLight.y+float(vert)*pixelHeight);\n\
+					//		float depthRelToLight = getDepthShadowMap(shadowMapTexCoord);\n\
+					//		if(posRelToLight.z > depthRelToLight*0.9963 )\n\
+					//		{\n\
+					//			if(occlusion > 0.4)\n\
+					//				occlusion -= (0.4/9.0);\n\
+					//		}\n\
+					//	}\n\
+					//}\n\
+					\n\
 				}\n\
 			}\n\
 		}\n\

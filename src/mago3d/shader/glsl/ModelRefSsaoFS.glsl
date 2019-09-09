@@ -101,21 +101,31 @@ void main()
 			offset.xy /= offset.w;
 			offset.xy = offset.xy * 0.5 + 0.5;        
 			float sampleDepth = -sample.z/far;
-			float realLinearDepth = linearDepth * far;
+			//float realLinearDepth = linearDepth * far;
 			
 			if(sampleDepth > 0.49)
-				continue;
-			float depthBufferValue = getDepth(offset.xy);	
-			
-			float range_check = abs(linearDepth - depthBufferValue);
-			if(range_check > 0.000000001 && range_check < 0.00000007)
 			{
 				continue;
 			}
+
+			float depthBufferValue = getDepth(offset.xy);	
+			
+			float range_check = abs(linearDepth - depthBufferValue);
+			if(depthBufferValue < 0.005)
+			{
+				occlusion = 0.0;
+				break;
+				//continue;
+			}
+			//else if(range_check > 0.000000001 && range_check < 0.00000007)
+			//{
+			//	continue;
+			//}
 			else if (depthBufferValue <= sampleDepth)
 			{
 				occlusion +=  1.0;
 			}
+			
 		}   
 			
 		occlusion = 1.0 - occlusion / float(kernelSize);
@@ -123,6 +133,9 @@ void main()
 	else{
 		occlusion = 1.0;
 	}
+	
+	if(occlusion > 0.93)
+	occlusion = 1.0;
 
     // Do specular lighting.***
 	float lambertian;
@@ -159,6 +172,7 @@ void main()
 	
 	if(bApplyShadow)
 	{
+	
 		vec3 posRelToLight = vPosRelToLight.xyz / vPosRelToLight.w;
 		if(posRelToLight.x >= -0.5 && posRelToLight.x <= 0.5)
 		{
@@ -182,21 +196,21 @@ void main()
 						if(occlusion > 0.4)
 							occlusion = 0.4;
 					}
-					/*
-					for(int horit = -1; horit<2; horit++)
-					{
-						for(int vert = -1; vert < 2; vert++)
-						{
-							vec2 shadowMapTexCoord = vec2(posRelToLight.x+float(horit)*pixelWidth, posRelToLight.y+float(vert)*pixelHeight);
-							float depthRelToLight = getDepthShadowMap(shadowMapTexCoord);
-							if(posRelToLight.z > depthRelToLight*0.9963 )
-							{
-								if(occlusion > 0.4)
-									occlusion -= (0.4/9.0);
-							}
-						}
-					}
-					*/
+					
+					//for(int horit = -1; horit<2; horit++)
+					//{
+					//	for(int vert = -1; vert < 2; vert++)
+					//	{
+					//		vec2 shadowMapTexCoord = vec2(posRelToLight.x+float(horit)*pixelWidth, posRelToLight.y+float(vert)*pixelHeight);
+					//		float depthRelToLight = getDepthShadowMap(shadowMapTexCoord);
+					//		if(posRelToLight.z > depthRelToLight*0.9963 )
+					//		{
+					//			if(occlusion > 0.4)
+					//				occlusion -= (0.4/9.0);
+					//		}
+					//	}
+					//}
+					
 				}
 			}
 		}

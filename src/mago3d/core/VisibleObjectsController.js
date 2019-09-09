@@ -16,6 +16,7 @@ var VisibleObjectsController = function()
 	this.currentVisibles2 = []; 
 	this.currentVisibles3 = []; 
 	this.currentVisiblesAux = [];
+	this.currentVisibleNativeObjects = [];
 };
 VisibleObjectsController.prototype.initArrays = function() 
 {
@@ -24,6 +25,7 @@ VisibleObjectsController.prototype.initArrays = function()
 	this.currentVisibles2 = [];
 	this.currentVisibles3 = [];
 	this.currentVisiblesAux = [];
+	this.currentVisibleNativeObjects = [];
 };
 /**Clear all of the volumn's data */
 
@@ -34,6 +36,7 @@ VisibleObjectsController.prototype.clear = function()
 	this.currentVisibles2.length = 0;
 	this.currentVisibles3.length = 0;
 	this.currentVisiblesAux.length = 0;
+	this.currentVisibleNativeObjects.length = 0;
 };
 
 /**
@@ -52,6 +55,22 @@ VisibleObjectsController.prototype.get01Visibles = function()
 {
 	var resultVisiblesArray = [].concat(this.currentVisibles0, this.currentVisibles1);
 	return resultVisiblesArray;
+};
+
+/**
+ * Make two volumns : 0, 1
+ */
+VisibleObjectsController.prototype.hasRenderables = function() 
+{
+	if (this.currentVisibles0.length > 0 || 
+		this.currentVisibles1.length > 0 || 
+		this.currentVisibles2.length > 0 || 
+		this.currentVisibles3.length > 0 || 
+		this.currentVisiblesAux.length > 0 || 
+		this.currentVisibleNativeObjects.length > 0 )
+	{ return true; }
+	else
+	{ return false; }
 };
 
 /**
@@ -205,6 +224,27 @@ VisibleObjectsController.prototype.putNodeToArraySortedByDist = function(nodesAr
 	else 
 	{
 		nodesArray.push(node);
+	}
+};
+
+/**
+ * Put the node to given node array
+ * @param nodesArray
+ * @param node
+ */
+VisibleObjectsController.prototype.putNodeByLod = function(node, lod) 
+{
+	if (lod === 0 || lod === 1) 
+	{
+		this.putNodeToArraySortedByDist(this.currentVisibles0, node);
+	}
+	else if (lod === 2) 
+	{
+		this.putNodeToArraySortedByDist(this.currentVisibles2, node);
+	}
+	else if (lod > 2) 
+	{
+		this.putNodeToArraySortedByDist(this.currentVisibles3, node);
 	}
 };
 

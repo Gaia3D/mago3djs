@@ -128,6 +128,22 @@ GeographicCoord.prototype.getMercatorProjection = function(resultPoint2d)
 /**
  * get the GeoLocationDataManager of this feature
  */
+GeographicCoord.prototype.makeDefaultGeoLocationData = function() 
+{
+	if (this.geoLocDataManager === undefined)
+	{ this.geoLocDataManager = new GeoLocationDataManager(); }
+	
+	var geoLocData = this.geoLocDataManager.getCurrentGeoLocationData();
+	if (geoLocData === undefined)
+	{
+		geoLocData = this.geoLocDataManager.newGeoLocationData("default");
+		geoLocData = ManagerUtils.calculateGeoLocationData(this.longitude, this.latitude, this.altitude, undefined, undefined, undefined, geoLocData);
+	}
+};
+
+/**
+ * get the GeoLocationDataManager of this feature
+ */
 GeographicCoord.prototype.getGeoLocationDataManager = function() 
 {
 	if (this.geoLocDataManager === undefined)
@@ -245,6 +261,20 @@ GeographicCoord.prototype.prepareData = function(vboMemManager)
 	}
 	
 	return true;
+};
+
+/**
+ * make the vbo data of this feature
+ * @param {VBOMemoryManager} vboMemManager
+ */
+ 
+GeographicCoord.prototype.readDataFromBuffer = function(dataArrayBuffer, bytesReaded) 
+{
+	// read longitude(64), latitude(64), altitude(32).
+	this.longitude = (new Float64Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+8)))[0]; bytesReaded += 8;
+	this.latitude = (new Float64Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+8)))[0]; bytesReaded += 8;
+	this.altitude = (new Float32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+	return bytesReaded;
 };
 
 /**

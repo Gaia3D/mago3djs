@@ -32,6 +32,8 @@ var ConcentricTubes = function(option, geoLocDataManager)
 	 * @default undefined
 	 */
 	this.tubes = [];
+	
+	this.bbox;
 
 	this.initTube(option.tubeInfos);
 };
@@ -74,6 +76,28 @@ ConcentricTubes.prototype.makeTube = function(option)
 	var tube = new Tube(interiorRadius, exteriorRadius, height, options);
 
 	this.addTube(tube);
+};
+
+/**
+ * Returns the bbox.
+ */
+ConcentricTubes.prototype.getBoundingBox = function()
+{
+	if (this.bbox === undefined)
+	{
+		this.bbox = new BoundingBox();
+		for (var i=0, len=this.getSize(); i<len; i++) 
+		{
+			var tube = this.getTube(i);
+
+			var tubeBbox = tube.getBoundingBox();
+			if (i === 0)
+			{ this.bbox.copyFrom(tubeBbox); }
+			else
+			{ this.bbox.addBox(tubeBbox); }
+		}
+	}
+	return this.bbox;
 };
 
 /**

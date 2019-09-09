@@ -94,44 +94,8 @@ var Renderer = function(manoManager)
  */
 Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, shader, renderTexture, renderType, maxSizeToRender, refMatrixIdxKey) 
 {
-	var node;
-	var rootNode;
-	var geoLocDataManager;
-	var neoBuilding;
-	var minSize = 0.0;
-	var lowestOctreesCount;
-	var lowestOctree;
-	var isInterior = false; // no used.
-	
-	// set webgl options.
-	gl.enable(gl.DEPTH_TEST);
-	if (MagoConfig.getPolicy().geo_cull_face_enable === "true") 
-	{
-		gl.enable(gl.CULL_FACE);
-	}
-	else 
-	{
-		gl.disable(gl.CULL_FACE);
-	}
-
-	gl.enable(gl.CULL_FACE);
-	gl.frontFace(gl.CCW);
-	
-	if (renderType === 2)
-	{
-		shader.disableVertexAttribArray(shader.texCoord2_loc);
-		shader.disableVertexAttribArray(shader.normal3_loc);
-	}
-	if (renderType === 0)
-	{
-		shader.disableVertexAttribArray(shader.texCoord2_loc);
-		shader.disableVertexAttribArray(shader.normal3_loc);
-		shader.disableVertexAttribArray(shader.color4_loc);
-	}
-	
-	var flipYTexCoord = false;
-	
 	// do render.
+	var node;
 	var nodesCount = visibleNodesArray.length;
 	for (var i=0; i<nodesCount; i++)
 	{
@@ -353,16 +317,12 @@ Renderer.prototype.renderObject = function(gl, renderable, magoManager, shader, 
 	if (vbo_vicks_container.vboCacheKeysArray.length === 0) 
 	{ return; }
 	
-
 	if (bRenderLines === undefined)
 	{ bRenderLines = false; }
-
 
 	var vbosCount = vbo_vicks_container.getVbosCount();
 	for (var i=0; i<vbosCount; i++)
 	{
-		
-		
 		// 1) Position.
 		var vbo_vicky = vbo_vicks_container.vboCacheKeysArray[i]; // there are only one.
 
@@ -404,8 +364,6 @@ Renderer.prototype.renderObject = function(gl, renderable, magoManager, shader, 
 			//gl.drawArrays(gl.TRIANGLES, 0, vertices_count);
 		}
 		
-		
-		
 		var glError = gl.getError();
 		if (glError !== gl.NO_ERROR)
 		{ var hola = 0; }
@@ -430,6 +388,7 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 	// Test Modeler Rendering.********************************************************************
 	// Test Modeler Rendering.********************************************************************
 	// Test Modeler Rendering.********************************************************************
+	/*
 	if (magoManager.modeler !== undefined)
 	{
 		currentShader = magoManager.postFxShadersManager.getShader("modelRefDepth"); 
@@ -454,11 +413,12 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 		gl.useProgram(null);
 
 	}
+	*/
 	
-	var nodesLOD0Count = visibleObjControlerNodes.currentVisibles0.length;
-	var nodesLOD2Count = visibleObjControlerNodes.currentVisibles2.length;
-	var nodesLOD3Count = visibleObjControlerNodes.currentVisibles3.length;
-	if (nodesLOD0Count > 0 || nodesLOD2Count > 0 || nodesLOD3Count > 0)
+	//var nodesLOD0Count = visibleObjControlerNodes.currentVisibles0.length;
+	//var nodesLOD2Count = visibleObjControlerNodes.currentVisibles2.length;
+	//var nodesLOD3Count = visibleObjControlerNodes.currentVisibles3.length;
+	if (visibleObjControlerNodes.hasRenderables())
 	{
 		// Make depth for all visible objects.***
 		currentShader = magoManager.postFxShadersManager.getShader("modelRefDepth"); 
@@ -478,7 +438,13 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 		magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
 		magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
 		magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
-		
+		// native objects.
+		var glPrimitive = undefined;
+		var nativeObjectsCount = visibleObjControlerNodes.currentVisibleNativeObjects.length;
+		for (var i=0; i<nativeObjectsCount; i++)
+		{
+			visibleObjControlerNodes.currentVisibleNativeObjects[i].render(magoManager, currentShader, renderType, glPrimitive);
+		}
 		currentShader.disableVertexAttribArray(currentShader.position3_loc); 
 		gl.useProgram(null);
 	}
@@ -575,8 +541,8 @@ Renderer.prototype.renderDepthSunPointOfView = function(gl, visibleObjControlerN
 	var sunLight = magoManager.sceneState.sunLight;
 	
 	// Sun direction.***
-	var sunLongitude = 105.31586919332165;
-	var sunLatitude = 0.0;
+	var sunLongitude = 115.31586919332165;
+	var sunLatitude = 10.0;
 	var sunAltitude = 0.0; // No important.***
 	var sunPosWC = Globe.geographicToCartesianWgs84(sunLongitude, sunLatitude, sunAltitude, undefined);
 	
@@ -598,8 +564,8 @@ Renderer.prototype.renderDepthSunPointOfView = function(gl, visibleObjControlerN
 	var realPosWC = Globe.geographicToCartesianWgs84(realLon, realLat, altitude, undefined);
 	
 	var ortho = new Matrix4();
-	var nRange = 200.0;
-	var left = -nRange, right = nRange, bottom = -nRange, top = nRange, near = -800.0, far = 800.0;
+	var nRange = 500.0;
+	var left = -nRange, right = nRange, bottom = -nRange, top = nRange, near = -2*nRange, far = 2*nRange;
 	ortho._floatArrays = glMatrix.mat4.ortho(ortho._floatArrays, left, right, bottom, top, near, far);
 	
 	sunLight.tMatrix = sunTMatrix.getMultipliedByMatrix(ortho, sunLight.tMatrix);
@@ -631,7 +597,7 @@ Renderer.prototype.renderDepthSunPointOfView = function(gl, visibleObjControlerN
 
 	
 	gl.uniform1i(currentShader.bApplySsao_loc, false); // apply ssao.***
-
+	gl.disable(gl.CULL_FACE);
 	var renderType = 0;
 	
 	// Do render.***
@@ -650,7 +616,8 @@ Renderer.prototype.renderDepthSunPointOfView = function(gl, visibleObjControlerN
 		//magoManager.tinTerrainManager.render(magoManager, bDepth, renderType, currentShader);
 		//gl.useProgram(null);
 	}
-
+	
+	gl.enable(gl.CULL_FACE);
 	currentShader.disableVertexAttribArrayAll();
 	gl.useProgram(null);
 };
@@ -678,8 +645,6 @@ Renderer.prototype.renderImageViewRectangle = function(gl, magoManager, depthFbo
 		currentShader.useProgram();
 		var bApplySsao = false;
 			
-		gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
-		gl.uniform1i(currentShader.bApplySpecularLighting_loc, false);
 		gl.uniform1i(currentShader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.
 			
 		gl.enableVertexAttribArray(currentShader.texCoord2_loc);
@@ -763,7 +728,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			// Test sunLight.***
 			if (magoManager.sceneState.sunLight === undefined)
 			{
-				var lightType = 2;
+				var lightType = 2; // 2 = directional light.
 				magoManager.sceneState.sunLight = new LightSource(lightType);
 			}
 			
@@ -796,8 +761,8 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 	}
 	if (renderType === 1) 
 	{
-		var textureAux1x1 = magoManager.texturesManager.getTextureAux1x1();
-		var noiseTexture = magoManager.texturesManager.getNoiseTexture4x4();
+		var textureAux1x1 = magoManager.texturesStore.getTextureAux1x1();
+		var noiseTexture = magoManager.texturesStore.getNoiseTexture4x4();
 		
 
 		// Test TinTerrain.**************************************************************************
@@ -889,8 +854,10 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 
 		var bApplySsao = false;
 		var bApplyShadow = false;
-		if (magoManager.currentFrustumIdx === 0)
+		if (magoManager.currentFrustumIdx < 2)
 		{ bApplySsao = true; }
+	
+		//bApplySsao = true;
 	
 		if (magoManager.sunDepthFbo !== undefined)
 		{ bApplyShadow = true; }
@@ -898,6 +865,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		// Test Modeler Rendering.********************************************************************
 		// Test Modeler Rendering.********************************************************************
 		// Test Modeler Rendering.********************************************************************
+		/*
 		if (magoManager.modeler !== undefined)
 		{
 			currentShader = magoManager.postFxShadersManager.getShader("modelRefSsao"); 
@@ -953,6 +921,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			currentShader.disableVertexAttribArrayAll();
 			gl.useProgram(null);
 		}
+		*/
 		
 		// check changesHistory.
 		magoManager.checkChangesHistoryMovements(visibleObjControlerNodes.currentVisibles0);
@@ -965,15 +934,12 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		magoManager.checkChangesHistoryColors(visibleObjControlerNodes.currentVisibles3);
 			
 		// ssao render.************************************************************************************************************
-		var nodesLOD0Count = visibleObjControlerNodes.currentVisibles0.length;
-		var nodesLOD2Count = visibleObjControlerNodes.currentVisibles2.length;
-		var nodesLOD3Count = visibleObjControlerNodes.currentVisibles3.length;
-		if (nodesLOD0Count > 0 || nodesLOD2Count > 0 || nodesLOD3Count > 0)
+		var visibleObjectControllerHasRenderables = visibleObjControlerNodes.hasRenderables();
+		if (visibleObjectControllerHasRenderables)
 		{
 			gl.enable(gl.BLEND);
 			currentShader = magoManager.postFxShadersManager.getShader("modelRefSsao"); 
 			currentShader.useProgram();
-		
 			gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
 			gl.uniform1i(currentShader.bApplyShadow_loc, bApplyShadow);
 			gl.uniform1i(currentShader.bApplySpecularLighting_loc, true);
@@ -1015,22 +981,36 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 				gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
 			}
 
-
+			/*
+			if (MagoConfig.getPolicy().geo_cull_face_enable === "true") 
+			{ gl.enable(gl.CULL_FACE); }
+			else 
+			{ gl.disable(gl.CULL_FACE); }
+			*/
+			gl.enable(gl.CULL_FACE);
 			var refTMatrixIdxKey = 0;
 			var minSizeToRender = 0.0;
 			var renderType = 1;
 			var refMatrixIdxKey =0; // provisionally set magoManager var here.***
-			magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
+			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 			
 			//bApplySsao = false;
 			//gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); 
 
-			magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
-			magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
+			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
+			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
+			
+			// native objects.
+			var nativeObjectsCount = visibleObjControlerNodes.currentVisibleNativeObjects.length;
+			for (var i=0; i<nativeObjectsCount; i++)
+			{
+				visibleObjControlerNodes.currentVisibleNativeObjects[i].render(magoManager, currentShader, renderType, glPrimitive);
+			}
 			
 			currentShader.disableVertexAttribArrayAll();
 			gl.useProgram(null);
 		}
+		
 		
 		// If there are an object selected, then there are a stencilBuffer.******************************************
 		if (magoManager.nodeSelected) // if there are an object selected then there are a building selected.***
@@ -1249,8 +1229,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		
 		
 		// 3) now render bboxes.*******************************************************************************************************************
-		var nodesPcloudCount = magoManager.visibleObjControlerNodes.currentVisiblesAux.length;
-		if (nodesLOD0Count > 0 || nodesLOD2Count > 0 || nodesLOD3Count > 0 || nodesPcloudCount > 0)
+		if (visibleObjectControllerHasRenderables)
 		{
 			if (magoManager.magoPolicy.getShowBoundingBox())
 			{
@@ -1445,7 +1424,7 @@ Renderer.prototype.renderAxisNodes = function(nodesArray, renderType)
 		gl.enable(gl.BLEND);
 	}
 	
-	var noiseTexture = magoManager.texturesManager.getNoiseTexture4x4();
+	var noiseTexture = magoManager.texturesStore.getNoiseTexture4x4();
 	
 	// Test rendering by modelRefShader.****
 	currentShader.useProgram();
@@ -1463,7 +1442,7 @@ Renderer.prototype.renderAxisNodes = function(nodesArray, renderType)
 		
 	if (renderType === 1)
 	{
-		var textureAux1x1 = magoManager.texturesManager.getTextureAux1x1();
+		var textureAux1x1 = magoManager.texturesStore.getTextureAux1x1();
 		
 		// provisionally render all native projects.***
 		gl.enableVertexAttribArray(currentShader.normal3_loc);
@@ -1588,7 +1567,7 @@ Renderer.prototype.renderBoundingBoxesNodes = function(nodesArray, color, bRende
 	gl.uniform1f(currentShader.screenWidth_loc, magoManager.sceneState.drawingBufferWidth);	
 	gl.uniform1f(currentShader.screenHeight_loc, magoManager.sceneState.drawingBufferHeight);
 
-	var noiseTexture = magoManager.texturesManager.getNoiseTexture4x4();
+	var noiseTexture = magoManager.texturesStore.getNoiseTexture4x4();
 	gl.uniform2fv(currentShader.noiseScale2_loc, [magoManager.depthFboNeo.width/noiseTexture.width, magoManager.depthFboNeo.height/noiseTexture.height]);
 	gl.uniform3fv(currentShader.kernel16_loc, magoManager.kernel);
 	gl.activeTexture(gl.TEXTURE0);
@@ -1662,7 +1641,7 @@ Renderer.prototype.renderFilter = function()
 	currentShader.useProgram();
 	gl.uniform1i(currentShader.bApplySsao_loc, true); // apply ssao default.***
 	
-	var noiseTexture = magoManager.texturesManager.getNoiseTexture4x4();
+	var noiseTexture = magoManager.texturesStore.getNoiseTexture4x4();
 	
 	gl.enable(gl.BLEND);
 	gl.disable(gl.DEPTH_TEST);
@@ -1709,6 +1688,7 @@ Renderer.prototype.renderGeometryColorCoding = function(visibleObjControlerNodes
 	var renderType = 2; // 0 = depthRender, 1= colorRender, 2 = selectionRender.***
 	
 	// Render mago modeler objects.***
+	/*
 	if (magoManager.modeler !== undefined)
 	{
 		currentShader = magoManager.postFxShadersManager.getShader("modelRefColorCoding"); 
@@ -1727,6 +1707,7 @@ Renderer.prototype.renderGeometryColorCoding = function(visibleObjControlerNodes
 		currentShader.disableVertexAttribArrayAll();
 		gl.useProgram(null);
 	}
+	*/
 	
 	// Render f4d objects.***
 	//if (magoManager.selectionFbo.dirty) // todo.
@@ -1748,6 +1729,13 @@ Renderer.prototype.renderGeometryColorCoding = function(visibleObjControlerNodes
 		magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 		magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 		magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
+		// native objects.
+		var glPrimitive = undefined;
+		var nativeObjectsCount = visibleObjControlerNodes.currentVisibleNativeObjects.length;
+		for (var i=0; i<nativeObjectsCount; i++)
+		{
+			visibleObjControlerNodes.currentVisibleNativeObjects[i].render(magoManager, currentShader, renderType, glPrimitive);
+		}
 
 		gl.enable(gl.CULL_FACE);
 		currentShader.disableVertexAttribArray(currentShader.position3_loc);
@@ -1757,7 +1745,6 @@ Renderer.prototype.renderGeometryColorCoding = function(visibleObjControlerNodes
 		if (magoManager.weatherStation)
 		{ magoManager.weatherStation.test_renderCuttingPlanes(magoManager, renderType); }
 	}
-	
 	if (magoManager.magoPolicy.objectMoveMode === CODE.moveMode.GEOGRAPHICPOINTS)
 	{
 		// render geographicCoords of the modeler.***
@@ -1783,6 +1770,7 @@ Renderer.prototype.renderGeometryColorCoding = function(visibleObjControlerNodes
 		magoManager.tinTerrainManager.render(magoManager, bDepth, renderType);
 		gl.useProgram(null);
 	}
+	
 }; 
 
 
@@ -1893,8 +1881,8 @@ Renderer.prototype.renderMagoGeometries = function(renderType)
 		
 	if (renderType === 1)
 	{
-		var textureAux1x1 = magoManager.texturesManager.getTextureAux1x1();
-		var noiseTexture = magoManager.texturesManager.getNoiseTexture4x4();
+		var textureAux1x1 = magoManager.texturesStore.getTextureAux1x1();
+		var noiseTexture = magoManager.texturesStore.getNoiseTexture4x4();
 		
 		// provisionally render all native projects.***
 		gl.enableVertexAttribArray(currentShader.normal3_loc);

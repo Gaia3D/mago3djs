@@ -6,12 +6,14 @@
  * Now under implementation
  * @class Modeler
  */
-var Modeler = function() 
+var Modeler = function(magoManager) 
 {
 	if (!(this instanceof Modeler)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
+	
+	this.magoManager = magoManager;
 	
 	/**
 	 * Current modeler's mode. 
@@ -28,10 +30,10 @@ var Modeler = function()
 	this.geoCoordsList; // class: GeographicCoordsList. geographic polyline.
 	this.excavation; // class : Excavation.
 	this.tunnel; // class : Tunnel.
-	this.basicFactorysArray; // class : BasicFactory.
 	this.bSplineCubic3d;
 	
 	this.objectsArray; // put here all objects.***
+	this.currentVisibleObjectsArray;
 };
 
 /**
@@ -104,6 +106,10 @@ Modeler.prototype.addObject = function(object)
 	{ this.objectsArray = []; }
 
 	this.objectsArray.push(object);
+	
+	var smartTileManager = this.magoManager.smartTileManager;
+	var targetDepth = 17;
+	smartTileManager.putObject(targetDepth, object, this);
 };
 
 /**
@@ -111,13 +117,41 @@ Modeler.prototype.addObject = function(object)
  */
 Modeler.prototype.newBasicFactory = function(factoryWidth, factoryLength, factoryHeight, options) 
 {
+	// set material for the roof of the factory.
+	var magoManager = this.magoManager;
+	var materialsManager = magoManager.materialsManager;
+	var materialName = "basicFactoryRoof";
+	var material = materialsManager.getOrNewMaterial(materialName);
+	if (material.diffuseTexture === undefined)
+	{ 
+		material.diffuseTexture = new Texture(); 
+		material.diffuseTexture.textureTypeName = "diffuse";
+		material.diffuseTexture.textureImageFileName = "factoryRoof.jpg"; // Gaia3dLogo.png
+		var imagesPath = materialsManager.imagesPath + "//" + material.diffuseTexture.textureImageFileName;
+		var flipYTexCoord = true;
+		TexturesManager.loadTexture(imagesPath, material.diffuseTexture, magoManager, flipYTexCoord);
+	}
+	
+	// add options.
+	if (options === undefined)
+	{ options = {}; }
+	
+	options.roof = {
+		"material": material
+	};
+	
+	
 	var basicFactory = new BasicFactory(factoryWidth, factoryLength, factoryHeight, options);
 	basicFactory.bHasGround = true;
 	
-	if (this.basicFactorysArray === undefined)
-	{ this.basicFactorysArray = []; }
+	if (this.objectsArray === undefined)
+	{ this.objectsArray = []; }
 	
-	this.basicFactorysArray.push(basicFactory);
+	this.objectsArray.push(basicFactory);
+	
+	
+
+	
 	
 	return basicFactory;
 };
@@ -225,6 +259,7 @@ Modeler.prototype.addPointToPolyline = function(point2d)
 Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive) 
 {
 	// Generic objects.***
+	/*
 	if (this.objectsArray !== undefined)
 	{
 		var objectsCount = this.objectsArray.length;
@@ -232,20 +267,13 @@ Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive
 		{
 			this.objectsArray[i].render(magoManager, shader, renderType, glPrimitive);
 		}
-		
 	}
+	*/
 	
 	// 1rst, render the planeGrid if exist.
 	if (this.planeGrid !== undefined)
 	{
 		this.planeGrid.render(magoManager, shader);
-	}
-	
-	if (this.polyLine2d !== undefined)
-	{
-		// Provisionally render the polyLine2d on the sketch plane here.
-		var points2dCount = this.polyLine2d.getPointsCount();
-		
 	}
 	
 	if (this.geoCoordsList !== undefined)
@@ -264,15 +292,6 @@ Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive
 		this.tunnel.renderPoints(magoManager, shader, renderType);
 	}
 	
-	if (this.basicFactorysArray !== undefined)
-	{
-		var factoriesCount = this.basicFactorysArray.length;
-		for (var i=0; i<factoriesCount; i++)
-		{
-			this.basicFactorysArray[i].render(magoManager, shader, renderType, glPrimitive);
-		}
-		
-	}
 	
 	if (this.bSplineCubic3d !== undefined)
 	{

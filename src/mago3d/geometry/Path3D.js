@@ -61,7 +61,7 @@ Path3D.prototype.getTangent = function(linearPosition, resultTangentLine, magoMa
 	}
 	
 	var bSplineCubic3d = this.curvesArray[0];
-	var resultTangentLine = BSplineCubic3D.getTangent(bSplineCubic3d, linearPosition, resultTangentLine);
+	var resultTangentLine = BSplineCubic3D.getTangent(bSplineCubic3d, linearPosition, resultTangentLine, magoManager);
 	return resultTangentLine;
 };
 
@@ -79,7 +79,7 @@ Path3D.prototype.getGeoLocationDataManager = function()
 	if (bSplineCubic3d === undefined)
 	{ return; }
 	
-	return bSplineCubic3d.knotPoints3dList.geoLocDataManager;
+	return bSplineCubic3d.knotPoints3dList.geoLocDataManager; // provisional.***
 };
 
 /**

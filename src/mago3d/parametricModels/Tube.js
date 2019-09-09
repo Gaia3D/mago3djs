@@ -26,6 +26,7 @@ var Tube = function(interiorRadius, exteriorRadius, height, options)
 	
 	this.dirty = true;
 	this.mesh;
+	this.bbox;
 	
 	/**
 	 * The geographic location of the factory.
@@ -44,6 +45,23 @@ var Tube = function(interiorRadius, exteriorRadius, height, options)
 			this.color4.setRGBA(color.r, color.g, color.b, color.a);
 		}
 	}
+};
+
+/**
+ * Returns the bbox.
+ */
+Tube.prototype.getBoundingBox = function()
+{
+	if (this.bbox === undefined)
+	{
+		this.bbox = new BoundingBox();
+		var maxRadius = this.extRadius;
+		if (maxRadius < this.intRadius)
+		{ maxRadius = this.intRadius; }
+		
+		this.bbox.set(-maxRadius, -maxRadius, 0.0, maxRadius, maxRadius, this.height);
+	}
+	return this.bbox;
 };
 
 /**

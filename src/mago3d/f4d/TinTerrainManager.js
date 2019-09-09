@@ -10,7 +10,7 @@ var TinTerrainManager = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	this.maxDepth = 17;
+	this.maxDepth = 18;
 	this.currentVisibles_terrName_geoCoords_map = {}; // current visible terrains map[terrainPathName, geographicCoords].
 	this.currentTerrainsMap = {}; // current terrains (that was created) map[terrainPathName, tinTerrain].
 	
@@ -265,7 +265,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	
 	currentShader.bindUniformGenerals();
 
-	var tex = magoManager.texturesManager.getTextureAux1x1(); // provisional.
+	var tex = magoManager.texturesStore.getTextureAux1x1(); // provisional.
 	gl.activeTexture(gl.TEXTURE2); 
 	gl.bindTexture(gl.TEXTURE_2D, tex.texId);
 	

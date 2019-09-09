@@ -4,7 +4,7 @@
  * BSplineCubic3D represented in 3D
  * @class BSplineCubic3D
  */
-var BSplineCubic3D = function() 
+var BSplineCubic3D = function(options) 
 {
 	if (!(this instanceof BSplineCubic3D)) 
 	{
@@ -36,6 +36,18 @@ var BSplineCubic3D = function()
 	this.vtxProfilesList;
 	this.vboKeysContainer;
 	this.vboKeysContainerEdges;
+	
+	if (options)
+	{
+		if (options.knotPoints3dArray)
+		{
+			if (this.knotPoints3dList === undefined)
+			{
+				this.knotPoints3dList = new Point3DList();
+				this.knotPoints3dList.pointsArray = options.knotPoints3dArray;
+			}
+		}
+	}
 };
 
 /**
@@ -50,6 +62,30 @@ BSplineCubic3D.prototype.getGeographicCoordsList = function()
 	}
 	
 	return this.geoCoordsList;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+BSplineCubic3D.prototype.getGeoLocationDataManager = function(magoManager) 
+{
+	if (this.geoLocDataManager === undefined)
+	{
+		// Take the 1rst geoCoord, if exist, and make the geoLocationData.***
+		if (this.geoCoordsList !== undefined)
+		{
+			var geoCoord = this.geoCoordsList.getGeoCoord(0);
+			if (geoCoord !== undefined)
+			{
+				this.geoLocDataManager = new GeoLocationDataManager();
+				var geoLoc = this.geoLocDataManager.newGeoLocationData("default");
+				var heading, pitch, roll;
+				geoLoc = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude, heading, pitch, roll, geoLoc, magoManager);
+			}
+		}
+	}
+	
+	return this.geoLocDataManager;
 };
 
 /**
@@ -97,6 +133,21 @@ BSplineCubic3D.prototype.renderPoints = function(magoManager, shader, renderType
 		//var lineWidthRange = gl.getParameter(gl.ALIASED_LINE_WIDTH_RANGE);
 		
 	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+BSplineCubic3D.prototype.makeKnotPointsFromGeoCoordsList = function(magoManager) 
+{
+	if (this.geoCoordsList.points3dList === undefined)
+	{ this.geoCoordsList.makeLines(magoManager); }
+	
+	this.knotPoints3dList = new Point3DList();
+	this.knotPoints3dList.pointsArray = this.geoCoordsList.points3dList.pointsArray;
+	
+	// Transfer the geoLocationDataManager too.***
+	this.knotPoints3dList.geoLocDataManager = this.geoCoordsList.points3dList.geoLocDataManager;
 };
 
 /**
@@ -268,6 +319,46 @@ BSplineCubic3D.getLengthForSegment = function(strPoint, strControlPoint, endCont
 };
 
 /**
+ * This function returns the length of the splineSegment at the unitaryPosition.
+ */
+BSplineCubic3D.getLength = function(bSpline, interpolationsCount) 
+{
+	if (bSpline === undefined || bSpline.knotPoints3dList === undefined)
+	{ return undefined; }
+	
+	var kNotsCount = bSpline.knotPoints3dList.getPointsCount();
+	if (bSpline.segmentLengthArray === undefined)
+	{
+		// Calculate all segments length of the bSpline.***
+		bSpline.segmentLengthArray = [];
+		if (interpolationsCount === undefined)
+		{ interpolationsCount = 20; }
+		var unitaryPosition = 1;
+		var bLoop; // undefined.
+		for (var i=0; i<kNotsCount-1; i++)
+		{
+			var currSegment = bSpline.knotPoints3dList.getSegment3D(i, undefined, bLoop);
+			var strPoint = currSegment.startPoint3d;
+			var endPoint = currSegment.endPoint3d;
+			
+			var strControlPoint = bSpline.controlPoints3dMap[i].outingControlPoint;
+			var endControlPoint = bSpline.controlPoints3dMap[i+1].inningControlPoint;
+			
+			var length = BSplineCubic3D.getLengthForSegment(strPoint, strControlPoint, endControlPoint, endPoint, unitaryPosition, interpolationsCount);
+			bSpline.segmentLengthArray[i] = length;
+		}
+	}
+	
+	var totalLength = 0;
+	for (var i=0; i<kNotsCount-1; i++)
+	{
+		totalLength += bSpline.segmentLengthArray[i];
+	}
+	
+	return totalLength;
+};
+
+/**
  * This function returns the unitaryPosition of the splineSegment at the linearPosition.
  */
 BSplineCubic3D.getUnitaryPositionForSegmentAtLinearPosition = function(strPoint, strControlPoint, endControlPoint, endPoint, linearPosition, interpolationsCount) 
@@ -335,14 +426,23 @@ BSplineCubic3D.getUnitaryPositionForSegmentAtLinearPosition = function(strPoint,
 		prevPoint.set(x, y, z);
 	}
 	
+	if (resultUnitaryPosition === undefined)
+	{ resultUnitaryPosition = 1.0; }
+	
 	return resultUnitaryPosition;
 };
 
 /**
  * This function returns the tangent line of the splineSegment at the unitaryPosition.
  */
-BSplineCubic3D.getTangent = function(bSpline, linearPosition, resultTangentLine) 
+BSplineCubic3D.getTangent = function(bSpline, linearPosition, resultTangentLine, magoManager) 
 {
+	if (bSpline.knotPoints3dList === undefined)
+	{
+		var controlPointArmLength = 0.3;
+		bSpline.makeControlPoints(controlPointArmLength, magoManager);
+	}
+	
 	// "linearPosition" is a length measurement.***
 	var kNotsCount = bSpline.knotPoints3dList.getPointsCount();
 	

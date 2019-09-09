@@ -16,8 +16,9 @@ var Texture = function()
 
 	this.textureTypeName = "";
 	this.textureImageFileName = "";
-	this.texId;
+	this.texId; // webGlTexture.
 	this.fileLoadState = CODE.fileLoadState.READY;
+	this.imageBinaryData;
 };
 
 /**
@@ -28,12 +29,13 @@ Texture.prototype.deleteObjects = function(gl)
 {
 	this.textureTypeName = undefined;
 	this.textureImageFileName = undefined;
-	if (this.texId)
+	if (this.texId !== undefined)
 	{
 		gl.deleteTexture(this.texId);
 	}
 	this.texId = undefined;
 	this.fileLoadState = undefined;
+	this.imageBinaryData = undefined;
 };
 
 /**

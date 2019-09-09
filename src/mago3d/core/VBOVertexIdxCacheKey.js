@@ -77,14 +77,126 @@ VBOVertexIdxCacheKey.prototype.stepOverPosNorIdx = function(arrayBuffer, readWri
 /**
  * 어떤 일을 하고 있습니까?
  */
-VBOVertexIdxCacheKey.prototype.readPosNorIdx = function(arrayBuffer, readWriter, vboMemManager, bytesReaded) 
+VBOVertexIdxCacheKey.prototype.readPositions = function(arrayBuffer, vboMemManager, bytesReaded) 
 {
+	// glType: (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
+	// 1) read glType.
+	var glType = (new Uint16Array(arrayBuffer.slice(bytesReaded, bytesReaded+2)))[0]; bytesReaded += 2;
+	
+	// 2) read dimensions.
+	var dimensions = (new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
+	
+	// 3) read vertex count.
+	var vertexCount = (new Uint32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+	
+	// 4) finally read data buffer.
+	var verticesFloatValuesCount = vertexCount * dimensions;
+	var startBuff = bytesReaded;
+	var byteSize = VboBuffer.getByteSizeByGlType(glType);
+	var endBuff = bytesReaded + byteSize * verticesFloatValuesCount;
+	var dataBuffer = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
+	bytesReaded = bytesReaded + byteSize * verticesFloatValuesCount; // updating data.
+	
+	this.setDataArrayPos(dataBuffer, vboMemManager);
+	
+	return bytesReaded;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+VBOVertexIdxCacheKey.prototype.readNormals = function(arrayBuffer, vboMemManager, bytesReaded) 
+{
+	// glType: (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
+	// 1) read glType.
+	var glType = (new Uint16Array(arrayBuffer.slice(bytesReaded, bytesReaded+2)))[0]; bytesReaded += 2;
+	
+	// 2) read dimensions.
+	var dimensions = (new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
+	
+	// 3) read vertex count.
+	var vertexCount = (new Uint32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+	
+	// 4) finally read data buffer.
+	var verticesFloatValuesCount = vertexCount * dimensions;
+	var startBuff = bytesReaded;
+	var byteSize = VboBuffer.getByteSizeByGlType(glType);
+	var endBuff = bytesReaded + byteSize * verticesFloatValuesCount;
+	var dataBuffer = new Int8Array(arrayBuffer.slice(startBuff, endBuff));
+	bytesReaded = bytesReaded + byteSize * verticesFloatValuesCount; // updating data.
+	
+	this.setDataArrayNor(dataBuffer, vboMemManager);
+	
+	return bytesReaded;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+VBOVertexIdxCacheKey.prototype.readTexCoords = function(arrayBuffer, vboMemManager, bytesReaded) 
+{
+	// glType: (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
+	// 1) read glType.
+	var glType = (new Uint16Array(arrayBuffer.slice(bytesReaded, bytesReaded+2)))[0]; bytesReaded += 2;
+	
+	// 2) read dimensions.
+	var dimensions = (new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
+	
+	// 3) read vertex count.
+	var vertexCount = (new Uint32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+	
+	// 4) finally read data buffer.
+	var verticesFloatValuesCount = vertexCount * dimensions;
+	var startBuff = bytesReaded;
+	var byteSize = VboBuffer.getByteSizeByGlType(glType);
+	var endBuff = bytesReaded + byteSize * verticesFloatValuesCount;
+	var dataBuffer = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
+	bytesReaded = bytesReaded + byteSize * verticesFloatValuesCount; // updating data.
+	
+	this.setDataArrayTexCoord(dataBuffer, vboMemManager);
+	
+	return bytesReaded;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+VBOVertexIdxCacheKey.prototype.readColors = function(arrayBuffer, vboMemManager, bytesReaded) 
+{
+	// glType: (5120 signed byte), (5121 unsigned byte), (5122 signed short), (5123 unsigned short), (5126 float)
+	// 1) read glType.
+	var glType = (new Uint16Array(arrayBuffer.slice(bytesReaded, bytesReaded+2)))[0]; bytesReaded += 2;
+	
+	// 2) read dimensions.
+	var dimensions = (new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
+	
+	// 3) read vertex count.
+	var vertexCount = (new Uint32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+	
+	// 4) finally read data buffer.
+	var verticesFloatValuesCount = vertexCount * dimensions;
+	var startBuff = bytesReaded;
+	var byteSize = VboBuffer.getByteSizeByGlType(glType);
+	var endBuff = bytesReaded + byteSize * verticesFloatValuesCount;
+	var dataBuffer = new Int8Array(arrayBuffer.slice(startBuff, endBuff));
+	bytesReaded = bytesReaded + byteSize * verticesFloatValuesCount; // updating data.
+	
+	this.setDataArrayCol(dataBuffer, vboMemManager);
+	
+	return bytesReaded;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+VBOVertexIdxCacheKey.prototype.readPosNorIdx = function(arrayBuffer, vboMemManager, bytesReaded) 
+{
+	// Function used by blocksList.
 	var startBuff, endBuff;
 	
 	// 1) Positions array.
-	var vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+	var vertexCount = (new Uint32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 	this.vertexCount = vertexCount;
-	bytesReaded += 4;
 	var verticesFloatValuesCount = vertexCount * 3;
 	
 	startBuff = bytesReaded;
@@ -95,8 +207,7 @@ VBOVertexIdxCacheKey.prototype.readPosNorIdx = function(arrayBuffer, readWriter,
 	bytesReaded = bytesReaded + 4 * verticesFloatValuesCount; // updating data.
 	
 	// 2) Normals.
-	vertexCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
-	bytesReaded += 4;
+	vertexCount = (new Uint32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 	var normalByteValuesCount = vertexCount * 3;
 	startBuff = bytesReaded;
 	endBuff = bytesReaded + 1 * normalByteValuesCount;
@@ -106,11 +217,9 @@ VBOVertexIdxCacheKey.prototype.readPosNorIdx = function(arrayBuffer, readWriter,
 	bytesReaded = bytesReaded + 1 * normalByteValuesCount; // updating data.
 	
 	// 3) Indices.
-	var shortIndicesValuesCount = readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4);
+	var shortIndicesValuesCount = (new Uint32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 
-	bytesReaded += 4;
-	var sizeLevels = readWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1);
-	bytesReaded +=1;
+	var sizeLevels = (new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
 	var sizeThresholds = [];
 	for ( var k = 0; k < sizeLevels; k++ )
 	{
@@ -120,7 +229,7 @@ VBOVertexIdxCacheKey.prototype.readPosNorIdx = function(arrayBuffer, readWriter,
 	var indexMarkers = [];
 	for ( var k = 0; k < sizeLevels; k++ )
 	{
-		indexMarkers.push(readWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4));
+		indexMarkers.push(new Uint32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)));
 		bytesReaded += 4;
 	}
 	var bigTrianglesShortIndicesValues_count = indexMarkers[sizeLevels-1];
@@ -141,25 +250,8 @@ VBOVertexIdxCacheKey.prototype.bindDataPosition = function(shader, vboMemManager
 {
 	if (shader === undefined)
 	{ return false; }
-	
-	var gl = shader.gl;
-	var vboBufferPos = this.vboBufferPos;
-	if (!vboBufferPos.isReady(gl, vboMemManager))
-	{ return false; }
-	
-	if (shader.position3_loc !== undefined && shader.position3_loc !== -1) 
-	{
-		shader.enableVertexAttribArray(shader.position3_loc);
-		if (vboBufferPos.key !== shader.last_vboPos_binded)
-		{
-			gl.bindBuffer(vboBufferPos.dataTarget, vboBufferPos.key);
-			gl.vertexAttribPointer(shader.position3_loc, 3, vboBufferPos.dataGlType, false, 0, 0);
-			shader.last_vboPos_binded = vboBufferPos.key;
-		}
-		return true;
-	}
-	else { shader.disableVertexAttribArray(shader.position3_loc); }
-	return false;
+
+	return this.vboBufferPos.bindData(shader, shader.position3_loc, vboMemManager);
 };
 
 /**
@@ -177,23 +269,7 @@ VBOVertexIdxCacheKey.prototype.bindDataNormal = function(shader, vboMemManager)
 		return true; // Return "true" bcos there are no "normal" data, that is different that having "normal" data and not prepared yet.
 	}
 	
-	var gl = shader.gl;
-	if (!vboBufferNor.isReady(gl, vboMemManager))
-	{ return false; }
-	
-	if (shader.normal3_loc !== undefined && shader.normal3_loc !== -1) 
-	{
-		shader.enableVertexAttribArray(shader.normal3_loc);
-		if (vboBufferNor.key !== shader.last_vboNor_binded)
-		{
-			gl.bindBuffer(vboBufferNor.dataTarget, vboBufferNor.key);
-			gl.vertexAttribPointer(shader.normal3_loc, 3, vboBufferNor.dataGlType, true, 0, 0);
-			shader.last_vboNor_binded = vboBufferNor.key;
-		}
-		return true;
-	}
-	else { shader.disableVertexAttribArray(shader.normal3_loc); }
-	return false;
+	return vboBufferNor.bindData(shader, shader.normal3_loc, vboMemManager);
 };
 
 /**
@@ -211,21 +287,7 @@ VBOVertexIdxCacheKey.prototype.bindDataTexCoord = function(shader, vboMemManager
 		return true; // Return "true" bcos there are no "tCoord" data, that is different that having "tCoord" data and not prepared yet.
 	}
 	
-	var gl = shader.gl;
-	if (!vboBufferTCoord.isReady(gl, vboMemManager))
-	{ return false; }
-	if (shader.texCoord2_loc !== undefined && shader.texCoord2_loc !== -1) 
-	{
-		shader.enableVertexAttribArray(shader.texCoord2_loc);
-		if (vboBufferTCoord.key !== shader.last_vboTexCoord_binded)
-		{
-			gl.bindBuffer(vboBufferTCoord.dataTarget, vboBufferTCoord.key);
-			gl.vertexAttribPointer(shader.texCoord2_loc, 2, vboBufferTCoord.dataGlType, false, 0, 0);
-			shader.last_vboTexCoord_binded = vboBufferTCoord.key;
-		}
-		return true;
-	}
-	else { shader.disableVertexAttribArray(shader.texCoord2_loc); }
+	return vboBufferTCoord.bindData(shader, shader.texCoord2_loc, vboMemManager);
 };
 
 /**
@@ -243,23 +305,7 @@ VBOVertexIdxCacheKey.prototype.bindDataColor = function(shader, vboMemManager)
 		return true; // Return "true" bcos there are no "color" data, that is different that having "color" data and not prepared yet.
 	}
 	
-	var gl = shader.gl;
-	if (!vboBufferCol.isReady(gl, vboMemManager))
-	{ return false; }
-
-	if (shader.color4_loc !== undefined && shader.color4_loc !== -1) 
-	{
-		shader.enableVertexAttribArray(shader.color4_loc);
-		if (vboBufferCol.key !== shader.last_vboCol_binded)
-		{
-			gl.bindBuffer(vboBufferCol.dataTarget, vboBufferCol.key);
-			gl.vertexAttribPointer(shader.color4_loc, 4, vboBufferCol.dataGlType, true, 0, 0);
-			shader.last_vboCol_binded = vboBufferCol.key;
-		}
-		return true;
-	}
-	else { shader.disableVertexAttribArray(shader.color4_loc); }
-	return false;
+	return vboBufferCol.bindData(shader, shader.color4_loc, vboMemManager);
 };
 
 /**
@@ -276,10 +322,10 @@ VBOVertexIdxCacheKey.prototype.bindDataIndice = function(shader, vboMemManager)
 	if (!vboBufferIdx.isReady(gl, vboMemManager))
 	{ return false; }
 	
-	if (vboBufferIdx.key !== shader.last_vboIdx_binded)
+	if (vboBufferIdx.key !== shader.lastVboKeyBindedMap.elemIdx)
 	{
 		gl.bindBuffer(vboBufferIdx.dataTarget, vboBufferIdx.key);
-		shader.last_vboIdx_binded = vboBufferIdx.key;
+		shader.lastVboKeyBindedMap.elemIdx = vboBufferIdx.key;
 	}
 	return true;
 };
@@ -295,8 +341,9 @@ VBOVertexIdxCacheKey.prototype.setDataArrayPos = function(posDataArray, vboMemMa
 	var gl = vboMemManager.gl;
 	if (this.vboBufferPos === undefined)
 	{ this.vboBufferPos = new VboBuffer(gl.ARRAY_BUFFER); }
-	
-	this.vboBufferPos.setDataArray(posDataArray, vboMemManager);
+	var dimensions = 3;
+	var normalized = false;
+	this.vboBufferPos.setDataArray(posDataArray, dimensions, normalized, vboMemManager);
 	this.vertexCount = this.vboBufferPos.dataLength/3;
 };
 
@@ -305,11 +352,16 @@ VBOVertexIdxCacheKey.prototype.setDataArrayPos = function(posDataArray, vboMemMa
  */
 VBOVertexIdxCacheKey.prototype.setDataArrayNor = function(norDataArray, vboMemManager) 
 {
+	if (norDataArray === undefined)
+	{ return; }
+
 	var gl = vboMemManager.gl;
 	if (this.vboBufferNor === undefined)
 	{ this.vboBufferNor = new VboBuffer(gl.ARRAY_BUFFER); }
 	
-	this.vboBufferNor.setDataArray(norDataArray, vboMemManager);
+	var dimensions = 3;
+	var normalized = true;
+	this.vboBufferNor.setDataArray(norDataArray, dimensions, normalized, vboMemManager);
 };
 
 /**
@@ -317,11 +369,16 @@ VBOVertexIdxCacheKey.prototype.setDataArrayNor = function(norDataArray, vboMemMa
  */
 VBOVertexIdxCacheKey.prototype.setDataArrayIdx = function(idxDataArray, vboMemManager) 
 {
+	if (idxDataArray === undefined)
+	{ return; }
+
 	var gl = vboMemManager.gl;
 	if (this.vboBufferIdx === undefined)
 	{ this.vboBufferIdx = new VboBuffer(gl.ELEMENT_ARRAY_BUFFER); }
 	
-	this.vboBufferIdx.setDataArray(idxDataArray, vboMemManager);
+	var dimensions = 1;
+	var normalized = false;
+	this.vboBufferIdx.setDataArray(idxDataArray, dimensions, normalized, vboMemManager);
 	this.indicesCount = this.vboBufferIdx.dataLength;
 };
 
@@ -330,12 +387,16 @@ VBOVertexIdxCacheKey.prototype.setDataArrayIdx = function(idxDataArray, vboMemMa
  */
 VBOVertexIdxCacheKey.prototype.setDataArrayCol = function(colDataArray, vboMemManager) 
 {
-	
+	if (colDataArray === undefined)
+	{ return; }
+
 	var gl = vboMemManager.gl;
 	if (this.vboBufferCol === undefined)
 	{ this.vboBufferCol = new VboBuffer(gl.ARRAY_BUFFER); }
 	
-	this.vboBufferCol.setDataArray(colDataArray, vboMemManager);
+	var dimensions = 4;
+	var normalized = true;
+	this.vboBufferCol.setDataArray(colDataArray, dimensions, normalized, vboMemManager);
 };
 
 /**
@@ -343,12 +404,17 @@ VBOVertexIdxCacheKey.prototype.setDataArrayCol = function(colDataArray, vboMemMa
  */
 VBOVertexIdxCacheKey.prototype.setDataArrayTexCoord = function(texCoordDataArray, vboMemManager) 
 {
+	if (texCoordDataArray === undefined)
+	{ return; }
+
 	var gl = vboMemManager.gl;
 	
 	if (this.vboBufferTCoord === undefined)
 	{ this.vboBufferTCoord = new VboBuffer(gl.ARRAY_BUFFER); }
 	
-	this.vboBufferTCoord.setDataArray(texCoordDataArray, vboMemManager);
+	var dimensions = 2;
+	var normalized = false;
+	this.vboBufferTCoord.setDataArray(texCoordDataArray, dimensions, normalized, vboMemManager);
 };
 
 

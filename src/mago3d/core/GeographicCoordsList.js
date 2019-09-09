@@ -33,6 +33,20 @@ GeographicCoordsList.prototype.addGeoCoord = function(geographicPoint)
 };
 
 /**
+ * push single point
+ * @param {GeographicCoord}
+ */
+GeographicCoordsList.prototype.addGeoCoordsArray = function(geographicPointsArray) 
+{
+	var geoCoordsCount = geographicPointsArray.length;
+	for (var i=0; i<geoCoordsCount; i++)
+	{
+		this.geographicCoordsArray.push(geographicPointsArray[i]);
+		geographicPointsArray[i].owner = this;
+	}
+};
+
+/**
  * get single point
  * @param {Number} idx the index of target
  */
@@ -101,7 +115,6 @@ GeographicCoordsList.prototype.getGeoCoordSegment = function(idx, resultGeoCoord
  */
 GeographicCoordsList.prototype.getPointsRelativeToGeoLocation = function(geoLocIn, resultPoints3dArray) 
 {
-
 	if (resultPoints3dArray === undefined)
 	{ resultPoints3dArray = []; }
 	
@@ -110,7 +123,14 @@ GeographicCoordsList.prototype.getPointsRelativeToGeoLocation = function(geoLocI
 	for (var i=0; i<geoPointsCount; i++)
 	{
 		var geoCoord = this.getGeoCoord(i);
-		var geoLoc = geoCoord.geoLocDataManager.getCurrentGeoLocationData();
+		var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+		var geoLoc = geoLocDataManager.getCurrentGeoLocationData();
+		if (geoLoc === undefined)
+		{
+			geoCoord.makeDefaultGeoLocationData();
+			geoLoc = geoLocDataManager.getCurrentGeoLocationData();
+		}
+		
 		var posAbs = geoLoc.position;
 		
 		resultPoints3dArray[i] = geoLocIn.getTransformedRelativePosition(posAbs, resultPoints3dArray[i]);

@@ -207,58 +207,52 @@ MetaData.prototype.deleteObjects = function()
  * @param {ArrayBuffer} arrayBuffer
  * @param {ReaderWriter} readWriter 
  */
-MetaData.prototype.parseFileHeaderAsimetricVersion = function(arrayBuffer, readWriter) 
+MetaData.prototype.parseFileHeaderAsimetricVersion = function(arrayBuffer, bytesReaded) 
 {
 	var version_string_length = 5;
 	var intAux_scratch = 0;
-	var bytes_readed = 0;
 
-	if (readWriter === undefined) { readWriter = new ReaderWriter(); }
+	//if (readWriter === undefined) { readWriter = new ReaderWriter(); }
 
 	// 1) Version(5 chars).
 	this.version = "";
 	for (var j=0; j<version_string_length; j++)
 	{
-		this.version += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1))[0]);bytes_readed += 1;
+		this.version += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1))[0]);bytesReaded += 1;
 	}
 
 	// 3) Global unique ID.
 	if (this.guid === undefined) { this.guid =""; }
 
-	intAux_scratch = readWriter.readInt32(arrayBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+	intAux_scratch = ReaderWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 	for (var j=0; j<intAux_scratch; j++)
 	{
-		this.guid += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytes_readed, bytes_readed+ 1))[0]);bytes_readed += 1;
+		this.guid += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1))[0]);bytesReaded += 1;
 	}
 
 	// 4) Location.
 	if (this.longitude === undefined) 
 	{
-		this.longitude = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
+		this.longitude = (new Float64Array(arrayBuffer.slice(bytesReaded, bytesReaded+8)))[0]; bytesReaded += 8;
 	}
-	else { bytes_readed += 8; }
+	else { bytesReaded += 8; }
 
 	if (this.latitude === undefined) 
 	{
-		this.latitude = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
+		this.latitude = (new Float64Array(arrayBuffer.slice(bytesReaded, bytesReaded+8)))[0]; bytesReaded += 8;
 	}
-	else { bytes_readed += 8; }
+	else { bytesReaded += 8; }
 
 	if (this.altitude === undefined) 
 	{
-		this.altitude = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+		this.altitude = (new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 	}
-	else { bytes_readed += 4; }
+	else { bytesReaded += 4; }
 
 	if (this.bbox === undefined) { this.bbox = new BoundingBox(); }
 
 	// 6) BoundingBox.
-	this.bbox.minX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-	this.bbox.minY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-	this.bbox.minZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-	this.bbox.maxX = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-	this.bbox.maxY = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
-	this.bbox.maxZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
+	bytesReaded = this.bbox.readData(arrayBuffer, bytesReaded);
 
 	var isLarge = false;
 	if (this.bbox.maxX - this.bbox.minX > 40.0 || this.bbox.maxY - this.bbox.minY > 40.0) 
@@ -271,19 +265,21 @@ MetaData.prototype.parseFileHeaderAsimetricVersion = function(arrayBuffer, readW
 		this.isSmall = true;
 	}
 	
+	this.projectDataType = 0; // Init a value.
+	
 	// if header version is "0.0.2", then must read extra parameters.
 	if (this.version === "0.0.2")
 	{
 		// parse dataType (unsigned short).
-		this.projectDataType = (new Uint16Array(arrayBuffer.slice(bytes_readed, bytes_readed+2)))[0]; bytes_readed += 2;
+		this.projectDataType = (new Uint16Array(arrayBuffer.slice(bytesReaded, bytesReaded+2)))[0]; bytesReaded += 2;
 		
 		// parse Project's offSet (double x 6).
-		this.offSetX = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
-		this.offSetY = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
-		this.offSetZ = (new Float64Array(arrayBuffer.slice(bytes_readed, bytes_readed+8)))[0]; bytes_readed += 8;
+		this.offSetX = (new Float64Array(arrayBuffer.slice(bytesReaded, bytesReaded+8)))[0]; bytesReaded += 8;
+		this.offSetY = (new Float64Array(arrayBuffer.slice(bytesReaded, bytesReaded+8)))[0]; bytesReaded += 8;
+		this.offSetZ = (new Float64Array(arrayBuffer.slice(bytesReaded, bytesReaded+8)))[0]; bytesReaded += 8;
 	}
 
-	return bytes_readed;
+	return bytesReaded;
 };
 
 

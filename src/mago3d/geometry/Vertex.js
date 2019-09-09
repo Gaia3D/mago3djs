@@ -241,6 +241,17 @@ Vertex.prototype.getNormal = function()
 };
 
 /**
+ * get this vertex normal
+ * @returns {Point2D} normal
+ */
+Vertex.prototype.getTexCoord = function() 
+{
+	if (this.texCoord === undefined) { this.texCoord = new Point2D(); }
+	
+	return this.texCoord;
+};
+
+/**
  * vertex point translate. use add method.
  * @param {Number} dx
  * @param {Number} dy

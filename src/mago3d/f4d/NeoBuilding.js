@@ -32,7 +32,9 @@ var NeoBuilding = function()
 	this.aditionalColor; // use for colorChanged.
 
 	// Textures loaded.
-	this.texturesLoaded; // material textures.
+	this.texturesLoaded; // material textures. OLD.
+	this.texturesManager;
+	
 
 	// The octree.**
 	this.octree; // f4d_octree. 
@@ -689,9 +691,12 @@ NeoBuilding.prototype.getCurrentSkin = function()
  */
 NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoManager) 
 {
-	var texture = undefined;
+	if (this.texturesManager === undefined)
+	{ this.texturesManager = new TexturesManager(); }
 	
-	if (this.metaData.version[0] === "v")
+	var texture = undefined;
+	var version = this.metaData.version;
+	if (version[0] === "v")
 	{
 		// this is the version beta.
 		if (neoReference.texture === undefined)
@@ -734,7 +739,7 @@ NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoMan
 		
 		return neoReference.texture.fileLoadState;
 	}
-	else if (this.metaData.version[0] === '0' && this.metaData.version[2] === '0' && this.metaData.version[4] === '1' )
+	else if (version[0] === '0' && version[2] === '0' && version[4] === '1' )
 	{
 		if (neoReference.texture === undefined || neoReference.texture.fileLoadState === CODE.fileLoadState.READY)
 		{
@@ -765,7 +770,7 @@ NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoMan
 		
 		return neoReference.texture.fileLoadState;
 	}
-	else if (this.metaData.version[0] === '0' && this.metaData.version[2] === '0' && this.metaData.version[4] === '2' )
+	else if (version[0] === '0' && version[2] === '0' && version[4] === '2' )
 	{
 		// Project_data_type (new in version 002).
 		// 1 = 3d model data type (normal 3d with interior & exterior data).
@@ -848,6 +853,152 @@ NeoBuilding.prototype.getShaderName = function(lod, projectType, renderType)
 /**
  * 어떤 일을 하고 있습니까?
  */
+NeoBuilding.prototype.parseTexturesList = function(arrayBuffer, bytesReaded) 
+{
+	// read materials list.
+	var materialsCount = ReaderWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+	for (var i=0; i<materialsCount; i++)
+	{
+		var textureTypeName = "";
+		var textureImageFileName = "";
+
+		// Now, read the texture_type and texture_file_name.***
+		var texture_type_nameLegth = ReaderWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		for (var j=0; j<texture_type_nameLegth; j++) 
+		{
+			textureTypeName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1))[0]);bytesReaded += 1; // for example "diffuse".***
+		}
+
+		var texture_fileName_Legth = ReaderWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		var charArray = new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ texture_fileName_Legth)); bytesReaded += texture_fileName_Legth;
+		var decoder = new TextDecoder('utf-8');
+		textureImageFileName = decoder.decode(charArray);
+		
+		if (texture_fileName_Legth > 0)
+		{
+			var texture = new Texture();
+			texture.textureTypeName = textureTypeName;
+			texture.textureImageFileName = textureImageFileName;
+			
+			if (this.texturesLoaded === undefined)
+			{ this.texturesLoaded = []; }
+			
+			this.texturesLoaded.push(texture);
+		}
+	}
+	
+	return bytesReaded;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+NeoBuilding.prototype.parseHeader = function(arrayBuffer, bytesReaded) 
+{
+	// In the header file, there are:
+	// 1) metaData.
+	// 2) octree.
+	// 3) textures list.
+	// 4) lodBuilding data.
+	
+	// metadata.
+	if (this.metaData === undefined) 
+	{
+		this.metaData = new MetaData();
+	}
+	if (bytesReaded === undefined)
+	{ bytesReaded = 0; }
+	
+	var metaData = this.metaData;
+	bytesReaded = metaData.parseFileHeaderAsimetricVersion(arrayBuffer, bytesReaded);
+	
+	// Now, make the neoBuilding's octree.***
+	if (this.octree === undefined) { this.octree = new Octree(undefined); }
+	this.octree.neoBuildingOwnerId = this.buildingId;
+	this.octree.octreeKey = this.buildingId + "_" + this.octree.octree_number_name;
+	
+	// now, parse octreeAsimetric or octreePyramid (check metadata.projectDataType).***
+	if (metaData.projectDataType === 5)
+	{ bytesReaded = this.octree.parsePyramidVersion(arrayBuffer, bytesReaded, this); }
+	else
+	{ bytesReaded = this.octree.parseAsimetricVersion(arrayBuffer, bytesReaded, this); }
+
+	metaData.oct_min_x = this.octree.centerPos.x - this.octree.half_dx;
+	metaData.oct_max_x = this.octree.centerPos.x + this.octree.half_dx;
+	metaData.oct_min_y = this.octree.centerPos.y - this.octree.half_dy;
+	metaData.oct_max_y = this.octree.centerPos.y + this.octree.half_dy;
+	metaData.oct_min_z = this.octree.centerPos.z - this.octree.half_dz;
+	metaData.oct_max_z = this.octree.centerPos.z + this.octree.half_dz;
+	
+	if (metaData.version === "0.0.1" || metaData.version === "0.0.2")
+	{
+		// read materials list.
+		bytesReaded = this.parseTexturesList(arrayBuffer, bytesReaded);
+
+		// read geometry type data.***
+		this.parseLodBuildingData(arrayBuffer, bytesReaded);
+	}
+
+	metaData.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+	return bytesReaded;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+NeoBuilding.prototype.parseLodBuildingData = function(arrayBuffer, bytesReaded) 
+{
+	var lod;
+	var nameLength;
+	var lodBuildingDatasCount = (new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
+	if (lodBuildingDatasCount !== undefined)
+	{
+		this.lodBuildingDatasMap = {};
+		
+		for (var i =0; i<lodBuildingDatasCount; i++)
+		{
+			var lodBuildingData = new LodBuildingData();
+			lodBuildingData.lod = (new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
+			lodBuildingData.isModelRef = (new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
+			
+			if (lodBuildingData.lod === 2)
+			{
+				// read the lod2_textureFileName.***
+				nameLength = (new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
+				lodBuildingData.textureFileName = "";
+				for (var j=0; j<nameLength; j++) 
+				{
+					lodBuildingData.textureFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1))[0]);bytesReaded += 1; 
+				}
+			}
+			
+			if (!lodBuildingData.isModelRef)
+			{
+				nameLength = (new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
+				lodBuildingData.geometryFileName = "";
+				for (var j=0; j<nameLength; j++) 
+				{
+					lodBuildingData.geometryFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1))[0]);bytesReaded += 1; 
+				}
+				
+				nameLength = (new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
+				lodBuildingData.textureFileName = "";
+				for (var j=0; j<nameLength; j++) 
+				{
+					lodBuildingData.textureFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1))[0]);bytesReaded += 1; 
+				}
+			}
+			this.lodBuildingDatasMap[lodBuildingData.lod] = lodBuildingData;
+		}
+
+	}
+	
+	return bytesReaded;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 NeoBuilding.prototype.prepareSkin = function(magoManager) 
 {
 	var headerVersion = this.getHeaderVersion();
@@ -855,9 +1006,10 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 	{ return false; }
 	
 	if (headerVersion[0] !== "0")
-	{
-		return false;
-	}
+	{ return false; }
+
+	if (this.buildingId === "JibCrane")
+	{ var hola = 0; }
 
 	if (this.lodMeshesMap === undefined)
 	{ this.lodMeshesMap = {}; } 
@@ -968,8 +1120,23 @@ NeoBuilding.prototype.render = function(magoManager, shader, renderType, refMatr
 				var lowestOctreesCount2 = this.currentVisibleOctreesControler.currentVisibles2.length;
 				
 				// If octreesRenderedsCount is minor than 60% of total of visibleOctrees, then render the buildingSkin.
-				if (octreesRenderedCount < (lowestOctreesCount0 + lowestOctreesCount1 + lowestOctreesCount2)*0.4)
-				{ this.renderSkin(magoManager, shader, renderType); }
+				// Project_data_type (new in version 002).
+				// 1 = 3d model data type (normal 3d with interior & exterior data).
+				// 2 = single building skin data type (as vWorld or googleEarth data).
+				// 3 = multi building skin data type (as Shibuya & Odaiba data).
+				// 4 = pointsCloud data type.
+				// 5 = pointsCloud data type pyramidOctree test.
+
+				if (this.metaData.projectDataType === 2)
+				{
+					if (octreesRenderedCount <= 0 )
+					{ this.renderSkin(magoManager, shader, renderType); }
+				}
+				else 
+				{
+					if (octreesRenderedCount < (lowestOctreesCount0 + lowestOctreesCount1 + lowestOctreesCount2)*0.4)
+					{ this.renderSkin(magoManager, shader, renderType); }
+				}
 			}
 		}
 		

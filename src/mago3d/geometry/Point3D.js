@@ -411,6 +411,20 @@ Point3D.prototype.set = function(x, y, z)
  * @param y 변수
  * @param z 변수
  */
+Point3D.prototype.readDataFromBuffer = function(dataArrayBuffer, bytesReaded) 
+{
+	this.x = (new Float32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+	this.y = (new Float32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+	this.z = (new Float32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+	return bytesReaded;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param x 변수
+ * @param y 변수
+ * @param z 변수
+ */
 Point3D.prototype.add = function(x, y, z) 
 {
 	this.x += x; this.y += y; this.z += z;
@@ -436,69 +450,6 @@ Point3D.prototype.addPoint = function(point)
 Point3D.prototype.scale = function(scaleFactor) 
 {
 	this.x *= scaleFactor; this.y *= scaleFactor; this.z *= scaleFactor;
-};
-
-
-/**
- * 3차원 정보
- * @class Point3DList
- */
-var Point3DList = function() 
-{
-	if (!(this instanceof Point3DList)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-
-	this.points3dArray;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- */
-Point3DList.prototype.newPoint3D = function(x, y, z) 
-{
-	if (this.points3dArray === undefined)
-	{ this.points3dArray = []; }
-	
-	var point3d = new Point3D(x, y, z);
-	this.points3dArray.push(point3d);
-	return point3d;
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- */
-Point3DList.prototype.addPoint3D = function(point3d) 
-{
-	if (this.points3dArray === undefined)
-	{ this.points3dArray = []; }
-	
-	this.points3dArray.push(point3d);
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- */
-Point3DList.calculateBBox = function(points3DArray, resultBBox) 
-{
-	if (points3DArray === undefined)
-	{ return undefined; }
-
-	var pointCount = points3DArray.length;
-	if (pointCount === 0)
-	{ return undefined; }
-	
-	if (resultBBox === undefined)
-	{ resultBBox = new BoundingBox(); }
-	
-	resultBBox.init(points3DArray[0]); // init the box.
-	for (var i=1; i<pointCount; i++)
-	{
-		resultBBox.addPoint(points3DArray[i]);
-	}
-	
-	return resultBBox;
 };
 
 

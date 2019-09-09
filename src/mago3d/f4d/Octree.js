@@ -672,7 +672,7 @@ Octree.prototype.renderSkin = function(magoManager, neoBuilding, renderType, ren
 		if (neoBuilding.simpleBuilding3x3Texture !== undefined && neoBuilding.simpleBuilding3x3Texture.texId && renderTexture)
 		{
 			// Provisionally flip tex coords here.
-			gl.uniform1i(shader.textureFlipYAxis_loc, false);//.ppp
+			//gl.uniform1i(shader.textureFlipYAxis_loc, false);//.ppp
 			gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
 			if (shader.last_tex_id !== neoBuilding.simpleBuilding3x3Texture.texId)
 			{
@@ -929,6 +929,14 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 				break; 
 			}
 		}
+		
+		// If lod is higher, the restringe the octree's depth:
+		if (this.lod > 2)
+		{ renderChildren = false; }
+		
+		if (this.lod === 2 && this.octree_level > 0)
+		{ renderChildren = false; }
+		// End restringe rendering by lod distance.-----------------------
 		
 		if (renderChildren)
 		{
@@ -1714,37 +1722,37 @@ Octree.prototype.multiplyKeyTransformMatrix = function(idxKey, matrix)
  * 어떤 일을 하고 있습니까?
  * @param result_octreesArray 변수
  */
-Octree.prototype.parseAsimetricVersion = function(arrayBuffer, readerWriter, bytesReaded, neoBuildingOwner) 
+Octree.prototype.parseAsimetricVersion = function(arrayBuffer, bytesReaded, neoBuildingOwner) 
 {
 	// Check the metaData version.
 	var version = neoBuildingOwner.getHeaderVersion();
 	
 	
-	var octreeLevel = readerWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+	var octreeLevel = ReaderWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 
 	if (octreeLevel === 0) 
 	{
 		// this is the mother octree, so read the mother octree's size.
-		var minX = readerWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		var maxX = readerWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		var minY = readerWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		var maxY = readerWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		var minZ = readerWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		var maxZ = readerWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		var minX = ReaderWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		var maxX = ReaderWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		var minY = ReaderWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		var maxY = ReaderWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		var minZ = ReaderWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		var maxZ = ReaderWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 
 		this.setBoxSize(minX, maxX, minY, maxY, minZ, maxZ );
 		this.octree_number_name = 0;
 	}
 
-	var subOctreesCount = readerWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1; // this must be 0 or 8.
-	this.triPolyhedronsCount = readerWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+	var subOctreesCount = ReaderWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1; // this must be 0 or 8.
+	this.triPolyhedronsCount = ReaderWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 	if (this.triPolyhedronsCount > 0)
 	{ this.neoBuildingOwner = neoBuildingOwner; }
 
 	//if (version === "0.0.2")
 	//{
 	// Read ModelLists partitions count.
-	//this.blocksListsPartitionsCount = readerWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+	//this.blocksListsPartitionsCount = ReaderWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 	//}
 
 	// 1rst, create the 8 subOctrees.
@@ -1762,7 +1770,7 @@ Octree.prototype.parseAsimetricVersion = function(arrayBuffer, readerWriter, byt
 	for (var i=0; i<subOctreesCount; i++) 
 	{
 		var subOctree = this.subOctrees_array[i];
-		bytesReaded = subOctree.parseAsimetricVersion(arrayBuffer, readerWriter, bytesReaded, neoBuildingOwner);
+		bytesReaded = subOctree.parseAsimetricVersion(arrayBuffer, bytesReaded, neoBuildingOwner);
 	}
 
 	return bytesReaded;
@@ -1772,31 +1780,31 @@ Octree.prototype.parseAsimetricVersion = function(arrayBuffer, readerWriter, byt
  * 어떤 일을 하고 있습니까?
  * @param result_octreesArray 변수
  */
-Octree.prototype.parsePyramidVersion = function(arrayBuffer, readerWriter, bytesReaded, neoBuildingOwner) 
+Octree.prototype.parsePyramidVersion = function(arrayBuffer, bytesReaded, neoBuildingOwner) 
 {
-	var octreeLevel = readerWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+	var octreeLevel = ReaderWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 
 	if (octreeLevel === 0) 
 	{
 		// this is the mother octree, so read the mother octree's size.
-		var minX = readerWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		var maxX = readerWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		var minY = readerWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		var maxY = readerWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		var minZ = readerWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		var maxZ = readerWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		var minX = ReaderWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		var maxX = ReaderWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		var minY = ReaderWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		var maxY = ReaderWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		var minZ = ReaderWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		var maxZ = ReaderWriter.readFloat32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 
 		this.setBoxSize(minX, maxX, minY, maxY, minZ, maxZ );
 		this.octree_number_name = 0;
 	}
 
-	var subOctreesCount = readerWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1; // this must be 0 or 8.
-	this.triPolyhedronsCount = readerWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+	var subOctreesCount = ReaderWriter.readUInt8(arrayBuffer, bytesReaded, bytesReaded+1); bytesReaded += 1; // this must be 0 or 8.
+	this.triPolyhedronsCount = ReaderWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 	if (this.triPolyhedronsCount > 0)
 	{ this.neoBuildingOwner = neoBuildingOwner; }
 
 	// Now, read verticesArray partitions count.
-	this.pCloudPartitionsCount = readerWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+	this.pCloudPartitionsCount = ReaderWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 
 	// 1rst, create the 8 subOctrees.
 	for (var i=0; i<subOctreesCount; i++) 
@@ -1813,7 +1821,7 @@ Octree.prototype.parsePyramidVersion = function(arrayBuffer, readerWriter, bytes
 	for (var i=0; i<subOctreesCount; i++) 
 	{
 		var subOctree = this.subOctrees_array[i];
-		bytesReaded = subOctree.parsePyramidVersion(arrayBuffer, readerWriter, bytesReaded, neoBuildingOwner);
+		bytesReaded = subOctree.parsePyramidVersion(arrayBuffer, bytesReaded, neoBuildingOwner);
 	}
 
 	return bytesReaded;
