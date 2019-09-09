@@ -2298,7 +2298,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			var openingData = {
 				"offSet" : 2,
 				"height" : roofMinHeight*0.8,
-				"width"  : 8
+				"width"  : 18
 			};
 			rightWallOptions.openingsDataArray.push(openingData);
 			
@@ -2306,7 +2306,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			var openingData = {
 				"offSet" : 2,
 				"height" : roofMinHeight*0.8,
-				"width"  : 8
+				"width"  : 28
 			};
 			rightWallOptions.openingsDataArray.push(openingData);
 			
@@ -2326,7 +2326,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			var openingData = {
 				"offSet" : 2,
 				"height" : roofMinHeight*0.8,
-				"width"  : 8
+				"width"  : 18
 			};
 			leftWallOptions.openingsDataArray.push(openingData);
 			
@@ -2334,7 +2334,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			var openingData = {
 				"offSet" : 2,
 				"height" : roofMinHeight*0.8,
-				"width"  : 8
+				"width"  : 28
 			};
 			leftWallOptions.openingsDataArray.push(openingData);
 			

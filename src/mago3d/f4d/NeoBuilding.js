@@ -853,6 +853,152 @@ NeoBuilding.prototype.getShaderName = function(lod, projectType, renderType)
 /**
  * 어떤 일을 하고 있습니까?
  */
+NeoBuilding.prototype.parseTexturesList = function(arrayBuffer, bytesReaded) 
+{
+	// read materials list.
+	var materialsCount = ReaderWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+	for (var i=0; i<materialsCount; i++)
+	{
+		var textureTypeName = "";
+		var textureImageFileName = "";
+
+		// Now, read the texture_type and texture_file_name.***
+		var texture_type_nameLegth = ReaderWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		for (var j=0; j<texture_type_nameLegth; j++) 
+		{
+			textureTypeName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1))[0]);bytesReaded += 1; // for example "diffuse".***
+		}
+
+		var texture_fileName_Legth = ReaderWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+		var charArray = new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ texture_fileName_Legth)); bytesReaded += texture_fileName_Legth;
+		var decoder = new TextDecoder('utf-8');
+		textureImageFileName = decoder.decode(charArray);
+		
+		if (texture_fileName_Legth > 0)
+		{
+			var texture = new Texture();
+			texture.textureTypeName = textureTypeName;
+			texture.textureImageFileName = textureImageFileName;
+			
+			if (this.texturesLoaded === undefined)
+			{ this.texturesLoaded = []; }
+			
+			this.texturesLoaded.push(texture);
+		}
+	}
+	
+	return bytesReaded;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+NeoBuilding.prototype.parseHeader = function(arrayBuffer, bytesReaded) 
+{
+	// In the header file, there are:
+	// 1) metaData.
+	// 2) octree.
+	// 3) textures list.
+	// 4) lodBuilding data.
+	
+	// metadata.
+	if (this.metaData === undefined) 
+	{
+		this.metaData = new MetaData();
+	}
+	if (bytesReaded === undefined)
+	{ bytesReaded = 0; }
+	
+	var metaData = this.metaData;
+	bytesReaded = metaData.parseFileHeaderAsimetricVersion(arrayBuffer, bytesReaded);
+	
+	// Now, make the neoBuilding's octree.***
+	if (this.octree === undefined) { this.octree = new Octree(undefined); }
+	this.octree.neoBuildingOwnerId = this.buildingId;
+	this.octree.octreeKey = this.buildingId + "_" + this.octree.octree_number_name;
+	
+	// now, parse octreeAsimetric or octreePyramid (check metadata.projectDataType).***
+	if (metaData.projectDataType === 5)
+	{ bytesReaded = this.octree.parsePyramidVersion(arrayBuffer, bytesReaded, this); }
+	else
+	{ bytesReaded = this.octree.parseAsimetricVersion(arrayBuffer, bytesReaded, this); }
+
+	metaData.oct_min_x = this.octree.centerPos.x - this.octree.half_dx;
+	metaData.oct_max_x = this.octree.centerPos.x + this.octree.half_dx;
+	metaData.oct_min_y = this.octree.centerPos.y - this.octree.half_dy;
+	metaData.oct_max_y = this.octree.centerPos.y + this.octree.half_dy;
+	metaData.oct_min_z = this.octree.centerPos.z - this.octree.half_dz;
+	metaData.oct_max_z = this.octree.centerPos.z + this.octree.half_dz;
+	
+	if (metaData.version === "0.0.1" || metaData.version === "0.0.2")
+	{
+		// read materials list.
+		bytesReaded = this.parseTexturesList(arrayBuffer, bytesReaded);
+
+		// read geometry type data.***
+		this.parseLodBuildingData(arrayBuffer, bytesReaded);
+	}
+
+	metaData.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+	return bytesReaded;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+NeoBuilding.prototype.parseLodBuildingData = function(arrayBuffer, bytesReaded) 
+{
+	var lod;
+	var nameLength;
+	var lodBuildingDatasCount = (new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
+	if (lodBuildingDatasCount !== undefined)
+	{
+		this.lodBuildingDatasMap = {};
+		
+		for (var i =0; i<lodBuildingDatasCount; i++)
+		{
+			var lodBuildingData = new LodBuildingData();
+			lodBuildingData.lod = (new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
+			lodBuildingData.isModelRef = (new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
+			
+			if (lodBuildingData.lod === 2)
+			{
+				// read the lod2_textureFileName.***
+				nameLength = (new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
+				lodBuildingData.textureFileName = "";
+				for (var j=0; j<nameLength; j++) 
+				{
+					lodBuildingData.textureFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1))[0]);bytesReaded += 1; 
+				}
+			}
+			
+			if (!lodBuildingData.isModelRef)
+			{
+				nameLength = (new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
+				lodBuildingData.geometryFileName = "";
+				for (var j=0; j<nameLength; j++) 
+				{
+					lodBuildingData.geometryFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1))[0]);bytesReaded += 1; 
+				}
+				
+				nameLength = (new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
+				lodBuildingData.textureFileName = "";
+				for (var j=0; j<nameLength; j++) 
+				{
+					lodBuildingData.textureFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1))[0]);bytesReaded += 1; 
+				}
+			}
+			this.lodBuildingDatasMap[lodBuildingData.lod] = lodBuildingData;
+		}
+
+	}
+	
+	return bytesReaded;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 NeoBuilding.prototype.prepareSkin = function(magoManager) 
 {
 	var headerVersion = this.getHeaderVersion();

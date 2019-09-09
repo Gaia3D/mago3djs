@@ -1011,6 +1011,13 @@ SmartTile.prototype.createGeometriesFromSeeds = function(magoManager)
 					var dataArrayBuffer = smartTileF4dSeed.dataArrayBuffer;
 					this.parseSmartTileF4d(dataArrayBuffer, magoManager);
 					parseQueue.smartTileF4dParsesCount++; // increment counter.
+					smartTileF4dSeed.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
+					
+					// remove the "smartTileF4dSeed" from the "this.smartTileF4dSeedArray".
+					this.smartTileF4dSeedArray.splice(i, 1);
+					
+					if (this.smartTileF4dSeedArray.length === 0)
+					{ this.smartTileF4dSeedArray = undefined; }
 				}
 			}
 		}
@@ -1023,6 +1030,8 @@ SmartTile.prototype.createGeometriesFromSeeds = function(magoManager)
 SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager) 
 {
 	var hierarchyManager = magoManager.hierarchyManager;
+	var readWriter = magoManager.readerWriter;
+	
 	// parse smartTileF4d.***
 	var bytesReaded = 0;
 	var buildingsCount = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
@@ -1060,7 +1069,7 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		// Create a neoBuilding.
 		var neoBuilding = new NeoBuilding();
 		
-		
+		// read header (metaData + octree + textures list + lodBuilding data).
 		var metadataByteSize = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 		var byteSize = 1;
 		var startBuff = bytesReaded;
@@ -1068,10 +1077,33 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		var dataBuffer = new Uint8Array(dataArrayBuffer.slice(startBuff, endBuff));
 		bytesReaded = bytesReaded + byteSize * metadataByteSize; // updating data.
 		
+		neoBuilding.parseHeader(dataBuffer);
 		
+		// read lod5 mesh data.
+		var lod5meshSize = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+		byteSize = 1;
+		startBuff = bytesReaded;
+		endBuff = bytesReaded + byteSize * lod5meshSize;
+		var lod5MeshDataBuffer = new Uint8Array(dataArrayBuffer.slice(startBuff, endBuff));
+		bytesReaded = bytesReaded + byteSize * lod5meshSize; // updating data.
+		
+		// read lod5 image.
+		var lod5ImageSize = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+		byteSize = 1;
+		startBuff = bytesReaded;
+		endBuff = bytesReaded + byteSize * lod5ImageSize;
+		var lod5ImageDataBuffer = new Uint8Array(dataArrayBuffer.slice(startBuff, endBuff));
+		bytesReaded = bytesReaded + byteSize * lod5ImageSize; // updating data.
+		
+		// read geographicCoord.
+		var geoCoord = new GeographicCoord();
+		bytesReaded = geoCoord.readDataFromBuffer(dataArrayBuffer, bytesReaded);
+		
+		// read euler angles degree.
+		var eulerAngDeg = new Point3D();
+		bytesReaded = eulerAngDeg.readDataFromBuffer(dataArrayBuffer, bytesReaded);
 	}
 	
-	var hola = 0;
 };
 
 /**

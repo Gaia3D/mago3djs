@@ -264,6 +264,20 @@ GeographicCoord.prototype.prepareData = function(vboMemManager)
 };
 
 /**
+ * make the vbo data of this feature
+ * @param {VBOMemoryManager} vboMemManager
+ */
+ 
+GeographicCoord.prototype.readDataFromBuffer = function(dataArrayBuffer, bytesReaded) 
+{
+	// read longitude(64), latitude(64), altitude(32).
+	this.longitude = (new Float64Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+8)))[0]; bytesReaded += 8;
+	this.latitude = (new Float64Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+8)))[0]; bytesReaded += 8;
+	this.altitude = (new Float32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+	return bytesReaded;
+};
+
+/**
  * Render this feature
  */
 GeographicCoord.prototype.renderPoint = function(magoManager, shader, gl, renderType) 

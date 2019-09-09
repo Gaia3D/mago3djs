@@ -655,8 +655,7 @@ BasicFactory.prototype.makeMesh = function()
 			if (roofMaterial.diffuseTexture !== undefined)
 			{
 				// Calculate texCoords for the roofMesh.
-				//Mesh.prototype.calculateTexCoordsBox = function(texCoordsBoundingBox)
-				// the difusse texture represents aprox 4x4 meters in the roofTexture.jpg image.
+				// the difusse texture represents aprox 20x60 meters in the roofTexture.jpg image.
 				var texCoordsBBox = new BoundingBox();
 				var length = 60;
 				var width = this.width;

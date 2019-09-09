@@ -94,6 +94,19 @@ ReaderWriter.prototype.readUInt32 = function(buffer, start, end)
 };
 
 /**
+ * 버퍼에서 데이터를 읽어서 32비트 부호없는 정수값에 대한 배열의 0번째 값을 돌려줌
+ * @param buffer 복사할 버퍼
+ * @param start 시작 바이트 인덱스
+ * @param end 끝 바이트 인덱스
+ * @returns uint32[0]
+ */
+ReaderWriter.readUInt32 = function(buffer, start, end) 
+{
+	var uint32 = new Uint32Array(buffer.slice(start, end));
+	return uint32[0];
+};
+
+/**
  * 버퍼에서 데이터를 읽어서 32비트 정수값에 대한 배열의 0번째 값을 돌려줌
  * @param buffer 복사할 버퍼
  * @param start 시작 바이트 인덱스
@@ -101,6 +114,19 @@ ReaderWriter.prototype.readUInt32 = function(buffer, start, end)
  * @returns int32[0]
  */
 ReaderWriter.prototype.readInt32 = function(buffer, start, end) 
+{
+	var int32 = new Int32Array(buffer.slice(start, end));
+	return int32[0];
+};
+
+/**
+ * 버퍼에서 데이터를 읽어서 32비트 정수값에 대한 배열의 0번째 값을 돌려줌
+ * @param buffer 복사할 버퍼
+ * @param start 시작 바이트 인덱스
+ * @param end 끝 바이트 인덱스
+ * @returns int32[0]
+ */
+ReaderWriter.readInt32 = function(buffer, start, end) 
 {
 	var int32 = new Int32Array(buffer.slice(start, end));
 	return int32[0];
@@ -120,6 +146,19 @@ ReaderWriter.prototype.readUInt16 = function(buffer, start, end)
 };
 
 /**
+ * 버퍼에서 데이터를 읽어서 16비트 부호없는 정수값에 대한 배열의 0번째 값을 돌려줌
+ * @param buffer 복사할 버퍼
+ * @param start 시작 바이트 인덱스
+ * @param end 끝 바이트 인덱스
+ * @returns uint16[0]
+ */
+ReaderWriter.readUInt16 = function(buffer, start, end) 
+{
+	var uint16 = new Uint16Array(buffer.slice(start, end));
+	return uint16[0];
+};
+
+/**
  * 버퍼에서 데이터를 읽어서 32비트 정수값에 대한 배열의 0번째 값을 돌려줌
  * @param buffer 복사할 버퍼
  * @param start 시작 바이트 인덱스
@@ -127,6 +166,19 @@ ReaderWriter.prototype.readUInt16 = function(buffer, start, end)
  * @returns int16[0]
  */
 ReaderWriter.prototype.readInt16 = function(buffer, start, end) 
+{
+	var int16 = new Int16Array(buffer.slice(start, end));
+	return int16[0];
+};
+
+/**
+ * 버퍼에서 데이터를 읽어서 32비트 정수값에 대한 배열의 0번째 값을 돌려줌
+ * @param buffer 복사할 버퍼
+ * @param start 시작 바이트 인덱스
+ * @param end 끝 바이트 인덱스
+ * @returns int16[0]
+ */
+ReaderWriter.readInt16 = function(buffer, start, end) 
 {
 	var int16 = new Int16Array(buffer.slice(start, end));
 	return int16[0];
@@ -146,6 +198,19 @@ ReaderWriter.prototype.readFloat64 = function(buffer, start, end)
 };
 
 /**
+ * 버퍼에서 데이터를 읽어서 64비트 float값에 대한 배열의 0번째 값을 돌려줌
+ * @param buffer 복사할 버퍼
+ * @param start 시작 바이트 인덱스
+ * @param end 끝 바이트 인덱스
+ * @returns float64[0]
+ */
+ReaderWriter.readFloat64 = function(buffer, start, end) 
+{
+	var float64 = new Float64Array(buffer.slice(start, end));
+	return float64[0];
+};
+
+/**
  * 버퍼에서 데이터를 읽어서 32비트 float값에 대한 배열의 0번째 값을 돌려줌
  * @param buffer 복사할 버퍼
  * @param start 시작 바이트 인덱스
@@ -153,6 +218,19 @@ ReaderWriter.prototype.readFloat64 = function(buffer, start, end)
  * @returns float32[0]
  */
 ReaderWriter.prototype.readFloat32 = function(buffer, start, end) 
+{
+	var float32 = new Float32Array(buffer.slice(start, end));
+	return float32[0];
+};
+
+/**
+ * 버퍼에서 데이터를 읽어서 32비트 float값에 대한 배열의 0번째 값을 돌려줌
+ * @param buffer 복사할 버퍼
+ * @param start 시작 바이트 인덱스
+ * @param end 끝 바이트 인덱스
+ * @returns float32[0]
+ */
+ReaderWriter.readFloat32 = function(buffer, start, end) 
 {
 	var float32 = new Float32Array(buffer.slice(start, end));
 	return float32[0];
@@ -185,6 +263,19 @@ ReaderWriter.prototype.readInt8 = function(buffer, start, end)
 };
 
 /**
+ * 버퍼에서 데이터를 읽어서 8비트 정수값에 대한 배열의 0번째 값을 돌려줌
+ * @param buffer 복사할 버퍼
+ * @param start 시작 바이트 인덱스
+ * @param end 끝 바이트 인덱스
+ * @returns int8[0]
+ */
+ReaderWriter.readInt8 = function(buffer, start, end) 
+{
+	var int8 = new Int8Array(buffer.slice(start, end));
+	return int8[0];
+};
+
+/**
  * 버퍼에서 데이터를 읽어서 8비트 부호없는 정수값에 대한 배열의 0번째 값을 돌려줌
  * @param buffer 복사할 버퍼
  * @param start 시작 바이트 인덱스
@@ -192,6 +283,19 @@ ReaderWriter.prototype.readInt8 = function(buffer, start, end)
  * @returns uint8[0]
  */
 ReaderWriter.prototype.readUInt8 = function(buffer, start, end) 
+{
+	var uint8 = new Uint8Array(buffer.slice(start, end));
+	return uint8[0];
+};
+
+/**
+ * 버퍼에서 데이터를 읽어서 8비트 부호없는 정수값에 대한 배열의 0번째 값을 돌려줌
+ * @param buffer 복사할 버퍼
+ * @param start 시작 바이트 인덱스
+ * @param end 끝 바이트 인덱스
+ * @returns uint8[0]
+ */
+ReaderWriter.readUInt8 = function(buffer, start, end) 
 {
 	var uint8 = new Uint8Array(buffer.slice(start, end));
 	return uint8[0];
@@ -215,6 +319,9 @@ ReaderWriter.prototype.readInt8ByteColor = function(buffer, start, end)
 
 	return int8_value;
 };
+
+
+
 
 function loadWithXhr_deprecated(fileName, xhr, timeOut) 
 {
@@ -955,121 +1062,8 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 		var arrayBuffer = response;
 		if (arrayBuffer) 
 		{
-			if (neoBuilding.metaData === undefined) 
-			{
-				neoBuilding.metaData = new MetaData();
-			}
-			
-			var metaData = neoBuilding.metaData;
-			var bytesReaded = metaData.parseFileHeaderAsimetricVersion(arrayBuffer, readerWriter);
-			
-			// Now, make the neoBuilding's octree.***
-			if (neoBuilding.octree === undefined) { neoBuilding.octree = new Octree(undefined); }
-			neoBuilding.octree.neoBuildingOwnerId = neoBuilding.buildingId;
-			neoBuilding.octree.octreeKey = neoBuilding.buildingId + "_" + neoBuilding.octree.octree_number_name;
-			
-			// now, parse octreeAsimetric or octreePyramid (check metadata.projectDataType).***
-			if (metaData.projectDataType === 5)
-			{ bytesReaded = neoBuilding.octree.parsePyramidVersion(arrayBuffer, readerWriter, bytesReaded, neoBuilding); }
-			else
-			{ bytesReaded = neoBuilding.octree.parseAsimetricVersion(arrayBuffer, readerWriter, bytesReaded, neoBuilding); }
-
-			metaData.oct_min_x = neoBuilding.octree.centerPos.x - neoBuilding.octree.half_dx;
-			metaData.oct_max_x = neoBuilding.octree.centerPos.x + neoBuilding.octree.half_dx;
-			metaData.oct_min_y = neoBuilding.octree.centerPos.y - neoBuilding.octree.half_dy;
-			metaData.oct_max_y = neoBuilding.octree.centerPos.y + neoBuilding.octree.half_dy;
-			metaData.oct_min_z = neoBuilding.octree.centerPos.z - neoBuilding.octree.half_dz;
-			metaData.oct_max_z = neoBuilding.octree.centerPos.z + neoBuilding.octree.half_dz;
-			
-			// now parse materialsList of the neoBuilding.
-			//var ver0 = neoBuilding.metaData.version[0];
-			//var ver1 = neoBuilding.metaData.version[2];
-			//var ver2 = neoBuilding.metaData.version[4];
-			
-			if (metaData.version === "0.0.1" || metaData.version === "0.0.2")
-			{
-				// read materials list.
-				var materialsCount = readerWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-				for (var i=0; i<materialsCount; i++)
-				{
-					var textureTypeName = "";
-					var textureImageFileName = "";
-
-					// Now, read the texture_type and texture_file_name.***
-					var texture_type_nameLegth = readerWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-					for (var j=0; j<texture_type_nameLegth; j++) 
-					{
-						textureTypeName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1))[0]);bytesReaded += 1; // for example "diffuse".***
-					}
-
-					var texture_fileName_Legth = readerWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-					var charArray = new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ texture_fileName_Legth)); bytesReaded += texture_fileName_Legth;
-					var decoder = new TextDecoder('utf-8');
-					textureImageFileName = decoder.decode(charArray);
-					
-					if (texture_fileName_Legth > 0)
-					{
-						var texture = new Texture();
-						texture.textureTypeName = textureTypeName;
-						texture.textureImageFileName = textureImageFileName;
-						
-						if (neoBuilding.texturesLoaded === undefined)
-						{ neoBuilding.texturesLoaded = []; }
-						
-						neoBuilding.texturesLoaded.push(texture);
-					}
-				}
-				
-				// read geometry type data.***
-				var lod;
-				var nameLength;
-				var lodBuildingDatasCount = (new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
-				if (lodBuildingDatasCount !== undefined)
-				{
-					neoBuilding.lodBuildingDatasMap = {};
-					
-					for (var i =0; i<lodBuildingDatasCount; i++)
-					{
-						var lodBuildingData = new LodBuildingData();
-						lodBuildingData.lod = (new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
-						lodBuildingData.isModelRef = (new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
-						
-						if (lodBuildingData.lod === 2)
-						{
-							// read the lod2_textureFileName.***
-							nameLength = (new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
-							lodBuildingData.textureFileName = "";
-							for (var j=0; j<nameLength; j++) 
-							{
-								lodBuildingData.textureFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1))[0]);bytesReaded += 1; 
-							}
-						}
-						
-						if (!lodBuildingData.isModelRef)
-						{
-							nameLength = (new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
-							lodBuildingData.geometryFileName = "";
-							for (var j=0; j<nameLength; j++) 
-							{
-								lodBuildingData.geometryFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1))[0]);bytesReaded += 1; 
-							}
-							
-							nameLength = (new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
-							lodBuildingData.textureFileName = "";
-							for (var j=0; j<nameLength; j++) 
-							{
-								lodBuildingData.textureFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1))[0]);bytesReaded += 1; 
-							}
-						}
-						neoBuilding.lodBuildingDatasMap[lodBuildingData.lod] = lodBuildingData;
-					}
-
-				}
-			}
-
-			metaData.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-
-			//BR_Project._f4d_header_readed_finished = true;
+			var bytesReaded = 0;
+			neoBuilding.parseHeader(arrayBuffer, bytesReaded) ;
 			arrayBuffer = undefined;
 		}
 		else 

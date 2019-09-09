@@ -411,6 +411,20 @@ Point3D.prototype.set = function(x, y, z)
  * @param y 변수
  * @param z 변수
  */
+Point3D.prototype.readDataFromBuffer = function(dataArrayBuffer, bytesReaded) 
+{
+	this.x = (new Float32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+	this.y = (new Float32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+	this.z = (new Float32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+	return bytesReaded;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param x 변수
+ * @param y 변수
+ * @param z 변수
+ */
 Point3D.prototype.add = function(x, y, z) 
 {
 	this.x += x; this.y += y; this.z += z;
