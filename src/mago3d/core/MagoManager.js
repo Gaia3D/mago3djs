@@ -2018,6 +2018,9 @@ MagoManager.prototype.keyDown = function(key)
 			var projectFolderName = "smartTile_f4d";
 			fileName = this.readerWriter.geometryDataPath + "/" + projectFolderName + "/" + "smartTile_f4d_indexFile.sii";
 			
+			//var projectFolderName = "3ds";
+			//fileName = this.readerWriter.geometryDataPath + "/" + projectFolderName + "/" + "smartTile_f4d_indexFile.sii";
+			
 			this.readerWriter.getObjectIndexFileSmartTileF4d(fileName, projectFolderName, this);
 		}
 		

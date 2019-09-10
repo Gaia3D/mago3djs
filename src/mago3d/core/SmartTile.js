@@ -778,7 +778,7 @@ SmartTile.prototype.extractLowestTiles = function(resultLowestTilesArray)
 		resultLowestTilesArray.push(this);
 	}
 		
-	if (this.subTiles === undefined)
+	if (this.subTiles === undefined || this.subTiles.length === 0)
 	{
 		return;
 	}
@@ -878,6 +878,9 @@ SmartTile.prototype.isNeededToCreateGeometriesFromSeeds = function()
 		if (this.nodesArray.length !== this.nodeSeedsArray.length)
 		{ return true; }
 	}
+	
+	if (this.smartTileF4dSeedArray !== undefined && this.smartTileF4dSeedArray.length > 0)
+	{ return true; }
 	
 	return isNeeded;
 };
@@ -1034,6 +1037,9 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 	var smartTileManager = magoManager.smartTileManager;
 	var targetDepth = 17;
 	
+	if (targetDepth < this.depth)
+	{ targetDepth = this.depth; }
+	
 	// parse smartTileF4d.***
 	var bytesReaded = 0;
 	var buildingsCount = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
@@ -1070,10 +1076,13 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		
 		// Create a neoBuilding.
 		var neoBuilding = new NeoBuilding();
+		data.neoBuilding = neoBuilding;
 		
 		// read header (metaData + octree's structure + textures list + lodBuilding data).
 		var metadataByteSize = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 		bytesReaded = neoBuilding.parseHeader(dataArrayBuffer, bytesReaded);
+		neoBuilding.bbox = neoBuilding.metaData.bbox;
+		neoBuilding.projectFolderName = "smartTile_f4d" + "/" + buildingId;
 		
 		// read lod5 mesh data.
 		var lod5meshSize = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
@@ -1119,7 +1128,7 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		data.rotationsDegree = eulerAngDeg; 
 		
 		// finally put the node into smartTile.
-		smartTileManager.putNode(targetDepth, node, magoManager);
+		this.putNode(targetDepth, node, magoManager);
 	}
 	
 };

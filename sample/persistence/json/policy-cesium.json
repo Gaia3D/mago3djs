@@ -23,8 +23,7 @@
   "geo_view_library": "cesium",
   "geo_cesium_ion_token": "",
   "geo_data_path": "/f4d",
-  "geo_data_default_projects": [
-    "3ds.json"
+  "geo_data_default_projects": ["3ds.json"
   ],
   "geo_cull_face_enable": "false",
   "geo_time_line_enable": "false",
