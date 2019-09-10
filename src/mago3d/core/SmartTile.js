@@ -1031,6 +1031,8 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 {
 	var hierarchyManager = magoManager.hierarchyManager;
 	var readWriter = magoManager.readerWriter;
+	var smartTileManager = magoManager.smartTileManager;
+	var targetDepth = 17;
 	
 	// parse smartTileF4d.***
 	var bytesReaded = 0;
@@ -1069,39 +1071,55 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		// Create a neoBuilding.
 		var neoBuilding = new NeoBuilding();
 		
-		// read header (metaData + octree + textures list + lodBuilding data).
+		// read header (metaData + octree's structure + textures list + lodBuilding data).
 		var metadataByteSize = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
-		var byteSize = 1;
-		var startBuff = bytesReaded;
-		var endBuff = bytesReaded + byteSize * metadataByteSize;
-		var dataBuffer = new Uint8Array(dataArrayBuffer.slice(startBuff, endBuff));
-		bytesReaded = bytesReaded + byteSize * metadataByteSize; // updating data.
-		
-		neoBuilding.parseHeader(dataBuffer);
+		bytesReaded = neoBuilding.parseHeader(dataArrayBuffer, bytesReaded);
 		
 		// read lod5 mesh data.
 		var lod5meshSize = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
-		byteSize = 1;
-		startBuff = bytesReaded;
-		endBuff = bytesReaded + byteSize * lod5meshSize;
-		var lod5MeshDataBuffer = new Uint8Array(dataArrayBuffer.slice(startBuff, endBuff));
-		bytesReaded = bytesReaded + byteSize * lod5meshSize; // updating data.
+		var lodToLoad = 5;
+		var lodBuildingData = neoBuilding.getLodBuildingData(lodToLoad);
+		if (lodBuildingData === undefined)
+		{ return false; }
+
+		if (lodBuildingData.isModelRef)
+		{ return false; }
+		
+		var textureFileName = lodBuildingData.textureFileName;
+		var lodString = lodBuildingData.geometryFileName;
+		
+		var lowLodMesh = neoBuilding.getOrNewLodMesh(lodString);
+		lowLodMesh.textureName = textureFileName;
+		lowLodMesh.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+		bytesReaded = lowLodMesh.parseLegoData(dataArrayBuffer, magoManager, bytesReaded);
 		
 		// read lod5 image.
 		var lod5ImageSize = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
-		byteSize = 1;
-		startBuff = bytesReaded;
-		endBuff = bytesReaded + byteSize * lod5ImageSize;
+		var byteSize = 1;
+		var startBuff = bytesReaded;
+		var endBuff = bytesReaded + byteSize * lod5ImageSize;
 		var lod5ImageDataBuffer = new Uint8Array(dataArrayBuffer.slice(startBuff, endBuff));
 		bytesReaded = bytesReaded + byteSize * lod5ImageSize; // updating data.
+
+		if (lowLodMesh.texture === undefined)
+		{ lowLodMesh.texture = new Texture(); }
+	
+		var gl = magoManager.getGl();
+		TexturesManager.newWebGlTextureByEmbeddedImage(gl, lod5ImageDataBuffer, lowLodMesh.texture);
+		
 		
 		// read geographicCoord.
 		var geoCoord = new GeographicCoord();
 		bytesReaded = geoCoord.readDataFromBuffer(dataArrayBuffer, bytesReaded);
+		node.data.geographicCoord = geoCoord;
 		
 		// read euler angles degree.
 		var eulerAngDeg = new Point3D();
 		bytesReaded = eulerAngDeg.readDataFromBuffer(dataArrayBuffer, bytesReaded);
+		data.rotationsDegree = eulerAngDeg; 
+		
+		// finally put the node into smartTile.
+		smartTileManager.putNode(targetDepth, node, magoManager);
 	}
 	
 };

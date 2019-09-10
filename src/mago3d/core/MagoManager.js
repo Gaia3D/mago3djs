@@ -2310,14 +2310,6 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			};
 			rightWallOptions.openingsDataArray.push(openingData);
 			
-			var options = {
-				"hasGround"        : true,
-				"roofMinHeight"    : factoryHeight*0.75,
-				"frontWallOptions" : frontWallOptions,
-				"rearWallOptions"  : rearWallOptions,
-				"rightWallOptions" : rightWallOptions
-			};
-			
 			// Left wall.
 			var leftWallOptions = {};
 			leftWallOptions.openingsDataArray = [];

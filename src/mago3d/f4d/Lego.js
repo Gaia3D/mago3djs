@@ -120,9 +120,9 @@ var Lego = function()
  * @param {ArrayBuffer} dataArraybuffer 
  * @param {MagoManager} magoManager 
  */
-Lego.prototype.parseArrayBuffer = function(gl, dataArraybuffer, magoManager)
+Lego.prototype.parseArrayBuffer = function(dataArraybuffer, magoManager)
 {
-	this.parseLegoData(dataArraybuffer, gl, magoManager);
+	this.parseLegoData(dataArraybuffer, magoManager);
 };
 
 /**
@@ -301,64 +301,110 @@ Lego.prototype.parsePointsCloudData = function(buffer, gl, magoManager)
  * @param {WebGLRenderingContext} gl not use
  * @param {MagoManager} magoManager 
  */
-Lego.prototype.parseLegoData = function(buffer, gl, magoManager)
+Lego.prototype.parseLegoData = function(buffer, magoManager, bytesReaded)
 {
 	if (this.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)	{ return; }
 	
 	var vboMemManager = magoManager.vboMemoryManager;
+	
+	if (bytesReaded === undefined)
+	{ bytesReaded = 0; }
 
-	var stream = new DataStream(buffer, 0, DataStream.LITTLE_ENDIAN);
+	//var stream = new DataStream(buffer, 0, DataStream.LITTLE_ENDIAN);
 	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 
 	this.bbox = new BoundingBox();
 	var bbox = this.bbox;
 	var vboCacheKey = this.vbo_vicks_container.newVBOVertexIdxCacheKey();
 
-	// BoundingBox
-	bbox.minX = stream.readFloat32();
-	bbox.minY = stream.readFloat32();
-	bbox.minZ = stream.readFloat32();
-	bbox.maxX = stream.readFloat32();
-	bbox.maxY = stream.readFloat32();
-	bbox.maxZ = stream.readFloat32();
+	// BoundingBox.
+	bytesReaded = bbox.readData(buffer, bytesReaded);
+	//bbox.minX = stream.readFloat32();
+	//bbox.minY = stream.readFloat32();
+	//bbox.minZ = stream.readFloat32();
+	//bbox.maxX = stream.readFloat32();
+	//bbox.maxY = stream.readFloat32();
+	//bbox.maxZ = stream.readFloat32();
 
 	// VBO(Position Buffer) - x,y,z
-	var numPositions = stream.readUint32();
-	var posDataArray = stream.readFloat32Array(numPositions * 3);
+	var numPositions = (new Int32Array(buffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+	var byteSize = 4;
+	var startBuff = bytesReaded;
+	var endBuff = bytesReaded + byteSize * numPositions * 3;
+	var posDataArray = new Float32Array(buffer.slice(startBuff, endBuff));
 	vboCacheKey.setDataArrayPos(posDataArray, vboMemManager);
+	bytesReaded = bytesReaded + byteSize * numPositions * 3; // updating data.
+		
+	//var numPositions = stream.readUint32();
+	//var posDataArray = stream.readFloat32Array(numPositions * 3);
+	//vboCacheKey.setDataArrayPos(posDataArray, vboMemManager);
 
 
 	// VBO(Normal Buffer) - i,j,k
-	var hasNormals = stream.readUint8();
-	if (hasNormals) 
+	var hasNormals = (new Uint8Array(buffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
+	if (hasNormals)
 	{
-		var numNormals = stream.readUint32();
-		var norDataArray = stream.readInt8Array(numNormals * 3);
+		var numNormals = (new Int32Array(buffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+		byteSize = 1;
+		startBuff = bytesReaded;
+		endBuff = bytesReaded + byteSize * numNormals * 3;
+		var norDataArray = new Int8Array(buffer.slice(startBuff, endBuff));
 		vboCacheKey.setDataArrayNor(norDataArray, vboMemManager);
+		bytesReaded = bytesReaded + byteSize * numNormals * 3; // updating data.
 	}
+	//var hasNormals = stream.readUint8();
+	//if (hasNormals) 
+	//{
+	//	var numNormals = stream.readUint32();
+	//	var norDataArray = stream.readInt8Array(numNormals * 3);
+	//	vboCacheKey.setDataArrayNor(norDataArray, vboMemManager);
+	//}
 
 	// VBO(Color Buffer) - r,g,b,a
-	var hasColors = stream.readUint8();
+	var hasColors = (new Uint8Array(buffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
 	if (hasColors)
 	{
-		var numColors = stream.readUint32();
-		var colDataArray = stream.readUint8Array(numColors * 4);
+		var numColors = (new Int32Array(buffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+		byteSize = 1;
+		startBuff = bytesReaded;
+		endBuff = bytesReaded + byteSize * numColors * 4;
+		var colDataArray = new Int8Array(buffer.slice(startBuff, endBuff));
 		vboCacheKey.setDataArrayCol(colDataArray, vboMemManager);
+		bytesReaded = bytesReaded + byteSize * numColors * 4; // updating data.
 	}
+	//var hasColors = stream.readUint8();
+	//if (hasColors)
+	//{
+	//	var numColors = stream.readUint32();
+	//	var colDataArray = stream.readUint8Array(numColors * 4);
+	//	vboCacheKey.setDataArrayCol(colDataArray, vboMemManager);
+	//}
 
 	// VBO(TextureCoord Buffer) - u,v
-	this.hasTexCoords = stream.readUint8();
+	this.hasTexCoords = (new Uint8Array(buffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
 	if (this.hasTexCoords)
 	{
-		var dataType = stream.readUint16();
-		var numCoords = stream.readUint32();
-		var texCoordDataArray = stream.readFloat32Array(numCoords * 2);
+		var dataType = (new Uint16Array(buffer.slice(bytesReaded, bytesReaded+2)))[0]; bytesReaded += 2;
+		var numCoords = (new Uint32Array(buffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+		byteSize = 4;
+		startBuff = bytesReaded;
+		endBuff = bytesReaded + byteSize * numCoords * 2;
+		var texCoordDataArray = new Float32Array(buffer.slice(startBuff, endBuff));
 		vboCacheKey.setDataArrayTexCoord(texCoordDataArray, vboMemManager);
+		bytesReaded = bytesReaded + byteSize * numCoords * 2; // updating data.
 	}
+	//this.hasTexCoords = stream.readUint8();
+	//if (this.hasTexCoords)
+	//{
+	//	var dataType = stream.readUint16();
+	//	var numCoords = stream.readUint32();
+	//	var texCoordDataArray = stream.readFloat32Array(numCoords * 2);
+	//	vboCacheKey.setDataArrayTexCoord(texCoordDataArray, vboMemManager);
+	//}
 
 	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 	
-	return true;
+	return bytesReaded;
 };
 
 /**

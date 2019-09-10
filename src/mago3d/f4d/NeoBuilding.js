@@ -493,6 +493,26 @@ NeoBuilding.prototype.getLodBuildingData = function(lod)
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param lod 변수
+ */
+NeoBuilding.prototype.getOrNewLodMesh = function(lodString) 
+{
+	if (this.lodMeshesMap === undefined)
+	{ this.lodMeshesMap = {}; }
+
+	var lowLodMesh = this.lodMeshesMap[lodString];
+	if (lowLodMesh === undefined)
+	{
+		lowLodMesh = new Lego();
+		lowLodMesh.fileLoadState = CODE.fileLoadState.READY;
+		lowLodMesh.legoKey = this.buildingId + "_" + lodString;
+		this.lodMeshesMap[lodString] = lowLodMesh;
+	}
+	return lowLodMesh;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  * @param neoReference 변수
  */
 NeoBuilding.prototype.getCurrentLodString = function() 
@@ -524,8 +544,10 @@ NeoBuilding.prototype.getLowerSkinLodToLoad = function(currentLod)
 		{ continue; }
 	
 		var lodStringAux = lodBuildingDataAux.geometryFileName;
-		var lowLodMeshAux = this.lodMeshesMap[lodStringAux];
-		
+		var lowLodMeshAux;
+		if (this.lodMeshesMap !== undefined)
+		{ lowLodMeshAux = this.lodMeshesMap[lodStringAux]; }
+			
 		// Check if lowLodMeshAux if finished loading data.
 		if (lowLodMeshAux === undefined || lowLodMeshAux.fileLoadState === CODE.fileLoadState.READY)
 		{
@@ -897,7 +919,7 @@ NeoBuilding.prototype.parseHeader = function(arrayBuffer, bytesReaded)
 {
 	// In the header file, there are:
 	// 1) metaData.
-	// 2) octree.
+	// 2) octree's structure.
 	// 3) textures list.
 	// 4) lodBuilding data.
 	
@@ -936,7 +958,7 @@ NeoBuilding.prototype.parseHeader = function(arrayBuffer, bytesReaded)
 		bytesReaded = this.parseTexturesList(arrayBuffer, bytesReaded);
 
 		// read geometry type data.***
-		this.parseLodBuildingData(arrayBuffer, bytesReaded);
+		bytesReaded = this.parseLodBuildingData(arrayBuffer, bytesReaded);
 	}
 
 	metaData.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
@@ -990,7 +1012,9 @@ NeoBuilding.prototype.parseLodBuildingData = function(arrayBuffer, bytesReaded)
 			}
 			this.lodBuildingDatasMap[lodBuildingData.lod] = lodBuildingData;
 		}
-
+		
+		// read a endMark.
+		var endMark = (new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
 	}
 	
 	return bytesReaded;
@@ -1009,10 +1033,7 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 	{ return false; }
 
 	if (this.buildingId === "JibCrane")
-	{ var hola = 0; }
-
-	if (this.lodMeshesMap === undefined)
-	{ this.lodMeshesMap = {}; } 
+	{ var hola = 0; } 
 	
 	var projectFolderName = this.projectFolderName;
 	var buildingFolderName = this.buildingFileName;
@@ -1031,16 +1052,8 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 	var textureFileName = lodBuildingData.textureFileName;
 	var lodString = lodBuildingData.geometryFileName;
 	
-	///lowLodMesh = this.lodMeshesMap.get(lodString); // code if "lodMeshesMap" is a map.
-	var lowLodMesh = this.lodMeshesMap[lodString];
-	if (lowLodMesh === undefined)
-	{
-		lowLodMesh = new Lego();
-		lowLodMesh.fileLoadState = CODE.fileLoadState.READY;
-		lowLodMesh.textureName = textureFileName;
-		lowLodMesh.legoKey = this.buildingId + "_" + lodString;
-		this.lodMeshesMap[lodString] = lowLodMesh;
-	}
+	var lowLodMesh = this.getOrNewLodMesh(lodString);
+	lowLodMesh.textureName = textureFileName;
 	
 	if (lowLodMesh.fileLoadState === -1)
 	{
