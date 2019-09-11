@@ -1066,6 +1066,11 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 			"isPhysical" : true,
 			"objectType" : "basicF4d"
 		};
+		
+		// test.!!!
+		projectId = "smartTile_f4d";
+		// end test.!!!
+		
 		var node = hierarchyManager.newNode(buildingId, projectId, attributes);
 		var data = node.data;
 		data.projectFolderName = projectId;
@@ -1077,12 +1082,15 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		// Create a neoBuilding.
 		var neoBuilding = new NeoBuilding();
 		data.neoBuilding = neoBuilding;
+		neoBuilding.buildingFileName = buildingId;
+		neoBuilding.buildingId = buildingId;
+		neoBuilding.projectFolderName = projectId;
+		neoBuilding.nodeOwner = node;
 		
 		// read header (metaData + octree's structure + textures list + lodBuilding data).
 		var metadataByteSize = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 		bytesReaded = neoBuilding.parseHeader(dataArrayBuffer, bytesReaded);
 		neoBuilding.bbox = neoBuilding.metaData.bbox;
-		neoBuilding.projectFolderName = "smartTile_f4d" + "/" + buildingId;
 		
 		// read lod5 mesh data.
 		var lod5meshSize = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;

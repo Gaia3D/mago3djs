@@ -1031,9 +1031,6 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 	
 	if (headerVersion[0] !== "0")
 	{ return false; }
-
-	if (this.buildingId === "JibCrane")
-	{ var hola = 0; } 
 	
 	var projectFolderName = this.projectFolderName;
 	var buildingFolderName = this.buildingFileName;
