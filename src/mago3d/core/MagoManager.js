@@ -2849,6 +2849,24 @@ MagoManager.prototype.moveSelectedObjectGeneral = function(gl, object)
 				}
 			}
 		}
+		if (attributes && attributes.hasStaticModel)
+		{
+			var projectId = attributes.projectId;
+			var dataKey = attributes.instanceId;
+			if (!defined(projectId))
+			{
+				return false;
+			}
+			if (!defined(dataKey))
+			{
+				return false;
+			}
+			var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
+			if (node !== undefined)
+			{
+				node.changeLocationAndRotation(newlatitude, newLongitude, 0, 0, 0, 0, this);
+			}
+		}
 		
 		difX = geoLocationData.geographicCoord.longitude - newLongitude;
 		difY = geoLocationData.geographicCoord.latitude - newlatitude;

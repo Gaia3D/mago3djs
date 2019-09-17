@@ -197,7 +197,7 @@ ConcentricTubes.prototype.render = function (magoManager, shader, renderType, gl
 		var idxKey = magoManager.selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
 		magoManager.selectionManager.setCandidateGeneral(idxKey, this);
 		
-		gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
+		gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 0.7]);
 		gl.disable(gl.BLEND);
 	}
 	

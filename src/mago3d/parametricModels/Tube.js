@@ -128,7 +128,7 @@ Tube.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 		var idxKey = magoManager.selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
 		magoManager.selectionManager.setCandidateGeneral(idxKey, this);
 		
-		gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
+		gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 0.7]);
 		gl.disable(gl.BLEND);
 	}
 	
@@ -163,19 +163,19 @@ Tube.prototype.renderRaw = function(magoManager, shader, renderType, glPrimitive
 		// Color render.***
 		//gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
 		gl.enable(gl.BLEND);
+		gl.uniform1i(shader.bApplySsao_loc, true);
 		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
 		
 		// Check if is selected.***
 		var selectionManager = magoManager.selectionManager;
 		if (bIsSelected !== undefined && bIsSelected)
 		{
-			gl.disable(gl.BLEND);
-			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 1.0]);
+			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 0.7]);
 		}
 		else if (selectionManager.isObjectSelected(this))
 		{
 			gl.disable(gl.BLEND);
-			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 1.0]);
+			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 0.7]);
 		}
 		else 
 		{
@@ -184,7 +184,7 @@ Tube.prototype.renderRaw = function(magoManager, shader, renderType, glPrimitive
 		
 	}
 
-	this.mesh.render(magoManager, shader, renderType, glPrimitive);
+	this.mesh.render(magoManager, shader, renderType, glPrimitive, bIsSelected);
 
 	gl.disable(gl.BLEND);
 };
