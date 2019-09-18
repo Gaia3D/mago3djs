@@ -862,67 +862,6 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		if (magoManager.sunDepthFbo !== undefined)
 		{ bApplyShadow = true; }
 		
-		// Test Modeler Rendering.********************************************************************
-		// Test Modeler Rendering.********************************************************************
-		// Test Modeler Rendering.********************************************************************
-		/*
-		if (magoManager.modeler !== undefined)
-		{
-			currentShader = magoManager.postFxShadersManager.getShader("modelRefSsao"); 
-			currentShader.useProgram();
-			gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
-			gl.uniform1i(currentShader.bApplySpecularLighting_loc, true);
-			gl.uniform1i(currentShader.bApplyShadow_loc, bApplyShadow);
-			
-			if (bApplyShadow)
-			{
-				// Set sunMatrix uniform.***
-				var sunLight = magoManager.sceneState.sunLight;
-				gl.uniformMatrix4fv(currentShader.sunMatrix_loc, false, sunLight.tMatrix._floatArrays);
-				gl.uniform3fv(currentShader.sunPosHigh_loc, sunLight.positionHIGH);
-				gl.uniform3fv(currentShader.sunPosLow_loc, sunLight.positionLOW);
-				gl.uniform1f(currentShader.shadowMapWidth_loc, sunLight.targetTextureWidth);
-				gl.uniform1f(currentShader.shadowMapHeight_loc, sunLight.targetTextureHeight);
-			}
-			gl.enableVertexAttribArray(currentShader.texCoord2_loc);
-			gl.enableVertexAttribArray(currentShader.position3_loc);
-			gl.enableVertexAttribArray(currentShader.normal3_loc);
-			if (currentShader.color4_loc !== -1){ gl.disableVertexAttribArray(currentShader.color4_loc); }
-			
-			gl.uniform1f(currentShader.externalAlpha_loc, 1.0);
-			gl.uniform1i(currentShader.textureFlipYAxis_loc, magoManager.sceneState.textureFlipYAxis);
-			gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
-			gl.uniform4fv(currentShader.oneColor4_loc, [1.0, 1.0, 1.0, 1.0]);
-			
-			currentShader.bindUniformGenerals();
-
-			gl.activeTexture(gl.TEXTURE0);
-			gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);  // original.***
-			gl.activeTexture(gl.TEXTURE1);
-			gl.bindTexture(gl.TEXTURE_2D, noiseTexture);
-			gl.activeTexture(gl.TEXTURE2); 
-			gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
-			currentShader.last_tex_id = textureAux1x1;
-			
-			gl.activeTexture(gl.TEXTURE3); 
-			if (bApplyShadow)
-			{
-				gl.bindTexture(gl.TEXTURE_2D, magoManager.sunDepthFbo.colorBuffer);
-			}
-			else 
-			{
-				gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
-			}
-			
-			var renderType = 1;
-			var refMatrixIdxKey =0; // provisionally set magoManager var here.***
-			magoManager.modeler.render(magoManager, currentShader, renderType);
-
-			currentShader.disableVertexAttribArrayAll();
-			gl.useProgram(null);
-		}
-		*/
-		
 		// check changesHistory.
 		magoManager.checkChangesHistoryMovements(visibleObjControlerNodes.currentVisibles0);
 		magoManager.checkChangesHistoryColors(visibleObjControlerNodes.currentVisibles0);

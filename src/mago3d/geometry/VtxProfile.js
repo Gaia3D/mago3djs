@@ -129,6 +129,29 @@ VtxProfile.prototype.translate = function(dx, dy, dz)
 };
 
 /**
+ * Rotates this VtxProfile specified angle by "angDeg" in (axisX, axisY, axisZ) axis.
+ * @param {Number} angDeg Angle in degrees to rotate this VtxProfile.
+ * @param {Number} axisX X component of the rotation axis.
+ * @param {Number} axisY Y component of the rotation axis.
+ * @param {Number} axisZ Z component of the rotation axis.
+ */
+VtxProfile.prototype.rotate = function(angDeg, axisX, axisY, axisZ)
+{
+	var rotMat = new Matrix4();
+	var quaternion = new Quaternion();
+	
+	// Note: the axisX, axisY, axisZ must be unitary, but to be safe process, force rotationAxis to be unitary.*** 
+	var rotAxis = new Point3D(axisX, axisY, axisZ);
+	rotAxis.unitary();
+
+	// calculate rotation.
+	quaternion.rotationAngDeg(angDeg, rotAxis.x, rotAxis.y, rotAxis.z);
+	rotMat.rotationByQuaternion(quaternion);
+	
+	this.transformPointsByMatrix4(rotMat);
+};
+
+/**
  * vertex point transform by matrix4
  * @param {Matrix4} tMat4
  * @see Matrix4#transformPoint3D

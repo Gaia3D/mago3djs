@@ -664,11 +664,21 @@ Node.prototype.calculateBBoxCenterPositionWorldCoord = function(geoLoc)
 	}
 	else if (this.data.neoBuilding !== undefined)
 	{
-		bboxCenterPoint = this.data.neoBuilding.bbox.getCenterPoint(bboxCenterPoint); // local bbox.
+		var bbox = this.data.neoBuilding.getBBox();
+		if (bbox !== undefined)
+		{
+			bboxCenterPoint = bbox.getCenterPoint(bboxCenterPoint); // local bbox.
+		}
+		else 
+		{
+			// error.
+			return undefined;
+		}
 	}
 	else 
 	{
-		bboxCenterPoint = new Point3D();
+		// error.
+		return undefined;
 	}
 
 	bboxAbsoluteCenterPosAux = geoLoc.tMatrix.transformPoint3D(bboxCenterPoint, bboxAbsoluteCenterPosAux);

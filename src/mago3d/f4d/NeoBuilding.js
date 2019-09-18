@@ -54,6 +54,9 @@ var NeoBuilding = function()
 	// Render settings.
 	// provisionally put this here.
 	this.applyOcclusionCulling;
+	
+	// header = metadata + octree's structute + textures list + lodBuildingData.
+	this.headerDataArrayBuffer;
 };
 
 /**
@@ -308,6 +311,23 @@ NeoBuilding.prototype.deleteLodMesh = function(gl, lod, vboMemoryManager)
 			legoSkin = undefined;
 		}
 	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param texture 변수
+ * @returns texId
+ */
+NeoBuilding.prototype.getBBox = function() 
+{
+	if (this.bbox !== undefined)
+	{ return this.bbox; }
+	else if (this.metaData !== undefined && this.metaData.bbox !== undefined)
+	{
+		return this.metaData.bbox;
+	}
+	
+	return undefined;
 };
 
 /**
@@ -695,6 +715,8 @@ NeoBuilding.prototype.getCurrentSkin = function()
 		
 		if (skinLego === undefined || !skinLego.isReadyToRender())
 		{
+			// If lod5 mesh is not ready to render, then check if can parse data.
+			
 			skinLego = this.lodMeshesMap.lod4;
 			if (skinLego === undefined || !skinLego.isReadyToRender())
 			{
@@ -925,9 +947,8 @@ NeoBuilding.prototype.parseHeader = function(arrayBuffer, bytesReaded)
 	
 	// metadata.
 	if (this.metaData === undefined) 
-	{
-		this.metaData = new MetaData();
-	}
+	{ this.metaData = new MetaData(); }
+
 	if (bytesReaded === undefined)
 	{ bytesReaded = 0; }
 	
@@ -961,7 +982,11 @@ NeoBuilding.prototype.parseHeader = function(arrayBuffer, bytesReaded)
 		bytesReaded = this.parseLodBuildingData(arrayBuffer, bytesReaded);
 	}
 
-	metaData.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+	metaData.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
+	this.headerDataArrayBuffer = undefined;
+	
+	this.bbox = this.metaData.bbox;
+	
 	return bytesReaded;
 };
 
@@ -975,6 +1000,9 @@ NeoBuilding.prototype.parseLodBuildingData = function(arrayBuffer, bytesReaded)
 	var lodBuildingDatasCount = (new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
 	if (lodBuildingDatasCount !== undefined)
 	{
+		if (lodBuildingDatasCount < 5)
+		{ var hola = 0; }
+		
 		this.lodBuildingDatasMap = {};
 		
 		for (var i =0; i<lodBuildingDatasCount; i++)
@@ -1015,6 +1043,10 @@ NeoBuilding.prototype.parseLodBuildingData = function(arrayBuffer, bytesReaded)
 		
 		// read a endMark.
 		var endMark = (new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
+	}
+	else 
+	{
+		var hola = 0;
 	}
 	
 	return bytesReaded;
@@ -1067,6 +1099,10 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 		{ lowLodMesh.vbo_vicks_container.vboCacheKeysArray = []; }
 		
 	}
+	else if (lowLodMesh.fileLoadState === CODE.fileLoadState.LOADING_FINISHED) 
+	{
+		magoManager.parseQueue.putSkinLegosToParse(lowLodMesh);
+	}
 	
 	if (lowLodMesh.vbo_vicks_container.vboCacheKeysArray[0] && lowLodMesh.vbo_vicks_container.vboCacheKeysArray[0].vboBufferTCoord)
 	{
@@ -1081,6 +1117,12 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 			{ flip_y_texCoords = false; }
 			
 			magoManager.readerWriter.readLegoSimpleBuildingTexture(gl, filePath_inServer, lowLodMesh.texture, magoManager, flip_y_texCoords); 
+		}
+		else if (lowLodMesh.texture.fileLoadState === CODE.fileLoadState.LOADING_FINISHED && lowLodMesh.texture.texId === undefined)
+		{
+			// then make the image to bind into gpu.
+			var gl = magoManager.sceneState.gl;
+			TexturesManager.newWebGlTextureByEmbeddedImage(gl, lowLodMesh.texture.imageBinaryData, lowLodMesh.texture);
 		}
 	}
 	

@@ -338,7 +338,8 @@ ProcessQueue.prototype.deleteNeoBuilding = function(gl, neoBuilding, magoManager
 		magoManager.objectSelected = undefined;
 	}
 	
-	neoBuilding.deleteObjects(gl, vboMemoryManager);
+	//neoBuilding.deleteObjects(gl, vboMemoryManager);
+	neoBuilding.deleteObjectsModelReferences(gl, vboMemoryManager);
 	
 };
 

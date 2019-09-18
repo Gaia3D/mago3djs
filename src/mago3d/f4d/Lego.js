@@ -111,6 +111,8 @@ var Lego = function()
 	 * @type {Boolean}
 	 */
 	this.isAdult = false;
+	
+	this.dataArrayBuffer;
 };
 
 /**
@@ -305,6 +307,9 @@ Lego.prototype.parseLegoData = function(buffer, magoManager, bytesReaded)
 {
 	if (this.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)	{ return; }
 	
+	if (buffer === undefined)
+	{ buffer = this.dataArrayBuffer; }
+	
 	var vboMemManager = magoManager.vboMemoryManager;
 	
 	if (bytesReaded === undefined)
@@ -319,12 +324,6 @@ Lego.prototype.parseLegoData = function(buffer, magoManager, bytesReaded)
 
 	// BoundingBox.
 	bytesReaded = bbox.readData(buffer, bytesReaded);
-	//bbox.minX = stream.readFloat32();
-	//bbox.minY = stream.readFloat32();
-	//bbox.minZ = stream.readFloat32();
-	//bbox.maxX = stream.readFloat32();
-	//bbox.maxY = stream.readFloat32();
-	//bbox.maxZ = stream.readFloat32();
 
 	// VBO(Position Buffer) - x,y,z
 	var numPositions = (new Int32Array(buffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;

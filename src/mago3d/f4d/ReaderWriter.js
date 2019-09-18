@@ -1063,7 +1063,9 @@ ReaderWriter.prototype.getNeoHeaderAsimetricVersion = function(gl, fileName, neo
 		if (arrayBuffer) 
 		{
 			var bytesReaded = 0;
-			neoBuilding.parseHeader(arrayBuffer, bytesReaded) ;
+			neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+			neoBuilding.headerDataArrayBuffer = arrayBuffer;
+			////neoBuilding.parseHeader(arrayBuffer, bytesReaded) ;
 			arrayBuffer = undefined;
 		}
 		else 
