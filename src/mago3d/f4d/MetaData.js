@@ -278,7 +278,6 @@ MetaData.prototype.parseFileHeaderAsimetricVersion = function(arrayBuffer, bytes
 		this.offSetY = (new Float64Array(arrayBuffer.slice(bytesReaded, bytesReaded+8)))[0]; bytesReaded += 8;
 		this.offSetZ = (new Float64Array(arrayBuffer.slice(bytesReaded, bytesReaded+8)))[0]; bytesReaded += 8;
 	}
-
 	return bytesReaded;
 };
 

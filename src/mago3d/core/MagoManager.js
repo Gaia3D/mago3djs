@@ -516,6 +516,11 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 				
 				this.readerWriter.getNeoHeaderAsimetricVersion(gl, neoBuildingHeaderPath, neoBuilding, this.readerWriter, this); // Here makes the tree of octree.***
 			}
+			else if (metaData.fileLoadState === CODE.fileLoadState.LOADING_FINISHED) 
+			{
+				var bytesReaded = 0;
+				neoBuilding.parseHeader(neoBuilding.headerDataArrayBuffer, bytesReaded);
+			}
 		}
 		
 	}
@@ -2015,8 +2020,11 @@ MagoManager.prototype.keyDown = function(key)
 			
 			this.buildingSeedList = new BuildingSeedList();
 			var fileName;
-			var projectFolderName = "smartTile_f4d";
+			var projectFolderName = "berilin";
 			fileName = this.readerWriter.geometryDataPath + "/" + projectFolderName + "/" + "smartTile_f4d_indexFile.sii";
+			
+			//var projectFolderName = "3ds";
+			//fileName = this.readerWriter.geometryDataPath + "/" + projectFolderName + "/" + "smartTile_f4d_indexFile.sii";
 			
 			this.readerWriter.getObjectIndexFileSmartTileF4d(fileName, projectFolderName, this);
 		}
@@ -2309,14 +2317,6 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 				"width"  : 28
 			};
 			rightWallOptions.openingsDataArray.push(openingData);
-			
-			var options = {
-				"hasGround"        : true,
-				"roofMinHeight"    : factoryHeight*0.75,
-				"frontWallOptions" : frontWallOptions,
-				"rearWallOptions"  : rearWallOptions,
-				"rightWallOptions" : rightWallOptions
-			};
 			
 			// Left wall.
 			var leftWallOptions = {};
@@ -4398,6 +4398,14 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 						visibleNodes.currentVisiblesAux.push(node);
 						continue;
 					}
+					
+					//check if parsed header.***
+					//neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+					if (neoBuilding.metaData !== undefined && neoBuilding.metaData.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
+					{
+						visibleNodes.currentVisiblesAux.push(node);
+						continue;
+					}
 
 					distToCamera = node.getDistToCamera(cameraPosition, this.boundingSphere_Aux);
 					var lodByDist = magoPolicy.getLod(distToCamera);
@@ -4474,7 +4482,7 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 					if (distToCamera > frustumFar)
 					{ 
 						// put this node to delete into queue.***
-						this.processQueue.putNodeToDelete(node, 0);
+						this.processQueue.putNodeToDelete(node, 1);
 						continue; 
 					}
 					

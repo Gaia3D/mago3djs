@@ -170,12 +170,13 @@ Tube.prototype.renderRaw = function(magoManager, shader, renderType, glPrimitive
 		var selectionManager = magoManager.selectionManager;
 		if (bIsSelected !== undefined && bIsSelected)
 		{
-			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 0.7]);
+			//gl.disable(gl.BLEND);
+			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 1.0]);
 		}
 		else if (selectionManager.isObjectSelected(this))
 		{
-			gl.disable(gl.BLEND);
-			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 0.7]);
+			//gl.disable(gl.BLEND);
+			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 1.0]);
 		}
 		else 
 		{

@@ -152,7 +152,7 @@ ParseQueue.prototype.parseArraySkins = function(gl, nodesArray, magoManager)
 			
 			if (this.eraseSkinLegosToParse(skinLego))
 			{
-				skinLego.parseArrayBuffer(gl, skinLego.dataArrayBuffer, magoManager);
+				skinLego.parseArrayBuffer(skinLego.dataArrayBuffer, magoManager);
 				skinLego.dataArrayBuffer = undefined;
 				
 				skinsParsedCount++;
@@ -352,7 +352,7 @@ ParseQueue.prototype.parseArrayOctreesLod2Legos = function(gl, octreesArray, mag
 				if (lowestOctree.lego === undefined)
 				{ continue; }
 				
-				lowestOctree.lego.parseArrayBuffer(gl, lowestOctree.lego.dataArrayBuffer, magoManager);
+				lowestOctree.lego.parseArrayBuffer(lowestOctree.lego.dataArrayBuffer, magoManager);
 				lowestOctree.lego.dataArrayBuffer = undefined;
 				
 				octreesParsedCount++;
@@ -371,7 +371,7 @@ ParseQueue.prototype.parseArrayOctreesLod2Legos = function(gl, octreesArray, mag
 					if (lowestOctree.lego === undefined)
 					{ continue; }
 					
-					lowestOctree.lego.parseArrayBuffer(gl, lowestOctree.lego.dataArrayBuffer, magoManager);
+					lowestOctree.lego.parseArrayBuffer(lowestOctree.lego.dataArrayBuffer, magoManager);
 					lowestOctree.lego.dataArrayBuffer = undefined;
 					
 					octreesParsedCount++;

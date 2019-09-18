@@ -778,7 +778,7 @@ SmartTile.prototype.extractLowestTiles = function(resultLowestTilesArray)
 		resultLowestTilesArray.push(this);
 	}
 		
-	if (this.subTiles === undefined)
+	if (this.subTiles === undefined || this.subTiles.length === 0)
 	{
 		return;
 	}
@@ -878,6 +878,9 @@ SmartTile.prototype.isNeededToCreateGeometriesFromSeeds = function()
 		if (this.nodesArray.length !== this.nodeSeedsArray.length)
 		{ return true; }
 	}
+	
+	if (this.smartTileF4dSeedArray !== undefined && this.smartTileF4dSeedArray.length > 0)
+	{ return true; }
 	
 	return isNeeded;
 };
@@ -1008,8 +1011,7 @@ SmartTile.prototype.createGeometriesFromSeeds = function(magoManager)
 				if (parseQueue.smartTileF4dParsesCount < 2)
 				{
 					// proceed to parse the dataArrayBuffer.***
-					var dataArrayBuffer = smartTileF4dSeed.dataArrayBuffer;
-					this.parseSmartTileF4d(dataArrayBuffer, magoManager);
+					this.parseSmartTileF4d(smartTileF4dSeed.dataArrayBuffer, magoManager);
 					parseQueue.smartTileF4dParsesCount++; // increment counter.
 					smartTileF4dSeed.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 					
@@ -1031,6 +1033,11 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 {
 	var hierarchyManager = magoManager.hierarchyManager;
 	var readWriter = magoManager.readerWriter;
+	var smartTileManager = magoManager.smartTileManager;
+	var targetDepth = 17;
+	
+	if (targetDepth < this.depth)
+	{ targetDepth = this.depth; }
 	
 	// parse smartTileF4d.***
 	var bytesReaded = 0;
@@ -1058,6 +1065,7 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 			"isPhysical" : true,
 			"objectType" : "basicF4d"
 		};
+		
 		var node = hierarchyManager.newNode(buildingId, projectId, attributes);
 		var data = node.data;
 		data.projectFolderName = projectId;
@@ -1068,40 +1076,186 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		
 		// Create a neoBuilding.
 		var neoBuilding = new NeoBuilding();
+		data.neoBuilding = neoBuilding;
+		neoBuilding.buildingFileName = buildingId;
+		neoBuilding.buildingId = buildingId;
+		neoBuilding.projectFolderName = projectId;
+		neoBuilding.nodeOwner = node;
 		
-		// read header (metaData + octree + textures list + lodBuilding data).
+		// read header (metaData + octree's structure + textures list + lodBuilding data).
 		var metadataByteSize = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
-		var byteSize = 1;
+		///bytesReaded = neoBuilding.parseHeader(dataArrayBuffer, bytesReaded);
+		///neoBuilding.bbox = neoBuilding.metaData.bbox;
+		
+		
 		var startBuff = bytesReaded;
-		var endBuff = bytesReaded + byteSize * metadataByteSize;
-		var dataBuffer = new Uint8Array(dataArrayBuffer.slice(startBuff, endBuff));
-		bytesReaded = bytesReaded + byteSize * metadataByteSize; // updating data.
+		var endBuff = bytesReaded + metadataByteSize;
+		neoBuilding.headerDataArrayBuffer = new Uint8Array(dataArrayBuffer.slice(startBuff, endBuff));
+		bytesReaded = bytesReaded + metadataByteSize; // updating data.
+		if (neoBuilding.metaData === undefined) 
+		{ neoBuilding.metaData = new MetaData(); }
+		neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 		
-		neoBuilding.parseHeader(dataBuffer);
-		
+	
 		// read lod5 mesh data.
 		var lod5meshSize = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
-		byteSize = 1;
-		startBuff = bytesReaded;
-		endBuff = bytesReaded + byteSize * lod5meshSize;
-		var lod5MeshDataBuffer = new Uint8Array(dataArrayBuffer.slice(startBuff, endBuff));
-		bytesReaded = bytesReaded + byteSize * lod5meshSize; // updating data.
+		//var lodToLoad = 5;
+		//var lodBuildingData = neoBuilding.getLodBuildingData(lodToLoad);
+		//if (lodBuildingData === undefined)
+		//{ return false; }
+
+		//if (lodBuildingData.isModelRef)
+		//{ return false; }
+		
+		//var textureFileName = lodBuildingData.textureFileName;
+		var lodString = "lod5";
+		var lowLodMesh = neoBuilding.getOrNewLodMesh(lodString);
+		//lowLodMesh.textureName = textureFileName;
+		var startBuff = bytesReaded;
+		var endBuff = bytesReaded + lod5meshSize;
+		lowLodMesh.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+		lowLodMesh.dataArrayBuffer = new Uint8Array(dataArrayBuffer.slice(startBuff, endBuff));
+		bytesReaded = bytesReaded + lod5meshSize; // updating data.
+		//bytesReaded = lowLodMesh.parseLegoData(dataArrayBuffer, magoManager, bytesReaded);
 		
 		// read lod5 image.
 		var lod5ImageSize = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
-		byteSize = 1;
-		startBuff = bytesReaded;
-		endBuff = bytesReaded + byteSize * lod5ImageSize;
-		var lod5ImageDataBuffer = new Uint8Array(dataArrayBuffer.slice(startBuff, endBuff));
+		var byteSize = 1;
+		var startBuff = bytesReaded;
+		var endBuff = bytesReaded + byteSize * lod5ImageSize;
+		//var lod5ImageDataBuffer = new Uint8Array(dataArrayBuffer.slice(startBuff, endBuff));
+		
+
+		if (lowLodMesh.texture === undefined)
+		{ lowLodMesh.texture = new Texture(); }
+	
+		lowLodMesh.texture.imageBinaryData = new Uint8Array(dataArrayBuffer.slice(startBuff, endBuff));
+		lowLodMesh.texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 		bytesReaded = bytesReaded + byteSize * lod5ImageSize; // updating data.
+	
+		//var gl = magoManager.getGl();
+		//TexturesManager.newWebGlTextureByEmbeddedImage(gl, lod5ImageDataBuffer, lowLodMesh.texture);
+		
 		
 		// read geographicCoord.
 		var geoCoord = new GeographicCoord();
 		bytesReaded = geoCoord.readDataFromBuffer(dataArrayBuffer, bytesReaded);
+		node.data.geographicCoord = geoCoord;
 		
 		// read euler angles degree.
 		var eulerAngDeg = new Point3D();
 		bytesReaded = eulerAngDeg.readDataFromBuffer(dataArrayBuffer, bytesReaded);
+		data.rotationsDegree = eulerAngDeg; 
+		
+		// finally put the node into smartTile.
+		this.putNode(targetDepth, node, magoManager);
+	}
+	
+};/**
+ */
+SmartTile.prototype.parseSmartTileF4d_original = function(dataArrayBuffer, magoManager) 
+{
+	var hierarchyManager = magoManager.hierarchyManager;
+	var readWriter = magoManager.readerWriter;
+	var smartTileManager = magoManager.smartTileManager;
+	var targetDepth = 17;
+	
+	if (targetDepth < this.depth)
+	{ targetDepth = this.depth; }
+	
+	// parse smartTileF4d.***
+	var bytesReaded = 0;
+	var buildingsCount = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+	for (var i=0; i<buildingsCount; i++)
+	{
+		// read projectId.
+		var projectId = "";
+		var wordLength = (new Uint16Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+2)))[0]; bytesReaded += 2;
+		for (var j=0; j<wordLength; j++)
+		{
+			projectId += String.fromCharCode(new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+ 1))[0]);bytesReaded += 1;
+		}
+		
+		// read buildingId.
+		var buildingId = "";
+		wordLength = (new Uint16Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+2)))[0]; bytesReaded += 2;
+		for (var j=0; j<wordLength; j++)
+		{
+			buildingId += String.fromCharCode(new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+ 1))[0]);bytesReaded += 1;
+		}
+		
+		// Create a node for each building.
+		var attributes = {
+			"isPhysical" : true,
+			"objectType" : "basicF4d"
+		};
+		
+		var node = hierarchyManager.newNode(buildingId, projectId, attributes);
+		var data = node.data;
+		data.projectFolderName = projectId;
+		data.projectId = projectId + ".json";
+		data.data_name = buildingId;
+		data.attributes = attributes;
+		data.mapping_type = "origin";
+		
+		// Create a neoBuilding.
+		var neoBuilding = new NeoBuilding();
+		data.neoBuilding = neoBuilding;
+		neoBuilding.buildingFileName = buildingId;
+		neoBuilding.buildingId = buildingId;
+		neoBuilding.projectFolderName = projectId;
+		neoBuilding.nodeOwner = node;
+		
+		// read header (metaData + octree's structure + textures list + lodBuilding data).
+		var metadataByteSize = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+		bytesReaded = neoBuilding.parseHeader(dataArrayBuffer, bytesReaded);
+		neoBuilding.bbox = neoBuilding.metaData.bbox;
+
+		// read lod5 mesh data.
+		var lod5meshSize = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+		var lodToLoad = 5;
+		var lodBuildingData = neoBuilding.getLodBuildingData(lodToLoad);
+		if (lodBuildingData === undefined)
+		{ return false; }
+
+		if (lodBuildingData.isModelRef)
+		{ return false; }
+		
+		var textureFileName = lodBuildingData.textureFileName;
+		var lodString = lodBuildingData.geometryFileName;
+		
+		var lowLodMesh = neoBuilding.getOrNewLodMesh(lodString);
+		lowLodMesh.textureName = textureFileName;
+		lowLodMesh.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+		bytesReaded = lowLodMesh.parseLegoData(dataArrayBuffer, magoManager, bytesReaded);
+		
+		// read lod5 image.
+		var lod5ImageSize = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+		var byteSize = 1;
+		var startBuff = bytesReaded;
+		var endBuff = bytesReaded + byteSize * lod5ImageSize;
+		var lod5ImageDataBuffer = new Uint8Array(dataArrayBuffer.slice(startBuff, endBuff));
+		bytesReaded = bytesReaded + byteSize * lod5ImageSize; // updating data.
+
+		if (lowLodMesh.texture === undefined)
+		{ lowLodMesh.texture = new Texture(); }
+	
+		var gl = magoManager.getGl();
+		TexturesManager.newWebGlTextureByEmbeddedImage(gl, lod5ImageDataBuffer, lowLodMesh.texture);
+		
+		
+		// read geographicCoord.
+		var geoCoord = new GeographicCoord();
+		bytesReaded = geoCoord.readDataFromBuffer(dataArrayBuffer, bytesReaded);
+		node.data.geographicCoord = geoCoord;
+		
+		// read euler angles degree.
+		var eulerAngDeg = new Point3D();
+		bytesReaded = eulerAngDeg.readDataFromBuffer(dataArrayBuffer, bytesReaded);
+		data.rotationsDegree = eulerAngDeg; 
+		
+		// finally put the node into smartTile.
+		this.putNode(targetDepth, node, magoManager);
 	}
 	
 };

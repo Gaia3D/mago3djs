@@ -54,6 +54,9 @@ var NeoBuilding = function()
 	// Render settings.
 	// provisionally put this here.
 	this.applyOcclusionCulling;
+	
+	// header = metadata + octree's structute + textures list + lodBuildingData.
+	this.headerDataArrayBuffer;
 };
 
 /**
@@ -315,6 +318,23 @@ NeoBuilding.prototype.deleteLodMesh = function(gl, lod, vboMemoryManager)
  * @param texture 변수
  * @returns texId
  */
+NeoBuilding.prototype.getBBox = function() 
+{
+	if (this.bbox !== undefined)
+	{ return this.bbox; }
+	else if (this.metaData !== undefined && this.metaData.bbox !== undefined)
+	{
+		return this.metaData.bbox;
+	}
+	
+	return undefined;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param texture 변수
+ * @returns texId
+ */
 NeoBuilding.prototype.getBBoxCenterPositionWorldCoord = function(geoLoc) 
 {
 	if (this.bboxAbsoluteCenterPos === undefined)
@@ -493,6 +513,26 @@ NeoBuilding.prototype.getLodBuildingData = function(lod)
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param lod 변수
+ */
+NeoBuilding.prototype.getOrNewLodMesh = function(lodString) 
+{
+	if (this.lodMeshesMap === undefined)
+	{ this.lodMeshesMap = {}; }
+
+	var lowLodMesh = this.lodMeshesMap[lodString];
+	if (lowLodMesh === undefined)
+	{
+		lowLodMesh = new Lego();
+		lowLodMesh.fileLoadState = CODE.fileLoadState.READY;
+		lowLodMesh.legoKey = this.buildingId + "_" + lodString;
+		this.lodMeshesMap[lodString] = lowLodMesh;
+	}
+	return lowLodMesh;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  * @param neoReference 변수
  */
 NeoBuilding.prototype.getCurrentLodString = function() 
@@ -524,8 +564,10 @@ NeoBuilding.prototype.getLowerSkinLodToLoad = function(currentLod)
 		{ continue; }
 	
 		var lodStringAux = lodBuildingDataAux.geometryFileName;
-		var lowLodMeshAux = this.lodMeshesMap[lodStringAux];
-		
+		var lowLodMeshAux;
+		if (this.lodMeshesMap !== undefined)
+		{ lowLodMeshAux = this.lodMeshesMap[lodStringAux]; }
+			
 		// Check if lowLodMeshAux if finished loading data.
 		if (lowLodMeshAux === undefined || lowLodMeshAux.fileLoadState === CODE.fileLoadState.READY)
 		{
@@ -673,6 +715,8 @@ NeoBuilding.prototype.getCurrentSkin = function()
 		
 		if (skinLego === undefined || !skinLego.isReadyToRender())
 		{
+			// If lod5 mesh is not ready to render, then check if can parse data.
+			
 			skinLego = this.lodMeshesMap.lod4;
 			if (skinLego === undefined || !skinLego.isReadyToRender())
 			{
@@ -897,15 +941,14 @@ NeoBuilding.prototype.parseHeader = function(arrayBuffer, bytesReaded)
 {
 	// In the header file, there are:
 	// 1) metaData.
-	// 2) octree.
+	// 2) octree's structure.
 	// 3) textures list.
 	// 4) lodBuilding data.
 	
 	// metadata.
 	if (this.metaData === undefined) 
-	{
-		this.metaData = new MetaData();
-	}
+	{ this.metaData = new MetaData(); }
+
 	if (bytesReaded === undefined)
 	{ bytesReaded = 0; }
 	
@@ -936,10 +979,14 @@ NeoBuilding.prototype.parseHeader = function(arrayBuffer, bytesReaded)
 		bytesReaded = this.parseTexturesList(arrayBuffer, bytesReaded);
 
 		// read geometry type data.***
-		this.parseLodBuildingData(arrayBuffer, bytesReaded);
+		bytesReaded = this.parseLodBuildingData(arrayBuffer, bytesReaded);
 	}
 
-	metaData.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+	metaData.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
+	this.headerDataArrayBuffer = undefined;
+	
+	this.bbox = this.metaData.bbox;
+	
 	return bytesReaded;
 };
 
@@ -953,6 +1000,9 @@ NeoBuilding.prototype.parseLodBuildingData = function(arrayBuffer, bytesReaded)
 	var lodBuildingDatasCount = (new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
 	if (lodBuildingDatasCount !== undefined)
 	{
+		if (lodBuildingDatasCount < 5)
+		{ var hola = 0; }
+		
 		this.lodBuildingDatasMap = {};
 		
 		for (var i =0; i<lodBuildingDatasCount; i++)
@@ -990,7 +1040,13 @@ NeoBuilding.prototype.parseLodBuildingData = function(arrayBuffer, bytesReaded)
 			}
 			this.lodBuildingDatasMap[lodBuildingData.lod] = lodBuildingData;
 		}
-
+		
+		// read a endMark.
+		var endMark = (new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
+	}
+	else 
+	{
+		var hola = 0;
 	}
 	
 	return bytesReaded;
@@ -1007,12 +1063,6 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 	
 	if (headerVersion[0] !== "0")
 	{ return false; }
-
-	if (this.buildingId === "JibCrane")
-	{ var hola = 0; }
-
-	if (this.lodMeshesMap === undefined)
-	{ this.lodMeshesMap = {}; } 
 	
 	var projectFolderName = this.projectFolderName;
 	var buildingFolderName = this.buildingFileName;
@@ -1031,16 +1081,8 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 	var textureFileName = lodBuildingData.textureFileName;
 	var lodString = lodBuildingData.geometryFileName;
 	
-	///lowLodMesh = this.lodMeshesMap.get(lodString); // code if "lodMeshesMap" is a map.
-	var lowLodMesh = this.lodMeshesMap[lodString];
-	if (lowLodMesh === undefined)
-	{
-		lowLodMesh = new Lego();
-		lowLodMesh.fileLoadState = CODE.fileLoadState.READY;
-		lowLodMesh.textureName = textureFileName;
-		lowLodMesh.legoKey = this.buildingId + "_" + lodString;
-		this.lodMeshesMap[lodString] = lowLodMesh;
-	}
+	var lowLodMesh = this.getOrNewLodMesh(lodString);
+	lowLodMesh.textureName = textureFileName;
 	
 	if (lowLodMesh.fileLoadState === -1)
 	{
@@ -1057,6 +1099,10 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 		{ lowLodMesh.vbo_vicks_container.vboCacheKeysArray = []; }
 		
 	}
+	else if (lowLodMesh.fileLoadState === CODE.fileLoadState.LOADING_FINISHED) 
+	{
+		magoManager.parseQueue.putSkinLegosToParse(lowLodMesh);
+	}
 	
 	if (lowLodMesh.vbo_vicks_container.vboCacheKeysArray[0] && lowLodMesh.vbo_vicks_container.vboCacheKeysArray[0].vboBufferTCoord)
 	{
@@ -1071,6 +1117,12 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 			{ flip_y_texCoords = false; }
 			
 			magoManager.readerWriter.readLegoSimpleBuildingTexture(gl, filePath_inServer, lowLodMesh.texture, magoManager, flip_y_texCoords); 
+		}
+		else if (lowLodMesh.texture.fileLoadState === CODE.fileLoadState.LOADING_FINISHED && lowLodMesh.texture.texId === undefined)
+		{
+			// then make the image to bind into gpu.
+			var gl = magoManager.sceneState.gl;
+			TexturesManager.newWebGlTextureByEmbeddedImage(gl, lowLodMesh.texture.imageBinaryData, lowLodMesh.texture);
 		}
 	}
 	
