@@ -245,6 +245,17 @@ GeoLocationData.prototype.doEffectivePivotPointTranslation = function()
 	var traslationVector;
 	traslationVector = this.tMatrix.rotatePoint3D(this.pivotPointTraslationLC, traslationVector );
 	
+	// Recalculate the position.
+	var geoCoord = this.geographicCoord;
+	this.position = ManagerUtils.geographicCoordToWorldPoint(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude, this.position);
+
+	// High and Low values of the position.**
+	if (this.positionHIGH === undefined)
+	{ this.positionHIGH = new Float32Array([0.0, 0.0, 0.0]); }
+	if (this.positionLOW === undefined)
+	{ this.positionLOW = new Float32Array([0.0, 0.0, 0.0]); }
+	ManagerUtils.calculateSplited3fv([this.position.x, this.position.y, this.position.z], this.positionHIGH, this.positionLOW);
+	
 	this.position.x += traslationVector.x;
 	this.position.y += traslationVector.y;
 	this.position.z += traslationVector.z;
