@@ -180,7 +180,10 @@ Node.prototype.calculateGeoLocData = function(magoManager)
 		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, heading, pitch, roll, geoLoc, magoManager);
 
 		// check if use "centerOfBoundingBoxAsOrigin".
-		if (this.data.mapping_type !== undefined && this.data.mapping_type.toLowerCase() === "boundingboxcenter")
+		if (this.data.mapping_type === undefined)
+		{ this.data.mapping_type= "origin"; }
+	
+		if (this.data.mapping_type.toLowerCase() === "boundingboxcenter")
 		{
 			var rootNode = this.getRoot();
 			if (rootNode)
@@ -189,6 +192,18 @@ Node.prototype.calculateGeoLocData = function(magoManager)
 				var buildingSeed = this.data.buildingSeed;
 				var buildingSeedBBox = buildingSeed.bBox;
 				this.pointSC = buildingSeedBBox.getCenterPoint(this.pointSC);
+				ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
+			}
+		}
+		else if (this.data.mapping_type.toLowerCase() === "boundingboxbottomcenter")
+		{
+			var rootNode = this.getRoot();
+			if (rootNode)
+			{
+				// now, calculate the root center of bbox.
+				var buildingSeed = this.data.buildingSeed;
+				var buildingSeedBBox = buildingSeed.bBox;
+				this.pointSC = buildingSeedBBox.getBottomCenterPoint(this.pointSC);
 				ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
 			}
 		}
@@ -712,8 +727,6 @@ Node.prototype.getDistToCamera = function(cameraPosition, boundingSphere_Aux)
 		// MultiBuildingsTile from cityGML style data.
 	}
 	
-	
-	
 	var nodeRoot = this.getRoot();
 	var geoLocDataManager = nodeRoot.data.geoLocDataManager;
 	var geoLoc = geoLocDataManager.getCurrentGeoLocationData();
@@ -734,6 +747,11 @@ Node.prototype.getDistToCamera = function(cameraPosition, boundingSphere_Aux)
 		else if (data.mapping_type.toLowerCase() === "boundingboxcenter")
 		{
 			bboxCenterPoint.set(0, 0, 0);
+		}
+		else if (data.mapping_type.toLowerCase() === "boundingboxbottomcenter")
+		{
+			var bboxHeight = this.data.bbox.getZLength();
+			bboxCenterPoint.set(0, 0, bboxHeight/2);
 		}
 		
 		this.bboxAbsoluteCenterPos = geoLoc.tMatrix.transformPoint3D(bboxCenterPoint, this.bboxAbsoluteCenterPos);
