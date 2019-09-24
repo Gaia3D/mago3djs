@@ -217,30 +217,25 @@ BasicFactory.getFactoryDimensionsByGeoCoordsArray = function(geoCoordsArray, edg
 	var geoCoord_2 = geoCoordsArray[2];
 	var geoCoord_3 = geoCoordsArray[3];
 	var fWidth, fLength, headingAngDeg;
-	var centerOfDoor;
 	if (edgeIdxOfDoor === 0)
 	{
 		var geoCoordSegment = new GeographicCoordSegment(geoCoord_0, geoCoord_1);
 		var geoCoordSegment2 = new GeographicCoordSegment(geoCoord_1, geoCoord_2);
-		centerOfDoor = GeographicCoord.getMidPoint(geoCoord_0, geoCoord_2);
 	}
 	else if (edgeIdxOfDoor === 1)
 	{
 		var geoCoordSegment = new GeographicCoordSegment(geoCoord_1, geoCoord_2);
 		var geoCoordSegment2 = new GeographicCoordSegment(geoCoord_2, geoCoord_3);
-		centerOfDoor = GeographicCoord.getMidPoint(geoCoord_1, geoCoord_3);
 	}
 	else if (edgeIdxOfDoor === 2)
 	{
 		var geoCoordSegment = new GeographicCoordSegment(geoCoord_2, geoCoord_3);
 		var geoCoordSegment2 = new GeographicCoordSegment(geoCoord_3, geoCoord_0);
-		centerOfDoor = GeographicCoord.getMidPoint(geoCoord_2, geoCoord_0);
 	}
 	else if (edgeIdxOfDoor === 3)
 	{
 		var geoCoordSegment = new GeographicCoordSegment(geoCoord_3, geoCoord_0);
 		var geoCoordSegment2 = new GeographicCoordSegment(geoCoord_0, geoCoord_1);
-		centerOfDoor = GeographicCoord.getMidPoint(geoCoord_3, geoCoord_1);
 	}
 	
 	fWidth = GeographicCoordSegment.getLengthInMeters(geoCoordSegment, magoManager);
@@ -255,8 +250,7 @@ BasicFactory.getFactoryDimensionsByGeoCoordsArray = function(geoCoordsArray, edg
 		factoryLength : fLength,
 		headingDeg    : headingAngDeg,
 		longitude     : lon,
-		latitude      : lat,
-		centerOfDoor  : centerOfDoor
+		latitude      : lat
 	};
 	return result;
 };
@@ -468,8 +462,10 @@ BasicFactory.prototype.getWallProfile2d = function(wallType, wallOption, resultP
 				var doorOffset = openingInfo.offset;
 				var doorHeight = openingInfo.height;
 				var doorWidth = openingInfo.width;
-//new Point3D(centerx,centery);
+
 				curOffset = curOffset + doorOffset;
+				openingInfo.centerPropterties = this.calculateOpeningProperties(wallType, curOffset, doorWidth, doorHeight, openingInfo.thickness);
+
 				polyline.newPoint2d(curOffset, 0);
 				polyline.newPoint2d(curOffset, doorHeight);
 
@@ -485,12 +481,13 @@ BasicFactory.prototype.getWallProfile2d = function(wallType, wallOption, resultP
 
 			var doorHeight = openingInfo.height;
 			var doorWidth = openingInfo.width;
+
+			openingInfo.centerPropterties = this.calculateOpeningProperties(wallType, offset, doorWidth, doorHeight, openingInfo.thickness);
 			polyline.newPoint2d(offset, 0);
 			polyline.newPoint2d(offset, doorHeight);
 			polyline.newPoint2d(offset + doorWidth, doorHeight);
 			polyline.newPoint2d(offset + doorWidth, 0);
 		}
-
 	}
 
 	polyline.newPoint2d(width, 0);
@@ -503,7 +500,70 @@ BasicFactory.prototype.getWallProfile2d = function(wallType, wallOption, resultP
 
 	return resultProfile2d;
 };
+BasicFactory.prototype.calculateOpeningProperties = function(wallType, start, width, height) 
+{
+	var profile2d = new Profile2D();
+	var outerRing = profile2d.newOuterRing();
+	var polyline = outerRing.newElement("POLYLINE");
 
+	/*polyline.newPoint2d(start, 0);
+	polyline.newPoint2d(start, height);
+	polyline.newPoint2d(start + width, height);
+	polyline.newPoint2d(start + width, 0);*/
+
+	polyline.newPoint2d(start, 0);
+	polyline.newPoint2d(start + width, 0);
+	polyline.newPoint2d(start + width, height);
+	polyline.newPoint2d(start, height);
+	
+	var vp =  new VtxProfile();
+	vp.makeByProfile2D(profile2d);
+
+	this.validateWallGeom(wallType, vp);
+
+	var outerRing = vp.outerVtxRing;
+	var outerVertexList = outerRing.vertexList;
+	var openingBbox = outerVertexList.getBoundingBox();
+
+	var openingCenterPointLC = openingBbox.getCenterPoint();
+	var openingNormalLC = outerRing.calculatePlaneNormal();
+
+	var geoLocDataManager = this.geoLocDataManager;
+	var geoLocData = geoLocDataManager.getCurrentGeoLocationData();
+	var rotMatrix = geoLocData.rotMatrix;
+
+	var openingCenterPointWC = geoLocData.localCoordToWorldCoord(openingCenterPointLC);
+	var openingNormalWC = rotMatrix.transformPoint3D(openingNormalLC);
+
+	return {
+		openeingProfile2d : profile2d,
+		centerLC          : openingCenterPointLC,
+		normalLC          : openingNormalLC,
+		centerWC          : openingCenterPointWC,
+		normalWC          : openingNormalWC
+	};
+};
+
+BasicFactory.prototype.getOpeningProperties = function(wallType, index) 
+{
+	var wallOptions = this.options.wallOptions;
+
+	if (!defined(index)) { index = 0; }
+
+	var wallOption;
+	if (wallOptions) 
+	{
+		for (var j in wallOptions) 
+		{
+			if (wallOptions[j].type === wallType) 
+			{
+				wallOption = wallOptions[j];
+			}
+		}
+	}
+
+	return wallOption.openingInfo.centerPropterties;
+};
 /**
  * Makes the geometry mesh.
  */
@@ -569,47 +629,7 @@ BasicFactory.prototype.makeMesh = function()
 		this.objectsArray.push(mesh);
 		this.objectsMap[mesh.name] = mesh;
 
-		switch (wallType) 
-		{
-		case 'front' : {
-			// Now rotate the front wall
-			mesh.rotate(90, 1, 0, 0);
-
-			// Now translate the front wall to front
-			mesh.translate(-this.width*0.5, -this.length*0.5+extrusionDist, 0);
-			mesh.setOneColor(0.9, 0.9, 0.9, 1.0);
-			break;
-		}
-		case 'rear' : {
-			// Now rotate the rear wall
-			mesh.rotate(90, 1, 0, 0);
-
-			// Now translate the rear wall to rear
-			mesh.translate(-this.width*0.5, this.length*0.5, 0);
-			mesh.setOneColor(0.9, 0.9, 0.9, 1.0);
-			break;
-		}
-		case 'left' : {
-			// Now rotate the left wall
-			mesh.rotate(90, 1, 0, 0);
-			mesh.rotate(90, 0, 0, 1);
-
-			// Now translate the left wall to left
-			mesh.translate(-this.width*0.5, -this.length*0.5, 0);
-			mesh.setOneColor(0.9, 0.9, 0.9, 1.0);
-			break;
-		}
-		case 'right' : {
-			// Now rotate the right wall.***
-			mesh.rotate(90, 1, 0, 0);
-			mesh.rotate(90, 0, 0, 1);
-
-			// Now translate the right wall to right
-			mesh.translate(this.width*0.5 - extrusionDist, -this.length*0.5, 0);
-			mesh.setOneColor(0.9, 0.9, 0.9, 1.0);
-			break;
-		}
-		}
+		this.validateWallGeom(wallType, mesh);
 	}
 
 	// Roof.*******************************************************************************************************************************
@@ -750,4 +770,60 @@ BasicFactory.prototype.render = function(magoManager, shader, renderType, glPrim
 	}
 	
 	gl.disable(gl.BLEND);
+};
+/**
+ * @param {string} wallType
+ * @param {Object} geom must have rotate function and translate function
+ */
+BasicFactory.prototype.validateWallGeom = function(wallType, geom, extrusionDist) 
+{
+	if (typeof geom.rotate !== 'function' || typeof geom.translate !== 'function') 
+	{
+		throw new Error('invalid geometry type.');
+	}
+
+	if (!defined(extrusionDist)) { extrusionDist = 0.4; }
+
+	switch (wallType) 
+	{
+	case 'front' : {
+		// Now rotate the front wall
+		geom.rotate(90, 1, 0, 0);
+
+		// Now translate the front wall to front
+		geom.translate(-this.width*0.5, -this.length*0.5+extrusionDist, 0);
+		break;
+	}
+	case 'rear' : {
+		// Now rotate the rear wall
+		geom.rotate(90, 1, 0, 0);
+
+		// Now translate the rear wall to rear
+		geom.translate(-this.width*0.5, this.length*0.5, 0);
+		break;
+	}
+	case 'left' : {
+		// Now rotate the left wall
+		geom.rotate(90, 1, 0, 0);
+		geom.rotate(90, 0, 0, 1);
+
+		// Now translate the left wall to left
+		geom.translate(-this.width*0.5, -this.length*0.5, 0);
+		break;
+	}
+	case 'right' : {
+		// Now rotate the right wall.***
+		geom.rotate(90, 1, 0, 0);
+		geom.rotate(90, 0, 0, 1);
+
+		// Now translate the right wall to right
+		geom.translate(this.width*0.5 - extrusionDist, -this.length*0.5, 0);
+		break;
+	}
+	}
+
+	if (geom instanceof Mesh) 
+	{
+		geom.setOneColor(0.9, 0.9, 0.9, 1.0);
+	}
 };
