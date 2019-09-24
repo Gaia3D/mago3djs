@@ -722,16 +722,20 @@ Node.prototype.getDistToCamera = function(cameraPosition, boundingSphere_Aux)
 	// If this.data.bbox no exist, then calculate a provisional value.
 	if (this.bboxAbsoluteCenterPos === undefined) 
 	{
-		var bboxCenterPoint;
-		if (data.mapping_type && data.mapping_type.toLowerCase() === "boundingboxcenter")
-		{
-			bboxCenterPoint = new Point3D(0, 0, 0);
-		}
-		else if (this.data.bbox !== undefined)
+		if (data.mapping_type === undefined)
+		{ data.mapping_type = "origin"; }
+		
+		var bboxCenterPoint = new Point3D(0, 0, 0);
+		if (this.data.bbox !== undefined && data.mapping_type.toLowerCase() === "origin")
 		{
 			// this.data.bbox is the most important bbox.
 			bboxCenterPoint = this.data.bbox.getCenterPoint(bboxCenterPoint); // local bbox.
 		}
+		else if (data.mapping_type.toLowerCase() === "boundingboxcenter")
+		{
+			bboxCenterPoint.set(0, 0, 0);
+		}
+		
 		this.bboxAbsoluteCenterPos = geoLoc.tMatrix.transformPoint3D(bboxCenterPoint, this.bboxAbsoluteCenterPos);
 	}
 	
