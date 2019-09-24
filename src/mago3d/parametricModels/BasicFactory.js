@@ -772,6 +772,22 @@ BasicFactory.prototype.render = function(magoManager, shader, renderType, glPrim
 	gl.disable(gl.BLEND);
 };
 /**
+ * delete mesh from this factory.
+ * @param {string} name Mesh name
+ */
+BasicFactory.prototype.removeMesh = function(name) 
+{
+	if (this.objectsMap && this.objectsMap[name]) { this.objectsMap[name] = undefined; }
+
+	if (this.objectsArray && Array.isArray(this.objectsArray)) 
+	{
+		this.objectsArray = this.objectsArray.filter(function(item) 
+		{
+			return item.name !== name;
+		});
+	}
+};
+/**
  * @param {string} wallType
  * @param {Object} geom must have rotate function and translate function
  */
