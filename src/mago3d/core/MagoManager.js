@@ -4379,6 +4379,9 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 				node = lowestTile.nodesArray[j];
 				nodeRoot = node.getRoot();
 				var attributes = node.data.attributes;
+				
+				if (node.data.nodeId === "B11P")
+				{ var hola = 0; }
 
 				// now, create a geoLocDataManager for node if no exist.
 				if (nodeRoot.data.geoLocDataManager === undefined)
@@ -4406,6 +4409,9 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 						visibleNodes.currentVisiblesAux.push(node);
 						continue;
 					}
+					
+					if (neoBuilding.buildingId === "B11P")
+					{ var hola = 0; }
 
 					distToCamera = node.getDistToCamera(cameraPosition, this.boundingSphere_Aux);
 					var lodByDist = magoPolicy.getLod(distToCamera);
