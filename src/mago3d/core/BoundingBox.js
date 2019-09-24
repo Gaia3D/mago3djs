@@ -256,6 +256,23 @@ BoundingBox.prototype.getCenterPoint = function(result)
 };
 
 /**
+ * Get the center point of this box
+ * 영역박스의 중심점을 구한다.
+ * 
+ * @param {Point3D} result 영역박스의 중심점
+ * 
+ * @returns {Point3D} 영역박스의 중심점
+ */
+BoundingBox.prototype.getBottomCenterPoint = function(result) 
+{
+	if ( result === undefined ) { result = new Point3D(); }
+
+	result.set((this.maxX + this.minX)/2, (this.maxY + this.minY)/2, 0);
+
+	return result;
+};
+
+/**
  * 
  * 영역박스의 중심점을 구한다.
  * 

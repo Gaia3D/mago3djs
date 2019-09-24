@@ -4932,10 +4932,10 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 			if (data.buildingSeed && data.buildingSeed.bBox)
 			{ data.bbox.copyFrom(buildingSeed.bBox); }
 			
-			if (data.mapping_type && data.mapping_type.toLowerCase() === "boundingboxcenter")
-			{
-				data.bbox.translateToOrigin();
-			}
+			//if (data.mapping_type && data.mapping_type.toLowerCase() === "boundingboxcenter")
+			//{
+			//	data.bbox.translateToOrigin();
+			//}
 			
 			// calculate the geographicCoordOfTheBBox.***
 			if (tMatrix !== undefined)
@@ -5035,6 +5035,8 @@ MagoManager.prototype.calculateBoundingBoxesNodes = function()
 			var tMatrix = ManagerUtils.calculateTransformMatrixAtWorldPosition(worldCoordPosition, heading, pitch, roll, undefined, tMatrix, this);
 			
 			// now calculate the geographicCoord of the center of the bBox.
+			buildingSeed.geographicCoordOfBBox.setLonLatAlt(longitude, latitude, height);
+			/*
 			if (node.data.attributes.mapping_type && node.data.attributes.mapping_type === "boundingboxcenter")
 			{
 				var bboxCenterPoint = buildingSeed.bBox.getCenterPoint(bboxCenterPoint);
@@ -5045,6 +5047,7 @@ MagoManager.prototype.calculateBoundingBoxesNodes = function()
 			{
 				buildingSeed.geographicCoordOfBBox.setLonLatAlt(longitude, latitude, height);
 			}
+			*/
 		}
 	}
 	
