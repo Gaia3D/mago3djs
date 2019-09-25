@@ -150,66 +150,98 @@ Node.prototype.calculateGeoLocData = function(magoManager)
 	var geoLocDataManager = nodeRoot.data.geoLocDataManager;
 	var geoLoc = geoLocDataManager.getCurrentGeoLocationData();
 		
-	if (geoLoc === undefined || geoLoc.pivotPoint === undefined)
+	if (geoLoc === undefined)
 	{ 
 		geoLoc = geoLocDataManager.newGeoLocationData("deploymentLoc"); 
-		var geographicCoord;
-		var rotationsDegree;
-		
-		if (this.data.geographicCoord === undefined)
-		{
-			var buildingSeed = this.data.buildingSeed;
-			geographicCoord = buildingSeed.geographicCoord;
-			rotationsDegree = buildingSeed.rotationsDegree;
-		}
-		else 
-		{
-			geographicCoord = this.data.geographicCoord;
-			rotationsDegree = this.data.rotationsDegree;
-		}
-		
-		if (rotationsDegree === undefined)
-		{ rotationsDegree = new Point3D(0.0, 0.0, 0.0); }
-		
-		var longitude = geographicCoord.longitude;
-		var latitude = geographicCoord.latitude;
-		var altitude = geographicCoord.altitude;
-		var heading = rotationsDegree.z;
-		var pitch = rotationsDegree.x;
-		var roll = rotationsDegree.y;
-		ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, heading, pitch, roll, geoLoc, magoManager);
-
-		// check if use "centerOfBoundingBoxAsOrigin".
-		if (this.data.mapping_type === undefined)
-		{ this.data.mapping_type= "origin"; }
+	}
 	
-		if (this.data.mapping_type.toLowerCase() === "boundingboxcenter")
+	var geographicCoord;
+	var rotationsDegree;
+	
+	if (this.data.geographicCoord === undefined)
+	{
+		var buildingSeed = this.data.buildingSeed;
+		geographicCoord = buildingSeed.geographicCoord;
+		rotationsDegree = buildingSeed.rotationsDegree;
+	}
+	else 
+	{
+		geographicCoord = this.data.geographicCoord;
+		rotationsDegree = this.data.rotationsDegree;
+	}
+	
+	if (rotationsDegree === undefined)
+	{ rotationsDegree = new Point3D(0.0, 0.0, 0.0); }
+	
+	var longitude = geographicCoord.longitude;
+	var latitude = geographicCoord.latitude;
+	var altitude = geographicCoord.altitude;
+	var heading = rotationsDegree.z;
+	var pitch = rotationsDegree.x;
+	var roll = rotationsDegree.y;
+	ManagerUtils.calculateGeoLocationData(longitude, latitude, altitude, heading, pitch, roll, geoLoc, magoManager);
+
+	this.correctGeoLocationDataByMappingType(geoLoc);
+	/*
+	// check if use "centerOfBoundingBoxAsOrigin".
+	if (this.data.mapping_type === undefined)
+	{ this.data.mapping_type= "origin"; }
+
+	if (this.data.mapping_type.toLowerCase() === "boundingboxcenter")
+	{
+		var rootNode = this.getRoot();
+		if (rootNode)
 		{
-			var rootNode = this.getRoot();
-			if (rootNode)
-			{
-				// now, calculate the root center of bbox.
-				var buildingSeed = this.data.buildingSeed;
-				var buildingSeedBBox = buildingSeed.bBox;
-				this.pointSC = buildingSeedBBox.getCenterPoint(this.pointSC);
-				ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
-			}
+			// now, calculate the root center of bbox.
+			var buildingSeed = this.data.buildingSeed;
+			var buildingSeedBBox = buildingSeed.bBox;
+			this.pointSC = buildingSeedBBox.getCenterPoint(this.pointSC);
+			ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
 		}
-		else if (this.data.mapping_type.toLowerCase() === "boundingboxbottomcenter")
+	}
+	else if (this.data.mapping_type.toLowerCase() === "boundingboxbottomcenter")
+	{
+		var rootNode = this.getRoot();
+		if (rootNode)
 		{
-			var rootNode = this.getRoot();
-			if (rootNode)
-			{
-				// now, calculate the root center of bbox.
-				var buildingSeed = this.data.buildingSeed;
-				var buildingSeedBBox = buildingSeed.bBox;
-				this.pointSC = buildingSeedBBox.getBottomCenterPoint(this.pointSC);
-				ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
-			}
+			// now, calculate the root center of bbox.
+			var buildingSeed = this.data.buildingSeed;
+			var buildingSeedBBox = buildingSeed.bBox;
+			this.pointSC = buildingSeedBBox.getBottomCenterPoint(this.pointSC);
+			ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
 		}
 	}
 	
+	*/
 	return geoLoc;
+};
+
+/**
+ * Calculates the geographicLocationData of the node.
+ * @param {MagoManager} magoManager Main class object of Mago3D.
+ * @returns {GeoLocationData} geoLoc The calculated geoLocationData of this node.
+ */
+Node.prototype.correctGeoLocationDataByMappingType = function(geoLoc) 
+{
+	// check if use "centerOfBoundingBoxAsOrigin".
+	var buildingSeed = this.data.buildingSeed;
+	var buildingSeedBBox = buildingSeed.bBox;
+		
+	if (this.data.mapping_type === undefined)
+	{ this.data.mapping_type= "origin"; }
+
+	if (this.data.mapping_type.toLowerCase() === "boundingboxcenter")
+	{
+		// now, calculate the root center of bbox.
+		this.pointSC = buildingSeedBBox.getCenterPoint(this.pointSC);
+		ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
+	}
+	else if (this.data.mapping_type.toLowerCase() === "boundingboxbottomcenter")
+	{
+		// now, calculate the root center of bbox.
+		this.pointSC = buildingSeedBBox.getBottomCenterPoint(this.pointSC);
+		ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
+	}
 };
 
 Node.prototype.checkChangesHistoryMovements = function() 
@@ -838,6 +870,10 @@ Node.prototype.finishedAnimation = function(magoManager)
 	var nextRoll;
 
 	// Check animationType.***
+	var autoChangeRotation = animData.autoChangeRotation;
+	if (autoChangeRotation === undefined)
+	{ autoChangeRotation = false; }
+	
 	var animType = animData.animationType;
 	if (animType === CODE.animationType.PATH)
 	{
@@ -866,18 +902,30 @@ Node.prototype.finishedAnimation = function(magoManager)
 		nextLatitude = geographicCoords.latitude;
 		nextLongitude = geographicCoords.longitude;
 		nextAltitude = geographicCoords.altitude;
+		//var headingAngle;
 		
-		// now calculate heading, pitch & roll.***
-		var yAxis = new Point2D(0, 1);
-		var dir2d = new Point2D(dir.x, dir.y);
-		dir2d.unitary();
-		var headingAngle = yAxis.angleDegToVector(dir2d);
-		if (dir2d.x > 0.0)
+		if (autoChangeRotation)
 		{
-			headingAngle *= -1;
+			// now calculate heading, pitch & roll.***
+			var yAxis = new Point2D(0, 1);
+			var dir2d = new Point2D(dir.x, dir.y);
+			dir2d.unitary();
+			nextHeading = yAxis.angleDegToVector(dir2d);
+			if (dir2d.x > 0.0)
+			{
+				nextHeading *= -1;
+			}
+
+			// pitch 랑  roll은 어떡하나요?
+		}
+		else 
+		{
+			nextHeading = animData.targetHeading;
+			nextPitch = animData.targetPitch;
+			nextRoll = animData.targetRoll;
 		}
 		
-		this.changeLocationAndRotation(nextLatitude, nextLongitude, nextAltitude, headingAngle, undefined, undefined, magoManager);
+		this.changeLocationAndRotation(nextLatitude, nextLongitude, nextAltitude, nextHeading, nextPitch, nextRoll, magoManager);
 		
 		// finally update "lastTime".
 		animData.lastTime = currTime;
@@ -982,6 +1030,7 @@ Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude,
 	animData.animationType = animationOption.animationType;
 	animData.path = animationOption.path;
 	animData.linearVelocityInMetersSecond = animationOption.linearVelocityInMetersSecond;
+	animData.autoChangeRotation = animationOption.autoChangeRotation;
 	// End animation by path.***
 	
 	var geoLocDataManager = this.getNodeGeoLocDataManager();
@@ -1242,6 +1291,8 @@ Node.prototype.changeLocationAndRotation = function(latitude, longitude, elevati
 		{ continue; }
 	
 		geoLocationData = ManagerUtils.calculateGeoLocationData(longitude, latitude, elevation, heading, pitch, roll, geoLocationData, magoManager);
+		this.correctGeoLocationDataByMappingType(geoLocationData);
+		
 		if (geoLocationData === undefined)
 		{ continue; }
 	

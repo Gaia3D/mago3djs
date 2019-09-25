@@ -1913,8 +1913,8 @@ MagoManager.prototype.keyDown = function(key)
 		var longitude;
 		var elevation;
 		
-		var heading;
-		var pitch;
+		var heading = 45;
+		var pitch = 45;
 		var roll;
 		
 		/*
@@ -1933,6 +1933,8 @@ MagoManager.prototype.keyDown = function(key)
 		};
 		this.changeLocationAndRotation(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll, animationOption);
 		*/
+		
+		//node.changeLocationAndRotation(latitude, longitude, elevation, heading, pitch, roll, this);
 
 		// Test 2: moving by a path.***
 		var bSplineCubic3d = this.modeler.bSplineCubic3d;
@@ -1944,7 +1946,8 @@ MagoManager.prototype.keyDown = function(key)
 			var animationOption = {
 				animationType                : CODE.animationType.PATH,
 				path                         : path3d,
-				linearVelocityInMetersSecond : 30
+				linearVelocityInMetersSecond : 30,
+				autoChangeRotation           : true
 			};
 			this.changeLocationAndRotation(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll, animationOption);
 		}

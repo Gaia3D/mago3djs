@@ -35,9 +35,12 @@ var NeoReferencesMotherAndIndices = function()
 NeoReferencesMotherAndIndices.prototype.multiplyKeyTransformMatrix = function(idxKey, matrix) 
 {
 	var refIndicesCount = this.neoRefsIndices.length;
+	var reference;
 	for (var i=0; i<refIndicesCount; i++)
 	{
-		this.motherNeoRefsList[this.neoRefsIndices[i]].multiplyKeyTransformMatrix(idxKey, matrix);
+		reference = this.motherNeoRefsList[this.neoRefsIndices[i]];
+		if (reference)
+		{ reference.multiplyKeyTransformMatrix(idxKey, matrix); }
 	}
 };
 

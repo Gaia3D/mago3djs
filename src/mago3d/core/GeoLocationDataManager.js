@@ -48,6 +48,8 @@ GeoLocationDataManager.prototype.popGeoLocationData = function()
  */
 GeoLocationDataManager.prototype.newGeoLocationData = function(geoLocationName) 
 {
+	var currGeoLocData = this.getCurrentGeoLocationData();
+	
 	if (geoLocationName === undefined)
 	{ geoLocationName = "noName" + this.geoLocationDataArray.length.toString(); }
 	var geoLocationData = new GeoLocationData(geoLocationName);
@@ -57,6 +59,12 @@ GeoLocationDataManager.prototype.newGeoLocationData = function(geoLocationName)
 	{
 		this.geoLocationDataArray.pop();
 		// delete extracted geoLocdata. TODO:
+	}
+	
+	if (currGeoLocData)
+	{
+		// If exist a geoLocationData previous, then copy from it.
+		geoLocationData.copyFrom(currGeoLocData);
 	}
 
 	return geoLocationData;
