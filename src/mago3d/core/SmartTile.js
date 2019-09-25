@@ -1090,7 +1090,7 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		
 		var startBuff = bytesReaded;
 		var endBuff = bytesReaded + metadataByteSize;
-		neoBuilding.headerDataArrayBuffer = new Uint8Array(dataArrayBuffer.slice(startBuff, endBuff));
+		neoBuilding.headerDataArrayBuffer = dataArrayBuffer.slice(startBuff, endBuff);
 		bytesReaded = bytesReaded + metadataByteSize; // updating data.
 		if (neoBuilding.metaData === undefined) 
 		{ neoBuilding.metaData = new MetaData(); }
@@ -1114,7 +1114,7 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		var startBuff = bytesReaded;
 		var endBuff = bytesReaded + lod5meshSize;
 		lowLodMesh.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-		lowLodMesh.dataArrayBuffer = new Uint8Array(dataArrayBuffer.slice(startBuff, endBuff));
+		lowLodMesh.dataArrayBuffer = dataArrayBuffer.slice(startBuff, endBuff);
 		bytesReaded = bytesReaded + lod5meshSize; // updating data.
 		//bytesReaded = lowLodMesh.parseLegoData(dataArrayBuffer, magoManager, bytesReaded);
 		
@@ -1129,7 +1129,7 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		if (lowLodMesh.texture === undefined)
 		{ lowLodMesh.texture = new Texture(); }
 	
-		lowLodMesh.texture.imageBinaryData = new Uint8Array(dataArrayBuffer.slice(startBuff, endBuff));
+		lowLodMesh.texture.imageBinaryData = dataArrayBuffer.slice(startBuff, endBuff);
 		lowLodMesh.texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 		bytesReaded = bytesReaded + byteSize * lod5ImageSize; // updating data.
 	
