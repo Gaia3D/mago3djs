@@ -309,11 +309,17 @@ Lego.prototype.parseLegoData = function(buffer, magoManager, bytesReaded)
 	
 	if (buffer === undefined)
 	{ buffer = this.dataArrayBuffer; }
+
+	if (buffer === undefined)
+	{ return bytesReaded; }
 	
 	var vboMemManager = magoManager.vboMemoryManager;
 	
 	if (bytesReaded === undefined)
 	{ bytesReaded = 0; }
+
+	if (this.vbo_vicks_container === undefined)
+	{ this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer(); }
 
 	//var stream = new DataStream(buffer, 0, DataStream.LITTLE_ENDIAN);
 	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;

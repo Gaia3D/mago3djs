@@ -1004,7 +1004,7 @@ SmartTile.prototype.createGeometriesFromSeeds = function(magoManager)
 				
 				readerWriter.getSmartTileF4d(fileName, smartTileF4dSeed, smartTileOwner, magoManager);
 			}
-			else if (smartTileF4dSeed.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
+			else if (smartTileF4dSeed.fileLoadState === CODE.fileLoadState.LOADING_FINISHED )
 			{
 				// parse the dataArrayBuffer.***
 				var parseQueue = magoManager.parseQueue;
@@ -1038,6 +1038,8 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 	
 	if (targetDepth < this.depth)
 	{ targetDepth = this.depth; }
+
+	var enc = new TextDecoder("utf-8");
 	
 	// parse smartTileF4d.***
 	var bytesReaded = 0;
@@ -1047,18 +1049,12 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		// read projectId.
 		var projectId = "";
 		var wordLength = (new Uint16Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+2)))[0]; bytesReaded += 2;
-		for (var j=0; j<wordLength; j++)
-		{
-			projectId += String.fromCharCode(new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+ 1))[0]);bytesReaded += 1;
-		}
+		projectId = enc.decode(new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+ wordLength))) ;bytesReaded += wordLength;
 		
 		// read buildingId.
 		var buildingId = "";
 		wordLength = (new Uint16Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+2)))[0]; bytesReaded += 2;
-		for (var j=0; j<wordLength; j++)
-		{
-			buildingId += String.fromCharCode(new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+ 1))[0]);bytesReaded += 1;
-		}
+		buildingId = enc.decode(new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+ wordLength))) ;bytesReaded += wordLength;
 		
 		// Create a node for each building.
 		var attributes = {
@@ -1090,7 +1086,7 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		
 		var startBuff = bytesReaded;
 		var endBuff = bytesReaded + metadataByteSize;
-		neoBuilding.headerDataArrayBuffer = new Uint8Array(dataArrayBuffer.slice(startBuff, endBuff));
+		neoBuilding.headerDataArrayBuffer = dataArrayBuffer.slice(startBuff, endBuff);
 		bytesReaded = bytesReaded + metadataByteSize; // updating data.
 		if (neoBuilding.metaData === undefined) 
 		{ neoBuilding.metaData = new MetaData(); }
@@ -1114,9 +1110,17 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		var startBuff = bytesReaded;
 		var endBuff = bytesReaded + lod5meshSize;
 		lowLodMesh.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-		lowLodMesh.dataArrayBuffer = new Uint8Array(dataArrayBuffer.slice(startBuff, endBuff));
+		lowLodMesh.dataArrayBuffer = dataArrayBuffer.slice(startBuff, endBuff);
 		bytesReaded = bytesReaded + lod5meshSize; // updating data.
 		//bytesReaded = lowLodMesh.parseLegoData(dataArrayBuffer, magoManager, bytesReaded);
+		
+		var lowLodMesh4 = neoBuilding.getOrNewLodMesh("lod4");
+		lowLodMesh4.dataArrayBuffer = lowLodMesh.dataArrayBuffer;
+		lowLodMesh4.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+		
+		var lowLodMesh3 = neoBuilding.getOrNewLodMesh("lod3");
+		lowLodMesh3.dataArrayBuffer = lowLodMesh.dataArrayBuffer;
+		lowLodMesh3.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 		
 		// read lod5 image.
 		var lod5ImageSize = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
@@ -1129,9 +1133,13 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		if (lowLodMesh.texture === undefined)
 		{ lowLodMesh.texture = new Texture(); }
 	
-		lowLodMesh.texture.imageBinaryData = new Uint8Array(dataArrayBuffer.slice(startBuff, endBuff));
+		lowLodMesh.texture.imageBinaryData = dataArrayBuffer.slice(startBuff, endBuff);
 		lowLodMesh.texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 		bytesReaded = bytesReaded + byteSize * lod5ImageSize; // updating data.
+		
+	
+		lowLodMesh4.texture = lowLodMesh.texture;
+		lowLodMesh3.texture = lowLodMesh.texture;
 	
 		//var gl = magoManager.getGl();
 		//TexturesManager.newWebGlTextureByEmbeddedImage(gl, lod5ImageDataBuffer, lowLodMesh.texture);
@@ -1151,7 +1159,10 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		this.putNode(targetDepth, node, magoManager);
 	}
 	
-};/**
+	
+};
+
+/**
  */
 SmartTile.prototype.parseSmartTileF4d_original = function(dataArrayBuffer, magoManager) 
 {

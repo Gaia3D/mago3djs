@@ -307,6 +307,36 @@ Matrix4.prototype.transformPoint3D = function(point3d, result)
  * @param {Point3D} result 출력 포인트
  * @returns {Point3D} 출력 포인트
  */
+Matrix4.prototype.rotateXYZDataArray = function(xyzDataArray, resultXYZDataArray) 
+{
+	if (xyzDataArray === undefined)
+	{ return resultXYZDataArray; }
+	
+	if (resultXYZDataArray === undefined) { resultXYZDataArray = []; }
+	var x, y, z;	
+	var points3dCount = xyzDataArray.length/3;
+	
+	for (var i=0; i<points3dCount; i++)
+	{
+		x = xyzDataArray[i*3];
+		y = xyzDataArray[i*3+1];
+		z = xyzDataArray[i*3+2];
+
+		resultXYZDataArray[i*3] = x*this.get(0, 0) + y*this.get(1, 0) + z*this.get(2, 0);
+		resultXYZDataArray[i*3+1] = x*this.get(0, 1) + y*this.get(1, 1) + z*this.get(2, 1);
+		resultXYZDataArray[i*3+2] = x*this.get(0, 2) + y*this.get(1, 2) + z*this.get(2, 2);
+	}
+
+	return resultXYZDataArray;
+};
+
+/**
+ * 행렬연산을 통해 주어진 포인트를 회전한다.
+ *
+ * @param {Point3D} point3d 입력 포인트
+ * @param {Point3D} result 출력 포인트
+ * @returns {Point3D} 출력 포인트
+ */
 Matrix4.prototype.rotatePoint3D = function(point3d, result) 
 {
 	if (result === undefined) { result = new Point3D(); }

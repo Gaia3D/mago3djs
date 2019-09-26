@@ -223,13 +223,24 @@ Node.prototype.calculateGeoLocData = function(magoManager)
  */
 Node.prototype.correctGeoLocationDataByMappingType = function(geoLoc) 
 {
+	if (this.data.mapping_type === undefined)
+	{ 
+		this.data.mapping_type= "origin"; 
+		return;
+	}
+
+	if (this.data.mapping_type.toLowerCase() === "origin")
+	{
+		return;
+	}
+
 	// check if use "centerOfBoundingBoxAsOrigin".
 	var buildingSeed = this.data.buildingSeed;
+	if (buildingSeed === undefined)
+	{ return; }
+
 	var buildingSeedBBox = buildingSeed.bBox;
 		
-	if (this.data.mapping_type === undefined)
-	{ this.data.mapping_type= "origin"; }
-
 	if (this.data.mapping_type.toLowerCase() === "boundingboxcenter")
 	{
 		// now, calculate the root center of bbox.

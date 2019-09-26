@@ -338,8 +338,7 @@ ProcessQueue.prototype.deleteNeoBuilding = function(gl, neoBuilding, magoManager
 		magoManager.objectSelected = undefined;
 	}
 	
-	//neoBuilding.deleteObjects(gl, vboMemoryManager);
-	neoBuilding.deleteObjectsModelReferences(gl, vboMemoryManager);
+	neoBuilding.deleteObjects(gl, vboMemoryManager);
 	
 };
 
@@ -354,6 +353,7 @@ ProcessQueue.prototype.manageDeleteQueue = function(magoManager)
 	var neoBuilding;
 	var node;
 	var rootNode;
+	var deletedCount = 0;
 	
 	// incompatibility gulp.
 	//for (var key of this.buildingsToDeleteMap.keys())
@@ -377,15 +377,19 @@ ProcessQueue.prototype.manageDeleteQueue = function(magoManager)
 			{ continue; }
 
 			neoBuilding = node.data.neoBuilding;
-			this.eraseNodeToDelete(node);
+			if (this.eraseNodeToDelete(node))
+			{
+				if (neoBuilding === undefined)
+				{ continue; }
 			
-			if (neoBuilding === undefined)
-			{ continue; }
-		
-			var deleteMetaData = true;
-			if (key === 1)
-			{ deleteMetaData = false; }
-			this.deleteNeoBuilding(gl, neoBuilding, magoManager);
+				var deleteMetaData = true;
+				if (key === 1)
+				{ deleteMetaData = false; }
+				this.deleteNeoBuilding(gl, neoBuilding, magoManager);
+				deletedCount++;
+				//if (deletedCount >= 2)
+				//{ break; }
+			}
 		}
 	}
 	
