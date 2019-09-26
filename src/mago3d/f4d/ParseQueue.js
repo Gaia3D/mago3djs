@@ -26,13 +26,16 @@ var ParseQueue = function()
 	this.tinTerrainsToParseMap = {};
 	this.multiBuildingsToParseMap = {};
 	
-	this.maxNumParses = 1; // default 1.***
+	this.maxNumParses = 10; // default 1.***
 	
 	// parse counters.***
 	this.smartTileF4dParsesCount = 0;
 	
 	// Test for pCloudPartitions.***
 	this.pCloudPartitionsParsed = 0;
+	
+	// Auxiliar vars.
+	this.lowlodMeshesParsed = 0;
 
 };
 
@@ -111,6 +114,9 @@ ParseQueue.prototype.parseArraySkins = function(gl, nodesArray, magoManager)
 		var neoBuilding;
 		var skinsParsedCount = 0;
 		var maxParsesCount = this.maxNumParses;
+		
+		maxParsesCount = 40;
+		
 		var lod3buildingsCount = nodesArray.length;
 		for (var i=0; i<lod3buildingsCount; i++)
 		{
@@ -160,44 +166,30 @@ ParseQueue.prototype.parseArraySkins = function(gl, nodesArray, magoManager)
 			if (skinsParsedCount > maxParsesCount)
 			{ break; }
 		}
-		/*
+		
 		if (skinsParsedCount === 0)
 		{
 			for (var key in this.skinLegosToParseMap)
 			{
-				var node = this.skinLegosToParseMap[key];
-			
-				if (node.data === undefined)
-				{ continue; }
-				
-				neoBuilding = node.data.neoBuilding;
-			
-				if (neoBuilding === undefined)
-				{ continue; }
-			
-				// check the current lod of the building.***
-				var currentBuildingLod = neoBuilding.currentLod;
-				var lodIdx = currentBuildingLod - 3;
-				
-				if (lodIdx < 0)
-				{ continue; }
-				
-				skinLego = neoBuilding.lodMeshesArray[lodIdx];
-				if (skinLego === undefined)
-				{ continue; }
-				if(this.eraseSkinLegosToParse(skinLego))
+				if (Object.prototype.hasOwnProperty.call(this.skinLegosToParseMap, key))
 				{
-					skinLego.parseArrayBuffer(gl, skinLego.dataArrayBuffer, magoManager);
-					skinLego.dataArrayBuffer = undefined;
-					
-					skinsParsedCount++;
-				}
-				if (skinsParsedCount > maxParsesCount)
-				{ break; }	
+					skinLego = this.skinLegosToParseMap[key];
 				
+					if (skinLego === undefined)
+					{ continue; }
+					if (this.eraseSkinLegosToParse(skinLego))
+					{
+						skinLego.parseArrayBuffer(skinLego.dataArrayBuffer, magoManager);
+						skinLego.dataArrayBuffer = undefined;
+						
+						skinsParsedCount++;
+					}
+					if (skinsParsedCount > maxParsesCount)
+					{ break; }	
+				}
 			}
 		}
-		*/
+		
 		
 	}
 };

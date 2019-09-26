@@ -287,6 +287,10 @@ NeoBuilding.prototype.deleteObjects = function(gl, vboMemoryManager, deleteMetad
 				var legoSkin = this.lodMeshesMap[key];
 				if (legoSkin === undefined)
 				{ continue; }
+			
+				// Before delete the legoSkin, must erase the legoSkin from the parseQueue if exist.
+				
+				
 				legoSkin.deleteObjects(gl, vboMemoryManager);
 				legoSkin = undefined;
 			}
@@ -569,7 +573,7 @@ NeoBuilding.prototype.getLowerSkinLodToLoad = function(currentLod)
 		{ lowLodMeshAux = this.lodMeshesMap[lodStringAux]; }
 			
 		// Check if lowLodMeshAux if finished loading data.
-		if (lowLodMeshAux === undefined || lowLodMeshAux.fileLoadState === CODE.fileLoadState.READY)
+		if (lowLodMeshAux === undefined || lowLodMeshAux.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
 		{
 			lodToLoad = lod;
 			break;
@@ -587,6 +591,12 @@ NeoBuilding.prototype.getLowerSkinLodToLoad = function(currentLod)
 				lodToLoad = lod;
 				break;
 			}
+		}
+		
+		if (lowLodMeshAux.texture === undefined || lowLodMeshAux.texture.id === undefined)
+		{
+			lodToLoad = lod;
+			break;
 		}
 	}
 
@@ -1097,7 +1107,6 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 		magoManager.readerWriter.getLegoArraybuffer(lodMeshFilePath, lowLodMesh, magoManager);
 		if (lowLodMesh.vbo_vicks_container.vboCacheKeysArray === undefined)
 		{ lowLodMesh.vbo_vicks_container.vboCacheKeysArray = []; }
-		
 	}
 	else if (lowLodMesh.fileLoadState === CODE.fileLoadState.LOADING_FINISHED) 
 	{
@@ -1125,6 +1134,7 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 			TexturesManager.newWebGlTextureByEmbeddedImage(gl, lowLodMesh.texture.imageBinaryData, lowLodMesh.texture);
 		}
 	}
+	
 	
 	return true;
 };
@@ -1263,31 +1273,34 @@ NeoBuilding.prototype.renderSkin = function(magoManager, shader, renderType)
 			//gl.uniform1i(shader.bUse1Color_loc, false);
 		}
 		//----------------------------------------------------------------------------------
-		if (skinLego.texture !== undefined && skinLego.texture.texId && renderTexture)
+		if (renderTexture)
 		{
-			
-			shader.enableVertexAttribArray(shader.texCoord2_loc);
-			gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
-			if (shader.last_tex_id !== skinLego.texture.texId)
+			if (skinLego.texture !== undefined && skinLego.texture.texId)
 			{
-				gl.activeTexture(gl.TEXTURE2);
-				gl.bindTexture(gl.TEXTURE_2D, skinLego.texture.texId);
-				shader.last_tex_id = skinLego.texture.texId;
-			}
-		}
-		else 
-		{
-			//return;
-			if (magoManager.textureAux_1x1 !== undefined && renderTexture)
-			{
+				
 				shader.enableVertexAttribArray(shader.texCoord2_loc);
 				gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
-				gl.activeTexture(gl.TEXTURE2);
-				gl.bindTexture(gl.TEXTURE_2D, magoManager.textureAux_1x1);
+				if (shader.last_tex_id !== skinLego.texture.texId)
+				{
+					gl.activeTexture(gl.TEXTURE2);
+					gl.bindTexture(gl.TEXTURE_2D, skinLego.texture.texId);
+					shader.last_tex_id = skinLego.texture.texId;
+				}
 			}
 			else 
 			{
-				gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
+				//return;
+				if (magoManager.textureAux_1x1 !== undefined)
+				{
+					shader.enableVertexAttribArray(shader.texCoord2_loc);
+					gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
+					gl.activeTexture(gl.TEXTURE2);
+					gl.bindTexture(gl.TEXTURE_2D, magoManager.textureAux_1x1);
+				}
+				else 
+				{
+					gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
+				}
 			}
 		}
 	}

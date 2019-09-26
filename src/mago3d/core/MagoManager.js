@@ -376,6 +376,8 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 	if (this.headersRequestedCounter === undefined)
 	{ this.headersRequestedCounter = 0; }
 
+	var counter = 0;
+
 	var currentVisibleNodes = [].concat(visibleObjControlerNodes.currentVisibles0, 
 		visibleObjControlerNodes.currentVisibles2, 
 		visibleObjControlerNodes.currentVisibles3, 
@@ -520,6 +522,10 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 			{
 				var bytesReaded = 0;
 				neoBuilding.parseHeader(neoBuilding.headerDataArrayBuffer, bytesReaded);
+				
+				counter++;
+				if (counter > 10)
+				{ break; }
 			}
 		}
 		
@@ -1289,6 +1295,8 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 	var gl = this.getGl();
 	this.upDateSceneStateMatrices(this.sceneState);
 	
+	var strTime = new Date().getTime();
+		
 	if (this.isFarestFrustum())
 	{
 		this.dateSC = new Date();
@@ -1317,6 +1325,10 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 		this.sceneState.camera.doTrack(this);
 	}
 	
+	var endTime = new Date().getTime();
+	if ((endTime - strTime)*0.001 > 4)
+	{ var hola = 0; }
+	
 	var cameraPosition = this.sceneState.camera.position;
 	
 	// Take the current frustumVolumenObject.***
@@ -1330,6 +1342,8 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 		if (this.frustumVolumeControl === undefined)
 		{ return; }
 
+		var strTime = new Date().getTime();
+	
 		var frustumVolume = this.myCameraSCX.bigFrustum;
 		var doFrustumCullingToBuildings = false;
 		this.tilesMultiFrustumCullingFinished(frustumVolumenObject.fullyIntersectedLowestTilesArray, visibleNodes, cameraPosition, frustumVolume, doFrustumCullingToBuildings);
@@ -1338,7 +1352,10 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 		this.tilesMultiFrustumCullingFinished(frustumVolumenObject.partiallyIntersectedLowestTilesArray, visibleNodes, cameraPosition, frustumVolume, doFrustumCullingToBuildings);
 		
 		this.prepareNeoBuildingsAsimetricVersion(gl, visibleNodes); 
-
+		
+		var endTime = new Date().getTime();
+		if ((endTime - strTime)*0.001 > 4)
+		{ var hola = 0; }
 	}
 
 	var currentShader = undefined;
@@ -1347,14 +1364,22 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 	// prepare data if camera is no moving.***
 	if (!this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
 	{
+		var strTime = new Date().getTime();
+		
 		this.loadAndPrepareData();
 		this.managePickingProcess();
+		
+		var endTime = new Date().getTime();
+		if ((endTime - strTime)*0.001 > 4)
+		{ var hola = 0; }
 	}
 	
 	if (this.bPicking === true && isLastFrustum)
 	{
 		var pixelPos;
-
+		
+		var strTime = new Date().getTime();
+	
 		if (this.magoPolicy.issueInsertEnable === true)
 		{
 			if (this.objMarkerSC === undefined)
@@ -1379,11 +1404,22 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 			
 			ManagerUtils.calculateGeoLocationDataByAbsolutePoint(pixelPos.x, pixelPos.y, pixelPos.z, this.objMarkerSC.geoLocationData, this);
 		}
+		
+		var endTime = new Date().getTime();
+		if ((endTime - strTime)*0.001 > 4)
+		{ var hola = 0; }
 	}
 	// lightDepthRender: TODO.***
 
 	// Render process.***
+	
+	var strTime = new Date().getTime();
+	
 	this.doRender(frustumVolumenObject);
+	
+	var endTime = new Date().getTime();
+	if ((endTime - strTime)*0.001 > 4)
+	{ var hola = 0; }
 
 	// test. Draw the buildingNames.***
 	if (this.magoPolicy.getShowLabelInfo())
@@ -1406,6 +1442,7 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 	var node;
 	var neoBuilding;
 	var extraCount = 5;
+	var counter = 0;
 	
 	var lowLodNodesCount = lowLodNodesArray.length;
 	for (var i=0; i<lowLodNodesCount; i++) 
@@ -1416,7 +1453,8 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 		if (attributes.objectType === "basicF4d")
 		{
 			neoBuilding = node.data.neoBuilding;
-			neoBuilding.prepareSkin(this);
+			if (neoBuilding.metaData && neoBuilding.metaData.fileLoadState === CODE.fileLoadState.PARSE_FINISHED)
+			{ neoBuilding.prepareSkin(this); }
 		}
 		else if (attributes.objectType === "multiBuildingsTile")
 		{
@@ -4335,12 +4373,16 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 	if (this.boundingSphere_Aux === undefined)
 	{ this.boundingSphere_Aux = new Sphere(); }
 
+	var frustumFar = magoPolicy.getFrustumFarDistance();
+	
+	if (frustumFar < 50000)
+	{ frustumFar = 50000; }
+
+	
+
 	for (var i=0; i<tilesCount; i++)
 	{
 		lowestTile = intersectedLowestTilesArray[i];
-		
-		if (lowestTile.depth === 14)
-		{ var hola = 0; }
 		
 		if (lowestTile.sphereExtent === undefined)
 		{ continue; }
@@ -4348,12 +4390,8 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 		distToCamera = cameraPosition.distToSphere(lowestTile.sphereExtent);
 		if (distToCamera > Number(lod5_minDist))
 		{ continue; }
-	
-		if (lowestTile.depth === 14)
-		{ var hola = 0; }
-		
+
 		// Check the smartTile state: (1- is all updated), (2- need make geometries from objectsSeeds).
-		
 		if (lowestTile.nodesArray && lowestTile.nodesArray.length > 0)
 		{
 			// the neoBuildings are made.
@@ -4364,9 +4402,6 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 				node = lowestTile.nodesArray[j];
 				nodeRoot = node.getRoot();
 				var attributes = node.data.attributes;
-				
-				if (node.data.nodeId === "B11P")
-				{ var hola = 0; }
 
 				// now, create a geoLocDataManager for node if no exist.
 				if (nodeRoot.data.geoLocDataManager === undefined)
@@ -4394,9 +4429,6 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 						visibleNodes.currentVisiblesAux.push(node);
 						continue;
 					}
-					
-					if (neoBuilding.buildingId === "B11P")
-					{ var hola = 0; }
 
 					distToCamera = node.getDistToCamera(cameraPosition, this.boundingSphere_Aux);
 					var lodByDist = magoPolicy.getLod(distToCamera);
@@ -4405,7 +4437,7 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 					data.distToCam = distToCamera;
 					data.currentLod = magoPolicy.getLod(data.distToCam);
 					
-					var frustumFar = magoPolicy.getFrustumFarDistance();
+					
 					if (distToCamera > frustumFar)
 					{ 
 						// put this node to delete into queue.***

@@ -151,6 +151,52 @@ BoundingBox.prototype.expand = function(distance)
  * 
  * @param {Point3D} point 3차원 점
  */
+BoundingBox.getBBoxByXYZDataArray = function(xyzDataArray, resultBBox) 
+{
+	if (xyzDataArray === undefined)
+	{ return undefined; }
+
+	var points3dCount = xyzDataArray.length/3;
+	
+	if (points3dCount === 0)
+	{ return undefined; }
+
+	if (resultBBox === undefined)
+	{ resultBBox = new BoundingBox(); }
+	
+	resultBBox.init(new Point3D(xyzDataArray[0], xyzDataArray[1], xyzDataArray[2]));
+	for (var i=0; i<points3dCount; i++)
+	{
+		resultBBox.addXYZData(xyzDataArray[i*3], xyzDataArray[i*3+1], xyzDataArray[i*3+2]);
+	}
+	
+	return resultBBox;
+};
+
+/**
+ * 주어진 3차원 점을 포함하는 영역으로 영역박스 크기를 변경
+ * 
+ * @param {Point3D} point 3차원 점
+ */
+BoundingBox.prototype.addXYZData = function(x, y, z) 
+{
+	if (x === undefined || y === undefined || z === undefined )	{ return; }
+
+	if (x < this.minX) { this.minX = x; }
+	else if (x > this.maxX) { this.maxX = x; }
+
+	if (y < this.minY) { this.minY = y; }
+	else if (y > this.maxY) { this.maxY = y; }
+
+	if (z < this.minZ) { this.minZ = z; }
+	else if (z > this.maxZ) { this.maxZ = z; }
+};
+
+/**
+ * 주어진 3차원 점을 포함하는 영역으로 영역박스 크기를 변경
+ * 
+ * @param {Point3D} point 3차원 점
+ */
 BoundingBox.prototype.addPoint = function(point) 
 {
 	if (point === undefined)	{ return; }
