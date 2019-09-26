@@ -155,6 +155,11 @@ ParseQueue.prototype.parseArraySkins = function(gl, nodesArray, magoManager)
 				skinLego.parseArrayBuffer(skinLego.dataArrayBuffer, magoManager);
 				skinLego.dataArrayBuffer = undefined;
 				
+				if(currentBuildingLod === 5 && skinLego.vbo_vicks_container.getVbosCount() > 0) {
+					var posDataArray = skinLego.vbo_vicks_container.getVboKey(0).vboBufferPos.dataArray;
+					node.data.onlyPosDataArray = posDataArray;
+				}
+				
 				skinsParsedCount++;
 			}
 			if (skinsParsedCount > maxParsesCount)

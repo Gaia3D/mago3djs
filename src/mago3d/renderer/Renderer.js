@@ -388,7 +388,7 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 	// Test Modeler Rendering.********************************************************************
 	// Test Modeler Rendering.********************************************************************
 	// Test Modeler Rendering.********************************************************************
-	/*
+	
 	if (magoManager.modeler !== undefined)
 	{
 		currentShader = magoManager.postFxShadersManager.getShader("modelRefDepth"); 
@@ -413,7 +413,7 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 		gl.useProgram(null);
 
 	}
-	*/
+	
 	
 	//var nodesLOD0Count = visibleObjControlerNodes.currentVisibles0.length;
 	//var nodesLOD2Count = visibleObjControlerNodes.currentVisibles2.length;
@@ -945,7 +945,9 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			{
 				visibleObjControlerNodes.currentVisibleNativeObjects[i].render(magoManager, currentShader, renderType, glPrimitive);
 			}
-			
+			//익스카바이션 렌더하는거 지운거 다시 넣어야함!!!!!!!!!!!!!!!!!!!!!!!!!
+			magoManager.modeler.render(magoManager, currentShader, renderType);
+
 			currentShader.disableVertexAttribArrayAll();
 			gl.useProgram(null);
 		}
