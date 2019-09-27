@@ -503,8 +503,7 @@ GeoLocationData.prototype.getRotMatrixLC = function()
 		if (roll !== undefined && roll !== 0)
 		{ yRotMatrix.rotationAxisAngDeg(roll, 0.0, 1.0, 0.0); }
 		
-		if (resultTransformMatrix === undefined)
-		{ resultTransformMatrix = new Matrix4(); }  // created as identity matrix.
+		var resultTransformMatrix = new Matrix4();   // created as identity matrix.
 		
 		var zRotatedTMatrix;
 		var zxRotatedTMatrix;
