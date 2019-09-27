@@ -1107,7 +1107,7 @@ Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude,
 	var currAltitude = geoCoords.altitude;
 
 	// target rotation.
-	animData.targetHeading = heading*1;
+	animData.targetHeading = heading;
 	animData.targetPitch = pitch;
 	animData.targetRoll = roll;
 
@@ -1209,7 +1209,7 @@ Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude,
 			{
 				heading += 360;
 			}
-			animData.targetHeading = heading*1;
+			animData.targetHeading = heading;
 		}
 	}
 	else

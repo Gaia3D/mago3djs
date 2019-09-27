@@ -1092,6 +1092,7 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 	var lodString = lodBuildingData.geometryFileName;
 	
 	var lowLodMesh = this.getOrNewLodMesh(lodString);
+	lowLodMesh.owner = this;
 	lowLodMesh.textureName = textureFileName;
 	
 	if (lowLodMesh.fileLoadState === -1)
