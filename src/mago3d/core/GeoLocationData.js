@@ -134,6 +134,13 @@ var GeoLocationData = function(geoLocationDataName)
 	 * @default undefined
 	 */
 	this.pivotPointTraslationLC; 
+	
+	/**
+	 * The local rotation matrix. This matrix uses only Heading, Pitch or Roll rotations.
+	 * @type {Matrix4}
+	 * @default Identity matrix.
+	 */
+	this.rotMatrixLC; 
 };
 
 /**
@@ -470,6 +477,47 @@ GeoLocationData.prototype.getTMatrixInv = function()
 	}
 	
 	return this.tMatrixInv;
+};
+
+/**
+ * 
+ * @returns this.rotMatrixLC.
+ */
+GeoLocationData.prototype.getRotMatrixLC = function() 
+{
+	if(this.rotMatrixLC === undefined)
+	{
+		var xRotMatrix = new Matrix4();  // created as identity matrix.
+		var yRotMatrix = new Matrix4();  // created as identity matrix.
+		var zRotMatrix = new Matrix4();  // created as identity matrix.
+		var heading = this.heading;
+		var pitch = this.pitch;
+		var roll = this.roll;
+		
+		if (heading !== undefined && heading !== 0)
+		{ zRotMatrix.rotationAxisAngDeg(heading, 0.0, 0.0, 1.0); }
+
+		if (pitch !== undefined && pitch !== 0)
+		{ xRotMatrix.rotationAxisAngDeg(pitch, 1.0, 0.0, 0.0); }
+
+		if (roll !== undefined && roll !== 0)
+		{ yRotMatrix.rotationAxisAngDeg(roll, 0.0, 1.0, 0.0); }
+		
+		if (resultTransformMatrix === undefined)
+		{ resultTransformMatrix = new Matrix4(); }  // created as identity matrix.
+		
+		var zRotatedTMatrix;
+		var zxRotatedTMatrix;
+		var zxyRotatedTMatrix;
+
+		zRotatedTMatrix = zRotMatrix.getMultipliedByMatrix(resultTransformMatrix, zRotatedTMatrix);
+		zxRotatedTMatrix = xRotMatrix.getMultipliedByMatrix(zRotatedTMatrix, zxRotatedTMatrix);
+		zxyRotatedTMatrix = yRotMatrix.getMultipliedByMatrix(zxRotatedTMatrix, zxyRotatedTMatrix);
+		
+		this.rotMatrixLC = zxyRotatedTMatrix;
+	}
+	
+	return this.rotMatrixLC;
 };
 
 /**
