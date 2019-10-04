@@ -13,6 +13,74 @@ var ManagerUtils = function()
 };
 
 /**
+ * 어떤 일을 하고 있습니까?
+ * @param octreesArray 변수
+ * @param octree 변수
+ * @returns result_idx
+ */
+ManagerUtils.getIndexToInsertBySquaredDistToEye = function(objectsArray, object, startIdx, endIdx) 
+{
+	// Note: the object must have "distToCamera" variable.
+	// this do a dicotomic search of idx in a ordered table.
+	// 1rst, check the range.
+	if (startIdx === undefined)
+	{ startIdx = 0; }
+	
+	if (endIdx === undefined)
+	{ endIdx = objectsArray.length-1; }
+	
+	var range = endIdx - startIdx;
+	
+	if (range <= 0)
+	{ return 0; }
+	
+	if (range < 6)
+	{
+		// in this case do a lineal search.
+		var finished = false;
+		var i = startIdx;
+		var idx;
+		var octreesCount = objectsArray.length;
+		while (!finished && i<=endIdx)
+		{
+			if (object.distToCamera < objectsArray[i].distToCamera)
+			{
+				idx = i;
+				finished = true;
+			}
+			i++;
+		}
+		
+		if (finished)
+		{
+			return idx;
+		}
+		else 
+		{
+			return endIdx+1;
+		}
+	}
+	else 
+	{
+		// in this case do the dicotomic search.
+		var middleIdx = startIdx + Math.floor(range/2);
+		var newStartIdx;
+		var newEndIdx;
+		if (objectsArray[middleIdx].distToCamera > object.distToCamera)
+		{
+			newStartIdx = startIdx;
+			newEndIdx = middleIdx;
+		}
+		else 
+		{
+			newStartIdx = middleIdx;
+			newEndIdx = endIdx;
+		}
+		return ManagerUtils.getIndexToInsertBySquaredDistToEye(objectsArray, object, newStartIdx, newEndIdx);
+	}
+};
+
+/**
  * world coordinate to geographic coordinate.
  * @param {Point3D} point world coordinate.
  * @param {GeographicCoord|undefined} resultGeographicCoord Optional. result geographicCoord. if undefined, create GeographicCoord instance.

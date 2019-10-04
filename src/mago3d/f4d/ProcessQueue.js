@@ -20,9 +20,38 @@ var ProcessQueue = function()
 	this.nodesToDeleteLessThanLod5Map = {};
 	this.nodesToDeleteLodMeshMap = {}; // no used.
 	this.tinTerrainsToDeleteMap = {};
+	this.smartTilesToDeleteMap = {};
 	
 	// Test.
 	this.octreeToDeletePCloudsMap = {};
+};
+
+ProcessQueue.prototype.putSmartTileToDelete = function(smartTile, aValue)
+{
+	// provisionally "aValue" can be anything.
+	if (aValue === undefined)
+	{ aValue = 0; }
+
+	if (smartTile === undefined)
+	{ return; }
+	
+	var key = smartTile.getId();
+	this.smartTilesToDeleteMap[key] = smartTile;
+};
+
+ProcessQueue.prototype.eraseSmartTileToDelete = function(smartTile)
+{
+	// this erases the smartTile from the "smartTilesToDeleteMap".
+	if (smartTile === undefined)
+	{ return false; }
+	
+	var key = smartTile.getId();
+	if (this.smartTilesToDeleteMap.hasOwnProperty(key)) 
+	{
+		delete this.smartTilesToDeleteMap[key];
+		return true;
+	}
+	return false;
 };
 
 ProcessQueue.prototype.putOctreeToDeletePCloud = function(octree, aValue)
@@ -342,6 +371,65 @@ ProcessQueue.prototype.deleteNeoBuilding = function(gl, neoBuilding, magoManager
 	
 };
 
+ProcessQueue.prototype.deleteSmartTiles = function(magoManager)
+{
+	var deletedCount = 0;
+	var gl = magoManager.sceneState.gl;
+	var node;
+	var neoBuilding;
+
+	for (var key in this.smartTilesToDeleteMap)
+	{
+		if (Object.prototype.hasOwnProperty.call(this.smartTilesToDeleteMap, key))
+		{
+			var smartTile = this.smartTilesToDeleteMap[key];
+			
+			if (smartTile === undefined)
+			{ continue; }
+
+			if (this.eraseSmartTileToDelete(smartTile))
+			{
+				// Delete the smartTile.
+				if (smartTile.nodesArray !== undefined)
+				{
+					var nodesCount = smartTile.nodesArray.length;
+					for (var i=0; i<nodesCount; i++)
+					{
+						node = smartTile.nodesArray[i];
+						neoBuilding = node.data.neoBuilding;
+						//if (this.eraseNodeToDelete(node))
+						{
+							if (neoBuilding === undefined)
+							{ continue; }
+						
+							this.deleteNeoBuilding(gl, neoBuilding, magoManager);
+							//deletedCount++;
+							//if (deletedCount >= 10)
+							//{ break; }
+						}
+					}
+				}
+				else
+				{ smartTile.nodesArray = []; }
+				
+				smartTile.nodesArray.length = 0;
+				if (smartTile.smartTileF4dSeedArray !== undefined)
+				{
+					var smartTileF4dSeedsCount = smartTile.smartTileF4dSeedArray.length;
+					for (var i=0; i<smartTileF4dSeedsCount; i++)
+					{
+						smartTile.smartTileF4dSeedArray[i].fileLoadState = CODE.fileLoadState.READY;
+					}
+				}
+				
+				deletedCount++;
+				if (deletedCount >= 1)
+				{ break; }
+			}
+		}
+	}
+};
+
 ProcessQueue.prototype.manageDeleteQueue = function(magoManager)
 {
 	var gl = magoManager.sceneState.gl;
@@ -365,6 +453,8 @@ ProcessQueue.prototype.manageDeleteQueue = function(magoManager)
 	//	{ break; }
 	//}
 	
+	this.deleteSmartTiles(magoManager);
+	
 
 	for (var key in this.nodesToDeleteMap)
 	{
@@ -382,13 +472,13 @@ ProcessQueue.prototype.manageDeleteQueue = function(magoManager)
 				if (neoBuilding === undefined)
 				{ continue; }
 			
-				var deleteMetaData = true;
-				if (key === 1)
-				{ deleteMetaData = false; }
+				//var deleteMetaData = true;
+				//if (key === 1)
+				//{ deleteMetaData = false; }
 				this.deleteNeoBuilding(gl, neoBuilding, magoManager);
 				deletedCount++;
-				//if (deletedCount >= 2)
-				//{ break; }
+				if (deletedCount >= 10)
+				{ break; }
 			}
 		}
 	}

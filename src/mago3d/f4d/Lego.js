@@ -305,7 +305,7 @@ Lego.prototype.parsePointsCloudData = function(buffer, gl, magoManager)
  */
 Lego.prototype.parseLegoData = function(buffer, magoManager, bytesReaded)
 {
-	if (this.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)	{ return; }
+	if (this.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED && this.fileLoadState !== CODE.fileLoadState.IN_PARSE_QUEUE)	{ return; }
 	
 	if (buffer === undefined)
 	{ buffer = this.dataArrayBuffer; }

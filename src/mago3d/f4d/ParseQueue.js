@@ -115,7 +115,7 @@ ParseQueue.prototype.parseArraySkins = function(gl, nodesArray, magoManager)
 		var skinsParsedCount = 0;
 		var maxParsesCount = this.maxNumParses;
 		
-		maxParsesCount = 40;
+		maxParsesCount = 50;
 		
 		var lod3buildingsCount = nodesArray.length;
 		for (var i=0; i<lod3buildingsCount; i++)
@@ -151,7 +151,8 @@ ParseQueue.prototype.parseArraySkins = function(gl, nodesArray, magoManager)
 			{ continue; }
 			
 			///skinLego = neoBuilding.lodMeshesMap.get(lodString);
-			skinLego = neoBuilding.lodMeshesMap[lodString];
+			//skinLego = neoBuilding.lodMeshesMap[lodString];
+			skinLego = neoBuilding.getLowerSkinLodToLoad(currentBuildingLod);
 			
 			if (skinLego === undefined)
 			{ continue; }
@@ -167,7 +168,7 @@ ParseQueue.prototype.parseArraySkins = function(gl, nodesArray, magoManager)
 			{ break; }
 		}
 		
-		if (skinsParsedCount === 0)
+		//if (skinsParsedCount === 0)
 		{
 			for (var key in this.skinLegosToParseMap)
 			{
@@ -604,6 +605,7 @@ ParseQueue.prototype.putOctreeLod0ReferencesToParse = function(octree, aValue)
 	{ aValue = 0; }
 	
 	this.octreesLod0ReferencesToParseMap[octree.octreeKey] = octree;
+
 };
 
 ParseQueue.prototype.eraseOctreeLod0ReferencesToParse = function(octree)
@@ -624,6 +626,7 @@ ParseQueue.prototype.putOctreeLod0ModelsToParse = function(octree, aValue)
 	{ aValue = 0; }
 	
 	this.octreesLod0ModelsToParseMap[octree.octreeKey] = octree;
+	//octree.fileLoadState = CODE.fileLoadState.IN_QUEUE;
 };
 
 ParseQueue.prototype.eraseOctreeLod0ModelsToParse = function(octree)
@@ -710,6 +713,7 @@ ParseQueue.prototype.putSkinLegosToParse = function(skinLego, aValue)
 	{ aValue = 0; }
 	
 	this.skinLegosToParseMap[skinLego.legoKey] = skinLego;
+	skinLego.fileLoadState = CODE.fileLoadState.IN_PARSE_QUEUE;
 };
 
 ParseQueue.prototype.eraseSkinLegosToParse = function(skinLego)

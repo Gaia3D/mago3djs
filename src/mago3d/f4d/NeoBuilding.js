@@ -559,6 +559,9 @@ NeoBuilding.prototype.getLowerSkinLodToLoad = function(currentLod)
 	
 	for (var lod = 5; lod >= 0; lod--)
 	{
+		if (lod < currentLod)
+		{ break; }
+		
 		var lodBuildingDataAux = this.getLodBuildingData(lod);
 		
 		if (lodBuildingDataAux === undefined)
@@ -583,21 +586,23 @@ NeoBuilding.prototype.getLowerSkinLodToLoad = function(currentLod)
 			lodToLoad = lod;
 			break;
 		}
+		
 		if (lowLodMeshAux.vbo_vicks_container.vboCacheKeysArray[0] && lowLodMeshAux.vbo_vicks_container.vboCacheKeysArray[0].vboBufferTCoord)
 		{
 			// this is the new version.
-			if (lowLodMeshAux.texture === undefined)
+			if (lowLodMeshAux.texture === undefined || lowLodMeshAux.texture.texId === undefined)
 			{
 				lodToLoad = lod;
 				break;
 			}
 		}
 		
-		if (lowLodMeshAux.texture === undefined || lowLodMeshAux.texture.id === undefined)
-		{
-			lodToLoad = lod;
-			break;
-		}
+		
+		//if (lowLodMeshAux.texture === undefined || lowLodMeshAux.texture.texId === undefined)
+		//{
+		//	lodToLoad = lod;
+		//	break;
+		//}
 	}
 
 	return lodToLoad;
@@ -712,28 +717,12 @@ NeoBuilding.prototype.getCurrentSkin = function()
 		if (skinLego === undefined || !skinLego.isReadyToRender())
 		{
 			skinLego = this.lodMeshesMap.lod5;
-			if (skinLego === undefined || !skinLego.isReadyToRender())
-			{
-				skinLego = this.lodMeshesMap.lod3;
-			}
 		}
 		
 	}
 	else if (this.currentLod === 5)
 	{
 		skinLego = this.lodMeshesMap.lod5;
-		
-		if (skinLego === undefined || !skinLego.isReadyToRender())
-		{
-			// If lod5 mesh is not ready to render, then check if can parse data.
-			
-			skinLego = this.lodMeshesMap.lod4;
-			if (skinLego === undefined || !skinLego.isReadyToRender())
-			{
-				skinLego = this.lodMeshesMap.lod3;
-			}
-		}
-		
 	}
 
 	return skinLego;
@@ -909,6 +898,7 @@ NeoBuilding.prototype.getShaderName = function(lod, projectType, renderType)
  */
 NeoBuilding.prototype.parseTexturesList = function(arrayBuffer, bytesReaded) 
 {
+	var decoder = new TextDecoder('utf-8');
 	// read materials list.
 	var materialsCount = ReaderWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 	for (var i=0; i<materialsCount; i++)
@@ -918,14 +908,11 @@ NeoBuilding.prototype.parseTexturesList = function(arrayBuffer, bytesReaded)
 
 		// Now, read the texture_type and texture_file_name.***
 		var texture_type_nameLegth = ReaderWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-		for (var j=0; j<texture_type_nameLegth; j++) 
-		{
-			textureTypeName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1))[0]);bytesReaded += 1; // for example "diffuse".***
-		}
+		textureTypeName = decoder.decode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ texture_type_nameLegth))) ;bytesReaded += texture_type_nameLegth;
 
 		var texture_fileName_Legth = ReaderWriter.readUInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 		var charArray = new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ texture_fileName_Legth)); bytesReaded += texture_fileName_Legth;
-		var decoder = new TextDecoder('utf-8');
+		
 		textureImageFileName = decoder.decode(charArray);
 		
 		if (texture_fileName_Legth > 0)
@@ -939,6 +926,7 @@ NeoBuilding.prototype.parseTexturesList = function(arrayBuffer, bytesReaded)
 			
 			this.texturesLoaded.push(texture);
 		}
+		
 	}
 	
 	return bytesReaded;
@@ -961,9 +949,10 @@ NeoBuilding.prototype.parseHeader = function(arrayBuffer, bytesReaded)
 
 	if (bytesReaded === undefined)
 	{ bytesReaded = 0; }
-	
+			
 	var metaData = this.metaData;
 	bytesReaded = metaData.parseFileHeaderAsimetricVersion(arrayBuffer, bytesReaded);
+	
 	
 	// Now, make the neoBuilding's octree.***
 	if (this.octree === undefined) { this.octree = new Octree(undefined); }
@@ -982,6 +971,7 @@ NeoBuilding.prototype.parseHeader = function(arrayBuffer, bytesReaded)
 	metaData.oct_max_y = this.octree.centerPos.y + this.octree.half_dy;
 	metaData.oct_min_z = this.octree.centerPos.z - this.octree.half_dz;
 	metaData.oct_max_z = this.octree.centerPos.z + this.octree.half_dz;
+
 	
 	if (metaData.version === "0.0.1" || metaData.version === "0.0.2")
 	{
@@ -1010,10 +1000,8 @@ NeoBuilding.prototype.parseLodBuildingData = function(arrayBuffer, bytesReaded)
 	var lodBuildingDatasCount = (new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
 	if (lodBuildingDatasCount !== undefined)
 	{
-		if (lodBuildingDatasCount < 5)
-		{ var hola = 0; }
-		
 		this.lodBuildingDatasMap = {};
+		var decoder = new TextDecoder('utf-8');
 		
 		for (var i =0; i<lodBuildingDatasCount; i++)
 		{
@@ -1026,37 +1014,24 @@ NeoBuilding.prototype.parseLodBuildingData = function(arrayBuffer, bytesReaded)
 				// read the lod2_textureFileName.***
 				nameLength = (new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
 				lodBuildingData.textureFileName = "";
-				for (var j=0; j<nameLength; j++) 
-				{
-					lodBuildingData.textureFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1))[0]);bytesReaded += 1; 
-				}
+				lodBuildingData.textureFileName = decoder.decode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ nameLength))) ;bytesReaded += nameLength;
 			}
 			
 			if (!lodBuildingData.isModelRef)
 			{
 				nameLength = (new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
 				lodBuildingData.geometryFileName = "";
-				for (var j=0; j<nameLength; j++) 
-				{
-					lodBuildingData.geometryFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1))[0]);bytesReaded += 1; 
-				}
+				lodBuildingData.geometryFileName = decoder.decode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ nameLength))) ;bytesReaded += nameLength;
 				
 				nameLength = (new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
 				lodBuildingData.textureFileName = "";
-				for (var j=0; j<nameLength; j++) 
-				{
-					lodBuildingData.textureFileName += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1))[0]);bytesReaded += 1; 
-				}
+				lodBuildingData.textureFileName = decoder.decode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ nameLength))) ;bytesReaded += nameLength;
 			}
 			this.lodBuildingDatasMap[lodBuildingData.lod] = lodBuildingData;
 		}
 		
 		// read a endMark.
 		var endMark = (new Uint8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1)))[0];bytesReaded += 1;
-	}
-	else 
-	{
-		var hola = 0;
 	}
 	
 	return bytesReaded;
@@ -1073,11 +1048,7 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 	
 	if (headerVersion[0] !== "0")
 	{ return false; }
-	
-	var projectFolderName = this.projectFolderName;
-	var buildingFolderName = this.buildingFileName;
-	var geometryDataPath = magoManager.readerWriter.geometryDataPath;
-	
+
 	// Must respect the lodLoading order: must load the lowerLod if is not loaded.
 	var lodToLoad;
 	lodToLoad = this.getLowerSkinLodToLoad(this.currentLod);
@@ -1087,6 +1058,10 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 
 	if (lodBuildingData.isModelRef)
 	{ return false; }
+
+	var projectFolderName = this.projectFolderName;
+	var buildingFolderName = this.buildingFileName;
+	var geometryDataPath = magoManager.readerWriter.geometryDataPath;
 	
 	var textureFileName = lodBuildingData.textureFileName;
 	var lodString = lodBuildingData.geometryFileName;
@@ -1102,18 +1077,23 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 	
 	if (lowLodMesh.fileLoadState === CODE.fileLoadState.READY) 
 	{
-		// put it into fileLoadQueue.
-		var lodMeshFilePath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + lodString;
-		magoManager.readerWriter.getLegoArraybuffer(lodMeshFilePath, lowLodMesh, magoManager);
-		if (lowLodMesh.vbo_vicks_container.vboCacheKeysArray === undefined)
-		{ lowLodMesh.vbo_vicks_container.vboCacheKeysArray = []; }
+		if (magoManager.readerWriter.skinLegos_requested < 5)
+		{
+			var lodMeshFilePath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + lodString;
+			magoManager.readerWriter.getLegoArraybuffer(lodMeshFilePath, lowLodMesh, magoManager);
+			if (lowLodMesh.vbo_vicks_container.vboCacheKeysArray === undefined)
+			{ lowLodMesh.vbo_vicks_container.vboCacheKeysArray = []; }
+		}
 	}
 	else if (lowLodMesh.fileLoadState === CODE.fileLoadState.LOADING_FINISHED) 
 	{
-		magoManager.parseQueue.putSkinLegosToParse(lowLodMesh);
+		////magoManager.parseQueue.putSkinLegosToParse(lowLodMesh);
+		////magoManager.readerWriter.skinLegos_requested ++;
+		
+		lowLodMesh.parseArrayBuffer(lowLodMesh.dataArrayBuffer, magoManager);
 	}
 	
-	if (lowLodMesh.vbo_vicks_container.vboCacheKeysArray[0] && lowLodMesh.vbo_vicks_container.vboCacheKeysArray[0].vboBufferTCoord)
+	else if (lowLodMesh.vbo_vicks_container.vboCacheKeysArray[0] && lowLodMesh.vbo_vicks_container.vboCacheKeysArray[0].vboBufferTCoord)
 	{
 		// this is the new version.
 		if (lowLodMesh.texture === undefined)
@@ -1132,6 +1112,7 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 			// then make the image to bind into gpu.
 			var gl = magoManager.sceneState.gl;
 			TexturesManager.newWebGlTextureByEmbeddedImage(gl, lowLodMesh.texture.imageBinaryData, lowLodMesh.texture);
+			magoManager.readerWriter.skinLegos_requested ++;
 		}
 	}
 	
@@ -1254,6 +1235,7 @@ NeoBuilding.prototype.renderSkin = function(magoManager, shader, renderType)
 	// if the building is highlighted, the use highlight oneColor4.
 	if (renderType === 1)
 	{
+		gl.uniform4fv(shader.oneColor4_loc, [0.7, 0.7, 0.7, 1.0]);
 		if (this.isHighLighted)
 		{
 			//gl.uniform1i(shader.bUse1Color_loc, true);

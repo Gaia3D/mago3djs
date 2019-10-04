@@ -14,12 +14,6 @@ var HierarchyManager = function()
 	}
 
 	/**
-	 * lowest nodes array. initial array to create tiles global distribution.
-	 * @type {Array.<Node>}
-	 */
-	this.nodesArray = [];
-
-	/**
 	 * 프로젝트 보관 객체
 	 * @type {Object}
 	 */
@@ -37,18 +31,30 @@ var HierarchyManager = function()
  */
 HierarchyManager.prototype.deleteNodes = function(gl, vboMemoryManager) 
 {
-	this.projectsMap = {};
-	
-	var nodesCount = this.nodesArray.length;
-	for (var i=0; i<nodesCount; i++)
+	for (var key in this.projectsMap)
 	{
-		if (this.nodesArray[i])
+		if (Object.prototype.hasOwnProperty.call(this.projectsMap, key))
 		{
-			this.nodesArray[i].deleteObjects(gl, vboMemoryManager);
-			this.nodesArray[i] = undefined;
+			var nodesMap = this.projectsMap[key];
+			
+			for (var nodesKey in nodesMap)
+			{
+				if (Object.prototype.hasOwnProperty.call(nodesMap, nodesKey))
+				{
+					var node = nodesMap[nodesKey];
+					if (node instanceof Node)
+					{						
+						node.deleteObjects(gl, vboMemoryManager);
+						delete nodesMap[nodesKey];
+					}
+				}
+			}
+			nodesMap.clear();
+			delete this.projectsMap[key];
 		}
 	}
-	this.nodesArray.length = 0;
+	this.projectsMap.clear();
+	this.projectsMap = {};
 };
 
 /**
@@ -122,20 +128,24 @@ HierarchyManager.prototype.getNodeByDataKey = function(projectId, dataKey)
  * @param {Array.<Node>} resultRootNodesArray
  * @returns {Array.<Node>}
  */
-HierarchyManager.prototype.getRootNodes = function(resultRootNodesArray) 
+HierarchyManager.prototype.getRootNodes = function(projectId, resultRootNodesArray) 
 {
 	if (resultRootNodesArray === undefined)
 	{ resultRootNodesArray = []; }
-	
-	var nodesCount = this.nodesArray.length;
-	var node;
-	for (var i=0; i<nodesCount; i++)
+
+	var nodesMap = this.projectsMap[projectId];	
+	for (var nodesKey in nodesMap)
 	{
-		node = this.nodesArray[i];
-		
-		if (node.parent === undefined)
+		if (Object.prototype.hasOwnProperty.call(nodesMap, nodesKey))
 		{
-			resultRootNodesArray.push(node);
+			var node = nodesMap[nodesKey];
+			if (node instanceof Node)
+			{						
+				if (node.parent === undefined)
+				{
+					resultRootNodesArray.push(node);
+				}
+			}
 		}
 	}
 	
@@ -189,10 +199,45 @@ HierarchyManager.prototype.newNode = function(id, projectId, attributes)
 {
 	var nodesMap = this.getNodesMap(projectId, attributes);
 	
-	var node = new Node();
-	node.data = {"nodeId": id};
-	this.nodesArray.push(node);
-	nodesMap[id] = node;
+	var node = nodesMap[id];
+	if (node === undefined)
+	{
+		var node = new Node();
+		node.data = {"nodeId": id};
+		nodesMap[id] = node;
+	}
+
 	return node;
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

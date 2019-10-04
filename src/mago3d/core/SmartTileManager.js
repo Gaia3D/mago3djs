@@ -32,6 +32,73 @@ var SmartTileManager = function()
 };
 
 /**
+ * Returns the depth of smartTile that corresponds by bbox size.
+ */
+SmartTileManager.getDepthByBoundingBoxMaxSize = function(bboxMaxSize) 
+{
+	if (bboxMaxSize === undefined)
+	{ return undefined; }
+	
+	var smartTileDepth;
+	
+	if (bboxMaxSize < 30.0)
+	{
+		smartTileDepth = 16;
+	}
+	else if (bboxMaxSize >= 30.0 && bboxMaxSize < 50.0)
+	{
+		smartTileDepth = 15;
+	}
+	else if (bboxMaxSize >= 50.0 && bboxMaxSize < 100.0)
+	{
+		smartTileDepth = 14;
+	}
+	else if (bboxMaxSize >=100.0)
+	{
+		smartTileDepth = 13;
+	}
+	
+	return smartTileDepth;
+};
+
+/**
+ * Returns the max distance that is visible a smartTile by his depth.
+ */
+SmartTileManager.maxDistToCameraByDepth = function(depth) 
+{
+	if (depth < 13)
+	{
+		return 10000;
+	}
+	else if (depth === 13)
+	{
+		return 9000;
+	}
+	else if (depth === 14)
+	{
+		return 4000;
+	}
+	else if (depth === 15)
+	{
+		return 1000;
+	}
+	else if (depth === 16)
+	{
+		return 500;
+	}
+	else if (depth === 17)
+	{
+		return 200;
+	}
+	else if (depth > 17)
+	{
+		return 50;
+	}
+	
+	return 10;
+};
+
+/**
  * 아메리카쪽 아시아쪽으로 구분하여 두개의 mother 타일 생성
  */
 SmartTileManager.prototype.createMainTiles = function() 
@@ -60,8 +127,8 @@ SmartTileManager.prototype.createMainTiles = function()
 	{ tile2.maxGeographicCoord = new GeographicCoord(); }
 	
 	tile2.depth = 0; // mother tile.
-	tile1.X = 1; // Asia side tile X coord = 1.***
-	tile1.Y = 0; 
+	tile2.X = 1; // Asia side tile X coord = 1.***
+	tile2.Y = 0; 
 	tile2.minGeographicCoord.setLonLatAlt(0, -90, 0);
 	tile2.maxGeographicCoord.setLonLatAlt(180, 90, 0);
 };
@@ -223,7 +290,8 @@ SmartTileManager.prototype.parseSmartTilesF4dIndexFile = function(dataBuffer, pr
 			"objectType"        : "F4dTile",
 			"id"                : f4dTileId,
 			"tileName"          : name,
-			"projectFolderName" : projectFolderName};
+			"projectFolderName" : projectFolderName,
+			"fileLoadState"     : CODE.fileLoadState.READY};
 
 	}
 	

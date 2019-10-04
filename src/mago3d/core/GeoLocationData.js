@@ -485,7 +485,7 @@ GeoLocationData.prototype.getTMatrixInv = function()
  */
 GeoLocationData.prototype.getRotMatrixLC = function() 
 {
-	if(this.rotMatrixLC === undefined)
+	if (this.rotMatrixLC === undefined)
 	{
 		var xRotMatrix = new Matrix4();  // created as identity matrix.
 		var yRotMatrix = new Matrix4();  // created as identity matrix.

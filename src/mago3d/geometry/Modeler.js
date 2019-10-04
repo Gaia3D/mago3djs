@@ -31,6 +31,7 @@ var Modeler = function(magoManager)
 	this.excavation; // class : Excavation.
 	this.tunnel; // class : Tunnel.
 	this.bSplineCubic3d;
+	this.testObjectsArray;
 	
 	this.objectsArray; // put here all objects.***
 	this.currentVisibleObjectsArray;
@@ -110,6 +111,19 @@ Modeler.prototype.addObject = function(object)
 	var smartTileManager = this.magoManager.smartTileManager;
 	var targetDepth = 17;
 	smartTileManager.putObject(targetDepth, object, this);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+Modeler.prototype.newPerson = function(options) 
+{
+	if (this.testObjectsArray === undefined)
+	{ this.testObjectsArray = []; }
+	
+	var person = new AnimatedPerson();
+	this.testObjectsArray.push(person);
+	return person;
 };
 
 /**
@@ -259,16 +273,18 @@ Modeler.prototype.addPointToPolyline = function(point2d)
 Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive) 
 {
 	// Generic objects.***
-	/*
-	if (this.objectsArray !== undefined)
+	// The generic objects are into smartTiles, so is rendered when smartTile is visible on camera.
+	
+	// Render test objects.
+	if (this.testObjectsArray !== undefined)
 	{
-		var objectsCount = this.objectsArray.length;
-		for (var i=0; i<objectsCount; i++)
+		var testObjectsCount = this.testObjectsArray.length;
+		for (var i=0; i<testObjectsCount; i++)
 		{
-			this.objectsArray[i].render(magoManager, shader, renderType, glPrimitive);
+			var testObject = this.testObjectsArray[i];
+			testObject.render(magoManager);
 		}
 	}
-	*/
 	
 	// 1rst, render the planeGrid if exist.
 	if (this.planeGrid !== undefined)

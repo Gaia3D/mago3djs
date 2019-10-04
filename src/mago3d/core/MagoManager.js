@@ -381,7 +381,8 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 	var currentVisibleNodes = [].concat(visibleObjControlerNodes.currentVisibles0, 
 		visibleObjControlerNodes.currentVisibles2, 
 		visibleObjControlerNodes.currentVisibles3, 
-		visibleObjControlerNodes.currentVisiblesAux);
+		visibleObjControlerNodes.currentVisiblesAux,
+		visibleObjControlerNodes.currentVisiblesToPrepare);
 	for (var i=0, length = currentVisibleNodes.length; i<length; i++) 
 	{
 		node = currentVisibleNodes[i];
@@ -522,9 +523,9 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 			{
 				var bytesReaded = 0;
 				neoBuilding.parseHeader(neoBuilding.headerDataArrayBuffer, bytesReaded);
-				
+	
 				counter++;
-				if (counter > 10)
+				if (counter > 60)
 				{ break; }
 			}
 		}
@@ -931,6 +932,7 @@ MagoManager.prototype.loadAndPrepareData = function()
 	// lod 0 & lod 1.
 	this.checkPropertyFilters(this.visibleObjControlerNodes.currentVisibles0);
 	this.checkPropertyFilters(this.visibleObjControlerNodes.currentVisibles2);
+	this.checkPropertyFilters(this.visibleObjControlerNodes.currentVisibles3);
 	var nodesCount = this.visibleObjControlerNodes.currentVisibles0.length;
 	for (var i=0; i<nodesCount; i++) 
 	{
@@ -982,9 +984,10 @@ MagoManager.prototype.loadAndPrepareData = function()
 	}
 	
 	// lod3, lod4, lod5.***
-	this.prepareVisibleLowLodNodes(this.visibleObjControlerNodes.currentVisibles3);
-	this.prepareVisibleLowLodNodes(this.visibleObjControlerNodes.currentVisibles2);
+	this.readerWriter.skinLegos_requested = 0;
 	this.prepareVisibleLowLodNodes(this.visibleObjControlerNodes.currentVisibles0);
+	this.prepareVisibleLowLodNodes(this.visibleObjControlerNodes.currentVisibles2);
+	this.prepareVisibleLowLodNodes(this.visibleObjControlerNodes.currentVisibles3);
 	
 	// Init the pCloudPartitionsMother_requested.***
 	this.readerWriter.pCloudPartitionsMother_requested = 0;
@@ -1295,7 +1298,7 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 	var gl = this.getGl();
 	this.upDateSceneStateMatrices(this.sceneState);
 	
-	var strTime = new Date().getTime();
+	var delaySecMax = 0.5;
 		
 	if (this.isFarestFrustum())
 	{
@@ -1325,10 +1328,6 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 		this.sceneState.camera.doTrack(this);
 	}
 	
-	var endTime = new Date().getTime();
-	if ((endTime - strTime)*0.001 > 4)
-	{ var hola = 0; }
-	
 	var cameraPosition = this.sceneState.camera.position;
 	
 	// Take the current frustumVolumenObject.***
@@ -1341,21 +1340,17 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 	{
 		if (this.frustumVolumeControl === undefined)
 		{ return; }
-
-		var strTime = new Date().getTime();
 	
 		var frustumVolume = this.myCameraSCX.bigFrustum;
 		var doFrustumCullingToBuildings = false;
 		this.tilesMultiFrustumCullingFinished(frustumVolumenObject.fullyIntersectedLowestTilesArray, visibleNodes, cameraPosition, frustumVolume, doFrustumCullingToBuildings);
 
+		
 		doFrustumCullingToBuildings = true;
 		this.tilesMultiFrustumCullingFinished(frustumVolumenObject.partiallyIntersectedLowestTilesArray, visibleNodes, cameraPosition, frustumVolume, doFrustumCullingToBuildings);
 		
 		this.prepareNeoBuildingsAsimetricVersion(gl, visibleNodes); 
-		
-		var endTime = new Date().getTime();
-		if ((endTime - strTime)*0.001 > 4)
-		{ var hola = 0; }
+
 	}
 
 	var currentShader = undefined;
@@ -1364,21 +1359,16 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 	// prepare data if camera is no moving.***
 	if (!this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
 	{
-		var strTime = new Date().getTime();
 		
 		this.loadAndPrepareData();
 		this.managePickingProcess();
 		
-		var endTime = new Date().getTime();
-		if ((endTime - strTime)*0.001 > 4)
-		{ var hola = 0; }
 	}
 	
 	if (this.bPicking === true && isLastFrustum)
 	{
 		var pixelPos;
 		
-		var strTime = new Date().getTime();
 	
 		if (this.magoPolicy.issueInsertEnable === true)
 		{
@@ -1405,21 +1395,14 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 			ManagerUtils.calculateGeoLocationDataByAbsolutePoint(pixelPos.x, pixelPos.y, pixelPos.z, this.objMarkerSC.geoLocationData, this);
 		}
 		
-		var endTime = new Date().getTime();
-		if ((endTime - strTime)*0.001 > 4)
-		{ var hola = 0; }
 	}
 	// lightDepthRender: TODO.***
 
 	// Render process.***
 	
-	var strTime = new Date().getTime();
 	
 	this.doRender(frustumVolumenObject);
 	
-	var endTime = new Date().getTime();
-	if ((endTime - strTime)*0.001 > 4)
-	{ var hola = 0; }
 
 	// test. Draw the buildingNames.***
 	if (this.magoPolicy.getShowLabelInfo())
@@ -1434,15 +1417,14 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
  */
 MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray) 
 {
-	if (this.readerWriter.skinLegos_requested > 5)
+	var maxParsesCount = 300; // 5
+	if (this.readerWriter.skinLegos_requested > maxParsesCount)
 	{ return; }
 	
 	// Prepare lod3, lod4 and lod5 meshes.***
 	// check "this.visibleObjControlerNodes.currentVisibles3".***
 	var node;
 	var neoBuilding;
-	var extraCount = 5;
-	var counter = 0;
 	
 	var lowLodNodesCount = lowLodNodesArray.length;
 	for (var i=0; i<lowLodNodesCount; i++) 
@@ -1465,7 +1447,7 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 			{ multiBuildings.prepareData(this); }
 		}
 		
-		if (this.readerWriter.skinLegos_requested > 5)
+		if (this.readerWriter.skinLegos_requested > maxParsesCount)
 		{ return; }
 	}
 };
@@ -2052,21 +2034,24 @@ MagoManager.prototype.keyDown = function(key)
 		
 		if (this.smartTile_f4d_tested === undefined)
 		{
-			this.smartTile_f4d_tested = true;
-			
-			if (this.configInformation === undefined)
-			{
-				this.configInformation = MagoConfig.getPolicy();
-			}
-			
-			this.buildingSeedList = new BuildingSeedList();
-			var fileName;
-			var projectFolderName = "berilin";
-			fileName = this.readerWriter.geometryDataPath + "/" + projectFolderName + "/" + "smartTile_f4d_indexFile.sii";
-			
-			//var projectFolderName = "3ds";
-			//fileName = this.readerWriter.geometryDataPath + "/" + projectFolderName + "/" + "smartTile_f4d_indexFile.sii";
-			
+			this.smartTile_f4d_tested = 1;
+			var projectFolderName = "daejeon";
+			var fileName = this.readerWriter.geometryDataPath + "/" + projectFolderName + "/" + "smartTile_f4d_indexFile.sii";
+			this.readerWriter.getObjectIndexFileSmartTileF4d(fileName, projectFolderName, this);
+
+		}
+		else if (this.smartTile_f4d_tested === 1)
+		{
+			this.smartTile_f4d_tested ++;
+			var projectFolderName = "sejong";
+			var fileName = this.readerWriter.geometryDataPath + "/" + projectFolderName + "/" + "smartTile_f4d_indexFile.sii";
+			this.readerWriter.getObjectIndexFileSmartTileF4d(fileName, projectFolderName, this);
+		}
+		else if (this.smartTile_f4d_tested === 2)
+		{
+			this.smartTile_f4d_tested ++;
+			var projectFolderName = "berlin";
+			var fileName = this.readerWriter.geometryDataPath + "/" + projectFolderName + "/" + "smartTile_f4d_indexFile.sii";
 			this.readerWriter.getObjectIndexFileSmartTileF4d(fileName, projectFolderName, this);
 		}
 		
@@ -4247,15 +4232,15 @@ MagoManager.prototype.doMultiFrustumCullingSmartTiles = function(camera)
 	if (this.fullyIntersectedLowestTilesArray === undefined)
 	{ this.fullyIntersectedLowestTilesArray = []; }
 
-	if (this.partiallyIntersectedLowestTilesArray === undefined)
-	{ this.partiallyIntersectedLowestTilesArray = []; }
+	//if (this.partiallyIntersectedLowestTilesArray === undefined)
+	//{ this.partiallyIntersectedLowestTilesArray = []; }
 	
 	if (this.lastIntersectedLowestTilesArray === undefined)
 	{ this.lastIntersectedLowestTilesArray = []; }
 	
 	// save the last frustumCulled lowestTiles to delete if necessary.
-	this.lastIntersectedLowestTilesArray.push.apply(this.lastIntersectedLowestTilesArray, this.fullyIntersectedLowestTilesArray);
-	this.lastIntersectedLowestTilesArray.push.apply(this.lastIntersectedLowestTilesArray, this.partiallyIntersectedLowestTilesArray);
+	this.lastIntersectedLowestTilesArray = this.fullyIntersectedLowestTilesArray;
+	this.fullyIntersectedLowestTilesArray = [];
 	
 	// mark all last_tiles as "no visible".
 	var lastLowestTilesCount = this.lastIntersectedLowestTilesArray.length;
@@ -4267,10 +4252,10 @@ MagoManager.prototype.doMultiFrustumCullingSmartTiles = function(camera)
 	}
 	
 	// do frustum culling for Asia_side_tile and America_side_tile.
-	this.fullyIntersectedLowestTilesArray.length = 0; // init array.
-	this.partiallyIntersectedLowestTilesArray.length = 0; // init array.
-	smartTile1.getFrustumIntersectedLowestTiles(frustumVolume, this.fullyIntersectedLowestTilesArray, this.partiallyIntersectedLowestTilesArray);
-	smartTile2.getFrustumIntersectedLowestTiles(frustumVolume, this.fullyIntersectedLowestTilesArray, this.partiallyIntersectedLowestTilesArray);
+	var maxDistToCamera = 5000;
+	smartTile1.getFrustumIntersectedLowestTiles(camera, frustumVolume, this.fullyIntersectedLowestTilesArray, maxDistToCamera);
+	smartTile2.getFrustumIntersectedLowestTiles(camera, frustumVolume, this.fullyIntersectedLowestTilesArray, maxDistToCamera);
+	
 	
 	// Now, store the culled tiles into corresponding frustums, and mark all current_tiles as "visible".***
 	this.frustumVolumeControl.initArrays(); // init.***
@@ -4283,7 +4268,10 @@ MagoManager.prototype.doMultiFrustumCullingSmartTiles = function(camera)
 		lowestTile = this.fullyIntersectedLowestTilesArray[i];
 		if (lowestTile.sphereExtent === undefined)
 		{ continue; }
-		
+	
+		// Now, if the "lowestOctree" is inside of deletingQueue, then erase from deletingQueue.
+		this.processQueue.eraseSmartTileToDelete(lowestTile);
+	
 		lowestTile.isVisible = true;
 		for (var j=frustumsCount-1; j>= 0 ; j--)
 		{
@@ -4297,25 +4285,6 @@ MagoManager.prototype.doMultiFrustumCullingSmartTiles = function(camera)
 		}
 	}
 	
-	currentLowestTilesCount = this.partiallyIntersectedLowestTilesArray.length;
-	for (var i=0; i<currentLowestTilesCount; i++)
-	{
-		lowestTile = this.partiallyIntersectedLowestTilesArray[i];
-		if (lowestTile.sphereExtent === undefined)
-		{ continue; }
-		
-		lowestTile.isVisible = true;
-		for (var j=frustumsCount-1; j>= 0 ; j--)
-		{
-			frustum = this.myCameraSCX.frustumsArray[j];
-			if (frustum.intersectionNearFarSphere(lowestTile.sphereExtent) !== Constant.INTERSECTION_OUTSIDE)
-			{
-				var frustumVolumeControlObject = this.frustumVolumeControl.getFrustumVolumeCulling(j); 
-				frustumVolumeControlObject.partiallyIntersectedLowestTilesArray.push(lowestTile);
-				//break;
-			}
-		}
-	}
 	
 	// Now, delete all tiles that is no visible in the all frustumVolumes.***
 	// Put to deleting queue.***
@@ -4326,8 +4295,13 @@ MagoManager.prototype.doMultiFrustumCullingSmartTiles = function(camera)
 		lowestTile = this.lastIntersectedLowestTilesArray[i];
 		if (!lowestTile.isVisible)
 		{
-			this.processQueue.putNodesArrayToDelete(lowestTile.nodesArray);
-			lowestTile.clearNodesArray();
+			//if (lowestTile.distToCamera > 2000)
+			{ 
+				//this.processQueue.putNodesArrayToDelete(lowestTile.nodesArray); 
+				this.processQueue.putSmartTileToDelete(lowestTile, 0);
+				///lowestTile.clearNodesArray();
+			}
+			
 		}
 	}
 	
@@ -4375,8 +4349,8 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 
 	var frustumFar = magoPolicy.getFrustumFarDistance();
 	
-	if (frustumFar < 50000)
-	{ frustumFar = 50000; }
+	//if (frustumFar < 30000)
+	//{ frustumFar = 30000; }
 
 	
 
@@ -4388,8 +4362,17 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 		{ continue; }
 	
 		distToCamera = cameraPosition.distToSphere(lowestTile.sphereExtent);
-		if (distToCamera > Number(lod5_minDist))
-		{ continue; }
+		//if (distToCamera > Number(lod5_minDist))
+		//{ continue; }
+	
+		if (lowestTile.intersectionType === Constant.INTERSECTION_INSIDE)
+		{
+			doFrustumCullingToBuildings = false;
+		}
+		else 
+		{
+			doFrustumCullingToBuildings = true;
+		}
 
 		// Check the smartTile state: (1- is all updated), (2- need make geometries from objectsSeeds).
 		if (lowestTile.nodesArray && lowestTile.nodesArray.length > 0)
@@ -4418,7 +4401,7 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 					if (neoBuilding === undefined) // attributes.isReference === true
 					{
 						// This node is a reference node.***
-						visibleNodes.currentVisiblesAux.push(node);
+						visibleNodes.currentVisiblesToPrepare.push(node);
 						continue;
 					}
 					
@@ -4426,7 +4409,7 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 					//neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 					if (neoBuilding.metaData !== undefined && neoBuilding.metaData.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
 					{
-						visibleNodes.currentVisiblesAux.push(node);
+						visibleNodes.currentVisiblesToPrepare.push(node);
 						continue;
 					}
 
@@ -4438,10 +4421,10 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 					data.currentLod = magoPolicy.getLod(data.distToCam);
 					
 					
-					if (distToCamera > frustumFar)
+					if (distToCamera > frustumFar)// || distToCamera > 1500)
 					{ 
 						// put this node to delete into queue.***
-						this.processQueue.putNodeToDelete(node, 0);
+						//this.processQueue.putNodeToDelete(node, 0);
 						continue; 
 					}
 					
@@ -4453,8 +4436,8 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 						if (frustumCull === Constant.INTERSECTION_OUTSIDE) 
 						{
 							// put this node to delete into queue.***
-							//this.processQueue.putNodeToDeleteModelReferences(node, 0);
-							this.processQueue.putNodeToDeleteLessThanLod3(node, 0);
+							////this.processQueue.putNodeToDeleteModelReferences(node, 0);
+							//this.processQueue.putNodeToDeleteLessThanLod3(node, 0);
 							continue;
 						}
 					}
@@ -5007,7 +4990,7 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 /**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
  */
-MagoManager.prototype.calculateBoundingBoxesNodes = function() 
+MagoManager.prototype.calculateBoundingBoxesNodes = function(projectId) 
 {
 	var node;
 	var nodeRoot;
@@ -5015,63 +4998,58 @@ MagoManager.prototype.calculateBoundingBoxesNodes = function()
 	var longitude, latitude, height;
 	var heading, pitch, roll;
 	
+	var nodesMap = this.hierarchyManager.getNodesMap(projectId);
 	// 1rst, calculate boundingBoxes of buildingSeeds of nodes.
-	var nodesCount = this.hierarchyManager.nodesArray.length;
-	for (var i=0; i<nodesCount; i++)
-	{
-		node = this.hierarchyManager.nodesArray[i];
-		buildingSeed = node.data.buildingSeed;
-		if (buildingSeed)
-		{
-			//nodeRoot = node.getRoot(); // old.***
-			nodeRoot = node.getClosestParentWithData("geographicCoord");
-			
-			longitude = nodeRoot.data.geographicCoord.longitude; 
-			latitude = nodeRoot.data.geographicCoord.latitude; 
-			height = nodeRoot.data.geographicCoord.altitude;
-			
-			heading = nodeRoot.data.rotationsDegree.z;
-			pitch = nodeRoot.data.rotationsDegree.x;
-			roll = nodeRoot.data.rotationsDegree.y;
-			
-			if (buildingSeed.geographicCoord === undefined)
-			{ buildingSeed.geographicCoord = new GeographicCoord(); }
-		
-			if (buildingSeed.rotationsDegree === undefined)
-			{ buildingSeed.rotationsDegree = new Point3D(); }
 
-			buildingSeed.geographicCoord.setLonLatAlt(longitude, latitude, height);
-			buildingSeed.rotationsDegree.set(pitch, roll, heading);
+	for (var key in nodesMap)
+	{
+		if (Object.prototype.hasOwnProperty.call(nodesMap, key))
+		{
+			node = nodesMap[key];
+			if (node.data === undefined)
+			{ continue; }
 			
-			// now calculate the geographic coord of the center of the bbox.
-			if (buildingSeed.geographicCoordOfBBox === undefined) 
-			{ buildingSeed.geographicCoordOfBBox = new GeographicCoord(); }
+			buildingSeed = node.data.buildingSeed;
+			if (buildingSeed)
+			{
+				nodeRoot = node.getClosestParentWithData("geographicCoord");
+			
+				longitude = nodeRoot.data.geographicCoord.longitude; 
+				latitude = nodeRoot.data.geographicCoord.latitude; 
+				height = nodeRoot.data.geographicCoord.altitude;
+			
+				heading = nodeRoot.data.rotationsDegree.z;
+				pitch = nodeRoot.data.rotationsDegree.x;
+				roll = nodeRoot.data.rotationsDegree.y;
+			
+				if (buildingSeed.geographicCoord === undefined)
+				{ buildingSeed.geographicCoord = new GeographicCoord(); }
 		
-			// calculate the transformation matrix at (longitude, latitude, height).
-			var worldCoordPosition = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, height, worldCoordPosition, this);
-			var tMatrix = ManagerUtils.calculateTransformMatrixAtWorldPosition(worldCoordPosition, heading, pitch, roll, undefined, tMatrix, this);
+				if (buildingSeed.rotationsDegree === undefined)
+				{ buildingSeed.rotationsDegree = new Point3D(); }
+
+				buildingSeed.geographicCoord.setLonLatAlt(longitude, latitude, height);
+				buildingSeed.rotationsDegree.set(pitch, roll, heading);
 			
-			// now calculate the geographicCoord of the center of the bBox.
-			buildingSeed.geographicCoordOfBBox.setLonLatAlt(longitude, latitude, height);
-			/*
-			if (node.data.attributes.mapping_type && node.data.attributes.mapping_type === "boundingboxcenter")
-			{
-				var bboxCenterPoint = buildingSeed.bBox.getCenterPoint(bboxCenterPoint);
-				var bboxCenterPointWorldCoord = tMatrix.transformPoint3D(bboxCenterPoint, bboxCenterPointWorldCoord);
-				buildingSeed.geographicCoordOfBBox = ManagerUtils.pointToGeographicCoord(bboxCenterPointWorldCoord, buildingSeed.geographicCoordOfBBox, this); // original.
-			}
-			else 
-			{
+				// now calculate the geographic coord of the center of the bbox.
+				if (buildingSeed.geographicCoordOfBBox === undefined) 
+				{ buildingSeed.geographicCoordOfBBox = new GeographicCoord(); }
+		
+				// calculate the transformation matrix at (longitude, latitude, height).
+				var worldCoordPosition = ManagerUtils.geographicCoordToWorldPoint(longitude, latitude, height, worldCoordPosition, this);
+				var tMatrix = ManagerUtils.calculateTransformMatrixAtWorldPosition(worldCoordPosition, heading, pitch, roll, undefined, tMatrix, this);
+			
+				// now calculate the geographicCoord of the center of the bBox.
 				buildingSeed.geographicCoordOfBBox.setLonLatAlt(longitude, latitude, height);
 			}
-			*/
 		}
 	}
+	
 	
 	// now, must calculate the bbox of the root nodes.
 	var rootNodesArray = [];
 	var nodesArray = [];
-	this.hierarchyManager.getRootNodes(rootNodesArray); // original.***
+	this.hierarchyManager.getRootNodes(projectId, rootNodesArray); // original.***
 	var bboxStarted = false;
 	
 	var rootNodesCount = rootNodesArray.length;
@@ -5083,7 +5061,7 @@ MagoManager.prototype.calculateBoundingBoxesNodes = function()
 		nodeRoot.extractNodesByDataName(nodesArray, "buildingSeed");
 		// now, take nodes that is "isMain" = true.
 		bboxStarted = false;
-		nodesCount =  nodesArray.length;
+		var nodesCount =  nodesArray.length;
 		for (var j=0; j<nodesCount; j++)
 		{
 			node = nodesArray[j];
@@ -5161,11 +5139,11 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList, projectId)
 	}
 	var projectFolderName = realTimeLocBlocksList.data_key;
 	this.makeNode(realTimeLocBlocksList, physicalNodesArray, buildingSeedMap, projectFolderName, projectId);
-	this.calculateBoundingBoxesNodes();
+	this.calculateBoundingBoxesNodes(projectId);
 	
 	// now, make smartTiles.
 	// there are 2 general smartTiles: AsiaSide & AmericaSide.
-	var targetDepth = 17;
+	var targetDepth = 15;
 	this.smartTileManager.makeTreeByDepth(targetDepth, physicalNodesArray, this);
 
 	this.buildingSeedList.buildingSeedArray.length = 0; // init.
