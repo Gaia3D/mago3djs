@@ -148,7 +148,7 @@ Ring2DList.prototype.intersectionWithSegment = function(segment)
 	var ringsCount = this.getRingsCount();
 	while (!intersects && i<ringsCount)
 	{
-		if (this.ringsArray[i].intersectionWithSegment(segment))
+		if (this.ringsArray[i].intersectionWithSegment(segment)) // TODO:
 		{
 			intersects = true;
 		}
