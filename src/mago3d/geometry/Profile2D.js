@@ -305,11 +305,11 @@ Profile2D.prototype.eliminateHolePolygon = function(computingPolygon, innerRing,
 		}
 		
 		// check if the splitSegment cuts other innerRings.
-		if (this.innerRingsList.intersectionWithSegment(splitSegment))
-		{
-			i++;
-			continue;
-		}
+		//if (this.innerRingsList.intersectionWithSegment(splitSegment))
+		//{
+		//	i++;
+		//	continue;
+		//}
 		
 		resultPolygon = this.eliminateHolePolygonBySplitPoints(computingPolygon, innerPolygon, outPointIdx, innerPointIdx, resultPolygon);
 		finished = true;
