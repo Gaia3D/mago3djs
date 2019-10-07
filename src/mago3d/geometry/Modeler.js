@@ -114,6 +114,18 @@ Modeler.prototype.addObject = function(object)
 };
 
 /**
+ * 모델러에 콘센트릭튜브 추가
+ * @param {Object}
+ */
+Modeler.prototype.removeObject = function(object) 
+{
+	if (object === undefined)
+	{ return false; }
+	
+	
+};
+
+/**
  * 어떤 일을 하고 있습니까?
  */
 Modeler.prototype.newPerson = function(options) 

@@ -137,6 +137,28 @@ Sphere.prototype.makePMesh = function(resultPMesh)
 	return resultPMesh;
 };
 
+Sphere.prototype.intersectionSphere = function(sphere) 
+{
+	if (sphere === undefined)
+	{ return Constant.INTERSECTION_OUTSIDE; }
+	
+	var dist = this.centerPoint.distToPoint(sphere.centerPoint);
+	if (dist < this.r)
+	{
+		return Constant.INTERSECTION_INSIDE;
+	}
+	else if (dist < sphere.r)
+	{
+		return Constant.INTERSECTION_INSIDE;
+	}
+	else if (dist < (this.r + sphere.r))
+	{
+		return Constant.INTERSECTION_INTERSECT;
+	}
+	
+	return Constant.INTERSECTION_OUTSIDE;
+};
+
 
 
 

@@ -281,6 +281,7 @@ var MagoManager = function()
 	
 	this.modeler = new Modeler(this);
 	this.materialsManager = new MaterialsManager(this);
+	this.idManager = new IdentifierManager();
 };
 
 /**
@@ -2035,7 +2036,7 @@ MagoManager.prototype.keyDown = function(key)
 		if (this.smartTile_f4d_tested === undefined)
 		{
 			this.smartTile_f4d_tested = 1;
-			var projectFolderName = "daejeon";
+			var projectFolderName = "smartTile_f4d";
 			var fileName = this.readerWriter.geometryDataPath + "/" + projectFolderName + "/" + "smartTile_f4d_indexFile.sii";
 			this.readerWriter.getObjectIndexFileSmartTileF4d(fileName, projectFolderName, this);
 

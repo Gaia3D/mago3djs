@@ -864,16 +864,39 @@ SmartTile.prototype.getFrustumIntersectedTiles = function(camera, frustum, resul
 				{ this.subTiles[i].getFrustumIntersectedTiles(camera, frustum, resultFullyIntersectedTilesArray, resultPartiallyIntersectedTilesArray, maxDistToCamera); }
 			}
 		}
-		//else
-		//{ 
-		//	if (this.hasRenderables())
-		//	{ 
-		//		// Calculate the distToCamera.
-		//		var distToCam = this.calculateDistToCamera(camera);
-		//		if (distToCam < SmartTileManager.maxDistToCameraByDepth(this.depth))
-		//		{ this.putSmartTileInEyeDistanceSortedArray(resultFullyIntersectedTilesArray, this); }
-		//	} 
-		//}
+	}
+};
+/*
+ * 어떤 일을 하고 있습니까?
+ * @param frustum 변수
+ */
+SmartTile.prototype.getSphereIntersectedTiles = function(sphere, resultIntersectedTilesArray, maxDepth) 
+{
+	if (this.depth > maxDepth)
+	{ return Constant.INTERSECTION_OUTSIDE; }
+	
+	if (this.sphereExtent === undefined)
+	{ return Constant.INTERSECTION_OUTSIDE; }
+	
+	var intersectionType = sphere.intersectionSphere(this.sphereExtent);
+	
+	if (intersectionType === Constant.INTERSECTION_OUTSIDE)
+	{ return Constant.INTERSECTION_OUTSIDE; }
+	else
+	{
+		if (this.hasRenderables())
+		{ 
+			resultIntersectedTilesArray.push(this);
+		} 
+			
+		if (this.subTiles && this.subTiles.length > 0)
+		{
+			for (var i=0; i<this.subTiles.length; i++)
+			{
+				if (this.subTiles[i].sphereExtent)
+				{ this.subTiles[i].getSphereIntersectedTiles(sphere, resultIntersectedTilesArray, maxDepth); }
+			}
+		}
 	}
 };
 

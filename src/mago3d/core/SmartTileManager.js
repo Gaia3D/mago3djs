@@ -29,6 +29,8 @@ var SmartTileManager = function()
 	
 	// objectSeedsMap created to process multiBuildings.
 	this.objectSeedsMap;
+	
+	this.maxDepth = 17;
 };
 
 /**
@@ -330,7 +332,7 @@ SmartTileManager.prototype.makeTreeByDepth = function(targetDepth, physicalNodes
  */
 SmartTileManager.prototype.putNode = function(targetDepth, node, magoManager) 
 {
-	targetDepth = defaultValue(targetDepth, 17);
+	targetDepth = defaultValue(targetDepth, this.maxDepth);
 	if (this.tilesArray !== undefined)
 	{
 		var tilesCount = this.tilesArray.length; // allways tilesCount = 2. (Asia & America sides).
@@ -346,13 +348,31 @@ SmartTileManager.prototype.putNode = function(targetDepth, node, magoManager)
  */
 SmartTileManager.prototype.putObject = function(targetDepth, object, magoManager) 
 {
-	targetDepth = defaultValue(targetDepth, 17);
+	targetDepth = defaultValue(targetDepth, this.maxDepth);
 	if (this.tilesArray !== undefined)
 	{
 		var tilesCount = this.tilesArray.length; // allways tilesCount = 2. (Asia & America sides).
 		for (var i=0; i<tilesCount; i++)
 		{
 			this.tilesArray[i].putObject(targetDepth, object, magoManager);
+		}
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+SmartTileManager.prototype.getSphereIntersectedTiles = function(sphere, resultIntersectedTilesArray, maxDepth) 
+{
+	if (maxDepth === undefined)
+	{ maxDepth = this.maxDepth; }
+	
+	if (this.tilesArray !== undefined)
+	{
+		var tilesCount = this.tilesArray.length; // allways tilesCount = 2. (Asia & America sides).
+		for (var i=0; i<tilesCount; i++)
+		{
+			this.tilesArray[i].getSphereIntersectedTiles(sphere, resultIntersectedTilesArray, maxDepth);
 		}
 	}
 };
