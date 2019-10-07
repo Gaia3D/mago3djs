@@ -1004,6 +1004,11 @@ SmartTile.prototype.createGeometriesFromSeeds = function(magoManager)
 			var attributes = node.data.attributes;
 			if (attributes.objectType === "basicF4d")
 			{
+				if (attributes.projectId !== undefined && attributes.isReference !== undefined && attributes.isReference === true)
+				{
+					StaticModelsManager.manageStaticModel(node, magoManager);
+				}
+			
 				if (node.data.neoBuilding !== undefined)
 				{
 					this.nodesArray.push(node);

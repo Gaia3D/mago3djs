@@ -408,6 +408,8 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 		
 		if (attributes.projectId !== undefined && attributes.isReference !== undefined && attributes.isReference === true)
 		{
+			StaticModelsManager.manageStaticModel(node, this);
+			/*
 			// check if has neoBuilding.***
 			if (neoBuilding === undefined)
 			{
@@ -471,6 +473,7 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 				neoBuilding.bbox.copyFrom(buildingSeed.bBox);
 				neoBuilding.projectFolderName = node.data.projectFolderName;
 			}
+			*/
 		}
 		
 		// Check if this node has topologyData.***
