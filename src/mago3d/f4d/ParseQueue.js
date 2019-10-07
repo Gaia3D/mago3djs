@@ -161,11 +161,11 @@ ParseQueue.prototype.parseArraySkins = function(gl, nodesArray, magoManager)
 				skinLego.parseArrayBuffer(skinLego.dataArrayBuffer, magoManager);
 				skinLego.dataArrayBuffer = undefined;
 				
-				if (!node.data.onlyPosDataArray && skinLego.vbo_vicks_container.getVbosCount() > 0) 
+				/*if (!node.data.onlyPosDataArray && skinLego.vbo_vicks_container.getVbosCount() > 0) 
 				{
 					var posDataArray = skinLego.vbo_vicks_container.getVboKey(0).vboBufferPos.dataArray;
 					node.data.onlyPosDataArray = posDataArray;
-				}
+				}*/
 				
 				skinsParsedCount++;
 			}
@@ -187,14 +187,14 @@ ParseQueue.prototype.parseArraySkins = function(gl, nodesArray, magoManager)
 					{
 						skinLego.parseArrayBuffer(skinLego.dataArrayBuffer, magoManager);
 						skinLego.dataArrayBuffer = undefined;
-						var neoBuildingOwner = skinLego.owner;
+						/*var neoBuildingOwner = skinLego.owner;
 						var node = neoBuildingOwner.nodeOwner;
 
 						if (!node.data.onlyPosDataArray && skinLego.vbo_vicks_container.getVbosCount() > 0) 
 						{
 							var posDataArray = skinLego.vbo_vicks_container.getVboKey(0).vboBufferPos.dataArray;
 							node.data.onlyPosDataArray = posDataArray;
-						}
+						}*/
 
 						skinsParsedCount++;
 					}
