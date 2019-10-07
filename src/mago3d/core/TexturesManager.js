@@ -115,13 +115,14 @@ TexturesManager.newWebGlTextureByEmbeddedImage = function(gl, embeddedImage, tex
 {
 	var blob = new Blob([embeddedImage], {type: 'application/octet-binary'});
 	var url = URL.createObjectURL(blob);
+	texture.fileLoadState = CODE.fileLoadState.BINDING_STARTED;
 	
 	var img = new Image();
 	img.onload = function() 
 	{
 		URL.revokeObjectURL(url);
 		texture.texId = TexturesManager.handleTextureLoaded(gl, img);
-		texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED; // file load finished.***
+		texture.fileLoadState = CODE.fileLoadState.BINDING_FINISHED; // file load finished.***
 	};
 	img.src = url;
 };

@@ -1541,73 +1541,6 @@ Octree.prototype.setDistToCamera = function(cameraPosition)
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param octreesArray 변수
- * @param octree 변수
- * @returns result_idx
- */
-Octree.prototype.getIndexToInsertBySquaredDistToEye = function(octreesArray, octree, startIdx, endIdx) 
-{
-	// this do a dicotomic search of idx in a ordered table.
-	// 1rst, check the range.
-	if (startIdx === undefined)
-	{ startIdx = 0; }
-	
-	if (endIdx === undefined)
-	{ endIdx = octreesArray.length-1; }
-	
-	var range = endIdx - startIdx;
-	
-	if (range <= 0)
-	{ return 0; }
-	
-	if (range < 6)
-	{
-		// in this case do a lineal search.
-		var finished = false;
-		var i = startIdx;
-		var idx;
-		var octreesCount = octreesArray.length;
-		while (!finished && i<=endIdx)
-		{
-			if (octree.distToCamera < octreesArray[i].distToCamera)
-			{
-				idx = i;
-				finished = true;
-			}
-			i++;
-		}
-		
-		if (finished)
-		{
-			return idx;
-		}
-		else 
-		{
-			return endIdx+1;
-		}
-	}
-	else 
-	{
-		// in this case do the dicotomic search.
-		var middleIdx = startIdx + Math.floor(range/2);
-		var newStartIdx;
-		var newEndIdx;
-		if (octreesArray[middleIdx].distToCamera > octree.distToCamera)
-		{
-			newStartIdx = startIdx;
-			newEndIdx = middleIdx;
-		}
-		else 
-		{
-			newStartIdx = middleIdx;
-			newEndIdx = endIdx;
-		}
-		return this.getIndexToInsertBySquaredDistToEye(octreesArray, octree, newStartIdx, newEndIdx);
-	}
-};
-
-/**
- * 어떤 일을 하고 있습니까?
  * @param result_octreesArray 변수
  * @param octree 변수
  */
@@ -1618,7 +1551,7 @@ Octree.prototype.putOctreeInEyeDistanceSortedArray = function(result_octreesArra
 	{
 		var startIdx = 0;
 		var endIdx = result_octreesArray.length - 1;
-		var insert_idx= this.getIndexToInsertBySquaredDistToEye(result_octreesArray, octree, startIdx, endIdx);
+		var insert_idx= ManagerUtils.getIndexToInsertBySquaredDistToEye(result_octreesArray, octree, startIdx, endIdx);
 
 		result_octreesArray.splice(insert_idx, 0, octree);
 	}

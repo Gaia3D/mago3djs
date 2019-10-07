@@ -17,6 +17,7 @@ var GeographicCoordsList = function(geographicCoordsArray)
 	{ this.geographicCoordsArray = []; }
 	this.vboKeysContainer;
 	this.owner;
+	this.id;
 	
 	// Aux vars.
 	this.points3dList; // used to render.

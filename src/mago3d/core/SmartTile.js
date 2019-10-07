@@ -32,10 +32,13 @@ var SmartTile = function(smartTileName)
 	this.subTiles; // array.
 	
 	this.nodeSeedsArray;
-	this.nodesArray; // nodes with geometry data only (lowest nodes).
+	this.smartTileF4dSeedArray;
+	this.nodesFromSmartTileF4dArray; 
+	this.nodesArray; 
 	this.objectsArray; // parametric objects.
 	
 	this.isVisible; // var to manage the frustumCulling and delete buildings if necessary.
+	this.distToCamera;
 };
 
 /**
@@ -771,11 +774,28 @@ SmartTile.prototype.eraseNode = function(node)
  * 어떤 일을 하고 있습니까?
  * @param frustum 변수
  */
-SmartTile.prototype.extractLowestTiles = function(resultLowestTilesArray) 
+SmartTile.prototype.calculateDistToCamera = function(camera) 
+{
+	var sphereExtent = this.getSphereExtent();
+	this.distToCamera = sphereExtent.distToPoint3D(camera.position);
+	return this.distToCamera;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param frustum 변수
+ */
+SmartTile.prototype.extractLowestTiles = function(camera, resultLowestTilesArray, maxDistToCamera) 
 {
 	if (this.hasRenderables())
 	{
-		resultLowestTilesArray.push(this);
+		// Calculate distToCamera to sort by distance.
+		var distToCam = this.calculateDistToCamera(camera);
+		if (distToCam < SmartTileManager.maxDistToCameraByDepth(this.depth))
+		{ 
+			this.intersectionType = Constant.INTERSECTION_INSIDE;
+			this.putSmartTileInEyeDistanceSortedArray(resultLowestTilesArray, this); 
+		}
 	}
 		
 	if (this.subTiles === undefined || this.subTiles.length === 0)
@@ -786,7 +806,7 @@ SmartTile.prototype.extractLowestTiles = function(resultLowestTilesArray)
 	var subTilesCount = this.subTiles.length;
 	for (var i=0; i<subTilesCount; i++)
 	{
-		this.subTiles[i].extractLowestTiles(resultLowestTilesArray);
+		this.subTiles[i].extractLowestTiles(camera, resultLowestTilesArray, maxDistToCamera);
 	}
 };
 
@@ -794,15 +814,17 @@ SmartTile.prototype.extractLowestTiles = function(resultLowestTilesArray)
  * 어떤 일을 하고 있습니까?
  * @param frustum 변수
  */
-SmartTile.prototype.getFrustumIntersectedLowestTiles = function(frustum, resultFullyIntersectedTilesArray, resultPartiallyIntersectedTilesArray) 
+SmartTile.prototype.getFrustumIntersectedLowestTiles = function(camera, frustum, resultFullyIntersectedTilesArray, maxDistToCamera) 
 {
 	var fullyIntersectedTiles = [];
-	this.getFrustumIntersectedTiles(frustum, fullyIntersectedTiles, resultPartiallyIntersectedTilesArray);
+	var partiallyIntersectedTilesArray = [];
+	this.getFrustumIntersectedTiles(camera, frustum, fullyIntersectedTiles, partiallyIntersectedTilesArray, maxDistToCamera);
+	resultFullyIntersectedTilesArray.push.apply(resultFullyIntersectedTilesArray, partiallyIntersectedTilesArray);
 	
 	var intersectedTilesCount = fullyIntersectedTiles.length;
 	for (var i=0; i<intersectedTilesCount; i++)
 	{
-		fullyIntersectedTiles[i].extractLowestTiles(resultFullyIntersectedTilesArray);
+		fullyIntersectedTiles[i].extractLowestTiles(camera, resultFullyIntersectedTilesArray, maxDistToCamera);
 	}
 };
 
@@ -810,35 +832,93 @@ SmartTile.prototype.getFrustumIntersectedLowestTiles = function(frustum, resultF
  * 어떤 일을 하고 있습니까?
  * @param frustum 변수
  */
-SmartTile.prototype.getFrustumIntersectedTiles = function(frustum, resultFullyIntersectedTilesArray, resultPartiallyIntersectedTilesArray) 
+SmartTile.prototype.getFrustumIntersectedTiles = function(camera, frustum, resultFullyIntersectedTilesArray, resultPartiallyIntersectedTilesArray, maxDistToCamera) 
 {
 	if (this.sphereExtent === undefined)
 	{ return Constant.INTERSECTION_OUTSIDE; }
 	
-	var intersectionType = frustum.intersectionSphere(this.sphereExtent);
+	this.intersectionType = frustum.intersectionSphere(this.sphereExtent);
 	
-	if (intersectionType === Constant.INTERSECTION_OUTSIDE)
+	if (this.intersectionType === Constant.INTERSECTION_OUTSIDE)
 	{ return; }
-	else if (intersectionType === Constant.INTERSECTION_INSIDE)
+	else if (this.intersectionType === Constant.INTERSECTION_INSIDE)
 	{
 		resultFullyIntersectedTilesArray.push(this);
 		return;
 	}
-	else if (intersectionType === Constant.INTERSECTION_INTERSECT)
+	else if (this.intersectionType === Constant.INTERSECTION_INTERSECT)
 	{
+		if (this.hasRenderables())
+		{ 
+			// Calculate the distToCamera.
+			var distToCam = this.calculateDistToCamera(camera);
+			if (distToCam < SmartTileManager.maxDistToCameraByDepth(this.depth))
+			{ this.putSmartTileInEyeDistanceSortedArray(resultPartiallyIntersectedTilesArray, this); }
+		} 
+			
 		if (this.subTiles && this.subTiles.length > 0)
 		{
 			for (var i=0; i<this.subTiles.length; i++)
 			{
 				if (this.subTiles[i].sphereExtent)
-				{ this.subTiles[i].getFrustumIntersectedTiles(frustum, resultFullyIntersectedTilesArray, resultPartiallyIntersectedTilesArray); }
+				{ this.subTiles[i].getFrustumIntersectedTiles(camera, frustum, resultFullyIntersectedTilesArray, resultPartiallyIntersectedTilesArray, maxDistToCamera); }
 			}
 		}
-		else
+	}
+};
+/*
+ * 어떤 일을 하고 있습니까?
+ * @param frustum 변수
+ */
+SmartTile.prototype.getSphereIntersectedTiles = function(sphere, resultIntersectedTilesArray, maxDepth) 
+{
+	if (this.depth > maxDepth)
+	{ return Constant.INTERSECTION_OUTSIDE; }
+	
+	if (this.sphereExtent === undefined)
+	{ return Constant.INTERSECTION_OUTSIDE; }
+	
+	var intersectionType = sphere.intersectionSphere(this.sphereExtent);
+	
+	if (intersectionType === Constant.INTERSECTION_OUTSIDE)
+	{ return Constant.INTERSECTION_OUTSIDE; }
+	else
+	{
+		if (this.hasRenderables())
 		{ 
-			if (this.hasRenderables())
-			{ resultPartiallyIntersectedTilesArray.push(this); } 
+			resultIntersectedTilesArray.push(this);
+		} 
+			
+		if (this.subTiles && this.subTiles.length > 0)
+		{
+			for (var i=0; i<this.subTiles.length; i++)
+			{
+				if (this.subTiles[i].sphereExtent)
+				{ this.subTiles[i].getSphereIntersectedTiles(sphere, resultIntersectedTilesArray, maxDepth); }
+			}
 		}
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param result_smartTilesArray 변수
+ * @param smartTile 변수
+ */
+SmartTile.prototype.putSmartTileInEyeDistanceSortedArray = function(result_smartTilesArray, smartTile) 
+{
+	// sorting is from minDist to maxDist.
+	if (result_smartTilesArray.length > 0)
+	{
+		var startIdx = 0;
+		var endIdx = result_smartTilesArray.length - 1;
+		var insert_idx= ManagerUtils.getIndexToInsertBySquaredDistToEye(result_smartTilesArray, smartTile, startIdx, endIdx);
+
+		result_smartTilesArray.splice(insert_idx, 0, smartTile);
+	}
+	else 
+	{
+		result_smartTilesArray.push(smartTile);
 	}
 };
 
@@ -850,6 +930,9 @@ SmartTile.prototype.hasRenderables = function()
 	var hasObjects = false;
 	
 	if (this.nodeSeedsArray !== undefined &&  this.nodeSeedsArray.length > 0)
+	{ return true; }
+
+	if (this.nodesArray !== undefined &&  this.nodesArray.length > 0)
 	{ return true; }
 
 	// check if has smartTileF4dSeeds.***
@@ -880,7 +963,14 @@ SmartTile.prototype.isNeededToCreateGeometriesFromSeeds = function()
 	}
 	
 	if (this.smartTileF4dSeedArray !== undefined && this.smartTileF4dSeedArray.length > 0)
-	{ return true; }
+	{ 
+		var smartTilesF4dCount = this.smartTileF4dSeedArray.length;
+		for (var i=0; i<smartTilesF4dCount; i++)
+		{
+			if (this.smartTileF4dSeedArray[i].fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
+			{ return true; }
+		} 
+	}
 	
 	return isNeeded;
 };
@@ -895,6 +985,8 @@ SmartTile.prototype.createGeometriesFromSeeds = function(magoManager)
 	var nodeBbox;
 	var buildingSeed;
 	var startIndex = 0;
+	
+	var geometriesCreated = false;
 	
 	// if exist nodesArray (there are buildings) and add a nodeSeed, we must make nodes of the added nodeSeeds.***
 	if (this.nodeSeedsArray !== undefined)
@@ -954,6 +1046,8 @@ SmartTile.prototype.createGeometriesFromSeeds = function(magoManager)
 				neoBuilding.metaData.pitch = buildingSeed.rotationsDegree.x;
 				neoBuilding.metaData.roll = buildingSeed.rotationsDegree.y;
 				neoBuilding.projectFolderName = node.data.projectFolderName;
+				
+				geometriesCreated = true;
 			}
 			else if (attributes.objectType === "multiBuildingsTile")
 			{
@@ -968,7 +1062,7 @@ SmartTile.prototype.createGeometriesFromSeeds = function(magoManager)
 				multiBuildings.attributes = attributes;
 				node.data.multiBuildings = multiBuildings;
 				
-				
+				geometriesCreated = true;
 			}
 		}
 	}
@@ -994,21 +1088,23 @@ SmartTile.prototype.createGeometriesFromSeeds = function(magoManager)
 				//"id"                : f4dTileId,
 				//"tileName"          : name,
 				//"projectFolderName" : projectFolderName};
-				
-				var readerWriter = magoManager.readerWriter;
-				var projectFolderName = smartTileF4dSeed.projectFolderName;
-				var tilename = smartTileF4dSeed.tileName;
-				var smartTileOwner = this;
-				var geometryDataPath = readerWriter.geometryDataPath; // default geometryDataPath = "/f4d".***
-				var fileName = geometryDataPath + "/" + projectFolderName + "/" + tilename;
-				
-				readerWriter.getSmartTileF4d(fileName, smartTileF4dSeed, smartTileOwner, magoManager);
+				if (magoManager.readerWriter.smartTileF4d_requested < 2)
+				{
+					var readerWriter = magoManager.readerWriter;
+					var projectFolderName = smartTileF4dSeed.projectFolderName;
+					var tilename = smartTileF4dSeed.tileName;
+					var smartTileOwner = this;
+					var geometryDataPath = readerWriter.geometryDataPath; // default geometryDataPath = "/f4d".***
+					var fileName = geometryDataPath + "/" + projectFolderName + "/" + tilename;
+					
+					readerWriter.getSmartTileF4d(fileName, smartTileF4dSeed, smartTileOwner, magoManager);
+				}
 			}
 			else if (smartTileF4dSeed.fileLoadState === CODE.fileLoadState.LOADING_FINISHED )
 			{
 				// parse the dataArrayBuffer.***
 				var parseQueue = magoManager.parseQueue;
-				if (parseQueue.smartTileF4dParsesCount < 2)
+				if (parseQueue.smartTileF4dParsesCount < 40)
 				{
 					// proceed to parse the dataArrayBuffer.***
 					this.parseSmartTileF4d(smartTileF4dSeed.dataArrayBuffer, magoManager);
@@ -1016,15 +1112,18 @@ SmartTile.prototype.createGeometriesFromSeeds = function(magoManager)
 					smartTileF4dSeed.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 					
 					// remove the "smartTileF4dSeed" from the "this.smartTileF4dSeedArray".
-					this.smartTileF4dSeedArray.splice(i, 1);
+					//this.smartTileF4dSeedArray.splice(i, 1);
 					
-					if (this.smartTileF4dSeedArray.length === 0)
-					{ this.smartTileF4dSeedArray = undefined; }
+					//if (this.smartTileF4dSeedArray.length === 0)
+					//{ this.smartTileF4dSeedArray = undefined; }
+				
+					geometriesCreated = true;
 				}
 			}
 		}
 	}
 
+	return geometriesCreated;
 };
 
 /**
@@ -1036,8 +1135,14 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 	var smartTileManager = magoManager.smartTileManager;
 	var targetDepth = 17;
 	
-	if (targetDepth < this.depth)
+	if (targetDepth > this.depth)
 	{ targetDepth = this.depth; }
+
+	if (this.nodesArray === undefined)
+	{ this.nodesArray = []; }
+
+	if (this.sphereExtent === undefined)
+	{ this.makeSphereExtent(magoManager); }
 
 	var enc = new TextDecoder("utf-8");
 	
@@ -1082,6 +1187,7 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		var metadataByteSize = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 		///bytesReaded = neoBuilding.parseHeader(dataArrayBuffer, bytesReaded);
 		///neoBuilding.bbox = neoBuilding.metaData.bbox;
+		///neoBuilding.metaData.fileLoadState = CODE.fileLoadState.PARESE_FINISHED;
 		
 		
 		var startBuff = bytesReaded;
@@ -1091,44 +1197,23 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		if (neoBuilding.metaData === undefined) 
 		{ neoBuilding.metaData = new MetaData(); }
 		neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-		
 	
 		// read lod5 mesh data.
 		var lod5meshSize = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
-		//var lodToLoad = 5;
-		//var lodBuildingData = neoBuilding.getLodBuildingData(lodToLoad);
-		//if (lodBuildingData === undefined)
-		//{ return false; }
 
-		//if (lodBuildingData.isModelRef)
-		//{ return false; }
-		
-		//var textureFileName = lodBuildingData.textureFileName;
 		var lodString = "lod5";
 		var lowLodMesh = neoBuilding.getOrNewLodMesh(lodString);
-		//lowLodMesh.textureName = textureFileName;
 		var startBuff = bytesReaded;
 		var endBuff = bytesReaded + lod5meshSize;
 		lowLodMesh.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 		lowLodMesh.dataArrayBuffer = dataArrayBuffer.slice(startBuff, endBuff);
 		bytesReaded = bytesReaded + lod5meshSize; // updating data.
-		//bytesReaded = lowLodMesh.parseLegoData(dataArrayBuffer, magoManager, bytesReaded);
-		
-		var lowLodMesh4 = neoBuilding.getOrNewLodMesh("lod4");
-		lowLodMesh4.dataArrayBuffer = lowLodMesh.dataArrayBuffer;
-		lowLodMesh4.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-		
-		var lowLodMesh3 = neoBuilding.getOrNewLodMesh("lod3");
-		lowLodMesh3.dataArrayBuffer = lowLodMesh.dataArrayBuffer;
-		lowLodMesh3.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 		
 		// read lod5 image.
 		var lod5ImageSize = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 		var byteSize = 1;
 		var startBuff = bytesReaded;
 		var endBuff = bytesReaded + byteSize * lod5ImageSize;
-		//var lod5ImageDataBuffer = new Uint8Array(dataArrayBuffer.slice(startBuff, endBuff));
-		
 
 		if (lowLodMesh.texture === undefined)
 		{ lowLodMesh.texture = new Texture(); }
@@ -1138,13 +1223,6 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		bytesReaded = bytesReaded + byteSize * lod5ImageSize; // updating data.
 		
 	
-		lowLodMesh4.texture = lowLodMesh.texture;
-		lowLodMesh3.texture = lowLodMesh.texture;
-	
-		//var gl = magoManager.getGl();
-		//TexturesManager.newWebGlTextureByEmbeddedImage(gl, lod5ImageDataBuffer, lowLodMesh.texture);
-		
-		
 		// read geographicCoord.
 		var geoCoord = new GeographicCoord();
 		bytesReaded = geoCoord.readDataFromBuffer(dataArrayBuffer, bytesReaded);
@@ -1156,10 +1234,12 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		data.rotationsDegree = eulerAngDeg; 
 		
 		// finally put the node into smartTile.
-		this.putNode(targetDepth, node, magoManager);
+		//this.putNode(this.depth, node, magoManager);
+		node.data.smartTileOwner = this;
+		this.nodesArray.push(node);
 	}
 	
-	
+	//this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 };
 
 /**
@@ -1277,7 +1357,7 @@ SmartTile.prototype.parseSmartTileF4d_original = function(dataArrayBuffer, magoM
  */
 SmartTile.selectTileAngleRangeByDepth = function(depth) 
 {
-	if (depth === undefined || depth < 0 || depth > 15)
+	if (depth === undefined || depth < 0 || depth > 21)
 	{ return undefined; }
 	
 	if (depth === 0)
@@ -1537,15 +1617,36 @@ SmartTile.prototype.setSizesToSubTiles = function()
 	
 	var subTile = this.subTiles[0];
 	subTile.setSize(minLon, minLat, minAlt,     midLon, midLat, maxAlt);
+	subTile.X = this.X;
+	subTile.Y = this.Y + 1;
 	
 	subTile = this.subTiles[1];
 	subTile.setSize(midLon, minLat, minAlt,     maxLon, midLat, maxAlt);
+	subTile.X = this.X + 1;
+	subTile.Y = this.Y + 1;
 	
 	subTile = this.subTiles[2];
 	subTile.setSize(midLon, midLat, minAlt,     maxLon, maxLat, maxAlt);
+	subTile.X = this.X + 1;
+	subTile.Y = this.Y;
 	
 	subTile = this.subTiles[3];
 	subTile.setSize(minLon, midLat, minAlt,     midLon, maxLat, maxAlt);
+	subTile.X = this.X;
+	subTile.Y = this.Y;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param geoLocData 변수
+ */
+SmartTile.prototype.getId = function() 
+{
+	if (this.id === undefined)
+	{
+		this.id = this.depth.toString()+ "_" + this.X.toString() + "_" + this.Y.toString();
+	}
+	return this.id;
 };
 
 /**

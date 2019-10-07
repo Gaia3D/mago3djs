@@ -9,5 +9,11 @@
  */
 var AnimatedPerson = function(name) 
 {
+	this.skeletalAnimObject;
+	
+};
 
+AnimatedPerson.prototype.render = function(magoManager)
+{
+	
 };

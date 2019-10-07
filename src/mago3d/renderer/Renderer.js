@@ -499,6 +499,7 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 
 	}
 	
+	
 	// Render cuttingPlanes of temperaturalayers if exist.***
 	if (magoManager.weatherStation)
 	{ magoManager.weatherStation.test_renderCuttingPlanes(magoManager, renderType); }
@@ -1167,6 +1168,9 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 				this.renderAxisNodes(nodes, renderType);
 			}
 		}
+		
+		// Render Animated Man.********************************************************************************************************************
+		
 		
 		
 		// 3) now render bboxes.*******************************************************************************************************************

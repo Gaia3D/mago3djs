@@ -17,6 +17,7 @@ var VisibleObjectsController = function()
 	this.currentVisibles3 = []; 
 	this.currentVisiblesAux = [];
 	this.currentVisibleNativeObjects = [];
+	this.currentVisiblesToPrepare = [];
 };
 VisibleObjectsController.prototype.initArrays = function() 
 {
@@ -26,6 +27,7 @@ VisibleObjectsController.prototype.initArrays = function()
 	this.currentVisibles3 = [];
 	this.currentVisiblesAux = [];
 	this.currentVisibleNativeObjects = [];
+	this.currentVisiblesToPrepare = [];
 };
 /**Clear all of the volumn's data */
 
@@ -37,6 +39,7 @@ VisibleObjectsController.prototype.clear = function()
 	this.currentVisibles3.length = 0;
 	this.currentVisiblesAux.length = 0;
 	this.currentVisibleNativeObjects.length = 0;
+	this.currentVisiblesToPrepare.length = 0;
 };
 
 /**

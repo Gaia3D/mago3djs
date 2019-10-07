@@ -27,6 +27,7 @@ var ReaderWriter = function()
 	this.skinLegos_requested = 0;
 	this.pCloudPartitionsMother_requested = 0;
 	this.pCloudPartitions_requested = 0;
+	this.smartTileF4d_requested = 0;
 
 	this.gl;
 	this.incre_latAng = 0.001;
@@ -802,6 +803,7 @@ ReaderWriter.prototype.getObjectIndexFileSmartTileF4d = function(fileName, proje
  */
 ReaderWriter.prototype.getSmartTileF4d = function(fileName, smartTileF4dSeed, smartTileOwner, magoManager) 
 {
+	this.smartTileF4d_requested ++;
 	smartTileF4dSeed.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	loadWithXhr(fileName).then(function(response) 
 	{	
@@ -819,6 +821,10 @@ ReaderWriter.prototype.getSmartTileF4d = function(fileName, smartTileF4dSeed, sm
 			// Error.***
 			smartTileF4dSeed.fileLoadState = CODE.fileLoadState.LOAD_FAILED;
 		}
+		
+		magoManager.readerWriter.smartTileF4d_requested --;
+		if (magoManager.readerWriter.smartTileF4d_requested < 0)
+		{ magoManager.readerWriter.smartTileF4d_requested = 0; }
 	},
 	function(status) 
 	{
@@ -826,6 +832,7 @@ ReaderWriter.prototype.getSmartTileF4d = function(fileName, smartTileF4dSeed, sm
 	}).finally(function() 
 	{
 		//	For the moment, do nothing.***
+		
 	});
 };
 

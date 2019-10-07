@@ -212,23 +212,25 @@ MetaData.prototype.parseFileHeaderAsimetricVersion = function(arrayBuffer, bytes
 	var version_string_length = 5;
 	var intAux_scratch = 0;
 
-	//if (readWriter === undefined) { readWriter = new ReaderWriter(); }
+	var enc = new TextDecoder("utf-8");
 
 	// 1) Version(5 chars).
 	this.version = "";
-	for (var j=0; j<version_string_length; j++)
-	{
-		this.version += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1))[0]);bytesReaded += 1;
-	}
+	//for (var j=0; j<version_string_length; j++)
+	//{
+	//	this.version += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1))[0]);bytesReaded += 1;
+	//}
+	this.version = enc.decode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ version_string_length))) ;bytesReaded += version_string_length;
 
 	// 3) Global unique ID.
 	if (this.guid === undefined) { this.guid =""; }
 
 	intAux_scratch = ReaderWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-	for (var j=0; j<intAux_scratch; j++)
-	{
-		this.guid += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1))[0]);bytesReaded += 1;
-	}
+	this.guid = enc.decode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ intAux_scratch))) ;bytesReaded += intAux_scratch;
+	//for (var j=0; j<intAux_scratch; j++)
+	//{
+	//	this.guid += String.fromCharCode(new Int8Array(arrayBuffer.slice(bytesReaded, bytesReaded+ 1))[0]);bytesReaded += 1;
+	//}
 
 	// 4) Location.
 	if (this.longitude === undefined) 

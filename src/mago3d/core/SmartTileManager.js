@@ -29,6 +29,75 @@ var SmartTileManager = function()
 	
 	// objectSeedsMap created to process multiBuildings.
 	this.objectSeedsMap;
+	
+	this.maxDepth = 17;
+};
+
+/**
+ * Returns the depth of smartTile that corresponds by bbox size.
+ */
+SmartTileManager.getDepthByBoundingBoxMaxSize = function(bboxMaxSize) 
+{
+	if (bboxMaxSize === undefined)
+	{ return undefined; }
+	
+	var smartTileDepth;
+	
+	if (bboxMaxSize < 30.0)
+	{
+		smartTileDepth = 16;
+	}
+	else if (bboxMaxSize >= 30.0 && bboxMaxSize < 50.0)
+	{
+		smartTileDepth = 15;
+	}
+	else if (bboxMaxSize >= 50.0 && bboxMaxSize < 100.0)
+	{
+		smartTileDepth = 14;
+	}
+	else if (bboxMaxSize >=100.0)
+	{
+		smartTileDepth = 13;
+	}
+	
+	return smartTileDepth;
+};
+
+/**
+ * Returns the max distance that is visible a smartTile by his depth.
+ */
+SmartTileManager.maxDistToCameraByDepth = function(depth) 
+{
+	if (depth < 13)
+	{
+		return 10000;
+	}
+	else if (depth === 13)
+	{
+		return 9000;
+	}
+	else if (depth === 14)
+	{
+		return 4000;
+	}
+	else if (depth === 15)
+	{
+		return 1000;
+	}
+	else if (depth === 16)
+	{
+		return 500;
+	}
+	else if (depth === 17)
+	{
+		return 200;
+	}
+	else if (depth > 17)
+	{
+		return 50;
+	}
+	
+	return 10;
 };
 
 /**
@@ -60,8 +129,8 @@ SmartTileManager.prototype.createMainTiles = function()
 	{ tile2.maxGeographicCoord = new GeographicCoord(); }
 	
 	tile2.depth = 0; // mother tile.
-	tile1.X = 1; // Asia side tile X coord = 1.***
-	tile1.Y = 0; 
+	tile2.X = 1; // Asia side tile X coord = 1.***
+	tile2.Y = 0; 
 	tile2.minGeographicCoord.setLonLatAlt(0, -90, 0);
 	tile2.maxGeographicCoord.setLonLatAlt(180, 90, 0);
 };
@@ -223,7 +292,8 @@ SmartTileManager.prototype.parseSmartTilesF4dIndexFile = function(dataBuffer, pr
 			"objectType"        : "F4dTile",
 			"id"                : f4dTileId,
 			"tileName"          : name,
-			"projectFolderName" : projectFolderName};
+			"projectFolderName" : projectFolderName,
+			"fileLoadState"     : CODE.fileLoadState.READY};
 
 	}
 	
@@ -262,7 +332,7 @@ SmartTileManager.prototype.makeTreeByDepth = function(targetDepth, physicalNodes
  */
 SmartTileManager.prototype.putNode = function(targetDepth, node, magoManager) 
 {
-	targetDepth = defaultValue(targetDepth, 17);
+	targetDepth = defaultValue(targetDepth, this.maxDepth);
 	if (this.tilesArray !== undefined)
 	{
 		var tilesCount = this.tilesArray.length; // allways tilesCount = 2. (Asia & America sides).
@@ -278,13 +348,31 @@ SmartTileManager.prototype.putNode = function(targetDepth, node, magoManager)
  */
 SmartTileManager.prototype.putObject = function(targetDepth, object, magoManager) 
 {
-	targetDepth = defaultValue(targetDepth, 17);
+	targetDepth = defaultValue(targetDepth, this.maxDepth);
 	if (this.tilesArray !== undefined)
 	{
 		var tilesCount = this.tilesArray.length; // allways tilesCount = 2. (Asia & America sides).
 		for (var i=0; i<tilesCount; i++)
 		{
 			this.tilesArray[i].putObject(targetDepth, object, magoManager);
+		}
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+SmartTileManager.prototype.getSphereIntersectedTiles = function(sphere, resultIntersectedTilesArray, maxDepth) 
+{
+	if (maxDepth === undefined)
+	{ maxDepth = this.maxDepth; }
+	
+	if (this.tilesArray !== undefined)
+	{
+		var tilesCount = this.tilesArray.length; // allways tilesCount = 2. (Asia & America sides).
+		for (var i=0; i<tilesCount; i++)
+		{
+			this.tilesArray[i].getSphereIntersectedTiles(sphere, resultIntersectedTilesArray, maxDepth);
 		}
 	}
 };
