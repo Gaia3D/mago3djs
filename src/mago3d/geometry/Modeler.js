@@ -100,8 +100,9 @@ Modeler.prototype.newTube = function(options)
 /**
  * 모델러에 콘센트릭튜브 추가
  * @param {Object}
+ * @param {number}} depth Optional. 설정 시 해당 depth로 targetDepth 설정
  */
-Modeler.prototype.addObject = function(object) 
+Modeler.prototype.addObject = function(object, depth) 
 {
 	if (this.objectsArray === undefined)
 	{ this.objectsArray = []; }
@@ -109,7 +110,7 @@ Modeler.prototype.addObject = function(object)
 	this.objectsArray.push(object);
 	
 	var smartTileManager = this.magoManager.smartTileManager;
-	var targetDepth = 17;
+	var targetDepth = depth ? depth : 17;
 	smartTileManager.putObject(targetDepth, object, this);
 };
 
