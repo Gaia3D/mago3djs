@@ -339,7 +339,7 @@ BoundingBox.prototype.getRadiusAprox = function()
 BoundingBox.prototype.getBoundingSphere = function(resultBoundingSphere) 
 {
 	if (resultBoundingSphere === undefined)
-	{ resultBoundingSphere = new new Sphere(); } 
+	{ resultBoundingSphere = new Sphere(); } 
 	
 	var centerPos = this.getCenterPoint();
 	resultBoundingSphere.setCenterPoint(centerPos.x, centerPos.y, centerPos.z);
