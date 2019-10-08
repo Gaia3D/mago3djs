@@ -977,6 +977,24 @@ SmartTile.prototype.isNeededToCreateGeometriesFromSeeds = function()
 
 /**
  */
+SmartTile.prototype.setNodesAttribute = function(nodesArray, attributeName, attributeValue) 
+{
+	if (nodesArray !== undefined)
+	{
+		var nodesCount = nodesArray.length;
+		for (var i=0; i<nodesCount; i++)
+		{
+			var node = nodesArray[i];
+			if (node.data.attributes === undefined)
+			{ node.data.attributes = {}; }
+			
+			node.data.attributes[attributeName] = attributeValue;
+		}
+	}
+};
+
+/**
+ */
 SmartTile.prototype.createGeometriesFromSeeds = function(magoManager) 
 {
 	// create the buildings by buildingSeeds.
@@ -991,83 +1009,95 @@ SmartTile.prototype.createGeometriesFromSeeds = function(magoManager)
 	// if exist nodesArray (there are buildings) and add a nodeSeed, we must make nodes of the added nodeSeeds.***
 	if (this.nodeSeedsArray !== undefined)
 	{
-		if (this.nodesArray)
-		{ startIndex = this.nodesArray.length; }
+		//if (this.nodesArray)
+		//{ startIndex = this.nodesArray.length; }
 
 		if (this.nodesArray === undefined)
 		{ this.nodesArray = []; }
 
 		var nodeSeedsCount = this.nodeSeedsArray.length;
-		for (var j=startIndex; j<nodeSeedsCount; j++)
+		var nodesCount = this.nodesArray.length;
+		
+		if (nodeSeedsCount !== nodesCount)
 		{
-			node = this.nodeSeedsArray[j];
-			var attributes = node.data.attributes;
-			if (attributes.objectType === "basicF4d")
-			{
-				if (attributes.projectId !== undefined && attributes.isReference !== undefined && attributes.isReference === true)
-				{
-					StaticModelsManager.manageStaticModel(node, magoManager);
-				}
+			this.setNodesAttribute(this.nodeSeedsArray, "needCreated", 1);
+			this.setNodesAttribute(this.nodesArray, "needCreated", 0);
 			
-				if (node.data.neoBuilding !== undefined)
-				{
-					this.nodesArray.push(node);
-					continue;
-				}
-				
-				neoBuilding = new NeoBuilding();
-				
-				neoBuilding.nodeOwner = node;
-				node.data.neoBuilding = neoBuilding;
-				if (node.data.bbox === undefined)
-				{ node.data.bbox = new BoundingBox(); }
-				nodeBbox = node.data.bbox;
-				buildingSeed = node.data.buildingSeed;
-				
-				this.nodesArray.push(node);
-				
-				if (neoBuilding.metaData === undefined) 
-				{ neoBuilding.metaData = new MetaData(); }
-
-				if (neoBuilding.metaData.geographicCoord === undefined)
-				{ neoBuilding.metaData.geographicCoord = new GeographicCoord(); }
-
-				if (neoBuilding.metaData.bbox === undefined) 
-				{ neoBuilding.metaData.bbox = new BoundingBox(); }
-
-				// create a building and set the location.***
-				neoBuilding.name = buildingSeed.name;
-				neoBuilding.buildingId = buildingSeed.buildingId;
-			
-				neoBuilding.buildingType = "basicBuilding";
-				neoBuilding.buildingFileName = buildingSeed.buildingFileName;
-				neoBuilding.metaData.geographicCoord.setLonLatAlt(buildingSeed.geographicCoord.longitude, buildingSeed.geographicCoord.latitude, buildingSeed.geographicCoord.altitude);
-				neoBuilding.metaData.bbox.copyFrom(buildingSeed.bBox);
-				nodeBbox.copyFrom(buildingSeed.bBox); // initially copy from building.
-				if (neoBuilding.bbox === undefined)
-				{ neoBuilding.bbox = new BoundingBox(); }
-				neoBuilding.bbox.copyFrom(buildingSeed.bBox);
-				neoBuilding.metaData.heading = buildingSeed.rotationsDegree.z;
-				neoBuilding.metaData.pitch = buildingSeed.rotationsDegree.x;
-				neoBuilding.metaData.roll = buildingSeed.rotationsDegree.y;
-				neoBuilding.projectFolderName = node.data.projectFolderName;
-				
-				geometriesCreated = true;
-			}
-			else if (attributes.objectType === "multiBuildingsTile")
+			for (var j=0; j<nodeSeedsCount; j++)
 			{
-				if (node.data.multiBuildings !== undefined)
+				node = this.nodeSeedsArray[j];
+				
+				if (node.data.attributes.needCreated === 1)
 				{
-					this.nodesArray.push(node);
-					continue;
+					var attributes = node.data.attributes;
+					if (attributes.objectType === "basicF4d")
+					{
+						if (attributes.projectId !== undefined && attributes.isReference !== undefined && attributes.isReference === true)
+						{
+							StaticModelsManager.manageStaticModel(node, magoManager);
+						}
+					
+						if (node.data.neoBuilding !== undefined)
+						{
+							this.nodesArray.push(node);
+							continue;
+						}
+						
+						neoBuilding = new NeoBuilding();
+						
+						neoBuilding.nodeOwner = node;
+						node.data.neoBuilding = neoBuilding;
+						if (node.data.bbox === undefined)
+						{ node.data.bbox = new BoundingBox(); }
+						nodeBbox = node.data.bbox;
+						buildingSeed = node.data.buildingSeed;
+						
+						this.nodesArray.push(node);
+						
+						if (neoBuilding.metaData === undefined) 
+						{ neoBuilding.metaData = new MetaData(); }
+
+						if (neoBuilding.metaData.geographicCoord === undefined)
+						{ neoBuilding.metaData.geographicCoord = new GeographicCoord(); }
+
+						if (neoBuilding.metaData.bbox === undefined) 
+						{ neoBuilding.metaData.bbox = new BoundingBox(); }
+
+						// create a building and set the location.***
+						neoBuilding.name = buildingSeed.name;
+						neoBuilding.buildingId = buildingSeed.buildingId;
+					
+						neoBuilding.buildingType = "basicBuilding";
+						neoBuilding.buildingFileName = buildingSeed.buildingFileName;
+						neoBuilding.metaData.geographicCoord.setLonLatAlt(buildingSeed.geographicCoord.longitude, buildingSeed.geographicCoord.latitude, buildingSeed.geographicCoord.altitude);
+						neoBuilding.metaData.bbox.copyFrom(buildingSeed.bBox);
+						nodeBbox.copyFrom(buildingSeed.bBox); // initially copy from building.
+						if (neoBuilding.bbox === undefined)
+						{ neoBuilding.bbox = new BoundingBox(); }
+						neoBuilding.bbox.copyFrom(buildingSeed.bBox);
+						neoBuilding.metaData.heading = buildingSeed.rotationsDegree.z;
+						neoBuilding.metaData.pitch = buildingSeed.rotationsDegree.x;
+						neoBuilding.metaData.roll = buildingSeed.rotationsDegree.y;
+						neoBuilding.projectFolderName = node.data.projectFolderName;
+						
+						geometriesCreated = true;
+					}
 				}
-				
-				var multiBuildings = new MultiBuildings();
-				multiBuildings.nodeOwner = node;
-				multiBuildings.attributes = attributes;
-				node.data.multiBuildings = multiBuildings;
-				
-				geometriesCreated = true;
+				//else if (attributes.objectType === "multiBuildingsTile")
+				//{
+				//	if (node.data.multiBuildings !== undefined)
+				//	{
+				//		this.nodesArray.push(node);
+				//		continue;
+				//	}
+				//	
+				//	var multiBuildings = new MultiBuildings();
+				//	multiBuildings.nodeOwner = node;
+				//	multiBuildings.attributes = attributes;
+				//	node.data.multiBuildings = multiBuildings;
+				//	
+				//	geometriesCreated = true;
+				//}
 			}
 		}
 	}
