@@ -4715,7 +4715,7 @@ MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, l
 	
 	var neoBuilding = node.data.neoBuilding;
 	
-	this.selectedObjectNotice(neoBuilding);
+	//this.selectedObjectNotice(neoBuilding);
 };
 
 /**
