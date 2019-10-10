@@ -1343,7 +1343,7 @@ Node.prototype.changeLocationAndRotation = function(latitude, longitude, elevati
 			smartTileOwner.eraseNode(aNode);
 					
 			// Now, put the node in the corresponent smartTile.
-			var targetDepth = smartTileOwner.targetDepth;
+			var targetDepth = smartTileOwner.depth;
 			magoManager.smartTileManager.putNode(targetDepth, aNode, magoManager);
 		}
 	}
