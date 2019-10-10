@@ -1652,23 +1652,23 @@ SmartTile.prototype.setSizesToSubTiles = function()
 	
 	var subTile = this.subTiles[0];
 	subTile.setSize(minLon, minLat, minAlt,     midLon, midLat, maxAlt);
-	subTile.X = this.X;
-	subTile.Y = this.Y + 1;
+	subTile.X = this.X*2;
+	subTile.Y = this.Y*2 + 1;
 	
 	subTile = this.subTiles[1];
 	subTile.setSize(midLon, minLat, minAlt,     maxLon, midLat, maxAlt);
-	subTile.X = this.X + 1;
-	subTile.Y = this.Y + 1;
+	subTile.X = this.X*2 + 1;
+	subTile.Y = this.Y*2 + 1;
 	
 	subTile = this.subTiles[2];
 	subTile.setSize(midLon, midLat, minAlt,     maxLon, maxLat, maxAlt);
-	subTile.X = this.X + 1;
-	subTile.Y = this.Y;
+	subTile.X = this.X*2 + 1;
+	subTile.Y = this.Y*2;
 	
 	subTile = this.subTiles[3];
 	subTile.setSize(minLon, midLat, minAlt,     midLon, maxLat, maxAlt);
-	subTile.X = this.X;
-	subTile.Y = this.Y;
+	subTile.X = this.X*2;
+	subTile.Y = this.Y*2;
 };
 
 /**
