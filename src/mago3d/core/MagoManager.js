@@ -1832,8 +1832,8 @@ MagoManager.prototype.keyDown = function(key)
 	}
 	else if (key === 39) // 39 = 'right'.***
 	{
-		this.modeler.mode = CODE.modelerMode.DRAWING_BSPLINE;
-		//this.modeler.mode = CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS;
+		//this.modeler.mode = CODE.modelerMode.DRAWING_BSPLINE;
+		this.modeler.mode = CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS;
 	}
 	else if (key === 40) // 40 = 'down'.***
 	{
