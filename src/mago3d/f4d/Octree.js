@@ -165,9 +165,8 @@ var Octree = function(octreeOwner)
 	 */
 	this.pCloudPartitionsArray;
 	
-	// v002.
-	//this.blocksListsPartitionsCount;
-	//this.blocksListsPartitionsParsedCount;
+	// gereral objects.
+	this.objectsArray;
 };
 
 /**
