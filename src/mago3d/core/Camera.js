@@ -16,6 +16,10 @@ var Camera = function()
 	this.direction = new Point3D(); 
 	this.up = new Point3D();
 	this.right = new Point3D();
+
+	//temp, for local renderer
+	this.target;
+	this.fixCameraTarget = false;
 	// current frustum.
 	this.frustum = new Frustum(); 
 	// sum of all frustums.

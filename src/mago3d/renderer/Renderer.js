@@ -757,7 +757,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			magoManager.depthFboNeo.bind(); 
 			gl.viewport(0, 0, magoManager.sceneState.drawingBufferWidth[0], magoManager.sceneState.drawingBufferHeight[0]);
 			
-			gl.clearColor(0, 0, 0, 1);
+			gl.clearColor(84/255, 193/255, 240/255, 1);
 		}
 	}
 	if (renderType === 1) 
@@ -770,7 +770,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		// Test TinTerrain.**************************************************************************
 		// render tiles, rendertiles.***
 		
-		if (magoManager.tinTerrainManager !== undefined)
+		/*if (magoManager.tinTerrainManager !== undefined)
 		{
 			gl.enable(gl.BLEND);
 			gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
@@ -843,7 +843,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 				this.renderImageViewRectangle(gl, magoManager, magoManager.sunDepthFbo);
 			}
 		}
-		
+		*/
 		// Test render depthBuffer on scene.***
 		// Render a test quad to render created textures.***
 		//var frustumVolumenObject = magoManager.frustumVolumeControl.getFrustumVolumeCulling(1); 

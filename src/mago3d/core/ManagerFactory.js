@@ -198,6 +198,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		manager.postFxShadersManager.createDefaultShaders(gl); // A1-OLD.***
 		manager.createDefaultShaders(gl);// A1-Use this.***
 		//viewer.renderTest();
+		initWwwMago(manager, gl);
 	};
 
 	// 실제 화면에 object를 rendering 하는 메인 메서드
@@ -708,6 +709,13 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 
 		
 		draw();
+
+		if (serverPolicy.geo_init_camera_enable === "true") 
+		{ 
+			viewer.goto(parseFloat(MagoConfig.getPolicy().geo_init_longitude),
+				parseFloat(MagoConfig.getPolicy().geo_init_latitude),
+				parseFloat(MagoConfig.getPolicy().geo_init_height));
+		 }
 	}
 
 	// 이미지 경로
