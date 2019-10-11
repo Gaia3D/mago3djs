@@ -1228,6 +1228,88 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
  * @param {Number} frustumIdx Current frustum indice.
  * @param {Number} numFrustums Total frustums count in current rendering pipe-line.
  */
+MagoManager.prototype.startRenderLocal = function(isLastFrustum, frustumIdx, numFrustums) 
+{
+	// Render scene locally, without globe.
+	// Here only renders datas stored in hierarchyManager.localDatasArray.
+	
+	var hierarchyManager = this.hierarchyManager;
+	if (hierarchyManager.localDatasArray !== undefined)
+	{
+		var localDatasArray = hierarchyManager.localDatasArray;
+		var localDatasCount = localDatasArray.length;
+		for (var i=0; i<localDatasCount; i++)
+		{
+			var node = localDatasArray[i];
+			
+			var attributes = node.data.attributes;
+
+			// In localRendering is not necessary create geoLocationData.
+			if (attributes.objectType === "basicF4d")
+			{		
+				var data = node.data;		
+				var neoBuilding = node.data.neoBuilding;
+				if (neoBuilding === undefined) // attributes.isReference === true
+				{
+					// This node is a reference node.***
+					neoBuilding = new NeoBuilding();
+						
+					neoBuilding.nodeOwner = node;
+					node.data.neoBuilding = neoBuilding;
+					if (node.data.bbox === undefined)
+					{ node.data.bbox = new BoundingBox(); }
+					nodeBbox = node.data.bbox;
+					buildingSeed = node.data.buildingSeed;
+					
+					this.nodesArray.push(node);
+					
+					if (neoBuilding.metaData === undefined) 
+					{ neoBuilding.metaData = new MetaData(); }
+
+					if (neoBuilding.metaData.geographicCoord === undefined)
+					{ neoBuilding.metaData.geographicCoord = new GeographicCoord(); }
+
+					if (neoBuilding.metaData.bbox === undefined) 
+					{ neoBuilding.metaData.bbox = new BoundingBox(); }
+
+					// create a building and set the location.***
+					neoBuilding.name = buildingSeed.name;
+					neoBuilding.buildingId = buildingSeed.buildingId;
+				
+					neoBuilding.buildingType = "basicBuilding";
+					neoBuilding.buildingFileName = buildingSeed.buildingFileName;
+					neoBuilding.metaData.geographicCoord.setLonLatAlt(buildingSeed.geographicCoord.longitude, buildingSeed.geographicCoord.latitude, buildingSeed.geographicCoord.altitude);
+					neoBuilding.metaData.bbox.copyFrom(buildingSeed.bBox);
+					nodeBbox.copyFrom(buildingSeed.bBox); // initially copy from building.
+					if (neoBuilding.bbox === undefined)
+					{ neoBuilding.bbox = new BoundingBox(); }
+					neoBuilding.bbox.copyFrom(buildingSeed.bBox);
+					neoBuilding.metaData.heading = buildingSeed.rotationsDegree.z;
+					neoBuilding.metaData.pitch = buildingSeed.rotationsDegree.x;
+					neoBuilding.metaData.roll = buildingSeed.rotationsDegree.y;
+					neoBuilding.projectFolderName = node.data.projectFolderName;
+				}
+				
+				//check if parsed header.***
+				//neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+				if (neoBuilding.metaData !== undefined && neoBuilding.metaData.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
+				{
+					visibleNodes.currentVisiblesToPrepare.push(node);
+					continue;
+				}
+			}
+			
+			
+		}
+	}
+};
+
+/**
+ * Main loop function. This function contains all Mago3D Pipe-Line.
+ * @param {Boolean} isLastFrustum Indicates if this is the last frustum in the render pipe-line.
+ * @param {Number} frustumIdx Current frustum indice.
+ * @param {Number} numFrustums Total frustums count in current rendering pipe-line.
+ */
 MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrustums) 
 {
 	// Update the current frame's frustums count.

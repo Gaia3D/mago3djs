@@ -13,9 +13,14 @@ var MagoWorld = function(magoManager)
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
+	// See "setDefaultDataset()" of ManagerFactory.
 	
 	this.magoManager = magoManager;
 	
+	// Define the sceneType default.
+	this.sceneType = CODE.sceneType.GLOBE;
+
+
 	// Set the start position of the camera.***
 	/*
 	var camera = this.magoManager.sceneState.camera;
@@ -52,7 +57,10 @@ MagoWorld.prototype.renderScene = function()
 	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	
-	this.magoManager.start(undefined, true, 0, 1);
+	if (this.sceneType === CODE.sceneType.GLOBE)
+	{ this.magoManager.start(undefined, true, 0, 1); } // MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums)
+	else
+	{ this.magoManager.start(undefined, true, 0, 1); }
 };
 
 /**

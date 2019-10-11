@@ -665,8 +665,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		magoManager.globe = new Globe();
 		// init matrices.***
 		viewer.updateModelViewMatrixByCamera(sceneState.camera);
-		//magoManager.upDateSceneStateMatrices(sceneState);
-		
+
 		// Create the tinTerrains(MagoEarth).***
 		magoManager.tinTerrainManager = new TinTerrainManager();
 		

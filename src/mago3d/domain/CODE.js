@@ -23,6 +23,11 @@ CODE.fileLoadState = {
 	"LOAD_FAILED"      : 9
 };
 
+CODE.sceneType = {
+	"GLOBE" : 0,
+	"LOCAL" : 1
+};
+
 CODE.moveMode = {
 	"ALL"              : "0",
 	"OBJECT"           : "1",

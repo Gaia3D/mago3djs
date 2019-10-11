@@ -24,6 +24,8 @@ var HierarchyManager = function()
 	 * @type {StaticModelManager}
 	 */
 	this.staticModelsManager;
+	
+	this.localDatasArray;
 };
 
 /**
