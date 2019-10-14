@@ -935,6 +935,27 @@ NeoBuilding.prototype.parseTexturesList = function(arrayBuffer, bytesReaded)
 /**
  * 어떤 일을 하고 있습니까?
  */
+NeoBuilding.prototype.forceToLoadModelsAndReferences = function() 
+{
+	// Load all models & references of leaf octrees.
+	
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+NeoBuilding.prototype.makeCollisionCheckOctree = function() 
+{
+	// 1rst, must force to load all models & references.
+	// Models & references are in leaf octrees.
+
+	var collisionCheckOctree = new Octree();
+	
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 NeoBuilding.prototype.parseHeader = function(arrayBuffer, bytesReaded) 
 {
 	// In the header file, there are:

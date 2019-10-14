@@ -1809,6 +1809,8 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
  */
 MagoManager.prototype.keyDown = function(key) 
 {
+	return;
+	
 	if (this.modeler === undefined)
 	{ this.modeler = new Modeler(this); }
 	
@@ -3446,6 +3448,7 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, globa
 			{
 				if (version === "0.0.2")
 				{
+					// This is a no used partitionsBlocksLists version. Delete it.
 					var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList; 
 					if (blocksList)
 					{ blocksList.prepareData(this, lowestOctree); }
@@ -5395,6 +5398,7 @@ MagoManager.prototype.callAPI = function(api)
 								{ continue; }
 							
 								node.data.isColorChanged = false;
+								node.data.colorChangedHistoryMap = undefined;
 								
 								var neoBuilding = node.data.neoBuilding;
 								if (neoBuilding === undefined)

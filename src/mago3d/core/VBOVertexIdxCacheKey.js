@@ -19,7 +19,8 @@ var VBOVertexIdxCacheKey = function()
 	this.vboBufferIdx;
 	this.vboBufferCol;
 	this.vboBufferTCoord;
-
+	
+	this.keepDataArrayBuffers;
 };
 
 /**
@@ -345,6 +346,9 @@ VBOVertexIdxCacheKey.prototype.setDataArrayPos = function(posDataArray, vboMemMa
 	var normalized = false;
 	this.vboBufferPos.setDataArray(posDataArray, dimensions, normalized, vboMemManager);
 	this.vertexCount = this.vboBufferPos.dataLength/3;
+	
+	if (this.keepDataArrayBuffers)
+	{ this.keepedPosDataArray = posDataArray; }
 };
 
 /**
@@ -362,6 +366,9 @@ VBOVertexIdxCacheKey.prototype.setDataArrayNor = function(norDataArray, vboMemMa
 	var dimensions = 3;
 	var normalized = true;
 	this.vboBufferNor.setDataArray(norDataArray, dimensions, normalized, vboMemManager);
+	
+	if (this.keepDataArrayBuffers)
+	{ this.keepedNorDataArray = norDataArray; }
 };
 
 /**
@@ -380,6 +387,9 @@ VBOVertexIdxCacheKey.prototype.setDataArrayIdx = function(idxDataArray, vboMemMa
 	var normalized = false;
 	this.vboBufferIdx.setDataArray(idxDataArray, dimensions, normalized, vboMemManager);
 	this.indicesCount = this.vboBufferIdx.dataLength;
+	
+	if (this.keepDataArrayBuffers)
+	{ this.keepedIdxDataArray = idxDataArray; }
 };
 
 /**
@@ -397,6 +407,9 @@ VBOVertexIdxCacheKey.prototype.setDataArrayCol = function(colDataArray, vboMemMa
 	var dimensions = 4;
 	var normalized = true;
 	this.vboBufferCol.setDataArray(colDataArray, dimensions, normalized, vboMemManager);
+	
+	if (this.keepDataArrayBuffers)
+	{ this.keepedColDataArray = colDataArray; }
 };
 
 /**
@@ -415,6 +428,9 @@ VBOVertexIdxCacheKey.prototype.setDataArrayTexCoord = function(texCoordDataArray
 	var dimensions = 2;
 	var normalized = false;
 	this.vboBufferTCoord.setDataArray(texCoordDataArray, dimensions, normalized, vboMemManager);
+	
+	if (this.keepDataArrayBuffers)
+	{ this.keepedTexCoordDataArray = texCoordDataArray; }
 };
 
 
@@ -449,4 +465,11 @@ VBOVertexIdxCacheKey.prototype.deleteGlObjects = function(gl, vboMemManager)
 		this.vboBufferTCoord.deleteGlObjects(vboMemManager);	
 		this.vboBufferTCoord = undefined;
 	}
+	
+	// If exist:
+	this.keepedColDataArray = undefined;
+	this.keepedIdxDataArray = undefined;
+	this.keepedNorDataArray = undefined;
+	this.keepedPosDataArray = undefined;
+	this.keepedTexCoordDataArray = undefined;
 };

@@ -123,7 +123,7 @@ Modeler.prototype.removeObject = function(object)
 	if (object === undefined)
 	{ return false; }
 	
-	
+	// todo:
 };
 
 /**
