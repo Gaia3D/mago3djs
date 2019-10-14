@@ -462,7 +462,7 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer_partition = function(fileName, lo
  * @param fileName 파일명
  * @param magoManager 변수
  */
-ReaderWriter.prototype.getNeoReferencesArraybuffer = function(fileName, lowestOctree, magoManager) 
+ReaderWriter.prototype.getNeoReferencesArraybuffer = function(fileName, lowestOctree, magoManager, options) 
 {
 	if (lowestOctree.neoReferencesMotherAndIndices === undefined)
 	{ return; }
