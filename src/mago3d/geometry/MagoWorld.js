@@ -147,6 +147,7 @@ MagoWorld.prototype.goto = function(longitude, latitude, altitude)
  */
 MagoWorld.prototype.mousedown = function(event)
 {
+	event.stopPropagation();
 	this.magoManager.sceneState.mouseButton = event.button;
 	MagoWorld.updateMouseStartClick(event.clientX, event.clientY, this.magoManager);
 	this.magoManager.isCameraMoving = true;
@@ -321,6 +322,7 @@ MagoWorld.prototype.updateModelViewMatrixByCamera = function(camera)
  */
 MagoWorld.prototype.mouseup = function(event)
 {
+	event.stopPropagation();
 	var magoManager = this.magoManager;
 	magoManager.sceneState.mouseButton = -1;
 	magoManager.bPicking = false;
@@ -359,6 +361,7 @@ MagoWorld.prototype.mouseup = function(event)
  */
 MagoWorld.prototype.mouseclick = function(event)
 {
+	event.stopPropagation();
 	if (event.button === 0)
 	{
 		var mouseX = event.clientX;
@@ -391,7 +394,8 @@ MagoWorld.prototype.checkCameraIsUnderGround = function(camera)
  */
 MagoWorld.prototype.mousewheel = function(event)
 {
-	var delta = event.wheelDelta / 10;
+	event.stopPropagation();
+	var delta = event.wheelDelta / 20;
 	
 	var mouseAction = this.magoManager.sceneState.mouseAction;
 	
@@ -399,30 +403,6 @@ MagoWorld.prototype.mousewheel = function(event)
 	var camera = this.magoManager.sceneState.camera;
 	var camPos = camera.position;
 	var camDir = camera.direction;
-	var camUp = camera.up;
-	
-	var camHeght = camera.getCameraElevation();
-
-	if (isNaN(camHeght))
-	{ return; }
-
-	// Lineal increment.
-	//delta *= camHeght * 0.003;
-	
-	// Squared increment.
-	delta *= (camHeght*camHeght) * 0.00001 + camHeght * 0.001;
-	delta += 1;
-	
-	//var maxDelta = 200000;
-	var maxDelta = 0.5*camHeght;
-	if (maxDelta > 200000)
-	{ maxDelta = 200000; }
-	
-	if (delta < -maxDelta)
-	{ delta = -maxDelta; }
-	
-	if (delta > maxDelta)
-	{ delta = maxDelta; }
 	
 	camPos.add(camDir.x * delta,  camDir.y * delta,  camDir.z * delta);
 	
@@ -435,6 +415,7 @@ MagoWorld.prototype.mousewheel = function(event)
  */
 MagoWorld.prototype.mousemove = function(event)
 {
+	event.stopPropagation();
 	var sceneState = this.magoManager.sceneState;
 	var mouseAction = sceneState.mouseAction;
 

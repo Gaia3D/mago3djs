@@ -51,11 +51,11 @@ HierarchyManager.prototype.deleteNodes = function(gl, vboMemoryManager)
 					}
 				}
 			}
-			nodesMap.clear();
+			//nodesMap.clear();
 			delete this.projectsMap[key];
 		}
 	}
-	this.projectsMap.clear();
+	//this.projectsMap.clear();
 	this.projectsMap = {};
 };
 

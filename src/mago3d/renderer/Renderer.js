@@ -858,11 +858,11 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		if (magoManager.currentFrustumIdx < 2)
 		{ bApplySsao = true; }
 	
-		//bApplySsao = true;
+		bApplySsao = true;
 	
 		if (magoManager.sunDepthFbo !== undefined)
 		{ bApplyShadow = true; }
-		
+		bApplyShadow = false;
 		// check changesHistory.
 		magoManager.checkChangesHistoryMovements(visibleObjControlerNodes.currentVisibles0);
 		magoManager.checkChangesHistoryColors(visibleObjControlerNodes.currentVisibles0);
