@@ -156,7 +156,7 @@ var Octree = function(octreeOwner)
 	 * @type {Number}
 	 * @default undefined
 	 */
-	this.pCloudPartitionsCount; // pointsCloud-pyramid-tree mode.
+	this.pCloudPartitionsCount; // No used.
 	
 	/**
 	 * PointsCloudPartitions.
@@ -167,6 +167,9 @@ var Octree = function(octreeOwner)
 	
 	// gereral objects.
 	this.objectsArray;
+	
+	// auxiliar triangles array.
+	this.trianglesArray;
 };
 
 /**
@@ -357,19 +360,89 @@ Octree.prototype.deleteLod2GlObjects = function(gl, vboMemManager)
  * 어떤 일을 하고 있습니까?
  * @param treeDepth 변수
  */
-Octree.prototype.makeTree = function(treeDepth) 
+Octree.prototype.createChildren = function() 
 {
-	if (this.octree_level < treeDepth) 
+	this.subOctrees_array = []; // Init array.
+	
+	for (var i=0; i<8; i++) 
 	{
+		var subOctree = this.new_subOctree();
+		subOctree.octree_number_name = this.octree_number_name * 10 + (i+1);
+		subOctree.neoBuildingOwnerId = this.neoBuildingOwnerId;
+		subOctree.octreeKey = this.neoBuildingOwnerId + "_" + subOctree.octree_number_name;
+	}
+
+	this.setSizesSubBoxes();
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param treeDepth 변수
+ */
+Octree.prototype.takeIntersectedTriangles = function(trianglesArray) 
+{
+	if (trianglesArray === undefined)
+	{ return; }
+
+	if (this.trianglesArray === undefined)
+	{ this.trianglesArray = []; }
+
+	var bbox = this.getBoundingBox();
+	
+	var trianglesCount = trianglesArray.length;
+	for (var i=0; i<trianglesCount; i++)
+	{
+		var tri = trianglesArray[i];
+		if (bbox.intersectsWithTriangle(tri))
+		{
+			this.trianglesArray.push(tri);
+		}
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param treeDepth 변수
+ */
+Octree.prototype.makeTreeByTrianglesArray = function(options) 
+{
+	if (this.trianglesArray === undefined || this.trianglesArray.length === 0)
+	{ return; }
+	
+	if (options === undefined)
+	{ return; }
+	
+	var desiredMinOctreeSize = options.desiredMinOctreeSize;
+	var desiredHalfSize = desiredMinOctreeSize/2;
+	
+	if (this.half_dx > desiredHalfSize || this.half_dy > desiredHalfSize || this.half_dz > desiredHalfSize)
+	{
+		this.createChildren();
+
 		for (var i=0; i<8; i++) 
 		{
-			var subOctree = this.new_subOctree();
-			subOctree.octree_number_name = this.octree_number_name * 10 + (i+1);
-			subOctree.neoBuildingOwnerId = this.neoBuildingOwnerId;
-			subOctree.octreeKey = this.neoBuildingOwnerId + "_" + subOctree.octree_number_name;
+			this.subOctrees_array[i].takeIntersectedTriangles(this.trianglesArray);
 		}
+		
+		for (var i=0; i<8; i++) 
+		{
+			this.subOctrees_array[i].makeTreeByTrianglesArray(options);
+		}
+		
+		this.trianglesArray = undefined;
+	}
+};
 
-		this.setSizesSubBoxes();
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param treeDepth 변수
+ */
+Octree.prototype.makeTree = function(treeDepth) 
+{
+	// No used.
+	if (this.octree_level < treeDepth) 
+	{
+		this.createChildren();
 
 		for (var i=0; i<8; i++) 
 		{
@@ -377,6 +450,7 @@ Octree.prototype.makeTree = function(treeDepth)
 		}
 	}
 };
+
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -517,6 +591,16 @@ Octree.prototype.prepareModelReferencesListData = function(magoManager)
 	var buildingFolderName = neoBuilding.buildingFileName;
 	var projectFolderName = neoBuilding.projectFolderName;
 	
+	var keepDataArrayBuffers = false;
+	var attrib = neoBuilding.attributes;
+	if (attrib !== undefined)
+	{
+		if (attrib.keepDataArrayBuffers !== undefined && attrib.keepDataArrayBuffers === true)
+		{
+			keepDataArrayBuffers = true;
+		}
+	}
+	
 	if (this.neoReferencesMotherAndIndices === undefined)
 	{
 		this.neoReferencesMotherAndIndices = new NeoReferencesMotherAndIndices();
@@ -527,6 +611,11 @@ Octree.prototype.prepareModelReferencesListData = function(magoManager)
 	{
 		if (this.neoReferencesMotherAndIndices.blocksList === undefined)
 		{ this.neoReferencesMotherAndIndices.blocksList = new BlocksList("0.0.1"); }
+	
+		if (keepDataArrayBuffers)
+		{	
+			this.neoReferencesMotherAndIndices.blocksList.keepDataArrayBuffers = keepDataArrayBuffers;
+		}
 
 		var subOctreeNumberName = this.octree_number_name.toString();
 		var references_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/References";
@@ -554,7 +643,7 @@ Octree.prototype.prepareModelReferencesListData = function(magoManager)
 /**
  * 어떤 일을 하고 있습니까?
  */
-Octree.prototype.prepareModelReferencesListData_v002 = function(magoManager) 
+Octree.prototype.prepareModelReferencesListData_partitionsVersion = function(magoManager) 
 {
 	var neoBuilding = this.neoBuildingOwner;
 		
@@ -1218,6 +1307,44 @@ Octree.prototype.getFrustumVisibleLowestOctreesByLOD = function(cullingVolume, v
  * @param z 변수
  * @returns intersects
  */
+Octree.prototype.getBoundingBox = function(resultBbox) 
+{
+	if (resultBbox === undefined)
+	{ resultBbox = new BoundingBox(); }
+	 
+	resultBbox.set(this.centerPos.x - this.half_dx, this.centerPos.y - this.half_dy, this.centerPos.z - this.half_dz, 
+		this.centerPos.x + this.half_dx, this.centerPos.y + this.half_dy, this.centerPos.z + this.half_dz);
+	
+	return resultBbox;
+};
+
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param x 변수
+ * @param y 변수
+ * @param z 변수
+ * @returns intersects
+ */
+Octree.prototype.intersectsWithTriangle = function(triangle) 
+{
+	if (triangle === undefined)
+	{ return false; }
+	
+	// 1) Check if triangle's bbox intersects with this octree.
+	var myBbox = this.getBoundingBox();
+	
+	
+	return true;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param x 변수
+ * @param y 변수
+ * @param z 변수
+ * @returns intersects
+ */
 Octree.prototype.intersectsWithPoint3D = function(x, y, z) 
 {
 	//this.centerPos = new Point3D();
@@ -1632,6 +1759,30 @@ Octree.prototype.extractLowestOctreesIfHasTriPolyhedrons = function(lowestOctree
  * 어떤 일을 하고 있습니까?
  * @param result_octreesArray 변수
  */
+Octree.prototype.extractLowestOctreesIfHasTriangles = function(lowestOctreesArray) 
+{
+	if (this.subOctrees_array === undefined)
+	{ return; }
+	
+	var subOctreesCount = this.subOctrees_array.length;
+
+	if (this.trianglesArray !== undefined && this.trianglesArray.length > 0) 
+	{
+		lowestOctreesArray.push(this);
+	}
+	else 
+	{
+		for (var i=0; i<subOctreesCount; i++) 
+		{
+			this.subOctrees_array[i].extractLowestOctreesIfHasTriangles(lowestOctreesArray);
+		}
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param result_octreesArray 변수
+ */
 Octree.prototype.multiplyKeyTransformMatrix = function(idxKey, matrix) 
 {
 	var subOctreesCount = this.subOctrees_array.length;
@@ -1688,16 +1839,8 @@ Octree.prototype.parseAsimetricVersion = function(arrayBuffer, bytesReaded, neoB
 	///}
 
 	// 1rst, create the 8 subOctrees.
-	for (var i=0; i<subOctreesCount; i++) 
-	{
-		var subOctree = this.new_subOctree();
-		subOctree.octree_number_name = this.octree_number_name * 10 + (i+1);
-		subOctree.neoBuildingOwnerId = this.neoBuildingOwnerId;
-		subOctree.octreeKey = this.neoBuildingOwnerId + "_" + subOctree.octree_number_name;
-	}
-
-	// now, set size of subOctrees.
-	this.setSizesSubBoxes();
+	if (subOctreesCount > 0)
+	{ this.createChildren(); }
 
 	for (var i=0; i<subOctreesCount; i++) 
 	{
@@ -1827,6 +1970,8 @@ Octree.prototype.getMinDistToCameraInTree = function(cameraPosition, boundingSph
 	
 	return dist;
 };
+
+
 
 
 

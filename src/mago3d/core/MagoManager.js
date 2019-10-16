@@ -1809,8 +1809,6 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
  */
 MagoManager.prototype.keyDown = function(key) 
 {
-	return;
-	
 	if (this.modeler === undefined)
 	{ this.modeler = new Modeler(this); }
 	
@@ -1826,7 +1824,8 @@ MagoManager.prototype.keyDown = function(key)
 		//this.modeler.mode = CODE.modelerMode.DRAWING_PLANEGRID;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_TUNNELPOINTS;
-		this.modeler.mode = CODE.modelerMode.DRAWING_PIPE;
+		//this.modeler.mode = CODE.modelerMode.DRAWING_PIPE;
+		this.modeler.mode = CODE.modelerMode.DRAWING_SPHERE;
 	}
 	else if (key === 38) // 38 = 'up'.***
 	{
@@ -1994,6 +1993,31 @@ MagoManager.prototype.keyDown = function(key)
 			var projectFolderName = "berlin";
 			var fileName = this.readerWriter.geometryDataPath + "/" + projectFolderName + "/" + "smartTile_f4d_indexFile.sii";
 			this.readerWriter.getObjectIndexFileSmartTileF4d(fileName, projectFolderName, this);
+		}
+		
+		// Another test. make collisionCheckOctree.***
+		if (this.selectionManager.currentNodeSelected !== undefined)
+		{
+			// make collisionCheckOctree.***
+			var selNode = this.selectionManager.currentNodeSelected;
+			var neoBuilding = selNode.data.neoBuilding;
+			if (neoBuilding !== undefined)
+			{
+				var attributeKey = "isDeletable";
+				var attributeValue = false;
+				neoBuilding.setAttribute(attributeKey, attributeValue);
+				neoBuilding.setAttribute("keepDataArrayBuffers", true);
+				// make collisionCheckOctree.***
+				if (neoBuilding.allModelsAndReferencesAreParsed(this))
+				{
+					var desiredMinOctreeSize = 0.25;
+					neoBuilding.makeCollisionCheckOctree(desiredMinOctreeSize);
+				}
+				else 
+				{
+					neoBuilding.forceToLoadModelsAndReferences(this);
+				}
+			}
 		}
 		
 		
@@ -2407,6 +2431,22 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			concentricTubes.attributes = {isMovable: true};
 
 			this.modeler.addObject(concentricTubes);
+		}
+		else if (this.modeler.mode === CODE.modelerMode.DRAWING_SPHERE)
+		{
+			// make a sphere.
+			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+50, undefined, undefined, undefined, geoLocData, this);
+			
+			var options = {};
+			var color = new Color();
+			color.setRGB(0.9, 0.7, 0.2);
+			options.color = color;
+			var sphere = new Sphere(options);
+			sphere.geoLocDataManager = geoLocDataManager;
+			sphere.setRadius(30);
+			this.modeler.addObject(sphere);
 		}
 	}
 	

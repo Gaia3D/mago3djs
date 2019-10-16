@@ -217,25 +217,36 @@ Arc2D.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 	var startAngRad = Math.PI/180.0 * this.startAngleDeg;
 	var sweepAngRad = Math.PI/180.0 * this.sweepAngleDeg;
 	var point;
-	
+	var segmentsCount = Math.ceil(sweepAngRad/increAngRad);
+	var currAngRad = 0.0;
 	if (sweepAngRad >=0)
 	{
-		for (var currAngRad = 0.0; currAngRad<sweepAngRad; currAngRad += increAngRad)
+		//for (var currAngRad = 0.0; currAngRad<sweepAngRad; currAngRad += increAngRad)
+		for (var i=0; i<=segmentsCount; i++)
 		{
+			if (currAngRad > sweepAngRad)
+			{ currAngRad = sweepAngRad; }
+			
 			x = cx + this.radius * Math.cos(currAngRad + startAngRad);
 			y = cy + this.radius * Math.sin(currAngRad + startAngRad);
 			point = new Point2D(x, y);
 			pointsArray.push(point);
+			currAngRad += increAngRad;
 		}
 	}
 	else 
 	{
-		for (var currAngRad = 0.0; currAngRad>sweepAngRad; currAngRad -= increAngRad)
+		//for (var currAngRad = 0.0; currAngRad>sweepAngRad; currAngRad -= increAngRad)
+		for (var i=0; i<=segmentsCount; i++)
 		{
+			if (currAngRad < sweepAngRad)
+			{ currAngRad = sweepAngRad; }
+			
 			x = cx + this.radius * Math.cos(currAngRad + startAngRad);
 			y = cy + this.radius * Math.sin(currAngRad + startAngRad);
 			point = new Point2D(x, y);
 			pointsArray.push(point);
+			currAngRad -= increAngRad;
 		}
 	}
 	

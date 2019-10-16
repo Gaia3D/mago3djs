@@ -58,6 +58,12 @@ var BlocksList = function(version)
 	 * @type {ArrayBuffer}
 	 */
 	this.dataArraybuffer;
+	
+	/**
+	 * If true, keep block data array buffer after binding to GPU.
+	 * @type {BOOLEAN}
+	 */
+	this.keepDataArrayBuffers;
 
 	/**
 	 * file request.
@@ -211,13 +217,17 @@ BlocksList.prototype.stepOverBlockVersioned = function(arrayBuffer, bytesReaded,
  * 
  * @see VBOVertexIdxCacheKey#readPosNorIdx
  */
-BlocksList.prototype.parseBlockVersioned = function(arrayBuffer, bytesReaded, block, readWriter, magoManager) 
+BlocksList.prototype.parseBlockVersioned = function(arrayBuffer, bytesReaded, block, readWriter, magoManager, options) 
 {
 	var vboMemManager = magoManager.vboMemoryManager;
 	var vboDatasCount = readWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
 	for ( var j = 0; j < vboDatasCount; j++ ) 
 	{
 		var vboViCacheKey = block.vBOVertexIdxCacheKeysContainer.newVBOVertexIdxCacheKey();
+		
+		if (this.keepDataArrayBuffers !== undefined && this.keepDataArrayBuffers)
+		{ vboViCacheKey.keepDataArrayBuffers = true; }
+	
 		bytesReaded = vboViCacheKey.readPosNorIdx(arrayBuffer, vboMemManager, bytesReaded);
 		block.vertexCount = vboViCacheKey.vertexCount;
 	}
@@ -300,7 +310,6 @@ BlocksList.prototype.parseBlocksListVersioned_v001 = function(arrayBuffer, readW
 		{
 			if (block.lego === undefined)
 			{ 
-				// TODO : this is no used. delete this.
 				block.lego = new Lego(); 
 			}
 			bytesReaded = this.parseBlockVersioned(arrayBuffer, bytesReaded, block.lego, readWriter, magoManager) ;
@@ -319,7 +328,7 @@ BlocksList.prototype.parseBlocksListVersioned_v001 = function(arrayBuffer, readW
  * @param {Array.<Block>} motherBlocksArray Global blocks array.
  * @param {MagoManager} magoManager
  */
-BlocksList.prototype.parseBlocksListVersioned_v002 = function(readWriter, motherBlocksArray, magoManager) 
+BlocksList.prototype.parseBlocksListVersioned_partitionsVersion = function(readWriter, motherBlocksArray, magoManager) 
 {
 	// 1rst, find the blocksArrayPartition to parse.
 	var blocksArrayPartitionsCount = this.blocksArrayPartitionsArray.length;

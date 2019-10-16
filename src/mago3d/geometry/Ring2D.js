@@ -22,6 +22,8 @@ var Ring2D = function()
 	 * @type {Polygon2D}
 	 */
 	this.polygon = undefined;
+	
+	this.isOpen; // note: only outer rongs can be open.
 };
 
 Ring2D.prototype.getElement = function(index)

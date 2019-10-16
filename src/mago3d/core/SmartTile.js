@@ -1045,6 +1045,10 @@ SmartTile.prototype.createGeometriesFromSeeds = function(magoManager)
 						
 						neoBuilding = new NeoBuilding();
 						
+						// Test.
+						neoBuilding.setAttribute("keepDataArrayBuffers", true);
+						// End test.
+						
 						neoBuilding.nodeOwner = node;
 						node.data.neoBuilding = neoBuilding;
 						if (node.data.bbox === undefined)

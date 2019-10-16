@@ -45,7 +45,8 @@ CODE.modelerMode = {
 	"DRAWING_BSPLINE"          : 6,
 	"DRAWING_BASICFACTORY"     : 7,
 	"DRAWING_STATICGEOMETRY"   : 8,
-	"DRAWING_PIPE"             : 9
+	"DRAWING_PIPE"             : 9,
+	"DRAWING_SPHERE"           : 10
 };
 
 CODE.boxFace = {

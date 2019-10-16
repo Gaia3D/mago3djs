@@ -365,6 +365,111 @@ NeoReference.prototype.solveReferenceColorOrTexture = function(magoManager, neoB
  * @param mag{Boolean}
  * @returns {Boolean} returns if the neoReference was rendered.
  */
+NeoReference.prototype.getTriangles = function(neoBuilding, resultTrianglesArray) 
+{
+	if (neoBuilding === undefined || neoBuilding.motherBlocksArray === undefined)
+	{ return motherBlocksArray; }
+	
+	if (resultTrianglesArray === undefined)
+	{ resultTrianglesArray = []; }
+	
+	var neoReference = this;
+	var block_idx = neoReference._block_idx;
+	var block = neoBuilding.motherBlocksArray[block_idx];
+	var cacheKeys_count = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray.length;
+	var refTMat = neoReference._originalMatrix4;
+	var vboKey;
+	var vertexMap = {};
+	
+	for (var n=0; n<cacheKeys_count; n++) // Original.
+	{
+		vboKey = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray[n];
+
+		var posArray = vboKey.keepedPosDataArray;
+		if (posArray === undefined)
+		{ return resultTrianglesArray; }
+		
+		var positionsCount = posArray.length/3;
+		
+		var idxArray = vboKey.keepedIdxDataArray;
+		var indicesCount = idxArray.length;
+		
+		var trianglesCount = indicesCount/3;
+		
+		for (var i=0; i<trianglesCount; i++)
+		{
+			var idx_1 = idxArray[i*3];
+			var idx_2 = idxArray[i*3+1];
+			var idx_3 = idxArray[i*3+2];
+			
+			var vertex_1 = vertexMap[idx_1];
+			if (vertex_1 === undefined)
+			{
+				var pos_1 = new Point3D(posArray[idx_1*3], posArray[idx_1*3+1], posArray[idx_1*3+2]);
+				//Parameter that specifies the type of the transformation matrix. 0 = identity matrix, 1 = translation matrix, 2 = transformation matrix.
+				if (neoReference.refMatrixType === 1)
+				{
+					pos_1.add(neoReference.refTranslationVec[0], neoReference.refTranslationVec[1], neoReference.refTranslationVec[2]);
+				}
+				else if (neoReference.refMatrixType === 2)
+				{
+					// Now, transform points with refTMat (reference transformation matrix).
+					pos_1 = refTMat.transformPoint3D(pos_1, pos_1);
+				}
+				
+				vertex_1 = new Vertex(pos_1);
+				vertexMap[idx_1] = vertex_1;
+			}
+			
+			var vertex_2 = vertexMap[idx_2];
+			if (vertex_2 === undefined)
+			{
+				var pos_2 = new Point3D(posArray[idx_2*3], posArray[idx_2*3+1], posArray[idx_2*3+2]);
+				//Parameter that specifies the type of the transformation matrix. 0 = identity matrix, 1 = translation matrix, 2 = transformation matrix.
+				if (neoReference.refMatrixType === 1)
+				{
+					pos_2.add(neoReference.refTranslationVec[0], neoReference.refTranslationVec[1], neoReference.refTranslationVec[2]);
+				}
+				else if (neoReference.refMatrixType === 2)
+				{
+					// Now, transform points with refTMat (reference transformation matrix).
+					pos_2 = refTMat.transformPoint3D(pos_2, pos_2);
+				}
+				vertex_2 = new Vertex(pos_2);
+				vertexMap[idx_2] = vertex_2;
+			}
+			
+			var vertex_3 = vertexMap[idx_3];
+			if (vertex_3 === undefined)
+			{
+				var pos_3 = new Point3D(posArray[idx_3*3], posArray[idx_3*3+1], posArray[idx_3*3+2]);
+				//Parameter that specifies the type of the transformation matrix. 0 = identity matrix, 1 = translation matrix, 2 = transformation matrix.
+				if (neoReference.refMatrixType === 1)
+				{
+					pos_3.add(neoReference.refTranslationVec[0], neoReference.refTranslationVec[1], neoReference.refTranslationVec[2]);
+				}
+				else if (neoReference.refMatrixType === 2)
+				{
+					// Now, transform points with refTMat (reference transformation matrix).
+					pos_3 = refTMat.transformPoint3D(pos_3, pos_3);
+				}
+				vertex_3 = new Vertex(pos_3);
+				vertexMap[idx_3] = vertex_3;
+			}
+			
+			var triangle = new Triangle(vertex_1, vertex_2, vertex_3);
+			resultTrianglesArray.push(triangle);
+		}
+	}
+	return resultTrianglesArray;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * 
+ * @param mag{Boolean}
+ * @returns {Boolean} returns if the neoReference was rendered.
+ */
 NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, renderTexture, shader, refMatrixIdxKey, minSizeToRender) 
 {
 	var neoReference = this;

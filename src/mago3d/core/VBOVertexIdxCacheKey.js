@@ -21,6 +21,11 @@ var VBOVertexIdxCacheKey = function()
 	this.vboBufferTCoord;
 	
 	this.keepDataArrayBuffers;
+	this.keepedColDataArray;
+	this.keepedIdxDataArray;
+	this.keepedNorDataArray;
+	this.keepedPosDataArray;
+	this.keepedTexCoordDataArray;
 };
 
 /**

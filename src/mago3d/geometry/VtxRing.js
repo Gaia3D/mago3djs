@@ -25,6 +25,8 @@ var VtxRing = function()
 	 * @type {Array.<IndexRange>}
 	 */
 	this.elemsIndexRangesArray;
+	
+	this.isOpen;
 };
 
 /**
@@ -135,6 +137,8 @@ VtxRing.prototype.copyFrom = function(vtxRing)
 			myIndexRange.copyFrom(indexRange);
 		}
 	}
+	
+	this.isOpen = vtxRing.isOpen;
 };
 
 /**

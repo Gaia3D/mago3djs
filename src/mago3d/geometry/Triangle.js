@@ -172,6 +172,17 @@ Triangle.prototype.calculatePlaneNormal = function()
 };
 
 /**
+ * PlaneNormal을 계산한다.
+ */
+Triangle.prototype.getPlaneNormal = function() 
+{
+	if (this.normal === undefined)
+	{ this.calculatePlaneNormal(); }
+	
+	return this.normal;
+};
+
+/**
  * CrossProduct(벡터의 외적)를 계산한다.
  * 
  * @param {Number} idxVertex 
@@ -217,3 +228,91 @@ Triangle.prototype.getCrossProduct = function(idxVertex, resultCrossProduct)
 
 	return resultCrossProduct;
 };
+
+/**
+ * 
+ */
+Triangle.prototype.getBoundingBox = function(resultBbox) 
+{
+	if (resultBbox === undefined)
+	{ resultBbox = new BoundingBox(); }
+	
+	resultBbox.init(this.vertex0.getPosition());
+	resultBbox.addPoint(this.vertex1.getPosition());
+	resultBbox.addPoint(this.vertex2.getPosition());
+	
+	return resultBbox;
+};
+
+/**
+ * 
+ */
+Triangle.prototype.getPlane = function(resultPlane) 
+{
+	if (resultPlane === undefined)
+	{ resultPlane = new Plane(); }
+	
+	// make a plane with the point3d of the vertex0 & the normal.
+	var point0 = this.vertex0.getPosition();
+	var normal = this.getPlaneNormal();
+	resultPlane.setPointAndNormal(point0.x, point0.y, point0.z, normal.x, normal.y, normal.z); 
+	
+	return resultPlane;
+};
+
+/**
+ * 
+ */
+Triangle.prototype.getSegment = function(idx, resultSegment) 
+{
+	if (idx === undefined)
+	{ return; }
+	
+	if (resultSegment === undefined)
+	{ resultSegment = new Segment3D(); }
+	
+	if (idx === 0)
+	{
+		resultSegment.setPoints(this.vertex0.getPosition(), this.vertex1.getPosition());
+	}
+	else if (idx === 1)
+	{
+		resultSegment.setPoints(this.vertex1.getPosition(), this.vertex2.getPosition());
+	}
+	else if (idx === 2)
+	{
+		resultSegment.setPoints(this.vertex2.getPosition(), this.vertex0.getPosition());
+	}
+	
+	return resultSegment;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

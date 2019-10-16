@@ -57,6 +57,8 @@ var NeoBuilding = function()
 	
 	// header = metadata + octree's structute + textures list + lodBuildingData.
 	this.headerDataArrayBuffer;
+	
+	this.attributes;
 };
 
 /**
@@ -71,6 +73,18 @@ NeoBuilding.prototype.getImageFileNameForLOD = function(lod)
 	{ return undefined; }
 	
 	return lodBuildingData.textureFileName;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns {Boolean} applyOcclusionCulling
+ */
+NeoBuilding.prototype.setAttribute = function(attributeKey, attributeValue) 
+{
+	if (this.attributes === undefined)
+	{ this.attributes = {}; }
+	
+	this.attributes[attributeKey] = attributeValue;
 };
 
 /**
@@ -237,8 +251,27 @@ NeoBuilding.prototype.deleteObjectsLod2 = function(gl, vboMemoryManager)
  * @param texture 변수
  * @returns texId
  */
+NeoBuilding.prototype.isDeletable = function() 
+{
+	if (this.attributes !== undefined)
+	{
+		if (this.attributes.isDeletable !== undefined && this.attributes.isDeletable === false)
+		{ return false; }
+	}
+	
+	return true;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param texture 변수
+ * @returns texId
+ */
 NeoBuilding.prototype.deleteObjects = function(gl, vboMemoryManager, deleteMetadata) 
 {
+	if (!this.isDeletable())
+	{ return; }
+	
 	if (deleteMetadata)
 	{
 		this.metaData.deleteObjects();
@@ -935,22 +968,138 @@ NeoBuilding.prototype.parseTexturesList = function(arrayBuffer, bytesReaded)
 /**
  * 어떤 일을 하고 있습니까?
  */
-NeoBuilding.prototype.forceToLoadModelsAndReferences = function() 
+NeoBuilding.prototype.getTriangles = function(resultTrianglesArray) 
 {
-	// Load all models & references of leaf octrees.
+	if (this.motherNeoReferencesArray === undefined || this.motherBlocksArray === undefined)
+	{ return false; }
+
+	if (resultTrianglesArray === undefined)
+	{ resultTrianglesArray = []; }
 	
+	var reference;
+	var objectsCount = this.motherNeoReferencesArray.length;
+	for (var i=0; i<objectsCount; i++)
+	{
+		reference = this.motherNeoReferencesArray[i];
+		if (reference !== undefined)
+		{ resultTrianglesArray = reference.getTriangles(this, resultTrianglesArray); }
+	}
+	
+	return resultTrianglesArray;
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  */
-NeoBuilding.prototype.makeCollisionCheckOctree = function() 
+NeoBuilding.prototype.allModelsAndReferencesAreParsed = function(magoManager) 
+{
+	var lowestOctreesArray = [];
+	this.octree.extractLowestOctreesIfHasTriPolyhedrons(lowestOctreesArray);
+	var lowestOctreesCount = lowestOctreesArray.length;
+	for (var i=0; i<lowestOctreesCount; i++)
+	{
+		var lowestOctree = lowestOctreesArray[i];
+		
+		// check if models & references is already loaded.
+		if (lowestOctree.neoReferencesMotherAndIndices === undefined)
+		{ return false; }
+		
+		if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
+		{ return false; }
+	
+		var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
+		if (blocksList.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
+		{ return false; }
+	}
+	
+	return true;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+NeoBuilding.prototype.forceToLoadModelsAndReferences = function(magoManager) 
+{
+	// Load all models & references.
+	var allModelsAndReferencesAreLoaded = true;
+	
+	var lowestOctreesArray = [];
+	this.octree.extractLowestOctreesIfHasTriPolyhedrons(lowestOctreesArray);
+	var lowestOctreesCount = lowestOctreesArray.length;
+	for (var i=0; i<lowestOctreesCount; i++)
+	{
+		var lowestOctree = lowestOctreesArray[i];
+		
+		// check if models & references is already loaded.
+		if (lowestOctree.neoReferencesMotherAndIndices === undefined || lowestOctree.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.READY)
+		{
+			lowestOctree.prepareModelReferencesListData(magoManager);
+			allModelsAndReferencesAreLoaded = false;
+			continue;
+		}
+		else if (lowestOctree.neoReferencesMotherAndIndices === undefined || lowestOctree.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
+		{
+			// parse references.
+			if (this.matrix4SC === undefined)
+			{ this.matrix4SC = new Matrix4(); }
+			var nodeOwner = this.nodeOwner;
+			var geoLocDataManager = nodeOwner.data.geoLocDataManager;
+			var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
+			var gl = magoManager.getGl();
+			
+			// parse vesioned.
+			lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferencesVersioned(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, 
+				magoManager.readerWriter, this, this.matrix4SC, magoManager);
+			
+			lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
+			lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer = undefined;
+			allModelsAndReferencesAreLoaded = false;
+			continue;
+		}
+		
+		var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
+		if (blocksList.fileLoadState === CODE.fileLoadState.READY)
+		{
+			lowestOctree.prepareModelReferencesListData(magoManager);
+			allModelsAndReferencesAreLoaded = false;
+			continue;
+		}
+		else if (blocksList.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
+		{
+			// parse models.
+			blocksList.parseBlocksListVersioned_v001(blocksList.dataArraybuffer, magoManager.readerWriter, this.motherBlocksArray, magoManager);
+		}
+	}
+
+	return allModelsAndReferencesAreLoaded;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+NeoBuilding.prototype.makeCollisionCheckOctree = function(desiredMinOctreeSize) 
 {
 	// 1rst, must force to load all models & references.
 	// Models & references are in leaf octrees.
-
-	var collisionCheckOctree = new Octree();
 	
+	if (this.motherNeoReferencesArray === undefined || this.motherBlocksArray === undefined)
+	{ return false; }
+
+	// Using the motherOctree (this.octree), make the 1rst aproximation to the collisionCheckOctree.
+	var collisionCheckOctree = new Octree();
+	var octree = this.octree;
+	collisionCheckOctree.centerPos.copyFrom(octree.centerPos);
+	collisionCheckOctree.half_dx = octree.half_dx; // half width.
+	collisionCheckOctree.half_dy = octree.half_dy; // half length.
+	collisionCheckOctree.half_dz = octree.half_dz; // half height.
+	collisionCheckOctree.octree_level = octree.octree_level;
+	
+	collisionCheckOctree.trianglesArray = this.getTriangles();
+	
+	var options = {};
+	options.desiredMinOctreeSize = desiredMinOctreeSize;
+	collisionCheckOctree.makeTreeByTrianglesArray(options);
+	this.collisionCheckOctree = collisionCheckOctree;
 };
 
 /**
@@ -1144,6 +1293,25 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 /**
  * 어떤 일을 하고 있습니까?
  */
+NeoBuilding.prototype.renderCollisionCheckSpheres = function(magoManager, shader, renderType) 
+{
+	if (this.collisionCheckOctree === undefined)
+	{ return; }
+
+	var lowestOctreesArray = [];
+	this.collisionCheckOctree.extractLowestOctreesIfHasTriangles(lowestOctreesArray);
+	
+	var checkOctreesCount = lowestOctreesArray.length;
+	for (var i=0; i<checkOctreesCount; i++)
+	{
+		var checkOctree = lowestOctreesArray[i];
+		
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 NeoBuilding.prototype.render = function(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord, currentLod) 
 {
 	var gl = magoManager.sceneState.gl;
@@ -1210,6 +1378,12 @@ NeoBuilding.prototype.render = function(magoManager, shader, renderType, refMatr
 	else if (this.currentLod > 2)
 	{
 		this.renderSkin(magoManager, shader, renderType);
+	}
+	
+	// test.
+	if (this.collisionCheckOctree !== undefined)
+	{
+		this.renderCollisionCheckSpheres(magoManager, shader, renderType);
 	}
 };
 
