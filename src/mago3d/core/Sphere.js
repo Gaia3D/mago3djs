@@ -202,7 +202,7 @@ Sphere.prototype.makeMesh = function()
 	// Outer ring.**
 	var outerRing = profile2dAux.newOuterRing();
 	
-	var startAngDeg = 90.00;
+	var startAngDeg = 91.00;
 	var endAngDeg = 270.00;
 	var arc = outerRing.newElement("ARC");
 	this.sweepSense = 1;

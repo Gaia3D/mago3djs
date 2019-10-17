@@ -168,8 +168,6 @@ var Octree = function(octreeOwner)
 	// gereral objects.
 	this.objectsArray;
 	
-	// auxiliar triangles array.
-	this.trianglesArray;
 };
 
 /**
@@ -373,64 +371,6 @@ Octree.prototype.createChildren = function()
 	}
 
 	this.setSizesSubBoxes();
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param treeDepth 변수
- */
-Octree.prototype.takeIntersectedTriangles = function(trianglesArray) 
-{
-	if (trianglesArray === undefined)
-	{ return; }
-
-	if (this.trianglesArray === undefined)
-	{ this.trianglesArray = []; }
-
-	var bbox = this.getBoundingBox();
-	
-	var trianglesCount = trianglesArray.length;
-	for (var i=0; i<trianglesCount; i++)
-	{
-		var tri = trianglesArray[i];
-		if (bbox.intersectsWithTriangle(tri))
-		{
-			this.trianglesArray.push(tri);
-		}
-	}
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param treeDepth 변수
- */
-Octree.prototype.makeTreeByTrianglesArray = function(options) 
-{
-	if (this.trianglesArray === undefined || this.trianglesArray.length === 0)
-	{ return; }
-	
-	if (options === undefined)
-	{ return; }
-	
-	var desiredMinOctreeSize = options.desiredMinOctreeSize;
-	var desiredHalfSize = desiredMinOctreeSize/2;
-	
-	if (this.half_dx > desiredHalfSize || this.half_dy > desiredHalfSize || this.half_dz > desiredHalfSize)
-	{
-		this.createChildren();
-
-		for (var i=0; i<8; i++) 
-		{
-			this.subOctrees_array[i].takeIntersectedTriangles(this.trianglesArray);
-		}
-		
-		for (var i=0; i<8; i++) 
-		{
-			this.subOctrees_array[i].makeTreeByTrianglesArray(options);
-		}
-		
-		this.trianglesArray = undefined;
-	}
 };
 
 /**
@@ -1751,30 +1691,6 @@ Octree.prototype.extractLowestOctreesIfHasTriPolyhedrons = function(lowestOctree
 		for (var i=0; i<subOctreesCount; i++) 
 		{
 			this.subOctrees_array[i].extractLowestOctreesIfHasTriPolyhedrons(lowestOctreesArray);
-		}
-	}
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param result_octreesArray 변수
- */
-Octree.prototype.extractLowestOctreesIfHasTriangles = function(lowestOctreesArray) 
-{
-	if (this.subOctrees_array === undefined)
-	{ return; }
-	
-	var subOctreesCount = this.subOctrees_array.length;
-
-	if (this.trianglesArray !== undefined && this.trianglesArray.length > 0) 
-	{
-		lowestOctreesArray.push(this);
-	}
-	else 
-	{
-		for (var i=0; i<subOctreesCount; i++) 
-		{
-			this.subOctrees_array[i].extractLowestOctreesIfHasTriangles(lowestOctreesArray);
 		}
 	}
 };

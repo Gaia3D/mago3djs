@@ -2446,7 +2446,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			var sphere = new Sphere(options);
 			sphere.geoLocDataManager = geoLocDataManager;
 			sphere.setRadius(30);
-			this.modeler.addObject(sphere);
+			this.modeler.addObject(sphere, 15);
 		}
 	}
 	
