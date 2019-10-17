@@ -406,11 +406,11 @@ CollisionCheckOctree.prototype.checkCollision = function(collisionOctree, result
 		resultCollidedOctreesArray.push(collisionOctree);
 		
 		// process finished.
-		this.collidedWithMeCollisionOctreesArray.length = 0; //init.
-		collisionOctree.collidedWithMeCollisionOctreesArray.length = 0; //init.
+		//this.collidedWithMeCollisionOctreesArray.length = 0; //init.
+		//collisionOctree.collidedWithMeCollisionOctreesArray.length = 0; //init.
 		
-		this.collidedWithMeCollisionOctreesArray.push(collisionOctree);
-		collisionOctree.collidedWithMeCollisionOctreesArray.push(this);
+		//this.collidedWithMeCollisionOctreesArray.push(collisionOctree);
+		//collisionOctree.collidedWithMeCollisionOctreesArray.push(this);
 		return true;
 	}
 	
