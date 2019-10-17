@@ -18,6 +18,7 @@ var CollisionCheckOctree = function(octreeOwner)
 	 * @default (0,0,0)
 	 */
 	this.centerPos = new Point3D();
+	this.transformedCenterPos;
 	
 	/**
 	 * The half width of the octree in x-axis.
@@ -330,9 +331,14 @@ CollisionCheckOctree.prototype.getBoundingBox = function(resultBbox)
 {
 	if (resultBbox === undefined)
 	{ resultBbox = new BoundingBox(); }
+
+	if ( this.transformedCenterPos === undefined)
+	{ this.transformedCenterPos = new Point3D(); }
+	
+	this.transformedCenterPos.copyFrom(this.centerPos);
 	 
-	resultBbox.set(this.centerPos.x - this.half_dx, this.centerPos.y - this.half_dy, this.centerPos.z - this.half_dz, 
-		this.centerPos.x + this.half_dx, this.centerPos.y + this.half_dy, this.centerPos.z + this.half_dz);
+	resultBbox.set(this.transformedCenterPos.x - this.half_dx, this.transformedCenterPos.y - this.half_dy, this.transformedCenterPos.z - this.half_dz, 
+		this.transformedCenterPos.x + this.half_dx, this.transformedCenterPos.y + this.half_dy, this.transformedCenterPos.z + this.half_dz);
 	
 	return resultBbox;
 };
@@ -351,8 +357,13 @@ CollisionCheckOctree.prototype.getRadius = function()
  */
 CollisionCheckOctree.prototype.getBoundingSphere = function() 
 {
+	if ( this.transformedCenterPos === undefined)
+	{ this.transformedCenterPos = new Point3D(); }
+	
+	this.transformedCenterPos.copyFrom(this.centerPos);
+	
 	if ( this.boundingSphere === undefined)
-	{ this.boundingSphere = new BoundingSphere(this.centerPos.x, this.centerPos.y, this.centerPos.z, this.getRadius()); }
+	{ this.boundingSphere = new BoundingSphere(this.transformedCenterPos.x, this.transformedCenterPos.y, this.transformedCenterPos.z, this.getRadius()); }
 
 	return this.boundingSphere;
 };
@@ -416,6 +427,57 @@ CollisionCheckOctree.prototype.checkCollision = function(collisionOctree)
 		}
 	}
 	
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns intersects
+ */
+CollisionCheckOctree.prototype.translate = function(translationVector) 
+{
+	if (translationVector === undefined)
+	{ return; }
+	
+	if ( this.transformedCenterPos === undefined)
+	{ this.transformedCenterPos = new Point3D(); }
+	
+	this.transformedCenterPos.copyFrom(this.centerPos);
+	
+	this.transformedCenterPos.addPoint(translationVector);
+	
+	if (this.hasChildren())
+	{
+		var childrenCount = this.subOctrees_array.length;
+		for (var i=0; i<childrenCount; i++)
+		{
+			this.subOctrees_array[i].translate(translationVector);
+		}
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns intersects
+ */
+CollisionCheckOctree.prototype.transformByMatrix4 = function(tMat) 
+{
+	if (tMat === undefined)
+	{ return; }
+
+	if ( this.transformedCenterPos === undefined)
+	{ this.transformedCenterPos = new Point3D(); }
+	
+	this.transformedCenterPos.copyFrom(this.centerPos);
+	
+	this.transformedCenterPos = tMat.transformPoint3D(this.transformedCenterPos, this.transformedCenterPos);
+	if (this.hasChildren())
+	{
+		var childrenCount = this.subOctrees_array.length;
+		for (var i=0; i<childrenCount; i++)
+		{
+			this.subOctrees_array[i].transformByMatrix4(tMat);
+		}
+	}
 };
 
 

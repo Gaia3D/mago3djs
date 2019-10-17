@@ -1085,7 +1085,7 @@ NeoBuilding.prototype.makeCollisionCheckOctree = function(desiredMinOctreeSize)
 	if (this.motherNeoReferencesArray === undefined || this.motherBlocksArray === undefined)
 	{ return false; }
 
-	// Using the motherOctree (this.octree), make the 1rst aproximation to the collisionCheckOctree.
+	// Using the motherOctree (this.octree), make the 1rst approximation to the collisionCheckOctree.
 	var collisionCheckOctree = new CollisionCheckOctree();
 	var octree = this.octree;
 	collisionCheckOctree.centerPos.copyFrom(octree.centerPos);
@@ -1100,6 +1100,21 @@ NeoBuilding.prototype.makeCollisionCheckOctree = function(desiredMinOctreeSize)
 	options.desiredMinOctreeSize = desiredMinOctreeSize;
 	collisionCheckOctree.makeTreeByTrianglesArray(options);
 	this.collisionCheckOctree = collisionCheckOctree;
+	
+	// Now, must transform the collisionCheckOctree with the neoBuilding's transforms.
+	var nodeOwner = this.nodeOwner;
+	var data = nodeOwner.data;
+	var geoLocDataManager = data.geoLocDataManager;
+	var geoLocationData = geoLocDataManager.getCurrentGeoLocationData();
+	var pivotPointTraslationLC = geoLocationData.pivotPointTraslationLC;
+	
+	if (pivotPointTraslationLC !== undefined)
+	{
+		this.collisionCheckOctree.translate(pivotPointTraslationLC);
+	}
+	
+	var tMat = geoLocationData.tMatrix;
+	this.collisionCheckOctree.transformByMatrix4(tMat);
 };
 
 /**
