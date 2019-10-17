@@ -131,7 +131,7 @@ Modeler.prototype.addBoundingSpheres__TEST = function(boundingSpheresArray, dept
 	{
 		var bSphere = boundingSpheresArray[i];
 		var geoCoord = ManagerUtils.pointToGeographicCoord(bSphere.centerPoint, undefined, this.magoManager);
-		var geoLocDataManager = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude, 0, 0, 0, undefined, this.magoManager);
+		var geoLocDataManager = new GeoLocationDataManager();
 		
 		var geoLocData = geoLocDataManager.newGeoLocationData("noName");
 		geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude, undefined, undefined, undefined, geoLocData, this);
