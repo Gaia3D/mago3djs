@@ -423,7 +423,7 @@ CollisionCheckOctree.prototype.checkCollision = function(collisionOctree, result
 			for (var i=0; i<childrenCount; i++)
 			{
 				var subOctree = this.subOctrees_array[i];
-				subOctree.checkCollision(collisionOctree);
+				subOctree.checkCollision(collisionOctree, resultCollidedOctreesArray);
 			}
 		}
 		else
@@ -433,7 +433,7 @@ CollisionCheckOctree.prototype.checkCollision = function(collisionOctree, result
 			for (var i=0; i<childrenCount; i++)
 			{
 				var subOctree = collisionOctree.subOctrees_array[i];
-				this.checkCollision(subOctree);
+				this.checkCollision(subOctree, resultCollidedOctreesArray);
 			}
 		}
 	}
@@ -446,7 +446,7 @@ CollisionCheckOctree.prototype.checkCollision = function(collisionOctree, result
 			for (var i=0; i<childrenCount; i++)
 			{
 				var subOctree = collisionOctree.subOctrees_array[i];
-				this.checkCollision(subOctree);
+				this.checkCollision(subOctree, resultCollidedOctreesArray);
 			}
 		}
 		else
@@ -455,7 +455,7 @@ CollisionCheckOctree.prototype.checkCollision = function(collisionOctree, result
 			for (var i=0; i<childrenCount; i++)
 			{
 				var subOctree = this.subOctrees_array[i];
-				subOctree.checkCollision(collisionOctree);
+				subOctree.checkCollision(collisionOctree, resultCollidedOctreesArray);
 			}
 		}
 	}
