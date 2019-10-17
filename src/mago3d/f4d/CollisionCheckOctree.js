@@ -333,10 +333,11 @@ CollisionCheckOctree.prototype.getBoundingBox = function(resultBbox)
 	{ resultBbox = new BoundingBox(); }
 
 	if ( this.transformedCenterPos === undefined)
-	{ this.transformedCenterPos = new Point3D(); }
-	
-	this.transformedCenterPos.copyFrom(this.centerPos);
-	 
+	{ 
+		this.transformedCenterPos = new Point3D(); 
+		this.transformedCenterPos.copyFrom(this.centerPos);
+	}
+
 	resultBbox.set(this.transformedCenterPos.x - this.half_dx, this.transformedCenterPos.y - this.half_dy, this.transformedCenterPos.z - this.half_dz, 
 		this.transformedCenterPos.x + this.half_dx, this.transformedCenterPos.y + this.half_dy, this.transformedCenterPos.z + this.half_dz);
 	
@@ -358,9 +359,10 @@ CollisionCheckOctree.prototype.getRadius = function()
 CollisionCheckOctree.prototype.getBoundingSphere = function() 
 {
 	if ( this.transformedCenterPos === undefined)
-	{ this.transformedCenterPos = new Point3D(); }
-	
-	this.transformedCenterPos.copyFrom(this.centerPos);
+	{ 
+		this.transformedCenterPos = new Point3D(); 
+		this.transformedCenterPos.copyFrom(this.centerPos);
+	}
 	
 	if ( this.boundingSphere === undefined)
 	{ this.boundingSphere = new BoundingSphere(this.transformedCenterPos.x, this.transformedCenterPos.y, this.transformedCenterPos.z, this.getRadius()); }
