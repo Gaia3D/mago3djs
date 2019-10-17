@@ -435,15 +435,22 @@ CollisionCheckOctree.prototype.checkCollision = function(collisionOctree)
  * 어떤 일을 하고 있습니까?
  * @returns intersects
  */
-CollisionCheckOctree.prototype.translate = function(translationVector) 
+CollisionCheckOctree.prototype.translate = function(translationVector, bTransformFromOrigin) 
 {
 	if (translationVector === undefined)
 	{ return; }
 	
 	if ( this.transformedCenterPos === undefined)
-	{ this.transformedCenterPos = new Point3D(); }
+	{ 
+		this.transformedCenterPos = new Point3D(); 
+		this.transformedCenterPos.copyFrom(this.centerPos);
+	}
+
+	if (bTransformFromOrigin === undefined)
+	{ bTransformFromOrigin = false; }
 	
-	this.transformedCenterPos.copyFrom(this.centerPos);
+	if (bTransformFromOrigin)
+	{ this.transformedCenterPos.copyFrom(this.centerPos); }
 	
 	this.transformedCenterPos.addPoint(translationVector);
 	
@@ -461,15 +468,22 @@ CollisionCheckOctree.prototype.translate = function(translationVector)
  * 어떤 일을 하고 있습니까?
  * @returns intersects
  */
-CollisionCheckOctree.prototype.transformByMatrix4 = function(tMat) 
+CollisionCheckOctree.prototype.transformByMatrix4 = function(tMat, bTransformFromOrigin) 
 {
 	if (tMat === undefined)
 	{ return; }
 
 	if ( this.transformedCenterPos === undefined)
-	{ this.transformedCenterPos = new Point3D(); }
+	{ 
+		this.transformedCenterPos = new Point3D(); 
+		this.transformedCenterPos.copyFrom(this.centerPos);
+	}
+
+	if (bTransformFromOrigin === undefined)
+	{ bTransformFromOrigin = false; }
 	
-	this.transformedCenterPos.copyFrom(this.centerPos);
+	if (bTransformFromOrigin)
+	{ this.transformedCenterPos.copyFrom(this.centerPos); }
 	
 	this.transformedCenterPos = tMat.transformPoint3D(this.transformedCenterPos, this.transformedCenterPos);
 	if (this.hasChildren())
