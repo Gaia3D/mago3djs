@@ -112,7 +112,7 @@ Modeler.prototype.addObject = function(object, depth)
 	this.objectsArray.push(object);
 	
 	var smartTileManager = this.magoManager.smartTileManager;
-	var targetDepth = depth ? depth : 17;
+	var targetDepth = depth ? depth : 16;
 	smartTileManager.putObject(targetDepth, object, this.magoManager);
 };
 

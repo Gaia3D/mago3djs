@@ -1127,7 +1127,7 @@ SmartTile.prototype.createGeometriesFromSeeds = function(magoManager)
 				//"id"                : f4dTileId,
 				//"tileName"          : name,
 				//"projectFolderName" : projectFolderName};
-				if (magoManager.readerWriter.smartTileF4d_requested < 2)
+				if (magoManager.readerWriter.smartTileF4d_requested < 3)
 				{
 					var readerWriter = magoManager.readerWriter;
 					var projectFolderName = smartTileF4dSeed.projectFolderName;

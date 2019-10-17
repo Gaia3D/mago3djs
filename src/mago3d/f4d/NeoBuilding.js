@@ -1086,7 +1086,7 @@ NeoBuilding.prototype.makeCollisionCheckOctree = function(desiredMinOctreeSize)
 	{ return false; }
 
 	// Using the motherOctree (this.octree), make the 1rst aproximation to the collisionCheckOctree.
-	var collisionCheckOctree = new Octree();
+	var collisionCheckOctree = new CollisionCheckOctree();
 	var octree = this.octree;
 	collisionCheckOctree.centerPos.copyFrom(octree.centerPos);
 	collisionCheckOctree.half_dx = octree.half_dx; // half width.
@@ -1383,7 +1383,7 @@ NeoBuilding.prototype.render = function(magoManager, shader, renderType, refMatr
 	// test.
 	if (this.collisionCheckOctree !== undefined)
 	{
-		this.renderCollisionCheckSpheres(magoManager, shader, renderType);
+		//this.renderCollisionCheckSpheres(magoManager, shader, renderType);
 	}
 };
 
