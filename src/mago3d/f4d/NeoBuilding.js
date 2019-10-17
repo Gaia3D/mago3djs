@@ -1023,6 +1023,9 @@ NeoBuilding.prototype.forceToLoadModelsAndReferences = function(magoManager)
 	// Load all models & references.
 	var allModelsAndReferencesAreLoaded = true;
 	
+	var options = {};
+	options.parseImmediately = true;
+	
 	var lowestOctreesArray = [];
 	this.octree.extractLowestOctreesIfHasTriPolyhedrons(lowestOctreesArray);
 	var lowestOctreesCount = lowestOctreesArray.length;
@@ -1030,6 +1033,61 @@ NeoBuilding.prototype.forceToLoadModelsAndReferences = function(magoManager)
 	{
 		var lowestOctree = lowestOctreesArray[i];
 		
+		if (lowestOctree.triPolyhedronsCount === 0) 
+		{ continue; }
+
+
+		var geometryDataPath = magoManager.readerWriter.geometryDataPath;
+		var buildingFolderName = this.buildingFileName;
+		var projectFolderName = this.projectFolderName;
+		
+		var keepDataArrayBuffers = false;
+		var attrib = this.attributes;
+		if (attrib !== undefined)
+		{
+			if (attrib.keepDataArrayBuffers !== undefined && attrib.keepDataArrayBuffers === true)
+			{
+				keepDataArrayBuffers = true;
+			}
+		}
+		
+		if (lowestOctree.neoReferencesMotherAndIndices === undefined)
+		{
+			lowestOctree.neoReferencesMotherAndIndices = new NeoReferencesMotherAndIndices();
+			lowestOctree.neoReferencesMotherAndIndices.motherNeoRefsList = this.motherNeoReferencesArray;
+		}
+		
+		if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.READY)
+		{
+			if (lowestOctree.neoReferencesMotherAndIndices.blocksList === undefined)
+			{ lowestOctree.neoReferencesMotherAndIndices.blocksList = new BlocksList("0.0.1"); }
+		
+			if (keepDataArrayBuffers)
+			{	
+				lowestOctree.neoReferencesMotherAndIndices.blocksList.keepDataArrayBuffers = keepDataArrayBuffers;
+			}
+
+			var subOctreeNumberName = lowestOctree.octree_number_name.toString();
+			var references_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/References";
+			var intRef_filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref";
+			magoManager.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, lowestOctree, magoManager, options);
+		}
+		
+		
+		// 4 = parsed.
+		// now, check if the blocksList is loaded & parsed.
+		var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
+		if (blocksList === undefined)
+		{ return; }
+		if (blocksList.fileLoadState === CODE.fileLoadState.READY) 
+		{
+			// must read blocksList.
+			var subOctreeNumberName = lowestOctree.octree_number_name.toString();
+			var blocks_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/Models";
+			var filePathInServer = blocks_folderPath + "/" + subOctreeNumberName + "_Model";
+			magoManager.readerWriter.getNeoBlocksArraybuffer(filePathInServer, lowestOctree, magoManager, options);
+		}
+		/*
 		// check if models & references is already loaded.
 		if (lowestOctree.neoReferencesMotherAndIndices === undefined || lowestOctree.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.READY)
 		{
@@ -1069,6 +1127,7 @@ NeoBuilding.prototype.forceToLoadModelsAndReferences = function(magoManager)
 			// parse models.
 			blocksList.parseBlocksListVersioned_v001(blocksList.dataArraybuffer, magoManager.readerWriter, this.motherBlocksArray, magoManager);
 		}
+		*/
 	}
 
 	return allModelsAndReferencesAreLoaded;

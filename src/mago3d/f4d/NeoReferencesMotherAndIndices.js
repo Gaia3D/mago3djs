@@ -202,9 +202,11 @@ NeoReferencesMotherAndIndices.prototype.createModelReferencedGroups = function()
  * @param neoBuilding 변수
  * @param readWriter 변수
  */
-NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = function(gl, arrayBuffer, readWriter, neoBuilding, tMatrix4, magoManager) 
+NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = function(arrayBuffer, readWriter, neoBuilding, tMatrix4, magoManager) 
 {
 	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
+	
+	var gl = magoManager.getGl();
 
 	var startBuff;
 	var endBuff;
@@ -574,9 +576,11 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
  * @param neoBuilding 변수
  * @param readWriter 변수
  */
-NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(gl, arrayBuffer, readWriter, neoBuilding, tMatrix4, magoManager) 
+NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(arrayBuffer, readWriter, neoBuilding, tMatrix4, magoManager) 
 {
 	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
+	
+	var gl = magoManager.getGl();
 
 	var startBuff;
 	var endBuff;

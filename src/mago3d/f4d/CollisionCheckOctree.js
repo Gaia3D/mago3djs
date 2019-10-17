@@ -411,21 +411,46 @@ CollisionCheckOctree.prototype.checkCollision = function(collisionOctree)
 	if (myBSphere.r > bSphere.r)
 	{
 		// check if my children collides with bSphere.
-		var childrenCount = this.subOctrees_array.length;
-		for (var i=0; i<childrenCount; i++)
+		if (this.hasChildren())
 		{
-			var subOctree = this.subOctrees_array[i];
-			subOctree.checkCollision(collisionOctree);
+			var childrenCount = this.subOctrees_array.length;
+			for (var i=0; i<childrenCount; i++)
+			{
+				var subOctree = this.subOctrees_array[i];
+				subOctree.checkCollision(collisionOctree);
+			}
+		}
+		else
+		{
+			// check if bSphere children collides with me.
+			var childrenCount = collisionOctree.subOctrees_array.length;
+			for (var i=0; i<childrenCount; i++)
+			{
+				var subOctree = collisionOctree.subOctrees_array[i];
+				this.checkCollision(subOctree);
+			}
 		}
 	}
 	else 
 	{
 		// check if bSphere children collides with me.
-		var childrenCount = collisionOctree.subOctrees_array.length;
-		for (var i=0; i<childrenCount; i++)
+		if (collisionOctree.hasChildren())
 		{
-			var subOctree = collisionOctree.subOctrees_array[i];
-			this.checkCollision(subOctree);
+			var childrenCount = collisionOctree.subOctrees_array.length;
+			for (var i=0; i<childrenCount; i++)
+			{
+				var subOctree = collisionOctree.subOctrees_array[i];
+				this.checkCollision(subOctree);
+			}
+		}
+		else
+		{
+			var childrenCount = this.subOctrees_array.length;
+			for (var i=0; i<childrenCount; i++)
+			{
+				var subOctree = this.subOctrees_array[i];
+				subOctree.checkCollision(collisionOctree);
+			}
 		}
 	}
 	

@@ -3307,13 +3307,13 @@ MagoManager.prototype.manageQueue = function()
 	this.parseQueue.initCounters();
 	
 	// parse octrees lod0 & lod1 references.***
-	this.parseQueue.parseArrayOctreesLod0References(gl, this.visibleObjControlerOctrees.currentVisibles0, this);
-	this.parseQueue.parseArrayOctreesLod0References(gl, this.visibleObjControlerOctrees.currentVisibles1, this);
+	this.parseQueue.parseArrayOctreesLod0References(this.visibleObjControlerOctrees.currentVisibles0, this);
+	this.parseQueue.parseArrayOctreesLod0References(this.visibleObjControlerOctrees.currentVisibles1, this);
 
 
 	// parse octrees lod0 & lod1 models.***
-	this.parseQueue.parseArrayOctreesLod0Models(gl, this.visibleObjControlerOctrees.currentVisibles0, this);
-	this.parseQueue.parseArrayOctreesLod0Models(gl, this.visibleObjControlerOctrees.currentVisibles1, this);
+	this.parseQueue.parseArrayOctreesLod0Models(this.visibleObjControlerOctrees.currentVisibles0, this);
+	this.parseQueue.parseArrayOctreesLod0Models(this.visibleObjControlerOctrees.currentVisibles1, this);
 	
 	
 	// parse octrees lod2 (lego).***
