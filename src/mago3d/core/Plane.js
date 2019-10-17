@@ -134,6 +134,28 @@ Plane.prototype.getRotationMatrix = function(resultTMatrix)
  * @param line 변수
  * @param intersectionPoint 변수
  */
+Plane.prototype.getProjectedPoint = function(point, resultProjectedPoint) 
+{
+	if (point === undefined)
+	{ return; }
+	
+	if (resultProjectedPoint === undefined)
+	{ resultProjectedPoint = new Point3D(); }
+	
+	var normal = this.getNormal();
+	var line = new Line();
+	line.setPointAndDir(point.x, point.y, point.z, normal.x, normal.y, normal.z);
+	
+	resultProjectedPoint = this.intersectionLine(line, resultProjectedPoint);
+	
+	return resultProjectedPoint;
+};
+
+/**
+ * Get the point of the intersecting point of line and this plane
+ * @param line 변수
+ * @param intersectionPoint 변수
+ */
 Plane.prototype.intersectionLine = function(line, intersectionPoint) 
 {
 	var r = line.point.x;

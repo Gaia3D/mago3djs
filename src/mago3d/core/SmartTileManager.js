@@ -82,15 +82,15 @@ SmartTileManager.maxDistToCameraByDepth = function(depth)
 	}
 	else if (depth === 15)
 	{
-		return 1000;
+		return 2000;
 	}
 	else if (depth === 16)
 	{
-		return 500;
+		return 1000;
 	}
 	else if (depth === 17)
 	{
-		return 200;
+		return 300;
 	}
 	else if (depth > 17)
 	{

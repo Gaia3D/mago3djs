@@ -31,6 +31,8 @@ var Modeler = function(magoManager)
 	this.excavation; // class : Excavation.
 	this.tunnel; // class : Tunnel.
 	this.bSplineCubic3d;
+	this.sphere; // class : Sphere.
+	
 	this.testObjectsArray;
 	
 	this.objectsArray; // put here all objects.***
@@ -235,6 +237,56 @@ Modeler.getExtrudedMesh = function(profile2d, extrusionDist, extrudeSegmentsCoun
 	return resultMesh;
 };
 
+Modeler.getRevolvedSolidMesh = function(profile2d, revolveAngDeg, revolveSegmentsCount, revolveSegment2d, bIncludeBottomCap, bIncludeTopCap, resultMesh) 
+{
+	// Note: move this function into "VtxProfilesList" class.
+	if (profile2d === undefined)
+	{ return undefined; }
+
+	var vtxProfilesList = new VtxProfilesList(); 
+	
+	// if want caps in the extruded mesh, must calculate "ConvexFacesIndicesData" of the profile2d before creating vtxProfiles.
+	vtxProfilesList.convexFacesIndicesData = profile2d.getConvexFacesIndicesData(undefined);
+	//profile2d.checkNormals();
+	// create vtxProfiles.
+	// make the base-vtxProfile.
+	var baseVtxProfile = vtxProfilesList.newVtxProfile();
+	baseVtxProfile.makeByProfile2D(profile2d);
+	
+	var increAngDeg = revolveAngDeg/revolveSegmentsCount;
+	
+	// calculate the translation.
+	var line2d = revolveSegment2d.getLine();
+	var origin2d = new Point2D(0, 0);
+	var translationVector = line2d.getProjectedPoint(origin2d);
+	translationVector.inverse();
+	
+	var rotMat = new Matrix4();
+	var quaternion = new Quaternion();
+	var rotAxis2d = revolveSegment2d.getDirection();
+	var rotAxis = new Point3D(rotAxis2d.x, rotAxis2d.y, 0);
+	rotAxis.unitary();
+	
+	for (var i=0; i<revolveSegmentsCount; i++)
+	{
+		// calculate rotation.
+		quaternion.rotationAngDeg(increAngDeg*(i+1), rotAxis.x, rotAxis.y, rotAxis.z);
+		rotMat.rotationByQuaternion(quaternion);
+		
+		// test top profile.
+		var nextVtxProfile = vtxProfilesList.newVtxProfile();
+		nextVtxProfile.copyFrom(baseVtxProfile);
+		nextVtxProfile.translate(translationVector.x, translationVector.y, 0);
+		nextVtxProfile.transformPointsByMatrix4(rotMat);
+		nextVtxProfile.translate(-translationVector.x, -translationVector.y, 0);
+	}
+	
+	resultMesh = vtxProfilesList.getMesh(resultMesh, bIncludeBottomCap, bIncludeTopCap);
+	resultMesh.calculateVerticesNormals();
+	
+	return resultMesh;
+};
+
 /**
  * 어떤 일을 하고 있습니까?
  */
@@ -325,6 +377,11 @@ Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive
 	if (this.bSplineCubic3d !== undefined)
 	{
 		this.bSplineCubic3d.renderPoints(magoManager, shader, renderType);
+	}
+	
+	if (this.sphere !== undefined)
+	{
+		this.sphere.render(magoManager, shader, renderType);
 	}
 	
 };

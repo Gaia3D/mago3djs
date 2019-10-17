@@ -295,9 +295,37 @@ BoundingBox.prototype.getZLength = function()
 BoundingBox.prototype.getCenterPoint = function(result) 
 {
 	if ( result === undefined ) { result = new Point3D(); }
-
 	result.set((this.maxX + this.minX)/2, (this.maxY + this.minY)/2, (this.maxZ + this.minZ)/2);
+	return result;
+};
 
+/**
+ * Get the center point of this box
+ * 영역박스의 중심점을 구한다.
+ * 
+ * @param {Point3D} result 영역박스의 중심점
+ * 
+ * @returns {Point3D} 영역박스의 중심점
+ */
+BoundingBox.prototype.getMinPoint = function(result) 
+{
+	if ( result === undefined ) { result = new Point3D(); }
+	result.set(this.minX, this.minY, this.minZ);
+	return result;
+};
+
+/**
+ * Get the center point of this box
+ * 영역박스의 중심점을 구한다.
+ * 
+ * @param {Point3D} result 영역박스의 중심점
+ * 
+ * @returns {Point3D} 영역박스의 중심점
+ */
+BoundingBox.prototype.getMaxPoint = function(result) 
+{
+	if ( result === undefined ) { result = new Point3D(); }
+	result.set(this.maxX, this.maxY, this.maxZ);
 	return result;
 };
 
@@ -328,6 +356,19 @@ BoundingBox.prototype.getRadiusAprox = function()
 {
 	var maxLength = this.getMaxLength();
 	return maxLength/1.5;
+};
+
+/**
+ * 
+ * 영역박스의 중심점을 구한다.
+ * 
+ * @returns {Number} apriximately radius.
+ */
+BoundingBox.prototype.getRadius = function() 
+{
+	var centerPoint = this.getCenterPoint();
+	var minPoint = this.getMinPoint();
+	return centerPoint.distToPoint(minPoint);
 };
 
 /**
@@ -414,6 +455,335 @@ BoundingBox.prototype.intersectWithBox = function(box)
 		return false;
 	}
 
+	return true;
+};
+
+/**
+ * Check whether this box and the given box are intersected by each others.
+ * 영역박스와 주어진 영역박스와의 교차 여부를 판단
+ * 
+ * @param {Triangle} triangle
+ * @returns {Boolean} the flag whether they are intersected or not 교차 여부 
+ */
+BoundingBox.prototype.getPlaneTop = function(resultPlane) 
+{
+	if (resultPlane === undefined)
+	{ resultPlane = new Plane(); }
+	
+	var point = this.getMaxPoint();
+	resultPlane.setPointAndNormal(point.x, point.y, point.z, 0, 0, 1);
+	
+	return resultPlane;
+};
+
+/**
+ * Check whether this box and the given box are intersected by each others.
+ * 영역박스와 주어진 영역박스와의 교차 여부를 판단
+ * 
+ * @param {Triangle} triangle
+ * @returns {Boolean} the flag whether they are intersected or not 교차 여부 
+ */
+BoundingBox.prototype.getPlaneBottom = function(resultPlane) 
+{
+	if (resultPlane === undefined)
+	{ resultPlane = new Plane(); }
+	
+	var point = this.getMinPoint();
+	resultPlane.setPointAndNormal(point.x, point.y, point.z, 0, 0, -1);
+	
+	return resultPlane;
+};
+
+/**
+ * Check whether this box and the given box are intersected by each others.
+ * 영역박스와 주어진 영역박스와의 교차 여부를 판단
+ * 
+ * @param {Triangle} triangle
+ * @returns {Boolean} the flag whether they are intersected or not 교차 여부 
+ */
+BoundingBox.prototype.getPlaneFront = function(resultPlane) 
+{
+	if (resultPlane === undefined)
+	{ resultPlane = new Plane(); }
+	
+	var point = this.getMinPoint();
+	resultPlane.setPointAndNormal(point.x, point.y, point.z, 0, -1, 0);
+	
+	return resultPlane;
+};
+
+/**
+ * Check whether this box and the given box are intersected by each others.
+ * 영역박스와 주어진 영역박스와의 교차 여부를 판단
+ * 
+ * @param {Triangle} triangle
+ * @returns {Boolean} the flag whether they are intersected or not 교차 여부 
+ */
+BoundingBox.prototype.getPlaneRear = function(resultPlane) 
+{
+	if (resultPlane === undefined)
+	{ resultPlane = new Plane(); }
+	
+	var point = this.getMaxPoint();
+	resultPlane.setPointAndNormal(point.x, point.y, point.z, 0, 1, 0);
+	
+	return resultPlane;
+};
+
+/**
+ * Check whether this box and the given box are intersected by each others.
+ * 영역박스와 주어진 영역박스와의 교차 여부를 판단
+ * 
+ * @param {Triangle} triangle
+ * @returns {Boolean} the flag whether they are intersected or not 교차 여부 
+ */
+BoundingBox.prototype.getPlaneLeft = function(resultPlane) 
+{
+	if (resultPlane === undefined)
+	{ resultPlane = new Plane(); }
+	
+	var point = this.getMinPoint();
+	resultPlane.setPointAndNormal(point.x, point.y, point.z, -1, 0, 0);
+	
+	return resultPlane;
+};
+
+/**
+ * Check whether this box and the given box are intersected by each others.
+ * 영역박스와 주어진 영역박스와의 교차 여부를 판단
+ * 
+ * @param {Triangle} triangle
+ * @returns {Boolean} the flag whether they are intersected or not 교차 여부 
+ */
+BoundingBox.prototype.getPlaneRight = function(resultPlane) 
+{
+	if (resultPlane === undefined)
+	{ resultPlane = new Plane(); }
+	
+	var point = this.getMaxPoint();
+	resultPlane.setPointAndNormal(point.x, point.y, point.z, 1, 0, 0);
+	
+	return resultPlane;
+};
+
+/**
+ * Check whether this box and the given box are intersected by each others.
+ * 영역박스와 주어진 영역박스와의 교차 여부를 판단
+ * 
+ * @param {Triangle} triangle
+ * @returns {Boolean} the flag whether they are intersected or not 교차 여부 
+ */
+BoundingBox.prototype.isPoint3dInsideXYPrism = function(point3d) 
+{
+	if (point3d === undefined)
+	{ return false; }
+	
+	if (point3d.x < this.minX || point3d.x > this.maxX || 
+		point3d.y < this.minY || point3d.y > this.maxY) 
+	{
+		return false;
+	}
+	
+	return true;
+};
+
+/**
+ * Check whether this box and the given box are intersected by each others.
+ * 영역박스와 주어진 영역박스와의 교차 여부를 판단
+ * 
+ * @param {Triangle} triangle
+ * @returns {Boolean} the flag whether they are intersected or not 교차 여부 
+ */
+BoundingBox.prototype.isPoint3dInsideXZPrism = function(point3d) 
+{
+	if (point3d === undefined)
+	{ return false; }
+	
+	if (point3d.x < this.minX || point3d.x > this.maxX || 
+		point3d.z < this.minZ || point3d.z > this.maxZ) 
+	{
+		return false;
+	}
+	
+	return true;
+};
+
+/**
+ * Check whether this box and the given box are intersected by each others.
+ * 영역박스와 주어진 영역박스와의 교차 여부를 판단
+ * 
+ * @param {Triangle} triangle
+ * @returns {Boolean} the flag whether they are intersected or not 교차 여부 
+ */
+BoundingBox.prototype.isPoint3dInsideYZPrism = function(point3d) 
+{
+	if (point3d === undefined)
+	{ return false; }
+	
+	if (point3d.y < this.minY || point3d.y > this.maxY ||
+		point3d.z < this.minZ || point3d.z > this.maxZ) 
+	{
+		return false;
+	}
+	
+	return true;
+};
+
+/**
+ * Check whether this box and the given box are intersected by each others.
+ * 영역박스와 주어진 영역박스와의 교차 여부를 판단
+ * 
+ * @param {Triangle} triangle
+ * @returns {Boolean} the flag whether they are intersected or not 교차 여부 
+ */
+BoundingBox.prototype.intersectsWithSegment3D = function(segment3d) 
+{
+	if (segment3d === undefined)
+	{ return false; }
+	
+	var line = segment3d.getLine();
+	
+	// 1) Top.
+	var plane = this.getPlaneTop();
+	var intersectionPoint = plane.intersectionLine(line, intersectionPoint);
+	if (intersectionPoint !== undefined)
+	{
+		// check if the intersectionPoint is inside of the top rectangle.
+		if (this.isPoint3dInsideXYPrism(intersectionPoint))
+		{ 
+			// check if intersectionPoint is inside of the segment3d.
+			if (segment3d.intersectionWithPoint(intersectionPoint))
+			{ return true; }
+		}
+	}
+	
+	// 2) Bottom.
+	var plane = this.getPlaneBottom();
+	var intersectionPoint = plane.intersectionLine(line, intersectionPoint);
+	if (intersectionPoint !== undefined)
+	{
+		// check if the intersectionPoint is inside of the top rectangle.
+		if (this.isPoint3dInsideXYPrism(intersectionPoint))
+		{ 
+			// check if intersectionPoint is inside of the segment3d.
+			if (segment3d.intersectionWithPoint(intersectionPoint))
+			{ return true; }
+		}
+	}
+	
+	// 3) Front.
+	var plane = this.getPlaneFront();
+	var intersectionPoint = plane.intersectionLine(line, intersectionPoint);
+	if (intersectionPoint !== undefined)
+	{
+		// check if the intersectionPoint is inside of the top rectangle.
+		if (this.isPoint3dInsideXZPrism(intersectionPoint))
+		{ 
+			// check if intersectionPoint is inside of the segment3d.
+			if (segment3d.intersectionWithPoint(intersectionPoint))
+			{ return true; }
+		}
+	}
+	
+	// 4) Rear.
+	var plane = this.getPlaneRear();
+	var intersectionPoint = plane.intersectionLine(line, intersectionPoint);
+	if (intersectionPoint !== undefined)
+	{
+		// check if the intersectionPoint is inside of the top rectangle.
+		if (this.isPoint3dInsideXZPrism(intersectionPoint))
+		{ 
+			// check if intersectionPoint is inside of the segment3d.
+			if (segment3d.intersectionWithPoint(intersectionPoint))
+			{ return true; }
+		}
+	}
+	
+	// 5) Left.
+	var plane = this.getPlaneLeft();
+	var intersectionPoint = plane.intersectionLine(line, intersectionPoint);
+	if (intersectionPoint !== undefined)
+	{
+		// check if the intersectionPoint is inside of the top rectangle.
+		if (this.isPoint3dInsideYZPrism(intersectionPoint))
+		{ 
+			// check if intersectionPoint is inside of the segment3d.
+			if (segment3d.intersectionWithPoint(intersectionPoint))
+			{ return true; }
+		}
+	}
+	
+	// 6) Right.
+	var plane = this.getPlaneRight();
+	var intersectionPoint = plane.intersectionLine(line, intersectionPoint);
+	if (intersectionPoint !== undefined)
+	{
+		// check if the intersectionPoint is inside of the top rectangle.
+		if (this.isPoint3dInsideYZPrism(intersectionPoint))
+		{ 
+			// check if intersectionPoint is inside of the segment3d.
+			if (segment3d.intersectionWithPoint(intersectionPoint))
+			{ return true; }
+		}
+	}
+	
+	return false;
+};
+
+/**
+ * Check whether this box and the given box are intersected by each others.
+ * 영역박스와 주어진 영역박스와의 교차 여부를 판단
+ * 
+ * @param {Triangle} triangle
+ * @returns {Boolean} the flag whether they are intersected or not 교차 여부 
+ */
+BoundingBox.prototype.intersectsWithTriangle = function(triangle) 
+{
+	if (triangle === undefined)
+	{ return false; }
+
+	var normal = triangle.getPlaneNormal();
+	if (normal.isNAN())
+	{ return false; }
+	
+	// 1) check if intersects with triangle'sBbox.
+	var triBbox = triangle.getBoundingBox();
+	if (!this.intersectsWithBBox(triBbox))
+	{ return false; }
+
+	// 2) check if some vertex is inside of the this bbox.
+	if (this.intersectWithPoint(triangle.vertex0.getPosition()) || this.intersectWithPoint(triangle.vertex1.getPosition()) || this.intersectWithPoint(triangle.vertex2.getPosition()))
+	{ return true; }
+
+	// 3) check if the bbox is near of the triangle's plane.
+	var trianglesPlane = triangle.getPlane();
+	var centerPoint = this.getCenterPoint();
+	var projectedPoint = trianglesPlane.getProjectedPoint(centerPoint);
+	
+	var dist = centerPoint.distToPoint(projectedPoint);
+	var radius = this.getRadius();
+	if (dist > radius)
+	{
+		return false;
+	}
+	
+	// 4) check if some edge of the triangle intersects with this bbox.
+	for (var i=0; i<3; i++)
+	{
+		var trianglesSegment3d = triangle.getSegment(i, trianglesSegment3d);
+		if (this.intersectsWithSegment3D(trianglesSegment3d))
+		{ return true; }
+	}
+	
+	// 5) finally, check if the bbox is inside of the triangle.
+	var bestPlane = Face.getBestFacePlaneToProject(normal);
+	
+	var triangle2d = GeometryUtils.projectTriangle3DInToBestPlaneToProject(triangle, bestPlane, undefined);
+	var point2d = GeometryUtils.projectPoint3DInToBestPlaneToProject(centerPoint, bestPlane, undefined);
+	
+	if (!triangle2d.isPoint2dInside(point2d))
+	{ return false; }
+	
 	return true;
 };
 

@@ -32,6 +32,49 @@ var Segment3D = function(strPoint3D, endPoint3D)
  * @param {Point3D} strPoint3D 시작 포인트
  * @param {Point3D} endPoint3D 종료 포인트
  */
+Segment3D.prototype.intersectionWithPoint = function(point, error)
+{
+	if (point === undefined)
+	{ return false; }
+	
+	// calculate the distance.
+	if (error === undefined)
+	{ error = 10E-8; }
+	
+	var totalLength = this.getLength();
+	var distA = this.startPoint3d.distToPoint(point);
+	var distB = this.endPoint3d.distToPoint(point);
+	
+	var diff = totalLength - distA - distB;
+	if (Math.abs(diff) < error)
+	{ return true; }
+	
+	return false;
+};
+
+/**
+ * 선분에 포인트를 설정한다.
+ *
+ * @param {Point3D} strPoint3D 시작 포인트
+ * @param {Point3D} endPoint3D 종료 포인트
+ */
+Segment3D.prototype.getLine = function(resultLine)
+{
+	if (resultLine === undefined)
+	{ resultLine = new Line(); }
+	
+	var direction = this.getDirection();
+	resultLine.setPointAndDir(this.startPoint3d.x, this.startPoint3d.y, this.startPoint3d.z, direction.x, direction.y, direction.z);
+	
+	return resultLine;
+};
+
+/**
+ * 선분에 포인트를 설정한다.
+ *
+ * @param {Point3D} strPoint3D 시작 포인트
+ * @param {Point3D} endPoint3D 종료 포인트
+ */
 Segment3D.prototype.setPoints = function(strPoint3D, endPoint3D)
 {
 	if (strPoint3D)
