@@ -125,6 +125,10 @@ var CollisionCheckOctree = function(octreeOwner)
 	
 	// auxiliar triangles array.
 	this.trianglesArray;
+	
+	this.collisionState = false;
+	this.boundingSphere;
+	this.collidedWithMeCollisionOctreesArray;
 };
 
 /**
@@ -207,6 +211,17 @@ CollisionCheckOctree.prototype.extractLowestOctreesIfHasTriangles = function(low
 			this.subOctrees_array[i].extractLowestOctreesIfHasTriangles(lowestOctreesArray);
 		}
 	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param treeDepth 변수
+ */
+CollisionCheckOctree.prototype.hasChildren = function() 
+{
+	if (this.subOctrees_array !== undefined && this.subOctrees_array.length > 0)
+	{ return true; }
+	else { return false; }
 };
 
 /**
@@ -310,10 +325,6 @@ CollisionCheckOctree.prototype.setBoxSize = function(Min_X, Max_X, Min_Y, Max_Y,
 
 /**
  * 어떤 일을 하고 있습니까?
- * @param x 변수
- * @param y 변수
- * @param z 변수
- * @returns intersects
  */
 CollisionCheckOctree.prototype.getBoundingBox = function(resultBbox) 
 {
@@ -324,6 +335,87 @@ CollisionCheckOctree.prototype.getBoundingBox = function(resultBbox)
 		this.centerPos.x + this.half_dx, this.centerPos.y + this.half_dy, this.centerPos.z + this.half_dz);
 	
 	return resultBbox;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+CollisionCheckOctree.prototype.getRadius = function() 
+{
+	var bbox = this.getBoundingBox();
+	return bbox.getRadius();
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+CollisionCheckOctree.prototype.getBoundingSphere = function() 
+{
+	if ( this.boundingSphere === undefined)
+	{ this.boundingSphere = new BoundingSphere(this.centerPos.x, this.centerPos.y, this.centerPos.z, this.getRadius()); }
+
+	return this.boundingSphere;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns intersects
+ */
+CollisionCheckOctree.prototype.checkCollision = function(collisionOctree) 
+{
+	if (collisionOctree === undefined)
+	{ return false; }
+	
+	var myBSphere = this.boundingSphere();
+	var bSphere = collisionOctree.boundingSphere();
+	
+	var collisionType = myBSphere.intersectsWithBSphere(bSphere);
+	if (collisionType === Constant.INTERSECTION_OUTSIDE)
+	{ return false; }
+
+	//if(collisionType === Constant.INTERSECTION_INSIDE)
+	//{
+	//	
+	//}
+	//else if(collisionType === Constant.INTERSECTION_INTERSECT)
+	//{
+	//	
+	//}
+	
+	// check the radius of the spheres, and, the bigger collisionOctree descends.
+	// check if the collisionOctrees has children.
+	if (!this.hasChildren() && !collisionOctree.hasChildren())
+	{
+		// process finished.
+		this.collidedWithMeCollisionOctreesArray.length = 0; //init.
+		collisionOctree.collidedWithMeCollisionOctreesArray.length = 0; //init.
+		
+		this.collidedWithMeCollisionOctreesArray.push(collisionOctree);
+		collisionOctree.collidedWithMeCollisionOctreesArray.push(this);
+		return true;
+	}
+	
+	if (myBSphere.r > bSphere.r)
+	{
+		// check if my children collides with bSphere.
+		var childrenCount = this.subOctrees_array.length;
+		for (var i=0; i<childrenCount; i++)
+		{
+			var subOctree = this.subOctrees_array[i];
+			subOctree.checkCollision(collisionOctree);
+		}
+	}
+	else 
+	{
+		// check if bSphere children collides with me.
+		var childrenCount = collisionOctree.subOctrees_array.length;
+		for (var i=0; i<childrenCount; i++)
+		{
+			var subOctree = collisionOctree.subOctrees_array[i];
+			this.checkCollision(subOctree);
+		}
+	}
+	
 };
 
 
