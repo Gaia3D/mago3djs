@@ -39,18 +39,17 @@ CollisionCheckScene.prototype.doCheck = function()
 	for (var i=0; i<extrasCount; i++)
 	{
 		var extra = this.extrasArray[i];
+		var extraNeoBuilding = extra.data.neobuilding;
 		
+		if (extraNeoBuilding === undefined)
+		{ continue; }
+		
+		var extraCollisionOctree = extraNeoBuilding.getCollisionCheckOctree();
+		if (extraCollisionOctree === undefined)
+		{ continue; }
+		
+		heroCollisionOctree.checkCollision(extraCollisionOctree);
 	}
 	
 };
 
-/**
- * 어떤 일을 하고 있습니까?
- */
-CollisionCheckScene.prototype.checkCollision = function(collisionOctreeA, collisionOctreeB) 
-{
-	if (collisionOctreeA === undefined || collisionOctreeB === undefined)
-	{ return; }
-
-	
-};
