@@ -375,7 +375,7 @@ function loadWithXhr_deprecated(fileName, xhr, timeOut)
 	return deferred.promise();
 };
 
-ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, lowestOctree, magoManager) 
+ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, lowestOctree, magoManager, options) 
 {
 	magoManager.fileRequestControler.modelRefFilesRequestedCount += 1;
 	var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
@@ -383,6 +383,13 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, lowestOctree
 	var xhr;
 	//xhr = new XMLHttpRequest();
 	blocksList.xhr = xhr; // possibility to cancel.***
+	
+	var parseImmediately = false;
+	if (options !== undefined)
+	{
+		if (options.parseImmediately !== undefined)
+		{ parseImmediately = options.parseImmediately; }
+	}
 	
 	this.blocksList_requested++;
 	
@@ -395,8 +402,15 @@ ReaderWriter.prototype.getNeoBlocksArraybuffer = function(fileName, lowestOctree
 			blocksList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 			arrayBuffer = null;
 			
-			
-			magoManager.parseQueue.putOctreeLod0ModelsToParse(lowestOctree);
+			if (parseImmediately)
+			{
+				// parse immediately.
+				ParseQueue.parseArrayOctreesLod0Models(lowestOctree, magoManager);
+			}
+			else 
+			{
+				magoManager.parseQueue.putOctreeLod0ModelsToParse(lowestOctree);
+			}
 		}
 		else 
 		{
@@ -472,6 +486,12 @@ ReaderWriter.prototype.getNeoReferencesArraybuffer = function(fileName, lowestOc
 	var xhr;
 	//xhr = new XMLHttpRequest();
 	lowestOctree.neoReferencesMotherAndIndices.xhr = xhr;
+	var parseImmediately = false;
+	if (options !== undefined)
+	{
+		if (options.parseImmediately !== undefined)
+		{ parseImmediately = options.parseImmediately; }
+	}
 	
 	this.referencesList_requested++;
 	loadWithXhr(fileName, xhr).then(function(response) 
@@ -484,7 +504,15 @@ ReaderWriter.prototype.getNeoReferencesArraybuffer = function(fileName, lowestOc
 			{
 				neoRefsList.dataArraybuffer = arrayBuffer;
 				neoRefsList.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-				magoManager.parseQueue.putOctreeLod0ReferencesToParse(lowestOctree);
+				if (parseImmediately)
+				{
+					// parse immediately.
+					ParseQueue.parseOctreesLod0References(lowestOctree, magoManager);
+				}
+				else 
+				{
+					magoManager.parseQueue.putOctreeLod0ReferencesToParse(lowestOctree);
+				}
 			}
 			arrayBuffer = null;
 			

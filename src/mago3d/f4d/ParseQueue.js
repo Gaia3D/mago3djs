@@ -397,7 +397,38 @@ ParseQueue.prototype.parseArrayOctreesLod2Legos = function(gl, octreesArray, mag
 	}
 };
 
-ParseQueue.prototype.parseArrayOctreesLod0Models = function(gl, octreesArray, magoManager)
+ParseQueue.parseArrayOctreesLod0Models = function(lowestOctree, magoManager)
+{
+	if (lowestOctree.neoReferencesMotherAndIndices === undefined)
+	{ return; }
+	
+	var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
+	if (blocksList === undefined)
+	{ return; }
+	
+	var neoBuilding = lowestOctree.neoBuildingOwner;
+	var headerVersion = neoBuilding.getHeaderVersion();
+	
+	if (blocksList.dataArraybuffer === undefined)
+	{ return; }
+
+	if (blocksList.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
+	{ return; }
+	
+	if (headerVersion[0] === "v")
+	{
+		// parse the beta version.***
+		blocksList.parseBlocksList(blocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray, magoManager);
+	}
+	else if (headerVersion === "0.0.1" || headerVersion === "0.0.2")
+	{
+		// parse versioned.***
+		blocksList.parseBlocksListVersioned_v001(blocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray, magoManager);
+	}
+	blocksList.dataArraybuffer = undefined;
+};
+
+ParseQueue.prototype.parseArrayOctreesLod0Models = function(octreesArray, magoManager)
 {
 	if (Object.keys(this.octreesLod0ModelsToParseMap).length > 0)
 	{
@@ -413,40 +444,9 @@ ParseQueue.prototype.parseArrayOctreesLod0Models = function(gl, octreesArray, ma
 		{
 			lowestOctree = octreesArray[i];
 			
-			// Temp code.******************************************
-			neoBuilding = lowestOctree.neoBuildingOwner;
-			headerVersion = neoBuilding.getHeaderVersion();
-			// End temp code.---------------------------------------
-			
 			if (this.eraseOctreeLod0ModelsToParse(lowestOctree))
 			{
-				if (lowestOctree.neoReferencesMotherAndIndices === undefined)
-				{ continue; }
-				
-				var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
-				if (blocksList === undefined)
-				{ continue; }
-				
-				neoBuilding = lowestOctree.neoBuildingOwner;
-				headerVersion = neoBuilding.getHeaderVersion();
-				
-				if (blocksList.dataArraybuffer === undefined)
-				{ continue; }
-			
-				if (blocksList.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
-				{ continue; }
-				
-				if (headerVersion[0] === "v")
-				{
-					// parse the beta version.***
-					blocksList.parseBlocksList(blocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray, magoManager);
-				}
-				else if (headerVersion === "0.0.1" || headerVersion === "0.0.2")
-				{
-					// parse versioned.***
-					blocksList.parseBlocksListVersioned_v001(blocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray, magoManager);
-				}
-				blocksList.dataArraybuffer = undefined;
+				ParseQueue.parseArrayOctreesLod0Models(lowestOctree, magoManager);
 				octreesParsedCount++;
 			}
 
@@ -461,33 +461,7 @@ ParseQueue.prototype.parseArrayOctreesLod0Models = function(gl, octreesArray, ma
 				var lowestOctree = this.octreesLod0ModelsToParseMap[key];
 				if(this.eraseOctreeLod0ModelsToParse(lowestOctree))
 				{
-					if (lowestOctree.neoReferencesMotherAndIndices === undefined)
-					{ continue; }
-					
-					var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
-					if (blocksList === undefined)
-					{ continue; }
-					
-					if (blocksList.dataArraybuffer === undefined)
-					{ continue; }
-				
-					if (blocksList.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
-					{ continue; }
-					
-					neoBuilding = lowestOctree.neoBuildingOwner;
-					headerVersion = neoBuilding.getHeaderVersion();
-				
-					if (headerVersion[0] === "v")
-					{
-						// parse the beta version.
-						blocksList.parseBlocksList(blocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray, magoManager);
-					}
-					else 
-					{
-						// parse versioned.
-						blocksList.parseBlocksListVersioned(blocksList.dataArraybuffer, magoManager.readerWriter, neoBuilding.motherBlocksArray, magoManager);
-					}
-					blocksList.dataArraybuffer = undefined;
+					ParseQueue.parseArrayOctreesLod0Models(lowestOctree, magoManager);
 					octreesParsedCount++;
 					if (octreesParsedCount > maxParsesCount)
 					{ break; }	
@@ -506,7 +480,7 @@ ParseQueue.prototype.parseArrayOctreesLod0Models = function(gl, octreesArray, ma
 	}
 };
 
-ParseQueue.prototype.parseArrayOctreesLod0References = function(gl, octreesArray, magoManager)
+ParseQueue.prototype.parseArrayOctreesLod0References = function(octreesArray, magoManager)
 {
 	if (Object.keys(this.octreesLod0ReferencesToParseMap).length > 0)
 	{
@@ -519,7 +493,7 @@ ParseQueue.prototype.parseArrayOctreesLod0References = function(gl, octreesArray
 		for (var i=0; i<octreesLod0Count; i++)
 		{
 			lowestOctree = octreesArray[i];
-			if (this.parseOctreesLod0References(gl, lowestOctree, magoManager))
+			if (this.parseOctreesLod0References(lowestOctree, magoManager))
 			{
 				octreesParsedCount++;
 			}
@@ -533,7 +507,7 @@ ParseQueue.prototype.parseArrayOctreesLod0References = function(gl, octreesArray
 			for (var key in this.octreesLod0ReferencesToParseMap)
 			{
 				var lowestOctree = this.octreesLod0ReferencesToParseMap[key];
-				if(this.parseOctreesLod0References(gl, lowestOctree, magoManager))
+				if(this.parseOctreesLod0References(lowestOctree, magoManager))
 				{
 					octreesParsedCount++;
 					if (octreesParsedCount > maxParsesCount)
@@ -551,64 +525,70 @@ ParseQueue.prototype.parseArrayOctreesLod0References = function(gl, octreesArray
 	}
 };
 
-ParseQueue.prototype.parseOctreesLod0References = function(gl, lowestOctree, magoManager)
+ParseQueue.prototype.parseOctreesLod0References = function(lowestOctree, magoManager)
 {
 	var parsed = false;
 	if (this.eraseOctreeLod0ReferencesToParse(lowestOctree))
 	{
-		if (lowestOctree.neoReferencesMotherAndIndices === undefined)
-		{ return false; }
-		
-		if (lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer === undefined)
-		{ return false; }
-	
-		if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
-		{ return false; }
-		
-		var neoBuilding = lowestOctree.neoBuildingOwner;
-				
-		var node = neoBuilding.nodeOwner;
-		var rootNode;
-		if (node)
-		{ rootNode = node.getRoot(); }
-		else
-		{ rootNode = undefined; }
-		
-		if (rootNode === undefined)
-		{ return false; }
-		
-		if (rootNode.data === undefined)
-		{ return false; }
-		
-		var geoLocDataManager = rootNode.data.geoLocDataManager;
-		
-		if (geoLocDataManager === undefined)
-		{ return false; }
-	
-		if (this.matrix4SC === undefined)
-		{ this.matrix4SC = new Matrix4(); }
-		
-		var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
-		var headerVersion = neoBuilding.getHeaderVersion();
-		this.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
-		if (headerVersion[0] === "v")
-		{
-			// parse beta version.
-			lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, 
-				magoManager.readerWriter, neoBuilding, this.matrix4SC, magoManager);
-		}
-		else 
-		{
-			// parse vesioned.
-			lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferencesVersioned(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, 
-				magoManager.readerWriter, neoBuilding, this.matrix4SC, magoManager);
-		}
-		lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
-		lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer = undefined;
+		ParseQueue.parseOctreesLod0References(lowestOctree, magoManager);
 		parsed = true;
 	}
 	
 	return parsed;
+};
+
+ParseQueue.parseOctreesLod0References = function(lowestOctree, magoManager)
+{
+	if (lowestOctree.neoReferencesMotherAndIndices === undefined)
+	{ return false; }
+	
+	if (lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer === undefined)
+	{ return false; }
+
+	if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
+	{ return false; }
+	
+	var neoBuilding = lowestOctree.neoBuildingOwner;
+			
+	var node = neoBuilding.nodeOwner;
+	var rootNode;
+	if (node)
+	{ rootNode = node.getRoot(); }
+	else
+	{ rootNode = undefined; }
+	
+	if (rootNode === undefined)
+	{ return false; }
+	
+	if (rootNode.data === undefined)
+	{ return false; }
+	
+	var geoLocDataManager = rootNode.data.geoLocDataManager;
+	
+	if (geoLocDataManager === undefined)
+	{ return false; }
+
+	if (magoManager.matrix4SC === undefined)
+	{ magoManager.matrix4SC = new Matrix4(); }
+	
+	var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
+	var headerVersion = neoBuilding.getHeaderVersion();
+	magoManager.matrix4SC.setByFloat32Array(buildingGeoLocation.rotMatrix._floatArrays);
+	if (headerVersion[0] === "v")
+	{
+		// parse beta version.
+		lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferences(lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, 
+			magoManager.readerWriter, neoBuilding, magoManager.matrix4SC, magoManager);
+	}
+	else 
+	{
+		// parse vesioned.
+		lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferencesVersioned(lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, 
+			magoManager.readerWriter, neoBuilding, magoManager.matrix4SC, magoManager);
+	}
+	lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
+	lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer = undefined;
+	return true;
 };
 
 
