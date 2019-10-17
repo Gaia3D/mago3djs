@@ -27,7 +27,7 @@ CollisionCheckScene.prototype.doCheck = function()
 	if (this.extrasArray === undefined || this.extrasArray.length === 0)
 	{ return false; }
 
-	var heroNeoBuilding = this.hero.data.neobuilding;
+	var heroNeoBuilding = this.hero.data.neoBuilding;
 	if (heroNeoBuilding === undefined)
 	{ return false; }
 
@@ -39,7 +39,7 @@ CollisionCheckScene.prototype.doCheck = function()
 	for (var i=0; i<extrasCount; i++)
 	{
 		var extra = this.extrasArray[i];
-		var extraNeoBuilding = extra.data.neobuilding;
+		var extraNeoBuilding = extra.data.neoBuilding;
 		
 		if (extraNeoBuilding === undefined)
 		{ continue; }
