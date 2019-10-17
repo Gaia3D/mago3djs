@@ -19,7 +19,7 @@ var CollisionCheckScene = function()
 /**
  * 어떤 일을 하고 있습니까?
  */
-CollisionCheckScene.prototype.doCheck = function() 
+CollisionCheckScene.prototype.doCheck = function(resultCollidedOctreesArray) 
 {
 	if (this.hero === undefined)
 	{ return false; }
@@ -34,6 +34,9 @@ CollisionCheckScene.prototype.doCheck = function()
 	var heroCollisionOctree = heroNeoBuilding.getCollisionCheckOctree();
 	if (heroCollisionOctree === undefined)
 	{ return false; }
+	
+	if (resultCollidedOctreesArray === undefined)
+	{ resultCollidedOctreesArray = []; }
 
 	var extrasCount = this.extrasArray.length;
 	for (var i=0; i<extrasCount; i++)
@@ -48,7 +51,7 @@ CollisionCheckScene.prototype.doCheck = function()
 		if (extraCollisionOctree === undefined)
 		{ continue; }
 		
-		heroCollisionOctree.checkCollision(extraCollisionOctree);
+		heroCollisionOctree.checkCollision(extraCollisionOctree, resultCollidedOctreesArray);
 	}
 	
 };

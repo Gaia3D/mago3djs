@@ -119,6 +119,37 @@ Modeler.prototype.addObject = function(object, depth)
 /**
  * 모델러에 콘센트릭튜브 추가
  * @param {Object}
+ * @param {number}} depth Optional. 설정 시 해당 depth로 targetDepth 설정
+ */
+Modeler.prototype.addBoundingSpheres__TEST = function(boundingSpheresArray, depth) 
+{
+	if (boundingSpheresArray === undefined || boundingSpheresArray.length === 0)
+	{ return; }
+	
+	var bSpheresCount = boundingSpheresArray.length;
+	for (var i=0; i<bSpheresCount; i++)
+	{
+		var bSphere = boundingSpheresArray[i];
+		var geoCoord = ManagerUtils.pointToGeographicCoord(bSphere.centerPoint, undefined, this.magoManager);
+		var geoLocDataManager = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude, 0, 0, 0, undefined, this.magoManager);
+		
+		var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+		geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude, undefined, undefined, undefined, geoLocData, this);
+		
+		var options = {};
+		var color = new Color();
+		color.setRGB(0.99, 0.1, 0.1);
+		options.color = color;
+		var sphere = new Sphere(options);
+		sphere.geoLocDataManager = geoLocDataManager;
+		sphere.setRadius(bSphere.r * 2);
+		this.addObject(sphere, depth);
+	}
+};
+
+/**
+ * 모델러에 콘센트릭튜브 추가
+ * @param {Object}
  */
 Modeler.prototype.removeObject = function(object) 
 {

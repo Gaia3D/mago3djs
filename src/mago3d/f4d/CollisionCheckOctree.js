@@ -374,7 +374,7 @@ CollisionCheckOctree.prototype.getBoundingSphere = function()
  * 어떤 일을 하고 있습니까?
  * @returns intersects
  */
-CollisionCheckOctree.prototype.checkCollision = function(collisionOctree) 
+CollisionCheckOctree.prototype.checkCollision = function(collisionOctree, resultCollidedOctreesArray) 
 {
 	if (collisionOctree === undefined)
 	{ return false; }
@@ -399,6 +399,12 @@ CollisionCheckOctree.prototype.checkCollision = function(collisionOctree)
 	// check if the collisionOctrees has children.
 	if (!this.hasChildren() && !collisionOctree.hasChildren())
 	{
+		if (resultCollidedOctreesArray === undefined)
+		{ resultCollidedOctreesArray = []; }
+		
+		resultCollidedOctreesArray.push(this);
+		resultCollidedOctreesArray.push(collisionOctree);
+		
 		// process finished.
 		this.collidedWithMeCollisionOctreesArray.length = 0; //init.
 		collisionOctree.collidedWithMeCollisionOctreesArray.length = 0; //init.
