@@ -366,8 +366,8 @@ CollisionCheckOctree.prototype.checkCollision = function(collisionOctree)
 	if (collisionOctree === undefined)
 	{ return false; }
 	
-	var myBSphere = this.boundingSphere();
-	var bSphere = collisionOctree.boundingSphere();
+	var myBSphere = this.getBoundingSphere();
+	var bSphere = collisionOctree.getBoundingSphere();
 	
 	var collisionType = myBSphere.intersectsWithBSphere(bSphere);
 	if (collisionType === Constant.INTERSECTION_OUTSIDE)
