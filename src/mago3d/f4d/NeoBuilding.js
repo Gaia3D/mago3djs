@@ -1105,6 +1105,14 @@ NeoBuilding.prototype.makeCollisionCheckOctree = function(desiredMinOctreeSize)
 /**
  * 어떤 일을 하고 있습니까?
  */
+NeoBuilding.prototype.getCollisionCheckOctree = function() 
+{
+	return this.collisionCheckOctree;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 NeoBuilding.prototype.parseHeader = function(arrayBuffer, bytesReaded) 
 {
 	// In the header file, there are:
