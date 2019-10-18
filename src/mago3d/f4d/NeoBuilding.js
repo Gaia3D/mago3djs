@@ -1437,7 +1437,7 @@ NeoBuilding.prototype.render = function(magoManager, shader, renderType, refMatr
 		var visibleCollisionOctreesCount = collisionOctreesArray.length;
 		for (var i=0; i<visibleCollisionOctreesCount; i++)
 		{
-			collisionOctreesArray[i].render(magoManager, shader, renderType, glPrimitive);
+			collisionOctreesArray[i].render(magoManager, shader, renderType, undefined);
 		}
 	}
 };
