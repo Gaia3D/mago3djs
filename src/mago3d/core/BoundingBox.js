@@ -203,6 +203,7 @@ BoundingBox.prototype.addPointsArray = function(pointsArray)
 	{ return; }
 	
 	var pointsCount = pointsArray.length;
+	for(var i=0;i<pointsCount;++i)
 	{
 		this.addPoint(pointsArray[i]);
 	}
