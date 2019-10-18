@@ -127,9 +127,13 @@ var CollisionCheckOctree = function(octreeOwner)
 	// auxiliar triangles array.
 	this.trianglesArray;
 	
+	this.currentVisibleOctreesArray;
+	
 	this.collisionState = false;
 	this.boundingSphere;
 	this.collidedWithMeCollisionOctreesArray;
+	this.vboKeysContainer;
+	this.geoLocDataManager;
 };
 
 /**
@@ -218,6 +222,30 @@ CollisionCheckOctree.prototype.extractLowestOctreesIfHasTriangles = function(low
  * 어떤 일을 하고 있습니까?
  * @param treeDepth 변수
  */
+CollisionCheckOctree.prototype.makeMesh = function(magoManager) 
+{
+	// make spheres. todo:
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param treeDepth 변수
+ */
+CollisionCheckOctree.prototype.render = function(magoManager) 
+{
+	if (this.sphere === undefined)
+	{
+		this.sphere = new Sphere();
+	}
+	
+	
+	
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param treeDepth 변수
+ */
 CollisionCheckOctree.prototype.hasChildren = function() 
 {
 	if (this.subOctrees_array !== undefined && this.subOctrees_array.length > 0)
@@ -255,6 +283,7 @@ CollisionCheckOctree.prototype.new_subOctree = function()
 	this.subOctrees_array.push(subOctree);
 	return subOctree;
 };
+
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -379,8 +408,6 @@ CollisionCheckOctree.prototype.checkCollision = function(collisionOctree, result
 	if (collisionOctree === undefined)
 	{ return false; }
 
-	
-	
 	var myBSphere = this.getBoundingSphere();
 	var bSphere = collisionOctree.getBoundingSphere();
 	

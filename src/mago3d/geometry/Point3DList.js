@@ -76,6 +76,7 @@ Point3DList.prototype.addPoint = function(point3d)
 
 	this.pointsArray.push(point3d);
 };
+
 /**
  * Return the coordinate contained at geoLocDataManager
  * @returns geoLoc

@@ -331,19 +331,31 @@ Modeler.getPoints3DList_fromPoints3dArray = function(points3dArray, resultPoints
 	var geoLocData;
 	
 	// check options.
-	if (options !== undefined)
+	if (options !== undefined && options.geoLocationData !== undefined)
 	{
-		if (options.geoLocationData !== undefined)
-		{
-			// use the existent geoLocationData.
-			geoLocData = options.geoLocationData;
-		}
-		else
-		{
-			// calculate geoLocationData by the centerPos of bbox.
-			
-		}
+		// use the existent geoLocationData.
+		geoLocData = options.geoLocationData;
 	}
+	else
+	{
+		// calculate geoLocationData by the centerPos of bbox.
+		var geoCoord = ManagerUtils.pointToGeographicCoord(centerPos, undefined);
+		geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude, 0, 0, 0, undefined);
+	}
+	
+	// calculate points3d relatives to the geoLocData.
+	var relPoitsArray = geoLocData.getTransformedRelativePositionsArray(absolutePositionsArray, undefined);
+	
+	if (resultPoints3dList === undefined)
+	{ resultPoints3dList = new Point3DList(); }
+	
+	resultPoints3dList.pointsArray = relPoitsArray;
+	
+	if (resultPoints3dList.geoLocDataManager === undefined)
+	{ resultPoints3dList.geoLocDataManager = new GeoLocationDataManager(); }
+	
+	resultPoints3dList.geoLocDataManager.addGeoLocationData(geoLocData);
+	return resultPoints3dList;
 };
 
 /**

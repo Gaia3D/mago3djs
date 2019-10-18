@@ -71,6 +71,23 @@ GeoLocationDataManager.prototype.newGeoLocationData = function(geoLocationName)
 };
 
 /**
+ * put the geoLocationData from this.geoLocationDataArray
+ * @param geoLocationName 변수
+ */
+GeoLocationDataManager.prototype.addGeoLocationData = function(geoLocData) 
+{
+	this.geoLocationDataArray.unshift(geoLocData);
+	
+	if (this.geoLocationDataArray.length > this.geoLocationDataArrayMaxLengthAllowed)
+	{
+		this.geoLocationDataArray.pop();
+		// delete extracted geoLocdata. TODO:
+	}
+
+	return geoLocationData;
+};
+
+/**
  * return the length of this geoLocationDataArray
  * @returns {Number} the length of this geoLocationDataArray
  */

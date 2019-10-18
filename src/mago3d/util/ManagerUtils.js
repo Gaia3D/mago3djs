@@ -87,7 +87,7 @@ ManagerUtils.getIndexToInsertBySquaredDistToEye = function(objectsArray, object,
  * @param {MagoManager} magoManager worldwind mode removed, this args is not need. 
  * @returns {GeographicCoord} geographic coordinate object.
  */
-ManagerUtils.pointToGeographicCoord = function(point, resultGeographicCoord, magoManager) 
+ManagerUtils.pointToGeographicCoord = function(point, resultGeographicCoord) 
 {
 	if (resultGeographicCoord === undefined)
 	{ resultGeographicCoord = new GeographicCoord(); }
@@ -233,7 +233,7 @@ ManagerUtils.calculateTransformMatrixAtWorldPosition = function(worldPosition, h
  * @param {MagoManager} magoManager for magoManager.globe
  * @returns {GeoLocationData} resultGeoLocationData.
  */
-ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, heading, pitch, roll, resultGeoLocationData, magoManager) 
+ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, heading, pitch, roll, resultGeoLocationData) 
 {
 	if (resultGeoLocationData === undefined)
 	{ resultGeoLocationData = new GeoLocationData(); }
