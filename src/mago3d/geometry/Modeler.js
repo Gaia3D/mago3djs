@@ -322,6 +322,7 @@ Modeler.getPoints3DList_fromPoints3dArray = function(points3dArray, resultPoints
 {
 	// 1rst, calculate the center point of the array.
 	var bbox = new BoundingBox();
+	bbox.init(points3dArray[0]);
 	bbox.addPointsArray(points3dArray);
 	
 	// calculate the centerPos.
