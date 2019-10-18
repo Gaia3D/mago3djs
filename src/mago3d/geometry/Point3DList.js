@@ -344,9 +344,9 @@ Point3DList.prototype.render = function(magoManager, shader, renderType, glPrimi
 		this.makeVbo(magoManager); 
 		return;
 	}
-	
+	var gl = magoManager.getGl();
 	shader.enableVertexAttribArray(shader.position3_loc);
-	
+	var bEnableDepth;
 	if (bEnableDepth === undefined)
 	{ bEnableDepth = true; }
 	
