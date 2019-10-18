@@ -238,9 +238,13 @@ CollisionCheckOctree.prototype.render = function(magoManager, shader, renderType
 	}
 	var bIsSelected = false;
 	var gl = magoManager.getGl();
-	gl.uniform1i(shader.hasAditionalMov_loc, true);
-	gl.uniform3fv(shader.aditionalMov_loc, [this.centerPos.x, this.centerPos.y, this.centerPos.z]); //.
-	shader.last_isAditionalMovedZero = false;
+	gl.uniform1i(shader.hasAditionalMov_loc, false);
+	//gl.uniform3fv(shader.aditionalMov_loc, [this.centerPos.x, this.centerPos.y, this.centerPos.z]); //.
+	//shader.last_isAditionalMovedZero = false;
+	
+	var refMatrixType = 1;
+	gl.uniform1i(shader.refMatrixType_loc, refMatrixType);
+	gl.uniform3fv(shader.refTranslationVec_loc, [this.centerPos.x, this.centerPos.y, this.centerPos.z]); 
 		
 	this.sphere.renderLocal(magoManager, shader, renderType, glPrimitive, bIsSelected);
 	
