@@ -503,7 +503,7 @@ CollisionCheckOctree.prototype.translate = function(translationVector, bTransfor
 		var childrenCount = this.subOctrees_array.length;
 		for (var i=0; i<childrenCount; i++)
 		{
-			this.subOctrees_array[i].translate(translationVector);
+			this.subOctrees_array[i].translate(translationVector, bTransformFromOrigin);
 		}
 	}
 };
@@ -535,7 +535,7 @@ CollisionCheckOctree.prototype.transformByMatrix4 = function(tMat, bTransformFro
 		var childrenCount = this.subOctrees_array.length;
 		for (var i=0; i<childrenCount; i++)
 		{
-			this.subOctrees_array[i].transformByMatrix4(tMat);
+			this.subOctrees_array[i].transformByMatrix4(tMat, bTransformFromOrigin);
 		}
 	}
 };
