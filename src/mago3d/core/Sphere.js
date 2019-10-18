@@ -25,10 +25,11 @@ var Sphere = function(options)
 		var color = options.color;
 		if (color)
 		{
-			this.color4 = new Color();
+			this.color4 = new DynamicColor();
 			this.color4.setRGBA(color.r, color.g, color.b, color.a);
 		}
 	}
+	
 };
 
 /**
@@ -136,7 +137,11 @@ Sphere.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 		gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
 		gl.disable(gl.BLEND);
 	}
-	
+	else if (renderType === 1 ) 
+	{
+		this.color4.updateColorAlarm(magoManager.getCurrentTime());
+	}
+
 	this.renderRaw(magoManager, shader, renderType, glPrimitive);
 
 };
@@ -189,7 +194,7 @@ Sphere.prototype.renderRaw = function(magoManager, shader, renderType, glPrimiti
 		
 	}
 	*/
-	this.mesh.render(magoManager, shader, renderType, glPrimitive, bIsSelected);
+	//this.mesh.render(magoManager, shader, renderType, glPrimitive, bIsSelected);
 
 	gl.disable(gl.BLEND);
 };
