@@ -344,7 +344,7 @@ Modeler.getPoints3DList_fromPoints3dArray = function(points3dArray, resultPoints
 	}
 	
 	// calculate points3d relatives to the geoLocData.
-	var relPoitsArray = geoLocData.getTransformedRelativePositionsArray(absolutePositionsArray, undefined);
+	var relPoitsArray = geoLocData.getTransformedRelativePositionsArray(points3dArray, undefined);
 	
 	if (resultPoints3dList === undefined)
 	{ resultPoints3dList = new Point3DList(); }
