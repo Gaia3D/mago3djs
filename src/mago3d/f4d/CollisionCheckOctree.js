@@ -379,11 +379,7 @@ CollisionCheckOctree.prototype.checkCollision = function(collisionOctree, result
 	if (collisionOctree === undefined)
 	{ return false; }
 
-	if (collisionOctree.trianglesArray === undefined || collisionOctree.trianglesArray.length === 0)
-	{ return false; }
-
-	if (this.trianglesArray === undefined || this.trianglesArray.length === 0)
-	{ return false; }
+	
 	
 	var myBSphere = this.getBoundingSphere();
 	var bSphere = collisionOctree.getBoundingSphere();
@@ -391,32 +387,16 @@ CollisionCheckOctree.prototype.checkCollision = function(collisionOctree, result
 	var collisionType = myBSphere.intersectsWithBSphere(bSphere);
 	if (collisionType === Constant.INTERSECTION_OUTSIDE)
 	{ return false; }
-
-	//if(collisionType === Constant.INTERSECTION_INSIDE)
-	//{
-	//	
-	//}
-	//else if(collisionType === Constant.INTERSECTION_INTERSECT)
-	//{
-	//	
-	//}
 	
 	// check the radius of the spheres, and, the bigger collisionOctree descends.
 	// check if the collisionOctrees has children.
 	if (!this.hasChildren() && !collisionOctree.hasChildren())
 	{
-		if (resultCollidedOctreesArray === undefined)
-		{ resultCollidedOctreesArray = []; }
-		
-		resultCollidedOctreesArray.push(this);
-		resultCollidedOctreesArray.push(collisionOctree);
-		
-		// process finished.
-		//this.collidedWithMeCollisionOctreesArray.length = 0; //init.
-		//collisionOctree.collidedWithMeCollisionOctreesArray.length = 0; //init.
-		
-		//this.collidedWithMeCollisionOctreesArray.push(collisionOctree);
-		//collisionOctree.collidedWithMeCollisionOctreesArray.push(this);
+		if (collisionOctree.trianglesArray !== undefined && collisionOctree.trianglesArray.length !== 0 && this.trianglesArray !== undefined && this.trianglesArray.length !== 0)
+		{ 
+			resultCollidedOctreesArray.push(this);
+		}
+
 		return true;
 	}
 	

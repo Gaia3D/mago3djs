@@ -993,6 +993,9 @@ NeoBuilding.prototype.getTriangles = function(resultTrianglesArray)
  */
 NeoBuilding.prototype.allModelsAndReferencesAreParsed = function(magoManager) 
 {
+	if (this.octree === undefined)
+	{ return false; }
+	
 	var lowestOctreesArray = [];
 	this.octree.extractLowestOctreesIfHasTriPolyhedrons(lowestOctreesArray);
 	var lowestOctreesCount = lowestOctreesArray.length;
@@ -1087,47 +1090,6 @@ NeoBuilding.prototype.forceToLoadModelsAndReferences = function(magoManager)
 			var filePathInServer = blocks_folderPath + "/" + subOctreeNumberName + "_Model";
 			magoManager.readerWriter.getNeoBlocksArraybuffer(filePathInServer, lowestOctree, magoManager, options);
 		}
-		/*
-		// check if models & references is already loaded.
-		if (lowestOctree.neoReferencesMotherAndIndices === undefined || lowestOctree.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.READY)
-		{
-			lowestOctree.prepareModelReferencesListData(magoManager);
-			allModelsAndReferencesAreLoaded = false;
-			continue;
-		}
-		else if (lowestOctree.neoReferencesMotherAndIndices === undefined || lowestOctree.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
-		{
-			// parse references.
-			if (this.matrix4SC === undefined)
-			{ this.matrix4SC = new Matrix4(); }
-			var nodeOwner = this.nodeOwner;
-			var geoLocDataManager = nodeOwner.data.geoLocDataManager;
-			var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
-			var gl = magoManager.getGl();
-			
-			// parse vesioned.
-			lowestOctree.neoReferencesMotherAndIndices.parseArrayBufferReferencesVersioned(gl, lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer, 
-				magoManager.readerWriter, this, this.matrix4SC, magoManager);
-			
-			lowestOctree.neoReferencesMotherAndIndices.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
-			lowestOctree.neoReferencesMotherAndIndices.dataArraybuffer = undefined;
-			allModelsAndReferencesAreLoaded = false;
-			continue;
-		}
-		
-		var blocksList = lowestOctree.neoReferencesMotherAndIndices.blocksList;
-		if (blocksList.fileLoadState === CODE.fileLoadState.READY)
-		{
-			lowestOctree.prepareModelReferencesListData(magoManager);
-			allModelsAndReferencesAreLoaded = false;
-			continue;
-		}
-		else if (blocksList.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
-		{
-			// parse models.
-			blocksList.parseBlocksListVersioned_v001(blocksList.dataArraybuffer, magoManager.readerWriter, this.motherBlocksArray, magoManager);
-		}
-		*/
 	}
 
 	return allModelsAndReferencesAreLoaded;
@@ -1144,21 +1106,24 @@ NeoBuilding.prototype.makeCollisionCheckOctree = function(desiredMinOctreeSize)
 	if (this.motherNeoReferencesArray === undefined || this.motherBlocksArray === undefined)
 	{ return false; }
 
-	// Using the motherOctree (this.octree), make the 1rst approximation to the collisionCheckOctree.
-	var collisionCheckOctree = new CollisionCheckOctree();
-	var octree = this.octree;
-	collisionCheckOctree.centerPos.copyFrom(octree.centerPos);
-	collisionCheckOctree.half_dx = octree.half_dx; // half width.
-	collisionCheckOctree.half_dy = octree.half_dy; // half length.
-	collisionCheckOctree.half_dz = octree.half_dz; // half height.
-	collisionCheckOctree.octree_level = octree.octree_level;
-	
-	collisionCheckOctree.trianglesArray = this.getTriangles();
-	
-	var options = {};
-	options.desiredMinOctreeSize = desiredMinOctreeSize;
-	collisionCheckOctree.makeTreeByTrianglesArray(options);
-	this.collisionCheckOctree = collisionCheckOctree;
+	if (this.collisionCheckOctree === undefined)
+	{
+		// Using the motherOctree (this.octree), make the 1rst approximation to the collisionCheckOctree.
+		var collisionCheckOctree = new CollisionCheckOctree();
+		var octree = this.octree;
+		collisionCheckOctree.centerPos.copyFrom(octree.centerPos);
+		collisionCheckOctree.half_dx = octree.half_dx; // half width.
+		collisionCheckOctree.half_dy = octree.half_dy; // half length.
+		collisionCheckOctree.half_dz = octree.half_dz; // half height.
+		collisionCheckOctree.octree_level = octree.octree_level;
+		
+		collisionCheckOctree.trianglesArray = this.getTriangles();
+		
+		var options = {};
+		options.desiredMinOctreeSize = desiredMinOctreeSize;
+		collisionCheckOctree.makeTreeByTrianglesArray(options);
+		this.collisionCheckOctree = collisionCheckOctree;
+	}
 	
 	// Now, must transform the collisionCheckOctree with the neoBuilding's transforms.
 	var nodeOwner = this.nodeOwner;
