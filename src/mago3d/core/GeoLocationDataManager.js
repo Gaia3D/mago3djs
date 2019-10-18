@@ -83,8 +83,6 @@ GeoLocationDataManager.prototype.addGeoLocationData = function(geoLocData)
 		this.geoLocationDataArray.pop();
 		// delete extracted geoLocdata. TODO:
 	}
-
-	return geoLocationData;
 };
 
 /**
