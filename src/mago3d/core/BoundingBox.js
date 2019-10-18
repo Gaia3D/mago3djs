@@ -197,6 +197,22 @@ BoundingBox.prototype.addXYZData = function(x, y, z)
  * 
  * @param {Point3D} point 3차원 점
  */
+BoundingBox.prototype.addPointsArray = function(pointsArray) 
+{
+	if (pointsArray === undefined)
+	{ return; }
+	
+	var pointsCount = pointsArray.length;
+	{
+		this.addPoint(pointsArray[i]);
+	}
+};
+
+/**
+ * 주어진 3차원 점을 포함하는 영역으로 영역박스 크기를 변경
+ * 
+ * @param {Point3D} point 3차원 점
+ */
 BoundingBox.prototype.addPoint = function(point) 
 {
 	if (point === undefined)	{ return; }

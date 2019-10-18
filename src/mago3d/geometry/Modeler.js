@@ -318,6 +318,34 @@ Modeler.getRevolvedSolidMesh = function(profile2d, revolveAngDeg, revolveSegment
 	return resultMesh;
 };
 
+Modeler.getPoints3DList_fromPoints3dArray = function(points3dArray, resultPoints3dList, options) 
+{
+	// 1rst, calculate the center point of the array.
+	var bbox = new BoundingBox();
+	bbox.addPointsArray(points3dArray);
+	
+	// calculate the centerPos.
+	var centerPos = bbox.getCenterPoint();
+	
+	// calculate geoLocationData.
+	var geoLocData;
+	
+	// check options.
+	if (options !== undefined)
+	{
+		if (options.geoLocationData !== undefined)
+		{
+			// use the existent geoLocationData.
+			geoLocData = options.geoLocationData;
+		}
+		else
+		{
+			// calculate geoLocationData by the centerPos of bbox.
+			
+		}
+	}
+};
+
 /**
  * 어떤 일을 하고 있습니까?
  */
