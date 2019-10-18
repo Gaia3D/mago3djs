@@ -1131,13 +1131,14 @@ NeoBuilding.prototype.makeCollisionCheckOctree = function(desiredMinOctreeSize)
 	var geoLocDataManager = data.geoLocDataManager;
 	var geoLocationData = geoLocDataManager.getCurrentGeoLocationData();
 	var pivotPointTraslationLC = geoLocationData.pivotPointTraslationLC;
-	var bTransformFromOrigin = false;
+	var bTransformFromOrigin = true;
 	if (pivotPointTraslationLC !== undefined)
 	{
 		this.collisionCheckOctree.translate(pivotPointTraslationLC, bTransformFromOrigin);
 	}
 	
 	var tMat = geoLocationData.tMatrix;
+	bTransformFromOrigin = false;
 	this.collisionCheckOctree.transformByMatrix4(tMat, bTransformFromOrigin);
 };
 
