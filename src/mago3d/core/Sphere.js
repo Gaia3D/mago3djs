@@ -157,6 +157,55 @@ Sphere.prototype.renderRaw = function(magoManager, shader, renderType, glPrimiti
 	var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
 	buildingGeoLocation.bindGeoLocationUniforms(gl, shader); // rotMatrix, positionHIGH, positionLOW.
 	
+	this.renderLocal(magoManager, shader, renderType, glPrimitive, bIsSelected);
+	/*
+	if (renderType === 0)
+	{
+		// Depth render.***
+	}
+	else if (renderType === 1)
+	{
+		// Color render.***
+		//gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
+		gl.enable(gl.BLEND);
+		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
+		
+		// Check if is selected.***
+		var selectionManager = magoManager.selectionManager;
+		if (bIsSelected !== undefined && bIsSelected)
+		{
+			//gl.disable(gl.BLEND);
+			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 1.0]);
+		}
+		else if (selectionManager.isObjectSelected(this))
+		{
+			//gl.disable(gl.BLEND);
+			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 1.0]);
+		}
+		else 
+		{
+			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, this.color4.a]);
+		}
+		
+	}
+	*/
+	this.mesh.render(magoManager, shader, renderType, glPrimitive, bIsSelected);
+
+	gl.disable(gl.BLEND);
+};
+
+/**
+ * Renders the factory.
+ */
+Sphere.prototype.renderLocal = function(magoManager, shader, renderType, glPrimitive, bIsSelected)
+{
+	if (this.dirty)
+	{ this.makeMesh(); }
+	
+	if (this.mesh === undefined)
+	{ return false; }
+
+	
 	if (renderType === 0)
 	{
 		// Depth render.***

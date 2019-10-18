@@ -1131,14 +1131,16 @@ NeoBuilding.prototype.makeCollisionCheckOctree = function(desiredMinOctreeSize)
 	var geoLocDataManager = data.geoLocDataManager;
 	var geoLocationData = geoLocDataManager.getCurrentGeoLocationData();
 	var pivotPointTraslationLC = geoLocationData.pivotPointTraslationLC;
+	
+	// Transform from origin only the 1rst time.
 	var bTransformFromOrigin = true;
 	if (pivotPointTraslationLC !== undefined)
 	{
 		this.collisionCheckOctree.translate(pivotPointTraslationLC, bTransformFromOrigin);
+		bTransformFromOrigin = false;
 	}
 	
 	var tMat = geoLocationData.tMatrix;
-	bTransformFromOrigin = false;
 	this.collisionCheckOctree.transformByMatrix4(tMat, bTransformFromOrigin);
 };
 
@@ -1429,9 +1431,14 @@ NeoBuilding.prototype.render = function(magoManager, shader, renderType, refMatr
 	}
 	
 	// test.
-	if (this.collisionCheckOctree !== undefined)
+	if (this.collisionCheckOctree !== undefined && this.collisionCheckOctree.currentVisibleOctreesArray !== undefined)
 	{
-		//this.renderCollisionCheckSpheres(magoManager, shader, renderType);
+		var collisionOctreesArray = this.collisionCheckOctree.currentVisibleOctreesArray;
+		var visibleCollisionOctreesCount = collisionOctreesArray.length;
+		for (var i=0; i<visibleCollisionOctreesCount; i++)
+		{
+			collisionOctreesArray[i].render(magoManager, shader, renderType, glPrimitive);
+		}
 	}
 };
 
