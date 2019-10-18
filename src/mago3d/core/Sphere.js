@@ -189,7 +189,7 @@ Sphere.prototype.renderRaw = function(magoManager, shader, renderType, glPrimiti
 		
 	}
 	*/
-	this.mesh.render(magoManager, shader, renderType, glPrimitive, bIsSelected);
+	//this.mesh.render(magoManager, shader, renderType, glPrimitive, bIsSelected);
 
 	gl.disable(gl.BLEND);
 };
