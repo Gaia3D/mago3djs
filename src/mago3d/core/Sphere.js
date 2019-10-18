@@ -204,7 +204,7 @@ Sphere.prototype.renderLocal = function(magoManager, shader, renderType, glPrimi
 	
 	if (this.mesh === undefined)
 	{ return false; }
-
+	var gl = magoManager.getGl();
 	
 	if (renderType === 0)
 	{
