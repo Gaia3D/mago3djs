@@ -1434,6 +1434,7 @@ NeoBuilding.prototype.render = function(magoManager, shader, renderType, refMatr
 	// test.
 	if (this.collisionCheckOctree !== undefined && this.collisionCheckOctree.currentVisibleOctreesArray !== undefined)
 	{
+		gl.uniform1i(shader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.
 		var collisionOctreesArray = this.collisionCheckOctree.currentVisibleOctreesArray;
 		var visibleCollisionOctreesCount = collisionOctreesArray.length;
 		for (var i=0; i<visibleCollisionOctreesCount; i++)
