@@ -222,23 +222,22 @@ CollisionCheckOctree.prototype.extractLowestOctreesIfHasTriangles = function(low
  * 어떤 일을 하고 있습니까?
  * @param treeDepth 변수
  */
-CollisionCheckOctree.prototype.makeMesh = function(magoManager) 
-{
-	// make spheres. todo:
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param treeDepth 변수
- */
-CollisionCheckOctree.prototype.render = function(magoManager) 
+CollisionCheckOctree.prototype.render = function(magoManager, shader, renderType, glPrimitive) 
 {
 	if (this.sphere === undefined)
 	{
-		this.sphere = new Sphere();
+		var color4 = new Color();
+		color4.setRGB(0.9, 0.1, 0.1);
+		var options = {};
+		options.color = color4;
+		this.sphere = new Sphere(options);
+		
+		this.sphere.setRadius(this.getRadius());
+		this.sphere.setCenterPoint(this.centerPos.x, this.centerPos.y, this.centerPos.z);
+		return;
 	}
-	
-	
+	var bIsSelected = false;
+	this.sphere.renderLocal(magoManager, shader, renderType, glPrimitive, bIsSelected);
 	
 };
 
