@@ -94,4 +94,5 @@
 		
 		if(colorType == 1)
 			aColor4 = color4;
+		gl_PointSize = 5.0;
 	}

@@ -355,6 +355,12 @@ Point3DList.prototype.render = function(magoManager, shader, renderType, glPrimi
 	else
 	{ gl.disable(gl.DEPTH_TEST); }
 
+	var refMatrixType = 0;
+	gl.uniform1i(shader.hasAditionalMov_loc, false);
+	gl.uniform1i(shader.refMatrixType_loc, refMatrixType);
+	gl.uniform4fv(shader.oneColor4_loc, [1.0, 0.0, 0.0, 0.7]);
+	gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
+
 	// Render the line.
 	var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
 	buildingGeoLocation.bindGeoLocationUniforms(gl, shader);

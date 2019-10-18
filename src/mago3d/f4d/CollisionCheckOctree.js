@@ -400,10 +400,7 @@ CollisionCheckOctree.prototype.getBoundingSphere = function()
 		this.transformedCenterPos = new Point3D(); 
 		this.transformedCenterPos.copyFrom(this.centerPos);
 	}
-	
-	if ( this.boundingSphere === undefined)
-	{ this.boundingSphere = new BoundingSphere(this.transformedCenterPos.x, this.transformedCenterPos.y, this.transformedCenterPos.z, this.getRadius()); }
-
+	this.boundingSphere = new BoundingSphere(this.transformedCenterPos.x, this.transformedCenterPos.y, this.transformedCenterPos.z, this.getRadius());
 	return this.boundingSphere;
 };
 
