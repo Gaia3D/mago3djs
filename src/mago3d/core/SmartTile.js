@@ -1248,6 +1248,19 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		lowLodMesh.dataArrayBuffer = dataArrayBuffer.slice(startBuff, endBuff);
 		bytesReaded = bytesReaded + lod5meshSize; // updating data.
 		
+		// Test.***
+		// read lod5 mesh data.
+		var lodString = "lod4";
+		var lowLodMesh4 = neoBuilding.getOrNewLodMesh(lodString);
+		lowLodMesh4.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+		lowLodMesh4.dataArrayBuffer = lowLodMesh.dataArrayBuffer;
+		
+		var lodString = "lod3";
+		var lowLodMesh3 = neoBuilding.getOrNewLodMesh(lodString);
+		lowLodMesh3.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+		lowLodMesh3.dataArrayBuffer = lowLodMesh.dataArrayBuffer;
+		// End test.---
+		
 		// read lod5 image.
 		var lod5ImageSize = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 		var byteSize = 1;

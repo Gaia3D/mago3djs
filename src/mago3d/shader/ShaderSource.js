@@ -1493,6 +1493,7 @@ ShaderSource.ModelRefSsaoVS = "	attribute vec3 position;\n\
 		\n\
 		if(colorType == 1)\n\
 			aColor4 = color4;\n\
+		gl_PointSize = 5.0;\n\
 	}";
 ShaderSource.OrthogonalDepthShaderFS = "#ifdef GL_ES\n\
 precision highp float;\n\
