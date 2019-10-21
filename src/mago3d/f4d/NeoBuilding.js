@@ -571,6 +571,25 @@ NeoBuilding.prototype.getOrNewLodMesh = function(lodString)
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param lod 변수
+ */
+NeoBuilding.prototype.getOrNewLodBuilding = function(lodString) 
+{
+	if (this.lodBuildingMap === undefined)
+	{ this.lodBuildingMap = {}; }
+
+	var lowLodBuilding = this.lodBuildingMap[lodString];
+	if (lowLodBuilding === undefined)
+	{
+		lowLodBuilding = new LodBuilding();
+		lowLodBuilding.attributes = {};
+		this.lodBuildingMap[lodString] = lowLodBuilding;
+	}
+	return lowLodBuilding;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  * @param neoReference 변수
  */
 NeoBuilding.prototype.getCurrentLodString = function() 
@@ -1457,25 +1476,11 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 	var projectFolderName = this.projectFolderName;
 	var buildingFolderName = this.buildingFileName;
 	var geometryDataPath = magoManager.readerWriter.geometryDataPath;
-	
 	var textureFileName = lodBuildingData.textureFileName;
-	var lodString = lodBuildingData.geometryFileName;
-	var lodName = "lod"+lodBuildingData.lod.toString();
-	
+
 	// check if exist lodBuilding in lodBuildingMap.
-	if (this.lodBuildingMap === undefined)
-	{ this.lodBuildingMap = {}; }
-	
-	if (this.lodTexturesMap === undefined)
-	{ this.lodTexturesMap = {}; }
-	
-	var lodBuilding = this.lodBuildingMap[lodName];
-	if (lodBuilding === undefined)
-	{
-		lodBuilding = new LodBuilding();
-		this.lodBuildingMap[lodName] = lodBuilding;
-		lodBuilding.attributes = {};
-	}
+	var lodBuildingName = "lod"+lodBuildingData.lod.toString();
+	var lodBuilding = this.getOrNewLodBuilding(lodBuildingName);
 	
 	if (textureFileName !== "noTexture")
 	{
@@ -1484,6 +1489,7 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 	}
 	
 	// check if exist the lodMesh in lodMeshMap.
+	var lodString = lodBuildingData.geometryFileName;
 	var lowLodMesh = this.getOrNewLodMesh(lodString);
 	lowLodMesh.textureName = textureFileName;
 	
@@ -1518,14 +1524,17 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 		// this is the new version.
 		if (lodBuilding.texture === undefined)
 		{
-			lodBuilding.texture = new Texture();
-			var filePath_inServer = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + textureFileName;
-			var gl = magoManager.sceneState.gl;
-			var flip_y_texCoords = true;
-			if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
-			{ flip_y_texCoords = false; }
-			
-			magoManager.readerWriter.readLegoSimpleBuildingTexture(gl, filePath_inServer, lodBuilding.texture, magoManager, flip_y_texCoords); 
+			if (magoManager.readerWriter.skinLegos_requested < 4)
+			{
+				lodBuilding.texture = new Texture();
+				var filePath_inServer = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + textureFileName;
+				var gl = magoManager.sceneState.gl;
+				var flip_y_texCoords = true;
+				if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
+				{ flip_y_texCoords = false; }
+				
+				magoManager.readerWriter.readLegoSimpleBuildingTexture(gl, filePath_inServer, lodBuilding.texture, magoManager, flip_y_texCoords); 
+			}
 		}
 		else if (lodBuilding.texture.fileLoadState === CODE.fileLoadState.LOADING_FINISHED && lodBuilding.texture.texId === undefined)
 		{
@@ -1533,6 +1542,7 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 			var gl = magoManager.sceneState.gl;
 			TexturesManager.newWebGlTextureByEmbeddedImage(gl, lodBuilding.texture.imageBinaryData, lodBuilding.texture);
 			magoManager.readerWriter.skinLegos_requested ++;
+			
 		}
 	}
 	

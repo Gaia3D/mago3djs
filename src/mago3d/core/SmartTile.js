@@ -1187,6 +1187,7 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 	
 	// parse smartTileF4d.***
 	var bytesReaded = 0;
+	var smartTileType = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 	var buildingsCount = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 	for (var i=0; i<buildingsCount; i++)
 	{
@@ -1224,11 +1225,6 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		
 		// read header (metaData + octree's structure + textures list + lodBuilding data).
 		var metadataByteSize = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
-		///bytesReaded = neoBuilding.parseHeader(dataArrayBuffer, bytesReaded);
-		///neoBuilding.bbox = neoBuilding.metaData.bbox;
-		///neoBuilding.metaData.fileLoadState = CODE.fileLoadState.PARESE_FINISHED;
-		
-		
 		var startBuff = bytesReaded;
 		var endBuff = bytesReaded + metadataByteSize;
 		neoBuilding.headerDataArrayBuffer = dataArrayBuffer.slice(startBuff, endBuff);
@@ -1238,28 +1234,18 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 	
 		// read lod5 mesh data.
+		var lodNameLength = (new Uint16Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+2)))[0]; bytesReaded += 2;
+		var lodName = enc.decode(new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+ lodNameLength))) ;bytesReaded += lodNameLength;
+		
 		var lod5meshSize = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
-
 		var lodString = "lod5";
-		var lowLodMesh = neoBuilding.getOrNewLodMesh(lodString);
+		var lodBuilding = neoBuilding.getOrNewLodBuilding(lodString);
+		var lowLodMesh = neoBuilding.getOrNewLodMesh(lodName);
 		var startBuff = bytesReaded;
 		var endBuff = bytesReaded + lod5meshSize;
 		lowLodMesh.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 		lowLodMesh.dataArrayBuffer = dataArrayBuffer.slice(startBuff, endBuff);
 		bytesReaded = bytesReaded + lod5meshSize; // updating data.
-		
-		// Test.***
-		// read lod5 mesh data.
-		var lodString = "lod4";
-		var lowLodMesh4 = neoBuilding.getOrNewLodMesh(lodString);
-		lowLodMesh4.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-		lowLodMesh4.dataArrayBuffer = lowLodMesh.dataArrayBuffer;
-		
-		var lodString = "lod3";
-		var lowLodMesh3 = neoBuilding.getOrNewLodMesh(lodString);
-		lowLodMesh3.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-		lowLodMesh3.dataArrayBuffer = lowLodMesh.dataArrayBuffer;
-		// End test.---
 		
 		// read lod5 image.
 		var lod5ImageSize = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
@@ -1267,11 +1253,11 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		var startBuff = bytesReaded;
 		var endBuff = bytesReaded + byteSize * lod5ImageSize;
 
-		if (lowLodMesh.texture === undefined)
-		{ lowLodMesh.texture = new Texture(); }
+		if (lodBuilding.texture === undefined)
+		{ lodBuilding.texture = new Texture(); }
 	
-		lowLodMesh.texture.imageBinaryData = dataArrayBuffer.slice(startBuff, endBuff);
-		lowLodMesh.texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+		lodBuilding.texture.imageBinaryData = dataArrayBuffer.slice(startBuff, endBuff);
+		lodBuilding.texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 		bytesReaded = bytesReaded + byteSize * lod5ImageSize; // updating data.
 		
 	
