@@ -635,11 +635,23 @@ NeoBuilding.prototype.getLowerSkinLodToLoad = function(currentLod)
 		if (lowLodMeshAux.skinLego.vbo_vicks_container.vboCacheKeysArray[0] && lowLodMeshAux.skinLego.vbo_vicks_container.vboCacheKeysArray[0].vboBufferTCoord)
 		{
 			// this is the new version.
-			if (lowLodMeshAux.texture === undefined || lowLodMeshAux.texture.texId === undefined)
+			if (lowLodMeshAux.texture === undefined)
 			{
 				lodToLoad = lod;
 				break;
 			}
+			else
+			{
+				if (lowLodMeshAux.texture.texId === undefined)
+				{
+					if (lowLodMeshAux.texture.fileLoadState !== CODE.fileLoadState.BINDING_FINISHED && lowLodMeshAux.texture.fileLoadState !== CODE.fileLoadState.LOADING_STARTED)
+					{
+						lodToLoad = lod;
+						break;
+					}
+				}
+			}
+
 		}
 		
 		
