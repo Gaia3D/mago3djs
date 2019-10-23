@@ -649,6 +649,10 @@ NeoBuilding.prototype.getLowerSkinLodToLoad = function(currentLod)
 						lodToLoad = lod;
 						break;
 					}
+					else
+					{
+						break;
+					}
 				}
 			}
 
@@ -1536,7 +1540,8 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 		// this is the new version.
 		if (lodBuilding.texture === undefined)
 		{
-			if (magoManager.readerWriter.skinLegos_requested < 4)
+			//if (magoManager.readerWriter.skinLegos_requested < 4)
+			if (magoManager.fileRequestControler.lowLodImagesRequestedCount < 4)
 			{
 				lodBuilding.texture = new Texture();
 				var filePath_inServer = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + textureFileName;

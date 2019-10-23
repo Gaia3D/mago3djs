@@ -1987,13 +1987,13 @@ MagoManager.prototype.keyDown = function(key)
 			var fileName = this.readerWriter.geometryDataPath + "/" + projectFolderName + "/" + "smartTile_f4d_indexFile.sii";
 			this.readerWriter.getObjectIndexFileSmartTileF4d(fileName, projectFolderName, this);
 		}
-		else if (this.smartTile_f4d_tested === 2)
-		{
-			this.smartTile_f4d_tested ++;
-			var projectFolderName = "berlin";
-			var fileName = this.readerWriter.geometryDataPath + "/" + projectFolderName + "/" + "smartTile_f4d_indexFile.sii";
-			this.readerWriter.getObjectIndexFileSmartTileF4d(fileName, projectFolderName, this);
-		}
+		//else if (this.smartTile_f4d_tested === 2)
+		//{
+		//	this.smartTile_f4d_tested ++;
+		//	var projectFolderName = "berlin";
+		//	var fileName = this.readerWriter.geometryDataPath + "/" + projectFolderName + "/" + "smartTile_f4d_indexFile.sii";
+		//	this.readerWriter.getObjectIndexFileSmartTileF4d(fileName, projectFolderName, this);
+		//}
 		
 		// Another test. make collisionCheckOctree.***
 		if (this.selectionManager.currentNodeSelected !== undefined)
