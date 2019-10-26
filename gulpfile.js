@@ -297,7 +297,7 @@ gulp.task('doc', function (cb)
 		.pipe(jsdoc(config, cb));
 });
 
-gulp.task('default', gulp.series('clean', 'lint', 'uglify:js',  'doc'));
+gulp.task('default', gulp.series('clean', 'lint', 'uglify:js'));
 
 gulp.task('buildShader', function(done) 
 {
