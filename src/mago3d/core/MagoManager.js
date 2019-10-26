@@ -1970,31 +1970,6 @@ MagoManager.prototype.keyDown = function(key)
 			}
 		}
 		
-		// Another test.***
-		
-		if (this.smartTile_f4d_tested === undefined)
-		{
-			this.smartTile_f4d_tested = 1;
-			var projectFolderName = "smartTile_f4d";
-			var fileName = this.readerWriter.geometryDataPath + "/" + projectFolderName + "/" + "smartTile_f4d_indexFile.sii";
-			this.readerWriter.getObjectIndexFileSmartTileF4d(fileName, projectFolderName, this);
-
-		}
-		else if (this.smartTile_f4d_tested === 1)
-		{
-			this.smartTile_f4d_tested ++;
-			var projectFolderName = "sejong";
-			var fileName = this.readerWriter.geometryDataPath + "/" + projectFolderName + "/" + "smartTile_f4d_indexFile.sii";
-			this.readerWriter.getObjectIndexFileSmartTileF4d(fileName, projectFolderName, this);
-		}
-		//else if (this.smartTile_f4d_tested === 2)
-		//{
-		//	this.smartTile_f4d_tested ++;
-		//	var projectFolderName = "berlin";
-		//	var fileName = this.readerWriter.geometryDataPath + "/" + projectFolderName + "/" + "smartTile_f4d_indexFile.sii";
-		//	this.readerWriter.getObjectIndexFileSmartTileF4d(fileName, projectFolderName, this);
-		//}
-		
 		// Another test. make collisionCheckOctree.***
 		if (this.selectionManager.currentNodeSelected !== undefined)
 		{
@@ -2019,7 +1994,6 @@ MagoManager.prototype.keyDown = function(key)
 				}
 			}
 		}
-		
 		
 		// Moviment restriction test.***
 		if (this.modeler !== undefined)
@@ -4778,6 +4752,22 @@ MagoManager.prototype.getObjectIndexFile_xxxx = function()
 		
 };
 
+/**
+ * smartTile 의 object index 파일을 읽음
+ * @param {string} projectId 프로젝트 고유번호
+ * @param {string} projectDataFolder smartTile 의 위치
+ */
+MagoManager.prototype.getObjectIndexFileSmartTileF4d = function(projectDataFolder) 
+{
+	if (this.configInformation === undefined)
+	{
+		this.configInformation = MagoConfig.getPolicy();
+	}
+
+	var geometrySubDataPath = projectDataFolder;
+	var fileName = this.readerWriter.geometryDataPath + "/" + geometrySubDataPath + Constant.TILE_INDEX_FILE;
+	this.readerWriter.getObjectIndexFileSmartTileF4d(fileName, geometrySubDataPath, this);
+};
 
 /**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
