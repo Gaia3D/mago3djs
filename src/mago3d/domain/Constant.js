@@ -10,6 +10,7 @@ Constant.CESIUM = "cesium";
 Constant.WORLDWIND = "worldwind";
 Constant.MAGOWORLD = "magoworld";
 Constant.OBJECT_INDEX_FILE = "/objectIndexFile.ihe";
+Constant.TILE_INDEX_FILE = "/smartTile_f4d_indexFile.sii";
 Constant.CACHE_VERSION = "?cache_version=";
 Constant.SIMPLE_BUILDING_TEXTURE3x3_BMP = "/SimpleBuildingTexture3x3.bmp";
 Constant.RESULT_XDO2F4D = "/Result_xdo2f4d/Images/";

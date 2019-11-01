@@ -1825,7 +1825,8 @@ MagoManager.prototype.keyDown = function(key)
 		//this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_TUNNELPOINTS;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_PIPE;
-		this.modeler.mode = CODE.modelerMode.DRAWING_SPHERE;
+		//this.modeler.mode = CODE.modelerMode.DRAWING_SPHERE;
+		this.modeler.mode = 50;
 	}
 	else if (key === 38) // 38 = 'up'.***
 	{
@@ -1834,7 +1835,8 @@ MagoManager.prototype.keyDown = function(key)
 	else if (key === 39) // 39 = 'right'.***
 	{
 		//this.modeler.mode = CODE.modelerMode.DRAWING_BSPLINE;
-		this.modeler.mode = CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS;
+		//this.modeler.mode = CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS;
+		this.modeler.mode = 51;
 	}
 	else if (key === 40) // 40 = 'down'.***
 	{
@@ -1970,31 +1972,6 @@ MagoManager.prototype.keyDown = function(key)
 			}
 		}
 		
-		// Another test.***
-		
-		if (this.smartTile_f4d_tested === undefined)
-		{
-			this.smartTile_f4d_tested = 1;
-			var projectFolderName = "smartTile_f4d";
-			var fileName = this.readerWriter.geometryDataPath + "/" + projectFolderName + "/" + "smartTile_f4d_indexFile.sii";
-			this.readerWriter.getObjectIndexFileSmartTileF4d(fileName, projectFolderName, this);
-
-		}
-		else if (this.smartTile_f4d_tested === 1)
-		{
-			this.smartTile_f4d_tested ++;
-			var projectFolderName = "sejong";
-			var fileName = this.readerWriter.geometryDataPath + "/" + projectFolderName + "/" + "smartTile_f4d_indexFile.sii";
-			this.readerWriter.getObjectIndexFileSmartTileF4d(fileName, projectFolderName, this);
-		}
-		else if (this.smartTile_f4d_tested === 2)
-		{
-			this.smartTile_f4d_tested ++;
-			var projectFolderName = "berlin";
-			var fileName = this.readerWriter.geometryDataPath + "/" + projectFolderName + "/" + "smartTile_f4d_indexFile.sii";
-			this.readerWriter.getObjectIndexFileSmartTileF4d(fileName, projectFolderName, this);
-		}
-		
 		// Another test. make collisionCheckOctree.***
 		if (this.selectionManager.currentNodeSelected !== undefined)
 		{
@@ -2019,7 +1996,6 @@ MagoManager.prototype.keyDown = function(key)
 				}
 			}
 		}
-		
 		
 		// Moviment restriction test.***
 		if (this.modeler !== undefined)
@@ -2447,6 +2423,66 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			sphere.geoLocDataManager = geoLocDataManager;
 			sphere.setRadius(30);
 			this.modeler.addObject(sphere, 15);
+		}
+		else if (this.modeler.mode === 50)
+		{
+			// make a sphere.
+			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude, undefined, undefined, undefined, geoLocData, this);
+			
+
+			//var wheel = new Wheel(0.2, 0.508, 0.3, {borderRadius: 0.01});
+			//wheel.geoLocDataManager = geoLocDataManager;
+			
+			//this.modeler.addObject(wheel, 15);
+
+			var box = new Box(4, 12, 2.2, new Date());
+			box.setOneColor(1, 1, 102/255, 1);
+
+			var totalLength = 2;
+			var bodyWidth = totalLength * 0.1;
+			var headWidth = totalLength * 0.2;
+			var tailLength = totalLength * 0.2;
+			var extrude = totalLength * 0.05;
+
+			var frontArrow = new Arrow({
+				totalLength : totalLength,
+				bodyWidth   : bodyWidth,
+				headWidth   : headWidth,
+				tailLength  : tailLength,
+				extrude     : extrude
+			});
+			
+			var rearArrow = new Arrow({
+				totalLength : totalLength,
+				bodyWidth   : bodyWidth,
+				headWidth   : headWidth,
+				tailLength  : tailLength,
+				extrude     : extrude
+			});
+
+			var ve = new BasicVehicle();
+			ve.setBox(box);
+			ve.setFrontArrow(frontArrow);
+			ve.setRearArrow(rearArrow);
+			ve.setWheelbase(12 * 0.8);
+			ve.geoLocDataManager = geoLocDataManager;
+
+			this.modeler.addObject(ve, 15);
+		}
+		else if (this.modeler.mode === 51)
+		{
+			// make a sphere.
+			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+8, undefined, undefined, undefined, geoLocData, this);
+			
+			
+			var arrow = new Arrow({tailLength: 1});
+			arrow.geoLocDataManager = geoLocDataManager;
+			
+			this.modeler.addObject(arrow, 15);
 		}
 	}
 	
@@ -4796,6 +4832,22 @@ MagoManager.prototype.getObjectIndexFile_xxxx = function()
 		
 };
 
+/**
+ * smartTile 의 object index 파일을 읽음
+ * @param {string} projectId 프로젝트 고유번호
+ * @param {string} projectDataFolder smartTile 의 위치
+ */
+MagoManager.prototype.getObjectIndexFileSmartTileF4d = function(projectDataFolder) 
+{
+	if (this.configInformation === undefined)
+	{
+		this.configInformation = MagoConfig.getPolicy();
+	}
+
+	var geometrySubDataPath = projectDataFolder;
+	var fileName = this.readerWriter.geometryDataPath + "/" + geometrySubDataPath + Constant.TILE_INDEX_FILE;
+	this.readerWriter.getObjectIndexFileSmartTileF4d(fileName, geometrySubDataPath, this);
+};
 
 /**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장

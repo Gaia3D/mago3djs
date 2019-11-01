@@ -133,6 +133,22 @@
 			"longitude": 126.79562661580214,
 			"pitch": 90,
 			"roll": 0
+		},
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "COLLADA"
+			},
+			"children": [],
+			"data_key": "DB010001",
+			"data_name": "DB010001",
+			"mapping_type": "boundingboxcenter",
+            "heading": 0,
+			"height": 4,
+			"latitude": 37.56626747520155,
+			"longitude": 126.79562661580214,
+			"pitch": 0,
+			"roll": 0
 		}
 	],
 	"parent": 0,

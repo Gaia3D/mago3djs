@@ -1,63 +1,121 @@
 'use strict';
 
-/**
- * Box geometry.
- * @class Box
- */
-var Box = function(width, length, height, name) 
+
+var Arrow = function(option) 
 {
-	if (!(this instanceof Box)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-	// Initially, box centered at the center of the bottom.***
 	this.dirty = true;
-	this.name;
-	this.id;
-	this.mesh;
-	this.centerPoint; // Usually (0,0,0).***
-	this.width;
-	this.length;
-	this.height;
-	this.owner;
-	this.geoLocDataManager;
-	this.color4;
-	if (name !== undefined)
-	{ this.name = name; }
-	
-	if (width !== undefined)
-	{ this.width = width; }
-	
-	if (length !== undefined)
-	{ this.length = length; }
-	
-	if (height !== undefined)
-	{ this.height = height; }
+	this.color4 = new Color();
+	this.color4.setRGBA(0.2, 0.2, 0.25, 1);
 
+	this.type = 'extruded';
+
+	this.totalLength = 10;
+	this.bodyWidth = 1;
+	this.headWidth = 1.5;
+	this.extrude = 1;
+    
+	this.tailLength;
+	this.tMat;
+
+	if (option) 
+	{
+		var bodyWidth = option.bodyWidth;
+		if (bodyWidth) 
+		{
+			this.bodyWidth = bodyWidth;
+		}
+        
+		var headWidth = option.headWidth;
+		if (headWidth) 
+		{
+			this.headWidth = headWidth;
+		}
+        
+		var headLength = option.headLength;
+		if (headLength) 
+		{
+			this.headLength = headLength;
+		}
+        
+		var totalLength = option.totalLength;
+		if (totalLength) 
+		{
+			this.totalLength = totalLength;
+		}
+        
+		var tailLength = option.tailLength;
+		if (tailLength) 
+		{
+			this.tailLength = tailLength;
+		}
+
+		var extrude = option.extrude;
+		if (extrude) 
+		{
+			this.extrude = extrude;
+		}
+	}
+
+	if (this.headWidth < this.bodyWidth) 
+	{
+		this.headWidth = this.bodyWidth * 1.5;
+	}
+
+	if (!this.headLength) 
+	{
+		this.headLength = this.totalLength *0.3;
+	}
 };
 
-/**
- * Set the unique one color of the box
- * @param {Number} r
- * @param {Number} g
- * @param {Number} b 
- * @param {Number} a
- */
-Box.prototype.setOneColor = function(r, g, b, a)
+Arrow.prototype.makeMesh = function() 
 {
-	// This function sets the unique one color of the mesh.***
-	if (this.color4 === undefined)
-	{ this.color4 = new Color(); }
+	var profile2dAux = new Profile2D();
 	
-	this.color4.setRGBA(r, g, b, a);
+	// Outer ring.**
+	var outerRing = profile2dAux.newOuterRing();
+ 
+	var halfBodyWidth = this.bodyWidth * 0.5;
+	var halfHeadWidth = this.headWidth * 0.5;
+	var bodyLengthWithoutHead = this.totalLength - this.headLength;
+
+	var polyline = outerRing.newElement("POLYLINE");
+	
+	if (this.tailLength)
+	{
+		polyline.newPoint2d(0, 0);
+		polyline.newPoint2d(halfBodyWidth, this.tailLength);
+		polyline.newPoint2d(halfBodyWidth, bodyLengthWithoutHead);
+		polyline.newPoint2d(halfHeadWidth, bodyLengthWithoutHead);
+		polyline.newPoint2d(0, this.totalLength);
+		polyline.newPoint2d(-halfHeadWidth, bodyLengthWithoutHead);
+		polyline.newPoint2d(-halfBodyWidth, bodyLengthWithoutHead);
+		polyline.newPoint2d(-halfBodyWidth, this.tailLength);
+	}
+	else 
+	{
+		polyline.newPoint2d(-halfBodyWidth, 0);    
+		polyline.newPoint2d(halfBodyWidth, 0);    
+		polyline.newPoint2d(halfBodyWidth, bodyLengthWithoutHead);
+		polyline.newPoint2d(halfHeadWidth, bodyLengthWithoutHead);
+		polyline.newPoint2d(0, this.totalLength);
+		polyline.newPoint2d(-halfHeadWidth, bodyLengthWithoutHead);
+		polyline.newPoint2d(-halfBodyWidth, bodyLengthWithoutHead);
+	}
+
+	var extrudeSegmentsCount = 1;
+	var extrusionVector = undefined;
+	var bIncludeBottomCap = false;
+	var bIncludeTopCap = false;
+    
+	var mesh = Modeler.getExtrudedMesh(profile2dAux, this.extrude, extrudeSegmentsCount, extrusionVector, bIncludeBottomCap, bIncludeTopCap, mesh);
+	this.mesh = mesh;
+	this.dirty = false;
 };
-
-
 
 /**
  * Renders the factory.
  */
-Box.prototype.render = function(magoManager, shader, renderType, glPrimitive)
+Arrow.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 {
 	if (this.attributes && this.attributes.isVisible !== undefined && this.attributes.isVisible === false) 
 	{
@@ -97,10 +155,60 @@ Box.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 	gl.disable(gl.BLEND);
 };
 
+Arrow.prototype.renderAsChild = function(magoManager, shader, renderType, glPrimitive, bIsSelected) 
+{
+	if (this.dirty)
+	{ this.makeMesh(); }
+	
+	if (this.mesh === undefined)
+	{ return false; }
+
+	// Set geoLocation uniforms.***
+	var gl = magoManager.getGl();
+	if (this.tMat && this.tMat instanceof Matrix4) 
+	{
+		gl.uniformMatrix4fv(shader.buildingRotMatrix_loc, false, this.tMat._floatArrays);
+	}
+	
+	if (renderType === 0)
+	{
+		// Depth render.***
+	}
+	else if (renderType === 1)
+	{
+		// Color render.***
+		//gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
+		gl.enable(gl.BLEND);
+		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
+		
+		// Check if is selected.***
+		var selectionManager = magoManager.selectionManager;
+		if (bIsSelected !== undefined && bIsSelected)
+		{
+			//gl.disable(gl.BLEND);
+			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 1.0]);
+		}
+		else if (selectionManager.isObjectSelected(this))
+		{
+			//gl.disable(gl.BLEND);
+			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 1.0]);
+		}
+		else 
+		{
+			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, this.color4.a]);
+		}
+		
+	}
+
+	this.mesh.render(magoManager, shader, renderType, glPrimitive, bIsSelected);
+
+	gl.disable(gl.BLEND);
+};
+
 /**
  * Renders the factory.
  */
-Box.prototype.renderRaw = function(magoManager, shader, renderType, glPrimitive, bIsSelected)
+Arrow.prototype.renderRaw = function(magoManager, shader, renderType, glPrimitive, bIsSelected)
 {
 	if (this.dirty)
 	{ this.makeMesh(); }
@@ -147,142 +255,3 @@ Box.prototype.renderRaw = function(magoManager, shader, renderType, glPrimitive,
 
 	gl.disable(gl.BLEND);
 };
-
-/**
- * Renders the factory.
- */
-Box.prototype.renderAsChild = function(magoManager, shader, renderType, glPrimitive, bIsSelected)
-{
-	if (this.dirty)
-	{ this.makeMesh(); }
-	
-	if (this.mesh === undefined)
-	{ return false; }
-
-	// Set geoLocation uniforms.***
-	var gl = magoManager.getGl();
-	
-	
-	if (renderType === 0)
-	{
-		// Depth render.***
-	}
-	else if (renderType === 1)
-	{
-		// Color render.***
-		//gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
-		gl.enable(gl.BLEND);
-		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
-		
-		// Check if is selected.***
-		var selectionManager = magoManager.selectionManager;
-		if (bIsSelected !== undefined && bIsSelected)
-		{
-			//gl.disable(gl.BLEND);
-			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 1.0]);
-		}
-		else if (selectionManager.isObjectSelected(this))
-		{
-			//gl.disable(gl.BLEND);
-			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 1.0]);
-		}
-		else 
-		{
-			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, this.color4.a]);
-		}
-		
-	}
-
-	this.mesh.render(magoManager, shader, renderType, glPrimitive, bIsSelected);
-
-	gl.disable(gl.BLEND);
-};
-
-/**
- * Returns the mesh.
- */
-Box.prototype.getMesh = function()
-{
-	if (this.mesh === undefined)
-	{
-		this.mesh = this.makeMesh(this.width, this.length, this.height);
-	}
-	
-	return this.mesh;
-};
-
-/**
- * Makes the box mesh.
- * @param {Number} width
- * @param {Number} length
- * @param {Number} height 
- */
-Box.prototype.makeMesh = function()
-{
-	var profileAux = new Profile2D();
-	
-	// Create a outer ring in the Profile2d.
-	var outerRing = profileAux.newOuterRing();
-
-	var halfWidth = this.width * 0.5;
-	var halLength = this.length * 0.5;
-	var polyline = outerRing.newElement("POLYLINE");
-
-	polyline.newPoint2d(-halfWidth, -halLength);
-	polyline.newPoint2d(halfWidth, -halLength);
-	polyline.newPoint2d(halfWidth, halLength);
-	polyline.newPoint2d(-halfWidth, halLength);
-
-
-	//var rect = outerRing.newElement("RECTANGLE");
-	//rect.setCenterPosition(this.centerPoint.x, this.centerPoint.y);
-	//rect.setDimensions(this.width, this.length);
-	
-	// Extrude the Profile.
-	var extrudeSegmentsCount = 1;
-	var extrusionVector = undefined;
-	var extrusionDist = this.height;
-	var bIncludeBottomCap = true;
-	var bIncludeTopCap = true;
-
-	var mesh = Modeler.getExtrudedMesh(profileAux, extrusionDist, extrudeSegmentsCount, extrusionVector, bIncludeBottomCap, bIncludeTopCap, undefined);
-	this.mesh = mesh;
-	this.dirty = false;
-	return mesh;
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1187,6 +1187,7 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 	
 	// parse smartTileF4d.***
 	var bytesReaded = 0;
+	var smartTileType = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 	var buildingsCount = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 	for (var i=0; i<buildingsCount; i++)
 	{
@@ -1224,11 +1225,6 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		
 		// read header (metaData + octree's structure + textures list + lodBuilding data).
 		var metadataByteSize = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
-		///bytesReaded = neoBuilding.parseHeader(dataArrayBuffer, bytesReaded);
-		///neoBuilding.bbox = neoBuilding.metaData.bbox;
-		///neoBuilding.metaData.fileLoadState = CODE.fileLoadState.PARESE_FINISHED;
-		
-		
 		var startBuff = bytesReaded;
 		var endBuff = bytesReaded + metadataByteSize;
 		neoBuilding.headerDataArrayBuffer = dataArrayBuffer.slice(startBuff, endBuff);
@@ -1238,10 +1234,13 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 	
 		// read lod5 mesh data.
+		var lodNameLength = (new Uint16Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+2)))[0]; bytesReaded += 2;
+		var lodName = enc.decode(new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+ lodNameLength))) ;bytesReaded += lodNameLength;
+		
 		var lod5meshSize = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
-
 		var lodString = "lod5";
-		var lowLodMesh = neoBuilding.getOrNewLodMesh(lodString);
+		var lodBuilding = neoBuilding.getOrNewLodBuilding(lodString);
+		var lowLodMesh = neoBuilding.getOrNewLodMesh(lodName);
 		var startBuff = bytesReaded;
 		var endBuff = bytesReaded + lod5meshSize;
 		lowLodMesh.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
@@ -1254,11 +1253,11 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		var startBuff = bytesReaded;
 		var endBuff = bytesReaded + byteSize * lod5ImageSize;
 
-		if (lowLodMesh.texture === undefined)
-		{ lowLodMesh.texture = new Texture(); }
+		if (lodBuilding.texture === undefined)
+		{ lodBuilding.texture = new Texture(); }
 	
-		lowLodMesh.texture.imageBinaryData = dataArrayBuffer.slice(startBuff, endBuff);
-		lowLodMesh.texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+		lodBuilding.texture.imageBinaryData = dataArrayBuffer.slice(startBuff, endBuff);
+		lodBuilding.texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 		bytesReaded = bytesReaded + byteSize * lod5ImageSize; // updating data.
 		
 	
@@ -1704,4 +1703,30 @@ SmartTile.prototype.getLongitudeRangeDegree = function()
 SmartTile.prototype.getLatitudeRangeDegree = function() 
 {
 	return this.maxGeographicCoord.latitude - this.minGeographicCoord.latitude;
+};
+
+/**
+ * 스마트 타일 내에 object 제거
+ * @param {object} object mago3d model object
+ * @param {string} comparision comparision key name
+ */
+SmartTile.prototype.eraseObjectByComparision = function(object, comparision) 
+{
+	if (!object[comparision]) { return false; }
+	
+	var comparisionValue = object[comparision];
+	var idx = null;
+	if (this.objectsArray && Array.isArray(this.objectsArray)) 
+	{
+		for (var i=0, len=this.objectsArray.length; i<len;++i) 
+		{
+			if (!this.objectsArray[i][comparision]) { continue; }
+			
+			if (this.objectsArray[i][comparision] === comparisionValue)
+			{
+				this.objectsArray.splice(i, 1);
+				break;
+			}
+		}
+	}
 };

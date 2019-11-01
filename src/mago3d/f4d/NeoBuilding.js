@@ -50,6 +50,7 @@ var NeoBuilding = function()
 	// In version 001, there are 6 lods.
 	this.lodMeshesMap;
 	this.lodBuildingDatasMap;
+	this.lodBuildingMap; // new.
 	
 	// Render settings.
 	// provisionally put this here.
@@ -570,6 +571,25 @@ NeoBuilding.prototype.getOrNewLodMesh = function(lodString)
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @param lod 변수
+ */
+NeoBuilding.prototype.getOrNewLodBuilding = function(lodString) 
+{
+	if (this.lodBuildingMap === undefined)
+	{ this.lodBuildingMap = {}; }
+
+	var lowLodBuilding = this.lodBuildingMap[lodString];
+	if (lowLodBuilding === undefined)
+	{
+		lowLodBuilding = new LodBuilding();
+		lowLodBuilding.attributes = {};
+		this.lodBuildingMap[lodString] = lowLodBuilding;
+	}
+	return lowLodBuilding;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
  * @param neoReference 변수
  */
 NeoBuilding.prototype.getCurrentLodString = function() 
@@ -585,6 +605,75 @@ NeoBuilding.prototype.getCurrentLodString = function()
  * @param neoReference 변수
  */
 NeoBuilding.prototype.getLowerSkinLodToLoad = function(currentLod) 
+{
+	// When load buildingSkin, must load respecting the LOD-order. Load 1rst lowerLod.
+	// This function returns the lowerLod that is no loaded from currentLod.
+	var lodToLoad;
+	
+	for (var lod = 5; lod >= 0; lod--)
+	{
+		if (lod < currentLod)
+		{ break; }
+		
+		var lodStringAux = "lod"+lod.toString();
+		var lowLodMeshAux;
+		if (this.lodBuildingMap !== undefined)
+		{ lowLodMeshAux = this.lodBuildingMap[lodStringAux]; }
+	
+		// Check if lowLodMeshAux if finished loading data.
+		if (lowLodMeshAux === undefined || lowLodMeshAux.skinLego === undefined || lowLodMeshAux.skinLego.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
+		{
+			lodToLoad = lod;
+			break;
+		}
+		else if (lowLodMeshAux.skinLego.vbo_vicks_container.vboCacheKeysArray === undefined)
+		{
+			lodToLoad = lod;
+			break;
+		}
+		
+		if (lowLodMeshAux.skinLego.vbo_vicks_container.vboCacheKeysArray[0] && lowLodMeshAux.skinLego.vbo_vicks_container.vboCacheKeysArray[0].vboBufferTCoord)
+		{
+			// this is the new version.
+			if (lowLodMeshAux.texture === undefined)
+			{
+				lodToLoad = lod;
+				break;
+			}
+			else
+			{
+				if (lowLodMeshAux.texture.texId === undefined)
+				{
+					if (lowLodMeshAux.texture.fileLoadState !== CODE.fileLoadState.BINDING_FINISHED && lowLodMeshAux.texture.fileLoadState !== CODE.fileLoadState.LOADING_STARTED)
+					{
+						lodToLoad = lod;
+						break;
+					}
+					else
+					{
+						break;
+					}
+				}
+			}
+
+		}
+		
+		
+		//if (lowLodMeshAux.texture === undefined || lowLodMeshAux.texture.texId === undefined)
+		//{
+		//	lodToLoad = lod;
+		//	break;
+		//}
+	}
+
+	return lodToLoad;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param neoReference 변수
+ */
+NeoBuilding.prototype.getLowerSkinLodToLoad__original = function(currentLod) 
 {
 	// When load buildingSkin, must load respecting the LOD-order. Load 1rst lowerLod.
 	// This function returns the lowerLod that is no loaded from currentLod.
@@ -646,6 +735,127 @@ NeoBuilding.prototype.getLowerSkinLodToLoad = function(currentLod)
  * @param neoReference 변수
  */
 NeoBuilding.prototype.getCurrentSkin = function() 
+{
+	if (this.lodMeshesMap === undefined)
+	{ return undefined; }
+	
+	var skinLego;
+	var lodBuildingData = this.getLodBuildingData(this.currentLod);
+	if (lodBuildingData === undefined)
+	{ return; }
+		
+	//textureFileName = lodBuildingData.textureFileName;
+	var lodString = lodBuildingData.geometryFileName;
+	//skinLego = this.lodMeshesMap[lodString];
+	var lodBuilding = this.lodBuildingMap[lodString];
+		
+	if (lodBuilding !== undefined && lodBuilding.isReadyToRender())
+	{ return lodBuilding; }
+		
+	
+	if (this.currentLod === 0)
+	{
+		lodBuilding = this.lodBuildingMap.lod0;
+		
+		if (lodBuilding === undefined || !lodBuilding.isReadyToRender())
+		{
+			lodBuilding = this.lodBuildingMap.lod1;
+			if (lodBuilding === undefined || !lodBuilding.isReadyToRender())
+			{
+				lodBuilding = this.lodBuildingMap.lod2;
+				if (lodBuilding === undefined || !lodBuilding.isReadyToRender())
+				{
+					lodBuilding = this.lodBuildingMap.lod3;
+					if (lodBuilding === undefined || !lodBuilding.isReadyToRender())
+					{
+						lodBuilding = this.lodBuildingMap.lod4;
+						if (lodBuilding === undefined || !lodBuilding.isReadyToRender())
+						{
+							lodBuilding = this.lodBuildingMap.lod5;
+						}
+					}
+				}
+			}
+		}
+		
+	}
+	else if (this.currentLod === 1)
+	{
+		lodBuilding = this.lodBuildingMap.lod1;
+		
+		if (lodBuilding === undefined || !lodBuilding.isReadyToRender())
+		{
+			lodBuilding = this.lodBuildingMap.lod2;
+			if (lodBuilding === undefined || !lodBuilding.isReadyToRender())
+			{
+				lodBuilding = this.lodBuildingMap.lod3;
+				if (lodBuilding === undefined || !lodBuilding.isReadyToRender())
+				{
+					lodBuilding = this.lodBuildingMap.lod4;
+					if (lodBuilding === undefined || !lodBuilding.isReadyToRender())
+					{
+						lodBuilding = this.lodBuildingMap.lod5;
+					}
+				}
+			}
+		}
+		
+	}
+	else if (this.currentLod === 2)
+	{
+		lodBuilding = this.lodBuildingMap.lod2;
+		
+		if (lodBuilding === undefined || !lodBuilding.isReadyToRender())
+		{
+			lodBuilding = this.lodBuildingMap.lod3;
+			if (lodBuilding === undefined || !lodBuilding.isReadyToRender())
+			{
+				lodBuilding = this.lodBuildingMap.lod4;
+				if (lodBuilding === undefined || !lodBuilding.isReadyToRender())
+				{
+					lodBuilding = this.lodBuildingMap.lod5;
+				}
+			}
+		}
+		
+	}
+	else if (this.currentLod === 3)
+	{
+		lodBuilding = this.lodBuildingMap.lod3;
+		
+		if (lodBuilding === undefined || !lodBuilding.isReadyToRender())
+		{
+			lodBuilding = this.lodBuildingMap.lod4;
+			if (lodBuilding === undefined || !lodBuilding.isReadyToRender())
+			{
+				lodBuilding = this.lodBuildingMap.lod5;
+			}
+		}
+		
+	}
+	else if (this.currentLod === 4)
+	{
+		lodBuilding = this.lodBuildingMap.lod4;
+		
+		if (lodBuilding === undefined || !lodBuilding.isReadyToRender())
+		{
+			lodBuilding = this.lodBuildingMap.lod5;
+		}
+		
+	}
+	else if (this.currentLod === 5)
+	{
+		lodBuilding = this.lodBuildingMap.lod5;
+	}
+
+	return lodBuilding;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param neoReference 변수
+ */
+NeoBuilding.prototype.getCurrentSkin__original = function() 
 {
 	if (this.lodMeshesMap === undefined)
 	{ return undefined; }
@@ -1282,13 +1492,118 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 	var projectFolderName = this.projectFolderName;
 	var buildingFolderName = this.buildingFileName;
 	var geometryDataPath = magoManager.readerWriter.geometryDataPath;
+	var textureFileName = lodBuildingData.textureFileName;
+
+	// check if exist lodBuilding in lodBuildingMap.
+	var lodBuildingName = "lod"+lodBuildingData.lod.toString();
+	var lodBuilding = this.getOrNewLodBuilding(lodBuildingName);
+	
+	if (textureFileName !== "noTexture")
+	{
+		lodBuilding.attributes.hasTexture = true;
+		lodBuilding.textureName = textureFileName;
+	}
+	
+	// check if exist the lodMesh in lodMeshMap.
+	var lodString = lodBuildingData.geometryFileName;
+	var lowLodMesh = this.getOrNewLodMesh(lodString);
+	lowLodMesh.textureName = textureFileName;
+	
+	lodBuilding.skinLego = lowLodMesh;
+	
+	if (lowLodMesh.fileLoadState === -1)
+	{
+		// if a lodObject has "fileLoadState" = -1 means that there are no file in server.
+		return false;
+	}
+	
+	if (lowLodMesh.fileLoadState === CODE.fileLoadState.READY) 
+	{
+		if (magoManager.readerWriter.skinLegos_requested < 5)
+		{
+			var lodMeshFilePath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + lodString;
+			magoManager.readerWriter.getLegoArraybuffer(lodMeshFilePath, lowLodMesh, magoManager);
+			if (lowLodMesh.vbo_vicks_container.vboCacheKeysArray === undefined)
+			{ lowLodMesh.vbo_vicks_container.vboCacheKeysArray = []; }
+		}
+	}
+	else if (lowLodMesh.fileLoadState === CODE.fileLoadState.LOADING_FINISHED) 
+	{
+		////magoManager.parseQueue.putSkinLegosToParse(lowLodMesh);
+		////magoManager.readerWriter.skinLegos_requested ++;
+		
+		lowLodMesh.parseArrayBuffer(lowLodMesh.dataArrayBuffer, magoManager);
+	}
+	
+	else if (lowLodMesh.vbo_vicks_container.vboCacheKeysArray[0] && lowLodMesh.vbo_vicks_container.vboCacheKeysArray[0].vboBufferTCoord)
+	{
+		// this is the new version.
+		if (lodBuilding.texture === undefined)
+		{
+			//if (magoManager.readerWriter.skinLegos_requested < 4)
+			if (magoManager.fileRequestControler.lowLodImagesRequestedCount < 4)
+			{
+				lodBuilding.texture = new Texture();
+				var filePath_inServer = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + textureFileName;
+				var gl = magoManager.sceneState.gl;
+				var flip_y_texCoords = true;
+				if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
+				{ flip_y_texCoords = false; }
+				
+				magoManager.readerWriter.readLegoSimpleBuildingTexture(gl, filePath_inServer, lodBuilding.texture, magoManager, flip_y_texCoords); 
+			}
+		}
+		else if (lodBuilding.texture.fileLoadState === CODE.fileLoadState.LOADING_FINISHED && lodBuilding.texture.texId === undefined)
+		{
+			// then make the image to bind into gpu.
+			var gl = magoManager.sceneState.gl;
+			TexturesManager.newWebGlTextureByEmbeddedImage(gl, lodBuilding.texture.imageBinaryData, lodBuilding.texture);
+			magoManager.readerWriter.skinLegos_requested ++;
+			
+		}
+	}
+	
+	
+	return true;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+NeoBuilding.prototype.prepareSkin__original = function(magoManager) 
+{
+	var headerVersion = this.getHeaderVersion();
+	if (headerVersion === undefined)
+	{ return false; }
+	
+	if (headerVersion[0] !== "0")
+	{ return false; }
+
+	// Must respect the lodLoading order: must load the lowerLod if is not loaded.
+	var lodToLoad;
+	lodToLoad = this.getLowerSkinLodToLoad(this.currentLod);
+	var lodBuildingData = this.getLodBuildingData(lodToLoad);
+	if (lodBuildingData === undefined)
+	{ return false; }
+
+	if (lodBuildingData.isModelRef)
+	{ return false; }
+
+	var projectFolderName = this.projectFolderName;
+	var buildingFolderName = this.buildingFileName;
+	var geometryDataPath = magoManager.readerWriter.geometryDataPath;
 	
 	var textureFileName = lodBuildingData.textureFileName;
 	var lodString = lodBuildingData.geometryFileName;
 	
+
+	
+	// check if exist the lodMesh in lodMeshMap.
 	var lowLodMesh = this.getOrNewLodMesh(lodString);
 	lowLodMesh.owner = this;
 	lowLodMesh.textureName = textureFileName;
+	
+
 	
 	if (lowLodMesh.fileLoadState === -1)
 	{
@@ -1448,6 +1763,122 @@ NeoBuilding.prototype.render = function(magoManager, shader, renderType, refMatr
  * 어떤 일을 하고 있습니까?
  */
 NeoBuilding.prototype.renderSkin = function(magoManager, shader, renderType) 
+{
+	var skinLego = this.getCurrentSkin();
+		
+	if (skinLego === undefined)
+	{ return; }
+
+	if (!skinLego.isReadyToRender())
+	{ return; }
+
+	var gl = magoManager.sceneState.gl;
+
+	if (renderType === 1 && magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected === this)
+	{
+		// active stencil buffer to draw silhouette.
+		magoManager.renderer.enableStencilBuffer(gl);
+	}
+	
+	magoManager.renderer.currentObjectsRendering.curOctree = this;
+	
+	var currentObjectsRendering = magoManager.renderer.currentObjectsRendering;
+	var selCandidates;
+	var selectionColor;
+	var currentNode;
+	var currentOctree;
+	
+	if (renderType === 2)
+	{
+		selCandidates = magoManager.selectionManager;
+		selectionColor = magoManager.selectionColor;
+		renderTexture = false; // reassign value for this var.
+		currentNode = currentObjectsRendering.curNode;
+		currentOctree = currentObjectsRendering.curOctree;
+	}
+	
+	var renderTexture = true;
+	
+	// if the building is highlighted, the use highlight oneColor4.
+	if (renderType === 1)
+	{
+		gl.uniform4fv(shader.oneColor4_loc, [0.7, 0.7, 0.7, 1.0]);
+		if (this.isHighLighted)
+		{
+			//gl.uniform1i(shader.bUse1Color_loc, true);
+			gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
+			gl.uniform4fv(shader.oneColor4_loc, this.highLightColor4); //.
+			renderTexture = false;
+		}
+		else if (this.isColorChanged)
+		{
+			//gl.uniform1i(shader.bUse1Color_loc, true);
+			gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
+			gl.uniform4fv(shader.oneColor4_loc, [this.aditionalColor.r, this.aditionalColor.g, this.aditionalColor.b, this.aditionalColor.a]); //.
+			renderTexture = false;
+		}
+		else
+		{
+			//gl.uniform1i(shader.bUse1Color_loc, false);
+		}
+		//----------------------------------------------------------------------------------
+		if (renderTexture)
+		{
+			if (skinLego.texture !== undefined && skinLego.texture.texId)
+			{
+				
+				shader.enableVertexAttribArray(shader.texCoord2_loc);
+				gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
+				if (shader.last_tex_id !== skinLego.texture.texId)
+				{
+					gl.activeTexture(gl.TEXTURE2);
+					gl.bindTexture(gl.TEXTURE_2D, skinLego.texture.texId);
+					shader.last_tex_id = skinLego.texture.texId;
+				}
+			}
+			else 
+			{
+				//return;
+				if (magoManager.textureAux_1x1 !== undefined)
+				{
+					shader.enableVertexAttribArray(shader.texCoord2_loc);
+					gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
+					gl.activeTexture(gl.TEXTURE2);
+					gl.bindTexture(gl.TEXTURE_2D, magoManager.textureAux_1x1);
+				}
+				else 
+				{
+					gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
+				}
+			}
+		}
+	}
+	else if (renderType === 2)
+	{
+		// Color selction mode.
+		var colorAux;
+		colorAux = magoManager.selectionColor.getAvailableColor(colorAux);
+		var idxKey = magoManager.selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
+		magoManager.selectionManager.setCandidates(idxKey, undefined, undefined, this, currentNode);
+		
+		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
+		gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
+	}
+	
+	gl.uniform1i(shader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.
+	skinLego.render(magoManager, renderType, renderTexture, shader);
+	
+	if (renderType === 1 && magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected === this)
+	{
+		// active stencil buffer to draw silhouette.
+		magoManager.renderer.disableStencilBuffer(gl);
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+NeoBuilding.prototype.renderSkin__original = function(magoManager, shader, renderType) 
 {
 	var skinLego = this.getCurrentSkin();
 		
