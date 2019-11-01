@@ -1825,7 +1825,8 @@ MagoManager.prototype.keyDown = function(key)
 		//this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_TUNNELPOINTS;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_PIPE;
-		this.modeler.mode = CODE.modelerMode.DRAWING_SPHERE;
+		//this.modeler.mode = CODE.modelerMode.DRAWING_SPHERE;
+		this.modeler.mode = 50;
 	}
 	else if (key === 38) // 38 = 'up'.***
 	{
@@ -1834,7 +1835,8 @@ MagoManager.prototype.keyDown = function(key)
 	else if (key === 39) // 39 = 'right'.***
 	{
 		//this.modeler.mode = CODE.modelerMode.DRAWING_BSPLINE;
-		this.modeler.mode = CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS;
+		//this.modeler.mode = CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS;
+		this.modeler.mode = 51;
 	}
 	else if (key === 40) // 40 = 'down'.***
 	{
@@ -2421,6 +2423,66 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			sphere.geoLocDataManager = geoLocDataManager;
 			sphere.setRadius(30);
 			this.modeler.addObject(sphere, 15);
+		}
+		else if (this.modeler.mode === 50)
+		{
+			// make a sphere.
+			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude, undefined, undefined, undefined, geoLocData, this);
+			
+
+			//var wheel = new Wheel(0.2, 0.508, 0.3, {borderRadius: 0.01});
+			//wheel.geoLocDataManager = geoLocDataManager;
+			
+			//this.modeler.addObject(wheel, 15);
+
+			var box = new Box(4, 12, 2.2, new Date());
+			box.setOneColor(1, 1, 102/255, 1);
+
+			var totalLength = 2;
+			var bodyWidth = totalLength * 0.1;
+			var headWidth = totalLength * 0.2;
+			var tailLength = totalLength * 0.2;
+			var extrude = totalLength * 0.05;
+
+			var frontArrow = new Arrow({
+				totalLength : totalLength,
+				bodyWidth   : bodyWidth,
+				headWidth   : headWidth,
+				tailLength  : tailLength,
+				extrude     : extrude
+			});
+			
+			var rearArrow = new Arrow({
+				totalLength : totalLength,
+				bodyWidth   : bodyWidth,
+				headWidth   : headWidth,
+				tailLength  : tailLength,
+				extrude     : extrude
+			});
+
+			var ve = new BasicVehicle();
+			ve.setBox(box);
+			ve.setFrontArrow(frontArrow);
+			ve.setRearArrow(rearArrow);
+			ve.setWheelbase(12 * 0.8);
+			ve.geoLocDataManager = geoLocDataManager;
+
+			this.modeler.addObject(ve, 15);
+		}
+		else if (this.modeler.mode === 51)
+		{
+			// make a sphere.
+			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+8, undefined, undefined, undefined, geoLocData, this);
+			
+			
+			var arrow = new Arrow({tailLength: 1});
+			arrow.geoLocDataManager = geoLocDataManager;
+			
+			this.modeler.addObject(arrow, 15);
 		}
 	}
 	

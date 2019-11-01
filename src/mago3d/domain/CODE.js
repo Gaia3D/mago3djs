@@ -96,5 +96,12 @@ CODE.animationType = {
 	"PATH"            : 2
 };
 
+CODE.relativePosition2D = {
+	"UNKNOWN"    : 0,
+	"LEFT"       : 1,
+	"RIGHT"      : 2,
+	"COINCIDENT" : 3
+};
+
 CODE.PROJECT_ID_PREFIX = "projectId_";
 CODE.PROJECT_DATA_FOLDER_PREFIX = "projectDataFolder_";

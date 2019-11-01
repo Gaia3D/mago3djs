@@ -120,6 +120,25 @@ Point2D.prototype.unitary = function()
 };
 
 /**
+ * Check whether the given line is parallel to this line or not
+ * @param {Point2D} point
+ * @returns {Boolean}
+ */
+Point2D.prototype.isParallelToPoint = function(point, err) 
+{
+	if (point === undefined)
+	{ return false; }
+	var zero = defaultValue(err, 10E-10);
+	var angRad = this.angleRadToVector(point);
+	
+	// if angle is zero or 180 degree, then this is parallel to "line".
+	if (angRad < zero || Math.abs(angRad - Math.PI) < zero)
+	{ return true; }
+	
+	return false;
+};
+
+/**
  * prepare to calculate the Euclidean distance between this point and the other point.
  * @param {Number} point
  * @returns dx*dx + dy*dy
