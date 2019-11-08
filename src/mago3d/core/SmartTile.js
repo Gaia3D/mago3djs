@@ -1487,25 +1487,30 @@ SmartTile.getGeographicExtentOfTileLXY = function(L, X, Y, resultGeoExtend)
  * @param frustum 변수
  */
  
-SmartTile.getFrustumIntersectedTilesNames = function(frustum, maxDepth, camPos, magoManager, resultFullyIntersectedTilesNamesMap) 
+SmartTile.getFrustumIntersectedTilesNames = function(frustum, maxDepth, camPos, magoManager, resultIntersectedTilesNamesMap) 
 {
 	var currMinGeographicCoords = new GeographicCoord();
 	var currMaxGeographicCoords = new GeographicCoord();
 	var currDepth = 0;
+	
+	if (resultIntersectedTilesNamesMap === undefined)
+	{ resultIntersectedTilesNamesMap = []; }
 	
 	// America side.
 	currMinGeographicCoords.setLonLatAlt(-180, -90, 0);
 	currMaxGeographicCoords.setLonLatAlt(0, 90, 0);
 	currDepth = 0;
 	SmartTile.getFrustumIntersectedTilesNamesForGeographicExtent(frustum, maxDepth, currDepth, camPos, currMinGeographicCoords, currMaxGeographicCoords, magoManager, magoManager.boundingSphere_Aux, 
-		resultFullyIntersectedTilesNamesMap);
+		resultIntersectedTilesNamesMap);
 	
 	// Asia side.
 	currMinGeographicCoords.setLonLatAlt(0, -90, 0);
 	currMaxGeographicCoords.setLonLatAlt(180, 90, 0);
 	currDepth = 0;
 	SmartTile.getFrustumIntersectedTilesNamesForGeographicExtent(frustum, maxDepth, currDepth, camPos, currMinGeographicCoords, currMaxGeographicCoords, magoManager, magoManager.boundingSphere_Aux, 
-		resultFullyIntersectedTilesNamesMap);
+		resultIntersectedTilesNamesMap);
+		
+	return resultIntersectedTilesNamesMap;
 };
 
 /**
@@ -1597,6 +1602,59 @@ SmartTile.getFrustumIntersectedTilesNamesForGeographicExtent = function(frustum,
 		}
 	}
 	
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param frustum 변수
+ */
+ 
+SmartTile.getTilesNamesByTargetDepth = function(targetDepth, currDepth, currMinGeographicCoords, currMaxGeographicCoords, resultTilesNamesMap) 
+{
+	if (currDepth < targetDepth)
+	{
+		// must descend.
+		currDepth += 1;
+		var minLon = currMinGeographicCoords.longitude;
+		var minLat = currMinGeographicCoords.latitude;
+		var minAlt = currMinGeographicCoords.altitude;
+		var maxLon = currMaxGeographicCoords.longitude;
+		var maxLat = currMaxGeographicCoords.latitude;
+		var maxAlt = currMaxGeographicCoords.altitude;
+		var midLon = (minLon + maxLon)/ 2;
+		var midLat = (minLat + maxLat)/ 2;
+		
+		// subTile 1.
+		currMaxGeographicCoords.setLonLatAlt(midLon, midLat, maxAlt);
+		this.getTilesNamesByTargetDepth(targetDepth, currDepth, currMinGeographicCoords, currMaxGeographicCoords, resultTilesNamesMap);
+		
+		// subTile 2.
+		currMinGeographicCoords.setLonLatAlt(midLon, minLat, minAlt);
+		currMaxGeographicCoords.setLonLatAlt(maxLon, midLat, maxAlt);
+		this.getTilesNamesByTargetDepth(targetDepth, currDepth, currMinGeographicCoords, currMaxGeographicCoords, resultTilesNamesMap);
+		
+		// subTile 3.
+		currMinGeographicCoords.setLonLatAlt(midLon, midLat, minAlt);
+		currMaxGeographicCoords.setLonLatAlt(maxLon, maxLat, maxAlt);
+		this.getTilesNamesByTargetDepth(targetDepth, currDepth, currMinGeographicCoords, currMaxGeographicCoords, resultTilesNamesMap);
+		
+		// subTile 4.
+		currMinGeographicCoords.setLonLatAlt(minLon, midLat, minAlt);
+		currMaxGeographicCoords.setLonLatAlt(midLon, maxLat, maxAlt);
+		this.getTilesNamesByTargetDepth(targetDepth, currDepth, currMinGeographicCoords, currMaxGeographicCoords, resultTilesNamesMap);
+		
+	}
+	else 
+	{
+		var midLon = (currMinGeographicCoords.longitude + currMaxGeographicCoords.longitude)/2;
+		var midLat = (currMinGeographicCoords.latitude + currMaxGeographicCoords.latitude)/2;
+		var tileName = SmartTile.selectTileName(currDepth, midLon, midLat, undefined);
+		var geographicExtent = new GeographicExtent();
+		geographicExtent.minGeographicCoord = new GeographicCoord(currMinGeographicCoords.longitude, currMinGeographicCoords.latitude, currMinGeographicCoords.altitude);
+		geographicExtent.maxGeographicCoord = new GeographicCoord(currMaxGeographicCoords.longitude, currMaxGeographicCoords.latitude, currMaxGeographicCoords.altitude);
+		resultTilesNamesMap[tileName] = geographicExtent;
+		return;
+	}
 };
 
 /**

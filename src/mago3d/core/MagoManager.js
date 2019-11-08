@@ -585,6 +585,9 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		sceneState.modelViewProjRelToEyeMatrix._floatArrays[14] = sceneState.projectionMatrix._floatArrays[14];
 		sceneState.modelViewProjRelToEyeMatrix._floatArrays[15] = 1;
 		*/
+		
+		// modelViewProjection.***
+		sceneState.modelViewProjMatrix._floatArrays = glMatrix.mat4.multiply(sceneState.modelViewProjMatrix._floatArrays, sceneState.projectionMatrix._floatArrays, sceneState.modelViewMatrix._floatArrays);
 	}
 	else if (this.configInformation.geo_view_library === Constant.MAGOWORLD)
 	{
@@ -1164,7 +1167,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	
 	if (this.weatherStation)
 	{
-		//this.weatherStation.test_renderWindLayer(this);
+		this.weatherStation.test_renderWindLayer(this);
 		//this.weatherStation.test_renderTemperatureLayer(this);
 		//this.weatherStation.test_renderCuttingPlanes(this, ssao_idx);
 		/*
@@ -1971,6 +1974,32 @@ MagoManager.prototype.keyDown = function(key)
 				bSplineCubic3d.makeInterpolatedPoints();
 			}
 		}
+		
+		// Another test.***
+		
+		if (this.smartTile_f4d_tested === undefined)
+		{
+			this.smartTile_f4d_tested = 1;
+			//var projectFolderName = "smartTile_f4d_GyeongGiDo";
+			var projectFolderName = "SejongParkJinWoo_20191101";
+			var fileName = this.readerWriter.geometryDataPath + "/" + projectFolderName + "/" + "smartTile_f4d_indexFile.sii";
+			this.readerWriter.getObjectIndexFileSmartTileF4d(fileName, projectFolderName, this);
+
+		}
+		else if (this.smartTile_f4d_tested === 1)
+		{
+			this.smartTile_f4d_tested ++;
+			var projectFolderName = "smartTile_f4d_Seoul";
+			var fileName = this.readerWriter.geometryDataPath + "/" + projectFolderName + "/" + "smartTile_f4d_indexFile.sii";
+			this.readerWriter.getObjectIndexFileSmartTileF4d(fileName, projectFolderName, this);
+		}
+		//else if (this.smartTile_f4d_tested === 2)
+		//{
+		//	this.smartTile_f4d_tested ++;
+		//	var projectFolderName = "berlin";
+		//	var fileName = this.readerWriter.geometryDataPath + "/" + projectFolderName + "/" + "smartTile_f4d_indexFile.sii";
+		//	this.readerWriter.getObjectIndexFileSmartTileF4d(fileName, projectFolderName, this);
+		//}
 		
 		// Another test. make collisionCheckOctree.***
 		if (this.selectionManager.currentNodeSelected !== undefined)

@@ -1442,7 +1442,7 @@ ReaderWriter.loadImage = function(gl, filePath_inServer, texture)
 		}
 
 		texture.texId = createTexture(gl, gl.LINEAR, image);
-		texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED; // file load finished.***
+		texture.fileLoadState = CODE.fileLoadState.BINDING_FINISHED; // file load finished.***
 	};
 
 	image.onerror = function() 

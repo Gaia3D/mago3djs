@@ -862,6 +862,7 @@ TinTerrain.prototype.calculateCenterPosition = function()
 {
 	// Note: The centerPosition is Float64Array type.
 	// The centerPosition of tiles are calculate with "altitude" = 0;.
+	// Note: if the earth is made in only 1 tile, then this calculations is no correct.
 	var altitude = 0.0;
 	var resultGeographicCoord;
 	resultGeographicCoord = this.geographicExtent.getMidPoint(resultGeographicCoord);
@@ -1139,6 +1140,100 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 			this.texCoordsArray[idx*2] = s;
 			this.texCoordsArray[idx*2+1] = t;
 			*/
+			
+			// actualize current values.
+			idx++;
+		}
+	}
+	
+	this.cartesiansArray = Globe.geographicRadianArrayToFloat32ArrayWgs84(lonArray, latArray, altArray, this.cartesiansArray);
+	
+	// Make normals using the cartesians.***
+	this.normalsArray = new Int8Array(vertexCount*3);
+	var point = new Point3D();
+	for (var i=0; i<vertexCount; i++)
+	{
+		point.set(this.cartesiansArray[i*3], this.cartesiansArray[i*3+1], this.cartesiansArray[i*3+2]);
+		point.unitary();
+		
+		this.normalsArray[i*3] = point.x*255;
+		this.normalsArray[i*3+1] = point.y*255;
+		this.normalsArray[i*3+2] = point.z*255;
+	}
+	
+	// finally make indicesArray.
+	var numCols = lonSegments + 1;
+	var numRows = latSegments + 1;
+
+	this.indices = GeometryUtils.getIndicesTrianglesRegularNet(numCols, numRows, undefined);
+	this.calculateCenterPosition();
+};
+
+TinTerrain.prototype.makeMeshVirtuallyCRS84 = function(lonSegments, latSegments, altitude, altitudesSlice)
+{
+	// This function makes an ellipsoidal mesh for tiles that has no elevation data.
+	// note: "altitude" & "altitudesSlice" are optionals.
+	var degToRadFactor = Math.PI/180.0;
+	var minLon = this.geographicExtent.minGeographicCoord.longitude * degToRadFactor;
+	var minLat = this.geographicExtent.minGeographicCoord.latitude * degToRadFactor;
+	var maxLon = this.geographicExtent.maxGeographicCoord.longitude * degToRadFactor;
+	var maxLat = this.geographicExtent.maxGeographicCoord.latitude * degToRadFactor;
+	var lonRange = maxLon - minLon;
+	var latRange = maxLat - minLat;
+	var depth = this.depth;
+	
+	var lonIncreDeg = lonRange/lonSegments;
+	var latIncreDeg = latRange/latSegments;
+	
+	// calculate total verticesCount.
+	var vertexCount = (lonSegments + 1)*(latSegments + 1);
+	var lonArray = new Float32Array(vertexCount);
+	var latArray = new Float32Array(vertexCount);
+	var altArray = new Float32Array(vertexCount);
+	this.texCoordsArray = new Float32Array(vertexCount*2);
+	
+	var currLon = minLon; // init startLon.
+	var currLat = minLat; // init startLat.
+	var idx = 0;
+	var s, t;
+
+	
+	// check if exist altitude.
+	var alt = 0;
+	if (altitude)
+	{ alt = altitude; }
+	
+	for (var currLatSeg = 0; currLatSeg<latSegments+1; currLatSeg++)
+	{
+		currLat = minLat + latIncreDeg * currLatSeg;
+		if (currLat > maxLat)
+		{ currLat = maxLat; }
+		
+		
+		for (var currLonSeg = 0; currLonSeg<lonSegments+1; currLonSeg++)
+		{
+			currLon = minLon + lonIncreDeg * currLonSeg;
+			
+			if (currLon > maxLon)
+			{ currLon = maxLon; }
+			
+			lonArray[idx] = currLon;
+			latArray[idx] = currLat;
+			// Now set the altitude.
+			if (altitudesSlice)
+			{
+				altArray[idx] = altitudesSlice.getValue(currLonSeg, currLatSeg);
+			}
+			else
+			{ altArray[idx] = alt; }
+
+
+			// make texcoords CRS84.***
+			s = (currLon - minLon)/lonRange;
+			t = (currLat - minLat)/latRange;
+			
+			this.texCoordsArray[idx*2] = s;
+			this.texCoordsArray[idx*2+1] = t;
 			
 			// actualize current values.
 			idx++;

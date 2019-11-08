@@ -39,6 +39,55 @@ var PostFxShader = function(gl)
 	this.attribLocationStateArray = [];
 };
 
+PostFxShader.createShader = function(gl, type, source) 
+{
+	var shader = gl.createShader(type);
+	gl.shaderSource(shader, source);
+
+	gl.compileShader(shader);
+	if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) 
+	{
+		throw new Error(gl.getShaderInfoLog(shader));
+	}
+
+	return shader;
+};
+
+PostFxShader.createProgram = function(gl, vertexSource, fragmentSource) 
+{
+	// static function.***
+	var program = gl.createProgram();
+
+	var vertexShader = PostFxShader.createShader(gl, gl.VERTEX_SHADER, vertexSource);
+	var fragmentShader = PostFxShader.createShader(gl, gl.FRAGMENT_SHADER, fragmentSource);
+
+	gl.attachShader(program, vertexShader);
+	gl.attachShader(program, fragmentShader);
+
+	gl.linkProgram(program);
+	if (!gl.getProgramParameter(program, gl.LINK_STATUS)) 
+	{
+		throw new Error(gl.getProgramInfoLog(program));
+	}
+
+	var wrapper = {program: program};
+
+	var numAttributes = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES);
+	for (var i = 0; i < numAttributes; i++) 
+	{
+		var attribute = gl.getActiveAttrib(program, i);
+		wrapper[attribute.name] = gl.getAttribLocation(program, attribute.name);
+	}
+	var numUniforms = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
+	for (var i = 0; i < numUniforms; i++) 
+	{
+		var uniform = gl.getActiveUniform(program, i);
+		wrapper[uniform.name] = gl.getUniformLocation(program, uniform.name);
+	}
+
+	return wrapper;
+};
+
 /**
  * 어떤 일을 하고 있습니까?
  * @param shaderName 변수

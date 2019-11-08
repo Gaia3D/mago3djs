@@ -4,7 +4,7 @@
  * Bouonding box which has vertexs represented as lon,lat,alt.
  * @class GeographicExtent
  */
-var GeographicExtent = function() 
+var GeographicExtent = function(minLon, minLat, minAlt, maxLon, maxLat, maxAlt) 
 {
 	if (!(this instanceof GeographicExtent)) 
 	{
@@ -13,6 +13,22 @@ var GeographicExtent = function()
 	
 	this.minGeographicCoord;
 	this.maxGeographicCoord;
+	
+	if (minLon !== undefined && minLat !== undefined && minAlt !== undefined)
+	{
+		if (this.minGeographicCoord === undefined)
+		{ this.minGeographicCoord = new GeographicCoord(); }
+		
+		this.minGeographicCoord.setLonLatAlt(minLon, minLat, minAlt);
+	}
+	
+	if (maxLon !== undefined && maxLat !== undefined && maxAlt !== undefined)
+	{
+		if (this.maxGeographicCoord === undefined)
+		{ this.maxGeographicCoord = new GeographicCoord(); }
+		
+		this.maxGeographicCoord.setLonLatAlt(maxLon, maxLat, maxAlt);
+	}
 };
 
 /**

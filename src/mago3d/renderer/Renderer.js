@@ -783,6 +783,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			
 			// Atmosphere.*******************************************************************************
 			// Test render sky.***
+			/*
 			if (magoManager.sky === undefined)
 			{ magoManager.sky = new Sky(); }
 			
@@ -842,6 +843,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			{
 				this.renderImageViewRectangle(gl, magoManager, magoManager.sunDepthFbo);
 			}
+			*/
 		}
 		
 		// Test render depthBuffer on scene.***
