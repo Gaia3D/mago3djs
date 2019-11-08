@@ -601,6 +601,116 @@ void main() {\n\
 	}\n\
 }\n\
 ";
+ShaderSource.draw_frag3D = "precision mediump float;\n\
+\n\
+uniform sampler2D u_wind;\n\
+uniform vec2 u_wind_min;\n\
+uniform vec2 u_wind_max;\n\
+uniform bool u_flipTexCoordY_windMap;\n\
+uniform bool u_colorScale;\n\
+uniform float u_alpha;\n\
+\n\
+varying vec2 v_particle_pos;\n\
+\n\
+vec3 getRainbowColor_byHeight(float height)\n\
+{\n\
+	float minHeight_rainbow = 0.0;\n\
+	float maxHeight_rainbow = 1.0;\n\
+	float gray = (height - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);\n\
+	if (gray > 1.0){ gray = 1.0; }\n\
+	else if (gray<0.0){ gray = 0.0; }\n\
+	\n\
+	float r, g, b;\n\
+	\n\
+	if(gray < 0.16666)\n\
+	{\n\
+		b = 0.0;\n\
+		g = gray*6.0;\n\
+		r = 1.0;\n\
+	}\n\
+	else if(gray >= 0.16666 && gray < 0.33333)\n\
+	{\n\
+		b = 0.0;\n\
+		g = 1.0;\n\
+		r = 2.0 - gray*6.0;\n\
+	}\n\
+	else if(gray >= 0.33333 && gray < 0.5)\n\
+	{\n\
+		b = -2.0 + gray*6.0;\n\
+		g = 1.0;\n\
+		r = 0.0;\n\
+	}\n\
+	else if(gray >= 0.5 && gray < 0.66666)\n\
+	{\n\
+		b = 1.0;\n\
+		g = 4.0 - gray*6.0;\n\
+		r = 0.0;\n\
+	}\n\
+	else if(gray >= 0.66666 && gray < 0.83333)\n\
+	{\n\
+		b = 1.0;\n\
+		g = 0.0;\n\
+		r = -4.0 + gray*6.0;\n\
+	}\n\
+	else if(gray >= 0.83333)\n\
+	{\n\
+		b = 6.0 - gray*6.0;\n\
+		g = 0.0;\n\
+		r = 1.0;\n\
+	}\n\
+	\n\
+	float aux = r;\n\
+	r = b;\n\
+	b = aux;\n\
+	\n\
+	//b = -gray + 1.0;\n\
+	//if (gray > 0.5)\n\
+	//{\n\
+	//	g = -gray*2.0 + 2.0; \n\
+	//}\n\
+	//else \n\
+	//{\n\
+	//	g = gray*2.0;\n\
+	//}\n\
+	//r = gray;\n\
+	vec3 resultColor = vec3(r, g, b);\n\
+    return resultColor;\n\
+} \n\
+\n\
+void main() {\n\
+	vec2 windMapTexCoord = v_particle_pos;\n\
+	if(u_flipTexCoordY_windMap)\n\
+	{\n\
+		windMapTexCoord.y = 1.0 - windMapTexCoord.y;\n\
+	}\n\
+    vec2 velocity = mix(u_wind_min, u_wind_max, texture2D(u_wind, windMapTexCoord).rg);\n\
+    float speed_t = length(velocity) / length(u_wind_max);\n\
+\n\
+	\n\
+	if(u_colorScale)\n\
+	{\n\
+		speed_t *= 1.5;\n\
+		if(speed_t > 1.0)speed_t = 1.0;\n\
+		float b = 1.0 - speed_t;\n\
+		float g;\n\
+		if(speed_t > 0.5)\n\
+		{\n\
+			g = 2.0-2.0*speed_t;\n\
+		}\n\
+		else{\n\
+			g = 2.0*speed_t;\n\
+		}\n\
+		vec3 col3 = getRainbowColor_byHeight(speed_t);\n\
+		float r = speed_t;\n\
+		gl_FragColor = vec4(col3.x, col3.y, col3.z ,u_alpha);\n\
+	}\n\
+	else{\n\
+		float intensity = speed_t*3.0;\n\
+		if(intensity > 1.0)\n\
+			intensity = 1.0;\n\
+		gl_FragColor = vec4(intensity,intensity,intensity,u_alpha);\n\
+	}\n\
+}";
 ShaderSource.draw_vert = "precision mediump float;\n\
 \n\
 attribute float a_index;\n\
@@ -626,17 +736,22 @@ void main() {\n\
 ";
 ShaderSource.draw_vert3D = "precision mediump float;\n\
 \n\
-	// This shader draws windParticles in 3d directly from positions on u_particles image.***\n\
+// This shader draws windParticles in 3d directly from positions on u_particles image.***\n\
 attribute float a_index;\n\
 \n\
 uniform sampler2D u_particles;\n\
 uniform float u_particles_res;\n\
 uniform mat4 ModelViewProjectionMatrix;\n\
+uniform vec3 u_camPosWC;\n\
+uniform vec3 u_geoCoordRadiansMax;\n\
+uniform vec3 u_geoCoordRadiansMin;\n\
+uniform float pendentPointSize;\n\
+uniform float u_alpha;\n\
 \n\
 varying vec2 v_particle_pos;\n\
 \n\
 #define M_PI 3.1415926535897932384626433832795\n\
-vec4 geographicToWorldCoord(float lonDeg, float latDeg, float alt)\n\
+vec4 geographicToWorldCoord(float lonRad, float latRad, float alt)\n\
 {\n\
 	// defined in the LINZ standard LINZS25000 (Standard for New Zealand Geodetic Datum 2000)\n\
 	// https://www.linz.govt.nz/data/geodetic-system/coordinate-conversion/geodetic-datum-conversions/equations-used-datum\n\
@@ -646,11 +761,8 @@ vec4 geographicToWorldCoord(float lonDeg, float latDeg, float alt)\n\
 	// x = (v+h)*cos(lat)*cos(lon).\n\
 	// y = (v+h)*cos(lat)*sin(lon).\n\
 	// z = [v*(1-e2)+h]*sin(lat).\n\
-	float degToRadFactor = M_PI/180.0;\n\
 	float equatorialRadius = 6378137.0; // meters.\n\
 	float firstEccentricitySquared = 6.69437999014E-3;\n\
-	float lonRad = lonDeg * degToRadFactor;\n\
-	float latRad = latDeg * degToRadFactor;\n\
 	float cosLon = cos(lonRad);\n\
 	float cosLat = cos(latRad);\n\
 	float sinLon = sin(lonRad);\n\
@@ -665,6 +777,7 @@ vec4 geographicToWorldCoord(float lonDeg, float latDeg, float alt)\n\
 }\n\
 \n\
 void main() {\n\
+	\n\
     vec4 color = texture2D(u_particles, vec2(\n\
         fract(a_index / u_particles_res),\n\
         floor(a_index / u_particles_res) / u_particles_res));\n\
@@ -674,19 +787,26 @@ void main() {\n\
         color.r / 255.0 + color.b,\n\
         color.g / 255.0 + color.a);\n\
 \n\
-    gl_PointSize = 1.0;\n\
-    vec4 pos2d = vec4(2.0 * v_particle_pos.x - 1.0, 1.0 - 2.0 * v_particle_pos.y, 0, 1);\n\
-	\n\
 	// Now, must calculate geographic coords of the pos2d.***\n\
-	float longitudeDeg = -180.0 + pos2d.x * 360.0;\n\
-	float latitudeDeg = 90.0 - pos2d.y * 180.0;\n\
-	float altitude = 0.0;\n\
+	float altitude = 16000.0;\n\
+	float minLonRad = u_geoCoordRadiansMin.x;\n\
+	float maxLonRad = u_geoCoordRadiansMax.x;\n\
+	float minLatRad = u_geoCoordRadiansMin.y;\n\
+	float maxLatRad = u_geoCoordRadiansMax.y;\n\
+	float lonRadRange = maxLonRad - minLonRad;\n\
+	float latRadRange = maxLatRad - minLatRad;\n\
+	float longitudeRad = -minLonRad + v_particle_pos.x * lonRadRange;\n\
+	float latitudeRad = maxLatRad - v_particle_pos.y * latRadRange;\n\
+	\n\
 	// Now, calculate worldPosition of the geographicCoords (lon, lat, alt).***\n\
-	vec4 worldPos = geographicToWorldCoord(longitudeDeg, latitudeDeg, altitude);\n\
+	vec4 worldPos = geographicToWorldCoord(longitudeRad, latitudeRad, altitude);\n\
 	\n\
 	// Now calculate the position on camCoord.***\n\
-	\n\
 	gl_Position = ModelViewProjectionMatrix * worldPos;\n\
+	float dist = distance(vec4(u_camPosWC.xyz, 1.0), worldPos);\n\
+	gl_PointSize = (2.0 + pendentPointSize/(dist))*u_alpha; \n\
+	if(gl_PointSize > 10.0)\n\
+	gl_PointSize = 10.0;\n\
 }";
 ShaderSource.filterSilhouetteFS = "precision mediump float;\n\
 \n\
@@ -2647,16 +2767,22 @@ uniform sampler2D u_wind;\n\
 uniform vec2 u_wind_res;\n\
 uniform vec2 u_wind_min;\n\
 uniform vec2 u_wind_max;\n\
+uniform vec3 u_geoCoordRadiansMax;\n\
+uniform vec3 u_geoCoordRadiansMin;\n\
 uniform float u_rand_seed;\n\
 uniform float u_speed_factor;\n\
+uniform float u_interpolation;\n\
 uniform float u_drop_rate;\n\
 uniform float u_drop_rate_bump;\n\
 uniform bool u_flipTexCoordY_windMap;\n\
+uniform vec4 u_visibleTilesRanges[16];\n\
+uniform int u_visibleTilesRangesCount;\n\
 \n\
 varying vec2 v_tex_pos;\n\
 \n\
 // pseudo-random generator\n\
 const vec3 rand_constants = vec3(12.9898, 78.233, 4375.85453);\n\
+// https://community.khronos.org/t/random-values/75728\n\
 float rand(const vec2 co) {\n\
     float t = dot(rand_constants.xy, co);\n\
     return fract(sin(t) * (rand_constants.z + t));\n\
@@ -2664,7 +2790,8 @@ float rand(const vec2 co) {\n\
 \n\
 // wind speed lookup; use manual bilinear filtering based on 4 adjacent pixels for smooth interpolation\n\
 vec2 lookup_wind(const vec2 uv) {\n\
-    // return texture2D(u_wind, uv).rg; // lower-res hardware filtering\n\
+    //return texture2D(u_wind, uv).rg; // lower-res hardware filtering\n\
+	\n\
     vec2 px = 1.0 / u_wind_res;\n\
     vec2 vc = (floor(uv * u_wind_res)) * px;\n\
     vec2 f = fract(uv * u_wind_res);\n\
@@ -2673,6 +2800,32 @@ vec2 lookup_wind(const vec2 uv) {\n\
     vec2 bl = texture2D(u_wind, vc + vec2(0, px.y)).rg;\n\
     vec2 br = texture2D(u_wind, vc + px).rg;\n\
     return mix(mix(tl, tr, f.x), mix(bl, br, f.x), f.y);\n\
+\n\
+}\n\
+\n\
+bool checkFrustumCulling(vec2 pos)\n\
+{\n\
+	for(int i=0; i<16; i++)\n\
+	{\n\
+		if(i >= u_visibleTilesRangesCount)\n\
+		return false;\n\
+		\n\
+		vec4 range = u_visibleTilesRanges[i]; // range = minX(x), minY(y), maxX(z), maxY(w)\n\
+\n\
+		float minX = range.x;\n\
+		float minY = range.y;\n\
+		float maxX = range.z;\n\
+		float maxY = range.w;\n\
+		\n\
+		if(pos.x > minX && pos.x < maxX)\n\
+		{\n\
+			if(pos.y > minY && pos.y < maxY)\n\
+			{\n\
+				return true;\n\
+			}\n\
+		}\n\
+	}\n\
+	return false;\n\
 }\n\
 \n\
 void main() {\n\
@@ -2689,23 +2842,63 @@ void main() {\n\
     float speed_t = length(velocity) / length(u_wind_max);\n\
 \n\
     // take EPSG:4236 distortion into account for calculating where the particle moved\n\
-    float distortion = cos(radians(pos.y * 180.0 - 90.0));\n\
-    vec2 offset = vec2(velocity.x / distortion, -velocity.y) * 0.0001 * u_speed_factor;\n\
+	float minLat = u_geoCoordRadiansMin.y;\n\
+	float maxLat = u_geoCoordRadiansMax.y;\n\
+	float latRange = maxLat - minLat;\n\
+	float distortion = cos((minLat + pos.y * latRange ));\n\
+    vec2 offset = vec2(velocity.x / distortion, -velocity.y) * 0.0001 * u_speed_factor * u_interpolation;\n\
 \n\
     // update particle position, wrapping around the date line\n\
     pos = fract(1.0 + pos + offset);\n\
-\n\
-    // a random seed to use for the particle drop\n\
-    vec2 seed = (pos + v_tex_pos) * u_rand_seed;\n\
+	//pos = pos + offset;\n\
 \n\
     // drop rate is a chance a particle will restart at random position, to avoid degeneration\n\
-    float drop_rate = u_drop_rate + speed_t * u_drop_rate_bump;\n\
-    float drop = step(1.0 - drop_rate, rand(seed));\n\
+	float drop = 0.0;\n\
 \n\
-    vec2 random_pos = vec2(\n\
-        rand(seed + 1.3),\n\
-        rand(seed + 2.1));\n\
-    pos = mix(pos, random_pos, drop);\n\
+	if(u_interpolation < 0.9)\n\
+	{\n\
+		drop = 0.0;\n\
+	}\n\
+	else\n\
+	{\n\
+		// a random seed to use for the particle drop\n\
+		vec2 seed = (pos + v_tex_pos) * u_rand_seed;\n\
+		float drop_rate = u_drop_rate + speed_t * u_drop_rate_bump;\n\
+		drop = step(1.0 - drop_rate, rand(seed));\n\
+	}\n\
+	/*\n\
+	if(drop > 0.01)\n\
+	{\n\
+		vec2 random_pos = vec2( rand(pos), rand(v_tex_pos) );\n\
+		float randomValue = (u_rand_seed);\n\
+		int index = int(floor(float(u_visibleTilesRangesCount+1)*(randomValue)));\n\
+		for(int i=0; i<32; i++)\n\
+		{\n\
+			if(i >= u_visibleTilesRangesCount)\n\
+			break;\n\
+		\n\
+			if(i == index)\n\
+			{\n\
+				vec4 posAux4 = u_visibleTilesRanges[i];\n\
+				float width = (posAux4.z-posAux4.x);\n\
+				float height = (posAux4.w-posAux4.y);\n\
+				float scaledX = posAux4.x + random_pos.x*width;\n\
+				float scaledY = posAux4.y + random_pos.y*height;\n\
+				random_pos = vec2(scaledX, 1.0-scaledY);\n\
+				pos = random_pos;\n\
+				break;\n\
+			}\n\
+		}\n\
+	}\n\
+	*/\n\
+	\n\
+	\n\
+	if(drop > 0.01)\n\
+	{\n\
+		vec2 random_pos = vec2( rand(pos), rand(v_tex_pos) );\n\
+		pos = random_pos;\n\
+	}\n\
+	\n\
 \n\
     // encode the new particle position back into RGBA\n\
     gl_FragColor = vec4(\n\
