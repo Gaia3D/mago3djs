@@ -1762,3 +1762,29 @@ SmartTile.prototype.getLatitudeRangeDegree = function()
 {
 	return this.maxGeographicCoord.latitude - this.minGeographicCoord.latitude;
 };
+
+/**
+ * 스마트 타일 내에 object 제거
+ * @param {object} object mago3d model object
+ * @param {string} comparision comparision key name
+ */
+SmartTile.prototype.eraseObjectByComparision = function(object, comparision) 
+{
+	if (!object[comparision]) { return false; }
+	
+	var comparisionValue = object[comparision];
+	var idx = null;
+	if (this.objectsArray && Array.isArray(this.objectsArray)) 
+	{
+		for (var i=0, len=this.objectsArray.length; i<len;++i) 
+		{
+			if (!this.objectsArray[i][comparision]) { continue; }
+			
+			if (this.objectsArray[i][comparision] === comparisionValue)
+			{
+				this.objectsArray.splice(i, 1);
+				break;
+			}
+		}
+	}
+};

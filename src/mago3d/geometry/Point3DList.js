@@ -48,6 +48,7 @@ Point3DList.prototype.deleteVboKeysContainer = function(magoManager)
 };
 /**
  * Clear this.pointsArray of this feature
+ * 
  */
 Point3DList.prototype.deletePoints3d = function()
 {
@@ -310,6 +311,10 @@ Point3DList.prototype.getBisectionPlane = function(idx, resultBisectionPlane, bL
  */
 Point3DList.prototype.makeVbo = function(magoManager)
 {
+	if (!this.pointsArray || this.pointsArray.length === 0) 
+	{
+		return;
+	}
 	if (this.vboKeysContainer === undefined)
 	{ this.vboKeysContainer = new VBOVertexIdxCacheKeysContainer(); }
 	
@@ -364,6 +369,70 @@ Point3DList.prototype.render = function(magoManager, shader, renderType, glPrimi
 	// Render the line.
 	var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
 	buildingGeoLocation.bindGeoLocationUniforms(gl, shader);
+	
+	if (renderType === 2)
+	{
+		var selectionManager = magoManager.selectionManager;
+		var selectionColor = magoManager.selectionColor;
+
+		var selColor = selectionColor.getAvailableColor(undefined); 
+		var idxKey = selectionColor.decodeColor3(selColor.r, selColor.g, selColor.b);
+
+		selectionManager.setCandidateGeneral(idxKey, this);
+		gl.uniform4fv(shader.oneColor4_loc, [selColor.r/255.0, selColor.g/255.0, selColor.b/255.0, 1.0]);
+	}
+	
+	var vbo_vicky = this.vboKeysContainer.vboCacheKeysArray[0]; // there are only one.
+	if (!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
+	{ return false; }
+
+	gl.drawArrays(gl.POINTS, 0, vbo_vicky.vertexCount);
+	
+	// Check if exist selectedGeoCoord.
+	/*
+	var currSelected = magoManager.selectionManager.getSelectedGeneral();
+	if(currSelected !== undefined && currSelected.constructor.name === "GeographicCoord")
+	{
+		gl.uniform4fv(shader.oneColor4_loc, [1.0, 0.1, 0.1, 1.0]); //.
+		gl.uniform1f(shader.fixPointSize_loc, 10.0);
+		currSelected.renderPoint(magoManager, shader, gl, renderType);
+	}
+	*/
+	
+	gl.enable(gl.DEPTH_TEST);
+};
+
+/**
+ * Render this point3dlist using vbo of this list. 
+ * @param magoManager
+ * @param shader 
+ * @param renderType
+ * @param bLoop 
+ * @param bEnableDepth if this is turned off, then the last-drawing feature will be shown at the top
+ */
+Point3DList.prototype.renderAsChild = function(magoManager, shader, renderType, glPrimitive, options)
+{
+	if (this.vboKeysContainer === undefined)
+	{ 
+		this.makeVbo(magoManager); 
+		return;
+	}
+	var gl = magoManager.getGl();
+	shader.enableVertexAttribArray(shader.position3_loc);
+	var bEnableDepth;
+	if (bEnableDepth === undefined)
+	{ bEnableDepth = true; }
+	
+	if (bEnableDepth)
+	{ gl.enable(gl.DEPTH_TEST); }
+	else
+	{ gl.disable(gl.DEPTH_TEST); }
+
+	var refMatrixType = 0;
+	gl.uniform1i(shader.hasAditionalMov_loc, false);
+	gl.uniform1i(shader.refMatrixType_loc, refMatrixType);
+	gl.uniform4fv(shader.oneColor4_loc, [1.0, 0.0, 0.0, 0.7]);
+	gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 	
 	if (renderType === 2)
 	{

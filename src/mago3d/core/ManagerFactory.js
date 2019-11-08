@@ -180,6 +180,11 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 				}
 			}
 		}
+		if (serverPolicy.geo_tile_path && serverPolicy.geo_tile_path !== "") 
+		{
+			viewer.scene.magoManager.getObjectIndexFileSmartTileF4d(serverPolicy.geo_tile_path);
+		}
+
 		viewer.scene.magoManager.handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
 		addMouseAction();
 		viewer.clock.onTick.addEventListener(function(clock) 

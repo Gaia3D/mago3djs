@@ -101,6 +101,39 @@ Line2D.prototype.getPerpendicularLeft = function(point)
 };
 
 /**
+ * Get the perpendicular direction of the line in left-handed coordinate system
+ * @param {Point2D} point target point
+ * @param {number} error 
+ * @returns {number} CODE relativePosition2D
+ */
+Line2D.prototype.getRelativeSideOfPoint = function(point, error) 
+{
+	if (error === undefined)
+	{ error = 10E-8; }
+
+	var projectPoint = this.getProjectedPoint(point);
+
+	var squaredDist = point.squareDistToPoint(projectPoint);
+	
+	if (squaredDist < error*error)
+	{ return CODE.relativePosition2D.COINCIDENT; }
+
+	var vector = new Point2D(point.x - projectPoint.x, point.y - projectPoint.y);
+	vector.unitary();
+
+	if ((Math.abs(vector.x-this.direction.y) < error) && (Math.abs(vector.y+this.direction.x) < error)) 
+	{
+		return CODE.relativePosition2D.RIGHT;
+	}
+	else 
+	{
+		return CODE.relativePosition2D.LEFT;
+	}
+
+	return CODE.relativePosition2D.UNKNOWN;
+};
+
+/**
  * Return the point which is projected as perpendicular way to the line
  * @param {Point2D} point the given point
  * @param {Point2D} projectedPoint the result of the projection to the line

@@ -353,6 +353,105 @@ ManagerUtils.calculateGeoLocationDataByAbsolutePoint = function(absoluteX, absol
 	resultGeoLocationData.position.z = absoluteZ;
 	
 	//추후에 세슘의존성 버리는 코드로 대체 가능해 보임. 손수석님과 검토 필요.
+	/*
+	if (magoManager.configInformation.geo_view_library === Constant.CESIUM)
+	{
+		// *if this in Cesium:
+		//resultGeoLocationData.position = Cesium.Cartesian3.fromDegrees(resultGeoLocationData.geographicCoord.longitude, resultGeoLocationData.geographicCoord.latitude, resultGeoLocationData.geographicCoord.altitude);
+		// must find cartographic data.
+		var cartographic = new Cesium.Cartographic();
+		var cartesian = new Cesium.Cartesian3();
+		cartesian.x = absoluteX;
+		cartesian.y = absoluteY;
+		cartesian.z = absoluteZ;
+		cartographic = Cesium.Cartographic.fromCartesian(cartesian, magoManager.scene._globe._ellipsoid, cartographic);
+		resultGeoLocationData.geographicCoord.longitude = cartographic.longitude * 180.0/Math.PI;
+		resultGeoLocationData.geographicCoord.latitude = cartographic.latitude * 180.0/Math.PI;
+		resultGeoLocationData.geographicCoord.altitude = cartographic.height;
+	}
+	*/
+
+	resultGeoLocationData.geographicCoord = ManagerUtils.pointToGeographicCoord(new Point3D(absoluteX, absoluteY, absoluteZ));
+
+	// High and Low values of the position.**
+	if (resultGeoLocationData.positionHIGH === undefined)
+	{ resultGeoLocationData.positionHIGH = new Float32Array([0.0, 0.0, 0.0]); }
+	if (resultGeoLocationData.positionLOW === undefined)
+	{ resultGeoLocationData.positionLOW = new Float32Array([0.0, 0.0, 0.0]); }
+	this.calculateSplited3fv([resultGeoLocationData.position.x, resultGeoLocationData.position.y, resultGeoLocationData.position.z], resultGeoLocationData.positionHIGH, resultGeoLocationData.positionLOW);
+
+	// Determine the elevation of the position.**
+	//var cartographic = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
+	//var height = cartographic.height;
+	// End Determine the elevation of the position.-------------------------------------------------------
+	if (resultGeoLocationData.tMatrix === undefined)
+	{ resultGeoLocationData.tMatrix = new Matrix4(); }
+	else
+	{ resultGeoLocationData.tMatrix.Identity(); }
+
+	if (resultGeoLocationData.geoLocMatrix === undefined)
+	{ resultGeoLocationData.geoLocMatrix = new Matrix4(); }
+	else
+	{ resultGeoLocationData.geoLocMatrix.Identity(); }
+
+	if (resultGeoLocationData.rotMatrix === undefined)
+	{ resultGeoLocationData.rotMatrix = new Matrix4(); }
+	else
+	{ resultGeoLocationData.rotMatrix.Identity(); }
+
+	// Set inverseMatrices as undefined.
+	resultGeoLocationData.tMatrixInv = undefined; // reset. is calculated when necessary.
+	resultGeoLocationData.rotMatrixInv = undefined; // reset. is calculated when necessary.
+	resultGeoLocationData.geoLocMatrixInv = undefined; // reset. is calculated when necessary.
+
+	// 1rst, calculate the transformation matrix for the location.
+	resultGeoLocationData.tMatrix = ManagerUtils.calculateTransformMatrixAtWorldPosition(resultGeoLocationData.position, resultGeoLocationData.heading, resultGeoLocationData.pitch, resultGeoLocationData.roll, 
+		resultGeoLocationData.geoLocMatrix, resultGeoLocationData.tMatrix);
+	resultGeoLocationData.rotMatrix.copyFromMatrix4(resultGeoLocationData.tMatrix);
+	resultGeoLocationData.rotMatrix._floatArrays[12] = 0;
+	resultGeoLocationData.rotMatrix._floatArrays[13] = 0;
+	resultGeoLocationData.rotMatrix._floatArrays[14] = 0;
+	
+	// finally assing the pivotPoint.
+	if (resultGeoLocationData.pivotPoint === undefined)
+	{ resultGeoLocationData.pivotPoint = new Point3D(); }
+
+	resultGeoLocationData.pivotPoint.set(resultGeoLocationData.position.x, resultGeoLocationData.position.y, resultGeoLocationData.position.z);
+	resultGeoLocationData.doEffectivePivotPointTranslation();
+	
+	return resultGeoLocationData;
+};
+
+/**
+ * This function calculates geolocation data use pixel point(calculated world point). 
+ * When use Object Marker, this function called.
+ * @param {number} absoluteX absoluteX.
+ * @param {number} absoluteY absoluteY.
+ * @param {number} absoluteZ absoluteZ.
+ * @param {GeoLocationData|undefined} resultGeoLocationData Optional. result geolocation matrix. if undefined, create GeoLocationData instance.
+ * @param {MagoManager} magoManager
+ * @returns {GeoLocationData} resultGeoLocationData.
+ */
+ManagerUtils.calculateGeoLocationDataByAbsolutePoint__original = function(absoluteX, absoluteY, absoluteZ, resultGeoLocationData, magoManager) 
+{
+	if (resultGeoLocationData === undefined)
+	{ resultGeoLocationData = new GeoLocationData(); }
+
+	// 0) Position.**
+	if (resultGeoLocationData.geographicCoord === undefined)
+	{ resultGeoLocationData.geographicCoord = new GeographicCoord(); }
+	
+	if (magoManager.configInformation === undefined)
+	{ return; }
+	
+	if (resultGeoLocationData.position === undefined)
+	{ resultGeoLocationData.position = new Point3D(); }
+		
+	resultGeoLocationData.position.x = absoluteX;
+	resultGeoLocationData.position.y = absoluteY;
+	resultGeoLocationData.position.z = absoluteZ;
+	
+	//추후에 세슘의존성 버리는 코드로 대체 가능해 보임. 손수석님과 검토 필요.
 	if (magoManager.configInformation.geo_view_library === Constant.CESIUM)
 	{
 		// *if this in Cesium:
