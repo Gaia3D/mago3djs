@@ -2587,6 +2587,109 @@ void main()\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
     \n\
 }";
+ShaderSource.thickLineFS = "precision highp float;\n\
+uniform vec4 color;\n\
+void main() {\n\
+	gl_FragColor = color;\n\
+}";
+ShaderSource.thickLineVS = "attribute vec3 prev;\n\
+attribute vec3 current;\n\
+attribute vec3 next;\n\
+attribute float order;\n\
+uniform float thickness;\n\
+uniform mat4 projectionMatrix;\n\
+uniform mat4 modelViewMatrix;\n\
+uniform vec2 viewport;\n\
+\n\
+const float C = 0.1;\n\
+const float far = 149.6e+9;\n\
+float logc = 2.0 / log( C * far + 1.0 );\n\
+\n\
+const float NEAR = -1.0;\n\
+\n\
+// based on https://weekly-geekly.github.io/articles/331164/index.html\n\
+\n\
+vec2 project(vec4 p){\n\
+	return (0.5 * p.xyz / p.w + 0.5).xy * viewport;\n\
+}\n\
+\n\
+void main(){\n\
+	\n\
+	vec4 vCurrent = modelViewMatrix * vec4(current, 1.0);\n\
+	vec4 vPrev = modelViewMatrix * vec4(prev, 1.0);\n\
+	vec4 vNext = modelViewMatrix * vec4(next, 1.0);\n\
+	\n\
+	/*Clip near plane*/\n\
+	if(vCurrent.z > NEAR) {\n\
+		if(vPrev.z < NEAR){\n\
+			/*to the begining path view*/\n\
+			vCurrent = vPrev + (vCurrent - vPrev) * (NEAR - vPrev.z) / (vCurrent.z - vPrev.z);\n\
+		}else if(vNext.z < NEAR){\n\
+			/*to the end path view*/\n\
+			vPrev = vPrev + (vCurrent - vPrev) * (NEAR - vPrev.z) / (vCurrent.z - vPrev.z);\n\
+			vCurrent = vNext + (vCurrent - vNext) * (NEAR - vNext.z) / (vCurrent.z - vNext.z);\n\
+		}\n\
+	} else if( vPrev.z > NEAR) {\n\
+		/*to the end path view*/\n\
+		vPrev = vPrev + (vCurrent - vPrev) * (NEAR - vPrev.z) / (vCurrent.z - vPrev.z);\n\
+	} else if( vNext.z > NEAR) {\n\
+		/*to the begining path view*/\n\
+		vNext = vNext + (vCurrent - vNext) * (NEAR - vNext.z) / (vCurrent.z - vNext.z);\n\
+	}\n\
+	\n\
+	vec4 dCurrent = projectionMatrix * vCurrent;\n\
+	vec2 _next = project(projectionMatrix * vNext);\n\
+	vec2 _prev = project(projectionMatrix * vPrev);\n\
+	vec2 _current = project(dCurrent);\n\
+	if(_prev == _current){\n\
+		if(_next == _current){\n\
+			_next = _current + vec2(1.0, 0.0);\n\
+			_prev = _current - _next;\n\
+		}else{\n\
+			_prev = _current + normalize(_current - _next);\n\
+		}\n\
+	}\n\
+	if(_next == _current){\n\
+		_next = _current + normalize(_current - _prev);\n\
+	}\n\
+	\n\
+	vec2 sNext = _next,\n\
+		 sCurrent = _current,\n\
+		 sPrev = _prev;\n\
+	vec2 dirNext = normalize(sNext - sCurrent);\n\
+	vec2 dirPrev = normalize(sPrev - sCurrent);\n\
+	float dotNP = dot(dirNext, dirPrev);\n\
+	\n\
+	vec2 normalNext = normalize(vec2(-dirNext.y, dirNext.x));\n\
+	vec2 normalPrev = normalize(vec2(dirPrev.y, -dirPrev.x));\n\
+	\n\
+	float d = thickness * 0.5 * sign(order);\n\
+	\n\
+	vec2 m;\n\
+	if(dotNP >= 0.99991){\n\
+		m = sCurrent - normalPrev * d;\n\
+	}else{\n\
+		vec2 dir = normalPrev + normalNext;\n\
+		m = sCurrent + dir * d / (dirNext.x * dir.y - dirNext.y * dir.x);\n\
+		\n\
+		if( dotNP > 0.5 && dot(dirNext + dirPrev, m - sCurrent) < 0.0 ){\n\
+			float occw = order * sign(dirNext.x * dirPrev.y - dirNext.y * dirPrev.x);\n\
+			if(occw == -1.0){\n\
+				m = sCurrent + normalPrev * d;\n\
+			}else if(occw == 1.0){\n\
+				m = sCurrent + normalNext * d;\n\
+			}else if(occw == -2.0){\n\
+				m = sCurrent + normalNext * d;\n\
+			}else if(occw == 2.0){\n\
+				m = sCurrent + normalPrev * d;\n\
+			}\n\
+		}else if(distance(sCurrent, m) > min(distance(sCurrent, sNext), distance(sCurrent, sPrev))){\n\
+			m = sCurrent + normalNext * d;\n\
+		}\n\
+	}\n\
+	gl_Position = vec4((2.0 * m / viewport - 1.0) * dCurrent.w, dCurrent.z, dCurrent.w);\n\
+	gl_Position.z = ( log( C * gl_Position.w + 1.0 ) * logc - 1.0 ) * gl_Position.w;\n\
+}";
 ShaderSource.TinTerrainFS = "#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\

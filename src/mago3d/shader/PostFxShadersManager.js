@@ -54,6 +54,32 @@ PostFxShadersManager.prototype.getShader = function(shaderName)
  * @param typeString 변수
  * @returns shader
  */
+PostFxShadersManager.prototype.createShaderProgram = function(gl, vertexSource, fragmentSource, shaderName, magoManager) 
+{
+	var shader = this.newShader(shaderName);
+	shader.program = gl.createProgram();
+	shader.shader_vertex = this.createShader(gl, vertexSource, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.createShader(gl, fragmentSource, gl.FRAGMENT_SHADER, "FRAGMENT");
+
+	gl.attachShader(shader.program, shader.shader_vertex);
+	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
+	gl.linkProgram(shader.program);
+			
+	shader.createUniformGenerals(gl, shader, magoManager.sceneState);
+	shader.createUniformLocals(gl, shader, magoManager.sceneState);
+	
+	return shader;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param gl 변수
+ * @param source 변수
+ * @param type 변수
+ * @param typeString 변수
+ * @returns shader
+ */
 PostFxShadersManager.prototype.createShader = function(gl, source, type, typeString) 
 {
 	// Source from internet.

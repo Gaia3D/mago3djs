@@ -169,6 +169,18 @@ GeographicCoordsList.prototype.deleteObjects = function(vboMemManager)
 /**
  * Make Lines making the first point as the origin for the other points. Change the points to the GeographicCoords.
  */
+GeographicCoordsList.prototype.test__makeThickLines = function(magoManager) 
+{
+	// 1rst, make lines.
+	this.makeLines(magoManager);
+	
+	// now, make thickLines.
+	var resultVboKeysContainer = Point3DList.getVboThickLines(magoManager, this.points3dList.pointsArray, undefined);
+};
+
+/**
+ * Make Lines making the first point as the origin for the other points. Change the points to the GeographicCoords.
+ */
 GeographicCoordsList.prototype.makeLines = function(magoManager) 
 {
 	if (this.geographicCoordsArray === undefined || this.geographicCoordsArray.length === 0)

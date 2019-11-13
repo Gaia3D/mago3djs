@@ -388,7 +388,7 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 	// Test Modeler Rendering.********************************************************************
 	// Test Modeler Rendering.********************************************************************
 	// Test Modeler Rendering.********************************************************************
-	/*
+	
 	if (magoManager.modeler !== undefined)
 	{
 		currentShader = magoManager.postFxShadersManager.getShader("modelRefDepth"); 
@@ -413,7 +413,7 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 		gl.useProgram(null);
 
 	}
-	*/
+	
 	
 	//var nodesLOD0Count = visibleObjControlerNodes.currentVisibles0.length;
 	//var nodesLOD2Count = visibleObjControlerNodes.currentVisibles2.length;
@@ -936,8 +936,8 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			var refMatrixIdxKey =0; // provisionally set magoManager var here.***
 			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 			
-			//bApplySsao = false;
-			//gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); 
+			bApplySsao = false;
+			gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); 
 
 			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
@@ -1171,6 +1171,34 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		
 		// Render Animated Man.********************************************************************************************************************
 		
+		// Test Modeler Rendering.********************************************************************
+		// Test Modeler Rendering.********************************************************************
+		// Test Modeler Rendering.********************************************************************
+		
+		if (magoManager.modeler !== undefined)
+		{
+			currentShader = magoManager.postFxShadersManager.getShader("modelRefSsao"); 
+			currentShader.resetLastBuffersBinded();
+			shaderProgram = currentShader.program;
+
+			currentShader.useProgram();
+			currentShader.disableVertexAttribArrayAll();
+			currentShader.enableVertexAttribArray(currentShader.position3_loc);
+
+			currentShader.bindUniformGenerals();
+			
+			gl.uniform1i(currentShader.bApplySsao_loc, false); // apply ssao.***
+
+			var refTMatrixIdxKey = 0;
+			var minSizeToRender = 0.0;
+			var renderType = 1;
+			var refMatrixIdxKey =0; // provisionally set this var here.***
+			magoManager.modeler.render(magoManager, currentShader, renderType);
+
+			currentShader.disableVertexAttribArrayAll();
+			gl.useProgram(null);
+
+		}
 		
 		
 		// 3) now render bboxes.*******************************************************************************************************************

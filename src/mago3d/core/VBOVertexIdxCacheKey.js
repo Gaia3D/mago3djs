@@ -339,7 +339,7 @@ VBOVertexIdxCacheKey.prototype.bindDataIndice = function(shader, vboMemManager)
 /**
  * 어떤 일을 하고 있습니까?
  */
-VBOVertexIdxCacheKey.prototype.setDataArrayPos = function(posDataArray, vboMemManager) 
+VBOVertexIdxCacheKey.prototype.setDataArrayPos = function(posDataArray, vboMemManager, dimensions) 
 {
 	if (posDataArray === undefined)
 	{ return; }
@@ -347,10 +347,11 @@ VBOVertexIdxCacheKey.prototype.setDataArrayPos = function(posDataArray, vboMemMa
 	var gl = vboMemManager.gl;
 	if (this.vboBufferPos === undefined)
 	{ this.vboBufferPos = new VboBuffer(gl.ARRAY_BUFFER); }
-	var dimensions = 3;
+	if (dimensions === undefined)
+	{ dimensions = 3; }
 	var normalized = false;
 	this.vboBufferPos.setDataArray(posDataArray, dimensions, normalized, vboMemManager);
-	this.vertexCount = this.vboBufferPos.dataLength/3;
+	this.vertexCount = this.vboBufferPos.dataLength/dimensions;
 	
 	if (this.keepDataArrayBuffers)
 	{ this.keepedPosDataArray = posDataArray; }

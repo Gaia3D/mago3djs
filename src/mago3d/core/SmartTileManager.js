@@ -86,15 +86,15 @@ SmartTileManager.maxDistToCameraByDepth = function(depth)
 	}
 	else if (depth === 16)
 	{
-		return 700;
+		return 1500;
 	}
 	else if (depth === 17)
 	{
-		return 300;
+		return 1000;
 	}
 	else if (depth > 17)
 	{
-		return 50;
+		return 250;
 	}
 	
 	return 10;
@@ -265,16 +265,17 @@ SmartTileManager.prototype.parseSmartTilesF4dIndexFile = function(dataBuffer, pr
 	var smartTilesMBCount = readWriter.readInt32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 	for (var i=0; i<smartTilesMBCount; i++)
 	{
-		var nameLength = readWriter.readInt32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		var nameLength = readWriter.readInt16(dataBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
 		var name = "";
 		for (var j=0; j<nameLength; j++)
 		{
 			name += String.fromCharCode(new Int8Array(dataBuffer.slice(bytes_readed, bytes_readed+ 1))[0]);bytes_readed += 1;
 		}
 		
-		var L = readWriter.readInt32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		var L = readWriter.readUInt8(dataBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 		var X = readWriter.readInt32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		var Y = readWriter.readInt32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		var smartTileType = readWriter.readUInt8(dataBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 		
 		// Now read bbox.
 		//var bbox = new BoundingBox();
@@ -291,6 +292,7 @@ SmartTileManager.prototype.parseSmartTilesF4dIndexFile = function(dataBuffer, pr
 			"geographicCoord"   : centerGeoCoord,
 			"objectType"        : "F4dTile",
 			"id"                : f4dTileId,
+			"smartTileType"     : smartTileType,
 			"tileName"          : name,
 			"projectFolderName" : projectFolderName,
 			"fileLoadState"     : CODE.fileLoadState.READY};

@@ -60,8 +60,8 @@ var BasicVehicle = function()
 
 	this.mode = {
 		'PARALLEL' : 0,
-		'FREE' : 0
-	}
+		'FREE'     : 0
+	};
 
 	//this.changingFrontArrow = false;
 	this.changingFrontArrowType = 0;

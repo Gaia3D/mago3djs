@@ -1131,10 +1131,12 @@ SmartTile.prototype.createGeometriesFromSeeds = function(magoManager)
 				{
 					var readerWriter = magoManager.readerWriter;
 					var projectFolderName = smartTileF4dSeed.projectFolderName;
+					var L = smartTileF4dSeed.L.toString();
+					var X = smartTileF4dSeed.X.toString();
 					var tilename = smartTileF4dSeed.tileName;
 					var smartTileOwner = this;
 					var geometryDataPath = readerWriter.geometryDataPath; // default geometryDataPath = "/f4d".***
-					var fileName = geometryDataPath + "/" + projectFolderName + "/" + tilename;
+					var fileName = geometryDataPath + "/" + projectFolderName + "/" + L + "/" + X + "/" + tilename;
 					
 					readerWriter.getSmartTileF4d(fileName, smartTileF4dSeed, smartTileOwner, magoManager);
 				}
@@ -1149,12 +1151,6 @@ SmartTile.prototype.createGeometriesFromSeeds = function(magoManager)
 					this.parseSmartTileF4d(smartTileF4dSeed.dataArrayBuffer, magoManager);
 					parseQueue.smartTileF4dParsesCount++; // increment counter.
 					smartTileF4dSeed.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
-					
-					// remove the "smartTileF4dSeed" from the "this.smartTileF4dSeedArray".
-					//this.smartTileF4dSeedArray.splice(i, 1);
-					
-					//if (this.smartTileF4dSeedArray.length === 0)
-					//{ this.smartTileF4dSeedArray = undefined; }
 				
 					geometriesCreated = true;
 				}
