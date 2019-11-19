@@ -29,7 +29,7 @@ var DynamicColor = function(option)
 };
 
 DynamicColor.prototype = Object.create(Color.prototype);
-DynamicColor.prototype.contructor = DynamicColor;
+DynamicColor.prototype.constructor = DynamicColor;
 
 /**
  * Update the color of the screen shown at the CCTV

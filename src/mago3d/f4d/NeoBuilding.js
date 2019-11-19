@@ -1600,6 +1600,7 @@ NeoBuilding.prototype.prepareSkin__original = function(magoManager)
 	
 	// check if exist the lodMesh in lodMeshMap.
 	var lowLodMesh = this.getOrNewLodMesh(lodString);
+	lowLodMesh.owner = this;
 	lowLodMesh.textureName = textureFileName;
 	
 

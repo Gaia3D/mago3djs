@@ -55,8 +55,8 @@ Excavation.prototype.renderPoints = function(magoManager, shader, renderType)
 		this.renderExcavation(magoManager, shader, renderType);
 	}
 	
-	this.geoCoordsList.renderPoints(magoManager, shader, renderType, false);
-	this.geoCoordsList.renderLines(magoManager, shader, renderType, false, false);
+	//this.geoCoordsList.renderPoints(magoManager, shader, renderType, false);
+	//this.geoCoordsList.renderLines(magoManager, shader, renderType, false, false);
 };
 
 /**

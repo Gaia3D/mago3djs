@@ -1,21 +1,38 @@
 'use strict';
 
 
-var Arrow = function(option) 
+var Arrow = function(width, length, height, option) 
 {
-	this.dirty = true;
+	MagoRenderable.call(this);
 	this.color4 = new Color();
 	this.color4.setRGBA(0.2, 0.2, 0.25, 1);
 
 	this.type = 'extruded';
 
 	this.totalLength = 10;
+	if (length) 
+	{
+		this.totalLength = length;
+	}
+
 	this.bodyWidth = 1;
+	if (width) 
+	{
+		this.bodyWidth = width * 0.5;
+	}
 	this.headWidth = 1.5;
+	if (width) 
+	{
+		this.headWidth = width;
+	}
+
 	this.extrude = 1;
-    
-	this.tailLength;
-	this.tMat;
+	if (height) 
+	{
+		this.extrude = height;
+	}
+	
+	this.tailLength = this.totalLength * 0.7;
 
 	if (option) 
 	{
@@ -66,6 +83,8 @@ var Arrow = function(option)
 		this.headLength = this.totalLength *0.3;
 	}
 };
+Arrow.prototype = Object.create(MagoRenderable.prototype);
+Arrow.prototype.contructor = Arrow;
 
 Arrow.prototype.makeMesh = function() 
 {
@@ -157,6 +176,10 @@ Arrow.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 
 Arrow.prototype.renderAsChild = function(magoManager, shader, renderType, glPrimitive, bIsSelected) 
 {
+	if (this.attributes && this.attributes.isVisible !== undefined && this.attributes.isVisible === false) 
+	{
+		return;
+	}
 	if (this.dirty)
 	{ this.makeMesh(); }
 	

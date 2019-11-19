@@ -22,14 +22,22 @@ LocationAndRotationAPI.changeLocationAndRotation = function(api, magoManager)
 	changeHistory.setPitch(parseFloat(api.getPitch()));
 	changeHistory.setRoll(parseFloat(api.getRoll()));
 	
+	var lat = api.getLatitude();
+	var lon = api.getLongitude();
+	var elevation = api.getElevation();
+	var heading = api.getHeading();
+	var pitch = api.getPitch();
+	var roll = api.getRoll();
+
+
 	magoManager.changeLocationAndRotation(	api.getProjectId(),
 		api.getDataKey(),
-		parseFloat(api.getLatitude()),
-		parseFloat(api.getLongitude()),
-		parseFloat(api.getElevation()),
-		parseFloat(api.getHeading()),
-		parseFloat(api.getPitch()),
-		parseFloat(api.getRoll()),
+		lat,
+		lon,
+		elevation,
+		heading,
+		pitch,
+		roll,
 		api.getAnimationOption()
 	);
 	

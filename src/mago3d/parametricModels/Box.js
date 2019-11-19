@@ -6,12 +6,12 @@
  */
 var Box = function(width, length, height, name) 
 {
+	MagoRenderable.call(this);
 	if (!(this instanceof Box)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	// Initially, box centered at the center of the bottom.***
-	this.dirty = true;
 	this.name;
 	this.id;
 	this.mesh;
@@ -21,7 +21,11 @@ var Box = function(width, length, height, name)
 	this.height;
 	this.owner;
 	this.geoLocDataManager;
-	this.color4;
+	//MagoRenderable's member start
+	this.color4; 
+	this.tMat;
+	this.tMatOriginal;
+	//MagoRenderable's member end
 	if (name !== undefined)
 	{ this.name = name; }
 	
@@ -35,24 +39,8 @@ var Box = function(width, length, height, name)
 	{ this.height = height; }
 
 };
-
-/**
- * Set the unique one color of the box
- * @param {Number} r
- * @param {Number} g
- * @param {Number} b 
- * @param {Number} a
- */
-Box.prototype.setOneColor = function(r, g, b, a)
-{
-	// This function sets the unique one color of the mesh.***
-	if (this.color4 === undefined)
-	{ this.color4 = new Color(); }
-	
-	this.color4.setRGBA(r, g, b, a);
-};
-
-
+Box.prototype = Object.create(MagoRenderable.prototype);
+Box.prototype.contructor = Box;
 
 /**
  * Renders the factory.
@@ -176,23 +164,37 @@ Box.prototype.renderAsChild = function(magoManager, shader, renderType, glPrimit
 		
 		// Check if is selected.***
 		var selectionManager = magoManager.selectionManager;
+
+		
 		if (bIsSelected !== undefined && bIsSelected)
 		{
 			//gl.disable(gl.BLEND);
-			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 1.0]);
+			if (this.color4) 
+			{
+				gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 1.0]);
+			}
+			
 		}
 		else if (selectionManager.isObjectSelected(this))
 		{
 			//gl.disable(gl.BLEND);
-			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 1.0]);
+			gl.uniform4fv(shader.oneColor4_loc, [0.9, 0.1, 0.1, 1.0]);
 		}
 		else 
 		{
-			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, this.color4.a]);
+			if (this.color4) 
+			{
+				gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 1.0]);
+			}
 		}
 		
 	}
 
+	if (this.tMat) 
+	{
+		gl.uniformMatrix4fv(shader.buildingRotMatrix_loc, false, this.tMat._floatArrays);
+	}
+	
 	this.mesh.render(magoManager, shader, renderType, glPrimitive, bIsSelected);
 
 	gl.disable(gl.BLEND);

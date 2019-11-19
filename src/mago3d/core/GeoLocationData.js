@@ -246,11 +246,15 @@ GeoLocationData.prototype.doEffectivePivotPointTranslation = function()
 	// this function adds the "pivotPointTraslation" to the positions.
 	// this function is not for move the building on the globe. This function is only for translate the pivot point of the building.
 	// Note: the translation vector only must be added into "this.pivotPoint". TODO:
-	if (this.pivotPointTraslationLC === undefined)
-	{ return; }
-	
 	var traslationVector;
-	traslationVector = this.tMatrix.rotatePoint3D(this.pivotPointTraslationLC, traslationVector );
+	if (this.pivotPointTraslationLC === undefined)
+	{ 
+		traslationVector = new Point3D(0, 0, 0);
+	}
+	else 
+	{
+		traslationVector = this.tMatrix.rotatePoint3D(this.pivotPointTraslationLC, traslationVector );
+	}
 	
 	// Recalculate the position.
 	var geoCoord = this.geographicCoord;

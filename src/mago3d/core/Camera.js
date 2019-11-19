@@ -499,8 +499,16 @@ Camera.prototype.doTrack = function(magoManager)
 			var camera = magoManager.scene.camera;
 			var position = camera.positionWC;
 			var movedCamPos;
-
-			var geoLocDatamanager = trackNode.getNodeGeoLocDataManager();
+			var geoLocDatamanager;
+			if (trackNode instanceof Node) 
+			{
+				geoLocDatamanager = trackNode.getNodeGeoLocDataManager();
+			}
+			else if (trackNode instanceof MagoRenderable)
+			{
+				geoLocDatamanager = trackNode.geoLocDataManager;
+			}
+			
 			//var geoLocationData = geoLocDatamanager.getTrackGeoLocationData();
 			if (geoLocDatamanager === undefined)
 			{ return; }
@@ -512,16 +520,21 @@ Camera.prototype.doTrack = function(magoManager)
 			var prevGeoLocationData = geoLocDatamanager.getGeoLocationData(1);
 			if (defined(prevGeoLocationData))
 			{
-				var currentPos = geoLocationData.position;
-				var prevPos =  prevGeoLocationData.position;
+				var currentPos = geoLocationData.positionLOW;
+				var prevPos =  prevGeoLocationData.positionLOW;
+				var camPosHIGH = new Float32Array([0.0, 0.0, 0.0]);
+				var camPosLOW = new Float32Array([0.0, 0.0, 0.0]);
+				
+				ManagerUtils.calculateSplited3fv([position.x, position.y, position.z], camPosHIGH, camPosLOW);
 
-				var dx = currentPos.x - prevPos.x;
-				var dy = currentPos.y - prevPos.y;
-				var dz  = currentPos.z - prevPos.z;
+				var dx = currentPos[0] - prevPos[0];
+				var dy = currentPos[1] - prevPos[1];
+				var dz  = currentPos[2] - prevPos[2];
 				movedCamPos = new Cesium.Cartesian3();
-				movedCamPos.x = position.x + dx;
-				movedCamPos.y = position.y + dy;
-				movedCamPos.z = position.z + dz;
+
+				movedCamPos.x = camPosHIGH[0] + camPosLOW[0] + dx;
+				movedCamPos.y = camPosHIGH[1] + camPosLOW[1] + dy;
+				movedCamPos.z = camPosHIGH[2] + camPosLOW[2] + dz;
 			}
 			var targetGeographicCoords = geoLocationData.getGeographicCoords();
 			if (targetGeographicCoords === undefined)
