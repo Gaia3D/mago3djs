@@ -762,7 +762,8 @@ BasicFactory.prototype.render = function(magoManager, shader, renderType, glPrim
 		}
 		gl.uniform4fv(shader.oneColor4_loc, [this.selColor4.r, this.selColor4.g, this.selColor4.b, 1.0]); 
 	}
-	
+	shader.enableVertexAttribArray(shader.position3_loc);
+	shader.enableVertexAttribArray(shader.normal3_loc);
 	var objectsCount = this.objectsArray.length;
 	for (var i=0; i<objectsCount; i++)
 	{

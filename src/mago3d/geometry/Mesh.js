@@ -639,6 +639,18 @@ Mesh.prototype.getTrianglesListsArrayBy2ByteSize = function(trianglesArray, resu
 	return resultTrianglesListsArray;
 };
 /**
+ * Render the mesh as child. equal render
+ * @param {MagoManager}magoManager
+ * @param {Shader} shader
+ * @param {Number} renderType
+ * @param glPrimitive
+ * @TODO : 누가 이 gl primitive의 type 정체를 안다면 좀 달아주세요ㅠㅠ 세슘 쪽인거 같은데ㅠㅠ
+ */
+Mesh.prototype.renderAsChild = function (magoManager, shader, renderType, glPrimitive, isSelected) 
+{
+	this.render(magoManager, shader, renderType, glPrimitive, isSelected);
+};
+/**
  * Render the mesh
  * @param {MagoManager}magoManager
  * @param {Shader} shader

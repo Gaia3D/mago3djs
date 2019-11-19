@@ -202,6 +202,8 @@ ConcentricTubes.prototype.render = function (magoManager, shader, renderType, gl
 	}
 	
 	var geoLocManager = this.getGeoLocDataManager();
+	shader.enableVertexAttribArray(shader.position3_loc);
+	shader.enableVertexAttribArray(shader.normal3_loc);
 	for (var i=0, len=this.getSize(); i<len; i++) 
 	{
 		var tube = this.getTube(i);

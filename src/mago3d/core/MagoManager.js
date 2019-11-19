@@ -4913,6 +4913,8 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 			node = this.hierarchyManager.newNode(buildingId, projectId, attributes);
 			// set main data of the node.
 			var data = node.data;
+			var relativePath = attributes.relativePath;
+			projectFolderName = (relativePath && relativePath.length > 0) ? projectFolderName + relativePath : projectFolderName;
 			data.projectFolderName = projectFolderName;
 			data.projectId = projectId;
 			data.data_name = data_name;
