@@ -432,19 +432,31 @@ Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive
 	if (this.geoCoordsList !== undefined)
 	{
 		// Provisionally render geographicPoints.
-		this.geoCoordsList.renderPoints(magoManager, shader, renderType);
+		
+		if (this.geoCoordsList.points3dList !== undefined && this.geoCoordsList.points3dList.vboKeysContainer !== undefined)
+		{
+			var bEnableDepth = true;
+			var options = {};
+			this.geoCoordsList.points3dList.renderThickLines(magoManager, shader, renderType, bEnableDepth, options);
+		}
+		else 
+		{
+			this.geoCoordsList.renderPoints(magoManager, shader, renderType);
+		}
 	}
 	
-	if (this.excavation !== undefined)
+	if (renderType === 1)
 	{
-		this.excavation.renderPoints(magoManager, shader, renderType);
+		if (this.excavation !== undefined)
+		{
+			this.excavation.renderPoints(magoManager, shader, renderType);
+		}
+		
+		if (this.tunnel !== undefined)
+		{
+			this.tunnel.renderPoints(magoManager, shader, renderType);
+		}
 	}
-	
-	if (this.tunnel !== undefined)
-	{
-		this.tunnel.renderPoints(magoManager, shader, renderType);
-	}
-	
 	
 	if (this.bSplineCubic3d !== undefined)
 	{

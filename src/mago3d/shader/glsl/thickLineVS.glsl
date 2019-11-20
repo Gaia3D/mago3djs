@@ -1,6 +1,6 @@
-attribute vec3 prev;
-attribute vec3 current;
-attribute vec3 next;
+attribute vec4 prev;
+attribute vec4 current;
+attribute vec4 next;
 attribute float order;
 uniform float thickness;
 uniform mat4 projectionMatrix;
@@ -12,87 +12,97 @@ const float far = 149.6e+9;
 float logc = 2.0 / log( C * far + 1.0 );
 
 const float NEAR = -1.0;
+const float error = 0.001;
 
 // based on https://weekly-geekly.github.io/articles/331164/index.html
+// see too https://github.com/ridiculousfish/wavefiz/blob/master/ts/polyline.ts#L306
 
 vec2 project(vec4 p){
 	return (0.5 * p.xyz / p.w + 0.5).xy * viewport;
 }
 
+bool isEqual(float value, float valueToCompare)
+{
+	if(value + error > valueToCompare && value - error < valueToCompare)
+	return true;
+	
+	return false;
+}
+
 void main(){
 	
-	vec4 vCurrent = modelViewMatrix * vec4(current, 1.0);
-	vec4 vPrev = modelViewMatrix * vec4(prev, 1.0);
-	vec4 vNext = modelViewMatrix * vec4(next, 1.0);
+	vec4 vCurrent = modelViewMatrix * vec4(current.xyz, 1.0);
+	//vec4 vPrev = modelViewMatrix * vec4(prev.xyz, 1.0);
+	//vec4 vNext = modelViewMatrix * vec4(next.xyz, 1.0);
 	
-	/*Clip near plane*/
-	if(vCurrent.z > NEAR) {
-		if(vPrev.z < NEAR){
-			/*to the begining path view*/
-			vCurrent = vPrev + (vCurrent - vPrev) * (NEAR - vPrev.z) / (vCurrent.z - vPrev.z);
-		}else if(vNext.z < NEAR){
-			/*to the end path view*/
-			vPrev = vPrev + (vCurrent - vPrev) * (NEAR - vPrev.z) / (vCurrent.z - vPrev.z);
-			vCurrent = vNext + (vCurrent - vNext) * (NEAR - vNext.z) / (vCurrent.z - vNext.z);
+	float order_w = current.w;
+	
+	//vec3 dir = normalize(vec3(vNext.xyz - vCurrent.xyz));
+	//vec3 offSetDir = vec3();
+	float sense = 1.0;
+	int orderInt = 0;
+	if(order_w > 0.0)
+	{
+		sense = 1.0;
+		if(isEqual(order_w, 1.0))
+		{
+			// order is 1.***
+			orderInt = 1;
 		}
-	} else if( vPrev.z > NEAR) {
-		/*to the end path view*/
-		vPrev = vPrev + (vCurrent - vPrev) * (NEAR - vPrev.z) / (vCurrent.z - vPrev.z);
-	} else if( vNext.z > NEAR) {
-		/*to the begining path view*/
-		vNext = vNext + (vCurrent - vNext) * (NEAR - vNext.z) / (vCurrent.z - vNext.z);
-	}
-	
-	vec4 dCurrent = projectionMatrix * vCurrent;
-	vec2 _next = project(projectionMatrix * vNext);
-	vec2 _prev = project(projectionMatrix * vPrev);
-	vec2 _current = project(dCurrent);
-	if(_prev == _current){
-		if(_next == _current){
-			_next = _current + vec2(1.0, 0.0);
-			_prev = _current - _next;
-		}else{
-			_prev = _current + normalize(_current - _next);
+		else{
+			// order is 2.***
+			orderInt = 2;
 		}
 	}
-	if(_next == _current){
-		_next = _current + normalize(_current - _prev);
-	}
-	
-	vec2 sNext = _next,
-		 sCurrent = _current,
-		 sPrev = _prev;
-	vec2 dirNext = normalize(sNext - sCurrent);
-	vec2 dirPrev = normalize(sPrev - sCurrent);
-	float dotNP = dot(dirNext, dirPrev);
-	
-	vec2 normalNext = normalize(vec2(-dirNext.y, dirNext.x));
-	vec2 normalPrev = normalize(vec2(dirPrev.y, -dirPrev.x));
-	
-	float d = thickness * 0.5 * sign(order);
-	
-	vec2 m;
-	if(dotNP >= 0.99991){
-		m = sCurrent - normalPrev * d;
-	}else{
-		vec2 dir = normalPrev + normalNext;
-		m = sCurrent + dir * d / (dirNext.x * dir.y - dirNext.y * dir.x);
-		
-		if( dotNP > 0.5 && dot(dirNext + dirPrev, m - sCurrent) < 0.0 ){
-			float occw = order * sign(dirNext.x * dirPrev.y - dirNext.y * dirPrev.x);
-			if(occw == -1.0){
-				m = sCurrent + normalPrev * d;
-			}else if(occw == 1.0){
-				m = sCurrent + normalNext * d;
-			}else if(occw == -2.0){
-				m = sCurrent + normalNext * d;
-			}else if(occw == 2.0){
-				m = sCurrent + normalPrev * d;
-			}
-		}else if(distance(sCurrent, m) > min(distance(sCurrent, sNext), distance(sCurrent, sPrev))){
-			m = sCurrent + normalNext * d;
+	else
+	{
+		sense = -1.0;
+		if(isEqual(order_w, -1.0))
+		{
+			// order is -1.***
+			orderInt = -1;
+		}
+		else{
+			// order is -2.***
+			orderInt = -2;
 		}
 	}
-	gl_Position = vec4((2.0 * m / viewport - 1.0) * dCurrent.w, dCurrent.z, dCurrent.w);
-	gl_Position.z = ( log( C * gl_Position.w + 1.0 ) * logc - 1.0 ) * gl_Position.w;
+	
+	float aspect = viewport.x / viewport.y;
+	vec2 aspectVec = vec2(aspect, 1.0);
+	mat4 projViewModel = projectionMatrix * modelViewMatrix;
+	
+	// Project all of our points to model space
+	vec4 previousProjected = projViewModel * vec4(prev.xyz, 1.0);
+	vec4 currentProjected = projViewModel * vec4(current.xyz, 1.0);
+	vec4 nextProjected = projViewModel * vec4(next.xyz, 1.0);
+	
+	// Pass the projected depth to the fragment shader
+	//projectedDepth = currentProjected.w;                
+	// Get 2D screen space with W divide and aspect correction
+	vec2 currentScreen = currentProjected.xy / currentProjected.w * aspectVec;
+	vec2 previousScreen = previousProjected.xy / previousProjected.w * aspectVec;
+	vec2 nextScreen = nextProjected.xy / nextProjected.w * aspectVec;
+					
+	// Use the average of the normals
+	// This helps us handle 90 degree turns correctly
+	vec2 tangentNext = normalize(nextScreen - currentScreen);
+	vec2 tangentPrev = normalize(currentScreen - previousScreen);
+	vec2 averageTangent = normalize(tangentNext + tangentPrev);
+	vec2 normal = vec2(-averageTangent.y, averageTangent.x);
+	if(orderInt == 1 || orderInt == -1)
+	{
+		normal = tangentNext;
+	}
+	else{
+		normal = tangentPrev;
+	}
+	normal *= thickness/2.0;
+	normal.x /= aspect;
+	//edgeiness = direction;
+	float direction = thickness*sense*vCurrent.z*0.005;
+	//direction *= 100.0;
+	// Offset our position along the normal
+	vec4 offset = vec4(normal * direction, 0.0, 1.0);
+	gl_Position = currentProjected + offset; 
 }

@@ -692,6 +692,59 @@ Renderer.prototype.renderImageViewRectangle = function(gl, magoManager, depthFbo
  * @param {Number} renderType If renderType = 0 (depth render), renderType = 1 (color render), renderType = 2 (colorCoding render).
  * @param {VisibleObjectsController} visibleObjControlerNodes This object contains visible objects for the camera frustum.
  */
+Renderer.prototype.renderAtmosphere = function(gl, renderType) 
+{
+	// Atmosphere.*******************************************************************************
+	// Test render sky.***
+	var magoManager = this.magoManager;
+	if (magoManager.sky === undefined)
+	{ magoManager.sky = new Sky(); }
+	
+	var currentShader = magoManager.postFxShadersManager.getShader("atmosphere"); 
+	currentShader.useProgram();
+	var bApplySsao = false;
+	
+	gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
+	
+	gl.uniform1i(currentShader.bApplySpecularLighting_loc, false);
+	gl.disableVertexAttribArray(currentShader.texCoord2_loc);
+	gl.enableVertexAttribArray(currentShader.position3_loc);
+	//gl.disableVertexAttribArray(currentShader.normal3_loc);
+	//gl.disableVertexAttribArray(currentShader.color4_loc); 
+	
+	currentShader.bindUniformGenerals();
+	gl.uniform1f(currentShader.externalAlpha_loc, 1.0);
+	gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
+	gl.uniform4fv(currentShader.oneColor4_loc, [0.1, 0.8, 0.99, 1.0]); //.***
+	
+	gl.uniform3fv(currentShader.buildingPosHIGH_loc, [0.0, 0.0, 0.0]);
+	gl.uniform3fv(currentShader.buildingPosLOW_loc, [0.0, 0.0, 0.0]);
+	
+	var refTMatrixIdxKey = 0;
+	var minSizeToRender = 0.0;
+	var renderType = 1;
+	var refMatrixIdxKey =0; // provisionally set magoManager var here.***
+	var glPrimitive = undefined;
+
+	magoManager.sky.render(magoManager, currentShader, renderType, glPrimitive);
+	
+	currentShader.disableVertexAttribArrayAll();
+	gl.useProgram(null);
+	
+	// Render a test quad to render created textures.***
+	if (magoManager.sunDepthFbo !== undefined)
+	{
+		this.renderImageViewRectangle(gl, magoManager, magoManager.sunDepthFbo);
+	}
+	
+};
+
+/**
+ * This function renders provisional ParametricMesh objects that has no self render function.
+ * @param {WebGLRenderingContext} gl WebGL Rendering Context.
+ * @param {Number} renderType If renderType = 0 (depth render), renderType = 1 (color render), renderType = 2 (colorCoding render).
+ * @param {VisibleObjectsController} visibleObjControlerNodes This object contains visible objects for the camera frustum.
+ */
 Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControlerNodes) 
 {
 	gl.frontFace(gl.CCW);	
@@ -782,68 +835,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			magoManager.tinTerrainManager.render(magoManager, bDepthRender, renderType);
 			
 			// Atmosphere.*******************************************************************************
-			// Test render sky.***
-			/*
-			if (magoManager.sky === undefined)
-			{ magoManager.sky = new Sky(); }
-			
-			
-			currentShader = magoManager.postFxShadersManager.getShader("atmosphere"); 
-			currentShader.useProgram();
-			var bApplySsao = false;
-			
-			gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
-			
-			gl.uniform1i(currentShader.bApplySpecularLighting_loc, false);
-			gl.disableVertexAttribArray(currentShader.texCoord2_loc);
-			gl.enableVertexAttribArray(currentShader.position3_loc);
-			//gl.disableVertexAttribArray(currentShader.normal3_loc);
-			//gl.disableVertexAttribArray(currentShader.color4_loc); 
-			
-			currentShader.bindUniformGenerals();
-			gl.uniform1f(currentShader.externalAlpha_loc, 1.0);
-			gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
-			gl.uniform4fv(currentShader.oneColor4_loc, [0.1, 0.8, 0.99, 1.0]); //.***
-			
-			gl.uniform3fv(currentShader.buildingPosHIGH_loc, [0.0, 0.0, 0.0]);
-			gl.uniform3fv(currentShader.buildingPosLOW_loc, [0.0, 0.0, 0.0]);
-
-			
-			gl.activeTexture(gl.TEXTURE0);
-			gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);  // original.***
-			gl.activeTexture(gl.TEXTURE1);
-			gl.bindTexture(gl.TEXTURE_2D, noiseTexture);
-			gl.activeTexture(gl.TEXTURE2); 
-			gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
-			currentShader.last_tex_id = textureAux1x1;
-			
-			
-			var refTMatrixIdxKey = 0;
-			var minSizeToRender = 0.0;
-			var renderType = 1;
-			var refMatrixIdxKey =0; // provisionally set magoManager var here.***
-			var glPrimitive = undefined;
-			
-
-			magoManager.sky.render(magoManager, currentShader, renderType, glPrimitive);
-
-			
-			gl.activeTexture(gl.TEXTURE0);
-			gl.bindTexture(gl.TEXTURE_2D, null);  // original.***
-			gl.activeTexture(gl.TEXTURE1);
-			gl.bindTexture(gl.TEXTURE_2D, null);
-			gl.activeTexture(gl.TEXTURE2);
-			gl.bindTexture(gl.TEXTURE_2D, null);
-			
-			currentShader.disableVertexAttribArrayAll();
-			gl.useProgram(null);
-			
-			// Render a test quad to render created textures.***
-			if (magoManager.sunDepthFbo !== undefined)
-			{
-				this.renderImageViewRectangle(gl, magoManager, magoManager.sunDepthFbo);
-			}
-			*/
+			this.renderAtmosphere(gl, renderType);
 		}
 		
 		// Test render depthBuffer on scene.***

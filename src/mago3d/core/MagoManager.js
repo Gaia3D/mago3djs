@@ -540,52 +540,6 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		sceneState.drawingBufferWidth[0] = scene.drawingBufferWidth;
 		sceneState.drawingBufferHeight[0] = scene.drawingBufferHeight;
 		
-		// Test.***************************************
-		/*
-		var scene = this.scene;
-		var frustumCommandsList = scene.frustumCommandsList;
-		var frustumIdx = this.currentFrustumIdx;
-		var camera = this.sceneState.camera;
-		var currentFrustumFar = frustumCommandsList[frustumIdx].far;
-		var currentFrustumNear = frustumCommandsList[frustumIdx].near;
-		var fovRad = scene.camera.frustum._fov;
-		var fovyRad= scene.camera.frustum._fovy;
-		var aspectRatio = scene.camera.frustum._aspectRatio;
-		//if (tanHalfFovy === undefined)
-		//{ tanHalfFovy = Math.tan(frustum.fovyRad/2); }
-		//frustum.tangentOfHalfFovy[0] = tanHalfFovy;
-		
-		// consider near as zero provisionally.***
-		//sceneState.projectionMatrix._floatArrays = glMatrix.mat4.perspective(sceneState.projectionMatrix._floatArrays, fovyRad, aspectRatio, currentFrustumNear, currentFrustumFar);
-		sceneState.projectionMatrix._floatArrays = Matrix4.perspective(fovyRad, aspectRatio, currentFrustumNear, currentFrustumFar);
-		
-		// modelView.***
-		//sceneState.modelViewMatrix._floatArrays; 
-		sceneState.modelViewMatrixInv._floatArrays = glMatrix.mat4.invert(sceneState.modelViewMatrixInv._floatArrays, sceneState.modelViewMatrix._floatArrays);
-	
-		// normalMat.***
-		sceneState.normalMatrix4._floatArrays = glMatrix.mat4.transpose(sceneState.normalMatrix4._floatArrays, sceneState.modelViewMatrixInv._floatArrays);
-		
-		// modelViewRelToEye.***
-		sceneState.modelViewRelToEyeMatrix._floatArrays = glMatrix.mat4.copy(sceneState.modelViewRelToEyeMatrix._floatArrays, sceneState.modelViewMatrix._floatArrays);
-		sceneState.modelViewRelToEyeMatrix._floatArrays[12] = 0;
-		sceneState.modelViewRelToEyeMatrix._floatArrays[13] = 0;
-		sceneState.modelViewRelToEyeMatrix._floatArrays[14] = 0;
-		sceneState.modelViewRelToEyeMatrix._floatArrays[15] = 1;
-		sceneState.modelViewRelToEyeMatrixInv._floatArrays = glMatrix.mat4.invert(sceneState.modelViewRelToEyeMatrixInv._floatArrays, sceneState.modelViewRelToEyeMatrix._floatArrays);
-		
-		// modelViewProjection.***
-		sceneState.modelViewProjMatrix._floatArrays = glMatrix.mat4.multiply(sceneState.modelViewProjMatrix._floatArrays, sceneState.projectionMatrix._floatArrays, sceneState.modelViewMatrix._floatArrays);
-		
-		// modelViewProjectionRelToEye.***
-		
-		sceneState.modelViewProjRelToEyeMatrix.copyFromMatrix4(sceneState.modelViewProjMatrix); // original.***
-		sceneState.modelViewProjRelToEyeMatrix._floatArrays[12] = 0;
-		sceneState.modelViewProjRelToEyeMatrix._floatArrays[13] = 0;
-		sceneState.modelViewProjRelToEyeMatrix._floatArrays[14] = sceneState.projectionMatrix._floatArrays[14];
-		sceneState.modelViewProjRelToEyeMatrix._floatArrays[15] = 1;
-		*/
-		
 		// modelViewProjection.***
 		sceneState.modelViewProjMatrix._floatArrays = glMatrix.mat4.multiply(sceneState.modelViewProjMatrix._floatArrays, sceneState.projectionMatrix._floatArrays, sceneState.modelViewMatrix._floatArrays);
 	}
@@ -641,6 +595,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 	}
 	
 	// Test.***
+	/*
 	for (var i=0; i<16; i++)
 	{
 		sceneState.normalMatrix4._floatArrays[i] = sceneState.modelViewMatrix._floatArrays[i];
@@ -649,6 +604,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 	sceneState.normalMatrix4._floatArrays[13] = 0;
 	sceneState.normalMatrix4._floatArrays[14] = 0;
 	sceneState.normalMatrix4._floatArrays[15] = 1;
+	*/
 	
 	if (this.depthFboNeo !== undefined)
 	{
@@ -669,7 +625,24 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 	frustum0.fovRad[0] = sceneCamFurustum0.fovRad[0];
 	frustum0.aspectRatio[0] = sceneCamFurustum0.aspectRatio[0];
 	
+	// Test.***************************
+	var currFrustumIdx = this.currentFrustumIdx;
+	var frustumFar = sceneState.camera.frustumsArray[currFrustumIdx].far[0];
 	
+	var point = ManagerUtils.geographicCoordToWorldPoint(126.61342381397036, 37.57615052829767, 10, undefined, this);
+	var cartesian = [point.x, point.y, point.z, 1.0];
+	
+	var transformedPoint_MVP = sceneState.modelViewProjMatrix.transformPoint4D__test(cartesian);
+	var xDivW = transformedPoint_MVP[0]/transformedPoint_MVP[3];
+	var yDivW = transformedPoint_MVP[1]/transformedPoint_MVP[3];
+	var zDivW = transformedPoint_MVP[2]/transformedPoint_MVP[3];
+	var transformedPoint_MVP_divW = [xDivW, yDivW, zDivW, 1.0];
+	var camera = sceneState.camera;
+	var frustum = camera.bigFrustum;
+		
+	var zDivW_divFar = zDivW/frustum.far[0];
+	var transformedPoint_MV = sceneState.modelViewMatrix.transformPoint4D__test(cartesian);
+	var transformedPoint_P = sceneState.projectionMatrix.transformPoint4D__test(cartesian);
 };
 
 /**
@@ -1247,8 +1220,6 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 		this.dateSC = new Date();
 		this.currTime = this.dateSC.getTime();
 		
-		//test code delete
-		//this.load_testTextures();
 		// Before of multiFrustumCullingSmartTile, do animation check, bcos during animation some object can change smartTile-owner.***
 		if (this.animationManager !== undefined)
 		{ this.animationManager.checkAnimation(this); }
@@ -1286,13 +1257,10 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 		var frustumVolume = this.myCameraSCX.bigFrustum;
 		var doFrustumCullingToBuildings = false;
 		this.tilesMultiFrustumCullingFinished(frustumVolumenObject.fullyIntersectedLowestTilesArray, visibleNodes, cameraPosition, frustumVolume, doFrustumCullingToBuildings);
-
 		
 		doFrustumCullingToBuildings = true;
 		this.tilesMultiFrustumCullingFinished(frustumVolumenObject.partiallyIntersectedLowestTilesArray, visibleNodes, cameraPosition, frustumVolume, doFrustumCullingToBuildings);
-		
 		this.prepareNeoBuildingsAsimetricVersion(gl, visibleNodes); 
-
 	}
 
 	var currentShader = undefined;
@@ -1301,16 +1269,13 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 	// prepare data if camera is no moving.***
 	if (!this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
 	{
-		
 		this.loadAndPrepareData();
 		this.managePickingProcess();
-		
 	}
 	
 	if (this.bPicking === true && isLastFrustum)
 	{
 		var pixelPos;
-		
 	
 		if (this.magoPolicy.issueInsertEnable === true)
 		{
@@ -1923,12 +1888,12 @@ MagoManager.prototype.keyDown = function(key)
 		
 		if (this.modeler !== undefined)
 		{
-			//var geoCoordsList = this.modeler.getGeographicCoordsList();
-			//if (geoCoordsList !== undefined)
-			//{
-			//	// test make thickLine.
-			//	geoCoordsList.test__makeThickLines(this);
-			//}
+			var geoCoordsList = this.modeler.getGeographicCoordsList();
+			if (geoCoordsList !== undefined)
+			{
+				// test make thickLine.
+				geoCoordsList.test__makeThickLines(this);
+			}
 			
 			var excavation = this.modeler.getExcavation();
 			if (excavation !== undefined)
@@ -2134,7 +2099,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			
 			var geoLocDataManager = this.modeler.planeGrid.geoLocDataManager;
 			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+1, undefined, undefined, undefined, geoLocData, this);
+			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+10, undefined, undefined, undefined, geoLocData, this);
 			return;
 		}
 		
@@ -4113,7 +4078,18 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	var ssao_vs_source = ShaderSource.thickLineVS;
 	var ssao_fs_source = ShaderSource.thickLineFS;
 	shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
-	
+	// ThickLine shader locations.***
+	shader.projectionMatrix_loc = gl.getUniformLocation(shader.program, "projectionMatrix");
+	shader.modelViewMatrix_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
+	shader.color_loc = gl.getUniformLocation(shader.program, "color");
+	shader.viewport_loc = gl.getUniformLocation(shader.program, "viewport");
+	shader.thickness_loc = gl.getUniformLocation(shader.program, "thickness");
+	gl.bindAttribLocation(shader.program, 0, "prev");
+	gl.bindAttribLocation(shader.program, 1, "current");
+	gl.bindAttribLocation(shader.program, 2, "next");
+	shader.prev_loc = 0;
+	shader.current_loc = 1;
+	shader.next_loc = 2;
 };
 
 /**

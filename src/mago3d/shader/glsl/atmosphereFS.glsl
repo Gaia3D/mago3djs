@@ -94,7 +94,7 @@ void main()
 		gl_FragColor = packDepth(-depthValue);
 	}
 	else{
-		vec4 textureColor;
+		vec4 textureColor = oneColor4;
 		if(colorType == 0)
 		{
 			textureColor = oneColor4;
@@ -106,13 +106,13 @@ void main()
 		}
 		else if(colorType == 2)
 		{
-			if(textureFlipYAxis)
-			{
-				textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));
-			}
-			else{
-				textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));
-			}
+			//if(textureFlipYAxis)
+			//{
+			//	textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));
+			//}
+			//else{
+			//	textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));
+			//}
 			
 			if(textureColor.w == 0.0)
 			{
