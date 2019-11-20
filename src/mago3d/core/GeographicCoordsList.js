@@ -141,6 +141,37 @@ GeographicCoordsList.prototype.getPointsRelativeToGeoLocation = function(geoLocI
 };
 
 /**
+ * This function returns points3dArray relative to the geoLocIn.
+ * @param {GeoLocationData} geoLocIn the information about the axis of this GeographicCoord
+ * @param resultPoint3dArray
+ * 
+ */
+GeographicCoordsList.prototype.getPointsWorldCoord = function(resultPoints3dArray) 
+{
+	if (resultPoints3dArray === undefined)
+	{ resultPoints3dArray = []; }
+	
+	var geoPointsCount = this.getGeoCoordsCount();
+	
+	for (var i=0; i<geoPointsCount; i++)
+	{
+		var geoCoord = this.getGeoCoord(i);
+		var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+		var geoLoc = geoLocDataManager.getCurrentGeoLocationData();
+		if (geoLoc === undefined)
+		{
+			geoCoord.makeDefaultGeoLocationData();
+			geoLoc = geoLocDataManager.getCurrentGeoLocationData();
+		}
+		
+		var posAbs = geoLoc.position;
+		resultPoints3dArray[i] = posAbs;
+	}
+	
+	return resultPoints3dArray;
+};
+
+/**
  * Clear the data in this instance and delete the vbo info of this instance
  */
 GeographicCoordsList.prototype.deleteObjects = function(vboMemManager) 
@@ -174,8 +205,13 @@ GeographicCoordsList.prototype.test__makeThickLines = function(magoManager)
 	// 1rst, make lines.
 	this.makeLines(magoManager);
 	
+	if (this.points3dList === undefined)
+	{ return; }
+	
 	// now, make thickLines.
 	var resultVboKeysContainer = Point3DList.getVboThickLines(magoManager, this.points3dList.pointsArray, undefined);
+	
+	this.points3dList.vboKeysContainer = resultVboKeysContainer;
 };
 
 /**
@@ -188,8 +224,14 @@ GeographicCoordsList.prototype.makeLines = function(magoManager)
 	
 	// To render lines, use Point3DList class object.
 	if (this.points3dList === undefined)
-	{ this.points3dList = new Point3DList(); }
-	
+	{ 
+		this.points3dList = new Point3DList(); 
+		var points3dArray = this.getPointsWorldCoord(undefined);
+		this.points3dList.deleteVboKeysContainer(magoManager);
+		this.points3dList.deletePoints3d();
+		this.points3dList.addPoint3dArray(points3dArray);
+	}
+	/*
 	var geoLoc = this.points3dList.getGeographicLocation();
 	
 	// Take the 1rst geographicCoord's geoLocation.
@@ -203,11 +245,13 @@ GeographicCoordsList.prototype.makeLines = function(magoManager)
 	
 	geoLoc.copyFrom(geoLocFirst);
 	
-	var points3dArray = this.getPointsRelativeToGeoLocation(geoLoc, undefined);
+
+	//var points3dArray = this.getPointsRelativeToGeoLocation(geoLoc, undefined);
+	var points3dArray = this.getPointsWorldCoord(undefined);
 	this.points3dList.deleteVboKeysContainer(magoManager);
 	this.points3dList.deletePoints3d();
 	this.points3dList.addPoint3dArray(points3dArray);
-	
+	*/
 };
 
 /**
