@@ -166,7 +166,6 @@ Polygon2D.prototype.calculateNormal = function(resultConcavePointsIdxArray)
  */
 Polygon2D.prototype.tessellate = function(concaveVerticesIndices, convexPolygonsArray)
 {
-
 	var concaveVerticesCount = concaveVerticesIndices.length;
 	
 	if (concaveVerticesCount === 0)
