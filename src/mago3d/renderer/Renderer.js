@@ -948,8 +948,6 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			{
 				visibleObjControlerNodes.currentVisibleNativeObjects[i].render(magoManager, currentShader, renderType, glPrimitive);
 			}
-			//익스카바이션 렌더하는거 지운거 다시 넣어야함!!!!!!!!!!!!!!!!!!!!!!!!!
-			magoManager.modeler.render(magoManager, currentShader, renderType);
 
 			currentShader.disableVertexAttribArrayAll();
 			gl.useProgram(null);

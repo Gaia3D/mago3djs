@@ -399,11 +399,6 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	if (data === undefined)
 	{ return; }
 
-	if (data.nodeId === '2B11' && data.projectId === "410506") 
-	{
-		var hola = 7;
-	}
-
 	// Check if there are renderables.***
 	var renderable = data.renderable;
 	if (renderable)
