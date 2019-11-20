@@ -478,6 +478,7 @@ Point3DList.prototype.renderAsChild = function(magoManager, shader, renderType, 
 	}
 	var gl = magoManager.getGl();
 	shader.enableVertexAttribArray(shader.position3_loc);
+	shader.disableVertexAttribArray(shader.normal3_loc);
 	var bEnableDepth;
 	if (bEnableDepth === undefined)
 	{ bEnableDepth = true; }
@@ -490,7 +491,6 @@ Point3DList.prototype.renderAsChild = function(magoManager, shader, renderType, 
 	var refMatrixType = 0;
 	gl.uniform1i(shader.hasAditionalMov_loc, false);
 	gl.uniform1i(shader.refMatrixType_loc, refMatrixType);
-	gl.uniform4fv(shader.oneColor4_loc, [1.0, 0.0, 0.0, 0.7]);
 	gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 	
 	if (renderType === 2)

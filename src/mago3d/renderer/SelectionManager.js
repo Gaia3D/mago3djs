@@ -233,7 +233,7 @@ SelectionManager.prototype.clearCurrents = function()
 			selCandidateFamily.clearCurrentSelected();
 		}
 	}
-	
+
 	this.currentGeneralObjectSelected = undefined;
 };
 

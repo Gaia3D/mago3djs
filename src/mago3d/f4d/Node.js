@@ -229,11 +229,6 @@ Node.prototype.correctGeoLocationDataByMappingType = function(geoLoc)
 		return;
 	}
 
-	if (this.data.mapping_type.toLowerCase() === "origin")
-	{
-		return;
-	}
-
 	// check if use "centerOfBoundingBoxAsOrigin".
 	var buildingSeed = this.data.buildingSeed;
 	if (buildingSeed === undefined)
@@ -245,14 +240,19 @@ Node.prototype.correctGeoLocationDataByMappingType = function(geoLoc)
 	{
 		// now, calculate the root center of bbox.
 		this.pointSC = buildingSeedBBox.getCenterPoint(this.pointSC);
-		ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
 	}
 	else if (this.data.mapping_type.toLowerCase() === "boundingboxbottomcenter")
 	{
 		// now, calculate the root center of bbox.
 		this.pointSC = buildingSeedBBox.getBottomCenterPoint(this.pointSC);
-		ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
 	}
+	else
+	{
+		geoLoc.pivotPointTraslationLC = undefined;
+		this.pointSC =new Point3D(0, 0, 0);
+	}
+
+	ManagerUtils.translatePivotPointGeoLocationData(geoLoc, this.pointSC );
 };
 
 Node.prototype.checkChangesHistoryMovements = function() 
@@ -1107,7 +1107,7 @@ Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude,
 	var currAltitude = geoCoords.altitude;
 
 	// target rotation.
-	animData.targetHeading = heading*1;
+	animData.targetHeading = heading;
 	animData.targetPitch = pitch;
 	animData.targetRoll = roll;
 
@@ -1209,7 +1209,7 @@ Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude,
 			{
 				heading += 360;
 			}
-			animData.targetHeading = heading*1;
+			animData.targetHeading = heading;
 		}
 	}
 	else
@@ -1255,7 +1255,10 @@ Node.prototype.nodeMoved = function(node)
 
 
 /**
+ * 
+ * TODO : ARGS CHANGE OBJECT
  * 어떤 일을 하고 있습니까?
+ * 
  */
 Node.prototype.changeLocationAndRotation = function(latitude, longitude, elevation, heading, pitch, roll, magoManager) 
 {

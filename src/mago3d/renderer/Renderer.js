@@ -942,7 +942,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			{
 				visibleObjControlerNodes.currentVisibleNativeObjects[i].render(magoManager, currentShader, renderType, glPrimitive);
 			}
-			
+
 			currentShader.disableVertexAttribArrayAll();
 			gl.useProgram(null);
 		}

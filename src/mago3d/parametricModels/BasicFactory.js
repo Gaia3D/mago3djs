@@ -187,7 +187,15 @@ var BasicFactory = function(factoryWidth, factoryLength, factoryHeight, options)
 	
 	this.attributes = {isVisible: true};
 };
-
+/**
+ * BasicFactory wallType.
+ */
+BasicFactory.wallType = {
+	'FRONT' : 'front',
+	'REAR'  : 'rear',
+	'LEFT'  : 'left',
+	'RIGHT' : 'right'
+};
 /**
  * Returns the bbox.
  */
@@ -209,7 +217,6 @@ BasicFactory.getFactoryDimensionsByGeoCoordsArray = function(geoCoordsArray, edg
 	var geoCoord_2 = geoCoordsArray[2];
 	var geoCoord_3 = geoCoordsArray[3];
 	var fWidth, fLength, headingAngDeg;
-	
 	if (edgeIdxOfDoor === 0)
 	{
 		var geoCoordSegment = new GeographicCoordSegment(geoCoord_0, geoCoord_1);
@@ -417,6 +424,147 @@ BasicFactory.getLateralWallProfile2d = function(options, resultProfile2d)
 };
 
 /**
+ * 공장 벽 프로파일
+ * @param {string} wallType 벽 위치
+ * @param {object} wallOption 벽 옵션, 존재하면 문을 그림.
+ * @param {Profile2d}} resultProfile2d
+ * @return {Profile2d}
+ */
+BasicFactory.prototype.getWallProfile2d = function(wallType, wallOption, resultProfile2d) 
+{
+	if (resultProfile2d === undefined)
+	{ resultProfile2d = new Profile2D(); }
+
+	// 앞뒤인지 여부
+	var isFrontOrRear = (wallType === BasicFactory.wallType.FRONT || wallType === BasicFactory.wallType.REAR);
+	// factory width.
+	var width = isFrontOrRear ? this.width : this.length;
+	// factory height.
+	var height = this.height;
+	// factory roof min height.
+	var roofMinHeight = this.roofMinHeight;
+
+	var outerRing = resultProfile2d.newOuterRing();
+	var polyline = outerRing.newElement("POLYLINE");
+	polyline.newPoint2d(0, 0);
+	if (wallOption && wallOption.openingInfo) 
+	{
+		if (Array.isArray(wallOption.openingInfo)) 
+		{
+			var curOffset = 0;
+			var openingInfos = wallOption.openingInfo;
+			for (var i=0, len=openingInfos.length;i<len;i++) 
+			{
+				var openingInfo = openingInfos[i];
+
+				if (!defined(openingInfo.offset)) { continue; }
+
+				var doorOffset = openingInfo.offset;
+				var doorHeight = openingInfo.height;
+				var doorWidth = openingInfo.width;
+
+				curOffset = curOffset + doorOffset;
+				openingInfo.centerPropterties = this.calculateOpeningProperties(wallType, curOffset, doorWidth, doorHeight, openingInfo.thickness);
+
+				polyline.newPoint2d(curOffset, 0);
+				polyline.newPoint2d(curOffset, doorHeight);
+
+				curOffset = curOffset + doorWidth;
+				polyline.newPoint2d(curOffset, doorHeight);
+				polyline.newPoint2d(curOffset, 0);
+			}
+		}
+		else 
+		{
+			var openingInfo = wallOption.openingInfo;
+			var offset = defined(openingInfo.offset) ? openingInfo.offset : (width - openingInfo.width) * 0.5;
+
+			var doorHeight = openingInfo.height;
+			var doorWidth = openingInfo.width;
+
+			openingInfo.centerPropterties = this.calculateOpeningProperties(wallType, offset, doorWidth, doorHeight, openingInfo.thickness);
+			polyline.newPoint2d(offset, 0);
+			polyline.newPoint2d(offset, doorHeight);
+			polyline.newPoint2d(offset + doorWidth, doorHeight);
+			polyline.newPoint2d(offset + doorWidth, 0);
+		}
+	}
+
+	polyline.newPoint2d(width, 0);
+	polyline.newPoint2d(width, roofMinHeight);
+	if (isFrontOrRear) 
+	{
+		polyline.newPoint2d(width*0.5, height);
+	}
+	polyline.newPoint2d(0, roofMinHeight);
+
+	return resultProfile2d;
+};
+BasicFactory.prototype.calculateOpeningProperties = function(wallType, start, width, height) 
+{
+	var profile2d = new Profile2D();
+	var outerRing = profile2d.newOuterRing();
+	var polyline = outerRing.newElement("POLYLINE");
+
+	/*polyline.newPoint2d(start, 0);
+	polyline.newPoint2d(start, height);
+	polyline.newPoint2d(start + width, height);
+	polyline.newPoint2d(start + width, 0);*/
+
+	polyline.newPoint2d(start, 0);
+	polyline.newPoint2d(start + width, 0);
+	polyline.newPoint2d(start + width, height);
+	polyline.newPoint2d(start, height);
+	
+	var vp =  new VtxProfile();
+	vp.makeByProfile2D(profile2d);
+
+	this.validateWallGeom(wallType, vp);
+
+	var outerRing = vp.outerVtxRing;
+	var outerVertexList = outerRing.vertexList;
+	var openingBbox = outerVertexList.getBoundingBox();
+
+	var openingCenterPointLC = openingBbox.getCenterPoint();
+	var openingNormalLC = outerRing.calculatePlaneNormal();
+
+	var geoLocDataManager = this.geoLocDataManager;
+	var geoLocData = geoLocDataManager.getCurrentGeoLocationData();
+	var rotMatrix = geoLocData.rotMatrix;
+
+	var openingCenterPointWC = geoLocData.localCoordToWorldCoord(openingCenterPointLC);
+	var openingNormalWC = rotMatrix.transformPoint3D(openingNormalLC);
+
+	return {
+		openeingProfile2d : profile2d,
+		centerLC          : openingCenterPointLC,
+		normalLC          : openingNormalLC,
+		centerWC          : openingCenterPointWC,
+		normalWC          : openingNormalWC
+	};
+};
+
+BasicFactory.prototype.getOpeningProperties = function(wallType, index) 
+{
+	var wallOptions = this.options.wallOptions;
+
+	if (!defined(index)) { index = 0; }
+
+	var wallOption;
+	if (wallOptions) 
+	{
+		for (var j in wallOptions) 
+		{
+			if (wallOptions[j].type === wallType) 
+			{
+				wallOption = wallOptions[j];
+			}
+		}
+	}
+
+	return wallOption.openingInfo.centerPropterties;
+};
+/**
  * Makes the geometry mesh.
  */
 BasicFactory.prototype.makeMesh = function()
@@ -442,176 +590,47 @@ BasicFactory.prototype.makeMesh = function()
 		this.objectsArray.push(groundMesh);
 		this.objectsMap[groundMesh.name] = groundMesh;
 	}
-	
-	// Walls.***
-	// Front wall with opening.******************************************************************************************************
-	//
-	//                   Y
-	//                   ^
-	//                   |
-	//                  /7\             <-- height
-	//                /  |  \
-	//              /    |    \
-	//            /      |      \
-	//          8        |        6     <-- roofMinHeigh
-	//          |        |         |
-	//          |  2------------3  |    <-- openingHeight
-	//          |  |     |      |  |
-	//          |  |     |      |  |
-	//          0--1     +      4--5-------> X
-	//
-	
-	this.roofMinHeight = this.options.roofMinHeight;
-	var frontWallOptions = this.options.frontWallOptions;
-	var options = {};
-	options.width = this.width;
-	options.height = this.height;
-	options.roofMinHeight = this.roofMinHeight;
-	if (frontWallOptions !== undefined)
-	{
-		options.hasOpening = frontWallOptions.hasOpening;
-		if (options.hasOpening)
-		{
-			options.openingWidth = frontWallOptions.openingWidth;
-			if (options.openingWidth === undefined)
-			{ options.openingWidth = this.width * 0.8; }
-			
-			options.openingHeight = frontWallOptions.openingHeight;
-			if (options.openingHeight === undefined)
-			{ options.openingHeight = this.height * 0.6; }
-		}
-		
-		this.frontWallThickness = frontWallOptions.frontWallThickness;
-	}
-	else
-	{
-		options.hasOpening = false;
-	}
-	
-	if (this.frontWallThickness === undefined)
-	{ this.frontWallThickness = 0.4; }
+	this.roofMinHeight = defaultValue(this.options.roofMinHeight, this.height*0.75);
 
-	var profileAux = BasicFactory.getTriangularWallProfile2d(options, undefined);
-	
-	// Extrude the Profile.
+	// Walls.***
+	var wallOptions = this.options.wallOptions;
+	var extrusionDist = 0.4;
 	var extrudeSegmentsCount = 1;
 	var extrusionVector = undefined;
-	var extrusionDist = this.frontWallThickness;
 	var bIncludeBottomCap = true;
 	var bIncludeTopCap = true;
-	var mesh = Modeler.getExtrudedMesh(profileAux, extrusionDist, extrudeSegmentsCount, extrusionVector, bIncludeBottomCap, bIncludeTopCap, undefined);
-	mesh.name = "frontWall";
-	this.objectsArray.push(mesh);
-	this.objectsMap[mesh.name] = mesh;
-	
-	// Now rotate the front wall.***
-	mesh.rotate(90, 1, 0, 0);
-	
-	// Now translate the front wall to front.***
-	mesh.translate(0, -this.length*0.5+this.frontWallThickness, 0);
-	mesh.setOneColor(0.9, 0.9, 0.9, 1.0);
 
-	// Rear wall without opening.******************************************************************************************************
-	var rearWallOptions = this.options.rearWallOptions;
-	var options = {};
-	options.width = this.width;
-	options.height = this.height;
-	options.roofMinHeight = this.roofMinHeight;
-	if (rearWallOptions !== undefined)
+	for (var key in BasicFactory.wallType) 
 	{
-		options.hasOpening = rearWallOptions.hasOpening;
-		if (options.hasOpening)
-		{
-			options.openingWidth = rearWallOptions.openingWidth;
-			if (options.openingWidth === undefined)
-			{ options.openingWidth = this.width * 0.8; }
-			
-			options.openingHeight = rearWallOptions.openingHeight;
-			if (options.openingHeight === undefined)
-			{ options.openingHeight = this.height * 0.6; }
-		}
+		if (!BasicFactory.wallType.hasOwnProperty(key)) { continue; }
 		
-		this.rearWallThickness = rearWallOptions.frontWallThickness;
+		var wallType = BasicFactory.wallType[key];
+		var wallOption;
+		if (wallOptions) 
+		{
+			for (var j in wallOptions) 
+			{
+				if (wallOptions[j].type === wallType) 
+				{
+					wallOption = wallOptions[j];
+					extrusionDist = defaultValue(wallOption.thickness, 0.4);
+				}
+				else 
+				{
+					wallOption = null;
+				}
+			}
+		}
+
+		var profileAux = this.getWallProfile2d(wallType, wallOption, undefined);
+
+		var mesh = Modeler.getExtrudedMesh(profileAux, extrusionDist, extrudeSegmentsCount, extrusionVector, bIncludeBottomCap, bIncludeTopCap, undefined);
+		mesh.name = wallType + "Wall";
+		this.objectsArray.push(mesh);
+		this.objectsMap[mesh.name] = mesh;
+
+		this.validateWallGeom(wallType, mesh);
 	}
-	else
-	{
-		options.hasOpening = false;
-	}
-	
-	if (this.rearWallThickness === undefined)
-	{ this.rearWallThickness = 0.4; }
-	var profileAux = BasicFactory.getTriangularWallProfile2d(options, undefined);
-
-	// Extrude the Profile.
-	extrusionDist = this.rearWallThickness;
-	var mesh = Modeler.getExtrudedMesh(profileAux, extrusionDist, extrudeSegmentsCount, extrusionVector, bIncludeBottomCap, bIncludeTopCap, undefined);
-	mesh.name = "rearWall";
-	this.objectsArray.push(mesh);
-	this.objectsMap[mesh.name] = mesh;
-	
-	// Now rotate the front wall.***
-	mesh.rotate(90, 1, 0, 0);
-	
-	// Now translate the front wall to front.***
-	mesh.translate(0, this.length*0.5, 0);
-	mesh.setOneColor(0.9, 0.9, 0.9, 1.0);
-	
-	// Lateral walls.***
-	// Left lateral wall.*****************************************************************************************************************
-	//
-	//   15-----------------------------------------------------------14      <-- height
-	//   |                                                            |
-	//   |                      6--------------7                      |               
-	//   |   2-----------3      |              |                      |       <-- openingHeight
-	//   |   |           |      |              |                      |
-	//   |   |           |      |              |      10----------11  |       <-- openingHeight
-	//   |   |           |      |              |      |           |   |
-	//   0---1           4------5              8------9           12--13
-	//
-	//   offset,width,height    offset,width,height    offset,width,height ...
-	
-	var leftWallOptions = this.options.leftWallOptions;
-	if (leftWallOptions === undefined)
-	{ leftWallOptions = {}; }
-
-	leftWallOptions.length = this.length;
-	leftWallOptions.height = this.roofMinHeight; // the lateral wall height is the factory minRoofHeight.
-	
-	var profileAux = BasicFactory.getLateralWallProfile2d(leftWallOptions, undefined);
-	
-	// Extrude the Profile.
-	var mesh = Modeler.getExtrudedMesh(profileAux, extrusionDist, extrudeSegmentsCount, extrusionVector, bIncludeBottomCap, bIncludeTopCap, undefined);
-	mesh.name = "leftWall";
-	this.objectsArray.push(mesh);
-	this.objectsMap[mesh.name] = mesh;
-	
-	// Now rotate the left wall.***
-	mesh.rotate(90, 1, 0, 0);
-	mesh.rotate(90, 0, 0, 1);
-	mesh.translate(-this.width*0.5, -this.length*0.5, 0);
-	mesh.setOneColor(0.9, 0.9, 0.9, 1.0);
-	
-	// Right lateral wall.*****************************************************************************************************************
-	var rightWallOptions = this.options.rightWallOptions;
-	if (rightWallOptions === undefined)
-	{ rightWallOptions = {}; }
-
-	rightWallOptions.length = this.length;
-	rightWallOptions.height = this.roofMinHeight; // the lateral wall height is the factory minRoofHeight.
-	
-	var profileAux = BasicFactory.getLateralWallProfile2d(rightWallOptions, undefined);
-	
-	// Extrude the Profile.
-	var mesh = Modeler.getExtrudedMesh(profileAux, extrusionDist, extrudeSegmentsCount, extrusionVector, bIncludeBottomCap, bIncludeTopCap, undefined);
-	mesh.name = "rightWall";
-	this.objectsArray.push(mesh);
-	this.objectsMap[mesh.name] = mesh;
-	
-	// Now rotate the left wall.***
-	mesh.rotate(90, 1, 0, 0);
-	mesh.rotate(90, 0, 0, 1);
-	mesh.translate(this.width*0.5 - extrusionDist, -this.length*0.5, 0);
-	mesh.setOneColor(0.9, 0.9, 0.9, 1.0);
 
 	// Roof.*******************************************************************************************************************************
 	var halfWidth = this.width * 0.5;
@@ -743,7 +762,8 @@ BasicFactory.prototype.render = function(magoManager, shader, renderType, glPrim
 		}
 		gl.uniform4fv(shader.oneColor4_loc, [this.selColor4.r, this.selColor4.g, this.selColor4.b, 1.0]); 
 	}
-	
+	shader.enableVertexAttribArray(shader.position3_loc);
+	shader.enableVertexAttribArray(shader.normal3_loc);
 	var objectsCount = this.objectsArray.length;
 	for (var i=0; i<objectsCount; i++)
 	{
@@ -752,44 +772,75 @@ BasicFactory.prototype.render = function(magoManager, shader, renderType, glPrim
 	
 	gl.disable(gl.BLEND);
 };
+/**
+ * delete mesh from this factory.
+ * @param {string} name Mesh name
+ */
+BasicFactory.prototype.removeMesh = function(name) 
+{
+	if (this.objectsMap && this.objectsMap[name]) { this.objectsMap[name] = undefined; }
 
+	if (this.objectsArray && Array.isArray(this.objectsArray)) 
+	{
+		this.objectsArray = this.objectsArray.filter(function(item) 
+		{
+			return item.name !== name;
+		});
+	}
+};
+/**
+ * @param {string} wallType
+ * @param {Object} geom must have rotate function and translate function
+ */
+BasicFactory.prototype.validateWallGeom = function(wallType, geom, extrusionDist) 
+{
+	if (typeof geom.rotate !== 'function' || typeof geom.translate !== 'function') 
+	{
+		throw new Error('invalid geometry type.');
+	}
 
+	if (!defined(extrusionDist)) { extrusionDist = 0.4; }
 
+	switch (wallType) 
+	{
+	case 'front' : {
+		// Now rotate the front wall
+		geom.rotate(90, 1, 0, 0);
 
+		// Now translate the front wall to front
+		geom.translate(-this.width*0.5, -this.length*0.5+extrusionDist, 0);
+		break;
+	}
+	case 'rear' : {
+		// Now rotate the rear wall
+		geom.rotate(90, 1, 0, 0);
 
+		// Now translate the rear wall to rear
+		geom.translate(-this.width*0.5, this.length*0.5, 0);
+		break;
+	}
+	case 'left' : {
+		// Now rotate the left wall
+		geom.rotate(90, 1, 0, 0);
+		geom.rotate(90, 0, 0, 1);
 
+		// Now translate the left wall to left
+		geom.translate(-this.width*0.5, -this.length*0.5, 0);
+		break;
+	}
+	case 'right' : {
+		// Now rotate the right wall.***
+		geom.rotate(90, 1, 0, 0);
+		geom.rotate(90, 0, 0, 1);
 
+		// Now translate the right wall to right
+		geom.translate(this.width*0.5 - extrusionDist, -this.length*0.5, 0);
+		break;
+	}
+	}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	if (geom instanceof Mesh) 
+	{
+		geom.setOneColor(0.9, 0.9, 0.9, 1.0);
+	}
+};

@@ -2858,7 +2858,7 @@ MagoManager.prototype.moveSelectedObjectGeneral = function(gl, object)
 		
 		// Must check if there are restrictions.***
 		var attributes = object.attributes;
-		if (attributes)
+		if (attributes && attributes.movementRestriction)
 		{
 			var movementRestriction = attributes.movementRestriction;
 			if (movementRestriction)
@@ -2885,6 +2885,24 @@ MagoManager.prototype.moveSelectedObjectGeneral = function(gl, object)
 						newlatitude = projectedCoord.latitude;
 					}
 				}
+			}
+		}
+		if (attributes && attributes.hasStaticModel)
+		{
+			var projectId = attributes.projectId;
+			var dataKey = attributes.instanceId;
+			if (!defined(projectId))
+			{
+				return false;
+			}
+			if (!defined(dataKey))
+			{
+				return false;
+			}
+			var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
+			if (node !== undefined)
+			{
+				node.changeLocationAndRotation(newlatitude, newLongitude, 0, 0, 0, 0, this);
 			}
 		}
 		
@@ -4632,7 +4650,7 @@ MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, l
 	
 	var neoBuilding = node.data.neoBuilding;
 	
-	this.selectedObjectNotice(neoBuilding);
+	//this.selectedObjectNotice(neoBuilding);
 };
 
 /**
@@ -4751,6 +4769,8 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 			node = this.hierarchyManager.newNode(buildingId, projectId, attributes);
 			// set main data of the node.
 			var data = node.data;
+			var relativePath = attributes.relativePath;
+			projectFolderName = (relativePath && relativePath.length > 0) ? projectFolderName + relativePath : projectFolderName;
 			data.projectFolderName = projectFolderName;
 			data.projectId = projectId;
 			data.data_name = data_name;

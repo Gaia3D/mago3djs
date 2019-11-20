@@ -639,6 +639,18 @@ Mesh.prototype.getTrianglesListsArrayBy2ByteSize = function(trianglesArray, resu
 	return resultTrianglesListsArray;
 };
 /**
+ * Render the mesh as child. equal render
+ * @param {MagoManager}magoManager
+ * @param {Shader} shader
+ * @param {Number} renderType
+ * @param glPrimitive
+ * @TODO : 누가 이 gl primitive의 type 정체를 안다면 좀 달아주세요ㅠㅠ 세슘 쪽인거 같은데ㅠㅠ
+ */
+Mesh.prototype.renderAsChild = function (magoManager, shader, renderType, glPrimitive, isSelected) 
+{
+	this.render(magoManager, shader, renderType, glPrimitive, isSelected);
+};
+/**
  * Render the mesh
  * @param {MagoManager}magoManager
  * @param {Shader} shader
@@ -682,7 +694,7 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive, i
 			else if (this.color4)
 			{ 
 				gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
-				gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 1.0]); 
+				gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, this.color4.a]); 
 			}
 		}
 	}
