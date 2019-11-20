@@ -13,7 +13,7 @@ uniform vec3 aditionalPosition;
 uniform vec3 refTranslationVec;
 uniform int refMatrixType; // 0= identity, 1= translate, 2= transform
 uniform vec2 camSpacePixelTranslation;
-uniform vec2 screenSize;    
+uniform vec2 screenSize;   
 varying vec2 camSpaceTranslation;
 
 void main()

@@ -96,7 +96,7 @@ void main()\n\
 		gl_FragColor = packDepth(-depthValue);\n\
 	}\n\
 	else{\n\
-		vec4 textureColor;\n\
+		vec4 textureColor = oneColor4;\n\
 		if(colorType == 0)\n\
 		{\n\
 			textureColor = oneColor4;\n\
@@ -108,13 +108,13 @@ void main()\n\
 		}\n\
 		else if(colorType == 2)\n\
 		{\n\
-			if(textureFlipYAxis)\n\
-			{\n\
-				textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));\n\
-			}\n\
-			else{\n\
-				textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));\n\
-			}\n\
+			//if(textureFlipYAxis)\n\
+			//{\n\
+			//	textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));\n\
+			//}\n\
+			//else{\n\
+			//	textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));\n\
+			//}\n\
 			\n\
 			if(textureColor.w == 0.0)\n\
 			{\n\
@@ -2326,7 +2326,6 @@ void main()\n\
     depth = (modelViewMatrixRelToEye * pos4).z/far; // original.***\n\
 \n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
-	//depth = gl_Position.z*0.5+0.5;\n\
 }";
 ShaderSource.screen_frag = "precision mediump float;\n\
 \n\
@@ -2363,7 +2362,7 @@ uniform vec3 aditionalPosition;\n\
 uniform vec3 refTranslationVec;\n\
 uniform int refMatrixType; // 0= identity, 1= translate, 2= transform\n\
 uniform vec2 camSpacePixelTranslation;\n\
-uniform vec2 screenSize;    \n\
+uniform vec2 screenSize;   \n\
 varying vec2 camSpaceTranslation;\n\
 \n\
 void main()\n\
@@ -2592,9 +2591,9 @@ uniform vec4 color;\n\
 void main() {\n\
 	gl_FragColor = color;\n\
 }";
-ShaderSource.thickLineVS = "attribute vec3 prev;\n\
-attribute vec3 current;\n\
-attribute vec3 next;\n\
+ShaderSource.thickLineVS = "attribute vec4 prev;\n\
+attribute vec4 current;\n\
+attribute vec4 next;\n\
 attribute float order;\n\
 uniform float thickness;\n\
 uniform mat4 projectionMatrix;\n\
@@ -2606,89 +2605,99 @@ const float far = 149.6e+9;\n\
 float logc = 2.0 / log( C * far + 1.0 );\n\
 \n\
 const float NEAR = -1.0;\n\
+const float error = 0.001;\n\
 \n\
 // based on https://weekly-geekly.github.io/articles/331164/index.html\n\
+// see too https://github.com/ridiculousfish/wavefiz/blob/master/ts/polyline.ts#L306\n\
 \n\
 vec2 project(vec4 p){\n\
 	return (0.5 * p.xyz / p.w + 0.5).xy * viewport;\n\
 }\n\
 \n\
+bool isEqual(float value, float valueToCompare)\n\
+{\n\
+	if(value + error > valueToCompare && value - error < valueToCompare)\n\
+	return true;\n\
+	\n\
+	return false;\n\
+}\n\
+\n\
 void main(){\n\
 	\n\
-	vec4 vCurrent = modelViewMatrix * vec4(current, 1.0);\n\
-	vec4 vPrev = modelViewMatrix * vec4(prev, 1.0);\n\
-	vec4 vNext = modelViewMatrix * vec4(next, 1.0);\n\
+	vec4 vCurrent = modelViewMatrix * vec4(current.xyz, 1.0);\n\
+	//vec4 vPrev = modelViewMatrix * vec4(prev.xyz, 1.0);\n\
+	//vec4 vNext = modelViewMatrix * vec4(next.xyz, 1.0);\n\
 	\n\
-	/*Clip near plane*/\n\
-	if(vCurrent.z > NEAR) {\n\
-		if(vPrev.z < NEAR){\n\
-			/*to the begining path view*/\n\
-			vCurrent = vPrev + (vCurrent - vPrev) * (NEAR - vPrev.z) / (vCurrent.z - vPrev.z);\n\
-		}else if(vNext.z < NEAR){\n\
-			/*to the end path view*/\n\
-			vPrev = vPrev + (vCurrent - vPrev) * (NEAR - vPrev.z) / (vCurrent.z - vPrev.z);\n\
-			vCurrent = vNext + (vCurrent - vNext) * (NEAR - vNext.z) / (vCurrent.z - vNext.z);\n\
+	float order_w = current.w;\n\
+	\n\
+	//vec3 dir = normalize(vec3(vNext.xyz - vCurrent.xyz));\n\
+	//vec3 offSetDir = vec3();\n\
+	float sense = 1.0;\n\
+	int orderInt = 0;\n\
+	if(order_w > 0.0)\n\
+	{\n\
+		sense = 1.0;\n\
+		if(isEqual(order_w, 1.0))\n\
+		{\n\
+			// order is 1.***\n\
+			orderInt = 1;\n\
 		}\n\
-	} else if( vPrev.z > NEAR) {\n\
-		/*to the end path view*/\n\
-		vPrev = vPrev + (vCurrent - vPrev) * (NEAR - vPrev.z) / (vCurrent.z - vPrev.z);\n\
-	} else if( vNext.z > NEAR) {\n\
-		/*to the begining path view*/\n\
-		vNext = vNext + (vCurrent - vNext) * (NEAR - vNext.z) / (vCurrent.z - vNext.z);\n\
-	}\n\
-	\n\
-	vec4 dCurrent = projectionMatrix * vCurrent;\n\
-	vec2 _next = project(projectionMatrix * vNext);\n\
-	vec2 _prev = project(projectionMatrix * vPrev);\n\
-	vec2 _current = project(dCurrent);\n\
-	if(_prev == _current){\n\
-		if(_next == _current){\n\
-			_next = _current + vec2(1.0, 0.0);\n\
-			_prev = _current - _next;\n\
-		}else{\n\
-			_prev = _current + normalize(_current - _next);\n\
+		else{\n\
+			// order is 2.***\n\
+			orderInt = 2;\n\
 		}\n\
 	}\n\
-	if(_next == _current){\n\
-		_next = _current + normalize(_current - _prev);\n\
-	}\n\
-	\n\
-	vec2 sNext = _next,\n\
-		 sCurrent = _current,\n\
-		 sPrev = _prev;\n\
-	vec2 dirNext = normalize(sNext - sCurrent);\n\
-	vec2 dirPrev = normalize(sPrev - sCurrent);\n\
-	float dotNP = dot(dirNext, dirPrev);\n\
-	\n\
-	vec2 normalNext = normalize(vec2(-dirNext.y, dirNext.x));\n\
-	vec2 normalPrev = normalize(vec2(dirPrev.y, -dirPrev.x));\n\
-	\n\
-	float d = thickness * 0.5 * sign(order);\n\
-	\n\
-	vec2 m;\n\
-	if(dotNP >= 0.99991){\n\
-		m = sCurrent - normalPrev * d;\n\
-	}else{\n\
-		vec2 dir = normalPrev + normalNext;\n\
-		m = sCurrent + dir * d / (dirNext.x * dir.y - dirNext.y * dir.x);\n\
-		\n\
-		if( dotNP > 0.5 && dot(dirNext + dirPrev, m - sCurrent) < 0.0 ){\n\
-			float occw = order * sign(dirNext.x * dirPrev.y - dirNext.y * dirPrev.x);\n\
-			if(occw == -1.0){\n\
-				m = sCurrent + normalPrev * d;\n\
-			}else if(occw == 1.0){\n\
-				m = sCurrent + normalNext * d;\n\
-			}else if(occw == -2.0){\n\
-				m = sCurrent + normalNext * d;\n\
-			}else if(occw == 2.0){\n\
-				m = sCurrent + normalPrev * d;\n\
-			}\n\
-		}else if(distance(sCurrent, m) > min(distance(sCurrent, sNext), distance(sCurrent, sPrev))){\n\
-			m = sCurrent + normalNext * d;\n\
+	else\n\
+	{\n\
+		sense = -1.0;\n\
+		if(isEqual(order_w, -1.0))\n\
+		{\n\
+			// order is -1.***\n\
+			orderInt = -1;\n\
+		}\n\
+		else{\n\
+			// order is -2.***\n\
+			orderInt = -2;\n\
 		}\n\
 	}\n\
-	gl_Position = vec4((2.0 * m / viewport - 1.0) * dCurrent.w, dCurrent.z, dCurrent.w);\n\
-	gl_Position.z = ( log( C * gl_Position.w + 1.0 ) * logc - 1.0 ) * gl_Position.w;\n\
+	\n\
+	float aspect = viewport.x / viewport.y;\n\
+	vec2 aspectVec = vec2(aspect, 1.0);\n\
+	mat4 projViewModel = projectionMatrix * modelViewMatrix;\n\
+	\n\
+	// Project all of our points to model space\n\
+	vec4 previousProjected = projViewModel * vec4(prev.xyz, 1.0);\n\
+	vec4 currentProjected = projViewModel * vec4(current.xyz, 1.0);\n\
+	vec4 nextProjected = projViewModel * vec4(next.xyz, 1.0);\n\
+	\n\
+	// Pass the projected depth to the fragment shader\n\
+	//projectedDepth = currentProjected.w;                \n\
+	// Get 2D screen space with W divide and aspect correction\n\
+	vec2 currentScreen = currentProjected.xy / currentProjected.w * aspectVec;\n\
+	vec2 previousScreen = previousProjected.xy / previousProjected.w * aspectVec;\n\
+	vec2 nextScreen = nextProjected.xy / nextProjected.w * aspectVec;\n\
+					\n\
+	// Use the average of the normals\n\
+	// This helps us handle 90 degree turns correctly\n\
+	vec2 tangentNext = normalize(nextScreen - currentScreen);\n\
+	vec2 tangentPrev = normalize(currentScreen - previousScreen);\n\
+	vec2 averageTangent = normalize(tangentNext + tangentPrev);\n\
+	vec2 normal = vec2(-averageTangent.y, averageTangent.x);\n\
+	if(orderInt == 1 || orderInt == -1)\n\
+	{\n\
+		normal = tangentNext;\n\
+	}\n\
+	else{\n\
+		normal = tangentPrev;\n\
+	}\n\
+	normal *= thickness/2.0;\n\
+	normal.x /= aspect;\n\
+	//edgeiness = direction;\n\
+	float direction = thickness*sense*vCurrent.z*0.005;\n\
+	//direction *= 100.0;\n\
+	// Offset our position along the normal\n\
+	vec4 offset = vec4(normal * direction, 0.0, 1.0);\n\
+	gl_Position = currentProjected + offset; \n\
 }";
 ShaderSource.TinTerrainFS = "#ifdef GL_ES\n\
     precision highp float;\n\

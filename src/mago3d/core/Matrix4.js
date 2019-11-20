@@ -301,6 +301,30 @@ Matrix4.prototype.transformPoint3D = function(point3d, result)
 };
 
 /**
+ * 행렬연산을 통해 주어진 포인트를 이동한다.
+ *
+ * @param {Point3D} point3d 입력 포인트
+ * @param {Point3D} result 출력 포인트
+ * @returns {Point3D} 출력 포인트
+ */
+Matrix4.prototype.transformPoint4D__test = function(cartesian4, result) 
+{
+	if (result === undefined) { result = new Point3D(); }
+
+	var x = cartesian4[0];
+	var y = cartesian4[1];
+	var z = cartesian4[2];
+	var w = cartesian4[3];
+
+	result[0] = x*this.get(0, 0) + y*this.get(1, 0) + z*this.get(2, 0) + w*this.get(3, 0);
+	result[1] = x*this.get(0, 1) + y*this.get(1, 1) + z*this.get(2, 1) + w*this.get(3, 1);
+	result[2] = x*this.get(0, 2) + y*this.get(1, 2) + z*this.get(2, 2) + w*this.get(3, 2);
+	result[3] = x*this.get(0, 3) + y*this.get(1, 3) + z*this.get(2, 3) + w*this.get(3, 3);
+
+	return result;
+};
+
+/**
  * 행렬연산을 통해 주어진 포인트를 회전한다.
  *
  * @param {Point3D} point3d 입력 포인트
