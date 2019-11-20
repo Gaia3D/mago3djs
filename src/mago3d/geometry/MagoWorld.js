@@ -320,14 +320,18 @@ MagoWorld.prototype.mouseclick = function(event)
 MagoWorld.prototype.mousewheel = function(event)
 {
 	var delta = event.wheelDelta / 10;
-	
-	var mouseAction = this.magoManager.sceneState.mouseAction;
+	var magoManager = this.magoManager;
+	var mouseAction = magoManager.sceneState.mouseAction;
 	
 	// move camera.
-	var camera = this.magoManager.sceneState.camera;
+	var camera = magoManager.sceneState.camera;
 	var camPos = camera.position;
-	var camDir = camera.direction;
-	var camUp = camera.up;
+	
+	// calculate the direction of the cursor.
+	var nowX = event.clientX;
+	var nowY = event.clientY;
+	var mouseRayWC = ManagerUtils.getRayWorldSpace(undefined, nowX, nowY, undefined, magoManager);
+	var mouseDirWC = mouseRayWC.direction;
 	
 	var camHeght = camera.getCameraElevation();
 
@@ -352,7 +356,7 @@ MagoWorld.prototype.mousewheel = function(event)
 	if (delta > maxDelta)
 	{ delta = maxDelta; }
 	
-	camPos.add(camDir.x * delta,  camDir.y * delta,  camDir.z * delta);
+	camPos.add(mouseDirWC.x * delta,  mouseDirWC.y * delta,  mouseDirWC.z * delta);
 	
 	this.updateModelViewMatrixByCamera(camera);
 };

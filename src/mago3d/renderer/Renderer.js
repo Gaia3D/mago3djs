@@ -828,14 +828,16 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			gl.enable(gl.BLEND);
 			gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
 			//gl.blendFunc( gl.ONE_MINUS_SRC_ALPHA, gl.DST_COLOR );
+			
+			// Atmosphere.*******************************************************************************
+			this.renderAtmosphere(gl, renderType);
 
 			//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 			//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE);
 			var bDepthRender = false; // magoManager is no depth render.***
 			magoManager.tinTerrainManager.render(magoManager, bDepthRender, renderType);
 			
-			// Atmosphere.*******************************************************************************
-			this.renderAtmosphere(gl, renderType);
+			
 		}
 		
 		// Test render depthBuffer on scene.***
