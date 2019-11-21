@@ -55,7 +55,7 @@ Excavation.prototype.renderPoints = function(magoManager, shader, renderType)
 		this.renderExcavation(magoManager, shader, renderType);
 	}
 	
-	//this.geoCoordsList.renderPoints(magoManager, shader, renderType, false);
+	this.geoCoordsList.renderPoints(magoManager, shader, renderType, false);
 	//this.geoCoordsList.renderLines(magoManager, shader, renderType, false, false);
 };
 
@@ -232,7 +232,7 @@ Excavation.prototype.makeExtrudeObject = function(magoManager)
 	var points3dArrayUp = [];
 	
 	if (this.excavationDepthInMeters === undefined)
-	{ this.excavationDepthInMeters = 80.0; }
+	{ this.excavationDepthInMeters = 780.0; }
 	
 	var cartesianAux;
 	var geoCoord;
@@ -248,7 +248,7 @@ Excavation.prototype.makeExtrudeObject = function(magoManager)
 		cartesianAux = Globe.geographicToCartesianWgs84(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude - this.excavationDepthInMeters, cartesianAux);
 		point3DDown.set(cartesianAux[0], cartesianAux[1], cartesianAux[2]);
 		
-		cartesianAux = Globe.geographicToCartesianWgs84(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude + 100.0, cartesianAux);
+		cartesianAux = Globe.geographicToCartesianWgs84(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude + 1700.0, cartesianAux);
 		point3DUp.set(cartesianAux[0], cartesianAux[1], cartesianAux[2]);
 		
 		// Down & Up relative points.

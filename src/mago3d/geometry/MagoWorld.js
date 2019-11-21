@@ -326,6 +326,7 @@ MagoWorld.prototype.mousewheel = function(event)
 	// move camera.
 	var camera = magoManager.sceneState.camera;
 	var camPos = camera.position;
+	var camDir = camera.direction;
 	
 	// calculate the direction of the cursor.
 	var nowX = event.clientX;
@@ -356,7 +357,32 @@ MagoWorld.prototype.mousewheel = function(event)
 	if (delta > maxDelta)
 	{ delta = maxDelta; }
 	
-	camPos.add(mouseDirWC.x * delta,  mouseDirWC.y * delta,  mouseDirWC.z * delta);
+	var oldCamPos = new Point3D(camPos.x, camPos.y, camPos.z);
+	var camNewPos = new Point3D(camPos.x + mouseDirWC.x * delta, camPos.y + mouseDirWC.y * delta, camPos.z + mouseDirWC.z * delta);
+	camPos.set(camNewPos.x,  camNewPos.y,  camNewPos.z);
+	
+	// calculate the camera's global rotation, and then rotate de cam's direction.
+	var rotAxis;
+	rotAxis = oldCamPos.crossProduct(camNewPos, rotAxis);
+	rotAxis.unitary();
+	if (rotAxis.isNAN())
+	{ return; }
+		
+	var angRad = oldCamPos.angleRadToVector(camNewPos);
+	if (angRad === 0 || isNaN(angRad))
+	{ return; }
+		
+	var rotMat = new Matrix4();
+	rotMat.rotationAxisAngRad(angRad, rotAxis.x, rotAxis.y, rotAxis.z);
+	camDir = rotMat.transformPoint3D(camDir, camDir);
+	
+	// now, must check the camera's up.
+	var globeNormalCartesian = Globe.normalAtCartesianPointWgs84(camPos.x, camPos.y, camPos.z, undefined);
+	var globeNormal = new Point3D(globeNormalCartesian[0], globeNormalCartesian[1], globeNormalCartesian[2]);
+	
+	var camRight = camDir.crossProduct(globeNormal);
+	camRight.unitary();
+	camera.up = camRight.crossProduct(camDir, camera.up);
 	
 	this.updateModelViewMatrixByCamera(camera);
 };
