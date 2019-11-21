@@ -87,8 +87,12 @@ MagoRenderable.prototype.setOneColor = function(r, g, b, a)
 	}
 };
 MagoRenderable.prototype.setOpaque = function(opaque){
-	this.opaque = opaque;
+	this.attributes.opaque = opaque;
 }
 MagoRenderable.prototype.isOpaque = function(){
-	return this.opaque;
+	if(this.attributes.opaque === undefined) {
+		return true;
+	}
+
+	return this.attributes.opaque;
 }

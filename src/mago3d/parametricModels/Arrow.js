@@ -84,7 +84,7 @@ var Arrow = function(width, length, height, option)
 	}
 };
 Arrow.prototype = Object.create(MagoRenderable.prototype);
-Arrow.prototype.contructor = Arrow;
+Arrow.prototype.constructor = Arrow;
 
 Arrow.prototype.makeMesh = function() 
 {

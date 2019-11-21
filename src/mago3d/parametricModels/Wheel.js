@@ -54,7 +54,7 @@ var Wheel = function(interiorRadius, exteriorRadius, width, options)
 	this.width < this.borderRadius, this.borderRadius = this.width * 0.2;
 };
 Wheel.prototype = Object.create(MagoRenderable.prototype);
-Wheel.prototype.contructor = Wheel;
+Wheel.prototype.constructor = Wheel;
 /**
  * Makes the geometry mesh.
  */

@@ -182,7 +182,6 @@ Tube.prototype.renderRaw = function(magoManager, shader, renderType, glPrimitive
 		{
 			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, this.color4.a]);
 		}
-		
 	}
 
 	this.mesh.render(magoManager, shader, renderType, glPrimitive, bIsSelected);

@@ -35,7 +35,7 @@ var Box = function(width, length, height, name)
 
 };
 Box.prototype = Object.create(MagoRenderable.prototype);
-Box.prototype.contructor = Box;
+Box.prototype.constructor = Box;
 
 /**
  * Renders the factory.

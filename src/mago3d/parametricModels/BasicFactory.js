@@ -10,99 +10,7 @@ var BasicFactory = function(factoryWidth, factoryLength, factoryHeight, options)
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	/**
-	// Usage example.
-	// Front wall.**********************************************************************
-	var frontWallOptions = {
-		"hasOpening"    : true,
-		"openingWidth"  : factoryWidth * 0.8,
-		"openingHeight" : factoryHeight*0.65
-	};
-	
-	// Rear wall.**********************************************************************
-	var rearWallOptions = {
-		"hasOpening"    : true,
-		"openingWidth"  : factoryWidth * 0.8,
-		"openingHeight" : factoryHeight*0.65
-	};
-	
-
-	// Right wall.**********************************************************************
-	var rightWallOptions = {};
-	rightWallOptions.openingsDataArray = [];
-	
-	// opening 1.
-	var openingData = {
-		"offSet" : 2,
-		"height" : roofMinHeight*0.8,
-		"width"  : 8
-	};
-	rightWallOptions.openingsDataArray.push(openingData);
-	
-	// opening 2.
-	var openingData = {
-		"offSet" : 2,
-		"height" : roofMinHeight*0.8,
-		"width"  : 8
-	};
-	rightWallOptions.openingsDataArray.push(openingData);
-	
-
-	
-	// Left wall.**********************************************************************
-	var leftWallOptions = {};
-	leftWallOptions.openingsDataArray = [];
-	
-	// opening 1.
-	var openingData = {
-		"offSet" : 2,
-		"height" : roofMinHeight*0.8,
-		"width"  : 8
-	};
-	leftWallOptions.openingsDataArray.push(openingData);
-	
-	// opening 2.
-	var openingData = {
-		"offSet" : 2,
-		"height" : roofMinHeight*0.8,
-		"width"  : 8
-	};
-	leftWallOptions.openingsDataArray.push(openingData);
-	
-	// Factory options.
-	var options = {
-		"hasGround"        : true,
-		"roofMinHeight"    : factoryHeight*0.75,
-		"frontWallOptions" : frontWallOptions,
-		"rearWallOptions"  : rearWallOptions,
-		"rightWallOptions" : rightWallOptions,
-		"leftWallOptions"  : leftWallOptions
-	};
-
-	var geoLocDataManager = geoCoord.getGeoLocationDataManager();
-	var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-	geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+10, testHeading, undefined, undefined, geoLocData, this);
-	
-	// set material for the roof of the factory.**********************************************************************
-	var materialsManager = this.materialsManager;
-	var materialName = "basicFactoryRoof";
-	var material = materialsManager.getOrNewMaterial(materialName);
-	if (material.diffuseTexture === undefined)
-	{ 
-		material.diffuseTexture = new Texture(); 
-		material.diffuseTexture.textureTypeName = "diffuse";
-		material.diffuseTexture.textureImageFileName = "mipoFactoryRoof.jpg"; // Gaia3dLogo.png
-		var imagesPath = materialsManager.imagesPath + "//" + material.diffuseTexture.textureImageFileName;
-		var flipYTexCoord = true;
-		TexturesManager.loadTexture(imagesPath, material.diffuseTexture, this, flipYTexCoord);
-	}
-	
-	// add options.
-	options.roofOptions = {
-		"material": material
-	};
-	*/	
-	
+	MagoRenderable.call(this);
 	/**
 	 * The name of the factory.
 	 * @type {String}
@@ -187,6 +95,10 @@ var BasicFactory = function(factoryWidth, factoryLength, factoryHeight, options)
 	
 	this.attributes = {isVisible: true};
 };
+
+BasicFactory.prototype = Object.create(MagoRenderable.prototype);
+BasicFactory.prototype.constructor = BasicFactory;
+
 /**
  * BasicFactory wallType.
  */
@@ -718,6 +630,78 @@ BasicFactory.prototype.render = function(magoManager, shader, renderType, glPrim
 	var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
 	buildingGeoLocation.bindGeoLocationUniforms(gl, shader); // rotMatrix, positionHIGH, positionLOW.
 	
+	
+	gl.uniform1i(shader.refMatrixType_loc, 0); // in magoManager case, there are not referencesMatrix.***
+	var isSelected = false;
+	
+	if (renderType === 0)
+	{
+		// Depth render.***
+	}
+	else if (renderType === 1)
+	{
+		// Color render.***
+		// Color render.***
+		var selectionManager = magoManager.selectionManager;
+		if (selectionManager.isObjectSelected(this))
+		{ isSelected = true; }
+	
+		//gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
+		gl.enable(gl.BLEND);
+		gl.uniform1i(shader.bApplySsao_loc, true); // apply ssao.***
+		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
+	}
+	else if (renderType === 2)
+	{
+		// Selection render.***
+		var selectionColor = magoManager.selectionColor;
+		var colorAux = magoManager.selectionColor.getAvailableColor(undefined);
+		var idxKey = magoManager.selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
+		magoManager.selectionManager.setCandidateGeneral(idxKey, this);
+		
+		gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
+		gl.disable(gl.BLEND);
+	}
+	
+	
+	if (isSelected)
+	{
+		if (this.selColor4 === undefined)
+		{
+			this.selColor4 = new Color();
+			this.selColor4.setRGBA(0.8, 0.4, 0.5, 1.0);
+		}
+		gl.uniform4fv(shader.oneColor4_loc, [this.selColor4.r, this.selColor4.g, this.selColor4.b, 1.0]); 
+	}
+	shader.enableVertexAttribArray(shader.position3_loc);
+	shader.enableVertexAttribArray(shader.normal3_loc);
+	var objectsCount = this.objectsArray.length;
+	for (var i=0; i<objectsCount; i++)
+	{
+		this.objectsArray[i].render(magoManager, shader, renderType, glPrimitive, isSelected);
+	}
+	
+	gl.disable(gl.BLEND);
+};
+
+/**
+ * Renders the factory.
+ */
+BasicFactory.prototype.renderAsChild = function(magoManager, shader, renderType, glPrimitive)
+{
+	if (this.attributes && this.attributes.isVisible !== undefined && this.attributes.isVisible === false) 
+	{
+		return;
+	}
+
+	if (this.dirty)
+	{ this.makeMesh(); }
+	
+	if (this.objectsArray === undefined)
+	{ return false; }
+
+	// Set geoLocation uniforms.***
+	var gl = magoManager.getGl();
 	
 	gl.uniform1i(shader.refMatrixType_loc, 0); // in magoManager case, there are not referencesMatrix.***
 	var isSelected = false;
