@@ -439,12 +439,15 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 		magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
 		magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
 		// native objects.
+		this.renderNativeObjects(gl, currentShader, renderType, visibleObjControlerNodes);
+		/*
 		var glPrimitive = undefined;
 		var nativeObjectsCount = visibleObjControlerNodes.currentVisibleNativeObjects.length;
 		for (var i=0; i<nativeObjectsCount; i++)
 		{
 			visibleObjControlerNodes.currentVisibleNativeObjects[i].render(magoManager, currentShader, renderType, glPrimitive);
 		}
+		*/
 		currentShader.disableVertexAttribArray(currentShader.position3_loc); 
 		gl.useProgram(null);
 	}
@@ -745,6 +748,34 @@ Renderer.prototype.renderAtmosphere = function(gl, renderType)
  * @param {Number} renderType If renderType = 0 (depth render), renderType = 1 (color render), renderType = 2 (colorCoding render).
  * @param {VisibleObjectsController} visibleObjControlerNodes This object contains visible objects for the camera frustum.
  */
+Renderer.prototype.renderNativeObjects = function(gl, shader, renderType, visibleObjControlerNodes) 
+{
+	var magoManager = this.magoManager;
+	var glPrimitive = undefined;
+	
+	// 1rst, opaques.
+	var opaquesArray = visibleObjControlerNodes.currentVisibleNativeObjects.opaquesArray;
+	var nativeObjectsCount = opaquesArray.length;
+	for (var i=0; i<nativeObjectsCount; i++)
+	{
+		opaquesArray[i].render(magoManager, shader, renderType, glPrimitive);
+	}
+	
+	// transparents.
+	var transparentsArray = visibleObjControlerNodes.currentVisibleNativeObjects.transparentsArray;
+	nativeObjectsCount = transparentsArray.length;
+	for (var i=0; i<nativeObjectsCount; i++)
+	{
+		transparentsArray[i].render(magoManager, shader, renderType, glPrimitive);
+	}
+};
+
+/**
+ * This function renders provisional ParametricMesh objects that has no self render function.
+ * @param {WebGLRenderingContext} gl WebGL Rendering Context.
+ * @param {Number} renderType If renderType = 0 (depth render), renderType = 1 (color render), renderType = 2 (colorCoding render).
+ * @param {VisibleObjectsController} visibleObjControlerNodes This object contains visible objects for the camera frustum.
+ */
 Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControlerNodes) 
 {
 	gl.frontFace(gl.CCW);	
@@ -937,12 +968,14 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 			
 			// native objects.
+			this.renderNativeObjects(gl, currentShader, renderType, visibleObjControlerNodes);
+			/*
 			var nativeObjectsCount = visibleObjControlerNodes.currentVisibleNativeObjects.length;
 			for (var i=0; i<nativeObjectsCount; i++)
 			{
 				visibleObjControlerNodes.currentVisibleNativeObjects[i].render(magoManager, currentShader, renderType, glPrimitive);
 			}
-
+			*/
 			currentShader.disableVertexAttribArrayAll();
 			gl.useProgram(null);
 		}
@@ -1698,12 +1731,14 @@ Renderer.prototype.renderGeometryColorCoding = function(visibleObjControlerNodes
 		magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 		// native objects.
 		var glPrimitive = undefined;
+		this.renderNativeObjects(gl, currentShader, renderType, visibleObjControlerNodes);
+		/*
 		var nativeObjectsCount = visibleObjControlerNodes.currentVisibleNativeObjects.length;
 		for (var i=0; i<nativeObjectsCount; i++)
 		{
 			visibleObjControlerNodes.currentVisibleNativeObjects[i].render(magoManager, currentShader, renderType, glPrimitive);
 		}
-
+		*/
 		gl.enable(gl.CULL_FACE);
 		currentShader.disableVertexAttribArray(currentShader.position3_loc);
 		gl.useProgram(null);

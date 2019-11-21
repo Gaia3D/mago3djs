@@ -26,7 +26,7 @@ FrustumVolumeControl.prototype.getFrustumVolumeCulling = function(key)
 	{
 		this.frustumVolumensMap[key] = {};
 		this.frustumVolumensMap[key].fullyIntersectedLowestTilesArray = [];
-		this.frustumVolumensMap[key].partiallyIntersectedLowestTilesArray = [];
+		this.frustumVolumensMap[key].partiallyIntersectedLowestTilesArray = []; // old.***
 		this.frustumVolumensMap[key].visibleNodes = new VisibleObjectsController();
 	}
 	
@@ -45,7 +45,7 @@ FrustumVolumeControl.prototype.initArrays = function()
 		{
 			frustumVolumeObject = this.frustumVolumensMap[key];
 			frustumVolumeObject.fullyIntersectedLowestTilesArray.length = 0;
-			frustumVolumeObject.partiallyIntersectedLowestTilesArray.length = 0;
+			frustumVolumeObject.partiallyIntersectedLowestTilesArray.length = 0; // old.***
 			frustumVolumeObject.visibleNodes.initArrays();
 		}
 	}

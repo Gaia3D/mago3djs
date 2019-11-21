@@ -4431,7 +4431,7 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 			for (var j=0; j<objectsCount; j++)
 			{
 				var object = lowestTile.objectsArray[j];
-				visibleNodes.currentVisibleNativeObjects.push(object);
+				visibleNodes.putNativeObject(object);
 				
 				//var bbox = object.getBoundingBox();
 				//this.boundingSphere_Aux = bbox.getBoundingSphere(this.boundingSphere_Aux);
