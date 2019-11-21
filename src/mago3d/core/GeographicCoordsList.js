@@ -224,14 +224,8 @@ GeographicCoordsList.prototype.makeLines = function(magoManager)
 	
 	// To render lines, use Point3DList class object.
 	if (this.points3dList === undefined)
-	{ 
-		this.points3dList = new Point3DList(); 
-		var points3dArray = this.getPointsWorldCoord(undefined);
-		this.points3dList.deleteVboKeysContainer(magoManager);
-		this.points3dList.deletePoints3d();
-		this.points3dList.addPoint3dArray(points3dArray);
-	}
-	/*
+	{ this.points3dList = new Point3DList(); }
+	
 	var geoLoc = this.points3dList.getGeographicLocation();
 	
 	// Take the 1rst geographicCoord's geoLocation.
@@ -245,13 +239,11 @@ GeographicCoordsList.prototype.makeLines = function(magoManager)
 	
 	geoLoc.copyFrom(geoLocFirst);
 	
-
-	//var points3dArray = this.getPointsRelativeToGeoLocation(geoLoc, undefined);
-	var points3dArray = this.getPointsWorldCoord(undefined);
+	var points3dArray = this.getPointsRelativeToGeoLocation(geoLoc, undefined);
 	this.points3dList.deleteVboKeysContainer(magoManager);
 	this.points3dList.deletePoints3d();
 	this.points3dList.addPoint3dArray(points3dArray);
-	*/
+	
 };
 
 /**

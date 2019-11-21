@@ -633,7 +633,7 @@ BasicFactory.prototype.render = function(magoManager, shader, renderType, glPrim
 	
 	gl.uniform1i(shader.refMatrixType_loc, 0); // in magoManager case, there are not referencesMatrix.***
 	var isSelected = false;
-	
+	gl.uniform1f(shader.externalAlpha_loc, this.isOpaque() ? 1.0 : 0.7);
 	if (renderType === 0)
 	{
 		// Depth render.***
@@ -682,6 +682,8 @@ BasicFactory.prototype.render = function(magoManager, shader, renderType, glPrim
 	}
 	
 	gl.disable(gl.BLEND);
+
+	gl.uniform1f(shader.externalAlpha_loc, 1.0);
 };
 
 /**

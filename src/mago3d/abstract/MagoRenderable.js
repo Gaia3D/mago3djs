@@ -20,8 +20,6 @@ var MagoRenderable = function()
 	
 	this.dirty = true;
 	this.color4;
-
-	this.opaque = true;
 };
 
 MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPrimitive) 
