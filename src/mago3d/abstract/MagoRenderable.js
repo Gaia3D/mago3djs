@@ -17,6 +17,8 @@ var MagoRenderable = function()
     
 	this.dirty = true;
 	this.color4;
+
+	this.opaque = true;
 };
 
 MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPrimitive) 
@@ -78,4 +80,15 @@ MagoRenderable.prototype.setOneColor = function(r, g, b, a)
 	{ this.color4 = new Color(); }
 	
 	this.color4.setRGBA(r, g, b, a);
+
+	//TODO : 좀 더 정교한 근사값 구하기로 변경
+	if(a < 1) {
+		this.setOpaque(false);
+	}
 };
+MagoRenderable.prototype.setOpaque = function(opaque){
+	this.opaque = opaque;
+}
+MagoRenderable.prototype.isOpaque = function(){
+	return this.opaque;
+}
