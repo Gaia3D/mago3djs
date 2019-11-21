@@ -16,7 +16,10 @@ var VisibleObjectsController = function()
 	this.currentVisibles2 = []; 
 	this.currentVisibles3 = []; 
 	this.currentVisiblesAux = [];
-	this.currentVisibleNativeObjects = [];
+	this.currentVisibleNativeObjects = {
+		opaquesArray      : [],
+		transparentsArray : []
+	};
 	this.currentVisiblesToPrepare = [];
 };
 VisibleObjectsController.prototype.initArrays = function() 
@@ -26,7 +29,10 @@ VisibleObjectsController.prototype.initArrays = function()
 	this.currentVisibles2 = [];
 	this.currentVisibles3 = [];
 	this.currentVisiblesAux = [];
-	this.currentVisibleNativeObjects = [];
+	this.currentVisibleNativeObjects = {
+		opaquesArray      : [],
+		transparentsArray : []
+	};
 	this.currentVisiblesToPrepare = [];
 };
 /**Clear all of the volumn's data */
@@ -38,7 +44,8 @@ VisibleObjectsController.prototype.clear = function()
 	this.currentVisibles2.length = 0;
 	this.currentVisibles3.length = 0;
 	this.currentVisiblesAux.length = 0;
-	this.currentVisibleNativeObjects.length = 0;
+	this.currentVisibleNativeObjects.opaquesArray.length = 0;
+	this.currentVisibleNativeObjects.transparentsArray.length = 0;
 	this.currentVisiblesToPrepare.length = 0;
 };
 
@@ -70,10 +77,31 @@ VisibleObjectsController.prototype.hasRenderables = function()
 		this.currentVisibles2.length > 0 || 
 		this.currentVisibles3.length > 0 || 
 		this.currentVisiblesAux.length > 0 || 
-		this.currentVisibleNativeObjects.length > 0 )
+		this.currentVisibleNativeObjects.opaquesArray.length > 0 ||
+		this.currentVisibleNativeObjects.transparentsArray.length > 0)
 	{ return true; }
 	else
 	{ return false; }
+};
+
+/**
+ * Put the node to given node array
+ * @param nodesArray
+ * @param node
+ */
+VisibleObjectsController.prototype.putNativeObject = function(object) 
+{
+	// check if the object if opaque or transparent.
+	var isOpaque = object.isOpaque();
+	//var isOpaque = true;
+	if (isOpaque)
+	{
+		this.currentVisibleNativeObjects.opaquesArray.push(object);
+	}
+	else 
+	{
+		this.currentVisibleNativeObjects.transparentsArray.push(object);
+	}
 };
 
 /**
