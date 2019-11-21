@@ -19,7 +19,6 @@ var Box = function(width, length, height, name)
 	this.length;
 	this.height;
 	this.owner;
-	this.geoLocDataManager;
 	
 	if (name !== undefined)
 	{ this.name = name; }
@@ -58,11 +57,6 @@ Box.prototype.render = function(magoManager, shader, renderType, glPrimitive, bI
 	buildingGeoLocation.bindGeoLocationUniforms(gl, shader); // rotMatrix, positionHIGH, positionLOW.
 	
 	this.renderAsChild(magoManager, shader, renderType, glPrimitive, bIsSelected);
-};
-
-Box.prototype.getGeoLocDataManager = function()
-{
-	return this.geoLocDataManager;
 };
 
 /**

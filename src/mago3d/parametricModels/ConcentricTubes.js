@@ -8,6 +8,7 @@
  */
 var ConcentricTubes = function(option, geoLocDataManager)
 {
+	MagoRenderable.call(this);
 	/**
 	 * @type {number}
 	 * @default 0
@@ -38,6 +39,8 @@ var ConcentricTubes = function(option, geoLocDataManager)
 	this.initTube(option.tubeInfos);
 };
 
+ConcentricTubes.prototype = Object.create(MagoRenderable.prototype);
+ConcentricTubes.prototype.constructor = ConcentricTubes;
 /**
  * 초기 튜브 정보를 가지고 튜브들을 초기화 함.
  */
@@ -177,6 +180,27 @@ ConcentricTubes.prototype.render = function (magoManager, shader, renderType, gl
 	}
 
 	var gl = magoManager.getGl();
+	var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
+	buildingGeoLocation.bindGeoLocationUniforms(gl, shader); // rotMatrix, positionHIGH, positionLOW.
+	var isSelected = false;
+	this.renderAsChild(magoManager, shader, renderType, glPrimitive, isSelected);
+};
+
+/**
+ * 튜브 렌더링
+ * @param {MagoManager} magoManager
+ * @param {Shader} shader
+ * @param {number} renderType
+ * @param {GL} glPrimitive
+ */
+ConcentricTubes.prototype.renderAsChild = function (magoManager, shader, renderType, glPrimitive, isSelected) 
+{
+	if (this.attributes && this.attributes.isVisible !== undefined && this.attributes.isVisible === false) 
+	{
+		return;
+	}
+
+	var gl = magoManager.getGl();
 	var isSelected = false;
 	if (renderType === 0)
 	{
@@ -208,8 +232,7 @@ ConcentricTubes.prototype.render = function (magoManager, shader, renderType, gl
 	{
 		var tube = this.getTube(i);
 
-		if (!tube.geoLocDataManager) { tube.geoLocDataManager = geoLocManager; }
-		tube.renderRaw(magoManager, shader, renderType, glPrimitive, isSelected);
+		tube.renderAsChild(magoManager, shader, renderType, glPrimitive, isSelected);
 	}
 };
 

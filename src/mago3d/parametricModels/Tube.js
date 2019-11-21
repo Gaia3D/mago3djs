@@ -6,6 +6,7 @@
  */
 var Tube = function(interiorRadius, exteriorRadius, height, options) 
 {
+	MagoRenderable.call(this);
 	if (!(this instanceof Tube)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
@@ -46,6 +47,8 @@ var Tube = function(interiorRadius, exteriorRadius, height, options)
 		}
 	}
 };
+Tube.prototype = Object.create(MagoRenderable.prototype);
+Tube.prototype.constructor = Tube;
 
 /**
  * Returns the bbox.
@@ -95,10 +98,12 @@ Tube.prototype.makeMesh = function()
 	this.dirty = false;
 };
 
+
+
 /**
  * Renders the factory.
  */
-Tube.prototype.render = function(magoManager, shader, renderType, glPrimitive)
+Tube.prototype.render = function(magoManager, shader, renderType, glPrimitive, bIsSelected)
 {
 	if (this.attributes && this.attributes.isVisible !== undefined && this.attributes.isVisible === false) 
 	{
@@ -113,27 +118,14 @@ Tube.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 	// Set geoLocation uniforms.***
 	
 	var gl = magoManager.getGl();
-	/*
+	
 	var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
 	buildingGeoLocation.bindGeoLocationUniforms(gl, shader); // rotMatrix, positionHIGH, positionLOW.
 	
 	gl.uniform1i(shader.refMatrixType_loc, 0); // in magoManager case, there are not referencesMatrix.***
 	gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
-	*/
-	if (renderType === 2)
-	{
-		// Selection render.***
-		var selectionColor = magoManager.selectionColor;
-		var colorAux = magoManager.selectionColor.getAvailableColor(undefined);
-		var idxKey = magoManager.selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
-		magoManager.selectionManager.setCandidateGeneral(idxKey, this);
-		
-		gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 0.7]);
-		gl.disable(gl.BLEND);
-	}
 	
-	this.renderRaw(magoManager, shader, renderType, glPrimitive);
-	//this.mesh.render(magoManager, shader, renderType, glPrimitive);
+	this.renderAsChild(magoManager, shader, renderType, glPrimitive, bIsSelected);
 
 	gl.disable(gl.BLEND);
 };
@@ -141,7 +133,7 @@ Tube.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 /**
  * Renders the factory.
  */
-Tube.prototype.renderRaw = function(magoManager, shader, renderType, glPrimitive, bIsSelected)
+Tube.prototype.renderAsChild = function(magoManager, shader, renderType, glPrimitive, bIsSelected)
 {
 	if (this.dirty)
 	{ this.makeMesh(); }
@@ -151,8 +143,6 @@ Tube.prototype.renderRaw = function(magoManager, shader, renderType, glPrimitive
 
 	// Set geoLocation uniforms.***
 	var gl = magoManager.getGl();
-	var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
-	buildingGeoLocation.bindGeoLocationUniforms(gl, shader); // rotMatrix, positionHIGH, positionLOW.
 	
 	if (renderType === 0)
 	{
@@ -171,19 +161,33 @@ Tube.prototype.renderRaw = function(magoManager, shader, renderType, glPrimitive
 		if (bIsSelected !== undefined && bIsSelected)
 		{
 			//gl.disable(gl.BLEND);
-			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 0.7]);
+			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, this.color4.a]);
 		}
 		else if (selectionManager.isObjectSelected(this))
 		{
 			//gl.disable(gl.BLEND);
-			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 0.7]);
+			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, this.color4.a]);
 		}
 		else 
 		{
 			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, this.color4.a]);
 		}
+	} 
+	else if (renderType === 2)
+	{
+		// Selection render.***
+		var selectionColor = magoManager.selectionColor;
+		var colorAux = magoManager.selectionColor.getAvailableColor(undefined);
+		var idxKey = magoManager.selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
+		magoManager.selectionManager.setCandidateGeneral(idxKey, this);
+		
+		gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 0.7]);
+		gl.disable(gl.BLEND);
 	}
-
+	if (this.tMat) 
+	{
+		gl.uniformMatrix4fv(shader.buildingRotMatrix_loc, false, this.tMat._floatArrays);
+	}
 	this.mesh.render(magoManager, shader, renderType, glPrimitive, bIsSelected);
 
 	gl.disable(gl.BLEND);
