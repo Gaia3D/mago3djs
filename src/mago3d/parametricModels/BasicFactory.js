@@ -654,7 +654,6 @@ BasicFactory.prototype.makeMesh = function()
 	this.objectsArray.push(mesh);
 	this.objectsMap[mesh.name] = mesh;
 	
-	
 	// Now rotate the roof.***
 	mesh.rotate(90, 1, 0, 0);
 	

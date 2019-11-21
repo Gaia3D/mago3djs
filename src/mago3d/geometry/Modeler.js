@@ -32,6 +32,7 @@ var Modeler = function(magoManager)
 	this.tunnel; // class : Tunnel.
 	this.bSplineCubic3d;
 	this.sphere; // class : Sphere.
+	this.clippingBox;
 	
 	this.testObjectsArray;
 	
@@ -112,6 +113,7 @@ Modeler.prototype.addObject = function(object, depth)
 	this.objectsArray.push(object);
 	
 	var smartTileManager = this.magoManager.smartTileManager;
+	// Note: the targetDepth must be calculated by the objects bbox size.
 	var targetDepth = depth ? depth : 16;
 	smartTileManager.putObject(targetDepth, object, this.magoManager);
 };

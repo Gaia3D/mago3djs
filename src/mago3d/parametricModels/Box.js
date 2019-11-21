@@ -11,9 +11,8 @@ var Box = function(width, length, height, name)
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
+	// See MagoRenderable's members.
 	// Initially, box centered at the center of the bottom.***
-	this.name;
-	this.id;
 	this.mesh;
 	this.centerPoint; // Usually (0,0,0).***
 	this.width;
@@ -21,11 +20,7 @@ var Box = function(width, length, height, name)
 	this.height;
 	this.owner;
 	this.geoLocDataManager;
-	//MagoRenderable's member start
-	this.color4; 
-	this.tMat;
-	this.tMatOriginal;
-	//MagoRenderable's member end
+	
 	if (name !== undefined)
 	{ this.name = name; }
 	
@@ -45,7 +40,7 @@ Box.prototype.contructor = Box;
 /**
  * Renders the factory.
  */
-Box.prototype.render = function(magoManager, shader, renderType, glPrimitive)
+Box.prototype.render = function(magoManager, shader, renderType, glPrimitive, bIsSelected)
 {
 	if (this.attributes && this.attributes.isVisible !== undefined && this.attributes.isVisible === false) 
 	{
@@ -58,82 +53,16 @@ Box.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 	{ return false; }
 
 	// Set geoLocation uniforms.***
-	
 	var gl = magoManager.getGl();
-	/*
 	var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
 	buildingGeoLocation.bindGeoLocationUniforms(gl, shader); // rotMatrix, positionHIGH, positionLOW.
 	
-	gl.uniform1i(shader.refMatrixType_loc, 0); // in magoManager case, there are not referencesMatrix.***
-	gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
-	*/
-	if (renderType === 2)
-	{
-		// Selection render.***
-		var selectionColor = magoManager.selectionColor;
-		var colorAux = magoManager.selectionColor.getAvailableColor(undefined);
-		var idxKey = magoManager.selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
-		magoManager.selectionManager.setCandidateGeneral(idxKey, this);
-		
-		gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
-		gl.disable(gl.BLEND);
-	}
-	
-	this.renderRaw(magoManager, shader, renderType, glPrimitive);
-	//this.mesh.render(magoManager, shader, renderType, glPrimitive);
-
-	gl.disable(gl.BLEND);
+	this.renderAsChild(magoManager, shader, renderType, glPrimitive, bIsSelected);
 };
 
-/**
- * Renders the factory.
- */
-Box.prototype.renderRaw = function(magoManager, shader, renderType, glPrimitive, bIsSelected)
+Box.prototype.getGeoLocDataManager = function()
 {
-	if (this.dirty)
-	{ this.makeMesh(); }
-	
-	if (this.mesh === undefined)
-	{ return false; }
-
-	// Set geoLocation uniforms.***
-	var gl = magoManager.getGl();
-	var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
-	buildingGeoLocation.bindGeoLocationUniforms(gl, shader); // rotMatrix, positionHIGH, positionLOW.
-	
-	if (renderType === 0)
-	{
-		// Depth render.***
-	}
-	else if (renderType === 1)
-	{
-		// Color render.***
-		//gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
-		gl.enable(gl.BLEND);
-		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
-		
-		// Check if is selected.***
-		var selectionManager = magoManager.selectionManager;
-		if (bIsSelected !== undefined && bIsSelected)
-		{
-			//gl.disable(gl.BLEND);
-			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 1.0]);
-		}
-		else if (selectionManager.isObjectSelected(this))
-		{
-			//gl.disable(gl.BLEND);
-			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 1.0]);
-		}
-		else 
-		{
-			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, this.color4.a]);
-		}
-		
-	}
-
-	this.mesh.render(magoManager, shader, renderType, glPrimitive, bIsSelected);
-
-	gl.disable(gl.BLEND);
+	return this.geoLocDataManager;
 };
 
 /**
@@ -150,7 +79,6 @@ Box.prototype.renderAsChild = function(magoManager, shader, renderType, glPrimit
 	// Set geoLocation uniforms.***
 	var gl = magoManager.getGl();
 	
-	
 	if (renderType === 0)
 	{
 		// Depth render.***
@@ -164,7 +92,6 @@ Box.prototype.renderAsChild = function(magoManager, shader, renderType, glPrimit
 		
 		// Check if is selected.***
 		var selectionManager = magoManager.selectionManager;
-
 		
 		if (bIsSelected !== undefined && bIsSelected)
 		{
@@ -188,6 +115,17 @@ Box.prototype.renderAsChild = function(magoManager, shader, renderType, glPrimit
 			}
 		}
 		
+	}
+	else if (renderType === 2)
+	{
+		// Selection render.***
+		var selectionColor = magoManager.selectionColor;
+		var colorAux = magoManager.selectionColor.getAvailableColor(undefined);
+		var idxKey = magoManager.selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
+		magoManager.selectionManager.setCandidateGeneral(idxKey, this);
+		
+		gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
+		gl.disable(gl.BLEND);
 	}
 
 	if (this.tMat) 
@@ -234,7 +172,6 @@ Box.prototype.makeMesh = function()
 	polyline.newPoint2d(halfWidth, -halLength);
 	polyline.newPoint2d(halfWidth, halLength);
 	polyline.newPoint2d(-halfWidth, halLength);
-
 
 	//var rect = outerRing.newElement("RECTANGLE");
 	//rect.setCenterPosition(this.centerPoint.x, this.centerPoint.y);

@@ -1790,10 +1790,11 @@ MagoManager.prototype.keyDown = function(key)
 	{
 		//this.modeler.mode = CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_PLANEGRID;
-		this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
+		//this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_TUNNELPOINTS;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_PIPE;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_SPHERE;
+		this.modeler.mode = CODE.modelerMode.DRAWING_BOX;
 		//this.modeler.mode = 50;
 	}
 	else if (key === 38) // 38 = 'up'.***
@@ -2418,6 +2419,25 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			sphere.geoLocDataManager = geoLocDataManager;
 			sphere.setRadius(30);
 			this.modeler.addObject(sphere, 15);
+		}
+		else if (this.modeler.mode === CODE.modelerMode.DRAWING_BOX)
+		{
+			// make a sphere.
+			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+50, undefined, undefined, undefined, geoLocData, this);
+			
+			var options = {};
+			var color = new Color();
+			color.setRGB(0.9, 0.7, 0.2);
+			options.color = color;
+			var box = new Box(10, 10, 20, "testBox");
+			box.geoLocDataManager = geoLocDataManager;
+			box.setOneColor(0.2, 0.5, 0.7, 1.0);
+			if (box.attributes === undefined)
+			{ box.attributes = {}; }
+			box.attributes.isMovable = true;
+			this.modeler.addObject(box, 15);
 		}
 		else if (this.modeler.mode === 50)
 		{

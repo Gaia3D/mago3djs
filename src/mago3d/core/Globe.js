@@ -106,10 +106,10 @@ Globe.normalizeCartesian = function(cartesian)
 };
 
 /**
- * Change cartesian point to WGS84 and nromalize that.
- * @param {Number} x the x coordi value of input cartesian point
- * @param {Number} y the y coordi value of input cartesian point
- * @param {Number} z the z coordi value of input cartesian point
+ * Change cartesian point to WGS84 and normalize that.
+ * @param {Number} x the x coord value of input cartesian point
+ * @param {Number} y the y coord value of input cartesian point
+ * @param {Number} z the z coord value of input cartesian point
  * @param {Float32Array} resultNormal the cartesian point which will hold the calculated result
  * @returns {Float32Array} resultNormal
  */
