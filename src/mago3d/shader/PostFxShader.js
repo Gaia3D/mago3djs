@@ -612,11 +612,15 @@ PostFxShader.prototype.createUniformLocals = function(gl, shader, sceneState)
 	shader.color4_loc = gl.getAttribLocation(shader.program, "color4");
 	
 	
-	
 	shader.bUse1Color_loc = gl.getUniformLocation(shader.program, "bUse1Color");
 	shader.oneColor4_loc = gl.getUniformLocation(shader.program, "oneColor4");
 	shader.bApplySsao_loc = gl.getUniformLocation(shader.program, "bApplySsao");
 	shader.bApplyShadow_loc = gl.getUniformLocation(shader.program, "bApplyShadow");
+	
+	// clippingPlanes.
+	shader.bApplyClippingPlanes_loc = gl.getUniformLocation(shader.program, "bApplyClippingPlanes");
+	shader.clippingPlanesCount_loc = gl.getUniformLocation(shader.program, "clippingPlanesCount");
+	shader.clippingPlanes_loc = gl.getUniformLocation(shader.program, "clippingPlanes");
 	
 	// compression data, for shaders with data compressed.
 	// compressionMaxPoint & compressionMinPoint: for refObjects, this is the octree's size.

@@ -430,6 +430,26 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 		currentShader.enableVertexAttribArray(currentShader.position3_loc);
 
 		currentShader.bindUniformGenerals();
+		
+		// check if exist clippingPlanes.
+		if (magoManager.modeler.clippingBox !== undefined)
+		{
+			var planesVec4Array = magoManager.modeler.clippingBox.getPlanesRelToEyevec4Array(magoManager);
+			var planesVec4FloatArray = new Float32Array(planesVec4Array);
+			
+			//shader.bApplyClippingPlanes_loc = gl.getUniformLocation(shader.program, "bApplyClippingPlanes");
+			//shader.clippingPlanesCount_loc = gl.getUniformLocation(shader.program, "clippingPlanesCount");
+			//shader.clippingPlanes_loc = gl.getUniformLocation(shader.program, "clippingPlanes");
+			
+			gl.uniform1i(currentShader.bApplyClippingPlanes_loc, true);
+			gl.uniform1i(currentShader.clippingPlanesCount_loc, 6);
+			gl.uniform4fv(currentShader.clippingPlanes_loc, planesVec4FloatArray);
+		}
+		else 
+		{
+			gl.uniform1i(currentShader.bApplyClippingPlanes_loc, false);
+		}
+			
 
 		// RenderDepth for all buildings.***
 		var refTMatrixIdxKey = 0;
@@ -568,7 +588,7 @@ Renderer.prototype.renderDepthSunPointOfView = function(gl, visibleObjControlerN
 	var realPosWC = Globe.geographicToCartesianWgs84(realLon, realLat, altitude, undefined);
 	
 	var ortho = new Matrix4();
-	var nRange = 500.0;
+	var nRange = 200.0;
 	var left = -nRange, right = nRange, bottom = -nRange, top = nRange, near = -2*nRange, far = 2*nRange;
 	ortho._floatArrays = glMatrix.mat4.ortho(ortho._floatArrays, left, right, bottom, top, near, far);
 	
@@ -902,7 +922,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			
 		// ssao render.************************************************************************************************************
 		var visibleObjectControllerHasRenderables = visibleObjControlerNodes.hasRenderables();
-		if (visibleObjectControllerHasRenderables)
+		if (visibleObjectControllerHasRenderables || magoManager.modeler !== undefined)
 		{
 			gl.enable(gl.BLEND);
 			currentShader = magoManager.postFxShadersManager.getShader("modelRefSsao"); 
@@ -919,6 +939,25 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 				gl.uniform3fv(currentShader.sunPosLow_loc, sunLight.positionLOW);
 				gl.uniform1f(currentShader.shadowMapWidth_loc, sunLight.targetTextureWidth);
 				gl.uniform1f(currentShader.shadowMapHeight_loc, sunLight.targetTextureHeight);
+			}
+			
+			// check if exist clippingPlanes.
+			if (magoManager.modeler.clippingBox !== undefined)
+			{
+				var planesVec4Array = magoManager.modeler.clippingBox.getPlanesRelToEyevec4Array(magoManager);
+				var planesVec4FloatArray = new Float32Array(planesVec4Array);
+				
+				//shader.bApplyClippingPlanes_loc = gl.getUniformLocation(shader.program, "bApplyClippingPlanes");
+				//shader.clippingPlanesCount_loc = gl.getUniformLocation(shader.program, "clippingPlanesCount");
+				//shader.clippingPlanes_loc = gl.getUniformLocation(shader.program, "clippingPlanes");
+				
+				gl.uniform1i(currentShader.bApplyClippingPlanes_loc, true);
+				gl.uniform1i(currentShader.clippingPlanesCount_loc, 6);
+				gl.uniform4fv(currentShader.clippingPlanes_loc, planesVec4FloatArray);
+			}
+			else 
+			{
+				gl.uniform1i(currentShader.bApplyClippingPlanes_loc, false);
 			}
 			
 			gl.enableVertexAttribArray(currentShader.texCoord2_loc);
@@ -969,13 +1008,10 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			
 			// native objects.
 			this.renderNativeObjects(gl, currentShader, renderType, visibleObjControlerNodes);
-			/*
-			var nativeObjectsCount = visibleObjControlerNodes.currentVisibleNativeObjects.length;
-			for (var i=0; i<nativeObjectsCount; i++)
-			{
-				visibleObjControlerNodes.currentVisibleNativeObjects[i].render(magoManager, currentShader, renderType, glPrimitive);
-			}
-			*/
+			
+			// temp test.
+			magoManager.modeler.render(magoManager, currentShader, renderType);
+			
 			currentShader.disableVertexAttribArrayAll();
 			gl.useProgram(null);
 		}
@@ -1201,7 +1237,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		// Test Modeler Rendering.********************************************************************
 		// Test Modeler Rendering.********************************************************************
 		// Test Modeler Rendering.********************************************************************
-		
+		/*
 		if (magoManager.modeler !== undefined)
 		{
 			currentShader = magoManager.postFxShadersManager.getShader("modelRefSsao"); 
@@ -1226,7 +1262,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			gl.useProgram(null);
 
 		}
-		
+		*/
 		
 		// 3) now render bboxes.*******************************************************************************************************************
 		if (visibleObjectControllerHasRenderables)

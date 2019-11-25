@@ -4,7 +4,13 @@ precision highp float;
 uniform float near;
 uniform float far;
 
+// clipping planes.***
+uniform bool bApplyClippingPlanes;
+uniform int clippingPlanesCount;
+uniform vec4 clippingPlanes[6];
+
 varying float depth;  
+varying vec3 vertexPos;
 
 vec4 packDepth(const in float depth)
 {
@@ -22,8 +28,37 @@ vec4 PackDepth32( in float depth )
     return vec4( encode.xyz - encode.yzw / 256.0, encode.w ) + 1.0/512.0;
 }
 
+bool clipVertexByPlane(in vec4 plane, in vec3 point)
+{
+	float dist = plane.x * point.x + plane.y * point.y + plane.z * point.z + plane.w;
+	
+	if(dist < 0.0)
+	return true;
+	else return false;
+}
+
 void main()
 {     
+	// 1rst, check if there are clipping planes.
+	if(bApplyClippingPlanes)
+	{
+		bool discardFrag = true;
+		for(int i=0; i<6; i++)
+		{
+			vec4 plane = clippingPlanes[i];
+			if(!clipVertexByPlane(plane, vertexPos))
+			{
+				discardFrag = false;
+				break;
+			}
+			if(i >= clippingPlanesCount)
+			break;
+		}
+		
+		if(discardFrag)
+		discard;
+	}
+	
     gl_FragData[0] = packDepth(-depth);
 	//gl_FragData[0] = PackDepth32(depth);
 }

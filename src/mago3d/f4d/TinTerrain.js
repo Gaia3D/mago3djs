@@ -375,7 +375,8 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 		if (this.fileLoadState === CODE.fileLoadState.READY)
 		{
 			var pathName = this.getPathName();
-			var fileName = "CesiumTerrain/" + pathName + ".terrain";
+			var geometryDataPath = magoManager.readerWriter.geometryDataPath;
+			var fileName = geometryDataPath + "/CesiumTerrain/" + pathName + ".terrain";
 			magoManager.readerWriter.loadTINTerrain(fileName, this, magoManager);
 			
 		}
@@ -392,6 +393,12 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 		else if (this.texture === undefined)
 		{
 			this.prepareTexture(magoManager, tinTerrainManager);
+		}
+		else if (this.fileLoadState === CODE.fileLoadState.LOAD_FAILED)
+		{
+			// Test.***
+			this.prepareTinTerrainPlain(magoManager, tinTerrainManager);
+			// End test.---
 		}
 
 		return;

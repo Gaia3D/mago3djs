@@ -1,6 +1,7 @@
 attribute vec3 position;
 
 uniform mat4 buildingRotMatrix; 
+uniform mat4 modelViewMatrix;
 uniform mat4 modelViewMatrixRelToEye; 
 uniform mat4 RefTransfMatrix;
 uniform mat4 ModelViewProjectionMatrixRelToEye;
@@ -15,6 +16,7 @@ uniform vec3 refTranslationVec;
 uniform int refMatrixType; // 0= identity, 1= translate, 2= transform
 
 varying float depth;
+varying vec3 vertexPos;
   
 void main()
 {	
@@ -43,4 +45,6 @@ void main()
     depth = (modelViewMatrixRelToEye * pos4).z/far; // original.***
 
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;
+	vertexPos = (modelViewMatrixRelToEye * pos4).xyz;
+		//vertexPos = objPosHigh + objPosLow;
 }

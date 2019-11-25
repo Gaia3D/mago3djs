@@ -447,7 +447,7 @@ Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive
 		}
 	}
 	
-	if (renderType === 1)
+	if (renderType === 1 || renderType === 2)
 	{
 		if (this.excavation !== undefined)
 		{
@@ -457,6 +457,13 @@ Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive
 		if (this.tunnel !== undefined)
 		{
 			this.tunnel.renderPoints(magoManager, shader, renderType);
+		}
+		
+		if (this.clippingBox !== undefined)
+		{
+			var glPrimitive = undefined;
+			var bIsSelected = false;
+			this.clippingBox.render(magoManager, shader, renderType, glPrimitive, bIsSelected);
 		}
 	}
 	
@@ -469,6 +476,8 @@ Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive
 	{
 		this.sphere.render(magoManager, shader, renderType);
 	}
+	
+	
 	
 };
 

@@ -6,6 +6,7 @@
  */
 var Sphere = function(options) 
 {
+	MagoRenderable.call(this);
 	if (!(this instanceof Sphere)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
@@ -31,6 +32,8 @@ var Sphere = function(options)
 	}
 	
 };
+Sphere.prototype = Object.create(MagoRenderable.prototype);
+Sphere.prototype.constructor = Sphere;
 
 /**
  * 포인트값 삭제
@@ -106,6 +109,7 @@ Sphere.prototype.getVbo = function(resultVboContainer, bTexCoords)
 /**
  * Renders the Sphere.
  */
+
 Sphere.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 {
 	if (this.attributes && this.attributes.isVisible !== undefined && this.attributes.isVisible === false) 
@@ -115,8 +119,8 @@ Sphere.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 	if (this.dirty)
 	{ this.makeMesh(); }
 	
-	if (this.mesh === undefined)
-	{ return false; }
+	//if (this.mesh === undefined)
+	//{ return false; }
 
 	var gl = magoManager.getGl();
 	/*
@@ -126,6 +130,7 @@ Sphere.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 	gl.uniform1i(shader.refMatrixType_loc, 0); // in magoManager case, there are not referencesMatrix.***
 	gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
 	*/
+
 	if (renderType === 2)
 	{
 		// Selection render.***
@@ -146,6 +151,7 @@ Sphere.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 
 };
 
+
 /**
  * Renders the factory.
  */
@@ -154,8 +160,8 @@ Sphere.prototype.renderRaw = function(magoManager, shader, renderType, glPrimiti
 	if (this.dirty)
 	{ this.makeMesh(); }
 	
-	if (this.mesh === undefined)
-	{ return false; }
+	//if (this.mesh === undefined)
+	//{ return false; }
 
 	// Set geoLocation uniforms.***
 	var gl = magoManager.getGl();
@@ -207,8 +213,8 @@ Sphere.prototype.renderLocal = function(magoManager, shader, renderType, glPrimi
 	if (this.dirty)
 	{ this.makeMesh(); }
 	
-	if (this.mesh === undefined)
-	{ return false; }
+	//if (this.mesh === undefined)
+	//{ return false; }
 	var gl = magoManager.getGl();
 	
 	if (renderType === 0)
@@ -241,7 +247,12 @@ Sphere.prototype.renderLocal = function(magoManager, shader, renderType, glPrimi
 		
 	}
 
-	this.mesh.render(magoManager, shader, renderType, glPrimitive, bIsSelected);
+	var objectsCount = this.objectsArray.length;
+	for (var i=0; i<objectsCount; i++)
+	{
+		this.objectsArray[i].renderAsChild(magoManager, shader, renderType, glPrimitive, bIsSelected);
+	}
+	//this.mesh.render(magoManager, shader, renderType, glPrimitive, bIsSelected);
 
 	gl.disable(gl.BLEND);
 };
@@ -274,8 +285,8 @@ Sphere.prototype.makeMesh = function()
 	revolveSegment2d.setPoints(strPoint2d, endPoint2d);
 	var bIncludeBottomCap = false;
 	var bIncludeTopCap = false;
-	this.mesh = Modeler.getRevolvedSolidMesh(profile2dAux, revolveAngDeg, revolveSegmentsCount, revolveSegment2d, bIncludeBottomCap, bIncludeTopCap, undefined);
-	
+	var mesh = Modeler.getRevolvedSolidMesh(profile2dAux, revolveAngDeg, revolveSegmentsCount, revolveSegment2d, bIncludeBottomCap, bIncludeTopCap, undefined);
+	this.objectsArray.push(mesh);
 	this.dirty = false;
 };
 

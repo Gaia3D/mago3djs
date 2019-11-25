@@ -143,7 +143,7 @@ void main()\n\
 			\n\
 		//textureColor = vec4(vNormal, 1.0);\n\
 		\n\
-		float maxAngDeg = 105.0;\n\
+		float maxAngDeg = 103.0;\n\
 		float A = 1.0/(maxAngDeg-95.0);\n\
 		float B = -A*95.0;\n\
 		float alpha = A*angDeg+B;\n\
@@ -154,7 +154,7 @@ void main()\n\
 		if(alphaPlusPerDist > 1.0)\n\
 		alphaPlusPerDist = 1.0;\n\
 \n\
-		textureColor = vec4(alpha*0.6*alphaPlusPerDist, alpha*0.9*alphaPlusPerDist, alpha, 1.0);\n\
+		textureColor = vec4(alpha*0.7*alphaPlusPerDist, alpha*0.9*alphaPlusPerDist, alpha, 1.0);\n\
 \n\
 \n\
 		gl_FragColor = vec4(textureColor.xyz, alpha); \n\
@@ -1299,6 +1299,11 @@ uniform bool bApplySsao;\n\
 uniform float externalAlpha;\n\
 uniform bool bApplyShadow;\n\
 \n\
+// clipping planes.***\n\
+uniform bool bApplyClippingPlanes;\n\
+uniform int clippingPlanesCount;\n\
+uniform vec4 clippingPlanes[6];\n\
+\n\
 varying vec2 vTexCoord;   \n\
 varying vec3 vLightWeighting;\n\
 varying vec3 diffuseColor;\n\
@@ -1340,8 +1345,37 @@ float getDepthShadowMap(vec2 coord)\n\
     return UnpackDepth32(texture2D(shadowMapTex, coord.xy));\n\
 }  \n\
 \n\
+bool clipVertexByPlane(in vec4 plane, in vec3 point)\n\
+{\n\
+	float dist = plane.x * point.x + plane.y * point.y + plane.z * point.z + plane.w;\n\
+	\n\
+	if(dist < 0.0)\n\
+	return true;\n\
+	else return false;\n\
+}\n\
+\n\
 void main()\n\
 {\n\
+	// 1rst, check if there are clipping planes.\n\
+	if(bApplyClippingPlanes)\n\
+	{\n\
+		bool discardFrag = true;\n\
+		for(int i=0; i<6; i++)\n\
+		{\n\
+			vec4 plane = clippingPlanes[i];\n\
+			if(!clipVertexByPlane(plane, vertexPos))\n\
+			{\n\
+				discardFrag = false;\n\
+				break;\n\
+			}\n\
+			if(i >= clippingPlanesCount)\n\
+			break;\n\
+		}\n\
+		\n\
+		if(discardFrag)\n\
+		discard;\n\
+	}\n\
+\n\
 	float occlusion = 1.0;\n\
 	vec3 normal2 = vNormal;\n\
 	if(bApplySsao)\n\
@@ -1610,6 +1644,8 @@ ShaderSource.ModelRefSsaoVS = "	attribute vec3 position;\n\
 			applySpecLighting = -1.0;\n\
 \n\
         gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+		vertexPos = (modelViewMatrixRelToEye * pos4).xyz;\n\
+		//vertexPos = objPosHigh + objPosLow;\n\
 		\n\
 		if(colorType == 1)\n\
 			aColor4 = color4;\n\
@@ -1739,6 +1775,40 @@ void main()\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 }\n\
 ";
+ShaderSource.PointCloudDepthFS = "#ifdef GL_ES\n\
+precision highp float;\n\
+#endif\n\
+uniform float near;\n\
+uniform float far;\n\
+\n\
+// clipping planes.***\n\
+uniform bool bApplyClippingPlanes;\n\
+uniform int clippingPlanesCount;\n\
+uniform vec4 clippingPlanes[6];\n\
+\n\
+varying float depth;  \n\
+\n\
+vec4 packDepth(const in float depth)\n\
+{\n\
+    const vec4 bit_shift = vec4(16777216.0, 65536.0, 256.0, 1.0);\n\
+    const vec4 bit_mask  = vec4(0.0, 0.00390625, 0.00390625, 0.00390625); \n\
+    vec4 res = fract(depth * bit_shift);\n\
+    res -= res.xxyz * bit_mask;\n\
+    return res;  \n\
+}\n\
+\n\
+vec4 PackDepth32( in float depth )\n\
+{\n\
+    depth *= (16777216.0 - 1.0) / (16777216.0);\n\
+    vec4 encode = fract( depth * vec4(1.0, 256.0, 256.0*256.0, 16777216.0) );// 256.0*256.0*256.0 = 16777216.0\n\
+    return vec4( encode.xyz - encode.yzw / 256.0, encode.w ) + 1.0/512.0;\n\
+}\n\
+\n\
+void main()\n\
+{     \n\
+    gl_FragData[0] = packDepth(-depth);\n\
+	//gl_FragData[0] = PackDepth32(depth);\n\
+}";
 ShaderSource.PointCloudDepthVS = "attribute vec3 position;\n\
 uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
 uniform mat4 modelViewMatrixRelToEye; \n\
@@ -2258,7 +2328,13 @@ precision highp float;\n\
 uniform float near;\n\
 uniform float far;\n\
 \n\
+// clipping planes.***\n\
+uniform bool bApplyClippingPlanes;\n\
+uniform int clippingPlanesCount;\n\
+uniform vec4 clippingPlanes[6];\n\
+\n\
 varying float depth;  \n\
+varying vec3 vertexPos;\n\
 \n\
 vec4 packDepth(const in float depth)\n\
 {\n\
@@ -2276,14 +2352,44 @@ vec4 PackDepth32( in float depth )\n\
     return vec4( encode.xyz - encode.yzw / 256.0, encode.w ) + 1.0/512.0;\n\
 }\n\
 \n\
+bool clipVertexByPlane(in vec4 plane, in vec3 point)\n\
+{\n\
+	float dist = plane.x * point.x + plane.y * point.y + plane.z * point.z + plane.w;\n\
+	\n\
+	if(dist < 0.0)\n\
+	return true;\n\
+	else return false;\n\
+}\n\
+\n\
 void main()\n\
 {     \n\
+	// 1rst, check if there are clipping planes.\n\
+	if(bApplyClippingPlanes)\n\
+	{\n\
+		bool discardFrag = true;\n\
+		for(int i=0; i<6; i++)\n\
+		{\n\
+			vec4 plane = clippingPlanes[i];\n\
+			if(!clipVertexByPlane(plane, vertexPos))\n\
+			{\n\
+				discardFrag = false;\n\
+				break;\n\
+			}\n\
+			if(i >= clippingPlanesCount)\n\
+			break;\n\
+		}\n\
+		\n\
+		if(discardFrag)\n\
+		discard;\n\
+	}\n\
+	\n\
     gl_FragData[0] = packDepth(-depth);\n\
 	//gl_FragData[0] = PackDepth32(depth);\n\
 }";
 ShaderSource.RenderShowDepthVS = "attribute vec3 position;\n\
 \n\
 uniform mat4 buildingRotMatrix; \n\
+uniform mat4 modelViewMatrix;\n\
 uniform mat4 modelViewMatrixRelToEye; \n\
 uniform mat4 RefTransfMatrix;\n\
 uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
@@ -2298,6 +2404,7 @@ uniform vec3 refTranslationVec;\n\
 uniform int refMatrixType; // 0= identity, 1= translate, 2= transform\n\
 \n\
 varying float depth;\n\
+varying vec3 vertexPos;\n\
   \n\
 void main()\n\
 {	\n\
@@ -2326,6 +2433,8 @@ void main()\n\
     depth = (modelViewMatrixRelToEye * pos4).z/far; // original.***\n\
 \n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+	vertexPos = (modelViewMatrixRelToEye * pos4).xyz;\n\
+		//vertexPos = objPosHigh + objPosLow;\n\
 }";
 ShaderSource.screen_frag = "precision mediump float;\n\
 \n\

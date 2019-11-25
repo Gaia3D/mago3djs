@@ -48,7 +48,10 @@ CODE.modelerMode = {
 	"DRAWING_PIPE"             : 9,
 	"DRAWING_SPHERE"           : 10,
 	"DRAWING_BOX"              : 11,
-	"DRAWING_CUTTINGPLANE"     : 12
+	"DRAWING_CUTTINGPLANE"     : 12,
+	"DRAWING_CLIPPINGBOX"      : 13,
+	"DRAWING_CONCENTRICTUBES"  : 14,
+	"DRAWING_TUBE"             : 15
 };
 
 CODE.boxFace = {

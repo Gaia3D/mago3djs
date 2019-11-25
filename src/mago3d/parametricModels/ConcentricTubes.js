@@ -27,16 +27,9 @@ var ConcentricTubes = function(option, geoLocDataManager)
 		this.geoLocDataManager = geoLocDataManager;
 	}
     
-	/**
-	 * tube array
-	 * @type {Array.<Tube>}
-	 * @default undefined
-	 */
-	this.tubes = [];
 	
 	this.bbox;
-
-	this.initTube(option.tubeInfos);
+	this.options = option;
 };
 
 ConcentricTubes.prototype = Object.create(MagoRenderable.prototype);
@@ -46,15 +39,16 @@ ConcentricTubes.prototype.constructor = ConcentricTubes;
  */
 ConcentricTubes.prototype.clear = function() 
 {
-	this.tubes = [];
+	this.objectsArray = [];
 };
 
 /**
- * 초기 튜브 정보를 가지고 튜브들을 초기화 함.
- * @param {Array.<Object>} tubeInfos
+ * 튜브정보를 이용하여 튜브 생성 후 튜브어레이에 넣음
+ * @param {Object} option
  */
-ConcentricTubes.prototype.initTube = function(tubeInfos) 
+ConcentricTubes.prototype.makeMesh = function() 
 {
+	var tubeInfos = this.options.tubeInfos;
 	if (defined(tubeInfos))
 	{	
 		this.clear();
@@ -62,6 +56,8 @@ ConcentricTubes.prototype.initTube = function(tubeInfos)
 		{
 			this.makeTube(tubeInfos[i]);
 		}
+		
+		this.setDirty(false);
 	}
 };
 
@@ -77,8 +73,8 @@ ConcentricTubes.prototype.makeTube = function(option)
 	var options = option;
 
 	var tube = new Tube(interiorRadius, exteriorRadius, height, options);
-
-	this.addTube(tube);
+	tube.owner = this;
+	this.objectsArray.push(tube);
 };
 
 /**
@@ -127,7 +123,7 @@ ConcentricTubes.prototype.getHeight = function(height)
  */
 ConcentricTubes.prototype.addTube = function(tube) 
 {
-	this.tubes.push(tube);
+	this.objectsArray.push(tube);
 };
 /**
  * 튜브 목록 반환
@@ -135,7 +131,7 @@ ConcentricTubes.prototype.addTube = function(tube)
  */
 ConcentricTubes.prototype.getTubes = function() 
 {
-	return this.tubes;
+	return this.objectsArray;
 };
 /**
  * 인덱스에 해당하는 튜브 반환
@@ -144,7 +140,7 @@ ConcentricTubes.prototype.getTubes = function()
  */
 ConcentricTubes.prototype.getTube = function(index) 
 {
-	return this.tubes[index];
+	return this.objectsArray[index];
 };
 
 /**
@@ -153,91 +149,8 @@ ConcentricTubes.prototype.getTube = function(index)
  */
 ConcentricTubes.prototype.getSize = function() 
 {
-	return this.tubes.length;
+	return this.objectsArray.length;
 };
-
-/**
- * getGeoLocDataManager 반환
- * @return {GeoLocationDataManager}
- */
-ConcentricTubes.prototype.getGeoLocDataManager = function() 
-{
-	return this.geoLocDataManager;
-};
-
-/**
- * 튜브 렌더링
- * @param {MagoManager} magoManager
- * @param {Shader} shader
- * @param {number} renderType
- * @param {GL} glPrimitive
- */
-ConcentricTubes.prototype.render = function (magoManager, shader, renderType, glPrimitive) 
-{
-	if (this.attributes && this.attributes.isVisible !== undefined && this.attributes.isVisible === false) 
-	{
-		return;
-	}
-
-	var gl = magoManager.getGl();
-	var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
-	buildingGeoLocation.bindGeoLocationUniforms(gl, shader); // rotMatrix, positionHIGH, positionLOW.
-	var isSelected = false;
-	this.renderAsChild(magoManager, shader, renderType, glPrimitive, isSelected);
-};
-
-/**
- * 튜브 렌더링
- * @param {MagoManager} magoManager
- * @param {Shader} shader
- * @param {number} renderType
- * @param {GL} glPrimitive
- */
-ConcentricTubes.prototype.renderAsChild = function (magoManager, shader, renderType, glPrimitive, isSelected) 
-{
-	if (this.attributes && this.attributes.isVisible !== undefined && this.attributes.isVisible === false) 
-	{
-		return;
-	}
-
-	var gl = magoManager.getGl();
-	var isSelected = false;
-	if (renderType === 0)
-	{
-		// Depth render.***
-	}
-	else if (renderType === 1)
-	{
-		// Color render.***
-		var selectionManager = magoManager.selectionManager;
-		if (selectionManager.isObjectSelected(this))
-		{ isSelected = true; }
-	}
-	else if (renderType === 2)
-	{
-		// Selection render.***
-		var selectionColor = magoManager.selectionColor;
-		var colorAux = magoManager.selectionColor.getAvailableColor(undefined);
-		var idxKey = magoManager.selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
-		magoManager.selectionManager.setCandidateGeneral(idxKey, this);
-		
-		gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 0.7]);
-		gl.disable(gl.BLEND);
-	}
-	
-	var geoLocManager = this.getGeoLocDataManager();
-	shader.enableVertexAttribArray(shader.position3_loc);
-	shader.enableVertexAttribArray(shader.normal3_loc);
-	for (var i=0, len=this.getSize(); i<len; i++) 
-	{
-		var tube = this.getTube(i);
-
-		tube.renderAsChild(magoManager, shader, renderType, glPrimitive, isSelected);
-	}
-};
-
-
-
 
 
 

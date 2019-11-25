@@ -1794,8 +1794,42 @@ MagoManager.prototype.keyDown = function(key)
 		//this.modeler.mode = CODE.modelerMode.DRAWING_TUNNELPOINTS;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_PIPE;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_SPHERE;
-		this.modeler.mode = CODE.modelerMode.DRAWING_BOX;
+		//this.modeler.mode = CODE.modelerMode.DRAWING_BOX;
+		this.modeler.mode = CODE.modelerMode.DRAWING_CLIPPINGBOX;
+		//this.modeler.mode = CODE.modelerMode.DRAWING_CONCENTRICTUBES;
+		//this.modeler.mode = CODE.modelerMode.DRAWING_TUBE;
+		//this.modeler.mode = CODE.modelerMode.DRAWING_BASICFACTORY;
 		//this.modeler.mode = 50;
+		
+		if (this.counterAux === undefined)
+		{ this.counterAux = 0; }
+		
+		if (this.counterAux === 0)
+		{
+			this.modeler.mode = CODE.modelerMode.DRAWING_BOX;
+			this.counterAux++;
+		}
+		else if (this.counterAux === 1)
+		{
+			this.modeler.mode = CODE.modelerMode.DRAWING_TUBE;
+			this.counterAux++;
+		}
+		else if (this.counterAux === 2)
+		{
+			this.modeler.mode = CODE.modelerMode.DRAWING_CONCENTRICTUBES;
+			this.counterAux++;
+		}
+		else if (this.counterAux === 3)
+		{
+			this.modeler.mode = CODE.modelerMode.DRAWING_BASICFACTORY;
+			this.counterAux++;
+		}
+		else if (this.counterAux === 4)
+		{
+			this.modeler.mode = CODE.modelerMode.DRAWING_SPHERE;
+			this.counterAux = 0;
+		}
+		
 	}
 	else if (key === 38) // 38 = 'up'.***
 	{
@@ -2085,6 +2119,9 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			var mouseAction = this.sceneState.mouseAction;
 			strWorldPoint = mouseAction.strWorldPoint;
 		}
+		if (strWorldPoint === undefined)
+		{ return; }
+		
 		geoCoord = Globe.CartesianToGeographicWgs84(strWorldPoint.x, strWorldPoint.y, strWorldPoint.z, undefined, true);
 		geoCoord.absolutePoint = strWorldPoint;
 		
@@ -2339,7 +2376,9 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			var factory = new BasicFactory(factoryWidth, factoryLength, factoryHeight, options);
 			factory.bHasGround = true;
 			factory.geoLocDataManager = geoLocDataManager;
-			
+			if (factory.attributes === undefined)
+			{ factory.attributes = {}; }
+			factory.attributes.isMovable = true;
 			this.modeler.addObject(factory);
 		}
 		else if (this.modeler.mode === CODE.modelerMode.DRAWING_PIPE)
@@ -2418,6 +2457,9 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			var sphere = new Sphere(options);
 			sphere.geoLocDataManager = geoLocDataManager;
 			sphere.setRadius(30);
+			if (sphere.attributes === undefined)
+			{ sphere.attributes = {}; }
+			sphere.attributes.isMovable = true;
 			this.modeler.addObject(sphere, 15);
 		}
 		else if (this.modeler.mode === CODE.modelerMode.DRAWING_BOX)
@@ -2439,65 +2481,81 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			box.attributes.isMovable = true;
 			this.modeler.addObject(box, 15);
 		}
-		else if (this.modeler.mode === 50)
+		else if (this.modeler.mode === CODE.modelerMode.DRAWING_CLIPPINGBOX)
 		{
-			// make a sphere.
-			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
-			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude, undefined, undefined, undefined, geoLocData, this);
-			
-
-			//var wheel = new Wheel(0.2, 0.508, 0.3, {borderRadius: 0.01});
-			//wheel.geoLocDataManager = geoLocDataManager;
-			
-			//this.modeler.addObject(wheel, 15);
-
-			var box = new Box(4, 12, 2.2, new Date());
-			box.setOneColor(1, 1, 102/255, 1);
-
-			var totalLength = 2;
-			var bodyWidth = totalLength * 0.1;
-			var headWidth = totalLength * 0.2;
-			var tailLength = totalLength * 0.2;
-			var extrude = totalLength * 0.05;
-
-			var frontArrow = new Arrow({
-				totalLength : totalLength,
-				bodyWidth   : bodyWidth,
-				headWidth   : headWidth,
-				tailLength  : tailLength,
-				extrude     : extrude
-			});
-			
-			var rearArrow = new Arrow({
-				totalLength : totalLength,
-				bodyWidth   : bodyWidth,
-				headWidth   : headWidth,
-				tailLength  : tailLength,
-				extrude     : extrude
-			});
-
-			var ve = new BasicVehicle();
-			ve.setBox(box);
-			ve.setFrontArrow(frontArrow);
-			ve.setRearArrow(rearArrow);
-			ve.setWheelbase(12 * 0.8);
-			ve.geoLocDataManager = geoLocDataManager;
-
-			this.modeler.addObject(ve, 15);
+			// make a clipping box.
+			if (this.modeler.clippingBox === undefined)
+			{
+				var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+				var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+				geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+50, undefined, undefined, undefined, geoLocData, this);
+				
+				var options = {};
+				var color = new Color();
+				color.setRGB(0.9, 0.7, 0.2);
+				options.color = color;
+				var box = new ClippingBox(40, 40, 60, "testBox");
+				box.geoLocDataManager = geoLocDataManager;
+				box.setOneColor(0.2, 0.5, 0.7, 0.0);
+				if (box.attributes === undefined)
+				{ box.attributes = {}; }
+				box.attributes.isMovable = true;
+				this.modeler.clippingBox = box;
+			}
 		}
-		else if (this.modeler.mode === 51)
+		else if (this.modeler.mode === CODE.modelerMode.DRAWING_CONCENTRICTUBES)
 		{
-			// make a sphere.
 			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
 			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+8, undefined, undefined, undefined, geoLocData, this);
+			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+50, undefined, undefined, undefined, geoLocData, this);
+			
+			var options = {};
+			var color = new Color();
+			color.setRGB(0.9, 0.7, 0.2);
+			options.color = color;
+			
+			var options = {height: 30, tubeInfos: []};
+			var tubeInfo = {
+				interiorRadius : 10,
+				exteriorRadius : 15,
+				color          : {r: 0.2, g: 0.5, b: 0.9, a: 0.5}
+			};
+			options.tubeInfos.push(tubeInfo);
+			var tubeInfo = {
+				interiorRadius : 20,
+				exteriorRadius : 30,
+				color          : {r: 0.8, g: 0.2, b: 0.5, a: 0.5}
+			};
+			options.tubeInfos.push(tubeInfo);
+			
+			var concentricTube = new ConcentricTubes(options, geoLocDataManager);
+			concentricTube.setOneColor(0.2, 0.5, 0.7, 1.0);
+			if (concentricTube.attributes === undefined)
+			{ concentricTube.attributes = {}; }
+			concentricTube.attributes.isMovable = true;
 			
 			
-			var arrow = new Arrow({tailLength: 1});
-			arrow.geoLocDataManager = geoLocDataManager;
+	
+			this.modeler.addObject(concentricTube, 15);
 			
-			this.modeler.addObject(arrow, 15);
+		}
+		else if (this.modeler.mode === CODE.modelerMode.DRAWING_TUBE)
+		{
+			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+50, undefined, undefined, undefined, geoLocData, this);
+			
+			var options = {color: {r: 0.2, g: 0.5, b: 0.9, a: 0.5}};
+			
+			var tube = new Tube(10, 20, 30, options);
+			tube.setOneColor(0.2, 0.5, 0.7, 1.0);
+			tube.geoLocDataManager = geoLocDataManager;
+			if (tube.attributes === undefined)
+			{ tube.attributes = {}; }
+			tube.attributes.isMovable = true;
+			
+			this.modeler.addObject(tube, 15);
+			
 		}
 	}
 	
@@ -2804,6 +2862,8 @@ MagoManager.prototype.moveSelectedObjectGeneral = function(gl, object)
 	if (object === undefined)
 	{ return; }
 
+	object = object.getRootOwner();
+
 	var attributes = object.attributes;
 	if (attributes === undefined)
 	{ return; }
@@ -2933,6 +2993,8 @@ MagoManager.prototype.moveSelectedObjectGeneral = function(gl, object)
 		this.startMovPoint.x -= difX;
 		this.startMovPoint.y -= difY;
 	}
+	
+	object.moved();
 };
 
 
@@ -4024,7 +4086,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	// 7) PointsCloud Depth shader.****************************************************************************************
 	shaderName = "pointsCloudDepth";
 	ssao_vs_source = ShaderSource.PointCloudDepthVS;
-	ssao_fs_source = ShaderSource.RenderShowDepthFS;
+	ssao_fs_source = ShaderSource.PointCloudDepthFS;
 	shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
 	// pointsCloud shader locals.***
 	shader.bPositionCompressed_loc = gl.getUniformLocation(shader.program, "bPositionCompressed");
@@ -4862,17 +4924,20 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 			if (data.buildingSeed && data.buildingSeed.bBox)
 			{ data.bbox.copyFrom(buildingSeed.bBox); }
 			
-			//if (data.mapping_type && data.mapping_type.toLowerCase() === "boundingboxcenter")
-			//{
-			//	data.bbox.translateToOrigin();
-			//}
-			
 			// calculate the geographicCoordOfTheBBox.***
 			if (tMatrix !== undefined)
 			{
-				bboxCenterPoint = data.bbox.getCenterPoint(bboxCenterPoint);
-				var bboxCenterPointWorldCoord = tMatrix.transformPoint3D(bboxCenterPoint, bboxCenterPointWorldCoord);
-				data.bbox.geographicCoord = ManagerUtils.pointToGeographicCoord(bboxCenterPointWorldCoord, data.bbox.geographicCoord, this);
+				if (data.mapping_type.toLowerCase() === "origin")
+				{
+					bboxCenterPoint = data.bbox.getCenterPoint(bboxCenterPoint);
+					var bboxCenterPointWorldCoord = tMatrix.transformPoint3D(bboxCenterPoint, bboxCenterPointWorldCoord);
+					data.bbox.geographicCoord = ManagerUtils.pointToGeographicCoord(bboxCenterPointWorldCoord, data.bbox.geographicCoord, this);
+				}
+				else if (data.mapping_type.toLowerCase() === "boundingboxcenter")
+				{
+					data.bbox.geographicCoord = new GeographicCoord();
+					data.bbox.geographicCoord.setLonLatAlt(longitude, latitude, height);
+				}
 			}
 
 			//bbox = node.data.bbox;

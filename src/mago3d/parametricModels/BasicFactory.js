@@ -499,6 +499,7 @@ BasicFactory.prototype.makeMesh = function()
 		
 		var groundMesh = new Box(groundWidth, groundLength, groundHeight, "ground");
 		groundMesh.setOneColor(0.2, 0.3, 0.3, 1.0);
+		groundMesh.owner = this;
 		this.objectsArray.push(groundMesh);
 		this.objectsMap[groundMesh.name] = groundMesh;
 	}
@@ -538,6 +539,7 @@ BasicFactory.prototype.makeMesh = function()
 
 		var mesh = Modeler.getExtrudedMesh(profileAux, extrusionDist, extrudeSegmentsCount, extrusionVector, bIncludeBottomCap, bIncludeTopCap, undefined);
 		mesh.name = wallType + "Wall";
+		mesh.owner = this;
 		this.objectsArray.push(mesh);
 		this.objectsMap[mesh.name] = mesh;
 
@@ -563,6 +565,7 @@ BasicFactory.prototype.makeMesh = function()
 	extrusionDist = this.length;
 	var mesh = Modeler.getExtrudedMesh(profileAux, extrusionDist, extrudeSegmentsCount, extrusionVector, bIncludeBottomCap, bIncludeTopCap, undefined);
 	mesh.name = "roof";
+	mesh.owner = this;
 	this.objectsArray.push(mesh);
 	this.objectsMap[mesh.name] = mesh;
 	
@@ -609,154 +612,6 @@ BasicFactory.prototype.getObjectByName = function(objectName)
 	return this.objectsMap[objectName];
 };
 
-/**
- * Renders the factory.
- */
-BasicFactory.prototype.render = function(magoManager, shader, renderType, glPrimitive)
-{
-	if (this.attributes && this.attributes.isVisible !== undefined && this.attributes.isVisible === false) 
-	{
-		return;
-	}
-
-	if (this.dirty)
-	{ this.makeMesh(); }
-	
-	if (this.objectsArray === undefined)
-	{ return false; }
-
-	// Set geoLocation uniforms.***
-	var gl = magoManager.getGl();
-	var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
-	buildingGeoLocation.bindGeoLocationUniforms(gl, shader); // rotMatrix, positionHIGH, positionLOW.
-	
-	
-	gl.uniform1i(shader.refMatrixType_loc, 0); // in magoManager case, there are not referencesMatrix.***
-	var isSelected = false;
-	gl.uniform1f(shader.externalAlpha_loc, this.isOpaque() ? 1.0 : 0.7);
-	if (renderType === 0)
-	{
-		// Depth render.***
-	}
-	else if (renderType === 1)
-	{
-		// Color render.***
-		// Color render.***
-		var selectionManager = magoManager.selectionManager;
-		if (selectionManager.isObjectSelected(this))
-		{ isSelected = true; }
-	
-		//gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
-		gl.enable(gl.BLEND);
-		gl.uniform1i(shader.bApplySsao_loc, true); // apply ssao.***
-		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
-	}
-	else if (renderType === 2)
-	{
-		// Selection render.***
-		var selectionColor = magoManager.selectionColor;
-		var colorAux = magoManager.selectionColor.getAvailableColor(undefined);
-		var idxKey = magoManager.selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
-		magoManager.selectionManager.setCandidateGeneral(idxKey, this);
-		
-		gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
-		gl.disable(gl.BLEND);
-	}
-	
-	
-	if (isSelected)
-	{
-		if (this.selColor4 === undefined)
-		{
-			this.selColor4 = new Color();
-			this.selColor4.setRGBA(0.8, 0.4, 0.5, 1.0);
-		}
-		gl.uniform4fv(shader.oneColor4_loc, [this.selColor4.r, this.selColor4.g, this.selColor4.b, 1.0]); 
-	}
-	shader.enableVertexAttribArray(shader.position3_loc);
-	shader.enableVertexAttribArray(shader.normal3_loc);
-	var objectsCount = this.objectsArray.length;
-	for (var i=0; i<objectsCount; i++)
-	{
-		this.objectsArray[i].render(magoManager, shader, renderType, glPrimitive, isSelected);
-	}
-	
-	gl.disable(gl.BLEND);
-
-	gl.uniform1f(shader.externalAlpha_loc, 1.0);
-};
-
-/**
- * Renders the factory.
- */
-BasicFactory.prototype.renderAsChild = function(magoManager, shader, renderType, glPrimitive)
-{
-	if (this.attributes && this.attributes.isVisible !== undefined && this.attributes.isVisible === false) 
-	{
-		return;
-	}
-
-	if (this.dirty)
-	{ this.makeMesh(); }
-	
-	if (this.objectsArray === undefined)
-	{ return false; }
-
-	// Set geoLocation uniforms.***
-	var gl = magoManager.getGl();
-	
-	gl.uniform1i(shader.refMatrixType_loc, 0); // in magoManager case, there are not referencesMatrix.***
-	var isSelected = false;
-	
-	if (renderType === 0)
-	{
-		// Depth render.***
-	}
-	else if (renderType === 1)
-	{
-		// Color render.***
-		// Color render.***
-		var selectionManager = magoManager.selectionManager;
-		if (selectionManager.isObjectSelected(this))
-		{ isSelected = true; }
-	
-		//gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
-		gl.enable(gl.BLEND);
-		gl.uniform1i(shader.bApplySsao_loc, true); // apply ssao.***
-		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
-	}
-	else if (renderType === 2)
-	{
-		// Selection render.***
-		var selectionColor = magoManager.selectionColor;
-		var colorAux = magoManager.selectionColor.getAvailableColor(undefined);
-		var idxKey = magoManager.selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
-		magoManager.selectionManager.setCandidateGeneral(idxKey, this);
-		
-		gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
-		gl.disable(gl.BLEND);
-	}
-	
-	
-	if (isSelected)
-	{
-		if (this.selColor4 === undefined)
-		{
-			this.selColor4 = new Color();
-			this.selColor4.setRGBA(0.8, 0.4, 0.5, 1.0);
-		}
-		gl.uniform4fv(shader.oneColor4_loc, [this.selColor4.r, this.selColor4.g, this.selColor4.b, 1.0]); 
-	}
-	shader.enableVertexAttribArray(shader.position3_loc);
-	shader.enableVertexAttribArray(shader.normal3_loc);
-	var objectsCount = this.objectsArray.length;
-	for (var i=0; i<objectsCount; i++)
-	{
-		this.objectsArray[i].render(magoManager, shader, renderType, glPrimitive, isSelected);
-	}
-	
-	gl.disable(gl.BLEND);
-};
 /**
  * delete mesh from this factory.
  * @param {string} name Mesh name

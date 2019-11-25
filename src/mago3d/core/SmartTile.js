@@ -546,6 +546,10 @@ SmartTile.prototype.makeTreeByDepth = function(targetDepth, magoManager)
 		}
 		
 	}
+	else 
+	{
+		var hola = 0;
+	}
 };
 
 /**

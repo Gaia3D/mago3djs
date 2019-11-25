@@ -38,6 +38,11 @@ uniform bool bApplySsao;
 uniform float externalAlpha;
 uniform bool bApplyShadow;
 
+// clipping planes.***
+uniform bool bApplyClippingPlanes;
+uniform int clippingPlanesCount;
+uniform vec4 clippingPlanes[6];
+
 varying vec2 vTexCoord;   
 varying vec3 vLightWeighting;
 varying vec3 diffuseColor;
@@ -79,8 +84,37 @@ float getDepthShadowMap(vec2 coord)
     return UnpackDepth32(texture2D(shadowMapTex, coord.xy));
 }  
 
+bool clipVertexByPlane(in vec4 plane, in vec3 point)
+{
+	float dist = plane.x * point.x + plane.y * point.y + plane.z * point.z + plane.w;
+	
+	if(dist < 0.0)
+	return true;
+	else return false;
+}
+
 void main()
 {
+	// 1rst, check if there are clipping planes.
+	if(bApplyClippingPlanes)
+	{
+		bool discardFrag = true;
+		for(int i=0; i<6; i++)
+		{
+			vec4 plane = clippingPlanes[i];
+			if(!clipVertexByPlane(plane, vertexPos))
+			{
+				discardFrag = false;
+				break;
+			}
+			if(i >= clippingPlanesCount)
+			break;
+		}
+		
+		if(discardFrag)
+		discard;
+	}
+
 	float occlusion = 1.0;
 	vec3 normal2 = vNormal;
 	if(bApplySsao)

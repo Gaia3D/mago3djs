@@ -91,6 +91,8 @@
 			applySpecLighting = -1.0;
 
         gl_Position = ModelViewProjectionMatrixRelToEye * pos4;
+		vertexPos = (modelViewMatrixRelToEye * pos4).xyz;
+		//vertexPos = objPosHigh + objPosLow;
 		
 		if(colorType == 1)
 			aColor4 = color4;
