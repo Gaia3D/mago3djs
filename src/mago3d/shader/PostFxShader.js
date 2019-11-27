@@ -597,6 +597,7 @@ PostFxShader.prototype.createUniformLocals = function(gl, shader, sceneState)
 	shader.hasTexture_loc = gl.getUniformLocation(shader.program, "hasTexture");
 	shader.textureFlipYAxis_loc = gl.getUniformLocation(shader.program, "textureFlipYAxis");
 	shader.kernel16_loc = gl.getUniformLocation(shader.program, "kernel");
+	//shader.kernel32_loc = gl.getUniformLocation(shader.program, "kernel32");
 	shader.noiseScale2_loc = gl.getUniformLocation(shader.program, "noiseScale");
 	
 	shader.sunPosHigh_loc = gl.getUniformLocation(shader.program, "sunPosHIGH");

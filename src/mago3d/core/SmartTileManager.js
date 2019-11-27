@@ -97,6 +97,7 @@ SmartTileManager.maxDistToCameraByDepth = function(depth)
 		return 250;
 	}
 	
+	
 	return 10;
 };
 

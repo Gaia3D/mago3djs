@@ -76,7 +76,7 @@ vec3 getViewRay(vec2 tc)
 //linear view space depth
 float getDepth(vec2 coord)
 {
-    return unpackDepth(texture2D(depthTex, coord.xy));
+	return unpackDepth(texture2D(depthTex, coord.xy));
 }   
 
 float getDepthShadowMap(vec2 coord)
@@ -115,61 +115,49 @@ void main()
 		discard;
 	}
 
-	float occlusion = 1.0;
-	vec3 normal2 = vNormal;
+	bool testBool = false;
+	float occlusion = 0.0;
+	vec3 normal2 = vNormal;	
+		
 	if(bApplySsao)
-	{          
-		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);		                 
-		float linearDepth = getDepth(screenPos);          
-		vec3 origin = getViewRay(screenPos) * linearDepth;   
+	{         
+		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
+		float linearDepth = getDepth(screenPos);  
+		vec3 ray = getViewRay(screenPos);
+		vec3 origin = ray * linearDepth;  
+
+
+		float tolerance = radius/far;
 
 		vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;
 		vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));
 		vec3 bitangent = cross(normal2, tangent);
-		mat3 tbn = mat3(tangent, bitangent, normal2);        
+		mat3 tbn = mat3(tangent, bitangent, normal2);   
 
 		for(int i = 0; i < kernelSize; ++i)
 		{    	 
-			vec3 sample = origin + (tbn * kernel[i]) * radius;
-			vec4 offset = projectionMatrix * vec4(sample, 1.0);		
+			vec3 sample = origin + (tbn * vec3(kernel[i].x*1.0, kernel[i].y*1.0, kernel[i].z)) * radius*2.0;
+			vec4 offset = projectionMatrix * vec4(sample, 1.0);					
 			offset.xy /= offset.w;
-			offset.xy = offset.xy * 0.5 + 0.5;        
+			offset.xy = offset.xy * 0.5 + 0.5;  				
 			float sampleDepth = -sample.z/far;
-			//float realLinearDepth = linearDepth * far;
-			
-			if(sampleDepth > 0.49)
-			{
-				continue;
-			}
 
 			float depthBufferValue = getDepth(offset.xy);	
-			
-			float range_check = abs(linearDepth - depthBufferValue);
-			if(depthBufferValue < 0.005)
-			{
-				occlusion = 0.0;
-				break;
-				//continue;
-			}
-			//else if(range_check > 0.000000001 && range_check < 0.00000007)
-			//{
-			//	continue;
-			//}
-			else if (depthBufferValue <= sampleDepth)
+
+			if (depthBufferValue < sampleDepth-tolerance)
 			{
 				occlusion +=  1.0;
 			}
-			
-		}   
-			
-		occlusion = 1.0 - occlusion / float(kernelSize);
+		} 
+		
+		occlusion = 1.0 - occlusion / float(kernelSize);	
 	}
 	else{
 		occlusion = 1.0;
 	}
 	
-	if(occlusion > 0.93)
-	occlusion = 1.0;
+	//if(occlusion > 0.93)
+	//occlusion = 1.0;
 
     // Do specular lighting.***
 	float lambertian;
@@ -278,6 +266,11 @@ void main()
 	
 	vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);
 	float alfa = textureColor.w * externalAlpha;
+	
+	// test render by depth.************************************************************
+	//if(testBool)
+	//textureColor = vec4(1.0, 0.0, 0.0, 1.0);
+	// End test.------------------------------------------------------------------------
 
     vec4 finalColor;
 	if(applySpecLighting> 0.0)
@@ -287,6 +280,6 @@ void main()
 	else{
 		finalColor = vec4((textureColor.xyz) * occlusion, alfa);
 	}
-	//finalColor = vec4(vNormal, 1.0); // test to render normal color coded.***
+	//finalColor = vec4(linearDepth, linearDepth, linearDepth, 1.0); // test to render depth color coded.***
     gl_FragColor = finalColor; 
 }

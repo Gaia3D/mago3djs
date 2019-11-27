@@ -141,7 +141,7 @@ void main()
 			
 		//textureColor = vec4(vNormal, 1.0);
 		
-		float maxAngDeg = 103.0;
+		float maxAngDeg = 102.5;
 		float A = 1.0/(maxAngDeg-95.0);
 		float B = -A*95.0;
 		float alpha = A*angDeg+B;
@@ -152,7 +152,7 @@ void main()
 		if(alphaPlusPerDist > 1.0)
 		alphaPlusPerDist = 1.0;
 
-		textureColor = vec4(alpha*0.7*alphaPlusPerDist, alpha*0.9*alphaPlusPerDist, alpha, 1.0);
+		textureColor = vec4(alpha*0.8*alphaPlusPerDist, alpha*0.95*alphaPlusPerDist, alpha, 1.0);
 
 
 		gl_FragColor = vec4(textureColor.xyz, alpha); 

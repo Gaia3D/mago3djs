@@ -153,34 +153,6 @@ var MagoManager = function()
 		this.magoPolicy.setLod5DistInMeters(serverPolicy.geo_lod5);
 	}
 
-	this.kernel = [ 0.33, 0.0, 0.85,
-		0.25, 0.3, 0.5,
-		0.1, 0.3, 0.85,
-		-0.15, 0.2, 0.85,
-		-0.33, 0.05, 0.6,
-		-0.1, -0.15, 0.85,
-		-0.05, -0.32, 0.25,
-		0.2, -0.15, 0.85,
-		0.6, 0.0, 0.55,
-		0.5, 0.6, 0.45,
-		-0.01, 0.7, 0.35,
-		-0.33, 0.5, 0.45,
-		-0.45, 0.0, 0.55,
-		-0.65, -0.5, 0.7,
-		0.0, -0.5, 0.55,
-		0.33, 0.3, 0.35];
-
-	// Test for sphere.***
-	this.sphereKernel = [];
-	var kernelSize = 16;
-	for (var i=0; i<kernelSize; i++) 
-	{
-		this.sphereKernel.push(2.0 * (Math.random() - 0.5));
-		this.sphereKernel.push(2.0 * (Math.random() - 0.5));
-		this.sphereKernel.push(2.0 * (Math.random() - 0.5));
-	}
-	// End ssao.------------------------------------------------
-	
 	// var to delete.*********************************************
 	this.loadQueue = new LoadQueue(this); // Old. delete.***
 
@@ -1827,6 +1799,11 @@ MagoManager.prototype.keyDown = function(key)
 		else if (this.counterAux === 4)
 		{
 			this.modeler.mode = CODE.modelerMode.DRAWING_SPHERE;
+			this.counterAux++;
+		}
+		else if (this.counterAux === 5)
+		{
+			this.modeler.mode = CODE.modelerMode.DRAWING_CLIPPINGBOX;
 			this.counterAux = 0;
 		}
 		

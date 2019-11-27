@@ -968,6 +968,10 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			currentShader.bindUniformGenerals();
 			gl.uniform1f(currentShader.externalAlpha_loc, 1.0);
 			gl.uniform1i(currentShader.textureFlipYAxis_loc, magoManager.sceneState.textureFlipYAxis);
+			
+			// Test sphericalKernel for ssao.************************
+			//gl.uniform3fv(currentShader.kernel32_loc, magoManager.sceneState.ssaoSphereKernel32);
+			// End test.---------------------------------------------
 
 			gl.activeTexture(gl.TEXTURE0);
 			gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);  // original.***
@@ -1000,7 +1004,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			var refMatrixIdxKey =0; // provisionally set magoManager var here.***
 			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 			
-			bApplySsao = false;
+			//bApplySsao = false;
 			gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); 
 
 			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
@@ -1605,7 +1609,7 @@ Renderer.prototype.renderBoundingBoxesNodes = function(nodesArray, color, bRende
 
 	var noiseTexture = magoManager.texturesStore.getNoiseTexture4x4();
 	gl.uniform2fv(currentShader.noiseScale2_loc, [magoManager.depthFboNeo.width/noiseTexture.width, magoManager.depthFboNeo.height/noiseTexture.height]);
-	gl.uniform3fv(currentShader.kernel16_loc, magoManager.kernel);
+	gl.uniform3fv(currentShader.kernel16_loc, magoManager.sceneState.ssaoKernel16);
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);  // original.***
 	gl.activeTexture(gl.TEXTURE1);

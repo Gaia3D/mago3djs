@@ -61,6 +61,25 @@ var SceneState = function()
 		-0.65, -0.5, 0.7,
 		0.0, -0.5, 0.55,
 		0.33, 0.3, 0.35]);
+	/*
+	var hAux = 1.0;
+	this.ssaoKernel16 = new Float32Array([ 0.33, 0.0, hAux,
+		0.25, 0.3, hAux,
+		0.1, 0.3, hAux,
+		-0.15, 0.2, hAux,
+		-0.33, 0.05, hAux,
+		-0.1, -0.15, hAux,
+		-0.05, -0.32, hAux,
+		0.2, -0.15, hAux,
+		0.6, 0.0, hAux,
+		0.5, 0.6, hAux,
+		-0.01, 0.7, hAux,
+		-0.33, 0.5, hAux,
+		-0.45, 0.0, hAux,
+		-0.65, -0.5, hAux,
+		0.0, -0.5, hAux,
+		0.33, 0.3, hAux]);
+		*/
 		
 	this.ssaoSphereKernel32 = new Float32Array([ 0.33, 0.0, 0.85,
 		0.25, 0.3, 0.5,
