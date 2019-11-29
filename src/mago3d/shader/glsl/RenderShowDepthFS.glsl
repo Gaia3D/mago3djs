@@ -22,6 +22,7 @@ vec4 packDepth(const in float depth)
     return res;  
 }
 
+
 vec4 PackDepth32( in float depth )
 {
     depth *= (16777216.0 - 1.0) / (16777216.0);

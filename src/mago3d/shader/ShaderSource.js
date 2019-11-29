@@ -747,6 +747,7 @@ uniform vec3 u_geoCoordRadiansMax;\n\
 uniform vec3 u_geoCoordRadiansMin;\n\
 uniform float pendentPointSize;\n\
 uniform float u_alpha;\n\
+uniform float u_layerAltitude;\n\
 \n\
 varying vec2 v_particle_pos;\n\
 \n\
@@ -788,7 +789,7 @@ void main() {\n\
         color.g / 255.0 + color.a);\n\
 \n\
 	// Now, must calculate geographic coords of the pos2d.***\n\
-	float altitude = 16000.0;\n\
+	float altitude = u_layerAltitude;\n\
 	float minLonRad = u_geoCoordRadiansMin.x;\n\
 	float maxLonRad = u_geoCoordRadiansMax.x;\n\
 	float minLatRad = u_geoCoordRadiansMin.y;\n\
@@ -1320,6 +1321,7 @@ float unpackDepth(const in vec4 rgba_depth)\n\
     return depth;\n\
 }  \n\
 \n\
+\n\
 float UnpackDepth32( in vec4 pack )\n\
 {\n\
     float depth = dot( pack, 1.0 / vec4(1.0, 256.0, 256.0*256.0, 16777216.0) );// 256.0*256.0*256.0 = 16777216.0\n\
@@ -1542,307 +1544,6 @@ void main()\n\
 		finalColor = vec4((textureColor.xyz) * occlusion, alfa);\n\
 	}\n\
 	//finalColor = vec4(linearDepth, linearDepth, linearDepth, 1.0); // test to render depth color coded.***\n\
-    gl_FragColor = finalColor; \n\
-}";
-ShaderSource.ModelRefSsaoFS__original = "#ifdef GL_ES\n\
-    precision highp float;\n\
-#endif\n\
-\n\
-uniform sampler2D depthTex;\n\
-uniform sampler2D noiseTex;  \n\
-uniform sampler2D diffuseTex;\n\
-uniform sampler2D shadowMapTex;\n\
-uniform bool textureFlipYAxis;\n\
-varying vec3 vNormal;\n\
-uniform mat4 projectionMatrix;\n\
-uniform mat4 m;\n\
-uniform vec2 noiseScale;\n\
-uniform float near;\n\
-uniform float far;            \n\
-uniform float fov;\n\
-uniform float aspectRatio;    \n\
-uniform float screenWidth;    \n\
-uniform float screenHeight;   \n\
-uniform float shadowMapWidth;    \n\
-uniform float shadowMapHeight; \n\
-uniform float shininessValue;\n\
-uniform vec3 kernel[16];   \n\
-uniform vec4 oneColor4;\n\
-varying vec4 aColor4; // color from attributes\n\
-uniform bool bApplyScpecularLighting;\n\
-uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
-\n\
-uniform vec3 specularColor;\n\
-\n\
-const int kernelSize = 16;  \n\
-uniform float radius;      \n\
-\n\
-uniform float ambientReflectionCoef;\n\
-uniform float diffuseReflectionCoef;  \n\
-uniform float specularReflectionCoef; \n\
-uniform bool bApplySsao;\n\
-uniform float externalAlpha;\n\
-uniform bool bApplyShadow;\n\
-\n\
-// clipping planes.***\n\
-uniform bool bApplyClippingPlanes;\n\
-uniform int clippingPlanesCount;\n\
-uniform vec4 clippingPlanes[6];\n\
-\n\
-varying vec2 vTexCoord;   \n\
-varying vec3 vLightWeighting;\n\
-varying vec3 diffuseColor;\n\
-varying vec3 vertexPos;\n\
-varying float applySpecLighting;\n\
-varying vec4 vPosRelToLight; \n\
-varying vec3 vLightDir; \n\
-varying vec3 vNormalWC;\n\
-\n\
-float unpackDepth(const in vec4 rgba_depth)\n\
-{\n\
-    const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);\n\
-    float depth = dot(rgba_depth, bit_shift);\n\
-    return depth;\n\
-}  \n\
-\n\
-float UnpackDepth32( in vec4 pack )\n\
-{\n\
-    float depth = dot( pack, 1.0 / vec4(1.0, 256.0, 256.0*256.0, 16777216.0) );// 256.0*256.0*256.0 = 16777216.0\n\
-    return depth * (16777216.0) / (16777216.0 - 1.0);\n\
-}              \n\
-\n\
-vec3 getViewRay(vec2 tc)\n\
-{\n\
-    float hfar = 2.0 * tan(fov/2.0) * far;\n\
-    float wfar = hfar * aspectRatio;    \n\
-    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    \n\
-    return ray;                      \n\
-}         \n\
-            \n\
-//linear view space depth\n\
-float getDepth(vec2 coord)\n\
-{\n\
-	return unpackDepth(texture2D(depthTex, coord.xy));\n\
-}   \n\
-\n\
-float getDepthShadowMap(vec2 coord)\n\
-{\n\
-    return UnpackDepth32(texture2D(shadowMapTex, coord.xy));\n\
-}  \n\
-\n\
-bool clipVertexByPlane(in vec4 plane, in vec3 point)\n\
-{\n\
-	float dist = plane.x * point.x + plane.y * point.y + plane.z * point.z + plane.w;\n\
-	\n\
-	if(dist < 0.0)\n\
-	return true;\n\
-	else return false;\n\
-}\n\
-\n\
-void main()\n\
-{\n\
-	// 1rst, check if there are clipping planes.\n\
-	if(bApplyClippingPlanes)\n\
-	{\n\
-		bool discardFrag = true;\n\
-		for(int i=0; i<6; i++)\n\
-		{\n\
-			vec4 plane = clippingPlanes[i];\n\
-			if(!clipVertexByPlane(plane, vertexPos))\n\
-			{\n\
-				discardFrag = false;\n\
-				break;\n\
-			}\n\
-			if(i >= clippingPlanesCount)\n\
-			break;\n\
-		}\n\
-		\n\
-		if(discardFrag)\n\
-		discard;\n\
-	}\n\
-\n\
-	float occlusion = 1.0;\n\
-	vec3 normal2 = vNormal;\n\
-	if(bApplySsao)\n\
-	{          \n\
-		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);		                 \n\
-		float linearDepth = getDepth(screenPos);          \n\
-		vec3 origin = getViewRay(screenPos) * linearDepth;   \n\
-\n\
-		vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
-		vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
-		vec3 bitangent = cross(normal2, tangent);\n\
-		mat3 tbn = mat3(tangent, bitangent, normal2);        \n\
-\n\
-		for(int i = 0; i < kernelSize; ++i)\n\
-		{    	 \n\
-			vec3 sample = origin + (tbn * kernel[i]) * radius;\n\
-			vec4 offset = projectionMatrix * vec4(sample, 1.0);		\n\
-			offset.xy /= offset.w;\n\
-			offset.xy = offset.xy * 0.5 + 0.5;        \n\
-			float sampleDepth = -sample.z/far;\n\
-			//float realLinearDepth = linearDepth * far;\n\
-			\n\
-			if(sampleDepth > 0.49)\n\
-			{\n\
-				continue;\n\
-			}\n\
-\n\
-			float depthBufferValue = getDepth(offset.xy);	\n\
-			\n\
-			float range_check = abs(linearDepth - depthBufferValue);\n\
-			\n\
-			if(depthBufferValue < 0.005)\n\
-			{\n\
-				occlusion = 0.0;\n\
-				break;\n\
-				//continue;\n\
-			}\n\
-			////else if(range_check > 0.000000001 && range_check < 0.00000007)\n\
-			////{\n\
-			////	continue;\n\
-			////}\n\
-			else if (depthBufferValue <= sampleDepth)\n\
-			{\n\
-				occlusion +=  1.0;\n\
-			}\n\
-			\n\
-		}   \n\
-			\n\
-		occlusion = 1.0 - occlusion / float(kernelSize);\n\
-	}\n\
-	else{\n\
-		occlusion = 1.0;\n\
-	}\n\
-	\n\
-	if(occlusion > 0.93)\n\
-	occlusion = 1.0;\n\
-\n\
-    // Do specular lighting.***\n\
-	float lambertian;\n\
-	float specular;\n\
-		\n\
-	if(applySpecLighting> 0.0)\n\
-	{\n\
-		//vec3 lightPos = vec3(20.0, 60.0, 200.0);\n\
-		vec3 lightPos = vec3(1.0, 1.0, 1.0);\n\
-		vec3 L = normalize(lightPos - vertexPos);\n\
-		lambertian = max(dot(normal2, L), 0.0);\n\
-		specular = 0.0;\n\
-		if(lambertian > 0.0)\n\
-		{\n\
-			vec3 R = reflect(-L, normal2);      // Reflected light vector\n\
-			vec3 V = normalize(-vertexPos); // Vector to viewer\n\
-			\n\
-			// Compute the specular term\n\
-			float specAngle = max(dot(R, V), 0.0);\n\
-			specular = pow(specAngle, shininessValue);\n\
-			\n\
-			if(specular > 1.0)\n\
-			{\n\
-				specular = 1.0;\n\
-			}\n\
-		}\n\
-		\n\
-		if(lambertian < 0.5)\n\
-		{\n\
-			lambertian = 0.5;\n\
-		}\n\
-\n\
-	}\n\
-	\n\
-	if(bApplyShadow)\n\
-	{\n\
-	\n\
-		vec3 posRelToLight = vPosRelToLight.xyz / vPosRelToLight.w;\n\
-		if(posRelToLight.x >= -0.5 && posRelToLight.x <= 0.5)\n\
-		{\n\
-			if(posRelToLight.y >= -0.5 && posRelToLight.y <= 0.5)\n\
-			{\n\
-				float ligthAngle = dot(vLightDir, vNormalWC);\n\
-				if(ligthAngle > 0.0)\n\
-				{\n\
-					// The angle between the light direction & face normal is less than 90 degree, so, the face is in shadow.***\n\
-					if(occlusion > 0.4)\n\
-						occlusion = 0.4;\n\
-				}\n\
-				else{\n\
-					float pixelWidth = 1.0 / shadowMapWidth;\n\
-					float pixelHeight = 1.0 / shadowMapHeight;\n\
-					posRelToLight = posRelToLight * 0.5 + 0.5;\n\
-					\n\
-					float depthRelToLight = getDepthShadowMap(posRelToLight.xy);\n\
-					if(posRelToLight.z > depthRelToLight*0.9963 )\n\
-					{\n\
-						if(occlusion > 0.4)\n\
-							occlusion = 0.4;\n\
-					}\n\
-					\n\
-					//for(int horit = -1; horit<2; horit++)\n\
-					//{\n\
-					//	for(int vert = -1; vert < 2; vert++)\n\
-					//	{\n\
-					//		vec2 shadowMapTexCoord = vec2(posRelToLight.x+float(horit)*pixelWidth, posRelToLight.y+float(vert)*pixelHeight);\n\
-					//		float depthRelToLight = getDepthShadowMap(shadowMapTexCoord);\n\
-					//		if(posRelToLight.z > depthRelToLight*0.9963 )\n\
-					//		{\n\
-					//			if(occlusion > 0.4)\n\
-					//				occlusion -= (0.4/9.0);\n\
-					//		}\n\
-					//	}\n\
-					//}\n\
-					\n\
-				}\n\
-			}\n\
-		}\n\
-		\n\
-	}\n\
-\n\
-    vec4 textureColor;\n\
-    if(colorType == 2)\n\
-    {\n\
-        if(textureFlipYAxis)\n\
-        {\n\
-            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));\n\
-        }\n\
-        else{\n\
-            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));\n\
-        }\n\
-		\n\
-        if(textureColor.w == 0.0)\n\
-        {\n\
-            discard;\n\
-        }\n\
-    }\n\
-    else if(colorType == 0)\n\
-	{\n\
-        textureColor = oneColor4;\n\
-    }\n\
-	else if(colorType == 1)\n\
-	{\n\
-        textureColor = aColor4;\n\
-    }\n\
-	\n\
-	vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);\n\
-	float alfa = textureColor.w * externalAlpha;\n\
-	\n\
-	// test render by depth.************************************************************\n\
-	vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);		                 \n\
-	float linearDepth = getDepth(screenPos);    \n\
-	if(linearDepth*far > 500.0)\n\
-	textureColor = vec4(1.0, 0.0, 0.0, 1.0);\n\
-	// End test.------------------------------------------------------------------------\n\
-\n\
-    vec4 finalColor;\n\
-	if(applySpecLighting> 0.0)\n\
-	{\n\
-		finalColor = vec4((ambientReflectionCoef * ambientColor + diffuseReflectionCoef * lambertian * textureColor.xyz + specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion, alfa); \n\
-	}\n\
-	else{\n\
-		finalColor = vec4((textureColor.xyz) * occlusion, alfa);\n\
-	}\n\
-	//finalColor = vec4(vNormal, 1.0); // test to render normal color coded.***\n\
-	\n\
     gl_FragColor = finalColor; \n\
 }";
 ShaderSource.ModelRefSsaoVS = "	attribute vec3 position;\n\
@@ -2640,6 +2341,7 @@ vec4 packDepth(const in float depth)\n\
     return res;  \n\
 }\n\
 \n\
+\n\
 vec4 PackDepth32( in float depth )\n\
 {\n\
     depth *= (16777216.0 - 1.0) / (16777216.0);\n\
@@ -3371,7 +3073,7 @@ void main() {\n\
     // drop rate is a chance a particle will restart at random position, to avoid degeneration\n\
 	float drop = 0.0;\n\
 \n\
-	if(u_interpolation < 0.9)\n\
+	if(u_interpolation < 0.9) // 0.9\n\
 	{\n\
 		drop = 0.0;\n\
 	}\n\
@@ -3383,7 +3085,7 @@ void main() {\n\
 		drop = step(1.0 - drop_rate, rand(seed));\n\
 	}\n\
 	/*\n\
-	if(drop > 0.01)\n\
+	if(drop > 0.5) // 0.01\n\
 	{\n\
 		vec2 random_pos = vec2( rand(pos), rand(v_tex_pos) );\n\
 		float randomValue = (u_rand_seed);\n\

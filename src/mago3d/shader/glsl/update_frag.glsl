@@ -93,7 +93,7 @@ void main() {
     // drop rate is a chance a particle will restart at random position, to avoid degeneration
 	float drop = 0.0;
 
-	if(u_interpolation < 0.9)
+	if(u_interpolation < 0.9) // 0.9
 	{
 		drop = 0.0;
 	}
@@ -105,7 +105,7 @@ void main() {
 		drop = step(1.0 - drop_rate, rand(seed));
 	}
 	/*
-	if(drop > 0.01)
+	if(drop > 0.5) // 0.01
 	{
 		vec2 random_pos = vec2( rand(pos), rand(v_tex_pos) );
 		float randomValue = (u_rand_seed);

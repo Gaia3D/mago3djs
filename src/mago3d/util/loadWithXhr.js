@@ -11,7 +11,7 @@
  * @returns {Promise} Promise.js object
  *
  * @example
- * loadWithXhr('url', undefined, , undefined, 'json', 'GET').done(function(res) {
+ * loadWithXhr('url', undefined, undefined, 'json', 'GET').done(function(res) {
  * 	TODO
  * });
  */

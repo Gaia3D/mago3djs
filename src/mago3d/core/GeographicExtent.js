@@ -94,6 +94,30 @@ GeographicExtent.prototype.getMinLatitudeRad = function()
 };
 
 /**
+ * Returns the minimum latitude in radians.
+ * @returns {Number}
+ */
+GeographicExtent.prototype.getMinAltitude = function() 
+{
+	if (this.minGeographicCoord === undefined)
+	{ return; }
+	
+	return this.minGeographicCoord.altitude;
+};
+
+/**
+ * Returns the minimum latitude in radians.
+ * @returns {Number}
+ */
+GeographicExtent.prototype.getMaxAltitude = function() 
+{
+	if (this.maxGeographicCoord === undefined)
+	{ return; }
+	
+	return this.maxGeographicCoord.altitude;
+};
+
+/**
  * Returns the minimum longitude in radians.
  * @returns {Number}
  */

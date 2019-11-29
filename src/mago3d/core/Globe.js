@@ -134,6 +134,25 @@ Globe.normalAtCartesianPointWgs84 = function(x, y, z, resultNormal)
 };
 
 /**
+ * Change cartesian point to tangent plane.
+ * @param {Number} x the x coord value of input cartesian point
+ * @param {Number} y the y coord value of input cartesian point
+ * @param {Number} z the z coord value of input cartesian point
+ * @param {Plane} resultPlane The tangent plane to globe  at x,y,z point.
+ * @returns {Plane} resultPlane
+ */
+Globe.planeAtCartesianPointWgs84 = function(x, y, z, resultPlane)
+{
+	if (resultPlane === undefined)
+	{ resultPlane = new Plane(); }
+	
+	var normal = Globe.normalAtCartesianPointWgs84(x, y, z, undefined);
+	resultPlane.setPointAndNormal(x, y, z, normal[0], normal[1], normal[2]);
+	
+	return resultPlane;
+};
+
+/**
  * Return the transformation matrix which transform the cartesian point to wgs84
  * @param {Number} x
  * @param {Number} y

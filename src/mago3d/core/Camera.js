@@ -638,7 +638,15 @@ Camera.prototype.initTrackOption = function()
  */
 Camera.prototype.getDirection = function()
 {
+	return this.direction;
+};
 
+/**
+ * 두 점을 이용하여 디렉션 정보 계산
+ */
+Camera.prototype.getUp = function()
+{
+	return this.up;
 };
 
 /**

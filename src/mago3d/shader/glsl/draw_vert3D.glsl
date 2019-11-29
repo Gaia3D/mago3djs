@@ -11,6 +11,7 @@ uniform vec3 u_geoCoordRadiansMax;
 uniform vec3 u_geoCoordRadiansMin;
 uniform float pendentPointSize;
 uniform float u_alpha;
+uniform float u_layerAltitude;
 
 varying vec2 v_particle_pos;
 
@@ -52,7 +53,7 @@ void main() {
         color.g / 255.0 + color.a);
 
 	// Now, must calculate geographic coords of the pos2d.***
-	float altitude = 16000.0;
+	float altitude = u_layerAltitude;
 	float minLonRad = u_geoCoordRadiansMin.x;
 	float maxLonRad = u_geoCoordRadiansMax.x;
 	float minLatRad = u_geoCoordRadiansMin.y;

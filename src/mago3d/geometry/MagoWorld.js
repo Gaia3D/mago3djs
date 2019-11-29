@@ -168,6 +168,49 @@ MagoWorld.updateMouseClick = function(mouseX, mouseY, magoManager)
  * @param {Number} mouseY the y coordi of the start point
  * @param {MagoManager} magoManager
  */
+MagoWorld.screenToCamCoord = function(mouseX, mouseY, magoManager, resultPointCamCoord)
+{
+	var gl = magoManager.sceneState.gl;
+	var camera = magoManager.sceneState.camera;
+	
+	if (resultPointCamCoord === undefined)
+	{ resultPointCamCoord = new Point3D(); }
+	
+	// Must find the frustum on pick(mouseX, mouseY) detected depth value.***
+	var currentDepthFbo;
+	var currentFrustumFar;
+	var currentFrustumNear;
+	var currentLinearDepth;
+	var frustumsCount = magoManager.numFrustums;
+	for (var i = 0; i < frustumsCount; i++)
+	{
+		var frustumVolume = magoManager.frustumVolumeControl.getFrustumVolumeCulling(i); 
+		var depthFbo = frustumVolume.depthFbo;
+
+		currentLinearDepth = ManagerUtils.calculatePixelLinearDepth(gl, mouseX, mouseY, depthFbo, magoManager);
+		if (currentLinearDepth < 0.996) // maxDepth/255 = 0.99607...
+		{ 
+			currentDepthFbo = depthFbo;
+			var frustum = camera.getFrustum(i);
+			currentFrustumFar = frustum.far[0];
+			currentFrustumNear = frustum.near[0];
+			break;
+		}
+	}
+	
+	if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
+	{ currentFrustumNear = 0.0; }
+	
+	resultPointCamCoord = ManagerUtils.calculatePixelPositionCamCoord(gl, mouseX, mouseY, resultPointCamCoord, currentDepthFbo, currentFrustumNear, currentFrustumFar, magoManager);
+	return resultPointCamCoord;
+};
+
+/**
+ * 마우스를 드래그하기 시작하는 시점을 저장
+ * @param {Number} mouseX the x coordi of the start point 
+ * @param {Number} mouseY the y coordi of the start point
+ * @param {MagoManager} magoManager
+ */
 MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 {
 	var gl = magoManager.sceneState.gl;
@@ -210,12 +253,13 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 		}
 	}
 	
-	if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
-	{ currentFrustumNear = 0.0; }
+	//if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
+	//{ currentFrustumNear = 0.0; }
 	
 	// determine world position of the X,Y.
 	mouseAction.strLinealDepth = currentLinearDepth;
-	mouseAction.strCamCoordPoint = ManagerUtils.calculatePixelPositionCamCoord(gl, mouseAction.strX, mouseAction.strY, mouseAction.strCamCoordPoint, currentDepthFbo, currentFrustumNear, currentFrustumFar, magoManager);
+	//mouseAction.strCamCoordPoint = ManagerUtils.calculatePixelPositionCamCoord(gl, mouseAction.strX, mouseAction.strY, mouseAction.strCamCoordPoint, currentDepthFbo, currentFrustumNear, currentFrustumFar, magoManager);
+	mouseAction.strCamCoordPoint = MagoWorld.screenToCamCoord(mouseX, mouseY, magoManager, mouseAction.strCamCoordPoint);
 	mouseAction.strWorldPoint = ManagerUtils.cameraCoordPositionToWorldCoord(mouseAction.strCamCoordPoint, mouseAction.strWorldPoint, magoManager);
 	
 	// now, copy camera to curCamera.
@@ -257,7 +301,6 @@ MagoWorld.prototype.updateModelViewMatrixByCamera = function(camera)
 	modelViewMatrix._floatArrays = Matrix4.lookAt(modelViewMatrix._floatArrays, [camPos.x, camPos.y, camPos.z], 
 		[tergetX, tergetY, tergetZ], 
 		[camUp.x, camUp.y, camUp.z]);
-
 };
 
 /**
@@ -400,69 +443,131 @@ MagoWorld.prototype.mousewheel = function(event)
  */
 MagoWorld.prototype.mousemove = function(event)
 {
-	var mouseAction = this.magoManager.sceneState.mouseAction;
-	if (this.magoManager.sceneState.mouseButton === 0)
+	var magoManager = this.magoManager;
+	var mouseAction = magoManager.sceneState.mouseAction;
+	if (magoManager.sceneState.mouseButton === 0)
 	{
 		// left button pressed.
-		var gl = this.magoManager.sceneState.gl;
-		var sceneState = this.magoManager.sceneState;
-		var strCamera = mouseAction.strCamera; // camera of onMouseDown.
-		var camera = this.magoManager.sceneState.camera;
-		
-		// now, calculate the angle and the rotationAxis.
-		var strWorldPoint = mouseAction.strWorldPoint;
-		var strEarthRadius = strWorldPoint.getModul();
 		var nowX = event.clientX;
 		var nowY = event.clientY;
 		if (nowX === mouseAction.strX && nowY === mouseAction.strY)
 		{ return; }
-		
-		var nowPoint;
-		var camRay, camRayCamCoord;
-		
-		camRayCamCoord = ManagerUtils.getRayCamSpace(nowX, nowY, camRayCamCoord, this.magoManager);
-		
-		// Now calculate rayWorldCoord.
-		if (this.pointSC === undefined)
-		{ this.pointSC = new Point3D(); }
-		
-		this.pointSC.set(camRayCamCoord[0], camRayCamCoord[1], camRayCamCoord[2]);
 
-		// Now, must transform this posCamCoord to world coord, but with the "mouseAction.strModelViewMatrixInv".
-		var mv_inv = mouseAction.strModelViewMatrixInv;
-		this.pointSC2 = mv_inv.rotatePoint3D(this.pointSC, this.pointSC2); // rayWorldSpace.
-		this.pointSC2.unitary(); // rayWorldSpace.
-		camRay = new Line();
-		camRay.setPointAndDir(strCamera.position.x, strCamera.position.y, strCamera.position.z,       this.pointSC2.x, this.pointSC2.y, this.pointSC2.z);// original.
-		// end calculate camRayWorldCoord.---------------
+		var difX = mouseAction.strX - nowX;
+		var difY = mouseAction.strY - nowY;
+		if (Math.abs(difX) < 3 && Math.abs(difY) < 3)
+		{
+			return; 
+		}
+			
+		var gl = magoManager.sceneState.gl;
+		var sceneState = magoManager.sceneState;
+		var strCamera = mouseAction.strCamera; // camera of onMouseDown.
+		var strWorldPoint = mouseAction.strWorldPoint;
+		var strEarthRadius = strWorldPoint.getModul();
+		var camera = magoManager.sceneState.camera;
 		
-		var nowWorldPoint;
-		nowWorldPoint = this.magoManager.globe.intersectionLineWgs84(camRay, nowWorldPoint, strEarthRadius);
+		
+		// now, calculate the angle and the rotationAxis.
+		var strCamCoordPoint = mouseAction.strCamCoordPoint;
+		
+		// 1rst, check the strPoint distance to camera. If distance is small -> translate. If distance is big -> rotate.
+		var distToCam = strCamCoordPoint.getModul();
+		if (distToCam < 30.0)
+		{
+			var strWorldPoint = mouseAction.strWorldPoint;
+			var strCamCoordPoint = mouseAction.strCamCoordPoint;
+			
+			// create a plane on strWorldPoint.
+			var planeWC = Globe.planeAtCartesianPointWgs84(strWorldPoint.x, strWorldPoint.y, strWorldPoint.z, undefined);
+			var planeWCNormalCartesian = Globe.normalAtCartesianPointWgs84(strWorldPoint.x, strWorldPoint.y, strWorldPoint.z, undefined);
+			var planeWCNormal = new Point3D(planeWCNormalCartesian[0], planeWCNormalCartesian[1], planeWCNormalCartesian[2]);
+			
+			var mv = mouseAction.strModelViewMatrix;
+			var planeCamCoordNormal = mv.rotatePoint3D(planeWCNormal, undefined);
+			var planeCamCoord = new Plane();
+			planeCamCoord.setPointAndNormal(strCamCoordPoint.x, strCamCoordPoint.y, strCamCoordPoint.z, planeCamCoordNormal.x, planeCamCoordNormal.y, planeCamCoordNormal.z);
+			
+			// Now calculate rayWorldCoord.*********************************************************************************************************************************
+			var camRayCamCoordCartesian = ManagerUtils.getRayCamSpace(nowX, nowY, camRayCamCoord, this.magoManager);
+			var camRayCamCoord = new Line();
+			camRayCamCoord.setPointAndDir(0.0, 0.0, 0.0,       camRayCamCoordCartesian[0], camRayCamCoordCartesian[1], camRayCamCoordCartesian[2]);// original.
+		
+			var nowCamCoordPoint = planeCamCoord.intersectionLine(camRayCamCoord, undefined);
+			
+			var moveVectorCC = new Point3D(nowCamCoordPoint.x - strCamCoordPoint.x, nowCamCoordPoint.y - strCamCoordPoint.y, nowCamCoordPoint.z - strCamCoordPoint.z);
+			
+			var mv_inv = mouseAction.strModelViewMatrixInv;
+			var moveVectorWC = mv_inv.rotatePoint3D(moveVectorCC, undefined);
 
-		if (nowWorldPoint === undefined)
-		{ return; }
+			var moveVecModul = moveVectorWC.getModul();
+			if (moveVecModul > 100.0)// there are error.
+			{ return; }
+			
+			camera.copyPosDirUpFrom(strCamera);
+			camera.position.add(-moveVectorWC.x, -moveVectorWC.y, -moveVectorWC.z);
+			
+			this.updateModelViewMatrixByCamera(camera);
+		}
+		else
+		{
+			var gl = this.magoManager.sceneState.gl;
+			var sceneState = this.magoManager.sceneState;
+			var strCamera = mouseAction.strCamera; // camera of onMouseDown.
+			var camera = this.magoManager.sceneState.camera;
+			
+			// now, calculate the angle and the rotationAxis.
+			var strWorldPoint = mouseAction.strWorldPoint;
+			var strEarthRadius = strWorldPoint.getModul();
+			
 
-		var strPoint = new Point3D(strWorldPoint.x, strWorldPoint.y, strWorldPoint.z); // copy point3d.
-		var nowPoint = new Point3D(nowWorldPoint[0], nowWorldPoint[1], nowWorldPoint[2]);
-		
-		var rotAxis;
-		rotAxis = strPoint.crossProduct(nowPoint, rotAxis);
-		rotAxis.unitary();
-		if (rotAxis.isNAN())
-		{ return; }
-		
-		var angRad = strPoint.angleRadToVector(nowPoint);
-		if (angRad === 0 || isNaN(angRad))
-		{ return; }
-		
-		// recalculate position and direction of the camera.
-		camera.copyPosDirUpFrom(strCamera);
-	
-		var rotMat = new Matrix4();
-		rotMat.rotationAxisAngRad(-angRad, rotAxis.x, rotAxis.y, rotAxis.z);
-		camera.transformByMatrix4(rotMat);
+			var nowPoint;
+			var camRay, camRayCamCoord;
+			
+			camRayCamCoord = ManagerUtils.getRayCamSpace(nowX, nowY, camRayCamCoord, this.magoManager);
+			
+			// Now calculate rayWorldCoord.
+			if (this.pointSC === undefined)
+			{ this.pointSC = new Point3D(); }
+			
+			this.pointSC.set(camRayCamCoord[0], camRayCamCoord[1], camRayCamCoord[2]);
 
-		this.updateModelViewMatrixByCamera(camera);
+			// Now, must transform this posCamCoord to world coord, but with the "mouseAction.strModelViewMatrixInv".
+			var mv_inv = mouseAction.strModelViewMatrixInv;
+			this.pointSC2 = mv_inv.rotatePoint3D(this.pointSC, this.pointSC2); // rayWorldSpace.
+			this.pointSC2.unitary(); // rayWorldSpace.
+			camRay = new Line();
+			var testScale = 0.0001;
+			camRay.setPointAndDir(strCamera.position.x*testScale, strCamera.position.y*testScale, strCamera.position.z*testScale,       this.pointSC2.x, this.pointSC2.y, this.pointSC2.z);// original.
+
+			var nowWorldPoint;
+			nowWorldPoint = this.magoManager.globe.intersectionLineWgs84(camRay, nowWorldPoint, strEarthRadius*testScale);
+
+			if (nowWorldPoint === undefined)
+			{ return; }
+		
+			var strPoint = new Point3D(strWorldPoint.x*testScale, strWorldPoint.y*testScale, strWorldPoint.z*testScale); // copy point3d.
+			var nowPoint = new Point3D(nowWorldPoint[0], nowWorldPoint[1], nowWorldPoint[2]);
+
+			var rotAxis;
+			rotAxis = strPoint.crossProduct(nowPoint, rotAxis);
+			rotAxis.unitary();
+			if (rotAxis.isNAN())
+			{ return; }
+			
+			var angRad = strPoint.angleRadToVector(nowPoint);
+			if (angRad < 10E-9 || isNaN(angRad))
+			{ return; }
+			
+			// recalculate position and direction of the camera.
+			camera.copyPosDirUpFrom(strCamera);
+		
+			var rotMat = new Matrix4();
+			rotMat.rotationAxisAngRad(-angRad, rotAxis.x, rotAxis.y, rotAxis.z);
+			camera.transformByMatrix4(rotMat);
+
+			this.updateModelViewMatrixByCamera(camera);
+		}
 	}
 	else if (this.magoManager.sceneState.mouseButton === 1)
 	{

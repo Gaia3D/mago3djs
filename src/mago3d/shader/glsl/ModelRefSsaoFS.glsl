@@ -59,6 +59,7 @@ float unpackDepth(const in vec4 rgba_depth)
     return depth;
 }  
 
+
 float UnpackDepth32( in vec4 pack )
 {
     float depth = dot( pack, 1.0 / vec4(1.0, 256.0, 256.0*256.0, 16777216.0) );// 256.0*256.0*256.0 = 16777216.0

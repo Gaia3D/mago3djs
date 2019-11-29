@@ -233,7 +233,7 @@ var MagoManager = function()
 	this.objMarkerManager = new ObjectMarkerManager();
 	this.pin = new Pin();
 	
-	//this.weatherStation = new WeatherStation();
+	this.weatherStation = new WeatherStation();
 	
 	// renderWithTopology === 0 -> render only CityGML.***
 	// renderWithTopology === 1 -> render only IndoorGML.***
@@ -1112,7 +1112,8 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	
 	if (this.weatherStation)
 	{
-		this.weatherStation.test_renderWindLayer(this);
+		this.weatherStation.renderLastWindLayer(this);
+		//this.weatherStation.test_renderWindLayer(this);
 		//this.weatherStation.test_renderTemperatureLayer(this);
 		//this.weatherStation.test_renderCuttingPlanes(this, ssao_idx);
 		/*
@@ -2033,6 +2034,168 @@ MagoManager.prototype.keyDown = function(key)
 			}
 		}
 		
+	}
+	else if (key === 87) // 87 = 'w'.***
+	{
+		// do wind test.
+		if (this.windCounterAux === undefined)
+		{ this.windCounterAux = 0; }
+		
+		var geometryDataPath = this.readerWriter.geometryDataPath;
+		var options = {
+			name              : "JeJu Island",
+			speedFactor       : 1.0,
+			dropRate          : 0.003,
+			dropRateBump      : 0.001,
+			numParticles      : 65536/4,
+			layerAltitude     : 60.0,
+			windMapFileName   : "OBS-QWM_2016062000.grib2_wind_000",
+			windMapFolderPath : geometryDataPath +"/JeJu_wind_20191127"
+		};
+		
+		var bCreateWind = true;
+			
+		if (this.windCounterAux === 0)
+		{
+			options.windMapFileName = "OBS-QWM_2016062000.grib2_wind_000";
+			this.windCounterAux++;
+		}
+		else if (this.windCounterAux === 1)
+		{
+			options.windMapFileName = "OBS-QWM_2016062001.grib2_wind_000";
+			this.windCounterAux++;
+		}
+		else if (this.windCounterAux === 2)
+		{
+			options.windMapFileName = "OBS-QWM_2016062002.grib2_wind_000";
+			this.windCounterAux++;
+		}
+		else if (this.windCounterAux === 3)
+		{
+			options.windMapFileName = "OBS-QWM_2016062003.grib2_wind_000";
+			this.windCounterAux++;
+		}
+		else if (this.windCounterAux === 4)
+		{
+			options.windMapFileName = "OBS-QWM_2016062004.grib2_wind_000";
+			this.windCounterAux++;
+		}
+		else if (this.windCounterAux === 5)
+		{
+			options.windMapFileName = "OBS-QWM_2016062005.grib2_wind_000";
+			this.windCounterAux++;
+		}
+		else if (this.windCounterAux === 6)
+		{
+			options.windMapFileName = "OBS-QWM_2016062006.grib2_wind_000";
+			this.windCounterAux++;
+		}
+		else if (this.windCounterAux === 7)
+		{
+			options.windMapFileName = "OBS-QWM_2016062007.grib2_wind_000";
+			this.windCounterAux++;
+		}
+		else if (this.windCounterAux === 8)
+		{
+			options.windMapFileName = "OBS-QWM_2016062008.grib2_wind_000";
+			this.windCounterAux++;
+		}
+		else if (this.windCounterAux === 9)
+		{
+			options.windMapFileName = "OBS-QWM_2016062009.grib2_wind_000";
+			this.windCounterAux++;
+		}
+		else if (this.windCounterAux === 10)
+		{
+			options.windMapFileName = "OBS-QWM_2016062010.grib2_wind_000";
+			this.windCounterAux++;
+		}
+		else if (this.windCounterAux === 11)
+		{
+			options.windMapFileName = "OBS-QWM_2016062011.grib2_wind_000";
+			this.windCounterAux++;
+		}
+		else if (this.windCounterAux === 12)
+		{
+			options.windMapFileName = "OBS-QWM_2016062012.grib2_wind_000";
+			this.windCounterAux++;
+		}
+		else if (this.windCounterAux === 13)
+		{
+			options.windMapFileName = "OBS-QWM_2016062013.grib2_wind_000";
+			this.windCounterAux++;
+		}
+		else if (this.windCounterAux === 14)
+		{
+			options.windMapFileName = "OBS-QWM_2016062014.grib2_wind_000";
+			this.windCounterAux++;
+		}
+		else if (this.windCounterAux === 15)
+		{
+			options.windMapFileName = "OBS-QWM_2016062015.grib2_wind_000";
+			this.windCounterAux++;
+		}
+		else if (this.windCounterAux === 16)
+		{
+			options.windMapFileName = "OBS-QWM_2016062016.grib2_wind_000";
+			this.windCounterAux++;
+		}
+		else if (this.windCounterAux === 17)
+		{
+			options.windMapFileName = "OBS-QWM_2016062017.grib2_wind_000";
+			this.windCounterAux++;
+		}
+		else if (this.windCounterAux === 18)
+		{
+			options.windMapFileName = "OBS-QWM_2016062018.grib2_wind_000";
+			this.windCounterAux++;
+		}
+		else if (this.windCounterAux === 19)
+		{
+			options.windMapFileName = "OBS-QWM_2016062019.grib2_wind_000";
+			this.windCounterAux++;
+		}
+		else if (this.windCounterAux === 20)
+		{
+			options.windMapFileName = "OBS-QWM_2016062020.grib2_wind_000";
+			this.windCounterAux++;
+		}
+		else if (this.windCounterAux === 21)
+		{
+			options.windMapFileName = "OBS-QWM_2016062021.grib2_wind_000";
+			this.windCounterAux++;
+		}
+		else if (this.windCounterAux === 22)
+		{
+			options.windMapFileName = "OBS-QWM_2016062022.grib2_wind_000";
+			this.windCounterAux++;
+		}
+		else if (this.windCounterAux === 23)
+		{
+			options.windMapFileName = "OBS-QWM_2016062023.grib2_wind_000";
+			this.windCounterAux++;
+		}
+		else
+		{ bCreateWind = false; }
+		
+		if (bCreateWind)
+		{
+			var firstWindLayer;
+			if (this.weatherStation.getWindLayersCount() > 0)
+			{
+				// maintain the 1rst windLayer.
+				firstWindLayer = this.weatherStation.getWindLayer(0);
+			}
+			
+			var gl = this.getGl();
+			var windLayer = this.weatherStation.newWindLayer(options);
+			windLayer.init(gl);
+			
+			if (firstWindLayer !== undefined)
+			{
+				windLayer.particlesPositionTexturesArray = firstWindLayer.particlesPositionTexturesArray;
+			}
+		}
 	}
 	else if (key === 89) // 89 = 'y'.***
 	{
