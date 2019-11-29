@@ -233,7 +233,7 @@ var MagoManager = function()
 	this.objMarkerManager = new ObjectMarkerManager();
 	this.pin = new Pin();
 	
-	this.weatherStation = new WeatherStation();
+	//this.weatherStation = new WeatherStation();
 	
 	// renderWithTopology === 0 -> render only CityGML.***
 	// renderWithTopology === 1 -> render only IndoorGML.***
