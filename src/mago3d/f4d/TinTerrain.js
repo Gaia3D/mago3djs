@@ -501,12 +501,12 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 				gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
 				//gl.uniform1f(currentShader.externalAlpha_loc, this.getBlendAlpha(magoManager.getCurrentTime()));
 				gl.uniform1f(currentShader.externalAlpha_loc, 1);
-				var currSelObject = magoManager.selectionManager.getSelectedGeneral();
-				if (currSelObject === this)
-				{
-					gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
-					gl.uniform4fv(currentShader.oneColor4_loc, [0.8, 0.3, 0.1, 1.0]);
-				}
+				//var currSelObject = magoManager.selectionManager.getSelectedGeneral();
+				//if (currSelObject === this)
+				//{
+				//	gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
+				//	gl.uniform4fv(currentShader.oneColor4_loc, [0.8, 0.3, 0.1, 1.0]);
+				//}
 			}
 			// End test.--------------------------------------------------------------------------------------
 			
@@ -572,13 +572,13 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			if (renderType === 1)
 			{
 				gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
-				var currSelObject = magoManager.selectionManager.getSelectedGeneral();
-				if (currSelObject === this)
-				{
-					gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
-					gl.uniform4fv(currentShader.oneColor4_loc, [0.0, 0.9, 0.9, 1.0]);
-					gl.drawElements(gl.LINE_LOOP, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.
-				}
+				//var currSelObject = magoManager.selectionManager.getSelectedGeneral();
+				//if (currSelObject === this)
+				//{
+				//	gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
+				//	gl.uniform4fv(currentShader.oneColor4_loc, [0.0, 0.9, 0.9, 1.0]);
+				//	gl.drawElements(gl.LINE_LOOP, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.
+				//}
 			}
 			// End test.--------------------------------------------------------------------------------------
 
@@ -1163,9 +1163,9 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 		point.set(this.cartesiansArray[i*3], this.cartesiansArray[i*3+1], this.cartesiansArray[i*3+2]);
 		point.unitary();
 		
-		this.normalsArray[i*3] = point.x*255;
-		this.normalsArray[i*3+1] = point.y*255;
-		this.normalsArray[i*3+2] = point.z*255;
+		this.normalsArray[i*3] = point.x*126;
+		this.normalsArray[i*3+1] = point.y*126;
+		this.normalsArray[i*3+2] = point.z*126;
 	}
 	
 	// finally make indicesArray.
@@ -1257,9 +1257,9 @@ TinTerrain.prototype.makeMeshVirtuallyCRS84 = function(lonSegments, latSegments,
 		point.set(this.cartesiansArray[i*3], this.cartesiansArray[i*3+1], this.cartesiansArray[i*3+2]);
 		point.unitary();
 		
-		this.normalsArray[i*3] = point.x*255;
-		this.normalsArray[i*3+1] = point.y*255;
-		this.normalsArray[i*3+2] = point.z*255;
+		this.normalsArray[i*3] = point.x*126;
+		this.normalsArray[i*3+1] = point.y*126;
+		this.normalsArray[i*3+2] = point.z*126;
 	}
 	
 	// finally make indicesArray.

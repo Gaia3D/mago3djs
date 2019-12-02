@@ -388,6 +388,13 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 	// Test Modeler Rendering.********************************************************************
 	// Test Modeler Rendering.********************************************************************
 	// Test Modeler Rendering.********************************************************************
+	// tin terrain.***
+	if (magoManager.tinTerrainManager !== undefined)
+	{
+		var bDepth = true;
+		magoManager.tinTerrainManager.render(magoManager, bDepth, renderType);
+		gl.useProgram(null);
+	}
 	
 	if (magoManager.modeler !== undefined)
 	{
@@ -527,13 +534,7 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 	if (magoManager.weatherStation)
 	{ magoManager.weatherStation.test_renderCuttingPlanes(magoManager, renderType); }
 	
-	// tin terrain.***
-	if (magoManager.tinTerrainManager !== undefined)
-	{
-		var bDepth = true;
-		magoManager.tinTerrainManager.render(magoManager, bDepth, renderType);
-		gl.useProgram(null);
-	}
+	
 	
 	// Test.***
 	var selGeneralObjects = magoManager.selectionManager.getSelectionCandidatesFamily("general");
@@ -891,6 +892,8 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			
 		}
 		
+		
+		
 		// Test render depthBuffer on scene.***
 		// Render a test quad to render created textures.***
 		//var frustumVolumenObject = magoManager.frustumVolumeControl.getFrustumVolumeCulling(1); 
@@ -924,6 +927,8 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		var visibleObjectControllerHasRenderables = visibleObjControlerNodes.hasRenderables();
 		if (visibleObjectControllerHasRenderables || magoManager.modeler !== undefined)
 		{
+			
+			
 			gl.enable(gl.BLEND);
 			currentShader = magoManager.postFxShadersManager.getShader("modelRefSsao"); 
 			currentShader.useProgram();
@@ -1002,6 +1007,10 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			var minSizeToRender = 0.0;
 			var renderType = 1;
 			var refMatrixIdxKey =0; // provisionally set magoManager var here.***
+			
+			// temp test excavation, thickLines, etc.***.
+			magoManager.modeler.render(magoManager, currentShader, renderType);
+			
 			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 			
 			//bApplySsao = false;
@@ -1013,8 +1022,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			// native objects.
 			this.renderNativeObjects(gl, currentShader, renderType, visibleObjControlerNodes);
 			
-			// temp test.
-			magoManager.modeler.render(magoManager, currentShader, renderType);
+			
 			
 			currentShader.disableVertexAttribArrayAll();
 			gl.useProgram(null);

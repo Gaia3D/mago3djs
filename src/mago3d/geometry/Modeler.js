@@ -447,17 +447,19 @@ Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive
 		}
 	}
 	
+	if (this.excavation !== undefined)
+	{
+		this.excavation.renderPoints(magoManager, shader, renderType);
+	}
+	
+	if (this.tunnel !== undefined)
+	{
+		this.tunnel.renderPoints(magoManager, shader, renderType);
+	}
+		
 	if (renderType === 1 || renderType === 2)
 	{
-		if (this.excavation !== undefined)
-		{
-			this.excavation.renderPoints(magoManager, shader, renderType);
-		}
 		
-		if (this.tunnel !== undefined)
-		{
-			this.tunnel.renderPoints(magoManager, shader, renderType);
-		}
 		
 		if (this.clippingBox !== undefined)
 		{

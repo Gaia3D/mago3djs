@@ -295,21 +295,21 @@ GeographicCoordsList.prototype.renderPoints = function(magoManager, shader, rend
 	//for(var i = 0; i<vertexAttribsCount; i++)
 	//	gl.disableVertexAttribArray(i);
 
-	var shader = magoManager.postFxShadersManager.getShader("pointsCloud");
-	shader.useProgram();
+	var shaderLocal = magoManager.postFxShadersManager.getShader("pointsCloud"); // provisional. Use the currentShader of argument.
+	shaderLocal.useProgram();
 	
-	shader.disableVertexAttribArrayAll();
-	shader.resetLastBuffersBinded();
+	shaderLocal.disableVertexAttribArrayAll();
+	shaderLocal.resetLastBuffersBinded();
 
-	shader.enableVertexAttribArray(shader.position3_loc);
+	shaderLocal.enableVertexAttribArray(shaderLocal.position3_loc);
 	
-	shader.bindUniformGenerals();
+	shaderLocal.bindUniformGenerals();
 	
-	gl.uniform1i(shader.bPositionCompressed_loc, false);
-	gl.uniform1i(shader.bUse1Color_loc, true);
-	gl.uniform4fv(shader.oneColor4_loc, [1.0, 1.0, 0.1, 1.0]); //.
-	gl.uniform1f(shader.fixPointSize_loc, 5.0);
-	gl.uniform1i(shader.bUseFixPointSize_loc, 1);
+	gl.uniform1i(shaderLocal.bPositionCompressed_loc, false);
+	gl.uniform1i(shaderLocal.bUse1Color_loc, true);
+	gl.uniform4fv(shaderLocal.oneColor4_loc, [1.0, 1.0, 0.1, 1.0]); //.
+	gl.uniform1f(shaderLocal.fixPointSize_loc, 5.0);
+	gl.uniform1i(shaderLocal.bUseFixPointSize_loc, 1);
 	
 	if (bEnableDepth === undefined)
 	{ bEnableDepth = true; }
@@ -325,19 +325,19 @@ GeographicCoordsList.prototype.renderPoints = function(magoManager, shader, rend
 	for (var i=0; i<geoCoordsCount; i++)
 	{
 		geoCoord = this.geographicCoordsArray[i];
-		geoCoord.renderPoint(magoManager, shader, gl, renderType);
+		geoCoord.renderPoint(magoManager, shaderLocal, gl, renderType);
 	}
 	
 	// Check if exist selectedGeoCoord.
 	var currSelected = magoManager.selectionManager.getSelectedGeneral();
 	if (currSelected !== undefined && currSelected.constructor.name === "GeographicCoord")
 	{
-		gl.uniform4fv(shader.oneColor4_loc, [1.0, 0.1, 0.1, 1.0]); //.
-		gl.uniform1f(shader.fixPointSize_loc, 10.0);
-		currSelected.renderPoint(magoManager, shader, gl, renderType);
+		gl.uniform4fv(shaderLocal.oneColor4_loc, [1.0, 0.1, 0.1, 1.0]); //.
+		gl.uniform1f(shaderLocal.fixPointSize_loc, 10.0);
+		currSelected.renderPoint(magoManager, shaderLocal, gl, renderType);
 	}
 	
-	shader.disableVertexAttribArrayAll();
+	shaderLocal.disableVertexAttribArrayAll();
 	gl.enable(gl.DEPTH_TEST);
 	
 	// Write coords.
@@ -368,6 +368,8 @@ GeographicCoordsList.prototype.renderPoints = function(magoManager, shader, rend
 	}
 	ctx.restore();
 	
+	// return the current shader.
+	shader.useProgram();
 };
 
 /**

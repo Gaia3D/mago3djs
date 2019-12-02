@@ -67,123 +67,210 @@ Excavation.prototype.renderExcavation = function(magoManager, shader, renderType
 	if (this.meshPositive === undefined)
 	{ return; }
 	
-	//if(magoManager.currentFrustumIdx !== 0)
-	//	return;
-	
-	var gl = magoManager.sceneState.gl;
-	
-	shader.useProgram();
-	shader.resetLastBuffersBinded();
-
-	shader.enableVertexAttribArray(shader.position3_loc);
-	shader.disableVertexAttribArray(shader.color4_loc);
-	shader.enableVertexAttribArray(shader.normal3_loc); 
-	shader.disableVertexAttribArray(shader.texCoord2_loc); // provisionally has no texCoords.
-	
-	shader.bindUniformGenerals();
-
-	gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
-	gl.uniform4fv(shader.oneColor4_loc, [1.0, 1.0, 0.1, 0.0]); //.
-	
-	gl.uniform1i(shader.bApplySsao_loc, false); // apply ssao.
-	gl.uniform1i(shader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.
-	gl.uniform1i(shader.colorType_loc, 1); // 0= oneColor, 1= attribColor, 2= texture.
-	gl.uniform1i(shader.bApplySpecularLighting_loc, true); // turn on/off specular lighting.
-	
-	gl.enable(gl.DEPTH_TEST);
-	gl.depthFunc(gl.LEQUAL);
-	gl.depthRange(0, 1);
-	
-	var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
-	buildingGeoLocation.bindGeoLocationUniforms(gl, shader); // rotMatrix, positionHIGH, positionLOW.
+	if (renderType === 0)
+	{
+		// do depth render only for the negative mesh.
+		var gl = magoManager.sceneState.gl;
 		
-	
-	// STENCIL SETTINGS.*
-	gl.colorMask(false, false, false, false);
-	gl.depthMask(false);
-	gl.enable(gl.CULL_FACE);
-	gl.enable(gl.STENCIL_TEST);
-	//gl.enable(gl.POLYGON_OFFSET_FILL);
-	//gl.polygonOffset(1.0, 2.0); // Original.
-	//gl.polygonOffset(0.0, 0.0); 
-	
-	gl.clearStencil(0);
-	var glPrimitive = undefined;
-	
-	
-	//if(magoManager.currentFrustumIdx !== 5)
-	{
-		// First pass.*
+		shader.useProgram();
+		shader.resetLastBuffersBinded();
+
+		shader.enableVertexAttribArray(shader.position3_loc);
+		shader.disableVertexAttribArray(shader.color4_loc);
+		shader.enableVertexAttribArray(shader.normal3_loc); 
+		shader.disableVertexAttribArray(shader.texCoord2_loc); // provisionally has no texCoords.
+		
+		shader.bindUniformGenerals();
+
+		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
+		gl.uniform4fv(shader.oneColor4_loc, [1.0, 1.0, 0.1, 0.0]); //.
+		
+		gl.uniform1i(shader.bApplySsao_loc, false); // apply ssao.
+		gl.uniform1i(shader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.
+		gl.uniform1i(shader.colorType_loc, 1); // 0= oneColor, 1= attribColor, 2= texture.
+		gl.uniform1i(shader.bApplySpecularLighting_loc, true); // turn on/off specular lighting.
+		
+		gl.enable(gl.DEPTH_TEST);
+		gl.depthFunc(gl.LEQUAL);
+		gl.depthRange(0, 1);
+		
+		var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
+		buildingGeoLocation.bindGeoLocationUniforms(gl, shader); // rotMatrix, positionHIGH, positionLOW.
+			
+		
+		// STENCIL SETTINGS.*
+		gl.colorMask(false, false, false, false);
+		gl.depthMask(false);
+		gl.enable(gl.CULL_FACE);
+		gl.enable(gl.STENCIL_TEST);
+		//gl.enable(gl.POLYGON_OFFSET_FILL);
+		//gl.polygonOffset(1.0, 2.0); // Original.
+		//gl.polygonOffset(0.0, 0.0); 
+		
+		gl.clearStencil(0);
+		var glPrimitive = undefined;
+		
+		
+		//if(magoManager.currentFrustumIdx !== 5)
+		{
+			// First pass.*
+			gl.cullFace(gl.FRONT); // 1rstPass.
+			gl.stencilFunc(gl.ALWAYS, 0x0, 0xff);
+			//gl.stencilOp(gl.KEEP, gl.INCR, gl.KEEP); // stencilOp(fail, zfail, zpass)
+			gl.stencilOp(gl.KEEP, gl.INCR, gl.KEEP); // stencilOp(fail, zfail, zpass)
+			this.meshPositive.render(magoManager, shader, renderType, glPrimitive);
+		}
+		
+		
+		//if(magoManager.currentFrustumIdx === 5)
+		{
+			// Second pass.*
+			gl.cullFace(gl.BACK); // 2ndPass.
+			gl.stencilFunc(gl.ALWAYS, 0x0, 0xff);
+			//gl.stencilOp(gl.KEEP, gl.DECR, gl.KEEP); // stencilOp(fail, zfail, zpass)
+			gl.stencilOp(gl.KEEP, gl.DECR, gl.KEEP); // stencilOp(fail, zfail, zpass)
+			this.meshPositive.render(magoManager, shader, renderType, glPrimitive);// Original.
+		}
+		
+		// Render the hole.
+		
+		//gl.disable(gl.POLYGON_OFFSET_FILL);
+		//gl.disable(gl.CULL_FACE);
 		gl.cullFace(gl.FRONT); // 1rstPass.
-		gl.stencilFunc(gl.ALWAYS, 0x0, 0xff);
-		//gl.stencilOp(gl.KEEP, gl.INCR, gl.KEEP); // stencilOp(fail, zfail, zpass)
-		gl.stencilOp(gl.KEEP, gl.INCR, gl.KEEP); // stencilOp(fail, zfail, zpass)
-		this.meshPositive.render(magoManager, shader, renderType, glPrimitive);
+		gl.colorMask(true, true, true, true);
+		gl.depthMask(true); //sets whether writing into the depth buffer is enabled or disabled. Default value: true, meaning that writing is enabled.
+		gl.stencilMask(0x00);
+
+		//gl.stencilFunc(gl.NOTEQUAL, 0, 0xff);
+		gl.stencilFunc(gl.LEQUAL, 1, 0xff);
+		//gl.stencilFunc(gl.LESS, 0, 0xff);
+		//gl.stencilFunc(gl.EQUAL, 1, 0xff);
+		gl.stencilOp(gl.KEEP, gl.KEEP, gl.REPLACE); // stencilOp(fail, zfail, zpass)
+
+		//gl.disable(gl.DEPTH_TEST);
+
+		gl.cullFace(gl.BACK);
+		gl.depthFunc(gl.ALWAYS);
+
+		//gl.disable(gl.DEPTH_TEST);
+		//gl.disable(gl.STENCIL_TEST);
+		
+		this.meshNegative.render(magoManager, shader, renderType, glPrimitive);
+
+
+		gl.enable(gl.DEPTH_TEST);
+		gl.depthFunc(gl.LEQUAL);
+		//gl.disable(gl.BLEND);
+		gl.disable(gl.STENCIL_TEST);
+		gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP); // stencilOp(fail, zfail, zpass)
+		gl.disable(gl.POLYGON_OFFSET_FILL);
+		gl.depthRange(0, 1);// return to the normal value.
+		//gl.useProgram(null);
+		
+		gl.depthMask(true); //sets whether writing into the depth buffer is enabled or disabled. Default value: true, meaning that writing is enabled.
+		gl.stencilMask(0xff);
 	}
-	
-	
-	//if(magoManager.currentFrustumIdx === 5)
+	else if (renderType === 1)
 	{
-		// Second pass.*
-		gl.cullFace(gl.BACK); // 2ndPass.
-		gl.stencilFunc(gl.ALWAYS, 0x0, 0xff);
-		//gl.stencilOp(gl.KEEP, gl.DECR, gl.KEEP); // stencilOp(fail, zfail, zpass)
-		gl.stencilOp(gl.KEEP, gl.DECR, gl.KEEP); // stencilOp(fail, zfail, zpass)
-		this.meshPositive.render(magoManager, shader, renderType, glPrimitive);// Original.
+		var gl = magoManager.sceneState.gl;
+		
+		shader.useProgram();
+		shader.resetLastBuffersBinded();
+
+		shader.enableVertexAttribArray(shader.position3_loc);
+		shader.disableVertexAttribArray(shader.color4_loc);
+		shader.enableVertexAttribArray(shader.normal3_loc); 
+		shader.disableVertexAttribArray(shader.texCoord2_loc); // provisionally has no texCoords.
+		
+		shader.bindUniformGenerals();
+
+		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
+		gl.uniform4fv(shader.oneColor4_loc, [1.0, 1.0, 0.1, 0.0]); //.
+		
+		gl.uniform1i(shader.bApplySsao_loc, false); // apply ssao.
+		gl.uniform1i(shader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.
+		gl.uniform1i(shader.colorType_loc, 1); // 0= oneColor, 1= attribColor, 2= texture.
+		gl.uniform1i(shader.bApplySpecularLighting_loc, true); // turn on/off specular lighting.
+		
+		gl.enable(gl.DEPTH_TEST);
+		gl.depthFunc(gl.LEQUAL);
+		gl.depthRange(0, 1);
+		
+		var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
+		buildingGeoLocation.bindGeoLocationUniforms(gl, shader); // rotMatrix, positionHIGH, positionLOW.
+			
+		
+		// STENCIL SETTINGS.*
+		gl.colorMask(false, false, false, false);
+		gl.depthMask(false);
+		gl.enable(gl.CULL_FACE);
+		gl.enable(gl.STENCIL_TEST);
+		//gl.enable(gl.POLYGON_OFFSET_FILL);
+		//gl.polygonOffset(1.0, 2.0); // Original.
+		//gl.polygonOffset(0.0, 0.0); 
+		
+		gl.clearStencil(0);
+		var glPrimitive = undefined;
+		
+		
+		//if(magoManager.currentFrustumIdx !== 5)
+		{
+			// First pass.*
+			gl.cullFace(gl.FRONT); // 1rstPass.
+			gl.stencilFunc(gl.ALWAYS, 0x0, 0xff);
+			//gl.stencilOp(gl.KEEP, gl.INCR, gl.KEEP); // stencilOp(fail, zfail, zpass)
+			gl.stencilOp(gl.KEEP, gl.INCR, gl.KEEP); // stencilOp(fail, zfail, zpass)
+			this.meshPositive.render(magoManager, shader, renderType, glPrimitive);
+		}
+		
+		
+		//if(magoManager.currentFrustumIdx === 5)
+		{
+			// Second pass.*
+			gl.cullFace(gl.BACK); // 2ndPass.
+			gl.stencilFunc(gl.ALWAYS, 0x0, 0xff);
+			//gl.stencilOp(gl.KEEP, gl.DECR, gl.KEEP); // stencilOp(fail, zfail, zpass)
+			gl.stencilOp(gl.KEEP, gl.DECR, gl.KEEP); // stencilOp(fail, zfail, zpass)
+			this.meshPositive.render(magoManager, shader, renderType, glPrimitive);// Original.
+		}
+		
+
+		// Render the hole.
+		//shader.bindUniformGenerals();
+		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
+		gl.uniform4fv(shader.oneColor4_loc, [222/255, 184/255, 135/255, 1.0]); //.
+		
+		//gl.disable(gl.POLYGON_OFFSET_FILL);
+		//gl.disable(gl.CULL_FACE);
+		gl.colorMask(true, true, true, true);
+		//gl.depthMask(false); // original.
+		gl.depthMask(true);
+		gl.stencilMask(0x00);
+
+		//gl.stencilFunc(gl.NOTEQUAL, 0, 0xff);
+		gl.stencilFunc(gl.LEQUAL, 1, 0xff);
+		//gl.stencilFunc(gl.LESS, 0, 0xff);
+		//gl.stencilFunc(gl.EQUAL, 1, 0xff);
+		gl.stencilOp(gl.REPLACE, gl.REPLACE, gl.REPLACE); // stencilOp(fail, zfail, zpass)
+
+		gl.cullFace(gl.BACK);
+		gl.depthFunc(gl.ALWAYS);
+
+		
+		this.meshNegative.render(magoManager, shader, renderType, glPrimitive);
+
+		gl.enable(gl.DEPTH_TEST);
+		gl.depthFunc(gl.LEQUAL);
+		//gl.disable(gl.BLEND);
+		gl.disable(gl.STENCIL_TEST);
+		gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP); // stencilOp(fail, zfail, zpass)
+		gl.disable(gl.POLYGON_OFFSET_FILL);
+		gl.depthRange(0, 1);// return to the normal value.
+		//gl.useProgram(null);
+		
+		gl.depthMask(true); //sets whether writing into the depth buffer is enabled or disabled. Default value: true, meaning that writing is enabled.
+		gl.stencilMask(0xff);
 	}
-	
-
-	// Render the hole.
-	//shader.bindUniformGenerals();
-	gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
-	gl.uniform4fv(shader.oneColor4_loc, [222/255, 184/255, 135/255, 1.0]); //.
-	
-	//gl.disable(gl.POLYGON_OFFSET_FILL);
-	//gl.disable(gl.CULL_FACE);
-	gl.colorMask(true, true, true, true);
-	//gl.depthMask(false); // original.
-	gl.depthMask(true);
-	gl.stencilMask(0x00);
-
-	//gl.stencilFunc(gl.NOTEQUAL, 0, 0xff);
-	gl.stencilFunc(gl.LEQUAL, 1, 0xff);
-	//gl.stencilFunc(gl.LESS, 0, 0xff);
-	//gl.stencilFunc(gl.EQUAL, 1, 0xff);
-	gl.stencilOp(gl.REPLACE, gl.REPLACE, gl.REPLACE); // stencilOp(fail, zfail, zpass)
-
-	//gl.disable(gl.DEPTH_TEST);
-
-	gl.cullFace(gl.BACK);
-
-	gl.depthFunc(gl.ALWAYS);
-
-	//gl.disable(gl.DEPTH_TEST);
-	//gl.disable(gl.STENCIL_TEST);
-	
-	//if (magoManager.currentFrustumIdx === 0)
-	//{
-	//	
-	//}
-	
-	this.meshNegative.render(magoManager, shader, renderType, glPrimitive);
-
-	
-	//gl.disable(gl.STENCIL_TEST);
-	//gl.depthFunc(gl.LEQUAL);
-	//this.meshPositive.render(magoManager, shader, renderType, glPrimitive);// Original.
-
-
-	gl.enable(gl.DEPTH_TEST);
-	gl.depthFunc(gl.LEQUAL);
-	//gl.disable(gl.BLEND);
-	gl.disable(gl.STENCIL_TEST);
-	gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP); // stencilOp(fail, zfail, zpass)
-	gl.disable(gl.POLYGON_OFFSET_FILL);
-	gl.depthRange(0, 1);// return to the normal value.
-	gl.useProgram(null);
-	
-	gl.depthMask(true); //sets whether writing into the depth buffer is enabled or disabled. Default value: true, meaning that writing is enabled.
-	gl.stencilMask(0xff);
 };
 
 /**
@@ -232,7 +319,7 @@ Excavation.prototype.makeExtrudeObject = function(magoManager)
 	var points3dArrayUp = [];
 	
 	if (this.excavationDepthInMeters === undefined)
-	{ this.excavationDepthInMeters = 780.0; }
+	{ this.excavationDepthInMeters = 30.0; }
 	
 	var cartesianAux;
 	var geoCoord;
@@ -248,7 +335,7 @@ Excavation.prototype.makeExtrudeObject = function(magoManager)
 		cartesianAux = Globe.geographicToCartesianWgs84(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude - this.excavationDepthInMeters, cartesianAux);
 		point3DDown.set(cartesianAux[0], cartesianAux[1], cartesianAux[2]);
 		
-		cartesianAux = Globe.geographicToCartesianWgs84(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude + 1700.0, cartesianAux);
+		cartesianAux = Globe.geographicToCartesianWgs84(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude + 70.0, cartesianAux);
 		point3DUp.set(cartesianAux[0], cartesianAux[1], cartesianAux[2]);
 		
 		// Down & Up relative points.

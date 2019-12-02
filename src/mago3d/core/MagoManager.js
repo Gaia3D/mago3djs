@@ -280,7 +280,6 @@ MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums)
 {
 	// Calculate FPS.
 	//var start = new Date().getTime();
-	
 	// this is cesium version.***
 	// mago3d 활성화가 아니면 화면을 그리지 않음
 	if (!this.magoPolicy.getMagoEnable()) { return; }
@@ -1087,6 +1086,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	gl.clearColor(0, 0, 0, 1);
 	gl.clearDepth(1);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	gl.clearStencil(0); // provisionally here.***
 	
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
 	this.renderer.renderGeometry(gl, ssao_idx, this.visibleObjControlerNodes);
@@ -1708,6 +1708,7 @@ MagoManager.prototype.setCameraMotion = function(state)
  */
 MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY) 
 {
+	if (!this.magoPolicy.getMagoEnable()) { return; }
 	if (this.objectMoved)
 	{
 		this.objectMoved = false;
@@ -1750,6 +1751,7 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
  */
 MagoManager.prototype.keyDown = function(key) 
 {
+	if (!this.magoPolicy.getMagoEnable()) { return; }
 	if (this.modeler === undefined)
 	{ this.modeler = new Modeler(this); }
 	
@@ -1768,16 +1770,22 @@ MagoManager.prototype.keyDown = function(key)
 		//this.modeler.mode = CODE.modelerMode.DRAWING_PIPE;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_SPHERE;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_BOX;
-		this.modeler.mode = CODE.modelerMode.DRAWING_CLIPPINGBOX;
+		//this.modeler.mode = CODE.modelerMode.DRAWING_CLIPPINGBOX;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_CONCENTRICTUBES;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_TUBE;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_BASICFACTORY;
 		//this.modeler.mode = 50;
 		
 		if (this.counterAux === undefined)
-		{ this.counterAux = 0; }
+		{ this.counterAux = -1; }
 		
-		if (this.counterAux === 0)
+		if (this.counterAux === -1)
+		{
+			//this.modeler.mode = CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS;
+			this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
+			this.counterAux++;
+		}
+		else if (this.counterAux === 0)
 		{
 			this.modeler.mode = CODE.modelerMode.DRAWING_BOX;
 			this.counterAux++;
@@ -2221,6 +2229,8 @@ MagoManager.prototype.keyDown = function(key)
  */
 MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY) 
 {
+	if (!this.magoPolicy.getMagoEnable()) { return; }
+	
 	// Note: the "mouseActionLeftClick" runs after "mouseActionLeftDown" & "mouseActionLeftUp".***
 	//--------------------------------------------------------------------------------------------
 	if (this.magoMode === CODE.magoMode.DRAWING)// then process to draw.***// Test code.***// Test code.***
@@ -2489,7 +2499,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 	
 			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
 			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+10, testHeading, undefined, undefined, geoLocData, this);
+			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude, testHeading, undefined, undefined, geoLocData, this);
 			
 			// set material for the roof of the factory.
 			var materialsManager = this.materialsManager;
@@ -2708,6 +2718,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
  */
 MagoManager.prototype.mouseActionLeftDown = function(mouseX, mouseY) 
 {
+	if (!this.magoPolicy.getMagoEnable()) { return; }
 	this.dateSC = new Date();
 	this.startTimeSC = this.dateSC.getTime();
 
@@ -2778,6 +2789,7 @@ MagoManager.prototype.saveHistoryObjectMovement = function(refObject, node)
  */
 MagoManager.prototype.mouseActionMiddleDown = function(mouseX, mouseY) 
 {
+	if (!this.magoPolicy.getMagoEnable()) { return; }
 	this.dateSC = new Date();
 	this.startTimeSC = this.dateSC.getTime();
 
@@ -2794,6 +2806,7 @@ MagoManager.prototype.mouseActionMiddleDown = function(mouseX, mouseY)
  */
 MagoManager.prototype.mouseActionMiddleUp = function(mouseX, mouseY) 
 {
+	if (!this.magoPolicy.getMagoEnable()) { return; }
 	this.isCameraMoving = false;
 	this.mouseMiddleDown = false;
 	this.mouseDragging = false;

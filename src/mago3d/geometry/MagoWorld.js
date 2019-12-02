@@ -483,7 +483,8 @@ MagoWorld.prototype.mousemove = function(event)
 			var planeWCNormalCartesian = Globe.normalAtCartesianPointWgs84(strWorldPoint.x, strWorldPoint.y, strWorldPoint.z, undefined);
 			var planeWCNormal = new Point3D(planeWCNormalCartesian[0], planeWCNormalCartesian[1], planeWCNormalCartesian[2]);
 			
-			var mv = mouseAction.strModelViewMatrix;
+			//var mv = mouseAction.strModelViewMatrix;
+			var mv = sceneState.modelViewMatrix;
 			var planeCamCoordNormal = mv.rotatePoint3D(planeWCNormal, undefined);
 			var planeCamCoord = new Plane();
 			planeCamCoord.setPointAndNormal(strCamCoordPoint.x, strCamCoordPoint.y, strCamCoordPoint.z, planeCamCoordNormal.x, planeCamCoordNormal.y, planeCamCoordNormal.z);
@@ -494,10 +495,13 @@ MagoWorld.prototype.mousemove = function(event)
 			camRayCamCoord.setPointAndDir(0.0, 0.0, 0.0,       camRayCamCoordCartesian[0], camRayCamCoordCartesian[1], camRayCamCoordCartesian[2]);// original.
 		
 			var nowCamCoordPoint = planeCamCoord.intersectionLine(camRayCamCoord, undefined);
+			if (nowCamCoordPoint === undefined)
+			{ return; }
 			
 			var moveVectorCC = new Point3D(nowCamCoordPoint.x - strCamCoordPoint.x, nowCamCoordPoint.y - strCamCoordPoint.y, nowCamCoordPoint.z - strCamCoordPoint.z);
 			
-			var mv_inv = mouseAction.strModelViewMatrixInv;
+			//var mv_inv = mouseAction.strModelViewMatrixInv;
+			var mv_inv = sceneState.modelViewMatrixInv;
 			var moveVectorWC = mv_inv.rotatePoint3D(moveVectorCC, undefined);
 
 			var moveVecModul = moveVectorWC.getModul();
