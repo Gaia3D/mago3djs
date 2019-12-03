@@ -891,17 +891,6 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			
 			
 		}
-		
-		
-		
-		// Test render depthBuffer on scene.***
-		// Render a test quad to render created textures.***
-		//var frustumVolumenObject = magoManager.frustumVolumeControl.getFrustumVolumeCulling(1); 
-		//var depthFboNeo = frustumVolumenObject.depthFbo;
-		//if (depthFboNeo !== undefined)
-		//{
-		//	this.renderImageViewRectangle(gl, magoManager, depthFboNeo);
-		//}
 
 		var bApplySsao = false;
 		var bApplyShadow = false;
@@ -951,10 +940,6 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			{
 				var planesVec4Array = magoManager.modeler.clippingBox.getPlanesRelToEyevec4Array(magoManager);
 				var planesVec4FloatArray = new Float32Array(planesVec4Array);
-				
-				//shader.bApplyClippingPlanes_loc = gl.getUniformLocation(shader.program, "bApplyClippingPlanes");
-				//shader.clippingPlanesCount_loc = gl.getUniformLocation(shader.program, "clippingPlanesCount");
-				//shader.clippingPlanes_loc = gl.getUniformLocation(shader.program, "clippingPlanes");
 				
 				gl.uniform1i(currentShader.bApplyClippingPlanes_loc, true);
 				gl.uniform1i(currentShader.clippingPlanesCount_loc, 6);

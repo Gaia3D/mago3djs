@@ -270,10 +270,11 @@ TinTerrain.prototype.prepareTexture = function(magoManager, tinTerrainManager)
 	var gl = magoManager.sceneState.gl;
 	this.texture = new Texture();
 	
-	// Provisionally test.
+	// Provisionally test.******************************************************************************************
 	//var imagesDataPath = "\\images\\ko";
-	//var textureFilePath = imagesDataPath +  "\\funny_" + this.depth + ".jpg";
+	//var textureFilePath = imagesDataPath +  "\\funny" + ".jpg";
 	//magoManager.readerWriter.readLegoSimpleBuildingTexture(gl, textureFilePath, this.texture, magoManager);
+	//return;
 	// End test.----------------------------------------------------------------------------------------------------
 			
 	var geoServURL = tinTerrainManager.geoServURL;
@@ -329,7 +330,7 @@ TinTerrain.prototype.prepareTinTerrainPlain = function(magoManager, tinTerrainMa
 		if (this.fileLoadState === CODE.fileLoadState.READY)
 		{
 			//var pathName = this.getPathName();
-			//var fileName = "CesiumTerrain/" + pathName + ".terrain";
+			//var fileName = "Terrain/" + pathName + ".terrain";
 			//magoManager.readerWriter.loadTINTerrain(fileName, this, magoManager);
 			
 		}
@@ -365,7 +366,6 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 {
 	// This function 1- loads file & 2- parses file & 3- makes vbo.
 	// 1rst, check if the parent is prepared. If parent is not prepared, then prepare the parent.
-	
 	if (this.owner === undefined || this.owner.isPrepared())
 	{
 		// 1rst, try to erase from procesQueue_deleting if exist.
@@ -376,7 +376,7 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 		{
 			var pathName = this.getPathName();
 			var geometryDataPath = magoManager.readerWriter.geometryDataPath;
-			var fileName = geometryDataPath + "/CesiumTerrain/" + pathName + ".terrain";
+			var fileName = geometryDataPath + "/Terrain/" + pathName + ".terrain";
 			magoManager.readerWriter.loadTINTerrain(fileName, this, magoManager);
 			
 		}

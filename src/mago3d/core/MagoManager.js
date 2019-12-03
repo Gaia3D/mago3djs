@@ -283,7 +283,7 @@ MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums)
 	// this is cesium version.***
 	// mago3d 활성화가 아니면 화면을 그리지 않음
 	if (!this.magoPolicy.getMagoEnable()) { return; }
-
+	
 	var isLastFrustum = false;
 	this.numFrustums = numFrustums;
 	this.currentFrustumIdx = this.numFrustums-frustumIdx-1;
@@ -1183,6 +1183,29 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrustums) 
 {
 	// Update the current frame's frustums count.
+	if (this.testClippingPlanes === undefined)
+	{
+		// make a modelmatrix for the clippingPlanes.
+		var modelMatrix;
+		var geoCoord = new GeographicCoord(126.61340759235748, 37.57613526692086, 0);
+		var modelmatrix = Globe.transformMatrixAtGeographicCoord(geoCoord, undefined);
+		var globe = this.scene._globe;
+		globe.clippingPlanes = new Cesium.ClippingPlaneCollection({
+			modelMatrix : modelmatrix,
+			planes      : [
+				new Cesium.ClippingPlane(new Cesium.Cartesian3( 1.0,  0.0, 0.0), -50.0),
+				new Cesium.ClippingPlane(new Cesium.Cartesian3(-1.0,  0.0, 0.0), -50.0),
+				new Cesium.ClippingPlane(new Cesium.Cartesian3( 0.0,  1.0, 0.0), -200.0),
+				new Cesium.ClippingPlane(new Cesium.Cartesian3( 0.0, -1.0, 0.0), -200.0)
+			],
+			edgeWidth : 1.0,
+			edgeColor : Cesium.Color.WHITE,
+			enabled   : true
+		});
+	
+		this.testClippingPlanes = true;
+	}
+	
 	this.numFrustums = numFrustums;
 	this.isLastFrustum = isLastFrustum;
 
@@ -1816,6 +1839,11 @@ MagoManager.prototype.keyDown = function(key)
 		else if (this.counterAux === 5)
 		{
 			this.modeler.mode = CODE.modelerMode.DRAWING_CLIPPINGBOX;
+			this.counterAux ++;
+		}
+		else if (this.counterAux === 6)
+		{
+			this.modeler.mode = CODE.modelerMode.DRAWING_FREECONTOURWALL;
 			this.counterAux = 0;
 		}
 		
@@ -2708,6 +2736,24 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			tube.attributes.isMovable = true;
 			
 			this.modeler.addObject(tube, 15);
+			
+		}
+		else if (this.modeler.mode === CODE.modelerMode.DRAWING_FREECONTOURWALL)
+		{
+			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+50, undefined, undefined, undefined, geoLocData, this);
+			
+			var options = {color: {r: 0.2, g: 0.5, b: 0.9, a: 0.5}};
+			
+			var freeContourWall = new TestFreeContourWallBuilding(options);
+			freeContourWall.setOneColor(0.2, 0.5, 0.7, 1.0);
+			freeContourWall.geoLocDataManager = geoLocDataManager;
+			if (freeContourWall.attributes === undefined)
+			{ freeContourWall.attributes = {}; }
+			freeContourWall.attributes.isMovable = true;
+			
+			this.modeler.addObject(freeContourWall, 15);
 			
 		}
 	}
