@@ -3,7 +3,6 @@
 var MagoRenderable = function() 
 {
 	this.objectsArray = [];
-	this.meshArray = [];
 
 	this.id;
 	this.name;
@@ -31,6 +30,17 @@ MagoRenderable.prototype.getRootOwner = function()
 	{
 		return this.owner.getRootOwner();
 	}
+};
+
+MagoRenderable.prototype.getObject = function(idx) 
+{
+	if (idx > this.objectsArray.length-1) 
+	{
+		throw new Error('out of bound range.');
+		//return undefined;
+	}
+
+	return this.objectsArray[idx];
 };
 
 MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPrimitive, bIsSelected) 
