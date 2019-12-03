@@ -1183,29 +1183,6 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrustums) 
 {
 	// Update the current frame's frustums count.
-	if (this.testClippingPlanes === undefined)
-	{
-		// make a modelmatrix for the clippingPlanes.
-		var modelMatrix;
-		var geoCoord = new GeographicCoord(126.61340759235748, 37.57613526692086, 0);
-		var modelmatrix = Globe.transformMatrixAtGeographicCoord(geoCoord, undefined);
-		var globe = this.scene._globe;
-		globe.clippingPlanes = new Cesium.ClippingPlaneCollection({
-			modelMatrix : modelmatrix,
-			planes      : [
-				new Cesium.ClippingPlane(new Cesium.Cartesian3( 1.0,  0.0, 0.0), -50.0),
-				new Cesium.ClippingPlane(new Cesium.Cartesian3(-1.0,  0.0, 0.0), -50.0),
-				new Cesium.ClippingPlane(new Cesium.Cartesian3( 0.0,  1.0, 0.0), -200.0),
-				new Cesium.ClippingPlane(new Cesium.Cartesian3( 0.0, -1.0, 0.0), -200.0)
-			],
-			edgeWidth : 1.0,
-			edgeColor : Cesium.Color.WHITE,
-			enabled   : true
-		});
-	
-		this.testClippingPlanes = true;
-	}
-	
 	this.numFrustums = numFrustums;
 	this.isLastFrustum = isLastFrustum;
 
