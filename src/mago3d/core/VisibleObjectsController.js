@@ -92,15 +92,22 @@ VisibleObjectsController.prototype.hasRenderables = function()
 VisibleObjectsController.prototype.putNativeObject = function(object) 
 {
 	// check if the object if opaque or transparent.
-	var isOpaque = object.isOpaque();
-	//var isOpaque = true;
-	if (isOpaque)
+	if (object instanceof MagoRenderable) 
 	{
-		this.currentVisibleNativeObjects.opaquesArray.push(object);
+		var isOpaque = object.isOpaque();
+		//var isOpaque = true;
+		if (isOpaque)
+		{
+		  this.currentVisibleNativeObjects.opaquesArray.push(object);
+		}
+		else 
+		{
+		  this.currentVisibleNativeObjects.transparentsArray.push(object);
+		}
 	}
 	else 
 	{
-		this.currentVisibleNativeObjects.transparentsArray.push(object);
+		this.currentVisibleNativeObjects.opaquesArray.push(object);
 	}
 };
 

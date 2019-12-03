@@ -933,7 +933,10 @@ MagoManager.prototype.managePickingProcess = function()
 			this.arrayAuxSC.length = 0;
 			selectionManager.clearCurrents();
 			var bSelectObjects = true;
+			
 			this.objectSelected = this.getSelectedObjects(gl, this.mouse_x, this.mouse_y, this.arrayAuxSC, bSelectObjects);
+			
+			
 			this.buildingSelected = this.arrayAuxSC[0];
 			this.octreeSelected = this.arrayAuxSC[1];
 			this.nodeSelected = this.arrayAuxSC[3];
@@ -3135,7 +3138,7 @@ MagoManager.prototype.moveSelectedObjectGeneral = function(gl, object)
 			var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
 			if (node !== undefined)
 			{
-				node.changeLocationAndRotation(newlatitude, newLongitude, 0, 0, 0, 0, this);
+				node.changeLocationAndRotation(newlatitude, newLongitude, 0, attributes.f4dHeading, 0, 0, this);
 			}
 		}
 		
