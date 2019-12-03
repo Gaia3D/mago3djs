@@ -27,6 +27,11 @@ var TinTerrainManager = function()
 	// terrainType = 0 -> terrainPlainModel.
 	// terrainType = 1 -> terrainElevationModel.
 	this.terrainType = 0; 
+	//CODE.imageryType = {
+	//"UNKNOWN"      : 0,
+	//"CRS84"        : 1,
+	//"WEB_MERCATOR" : 2
+	//};
 	this.imageryType = CODE.imageryType.WEB_MERCATOR; // Test.***
 	
 	this.init();

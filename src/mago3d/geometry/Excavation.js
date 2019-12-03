@@ -26,6 +26,8 @@ var Excavation = function()
 	this.vtxProfilesList;
 	this.vboKeysContainer;
 	this.vboKeysContainerEdges;
+	
+	// https://sandcastle.cesium.com/gallery/Terrain%20Clipping%20Planes.html sandcastle sample clip terrain.
 };
 
 /**

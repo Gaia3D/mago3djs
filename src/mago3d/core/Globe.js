@@ -161,6 +161,24 @@ Globe.planeAtCartesianPointWgs84 = function(x, y, z, resultPlane)
  * @returns {Float32Array} float32Array
  * 
  */
+Globe.transformMatrixAtGeographicCoord = function(geoCoord, float32Array)
+{
+	if (geoCoord === undefined)
+	{ return float32Array; }
+	
+	var cartesian = Globe.geographicToCartesianWgs84(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude, undefined);
+	return Globe.transformMatrixAtCartesianPointWgs84(cartesian[0], cartesian[1], cartesian[2], float32Array);
+};
+
+/**
+ * Return the transformation matrix which transform the cartesian point to wgs84
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} z 
+ * @param {Float32Array} float32Array
+ * @returns {Float32Array} float32Array
+ * 
+ */
 Globe.transformMatrixAtCartesianPointWgs84 = function(x, y, z, float32Array)
 {
 	var xAxis, yAxis, zAxis;
