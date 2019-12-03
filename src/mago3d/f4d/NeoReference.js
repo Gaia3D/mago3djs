@@ -376,6 +376,10 @@ NeoReference.prototype.getTriangles = function(neoBuilding, resultTrianglesArray
 	var neoReference = this;
 	var block_idx = neoReference._block_idx;
 	var block = neoBuilding.motherBlocksArray[block_idx];
+	if (!block) 
+	{
+		return resultTrianglesArray;
+	}
 	var cacheKeys_count = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray.length;
 	var refTMat = neoReference._originalMatrix4;
 	var vboKey;

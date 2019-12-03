@@ -1328,6 +1328,12 @@ NeoBuilding.prototype.makeCollisionCheckOctree = function(desiredMinOctreeSize)
 		collisionCheckOctree.octree_level = octree.octree_level;
 		
 		collisionCheckOctree.trianglesArray = this.getTriangles();
+
+		    
+		if (!collisionCheckOctree.trianglesArray ) 
+		{
+			return false;
+		}
 		
 		var options = {};
 		options.desiredMinOctreeSize = desiredMinOctreeSize;

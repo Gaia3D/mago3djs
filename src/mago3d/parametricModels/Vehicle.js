@@ -274,33 +274,33 @@ Vehicle.prototype.makeMesh = function()
 	var tailLength = totalLength * 0.2;
 	var extrude = totalLength * 0.05;
     
-	var frontArrow = new Arrow(0.2, 10, 0.1, {
-		totalLength : totalLength,
-		bodyWidth   : bodyWidth,
-		headWidth   : headWidth,
-		tailLength  : tailLength,
-		extrude     : extrude
+	var frontArrow = new Arrow(10, 50, 0.5, {
+		totalLength : 12,
+		bodyWidth   : 2,
+		headWidth   : 4,
+		tailLength  : 1,
+		extrude     : 2
 	});
 
-	var rearArrow = new Arrow(0.2, 10, 0.1, {
-		totalLength : totalLength,
-		bodyWidth   : bodyWidth,
-		headWidth   : headWidth,
-		tailLength  : tailLength,
-		extrude     : extrude
+	var rearArrow = new Arrow(10, 50, 0.5, {
+		totalLength : 12,
+		bodyWidth   : 2,
+		headWidth   : 4,
+		tailLength  : 1,
+		extrude     : 2
 	});
 
 	this.objectsArray.push(frontArrow);
 	this.frontArrow = frontArrow;
 	this.frontArrow.setOneColor(0.9, 0.1, 0.1, 1);
-	this.frontArrowPos = new Point3D(0.0, this.wheelbase * 0.5, this.height);
+	this.frontArrowPos = new Point3D(0.0, this.wheelbase * 1.5, this.height);
 	frontArrow.tMatOriginal = new Matrix4();
 	frontArrow.tMatOriginal.setTranslation(this.frontArrowPos.x, this.frontArrowPos.y, this.frontArrowPos.z);
 	
 	this.objectsArray.push(rearArrow);
 	this.rearArrow = rearArrow;
     
-	this.rearArrowPos = new Point3D(0.0, -this.wheelbase * 0.5, this.height);
+	this.rearArrowPos = new Point3D(0.0, -this.wheelbase * 1.5, this.height);
 	rearArrow.tMatOriginal = new Matrix4();
 	rearArrow.tMatOriginal.setTranslation(this.rearArrowPos.x, this.rearArrowPos.y, this.rearArrowPos.z);
     

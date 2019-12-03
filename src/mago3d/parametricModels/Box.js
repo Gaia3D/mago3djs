@@ -89,9 +89,7 @@ Box.prototype.makeMesh = function()
 
 	var mesh = Modeler.getExtrudedMesh(profileAux, extrusionDist, extrudeSegmentsCount, extrusionVector, bIncludeBottomCap, bIncludeTopCap, undefined);
 	this.objectsArray.push(mesh);
-	this.mesh = mesh;
 	this.dirty = false;
-	return mesh;
 };
 
 
