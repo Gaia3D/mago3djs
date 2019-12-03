@@ -161,7 +161,7 @@ Tube.prototype.renderAsChild = function(magoManager, shader, renderType, glPrimi
 		if (bIsSelected !== undefined && bIsSelected)
 		{
 			//gl.disable(gl.BLEND);
-			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, this.color4.a]);
+			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, 1.0]);
 		}
 		else if (selectionManager.isObjectSelected(this))
 		{
@@ -173,6 +173,7 @@ Tube.prototype.renderAsChild = function(magoManager, shader, renderType, glPrimi
 			gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, this.color4.a]);
 		}
 	} 
+	/*
 	else if (renderType === 2)
 	{
 		// Selection render.***
@@ -184,6 +185,7 @@ Tube.prototype.renderAsChild = function(magoManager, shader, renderType, glPrimi
 		gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 0.7]);
 		gl.disable(gl.BLEND);
 	}
+	*/
 	if (this.tMat) 
 	{
 		gl.uniformMatrix4fv(shader.buildingRotMatrix_loc, false, this.tMat._floatArrays);

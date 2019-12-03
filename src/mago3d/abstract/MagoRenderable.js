@@ -7,6 +7,7 @@ var MagoRenderable = function()
 
 	this.id;
 	this.name;
+	this.owner;
 
 	this.attributes = {
 		isVisible: true

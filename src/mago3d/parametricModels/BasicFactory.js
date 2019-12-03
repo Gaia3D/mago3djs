@@ -474,7 +474,14 @@ BasicFactory.prototype.getOpeningProperties = function(wallType, index)
 		}
 	}
 
-	return wallOption.openingInfo.centerPropterties;
+	if (Array.isArray(wallOption.openingInfo)) 
+	{
+		return wallOption.openingInfo[0].centerPropterties;
+	}
+	else 
+	{
+		return wallOption.openingInfo.centerPropterties;
+	}
 };
 /**
  * Makes the geometry mesh.
@@ -526,22 +533,26 @@ BasicFactory.prototype.makeMesh = function()
 				{
 					wallOption = wallOptions[j];
 					extrusionDist = defaultValue(wallOption.thickness, 0.4);
+					break;
 				}
 				else 
 				{
 					wallOption = null;
 				}
 			}
+			var meshName = wallType + "Wall";
+      		if (!this.objectsMap[meshName]) 
+			{
+        		var profileAux = this.getWallProfile2d(wallType, wallOption, undefined);
+
+        		var mesh = Modeler.getExtrudedMesh(profileAux, extrusionDist, extrudeSegmentsCount, extrusionVector, bIncludeBottomCap, bIncludeTopCap, undefined);
+        		mesh.name = meshName;
+        		this.objectsArray.push(mesh);
+        		this.objectsMap[meshName] = mesh;
+
+        		this.validateWallGeom(wallType, mesh);
+      		}
 		}
-
-		var profileAux = this.getWallProfile2d(wallType, wallOption, undefined);
-
-		var mesh = Modeler.getExtrudedMesh(profileAux, extrusionDist, extrudeSegmentsCount, extrusionVector, bIncludeBottomCap, bIncludeTopCap, undefined);
-		mesh.name = wallType + "Wall";
-		this.objectsArray.push(mesh);
-		this.objectsMap[mesh.name] = mesh;
-
-		this.validateWallGeom(wallType, mesh);
 	}
 
 	// Roof.*******************************************************************************************************************************
