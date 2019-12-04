@@ -28,6 +28,12 @@ var Sphere = function(options)
 		{
 			this.color4 = new DynamicColor();
 			this.color4.setRGBA(color.r, color.g, color.b, color.a);
+
+			var event = new MagoEvent('RENDER_END', function(thisArgs, magoManager)
+			{
+				thisArgs.color4.updateColorAlarm(magoManager.getCurrentTime());
+			});
+			this.addEventListener(event);
 		}
 	}
 	
@@ -105,8 +111,6 @@ Sphere.prototype.getVbo = function(resultVboContainer, bTexCoords)
 
 	return resultVboContainer;
 };
-
-
 
 /**
  * Makes the geometry mesh.
