@@ -1285,6 +1285,10 @@ NeoBuilding.prototype.forceToLoadModelsAndReferences = function(magoManager)
 			var intRef_filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref";
 			magoManager.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, lowestOctree, magoManager, options);
 		}
+		else if (lowestOctree.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
+		{
+			ParseQueue.parseOctreesLod0References(lowestOctree, magoManager);
+		}
 		
 		
 		// 4 = parsed.
@@ -1299,6 +1303,10 @@ NeoBuilding.prototype.forceToLoadModelsAndReferences = function(magoManager)
 			var blocks_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/Models";
 			var filePathInServer = blocks_folderPath + "/" + subOctreeNumberName + "_Model";
 			magoManager.readerWriter.getNeoBlocksArraybuffer(filePathInServer, lowestOctree, magoManager, options);
+		}
+		else if (blocksList.fileLoadState === CODE.fileLoadState.LOADING_FINISHED) 
+		{
+			ParseQueue.parseArrayOctreesLod0Models(lowestOctree, magoManager);
 		}
 	}
 
