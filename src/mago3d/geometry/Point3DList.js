@@ -536,12 +536,16 @@ Point3DList.prototype.renderThickLines = function(magoManager, shader, renderTyp
 {
 	if (this.vboKeysContainer === undefined)
 	{ return; }
+
+	if (this.geoLocDataManager === undefined)
+	{ return; }
 	
 	var vbo = this.vboKeysContainer.getVboKey(0);
 	
 	// based on https://weekly-geekly.github.io/articles/331164/index.html
 	var shader = magoManager.postFxShadersManager.getShader("thickLine");
 	shader.useProgram();
+	shader.bindUniformGenerals();
 	var gl = magoManager.getGl();
 	gl.enable(gl.BLEND);
 	gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
@@ -551,6 +555,9 @@ Point3DList.prototype.renderThickLines = function(magoManager, shader, renderTyp
 	gl.enableVertexAttribArray(shader.prev_loc);
 	gl.enableVertexAttribArray(shader.current_loc);
 	gl.enableVertexAttribArray(shader.next_loc);
+	
+	var geoLocData = this.geoLocDataManager.getCurrentGeoLocationData();
+	geoLocData.bindGeoLocationUniforms(gl, shader);
 
 	var sceneState = magoManager.sceneState;
 	var projMat = sceneState.projectionMatrix;
@@ -558,11 +565,8 @@ Point3DList.prototype.renderThickLines = function(magoManager, shader, renderTyp
 	var drawingBufferWidth = sceneState.drawingBufferWidth;
 	var drawingBufferHeight = sceneState.drawingBufferHeight;
 	
-	this.thickness = 5.0;
+	this.thickness = 3.0;
 	
-	gl.uniformMatrix4fv(shader.projectionMatrix_loc, false, projMat._floatArrays);
-	gl.uniformMatrix4fv(shader.modelViewMatrix_loc, false, viewMat._floatArrays);
-
 	gl.uniform4fv(shader.color_loc, [0.5, 0.7, 0.9, 1.0]);
 	gl.uniform2fv(shader.viewport_loc, [drawingBufferWidth[0], drawingBufferHeight[0]]);
 	gl.uniform1f(shader.thickness_loc, this.thickness);
@@ -575,8 +579,8 @@ Point3DList.prototype.renderThickLines = function(magoManager, shader, renderTyp
 	}
 	gl.bindBuffer(gl.ARRAY_BUFFER, vboPos.key);
 	gl.vertexAttribPointer(shader.prev_loc, dim, gl.FLOAT, false, 16, 0);
-	gl.vertexAttribPointer(shader.current_loc, dim, gl.FLOAT, false, 16, 64);
-	gl.vertexAttribPointer(shader.next_loc, dim, gl.FLOAT, false, 16, 128);
+	gl.vertexAttribPointer(shader.current_loc, dim, gl.FLOAT, false, 16, 64-32);
+	gl.vertexAttribPointer(shader.next_loc, dim, gl.FLOAT, false, 16, 128-32);
 
 	//gl.bindBuffer(gl.ARRAY_BUFFER, this._ordersBuffer);
 	//gl.vertexAttribPointer(shader.order._pName, this._ordersBuffer.itemSize, gl.FLOAT, false, 4, 0);
@@ -584,7 +588,10 @@ Point3DList.prototype.renderThickLines = function(magoManager, shader, renderTyp
 	//gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexesBuffer);
 	//gl.drawElements(gl.TRIANGLE_STRIP, this._indexesBuffer.numItems, gl.UNSIGNED_INT, 0);
 	
-	gl.drawArrays(gl.TRIANGLE_STRIP, 0, vbo.vertexCount-1);
+	gl.drawArrays(gl.TRIANGLE_STRIP, 0, vbo.vertexCount-4);
+	
+	//gl.uniform4fv(shader.color_loc, [0.0, 0.0, 0.0, 1.0]);
+	//gl.drawArrays(gl.LINE_STRIP, 0, vbo.vertexCount);
 
 	gl.enable(gl.CULL_FACE);
 	gl.disable(gl.BLEND);

@@ -441,6 +441,10 @@ Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive
 			var options = {};
 			var thickLineShader = magoManager.postFxShadersManager.getShader("thickLine"); 
 			thickLineShader.useProgram();
+			
+			// bind building geoLocationData.
+			
+			
 			var gl = this.magoManager.getGl();
 			var sceneState = this.magoManager.sceneState;
 			gl.uniform4fv(thickLineShader.color_loc, [0.9, 0.5, 0.3, 1.0]);
