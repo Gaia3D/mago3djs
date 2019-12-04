@@ -20,6 +20,7 @@ var MagoRenderable = function()
 	
 	this.dirty = true;
 	this.color4;
+	this.selectedColor4;
 
 	this.eventObject = {};
 };
@@ -143,14 +144,15 @@ MagoRenderable.prototype.renderAsChild = function(magoManager, shader, renderTyp
 		
 		if (bIsSelected !== undefined && bIsSelected)
 		{
-			if (this.color4) 
+			var color = this.selectedColor4 ? this.selectedColor4 : this.color4;
+			if (color) 
 			{
-				gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, this.color4.a]);
+				gl.uniform4fv(shader.oneColor4_loc, [color.r, color.g, color.b, color.a]);
 			}
-			
 		}
 		else if (selectionManager.isObjectSelected(this))
 		{
+			bIsSelected = true;
 			gl.uniform4fv(shader.oneColor4_loc, [0.9, 0.1, 0.1, 1.0]);
 		}
 		else 
