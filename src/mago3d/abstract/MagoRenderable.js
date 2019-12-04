@@ -20,8 +20,66 @@ var MagoRenderable = function()
 	
 	this.dirty = true;
 	this.color4;
+
+	this.eventObject = {};
 };
 
+MagoRenderable.EVENT_TYPE = {
+	'RENDER_END'   : 'renderEnd',
+	'RENDER_START' : 'renderStart',
+	'MOVE_END'     : 'moveEnd',
+	'MOVE_START'   : 'moveStart'
+};
+/**
+ * 이벤트 등록
+ * @param {MagoEvent} event 
+ */
+MagoRenderable.prototype.addEventListener = function(event) 
+{
+	if (!event instanceof MagoEvent) 
+	{
+		throw new Error('args event must MagoEvent!');
+	}
+
+	var type = event.getType();
+
+	if (!MagoRenderable.EVENT_TYPE[type]) 
+	{
+		throw new Error('this type is not support.');
+	}
+
+	if (!this.eventObject[type]) 
+	{
+		this.eventObject[type] = [];
+	}
+
+	this.eventObject[type].push(event);
+};
+/**
+ * 이벤트 실행
+ * @param {String} type 
+ */
+MagoRenderable.prototype.dispatchEvent = function(type, magoManager) 
+{
+	if (!MagoRenderable.EVENT_TYPE[type]) 
+	{
+		throw new Error('this type is not support.');
+	}
+
+	var events = this.eventObject[type];
+
+	if (!events || !Array.isArray(events)) { return; } 
+	
+	for (var i=0, len=events.length;i<len;i++) 
+	{
+		var event = events[i];
+		var listener = event.getListener();
+		if (typeof listener === 'function') 
+		{
+			listener.apply(this, [this, magoManager]);
+		}
+	}
+};
 MagoRenderable.prototype.getRootOwner = function() 
 {
 	if (this.owner === undefined)
@@ -127,6 +185,8 @@ MagoRenderable.prototype.renderAsChild = function(magoManager, shader, renderTyp
 	}
 
 	gl.disable(gl.BLEND);
+
+	this.dispatchEvent('RENDER_END', magoManager);
 };
 MagoRenderable.prototype.makeMesh = function() 
 {
