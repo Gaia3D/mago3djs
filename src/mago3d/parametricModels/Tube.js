@@ -45,6 +45,12 @@ var Tube = function(interiorRadius, exteriorRadius, height, options)
 			this.color4 = new Color();
 			this.color4.setRGBA(color.r, color.g, color.b, color.a);
 		}
+		var selectedColor = options.selectedColor;
+		if (selectedColor)
+		{
+			this.selectedColor4 = new Color();
+			this.selectedColor4.setRGBA(selectedColor.r, selectedColor.g, selectedColor.b, selectedColor.a);
+		}
 	}
 };
 Tube.prototype = Object.create(MagoRenderable.prototype);
