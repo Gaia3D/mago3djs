@@ -377,8 +377,8 @@ Modeler.prototype.getGeographicCoordsList = function()
  */
 Modeler.prototype.getExcavation = function() 
 {
-	if (this.excavation === undefined)
-	{ this.excavation = new Excavation(); }
+	//if (this.excavation === undefined)
+	//{ this.excavation = new Excavation(); }
 	
 	return this.excavation;
 };
@@ -388,8 +388,8 @@ Modeler.prototype.getExcavation = function()
  */
 Modeler.prototype.getTunnel = function() 
 {
-	if (this.tunnel === undefined)
-	{ this.tunnel = new Tunnel(); }
+	//if (this.tunnel === undefined)
+	//{ this.tunnel = new Tunnel(); }
 	
 	return this.tunnel;
 };
@@ -434,9 +434,10 @@ Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive
 	if (this.geoCoordsList !== undefined && renderType === 1)
 	{
 		// Provisionally render geographicPoints.
-		
 		if (this.geoCoordsList.points3dList !== undefined && this.geoCoordsList.points3dList.vboKeysContainer !== undefined)
 		{
+			//magoManager.clearCanvas2D();
+			
 			var bEnableDepth = true;
 			var options = {};
 			var thickLineShader = magoManager.postFxShadersManager.getShader("thickLine"); 
@@ -454,10 +455,7 @@ Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive
 			
 			shader.useProgram();
 		}
-		else 
-		{
-			this.geoCoordsList.renderPoints(magoManager, shader, renderType);
-		}
+		this.geoCoordsList.renderPoints(magoManager, shader, renderType);
 	}
 	
 	if (this.excavation !== undefined)

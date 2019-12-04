@@ -1294,6 +1294,16 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 	}
 };
 
+/**
+ * Prepare current visibles low LOD nodes.***
+ */
+MagoManager.prototype.clearCanvas2D = function() 
+{
+	var canvas = this.getObjectLabel();
+	var ctx = canvas.getContext("2d");
+	ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); 
+};
+
 
 /**
  * Prepare current visibles low LOD nodes.***
@@ -1344,7 +1354,7 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 	var ctx = canvas.getContext("2d");
 	
 	if (this.isFarestFrustum())
-	{ ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); }
+	{ this.clearCanvas2D(); }
 
 	// lod2.
 	var gl = this.getGl();

@@ -2809,7 +2809,6 @@ void main(){\n\
 	normal *= thickness/2.0;\n\
 	normal.x /= aspect;\n\
 	float direction = (thickness*sense*projectedDepth)/1000.0;\n\
-	//float direction = thickness*sense*vCurrent.z*0.0000005;\n\
 	// Offset our position along the normal\n\
 	vec4 offset = vec4(normal * direction, 0.0, 1.0);\n\
 	gl_Position = currentProjected + offset; \n\

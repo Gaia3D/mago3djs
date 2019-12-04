@@ -162,6 +162,34 @@ Point2D.prototype.distToPoint = function(point)
 };
 
 /**
+ * returns a perpendicular vector to left
+ * @param {Point2D} resultPoint
+ * @returns {Point2D} resultPoint
+ */
+Point2D.prototype.getLeft = function(resultPoint) 
+{
+	if (resultPoint === undefined)
+	{ resultPoint = new Point2D(); }
+	
+	resultPoint.set(-this.y, this.x);
+	return resultPoint;
+};
+
+/**
+ * returns a perpendicular vector to right
+ * @param {Point2D} resultPoint
+ * @returns {Point2D} resultPoint
+ */
+Point2D.prototype.getRight = function(resultPoint) 
+{
+	if (resultPoint === undefined)
+	{ resultPoint = new Point2D(); }
+	
+	resultPoint.set(this.y, -this.x);
+	return resultPoint;
+};
+
+/**
  * Check whether this point and the other point are overlapped(coincident) or not 
  * @param {Point2D} point the point which will be checked whether the two points are coincident or not
  * @param {Number} errorDist allowed error range value of calculating distance. It can be from 0.1mm to 10E-8

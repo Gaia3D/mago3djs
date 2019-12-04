@@ -44,7 +44,6 @@ var Vertex = function(position)
 	 * @type {HalfEdge}
 	 */
 	this.outingHedge; // class: HalfEdge
-	//this.outingHalfEdgesArray; // Array [class: HalfEdge]. 
 
 	/**
 	 * vertex type. 1 is important vertex.

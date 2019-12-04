@@ -565,7 +565,7 @@ Point3DList.prototype.renderThickLines = function(magoManager, shader, renderTyp
 	var drawingBufferWidth = sceneState.drawingBufferWidth;
 	var drawingBufferHeight = sceneState.drawingBufferHeight;
 	
-	this.thickness = 3.0;
+	this.thickness = 2.0;
 	
 	gl.uniform4fv(shader.color_loc, [0.5, 0.7, 0.9, 1.0]);
 	gl.uniform2fv(shader.viewport_loc, [drawingBufferWidth[0], drawingBufferHeight[0]]);
