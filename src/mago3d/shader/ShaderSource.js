@@ -2702,9 +2702,16 @@ attribute vec4 current;\n\
 attribute vec4 next;\n\
 attribute float order;\n\
 uniform float thickness;\n\
+uniform mat4 buildingRotMatrix;\n\
 uniform mat4 projectionMatrix;\n\
 uniform mat4 modelViewMatrix;\n\
+uniform mat4 modelViewMatrixRelToEye; \n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
 uniform vec2 viewport;\n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
 \n\
 const float C = 0.1;\n\
 const float far = 149.6e+9;\n\
@@ -2728,21 +2735,28 @@ bool isEqual(float value, float valueToCompare)\n\
 	return false;\n\
 }\n\
 \n\
+vec4 getPointRelToEye(in vec4 point)\n\
+{\n\
+	vec4 rotatedCurrent = buildingRotMatrix * vec4(point.xyz, 1.0);\n\
+	vec3 objPosHigh = buildingPosHIGH;\n\
+	vec3 objPosLow = buildingPosLOW.xyz + rotatedCurrent.xyz;\n\
+	vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+	vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+	return vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+}\n\
+\n\
 void main(){\n\
-	\n\
-	vec4 vCurrent = modelViewMatrix * vec4(current.xyz, 1.0);\n\
-	//vec4 vPrev = modelViewMatrix * vec4(prev.xyz, 1.0);\n\
-	//vec4 vNext = modelViewMatrix * vec4(next.xyz, 1.0);\n\
+	// current, prev & next.***\n\
+	vec4 vCurrent = getPointRelToEye(vec4(current.xyz, 1.0));\n\
+	vec4 vPrev = getPointRelToEye(vec4(prev.xyz, 1.0));\n\
+	vec4 vNext = getPointRelToEye(vec4(next.xyz, 1.0));\n\
 	\n\
 	float order_w = current.w;\n\
-	\n\
-	//vec3 dir = normalize(vec3(vNext.xyz - vCurrent.xyz));\n\
-	//vec3 offSetDir = vec3();\n\
 	float sense = 1.0;\n\
 	int orderInt = 0;\n\
 	if(order_w > 0.0)\n\
 	{\n\
-		sense = 1.0;\n\
+		sense = -1.0;\n\
 		if(isEqual(order_w, 1.0))\n\
 		{\n\
 			// order is 1.***\n\
@@ -2755,7 +2769,7 @@ void main(){\n\
 	}\n\
 	else\n\
 	{\n\
-		sense = -1.0;\n\
+		sense = 1.0;\n\
 		if(isEqual(order_w, -1.0))\n\
 		{\n\
 			// order is -1.***\n\
@@ -2769,15 +2783,12 @@ void main(){\n\
 	\n\
 	float aspect = viewport.x / viewport.y;\n\
 	vec2 aspectVec = vec2(aspect, 1.0);\n\
-	mat4 projViewModel = projectionMatrix * modelViewMatrix;\n\
 	\n\
-	// Project all of our points to model space\n\
-	vec4 previousProjected = projViewModel * vec4(prev.xyz, 1.0);\n\
-	vec4 currentProjected = projViewModel * vec4(current.xyz, 1.0);\n\
-	vec4 nextProjected = projViewModel * vec4(next.xyz, 1.0);\n\
+	vec4 previousProjected = ModelViewProjectionMatrixRelToEye * vPrev;\n\
+	vec4 currentProjected = ModelViewProjectionMatrixRelToEye * vCurrent;\n\
+	vec4 nextProjected = ModelViewProjectionMatrixRelToEye * vNext;\n\
 	\n\
-	// Pass the projected depth to the fragment shader\n\
-	//projectedDepth = currentProjected.w;                \n\
+	float projectedDepth = currentProjected.w;                \n\
 	// Get 2D screen space with W divide and aspect correction\n\
 	vec2 currentScreen = currentProjected.xy / currentProjected.w * aspectVec;\n\
 	vec2 previousScreen = previousProjected.xy / previousProjected.w * aspectVec;\n\
@@ -2787,20 +2798,18 @@ void main(){\n\
 	// This helps us handle 90 degree turns correctly\n\
 	vec2 tangentNext = normalize(nextScreen - currentScreen);\n\
 	vec2 tangentPrev = normalize(currentScreen - previousScreen);\n\
-	vec2 averageTangent = normalize(tangentNext + tangentPrev);\n\
-	vec2 normal = vec2(-averageTangent.y, averageTangent.x);\n\
+	vec2 normal; \n\
 	if(orderInt == 1 || orderInt == -1)\n\
 	{\n\
-		normal = tangentNext;\n\
+		normal = vec2(-tangentPrev.y, tangentPrev.x);\n\
 	}\n\
 	else{\n\
-		normal = tangentPrev;\n\
+		normal = vec2(-tangentNext.y, tangentNext.x);\n\
 	}\n\
 	normal *= thickness/2.0;\n\
 	normal.x /= aspect;\n\
-	//edgeiness = direction;\n\
-	float direction = thickness*sense*vCurrent.z*0.005;\n\
-	//direction *= 100.0;\n\
+	float direction = (thickness*sense*projectedDepth)/1000.0;\n\
+	//float direction = thickness*sense*vCurrent.z*0.0000005;\n\
 	// Offset our position along the normal\n\
 	vec4 offset = vec4(normal * direction, 0.0, 1.0);\n\
 	gl_Position = currentProjected + offset; \n\
