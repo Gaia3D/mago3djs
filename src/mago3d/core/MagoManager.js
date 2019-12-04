@@ -1784,8 +1784,8 @@ MagoManager.prototype.keyDown = function(key)
 		
 		if (this.counterAux === -1)
 		{
-			//this.modeler.mode = CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS;
-			this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
+			this.modeler.mode = CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS;
+			//this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
 			this.counterAux++;
 		}
 		else if (this.counterAux === 0)
@@ -2440,69 +2440,17 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			var doorWidth = factoryWidth * 0.8;
 			var roofMinHeight = factoryHeight*0.75;
 			
-			// Front wall.
-			var frontWallOptions = {
-				"hasOpening"    : true,
-				"openingWidth"  : factoryWidth * 0.8,
-				"openingHeight" : factoryHeight*0.65
-			};
-			
-			// Rear wall.
-			var rearWallOptions = {
-				"hasOpening"    : true,
-				"openingWidth"  : factoryWidth * 0.8,
-				"openingHeight" : factoryHeight*0.65
-			};
-			
-			
-	
-			// Right wall.
-			var rightWallOptions = {};
-			rightWallOptions.openingsDataArray = [];
-			
-			// opening 1.
-			var openingData = {
-				"offSet" : 2,
-				"height" : roofMinHeight*0.8,
-				"width"  : 18
-			};
-			rightWallOptions.openingsDataArray.push(openingData);
-			
-			// opening 2.
-			var openingData = {
-				"offSet" : 2,
-				"height" : roofMinHeight*0.8,
-				"width"  : 28
-			};
-			rightWallOptions.openingsDataArray.push(openingData);
-			
-			// Left wall.
-			var leftWallOptions = {};
-			leftWallOptions.openingsDataArray = [];
-			
-			// opening 1.
-			var openingData = {
-				"offSet" : 2,
-				"height" : roofMinHeight*0.8,
-				"width"  : 18
-			};
-			leftWallOptions.openingsDataArray.push(openingData);
-			
-			// opening 2.
-			var openingData = {
-				"offSet" : 2,
-				"height" : roofMinHeight*0.8,
-				"width"  : 28
-			};
-			leftWallOptions.openingsDataArray.push(openingData);
-			
+			var height = roofMinHeight;
+			var wallOptions = [];
+			wallOptions.push({
+				type        : 'front', // front, rear, left, right
+				openingInfo : {width: doorWidth, height: height * 0.6}  // front, rear, left, right
+			});
+
 			var options = {
-				"hasGround"        : true,
-				"roofMinHeight"    : factoryHeight*0.75,
-				"frontWallOptions" : frontWallOptions,
-				"rearWallOptions"  : rearWallOptions,
-				"rightWallOptions" : rightWallOptions,
-				"leftWallOptions"  : leftWallOptions
+				"hasGround"     : true,
+				"roofMinHeight" : factoryHeight*0.75,
+				"wallOptions"   : wallOptions
 			};
 	
 			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
@@ -2723,6 +2671,21 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			
 			var options = {color: {r: 0.2, g: 0.5, b: 0.9, a: 0.5}};
 			
+			// Create 4(or more) points of contour.
+			var semiWidth = 10.0;
+			var semiLength = 30.0;
+			var points2dArray = [];
+			var point2d = new Point2D(-semiWidth, -semiLength);
+			points2dArray.push(point2d);
+			point2d = new Point2D(semiWidth, -semiLength);
+			points2dArray.push(point2d);
+			point2d = new Point2D(semiWidth, semiLength);
+			points2dArray.push(point2d);
+			point2d = new Point2D(-semiWidth, semiLength);
+			points2dArray.push(point2d);
+			
+			options.points2dArray = points2dArray;
+			options.height = 10;
 			var freeContourWall = new TestFreeContourWallBuilding(options);
 			freeContourWall.setOneColor(0.2, 0.5, 0.7, 1.0);
 			freeContourWall.geoLocDataManager = geoLocDataManager;
