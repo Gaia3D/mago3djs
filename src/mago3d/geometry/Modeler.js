@@ -431,7 +431,7 @@ Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive
 		this.planeGrid.render(magoManager, shader);
 	}
 	
-	if (this.geoCoordsList !== undefined)
+	if (this.geoCoordsList !== undefined && renderType === 1)
 	{
 		// Provisionally render geographicPoints.
 		
@@ -439,7 +439,16 @@ Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive
 		{
 			var bEnableDepth = true;
 			var options = {};
-			this.geoCoordsList.points3dList.renderThickLines(magoManager, shader, renderType, bEnableDepth, options);
+			var thickLineShader = magoManager.postFxShadersManager.getShader("thickLine"); 
+			thickLineShader.useProgram();
+			var gl = this.magoManager.getGl();
+			var sceneState = this.magoManager.sceneState;
+			gl.uniform4fv(thickLineShader.color_loc, [0.9, 0.5, 0.3, 1.0]);
+			gl.uniform2fv(thickLineShader.viewport_loc, [sceneState.drawingBufferWidth, sceneState.drawingBufferHeight]);
+			gl.uniform1f(thickLineShader.thickness_loc, 5.0);
+			this.geoCoordsList.points3dList.renderThickLines(magoManager, thickLineShader, renderType, bEnableDepth, options);
+			
+			shader.useProgram();
 		}
 		else 
 		{

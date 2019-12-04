@@ -16,19 +16,21 @@ var TestFreeContourWallBuilding = function(options)
 	{
 		if (options.points2dArray !== undefined)
 		{
-			if (this.point2dArray === undefined)
+			if (this.point2DList === undefined)
 			{
-				this.point2dArray = [];
+				this.point2DList = new Point2DList();
 			}
 			
-			var pointsCount = options.points2dArray.length;
-			for (var i=0; i<pointsCount; i++)
-			{
-				//
-			}
+			this.point2DList.pointsArray = options.points2dArray;
+		}
+		
+		if (options.height !== undefined)
+		{
+			this.height = options.height;
 		}
 	}
 	
+	this.height;
 	this.point2DList;
 };
 
@@ -74,12 +76,14 @@ TestFreeContourWallBuilding.prototype.makeMesh = function()
 		var point2d = this.point2DList.getPoint(i);
 		polyline.newPoint2d(point2d.x, point2d.y);
 	}
+	//var leftExpandDist = 0.2;
+	//var innerPointsArray = Point2DList.getExpandedPoints(this.point2DList.pointsArray, undefined, leftExpandDist, rightExpandDist, bLoop);
 	
-
-
-	//var rect = outerRing.newElement("RECTANGLE");
-	//rect.setCenterPosition(this.centerPoint.x, this.centerPoint.y);
-	//rect.setDimensions(this.width, this.length);
+	// Now create interior ring.***
+	var innerRing = profileAux.newInnerRing();
+	var circle = innerRing.newElement("CIRCLE");
+	circle.setCenterPosition(0, 0);
+	circle.setRadius(2);
 	
 	// Extrude the Profile.
 	var extrudeSegmentsCount = 1;
@@ -94,7 +98,6 @@ TestFreeContourWallBuilding.prototype.makeMesh = function()
 	var mesh = Modeler.getExtrudedMesh(profileAux, extrusionDist, extrudeSegmentsCount, extrusionVector, bIncludeBottomCap, bIncludeTopCap, undefined);
 	this.objectsArray.push(mesh);
 	this.dirty = false;
-	return mesh;
 };
 
 
