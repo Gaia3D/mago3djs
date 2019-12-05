@@ -46,6 +46,11 @@ var Excavation = function(options)
 			var geoLocFirst = geoLocDataManagerFirst.getCurrentGeoLocationData();
 			geoLoc.copyFrom(geoLocFirst);
 		}
+
+		if (options.excavationDepthInMeters !== undefined)
+		{
+			this.excavationDepthInMeters = options.excavationDepthInMeters;
+		}
 	}
 };
 
