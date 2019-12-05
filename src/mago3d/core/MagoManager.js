@@ -1934,11 +1934,21 @@ MagoManager.prototype.keyDown = function(key)
 				geoCoordsList.test__makeThickLines(this);
 			}
 			
-			var excavation = this.modeler.getExcavation();
-			if (excavation !== undefined)
+			//var excavation = this.modeler.getExcavation();
+			//if (excavation !== undefined)
+			//{
+			//	excavation.makeExtrudeObject(this);
+			//}
+			if (geoCoordsList !== undefined)
 			{
-				excavation.makeExtrudeObject(this);
+				// test make thickLine.
+				var options = {
+					geoCoordsArray: geoCoordsList.geographicCoordsArray
+				};
+				var excavation = new Excavation(options);
+				this.modeler.addObject(excavation);
 			}
+			
 			
 			var tunnel = this.modeler.getTunnel();
 			if (tunnel !== undefined)

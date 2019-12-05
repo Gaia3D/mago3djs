@@ -72,23 +72,12 @@ PolyLine3D.prototype.getGeographicLocation = function()
  */
 PolyLine3D.prototype.makeVbo = function(magoManager)
 {
-	if (this.vboKeysContainer === undefined)
-	{ this.vboKeysContainer = new VBOVertexIdxCacheKeysContainer(); }
-	
-	var pointsCount = this.point3dArray.length;
-	var posByteSize = pointsCount * 3;
-	var posVboDataArray = new Float32Array(posByteSize);
-	var point3d;
-	for (var i=0; i<pointsCount; i++)
+	if (!this.point3dArray || this.point3dArray.length === 0) 
 	{
-		point3d = this.point3dArray[i];
-		posVboDataArray[i*3] = point3d.x;
-		posVboDataArray[i*3+1] = point3d.y;
-		posVboDataArray[i*3+2] = point3d.z;
+		return;
 	}
 	
-	var vbo = this.vboKeysContainer.newVBOVertexIdxCacheKey();
-	vbo.setDataArrayPos(posVboDataArray, magoManager.vboMemoryManager);
+	this.vboKeysContainer = Point3DList.getVbo(magoManager, this.point3dArray, this.vboKeysContainer);
 };
 
 /**
@@ -166,5 +155,5 @@ PolyLine3D.prototype.renderLines = function(magoManager, shader, renderType, bLo
  */
 PolyLine3D.prototype.renderPoints = function(magoManager)
 {
-	
+	// todo:
 };

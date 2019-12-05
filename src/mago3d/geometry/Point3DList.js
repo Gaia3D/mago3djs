@@ -304,6 +304,35 @@ Point3DList.prototype.getBisectionPlane = function(idx, resultBisectionPlane, bL
 	return resultBisectionPlane;
 };
 
+/**
+ * Make the vbo of this point3DList
+ * @param magoManager
+ */
+Point3DList.getVbo = function(magoManager, point3dArray, resultVboKeysContainer)
+{
+	if (!point3dArray || point3dArray.length === 0) 
+	{
+		return;
+	}
+	if (resultVboKeysContainer === undefined)
+	{ resultVboKeysContainer = new VBOVertexIdxCacheKeysContainer(); }
+	
+	var pointsCount = point3dArray.length;
+	var posByteSize = pointsCount * 3;
+	var posVboDataArray = new Float32Array(posByteSize);
+	var point3d;
+	for (var i=0; i<pointsCount; i++)
+	{
+		point3d = point3dArray[i];
+		posVboDataArray[i*3] = point3d.x;
+		posVboDataArray[i*3+1] = point3d.y;
+		posVboDataArray[i*3+2] = point3d.z;
+	}
+	
+	var vbo = resultVboKeysContainer.newVBOVertexIdxCacheKey();
+	vbo.setDataArrayPos(posVboDataArray, magoManager.vboMemoryManager);
+	return resultVboKeysContainer;
+};
 
 /**
  * Make the vbo of this point3DList
@@ -324,7 +353,7 @@ Point3DList.getVboThickLines = function(magoManager, point3dArray, resultVboKeys
 	var pointDimension = 4;
 	var posByteSize = pointsCount * pointDimension * repeats;
 	var posVboDataArray = new Float32Array(posByteSize);
-	var idxVboDataArray = new Uint16Array(pointsCount * repeats);
+	//var idxVboDataArray = new Uint16Array(pointsCount * repeats);
 	var point3d;
 
 	for (var i=0; i<pointsCount; i++)
@@ -350,16 +379,16 @@ Point3DList.getVboThickLines = function(magoManager, point3dArray, resultVboKeys
 		posVboDataArray[i*16+14] = point3d.z;
 		posVboDataArray[i*16+15] = -2; // order.
 		
-		idxVboDataArray[i*4] = i*4;
-		idxVboDataArray[i*4+1] = i*4+1;
-		idxVboDataArray[i*4+2] = i*4+2;
-		idxVboDataArray[i*4+3] = i*4+3;
+		//idxVboDataArray[i*4] = i*4;
+		//idxVboDataArray[i*4+1] = i*4+1;
+		//idxVboDataArray[i*4+2] = i*4+2;
+		//idxVboDataArray[i*4+3] = i*4+3;
 	}
 	
 	
 	var vbo = resultVboKeysContainer.newVBOVertexIdxCacheKey();
 	vbo.setDataArrayPos(posVboDataArray, magoManager.vboMemoryManager, pointDimension);
-	vbo.setDataArrayIdx(idxVboDataArray, magoManager.vboMemoryManager);
+	//vbo.setDataArrayIdx(idxVboDataArray, magoManager.vboMemoryManager);
 
 	return resultVboKeysContainer;
 };
@@ -374,23 +403,8 @@ Point3DList.prototype.makeVbo = function(magoManager)
 	{
 		return;
 	}
-	if (this.vboKeysContainer === undefined)
-	{ this.vboKeysContainer = new VBOVertexIdxCacheKeysContainer(); }
 	
-	var pointsCount = this.pointsArray.length;
-	var posByteSize = pointsCount * 3;
-	var posVboDataArray = new Float32Array(posByteSize);
-	var point3d;
-	for (var i=0; i<pointsCount; i++)
-	{
-		point3d = this.pointsArray[i];
-		posVboDataArray[i*3] = point3d.x;
-		posVboDataArray[i*3+1] = point3d.y;
-		posVboDataArray[i*3+2] = point3d.z;
-	}
-	
-	var vbo = this.vboKeysContainer.newVBOVertexIdxCacheKey();
-	vbo.setDataArrayPos(posVboDataArray, magoManager.vboMemoryManager);
+	this.vboKeysContainer = Point3DList.getVbo(magoManager, this.pointsArray, this.vboKeysContainer);
 };
 
 /**
@@ -565,7 +579,7 @@ Point3DList.prototype.renderThickLines = function(magoManager, shader, renderTyp
 	var drawingBufferWidth = sceneState.drawingBufferWidth;
 	var drawingBufferHeight = sceneState.drawingBufferHeight;
 	
-	this.thickness = 2.0;
+	this.thickness = 3.0;
 	
 	gl.uniform4fv(shader.color_loc, [0.5, 0.7, 0.9, 1.0]);
 	gl.uniform2fv(shader.viewport_loc, [drawingBufferWidth[0], drawingBufferHeight[0]]);

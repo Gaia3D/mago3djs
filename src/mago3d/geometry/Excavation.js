@@ -6,7 +6,7 @@
  * This class draws an excavation on the grown.
  * @class Excavation
  */
-var Excavation = function() 
+var Excavation = function(options) 
 {
 	if (!(this instanceof Excavation)) 
 	{
@@ -27,7 +27,26 @@ var Excavation = function()
 	this.vboKeysContainer;
 	this.vboKeysContainerEdges;
 	
-	// https://sandcastle.cesium.com/gallery/Terrain%20Clipping%20Planes.html sandcastle sample clip terrain.
+	this.dirty = true;
+	
+	if (options !== undefined)
+	{
+		if (options.geoCoordsArray !== undefined)
+		{
+			this.geoCoordsList = new GeographicCoordsList(options.geoCoordsArray);
+			this.geoCoordsList.owner = this;
+			
+			// 1rst, set position of this extrude object. Take as position the 1rst geoCoord absolute position.
+			// Another possibility is calculate the average point of geoCoords.
+			var geoLoc = this.getGeoLocationData();
+
+			// Take the 1rst geographicCoord's geoLocation.
+			var geoCoord = this.geoCoordsList.getGeoCoord(0);
+			var geoLocDataManagerFirst = geoCoord.getGeoLocationDataManager();
+			var geoLocFirst = geoLocDataManagerFirst.getCurrentGeoLocationData();
+			geoLoc.copyFrom(geoLocFirst);
+		}
+	}
 };
 
 /**
@@ -35,12 +54,6 @@ var Excavation = function()
  */
 Excavation.prototype.getGeographicCoordsList = function() 
 {
-	if (this.geoCoordsList === undefined)
-	{
-		this.geoCoordsList = new GeographicCoordsList();
-		this.geoCoordsList.owner = this;
-	}
-	
 	return this.geoCoordsList;
 };
 
@@ -52,11 +65,6 @@ Excavation.prototype.renderPoints = function(magoManager, shader, renderType)
 	if (this.geoCoordsList === undefined)
 	{ return false; }
 	
-	if (this.meshPositive !== undefined)
-	{
-		this.renderExcavation(magoManager, shader, renderType);
-	}
-	
 	this.geoCoordsList.renderPoints(magoManager, shader, renderType, false);
 	//this.geoCoordsList.renderLines(magoManager, shader, renderType, false, false);
 };
@@ -64,8 +72,14 @@ Excavation.prototype.renderPoints = function(magoManager, shader, renderType)
 /**
  * 어떤 일을 하고 있습니까?
  */
-Excavation.prototype.renderExcavation = function(magoManager, shader, renderType) 
+Excavation.prototype.render = function(magoManager, shader, renderType, glPrimitive, bIsSelected) 
 {
+	if (this.dirty)
+	{
+		this.makeMesh(magoManager);
+		return;
+	}
+	
 	if (this.meshPositive === undefined)
 	{ return; }
 
@@ -177,7 +191,7 @@ Excavation.prototype.getGeoLocationData = function()
 /**
  * 어떤 일을 하고 있습니까?
  */
-Excavation.prototype.makeExtrudeObject = function(magoManager) 
+Excavation.prototype.makeMesh = function(magoManager) 
 {
 	if (this.geoCoordsList === undefined)
 	{ return false; }
@@ -269,12 +283,14 @@ Excavation.prototype.makeExtrudeObject = function(magoManager)
 		this.meshNegative.getVboEdges(this.vboKeysContainerEdges, magoManager.vboMemoryManager);
 		
 	}
+	
+	this.dirty = false;
 };
 
 /**
  * 어떤 일을 하고 있습니까?
  */
-Excavation.prototype.remakeExtrudeObject = function(magoManager) 
+Excavation.prototype.remakeMesh = function(magoManager) 
 {
 	if (this.vtxProfilesList === undefined)
 	{ return false; }
@@ -373,6 +389,7 @@ Excavation.prototype.remakeExtrudeObject = function(magoManager)
 		
 	}
 	
+	this.dirty = false;
 };
 
 

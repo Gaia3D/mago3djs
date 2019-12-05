@@ -14,14 +14,9 @@ uniform vec3 buildingPosLOW;
 uniform vec3 encodedCameraPositionMCHigh;
 uniform vec3 encodedCameraPositionMCLow;
 
-const float C = 0.1;
-const float far = 149.6e+9;
-float logc = 2.0 / log( C * far + 1.0 );
-
-const float NEAR = -1.0;
 const float error = 0.001;
 
-// based on https://weekly-geekly.github.io/articles/331164/index.html
+// see https://weekly-geekly.github.io/articles/331164/index.html
 // see too https://github.com/ridiculousfish/wavefiz/blob/master/ts/polyline.ts#L306
 
 vec2 project(vec4 p){
@@ -58,26 +53,22 @@ void main(){
 	if(order_w > 0.0)
 	{
 		sense = -1.0;
-		if(isEqual(order_w, 1.0))
+		if(order_w < 1.5)
 		{
-			// order is 1.***
 			orderInt = 1;
 		}
 		else{
-			// order is 2.***
 			orderInt = 2;
 		}
 	}
 	else
 	{
 		sense = 1.0;
-		if(isEqual(order_w, -1.0))
+		if(order_w > -1.5)
 		{
-			// order is -1.***
 			orderInt = -1;
 		}
 		else{
-			// order is -2.***
 			orderInt = -2;
 		}
 	}

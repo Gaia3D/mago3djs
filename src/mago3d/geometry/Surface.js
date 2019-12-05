@@ -119,7 +119,6 @@ Surface.prototype.addFacesArray = function(faces)
 	}
 };
 
-
 /**
  * 전체 Face 에 대한 Frontier Half Edge 를 구한다.
  *

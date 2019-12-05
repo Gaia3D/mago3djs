@@ -211,10 +211,6 @@ Modeler.prototype.newBasicFactory = function(factoryWidth, factoryLength, factor
 	
 	this.objectsArray.push(basicFactory);
 	
-	
-
-	
-	
 	return basicFactory;
 };
 
