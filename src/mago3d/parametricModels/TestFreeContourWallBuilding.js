@@ -80,10 +80,10 @@ TestFreeContourWallBuilding.prototype.makeMesh = function()
 	//var innerPointsArray = Point2DList.getExpandedPoints(this.point2DList.pointsArray, undefined, leftExpandDist, rightExpandDist, bLoop);
 	
 	// Now create interior ring.***
-	var innerRing = profileAux.newInnerRing();
-	var circle = innerRing.newElement("CIRCLE");
-	circle.setCenterPosition(0, 0);
-	circle.setRadius(2);
+	//var innerRing = profileAux.newInnerRing();
+	//var circle = innerRing.newElement("CIRCLE");
+	//circle.setCenterPosition(0, 0);
+	//circle.setRadius(2);
 	
 	// Extrude the Profile.
 	var extrudeSegmentsCount = 1;

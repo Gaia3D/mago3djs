@@ -30,6 +30,17 @@ Line2D.prototype.setPointAndDir = function(px, py, dx, dy)
 	this.direction.unitary();
 };
 
+/**
+ * @param point2d 
+ */
+Line2D.prototype.distToPoint = function(point2d) 
+{
+	var projectedPoint = this.getProjectedPoint(point2d);
+	var dist = point2d.distToPoint(projectedPoint);
+
+	return dist;
+};
+
 /** 
  * Get the perpendicular direction of the line in right-handed coordinate system
  * @param {Point2D} point target point

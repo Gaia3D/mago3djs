@@ -784,8 +784,12 @@ Node.prototype.getDistToCamera = function(cameraPosition, boundingSphere_Aux)
 		{ data.mapping_type = "origin"; }
 		
 		var bboxCenterPoint = new Point3D(0, 0, 0);
-		if (this.data.bbox !== undefined && data.mapping_type.toLowerCase() === "origin")
+		if (data.mapping_type.toLowerCase() === "origin")
 		{
+			if (!this.data.bbox) 
+			{
+				this.getBBox();
+			}
 			// this.data.bbox is the most important bbox.
 			bboxCenterPoint = this.data.bbox.getCenterPoint(bboxCenterPoint); // local bbox.
 		}
