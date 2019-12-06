@@ -1950,7 +1950,7 @@ MagoManager.prototype.keyDown = function(key)
 					geoCoordsArray: geoCoordsList.geographicCoordsArray
 				};
 				var excavation = new Excavation(options);
-				this.modeler.addObject(excavation);
+				this.modeler.addObject(excavation, 12);
 			}
 			
 			

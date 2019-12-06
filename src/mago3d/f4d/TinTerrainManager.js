@@ -18,8 +18,9 @@ var TinTerrainManager = function()
 	this.noVisibleTilesArray = [];
 	
 	// TinTerrainQuadTrees.
-	this.tinTerrainsQuadTreeAsia; // Main object.
-	this.tinTerrainsQuadTreeAmerica; // Main object.
+	this.tinTerrainsQuadTreeAsia; // Use if this imageryType = CODE.imageryType.CRS84.
+	this.tinTerrainsQuadTreeAmerica; // Use if this imageryType = CODE.imageryType.CRS84.
+	this.tinTerrainQuadTreeMercator; // Use if this imageryType = CODE.imageryType.WEB_MERCATOR.
 	
 	this.geoServURL = "http://192.168.10.57:9090/geoserver/gwc/service/wmts";
 	
@@ -39,82 +40,108 @@ var TinTerrainManager = function()
 
 TinTerrainManager.prototype.init = function()
 {
-	this.tinTerrainsQuadTreeAsia = new TinTerrain(undefined); // Main object.
-	this.tinTerrainsQuadTreeAmerica = new TinTerrain(undefined); // Main object.
-	//1.4844222297453322
-	//var latDeg = 1.4844222297453322 *180/Math.PI;
-	//https://en.wikipedia.org/wiki/Web_Mercator_projection
-	//https://en.wikipedia.org/wiki/Mercator_projection
-	var webMercatorMaxLatRad = 2*Math.atan(Math.pow(Math.E, Math.PI)) - (Math.PI/2);
-	var webMercatorMaxLatDeg = webMercatorMaxLatRad * 180/Math.PI; // = 85.0511287798...
+	if (this.imageryType === CODE.imageryType.WEB_MERCATOR)
+	{
+		this.tinTerrainQuadTreeMercator = new TinTerrain(undefined); // Main object.
+		//1.4844222297453322
+		//var latDeg = 1.4844222297453322 *180/Math.PI;
+		//https://en.wikipedia.org/wiki/Web_Mercator_projection
+		//https://en.wikipedia.org/wiki/Mercator_projection
+		var webMercatorMaxLatRad = 2*Math.atan(Math.pow(Math.E, Math.PI)) - (Math.PI/2);
+		var webMercatorMaxLatDeg = webMercatorMaxLatRad * 180/Math.PI; // = 85.0511287798...
+		
+		// All earth.
+		var minLon = -180;
+		var minLat = -90;
+		var minAlt = 0;
+		var maxLon = 180;
+		var maxLat = 90;
+		var maxAlt = 0;
 
-	
-	// Asia side.
-	var minLon = 0;
-	var minLat = -90;
-	var minAlt = 0;
-	var maxLon = 180;
-	var maxLat = 90;
-	var maxAlt = 0;
-	if (this.imageryType === CODE.imageryType.WEB_MERCATOR)
-	{
 		minLat = -webMercatorMaxLatDeg; 
 		maxLat = webMercatorMaxLatDeg; 
+		
+		this.tinTerrainQuadTreeMercator.setGeographicExtent(minLon, minLat, minAlt, maxLon, maxLat, maxAlt);
+		this.tinTerrainQuadTreeMercator.setWebMercatorExtent(-1, -Math.PI, 1, Math.PI); // unitary extension.***
+		this.tinTerrainQuadTreeMercator.X = 0;
+		this.tinTerrainQuadTreeMercator.Y = 0;
+		this.tinTerrainQuadTreeMercator.indexName = "RU";
+		this.tinTerrainQuadTreeMercator.tinTerrainManager = this;
+		
+		// do imagery test.
+		// set imagery initial geoExtent (in mercator coords).
+		
+		// Full extent. https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer
+		var initImageryMercatorMinX = -2.003750722959434E7;
+		var initImageryMercatorMinY = -1.997186888040859E7;
+		var initImageryMercatorMaxX = 2.003750722959434E7;
+		var initImageryMercatorMaxY = 1.9971868880408563E7;
+
+		
+		this.tinTerrainQuadTreeMercator.imageryGeoExtent = new GeographicExtent();
+		this.tinTerrainQuadTreeMercator.imageryGeoExtent.setExtent(initImageryMercatorMinX, initImageryMercatorMinY, 0.0, initImageryMercatorMaxX, initImageryMercatorMaxY, 0.0);
+		
 	}
-	
-	this.tinTerrainsQuadTreeAsia.setGeographicExtent(minLon, minLat, minAlt, maxLon, maxLat, maxAlt);
-	this.tinTerrainsQuadTreeAsia.setWebMercatorExtent(0, -Math.PI, 1, Math.PI); // unitary extension.***
-	this.tinTerrainsQuadTreeAsia.X = 1;
-	this.tinTerrainsQuadTreeAsia.Y = 0;
-	this.tinTerrainsQuadTreeAsia.indexName = "RU";
-	this.tinTerrainsQuadTreeAsia.tinTerrainManager = this;
-	
-	// America side.
-	minLon = -180;
-	minLat = -90;
-	minAlt = 0;
-	maxLon = 0;
-	maxLat = 90;
-	maxAlt = 0;
-	if (this.imageryType === CODE.imageryType.WEB_MERCATOR)
+	else
 	{
-		minLat = -webMercatorMaxLatDeg; 
-		maxLat = webMercatorMaxLatDeg; 
+		// CRS84.
+		this.tinTerrainsQuadTreeAsia = new TinTerrain(undefined); // Main object.
+		this.tinTerrainsQuadTreeAmerica = new TinTerrain(undefined); // Main object.
+		
+		// Asia side.
+		var minLon = 0;
+		var minLat = -90;
+		var minAlt = 0;
+		var maxLon = 180;
+		var maxLat = 90;
+		var maxAlt = 0;
+		if (this.imageryType === CODE.imageryType.WEB_MERCATOR)
+		{
+			minLat = -webMercatorMaxLatDeg; 
+			maxLat = webMercatorMaxLatDeg; 
+		}
+		
+		this.tinTerrainsQuadTreeAsia.setGeographicExtent(minLon, minLat, minAlt, maxLon, maxLat, maxAlt);
+		this.tinTerrainsQuadTreeAsia.setWebMercatorExtent(0, -Math.PI, 1, Math.PI); // unitary extension.***
+		this.tinTerrainsQuadTreeAsia.X = 1;
+		this.tinTerrainsQuadTreeAsia.Y = 0;
+		this.tinTerrainsQuadTreeAsia.indexName = "RU";
+		this.tinTerrainsQuadTreeAsia.tinTerrainManager = this;
+		
+		// America side.
+		minLon = -180;
+		minLat = -90;
+		minAlt = 0;
+		maxLon = 0;
+		maxLat = 90;
+		maxAlt = 0;
+		if (this.imageryType === CODE.imageryType.WEB_MERCATOR)
+		{
+			minLat = -webMercatorMaxLatDeg; 
+			maxLat = webMercatorMaxLatDeg; 
+		}
+		this.tinTerrainsQuadTreeAmerica.setGeographicExtent(minLon, minLat, minAlt, maxLon, maxLat, maxAlt);
+		this.tinTerrainsQuadTreeAmerica.setWebMercatorExtent(-1, -Math.PI, 0, Math.PI); // unitary extension.***
+		this.tinTerrainsQuadTreeAmerica.X = 0;
+		this.tinTerrainsQuadTreeAmerica.Y = 0;
+		this.tinTerrainsQuadTreeAmerica.indexName = "LU";
+		this.tinTerrainsQuadTreeAmerica.tinTerrainManager = this;
+		
+		// do imagery test.
+		// set imagery initial geoExtent (in mercator coords).
+		
+		// Full extent. https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer
+		var initImageryMercatorMinX = -2.003750722959434E7; // for Mercator.
+		var initImageryMercatorMinY = -1.997186888040859E7; // for Mercator.
+		var initImageryMercatorMaxX = 2.003750722959434E7; // for Mercator.
+		var initImageryMercatorMaxY = 1.9971868880408563E7; // for Mercator.
+		
+		this.tinTerrainsQuadTreeAsia.imageryGeoExtent = new GeographicExtent();
+		this.tinTerrainsQuadTreeAsia.imageryGeoExtent.setExtent(initImageryMercatorMinX, initImageryMercatorMinY, 0.0, initImageryMercatorMaxX, initImageryMercatorMaxY, 0.0);
+		
+		this.tinTerrainsQuadTreeAmerica.imageryGeoExtent = new GeographicExtent();
+		this.tinTerrainsQuadTreeAmerica.imageryGeoExtent.setExtent(initImageryMercatorMinX, initImageryMercatorMinY, 0.0, initImageryMercatorMaxX, initImageryMercatorMaxY, 0.0);
 	}
-	this.tinTerrainsQuadTreeAmerica.setGeographicExtent(minLon, minLat, minAlt, maxLon, maxLat, maxAlt);
-	this.tinTerrainsQuadTreeAmerica.setWebMercatorExtent(-1, -Math.PI, 0, Math.PI); // unitary extension.***
-	this.tinTerrainsQuadTreeAmerica.X = 0;
-	this.tinTerrainsQuadTreeAmerica.Y = 0;
-	this.tinTerrainsQuadTreeAmerica.indexName = "LU";
-	this.tinTerrainsQuadTreeAmerica.tinTerrainManager = this;
-	
-	// do imagery test.
-	// set imagery initial geoExtent (in mercator coords).
-	
-	// Full extent. https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer
-	var initImageryMercatorMinX = -2.003750722959434E7;
-	var initImageryMercatorMinY = -1.997186888040859E7;
-	var initImageryMercatorMaxX = 2.003750722959434E7;
-	var initImageryMercatorMaxY = 1.9971868880408563E7;
-	/*
-	//north: 1.4844222297453322
-	var eqRadius = Globe.equatorialRadius();
-	var north = eqRadius*1.48352986419518;
-	var north2 = eqRadius*Math.PI/2;
-	
-	// my extent.
-	
-	var initImageryMercatorMinX = -2.003750722959434E7;
-	var initImageryMercatorMinY = -north2;
-	var initImageryMercatorMaxX = 2.003750722959434E7;
-	var initImageryMercatorMaxY = north2;
-	*/
-	
-	this.tinTerrainsQuadTreeAsia.imageryGeoExtent = new GeographicExtent();
-	this.tinTerrainsQuadTreeAsia.imageryGeoExtent.setExtent(initImageryMercatorMinX, initImageryMercatorMinY, 0.0, initImageryMercatorMaxX, initImageryMercatorMaxY, 0.0);
-	
-	this.tinTerrainsQuadTreeAmerica.imageryGeoExtent = new GeographicExtent();
-	this.tinTerrainsQuadTreeAmerica.imageryGeoExtent.setExtent(initImageryMercatorMinX, initImageryMercatorMinY, 0.0, initImageryMercatorMaxX, initImageryMercatorMaxY, 0.0);
 };
 
 TinTerrainManager.prototype.doFrustumCulling = function(frustum, camPos, magoManager, maxDepth)
@@ -124,8 +151,15 @@ TinTerrainManager.prototype.doFrustumCulling = function(frustum, camPos, magoMan
 	
 	this.visibleTilesArray.length = 0;
 	this.noVisibleTilesArray.length = 0;
-	this.tinTerrainsQuadTreeAsia.getFrustumIntersectedTinTerrainsQuadTree(frustum, maxDepth, camPos, magoManager, this.visibleTilesArray, this.noVisibleTilesArray);
-	this.tinTerrainsQuadTreeAmerica.getFrustumIntersectedTinTerrainsQuadTree(frustum, maxDepth, camPos, magoManager, this.visibleTilesArray, this.noVisibleTilesArray);
+	if (this.imageryType === CODE.imageryType.WEB_MERCATOR)
+	{
+		this.tinTerrainQuadTreeMercator.getFrustumIntersectedTinTerrainsQuadTree(frustum, maxDepth, camPos, magoManager, this.visibleTilesArray, this.noVisibleTilesArray);
+	}
+	else 
+	{
+		this.tinTerrainsQuadTreeAsia.getFrustumIntersectedTinTerrainsQuadTree(frustum, maxDepth, camPos, magoManager, this.visibleTilesArray, this.noVisibleTilesArray);
+		this.tinTerrainsQuadTreeAmerica.getFrustumIntersectedTinTerrainsQuadTree(frustum, maxDepth, camPos, magoManager, this.visibleTilesArray, this.noVisibleTilesArray);
+	}
 };
 
 /**

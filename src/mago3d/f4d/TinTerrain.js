@@ -282,27 +282,17 @@ TinTerrain.prototype.prepareTexture = function(magoManager, tinTerrainManager)
 	var X = this.X.toString();
 	var Y = this.Y.toString();
 	
-	X = (Math.floor(this.X/2)).toString();
-	//L = (this.depth+1).toString();
-	
-
-	var tilePath = L + "&TileRow=" + Y + "&TileCol=" + X;
+	//var tilePath = L + "&TileRow=" + Y + "&TileCol=" + X;
 	//var textureFilePath = geoServURL + "?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&Layer=mago3d:SejongBGM&Format=image/png&TileMatrixSet=EPSG:4326&TileMatrix=EPSG:4326:" + tilePath;
 	//https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
 
-	var xDef;
-	
-	xDef = Math.floor(this.X/2);
-	
-	if (xDef < 0)
-	{ xDef = 0; }
 
 	//https://a.tile.openstreetmap.org/${z}/${x}/${y}.png 
 	//https://b.tile.openstreetmap.org/${z}/${x}/${y}.png 
 	//https://c.tile.openstreetmap.org/${z}/${x}/${y}.png
 		
-	var textureFilePath = "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/" + L + "/" + Y + "/" + xDef + ".png";
-	//var textureFilePath = "http://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer/tile/" + L + "/" + Y + "/" + xDef + ".jpg";
+	var textureFilePath = "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/" + L + "/" + Y + "/" + X + ".png";
+	//var textureFilePath = "http://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer/tile/" + L + "/" + Y + "/" + X + ".jpg";
 	
 	// Provisionally, for debug, save textureFilePath.***
 	this.texFilePath__TEST = textureFilePath;
@@ -500,13 +490,13 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			{
 				gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
 				//gl.uniform1f(currentShader.externalAlpha_loc, this.getBlendAlpha(magoManager.getCurrentTime()));
-				gl.uniform1f(currentShader.externalAlpha_loc, 1);
-				//var currSelObject = magoManager.selectionManager.getSelectedGeneral();
-				//if (currSelObject === this)
-				//{
-				//	gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
-				//	gl.uniform4fv(currentShader.oneColor4_loc, [0.8, 0.3, 0.1, 1.0]);
-				//}
+				///gl.uniform1f(currentShader.externalAlpha_loc, 1);
+				///var currSelObject = magoManager.selectionManager.getSelectedGeneral();
+				///if (currSelObject === this)
+				///{
+				///	gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
+				///	gl.uniform4fv(currentShader.oneColor4_loc, [0.8, 0.3, 0.1, 1.0]);
+				///}
 			}
 			// End test.--------------------------------------------------------------------------------------
 			
@@ -921,83 +911,6 @@ ImageryLayer.prototype._calculateTextureTranslationAndScale = function(tile, til
 };
 */
 
-TinTerrain.prototype.calculateTextureCoordinateTranslationAndScale_original = function()
-{
-	// In construction function.
-	// Tile Images from World Imagery has different extent to the tiles obtained by CRS84 rules.
-	// To match image texture on to the tile, must calculate texture's coordinates translation & scale.
-	// The calculation must to do onto mercator projection.
-	
-	// Calculate terrain mercator extension.
-	var terrainMercatorMinPoint2d, terrainMercatorMaxPoint2d;
-	terrainMercatorMinPoint2d = this.geographicExtent.minGeographicCoord.getMercatorProjection(terrainMercatorMinPoint2d);
-	terrainMercatorMaxPoint2d = this.geographicExtent.maxGeographicCoord.getMercatorProjection(terrainMercatorMaxPoint2d);
-	
-	// Calculate imagery mercator extension.
-	var imageryMercatorMinPoint2d, imageryMercatorMaxPoint2d;
-	// Imagery coords are just mercator.
-	imageryMercatorMinPoint2d = new Point2D(this.imageryGeoExtent.minGeographicCoord.longitude, this.imageryGeoExtent.minGeographicCoord.latitude);
-	imageryMercatorMaxPoint2d = new Point2D(this.imageryGeoExtent.maxGeographicCoord.longitude, this.imageryGeoExtent.maxGeographicCoord.latitude);
-	
-	var terrainWidth = terrainMercatorMaxPoint2d.x - terrainMercatorMinPoint2d.x;
-	var terrainHeight = terrainMercatorMaxPoint2d.y - terrainMercatorMinPoint2d.y;
-	var imageryWidth = imageryMercatorMaxPoint2d.x - imageryMercatorMinPoint2d.x;
-	var imageryHeight = imageryMercatorMaxPoint2d.y - imageryMercatorMinPoint2d.y;
-	
-	var scaleX = terrainWidth / imageryWidth;
-	var scaleY = terrainHeight / imageryHeight;
-	var translateX = scaleX *(terrainMercatorMinPoint2d.x - imageryMercatorMinPoint2d.x)/ terrainWidth;
-	var translateY = scaleY *(terrainMercatorMinPoint2d.y - imageryMercatorMinPoint2d.y)/ terrainHeight;
-	
-	if (this.X%2 !== 0)
-	{ translateX -= 0.5; }
-	
-	this.textureTranslateAndScale = new Point4D(translateX, translateY, scaleX, scaleY);
-};
-
-TinTerrain.prototype.calculateTextureCoordinateTranslationAndScale = function()
-{
-	// In construction function.
-	// Tile Images from World Imagery has different extent to the tiles obtained by CRS84 rules.
-	// To match image texture on to the tile, must calculate texture's coordinates translation & scale.
-	// The calculation must to do onto mercator projection.
-	
-	// Calculate terrain mercator extension.
-	var terrainMercatorMinPoint2d, terrainMercatorMaxPoint2d;
-	terrainMercatorMinPoint2d = this.geographicExtent.minGeographicCoord.getMercatorProjection(terrainMercatorMinPoint2d);
-	terrainMercatorMaxPoint2d = this.geographicExtent.maxGeographicCoord.getMercatorProjection(terrainMercatorMaxPoint2d);
-	
-	////terrainMercatorMinPoint2d = this.webMercatorExtent.getMinPoint(terrainMercatorMinPoint2d);
-	////terrainMercatorMaxPoint2d = this.webMercatorExtent.getMaxPoint(terrainMercatorMaxPoint2d);
-	
-	// test.**********************************
-	var equatorialRadius = Globe.equatorialRadius();
-	//var lonRad = 
-	//resultPoint2d.set(equatorialRadius * lonRad, equatorialRadius * latRad);
-	
-	
-	// Calculate imagery mercator extension.
-	var imageryMercatorMinPoint2d, imageryMercatorMaxPoint2d;
-	// Imagery coords are just mercator.
-	imageryMercatorMinPoint2d = new Point2D(this.imageryGeoExtent.minGeographicCoord.longitude, this.imageryGeoExtent.minGeographicCoord.latitude);
-	imageryMercatorMaxPoint2d = new Point2D(this.imageryGeoExtent.maxGeographicCoord.longitude, this.imageryGeoExtent.maxGeographicCoord.latitude);
-	
-	var terrainWidth = terrainMercatorMaxPoint2d.x - terrainMercatorMinPoint2d.x;
-	var terrainHeight = terrainMercatorMaxPoint2d.y - terrainMercatorMinPoint2d.y;
-	var imageryWidth = imageryMercatorMaxPoint2d.x - imageryMercatorMinPoint2d.x;
-	var imageryHeight = imageryMercatorMaxPoint2d.y - imageryMercatorMinPoint2d.y;
-	
-	var scaleX = terrainWidth / imageryWidth;
-	var scaleY = terrainHeight / imageryHeight;
-	var translateX = scaleX *(terrainMercatorMinPoint2d.x - imageryMercatorMinPoint2d.x)/ terrainWidth;
-	var translateY = scaleY *(terrainMercatorMinPoint2d.y - imageryMercatorMinPoint2d.y)/ terrainHeight;
-	
-	if (this.X%2 !== 0)
-	{ translateX -= 0.5; }
-	
-	this.textureTranslateAndScale = new Point4D(translateX, translateY, scaleX, scaleY);
-};
-
 TinTerrain.prototype.getMidLatitudeRadWebMercator = function()
 {
 	if (this.webMercatorExtent === undefined)
@@ -1056,15 +969,6 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 	var alt = 0;
 	if (altitude)
 	{ alt = altitude; }
-
-	// Note: If exist "altitudesSlice", then use it.
-	
-	// Test.**
-	//var minMercator, maxMercator;
-	//minMercator = Globe.geographicRadianToMercatorProjection(minLon, minLat, minMercator);
-	//maxMercator = Globe.geographicRadianToMercatorProjection(maxLon, maxLat, maxMercator);
-	//this.calculateTextureCoordinateTranslationAndScale();
-	// End test.-------------------------------------------------------------------------------
 	
 	// https://en.wikipedia.org/wiki/Web_Mercator_projection
 	var PI_DIV_4 = PI/4;
@@ -1088,8 +992,6 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 		if (currLat > maxLat)
 		{ currLat = maxLat; }
 	
-		var currLatDeg = currLat*180/PI; // Test debug.***
-		
 		t = aConst*(PI-Math.log(Math.tan(PI_DIV_4+currLat/2)));
 		t = 1.0 - t;
 			
@@ -1138,15 +1040,6 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 			
 			this.texCoordsArray[idx*2] = s;
 			this.texCoordsArray[idx*2+1] = t;
-
-			/*
-			// make texcoords CRS84.***
-			s = (currLon - minLon)/lonRange;
-			t = (currLat - minLat)/latRange;
-			
-			this.texCoordsArray[idx*2] = s;
-			this.texCoordsArray[idx*2+1] = t;
-			*/
 			
 			// actualize current values.
 			idx++;
@@ -1313,29 +1206,6 @@ TinTerrain.prototype.makeVbo = function(vboMemManager)
 	// TexCoords.
 	if (this.texCoordsArray)
 	{
-		// Test modify texCoords here.
-		/*
-		var minLat = this.geographicExtent.minGeographicCoord.latitude;
-		var maxLat = this.geographicExtent.maxGeographicCoord.latitude;
-		var latRange = maxLat - minLat;
-		
-		var minTan = Math.tan(minLat * Math.PI/180.0);
-		var maxTan = Math.tan(maxLat * Math.PI/180.0);
-		var tanRange = maxTan - minTan;
-		
-		var texCoordsCount = this.texCoordsArray.length/2;
-		for (var i=0; i<texCoordsCount; i++)
-		{
-			// scale.
-			//this.texCoordsArray[i*2] *= this.textureTranslateAndScale.z;
-			//this.texCoordsArray[i*2+1] *= this.textureTranslateAndScale.w;
-			
-			// translate.
-			//this.texCoordsArray[i*2] += this.textureTranslateAndScale.x;
-			//this.texCoordsArray[i*2+1] += this.textureTranslateAndScale.y;
-			
-		}
-		*/
 		vboKey.setDataArrayTexCoord(this.texCoordsArray, vboMemManager);
 	}
 		

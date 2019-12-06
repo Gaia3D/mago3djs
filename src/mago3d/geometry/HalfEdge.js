@@ -127,7 +127,6 @@ HalfEdge.prototype.isFrontier = function()
 /**
  * get prev hedge.
  * half edge의 next를 계속 찾아서 현재 edge와 특정 테두리의 next가 일치할때 특정테두리를 반환.
- * @deprecated not use
  * @returns {HalfEdge|undefined}  if next is not define, return undefined.
  */
 HalfEdge.prototype.getPrev = function()
@@ -150,6 +149,16 @@ HalfEdge.prototype.getPrev = function()
 	}
 	
 	return undefined;
+};
+
+/**
+ * This function returns the outingFrontierHedge of the "endVertex".
+ * @returns {HalfEdge|undefined}  next frontier hedge.
+ */
+HalfEdge.prototype.getNextFrontier = function()
+{
+	var endVertex = this.getEndVertex();
+	return endVertex.getOutingFrontierHEdge();
 };
 
 /**
