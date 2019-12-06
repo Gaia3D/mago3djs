@@ -86,7 +86,6 @@ void main(){
 	vec2 previousScreen = previousProjected.xy / previousProjected.w * aspectVec;
 	vec2 nextScreen = nextProjected.xy / nextProjected.w * aspectVec;
 					
-	// Use the average of the normals
 	// This helps us handle 90 degree turns correctly
 	vec2 tangentNext = normalize(nextScreen - currentScreen);
 	vec2 tangentPrev = normalize(currentScreen - previousScreen);

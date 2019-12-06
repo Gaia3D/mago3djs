@@ -129,6 +129,9 @@ Surface.prototype.addFacesArray = function(faces)
  */
 Surface.prototype.getFrontierHalfEdges = function(result)
 {
+	if (this.facesArray === undefined)
+	{ return result; }
+	
 	result = result || [];
 
 	var face;
@@ -140,6 +143,69 @@ Surface.prototype.getFrontierHalfEdges = function(result)
 
 	return result;
 };
+
+/**
+ * 전체 Face 에 대한 Frontier Half Edge 를 구한다.
+ *
+ * @param {HalfEdge[]} result Frontier Half Edges
+ * @returns {HalfEdge[]} Frontier Half Edges
+ * 
+ * @see HalfEdge
+ */
+Surface.prototype.getAnyFrontierHalfEdge = function()
+{
+	if (this.facesArray === undefined)
+	{ return undefined; }
+	
+	var face;
+	var hedgesArray = [];
+	for (var i=0, len=this.getFacesCount(); i<len; i++)
+	{
+		face = this.getFace(i);
+		hedgesArray = face.getFrontierHalfEdges(hedgesArray);
+		
+		if (hedgesArray.length > 0)
+		{ return hedgesArray[0]; }
+	}
+};
+
+/**
+ * 전체 Face 에 대한 Frontier Half Edge 를 구한다.
+ *
+ * @param {HalfEdge[]} result Frontier Half Edges
+ * @returns {HalfEdge[]} Frontier Half Edges
+ * 
+ * @see HalfEdge
+ */
+Surface.prototype.getFrontierPolyline = function(resultPolyline)
+{
+	// 1rst, find any frontier hedge.
+	var frontierHedge = this.getAnyFrontierHalfEdge();
+	if (frontierHedge === undefined)
+	{ return; }
+
+	if (resultPolyline === undefined)
+	{ resultPolyline = new PolyLine3D(); }
+	
+	// create the 1rst point3d.
+	var currPoint3d = frontierHedge.startVertex.point3d;
+	var point3d = resultPolyline.newPoint3d(currPoint3d.x, currPoint3d.y, currPoint3d.z);
+	
+	var nextFrontierHedge = frontierHedge.getNextFrontier();
+	var finished = false;
+	while (!finished)
+	{
+		if (nextFrontierHedge === undefined || nextFrontierHedge === frontierHedge)
+		{ break; }
+		currPoint3d = nextFrontierHedge.startVertex.point3d;
+		point3d = resultPolyline.newPoint3d(currPoint3d.x, currPoint3d.y, currPoint3d.z);
+		
+		nextFrontierHedge = nextFrontierHedge.getNextFrontier();
+	}
+	
+	return resultPolyline;
+};
+
 
 /**
  * 전체 Face 에 대한 Half Edge 를 구한다.

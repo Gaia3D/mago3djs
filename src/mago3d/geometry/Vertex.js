@@ -264,7 +264,6 @@ Vertex.prototype.translate = function(dx, dy, dz)
 
 /**
  * get vertex outinghedges. 
- * @deprecated
  * @param {Array} resultHedgesArray
  * @returns {Array} resultHedgesArray
  */
@@ -272,10 +271,34 @@ Vertex.prototype.getOutingHEdges = function(resultHedgesArray)
 {
 	if (resultHedgesArray === undefined)
 	{ resultHedgesArray = []; }
-	
+
 	// todo:
 	
 	return resultHedgesArray;
+};
+
+/**
+ * get vertex outinghedges. 
+ * @returns {HalfEdge} resultHedge
+ */
+Vertex.prototype.getOutingFrontierHEdge = function() 
+{
+	// 1rst, check if this.outingHedge is frontier.
+	if (this.outingHedge.isFrontier())
+	{ return this.outingHedge; }
+	
+	var finished = false;
+	var hedge = this.outingHedge.twin.next;
+	while (!finished)
+	{
+		if (hedge.isFrontier())
+		{ return hedge; }
+		
+		hedge = hedge.twin.next;
+		
+		if (hedge === undefined || hedge === this.outingHedge)
+		{ return undefined; }
+	}
 };
 
 /**
