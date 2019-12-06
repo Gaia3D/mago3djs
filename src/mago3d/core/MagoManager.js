@@ -1680,6 +1680,10 @@ MagoManager.prototype.isDragging = function()
 	// General objects.***
 	if (!bIsDragging)
 	{
+		if (current_objectSelected instanceof MagoRenderable) 
+		{
+			current_objectSelected = current_objectSelected.getRootOwner();
+		}
 		if (current_objectSelected !== undefined && current_objectSelected === this.selectionManager.getSelectedGeneral())
 		{
 			bIsDragging = true;
@@ -5388,7 +5392,7 @@ MagoManager.prototype.instantiateStaticModel = function(attributes)
 		node.data.geoLocDataManager = geoLocDataManager;
 
 		// Now, insert node into smartTile.***
-		var targetDepth = defaultValue(this.smartTileManager.targetDepth, 17);
+		var targetDepth = 12;
 		this.smartTileManager.putNode(targetDepth, node, this);
 	}
 	else 
