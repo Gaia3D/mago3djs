@@ -18,7 +18,8 @@ var VisibleObjectsController = function()
 	this.currentVisiblesAux = [];
 	this.currentVisibleNativeObjects = {
 		opaquesArray      : [],
-		transparentsArray : []
+		transparentsArray : [],
+		excavationsArray  : []
 	};
 	this.currentVisiblesToPrepare = [];
 };
@@ -31,7 +32,8 @@ VisibleObjectsController.prototype.initArrays = function()
 	this.currentVisiblesAux = [];
 	this.currentVisibleNativeObjects = {
 		opaquesArray      : [],
-		transparentsArray : []
+		transparentsArray : [],
+		excavationsArray  : []
 	};
 	this.currentVisiblesToPrepare = [];
 };
@@ -46,6 +48,7 @@ VisibleObjectsController.prototype.clear = function()
 	this.currentVisiblesAux.length = 0;
 	this.currentVisibleNativeObjects.opaquesArray.length = 0;
 	this.currentVisibleNativeObjects.transparentsArray.length = 0;
+	this.currentVisibleNativeObjects.excavationsArray.length = 0;
 	this.currentVisiblesToPrepare.length = 0;
 };
 
@@ -78,7 +81,8 @@ VisibleObjectsController.prototype.hasRenderables = function()
 		this.currentVisibles3.length > 0 || 
 		this.currentVisiblesAux.length > 0 || 
 		this.currentVisibleNativeObjects.opaquesArray.length > 0 ||
-		this.currentVisibleNativeObjects.transparentsArray.length > 0)
+		this.currentVisibleNativeObjects.transparentsArray.length > 0 ||
+		this.currentVisibleNativeObjects.excavationsArray.length > 0)
 	{ return true; }
 	else
 	{ return false; }
@@ -104,6 +108,10 @@ VisibleObjectsController.prototype.putNativeObject = function(object)
 		{
 		  this.currentVisibleNativeObjects.transparentsArray.push(object);
 		}
+	}
+	else if (object instanceof Excavation) 
+	{
+		this.currentVisibleNativeObjects.excavationsArray.push(object);
 	}
 	else 
 	{
