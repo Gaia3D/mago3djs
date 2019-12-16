@@ -4335,9 +4335,11 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	gl.bindAttribLocation(shader.program, 0, "prev");
 	gl.bindAttribLocation(shader.program, 1, "current");
 	gl.bindAttribLocation(shader.program, 2, "next");
+	gl.bindAttribLocation(shader.program, 3, "order");
 	shader.prev_loc = 0;
 	shader.current_loc = 1;
 	shader.next_loc = 2;
+	shader.order_loc = 3;
 };
 
 /**

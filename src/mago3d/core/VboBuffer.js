@@ -57,6 +57,9 @@ var VboBuffer = function(dataTarget)
 	this.dataStride = 0;
 	this.dataOffSet = 0;
 	this.normalized = false;
+	this.id;
+	
+	this.attribLocation;
 };
 
 /**
@@ -87,7 +90,7 @@ VboBuffer.prototype.deleteGlObjects = function(vboMemManager)
  * @param {TypedArray} dataArray The heading value in degrees.
  * @param {VboMemoryManager} vboMemManager.
  */
-VboBuffer.prototype.setDataArray = function(dataArray, dimensions, normalized, vboMemManager) 
+VboBuffer.prototype.setDataArray = function(dataArray, dimensions, normalized, vboMemManager, attribLocation) 
 {
 	if (dataArray === undefined)
 	{ return; }
@@ -109,6 +112,7 @@ VboBuffer.prototype.setDataArray = function(dataArray, dimensions, normalized, v
 	this.dataLength = arrayElemsCount;
 	this.dataDimensions = dimensions;
 	this.normalized = normalized;
+	this.attribLocation = attribLocation;
 };
 
 /**

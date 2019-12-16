@@ -20,6 +20,8 @@ var VBOVertexIdxCacheKey = function()
 	this.vboBufferCol;
 	this.vboBufferTCoord;
 	
+	this.vboBufferCustomMap;
+	
 	this.keepDataArrayBuffers;
 	this.keepedColDataArray;
 	this.keepedIdxDataArray;
@@ -252,6 +254,18 @@ VBOVertexIdxCacheKey.prototype.readPosNorIdx = function(arrayBuffer, vboMemManag
 /**
  * 어떤 일을 하고 있습니까?
  */
+VBOVertexIdxCacheKey.prototype.bindDataCustom = function(shader, vboMemManager, name) 
+{
+	if (shader === undefined)
+	{ return false; }
+
+	var vboBufferCustom = this.vboBufferCustomMap[name];
+	return vboBufferCustom.bindData(shader, vboBufferCustom.attribLoc, vboMemManager);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 VBOVertexIdxCacheKey.prototype.bindDataPosition = function(shader, vboMemManager) 
 {
 	if (shader === undefined)
@@ -334,6 +348,44 @@ VBOVertexIdxCacheKey.prototype.bindDataIndice = function(shader, vboMemManager)
 		shader.lastVboKeyBindedMap.elemIdx = vboBufferIdx.key;
 	}
 	return true;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+VBOVertexIdxCacheKey.prototype.getVboCustom = function(name) 
+{
+	if (this.vboBufferCustomMap === undefined)
+	{ return undefined; }
+	
+	return this.vboBufferCustomMap[name];
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+VBOVertexIdxCacheKey.prototype.setDataArrayCustom = function(customDataArray, vboMemManager, dimensions, name, attribLoc) 
+{
+	if (customDataArray === undefined)
+	{ return; }
+
+	if (dimensions === undefined)
+	{ return; }
+
+	if (name === undefined)
+	{ return; }
+
+	if (attribLoc === undefined)
+	{ return; }
+
+	if (this.vboBufferCustomMap === undefined)
+	{ this.vboBufferCustomMap = {}; }
+	
+	var gl = vboMemManager.gl;
+	var vboBufferCustom = new VboBuffer(gl.ARRAY_BUFFER); 
+	var normalized = false;
+	vboBufferCustom.setDataArray(customDataArray, dimensions, normalized, vboMemManager, attribLoc);
+	this.vboBufferCustomMap[name] = vboBufferCustom;
 };
 
 /**

@@ -117,7 +117,8 @@ void main()
 	}
 
 	bool testBool = false;
-	float occlusion = 0.0;
+	float occlusion = 0.0; // ambient occlusion.***
+	float shadow_occlusion = 1.0;
 	vec3 normal2 = vNormal;	
 		
 	if(bApplySsao)
@@ -205,8 +206,8 @@ void main()
 				if(ligthAngle > 0.0)
 				{
 					// The angle between the light direction & face normal is less than 90 degree, so, the face is in shadow.***
-					if(occlusion > 0.4)
-						occlusion = 0.4;
+					if(shadow_occlusion > 0.4)
+						shadow_occlusion = 0.4;
 				}
 				else{
 					float pixelWidth = 1.0 / shadowMapWidth;
@@ -216,8 +217,8 @@ void main()
 					float depthRelToLight = getDepthShadowMap(posRelToLight.xy);
 					if(posRelToLight.z > depthRelToLight*0.9963 )
 					{
-						if(occlusion > 0.4)
-							occlusion = 0.4;
+						if(shadow_occlusion > 0.4)
+							shadow_occlusion = 0.4;
 					}
 					
 					//for(int horit = -1; horit<2; horit++)
@@ -228,8 +229,8 @@ void main()
 					//		float depthRelToLight = getDepthShadowMap(shadowMapTexCoord);
 					//		if(posRelToLight.z > depthRelToLight*0.9963 )
 					//		{
-					//			if(occlusion > 0.4)
-					//				occlusion -= (0.4/9.0);
+					//			if(shadow_occlusion > 0.4)
+					//				shadow_occlusion -= (0.4/9.0);
 					//		}
 					//	}
 					//}
@@ -276,10 +277,10 @@ void main()
     vec4 finalColor;
 	if(applySpecLighting> 0.0)
 	{
-		finalColor = vec4((ambientReflectionCoef * ambientColor + diffuseReflectionCoef * lambertian * textureColor.xyz + specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion, alfa); 
+		finalColor = vec4((ambientReflectionCoef * ambientColor + diffuseReflectionCoef * lambertian * textureColor.xyz + specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion * shadow_occlusion, alfa); 
 	}
 	else{
-		finalColor = vec4((textureColor.xyz) * occlusion, alfa);
+		finalColor = vec4((textureColor.xyz) * occlusion * shadow_occlusion, alfa);
 	}
 	//finalColor = vec4(linearDepth, linearDepth, linearDepth, 1.0); // test to render depth color coded.***
     gl_FragColor = finalColor; 

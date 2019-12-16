@@ -1379,7 +1379,8 @@ void main()\n\
 	}\n\
 \n\
 	bool testBool = false;\n\
-	float occlusion = 0.0;\n\
+	float occlusion = 0.0; // ambient occlusion.***\n\
+	float shadow_occlusion = 1.0;\n\
 	vec3 normal2 = vNormal;	\n\
 		\n\
 	if(bApplySsao)\n\
@@ -1467,8 +1468,8 @@ void main()\n\
 				if(ligthAngle > 0.0)\n\
 				{\n\
 					// The angle between the light direction & face normal is less than 90 degree, so, the face is in shadow.***\n\
-					if(occlusion > 0.4)\n\
-						occlusion = 0.4;\n\
+					if(shadow_occlusion > 0.4)\n\
+						shadow_occlusion = 0.4;\n\
 				}\n\
 				else{\n\
 					float pixelWidth = 1.0 / shadowMapWidth;\n\
@@ -1478,8 +1479,8 @@ void main()\n\
 					float depthRelToLight = getDepthShadowMap(posRelToLight.xy);\n\
 					if(posRelToLight.z > depthRelToLight*0.9963 )\n\
 					{\n\
-						if(occlusion > 0.4)\n\
-							occlusion = 0.4;\n\
+						if(shadow_occlusion > 0.4)\n\
+							shadow_occlusion = 0.4;\n\
 					}\n\
 					\n\
 					//for(int horit = -1; horit<2; horit++)\n\
@@ -1490,8 +1491,8 @@ void main()\n\
 					//		float depthRelToLight = getDepthShadowMap(shadowMapTexCoord);\n\
 					//		if(posRelToLight.z > depthRelToLight*0.9963 )\n\
 					//		{\n\
-					//			if(occlusion > 0.4)\n\
-					//				occlusion -= (0.4/9.0);\n\
+					//			if(shadow_occlusion > 0.4)\n\
+					//				shadow_occlusion -= (0.4/9.0);\n\
 					//		}\n\
 					//	}\n\
 					//}\n\
@@ -1538,10 +1539,10 @@ void main()\n\
     vec4 finalColor;\n\
 	if(applySpecLighting> 0.0)\n\
 	{\n\
-		finalColor = vec4((ambientReflectionCoef * ambientColor + diffuseReflectionCoef * lambertian * textureColor.xyz + specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion, alfa); \n\
+		finalColor = vec4((ambientReflectionCoef * ambientColor + diffuseReflectionCoef * lambertian * textureColor.xyz + specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion * shadow_occlusion, alfa); \n\
 	}\n\
 	else{\n\
-		finalColor = vec4((textureColor.xyz) * occlusion, alfa);\n\
+		finalColor = vec4((textureColor.xyz) * occlusion * shadow_occlusion, alfa);\n\
 	}\n\
 	//finalColor = vec4(linearDepth, linearDepth, linearDepth, 1.0); // test to render depth color coded.***\n\
     gl_FragColor = finalColor; \n\
@@ -2747,6 +2748,7 @@ void main(){\n\
 	vec4 vNext = getPointRelToEye(vec4(next.xyz, 1.0));\n\
 	\n\
 	float order_w = current.w;\n\
+	//float order_w = order;\n\
 	float sense = 1.0;\n\
 	int orderInt = 0;\n\
 	if(order_w > 0.0)\n\
@@ -2810,6 +2812,7 @@ ShaderSource.TinTerrainFS = "#ifdef GL_ES\n\
 uniform sampler2D depthTex;\n\
 uniform sampler2D noiseTex;  \n\
 uniform sampler2D diffuseTex;\n\
+uniform sampler2D shadowMapTex;\n\
 uniform bool textureFlipYAxis;\n\
 uniform bool bIsMakingDepth;\n\
 varying vec3 vNormal;\n\
@@ -2843,7 +2846,14 @@ uniform float ambientReflectionCoef;\n\
 uniform float diffuseReflectionCoef;  \n\
 uniform float specularReflectionCoef; \n\
 uniform float externalAlpha;\n\
+uniform bool bApplyShadow;\n\
+uniform float shadowMapWidth;    \n\
+uniform float shadowMapHeight;\n\
 varying vec3 v3Pos;\n\
+\n\
+varying vec4 vPosRelToLight; \n\
+varying vec3 vLightDir; \n\
+varying vec3 vNormalWC;\n\
 \n\
 const float equatorialRadius = 6378137.0;\n\
 const float polarRadius = 6356752.3142;\n\
@@ -2855,11 +2865,18 @@ float unpackDepth(const in vec4 rgba_depth)\n\
     return depth;\n\
 } \n\
 \n\
+float UnpackDepth32( in vec4 pack )\n\
+{\n\
+    float depth = dot( pack, 1.0 / vec4(1.0, 256.0, 256.0*256.0, 16777216.0) );// 256.0*256.0*256.0 = 16777216.0\n\
+    return depth * (16777216.0) / (16777216.0 - 1.0);\n\
+}\n\
+\n\
 vec4 packDepth(const in float depth)\n\
 {\n\
     const vec4 bit_shift = vec4(16777216.0, 65536.0, 256.0, 1.0);\n\
     const vec4 bit_mask  = vec4(0.0, 0.00390625, 0.00390625, 0.00390625); \n\
-    vec4 res = fract(depth * bit_shift);\n\
+    //vec4 res = fract(depth * bit_shift); // Is not precise.\n\
+	vec4 res = mod(depth * bit_shift * vec4(255), vec4(256) ) / vec4(255); // Is better.\n\
     res -= res.xxyz * bit_mask;\n\
     return res;  \n\
 }               \n\
@@ -2876,7 +2893,12 @@ vec3 getViewRay(vec2 tc)\n\
 float getDepth(vec2 coord)\n\
 {\n\
     return unpackDepth(texture2D(depthTex, coord.xy));\n\
-}    \n\
+}  \n\
+\n\
+float getDepthShadowMap(vec2 coord)\n\
+{\n\
+    return UnpackDepth32(texture2D(shadowMapTex, coord.xy));\n\
+}  \n\
 \n\
 void main()\n\
 {           \n\
@@ -2885,6 +2907,41 @@ void main()\n\
 		gl_FragColor = packDepth(-depthValue);\n\
 	}\n\
 	else{\n\
+		float shadow_occlusion = 1.0;\n\
+		if(bApplyShadow)\n\
+		{\n\
+		\n\
+			vec3 posRelToLight = vPosRelToLight.xyz / vPosRelToLight.w;\n\
+			if(posRelToLight.x >= -0.5 && posRelToLight.x <= 0.5)\n\
+			{\n\
+				if(posRelToLight.y >= -0.5 && posRelToLight.y <= 0.5)\n\
+				{\n\
+					//float ligthAngle = dot(vLightDir, vNormalWC);\n\
+					//if(ligthAngle > 0.0)\n\
+					//{\n\
+					//	// The angle between the light direction & face normal is less than 90 degree, so, the face is in shadow.***\n\
+					//	if(shadow_occlusion > 0.4)\n\
+					//		shadow_occlusion = 0.4;\n\
+					//}\n\
+					//else\n\
+					{\n\
+						float pixelWidth = 1.0 / shadowMapWidth;\n\
+						float pixelHeight = 1.0 / shadowMapHeight;\n\
+						posRelToLight = posRelToLight * 0.5 + 0.5;\n\
+						\n\
+						float depthRelToLight = getDepthShadowMap(posRelToLight.xy);\n\
+						if(posRelToLight.z > depthRelToLight*0.9963 )\n\
+						{\n\
+							if(shadow_occlusion > 0.4)\n\
+								shadow_occlusion = 0.4;\n\
+						}\n\
+						\n\
+					}\n\
+				}\n\
+			}\n\
+			\n\
+		}\n\
+	\n\
 		vec4 textureColor;\n\
 		if(colorType == 0)\n\
 		{\n\
@@ -2921,7 +2978,8 @@ void main()\n\
 		float fogParam = v3Pos.z/(far - 100000.0);\n\
 		float fogParam2 = fogParam*fogParam;\n\
 		float fogAmount = fogParam2*fogParam2;\n\
-		gl_FragColor = mix(textureColor, fogColor, fogAmount); \n\
+		vec4 finalColor = mix(textureColor, fogColor, fogAmount); \n\
+		gl_FragColor = vec4(finalColor.xyz * shadow_occlusion, 1.0);\n\
 	}\n\
 }";
 ShaderSource.TinTerrainVS = "attribute vec3 position;\n\
@@ -2936,9 +2994,12 @@ uniform mat4 modelViewMatrixRelToEye; \n\
 uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
 uniform mat4 ModelViewProjectionMatrix;\n\
 uniform mat4 normalMatrix4;\n\
+uniform mat4 sunMatrix; \n\
 uniform mat4 buildingRotMatrix;  \n\
 uniform vec3 buildingPosHIGH;\n\
 uniform vec3 buildingPosLOW;\n\
+uniform vec3 sunPosHIGH;\n\
+uniform vec3 sunPosLOW;\n\
 uniform vec3 encodedCameraPositionMCHigh;\n\
 uniform vec3 encodedCameraPositionMCLow;\n\
 uniform vec3 aditionalPosition;\n\
@@ -2948,6 +3009,7 @@ uniform bool hasTexture;\n\
 uniform bool bIsMakingDepth;\n\
 uniform float near;\n\
 uniform float far;\n\
+uniform bool bApplyShadow;\n\
 \n\
 varying vec3 vNormal;\n\
 varying vec2 vTexCoord;   \n\
@@ -2957,6 +3019,10 @@ varying vec4 vcolor4;\n\
 varying vec3 v3Pos;\n\
 varying float depthValue;\n\
 \n\
+varying vec4 vPosRelToLight; \n\
+varying vec3 vLightDir; \n\
+varying vec3 vNormalWC;\n\
+\n\
 void main()\n\
 {	\n\
     vec3 objPosHigh = buildingPosHIGH;\n\
@@ -2964,6 +3030,19 @@ void main()\n\
     vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
     vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
     vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+	\n\
+	if(bApplyShadow)\n\
+	{\n\
+		// Calculate the vertex relative to light.***\n\
+		vec3 highDifferenceSun = objPosHigh.xyz - sunPosHIGH.xyz;\n\
+		vec3 lowDifferenceSun = objPosLow.xyz - sunPosLOW.xyz;\n\
+		vec4 pos4Sun = vec4(highDifferenceSun.xyz + lowDifferenceSun.xyz, 1.0);\n\
+	\n\
+		vPosRelToLight = sunMatrix * pos4Sun;\n\
+		vLightDir = vec3(-sunMatrix[2][0], -sunMatrix[2][1], -sunMatrix[2][2]);\n\
+		vec3 rotatedNormal = vec3(0.0, 0.0, 1.0); // provisional.***\n\
+		vNormalWC = rotatedNormal;\n\
+	}\n\
 \n\
 	if(bIsMakingDepth)\n\
 	{\n\

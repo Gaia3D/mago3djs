@@ -590,7 +590,7 @@ Renderer.prototype.renderDepthSunPointOfView = function(gl, visibleObjControlerN
 	
 	var ortho = new Matrix4();
 	var nRange = 200.0;
-	var left = -nRange, right = nRange, bottom = -nRange, top = nRange, near = -2*nRange, far = 2*nRange;
+	var left = -nRange, right = nRange, bottom = -nRange, top = nRange, near = -10*nRange, far = 10*nRange;
 	ortho._floatArrays = glMatrix.mat4.ortho(ortho._floatArrays, left, right, bottom, top, near, far);
 	
 	sunLight.tMatrix = sunTMatrix.getMultipliedByMatrix(ortho, sunLight.tMatrix);

@@ -5,6 +5,7 @@
 uniform sampler2D depthTex;
 uniform sampler2D noiseTex;  
 uniform sampler2D diffuseTex;
+uniform sampler2D shadowMapTex;
 uniform bool textureFlipYAxis;
 uniform bool bIsMakingDepth;
 varying vec3 vNormal;
@@ -38,7 +39,14 @@ uniform float ambientReflectionCoef;
 uniform float diffuseReflectionCoef;  
 uniform float specularReflectionCoef; 
 uniform float externalAlpha;
+uniform bool bApplyShadow;
+uniform float shadowMapWidth;    
+uniform float shadowMapHeight;
 varying vec3 v3Pos;
+
+varying vec4 vPosRelToLight; 
+varying vec3 vLightDir; 
+varying vec3 vNormalWC;
 
 const float equatorialRadius = 6378137.0;
 const float polarRadius = 6356752.3142;
@@ -50,11 +58,18 @@ float unpackDepth(const in vec4 rgba_depth)
     return depth;
 } 
 
+float UnpackDepth32( in vec4 pack )
+{
+    float depth = dot( pack, 1.0 / vec4(1.0, 256.0, 256.0*256.0, 16777216.0) );// 256.0*256.0*256.0 = 16777216.0
+    return depth * (16777216.0) / (16777216.0 - 1.0);
+}
+
 vec4 packDepth(const in float depth)
 {
     const vec4 bit_shift = vec4(16777216.0, 65536.0, 256.0, 1.0);
     const vec4 bit_mask  = vec4(0.0, 0.00390625, 0.00390625, 0.00390625); 
-    vec4 res = fract(depth * bit_shift);
+    //vec4 res = fract(depth * bit_shift); // Is not precise.
+	vec4 res = mod(depth * bit_shift * vec4(255), vec4(256) ) / vec4(255); // Is better.
     res -= res.xxyz * bit_mask;
     return res;  
 }               
@@ -71,7 +86,12 @@ vec3 getViewRay(vec2 tc)
 float getDepth(vec2 coord)
 {
     return unpackDepth(texture2D(depthTex, coord.xy));
-}    
+}  
+
+float getDepthShadowMap(vec2 coord)
+{
+    return UnpackDepth32(texture2D(shadowMapTex, coord.xy));
+}  
 
 void main()
 {           
@@ -80,6 +100,41 @@ void main()
 		gl_FragColor = packDepth(-depthValue);
 	}
 	else{
+		float shadow_occlusion = 1.0;
+		if(bApplyShadow)
+		{
+		
+			vec3 posRelToLight = vPosRelToLight.xyz / vPosRelToLight.w;
+			if(posRelToLight.x >= -0.5 && posRelToLight.x <= 0.5)
+			{
+				if(posRelToLight.y >= -0.5 && posRelToLight.y <= 0.5)
+				{
+					//float ligthAngle = dot(vLightDir, vNormalWC);
+					//if(ligthAngle > 0.0)
+					//{
+					//	// The angle between the light direction & face normal is less than 90 degree, so, the face is in shadow.***
+					//	if(shadow_occlusion > 0.4)
+					//		shadow_occlusion = 0.4;
+					//}
+					//else
+					{
+						float pixelWidth = 1.0 / shadowMapWidth;
+						float pixelHeight = 1.0 / shadowMapHeight;
+						posRelToLight = posRelToLight * 0.5 + 0.5;
+						
+						float depthRelToLight = getDepthShadowMap(posRelToLight.xy);
+						if(posRelToLight.z > depthRelToLight*0.9963 )
+						{
+							if(shadow_occlusion > 0.4)
+								shadow_occlusion = 0.4;
+						}
+						
+					}
+				}
+			}
+			
+		}
+	
 		vec4 textureColor;
 		if(colorType == 0)
 		{
@@ -116,6 +171,7 @@ void main()
 		float fogParam = v3Pos.z/(far - 100000.0);
 		float fogParam2 = fogParam*fogParam;
 		float fogAmount = fogParam2*fogParam2;
-		gl_FragColor = mix(textureColor, fogColor, fogAmount); 
+		vec4 finalColor = mix(textureColor, fogColor, fogAmount); 
+		gl_FragColor = vec4(finalColor.xyz * shadow_occlusion, 1.0);
 	}
 }

@@ -48,6 +48,7 @@ void main(){
 	vec4 vNext = getPointRelToEye(vec4(next.xyz, 1.0));
 	
 	float order_w = current.w;
+	//float order_w = order;
 	float sense = 1.0;
 	int orderInt = 0;
 	if(order_w > 0.0)

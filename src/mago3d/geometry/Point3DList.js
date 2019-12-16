@@ -347,6 +347,54 @@ Point3DList.getVboThickLines = function(magoManager, point3dArray, resultVboKeys
 	{ resultVboKeysContainer = new VBOVertexIdxCacheKeysContainer(); }
 
 	var pointsCount = point3dArray.length;
+	/*
+	// New.*************************************************************************************************************************
+	var repeats = 4;
+	var pointDimension = 3;
+	var posByteSize = pointsCount * pointDimension;
+	var posVboDataArray = new Float32Array(posByteSize);
+	var idxVboDataArray = new Uint16Array(pointsCount * repeats);
+	var orderVboDataArray = new Float32Array(pointsCount * repeats);
+	var point3d;
+
+	for (var i=0; i<pointsCount; i++)
+	{
+		point3d = point3dArray[i];
+		posVboDataArray[i*3] = point3d.x;
+		posVboDataArray[i*3+1] = point3d.y;
+		posVboDataArray[i*3+2] = point3d.z;
+		
+		//if (i === 0 || i === pointsCount-1)
+		//{
+		//	// add an extra point at the start & at the end of array.
+		//	posVboDataArray[i*3] = point3d.x;
+		//	posVboDataArray[i*3+1] = point3d.y;
+		//	posVboDataArray[i*3+2] = point3d.z;
+		//}
+		
+		idxVboDataArray[i*4] = i;
+		idxVboDataArray[i*4+1] = i;
+		idxVboDataArray[i*4+2] = i;
+		idxVboDataArray[i*4+3] = i;
+		
+		orderVboDataArray[i*4] = 1;
+		orderVboDataArray[i*4+1] = -1;
+		orderVboDataArray[i*4+2] = 2;
+		orderVboDataArray[i*4+3] = -2;
+		
+	}
+	var vboMemManager = magoManager.vboMemoryManager;
+	var vbo = resultVboKeysContainer.newVBOVertexIdxCacheKey();
+	vbo.setDataArrayPos(posVboDataArray, vboMemManager, pointDimension);
+	vbo.setDataArrayIdx(idxVboDataArray, vboMemManager);
+	
+	var dimensions = 1;
+	var name = "thickLineOrder";
+	var attribLoc = 3; // defined as "3" when create the thickLine_shader.
+	vbo.setDataArrayCustom(orderVboDataArray, vboMemManager, dimensions, name, attribLoc);
+	*/
+	
+	// Old.*************************************************************************************************************************
 	// in this case make point4d (x, y, z, w). In "w" save the sign (1 or -1) for the offset in the shader to draw triangles strip.
 	// check if the indexes is bigger than 65536. TODO.
 	var repeats = 4;
@@ -389,7 +437,8 @@ Point3DList.getVboThickLines = function(magoManager, point3dArray, resultVboKeys
 	var vbo = resultVboKeysContainer.newVBOVertexIdxCacheKey();
 	vbo.setDataArrayPos(posVboDataArray, magoManager.vboMemoryManager, pointDimension);
 	//vbo.setDataArrayIdx(idxVboDataArray, magoManager.vboMemoryManager);
-
+	// End old.-----------------------------------------------------------------------------------------------------------------------
+	
 	return resultVboKeysContainer;
 };
 
@@ -591,6 +640,30 @@ Point3DList.prototype.renderThickLines = function(magoManager, shader, renderTyp
 	{
 		return;
 	}
+	
+	// New.**********************
+	/*
+	gl.bindBuffer(gl.ARRAY_BUFFER, vboPos.key);
+	gl.vertexAttribPointer(shader.prev_loc, dim, gl.FLOAT, false, 3, 0);
+	gl.vertexAttribPointer(shader.current_loc, dim, gl.FLOAT, false, 3, 6);
+	gl.vertexAttribPointer(shader.next_loc, dim, gl.FLOAT, false, 3, 12);
+
+	var vboOrder = vbo.getVboCustom("thickLineOrder");
+	if (!vboOrder.isReady(gl, magoManager.vboMemoryManager))
+	{
+		return;
+	}
+	gl.bindBuffer(gl.ARRAY_BUFFER, vboOrder.key);
+	gl.vertexAttribPointer(shader.order_loc, vboOrder.dataDimensions, gl.FLOAT, false, 4, 0);
+
+	var indicesCount = vbo.indicesCount;
+	if (!vbo.bindDataIndice(shader, magoManager.vboMemoryManager))
+	{ return false; }
+	gl.drawElements(gl.TRIANGLE_STRIP, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.
+	*/
+	
+	
+	// old.**********************************************************************************************
 	gl.bindBuffer(gl.ARRAY_BUFFER, vboPos.key);
 	gl.vertexAttribPointer(shader.prev_loc, dim, gl.FLOAT, false, 16, 0);
 	gl.vertexAttribPointer(shader.current_loc, dim, gl.FLOAT, false, 16, 64-32);
@@ -606,6 +679,8 @@ Point3DList.prototype.renderThickLines = function(magoManager, shader, renderTyp
 	
 	//gl.uniform4fv(shader.color_loc, [0.0, 0.0, 0.0, 1.0]);
 	//gl.drawArrays(gl.LINE_STRIP, 0, vbo.vertexCount);
+	// End old.-------------------------------------------------------------------------------------------
+	
 
 	gl.enable(gl.CULL_FACE);
 	gl.disable(gl.BLEND);

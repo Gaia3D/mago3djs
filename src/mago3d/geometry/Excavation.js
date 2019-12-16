@@ -42,9 +42,12 @@ var Excavation = function(options)
 
 			// Take the 1rst geographicCoord's geoLocation.
 			var geoCoord = this.geoCoordsList.getGeoCoord(0);
-			var geoLocDataManagerFirst = geoCoord.getGeoLocationDataManager();
-			var geoLocFirst = geoLocDataManagerFirst.getCurrentGeoLocationData();
-			geoLoc.copyFrom(geoLocFirst);
+			if (geoCoord)
+			{
+				var geoLocDataManagerFirst = geoCoord.getGeoLocationDataManager();
+				var geoLocFirst = geoLocDataManagerFirst.getCurrentGeoLocationData();
+				geoLoc.copyFrom(geoLocFirst);
+			}
 		}
 
 		if (options.excavationDepthInMeters !== undefined)

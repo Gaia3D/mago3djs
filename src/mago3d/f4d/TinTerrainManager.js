@@ -10,7 +10,8 @@ var TinTerrainManager = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	this.maxDepth = 18;
+	//this.maxDepth = 18;
+	this.maxDepth = 13;
 	this.currentVisibles_terrName_geoCoords_map = {}; // current visible terrains map[terrainPathName, geographicCoords].
 	this.currentTerrainsMap = {}; // current terrains (that was created) map[terrainPathName, tinTerrain].
 	
@@ -27,7 +28,7 @@ var TinTerrainManager = function()
 	// Elevation model or plain ellipsoid.
 	// terrainType = 0 -> terrainPlainModel.
 	// terrainType = 1 -> terrainElevationModel.
-	this.terrainType = 0; 
+	this.terrainType = 1; 
 	//CODE.imageryType = {
 	//"UNKNOWN"      : 0,
 	//"CRS84"        : 1,
@@ -36,6 +37,9 @@ var TinTerrainManager = function()
 	this.imageryType = CODE.imageryType.WEB_MERCATOR; // Test.***
 	
 	this.init();
+	this.makeTinTerrainWithDEMIndex(); // provisional.
+	
+	//https://www.ngdc.noaa.gov/mgg/global/global.html here there are geotiff of land & ocean 1arc-minute. All earth. size : 21600 x 10800.
 };
 
 TinTerrainManager.prototype.init = function()
@@ -72,15 +76,6 @@ TinTerrainManager.prototype.init = function()
 		// set imagery initial geoExtent (in mercator coords).
 		
 		// Full extent. https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer
-		var initImageryMercatorMinX = -2.003750722959434E7;
-		var initImageryMercatorMinY = -1.997186888040859E7;
-		var initImageryMercatorMaxX = 2.003750722959434E7;
-		var initImageryMercatorMaxY = 1.9971868880408563E7;
-
-		
-		this.tinTerrainQuadTreeMercator.imageryGeoExtent = new GeographicExtent();
-		this.tinTerrainQuadTreeMercator.imageryGeoExtent.setExtent(initImageryMercatorMinX, initImageryMercatorMinY, 0.0, initImageryMercatorMaxX, initImageryMercatorMaxY, 0.0);
-		
 	}
 	else
 	{
@@ -131,17 +126,67 @@ TinTerrainManager.prototype.init = function()
 		// set imagery initial geoExtent (in mercator coords).
 		
 		// Full extent. https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer
-		var initImageryMercatorMinX = -2.003750722959434E7; // for Mercator.
-		var initImageryMercatorMinY = -1.997186888040859E7; // for Mercator.
-		var initImageryMercatorMaxX = 2.003750722959434E7; // for Mercator.
-		var initImageryMercatorMaxY = 1.9971868880408563E7; // for Mercator.
-		
-		this.tinTerrainsQuadTreeAsia.imageryGeoExtent = new GeographicExtent();
-		this.tinTerrainsQuadTreeAsia.imageryGeoExtent.setExtent(initImageryMercatorMinX, initImageryMercatorMinY, 0.0, initImageryMercatorMaxX, initImageryMercatorMaxY, 0.0);
-		
-		this.tinTerrainsQuadTreeAmerica.imageryGeoExtent = new GeographicExtent();
-		this.tinTerrainsQuadTreeAmerica.imageryGeoExtent.setExtent(initImageryMercatorMinX, initImageryMercatorMinY, 0.0, initImageryMercatorMaxX, initImageryMercatorMaxY, 0.0);
 	}
+	
+	this.makeDistanceLimitByDepth();
+};
+
+TinTerrainManager.prototype.makeTinTerrainWithDEMIndex = function()
+{
+	// Provisional.
+	// Makes a index of tiles that has DEM data in the server.
+	this.tinTerrainWithDEMIndex = [];
+	this.tinTerrainWithDEMIndex[0] = { minX: -1, minY: -1, maxX: -1, maxY: -1 };
+	this.tinTerrainWithDEMIndex[1] = { minX: -1, minY: -1, maxX: -1, maxY: -1 };
+	this.tinTerrainWithDEMIndex[2] = { minX: -1, minY: -1, maxX: -1, maxY: -1 };
+	this.tinTerrainWithDEMIndex[3] = { minX: -1, minY: -1, maxX: -1, maxY: -1 };
+	this.tinTerrainWithDEMIndex[4] = { minX: -1, minY: -1, maxX: -1, maxY: -1 };
+	this.tinTerrainWithDEMIndex[5] = { minX: -1, minY: -1, maxX: -1, maxY: -1 };
+	this.tinTerrainWithDEMIndex[6] = { minX: -1, minY: -1, maxX: -1, maxY: -1 };
+	this.tinTerrainWithDEMIndex[7] = { minX: -1, minY: -1, maxX: -1, maxY: -1 };
+	this.tinTerrainWithDEMIndex[8] = { minX: 213, minY: 94, maxX: 222, maxY: 105 };
+	this.tinTerrainWithDEMIndex[9] = { minX: 425, minY: 189, maxX: 443, maxY: 211 };
+	this.tinTerrainWithDEMIndex[10] = { minX: 852, minY: 376, maxX: 885, maxY: 423 };
+	this.tinTerrainWithDEMIndex[11] = { minX: 1705, minY: 753, maxX: 1770, maxY: 844 };
+	this.tinTerrainWithDEMIndex[12] = { minX: 3412, minY: 1506, maxX: 3539, maxY: 1689 };
+	this.tinTerrainWithDEMIndex[13] = { minX: -1, minY: -1, maxX: -1, maxY: -1 };
+	this.tinTerrainWithDEMIndex[14] = { minX: -1, minY: -1, maxX: -1, maxY: -1 };
+	this.tinTerrainWithDEMIndex[15] = { minX: -1, minY: -1, maxX: -1, maxY: -1 };
+	this.tinTerrainWithDEMIndex[16] = { minX: -1, minY: -1, maxX: -1, maxY: -1 };
+	this.tinTerrainWithDEMIndex[17] = { minX: -1, minY: -1, maxX: -1, maxY: -1 };
+	this.tinTerrainWithDEMIndex[18] = { minX: -1, minY: -1, maxX: -1, maxY: -1 };
+	this.tinTerrainWithDEMIndex[19] = { minX: -1, minY: -1, maxX: -1, maxY: -1 };
+	this.tinTerrainWithDEMIndex[20] = { minX: -1, minY: -1, maxX: -1, maxY: -1 };
+};
+
+TinTerrainManager.prototype.makeDistanceLimitByDepth = function()
+{
+	if (this.distLimitByDepth === undefined)
+	{ this.distLimitByDepth = []; }
+		
+	// For each depth, there are a limit distance.***
+	this.distLimitByDepth[0] = 50000000; 
+	this.distLimitByDepth[1] = 10000000; 
+	this.distLimitByDepth[2] = 5000000; 
+	this.distLimitByDepth[3] = 2000000; 
+	this.distLimitByDepth[4] = 1000000; 
+	this.distLimitByDepth[5] = 500000; 
+	this.distLimitByDepth[6] = 100000; 
+	this.distLimitByDepth[7] = 50000; 
+	this.distLimitByDepth[8] = 20000; 
+	this.distLimitByDepth[9] = 10000; 
+	this.distLimitByDepth[10] = 9000; 
+	this.distLimitByDepth[11] = 8000; 
+	this.distLimitByDepth[12] = 7000; 
+	this.distLimitByDepth[13] = 6000; 
+	this.distLimitByDepth[14] = 5000; 
+	this.distLimitByDepth[15] = 4000; 
+	this.distLimitByDepth[16] = 3000; 
+	this.distLimitByDepth[17] = 2000; 
+	this.distLimitByDepth[18] = 1000; 
+	this.distLimitByDepth[19] = 800; 
+	this.distLimitByDepth[20] = 500; 
+
 };
 
 TinTerrainManager.prototype.doFrustumCulling = function(frustum, camPos, magoManager, maxDepth)
@@ -240,6 +285,24 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	gl.uniform1i(currentShader.bIsMakingDepth_loc, bDepth); //.
 	gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture. Initially set as texture color type.***
 	gl.uniform4fv(currentShader.oneColor4_loc, [0.5, 0.5, 0.5, 1.0]);
+	var bApplyShadow = false;
+	if (magoManager.sunDepthFbo !== undefined)
+	{ bApplyShadow = true; }
+	gl.uniform1i(currentShader.bApplyShadow_loc, bApplyShadow);
+	
+	if (bApplyShadow)
+	{
+		// Set sunMatrix uniform.***
+		var sunLight = magoManager.sceneState.sunLight;
+		gl.uniformMatrix4fv(currentShader.sunMatrix_loc, false, sunLight.tMatrix._floatArrays);
+		gl.uniform3fv(currentShader.sunPosHigh_loc, sunLight.positionHIGH);
+		gl.uniform3fv(currentShader.sunPosLow_loc, sunLight.positionLOW);
+		gl.uniform1f(currentShader.shadowMapWidth_loc, sunLight.targetTextureWidth);
+		gl.uniform1f(currentShader.shadowMapHeight_loc, sunLight.targetTextureHeight);
+		
+		gl.bindTexture(gl.TEXTURE_2D, magoManager.sunDepthFbo.colorBuffer);
+	}
+
 	
 	var flipTexCoordY = true;
 	if (magoManager.configInformation.geo_view_library === Constant.CESIUM)
