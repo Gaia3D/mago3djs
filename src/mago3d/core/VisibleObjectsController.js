@@ -244,6 +244,54 @@ VisibleObjectsController.prototype.getNodeIdxSortedByDist = function(nodesArray,
 };
 
 /**
+ * Calculates a boundingSphere for visibleArray.
+ */
+VisibleObjectsController.calculateBoundingSphereForArray = function(visiblesArray, resultBoundingSphere) 
+{
+	if (resultBoundingSphere === undefined)
+	{ resultBoundingSphere = new BoundingSphere(); }
+	
+	var visiblesCount = visiblesArray.length;
+	var bSphere;
+	for (var i=0; i<visiblesCount; i++)
+	{
+		var visible = visiblesArray[i];
+		bSphere = visible.getBoundingSphereWC(bSphere);
+		if (i === 0)
+		{
+			resultBoundingSphere.copyFrom(bSphere);
+		}
+		else 
+		{
+			resultBoundingSphere.addBSphere(bSphere);
+		}
+		
+	}
+	
+	return resultBoundingSphere;
+};
+
+/**
+ * Calculates a boundingSphere for each visibles array.
+ */
+VisibleObjectsController.prototype.calculateBoundingSpheres = function() 
+{
+	//this.currentVisibles0; 
+	//this.currentVisibles1; 
+	//this.currentVisibles2; 
+	//this.currentVisibles3; 
+	//this.currentVisiblesAux;
+	//this.currentVisibleNativeObjects; 
+	
+	// check currentVisibles & make a boundingSphere for each visibles array.
+	if (this.bSphere === undefined)
+	{ this.bSphere = new BoundingSphere(); }
+	
+	var visiblesArray = this.currentVisibles0.concat(this.currentVisibles1, this.currentVisibles2, this.currentVisibles3);
+	this.bSphere = VisibleObjectsController.calculateBoundingSphereForArray(visiblesArray, this.bSphere);
+};
+
+/**
  * Put the node to given node array
  * @param nodesArray
  * @param node

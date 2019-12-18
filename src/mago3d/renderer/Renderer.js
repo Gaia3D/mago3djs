@@ -560,41 +560,13 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
  * @param {WebGLRenderingContext} gl WebGL Rendering Context.
  * @param {VisibleObjectsController} visibleObjControlerNodes This object contains visible objects for the camera frustum.
  */
-Renderer.prototype.renderDepthSunPointOfView = function(gl, visibleObjControlerNodes) 
+Renderer.prototype.renderDepthSunPointOfView = function(gl, visibleObjControlerNodes, sunLight) 
 {
-	var magoManager = this.magoManager;
-	var sunLight = magoManager.sceneState.sunLight;
-	
-	// Sun direction.***
-	var sunLongitude = 115.31586919332165;
-	var sunLatitude = 10.0;
-	var sunAltitude = 0.0; // No important.***
-	var sunPosWC = Globe.geographicToCartesianWgs84(sunLongitude, sunLatitude, sunAltitude, undefined);
-	
 	if (sunLight.tMatrix === undefined)
-	{ sunLight.tMatrix = new Matrix4(); }
+	{ return; }
 	
-	var sunTMatrix = new Matrix4();
-	sunTMatrix._floatArrays = Globe.transformMatrixAtCartesianPointWgs84(sunPosWC[0], sunPosWC[1], sunPosWC[2], sunTMatrix._floatArrays);
-	sunTMatrix._floatArrays[12] = 0;
-	sunTMatrix._floatArrays[13] = 0;
-	sunTMatrix._floatArrays[14] = 0;
-	
-	// Sun real position.***
-	var realLat = 37.58071053758259;
-	var realLon = 126.61255088096084;
-	var altitude = 50;
-	
-	// calculate sunTransformMatrix.***
-	var realPosWC = Globe.geographicToCartesianWgs84(realLon, realLat, altitude, undefined);
-	
-	var ortho = new Matrix4();
-	var nRange = 200.0;
-	var left = -nRange, right = nRange, bottom = -nRange, top = nRange, near = -10*nRange, far = 10*nRange;
-	ortho._floatArrays = glMatrix.mat4.ortho(ortho._floatArrays, left, right, bottom, top, near, far);
-	
-	sunLight.tMatrix = sunTMatrix.getMultipliedByMatrix(ortho, sunLight.tMatrix);
-	
+	var magoManager = this.magoManager;
+
 	// Do the depth render.***
 	var shaderName = "orthogonalDepth";
 	var currentShader = magoManager.postFxShadersManager.getShader(shaderName); 
@@ -606,16 +578,7 @@ Renderer.prototype.renderDepthSunPointOfView = function(gl, visibleObjControlerN
 	currentShader.enableVertexAttribArray(currentShader.position3_loc);
 
 	currentShader.bindUniformGenerals();
-	// Must bind modelViewMatrix of the sun.***
 
-	if (sunLight.positionHIGH === undefined)
-	{ sunLight.positionHIGH = new Float32Array([0.0, 0.0, 0.0]); } 
-	
-	if (sunLight.positionLOW === undefined)
-	{ sunLight.positionLOW = new Float32Array([0.0, 0.0, 0.0]); } 
-	
-	ManagerUtils.calculateSplited3fv([realPosWC[0], realPosWC[1], realPosWC[2]], sunLight.positionHIGH, sunLight.positionLOW);
-	
 	gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrixRelToEye_loc, false, sunLight.tMatrix._floatArrays);
 	gl.uniform3fv(currentShader.encodedCameraPositionMCHigh_loc, sunLight.positionHIGH);
 	gl.uniform3fv(currentShader.encodedCameraPositionMCLow_loc, sunLight.positionLOW);
@@ -646,6 +609,7 @@ Renderer.prototype.renderDepthSunPointOfView = function(gl, visibleObjControlerN
 	currentShader.disableVertexAttribArrayAll();
 	gl.useProgram(null);
 };
+
 
 /**
  * Test function.
@@ -832,6 +796,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
 		{
 			// Test sunLight.***
+			magoManager.sceneState.applySunShadows = true;
 			if (magoManager.sceneState.sunLight === undefined)
 			{
 				var lightType = 2; // 2 = directional light.
@@ -857,7 +822,11 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 				gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 			}
 			gl.viewport(0, 0, imageWidth, imageHeight);
-			this.renderDepthSunPointOfView(gl, visibleObjControlerNodes);
+			
+			//var sunLight = magoManager.sceneState.sunLight;
+			var sunLight = magoManager.sceneState.sunSystem.getLight(0);
+			this.renderDepthSunPointOfView(gl, visibleObjControlerNodes, sunLight);
+			
 			magoManager.sunDepthFbo.unbind();
 			magoManager.depthFboNeo.bind(); 
 			gl.viewport(0, 0, magoManager.sceneState.drawingBufferWidth[0], magoManager.sceneState.drawingBufferHeight[0]);
@@ -927,12 +896,15 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			if (bApplyShadow)
 			{
 				// Set sunMatrix uniform.***
-				var sunLight = magoManager.sceneState.sunLight;
-				gl.uniformMatrix4fv(currentShader.sunMatrix_loc, false, sunLight.tMatrix._floatArrays);
-				gl.uniform3fv(currentShader.sunPosHigh_loc, sunLight.positionHIGH);
-				gl.uniform3fv(currentShader.sunPosLow_loc, sunLight.positionLOW);
-				gl.uniform1f(currentShader.shadowMapWidth_loc, sunLight.targetTextureWidth);
-				gl.uniform1f(currentShader.shadowMapHeight_loc, sunLight.targetTextureHeight);
+				var sunLight = magoManager.sceneState.sunSystem.getLight(0);
+				if (sunLight.tMatrix!== undefined)
+				{
+					gl.uniformMatrix4fv(currentShader.sunMatrix_loc, false, sunLight.tMatrix._floatArrays);
+					gl.uniform3fv(currentShader.sunPosHigh_loc, sunLight.positionHIGH);
+					gl.uniform3fv(currentShader.sunPosLow_loc, sunLight.positionLOW);
+					gl.uniform1f(currentShader.shadowMapWidth_loc, sunLight.targetTextureWidth);
+					gl.uniform1f(currentShader.shadowMapHeight_loc, sunLight.targetTextureHeight);
+				}
 			}
 			
 			// check if exist clippingPlanes.
@@ -958,6 +930,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			currentShader.bindUniformGenerals();
 			gl.uniform1f(currentShader.externalAlpha_loc, 1.0);
 			gl.uniform1i(currentShader.textureFlipYAxis_loc, magoManager.sceneState.textureFlipYAxis);
+			gl.uniform1i(currentShader.refMatrixType_loc, 0); // init referencesMatrix.
 			
 			// Test sphericalKernel for ssao.************************
 			//gl.uniform3fv(currentShader.kernel32_loc, magoManager.sceneState.ssaoSphereKernel32);

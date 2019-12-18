@@ -19,14 +19,20 @@ var LightSource = function(lightType)
 	 * @default "noName"
 	 */
 	this.name;
+	this.id;
 	
 	this.lightType = lightType; // omni = 0, spot = 1, directional = 2, area = 3, volume = 4.
 	
+	this.geoCoord;
 	this.position;
 	this.positionHIGH;
 	this.positionLOW;
 	this.tMatrix;
 	
+	// light is directionType, must have the rectangle size.
+	
+	
 	this.targetTextureWidth = new Int32Array([2048]);
 	this.targetTextureHeight = new Int32Array([2048]);
 };
+

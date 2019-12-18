@@ -614,6 +614,12 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 	var zDivW_divFar = zDivW/frustum.far[0];
 	var transformedPoint_MV = sceneState.modelViewMatrix.transformPoint4D__test(cartesian);
 	var transformedPoint_P = sceneState.projectionMatrix.transformPoint4D__test(cartesian);
+	
+	// update sun if exist.
+	if (this.sceneState.sunSystem)
+	{
+		this.sceneState.sunSystem.updateSun(this);
+	}
 };
 
 /**
@@ -1188,8 +1194,7 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 
 	var gl = this.getGl();
 	this.upDateSceneStateMatrices(this.sceneState);
-	
-	var delaySecMax = 0.5;
+
 		
 	if (this.isFarestFrustum())
 	{
@@ -1223,7 +1228,7 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 	var frustumVolumenObject = this.frustumVolumeControl.getFrustumVolumeCulling(frustumIdx); 
 	this.myCameraSCX.setCurrentFrustum(frustumIdx);
 	this.sceneState.camera.setCurrentFrustum(frustumIdx);
-	var visibleNodes = frustumVolumenObject.visibleNodes;
+	var visibleNodes = frustumVolumenObject.visibleNodes; // class: VisibleObjectsController.
 	
 	if (!this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
 	{
@@ -1237,6 +1242,11 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 		doFrustumCullingToBuildings = true;
 		this.tilesMultiFrustumCullingFinished(frustumVolumenObject.partiallyIntersectedLowestTilesArray, visibleNodes, cameraPosition, frustumVolume, doFrustumCullingToBuildings);
 		this.prepareNeoBuildingsAsimetricVersion(gl, visibleNodes); 
+		
+		if (this.sceneState.applySunShadows)
+		{
+			visibleNodes.calculateBoundingSpheres();
+		}
 	}
 
 	var currentShader = undefined;

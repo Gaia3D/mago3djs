@@ -11,7 +11,7 @@ var TinTerrainManager = function()
 	}
 	
 	//this.maxDepth = 18;
-	this.maxDepth = 13;
+	this.maxDepth = 14;
 	this.currentVisibles_terrName_geoCoords_map = {}; // current visible terrains map[terrainPathName, geographicCoords].
 	this.currentTerrainsMap = {}; // current terrains (that was created) map[terrainPathName, tinTerrain].
 	
@@ -282,9 +282,15 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	gl.activeTexture(gl.TEXTURE2); 
 	gl.bindTexture(gl.TEXTURE_2D, tex.texId);
 	
+	if (this.identityMat === undefined)
+	{ this.identityMat = new Matrix4(); }
+	
 	gl.uniform1i(currentShader.bIsMakingDepth_loc, bDepth); //.
 	gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture. Initially set as texture color type.***
 	gl.uniform4fv(currentShader.oneColor4_loc, [0.5, 0.5, 0.5, 1.0]);
+	gl.uniform1i(currentShader.refMatrixType_loc, 0); // init referencesMatrix.
+	gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, this.identityMat._floatArrays);
+	
 	var bApplyShadow = false;
 	if (magoManager.sunDepthFbo !== undefined)
 	{ bApplyShadow = true; }
@@ -293,12 +299,15 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	if (bApplyShadow)
 	{
 		// Set sunMatrix uniform.***
-		var sunLight = magoManager.sceneState.sunLight;
-		gl.uniformMatrix4fv(currentShader.sunMatrix_loc, false, sunLight.tMatrix._floatArrays);
-		gl.uniform3fv(currentShader.sunPosHigh_loc, sunLight.positionHIGH);
-		gl.uniform3fv(currentShader.sunPosLow_loc, sunLight.positionLOW);
-		gl.uniform1f(currentShader.shadowMapWidth_loc, sunLight.targetTextureWidth);
-		gl.uniform1f(currentShader.shadowMapHeight_loc, sunLight.targetTextureHeight);
+		var sunLight = magoManager.sceneState.sunSystem.getLight(0);
+		if (sunLight.tMatrix!== undefined)
+		{
+			gl.uniformMatrix4fv(currentShader.sunMatrix_loc, false, sunLight.tMatrix._floatArrays);
+			gl.uniform3fv(currentShader.sunPosHigh_loc, sunLight.positionHIGH);
+			gl.uniform3fv(currentShader.sunPosLow_loc, sunLight.positionLOW);
+			gl.uniform1f(currentShader.shadowMapWidth_loc, sunLight.targetTextureWidth);
+			gl.uniform1f(currentShader.shadowMapHeight_loc, sunLight.targetTextureHeight);
+		}
 		
 		gl.bindTexture(gl.TEXTURE_2D, magoManager.sunDepthFbo.colorBuffer);
 	}

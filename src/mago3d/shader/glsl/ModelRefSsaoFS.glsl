@@ -117,7 +117,7 @@ void main()
 	}
 
 	bool testBool = false;
-	float occlusion = 0.0; // ambient occlusion.***
+	float occlusion = 1.0; // ambient occlusion.***
 	float shadow_occlusion = 1.0;
 	vec3 normal2 = vNormal;	
 		
@@ -127,8 +127,6 @@ void main()
 		float linearDepth = getDepth(screenPos);  
 		vec3 ray = getViewRay(screenPos);
 		vec3 origin = ray * linearDepth;  
-
-
 		float tolerance = radius/far;
 
 		vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;
@@ -153,9 +151,7 @@ void main()
 		} 
 		
 		occlusion = 1.0 - occlusion / float(kernelSize);	
-	}
-	else{
-		occlusion = 1.0;
+		
 	}
 	
 	//if(occlusion > 0.93)

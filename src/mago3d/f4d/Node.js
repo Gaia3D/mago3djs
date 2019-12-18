@@ -715,30 +715,28 @@ Node.prototype.getBBoxCenterPositionWorldCoord = function(geoLoc)
  */
 Node.prototype.calculateBBoxCenterPositionWorldCoord = function(geoLoc) 
 {
-	var bboxCenterPoint;
+	if (data.mapping_type === undefined)
+	{ data.mapping_type = "origin"; }
+
 	var bboxAbsoluteCenterPosAux;
-	if (this.data.bbox !== undefined)
+	var bboxCenterPoint = new Point3D(0, 0, 0);
+	if (data.mapping_type.toLowerCase() === "origin")
 	{
+		if (!this.data.bbox) 
+		{
+			this.getBBox();
+		}
 		// this.data.bbox is the most important bbox.
 		bboxCenterPoint = this.data.bbox.getCenterPoint(bboxCenterPoint); // local bbox.
 	}
-	else if (this.data.neoBuilding !== undefined)
+	else if (data.mapping_type.toLowerCase() === "boundingboxcenter")
 	{
-		var bbox = this.data.neoBuilding.getBBox();
-		if (bbox !== undefined)
-		{
-			bboxCenterPoint = bbox.getCenterPoint(bboxCenterPoint); // local bbox.
-		}
-		else 
-		{
-			// error.
-			return undefined;
-		}
+		bboxCenterPoint.set(0, 0, 0);
 	}
-	else 
+	else if (data.mapping_type.toLowerCase() === "boundingboxbottomcenter")
 	{
-		// error.
-		return undefined;
+		var bboxHeight = this.data.bbox.getZLength();
+		bboxCenterPoint.set(0, 0, bboxHeight/2);
 	}
 
 	bboxAbsoluteCenterPosAux = geoLoc.tMatrix.transformPoint3D(bboxCenterPoint, bboxAbsoluteCenterPosAux);
@@ -752,6 +750,33 @@ Node.prototype.calculateBBoxCenterPositionWorldCoord = function(geoLoc)
 	}
 	
 	return bboxAbsoluteCenterPosAux;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @returns {Boolean} applyOcclusionCulling
+ */
+Node.prototype.getBoundingSphereWC = function(resultBoundingSphere) 
+{
+	if (this.bboxAbsoluteCenterPos === undefined) 
+	{ return resultBoundingSphere; }
+	
+	if (resultBoundingSphere === undefined)
+	{ resultBoundingSphere = new BoundingSphere(); }
+	
+	var nodeRoot = this.getRoot();
+	var geoLocDataManager = nodeRoot.data.geoLocDataManager;
+	var geoLoc = geoLocDataManager.getCurrentGeoLocationData();
+	
+	var realBuildingPos = this.getBBoxCenterPositionWorldCoord(geoLoc);
+	var radiusAprox;
+	var bbox = this.getBBox();
+	radiusAprox = bbox.getRadiusAprox(); 
+	
+	resultBoundingSphere.setCenterPoint(realBuildingPos.x, realBuildingPos.y, realBuildingPos.z);
+	resultBoundingSphere.setRadius(radiusAprox);
+	
+	return resultBoundingSphere;
 };
 
 /**

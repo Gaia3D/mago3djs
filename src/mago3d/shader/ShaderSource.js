@@ -1379,7 +1379,7 @@ void main()\n\
 	}\n\
 \n\
 	bool testBool = false;\n\
-	float occlusion = 0.0; // ambient occlusion.***\n\
+	float occlusion = 1.0; // ambient occlusion.***\n\
 	float shadow_occlusion = 1.0;\n\
 	vec3 normal2 = vNormal;	\n\
 		\n\
@@ -1389,8 +1389,6 @@ void main()\n\
 		float linearDepth = getDepth(screenPos);  \n\
 		vec3 ray = getViewRay(screenPos);\n\
 		vec3 origin = ray * linearDepth;  \n\
-\n\
-\n\
 		float tolerance = radius/far;\n\
 \n\
 		vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
@@ -1415,9 +1413,7 @@ void main()\n\
 		} \n\
 		\n\
 		occlusion = 1.0 - occlusion / float(kernelSize);	\n\
-	}\n\
-	else{\n\
-		occlusion = 1.0;\n\
+		\n\
 	}\n\
 	\n\
 	//if(occlusion > 0.93)\n\
@@ -1659,7 +1655,8 @@ vec4 packDepth(const in float depth)\n\
 {\n\
     const vec4 bit_shift = vec4(16777216.0, 65536.0, 256.0, 1.0);\n\
     const vec4 bit_mask  = vec4(0.0, 0.00390625, 0.00390625, 0.00390625); \n\
-    vec4 res = fract(depth * bit_shift);\n\
+    //vec4 res = fract(depth * bit_shift); // Is not precise.\n\
+	vec4 res = mod(depth * bit_shift * vec4(255), vec4(256) ) / vec4(255); // Is better.\n\
     res -= res.xxyz * bit_mask;\n\
     return res;  \n\
 }\n\

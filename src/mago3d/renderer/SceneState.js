@@ -35,7 +35,9 @@ var SceneState = function()
 	// Sun.***
 	// omni = 0, spot = 1, directional = 2, area = 3, volume = 4.
 	var lightType = 2;
-	this.sunLight = new LightSource(lightType);
+	this.sunLight = new LightSource(lightType); // OLD.***
+	this.sunSystem = new SunSystem();
+	this.applySunShadows = false;
 	
 	// lighting & ssao.
 	this.ambientReflectionCoef = new Float32Array([0.45]); // 0.2.
@@ -138,6 +140,14 @@ var SceneState = function()
 SceneState.prototype.getModelViewMatrixInv = function() 
 {
 	return this.modelViewMatrixInv;
+};
+
+/**
+ * Returns the camera.
+ */
+SceneState.prototype.getCamera = function() 
+{
+	return this.camera;
 };
 
 

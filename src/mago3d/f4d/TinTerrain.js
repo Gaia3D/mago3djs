@@ -487,8 +487,8 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 					gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 					gl.uniform4fv(currentShader.oneColor4_loc, [0.8, 0.3, 0.1, 1.0]);
 					
-					if (this.depth === 15)
-					{ var hola = 0; }
+					//if (this.depth === 15)
+					//{ var hola = 0; }
 				}
 			}
 			// End test.--------------------------------------------------------------------------------------
@@ -1209,6 +1209,9 @@ TinTerrain.prototype.decodeData = function(imageryType)
 		//var texCorrectionFactor = 0.0005;
 		var texCorrectionFactor = 0.003 + (depth * 0.0000001);
 		//var texCorrectionFactor = 0.002 + (1/(depth+1) * 0.008);
+		
+		//if (this.depth === 13)
+		//{ texCorrectionFactor = 0.0033; }
 	
 		for (var i=0; i<vertexCount; i++)
 		{
