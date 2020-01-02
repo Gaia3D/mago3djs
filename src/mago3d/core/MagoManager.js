@@ -616,7 +616,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 	var transformedPoint_P = sceneState.projectionMatrix.transformPoint4D__test(cartesian);
 	
 	// update sun if exist.
-	if (this.sceneState.sunSystem)
+	if (this.sceneState.sunSystem && this.sceneState.applySunShadows)
 	{
 		this.sceneState.sunSystem.updateSun(this);
 	}
@@ -1242,11 +1242,6 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 		doFrustumCullingToBuildings = true;
 		this.tilesMultiFrustumCullingFinished(frustumVolumenObject.partiallyIntersectedLowestTilesArray, visibleNodes, cameraPosition, frustumVolume, doFrustumCullingToBuildings);
 		this.prepareNeoBuildingsAsimetricVersion(gl, visibleNodes); 
-		
-		if (this.sceneState.applySunShadows)
-		{
-			visibleNodes.calculateBoundingSpheres();
-		}
 	}
 
 	var currentShader = undefined;
@@ -1934,6 +1929,14 @@ MagoManager.prototype.keyDown = function(key)
 			};
 			this.changeLocationAndRotation(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll, animationOption);
 		}
+	}
+	else if (key === 83) // 83 = 's'.***
+	{
+		// active or deactive shadows.
+		if (this.sceneState.applySunShadows)
+		{ this.sceneState.applySunShadows = false; }
+		else
+		{ this.sceneState.applySunShadows = true; }
 	}
 	else if (key === 84) // 84 = 't'.***
 	{
@@ -4383,9 +4386,6 @@ MagoManager.prototype.doMultiFrustumCullingSmartTiles = function(camera)
 	
 	if (this.fullyIntersectedLowestTilesArray === undefined)
 	{ this.fullyIntersectedLowestTilesArray = []; }
-
-	//if (this.partiallyIntersectedLowestTilesArray === undefined)
-	//{ this.partiallyIntersectedLowestTilesArray = []; }
 	
 	if (this.lastIntersectedLowestTilesArray === undefined)
 	{ this.lastIntersectedLowestTilesArray = []; }

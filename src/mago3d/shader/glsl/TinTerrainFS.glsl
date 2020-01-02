@@ -2,8 +2,8 @@
     precision highp float;
 #endif
 
-uniform sampler2D depthTex;
-uniform sampler2D noiseTex;  
+//uniform sampler2D depthTex;
+//uniform sampler2D noiseTex;  
 uniform sampler2D diffuseTex;
 uniform sampler2D shadowMapTex;
 uniform bool textureFlipYAxis;
@@ -83,10 +83,10 @@ vec3 getViewRay(vec2 tc)
 }
 
 //linear view space depth
-float getDepth(vec2 coord)
-{
-    return unpackDepth(texture2D(depthTex, coord.xy));
-}  
+//float getDepth(vec2 coord)
+//{
+//    return unpackDepth(texture2D(depthTex, coord.xy));
+//}  
 
 float getDepthShadowMap(vec2 coord)
 {

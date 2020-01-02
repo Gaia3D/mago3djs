@@ -256,6 +256,9 @@ VisibleObjectsController.calculateBoundingSphereForArray = function(visiblesArra
 	for (var i=0; i<visiblesCount; i++)
 	{
 		var visible = visiblesArray[i];
+		if (visible === undefined)
+		{ continue; }
+		
 		bSphere = visible.getBoundingSphereWC(bSphere);
 		if (i === 0)
 		{
@@ -280,15 +283,77 @@ VisibleObjectsController.prototype.calculateBoundingSpheres = function()
 	//this.currentVisibles1; 
 	//this.currentVisibles2; 
 	//this.currentVisibles3; 
-	//this.currentVisiblesAux;
-	//this.currentVisibleNativeObjects; 
+	//this.currentVisiblesAux; // todo:
+	//this.currentVisibleNativeObjects;  // todo:
 	
 	// check currentVisibles & make a boundingSphere for each visibles array.
 	if (this.bSphere === undefined)
 	{ this.bSphere = new BoundingSphere(); }
-	
+
 	var visiblesArray = this.currentVisibles0.concat(this.currentVisibles1, this.currentVisibles2, this.currentVisibles3);
-	this.bSphere = VisibleObjectsController.calculateBoundingSphereForArray(visiblesArray, this.bSphere);
+	
+	if (visiblesArray.length === 0)
+	{ return; }
+
+	var filteredVisiblesArray = [];
+	// Find the geoExtent of the all visibles.
+	var minLonCandidate;
+	var minLatCandidate;
+	var maxLonCandidate;
+	var maxLatCandidate;
+	
+	var minLonVisible;
+	var maxLonVisible;
+	var minLatVisible;
+	var maxLatVisible;
+	
+	var visiblesCount = visiblesArray.length;
+	for (var i=0; i<visiblesCount; i++)
+	{
+		var visible = visiblesArray[i];
+		if (visible.data.distToCam > 2000.0)
+		{ continue; }
+		
+		var geoCoord = visible.data.geographicCoord;
+		if (i===0)
+		{
+			minLonCandidate = geoCoord.longitude;
+			minLatCandidate = geoCoord.latitude;
+			maxLonCandidate = geoCoord.longitude;
+			maxLatCandidate = geoCoord.latitude;
+			minLonVisible = visible;
+			maxLonVisible = visible;
+			minLatVisible = visible;
+			maxLatVisible = visible;
+		}
+		else
+		{
+			if (geoCoord.longitude < minLonCandidate)
+			{ 
+				minLonCandidate = geoCoord.longitude; 
+				minLonVisible = visible;
+			}
+			else if (geoCoord.longitude > maxLonCandidate)
+			{ 
+				maxLonCandidate = geoCoord.longitude; 
+				maxLonVisible = visible;
+			}
+			
+			if (geoCoord.latitude < minLatCandidate)
+			{ 
+				minLatCandidate = geoCoord.latitude; 
+				minLatVisible = visible;
+			}
+			else if (geoCoord.latitude > maxLatCandidate)
+			{ 
+				maxLatCandidate = geoCoord.latitude; 
+				maxLatVisible = visible;
+			}
+		}
+	}
+	
+	filteredVisiblesArray.push.apply(filteredVisiblesArray, [minLonVisible, maxLonVisible, minLatVisible, maxLatVisible]);
+	this.bSphere = VisibleObjectsController.calculateBoundingSphereForArray(filteredVisiblesArray, this.bSphere);
 };
 
 /**

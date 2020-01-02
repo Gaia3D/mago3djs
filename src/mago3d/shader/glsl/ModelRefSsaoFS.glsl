@@ -51,6 +51,7 @@ varying float applySpecLighting;
 varying vec4 vPosRelToLight; 
 varying vec3 vLightDir; 
 varying vec3 vNormalWC;
+varying float currSunIdx; 
 
 float unpackDepth(const in vec4 rgba_depth)
 {
@@ -192,46 +193,117 @@ void main()
 	
 	if(bApplyShadow)
 	{
-	
-		vec3 posRelToLight = vPosRelToLight.xyz / vPosRelToLight.w;
-		if(posRelToLight.x >= -0.5 && posRelToLight.x <= 0.5)
+		if(currSunIdx > 0.0)
 		{
-			if(posRelToLight.y >= -0.5 && posRelToLight.y <= 0.5)
+			float ligthAngle = dot(vLightDir, vNormalWC);
+			if(ligthAngle > 0.0)
 			{
-				float ligthAngle = dot(vLightDir, vNormalWC);
-				if(ligthAngle > 0.0)
+				// The angle between the light direction & face normal is less than 90 degree, so, the face is in shadow.***
+				shadow_occlusion = 0.5;
+			}
+			else
+			{
+				vec3 posRelToLight = vPosRelToLight.xyz / vPosRelToLight.w;
+				float tolerance = 0.9963;
+				//tolerance = 0.9962;
+				posRelToLight = posRelToLight * 0.5 + 0.5;
+				float depthRelToLight = getDepthShadowMap(posRelToLight.xy);
+				if(posRelToLight.z > depthRelToLight*tolerance )
 				{
-					// The angle between the light direction & face normal is less than 90 degree, so, the face is in shadow.***
-					if(shadow_occlusion > 0.4)
-						shadow_occlusion = 0.4;
+					shadow_occlusion = 0.5;
 				}
-				else{
-					float pixelWidth = 1.0 / shadowMapWidth;
-					float pixelHeight = 1.0 / shadowMapHeight;
-					posRelToLight = posRelToLight * 0.5 + 0.5;
-					
-					float depthRelToLight = getDepthShadowMap(posRelToLight.xy);
-					if(posRelToLight.z > depthRelToLight*0.9963 )
+				/*
+				// test. Calculate the zone inside the pixel.************************************
+				//https://docs.microsoft.com/ko-kr/windows/win32/dxtecharts/cascaded-shadow-maps
+				float pixelWidth = 1.0 / shadowMapWidth;
+				float pixelHeight = 1.0 / shadowMapHeight;
+				float currPixel_s = posRelToLight.x*pixelWidth;
+				float currPixel_t = posRelToLight.y*pixelHeight;
+				float currPixel_s_decimals = currPixel_s - floor(currPixel_s);
+				float currPixel_t_decimals = currPixel_t - floor(currPixel_t);
+				float horit = 0.0;
+				float vert = 0.0;
+				if(currPixel_s_decimals < 0.5)
+				{
+					horit = -1.0;
+				}
+				else //if(currPixel_s_decimals >= 0.66)
+				{
+					horit = 1.0;
+				}
+				
+				if(currPixel_t_decimals < 0.5)
+				{
+					vert = -1.0;
+				}
+				else //if(currPixel_t_decimals >= 0.66)
+				{
+					vert = 1.0;
+				}
+				
+				//pixelWidth *= 0.05;
+				//pixelHeight *= 0.05;
+				
+				vec2 shadowMapTexCoord = vec2(posRelToLight.x + horit * pixelWidth, posRelToLight.y);
+				float depthRelToLight = getDepthShadowMap(shadowMapTexCoord);
+				if(posRelToLight.z > depthRelToLight*tolerance )
+				{
+					float pixelDist = 1.0;
+					if(horit < 0.0)
 					{
-						if(shadow_occlusion > 0.4)
-							shadow_occlusion = 0.4;
+						pixelDist = 1.0 - currPixel_s_decimals;
+					}
+					else{
+						pixelDist = currPixel_s_decimals;
 					}
 					
-					//for(int horit = -1; horit<2; horit++)
-					//{
-					//	for(int vert = -1; vert < 2; vert++)
-					//	{
-					//		vec2 shadowMapTexCoord = vec2(posRelToLight.x+float(horit)*pixelWidth, posRelToLight.y+float(vert)*pixelHeight);
-					//		float depthRelToLight = getDepthShadowMap(shadowMapTexCoord);
-					//		if(posRelToLight.z > depthRelToLight*0.9963 )
-					//		{
-					//			if(shadow_occlusion > 0.4)
-					//				shadow_occlusion -= (0.4/9.0);
-					//		}
-					//	}
-					//}
-					
+					shadow_occlusion -= (0.5/3.0)*pixelDist;
 				}
+				
+				shadowMapTexCoord = vec2(posRelToLight.x, posRelToLight.y + vert * pixelHeight);
+				depthRelToLight = getDepthShadowMap(shadowMapTexCoord);
+				if(posRelToLight.z > depthRelToLight*tolerance )
+				{
+					float pixelDist = 1.0;
+					if(vert < 0.0)
+					{
+						pixelDist = 1.0 - currPixel_t_decimals;
+					}
+					else{
+						pixelDist = currPixel_t_decimals;
+					}
+					shadow_occlusion -= (0.5/3.0)*pixelDist;
+				}
+				
+				shadowMapTexCoord = vec2(posRelToLight.x + horit * pixelWidth, posRelToLight.y + vert * pixelHeight);
+				depthRelToLight = getDepthShadowMap(shadowMapTexCoord);
+				if(posRelToLight.z > depthRelToLight*tolerance )
+				{
+					float pixelDistH = 1.0;
+					if(horit < 0.0)
+					{
+						pixelDistH = 1.0 - currPixel_s_decimals;
+					}
+					else{
+						pixelDistH = currPixel_s_decimals;
+					}
+					
+					float pixelDistV = 1.0;
+					if(vert < 0.0)
+					{
+						pixelDistV = 1.0 - currPixel_t_decimals;
+					}
+					else{
+						pixelDistV = currPixel_t_decimals;
+					}
+					
+					shadow_occlusion -= (0.5/3.0)*pixelDistV*pixelDistH;
+				}
+				
+				// End test.---------------------------------------------------------------------
+				*/
+				
+				
 			}
 		}
 		

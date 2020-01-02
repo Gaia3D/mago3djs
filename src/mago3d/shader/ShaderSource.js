@@ -1313,6 +1313,7 @@ varying float applySpecLighting;\n\
 varying vec4 vPosRelToLight; \n\
 varying vec3 vLightDir; \n\
 varying vec3 vNormalWC;\n\
+varying float currSunIdx; \n\
 \n\
 float unpackDepth(const in vec4 rgba_depth)\n\
 {\n\
@@ -1454,46 +1455,117 @@ void main()\n\
 	\n\
 	if(bApplyShadow)\n\
 	{\n\
-	\n\
-		vec3 posRelToLight = vPosRelToLight.xyz / vPosRelToLight.w;\n\
-		if(posRelToLight.x >= -0.5 && posRelToLight.x <= 0.5)\n\
+		if(currSunIdx > 0.0)\n\
 		{\n\
-			if(posRelToLight.y >= -0.5 && posRelToLight.y <= 0.5)\n\
+			float ligthAngle = dot(vLightDir, vNormalWC);\n\
+			if(ligthAngle > 0.0)\n\
 			{\n\
-				float ligthAngle = dot(vLightDir, vNormalWC);\n\
-				if(ligthAngle > 0.0)\n\
+				// The angle between the light direction & face normal is less than 90 degree, so, the face is in shadow.***\n\
+				shadow_occlusion = 0.5;\n\
+			}\n\
+			else\n\
+			{\n\
+				vec3 posRelToLight = vPosRelToLight.xyz / vPosRelToLight.w;\n\
+				float tolerance = 0.9963;\n\
+				//tolerance = 0.9962;\n\
+				posRelToLight = posRelToLight * 0.5 + 0.5;\n\
+				float depthRelToLight = getDepthShadowMap(posRelToLight.xy);\n\
+				if(posRelToLight.z > depthRelToLight*tolerance )\n\
 				{\n\
-					// The angle between the light direction & face normal is less than 90 degree, so, the face is in shadow.***\n\
-					if(shadow_occlusion > 0.4)\n\
-						shadow_occlusion = 0.4;\n\
+					shadow_occlusion = 0.5;\n\
 				}\n\
-				else{\n\
-					float pixelWidth = 1.0 / shadowMapWidth;\n\
-					float pixelHeight = 1.0 / shadowMapHeight;\n\
-					posRelToLight = posRelToLight * 0.5 + 0.5;\n\
-					\n\
-					float depthRelToLight = getDepthShadowMap(posRelToLight.xy);\n\
-					if(posRelToLight.z > depthRelToLight*0.9963 )\n\
+				/*\n\
+				// test. Calculate the zone inside the pixel.************************************\n\
+				//https://docs.microsoft.com/ko-kr/windows/win32/dxtecharts/cascaded-shadow-maps\n\
+				float pixelWidth = 1.0 / shadowMapWidth;\n\
+				float pixelHeight = 1.0 / shadowMapHeight;\n\
+				float currPixel_s = posRelToLight.x*pixelWidth;\n\
+				float currPixel_t = posRelToLight.y*pixelHeight;\n\
+				float currPixel_s_decimals = currPixel_s - floor(currPixel_s);\n\
+				float currPixel_t_decimals = currPixel_t - floor(currPixel_t);\n\
+				float horit = 0.0;\n\
+				float vert = 0.0;\n\
+				if(currPixel_s_decimals < 0.5)\n\
+				{\n\
+					horit = -1.0;\n\
+				}\n\
+				else //if(currPixel_s_decimals >= 0.66)\n\
+				{\n\
+					horit = 1.0;\n\
+				}\n\
+				\n\
+				if(currPixel_t_decimals < 0.5)\n\
+				{\n\
+					vert = -1.0;\n\
+				}\n\
+				else //if(currPixel_t_decimals >= 0.66)\n\
+				{\n\
+					vert = 1.0;\n\
+				}\n\
+				\n\
+				//pixelWidth *= 0.05;\n\
+				//pixelHeight *= 0.05;\n\
+				\n\
+				vec2 shadowMapTexCoord = vec2(posRelToLight.x + horit * pixelWidth, posRelToLight.y);\n\
+				float depthRelToLight = getDepthShadowMap(shadowMapTexCoord);\n\
+				if(posRelToLight.z > depthRelToLight*tolerance )\n\
+				{\n\
+					float pixelDist = 1.0;\n\
+					if(horit < 0.0)\n\
 					{\n\
-						if(shadow_occlusion > 0.4)\n\
-							shadow_occlusion = 0.4;\n\
+						pixelDist = 1.0 - currPixel_s_decimals;\n\
+					}\n\
+					else{\n\
+						pixelDist = currPixel_s_decimals;\n\
 					}\n\
 					\n\
-					//for(int horit = -1; horit<2; horit++)\n\
-					//{\n\
-					//	for(int vert = -1; vert < 2; vert++)\n\
-					//	{\n\
-					//		vec2 shadowMapTexCoord = vec2(posRelToLight.x+float(horit)*pixelWidth, posRelToLight.y+float(vert)*pixelHeight);\n\
-					//		float depthRelToLight = getDepthShadowMap(shadowMapTexCoord);\n\
-					//		if(posRelToLight.z > depthRelToLight*0.9963 )\n\
-					//		{\n\
-					//			if(shadow_occlusion > 0.4)\n\
-					//				shadow_occlusion -= (0.4/9.0);\n\
-					//		}\n\
-					//	}\n\
-					//}\n\
-					\n\
+					shadow_occlusion -= (0.5/3.0)*pixelDist;\n\
 				}\n\
+				\n\
+				shadowMapTexCoord = vec2(posRelToLight.x, posRelToLight.y + vert * pixelHeight);\n\
+				depthRelToLight = getDepthShadowMap(shadowMapTexCoord);\n\
+				if(posRelToLight.z > depthRelToLight*tolerance )\n\
+				{\n\
+					float pixelDist = 1.0;\n\
+					if(vert < 0.0)\n\
+					{\n\
+						pixelDist = 1.0 - currPixel_t_decimals;\n\
+					}\n\
+					else{\n\
+						pixelDist = currPixel_t_decimals;\n\
+					}\n\
+					shadow_occlusion -= (0.5/3.0)*pixelDist;\n\
+				}\n\
+				\n\
+				shadowMapTexCoord = vec2(posRelToLight.x + horit * pixelWidth, posRelToLight.y + vert * pixelHeight);\n\
+				depthRelToLight = getDepthShadowMap(shadowMapTexCoord);\n\
+				if(posRelToLight.z > depthRelToLight*tolerance )\n\
+				{\n\
+					float pixelDistH = 1.0;\n\
+					if(horit < 0.0)\n\
+					{\n\
+						pixelDistH = 1.0 - currPixel_s_decimals;\n\
+					}\n\
+					else{\n\
+						pixelDistH = currPixel_s_decimals;\n\
+					}\n\
+					\n\
+					float pixelDistV = 1.0;\n\
+					if(vert < 0.0)\n\
+					{\n\
+						pixelDistV = 1.0 - currPixel_t_decimals;\n\
+					}\n\
+					else{\n\
+						pixelDistV = currPixel_t_decimals;\n\
+					}\n\
+					\n\
+					shadow_occlusion -= (0.5/3.0)*pixelDistV*pixelDistH;\n\
+				}\n\
+				\n\
+				// End test.---------------------------------------------------------------------\n\
+				*/\n\
+				\n\
+				\n\
 			}\n\
 		}\n\
 		\n\
@@ -1555,11 +1627,11 @@ ShaderSource.ModelRefSsaoVS = "	attribute vec3 position;\n\
 	uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
 	uniform mat4 RefTransfMatrix;\n\
 	uniform mat4 normalMatrix4;\n\
-	uniform mat4 sunMatrix; \n\
+	uniform mat4 sunMatrix[2]; \n\
 	uniform vec3 buildingPosHIGH;\n\
 	uniform vec3 buildingPosLOW;\n\
-	uniform vec3 sunPosHIGH;\n\
-	uniform vec3 sunPosLOW;\n\
+	uniform vec3 sunPosHIGH[2];\n\
+	uniform vec3 sunPosLOW[2];\n\
 	uniform vec3 encodedCameraPositionMCHigh;\n\
 	uniform vec3 encodedCameraPositionMCLow;\n\
 	uniform vec3 aditionalPosition;\n\
@@ -1580,6 +1652,7 @@ ShaderSource.ModelRefSsaoVS = "	attribute vec3 position;\n\
 	varying vec4 vPosRelToLight; \n\
 	varying vec3 vLightDir; \n\
 	varying vec3 vNormalWC; \n\
+	varying float currSunIdx; \n\
 	\n\
 	void main()\n\
     {	\n\
@@ -1608,16 +1681,36 @@ ShaderSource.ModelRefSsaoVS = "	attribute vec3 position;\n\
 		vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
 		vec3 rotatedNormal = currentTMat * normal;\n\
 		\n\
+		currSunIdx = -1.0; // initially no apply shdow.\n\
 		if(bApplyShadow)\n\
 		{\n\
-			// Calculate the vertex relative to light.***\n\
-			vec3 highDifferenceSun = objPosHigh.xyz - sunPosHIGH.xyz;\n\
-			vec3 lowDifferenceSun = objPosLow.xyz - sunPosLOW.xyz;\n\
-			vec4 pos4Sun = vec4(highDifferenceSun.xyz + lowDifferenceSun.xyz, 1.0);\n\
-		\n\
-			vPosRelToLight = sunMatrix * pos4Sun;\n\
-			vLightDir = vec3(-sunMatrix[2][0], -sunMatrix[2][1], -sunMatrix[2][2]);\n\
-			vNormalWC = rotatedNormal;\n\
+			// the sun lights count are 2.\n\
+			for(int i=0; i<2; i++)\n\
+			{\n\
+				vec3 currSunPosLOW = sunPosLOW[i];\n\
+				vec3 currSunPosHIGH = sunPosHIGH[i];\n\
+				// Calculate the vertex relative to light.***\n\
+				vec3 highDifferenceSun = objPosHigh.xyz - currSunPosHIGH.xyz;\n\
+				vec3 lowDifferenceSun = objPosLow.xyz - currSunPosLOW.xyz;\n\
+				vec4 pos4Sun = vec4(highDifferenceSun.xyz + lowDifferenceSun.xyz, 1.0);\n\
+				\n\
+				mat4 currSunMatrix = sunMatrix[i];\n\
+				vPosRelToLight = currSunMatrix * pos4Sun;\n\
+				\n\
+				// now, check if \"vPosRelToLight\" is inside of the lightVolume (inside of the depthTexture of the light).\n\
+				vec3 posRelToLightNDC = vPosRelToLight.xyz / vPosRelToLight.w;\n\
+				if(posRelToLightNDC.x >= -0.5 && posRelToLightNDC.x <= 0.5)\n\
+				{\n\
+					if(posRelToLightNDC.y >= -0.5 && posRelToLightNDC.y <= 0.5)\n\
+					{\n\
+						// is inside of the lightVolume.***\n\
+						currSunIdx = float(i) + 0.5;\n\
+						vLightDir = vec3(-currSunMatrix[2][0], -currSunMatrix[2][1], -currSunMatrix[2][2]);\n\
+						vNormalWC = rotatedNormal;\n\
+						break;\n\
+					}\n\
+				}\n\
+			}\n\
 		}\n\
 \n\
 		\n\
@@ -2806,8 +2899,8 @@ ShaderSource.TinTerrainFS = "#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\
 \n\
-uniform sampler2D depthTex;\n\
-uniform sampler2D noiseTex;  \n\
+//uniform sampler2D depthTex;\n\
+//uniform sampler2D noiseTex;  \n\
 uniform sampler2D diffuseTex;\n\
 uniform sampler2D shadowMapTex;\n\
 uniform bool textureFlipYAxis;\n\
@@ -2887,10 +2980,10 @@ vec3 getViewRay(vec2 tc)\n\
 }\n\
 \n\
 //linear view space depth\n\
-float getDepth(vec2 coord)\n\
-{\n\
-    return unpackDepth(texture2D(depthTex, coord.xy));\n\
-}  \n\
+//float getDepth(vec2 coord)\n\
+//{\n\
+//    return unpackDepth(texture2D(depthTex, coord.xy));\n\
+//}  \n\
 \n\
 float getDepthShadowMap(vec2 coord)\n\
 {\n\
@@ -2984,7 +3077,6 @@ attribute vec3 normal;\n\
 attribute vec4 color4;\n\
 attribute vec2 texCoord;\n\
 \n\
-uniform sampler2D diffuseTex;\n\
 uniform mat4 projectionMatrix;  \n\
 uniform mat4 modelViewMatrix;\n\
 uniform mat4 modelViewMatrixRelToEye; \n\
