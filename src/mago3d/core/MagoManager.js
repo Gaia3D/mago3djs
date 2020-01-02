@@ -920,6 +920,19 @@ MagoManager.prototype.managePickingProcess = function()
 		if (this.currentFrustumIdx === 0)
 		{
 			this.isCameraMoved = false;
+
+			//TODO : MOVEEND EVENT TRIGGER
+			//PSEUDO CODE FOR CLUSTER
+			if (this.modeler && this.modeler.objectsArray) 
+			{
+				for (var i=0, len=this.modeler.objectsArray.length;i<len;i++) 
+				{
+					var obj = this.modeler.objectsArray[i];
+					if (!obj instanceof Cluster) { continue; }
+
+					obj.setDirty(true);
+				}
+			}
 		}
 	}
 	
