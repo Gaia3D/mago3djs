@@ -172,7 +172,7 @@ BoundingBox.getBBoxByPonintAndSize = function(point, size)
 	var minY = point.y - size;
 	var minZ = point.z - size;
 	var maxZ = point.z + size;
-	bbox.set(minX, minY, 0, maxX, maxY, 0);
+	bbox.set(minX, minY, minZ, maxX, maxY, maxZ);
 
 	return bbox;
 };

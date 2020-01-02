@@ -78,7 +78,6 @@ Cluster.prototype.makeCluster = function(magoManager)
 	var pointCnt = this.point3DList.getPointsCount();
 	if (pointCnt < 1) { return false; }
 	
-	var halfRange = this.range / 2;
 	var gl = magoManager.getGl();
 
 	var clusterObj = {};
@@ -91,7 +90,7 @@ Cluster.prototype.makeCluster = function(magoManager)
         
 			var pixel = ManagerUtils.calculateWorldPositionToScreenCoord(gl, point3D.x, point3D.y, point3D.z, undefined, magoManager);
 
-			var screenExtent = BoundingBox.getBBoxByPonintAndSize(pixel, halfRange);
+			var screenExtent = BoundingBox.getBBoxByPonintAndSize(pixel, this.range);
 
 			var leftBottom = ManagerUtils.cameraCoordPositionToWorldCoord(new Point3D(screenExtent.minX, screenExtent.minY, screenExtent.minZ), leftBottom, magoManager);
 			var rightTop = ManagerUtils.cameraCoordPositionToWorldCoord(new Point3D(screenExtent.maxX, screenExtent.maxY, screenExtent.maxZ), rightTop, magoManager);
