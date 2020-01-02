@@ -461,6 +461,8 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 		// RenderDepth for all buildings.***
 		var refTMatrixIdxKey = 0;
 		var minSize = 0.0;
+		// excavation objects.
+		this.renderExcavationObjects(gl, currentShader, renderType, visibleObjControlerNodes);
 
 		magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
 		magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
@@ -756,6 +758,26 @@ Renderer.prototype.renderNativeObjects = function(gl, shader, renderType, visibl
 };
 
 /**
+ * This function renders Excavation type objects that has no self render function.
+ * @param {WebGLRenderingContext} gl WebGL Rendering Context.
+ * @param {Number} renderType If renderType = 0 (depth render), renderType = 1 (color render), renderType = 2 (colorCoding render).
+ * @param {VisibleObjectsController} visibleObjControlerNodes This object contains visible objects for the camera frustum.
+ */
+Renderer.prototype.renderExcavationObjects = function(gl, shader, renderType, visibleObjControlerNodes) 
+{
+	var magoManager = this.magoManager;
+	var glPrimitive = undefined;
+	
+	// excavation
+	var excavationsArray = visibleObjControlerNodes.currentVisibleNativeObjects.excavationsArray;
+	var nativeObjectsCount = excavationsArray.length;
+	for (var i=0; i<nativeObjectsCount; i++)
+	{
+		excavationsArray[i].render(magoManager, shader, renderType, glPrimitive);
+	}
+};
+
+/**
  * This function renders provisional ParametricMesh objects that has no self render function.
  * @param {WebGLRenderingContext} gl WebGL Rendering Context.
  * @param {Number} renderType If renderType = 0 (depth render), renderType = 1 (color render), renderType = 2 (colorCoding render).
@@ -968,7 +990,9 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			
 			// temp test excavation, thickLines, etc.***.
 			magoManager.modeler.render(magoManager, currentShader, renderType);
+			// excavation objects.
 			
+			this.renderExcavationObjects(gl, currentShader, renderType, visibleObjControlerNodes);
 			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 			
 			//bApplySsao = false;
@@ -979,8 +1003,6 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			
 			// native objects.
 			this.renderNativeObjects(gl, currentShader, renderType, visibleObjControlerNodes);
-			
-			
 			
 			currentShader.disableVertexAttribArrayAll();
 			gl.useProgram(null);

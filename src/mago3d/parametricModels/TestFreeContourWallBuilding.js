@@ -6,12 +6,13 @@
  */
 var TestFreeContourWallBuilding = function(options) 
 {
-	MagoRenderable.call(this);
+	MagoRenderable.call(this, options);
 	if (!(this instanceof TestFreeContourWallBuilding)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+	this.height;
+	this.point2DList;
 	if (options !== undefined)
 	{
 		if (options.points2dArray !== undefined)
@@ -30,8 +31,7 @@ var TestFreeContourWallBuilding = function(options)
 		}
 	}
 	
-	this.height;
-	this.point2DList;
+	
 };
 
 TestFreeContourWallBuilding.prototype = Object.create(MagoRenderable.prototype);

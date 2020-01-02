@@ -28,6 +28,7 @@ var Excavation = function(options)
 	this.vboKeysContainerEdges;
 	
 	this.dirty = true;
+	this.color4 = new Color(222/255, 184/255, 135/255, 1.0);
 	
 	if (options !== undefined)
 	{
@@ -53,6 +54,11 @@ var Excavation = function(options)
 		if (options.excavationDepthInMeters !== undefined)
 		{
 			this.excavationDepthInMeters = options.excavationDepthInMeters;
+		}
+
+		if (options.color && options.color instanceof Color) 
+		{
+			this.color4 = options.color;
 		}
 	}
 };
@@ -153,7 +159,7 @@ Excavation.prototype.render = function(magoManager, shader, renderType, glPrimit
 	if (renderType === 1)
 	{
 		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
-		gl.uniform4fv(shader.oneColor4_loc, [222/255, 184/255, 135/255, 1.0]); //.
+		gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, this.color4.a]); //.
 	}
 	
 	gl.colorMask(true, true, true, true);

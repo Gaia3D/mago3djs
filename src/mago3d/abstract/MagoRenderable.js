@@ -1,6 +1,6 @@
 'use strict';
 
-var MagoRenderable = function() 
+var MagoRenderable = function(options) 
 {
 	this.objectsArray = [];
 
@@ -23,6 +23,14 @@ var MagoRenderable = function()
 	this.selectedColor4;
 
 	this.eventObject = {};
+
+	if (options !== undefined)
+	{
+		if (options.color && options.color instanceof Color) 
+		{
+			this.color4 = options.color;
+		}
+	}
 };
 
 MagoRenderable.EVENT_TYPE = {

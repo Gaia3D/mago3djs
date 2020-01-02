@@ -145,6 +145,37 @@ BoundingBox.prototype.expand = function(distance)
 	this.maxY += distance;
 	this.maxZ += distance;
 };
+/**
+ * 중심점과 박스의 변의 길이로 bbox 만들기
+ * 
+ * @param {Point3D} point 3차원 점
+ * @param {number} size 
+ * @return {BoundingBox}
+ */
+BoundingBox.getBBoxByPonintAndSize = function(point, size) 
+{
+
+	if (!point || !point instanceof Point3D) 
+	{
+		throw new Error('point is required');
+	}
+
+	if (isNaN(size))
+	{
+		throw new Error('size must number.');
+	}
+	
+	var bbox = new BoundingBox();
+	var maxX = point.x + size;
+	var minX = point.x - size;
+	var maxY = point.y + size;
+	var minY = point.y - size;
+	var minZ = point.z - size;
+	var maxZ = point.z + size;
+	bbox.set(minX, minY, 0, maxX, maxY, 0);
+
+	return bbox;
+};
 
 /**
  * 주어진 3차원 점을 포함하는 영역으로 영역박스 크기를 변경
