@@ -10,11 +10,11 @@
 	uniform mat4 ModelViewProjectionMatrixRelToEye;
 	uniform mat4 RefTransfMatrix;
 	uniform mat4 normalMatrix4;
-	uniform mat4 sunMatrix; 
+	uniform mat4 sunMatrix[2]; 
 	uniform vec3 buildingPosHIGH;
 	uniform vec3 buildingPosLOW;
-	uniform vec3 sunPosHIGH;
-	uniform vec3 sunPosLOW;
+	uniform vec3 sunPosHIGH[2];
+	uniform vec3 sunPosLOW[2];
 	uniform vec3 encodedCameraPositionMCHigh;
 	uniform vec3 encodedCameraPositionMCLow;
 	uniform vec3 aditionalPosition;
@@ -35,6 +35,7 @@
 	varying vec4 vPosRelToLight; 
 	varying vec3 vLightDir; 
 	varying vec3 vNormalWC; 
+	varying float currSunIdx; 
 	
 	void main()
     {	
@@ -63,16 +64,36 @@
 		vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);
 		vec3 rotatedNormal = currentTMat * normal;
 		
+		currSunIdx = -1.0; // initially no apply shdow.
 		if(bApplyShadow)
 		{
-			// Calculate the vertex relative to light.***
-			vec3 highDifferenceSun = objPosHigh.xyz - sunPosHIGH.xyz;
-			vec3 lowDifferenceSun = objPosLow.xyz - sunPosLOW.xyz;
-			vec4 pos4Sun = vec4(highDifferenceSun.xyz + lowDifferenceSun.xyz, 1.0);
-		
-			vPosRelToLight = sunMatrix * pos4Sun;
-			vLightDir = vec3(-sunMatrix[2][0], -sunMatrix[2][1], -sunMatrix[2][2]);
-			vNormalWC = rotatedNormal;
+			// the sun lights count are 2.
+			for(int i=0; i<2; i++)
+			{
+				vec3 currSunPosLOW = sunPosLOW[i];
+				vec3 currSunPosHIGH = sunPosHIGH[i];
+				// Calculate the vertex relative to light.***
+				vec3 highDifferenceSun = objPosHigh.xyz - currSunPosHIGH.xyz;
+				vec3 lowDifferenceSun = objPosLow.xyz - currSunPosLOW.xyz;
+				vec4 pos4Sun = vec4(highDifferenceSun.xyz + lowDifferenceSun.xyz, 1.0);
+				
+				mat4 currSunMatrix = sunMatrix[i];
+				vPosRelToLight = currSunMatrix * pos4Sun;
+				
+				// now, check if "vPosRelToLight" is inside of the lightVolume (inside of the depthTexture of the light).
+				vec3 posRelToLightNDC = vPosRelToLight.xyz / vPosRelToLight.w;
+				if(posRelToLightNDC.x >= -0.5 && posRelToLightNDC.x <= 0.5)
+				{
+					if(posRelToLightNDC.y >= -0.5 && posRelToLightNDC.y <= 0.5)
+					{
+						// is inside of the lightVolume.***
+						currSunIdx = float(i) + 0.5;
+						vLightDir = vec3(-currSunMatrix[2][0], -currSunMatrix[2][1], -currSunMatrix[2][2]);
+						vNormalWC = rotatedNormal;
+						break;
+					}
+				}
+			}
 		}
 
 		

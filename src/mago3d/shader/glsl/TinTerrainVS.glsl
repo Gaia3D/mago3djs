@@ -3,7 +3,6 @@ attribute vec3 normal;
 attribute vec4 color4;
 attribute vec2 texCoord;
 
-uniform sampler2D diffuseTex;
 uniform mat4 projectionMatrix;  
 uniform mat4 modelViewMatrix;
 uniform mat4 modelViewMatrixRelToEye; 

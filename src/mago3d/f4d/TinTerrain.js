@@ -479,17 +479,16 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			if (renderType === 1)
 			{
 				gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
-				//gl.uniform1f(currentShader.externalAlpha_loc, this.getBlendAlpha(magoManager.getCurrentTime()));
 				gl.uniform1f(currentShader.externalAlpha_loc, 1);
-				var currSelObject = magoManager.selectionManager.getSelectedGeneral();
-				if (currSelObject === this)
-				{
-					gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
-					gl.uniform4fv(currentShader.oneColor4_loc, [0.8, 0.3, 0.1, 1.0]);
+				//var currSelObject = magoManager.selectionManager.getSelectedGeneral();
+				//if (currSelObject === this)
+				//{
+				//	gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
+				//	gl.uniform4fv(currentShader.oneColor4_loc, [0.8, 0.3, 0.1, 1.0]);
 					
-					//if (this.depth === 15)
-					//{ var hola = 0; }
-				}
+				//if (this.depth === 15)
+				//{ var hola = 0; }
+				//}
 			}
 			// End test.--------------------------------------------------------------------------------------
 			
@@ -560,7 +559,12 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 				{
 					gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 					gl.uniform4fv(currentShader.oneColor4_loc, [0.0, 0.9, 0.9, 1.0]);
-					gl.drawElements(gl.LINE_LOOP, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.
+					//gl.drawElements(gl.LINE_LOOP, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.
+					var trianglesCount = indicesCount;
+					for (var i=0; i<trianglesCount; i++)
+					{
+						gl.drawElements(gl.LINE_LOOP, 3, gl.UNSIGNED_SHORT, i*3); // Fill.
+					}
 				}
 			}
 			// End test.--------------------------------------------------------------------------------------

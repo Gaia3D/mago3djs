@@ -719,6 +719,35 @@ ManagerUtils.cameraCoordPositionToWorldCoord = function(camCoordPos, resultWorld
  * @param {MagoManager} magoManager Mago3D main manager.
  * @returns {Point3D} resultPixelPos The result of the calculation.
  */
+ManagerUtils.screenCoordToWorldCoord = function(gl, pixelX, pixelY, resultWCPos, depthFbo, frustumNear, frustumFar, magoManager) 
+{
+	if (magoManager.configInformation.geo_view_library === Constant.CESIUM)
+	{
+		// https://cesium.com/docs/cesiumjs-ref-doc/Globe.html
+		
+		var cesiumScene = magoManager.scene; 
+		var cesiumGlobe = cesiumScene.globe;
+		var cesiumCamera = cesiumScene.camera;
+		var windowCoordinates = new Cesium.Cartesian2(pixelX, pixelY);
+		var ray = cesiumCamera.getPickRay(windowCoordinates);
+		var intersection = cesiumGlobe.pick(ray, cesiumScene);
+		return intersection;
+	}
+	else if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
+	{
+		// todo:
+	}
+};
+
+/**
+ * Calculates the pixel position in world coordinates.
+ * @param {WebGLRenderingContext} gl WebGL Rendering Context.
+ * @param {Number} pixelX Screen x position of the pixel.
+ * @param {Number} pixelY Screen y position of the pixel.
+ * @param {Point3D} resultPixelPos The result of the calculation.
+ * @param {MagoManager} magoManager Mago3D main manager.
+ * @returns {Point3D} resultPixelPos The result of the calculation.
+ */
 ManagerUtils.calculatePixelPositionWorldCoord = function(gl, pixelX, pixelY, resultPixelPos, depthFbo, frustumNear, frustumFar, magoManager) 
 {
 	var pixelPosCamCoord = new Point3D();

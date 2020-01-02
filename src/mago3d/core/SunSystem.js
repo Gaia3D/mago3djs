@@ -46,7 +46,11 @@ SunSystem.prototype.init = function()
 	this.lightSourcesArray.push(light);
 	
 	// 2nd light.
-	
+	lightType = 2; // omni = 0, spot = 1, directional = 2, area = 3, volume = 4.
+	light = new LightSource(lightType);
+	light.directionalBoxWidth = 400.0;
+	light.geoCoord = new GeographicCoord(126.61255088096084, 37.58071053758259, 50);
+	this.lightSourcesArray.push(light);
 };
 
 SunSystem.prototype.getLight = function(idx) 
@@ -57,13 +61,90 @@ SunSystem.prototype.getLight = function(idx)
 	return this.lightSourcesArray[idx];
 };
 
-SunSystem.prototype.updateSun = function(magoManager) 
+SunSystem.prototype.getLightsMatrixFloat32Array = function() 
+{
+	var lightsCount = this.lightSourcesArray.length;
+	
+	if (this.lightMatrixFloat32Array === undefined)
+	{ this.lightMatrixFloat32Array = new Float32Array(16*lightsCount); }
+	
+	for (var i=0; i<lightsCount; i++)
+	{
+		var light = this.getLight(i);
+		var lightMat = light.tMatrix;
+		if (lightMat === undefined)
+		{ continue; }
+		
+		for (var j=0; j<16; j++)
+		{
+			this.lightMatrixFloat32Array[j + 16*i] = lightMat._floatArrays[j];
+		}
+	}
+	
+	return this.lightMatrixFloat32Array;
+};
+
+SunSystem.prototype.getLightsPosLOWFloat32Array = function() 
+{
+	var lightsCount = this.lightSourcesArray.length;
+	
+	if (this.lightPosLOWFloat32Array === undefined)
+	{ this.lightPosLOWFloat32Array = new Float32Array(3*lightsCount); }
+	
+	for (var i=0; i<lightsCount; i++)
+	{
+		var light = this.getLight(i);
+		var lightPosLOW = light.positionLOW;
+		if (lightPosLOW === undefined)
+		{ continue; }
+		for (var j=0; j<3; j++)
+		{
+			this.lightPosLOWFloat32Array[j + 3*i] = lightPosLOW[j];
+		}
+	}
+	
+	return this.lightPosLOWFloat32Array;
+};
+
+SunSystem.prototype.getLightsPosHIGHFloat32Array = function() 
+{
+	var lightsCount = this.lightSourcesArray.length;
+	
+	if (this.lightPosHIGHFloat32Array === undefined)
+	{ this.lightPosHIGHFloat32Array = new Float32Array(3*lightsCount); }
+	
+	for (var i=0; i<lightsCount; i++)
+	{
+		var light = this.getLight(i);
+		var lightPosHIGH = light.positionHIGH;
+		if (lightPosHIGH === undefined)
+		{ continue; }
+		for (var j=0; j<3; j++)
+		{
+			this.lightPosHIGHFloat32Array[j + 3*i] = lightPosHIGH[j];
+		}
+	}
+	
+	return this.lightPosHIGHFloat32Array;
+};
+
+SunSystem.prototype.updateSun = function(magoManager, options) 
 {
 	if (this.lightSourcesArray === undefined)
 	{ return; }
 
 	if (magoManager.frustumVolumeControl === undefined)
 	{ return; }
+
+	//var date = new Date();
+	
+	if (options)
+	{
+		if (options.date)
+		{
+			//
+		}
+	}
 	
 	var camera = magoManager.sceneState.getCamera();
 	var camPos = camera.position;
@@ -78,17 +159,31 @@ SunSystem.prototype.updateSun = function(magoManager)
 	// calculate the parameters of the light.
 	var frustumVolumenObject = magoManager.frustumVolumeControl.getFrustumVolumeCulling(0); 
 	var visibleNodes = frustumVolumenObject.visibleNodes; // class: VisibleObjectsController.
+	
+	if (!visibleNodes.hasRenderables())
+	{ return; }
+	
 	var bSphere = visibleNodes.bSphere;
 	if (bSphere === undefined)
 	{ return; }
 	
+	// Test. Make a frustum ajusted newBSphere in the same distance of the bSphere.
+	
+	var frustum = camera.getFrustum(0);
+	var tangentOfHalfFovy = frustum.tangentOfHalfFovy;
+	var dist = camPos.distToPoint(bSphere.centerPoint);
+	var newRadius = Math.abs(tangentOfHalfFovy*dist)*4.0;
+	var newPoint = new Point3D(camPos.x + camDir.x * dist, camPos.y + camDir.y * dist, camPos.z + camDir.z * dist);
+	
+	bSphere.setCenterPoint(newPoint.x, newPoint.y, newPoint.z);
+	bSphere.setRadius(newRadius);
 	
 	var lightsCount = this.lightSourcesArray.length;
 	for (var i=0; i<lightsCount; i++)
 	{
 		var light = this.lightSourcesArray[i];
 		light.lightPosWC = bSphere.centerPoint;
-		light.directionalBoxWidth = bSphere.r*2;
+		light.directionalBoxWidth = bSphere.r*4.0;
 		this.updateLight(light);
 	}
 };
