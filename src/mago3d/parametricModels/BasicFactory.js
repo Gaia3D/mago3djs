@@ -473,15 +473,25 @@ BasicFactory.prototype.getOpeningProperties = function(wallType, index)
 			}
 		}
 	}
-
+	var centerProperties;
 	if (Array.isArray(wallOption.openingInfo)) 
 	{
-		return wallOption.openingInfo[0].centerPropterties;
+		if (wallOption.openingInfo[index].centerPropterties) 
+		{
+			wallOption.openingInfo[index].centerPropterties.wallType = wallType;
+		}
+		centerProperties = wallOption.openingInfo[index].centerPropterties;
 	}
 	else 
 	{
-		return wallOption.openingInfo.centerPropterties;
+		if (wallOption.openingInfo.centerPropterties) 
+		{
+			wallOption.openingInfo.centerPropterties.wallType = wallType;
+		}
+		centerProperties = wallOption.openingInfo.centerPropterties;
 	}
+
+	return centerProperties;
 };
 /**
  * Makes the geometry mesh.
