@@ -296,7 +296,7 @@ TinTerrain.prototype.prepareTexture = function(magoManager, tinTerrainManager)
 	//var textureFilePath = "https://services.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer/tile/" + L + "/" + Y + "/" + X + ".png";
 	//var textureFilePath = "https://services.arcgisonline.com/arcgis/rest/services/World_Physical_Map/MapServer/tile/" + L + "/" + Y + "/" + X + ".png"; // low res.
 	//var textureFilePath = "https://services.arcgisonline.com/arcgis/rest/services/NatGeo_World_Map/MapServer/tile/" + L + "/" + Y + "/" + X + ".png"; // low res.
-	//var textureFilePath = "https://c.tile.openstreetmap.org/" + L + "/" + Y + "/" + X + ".png";
+	//var textureFilePath = "https://c.tile.openstreetmap.org/" + L + "/" + X + "/" + Y + ".png";
 	
 	// Provisionally, for debug, save textureFilePath.***
 	this.texFilePath__TEST = textureFilePath;

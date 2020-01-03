@@ -34,8 +34,8 @@ var TinTerrainManager = function()
 	//"CRS84"        : 1,
 	//"WEB_MERCATOR" : 2
 	//};
-	//this.imageryType = CODE.imageryType.WEB_MERCATOR; // Test.***
-	this.imageryType = CODE.imageryType.CRS84; // Test.***
+	this.imageryType = CODE.imageryType.WEB_MERCATOR; // Test.***
+	//this.imageryType = CODE.imageryType.CRS84; // Test.***
 	
 	this.init();
 	this.makeTinTerrainWithDEMIndex(); // provisional.
