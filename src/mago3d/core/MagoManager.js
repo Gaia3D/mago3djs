@@ -326,6 +326,7 @@ MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums)
 
 /**
  * Swaps the current rendering Phase.
+ * 중복 그리기를 방지하기 위하여... (각기 다른 frustum에 걸쳤을 때 여러번 그리는 것을 방지하기 위하여.)
  */
 MagoManager.prototype.swapRenderingFase = function() 
 {
@@ -488,8 +489,6 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		var frustumCommandsList = this.scene._frustumCommandsList;
 		if (frustumCommandsList === undefined)
 		{ frustumCommandsList = this.scene.frustumCommandsList; }
-		
-		
 		
 		var camPosX = this.scene.camera.positionWC.x;
 		var camPosY = this.scene.camera.positionWC.y;
@@ -832,6 +831,7 @@ MagoManager.prototype.loadAndPrepareData = function()
 		var attributes = node.data.attributes;
 		if (attributes.objectType === "basicF4d")
 		{
+			// lod0 일시 카메라에 들어오는 옥트리들을 추출
 			if (!this.getRenderablesDetailedNeoBuildingAsimetricVersion(gl, node, this.visibleObjControlerOctrees, 0))
 			{
 				// any octree is visible.
@@ -853,6 +853,7 @@ MagoManager.prototype.loadAndPrepareData = function()
 	this.prepareVisibleOctreesSortedByDistanceLOD2(gl, this.visibleObjControlerOctrees.currentVisibles2); 
 	
 	// lod 2.
+	// TODO : maxRequest count to settings
 	if (this.readerWriter.referencesList_requested < 5)
 	{
 		nodesCount = this.visibleObjControlerNodes.currentVisibles2.length;
@@ -936,7 +937,7 @@ MagoManager.prototype.managePickingProcess = function()
 					var obj = this.modeler.objectsArray[i];
 					if (!obj instanceof Cluster) { continue; }
 
-					obj.setDirty(true);
+					if (!obj.dirty && !obj.isMaking) { obj.setDirty(true); }
 				}
 			}
 		}
@@ -1295,7 +1296,6 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 			
 			ManagerUtils.calculateGeoLocationDataByAbsolutePoint(pixelPos.x, pixelPos.y, pixelPos.z, this.objMarkerSC.geoLocationData, this);
 		}
-		
 	}
 	// lightDepthRender: TODO.***
 

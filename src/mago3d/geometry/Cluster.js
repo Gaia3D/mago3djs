@@ -17,7 +17,7 @@ var Cluster = function(point3DList, range, minSize)
 		for (var i=0, len=point3DList.getPointsCount();i<len;i++) 
 		{
 			var p3d = point3DList.getPoint(i);
-
+			p3d.id = i;
 			var geoCoord = ManagerUtils.pointToGeographicCoord(p3d);
 			geoCoord.id = i;
 			var item = {
@@ -37,6 +37,7 @@ var Cluster = function(point3DList, range, minSize)
     
 	this.range = defaultValue(range, 10);
 	this.minSize = defaultValue(minSize, 2);
+	this.isMaking = false;
 };
 Cluster.prototype = Object.create(MagoRenderable.prototype);
 Cluster.prototype.constructor = Cluster;
@@ -78,6 +79,7 @@ Cluster.prototype.makeCluster = function(magoManager)
 	var pointCnt = this.point3DList.getPointsCount();
 	if (pointCnt < 1) { return false; }
 	
+	this.isMaking = true;
 	var gl = magoManager.getGl();
 
 	var clusterObj = {};
@@ -91,51 +93,56 @@ Cluster.prototype.makeCluster = function(magoManager)
 			var pixel = ManagerUtils.calculateWorldPositionToScreenCoord(gl, point3D.x, point3D.y, point3D.z, undefined, magoManager);
 
 			var screenExtent = BoundingBox.getBBoxByPonintAndSize(pixel, this.range);
+			//ManagerUtils.screenCoordToWorldCoord = function(gl, pixelX, pixelY, resultWCPos, depthFbo, frustumNear, frustumFar, magoManager) 
+			var leftBottom = ManagerUtils.screenCoordToWorldCoord(gl, screenExtent.minX, screenExtent.minY, leftBottom, undefined, undefined, undefined, magoManager);
+			var rightTop = ManagerUtils.screenCoordToWorldCoord(gl, screenExtent.maxX, screenExtent.maxY, rightTop, undefined, undefined, undefined, magoManager);
 
-			var leftBottom = ManagerUtils.cameraCoordPositionToWorldCoord(new Point3D(screenExtent.minX, screenExtent.minY, screenExtent.minZ), leftBottom, magoManager);
-			var rightTop = ManagerUtils.cameraCoordPositionToWorldCoord(new Point3D(screenExtent.maxX, screenExtent.maxY, screenExtent.maxZ), rightTop, magoManager);
+			
+			if (!leftBottom || !rightTop) 
+			{
+				continue;
+			}
 
 			var leftBottomGeoCoord = ManagerUtils.pointToGeographicCoord(leftBottom);
 			var rightTopGeoCoord = ManagerUtils.pointToGeographicCoord(rightTop);
 
 			var searchObj = {
 				minX : leftBottomGeoCoord.longitude,
-				minY : leftBottomGeoCoord.latitude,
+				minY : rightTopGeoCoord.latitude,
 				maxX : rightTopGeoCoord.longitude,
-				maxY : rightTopGeoCoord.latitude
+				maxY : leftBottomGeoCoord.latitude
 			};
 
+			var clusterPoint3D;
+			var clusterCnt = 0;
+			
 			var searched = this.bush.search(searchObj);
 			if (searched.length > 0 )
 			{
-				console.info(searched);
-			}
-			
-			/*var clusterCnt = 0;
-			var auxX = 0;
-			var auxY = 0;
-			var auxZ = 0;
-			// this code fuck
-			for (var j = 0;j<pointCnt;j++) 
-			{
-				if (!clusterObj[j]) 
+				var auxP3d = new Point3D(0, 0, 0);
+				for (var j=0, searchedLen=searched.length;j<searchedLen;j++) 
 				{
-					var auxPoint3D = this.point3DList.getPoint(j);
-        
-					var auxPixel = ManagerUtils.calculateWorldPositionToScreenCoord(gl, auxPoint3D.x, auxPoint3D.y, auxPoint3D.z, undefined, magoManager);
-					if (extent.intersectWithPoint(auxPixel)) 
-					{
-						clusterObj[j] = true;
+					var searchedValue = searched[j].value;
+					var id = searchedValue.id;
 
-						auxX += auxPoint3D.x;
-						auxY += auxPoint3D.y;
-						auxZ += auxPoint3D.z;
+					if (!clusterObj[id]) 
+					{
+						clusterObj[id] = true;
+
+						var auxPoint3D = this.point3DList.getPoint(id);
+						auxP3d.add(auxPoint3D.x, auxPoint3D.y, auxPoint3D.z);
+						
 						clusterCnt++;
 					}
 				}
+				clusterPoint3D = auxP3d.scale(1/clusterCnt);
 			}
-
-			var clusterPoint3D = new Point3D(auxX/clusterCnt, auxY/clusterCnt, auxZ/clusterCnt);
+			else 
+			{
+				clusterCnt = 1;
+				clusterObj[point3D.id] = true;
+				clusterPoint3D = new Point3D(point3D.x, point3D.y, point3D.z);
+			}
 
 			var sphereOptions = {};
 			var color = new Color();
@@ -151,9 +158,10 @@ Cluster.prototype.makeCluster = function(magoManager)
 			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, 0, 0, 0, 0, geoLocData);
 			s.geoLocDataManager = geoLocDataManager;
 
-			this.objectsArray.push(s);*/
+			this.objectsArray.push(s);
 		}
 	}
 	
 	this.dirty = false;
+	this.isMaking = false;
 };

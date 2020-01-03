@@ -89,6 +89,11 @@ ManagerUtils.getIndexToInsertBySquaredDistToEye = function(objectsArray, object,
  */
 ManagerUtils.pointToGeographicCoord = function(point, resultGeographicCoord) 
 {
+	if (!point) 
+	{
+		throw new Error('point is requred');
+	}
+
 	if (resultGeographicCoord === undefined)
 	{ resultGeographicCoord = new GeographicCoord(); }
 	
