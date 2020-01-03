@@ -1268,6 +1268,7 @@ uniform sampler2D depthTex;\n\
 uniform sampler2D noiseTex;  \n\
 uniform sampler2D diffuseTex;\n\
 uniform sampler2D shadowMapTex;\n\
+uniform sampler2D shadowMapTex2;\n\
 uniform bool textureFlipYAxis;\n\
 varying vec3 vNormal;\n\
 uniform mat4 projectionMatrix;\n\
@@ -1345,6 +1346,7 @@ float getDepth(vec2 coord)\n\
 \n\
 float getDepthShadowMap(vec2 coord)\n\
 {\n\
+	// currSunIdx\n\
     return UnpackDepth32(texture2D(shadowMapTex, coord.xy));\n\
 }  \n\
 \n\

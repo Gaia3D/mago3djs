@@ -1941,7 +1941,9 @@ MagoManager.prototype.keyDown = function(key)
 	else if (key === 84) // 84 = 't'.***
 	{
 		// do test.***
+		var wcPos = ManagerUtils.calculatePixelPositionWorldCoord(this.getGl(), 1000, 500, undefined, undefined, undefined, undefined, this);
 		
+		// another test.***
 		if (this.modeler !== undefined)
 		{
 			var geoCoordsList = this.modeler.getGeographicCoordsList();

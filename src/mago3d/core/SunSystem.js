@@ -167,11 +167,15 @@ SunSystem.prototype.updateSun = function(magoManager, options)
 	if (bSphere === undefined)
 	{ return; }
 	
-	// Test. Make a frustum ajusted newBSphere in the same distance of the bSphere.
+	// Test. Make a frustum fitted newBSphere in the same distance of the bSphere.
 	
 	var frustum = camera.getFrustum(0);
 	var tangentOfHalfFovy = frustum.tangentOfHalfFovy;
 	var dist = camPos.distToPoint(bSphere.centerPoint);
+	var minDist = dist - bSphere.r;
+	var maxDist = dist + bSphere.r;
+	
+	
 	var newRadius = Math.abs(tangentOfHalfFovy*dist)*4.0;
 	var newPoint = new Point3D(camPos.x + camDir.x * dist, camPos.y + camDir.y * dist, camPos.z + camDir.z * dist);
 	
