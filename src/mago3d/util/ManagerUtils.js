@@ -741,6 +741,7 @@ ManagerUtils.screenCoordToWorldCoord = function(gl, pixelX, pixelY, resultWCPos,
 	else if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
 	{
 		// todo:
+		
 	}
 };
 
