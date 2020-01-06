@@ -486,6 +486,15 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 		uniformDataPair.intValue = 3;
 	}
 	
+	// 16.2 shadowMapTex2.
+	uniformLocation = gl.getUniformLocation(shader.program, "shadowMapTex2");
+	if (uniformLocation !== null && uniformLocation !== undefined)
+	{
+		uniformDataPair = shader.newUniformDataPair("1i", "shadowMapTex2");
+		uniformDataPair.uniformLocation = uniformLocation;
+		uniformDataPair.intValue = 4;
+	}
+	
 	// 17. specularColor.
 	uniformLocation = gl.getUniformLocation(shader.program, "specularColor");
 	if (uniformLocation !== null && uniformLocation !== undefined)

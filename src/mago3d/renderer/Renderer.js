@@ -1003,6 +1003,18 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			{
 				gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
 			}
+			
+			gl.activeTexture(gl.TEXTURE4); 
+			if (bApplyShadow)
+			{
+				var sunSystem = magoManager.sceneState.sunSystem;
+				var sunLight = sunSystem.getLight(1);
+				gl.bindTexture(gl.TEXTURE_2D, sunLight.depthFbo.colorBuffer);
+			}
+			else 
+			{
+				gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
+			}
 
 			/*
 			if (MagoConfig.getPolicy().geo_cull_face_enable === "true") 

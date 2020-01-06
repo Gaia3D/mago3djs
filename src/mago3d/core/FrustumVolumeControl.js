@@ -25,8 +25,7 @@ FrustumVolumeControl.prototype.getFrustumVolumeCulling = function(key)
 	if (!this.frustumVolumensMap.hasOwnProperty(key))
 	{
 		this.frustumVolumensMap[key] = {};
-		this.frustumVolumensMap[key].fullyIntersectedLowestTilesArray = [];
-		this.frustumVolumensMap[key].partiallyIntersectedLowestTilesArray = []; // old.***
+		this.frustumVolumensMap[key].intersectedTilesArray = []; // todo: change name to "intersectedTilesArray".***
 		this.frustumVolumensMap[key].visibleNodes = new VisibleObjectsController();
 	}
 	
@@ -44,8 +43,7 @@ FrustumVolumeControl.prototype.initArrays = function()
 		if (Object.prototype.hasOwnProperty.call(this.frustumVolumensMap, key)) 
 		{
 			frustumVolumeObject = this.frustumVolumensMap[key];
-			frustumVolumeObject.fullyIntersectedLowestTilesArray.length = 0;
-			frustumVolumeObject.partiallyIntersectedLowestTilesArray.length = 0; // old.***
+			frustumVolumeObject.intersectedTilesArray.length = 0; // todo: change name to "intersectedTilesArray".***
 			frustumVolumeObject.visibleNodes.initArrays();
 		}
 	}

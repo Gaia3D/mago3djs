@@ -1250,11 +1250,7 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 		{ return; }
 	
 		var frustumVolume = this.myCameraSCX.bigFrustum;
-		var doFrustumCullingToBuildings = false;
-		this.tilesMultiFrustumCullingFinished(frustumVolumenObject.fullyIntersectedLowestTilesArray, visibleNodes, cameraPosition, frustumVolume, doFrustumCullingToBuildings);
-		
-		doFrustumCullingToBuildings = true;
-		this.tilesMultiFrustumCullingFinished(frustumVolumenObject.partiallyIntersectedLowestTilesArray, visibleNodes, cameraPosition, frustumVolume, doFrustumCullingToBuildings);
+		this.tilesMultiFrustumCullingFinished(frustumVolumenObject.intersectedTilesArray, visibleNodes, cameraPosition, frustumVolume);
 		this.prepareNeoBuildingsAsimetricVersion(gl, visibleNodes); 
 	}
 
@@ -1954,7 +1950,9 @@ MagoManager.prototype.keyDown = function(key)
 	else if (key === 84) // 84 = 't'.***
 	{
 		// do test.***
+		var wcPos = ManagerUtils.calculatePixelPositionWorldCoord(this.getGl(), 1000, 500, undefined, undefined, undefined, undefined, this);
 		
+		// another test.***
 		if (this.modeler !== undefined)
 		{
 			var geoCoordsList = this.modeler.getGeographicCoordsList();
@@ -4397,15 +4395,15 @@ MagoManager.prototype.doMultiFrustumCullingSmartTiles = function(camera)
 	if (this.frustumVolumeControl === undefined)
 	{ this.frustumVolumeControl = new FrustumVolumeControl(); }
 	
-	if (this.fullyIntersectedLowestTilesArray === undefined)
-	{ this.fullyIntersectedLowestTilesArray = []; }
+	if (this.intersectedTilesArray === undefined)
+	{ this.intersectedTilesArray = []; }
 	
 	if (this.lastIntersectedLowestTilesArray === undefined)
 	{ this.lastIntersectedLowestTilesArray = []; }
 	
 	// save the last frustumCulled lowestTiles to delete if necessary.
-	this.lastIntersectedLowestTilesArray = this.fullyIntersectedLowestTilesArray;
-	this.fullyIntersectedLowestTilesArray = [];
+	this.lastIntersectedLowestTilesArray = this.intersectedTilesArray;
+	this.intersectedTilesArray = [];
 	
 	// mark all last_tiles as "no visible".
 	var lastLowestTilesCount = this.lastIntersectedLowestTilesArray.length;
@@ -4418,8 +4416,8 @@ MagoManager.prototype.doMultiFrustumCullingSmartTiles = function(camera)
 	
 	// do frustum culling for Asia_side_tile and America_side_tile.
 	var maxDistToCamera = 5000;
-	smartTile1.getFrustumIntersectedLowestTiles(camera, frustumVolume, this.fullyIntersectedLowestTilesArray, maxDistToCamera);
-	smartTile2.getFrustumIntersectedLowestTiles(camera, frustumVolume, this.fullyIntersectedLowestTilesArray, maxDistToCamera);
+	smartTile1.getFrustumIntersectedLowestTiles(camera, frustumVolume, this.intersectedTilesArray, maxDistToCamera);
+	smartTile2.getFrustumIntersectedLowestTiles(camera, frustumVolume, this.intersectedTilesArray, maxDistToCamera);
 	
 	
 	// Now, store the culled tiles into corresponding frustums, and mark all current_tiles as "visible".***
@@ -4427,10 +4425,10 @@ MagoManager.prototype.doMultiFrustumCullingSmartTiles = function(camera)
 	var frustumsCount = this.myCameraSCX.frustumsArray.length;
 	var frustum;
 	var lowestTile;
-	var currentLowestTilesCount = this.fullyIntersectedLowestTilesArray.length;
+	var currentLowestTilesCount = this.intersectedTilesArray.length;
 	for (var i=0; i<currentLowestTilesCount; i++)
 	{
-		lowestTile = this.fullyIntersectedLowestTilesArray[i];
+		lowestTile = this.intersectedTilesArray[i];
 		if (lowestTile.sphereExtent === undefined)
 		{ continue; }
 	
@@ -4444,7 +4442,7 @@ MagoManager.prototype.doMultiFrustumCullingSmartTiles = function(camera)
 			if (frustum.intersectionNearFarSphere(lowestTile.sphereExtent) !== Constant.INTERSECTION_OUTSIDE)
 			{
 				var frustumVolumeControlObject = this.frustumVolumeControl.getFrustumVolumeCulling(j); 
-				frustumVolumeControlObject.fullyIntersectedLowestTilesArray.push(lowestTile);
+				frustumVolumeControlObject.intersectedTilesArray.push(lowestTile);
 				//break;
 			}
 		}
@@ -4483,7 +4481,7 @@ MagoManager.prototype.doMultiFrustumCullingSmartTiles = function(camera)
  * dataKey 이용해서 data 검색
  * @param dataKey
  */
-MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLowestTilesArray, visibleNodes, cameraPosition, frustumVolume, doFrustumCullingToBuildings) 
+MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLowestTilesArray, visibleNodes, cameraPosition, frustumVolume) 
 {
 	var tilesCount = intersectedLowestTilesArray.length;
 	
@@ -4517,7 +4515,7 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 	//if (frustumFar < 30000)
 	//{ frustumFar = 30000; }
 
-	
+	var doFrustumCullingToBuildings = false;
 
 	for (var i=0; i<tilesCount; i++)
 	{
