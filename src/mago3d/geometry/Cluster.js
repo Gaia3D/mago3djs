@@ -38,6 +38,7 @@ var Cluster = function(point3DList, range, minSize)
 	this.range = defaultValue(range, 10);
 	this.minSize = defaultValue(minSize, 2);
 	this.isMaking = false;
+	this.prevHeight;
 };
 Cluster.prototype = Object.create(MagoRenderable.prototype);
 Cluster.prototype.constructor = Cluster;
@@ -81,6 +82,8 @@ Cluster.prototype.makeCluster = function(magoManager)
 	
 	this.isMaking = true;
 	var gl = magoManager.getGl();
+	var dbWidth = gl.drawingBufferWidth;
+	var dbHeight = gl.drawingBufferHeight;
 
 	var clusterObj = {};
 	
@@ -92,6 +95,7 @@ Cluster.prototype.makeCluster = function(magoManager)
         
 			var pixel = ManagerUtils.calculateWorldPositionToScreenCoord(gl, point3D.x, point3D.y, point3D.z, undefined, magoManager);
 
+			if (!isInScreen(pixel, dbWidth, dbHeight)) { continue; }
 			var screenExtent = BoundingBox.getBBoxByPonintAndSize(pixel, this.range);
 			//ManagerUtils.screenCoordToWorldCoord = function(gl, pixelX, pixelY, resultWCPos, depthFbo, frustumNear, frustumFar, magoManager) 
 			var leftBottom = ManagerUtils.screenCoordToWorldCoord(gl, screenExtent.minX, screenExtent.minY, leftBottom, undefined, undefined, undefined, magoManager);
@@ -135,7 +139,8 @@ Cluster.prototype.makeCluster = function(magoManager)
 						clusterCnt++;
 					}
 				}
-				clusterPoint3D = auxP3d.scale(1/clusterCnt);
+				auxP3d.scale(1/clusterCnt);
+				clusterPoint3D = auxP3d;
 			}
 			else 
 			{
@@ -164,4 +169,15 @@ Cluster.prototype.makeCluster = function(magoManager)
 	
 	this.dirty = false;
 	this.isMaking = false;
+	
+	function isInScreen(pxl, glWidth, glHeight) 
+	{
+		var offset = 100;
+		var pxlX = pxl.x;
+		var pxlY = pxl.y;
+
+		if (pxlX < -offset || pxlX > glWidth + offset || pxlY < -offset || pxlY > glHeight + offset) { return false; }
+
+		return true;
+	}
 };

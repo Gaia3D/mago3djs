@@ -707,7 +707,10 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive, i
 	for (var i=0; i<vboKeysCount; i++)
 	{
 		var vboKey = this.vboKeysContainer.vboCacheKeysArray[i];
-		
+		if (!vboKey) 
+		{
+			return false;
+		}
 		// Positions.
 		if (!vboKey.bindDataPosition(shader, vboMemManager))
 		{ return false; }
