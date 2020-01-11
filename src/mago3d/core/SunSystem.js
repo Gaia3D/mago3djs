@@ -16,6 +16,7 @@ var SunSystem = function(options)
 	this.sunGeoLocDataManager = new GeoLocationDataManager();
 	this.lightSourcesArray;
 	this.date; // month, day, hour, min, sec.
+	this.sunDirWC;
 	
 	if (options !== undefined)
 	{
@@ -29,6 +30,8 @@ var SunSystem = function(options)
 	var alt = 0.0;
 	geoLocData = ManagerUtils.calculateGeoLocationData(lon, lat, alt, undefined, undefined, undefined, geoLocData);
 	
+	var sunRotMat = geoLocData.rotMatrix;
+	this.sunDirWC = new Float32Array([-sunRotMat._floatArrays[8], -sunRotMat._floatArrays[9], -sunRotMat._floatArrays[10]]);
 	this.init();
 };
 
@@ -51,6 +54,11 @@ SunSystem.prototype.init = function()
 	light.directionalBoxWidth = 400.0;
 	light.geoCoord = new GeographicCoord(126.61255088096084, 37.58071053758259, 50);
 	this.lightSourcesArray.push(light);
+};
+
+SunSystem.prototype.getSunDirWC = function() 
+{
+	return this.sunDirWC;
 };
 
 SunSystem.prototype.getLight = function(idx) 
@@ -128,8 +136,56 @@ SunSystem.prototype.getLightsPosHIGHFloat32Array = function()
 	return this.lightPosHIGHFloat32Array;
 };
 
+SunSystem.prototype.calculateSunGeographicCoords = function() 
+{
+	//https://in-the-sky.org/twilightmap.php // web page. sun in current time.
+	//----------------------------------------------
+	//https://en.wikipedia.org/wiki/Position_of_the_Sun
+	//https://www.nrel.gov/docs/fy08osti/34302.pdf
+	//https://forum.logicmachine.net/showthread.php?tid=161
+	
+	//https://astronomy.stackexchange.com/questions/20560/how-to-calculate-the-position-of-the-sun-in-long-lat
+	// The boilerplate: fiddling with dates
+	var radToDeg = 180/Math.PI;
+	var date = new Date();
+	
+	// test setting hour.
+	date.setHours(11);
+	date.setMinutes(30);
+	
+	var fullYear = date.getFullYear();
+	var soy = (new Date(date.getFullYear(), 0, 0)).getTime();
+	var eoy = (new Date(date.getFullYear() + 1, 0, 0)).getTime();
+	var nows = date.getTime();
+	var poy = (nows - soy) / (eoy - soy);
+
+	var secs = date.getUTCMilliseconds() / 1e3
+                + date.getUTCSeconds()
+                + 60 * (date.getUTCMinutes() + 60 * date.getUTCHours());
+	var pod = secs / 86400; // leap secs? nah.
+
+	// The actual magic
+	var lon = (-pod + 0.5) * Math.PI * 2;
+	lon = lon*radToDeg;
+	var lat = Math.sin((poy - .22) * Math.PI * 2) * .41;
+	lat = lat*radToDeg;
+	var alt = 0.0;
+	
+	// Now, calculate the sun geoLocationData & sun direction world coord.
+	var geoLocData = this.sunGeoLocDataManager.getCurrentGeoLocationData();
+	geoLocData = ManagerUtils.calculateGeoLocationData(lon, lat, alt, undefined, undefined, undefined, geoLocData);
+	
+	var sunRotMat = geoLocData.rotMatrix;
+	this.sunDirWC = new Float32Array([-sunRotMat._floatArrays[8], -sunRotMat._floatArrays[9], -sunRotMat._floatArrays[10]]);
+};
+
+
 SunSystem.prototype.updateSun = function(magoManager, options) 
 {
+	// test.
+	this.calculateSunGeographicCoords(); // test.***
+	// end test.---
+	
 	if (this.lightSourcesArray === undefined)
 	{ return; }
 
@@ -142,19 +198,16 @@ SunSystem.prototype.updateSun = function(magoManager, options)
 	{
 		if (options.date)
 		{
-			//
+			// earthAxis inclination = 23.439281 degree.
+			// December solstice -> March equinox (Friday, 20 March 2020, 03:49 UTC) -> June solstice -> September equinox.
+			
 		}
 	}
 	
 	var camera = magoManager.sceneState.getCamera();
 	var camPos = camera.position;
 	var camDir = camera.getDirection();
-	
-	// Find the 3 locations of the lights for lod0, lod1, lod2.
-	// provisionally assign arbitrary values.
-	var dist0 = 50.0; // 50m.
-	var dist1 = 300.0;
-	var dist2 = 1000.0;
+
 	
 	// calculate the parameters of the light.
 	var frustumVolumenObject = magoManager.frustumVolumeControl.getFrustumVolumeCulling(0); 
@@ -162,34 +215,44 @@ SunSystem.prototype.updateSun = function(magoManager, options)
 	
 	if (!visibleNodes.hasRenderables())
 	{ return; }
-	
-	var bSphere = visibleNodes.bSphere;
-	if (bSphere === undefined)
-	{ return; }
-	
-	// Test. Make a frustum fitted newBSphere in the same distance of the bSphere.
+
+	var bFrustumNear = visibleNodes.bFrustumNear;
+	var bFrustumFar = visibleNodes.bFrustumFar;
 	
 	var frustum = camera.getFrustum(0);
 	var tangentOfHalfFovy = frustum.tangentOfHalfFovy;
-	var dist = camPos.distToPoint(bSphere.centerPoint);
-	var minDist = dist - bSphere.r;
-	var maxDist = dist + bSphere.r;
 	
+	var minDist = bFrustumNear;
+	if (minDist < 0.0)
+	{ minDist = 0.0; }
+	var maxDist = bFrustumFar;
+	var distRange = maxDist - minDist;
 	
-	var newRadius = Math.abs(tangentOfHalfFovy*dist)*4.0;
-	var newPoint = new Point3D(camPos.x + camDir.x * dist, camPos.y + camDir.y * dist, camPos.z + camDir.z * dist);
+	// light 0 (nearest).
+	//var dist0 = minDist + distRange * 0.20;
+	var dist0 = minDist + distRange * 0.60;
+	if (dist0 < 1.0){ dist0 = 1.0; }
 	
-	bSphere.setCenterPoint(newPoint.x, newPoint.y, newPoint.z);
-	bSphere.setRadius(newRadius);
+	var newRadius = Math.abs(tangentOfHalfFovy*dist0)*4.0;
+	var newPoint = new Point3D(camPos.x + camDir.x * dist0, camPos.y + camDir.y * dist0, camPos.z + camDir.z * dist0);
+	var bSphere0 = new BoundingSphere(newPoint.x, newPoint.y, newPoint.z, newRadius);
+	var light = this.lightSourcesArray[0];
+	light.lightPosWC = bSphere0.centerPoint;
+	light.directionalBoxWidth = bSphere0.r*2;
+	this.updateLight(light);
 	
-	var lightsCount = this.lightSourcesArray.length;
-	for (var i=0; i<lightsCount; i++)
-	{
-		var light = this.lightSourcesArray[i];
-		light.lightPosWC = bSphere.centerPoint;
-		light.directionalBoxWidth = bSphere.r*4.0;
-		this.updateLight(light);
-	}
+	// light 1 (farest).
+	//var dist1 = minDist + distRange * 0.70;
+	var dist1 = minDist + distRange * 0.60;
+	if (dist1 < 10.0){ dist1 = 10.0; }
+	var newRadius = Math.abs(tangentOfHalfFovy*dist1)*4.0;
+	var newPoint = new Point3D(camPos.x + camDir.x * dist1, camPos.y + camDir.y * dist1, camPos.z + camDir.z * dist1);
+	var bSphere1 = new BoundingSphere(newPoint.x, newPoint.y, newPoint.z, newRadius);
+	var light = this.lightSourcesArray[1];
+	light.lightPosWC = bSphere1.centerPoint;
+	light.directionalBoxWidth = bSphere1.r*2;
+	this.updateLight(light);
+		
 };
 
 /**
@@ -200,17 +263,17 @@ SunSystem.prototype.updateSun = function(magoManager, options)
 SunSystem.prototype.updateLight = function(light) 
 {
 	var sunGeoLocData = this.sunGeoLocDataManager.getCurrentGeoLocationData();
-	var sunTMatrix = sunGeoLocData.rotMatrix;
-	
+	//var sunTMatrix = sunGeoLocData.rotMatrix;
+	var sunTMatrix = sunGeoLocData.getRotMatrixInv();
 	if (light.tMatrix === undefined)
 	{ light.tMatrix = new Matrix4(); }
 
 	// calculate sunTransformMatrix for this light.***
 	var lightPosWC = light.lightPosWC;
-	
+	var depthFactor = 10.0;
 	var ortho = new Matrix4();
 	var nRange = light.directionalBoxWidth/2;
-	var left = -nRange, right = nRange, bottom = -nRange, top = nRange, near = -10*nRange, far = 10*nRange;
+	var left = -nRange, right = nRange, bottom = -nRange, top = nRange, near = -depthFactor*nRange, far = depthFactor*nRange;
 	ortho._floatArrays = glMatrix.mat4.ortho(ortho._floatArrays, left, right, bottom, top, near, far);
 	
 	light.tMatrix = sunTMatrix.getMultipliedByMatrix(ortho, light.tMatrix);

@@ -1,3 +1,4 @@
+
 	attribute vec3 position;
 	attribute vec3 normal;
 	attribute vec2 texCoord;
@@ -15,6 +16,8 @@
 	uniform vec3 buildingPosLOW;
 	uniform vec3 sunPosHIGH[2];
 	uniform vec3 sunPosLOW[2];
+	uniform int sunIdx;
+	uniform vec3 sunDirWC;
 	uniform vec3 encodedCameraPositionMCHigh;
 	uniform vec3 encodedCameraPositionMCLow;
 	uniform vec3 aditionalPosition;
@@ -35,7 +38,7 @@
 	varying vec4 vPosRelToLight; 
 	varying vec3 vLightDir; 
 	varying vec3 vNormalWC; 
-	varying float currSunIdx; 
+	varying float currSunIdx;  
 	
 	void main()
     {	
@@ -64,36 +67,41 @@
 		vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);
 		vec3 rotatedNormal = currentTMat * normal;
 		
-		currSunIdx = -1.0; // initially no apply shdow.
+		currSunIdx = -1.0; // initially no apply shadow.
 		if(bApplyShadow)
 		{
+			vLightDir = sunDirWC;
+			vNormalWC = rotatedNormal;
+						
 			// the sun lights count are 2.
-			for(int i=0; i<2; i++)
+			
+			vec3 currSunPosLOW;
+			vec3 currSunPosHIGH;
+			mat4 currSunMatrix;
+			if(sunIdx == 0)
 			{
-				vec3 currSunPosLOW = sunPosLOW[i];
-				vec3 currSunPosHIGH = sunPosHIGH[i];
-				// Calculate the vertex relative to light.***
-				vec3 highDifferenceSun = objPosHigh.xyz - currSunPosHIGH.xyz;
-				vec3 lowDifferenceSun = objPosLow.xyz - currSunPosLOW.xyz;
-				vec4 pos4Sun = vec4(highDifferenceSun.xyz + lowDifferenceSun.xyz, 1.0);
-				
-				mat4 currSunMatrix = sunMatrix[i];
-				vPosRelToLight = currSunMatrix * pos4Sun;
-				
-				// now, check if "vPosRelToLight" is inside of the lightVolume (inside of the depthTexture of the light).
-				vec3 posRelToLightNDC = vPosRelToLight.xyz / vPosRelToLight.w;
-				if(posRelToLightNDC.x >= -0.5 && posRelToLightNDC.x <= 0.5)
-				{
-					if(posRelToLightNDC.y >= -0.5 && posRelToLightNDC.y <= 0.5)
-					{
-						// is inside of the lightVolume.***
-						currSunIdx = float(i) + 0.5;
-						vLightDir = vec3(-currSunMatrix[2][0], -currSunMatrix[2][1], -currSunMatrix[2][2]);
-						vNormalWC = rotatedNormal;
-						break;
-					}
-				}
+				currSunPosLOW = sunPosLOW[0];
+				currSunPosHIGH = sunPosHIGH[0];
+				currSunMatrix = sunMatrix[0];
+				currSunIdx = 0.5;
 			}
+			else if(sunIdx == 1)
+			{
+				currSunPosLOW = sunPosLOW[1];
+				currSunPosHIGH = sunPosHIGH[1];
+				currSunMatrix = sunMatrix[1];
+				currSunIdx = 1.5;
+			}
+			
+			// Calculate the vertex relative to light.***
+			vec3 highDifferenceSun = objPosHigh.xyz - currSunPosHIGH.xyz;
+			vec3 lowDifferenceSun = objPosLow.xyz - currSunPosLOW.xyz;
+			vec4 pos4Sun = vec4(highDifferenceSun.xyz + lowDifferenceSun.xyz, 1.0);
+			vec4 posRelToLightAux = currSunMatrix * pos4Sun;
+			
+			// now, check if "posRelToLightAux" is inside of the lightVolume (inside of the depthTexture of the light).
+			vec3 posRelToLightNDC = posRelToLightAux.xyz / posRelToLightAux.w;
+			vPosRelToLight = posRelToLightAux;
 		}
 
 		

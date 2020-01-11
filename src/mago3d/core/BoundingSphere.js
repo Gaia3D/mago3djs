@@ -23,9 +23,27 @@ var BoundingSphere = function(x, y, z, radius)
  * 포인트값 삭제
  * 어떤 일을 하고 있습니까?
  */
+BoundingSphere.prototype.getCenterPoint = function() 
+{
+	return this.centerPoint;
+};
+
+/**
+ * 포인트값 삭제
+ * 어떤 일을 하고 있습니까?
+ */
 BoundingSphere.prototype.setCenterPoint = function(x, y, z) 
 {
 	this.centerPoint.set(x, y, z);
+};
+
+/**
+ * 포인트값 삭제
+ * 어떤 일을 하고 있습니까?
+ */
+BoundingSphere.prototype.getRadius = function() 
+{
+	return this.r;
 };
 
 /**

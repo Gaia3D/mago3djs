@@ -11,7 +11,7 @@ var TinTerrainManager = function()
 	}
 	
 	//this.maxDepth = 18;
-	this.maxDepth = 14;
+	this.maxDepth = 15;
 	this.currentVisibles_terrName_geoCoords_map = {}; // current visible terrains map[terrainPathName, geographicCoords].
 	this.currentTerrainsMap = {}; // current terrains (that was created) map[terrainPathName, tinTerrain].
 	
@@ -268,7 +268,6 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	var shaderProgram = currentShader.program;
 	
 	gl.useProgram(shaderProgram);
-	//gl.enableVertexAttribArray(currentShader.position3_loc);
 	currentShader.enableVertexAttribArray(currentShader.position3_loc);
 	if (bDepth)
 	{ currentShader.disableVertexAttribArray(currentShader.texCoord2_loc); }
@@ -290,6 +289,9 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	gl.uniform1i(currentShader.bIsMakingDepth_loc, bDepth); //.
 	if (renderType === 1)
 	{
+		var textureAux1x1 = magoManager.texturesStore.getTextureAux1x1();
+		var noiseTexture = magoManager.texturesStore.getNoiseTexture4x4();
+		
 		gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture. Initially set as texture color type.***
 		gl.uniform4fv(currentShader.oneColor4_loc, [0.5, 0.5, 0.5, 1.0]);
 		gl.uniform1i(currentShader.refMatrixType_loc, 0); // init referencesMatrix.
@@ -308,6 +310,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 			var sunMatFloat32Array = sunSystem.getLightsMatrixFloat32Array();
 			var sunPosLOWFloat32Array = sunSystem.getLightsPosLOWFloat32Array();
 			var sunPosHIGHFloat32Array = sunSystem.getLightsPosHIGHFloat32Array();
+			var sunDirWC = sunSystem.getSunDirWC();
 			var sunLight = sunSystem.getLight(0);
 			if (sunLight.tMatrix!== undefined)
 			{
@@ -316,10 +319,37 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 				gl.uniform3fv(currentShader.sunPosLow_loc, sunPosLOWFloat32Array);
 				gl.uniform1f(currentShader.shadowMapWidth_loc, sunLight.targetTextureWidth);
 				gl.uniform1f(currentShader.shadowMapHeight_loc, sunLight.targetTextureHeight);
+				gl.uniform3fv(currentShader.sunDirWC_loc, sunDirWC);
+				gl.uniform1i(currentShader.sunIdx_loc, 0);
 			}
+			
+			//var sunTexLoc = gl.getUniformLocation(currentShader.program, 'shadowMapTex');
+			//gl.uniform1i(sunTexLoc, 3);
+			
+			//var sunTex2Loc = gl.getUniformLocation(currentShader.program, 'shadowMapTex2');
+			//gl.uniform1i(sunTex2Loc, 4);
+			
 			gl.activeTexture(gl.TEXTURE3); 
-			if (sunLight.depthFbo)
-			{ gl.bindTexture(gl.TEXTURE_2D, sunLight.depthFbo.colorBuffer); }
+			if (bApplyShadow && sunLight.depthFbo)
+			{
+				var sunLight = sunSystem.getLight(0);
+				gl.bindTexture(gl.TEXTURE_2D, sunLight.depthFbo.colorBuffer);
+			}
+			else 
+			{
+				gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
+			}
+			
+			gl.activeTexture(gl.TEXTURE4); 
+			if (bApplyShadow && sunLight.depthFbo)
+			{
+				var sunLight = sunSystem.getLight(1);
+				gl.bindTexture(gl.TEXTURE_2D, sunLight.depthFbo.colorBuffer);
+			}
+			else 
+			{
+				gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
+			}
 		}
 
 		

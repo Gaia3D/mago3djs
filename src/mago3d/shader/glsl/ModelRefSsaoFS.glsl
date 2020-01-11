@@ -8,7 +8,6 @@ uniform sampler2D diffuseTex;
 uniform sampler2D shadowMapTex;
 uniform sampler2D shadowMapTex2;
 uniform bool textureFlipYAxis;
-varying vec3 vNormal;
 uniform mat4 projectionMatrix;
 uniform mat4 m;
 uniform vec2 noiseScale;
@@ -39,11 +38,14 @@ uniform bool bApplySsao;
 uniform float externalAlpha;
 uniform bool bApplyShadow;
 
+//uniform int sunIdx;
+
 // clipping planes.***
 uniform bool bApplyClippingPlanes;
 uniform int clippingPlanesCount;
 uniform vec4 clippingPlanes[6];
 
+varying vec3 vNormal;
 varying vec2 vTexCoord;   
 varying vec3 vLightWeighting;
 varying vec3 diffuseColor;
@@ -85,7 +87,16 @@ float getDepth(vec2 coord)
 float getDepthShadowMap(vec2 coord)
 {
 	// currSunIdx
-    return UnpackDepth32(texture2D(shadowMapTex, coord.xy));
+	if(currSunIdx > 0.0 && currSunIdx < 1.0)
+	{
+		return UnpackDepth32(texture2D(shadowMapTex, coord.xy));
+	}
+    else if(currSunIdx > 1.0 && currSunIdx < 2.0)
+	{
+		return UnpackDepth32(texture2D(shadowMapTex2, coord.xy));
+	}
+	else
+		return -1.0;
 }  
 
 bool clipVertexByPlane(in vec4 plane, in vec3 point)
@@ -169,6 +180,7 @@ void main()
 		//vec3 lightPos = vec3(20.0, 60.0, 200.0);
 		vec3 lightPos = vec3(1.0, 1.0, 1.0);
 		vec3 L = normalize(lightPos - vertexPos);
+		//vec3 L = -vLightDir;
 		lambertian = max(dot(normal2, L), 0.0);
 		specular = 0.0;
 		if(lambertian > 0.0)
@@ -207,13 +219,16 @@ void main()
 			{
 				vec3 posRelToLight = vPosRelToLight.xyz / vPosRelToLight.w;
 				float tolerance = 0.9963;
-				//tolerance = 0.9962;
-				posRelToLight = posRelToLight * 0.5 + 0.5;
+				//tolerance = 0.5;
+				//tolerance = 1.0;
+				posRelToLight = posRelToLight * 0.5 + 0.5; // transform to [0,1] range
+				
 				float depthRelToLight = getDepthShadowMap(posRelToLight.xy);
 				if(posRelToLight.z > depthRelToLight*tolerance )
 				{
 					shadow_occlusion = 0.5;
 				}
+				
 				/*
 				// test. Calculate the zone inside the pixel.************************************
 				//https://docs.microsoft.com/ko-kr/windows/win32/dxtecharts/cascaded-shadow-maps
@@ -354,4 +369,7 @@ void main()
 	}
 	//finalColor = vec4(linearDepth, linearDepth, linearDepth, 1.0); // test to render depth color coded.***
     gl_FragColor = finalColor; 
+	
+	//if(currSunIdx < 0.0)gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+	//if(currSunIdx > 1.0)gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 }

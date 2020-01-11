@@ -615,9 +615,12 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 	var transformedPoint_P = sceneState.projectionMatrix.transformPoint4D__test(cartesian);
 	
 	// update sun if exist.
-	if (this.sceneState.sunSystem && this.sceneState.applySunShadows)
+	if (!this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
 	{
-		this.sceneState.sunSystem.updateSun(this);
+		if (this.sceneState.sunSystem && this.sceneState.applySunShadows)
+		{
+			this.sceneState.sunSystem.updateSun(this);
+		}
 	}
 };
 
@@ -1773,6 +1776,8 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
 	// Clear startPositions of mouseAction.***
 	var mouseAction = this.sceneState.mouseAction;
 	mouseAction.clearStartPositionsAux(); // provisionally only clear the aux.***
+	
+	
 };
 
 /**
@@ -4338,6 +4343,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
 	// OrthogonalShader locations.***
 	shader.modelViewProjectionMatrixRelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
+	shader.modelViewMatrixRelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
 	shader.encodedCameraPositionMCHigh_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
 	shader.encodedCameraPositionMCLow_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
 	shader.fov_loc = gl.getUniformLocation(shader.program, "fov");

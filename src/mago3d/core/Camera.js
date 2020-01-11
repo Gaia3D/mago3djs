@@ -636,6 +636,14 @@ Camera.prototype.initTrackOption = function()
 /**
  * 두 점을 이용하여 디렉션 정보 계산
  */
+Camera.prototype.getPosition = function()
+{
+	return this.position;
+};
+
+/**
+ * 두 점을 이용하여 디렉션 정보 계산
+ */
 Camera.prototype.getDirection = function()
 {
 	return this.direction;

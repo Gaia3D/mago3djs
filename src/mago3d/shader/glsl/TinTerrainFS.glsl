@@ -6,6 +6,7 @@
 //uniform sampler2D noiseTex;  
 uniform sampler2D diffuseTex;
 uniform sampler2D shadowMapTex;
+uniform sampler2D shadowMapTex2;
 uniform bool textureFlipYAxis;
 uniform bool bIsMakingDepth;
 varying vec3 vNormal;
@@ -47,6 +48,7 @@ varying vec3 v3Pos;
 varying vec4 vPosRelToLight; 
 varying vec3 vLightDir; 
 varying vec3 vNormalWC;
+varying float currSunIdx;
 
 const float equatorialRadius = 6378137.0;
 const float polarRadius = 6356752.3142;
@@ -90,8 +92,18 @@ vec3 getViewRay(vec2 tc)
 
 float getDepthShadowMap(vec2 coord)
 {
-    return UnpackDepth32(texture2D(shadowMapTex, coord.xy));
-}  
+	// currSunIdx
+	if(currSunIdx > 0.0 && currSunIdx < 1.0)
+	{
+		return UnpackDepth32(texture2D(shadowMapTex, coord.xy));
+	}
+    else if(currSunIdx > 1.0 && currSunIdx < 2.0)
+	{
+		return UnpackDepth32(texture2D(shadowMapTex2, coord.xy));
+	}
+	else
+		return -1.0;
+} 
 
 void main()
 {           
@@ -103,36 +115,34 @@ void main()
 		float shadow_occlusion = 1.0;
 		if(bApplyShadow)
 		{
-		
-			vec3 posRelToLight = vPosRelToLight.xyz / vPosRelToLight.w;
-			if(posRelToLight.x >= -0.5 && posRelToLight.x <= 0.5)
+			if(currSunIdx > 0.0)
 			{
-				if(posRelToLight.y >= -0.5 && posRelToLight.y <= 0.5)
+				vec3 fragCoord = gl_FragCoord.xyz;
+				vec3 fragWC;
+				
+				//float ligthAngle = dot(vLightDir, vNormalWC);
+				//if(ligthAngle > 0.0)
+				//{
+				//	// The angle between the light direction & face normal is less than 90 degree, so, the face is in shadow.***
+				//	shadow_occlusion = 0.5;
+				//}
+				//else
 				{
-					//float ligthAngle = dot(vLightDir, vNormalWC);
-					//if(ligthAngle > 0.0)
-					//{
-					//	// The angle between the light direction & face normal is less than 90 degree, so, the face is in shadow.***
-					//	if(shadow_occlusion > 0.4)
-					//		shadow_occlusion = 0.4;
-					//}
-					//else
+
+					vec3 posRelToLight = vPosRelToLight.xyz / vPosRelToLight.w;
+					float tolerance = 0.9963;
+					//tolerance = 0.9962;
+					//tolerance = 1.0;
+					posRelToLight = posRelToLight * 0.5 + 0.5; // transform to [0,1] range
+					
+					float depthRelToLight = getDepthShadowMap(posRelToLight.xy);
+					if(posRelToLight.z > depthRelToLight*tolerance )
 					{
-						float pixelWidth = 1.0 / shadowMapWidth;
-						float pixelHeight = 1.0 / shadowMapHeight;
-						posRelToLight = posRelToLight * 0.5 + 0.5;
-						
-						float depthRelToLight = getDepthShadowMap(posRelToLight.xy);
-						if(posRelToLight.z > depthRelToLight*0.9963 )
-						{
-							if(shadow_occlusion > 0.4)
-								shadow_occlusion = 0.4;
-						}
-						
+						shadow_occlusion = 0.5;
 					}
+					
 				}
 			}
-			
 		}
 	
 		vec4 textureColor;
@@ -173,5 +183,7 @@ void main()
 		float fogAmount = fogParam2*fogParam2;
 		vec4 finalColor = mix(textureColor, fogColor, fogAmount); 
 		gl_FragColor = vec4(finalColor.xyz * shadow_occlusion, 1.0);
+		
+		//if(currSunIdx > 0.0 && currSunIdx < 1.0 && shadow_occlusion<0.9)gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 	}
 }

@@ -28,18 +28,19 @@ var LightSource = function(lightType)
 	this.positionHIGH;
 	this.positionLOW;
 	this.tMatrix;
+	this.tMatrixInv;
 	this.depthFbo;
 	
 	// light is directionType, must have the rectangle size.
 	
 	
-	this.targetTextureWidth = new Int32Array([2048]);
-	this.targetTextureHeight = new Int32Array([2048]);
+	//this.targetTextureWidth = new Int32Array([2048]);
+	//this.targetTextureHeight = new Int32Array([2048]);
 	
 	//this.targetTextureWidth = new Int32Array([4096]);
 	//this.targetTextureHeight = new Int32Array([4096]);
 	
-	//this.targetTextureWidth = new Int32Array([8192]);
-	//this.targetTextureHeight = new Int32Array([8192]);
+	this.targetTextureWidth = new Int32Array([8192]);
+	this.targetTextureHeight = new Int32Array([8192]);
 };
 
