@@ -78,19 +78,19 @@ var Policy = function()
 	this.pointsCloudSettings = {};
 	if (defined(policy)) 
 	{
-		this.pointsCloudSettings.maxPartitionsLod0 = defaultValue(policy.max_partitions_lod0, 4);
-		this.pointsCloudSettings.maxPartitionsLod1 = defaultValue(policy.max_partitions_lod1, 2);
-		this.pointsCloudSettings.maxPartitionsLod2orLess = defaultValue(policy.max_partitions_lod2_or_less, 1);
-		this.pointsCloudSettings.MaxPerUnitPointsRenderDistToCam0m = 1.0/defaultValue(policy.max_per_unit_points_render_dist_to_cam_0m, 10.0);
-		this.pointsCloudSettings.MaxPerUnitPointsRenderDistToCam100m = 1.0/defaultValue(policy.max_per_unit_points_render_dist_to_cam_100m, 120.0);
-		this.pointsCloudSettings.MaxPerUnitPointsRenderDistToCam200m = 1.0/defaultValue(policy.max_per_unit_points_render_dist_to_cam_200m, 240.0);
-		this.pointsCloudSettings.MaxPerUnitPointsRenderDistToCam400m = 1.0/defaultValue(policy.max_per_unit_points_render_dist_to_cam_400m, 480.0);
-		this.pointsCloudSettings.MaxPerUnitPointsRenderDistToCam800m = 1.0/defaultValue(policy.max_per_unit_points_render_dist_to_cam_800m, 960.0);
-		this.pointsCloudSettings.MaxPerUnitPointsRenderDistToCam1600m = 1.0/defaultValue(policy.max_per_unit_points_render_dist_to_cam_1600m, 1920.0);
-		this.pointsCloudSettings.MaxPerUnitPointsRenderDistToCamMoreThan1600m = 1.0/defaultValue(policy.max_per_unit_points_render_dist_to_cam_more_than_1600m, 3840.0);
-		this.pointsCloudSettings.maxPointSize = defaultValue(policy.max_point_size_for_pc, 40.0);
-		this.pointsCloudSettings.minPointSize = defaultValue(policy.min_point_size_for_pc, 3.0);
-		this.pointsCloudSettings.pendentPointSize = defaultValue(policy.pendent_point_size_for_pc, 60.0);
+		this.pointsCloudSettings.maxPartitionsLod0 = defaultValue(policy.maxPartitionsLod0, 4);
+		this.pointsCloudSettings.maxPartitionsLod1 = defaultValue(policy.maxPartitionsLod1, 2);
+		this.pointsCloudSettings.maxPartitionsLod2orLess = defaultValue(policy.maxPartitionsLod2OrLess, 1);
+		this.pointsCloudSettings.MaxPerUnitPointsRenderDistToCam0m = 1.0/defaultValue(policy.maxRatioPointsDist0m, 10.0);
+		this.pointsCloudSettings.MaxPerUnitPointsRenderDistToCam100m = 1.0/defaultValue(policy.maxRatioPointsDist100m, 120.0);
+		this.pointsCloudSettings.MaxPerUnitPointsRenderDistToCam200m = 1.0/defaultValue(policy.maxRatioPointsDist200m, 240.0);
+		this.pointsCloudSettings.MaxPerUnitPointsRenderDistToCam400m = 1.0/defaultValue(policy.maxRatioPointsDist400m, 480.0);
+		this.pointsCloudSettings.MaxPerUnitPointsRenderDistToCam800m = 1.0/defaultValue(policy.maxRatioPointsDist800m, 960.0);
+		this.pointsCloudSettings.MaxPerUnitPointsRenderDistToCam1600m = 1.0/defaultValue(policy.maxRatioPointsDist1600m, 1920.0);
+		this.pointsCloudSettings.MaxPerUnitPointsRenderDistToCamMoreThan1600m = 1.0/defaultValue(policy.maxRatioPointsDistOver1600m, 3840.0);
+		this.pointsCloudSettings.maxPointSize = defaultValue(policy.maxPointSizeForPc, 40.0);
+		this.pointsCloudSettings.minPointSize = defaultValue(policy.minPointSizeForPc, 3.0);
+		this.pointsCloudSettings.pendentPointSize = defaultValue(policy.pendentPointSizeForPc, 60.0);
 		this.pointsCloudSettings.minHeightRainbow = defaultValue(policy.minHeight_rainbow_loc, 0.0);
 		this.pointsCloudSettings.maxHeightRainbow = defaultValue(policy.maxHeight_rainbow_loc, 100.0);
 	}

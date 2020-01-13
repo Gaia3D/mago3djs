@@ -198,7 +198,7 @@ MagoWorld.screenToCamCoord = function(mouseX, mouseY, magoManager, resultPointCa
 		}
 	}
 	
-	if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
+	if (!magoManager.isCesiumGlobe())
 	{ currentFrustumNear = 0.0; }
 	
 	resultPointCamCoord = ManagerUtils.calculatePixelPositionCamCoord(gl, mouseX, mouseY, resultPointCamCoord, currentDepthFbo, currentFrustumNear, currentFrustumFar, magoManager);
@@ -253,7 +253,7 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 		}
 	}
 	
-	//if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
+	//if (!magoManager.isCesiumGlobe())
 	//{ currentFrustumNear = 0.0; }
 	
 	// determine world position of the X,Y.

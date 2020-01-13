@@ -477,7 +477,7 @@ Octree.prototype.prepareSkinData = function(magoManager)
 		else 
 		{
 			var flip_y_texCoords = true;
-			if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
+			if (!magoManager.isCesiumGlobe())
 			{ flip_y_texCoords = false; }
 		
 			// This is the version 001.

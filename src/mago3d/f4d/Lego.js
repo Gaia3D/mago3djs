@@ -500,7 +500,7 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader)
 		if (renderTexture && vbo_vicky.vboBufferTCoord !== undefined)
 		{
 			// Provisionally flip tex coords here.
-			if (magoManager.configInformation.geo_view_library === Constant.CESIUM)
+			if (magoManager.isCesiumGlobe())
 			{ gl.uniform1i(shader.textureFlipYAxis_loc, false); }//.ppp
 			else
 			{ gl.uniform1i(shader.textureFlipYAxis_loc, true); }//.ppp

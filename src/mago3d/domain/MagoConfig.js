@@ -11,6 +11,11 @@ MagoConfig.getPolicy = function()
 	return this.serverPolicy;
 };
 
+MagoConfig.getGeoserver = function() 
+{
+	return this.geoserver;
+};
+
 MagoConfig.getData = function(key) 
 {
 	return this.dataObject[key];
@@ -91,15 +96,40 @@ MagoConfig.setProjectDataFolder = function(projectDataFolder, value)
  */
 MagoConfig.init = function(serverPolicy, projectIdArray, projectDataArray) 
 {
+	if (!serverPolicy || !serverPolicy instanceof Object) 
+	{
+		throw new Error('geopolicy is required object.');
+	}
 	this.dataObject = {};
 	
 	this.selectHistoryObject = {};
 	this.movingHistoryObject = {};
 	this.colorHistoryObject = {};
 	this.locationAndRotationHistoryObject = {};
-	
+
 	this.serverPolicy = serverPolicy;
-	if (projectIdArray !== null && projectIdArray.length > 0) 
+
+	if (!this.serverPolicy.basicGlobe) { this.serverPolicy.basicGlobe = Constant.CESIUM; }
+
+	this.serverPolicy.online = true;
+
+	if (this.serverPolicy.geoserverEnable) 
+	{
+		this.geoserver = new GeoServer();
+
+		var info = {
+			"wmsVersion"    : geopolicy.geoserverWmsVersion,
+			"dataUrl"       : geopolicy.geoserverDataUrl,
+			"dataWorkspace" : geopolicy.geoserverDataWorkspace,
+			"dataStore"     : geopolicy.geoserverDataStore,
+			"user"          : geopolicy.geoserverUser,
+			"password"      : geopolicy.geoserverPassword
+		};
+		this.geoserver.setServerInfo(info);
+	}
+
+
+	if (projectIdArray && projectIdArray.length > 0) 
 	{
 		for (var i=0; i<projectIdArray.length; i++) 
 		{

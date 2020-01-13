@@ -816,7 +816,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			this.renderAxisNodes(nodes, renderType);
 		}
 		
-		if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
+		if (!magoManager.isCesiumGlobe())
 		{
 			var sceneState = magoManager.sceneState;
 			//sceneState.applySunShadows = true;

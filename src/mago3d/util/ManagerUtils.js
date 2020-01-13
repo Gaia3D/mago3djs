@@ -359,7 +359,7 @@ ManagerUtils.calculateGeoLocationDataByAbsolutePoint = function(absoluteX, absol
 	
 	//추후에 세슘의존성 버리는 코드로 대체 가능해 보임. 손수석님과 검토 필요.
 	/*
-	if (magoManager.configInformation.geo_view_library === Constant.CESIUM)
+	if (magoManager.isCesiumGlobe())
 	{
 		// *if this in Cesium:
 		//resultGeoLocationData.position = Cesium.Cartesian3.fromDegrees(resultGeoLocationData.geographicCoord.longitude, resultGeoLocationData.geographicCoord.latitude, resultGeoLocationData.geographicCoord.altitude);
@@ -457,7 +457,7 @@ ManagerUtils.calculateGeoLocationDataByAbsolutePoint__original = function(absolu
 	resultGeoLocationData.position.z = absoluteZ;
 	
 	//추후에 세슘의존성 버리는 코드로 대체 가능해 보임. 손수석님과 검토 필요.
-	if (magoManager.configInformation.geo_view_library === Constant.CESIUM)
+	if (magoManager.isCesiumGlobe())
 	{
 		// *if this in Cesium:
 		//resultGeoLocationData.position = Cesium.Cartesian3.fromDegrees(resultGeoLocationData.geographicCoord.longitude, resultGeoLocationData.geographicCoord.latitude, resultGeoLocationData.geographicCoord.altitude);
@@ -535,7 +535,7 @@ ManagerUtils.calculateGeoLocationDataByAbsolutePoint__original = function(absolu
 		yRotMatrix.rotationAxisAngDeg(resultGeoLocationData.roll, 0.0, -1.0, 0.0);
 	}
 	
-	if (magoManager.configInformation.geo_view_library === Constant.CESIUM)
+	if (magoManager.isCesiumGlobe())
 	{
 		// *if this in Cesium:
 		Cesium.Transforms.eastNorthUpToFixedFrame(resultGeoLocationData.position, undefined, resultGeoLocationData.tMatrix._floatArrays);
@@ -726,7 +726,7 @@ ManagerUtils.cameraCoordPositionToWorldCoord = function(camCoordPos, resultWorld
  */
 ManagerUtils.screenCoordToWorldCoord = function(gl, pixelX, pixelY, resultWCPos, depthFbo, frustumNear, frustumFar, magoManager) 
 {
-	if (magoManager.configInformation.geo_view_library === Constant.CESIUM)
+	if (magoManager.isCesiumGlobe())
 	{
 		// https://cesium.com/docs/cesiumjs-ref-doc/Globe.html
 		
@@ -738,7 +738,7 @@ ManagerUtils.screenCoordToWorldCoord = function(gl, pixelX, pixelY, resultWCPos,
 		var intersection = cesiumGlobe.pick(ray, cesiumScene);
 		return intersection;
 	}
-	else if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
+	else/* if (magoManager.configInformation.basicGlobe === Constant.MAGOWORLD)*/
 	{
 		// todo:
 		
@@ -915,4 +915,24 @@ ManagerUtils.getHeadingToNorthByTwoGeographicCoords = function(startGeographic, 
 	}
 
 	return heading;
+};
+
+/**
+ * Using screen coordinate, return world coord, geographic coord, screen coord.
+ * @param {WebGLRenderingContext} gl WebGL Rendering Context.
+ * @param {Number} pixelX Screen x position of the pixel.
+ * @param {Number} pixelY Screen y position of the pixel.
+ * @param {MagoManager} magoManager Mago3D main manager.
+ * @returns {object} world coord, geographic coord, screen coord.
+ */
+ManagerUtils.getComplexCoordinateByScreenCoord = function(gl, pixelX, pixelY, depthFbo, frustumNear, frustumFar, magoManager) 
+{
+	var worldCoord = ManagerUtils.screenCoordToWorldCoord(magoManager.getGl(), pixelX, pixelY, worldCoord, undefined, undefined, undefined, magoManager);
+	var geographicCoord = ManagerUtils.pointToGeographicCoord(worldCoord, geographicCoord);
+
+	return {
+		screenCoordinate     : new Point2D(pixelX, pixelY),
+		worldCoordinate      : worldCoord,
+		geographicCoordinate : geographicCoord
+	};
 };

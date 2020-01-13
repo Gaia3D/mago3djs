@@ -16,6 +16,8 @@ var ReaderWriter = function()
 	if (serverPolicy !== undefined)
 	{ this.geometryDataPath = serverPolicy.geo_data_path; }
 	
+	if (!this.geometryDataPath) { this.geometryDataPath = '/f4d'; }
+
 	this.geometrySubDataPath;
 
 	this.j_counter;

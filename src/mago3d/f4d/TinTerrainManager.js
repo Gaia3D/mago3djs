@@ -324,7 +324,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 
 		
 		var flipTexCoordY = true;
-		if (magoManager.configInformation.geo_view_library === Constant.CESIUM)
+		if (magoManager.isCesiumGlobe())
 		{ flipTexCoordY = false; }
 		gl.uniform1i(currentShader.textureFlipYAxis_loc, flipTexCoordY); // false for cesium, true for magoWorld.
 		gl.uniform1f(currentShader.externalAlpha_loc, 1.0);

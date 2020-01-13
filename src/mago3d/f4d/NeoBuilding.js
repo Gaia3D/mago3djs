@@ -1561,7 +1561,7 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 				var filePath_inServer = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + textureFileName;
 				var gl = magoManager.sceneState.gl;
 				var flip_y_texCoords = true;
-				if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
+				if (!magoManager.isCesiumGlobe())
 				{ flip_y_texCoords = false; }
 				
 				magoManager.readerWriter.readLegoSimpleBuildingTexture(gl, filePath_inServer, lodBuilding.texture, magoManager, flip_y_texCoords); 
@@ -1652,7 +1652,7 @@ NeoBuilding.prototype.prepareSkin__original = function(magoManager)
 			var filePath_inServer = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + textureFileName;
 			var gl = magoManager.sceneState.gl;
 			var flip_y_texCoords = true;
-			if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
+			if (!magoManager.isCesiumGlobe())
 			{ flip_y_texCoords = false; }
 			
 			magoManager.readerWriter.readLegoSimpleBuildingTexture(gl, filePath_inServer, lowLodMesh.texture, magoManager, flip_y_texCoords); 

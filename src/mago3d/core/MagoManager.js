@@ -10,6 +10,7 @@ var MagoManager = function()
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
+	Emitter.call(this);
 	//// http://dj.gaia3d.com:10080
 	/**
 	 * Auxiliary renderer.
@@ -138,19 +139,18 @@ var MagoManager = function()
 	this.thereAreStartMovePoint = false;
 	this.startMovPoint = new Point3D();
 	
-	this.configInformation;
+	this.configInformation = MagoConfig.getPolicy();
 	this.cameraFPV = new FirstPersonView();
 	this.myCameraSCX;
 	
-	var serverPolicy = MagoConfig.getPolicy();
-	if (serverPolicy !== undefined)
+	if (this.configInformation !== undefined)
 	{
-		this.magoPolicy.setLod0DistInMeters(serverPolicy.geo_lod0);
-		this.magoPolicy.setLod1DistInMeters(serverPolicy.geo_lod1);
-		this.magoPolicy.setLod2DistInMeters(serverPolicy.geo_lod2);
-		this.magoPolicy.setLod3DistInMeters(serverPolicy.geo_lod3);
-		this.magoPolicy.setLod4DistInMeters(serverPolicy.geo_lod4);
-		this.magoPolicy.setLod5DistInMeters(serverPolicy.geo_lod5);
+		this.magoPolicy.setLod0DistInMeters(this.configInformation.lod0);
+		this.magoPolicy.setLod1DistInMeters(this.configInformation.lod1);
+		this.magoPolicy.setLod2DistInMeters(this.configInformation.lod2);
+		this.magoPolicy.setLod3DistInMeters(this.configInformation.lod3);
+		this.magoPolicy.setLod4DistInMeters(this.configInformation.lod4);
+		this.magoPolicy.setLod5DistInMeters(this.configInformation.lod5);
 	}
 
 	// var to delete.*********************************************
@@ -254,6 +254,16 @@ var MagoManager = function()
 	this.modeler = new Modeler(this);
 	this.materialsManager = new MaterialsManager(this);
 	this.idManager = new IdentifierManager();
+
+	this.f4dController = new F4dController(this);
+};
+
+MagoManager.prototype = Object.create(Emitter.prototype);
+MagoManager.prototype.constructor = MagoManager;
+
+MagoManager.EVENT_TYPE = {
+	'CLICK'    	: 'click',
+	'MOUSEMOVE' : 'mousemove'
 };
 
 /**
@@ -315,13 +325,16 @@ MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums)
 		
 			if (gl.isContextLost())
 			{ return; }
-
-			
 		}
 
 		this.startRender(isLastFrustum, this.currentFrustumIdx, numFrustums);
 			
 	}
+};
+
+MagoManager.prototype.isCesiumGlobe = function() 
+{
+	return this.configInformation.basicGlobe === Constant.CESIUM;
 };
 
 /**
@@ -460,7 +473,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		return;
 	}
 
-	if (this.configInformation.geo_view_library === Constant.CESIUM)
+	if (this.isCesiumGlobe())
 	{
 		// * if this is in Cesium:
 		var scene = this.scene;
@@ -513,7 +526,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		// modelViewProjection.***
 		sceneState.modelViewProjMatrix._floatArrays = glMatrix.mat4.multiply(sceneState.modelViewProjMatrix._floatArrays, sceneState.projectionMatrix._floatArrays, sceneState.modelViewMatrix._floatArrays);
 	}
-	else if (this.configInformation.geo_view_library === Constant.MAGOWORLD)
+	else/* if (this.configInformation.basicGlobe === Constant.MAGOWORLD)*/
 	{
 		var camera = sceneState.camera;
 		var camPos = camera.position;
@@ -627,7 +640,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
  */
 MagoManager.prototype.upDateCamera = function(resultCamera) 
 {
-	if (this.configInformation.geo_view_library === Constant.CESIUM)
+	if (this.isCesiumGlobe())
 	{
 		var scene = this.scene;
 		var frustumCommandsList = scene.frustumCommandsList;
@@ -697,7 +710,7 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
 		
 		//resultCamera.currentFrustumFar
 	}
-	else if (this.configInformation.geo_view_library === Constant.MAGOWORLD)
+	else/* if (this.configInformation.basicGlobe === Constant.MAGOWORLD)*/
 	{
 		var camera = this.sceneState.camera;
 		
@@ -1119,7 +1132,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	this.swapRenderingFase();
 
 	// 2) color render.************************************************************************************************************
-	if (this.configInformation.geo_view_library === Constant.CESIUM)
+	if (this.isCesiumGlobe())
 	{
 		var scene = this.scene;
 		scene._context._currentFramebuffer._bind();
@@ -1722,7 +1735,7 @@ MagoManager.prototype.isDragging = function()
  */
 MagoManager.prototype.setCameraMotion = function(state)
 {
-	if (this.configInformation.geo_view_library === Constant.CESIUM)
+	if (this.isCesiumGlobe())
 	{
 		this.scene.screenSpaceCameraController.enableRotate = state;
 		this.scene.screenSpaceCameraController.enableZoom = state;
@@ -1773,6 +1786,11 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
 	// Clear startPositions of mouseAction.***
 	var mouseAction = this.sceneState.mouseAction;
 	mouseAction.clearStartPositionsAux(); // provisionally only clear the aux.***
+
+	
+	var eventCoordinate = ManagerUtils.getComplexCoordinateByScreenCoord(this.getGl(), mouseX, mouseY, undefined, undefined, undefined, this);
+
+	this.emit(MagoManager.EVENT_TYPE.CLICK, {type: MagoManager.EVENT_TYPE.CLICK, clickCoordinate: eventCoordinate, timestamp: this.getCurrentTime()});
 };
 
 /**
@@ -2313,7 +2331,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		var geoCoord;
 		var strWorldPoint;
 		
-		if (this.configInformation.geo_view_library === Constant.CESIUM)
+		if (this.isCesiumGlobe())
 		{
 			var camera = this.scene.frameState.camera;
 			var scene = this.scene;
@@ -2887,11 +2905,49 @@ MagoManager.prototype.mouseActionRightUp = function(mouseX, mouseY)
 /**
  * 선택 객체를 asimetric mode 로 이동
  * @param gl 변수
- * @param scene 변수
+ * @param {Point2D} newPixel
+ * @param {Point2D} oldPixel
  */
-MagoManager.prototype.mouseActionMove = function(mouseX, mouseY) 
+MagoManager.prototype.mouseActionMove = function(newPixel, oldPixel) 
 {
 	if (this.mouseLeftDown) 
+	{
+		if (newPixel.x !== oldPixel.x || newPixel.y !== oldPixel.y) 
+		{
+			this.manageMouseDragging(newPixel.x, newPixel.y);
+			this.cameraMoved();
+		}
+	}
+	else
+	{
+		this.mouseDragging = false;
+		if (this.isCesiumGlobe()) 
+		{
+			disableCameraMotion(this.scene.screenSpaceCameraController, true);
+		}
+		
+		if (this.mouseMiddleDown || this.mouseRightDown)
+		{
+			this.isCameraMoving = true;
+			this.cameraMoved();
+		}
+	}
+	var gl = this.getGl();
+	
+	//var startEventCoordinate = ManagerUtils.getComplexCoordinateByScreenCoord(gl, oldPixel.x, oldPixel.y, undefined, undefined, undefined, this);
+	//var endEventCoordinate = ManagerUtils.getComplexCoordinateByScreenCoord(gl, newPixel.x, newPixel.y, undefined, undefined, undefined, this);
+
+	//this.emit(MagoManager.EVENT_TYPE.MOUSEMOVE, {type: MagoManager.EVENT_TYPE.MOUSEMOVE, startEvent: startEventCoordinate, endEvent: endEventCoordinate, timestamp: this.getCurrentTime() });
+
+	function disableCameraMotion(screenSpaceCameraController, state)
+	{
+		screenSpaceCameraController.enableRotate = state;
+		screenSpaceCameraController.enableZoom = state;
+		screenSpaceCameraController.enableLook = state;
+		screenSpaceCameraController.enableTilt = state;
+		screenSpaceCameraController.enableTranslate = state;
+	}
+	/*if (this.mouseLeftDown) 
 	{
 		this.manageMouseDragging(mouseX, mouseY);
 	}
@@ -2912,7 +2968,7 @@ MagoManager.prototype.mouseActionMove = function(mouseX, mouseY)
 			this.isCameraMoving = true;
 		}
 		
-	}
+	}*/
 };
 
 
@@ -3348,7 +3404,7 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 				
 				var geoCoord;
 				var strWorldPoint;
-				if (this.configInformation.geo_view_library === Constant.CESIUM)
+				if (this.isCesiumGlobe())
 				{
 					var camera = this.scene.frameState.camera;
 					var scene = this.scene;
@@ -4712,7 +4768,7 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
  */
 MagoManager.prototype.flyToTopology = function(worldPoint3d, duration) 
 {
-	if (MagoConfig.getPolicy().geo_view_library === Constant.CESIUM) 
+	if (this.isCesiumGlobe()) 
 	{
 		this.scene.camera.flyTo({
 			destination : Cesium.Cartesian3.clone(worldPoint3d),
@@ -4723,12 +4779,12 @@ MagoManager.prototype.flyToTopology = function(worldPoint3d, duration)
 		});
 	}
 	/*
-	else if (MagoConfig.getPolicy().geo_view_library === Constant.WORLDWIND)
+	else if (MagoConfig.getPolicy().basicGlobe === Constant.WORLDWIND)
 	{
 		this.wwd.goToAnimator.travelTime = duration * 1000;
 		this.wwd.goTo(new WorldWind.Position(parseFloat(latitude), parseFloat(longitude), parseFloat(altitude) + 50));
 	}
-	else if (MagoConfig.getPolicy().geo_view_library === Constant.MAGOWORLD)
+	else if (MagoConfig.getPolicy().basicGlobe === Constant.MAGOWORLD)
 	{
 		this.magoWorld.goto(parseFloat(longitude),
 			parseFloat(latitude),
@@ -4745,7 +4801,7 @@ MagoManager.prototype.flyToTopology = function(worldPoint3d, duration)
  */
 MagoManager.prototype.flyTo = function(longitude, latitude, altitude, duration) 
 {
-	if (MagoConfig.getPolicy().geo_view_library === Constant.CESIUM) 
+	if (this.isCesiumGlobe()) 
 	{
 		this.scene.camera.flyTo({
 			destination: Cesium.Cartesian3.fromDegrees(parseFloat(longitude),
@@ -4754,7 +4810,7 @@ MagoManager.prototype.flyTo = function(longitude, latitude, altitude, duration)
 			duration: parseInt(duration)
 		});
 	}
-	else if (MagoConfig.getPolicy().geo_view_library === Constant.MAGOWORLD)
+	else/* if (MagoConfig.getPolicy().basicGlobe === Constant.MAGOWORLD)*/
 	{
 		this.magoWorld.goto(parseFloat(longitude),
 			parseFloat(latitude),
@@ -4806,7 +4862,7 @@ MagoManager.prototype.flyToBuilding = function(apiName, projectId, dataKey)
 	
 	this.boundingSphere_Aux.radius = this.radiusAprox_aux;
 
-	if (this.configInformation.geo_view_library === Constant.CESIUM)
+	if (this.isCesiumGlobe())
 	{
 		this.boundingSphere_Aux.center = Cesium.Cartesian3.clone(realBuildingPos);
 		var seconds = 3;
@@ -5728,7 +5784,7 @@ MagoManager.prototype.callAPI = function(api)
 
 			this.cameraFPV.init();
 
-			 if (this.configInformation.geo_view_library === Constant.CESIUM)
+			 if (this.isCesiumGlobe())
 			{
 				var scratchLookAtMatrix4 = new Cesium.Matrix4();
 				var scratchFlyToBoundingSphereCart4 = new Cesium.Cartesian4();
@@ -5762,7 +5818,7 @@ MagoManager.prototype.callAPI = function(api)
 		else 
 		{
 			if (this.cameraFPV._cameraBAK === undefined)	{ return; }
-			if (this.configInformation.geo_view_library === Constant.CESIUM)
+			if (this.isCesiumGlobe())
 			{
 				this.scene.camera = Cesium.Camera.clone(this.cameraFPV._cameraBAK, this.scene.camera);
 			}
@@ -5949,7 +6005,7 @@ MagoManager.prototype.callAPI = function(api)
 	else if (apiName === "getCameraCurrentPosition")
 	{
 		var unit = api.getUnit();
-		if (this.configInformation.geo_view_library === Constant.CESIUM)
+		if (this.isCesiumGlobe())
 		{
 			var position = this.scene.camera.position;
 		
@@ -5970,7 +6026,7 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "getCameraCurrentOrientaion")
 	{
-		if (MagoConfig.getPolicy().geo_view_library === Constant.CESIUM)
+		if (this.isCesiumGlobe())
 		{
 			var camera = this.scene.camera;
 			if (!camera)
@@ -5993,7 +6049,7 @@ MagoManager.prototype.callAPI = function(api)
 		var roll = defaultValue(api.getRoll(), Cesium.Math.toDegrees(camera.roll));
 		var duration = defaultValue(api.getDuration(), 0);
 
-		if (MagoConfig.getPolicy().geo_view_library === Constant.CESIUM)
+		if (this.isCesiumGlobe())
 		{
 			var camera = this.scene.camera;
 			if (!camera)

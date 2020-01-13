@@ -494,7 +494,7 @@ Camera.prototype.doTrack = function(magoManager)
 	{
 		// Set camera position.*
 		var trackNode = this.tracked;
-		if (MagoConfig.getPolicy().geo_view_library === Constant.CESIUM)
+		if (magoManager.isCesiumGlobe())
 		{
 			var camera = magoManager.scene.camera;
 			var position = camera.positionWC;
@@ -587,7 +587,7 @@ Camera.prototype.doTrack = function(magoManager)
 Camera.prototype.stopTrack = function(magoManager)
 {
 	this.tracked = undefined;
-	if (MagoConfig.getPolicy().geo_view_library === Constant.CESIUM)
+	if (magoManager.isCesiumGlobe())
 	{
 		magoManager.scene.camera.lookAtTransform(Cesium.Matrix4.IDENTITY); //set camera transform
 	}
