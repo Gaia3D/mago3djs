@@ -1439,10 +1439,35 @@ void main()\n\
 		\n\
 	if(applySpecLighting> 0.0)\n\
 	{\n\
-		//vec3 lightPos = vec3(20.0, 60.0, 200.0);\n\
+	/*\n\
+		//vec3 lightPos = vec3(1.0, 1.0, 1.0);\n\
+		//vec3 L = normalize(lightPos - vertexPos);\n\
+		vec3 L = vLightDir;// test.***\n\
+		lambertian = max(dot(normal2, L), 0.0); // original.***\n\
+		//lambertian = max(dot(vNormalWC, L), 0.0); // test.\n\
+		specular = 0.0;\n\
+		if(lambertian > 0.0)\n\
+		{\n\
+			vec3 R = reflect(-L, normal2);      // Reflected light vector\n\
+			vec3 V = normalize(-vertexPos); // Vector to viewer\n\
+			\n\
+			// Compute the specular term\n\
+			float specAngle = max(dot(R, V), 0.0);\n\
+			specular = pow(specAngle, shininessValue);\n\
+			\n\
+			if(specular > 1.0)\n\
+			{\n\
+				specular = 1.0;\n\
+			}\n\
+		}\n\
+		\n\
+		if(lambertian < 0.5)\n\
+		{\n\
+			lambertian = 0.5;\n\
+		}\n\
+		*/\n\
 		vec3 lightPos = vec3(1.0, 1.0, 1.0);\n\
 		vec3 L = normalize(lightPos - vertexPos);\n\
-		//vec3 L = -vLightDir;\n\
 		lambertian = max(dot(normal2, L), 0.0);\n\
 		specular = 0.0;\n\
 		if(lambertian > 0.0)\n\
@@ -1484,11 +1509,16 @@ void main()\n\
 				//tolerance = 0.5;\n\
 				//tolerance = 1.0;\n\
 				posRelToLight = posRelToLight * 0.5 + 0.5; // transform to [0,1] range\n\
-				\n\
-				float depthRelToLight = getDepthShadowMap(posRelToLight.xy);\n\
-				if(posRelToLight.z > depthRelToLight*tolerance )\n\
+				if(posRelToLight.x >= 0.0 && posRelToLight.x <= 1.0)\n\
 				{\n\
-					shadow_occlusion = 0.5;\n\
+					if(posRelToLight.y >= 0.0 && posRelToLight.y <= 1.0)\n\
+					{\n\
+						float depthRelToLight = getDepthShadowMap(posRelToLight.xy);\n\
+						if(posRelToLight.z > depthRelToLight*tolerance )\n\
+						{\n\
+							shadow_occlusion = 0.5;\n\
+						}\n\
+					}\n\
 				}\n\
 				\n\
 				/*\n\
@@ -1613,27 +1643,29 @@ void main()\n\
         textureColor = aColor4;\n\
     }\n\
 	\n\
+	//textureColor = vec4(0.8, 0.75, 0.9, 1.0);\n\
+	\n\
 	vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);\n\
 	float alfa = textureColor.w * externalAlpha;\n\
 	\n\
 	// test render by depth.************************************************************\n\
 	//if(testBool)\n\
-	//textureColor = vec4(1.0, 0.0, 0.0, 1.0);\n\
+	//textureColor = vec4(0.8, 0.75, 0.9, 1.0);\n\
 	// End test.------------------------------------------------------------------------\n\
 \n\
     vec4 finalColor;\n\
 	if(applySpecLighting> 0.0)\n\
 	{\n\
-		finalColor = vec4((ambientReflectionCoef * ambientColor + diffuseReflectionCoef * lambertian * textureColor.xyz + specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion * shadow_occlusion, alfa); \n\
+		finalColor = vec4((ambientReflectionCoef * ambientColor + \n\
+							diffuseReflectionCoef * lambertian * textureColor.xyz + \n\
+							specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion * shadow_occlusion, alfa); \n\
 	}\n\
 	else{\n\
 		finalColor = vec4((textureColor.xyz) * occlusion * shadow_occlusion, alfa);\n\
 	}\n\
 	//finalColor = vec4(linearDepth, linearDepth, linearDepth, 1.0); // test to render depth color coded.***\n\
     gl_FragColor = finalColor; \n\
-	\n\
-	//if(currSunIdx < 0.0)gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n\
-	//if(currSunIdx > 1.0)gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n\
+\n\
 }";
 ShaderSource.ModelRefSsaoVS = "\n\
 	attribute vec3 position;\n\
@@ -1704,9 +1736,15 @@ ShaderSource.ModelRefSsaoVS = "\n\
 		vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
 		vec3 rotatedNormal = currentTMat * normal;\n\
 		\n\
+		vec3 uLightingDirection = vec3(-0.1320580393075943, -0.9903827905654907, 0.041261956095695496); \n\
+		uAmbientColor = vec3(1.0);\n\
+		vNormalWC = rotatedNormal;\n\
+		vLightDir = vec3(-0.1320580393075943, -0.9903827905654907, 0.041261956095695496);\n\
+		\n\
 		currSunIdx = -1.0; // initially no apply shadow.\n\
 		if(bApplyShadow)\n\
 		{\n\
+			//vLightDir = normalize(vec3(normalMatrix4 * vec4(sunDirWC.xyz, 1.0)).xyz); // test.***\n\
 			vLightDir = sunDirWC;\n\
 			vNormalWC = rotatedNormal;\n\
 						\n\
@@ -1734,18 +1772,18 @@ ShaderSource.ModelRefSsaoVS = "\n\
 			vec3 highDifferenceSun = objPosHigh.xyz - currSunPosHIGH.xyz;\n\
 			vec3 lowDifferenceSun = objPosLow.xyz - currSunPosLOW.xyz;\n\
 			vec4 pos4Sun = vec4(highDifferenceSun.xyz + lowDifferenceSun.xyz, 1.0);\n\
-			vec4 posRelToLightAux = currSunMatrix * pos4Sun;\n\
+			vPosRelToLight = currSunMatrix * pos4Sun;\n\
 			\n\
-			// now, check if \"posRelToLightAux\" is inside of the lightVolume (inside of the depthTexture of the light).\n\
-			vec3 posRelToLightNDC = posRelToLightAux.xyz / posRelToLightAux.w;\n\
-			vPosRelToLight = posRelToLightAux;\n\
+			uLightingDirection = sunDirWC; \n\
+		}\n\
+		else\n\
+		{\n\
+			uAmbientColor = vec3(0.8);\n\
+			uLightingDirection = vec3(0.6, 0.6, 0.6);\n\
 		}\n\
 \n\
-		\n\
-		vLightWeighting = vec3(1.0, 1.0, 1.0);\n\
-		uAmbientColor = vec3(0.8);\n\
-		vec3 uLightingDirection = vec3(0.6, 0.6, 0.6);\n\
 		vec3 directionalLightColor = vec3(0.7, 0.7, 0.7);\n\
+		\n\
 		vNormal = normalize((normalMatrix4 * vec4(rotatedNormal.x, rotatedNormal.y, rotatedNormal.z, 1.0)).xyz); // original.***\n\
 		vTexCoord = texCoord;\n\
 		float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
@@ -3028,7 +3066,7 @@ float getDepthShadowMap(vec2 coord)\n\
 		return UnpackDepth32(texture2D(shadowMapTex2, coord.xy));\n\
 	}\n\
 	else\n\
-		return -1.0;\n\
+		return 1000.0;\n\
 } \n\
 \n\
 void main()\n\
@@ -3060,13 +3098,17 @@ void main()\n\
 					//tolerance = 0.9962;\n\
 					//tolerance = 1.0;\n\
 					posRelToLight = posRelToLight * 0.5 + 0.5; // transform to [0,1] range\n\
-					\n\
-					float depthRelToLight = getDepthShadowMap(posRelToLight.xy);\n\
-					if(posRelToLight.z > depthRelToLight*tolerance )\n\
+					if(posRelToLight.x >= 0.0 && posRelToLight.x <= 1.0)\n\
 					{\n\
-						shadow_occlusion = 0.5;\n\
+						if(posRelToLight.y >= 0.0 && posRelToLight.y <= 1.0)\n\
+						{\n\
+							float depthRelToLight = getDepthShadowMap(posRelToLight.xy);\n\
+							if(posRelToLight.z > depthRelToLight*tolerance )\n\
+							{\n\
+								shadow_occlusion = 0.5;\n\
+							}\n\
+						}\n\
 					}\n\
-					\n\
 				}\n\
 			}\n\
 		}\n\

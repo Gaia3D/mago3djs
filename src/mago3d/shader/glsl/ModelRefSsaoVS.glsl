@@ -67,9 +67,15 @@
 		vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);
 		vec3 rotatedNormal = currentTMat * normal;
 		
+		vec3 uLightingDirection = vec3(-0.1320580393075943, -0.9903827905654907, 0.041261956095695496); 
+		uAmbientColor = vec3(1.0);
+		vNormalWC = rotatedNormal;
+		vLightDir = vec3(-0.1320580393075943, -0.9903827905654907, 0.041261956095695496);
+		
 		currSunIdx = -1.0; // initially no apply shadow.
 		if(bApplyShadow)
 		{
+			//vLightDir = normalize(vec3(normalMatrix4 * vec4(sunDirWC.xyz, 1.0)).xyz); // test.***
 			vLightDir = sunDirWC;
 			vNormalWC = rotatedNormal;
 						
@@ -97,18 +103,18 @@
 			vec3 highDifferenceSun = objPosHigh.xyz - currSunPosHIGH.xyz;
 			vec3 lowDifferenceSun = objPosLow.xyz - currSunPosLOW.xyz;
 			vec4 pos4Sun = vec4(highDifferenceSun.xyz + lowDifferenceSun.xyz, 1.0);
-			vec4 posRelToLightAux = currSunMatrix * pos4Sun;
+			vPosRelToLight = currSunMatrix * pos4Sun;
 			
-			// now, check if "posRelToLightAux" is inside of the lightVolume (inside of the depthTexture of the light).
-			vec3 posRelToLightNDC = posRelToLightAux.xyz / posRelToLightAux.w;
-			vPosRelToLight = posRelToLightAux;
+			uLightingDirection = sunDirWC; 
+		}
+		else
+		{
+			uAmbientColor = vec3(0.8);
+			uLightingDirection = vec3(0.6, 0.6, 0.6);
 		}
 
-		
-		vLightWeighting = vec3(1.0, 1.0, 1.0);
-		uAmbientColor = vec3(0.8);
-		vec3 uLightingDirection = vec3(0.6, 0.6, 0.6);
 		vec3 directionalLightColor = vec3(0.7, 0.7, 0.7);
+		
 		vNormal = normalize((normalMatrix4 * vec4(rotatedNormal.x, rotatedNormal.y, rotatedNormal.z, 1.0)).xyz); // original.***
 		vTexCoord = texCoord;
 		float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);

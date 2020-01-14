@@ -617,8 +617,9 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 	// update sun if exist.
 	if (!this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
 	{
-		if (this.sceneState.sunSystem && this.sceneState.applySunShadows)
+		if (this.sceneState.sunSystem && this.sceneState.applySunShadows && this.currentFrustumIdx === 0)
 		{
+			//this.frustumVolumeControl.calculateBoundingFrustums(sceneState.camera);
 			this.sceneState.sunSystem.updateSun(this);
 		}
 	}
@@ -1948,9 +1949,9 @@ MagoManager.prototype.keyDown = function(key)
 	{
 		// active or deactive shadows.
 		if (this.sceneState.applySunShadows)
-		{ this.sceneState.applySunShadows = false; }
+		{ this.sceneState.setApplySunShadows(false); }
 		else
-		{ this.sceneState.applySunShadows = true; }
+		{ this.sceneState.setApplySunShadows(true); }
 	}
 	else if (key === 84) // 84 = 't'.***
 	{

@@ -17,6 +17,7 @@ var SunSystem = function(options)
 	this.lightSourcesArray;
 	this.date; // month, day, hour, min, sec.
 	this.sunDirWC;
+	this.bAnimation = false;
 	
 	if (options !== undefined)
 	{
@@ -136,6 +137,18 @@ SunSystem.prototype.getLightsPosHIGHFloat32Array = function()
 	return this.lightPosHIGHFloat32Array;
 };
 
+SunSystem.prototype.setAnimation = function(options) 
+{
+	if (options === undefined)
+	{ return; }
+	
+	this.bAnimation = true;
+	var timeSpeed = options.timeSpeed; // seconds/seconds.
+	var startHour = options.startHour;
+	var startMin = options.startMin;
+	
+};
+
 SunSystem.prototype.calculateSunGeographicCoords = function() 
 {
 	//https://in-the-sky.org/twilightmap.php // web page. sun in current time.
@@ -150,7 +163,8 @@ SunSystem.prototype.calculateSunGeographicCoords = function()
 	var date = new Date();
 	
 	// test setting hour.
-	date.setHours(11);
+	date.setMonth(2);
+	date.setHours(15);
 	date.setMinutes(30);
 	
 	var fullYear = date.getFullYear();
@@ -210,14 +224,14 @@ SunSystem.prototype.updateSun = function(magoManager, options)
 
 	
 	// calculate the parameters of the light.
-	var frustumVolumenObject = magoManager.frustumVolumeControl.getFrustumVolumeCulling(0); 
-	var visibleNodes = frustumVolumenObject.visibleNodes; // class: VisibleObjectsController.
+	var frustumVolumeControl = magoManager.frustumVolumeControl;
+	var totalBoundingFrustum = frustumVolumeControl.getTotalBoundingFrustum(undefined);
 	
-	if (!visibleNodes.hasRenderables())
+	if (totalBoundingFrustum.bFrustumNear === undefined || totalBoundingFrustum.bFrustumFar === undefined)
 	{ return; }
-
-	var bFrustumNear = visibleNodes.bFrustumNear;
-	var bFrustumFar = visibleNodes.bFrustumFar;
+	
+	var bFrustumNear = totalBoundingFrustum.bFrustumNear;
+	var bFrustumFar = totalBoundingFrustum.bFrustumFar;
 	
 	var frustum = camera.getFrustum(0);
 	var tangentOfHalfFovy = frustum.tangentOfHalfFovy;
@@ -227,30 +241,48 @@ SunSystem.prototype.updateSun = function(magoManager, options)
 	{ minDist = 0.0; }
 	var maxDist = bFrustumFar;
 	var distRange = maxDist - minDist;
+
 	
 	// light 0 (nearest).
 	//var dist0 = minDist + distRange * 0.20;
-	var dist0 = minDist + distRange * 0.60;
+	var dist0 = minDist + distRange * 0.30;
 	if (dist0 < 1.0){ dist0 = 1.0; }
+	
+	var light = this.lightSourcesArray[0];
 	
 	var newRadius = Math.abs(tangentOfHalfFovy*dist0)*4.0;
 	var newPoint = new Point3D(camPos.x + camDir.x * dist0, camPos.y + camDir.y * dist0, camPos.z + camDir.z * dist0);
-	var bSphere0 = new BoundingSphere(newPoint.x, newPoint.y, newPoint.z, newRadius);
-	var light = this.lightSourcesArray[0];
-	light.lightPosWC = bSphere0.centerPoint;
-	light.directionalBoxWidth = bSphere0.r*2;
+	if (light.bSphere === undefined)
+	{ light.bSphere = new BoundingSphere(newPoint.x, newPoint.y, newPoint.z, newRadius); }
+	else 
+	{
+		light.bSphere.setCenterPoint(newPoint.x, newPoint.y, newPoint.z);
+		light.bSphere.setRadius(newRadius);
+	}
+	light.lightPosWC = light.bSphere.centerPoint;
+	light.directionalBoxWidth = light.bSphere.r;
+	light.minDistToCam = dist0 - light.bSphere.r; // use only in directional lights.
+	light.maxDistToCam = dist0 + light.bSphere.r; // use only in directional lights.
 	this.updateLight(light);
 	
 	// light 1 (farest).
 	//var dist1 = minDist + distRange * 0.70;
 	var dist1 = minDist + distRange * 0.60;
 	if (dist1 < 10.0){ dist1 = 10.0; }
+	var light = this.lightSourcesArray[1];
 	var newRadius = Math.abs(tangentOfHalfFovy*dist1)*4.0;
 	var newPoint = new Point3D(camPos.x + camDir.x * dist1, camPos.y + camDir.y * dist1, camPos.z + camDir.z * dist1);
-	var bSphere1 = new BoundingSphere(newPoint.x, newPoint.y, newPoint.z, newRadius);
-	var light = this.lightSourcesArray[1];
-	light.lightPosWC = bSphere1.centerPoint;
-	light.directionalBoxWidth = bSphere1.r*2;
+	if (light.bSphere === undefined)
+	{ light.bSphere = new BoundingSphere(newPoint.x, newPoint.y, newPoint.z, newRadius); }
+	else 
+	{
+		light.bSphere.setCenterPoint(newPoint.x, newPoint.y, newPoint.z);
+		light.bSphere.setRadius(newRadius);
+	}
+	light.lightPosWC = light.bSphere.centerPoint;
+	light.directionalBoxWidth = light.bSphere.r*2;
+	light.minDistToCam = dist1 - light.bSphere.r; // use only in directional lights.
+	light.maxDistToCam = dist1 + light.bSphere.r; // use only in directional lights.
 	this.updateLight(light);
 		
 };

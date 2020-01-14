@@ -97,11 +97,52 @@ Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, sh
 	// do render.
 	var node;
 	var nodesCount = visibleNodesArray.length;
-	for (var i=0; i<nodesCount; i++)
+	
+	var sceneState = magoManager.sceneState;
+	var bApplyShadow = sceneState.applySunShadows;
+	if (bApplyShadow && renderType === 1)
 	{
-		node = visibleNodesArray[i];
-		node.renderContent(magoManager, shader, renderType, refMatrixIdxKey);
+		var light0 = sceneState.sunSystem.getLight(0);
+		var light0MaxDistToCam = light0.maxDistToCam;
+		var light0BSphere = light0.bSphere;
+		if (light0BSphere === undefined)
+		{ return; }
+	
+		var light0Radius = light0BSphere.getRadius();
+		
+		var light0CenterPoint = light0BSphere.getCenterPoint();
+		for (var i=0; i<nodesCount; i++)
+		{
+			node = visibleNodesArray[i];
+			
+			// now check if the node is inside of the light0 bSphere.
+			var bboxAbsoluteCenterPos = node.bboxAbsoluteCenterPos;
+			var bbox = node.data.bbox;
+			var radiusAprox = bbox.getRadiusAprox();
+			var distToLight0 = light0CenterPoint.distToPoint(bboxAbsoluteCenterPos);//+radiusAprox;
+			
+			if (distToLight0 < light0Radius)
+			{
+				gl.uniform1i(shader.sunIdx_loc, 0);
+			}
+			else
+			{
+				gl.uniform1i(shader.sunIdx_loc, 1);
+			}
+			node.renderContent(magoManager, shader, renderType, refMatrixIdxKey);
+		}
 	}
+	else
+	{
+		for (var i=0; i<nodesCount; i++)
+		{
+			node = visibleNodesArray[i];
+			node.renderContent(magoManager, shader, renderType, refMatrixIdxKey);
+		}
+	}
+	
+	
+	
 };
 
 /**
@@ -820,7 +861,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			this.renderAxisNodes(nodes, renderType);
 		}
 		
-		if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
+		//if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
 		{
 			var sceneState = magoManager.sceneState;
 			//sceneState.applySunShadows = true;
@@ -828,12 +869,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			// Test sunLight.***
 			if (sceneState.applySunShadows && !this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
 			{
-				var frustumVolumenObject = magoManager.frustumVolumeControl.getFrustumVolumeCulling(0); 
-				var visibleNodes = frustumVolumenObject.visibleNodes; // class: VisibleObjectsController.
-				if (!visibleNodes.hasRenderables())
-				{ return; }
-
-				visibleNodes.calculateBoundingFrustum(sceneState.camera);
+				visibleObjControlerNodes.calculateBoundingFrustum(sceneState.camera);
 			
 				var sunSystem = sceneState.sunSystem;
 				var sunLightsCount = sunSystem.lightSourcesArray.length;
@@ -946,7 +982,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 					gl.uniform1f(currentShader.shadowMapWidth_loc, sunLight.targetTextureWidth);
 					gl.uniform1f(currentShader.shadowMapHeight_loc, sunLight.targetTextureHeight);
 					gl.uniform3fv(currentShader.sunDirWC_loc, sunDirWC);
-					gl.uniform1i(currentShader.sunIdx_loc, 0);
+					gl.uniform1i(currentShader.sunIdx_loc, 1);
 				}
 			}
 			
@@ -1032,7 +1068,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			
 			//bApplySsao = false;
 			gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); 
-
+			
 			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 			

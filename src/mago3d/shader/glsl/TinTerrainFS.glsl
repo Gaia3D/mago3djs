@@ -102,7 +102,7 @@ float getDepthShadowMap(vec2 coord)
 		return UnpackDepth32(texture2D(shadowMapTex2, coord.xy));
 	}
 	else
-		return -1.0;
+		return 1000.0;
 } 
 
 void main()
@@ -134,13 +134,17 @@ void main()
 					//tolerance = 0.9962;
 					//tolerance = 1.0;
 					posRelToLight = posRelToLight * 0.5 + 0.5; // transform to [0,1] range
-					
-					float depthRelToLight = getDepthShadowMap(posRelToLight.xy);
-					if(posRelToLight.z > depthRelToLight*tolerance )
+					if(posRelToLight.x >= 0.0 && posRelToLight.x <= 1.0)
 					{
-						shadow_occlusion = 0.5;
+						if(posRelToLight.y >= 0.0 && posRelToLight.y <= 1.0)
+						{
+							float depthRelToLight = getDepthShadowMap(posRelToLight.xy);
+							if(posRelToLight.z > depthRelToLight*tolerance )
+							{
+								shadow_occlusion = 0.5;
+							}
+						}
 					}
-					
 				}
 			}
 		}

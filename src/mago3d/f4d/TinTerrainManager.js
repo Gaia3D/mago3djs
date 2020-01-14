@@ -320,7 +320,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 				gl.uniform1f(currentShader.shadowMapWidth_loc, sunLight.targetTextureWidth);
 				gl.uniform1f(currentShader.shadowMapHeight_loc, sunLight.targetTextureHeight);
 				gl.uniform3fv(currentShader.sunDirWC_loc, sunDirWC);
-				gl.uniform1i(currentShader.sunIdx_loc, 0);
+				gl.uniform1i(currentShader.sunIdx_loc, 1);
 			}
 			
 			//var sunTexLoc = gl.getUniformLocation(currentShader.program, 'shadowMapTex');
@@ -365,19 +365,58 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 		gl.activeTexture(gl.TEXTURE2); // difusseTex.
 	}
 	
+	var sceneState = magoManager.sceneState;
+	var bApplyShadow = sceneState.applySunShadows;
 	var renderWireframe = false;
 	var tinTerrain;
 	var visiblesTilesCount = this.visibleTilesArray.length;
-	for (var i=0; i<visiblesTilesCount; i++)
-	{
-		//currentVisiblesTerrainsMap
-		tinTerrain = this.visibleTilesArray[i];
-		
-		if (tinTerrain === undefined)
-		{ continue; }
 	
-		tinTerrain.render(currentShader, magoManager, bDepth, renderType);
+	// check if apply sun shadow.
+	var light0 = sceneState.sunSystem.getLight(0);
+	var light0MaxDistToCam = light0.maxDistToCam;
+	var light0BSphere = light0.bSphere;
+	if (light0BSphere === undefined)
+	{ bApplyShadow = false; } // cant apply shadow anyway.
+	
+	if (bApplyShadow)
+	{
+		var light0Radius = light0BSphere.getRadius();
+		var light0CenterPoint = light0BSphere.getCenterPoint();
+		for (var i=0; i<visiblesTilesCount; i++)
+		{
+			tinTerrain = this.visibleTilesArray[i];
+			
+			if (tinTerrain === undefined)
+			{ continue; }
+		
+			var sphereExtent = tinTerrain.sphereExtent;
+			var distToLight0 = light0CenterPoint.distToPoint(sphereExtent.centerPoint)+sphereExtent.r;
+			if (distToLight0 < light0Radius*5.0)
+			{
+				gl.uniform1i(currentShader.sunIdx_loc, 0);
+			}
+			else
+			{
+				gl.uniform1i(currentShader.sunIdx_loc, 1);
+			}
+			tinTerrain.render(currentShader, magoManager, bDepth, renderType);
+		}
 	}
+	else
+	{
+		for (var i=0; i<visiblesTilesCount; i++)
+		{
+			tinTerrain = this.visibleTilesArray[i];
+			
+			if (tinTerrain === undefined)
+			{ continue; }
+		
+			tinTerrain.render(currentShader, magoManager, bDepth, renderType);
+		}
+	}
+	
+	
+	
 
 	currentShader.disableVertexAttribArray(currentShader.texCoord2_loc); 
 	currentShader.disableVertexAttribArray(currentShader.position3_loc); 

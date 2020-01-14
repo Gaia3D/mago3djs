@@ -177,10 +177,35 @@ void main()
 		
 	if(applySpecLighting> 0.0)
 	{
-		//vec3 lightPos = vec3(20.0, 60.0, 200.0);
+	/*
+		//vec3 lightPos = vec3(1.0, 1.0, 1.0);
+		//vec3 L = normalize(lightPos - vertexPos);
+		vec3 L = vLightDir;// test.***
+		lambertian = max(dot(normal2, L), 0.0); // original.***
+		//lambertian = max(dot(vNormalWC, L), 0.0); // test.
+		specular = 0.0;
+		if(lambertian > 0.0)
+		{
+			vec3 R = reflect(-L, normal2);      // Reflected light vector
+			vec3 V = normalize(-vertexPos); // Vector to viewer
+			
+			// Compute the specular term
+			float specAngle = max(dot(R, V), 0.0);
+			specular = pow(specAngle, shininessValue);
+			
+			if(specular > 1.0)
+			{
+				specular = 1.0;
+			}
+		}
+		
+		if(lambertian < 0.5)
+		{
+			lambertian = 0.5;
+		}
+		*/
 		vec3 lightPos = vec3(1.0, 1.0, 1.0);
 		vec3 L = normalize(lightPos - vertexPos);
-		//vec3 L = -vLightDir;
 		lambertian = max(dot(normal2, L), 0.0);
 		specular = 0.0;
 		if(lambertian > 0.0)
@@ -222,11 +247,16 @@ void main()
 				//tolerance = 0.5;
 				//tolerance = 1.0;
 				posRelToLight = posRelToLight * 0.5 + 0.5; // transform to [0,1] range
-				
-				float depthRelToLight = getDepthShadowMap(posRelToLight.xy);
-				if(posRelToLight.z > depthRelToLight*tolerance )
+				if(posRelToLight.x >= 0.0 && posRelToLight.x <= 1.0)
 				{
-					shadow_occlusion = 0.5;
+					if(posRelToLight.y >= 0.0 && posRelToLight.y <= 1.0)
+					{
+						float depthRelToLight = getDepthShadowMap(posRelToLight.xy);
+						if(posRelToLight.z > depthRelToLight*tolerance )
+						{
+							shadow_occlusion = 0.5;
+						}
+					}
 				}
 				
 				/*
@@ -351,25 +381,27 @@ void main()
         textureColor = aColor4;
     }
 	
+	//textureColor = vec4(0.8, 0.75, 0.9, 1.0);
+	
 	vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);
 	float alfa = textureColor.w * externalAlpha;
 	
 	// test render by depth.************************************************************
 	//if(testBool)
-	//textureColor = vec4(1.0, 0.0, 0.0, 1.0);
+	//textureColor = vec4(0.8, 0.75, 0.9, 1.0);
 	// End test.------------------------------------------------------------------------
 
     vec4 finalColor;
 	if(applySpecLighting> 0.0)
 	{
-		finalColor = vec4((ambientReflectionCoef * ambientColor + diffuseReflectionCoef * lambertian * textureColor.xyz + specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion * shadow_occlusion, alfa); 
+		finalColor = vec4((ambientReflectionCoef * ambientColor + 
+							diffuseReflectionCoef * lambertian * textureColor.xyz + 
+							specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion * shadow_occlusion, alfa); 
 	}
 	else{
 		finalColor = vec4((textureColor.xyz) * occlusion * shadow_occlusion, alfa);
 	}
 	//finalColor = vec4(linearDepth, linearDepth, linearDepth, 1.0); // test to render depth color coded.***
     gl_FragColor = finalColor; 
-	
-	//if(currSunIdx < 0.0)gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-	//if(currSunIdx > 1.0)gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+
 }

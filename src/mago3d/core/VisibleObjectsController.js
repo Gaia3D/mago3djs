@@ -22,6 +22,10 @@ var VisibleObjectsController = function()
 		excavationsArray  : []
 	};
 	this.currentVisiblesToPrepare = [];
+	
+	this.bSphere;
+	this.bFrustumNear;
+	this.bFrustumFar;
 };
 VisibleObjectsController.prototype.initArrays = function() 
 {
@@ -36,6 +40,10 @@ VisibleObjectsController.prototype.initArrays = function()
 		excavationsArray  : []
 	};
 	this.currentVisiblesToPrepare = [];
+	
+	this.bSphere = undefined;
+	this.bFrustumNear = undefined;
+	this.bFrustumFar = undefined;
 };
 /**Clear all of the volumn's data */
 
@@ -50,6 +58,10 @@ VisibleObjectsController.prototype.clear = function()
 	this.currentVisibleNativeObjects.transparentsArray.length = 0;
 	this.currentVisibleNativeObjects.excavationsArray.length = 0;
 	this.currentVisiblesToPrepare.length = 0;
+	
+	this.bSphere = undefined;
+	this.bFrustumNear = undefined;
+	this.bFrustumFar = undefined;
 };
 
 /**

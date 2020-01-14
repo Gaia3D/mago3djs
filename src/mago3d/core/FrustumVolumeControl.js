@@ -48,3 +48,109 @@ FrustumVolumeControl.prototype.initArrays = function()
 		}
 	}
 };
+
+/**
+ * Returns the near & far considering all frustum partitions.
+ */
+FrustumVolumeControl.prototype.getTotalBoundingFrustum = function(resultBFrustum)
+{
+	resultBFrustum = {}; // init.
+	
+	var frustumVolumeObject;
+	for (var key in this.frustumVolumensMap)
+	{
+		if (Object.prototype.hasOwnProperty.call(this.frustumVolumensMap, key)) 
+		{
+			frustumVolumeObject = this.frustumVolumensMap[key];
+			if (frustumVolumeObject.intersectedTilesArray.length > 0)
+			{
+				var bFrustumNear = frustumVolumeObject.visibleNodes.bFrustumNear;
+				var bFrustumFar = frustumVolumeObject.visibleNodes.bFrustumFar;
+				
+				if (bFrustumNear !== undefined && bFrustumFar !== undefined)
+				{
+					if (resultBFrustum.bFrustumNear === undefined)
+					{
+						resultBFrustum.bFrustumNear = bFrustumNear;
+					}
+					else
+					{
+						if (bFrustumNear < resultBFrustum.bFrustumNear)
+						{ resultBFrustum.bFrustumNear = bFrustumNear; }
+					}
+					
+					if (resultBFrustum.bFrustumFar === undefined)
+					{
+						resultBFrustum.bFrustumFar = bFrustumFar;
+					}
+					else
+					{
+						if (bFrustumFar > resultBFrustum.bFrustumFar)
+						{ resultBFrustum.bFrustumFar = bFrustumFar; }
+					}
+				}
+			}
+		}
+	}
+	
+	return resultBFrustum;
+};
+
+/**
+ * Returns the near & far considering all frustum partitions.
+ */
+FrustumVolumeControl.prototype.calculateBoundingFrustums = function(camera)
+{
+	var frustumVolumeObject;
+	for (var key in this.frustumVolumensMap)
+	{
+		if (Object.prototype.hasOwnProperty.call(this.frustumVolumensMap, key)) 
+		{
+			frustumVolumeObject = this.frustumVolumensMap[key];
+			if (frustumVolumeObject.intersectedTilesArray.length > 0)
+			{
+				frustumVolumeObject.visibleNodes.calculateBoundingFrustum(camera);
+			}
+		}
+	}
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
