@@ -70,7 +70,11 @@
 		vec3 uLightingDirection = vec3(-0.1320580393075943, -0.9903827905654907, 0.041261956095695496); 
 		uAmbientColor = vec3(1.0);
 		vNormalWC = rotatedNormal;
+		vNormal = normalize((normalMatrix4 * vec4(rotatedNormal.x, rotatedNormal.y, rotatedNormal.z, 1.0)).xyz); // original.***
+		vTexCoord = texCoord;
 		vLightDir = vec3(-0.1320580393075943, -0.9903827905654907, 0.041261956095695496);
+		vec3 directionalLightColor = vec3(0.7, 0.7, 0.7);
+		float directionalLightWeighting = 1.0;
 		
 		currSunIdx = -1.0; // initially no apply shadow.
 		if(bApplyShadow)
@@ -106,18 +110,16 @@
 			vPosRelToLight = currSunMatrix * pos4Sun;
 			
 			uLightingDirection = sunDirWC; 
+			//directionalLightColor = vec3(0.9, 0.9, 0.9);
+			directionalLightWeighting = max(dot(rotatedNormal, -sunDirWC), 0.0);
 		}
 		else
 		{
 			uAmbientColor = vec3(0.8);
-			uLightingDirection = vec3(0.6, 0.6, 0.6);
+			uLightingDirection = normalize(vec3(0.6, 0.6, 0.6));
+			directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);
 		}
 
-		vec3 directionalLightColor = vec3(0.7, 0.7, 0.7);
-		
-		vNormal = normalize((normalMatrix4 * vec4(rotatedNormal.x, rotatedNormal.y, rotatedNormal.z, 1.0)).xyz); // original.***
-		vTexCoord = texCoord;
-		float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);
 		vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;
 		
 		if(bApplySpecularLighting)

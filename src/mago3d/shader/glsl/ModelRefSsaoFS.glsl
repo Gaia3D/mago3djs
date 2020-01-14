@@ -177,36 +177,20 @@ void main()
 		
 	if(applySpecLighting> 0.0)
 	{
-	/*
-		//vec3 lightPos = vec3(1.0, 1.0, 1.0);
-		//vec3 L = normalize(lightPos - vertexPos);
-		vec3 L = vLightDir;// test.***
-		lambertian = max(dot(normal2, L), 0.0); // original.***
-		//lambertian = max(dot(vNormalWC, L), 0.0); // test.
-		specular = 0.0;
-		if(lambertian > 0.0)
+		vec3 L;
+		if(bApplyShadow)
 		{
-			vec3 R = reflect(-L, normal2);      // Reflected light vector
-			vec3 V = normalize(-vertexPos); // Vector to viewer
-			
-			// Compute the specular term
-			float specAngle = max(dot(R, V), 0.0);
-			specular = pow(specAngle, shininessValue);
-			
-			if(specular > 1.0)
-			{
-				specular = 1.0;
-			}
+			L = vLightDir;// test.***
+			lambertian = max(dot(normal2, L), 0.0); // original.***
+			//lambertian = max(dot(vNormalWC, L), 0.0); // test.
+		}
+		else
+		{
+			vec3 lightPos = vec3(1.0, 1.0, 1.0);
+			L = normalize(lightPos - vertexPos);
+			lambertian = max(dot(normal2, L), 0.0);
 		}
 		
-		if(lambertian < 0.5)
-		{
-			lambertian = 0.5;
-		}
-		*/
-		vec3 lightPos = vec3(1.0, 1.0, 1.0);
-		vec3 L = normalize(lightPos - vertexPos);
-		lambertian = max(dot(normal2, L), 0.0);
 		specular = 0.0;
 		if(lambertian > 0.0)
 		{

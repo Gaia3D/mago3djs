@@ -1439,36 +1439,20 @@ void main()\n\
 		\n\
 	if(applySpecLighting> 0.0)\n\
 	{\n\
-	/*\n\
-		//vec3 lightPos = vec3(1.0, 1.0, 1.0);\n\
-		//vec3 L = normalize(lightPos - vertexPos);\n\
-		vec3 L = vLightDir;// test.***\n\
-		lambertian = max(dot(normal2, L), 0.0); // original.***\n\
-		//lambertian = max(dot(vNormalWC, L), 0.0); // test.\n\
-		specular = 0.0;\n\
-		if(lambertian > 0.0)\n\
+		vec3 L;\n\
+		if(bApplyShadow)\n\
 		{\n\
-			vec3 R = reflect(-L, normal2);      // Reflected light vector\n\
-			vec3 V = normalize(-vertexPos); // Vector to viewer\n\
-			\n\
-			// Compute the specular term\n\
-			float specAngle = max(dot(R, V), 0.0);\n\
-			specular = pow(specAngle, shininessValue);\n\
-			\n\
-			if(specular > 1.0)\n\
-			{\n\
-				specular = 1.0;\n\
-			}\n\
+			L = vLightDir;// test.***\n\
+			lambertian = max(dot(normal2, L), 0.0); // original.***\n\
+			//lambertian = max(dot(vNormalWC, L), 0.0); // test.\n\
+		}\n\
+		else\n\
+		{\n\
+			vec3 lightPos = vec3(1.0, 1.0, 1.0);\n\
+			L = normalize(lightPos - vertexPos);\n\
+			lambertian = max(dot(normal2, L), 0.0);\n\
 		}\n\
 		\n\
-		if(lambertian < 0.5)\n\
-		{\n\
-			lambertian = 0.5;\n\
-		}\n\
-		*/\n\
-		vec3 lightPos = vec3(1.0, 1.0, 1.0);\n\
-		vec3 L = normalize(lightPos - vertexPos);\n\
-		lambertian = max(dot(normal2, L), 0.0);\n\
 		specular = 0.0;\n\
 		if(lambertian > 0.0)\n\
 		{\n\
@@ -1739,7 +1723,11 @@ ShaderSource.ModelRefSsaoVS = "\n\
 		vec3 uLightingDirection = vec3(-0.1320580393075943, -0.9903827905654907, 0.041261956095695496); \n\
 		uAmbientColor = vec3(1.0);\n\
 		vNormalWC = rotatedNormal;\n\
+		vNormal = normalize((normalMatrix4 * vec4(rotatedNormal.x, rotatedNormal.y, rotatedNormal.z, 1.0)).xyz); // original.***\n\
+		vTexCoord = texCoord;\n\
 		vLightDir = vec3(-0.1320580393075943, -0.9903827905654907, 0.041261956095695496);\n\
+		vec3 directionalLightColor = vec3(0.7, 0.7, 0.7);\n\
+		float directionalLightWeighting = 1.0;\n\
 		\n\
 		currSunIdx = -1.0; // initially no apply shadow.\n\
 		if(bApplyShadow)\n\
@@ -1775,18 +1763,16 @@ ShaderSource.ModelRefSsaoVS = "\n\
 			vPosRelToLight = currSunMatrix * pos4Sun;\n\
 			\n\
 			uLightingDirection = sunDirWC; \n\
+			//directionalLightColor = vec3(0.9, 0.9, 0.9);\n\
+			directionalLightWeighting = max(dot(rotatedNormal, -sunDirWC), 0.0);\n\
 		}\n\
 		else\n\
 		{\n\
 			uAmbientColor = vec3(0.8);\n\
-			uLightingDirection = vec3(0.6, 0.6, 0.6);\n\
+			uLightingDirection = normalize(vec3(0.6, 0.6, 0.6));\n\
+			directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
 		}\n\
 \n\
-		vec3 directionalLightColor = vec3(0.7, 0.7, 0.7);\n\
-		\n\
-		vNormal = normalize((normalMatrix4 * vec4(rotatedNormal.x, rotatedNormal.y, rotatedNormal.z, 1.0)).xyz); // original.***\n\
-		vTexCoord = texCoord;\n\
-		float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
 		vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;\n\
 		\n\
 		if(bApplySpecularLighting)\n\
