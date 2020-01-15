@@ -45,7 +45,7 @@ F4dController.prototype.addF4dGroup = function(f4dObject)
 	}
 	else 
 	{
-		var groupId = f4dObject.data_key;
+		
 		var groupDataFolder = groupId;
 
 		MagoConfig.setData(CODE.PROJECT_ID_PREFIX + groupId, f4dObject);

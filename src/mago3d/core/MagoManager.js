@@ -5054,20 +5054,44 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 	
 	if (jasonObject !== undefined)
 	{
+		if(!jasonObject.data_key) {
+			
+			jasonObject.childrenCnt = jasonObject.children;
+			jasonObject.attributes = JSON.parse(jasonObject.metainfo);
+			
+			jasonObject.children = jasonObject.datas;
+			
+			delete jasonObject.datas;
+			
+			
+			data_group_id = jasonObject.dataGroupId;
+			data_group_name = jasonObject.dataGroupName;
+			data_id = jasonObject.data_id;
+			data_key = jasonObject.dataGroupKey || jasonObject.dataKey;
+			data_name = jasonObject.dataName || jasonObject.dataGroupName;
+			heading = jasonObject.heading;
+			height = jasonObject.altitude;
+			latitude = jasonObject.latitude;
+			longitude = jasonObject.longitude;
+			pitch = jasonObject.pitch;
+			roll = jasonObject.roll;
+			mapping_type = jasonObject.mappingType || 'origin';
+		} else {
+			data_group_id = jasonObject.data_group_id;
+			data_group_name = jasonObject.data_group_name;
+			data_id = jasonObject.data_id;
+			data_key = jasonObject.data_key;
+			data_name = jasonObject.data_name;
+			heading = jasonObject.heading;
+			height = jasonObject.height;
+			latitude = jasonObject.latitude;
+			longitude = jasonObject.longitude;
+			pitch = jasonObject.pitch;
+			roll = jasonObject.roll;
+			mapping_type = jasonObject.mapping_type;
+		}
 		attributes = jasonObject.attributes;
 		children = jasonObject.children;
-		data_group_id = jasonObject.data_group_id;
-		data_group_name = jasonObject.data_group_name;
-		data_id = jasonObject.data_id;
-		data_key = jasonObject.data_key;
-		data_name = jasonObject.data_name;
-		heading = jasonObject.heading;
-		height = jasonObject.height;
-		latitude = jasonObject.latitude;
-		longitude = jasonObject.longitude;
-		pitch = jasonObject.pitch;
-		roll = jasonObject.roll;
-		mapping_type = jasonObject.mapping_type;
 	}
 	
 	if (heading === undefined)
@@ -5377,7 +5401,8 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList, projectId)
 		buildingId = buildingSeed.buildingId;
 		buildingSeedMap[buildingId] = buildingSeed;
 	}
-	var projectFolderName = realTimeLocBlocksList.data_key;
+	//var projectFolderName = realTimeLocBlocksList.data_key;
+	var projectFolderName = realTimeLocBlocksList.data_key || realTimeLocBlocksList.dataGroupKey || realTimeLocBlocksList.dataKey;
 	this.makeNode(realTimeLocBlocksList, physicalNodesArray, buildingSeedMap, projectFolderName, projectId);
 	this.calculateBoundingBoxesNodes(projectId);
 	

@@ -1,7 +1,7 @@
 {
   "geopolicyId": 1,
   "basicGlobe": "cesium",
-  "cesiumIonToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIwN2UxZDI3YS1lZjgxLTQwNWItYmIzMS0wNjMyY2IxMDRmZWMiLCJpZCI6Mzk5Miwic2NvcGVzIjpbImFzciIsImdjIl0sImlhdCI6MTUzOTY1NzYwN30.5nOwFNPB3zhEAYLdG9XCIwCWSmpq6sJX5wU9Gnz-XzA",
+  "cesiumIonToken": "",
   "geoserverEnable":false,
   "geoserverWmsVersion":"1.1.1",
   "geoserverDataUrl":"",

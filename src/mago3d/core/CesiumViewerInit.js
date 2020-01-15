@@ -39,7 +39,7 @@ CesiumViewerInit.prototype.init = function()
 
 		var lon = parseFloat(this.policy.initLatitude);
 		var lat = parseFloat(this.policy.initLongitude);
-		var height = parseFloat(this.policy.initHeight);
+		var height = parseFloat(this.policy.initAltitude);
 		var duration = parseInt(this.policy.initDuration);
 
 		if (isNaN(lon) || isNaN(lat) || isNaN(height)) 
@@ -113,9 +113,9 @@ CesiumViewerInit.prototype.geoserverImageProviderBuild = function()
 	}
     
 	var wmsUrl;
-	if (!policy.geoserverImageproviderUrl && geoserverObj) 
+	if (!policy.geoserverImageproviderUrl && geoserver) 
 	{
-		wmsUrl = geoserverObj.getDataRequestUrl();
+		wmsUrl = geoserver.getDataRequestUrl();
 	}
 
 	wmsUrl = policy.geoserverImageproviderUrl;
@@ -269,7 +269,7 @@ CesiumViewerInit.prototype.initMagoManager = function()
 	this.magoManager = this.viewer.scene.magoManager;
 	scene = this.viewer.scene;
 	
-	this.viewer.scene.globe.depthTestAgainstTerrain = true;
+	this.viewer.scene.globe.depthTestAgainstTerrain = false;
 	this.viewer.scene.logarithmicDepthBuffer = false; //do not use logarithmic buffer
 	this.viewer.scene.highDynamicRange = false; //do not use high dynamic range
     
@@ -281,11 +281,6 @@ CesiumViewerInit.prototype.setEventHandler = function()
 	var magoManager = this.magoManager;
 	var scene = magoManager.scene;
 	var viewer = this.viewer;
-
-	this.viewer.clock.onTick.addEventListener(function(clock) 
-	{
-		magoManager.cameraFPV.update(magoManager);
-	});
 
 	this.viewer.scene.magoManager.handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
 	
@@ -328,4 +323,9 @@ CesiumViewerInit.prototype.setEventHandler = function()
 	{
 		magoManager.mouseActionLeftClick(movement.position.x, movement.position.y);
 	}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+	this.viewer.clock.onTick.addEventListener(function(clock) 
+	{
+		magoManager.cameraFPV.update(magoManager);
+	});
 };

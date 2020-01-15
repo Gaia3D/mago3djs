@@ -118,12 +118,12 @@ MagoConfig.init = function(serverPolicy, projectIdArray, projectDataArray)
 		this.geoserver = new GeoServer();
 
 		var info = {
-			"wmsVersion"    : geopolicy.geoserverWmsVersion,
-			"dataUrl"       : geopolicy.geoserverDataUrl,
-			"dataWorkspace" : geopolicy.geoserverDataWorkspace,
-			"dataStore"     : geopolicy.geoserverDataStore,
-			"user"          : geopolicy.geoserverUser,
-			"password"      : geopolicy.geoserverPassword
+			"wmsVersion"    : this.serverPolicy.geoserverWmsVersion,
+			"dataUrl"       : this.serverPolicy.geoserverDataUrl,
+			"dataWorkspace" : this.serverPolicy.geoserverDataWorkspace,
+			"dataStore"     : this.serverPolicy.geoserverDataStore,
+			"user"          : this.serverPolicy.geoserverUser,
+			"password"      : this.serverPolicy.geoserverPassword
 		};
 		this.geoserver.setServerInfo(info);
 	}
