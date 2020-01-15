@@ -365,14 +365,14 @@ void main()
         textureColor = aColor4;
     }
 	
-	//textureColor = vec4(0.8, 0.75, 0.9, 1.0);
+	//textureColor = vec4(0.8, 0.85, 0.9, 1.0);
 	
 	vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);
 	float alfa = textureColor.w * externalAlpha;
 	
 	// test render by depth.************************************************************
 	//if(testBool)
-	//textureColor = vec4(0.8, 0.75, 0.9, 1.0);
+	//textureColor = vec4(0.8, 0.85, 0.9, 1.0);
 	// End test.------------------------------------------------------------------------
 
     vec4 finalColor;

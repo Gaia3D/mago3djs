@@ -18,6 +18,7 @@ var SunSystem = function(options)
 	this.date; // month, day, hour, min, sec.
 	this.sunDirWC;
 	this.bAnimation = false;
+
 	
 	if (options !== undefined)
 	{
@@ -147,6 +148,10 @@ SunSystem.prototype.setAnimation = function(options)
 	var startHour = options.startHour;
 	var startMin = options.startMin;
 	
+	var endHour = options.endHour;
+	var endMin = options.endMin;
+	
+	
 };
 
 SunSystem.prototype.calculateSunGeographicCoords = function() 
@@ -221,7 +226,7 @@ SunSystem.prototype.updateSun = function(magoManager, options)
 	var camera = magoManager.sceneState.getCamera();
 	var camPos = camera.position;
 	var camDir = camera.getDirection();
-
+	
 	
 	// calculate the parameters of the light.
 	var frustumVolumeControl = magoManager.frustumVolumeControl;

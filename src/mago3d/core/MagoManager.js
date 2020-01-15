@@ -466,26 +466,36 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		var scene = this.scene;
 		var uniformState = scene._context.uniformState;
 		
-		// check if the matrices changed.***
-		// compare with the lastModelViewProjectionMatrix.***
-
-		//var uniformState = scene._context._us;
-		Cesium.Matrix4.toArray(uniformState._modelViewProjectionRelativeToEye, sceneState.modelViewProjRelToEyeMatrix._floatArrays);
-		Cesium.Matrix4.toArray(uniformState._modelViewProjection, sceneState.modelViewProjMatrix._floatArrays); // always dirty.
-		Cesium.Matrix4.toArray(uniformState._modelViewRelativeToEye, sceneState.modelViewRelToEyeMatrix._floatArrays);
-		
-		sceneState.modelViewRelToEyeMatrixInv._floatArrays = Cesium.Matrix4.inverseTransformation(sceneState.modelViewRelToEyeMatrix._floatArrays, sceneState.modelViewRelToEyeMatrixInv._floatArrays);// original.***
+		// ModelViewMatrix.
 		sceneState.modelViewMatrix._floatArrays = Cesium.Matrix4.clone(uniformState.view, sceneState.modelViewMatrix._floatArrays);
 		
 		// ProjectionMatrix.***
 		Cesium.Matrix4.toArray(uniformState._projection, sceneState.projectionMatrix._floatArrays); // original.***
+		
+		// Given ModelViewMatrix & ProjectionMatrix, calculate all sceneState matrix.
+		sceneState.modelViewMatrixInv._floatArrays = glMatrix.mat4.invert(sceneState.modelViewMatrixInv._floatArrays, sceneState.modelViewMatrix._floatArrays);
+	
+		// normalMat.***
+		sceneState.normalMatrix4._floatArrays = glMatrix.mat4.transpose(sceneState.normalMatrix4._floatArrays, sceneState.modelViewMatrixInv._floatArrays);
+			
+		// modelViewRelToEye.***
+		sceneState.modelViewRelToEyeMatrix._floatArrays = glMatrix.mat4.copy(sceneState.modelViewRelToEyeMatrix._floatArrays, sceneState.modelViewMatrix._floatArrays);
+		sceneState.modelViewRelToEyeMatrix._floatArrays[12] = 0;
+		sceneState.modelViewRelToEyeMatrix._floatArrays[13] = 0;
+		sceneState.modelViewRelToEyeMatrix._floatArrays[14] = 0;
+		sceneState.modelViewRelToEyeMatrix._floatArrays[15] = 1;
+		sceneState.modelViewRelToEyeMatrixInv._floatArrays = glMatrix.mat4.invert(sceneState.modelViewRelToEyeMatrixInv._floatArrays, sceneState.modelViewRelToEyeMatrix._floatArrays);
+			
+		// modelViewProjection.***
+		sceneState.modelViewProjMatrix._floatArrays = glMatrix.mat4.multiply(sceneState.modelViewProjMatrix._floatArrays, sceneState.projectionMatrix._floatArrays, sceneState.modelViewMatrix._floatArrays);
 
+		// modelViewProjectionRelToEye.***
+		sceneState.modelViewProjRelToEyeMatrix._floatArrays = glMatrix.mat4.multiply(sceneState.modelViewProjRelToEyeMatrix._floatArrays, sceneState.projectionMatrix._floatArrays, sceneState.modelViewRelToEyeMatrix._floatArrays);
+		
+		// Check camera.
 		var cameraPosition = scene.context._us._cameraPosition;
 		ManagerUtils.calculateSplited3fv([cameraPosition.x, cameraPosition.y, cameraPosition.z], sceneState.encodedCamPosHigh, sceneState.encodedCamPosLow);
 
-		sceneState.modelViewMatrixInv._floatArrays = Cesium.Matrix4.inverseTransformation(sceneState.modelViewMatrix._floatArrays, sceneState.modelViewMatrixInv._floatArrays);// original.***
-		sceneState.normalMatrix4._floatArrays = Cesium.Matrix4.transpose(sceneState.modelViewMatrixInv._floatArrays, sceneState.normalMatrix4._floatArrays);// original.***
-		
 		var frustumCommandsList = this.scene._frustumCommandsList;
 		if (frustumCommandsList === undefined)
 		{ frustumCommandsList = this.scene.frustumCommandsList; }
@@ -509,9 +519,6 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 					
 		sceneState.drawingBufferWidth[0] = scene.drawingBufferWidth;
 		sceneState.drawingBufferHeight[0] = scene.drawingBufferHeight;
-		
-		// modelViewProjection.***
-		sceneState.modelViewProjMatrix._floatArrays = glMatrix.mat4.multiply(sceneState.modelViewProjMatrix._floatArrays, sceneState.projectionMatrix._floatArrays, sceneState.modelViewMatrix._floatArrays);
 	}
 	else if (this.configInformation.geo_view_library === Constant.MAGOWORLD)
 	{
@@ -561,20 +568,10 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		sceneState.modelViewProjRelToEyeMatrix._floatArrays[15] = 1;
 		
 		frustum0.tangentOfHalfFovy[0] = Math.tan(frustum0.fovyRad[0]/2);
+		
+		//sceneState.modelViewProjRelToEyeMatrix._floatArrays = glMatrix.mat4.multiply(sceneState.modelViewProjRelToEyeMatrix._floatArrays, sceneState.projectionMatrix._floatArrays, sceneState.modelViewRelToEyeMatrix._floatArrays);
 
 	}
-	
-	// Test.***
-	/*
-	for (var i=0; i<16; i++)
-	{
-		sceneState.normalMatrix4._floatArrays[i] = sceneState.modelViewMatrix._floatArrays[i];
-	}
-	sceneState.normalMatrix4._floatArrays[12] = 0;
-	sceneState.normalMatrix4._floatArrays[13] = 0;
-	sceneState.normalMatrix4._floatArrays[14] = 0;
-	sceneState.normalMatrix4._floatArrays[15] = 1;
-	*/
 	
 	if (this.depthFboNeo !== undefined)
 	{
@@ -596,6 +593,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 	frustum0.aspectRatio[0] = sceneCamFurustum0.aspectRatio[0];
 	
 	// Test.***************************
+	/*
 	var currFrustumIdx = this.currentFrustumIdx;
 	var frustumFar = sceneState.camera.frustumsArray[currFrustumIdx].far[0];
 	
@@ -613,13 +611,12 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 	var zDivW_divFar = zDivW/frustum.far[0];
 	var transformedPoint_MV = sceneState.modelViewMatrix.transformPoint4D__test(cartesian);
 	var transformedPoint_P = sceneState.projectionMatrix.transformPoint4D__test(cartesian);
-	
+	*/
 	// update sun if exist.
 	if (!this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
 	{
 		if (this.sceneState.sunSystem && this.sceneState.applySunShadows && this.currentFrustumIdx === 0)
 		{
-			//this.frustumVolumeControl.calculateBoundingFrustums(sceneState.camera);
 			this.sceneState.sunSystem.updateSun(this);
 		}
 	}
@@ -1778,7 +1775,10 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
 	var mouseAction = this.sceneState.mouseAction;
 	mouseAction.clearStartPositionsAux(); // provisionally only clear the aux.***
 	
-	
+	if (this.sceneState.sunSystem && this.sceneState.applySunShadows && this.currentFrustumIdx === 0)
+	{
+		this.sceneState.sunSystem.updateSun(this);
+	}
 };
 
 /**
