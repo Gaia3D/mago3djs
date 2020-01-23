@@ -117,17 +117,24 @@ Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, sh
 			
 			// now check if the node is inside of the light0 bSphere.
 			var bboxAbsoluteCenterPos = node.bboxAbsoluteCenterPos;
-			var bbox = node.data.bbox;
-			var radiusAprox = bbox.getRadiusAprox();
-			var distToLight0 = light0CenterPoint.distToPoint(bboxAbsoluteCenterPos);//+radiusAprox;
-			
-			if (distToLight0 < light0Radius)
-			{
-				gl.uniform1i(shader.sunIdx_loc, 0);
+			if (bboxAbsoluteCenterPos === undefined)
+			{ 
+				gl.uniform1i(shader.sunIdx_loc, 1);
 			}
 			else
 			{
-				gl.uniform1i(shader.sunIdx_loc, 1);
+				var bbox = node.data.bbox;
+				var radiusAprox = bbox.getRadiusAprox();
+				var distToLight0 = light0CenterPoint.distToPoint(bboxAbsoluteCenterPos);//+radiusAprox;
+				
+				if (distToLight0 < light0Radius)
+				{
+					gl.uniform1i(shader.sunIdx_loc, 0);
+				}
+				else
+				{
+					gl.uniform1i(shader.sunIdx_loc, 1);
+				}
 			}
 			node.renderContent(magoManager, shader, renderType, refMatrixIdxKey);
 		}
