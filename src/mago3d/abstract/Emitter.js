@@ -5,21 +5,28 @@ var Emitter = function ()
 	this._events = {};
 };
 
-Emitter.prototype.on = function (event, fn) 
+Emitter.prototype.on = function (event, fn, once) 
 {
 	if (!this._events[event]) 
 	{
 		this._events[event] = [];
 	}
-	this._events[event].push(fn);
+	this._events[event].push({
+		fn   : fn,
+		once : once
+	});
 
 	return this;
+};
+Emitter.prototype.once = function (event, fn) 
+{
+	return this.on(event, fn, true);
 };
 
 Emitter.prototype.emit = function (event) 
 {
 	var callbacks = this._events[event];
-
+	var onces = [];
 	if (callbacks) 
 	{
 		for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) 
@@ -42,10 +49,24 @@ Emitter.prototype.emit = function (event)
 				if (_i.done) { break; }
 				_ref = _i.value;
 			}
+			var callbackObj = _ref;
+			if (callbackObj.fn && typeof callbackObj.fn === 'function') 
+			{
+				callbackObj.fn.apply(this, args);
+			}
 
-			var callback = _ref;
-
-			callback.apply(this, args);
+			if (callbackObj.once && _isArray) 
+			{
+				onces.push(_i-1);
+			}
+			//
+		}
+	}
+	if (onces.length > 0 && Array.isArray(callbacks)) 
+	{
+		for (var i=onces.length-1;i>=0;i--) 
+		{
+			callbacks.splice(onces[i], 1);
 		}
 	}
 
@@ -78,7 +99,7 @@ Emitter.prototype.off = function (event, fn)
 	for (var i = 0; i < callbacks.length; i++) 
 	{
 		var callback = callbacks[i];
-		if (callback === fn) 
+		if (callback.fn === fn) 
 		{
 			callbacks.splice(i, 1);
 			break;

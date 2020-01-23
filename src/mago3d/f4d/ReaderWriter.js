@@ -953,6 +953,67 @@ ReaderWriter.prototype.getObjectIndexFileForSmartTile = function(fileName, magoM
 /**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
  * @param gl gl context
+ * @param {string} fileName 파일명
+ * @param {MagoManager} magoManager 파일 처리를 담당
+ * @param {string} projectId 프로젝트 아이디.
+ * @param {Array<string>} newDataKeys 추가할 데이터 키 목록
+ * @param {Array<object> | object} f4dObject 추가할 데이터 object.
+ */
+ReaderWriter.prototype.getObjectIndexFileForData = function(fileName, magoManager, projectId, newDataKeys, f4dObject) 
+{
+	loadWithXhr(fileName).then(function(response) 
+	{	
+		var arrayBuffer = response;
+		if (arrayBuffer) 
+		{
+			var buildingSeedList = new BuildingSeedList(); 
+			buildingSeedList.dataArrayBuffer = arrayBuffer;
+			buildingSeedList.parseBuildingSeedArrayBuffer();
+
+			var buildingSeedMap = {};
+			var buildingSeedsCount = buildingSeedList.buildingSeedArray.length;
+			for (var i=0; i<buildingSeedsCount; i++)
+			{
+				var buildingSeed = buildingSeedList.buildingSeedArray[i];
+				var buildingId = buildingSeed.buildingId;
+
+				if (newDataKeys.indexOf(buildingId) >= 0) 
+				{
+					buildingSeedMap[buildingId] = buildingSeed;	
+				}
+				
+			}
+			var seedCnt = Object.keys(buildingSeedMap).length;
+
+			//object 인덱스파일에 새로운 데이터에 대한 정보가 없으면 에러 발생.
+			if (seedCnt !== newDataKeys.length) 
+			{
+				throw new Error('ObjectIndexFile is not ready. Please make objectIndexFile and try add data.'); 
+			}
+			
+			magoManager.makeSmartTile(buildingSeedMap, projectId, f4dObject, buildingSeedMap);
+			arrayBuffer = null;
+		}
+		else 
+		{
+			// blocksList.fileLoadState = 500;
+		}
+	},
+	function(status) 
+	{
+		console.log("xhr status = " + status);
+		//		if(status === 0) blocksList.fileLoadState = 500;
+		//		else blocksList.fileLoadState = status;
+	}).finally(function() 
+	{
+		//		magoManager.fileRequestControler.filesRequestedCount -= 1;
+		//		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
+	});
+};
+
+/**
+ * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
+ * @param gl gl context
  * @param fileName 파일명
  * @param readerWriter 파일 처리를 담당
  * @param neoBuildingsList object index 파일을 파싱한 정보를 저장할 배열

@@ -22,40 +22,6 @@
 			"heading": 0.000000,
 			"pitch": 0.000000,
 			"roll": 0.000000
-		},
-		{
-			"attributes": {
-				"isPhysical": true,
-				"nodeType": "singapore",
-				"flipYTexCoords": true
-			},
-			"children": [],
-			"data_key": "2E31",
-			"data_name": "2E31",
-			"mapping_type":"boundingboxcenter",
-			"longitude": 126.91362418218968,
-			"latitude": 37.52693042065141,
-			"height": 100.200000,
-			"heading": 0.000000,
-			"pitch": 0.000000,
-			"roll": 0.000000
-		},
-		{
-			"attributes": {
-				"isPhysical": true,
-				"nodeType": "singapore",
-				"flipYTexCoords": true
-			},
-			"children": [],
-			"data_key": "B11P",
-			"data_name": "B11P",
-			"mapping_type":"boundingboxcenter",
-			"longitude": 126.91511673520017,
-			"latitude": 37.52023780736431,
-			"height": 100.200000,
-			"heading": 0.000000,
-			"pitch": 0.000000,
-			"roll": 0.000000
 		}
 	],
 	"parent": 0,

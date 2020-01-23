@@ -262,8 +262,10 @@ MagoManager.prototype = Object.create(Emitter.prototype);
 MagoManager.prototype.constructor = MagoManager;
 
 MagoManager.EVENT_TYPE = {
-	'CLICK'    	: 'click',
-	'MOUSEMOVE' : 'mousemove'
+	'CLICK'     	: 'click',
+	'DBCLICK'   	: 'dbclick',
+	'RIGHTCLICK' : 'rightclick',
+	'MOUSEMOVE'  : 'mousemove'
 };
 
 /**
@@ -1786,11 +1788,6 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
 	// Clear startPositions of mouseAction.***
 	var mouseAction = this.sceneState.mouseAction;
 	mouseAction.clearStartPositionsAux(); // provisionally only clear the aux.***
-
-	
-	var eventCoordinate = ManagerUtils.getComplexCoordinateByScreenCoord(this.getGl(), mouseX, mouseY, undefined, undefined, undefined, this);
-
-	this.emit(MagoManager.EVENT_TYPE.CLICK, {type: MagoManager.EVENT_TYPE.CLICK, clickCoordinate: eventCoordinate, timestamp: this.getCurrentTime()});
 };
 
 /**
@@ -2297,474 +2294,63 @@ MagoManager.prototype.keyDown = function(key)
 };
 
 /**
- * 선택 객체를 asimetric mode 로 이동
+ * 마우스 클릭 이벤트 처리
  * @param gl 변수
  * @param scene 변수
  */
 MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY) 
 {
 	if (!this.magoPolicy.getMagoEnable()) { return; }
-	
-	// Note: the "mouseActionLeftClick" runs after "mouseActionLeftDown" & "mouseActionLeftUp".***
-	//--------------------------------------------------------------------------------------------
-	if (this.magoMode === CODE.magoMode.DRAWING)// then process to draw.***// Test code.***// Test code.***
+
+	if (!this.isDragging()) 
 	{
-		// Test code.***
-		// Test code.***// Test code.***// Test code.***// Test code.***// Test code.***// Test code.***// Test code.***
-		if (this.modeler === undefined)
-		{ this.modeler = new Modeler(this); }
-		//	CODE.modelerMode = {
-		//	"INACTIVE"                 : 0,
-		//	"DRAWING_POLYLINE"         : 1,
-		//	"DRAWING_GEOGRAPHICPOINTS" : 2,
-		//};
-			
-		//this.modeler.mode = CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS;
-		//this.modeler.mode = CODE.modelerMode.DRAWING_PLANEGRID;
-		//this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
-		//this.modeler.mode = CODE.modelerMode.DRAWING_TUNNELPOINTS;
-		//this.modeler.mode = CODE.modelerMode.DRAWING_STATICGEOMETRY;
-		//this.modeler.mode = CODE.modelerMode.DRAWING_BSPLINE;
-		//this.modeler.mode = CODE.modelerMode.DRAWING_BASICFACTORY;
-		
-		// Calculate the geographicCoord of the click position.****
-		var geoCoord;
-		var strWorldPoint;
-		
-		if (this.isCesiumGlobe())
+		var eventCoordinate = ManagerUtils.getComplexCoordinateByScreenCoord(this.getGl(), mouseX, mouseY, undefined, undefined, undefined, this);
+		if (eventCoordinate) 
 		{
-			var camera = this.scene.frameState.camera;
-			var scene = this.scene;
-			var ray = camera.getPickRay(new Cesium.Cartesian2(mouseX, mouseY));
-			strWorldPoint = scene.globe.pick(ray, scene);
-		}
-		else 
-		{
-			var mouseAction = this.sceneState.mouseAction;
-			strWorldPoint = mouseAction.strWorldPoint;
-		}
-		if (strWorldPoint === undefined)
-		{ return; }
-		
-		geoCoord = Globe.CartesianToGeographicWgs84(strWorldPoint.x, strWorldPoint.y, strWorldPoint.z, undefined, true);
-		geoCoord.absolutePoint = strWorldPoint;
-		
-		var modelerMode = this.modeler.mode;
-		if (this.modeler.mode === CODE.modelerMode.DRAWING_PLANEGRID && this.modeler.planeGrid === undefined)
-		{
-			// Calculate the click position and create the planeGrid geoLocation.***
-			this.modeler.createPlaneGrid();
-			this.modeler.planeGrid.makeVbo(this.vboMemoryManager);
-			
-			if (this.modeler.planeGrid.geoLocDataManager === undefined)
-			{ this.modeler.planeGrid.geoLocDataManager = new GeoLocationDataManager(); }
-			
-			var geoLocDataManager = this.modeler.planeGrid.geoLocDataManager;
-			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+10, undefined, undefined, undefined, geoLocData, this);
-			return;
-		}
-		
-		// For each "click" add geographicPoint to the modeler's geographicPointsList.***
-		else if (this.modeler.mode === CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS)
-		{
-			geoCoord.makeDefaultGeoLocationData();
-			//var geoLocDataManager = geoCoord.getGeoLocationDataManager();
-			//var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-			//geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+1, undefined, undefined, undefined, geoLocData, this);
-			
-			var geoCoordsList = this.modeler.getGeographicCoordsList();
-			geoCoordsList.addGeoCoord(geoCoord);
-		}
-		
-		// Excavation.***
-		else if (this.modeler.mode === CODE.modelerMode.DRAWING_EXCAVATIONPOINTS)
-		{
-			geoCoord.makeDefaultGeoLocationData();
-			//var geoLocDataManager = geoCoord.getGeoLocationDataManager();
-			//var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-			//geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+1, undefined, undefined, undefined, geoLocData, this);
-			
-			var excavation = this.modeler.getExcavation();
-			var geoCoordsList = excavation.getGeographicCoordsList();
-			geoCoordsList.addGeoCoord(geoCoord);
-			geoCoordsList.makeLines(this);
-		}
-		
-		// Tunnel.***
-		else if (this.modeler.mode === CODE.modelerMode.DRAWING_TUNNELPOINTS)
-		{
-			geoCoord.makeDefaultGeoLocationData();
-			//var geoLocDataManager = geoCoord.getGeoLocationDataManager();
-			//var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-			//geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+1, undefined, undefined, undefined, geoLocData, this);
-			
-			var tunnel = this.modeler.getTunnel();
-			var geoCoordsList = tunnel.getPathGeographicCoordsList();
-			geoCoordsList.addGeoCoord(geoCoord);
-			geoCoordsList.makeLines(this);
-		}
-		
-		// BSpline.***
-		else if (this.modeler.mode === CODE.modelerMode.DRAWING_BSPLINE)
-		{
-			geoCoord.makeDefaultGeoLocationData();
-			// Testing bSpline.***
-			//var geoLocDataManager = geoCoord.getGeoLocationDataManager();
-			//var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-			//geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+1, undefined, undefined, undefined, geoLocData, this);
-			
-			
-			if (this.modeler.bSplineCubic3d === undefined)
-			{ this.modeler.bSplineCubic3d = new BSplineCubic3D(); }
-			
-			var bSplineCubic = this.modeler.bSplineCubic3d;
-			var geoCoordsList = bSplineCubic.getGeographicCoordsList();
-			geoCoordsList.addGeoCoord(geoCoord);
-			geoCoordsList.makeLines(this);
-			
-		}
-		
-		// StaticGeometries.***
-		else if (this.modeler.mode === CODE.modelerMode.DRAWING_STATICGEOMETRY)
-		{
-			// create a "node" & insert into smartTile.***
-			var projectId = "AutonomousBus";
-			var attributes = {
-				"isPhysical"         : true,
-				"nodeType"           : "TEST",
-				"isReference"        : true,
-				"projectFolderName"  : "staticModels",
-				"buildingFolderName" : "F4D_AutonomousBus",
-				"heading"            : 0,
-				"pitch"              : 0,
-				"roll"               : 0};
-				/*
-			var attributes = {
-				"isPhysical"         : true,
-				"nodeType"           : "TEST",
-				"isReference"        : true,
-				"projectFolderName"  : "3ds",
-				"buildingFolderName" : "F4D_GyeomjaeJeongSeon_del",
-				"heading"            : 0,
-				"pitch"              : 0,
-				"roll"               : 0};
-				
-			attributes.pitch = 90.0;
-			*/
-			if (!this.isExistStaticModel('AutonomousBus'))
-			{
-				this.addStaticModel({
-					projectId          : 'AutonomousBus',
-					projectFolderName  : 'staticModels',
-					buildingFolderName : 'F4D_AutonomousBus'
-				});
-			}
-			
-			var nodesMap = this.hierarchyManager.getNodesMap(projectId, undefined);
-			var existentNodesCount = Object.keys(nodesMap).length;
-			var buildingId = "AutonomousBus_" + existentNodesCount.toString();
-			
-			this.instantiateStaticModel({
-				projectId  : 'AutonomousBus',
-				instanceId : buildingId,
-				longitude  : geoCoord.longitude,
-				latitude   : geoCoord.latitude,
-				height     : geoCoord.altitude+20
-			});
-
-		}
-		// Basic Factory. This is a factory shaped object.***
-		else if (this.modeler.mode === CODE.modelerMode.DRAWING_BASICFACTORY)
-		{
-			var min = 10;
-			var max = 50;
-			var minHeight = 2;
-			var maxHeight = 8;
-			var factoryWidth = 20 + Math.random() * (max - min) + min; 
-			var factoryLength = 40 + Math.random() * (max - min) + min;
-			var factoryHeight = 13 + Math.random() * (maxHeight - minHeight) + minHeight;
-			
-			// Test.***
-			var strGeoCoord = new GeographicCoord(127.567, 38.123, 0);
-			var endGeoCoord = new GeographicCoord(128.567, 39.123, 0);
-			var geoCoordSegment = new GeographicCoordSegment(strGeoCoord, endGeoCoord);
-			
-			var testHeading = GeographicCoordSegment.calculateHeadingAngRadToNorthOfSegment(geoCoordSegment, this)*180/Math.PI;
-			var length = GeographicCoordSegment.getLengthInMeters(geoCoordSegment, this);
-			var hola = 0;
-			
-			// Test.******************
-			var geoCoord_0 = new GeographicCoord(129.3995, 35.5076, 0);
-			var geoCoord_1 = new GeographicCoord(129.3995, 35.5073, 0);
-			var geoCoord_2 = new GeographicCoord(129.3986, 35.5075, 0);
-			var geoCoord_3 = new GeographicCoord(129.3987, 35.5077, 0);
-			var geoCoordsArray = [geoCoord_0, geoCoord_1, geoCoord_2, geoCoord_3];
-			var edgeIdxOfDoor = 0;
-			var resultObj = BasicFactory.getFactoryDimensionsByGeoCoordsArray(geoCoordsArray, edgeIdxOfDoor, this);
-			
-			var doorWidth = factoryWidth * 0.8;
-			var roofMinHeight = factoryHeight*0.75;
-			
-			var height = roofMinHeight;
-			var wallOptions = [];
-			wallOptions.push({
-				type        : 'front', // front, rear, left, right
-				openingInfo : {width: doorWidth, height: height * 0.6}  // front, rear, left, right
-			});
-
-			var options = {
-				"hasGround"     : true,
-				"roofMinHeight" : factoryHeight*0.75,
-				"wallOptions"   : wallOptions
-			};
-	
-			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
-			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude, testHeading, undefined, undefined, geoLocData, this);
-			
-			// set material for the roof of the factory.
-			var materialsManager = this.materialsManager;
-			var materialName = "basicFactoryRoof";
-			var material = materialsManager.getOrNewMaterial(materialName);
-			if (material.diffuseTexture === undefined)
-			{ 
-				material.diffuseTexture = new Texture(); 
-				material.diffuseTexture.textureTypeName = "diffuse";
-				material.diffuseTexture.textureImageFileName = "mipoFactoryRoof.jpg"; // Gaia3dLogo.png
-				var imagesPath = materialsManager.imagesPath + "//" + material.diffuseTexture.textureImageFileName;
-				var flipYTexCoord = true;
-				TexturesManager.loadTexture(imagesPath, material.diffuseTexture, this, flipYTexCoord);
-			}
-			
-			// add options.
-			if (options === undefined)
-			{ options = {}; }
-			
-			options.roofOptions = {
-				"material": material
-			};
-	
-			var factory = new BasicFactory(factoryWidth, factoryLength, factoryHeight, options);
-			factory.bHasGround = true;
-			factory.geoLocDataManager = geoLocDataManager;
-			if (factory.attributes === undefined)
-			{ factory.attributes = {}; }
-			factory.attributes.isMovable = true;
-			this.modeler.addObject(factory);
-		}
-		else if (this.modeler.mode === CODE.modelerMode.DRAWING_PIPE)
-		{
-			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
-			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+10, undefined, undefined, undefined, geoLocData, this);
-			
-			/*
-			// Create a Pipe object.***
-			var options = {
-				"interiorRadius" : 10,
-				"exteriorRadius" : 20,
-				"height"         : 50,
-				"color"          : {
-					"r" : 0.2,
-					"g" : 0.8, 
-					"b" : 0.8,
-					"a" : 0.4
-				}
-			};
-			
-			var pipe = this.modeler.newPipe(options);
-			pipe.geoLocDataManager = geoLocDataManager;
-			*/
-			var options = {
-				height    : 50,
-				tubeInfos : [
-					{
-						"interiorRadius" : 5,
-						"exteriorRadius" : 10,
-						"color"          : {
-							"r" : 0.2,
-							"g" : 0.8, 
-							"b" : 0.8,
-							"a" : 0.4
-						}
-					}, {
-						"interiorRadius" : 10,
-						"exteriorRadius" : 15,
-						"color"          : {
-							"r" : 0.6,
-							"g" : 0.3, 
-							"b" : 0.8,
-							"a" : 0.4
-						}
-					}, {
-						"interiorRadius" : 15,
-						"exteriorRadius" : 20,
-						"color"          : {
-							"r" : 0.4,
-							"g" : 0.2, 
-							"b" : 0.8,
-							"a" : 0.4
-						}
-					}
-				]
-			};
-			
-			var concentricTubes = new ConcentricTubes(options, geoLocDataManager);
-			concentricTubes.attributes = {isMovable: true};
-
-			this.modeler.addObject(concentricTubes);
-		}
-		else if (this.modeler.mode === CODE.modelerMode.DRAWING_SPHERE)
-		{
-			// make a sphere.
-			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
-			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+50, undefined, undefined, undefined, geoLocData, this);
-			
-			var options = {};
-			var color = new Color();
-			color.setRGB(0.9, 0.7, 0.2);
-			options.color = color;
-			var sphere = new Sphere(options);
-			sphere.geoLocDataManager = geoLocDataManager;
-			sphere.setRadius(30);
-			if (sphere.attributes === undefined)
-			{ sphere.attributes = {}; }
-			sphere.attributes.isMovable = true;
-			this.modeler.addObject(sphere, 15);
-		}
-		else if (this.modeler.mode === CODE.modelerMode.DRAWING_BOX)
-		{
-			// make a sphere.
-			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
-			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+50, undefined, undefined, undefined, geoLocData, this);
-			
-			var options = {};
-			var color = new Color();
-			color.setRGB(0.9, 0.7, 0.2);
-			options.color = color;
-			var box = new Box(10, 10, 20, "testBox");
-			box.geoLocDataManager = geoLocDataManager;
-			box.setOneColor(0.2, 0.5, 0.7, 1.0);
-			if (box.attributes === undefined)
-			{ box.attributes = {}; }
-			box.attributes.isMovable = true;
-			this.modeler.addObject(box, 15);
-		}
-		else if (this.modeler.mode === CODE.modelerMode.DRAWING_CLIPPINGBOX)
-		{
-			// make a clipping box.
-			if (this.modeler.clippingBox === undefined)
-			{
-				var geoLocDataManager = geoCoord.getGeoLocationDataManager();
-				var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-				geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+50, undefined, undefined, undefined, geoLocData, this);
-				
-				var options = {};
-				var color = new Color();
-				color.setRGB(0.9, 0.7, 0.2);
-				options.color = color;
-				var box = new ClippingBox(40, 40, 60, "testBox");
-				box.geoLocDataManager = geoLocDataManager;
-				box.setOneColor(0.2, 0.5, 0.7, 0.0);
-				if (box.attributes === undefined)
-				{ box.attributes = {}; }
-				box.attributes.isMovable = true;
-				this.modeler.clippingBox = box;
-			}
-		}
-		else if (this.modeler.mode === CODE.modelerMode.DRAWING_CONCENTRICTUBES)
-		{
-			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
-			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+50, undefined, undefined, undefined, geoLocData, this);
-			
-			var options = {};
-			var color = new Color();
-			color.setRGB(0.9, 0.7, 0.2);
-			options.color = color;
-			
-			var options = {height: 30, tubeInfos: []};
-			var tubeInfo = {
-				interiorRadius : 10,
-				exteriorRadius : 15,
-				color          : {r: 0.2, g: 0.5, b: 0.9, a: 0.5}
-			};
-			options.tubeInfos.push(tubeInfo);
-			var tubeInfo = {
-				interiorRadius : 20,
-				exteriorRadius : 30,
-				color          : {r: 0.8, g: 0.2, b: 0.5, a: 0.5}
-			};
-			options.tubeInfos.push(tubeInfo);
-			
-			var concentricTube = new ConcentricTubes(options, geoLocDataManager);
-			concentricTube.setOneColor(0.2, 0.5, 0.7, 1.0);
-			if (concentricTube.attributes === undefined)
-			{ concentricTube.attributes = {}; }
-			concentricTube.attributes.isMovable = true;
-			
-			
-	
-			this.modeler.addObject(concentricTube, 15);
-			
-		}
-		else if (this.modeler.mode === CODE.modelerMode.DRAWING_TUBE)
-		{
-			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
-			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+50, undefined, undefined, undefined, geoLocData, this);
-			
-			var options = {color: {r: 0.2, g: 0.5, b: 0.9, a: 0.5}};
-			
-			var tube = new Tube(10, 20, 30, options);
-			tube.setOneColor(0.2, 0.5, 0.7, 1.0);
-			tube.geoLocDataManager = geoLocDataManager;
-			if (tube.attributes === undefined)
-			{ tube.attributes = {}; }
-			tube.attributes.isMovable = true;
-			
-			this.modeler.addObject(tube, 15);
-			
-		}
-		else if (this.modeler.mode === CODE.modelerMode.DRAWING_FREECONTOURWALL)
-		{
-			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
-			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+50, undefined, undefined, undefined, geoLocData, this);
-			
-			var options = {color: {r: 0.2, g: 0.5, b: 0.9, a: 0.5}};
-			
-			// Create 4(or more) points of contour.
-			var semiWidth = 10.0;
-			var semiLength = 30.0;
-			var points2dArray = [];
-			var point2d = new Point2D(-semiWidth, -semiLength);
-			points2dArray.push(point2d);
-			point2d = new Point2D(semiWidth, -semiLength);
-			points2dArray.push(point2d);
-			point2d = new Point2D(semiWidth, semiLength);
-			points2dArray.push(point2d);
-			point2d = new Point2D(-semiWidth, semiLength);
-			points2dArray.push(point2d);
-			
-			options.points2dArray = points2dArray;
-			options.height = 10;
-			var freeContourWall = new TestFreeContourWallBuilding(options);
-			freeContourWall.setOneColor(0.2, 0.5, 0.7, 1.0);
-			freeContourWall.geoLocDataManager = geoLocDataManager;
-			if (freeContourWall.attributes === undefined)
-			{ freeContourWall.attributes = {}; }
-			freeContourWall.attributes.isMovable = true;
-			
-			this.modeler.addObject(freeContourWall, 15);
-			
+			this.emit(MagoManager.EVENT_TYPE.CLICK, {type: MagoManager.EVENT_TYPE.CLICK, clickCoordinate: eventCoordinate, timestamp: this.getCurrentTime()});
 		}
 	}
-	
 };
+
+/**
+ * 마우스 더블 클릭 이벤트 처리
+ * @param gl 변수
+ * @param scene 변수
+ */
+MagoManager.prototype.mouseActionLeftDoubleClick = function(mouseX, mouseY) 
+{
+	if (!this.magoPolicy.getMagoEnable()) { return; }
+
+	if (!this.isDragging()) 
+	{
+		var eventCoordinate = ManagerUtils.getComplexCoordinateByScreenCoord(this.getGl(), mouseX, mouseY, undefined, undefined, undefined, this);
+		if (eventCoordinate) 
+		{
+			this.emit(MagoManager.EVENT_TYPE.DBCLICK, {type: MagoManager.EVENT_TYPE.CLICK, clickCoordinate: eventCoordinate, timestamp: this.getCurrentTime()});
+		}
+	}
+};
+
+/**
+ * 마우스 더블 클릭 이벤트 처리
+ * @param gl 변수
+ * @param scene 변수
+ */
+MagoManager.prototype.mouseActionRightClick = function(mouseX, mouseY) 
+{
+	if (!this.magoPolicy.getMagoEnable()) { return; }
+
+	if (!this.isDragging()) 
+	{
+		var eventCoordinate = ManagerUtils.getComplexCoordinateByScreenCoord(this.getGl(), mouseX, mouseY, undefined, undefined, undefined, this);
+		if (eventCoordinate) 
+		{
+			this.emit(MagoManager.EVENT_TYPE.RIGHTCLICK, {type: MagoManager.EVENT_TYPE.CLICK, clickCoordinate: eventCoordinate, timestamp: this.getCurrentTime()});
+		}
+	}
+};
+
+
 
 /**
  * 선택 객체를 asimetric mode 로 이동
@@ -2934,10 +2520,12 @@ MagoManager.prototype.mouseActionMove = function(newPixel, oldPixel)
 	}
 	var gl = this.getGl();
 	
-	//var startEventCoordinate = ManagerUtils.getComplexCoordinateByScreenCoord(gl, oldPixel.x, oldPixel.y, undefined, undefined, undefined, this);
-	//var endEventCoordinate = ManagerUtils.getComplexCoordinateByScreenCoord(gl, newPixel.x, newPixel.y, undefined, undefined, undefined, this);
-
-	//this.emit(MagoManager.EVENT_TYPE.MOUSEMOVE, {type: MagoManager.EVENT_TYPE.MOUSEMOVE, startEvent: startEventCoordinate, endEvent: endEventCoordinate, timestamp: this.getCurrentTime() });
+	var startEventCoordinate = ManagerUtils.getComplexCoordinateByScreenCoord(gl, oldPixel.x, oldPixel.y, undefined, undefined, undefined, this);
+	var endEventCoordinate = ManagerUtils.getComplexCoordinateByScreenCoord(gl, newPixel.x, newPixel.y, undefined, undefined, undefined, this);
+	if (startEventCoordinate && endEventCoordinate) 
+	{
+		this.emit(MagoManager.EVENT_TYPE.MOUSEMOVE, {type: MagoManager.EVENT_TYPE.MOUSEMOVE, startEvent: startEventCoordinate, endEvent: endEventCoordinate, timestamp: this.getCurrentTime() });
+	}
 
 	function disableCameraMotion(screenSpaceCameraController, state)
 	{
@@ -3017,7 +2605,7 @@ MagoManager.prototype.manageMouseDragging = function(mouseX, mouseY)
 			if (geographicCoords === undefined)
 			{ return; }
 			
-			movedDataCallback(	MagoConfig.getPolicy().geo_callback_moveddata,
+			/*movedDataCallback(	MagoConfig.getPolicy().geo_callback_moveddata,
 				nodeOwner.data.projectId,
 				nodeOwner.data.nodeId,
 				null,
@@ -3026,7 +2614,7 @@ MagoManager.prototype.manageMouseDragging = function(mouseX, mouseY)
 				geographicCoords.altitude,
 				geoLocation.heading,
 				geoLocation.pitch,
-				geoLocation.roll);
+				geoLocation.roll);*/
 								
 		}
 		else 
@@ -4269,6 +3857,52 @@ MagoManager.prototype.drawCCTVNames = function(cctvArray)
 
 	ctx.restore();
 };
+/**
+ * 데이터 표출 컨디션 설정
+ * @param {string} projectId required.
+ * @param {string} dataKey option. 키 존재 시 해당 노드만 컨디션 들어감.
+ * @param {function} condition required.
+ */
+MagoManager.prototype.setRenderCondition = function(projectId, dataKey, condition) 
+{
+	if (!condition || typeof condition !== 'function') 
+	{
+		throw new Error('renderCondition is required.');
+	}
+
+	if (!projectId) 
+	{
+		throw new Error('projectId is required.');
+	}
+	if (!this.hierarchyManager.existProject(projectId)) 
+	{
+		throw new Error(projectId + ' project is not exist.');
+	}
+
+	var nodeMap = this.hierarchyManager.getNodesMap(projectId);
+	if (!dataKey) 
+	{
+		for (var i in nodeMap) 
+		{
+			if (nodeMap.hasOwnProperty(i)) 
+			{
+				checkAndSetCondition(nodeMap[i], condition);
+			}
+		}
+	}
+	else 
+	{
+		checkAndSetCondition(nodeMap[dataKey], condition);
+	}
+	
+	function checkAndSetCondition(node, cond)
+	{
+		if (node instanceof Node && node.data.attributes.isPhysical) 
+		{
+			node.setRenderCondition(cond);
+		}
+	}
+};
 
 
 /**
@@ -5001,6 +4635,58 @@ MagoManager.prototype.getObjectIndexFile = function(projectId, projectDataFolder
 
 /**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
+ * @param {string} projectId policy 사용 시 geo_data_default_projects 배열에 있는 값.
+ * @param {Array<object> | object} f4dObject f4d data definition object
+ */
+MagoManager.prototype.getObjectIndexFileForData = function(projectId, f4dObject) 
+{
+	if (this.configInformation === undefined)
+	{
+		this.configInformation = MagoConfig.getPolicy();
+	}
+	
+	var f4dGroupObject = MagoConfig.getData(CODE.PROJECT_ID_PREFIX + projectId);
+	var groupDataFolder = this.hierarchyManager.getNodeByDataKey(projectId, projectId).data.projectFolderName;
+	groupDataFolder = groupDataFolder.replace(/\/+$/, '');
+	var newDataKeys = [];
+	var children = f4dGroupObject.children;
+	// TODO :
+	if (Array.isArray(f4dObject)) 
+	{
+		for (var i=0, len=f4dObject.length;i<len;i++) 
+		{
+			var attributes = f4dObject[i].attributes || JSON.parse(f4dObject[i].metainfo);
+			if (!attributes.isPhysical) 
+			{
+				throw new Error('f4d member must isPhysical true.'); 
+			}
+			f4dObject[i].groupDataFolder = groupDataFolder;
+			var dataKey = f4dObject[i].data_key || f4dObject[i].dataKey;
+			newDataKeys.push(dataKey);
+			children.push(f4dObject[i]);
+		}
+	}
+	else 
+	{
+		// TODO :
+		var attributes = f4dObject.attributes || JSON.parse(f4dObject.metainfo);
+		if (!attributes.isPhysical) 
+		{
+			throw new Error('f4d member must isPhysical true.'); 
+		}
+		f4dObject.groupDataFolder = groupDataFolder;
+		var dataKey = f4dObject.data_key || f4dObject.dataKey;
+		newDataKeys.push(dataKey);
+		children.push(f4dObject);
+	}
+	
+	var geometrySubDataPath = groupDataFolder;
+	var fileName = this.readerWriter.geometryDataPath + "/" + geometrySubDataPath + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + MagoConfig.getPolicy().content_cache_version;
+	this.readerWriter.getObjectIndexFileForData(fileName, this, projectId, newDataKeys, f4dObject);
+};
+
+/**
+ * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
  */
 MagoManager.prototype.getObjectIndexFile_xxxx = function() 
 {
@@ -5051,13 +4737,13 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 	var pitch = undefined;
 	var roll = undefined;
 	var mapping_type = undefined;
-	
+
 	if (jasonObject !== undefined)
 	{
-		if(!jasonObject.data_key) {
-			
+		if (!jasonObject.data_key) 
+		{
 			jasonObject.childrenCnt = jasonObject.children;
-			jasonObject.attributes = JSON.parse(jasonObject.metainfo);
+			jasonObject.attributes = jasonObject.attributes || JSON.parse(jasonObject.metainfo);
 			
 			jasonObject.children = jasonObject.datas;
 			
@@ -5076,7 +4762,9 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 			pitch = jasonObject.pitch;
 			roll = jasonObject.roll;
 			mapping_type = jasonObject.mappingType || 'origin';
-		} else {
+		}
+		else 
+		{
 			data_group_id = jasonObject.data_group_id;
 			data_group_name = jasonObject.data_group_name;
 			data_id = jasonObject.data_id;
@@ -5093,16 +4781,16 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 		attributes = jasonObject.attributes;
 		children = jasonObject.children;
 	}
-	
+
 	if (heading === undefined)
 	{ heading = 0; }
-	
+
 	if (pitch === undefined)
 	{ pitch = 0; }
-	
+
 	if (roll === undefined)
 	{ roll = 0; }
-	
+
 	// now make the node.
 	var buildingId;
 	var buildingSeed;
@@ -5381,11 +5069,15 @@ MagoManager.prototype.calculateBoundingBoxesNodes = function(projectId)
 /**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
  */
-MagoManager.prototype.makeSmartTile = function(buildingSeedList, projectId) 
+MagoManager.prototype.makeSmartTile = function(buildingSeedList, projectId, f4dObjectJson, seedMap) 
 {
+	if (!buildingSeedList && !seedMap) 
+	{
+		throw new Error('buildingSeedList or seedMap is required'); 
+	}
 	//var realTimeLocBlocksList = MagoConfig.getData().alldata; // original.***
 	// "projectId" = json file name.
-	var realTimeLocBlocksList = MagoConfig.getData(CODE.PROJECT_ID_PREFIX + projectId);
+	var realTimeLocBlocksList = f4dObjectJson || MagoConfig.getData(CODE.PROJECT_ID_PREFIX + projectId);
 	var buildingSeed;
 	var buildingId;
 	var newLocation;
@@ -5393,17 +5085,32 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList, projectId)
 	// now, read all hierarchyJason and make the hierarchy tree.
 	var physicalNodesArray = []; // put here the nodes that has geometry data.
 	// make a buildingSeedMap.
-	var buildingSeedMap = {};
-	var buildingSeedsCount = buildingSeedList.buildingSeedArray.length;
-	for (var i=0; i<buildingSeedsCount; i++)
+	var buildingSeedMap = seedMap || {};
+	var buildingSeedMapLength = Object.keys(buildingSeedMap).length;
+	if (buildingSeedMapLength === 0) 
 	{
-		buildingSeed = buildingSeedList.buildingSeedArray[i];
-		buildingId = buildingSeed.buildingId;
-		buildingSeedMap[buildingId] = buildingSeed;
+		var buildingSeedsCount = buildingSeedList.buildingSeedArray.length;
+		for (var i=0; i<buildingSeedsCount; i++)
+		{
+			buildingSeed = buildingSeedList.buildingSeedArray[i];
+			buildingId = buildingSeed.buildingId;
+			buildingSeedMap[buildingId] = buildingSeed;
+		}
 	}
-	//var projectFolderName = realTimeLocBlocksList.data_key;
-	var projectFolderName = realTimeLocBlocksList.data_key || realTimeLocBlocksList.dataGroupKey || realTimeLocBlocksList.dataKey;
-	this.makeNode(realTimeLocBlocksList, physicalNodesArray, buildingSeedMap, projectFolderName, projectId);
+	
+	var projectFolderName = getProjectFolderName(realTimeLocBlocksList);
+	if (!Array.isArray(realTimeLocBlocksList)) 
+	{
+		this.makeNode(realTimeLocBlocksList, physicalNodesArray, buildingSeedMap, projectFolderName, projectId);
+	}
+	else 
+	{
+		for (var i=0, len=realTimeLocBlocksList.length;i<len;i++) 
+		{
+			var blocks = realTimeLocBlocksList[i];
+			this.makeNode(blocks, physicalNodesArray, buildingSeedMap, projectFolderName, projectId);
+		}
+	}
 	this.calculateBoundingBoxesNodes(projectId);
 	
 	// now, make smartTiles.
@@ -5412,6 +5119,30 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList, projectId)
 	this.smartTileManager.makeTreeByDepth(targetDepth, physicalNodesArray, this);
 
 	this.buildingSeedList.buildingSeedArray.length = 0; // init.
+
+	function getProjectFolderName(json) 
+	{
+		var folderName;
+		var f4d = Array.isArray(json) ? json[0] : json;
+		if (f4d.data_key) 
+		{
+			folderName = f4d.groupDataFolder || f4d.data_key;
+		}
+		else 
+		{
+			if (f4d.dataGroupPath) 
+			{
+				folderName = f4d.dataGroupPath;
+				folderName = folderName.replace(/\/+$/, '');
+			}
+			else 
+			{
+				folderName = f4d.groupDataFolder;
+			}
+		}
+
+		return folderName;
+	}
 };
 
 

@@ -928,8 +928,12 @@ ManagerUtils.getHeadingToNorthByTwoGeographicCoords = function(startGeographic, 
 ManagerUtils.getComplexCoordinateByScreenCoord = function(gl, pixelX, pixelY, depthFbo, frustumNear, frustumFar, magoManager) 
 {
 	var worldCoord = ManagerUtils.screenCoordToWorldCoord(magoManager.getGl(), pixelX, pixelY, worldCoord, undefined, undefined, undefined, magoManager);
+	if (!worldCoord) 
+	{
+		return null;
+	}
 	var geographicCoord = ManagerUtils.pointToGeographicCoord(worldCoord, geographicCoord);
-
+	
 	return {
 		screenCoordinate     : new Point2D(pixelX, pixelY),
 		worldCoordinate      : worldCoord,

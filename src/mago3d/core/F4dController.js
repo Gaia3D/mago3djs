@@ -45,8 +45,18 @@ F4dController.prototype.addF4dGroup = function(f4dObject)
 	}
 	else 
 	{
-		
-		var groupDataFolder = groupId;
+		var groupId = f4dObject.data_key || f4dObject.dataGroupKey || f4dObject.dataKey;
+		var groupDataFolder;
+
+		if (f4dObject.data_key) 
+		{
+			groupDataFolder = groupId;
+		}
+		else 
+		{
+			groupDataFolder = f4dObject.dataGroupPath;
+			groupDataFolder = groupDataFolder.replace(/\/+$/, '');
+		}
 
 		MagoConfig.setData(CODE.PROJECT_ID_PREFIX + groupId, f4dObject);
 		MagoConfig.setProjectDataFolder(CODE.PROJECT_DATA_FOLDER_PREFIX + groupDataFolder, groupDataFolder);
@@ -67,18 +77,7 @@ F4dController.prototype.addF4dMember = function(groupId, f4dObject)
 		throw new Error('groupId is required.');
 	}
 
-	// TODO :
-	if (Array.isArray(f4dObject)) 
-	{
-		for (var i=0, len=f4dObject.length;i<len;i++) 
-		{
-			this.addF4dMember(f4dObject[i]);
-		}
-	}
-	else 
-	{
-		// TODO :
-	}
+	this.magoManager.getObjectIndexFileForData(groupId, f4dObject);
 };
 
 /**

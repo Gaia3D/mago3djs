@@ -324,6 +324,17 @@ CesiumViewerInit.prototype.setEventHandler = function()
 		magoManager.mouseActionLeftClick(movement.position.x, movement.position.y);
 	}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
+	magoManager.handler.setInputAction(function(movement) 
+	{
+		magoManager.mouseActionLeftDoubleClick(movement.position.x, movement.position.y);
+	}, Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
+
+	magoManager.handler.setInputAction(function(movement) 
+	{
+		magoManager.mouseActionRightClick(movement.position.x, movement.position.y);
+	}, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
+
+	 
 	this.viewer.clock.onTick.addEventListener(function(clock) 
 	{
 		magoManager.cameraFPV.update(magoManager);

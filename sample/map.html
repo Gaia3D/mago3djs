@@ -69,6 +69,9 @@
 	});
 
 	var MAGO3D_INSTANCE;
+	var a = function(result) {
+			console.info(result);
+		}
 	var imagePath = "/images/ko";
 	var dataInformationUrl = "/sample/persistence/json/";
 	magoStart(null, "magoContainer", imagePath);
@@ -122,16 +125,22 @@
 		var magoManager = magoInstance.getMagoManager();
 		var f4dController = magoInstance.getF4dController();
 
-		magoManager.on(Mago3D.MagoManager.EVENT_TYPE.CLICK, function(result) {
-			console.info(result);
-		});
+		
+		magoManager.on(Mago3D.MagoManager.EVENT_TYPE.CLICK, a);
 
-		magoManager.on(Mago3D.MagoManager.EVENT_TYPE.MOUSEMOVE, function(result) {
-			//
-		});
+		magoManager.once(Mago3D.MagoManager.EVENT_TYPE.CLICK, a);
+		magoManager.once(Mago3D.MagoManager.EVENT_TYPE.CLICK, a);
+		magoManager.on(Mago3D.MagoManager.EVENT_TYPE.CLICK, a);
+		magoManager.on(Mago3D.MagoManager.EVENT_TYPE.CLICK, a);
+		magoManager.once(Mago3D.MagoManager.EVENT_TYPE.CLICK, a);
+		magoManager.on(Mago3D.MagoManager.EVENT_TYPE.CLICK, a);
+		magoManager.on(Mago3D.MagoManager.EVENT_TYPE.CLICK, a);
+		magoManager.once(Mago3D.MagoManager.EVENT_TYPE.CLICK, a);
+		magoManager.on(Mago3D.MagoManager.EVENT_TYPE.CLICK, a);
+
 
 		$.ajax({
-			url: dataInformationUrl + "singapore.json",
+			url: dataInformationUrl + "mipo.json",
 			type: "GET",
 			dataType: "json",
 			success: function(f4dObject){
