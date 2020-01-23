@@ -260,6 +260,10 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 	mouseAction.strLinealDepth = currentLinearDepth;
 	//mouseAction.strCamCoordPoint = ManagerUtils.calculatePixelPositionCamCoord(gl, mouseAction.strX, mouseAction.strY, mouseAction.strCamCoordPoint, currentDepthFbo, currentFrustumNear, currentFrustumFar, magoManager);
 	mouseAction.strCamCoordPoint = MagoWorld.screenToCamCoord(mouseX, mouseY, magoManager, mouseAction.strCamCoordPoint);
+	if (!mouseAction.strCamCoordPoint) 
+	{
+		return;
+	}
 	mouseAction.strWorldPoint = ManagerUtils.cameraCoordPositionToWorldCoord(mouseAction.strCamCoordPoint, mouseAction.strWorldPoint, magoManager);
 	
 	// now, copy camera to curCamera.

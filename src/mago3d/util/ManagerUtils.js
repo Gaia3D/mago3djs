@@ -653,6 +653,11 @@ ManagerUtils.calculatePixelLinearDepth = function(gl, pixelX, pixelY, depthFbo, 
 {
 	if (depthFbo === undefined)
 	{ depthFbo = magoManager.depthFboNeo; }
+
+	if (!depthFbo) 
+	{
+		return;
+	}
 	
 	if (depthFbo) 
 	{
@@ -687,6 +692,10 @@ ManagerUtils.calculatePixelPositionCamCoord = function(gl, pixelX, pixelY, resul
 	{ frustumNear = 0.0; }
 	
 	var linearDepth = ManagerUtils.calculatePixelLinearDepth(gl, pixelX, pixelY, depthFbo, magoManager);
+	if (!linearDepth) 
+	{
+		return;
+	}
 	var realZDepth = frustumNear + linearDepth*frustumFar; // original.
 
 	// now, find the 3d position of the pixel in camCoord.*

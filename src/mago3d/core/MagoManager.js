@@ -138,11 +138,11 @@ var MagoManager = function()
 	this.thereAreStartMovePoint = false;
 	this.startMovPoint = new Point3D();
 	
-	this.configInformation;
+	this.configInformation = MagoConfig.getPolicy();
 	this.cameraFPV = new FirstPersonView();
 	this.myCameraSCX;
 	
-	var serverPolicy = MagoConfig.getPolicy();
+	var serverPolicy = this.configInformation;
 	if (serverPolicy !== undefined)
 	{
 		this.magoPolicy.setLod0DistInMeters(serverPolicy.geo_lod0);
@@ -166,6 +166,8 @@ var MagoManager = function()
 	this.visibleObjControlerOctrees = new VisibleObjectsController(); 
 	this.visibleObjControlerNodes = new VisibleObjectsController(); 
 	this.visibleObjControlerTerrain = new VisibleObjectsController(); 
+	
+	this.frustumVolumeControl = new FrustumVolumeControl();
 	
 	this.boundingSphere_Aux; 
 	this.radiusAprox_aux;
@@ -1462,10 +1464,17 @@ MagoManager.prototype.cameraMoved = function()
 {
 	this.sceneState.camera.setDirty(true);
 	
-	if (this.selectionFbo === undefined) 
-	{ this.selectionFbo = new FBO(this.sceneState.gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
-
-	this.selectionFbo.dirty = true;
+	if (this.selectionFbo === undefined)     
+	{ 
+		if (this.sceneState.gl) 
+		{
+			this.selectionFbo = new FBO(this.sceneState.gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); 
+		}
+	}
+	if (this.selectionFbo)
+	{
+		this.selectionFbo.dirty = true;
+	}
 };
 
 /**
@@ -1629,11 +1638,16 @@ MagoManager.prototype.calculateSelObjMovePlaneAsimetricMode = function(gl, pixel
  */
 MagoManager.prototype.isDragging = function() 
 {
-	// test function.***
+	if (!this.selectionFbo)
+	{
+		return false;
+	}
+	
 	var bIsDragging = false;
 	var gl = this.sceneState.gl;
 	
 	this.arrayAuxSC.length = 0;
+	
 	this.selectionFbo.bind();
 	var current_objectSelected = this.getSelectedObjects(gl, this.mouse_x, this.mouse_y, this.arrayAuxSC);
 
