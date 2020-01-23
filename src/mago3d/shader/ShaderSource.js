@@ -1270,7 +1270,6 @@ uniform sampler2D diffuseTex;\n\
 uniform sampler2D shadowMapTex;\n\
 uniform sampler2D shadowMapTex2;\n\
 uniform bool textureFlipYAxis;\n\
-varying vec3 vNormal;\n\
 uniform mat4 projectionMatrix;\n\
 uniform mat4 m;\n\
 uniform vec2 noiseScale;\n\
@@ -1301,11 +1300,14 @@ uniform bool bApplySsao;\n\
 uniform float externalAlpha;\n\
 uniform bool bApplyShadow;\n\
 \n\
+//uniform int sunIdx;\n\
+\n\
 // clipping planes.***\n\
 uniform bool bApplyClippingPlanes;\n\
 uniform int clippingPlanesCount;\n\
 uniform vec4 clippingPlanes[6];\n\
 \n\
+varying vec3 vNormal;\n\
 varying vec2 vTexCoord;   \n\
 varying vec3 vLightWeighting;\n\
 varying vec3 diffuseColor;\n\
@@ -1347,7 +1349,16 @@ float getDepth(vec2 coord)\n\
 float getDepthShadowMap(vec2 coord)\n\
 {\n\
 	// currSunIdx\n\
-    return UnpackDepth32(texture2D(shadowMapTex, coord.xy));\n\
+	if(currSunIdx > 0.0 && currSunIdx < 1.0)\n\
+	{\n\
+		return UnpackDepth32(texture2D(shadowMapTex, coord.xy));\n\
+	}\n\
+    else if(currSunIdx > 1.0 && currSunIdx < 2.0)\n\
+	{\n\
+		return UnpackDepth32(texture2D(shadowMapTex2, coord.xy));\n\
+	}\n\
+	else\n\
+		return -1.0;\n\
 }  \n\
 \n\
 bool clipVertexByPlane(in vec4 plane, in vec3 point)\n\
@@ -1428,10 +1439,20 @@ void main()\n\
 		\n\
 	if(applySpecLighting> 0.0)\n\
 	{\n\
-		//vec3 lightPos = vec3(20.0, 60.0, 200.0);\n\
-		vec3 lightPos = vec3(1.0, 1.0, 1.0);\n\
-		vec3 L = normalize(lightPos - vertexPos);\n\
-		lambertian = max(dot(normal2, L), 0.0);\n\
+		vec3 L;\n\
+		if(bApplyShadow)\n\
+		{\n\
+			L = vLightDir;// test.***\n\
+			lambertian = max(dot(normal2, L), 0.0); // original.***\n\
+			//lambertian = max(dot(vNormalWC, L), 0.0); // test.\n\
+		}\n\
+		else\n\
+		{\n\
+			vec3 lightPos = vec3(1.0, 1.0, 1.0);\n\
+			L = normalize(lightPos - vertexPos);\n\
+			lambertian = max(dot(normal2, L), 0.0);\n\
+		}\n\
+		\n\
 		specular = 0.0;\n\
 		if(lambertian > 0.0)\n\
 		{\n\
@@ -1469,13 +1490,21 @@ void main()\n\
 			{\n\
 				vec3 posRelToLight = vPosRelToLight.xyz / vPosRelToLight.w;\n\
 				float tolerance = 0.9963;\n\
-				//tolerance = 0.9962;\n\
-				posRelToLight = posRelToLight * 0.5 + 0.5;\n\
-				float depthRelToLight = getDepthShadowMap(posRelToLight.xy);\n\
-				if(posRelToLight.z > depthRelToLight*tolerance )\n\
+				//tolerance = 0.5;\n\
+				//tolerance = 1.0;\n\
+				posRelToLight = posRelToLight * 0.5 + 0.5; // transform to [0,1] range\n\
+				if(posRelToLight.x >= 0.0 && posRelToLight.x <= 1.0)\n\
 				{\n\
-					shadow_occlusion = 0.5;\n\
+					if(posRelToLight.y >= 0.0 && posRelToLight.y <= 1.0)\n\
+					{\n\
+						float depthRelToLight = getDepthShadowMap(posRelToLight.xy);\n\
+						if(posRelToLight.z > depthRelToLight*tolerance )\n\
+						{\n\
+							shadow_occlusion = 0.5;\n\
+						}\n\
+					}\n\
 				}\n\
+				\n\
 				/*\n\
 				// test. Calculate the zone inside the pixel.************************************\n\
 				//https://docs.microsoft.com/ko-kr/windows/win32/dxtecharts/cascaded-shadow-maps\n\
@@ -1598,26 +1627,32 @@ void main()\n\
         textureColor = aColor4;\n\
     }\n\
 	\n\
+	//textureColor = vec4(0.8, 0.85, 0.9, 1.0);\n\
+	\n\
 	vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);\n\
 	float alfa = textureColor.w * externalAlpha;\n\
 	\n\
 	// test render by depth.************************************************************\n\
 	//if(testBool)\n\
-	//textureColor = vec4(1.0, 0.0, 0.0, 1.0);\n\
+	//textureColor = vec4(0.8, 0.85, 0.9, 1.0);\n\
 	// End test.------------------------------------------------------------------------\n\
 \n\
     vec4 finalColor;\n\
 	if(applySpecLighting> 0.0)\n\
 	{\n\
-		finalColor = vec4((ambientReflectionCoef * ambientColor + diffuseReflectionCoef * lambertian * textureColor.xyz + specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion * shadow_occlusion, alfa); \n\
+		finalColor = vec4((ambientReflectionCoef * ambientColor + \n\
+							diffuseReflectionCoef * lambertian * textureColor.xyz + \n\
+							specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion * shadow_occlusion, alfa); \n\
 	}\n\
 	else{\n\
 		finalColor = vec4((textureColor.xyz) * occlusion * shadow_occlusion, alfa);\n\
 	}\n\
 	//finalColor = vec4(linearDepth, linearDepth, linearDepth, 1.0); // test to render depth color coded.***\n\
     gl_FragColor = finalColor; \n\
+\n\
 }";
-ShaderSource.ModelRefSsaoVS = "	attribute vec3 position;\n\
+ShaderSource.ModelRefSsaoVS = "\n\
+	attribute vec3 position;\n\
 	attribute vec3 normal;\n\
 	attribute vec2 texCoord;\n\
 	attribute vec4 color4;\n\
@@ -1634,6 +1669,8 @@ ShaderSource.ModelRefSsaoVS = "	attribute vec3 position;\n\
 	uniform vec3 buildingPosLOW;\n\
 	uniform vec3 sunPosHIGH[2];\n\
 	uniform vec3 sunPosLOW[2];\n\
+	uniform int sunIdx;\n\
+	uniform vec3 sunDirWC;\n\
 	uniform vec3 encodedCameraPositionMCHigh;\n\
 	uniform vec3 encodedCameraPositionMCLow;\n\
 	uniform vec3 aditionalPosition;\n\
@@ -1654,7 +1691,7 @@ ShaderSource.ModelRefSsaoVS = "	attribute vec3 position;\n\
 	varying vec4 vPosRelToLight; \n\
 	varying vec3 vLightDir; \n\
 	varying vec3 vNormalWC; \n\
-	varying float currSunIdx; \n\
+	varying float currSunIdx;  \n\
 	\n\
 	void main()\n\
     {	\n\
@@ -1683,46 +1720,59 @@ ShaderSource.ModelRefSsaoVS = "	attribute vec3 position;\n\
 		vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
 		vec3 rotatedNormal = currentTMat * normal;\n\
 		\n\
-		currSunIdx = -1.0; // initially no apply shdow.\n\
-		if(bApplyShadow)\n\
-		{\n\
-			// the sun lights count are 2.\n\
-			for(int i=0; i<2; i++)\n\
-			{\n\
-				vec3 currSunPosLOW = sunPosLOW[i];\n\
-				vec3 currSunPosHIGH = sunPosHIGH[i];\n\
-				// Calculate the vertex relative to light.***\n\
-				vec3 highDifferenceSun = objPosHigh.xyz - currSunPosHIGH.xyz;\n\
-				vec3 lowDifferenceSun = objPosLow.xyz - currSunPosLOW.xyz;\n\
-				vec4 pos4Sun = vec4(highDifferenceSun.xyz + lowDifferenceSun.xyz, 1.0);\n\
-				\n\
-				mat4 currSunMatrix = sunMatrix[i];\n\
-				vPosRelToLight = currSunMatrix * pos4Sun;\n\
-				\n\
-				// now, check if \"vPosRelToLight\" is inside of the lightVolume (inside of the depthTexture of the light).\n\
-				vec3 posRelToLightNDC = vPosRelToLight.xyz / vPosRelToLight.w;\n\
-				if(posRelToLightNDC.x >= -0.5 && posRelToLightNDC.x <= 0.5)\n\
-				{\n\
-					if(posRelToLightNDC.y >= -0.5 && posRelToLightNDC.y <= 0.5)\n\
-					{\n\
-						// is inside of the lightVolume.***\n\
-						currSunIdx = float(i) + 0.5;\n\
-						vLightDir = vec3(-currSunMatrix[2][0], -currSunMatrix[2][1], -currSunMatrix[2][2]);\n\
-						vNormalWC = rotatedNormal;\n\
-						break;\n\
-					}\n\
-				}\n\
-			}\n\
-		}\n\
-\n\
-		\n\
-		vLightWeighting = vec3(1.0, 1.0, 1.0);\n\
-		uAmbientColor = vec3(0.8);\n\
-		vec3 uLightingDirection = vec3(0.6, 0.6, 0.6);\n\
-		vec3 directionalLightColor = vec3(0.7, 0.7, 0.7);\n\
+		vec3 uLightingDirection = vec3(-0.1320580393075943, -0.9903827905654907, 0.041261956095695496); \n\
+		uAmbientColor = vec3(1.0);\n\
+		vNormalWC = rotatedNormal;\n\
 		vNormal = normalize((normalMatrix4 * vec4(rotatedNormal.x, rotatedNormal.y, rotatedNormal.z, 1.0)).xyz); // original.***\n\
 		vTexCoord = texCoord;\n\
-		float directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
+		vLightDir = vec3(-0.1320580393075943, -0.9903827905654907, 0.041261956095695496);\n\
+		vec3 directionalLightColor = vec3(0.7, 0.7, 0.7);\n\
+		float directionalLightWeighting = 1.0;\n\
+		\n\
+		currSunIdx = -1.0; // initially no apply shadow.\n\
+		if(bApplyShadow)\n\
+		{\n\
+			//vLightDir = normalize(vec3(normalMatrix4 * vec4(sunDirWC.xyz, 1.0)).xyz); // test.***\n\
+			vLightDir = sunDirWC;\n\
+			vNormalWC = rotatedNormal;\n\
+						\n\
+			// the sun lights count are 2.\n\
+			\n\
+			vec3 currSunPosLOW;\n\
+			vec3 currSunPosHIGH;\n\
+			mat4 currSunMatrix;\n\
+			if(sunIdx == 0)\n\
+			{\n\
+				currSunPosLOW = sunPosLOW[0];\n\
+				currSunPosHIGH = sunPosHIGH[0];\n\
+				currSunMatrix = sunMatrix[0];\n\
+				currSunIdx = 0.5;\n\
+			}\n\
+			else if(sunIdx == 1)\n\
+			{\n\
+				currSunPosLOW = sunPosLOW[1];\n\
+				currSunPosHIGH = sunPosHIGH[1];\n\
+				currSunMatrix = sunMatrix[1];\n\
+				currSunIdx = 1.5;\n\
+			}\n\
+			\n\
+			// Calculate the vertex relative to light.***\n\
+			vec3 highDifferenceSun = objPosHigh.xyz - currSunPosHIGH.xyz;\n\
+			vec3 lowDifferenceSun = objPosLow.xyz - currSunPosLOW.xyz;\n\
+			vec4 pos4Sun = vec4(highDifferenceSun.xyz + lowDifferenceSun.xyz, 1.0);\n\
+			vPosRelToLight = currSunMatrix * pos4Sun;\n\
+			\n\
+			uLightingDirection = sunDirWC; \n\
+			//directionalLightColor = vec3(0.9, 0.9, 0.9);\n\
+			directionalLightWeighting = max(dot(rotatedNormal, -sunDirWC), 0.0);\n\
+		}\n\
+		else\n\
+		{\n\
+			uAmbientColor = vec3(0.8);\n\
+			uLightingDirection = normalize(vec3(0.6, 0.6, 0.6));\n\
+			directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
+		}\n\
+\n\
 		vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;\n\
 		\n\
 		if(bApplySpecularLighting)\n\
@@ -1766,6 +1816,7 @@ vec4 PackDepth32( in float depth )\n\
 void main()\n\
 {     \n\
     gl_FragData[0] = PackDepth32(depth);\n\
+	//gl_FragData[0] = packDepth(-depth);\n\
 }";
 ShaderSource.OrthogonalDepthShaderVS = "attribute vec3 position;\n\
 \n\
@@ -2435,12 +2486,12 @@ vec4 packDepth(const in float depth)\n\
 }\n\
 \n\
 \n\
-vec4 PackDepth32( in float depth )\n\
-{\n\
-    depth *= (16777216.0 - 1.0) / (16777216.0);\n\
-    vec4 encode = fract( depth * vec4(1.0, 256.0, 256.0*256.0, 16777216.0) );// 256.0*256.0*256.0 = 16777216.0\n\
-    return vec4( encode.xyz - encode.yzw / 256.0, encode.w ) + 1.0/512.0;\n\
-}\n\
+//vec4 PackDepth32( in float depth )\n\
+//{\n\
+//    depth *= (16777216.0 - 1.0) / (16777216.0);\n\
+//    vec4 encode = fract( depth * vec4(1.0, 256.0, 256.0*256.0, 16777216.0) );// 256.0*256.0*256.0 = 16777216.0\n\
+//    return vec4( encode.xyz - encode.yzw / 256.0, encode.w ) + 1.0/512.0;\n\
+//}\n\
 \n\
 bool clipVertexByPlane(in vec4 plane, in vec3 point)\n\
 {\n\
@@ -2525,6 +2576,22 @@ void main()\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 	vertexPos = (modelViewMatrixRelToEye * pos4).xyz;\n\
 		//vertexPos = objPosHigh + objPosLow;\n\
+}";
+ShaderSource.ScreenQuadFS = "precision lowp float;\n\
+varying vec4 vColor;\n\
+\n\
+void main()\n\
+{\n\
+    gl_FragColor = vColor;\n\
+}";
+ShaderSource.ScreenQuadVS = "precision mediump float;\n\
+\n\
+attribute vec2 position;\n\
+varying vec4 vColor;\n\
+\n\
+void main() {\n\
+	vColor = vec4(0.2, 0.2, 0.2, 0.5);\n\
+    gl_Position = vec4(1.0 - 2.0 * position, 0.0, 1.0);\n\
 }";
 ShaderSource.screen_frag = "precision mediump float;\n\
 \n\
@@ -2905,6 +2972,7 @@ ShaderSource.TinTerrainFS = "#ifdef GL_ES\n\
 //uniform sampler2D noiseTex;  \n\
 uniform sampler2D diffuseTex;\n\
 uniform sampler2D shadowMapTex;\n\
+uniform sampler2D shadowMapTex2;\n\
 uniform bool textureFlipYAxis;\n\
 uniform bool bIsMakingDepth;\n\
 varying vec3 vNormal;\n\
@@ -2946,6 +3014,7 @@ varying vec3 v3Pos;\n\
 varying vec4 vPosRelToLight; \n\
 varying vec3 vLightDir; \n\
 varying vec3 vNormalWC;\n\
+varying float currSunIdx;\n\
 \n\
 const float equatorialRadius = 6378137.0;\n\
 const float polarRadius = 6356752.3142;\n\
@@ -2989,8 +3058,18 @@ vec3 getViewRay(vec2 tc)\n\
 \n\
 float getDepthShadowMap(vec2 coord)\n\
 {\n\
-    return UnpackDepth32(texture2D(shadowMapTex, coord.xy));\n\
-}  \n\
+	// currSunIdx\n\
+	if(currSunIdx > 0.0 && currSunIdx < 1.0)\n\
+	{\n\
+		return UnpackDepth32(texture2D(shadowMapTex, coord.xy));\n\
+	}\n\
+    else if(currSunIdx > 1.0 && currSunIdx < 2.0)\n\
+	{\n\
+		return UnpackDepth32(texture2D(shadowMapTex2, coord.xy));\n\
+	}\n\
+	else\n\
+		return 1000.0;\n\
+} \n\
 \n\
 void main()\n\
 {           \n\
@@ -3002,36 +3081,38 @@ void main()\n\
 		float shadow_occlusion = 1.0;\n\
 		if(bApplyShadow)\n\
 		{\n\
-		\n\
-			vec3 posRelToLight = vPosRelToLight.xyz / vPosRelToLight.w;\n\
-			if(posRelToLight.x >= -0.5 && posRelToLight.x <= 0.5)\n\
+			if(currSunIdx > 0.0)\n\
 			{\n\
-				if(posRelToLight.y >= -0.5 && posRelToLight.y <= 0.5)\n\
+				vec3 fragCoord = gl_FragCoord.xyz;\n\
+				vec3 fragWC;\n\
+				\n\
+				//float ligthAngle = dot(vLightDir, vNormalWC);\n\
+				//if(ligthAngle > 0.0)\n\
+				//{\n\
+				//	// The angle between the light direction & face normal is less than 90 degree, so, the face is in shadow.***\n\
+				//	shadow_occlusion = 0.5;\n\
+				//}\n\
+				//else\n\
 				{\n\
-					//float ligthAngle = dot(vLightDir, vNormalWC);\n\
-					//if(ligthAngle > 0.0)\n\
-					//{\n\
-					//	// The angle between the light direction & face normal is less than 90 degree, so, the face is in shadow.***\n\
-					//	if(shadow_occlusion > 0.4)\n\
-					//		shadow_occlusion = 0.4;\n\
-					//}\n\
-					//else\n\
+\n\
+					vec3 posRelToLight = vPosRelToLight.xyz / vPosRelToLight.w;\n\
+					float tolerance = 0.9963;\n\
+					//tolerance = 0.9962;\n\
+					//tolerance = 1.0;\n\
+					posRelToLight = posRelToLight * 0.5 + 0.5; // transform to [0,1] range\n\
+					if(posRelToLight.x >= 0.0 && posRelToLight.x <= 1.0)\n\
 					{\n\
-						float pixelWidth = 1.0 / shadowMapWidth;\n\
-						float pixelHeight = 1.0 / shadowMapHeight;\n\
-						posRelToLight = posRelToLight * 0.5 + 0.5;\n\
-						\n\
-						float depthRelToLight = getDepthShadowMap(posRelToLight.xy);\n\
-						if(posRelToLight.z > depthRelToLight*0.9963 )\n\
+						if(posRelToLight.y >= 0.0 && posRelToLight.y <= 1.0)\n\
 						{\n\
-							if(shadow_occlusion > 0.4)\n\
-								shadow_occlusion = 0.4;\n\
+							float depthRelToLight = getDepthShadowMap(posRelToLight.xy);\n\
+							if(posRelToLight.z > depthRelToLight*tolerance )\n\
+							{\n\
+								shadow_occlusion = 0.5;\n\
+							}\n\
 						}\n\
-						\n\
 					}\n\
 				}\n\
 			}\n\
-			\n\
 		}\n\
 	\n\
 		vec4 textureColor;\n\
@@ -3072,6 +3153,8 @@ void main()\n\
 		float fogAmount = fogParam2*fogParam2;\n\
 		vec4 finalColor = mix(textureColor, fogColor, fogAmount); \n\
 		gl_FragColor = vec4(finalColor.xyz * shadow_occlusion, 1.0);\n\
+		\n\
+		//if(currSunIdx > 0.0 && currSunIdx < 1.0 && shadow_occlusion<0.9)gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n\
 	}\n\
 }";
 ShaderSource.TinTerrainVS = "attribute vec3 position;\n\
@@ -3081,16 +3164,18 @@ attribute vec2 texCoord;\n\
 \n\
 uniform mat4 projectionMatrix;  \n\
 uniform mat4 modelViewMatrix;\n\
+uniform mat4 modelViewMatrixInv;\n\
 uniform mat4 modelViewMatrixRelToEye; \n\
 uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
 uniform mat4 ModelViewProjectionMatrix;\n\
 uniform mat4 normalMatrix4;\n\
-uniform mat4 sunMatrix; \n\
+uniform mat4 sunMatrix[2]; \n\
 uniform mat4 buildingRotMatrix;  \n\
 uniform vec3 buildingPosHIGH;\n\
 uniform vec3 buildingPosLOW;\n\
-uniform vec3 sunPosHIGH;\n\
-uniform vec3 sunPosLOW;\n\
+uniform vec3 sunPosHIGH[2];\n\
+uniform vec3 sunPosLOW[2];\n\
+uniform vec3 sunDirWC;\n\
 uniform vec3 encodedCameraPositionMCHigh;\n\
 uniform vec3 encodedCameraPositionMCLow;\n\
 uniform vec3 aditionalPosition;\n\
@@ -3101,6 +3186,7 @@ uniform bool bIsMakingDepth;\n\
 uniform float near;\n\
 uniform float far;\n\
 uniform bool bApplyShadow;\n\
+uniform int sunIdx;\n\
 \n\
 varying vec3 vNormal;\n\
 varying vec2 vTexCoord;   \n\
@@ -3113,6 +3199,7 @@ varying float depthValue;\n\
 varying vec4 vPosRelToLight; \n\
 varying vec3 vLightDir; \n\
 varying vec3 vNormalWC;\n\
+varying float currSunIdx;\n\
 \n\
 void main()\n\
 {	\n\
@@ -3122,17 +3209,41 @@ void main()\n\
     vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
     vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
 	\n\
-	if(bApplyShadow)\n\
+	currSunIdx = -1.0; // initially no apply shadow.\n\
+	if(bApplyShadow && !bIsMakingDepth)\n\
 	{\n\
-		// Calculate the vertex relative to light.***\n\
-		vec3 highDifferenceSun = objPosHigh.xyz - sunPosHIGH.xyz;\n\
-		vec3 lowDifferenceSun = objPosLow.xyz - sunPosLOW.xyz;\n\
-		vec4 pos4Sun = vec4(highDifferenceSun.xyz + lowDifferenceSun.xyz, 1.0);\n\
-	\n\
-		vPosRelToLight = sunMatrix * pos4Sun;\n\
-		vLightDir = vec3(-sunMatrix[2][0], -sunMatrix[2][1], -sunMatrix[2][2]);\n\
+		vLightDir = sunDirWC;\n\
 		vec3 rotatedNormal = vec3(0.0, 0.0, 1.0); // provisional.***\n\
 		vNormalWC = rotatedNormal;\n\
+					\n\
+		// the sun lights count are 2.\n\
+		vec3 currSunPosLOW;\n\
+		vec3 currSunPosHIGH;\n\
+		mat4 currSunMatrix;\n\
+		if(sunIdx == 0)\n\
+		{\n\
+			currSunPosLOW = sunPosLOW[0];\n\
+			currSunPosHIGH = sunPosHIGH[0];\n\
+			currSunMatrix = sunMatrix[0];\n\
+			currSunIdx = 0.5;\n\
+		}\n\
+		else if(sunIdx == 1)\n\
+		{\n\
+			currSunPosLOW = sunPosLOW[1];\n\
+			currSunPosHIGH = sunPosHIGH[1];\n\
+			currSunMatrix = sunMatrix[1];\n\
+			currSunIdx = 1.5;\n\
+		}\n\
+		\n\
+		// Calculate the vertex relative to light.***\n\
+		vec3 highDifferenceSun = objPosHigh.xyz - currSunPosHIGH.xyz;\n\
+		vec3 lowDifferenceSun = objPosLow.xyz - currSunPosLOW.xyz;\n\
+		vec4 pos4Sun = vec4(highDifferenceSun.xyz + lowDifferenceSun.xyz, 1.0);\n\
+		vec4 posRelToLightAux = currSunMatrix * pos4Sun;\n\
+		\n\
+		// now, check if \"posRelToLightAux\" is inside of the lightVolume (inside of the depthTexture of the light).\n\
+		vec3 posRelToLightNDC = posRelToLightAux.xyz / posRelToLightAux.w;\n\
+		vPosRelToLight = posRelToLightAux;\n\
 	}\n\
 \n\
 	if(bIsMakingDepth)\n\

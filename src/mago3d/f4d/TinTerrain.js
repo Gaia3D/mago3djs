@@ -672,10 +672,10 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 		var currDepth = this.depth;
 		
 		// check distance to camera.
-		var distToCam = camPos.distToSphere(sphereExtentAux);
+		this.distToCam = camPos.distToSphere(sphereExtentAux);
 		var distLimit = this.tinTerrainManager.distLimitByDepth[currDepth];
 		
-		if (distToCam > distLimit)// && this.depth > 1)
+		if (this.distToCam > distLimit)// && this.depth > 1)
 		{
 			// finish the process.
 			this.visible = true;
@@ -1188,6 +1188,8 @@ TinTerrain.prototype.decodeData = function(imageryType)
 	var vValues = this.vValues;
 	var hValues = this.hValues;
 	
+	var exageration = 5.0;
+	
 	if (imageryType === undefined)
 	{ imageryType = CODE.imageryType.CRS84; }
 	
@@ -1223,6 +1225,8 @@ TinTerrain.prototype.decodeData = function(imageryType)
 			latArray[i] = minLat + vValues[i]*latRangeDivShortMax;
 			altArray[i] = minHeight + hValues[i]*heightRangeDivShortMax;
 			
+			//altArray[i] *= exageration;
+			
 			var currLon = lonArray[i];
 			var currLat = latArray[i];
 			
@@ -1241,6 +1245,7 @@ TinTerrain.prototype.decodeData = function(imageryType)
 		}
 		
 		// Texture correction in borders & make skirt data.***
+		var skirtDepth = 5000.0;
 		var skirtLonArray = [];
 		var skirtLatArray = [];
 		var skirtAltArray = [];
@@ -1256,7 +1261,7 @@ TinTerrain.prototype.decodeData = function(imageryType)
 			
 			skirtLonArray.push(lonArray[idx]);
 			skirtLatArray.push(latArray[idx]);
-			skirtAltArray.push(altArray[idx]-500.0);
+			skirtAltArray.push(altArray[idx]-skirtDepth);
 			
 			// insert texCoords 2 times for the triangles strip.
 			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2]);   // s.
@@ -1276,7 +1281,7 @@ TinTerrain.prototype.decodeData = function(imageryType)
 			
 			skirtLonArray.push(lonArray[idx]);
 			skirtLatArray.push(latArray[idx]);
-			skirtAltArray.push(altArray[idx]-500.0);
+			skirtAltArray.push(altArray[idx]-skirtDepth);
 			
 			// insert texCoords 2 times for the triangles strip.
 			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2]);   // s.
@@ -1296,7 +1301,7 @@ TinTerrain.prototype.decodeData = function(imageryType)
 			
 			skirtLonArray.push(lonArray[idx]);
 			skirtLatArray.push(latArray[idx]);
-			skirtAltArray.push(altArray[idx]-500.0);
+			skirtAltArray.push(altArray[idx]-skirtDepth);
 			
 			// insert texCoords 2 times for the triangles strip.
 			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2]);   // s.
@@ -1316,7 +1321,7 @@ TinTerrain.prototype.decodeData = function(imageryType)
 			
 			skirtLonArray.push(lonArray[idx]);
 			skirtLatArray.push(latArray[idx]);
-			skirtAltArray.push(altArray[idx]-500.0);
+			skirtAltArray.push(altArray[idx]-skirtDepth);
 			
 			// insert texCoords 2 times for the triangles strip.
 			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2]);   // s.

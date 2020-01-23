@@ -394,6 +394,7 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	// renderType = 0 -> depth render.
 	// renderType = 1 -> normal render.
 	// renderType = 2 -> colorSelection render.
+	// renderType = 3 -> shadowMesh render.
 	//--------------------------------------------
 	var data = this.data;
 	if (data === undefined)
@@ -470,6 +471,7 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	}
 	// end check attributes of the project.----------------------------------------
 	
+	
 	// set the currentObjectsRendering.
 	magoManager.renderer.currentObjectsRendering.curNode = this;
 	
@@ -483,6 +485,8 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	}
 
 	gl.uniform1i(shader.textureFlipYAxis_loc, flipYTexCoord);
+	
+	
 	
 	// Check the geoLocationDatasCount & check if is a ghost-trail-render (trail as ghost).
 	var currRenderingFase = magoManager.renderingFase;
@@ -514,6 +518,8 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 		magoManager.isTrailRender = false;
 	}
 	//--------------------------------------------------------------------------------------------------------------------
+	
+	
 	var geoLocDataIdx;
 	if (geoLocDataManager.getGeoLocationDatasCount() > 1)
 	{ geoLocDataIdx = 1; }
@@ -740,31 +746,30 @@ Node.prototype.getBBoxCenterPositionWorldCoord = function(geoLoc)
 Node.prototype.calculateBBoxCenterPositionWorldCoord = function(geoLoc) 
 {
 	var data = this.data;
-	if (!data) 
-	{
-		return;
-	}
-	if (data.mapping_type === undefined)
-	{ data.mapping_type = "origin"; }
+
+	var mapping_type = data.mapping_type;
+	
+	if (mapping_type === undefined)
+	{ mapping_type = "origin"; }
 
 	var bboxAbsoluteCenterPosAux;
 	var bboxCenterPoint = new Point3D(0, 0, 0);
-	if (data.mapping_type.toLowerCase() === "origin")
+	if (mapping_type.toLowerCase() === "origin")
 	{
-		if (!this.data.bbox) 
+		if (!data.bbox) 
 		{
 			this.getBBox();
 		}
 		// this.data.bbox is the most important bbox.
-		bboxCenterPoint = this.data.bbox.getCenterPoint(bboxCenterPoint); // local bbox.
+		bboxCenterPoint = data.bbox.getCenterPoint(bboxCenterPoint); // local bbox.
 	}
-	else if (data.mapping_type.toLowerCase() === "boundingboxcenter")
+	else if (mapping_type.toLowerCase() === "boundingboxcenter")
 	{
 		bboxCenterPoint.set(0, 0, 0);
 	}
-	else if (data.mapping_type.toLowerCase() === "boundingboxbottomcenter")
+	else if (mapping_type.toLowerCase() === "boundingboxbottomcenter")
 	{
-		var bboxHeight = this.data.bbox.getZLength();
+		var bboxHeight = data.bbox.getZLength();
 		bboxCenterPoint.set(0, 0, bboxHeight/2);
 	}
 

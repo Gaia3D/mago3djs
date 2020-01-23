@@ -42,7 +42,7 @@ LodBuilding.prototype.isReadyToRender = function()
  * @param {Boolean} renderTexture
  * @param {PostFxShader} shader 
  */
-LodBuilding.prototype.render = function(magoManager, renderType, renderTexture, shader)
+LodBuilding.prototype.render = function(magoManager, renderType, renderTexture, shader, owner)
 {
-	return this.skinLego.render(magoManager, renderType, renderTexture, shader);
+	return this.skinLego.render(magoManager, renderType, renderTexture, shader, owner);
 };

@@ -22,6 +22,10 @@ var VisibleObjectsController = function()
 		excavationsArray  : []
 	};
 	this.currentVisiblesToPrepare = [];
+	
+	this.bSphere;
+	this.bFrustumNear;
+	this.bFrustumFar;
 };
 VisibleObjectsController.prototype.initArrays = function() 
 {
@@ -36,6 +40,10 @@ VisibleObjectsController.prototype.initArrays = function()
 		excavationsArray  : []
 	};
 	this.currentVisiblesToPrepare = [];
+	
+	this.bSphere = undefined;
+	this.bFrustumNear = undefined;
+	this.bFrustumFar = undefined;
 };
 /**Clear all of the volumn's data */
 
@@ -50,6 +58,10 @@ VisibleObjectsController.prototype.clear = function()
 	this.currentVisibleNativeObjects.transparentsArray.length = 0;
 	this.currentVisibleNativeObjects.excavationsArray.length = 0;
 	this.currentVisiblesToPrepare.length = 0;
+	
+	this.bSphere = undefined;
+	this.bFrustumNear = undefined;
+	this.bFrustumFar = undefined;
 };
 
 /**
@@ -283,28 +295,13 @@ VisibleObjectsController.calculateBoundingSphereForArray = function(visiblesArra
 };
 
 /**
- * Calculates a boundingSphere for each visibles array.
+ * Given a nodes array, this returns the nodes in the boundary of the nodes group.
  */
-VisibleObjectsController.prototype.calculateBoundingSpheres = function() 
+VisibleObjectsController.getBoundaryNodes = function(visiblesArray, resultBoundaryNodesArray) 
 {
-	//this.currentVisibles0; 
-	//this.currentVisibles1; 
-	//this.currentVisibles2; 
-	//this.currentVisibles3; 
-	//this.currentVisiblesAux; // todo:
-	//this.currentVisibleNativeObjects;  // todo:
-	
-	// check currentVisibles & make a boundingSphere for each visibles array.
-	if (this.bSphere === undefined)
-	{ this.bSphere = new BoundingSphere(); }
+	if (resultBoundaryNodesArray === undefined)
+	{ resultBoundaryNodesArray = []; }
 
-	var visiblesArray = this.currentVisibles0.concat(this.currentVisibles1, this.currentVisibles2, this.currentVisibles3);
-	
-	if (visiblesArray.length === 0)
-	{ return; }
-
-	var filteredVisiblesArray = [];
-	// Find the geoExtent of the all visibles.
 	var minLonCandidate;
 	var minLatCandidate;
 	var maxLonCandidate;
@@ -319,16 +316,13 @@ VisibleObjectsController.prototype.calculateBoundingSpheres = function()
 	for (var i=0; i<visiblesCount; i++)
 	{
 		var visible = visiblesArray[i];
-		if (visible.data.distToCam > 2000.0)
-		{ continue; }
-		
 		var geoCoord = visible.data.geographicCoord;
 		if (i===0)
 		{
 			minLonCandidate = geoCoord.longitude;
 			minLatCandidate = geoCoord.latitude;
 			maxLonCandidate = geoCoord.longitude;
-			maxLatCandidate = geoCoord.latitude;
+			maxLatCandidate = geoCoord.latitudes;
 			minLonVisible = visible;
 			maxLonVisible = visible;
 			minLatVisible = visible;
@@ -360,7 +354,104 @@ VisibleObjectsController.prototype.calculateBoundingSpheres = function()
 		}
 	}
 	
-	filteredVisiblesArray.push.apply(filteredVisiblesArray, [minLonVisible, maxLonVisible, minLatVisible, maxLatVisible]);
+	resultBoundaryNodesArray.push.apply(resultBoundaryNodesArray, [minLonVisible, maxLonVisible, minLatVisible, maxLatVisible]);
+	return resultBoundaryNodesArray;
+};
+
+/**
+ * Calculates a boundingFrustum for all visibles array, in other words, calculates the nearDist & farDist of the visibleNodes.
+ */
+VisibleObjectsController.prototype.calculateBoundingFrustum = function(camera) 
+{
+	var visiblesArray = this.currentVisibles0.concat(this.currentVisibles1, this.currentVisibles2, this.currentVisibles3);
+	
+	if (visiblesArray.length === 0)
+	{ return; }
+
+	var camPos = camera.getPosition();
+	var camDir = camera.getDirection();
+	var camPosCopy = new Point3D(camPos.x, camPos.y, camPos.z);
+	var camDirCopy = new Point3D(camDir.x, camDir.y, camDir.z);
+	var camDirLine = new Line(camPosCopy, camDirCopy);
+
+	var filteredVisiblesArray = [];
+	filteredVisiblesArray = VisibleObjectsController.getBoundaryNodes(visiblesArray, filteredVisiblesArray);
+	
+	var nearSquareDistCandidate = 10E10;
+	var farSquareDistCandidate = 0.0;
+	var vecAux = new Point3D();
+	
+	var nodesCount = filteredVisiblesArray.length;
+	for (var i=0; i<nodesCount; i++)
+	{
+		var visible = filteredVisiblesArray[i];
+		var bSphere = visible.getBoundingSphereWC(bSphere);
+		var centerPoint = bSphere.getCenterPoint();
+		var radius = bSphere.getRadius();
+		var projectedPoint = camDirLine.getProjectedPoint(centerPoint, undefined);
+		var nearPoint = new Point3D(projectedPoint.x - camDir.x * radius, projectedPoint.y - camDir.y * radius, projectedPoint.z - camDir.z * radius);
+		var farPoint = new Point3D(projectedPoint.x + camDir.x * radius, projectedPoint.y + camDir.y * radius, projectedPoint.z + camDir.z * radius);
+		
+		var currNearSquareDist = camPos.squareDistTo(nearPoint.x, nearPoint.y, nearPoint.z);
+		var currFarSquareDist = camPos.squareDistTo(farPoint.x, farPoint.y, farPoint.z);
+		
+		// must check if the nearPoint is rear of the camera.
+		if (nearSquareDistCandidate > 0.0)
+		{
+			vecAux.set(nearPoint.x - camPos.x, nearPoint.y - camPos.y, nearPoint.z - camPos.z);
+			var dotProd = camDir.scalarProduct(vecAux);
+			if (dotProd < 0.0)
+			{
+				// the nearPoint is rear of the camera.
+				currNearSquareDist = 0.0;
+			}
+		}
+		else
+		{ currNearSquareDist = 0.0; }
+		
+		
+		if (i === 0)
+		{
+			nearSquareDistCandidate = currNearSquareDist;
+			farSquareDistCandidate = currFarSquareDist;
+		}
+		else
+		{
+			if (currNearSquareDist < nearSquareDistCandidate)
+			{ nearSquareDistCandidate = currNearSquareDist; }
+			
+			if (currFarSquareDist > farSquareDistCandidate)
+			{ farSquareDistCandidate = currFarSquareDist; }
+		}
+	}
+	
+	this.bFrustumNear = Math.sqrt(nearSquareDistCandidate);
+	this.bFrustumFar = Math.sqrt(farSquareDistCandidate);
+};
+
+/**
+ * Calculates a boundingSphere for all visibles array.
+ */
+VisibleObjectsController.prototype.calculateBoundingSpheres = function() 
+{
+	//this.currentVisibles0; 
+	//this.currentVisibles1; 
+	//this.currentVisibles2; 
+	//this.currentVisibles3; 
+	//this.currentVisiblesAux; // todo:
+	//this.currentVisibleNativeObjects;  // todo:
+	
+	// check currentVisibles & make a boundingSphere for each visibles array.
+	if (this.bSphere === undefined)
+	{ this.bSphere = new BoundingSphere(); }
+
+	var visiblesArray = this.currentVisibles0.concat(this.currentVisibles1, this.currentVisibles2, this.currentVisibles3);
+	
+	if (visiblesArray.length === 0)
+	{ return; }
+
+	var filteredVisiblesArray = [];
+	filteredVisiblesArray = VisibleObjectsController.getBoundaryNodes(visiblesArray, filteredVisiblesArray);
 	this.bSphere = VisibleObjectsController.calculateBoundingSphereForArray(filteredVisiblesArray, this.bSphere);
 };
 

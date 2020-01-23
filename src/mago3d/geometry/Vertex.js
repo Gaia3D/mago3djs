@@ -108,6 +108,24 @@ Vertex.prototype.setIdxInList = function(idx)
 };
 
 /**
+ * set this vertex type. vertexType is used in auxiliar process, such as merging vertices in a mesh.
+ * @param {Number} vertexType
+ */
+Vertex.prototype.setVertexType = function(vertexType) 
+{
+	this.vertexType = vertexType;
+};
+
+/**
+ * set this vertex type. vertexType is used in auxiliar process, such as merging vertices in a mesh.
+ * @param {Number} vertexType
+ */
+Vertex.prototype.getVertexType = function() 
+{
+	return this.vertexType;
+};
+
+/**
  * make vertex copy from another vertex. like clone.
  * @param {Vertex} vertex 
  */
@@ -299,6 +317,42 @@ Vertex.prototype.getOutingFrontierHEdge = function()
 		if (hedge === undefined || hedge === this.outingHedge)
 		{ return undefined; }
 	}
+};
+
+/**
+ * get vertex intersected with plane. 
+ * @static
+ * @param {Vertex} vertex Required. 
+ * @returns {Array} resultCoincidentVertexArray
+ */
+Vertex.getCoincidentVertexArray = function(vertex, vertexToCompareArray, resultCoincidentVertexArray, errorDist)
+{
+	if (vertex === undefined || vertexToCompareArray === undefined)
+	{ return resultCoincidentVertexArray; }
+	
+	if (resultCoincidentVertexArray === undefined)
+	{ resultCoincidentVertexArray = []; }
+	
+	if (errorDist === undefined)
+	{ errorDist = 1e-4; }
+	
+	var point3d = vertex.getPosition();
+	var vertexCount = vertexToCompareArray.length;
+	for (var i=0; i<vertexCount; i++)
+	{
+		var currVertex = vertexToCompareArray[i];
+		if (vertex === currVertex)
+		{ continue; }
+		
+		var currPoint3d = currVertex.getPosition();
+		
+		if (point3d.isCoincidentToPointCHEAP(currPoint3d, errorDist))
+		{
+			resultCoincidentVertexArray.push(currVertex);
+		}
+	}
+	
+	return resultCoincidentVertexArray;
 };
 
 /**

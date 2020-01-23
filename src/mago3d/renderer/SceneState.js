@@ -14,6 +14,8 @@ var SceneState = function()
 	this.gl;
 
 	// this contains the model matrices and camera position.
+	this.modelMatrix = new Matrix4(); // created as identity matrix.
+	this.viewMatrix = new Matrix4(); // created as identity matrix.
 	this.modelViewProjRelToEyeMatrix = new Matrix4(); // created as identity matrix.
 	this.modelViewRelToEyeMatrix = new Matrix4(); // created as identity matrix.
 	this.modelViewRelToEyeMatrixInv = new Matrix4(); // created as identity matrix.
@@ -23,6 +25,8 @@ var SceneState = function()
 	this.modelViewProjMatrix = new Matrix4(); // created as identity matrix.
 	this.normalMatrix4 = new Matrix4(); // created as identity matrix.
 	this.identityMatrix4 = new Matrix4(); // created as identity matrix.
+	this.modelViewMatrixLast = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; // Number array.
+	this.projectionMatrixLast = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; // Number array.
 
 	this.encodedCamPosHigh = new Float32Array([0.0, 0.0, 0.0]);
 	this.encodedCamPosLow = new Float32Array([0.0, 0.0, 0.0]);
@@ -40,8 +44,8 @@ var SceneState = function()
 	this.applySunShadows = false;
 	
 	// lighting & ssao.
-	this.ambientReflectionCoef = new Float32Array([0.45]); // 0.2.
-	this.diffuseReflectionCoef = new Float32Array([0.75]); // 1.0
+	this.ambientReflectionCoef = new Float32Array([0.7]); // 0.2.
+	this.diffuseReflectionCoef = new Float32Array([0.40]); // 1.0
 	this.specularReflectionCoef = new Float32Array([0.6]); // 0.7
 	this.specularColor = new Float32Array([0.7, 0.7, 0.7]);
 	this.ssaoRadius = new Float32Array([0.15]);
@@ -148,6 +152,29 @@ SceneState.prototype.getModelViewMatrixInv = function()
 SceneState.prototype.getCamera = function() 
 {
 	return this.camera;
+};
+
+/**
+ * Returns the camera.
+ */
+SceneState.prototype.setApplySunShadows = function(bApplySunShadows) 
+{
+	this.applySunShadows = bApplySunShadows;
+	
+	if (this.applySunShadows)
+	{
+		this.ambientReflectionCoef = new Float32Array([1.0]); // 0.2.
+		this.diffuseReflectionCoef = new Float32Array([0.30]); // 1.0
+		this.specularReflectionCoef = new Float32Array([0.4]); // 0.7
+		this.specularColor = new Float32Array([0.7, 0.7, 0.7]);
+	}
+	else
+	{
+		this.ambientReflectionCoef = new Float32Array([0.7]); // 0.2.
+		this.diffuseReflectionCoef = new Float32Array([0.40]); // 1.0
+		this.specularReflectionCoef = new Float32Array([0.6]); // 0.7
+		this.specularColor = new Float32Array([0.7, 0.7, 0.7]);
+	}
 };
 
 

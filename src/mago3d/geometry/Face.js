@@ -76,6 +76,68 @@ Face.prototype.getVerticesCount = function()
  * add vertex to this vertexArray
  * @param {Vertex} vertex
  */
+Face.prototype.setVertexIdxInList = function()
+{
+	var verticesCount = this.getVerticesCount();
+	for (var i=0; i<verticesCount; i++)
+	{
+		this.vertexArray[i].setIdxInList(i);
+	}
+};
+
+/**
+ * This function returns the halfEdge that has the "vertex" as startVertex.
+ * @param {Vertex} vertex
+ */
+Face.prototype.getHalfEdgeOutingFromVertex = function(vertex)
+{
+	var find = false;
+	var i=0;
+	var currHedge = this.hEdge;
+	var targetHedge;
+	var vertexCount = this.getVerticesCount();
+	while (!find && i<vertexCount)
+	{
+		if (currHedge.startVertex === vertex)
+		{
+			find = true;
+			targetHedge = currHedge;
+			break;
+		}
+		
+		currHedge = currHedge.next;
+		i++;
+	}
+	
+	return targetHedge;
+};
+
+/**
+ * add vertex to this vertexArray
+ * @param {Vertex} vertex
+ */
+Face.prototype.changeVertex = function(idx, newVertex)
+{
+	var vertexCount = this.getVerticesCount();
+	
+	if (idx < 0 || idx >= vertexCount)
+	{ return false; }
+	
+	var vertexToChange = this.vertexArray[idx];
+	
+	// must find the hedge that uses the "vertexToChange".
+	var hedge = this.getHalfEdgeOutingFromVertex(vertexToChange);
+	hedge.setStartVertex(newVertex);
+	
+	this.vertexArray[idx] = newVertex;
+	
+	return true;
+};
+
+/**
+ * add vertex to this vertexArray
+ * @param {Vertex} vertex
+ */
 Face.prototype.addVertex = function(vertex)
 {
 	if (this.vertexArray === undefined)
@@ -392,6 +454,29 @@ Face.prototype.solveUroborus = function()
 	{
 		// remove the last vertex.
 		this.vertexArray.pop();
+	}
+};
+
+/**
+ * 전체 Face 배열 중 동일한 Face 가 존재하는지를 알려준다.
+ *
+ */
+Face.setTwinsFacesOfArray = function(facesArray)
+{
+	var face, face2;
+	
+	var facesCount = facesArray.length;
+	for (var i=0; i<facesCount; i++)
+	{
+		face = facesArray[i];
+		for (var j=i+1; j<facesCount; j++)
+		{
+			if (i !== j)
+			{
+				face2 = facesArray[j];
+				face.setTwinFace(face2);
+			}
+		}
 	}
 };
 

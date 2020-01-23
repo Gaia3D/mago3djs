@@ -98,6 +98,7 @@ HalfEdge.prototype.setTwin = function(hedge)
 HalfEdge.prototype.setFace = function(face)
 {
 	this.face = face;
+	this.face.hEdge = this;
 };
 
 /**

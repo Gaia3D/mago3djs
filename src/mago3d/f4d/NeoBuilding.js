@@ -1706,6 +1706,21 @@ NeoBuilding.prototype.render = function(magoManager, shader, renderType, refMatr
 		// Render pointsCloud pyramidMode.
 		return;
 	}
+	/*
+	if (renderType === 3)
+	{
+		// Render the shadowMesh.
+		var lod = 5;
+		var lodBuildingData = this.getLodBuildingData(lod);
+		if (lodBuildingData && !lodBuildingData.isModelRef)
+		{
+			// This building is skinType data.
+			this.renderSkin(magoManager, shader, renderType);
+		}
+		
+		return;
+	}
+	*/
 	
 	if (this.currentLod <= 2)
 	{
@@ -1776,9 +1791,36 @@ NeoBuilding.prototype.render = function(magoManager, shader, renderType, refMatr
 /**
  * 어떤 일을 하고 있습니까?
  */
+NeoBuilding.prototype.renderShadowMesh = function(magoManager, shader, renderType) 
+{
+	var skinLego = this.getCurrentSkin();
+	// Note: skinLego is "LodBuilding" class object.
+		
+	if (skinLego === undefined)
+	{ return; }
+
+	if (!skinLego.isReadyToRender())
+	{ return; }
+
+	var gl = magoManager.sceneState.gl;
+	
+	var renderTexture = true;
+	
+	// if the building is highlighted, the use highlight oneColor4.
+	gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
+	gl.uniform4fv(shader.oneColor4_loc, [0.7, 0.7, 0.7, 1.0]);
+	
+	gl.uniform1i(shader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.
+	skinLego.render(magoManager, renderType, renderTexture, shader, this);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 NeoBuilding.prototype.renderSkin = function(magoManager, shader, renderType) 
 {
 	var skinLego = this.getCurrentSkin();
+	// Note: skinLego is "LodBuilding" class object.
 		
 	if (skinLego === undefined)
 	{ return; }
@@ -1831,10 +1873,7 @@ NeoBuilding.prototype.renderSkin = function(magoManager, shader, renderType)
 			gl.uniform4fv(shader.oneColor4_loc, [this.aditionalColor.r, this.aditionalColor.g, this.aditionalColor.b, this.aditionalColor.a]); //.
 			renderTexture = false;
 		}
-		else
-		{
-			//gl.uniform1i(shader.bUse1Color_loc, false);
-		}
+
 		//----------------------------------------------------------------------------------
 		if (renderTexture)
 		{
@@ -1878,9 +1917,15 @@ NeoBuilding.prototype.renderSkin = function(magoManager, shader, renderType)
 		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 		gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
 	}
+	else if (renderType === 3)
+	{
+		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
+		gl.uniform4fv(shader.oneColor4_loc, [0.7, 0.7, 0.7, 1.0]);
+
+	}
 	
 	gl.uniform1i(shader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.
-	skinLego.render(magoManager, renderType, renderTexture, shader);
+	skinLego.render(magoManager, renderType, renderTexture, shader, this);
 	
 	if (renderType === 1 && magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected === this)
 	{

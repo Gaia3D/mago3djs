@@ -386,7 +386,7 @@ Surface.prototype.setTwinsFaces = function()
 	for (var i=0; i<facesCount; i++)
 	{
 		face = this.getFace(i);
-		for (var j=0; j<facesCount; j++)
+		for (var j=i+1; j<facesCount; j++)
 		{
 			if (i !== j)
 			{

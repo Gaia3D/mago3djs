@@ -254,7 +254,8 @@ var MagoManager = function()
 	this.modeler = new Modeler(this);
 	this.materialsManager = new MaterialsManager(this);
 	this.idManager = new IdentifierManager();
-
+	this.processCounterManager = new ProcessCounterManager();
+	
 	this.f4dController = new F4dController(this);
 };
 
@@ -481,26 +482,43 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		var scene = this.scene;
 		var uniformState = scene._context.uniformState;
 		
-		// check if the matrices changed.***
-		// compare with the lastModelViewProjectionMatrix.***
-
-		//var uniformState = scene._context._us;
-		Cesium.Matrix4.toArray(uniformState._modelViewProjectionRelativeToEye, sceneState.modelViewProjRelToEyeMatrix._floatArrays);
-		Cesium.Matrix4.toArray(uniformState._modelViewProjection, sceneState.modelViewProjMatrix._floatArrays); // always dirty.
-		Cesium.Matrix4.toArray(uniformState._modelViewRelativeToEye, sceneState.modelViewRelToEyeMatrix._floatArrays);
+		//if(!Matrix4.areEqualArrays(sceneState.modelViewMatrixLast, uniformState.modelView) || !Matrix4.areEqualArrays(sceneState.projectionMatrixLast, uniformState._projection))
+		//{
+		//	// calculate matrices.
+		//	Matrix4.copyArray(uniformState.modelView, sceneState.modelViewMatrixLast);
+		//	Matrix4.copyArray(uniformState.modelView, sceneState.modelViewMatrixLast);
+		//}
 		
-		sceneState.modelViewRelToEyeMatrixInv._floatArrays = Cesium.Matrix4.inverseTransformation(sceneState.modelViewRelToEyeMatrix._floatArrays, sceneState.modelViewRelToEyeMatrixInv._floatArrays);// original.***
-		sceneState.modelViewMatrix._floatArrays = Cesium.Matrix4.clone(uniformState.view, sceneState.modelViewMatrix._floatArrays);
+		// ModelViewMatrix.
+		sceneState.modelViewMatrix._floatArrays = Cesium.Matrix4.clone(uniformState.modelView, sceneState.modelViewMatrix._floatArrays);
 		
 		// ProjectionMatrix.***
 		Cesium.Matrix4.toArray(uniformState._projection, sceneState.projectionMatrix._floatArrays); // original.***
 
+		// Given ModelViewMatrix & ProjectionMatrix, calculate all sceneState matrix.
+		sceneState.modelViewMatrixInv._floatArrays = glMatrix.mat4.invert(sceneState.modelViewMatrixInv._floatArrays, sceneState.modelViewMatrix._floatArrays);
+	
+		// normalMat.***
+		sceneState.normalMatrix4._floatArrays = glMatrix.mat4.transpose(sceneState.normalMatrix4._floatArrays, sceneState.modelViewMatrixInv._floatArrays);
+			
+		// modelViewRelToEye.***
+		sceneState.modelViewRelToEyeMatrix._floatArrays = glMatrix.mat4.copy(sceneState.modelViewRelToEyeMatrix._floatArrays, sceneState.modelViewMatrix._floatArrays);
+		sceneState.modelViewRelToEyeMatrix._floatArrays[12] = 0;
+		sceneState.modelViewRelToEyeMatrix._floatArrays[13] = 0;
+		sceneState.modelViewRelToEyeMatrix._floatArrays[14] = 0;
+		sceneState.modelViewRelToEyeMatrix._floatArrays[15] = 1;
+		sceneState.modelViewRelToEyeMatrixInv._floatArrays = glMatrix.mat4.invert(sceneState.modelViewRelToEyeMatrixInv._floatArrays, sceneState.modelViewRelToEyeMatrix._floatArrays);
+			
+		// modelViewProjection.***
+		sceneState.modelViewProjMatrix._floatArrays = glMatrix.mat4.multiply(sceneState.modelViewProjMatrix._floatArrays, sceneState.projectionMatrix._floatArrays, sceneState.modelViewMatrix._floatArrays);
+
+		// modelViewProjectionRelToEye.***
+		sceneState.modelViewProjRelToEyeMatrix._floatArrays = glMatrix.mat4.multiply(sceneState.modelViewProjRelToEyeMatrix._floatArrays, sceneState.projectionMatrix._floatArrays, sceneState.modelViewRelToEyeMatrix._floatArrays);
+		
+		// Check camera.
 		var cameraPosition = scene.context._us._cameraPosition;
 		ManagerUtils.calculateSplited3fv([cameraPosition.x, cameraPosition.y, cameraPosition.z], sceneState.encodedCamPosHigh, sceneState.encodedCamPosLow);
 
-		sceneState.modelViewMatrixInv._floatArrays = Cesium.Matrix4.inverseTransformation(sceneState.modelViewMatrix._floatArrays, sceneState.modelViewMatrixInv._floatArrays);// original.***
-		sceneState.normalMatrix4._floatArrays = Cesium.Matrix4.transpose(sceneState.modelViewMatrixInv._floatArrays, sceneState.normalMatrix4._floatArrays);// original.***
-		
 		var frustumCommandsList = this.scene._frustumCommandsList;
 		if (frustumCommandsList === undefined)
 		{ frustumCommandsList = this.scene.frustumCommandsList; }
@@ -524,9 +542,6 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 					
 		sceneState.drawingBufferWidth[0] = scene.drawingBufferWidth;
 		sceneState.drawingBufferHeight[0] = scene.drawingBufferHeight;
-		
-		// modelViewProjection.***
-		sceneState.modelViewProjMatrix._floatArrays = glMatrix.mat4.multiply(sceneState.modelViewProjMatrix._floatArrays, sceneState.projectionMatrix._floatArrays, sceneState.modelViewMatrix._floatArrays);
 	}
 	else/* if (this.configInformation.basicGlobe === Constant.MAGOWORLD)*/
 	{
@@ -576,20 +591,10 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		sceneState.modelViewProjRelToEyeMatrix._floatArrays[15] = 1;
 		
 		frustum0.tangentOfHalfFovy[0] = Math.tan(frustum0.fovyRad[0]/2);
+		
+		//sceneState.modelViewProjRelToEyeMatrix._floatArrays = glMatrix.mat4.multiply(sceneState.modelViewProjRelToEyeMatrix._floatArrays, sceneState.projectionMatrix._floatArrays, sceneState.modelViewRelToEyeMatrix._floatArrays);
 
 	}
-	
-	// Test.***
-	/*
-	for (var i=0; i<16; i++)
-	{
-		sceneState.normalMatrix4._floatArrays[i] = sceneState.modelViewMatrix._floatArrays[i];
-	}
-	sceneState.normalMatrix4._floatArrays[12] = 0;
-	sceneState.normalMatrix4._floatArrays[13] = 0;
-	sceneState.normalMatrix4._floatArrays[14] = 0;
-	sceneState.normalMatrix4._floatArrays[15] = 1;
-	*/
 	
 	if (this.depthFboNeo !== undefined)
 	{
@@ -611,6 +616,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 	frustum0.aspectRatio[0] = sceneCamFurustum0.aspectRatio[0];
 	
 	// Test.***************************
+	/*
 	var currFrustumIdx = this.currentFrustumIdx;
 	var frustumFar = sceneState.camera.frustumsArray[currFrustumIdx].far[0];
 	
@@ -628,11 +634,16 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 	var zDivW_divFar = zDivW/frustum.far[0];
 	var transformedPoint_MV = sceneState.modelViewMatrix.transformPoint4D__test(cartesian);
 	var transformedPoint_P = sceneState.projectionMatrix.transformPoint4D__test(cartesian);
-	
+	*/
+
+
 	// update sun if exist.
-	if (this.sceneState.sunSystem && this.sceneState.applySunShadows)
+	if (!this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
 	{
-		this.sceneState.sunSystem.updateSun(this);
+		if (this.sceneState.sunSystem && this.sceneState.applySunShadows && this.currentFrustumIdx === 0)
+		{
+			this.sceneState.sunSystem.updateSun(this);
+		}
 	}
 };
 
@@ -945,16 +956,16 @@ MagoManager.prototype.managePickingProcess = function()
 
 			//TODO : MOVEEND EVENT TRIGGER
 			//PSEUDO CODE FOR CLUSTER
-			if (this.modeler && this.modeler.objectsArray) 
-			{
-				for (var i=0, len=this.modeler.objectsArray.length;i<len;i++) 
-				{
-					var obj = this.modeler.objectsArray[i];
-					if (!obj instanceof Cluster) { continue; }
-
-					if (!obj.dirty && !obj.isMaking) { obj.setDirty(true); }
-				}
-			}
+			//if (this.modeler && this.modeler.objectsArray) 
+			//{
+			//	for (var i=0, len=this.modeler.objectsArray.length;i<len;i++) 
+			//	{
+			//		var obj = this.modeler.objectsArray[i];
+			//		if (!obj instanceof Cluster) { continue; }
+			//
+			//		if (!obj.dirty && !obj.isMaking) { obj.setDirty(true); }
+			//	}
+			//}
 		}
 	}
 	
@@ -1104,7 +1115,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	var currentShader = undefined;
 	
 	// 1) The depth render.**********************************************************************************************************************
-	var ssao_idx = 0; // 0= depth. 1= color.***
+	var renderType = 0; // 0= depth. 1= color.***
 	this.renderType = 0;
 	var renderTexture = false;
 	
@@ -1127,9 +1138,9 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	gl.clearStencil(0); // provisionally here.***
 	
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
-	this.renderer.renderGeometry(gl, ssao_idx, this.visibleObjControlerNodes);
+	this.renderer.renderGeometry(gl, renderType, this.visibleObjControlerNodes);
 	// test mago geometries.***********************************************************************************************************
-	this.renderer.renderMagoGeometries(ssao_idx); //TEST
+	this.renderer.renderMagoGeometries(renderType); //TEST
 	this.depthFboNeo.unbind();
 	this.swapRenderingFase();
 
@@ -1144,16 +1155,20 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	//gl.clearDepth(1);
 	//gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	
-	ssao_idx = 1;
+	renderType = 1;
 	this.renderType = 1;
-	this.renderer.renderGeometry(gl, ssao_idx, this.visibleObjControlerNodes);
+	this.renderer.renderGeometry(gl, renderType, this.visibleObjControlerNodes);
+	
+	// 3) Stencil buffer render.*******************************************************************************************************
+	//renderType = 3;
+	//this.renderer.renderGeometryStencilShadowMeshes(gl, renderType, this.visibleObjControlerNodes);
 	
 	if (this.weatherStation)
 	{
 		this.weatherStation.renderLastWindLayer(this);
 		//this.weatherStation.test_renderWindLayer(this);
 		//this.weatherStation.test_renderTemperatureLayer(this);
-		//this.weatherStation.test_renderCuttingPlanes(this, ssao_idx);
+		//this.weatherStation.test_renderCuttingPlanes(this, renderType);
 		/*
 		var renderType = 1;
 		var currentShader;
@@ -1203,10 +1218,18 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	this.swapRenderingFase();
 	
 	// 3) test mago geometries.***********************************************************************************************************
-	this.renderer.renderMagoGeometries(ssao_idx); //TEST
+	this.renderer.renderMagoGeometries(renderType); //TEST
 	
 	// 4) Render filter.******************************************************************************************************************
 	//this.renderFilter();
+};
+
+/**
+ * 
+ */
+MagoManager.prototype.initCounters = function() 
+{
+	this.processCounterManager.reset();
 };
 
 /**
@@ -1220,15 +1243,18 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 	// Update the current frame's frustums count.
 	this.numFrustums = numFrustums;
 	this.isLastFrustum = isLastFrustum;
+	
 
 	var gl = this.getGl();
 	this.upDateSceneStateMatrices(this.sceneState);
-
+	
 		
 	if (this.isFarestFrustum())
 	{
 		this.dateSC = new Date();
 		this.currTime = this.dateSC.getTime();
+		
+		this.initCounters();
 		
 		// Before of multiFrustumCullingSmartTile, do animation check, bcos during animation some object can change smartTile-owner.***
 		if (this.animationManager !== undefined)
@@ -1788,6 +1814,11 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
 	// Clear startPositions of mouseAction.***
 	var mouseAction = this.sceneState.mouseAction;
 	mouseAction.clearStartPositionsAux(); // provisionally only clear the aux.***
+	
+	if (this.sceneState.sunSystem && this.sceneState.applySunShadows && this.currentFrustumIdx === 0)
+	{
+		this.sceneState.sunSystem.updateSun(this);
+	}
 };
 
 /**
@@ -1958,9 +1989,9 @@ MagoManager.prototype.keyDown = function(key)
 	{
 		// active or deactive shadows.
 		if (this.sceneState.applySunShadows)
-		{ this.sceneState.applySunShadows = false; }
+		{ this.sceneState.setApplySunShadows(false); }
 		else
-		{ this.sceneState.applySunShadows = true; }
+		{ this.sceneState.setApplySunShadows(true); }
 	}
 	else if (key === 84) // 84 = 't'.***
 	{
@@ -4028,6 +4059,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
 	// OrthogonalShader locations.***
 	shader.modelViewProjectionMatrixRelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
+	shader.modelViewMatrixRelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
 	shader.encodedCameraPositionMCHigh_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
 	shader.encodedCameraPositionMCLow_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
 	shader.fov_loc = gl.getUniformLocation(shader.program, "fov");
@@ -4054,6 +4086,12 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.current_loc = 1;
 	shader.next_loc = 2;
 	shader.order_loc = 3;
+	
+	// 14) ScreenQuad shader.***********************************************************************************
+	var shaderName = "screenQuad";
+	var ssao_vs_source = ShaderSource.ScreenQuadVS;
+	var ssao_fs_source = ShaderSource.ScreenQuadFS;
+	var shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
 };
 
 /**

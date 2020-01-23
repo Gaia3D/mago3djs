@@ -6,7 +6,7 @@
  * @class VboBuffer
  * @constructor 
  */
-var VboBuffer = function(dataTarget) 
+var VboBuffer = function(dataTarget, options) 
 {
 	if (!(this instanceof VboBuffer)) 
 	{
@@ -58,6 +58,13 @@ var VboBuffer = function(dataTarget)
 	this.dataOffSet = 0;
 	this.normalized = false;
 	this.id;
+	this.bKeepDataArray = false;
+	
+	if (options)
+	{
+		if (options.bKeepDataArray !== undefined)
+		{ this.bKeepDataArray = options.bKeepDataArray; }
+	}
 	
 	this.attribLocation;
 };
@@ -143,7 +150,6 @@ VboBuffer.prototype.bindData = function(shader, vertexAttribIndex, vboMemManager
 	return false;
 };
 
-
 /**
  * 어떤 일을 하고 있습니까?
  */
@@ -162,7 +168,8 @@ VboBuffer.prototype.isReady = function(gl, vboMemManager)
 		{ return false; }
 		gl.bindBuffer(this.dataTarget, this.key);
 		gl.bufferData(this.dataTarget, this.dataArray, gl.STATIC_DRAW);
-		this.dataArray = undefined;
+		if (!this.bKeepDataArray)
+		{ this.dataArray = undefined; }
 		return true;
 	}
 	return true;

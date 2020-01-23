@@ -1094,7 +1094,7 @@ Octree.prototype.setSizesSubBoxes = function()
 	// |         |         |     |         |         |       |-----------> X
 	// |---------|---------|     |---------|---------|
 
-	if (this.subOctrees_array.length > 0) 
+	if (this.subOctrees_array.length > 7) 
 	{
 		var half_x = this.centerPos.x;
 		var half_y = this.centerPos.y;
@@ -1117,8 +1117,9 @@ Octree.prototype.setSizesSubBoxes = function()
 		this.subOctrees_array[5].setBoxSize(half_x, max_x, min_y, half_y, half_z, max_z);
 		this.subOctrees_array[6].setBoxSize(half_x, max_x, half_y, max_y, half_z, max_z);
 		this.subOctrees_array[7].setBoxSize(min_x, half_x, half_y, max_y, half_z, max_z);
-
-		for (var i=0; i<8; i++) 
+		
+		var subOctreesCount = this.subOctrees_array.length; // must be 8.
+		for (var i=0; i<subOctreesCount; i++) 
 		{
 			this.subOctrees_array[i].setSizesSubBoxes();
 		}

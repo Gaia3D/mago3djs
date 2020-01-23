@@ -617,6 +617,24 @@ GeoLocationData.prototype.getTransformedRelativePosition = function(absolutePosi
 };
 
 /**
+ * Change the absolute direction(vector) feature to relative direction(vector) feature
+ * @param absoluteVector
+ * @param {Point3D} resultRelativeVector
+ */
+GeoLocationData.prototype.getRotatedRelativeVector = function(absoluteVector, resultRelativeVector) 
+{
+	if (resultRelativeVector === undefined)
+	{ resultRelativeVector = new Point3D(); }
+
+	var pointAux = new Point3D(absoluteVector[0], absoluteVector[1], absoluteVector[2]);
+	
+	var rotMatInv = this.getRotMatrixInv();
+	resultRelativeVector = rotMatInv.transformPoint3D(pointAux, resultRelativeVector);
+	
+	return resultRelativeVector;
+};
+
+/**
  * This function transforms an absolute camera (world coord) into a relative camera (local coord) for this geoLocation.
  */
 GeoLocationData.prototype.getTransformedRelativePositionsArray = function(absolutePositionsArray, resultRelativePositionsArray) 

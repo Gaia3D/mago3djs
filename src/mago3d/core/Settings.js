@@ -17,6 +17,7 @@ var Settings = function()
 	 */
 	this._renderingSettings = new RenderingSettings();
 	
+	this.keepVboPositionDataArrayBuffers = true;
 };
 
 /**

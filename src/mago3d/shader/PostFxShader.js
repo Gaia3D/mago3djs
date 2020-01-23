@@ -378,6 +378,15 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 		uniformDataPair.matrix4fv = sceneState.modelViewMatrix._floatArrays;
 	}
 	
+	// 3.1. modelViewMatrixInv.
+	uniformLocation = gl.getUniformLocation(shader.program, "modelViewMatrixInv");
+	if (uniformLocation !== null && uniformLocation !== undefined)
+	{
+		uniformDataPair = shader.newUniformDataPair("Matrix4fv", "modelViewMatrixInv");
+		uniformDataPair.uniformLocation = uniformLocation;
+		uniformDataPair.matrix4fv = sceneState.modelViewMatrixInv._floatArrays;
+	}
+	
 	// 4. projectionMatrix.
 	uniformLocation = gl.getUniformLocation(shader.program, "projectionMatrix");
 	if (uniformLocation !== null && uniformLocation !== undefined)
@@ -614,6 +623,9 @@ PostFxShader.prototype.createUniformLocals = function(gl, shader, sceneState)
 	
 	shader.shadowMapWidth_loc = gl.getUniformLocation(shader.program, "shadowMapWidth");
 	shader.shadowMapHeight_loc = gl.getUniformLocation(shader.program, "shadowMapHeight");
+	
+	shader.sunDirWC_loc = gl.getUniformLocation(shader.program, "sunDirWC");
+	shader.sunIdx_loc = gl.getUniformLocation(shader.program, "sunIdx");
 	
 	// Attributtes.*
 	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
