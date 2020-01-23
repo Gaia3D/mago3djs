@@ -1355,8 +1355,11 @@ Node.prototype.changeLocationAndRotation = function(latitude, longitude, elevati
 	
 		// Change the geoCoords of the buildingSeed.
 		var buildingSeed = aNode.data.buildingSeed;
-		buildingSeed.geographicCoordOfBBox.longitude = longitude;
-		buildingSeed.geographicCoordOfBBox.latitude = latitude;
+		if (buildingSeed)
+		{
+			buildingSeed.geographicCoordOfBBox.longitude = longitude;
+			buildingSeed.geographicCoordOfBBox.latitude = latitude;
+		}
 
 		
 		// now, must change the keyMatrix of the references of the octrees of all buildings of this node.
