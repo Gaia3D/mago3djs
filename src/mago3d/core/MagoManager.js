@@ -2398,8 +2398,11 @@ MagoManager.prototype.mouseActionLeftDown = function(mouseX, mouseY)
 	this.mouse_y = mouseY;
 	this.mouseLeftDown = true;
 	//this.isCameraMoving = true;
+	if (!this.isCesiumGlobe()) 
+	{
+		MagoWorld.updateMouseStartClick(mouseX, mouseY, this);
+	}
 	
-	MagoWorld.updateMouseStartClick(mouseX, mouseY, this);
 	/*
 	// Test.**********************************************************************************************************************
 	var selGeneralObjects = this.selectionManager.getSelectionCandidatesFamily("general");
