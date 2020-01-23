@@ -26,6 +26,139 @@ var Mesh = function()
 	this.material;// class Material.
 };
 
+/** 
+ * Makes & returns a mesh from a vboCacheKey.
+ */
+Mesh.fromVbo = function(vboCacheKey)
+{
+	if (vboCacheKey === undefined)
+	{ return; }
+	
+	var resultMesh = new Mesh();
+	resultMesh.vertexList = new VertexList();
+	var vertexList = resultMesh.vertexList;
+	resultMesh.hedgesList = new HalfEdgesList();
+	var hedgesList = resultMesh.hedgesList;
+	
+	var surface = resultMesh.newSurface();
+	
+	// Note: each triangle is a face.
+	
+	var pos0, pos1, pos2;
+	var vertex0, vertex1, vertex2;
+	var hedge0, hedge1, hedge2;
+	var face;
+	
+	// 1rst, check if the vbo is "array" type or "element" type.
+	if (vboCacheKey.vboBufferIdx !== undefined)
+	{
+		// the vbo is elementType.
+		
+	}
+	else
+	{
+		// the vbo is arrayType.
+		var posDataArray = vboCacheKey.vboBufferPos.dataArray;
+		
+		if (posDataArray === undefined)
+		{ return; }
+		
+		var pointsCount = posDataArray.length/3;
+		
+		if (pointsCount === 0)
+		{ return; }
+		
+		var trianglesCount = pointsCount/3;
+		
+		var vertexOctree = new VertexOctree(); // indexing octree.
+		vertexOctree.vertexArray = new Array(pointsCount);
+		var indexingVertexArray = vertexOctree.vertexArray;
+		
+		// 1rst, make the vertexList and then make vertexIndexOctree.
+		for (var i=0; i<trianglesCount; i++)
+		{
+			pos0 = new Point3D(posDataArray[i*9], posDataArray[i*9+1], posDataArray[i*9+2]);
+			pos1 = new Point3D(posDataArray[i*9+3], posDataArray[i*9+4], posDataArray[i*9+5]);
+			pos2 = new Point3D(posDataArray[i*9+6], posDataArray[i*9+7], posDataArray[i*9+8]);
+			
+			vertex0 = vertexList.newVertex(pos0);
+			vertex1 = vertexList.newVertex(pos1);
+			vertex2 = vertexList.newVertex(pos2);
+			
+			face = surface.newFace();
+			face.addVerticesArray([vertex0, vertex1, vertex2]);
+			hedgesList.addHalfEdgesArray(face.createHalfEdges(undefined));
+			
+			vertex0.facesOwnerArray = [face]; // array exists only in mesh making process.
+			vertex1.facesOwnerArray = [face]; // array exists only in mesh making process.
+			vertex2.facesOwnerArray = [face]; // array exists only in mesh making process.
+			
+			// parallely, make the indexingVertexArray of vertexOctree.
+			indexingVertexArray[i*3] = vertex0;
+			indexingVertexArray[i*3+1] = vertex1;
+			indexingVertexArray[i*3+2] = vertex2;
+		}
+		
+		// make a vertexOctree to indexing.
+		var bbox = vertexList.getBoundingBox(undefined);
+		var maxLength = bbox.getMaxLength();
+		
+		// make a cubic mother octree (cubic octree = all edges has the same length).
+		vertexOctree.setBoxSize(bbox.minX, bbox.minX+maxLength, bbox.minY, bbox.minY+maxLength, bbox.minZ, bbox.minZ+maxLength);
+		var targetMinSize = maxLength/30;
+		if (targetMinSize < 0.1)
+		{ targetMinSize = 0.1; }
+		vertexOctree.makeTreeByMinSize(targetMinSize);
+		
+		var lowestOctrees = vertexOctree.extractOctreesWithData();
+		
+		// now, make triangles merging merge-able vertices.
+		var errorDist = 1e-4;
+		var vertexCount = vertexList.getVertexCount();
+		for (var i=0; i<vertexCount; i++)
+		{
+			var currVertex = vertexList.getVertex(i);
+			if (currVertex.getVertexType() === -1)
+			{ continue; }
+			
+			// find all coincident vertices to "currVertex".
+			var indexingOctree = currVertex.vertexIndexingOctree;
+			var indexingOctreeVertexArray = indexingOctree.vertexArray;
+			
+			var resultCoincidentVertexArray = Vertex.getCoincidentVertexArray(currVertex, indexingOctreeVertexArray, undefined, errorDist);
+			var coincidentVertexCount = resultCoincidentVertexArray.length;
+			for (var j=0; j<coincidentVertexCount; j++)
+			{
+				var coincidentVertex = resultCoincidentVertexArray[j];
+				coincidentVertex.setVertexType(-1); // mark the vertex, -1 = meaning that must be deleted.
+				var facesOwnerArray = coincidentVertex.facesOwnerArray;
+				var facesCount = facesOwnerArray.length;
+				for (var k=0; k<facesCount; k++)
+				{
+					var face = facesOwnerArray[k];
+					
+					// for the face, change the "coincidentVertex" to "currVertex", & delete "coincidentVertex".
+					face.setVertexIdxInList();
+					var coincidentVertexIdx = coincidentVertex.getIdxInList();
+					face.changeVertex(coincidentVertexIdx, currVertex);
+					
+					// Add face into the currVertex's facesOwnerArray.
+					currVertex.facesOwnerArray.push(face);
+				}
+			}
+			
+			// now, set twins between faces of the currVertex.
+			Face.setTwinsFacesOfArray(currVertex.facesOwnerArray);
+		}
+		
+		// now, delete all coincident vertex.
+		vertexList.deleteVertexByVertexType(-1);
+		
+	}
+	
+	return resultMesh;
+};
+
 /**
  * Clear the data of this feature
  * @param {VBOMemManager} vboMemManager 
@@ -702,6 +835,12 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive, i
 	{
 		// Selection render.***
 	}
+	else if (renderType === 3)
+	{
+		// Shadow mesh render.***
+		shader.disableVertexAttribArray(shader.texCoord2_loc);
+		shader.disableVertexAttribArray(shader.color4_loc);
+	}
 	
 	var vboKeysCount = this.vboKeysContainer.vboCacheKeysArray.length;
 	for (var i=0; i<vboKeysCount; i++)
@@ -711,9 +850,22 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive, i
 		{
 			return false;
 		}
+		
 		// Positions.
 		if (!vboKey.bindDataPosition(shader, vboMemManager))
 		{ return false; }
+	
+		// test Normals.*** TEST*** TEST*** TEST*** TEST*** TEST*** TEST***
+		if (vboKey.vboBufferNor)
+		{
+			if (!vboKey.bindDataNormal(shader, vboMemManager))
+			{ return false; }
+		}
+		else 
+		{
+			shader.disableVertexAttribArray(shader.normal3_loc);
+		}
+		// End  TEST*** TEST*** TEST*** TEST*** TEST*** TEST*** TEST*** TEST***
 		
 		
 		if (renderType === 1)

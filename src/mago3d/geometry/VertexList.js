@@ -261,6 +261,28 @@ VertexList.getProjectedPoints2DArray = function(vertexArray, normal, resultPoint
 /**
  * delete all vertex.
  */
+VertexList.prototype.deleteVertexByVertexType = function(vertexTypeToDelete) 
+{
+	var vertexToSave = [];
+	var vertexCount = this.getVertexCount();
+	for (var i=0; i<vertexCount; i++)
+	{
+		var currVertex = this.getVertex(i);
+		if (currVertex.getVertexType() !== vertexTypeToDelete)
+		{ 
+			vertexToSave.push(currVertex); 
+		}
+		else
+		{
+			currVertex.deleteObjects();
+		}
+	}
+	this.vertexArray = vertexToSave;
+};
+
+/**
+ * delete all vertex.
+ */
 VertexList.prototype.deleteObjects = function() 
 {
 	for (var i = 0, vertexCount = this.vertexArray.length; i < vertexCount; i++) 
@@ -369,9 +391,9 @@ VertexList.prototype.setNormal = function(nx, ny, nz)
  * add vertex and return.
  * @returns {Vertex}
  */
-VertexList.prototype.newVertex = function() 
+VertexList.prototype.newVertex = function(point3d) 
 {
-	var vertex = new Vertex();
+	var vertex = new Vertex(point3d);
 	this.vertexArray.push(vertex);
 	return vertex;
 };

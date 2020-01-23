@@ -824,6 +824,188 @@ Renderer.prototype.renderExcavationObjects = function(gl, shader, renderType, vi
 };
 
 /**
+ * This function renders the stencil shadows meshes of the scene.
+ * @param {WebGLRenderingContext} gl WebGL Rendering Context.
+ * @param {Number} renderType If renderType = 0 (depth render), renderType = 1 (color render), renderType = 2 (colorCoding render).
+ * @param {VisibleObjectsController} visibleObjControlerNodes This object contains visible objects for the camera frustum.
+ */
+Renderer.prototype.renderGeometryStencilShadowMeshes = function(gl, renderType, visibleObjControlerNodes) 
+{
+	gl.frontFace(gl.CCW);	
+	gl.enable(gl.DEPTH_TEST);
+	gl.depthFunc(gl.LEQUAL);
+	gl.enable(gl.CULL_FACE);
+	
+	//return;
+	
+	var currentShader;
+	var shaderProgram;
+	var neoBuilding;
+	var node;
+	var rootNode;
+	var geoLocDataManager;
+	var magoManager = this.magoManager;
+	var renderingSettings = magoManager._settings.getRenderingSettings();
+
+	var renderTexture = false;
+	//gl.clearStencil(0);
+	
+	//if (renderType === 3) 
+	{
+		// SHADOW SETTINGS.**********************************************************************************
+		gl.colorMask(false, false, false, false);
+		gl.depthMask(false);
+		gl.enable(gl.CULL_FACE);
+		gl.enable(gl.STENCIL_TEST);
+		//gl.enable(gl.POLYGON_OFFSET_FILL);
+		//gl.polygonOffset(1.0, 2.0); // Original.***
+		
+		//gl.clear(gl.STENCIL_BUFFER_BIT);
+		if (magoManager.isFarestFrustum())
+		{ gl.clearStencil(0); }
+	
+		var textureAux1x1 = magoManager.texturesStore.getTextureAux1x1();
+		var noiseTexture = magoManager.texturesStore.getNoiseTexture4x4();
+		
+
+		var bApplySsao = false;
+		var bApplyShadow = false;
+		var bApplySpecularLighting = false;
+			
+		// ssao render.************************************************************************************************************
+		var visibleObjectControllerHasRenderables = visibleObjControlerNodes.hasRenderables();
+		//if (visibleObjectControllerHasRenderables || magoManager.modeler !== undefined)
+		//if (visibleObjControlerNodes.currentVisibles3.length > 0)
+		//if (magoManager.currentFrustumIdx === 1)
+		{
+			
+			gl.enable(gl.BLEND);
+			currentShader = magoManager.postFxShadersManager.getShader("modelRefSsao"); 
+			currentShader.useProgram();
+			gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
+			gl.uniform1i(currentShader.bApplyShadow_loc, bApplyShadow);
+			gl.uniform1i(currentShader.bApplySpecularLighting_loc, bApplySpecularLighting);
+
+			
+			// check if exist clippingPlanes.
+			if (magoManager.modeler.clippingBox !== undefined)
+			{
+				var planesVec4Array = magoManager.modeler.clippingBox.getPlanesRelToEyevec4Array(magoManager);
+				var planesVec4FloatArray = new Float32Array(planesVec4Array);
+				
+				gl.uniform1i(currentShader.bApplyClippingPlanes_loc, true);
+				gl.uniform1i(currentShader.clippingPlanesCount_loc, 6);
+				gl.uniform4fv(currentShader.clippingPlanes_loc, planesVec4FloatArray);
+			}
+			else 
+			{
+				gl.uniform1i(currentShader.bApplyClippingPlanes_loc, false);
+			}
+			
+			gl.disableVertexAttribArray(currentShader.texCoord2_loc);
+			gl.enableVertexAttribArray(currentShader.position3_loc);
+			gl.enableVertexAttribArray(currentShader.normal3_loc);
+			gl.disableVertexAttribArray(currentShader.color4_loc); 
+			
+			currentShader.bindUniformGenerals();
+			gl.uniform1f(currentShader.externalAlpha_loc, 1.0);
+			gl.uniform1i(currentShader.textureFlipYAxis_loc, magoManager.sceneState.textureFlipYAxis);
+			gl.uniform1i(currentShader.refMatrixType_loc, 0); // init referencesMatrix.
+			
+			// Test sphericalKernel for ssao.************************
+			//gl.uniform3fv(currentShader.kernel32_loc, magoManager.sceneState.ssaoSphereKernel32);
+			// End test.---------------------------------------------
+
+			gl.activeTexture(gl.TEXTURE0);
+			gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);  // original.***
+			gl.activeTexture(gl.TEXTURE1);
+			gl.bindTexture(gl.TEXTURE_2D, noiseTexture);
+			gl.activeTexture(gl.TEXTURE2); 
+			gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
+			currentShader.last_tex_id = textureAux1x1;
+			
+
+			var refTMatrixIdxKey = 0;
+			var minSizeToRender = 0.0;
+			var refMatrixIdxKey =0; // provisionally set magoManager var here.***
+			
+			// temp test excavation, thickLines, etc.***.
+			//magoManager.modeler.render(magoManager, currentShader, renderType);
+			// excavation objects.
+			
+			//this.renderExcavationObjects(gl, currentShader, renderType, visibleObjControlerNodes);
+			//this.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
+			gl.stencilMask(0xff);
+			
+			
+			// First pas.****************************************************************************************************
+			gl.cullFace(gl.FRONT);
+			gl.stencilFunc(gl.ALWAYS, 0x0, 0xff);
+			gl.stencilOp(gl.KEEP, gl.INCR, gl.KEEP);
+
+			////this.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
+			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
+
+			
+			// Second pass.****************************************************************************************************
+			gl.cullFace(gl.BACK);
+			gl.stencilFunc(gl.ALWAYS, 0x0, 0xff);
+			gl.stencilOp(gl.KEEP, gl.DECR, gl.KEEP);
+			
+			////this.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
+			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
+
+			
+			// native objects.
+			//this.renderNativeObjects(gl, currentShader, renderType, visibleObjControlerNodes);
+			
+			currentShader.disableVertexAttribArrayAll();
+			gl.useProgram(null);
+			
+			// 3rd pass.********************************************************************************************************
+			// Once finished rendering shadow meshes, then render the screenQuad.
+			
+			currentShader = magoManager.postFxShadersManager.getShader("screenQuad"); 
+			currentShader.useProgram();
+			
+			gl.disable(gl.POLYGON_OFFSET_FILL);
+			//gl.disable(gl.CULL_FACE);
+			gl.colorMask(true, true, true, true);
+			gl.depthMask(false);
+			gl.stencilMask(0x00);
+
+			gl.stencilFunc(gl.EQUAL, 1, 0xff);
+			//gl.stencilFunc(gl.LEQUAL, 1, 0xff);
+			//gl.stencilFunc(gl.LESS, 1, 0xff);
+			//gl.stencilOp(gl.REPLACE, gl.REPLACE, gl.REPLACE); // stencilOp(fail, zfail, zpass)
+			gl.stencilOp(gl.REPLACE, gl.KEEP, gl.REPLACE); // stencilOp(fail, zfail, zpass)
+
+			gl.disable(gl.DEPTH_TEST);
+			gl.enable(gl.BLEND);
+			gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); // Original.***
+			//gl.cullFace(gl.FRONT);
+	
+			if (this.screenQuad === undefined)
+			{
+				this.screenQuad = new ScreenQuad(magoManager.vboMemoryManager);
+			}
+			
+			this.screenQuad.render(magoManager, currentShader);
+
+			gl.stencilMask(0xff);
+		}
+	}
+	
+	// Restore settings.***
+	gl.colorMask(true, true, true, true);
+	gl.depthMask(true);
+	gl.disable(gl.STENCIL_TEST);
+	gl.disable(gl.BLEND);
+	gl.depthRange(0.0, 1.0);	
+};
+
+
+/**
  * This function renders provisional ParametricMesh objects that has no self render function.
  * @param {WebGLRenderingContext} gl WebGL Rendering Context.
  * @param {Number} renderType If renderType = 0 (depth render), renderType = 1 (color render), renderType = 2 (colorCoding render).
@@ -1069,6 +1251,10 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			
 			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
+			
+			// test.***
+			//this.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, 3, minSizeToRender, refTMatrixIdxKey);
+			//this.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, magoManager, currentShader, renderTexture, 3, minSizeToRender, refTMatrixIdxKey);
 			
 			// native objects.
 			this.renderNativeObjects(gl, currentShader, renderType, visibleObjControlerNodes);

@@ -113,6 +113,7 @@ var Lego = function()
 	this.isAdult = false;
 	
 	this.dataArrayBuffer;
+	
 };
 
 /**
@@ -314,12 +315,16 @@ Lego.prototype.parseLegoData = function(buffer, magoManager, bytesReaded)
 	{ return bytesReaded; }
 	
 	var vboMemManager = magoManager.vboMemoryManager;
+	var settings = magoManager._settings;
+	var keepVboPositionDataArrayBuffers = settings.keepVboPositionDataArrayBuffers;
 	
 	if (bytesReaded === undefined)
 	{ bytesReaded = 0; }
 
 	if (this.vbo_vicks_container === undefined)
-	{ this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer(); }
+	{ 
+		this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer(); 
+	}
 
 	//var stream = new DataStream(buffer, 0, DataStream.LITTLE_ENDIAN);
 	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
@@ -327,6 +332,8 @@ Lego.prototype.parseLegoData = function(buffer, magoManager, bytesReaded)
 	this.bbox = new BoundingBox();
 	var bbox = this.bbox;
 	var vboCacheKey = this.vbo_vicks_container.newVBOVertexIdxCacheKey();
+	
+	
 
 	// BoundingBox.
 	bytesReaded = bbox.readData(buffer, bytesReaded);
@@ -339,6 +346,11 @@ Lego.prototype.parseLegoData = function(buffer, magoManager, bytesReaded)
 	var posDataArray = new Float32Array(buffer.slice(startBuff, endBuff));
 	vboCacheKey.setDataArrayPos(posDataArray, vboMemManager);
 	bytesReaded = bytesReaded + byteSize * numPositions * 3; // updating data.
+	
+	if (keepVboPositionDataArrayBuffers)
+	{
+		vboCacheKey.vboBufferPos.bKeepDataArray = true;
+	}
 		
 	//var numPositions = stream.readUint32();
 	//var posDataArray = stream.readFloat32Array(numPositions * 3);
@@ -413,6 +425,205 @@ Lego.prototype.parseLegoData = function(buffer, magoManager, bytesReaded)
 };
 
 /**
+ */
+Lego.prototype.makeStencilShadowMesh = function(lightDirectionLC)
+{
+	if (this.vbo_vicks_container === undefined)
+	{ return; }
+	
+	this.shadowMeshesArray = [];
+	
+	var vboKeysCount = this.vbo_vicks_container.getVbosCount();
+	for (var i=0; i<vboKeysCount; i++)
+	{
+		var vboCacheKey = this.vbo_vicks_container.getVboKey(i);
+		var shadowMaesh = Mesh.fromVbo(vboCacheKey);
+		if (shadowMaesh !== undefined)
+		{ this.shadowMeshesArray.push(shadowMaesh); }
+	}
+	
+	// Now, detect faces on light & faces on shadow.
+	var facesInLightArray = [];
+	var facesInShadowArray = [];
+	var meshesCount = this.shadowMeshesArray.length;
+
+	for (var i=0; i<meshesCount; i++)
+	{
+		var mesh = this.shadowMeshesArray[i];
+		var surfacesCount = mesh.getSurfacesCount();
+			
+		for (var j=0; j<surfacesCount; j++)
+		{
+			var surface = mesh.getSurface(j);
+			var facesCount = surface.getFacesCount();
+			
+			for (var k=0; k<facesCount; k++)
+			{
+				var face = surface.getFace(k);
+				var normal = face.calculatePlaneNormal();
+				
+				var dot = lightDirectionLC.scalarProduct(normal);
+				if (dot < 0.0)
+				{
+					// is in light.
+					face.isInLight = true;
+					facesInLightArray.push(face);
+				}
+				else
+				{
+					// is in shadow.
+					face.isInLight = false;
+					facesInShadowArray.push(face);
+				}
+			}
+		}
+		
+		// Now, make cap + side + downCap mesh.
+		// Extract the hedges that the one face is in light & the other is in shadow.
+		// We can loop the facesInLightArray or facesInShadowArray, so loop the shorttest array.
+		var facesInLightCount = facesInLightArray.length;
+		var facesInShadowCount = facesInShadowArray.length;
+		var facesToLoop = (facesInLightCount < facesInShadowCount)?facesInLightArray : facesInShadowArray;
+		var facesCount = facesToLoop.length;
+		var targetHedgesArray = [];
+		var face;
+		for (var j=0; j<facesCount; j++)
+		{
+			face = facesToLoop[j];
+			var hedgesArray = face.getHalfEdgesLoop(undefined);
+			var hedgesCount = hedgesArray.length;
+			for (var k=0; k<hedgesCount; k++)
+			{
+				var hedge = hedgesArray[k];
+				var twin = hedge.twin;
+				if (twin === undefined)
+				{
+					targetHedgesArray.push(hedge);
+					continue;
+				}
+				
+				if (twin.face.isInLight !== face.isInLight)
+				{
+					targetHedgesArray.push(hedge);
+				}
+			}
+		}
+		
+		// Now, for each targetHedge (named "hedge"), make a face & insert it into hedge-twin.
+		//
+		//             BEFORE                                                             AFTER
+		//
+		//    <-----------(v0)<-----------                  //    <----------(v0)<--------------------(newV1)<------------
+		//                 ^|                               //                 ^|      newHedge3         ^|
+		//                 ||                               //                 ||                        ||
+		//          "hedge"||twin             =========>    //          "hedge"||newHedge0      newHedge2||twin 
+		//      [face]     ||     [twinFace]                //     [face]      ||       [newFace]        ||      [twinFace]
+		//                 ||                               //                 ||                        ||
+		//                 |V                               //                 |V    newHedge1           |V
+		//   ------------>(v1)----------->                  //   ----------->(v1)-------------------->(newV0)------------->
+		
+		var dist = 100.0;
+		var vertexList = mesh.vertexList;
+		var newSurface = mesh.newSurface();
+		var hedgesList = mesh.hedgesList;
+		var targetHedgesCount = targetHedgesArray.length;
+		for (var j=0; j<targetHedgesCount; j++)
+		{
+			var hedge = targetHedgesArray[j];
+			var twin = hedge.twin;
+			var next = hedge.next;
+			
+			var vertex0 = next.startVertex;
+			var vertex1 = hedge.startVertex;
+			var point0 = vertex0.getPosition();
+			var point1 = vertex1.getPosition();
+
+			// Must to create 2 new vertex, 4 new hedges and 1 new face.
+			var newFace = newSurface.newFace();
+			var newVertex0 = vertexList.newVertex(new Point3D(point1.x, point1.y, point1.z));
+			var newVertex1 = vertexList.newVertex(new Point3D(point0.x, point0.y, point0.z));
+			var newHedge0 = hedgesList.newHalfEdge();
+			var newHedge1 = hedgesList.newHalfEdge();
+			var newHedge2 = hedgesList.newHalfEdge();
+			var newHedge3 = hedgesList.newHalfEdge();
+			
+			// newHedge0. The "newHedge0" is the twin of the "hedge".
+			newHedge0.setStartVertex(vertex0);
+			newHedge0.setNext(newHedge1);
+			newHedge0.setFace(newFace);
+			
+			// newHedge1.
+			newHedge1.setStartVertex(vertex1);
+			newHedge1.setNext(newHedge2);
+			newHedge1.setFace(newFace);
+			
+			// newHedge2.
+			newHedge2.setStartVertex(newVertex0);
+			newHedge2.setNext(newHedge3);
+			newHedge2.setFace(newFace);
+			
+			// newHedge3.
+			newHedge3.setStartVertex(newVertex1);
+			newHedge3.setNext(newHedge0);
+			newHedge3.setFace(newFace);
+			
+			newFace.addVerticesArray([vertex0, vertex1, newVertex0, newVertex1]);
+			newHedge0.setTwin(hedge);
+			
+			if (twin !== undefined)
+			{
+				// Now, make the twins.
+				newHedge2.setTwin(twin);
+			}
+			else
+			{ 
+				// In this case, translate the newVertex0 & newVertex1 10Km in sunLightDirection.
+				var newPoint0 = newVertex0.getPosition();
+				var newPoint1 = newVertex1.getPosition();
+				
+				//lightDirectionLC
+				newPoint0.add(lightDirectionLC.x * dist, lightDirectionLC.y * dist, lightDirectionLC.z * dist);
+				newPoint1.add(lightDirectionLC.x * dist, lightDirectionLC.y * dist, lightDirectionLC.z * dist);
+			}
+
+		}
+		
+		// Now, translate 10Km in sunLightDirection all vertices of faces in shadow.
+		// To do this, mark all vertices of faces_in_shadow.
+		var facesInShadowCount = facesInShadowArray.length;
+		for (var j=0; j<facesInShadowCount; j++)
+		{
+			var face = facesInShadowArray[j];
+			var vertexCount = face.getVerticesCount();
+			for (var k=0; k<vertexCount; k++)
+			{
+				var vertex = face.getVertex(k);
+				vertex.isInLight = false; // provisionally.
+			}
+		}
+		
+		// Translate all shadow_vertices in sunLightDirection.
+		var vertexCount = vertexList.getVertexCount();
+		for (var j=0; j<vertexCount; j++)
+		{
+			var vertex = vertexList.getVertex(j);
+			if (vertex.isInLight !== undefined && vertex.isInLight === false)
+			{
+				var pos = vertex.getPosition();
+				pos.add(lightDirectionLC.x * dist, lightDirectionLC.y * dist, lightDirectionLC.z * dist);
+			}
+		}
+		
+		// Finally calculate the normal of the shadowMesh.
+		var bForceRecalculatePlaneNormal = true;
+		mesh.calculateVerticesNormals(bForceRecalculatePlaneNormal);
+	}
+	
+	
+	
+};
+
+/**
  * F4D Lego 자료를 gl에 렌더
  * 
  * @param {MagoManager} magoManager
@@ -420,7 +631,20 @@ Lego.prototype.parseLegoData = function(buffer, magoManager, bytesReaded)
  * @param {Boolean} renderTexture
  * @param {PostFxShader} shader 
  */
-Lego.prototype.render = function(magoManager, renderType, renderTexture, shader)
+Lego.prototype.renderStencilShadowMeshes = function(magoManager, renderType, renderTexture, shader, owner)
+{
+	
+};
+
+/**
+ * F4D Lego 자료를 gl에 렌더
+ * 
+ * @param {MagoManager} magoManager
+ * @param {Number} renderType
+ * @param {Boolean} renderTexture
+ * @param {PostFxShader} shader 
+ */
+Lego.prototype.render = function(magoManager, renderType, renderTexture, shader, owner)
 {
 	var rendered = false;
 	var gl = magoManager.sceneState.gl;
@@ -434,7 +658,48 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader)
 	// renderType = 0 -> depth render.
 	// renderType = 1 -> normal render.
 	// renderType = 2 -> colorSelection render.
+	// renderType = 3 -> shadowMesh render.
 	//--------------------------------------------
+	if (renderType === 3)
+	{
+		var processCounterManager = magoManager.processCounterManager;
+		
+		if (owner === undefined)
+		{ return; }
+		
+		if (this.shadowMeshesArray !== undefined)
+		{
+			// render the shadowMeshes.
+			// render the shadowMeshes.
+			
+			var glPrimitive;
+			var isSelected = false;
+			var shadowMeshesCount = this.shadowMeshesArray.length;
+			for (var i=0; i<shadowMeshesCount; i++)
+			{
+				var shadowMesh = this.shadowMeshesArray[i];
+				shadowMesh.renderAsChild(magoManager, shader, renderType, glPrimitive, isSelected);
+			}
+		}
+		else if (processCounterManager.shadowMeshesMadeCount === 0)
+		{
+			// make the shadow meshes.
+			// Calculate sunDirLC.
+			var nodeOwner = owner.nodeOwner;
+			var geoLocDataManager = nodeOwner.data.geoLocDataManager;
+			var geoLocData = geoLocDataManager.getCurrentGeoLocationData();
+			var sunSystem = magoManager.sceneState.sunSystem;
+			var sunDirWC = sunSystem.getSunDirWC();
+			var sunDirLC = geoLocData.getRotatedRelativeVector(sunDirWC, sunDirLC);
+			this.makeStencilShadowMesh(sunDirLC);
+			
+			processCounterManager.shadowMeshesMadeCount ++;
+		}
+		
+		
+		
+		return;
+	}
 	
 	var vbo_vicky = this.vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.
 

@@ -33,6 +33,14 @@ var VBOVertexIdxCacheKey = function()
 /**
  * 어떤 일을 하고 있습니까?
  */
+VBOVertexIdxCacheKey.prototype.setKeepDataArray = function(bKeepDataArray) 
+{
+	this.keepDataArrayBuffers = bKeepDataArray;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 VBOVertexIdxCacheKey.prototype.stepOverPosNorIdx = function(arrayBuffer, readWriter, vboMemManager, bytesReaded) 
 {
 	var startBuff, endBuff;

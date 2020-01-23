@@ -263,6 +263,27 @@ Point3D.prototype.isCoincidentToPoint = function(point, errorDist)
  * @param pz 변수
  * @returns dx*dx + dy*dy + dz*dz
  */
+Point3D.prototype.isCoincidentToPointCHEAP = function(point, errorDist) 
+{
+	if (Math.abs(this.x - point.x) > errorDist)
+	{ return false; }
+	
+	if (Math.abs(this.y - point.y) > errorDist)
+	{ return false; }
+	
+	if (Math.abs(this.z - point.z) > errorDist)
+	{ return false; }
+	
+	return true;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param px 변수
+ * @param py 변수
+ * @param pz 변수
+ * @returns dx*dx + dy*dy + dz*dz
+ */
 Point3D.prototype.squareDistTo = function(x, y, z) 
 {
 	var dx = this.x - x;

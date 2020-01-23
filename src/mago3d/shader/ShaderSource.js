@@ -2577,6 +2577,22 @@ void main()\n\
 	vertexPos = (modelViewMatrixRelToEye * pos4).xyz;\n\
 		//vertexPos = objPosHigh + objPosLow;\n\
 }";
+ShaderSource.ScreenQuadFS = "precision lowp float;\n\
+varying vec4 vColor;\n\
+\n\
+void main()\n\
+{\n\
+    gl_FragColor = vColor;\n\
+}";
+ShaderSource.ScreenQuadVS = "precision mediump float;\n\
+\n\
+attribute vec2 position;\n\
+varying vec4 vColor;\n\
+\n\
+void main() {\n\
+	vColor = vec4(0.2, 0.2, 0.2, 0.5);\n\
+    gl_Position = vec4(1.0 - 2.0 * position, 0.0, 1.0);\n\
+}";
 ShaderSource.screen_frag = "precision mediump float;\n\
 \n\
 uniform sampler2D u_screen;\n\

@@ -18,7 +18,7 @@ var SunSystem = function(options)
 	this.date; // month, day, hour, min, sec.
 	this.sunDirWC;
 	this.bAnimation = false;
-
+	this.updated = false;
 	
 	if (options !== undefined)
 	{
@@ -290,6 +290,7 @@ SunSystem.prototype.updateSun = function(magoManager, options)
 	light.maxDistToCam = dist1 + light.bSphere.r; // use only in directional lights.
 	this.updateLight(light);
 		
+	this.updated = true;
 };
 
 /**

@@ -678,6 +678,17 @@ Matrix4.areEqualArrays = function(arrayA, arrayB)
 };
 
 /**
+ *
+ */
+Matrix4.copyArray = function(arrayOrigin, arrayDest) 
+{
+	for (var i=0; i<16; i++)
+	{
+		arrayDest[i] = arrayOrigin[i];
+	}
+};
+
+/**
  * 회전/이동을 위한 단위행렬 여부를 확인한다.
  *
  * @param {Number} error

@@ -14,6 +14,8 @@ var SceneState = function()
 	this.gl;
 
 	// this contains the model matrices and camera position.
+	this.modelMatrix = new Matrix4(); // created as identity matrix.
+	this.viewMatrix = new Matrix4(); // created as identity matrix.
 	this.modelViewProjRelToEyeMatrix = new Matrix4(); // created as identity matrix.
 	this.modelViewRelToEyeMatrix = new Matrix4(); // created as identity matrix.
 	this.modelViewRelToEyeMatrixInv = new Matrix4(); // created as identity matrix.
@@ -23,6 +25,8 @@ var SceneState = function()
 	this.modelViewProjMatrix = new Matrix4(); // created as identity matrix.
 	this.normalMatrix4 = new Matrix4(); // created as identity matrix.
 	this.identityMatrix4 = new Matrix4(); // created as identity matrix.
+	this.modelViewMatrixLast = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; // Number array.
+	this.projectionMatrixLast = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; // Number array.
 
 	this.encodedCamPosHigh = new Float32Array([0.0, 0.0, 0.0]);
 	this.encodedCamPosLow = new Float32Array([0.0, 0.0, 0.0]);

@@ -254,6 +254,8 @@ var MagoManager = function()
 	this.modeler = new Modeler(this);
 	this.materialsManager = new MaterialsManager(this);
 	this.idManager = new IdentifierManager();
+	
+	this.processCounterManager = new ProcessCounterManager();
 };
 
 /**
@@ -466,12 +468,19 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		var scene = this.scene;
 		var uniformState = scene._context.uniformState;
 		
+		//if(!Matrix4.areEqualArrays(sceneState.modelViewMatrixLast, uniformState.modelView) || !Matrix4.areEqualArrays(sceneState.projectionMatrixLast, uniformState._projection))
+		//{
+		//	// calculate matrices.
+		//	Matrix4.copyArray(uniformState.modelView, sceneState.modelViewMatrixLast);
+		//	Matrix4.copyArray(uniformState.modelView, sceneState.modelViewMatrixLast);
+		//}
+		
 		// ModelViewMatrix.
-		sceneState.modelViewMatrix._floatArrays = Cesium.Matrix4.clone(uniformState.view, sceneState.modelViewMatrix._floatArrays);
+		sceneState.modelViewMatrix._floatArrays = Cesium.Matrix4.clone(uniformState.modelView, sceneState.modelViewMatrix._floatArrays);
 		
 		// ProjectionMatrix.***
 		Cesium.Matrix4.toArray(uniformState._projection, sceneState.projectionMatrix._floatArrays); // original.***
-		
+
 		// Given ModelViewMatrix & ProjectionMatrix, calculate all sceneState matrix.
 		sceneState.modelViewMatrixInv._floatArrays = glMatrix.mat4.invert(sceneState.modelViewMatrixInv._floatArrays, sceneState.modelViewMatrix._floatArrays);
 	
@@ -612,6 +621,8 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 	var transformedPoint_MV = sceneState.modelViewMatrix.transformPoint4D__test(cartesian);
 	var transformedPoint_P = sceneState.projectionMatrix.transformPoint4D__test(cartesian);
 	*/
+
+
 	// update sun if exist.
 	if (!this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
 	{
@@ -931,16 +942,16 @@ MagoManager.prototype.managePickingProcess = function()
 
 			//TODO : MOVEEND EVENT TRIGGER
 			//PSEUDO CODE FOR CLUSTER
-			if (this.modeler && this.modeler.objectsArray) 
-			{
-				for (var i=0, len=this.modeler.objectsArray.length;i<len;i++) 
-				{
-					var obj = this.modeler.objectsArray[i];
-					if (!obj instanceof Cluster) { continue; }
-
-					if (!obj.dirty && !obj.isMaking) { obj.setDirty(true); }
-				}
-			}
+			//if (this.modeler && this.modeler.objectsArray) 
+			//{
+			//	for (var i=0, len=this.modeler.objectsArray.length;i<len;i++) 
+			//	{
+			//		var obj = this.modeler.objectsArray[i];
+			//		if (!obj instanceof Cluster) { continue; }
+			//
+			//		if (!obj.dirty && !obj.isMaking) { obj.setDirty(true); }
+			//	}
+			//}
 		}
 	}
 	
@@ -1090,7 +1101,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	var currentShader = undefined;
 	
 	// 1) The depth render.**********************************************************************************************************************
-	var ssao_idx = 0; // 0= depth. 1= color.***
+	var renderType = 0; // 0= depth. 1= color.***
 	this.renderType = 0;
 	var renderTexture = false;
 	
@@ -1113,9 +1124,9 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	gl.clearStencil(0); // provisionally here.***
 	
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
-	this.renderer.renderGeometry(gl, ssao_idx, this.visibleObjControlerNodes);
+	this.renderer.renderGeometry(gl, renderType, this.visibleObjControlerNodes);
 	// test mago geometries.***********************************************************************************************************
-	this.renderer.renderMagoGeometries(ssao_idx); //TEST
+	this.renderer.renderMagoGeometries(renderType); //TEST
 	this.depthFboNeo.unbind();
 	this.swapRenderingFase();
 
@@ -1130,16 +1141,20 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	//gl.clearDepth(1);
 	//gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	
-	ssao_idx = 1;
+	renderType = 1;
 	this.renderType = 1;
-	this.renderer.renderGeometry(gl, ssao_idx, this.visibleObjControlerNodes);
+	this.renderer.renderGeometry(gl, renderType, this.visibleObjControlerNodes);
+	
+	// 3) Stencil buffer render.*******************************************************************************************************
+	//renderType = 3;
+	//this.renderer.renderGeometryStencilShadowMeshes(gl, renderType, this.visibleObjControlerNodes);
 	
 	if (this.weatherStation)
 	{
 		this.weatherStation.renderLastWindLayer(this);
 		//this.weatherStation.test_renderWindLayer(this);
 		//this.weatherStation.test_renderTemperatureLayer(this);
-		//this.weatherStation.test_renderCuttingPlanes(this, ssao_idx);
+		//this.weatherStation.test_renderCuttingPlanes(this, renderType);
 		/*
 		var renderType = 1;
 		var currentShader;
@@ -1189,10 +1204,18 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	this.swapRenderingFase();
 	
 	// 3) test mago geometries.***********************************************************************************************************
-	this.renderer.renderMagoGeometries(ssao_idx); //TEST
+	this.renderer.renderMagoGeometries(renderType); //TEST
 	
 	// 4) Render filter.******************************************************************************************************************
 	//this.renderFilter();
+};
+
+/**
+ * 
+ */
+MagoManager.prototype.initCounters = function() 
+{
+	this.processCounterManager.reset();
 };
 
 /**
@@ -1206,15 +1229,18 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 	// Update the current frame's frustums count.
 	this.numFrustums = numFrustums;
 	this.isLastFrustum = isLastFrustum;
+	
 
 	var gl = this.getGl();
 	this.upDateSceneStateMatrices(this.sceneState);
-
+	
 		
 	if (this.isFarestFrustum())
 	{
 		this.dateSC = new Date();
 		this.currTime = this.dateSC.getTime();
+		
+		this.initCounters();
 		
 		// Before of multiFrustumCullingSmartTile, do animation check, bcos during animation some object can change smartTile-owner.***
 		if (this.animationManager !== undefined)
@@ -4371,6 +4397,12 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.current_loc = 1;
 	shader.next_loc = 2;
 	shader.order_loc = 3;
+	
+	// 14) ScreenQuad shader.***********************************************************************************
+	var shaderName = "screenQuad";
+	var ssao_vs_source = ShaderSource.ScreenQuadVS;
+	var ssao_fs_source = ShaderSource.ScreenQuadFS;
+	var shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
 };
 
 /**
