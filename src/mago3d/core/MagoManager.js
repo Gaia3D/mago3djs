@@ -2013,7 +2013,7 @@ MagoManager.prototype.keyDown = function(key)
 			//{
 			//	excavation.makeExtrudeObject(this);
 			//}
-			if (geoCoordsList !== undefined)
+			if (geoCoordsList !== undefined && geoCoordsList.geographicCoordsArray.length > 0)
 			{
 				// test make thickLine.
 				var options = {
@@ -2075,8 +2075,9 @@ MagoManager.prototype.keyDown = function(key)
 		if (this.smartTile_f4d_tested === undefined)
 		{
 			this.smartTile_f4d_tested = 1;
-			var projectFolderName = "smartTile_f4d_Korea";
+			//var projectFolderName = "smartTile_f4d_Korea";
 			//var projectFolderName = "SejongParkJinWoo_20191101";
+			var projectFolderName = "sejong_time_series_smartTiles";
 			var fileName = this.readerWriter.geometryDataPath + "/" + projectFolderName + "/" + "smartTile_f4d_indexFile.sii";
 			this.readerWriter.getObjectIndexFileSmartTileF4d(fileName, projectFolderName, this);
 
