@@ -413,6 +413,11 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 		return;
 	}
 	
+	//if (data.attributes && data.attributes.castShadow !== undefined && data.attributes.castShadow === true) 
+	//{
+	//	//
+	//}
+	
 	// Check if there are effects.
 	var executedEffects = magoManager.effectsManager.executeEffects(data.nodeId, magoManager.getCurrentTime());
 	
