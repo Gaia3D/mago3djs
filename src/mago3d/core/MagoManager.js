@@ -1824,17 +1824,18 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
 	}
 	
 	// test zBouncing.************************
-	//var nodeSelected = this.selectionManager.currentNodeSelected;
-	//if (nodeSelected)
-	//{
-	//	var nodeId = nodeSelected.data.nodeId;
-	//	var effect = new Effect({
-	//		effectType      : "zBounceLinear",
-	//		durationSeconds : 0.4
-	//	});
-	//	
-	//	this.effectsManager.addEffect(nodeId, effect);
-	//}
+	/*
+	var nodeSelected = this.selectionManager.currentNodeSelected;
+	if (nodeSelected)
+	{
+		var nodeId = nodeSelected.data.nodeId;
+		var effect = new Effect({
+			effectType      : "zBounceSpring",
+			durationSeconds : 0.4
+		});
+		
+		this.effectsManager.addEffect(nodeId, effect);
+	}*/
 };
 
 /**

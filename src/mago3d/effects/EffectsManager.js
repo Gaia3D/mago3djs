@@ -70,7 +70,7 @@ EffectsManager.prototype.executeEffects = function(id, currTime)
 		}
 		effectExecuted = true;
 		
-		if (effectsObject.effectsArray === 0)
+		if (effectsObject.effectsArray.length === 0)
 		{ this.effectsObjectsMap[id] = undefined; }
 	}
 	

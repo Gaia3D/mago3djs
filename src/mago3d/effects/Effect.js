@@ -27,7 +27,8 @@ var Effect = function(options)
 	}
 	
 	// available effectType:
-	// 1: zBounce
+	// 1: zBounceLinear
+	// 2: zBounceSpring
 };
 
 /**
@@ -80,10 +81,39 @@ Effect.prototype.execute = function(currTimeSec)
 		}
 		else
 		{
-			//https://en.wikipedia.org/wiki/Damped_sine_wave
 			zScale = timeDiffSeconds/this.durationSeconds;
 		}
 		gl.uniform3fv(this.effectsManager.currShader.scaleLC_loc, [1.0, 1.0, zScale]); // init referencesMatrix.
 		return effectFinished;
 	}
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
