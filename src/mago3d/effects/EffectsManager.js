@@ -32,6 +32,23 @@ EffectsManager.prototype.getEffectsObject = function(id)
 	return this.effectsObjectsMap[id];
 };
 
+EffectsManager.prototype.hasEffect = function(id) 
+{
+	
+	if (!this.effectsObjectsMap[id]) 
+	{
+		return false;
+	}
+
+	if (!this.effectsObjectsMap[id].effectsArray || this.effectsObjectsMap[id].effectsArray.length === 0)
+	{
+		return false;
+	}
+
+	return true;
+};
+
+
 /**
  *
  */
