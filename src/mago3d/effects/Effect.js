@@ -42,7 +42,7 @@ Effect.prototype.execute = function(currTimeSec)
 		return effectFinished;
 	}
 	
-	if (this.effectType === "zBounce")
+	if (this.effectType === "zBounceSpring")
 	{
 		var timeDiffSeconds = (currTimeSec - this.birthData);
 		var zScale = 1.0;
@@ -62,6 +62,24 @@ Effect.prototype.execute = function(currTimeSec)
 			var fita = 0.0; // initial angle in t=0.
 			zScale = amp*Math.pow(Math.E, -lambda*t)*(Math.cos(w*t+fita) + Math.sin(w*t+fita));
 			zScale = (1.0-zScale)*Math.log(t/this.durationSeconds+0.8);
+		}
+		gl.uniform3fv(this.effectsManager.currShader.scaleLC_loc, [1.0, 1.0, zScale]); // init referencesMatrix.
+		return effectFinished;
+	}
+	else if (this.effectType === "zBounceLinear")
+	{
+		var timeDiffSeconds = (currTimeSec - this.birthData);
+		var zScale = 1.0;
+		var gl = this.effectsManager.gl;
+		if (timeDiffSeconds >= this.durationSeconds)
+		{
+			zScale = 1.0;
+			effectFinished = true; // if return true, then this effect is finished, so this effect will be deleted.
+		}
+		else
+		{
+			//https://en.wikipedia.org/wiki/Damped_sine_wave
+			zScale = timeDiffSeconds/this.durationSeconds;
 		}
 		gl.uniform3fv(this.effectsManager.currShader.scaleLC_loc, [1.0, 1.0, zScale]); // init referencesMatrix.
 		return effectFinished;
