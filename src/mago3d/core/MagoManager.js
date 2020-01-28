@@ -1897,8 +1897,8 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
 	//{
 	//	var nodeId = nodeSelected.data.nodeId;
 	//	var effect = new Effect({
-	//		effectType      : "zBounce",
-	//		durationSeconds : 0.3
+	//		effectType      : "zBounceLinear",
+	//		durationSeconds : 0.4
 	//	});
 	//	
 	//	this.effectsManager.addEffect(nodeId, effect);
