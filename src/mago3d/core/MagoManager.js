@@ -258,6 +258,7 @@ var MagoManager = function()
 	this.idManager = new IdentifierManager();
 	
 	this.processCounterManager = new ProcessCounterManager();
+	this.effectsManager = new EffectsManager();
 };
 
 /**
@@ -271,6 +272,8 @@ MagoManager.prototype.init = function(gl)
 	{ this.sceneState.gl = gl; }
 	if (this.vboMemoryManager.gl === undefined)
 	{ this.vboMemoryManager.gl = gl; }
+	if (this.effectsManager.gl === undefined)
+	{ this.effectsManager.gl = gl; }
 };
 
 /**
@@ -1819,6 +1822,19 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
 	{
 		this.sceneState.sunSystem.updateSun(this);
 	}
+	
+	// test zBouncing.************************
+	//var nodeSelected = this.selectionManager.currentNodeSelected;
+	//if (nodeSelected)
+	//{
+	//	var nodeId = nodeSelected.data.nodeId;
+	//	var effect = new Effect({
+	//		effectType      : "zBounce",
+	//		durationSeconds : 0.3
+	//	});
+	//	
+	//	this.effectsManager.addEffect(nodeId, effect);
+	//}
 };
 
 /**

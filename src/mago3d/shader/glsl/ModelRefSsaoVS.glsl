@@ -14,6 +14,7 @@
 	uniform mat4 sunMatrix[2]; 
 	uniform vec3 buildingPosHIGH;
 	uniform vec3 buildingPosLOW;
+	uniform vec3 scaleLC;
 	uniform vec3 sunPosHIGH[2];
 	uniform vec3 sunPosLOW[2];
 	uniform int sunIdx;
@@ -42,21 +43,22 @@
 	
 	void main()
     {	
+		vec4 scaledPos = vec4(position.x * scaleLC.x, position.y * scaleLC.y, position.z * scaleLC.z, 1.0);
 		vec4 rotatedPos;
 		mat3 currentTMat;
 		if(refMatrixType == 0)
 		{
-			rotatedPos = buildingRotMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);
+			rotatedPos = buildingRotMatrix * vec4(scaledPos.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);
 			currentTMat = mat3(buildingRotMatrix);
 		}
 		else if(refMatrixType == 1)
 		{
-			rotatedPos = buildingRotMatrix * vec4(position.xyz + refTranslationVec.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);
+			rotatedPos = buildingRotMatrix * vec4(scaledPos.xyz + refTranslationVec.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);
 			currentTMat = mat3(buildingRotMatrix);
 		}
 		else if(refMatrixType == 2)
 		{
-			rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);
+			rotatedPos = RefTransfMatrix * vec4(scaledPos.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);
 			currentTMat = mat3(RefTransfMatrix);
 		}
 
