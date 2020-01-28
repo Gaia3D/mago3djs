@@ -32,7 +32,7 @@ EffectsManager.prototype.getEffectsObject = function(id)
 	return this.effectsObjectsMap[id];
 };
 
-EffectsManager.prototype.hasEffect = function(id) 
+EffectsManager.prototype.hasEffects = function(id) 
 {
 	
 	if (!this.effectsObjectsMap[id]) 
