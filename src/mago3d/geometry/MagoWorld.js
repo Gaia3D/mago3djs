@@ -264,7 +264,6 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 	{
 		return;
 	}
-
 	mouseAction.strWorldPoint = ManagerUtils.cameraCoordPositionToWorldCoord(mouseAction.strCamCoordPoint, mouseAction.strWorldPoint, magoManager);
 	
 	// now, copy camera to curCamera.

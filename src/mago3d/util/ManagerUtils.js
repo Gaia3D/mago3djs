@@ -653,11 +653,11 @@ ManagerUtils.calculatePixelLinearDepth = function(gl, pixelX, pixelY, depthFbo, 
 {
 	if (depthFbo === undefined)
 	{ depthFbo = magoManager.depthFboNeo; }
+
 	if (!depthFbo) 
 	{
 		return;
 	}
-
 
 	if (depthFbo) 
 	{

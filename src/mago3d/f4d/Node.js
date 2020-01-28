@@ -418,6 +418,9 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 		return;
 	}
 	
+	// Check if there are effects.
+	var executedEffects = magoManager.effectsManager.executeEffects(data.nodeId, magoManager.getCurrentTime());
+	
 	// check if this is a multiBuildings.
 	//if(data.attributes.objectType === "multiBuildingsTile")
 	var multiBuildings = data.multiBuildings;
@@ -583,6 +586,12 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 		}
 	}
 	*/
+	
+	if (executedEffects)
+	{
+		// must return all uniforms changed for effects.
+		gl.uniform3fv(shader.scaleLC_loc, [1.0, 1.0, 1.0]); // init local scale.
+	}
 };
 
 /**

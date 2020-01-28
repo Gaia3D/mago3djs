@@ -167,6 +167,8 @@ var MagoManager = function()
 	this.visibleObjControlerNodes = new VisibleObjectsController(); 
 	this.visibleObjControlerTerrain = new VisibleObjectsController(); 
 	
+	this.frustumVolumeControl = new FrustumVolumeControl();
+	
 	this.boundingSphere_Aux; 
 	this.radiusAprox_aux;
 
@@ -257,8 +259,10 @@ var MagoManager = function()
 	this.materialsManager = new MaterialsManager(this);
 	this.idManager = new IdentifierManager();
 	this.processCounterManager = new ProcessCounterManager();
+
 	
 	this.f4dController = new F4dController(this);
+	this.effectsManager = new EffectsManager();
 };
 
 MagoManager.prototype = Object.create(Emitter.prototype);
@@ -289,6 +293,8 @@ MagoManager.prototype.init = function(gl)
 	{ this.sceneState.gl = gl; }
 	if (this.vboMemoryManager.gl === undefined)
 	{ this.vboMemoryManager.gl = gl; }
+	if (this.effectsManager.gl === undefined)
+	{ this.effectsManager.gl = gl; }
 };
 
 /**
@@ -1524,8 +1530,8 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 MagoManager.prototype.cameraMoved = function() 
 {
 	this.sceneState.camera.setDirty(true);
-	
-	if (this.selectionFbo === undefined) 
+
+	if (this.selectionFbo === undefined)     
 	{ 
 		if (this.sceneState.gl) 
 		{
@@ -1699,7 +1705,11 @@ MagoManager.prototype.calculateSelObjMovePlaneAsimetricMode = function(gl, pixel
  */
 MagoManager.prototype.isDragging = function() 
 {
-	// test function.***
+	if (!this.selectionFbo)
+	{
+		return false;
+	}
+	
 	var bIsDragging = false;
 	var gl = this.sceneState.gl;
 	
@@ -1880,6 +1890,19 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
 	{
 		this.sceneState.sunSystem.updateSun(this);
 	}
+	
+	// test zBouncing.************************
+	//var nodeSelected = this.selectionManager.currentNodeSelected;
+	//if (nodeSelected)
+	//{
+	//	var nodeId = nodeSelected.data.nodeId;
+	//	var effect = new Effect({
+	//		effectType      : "zBounce",
+	//		durationSeconds : 0.3
+	//	});
+	//	
+	//	this.effectsManager.addEffect(nodeId, effect);
+	//}
 };
 
 /**
