@@ -424,7 +424,8 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	//}
 	
 	// Check if there are effects.
-	var executedEffects = magoManager.effectsManager.executeEffects(data.nodeId, magoManager.getCurrentTime());
+	if (renderType !== 2)
+	{ var executedEffects = magoManager.effectsManager.executeEffects(data.nodeId, magoManager.getCurrentTime()); }
 	
 	// check if this is a multiBuildings.
 	//if(data.attributes.objectType === "multiBuildingsTile")

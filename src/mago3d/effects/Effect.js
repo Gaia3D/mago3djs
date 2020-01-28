@@ -42,6 +42,8 @@ Effect.prototype.execute = function(currTimeSec)
 		return effectFinished;
 	}
 	
+	
+	
 	if (this.effectType === "zBounceSpring")
 	{
 		var timeDiffSeconds = (currTimeSec - this.birthData);
