@@ -205,7 +205,6 @@ MagoRenderable.prototype.makeMesh = function()
 MagoRenderable.prototype.moved = function() 
 {
 	// do something.
-	var hola = 0;
 };
 MagoRenderable.prototype.updateMatrix = function(ownerMatrix) 
 {

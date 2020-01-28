@@ -24,7 +24,7 @@ var MagoManager = function()
 	 * @type {SelectionManager}
 	 * @default SelectionManager.
 	 */
-	this.selectionManager = new SelectionManager();
+	this.selectionManager = new SelectionManager(this);
 	
 	/**
 	 * Manages the shaders.
@@ -207,6 +207,8 @@ var MagoManager = function()
 	
 	this.managerUtil = new ManagerUtils();
 
+	this.frustumVolumeControl = new FrustumVolumeControl();
+
 	// CURRENTS.********************************************************************
 	this.currentSelectedObj_idx = -1;
 	this.currentByteColorPicked = new Uint8Array(4);
@@ -263,10 +265,17 @@ MagoManager.prototype = Object.create(Emitter.prototype);
 MagoManager.prototype.constructor = MagoManager;
 
 MagoManager.EVENT_TYPE = {
-	'CLICK'     	: 'click',
-	'DBCLICK'   	: 'dbclick',
-	'RIGHTCLICK' : 'rightclick',
-	'MOUSEMOVE'  : 'mousemove'
+	'CLICK'              	: 'click',
+	'DBCLICK'            	: 'dbclick',
+	'RIGHTCLICK'         	: 'rightclick',
+	'MOUSEMOVE'          	: 'mousemove',
+	'SMARTTILELOADSTART' 	: 'smarttileloadstart',
+	'SMARTTILELOADEND'   	: 'smarttileloadend',
+	'SELECTEDF4D'      	 	: 'selectedf4d',
+	'SELECTEDF4DMOVED'    : 'selectedf4dmoved',
+	'SELECTEDF4DOBJECT'  	: 'selectedf4dobject',
+	'DESELECTEDF4D'    	 	: 'deselectedf4d',
+	'DESELECTEDF4DOBJECT'	: 'deselectedf4dobject'
 };
 
 /**
@@ -982,10 +991,50 @@ MagoManager.prototype.managePickingProcess = function()
 			
 			this.objectSelected = this.getSelectedObjects(gl, this.mouse_x, this.mouse_y, this.arrayAuxSC, bSelectObjects);
 			
-			
-			this.buildingSelected = this.arrayAuxSC[0];
-			this.octreeSelected = this.arrayAuxSC[1];
-			this.nodeSelected = this.arrayAuxSC[3];
+			var auxBuildingSelected = this.arrayAuxSC[0];
+			var auxOctreeSelected = this.arrayAuxSC[1];
+			var auxNodeSelected = this.arrayAuxSC[3]; 
+
+			var mode = this.magoPolicy.getObjectMoveMode();
+
+			if (mode === CODE.moveMode.ALL) 
+			{
+				if (auxBuildingSelected && auxNodeSelected) 
+				{
+					this.emit(MagoManager.EVENT_TYPE.SELECTEDF4D, {
+						type      : MagoManager.EVENT_TYPE.SELECTEDF4D, 
+						f4d       : auxNodeSelected, 
+						timestamp : new Date()
+					});
+				}
+				else if (!auxBuildingSelected && !auxNodeSelected) 
+				{
+					this.emit(MagoManager.EVENT_TYPE.DESELECTEDF4D, {
+						type: MagoManager.EVENT_TYPE.DESELECTEDF4D
+					});
+				}
+			}
+			else if (mode === CODE.moveMode.OBJECT) 
+			{
+				if (auxOctreeSelected) 
+				{
+					this.emit(MagoManager.EVENT_TYPE.SELECTEDF4DOBJECT, {
+						type      : MagoManager.EVENT_TYPE.SELECTEDF4DOBJECT,
+						object    : auxOctreeSelected,
+						timestamp : new Date()
+					});
+				}
+				else 
+				{
+					this.emit(MagoManager.EVENT_TYPE.DESELECTEDF4DOBJECT, {
+						type: MagoManager.EVENT_TYPE.DESELECTEDF4DOBJECT
+					});
+				}
+			}
+
+			this.buildingSelected = auxBuildingSelected;
+			this.octreeSelected = auxOctreeSelected;
+			this.nodeSelected = auxNodeSelected;
 			if (this.nodeSelected)
 			{ this.rootNodeSelected = this.nodeSelected.getRoot(); }
 			else
@@ -1477,9 +1526,16 @@ MagoManager.prototype.cameraMoved = function()
 	this.sceneState.camera.setDirty(true);
 	
 	if (this.selectionFbo === undefined) 
-	{ this.selectionFbo = new FBO(this.sceneState.gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
-
-	this.selectionFbo.dirty = true;
+	{ 
+		if (this.sceneState.gl) 
+		{
+			this.selectionFbo = new FBO(this.sceneState.gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); 
+		}
+	}
+	if (this.selectionFbo)
+	{
+		this.selectionFbo.dirty = true;
+	}
 };
 
 /**
@@ -1648,6 +1704,11 @@ MagoManager.prototype.isDragging = function()
 	var gl = this.sceneState.gl;
 	
 	this.arrayAuxSC.length = 0;
+	if (!this.selectionFbo)
+	{
+		return false;
+	}
+
 	this.selectionFbo.bind();
 	var current_objectSelected = this.getSelectedObjects(gl, this.mouse_x, this.mouse_y, this.arrayAuxSC);
 
@@ -2358,7 +2419,11 @@ MagoManager.prototype.mouseActionLeftDoubleClick = function(mouseX, mouseY)
 		var eventCoordinate = ManagerUtils.getComplexCoordinateByScreenCoord(this.getGl(), mouseX, mouseY, undefined, undefined, undefined, this);
 		if (eventCoordinate) 
 		{
-			this.emit(MagoManager.EVENT_TYPE.DBCLICK, {type: MagoManager.EVENT_TYPE.CLICK, clickCoordinate: eventCoordinate, timestamp: this.getCurrentTime()});
+			this.emit(MagoManager.EVENT_TYPE.DBCLICK, {
+				type            : MagoManager.EVENT_TYPE.DBCLICK, 
+				clickCoordinate : eventCoordinate, 
+				timestamp       : this.getCurrentTime()
+			});
 		}
 	}
 };
@@ -2399,10 +2464,11 @@ MagoManager.prototype.mouseActionLeftDown = function(mouseX, mouseY)
 	this.mouse_y = mouseY;
 	this.mouseLeftDown = true;
 	//this.isCameraMoving = true;
-	if (!this.isCesiumGlobe()) 
+	MagoWorld.updateMouseStartClick(mouseX, mouseY, this);
+	/*if (!this.isCesiumGlobe()) 
 	{
 		MagoWorld.updateMouseStartClick(mouseX, mouseY, this);
-	}
+	}*/
 	
 	/*
 	// Test.**********************************************************************************************************************
@@ -2611,7 +2677,7 @@ MagoManager.prototype.manageMouseDragging = function(mouseX, mouseY)
 	// distinguish 2 modes.******************************************************
 	if (this.magoPolicy.objectMoveMode === CODE.moveMode.ALL) // blocks move.***
 	{
-		if (this.buildingSelected !== undefined) 
+		if (this.buildingSelected !== undefined && this.selectionManager.currentNodeSelected) 
 		{
 			// 1rst, check if there are objects to move.***
 			if (this.mustCheckIfDragging) 
@@ -2640,6 +2706,21 @@ MagoManager.prototype.manageMouseDragging = function(mouseX, mouseY)
 			if (geographicCoords === undefined)
 			{ return; }
 			
+			this.emit(MagoManager.EVENT_TYPE.SELECTEDF4DMOVED, {
+				type   : MagoManager.EVENT_TYPE.SELECTEDF4DMOVED,
+				result : {
+					projectId : nodeOwner.data.projectId,
+					dataKey   : nodeOwner.data.nodeId,
+					latitude  : geographicCoords.latitude,
+					longitude : geographicCoords.longitude,
+					altitude  : geographicCoords.altitude, 
+					heading   : geoLocation.heading, 
+					pitch     : geoLocation.pitch, 
+					roll      : geoLocation.roll
+				},
+				timestamp: new Date()
+			});
+
 			/*movedDataCallback(	MagoConfig.getPolicy().geo_callback_moveddata,
 				nodeOwner.data.projectId,
 				nodeOwner.data.nodeId,
@@ -2649,8 +2730,8 @@ MagoManager.prototype.manageMouseDragging = function(mouseX, mouseY)
 				geographicCoords.altitude,
 				geoLocation.heading,
 				geoLocation.pitch,
-				geoLocation.roll);*/
-								
+				geoLocation.roll
+			);*/				
 		}
 		else 
 		{
@@ -2659,7 +2740,7 @@ MagoManager.prototype.manageMouseDragging = function(mouseX, mouseY)
 	}
 	else if (this.magoPolicy.objectMoveMode === CODE.moveMode.OBJECT) // objects move.***
 	{
-		if (this.objectSelected !== undefined) 
+		if (this.objectSelected !== undefined && this.selectionManager.currentOctreeSelected) 
 		{
 			// 1rst, check if there are objects to move.***
 			if (this.mustCheckIfDragging) 
@@ -4124,9 +4205,6 @@ MagoManager.prototype.doMultiFrustumCullingSmartTiles = function(camera)
 	var smartTile1 = this.smartTileManager.tilesArray[0]; // America side tile.
 	var smartTile2 = this.smartTileManager.tilesArray[1]; // Asia side tile.
 	
-	if (this.frustumVolumeControl === undefined)
-	{ this.frustumVolumeControl = new FrustumVolumeControl(); }
-	
 	if (this.intersectedTilesArray === undefined)
 	{ this.intersectedTilesArray = []; }
 	
@@ -4794,7 +4872,7 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 			
 			data_group_id = jasonObject.dataGroupId;
 			data_group_name = jasonObject.dataGroupName;
-			data_id = jasonObject.data_id;
+			data_id = jasonObject.dataId;
 			data_key = jasonObject.dataGroupKey || jasonObject.dataKey;
 			data_name = jasonObject.dataName || jasonObject.dataGroupName;
 			heading = jasonObject.heading;
@@ -4857,6 +4935,8 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 			data.data_name = data_name;
 			data.attributes = attributes;
 			data.mapping_type = mapping_type;
+			data.dataId = data_id;
+			data.dataGroupId = data_group_id;
 			var tMatrix;
 			
 			if (attributes.isPhysical)
@@ -5392,7 +5472,19 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "changeObjectMove") 
 	{
-		this.magoPolicy.setObjectMoveMode(api.getObjectMoveMode());
+		var objectMoveMode = api.getObjectMoveMode();
+		// CODE MOVEMODE에 왜 GEOGRAPHICPOINTS가 2로 매핑되었는지....;;
+		if (objectMoveMode === CODE.moveMode.GEOGRAPHICPOINTS || objectMoveMode === CODE.moveMode.NONE) 
+		{
+			this.emit(MagoManager.EVENT_TYPE.DESELECTEDF4D, {
+				type: MagoManager.EVENT_TYPE.DESELECTEDF4D
+			});
+			this.emit(MagoManager.EVENT_TYPE.DESELECTEDF4DOBJECT, {
+				type: MagoManager.EVENT_TYPE.DESELECTEDF4DOBJECT
+			});
+		}
+		
+		this.magoPolicy.setObjectMoveMode(objectMoveMode);
 	}
 	else if (apiName === "saveObjectMove") 
 	{
