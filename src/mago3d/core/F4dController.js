@@ -45,7 +45,7 @@ F4dController.prototype.addF4dGroup = function(f4dObject)
 	}
 	else 
 	{
-		var groupId = f4dObject.data_key || f4dObject.dataGroupKey || f4dObject.dataKey;
+		var groupId = f4dObject.data_key || f4dObject.dataKey || f4dObject.dataGroupKey;
 		var groupDataFolder;
 
 		if (f4dObject.data_key) 

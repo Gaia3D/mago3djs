@@ -64,7 +64,7 @@ Effect.prototype.execute = function(currTimeSec)
 			var t = timeDiffSeconds;
 			var fita = 0.0; // initial angle in t=0.
 			zScale = amp*Math.pow(Math.E, -lambda*t)*(Math.cos(w*t+fita) + Math.sin(w*t+fita));
-			zScale = (1.0-zScale)*Math.log(t/this.durationSeconds+0.8);
+			zScale = (1.0-zScale)*Math.log(t/this.durationSeconds+1.1);
 		}
 		gl.uniform3fv(this.effectsManager.currShader.scaleLC_loc, [1.0, 1.0, zScale]); // init referencesMatrix.
 		return effectFinished;

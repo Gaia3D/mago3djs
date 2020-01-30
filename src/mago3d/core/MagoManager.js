@@ -4773,7 +4773,7 @@ MagoManager.prototype.getObjectIndexFile = function(projectId, projectDataFolder
 	this.buildingSeedList = new BuildingSeedList();
 	var fileName;
 	var geometrySubDataPath = projectDataFolder;
-	fileName = this.readerWriter.geometryDataPath + "/" + geometrySubDataPath + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + MagoConfig.getPolicy().content_cache_version;
+	fileName = this.readerWriter.geometryDataPath + "/" + geometrySubDataPath + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + new Date().getTime();
 	this.readerWriter.getObjectIndexFileForSmartTile(fileName, this, this.buildingSeedList, projectId);
 };
 
@@ -4897,7 +4897,7 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 			data_group_id = jasonObject.dataGroupId;
 			data_group_name = jasonObject.dataGroupName;
 			data_id = jasonObject.dataId;
-			data_key = jasonObject.dataGroupKey || jasonObject.dataKey;
+			data_key = jasonObject.dataKey || jasonObject.dataGroupKey;
 			data_name = jasonObject.dataName || jasonObject.dataGroupName;
 			heading = jasonObject.heading;
 			height = jasonObject.altitude;
