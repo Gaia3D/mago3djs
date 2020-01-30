@@ -433,6 +433,7 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 	
 	var magoManager = this.magoManager;
 	var renderType = 0;
+	magoManager.currentProcess = CODE.magoCurrentProcess.DepthRendering;
 	
 	// Test Modeler Rendering.********************************************************************
 	// Test Modeler Rendering.********************************************************************
@@ -618,8 +619,13 @@ Renderer.prototype.renderDepthSunPointOfView = function(gl, visibleObjControlerN
 {
 	if (sunLight.tMatrix === undefined)
 	{ return; }
+
+	// collect all shadowCaster's nodes.
+	//var resultVisiblesArray = [].concat(visibleObjControlerNodes.currentVisibles0, visibleObjControlerNodes.currentVisibles2, visibleObjControlerNodes.currentVisibles3);
+	//var 
 	
 	var magoManager = this.magoManager;
+	magoManager.currentProcess = CODE.magoCurrentProcess.DepthShadowRendering;
 
 	// Do the depth render.***
 	var shaderName = "orthogonalDepth";
@@ -1103,7 +1109,8 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		var textureAux1x1 = magoManager.texturesStore.getTextureAux1x1();
 		var noiseTexture = magoManager.texturesStore.getNoiseTexture4x4();
 		
-
+		magoManager.currentProcess = CODE.magoCurrentProcess.ColorRendering;
+		
 		// Test TinTerrain.**************************************************************************
 		// Test TinTerrain.**************************************************************************
 		// render tiles, rendertiles.***

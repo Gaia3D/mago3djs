@@ -263,6 +263,16 @@ var MagoManager = function()
 	
 	this.f4dController = new F4dController(this);
 	this.effectsManager = new EffectsManager();
+	
+	//CODE.magoCurrentProcess = {
+	//"Unknown"  : 0,
+	//"DepthRendering"  : 1,
+	//"ColorRendering" : 2,
+	//"ColorCodeRendering" : 3,
+	//"DepthShadowRendering" : 4
+
+	this.currentProcess = CODE.magoCurrentProcess.Unknown;
+
 };
 
 MagoManager.prototype = Object.create(Emitter.prototype);
@@ -657,7 +667,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 	// update sun if exist.
 	if (!this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
 	{
-		if (this.sceneState.sunSystem && this.sceneState.applySunShadows && this.currentFrustumIdx === 0)
+		if (this.sceneState.sunSystem && this.sceneState.applySunShadows && this.isFarestFrustum())
 		{
 			this.sceneState.sunSystem.updateSun(this);
 		}
@@ -1894,7 +1904,7 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
 	}
 	
 	// test zBouncing.************************
-	/*
+	
 	var nodeSelected = this.selectionManager.currentNodeSelected;
 	if (nodeSelected)
 	{
@@ -1905,7 +1915,12 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
 		});
 		
 		this.effectsManager.addEffect(nodeId, effect);
-	}*/
+		
+		// shadow on-off test.
+		var data = nodeSelected.data;
+		var attributes = data.attributes;
+		attributes.castShadow = false;
+	}
 };
 
 /**
@@ -2082,8 +2097,31 @@ MagoManager.prototype.keyDown = function(key)
 	}
 	else if (key === 84) // 84 = 't'.***
 	{
-		// do test.***
-		var wcPos = ManagerUtils.calculatePixelPositionWorldCoord(this.getGl(), 1000, 500, undefined, undefined, undefined, undefined, this);
+		// change sunPosition test.***
+		/*
+		var sunSystem = this.sceneState.sunSystem;
+		if (this.dateTest === undefined)
+		{
+			this.dateTest = new Date();
+			this.dateTest.setMonth(2);
+			this.dateTest.setHours(9);
+			this.dateTest.setMinutes(30);
+		}
+		
+		var currHour = this.dateTest.getHours();
+		var currMin = this.dateTest.getMinutes()+10;
+		if (currMin >= 50)
+		{
+			this.dateTest.setMinutes(0);
+			currHour += 1;
+			this.dateTest.setHours(currHour);
+		}
+		else 
+		{
+			this.dateTest.setMinutes(currMin);
+		}
+		sunSystem.setDate(this.dateTest);
+		*/
 		
 		// another test.***
 		if (this.modeler !== undefined)
