@@ -285,10 +285,10 @@ MagoManager.EVENT_TYPE = {
 	'MOUSEMOVE'          	: 'mousemove',
 	'SMARTTILELOADSTART' 	: 'smarttileloadstart',
 	'SMARTTILELOADEND'   	: 'smarttileloadend',
-	'F4DLOADSTART'   		: 'f4dloadstart',
-	'F4DLOADEND'   			: 'f4dloadend',
+	'F4DLOADSTART'      		: 'f4dloadstart',
+	'F4DLOADEND'       			: 'f4dloadend',
 	'SELECTEDF4D'      	 	: 'selectedf4d',
-	'SELECTEDF4DMOVED'      : 'selectedf4dmoved',
+	'SELECTEDF4DMOVED'    : 'selectedf4dmoved',
 	'SELECTEDF4DOBJECT'  	: 'selectedf4dobject',
 	'DESELECTEDF4D'    	 	: 'deselectedf4d',
 	'DESELECTEDF4DOBJECT'	: 'deselectedf4dobject'
@@ -5299,6 +5299,8 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList, projectId, f4dO
 	}
 	this.calculateBoundingBoxesNodes(projectId);
 	
+
+	var auxNodesArray = JSON.parse(JSON.stringify(physicalNodesArray));
 	// now, make smartTiles.
 	// there are 2 general smartTiles: AsiaSide & AmericaSide.
 	var targetDepth = 15;
@@ -5306,8 +5308,11 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList, projectId, f4dO
 
 	this.buildingSeedList.buildingSeedArray.length = 0; // init.
 
+	
 	this.emit(MagoManager.EVENT_TYPE.F4DLOADEND, {
-		type: MagoManager.EVENT_TYPE.F4DLOADEND
+		type      : MagoManager.EVENT_TYPE.F4DLOADEND,
+		f4d       : auxNodesArray,
+		timestamp : new Date()
 	});
 
 	function getProjectFolderName(json) 
