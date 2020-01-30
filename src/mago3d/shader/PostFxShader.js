@@ -668,4 +668,5 @@ PostFxShader.prototype.createUniformLocals = function(gl, shader, sceneState)
 	shader.frustumFar_loc = gl.getUniformLocation(shader.program, "far");
 	
 	shader.scaleLC_loc = gl.getUniformLocation(shader.program, "scaleLC");
+	shader.colorMultiplier_loc = gl.getUniformLocation(shader.program, "colorMultiplier");
 };

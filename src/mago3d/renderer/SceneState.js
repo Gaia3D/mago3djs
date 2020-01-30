@@ -138,6 +138,15 @@ var SceneState = function()
 };
 
 /**
+ */
+SceneState.prototype.restoreDefaultValuesAmbientDiffuseSpecularCoeficients = function() 
+{
+	this.ambientReflectionCoef[0] = 0.7; 
+	this.diffuseReflectionCoef[0] = 0.40; 
+	this.specularReflectionCoef[0] = 0.6; 
+};
+
+/**
  * Returns the modelViewMatrixInverse.
  * @returns {Matrix4} modelViewMatrixInv.
  */
@@ -160,21 +169,6 @@ SceneState.prototype.getCamera = function()
 SceneState.prototype.setApplySunShadows = function(bApplySunShadows) 
 {
 	this.applySunShadows = bApplySunShadows;
-	
-	if (this.applySunShadows)
-	{
-		this.ambientReflectionCoef = new Float32Array([1.0]); // 0.2.
-		this.diffuseReflectionCoef = new Float32Array([0.30]); // 1.0
-		this.specularReflectionCoef = new Float32Array([0.4]); // 0.7
-		this.specularColor = new Float32Array([0.7, 0.7, 0.7]);
-	}
-	else
-	{
-		this.ambientReflectionCoef = new Float32Array([0.7]); // 0.2.
-		this.diffuseReflectionCoef = new Float32Array([0.40]); // 1.0
-		this.specularReflectionCoef = new Float32Array([0.6]); // 0.7
-		this.specularColor = new Float32Array([0.7, 0.7, 0.7]);
-	}
 };
 
 
