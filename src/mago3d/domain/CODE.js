@@ -36,11 +36,12 @@ CODE.magoMode = {
 };
 
 CODE.magoCurrentProcess = {
-	"Unknown"              : 0,
-	"DepthRendering"       : 1,
-	"ColorRendering"       : 2,
-	"ColorCodeRendering"   : 3,
-	"DepthShadowRendering" : 4
+	"Unknown"                    : 0,
+	"DepthRendering"             : 1,
+	"ColorRendering"             : 2,
+	"ColorCodeRendering"         : 3,
+	"DepthShadowRendering"       : 4,
+	"StencilSilhouetteRendering" : 5
 };
 
 CODE.modelerMode = {

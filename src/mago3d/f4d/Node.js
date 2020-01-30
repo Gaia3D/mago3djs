@@ -427,7 +427,7 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	}
 
 	// Check if there are effects.
-	if (renderType !== 2)
+	if (renderType !== 2 && magoManager.currentProcess !== CODE.magoCurrentProcess.StencilSilhouetteRendering)
 	{ var executedEffects = magoManager.effectsManager.executeEffects(data.nodeId, magoManager.getCurrentTime()); }
 	
 	// check if this is a multiBuildings.
