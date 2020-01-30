@@ -1298,6 +1298,8 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 				var maxSizeToRender = 0.0;
 				var refMatrixIdxKey = 0;
 				
+				magoManager.currentProcess = CODE.magoCurrentProcess.StencilSilhouetteRendering;
+				
 				// do as the "getSelectedObjectPicking".**********************************************************
 				currentShader = magoManager.postFxShadersManager.getModelRefSilhouetteShader(); // silhouette shader.***
 				currentShader.useProgram();
@@ -1364,6 +1366,8 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 					var geoLocDataManager = node.getNodeGeoLocDataManager();
 					neoBuilding = magoManager.buildingSelected;
 					var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
+					
+					magoManager.currentProcess = CODE.magoCurrentProcess.StencilSilhouetteRendering;
 				
 					currentShader = magoManager.postFxShadersManager.getModelRefSilhouetteShader(); // silhouette shader.***
 					currentShader.useProgram();
