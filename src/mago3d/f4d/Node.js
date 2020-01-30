@@ -408,16 +408,24 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 		return;
 	}
 	
-	if (data.attributes && data.attributes.isVisible !== undefined && data.attributes.isVisible === false) 
+	var attributes = data.attributes;
+	
+	if (attributes)
 	{
-		return;
+		if (attributes.isVisible !== undefined && attributes.isVisible === false) 
+		{
+			return;
+		}
+		
+		if (magoManager.currentProcess === CODE.magoCurrentProcess.DepthShadowRendering)
+		{
+			if (attributes.castShadow !== undefined && attributes.castShadow === false) 
+			{
+				return;
+			}
+		}
 	}
-	
-	//if (data.attributes && data.attributes.castShadow !== undefined && data.attributes.castShadow === true) 
-	//{
-	//	//
-	//}
-	
+
 	// Check if there are effects.
 	if (renderType !== 2)
 	{ var executedEffects = magoManager.effectsManager.executeEffects(data.nodeId, magoManager.getCurrentTime()); }

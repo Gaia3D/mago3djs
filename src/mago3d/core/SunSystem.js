@@ -138,6 +138,12 @@ SunSystem.prototype.getLightsPosHIGHFloat32Array = function()
 	return this.lightPosHIGHFloat32Array;
 };
 
+SunSystem.prototype.setDate = function(date) 
+{
+	this.date = date;
+	this.calculateSunGeographicCoords();
+};
+
 SunSystem.prototype.setAnimation = function(options) 
 {
 	if (options === undefined)
@@ -165,12 +171,15 @@ SunSystem.prototype.calculateSunGeographicCoords = function()
 	//https://astronomy.stackexchange.com/questions/20560/how-to-calculate-the-position-of-the-sun-in-long-lat
 	// The boilerplate: fiddling with dates
 	var radToDeg = 180/Math.PI;
-	var date = new Date();
+	if (this.date === undefined)
+	{
+		this.date = new Date();
+		this.date.setMonth(2);
+		this.date.setHours(15);
+		this.date.setMinutes(30);
+	}
 	
-	// test setting hour.
-	date.setMonth(2);
-	date.setHours(15);
-	date.setMinutes(30);
+	var date = this.date;
 	
 	var fullYear = date.getFullYear();
 	var soy = (new Date(date.getFullYear(), 0, 0)).getTime();
@@ -201,9 +210,7 @@ SunSystem.prototype.calculateSunGeographicCoords = function()
 
 SunSystem.prototype.updateSun = function(magoManager, options) 
 {
-	// test.
 	this.calculateSunGeographicCoords(); // test.***
-	// end test.---
 	
 	if (this.lightSourcesArray === undefined)
 	{ return; }

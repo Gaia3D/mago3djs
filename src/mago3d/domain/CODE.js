@@ -35,6 +35,14 @@ CODE.magoMode = {
 	"DRAWING" : 1
 };
 
+CODE.magoCurrentProcess = {
+	"Unknown"              : 0,
+	"DepthRendering"       : 1,
+	"ColorRendering"       : 2,
+	"ColorCodeRendering"   : 3,
+	"DepthShadowRendering" : 4
+};
+
 CODE.modelerMode = {
 	"INACTIVE"                 : 0,
 	"DRAWING_POLYLINE"         : 1,

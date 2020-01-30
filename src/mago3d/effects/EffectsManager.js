@@ -71,7 +71,10 @@ EffectsManager.prototype.executeEffects = function(id, currTime)
 		effectExecuted = true;
 		
 		if (effectsObject.effectsArray.length === 0)
-		{ this.effectsObjectsMap[id] = undefined; }
+		{ 
+			this.effectsObjectsMap[id] = undefined;
+			delete this.effectsObjectsMap[id];
+		}
 	}
 	
 	return effectExecuted;
