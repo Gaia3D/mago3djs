@@ -1423,10 +1423,10 @@ Node.prototype.changeLocationAndRotation = function(latitude, longitude, elevati
 		}
 		neoBuilding.calculateBBoxCenterPositionWorldCoord(geoLocationData);
 		nodeRoot.bboxAbsoluteCenterPos = undefined; // provisional.
-		nodeRoot.calculateBBoxCenterPositionWorldCoord(geoLocationData); // provisional.
+		nodeRoot.bboxAbsoluteCenterPos = nodeRoot.calculateBBoxCenterPositionWorldCoord(geoLocationData); // provisional.
 		
 		aNode.bboxAbsoluteCenterPos = undefined; // provisional.
-		aNode.calculateBBoxCenterPositionWorldCoord(geoLocationData); // provisional.
+		aNode.bboxAbsoluteCenterPos = aNode.calculateBBoxCenterPositionWorldCoord(geoLocationData); // provisional.
 		
 		// Now, calculate the geoCoords of the bbox.
 		if (nodeRoot.data.bbox.geographicCoord === undefined)
