@@ -29,6 +29,7 @@ var Effect = function(options)
 	// available effectType:
 	// 1: zBounceLinear
 	// 2: zBounceSpring
+	// 3: borningLight
 };
 
 /**
@@ -43,13 +44,12 @@ Effect.prototype.execute = function(currTimeSec)
 		return effectFinished;
 	}
 	
-	
+	var timeDiffSeconds = (currTimeSec - this.birthData);
+	var gl = this.effectsManager.gl;
 	
 	if (this.effectType === "zBounceSpring")
 	{
-		var timeDiffSeconds = (currTimeSec - this.birthData);
 		var zScale = 1.0;
-		var gl = this.effectsManager.gl;
 		if (timeDiffSeconds >= this.durationSeconds)
 		{
 			zScale = 1.0;
@@ -71,9 +71,7 @@ Effect.prototype.execute = function(currTimeSec)
 	}
 	else if (this.effectType === "zBounceLinear")
 	{
-		var timeDiffSeconds = (currTimeSec - this.birthData);
 		var zScale = 1.0;
-		var gl = this.effectsManager.gl;
 		if (timeDiffSeconds >= this.durationSeconds)
 		{
 			zScale = 1.0;
@@ -84,6 +82,21 @@ Effect.prototype.execute = function(currTimeSec)
 			zScale = timeDiffSeconds/this.durationSeconds;
 		}
 		gl.uniform3fv(this.effectsManager.currShader.scaleLC_loc, [1.0, 1.0, zScale]); // init referencesMatrix.
+		return effectFinished;
+	}
+	else if (this.effectType === "borningLight")
+	{
+		var colorMultiplier = 1.0;
+		if (timeDiffSeconds >= this.durationSeconds)
+		{
+			colorMultiplier = 1.0;
+			effectFinished = true; // if return true, then this effect is finished, so this effect will be deleted.
+		}
+		else
+		{
+			colorMultiplier = 1/(timeDiffSeconds/this.durationSeconds);
+		}
+		gl.uniform4fv(this.effectsManager.currShader.colorMultiplier_loc, [colorMultiplier, colorMultiplier, colorMultiplier, 1.0]);
 		return effectFinished;
 	}
 };

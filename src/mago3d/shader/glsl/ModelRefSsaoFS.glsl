@@ -35,8 +35,9 @@ uniform float ambientReflectionCoef;
 uniform float diffuseReflectionCoef;  
 uniform float specularReflectionCoef; 
 uniform bool bApplySsao;
-uniform float externalAlpha;
 uniform bool bApplyShadow;
+uniform float externalAlpha;
+uniform vec4 colorMultiplier;
 
 //uniform int sunIdx;
 
@@ -385,6 +386,7 @@ void main()
 	else{
 		finalColor = vec4((textureColor.xyz) * occlusion * shadow_occlusion, alfa);
 	}
+	finalColor *= colorMultiplier;
 	//finalColor = vec4(linearDepth, linearDepth, linearDepth, 1.0); // test to render depth color coded.***
     gl_FragColor = finalColor; 
 

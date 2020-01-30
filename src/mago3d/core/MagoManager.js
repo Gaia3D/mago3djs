@@ -1834,7 +1834,7 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
 	}
 	
 	// test zBouncing.************************
-	
+	/*
 	var nodeSelected = this.selectionManager.currentNodeSelected;
 	if (nodeSelected)
 	{
@@ -1847,10 +1847,14 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
 		this.effectsManager.addEffect(nodeId, effect);
 		
 		// shadow on-off test.
-		var data = nodeSelected.data;
-		var attributes = data.attributes;
-		attributes.castShadow = false;
+		var effect = new Effect({
+			effectType      : "borningLight",
+			durationSeconds : 1.0
+		});
+		
+		this.effectsManager.addEffect(nodeId, effect);
 	}
+	*/
 };
 
 /**

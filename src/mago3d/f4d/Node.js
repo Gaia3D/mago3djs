@@ -600,6 +600,11 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	{
 		// must return all uniforms changed for effects.
 		gl.uniform3fv(shader.scaleLC_loc, [1.0, 1.0, 1.0]); // init local scale.
+		
+		if (renderType === 1)
+		{
+			gl.uniform4fv(shader.colorMultiplier_loc, [1.0, 1.0, 1.0, 1.0]);
+		}
 	}
 };
 
