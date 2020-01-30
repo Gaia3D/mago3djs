@@ -1059,50 +1059,48 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			
 			this.renderAxisNodes(nodes, renderType);
 		}
-		
-		if (!magoManager.isCesiumGlobe())
+
+		var sceneState = magoManager.sceneState;
+		//sceneState.applySunShadows = true;
+		// SunLight.***
+		if (sceneState.applySunShadows && !this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
 		{
-			var sceneState = magoManager.sceneState;
-			//sceneState.applySunShadows = true;
-			// SunLight.***
-			if (sceneState.applySunShadows && !this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
+			visibleObjControlerNodes.calculateBoundingFrustum(sceneState.camera);
+		
+			var sunSystem = sceneState.sunSystem;
+			var sunLightsCount = sunSystem.lightSourcesArray.length;
+			for (var i=0; i<sunLightsCount; i++)
 			{
-				visibleObjControlerNodes.calculateBoundingFrustum(sceneState.camera);
-			
-				var sunSystem = sceneState.sunSystem;
-				var sunLightsCount = sunSystem.lightSourcesArray.length;
-				for (var i=0; i<sunLightsCount; i++)
-				{
-					var sunLight = sunSystem.getLight(i);
-					var imageWidth = sunLight.targetTextureWidth;
-					var imageHeight = sunLight.targetTextureHeight;
-					
-					if (sunLight.depthFbo === undefined) 
-					{ 
-						sunLight.depthFbo = new FBO(gl, imageWidth, imageHeight ); 
-					}
-					
-					// Must swap rendering phase before render depth from the sun.***
-					magoManager.swapRenderingFase();
-					
-					sunLight.depthFbo.bind();
-					if (magoManager.isFarestFrustum())
-					{
-						gl.clearColor(1, 1, 1, 1);
-						gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-					}
-					gl.viewport(0, 0, imageWidth, imageHeight);
-					
-					this.renderDepthSunPointOfView(gl, visibleObjControlerNodes, sunLight, sunSystem);
-					
-					sunLight.depthFbo.unbind();
+				var sunLight = sunSystem.getLight(i);
+				var imageWidth = sunLight.targetTextureWidth;
+				var imageHeight = sunLight.targetTextureHeight;
+				
+				if (sunLight.depthFbo === undefined) 
+				{ 
+					sunLight.depthFbo = new FBO(gl, imageWidth, imageHeight ); 
 				}
 				
-				magoManager.depthFboNeo.bind(); 
-				gl.viewport(0, 0, sceneState.drawingBufferWidth[0], sceneState.drawingBufferHeight[0]);
-				gl.clearColor(0, 0, 0, 1);
+				// Must swap rendering phase before render depth from the sun.***
+				magoManager.swapRenderingFase();
+				
+				sunLight.depthFbo.bind();
+				if (magoManager.isFarestFrustum())
+				{
+					gl.clearColor(1, 1, 1, 1);
+					gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+				}
+				gl.viewport(0, 0, imageWidth, imageHeight);
+				
+				this.renderDepthSunPointOfView(gl, visibleObjControlerNodes, sunLight, sunSystem);
+				
+				sunLight.depthFbo.unbind();
 			}
+			
+			magoManager.depthFboNeo.bind(); 
+			gl.viewport(0, 0, sceneState.drawingBufferWidth[0], sceneState.drawingBufferHeight[0]);
+			gl.clearColor(0, 0, 0, 1);
 		}
+		
 	}
 	if (renderType === 1) 
 	{
