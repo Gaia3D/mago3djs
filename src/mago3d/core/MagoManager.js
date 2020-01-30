@@ -275,8 +275,10 @@ MagoManager.EVENT_TYPE = {
 	'MOUSEMOVE'          	: 'mousemove',
 	'SMARTTILELOADSTART' 	: 'smarttileloadstart',
 	'SMARTTILELOADEND'   	: 'smarttileloadend',
+	'F4DLOADSTART'   		: 'f4dloadstart',
+	'F4DLOADEND'   			: 'f4dloadend',
 	'SELECTEDF4D'      	 	: 'selectedf4d',
-	'SELECTEDF4DMOVED'    : 'selectedf4dmoved',
+	'SELECTEDF4DMOVED'      : 'selectedf4dmoved',
 	'SELECTEDF4DOBJECT'  	: 'selectedf4dobject',
 	'DESELECTEDF4D'    	 	: 'deselectedf4d',
 	'DESELECTEDF4DOBJECT'	: 'deselectedf4dobject'
@@ -5265,6 +5267,10 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList, projectId, f4dO
 	this.smartTileManager.makeTreeByDepth(targetDepth, physicalNodesArray, this);
 
 	this.buildingSeedList.buildingSeedArray.length = 0; // init.
+
+	this.emit(MagoManager.EVENT_TYPE.F4DLOADEND, {
+		type: MagoManager.EVENT_TYPE.F4DLOADEND
+	});
 
 	function getProjectFolderName(json) 
 	{
