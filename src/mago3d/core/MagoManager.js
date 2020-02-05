@@ -1161,7 +1161,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	
 	// 2.1) Render terrain shadows.*******************************************************************************************************
 	// Now render the geomatry.
-	if (this.configInformation.geo_view_library === Constant.CESIUM && this.currentFrustumIdx === 1)
+	if (this.configInformation.geo_view_library === Constant.CESIUM && this.currentFrustumIdx < 2)
 	{
 		renderType = 3;
 		this.renderer.renderTerrainShadow(gl, renderType, this.visibleObjControlerNodes);

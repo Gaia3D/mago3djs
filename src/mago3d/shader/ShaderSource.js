@@ -2678,6 +2678,8 @@ void main()\n\
 		// 1rst, calculate the pixelPosWC.\n\
 		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
 		float z_window  = unpackDepth(texture2D(depthTex, screenPos.xy)); // z_window  is [0.0, 1.0] range depth.\n\
+		if(z_window < 0.001)\n\
+		discard;\n\
 \n\
 		vec3 ray = getViewRay(screenPos);\n\
 		\n\
@@ -2690,8 +2692,6 @@ void main()\n\
 		\n\
 		vec4 viewPosH = projectionMatrixInv * vec4(x_ndc, y_ndc, z_ndc, 1.0);\n\
 		vec3 posCC = viewPosH.xyz/viewPosH.w;\n\
-		\n\
-  \n\
 		vec4 posWC = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0) + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 1.0);\n\
 		//----------------------------------------------------------------\n\
 	\n\
