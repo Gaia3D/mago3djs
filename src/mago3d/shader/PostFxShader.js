@@ -432,6 +432,15 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 		uniformDataPair.floatValue = sceneState.camera.frustum.fovyRad;
 	}
 	
+	// 10.1 tangentOfHalfFovy.
+	uniformLocation = gl.getUniformLocation(shader.program, "tangentOfHalfFovy");
+	if (uniformLocation !== null && uniformLocation !== undefined)
+	{
+		uniformDataPair = shader.newUniformDataPair("1f", "tangentOfHalfFovy");
+		uniformDataPair.uniformLocation = uniformLocation;
+		uniformDataPair.floatValue = sceneState.camera.frustum.tangentOfHalfFovy;
+	}
+	
 	// 11. aspectRatio.
 	uniformLocation = gl.getUniformLocation(shader.program, "aspectRatio");
 	if (uniformLocation !== null && uniformLocation !== undefined)

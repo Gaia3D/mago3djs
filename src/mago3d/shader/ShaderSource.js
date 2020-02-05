@@ -1276,6 +1276,7 @@ uniform vec2 noiseScale;\n\
 uniform float near;\n\
 uniform float far;            \n\
 uniform float fov;\n\
+uniform float tangentOfHalfFovy;\n\
 uniform float aspectRatio;    \n\
 uniform float screenWidth;    \n\
 uniform float screenHeight;   \n\
@@ -1321,7 +1322,7 @@ varying float currSunIdx; \n\
 \n\
 float unpackDepth(const in vec4 rgba_depth)\n\
 {\n\
-    const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);\n\
+    const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);// original.***\n\
     float depth = dot(rgba_depth, bit_shift);\n\
     return depth;\n\
 }  \n\
@@ -1329,13 +1330,13 @@ float unpackDepth(const in vec4 rgba_depth)\n\
 \n\
 float UnpackDepth32( in vec4 pack )\n\
 {\n\
-    float depth = dot( pack, 1.0 / vec4(1.0, 256.0, 256.0*256.0, 16777216.0) );// 256.0*256.0*256.0 = 16777216.0\n\
-    return depth * (16777216.0) / (16777216.0 - 1.0);\n\
-}              \n\
+	float depth = dot( pack, vec4(1.0, 0.00390625, 0.000015258789, 0.000000059605) );\n\
+    return depth * 1.000000059605;// 1.000000059605 = (16777216.0) / (16777216.0 - 1.0);\n\
+}             \n\
 \n\
 vec3 getViewRay(vec2 tc)\n\
 {\n\
-    float hfar = 2.0 * tan(fov/2.0) * far;\n\
+	float hfar = 2.0 * tangentOfHalfFovy * far;\n\
     float wfar = hfar * aspectRatio;    \n\
     vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    \n\
     return ray;                      \n\
@@ -1491,8 +1492,6 @@ void main()\n\
 			{\n\
 				vec3 posRelToLight = vPosRelToLight.xyz / vPosRelToLight.w;\n\
 				float tolerance = 0.9963;\n\
-				//tolerance = 0.5;\n\
-				//tolerance = 1.0;\n\
 				posRelToLight = posRelToLight * 0.5 + 0.5; // transform to [0,1] range\n\
 				if(posRelToLight.x >= 0.0 && posRelToLight.x <= 1.0)\n\
 				{\n\
@@ -1509,92 +1508,6 @@ void main()\n\
 				/*\n\
 				// test. Calculate the zone inside the pixel.************************************\n\
 				//https://docs.microsoft.com/ko-kr/windows/win32/dxtecharts/cascaded-shadow-maps\n\
-				float pixelWidth = 1.0 / shadowMapWidth;\n\
-				float pixelHeight = 1.0 / shadowMapHeight;\n\
-				float currPixel_s = posRelToLight.x*pixelWidth;\n\
-				float currPixel_t = posRelToLight.y*pixelHeight;\n\
-				float currPixel_s_decimals = currPixel_s - floor(currPixel_s);\n\
-				float currPixel_t_decimals = currPixel_t - floor(currPixel_t);\n\
-				float horit = 0.0;\n\
-				float vert = 0.0;\n\
-				if(currPixel_s_decimals < 0.5)\n\
-				{\n\
-					horit = -1.0;\n\
-				}\n\
-				else //if(currPixel_s_decimals >= 0.66)\n\
-				{\n\
-					horit = 1.0;\n\
-				}\n\
-				\n\
-				if(currPixel_t_decimals < 0.5)\n\
-				{\n\
-					vert = -1.0;\n\
-				}\n\
-				else //if(currPixel_t_decimals >= 0.66)\n\
-				{\n\
-					vert = 1.0;\n\
-				}\n\
-				\n\
-				//pixelWidth *= 0.05;\n\
-				//pixelHeight *= 0.05;\n\
-				\n\
-				vec2 shadowMapTexCoord = vec2(posRelToLight.x + horit * pixelWidth, posRelToLight.y);\n\
-				float depthRelToLight = getDepthShadowMap(shadowMapTexCoord);\n\
-				if(posRelToLight.z > depthRelToLight*tolerance )\n\
-				{\n\
-					float pixelDist = 1.0;\n\
-					if(horit < 0.0)\n\
-					{\n\
-						pixelDist = 1.0 - currPixel_s_decimals;\n\
-					}\n\
-					else{\n\
-						pixelDist = currPixel_s_decimals;\n\
-					}\n\
-					\n\
-					shadow_occlusion -= (0.5/3.0)*pixelDist;\n\
-				}\n\
-				\n\
-				shadowMapTexCoord = vec2(posRelToLight.x, posRelToLight.y + vert * pixelHeight);\n\
-				depthRelToLight = getDepthShadowMap(shadowMapTexCoord);\n\
-				if(posRelToLight.z > depthRelToLight*tolerance )\n\
-				{\n\
-					float pixelDist = 1.0;\n\
-					if(vert < 0.0)\n\
-					{\n\
-						pixelDist = 1.0 - currPixel_t_decimals;\n\
-					}\n\
-					else{\n\
-						pixelDist = currPixel_t_decimals;\n\
-					}\n\
-					shadow_occlusion -= (0.5/3.0)*pixelDist;\n\
-				}\n\
-				\n\
-				shadowMapTexCoord = vec2(posRelToLight.x + horit * pixelWidth, posRelToLight.y + vert * pixelHeight);\n\
-				depthRelToLight = getDepthShadowMap(shadowMapTexCoord);\n\
-				if(posRelToLight.z > depthRelToLight*tolerance )\n\
-				{\n\
-					float pixelDistH = 1.0;\n\
-					if(horit < 0.0)\n\
-					{\n\
-						pixelDistH = 1.0 - currPixel_s_decimals;\n\
-					}\n\
-					else{\n\
-						pixelDistH = currPixel_s_decimals;\n\
-					}\n\
-					\n\
-					float pixelDistV = 1.0;\n\
-					if(vert < 0.0)\n\
-					{\n\
-						pixelDistV = 1.0 - currPixel_t_decimals;\n\
-					}\n\
-					else{\n\
-						pixelDistV = currPixel_t_decimals;\n\
-					}\n\
-					\n\
-					shadow_occlusion -= (0.5/3.0)*pixelDistV*pixelDistH;\n\
-				}\n\
-				\n\
-				// End test.---------------------------------------------------------------------\n\
 				*/\n\
 				\n\
 				\n\
@@ -2481,8 +2394,9 @@ varying vec3 vertexPos;\n\
 \n\
 vec4 packDepth(const in float depth)\n\
 {\n\
-    const vec4 bit_shift = vec4(16777216.0, 65536.0, 256.0, 1.0);\n\
-    const vec4 bit_mask  = vec4(0.0, 0.00390625, 0.00390625, 0.00390625); \n\
+    const vec4 bit_shift = vec4(16777216.0, 65536.0, 256.0, 1.0); // original.***\n\
+    const vec4 bit_mask  = vec4(0.0, 0.00390625, 0.00390625, 0.00390625);  // original.*** \n\
+	\n\
     //vec4 res = fract(depth * bit_shift); // Is not precise.\n\
 	vec4 res = mod(depth * bit_shift * vec4(255), vec4(256) ) / vec4(255); // Is better.\n\
     res -= res.xxyz * bit_mask;\n\
@@ -2611,12 +2525,13 @@ uniform float screenHeight;   \n\
 uniform float near;\n\
 uniform float far;\n\
 uniform float fov;\n\
+uniform float tangentOfHalfFovy;\n\
 uniform float aspectRatio;\n\
 varying vec4 vColor; \n\
 \n\
 vec3 getViewRay(vec2 tc)\n\
 {\n\
-    float hfar = 2.0 * tan(fov/2.0) * far;\n\
+    float hfar = 2.0 * tangentOfHalfFovy * far;\n\
     float wfar = hfar * aspectRatio;    \n\
     vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    \n\
     return ray;                      \n\
@@ -2631,9 +2546,9 @@ float unpackDepth(vec4 packedDepth)\n\
 \n\
 float UnpackDepth32( in vec4 pack )\n\
 {\n\
-    float depth = dot( pack, 1.0 / vec4(1.0, 256.0, 256.0*256.0, 16777216.0) );// 256.0*256.0*256.0 = 16777216.0\n\
-    return depth * (16777216.0) / (16777216.0 - 1.0);\n\
-} \n\
+	float depth = dot( pack, vec4(1.0, 0.00390625, 0.000015258789, 0.000000059605) );\n\
+    return depth * 1.000000059605;// 1.000000059605 = (16777216.0) / (16777216.0 - 1.0);\n\
+}  \n\
 \n\
 float getDepthShadowMap(vec2 coord)\n\
 {\n\
@@ -2704,7 +2619,7 @@ void main()\n\
 	float shadow_occlusion = 1.0;\n\
 	float alpha = 0.0;\n\
 	vec4 finalColor;\n\
-	finalColor = vec4(0.5, 0.5, 0.5, 0.8);\n\
+	finalColor = vec4(0.2, 0.2, 0.2, 0.8);\n\
 	if(bApplyShadow)\n\
 	{\n\
 		// the sun lights count are 2.\n\
@@ -2739,7 +2654,7 @@ void main()\n\
 		if(pointIsinShadow)\n\
 		{\n\
 			shadow_occlusion = 0.5;\n\
-			alpha = 0.7;\n\
+			alpha = 0.5;\n\
 		}\n\
 		\n\
 	}\n\
@@ -2748,14 +2663,7 @@ void main()\n\
 ShaderSource.ScreenQuadVS = "precision mediump float;\n\
 \n\
 attribute vec2 position;\n\
-//uniform mat4 sunMatrix[2]; \n\
-//uniform vec3 sunPosHIGH[2];\n\
-//uniform vec3 sunPosLOW[2];\n\
-//uniform int sunIdx;\n\
-//uniform bool bApplyShadow;\n\
-varying vec4 vColor;\n\
-//varying float currSunIdx;\n\
-//varying vec4 vPosRelToLight; \n\
+varying vec4 vColor; \n\
 \n\
 void main() {\n\
 	vColor = vec4(0.2, 0.2, 0.2, 0.5);\n\

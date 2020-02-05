@@ -26,12 +26,13 @@ uniform float screenHeight;
 uniform float near;
 uniform float far;
 uniform float fov;
+uniform float tangentOfHalfFovy;
 uniform float aspectRatio;
 varying vec4 vColor; 
 
 vec3 getViewRay(vec2 tc)
 {
-    float hfar = 2.0 * tan(fov/2.0) * far;
+    float hfar = 2.0 * tangentOfHalfFovy * far;
     float wfar = hfar * aspectRatio;    
     vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    
     return ray;                      
@@ -46,9 +47,9 @@ float unpackDepth(vec4 packedDepth)
 
 float UnpackDepth32( in vec4 pack )
 {
-    float depth = dot( pack, 1.0 / vec4(1.0, 256.0, 256.0*256.0, 16777216.0) );// 256.0*256.0*256.0 = 16777216.0
-    return depth * (16777216.0) / (16777216.0 - 1.0);
-} 
+	float depth = dot( pack, vec4(1.0, 0.00390625, 0.000015258789, 0.000000059605) );
+    return depth * 1.000000059605;// 1.000000059605 = (16777216.0) / (16777216.0 - 1.0);
+}  
 
 float getDepthShadowMap(vec2 coord)
 {
@@ -119,7 +120,7 @@ void main()
 	float shadow_occlusion = 1.0;
 	float alpha = 0.0;
 	vec4 finalColor;
-	finalColor = vec4(0.5, 0.5, 0.5, 0.8);
+	finalColor = vec4(0.2, 0.2, 0.2, 0.8);
 	if(bApplyShadow)
 	{
 		// the sun lights count are 2.
@@ -154,7 +155,7 @@ void main()
 		if(pointIsinShadow)
 		{
 			shadow_occlusion = 0.5;
-			alpha = 0.7;
+			alpha = 0.5;
 		}
 		
 	}
