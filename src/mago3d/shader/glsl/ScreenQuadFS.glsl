@@ -63,7 +63,56 @@ float getDepthShadowMap(vec2 coord)
 	}
 	else
 		return -1.0;
-} 
+}
+
+bool isInShadow(vec4 pointWC, int currSunIdx)
+{
+	bool inShadow = false;
+	vec3 currSunPosLOW;
+	vec3 currSunPosHIGH;
+	mat4 currSunMatrix;
+	if(currSunIdx == 0)
+	{
+		currSunPosLOW = sunPosLOW[0];
+		currSunPosHIGH = sunPosHIGH[0];
+		currSunMatrix = sunMatrix[0];
+	}
+	else if(currSunIdx == 1)
+	{
+		currSunPosLOW = sunPosLOW[1];
+		currSunPosHIGH = sunPosHIGH[1];
+		currSunMatrix = sunMatrix[1];
+	}
+	else
+	return false;
+	
+		
+	vec3 highDifferenceSun = pointWC.xyz -currSunPosHIGH.xyz;
+	vec3 lowDifferenceSun = -currSunPosLOW.xyz;
+	vec4 pos4Sun = vec4(highDifferenceSun.xyz + lowDifferenceSun.xyz, 1.0);
+	vec4 vPosRelToLight = currSunMatrix * pos4Sun;
+
+	vec3 posRelToLight = vPosRelToLight.xyz / vPosRelToLight.w;
+	float tolerance = 0.9963;
+	posRelToLight = posRelToLight * 0.5 + 0.5; // transform to [0,1] range
+	if(posRelToLight.x >= 0.0 && posRelToLight.x <= 1.0)
+	{
+		if(posRelToLight.y >= 0.0 && posRelToLight.y <= 1.0)
+		{
+			float depthRelToLight;
+			if(currSunIdx == 0)
+			{depthRelToLight = UnpackDepth32(texture2D(shadowMapTex, posRelToLight.xy));}
+			else if(currSunIdx == 1)
+			{depthRelToLight = UnpackDepth32(texture2D(shadowMapTex2, posRelToLight.xy));}
+			if(posRelToLight.z > depthRelToLight*tolerance )
+			{
+				inShadow = true;
+			}
+		}
+	}
+	
+	return inShadow;
+}
 
 void main()
 {
@@ -74,22 +123,6 @@ void main()
 	if(bApplyShadow)
 	{
 		// the sun lights count are 2.
-		vec3 currSunPosLOW;
-		vec3 currSunPosHIGH;
-		mat4 currSunMatrix;
-		if(sunIdx == 0)
-		{
-			currSunPosLOW = sunPosLOW[0];
-			currSunPosHIGH = sunPosHIGH[0];
-			currSunMatrix = sunMatrix[0];
-		}
-		else if(sunIdx == 1)
-		{
-			currSunPosLOW = sunPosLOW[1];
-			currSunPosHIGH = sunPosHIGH[1];
-			currSunMatrix = sunMatrix[1];
-		}
-		
 		// 1rst, calculate the pixelPosWC.
 		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
 		float z_window  = unpackDepth(texture2D(depthTex, screenPos.xy)); // z_window  is [0.0, 1.0] range depth.
@@ -111,31 +144,17 @@ void main()
 		//----------------------------------------------------------------
 	
 		// 2nd, calculate the vertex relative to light.***
-		vec3 highDifferenceSun = posWC.xyz -currSunPosHIGH.xyz;
-		vec3 lowDifferenceSun = -currSunPosLOW.xyz;
-		vec4 pos4Sun = vec4(highDifferenceSun.xyz + lowDifferenceSun.xyz, 1.0);
-		vec4 vPosRelToLight = currSunMatrix * pos4Sun;
-
-
-		vec3 posRelToLight = vPosRelToLight.xyz / vPosRelToLight.w;
-		float tolerance = 0.9963;
-		tolerance = 0.9;
-		posRelToLight = posRelToLight * 0.5 + 0.5; // transform to [0,1] range
-		if(posRelToLight.x >= 0.0 && posRelToLight.x <= 1.0)
+		// 1rst, try with the closest sun. sunIdx = 0.
+		bool pointIsinShadow = isInShadow(posWC, 0);
+		if(!pointIsinShadow)
 		{
-			if(posRelToLight.y >= 0.0 && posRelToLight.y <= 1.0)
-			{
-				float depthRelToLight = getDepthShadowMap(vec2(posRelToLight.x,posRelToLight.y));
-				if(posRelToLight.z > depthRelToLight*tolerance )
-				{
-					shadow_occlusion = 0.5;
-					alpha = 0.7;
-				}
-			}
+			pointIsinShadow = isInShadow(posWC, 1);
 		}
-		else{
-			float factor = 100.0;
-			finalColor = vec4(z_window, 0.0, 0.0, 1.0);
+
+		if(pointIsinShadow)
+		{
+			shadow_occlusion = 0.5;
+			alpha = 0.7;
 		}
 		
 	}
