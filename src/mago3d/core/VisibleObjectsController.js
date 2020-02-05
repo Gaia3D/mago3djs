@@ -386,6 +386,9 @@ VisibleObjectsController.prototype.calculateBoundingFrustum = function(camera)
 	{
 		var visible = filteredVisiblesArray[i];
 		var bSphere = visible.getBoundingSphereWC(bSphere);
+		if (!bSphere)
+		{ continue; }
+		
 		var centerPoint = bSphere.getCenterPoint();
 		var radius = bSphere.getRadius();
 		var projectedPoint = camDirLine.getProjectedPoint(centerPoint, undefined);

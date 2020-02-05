@@ -597,6 +597,10 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 
 	}
 	
+	
+	sceneState.modelViewProjMatrixInv = undefined; // init. Calculate when necessary.***
+	sceneState.projectionMatrixInv = undefined; // init.Calculate when necessary.***
+	
 	if (this.depthFboNeo !== undefined)
 	{
 		var noiseTexture = this.texturesStore.getNoiseTexture4x4();
@@ -1144,6 +1148,9 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	this.renderer.renderMagoGeometries(renderType); //TEST
 	this.depthFboNeo.unbind();
 	this.swapRenderingFase();
+	
+	
+	
 
 	// 2) color render.************************************************************************************************************
 	if (this.configInformation.geo_view_library === Constant.CESIUM)
@@ -1152,17 +1159,23 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		scene._context._currentFramebuffer._bind();
 	}
 	
+	// 2.1) Render terrain shadows.*******************************************************************************************************
+	// Now render the geomatry.
+	if (this.configInformation.geo_view_library === Constant.CESIUM && this.currentFrustumIdx === 1)
+	{
+		renderType = 3;
+		this.renderer.renderTerrainShadow(gl, renderType, this.visibleObjControlerNodes);
+	}
 	//gl.clearColor(0, 0, 0, 1);
 	//gl.clearDepth(1);
 	//gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	
 	
 	renderType = 1;
 	this.renderType = 1;
 	this.renderer.renderGeometry(gl, renderType, this.visibleObjControlerNodes);
 	
-	// 3) Stencil buffer render.*******************************************************************************************************
-	//renderType = 3;
-	//this.renderer.renderGeometryStencilShadowMeshes(gl, renderType, this.visibleObjControlerNodes);
+	
 	
 	if (this.weatherStation)
 	{
@@ -1245,7 +1258,6 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 	this.numFrustums = numFrustums;
 	this.isLastFrustum = isLastFrustum;
 	
-
 	var gl = this.getGl();
 	this.upDateSceneStateMatrices(this.sceneState);
 	
@@ -2056,6 +2068,23 @@ MagoManager.prototype.keyDown = function(key)
 		}
 		sunSystem.setDate(this.dateTest);
 		*/
+		
+		// Stencil shadow mesh making test.********************
+		var nodeSelected = this.selectionManager.currentNodeSelected;
+		if (nodeSelected)
+		{
+			var geoLocDataManager = nodeSelected.data.geoLocDataManager;
+			var geoLocData = geoLocDataManager.getCurrentGeoLocationData();
+			var sunSystem = this.sceneState.sunSystem;
+			var sunDirWC = sunSystem.getSunDirWC();
+			var sunDirLC = geoLocData.getRotatedRelativeVector(sunDirWC, sunDirLC);
+			
+			var neoBuilding = nodeSelected.data.neoBuilding;
+			var lodBuilding = neoBuilding.lodBuildingMap.lod3;
+			if (lodBuilding)
+			{ lodBuilding.skinLego.makeStencilShadowMesh(sunDirLC); }
+		}
+		// End test----------------------------------------------------
 		
 		// another test.***
 		if (this.modeler !== undefined)
