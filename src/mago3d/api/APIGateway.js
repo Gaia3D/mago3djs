@@ -829,3 +829,17 @@ function togglePointCloudColorAPI(managerFactoryInstance)
 	var api = new Mago3D.API("togglePointCloudColor");
 	managerFactoryInstance.callAPI(api);
 }
+
+/**
+ * select f4d
+ * @param {ManagerFactory} managerFactoryInstance
+ */
+function selectF4dAPI(managerFactoryInstance, projectId, dataKey) 
+{
+	var api = new Mago3D.API("selectF4d");
+	api.setProjectId(projectId);
+	api.setDataKey(dataKey);
+	managerFactoryInstance.callAPI(api);
+
+	
+}

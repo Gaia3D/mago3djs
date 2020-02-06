@@ -1414,6 +1414,9 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 	{
 		this.drawBuildingNames(this.visibleObjControlerNodes) ;
 	}
+
+	// kjh test.***
+
 };
 
 /**
@@ -1881,7 +1884,7 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
 	this.mustCheckIfDragging = true;
 	this.thereAreStartMovePoint = false;
 
-	this.dateSC = new Date();
+	/*this.dateSC = new Date();
 	this.currentTimeSC = this.dateSC.getTime();
 	var miliSecondsUsed = this.currentTimeSC - this.startTimeSC;
 	if (miliSecondsUsed < 1500) 
@@ -1890,7 +1893,7 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
 		{
 			this.bPicking = true;
 		}
-	}
+	}*/
 	
 	this.setCameraMotion(true);
 	
@@ -2533,6 +2536,17 @@ MagoManager.prototype.mouseActionLeftDown = function(mouseX, mouseY)
 	this.mouseLeftDown = true;
 	//this.isCameraMoving = true;
 	MagoWorld.updateMouseStartClick(mouseX, mouseY, this);
+
+	this.dateSC = new Date();
+	this.currentTimeSC = this.dateSC.getTime();
+	var miliSecondsUsed = this.currentTimeSC - this.startTimeSC;
+	if (miliSecondsUsed < 1500) 
+	{
+		if (this.mouse_x === mouseX && this.mouse_y === mouseY) 
+		{
+			this.bPicking = true;
+		}
+	}
 	/*if (!this.isCesiumGlobe()) 
 	{
 		MagoWorld.updateMouseStartClick(mouseX, mouseY, this);
@@ -6164,6 +6178,33 @@ MagoManager.prototype.callAPI = function(api)
 		var renderingSettings = this._settings.getRenderingSettings();
 		var pointsCloudColorRamp = renderingSettings.getPointsCloudInColorRamp();
 		renderingSettings.setPointsCloudInColorRamp(!pointsCloudColorRamp);
+	}
+	else if (apiName === 'selectF4d')
+	{
+		var projectId = api.getProjectId();
+		var dataKey = api.getDataKey();
+		if (!defined(projectId))
+		{
+			throw new Error("projectId is required.");
+		}
+		if (!defined(dataKey))
+		{
+			throw new Error("dataKey is required.");
+		}
+		var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
+		if (!node)
+		{
+			throw new Error("f4d is not exist.");
+		}
+
+		this.magoPolicy.setObjectMoveMode(CODE.moveMode.ALL);
+		this.nodeSelected = node;
+		this.buildingSelected = node.data.neoBuilding;
+		this.emit(MagoManager.EVENT_TYPE.SELECTEDF4D, {
+			type      : MagoManager.EVENT_TYPE.SELECTEDF4D, 
+			f4d       : node, 
+			timestamp : new Date()
+		});
 	}
 };
 
