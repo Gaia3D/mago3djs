@@ -48,5 +48,4 @@ void main()
 
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;
 	vertexPos = (modelViewMatrixRelToEye * pos4).xyz;
-		//vertexPos = objPosHigh + objPosLow;
 }

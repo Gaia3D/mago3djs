@@ -5,12 +5,15 @@
  * 
  * @class
  */
-var Surface = function()
+var Surface = function(options)
 {
 	if (!(this instanceof Surface))
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
+	
+	this.id;
+	this.name;
 
 	/** 
 	 * Surface 가 가진 Face 배열
@@ -32,6 +35,15 @@ var Surface = function()
 	 * @type {Object[]}
 	 */
 	this.localHedgesList = undefined;
+	
+	if (options !== undefined)
+	{
+		if (options.id !== undefined)
+		{ this.id = options.id; }
+		
+		if (options.name !== undefined)
+		{ this.name = options.name; }
+	}
 };
 
 /**
@@ -248,6 +260,8 @@ Surface.prototype.getCopyIndependentSurface = function(result)
 	}
 
 	var resultLocalvertexList = result.localVertexList;
+	result.id = this.id;
+	result.name = this.name;
 
 	// copy the localVertexList.
 	var vertex;

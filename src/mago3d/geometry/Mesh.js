@@ -20,8 +20,10 @@ var Mesh = function()
 	this.color4;
 
 	this.hedgesList;
+	this.edgesSegment3dsArray; // to render wireframe.
 	
 	this.vboKeysContainer;
+	this.edgesVboKeysContainer;
 	this.bbox;
 	this.material;// class Material.
 };
@@ -212,12 +214,12 @@ Mesh.prototype.deleteVbos = function(vboMemManager)
 /**
  * Add new surface at the surface array
  */
-Mesh.prototype.newSurface = function()
+Mesh.prototype.newSurface = function(options)
 {
 	if (this.surfacesArray === undefined)
 	{ this.surfacesArray = []; }
 	
-	var surface = new Surface();
+	var surface = new Surface(options);
 	this.surfacesArray.push(surface);
 	return surface;
 };
@@ -650,7 +652,7 @@ Mesh.prototype.getFrontierHalfEdges = function(resultHalfEdgesArray)
 	for (var i=0; i<surfacesCount; i++)
 	{
 		surface = this.getSurface(i);
-		resultHalfEdgesArray = surface.getFrontierHalfEdges(resultHalfEdgesArray);
+		resultHalfEdgesArray = surface.getFrontierHalfEdges(resultHalfEdgesArray); 
 	}
 	
 	return resultHalfEdgesArray;
@@ -692,6 +694,11 @@ Mesh.prototype.getCopy = function(resultMeshCopy)
 	{
 		surface = this.getSurface(i);
 		surfaceCopy = resultMeshCopy.newSurface();
+		
+		// copy id & name.
+		surfaceCopy.id = surface.id;
+		surfaceCopy.name = surface.name;
+	
 		facesCount = surface.getFacesCount();
 		for (var j=0; j<facesCount; j++)
 		{
@@ -779,10 +786,46 @@ Mesh.prototype.getTrianglesListsArrayBy2ByteSize = function(trianglesArray, resu
  * @param glPrimitive
  * @TODO : 누가 이 gl primitive의 type 정체를 안다면 좀 달아주세요ㅠㅠ 세슘 쪽인거 같은데ㅠㅠ
  */
-Mesh.prototype.renderAsChild = function (magoManager, shader, renderType, glPrimitive, isSelected) 
+Mesh.prototype.renderAsChild = function (magoManager, shader, renderType, glPrimitive, isSelected, options) 
 {
-	this.render(magoManager, shader, renderType, glPrimitive, isSelected);
+	var renderShaded = true;
+	var renderWireframe = false;
+	var depthMask = true;
+	
+	var gl = magoManager.getGl();
+	
+	if (options)
+	{
+		if (options.renderShaded !== undefined)
+		{
+			renderShaded = options.renderShaded;
+		}
+		
+		if (options.renderWireframe !== undefined)
+		{
+			renderWireframe = options.renderWireframe;
+		}
+		
+		if (options.depthMask !== undefined)
+		{
+			depthMask = options.depthMask;
+		}
+	}
+	
+	if (renderShaded)
+	{
+		gl.depthMask(depthMask);
+		this.render(magoManager, shader, renderType, glPrimitive, isSelected);
+		gl.depthMask(true);
+	}
+	
+	if (renderWireframe)
+	{
+		this.renderWireframe(magoManager, shader, renderType, glPrimitive, isSelected);
+	}
+	
 };
+
 /**
  * Render the mesh
  * @param {MagoManager}magoManager
@@ -835,12 +878,6 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive, i
 	{
 		// Selection render.***
 	}
-	else if (renderType === 3)
-	{
-		// Shadow mesh render.***
-		shader.disableVertexAttribArray(shader.texCoord2_loc);
-		shader.disableVertexAttribArray(shader.color4_loc);
-	}
 	
 	var vboKeysCount = this.vboKeysContainer.vboCacheKeysArray.length;
 	for (var i=0; i<vboKeysCount; i++)
@@ -855,19 +892,6 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive, i
 		if (!vboKey.bindDataPosition(shader, vboMemManager))
 		{ return false; }
 	
-		// test Normals.*** TEST*** TEST*** TEST*** TEST*** TEST*** TEST***
-		if (vboKey.vboBufferNor)
-		{
-			if (!vboKey.bindDataNormal(shader, vboMemManager))
-			{ return false; }
-		}
-		else 
-		{
-			shader.disableVertexAttribArray(shader.normal3_loc);
-		}
-		// End  TEST*** TEST*** TEST*** TEST*** TEST*** TEST*** TEST*** TEST***
-		
-		
 		if (renderType === 1)
 		{
 			// Normals.
@@ -920,6 +944,109 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive, i
 		gl.drawElements(primitive, vboKey.indicesCount, gl.UNSIGNED_SHORT, 0);
 	}
 };
+
+/**
+ * Render the mesh
+ * @param {MagoManager}magoManager
+ * @param {Shader} shader
+ * @param {Number} renderType
+ * @param glPrimitive
+ * @TODO : 누가 이 gl primitive의 type 정체를 안다면 좀 달아주세요ㅠㅠ 세슘 쪽인거 같은데ㅠㅠ
+ */
+Mesh.prototype.renderWireframe = function(magoManager, shader, renderType, glPrimitive, isSelected)
+{
+	var vboMemManager = magoManager.vboMemoryManager;
+	
+	if (this.edgesVboKeysContainer === undefined)
+	{
+		this.edgesVboKeysContainer = this.getVboEdgesThickLines(this.edgesVboKeysContainer, magoManager);
+		return;
+	}
+	
+	var gl = magoManager.sceneState.gl;
+	var primitive;
+	
+	if (renderType === 0)
+	{
+		// Depth render.***
+	}
+	else if (renderType === 1)
+	{
+		if (!isSelected)
+		{
+			// Color render.***
+			if (this.material !== undefined && this.material.diffuseTexture !== undefined && this.material.diffuseTexture.texId !== undefined)
+			{
+				var texture = this.material.diffuseTexture;
+				gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
+				if (shader.last_tex_id !== texture.texId) 
+				{
+					gl.activeTexture(gl.TEXTURE2);
+					gl.bindTexture(gl.TEXTURE_2D, texture.texId);
+					shader.last_tex_id = texture.texId;
+				}
+			}
+			else if (this.color4)
+			{ 
+				gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
+				gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, this.color4.a]); 
+			}
+		}
+	}
+	else if (renderType === 2)
+	{
+		// Selection render.***
+	}
+	
+	var vbo = this.edgesVboKeysContainer.getVboKey(0);
+	
+	// based on https://weekly-geekly.github.io/articles/331164/index.html
+	/*
+	var shader = magoManager.postFxShadersManager.getShader("thickLine");
+	shader.useProgram();
+	shader.bindUniformGenerals();
+	var gl = magoManager.getGl();
+
+	gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
+	gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+	gl.disable(gl.CULL_FACE);
+	
+	gl.enableVertexAttribArray(shader.prev_loc);
+	gl.enableVertexAttribArray(shader.current_loc);
+	gl.enableVertexAttribArray(shader.next_loc);
+	
+	var geoLocData = this.geoLocDataManager.getCurrentGeoLocationData();
+	geoLocData.bindGeoLocationUniforms(gl, shader);
+
+	var sceneState = magoManager.sceneState;
+	var drawingBufferWidth = sceneState.drawingBufferWidth;
+	var drawingBufferHeight = sceneState.drawingBufferHeight;
+
+	gl.uniform4fv(shader.color_loc, [0.5, 0.7, 0.9, 1.0]);
+	gl.uniform2fv(shader.viewport_loc, [drawingBufferWidth[0], drawingBufferHeight[0]]);
+	*/
+	
+	this.thickness = 2.0;
+	gl.uniform1f(shader.thickness_loc, this.thickness);
+
+	var vboPos = vbo.vboBufferPos;
+	var dim = vboPos.dataDimensions; // in this case dimensions = 4.
+	if (!vboPos.isReady(gl, magoManager.vboMemoryManager))
+	{
+		return;
+	}
+
+	gl.bindBuffer(gl.ARRAY_BUFFER, vboPos.key);
+	gl.vertexAttribPointer(shader.prev_loc, dim, gl.FLOAT, false, 16, 0);
+	gl.vertexAttribPointer(shader.current_loc, dim, gl.FLOAT, false, 16, 64-32);
+	gl.vertexAttribPointer(shader.next_loc, dim, gl.FLOAT, false, 16, 128-32);
+
+	gl.drawArrays(gl.TRIANGLE_STRIP, 0, vbo.vertexCount-(4));
+
+	gl.enable(gl.CULL_FACE);
+	
+};
+
 /**
  * Get the VBO keys of this mesh
  * @param {VBOVertexIdxCacheKeysContainer} resultVboContainer 
@@ -990,6 +1117,62 @@ Mesh.prototype.getVboTrianglesConvex = function(resultVboContainer, vboMemManage
 	return resultVboContainer;
 };
 
+Mesh.prototype.getEdgeSegment3ds = function(resultSegment3dsArray)
+{
+	var frontierHedgesArray = [];
+	var surface;
+	var surfacesCount = this.getSurfacesCount();
+	for (var i=0; i<surfacesCount; i++)
+	{
+		surface = this.getSurface(i);
+		if (surface.name === "outerLateral")
+		{ frontierHedgesArray = surface.getFrontierHalfEdges(frontierHedgesArray); }
+	}
+
+	var hedgesCount = frontierHedgesArray.length;
+	
+	if (hedgesCount === 0)
+	{ return resultSegment3dsArray; }
+	
+	if (!resultSegment3dsArray)
+	{ resultSegment3dsArray = []; }
+	
+	var hedge;
+	var segment3d;
+	var strVertex, endVertex;
+	var strPoint3d, endPoint3d;
+	var index = 0;
+	for (var i=0; i<hedgesCount; i++)
+	{
+		hedge = frontierHedgesArray[i];
+		strVertex = hedge.startVertex;
+		endVertex = hedge.getEndVertex();
+		
+		strPoint3d = strVertex.getPosition();
+		endPoint3d = endVertex.getPosition();
+		
+		segment3d = new Segment3D(strPoint3d, endPoint3d);
+		resultSegment3dsArray.push(segment3d);
+	}
+	
+	return resultSegment3dsArray;
+};
+
+/**
+ * Register the VBO cache keys of the half edges of this mesh to VBOMemManager.
+ * @param {VBOVertexIdxCacheKeysContainer} resultVboContainer 
+ * @param {VBOMemManager} vboMemManager
+ * @TODO : Need to change name! Not Getter!
+ */
+Mesh.prototype.getVboEdgesThickLines = function(resultVboContainer, magoManager)
+{
+	// Make edges if need render wireframe. 
+	this.edgesSegment3dsArray = []; // init.
+	this.edgesSegment3dsArray = this.getEdgeSegment3ds(this.edgesSegment3dsArray);
+	resultVboContainer = Segment3D.getVboThickLines(magoManager, this.edgesSegment3dsArray, resultVboContainer);
+	return resultVboContainer;
+};
+
 /**
  * Register the VBO cache keys of the half edges of this mesh to VBOMemManager.
  * @param {VBOVertexIdxCacheKeysContainer} resultVboContainer 
@@ -998,6 +1181,7 @@ Mesh.prototype.getVboTrianglesConvex = function(resultVboContainer, vboMemManage
  */
 Mesh.prototype.getVboEdges = function(resultVboContainer, vboMemManager)
 {
+	// Old. deprecated.
 	if (resultVboContainer === undefined)
 	{ return; }
 	
@@ -1029,6 +1213,8 @@ Mesh.prototype.getVboEdges = function(resultVboContainer, vboMemManager)
 	var resultVbo = resultVboContainer.newVBOVertexIdxCacheKey();
 	resultVbo.setDataArrayPos(vertexArray, vboMemManager);
 	resultVbo.setDataArrayIdx(indicesArray, vboMemManager);
+	
+	return resultVboContainer;
 };
 
 

@@ -1,13 +1,18 @@
 
 'use strict';
-
-
+// TEST OBJECT. NO USE THIS CLASS.***
+// TEST OBJECT. NO USE THIS CLASS.***
+// TEST OBJECT. NO USE THIS CLASS.***
+// TEST OBJECT. NO USE THIS CLASS.***
+// TEST OBJECT. NO USE THIS CLASS.***
 /**
  * 어떤 일을 하고 있습니까?
  * @class ParametricMesh
  */
 var ParametricMesh = function() 
 {
+	// TEST OBJECT. NO USE THIS CLASS.***
+	
 	if (!(this instanceof ParametricMesh)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
@@ -24,6 +29,7 @@ var ParametricMesh = function()
  */
 ParametricMesh.prototype.deleteObjects = function() 
 {
+	// TEST OBJECT. NO USE THIS CLASS.***
 	if (this.profile)
 	{ this.profile.deleteObjects(); }
 	
@@ -36,6 +42,7 @@ ParametricMesh.prototype.deleteObjects = function()
  */
 ParametricMesh.prototype.getVboKeysContainer = function()
 {
+	// TEST OBJECT. NO USE THIS CLASS.***
 	return this.vboKeyContainer;
 };
 
@@ -88,6 +95,7 @@ ParametricMesh.prototype.getSurfaceIndependentMesh = function(resultMesh, bInclu
  */
 ParametricMesh.prototype.revolve = function(profile2d, revolveAngDeg, revolveSegmentsCount, revolveSegment2d) 
 {
+	// TEST OBJECT. NO USE THIS CLASS.***
 	// Note: move this function into "VtxProfilesList" class.
 	if (profile2d === undefined)
 	{ return undefined; }
@@ -141,6 +149,7 @@ ParametricMesh.prototype.revolve = function(profile2d, revolveAngDeg, revolveSeg
  */
 ParametricMesh.prototype.extrude = function(profile2d, extrusionDist, extrudeSegmentsCount, extrusionVector) 
 {
+	// TEST OBJECT. NO USE THIS CLASS.***
 	// Note: move this function into "VtxProfilesList" class.
 	if (profile2d === undefined || extrusionDist === undefined)
 	{ return undefined; }

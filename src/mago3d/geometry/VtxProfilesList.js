@@ -216,7 +216,6 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 	// 3-------2
 	// |       |
 	// |       |
-	// |       |
 	// 0-------1
 	
 	if (this.vtxProfilesArray === undefined)
@@ -231,6 +230,7 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 		bIncludeBottomCap = false;
 		bIncludeTopCap = false;
 	}
+	
 	
 	// outerLateral.
 	var vtxProfilesCount = this.getVtxProfilesCount();
@@ -261,10 +261,11 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 	var facesArray = [];
 	var prevFacesArray;
 	var elemsCount = outerVtxRing.elemsIndexRangesArray.length;
-	
+	var options = {};
+	options.name = "outerLateral";
 	for (var i=0; i<elemsCount; i++)
 	{
-		surface = resultMesh.newSurface();
+		surface = resultMesh.newSurface(options);
 		prevFacesArray = undefined;
 		elemIndexRange = outerVtxRing.getElementIndexRange(i);
 		for (var j=0; j<vtxProfilesCount; j++)
@@ -310,6 +311,7 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 	}
 	
 	// Inner laterals.
+	options.name = "innerLateral";
 	var innerVtxRing;
 	var innerRinsCount = bottomVtxProfile.getInnerVtxRingsCount();
 	for (var k=0; k<innerRinsCount; k++)
@@ -318,7 +320,7 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 		elemsCount = innerVtxRing.elemsIndexRangesArray.length;
 		for (var i=0; i<elemsCount; i++)
 		{
-			surface = resultMesh.newSurface();
+			surface = resultMesh.newSurface(options);
 			prevFacesArray = undefined;
 			elemIndexRange = innerVtxRing.getElementIndexRange(i);
 			for (var j=0; j<vtxProfilesCount; j++)
@@ -380,22 +382,24 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 	// in this case, there are a surface with multiple convex faces.
 	if (bIncludeTopCap === undefined || bIncludeTopCap === true)
 	{
+		options.name = "top";
 		topVtxProfile = this.getVtxProfile(vtxProfilesCount-1);
-		resultSurface = resultMesh.newSurface();
+		resultSurface = resultMesh.newSurface(options);
 		resultSurface = VtxProfilesList.getTransversalSurface(topVtxProfile, this.convexFacesIndicesData, resultSurface);
 	}
 
 	// Bottom profile.**
 	if (bIncludeBottomCap === undefined || bIncludeBottomCap === true)
 	{
+		options.name = "bottom";
 		bottomVtxProfile = this.getVtxProfile(0);
-		resultSurface = resultMesh.newSurface();
+		resultSurface = resultMesh.newSurface(options);
 		resultSurface = VtxProfilesList.getTransversalSurface(bottomVtxProfile, this.convexFacesIndicesData, resultSurface);
 		
 		// in bottomSurface inverse sense of faces.
 		resultSurface.reverseSense();
 	}
-	
+
 	return resultMesh;
 };
 

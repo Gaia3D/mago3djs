@@ -601,14 +601,15 @@ void main() {\n\
 	}\n\
 }\n\
 ";
-ShaderSource.draw_frag3D = "precision mediump float;\n\
+ShaderSource.draw_frag3D = "precision highp float;\n\
 \n\
 uniform sampler2D u_wind;\n\
 uniform vec2 u_wind_min;\n\
 uniform vec2 u_wind_max;\n\
 uniform bool u_flipTexCoordY_windMap;\n\
 uniform bool u_colorScale;\n\
-uniform float u_alpha;\n\
+uniform float u_tailAlpha;\n\
+uniform float u_externAlpha;\n\
 \n\
 varying vec2 v_particle_pos;\n\
 \n\
@@ -702,13 +703,13 @@ void main() {\n\
 		}\n\
 		vec3 col3 = getRainbowColor_byHeight(speed_t);\n\
 		float r = speed_t;\n\
-		gl_FragColor = vec4(col3.x, col3.y, col3.z ,u_alpha);\n\
+		gl_FragColor = vec4(col3.x, col3.y, col3.z ,u_tailAlpha*u_externAlpha);\n\
 	}\n\
 	else{\n\
 		float intensity = speed_t*3.0;\n\
 		if(intensity > 1.0)\n\
 			intensity = 1.0;\n\
-		gl_FragColor = vec4(intensity,intensity,intensity,u_alpha);\n\
+		gl_FragColor = vec4(intensity,intensity,intensity,u_tailAlpha*u_externAlpha);\n\
 	}\n\
 }";
 ShaderSource.draw_vert = "precision mediump float;\n\
@@ -734,25 +735,52 @@ void main() {\n\
     gl_Position = vec4(2.0 * v_particle_pos.x - 1.0, 1.0 - 2.0 * v_particle_pos.y, 0, 1);\n\
 }\n\
 ";
-ShaderSource.draw_vert3D = "precision mediump float;\n\
+ShaderSource.draw_vert3D = "precision highp float;\n\
 \n\
 // This shader draws windParticles in 3d directly from positions on u_particles image.***\n\
 attribute float a_index;\n\
 \n\
 uniform sampler2D u_particles;\n\
 uniform float u_particles_res;\n\
+uniform mat4 buildingRotMatrix;\n\
 uniform mat4 ModelViewProjectionMatrix;\n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
 uniform vec3 u_camPosWC;\n\
 uniform vec3 u_geoCoordRadiansMax;\n\
 uniform vec3 u_geoCoordRadiansMin;\n\
 uniform float pendentPointSize;\n\
-uniform float u_alpha;\n\
+uniform float u_tailAlpha;\n\
 uniform float u_layerAltitude;\n\
 \n\
 varying vec2 v_particle_pos;\n\
 \n\
 #define M_PI 3.1415926535897932384626433832795\n\
-vec4 geographicToWorldCoord(float lonRad, float latRad, float alt)\n\
+\n\
+vec2 splitValue(float value)\n\
+{\n\
+	float doubleHigh;\n\
+	vec2 resultSplitValue;\n\
+	if (value >= 0.0) \n\
+	{\n\
+		doubleHigh = floor(value / 65536.0) * 65536.0; //unsigned short max\n\
+		resultSplitValue.x = doubleHigh;\n\
+		resultSplitValue.y = value - doubleHigh;\n\
+	}\n\
+	else \n\
+	{\n\
+		doubleHigh = floor(-value / 65536.0) * 65536.0;\n\
+		resultSplitValue.x = -doubleHigh;\n\
+		resultSplitValue.y = value + doubleHigh;\n\
+	}\n\
+	\n\
+	return resultSplitValue;\n\
+}\n\
+	\n\
+vec3 geographicToWorldCoord(float lonRad, float latRad, float alt)\n\
 {\n\
 	// defined in the LINZ standard LINZS25000 (Standard for New Zealand Geodetic Datum 2000)\n\
 	// https://www.linz.govt.nz/data/geodetic-system/coordinate-conversion/geodetic-datum-conversions/equations-used-datum\n\
@@ -773,7 +801,13 @@ vec4 geographicToWorldCoord(float lonRad, float latRad, float alt)\n\
 	float v = a/sqrt(1.0 - e2 * sinLat * sinLat);\n\
 	float h = alt;\n\
 	\n\
-	vec4 resultCartesian = vec4((v+h)*cosLat*cosLon, (v+h)*cosLat*sinLon, (v*(1.0-e2)+h)*sinLat, 1.0);\n\
+	float x = (v+h)*cosLat*cosLon;\n\
+	float y = (v+h)*cosLat*sinLon;\n\
+	float z = (v*(1.0-e2)+h)*sinLat;\n\
+	\n\
+	\n\
+	vec3 resultCartesian = vec3(x, y, z);\n\
+	\n\
 	return resultCartesian;\n\
 }\n\
 \n\
@@ -800,15 +834,47 @@ void main() {\n\
 	float latitudeRad = maxLatRad - v_particle_pos.y * latRadRange;\n\
 	\n\
 	// Now, calculate worldPosition of the geographicCoords (lon, lat, alt).***\n\
-	vec4 worldPos = geographicToWorldCoord(longitudeRad, latitudeRad, altitude);\n\
+	//vec3 posWC = geographicToWorldCoord(longitudeRad, latitudeRad, altitude);\n\
+	//vec4 posCC = vec4((posWC - encodedCameraPositionMCHigh) - encodedCameraPositionMCLow, 1.0);\n\
+	\n\
+	// Alternative.\n\
+	\n\
+	vec3 buildingPos = buildingPosHIGH + buildingPosLOW;\n\
+	float radius = length(buildingPos);\n\
+	float xOffset = (v_particle_pos.x - 0.5) * lonRadRange * radius;\n\
+	float yOffset = (0.5 - v_particle_pos.y) * latRadRange * radius;\n\
+	vec4 rotatedPos = buildingRotMatrix * vec4(xOffset, yOffset, 0.0, 1.0);\n\
+	\n\
+	\n\
+	vec4 posWC = vec4((rotatedPos.xyz+buildingPosLOW) +( buildingPosHIGH ), 1.0);\n\
+	vec4 posCC = vec4((rotatedPos.xyz+buildingPosLOW- encodedCameraPositionMCLow) +( buildingPosHIGH- encodedCameraPositionMCHigh), 1.0);\n\
 	\n\
 	// Now calculate the position on camCoord.***\n\
-	gl_Position = ModelViewProjectionMatrix * worldPos;\n\
-	float dist = distance(vec4(u_camPosWC.xyz, 1.0), worldPos);\n\
-	gl_PointSize = (2.0 + pendentPointSize/(dist))*u_alpha; \n\
+	//gl_Position = ModelViewProjectionMatrix * posWC;\n\
+	gl_Position = ModelViewProjectionMatrixRelToEye * posCC;\n\
+	//gl_Position = vec4(2.0 * v_particle_pos.x - 1.0, 1.0 - 2.0 * v_particle_pos.y, 0, 1);\n\
+	//gl_Position = vec4(v_particle_pos.x, v_particle_pos.y, 0, 1);\n\
+	\n\
+	// Now calculate the point size.\n\
+	float dist = distance(vec4(u_camPosWC.xyz, 1.0), vec4(posWC.xyz, 1.0));\n\
+	gl_PointSize = (1.0 + pendentPointSize/(dist))*u_tailAlpha; \n\
+	\n\
 	if(gl_PointSize > 10.0)\n\
 	gl_PointSize = 10.0;\n\
-}";
+}\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+";
 ShaderSource.filterSilhouetteFS = "precision mediump float;\n\
 \n\
 uniform sampler2D depthTex;\n\
@@ -2495,7 +2561,6 @@ void main()\n\
 \n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 	vertexPos = (modelViewMatrixRelToEye * pos4).xyz;\n\
-		//vertexPos = objPosHigh + objPosLow;\n\
 }";
 ShaderSource.ScreenQuadFS = "#ifdef GL_ES\n\
     precision highp float;\n\
@@ -2933,10 +2998,11 @@ uniform vec4 color;\n\
 void main() {\n\
 	gl_FragColor = color;\n\
 }";
-ShaderSource.thickLineVS = "attribute vec4 prev;\n\
+ShaderSource.thickLineVS = "\n\
+attribute vec4 prev;\n\
 attribute vec4 current;\n\
 attribute vec4 next;\n\
-attribute float order;\n\
+//attribute float order;\n\
 uniform float thickness;\n\
 uniform mat4 buildingRotMatrix;\n\
 uniform mat4 projectionMatrix;\n\
@@ -2983,7 +3049,7 @@ void main(){\n\
 	vec4 vNext = getPointRelToEye(vec4(next.xyz, 1.0));\n\
 	\n\
 	float order_w = current.w;\n\
-	//float order_w = order;\n\
+	//float order_w = float(order);\n\
 	float sense = 1.0;\n\
 	int orderInt = 0;\n\
 	if(order_w > 0.0)\n\
@@ -3039,6 +3105,7 @@ void main(){\n\
 	// Offset our position along the normal\n\
 	vec4 offset = vec4(normal * direction, 0.0, 1.0);\n\
 	gl_Position = currentProjected + offset; \n\
+	\n\
 }";
 ShaderSource.TinTerrainFS = "#ifdef GL_ES\n\
     precision highp float;\n\
@@ -3373,7 +3440,7 @@ vec2 lookup_wind(const vec2 uv) {\n\
     vec2 bl = texture2D(u_wind, vc + vec2(0, px.y)).rg;\n\
     vec2 br = texture2D(u_wind, vc + px).rg;\n\
     return mix(mix(tl, tr, f.x), mix(bl, br, f.x), f.y);\n\
-\n\
+	\n\
 }\n\
 \n\
 bool checkFrustumCulling(vec2 pos)\n\
@@ -3423,12 +3490,12 @@ void main() {\n\
 \n\
     // update particle position, wrapping around the date line\n\
     pos = fract(1.0 + pos + offset);\n\
-	//pos = pos + offset;\n\
+\n\
 \n\
     // drop rate is a chance a particle will restart at random position, to avoid degeneration\n\
 	float drop = 0.0;\n\
 \n\
-	if(u_interpolation < 0.9) // 0.9\n\
+	if(u_interpolation < 0.99) // 0.9\n\
 	{\n\
 		drop = 0.0;\n\
 	}\n\

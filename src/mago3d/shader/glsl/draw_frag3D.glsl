@@ -1,11 +1,12 @@
-precision mediump float;
+precision highp float;
 
 uniform sampler2D u_wind;
 uniform vec2 u_wind_min;
 uniform vec2 u_wind_max;
 uniform bool u_flipTexCoordY_windMap;
 uniform bool u_colorScale;
-uniform float u_alpha;
+uniform float u_tailAlpha;
+uniform float u_externAlpha;
 
 varying vec2 v_particle_pos;
 
@@ -99,12 +100,12 @@ void main() {
 		}
 		vec3 col3 = getRainbowColor_byHeight(speed_t);
 		float r = speed_t;
-		gl_FragColor = vec4(col3.x, col3.y, col3.z ,u_alpha);
+		gl_FragColor = vec4(col3.x, col3.y, col3.z ,u_tailAlpha*u_externAlpha);
 	}
 	else{
 		float intensity = speed_t*3.0;
 		if(intensity > 1.0)
 			intensity = 1.0;
-		gl_FragColor = vec4(intensity,intensity,intensity,u_alpha);
+		gl_FragColor = vec4(intensity,intensity,intensity,u_tailAlpha*u_externAlpha);
 	}
 }

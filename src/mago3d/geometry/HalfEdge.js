@@ -102,6 +102,30 @@ HalfEdge.prototype.setFace = function(face)
 };
 
 /**
+ * get segment3d.
+ * @returns {Segment3D} if this next is undefined, can't get end vertex. so return undefined.
+ */
+HalfEdge.prototype.getSegment3d = function()
+{
+	if (this.next === undefined)
+	{ return undefined; }
+
+	var strPoint3d = this.getStartVertex().getPosition();
+	var endPoint3d = this.getEndVertex().getPosition();
+	var segment3d = new Segment3D(strPoint3d, endPoint3d);
+	return segment3d;
+};
+
+/**
+ * get start vertex.
+ * @returns {Vertex|undefined} .
+ */
+HalfEdge.prototype.getStartVertex = function()
+{
+	return this.startVertex;
+};
+
+/**
  * get end vertex.
  * @returns {Vertex|undefined} if this next is undefined, can't get end vertex. so return undefined.
  */

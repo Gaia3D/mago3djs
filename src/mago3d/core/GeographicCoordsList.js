@@ -27,6 +27,17 @@ var GeographicCoordsList = function(geographicCoordsArray)
  * push single point
  * @param {GeographicCoord}
  */
+GeographicCoordsList.prototype.newGeoCoord = function(lon, lat, alt) 
+{
+	var geoCoord = new GeographicCoord(lon, lat, alt);
+	this.addGeoCoord(geoCoord);
+	return geoCoord;
+};
+
+/**
+ * push single point
+ * @param {GeographicCoord}
+ */
 GeographicCoordsList.prototype.addGeoCoord = function(geographicPoint) 
 {
 	this.geographicCoordsArray.push(geographicPoint);
@@ -106,6 +117,26 @@ GeographicCoordsList.prototype.getGeoCoordSegment = function(idx, resultGeoCoord
 	resultGeoCoordSegment.endGeoCoord = geoCoord2;
 	
 	return resultGeoCoordSegment;
+};
+
+/**
+ * 
+ * 
+ */
+GeographicCoordsList.prototype.getCopy = function(resultGeoCoordsListCopy) 
+{
+	if (resultGeoCoordsListCopy === undefined)
+	{ resultGeoCoordsListCopy = new GeographicCoordsList(); }
+	
+	var geoPointsCount = this.getGeoCoordsCount();
+	for (var i=0; i<geoPointsCount; i++)
+	{
+		var geoCoord = this.getGeoCoord(i);
+		var geoCoordCopy = new GeographicCoord(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude);
+		resultGeoCoordsListCopy.addGeoCoord(geoCoordCopy);
+	}
+	
+	return resultGeoCoordsListCopy;
 };
 
 /**
@@ -212,6 +243,99 @@ GeographicCoordsList.prototype.test__makeThickLines = function(magoManager)
 	var resultVboKeysContainer = Point3DList.getVboThickLines(magoManager, this.points3dList.pointsArray, undefined);
 	
 	this.points3dList.vboKeysContainer = resultVboKeysContainer;
+};
+
+/**
+ * 
+ */
+GeographicCoordsList.prototype.getGeographicExtent = function(resultGeographicExtent) 
+{
+	if (!resultGeographicExtent)
+	{ resultGeographicExtent = new GeographicExtent(); }
+	
+	var geoCoord;
+	var geoCoordsCount = this.geographicCoordsArray.length;
+	for (var i=0; i<geoCoordsCount; i++)
+	{
+		geoCoord = this.geographicCoordsArray[i];
+		if (i === 0)
+		{
+			resultGeographicExtent.setInitExtent(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude);
+		}
+		else 
+		{
+			resultGeographicExtent.addGeographicCoord(geoCoord);
+		}
+	}
+	
+	return resultGeographicExtent;
+};
+
+/**
+ * 
+ */
+GeographicCoordsList.prototype.getMiddleGeographicCoords = function(resultMiddleGeoCoords) 
+{
+	var geoExtent = this.getGeographicExtent();
+	return geoExtent.getMidPoint(resultMiddleGeoCoords);
+};
+
+/**
+ * 
+ */
+GeographicCoordsList.prototype.addAltitude = function(length) 
+{
+	var geoCoord;
+	var geoCoordsCount = this.geographicCoordsArray.length;
+	for (var i=0; i<geoCoordsCount; i++)
+	{
+		geoCoord = this.geographicCoordsArray[i];
+		geoCoord.altitude += length;
+	}
+};
+
+/**
+ * 
+ */
+GeographicCoordsList.prototype.getExtrudedMeshRenderableObject = function(height, bLoop, resultRenderableObject, magoManager, extrudeDirWC) 
+{
+	if (!resultRenderableObject)
+	{
+		resultRenderableObject = new RenderableObject();
+	}
+	resultRenderableObject.geoLocDataManager = new GeoLocationDataManager();
+	var geoLocData = resultRenderableObject.geoLocDataManager.newGeoLocationData();
+	
+	// The origin of this object is in the middle of this geoCoordsList.
+	var midGeoCoord = this.getMiddleGeographicCoords();
+	
+	// Make the topGeoCoordsList.
+	var topGeoCoordsList = this.getCopy();
+	
+	// Reassign the altitude on the geoCoordsListCopy.
+	topGeoCoordsList.addAltitude(height);
+	
+	// All points3d is referenced to the middleGeoCoord.
+	ManagerUtils.calculateGeoLocationData(midGeoCoord.longitude, midGeoCoord.latitude, midGeoCoord.altitude, 0, 0, 0, geoLocData);
+	var basePoints3dArray = this.getPointsRelativeToGeoLocation(geoLocData, undefined);
+	var topPoints3dArray = topGeoCoordsList.getPointsRelativeToGeoLocation(geoLocData, undefined);
+	
+	// Now, with basePoints3dArray & topPoints3dArray make a mesh.
+	// Create a VtxProfilesList.
+	var vtxProfilesList = new VtxProfilesList();
+	var baseVtxProfile = vtxProfilesList.newVtxProfile();
+	baseVtxProfile.makeByPoints3DArray(basePoints3dArray, undefined); 
+	var topVtxProfile = vtxProfilesList.newVtxProfile();
+	topVtxProfile.makeByPoints3DArray(topPoints3dArray, undefined); 
+	
+	var bIncludeBottomCap = true;
+	var bIncludeTopCap = true;
+	var solidMesh = vtxProfilesList.getMesh(undefined, bIncludeBottomCap, bIncludeTopCap);
+	var surfIndepMesh = solidMesh.getCopySurfaceIndependentMesh();
+	surfIndepMesh.calculateVerticesNormals();
+	
+	resultRenderableObject.objectsArray.push(surfIndepMesh);
+	return resultRenderableObject;
 };
 
 /**

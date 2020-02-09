@@ -338,7 +338,7 @@ Point3DList.getVbo = function(magoManager, point3dArray, resultVboKeysContainer)
  * Make the vbo of this point3DList
  * @param magoManager
  */
-Point3DList.getVboThickLines = function(magoManager, point3dArray, resultVboKeysContainer)
+Point3DList.getVboThickLines__element = function(magoManager, point3dArray, resultVboKeysContainer)
 {
 	if (point3dArray === undefined || point3dArray.length < 2)
 	{ return resultVboKeysContainer; }
@@ -347,7 +347,7 @@ Point3DList.getVboThickLines = function(magoManager, point3dArray, resultVboKeys
 	{ resultVboKeysContainer = new VBOVertexIdxCacheKeysContainer(); }
 
 	var pointsCount = point3dArray.length;
-	/*
+	
 	// New.*************************************************************************************************************************
 	var repeats = 4;
 	var pointDimension = 3;
@@ -371,17 +371,26 @@ Point3DList.getVboThickLines = function(magoManager, point3dArray, resultVboKeys
 		//	posVboDataArray[i*3+1] = point3d.y;
 		//	posVboDataArray[i*3+2] = point3d.z;
 		//}
+		var idx = new Uint16Array([i]);
+		idxVboDataArray[i*4] = idx[0];
+		idxVboDataArray[i*4+1] = idx[0];
+		idxVboDataArray[i*4+2] = idx[0];
+		idxVboDataArray[i*4+3] = idx[0];
 		
-		idxVboDataArray[i*4] = i;
-		idxVboDataArray[i*4+1] = i;
-		idxVboDataArray[i*4+2] = i;
-		idxVboDataArray[i*4+3] = i;
+		//orderVboDataArray[i*4] = 2;
+		//orderVboDataArray[i*4+1] = -2;
+		//orderVboDataArray[i*4+2] = 1;
+		//orderVboDataArray[i*4+3] = -1;
 		
-		orderVboDataArray[i*4] = 1;
-		orderVboDataArray[i*4+1] = -1;
-		orderVboDataArray[i*4+2] = 2;
-		orderVboDataArray[i*4+3] = -2;
+		//orderVboDataArray[i*4] = -1;
+		//orderVboDataArray[i*4+1] = 2;
+		//orderVboDataArray[i*4+2] = -2;
+		//orderVboDataArray[i*4+3] = 1;
 		
+		orderVboDataArray[i*4] = -2;
+		orderVboDataArray[i*4+1] = 1;
+		orderVboDataArray[i*4+2] = -1;
+		orderVboDataArray[i*4+3] = 2;
 	}
 	var vboMemManager = magoManager.vboMemoryManager;
 	var vbo = resultVboKeysContainer.newVBOVertexIdxCacheKey();
@@ -392,16 +401,29 @@ Point3DList.getVboThickLines = function(magoManager, point3dArray, resultVboKeys
 	var name = "thickLineOrder";
 	var attribLoc = 3; // defined as "3" when create the thickLine_shader.
 	vbo.setDataArrayCustom(orderVboDataArray, vboMemManager, dimensions, name, attribLoc);
-	*/
 	
-	// Old.*************************************************************************************************************************
+	return resultVboKeysContainer;
+};
+
+/**
+ * Make the vbo of this point3DList
+ * @param magoManager
+ */
+Point3DList.getVboThickLines = function(magoManager, point3dArray, resultVboKeysContainer)
+{
+	if (point3dArray === undefined || point3dArray.length < 2)
+	{ return resultVboKeysContainer; }
+
+	if (resultVboKeysContainer === undefined)
+	{ resultVboKeysContainer = new VBOVertexIdxCacheKeysContainer(); }
+
+	var pointsCount = point3dArray.length;
+
 	// in this case make point4d (x, y, z, w). In "w" save the sign (1 or -1) for the offset in the shader to draw triangles strip.
-	// check if the indexes is bigger than 65536. TODO.
 	var repeats = 4;
 	var pointDimension = 4;
 	var posByteSize = pointsCount * pointDimension * repeats;
 	var posVboDataArray = new Float32Array(posByteSize);
-	//var idxVboDataArray = new Uint16Array(pointsCount * repeats);
 	var point3d;
 
 	for (var i=0; i<pointsCount; i++)
@@ -426,18 +448,11 @@ Point3DList.getVboThickLines = function(magoManager, point3dArray, resultVboKeys
 		posVboDataArray[i*16+13] = point3d.y;
 		posVboDataArray[i*16+14] = point3d.z;
 		posVboDataArray[i*16+15] = -2; // order.
-		
-		//idxVboDataArray[i*4] = i*4;
-		//idxVboDataArray[i*4+1] = i*4+1;
-		//idxVboDataArray[i*4+2] = i*4+2;
-		//idxVboDataArray[i*4+3] = i*4+3;
 	}
 	
 	
 	var vbo = resultVboKeysContainer.newVBOVertexIdxCacheKey();
 	vbo.setDataArrayPos(posVboDataArray, magoManager.vboMemoryManager, pointDimension);
-	//vbo.setDataArrayIdx(idxVboDataArray, magoManager.vboMemoryManager);
-	// End old.-----------------------------------------------------------------------------------------------------------------------
 	
 	return resultVboKeysContainer;
 };
@@ -595,7 +610,7 @@ Point3DList.prototype.renderAsChild = function(magoManager, shader, renderType, 
  * @param renderType
  * @param bEnableDepth if this is turned off, then the last-drawing feature will be shown at the top
  */
-Point3DList.prototype.renderThickLines = function(magoManager, shader, renderType, bEnableDepth, options)
+Point3DList.prototype.renderThickLines__element = function(magoManager, shader, renderType, bEnableDepth, options)
 {
 	if (this.vboKeysContainer === undefined)
 	{ return; }
@@ -611,6 +626,103 @@ Point3DList.prototype.renderThickLines = function(magoManager, shader, renderTyp
 	shader.bindUniformGenerals();
 	var gl = magoManager.getGl();
 	gl.enable(gl.BLEND);
+	gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
+	gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+	gl.disable(gl.CULL_FACE);
+	
+	gl.enableVertexAttribArray(shader.prev_loc);
+	gl.enableVertexAttribArray(shader.current_loc);
+	gl.enableVertexAttribArray(shader.next_loc);
+	gl.enableVertexAttribArray(shader.order_loc);
+	
+	var orderLoc = gl.getAttribLocation(shader.program, "order");
+	
+	var geoLocData = this.geoLocDataManager.getCurrentGeoLocationData();
+	geoLocData.bindGeoLocationUniforms(gl, shader);
+
+	var sceneState = magoManager.sceneState;
+	var projMat = sceneState.projectionMatrix;
+	var viewMat = sceneState.modelViewMatrix;
+	var drawingBufferWidth = sceneState.drawingBufferWidth;
+	var drawingBufferHeight = sceneState.drawingBufferHeight;
+	
+	this.thickness = 10.0;
+	
+	gl.uniform4fv(shader.color_loc, [0.5, 0.7, 0.9, 1.0]);
+	gl.uniform2fv(shader.viewport_loc, [drawingBufferWidth[0], drawingBufferHeight[0]]);
+	gl.uniform1f(shader.thickness_loc, this.thickness);
+
+	var vboPos = vbo.vboBufferPos;
+	var dim = vboPos.dataDimensions; // in this case dimensions = 4.
+	if (!vboPos.isReady(gl, magoManager.vboMemoryManager))
+	{
+		return;
+	}
+	
+	// New.**********************
+	
+	gl.bindBuffer(gl.ARRAY_BUFFER, vboPos.key);
+	gl.vertexAttribPointer(shader.prev_loc, dim, gl.FLOAT, false, 0, 0);
+	gl.vertexAttribPointer(shader.current_loc, dim, gl.FLOAT, false, 0, 12);
+	gl.vertexAttribPointer(shader.next_loc, dim, gl.FLOAT, false, 0, 24);
+
+	var vboOrder = vbo.getVboCustom("thickLineOrder");
+	if (!vboOrder.isReady(gl, magoManager.vboMemoryManager))
+	{
+		return;
+	}
+	gl.bindBuffer(gl.ARRAY_BUFFER, vboOrder.key);
+	gl.vertexAttribPointer(shader.order_loc, vboOrder.dataDimensions, gl.FLOAT, false, 0, 0);
+
+	var indicesCount = vbo.indicesCount;
+	if (!vbo.bindDataIndice(shader, magoManager.vboMemoryManager))
+	{ return false; }
+
+	gl.disable(gl.DEPTH_TEST);
+	//gl.drawElements(gl.TRIANGLE_STRIP, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.
+	gl.drawElements(gl.LINE_STRIP, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.
+	//gl.drawArrays(gl.TRIANGLE_STRIP, 0, vbo.vertexCount-4);
+	gl.enable(gl.DEPTH_TEST);
+	
+	
+	// old.**********************************************************************************************
+	//gl.bindBuffer(gl.ARRAY_BUFFER, vboPos.key);
+	//gl.vertexAttribPointer(shader.prev_loc, dim, gl.FLOAT, false, 16, 0);
+	//gl.vertexAttribPointer(shader.current_loc, dim, gl.FLOAT, false, 16, 64-32);
+	//gl.vertexAttribPointer(shader.next_loc, dim, gl.FLOAT, false, 16, 128-32);
+	
+	//gl.drawArrays(gl.TRIANGLE_STRIP, 0, vbo.vertexCount-4);
+
+	// End old.-------------------------------------------------------------------------------------------
+	
+
+	gl.enable(gl.CULL_FACE);
+	gl.disable(gl.BLEND);
+};
+
+/**
+ * Render this point3dlist using vbo of this list. 
+ * @param magoManager
+ * @param shader 
+ * @param renderType
+ * @param bEnableDepth if this is turned off, then the last-drawing feature will be shown at the top
+ */
+Point3DList.prototype.renderThickLines = function(magoManager, shader, renderType, bEnableDepth, options)
+{
+	if (this.vboKeysContainer === undefined)
+	{ return; }
+
+	if (this.geoLocDataManager === undefined)
+	{ return; }
+	
+	var vbo = this.vboKeysContainer.getVboKey(0);
+	
+	// based on https://weekly-geekly.github.io/articles/331164/index.html
+	var shader = magoManager.postFxShadersManager.getShader("thickLine");
+	shader.useProgram();
+	shader.bindUniformGenerals();
+	var gl = magoManager.getGl();
+
 	gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
 	gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 	gl.disable(gl.CULL_FACE);
@@ -640,50 +752,15 @@ Point3DList.prototype.renderThickLines = function(magoManager, shader, renderTyp
 	{
 		return;
 	}
-	
-	// New.**********************
-	/*
-	gl.bindBuffer(gl.ARRAY_BUFFER, vboPos.key);
-	gl.vertexAttribPointer(shader.prev_loc, dim, gl.FLOAT, false, 3, 0);
-	gl.vertexAttribPointer(shader.current_loc, dim, gl.FLOAT, false, 3, 6);
-	gl.vertexAttribPointer(shader.next_loc, dim, gl.FLOAT, false, 3, 12);
 
-	var vboOrder = vbo.getVboCustom("thickLineOrder");
-	if (!vboOrder.isReady(gl, magoManager.vboMemoryManager))
-	{
-		return;
-	}
-	gl.bindBuffer(gl.ARRAY_BUFFER, vboOrder.key);
-	gl.vertexAttribPointer(shader.order_loc, vboOrder.dataDimensions, gl.FLOAT, false, 4, 0);
-
-	var indicesCount = vbo.indicesCount;
-	if (!vbo.bindDataIndice(shader, magoManager.vboMemoryManager))
-	{ return false; }
-	gl.drawElements(gl.TRIANGLE_STRIP, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.
-	*/
-	
-	
-	// old.**********************************************************************************************
 	gl.bindBuffer(gl.ARRAY_BUFFER, vboPos.key);
 	gl.vertexAttribPointer(shader.prev_loc, dim, gl.FLOAT, false, 16, 0);
 	gl.vertexAttribPointer(shader.current_loc, dim, gl.FLOAT, false, 16, 64-32);
 	gl.vertexAttribPointer(shader.next_loc, dim, gl.FLOAT, false, 16, 128-32);
 
-	//gl.bindBuffer(gl.ARRAY_BUFFER, this._ordersBuffer);
-	//gl.vertexAttribPointer(shader.order._pName, this._ordersBuffer.itemSize, gl.FLOAT, false, 4, 0);
-
-	//gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexesBuffer);
-	//gl.drawElements(gl.TRIANGLE_STRIP, this._indexesBuffer.numItems, gl.UNSIGNED_INT, 0);
-	
 	gl.drawArrays(gl.TRIANGLE_STRIP, 0, vbo.vertexCount-4);
-	
-	//gl.uniform4fv(shader.color_loc, [0.0, 0.0, 0.0, 1.0]);
-	//gl.drawArrays(gl.LINE_STRIP, 0, vbo.vertexCount);
-	// End old.-------------------------------------------------------------------------------------------
-	
 
 	gl.enable(gl.CULL_FACE);
-	gl.disable(gl.BLEND);
 };
 
 /**

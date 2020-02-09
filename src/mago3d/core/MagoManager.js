@@ -235,7 +235,7 @@ var MagoManager = function()
 	this.objMarkerManager = new ObjectMarkerManager();
 	this.pin = new Pin();
 	
-	//this.weatherStation = new WeatherStation();
+	this.weatherStation = new WeatherStation();
 	
 	// renderWithTopology === 0 -> render only CityGML.***
 	// renderWithTopology === 1 -> render only IndoorGML.***
@@ -1180,6 +1180,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	if (this.weatherStation)
 	{
 		this.weatherStation.renderLastWindLayer(this);
+		//this.weatherStation.renderWindMultiLayers(this);
 		//this.weatherStation.test_renderWindLayer(this);
 		//this.weatherStation.test_renderTemperatureLayer(this);
 		//this.weatherStation.test_renderCuttingPlanes(this, renderType);
@@ -1820,6 +1821,8 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
 	this.mouseLeftDown = false;
 	this.mouseDragging = false;
 	this.selObjMovePlane = undefined;
+	this.selObjMovePlaneCC = undefined;
+	this.startGeoCoordDif = undefined;
 	this.mustCheckIfDragging = true;
 	this.thereAreStartMovePoint = false;
 
@@ -1953,9 +1956,9 @@ MagoManager.prototype.keyDown = function(key)
 	}
 	else if (key === 39) // 39 = 'right'.***
 	{
-		//this.modeler.mode = CODE.modelerMode.DRAWING_BSPLINE;
+		this.modeler.mode = CODE.modelerMode.DRAWING_BSPLINE;
 		//this.modeler.mode = CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS;
-		this.modeler.mode = 51;
+		//this.modeler.mode = 51;
 	}
 	else if (key === 40) // 40 = 'down'.***
 	{
@@ -2101,6 +2104,7 @@ MagoManager.prototype.keyDown = function(key)
 			//{
 			//	excavation.makeExtrudeObject(this);
 			//}
+			/*
 			if (geoCoordsList !== undefined && geoCoordsList.geographicCoordsArray.length > 0)
 			{
 				// test make thickLine.
@@ -2119,7 +2123,7 @@ MagoManager.prototype.keyDown = function(key)
 				tunnel.makeMesh(this);
 				
 			}
-			
+			*/
 			// Another test: Change color by projectId & objectId.***
 			var api = new API();
 			api.apiName = "changeColor";
@@ -2240,16 +2244,21 @@ MagoManager.prototype.keyDown = function(key)
 		if (this.windCounterAux === undefined)
 		{ this.windCounterAux = 0; }
 		
+		if (this.altitudeAux === undefined)
+		{ this.altitudeAux = 0.0; }
+	
+		this.altitudeAux += 10.0;
+	
 		var geometryDataPath = this.readerWriter.geometryDataPath;
 		var options = {
 			name              : "JeJu Island",
-			speedFactor       : 1.0,
+			speedFactor       : 2.0,
 			dropRate          : 0.003,
 			dropRateBump      : 0.001,
-			numParticles      : 65536/4,
-			layerAltitude     : 60.0,
+			numParticles      : 65536/8,
+			layerAltitude     : this.altitudeAux,
 			windMapFileName   : "OBS-QWM_2016062000.grib2_wind_000",
-			windMapFolderPath : geometryDataPath +"/JeJu_wind_20191127"
+			windMapFolderPath : geometryDataPath +"/JeJu_wind_GolfPark"
 		};
 		
 		var bCreateWind = true;
@@ -2388,7 +2397,7 @@ MagoManager.prototype.keyDown = function(key)
 			
 			var gl = this.getGl();
 			var windLayer = this.weatherStation.newWindLayer(options);
-			windLayer.init(gl);
+			windLayer.init(gl, this);
 			
 			if (firstWindLayer !== undefined)
 			{
@@ -3205,6 +3214,166 @@ MagoManager.prototype.moveSelectedObjectGeneral = function(gl, object)
 	
 	var mouseAction = this.sceneState.mouseAction;
 
+	
+	if (this.selObjMovePlaneCC === undefined) 
+	{
+		this.selObjMovePlaneCC = new Plane();
+		// calculate the pixelPos in camCoord.
+		var camPosWC = this.sceneState.camera.getPosition();
+		var camPosTMat = ManagerUtils.calculateGeoLocationMatrixAtWorldPosition(camPosWC, camPosTMat);
+		var mvMat = this.sceneState.modelViewMatrix;
+		var mvMatRelToEye = this.sceneState.modelViewRelToEyeMatrix;
+		var pixelPosCC = mvMat.transformPoint3D(mouseAction.strWorldPoint, undefined);
+		
+		var globeYaxisWC = new Point3D(camPosTMat._floatArrays[4], camPosTMat._floatArrays[5], camPosTMat._floatArrays[6]);
+		var globeYaxisCC = mvMatRelToEye.transformPoint3D(globeYaxisWC, undefined);
+		
+		var globeZaxisWC = new Point3D(camPosTMat._floatArrays[8], camPosTMat._floatArrays[9], camPosTMat._floatArrays[10]);
+		var globeZaxisCC = mvMatRelToEye.transformPoint3D(globeZaxisWC, undefined);
+		
+		if (attributes.movementInAxisZ)
+		{
+			this.selObjMovePlaneCC.setPointAndNormal(pixelPosCC.x, pixelPosCC.y, pixelPosCC.z,    globeYaxisCC.x, globeYaxisCC.y, globeYaxisCC.z); 
+		}
+		else 
+		{
+			// movement in plane XY.
+			this.selObjMovePlaneCC.setPointAndNormal(pixelPosCC.x, pixelPosCC.y, pixelPosCC.z,    globeZaxisCC.x, globeZaxisCC.y, globeZaxisCC.z); 
+		}
+	}
+
+	
+	if (this.lineCC === undefined)
+	{ this.lineCC = new Line(); }
+	var camRay = ManagerUtils.getRayCamSpace(this.mouse_x, this.mouse_y, camRay, this);
+	this.lineCC.setPointAndDir(0, 0, 0,  camRay[0], camRay[1], camRay[2]);
+	
+	
+	// Calculate intersection cameraRay with planeCC.
+	var intersectionPointCC = new Point3D();
+	intersectionPointCC = this.selObjMovePlaneCC.intersectionLine(this.lineCC, intersectionPointCC);
+	//------------------------------------------------------------------------------------------------
+
+	var mvMat = this.sceneState.modelViewMatrixInv;
+	var intersectionPointWC = mvMat.transformPoint3D(intersectionPointCC, intersectionPointWC);
+
+	
+	// register the movement.***
+	if (!this.thereAreStartMovePoint) 
+	{
+		var cartographic = ManagerUtils.pointToGeographicCoord(intersectionPointWC, cartographic, this);
+		this.thereAreStartMovePoint = true;
+		
+		var buildingGeoCoord = geoLocationData.geographicCoord;
+		this.startGeoCoordDif = new GeographicCoord(cartographic.longitude-buildingGeoCoord.longitude, cartographic.latitude-buildingGeoCoord.latitude, cartographic.altitude-buildingGeoCoord.altitude);
+
+	}
+	else 
+	{
+		var cartographic = ManagerUtils.pointToGeographicCoord(intersectionPointWC, cartographic, this);
+
+		var difX = cartographic.longitude - this.startGeoCoordDif.longitude;
+		var difY = cartographic.latitude - this.startGeoCoordDif.latitude;
+		var difZ = cartographic.altitude - this.startGeoCoordDif.altitude;
+		
+		var newLongitude = difX;
+		var newlatitude = difY;
+		var newAltitude = difZ;
+		
+		if (Math.abs(newAltitude) > 50)
+		{ var hola = 0; }
+		
+		// Must check if there are restrictions.***
+		var attributes = object.attributes;
+		if (attributes && attributes.movementRestriction)
+		{
+			var movementRestriction = attributes.movementRestriction;
+			if (movementRestriction)
+			{
+				var movementRestrictionType = movementRestriction.restrictionType;
+				var movRestrictionElem = movementRestriction.element;
+				if (movRestrictionElem && movRestrictionElem.constructor.name === "GeographicCoordSegment")
+				{
+					// restriction.***
+					var geoCoordSegment = movRestrictionElem;
+					var newGeoCoord = new GeographicCoord(newLongitude, newlatitude, 0.0);
+					var projectedCoord = GeographicCoordSegment.getProjectedCoordToLine(geoCoordSegment, newGeoCoord, undefined);
+					
+					// check if is inside.***
+					if (!GeographicCoordSegment.intersectionWithGeoCoord(geoCoordSegment, projectedCoord))
+					{
+						var nearestGeoCoord = GeographicCoordSegment.getNearestGeoCoord(geoCoordSegment, projectedCoord);
+						newLongitude = nearestGeoCoord.longitude;
+						newlatitude = nearestGeoCoord.latitude;
+					}
+					else 
+					{
+						newLongitude = projectedCoord.longitude;
+						newlatitude = projectedCoord.latitude;
+					}
+				}
+			}
+		}
+		if (attributes && attributes.hasStaticModel)
+		{
+			var projectId = attributes.projectId;
+			var dataKey = attributes.instanceId;
+			if (!defined(projectId))
+			{
+				return false;
+			}
+			if (!defined(dataKey))
+			{
+				return false;
+			}
+			var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
+			if (node !== undefined)
+			{
+				node.changeLocationAndRotation(newlatitude, newLongitude, 0, attributes.f4dHeading, 0, 0, this);
+			}
+		}
+		
+		if (attributes.movementInAxisZ)
+		{
+			geoLocationData = ManagerUtils.calculateGeoLocationData(undefined, undefined, newAltitude, undefined, undefined, undefined, geoLocationData, this);
+		}
+		else 
+		{
+			geoLocationData = ManagerUtils.calculateGeoLocationData(newLongitude, newlatitude, undefined, undefined, undefined, undefined, geoLocationData, this);
+		}
+
+	}
+	
+	object.moved();
+};
+
+/**
+ * Moves an object.
+ * @param {WebGLRenderingContext} gl WebGLRenderingContext.
+ */
+MagoManager.prototype.moveSelectedObjectGeneral__original = function(gl, object) 
+{
+	if (object === undefined)
+	{ return; }
+
+	object = object.getRootOwner();
+
+	var attributes = object.attributes;
+	if (attributes === undefined)
+	{ return; }
+
+	var isMovable = attributes.isMovable;
+	if (isMovable === undefined || isMovable === false)
+	{ return; }
+	
+	var geoLocDataManager = object.getGeoLocDataManager();
+	if (geoLocDataManager === undefined)
+	{ return; }
+	
+	var geoLocationData = geoLocDataManager.getCurrentGeoLocationData();
+	
+	var mouseAction = this.sceneState.mouseAction;
+
 	// create a XY_plane in the selected_pixel_position.***
 	if (this.selObjMovePlane === undefined) 
 	{
@@ -3213,7 +3382,16 @@ MagoManager.prototype.moveSelectedObjectGeneral = function(gl, object)
 		// find the pixel position relative to building.
 		var tMatrixInv = geoLocationData.getGeoLocationMatrixInv();
 		var pixelPosBuildingCoord = tMatrixInv.transformPoint3D(mouseAction.strWorldPoint, pixelPosBuildingCoord);
-		this.selObjMovePlane.setPointAndNormal(pixelPosBuildingCoord.x, pixelPosBuildingCoord.y, pixelPosBuildingCoord.z,    0.0, 0.0, 1.0); 
+		
+		if (attributes.movementInAxisZ)
+		{
+			this.selObjMovePlane.setPointAndNormal(pixelPosBuildingCoord.x, pixelPosBuildingCoord.y, pixelPosBuildingCoord.z,    0.0, -1.0, 0.0); 
+		}
+		else 
+		{
+			// movement in plane XY.
+			this.selObjMovePlane.setPointAndNormal(pixelPosBuildingCoord.x, pixelPosBuildingCoord.y, pixelPosBuildingCoord.z,    0.0, 0.0, 1.0); 
+		}
 	}
 
 	if (this.lineSC === undefined)
@@ -3250,6 +3428,7 @@ MagoManager.prototype.moveSelectedObjectGeneral = function(gl, object)
 		var cartographic = ManagerUtils.pointToGeographicCoord(intersectionPointWC, cartographic, this);
 		this.startMovPoint.x = cartographic.longitude;
 		this.startMovPoint.y = cartographic.latitude;
+		this.startMovPoint.z = cartographic.altitude;
 		this.thereAreStartMovePoint = true;
 	}
 	else 
@@ -3257,9 +3436,11 @@ MagoManager.prototype.moveSelectedObjectGeneral = function(gl, object)
 		var cartographic = ManagerUtils.pointToGeographicCoord(intersectionPointWC, cartographic, this);
 		var difX = cartographic.longitude - this.startMovPoint.x;
 		var difY = cartographic.latitude - this.startMovPoint.y;
-
+		var difZ = cartographic.altitude - this.startMovPoint.z;
+		
 		var newLongitude = geoLocationData.geographicCoord.longitude - difX;
 		var newlatitude = geoLocationData.geographicCoord.latitude - difY;
+		var newAltitude = geoLocationData.geographicCoord.altitude - difZ;
 		
 		// Must check if there are restrictions.***
 		var attributes = object.attributes;
@@ -3313,7 +3494,16 @@ MagoManager.prototype.moveSelectedObjectGeneral = function(gl, object)
 		
 		difX = geoLocationData.geographicCoord.longitude - newLongitude;
 		difY = geoLocationData.geographicCoord.latitude - newlatitude;
-		geoLocationData = ManagerUtils.calculateGeoLocationData(newLongitude, newlatitude, undefined, undefined, undefined, undefined, geoLocationData, this);
+		difZ = geoLocationData.geographicCoord.altitude - newAltitude;
+		
+		if (attributes.movementInAxisZ)
+		{
+			geoLocationData = ManagerUtils.calculateGeoLocationData(undefined, undefined, newAltitude, undefined, undefined, undefined, geoLocationData, this);
+		}
+		else 
+		{
+			geoLocationData = ManagerUtils.calculateGeoLocationData(newLongitude, newlatitude, undefined, undefined, undefined, undefined, geoLocationData, this);
+		}
 		
 		this.startMovPoint.x -= difX;
 		this.startMovPoint.y -= difY;
@@ -3344,67 +3534,79 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 		
 		var mouseAction = this.sceneState.mouseAction;
 	
-		// create a XY_plane in the selected_pixel_position.***
-		if (this.selObjMovePlane === undefined) 
+		var attributes = {};
+		
+		if (this.selObjMovePlaneCC === undefined) 
 		{
-			this.selObjMovePlane = new Plane();
-			// create a local XY plane.
-			// find the pixel position relative to building.
-			var tMatrixInv = geoLocationData.getGeoLocationMatrixInv();
-			var pixelPosBuildingCoord = tMatrixInv.transformPoint3D(mouseAction.strWorldPoint, pixelPosBuildingCoord);
-			this.selObjMovePlane.setPointAndNormal(pixelPosBuildingCoord.x, pixelPosBuildingCoord.y, pixelPosBuildingCoord.z,    0.0, 0.0, 1.0); 
+			this.selObjMovePlaneCC = new Plane();
+			// calculate the pixelPos in camCoord.
+			var camPosWC = this.sceneState.camera.getPosition();
+			var camPosTMat = ManagerUtils.calculateGeoLocationMatrixAtWorldPosition(camPosWC, camPosTMat);
+			var mvMat = this.sceneState.modelViewMatrix;
+			var mvMatRelToEye = this.sceneState.modelViewRelToEyeMatrix;
+			var pixelPosCC = mvMat.transformPoint3D(mouseAction.strWorldPoint, undefined);
+			
+			var globeYaxisWC = new Point3D(camPosTMat._floatArrays[4], camPosTMat._floatArrays[5], camPosTMat._floatArrays[6]);
+			var globeYaxisCC = mvMatRelToEye.transformPoint3D(globeYaxisWC, undefined);
+			
+			var globeZaxisWC = new Point3D(camPosTMat._floatArrays[8], camPosTMat._floatArrays[9], camPosTMat._floatArrays[10]);
+			var globeZaxisCC = mvMatRelToEye.transformPoint3D(globeZaxisWC, undefined);
+			
+			if (attributes.movementInAxisZ)
+			{
+				this.selObjMovePlaneCC.setPointAndNormal(pixelPosCC.x, pixelPosCC.y, pixelPosCC.z,    globeYaxisCC.x, globeYaxisCC.y, globeYaxisCC.z); 
+			}
+			else 
+			{
+				// movement in plane XY.
+				this.selObjMovePlaneCC.setPointAndNormal(pixelPosCC.x, pixelPosCC.y, pixelPosCC.z,    globeZaxisCC.x, globeZaxisCC.y, globeZaxisCC.z); 
+			}
 		}
 
-		if (this.lineSC === undefined)
-		{ this.lineSC = new Line(); }
+		if (this.lineCC === undefined)
+		{ this.lineCC = new Line(); }
+		var camRay = ManagerUtils.getRayCamSpace(this.mouse_x, this.mouse_y, camRay, this);
+		this.lineCC.setPointAndDir(0, 0, 0,  camRay[0], camRay[1], camRay[2]);
 		
-		this.lineSC = ManagerUtils.getRayWorldSpace(gl, this.mouse_x, this.mouse_y, this.lineSC, this); // rayWorldSpace.***
-
-		// transform world_ray to building_ray.***
-		var camPosBuilding = new Point3D();
-		var camDirBuilding = new Point3D();
 		
-		var geoLocMatrixInv = geoLocationData.getGeoLocationMatrixInv();
-		camPosBuilding = geoLocMatrixInv.transformPoint3D(this.lineSC.point, camPosBuilding);
-		this.pointSC = geoLocMatrixInv.rotatePoint3D(this.lineSC.direction, this.pointSC);
-		camDirBuilding.x = this.pointSC.x;
-		camDirBuilding.y = this.pointSC.y;
-		camDirBuilding.z = this.pointSC.z;
+		// Calculate intersection cameraRay with planeCC.
+		var intersectionPointCC = new Point3D();
+		intersectionPointCC = this.selObjMovePlaneCC.intersectionLine(this.lineCC, intersectionPointCC);
+		//------------------------------------------------------------------------------------------------
 
-		// now, intersect building_ray with the selObjMovePlane.***
-		var line = new Line();
-		line.setPointAndDir(camPosBuilding.x, camPosBuilding.y, camPosBuilding.z,       camDirBuilding.x, camDirBuilding.y, camDirBuilding.z);
-
-		var intersectionPoint = new Point3D();
-		intersectionPoint = this.selObjMovePlane.intersectionLine(line, intersectionPoint);
-		intersectionPoint.set(-intersectionPoint.x, -intersectionPoint.y, -intersectionPoint.z);
-		
-		// Now, calculate the intersectionPoint in world coordinates.***
-		var intersectionPointWC = new Point3D();
-		intersectionPointWC = geoLocationData.geoLocMatrix.transformPoint3D(intersectionPoint, intersectionPointWC);
-
+		var mvMat = this.sceneState.modelViewMatrixInv;
+		var intersectionPointWC = mvMat.transformPoint3D(intersectionPointCC, intersectionPointWC);
+	
 		// register the movement.***
 		if (!this.thereAreStartMovePoint) 
 		{
 			var cartographic = ManagerUtils.pointToGeographicCoord(intersectionPointWC, cartographic, this);
-			this.startMovPoint.x = cartographic.longitude;
-			this.startMovPoint.y = cartographic.latitude;
 			this.thereAreStartMovePoint = true;
+			
+			var buildingGeoCoord = geoLocationData.geographicCoord;
+			this.startGeoCoordDif = new GeographicCoord(cartographic.longitude-buildingGeoCoord.longitude, cartographic.latitude-buildingGeoCoord.latitude, cartographic.altitude-buildingGeoCoord.altitude);
 		}
 		else 
 		{
 			var cartographic = ManagerUtils.pointToGeographicCoord(intersectionPointWC, cartographic, this);
-			var difX = cartographic.longitude - this.startMovPoint.x;
-			var difY = cartographic.latitude - this.startMovPoint.y;
 
-			var newLongitude = geoLocationData.geographicCoord.longitude - difX;
-			var newlatitude = geoLocationData.geographicCoord.latitude - difY;
-
-			this.changeLocationAndRotationNode(this.selectionManager.currentNodeSelected, newlatitude, newLongitude, undefined, undefined, undefined, undefined);
-			this.displayLocationAndRotation(this.buildingSelected);
+			var difX = cartographic.longitude - this.startGeoCoordDif.longitude;
+			var difY = cartographic.latitude - this.startGeoCoordDif.latitude;
+			var difZ = cartographic.altitude - this.startGeoCoordDif.altitude;
 			
-			this.startMovPoint.x -= difX;
-			this.startMovPoint.y -= difY;
+			var newLongitude = difX;
+			var newlatitude = difY;
+			var newAltitude = difZ;
+
+			if (attributes.movementInAxisZ)
+			{
+				geoLocationData = ManagerUtils.calculateGeoLocationData(undefined, undefined, newAltitude, undefined, undefined, undefined, geoLocationData, this);
+			}
+			else 
+			{
+				geoLocationData = ManagerUtils.calculateGeoLocationData(newLongitude, newlatitude, undefined, undefined, undefined, undefined, geoLocationData, this);
+			}
+
 		}
 	}
 	else if (this.magoPolicy.objectMoveMode === CODE.moveMode.OBJECT) // objects move.***
