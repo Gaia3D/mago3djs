@@ -235,7 +235,7 @@ var MagoManager = function()
 	this.objMarkerManager = new ObjectMarkerManager();
 	this.pin = new Pin();
 	
-	this.weatherStation = new WeatherStation();
+	//this.weatherStation = new WeatherStation();
 	
 	// renderWithTopology === 0 -> render only CityGML.***
 	// renderWithTopology === 1 -> render only IndoorGML.***
@@ -2247,6 +2247,9 @@ MagoManager.prototype.keyDown = function(key)
 		if (this.altitudeAux === undefined)
 		{ this.altitudeAux = 0.0; }
 	
+		if (this.weatherStation === undefined)
+		{ this.weatherStation = new WeatherStation(); }
+	
 		this.altitudeAux += 10.0;
 	
 		var geometryDataPath = this.readerWriter.geometryDataPath;
@@ -3219,16 +3222,15 @@ MagoManager.prototype.moveSelectedObjectGeneral = function(gl, object)
 	{
 		this.selObjMovePlaneCC = new Plane();
 		// calculate the pixelPos in camCoord.
-		var camPosWC = this.sceneState.camera.getPosition();
-		var camPosTMat = ManagerUtils.calculateGeoLocationMatrixAtWorldPosition(camPosWC, camPosTMat);
+		var geoLocMatrix = geoLocationData.geoLocMatrix;
 		var mvMat = this.sceneState.modelViewMatrix;
 		var mvMatRelToEye = this.sceneState.modelViewRelToEyeMatrix;
 		var pixelPosCC = mvMat.transformPoint3D(mouseAction.strWorldPoint, undefined);
 		
-		var globeYaxisWC = new Point3D(camPosTMat._floatArrays[4], camPosTMat._floatArrays[5], camPosTMat._floatArrays[6]);
+		var globeYaxisWC = new Point3D(geoLocMatrix._floatArrays[4], geoLocMatrix._floatArrays[5], geoLocMatrix._floatArrays[6]);
 		var globeYaxisCC = mvMatRelToEye.transformPoint3D(globeYaxisWC, undefined);
 		
-		var globeZaxisWC = new Point3D(camPosTMat._floatArrays[8], camPosTMat._floatArrays[9], camPosTMat._floatArrays[10]);
+		var globeZaxisWC = new Point3D(geoLocMatrix._floatArrays[8], geoLocMatrix._floatArrays[9], geoLocMatrix._floatArrays[10]);
 		var globeZaxisCC = mvMatRelToEye.transformPoint3D(globeZaxisWC, undefined);
 		
 		if (attributes.movementInAxisZ)
@@ -3347,171 +3349,6 @@ MagoManager.prototype.moveSelectedObjectGeneral = function(gl, object)
 	object.moved();
 };
 
-/**
- * Moves an object.
- * @param {WebGLRenderingContext} gl WebGLRenderingContext.
- */
-MagoManager.prototype.moveSelectedObjectGeneral__original = function(gl, object) 
-{
-	if (object === undefined)
-	{ return; }
-
-	object = object.getRootOwner();
-
-	var attributes = object.attributes;
-	if (attributes === undefined)
-	{ return; }
-
-	var isMovable = attributes.isMovable;
-	if (isMovable === undefined || isMovable === false)
-	{ return; }
-	
-	var geoLocDataManager = object.getGeoLocDataManager();
-	if (geoLocDataManager === undefined)
-	{ return; }
-	
-	var geoLocationData = geoLocDataManager.getCurrentGeoLocationData();
-	
-	var mouseAction = this.sceneState.mouseAction;
-
-	// create a XY_plane in the selected_pixel_position.***
-	if (this.selObjMovePlane === undefined) 
-	{
-		this.selObjMovePlane = new Plane();
-		// create a local XY plane.
-		// find the pixel position relative to building.
-		var tMatrixInv = geoLocationData.getGeoLocationMatrixInv();
-		var pixelPosBuildingCoord = tMatrixInv.transformPoint3D(mouseAction.strWorldPoint, pixelPosBuildingCoord);
-		
-		if (attributes.movementInAxisZ)
-		{
-			this.selObjMovePlane.setPointAndNormal(pixelPosBuildingCoord.x, pixelPosBuildingCoord.y, pixelPosBuildingCoord.z,    0.0, -1.0, 0.0); 
-		}
-		else 
-		{
-			// movement in plane XY.
-			this.selObjMovePlane.setPointAndNormal(pixelPosBuildingCoord.x, pixelPosBuildingCoord.y, pixelPosBuildingCoord.z,    0.0, 0.0, 1.0); 
-		}
-	}
-
-	if (this.lineSC === undefined)
-	{ this.lineSC = new Line(); }
-	
-	this.lineSC = ManagerUtils.getRayWorldSpace(gl, this.mouse_x, this.mouse_y, this.lineSC, this); // rayWorldSpace.***
-
-	// transform world_ray to building_ray.***
-	var camPosBuilding = new Point3D();
-	var camDirBuilding = new Point3D();
-	
-	var geoLocMatrixInv = geoLocationData.getGeoLocationMatrixInv();
-	camPosBuilding = geoLocMatrixInv.transformPoint3D(this.lineSC.point, camPosBuilding);
-	this.pointSC = geoLocMatrixInv.rotatePoint3D(this.lineSC.direction, this.pointSC);
-	camDirBuilding.x = this.pointSC.x;
-	camDirBuilding.y = this.pointSC.y;
-	camDirBuilding.z = this.pointSC.z;
-
-	// now, intersect building_ray with the selObjMovePlane.***
-	var line = new Line();
-	line.setPointAndDir(camPosBuilding.x, camPosBuilding.y, camPosBuilding.z,       camDirBuilding.x, camDirBuilding.y, camDirBuilding.z);
-
-	var intersectionPoint = new Point3D();
-	intersectionPoint = this.selObjMovePlane.intersectionLine(line, intersectionPoint);
-	intersectionPoint.set(-intersectionPoint.x, -intersectionPoint.y, -intersectionPoint.z);
-	
-	// Now, calculate the intersectionPoint in world coordinates.***
-	var intersectionPointWC = new Point3D();
-	intersectionPointWC = geoLocationData.geoLocMatrix.transformPoint3D(intersectionPoint, intersectionPointWC);
-
-	// register the movement.***
-	if (!this.thereAreStartMovePoint) 
-	{
-		var cartographic = ManagerUtils.pointToGeographicCoord(intersectionPointWC, cartographic, this);
-		this.startMovPoint.x = cartographic.longitude;
-		this.startMovPoint.y = cartographic.latitude;
-		this.startMovPoint.z = cartographic.altitude;
-		this.thereAreStartMovePoint = true;
-	}
-	else 
-	{
-		var cartographic = ManagerUtils.pointToGeographicCoord(intersectionPointWC, cartographic, this);
-		var difX = cartographic.longitude - this.startMovPoint.x;
-		var difY = cartographic.latitude - this.startMovPoint.y;
-		var difZ = cartographic.altitude - this.startMovPoint.z;
-		
-		var newLongitude = geoLocationData.geographicCoord.longitude - difX;
-		var newlatitude = geoLocationData.geographicCoord.latitude - difY;
-		var newAltitude = geoLocationData.geographicCoord.altitude - difZ;
-		
-		// Must check if there are restrictions.***
-		var attributes = object.attributes;
-		if (attributes && attributes.movementRestriction)
-		{
-			var movementRestriction = attributes.movementRestriction;
-			if (movementRestriction)
-			{
-				var movementRestrictionType = movementRestriction.restrictionType;
-				var movRestrictionElem = movementRestriction.element;
-				if (movRestrictionElem && movRestrictionElem.constructor.name === "GeographicCoordSegment")
-				{
-					// restriction.***
-					var geoCoordSegment = movRestrictionElem;
-					var newGeoCoord = new GeographicCoord(newLongitude, newlatitude, 0.0);
-					var projectedCoord = GeographicCoordSegment.getProjectedCoordToLine(geoCoordSegment, newGeoCoord, undefined);
-					
-					// check if is inside.***
-					if (!GeographicCoordSegment.intersectionWithGeoCoord(geoCoordSegment, projectedCoord))
-					{
-						var nearestGeoCoord = GeographicCoordSegment.getNearestGeoCoord(geoCoordSegment, projectedCoord);
-						newLongitude = nearestGeoCoord.longitude;
-						newlatitude = nearestGeoCoord.latitude;
-					}
-					else 
-					{
-						newLongitude = projectedCoord.longitude;
-						newlatitude = projectedCoord.latitude;
-					}
-				}
-			}
-		}
-		if (attributes && attributes.hasStaticModel)
-		{
-			var projectId = attributes.projectId;
-			var dataKey = attributes.instanceId;
-			if (!defined(projectId))
-			{
-				return false;
-			}
-			if (!defined(dataKey))
-			{
-				return false;
-			}
-			var node = this.hierarchyManager.getNodeByDataKey(projectId, dataKey);
-			if (node !== undefined)
-			{
-				node.changeLocationAndRotation(newlatitude, newLongitude, 0, attributes.f4dHeading, 0, 0, this);
-			}
-		}
-		
-		difX = geoLocationData.geographicCoord.longitude - newLongitude;
-		difY = geoLocationData.geographicCoord.latitude - newlatitude;
-		difZ = geoLocationData.geographicCoord.altitude - newAltitude;
-		
-		if (attributes.movementInAxisZ)
-		{
-			geoLocationData = ManagerUtils.calculateGeoLocationData(undefined, undefined, newAltitude, undefined, undefined, undefined, geoLocationData, this);
-		}
-		else 
-		{
-			geoLocationData = ManagerUtils.calculateGeoLocationData(newLongitude, newlatitude, undefined, undefined, undefined, undefined, geoLocationData, this);
-		}
-		
-		this.startMovPoint.x -= difX;
-		this.startMovPoint.y -= difY;
-	}
-	
-	object.moved();
-};
-
 
 /**
  * Moves an object.
@@ -3540,16 +3377,15 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 		{
 			this.selObjMovePlaneCC = new Plane();
 			// calculate the pixelPos in camCoord.
-			var camPosWC = this.sceneState.camera.getPosition();
-			var camPosTMat = ManagerUtils.calculateGeoLocationMatrixAtWorldPosition(camPosWC, camPosTMat);
+			var geoLocMatrix = geoLocationData.geoLocMatrix;
 			var mvMat = this.sceneState.modelViewMatrix;
 			var mvMatRelToEye = this.sceneState.modelViewRelToEyeMatrix;
 			var pixelPosCC = mvMat.transformPoint3D(mouseAction.strWorldPoint, undefined);
 			
-			var globeYaxisWC = new Point3D(camPosTMat._floatArrays[4], camPosTMat._floatArrays[5], camPosTMat._floatArrays[6]);
+			var globeYaxisWC = new Point3D(geoLocMatrix._floatArrays[4], geoLocMatrix._floatArrays[5], geoLocMatrix._floatArrays[6]);
 			var globeYaxisCC = mvMatRelToEye.transformPoint3D(globeYaxisWC, undefined);
 			
-			var globeZaxisWC = new Point3D(camPosTMat._floatArrays[8], camPosTMat._floatArrays[9], camPosTMat._floatArrays[10]);
+			var globeZaxisWC = new Point3D(geoLocMatrix._floatArrays[8], geoLocMatrix._floatArrays[9], geoLocMatrix._floatArrays[10]);
 			var globeZaxisCC = mvMatRelToEye.transformPoint3D(globeZaxisWC, undefined);
 			
 			if (attributes.movementInAxisZ)
