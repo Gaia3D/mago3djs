@@ -287,6 +287,7 @@ MagoManager.EVENT_TYPE = {
 	'SMARTTILELOADEND'   	: 'smarttileloadend',
 	'F4DLOADSTART'      		: 'f4dloadstart',
 	'F4DLOADEND'       			: 'f4dloadend',
+	'F4DRENDERREADY'   			: 'f4drenderready',
 	'SELECTEDF4D'      	 	: 'selectedf4d',
 	'SELECTEDF4DMOVED'    : 'selectedf4dmoved',
 	'SELECTEDF4DOBJECT'  	: 'selectedf4dobject',
@@ -622,6 +623,10 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		//sceneState.modelViewProjRelToEyeMatrix._floatArrays = glMatrix.mat4.multiply(sceneState.modelViewProjRelToEyeMatrix._floatArrays, sceneState.projectionMatrix._floatArrays, sceneState.modelViewRelToEyeMatrix._floatArrays);
 
 	}
+	
+	
+	sceneState.modelViewProjMatrixInv = undefined; // init. Calculate when necessary.***
+	sceneState.projectionMatrixInv = undefined; // init.Calculate when necessary.***
 	
 	if (this.depthFboNeo !== undefined)
 	{
@@ -1025,12 +1030,6 @@ MagoManager.prototype.managePickingProcess = function()
 						timestamp : new Date()
 					});
 				}
-				else if (!auxBuildingSelected && !auxNodeSelected) 
-				{
-					this.emit(MagoManager.EVENT_TYPE.DESELECTEDF4D, {
-						type: MagoManager.EVENT_TYPE.DESELECTEDF4D
-					});
-				}
 			}
 			else if (mode === CODE.moveMode.OBJECT) 
 			{
@@ -1040,12 +1039,6 @@ MagoManager.prototype.managePickingProcess = function()
 						type      : MagoManager.EVENT_TYPE.SELECTEDF4DOBJECT,
 						object    : auxOctreeSelected,
 						timestamp : new Date()
-					});
-				}
-				else 
-				{
-					this.emit(MagoManager.EVENT_TYPE.DESELECTEDF4DOBJECT, {
-						type: MagoManager.EVENT_TYPE.DESELECTEDF4DOBJECT
 					});
 				}
 			}
@@ -1212,12 +1205,20 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	this.swapRenderingFase();
 
 	// 2) color render.************************************************************************************************************
+	// 2.1) Render terrain shadows.*******************************************************************************************************
+	// Now render the geomatry.
 	if (this.isCesiumGlobe())
 	{
 		var scene = this.scene;
 		scene._context._currentFramebuffer._bind();
+
+		if (this.currentFrustumIdx < 2) 
+		{
+			renderType = 3;
+			this.renderer.renderTerrainShadow(gl, renderType, this.visibleObjControlerNodes);
+		}
 	}
-	
+
 	//gl.clearColor(0, 0, 0, 1);
 	//gl.clearDepth(1);
 	//gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -1225,10 +1226,6 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	renderType = 1;
 	this.renderType = 1;
 	this.renderer.renderGeometry(gl, renderType, this.visibleObjControlerNodes);
-	
-	// 3) Stencil buffer render.*******************************************************************************************************
-	//renderType = 3;
-	//this.renderer.renderGeometryStencilShadowMeshes(gl, renderType, this.visibleObjControlerNodes);
 	
 	if (this.weatherStation)
 	{
@@ -1311,7 +1308,6 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 	this.numFrustums = numFrustums;
 	this.isLastFrustum = isLastFrustum;
 	
-
 	var gl = this.getGl();
 	this.upDateSceneStateMatrices(this.sceneState);
 	
@@ -1366,7 +1362,8 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 	this.visibleObjControlerNodes = visibleNodes; // set the current visible nodes.***
 
 	// prepare data if camera is no moving.***
-	if (!this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
+	//if (!this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
+	if (!this.isCameraMoving && !this.mouseMiddleDown)
 	{
 		this.loadAndPrepareData();
 		this.managePickingProcess();
@@ -1877,6 +1874,37 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
 		this.saveHistoryObjectMovement(this.objectSelected, nodeSelected);
 	}
 	
+	if (!this.isCameraMoving) 
+	{
+		this.getSelectedObjects(this.getGl(), this.mouse_x, this.mouse_y, this.arrayAuxSC, true);
+			
+		var auxBuildingSelected = this.arrayAuxSC[0];
+		var auxOctreeSelected = this.arrayAuxSC[1];
+		var auxReferenceSelected = this.arrayAuxSC[2];
+		var auxNodeSelected = this.arrayAuxSC[3]; 
+
+		var mode = this.magoPolicy.getObjectMoveMode();
+
+		if (mode === CODE.moveMode.ALL) 
+		{
+			if (!auxBuildingSelected && !auxNodeSelected) 
+			{
+				this.emit(MagoManager.EVENT_TYPE.DESELECTEDF4D, {
+					type: MagoManager.EVENT_TYPE.DESELECTEDF4D
+				});
+			}
+		}
+		else if (mode === CODE.moveMode.OBJECT) 
+		{
+			if (!auxOctreeSelected && !auxReferenceSelected) 
+			{
+				this.emit(MagoManager.EVENT_TYPE.DESELECTEDF4DOBJECT, {
+					type: MagoManager.EVENT_TYPE.DESELECTEDF4DOBJECT
+				});
+			}
+		}
+	}
+
 	this.isCameraMoving = false;
 	this.mouseLeftDown = false;
 	this.mouseDragging = false;
@@ -1884,17 +1912,8 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
 	this.mustCheckIfDragging = true;
 	this.thereAreStartMovePoint = false;
 
-	/*this.dateSC = new Date();
-	this.currentTimeSC = this.dateSC.getTime();
-	var miliSecondsUsed = this.currentTimeSC - this.startTimeSC;
-	if (miliSecondsUsed < 1500) 
-	{
-		if (this.mouse_x === mouseX && this.mouse_y === mouseY) 
-		{
-			this.bPicking = true;
-		}
-	}*/
-	
+	//this.setBPicking(mouseX, mouseY);
+
 	this.setCameraMotion(true);
 	
 	// Clear startPositions of mouseAction.***
@@ -1905,29 +1924,19 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
 	{
 		this.sceneState.sunSystem.updateSun(this);
 	}
-	
-	// test zBouncing.************************
-	/*
-	var nodeSelected = this.selectionManager.currentNodeSelected;
-	if (nodeSelected)
+};
+MagoManager.prototype.setBPicking = function(mouseX, mouseY) 
+{
+	this.dateSC = new Date();
+	this.currentTimeSC = this.dateSC.getTime();
+	var miliSecondsUsed = this.currentTimeSC - this.startTimeSC;
+	if (miliSecondsUsed < 1500) 
 	{
-		var nodeId = nodeSelected.data.nodeId;
-		var effect = new Effect({
-			effectType      : "zBounceSpring",
-			durationSeconds : 0.4
-		});
-		
-		this.effectsManager.addEffect(nodeId, effect);
-		
-		// shadow on-off test.
-		var effect = new Effect({
-			effectType      : "borningLight",
-			durationSeconds : 1.0
-		});
-		
-		this.effectsManager.addEffect(nodeId, effect);
+		if (this.mouse_x === mouseX && this.mouse_y === mouseY) 
+		{
+			this.bPicking = true;
+		}
 	}
-	*/
 };
 
 /**
@@ -2129,6 +2138,23 @@ MagoManager.prototype.keyDown = function(key)
 		}
 		sunSystem.setDate(this.dateTest);
 		*/
+		
+		// Stencil shadow mesh making test.********************
+		var nodeSelected = this.selectionManager.currentNodeSelected;
+		if (nodeSelected)
+		{
+			var geoLocDataManager = nodeSelected.data.geoLocDataManager;
+			var geoLocData = geoLocDataManager.getCurrentGeoLocationData();
+			var sunSystem = this.sceneState.sunSystem;
+			var sunDirWC = sunSystem.getSunDirWC();
+			var sunDirLC = geoLocData.getRotatedRelativeVector(sunDirWC, sunDirLC);
+			
+			var neoBuilding = nodeSelected.data.neoBuilding;
+			var lodBuilding = neoBuilding.lodBuildingMap.lod3;
+			if (lodBuilding)
+			{ lodBuilding.skinLego.makeStencilShadowMesh(sunDirLC); }
+		}
+		// End test----------------------------------------------------
 		
 		// another test.***
 		if (this.modeler !== undefined)
@@ -2536,40 +2562,7 @@ MagoManager.prototype.mouseActionLeftDown = function(mouseX, mouseY)
 	this.mouseLeftDown = true;
 	//this.isCameraMoving = true;
 	MagoWorld.updateMouseStartClick(mouseX, mouseY, this);
-
-	this.dateSC = new Date();
-	this.currentTimeSC = this.dateSC.getTime();
-	var miliSecondsUsed = this.currentTimeSC - this.startTimeSC;
-	if (miliSecondsUsed < 1500) 
-	{
-		if (this.mouse_x === mouseX && this.mouse_y === mouseY) 
-		{
-			this.bPicking = true;
-		}
-	}
-	/*if (!this.isCesiumGlobe()) 
-	{
-		MagoWorld.updateMouseStartClick(mouseX, mouseY, this);
-	}*/
-	
-	/*
-	// Test.**********************************************************************************************************************
-	var selGeneralObjects = this.selectionManager.getSelectionCandidatesFamily("general");
-	if (selGeneralObjects)
-	{
-		var currObjectSelected = selGeneralObjects.currentSelected;
-		if (currObjectSelected)
-		{
-			// check if is a cuttingPlane.***
-			if (currObjectSelected instanceof CuttingPlane)
-			{
-				var mouseAction = this.sceneState.mouseAction;
-				mouseAction.claculateStartPositionsAux(this);
-			}
-		}
-	}
-	*/
-	// End test.-------------------------------------------------------------------------------------------------------------------
+	this.setBPicking(mouseX, mouseY);
 };
 
 /**
@@ -3975,7 +3968,7 @@ MagoManager.prototype.getObjectLabel = function()
 		if (this.canvasObjectLabel === undefined)
 		{ return; }
 
-		var magoDiv = document.getElementById('magoContainer');
+		var magoDiv = document.getElementById(MagoConfig.getContainerId());
 		var offsetLeft = magoDiv.offsetLeft;
 		var offsetTop = magoDiv.offsetTop;
 		var offsetWidth = magoDiv.offsetWidth;
@@ -6198,8 +6191,14 @@ MagoManager.prototype.callAPI = function(api)
 		}
 
 		this.magoPolicy.setObjectMoveMode(CODE.moveMode.ALL);
+
 		this.nodeSelected = node;
 		this.buildingSelected = node.data.neoBuilding;
+		this.rootNodeSelected = this.nodeSelected.getRoot();
+
+		this.selectionManager.currentBuildingSelected = this.buildingSelected;
+		this.selectionManager.currentNodeSelected = this.nodeSelected;
+
 		this.emit(MagoManager.EVENT_TYPE.SELECTEDF4D, {
 			type      : MagoManager.EVENT_TYPE.SELECTEDF4D, 
 			f4d       : node, 

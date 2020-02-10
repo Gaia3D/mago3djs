@@ -6,6 +6,16 @@
  */
 var MagoConfig = {};
 
+MagoConfig.setContainerId = function(containerId) 
+{
+	this.containerId = containerId;
+};
+
+MagoConfig.getContainerId = function() 
+{
+	return this.containerId;
+};
+
 MagoConfig.getPolicy = function() 
 {
 	return this.serverPolicy;

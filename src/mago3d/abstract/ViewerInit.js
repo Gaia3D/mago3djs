@@ -14,6 +14,7 @@ var ViewerInit = function(containerId, serverPolicy)
 	this.viewer;
 	this.policy = MagoConfig.getPolicy();
 
+	MagoConfig.setContainerId(this.targetId);
 	this.init();
 };
 

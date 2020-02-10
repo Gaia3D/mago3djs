@@ -1,7 +1,7 @@
 precision mediump float;
 
 attribute vec2 position;
-varying vec4 vColor;
+varying vec4 vColor; 
 
 void main() {
 	vColor = vec4(0.2, 0.2, 0.2, 0.5);

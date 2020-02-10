@@ -432,6 +432,15 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 		uniformDataPair.floatValue = sceneState.camera.frustum.fovyRad;
 	}
 	
+	// 10.1 tangentOfHalfFovy.
+	uniformLocation = gl.getUniformLocation(shader.program, "tangentOfHalfFovy");
+	if (uniformLocation !== null && uniformLocation !== undefined)
+	{
+		uniformDataPair = shader.newUniformDataPair("1f", "tangentOfHalfFovy");
+		uniformDataPair.uniformLocation = uniformLocation;
+		uniformDataPair.floatValue = sceneState.camera.frustum.tangentOfHalfFovy;
+	}
+	
 	// 11. aspectRatio.
 	uniformLocation = gl.getUniformLocation(shader.program, "aspectRatio");
 	if (uniformLocation !== null && uniformLocation !== undefined)
@@ -669,4 +678,7 @@ PostFxShader.prototype.createUniformLocals = function(gl, shader, sceneState)
 	
 	shader.scaleLC_loc = gl.getUniformLocation(shader.program, "scaleLC");
 	shader.colorMultiplier_loc = gl.getUniformLocation(shader.program, "colorMultiplier");
+	shader.modelViewProjectionMatrixInv_loc = gl.getUniformLocation(shader.program, "modelViewProjectionMatrixInv");
+	shader.projectionMatrixInv_loc = gl.getUniformLocation(shader.program, "projectionMatrixInv");
+	shader.modelViewMatrixRelToEyeInv_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEyeInv");
 };

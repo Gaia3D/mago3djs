@@ -94,7 +94,8 @@ Effect.prototype.execute = function(currTimeSec)
 		}
 		else
 		{
-			colorMultiplier = 1/(timeDiffSeconds/this.durationSeconds);
+			var timeRatio = timeDiffSeconds/this.durationSeconds;
+			colorMultiplier = 1/(timeRatio*timeRatio);
 		}
 		gl.uniform4fv(this.effectsManager.currShader.colorMultiplier_loc, [colorMultiplier, colorMultiplier, colorMultiplier, 1.0]);
 		return effectFinished;

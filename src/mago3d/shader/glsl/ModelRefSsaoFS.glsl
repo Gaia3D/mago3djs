@@ -14,6 +14,7 @@ uniform vec2 noiseScale;
 uniform float near;
 uniform float far;            
 uniform float fov;
+uniform float tangentOfHalfFovy;
 uniform float aspectRatio;    
 uniform float screenWidth;    
 uniform float screenHeight;   
@@ -59,7 +60,7 @@ varying float currSunIdx;
 
 float unpackDepth(const in vec4 rgba_depth)
 {
-    const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);
+    const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);// original.***
     float depth = dot(rgba_depth, bit_shift);
     return depth;
 }  
@@ -67,13 +68,13 @@ float unpackDepth(const in vec4 rgba_depth)
 
 float UnpackDepth32( in vec4 pack )
 {
-    float depth = dot( pack, 1.0 / vec4(1.0, 256.0, 256.0*256.0, 16777216.0) );// 256.0*256.0*256.0 = 16777216.0
-    return depth * (16777216.0) / (16777216.0 - 1.0);
-}              
+	float depth = dot( pack, vec4(1.0, 0.00390625, 0.000015258789, 0.000000059605) );
+    return depth * 1.000000059605;// 1.000000059605 = (16777216.0) / (16777216.0 - 1.0);
+}             
 
 vec3 getViewRay(vec2 tc)
 {
-    float hfar = 2.0 * tan(fov/2.0) * far;
+	float hfar = 2.0 * tangentOfHalfFovy * far;
     float wfar = hfar * aspectRatio;    
     vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    
     return ray;                      
@@ -229,8 +230,6 @@ void main()
 			{
 				vec3 posRelToLight = vPosRelToLight.xyz / vPosRelToLight.w;
 				float tolerance = 0.9963;
-				//tolerance = 0.5;
-				//tolerance = 1.0;
 				posRelToLight = posRelToLight * 0.5 + 0.5; // transform to [0,1] range
 				if(posRelToLight.x >= 0.0 && posRelToLight.x <= 1.0)
 				{
@@ -247,92 +246,6 @@ void main()
 				/*
 				// test. Calculate the zone inside the pixel.************************************
 				//https://docs.microsoft.com/ko-kr/windows/win32/dxtecharts/cascaded-shadow-maps
-				float pixelWidth = 1.0 / shadowMapWidth;
-				float pixelHeight = 1.0 / shadowMapHeight;
-				float currPixel_s = posRelToLight.x*pixelWidth;
-				float currPixel_t = posRelToLight.y*pixelHeight;
-				float currPixel_s_decimals = currPixel_s - floor(currPixel_s);
-				float currPixel_t_decimals = currPixel_t - floor(currPixel_t);
-				float horit = 0.0;
-				float vert = 0.0;
-				if(currPixel_s_decimals < 0.5)
-				{
-					horit = -1.0;
-				}
-				else //if(currPixel_s_decimals >= 0.66)
-				{
-					horit = 1.0;
-				}
-				
-				if(currPixel_t_decimals < 0.5)
-				{
-					vert = -1.0;
-				}
-				else //if(currPixel_t_decimals >= 0.66)
-				{
-					vert = 1.0;
-				}
-				
-				//pixelWidth *= 0.05;
-				//pixelHeight *= 0.05;
-				
-				vec2 shadowMapTexCoord = vec2(posRelToLight.x + horit * pixelWidth, posRelToLight.y);
-				float depthRelToLight = getDepthShadowMap(shadowMapTexCoord);
-				if(posRelToLight.z > depthRelToLight*tolerance )
-				{
-					float pixelDist = 1.0;
-					if(horit < 0.0)
-					{
-						pixelDist = 1.0 - currPixel_s_decimals;
-					}
-					else{
-						pixelDist = currPixel_s_decimals;
-					}
-					
-					shadow_occlusion -= (0.5/3.0)*pixelDist;
-				}
-				
-				shadowMapTexCoord = vec2(posRelToLight.x, posRelToLight.y + vert * pixelHeight);
-				depthRelToLight = getDepthShadowMap(shadowMapTexCoord);
-				if(posRelToLight.z > depthRelToLight*tolerance )
-				{
-					float pixelDist = 1.0;
-					if(vert < 0.0)
-					{
-						pixelDist = 1.0 - currPixel_t_decimals;
-					}
-					else{
-						pixelDist = currPixel_t_decimals;
-					}
-					shadow_occlusion -= (0.5/3.0)*pixelDist;
-				}
-				
-				shadowMapTexCoord = vec2(posRelToLight.x + horit * pixelWidth, posRelToLight.y + vert * pixelHeight);
-				depthRelToLight = getDepthShadowMap(shadowMapTexCoord);
-				if(posRelToLight.z > depthRelToLight*tolerance )
-				{
-					float pixelDistH = 1.0;
-					if(horit < 0.0)
-					{
-						pixelDistH = 1.0 - currPixel_s_decimals;
-					}
-					else{
-						pixelDistH = currPixel_s_decimals;
-					}
-					
-					float pixelDistV = 1.0;
-					if(vert < 0.0)
-					{
-						pixelDistV = 1.0 - currPixel_t_decimals;
-					}
-					else{
-						pixelDistV = currPixel_t_decimals;
-					}
-					
-					shadow_occlusion -= (0.5/3.0)*pixelDistV*pixelDistH;
-				}
-				
-				// End test.---------------------------------------------------------------------
 				*/
 				
 				

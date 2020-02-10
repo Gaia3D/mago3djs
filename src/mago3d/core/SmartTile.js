@@ -1089,6 +1089,12 @@ SmartTile.prototype.createGeometriesFromSeeds = function(magoManager)
 						neoBuilding.projectFolderName = node.data.projectFolderName;
 						
 						geometriesCreated = true;
+
+						magoManager.emit(MagoManager.EVENT_TYPE.F4DRENDERREADY, {
+							type      : MagoManager.EVENT_TYPE.F4DRENDERREADY,
+							f4d       : node,
+							timestamp : new Date()
+						});
 					}
 				}
 				//else if (attributes.objectType === "multiBuildingsTile")

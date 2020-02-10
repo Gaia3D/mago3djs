@@ -442,6 +442,8 @@ Lego.prototype.makeStencilShadowMesh = function(lightDirectionLC)
 		{ this.shadowMeshesArray.push(shadowMaesh); }
 	}
 	
+	return;
+	
 	// Now, detect faces on light & faces on shadow.
 	var facesInLightArray = [];
 	var facesInShadowArray = [];
@@ -518,11 +520,15 @@ Lego.prototype.makeStencilShadowMesh = function(lightDirectionLC)
 		//                 ||                               //                 ||                        ||
 		//          "hedge"||twin             =========>    //          "hedge"||newHedge0      newHedge2||twin 
 		//      [face]     ||     [twinFace]                //     [face]      ||       [newFace]        ||      [twinFace]
-		//                 ||                               //                 ||                        ||
+		//      [inLight]  ||     [inShadow]                //    [inLight]    ||      [inShadow]        ||      [inShadow]
 		//                 |V                               //                 |V    newHedge1           |V
 		//   ------------>(v1)----------->                  //   ----------->(v1)-------------------->(newV0)------------->
 		
-		var dist = 100.0;
+		// test.***
+		mesh.surfacesArray.length = 0;
+		// end test.---
+		
+		var dist = 1000.0;
 		var vertexList = mesh.vertexList;
 		var newSurface = mesh.newSurface();
 		var hedgesList = mesh.hedgesList;
