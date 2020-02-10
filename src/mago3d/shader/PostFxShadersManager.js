@@ -69,6 +69,21 @@ PostFxShadersManager.prototype.createShaderProgram = function(gl, vertexSource, 
 	shader.createUniformGenerals(gl, shader, magoManager.sceneState);
 	shader.createUniformLocals(gl, shader, magoManager.sceneState);
 	
+	
+	// keep shader locations.
+	var numAttributes = gl.getProgramParameter(shader.program, gl.ACTIVE_ATTRIBUTES);
+	for (var i = 0; i < numAttributes; i++) 
+	{
+		var attribute = gl.getActiveAttrib(shader.program, i);
+		shader[attribute.name] = gl.getAttribLocation(shader.program, attribute.name);
+	}
+	var numUniforms = gl.getProgramParameter(shader.program, gl.ACTIVE_UNIFORMS);
+	for (var i = 0; i < numUniforms; i++) 
+	{
+		var uniform = gl.getActiveUniform(shader.program, i);
+		shader[uniform.name] = gl.getUniformLocation(shader.program, uniform.name);
+	}
+
 	return shader;
 };
 

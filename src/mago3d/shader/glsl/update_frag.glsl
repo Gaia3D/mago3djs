@@ -38,7 +38,7 @@ vec2 lookup_wind(const vec2 uv) {
     vec2 bl = texture2D(u_wind, vc + vec2(0, px.y)).rg;
     vec2 br = texture2D(u_wind, vc + px).rg;
     return mix(mix(tl, tr, f.x), mix(bl, br, f.x), f.y);
-
+	
 }
 
 bool checkFrustumCulling(vec2 pos)
@@ -88,12 +88,12 @@ void main() {
 
     // update particle position, wrapping around the date line
     pos = fract(1.0 + pos + offset);
-	//pos = pos + offset;
+
 
     // drop rate is a chance a particle will restart at random position, to avoid degeneration
 	float drop = 0.0;
 
-	if(u_interpolation < 0.9) // 0.9
+	if(u_interpolation < 0.99) // 0.9
 	{
 		drop = 0.0;
 	}

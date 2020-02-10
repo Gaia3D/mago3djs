@@ -23,7 +23,8 @@ var MagoRenderable = function(options)
 	this.selectedColor4;
 
 	this.eventObject = {};
-
+	
+	this.options = options;
 	if (options !== undefined)
 	{
 		if (options.color && options.color instanceof Color) 
@@ -116,6 +117,7 @@ MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPr
 	{
 		return;
 	}
+
 	if (this.dirty)
 	{ this.makeMesh(); }
 	
@@ -127,9 +129,43 @@ MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPr
 	var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
 	buildingGeoLocation.bindGeoLocationUniforms(gl, shader); // rotMatrix, positionHIGH, positionLOW.
 	
-	this.renderAsChild(magoManager, shader, renderType, glPrimitive, bIsSelected);
+	this.renderAsChild(magoManager, shader, renderType, glPrimitive, bIsSelected, this.options);
+	
+	// check options provisionally here.
+	if (this.options)
+	{
+		if (this.options.renderWireframe)
+		{
+			var shader = magoManager.postFxShadersManager.getShader("thickLine");
+			shader.useProgram();
+			shader.bindUniformGenerals();
+			var gl = magoManager.getGl();
+
+			gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
+			gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+			gl.disable(gl.CULL_FACE);
+			
+			gl.enableVertexAttribArray(shader.prev_loc);
+			gl.enableVertexAttribArray(shader.current_loc);
+			gl.enableVertexAttribArray(shader.next_loc);
+			
+			var geoLocData = this.geoLocDataManager.getCurrentGeoLocationData();
+			geoLocData.bindGeoLocationUniforms(gl, shader);
+
+			var sceneState = magoManager.sceneState;
+			var drawingBufferWidth = sceneState.drawingBufferWidth;
+			var drawingBufferHeight = sceneState.drawingBufferHeight;
+			
+			gl.uniform4fv(shader.color_loc, [0.6, 0.8, 0.9, 1.0]);
+			gl.uniform2fv(shader.viewport_loc, [drawingBufferWidth[0], drawingBufferHeight[0]]);
+
+			
+			this.renderAsChild(magoManager, shader, renderType, glPrimitive, bIsSelected, this.options);
+		}
+	}
 };
-MagoRenderable.prototype.renderAsChild = function(magoManager, shader, renderType, glPrimitive, bIsSelected) 
+
+MagoRenderable.prototype.renderAsChild = function(magoManager, shader, renderType, glPrimitive, bIsSelected, options) 
 {
 	if (this.dirty)
 	{ this.makeMesh(); }
@@ -189,23 +225,27 @@ MagoRenderable.prototype.renderAsChild = function(magoManager, shader, renderTyp
 	}
 	
 	var objectsCount = this.objectsArray.length;
+	
 	for (var i=0; i<objectsCount; i++)
 	{
-		this.objectsArray[i].renderAsChild(magoManager, shader, renderType, glPrimitive, bIsSelected);
+		this.objectsArray[i].renderAsChild(magoManager, shader, renderType, glPrimitive, bIsSelected, options);
 	}
 
 	gl.disable(gl.BLEND);
 
 	this.dispatchEvent('RENDER_END', magoManager);
 };
+
 MagoRenderable.prototype.makeMesh = function() 
 {
 	return abstract();
 };
+
 MagoRenderable.prototype.moved = function() 
 {
 	// do something.
 };
+
 MagoRenderable.prototype.updateMatrix = function(ownerMatrix) 
 {
 	if (!ownerMatrix) 

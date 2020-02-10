@@ -72,6 +72,85 @@ GeographicExtent.prototype.setExtent = function(minLon, minLat, minAlt, maxLon, 
 };
 
 /**
+ * set the value of this instance
+ * @param lon
+ * @param lat
+ * @param alt
+ */
+GeographicExtent.prototype.setInitExtent = function(lon, lat, alt) 
+{
+	this.setExtent(lon, lat, alt, lon, lat, alt);
+};
+
+/**
+ * set the value of this instance
+ * @param lon
+ * @param lat
+ * @param alt
+ */
+GeographicExtent.prototype.addGeographicCoord = function(geoCoord) 
+{
+	var lon = geoCoord.longitude;
+	var lat = geoCoord.latitude;
+	var alt = geoCoord.altitude;
+	
+	if (this.minGeographicCoord === undefined)
+	{ 
+		this.minGeographicCoord = new GeographicCoord(); 
+		this.minGeographicCoord.setLonLatAlt(lon, lat, alt);
+	}
+	else 
+	{
+		if (lon < this.minGeographicCoord.longitude)
+		{ this.minGeographicCoord.setLongitude(lon); }
+		
+		if (lat < this.minGeographicCoord.latitude)
+		{ this.minGeographicCoord.setLatitude(lat); }
+		
+		if (alt < this.minGeographicCoord.altitude)
+		{ this.minGeographicCoord.setAltitude(alt); }
+	}
+	
+	if (this.maxGeographicCoord === undefined)
+	{ 
+		this.maxGeographicCoord = new GeographicCoord(); 
+		this.maxGeographicCoord.setLonLatAlt(lon, lat, alt);
+	}
+	else 
+	{
+		if (lon > this.maxGeographicCoord.longitude)
+		{ this.maxGeographicCoord.setLongitude(lon); }
+		
+		if (lat > this.maxGeographicCoord.latitude)
+		{ this.maxGeographicCoord.setLatitude(lat); }
+		
+		if (alt > this.maxGeographicCoord.altitude)
+		{ this.maxGeographicCoord.setAltitude(alt); }
+	}
+};
+
+GeographicExtent.prototype.getCenterLongitude = function() 
+{
+	var minLon = this.minGeographicCoord.longitude;
+	var maxLon = this.maxGeographicCoord.longitude;
+	return (maxLon+minLon)/2;
+};
+
+GeographicExtent.prototype.getCenterLatitude = function() 
+{
+	var minLat = this.minGeographicCoord.latitude;
+	var maxLat = this.maxGeographicCoord.latitude;
+	return (maxLat+minLat)/2;
+};
+
+GeographicExtent.prototype.getCenterAltitude = function() 
+{
+	var minAlt = this.minGeographicCoord.altitude;
+	var maxAlt = this.maxGeographicCoord.altitude;
+	return (maxAlt+minAlt)/2;
+};
+
+/**
  * Returns the middle point of the lower bound point and uppper bound point
  * @param resultGeographicCoord the point which will save the result
  * @returns {GeographicCoord}

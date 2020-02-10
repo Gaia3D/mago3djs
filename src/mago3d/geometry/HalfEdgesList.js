@@ -23,6 +23,26 @@ var HalfEdgesList = function()
 /**
  * hEdgesArray 초기화
  */
+HalfEdgesList.getSegment3dsFromHedgesArray = function(hedgesArray, resultSegments3dArray)
+{
+	var hedgesCount = hedgesArray.length;
+	if (hedgesCount === 0)
+	{ return resultSegments3dArray; }
+	
+	if (resultSegments3dArray === undefined)
+	{ resultSegments3dArray = []; }
+	
+	for (var i=0; i<hedgesCount; i++)
+	{
+		resultSegments3dArray.push(hedgesArray[i].getSegment3d());
+	}
+	
+	return resultSegments3dArray;
+};
+
+/**
+ * hEdgesArray 초기화
+ */
 HalfEdgesList.prototype.deleteObjects = function()
 {
 	if (this.hEdgesArray !== undefined)

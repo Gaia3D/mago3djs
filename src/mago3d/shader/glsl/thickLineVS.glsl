@@ -1,7 +1,8 @@
+
 attribute vec4 prev;
 attribute vec4 current;
 attribute vec4 next;
-attribute float order;
+//attribute float order;
 uniform float thickness;
 uniform mat4 buildingRotMatrix;
 uniform mat4 projectionMatrix;
@@ -48,7 +49,7 @@ void main(){
 	vec4 vNext = getPointRelToEye(vec4(next.xyz, 1.0));
 	
 	float order_w = current.w;
-	//float order_w = order;
+	//float order_w = float(order);
 	float sense = 1.0;
 	int orderInt = 0;
 	if(order_w > 0.0)
@@ -104,4 +105,5 @@ void main(){
 	// Offset our position along the normal
 	vec4 offset = vec4(normal * direction, 0.0, 1.0);
 	gl_Position = currentProjected + offset; 
+	
 }

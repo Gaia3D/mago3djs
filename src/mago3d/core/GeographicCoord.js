@@ -180,6 +180,33 @@ GeographicCoord.prototype.setLonLatAlt = function(longitude, latitude, altitude)
 };
 
 /**
+ * Set lon at this feature
+ * @param longitude 경도
+ */
+GeographicCoord.prototype.setLongitude = function(longitude) 
+{
+	this.longitude = longitude; 
+};
+
+/**
+ * Set lon at this feature
+ * @param longitude 경도
+ */
+GeographicCoord.prototype.setLatitude = function(latitude) 
+{
+	this.latitude = latitude; 
+};
+
+/**
+ * Set lon at this feature
+ * @param longitude 경도
+ */
+GeographicCoord.prototype.setAltitude = function(altitude) 
+{
+	this.altitude = altitude;
+};
+
+/**
  * Returns the latitude in radians.
  * @returns {Number}
  */

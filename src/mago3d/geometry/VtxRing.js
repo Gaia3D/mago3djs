@@ -210,6 +210,15 @@ VtxRing.prototype.makeByPoints3DArray = function(point3dArray)
 	{ this.vertexList = new VertexList(); }
 	
 	this.vertexList.copyFromPoint3DArray(point3dArray);
+	
+	// Now, in this case, mark all vertex.vertexType = 1 (bcos all elems are lines).
+	var vertexCount = this.vertexList.getVertexCount();
+	var vertex;
+	for (var i=0; i<vertexCount; i++)
+	{
+		vertex = this.vertexList.getVertex(i);
+		vertex.setVertexType(1);
+	}
 	this.calculateElementsIndicesRange();
 };
 
