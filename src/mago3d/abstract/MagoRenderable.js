@@ -113,10 +113,22 @@ MagoRenderable.prototype.getObject = function(idx)
 
 MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPrimitive, bIsSelected) 
 {
-	if (this.attributes && this.attributes.isVisible !== undefined && this.attributes.isVisible === false) 
+	if (this.attributes) 
 	{
-		return;
+		if (this.attributes.isVisible !== undefined && this.attributes.isVisible === false) 
+		{
+			return;
+		}
+		
+		if (renderType === 2)
+		{
+			if (this.attributes.isSelectable !== undefined && this.attributes.isSelectable === false) 
+			{
+				return;
+			}
+		}
 	}
+	
 
 	if (this.dirty)
 	{ this.makeMesh(); }
@@ -136,31 +148,33 @@ MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPr
 	{
 		if (this.options.renderWireframe)
 		{
-			var shader = magoManager.postFxShadersManager.getShader("thickLine");
-			shader.useProgram();
-			shader.bindUniformGenerals();
+			var shaderThickLine = magoManager.postFxShadersManager.getShader("thickLine");
+			shaderThickLine.useProgram();
+			shaderThickLine.bindUniformGenerals();
 			var gl = magoManager.getGl();
 
 			gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
 			gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 			gl.disable(gl.CULL_FACE);
 			
-			gl.enableVertexAttribArray(shader.prev_loc);
-			gl.enableVertexAttribArray(shader.current_loc);
-			gl.enableVertexAttribArray(shader.next_loc);
+			gl.enableVertexAttribArray(shaderThickLine.prev_loc);
+			gl.enableVertexAttribArray(shaderThickLine.current_loc);
+			gl.enableVertexAttribArray(shaderThickLine.next_loc);
 			
 			var geoLocData = this.geoLocDataManager.getCurrentGeoLocationData();
-			geoLocData.bindGeoLocationUniforms(gl, shader);
+			geoLocData.bindGeoLocationUniforms(gl, shaderThickLine);
 
 			var sceneState = magoManager.sceneState;
 			var drawingBufferWidth = sceneState.drawingBufferWidth;
 			var drawingBufferHeight = sceneState.drawingBufferHeight;
 			
-			gl.uniform4fv(shader.color_loc, [0.6, 0.8, 0.9, 1.0]);
-			gl.uniform2fv(shader.viewport_loc, [drawingBufferWidth[0], drawingBufferHeight[0]]);
+			gl.uniform4fv(shaderThickLine.color_loc, [0.6, 0.8, 0.9, 1.0]);
+			gl.uniform2fv(shaderThickLine.viewport_loc, [drawingBufferWidth[0], drawingBufferHeight[0]]);
 
+			this.renderAsChild(magoManager, shaderThickLine, renderType, glPrimitive, bIsSelected, this.options);
 			
-			this.renderAsChild(magoManager, shader, renderType, glPrimitive, bIsSelected, this.options);
+			// Return to the currentShader.
+			shader.useProgram();
 		}
 	}
 };
@@ -197,7 +211,14 @@ MagoRenderable.prototype.renderAsChild = function(magoManager, shader, renderTyp
 		else if (selectionManager.isObjectSelected(this))
 		{
 			bIsSelected = true;
-			gl.uniform4fv(shader.oneColor4_loc, [0.9, 0.1, 0.1, 1.0]);
+			var selColor = [0.9, 0.1, 0.1, 1.0];
+			if (this.attributes.selectedColor4)
+			{
+				var selectedColor = this.attributes.selectedColor4;
+				selColor = [selectedColor.r, selectedColor.g, selectedColor.b, selectedColor.a];
+			}
+			
+			gl.uniform4fv(shader.oneColor4_loc, selColor);
 		}
 		else 
 		{

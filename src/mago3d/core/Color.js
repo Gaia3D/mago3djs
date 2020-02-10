@@ -7,7 +7,7 @@
  * Save and calculate the color value as RGB
  * @class Color
  */
-var Color = function() 
+var Color = function(red, green, blue, alpha) 
 {
 	if (!(this instanceof Color)) 
 	{
@@ -18,6 +18,18 @@ var Color = function()
 	this.g = 0;
 	this.b = 0;
 	this.a = 1;
+	
+	if (red !== undefined)
+	{ this.r = red; }
+	
+	if (green !== undefined)
+	{ this.g = green; }
+	
+	if (blue !== undefined)
+	{ this.b = blue; }
+	
+	if (alpha !== undefined)
+	{ this.a = alpha; }
 };
 
 
