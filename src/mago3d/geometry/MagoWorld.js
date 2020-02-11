@@ -236,6 +236,7 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 	var currentFrustumFar;
 	var currentFrustumNear;
 	var currentLinearDepth;
+	var depthDetected = false;
 	var frustumsCount = magoManager.numFrustums;
 	for (var i = 0; i < frustumsCount; i++)
 	{
@@ -249,6 +250,7 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 			var frustum = camera.getFrustum(i);
 			currentFrustumFar = frustum.far[0];
 			currentFrustumNear = frustum.near[0];
+			depthDetected = true;
 			break;
 		}
 	}

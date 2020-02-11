@@ -1674,6 +1674,14 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			if (magoManager.pin.positionBuffer === undefined)
 			{ magoManager.pin.createPinCenterBottom(gl); }
 			
+			// check if pin textures is loaded.
+			var currentTexture = magoManager.pin.texturesArray[0];
+			if (!currentTexture || !currentTexture.texId)
+			{
+				magoManager.load_testTextures();
+				return;
+			}
+			
 			currentShader = magoManager.postFxShadersManager.pngImageShader; // png image shader.***
 			currentShader.resetLastBuffersBinded();
 			

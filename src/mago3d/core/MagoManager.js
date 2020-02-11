@@ -1328,8 +1328,10 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 			if (this.objMarkerSC === undefined)
 			{ this.objMarkerSC = new ObjectMarker(); }
 			
-			pixelPos = new Point3D();
-			pixelPos = ManagerUtils.calculatePixelPositionWorldCoord(gl, this.mouse_x, this.mouse_y, pixelPos, undefined, undefined, undefined, this);
+			var mouseAction = this.sceneState.mouseAction;
+			var strWC = mouseAction.getStartWorldPoint();
+			pixelPos = new Point3D(strWC.x, strWC.y, strWC.z);
+
 			var objMarker = this.objMarkerManager.newObjectMarker();
 			ManagerUtils.calculateGeoLocationDataByAbsolutePoint(pixelPos.x, pixelPos.y, pixelPos.z, objMarker.geoLocationData, this);
 		}
@@ -1341,8 +1343,9 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 			
 			if (pixelPos === undefined)
 			{
-				pixelPos = new Point3D();
-				pixelPos = ManagerUtils.calculatePixelPositionWorldCoord(gl, this.mouse_x, this.mouse_y, pixelPos, undefined, undefined, undefined, this);
+				var mouseAction = this.sceneState.mouseAction;
+				var strWC = mouseAction.getStartWorldPoint();
+				pixelPos = new Point3D(strWC.x, strWC.y, strWC.z);
 			}
 			
 			ManagerUtils.calculateGeoLocationDataByAbsolutePoint(pixelPos.x, pixelPos.y, pixelPos.z, this.objMarkerSC.geoLocationData, this);
@@ -2071,6 +2074,8 @@ MagoManager.prototype.keyDown = function(key)
 		}
 		sunSystem.setDate(this.dateTest);
 		*/
+		
+		//this.magoPolicy.issueInsertEnable = true; // test to inser pins in scene.!!!!!!!!!!!!!!!!!!!!!! TEST.!!!
 		
 		// Stencil shadow mesh making test.********************
 		var nodeSelected = this.selectionManager.currentNodeSelected;
