@@ -30,14 +30,6 @@ uniform float tangentOfHalfFovy;
 uniform float aspectRatio;
 varying vec4 vColor; 
 
-vec3 getViewRay(vec2 tc)
-{
-    float hfar = 2.0 * tangentOfHalfFovy * far;
-    float wfar = hfar * aspectRatio;    
-    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    
-    return ray;                      
-}
-
 float unpackDepth(vec4 packedDepth)
 {
 	// See Aras Pranckevičius' post Encoding Floats to RGBA
@@ -129,8 +121,6 @@ void main()
 		float z_window  = unpackDepth(texture2D(depthTex, screenPos.xy)); // z_window  is [0.0, 1.0] range depth.
 		if(z_window < 0.001)
 		discard;
-
-		vec3 ray = getViewRay(screenPos);
 		
 		// https://stackoverflow.com/questions/11277501/how-to-recover-view-space-position-given-view-space-depth-value-and-ndc-xy
 		float depthRange_near = 0.0;

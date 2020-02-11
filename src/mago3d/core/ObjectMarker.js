@@ -32,29 +32,13 @@ ObjectMarker.prototype.copyFrom = function(objMarker)
 	this.issue_type = objMarker.issue_type;
 };
 
-/**
- * 어떤 일을 하고 있습니까?
- * @class ObjectMarkerManager
- *
- */
-var ObjectMarkerManager = function() 
+ObjectMarker.prototype.render = function(shader, renderType, magoManager) 
 {
-	if (!(this instanceof ObjectMarkerManager)) 
-	{
-		throw new Error(Messages.CONSTRUCT_ERROR);
-	}
-	this.objectMarkerArray = [];
+	var objMarkerGeoLocation = this.geoLocationData;
+	gl.bindTexture(gl.TEXTURE_2D, currentTexture.texId);
+	gl.uniform3fv(currentShader.buildingPosHIGH_loc, objMarkerGeoLocation.positionHIGH);
+	gl.uniform3fv(currentShader.buildingPosLOW_loc, objMarkerGeoLocation.positionLOW);
 
+	gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 };
 
-/**
- * 어떤 일을 하고 있습니까?
- * @class ObjectMarkerManager
- *
- */
-ObjectMarkerManager.prototype.newObjectMarker = function()
-{
-	var objMarker = new ObjectMarker();
-	this.objectMarkerArray.push(objMarker);
-	return objMarker;
-};

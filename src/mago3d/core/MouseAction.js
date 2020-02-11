@@ -196,6 +196,14 @@ MouseAction.prototype.saveCurrentToStart = function()
 	}
 };
 
+/**
+ * Save the current-state on start-state vars. of worldPoint and CamCoordPoint
+ */
+MouseAction.prototype.getStartWorldPoint = function()
+{
+	return this.strWorldPoint;
+};
+
 
 
 

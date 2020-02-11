@@ -1379,8 +1379,10 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 			if (this.objMarkerSC === undefined)
 			{ this.objMarkerSC = new ObjectMarker(); }
 			
-			pixelPos = new Point3D();
-			pixelPos = ManagerUtils.calculatePixelPositionWorldCoord(gl, this.mouse_x, this.mouse_y, pixelPos, undefined, undefined, undefined, this);
+			var mouseAction = this.sceneState.mouseAction;
+			var strWC = mouseAction.getStartWorldPoint();
+			pixelPos = new Point3D(strWC.x, strWC.y, strWC.z);
+
 			var objMarker = this.objMarkerManager.newObjectMarker();
 			ManagerUtils.calculateGeoLocationDataByAbsolutePoint(pixelPos.x, pixelPos.y, pixelPos.z, objMarker.geoLocationData, this);
 		}
@@ -1392,8 +1394,9 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 			
 			if (pixelPos === undefined)
 			{
-				pixelPos = new Point3D();
-				pixelPos = ManagerUtils.calculatePixelPositionWorldCoord(gl, this.mouse_x, this.mouse_y, pixelPos, undefined, undefined, undefined, this);
+				var mouseAction = this.sceneState.mouseAction;
+				var strWC = mouseAction.getStartWorldPoint();
+				pixelPos = new Point3D(strWC.x, strWC.y, strWC.z);
 			}
 			
 			ManagerUtils.calculateGeoLocationDataByAbsolutePoint(pixelPos.x, pixelPos.y, pixelPos.z, this.objMarkerSC.geoLocationData, this);
@@ -2141,6 +2144,8 @@ MagoManager.prototype.keyDown = function(key)
 		}
 		sunSystem.setDate(this.dateTest);
 		*/
+		
+		//this.magoPolicy.issueInsertEnable = true; // test to inser pins in scene.!!!!!!!!!!!!!!!!!!!!!! TEST.!!!
 		
 		// Stencil shadow mesh making test.********************
 		var nodeSelected = this.selectionManager.currentNodeSelected;
@@ -4154,6 +4159,14 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	var ssao_vs_source = ShaderSource.ScreenQuadVS;
 	var ssao_fs_source = ShaderSource.ScreenQuadFS;
 	var shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
+	
+	// 15) Pin shader.******************************************************************************************
+	var shaderName = "pin";
+	var ssao_vs_source = ShaderSource.PngImageVS;
+	var ssao_fs_source = ShaderSource.PngImageFS;
+	var shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
+	shader.position4_loc = gl.getAttribLocation(shader.program, "position");
+	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
 };
 
 /**
