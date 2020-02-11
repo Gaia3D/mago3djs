@@ -1664,7 +1664,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		}
 		
 		// 4) Render ObjectMarkers.********************************************************************************************************
-		magoManager.objMarkerManager.render(magoManager);
+		magoManager.objMarkerManager.render(magoManager, renderType);
 
 		// test renders.***
 		// render cctv.***
@@ -2134,6 +2134,9 @@ Renderer.prototype.renderGeometryColorCoding = function(visibleObjControlerNodes
 		magoManager.tinTerrainManager.render(magoManager, bDepth, renderType);
 		gl.useProgram(null);
 	}
+	
+	// pins.**********************************************************************
+	magoManager.objMarkerManager.render(magoManager, renderType);
 	
 }; 
 

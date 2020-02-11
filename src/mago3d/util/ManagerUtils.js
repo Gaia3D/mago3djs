@@ -686,7 +686,10 @@ ManagerUtils.calculatePixelLinearDepth = function(gl, pixelX, pixelY, depthFbo, 
 ManagerUtils.calculatePixelLinearDepthABGR = function(gl, pixelX, pixelY, depthFbo, magoManager) 
 {
 	// Test function.
-	
+	// Test function.
+	// Test function.
+	// Test function.
+	// Called from MagoWorld.updateMouseStartClick(...).***
 	if (depthFbo === undefined)
 	{ depthFbo = magoManager.depthFboNeo; }
 

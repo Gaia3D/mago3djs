@@ -84,29 +84,60 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 		gl.activeTexture(gl.TEXTURE0);
 		
 		gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
+		gl.uniform4fv(shader.oneColor4_loc, [0.2, 0.7, 0.9, 1.0]);
 		
 		var j=0;
 		gl.depthMask(false);
-		for (var i=0; i<objectsMarkersCount; i++)
+		if (renderType === 1)
 		{
-			if (j>= magoManager.pin.texturesArray.length)
-			{ j=0; }
-		
-			//if (i === 4)
-			//{ gl.uniform1i(shader.colorType_loc, 0); } // 0= oneColor, 1= attribColor, 2= texture.
+			for (var i=0; i<objectsMarkersCount; i++)
+			{
+				if (j>= magoManager.pin.texturesArray.length)
+				{ j=0; }
+				
+				var currentTexture = magoManager.pin.texturesArray[j];
+				
+				var objMarker = magoManager.objMarkerManager.objectMarkerArray[i];
+				var objMarkerGeoLocation = objMarker.geoLocationData;
+				gl.bindTexture(gl.TEXTURE_2D, currentTexture.texId);
+				gl.uniform3fv(shader.buildingPosHIGH_loc, objMarkerGeoLocation.positionHIGH);
+				gl.uniform3fv(shader.buildingPosLOW_loc, objMarkerGeoLocation.positionLOW);
 
-			
-			var currentTexture = magoManager.pin.texturesArray[j];
-			var objMarker = magoManager.objMarkerManager.objectMarkerArray[i];
-			var objMarkerGeoLocation = objMarker.geoLocationData;
-			gl.bindTexture(gl.TEXTURE_2D, currentTexture.texId);
-			gl.uniform3fv(shader.buildingPosHIGH_loc, objMarkerGeoLocation.positionHIGH);
-			gl.uniform3fv(shader.buildingPosLOW_loc, objMarkerGeoLocation.positionLOW);
-
-			gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-			
-			j++;
+				gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+				
+				j++;
+			}
 		}
+		else if (renderType === 2)
+		{
+			// Selection render.***
+			var selectionColor = magoManager.selectionColor;
+			gl.disable(gl.BLEND);
+			gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
+			
+			for (var i=0; i<objectsMarkersCount; i++)
+			{
+				//var currentTexture = magoManager.pin.texturesArray[j];
+				var objMarker = magoManager.objMarkerManager.objectMarkerArray[i];
+				var objMarkerGeoLocation = objMarker.geoLocationData;
+				//gl.bindTexture(gl.TEXTURE_2D, currentTexture.texId);
+				
+				var colorAux = selectionColor.getAvailableColor(undefined);
+				var idxKey = selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
+				magoManager.selectionManager.setCandidateGeneral(idxKey, objMarker);
+			
+				gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
+			
+				gl.uniform3fv(shader.buildingPosHIGH_loc, objMarkerGeoLocation.positionHIGH);
+				gl.uniform3fv(shader.buildingPosLOW_loc, objMarkerGeoLocation.positionLOW);
+
+				gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+				
+				j++;
+			}
+			gl.enable(gl.BLEND);
+		}
+		
 		gl.depthRange(0, 1);
 		gl.depthMask(true);
 		gl.useProgram(null);

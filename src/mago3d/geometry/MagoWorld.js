@@ -181,6 +181,7 @@ MagoWorld.screenToCamCoord = function(mouseX, mouseY, magoManager, resultPointCa
 	var currentFrustumFar;
 	var currentFrustumNear;
 	var currentLinearDepth;
+	var depthDetected = false;
 	var frustumsCount = magoManager.numFrustums;
 	for (var i = 0; i < frustumsCount; i++)
 	{
@@ -194,6 +195,7 @@ MagoWorld.screenToCamCoord = function(mouseX, mouseY, magoManager, resultPointCa
 			var frustum = camera.getFrustum(i);
 			currentFrustumFar = frustum.far[0];
 			currentFrustumNear = frustum.near[0];
+			depthDetected = true;
 			break;
 		}
 	}
@@ -259,11 +261,19 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 	
 	if (!depthDetected)
 	{
+		var camera = magoManager.scene.frameState.camera;
+		var scene = magoManager.scene;
+		var ray = camera.getPickRay(new Cesium.Cartesian2(mouseX, mouseY));
+		var pointWC = scene.globe.pick(ray, scene);
+		var difX = camera._positionWC.x - pointWC.x;
+		var difY = camera._positionWC.y - pointWC.y;
+		var difZ = camera._positionWC.z - pointWC.z;
+		currentLinearDepth = Math.sqrt(difX*difX + difY*difY + difZ*difZ);
 		// in case of this is cesium globe, then check globe depth.
-		var globeDepthTex = magoManager.czm_globeDepthText;
-		var depthFbo = new FBO(gl, sceneState.drawingBufferWidth, sceneState.drawingBufferHeight);
-		depthFbo.colorBuffer = globeDepthTex;
-		currentLinearDepth = ManagerUtils.calculatePixelLinearDepthABGR(gl, mouseAction.strX, mouseAction.strY, depthFbo, magoManager);
+		//var globeDepthTex = magoManager.czm_globeDepthText;
+		//var depthFbo = new FBO(gl, sceneState.drawingBufferWidth, sceneState.drawingBufferHeight);
+		//depthFbo.colorBuffer = globeDepthTex;
+		//currentLinearDepth = ManagerUtils.calculatePixelLinearDepthABGR(gl, mouseAction.strX, mouseAction.strY, depthFbo, magoManager);
 	}
 	
 	//if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)

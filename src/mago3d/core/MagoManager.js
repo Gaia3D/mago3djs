@@ -1558,8 +1558,8 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, resultSe
 	{ bSelectObjects = false; }
 	
 	// Read the picked pixel and find the object.*********************************************************
-	var mosaicWidth = 9;
-	var mosaicHeight = 9;
+	var mosaicWidth = 1;
+	var mosaicHeight = 1;
 	var totalPixelsCount = mosaicWidth*mosaicHeight;
 	var pixels = new Uint8Array(4 * mosaicWidth * mosaicHeight); // 4 x 3x3 pixel, total 9 pixels select.***
 	var pixelX = mouseX - Math.floor(mosaicWidth/2);
@@ -1627,6 +1627,11 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, resultSe
 	// Check general objects.***
 	if (selectedObject === undefined)
 	{ selectedObject = selectionManager.selCandidatesMap[idx]; }
+
+	selectionManager.currentGeneralObjectSelected = selectionManager.selCandidatesMap[idx];
+	
+	//if (selectionManager.currentGeneralObjectSelected)
+	//{ var hola =0; }
 	
 	return selectedObject;
 };
@@ -1713,6 +1718,7 @@ MagoManager.prototype.isDragging = function()
 			bIsDragging = false;
 		}
 	}
+	/*
 	else if (this.magoPolicy.objectMoveMode === CODE.moveMode.GEOGRAPHICPOINTS) 
 	{
 		// Compare currentSelectedObject with the nowSelectedObject.***
@@ -1733,6 +1739,7 @@ MagoManager.prototype.isDragging = function()
 			}
 		}
 	}
+	*/
 	else
 	{
 		if (this.weatherStation)
@@ -2075,9 +2082,17 @@ MagoManager.prototype.keyDown = function(key)
 		sunSystem.setDate(this.dateTest);
 		*/
 		
-		//this.magoPolicy.issueInsertEnable = true; // test to inser pins in scene.!!!!!!!!!!!!!!!!!!!!!! TEST.!!!
+		/*
+		if (this.magoPolicy.issueInsertEnable)
+		{
+			this.magoPolicy.issueInsertEnable = false; // test to inser pins in scene.!!!!!!!!!!!!!!!!!!!!!! TEST.!!!
+		}
+		else
+		{ this.magoPolicy.issueInsertEnable = true; }
+	*/
 		
 		// Stencil shadow mesh making test.********************
+		/*
 		var nodeSelected = this.selectionManager.currentNodeSelected;
 		if (nodeSelected)
 		{
@@ -2092,18 +2107,20 @@ MagoManager.prototype.keyDown = function(key)
 			if (lodBuilding)
 			{ lodBuilding.skinLego.makeStencilShadowMesh(sunDirLC); }
 		}
+		*/
 		// End test----------------------------------------------------
 		
 		// another test.***
 		if (this.modeler !== undefined)
 		{
+			/*
 			var geoCoordsList = this.modeler.getGeographicCoordsList();
 			if (geoCoordsList !== undefined)
 			{
 				// test make thickLine.
 				geoCoordsList.test__makeThickLines(this);
 			}
-			
+			*/
 			//var excavation = this.modeler.getExcavation();
 			//if (excavation !== undefined)
 			//{
@@ -2129,6 +2146,7 @@ MagoManager.prototype.keyDown = function(key)
 				
 			}
 			*/
+			/*
 			// Another test: Change color by projectId & objectId.***
 			var api = new API();
 			api.apiName = "changeColor";
@@ -2165,10 +2183,11 @@ MagoManager.prototype.keyDown = function(key)
 				bSplineCubic3d.makeControlPoints(controlPointArmLength, this);
 				bSplineCubic3d.makeInterpolatedPoints();
 			}
+			*/
 		}
 		
 		// Another test.***
-		
+		/*
 		if (this.smartTile_f4d_tested === undefined)
 		{
 			this.smartTile_f4d_tested = 1;
@@ -2179,6 +2198,7 @@ MagoManager.prototype.keyDown = function(key)
 			this.readerWriter.getObjectIndexFileSmartTileF4d(fileName, projectFolderName, this);
 
 		}
+		*/
 		//else if (this.smartTile_f4d_tested === 1)
 		//{
 		//	this.smartTile_f4d_tested ++;
@@ -2189,6 +2209,7 @@ MagoManager.prototype.keyDown = function(key)
 
 		
 		// Another test. make collisionCheckOctree.***
+		/*
 		if (this.selectionManager.currentNodeSelected !== undefined)
 		{
 			// make collisionCheckOctree.***
@@ -2241,6 +2262,7 @@ MagoManager.prototype.keyDown = function(key)
 				
 			}
 		}
+		*/
 		
 	}
 	else if (key === 87) // 87 = 'w'.***

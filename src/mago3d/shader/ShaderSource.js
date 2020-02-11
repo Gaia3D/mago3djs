@@ -1854,6 +1854,7 @@ varying vec2 v_texcoord;\n\
 uniform bool textureFlipYAxis;\n\
 uniform sampler2D u_texture;\n\
 uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
+uniform vec4 oneColor4;\n\
 \n\
 void main()\n\
 {\n\
@@ -1875,7 +1876,7 @@ void main()\n\
 	}\n\
 	else if( colorType == 0)\n\
 	{\n\
-		textureColor = vec4(1.0, 0.5, 0.5, 0.5);\n\
+		textureColor = oneColor4;\n\
 	}\n\
 \n\
     gl_FragColor = textureColor;\n\

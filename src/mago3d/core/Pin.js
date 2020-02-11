@@ -16,6 +16,9 @@ var Pin = function()
 	this.positionBuffer;
 	this.texcoordBuffer;
 	
+	this.imageFileMap = {};
+
+	
 };
 
 Pin.prototype.createPin = function(gl)
