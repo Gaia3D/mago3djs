@@ -15,6 +15,7 @@ uniform vec3 buildingPosLOW;
 uniform vec3 encodedCameraPositionMCHigh;
 uniform vec3 encodedCameraPositionMCLow;
 
+
 const float error = 0.001;
 
 // see https://weekly-geekly.github.io/articles/331164/index.html
@@ -107,3 +108,15 @@ void main(){
 	gl_Position = currentProjected + offset; 
 	
 }
+
+
+
+
+
+
+
+
+
+
+
+

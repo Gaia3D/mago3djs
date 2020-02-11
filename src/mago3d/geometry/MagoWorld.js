@@ -213,8 +213,9 @@ MagoWorld.screenToCamCoord = function(mouseX, mouseY, magoManager, resultPointCa
  */
 MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 {
-	var gl = magoManager.sceneState.gl;
-	var mouseAction = magoManager.sceneState.mouseAction;
+	var sceneState = magoManager.sceneState;
+	var gl = sceneState.gl;
+	var mouseAction = sceneState.mouseAction;
 	
 	MagoWorld.updateMouseClick(mouseX, mouseY, magoManager);
 	
@@ -224,14 +225,15 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 	// if button = 1 (middleButton), then rotate camera.
 	mouseAction.strX = mouseX;
 	mouseAction.strY = mouseY;
-	if (magoManager.sceneState.mouseButton === 0)
+	if (sceneState.mouseButton === 0)
 	{
 		magoManager.bPicking = true;
 	}
 	
-	var camera = magoManager.sceneState.camera;
+	var camera = sceneState.camera;
 	
 	// Must find the frustum on pick(mouseX, mouseY) detected depth value.***
+	var maxDepth = 0.996;
 	var currentDepthFbo;
 	var currentFrustumFar;
 	var currentFrustumNear;
@@ -244,7 +246,7 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 		var depthFbo = frustumVolume.depthFbo;
 
 		currentLinearDepth = ManagerUtils.calculatePixelLinearDepth(gl, mouseAction.strX, mouseAction.strY, depthFbo, magoManager);
-		if (currentLinearDepth < 0.996) // maxDepth/255 = 0.99607...
+		if (currentLinearDepth < maxDepth) // maxDepth/255 = 0.99607...
 		{ 
 			currentDepthFbo = depthFbo;
 			var frustum = camera.getFrustum(i);
@@ -253,6 +255,15 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 			depthDetected = true;
 			break;
 		}
+	}
+	
+	if (!depthDetected)
+	{
+		// in case of this is cesium globe, then check globe depth.
+		var globeDepthTex = magoManager.czm_globeDepthText;
+		var depthFbo = new FBO(gl, sceneState.drawingBufferWidth, sceneState.drawingBufferHeight);
+		depthFbo.colorBuffer = globeDepthTex;
+		currentLinearDepth = ManagerUtils.calculatePixelLinearDepthABGR(gl, mouseAction.strX, mouseAction.strY, depthFbo, magoManager);
 	}
 	
 	//if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
@@ -273,8 +284,8 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 	strCamera.copyPosDirUpFrom(camera);
 	
 	// copy modelViewMatrix.
-	var modelViewMatrix = magoManager.sceneState.modelViewMatrix;
-	var modelViewMatrixInv = magoManager.sceneState.modelViewMatrixInv;
+	var modelViewMatrix = sceneState.modelViewMatrix;
+	var modelViewMatrixInv = sceneState.modelViewMatrixInv;
 	mouseAction.strModelViewMatrix._floatArrays = glMatrix.mat4.copy(mouseAction.strModelViewMatrix._floatArrays, modelViewMatrix._floatArrays);
 	mouseAction.strModelViewMatrixInv._floatArrays = glMatrix.mat4.copy(mouseAction.strModelViewMatrixInv._floatArrays, modelViewMatrixInv._floatArrays);
 

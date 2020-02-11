@@ -675,6 +675,41 @@ ManagerUtils.calculatePixelLinearDepth = function(gl, pixelX, pixelY, depthFbo, 
 };
 
 /**
+ * Calculates the pixel linear depth value.
+ * @param {WebGLRenderingContext} gl WebGL Rendering Context.
+ * @param {Number} pixelX Screen x position of the pixel.
+ * @param {Number} pixelY Screen y position of the pixel.
+ * @param {FBO} depthFbo Depth frameBuffer object.
+ * @param {MagoManager} magoManager Mago3D main manager.
+ * @returns {Number} linearDepth Returns the linear depth [0.0, 1.0] ranged value.
+ */
+ManagerUtils.calculatePixelLinearDepthABGR = function(gl, pixelX, pixelY, depthFbo, magoManager) 
+{
+	// Test function.
+	
+	if (depthFbo === undefined)
+	{ depthFbo = magoManager.depthFboNeo; }
+
+	if (!depthFbo) 
+	{
+		return;
+	}
+	
+	if (depthFbo) 
+	{
+		depthFbo.bind(); 
+	}
+	
+	// Now, read the pixel and find the pixel position.
+	var depthPixels = new Uint8Array(4 * 1 * 1); // 4 x 1x1 pixel.
+	gl.readPixels(pixelX, magoManager.sceneState.drawingBufferHeight - pixelY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, depthPixels);
+	
+	var zDepth = depthPixels[3]/(255.0*255.0*255.0) + depthPixels[2]/(255.0*255.0) + depthPixels[1]/255.0 + depthPixels[0]; // 0 to 256 range depth.
+	var linearDepth = zDepth / 255.0; // LinearDepth. Convert to [0.0, 1.0] range depth.
+	return linearDepth;
+};
+
+/**
  * Calculates the pixel position in camera coordinates.
  * @param {WebGLRenderingContext} gl WebGL Rendering Context.
  * @param {Number} pixelX Screen x position of the pixel.

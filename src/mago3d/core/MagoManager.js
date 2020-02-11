@@ -4413,6 +4413,14 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	var ssao_vs_source = ShaderSource.ScreenQuadVS;
 	var ssao_fs_source = ShaderSource.ScreenQuadFS;
 	var shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
+	
+	// 15) Pin shader.******************************************************************************************
+	var shaderName = "pin";
+	var ssao_vs_source = ShaderSource.PngImageVS;
+	var ssao_fs_source = ShaderSource.PngImageFS;
+	var shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
+	shader.position4_loc = gl.getAttribLocation(shader.program, "position");
+	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
 };
 
 /**

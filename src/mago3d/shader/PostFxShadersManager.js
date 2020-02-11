@@ -115,7 +115,6 @@ PostFxShadersManager.prototype.createShader = function(gl, source, type, typeStr
  */
 PostFxShadersManager.prototype.createDefaultShaders = function(gl, sceneState) 
 {
-	this.pngImageShader = this.createPngImageShader(gl); // 13.
 	this.modelRefSilhouetteShader = this.createSilhouetteShaderModelRef(gl); // 14.
 	this.triPolyhedronShader = this.createSsaoShaderBox(gl); // 12.
 	
@@ -152,45 +151,6 @@ PostFxShadersManager.prototype.getTriPolyhedronShader = function()
 PostFxShadersManager.prototype.getInvertedBoxShader = function() 
 {
 	return this.invertedBoxShader;
-};
-
-// PNG images shader.
-/**
- * 어떤 일을 하고 있습니까?
- * @param gl 변수
- */
-PostFxShadersManager.prototype.createPngImageShader = function(gl) 
-{
-	// 13.
-	var shader = new PostFxShader(this.gl);
-	this.pFx_shaders_array.push(shader);
-
-	var ssao_vs_source = ShaderSource.PngImageVS;
-	var ssao_fs_source = ShaderSource.PngImageFS;
-
-	shader.program = gl.createProgram();
-	shader.shader_vertex = this.createShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
-	shader.shader_fragment = this.createShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
-
-	gl.attachShader(shader.program, shader.shader_vertex);
-	gl.attachShader(shader.program, shader.shader_fragment);
-	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
-	gl.linkProgram(shader.program);
-
-	shader.texture_loc = gl.getUniformLocation(shader.program, "u_texture"); 
-	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
-	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
-	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
-	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
-	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
-	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
-	
-	shader.position3_loc = gl.getAttribLocation(shader.program, "a_position");
-	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "a_texcoord");
-	
-	shader.textureFlipYAxis_loc = gl.getUniformLocation(shader.program, "textureFlipYAxis");
-	return shader;
-	
 };
 
 // 14) Silhouette shader.

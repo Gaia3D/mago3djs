@@ -37,6 +37,14 @@ var Block = function()
 	 * @default false
 	 */
 	this.isSmallObj = false;
+	
+	/**
+	 * block bounding box
+	 * 
+	 * @type {BoundingBox} 
+	 * @default undefined
+	 */
+	this.bbox;
 
 	/**
 	 * block radius

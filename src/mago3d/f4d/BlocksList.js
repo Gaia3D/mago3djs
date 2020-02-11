@@ -287,7 +287,8 @@ BlocksList.prototype.parseBlocksListVersioned_v001 = function(arrayBuffer, readW
 		motherBlocksArray[blockIdx] = block;
 
 		// 1rst, read bbox.
-		var bbox = new BoundingBox();
+		block.bbox = new BoundingBox();
+		var bbox = block.bbox;
 		bbox.minX = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
 		bbox.minY = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;
 		bbox.minZ = new Float32Array(arrayBuffer.slice(bytesReaded, bytesReaded+4)); bytesReaded += 4;

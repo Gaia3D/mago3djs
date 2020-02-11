@@ -1849,52 +1849,112 @@ void main()\n\
 	depth = gl_Position.z*0.5+0.5;\n\
 }\n\
 ";
-ShaderSource.PngImageFS = "precision mediump float;\n\
+ShaderSource.PngImageFS = "precision highp float;\n\
 varying vec2 v_texcoord;\n\
 uniform bool textureFlipYAxis;\n\
 uniform sampler2D u_texture;\n\
+uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
 \n\
 void main()\n\
 {\n\
     vec4 textureColor;\n\
-    if(textureFlipYAxis)\n\
-    {\n\
-        textureColor = texture2D(u_texture, vec2(v_texcoord.s, 1.0 - v_texcoord.t));\n\
-    }\n\
-    else\n\
-    {\n\
-        textureColor = texture2D(u_texture, v_texcoord);\n\
-    }\n\
-    if(textureColor.w < 0.1)\n\
-    {\n\
-        discard;\n\
-    }\n\
+	if(colorType == 2)\n\
+	{\n\
+		if(textureFlipYAxis)\n\
+		{\n\
+			textureColor = texture2D(u_texture, vec2(v_texcoord.s, 1.0 - v_texcoord.t));\n\
+		}\n\
+		else\n\
+		{\n\
+			textureColor = texture2D(u_texture, v_texcoord);\n\
+		}\n\
+		if(textureColor.w < 0.05)\n\
+		{\n\
+			discard;\n\
+		}\n\
+	}\n\
+	else if( colorType == 0)\n\
+	{\n\
+		textureColor = vec4(1.0, 0.5, 0.5, 0.5);\n\
+	}\n\
 \n\
     gl_FragColor = textureColor;\n\
 }";
-ShaderSource.PngImageVS = "attribute vec3 a_position;\n\
-attribute vec2 a_texcoord;\n\
-uniform mat4 buildingRotMatrix;  \n\
+ShaderSource.PngImageVS = "attribute vec4 position;\n\
+attribute vec2 texCoord;\n\
+uniform mat4 buildingRotMatrix;\n\
+uniform mat4 modelViewMatrixRelToEye;  \n\
 uniform mat4 ModelViewProjectionMatrixRelToEye;  \n\
 uniform vec3 buildingPosHIGH;\n\
 uniform vec3 buildingPosLOW;\n\
 uniform vec3 encodedCameraPositionMCHigh;\n\
 uniform vec3 encodedCameraPositionMCLow;\n\
+//uniform float screenWidth;    \n\
+//uniform float screenHeight;\n\
 varying vec2 v_texcoord;\n\
 \n\
 void main()\n\
 {\n\
-    vec4 position2 = vec4(a_position.xyz, 1.0);\n\
+    vec4 position2 = vec4(position.xyz, 1.0);\n\
     vec4 rotatedPos = buildingRotMatrix * vec4(position2.xyz, 1.0);\n\
     vec3 objPosHigh = buildingPosHIGH;\n\
     vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
     vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
     vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
     vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+	\n\
+	float order_w = position.w;\n\
+	float sense = 1.0;\n\
+	int orderInt = 0;\n\
+	if(order_w > 0.0)\n\
+	{\n\
+		sense = -1.0;\n\
+		if(order_w < 1.5)\n\
+		{\n\
+			orderInt = 1;\n\
+		}\n\
+		else{\n\
+			orderInt = 2;\n\
+		}\n\
+	}\n\
+	else\n\
+	{\n\
+		sense = 1.0;\n\
+		if(order_w > -1.5)\n\
+		{\n\
+			orderInt = -1;\n\
+		}\n\
+		else{\n\
+			orderInt = -2;\n\
+		}\n\
+	}\n\
+	\n\
+    v_texcoord = texCoord;\n\
+	vec4 projected = ModelViewProjectionMatrixRelToEye * pos4;\n\
+	//vec4 projected2 = modelViewMatrixRelToEye * pos4;\n\
+	float thickness = 30.0;\n\
+	vec4 offset;\n\
+	float projectedDepth = projected.w;\n\
+	float offsetQuantity = (thickness*projectedDepth)/1000.0;\n\
+	// Offset our position along the normal\n\
+	if(orderInt == 1)\n\
+	{\n\
+		offset = vec4(-offsetQuantity, 0.0, 0.0, 1.0);\n\
+	}\n\
+	else if(orderInt == -1)\n\
+	{\n\
+		offset = vec4(offsetQuantity, 0.0, 0.0, 1.0);\n\
+	}\n\
+	else if(orderInt == 2)\n\
+	{\n\
+		offset = vec4(-offsetQuantity, offsetQuantity*4.0, 0.0, 1.0);\n\
+	}\n\
+	else if(orderInt == -2)\n\
+	{\n\
+		offset = vec4(offsetQuantity, offsetQuantity*4.0, 0.0, 1.0);\n\
+	}\n\
 \n\
-    v_texcoord = a_texcoord;\n\
-\n\
-    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+	gl_Position = projected + offset; \n\
 }\n\
 ";
 ShaderSource.PointCloudDepthFS = "#ifdef GL_ES\n\
@@ -3005,6 +3065,7 @@ uniform vec3 buildingPosLOW;\n\
 uniform vec3 encodedCameraPositionMCHigh;\n\
 uniform vec3 encodedCameraPositionMCLow;\n\
 \n\
+\n\
 const float error = 0.001;\n\
 \n\
 // see https://weekly-geekly.github.io/articles/331164/index.html\n\
@@ -3096,7 +3157,20 @@ void main(){\n\
 	vec4 offset = vec4(normal * direction, 0.0, 1.0);\n\
 	gl_Position = currentProjected + offset; \n\
 	\n\
-}";
+}\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+";
 ShaderSource.TinTerrainFS = "#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\

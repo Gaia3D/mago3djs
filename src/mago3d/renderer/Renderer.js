@@ -1664,74 +1664,8 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		}
 		
 		// 4) Render ObjectMarkers.********************************************************************************************************
-		// 4) Render ObjectMarkers.********************************************************************************************************
-		// 4) Render ObjectMarkers.********************************************************************************************************
-		var objectsMarkersCount = magoManager.objMarkerManager.objectMarkerArray.length;
-		if (objectsMarkersCount > 0)
-		{
-			// now repeat the objects markers for png images.***
-			// Png for pin image 128x128.********************************************************************
-			if (magoManager.pin.positionBuffer === undefined)
-			{ magoManager.pin.createPinCenterBottom(gl); }
-			
-			// check if pin textures is loaded.
-			var currentTexture = magoManager.pin.texturesArray[0];
-			if (!currentTexture || !currentTexture.texId)
-			{
-				magoManager.load_testTextures();
-				return;
-			}
-			
-			currentShader = magoManager.postFxShadersManager.pngImageShader; // png image shader.***
-			currentShader.resetLastBuffersBinded();
-			
-			shaderProgram = currentShader.program;
-			
-			gl.useProgram(shaderProgram);
-			gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, magoManager.sceneState.modelViewProjRelToEyeMatrix._floatArrays);
-			gl.uniform3fv(currentShader.cameraPosHIGH_loc, magoManager.sceneState.encodedCamPosHigh);
-			gl.uniform3fv(currentShader.cameraPosLOW_loc, magoManager.sceneState.encodedCamPosLow);
-			gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, magoManager.sceneState.modelViewRelToEyeMatrixInv._floatArrays);
-			
-			gl.uniform1i(currentShader.textureFlipYAxis_loc, magoManager.sceneState.textureFlipYAxis); 
-			// Tell the shader to get the texture from texture unit 0
-			gl.uniform1i(currentShader.texture_loc, 0);
-			gl.enableVertexAttribArray(currentShader.texCoord2_loc);
-			gl.enableVertexAttribArray(currentShader.position3_loc);
-			gl.activeTexture(gl.TEXTURE0);
-			
-			gl.depthRange(0, 0);
-			//var context = document.getElementById('canvas2').getContext("2d");
-			//var canvas = document.getElementById("magoContainer");
-			
-			gl.bindBuffer(gl.ARRAY_BUFFER, magoManager.pin.positionBuffer);
-			gl.vertexAttribPointer(currentShader.position3_loc, 3, gl.FLOAT, false, 0, 0);
-			gl.bindBuffer(gl.ARRAY_BUFFER, magoManager.pin.texcoordBuffer);
-			gl.vertexAttribPointer(currentShader.texCoord2_loc, 2, gl.FLOAT, false, 0, 0);
-			var j=0;
-			for (var i=0; i<objectsMarkersCount; i++)
-			{
-				if (j>= magoManager.pin.texturesArray.length)
-				{ j=0; }
-				
-				var currentTexture = magoManager.pin.texturesArray[j];
-				var objMarker = magoManager.objMarkerManager.objectMarkerArray[i];
-				var objMarkerGeoLocation = objMarker.geoLocationData;
-				gl.bindTexture(gl.TEXTURE_2D, currentTexture.texId);
-				gl.uniform3fv(currentShader.buildingPosHIGH_loc, objMarkerGeoLocation.positionHIGH);
-				gl.uniform3fv(currentShader.buildingPosLOW_loc, objMarkerGeoLocation.positionLOW);
+		magoManager.objMarkerManager.render(magoManager);
 
-				gl.drawArrays(gl.TRIANGLES, 0, 6);
-				
-				j++;
-			}
-			gl.depthRange(0, 1);
-			gl.useProgram(null);
-			gl.bindTexture(gl.TEXTURE_2D, null);
-			currentShader.disableVertexAttribArrayAll();
-			
-		}
-		
 		// test renders.***
 		// render cctv.***
 		/*
