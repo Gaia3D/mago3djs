@@ -564,6 +564,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		
 		// projection.***
 		// consider near as zero provisionally.***
+		//sceneState.projectionMatrix._floatArrays = glMatrix.mat4.perspective(sceneState.projectionMatrix._floatArrays, frustum0.fovyRad[0], frustum0.aspectRatio[0], frustum0.near[0], frustum0.far[0]);
 		sceneState.projectionMatrix._floatArrays = glMatrix.mat4.perspective(sceneState.projectionMatrix._floatArrays, frustum0.fovyRad[0], frustum0.aspectRatio[0], 0.0, frustum0.far[0]);
 		
 		// modelView.***
@@ -1119,7 +1120,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
 		this.sceneState.camera.frustum.dirty = true;
 	}
-	
+
 	this.depthFboNeo = frustumVolumenObject.depthFbo;
 	this.depthFboNeo.bind(); 
 
@@ -1134,9 +1135,6 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	this.renderer.renderMagoGeometries(renderType); //TEST
 	this.depthFboNeo.unbind();
 	this.swapRenderingFase();
-	
-	
-	
 
 	// 2) color render.************************************************************************************************************
 	if (this.configInformation.geo_view_library === Constant.CESIUM)
@@ -1149,20 +1147,18 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	// Now render the geomatry.
 	if (this.configInformation.geo_view_library === Constant.CESIUM && this.currentFrustumIdx < 2)
 	{
-		renderType = 3;
-		this.renderer.renderTerrainShadow(gl, renderType, this.visibleObjControlerNodes);
+		this.renderer.renderTerrainShadow(gl);
 	}
-	//gl.clearColor(0, 0, 0, 1);
-	//gl.clearDepth(1);
-	//gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	
 	
 	renderType = 1;
 	this.renderType = 1;
 	this.renderer.renderGeometry(gl, renderType, this.visibleObjControlerNodes);
 	
-	
-	
+	//if (this.configInformation.geo_view_library === Constant.MAGOWORLD)
+	//{
+	//	this.renderer.renderScreenQuadShadow(gl, this.depthFboNeo.colorBuffer);
+	//}
+
 	if (this.weatherStation)
 	{
 		this.weatherStation.renderWindLayerDisplayPlanes(this);
@@ -2079,14 +2075,14 @@ MagoManager.prototype.keyDown = function(key)
 		sunSystem.setDate(this.dateTest);
 		*/
 		
-		/*
-		if (this.magoPolicy.issueInsertEnable)
-		{
-			this.magoPolicy.issueInsertEnable = false; // test to inser pins in scene.!!!!!!!!!!!!!!!!!!!!!! TEST.!!!
-		}
-		else
-		{ this.magoPolicy.issueInsertEnable = true; }
-		*/
+		
+		//if (this.magoPolicy.issueInsertEnable)
+		//{
+		//	this.magoPolicy.issueInsertEnable = false; // test to inser pins in scene.!!!!!!!!!!!!!!!!!!!!!! TEST.!!!
+		//}
+		//else
+		//{ this.magoPolicy.issueInsertEnable = true; }
+		
 		
 		// Stencil shadow mesh making test.********************
 		/*
@@ -2184,18 +2180,18 @@ MagoManager.prototype.keyDown = function(key)
 		}
 		
 		// Another test.***
-		/*
+		
 		if (this.smartTile_f4d_tested === undefined)
 		{
 			this.smartTile_f4d_tested = 1;
 			//var projectFolderName = "smartTile_f4d_Korea";
 			//var projectFolderName = "SejongParkJinWoo_20191101";
-			var projectFolderName = "sejong_time_series_smartTiles";
+			var projectFolderName = "SmartTilesF4D_WorkFolder_LXPark1";
 			var fileName = this.readerWriter.geometryDataPath + "/" + projectFolderName + "/" + "smartTile_f4d_indexFile.sii";
 			this.readerWriter.getObjectIndexFileSmartTileF4d(fileName, projectFolderName, this);
 
 		}
-		*/
+		
 		//else if (this.smartTile_f4d_tested === 1)
 		//{
 		//	this.smartTile_f4d_tested ++;

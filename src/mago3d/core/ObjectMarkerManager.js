@@ -94,7 +94,7 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 		gl.enableVertexAttribArray(shader.position4_loc);
 		gl.activeTexture(gl.TEXTURE0);
 		
-		gl.depthRange(0, 0);
+		gl.depthRange(0, 0.05);
 		//var context = document.getElementById('canvas2').getContext("2d");
 		//var canvas = document.getElementById("magoContainer");
 		
@@ -109,9 +109,9 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 		gl.uniform4fv(shader.oneColor4_loc, [0.2, 0.7, 0.9, 1.0]);
 		gl.uniform2fv(shader.scale2d_loc, [1.0, 1.0]);
 		
-		gl.depthMask(false);
+		//gl.depthMask(false);
 		var selectionManager = magoManager.selectionManager;
-		
+		var lastTexId = undefined;
 		if (renderType === 1)
 		{
 			for (var i=0; i<objectsMarkersCount; i++)
@@ -133,7 +133,13 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 				
 				
 				var objMarkerGeoLocation = objMarker.geoLocationData;
-				gl.bindTexture(gl.TEXTURE_2D, currentTexture.texId);
+				
+				if (currentTexture.texId !== lastTexId)
+				{
+					gl.bindTexture(gl.TEXTURE_2D, currentTexture.texId);
+					lastTexId = currentTexture.texId;
+				}
+					
 				gl.uniform3fv(shader.buildingPosHIGH_loc, objMarkerGeoLocation.positionHIGH);
 				gl.uniform3fv(shader.buildingPosLOW_loc, objMarkerGeoLocation.positionLOW);
 
@@ -168,7 +174,7 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 		}
 		
 		gl.depthRange(0, 1);
-		gl.depthMask(true);
+		//gl.depthMask(true);
 		gl.useProgram(null);
 		gl.bindTexture(gl.TEXTURE_2D, null);
 		shader.disableVertexAttribArrayAll();

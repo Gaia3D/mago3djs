@@ -1570,17 +1570,13 @@ void main()\n\
 						}\n\
 					}\n\
 				}\n\
-				\n\
-				/*\n\
+\n\
 				// test. Calculate the zone inside the pixel.************************************\n\
 				//https://docs.microsoft.com/ko-kr/windows/win32/dxtecharts/cascaded-shadow-maps\n\
-				*/\n\
-				\n\
-				\n\
 			}\n\
 		}\n\
-		\n\
 	}\n\
+	\n\
 \n\
     vec4 textureColor;\n\
     if(colorType == 2)\n\
@@ -1933,10 +1929,11 @@ void main()\n\
 	\n\
     v_texcoord = texCoord;\n\
 	vec4 projected = ModelViewProjectionMatrixRelToEye * pos4;\n\
-	//vec4 projected2 = modelViewMatrixRelToEye * pos4;\n\
+	vec4 projected2 = modelViewMatrixRelToEye * pos4;\n\
 	float thickness = 30.0;\n\
 	vec4 offset;\n\
-	float projectedDepth = projected.w;\n\
+	//float projectedDepth = projected.w;\n\
+	float projectedDepth = -projected2.z;\n\
 	float offsetQuantity = (thickness*projectedDepth)/1000.0;\n\
 	// Offset our position along the normal\n\
 	if(orderInt == 1)\n\
@@ -2619,10 +2616,11 @@ void main()\n\
     vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
     \n\
     //linear depth in camera space (0..far)\n\
-    depth = (modelViewMatrixRelToEye * pos4).z/far; // original.***\n\
+	vec4 posCC = modelViewMatrixRelToEye * pos4;\n\
+    depth = posCC.z/far; // original.***\n\
 \n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
-	vertexPos = (modelViewMatrixRelToEye * pos4).xyz;\n\
+	vertexPos = posCC.xyz;\n\
 }";
 ShaderSource.ScreenQuadFS = "#ifdef GL_ES\n\
     precision highp float;\n\

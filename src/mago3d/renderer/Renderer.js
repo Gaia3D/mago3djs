@@ -846,7 +846,7 @@ Renderer.prototype.renderExcavationObjects = function(gl, shader, renderType, vi
  * @param {Number} renderType If renderType = 0 (depth render), renderType = 1 (color render), renderType = 2 (colorCoding render).
  * @param {VisibleObjectsController} visibleObjControlerNodes This object contains visible objects for the camera frustum.
  */
-Renderer.prototype.renderTerrainShadow = function(gl, renderType, visibleObjControlerNodes) 
+Renderer.prototype.renderTerrainShadow = function(gl) 
 {
 
 	var currentShader;
@@ -905,6 +905,123 @@ Renderer.prototype.renderTerrainShadow = function(gl, renderType, visibleObjCont
 	
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, magoManager.czm_globeDepthText);  // cesium globeDepthTexture.***
+	gl.activeTexture(gl.TEXTURE3); 
+	if (bApplyShadow && sunLight.depthFbo)
+	{
+		var sunSystem = sceneState.sunSystem;
+		var sunLight = sunSystem.getLight(0);
+		gl.bindTexture(gl.TEXTURE_2D, sunLight.depthFbo.colorBuffer);
+	}
+	else 
+	{
+		gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
+	}
+	
+	gl.activeTexture(gl.TEXTURE4); 
+	if (bApplyShadow && sunLight.depthFbo)
+	{
+		var sunSystem = sceneState.sunSystem;
+		var sunLight = sunSystem.getLight(1);
+		gl.bindTexture(gl.TEXTURE_2D, sunLight.depthFbo.colorBuffer);
+	}
+	else 
+	{
+		gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
+	}
+	currentShader.last_tex_id = textureAux1x1;
+			
+	
+	gl.disable(gl.POLYGON_OFFSET_FILL);
+	//gl.disable(gl.CULL_FACE);
+	gl.colorMask(true, true, true, true);
+	gl.depthMask(false);
+
+	gl.disable(gl.DEPTH_TEST);
+	gl.enable(gl.BLEND);
+	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); // Original.***
+	//gl.cullFace(gl.FRONT);
+
+	if (this.screenQuad === undefined)
+	{
+		this.screenQuad = new ScreenQuad(magoManager.vboMemoryManager);
+	}
+	
+	this.screenQuad.render(magoManager, currentShader);
+
+	// Restore settings.***
+	gl.colorMask(true, true, true, true);
+	gl.depthMask(true);
+	gl.disable(gl.BLEND);
+	gl.depthRange(0.0, 1.0);	
+};
+
+/**
+ * This function renders the stencil shadows meshes of the scene.
+ * @param {WebGLRenderingContext} gl WebGL Rendering Context.
+ * @param {Number} renderType If renderType = 0 (depth render), renderType = 1 (color render), renderType = 2 (colorCoding render).
+ * @param {VisibleObjectsController} visibleObjControlerNodes This object contains visible objects for the camera frustum.
+ */
+Renderer.prototype.renderScreenQuadShadow = function(gl, depthTex) 
+{
+	var currentShader;
+	var shaderProgram;
+	var neoBuilding;
+	var node;
+	var rootNode;
+	var geoLocDataManager;
+	var magoManager = this.magoManager;
+	var sceneState = magoManager.sceneState;
+
+	var bApplyShadow = false;
+	if (sceneState.sunSystem !== undefined && sceneState.applySunShadows)
+	{ bApplyShadow = true; }
+
+	bApplyShadow = true;
+
+	//if (!bApplyShadow)
+	//{ return; }
+
+	currentShader = magoManager.postFxShadersManager.getShader("screenQuad"); 
+	currentShader.useProgram();
+	
+	currentShader.bindUniformGenerals();
+	var projectionMatrixInv = sceneState.getProjectionMatrixInv();
+	
+	if (!projectionMatrixInv._floatArrays)
+	{ return; }
+	
+	gl.uniformMatrix4fv(currentShader.projectionMatrixInv_loc, false, projectionMatrixInv._floatArrays);
+	var modelViewMatrixRelToEyeInv = sceneState.getModelViewRelToEyeMatrixInv();
+	gl.uniformMatrix4fv(currentShader.modelViewMatrixRelToEyeInv_loc, false, modelViewMatrixRelToEyeInv._floatArrays);
+	
+	gl.uniform1i(currentShader.bApplyShadow_loc, bApplyShadow);
+	var sunSystem = sceneState.sunSystem;
+	var sunLight = sunSystem.getLight(0);
+	var textureAux1x1 = magoManager.texturesStore.getTextureAux1x1();
+	
+	if (bApplyShadow)
+	{
+		// Set sunMatrix uniform.***
+		
+		var sunMatFloat32Array = sunSystem.getLightsMatrixFloat32Array();
+		var sunPosLOWFloat32Array = sunSystem.getLightsPosLOWFloat32Array();
+		var sunPosHIGHFloat32Array = sunSystem.getLightsPosHIGHFloat32Array();
+		var sunDirWC = sunSystem.getSunDirWC();
+		
+		if (sunLight.tMatrix!== undefined)
+		{
+			gl.uniformMatrix4fv(currentShader.sunMatrix_loc, false, sunMatFloat32Array);
+			gl.uniform3fv(currentShader.sunPosHigh_loc, sunPosHIGHFloat32Array);
+			gl.uniform3fv(currentShader.sunPosLow_loc, sunPosLOWFloat32Array);
+			gl.uniform1f(currentShader.shadowMapWidth_loc, sunLight.targetTextureWidth);
+			gl.uniform1f(currentShader.shadowMapHeight_loc, sunLight.targetTextureHeight);
+			gl.uniform3fv(currentShader.sunDirWC_loc, sunDirWC);
+			gl.uniform1i(currentShader.sunIdx_loc, 1);
+		}
+	}
+	
+	gl.activeTexture(gl.TEXTURE0);
+	gl.bindTexture(gl.TEXTURE_2D, depthTex);  
 	gl.activeTexture(gl.TEXTURE3); 
 	if (bApplyShadow && sunLight.depthFbo)
 	{

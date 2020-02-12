@@ -35,13 +35,14 @@ var LightSource = function(lightType)
 	this.maxDistToCam; // use only in directional lights.
 	
 	// light is directionType, must have the rectangle size.
+	//this.targetTextureWidth = new Int32Array([1024]);
+	//this.targetTextureHeight = new Int32Array([1024]);
 	
+	this.targetTextureWidth = new Int32Array([2048]);
+	this.targetTextureHeight = new Int32Array([2048]);
 	
-	//this.targetTextureWidth = new Int32Array([2048]);
-	//this.targetTextureHeight = new Int32Array([2048]);
-	
-	this.targetTextureWidth = new Int32Array([4096]);
-	this.targetTextureHeight = new Int32Array([4096]);
+	//this.targetTextureWidth = new Int32Array([4096]);
+	//this.targetTextureHeight = new Int32Array([4096]);
 	
 	//this.targetTextureWidth = new Int32Array([8192]);
 	//this.targetTextureHeight = new Int32Array([8192]);

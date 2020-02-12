@@ -50,10 +50,11 @@ void main()
 	
     v_texcoord = texCoord;
 	vec4 projected = ModelViewProjectionMatrixRelToEye * pos4;
-	//vec4 projected2 = modelViewMatrixRelToEye * pos4;
+	vec4 projected2 = modelViewMatrixRelToEye * pos4;
 	float thickness = 30.0;
 	vec4 offset;
-	float projectedDepth = projected.w;
+	//float projectedDepth = projected.w;
+	float projectedDepth = -projected2.z;
 	float offsetQuantity = (thickness*projectedDepth)/1000.0;
 	// Offset our position along the normal
 	if(orderInt == 1)
