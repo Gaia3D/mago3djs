@@ -782,35 +782,21 @@ MagoManager.prototype.load_testTextures = function()
 	{
 		var gl = this.sceneState.gl;
 		
-		this.pin.texture = new Texture();
-		var filePath_inServer = this.magoPolicy.imagePath + "/bugger.png";
-		this.pin.texture.texId = gl.createTexture();
-		this.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, this.pin.texture, undefined, this);
-		this.pin.texturesArray.push(this.pin.texture);
+		var filePath_inServer = this.magoPolicy.imagePath + "/defaultRed.png";
+		var texture = this.pin.loadImage(filePath_inServer, this);
+		this.pin.imageFileMap.defaultRed = texture;
 		
-		var cabreadoTex = new Texture();
-		filePath_inServer = this.magoPolicy.imagePath + "/improve.png";
-		cabreadoTex.texId = gl.createTexture();
-		this.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, cabreadoTex, undefined, this);
-		this.pin.texturesArray.push(cabreadoTex);
+		filePath_inServer = this.magoPolicy.imagePath + "/defaultBlue.png";
+		var texture = this.pin.loadImage(filePath_inServer, this);
+		this.pin.imageFileMap.defaultBlue = texture;
 		
-		cabreadoTex = new Texture();
-		filePath_inServer = this.magoPolicy.imagePath + "/etc.png";
-		cabreadoTex.texId = gl.createTexture();
-		this.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, cabreadoTex, undefined, this);
-		this.pin.texturesArray.push(cabreadoTex);
+		filePath_inServer = this.magoPolicy.imagePath + "/defaultOrange.png";
+		var texture = this.pin.loadImage(filePath_inServer, this);
+		this.pin.imageFileMap.defaultOrange = texture;
 		
-		cabreadoTex = new Texture();
-		filePath_inServer = this.magoPolicy.imagePath + "/new.png";
-		cabreadoTex.texId = gl.createTexture();
-		this.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, cabreadoTex, undefined, this);
-		this.pin.texturesArray.push(cabreadoTex);
-		
-		cabreadoTex = new Texture();
-		filePath_inServer = this.magoPolicy.imagePath + "/funny.jpg";
-		cabreadoTex.texId = gl.createTexture();
-		this.readerWriter.readNeoReferenceTexture(gl, filePath_inServer, cabreadoTex, undefined, this);
-		this.pin.texturesArray.push(cabreadoTex);
+		filePath_inServer = this.magoPolicy.imagePath + "/defaultCian.png";
+		var texture = this.pin.loadImage(filePath_inServer, this);
+		this.pin.imageFileMap.defaultCian = texture;
 	}
 };
 
@@ -1321,7 +1307,7 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 	
 	if (this.bPicking === true && isLastFrustum)
 	{
-		var pixelPos;
+		var posWC;
 	
 		if (this.magoPolicy.issueInsertEnable === true)
 		{
@@ -1330,25 +1316,36 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 			
 			var mouseAction = this.sceneState.mouseAction;
 			var strWC = mouseAction.getStartWorldPoint();
-			pixelPos = new Point3D(strWC.x, strWC.y, strWC.z);
-
-			var objMarker = this.objMarkerManager.newObjectMarker();
-			ManagerUtils.calculateGeoLocationDataByAbsolutePoint(pixelPos.x, pixelPos.y, pixelPos.z, objMarker.geoLocationData, this);
+			posWC = new Point3D(strWC.x, strWC.y, strWC.z);
+			
+			var options = {
+				positionWC            : posWC,
+				imageFilePath         : "defaultBlue",
+				imageFilePathSelected : "defaultRed"
+			};
+			var objMarker = this.objMarkerManager.newObjectMarker(options, this);
 		}
 
 		if (this.magoPolicy.objectInfoViewEnable === true)
 		{
 			if (this.objMarkerSC === undefined)
-			{ this.objMarkerSC = new ObjectMarker(); }
+			{ 
+				if (posWC === undefined)
+				{
+					var mouseAction = this.sceneState.mouseAction;
+					var strWC = mouseAction.getStartWorldPoint();
+					posWC = new Point3D(strWC.x, strWC.y, strWC.z);
+				}
+				
+				var options = {
+					positionWC            : posWC,
+					imageFilePath         : "defaultBlue",
+					imageFilePathSelected : "defaultRed"
+				};
 			
-			if (pixelPos === undefined)
-			{
-				var mouseAction = this.sceneState.mouseAction;
-				var strWC = mouseAction.getStartWorldPoint();
-				pixelPos = new Point3D(strWC.x, strWC.y, strWC.z);
+				this.objMarkerSC = this.objMarkerManager.newObjectMarker(options, this);
+				this.objMarkerManager.objectMarkerArray.pop();
 			}
-			
-			ManagerUtils.calculateGeoLocationDataByAbsolutePoint(pixelPos.x, pixelPos.y, pixelPos.z, this.objMarkerSC.geoLocationData, this);
 		}
 	}
 	// lightDepthRender: TODO.***
@@ -2089,7 +2086,7 @@ MagoManager.prototype.keyDown = function(key)
 		}
 		else
 		{ this.magoPolicy.issueInsertEnable = true; }
-	*/
+		*/
 		
 		// Stencil shadow mesh making test.********************
 		/*
@@ -4443,6 +4440,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	var shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
 	shader.position4_loc = gl.getAttribLocation(shader.program, "position");
 	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
+	shader.scale2d_loc = gl.getUniformLocation(shader.program, "scale2d");
 };
 
 /**

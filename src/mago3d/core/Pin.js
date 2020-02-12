@@ -23,6 +23,7 @@ var Pin = function()
 
 Pin.prototype.createPin = function(gl)
 {
+	// Old. deprecated.
 	this.positionBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
 
@@ -49,6 +50,29 @@ Pin.prototype.createPin = function(gl)
 	];
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(texcoordsPinQuad), gl.STATIC_DRAW);
 	
+};
+
+/**
+ * draw the bottom pick of the pin
+ */
+Pin.prototype.loadImage = function(imageFilePath, magoManager)
+{
+	var texture = new Texture();
+	var gl = magoManager.getGl();
+	texture.texId = gl.createTexture();
+	magoManager.readerWriter.readNeoReferenceTexture(gl, imageFilePath, texture, undefined, magoManager);
+	this.texturesArray.push(texture);
+	this.imageFileMap[imageFilePath] = texture;
+	
+	return texture;
+};
+
+/**
+ * draw the bottom pick of the pin
+ */
+Pin.prototype.getTexture = function(imageFilePath)
+{
+	return this.imageFileMap[imageFilePath];
 };
 
 /**
@@ -92,39 +116,6 @@ Pin.prototype.createPinCenterBottom = function(gl)
 		0, 0,
 		1, 0,
 		0, 1,
-		1, 1
-	];
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(texcoordsPinQuad), gl.STATIC_DRAW);
-	
-};
-
-/**
- * draw the bottom pick of the pin
- */
-Pin.prototype.createPinCenterBottom__original = function(gl)
-{
-	this.positionBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
-
-	// Put a unit quad in the buffer
-	var positionsPinQuad = [
-		-0.5, 0, 0,
-		0.5, 0, 0,
-		-0.5, 1, 0,
-		-0.5, 1, 0,
-		0.5, 0, 0,
-		0.5, 1, 0
-	];
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positionsPinQuad), gl.STATIC_DRAW);
-
-	this.texcoordBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, this.texcoordBuffer);
-	var texcoordsPinQuad = [
-		0, 0,
-		1, 0,
-		0, 1,
-		0, 1,
-		1, 0,
 		1, 1
 	];
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(texcoordsPinQuad), gl.STATIC_DRAW);

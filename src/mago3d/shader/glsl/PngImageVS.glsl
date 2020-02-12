@@ -7,6 +7,7 @@ uniform vec3 buildingPosHIGH;
 uniform vec3 buildingPosLOW;
 uniform vec3 encodedCameraPositionMCHigh;
 uniform vec3 encodedCameraPositionMCLow;
+uniform vec2 scale2d;
 //uniform float screenWidth;    
 //uniform float screenHeight;
 varying vec2 v_texcoord;
@@ -57,19 +58,19 @@ void main()
 	// Offset our position along the normal
 	if(orderInt == 1)
 	{
-		offset = vec4(-offsetQuantity, 0.0, 0.0, 1.0);
+		offset = vec4(-offsetQuantity*scale2d.x, 0.0, 0.0, 1.0);
 	}
 	else if(orderInt == -1)
 	{
-		offset = vec4(offsetQuantity, 0.0, 0.0, 1.0);
+		offset = vec4(offsetQuantity*scale2d.x, 0.0, 0.0, 1.0);
 	}
 	else if(orderInt == 2)
 	{
-		offset = vec4(-offsetQuantity, offsetQuantity*4.0, 0.0, 1.0);
+		offset = vec4(-offsetQuantity*scale2d.x, offsetQuantity*4.0*scale2d.y, 0.0, 1.0);
 	}
 	else if(orderInt == -2)
 	{
-		offset = vec4(offsetQuantity, offsetQuantity*4.0, 0.0, 1.0);
+		offset = vec4(offsetQuantity*scale2d.x, offsetQuantity*4.0*scale2d.y, 0.0, 1.0);
 	}
 
 	gl_Position = projected + offset; 

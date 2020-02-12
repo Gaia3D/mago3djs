@@ -21,10 +21,32 @@ var ObjectMarkerManager = function()
  * @class ObjectMarkerManager
  *
  */
-ObjectMarkerManager.prototype.newObjectMarker = function()
+ObjectMarkerManager.prototype.newObjectMarker = function(options, magoManager)
 {
 	var objMarker = new ObjectMarker();
 	this.objectMarkerArray.push(objMarker);
+	
+	if (options)
+	{
+		if (options.positionWC)
+		{
+			var posWC = options.positionWC;
+			if (objMarker.geoLocationData === undefined)
+			{ objMarker.geoLocationData = new GeoLocationData(); }
+			ManagerUtils.calculateGeoLocationDataByAbsolutePoint(posWC.x, posWC.y, posWC.z, objMarker.geoLocationData, magoManager);
+		}
+		
+		if (options.imageFilePath)
+		{
+			objMarker.imageFilePath = options.imageFilePath;
+		}
+		
+		if (options.imageFilePathSelected)
+		{
+			objMarker.imageFilePathSelected = options.imageFilePathSelected;
+		}
+	}
+	
 	return objMarker;
 };
 
@@ -85,27 +107,38 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 		
 		gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
 		gl.uniform4fv(shader.oneColor4_loc, [0.2, 0.7, 0.9, 1.0]);
+		gl.uniform2fv(shader.scale2d_loc, [1.0, 1.0]);
 		
-		var j=0;
 		gl.depthMask(false);
+		var selectionManager = magoManager.selectionManager;
+		
 		if (renderType === 1)
 		{
 			for (var i=0; i<objectsMarkersCount; i++)
 			{
-				if (j>= magoManager.pin.texturesArray.length)
-				{ j=0; }
-				
-				var currentTexture = magoManager.pin.texturesArray[j];
-				
 				var objMarker = magoManager.objMarkerManager.objectMarkerArray[i];
+				var currentTexture = magoManager.pin.getTexture(objMarker.imageFilePath);
+				
+				if (selectionManager.isObjectSelected(objMarker))
+				{
+					gl.uniform2fv(shader.scale2d_loc, [1.5, 1.5]);
+					var selectedTexture = magoManager.pin.getTexture(objMarker.imageFilePathSelected);
+					if (selectedTexture)
+					{ currentTexture = selectedTexture; }
+				}
+				else
+				{
+					gl.uniform2fv(shader.scale2d_loc, [1.0, 1.0]);
+				}
+				
+				
 				var objMarkerGeoLocation = objMarker.geoLocationData;
 				gl.bindTexture(gl.TEXTURE_2D, currentTexture.texId);
 				gl.uniform3fv(shader.buildingPosHIGH_loc, objMarkerGeoLocation.positionHIGH);
 				gl.uniform3fv(shader.buildingPosLOW_loc, objMarkerGeoLocation.positionLOW);
 
 				gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-				
-				j++;
+
 			}
 		}
 		else if (renderType === 2)
@@ -117,14 +150,12 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 			
 			for (var i=0; i<objectsMarkersCount; i++)
 			{
-				//var currentTexture = magoManager.pin.texturesArray[j];
 				var objMarker = magoManager.objMarkerManager.objectMarkerArray[i];
 				var objMarkerGeoLocation = objMarker.geoLocationData;
-				//gl.bindTexture(gl.TEXTURE_2D, currentTexture.texId);
 				
 				var colorAux = selectionColor.getAvailableColor(undefined);
 				var idxKey = selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
-				magoManager.selectionManager.setCandidateGeneral(idxKey, objMarker);
+				selectionManager.setCandidateGeneral(idxKey, objMarker);
 			
 				gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
 			
@@ -132,8 +163,6 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 				gl.uniform3fv(shader.buildingPosLOW_loc, objMarkerGeoLocation.positionLOW);
 
 				gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-				
-				j++;
 			}
 			gl.enable(gl.BLEND);
 		}
