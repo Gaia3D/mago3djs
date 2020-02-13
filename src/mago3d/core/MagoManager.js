@@ -10,7 +10,7 @@ var MagoManager = function()
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	//// http://dj.gaia3d.com:10080
+	Emitter.call(this);
 	/**
 	 * Auxiliary renderer.
 	 * @type {Renderer}
@@ -269,6 +269,14 @@ var MagoManager = function()
 
 	this.currentProcess = CODE.magoCurrentProcess.Unknown;
 
+};
+MagoManager.prototype = Object.create(Emitter.prototype);
+MagoManager.prototype.constructor = MagoManager;
+
+MagoManager.EVENT_TYPE = {
+	'CAMERACHANGED'   : 'camerachanged',
+	'CAMERAMOVEEND'   : 'cameramoveend',
+	'CAMERAMOVESTART' : 'cameramovestart'
 };
 
 /**
@@ -2764,17 +2772,26 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 };
 MagoManager.prototype.cameraChanged = function(e) 
 {
-	//TODO:
+	this.emit(MagoManager.EVENT_TYPE.CAMERACHANGED, {
+		type      : MagoManager.EVENT_TYPE.CAMERACHANGED,
+		timestamp : new Date()
+	});
 };
 
 MagoManager.prototype.cameraMoveStart = function() 
 {
-	//TODO:
+	this.emit(MagoManager.EVENT_TYPE.CAMERAMOVESTART, {
+		type      : MagoManager.EVENT_TYPE.CAMERAMOVESTART,
+		timestamp : new Date()
+	});
 };
 
 MagoManager.prototype.cameraMoveEnd = function() 
 {
-	//TODO:
+	this.emit(MagoManager.EVENT_TYPE.CAMERAMOVEEND, {
+		type      : MagoManager.EVENT_TYPE.CAMERAMOVEEND,
+		timestamp : new Date()
+	});
 };
 
 /**
