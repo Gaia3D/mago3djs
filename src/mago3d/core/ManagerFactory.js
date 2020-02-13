@@ -165,6 +165,19 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		{
 			magoManager.cameraFPV.update(magoManager);
 		});
+
+		viewer.camera.changed.addEventListener(function(e)
+		{
+			magoManager.cameraChanged(e);
+		});
+		viewer.camera.moveEnd.addEventListener(function(e)
+		{
+			magoManager.cameraMoveEnd(e);
+		});
+		viewer.camera.moveStart.addEventListener(function(e)
+		{
+			magoManager.cameraMoveStart(e);
+		});
 	}
 	
 	// magoworld을 구현체로서 이용

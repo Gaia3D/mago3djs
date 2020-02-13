@@ -21,6 +21,22 @@ var ObjectMarkerManager = function()
  * @class ObjectMarkerManager
  *
  */
+ObjectMarkerManager.prototype.deleteObjects = function()
+{
+	var objectsMarkersCount = this.objectMarkerArray.length;
+	for (var i=0; i<objectsMarkersCount; i++)
+	{
+		this.objectMarkerArray[i].deleteObjects();
+		this.objectMarkerArray[i] = undefined;
+	}
+	this.objectMarkerArray = [];
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class ObjectMarkerManager
+ *
+ */
 ObjectMarkerManager.prototype.newObjectMarker = function(options, magoManager)
 {
 	var objMarker = new ObjectMarker();
@@ -57,7 +73,7 @@ ObjectMarkerManager.prototype.newObjectMarker = function(options, magoManager)
  */
 ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 {
-	var objectsMarkersCount = magoManager.objMarkerManager.objectMarkerArray.length;
+	var objectsMarkersCount = this.objectMarkerArray.length;
 	if (objectsMarkersCount > 0)
 	{
 		var gl = magoManager.getGl();
