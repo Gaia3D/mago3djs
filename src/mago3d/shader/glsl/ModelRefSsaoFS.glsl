@@ -242,17 +242,13 @@ void main()
 						}
 					}
 				}
-				
-				/*
+
 				// test. Calculate the zone inside the pixel.************************************
 				//https://docs.microsoft.com/ko-kr/windows/win32/dxtecharts/cascaded-shadow-maps
-				*/
-				
-				
 			}
 		}
-		
 	}
+	
 
     vec4 textureColor;
     if(colorType == 2)

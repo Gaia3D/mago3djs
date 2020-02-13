@@ -686,7 +686,10 @@ ManagerUtils.calculatePixelLinearDepth = function(gl, pixelX, pixelY, depthFbo, 
 ManagerUtils.calculatePixelLinearDepthABGR = function(gl, pixelX, pixelY, depthFbo, magoManager) 
 {
 	// Test function.
-	
+	// Test function.
+	// Test function.
+	// Test function.
+	// Called from MagoWorld.updateMouseStartClick(...).***
 	if (depthFbo === undefined)
 	{ depthFbo = magoManager.depthFboNeo; }
 
@@ -784,7 +787,9 @@ ManagerUtils.calculatePixelPositionCamCoord = function(gl, pixelX, pixelY, resul
 	{
 		return;
 	}
-	var realZDepth = frustumNear + linearDepth*frustumFar; // original.
+	//var realZDepth = frustumNear + linearDepth*frustumFar; // Use this code if the zDepth encoder uses frustum near & frustum far, both.
+	// Note: In our RenderShowDepth shaders, we are encoding zDepth no considering the frustum near.
+	var realZDepth = linearDepth*frustumFar; // original.
 
 	// now, find the 3d position of the pixel in camCoord.*
 	magoManager.resultRaySC = ManagerUtils.getRayCamSpace(pixelX, pixelY, magoManager.resultRaySC, magoManager);
