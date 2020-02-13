@@ -21,6 +21,12 @@ var ObjectMarker = function()
 	this.imageFilePath;
 };
 
+ObjectMarker.prototype.deleteObjects = function() 
+{
+	if (this.geoLocationData)
+	{ this.geoLocationData.deleteObjects(); }
+};
+
 ObjectMarker.prototype.setImageFilePath = function(imageFilePath) 
 {
 	this.imageFilePath = imageFilePath;
