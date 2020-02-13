@@ -266,13 +266,26 @@ CesiumViewerInit.prototype.initMagoManager = function()
 	this.viewer.scene.magoManager.createDefaultShaders(gl);// A1-Use this.***
 	this.viewer.scene.magoManager.scene = this.viewer.scene;
 
-	this.magoManager = this.viewer.scene.magoManager;
+	var magoManager = this.viewer.scene.magoManager;
+	this.magoManager = magoManager;
 	scene = this.viewer.scene;
 	
 	this.viewer.scene.globe.depthTestAgainstTerrain = false;
 	this.viewer.scene.logarithmicDepthBuffer = false; //do not use logarithmic buffer
 	this.viewer.scene.highDynamicRange = false; //do not use high dynamic range
-    
+	
+	viewer.camera.changed.addEventListener(function(e)
+	{
+		magoManager.cameraChanged(e);
+	});
+	viewer.camera.moveEnd.addEventListener(function()
+	{
+		magoManager.cameraMoveEnd();
+	});
+	viewer.camera.moveStart.addEventListener(function()
+	{
+		magoManager.cameraMoveStart();
+	});
 	//this.magoManager.init(gl);
 };
 

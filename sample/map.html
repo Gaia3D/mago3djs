@@ -126,18 +126,9 @@
 		var f4dController = magoInstance.getF4dController();
 
 		
-		magoManager.on(Mago3D.MagoManager.EVENT_TYPE.CLICK, a);
-
-		magoManager.once(Mago3D.MagoManager.EVENT_TYPE.CLICK, a);
-		magoManager.once(Mago3D.MagoManager.EVENT_TYPE.CLICK, a);
-		magoManager.on(Mago3D.MagoManager.EVENT_TYPE.CLICK, a);
-		magoManager.on(Mago3D.MagoManager.EVENT_TYPE.CLICK, a);
-		magoManager.once(Mago3D.MagoManager.EVENT_TYPE.CLICK, a);
-		magoManager.on(Mago3D.MagoManager.EVENT_TYPE.CLICK, a);
-		magoManager.on(Mago3D.MagoManager.EVENT_TYPE.CLICK, a);
-		magoManager.once(Mago3D.MagoManager.EVENT_TYPE.CLICK, a);
-		magoManager.on(Mago3D.MagoManager.EVENT_TYPE.CLICK, a);
-
+		magoManager.on(Mago3D.MagoManager.EVENT_TYPE.CAMERAMOVEEND, function(){
+			console.info('CAMERAMOVEEND');
+		});
 
 		$.ajax({
 			url: dataInformationUrl + "mipo.json",

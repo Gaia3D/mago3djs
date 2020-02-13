@@ -292,7 +292,10 @@ MagoManager.EVENT_TYPE = {
 	'SELECTEDF4DMOVED'    : 'selectedf4dmoved',
 	'SELECTEDF4DOBJECT'  	: 'selectedf4dobject',
 	'DESELECTEDF4D'    	 	: 'deselectedf4d',
-	'DESELECTEDF4DOBJECT'	: 'deselectedf4dobject'
+	'DESELECTEDF4DOBJECT'	: 'deselectedf4dobject',
+	'CAMERACHANGED'       : 'camerachanged',
+	'CAMERAMOVEEND'       : 'cameramoveend',
+	'CAMERAMOVESTART'     : 'cameramovestart',
 };
 
 /**
@@ -2772,6 +2775,29 @@ MagoManager.prototype.manageMouseDragging = function(mouseX, mouseY)
 	{
 		this.moveSelectedObjectAsimetricMode(this.sceneState.gl);
 	}
+};
+MagoManager.prototype.cameraChanged = function(e) 
+{
+	this.emit(MagoManager.EVENT_TYPE.CAMERACHANGED, {
+		type      : MagoManager.EVENT_TYPE.CAMERACHANGED,
+		timestamp : new Date()
+	});
+};
+
+MagoManager.prototype.cameraMoveStart = function() 
+{
+	this.emit(MagoManager.EVENT_TYPE.CAMERAMOVESTART, {
+		type      : MagoManager.EVENT_TYPE.CAMERAMOVESTART,
+		timestamp : new Date()
+	});
+};
+
+MagoManager.prototype.cameraMoveEnd = function() 
+{
+	this.emit(MagoManager.EVENT_TYPE.CAMERAMOVEEND, {
+		type      : MagoManager.EVENT_TYPE.CAMERAMOVEEND,
+		timestamp : new Date()
+	});
 };
 
 /**
