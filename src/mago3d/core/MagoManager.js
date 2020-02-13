@@ -2762,6 +2762,20 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 	}
 	
 };
+MagoManager.prototype.cameraChanged = function(e) 
+{
+	//TODO:
+};
+
+MagoManager.prototype.cameraMoveStart = function() 
+{
+	//TODO:
+};
+
+MagoManager.prototype.cameraMoveEnd = function() 
+{
+	//TODO:
+};
 
 /**
  * 선택 객체를 asimetric mode 로 이동
