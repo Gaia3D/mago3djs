@@ -1030,15 +1030,28 @@ MagoManager.prototype.managePickingProcess = function()
 						timestamp : new Date()
 					});
 				}
+				else 
+				{
+					this.emit(MagoManager.EVENT_TYPE.DESELECTEDF4D, {
+						type: MagoManager.EVENT_TYPE.DESELECTEDF4D
+					});
+				}
 			}
 			else if (mode === CODE.moveMode.OBJECT) 
 			{
-				if (auxOctreeSelected) 
+				if (auxOctreeSelected && this.objectSelected) 
 				{
 					this.emit(MagoManager.EVENT_TYPE.SELECTEDF4DOBJECT, {
 						type      : MagoManager.EVENT_TYPE.SELECTEDF4DOBJECT,
-						object    : auxOctreeSelected,
+						octree    : auxBuildingSelected,
+						object    : this.objectSelected,
 						timestamp : new Date()
+					});
+				}
+				else 
+				{
+					this.emit(MagoManager.EVENT_TYPE.DESELECTEDF4DOBJECT, {
+						type: MagoManager.EVENT_TYPE.DESELECTEDF4DOBJECT
 					});
 				}
 			}
@@ -1878,7 +1891,7 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
 		this.saveHistoryObjectMovement(this.objectSelected, nodeSelected);
 	}
 	
-	if (!this.isCameraMoving) 
+	/*if (!this.isCameraMoving) 
 	{
 		this.getSelectedObjects(this.getGl(), this.mouse_x, this.mouse_y, this.arrayAuxSC, true);
 			
@@ -1907,7 +1920,7 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
 				});
 			}
 		}
-	}
+	}*/
 
 	this.isCameraMoving = false;
 	this.mouseLeftDown = false;
