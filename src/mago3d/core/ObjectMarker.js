@@ -19,6 +19,7 @@ var ObjectMarker = function()
 	//this.height = 0;
 	
 	this.imageFilePath;
+	this.size2d = new Float32Array([25.0, 25.0]);
 };
 
 ObjectMarker.prototype.deleteObjects = function() 
