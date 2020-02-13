@@ -75,16 +75,18 @@ float UnpackDepth32( in vec4 pack )
 vec3 getViewRay(vec2 tc)
 {
 	// The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
+	/*
 	float farForDepth = 30000.0;
 	float hfar = 2.0 * tangentOfHalfFovy * farForDepth;
     float wfar = hfar * aspectRatio;    
-    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -farForDepth);    
+    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -farForDepth);  
+	*/	
 	
-	/*
+	
 	float hfar = 2.0 * tangentOfHalfFovy * far;
     float wfar = hfar * aspectRatio;    
     vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    
-	*/
+	
     return ray;                      
 }         
             
@@ -147,13 +149,13 @@ void main()
 		
 	if(bApplySsao)
 	{        
-		float farForDepth = 30000.0;
+		//float farForDepth = 30000.0;
 		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
 		float linearDepth = getDepth(screenPos);  
 		vec3 ray = getViewRay(screenPos); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
 		vec3 origin = ray * linearDepth;  
-		//float tolerance = radius/far; // original.***
-		float tolerance = radius/farForDepth;
+		float tolerance = radius/far; // original.***
+		//float tolerance = radius/farForDepth;
 
 		vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;
 		vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));
@@ -167,8 +169,8 @@ void main()
 			vec4 offset = projectionMatrix * vec4(sample, 1.0);					
 			offset.xy /= offset.w;
 			offset.xy = offset.xy * 0.5 + 0.5;  				
-			//float sampleDepth = -sample.z/far;// original.***
-			float sampleDepth = -sample.z/farForDepth;
+			float sampleDepth = -sample.z/far;// original.***
+			//float sampleDepth = -sample.z/farForDepth;
 
 			float depthBufferValue = getDepth(offset.xy);	
 			

@@ -1120,6 +1120,18 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	var renderTexture = false;
 	
 	// Take the depFrameBufferObject of the current frustumVolume.***
+	/*
+	if (this.depthFboNeo === undefined) { this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
+	if (this.sceneState.drawingBufferWidth[0] !== this.depthFboNeo.width[0] || this.sceneState.drawingBufferHeight[0] !== this.depthFboNeo.height[0])
+	{
+		// move this to onResize.***
+		this.depthFboNeo.deleteObjects(gl);
+		this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
+		this.sceneState.camera.frustum.dirty = true;
+	}
+	*/
+	
+	
 	if (frustumVolumenObject.depthFbo === undefined) { frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
 	if (this.sceneState.drawingBufferWidth[0] !== frustumVolumenObject.depthFbo.width[0] || this.sceneState.drawingBufferHeight[0] !== frustumVolumenObject.depthFbo.height[0])
 	{
@@ -1128,14 +1140,19 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
 		this.sceneState.camera.frustum.dirty = true;
 	}
+	
 
 	this.depthFboNeo = frustumVolumenObject.depthFbo;
+	//frustumVolumenObject.depthFbo = this.depthFboNeo;
 	this.depthFboNeo.bind(); 
-
-	gl.clearColor(0, 0, 0, 1);
-	gl.clearDepth(1);
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	gl.clearStencil(0); // provisionally here.***
+	
+	//if (this.isFarestFrustum())
+	{
+		gl.clearColor(0, 0, 0, 1);
+		gl.clearDepth(1);
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		gl.clearStencil(0); // provisionally here.***
+	}
 	
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
 	this.renderer.renderGeometry(gl, renderType, this.visibleObjControlerNodes);
@@ -1326,8 +1343,8 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 				positionWC            : posWC,
 				imageFilePath         : "defaultBlue",
 				imageFilePathSelected : "defaultRed",
-				sizeX                 : 10.0,
-				sizeY                 : 45.0
+				sizeX                 : 20.0,
+				sizeY                 : 20.0
 			};
 			var objMarker = this.objMarkerManager.newObjectMarker(options, this);
 		}
@@ -2069,9 +2086,7 @@ MagoManager.prototype.keyDown = function(key)
 		
 		
 		//if (this.magoPolicy.issueInsertEnable)
-		//{
-		//	this.magoPolicy.issueInsertEnable = false; // test to inser pins in scene.!!!!!!!!!!!!!!!!!!!!!! TEST.!!!
-		//}
+		//{this.magoPolicy.issueInsertEnable = false;}
 		//else
 		//{ this.magoPolicy.issueInsertEnable = true; }
 		
