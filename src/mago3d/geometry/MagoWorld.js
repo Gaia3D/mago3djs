@@ -203,6 +203,7 @@ MagoWorld.screenToCamCoord = function(mouseX, mouseY, magoManager, resultPointCa
 	if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
 	{ currentFrustumNear = 0.0; }
 	
+	currentFrustumFar = 30000.0; // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
 	resultPointCamCoord = ManagerUtils.calculatePixelPositionCamCoord(gl, mouseX, mouseY, resultPointCamCoord, currentDepthFbo, currentFrustumNear, currentFrustumFar, magoManager);
 	return resultPointCamCoord;
 };

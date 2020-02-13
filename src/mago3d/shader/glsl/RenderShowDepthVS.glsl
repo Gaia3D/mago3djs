@@ -46,7 +46,7 @@ void main()
     //linear depth in camera space (0..far)
 	vec4 posCC = modelViewMatrixRelToEye * pos4;
     //depth = posCC.z/far; // original.***
-	float farForDepth = 50000.0;
+	float farForDepth = 30000.0;
 	depth = posCC.z/farForDepth; // test.***
 
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;

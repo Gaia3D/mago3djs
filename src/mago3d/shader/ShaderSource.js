@@ -1402,7 +1402,8 @@ float UnpackDepth32( in vec4 pack )\n\
 \n\
 vec3 getViewRay(vec2 tc)\n\
 {\n\
-	float farForDepth = 50000.0;\n\
+	// The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
+	float farForDepth = 30000.0;\n\
 	float hfar = 2.0 * tangentOfHalfFovy * farForDepth;\n\
     float wfar = hfar * aspectRatio;    \n\
     vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -farForDepth);    \n\
@@ -1474,10 +1475,10 @@ void main()\n\
 		\n\
 	if(bApplySsao)\n\
 	{        \n\
-		float farForDepth = 50000.0;\n\
+		float farForDepth = 30000.0;\n\
 		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
 		float linearDepth = getDepth(screenPos);  \n\
-		vec3 ray = getViewRay(screenPos);\n\
+		vec3 ray = getViewRay(screenPos); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
 		vec3 origin = ray * linearDepth;  \n\
 		//float tolerance = radius/far; // original.***\n\
 		float tolerance = radius/farForDepth;\n\
@@ -2633,7 +2634,7 @@ void main()\n\
     //linear depth in camera space (0..far)\n\
 	vec4 posCC = modelViewMatrixRelToEye * pos4;\n\
     //depth = posCC.z/far; // original.***\n\
-	float farForDepth = 50000.0;\n\
+	float farForDepth = 30000.0;\n\
 	depth = posCC.z/farForDepth; // test.***\n\
 \n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
