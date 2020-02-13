@@ -2162,12 +2162,12 @@ MagoManager.prototype.keyDown = function(key)
 		*/
 		
 		
-		//if (this.magoPolicy.issueInsertEnable)
-		//{
-		//	this.magoPolicy.issueInsertEnable = false; // test to inser pins in scene.!!!!!!!!!!!!!!!!!!!!!! TEST.!!!
-		//}
-		//else
-		//{ this.magoPolicy.issueInsertEnable = true; }
+		if (this.magoPolicy.issueInsertEnable)
+		{
+			this.magoPolicy.issueInsertEnable = false; // test to inser pins in scene.!!!!!!!!!!!!!!!!!!!!!! TEST.!!!
+		}
+		else
+		{ this.magoPolicy.issueInsertEnable = true; }
 		
 		
 		// Stencil shadow mesh making test.********************

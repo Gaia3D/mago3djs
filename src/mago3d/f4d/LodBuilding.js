@@ -13,7 +13,6 @@ var LodBuilding = function()
 	
 	this.skinLego;
 	this.texture;
-	
 };
 
 /**
@@ -28,8 +27,11 @@ LodBuilding.prototype.isReadyToRender = function()
 	if (this.skinLego.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
 	{ return false; }
 	
-	if (this.texture === undefined || this.texture.texId === undefined) // In the future, a skin can has no texture. TODO:
-	{ return false; }
+	if (this.skinLego.textureName !== "noTexture" )
+	{
+		if (this.texture === undefined || this.texture.texId === undefined) // In the future, a skin can has no texture. TODO:
+		{ return false; }
+	}
 	
 	return true;
 };

@@ -1925,17 +1925,8 @@ NeoBuilding.prototype.renderSkin = function(magoManager, shader, renderType)
 	}
 	
 	gl.uniform1i(shader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.
-	
-	// TEST.*******************************
-	if (skinLego.skinLego.shadowMeshesArray && skinLego.skinLego.shadowMeshesArray.length > 0)
-	{
-		//gl.disable(gl.CULL_FACE);
-		skinLego.render(magoManager, 3, renderTexture, shader, this);
-		//gl.enable(gl.CULL_FACE);
-	}
-	else
-	{ skinLego.render(magoManager, renderType, renderTexture, shader, this); }
-	
+	skinLego.render(magoManager, renderType, renderTexture, shader, this);
+
 	if (renderType === 1 && magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected === this)
 	{
 		// active stencil buffer to draw silhouette.

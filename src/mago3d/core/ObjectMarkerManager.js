@@ -119,12 +119,26 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 				var objMarker = magoManager.objMarkerManager.objectMarkerArray[i];
 				var currentTexture = magoManager.pin.getTexture(objMarker.imageFilePath);
 				
+				if (!currentTexture)
+				{
+					magoManager.pin.loadImage(objMarker.imageFilePath, magoManager);
+					continue;
+				}
+				
 				if (selectionManager.isObjectSelected(objMarker))
 				{
 					gl.uniform2fv(shader.scale2d_loc, [1.5, 1.5]);
-					var selectedTexture = magoManager.pin.getTexture(objMarker.imageFilePathSelected);
-					if (selectedTexture)
-					{ currentTexture = selectedTexture; }
+					if (objMarker.imageFilePathSelected)
+					{
+						var selectedTexture = magoManager.pin.getTexture(objMarker.imageFilePathSelected);
+						if (selectedTexture)
+						{ currentTexture = selectedTexture; }
+						else 
+						{
+							magoManager.pin.loadImage(objMarker.imageFilePathSelected, magoManager);
+							continue;
+						}
+					}
 				}
 				else
 				{

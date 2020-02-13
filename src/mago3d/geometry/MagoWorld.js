@@ -268,6 +268,8 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 		var scene = magoManager.scene;
 		var ray = camera.getPickRay(new Cesium.Cartesian2(mouseX, mouseY));
 		var pointWC = scene.globe.pick(ray, scene);
+		mouseAction.strWorldPoint = pointWC;
+		return;
 		var difX = camera._positionWC.x - pointWC.x;
 		var difY = camera._positionWC.y - pointWC.y;
 		var difZ = camera._positionWC.z - pointWC.z;
