@@ -1402,9 +1402,16 @@ float UnpackDepth32( in vec4 pack )\n\
 \n\
 vec3 getViewRay(vec2 tc)\n\
 {\n\
+	float farForDepth = 50000.0;\n\
+	float hfar = 2.0 * tangentOfHalfFovy * farForDepth;\n\
+    float wfar = hfar * aspectRatio;    \n\
+    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -farForDepth);    \n\
+	\n\
+	/*\n\
 	float hfar = 2.0 * tangentOfHalfFovy * far;\n\
     float wfar = hfar * aspectRatio;    \n\
     vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    \n\
+	*/\n\
     return ray;                      \n\
 }         \n\
             \n\
@@ -1466,12 +1473,14 @@ void main()\n\
 	vec3 normal2 = vNormal;	\n\
 		\n\
 	if(bApplySsao)\n\
-	{         \n\
+	{        \n\
+		float farForDepth = 50000.0;\n\
 		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
 		float linearDepth = getDepth(screenPos);  \n\
 		vec3 ray = getViewRay(screenPos);\n\
 		vec3 origin = ray * linearDepth;  \n\
-		float tolerance = radius/far;\n\
+		//float tolerance = radius/far; // original.***\n\
+		float tolerance = radius/farForDepth;\n\
 \n\
 		vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
 		vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
@@ -1485,34 +1494,18 @@ void main()\n\
 			vec4 offset = projectionMatrix * vec4(sample, 1.0);					\n\
 			offset.xy /= offset.w;\n\
 			offset.xy = offset.xy * 0.5 + 0.5;  				\n\
-			float sampleDepth = -sample.z/far;\n\
+			//float sampleDepth = -sample.z/far;// original.***\n\
+			float sampleDepth = -sample.z/farForDepth;\n\
 \n\
 			float depthBufferValue = getDepth(offset.xy);	\n\
 			\n\
-			if(i == 0)\n\
-			{\n\
-				minDepthBuffer = depthBufferValue;\n\
-				maxDepthBuffer = depthBufferValue;\n\
-			}\n\
-			else{\n\
-				if(depthBufferValue < minDepthBuffer)\n\
-					minDepthBuffer = depthBufferValue;\n\
-				else if(depthBufferValue > maxDepthBuffer)\n\
-					maxDepthBuffer = depthBufferValue;\n\
-			}\n\
-\n\
 			if (depthBufferValue < sampleDepth-tolerance)\n\
 			{\n\
 				occlusion +=  1.0;\n\
 			}\n\
 		} \n\
-		\n\
-		if(maxDepthBuffer - minDepthBuffer > 0.00001)\n\
-		{\n\
-			occlusion = 1.0;\n\
-		}\n\
-		else\n\
-			occlusion = 1.0 - occlusion / float(kernelSize);	\n\
+\n\
+		occlusion = 1.0 - occlusion / float(kernelSize);	\n\
 		\n\
 	}\n\
 	\n\
@@ -1522,7 +1515,7 @@ void main()\n\
     // Do specular lighting.***\n\
 	float lambertian;\n\
 	float specular;\n\
-		\n\
+	\n\
 	if(applySpecLighting> 0.0)\n\
 	{\n\
 		vec3 L;\n\
@@ -1642,6 +1635,8 @@ void main()\n\
 		finalColor = vec4((textureColor.xyz) * occlusion * shadow_occlusion, alfa);\n\
 	}\n\
 	finalColor *= colorMultiplier;\n\
+	\n\
+\n\
 	//finalColor = vec4(linearDepth, linearDepth, linearDepth, 1.0); // test to render depth color coded.***\n\
     gl_FragColor = finalColor; \n\
 \n\
@@ -2637,7 +2632,9 @@ void main()\n\
     \n\
     //linear depth in camera space (0..far)\n\
 	vec4 posCC = modelViewMatrixRelToEye * pos4;\n\
-    depth = posCC.z/far; // original.***\n\
+    //depth = posCC.z/far; // original.***\n\
+	float farForDepth = 50000.0;\n\
+	depth = posCC.z/farForDepth; // test.***\n\
 \n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 	vertexPos = posCC.xyz;\n\
