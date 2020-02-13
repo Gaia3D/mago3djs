@@ -1477,7 +1477,8 @@ void main()\n\
 		vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
 		vec3 bitangent = cross(normal2, tangent);\n\
 		mat3 tbn = mat3(tangent, bitangent, normal2);   \n\
-\n\
+		float minDepthBuffer;\n\
+		float maxDepthBuffer;\n\
 		for(int i = 0; i < kernelSize; ++i)\n\
 		{    	 \n\
 			vec3 sample = origin + (tbn * vec3(kernel[i].x*1.0, kernel[i].y*1.0, kernel[i].z)) * radius*2.0;\n\
@@ -1487,6 +1488,18 @@ void main()\n\
 			float sampleDepth = -sample.z/far;\n\
 \n\
 			float depthBufferValue = getDepth(offset.xy);	\n\
+			\n\
+			if(i == 0)\n\
+			{\n\
+				minDepthBuffer = depthBufferValue;\n\
+				maxDepthBuffer = depthBufferValue;\n\
+			}\n\
+			else{\n\
+				if(depthBufferValue < minDepthBuffer)\n\
+					minDepthBuffer = depthBufferValue;\n\
+				else if(depthBufferValue > maxDepthBuffer)\n\
+					maxDepthBuffer = depthBufferValue;\n\
+			}\n\
 \n\
 			if (depthBufferValue < sampleDepth-tolerance)\n\
 			{\n\
@@ -1494,7 +1507,12 @@ void main()\n\
 			}\n\
 		} \n\
 		\n\
-		occlusion = 1.0 - occlusion / float(kernelSize);	\n\
+		if(maxDepthBuffer - minDepthBuffer > 0.00001)\n\
+		{\n\
+			occlusion = 1.0;\n\
+		}\n\
+		else\n\
+			occlusion = 1.0 - occlusion / float(kernelSize);	\n\
 		\n\
 	}\n\
 	\n\

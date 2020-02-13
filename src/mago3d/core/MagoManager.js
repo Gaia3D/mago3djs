@@ -2004,24 +2004,6 @@ MagoManager.prototype.keyDown = function(key)
 		var pitch = 45;
 		var roll;
 		
-		/*
-		// Move a little.***
-		var latitude = currLat + 0.0001 * 10*(Math.random()*2-1);
-		var longitude = currLon + 0.0001 * 10*(Math.random()*2-1);
-		var elevation = currAlt + 2.0 * 10*(Math.random()*2-1);
-		
-		var heading;
-		var pitch;
-		var roll;
-		//var durationTimeInSeconds = 5;
-		var animationOption = {
-			autoChangeRotation : true,
-			duration           : 5
-		};
-		this.changeLocationAndRotation(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll, animationOption);
-		*/
-		
-		//node.changeLocationAndRotation(latitude, longitude, elevation, heading, pitch, roll, this);
 
 		// Test 2: moving by a path.***
 		var bSplineCubic3d = this.modeler.bSplineCubic3d;
@@ -2076,12 +2058,12 @@ MagoManager.prototype.keyDown = function(key)
 		*/
 		
 		
-		if (this.magoPolicy.issueInsertEnable)
-		{
-			this.magoPolicy.issueInsertEnable = false; // test to inser pins in scene.!!!!!!!!!!!!!!!!!!!!!! TEST.!!!
-		}
-		else
-		{ this.magoPolicy.issueInsertEnable = true; }
+		//if (this.magoPolicy.issueInsertEnable)
+		//{
+		//	this.magoPolicy.issueInsertEnable = false; // test to inser pins in scene.!!!!!!!!!!!!!!!!!!!!!! TEST.!!!
+		//}
+		//else
+		//{ this.magoPolicy.issueInsertEnable = true; }
 		
 		
 		// Stencil shadow mesh making test.********************
@@ -3065,6 +3047,9 @@ MagoManager.prototype.manageMouseDragging = function(mouseX, mouseY)
 MagoManager.prototype.moveSelectedObjectGeneral = function(gl, object) 
 {
 	if (object === undefined)
+	{ return; }
+
+	if (object instanceof ObjectMarker)
 	{ return; }
 
 	object = object.getRootOwner();
