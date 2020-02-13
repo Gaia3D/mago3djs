@@ -1,0 +1,33 @@
+{
+	"attributes": {
+		"isPhysical": false,
+		"nodeType": " root ",
+		"projectType": "jejuGolf",
+		"specularLighting": true
+	},
+	"children": [
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "jejuGolf",
+				"flipYTexCoords": true
+			},
+			"children": [],
+			"data_key": "NineBridge_2M_sample",
+			"data_name": "NineBridge_2M_sample",
+			"mapping_type":"origin",
+			"longitude": 126.34300080454938,
+			"latitude": 33.289954923366,
+			"height": 30.000000,
+			"heading": 0.000000,
+			"pitch": 0.000000,
+			"roll": 0.000000
+		}
+	],
+	"parent": 0,
+	"depth": 1,
+	"view_order": 2,  	
+	"data_key": "jejuGolf",
+	"data_name": "jejuGolf",
+    "mapping_type": "origin"
+}
