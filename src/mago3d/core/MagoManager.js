@@ -1325,7 +1325,9 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 			var options = {
 				positionWC            : posWC,
 				imageFilePath         : "defaultBlue",
-				imageFilePathSelected : "defaultRed"
+				imageFilePathSelected : "defaultRed",
+				sizeX                 : 10.0,
+				sizeY                 : 45.0
 			};
 			var objMarker = this.objMarkerManager.newObjectMarker(options, this);
 		}
@@ -4453,6 +4455,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.position4_loc = gl.getAttribLocation(shader.program, "position");
 	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
 	shader.scale2d_loc = gl.getUniformLocation(shader.program, "scale2d");
+	shader.size2d_loc = gl.getUniformLocation(shader.program, "size2d");
 };
 
 /**
