@@ -233,8 +233,7 @@ var MagoManager = function()
 
 	this.demoBlocksLoaded = false;
 
-	this.objMarkerManager = new ObjectMarkerManager();
-	this.pin = new Pin();
+	this.objMarkerManager = new ObjectMarkerManager(this);
 	
 	//this.weatherStation = new WeatherStation();
 	
@@ -805,39 +804,6 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
 	}
 };
 
-
-
-
-/**
- * start rendering.
- * @param scene 변수
- * @param isLastFrustum 변수
- */
- 
-MagoManager.prototype.load_testTextures = function() 
-{
-	if (this.pin.texture === undefined)
-	{
-		var gl = this.sceneState.gl;
-		
-		var filePath_inServer = this.magoPolicy.imagePath + "/defaultRed.png";
-		var texture = this.pin.loadImage(filePath_inServer, this);
-		this.pin.imageFileMap.defaultRed = texture;
-		
-		filePath_inServer = this.magoPolicy.imagePath + "/defaultBlue.png";
-		var texture = this.pin.loadImage(filePath_inServer, this);
-		this.pin.imageFileMap.defaultBlue = texture;
-		
-		filePath_inServer = this.magoPolicy.imagePath + "/defaultOrange.png";
-		var texture = this.pin.loadImage(filePath_inServer, this);
-		this.pin.imageFileMap.defaultOrange = texture;
-		
-		filePath_inServer = this.magoPolicy.imagePath + "/defaultCian.png";
-		var texture = this.pin.loadImage(filePath_inServer, this);
-		this.pin.imageFileMap.defaultCian = texture;
-	}
-};
-
 /**
  * start rendering.
  * @param scene 변수
@@ -1190,6 +1156,18 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	var renderTexture = false;
 	
 	// Take the depFrameBufferObject of the current frustumVolume.***
+	/*
+	if (this.depthFboNeo === undefined) { this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
+	if (this.sceneState.drawingBufferWidth[0] !== this.depthFboNeo.width[0] || this.sceneState.drawingBufferHeight[0] !== this.depthFboNeo.height[0])
+	{
+		// move this to onResize.***
+		this.depthFboNeo.deleteObjects(gl);
+		this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
+		this.sceneState.camera.frustum.dirty = true;
+	}
+	*/
+	
+	
 	if (frustumVolumenObject.depthFbo === undefined) { frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
 	if (this.sceneState.drawingBufferWidth[0] !== frustumVolumenObject.depthFbo.width[0] || this.sceneState.drawingBufferHeight[0] !== frustumVolumenObject.depthFbo.height[0])
 	{
@@ -1198,14 +1176,19 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
 		this.sceneState.camera.frustum.dirty = true;
 	}
+	
 
 	this.depthFboNeo = frustumVolumenObject.depthFbo;
+	//frustumVolumenObject.depthFbo = this.depthFboNeo;
 	this.depthFboNeo.bind(); 
-
-	gl.clearColor(0, 0, 0, 1);
-	gl.clearDepth(1);
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	gl.clearStencil(0); // provisionally here.***
+	
+	//if (this.isFarestFrustum())
+	{
+		gl.clearColor(0, 0, 0, 1);
+		gl.clearDepth(1);
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		gl.clearStencil(0); // provisionally here.***
+	}
 	
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
 	this.renderer.renderGeometry(gl, renderType, this.visibleObjControlerNodes);
@@ -1461,8 +1444,8 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 				positionWC            : posWC,
 				imageFilePath         : "defaultBlue",
 				imageFilePathSelected : "defaultRed",
-				sizeX                 : 10.0,
-				sizeY                 : 45.0
+				sizeX                 : 20.0,
+				sizeY                 : 20.0
 			};
 			var objMarker = this.objMarkerManager.newObjectMarker(options, this);
 		}
@@ -2223,9 +2206,7 @@ MagoManager.prototype.keyDown = function(key)
 		
 		
 		//if (this.magoPolicy.issueInsertEnable)
-		//{
-		//	this.magoPolicy.issueInsertEnable = false; // test to inser pins in scene.!!!!!!!!!!!!!!!!!!!!!! TEST.!!!
-		//}
+		//{ this.magoPolicy.issueInsertEnable = false; }
 		//else
 		//{ this.magoPolicy.issueInsertEnable = true; }
 		

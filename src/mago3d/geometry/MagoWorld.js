@@ -203,6 +203,8 @@ MagoWorld.screenToCamCoord = function(mouseX, mouseY, magoManager, resultPointCa
 	if (!magoManager.isCesiumGlobe())
 	{ currentFrustumNear = 0.0; }
 	
+	//currentFrustumFar = 30000.0; // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
+	//currentDepthFbo = magoManager.depthFboNeo;
 	resultPointCamCoord = ManagerUtils.calculatePixelPositionCamCoord(gl, mouseX, mouseY, resultPointCamCoord, currentDepthFbo, currentFrustumNear, currentFrustumFar, magoManager);
 	return resultPointCamCoord;
 };
@@ -236,6 +238,7 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 	
 	// Must find the frustum on pick(mouseX, mouseY) detected depth value.***
 	var maxDepth = 0.996;
+	//maxDepth = 0.996094;
 	var currentDepthFbo;
 	var currentFrustumFar;
 	var currentFrustumNear;

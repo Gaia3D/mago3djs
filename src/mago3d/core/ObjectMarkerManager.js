@@ -6,14 +6,15 @@
  * @class ObjectMarkerManager
  *
  */
-var ObjectMarkerManager = function() 
+var ObjectMarkerManager = function(magoManager) 
 {
 	if (!(this instanceof ObjectMarkerManager)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
+	this.magoManager = magoManager;
 	this.objectMarkerArray = [];
-
+	this.pin = new Pin();
 };
 
 /**
@@ -30,6 +31,40 @@ ObjectMarkerManager.prototype.deleteObjects = function()
 		this.objectMarkerArray[i] = undefined;
 	}
 	this.objectMarkerArray = [];
+};
+
+/**
+ * start rendering.
+ * @param scene 변수
+ * @param isLastFrustum 변수
+ */
+ 
+ObjectMarkerManager.prototype.loadDefaultImages = function(magoManager) 
+{
+	if (this.pin.defaultImagesLoaded === false)
+	{
+		var gl = magoManager.getGl();
+		var magoPolicy = magoManager.magoPolicy;
+		var pin = this.pin;
+		
+		var filePath_inServer = magoPolicy.imagePath + "/defaultRed.png";
+		var texture = pin.loadImage(filePath_inServer, magoManager);
+		pin.imageFileMap.defaultRed = texture;
+		
+		filePath_inServer = magoPolicy.imagePath + "/defaultBlue.png";
+		var texture = pin.loadImage(filePath_inServer, magoManager);
+		pin.imageFileMap.defaultBlue = texture;
+		
+		filePath_inServer = magoPolicy.imagePath + "/defaultOrange.png";
+		var texture = pin.loadImage(filePath_inServer, magoManager);
+		pin.imageFileMap.defaultOrange = texture;
+		
+		filePath_inServer = magoPolicy.imagePath + "/defaultCian.png";
+		var texture = pin.loadImage(filePath_inServer, magoManager);
+		pin.imageFileMap.defaultCian = texture;
+		
+		this.pin.defaultImagesLoaded = true;
+	}
 };
 
 /**
@@ -90,15 +125,17 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 	var objectsMarkersCount = this.objectMarkerArray.length;
 	if (objectsMarkersCount > 0)
 	{
+		// Check if defaultImages are loaded.
+		this.loadDefaultImages(magoManager);
 		var gl = magoManager.getGl();
 		
 		// now repeat the objects markers for png images.***
 		// Png for pin image 128x128.********************************************************************
-		if (magoManager.pin.positionBuffer === undefined)
-		{ magoManager.pin.createPinCenterBottom(gl); }
+		if (this.pin.positionBuffer === undefined)
+		{ this.pin.createPinCenterBottom(gl); }
 		
 		// check if pin textures is loaded.
-		var currentTexture = magoManager.pin.texturesArray[0];
+		var currentTexture = this.pin.texturesArray[0];
 		if (!currentTexture || !currentTexture.texId)
 		{
 			magoManager.load_testTextures();
@@ -128,9 +165,9 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 		//var context = document.getElementById('canvas2').getContext("2d");
 		//var canvas = document.getElementById("magoContainer");
 		
-		gl.bindBuffer(gl.ARRAY_BUFFER, magoManager.pin.positionBuffer);
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.pin.positionBuffer);
 		gl.vertexAttribPointer(shader.position4_loc, 4, gl.FLOAT, false, 0, 0);
-		gl.bindBuffer(gl.ARRAY_BUFFER, magoManager.pin.texcoordBuffer);
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.pin.texcoordBuffer);
 		gl.vertexAttribPointer(shader.texCoord2_loc, 2, gl.FLOAT, false, 0, 0);
 		
 		gl.activeTexture(gl.TEXTURE0);
@@ -148,11 +185,11 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 			for (var i=0; i<objectsMarkersCount; i++)
 			{
 				var objMarker = magoManager.objMarkerManager.objectMarkerArray[i];
-				var currentTexture = magoManager.pin.getTexture(objMarker.imageFilePath);
+				var currentTexture = this.pin.getTexture(objMarker.imageFilePath);
 				
 				if (!currentTexture)
 				{
-					magoManager.pin.loadImage(objMarker.imageFilePath, magoManager);
+					this.pin.loadImage(objMarker.imageFilePath, magoManager);
 					continue;
 				}
 				
@@ -161,12 +198,12 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 					gl.uniform2fv(shader.scale2d_loc, [1.5, 1.5]);
 					if (objMarker.imageFilePathSelected)
 					{
-						var selectedTexture = magoManager.pin.getTexture(objMarker.imageFilePathSelected);
+						var selectedTexture = this.pin.getTexture(objMarker.imageFilePathSelected);
 						if (selectedTexture)
 						{ currentTexture = selectedTexture; }
 						else 
 						{
-							magoManager.pin.loadImage(objMarker.imageFilePathSelected, magoManager);
+							this.pin.loadImage(objMarker.imageFilePathSelected, magoManager);
 							continue;
 						}
 					}
