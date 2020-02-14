@@ -17,7 +17,7 @@ var Pin = function()
 	this.texcoordBuffer;
 	
 	this.imageFileMap = {};
-
+	this.defaultImagesLoaded = false;
 	
 };
 

@@ -232,8 +232,7 @@ var MagoManager = function()
 
 	this.demoBlocksLoaded = false;
 
-	this.objMarkerManager = new ObjectMarkerManager();
-	this.pin = new Pin();
+	this.objMarkerManager = new ObjectMarkerManager(this);
 	
 	//this.weatherStation = new WeatherStation();
 	
@@ -773,39 +772,6 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
 		resultCamera.setFrustumsDistances(numFrustums, distancesArray);
 		resultCamera.setAspectRatioAndFovyRad(aspectRatio, fovy);
 		resultCamera.calculateFrustumsPlanes();
-	}
-};
-
-
-
-
-/**
- * start rendering.
- * @param scene 변수
- * @param isLastFrustum 변수
- */
- 
-MagoManager.prototype.load_testTextures = function() 
-{
-	if (this.pin.texture === undefined)
-	{
-		var gl = this.sceneState.gl;
-		
-		var filePath_inServer = this.magoPolicy.imagePath + "/defaultRed.png";
-		var texture = this.pin.loadImage(filePath_inServer, this);
-		this.pin.imageFileMap.defaultRed = texture;
-		
-		filePath_inServer = this.magoPolicy.imagePath + "/defaultBlue.png";
-		var texture = this.pin.loadImage(filePath_inServer, this);
-		this.pin.imageFileMap.defaultBlue = texture;
-		
-		filePath_inServer = this.magoPolicy.imagePath + "/defaultOrange.png";
-		var texture = this.pin.loadImage(filePath_inServer, this);
-		this.pin.imageFileMap.defaultOrange = texture;
-		
-		filePath_inServer = this.magoPolicy.imagePath + "/defaultCian.png";
-		var texture = this.pin.loadImage(filePath_inServer, this);
-		this.pin.imageFileMap.defaultCian = texture;
 	}
 };
 
@@ -2086,7 +2052,7 @@ MagoManager.prototype.keyDown = function(key)
 		
 		
 		//if (this.magoPolicy.issueInsertEnable)
-		//{this.magoPolicy.issueInsertEnable = false;}
+		//{ this.magoPolicy.issueInsertEnable = false; }
 		//else
 		//{ this.magoPolicy.issueInsertEnable = true; }
 		
