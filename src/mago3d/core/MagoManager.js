@@ -1235,6 +1235,11 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	this.renderType = 1;
 	this.renderer.renderGeometry(gl, renderType, this.visibleObjControlerNodes);
 	
+	if (this.currentFrustumIdx === 0) 
+	{
+		this.renderQuatTree();
+	}
+
 	if (this.weatherStation)
 	{
 		this.weatherStation.renderWindLayerDisplayPlanes(this);
@@ -1295,6 +1300,67 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	
 	// 4) Render filter.******************************************************************************************************************
 	//this.renderFilter();
+};
+
+MagoManager.prototype.renderQuatTree = function() 
+{
+	var qtree = this.qtree;
+	if (qtree) 
+	{
+		var camPosWc = this.sceneState.camera.getPosition();
+		var result = qtree.getDisplayPoints();
+		var trees = qtree.getQuatTreeByCamDistance(undefined, camPosWc);
+
+		var treeLength = trees.length;
+		this.objMarkerManager.objectMarkerArray = [];
+		for (var i=0;i<treeLength;i++) 
+		{
+			var tree = trees[i];
+			if (tree.hasChildren()) 
+			{
+				var points = tree.displayPointsArray;
+
+				var pointLength = points.length;
+				for (var j=0;j<pointLength;j++) 
+				{
+					var point = points[j];
+					var mass = point.mass;
+
+					if (mass > 50) { mass=50; }
+					if (mass < 15) { mass = 15; }
+					var options = {
+						positionWC            : point,
+						imageFilePath         : "/images/ko/triangle-16.png",
+						imageFilePathSelected : "/images/ko/black_arrow_26.png",
+						sizeX                 : mass,
+						sizeY                 : mass
+					};
+					this.objMarkerManager.newObjectMarker(options, this);
+				}
+			}
+			else 
+			{
+				
+				var points = tree.data;
+				if (points) 
+				{
+					var pointLength = points.length;
+					for (var j=0;j<pointLength;j++) 
+					{
+						var point = points[j];
+						
+						var options = {
+							positionWC    : ManagerUtils.geographicCoordToWorldPoint(point.x, point.y, 0),
+							imageFilePath : "/images/ko/triangle-16.png",
+							sizeX         : 8,
+							sizeY         : 8
+						};
+						this.objMarkerManager.newObjectMarker(options, this);
+					}
+				}
+			}
+		}
+	}
 };
 
 /**
