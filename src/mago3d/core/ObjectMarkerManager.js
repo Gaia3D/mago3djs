@@ -177,7 +177,7 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 		gl.uniform2fv(shader.scale2d_loc, [1.0, 1.0]);
 		gl.uniform2fv(shader.size2d_loc, [25.0, 25.0]);
 		
-		//gl.depthMask(false);
+		gl.depthMask(false);
 		var selectionManager = magoManager.selectionManager;
 		var lastTexId = undefined;
 		if (renderType === 1)
@@ -257,7 +257,7 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 		}
 		
 		gl.depthRange(0, 1);
-		//gl.depthMask(true);
+		gl.depthMask(true);
 		gl.useProgram(null);
 		gl.bindTexture(gl.TEXTURE_2D, null);
 		shader.disableVertexAttribArrayAll();

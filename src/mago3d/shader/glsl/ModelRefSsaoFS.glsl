@@ -74,8 +74,8 @@ float UnpackDepth32( in vec4 pack )
 
 vec3 getViewRay(vec2 tc)
 {
-	// The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
 	/*
+	// The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
 	float farForDepth = 30000.0;
 	float hfar = 2.0 * tangentOfHalfFovy * farForDepth;
     float wfar = hfar * aspectRatio;    
@@ -155,6 +155,7 @@ void main()
 		vec3 ray = getViewRay(screenPos); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
 		vec3 origin = ray * linearDepth;  
 		float tolerance = radius/far; // original.***
+		//float tolerance = radius/(far-near);// test.***
 		//float tolerance = radius/farForDepth;
 
 		vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;
@@ -170,9 +171,21 @@ void main()
 			offset.xy /= offset.w;
 			offset.xy = offset.xy * 0.5 + 0.5;  				
 			float sampleDepth = -sample.z/far;// original.***
+			//float sampleDepth = -sample.z/(far-near);// test.***
 			//float sampleDepth = -sample.z/farForDepth;
 
-			float depthBufferValue = getDepth(offset.xy);	
+			float depthBufferValue = getDepth(offset.xy);
+
+			//if(depthBufferValue > 0.003914 && depthBufferValue < 0.003924)
+			if(depthBufferValue > 0.00391 && depthBufferValue < 0.00393)
+			{
+				if (depthBufferValue < sampleDepth-tolerance*1000.0)
+				{
+					occlusion +=  0.5;
+				}
+				
+				continue;
+			}			
 			
 			if (depthBufferValue < sampleDepth-tolerance)
 			{
@@ -309,8 +322,12 @@ void main()
 	else{
 		finalColor = vec4((textureColor.xyz) * occlusion * shadow_occlusion, alfa);
 	}
-	finalColor *= colorMultiplier;
 	
+	if(testBool)
+	finalColor *= vec4(0.99, 0.33, 0.32, 1.0);
+	
+	finalColor *= colorMultiplier;
+
 
 	//finalColor = vec4(linearDepth, linearDepth, linearDepth, 1.0); // test to render depth color coded.***
     gl_FragColor = finalColor; 
