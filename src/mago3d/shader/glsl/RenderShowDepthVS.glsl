@@ -46,6 +46,7 @@ void main()
     //linear depth in camera space (0..far)
 	vec4 posCC = modelViewMatrixRelToEye * pos4;
     depth = posCC.z/far; // original.***
+	//depth = posCC.z/(far-near); // test.***
 	//float farForDepth = 30000.0;
 	//depth = posCC.z/farForDepth; // test.***
 

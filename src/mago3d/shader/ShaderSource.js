@@ -1402,8 +1402,8 @@ float UnpackDepth32( in vec4 pack )\n\
 \n\
 vec3 getViewRay(vec2 tc)\n\
 {\n\
-	// The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
 	/*\n\
+	// The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
 	float farForDepth = 30000.0;\n\
 	float hfar = 2.0 * tangentOfHalfFovy * farForDepth;\n\
     float wfar = hfar * aspectRatio;    \n\
@@ -1483,6 +1483,7 @@ void main()\n\
 		vec3 ray = getViewRay(screenPos); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
 		vec3 origin = ray * linearDepth;  \n\
 		float tolerance = radius/far; // original.***\n\
+		//float tolerance = radius/(far-near);// test.***\n\
 		//float tolerance = radius/farForDepth;\n\
 \n\
 		vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
@@ -1498,9 +1499,21 @@ void main()\n\
 			offset.xy /= offset.w;\n\
 			offset.xy = offset.xy * 0.5 + 0.5;  				\n\
 			float sampleDepth = -sample.z/far;// original.***\n\
+			//float sampleDepth = -sample.z/(far-near);// test.***\n\
 			//float sampleDepth = -sample.z/farForDepth;\n\
 \n\
-			float depthBufferValue = getDepth(offset.xy);	\n\
+			float depthBufferValue = getDepth(offset.xy);\n\
+\n\
+			//if(depthBufferValue > 0.003914 && depthBufferValue < 0.003924)\n\
+			if(depthBufferValue > 0.00391 && depthBufferValue < 0.00393)\n\
+			{\n\
+				if (depthBufferValue < sampleDepth-tolerance*1000.0)\n\
+				{\n\
+					occlusion +=  0.5;\n\
+				}\n\
+				\n\
+				continue;\n\
+			}			\n\
 			\n\
 			if (depthBufferValue < sampleDepth-tolerance)\n\
 			{\n\
@@ -1637,8 +1650,12 @@ void main()\n\
 	else{\n\
 		finalColor = vec4((textureColor.xyz) * occlusion * shadow_occlusion, alfa);\n\
 	}\n\
-	finalColor *= colorMultiplier;\n\
 	\n\
+	if(testBool)\n\
+	finalColor *= vec4(0.99, 0.33, 0.32, 1.0);\n\
+	\n\
+	finalColor *= colorMultiplier;\n\
+\n\
 \n\
 	//finalColor = vec4(linearDepth, linearDepth, linearDepth, 1.0); // test to render depth color coded.***\n\
     gl_FragColor = finalColor; \n\
@@ -2636,6 +2653,7 @@ void main()\n\
     //linear depth in camera space (0..far)\n\
 	vec4 posCC = modelViewMatrixRelToEye * pos4;\n\
     depth = posCC.z/far; // original.***\n\
+	//depth = posCC.z/(far-near); // test.***\n\
 	//float farForDepth = 30000.0;\n\
 	//depth = posCC.z/farForDepth; // test.***\n\
 \n\
