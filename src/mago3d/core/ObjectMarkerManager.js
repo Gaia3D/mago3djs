@@ -195,7 +195,7 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 				
 				if (selectionManager.isObjectSelected(objMarker))
 				{
-					gl.uniform2fv(shader.scale2d_loc, [1.5, 1.5]);
+					gl.uniform2fv(shader.scale2d_loc, new Float32Array([1.5, 1.5]));
 					if (objMarker.imageFilePathSelected)
 					{
 						var selectedTexture = this.pin.getTexture(objMarker.imageFilePathSelected);
@@ -210,7 +210,7 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 				}
 				else
 				{
-					gl.uniform2fv(shader.scale2d_loc, [1.0, 1.0]);
+					gl.uniform2fv(shader.scale2d_loc, new Float32Array([1.0, 1.0]));
 				}
 				
 				gl.uniform2fv(shader.size2d_loc, objMarker.size2d);
