@@ -137,6 +137,18 @@ var SceneState = function()
 	// mouse.
 	this.mouseButton = -1;
 	
+	// some stadistics.
+	this.trianglesRenderedCount = 0;
+	this.fps = 0.0;
+	
+};
+
+/**
+ */
+SceneState.prototype.resetStadistics = function() 
+{
+	this.trianglesRenderedCount = 0;
+	this.fps = 0.0;
 };
 
 /**

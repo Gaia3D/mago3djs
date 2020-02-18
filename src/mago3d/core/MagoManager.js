@@ -1233,10 +1233,10 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 	var gl = this.getGl();
 	this.upDateSceneStateMatrices(this.sceneState);
 	
-		
 	if (this.isFarestFrustum())
 	{
 		this.dateSC = new Date();
+		this.prevTime = this.currTime;
 		this.currTime = this.dateSC.getTime();
 		
 		this.initCounters();
@@ -1260,6 +1260,9 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 
 		// If mago camera has track node, camera look track node.
 		this.sceneState.camera.doTrack(this);
+		
+		// reset stadistics data.
+		this.sceneState.resetStadistics();
 	}
 	
 	var cameraPosition = this.sceneState.camera.position;
@@ -1335,19 +1338,41 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 			}
 		}
 	}
-	// lightDepthRender: TODO.***
 
 	// Render process.***
-	
-	
 	this.doRender(frustumVolumenObject);
-	
 
 	// test. Draw the buildingNames.***
 	if (this.magoPolicy.getShowLabelInfo())
 	{
+		if (this.currentFrustumIdx === 0)
+		{ this.clearCanvas2D(); }
 		this.drawBuildingNames(this.visibleObjControlerNodes) ;
 	}
+	
+	// Do stadistics.
+	var displayStadistics = false;
+	if (this.currentFrustumIdx === 0 && displayStadistics)
+	{
+		if (this.stadisticsDisplayed === undefined)
+		{ this.stadisticsDisplayed = 0; }
+
+		if (this.stadisticsDisplayed === 0)
+		{
+			var timePerFrame = this.getCurrentTime() - this.prevTime;
+			this.sceneState.fps = Math.floor(1000.0/timePerFrame);
+			this.clearCanvas2D();
+			this.drawStadistics();
+		}
+
+		this.stadisticsDisplayed+= 1;
+		
+		if (this.stadisticsDisplayed > 15)
+		{ this.stadisticsDisplayed = 0; }
+	
+		this.canvasDirty = true;
+	}
+
 };
 
 /**
@@ -1355,9 +1380,16 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
  */
 MagoManager.prototype.clearCanvas2D = function() 
 {
-	var canvas = this.getObjectLabel();
-	var ctx = canvas.getContext("2d");
-	ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); 
+	if (this.canvasDirty === undefined)
+	{ this.canvasDirty = true; }
+	
+	if (this.canvasDirty)
+	{
+		var canvas = this.getObjectLabel();
+		var ctx = canvas.getContext("2d");
+		ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); 
+		this.canvasDirty = false;
+	}
 };
 
 
@@ -1404,13 +1436,35 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 /**
  * Draw building names on scene.
  */
-MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes) 
+MagoManager.prototype.drawStadistics = function() 
 {
 	var canvas = this.getObjectLabel();
 	var ctx = canvas.getContext("2d");
 	
 	if (this.isFarestFrustum())
 	{ this.clearCanvas2D(); }
+
+	var screenCoord = new Point2D(130, 60);
+	var sceneState = this.sceneState;
+	
+	ctx.font = "13px Arial";
+
+	ctx.strokeText("Triangles : " + sceneState.trianglesRenderedCount, screenCoord.x, screenCoord.y);
+	ctx.fillText("Triangles : " + sceneState.trianglesRenderedCount, screenCoord.x, screenCoord.y);
+	
+	ctx.strokeText("FPS : " + sceneState.fps, screenCoord.x, screenCoord.y+30);
+	ctx.fillText("FPS : " + sceneState.fps, screenCoord.x, screenCoord.y+30);
+
+	ctx.restore(); 
+};
+
+/**
+ * Draw building names on scene.
+ */
+MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes) 
+{
+	var canvas = this.getObjectLabel();
+	var ctx = canvas.getContext("2d");
 
 	// lod2.
 	var gl = this.getGl();

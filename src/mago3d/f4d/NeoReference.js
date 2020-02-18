@@ -641,6 +641,12 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 		if (!vboKey.bindDataIndice(shader, magoManager.vboMemoryManager))
 		{ return false; }
 		gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.
+		
+		if (renderType === 1)
+		{
+			// some stadistics.
+			magoManager.sceneState.trianglesRenderedCount += indicesCount/3;
+		}
 	}
 		
 	return true;
