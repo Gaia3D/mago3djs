@@ -21,11 +21,57 @@ var F4dController = function(magoManager)
 
 	this.magoManager = magoManager;
 
+	this.smartTilePathInfo = {};
+
 };
 
 F4dController.prototype = Object.create(Emitter.prototype);
 F4dController.prototype.constructor = F4dController;
 
+/**
+ * f4d smarttile data group 등록
+ * @param {Array<object> | object} f4dObject f4d smarttile data group
+ */
+F4dController.prototype.addSmartTileGroup = function(f4dObject) 
+{
+	var magoManager = this.magoManager;
+	if (Array.isArray(f4dObject)) 
+	{
+		for (var i=0, len=f4dObject.length;i<len;i++) 
+		{
+			this.addSmartTileGroup(f4dObject[i]);
+		}
+	} 
+	else 
+	{
+		var groupId = f4dObject.data_key || f4dObject.dataGroupId;
+		var groupDataFolder;
+		var groupKey;
+		if (f4dObject.data_key) 
+		{
+			groupDataFolder = groupId;
+			groupKey = groupId;
+		}
+		else 
+		{
+			groupDataFolder = f4dObject.dataGroupPath;
+			groupDataFolder = groupDataFolder.replace(/\/+$/, '');
+
+			groupKey = f4dObject.dataGroupKey;
+		}
+
+		if (!this.smartTilePathInfo[groupKey])
+		{
+			this.smartTilePathInfo[groupKey] = {};
+		}
+
+		this.smartTilePathInfo[groupKey].projectId = groupId;
+		this.smartTilePathInfo[groupKey].projectFolderPath = groupDataFolder;
+		this.smartTilePathInfo[groupKey].smartTileIndexPath = groupDataFolder + '/' + groupKey + '_TILE';
+
+		magoManager.getObjectIndexFileSmartTileF4d(this.smartTilePathInfo[groupKey].smartTileIndexPath);
+	}
+};
 /**
  * f4d data group 등록
  * @param {Array<object> | object} f4dObject f4d data definition object

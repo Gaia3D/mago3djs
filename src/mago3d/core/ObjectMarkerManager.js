@@ -126,7 +126,7 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 	if (objectsMarkersCount > 0)
 	{
 		// Check if defaultImages are loaded.
-		this.loadDefaultImages(magoManager);
+		//this.loadDefaultImages(magoManager);
 		var gl = magoManager.getGl();
 		
 		// now repeat the objects markers for png images.***
@@ -135,12 +135,12 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 		{ this.pin.createPinCenterBottom(gl); }
 		
 		// check if pin textures is loaded.
-		var currentTexture = this.pin.texturesArray[0];
+		/*var currentTexture = this.pin.texturesArray[0];
 		if (!currentTexture || !currentTexture.texId)
 		{
 			magoManager.load_testTextures();
 			return;
-		}
+		}*/
 		
 		var shader = magoManager.postFxShadersManager.getShader("pin"); 
 		shader.resetLastBuffersBinded();

@@ -283,23 +283,25 @@ MagoManager.prototype = Object.create(Emitter.prototype);
 MagoManager.prototype.constructor = MagoManager;
 
 MagoManager.EVENT_TYPE = {
-	'CLICK'              	: 'click',
-	'DBCLICK'            	: 'dbclick',
-	'RIGHTCLICK'         	: 'rightclick',
-	'MOUSEMOVE'          	: 'mousemove',
-	'SMARTTILELOADSTART' 	: 'smarttileloadstart',
-	'SMARTTILELOADEND'   	: 'smarttileloadend',
-	'F4DLOADSTART'      		: 'f4dloadstart',
-	'F4DLOADEND'       			: 'f4dloadend',
-	'F4DRENDERREADY'   			: 'f4drenderready',
-	'SELECTEDF4D'      	 	: 'selectedf4d',
-	'SELECTEDF4DMOVED'    : 'selectedf4dmoved',
-	'SELECTEDF4DOBJECT'  	: 'selectedf4dobject',
-	'DESELECTEDF4D'    	 	: 'deselectedf4d',
-	'DESELECTEDF4DOBJECT'	: 'deselectedf4dobject',
-	'CAMERACHANGED'       : 'camerachanged',
-	'CAMERAMOVEEND'       : 'cameramoveend',
-	'CAMERAMOVESTART'     : 'cameramovestart',
+	'CLICK'                  	: 'click',
+	'DBCLICK'                	: 'dbclick',
+	'RIGHTCLICK'             	: 'rightclick',
+	'MOUSEMOVE'              	: 'mousemove',
+	'SMARTTILELOADSTART'     	: 'smarttileloadstart',
+	'SMARTTILELOADEND'       	: 'smarttileloadend',
+	'F4DLOADSTART'          		: 'f4dloadstart',
+	'F4DLOADEND'           			: 'f4dloadend',
+	'F4DRENDERREADY'       			: 'f4drenderready',
+	'SELECTEDF4D'          	 	: 'selectedf4d',
+	'SELECTEDF4DMOVED'        : 'selectedf4dmoved',
+	'SELECTEDF4DOBJECT'      	: 'selectedf4dobject',
+	'SELECTEDGENERALOBJECT'   : 'selectedgeneralobject',
+	'DESELECTEDF4D'        	 	: 'deselectedf4d',
+	'DESELECTEDF4DOBJECT'    	: 'deselectedf4dobject',
+	'DESELECTEDGENERALOBJECT' : 'deselectedgeneralobject',
+	'CAMERACHANGED'           : 'camerachanged',
+	'CAMERAMOVEEND'           : 'cameramoveend',
+	'CAMERAMOVESTART'         : 'cameramovestart',
 };
 
 /**
@@ -968,11 +970,12 @@ MagoManager.prototype.managePickingProcess = function()
 		{
 			// this is the closest frustum.***
 			var selectionManager = this.selectionManager;
+			var selectedGeneralObject = selectionManager.currentGeneralObjectSelected ? true : false;
 			this.bPicking = false;
 			this.arrayAuxSC.length = 0;
 			selectionManager.clearCurrents();
 			var bSelectObjects = true;
-			
+
 			this.objectSelected = this.getSelectedObjects(gl, this.mouse_x, this.mouse_y, this.arrayAuxSC, bSelectObjects);
 			
 			var auxBuildingSelected = this.arrayAuxSC[0];
@@ -991,7 +994,7 @@ MagoManager.prototype.managePickingProcess = function()
 						timestamp : new Date()
 					});
 				}
-				else 
+				else if ((this.buildingSelected && !auxBuildingSelected) && (this.nodeSelected && !auxNodeSelected))
 				{
 					this.emit(MagoManager.EVENT_TYPE.DESELECTEDF4D, {
 						type: MagoManager.EVENT_TYPE.DESELECTEDF4D
@@ -1009,7 +1012,7 @@ MagoManager.prototype.managePickingProcess = function()
 						timestamp : new Date()
 					});
 				}
-				else 
+				else if (this.octreeSelected && !auxOctreeSelected)
 				{
 					this.emit(MagoManager.EVENT_TYPE.DESELECTEDF4DOBJECT, {
 						type: MagoManager.EVENT_TYPE.DESELECTEDF4DOBJECT
@@ -1036,6 +1039,21 @@ MagoManager.prototype.managePickingProcess = function()
 				//this.displayLocationAndRotation(currentSelectedBuilding);
 				//this.selectedObjectNotice(currentSelectedBuilding);
 				//console.log("objectId = " + selectedObject.objectId);
+			}
+
+			if (selectionManager.currentGeneralObjectSelected) 
+			{
+				this.emit(MagoManager.EVENT_TYPE.SELECTEDGENERALOBJECT, {
+					type          : MagoManager.EVENT_TYPE.SELECTEDGENERALOBJECT,
+					generalObject : selectionManager.currentGeneralObjectSelected,
+					timestamp     : new Date()
+				});
+			}
+			else if (selectedGeneralObject && !selectionManager.currentGeneralObjectSelected)
+			{
+				this.emit(MagoManager.EVENT_TYPE.DESELECTEDGENERALOBJECT, {
+					type: MagoManager.EVENT_TYPE.DESELECTEDGENERALOBJECT
+				});
 			}
 	
 			// Test flyTo by topology.******************************************************************************
@@ -1749,9 +1767,7 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, resultSe
 	// Check general objects.***
 	if (selectedObject === undefined)
 	{ selectedObject = selectionManager.selCandidatesMap[idx]; }
-
 	selectionManager.currentGeneralObjectSelected = selectionManager.selCandidatesMap[idx];
-	
 	//if (selectionManager.currentGeneralObjectSelected)
 	//{ var hola =0; }
 	
@@ -5578,8 +5594,7 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "changeShadow") 
 	{
-		this.magoPolicy.setShowShadow(api.getShowShadow());
-		
+		this.sceneState.setApplySunShadows(api.getShowShadow());
 	}
 	else if (apiName === "changefrustumFarDistance") 
 	{

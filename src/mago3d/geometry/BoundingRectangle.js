@@ -101,49 +101,45 @@ BoundingRectangle.prototype.intersectsWithRectangle = function(bRect)
 	return true;
 };
 
+/**
+ * Check whether this rectangle is intersected with the given bounding rectangle
+ * @param {BoundingRectangle} bRect
+ * @returns {Point2D}
+ */
+BoundingRectangle.prototype.getCenterPoint = function()
+{
+	var centerx = (this.minX + this.maxX) / 2;
+	var centery = (this.minY + this.maxY) / 2;
+	
+	return new Point2D(centerx, centery);
+};
 
+/**
+ * Bounding Rectangle Center point
+ * @returns {Point2D}
+ */
+BoundingRectangle.prototype.getCenterPoint = function()
+{
+	var centerx = (this.minX + this.maxX) / 2;
+	var centery = (this.minY + this.maxY) / 2;
+	
+	return new Point2D(centerx, centery);
+};
 
+/**
+ * Bounding Rectangle x length
+ * @returns {number}
+ */
+BoundingRectangle.prototype.getXLength = function()
+{
+	return this.maxX - this.minX;
+};
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/**
+ * Bounding Rectangle y length
+ * @returns {number}
+ */
+BoundingRectangle.prototype.getYLength = function()
+{
+	return this.maxY - this.minY;
+};

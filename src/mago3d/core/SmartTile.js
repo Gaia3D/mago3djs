@@ -1196,6 +1196,8 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 	var smartTileType = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 	var buildingsCount = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 	magoManager.emit(MagoManager.EVENT_TYPE.SMARTTILELOADSTART, {tile: this, timestamp: new Date()});
+
+	var smartTilePathInfo = magoManager.f4dController.smartTilePathInfo;
 	for (var i=0; i<buildingsCount; i++)
 	{
 		// read projectId.
@@ -1214,10 +1216,13 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 			"objectType" : "basicF4d"
 		};
 		
-		var node = hierarchyManager.newNode(buildingId, projectId, attributes);
+		var projectFolderName = smartTilePathInfo[projectId].projectFolderPath;
+		var savedProjectId = smartTilePathInfo[projectId].projectId;
+		var node = hierarchyManager.newNode(buildingId, savedProjectId, attributes);
 		var data = node.data;
-		data.projectFolderName = projectId;
-		data.projectId = projectId;// + ".json";
+
+		data.projectFolderName = projectFolderName;
+		data.projectId = savedProjectId;// + ".json";
 		data.data_name = buildingId;
 		data.attributes = attributes;
 		data.mapping_type = "boundingboxcenter";
@@ -1227,7 +1232,7 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		data.neoBuilding = neoBuilding;
 		neoBuilding.buildingFileName = buildingId;
 		neoBuilding.buildingId = buildingId;
-		neoBuilding.projectFolderName = projectId;
+		neoBuilding.projectFolderName = projectFolderName;
 		neoBuilding.nodeOwner = node;
 		
 		// read header (metaData + octree's structure + textures list + lodBuilding data).
@@ -1280,6 +1285,13 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		
 		// finally put the node into smartTile.
 		//this.putNode(this.depth, node, magoManager);
+
+		var dataId = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+		var dataGroupId = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+		var endMark = (new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
+		data.dataId = dataId;
+		data.dataGroupId = dataGroupId;
+
 		node.data.smartTileOwner = this;
 		this.nodesArray.push(node);
 	}

@@ -3,7 +3,7 @@
 
 /**
  * 
- * @module APIGateway
+ * @class APIGateway
  */
 
 /**
@@ -99,7 +99,7 @@ function changeShadowAPI(managerFactoryInstance, isShow)
  * @param {ManagerFactory} managerFactoryInstance
  * @param {string} projectId 프로젝트 아이디
  * @param {string} dataKey data key
- * @param {Array[string]} objectIds object id. 복수개의 경우 , 로 입력
+ * @param {Array<string>} objectIds object id. 복수개의 경우 , 로 입력
  * @param {string} property 속성값 예)isPhysical=true
  * @param {string} color R, G, B 색깔을 ',' 로 연결한 string 값을 받음.
  */
