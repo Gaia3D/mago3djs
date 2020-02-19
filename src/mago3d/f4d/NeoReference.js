@@ -269,12 +269,6 @@ NeoReference.prototype.solveReferenceColorOrTexture = function(magoManager, neoB
 	if (selectionManager.parentSelected && magoManager.objectSelected === this)
 	{
 		referenceObjectIsSelected = true;
-		
-		if (magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.OBJECT) 
-		{
-			// Active stencil if the object is selected.
-			magoManager.renderer.enableStencilBuffer(gl);
-		}
 	}
 	
 	// Check the color or texture of reference object.
@@ -641,6 +635,12 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 		if (!vboKey.bindDataIndice(shader, magoManager.vboMemoryManager))
 		{ return false; }
 		gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.
+		
+		if (renderType === 1)
+		{
+			// some stadistics.
+			magoManager.sceneState.trianglesRenderedCount += indicesCount/3;
+		}
 	}
 		
 	return true;

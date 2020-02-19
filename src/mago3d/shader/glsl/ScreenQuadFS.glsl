@@ -15,14 +15,13 @@ uniform mat4 projectionMatrixInv;
 uniform vec3 encodedCameraPositionMCHigh;
 uniform vec3 encodedCameraPositionMCLow;
 uniform bool bApplyShadow;
+uniform bool bSilhouette;
 uniform mat4 sunMatrix[2]; 
 uniform vec3 sunPosHIGH[2];
 uniform vec3 sunPosLOW[2];
 uniform int sunIdx;
 uniform float screenWidth;    
 uniform float screenHeight;   
-//uniform float shadowMapWidth;    
-//uniform float shadowMapHeight;
 uniform float near;
 uniform float far;
 uniform float fov;
@@ -36,6 +35,13 @@ float unpackDepth(vec4 packedDepth)
 	// http://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/
 	return dot(packedDepth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));
 }
+
+float unpackDepthMago(const in vec4 rgba_depth)
+{
+    const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);// original.***
+    float depth = dot(rgba_depth, bit_shift);
+    return depth;
+} 
 
 float UnpackDepth32( in vec4 pack )
 {
@@ -109,6 +115,52 @@ bool isInShadow(vec4 pointWC, int currSunIdx)
 
 void main()
 {
+	// 1rst, check if this is silhouette rendering.
+	if(bSilhouette)
+	{
+		// Check the adjacent pixels to decide if this is silhouette.
+		// Analize a 5x5 rectangle of the depthTexture: if there are objectDepth & backgroundDepth => is silhouette.
+		float pixelSizeW = 1.0/screenWidth;
+		float pixelSizeH = 1.0/screenHeight;
+		int objectDepthCount = 0;
+		int backgroundDepthCount = 0;
+		float tolerance = 0.9963;
+		tolerance = 0.9963;
+		
+		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight); // centerPos.
+		vec2 screenPos_LD = vec2(screenPos.x - pixelSizeW*1.5, screenPos.y - pixelSizeH*1.5); // left-down corner.
+		
+		for(int w = 0; w<3; w++)
+		{
+			for(int h=0; h<3; h++)
+			{
+				vec2 screenPosAux = vec2(screenPos_LD.x + pixelSizeW*float(w), screenPos_LD.y + pixelSizeH*float(h));
+				float z_window  = unpackDepthMago(texture2D(depthTex, screenPosAux.xy)); // z_window  is [0.0, 1.0] range depth.
+
+				if(z_window > tolerance)
+				{
+					// is background.
+					backgroundDepthCount += 1;
+				}
+				else
+				{
+					// is object.
+					objectDepthCount += 1;
+				}
+
+				if(backgroundDepthCount > 0 && objectDepthCount > 0)
+				{
+					// is silhouette.
+					gl_FragColor = vec4(0.2, 1.0, 0.3, 1.0);
+					return;
+				}
+				
+			}
+		}
+		
+		return;
+	}
+	
 	float shadow_occlusion = 1.0;
 	float alpha = 0.0;
 	vec4 finalColor;

@@ -1830,12 +1830,6 @@ NeoBuilding.prototype.renderSkin = function(magoManager, shader, renderType)
 
 	var gl = magoManager.sceneState.gl;
 
-	if (renderType === 1 && magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected === this)
-	{
-		// active stencil buffer to draw silhouette.
-		magoManager.renderer.enableStencilBuffer(gl);
-	}
-	
 	magoManager.renderer.currentObjectsRendering.curOctree = this;
 	
 	var currentObjectsRendering = magoManager.renderer.currentObjectsRendering;
@@ -1926,12 +1920,6 @@ NeoBuilding.prototype.renderSkin = function(magoManager, shader, renderType)
 	
 	gl.uniform1i(shader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.
 	skinLego.render(magoManager, renderType, renderTexture, shader, this);
-
-	if (renderType === 1 && magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected === this)
-	{
-		// active stencil buffer to draw silhouette.
-		magoManager.renderer.disableStencilBuffer(gl);
-	}
 };
 
 /**
@@ -1948,12 +1936,6 @@ NeoBuilding.prototype.renderSkin__original = function(magoManager, shader, rende
 	{ return; }
 
 	var gl = magoManager.sceneState.gl;
-
-	if (renderType === 1 && magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected === this)
-	{
-		// active stencil buffer to draw silhouette.
-		magoManager.renderer.enableStencilBuffer(gl);
-	}
 	
 	magoManager.renderer.currentObjectsRendering.curOctree = this;
 	
@@ -2042,12 +2024,6 @@ NeoBuilding.prototype.renderSkin__original = function(magoManager, shader, rende
 	
 	gl.uniform1i(shader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.
 	skinLego.render(magoManager, renderType, renderTexture, shader);
-	
-	if (renderType === 1 && magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected === this)
-	{
-		// active stencil buffer to draw silhouette.
-		magoManager.renderer.disableStencilBuffer(gl);
-	}
 };
 
 /**
@@ -2073,12 +2049,6 @@ NeoBuilding.prototype.renderDetailed = function(magoManager, shader, renderType,
 			renderTexture = true;
 		}
 		else { renderTexture = false; }
-		
-		if (magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected === this)
-		{
-			// active stencil buffer to draw silhouette.
-			magoManager.renderer.enableStencilBuffer(gl);
-		}
 	}
 	//else if (renderType === 2) // No need to do any function.
 	
@@ -2148,16 +2118,6 @@ NeoBuilding.prototype.renderDetailed = function(magoManager, shader, renderType,
 		lowestOctree.lod = 2; // set current lod to octree.
 		if (lowestOctree.renderContent(magoManager, this, renderType, renderTexture, shader, minSize, refMatrixIdxKey, flipYTexCoord))
 		{ octreesRenderedCount++; }
-	}
-	
-	// Finally:
-	if (renderType === 1)
-	{
-		if (magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected === this)
-		{
-			// deactive stencil buffer to draw silhouette.
-			magoManager.renderer.disableStencilBuffer(gl);
-		}
 	}
 	
 	return octreesRenderedCount;

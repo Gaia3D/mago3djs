@@ -701,9 +701,7 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader,
 			
 			processCounterManager.shadowMeshesMadeCount ++;
 		}
-		
-		
-		
+
 		return;
 	}
 	
@@ -784,6 +782,9 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader,
 		}
 
 		gl.drawArrays(gl.TRIANGLES, 0, vertices_count);
+		
+		// some stadistics.
+		magoManager.sceneState.trianglesRenderedCount += vertices_count/3;
 		
 		
 		rendered = true;
