@@ -1070,6 +1070,28 @@ MagoManager.prototype.managePickingProcess = function()
 };
 
 /**
+ * Provisional function.
+ */
+MagoManager.prototype.getSilhouetteDepthFbo = function() 
+{
+	// Provisional function.***
+	// Provisional function.***
+	// Provisional function.***
+	var gl = this.getGl();
+	
+	if (this.silhouetteDepthFboNeo === undefined) { this.silhouetteDepthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
+	if (this.sceneState.drawingBufferWidth[0] !== this.silhouetteDepthFboNeo.width[0] || this.sceneState.drawingBufferHeight[0] !== this.silhouetteDepthFboNeo.height[0])
+	{
+		// move this to onResize.***
+		this.silhouetteDepthFboNeo.deleteObjects(gl);
+		this.silhouetteDepthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
+		this.sceneState.camera.frustum.dirty = true;
+	}
+	
+	return this.silhouetteDepthFboNeo;
+};
+
+/**
  * Main rendering function.
  */
 MagoManager.prototype.doRender = function(frustumVolumenObject) 
@@ -1105,8 +1127,19 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		this.sceneState.camera.frustum.dirty = true;
 	}
 	
+	// test silhouette depthFbo.***
+	//if (frustumVolumenObject.silhouetteDepthFboNeo === undefined) { frustumVolumenObject.silhouetteDepthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
+	//if (this.sceneState.drawingBufferWidth[0] !== frustumVolumenObject.silhouetteDepthFboNeo.width[0] || this.sceneState.drawingBufferHeight[0] !== frustumVolumenObject.silhouetteDepthFboNeo.height[0])
+	//{
+	//	// move this to onResize.***
+	//	frustumVolumenObject.silhouetteDepthFboNeo.deleteObjects(gl);
+	//	frustumVolumenObject.silhouetteDepthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
+	//	this.sceneState.camera.frustum.dirty = true;
+	//}
+	
 
 	this.depthFboNeo = frustumVolumenObject.depthFbo;
+	//this.silhouetteDepthFboNeo = frustumVolumenObject.silhouetteDepthFboNeo;
 	//frustumVolumenObject.depthFbo = this.depthFboNeo;
 	this.depthFboNeo.bind(); 
 	
@@ -1348,6 +1381,7 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 		if (this.currentFrustumIdx === 0)
 		{ this.clearCanvas2D(); }
 		this.drawBuildingNames(this.visibleObjControlerNodes) ;
+		this.canvasDirty = true;
 	}
 	
 	// Do stadistics.
@@ -2211,7 +2245,7 @@ MagoManager.prototype.keyDown = function(key)
 			this.smartTile_f4d_tested = 1;
 			//var projectFolderName = "smartTile_f4d_Korea";
 			//var projectFolderName = "SejongParkJinWoo_20191101";
-			var projectFolderName = "SmartTilesF4D_WorkFolder_LXPark1";
+			var projectFolderName = "SmartTilesF4D_WorkFolder_sejongLX";
 			var fileName = this.readerWriter.geometryDataPath + "/" + projectFolderName + "/" + "smartTile_f4d_indexFile.sii";
 			this.readerWriter.getObjectIndexFileSmartTileF4d(fileName, projectFolderName, this);
 

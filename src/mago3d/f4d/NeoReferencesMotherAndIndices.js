@@ -1027,8 +1027,8 @@ NeoReferencesMotherAndIndices.prototype.render = function(magoManager, neoBuildi
 		{ continue; }
 		
 		// Check renderingFase.
-		if (neoReference.renderingFase === magoManager.renderingFase)
-		{ continue; }
+		//if (neoReference.renderingFase === magoManager.renderingFase)
+		//{ continue; }
 		
 		// Render the referenceObject.
 		if (!neoReference.render(magoManager, neoBuilding, renderType, renderTexture, shader, refMatrixIdxKey, maxSizeToRender))
@@ -1038,16 +1038,6 @@ NeoReferencesMotherAndIndices.prototype.render = function(magoManager, neoBuildi
 
 		// Swap renderingFase.
 		neoReference.swapRenderingFase();
-		
-		
-		if (renderType === 1)
-		{
-			if (magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.OBJECT && magoManager.objectSelected === neoReference)
-			{
-				magoManager.renderer.disableStencilBuffer(gl);
-				gl.disable(gl.POLYGON_OFFSET_FILL);
-			}
-		}
 	}
 	
 	if ((visibleIndices_count - noRenderedsCount)/visibleIndices_count < 0.4)

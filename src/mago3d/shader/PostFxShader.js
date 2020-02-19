@@ -647,6 +647,7 @@ PostFxShader.prototype.createUniformLocals = function(gl, shader, sceneState)
 	shader.oneColor4_loc = gl.getUniformLocation(shader.program, "oneColor4");
 	shader.bApplySsao_loc = gl.getUniformLocation(shader.program, "bApplySsao");
 	shader.bApplyShadow_loc = gl.getUniformLocation(shader.program, "bApplyShadow");
+	shader.bSilhouette_loc = gl.getUniformLocation(shader.program, "bSilhouette");
 	
 	// clippingPlanes.
 	shader.bApplyClippingPlanes_loc = gl.getUniformLocation(shader.program, "bApplyClippingPlanes");

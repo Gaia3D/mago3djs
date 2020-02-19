@@ -269,12 +269,6 @@ NeoReference.prototype.solveReferenceColorOrTexture = function(magoManager, neoB
 	if (selectionManager.parentSelected && magoManager.objectSelected === this)
 	{
 		referenceObjectIsSelected = true;
-		
-		if (magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.OBJECT) 
-		{
-			// Active stencil if the object is selected.
-			magoManager.renderer.enableStencilBuffer(gl);
-		}
 	}
 	
 	// Check the color or texture of reference object.

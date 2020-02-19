@@ -1470,21 +1470,21 @@ void main()\n\
 		discard;\n\
 	}\n\
 \n\
-	bool testBool = false;\n\
+	//bool testBool = false;\n\
 	float occlusion = 1.0; // ambient occlusion.***\n\
 	float shadow_occlusion = 1.0;\n\
 	vec3 normal2 = vNormal;	\n\
 		\n\
 	if(bApplySsao)\n\
 	{        \n\
-		//float farForDepth = 30000.0;\n\
+		////float farForDepth = 30000.0;\n\
 		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
 		float linearDepth = getDepth(screenPos);  \n\
 		vec3 ray = getViewRay(screenPos); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
 		vec3 origin = ray * linearDepth;  \n\
 		float tolerance = radius/far; // original.***\n\
-		//float tolerance = radius/(far-near);// test.***\n\
-		//float tolerance = radius/farForDepth;\n\
+		////float tolerance = radius/(far-near);// test.***\n\
+		////float tolerance = radius/farForDepth;\n\
 \n\
 		vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
 		vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
@@ -1499,12 +1499,11 @@ void main()\n\
 			offset.xy /= offset.w;\n\
 			offset.xy = offset.xy * 0.5 + 0.5;  				\n\
 			float sampleDepth = -sample.z/far;// original.***\n\
-			//float sampleDepth = -sample.z/(far-near);// test.***\n\
-			//float sampleDepth = -sample.z/farForDepth;\n\
+			////float sampleDepth = -sample.z/(far-near);// test.***\n\
+			////float sampleDepth = -sample.z/farForDepth;\n\
 \n\
 			float depthBufferValue = getDepth(offset.xy);\n\
 \n\
-			//if(depthBufferValue > 0.003914 && depthBufferValue < 0.003924)\n\
 			if(depthBufferValue > 0.00391 && depthBufferValue < 0.00393)\n\
 			{\n\
 				if (depthBufferValue < sampleDepth-tolerance*1000.0)\n\
@@ -1522,12 +1521,8 @@ void main()\n\
 		} \n\
 \n\
 		occlusion = 1.0 - occlusion / float(kernelSize);	\n\
-		\n\
 	}\n\
 	\n\
-	//if(occlusion > 0.93)\n\
-	//occlusion = 1.0;\n\
-\n\
     // Do specular lighting.***\n\
 	float lambertian;\n\
 	float specular;\n\
@@ -1634,11 +1629,6 @@ void main()\n\
 	\n\
 	vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);\n\
 	float alfa = textureColor.w * externalAlpha;\n\
-	\n\
-	// test render by depth.************************************************************\n\
-	//if(testBool)\n\
-	//textureColor = vec4(0.8, 0.85, 0.9, 1.0);\n\
-	// End test.------------------------------------------------------------------------\n\
 \n\
     vec4 finalColor;\n\
 	if(applySpecLighting> 0.0)\n\
@@ -1651,8 +1641,8 @@ void main()\n\
 		finalColor = vec4((textureColor.xyz) * occlusion * shadow_occlusion, alfa);\n\
 	}\n\
 	\n\
-	if(testBool)\n\
-	finalColor *= vec4(0.99, 0.33, 0.32, 1.0);\n\
+	//if(testBool)\n\
+	//finalColor *= vec4(0.99, 0.33, 0.32, 1.0);\n\
 	\n\
 	finalColor *= colorMultiplier;\n\
 \n\
@@ -2677,14 +2667,13 @@ uniform mat4 projectionMatrixInv;\n\
 uniform vec3 encodedCameraPositionMCHigh;\n\
 uniform vec3 encodedCameraPositionMCLow;\n\
 uniform bool bApplyShadow;\n\
+uniform bool bSilhouette;\n\
 uniform mat4 sunMatrix[2]; \n\
 uniform vec3 sunPosHIGH[2];\n\
 uniform vec3 sunPosLOW[2];\n\
 uniform int sunIdx;\n\
 uniform float screenWidth;    \n\
 uniform float screenHeight;   \n\
-//uniform float shadowMapWidth;    \n\
-//uniform float shadowMapHeight;\n\
 uniform float near;\n\
 uniform float far;\n\
 uniform float fov;\n\
@@ -2698,6 +2687,13 @@ float unpackDepth(vec4 packedDepth)\n\
 	// http://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/\n\
 	return dot(packedDepth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
 }\n\
+\n\
+float unpackDepthMago(const in vec4 rgba_depth)\n\
+{\n\
+    const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);// original.***\n\
+    float depth = dot(rgba_depth, bit_shift);\n\
+    return depth;\n\
+} \n\
 \n\
 float UnpackDepth32( in vec4 pack )\n\
 {\n\
@@ -2771,6 +2767,52 @@ bool isInShadow(vec4 pointWC, int currSunIdx)\n\
 \n\
 void main()\n\
 {\n\
+	// 1rst, check if this is silhouette rendering.\n\
+	if(bSilhouette)\n\
+	{\n\
+		// Check the adjacent pixels to decide if this is silhouette.\n\
+		// Analize a 5x5 rectangle of the depthTexture: if there are objectDepth & backgroundDepth => is silhouette.\n\
+		float pixelSizeW = 1.0/screenWidth;\n\
+		float pixelSizeH = 1.0/screenHeight;\n\
+		int objectDepthCount = 0;\n\
+		int backgroundDepthCount = 0;\n\
+		float tolerance = 0.9963;\n\
+		tolerance = 0.9963;\n\
+		\n\
+		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight); // centerPos.\n\
+		vec2 screenPos_LD = vec2(screenPos.x - pixelSizeW*1.5, screenPos.y - pixelSizeH*1.5); // left-down corner.\n\
+		\n\
+		for(int w = 0; w<3; w++)\n\
+		{\n\
+			for(int h=0; h<3; h++)\n\
+			{\n\
+				vec2 screenPosAux = vec2(screenPos_LD.x + pixelSizeW*float(w), screenPos_LD.y + pixelSizeH*float(h));\n\
+				float z_window  = unpackDepthMago(texture2D(depthTex, screenPosAux.xy)); // z_window  is [0.0, 1.0] range depth.\n\
+\n\
+				if(z_window > tolerance)\n\
+				{\n\
+					// is background.\n\
+					backgroundDepthCount += 1;\n\
+				}\n\
+				else\n\
+				{\n\
+					// is object.\n\
+					objectDepthCount += 1;\n\
+				}\n\
+\n\
+				if(backgroundDepthCount > 0 && objectDepthCount > 0)\n\
+				{\n\
+					// is silhouette.\n\
+					gl_FragColor = vec4(0.2, 1.0, 0.3, 1.0);\n\
+					return;\n\
+				}\n\
+				\n\
+			}\n\
+		}\n\
+		\n\
+		return;\n\
+	}\n\
+	\n\
 	float shadow_occlusion = 1.0;\n\
 	float alpha = 0.0;\n\
 	vec4 finalColor;\n\

@@ -1271,6 +1271,13 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		bytesReaded = eulerAngDeg.readDataFromBuffer(dataArrayBuffer, bytesReaded);
 		data.rotationsDegree = eulerAngDeg; 
 		
+		// New 20200218.***
+		var dataId = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+		var dataGroupId = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+		var endMark = (new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
+		node.data.dataId = dataId;
+		node.data.dataGroupId = dataGroupId;
+		
 		// finally put the node into smartTile.
 		//this.putNode(this.depth, node, magoManager);
 		node.data.smartTileOwner = this;

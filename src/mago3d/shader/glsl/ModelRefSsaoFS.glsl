@@ -142,21 +142,21 @@ void main()
 		discard;
 	}
 
-	bool testBool = false;
+	//bool testBool = false;
 	float occlusion = 1.0; // ambient occlusion.***
 	float shadow_occlusion = 1.0;
 	vec3 normal2 = vNormal;	
 		
 	if(bApplySsao)
 	{        
-		//float farForDepth = 30000.0;
+		////float farForDepth = 30000.0;
 		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
 		float linearDepth = getDepth(screenPos);  
 		vec3 ray = getViewRay(screenPos); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
 		vec3 origin = ray * linearDepth;  
 		float tolerance = radius/far; // original.***
-		//float tolerance = radius/(far-near);// test.***
-		//float tolerance = radius/farForDepth;
+		////float tolerance = radius/(far-near);// test.***
+		////float tolerance = radius/farForDepth;
 
 		vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;
 		vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));
@@ -171,12 +171,11 @@ void main()
 			offset.xy /= offset.w;
 			offset.xy = offset.xy * 0.5 + 0.5;  				
 			float sampleDepth = -sample.z/far;// original.***
-			//float sampleDepth = -sample.z/(far-near);// test.***
-			//float sampleDepth = -sample.z/farForDepth;
+			////float sampleDepth = -sample.z/(far-near);// test.***
+			////float sampleDepth = -sample.z/farForDepth;
 
 			float depthBufferValue = getDepth(offset.xy);
 
-			//if(depthBufferValue > 0.003914 && depthBufferValue < 0.003924)
 			if(depthBufferValue > 0.00391 && depthBufferValue < 0.00393)
 			{
 				if (depthBufferValue < sampleDepth-tolerance*1000.0)
@@ -194,12 +193,8 @@ void main()
 		} 
 
 		occlusion = 1.0 - occlusion / float(kernelSize);	
-		
 	}
 	
-	//if(occlusion > 0.93)
-	//occlusion = 1.0;
-
     // Do specular lighting.***
 	float lambertian;
 	float specular;
@@ -306,11 +301,6 @@ void main()
 	
 	vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);
 	float alfa = textureColor.w * externalAlpha;
-	
-	// test render by depth.************************************************************
-	//if(testBool)
-	//textureColor = vec4(0.8, 0.85, 0.9, 1.0);
-	// End test.------------------------------------------------------------------------
 
     vec4 finalColor;
 	if(applySpecLighting> 0.0)
@@ -323,8 +313,8 @@ void main()
 		finalColor = vec4((textureColor.xyz) * occlusion * shadow_occlusion, alfa);
 	}
 	
-	if(testBool)
-	finalColor *= vec4(0.99, 0.33, 0.32, 1.0);
+	//if(testBool)
+	//finalColor *= vec4(0.99, 0.33, 0.32, 1.0);
 	
 	finalColor *= colorMultiplier;
 
