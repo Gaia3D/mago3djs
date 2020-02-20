@@ -667,53 +667,56 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 	// Check if there are a object selected.**********************************************************************
 	if (magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.OBJECT && magoManager.objectSelected)
 	{
-		var node = magoManager.nodeSelected;
-		var geoLocDataManager = node.getNodeGeoLocDataManager();
-		var neoBuilding = magoManager.buildingSelected;
-		var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
-		var neoReferencesMotherAndIndices = magoManager.octreeSelected.neoReferencesMotherAndIndices;
-		var glPrimitive = gl.POINTS;
-		glPrimitive = gl.TRIANGLES;
-		var maxSizeToRender = 0.0;
-		var refMatrixIdxKey = 0;
-		
-		magoManager.currentProcess = CODE.magoCurrentProcess.StencilSilhouetteRendering;
-		
-		// do as the "getSelectedObjectPicking".**********************************************************
-		var silhouetteDepthFbo = magoManager.getSilhouetteDepthFbo();
-		silhouetteDepthFbo.bind(); 
-			
-		if (magoManager.isFarestFrustum())
+		if (magoManager.objectSelected instanceof NeoReference) 
 		{
-			gl.clearColor(0, 0, 0, 1);
-			gl.clearDepth(1);
-			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-		}
+			var node = magoManager.nodeSelected;
+			var geoLocDataManager = node.getNodeGeoLocDataManager();
+			var neoBuilding = magoManager.buildingSelected;
+			var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
+			var neoReferencesMotherAndIndices = magoManager.octreeSelected.neoReferencesMotherAndIndices;
+			var glPrimitive = gl.POINTS;
+			glPrimitive = gl.TRIANGLES;
+			var maxSizeToRender = 0.0;
+			var refMatrixIdxKey = 0;
 			
-		var currentShader;
-		currentShader = magoManager.postFxShadersManager.getShader("modelRefDepth"); 
-		currentShader.resetLastBuffersBinded();
+			magoManager.currentProcess = CODE.magoCurrentProcess.StencilSilhouetteRendering;
+			
+			// do as the "getSelectedObjectPicking".**********************************************************
+			var silhouetteDepthFbo = magoManager.getSilhouetteDepthFbo();
+			silhouetteDepthFbo.bind(); 
+				
+			if (magoManager.isFarestFrustum())
+			{
+				gl.clearColor(0, 0, 0, 1);
+				gl.clearDepth(1);
+				gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+			}
+				
+			var currentShader;
+			currentShader = magoManager.postFxShadersManager.getShader("modelRefDepth"); 
+			currentShader.resetLastBuffersBinded();
 
-		currentShader.useProgram();
-		currentShader.disableVertexAttribArrayAll();
-		currentShader.enableVertexAttribArray(currentShader.position3_loc);
+			currentShader.useProgram();
+			currentShader.disableVertexAttribArrayAll();
+			currentShader.enableVertexAttribArray(currentShader.position3_loc);
 
-		currentShader.bindUniformGenerals();
-		gl.uniform3fv(currentShader.scaleLC_loc, [1.0, 1.0, 1.0]); // init referencesMatrix.
-		
-		buildingGeoLocation.bindGeoLocationUniforms(gl, currentShader);
+			currentShader.bindUniformGenerals();
+			gl.uniform3fv(currentShader.scaleLC_loc, [1.0, 1.0, 1.0]); // init referencesMatrix.
+			
+			buildingGeoLocation.bindGeoLocationUniforms(gl, currentShader);
 
-		glPrimitive = gl.TRIANGLES;
-		var localRenderType = 0; // only need positions.***
-		var minSizeToRender = 0.0;
-		var offsetSize = 3/1000;
-		
-		gl.disable(gl.CULL_FACE);
-		
-		magoManager.objectSelected.render(magoManager, neoBuilding, localRenderType, renderTexture, currentShader, refMatrixIdxKey, minSizeToRender);
-		silhouetteDepthFbo.unbind(); 
-		
-		gl.enable(gl.CULL_FACE);
+			glPrimitive = gl.TRIANGLES;
+			var localRenderType = 0; // only need positions.***
+			var minSizeToRender = 0.0;
+			var offsetSize = 3/1000;
+			
+			gl.disable(gl.CULL_FACE);
+			
+			magoManager.objectSelected.render(magoManager, neoBuilding, localRenderType, renderTexture, currentShader, refMatrixIdxKey, minSizeToRender);
+			silhouetteDepthFbo.unbind(); 
+			
+			gl.enable(gl.CULL_FACE);	
+		}
 	}
 };
 

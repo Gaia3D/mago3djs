@@ -62,6 +62,30 @@ Point2DList.prototype.newPoint = function(x, y)
 };
 
 /**
+ * delete Point2D by condition
+ * @param {function} condition must return boolean type
+ */
+Point2DList.prototype.deletePointByCondition = function(condition)
+{	
+	this.pointsArray = this.findPointArray(condition);;
+};
+
+/**
+ * find Point2D by condition
+ * @param {function} condition must return boolean type
+ * @return {Point2DList} return the find point
+ */
+Point2DList.prototype.findPointArray = function(condition)
+{
+	var that = this;
+	var arr = that.pointsArray.filter(function(point)
+	{
+		return condition.call(that, point);
+	});
+
+	return arr;
+};
+/**
  * Search and return the specific feature of Point2D with the index that has at this.pointArray
  * @param {Number} idx the index of the target point at this.pointArray
  * 
