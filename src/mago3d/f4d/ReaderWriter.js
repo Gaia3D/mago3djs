@@ -1665,6 +1665,9 @@ ReaderWriter.prototype.handleTextureLoaded = function(gl, image, texture, flip_y
 {
 	// https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Using_textures_in_WebGL
 	//var gl = viewer.scene.context._gl;
+	texture.imageWidth = image.width;
+	texture.imageHeight = image.height;
+	
 	if (flip_y_texCoord === undefined)
 	{ flip_y_texCoord = true; }
 	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, flip_y_texCoord); // if need vertical mirror of the image.***

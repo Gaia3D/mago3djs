@@ -139,6 +139,7 @@ var SceneState = function()
 	
 	// some stadistics.
 	this.trianglesRenderedCount = 0;
+	this.pointsRenderedCount = 0;
 	this.fps = 0.0;
 	
 };
@@ -148,6 +149,7 @@ var SceneState = function()
 SceneState.prototype.resetStadistics = function() 
 {
 	this.trianglesRenderedCount = 0;
+	this.pointsRenderedCount = 0;
 	this.fps = 0.0;
 };
 
