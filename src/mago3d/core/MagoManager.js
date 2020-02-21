@@ -1994,7 +1994,8 @@ MagoManager.prototype.keyDown = function(key)
 		
 		if (this.counterAux === -1)
 		{
-			this.modeler.mode = CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS;
+			this.modeler.mode = CODE.modelerMode.DRAWING_CYLYNDER;
+			//this.modeler.mode = CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS;
 			//this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
 			this.counterAux++;
 		}
@@ -2030,7 +2031,7 @@ MagoManager.prototype.keyDown = function(key)
 		}
 		else if (this.counterAux === 6)
 		{
-			this.modeler.mode = CODE.modelerMode.DRAWING_FREECONTOURWALL;
+			this.modeler.mode = CODE.modelerMode.DRAWING_FREECONTOURWALL;//
 			this.counterAux = 0;
 		}
 		
@@ -2360,6 +2361,17 @@ MagoManager.prototype.keyDown = function(key)
  * @param gl 변수
  * @param scene 변수
  */
+MagoManager.prototype.TEST__golfPark = function() 
+{
+	// create a golfHoleFlag.
+	
+};
+
+/**
+ * 선택 객체를 asimetric mode 로 이동
+ * @param gl 변수
+ * @param scene 변수
+ */
 MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY) 
 {
 	if (!this.magoPolicy.getMagoEnable()) { return; }
@@ -2428,10 +2440,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		else if (this.modeler.mode === CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS)
 		{
 			geoCoord.makeDefaultGeoLocationData();
-			//var geoLocDataManager = geoCoord.getGeoLocationDataManager();
-			//var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-			//geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+1, undefined, undefined, undefined, geoLocData, this);
-			
+
 			var geoCoordsList = this.modeler.getGeographicCoordsList();
 			geoCoordsList.addGeoCoord(geoCoord);
 		}
@@ -2440,10 +2449,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		else if (this.modeler.mode === CODE.modelerMode.DRAWING_EXCAVATIONPOINTS)
 		{
 			geoCoord.makeDefaultGeoLocationData();
-			//var geoLocDataManager = geoCoord.getGeoLocationDataManager();
-			//var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-			//geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+1, undefined, undefined, undefined, geoLocData, this);
-			
+
 			var excavation = this.modeler.getExcavation();
 			var geoCoordsList = excavation.getGeographicCoordsList();
 			geoCoordsList.addGeoCoord(geoCoord);
@@ -2454,10 +2460,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		else if (this.modeler.mode === CODE.modelerMode.DRAWING_TUNNELPOINTS)
 		{
 			geoCoord.makeDefaultGeoLocationData();
-			//var geoLocDataManager = geoCoord.getGeoLocationDataManager();
-			//var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-			//geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+1, undefined, undefined, undefined, geoLocData, this);
-			
+
 			var tunnel = this.modeler.getTunnel();
 			var geoCoordsList = tunnel.getPathGeographicCoordsList();
 			geoCoordsList.addGeoCoord(geoCoord);
@@ -2468,12 +2471,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		else if (this.modeler.mode === CODE.modelerMode.DRAWING_BSPLINE)
 		{
 			geoCoord.makeDefaultGeoLocationData();
-			// Testing bSpline.***
-			//var geoLocDataManager = geoCoord.getGeoLocationDataManager();
-			//var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-			//geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+1, undefined, undefined, undefined, geoLocData, this);
-			
-			
+
 			if (this.modeler.bSplineCubic3d === undefined)
 			{ this.modeler.bSplineCubic3d = new BSplineCubic3D(); }
 			
@@ -2821,9 +2819,28 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			this.modeler.addObject(freeContourWall, 15);
 			
 		}
+		else if (this.modeler.mode === CODE.modelerMode.DRAWING_CYLYNDER)
+		{
+			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+50, undefined, undefined, undefined, geoLocData, this);
+			
+			var options = {color: {r: 0.2, g: 0.5, b: 0.9, a: 0.5}};
+			
+			var cylinder = new GolfHoleFlag(0.3, 20, options);
+			//var cylinder = new Cylinder(10, 20, options);
+			//cylinder.setOneColor(0.2, 0.5, 0.7, 1.0);
+			cylinder.geoLocDataManager = geoLocDataManager;
+			if (cylinder.attributes === undefined)
+			{ cylinder.attributes = {}; }
+			cylinder.attributes.isMovable = true;
+			
+			this.modeler.addObject(cylinder, 15);
+		}
 	}
 	
 };
+
 MagoManager.prototype.cameraChanged = function(e) 
 {
 	this.emit(MagoManager.EVENT_TYPE.CAMERACHANGED, {

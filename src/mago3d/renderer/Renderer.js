@@ -771,6 +771,9 @@ Renderer.prototype.renderDepthSunPointOfView = function(gl, visibleObjControlerN
 	magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
 	magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
 	
+	// Mago native geometries.
+	this.renderNativeObjects(gl, currentShader, renderType, visibleObjControlerNodes);
+	
 	// tin terrain.***
 	if (magoManager.tinTerrainManager !== undefined)
 	{
