@@ -135,3 +135,20 @@ Color.prototype.setRGBA = function(red, green, blue, alpha)
 	//this[3] = alpha;
 	this.r = red; this.g = green; this.b = blue; this.a = alpha;
 };
+
+/**
+ * return hexCode
+ * @return {string}
+ */
+Color.prototype.getHexCode = function() 
+{
+	var r = this.r * 255;
+	var g = this.g * 255;
+	var b = this.b * 255;
+	
+	var hexR = r.toString(16).padStart(2, '0'); //String.padStart i.e no support..TT 
+	var hexG = g.toString(16).padStart(2, '0');
+	var hexB = b.toString(16).padStart(2, '0');
+	
+	return '#'+hexR+hexG+hexB;
+};
