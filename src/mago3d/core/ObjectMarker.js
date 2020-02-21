@@ -20,6 +20,7 @@ var ObjectMarker = function()
 	
 	this.imageFilePath;
 	this.size2d = new Float32Array([25.0, 25.0]);
+	this.bUseOriginalImageSize = true;
 };
 
 ObjectMarker.prototype.deleteObjects = function() 
