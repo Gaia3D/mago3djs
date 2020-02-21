@@ -57,6 +57,7 @@ TexturesStore.prototype.getGl = function()
 
 function isPowerOf2(number) 
 {
+	// Returns if the number is powerOf2.***
 	return (Math.log(number)/Math.log(2)) % 1 === 0;
 };
 
