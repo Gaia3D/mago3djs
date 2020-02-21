@@ -97,18 +97,21 @@ ObjectMarkerManager.prototype.newObjectMarker = function(options, magoManager)
 			objMarker.imageFilePathSelected = options.imageFilePathSelected;
 		}
 		
-		if (options.sizeX)
+		if (options.sizeX && options.sizeY)
 		{
 			if (objMarker.size2d === undefined)
 			{ objMarker.size2d = new Float32Array([25.0, 25.0]); }
 			objMarker.size2d[0] = options.sizeX;
-		}
-		
-		if (options.sizeY)
-		{
+			
 			if (objMarker.size2d === undefined)
 			{ objMarker.size2d = new Float32Array([25.0, 25.0]); }
 			objMarker.size2d[1] = options.sizeY;
+			
+			objMarker.bUseOriginalImageSize = false;
+		}
+		else
+		{
+			objMarker.bUseOriginalImageSize = true;
 		}
 	}
 	
@@ -213,8 +216,10 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 				{
 					gl.uniform2fv(shader.scale2d_loc, [1.0, 1.0]);
 				}
-				
-				gl.uniform2fv(shader.size2d_loc, objMarker.size2d);
+				gl.uniform1i(shader.bUseOriginalImageSize_loc, objMarker.bUseOriginalImageSize);
+				if (!objMarker.bUseOriginalImageSize)
+				{ gl.uniform2fv(shader.size2d_loc, objMarker.size2d); }
+			
 				gl.uniform2fv(shader.imageSize_loc, [currentTexture.texId.imageWidth, currentTexture.texId.imageHeight]);
 				
 				var objMarkerGeoLocation = objMarker.geoLocationData;
