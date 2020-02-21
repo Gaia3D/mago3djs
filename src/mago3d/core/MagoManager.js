@@ -1401,7 +1401,7 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 
 		this.stadisticsDisplayed+= 1;
 		
-		if (this.stadisticsDisplayed > 15)
+		if (this.stadisticsDisplayed > 5)
 		{ this.stadisticsDisplayed = 0; }
 	
 		this.canvasDirty = true;
@@ -1486,8 +1486,11 @@ MagoManager.prototype.drawStadistics = function()
 	ctx.strokeText("Triangles : " + sceneState.trianglesRenderedCount, screenCoord.x, screenCoord.y);
 	ctx.fillText("Triangles : " + sceneState.trianglesRenderedCount, screenCoord.x, screenCoord.y);
 	
-	ctx.strokeText("FPS : " + sceneState.fps, screenCoord.x, screenCoord.y+30);
-	ctx.fillText("FPS : " + sceneState.fps, screenCoord.x, screenCoord.y+30);
+	ctx.strokeText("Points : " + sceneState.pointsRenderedCount, screenCoord.x, screenCoord.y + 30);
+	ctx.fillText("Points : " + sceneState.pointsRenderedCount, screenCoord.x, screenCoord.y + 30);
+	
+	ctx.strokeText("FPS : " + sceneState.fps, screenCoord.x, screenCoord.y+60);
+	ctx.fillText("FPS : " + sceneState.fps, screenCoord.x, screenCoord.y+60);
 
 	ctx.restore(); 
 };
@@ -2137,10 +2140,10 @@ MagoManager.prototype.keyDown = function(key)
 		*/
 		
 		
-		//if (this.magoPolicy.issueInsertEnable)
-		//{ this.magoPolicy.issueInsertEnable = false; }
-		//else
-		//{ this.magoPolicy.issueInsertEnable = true; }
+		if (this.magoPolicy.issueInsertEnable)
+		{ this.magoPolicy.issueInsertEnable = false; }
+		else
+		{ this.magoPolicy.issueInsertEnable = true; }
 		
 		
 		// Stencil shadow mesh making test.********************
@@ -4523,6 +4526,8 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
 	shader.scale2d_loc = gl.getUniformLocation(shader.program, "scale2d");
 	shader.size2d_loc = gl.getUniformLocation(shader.program, "size2d");
+	shader.imageSize_loc = gl.getUniformLocation(shader.program, "imageSize");
+	shader.bUseOriginalImageSize_loc = gl.getUniformLocation(shader.program, "bUseOriginalImageSize");
 };
 
 /**

@@ -3,15 +3,19 @@ attribute vec2 texCoord;
 uniform mat4 buildingRotMatrix;
 uniform mat4 modelViewMatrixRelToEye;  
 uniform mat4 ModelViewProjectionMatrixRelToEye;  
+uniform mat4 projectionMatrix;
 uniform vec3 buildingPosHIGH;
 uniform vec3 buildingPosLOW;
 uniform vec3 encodedCameraPositionMCHigh;
 uniform vec3 encodedCameraPositionMCLow;
 uniform vec2 scale2d;
 uniform vec2 size2d;
-//uniform float screenWidth;    
-//uniform float screenHeight;
+uniform vec2 imageSize;
+uniform float screenWidth;    
+uniform float screenHeight;
+uniform bool bUseOriginalImageSize;
 varying vec2 v_texcoord;
+varying vec2 imageSizeInPixels;
 
 void main()
 {
@@ -22,6 +26,8 @@ void main()
     vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;
     vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;
     vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);
+	
+	//imageSizeInPixels = vec2(imageSize.x, imageSize.y);
 	
 	float order_w = position.w;
 	float sense = 1.0;
@@ -52,12 +58,27 @@ void main()
     v_texcoord = texCoord;
 	vec4 projected = ModelViewProjectionMatrixRelToEye * pos4;
 	vec4 projected2 = modelViewMatrixRelToEye * pos4;
+	
+	// Now, calculate the pixelSize in the plane of the projected point.
+	float pixelWidthRatio = 2. / (screenWidth * projectionMatrix[0][0]);
+	float pixelWidth = projected.w * pixelWidthRatio;
+	
 	float thickness = 30.0;
 	vec4 offset;
 	//float projectedDepth = projected.w;
-	float projectedDepth = -projected2.z;
-	float offsetX = (size2d.x*projectedDepth)/1000.0;
-	float offsetY = (size2d.y*projectedDepth)/1000.0;
+	//float projectedDepth = -projected2.z;
+	float offsetX;// = (size2d.x*projectedDepth)/1000.0;
+	float offsetY;// = (size2d.y*projectedDepth)/1000.0;
+	if(bUseOriginalImageSize)
+	{
+		offsetX = pixelWidth*imageSize.x/2.0;
+		offsetY = pixelWidth*imageSize.y/2.0;
+	}
+	else{
+		offsetX = pixelWidth*size2d.x/2.0;
+		offsetY = pixelWidth*size2d.y/2.0;
+	}
+	
 	// Offset our position along the normal
 	if(orderInt == 1)
 	{
@@ -78,3 +99,35 @@ void main()
 
 	gl_Position = projected + offset; 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
