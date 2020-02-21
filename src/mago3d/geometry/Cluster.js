@@ -63,6 +63,14 @@ Cluster.prototype.updatePoint = function(point, findOption)
 {
 	var findPoint = this.point2DList.findPointArray(findOption)[0];
 	findPoint.set(point.getX(), point.getY());
+	var keys = Object.keys(findPoint);
+
+	for (var i=0, len=keys.length;i<len;i++) 
+	{
+		var key = keys[i];
+		findPoint[key] = point[key];
+	}
+
 	this.initQuatTree();
 };
 

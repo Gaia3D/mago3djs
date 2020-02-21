@@ -179,6 +179,7 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 		gl.uniform1i(shader.bUseOriginalImageSize_loc, true);
 		
 		gl.depthMask(false);
+		gl.disable(gl.BLEND);
 		var selectionManager = magoManager.selectionManager;
 		var lastTexId = undefined;
 		if (renderType === 1)
@@ -258,6 +259,7 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 			gl.enable(gl.BLEND);
 		}
 		
+		gl.enable(gl.BLEND);
 		gl.depthRange(0, 1);
 		gl.depthMask(true);
 		gl.useProgram(null);
