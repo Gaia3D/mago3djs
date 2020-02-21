@@ -1,0 +1,307 @@
+{  
+   "attributes":{  
+      "isPhysical":false,
+      "nodeType":"root",
+      "projectType":"test",
+      "specularLighting":true
+   },
+   "children":[  
+      {  
+         "attributes":{  
+            "isPhysical":true,
+            "nodeType":"test"
+         },
+         "children":[  
+
+         ],
+         "data_key":"KSJ_100_0_0",
+         "data_name":"KSJ_100_0_0",
+         "mapping_type":"origin",
+		 "latitude" : 37.5665,
+		 "longitude" : 126.9780,
+         "height":0,
+         "heading":0,
+         "pitch":0,
+         "roll": 0
+      },
+	  {  
+         "attributes":{  
+            "isPhysical":true,
+            "nodeType":"test"
+         },
+         "children":[  
+
+         ],
+         "data_key":"KSJ_100_0_1",
+         "data_name":"KSJ_100_0_1",
+         "mapping_type":"origin",
+		 "latitude" : 37.5665,
+		 "longitude" : 126.9780,
+         "height":0,
+         "heading":0,
+         "pitch":0,
+         "roll": 0
+      },
+	  {  
+         "attributes":{  
+            "isPhysical":true,
+            "nodeType":"test"
+         },
+         "children":[  
+
+         ],
+         "data_key":"KSJ_100_0_2",
+         "data_name":"KSJ_100_0_2",
+         "mapping_type":"origin",
+		 "latitude" : 37.5665,
+		 "longitude" : 126.9780,
+         "height":0,
+         "heading":0,
+         "pitch":0,
+         "roll": 0
+      },
+	  {  
+         "attributes":{  
+            "isPhysical":true,
+            "nodeType":"test"
+         },
+         "children":[  
+
+         ],
+         "data_key":"KSJ_100_0_3",
+         "data_name":"KSJ_100_0_3",
+         "mapping_type":"origin",
+		 "latitude" : 37.5665,
+		 "longitude" : 126.9780,
+         "height":0,
+         "heading":0,
+         "pitch":0,
+         "roll": 0
+      },
+	  {  
+         "attributes":{  
+            "isPhysical":true,
+            "nodeType":"test"
+         },
+         "children":[  
+
+         ],
+         "data_key":"KSJ_100_1_0",
+         "data_name":"KSJ_100_1_0",
+         "mapping_type":"origin",
+		 "latitude" : 37.5665,
+		 "longitude" : 126.9780,
+         "height":0,
+         "heading":0,
+         "pitch":0,
+         "roll": 0
+      },
+	  {  
+         "attributes":{  
+            "isPhysical":true,
+            "nodeType":"test"
+         },
+         "children":[  
+
+         ],
+         "data_key":"KSJ_100_1_1",
+         "data_name":"KSJ_100_1_1",
+         "mapping_type":"origin",
+		 "latitude" : 37.5665,
+		 "longitude" : 126.9780,
+         "height":0,
+         "heading":0,
+         "pitch":0,
+         "roll": 0
+      },
+	  {  
+         "attributes":{  
+            "isPhysical":true,
+            "nodeType":"test"
+         },
+         "children":[  
+
+         ],
+         "data_key":"KSJ_100_1_2",
+         "data_name":"KSJ_100_1_2",
+         "mapping_type":"origin",
+		 "latitude" : 37.5665,
+		 "longitude" : 126.9780,
+         "height":0,
+         "heading":0,
+         "pitch":0,
+         "roll": 0
+      },
+	  {  
+         "attributes":{  
+            "isPhysical":true,
+            "nodeType":"test"
+         },
+         "children":[  
+
+         ],
+         "data_key":"KSJ_100_1_3",
+         "data_name":"KSJ_100_1_3",
+         "mapping_type":"origin",
+		 "latitude" : 37.5665,
+		 "longitude" : 126.9780,
+         "height":0,
+         "heading":0,
+         "pitch":0,
+         "roll": 0
+      },
+	  {  
+         "attributes":{  
+            "isPhysical":true,
+            "nodeType":"test"
+         },
+         "children":[  
+
+         ],
+         "data_key":"KSJ_100_1_4",
+         "data_name":"KSJ_100_1_4",
+         "mapping_type":"origin",
+		 "latitude" : 37.5665,
+		 "longitude" : 126.9780,
+         "height":0,
+         "heading":0,
+         "pitch":0,
+         "roll": 0
+      },
+	  {  
+         "attributes":{  
+            "isPhysical":true,
+            "nodeType":"test"
+         },
+         "children":[  
+
+         ],
+         "data_key":"KSJ_100_2_0",
+         "data_name":"KSJ_100_2_0",
+         "mapping_type":"origin",
+		 "latitude" : 37.5665,
+		 "longitude" : 126.9780,
+         "height":0,
+         "heading":0,
+         "pitch":0,
+         "roll": 0
+      },
+	  {  
+         "attributes":{  
+            "isPhysical":true,
+            "nodeType":"test"
+         },
+         "children":[  
+
+         ],
+         "data_key":"KSJ_100_2_1",
+         "data_name":"KSJ_100_2_1",
+         "mapping_type":"origin",
+		 "latitude" : 37.5665,
+		 "longitude" : 126.9780,
+         "height":0,
+         "heading":0,
+         "pitch":0,
+         "roll": 0
+      }
+	  ,
+	  {  
+         "attributes":{  
+            "isPhysical":true,
+            "nodeType":"test"
+         },
+         "children":[  
+
+         ],
+         "data_key":"KSJ_100_2_2",
+         "data_name":"KSJ_100_2_2",
+         "mapping_type":"origin",
+		 "latitude" : 37.5665,
+		 "longitude" : 126.9780,
+         "height":0,
+         "heading":0,
+         "pitch":0,
+         "roll": 0
+      }
+	  ,
+	  {  
+         "attributes":{  
+            "isPhysical":true,
+            "nodeType":"test"
+         },
+         "children":[  
+
+         ],
+         "data_key":"KSJ_100_2_3",
+         "data_name":"KSJ_100_2_3",
+         "mapping_type":"origin",
+		 "latitude" : 37.5665,
+		 "longitude" : 126.9780,
+         "height":0,
+         "heading":0,
+         "pitch":0,
+         "roll": 0
+      }
+	  ,
+	  {  
+         "attributes":{  
+            "isPhysical":true,
+            "nodeType":"test"
+         },
+         "children":[  
+
+         ],
+         "data_key":"KSJ_100_2_4",
+         "data_name":"KSJ_100_2_4",
+         "mapping_type":"origin",
+		 "latitude" : 37.5665,
+		 "longitude" : 126.9780,
+         "height":0,
+         "heading":0,
+         "pitch":0,
+         "roll": 0
+      },
+	  {  
+         "attributes":{  
+            "isPhysical":true,
+            "nodeType":"test"
+         },
+         "children":[  
+
+         ],
+         "data_key":"KSJ_100_3_0",
+         "data_name":"KSJ_100_3_0",
+         "mapping_type":"origin",
+		 "latitude" : 37.5665,
+		 "longitude" : 126.9780,
+         "height":0,
+         "heading":0,
+         "pitch":0,
+         "roll": 0
+      },
+	  {  
+         "attributes":{  
+            "isPhysical":true,
+            "nodeType":"test"
+         },
+         "children":[  
+
+         ],
+         "data_key":"KSJ_100_3_1",
+         "data_name":"KSJ_100_3_1",
+         "mapping_type":"origin",
+		 "latitude" : 37.5665,
+		 "longitude" : 126.9780,
+         "height":0,
+         "heading":0,
+         "pitch":0,
+         "roll": 0
+      }
+   ],
+   "parent":0,
+   "depth":1,
+   "view_order":2,
+   "data_key":"test",
+   "data_name":"test",
+   "mapping_type":"origin"
+}
