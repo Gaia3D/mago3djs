@@ -5,6 +5,9 @@ uniform sampler2D u_texture;
 uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.
 uniform vec4 oneColor4;
 
+
+varying vec2 imageSizeInPixels;
+
 void main()
 {
     vec4 textureColor;

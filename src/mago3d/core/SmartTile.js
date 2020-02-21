@@ -1216,9 +1216,18 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 			"objectType" : "basicF4d"
 		};
 		
+
 		var projectFolderName = smartTilePathInfo[projectId].projectFolderPath;
 		var savedProjectId = smartTilePathInfo[projectId].projectId;
-		var node = hierarchyManager.newNode(buildingId, savedProjectId, attributes);
+		
+		// Now, must check if the node exists.
+		var node = hierarchyManager.getNodeByDataKey(savedProjectId, buildingId);
+		if (!node)
+		{ 
+			node = hierarchyManager.newNode(buildingId, savedProjectId, attributes); 
+		}
+		
+
 		var data = node.data;
 
 		data.projectFolderName = projectFolderName;

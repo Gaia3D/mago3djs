@@ -19,6 +19,8 @@ var Texture = function()
 	this.texId; // webGlTexture.
 	this.fileLoadState = CODE.fileLoadState.READY;
 	this.imageBinaryData;
+	this.imageWidth = 32;
+	this.imageHeight = 32;
 };
 
 /**

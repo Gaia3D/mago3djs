@@ -248,6 +248,8 @@ Renderer.prototype.renderPCloud = function(gl, pCloud, magoManager, shader, rend
 		
 		gl.drawArrays(gl.POINTS, 0, pointsCountToDraw);
 		
+		magoManager.sceneState.pointsRenderedCount += pointsCountToDraw;
+		
 	}
 	
 	
@@ -1622,6 +1624,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			gl.uniform1i(currentShader.refMatrixType_loc, 0); // init referencesMatrix.
 			gl.uniform3fv(currentShader.scaleLC_loc, [1.0, 1.0, 1.0]); // init local scale.
 			gl.uniform4fv(currentShader.colorMultiplier_loc, [1.0, 1.0, 1.0, 1.0]);
+			gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.
 			
 			// Test sphericalKernel for ssao.************************
 			//gl.uniform3fv(currentShader.kernel32_loc, magoManager.sceneState.ssaoSphereKernel32);

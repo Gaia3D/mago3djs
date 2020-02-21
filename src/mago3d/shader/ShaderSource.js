@@ -1875,6 +1875,9 @@ uniform sampler2D u_texture;\n\
 uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
 uniform vec4 oneColor4;\n\
 \n\
+\n\
+varying vec2 imageSizeInPixels;\n\
+\n\
 void main()\n\
 {\n\
     vec4 textureColor;\n\
@@ -1905,15 +1908,19 @@ attribute vec2 texCoord;\n\
 uniform mat4 buildingRotMatrix;\n\
 uniform mat4 modelViewMatrixRelToEye;  \n\
 uniform mat4 ModelViewProjectionMatrixRelToEye;  \n\
+uniform mat4 projectionMatrix;\n\
 uniform vec3 buildingPosHIGH;\n\
 uniform vec3 buildingPosLOW;\n\
 uniform vec3 encodedCameraPositionMCHigh;\n\
 uniform vec3 encodedCameraPositionMCLow;\n\
 uniform vec2 scale2d;\n\
 uniform vec2 size2d;\n\
-//uniform float screenWidth;    \n\
-//uniform float screenHeight;\n\
+uniform vec2 imageSize;\n\
+uniform float screenWidth;    \n\
+uniform float screenHeight;\n\
+uniform bool bUseOriginalImageSize;\n\
 varying vec2 v_texcoord;\n\
+varying vec2 imageSizeInPixels;\n\
 \n\
 void main()\n\
 {\n\
@@ -1924,6 +1931,8 @@ void main()\n\
     vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
     vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
     vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+	\n\
+	//imageSizeInPixels = vec2(imageSize.x, imageSize.y);\n\
 	\n\
 	float order_w = position.w;\n\
 	float sense = 1.0;\n\
@@ -1954,12 +1963,27 @@ void main()\n\
     v_texcoord = texCoord;\n\
 	vec4 projected = ModelViewProjectionMatrixRelToEye * pos4;\n\
 	vec4 projected2 = modelViewMatrixRelToEye * pos4;\n\
+	\n\
+	// Now, calculate the pixelSize in the plane of the projected point.\n\
+	float pixelWidthRatio = 2. / (screenWidth * projectionMatrix[0][0]);\n\
+	float pixelWidth = projected.w * pixelWidthRatio;\n\
+	\n\
 	float thickness = 30.0;\n\
 	vec4 offset;\n\
 	//float projectedDepth = projected.w;\n\
-	float projectedDepth = -projected2.z;\n\
-	float offsetX = (size2d.x*projectedDepth)/1000.0;\n\
-	float offsetY = (size2d.y*projectedDepth)/1000.0;\n\
+	//float projectedDepth = -projected2.z;\n\
+	float offsetX;// = (size2d.x*projectedDepth)/1000.0;\n\
+	float offsetY;// = (size2d.y*projectedDepth)/1000.0;\n\
+	if(bUseOriginalImageSize)\n\
+	{\n\
+		offsetX = pixelWidth*imageSize.x/2.0;\n\
+		offsetY = pixelWidth*imageSize.y/2.0;\n\
+	}\n\
+	else{\n\
+		offsetX = pixelWidth*size2d.x/2.0;\n\
+		offsetY = pixelWidth*size2d.y/2.0;\n\
+	}\n\
+	\n\
 	// Offset our position along the normal\n\
 	if(orderInt == 1)\n\
 	{\n\
@@ -1980,6 +2004,38 @@ void main()\n\
 \n\
 	gl_Position = projected + offset; \n\
 }\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
 ";
 ShaderSource.PointCloudDepthFS = "#ifdef GL_ES\n\
 precision highp float;\n\
