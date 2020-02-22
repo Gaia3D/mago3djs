@@ -32,7 +32,15 @@ ObjectMarkerManager.prototype.deleteObjects = function()
 	}
 	this.objectMarkerArray = [];
 };
-
+ObjectMarkerManager.prototype.setMarkerByCondition = function(condition)
+{
+	var that = this;
+	var arr = that.objectMarkerArray.filter(function(om)
+	{
+		return condition.call(that, om);
+	});
+	that.objectMarkerArray = arr;
+};
 /**
  * start rendering.
  * @param scene 변수
