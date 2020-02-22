@@ -20,6 +20,7 @@ var MagoRenderable = function(options)
 	
 	this.dirty = true;
 	this.color4;
+	this.wireframeColor4;
 	this.selectedColor4;
 
 	this.eventObject = {};
@@ -167,8 +168,10 @@ MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPr
 			var sceneState = magoManager.sceneState;
 			var drawingBufferWidth = sceneState.drawingBufferWidth;
 			var drawingBufferHeight = sceneState.drawingBufferHeight;
-			
-			gl.uniform4fv(shaderThickLine.color_loc, [0.6, 0.8, 0.9, 1.0]);
+			if (this.wireframeColor4)
+			{ gl.uniform4fv(shaderThickLine.color_loc, [this.wireframeColor4.r, this.wireframeColor4.g, this.wireframeColor4.b, this.wireframeColor4.a]); }
+			else
+			{ gl.uniform4fv(shaderThickLine.color_loc, [0.6, 0.8, 0.9, 1.0]); }
 			gl.uniform2fv(shaderThickLine.viewport_loc, [drawingBufferWidth[0], drawingBufferHeight[0]]);
 
 			this.renderAsChild(magoManager, shaderThickLine, renderType, glPrimitive, bIsSelected, this.options);
