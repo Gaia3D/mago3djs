@@ -2458,7 +2458,9 @@ MagoManager.prototype.keyDown = function(key)
 			"OBS-QWM_2016062012.grib2_wind_000", "OBS-QWM_2016062013.grib2_wind_000", "OBS-QWM_2016062014.grib2_wind_000", "OBS-QWM_2016062015.grib2_wind_000",
 			"OBS-QWM_2016062016.grib2_wind_000", "OBS-QWM_2016062017.grib2_wind_000", "OBS-QWM_2016062018.grib2_wind_000", "OBS-QWM_2016062019.grib2_wind_000",
 			"OBS-QWM_2016062020.grib2_wind_000", "OBS-QWM_2016062021.grib2_wind_000", "OBS-QWM_2016062022.grib2_wind_000", "OBS-QWM_2016062023.grib2_wind_000"];
-		var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_GolfPark";
+			
+		//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_Airport";
+		var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_GolfPark_NineBridge1";
 		
 		this.weatherStation.test_loadWindData3d(this, windDataFilesNamesArray, windMapFilesFolderPath);
 
@@ -2554,7 +2556,7 @@ MagoManager.prototype.mouseActionRightClick = function(mouseX, mouseY)
 		{
 			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
 			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+50, undefined, undefined, undefined, geoLocData, this);
+			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+40, undefined, undefined, undefined, geoLocData, this);
 			
 			var options = {color: {r: 0.2, g: 0.5, b: 0.9, a: 0.5}};
 			

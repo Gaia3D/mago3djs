@@ -841,7 +841,8 @@ void main() {\n\
 	\n\
 	vec3 buildingPos = buildingPosHIGH + buildingPosLOW;\n\
 	float radius = length(buildingPos);\n\
-	float xOffset = (v_particle_pos.x - 0.5) * lonRadRange * radius;\n\
+	float distortion = cos((minLatRad + v_particle_pos.y * latRadRange ));\n\
+	float xOffset = (v_particle_pos.x - 0.5)*distortion * lonRadRange * radius;\n\
 	float yOffset = (0.5 - v_particle_pos.y) * latRadRange * radius;\n\
 	vec4 rotatedPos = buildingRotMatrix * vec4(xOffset, yOffset, 0.0, 1.0);\n\
 	\n\

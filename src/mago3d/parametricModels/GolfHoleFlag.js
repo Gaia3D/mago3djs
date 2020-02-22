@@ -22,6 +22,7 @@ var GolfHoleFlag = function(radius, height, options)
 	{ this.height = height; }
 
 	this.baseRadius = 4.0*this.radius;
+	this.flagOrientation;
 	
 	this.dirty = true;
 	this.mesh;
@@ -101,9 +102,9 @@ GolfHoleFlag.prototype.makeMesh = function()
 	var mesh = Modeler.getExtrudedMesh(profile2dAux, extrudeDist, extrudeSegmentsCount, extrusionVector, bIncludeBottomCap, bIncludeTopCap, mesh);
 	mesh.setOneColor(1.0, 0.1, 0.1, 1.0);
 	mesh.rotate(90.0, 0.0, 1.0, 0.0);
+	mesh.rotate(45.0, 0.0, 0.0, 1.0);
 	mesh.translate(0.0, 0.0, this.height - flagHeight/2);
-	
-	
+
 	this.objectsArray.push(mesh);
 	
 	this.dirty = false;

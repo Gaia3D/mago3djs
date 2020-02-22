@@ -539,7 +539,7 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 	// End check color or texture of reference object.-----------------------------------------------------------------------------
 	
 	//Now erase the aditional information (aditionalColor & moveVector).
-	this.aditionalColor = undefined;
+	//this.aditionalColor = undefined; 
 	
 	// Test external alpha.
 	if (magoManager.isTrailRender === undefined || magoManager.isTrailRender === false) // check if mago is not rendering special effects.

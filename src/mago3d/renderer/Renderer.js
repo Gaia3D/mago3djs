@@ -474,11 +474,7 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 		gl.useProgram(null);
 
 	}
-	
-	
-	//var nodesLOD0Count = visibleObjControlerNodes.currentVisibles0.length;
-	//var nodesLOD2Count = visibleObjControlerNodes.currentVisibles2.length;
-	//var nodesLOD3Count = visibleObjControlerNodes.currentVisibles3.length;
+
 	if (visibleObjControlerNodes.hasRenderables())
 	{
 		// Make depth for all visible objects.***
@@ -523,25 +519,14 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 		magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
 		magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
 		// native objects.
-		this.renderNativeObjects(gl, currentShader, renderType, visibleObjControlerNodes);
-		/*
-		var glPrimitive = undefined;
-		var nativeObjectsCount = visibleObjControlerNodes.currentVisibleNativeObjects.length;
-		for (var i=0; i<nativeObjectsCount; i++)
-		{
-			visibleObjControlerNodes.currentVisibleNativeObjects[i].render(magoManager, currentShader, renderType, glPrimitive);
-		}
-		*/
+		var bIncludeTransparentObjects = false;
+		this.renderNativeObjects(gl, currentShader, renderType, visibleObjControlerNodes, bIncludeTransparentObjects);
+
 		currentShader.disableVertexAttribArray(currentShader.position3_loc); 
 		gl.useProgram(null);
-		
-		
-		
+
 	}
-	
-	
-			
-	
+
 	// PointsCloud.****************************************************************************************
 	// PointsCloud.****************************************************************************************
 	var nodesPCloudCount = magoManager.visibleObjControlerNodes.currentVisiblesAux.length;
@@ -913,10 +898,12 @@ Renderer.prototype.renderAtmosphere = function(gl, renderType)
  * @param {Number} renderType If renderType = 0 (depth render), renderType = 1 (color render), renderType = 2 (colorCoding render).
  * @param {VisibleObjectsController} visibleObjControlerNodes This object contains visible objects for the camera frustum.
  */
-Renderer.prototype.renderNativeObjects = function(gl, shader, renderType, visibleObjControlerNodes) 
+Renderer.prototype.renderNativeObjects = function(gl, shader, renderType, visibleObjControlerNodes, bIncludeTransparentObjects) 
 {
 	var magoManager = this.magoManager;
 	var glPrimitive = undefined;
+	if (bIncludeTransparentObjects === undefined)
+	{ bIncludeTransparentObjects = true; }
 	
 	// 1rst, opaques.
 	var opaquesArray = visibleObjControlerNodes.currentVisibleNativeObjects.opaquesArray;
@@ -927,11 +914,14 @@ Renderer.prototype.renderNativeObjects = function(gl, shader, renderType, visibl
 	}
 	
 	// transparents.
-	var transparentsArray = visibleObjControlerNodes.currentVisibleNativeObjects.transparentsArray;
-	nativeObjectsCount = transparentsArray.length;
-	for (var i=0; i<nativeObjectsCount; i++)
+	if (bIncludeTransparentObjects)
 	{
-		transparentsArray[i].render(magoManager, shader, renderType, glPrimitive);
+		var transparentsArray = visibleObjControlerNodes.currentVisibleNativeObjects.transparentsArray;
+		nativeObjectsCount = transparentsArray.length;
+		for (var i=0; i<nativeObjectsCount; i++)
+		{
+			transparentsArray[i].render(magoManager, shader, renderType, glPrimitive);
+		}
 	}
 };
 
