@@ -1982,6 +1982,10 @@ MagoManager.prototype.isDragging = function()
  */
 MagoManager.prototype.setCameraMotion = function(state)
 {
+	if (MagoConfig.isTwoDimension()) 
+	{
+		return;
+	}
 	if (this.isCesiumGlobe())
 	{
 		this.scene.screenSpaceCameraController.enableRotate = state;
@@ -2732,7 +2736,8 @@ MagoManager.prototype.mouseActionMove = function(newPixel, oldPixel)
 		this.mouseDragging = false;
 		if (this.isCesiumGlobe()) 
 		{
-			disableCameraMotion(this.scene.screenSpaceCameraController, true);
+			this.setCameraMotion(true);
+			//disableCameraMotion(this.scene.screenSpaceCameraController, true);
 		}
 		
 		if (this.mouseMiddleDown || this.mouseRightDown)
@@ -2750,7 +2755,7 @@ MagoManager.prototype.mouseActionMove = function(newPixel, oldPixel)
 		this.emit(MagoManager.EVENT_TYPE.MOUSEMOVE, {type: MagoManager.EVENT_TYPE.MOUSEMOVE, startEvent: startEventCoordinate, endEvent: endEventCoordinate, timestamp: this.getCurrentTime() });
 	}
 
-	function disableCameraMotion(screenSpaceCameraController, state)
+	/*function disableCameraMotion(screenSpaceCameraController, state)
 	{
 		screenSpaceCameraController.enableRotate = state;
 		screenSpaceCameraController.enableZoom = state;
@@ -2758,7 +2763,7 @@ MagoManager.prototype.mouseActionMove = function(newPixel, oldPixel)
 		screenSpaceCameraController.enableTilt = state;
 		screenSpaceCameraController.enableTranslate = state;
 	}
-	/*if (this.mouseLeftDown) 
+	if (this.mouseLeftDown) 
 	{
 		this.manageMouseDragging(mouseX, mouseY);
 	}

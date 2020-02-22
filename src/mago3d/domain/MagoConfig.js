@@ -118,7 +118,7 @@ MagoConfig.init = function(serverPolicy, projectIdArray, projectDataArray)
 	this.locationAndRotationHistoryObject = {};
 
 	this.serverPolicy = serverPolicy;
-
+	this.twoDimension = false;
 	if (!this.serverPolicy.basicGlobe) { this.serverPolicy.basicGlobe = Constant.CESIUM; }
 
 	this.serverPolicy.online = true;
@@ -524,3 +524,12 @@ MagoConfig.clearLocationAndRotationHistory = function()
 		}
 	}
 };*/
+
+MagoConfig.setTwoDimension = function(twoDimension) 
+{
+	this.twoDimension = twoDimension;
+};
+MagoConfig.isTwoDimension = function()
+{
+	return this.twoDimension;
+};
