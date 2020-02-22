@@ -1027,8 +1027,8 @@ NeoReferencesMotherAndIndices.prototype.render = function(magoManager, neoBuildi
 		{ continue; }
 		
 		// Check renderingFase.
-		//if (neoReference.renderingFase === magoManager.renderingFase)
-		//{ continue; }
+		if (neoReference.renderingFase === magoManager.renderingFase)
+		{ continue; }
 		
 		// Render the referenceObject.
 		if (!neoReference.render(magoManager, neoBuilding, renderType, renderTexture, shader, refMatrixIdxKey, maxSizeToRender))

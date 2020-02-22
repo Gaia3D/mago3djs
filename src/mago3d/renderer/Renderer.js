@@ -617,6 +617,8 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 				gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 			}
 			
+			magoManager.swapRenderingFase();
+			
 			var currentShader;
 			currentShader = magoManager.postFxShadersManager.getShader("modelRefDepth"); 
 			currentShader.resetLastBuffersBinded();
