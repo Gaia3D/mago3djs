@@ -284,8 +284,9 @@ SmartTileManager.prototype.parseSmartTilesF4dIndexFile = function(dataBuffer, pr
 		
 		var geoExtent = SmartTile.getGeographicExtentOfTileLXY(L, X, Y, undefined);
 		var centerGeoCoord = geoExtent.getMidPoint();
-		centerGeoCoord.altitude += 20.0;// test. delete!!!
+		//centerGeoCoord.altitude += 20.0;// test. delete!!!
 		var f4dTileId = "";
+		//var smartTileLodsCount = 3;
 		this.smartTileF4dSeedMap[name] = {
 			"L"                 : L,
 			"X"                 : X,
