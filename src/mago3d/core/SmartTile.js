@@ -1194,7 +1194,7 @@ SmartTile.prototype.createGeometriesFromSeeds = function(magoManager)
 			else if (smartTileF4dSeed.fileLoadState === CODE.fileLoadState.LOADING_FINISHED )
 			{
 				// parse the dataArrayBuffer.***
-				var maxParses = 20;
+				var maxParses = 30;
 				if (i > 0)
 				{ maxParses = 1; }
 				var parseQueue = magoManager.parseQueue;
