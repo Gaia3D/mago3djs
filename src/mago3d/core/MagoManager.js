@@ -274,15 +274,6 @@ MagoManager.prototype = Object.create(Emitter.prototype);
 MagoManager.prototype.constructor = MagoManager;
 
 MagoManager.EVENT_TYPE = {
-	'CAMERACHANGED'   : 'camerachanged',
-	'CAMERAMOVEEND'   : 'cameramoveend',
-	'CAMERAMOVESTART' : 'cameramovestart'
-};
-
-MagoManager.prototype = Object.create(Emitter.prototype);
-MagoManager.prototype.constructor = MagoManager;
-
-MagoManager.EVENT_TYPE = {
 	'CLICK'                  	: 'click',
 	'DBCLICK'                	: 'dbclick',
 	'RIGHTCLICK'             	: 'rightclick',
@@ -5935,15 +5926,23 @@ MagoManager.prototype.callAPI = function(api)
 		var difusse = api.getDiffuseReflectionCoef();
 		var specular = api.getSpecularReflectionCoef();
 		var specularColor = api.getSpecularColor();
+		var ambientColor = api.getAmbientColor();
 		
-		this.magoPolicy.setAmbientReflectionCoef(api.getAmbientReflectionCoef());
-		this.magoPolicy.setDiffuseReflectionCoef(api.getDiffuseReflectionCoef());
-		this.magoPolicy.setSpecularReflectionCoef(api.getSpecularReflectionCoef());
-		this.magoPolicy.setSpecularColor(api.getSpecularColor());
+		if (!isNaN(ambient)) 
+		{
+			this.sceneState.ambientReflectionCoef[0] = Number(ambient); // 0.2.
+		}
+
+		if (!isNaN(difusse)) 
+		{
+			this.sceneState.diffuseReflectionCoef[0] = Number(difusse); // 1.0
+		}
 		
-		this.sceneState.ambientReflectionCoef[0] = Number(ambient); // 0.2.
-		this.sceneState.diffuseReflectionCoef[0] = Number(difusse); // 1.0
-		this.sceneState.specularReflectionCoef[0] = Number(specular); // 0.7
+		if (!isNaN(specular)) 
+		{
+			this.sceneState.specularReflectionCoef[0] = Number(specular); // 0.7
+		}
+		
 		//this.sceneState.specularColor[0] = Number(specular); // 0.7
 	}
 	else if (apiName === "changeSsaoRadius")
