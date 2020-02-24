@@ -522,6 +522,15 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 		uniformDataPair.vec3fv = sceneState.specularColor;
 	}
 	
+	// 17. ambientColor.
+	uniformLocation = gl.getUniformLocation(shader.program, "ambientColor");
+	if (uniformLocation !== null && uniformLocation !== undefined)
+	{
+		uniformDataPair = shader.newUniformDataPair("Vec3fv", "ambientColor");
+		uniformDataPair.uniformLocation = uniformLocation;
+		uniformDataPair.vec3fv = sceneState.ambientColor;
+	}
+	
 	// 18. ssaoRadius.
 	uniformLocation = gl.getUniformLocation(shader.program, "radius");
 	if (uniformLocation !== null && uniformLocation !== undefined)

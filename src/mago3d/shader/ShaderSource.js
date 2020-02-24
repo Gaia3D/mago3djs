@@ -1357,6 +1357,7 @@ uniform bool bApplyScpecularLighting;\n\
 uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
 \n\
 uniform vec3 specularColor;\n\
+uniform vec3 ambientColor;\n\
 \n\
 const int kernelSize = 16;  \n\
 uniform float radius;      \n\
@@ -1628,13 +1629,13 @@ void main()\n\
 	\n\
 	//textureColor = vec4(0.8, 0.85, 0.9, 1.0);\n\
 	\n\
-	vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);\n\
+	vec3 ambientColorAux = vec3(textureColor.x*ambientColor.x, textureColor.y*ambientColor.y, textureColor.z*ambientColor.z);\n\
 	float alfa = textureColor.w * externalAlpha;\n\
 \n\
     vec4 finalColor;\n\
 	if(applySpecLighting> 0.0)\n\
 	{\n\
-		finalColor = vec4((ambientReflectionCoef * ambientColor + \n\
+		finalColor = vec4((ambientReflectionCoef * ambientColorAux + \n\
 							diffuseReflectionCoef * lambertian * textureColor.xyz + \n\
 							specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion * shadow_occlusion, alfa); \n\
 	}\n\
