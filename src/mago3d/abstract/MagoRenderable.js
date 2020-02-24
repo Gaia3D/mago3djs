@@ -325,6 +325,28 @@ MagoRenderable.prototype.setOneColor = function(r, g, b, a)
 		this.setOpaque(false);
 	}
 };
+/**
+ * Set the unique one color of the box
+ * @param {Number} r
+ * @param {Number} g
+ * @param {Number} b 
+ * @param {Number} a
+ */
+MagoRenderable.prototype.setWireframeColor = function(r, g, b, a)
+{
+	// This function sets the unique one color of the mesh.***
+	if (this.wireframeColor4 === undefined)
+	{ this.wireframeColor4 = new Color(); }
+	
+	this.wireframeColor4.setRGBA(r, g, b, a);
+
+	//TODO : 좀 더 정교한 근사값 구하기로 변경
+	if (a < 1) 
+	{
+		this.setOpaque(false);
+	}
+};
+
 MagoRenderable.prototype.setOpaque = function(opaque)
 {
 	this.attributes.opaque = opaque;

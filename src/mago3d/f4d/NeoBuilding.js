@@ -1531,14 +1531,37 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 		return false;
 	}
 	
+	// Check if this neoBuilding is fromSmartTile.***
+	var fromSmartTile = this.nodeOwner.data.attributes.fromSmartTile;
+	if (fromSmartTile === undefined)
+	{ fromSmartTile = false; }
+	
 	if (lowLodMesh.fileLoadState === CODE.fileLoadState.READY) 
 	{
-		if (magoManager.readerWriter.skinLegos_requested < 5)
+		if (fromSmartTile)
 		{
-			var lodMeshFilePath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + lodString;
-			magoManager.readerWriter.getLegoArraybuffer(lodMeshFilePath, lowLodMesh, magoManager);
-			if (lowLodMesh.vbo_vicks_container.vboCacheKeysArray === undefined)
-			{ lowLodMesh.vbo_vicks_container.vboCacheKeysArray = []; }
+			// No load lod5, lod4 & lod3.***
+			if (lodToLoad <3)
+			{
+				if (magoManager.readerWriter.skinLegos_requested < 5)
+				{
+					var lodMeshFilePath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + lodString;
+					magoManager.readerWriter.getLegoArraybuffer(lodMeshFilePath, lowLodMesh, magoManager);
+					if (lowLodMesh.vbo_vicks_container.vboCacheKeysArray === undefined)
+					{ lowLodMesh.vbo_vicks_container.vboCacheKeysArray = []; }
+				}
+			}
+		}
+		else
+		{
+			if (magoManager.readerWriter.skinLegos_requested < 5)
+			{
+				var lodMeshFilePath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + lodString;
+				magoManager.readerWriter.getLegoArraybuffer(lodMeshFilePath, lowLodMesh, magoManager);
+				if (lowLodMesh.vbo_vicks_container.vboCacheKeysArray === undefined)
+				{ lowLodMesh.vbo_vicks_container.vboCacheKeysArray = []; }
+			}
+			
 		}
 	}
 	else if (lowLodMesh.fileLoadState === CODE.fileLoadState.LOADING_FINISHED) 
@@ -1554,18 +1577,40 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 		// this is the new version.
 		if (lodBuilding.texture === undefined)
 		{
-			//if (magoManager.readerWriter.skinLegos_requested < 4)
-			if (magoManager.fileRequestControler.lowLodImagesRequestedCount < 4)
+			if (fromSmartTile)
 			{
-				lodBuilding.texture = new Texture();
-				var filePath_inServer = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + textureFileName;
-				var gl = magoManager.sceneState.gl;
-				var flip_y_texCoords = true;
-				if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
-				{ flip_y_texCoords = false; }
-				
-				magoManager.readerWriter.readLegoSimpleBuildingTexture(gl, filePath_inServer, lodBuilding.texture, magoManager, flip_y_texCoords); 
+				if (lodToLoad <3)
+				{
+					//if (magoManager.readerWriter.skinLegos_requested < 4)
+					if (magoManager.fileRequestControler.lowLodImagesRequestedCount < 4)
+					{
+						lodBuilding.texture = new Texture();
+						var filePath_inServer = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + textureFileName;
+						var gl = magoManager.sceneState.gl;
+						var flip_y_texCoords = true;
+						if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
+						{ flip_y_texCoords = false; }
+						
+						magoManager.readerWriter.readLegoSimpleBuildingTexture(gl, filePath_inServer, lodBuilding.texture, magoManager, flip_y_texCoords); 
+					}
+				}
 			}
+			else
+			{
+				//if (magoManager.readerWriter.skinLegos_requested < 4)
+				if (magoManager.fileRequestControler.lowLodImagesRequestedCount < 4)
+				{
+					lodBuilding.texture = new Texture();
+					var filePath_inServer = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + textureFileName;
+					var gl = magoManager.sceneState.gl;
+					var flip_y_texCoords = true;
+					if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
+					{ flip_y_texCoords = false; }
+					
+					magoManager.readerWriter.readLegoSimpleBuildingTexture(gl, filePath_inServer, lodBuilding.texture, magoManager, flip_y_texCoords); 
+				}
+			}
+			
 		}
 		else if (lodBuilding.texture.fileLoadState === CODE.fileLoadState.LOADING_FINISHED && lodBuilding.texture.texId === undefined)
 		{

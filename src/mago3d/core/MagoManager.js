@@ -438,6 +438,10 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 	
 		}
 		*/
+		
+		var fromSmartTile = node.data.attributes.fromSmartTile;
+		if (fromSmartTile === undefined)
+		{ fromSmartTile = false; }
 
 		// check if this building is ready to render.***
 		if (neoBuilding)
@@ -446,11 +450,14 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 			var metaData = neoBuilding.metaData;
 			if (metaData.fileLoadState === CODE.fileLoadState.READY) 
 			{
-				projectFolderName = neoBuilding.projectFolderName;
-				if (this.fileRequestControler.isFullHeaders())	{ return; }
-				var neoBuildingHeaderPath = geometryDataPath + "/" + projectFolderName + "/" + neoBuilding.buildingFileName + "/HeaderAsimetric.hed";
-				
-				this.readerWriter.getNeoHeaderAsimetricVersion(gl, neoBuildingHeaderPath, neoBuilding, this.readerWriter, this); // Here makes the tree of octree.***
+				if (!fromSmartTile) // load only if this no is NO from a smartTile.***
+				{
+					projectFolderName = neoBuilding.projectFolderName;
+					if (this.fileRequestControler.isFullHeaders())	{ return; }
+					var neoBuildingHeaderPath = geometryDataPath + "/" + projectFolderName + "/" + neoBuilding.buildingFileName + "/HeaderAsimetric.hed";
+					
+					this.readerWriter.getNeoHeaderAsimetricVersion(gl, neoBuildingHeaderPath, neoBuilding, this.readerWriter, this); // Here makes the tree of octree.***
+				}
 			}
 			else if (metaData.fileLoadState === CODE.fileLoadState.LOADING_FINISHED) 
 			{
@@ -2324,22 +2331,26 @@ MagoManager.prototype.keyDown = function(key)
 	else if (key === 87) // 87 = 'w'.***
 	{
 		// do wind test.
-		if (this.weatherStation === undefined)
-		{ this.weatherStation = new WeatherStation(); }
-	
-		var geometryDataPath = this.readerWriter.geometryDataPath;
-		var windDataFilesNamesArray = ["OBS-QWM_2016062000.grib2_wind_000", "OBS-QWM_2016062001.grib2_wind_000", "OBS-QWM_2016062002.grib2_wind_000", "OBS-QWM_2016062003.grib2_wind_000",
-			"OBS-QWM_2016062004.grib2_wind_000", "OBS-QWM_2016062005.grib2_wind_000", "OBS-QWM_2016062006.grib2_wind_000", "OBS-QWM_2016062007.grib2_wind_000",
-			"OBS-QWM_2016062008.grib2_wind_000", "OBS-QWM_2016062009.grib2_wind_000", "OBS-QWM_2016062010.grib2_wind_000", "OBS-QWM_2016062011.grib2_wind_000",
-			"OBS-QWM_2016062012.grib2_wind_000", "OBS-QWM_2016062013.grib2_wind_000", "OBS-QWM_2016062014.grib2_wind_000", "OBS-QWM_2016062015.grib2_wind_000",
-			"OBS-QWM_2016062016.grib2_wind_000", "OBS-QWM_2016062017.grib2_wind_000", "OBS-QWM_2016062018.grib2_wind_000", "OBS-QWM_2016062019.grib2_wind_000",
-			"OBS-QWM_2016062020.grib2_wind_000", "OBS-QWM_2016062021.grib2_wind_000", "OBS-QWM_2016062022.grib2_wind_000", "OBS-QWM_2016062023.grib2_wind_000"];
-			
-		//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_Airport";
-		var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_GolfPark_NineBridge1";
+		if (this.windTest === undefined)
+		{
+			if (this.weatherStation === undefined)
+			{ this.weatherStation = new WeatherStation(); }
 		
-		this.weatherStation.test_loadWindData3d(this, windDataFilesNamesArray, windMapFilesFolderPath);
-
+			var geometryDataPath = this.readerWriter.geometryDataPath;
+			var windDataFilesNamesArray = ["OBS-QWM_2016062000.grib2_wind_000", "OBS-QWM_2016062001.grib2_wind_000", "OBS-QWM_2016062002.grib2_wind_000", "OBS-QWM_2016062003.grib2_wind_000",
+				"OBS-QWM_2016062004.grib2_wind_000", "OBS-QWM_2016062005.grib2_wind_000", "OBS-QWM_2016062006.grib2_wind_000", "OBS-QWM_2016062007.grib2_wind_000",
+				"OBS-QWM_2016062008.grib2_wind_000", "OBS-QWM_2016062009.grib2_wind_000", "OBS-QWM_2016062010.grib2_wind_000", "OBS-QWM_2016062011.grib2_wind_000",
+				"OBS-QWM_2016062012.grib2_wind_000", "OBS-QWM_2016062013.grib2_wind_000", "OBS-QWM_2016062014.grib2_wind_000", "OBS-QWM_2016062015.grib2_wind_000",
+				"OBS-QWM_2016062016.grib2_wind_000", "OBS-QWM_2016062017.grib2_wind_000", "OBS-QWM_2016062018.grib2_wind_000", "OBS-QWM_2016062019.grib2_wind_000",
+				"OBS-QWM_2016062020.grib2_wind_000", "OBS-QWM_2016062021.grib2_wind_000", "OBS-QWM_2016062022.grib2_wind_000", "OBS-QWM_2016062023.grib2_wind_000"];
+				
+			//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_Airport";
+			var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_GolfPark_NineBridge1";
+			
+			this.weatherStation.test_loadWindData3d(this, windDataFilesNamesArray, windMapFilesFolderPath);
+			this.TEST__golfPark();
+			this.windTest = true;
+		}
 	}
 	else if (key === 89) // 89 = 'y'.***
 	{
@@ -2365,8 +2376,53 @@ MagoManager.prototype.keyDown = function(key)
  */
 MagoManager.prototype.TEST__golfPark = function() 
 {
-	// create a golfHoleFlag.
+	// create 3 golfHoleFlags.
+	var geoCoord = new GeographicCoord(126.40310387701689, 33.34144078912163, 34.0);
+	var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+	var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+	geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude, undefined, undefined, undefined, geoLocData, this);
 	
+	var options = {color: {r: 0.2, g: 0.5, b: 0.9, a: 0.5}};
+	
+	var golfHoleFlag = new GolfHoleFlag(0.3, 20, options);
+	golfHoleFlag.geoLocDataManager = geoLocDataManager;
+	if (golfHoleFlag.attributes === undefined)
+	{ golfHoleFlag.attributes = {}; }
+	golfHoleFlag.attributes.isMovable = true;
+	
+	this.modeler.addObject(golfHoleFlag, 15);
+	
+	// 2nd golfHoleFlag.
+	var geoCoord = new GeographicCoord(126.39837002777193, 33.341987673830694, 23.8);
+	var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+	var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+	geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude, undefined, undefined, undefined, geoLocData, this);
+	
+	var options = {color: {r: 0.2, g: 0.5, b: 0.9, a: 0.5}};
+	
+	var golfHoleFlag = new GolfHoleFlag(0.3, 20, options);
+	golfHoleFlag.geoLocDataManager = geoLocDataManager;
+	if (golfHoleFlag.attributes === undefined)
+	{ golfHoleFlag.attributes = {}; }
+	golfHoleFlag.attributes.isMovable = true;
+	
+	this.modeler.addObject(golfHoleFlag, 15);
+	
+	// 3rd golfHoleFlag.
+	var geoCoord = new GeographicCoord(126.39794580151037, 33.341476458307255, 18.5);
+	var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+	var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+	geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude, undefined, undefined, undefined, geoLocData, this);
+	
+	var options = {color: {r: 0.2, g: 0.5, b: 0.9, a: 0.5}};
+	
+	var golfHoleFlag = new GolfHoleFlag(0.3, 20, options);
+	golfHoleFlag.geoLocDataManager = geoLocDataManager;
+	if (golfHoleFlag.attributes === undefined)
+	{ golfHoleFlag.attributes = {}; }
+	golfHoleFlag.attributes.isMovable = true;
+	
+	this.modeler.addObject(golfHoleFlag, 15);
 };
 
 /**

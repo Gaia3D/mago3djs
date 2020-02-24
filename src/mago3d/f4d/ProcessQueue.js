@@ -403,6 +403,7 @@ ProcessQueue.prototype.deleteSmartTiles = function(magoManager)
 							{ continue; }
 						
 							this.deleteNeoBuilding(gl, neoBuilding, magoManager);
+							node.data.neoBuilding = undefined;
 							//deletedCount++;
 							//if (deletedCount >= 10)
 							//{ break; }
