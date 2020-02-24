@@ -5950,14 +5950,26 @@ MagoManager.prototype.callAPI = function(api)
 	}
 	else if (apiName === "changeLighting")
 	{
+		var ambient = api.getAmbientReflectionCoef();
+		var difusse = api.getDiffuseReflectionCoef();
+		var specular = api.getSpecularReflectionCoef();
+		var specularColor = api.getSpecularColor();
+		
 		this.magoPolicy.setAmbientReflectionCoef(api.getAmbientReflectionCoef());
 		this.magoPolicy.setDiffuseReflectionCoef(api.getDiffuseReflectionCoef());
 		this.magoPolicy.setSpecularReflectionCoef(api.getSpecularReflectionCoef());
 		this.magoPolicy.setSpecularColor(api.getSpecularColor());
+		
+		this.sceneState.ambientReflectionCoef[0] = Number(ambient); // 0.2.
+		this.sceneState.diffuseReflectionCoef[0] = Number(difusse); // 1.0
+		this.sceneState.specularReflectionCoef[0] = Number(specular); // 0.7
+		//this.sceneState.specularColor[0] = Number(specular); // 0.7
 	}
 	else if (apiName === "changeSsaoRadius")
 	{
-		this.magoPolicy.setSsaoRadius(api.getSsaoRadius());
+		var ssaoRadius = api.getSsaoRadius();
+		this.magoPolicy.setSsaoRadius(ssaoRadius);
+		this.sceneState.ssaoRadius[0] = Number(ssaoRadius);
 	}	
 	else if (apiName === "changeFPVMode")
 	{
