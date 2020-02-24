@@ -542,9 +542,10 @@ function getDataInfoByDataKeyAPI(managerFactoryInstance, projectId, dataKey)
 	if (managerFactoryInstance === null) { return; }
 
 	var api = new Mago3D.API("getDataInfoByDataKey");
+	api.setReturnable(true);
 	api.setProjectId(projectId);
 	api.setDataKey(dataKey);
-	managerFactoryInstance.callAPI(api);
+	return managerFactoryInstance.callAPI(api);
 }
 
 /**

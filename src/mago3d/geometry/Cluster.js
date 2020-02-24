@@ -4,9 +4,10 @@
  *
  * @param {Point3DList} point2DList 
  * @param {number} depth
+ * @param {MagoManager} magoMangaer
  * @param {function} customRenderFunc optional
  */
-var Cluster = function(point2DList, depth, customRenderFunc) 
+var Cluster = function(point2DList, depth, magoMangaer, customRenderFunc) 
 {
     
 	if (!point2DList || !point2DList instanceof Point2DList) 
@@ -17,6 +18,7 @@ var Cluster = function(point2DList, depth, customRenderFunc)
 	this.depth = defaultValue(depth, 8);
 
 	this.quatTree;
+	this.magoMangaer = magoMangaer;
 
 	this.renderFunction = (customRenderFunc && typeof customRenderFunc === 'function') ? customRenderFunc : this.defaultRenderFunc;
 
@@ -40,6 +42,8 @@ Cluster.prototype.getTreeOption = function()
 	var yLength = br.getYLength();
 	var center = br.getCenterPoint();
 	
+	if (xLength < 0.03) { xLength = 0.03; }
+	if (yLength < 0.03) { yLength = 0.03; }
 	return {
 		halfWidth  : xLength/2,
 		halfHeight : yLength/2,
@@ -56,7 +60,21 @@ Cluster.prototype.addPoint = function(point)
 Cluster.prototype.deletePointByCondition = function(condition)
 {
 	this.point2DList.deletePointByCondition(condition);
-	this.initQuatTree();
+
+	if (this.point2DList.getPointsCount() > 0 ) 
+	{
+		this.initQuatTree();
+	}
+	else 
+	{
+		this.quatTree = undefined;
+
+		this.magoMangaer.objMarkerManager.setMarkerByCondition(function(om)
+		{
+			return !om.tree;
+		});
+	}
+	
 };
 
 Cluster.prototype.updatePoint = function(point, findOption)

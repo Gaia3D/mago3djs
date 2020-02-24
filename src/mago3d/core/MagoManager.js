@@ -1438,7 +1438,7 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 	{
 		var posWC;
 	
-		if (this.magoPolicy.issueInsertEnable === true)
+		/*if (this.magoPolicy.issueInsertEnable === true)
 		{
 			if (this.objMarkerSC === undefined)
 			{ this.objMarkerSC = new ObjectMarker(); }
@@ -1477,7 +1477,7 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 				this.objMarkerSC = this.objMarkerManager.newObjectMarker(options, this);
 				this.objMarkerManager.objectMarkerArray.pop();
 			}
-		}
+		}*/
 	}
 
 	// Render process.***
@@ -4890,7 +4890,7 @@ MagoManager.prototype.selectedObjectNotice = function(neoBuilding)
 		// 이슈 등록 창 오픈
 		if (this.magoPolicy.getIssueInsertEnable()) 
 		{
-			if (this.objMarkerSC === undefined) { return; }
+			//if (this.objMarkerSC === undefined) { return; }
 			
 			insertIssueCallback(	MagoConfig.getPolicy().geo_callback_insertissue,
 				projectId,
@@ -5751,6 +5751,7 @@ MagoManager.prototype.callAPI = function(api)
 								{ continue; }
 								
 								var refObject = neoBuilding.getReferenceObject(objectIdx);
+								delete node.data.moveHistoryMap[objectIdx];
 								if (refObject)
 								{
 									refObject.moveVector = undefined;
@@ -6000,16 +6001,17 @@ MagoManager.prototype.callAPI = function(api)
 		var pitch = geoLocdata.pitch;
 		var roll = geoLocdata.roll;
 		
-		dataInfoCallback(		MagoConfig.getPolicy().geo_callback_dataInfo,
-			projectId,
-			dataKey,
-			dataName,
-			latitude,
-			longitude,
-			altitude,
-			heading,
-			pitch,
-			roll);
+		return {
+			projectId : projectId,
+			dataKey   : dataKey,
+			dataName  : dataName,
+			latitude  : latitude,
+			longitude : longitude,
+			altitude  : altitude,
+			heading   : heading,
+			pitch     : pitch,
+			roll      : roll
+		};
 	}
 	else if (apiName === "gotoProject")
 	{
@@ -6193,7 +6195,7 @@ MagoManager.prototype.callAPI = function(api)
 			throw new Error("This node is not exist.");
 		}
 
-		if (node.isReadyToRender)
+		if (node.isReadyToRender())
 		{
 			var geoLocDataManager = node.getNodeGeoLocDataManager();
 			var geoLocData = geoLocDataManager.getCurrentGeoLocationData();
@@ -6202,7 +6204,7 @@ MagoManager.prototype.callAPI = function(api)
 			var currLon = geoCoords.longitude;
 			var currLat = geoCoords.latitude;
 
-			this.flyTo(currLon, currLat, 100, 0);
+			this.flyTo(currLon, currLat, 400, 0);
 			var camera = this.sceneState.camera;
 			camera.stopTrack(this);
 			camera.setTrack(node, api.getTrackOption());
