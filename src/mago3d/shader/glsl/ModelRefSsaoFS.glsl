@@ -28,6 +28,7 @@ uniform bool bApplyScpecularLighting;
 uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.
 
 uniform vec3 specularColor;
+uniform vec3 ambientColor;
 
 const int kernelSize = 16;  
 uniform float radius;      
@@ -299,13 +300,13 @@ void main()
 	
 	//textureColor = vec4(0.8, 0.85, 0.9, 1.0);
 	
-	vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);
+	vec3 ambientColorAux = vec3(textureColor.x*ambientColor.x, textureColor.y*ambientColor.y, textureColor.z*ambientColor.z);
 	float alfa = textureColor.w * externalAlpha;
 
     vec4 finalColor;
 	if(applySpecLighting> 0.0)
 	{
-		finalColor = vec4((ambientReflectionCoef * ambientColor + 
+		finalColor = vec4((ambientReflectionCoef * ambientColorAux + 
 							diffuseReflectionCoef * lambertian * textureColor.xyz + 
 							specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion * shadow_occlusion, alfa); 
 	}
