@@ -1493,6 +1493,9 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 	if (headerVersion[0] !== "0")
 	{ return false; }
 
+	if (!this.currentLod)
+	{ this.currentLod = this.nodeOwner.data.currentLod; }
+
 	// Must respect the lodLoading order: must load the lowerLod if is not loaded.
 	var lodToLoad;
 	if (!this.currentLod) 
@@ -1500,6 +1503,8 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 		this.currentLod = this.nodeOwner.data.currentLod;
 	}
 	lodToLoad = this.getLowerSkinLodToLoad(this.currentLod);
+	
+
 	var lodBuildingData = this.getLodBuildingData(lodToLoad);
 	if (lodBuildingData === undefined)
 	{ return false; }
