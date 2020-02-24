@@ -1314,7 +1314,7 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 				data.neoBuilding = neoBuilding;
 				neoBuilding.buildingFileName = buildingId;
 				neoBuilding.buildingId = buildingId;
-				neoBuilding.projectFolderName = projectId;
+				neoBuilding.projectFolderName = projectFolderName;
 				neoBuilding.nodeOwner = node;
 			}
 			

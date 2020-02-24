@@ -1495,6 +1495,10 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 
 	// Must respect the lodLoading order: must load the lowerLod if is not loaded.
 	var lodToLoad;
+	if (!this.currentLod) 
+	{
+		this.currentLod = this.nodeOwner.data.currentLod;
+	}
 	lodToLoad = this.getLowerSkinLodToLoad(this.currentLod);
 	var lodBuildingData = this.getLodBuildingData(lodToLoad);
 	if (lodBuildingData === undefined)
