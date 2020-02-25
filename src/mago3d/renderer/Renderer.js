@@ -607,6 +607,7 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 		var node = magoManager.nodeSelected;
 		if (node !== undefined) // test code.***
 		{
+			magoManager.currentProcess = CODE.magoCurrentProcess.SilhouetteDepthRendering;
 			var silhouetteDepthFbo = magoManager.getSilhouetteDepthFbo();
 			silhouetteDepthFbo.bind(); 
 			
@@ -650,6 +651,7 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 			node.renderContent(magoManager, currentShader, renderType, refMatrixIdxKey);
 
 			silhouetteDepthFbo.unbind(); 
+			magoManager.swapRenderingFase();
 		}
 	}
 	
@@ -660,6 +662,7 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 		var neoBuilding = magoManager.buildingSelected;
 		if (node !== undefined && neoBuilding !== undefined) // test code.***
 		{
+			magoManager.currentProcess = CODE.magoCurrentProcess.SilhouetteDepthRendering;
 			var geoLocDataManager = node.getNodeGeoLocDataManager();
 			var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
 			var neoReferencesMotherAndIndices = magoManager.octreeSelected.neoReferencesMotherAndIndices;
@@ -705,6 +708,7 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 			silhouetteDepthFbo.unbind(); 
 			
 			gl.enable(gl.CULL_FACE);
+			//magoManager.swapRenderingFase();
 		}
 	}
 };

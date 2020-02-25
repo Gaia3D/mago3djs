@@ -1026,18 +1026,25 @@ NeoReferencesMotherAndIndices.prototype.render = function(magoManager, neoBuildi
 		if (neoReference === undefined)
 		{ continue; }
 		
-		// Check renderingFase.
-		if (neoReference.renderingFase === magoManager.renderingFase)
-		{ continue; }
-		
-		// Render the referenceObject.
-		if (!neoReference.render(magoManager, neoBuilding, renderType, renderTexture, shader, refMatrixIdxKey, maxSizeToRender))
+		if (magoManager.currentProcess === CODE.magoCurrentProcess.SilhouetteDepthRendering)
 		{
-			noRenderedsCount ++;
+			neoReference.render(magoManager, neoBuilding, renderType, renderTexture, shader, refMatrixIdxKey, maxSizeToRender);
 		}
+		else 
+		{
+			// Check renderingFase.
+			if (neoReference.renderingFase === magoManager.renderingFase)
+			{ continue; }
+			
+			// Render the referenceObject.
+			if (!neoReference.render(magoManager, neoBuilding, renderType, renderTexture, shader, refMatrixIdxKey, maxSizeToRender))
+			{
+				noRenderedsCount ++;
+			}
 
-		// Swap renderingFase.
-		neoReference.swapRenderingFase();
+			// Swap renderingFase.
+			neoReference.swapRenderingFase(); 
+		}
 	}
 	
 	if ((visibleIndices_count - noRenderedsCount)/visibleIndices_count < 0.4)
