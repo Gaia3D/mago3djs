@@ -16,15 +16,15 @@ var DynamicColor = function(option)
     
 	if (option) 
 	{
-		this.redFactorSpeed = defaultValue(option.redFactorSpeed, 1.0);
-		this.greenFactorSpeed = defaultValue(option.greenFactorSpeed, 1.0);
-		this.blueFactorSpeed = defaultValue(option.blueFactorSpeed, 2.0);
-		this.alphaFactorSpeed = defaultValue(option.alphaFactorSpeed, 2.0);
+		this.redFactorSpeed = defaultValueCheckLength(option.redFactorSpeed, 1.0);
+		this.greenFactorSpeed = defaultValueCheckLength(option.greenFactorSpeed, 1.0);
+		this.blueFactorSpeed = defaultValueCheckLength(option.blueFactorSpeed, 2.0);
+		this.alphaFactorSpeed = defaultValueCheckLength(option.alphaFactorSpeed, 2.0);
         
-		this.redFactor = defaultValue(option.redFactor, 1.0);
-		this.greenFactor = defaultValue(option.greenFactor, 1.0);
-		this.blueFactor = defaultValue(option.blueFactor, 1.0);
-		this.alphaFactor = defaultValue(option.alphaFactor, 1.0);
+		this.redFactor = defaultValueCheckLength(option.redFactor, 1.0);
+		this.greenFactor = defaultValueCheckLength(option.greenFactor, 1.0);
+		this.blueFactor = defaultValueCheckLength(option.blueFactor, 1.0);
+		this.alphaFactor = defaultValueCheckLength(option.alphaFactor, 1.0);
 	}
 };
 

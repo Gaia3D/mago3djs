@@ -616,8 +616,8 @@ Camera.prototype.setTrack = function(node, option)
 
 		if (option.trackCameraOffset)
 		{
-			this.trackCameraOffsetY = defaultValue(option.trackCameraOffset.y, this.trackCameraOffsetY);
-			this.trackCameraOffsetZ = defaultValue(option.trackCameraOffset.z, this.trackCameraOffsetZ);
+			this.trackCameraOffsetY = defaultValueCheckLength(option.trackCameraOffset.y, this.trackCameraOffsetY);
+			this.trackCameraOffsetZ = defaultValueCheckLength(option.trackCameraOffset.z, this.trackCameraOffsetZ);
 		}
 	}
 };

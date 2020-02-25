@@ -141,6 +141,13 @@ var MagoManager = function()
 	this.configInformation = MagoConfig.getPolicy();
 	this.cameraFPV = new FirstPersonView();
 	this.myCameraSCX;
+	// var to delete.*********************************************
+	this.loadQueue = new LoadQueue(this); // Old. delete.***
+
+	// Vars.****************************************************************
+	this.sceneState = new SceneState(); // this contains all scene mtrices and camera position.***
+	this.selectionColor = new SelectionColor();
+	this.vboMemoryManager = new VBOMemoryManager();
 	
 	if (this.configInformation !== undefined)
 	{
@@ -150,16 +157,12 @@ var MagoManager = function()
 		this.magoPolicy.setLod3DistInMeters(this.configInformation.lod3);
 		this.magoPolicy.setLod4DistInMeters(this.configInformation.lod4);
 		this.magoPolicy.setLod5DistInMeters(this.configInformation.lod5);
+
+		if (this.configInformation.ssaoRadius)
+		{
+			this.sceneState.ssaoRadius[0] = Number(this.configInformation.ssaoRadius);
+		}
 	}
-
-	// var to delete.*********************************************
-	this.loadQueue = new LoadQueue(this); // Old. delete.***
-
-	// Vars.****************************************************************
-	this.sceneState = new SceneState(); // this contains all scene mtrices and camera position.***
-	this.selectionColor = new SelectionColor();
-	this.vboMemoryManager = new VBOMemoryManager();
-	
 
 	this.fileRequestControler = new FileRequestControler();
 	this.visibleObjControlerOctrees = new VisibleObjectsController(); 
@@ -5587,10 +5590,10 @@ MagoManager.prototype.instantiateStaticModel = function(attributes)
 	
 	var longitude = attributes.longitude;
 	var latitude = attributes.latitude;
-	var altitude = parseFloat(defaultValue(attributes.height, 0));
-	var heading = parseFloat(defaultValue(attributes.heading, 0));
-	var pitch = parseFloat(defaultValue(attributes.pitch, 0));
-	var roll = parseFloat(defaultValue(attributes.roll, 0));
+	var altitude = parseFloat(defaultValueCheckLength(attributes.height, 0));
+	var heading = parseFloat(defaultValueCheckLength(attributes.heading, 0));
+	var pitch = parseFloat(defaultValueCheckLength(attributes.pitch, 0));
+	var roll = parseFloat(defaultValueCheckLength(attributes.roll, 0));
 	
 	var node = this.hierarchyManager.getNodeByDataKey(projectId, instanceId);
 	if (node === undefined)
@@ -5942,8 +5945,36 @@ MagoManager.prototype.callAPI = function(api)
 		{
 			this.sceneState.specularReflectionCoef[0] = Number(specular); // 0.7
 		}
-		
-		//this.sceneState.specularColor[0] = Number(specular); // 0.7
+
+		if (specularColor) 
+		{
+			var splitedSpecularColor = specularColor.split(',');
+			if (splitedSpecularColor.length === 3) 
+			{
+				var sr = parseInt(splitedSpecularColor[0]) / 255;
+				var sg = parseInt(splitedSpecularColor[1]) / 255;
+				var sb = parseInt(splitedSpecularColor[2]) / 255;
+
+				this.sceneState.specularColor[0] = sr; // 0.7
+				this.sceneState.specularColor[1] = sg; // 0.7
+				this.sceneState.specularColor[2] = sb; // 0.7
+			}
+		}
+
+		if (ambientColor) 
+		{
+			var splitedAmbientColor = ambientColor.split(',');
+			if (splitedAmbientColor.length === 3) 
+			{
+				var ar = parseInt(splitedAmbientColor[0]) / 255;
+				var ag = parseInt(splitedAmbientColor[1]) / 255;
+				var ab = parseInt(splitedAmbientColor[2]) / 255;
+
+				this.sceneState.ambientColor[0] = ar;
+				this.sceneState.ambientColor[1] = ag;
+				this.sceneState.ambientColor[2] = ab;
+			}
+		}
 	}
 	else if (apiName === "changeSsaoRadius")
 	{
@@ -6220,10 +6251,10 @@ MagoManager.prototype.callAPI = function(api)
 	{	
 		//수정필요, 카메라가 세슘카메라
 		var camera = this.scene.camera;
-		var heading = defaultValue(api.getHeading(), Cesium.Math.toDegrees(camera.heading));
-		var pitch = defaultValue(api.getPitch(), Cesium.Math.toDegrees(camera.pitch));
-		var roll = defaultValue(api.getRoll(), Cesium.Math.toDegrees(camera.roll));
-		var duration = defaultValue(api.getDuration(), 0);
+		var heading = defaultValueCheckLength(api.getHeading(), Cesium.Math.toDegrees(camera.heading));
+		var pitch = defaultValueCheckLength(api.getPitch(), Cesium.Math.toDegrees(camera.pitch));
+		var roll = defaultValueCheckLength(api.getRoll(), Cesium.Math.toDegrees(camera.roll));
+		var duration = defaultValueCheckLength(api.getDuration(), 0);
 
 		if (this.isCesiumGlobe())
 		{

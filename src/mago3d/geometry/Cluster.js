@@ -15,7 +15,7 @@ var Cluster = function(point2DList, depth, magoMangaer, customRenderFunc)
 		throw new Error('point2DList is required');
 	}
 	this.point2DList = point2DList;
-	this.depth = defaultValue(depth, 8);
+	this.depth = defaultValueCheckLength(depth, 8);
 
 	this.quatTree;
 	this.magoMangaer = magoMangaer;
