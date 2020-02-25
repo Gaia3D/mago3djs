@@ -2148,10 +2148,10 @@ MagoManager.prototype.keyDown = function(key)
 		*/
 		
 		
-		if (this.magoPolicy.issueInsertEnable)
-		{ this.magoPolicy.issueInsertEnable = false; }
-		else
-		{ this.magoPolicy.issueInsertEnable = true; }
+		//if (this.magoPolicy.issueInsertEnable)
+		//{ this.magoPolicy.issueInsertEnable = false; }
+		//else
+		//{ this.magoPolicy.issueInsertEnable = true; }
 		
 		
 		// Stencil shadow mesh making test.********************
