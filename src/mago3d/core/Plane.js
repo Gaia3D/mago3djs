@@ -13,6 +13,8 @@ var Plane = function()
 	}
 	
 	// ax+by+cz+d = 0 plane.
+	// a*x + b*y + c*z + d = 0
+	// where (a,b,c) is the normal, and d is negative distance to origin.
 	this.a = 0.0;
 	this.b = 0.0;
 	this.c = 0.0;

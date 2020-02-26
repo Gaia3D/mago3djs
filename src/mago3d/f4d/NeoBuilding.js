@@ -1776,6 +1776,10 @@ NeoBuilding.prototype.render = function(magoManager, shader, renderType, refMatr
 	{
 		// There are buildings that are only skin, so check projectType of the building.
 		var lodBuildingData = this.getLodBuildingData(this.currentLod);
+		
+		if (this.currentLod === 2 && this.buildingId === "7D6_1")
+		{ var hola = 0; }
+		
 		if (lodBuildingData && !lodBuildingData.isModelRef)
 		{
 			// This building is skinType data.

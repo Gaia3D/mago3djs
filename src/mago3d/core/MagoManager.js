@@ -2119,7 +2119,8 @@ MagoManager.prototype.keyDown = function(key)
 		
 		if (this.counterAux === -1)
 		{
-			this.modeler.mode = CODE.modelerMode.DRAWING_CYLYNDER;
+			this.modeler.mode = CODE.modelerMode.DRAWING_CLIPPINGBOX;
+			//this.modeler.mode = CODE.modelerMode.DRAWING_CYLYNDER;
 			//this.modeler.mode = CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS;
 			//this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
 			this.counterAux++;
@@ -2266,10 +2267,10 @@ MagoManager.prototype.keyDown = function(key)
 		*/
 		
 		
-		if (this.magoPolicy.issueInsertEnable)
-		{ this.magoPolicy.issueInsertEnable = false; }
-		else
-		{ this.magoPolicy.issueInsertEnable = true; }
+		//if (this.magoPolicy.issueInsertEnable)
+		//{ this.magoPolicy.issueInsertEnable = false; }
+		//else
+		//{ this.magoPolicy.issueInsertEnable = true; }
 		
 		
 		// Stencil shadow mesh making test.********************
@@ -2586,6 +2587,7 @@ MagoManager.prototype.mouseActionLeftDoubleClick = function(mouseX, mouseY)
 	}
 };
 
+
 /**
  * 마우스 더블 클릭 이벤트 처리
  * @param gl 변수
@@ -2601,24 +2603,6 @@ MagoManager.prototype.mouseActionRightClick = function(mouseX, mouseY)
 		if (eventCoordinate) 
 		{
 			this.emit(MagoManager.EVENT_TYPE.RIGHTCLICK, {type: MagoManager.EVENT_TYPE.CLICK, clickCoordinate: eventCoordinate, timestamp: this.getCurrentTime()});
-		}
-		else if (this.modeler.mode === CODE.modelerMode.DRAWING_CYLYNDER)
-		{
-			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
-			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+40, undefined, undefined, undefined, geoLocData, this);
-			
-			var options = {color: {r: 0.2, g: 0.5, b: 0.9, a: 0.5}};
-			
-			var cylinder = new GolfHoleFlag(0.3, 20, options);
-			//var cylinder = new Cylinder(10, 20, options);
-			//cylinder.setOneColor(0.2, 0.5, 0.7, 1.0);
-			cylinder.geoLocDataManager = geoLocDataManager;
-			if (cylinder.attributes === undefined)
-			{ cylinder.attributes = {}; }
-			cylinder.attributes.isMovable = true;
-			
-			this.modeler.addObject(cylinder, 15);
 		}
 	}
 };
@@ -3796,13 +3780,17 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, globa
 		var neoBuilding = lowestOctree.neoBuildingOwner;
 		var version = neoBuilding.getHeaderVersion();
 		
-		
-		// 1rst, check if lod2 is loaded. If lod2 is no loaded yet, then load first lod2.***
-		if (this.readerWriter.octreesSkinLegos_requested < 5)
+		// Check if the lod2 is modelRef type data.
+		var lodBuildingData = neoBuilding.getLodBuildingData(2);
+		if (lodBuildingData.isModelRef === true)
 		{
-			if (lowestOctree.lego === undefined || !lowestOctree.lego.isReadyToRender())
+			// 1rst, check if lod2 is loaded. If lod2 is no loaded yet, then load first lod2.***
+			if (this.readerWriter.octreesSkinLegos_requested < 5)
 			{
-				lowestOctree.prepareSkinData(this);
+				if (lowestOctree.lego === undefined || !lowestOctree.lego.isReadyToRender())
+				{
+					lowestOctree.prepareSkinData(this);
+				}
 			}
 		}
 
@@ -3856,6 +3844,12 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistanceLOD2 = function(gl, c
 	for (var i=0, length = currentVisibles.length; i<length; i++) 
 	{	
 		lowestOctree = currentVisibles[i];
+		
+		// Check if the lod2 is modelRef type data.
+		var lodBuildingData = lowestOctree.neoBuildingOwner.getLodBuildingData(2);
+		if (!lodBuildingData.isModelRef)
+		{ continue; }
+
 		lowestOctree.prepareSkinData(this);
 
 		if (this.readerWriter.octreesSkinLegos_requested > 5)
