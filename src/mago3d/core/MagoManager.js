@@ -2001,7 +2001,8 @@ MagoManager.prototype.keyDown = function(key)
 		
 		if (this.counterAux === -1)
 		{
-			this.modeler.mode = CODE.modelerMode.DRAWING_CYLYNDER;
+			this.modeler.mode = CODE.modelerMode.DRAWING_CLIPPINGBOX;
+			//this.modeler.mode = CODE.modelerMode.DRAWING_CYLYNDER;
 			//this.modeler.mode = CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS;
 			//this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
 			this.counterAux++;
@@ -2148,10 +2149,10 @@ MagoManager.prototype.keyDown = function(key)
 		*/
 		
 		
-		if (this.magoPolicy.issueInsertEnable)
-		{ this.magoPolicy.issueInsertEnable = false; }
-		else
-		{ this.magoPolicy.issueInsertEnable = true; }
+		//if (this.magoPolicy.issueInsertEnable)
+		//{ this.magoPolicy.issueInsertEnable = false; }
+		//else
+		//{ this.magoPolicy.issueInsertEnable = true; }
 		
 		
 		// Stencil shadow mesh making test.********************
@@ -2787,7 +2788,8 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 				if (box.attributes === undefined)
 				{ box.attributes = {}; }
 				box.attributes.isMovable = true;
-				this.modeler.clippingBox = box;
+				this.modeler.addObject(box, 15);
+				//this.modeler.clippingBox = box;
 			}
 		}
 		else if (this.modeler.mode === CODE.modelerMode.DRAWING_CONCENTRICTUBES)
@@ -4009,13 +4011,17 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, globa
 		var neoBuilding = lowestOctree.neoBuildingOwner;
 		var version = neoBuilding.getHeaderVersion();
 		
-		
-		// 1rst, check if lod2 is loaded. If lod2 is no loaded yet, then load first lod2.***
-		if (this.readerWriter.octreesSkinLegos_requested < 5)
+		// Check if the lod2 is modelRef type data.
+		var lodBuildingData = neoBuilding.getLodBuildingData(2);
+		if (lodBuildingData.isModelRef === true)
 		{
-			if (lowestOctree.lego === undefined || !lowestOctree.lego.isReadyToRender())
+			// 1rst, check if lod2 is loaded. If lod2 is no loaded yet, then load first lod2.***
+			if (this.readerWriter.octreesSkinLegos_requested < 5)
 			{
-				lowestOctree.prepareSkinData(this);
+				if (lowestOctree.lego === undefined || !lowestOctree.lego.isReadyToRender())
+				{
+					lowestOctree.prepareSkinData(this);
+				}
 			}
 		}
 
@@ -4069,6 +4075,12 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistanceLOD2 = function(gl, c
 	for (var i=0, length = currentVisibles.length; i<length; i++) 
 	{	
 		lowestOctree = currentVisibles[i];
+		
+		// Check if the lod2 is modelRef type data.
+		var lodBuildingData = lowestOctree.neoBuildingOwner.getLodBuildingData(2);
+		if (!lodBuildingData.isModelRef)
+		{ continue; }
+
 		lowestOctree.prepareSkinData(this);
 
 		if (this.readerWriter.octreesSkinLegos_requested > 5)

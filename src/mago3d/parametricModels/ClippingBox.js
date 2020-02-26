@@ -155,6 +155,88 @@ ClippingBox.prototype.getPlanesRelToEye = function(resultPlanesArray, magoManage
 	return resultPlanesArray;
 };
 
+ClippingBox.prototype.getPlanes = function(resultPlanesArray, magoManager)
+{
+	// 1rst, calculate planes on the initial state.
+	// Initially, box centered at the center of the bottom.***
+	if (resultPlanesArray === undefined)
+	{ resultPlanesArray = []; }
+
+	var sceneState = magoManager.sceneState;
+	var mvMat = sceneState.modelViewMatrix;
+	var mvMatRelToEye = sceneState.modelViewRelToEyeMatrix;
+	var camera = sceneState.camera;
+	var camPos = camera.position;
+	var mvMat_inv = sceneState.modelViewMatrixInv;
+	
+	var geoLocDataManager = this.getGeoLocDataManager();
+	var geoLocData = geoLocDataManager.getCurrentGeoLocationData();
+	var rotMat = geoLocData.rotMatrix;
+	
+	var point = new Point3D();
+	var dir = new Point3D();
+	var pointWC = new Point3D();
+	var dirWC = new Point3D();
+	var pointCamCoord = new Point3D();
+	var dirCamCoord = new Point3D();
+	
+	// top plane.
+	point.set(0.0, 0.0, this.height);
+	dir.set(0.0, 0.0, 1.0);
+	pointWC = rotMat.transformPoint3D(point, pointWC);
+	dirWC = rotMat.transformPoint3D(dir, dirWC);
+	var plane = new Plane();
+	plane.setPointAndNormal(pointWC.x, pointWC.y, pointWC.z, dirWC.x, dirWC.y, dirWC.z);
+	resultPlanesArray.push(plane);
+	
+	// bottom plane.
+	point.set(0.0, 0.0, 0.0);
+	dir.set(0.0, 0.0, -1.0);
+	pointWC = rotMat.transformPoint3D(point, pointWC);
+	dirWC = rotMat.transformPoint3D(dir, dirWC);
+	var plane = new Plane();
+	plane.setPointAndNormal(pointWC.x, pointWC.y, pointWC.z, dirWC.x, dirWC.y, dirWC.z);
+	resultPlanesArray.push(plane);
+	
+	// front plane.
+	point.set(0.0, -this.length/2, this.height/2);
+	dir.set(0.0, -1.0, 0.0);
+	pointWC = rotMat.transformPoint3D(point, pointWC);
+	dirWC = rotMat.transformPoint3D(dir, dirWC);
+	var plane = new Plane();
+	plane.setPointAndNormal(pointWC.x, pointWC.y, pointWC.z, dirWC.x, dirWC.y, dirWC.z);
+	resultPlanesArray.push(plane);
+	
+	// rear plane.
+	point.set(0.0, this.length/2, this.height/2);
+	dir.set(0.0, 1.0, 0.0);
+	pointWC = rotMat.transformPoint3D(point, pointWC);
+	dirWC = rotMat.transformPoint3D(dir, dirWC);
+	var plane = new Plane();
+	plane.setPointAndNormal(pointWC.x, pointWC.y, pointWC.z, dirWC.x, dirWC.y, dirWC.z);
+	resultPlanesArray.push(plane);
+	
+	// left plane.
+	point.set(-this.width/2, 0.0, this.height/2);
+	dir.set(-1.0, 0.0, 0.0);
+	pointWC = rotMat.transformPoint3D(point, pointWC);
+	dirWC = rotMat.transformPoint3D(dir, dirWC);
+	var plane = new Plane();
+	plane.setPointAndNormal(pointWC.x, pointWC.y, pointWC.z, dirWC.x, dirWC.y, dirWC.z);
+	resultPlanesArray.push(plane);
+	
+	// right plane.
+	point.set(this.width/2, 0.0, this.height/2);
+	dir.set(1.0, 0.0, 0.0);
+	pointWC = rotMat.transformPoint3D(point, pointWC);
+	dirWC = rotMat.transformPoint3D(dir, dirWC);
+	var plane = new Plane();
+	plane.setPointAndNormal(pointWC.x, pointWC.y, pointWC.z, dirWC.x, dirWC.y, dirWC.z);
+	resultPlanesArray.push(plane);
+	
+	return resultPlanesArray;
+};
+
 /**
  * Makes the box mesh.
  * @param {Number} width
@@ -189,6 +271,20 @@ ClippingBox.prototype.makeMesh = function()
 	var bIncludeTopCap = true;
 
 	var mesh = Modeler.getExtrudedMesh(profileAux, extrusionDist, extrudeSegmentsCount, extrusionVector, bIncludeBottomCap, bIncludeTopCap, undefined);
+	
+	// set attributes & options.
+	this.setOneColor(0.2, 0.7, 0.8, 0.3);
+	this.attributes.isMovable = true;
+	this.attributes.isSelectable = true;
+	this.attributes.name = "clippingBox";
+	this.attributes.selectedColor4 = new Color(1.0, 0.0, 0.0, 0.0); // selectedColor fully transparent.
+	if (this.options === undefined)
+	{ this.options = {}; }
+	
+	this.options.renderWireframe = true;
+	this.options.renderShaded = true;
+	this.options.depthMask = true;
+	
 	this.objectsArray.push(mesh);
 	this.dirty = false;
 	return mesh;

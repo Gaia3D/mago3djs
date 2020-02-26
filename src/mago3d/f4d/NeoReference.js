@@ -517,7 +517,7 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 	if (magoManager.mouseLeftDown || magoManager.mouseMiddleDown)
 	{ minSizeToRender = 0.5; }
 	
-	if (!block.isReadyToRender(neoReference, magoManager, minSizeToRender))
+	if (magoManager.currentProcess !== CODE.magoCurrentProcess.ColorCodeRendering && !block.isReadyToRender(neoReference, magoManager, minSizeToRender))
 	{ return false; }
 
 	// Check the color or texture of reference object.
