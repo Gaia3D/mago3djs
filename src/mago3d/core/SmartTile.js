@@ -1202,7 +1202,7 @@ SmartTile.prototype.createGeometriesFromSeeds = function(magoManager)
 				// parse the dataArrayBuffer.***
 				var maxParses = 30;
 				if (i > 0)
-				{ maxParses = 1; }
+				{ maxParses = 5; }
 				var parseQueue = magoManager.parseQueue;
 				if (parseQueue.smartTileF4dParsesCount < maxParses)
 				{
@@ -1271,12 +1271,12 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		var savedProjectId = smartTilePathInfo[projectId].projectId;
 		
 		// Now, must check if the node exists.
-		var node = hierarchyManager.getNodeByDataKey(projectId, buildingId);
+		var node = hierarchyManager.getNodeByDataKey(savedProjectId, buildingId);
 		var neoBuilding;
 		var data;
 		if (!node)
 		{ 
-			node = hierarchyManager.newNode(buildingId, projectId, attributes); 
+			node = hierarchyManager.newNode(buildingId, savedProjectId, attributes); 
 			
 			// Create a neoBuilding.
 			data = node.data;
@@ -1384,7 +1384,7 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		var dataGroupId = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 		var endMark = (new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
 		data.dataId = dataId;
-		data.dataGroupId = dataGroupId;
+		data.dataGroupId = savedProjectId;
 
 		node.data.smartTileOwner = this;
 		this.nodesArray.push(node);

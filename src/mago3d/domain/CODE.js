@@ -41,7 +41,8 @@ CODE.magoCurrentProcess = {
 	"ColorRendering"             : 2,
 	"ColorCodeRendering"         : 3,
 	"DepthShadowRendering"       : 4,
-	"StencilSilhouetteRendering" : 5
+	"SilhouetteDepthRendering"   : 5,
+	"StencilSilhouetteRendering" : 6
 };
 
 CODE.modelerMode = {

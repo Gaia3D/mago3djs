@@ -169,7 +169,7 @@ CesiumViewerInit.prototype.geoserverTerrainProviderBuild = function()
 	var policy = this.policy;
 
 	var terrainParam = {
-		service: 'WMS'
+		service: 'WMTS'
 	};
 	var terrainUrl = policy.geoserverTerrainproviderUrl;
     
