@@ -1373,9 +1373,9 @@ uniform vec4 colorMultiplier;\n\
 //uniform int sunIdx;\n\
 \n\
 // clipping planes.***\n\
-uniform bool bApplyClippingPlanes;\n\
-uniform int clippingPlanesCount;\n\
-uniform vec4 clippingPlanes[6];\n\
+//uniform bool bApplyClippingPlanes;\n\
+//uniform int clippingPlanesCount;\n\
+//uniform vec4 clippingPlanes[6];\n\
 \n\
 varying vec3 vNormal;\n\
 varying vec2 vTexCoord;   \n\
@@ -1387,6 +1387,7 @@ varying vec4 vPosRelToLight; \n\
 varying vec3 vLightDir; \n\
 varying vec3 vNormalWC;\n\
 varying float currSunIdx; \n\
+varying float discardFrag;\n\
 \n\
 float unpackDepth(const in vec4 rgba_depth)\n\
 {\n\
@@ -1453,6 +1454,7 @@ bool clipVertexByPlane(in vec4 plane, in vec3 point)\n\
 void main()\n\
 {\n\
 	// 1rst, check if there are clipping planes.\n\
+	/*\n\
 	if(bApplyClippingPlanes)\n\
 	{\n\
 		bool discardFrag = true;\n\
@@ -1471,6 +1473,7 @@ void main()\n\
 		if(discardFrag)\n\
 		discard;\n\
 	}\n\
+	*/\n\
 \n\
 	//bool testBool = false;\n\
 	float occlusion = 1.0; // ambient occlusion.***\n\
@@ -1627,7 +1630,7 @@ void main()\n\
         textureColor = aColor4;\n\
     }\n\
 	\n\
-	//textureColor = vec4(0.8, 0.85, 0.9, 1.0);\n\
+	//textureColor = vec4(0.85, 0.85, 0.85, 1.0);\n\
 	\n\
 	vec3 ambientColorAux = vec3(textureColor.x*ambientColor.x, textureColor.y*ambientColor.y, textureColor.z*ambientColor.z);\n\
 	float alfa = textureColor.w * externalAlpha;\n\
@@ -1683,6 +1686,14 @@ ShaderSource.ModelRefSsaoVS = "\n\
 	uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
 	\n\
 	uniform bool bApplyShadow;\n\
+	\n\
+	// clipping planes.***\n\
+	uniform mat4 clippingPlanesRotMatrix; \n\
+	uniform vec3 clippingPlanesPosHIGH;\n\
+	uniform vec3 clippingPlanesPosLOW;\n\
+	uniform bool bApplyClippingPlanes;\n\
+	uniform int clippingPlanesCount;\n\
+	uniform vec4 clippingPlanes[6];\n\
 \n\
 	varying vec3 vNormal;\n\
 	varying vec2 vTexCoord;  \n\
@@ -1695,6 +1706,16 @@ ShaderSource.ModelRefSsaoVS = "\n\
 	varying vec3 vLightDir; \n\
 	varying vec3 vNormalWC; \n\
 	varying float currSunIdx;  \n\
+	varying float discardFrag;\n\
+	\n\
+	bool clipVertexByPlane(in vec4 plane, in vec3 point)\n\
+	{\n\
+		float dist = plane.x * point.x + plane.y * point.y + plane.z * point.z + plane.w;\n\
+		\n\
+		if(dist < 0.0)\n\
+		return true;\n\
+		else return false;\n\
+	}\n\
 	\n\
 	void main()\n\
     {	\n\
@@ -1723,6 +1744,31 @@ ShaderSource.ModelRefSsaoVS = "\n\
 		vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
 		vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
 		vec3 rotatedNormal = currentTMat * normal;\n\
+		\n\
+		// Check if clipping.********************************************\n\
+		if(bApplyClippingPlanes)\n\
+		{\n\
+			discardFrag = 1.0; // true.\n\
+			for(int i=0; i<6; i++)\n\
+			{\n\
+				vec4 plane = clippingPlanes[i];\n\
+				\n\
+				// calculate any point of the plane.\n\
+				\n\
+				\n\
+				if(!clipVertexByPlane(plane, vertexPos))\n\
+				{\n\
+					discardFrag = -1.0; // false.\n\
+					break;\n\
+				}\n\
+				if(i >= clippingPlanesCount)\n\
+				break;\n\
+			}\n\
+			\n\
+			//if(discardFrag)\n\
+			//discard;\n\
+		}\n\
+		//----------------------------------------------------------------\n\
 		\n\
 		vec3 uLightingDirection = vec3(-0.1320580393075943, -0.9903827905654907, 0.041261956095695496); \n\
 		uAmbientColor = vec3(1.0);\n\

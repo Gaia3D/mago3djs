@@ -296,6 +296,24 @@
          "heading":0,
          "pitch":0,
          "roll": 0
+      },
+	  {  
+         "attributes":{  
+            "isPhysical":true,
+            "nodeType":"test"
+         },
+         "children":[  
+
+         ],
+         "data_key":"7D6_1",
+         "data_name":"7D6_1",
+         "mapping_type":"origin",
+		 "latitude" : 37.56651,
+		 "longitude" : 126.97801,
+         "height":0,
+         "heading":0,
+         "pitch":0,
+         "roll": 0
       }
    ],
    "parent":0,

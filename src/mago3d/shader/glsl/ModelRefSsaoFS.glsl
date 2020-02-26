@@ -44,9 +44,9 @@ uniform vec4 colorMultiplier;
 //uniform int sunIdx;
 
 // clipping planes.***
-uniform bool bApplyClippingPlanes;
-uniform int clippingPlanesCount;
-uniform vec4 clippingPlanes[6];
+//uniform bool bApplyClippingPlanes;
+//uniform int clippingPlanesCount;
+//uniform vec4 clippingPlanes[6];
 
 varying vec3 vNormal;
 varying vec2 vTexCoord;   
@@ -58,6 +58,7 @@ varying vec4 vPosRelToLight;
 varying vec3 vLightDir; 
 varying vec3 vNormalWC;
 varying float currSunIdx; 
+varying float discardFrag;
 
 float unpackDepth(const in vec4 rgba_depth)
 {
@@ -124,6 +125,7 @@ bool clipVertexByPlane(in vec4 plane, in vec3 point)
 void main()
 {
 	// 1rst, check if there are clipping planes.
+	/*
 	if(bApplyClippingPlanes)
 	{
 		bool discardFrag = true;
@@ -142,6 +144,7 @@ void main()
 		if(discardFrag)
 		discard;
 	}
+	*/
 
 	//bool testBool = false;
 	float occlusion = 1.0; // ambient occlusion.***
@@ -298,7 +301,7 @@ void main()
         textureColor = aColor4;
     }
 	
-	//textureColor = vec4(0.8, 0.85, 0.9, 1.0);
+	//textureColor = vec4(0.85, 0.85, 0.85, 1.0);
 	
 	vec3 ambientColorAux = vec3(textureColor.x*ambientColor.x, textureColor.y*ambientColor.y, textureColor.z*ambientColor.z);
 	float alfa = textureColor.w * externalAlpha;

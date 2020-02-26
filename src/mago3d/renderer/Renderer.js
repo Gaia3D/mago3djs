@@ -2156,6 +2156,8 @@ Renderer.prototype.renderGeometryColorCoding = function(visibleObjControlerNodes
 	var gl = magoManager.getGl();
 	var renderType = 2; // 0 = depthRender, 1= colorRender, 2 = selectionRender.***
 	
+	magoManager.currentProcess = CODE.magoCurrentProcess.ColorCodeRendering;
+	
 	// Render mago modeler objects.***
 	/*
 	if (magoManager.modeler !== undefined)
