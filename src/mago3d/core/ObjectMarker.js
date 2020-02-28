@@ -11,6 +11,7 @@ var ObjectMarker = function()
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
+	this.id;
 	this.geoLocationData = new GeoLocationData();
 	this.issue_id = null;
 	this.issue_type = null;
