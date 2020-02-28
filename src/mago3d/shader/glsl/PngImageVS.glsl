@@ -98,7 +98,7 @@ void main()
 		offset = vec4(offsetX*scale2d.x, offsetY*4.0*scale2d.y, 0.0, 1.0);
 	}
 
-	gl_Position = projected + offset + vec4(aditionalOffset.x, aditionalOffset.y, aditionalOffset.z, 0.0); 
+	gl_Position = projected + offset + vec4(aditionalOffset.x*pixelWidth, aditionalOffset.y*pixelWidth, aditionalOffset.z*pixelWidth, 0.0); 
 }
 
 
