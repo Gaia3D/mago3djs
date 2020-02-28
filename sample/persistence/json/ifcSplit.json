@@ -305,12 +305,12 @@
          "children":[  
 
          ],
-         "data_key":"7D6_1",
-         "data_name":"7D6_1",
+         "data_key":"bus_sign_0",
+         "data_name":"bus_sign_0",
          "mapping_type":"origin",
-		 "latitude" : 37.56651,
+		 "latitude" : 37.567,
 		 "longitude" : 126.97801,
-         "height":0,
+         "height":20,
          "heading":0,
          "pitch":0,
          "roll": 0

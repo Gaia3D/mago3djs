@@ -152,6 +152,7 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 		
 		gl.useProgram(shaderProgram);
 		shader.bindUniformGenerals();
+		magoManager.effectsManager.setCurrentShader(shader);
 		gl.uniformMatrix4fv(shader.modelViewProjectionMatrix4RelToEye_loc, false, magoManager.sceneState.modelViewProjRelToEyeMatrix._floatArrays);
 		gl.uniform3fv(shader.cameraPosHIGH_loc, magoManager.sceneState.encodedCamPosHigh);
 		gl.uniform3fv(shader.cameraPosLOW_loc, magoManager.sceneState.encodedCamPosLow);
@@ -180,6 +181,7 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 		gl.uniform2fv(shader.scale2d_loc, [1.0, 1.0]);
 		gl.uniform2fv(shader.size2d_loc, [25.0, 25.0]);
 		gl.uniform1i(shader.bUseOriginalImageSize_loc, true);
+		gl.uniform3fv(shader.aditionalOffset_loc, [0.0, 0.0, 0.0]);
 		
 		gl.depthMask(false);
 		var selectionManager = magoManager.selectionManager;

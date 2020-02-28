@@ -2149,10 +2149,10 @@ MagoManager.prototype.keyDown = function(key)
 		*/
 		
 		
-		//if (this.magoPolicy.issueInsertEnable)
-		//{ this.magoPolicy.issueInsertEnable = false; }
-		//else
-		//{ this.magoPolicy.issueInsertEnable = true; }
+		if (this.magoPolicy.issueInsertEnable)
+		{ this.magoPolicy.issueInsertEnable = false; }
+		else
+		{ this.magoPolicy.issueInsertEnable = true; }
 		
 		
 		// Stencil shadow mesh making test.********************
@@ -2257,7 +2257,7 @@ MagoManager.prototype.keyDown = function(key)
 			this.smartTile_f4d_tested = 1;
 			//var projectFolderName = "smartTile_f4d_Korea";
 			//var projectFolderName = "SejongParkJinWoo_20191101";
-			var projectFolderName = "SmartTilesF4D_WorkFolder_sejongLX";
+			var projectFolderName = "SmartTilesF4D_WorkFolder";
 			var fileName = this.readerWriter.geometryDataPath + "/" + projectFolderName + "/" + "smartTile_f4d_indexFile.sii";
 			this.readerWriter.getObjectIndexFileSmartTileF4d(fileName, projectFolderName, this);
 
@@ -4615,6 +4615,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.size2d_loc = gl.getUniformLocation(shader.program, "size2d");
 	shader.imageSize_loc = gl.getUniformLocation(shader.program, "imageSize");
 	shader.bUseOriginalImageSize_loc = gl.getUniformLocation(shader.program, "bUseOriginalImageSize");
+	shader.aditionalOffset_loc = gl.getUniformLocation(shader.program, "aditionalOffset");
 };
 
 /**

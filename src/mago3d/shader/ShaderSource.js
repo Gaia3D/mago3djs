@@ -1963,6 +1963,7 @@ uniform vec3 encodedCameraPositionMCHigh;\n\
 uniform vec3 encodedCameraPositionMCLow;\n\
 uniform vec2 scale2d;\n\
 uniform vec2 size2d;\n\
+uniform vec3 aditionalOffset;\n\
 uniform vec2 imageSize;\n\
 uniform float screenWidth;    \n\
 uniform float screenHeight;\n\
@@ -2050,7 +2051,7 @@ void main()\n\
 		offset = vec4(offsetX*scale2d.x, offsetY*4.0*scale2d.y, 0.0, 1.0);\n\
 	}\n\
 \n\
-	gl_Position = projected + offset; \n\
+	gl_Position = projected + offset + vec4(aditionalOffset.x, aditionalOffset.y, aditionalOffset.z, 0.0); \n\
 }\n\
 \n\
 \n\
