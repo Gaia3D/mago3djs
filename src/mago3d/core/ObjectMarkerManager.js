@@ -160,6 +160,7 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 		
 		gl.useProgram(shaderProgram);
 		shader.bindUniformGenerals();
+		magoManager.effectsManager.setCurrentShader(shader);
 		gl.uniformMatrix4fv(shader.modelViewProjectionMatrix4RelToEye_loc, false, magoManager.sceneState.modelViewProjRelToEyeMatrix._floatArrays);
 		gl.uniform3fv(shader.cameraPosHIGH_loc, magoManager.sceneState.encodedCamPosHigh);
 		gl.uniform3fv(shader.cameraPosLOW_loc, magoManager.sceneState.encodedCamPosLow);
@@ -188,6 +189,7 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 		gl.uniform2fv(shader.scale2d_loc, [1.0, 1.0]);
 		gl.uniform2fv(shader.size2d_loc, [25.0, 25.0]);
 		gl.uniform1i(shader.bUseOriginalImageSize_loc, true);
+		gl.uniform3fv(shader.aditionalOffset_loc, [0.0, 0.0, 0.0]);
 		
 		gl.depthMask(false);
 		gl.disable(gl.BLEND);
@@ -195,6 +197,7 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 		var lastTexId = undefined;
 		if (renderType === 1)
 		{
+			var executedEffects = false;
 			for (var i=0; i<objectsMarkersCount; i++)
 			{
 				var objMarker = magoManager.objMarkerManager.objectMarkerArray[i];
@@ -229,6 +232,10 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 				if (!objMarker.bUseOriginalImageSize)
 				{ gl.uniform2fv(shader.size2d_loc, objMarker.size2d); }
 			
+				// Check if there are effects.
+				if (renderType !== 2 && magoManager.currentProcess !== CODE.magoCurrentProcess.StencilSilhouetteRendering)
+				{ executedEffects = magoManager.effectsManager.executeEffects(objMarker.issue_id, magoManager.getCurrentTime()); }
+			
 				gl.uniform2fv(shader.imageSize_loc, [currentTexture.texId.imageWidth, currentTexture.texId.imageHeight]);
 				
 				var objMarkerGeoLocation = objMarker.geoLocationData;
@@ -244,6 +251,12 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 
 				gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
+			}
+			
+			if (executedEffects)
+			{
+				// must return all uniforms changed for effects.
+				gl.uniform3fv(shader.aditionalOffset_loc, [0.0, 0.0, 0.0]); // init referencesMatrix.
 			}
 		}
 		else if (renderType === 2)

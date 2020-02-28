@@ -517,8 +517,15 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 	if (magoManager.mouseLeftDown || magoManager.mouseMiddleDown)
 	{ minSizeToRender = 0.5; }
 	
-	if (magoManager.currentProcess !== CODE.magoCurrentProcess.ColorCodeRendering && !block.isReadyToRender(neoReference, magoManager, minSizeToRender))
-	{ return false; }
+	// If colorCodeRendering, then must render all objects, without filtering by size.
+	if (magoManager.currentProcess !== CODE.magoCurrentProcess.ColorCodeRendering)// && !block.isReadyToRender(neoReference, magoManager, minSizeToRender))
+	{ 
+		if (!block.isReadyToRender(neoReference, magoManager, minSizeToRender))
+		{
+			if (magoManager.objectSelected !== neoReference)
+			{ return false; } 
+		}
+	}
 
 	// Check the color or texture of reference object.
 	if (renderType === 1)
