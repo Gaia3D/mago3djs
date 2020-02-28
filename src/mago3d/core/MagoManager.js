@@ -3966,7 +3966,7 @@ MagoManager.prototype.checkPropertyFilters = function(nodesArray)
 			{
 				if (node.data.attributes[propertyKey] !== undefined && node.data.attributes[propertyKey].toString() === propertyValue)
 				{
-					if (visible === "true")
+					if (visible === true)
 					{
 						// do nothing.
 					}
@@ -3979,7 +3979,7 @@ MagoManager.prototype.checkPropertyFilters = function(nodesArray)
 				}
 				else
 				{
-					if (visible === "true")
+					if (visible === true)
 					{
 						nodesArray.splice(i, 1);
 						i--;

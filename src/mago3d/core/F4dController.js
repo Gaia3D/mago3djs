@@ -67,9 +67,12 @@ F4dController.prototype.addSmartTileGroup = function(f4dObject)
 
 		this.smartTilePathInfo[groupKey].projectId = groupId;
 		this.smartTilePathInfo[groupKey].projectFolderPath = groupDataFolder;
-		this.smartTilePathInfo[groupKey].smartTileIndexPath = groupDataFolder + '/' + groupKey + '_TILE';
+		//this.smartTilePathInfo[groupKey].smartTileIndexPath = groupDataFolder + '/' + groupKey + '_TILE';
 
-		magoManager.getObjectIndexFileSmartTileF4d(this.smartTilePathInfo[groupKey].smartTileIndexPath);
+		if (f4dObject.smartTileIndexPath) 
+		{
+			magoManager.getObjectIndexFileSmartTileF4d(f4dObject.smartTileIndexPath);
+		}
 	}
 };
 /**
