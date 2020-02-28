@@ -152,10 +152,8 @@ Effect.prototype.execute = function(currTimeSec)
 					this.zVelocity *= -1.0;
 				}
 			}
-			
-			zOffset = timeDiffSeconds/this.durationSeconds;
 		}
-		gl.uniform3fv(this.effectsManager.currShader.aditionalOffset_loc, [0.0, 0.0, this.zOffset]); // init referencesMatrix.
+		gl.uniform3fv(this.effectsManager.currShader.aditionalOffset_loc, [0.0, this.zOffset, 0.0]); // init referencesMatrix.
 		return effectFinished;
 	}
 };
