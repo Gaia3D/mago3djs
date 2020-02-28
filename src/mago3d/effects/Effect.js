@@ -113,18 +113,21 @@ Effect.prototype.execute = function(currTimeSec)
 	}
 	else if (this.effectType === "zMovement")
 	{
-		if (this.zVelocity === undefined) 
+		if (this.zVelocity === undefined)
 		{ this.zVelocity = 1.0; }
-			
-		if (this.zMax === undefined) 
+
+		if (this.zMax === undefined)
 		{ this.zMax = 1.0; }
-			
-		if (this.zMin === undefined) 
+
+		if (this.zMin === undefined)
 		{ this.zMin = -1.0; }
-			
-		if (this.zOffset === undefined) 
+
+		if (this.zOffset === undefined)
 		{ this.zOffset = 0.0; }
-		
+
+		if (this.lastTime === undefined)
+		{ this.lastTime = currTimeSec; }
+
 		if (timeDiffSeconds >= this.durationSeconds)
 		{
 			this.zOffset = 0.0;
@@ -132,8 +135,9 @@ Effect.prototype.execute = function(currTimeSec)
 		}
 		else
 		{
-			this.zOffset = this.zVelocity * timeDiffSeconds;
-			
+			var diffTime = currTimeSec - this.lastTime;
+			this.zOffset += this.zVelocity * diffTime;
+
 			if (this.zVelocity > 0.0)
 			{
 				if (this.zOffset > this.zMax)
@@ -148,12 +152,13 @@ Effect.prototype.execute = function(currTimeSec)
 				if (this.zOffset < this.zMin)
 				{
 					var diff = (this.zOffset - this.zMin);
-					this.zOffset = this.zMin + diff;
+					this.zOffset = this.zMin - diff;
 					this.zVelocity *= -1.0;
 				}
 			}
 		}
-		gl.uniform3fv(this.effectsManager.currShader.aditionalOffset_loc, [0.0, this.zOffset, 0.0]); // init referencesMatrix.
+		gl.uniform3fv(this.effectsManager.currShader.aditionalOffset_loc, [0.0, this.zOffset, 0.0 ]); // init referencesMatrix.
+		this.lastTime = currTimeSec;
 		return effectFinished;
 	}
 };
