@@ -188,6 +188,7 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 		var lastTexId = undefined;
 		if (renderType === 1)
 		{
+			var executedEffects = false;
 			for (var i=0; i<objectsMarkersCount; i++)
 			{
 				var objMarker = magoManager.objMarkerManager.objectMarkerArray[i];
@@ -222,6 +223,10 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 				if (!objMarker.bUseOriginalImageSize)
 				{ gl.uniform2fv(shader.size2d_loc, objMarker.size2d); }
 			
+				// Check if there are effects.
+				if (renderType !== 2 && magoManager.currentProcess !== CODE.magoCurrentProcess.StencilSilhouetteRendering)
+				{ executedEffects = magoManager.effectsManager.executeEffects(objMarker.issue_id, magoManager.getCurrentTime()); }
+			
 				gl.uniform2fv(shader.imageSize_loc, [currentTexture.texId.imageWidth, currentTexture.texId.imageHeight]);
 				
 				var objMarkerGeoLocation = objMarker.geoLocationData;
@@ -237,6 +242,12 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 
 				gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
+			}
+			
+			if (executedEffects)
+			{
+				// must return all uniforms changed for effects.
+				gl.uniform3fv(shader.aditionalOffset_loc, [0.0, 0.0, 0.0]); // init referencesMatrix.
 			}
 		}
 		else if (renderType === 2)
