@@ -1660,7 +1660,7 @@ ReaderWriter.prototype.loadWMSImage = function(gl, filePath_inServer, texture, m
 		
 };
 
-
+/*
 ReaderWriter.prototype.handleTextureLoaded = function(gl, image, texture, flip_y_texCoord) 
 {
 	// https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Using_textures_in_WebGL
@@ -1683,3 +1683,4 @@ ReaderWriter.prototype.handleTextureLoaded = function(gl, image, texture, flip_y
 	gl.generateMipmap(gl.TEXTURE_2D);
 	gl.bindTexture(gl.TEXTURE_2D, null);
 };
+*/

@@ -141,7 +141,7 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 		var currentTexture = this.pin.texturesArray[0];
 		if (!currentTexture || !currentTexture.texId)
 		{
-			magoManager.load_testTextures();
+			//magoManager.load_testTextures();
 			return;
 		}
 		
