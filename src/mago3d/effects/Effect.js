@@ -113,21 +113,22 @@ Effect.prototype.execute = function(currTimeSec)
 	}
 	else if (this.effectType === "zMovement")
 	{
-		if (this.zVelocity === undefined) 
+		if (this.zVelocity === undefined)
 		{ this.zVelocity = 1.0; }
-			
-		if (this.zMax === undefined) 
+
+		if (this.zMax === undefined)
 		{ this.zMax = 1.0; }
-			
-		if (this.zMin === undefined) 
+
+		if (this.zMin === undefined)
 		{ this.zMin = -1.0; }
-			
-		if (this.zOffset === undefined) 
+
+		if (this.zOffset === undefined)
 		{ this.zOffset = 0.0; }
-		
-		if (this.lastTime === undefined) 
+
+		if (this.lastTime === undefined)
 		{ this.lastTime = currTimeSec; }
-		
+
+
 		if (timeDiffSeconds >= this.durationSeconds)
 		{
 			this.zOffset = 0.0;
@@ -137,7 +138,7 @@ Effect.prototype.execute = function(currTimeSec)
 		{
 			var diffTime = currTimeSec - this.lastTime;
 			this.zOffset += this.zVelocity * diffTime;
-			
+
 			if (this.zVelocity > 0.0)
 			{
 				if (this.zOffset > this.zMax)

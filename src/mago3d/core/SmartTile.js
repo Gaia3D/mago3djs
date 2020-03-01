@@ -1259,17 +1259,22 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		var buildingId = "";
 		wordLength = (new Uint16Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+2)))[0]; bytesReaded += 2;
 		buildingId = enc.decode(new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+ wordLength))) ;bytesReaded += wordLength;
+
+		var projectFolderName = smartTilePathInfo[projectId].projectFolderPath;
+		var savedProjectId = smartTilePathInfo[projectId].projectId;
 		
 		// Create a node for each building.
 		var attributes = {
 			"isPhysical" : true,
 			"objectType" : "basicF4d"
 		};
-		
 
-		var projectFolderName = smartTilePathInfo[projectId].projectFolderPath;
-		var savedProjectId = smartTilePathInfo[projectId].projectId;
-		
+		var commonAttr = magoManager.hierarchyManager.getNodeByDataKey(savedProjectId, 'attributes');
+		if (commonAttr) 
+		{
+			attributes.isVisible = commonAttr.isVisible;
+		}
+
 		// Now, must check if the node exists.
 		var node = hierarchyManager.getNodeByDataKey(savedProjectId, buildingId);
 		var neoBuilding;
