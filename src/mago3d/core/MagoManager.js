@@ -520,6 +520,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		sceneState.modelViewRelToEyeMatrix._floatArrays[13] = 0;
 		sceneState.modelViewRelToEyeMatrix._floatArrays[14] = 0;
 		sceneState.modelViewRelToEyeMatrix._floatArrays[15] = 1;
+		
 		sceneState.modelViewRelToEyeMatrixInv._floatArrays = glMatrix.mat4.invert(sceneState.modelViewRelToEyeMatrixInv._floatArrays, sceneState.modelViewRelToEyeMatrix._floatArrays);
 			
 		// modelViewProjection.***

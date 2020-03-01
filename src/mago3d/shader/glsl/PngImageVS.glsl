@@ -58,18 +58,19 @@ void main()
 	
     v_texcoord = texCoord;
 	vec4 projected = ModelViewProjectionMatrixRelToEye * pos4;
-	vec4 projected2 = modelViewMatrixRelToEye * pos4;
-	
+	//vec4 projected2 = modelViewMatrixRelToEye * pos4;
+
 	// Now, calculate the pixelSize in the plane of the projected point.
 	float pixelWidthRatio = 2. / (screenWidth * projectionMatrix[0][0]);
+	// alternative : float pixelWidthRatio = 2. / (screenHeight * projectionMatrix[1][1]);
 	float pixelWidth = projected.w * pixelWidthRatio;
 	
-	float thickness = 30.0;
+	if(projected.w < 5.0)
+		pixelWidth = 5.0 * pixelWidthRatio;
+	
 	vec4 offset;
-	//float projectedDepth = projected.w;
-	//float projectedDepth = -projected2.z;
-	float offsetX;// = (size2d.x*projectedDepth)/1000.0;
-	float offsetY;// = (size2d.y*projectedDepth)/1000.0;
+	float offsetX;
+	float offsetY;
 	if(bUseOriginalImageSize)
 	{
 		offsetX = pixelWidth*imageSize.x/2.0;
