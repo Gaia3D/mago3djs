@@ -2002,9 +2002,9 @@ MagoManager.prototype.keyDown = function(key)
 		
 		if (this.counterAux === -1)
 		{
-			this.modeler.mode = CODE.modelerMode.DRAWING_CLIPPINGBOX;
+			//this.modeler.mode = CODE.modelerMode.DRAWING_CLIPPINGBOX;
 			//this.modeler.mode = CODE.modelerMode.DRAWING_CYLYNDER;
-			//this.modeler.mode = CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS;
+			this.modeler.mode = CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS;
 			//this.modeler.mode = CODE.modelerMode.DRAWING_EXCAVATIONPOINTS;
 			this.counterAux++;
 		}
@@ -2123,37 +2123,11 @@ MagoManager.prototype.keyDown = function(key)
 	}
 	else if (key === 84) // 84 = 't'.***
 	{
-		// change sunPosition test.***
-		/*
-		var sunSystem = this.sceneState.sunSystem;
-		if (this.dateTest === undefined)
-		{
-			this.dateTest = new Date();
-			this.dateTest.setMonth(2);
-			this.dateTest.setHours(9);
-			this.dateTest.setMinutes(30);
-		}
-		
-		var currHour = this.dateTest.getHours();
-		var currMin = this.dateTest.getMinutes()+10;
-		if (currMin >= 50)
-		{
-			this.dateTest.setMinutes(0);
-			currHour += 1;
-			this.dateTest.setHours(currHour);
-		}
-		else 
-		{
-			this.dateTest.setMinutes(currMin);
-		}
-		sunSystem.setDate(this.dateTest);
-		*/
-		
-		
-		if (this.magoPolicy.issueInsertEnable)
-		{ this.magoPolicy.issueInsertEnable = false; }
-		else
-		{ this.magoPolicy.issueInsertEnable = true; }
+
+		//if (this.magoPolicy.issueInsertEnable)
+		//{ this.magoPolicy.issueInsertEnable = false; }
+		//else
+		//{ this.magoPolicy.issueInsertEnable = true; }
 		
 		
 		// Stencil shadow mesh making test.********************
@@ -2178,14 +2152,20 @@ MagoManager.prototype.keyDown = function(key)
 		// another test.***
 		if (this.modeler !== undefined)
 		{
-			/*
+			
 			var geoCoordsList = this.modeler.getGeographicCoordsList();
 			if (geoCoordsList !== undefined)
 			{
 				// test make thickLine.
-				geoCoordsList.test__makeThickLines(this);
+				//geoCoordsList.test__makeThickLines(this);
+				if (geoCoordsList.getGeoCoordsCount() > 0)
+				{
+					var renderableObject = GeographicCoordsList.getRenderableObjectOfGeoCoordsArray(geoCoordsList.geographicCoordsArray, this);
+					this.modeler.addObject(renderableObject, 15);
+				}
+				var hola = 0;
 			}
-			*/
+			
 			//var excavation = this.modeler.getExcavation();
 			//if (excavation !== undefined)
 			//{
@@ -4909,17 +4889,17 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 					}
 					
 					// If necessary do frustum culling.**********************************************************
-					if (doFrustumCullingToBuildings)
-					{
-						var frustumCull = frustumVolume.intersectionSphere(this.boundingSphere_Aux); // cesium.***
-						// intersect with Frustum
-						if (frustumCull === Constant.INTERSECTION_OUTSIDE) 
-						{
-							// put this node to delete into queue.***
-							//this.processQueue.putNodeToDeleteLessThanLod3(node, 0);
-							continue;
-						}
-					}
+					//if (doFrustumCullingToBuildings)
+					//{
+					//	var frustumCull = frustumVolume.intersectionSphere(this.boundingSphere_Aux); // cesium.***
+					//	// intersect with Frustum
+					//	if (frustumCull === Constant.INTERSECTION_OUTSIDE) 
+					//	{
+					//		// put this node to delete into queue.***
+					//		//this.processQueue.putNodeToDeleteLessThanLod3(node, 0);
+					//		continue;
+					//	}
+					//}
 					//-------------------------------------------------------------------------------------------
 					
 					visibleNodes.putNodeByLod(node, lodByDist);
@@ -4927,38 +4907,19 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 			}
 		}
 		
-		// Now, check parametric objects created natively in mago.
-		if (lowestTile.objectsArray !== undefined && lowestTile.objectsArray.length > 0)
-		{
-			// check parametric objects.
-			var objectsCount = lowestTile.objectsArray.length;
-			for (var j=0; j<objectsCount; j++)
-			{
-				var object = lowestTile.objectsArray[j];
-				visibleNodes.putNativeObject(object);
-				
-				//var bbox = object.getBoundingBox();
-				//this.boundingSphere_Aux = bbox.getBoundingSphere(this.boundingSphere_Aux);
-				
-				//// do frustumCulling.
-				//var frustumCull = frustumVolume.intersectionSphere(this.boundingSphere_Aux); // cesium.***
-				//// intersect with Frustum
-				//if (frustumCull !== Constant.INTERSECTION_OUTSIDE) 
-				//{
-				//	visibleNodes.currentVisibleNativeObjects.push(object);
-				//}
-				
-			}
-		}
-		
-		
+		// Check native objects.
+		var nativeObjects = lowestTile.nativeObjects;
+		var currVisibleNativeObjects = visibleNodes.currentVisibleNativeObjects;
+		Array.prototype.push.apply(currVisibleNativeObjects.opaquesArray, nativeObjects.opaquesArray);
+		Array.prototype.push.apply(currVisibleNativeObjects.transparentsArray, nativeObjects.transparentsArray);
+		Array.prototype.push.apply(currVisibleNativeObjects.excavationsArray, nativeObjects.excavationsArray);
+		Array.prototype.push.apply(currVisibleNativeObjects.vectorTypeArray, nativeObjects.vectorTypeArray);
+
 		if (lowestTile.isNeededToCreateGeometriesFromSeeds())
 		{
 			lowestTile.createGeometriesFromSeeds(this);
 		}
-		
 	}
-	
 };
 
 /**

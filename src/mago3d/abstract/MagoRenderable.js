@@ -22,6 +22,7 @@ var MagoRenderable = function(options)
 	this.color4;
 	this.wireframeColor4;
 	this.selectedColor4;
+	this.objectType = MagoRenderable.OBJECT_TYPE.MESH; // Init as mesh type.
 
 	this.eventObject = {};
 	
@@ -41,6 +42,12 @@ MagoRenderable.EVENT_TYPE = {
 	'MOVE_END'     : 'moveEnd',
 	'MOVE_START'   : 'moveStart'
 };
+
+MagoRenderable.OBJECT_TYPE = {
+	'MESH'       : 0,
+	'VECTORMESH' : 1
+};
+
 /**
  * 이벤트 등록
  * @param {MagoEvent} event 
@@ -129,7 +136,6 @@ MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPr
 			}
 		}
 	}
-	
 
 	if (this.dirty)
 	{ this.makeMesh(); }

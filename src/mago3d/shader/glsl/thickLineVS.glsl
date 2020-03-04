@@ -2,7 +2,8 @@
 attribute vec4 prev;
 attribute vec4 current;
 attribute vec4 next;
-//attribute float order;
+attribute vec4 color4;
+
 uniform float thickness;
 uniform mat4 buildingRotMatrix;
 uniform mat4 projectionMatrix;
@@ -14,6 +15,11 @@ uniform vec3 buildingPosHIGH;
 uniform vec3 buildingPosLOW;
 uniform vec3 encodedCameraPositionMCHigh;
 uniform vec3 encodedCameraPositionMCLow;
+//uniform vec4 color;
+uniform vec4 oneColor4;
+uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.
+
+varying vec4 vColor;
 
 
 const float error = 0.001;
@@ -107,6 +113,12 @@ void main(){
 	vec4 offset = vec4(normal * direction, 0.0, 1.0);
 	gl_Position = currentProjected + offset; 
 	
+	if(colorType == 0)
+		vColor = oneColor4;
+	else if(colorType == 1)
+		vColor = oneColor4;
+	else
+		vColor = oneColor4;
 }
 
 

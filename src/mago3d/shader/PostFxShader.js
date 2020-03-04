@@ -37,6 +37,8 @@ var PostFxShader = function(gl)
 	
 	// attribLocations state management.
 	this.attribLocationStateArray = [];
+	
+	this.shaderManager; 
 };
 
 PostFxShader.createShader = function(gl, type, source) 
@@ -211,6 +213,7 @@ PostFxShader.prototype.useProgram = function()
 	if (currProgram !== this.program)
 	{
 		gl.useProgram(this.program);
+		this.shaderManager.currentShaderUsing = this;
 	}
 	this.resetLastBuffersBinded();
 };
