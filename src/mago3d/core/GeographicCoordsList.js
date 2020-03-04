@@ -174,7 +174,7 @@ GeographicCoordsList.getPointsRelativeToGeoLocation = function(geoLocIn, geoCoor
 /**
  * Returns renderableObject of the geoCoordsList.
  */
-GeographicCoordsList.getRenderableObjectOfGeoCoordsArray = function(geoCoordsArray, magoManager) 
+GeographicCoordsList.getRenderableObjectOfGeoCoordsArray = function(geoCoordsArray, magoManager, options) 
 {
 	if (geoCoordsArray === undefined || geoCoordsArray.length === 0)
 	{ return undefined; }
@@ -186,9 +186,18 @@ GeographicCoordsList.getRenderableObjectOfGeoCoordsArray = function(geoCoordsArr
 	var points3dLCArray = GeographicCoordsList.getPointsRelativeToGeoLocation(geoLoc, geoCoordsArray, undefined);
 	
 	// Create a vectorMesh.
-	var options = {
-		thickness: 2.0
-	};
+	if (options === undefined)
+	{
+		options = {
+			thickness: 2.0
+		};
+	}
+	else
+	{
+		if (options.thickness === undefined)
+		{ options.thickness = 2.0; }
+	}
+	
 	var vectorMesh = new VectorMesh(options);
 	vectorMesh.vboKeysContainer = Point3DList.getVboThickLines(magoManager, points3dLCArray, vectorMesh.vboKeysContainer);
 	
