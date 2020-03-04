@@ -786,43 +786,51 @@ Mesh.prototype.getTrianglesListsArrayBy2ByteSize = function(trianglesArray, resu
  * @param glPrimitive
  * @TODO : 누가 이 gl primitive의 type 정체를 안다면 좀 달아주세요ㅠㅠ 세슘 쪽인거 같은데ㅠㅠ
  */
-Mesh.prototype.renderAsChild = function (magoManager, shader, renderType, glPrimitive, isSelected, options) 
+Mesh.prototype.renderAsChild = function (magoManager, shader, renderType, glPrimitive, isSelected, options, bWireframe) 
 {
 	var renderShaded = true;
 	var renderWireframe = false;
 	var depthMask = true;
 	
 	var gl = magoManager.getGl();
-	
-	if (options)
+
+	if (bWireframe)
 	{
-		if (options.renderShaded !== undefined)
+		if (options)
 		{
-			renderShaded = options.renderShaded;
+			if (options.renderWireframe !== undefined)
+			{ renderWireframe = options.renderWireframe; }
+			
+			if (options.depthMask !== undefined)
+			{ depthMask = options.depthMask; }
+		}
+	
+		if (renderWireframe)
+		{
+			this.renderWireframe(magoManager, shader, renderType, glPrimitive, isSelected);
+		}
+	}
+	else
+	{
+		if (options)
+		{
+			if (options.renderShaded !== undefined)
+			{ renderShaded = options.renderShaded; }
+
+			if (options.depthMask !== undefined)
+			{ depthMask = options.depthMask; }
 		}
 		
-		if (options.renderWireframe !== undefined)
+		if (renderShaded)
 		{
-			renderWireframe = options.renderWireframe;
-		}
-		
-		if (options.depthMask !== undefined)
-		{
-			depthMask = options.depthMask;
+			gl.depthMask(depthMask);
+			this.render(magoManager, shader, renderType, glPrimitive, isSelected);
+			gl.depthMask(true);
 		}
 	}
 	
-	if (renderShaded)
-	{
-		gl.depthMask(depthMask);
-		this.render(magoManager, shader, renderType, glPrimitive, isSelected);
-		gl.depthMask(true);
-	}
 	
-	if (renderWireframe)
-	{
-		this.renderWireframe(magoManager, shader, renderType, glPrimitive, isSelected);
-	}
+	
 	
 };
 

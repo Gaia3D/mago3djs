@@ -2162,6 +2162,8 @@ MagoManager.prototype.keyDown = function(key)
 				{
 					var renderableObject = GeographicCoordsList.getRenderableObjectOfGeoCoordsArray(geoCoordsList.geographicCoordsArray, this);
 					this.modeler.addObject(renderableObject, 15);
+					
+					geoCoordsList.geographicCoordsArray.length = 0;
 				}
 				var hola = 0;
 			}
