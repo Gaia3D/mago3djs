@@ -273,15 +273,6 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 		var pointWC = scene.globe.pick(ray, scene);
 		mouseAction.strWorldPoint = pointWC;
 		return;
-		var difX = camera._positionWC.x - pointWC.x;
-		var difY = camera._positionWC.y - pointWC.y;
-		var difZ = camera._positionWC.z - pointWC.z;
-		currentLinearDepth = Math.sqrt(difX*difX + difY*difY + difZ*difZ);
-		// in case of this is cesium globe, then check globe depth.
-		//var globeDepthTex = magoManager.czm_globeDepthText;
-		//var depthFbo = new FBO(gl, sceneState.drawingBufferWidth, sceneState.drawingBufferHeight);
-		//depthFbo.colorBuffer = globeDepthTex;
-		//currentLinearDepth = ManagerUtils.calculatePixelLinearDepthABGR(gl, mouseAction.strX, mouseAction.strY, depthFbo, magoManager);
 	}
 	
 	//if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)

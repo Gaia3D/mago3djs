@@ -140,12 +140,38 @@ F4dController.prototype.deleteF4dGroup = function(groupId)
 	{
 		throw new Error('groupId is required.');
 	}
+
+	var nodeMap = this.magoManager.hierarchyManager.getNodesMap(groupId);
+	if (!nodeMap) 
+	{
+		throw new Error(groupId + ' group is no exists.');
+	}
+
+	var keys = Object.keys(nodeMap);
+	for (var i=0, len=keys.length;i<len;i++) 
+	{
+		var key = keys[i];
+		if (key === 'attributes') 
+		{
+			continue;
+		}
+		
+		var item = nodeMap[keys[i]];
+		if (!item.data.attributes.isPhysical) 
+		{
+			continue;
+		}
+
+		this.deleteF4dMember(groupId, key);
+	}
+
+	delete this.magoManager.hierarchyManager.projectsMap[groupId];
 };
 
 /**
  * f4d data를 삭제
  * @param {string} groupId required. target group id
- * @param {Array<object>} f4dObjectArray f4d data definition object
+ * @param {string} memberId f4d data definition object
  */
 F4dController.prototype.deleteF4dMember = function(groupId, memberId) 
 {
@@ -157,7 +183,20 @@ F4dController.prototype.deleteF4dMember = function(groupId, memberId)
 	{
 		throw new Error('memberId is required.');
 	}
-    
+
+	var node = this.magoManager.hierarchyManager.getNodeByDataKey(groupId, memberId);
+	if (!node) 
+	{
+		throw new Error('node is no exists.');
+	}
+
+	var smartTile = node.data.smartTileOwner;
+	if (smartTile) 
+	{
+		smartTile.eraseNode(node);
+	}
+	node.deleteObjects(this.magoManager.sceneState.gl, this.magoManager.vboMemoryManager);
+	delete this.magoManager.hierarchyManager.projectsMap[groupId][memberId];
 };
 
 F4dController.f4dObjectValidate = function(f4dObject) 

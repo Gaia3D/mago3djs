@@ -284,6 +284,15 @@ Renderer.prototype.renderNeoBuildingsPCloud = function(gl, visibleNodesArray, ma
 	{
 		node = visibleNodesArray[i];
 		
+		var attributes = node.data.attributes;
+		if (attributes)
+		{
+			if (attributes.isVisible !== undefined && attributes.isVisible === false) 
+			{
+				continue;
+			}
+		}
+
 		rootNode = node.getRoot();
 		geoLocDataManager = rootNode.data.geoLocDataManager;
 		neoBuilding = node.data.neoBuilding;
@@ -2257,7 +2266,7 @@ Renderer.prototype.renderMagoGeometries = function(renderType)
 	var magoManager = this.magoManager;
 	
 	// 1rst, make the test object if no exist.***
-	return;
+	//return;
 	
 	if (magoManager.nativeProjectsArray === undefined)
 	{

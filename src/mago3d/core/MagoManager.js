@@ -1244,7 +1244,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
 	this.renderer.renderGeometry(gl, renderType, this.visibleObjControlerNodes);
 	// test mago geometries.***********************************************************************************************************
-	this.renderer.renderMagoGeometries(renderType); //TEST
+	//this.renderer.renderMagoGeometries(renderType); //TEST
 	this.depthFboNeo.unbind();
 	this.swapRenderingFase();
 
@@ -1330,7 +1330,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	this.swapRenderingFase();
 	
 	// 3) test mago geometries.***********************************************************************************************************
-	this.renderer.renderMagoGeometries(renderType); //TEST
+	//this.renderer.renderMagoGeometries(renderType); //TEST
 	
 	// 4) Render filter.******************************************************************************************************************
 	//this.renderFilter();
