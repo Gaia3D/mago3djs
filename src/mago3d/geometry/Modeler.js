@@ -37,6 +37,7 @@ var Modeler = function(magoManager)
 	this.testObjectsArray;
 	
 	this.objectsArray; // put here all objects.***
+	this.vectorsArray; // put here vector objects (lines, polylines, etc.).***
 	this.currentVisibleObjectsArray;
 };
 
@@ -444,7 +445,7 @@ Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive
 			
 			var gl = this.magoManager.getGl();
 			var sceneState = this.magoManager.sceneState;
-			gl.uniform4fv(thickLineShader.color_loc, [0.9, 0.5, 0.3, 1.0]);
+			gl.uniform4fv(thickLineShader.oneColor4_loc, [0.9, 0.5, 0.3, 1.0]);
 			gl.uniform2fv(thickLineShader.viewport_loc, [sceneState.drawingBufferWidth, sceneState.drawingBufferHeight]);
 			gl.uniform1f(thickLineShader.thickness_loc, 5.0);
 			this.geoCoordsList.points3dList.renderThickLines(magoManager, thickLineShader, renderType, bEnableDepth, options);

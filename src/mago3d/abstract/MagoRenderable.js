@@ -22,6 +22,7 @@ var MagoRenderable = function(options)
 	this.color4;
 	this.wireframeColor4;
 	this.selectedColor4;
+	this.objectType = MagoRenderable.OBJECT_TYPE.MESH; // Init as mesh type.
 
 	this.eventObject = {};
 	
@@ -41,6 +42,12 @@ MagoRenderable.EVENT_TYPE = {
 	'MOVE_END'     : 'moveEnd',
 	'MOVE_START'   : 'moveStart'
 };
+
+MagoRenderable.OBJECT_TYPE = {
+	'MESH'       : 0,
+	'VECTORMESH' : 1
+};
+
 /**
  * 이벤트 등록
  * @param {MagoEvent} event 
@@ -129,7 +136,6 @@ MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPr
 			}
 		}
 	}
-	
 
 	if (this.dirty)
 	{ this.makeMesh(); }
@@ -142,7 +148,14 @@ MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPr
 	var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
 	buildingGeoLocation.bindGeoLocationUniforms(gl, shader); // rotMatrix, positionHIGH, positionLOW.
 	
-	this.renderAsChild(magoManager, shader, renderType, glPrimitive, bIsSelected, this.options);
+	var renderShaded = true;
+	if (this.options && this.options.renderShaded === false)
+	{
+		renderShaded = false;
+	}
+	
+	if (renderShaded)
+	{ this.renderAsChild(magoManager, shader, renderType, glPrimitive, bIsSelected, this.options); }
 	
 	// check options provisionally here.
 	if (this.options)
@@ -169,12 +182,13 @@ MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPr
 			var drawingBufferWidth = sceneState.drawingBufferWidth;
 			var drawingBufferHeight = sceneState.drawingBufferHeight;
 			if (this.wireframeColor4)
-			{ gl.uniform4fv(shaderThickLine.color_loc, [this.wireframeColor4.r, this.wireframeColor4.g, this.wireframeColor4.b, this.wireframeColor4.a]); }
+			{ gl.uniform4fv(shaderThickLine.oneColor4_loc, [this.wireframeColor4.r, this.wireframeColor4.g, this.wireframeColor4.b, this.wireframeColor4.a]); }
 			else
-			{ gl.uniform4fv(shaderThickLine.color_loc, [0.6, 0.8, 0.9, 1.0]); }
+			{ gl.uniform4fv(shaderThickLine.oneColor4_loc, [0.6, 0.8, 0.9, 1.0]); }
 			gl.uniform2fv(shaderThickLine.viewport_loc, [drawingBufferWidth[0], drawingBufferHeight[0]]);
-
-			this.renderAsChild(magoManager, shaderThickLine, renderType, glPrimitive, bIsSelected, this.options);
+			
+			var bWireframe = true;
+			this.renderAsChild(magoManager, shaderThickLine, renderType, glPrimitive, bIsSelected, this.options, bWireframe);
 			
 			// Return to the currentShader.
 			shader.useProgram();
@@ -182,7 +196,7 @@ MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPr
 	}
 };
 
-MagoRenderable.prototype.renderAsChild = function(magoManager, shader, renderType, glPrimitive, bIsSelected, options) 
+MagoRenderable.prototype.renderAsChild = function(magoManager, shader, renderType, glPrimitive, bIsSelected, options, bWireframe) 
 {
 	if (this.dirty)
 	{ this.makeMesh(); }
@@ -202,32 +216,43 @@ MagoRenderable.prototype.renderAsChild = function(magoManager, shader, renderTyp
 		
 		// Check if is selected.***
 		var selectionManager = magoManager.selectionManager;
+
+		if (selectionManager.isObjectSelected(this))
+		{ bIsSelected = true; }
 		
-		if (bIsSelected !== undefined && bIsSelected)
+		if (bIsSelected)
 		{
-			var color = this.selectedColor4 ? this.selectedColor4 : this.color4;
-			if (color) 
-			{
-				gl.uniform4fv(shader.oneColor4_loc, [color.r, color.g, color.b, color.a]);
-			}
-		}
-		else if (selectionManager.isObjectSelected(this))
-		{
-			bIsSelected = true;
 			var selColor = [0.9, 0.1, 0.1, 1.0];
-			if (this.attributes.selectedColor4)
+			if (bWireframe)
 			{
-				var selectedColor = this.attributes.selectedColor4;
-				selColor = [selectedColor.r, selectedColor.g, selectedColor.b, selectedColor.a];
+				selColor = [0.6, 0.6, 0.99, 1.0];
+			}
+			else
+			{
+				if (this.attributes.selectedColor4)
+				{
+					var selectedColor = this.attributes.selectedColor4;
+					selColor = [selectedColor.r, selectedColor.g, selectedColor.b, selectedColor.a];
+				}
 			}
 			
 			gl.uniform4fv(shader.oneColor4_loc, selColor);
 		}
 		else 
 		{
-			if (this.color4) 
+			if (bWireframe)
 			{
-				gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, this.color4.a]);
+				if (this.wireframeColor4) 
+				{
+					gl.uniform4fv(shader.oneColor4_loc, [this.wireframeColor4.r, this.wireframeColor4.g, this.wireframeColor4.b, this.wireframeColor4.a]); 
+				}
+			}
+			else
+			{
+				if (this.color4) 
+				{
+					gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, this.color4.a]);
+				}
 			}
 		}
 	}
@@ -249,12 +274,11 @@ MagoRenderable.prototype.renderAsChild = function(magoManager, shader, renderTyp
 	}
 	
 	var objectsCount = this.objectsArray.length;
-	
 	for (var i=0; i<objectsCount; i++)
 	{
-		this.objectsArray[i].renderAsChild(magoManager, shader, renderType, glPrimitive, bIsSelected, options);
+		this.objectsArray[i].renderAsChild(magoManager, shader, renderType, glPrimitive, bIsSelected, options, bWireframe);
 	}
-
+	
 	gl.disable(gl.BLEND);
 
 	this.dispatchEvent('RENDER_END', magoManager);

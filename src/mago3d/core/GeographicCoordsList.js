@@ -145,16 +145,16 @@ GeographicCoordsList.prototype.getCopy = function(resultGeoCoordsListCopy)
  * @param resultPoint3dArray
  * 
  */
-GeographicCoordsList.prototype.getPointsRelativeToGeoLocation = function(geoLocIn, resultPoints3dArray) 
+GeographicCoordsList.getPointsRelativeToGeoLocation = function(geoLocIn, geoCoordsArray, resultPoints3dArray) 
 {
 	if (resultPoints3dArray === undefined)
 	{ resultPoints3dArray = []; }
 	
-	var geoPointsCount = this.getGeoCoordsCount();
+	var geoPointsCount = geoCoordsArray.length;
 	
 	for (var i=0; i<geoPointsCount; i++)
 	{
-		var geoCoord = this.getGeoCoord(i);
+		var geoCoord = geoCoordsArray[i];
 		var geoLocDataManager = geoCoord.getGeoLocationDataManager();
 		var geoLoc = geoLocDataManager.getCurrentGeoLocationData();
 		if (geoLoc === undefined)
@@ -169,6 +169,45 @@ GeographicCoordsList.prototype.getPointsRelativeToGeoLocation = function(geoLocI
 	}
 	
 	return resultPoints3dArray;
+};
+
+/**
+ * Returns renderableObject of the geoCoordsList.
+ */
+GeographicCoordsList.getRenderableObjectOfGeoCoordsArray = function(geoCoordsArray, magoManager, options) 
+{
+	if (geoCoordsArray === undefined || geoCoordsArray.length === 0)
+	{ return undefined; }
+	
+	// 1rst, make points3dList relative to the 1rst_geoCoord.
+	var firstGeoCoord = geoCoordsArray[0];
+	var geoLoc = ManagerUtils.calculateGeoLocationData(firstGeoCoord.longitude, firstGeoCoord.latitude, firstGeoCoord.altitude, 0, 0, 0, undefined);
+	
+	var points3dLCArray = GeographicCoordsList.getPointsRelativeToGeoLocation(geoLoc, geoCoordsArray, undefined);
+	
+	// Create a vectorMesh.
+	if (options === undefined)
+	{
+		options = {
+			thickness: 2.0
+		};
+	}
+	else
+	{
+		if (options.thickness === undefined)
+		{ options.thickness = 2.0; }
+	}
+	
+	var vectorMesh = new VectorMesh(options);
+	vectorMesh.vboKeysContainer = Point3DList.getVboThickLines(magoManager, points3dLCArray, vectorMesh.vboKeysContainer);
+	
+	var renderableObject = new RenderableObject();
+	renderableObject.geoLocDataManager = new GeoLocationDataManager();
+	renderableObject.geoLocDataManager.addGeoLocationData(geoLoc);
+	renderableObject.objectType = MagoRenderable.OBJECT_TYPE.VECTORMESH;
+	renderableObject.objectsArray.push(vectorMesh);
+	
+	return renderableObject;
 };
 
 /**
@@ -227,6 +266,8 @@ GeographicCoordsList.prototype.deleteObjects = function(vboMemManager)
 	
 	this.owner = undefined;
 };
+
+
 
 /**
  * Make Lines making the first point as the origin for the other points. Change the points to the GeographicCoords.
@@ -317,8 +358,8 @@ GeographicCoordsList.prototype.getExtrudedMeshRenderableObject = function(height
 	
 	// All points3d is referenced to the middleGeoCoord.
 	ManagerUtils.calculateGeoLocationData(midGeoCoord.longitude, midGeoCoord.latitude, midGeoCoord.altitude, 0, 0, 0, geoLocData);
-	var basePoints3dArray = this.getPointsRelativeToGeoLocation(geoLocData, undefined);
-	var topPoints3dArray = topGeoCoordsList.getPointsRelativeToGeoLocation(geoLocData, undefined);
+	var basePoints3dArray = GeographicCoordsList.getPointsRelativeToGeoLocation(geoLocData, this.geographicCoordsArray, undefined);
+	var topPoints3dArray = GeographicCoordsList.getPointsRelativeToGeoLocation(geoLocData, topGeoCoordsList.geographicCoordsArray, undefined);
 	
 	// Now, with basePoints3dArray & topPoints3dArray make a mesh.
 	// Create a VtxProfilesList.
@@ -363,7 +404,7 @@ GeographicCoordsList.prototype.makeLines = function(magoManager)
 	
 	geoLoc.copyFrom(geoLocFirst);
 	
-	var points3dArray = this.getPointsRelativeToGeoLocation(geoLoc, undefined);
+	var points3dArray = GeographicCoordsList.getPointsRelativeToGeoLocation(geoLoc, this.geographicCoordsArray, undefined);
 	this.points3dList.deleteVboKeysContainer(magoManager);
 	this.points3dList.deletePoints3d();
 	this.points3dList.addPoint3dArray(points3dArray);

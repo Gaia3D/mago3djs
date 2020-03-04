@@ -232,6 +232,23 @@ GeographicExtent.prototype.getMaxLongitudeRad = function()
 	return this.maxGeographicCoord.getLongitudeRad();
 };
 
+GeographicExtent.prototype.intersects2dWithGeoCoord = function(geoCoord) 
+{
+	// In 2D intersection do not considere "altitude".
+	var lon = geoCoord.longitude;
+	var lat = geoCoord.latitude;
+	
+	if (lon > this.minGeographicCoord.longitude && lon < this.maxGeographicCoord.longitude)
+	{
+		if (lat > this.minGeographicCoord.latitude && lat < this.maxGeographicCoord.latitude)
+		{
+			return true;
+		}
+	}
+	
+	return false;
+};
+
 
 
 

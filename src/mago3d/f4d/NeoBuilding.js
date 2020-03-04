@@ -2125,6 +2125,9 @@ NeoBuilding.prototype.renderDetailed = function(magoManager, shader, renderType,
 		relCamPosZ = this.myCameraRelative.position.z;
 	}
 	
+	if (this.buildingId === "gangnam_del")
+	{ var hola = 0; }
+	
 	// LOD0.
 	var minSize = 0.0;
 	var lowestOctreesCount = this.currentVisibleOctreesControler.currentVisibles0.length;
@@ -2134,8 +2137,7 @@ NeoBuilding.prototype.renderDetailed = function(magoManager, shader, renderType,
 		if (lowestOctree.neoReferencesMotherAndIndices === undefined) 
 		{ continue; }
 		
-		if (applyOcclusionCulling)
-		{ lowestOctree.neoReferencesMotherAndIndices.updateCurrentVisibleIndices(relCamPosX, relCamPosY, relCamPosZ, applyOcclusionCulling); }
+		lowestOctree.neoReferencesMotherAndIndices.updateCurrentVisibleIndices(relCamPosX, relCamPosY, relCamPosZ, applyOcclusionCulling);
 		
 		lowestOctree.lod = 0; // set current lod to octree.
 		if (lowestOctree.renderContent(magoManager, this, renderType, renderTexture, shader, minSize, refMatrixIdxKey, flipYTexCoord))
@@ -2151,8 +2153,7 @@ NeoBuilding.prototype.renderDetailed = function(magoManager, shader, renderType,
 		if (lowestOctree.neoReferencesMotherAndIndices === undefined) 
 		{ continue; }
 	
-		if (applyOcclusionCulling)
-		{ lowestOctree.neoReferencesMotherAndIndices.updateCurrentVisibleIndices(relCamPosX, relCamPosY, relCamPosZ, applyOcclusionCulling); }
+		lowestOctree.neoReferencesMotherAndIndices.updateCurrentVisibleIndices(relCamPosX, relCamPosY, relCamPosZ, applyOcclusionCulling);
 		
 		lowestOctree.lod = 1; // set current lod to octree.
 		if (lowestOctree.renderContent(magoManager, this, renderType, renderTexture, shader, minSize, refMatrixIdxKey, flipYTexCoord))

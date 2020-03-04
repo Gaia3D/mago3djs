@@ -18,6 +18,8 @@ var PostFxShadersManager = function()
 	this.modelRefShader;
 	this.modelRefSilhouetteShader;
 	this.lodBuildingShader;
+	
+	this.currentShaderUsing = undefined;
 };
 
 /**
@@ -29,6 +31,7 @@ PostFxShadersManager.prototype.newShader = function(shaderName)
 {
 	var shader = new PostFxShader(this.gl);
 	shader.name = shaderName;
+	shader.shaderManager = this;
 	this.shadersMap[shaderName] = shader;
 	return shader;
 };

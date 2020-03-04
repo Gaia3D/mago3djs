@@ -3230,15 +3230,17 @@ void main()\n\
     \n\
 }";
 ShaderSource.thickLineFS = "precision highp float;\n\
-uniform vec4 color;\n\
+\n\
+varying vec4 vColor;\n\
 void main() {\n\
-	gl_FragColor = color;\n\
+	gl_FragColor = vColor;\n\
 }";
 ShaderSource.thickLineVS = "\n\
 attribute vec4 prev;\n\
 attribute vec4 current;\n\
 attribute vec4 next;\n\
-//attribute float order;\n\
+attribute vec4 color4;\n\
+\n\
 uniform float thickness;\n\
 uniform mat4 buildingRotMatrix;\n\
 uniform mat4 projectionMatrix;\n\
@@ -3250,6 +3252,11 @@ uniform vec3 buildingPosHIGH;\n\
 uniform vec3 buildingPosLOW;\n\
 uniform vec3 encodedCameraPositionMCHigh;\n\
 uniform vec3 encodedCameraPositionMCLow;\n\
+//uniform vec4 color;\n\
+uniform vec4 oneColor4;\n\
+uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
+\n\
+varying vec4 vColor;\n\
 \n\
 \n\
 const float error = 0.001;\n\
@@ -3343,6 +3350,12 @@ void main(){\n\
 	vec4 offset = vec4(normal * direction, 0.0, 1.0);\n\
 	gl_Position = currentProjected + offset; \n\
 	\n\
+	if(colorType == 0)\n\
+		vColor = oneColor4;\n\
+	else if(colorType == 1)\n\
+		vColor = oneColor4;\n\
+	else\n\
+		vColor = oneColor4;\n\
 }\n\
 \n\
 \n\

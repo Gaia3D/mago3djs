@@ -36,6 +36,14 @@ var SmartTile = function(smartTileName)
 	this.nodesFromSmartTileF4dArray; 
 	this.nodesArray; 
 	this.objectsArray; // parametric objects.
+	this.vectorTypeObjectsArray;
+	
+	this.nativeObjects = {
+		opaquesArray      : [],
+		transparentsArray : [],
+		excavationsArray  : [],
+		vectorTypeArray   : []
+	};
 	
 	this.isVisible; // var to manage the frustumCulling and delete buildings if necessary.
 	this.distToCamera;
@@ -527,16 +535,34 @@ SmartTile.prototype.putObject = function(targetDepth, object, magoManager)
 	}
 	else if (this.depth === targetDepth)
 	{
-		if (this.objectsArray === undefined)
-		{ this.objectsArray = []; }
-		
 		object.smartTileOwner = this;
-		this.objectsArray.push(object);
-		
+		if (object instanceof MagoRenderable) 
+		{
+			if (object.objectType === MagoRenderable.OBJECT_TYPE.MESH)
+			{
+				if (object.isOpaque())
+				{
+					this.nativeObjects.opaquesArray.push(object);
+				}
+				else 
+				{
+					this.nativeObjects.transparentsArray.push(object);
+				}
+			}
+			else if (object.objectType === MagoRenderable.OBJECT_TYPE.VECTORMESH)
+			{
+				this.nativeObjects.vectorTypeArray.push(object);
+			}
+		}
+		else if (object instanceof Excavation) 
+		{
+			this.nativeObjects.excavationsArray.push(object);
+		}
 		// todo: Must recalculate the smartTile sphereExtent.
 		return true;
 	}
 };
+
 
 /**
  * 목표레벨까지 각 타일의 SUB타일 생성 및 노드의 위치와 교점이 있는지 파악 후 노드를 보관.
@@ -977,8 +1003,12 @@ SmartTile.prototype.hasRenderables = function()
 	{ return true; }
 
 	// check native objects.
-	if (this.objectsArray !== undefined && this.objectsArray.length > 0)
+	var nativeObjects = this.nativeObjects;
+	if (nativeObjects.opaquesArray.length > 0 || nativeObjects.transparentsArray.length > 0 || nativeObjects.excavationsArray.length > 0 || nativeObjects.vectorTypeArray.length > 0)
 	{ return true; }
+	
+	//if (this.objectsArray !== undefined && this.objectsArray.length > 0)
+	//{ return true; }
 	
 	return hasObjects;
 };

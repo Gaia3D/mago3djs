@@ -938,6 +938,33 @@ Renderer.prototype.renderNativeObjects = function(gl, shader, renderType, visibl
 			transparentsArray[i].render(magoManager, shader, renderType, glPrimitive);
 		}
 	}
+	
+	// vectorType objects.
+	if (renderType === 1)
+	{
+		var vectorTypeObjectsArray = visibleObjControlerNodes.currentVisibleNativeObjects.vectorTypeArray;
+		var vectorTypeObjectsCount = vectorTypeObjectsArray.length;
+		if (vectorTypeObjectsCount > 0)
+		{
+			// change shader. use "thickLines" shader.
+			var sceneState = magoManager.sceneState;
+			var thickLineShader = magoManager.postFxShadersManager.getShader("thickLine"); 
+			thickLineShader.useProgram();
+			thickLineShader.bindUniformGenerals();
+			
+			gl.uniform4fv(thickLineShader.oneColor4_loc, [0.3, 0.9, 0.5, 1.0]);
+			gl.uniform2fv(thickLineShader.viewport_loc, [sceneState.drawingBufferWidth, sceneState.drawingBufferHeight]);
+			gl.uniform1f(thickLineShader.thickness_loc, 5.0);
+				
+			for (var i=0; i<vectorTypeObjectsCount; i++)
+			{
+				vectorTypeObjectsArray[i].render(magoManager, thickLineShader, renderType, glPrimitive);
+			}
+			
+			// return to the current shader.
+			shader.useProgram();
+		}
+	}
 };
 
 /**
