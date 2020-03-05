@@ -67,6 +67,57 @@ Color.grayToRGB_MagoStyle = function(gray, resultColor)
 	return resultColor;
 };
 
+Color.grayToRGBYCM_MagoStyle = function(gray, resultColor)
+{
+	if (resultColor === undefined)
+	{ resultColor = new Color(); }
+
+	if (gray > 1.0){ gray = 1.0; }
+	else if (gray<0.0){ gray = 0.0; }
+	
+	var r, g, b;
+	
+	if (gray < 0.16666)
+	{
+		b = 0.0;
+		g = gray*6.0;
+		r = 1.0;
+	}
+	else if (gray >= 0.16666 && gray < 0.33333)
+	{
+		b = 0.0;
+		g = 1.0;
+		r = 2.0 - gray*6.0;
+	}
+	else if (gray >= 0.33333 && gray < 0.5)
+	{
+		b = -2.0 + gray*6.0;
+		g = 1.0;
+		r = 0.0;
+	}
+	else if (gray >= 0.5 && gray < 0.66666)
+	{
+		b = 1.0;
+		g = 4.0 - gray*6.0;
+		r = 0.0;
+	}
+	else if (gray >= 0.66666 && gray < 0.83333)
+	{
+		b = 1.0;
+		g = 0.0;
+		r = -4.0 + gray*6.0;
+	}
+	else if (gray >= 0.83333)
+	{
+		b = 6.0 - gray*6.0;
+		g = 0.0;
+		r = 1.0;
+	}
+	
+	resultColor.setRGB(r, g, b);
+	return resultColor;
+}; 
+
 /**
  * copy of the value of RGB instance
  * @param {Color} color

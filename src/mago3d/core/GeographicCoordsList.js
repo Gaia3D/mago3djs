@@ -164,7 +164,6 @@ GeographicCoordsList.getPointsRelativeToGeoLocation = function(geoLocIn, geoCoor
 		}
 		
 		var posAbs = geoLoc.position;
-		
 		resultPoints3dArray[i] = geoLocIn.getTransformedRelativePosition(posAbs, resultPoints3dArray[i]);
 	}
 	
@@ -185,6 +184,9 @@ GeographicCoordsList.getRenderableObjectOfGeoCoordsArray = function(geoCoordsArr
 	
 	var points3dLCArray = GeographicCoordsList.getPointsRelativeToGeoLocation(geoLoc, geoCoordsArray, undefined);
 	
+	// Now, for each point, set attributes by speed & others.
+	
+	
 	// Create a vectorMesh.
 	if (options === undefined)
 	{
@@ -197,9 +199,13 @@ GeographicCoordsList.getRenderableObjectOfGeoCoordsArray = function(geoCoordsArr
 		if (options.thickness === undefined)
 		{ options.thickness = 2.0; }
 	}
-	
+
 	var vectorMesh = new VectorMesh(options);
-	vectorMesh.vboKeysContainer = Point3DList.getVboThickLines(magoManager, points3dLCArray, vectorMesh.vboKeysContainer);
+	
+	var optionsThickLine = {
+		colorType: "alphaGradient"
+	};
+	vectorMesh.vboKeysContainer = Point3DList.getVboThickLines(magoManager, points3dLCArray, vectorMesh.vboKeysContainer, optionsThickLine);
 	
 	var renderableObject = new RenderableObject();
 	renderableObject.geoLocDataManager = new GeoLocationDataManager();

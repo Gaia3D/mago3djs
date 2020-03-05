@@ -75,13 +75,15 @@ VectorMesh.prototype.render = function(magoManager, shader, renderType, glPrimit
 	var vbo = this.vboKeysContainer.getVboKey(0);
 	var gl = magoManager.getGl();
 
-	gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
-	gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+	//gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
+	//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 	gl.disable(gl.CULL_FACE);
 	
 	gl.enableVertexAttribArray(shader.prev_loc);
 	gl.enableVertexAttribArray(shader.current_loc);
 	gl.enableVertexAttribArray(shader.next_loc);
+	
+	gl.disableVertexAttribArray(shader.color4_loc);
 
 	var sceneState = magoManager.sceneState;
 	var projMat = sceneState.projectionMatrix;
@@ -92,7 +94,7 @@ VectorMesh.prototype.render = function(magoManager, shader, renderType, glPrimit
 	if (this.thickness === undefined)
 	{ this.thickness = 2.0; }
 	
-	gl.uniform4fv(shader.color_loc, [0.5, 0.7, 0.9, 1.0]);
+	gl.uniform4fv(shader.oneColor4_loc, [0.5, 0.7, 0.9, 1.0]);
 	gl.uniform2fv(shader.viewport_loc, [drawingBufferWidth[0], drawingBufferHeight[0]]);
 	gl.uniform1f(shader.thickness_loc, this.thickness);
 
@@ -102,6 +104,21 @@ VectorMesh.prototype.render = function(magoManager, shader, renderType, glPrimit
 	{
 		return;
 	}
+	
+	if (vbo.vboBufferCol)
+	{
+		if (!vbo.bindDataColor(shader, magoManager.vboMemoryManager) )
+		{
+			return;
+		}
+		gl.uniform1i(shader.colorType_loc, 1);
+	}
+	else 
+	{
+		gl.uniform1i(shader.colorType_loc, 0);
+		gl.disableVertexAttribArray(shader.color4_loc);
+	}
+	gl.enableVertexAttribArray(shader.color4_loc);
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, vboPos.key);
 	gl.vertexAttribPointer(shader.prev_loc, dim, gl.FLOAT, false, 16, 0);

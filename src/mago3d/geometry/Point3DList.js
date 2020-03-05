@@ -338,78 +338,7 @@ Point3DList.getVbo = function(magoManager, point3dArray, resultVboKeysContainer)
  * Make the vbo of this point3DList
  * @param magoManager
  */
-Point3DList.getVboThickLines__element = function(magoManager, point3dArray, resultVboKeysContainer)
-{
-	if (point3dArray === undefined || point3dArray.length < 2)
-	{ return resultVboKeysContainer; }
-
-	if (resultVboKeysContainer === undefined)
-	{ resultVboKeysContainer = new VBOVertexIdxCacheKeysContainer(); }
-
-	var pointsCount = point3dArray.length;
-	
-	// New.*************************************************************************************************************************
-	var repeats = 4;
-	var pointDimension = 3;
-	var posByteSize = pointsCount * pointDimension;
-	var posVboDataArray = new Float32Array(posByteSize);
-	var idxVboDataArray = new Uint16Array(pointsCount * repeats);
-	var orderVboDataArray = new Float32Array(pointsCount * repeats);
-	var point3d;
-
-	for (var i=0; i<pointsCount; i++)
-	{
-		point3d = point3dArray[i];
-		posVboDataArray[i*3] = point3d.x;
-		posVboDataArray[i*3+1] = point3d.y;
-		posVboDataArray[i*3+2] = point3d.z;
-		
-		//if (i === 0 || i === pointsCount-1)
-		//{
-		//	// add an extra point at the start & at the end of array.
-		//	posVboDataArray[i*3] = point3d.x;
-		//	posVboDataArray[i*3+1] = point3d.y;
-		//	posVboDataArray[i*3+2] = point3d.z;
-		//}
-		var idx = new Uint16Array([i]);
-		idxVboDataArray[i*4] = idx[0];
-		idxVboDataArray[i*4+1] = idx[0];
-		idxVboDataArray[i*4+2] = idx[0];
-		idxVboDataArray[i*4+3] = idx[0];
-		
-		//orderVboDataArray[i*4] = 2;
-		//orderVboDataArray[i*4+1] = -2;
-		//orderVboDataArray[i*4+2] = 1;
-		//orderVboDataArray[i*4+3] = -1;
-		
-		//orderVboDataArray[i*4] = -1;
-		//orderVboDataArray[i*4+1] = 2;
-		//orderVboDataArray[i*4+2] = -2;
-		//orderVboDataArray[i*4+3] = 1;
-		
-		orderVboDataArray[i*4] = -2;
-		orderVboDataArray[i*4+1] = 1;
-		orderVboDataArray[i*4+2] = -1;
-		orderVboDataArray[i*4+3] = 2;
-	}
-	var vboMemManager = magoManager.vboMemoryManager;
-	var vbo = resultVboKeysContainer.newVBOVertexIdxCacheKey();
-	vbo.setDataArrayPos(posVboDataArray, vboMemManager, pointDimension);
-	vbo.setDataArrayIdx(idxVboDataArray, vboMemManager);
-	
-	var dimensions = 1;
-	var name = "thickLineOrder";
-	var attribLoc = 3; // defined as "3" when create the thickLine_shader.
-	vbo.setDataArrayCustom(orderVboDataArray, vboMemManager, dimensions, name, attribLoc);
-	
-	return resultVboKeysContainer;
-};
-
-/**
- * Make the vbo of this point3DList
- * @param magoManager
- */
-Point3DList.getVboThickLines = function(magoManager, point3dArray, resultVboKeysContainer)
+Point3DList.getVboThickLines = function(magoManager, point3dArray, resultVboKeysContainer, options)
 {
 	if (point3dArray === undefined || point3dArray.length < 2)
 	{ return resultVboKeysContainer; }
@@ -424,6 +353,7 @@ Point3DList.getVboThickLines = function(magoManager, point3dArray, resultVboKeys
 	var pointDimension = 4;
 	var posByteSize = pointsCount * pointDimension * repeats;
 	var posVboDataArray = new Float32Array(posByteSize);
+	
 	var point3d;
 
 	for (var i=0; i<pointsCount; i++)
@@ -450,9 +380,52 @@ Point3DList.getVboThickLines = function(magoManager, point3dArray, resultVboKeys
 		posVboDataArray[i*16+15] = -2; // order.
 	}
 	
+	// Check if must make color vbo.
+	var colVboDataArray;
+	if (options)
+	{
+		if (options.colorType !== undefined)
+		{
+			if (options.colorType === "alphaGradient")
+			{
+				var color4 = new Color(0.6, 0.9, 0.99, 1.0);
+				colVboDataArray = new Uint8Array(pointsCount * 4 * repeats);
+				for (var i=0; i<pointsCount; i++)
+				{
+					point3d = point3dArray[i];
+					var currAlpha = Math.floor((1.0 - ((pointsCount - i)/pointsCount))*255);
+					//currAlpha = 255;
+					colVboDataArray[i*16] = Math.floor(color4.r*255);
+					colVboDataArray[i*16+1] = Math.floor(color4.g*255);
+					colVboDataArray[i*16+2] = Math.floor(color4.b*255);
+					colVboDataArray[i*16+3] = currAlpha; // alpha.
+					
+					colVboDataArray[i*16+4] = Math.floor(color4.r*255);
+					colVboDataArray[i*16+5] = Math.floor(color4.g*255);
+					colVboDataArray[i*16+6] = Math.floor(color4.b*255);
+					colVboDataArray[i*16+7] = currAlpha; // alpha.
+					
+					colVboDataArray[i*16+8] = Math.floor(color4.r*255);
+					colVboDataArray[i*16+9] = Math.floor(color4.g*255);
+					colVboDataArray[i*16+10] = Math.floor(color4.b*255);
+					colVboDataArray[i*16+11] = currAlpha; // alpha.
+					
+					colVboDataArray[i*16+12] = Math.floor(color4.r*255);
+					colVboDataArray[i*16+13] = Math.floor(color4.g*255);
+					colVboDataArray[i*16+14] = Math.floor(color4.b*255);
+					colVboDataArray[i*16+15] = currAlpha; // alpha.
+				}
+			}
+		}
+	}
 	
 	var vbo = resultVboKeysContainer.newVBOVertexIdxCacheKey();
 	vbo.setDataArrayPos(posVboDataArray, magoManager.vboMemoryManager, pointDimension);
+	
+	if (colVboDataArray)
+	{
+		vbo.setDataArrayCol(colVboDataArray, magoManager.vboMemoryManager);
+	}
 	
 	return resultVboKeysContainer;
 };

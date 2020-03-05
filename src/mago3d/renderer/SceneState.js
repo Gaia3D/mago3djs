@@ -46,9 +46,9 @@ var SceneState = function()
 	this.applySunShadows = false;
 	
 	// lighting & ssao.
-	this.ambientReflectionCoef = new Float32Array([0.7]); // 0.2.
-	this.diffuseReflectionCoef = new Float32Array([0.40]); // 1.0
-	this.specularReflectionCoef = new Float32Array([0.6]); // 0.7
+	this.ambientReflectionCoef = new Float32Array([0.5]); // 0.7.
+	this.diffuseReflectionCoef = new Float32Array([1.0]); // 0.4
+	this.specularReflectionCoef = new Float32Array([0.6]); // 0.6
 	this.specularColor = new Float32Array([0.7, 0.7, 0.7]);
 	this.ambientColor = new Float32Array([1.0, 1.0, 1.0]);
 	this.ssaoRadius = new Float32Array([0.15]);
