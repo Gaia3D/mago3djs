@@ -944,6 +944,7 @@ Renderer.prototype.renderNativeObjects = function(gl, shader, renderType, visibl
 			thickLineShader.bindUniformGenerals();
 			
 			gl.uniform4fv(thickLineShader.oneColor4_loc, [0.3, 0.9, 0.5, 1.0]);
+			gl.uniform1i(thickLineShader.colorType_loc, 0);
 			gl.uniform2fv(thickLineShader.viewport_loc, [sceneState.drawingBufferWidth, sceneState.drawingBufferHeight]);
 			gl.uniform1f(thickLineShader.thickness_loc, 5.0);
 				

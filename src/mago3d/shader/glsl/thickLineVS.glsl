@@ -15,7 +15,6 @@ uniform vec3 buildingPosHIGH;
 uniform vec3 buildingPosLOW;
 uniform vec3 encodedCameraPositionMCHigh;
 uniform vec3 encodedCameraPositionMCLow;
-//uniform vec4 color;
 uniform vec4 oneColor4;
 uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.
 
@@ -116,7 +115,7 @@ void main(){
 	if(colorType == 0)
 		vColor = oneColor4;
 	else if(colorType == 1)
-		vColor = oneColor4;
+		vColor = color4; //vec4(color4.r+0.8, color4.g+0.8, color4.b+0.8, color4.a+0.8);
 	else
 		vColor = oneColor4;
 }

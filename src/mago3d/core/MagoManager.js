@@ -503,7 +503,31 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		//}
 		
 		// ModelViewMatrix.
-		sceneState.modelViewMatrix._floatArrays = Cesium.Matrix4.clone(uniformState.modelView, sceneState.modelViewMatrix._floatArrays);
+		//sceneState.modelViewMatrix._floatArrays = Cesium.Matrix4.clone(uniformState.modelView, sceneState.modelViewMatrix._floatArrays);
+		
+		// Calculate modelViewMatrix.
+		if (this.isFarestFrustum())
+		{
+			var camera = scene.camera;
+			var camPosX = camera.positionWC.x;
+			var camPosY = camera.positionWC.y;
+			var camPosZ = camera.positionWC.z;
+			var camDirX = camera.direction.x;
+			var camDirY = camera.direction.y;
+			var camDirZ = camera.direction.z;
+			var camUpX = camera.up.x;
+			var camUpY = camera.up.y;
+			var camUpZ = camera.up.z;
+		
+			var tergetX = camPosX + camDirX * 1000;
+			var tergetY = camPosY + camDirY * 1000;
+			var tergetZ = camPosZ + camDirZ * 1000;
+		
+			var modelViewMatrix = this.sceneState.modelViewMatrix;																	
+			modelViewMatrix._floatArrays = Matrix4.lookAt(modelViewMatrix._floatArrays, [camPosX, camPosY, camPosZ], 
+				[tergetX, tergetY, tergetZ], 
+				[camUpX, camUpY, camUpZ]);
+		}
 		
 		// ProjectionMatrix.***
 		Cesium.Matrix4.toArray(uniformState._projection, sceneState.projectionMatrix._floatArrays); // original.***
@@ -4569,17 +4593,16 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	// ThickLine shader locations.***
 	shader.projectionMatrix_loc = gl.getUniformLocation(shader.program, "projectionMatrix");
 	shader.modelViewMatrix_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
-	shader.color_loc = gl.getUniformLocation(shader.program, "color");
 	shader.viewport_loc = gl.getUniformLocation(shader.program, "viewport");
 	shader.thickness_loc = gl.getUniformLocation(shader.program, "thickness");
 	gl.bindAttribLocation(shader.program, 0, "prev");
 	gl.bindAttribLocation(shader.program, 1, "current");
 	gl.bindAttribLocation(shader.program, 2, "next");
-	gl.bindAttribLocation(shader.program, 3, "order");
+	gl.bindAttribLocation(shader.program, 3, "color4");
 	shader.prev_loc = 0;
 	shader.current_loc = 1;
 	shader.next_loc = 2;
-	shader.order_loc = 3;
+	shader.color4_loc = 3;
 	
 	// 14) ScreenQuad shader.***********************************************************************************
 	var shaderName = "screenQuad";
