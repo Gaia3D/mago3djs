@@ -1559,6 +1559,9 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		
 		magoManager.currentProcess = CODE.magoCurrentProcess.ColorRendering;
 		
+		// Set default blending setting.
+		gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
+		
 		// Test TinTerrain.**************************************************************************
 		// Test TinTerrain.**************************************************************************
 		// render tiles, rendertiles.***
@@ -1566,8 +1569,6 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		if (magoManager.tinTerrainManager !== undefined)
 		{
 			gl.enable(gl.BLEND);
-			gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
-			//gl.blendFunc( gl.ONE_MINUS_SRC_ALPHA, gl.DST_COLOR );
 			
 			// Atmosphere.*******************************************************************************
 			this.renderAtmosphere(gl, renderType);
