@@ -332,7 +332,7 @@ Node.prototype.checkChangesHistoryColors = function()
 					if (data.aditionalColor === undefined)
 					{ data.aditionalColor = new Color(); }
 					
-					data.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
+					data.aditionalColor.setRGBA(changeHistory.color[0], changeHistory.color[1], changeHistory.color[2], changeHistory.color[3]);
 				}
 				else 
 				{
@@ -353,7 +353,7 @@ Node.prototype.checkChangesHistoryColors = function()
 							if (data.aditionalColor === undefined)
 							{ data.aditionalColor = new Color(); }
 							
-							data.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
+							data.aditionalColor.setRGBA(changeHistory.color[0], changeHistory.color[1], changeHistory.color[2], changeHistory.color[3]);
 						}
 					}
 				}
@@ -377,7 +377,7 @@ Node.prototype.checkChangesHistoryColors = function()
 						if (object.aditionalColor === undefined)
 						{ object.aditionalColor = new Color(); }
 						
-						object.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
+						object.aditionalColor.setRGBA(changeHistory.color[0], changeHistory.color[1], changeHistory.color[2], changeHistory.color[3]);
 					}
 				}
 			}	

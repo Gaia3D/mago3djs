@@ -379,6 +379,8 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		{
 		  console.log(e); 
 		}, false);
+		
+		
 		//-------------------------------------------------------------
 		
 		if (serverPolicy.geo_server_enable === "true" && serverPolicy.geo_server_url !== null && serverPolicy.geo_server_url !== '') 
@@ -399,6 +401,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 			// var options = {imageryProvider: imageryProvider, baseLayerPicker: false};
 			_options.imageryProvider = imageryProvider;
 			_options.baseLayerPicker = false;
+			_options.antialias = true;
 			if (viewer === null) { viewer = new Cesium.Viewer(containerId, _options); }
 		}
 		else 
@@ -410,6 +413,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 			}
 
 			_options.shouldAnimate = true;
+			
 			if (viewer === null) { viewer = new Cesium.Viewer(containerId, _options); }
 			// 기본 지도 설정
 			setDefaultDataset();

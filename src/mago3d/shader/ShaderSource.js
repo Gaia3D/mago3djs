@@ -3232,6 +3232,7 @@ void main()\n\
 ShaderSource.thickLineFS = "precision highp float;\n\
 \n\
 varying vec4 vColor;\n\
+\n\
 void main() {\n\
 	gl_FragColor = vColor;\n\
 }";
@@ -3256,7 +3257,6 @@ uniform vec4 oneColor4;\n\
 uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
 \n\
 varying vec4 vColor;\n\
-\n\
 \n\
 const float error = 0.001;\n\
 \n\
@@ -3348,6 +3348,7 @@ void main(){\n\
 	// Offset our position along the normal\n\
 	vec4 offset = vec4(normal * direction, 0.0, 1.0);\n\
 	gl_Position = currentProjected + offset; \n\
+\n\
 	\n\
 	if(colorType == 0)\n\
 		vColor = oneColor4;\n\

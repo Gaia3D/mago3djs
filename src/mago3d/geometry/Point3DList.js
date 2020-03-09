@@ -381,44 +381,67 @@ Point3DList.getVboThickLines = function(magoManager, point3dArray, resultVboKeys
 	}
 	
 	// Check if must make color vbo.
+	var strColor4 = new Color(0.6, 0.9, 0.99, 1.0);
+	var endColor4 = new Color(0.6, 0.9, 0.99, 1.0);
+	
 	var colVboDataArray;
+	var makeColorVbo = false;
 	if (options)
 	{
-		if (options.colorType !== undefined)
+		if (options.color)
 		{
-			if (options.colorType === "alphaGradient")
-			{
-				var color4 = new Color(0.6, 0.9, 0.99, 1.0);
-				colVboDataArray = new Uint8Array(pointsCount * 4 * repeats);
-				for (var i=0; i<pointsCount; i++)
-				{
-					point3d = point3dArray[i];
-					var currAlpha = Math.floor((1.0 - ((pointsCount - i)/pointsCount))*255);
-					//currAlpha = 255;
-					colVboDataArray[i*16] = Math.floor(color4.r*255);
-					colVboDataArray[i*16+1] = Math.floor(color4.g*255);
-					colVboDataArray[i*16+2] = Math.floor(color4.b*255);
-					colVboDataArray[i*16+3] = currAlpha; // alpha.
-					
-					colVboDataArray[i*16+4] = Math.floor(color4.r*255);
-					colVboDataArray[i*16+5] = Math.floor(color4.g*255);
-					colVboDataArray[i*16+6] = Math.floor(color4.b*255);
-					colVboDataArray[i*16+7] = currAlpha; // alpha.
-					
-					colVboDataArray[i*16+8] = Math.floor(color4.r*255);
-					colVboDataArray[i*16+9] = Math.floor(color4.g*255);
-					colVboDataArray[i*16+10] = Math.floor(color4.b*255);
-					colVboDataArray[i*16+11] = currAlpha; // alpha.
-					
-					colVboDataArray[i*16+12] = Math.floor(color4.r*255);
-					colVboDataArray[i*16+13] = Math.floor(color4.g*255);
-					colVboDataArray[i*16+14] = Math.floor(color4.b*255);
-					colVboDataArray[i*16+15] = currAlpha; // alpha.
-				}
-			}
+			strColor4.setRGBA(options.color.r, options.color.g, options.color.b, options.color.a);
+			endColor4.setRGBA(options.color.r, options.color.g, options.color.b, options.color.a);
+		}
+		
+		if (options.startColor)
+		{
+			strColor4.setRGBA(options.startColor.r, options.startColor.g, options.startColor.b, options.startColor.a);
+			makeColorVbo = true;
+		}
+		
+		if (options.endColor)
+		{
+			endColor4.setRGBA(options.endColor.r, options.endColor.g, options.endColor.b, options.endColor.a);
+			makeColorVbo = true;
 		}
 	}
 	
+	// Make the color vbo if necessary.
+	if (makeColorVbo)
+	{
+		colVboDataArray = new Uint8Array(pointsCount * 4 * repeats);
+		
+		var currColor4 = new Color(0.6, 0.9, 0.99, 1.0);
+		currColor4.copyFrom(strColor4);
+		var w = 1.0; // weight.***
+		var r, g, b, a;
+		for (var i=0; i<pointsCount; i++)
+		{
+			w = 1.0 - (i/(pointsCount-1));
+			currColor4 = Color.mix(strColor4, endColor4, w);
+			
+			colVboDataArray[i*16] = Math.floor(currColor4.r*255);
+			colVboDataArray[i*16+1] = Math.floor(currColor4.g*255);
+			colVboDataArray[i*16+2] = Math.floor(currColor4.b*255);
+			colVboDataArray[i*16+3] = Math.floor(currColor4.a*255);
+			
+			colVboDataArray[i*16+4] = Math.floor(currColor4.r*255);
+			colVboDataArray[i*16+5] = Math.floor(currColor4.g*255);
+			colVboDataArray[i*16+6] = Math.floor(currColor4.b*255);
+			colVboDataArray[i*16+7] = Math.floor(currColor4.a*255);
+			
+			colVboDataArray[i*16+8] = Math.floor(currColor4.r*255);
+			colVboDataArray[i*16+9] = Math.floor(currColor4.g*255);
+			colVboDataArray[i*16+10] = Math.floor(currColor4.b*255);
+			colVboDataArray[i*16+11] = Math.floor(currColor4.a*255);
+			
+			colVboDataArray[i*16+12] = Math.floor(currColor4.r*255);
+			colVboDataArray[i*16+13] = Math.floor(currColor4.g*255);
+			colVboDataArray[i*16+14] = Math.floor(currColor4.b*255);
+			colVboDataArray[i*16+15] = Math.floor(currColor4.a*255);
+		}
+	}
 	var vbo = resultVboKeysContainer.newVBOVertexIdxCacheKey();
 	vbo.setDataArrayPos(posVboDataArray, magoManager.vboMemoryManager, pointDimension);
 	

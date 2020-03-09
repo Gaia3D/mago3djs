@@ -283,6 +283,16 @@ MagoManager.prototype.init = function(gl)
 {
 	this.bInit = true;
 	
+	/*
+	var canvas = this.scene.canvas;
+	var glAttrs = {antialias          : true, 
+		stencil            : true,
+		premultipliedAlpha : false};
+	var gl = canvas.getContext("webgl", glAttrs);
+	if (!gl)
+	{ gl = canvas.getContext("experimental-webgl", glAttrs); }
+	*/
+	
 	if (this.sceneState.gl === undefined)
 	{ this.sceneState.gl = gl; }
 	if (this.vboMemoryManager.gl === undefined)
@@ -4319,7 +4329,7 @@ MagoManager.prototype.checkChangesHistoryColors = function(nodesArray)
 												if (data.aditionalColor === undefined)
 												{ data.aditionalColor = new Color(); }
 												
-												data.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
+												data.aditionalColor.setRGBA(changeHistory.color[0], changeHistory.color[1], changeHistory.color[2], changeHistory.color[3]);
 											}
 										}
 									}
@@ -4345,7 +4355,7 @@ MagoManager.prototype.checkChangesHistoryColors = function(nodesArray)
 													if (data.aditionalColor === undefined)
 													{ data.aditionalColor = new Color(); }
 													
-													data.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
+													data.aditionalColor.setRGBA(changeHistory.color[0], changeHistory.color[1], changeHistory.color[2], changeHistory.color[3]);
 												}
 											}
 										}
