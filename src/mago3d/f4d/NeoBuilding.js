@@ -1034,7 +1034,7 @@ NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoMan
 			texture = this.texturesLoaded[textureId];
 			neoReference.texture = texture;
 			
-			if (texture.texId === undefined && texture.textureImageFileName !== "")
+			if (texture && texture.texId === undefined && texture.textureImageFileName !== "")
 			{
 				if (magoManager.backGround_fileReadings_count > 10) 
 				{ return undefined; }
@@ -1074,7 +1074,7 @@ NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoMan
 			texture = this.texturesLoaded[textureId];
 			neoReference.texture = texture;
 			
-			if (texture.texId === undefined && texture.textureImageFileName !== "")
+			if (texture && texture.texId === undefined && texture.textureImageFileName !== "")
 			{
 				if (magoManager.backGround_fileReadings_count > 10) 
 				{ return undefined; }
