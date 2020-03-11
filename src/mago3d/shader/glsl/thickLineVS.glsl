@@ -20,7 +20,6 @@ uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.
 
 varying vec4 vColor;
 
-
 const float error = 0.001;
 
 // see https://weekly-geekly.github.io/articles/331164/index.html
@@ -111,6 +110,7 @@ void main(){
 	// Offset our position along the normal
 	vec4 offset = vec4(normal * direction, 0.0, 1.0);
 	gl_Position = currentProjected + offset; 
+
 	
 	if(colorType == 0)
 		vColor = oneColor4;

@@ -25,7 +25,14 @@ ColorAPI.changeColor = function(api, magoManager)
 	{ return; }
 	
 	var color = api.getColor().split(",");
-	var rgbColor = [ color[0]/255, color[1]/255, color[2]/255 ] ;
+	var colorsValueCount = color.length;
+	var alpha = 255.0;
+	if (colorsValueCount === 4)
+	{
+		alpha = color[3]/255;
+	}
+	
+	var rgbaColor = [ color[0]/255, color[1]/255, color[2]/255, alpha ] ;
 	
 	var isExistObjectIds = false;
 	if (objectIds !== null && objectIds.length !== 0) 
@@ -45,7 +52,8 @@ ColorAPI.changeColor = function(api, magoManager)
 			changeHistory.setProperty(property);
 			changeHistory.setPropertyKey(propertyKey);
 			changeHistory.setPropertyValue(propertyValue);
-			changeHistory.setRgbColor(rgbColor);
+			//changeHistory.setRgbColor(rgbColor);
+			changeHistory.setColor(rgbaColor);
 			
 			changeHistorys.push(changeHistory);
 		}
@@ -59,8 +67,8 @@ ColorAPI.changeColor = function(api, magoManager)
 		changeHistory.setProperty(property);
 		changeHistory.setPropertyKey(propertyKey);
 		changeHistory.setPropertyValue(propertyValue);
-		changeHistory.setRgbColor(rgbColor);
-		
+		//changeHistory.setRgbColor(rgbColor);
+		changeHistory.setColor(rgbaColor);
 		changeHistorys.push(changeHistory);
 	}
 

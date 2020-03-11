@@ -205,7 +205,7 @@ GeographicCoordsList.getRenderableObjectOfGeoCoordsArray = function(geoCoordsArr
 	var optionsThickLine = {
 		colorType: "alphaGradient"
 	};
-	vectorMesh.vboKeysContainer = Point3DList.getVboThickLines(magoManager, points3dLCArray, vectorMesh.vboKeysContainer, optionsThickLine);
+	vectorMesh.vboKeysContainer = Point3DList.getVboThickLines(magoManager, points3dLCArray, vectorMesh.vboKeysContainer, options);
 	
 	var renderableObject = new RenderableObject();
 	renderableObject.geoLocDataManager = new GeoLocationDataManager();

@@ -140,6 +140,25 @@ Color.prototype.deleteObjects = function()
 	this.b = undefined;
 	this.a = undefined;
 };
+
+/**
+ * Linear interpolation between colorA & colorB
+ */
+Color.mix = function(colorA, colorB, weight, resultColor ) 
+{
+	if (resultColor === undefined)
+	{ resultColor = new Color(); }
+	
+	var w = weight;
+	var r = colorA.r * w + colorB.r * (1.0 - w);
+	var g = colorA.g * w + colorB.g * (1.0 - w);
+	var b = colorA.b * w + colorB.b * (1.0 - w);
+	var a = colorA.a * w + colorB.a * (1.0 - w);
+	
+	resultColor.setRGBA(r, g, b, a);
+	
+	return resultColor;
+};
   
 /**
  * Set the value of RGBA (A means transparancy) as default. 

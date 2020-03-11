@@ -305,6 +305,16 @@ MagoManager.prototype.init = function(gl)
 {
 	this.bInit = true;
 	
+	/*
+	var canvas = this.scene.canvas;
+	var glAttrs = {antialias          : true, 
+		stencil            : true,
+		premultipliedAlpha : false};
+	var gl = canvas.getContext("webgl", glAttrs);
+	if (!gl)
+	{ gl = canvas.getContext("experimental-webgl", glAttrs); }
+	*/
+	
 	if (this.sceneState.gl === undefined)
 	{ this.sceneState.gl = gl; }
 	if (this.vboMemoryManager.gl === undefined)
@@ -537,12 +547,12 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 			var camPosX = camera.positionWC.x;
 			var camPosY = camera.positionWC.y;
 			var camPosZ = camera.positionWC.z;
-			var camDirX = camera.direction.x;
-			var camDirY = camera.direction.y;
-			var camDirZ = camera.direction.z;
-			var camUpX = camera.up.x;
-			var camUpY = camera.up.y;
-			var camUpZ = camera.up.z;
+			var camDirX = camera.directionWC.x;
+			var camDirY = camera.directionWC.y;
+			var camDirZ = camera.directionWC.z;
+			var camUpX = camera.upWC.x;
+			var camUpY = camera.upWC.y;
+			var camUpZ = camera.upWC.z;
 		
 			var tergetX = camPosX + camDirX * 1000;
 			var tergetY = camPosY + camDirY * 1000;
@@ -4088,7 +4098,7 @@ MagoManager.prototype.checkChangesHistoryColors = function(nodesArray)
 												if (data.aditionalColor === undefined)
 												{ data.aditionalColor = new Color(); }
 												
-												data.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
+												data.aditionalColor.setRGBA(changeHistory.color[0], changeHistory.color[1], changeHistory.color[2], changeHistory.color[3]);
 											}
 										}
 									}
@@ -4114,7 +4124,7 @@ MagoManager.prototype.checkChangesHistoryColors = function(nodesArray)
 													if (data.aditionalColor === undefined)
 													{ data.aditionalColor = new Color(); }
 													
-													data.aditionalColor.setRGB(changeHistory.rgbColor[0], changeHistory.rgbColor[1], changeHistory.rgbColor[2]);
+													data.aditionalColor.setRGBA(changeHistory.color[0], changeHistory.color[1], changeHistory.color[2], changeHistory.color[3]);
 												}
 											}
 										}

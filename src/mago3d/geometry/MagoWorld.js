@@ -542,7 +542,6 @@ MagoWorld.prototype.mousemove = function(event)
 		}
 		else
 		{
-			var gl = this.magoManager.sceneState.gl;
 			var sceneState = this.magoManager.sceneState;
 			var strCamera = mouseAction.strCamera; // camera of onMouseDown.
 			var camera = this.magoManager.sceneState.camera;

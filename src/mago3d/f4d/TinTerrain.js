@@ -1225,7 +1225,7 @@ TinTerrain.prototype.decodeData = function(imageryType)
 			latArray[i] = minLat + vValues[i]*latRangeDivShortMax;
 			altArray[i] = minHeight + hValues[i]*heightRangeDivShortMax;
 			
-			//altArray[i] *= exageration;
+			altArray[i] *= exageration;
 			
 			var currLon = lonArray[i];
 			var currLat = latArray[i];
