@@ -314,7 +314,23 @@
          "heading":0,
          "pitch":0,
          "roll": 0
-      }
+      },
+	  {
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "IFC"
+			},
+			"children": [],
+			"data_key": "Alphadom_IndoorGML_data_-_2020-01-10-revised_21",
+			"data_name": "Alphadom_IndoorGML_data_-_2020-01-10-revised_21",
+			"mapping_type": "origin",
+            "heading": 63,
+			"height": 63,
+			"latitude": 37.567,
+			"longitude": 126.97801,
+			"pitch": 0,
+			"roll": 0
+		}
    ],
    "parent":0,
    "depth":1,
