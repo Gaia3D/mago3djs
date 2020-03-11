@@ -1097,7 +1097,7 @@ SmartTile.prototype.createGeometriesFromSeeds = function(magoManager)
 				if (node.data.attributes.needCreated === 1)
 				{
 					var attributes = node.data.attributes;
-					if (attributes.objectType === "basicF4d")
+					if (attributes.objectType === "basicF4d" && attributes.fromSmartTile === false)
 					{
 						if (attributes.projectId !== undefined && attributes.isReference !== undefined && attributes.isReference === true)
 						{
