@@ -1054,7 +1054,8 @@ NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoMan
 			}
 		}
 		
-		return neoReference.texture.fileLoadState;
+		if (neoReference.texture)
+		{ return neoReference.texture.fileLoadState; }
 	}
 	else if (version[0] === '0' && version[2] === '0' && version[4] === '2' )
 	{
@@ -1094,7 +1095,8 @@ NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoMan
 			}
 		}
 		
-		return neoReference.texture.fileLoadState;
+		if (neoReference.texture)
+		{ return neoReference.texture.fileLoadState; }
 	}
 	
 };
