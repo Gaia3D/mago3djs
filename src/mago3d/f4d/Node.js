@@ -491,11 +491,6 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	if (data.attributes.flipYTexCoords !== undefined)
 	{ flipYTexCoord = data.attributes.flipYTexCoords; }
 
-	if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
-	{ 
-		flipYTexCoord = true; 
-	}
-
 	gl.uniform1i(shader.textureFlipYAxis_loc, flipYTexCoord);
 	
 	

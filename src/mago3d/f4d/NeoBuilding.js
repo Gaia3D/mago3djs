@@ -1595,9 +1595,6 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 						var filePath_inServer = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + textureFileName;
 						var gl = magoManager.sceneState.gl;
 						var flip_y_texCoords = true;
-						if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
-						{ flip_y_texCoords = false; }
-						
 						magoManager.readerWriter.readLegoSimpleBuildingTexture(gl, filePath_inServer, lodBuilding.texture, magoManager, flip_y_texCoords); 
 					}
 				}
@@ -1611,9 +1608,6 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 					var filePath_inServer = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + textureFileName;
 					var gl = magoManager.sceneState.gl;
 					var flip_y_texCoords = true;
-					if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
-					{ flip_y_texCoords = false; }
-					
 					magoManager.readerWriter.readLegoSimpleBuildingTexture(gl, filePath_inServer, lodBuilding.texture, magoManager, flip_y_texCoords); 
 				}
 			}
@@ -1633,94 +1627,6 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 	return true;
 };
 
-/**
- * 어떤 일을 하고 있습니까?
- */
-NeoBuilding.prototype.prepareSkin__original = function(magoManager) 
-{
-	var headerVersion = this.getHeaderVersion();
-	if (headerVersion === undefined)
-	{ return false; }
-	
-	if (headerVersion[0] !== "0")
-	{ return false; }
-
-	// Must respect the lodLoading order: must load the lowerLod if is not loaded.
-	var lodToLoad;
-	lodToLoad = this.getLowerSkinLodToLoad(this.currentLod);
-	var lodBuildingData = this.getLodBuildingData(lodToLoad);
-	if (lodBuildingData === undefined)
-	{ return false; }
-
-	if (lodBuildingData.isModelRef)
-	{ return false; }
-
-	var projectFolderName = this.projectFolderName;
-	var buildingFolderName = this.buildingFileName;
-	var geometryDataPath = magoManager.readerWriter.geometryDataPath;
-	
-	var textureFileName = lodBuildingData.textureFileName;
-	var lodString = lodBuildingData.geometryFileName;
-	
-
-	
-	// check if exist the lodMesh in lodMeshMap.
-	var lowLodMesh = this.getOrNewLodMesh(lodString);
-	lowLodMesh.owner = this;
-	lowLodMesh.textureName = textureFileName;
-	
-
-	
-	if (lowLodMesh.fileLoadState === -1)
-	{
-		// if a lodObject has "fileLoadState" = -1 means that there are no file in server.
-		return false;
-	}
-	
-	if (lowLodMesh.fileLoadState === CODE.fileLoadState.READY) 
-	{
-		if (magoManager.readerWriter.skinLegos_requested < 5)
-		{
-			var lodMeshFilePath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + lodString;
-			magoManager.readerWriter.getLegoArraybuffer(lodMeshFilePath, lowLodMesh, magoManager);
-			if (lowLodMesh.vbo_vicks_container.vboCacheKeysArray === undefined)
-			{ lowLodMesh.vbo_vicks_container.vboCacheKeysArray = []; }
-		}
-	}
-	else if (lowLodMesh.fileLoadState === CODE.fileLoadState.LOADING_FINISHED) 
-	{
-		////magoManager.parseQueue.putSkinLegosToParse(lowLodMesh);
-		////magoManager.readerWriter.skinLegos_requested ++;
-		
-		lowLodMesh.parseArrayBuffer(lowLodMesh.dataArrayBuffer, magoManager);
-	}
-	
-	else if (lowLodMesh.vbo_vicks_container.vboCacheKeysArray[0] && lowLodMesh.vbo_vicks_container.vboCacheKeysArray[0].vboBufferTCoord)
-	{
-		// this is the new version.
-		if (lowLodMesh.texture === undefined)
-		{
-			lowLodMesh.texture = new Texture();
-			var filePath_inServer = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + textureFileName;
-			var gl = magoManager.sceneState.gl;
-			var flip_y_texCoords = true;
-			if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
-			{ flip_y_texCoords = false; }
-			
-			magoManager.readerWriter.readLegoSimpleBuildingTexture(gl, filePath_inServer, lowLodMesh.texture, magoManager, flip_y_texCoords); 
-		}
-		else if (lowLodMesh.texture.fileLoadState === CODE.fileLoadState.LOADING_FINISHED && lowLodMesh.texture.texId === undefined)
-		{
-			// then make the image to bind into gpu.
-			var gl = magoManager.sceneState.gl;
-			TexturesManager.newWebGlTextureByEmbeddedImage(gl, lowLodMesh.texture.imageBinaryData, lowLodMesh.texture);
-			magoManager.readerWriter.skinLegos_requested ++;
-		}
-	}
-	
-	
-	return true;
-};
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -1789,7 +1695,6 @@ NeoBuilding.prototype.render = function(magoManager, shader, renderType, refMatr
 		}
 		else
 		{
-			// This building is octree divided type data.
 			var octreesRenderedCount = this.renderDetailed(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord);
 			
 			if (this.currentVisibleOctreesControler === undefined)

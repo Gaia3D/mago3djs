@@ -1426,7 +1426,7 @@ ReaderWriter.loadImage = function(gl, filePath_inServer, texture)
 		{
 			var textureAux = _gl.createTexture();
 			_gl.bindTexture(_gl.TEXTURE_2D, textureAux);
-			_gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+			//_gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 			_gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, _gl.CLAMP_TO_EDGE);
 			_gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, _gl.CLAMP_TO_EDGE);
 			_gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, filter);

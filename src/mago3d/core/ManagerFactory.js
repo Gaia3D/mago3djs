@@ -519,7 +519,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 
 		magoManager = new MagoManager();
 		magoManager.wwd = wwd;
-		magoManager.sceneState.textureFlipYAxis = true;
+		magoManager.sceneState.textureFlipYAxis = false;
 			
 		var newRenderableLayer = new WorldWind.RenderableLayer();
 		newRenderableLayer.displayName = "F4D tiles";
@@ -657,7 +657,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		
 		magoManager = new MagoManager();
 		var sceneState = magoManager.sceneState;
-		sceneState.textureFlipYAxis = true;
+		sceneState.textureFlipYAxis = false;
 		sceneState.gl = gl;
 		sceneState.drawingBufferWidth[0] = canvas.clientWidth;
 		sceneState.drawingBufferHeight[0] = canvas.clientHeight;
