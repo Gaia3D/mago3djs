@@ -108,14 +108,33 @@ Camera.prototype.doInertialMovement = function(magoManager)
 	if (this.lastMovement === undefined)
 	{ return false; }
 
+	if (this.lastMovement.movementType === CODE.movementType.NO_MOVEMENT)
+	{ return false; }
+
 	var movement = this.lastMovement;
+	var deltaTime = movement.deltaTime;
+	var magoWorld = magoManager.magoWorld;
 	
 	var movType = movement.movementType;
-	if (movType === CODE.movementType.ROTATION)
+	if (movType === CODE.movementType.TRANSLATION) // TRANSLATION.************************************
 	{
-		var magoWorld = magoManager.magoWorld;
+		var linearVelocity = movement.currLinearVelocity;
+		var dir = movement.translationDir;
+		var dist = linearVelocity * deltaTime;
+		
+		if (Math.abs(dist) < 1E-4)
+		{ movement.movementType = CODE.movementType.NO_MOVEMENT; }
+		
+		this.position.add(-dir.x*dist, -dir.y*dist, -dir.z*dist);
+		
+		magoWorld.updateModelViewMatrixByCamera(this);
+		movement.currLinearVelocity *= 0.9;
+		if (Math.abs(movement.currLinearVelocity) < 1E-4)
+		{ movement.movementType = CODE.movementType.NO_MOVEMENT; }
+	}
+	else if (movType === CODE.movementType.ROTATION) // ROTATION.************************************
+	{
 		var angVelocity = movement.currAngularVelocity;
-		var deltaTime = movement.deltaTime;
 		movement.angRad = angVelocity * deltaTime;
 		
 		if (Math.abs(movement.angRad) < 1E-11)
@@ -152,11 +171,9 @@ Camera.prototype.doInertialMovement = function(magoManager)
 		if (Math.abs(movement.currAngularVelocity) < 1E-11)
 		{ movement.movementType = CODE.movementType.NO_MOVEMENT; }
 	}
-	else if (movType === CODE.movementType.ROTATION_ZX)
+	else if (movType === CODE.movementType.ROTATION_ZX) // ROTATION_ZX.************************************
 	{
-		var magoWorld = magoManager.magoWorld;
 		var angVelocity = movement.currAngularVelocity;
-		var deltaTime = movement.deltaTime;
 		movement.angRad = angVelocity * deltaTime;
 		
 		var angRad = movement.angRad;

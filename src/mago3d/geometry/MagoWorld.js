@@ -378,12 +378,7 @@ MagoWorld.prototype.mouseup = function(event)
 	if (deltaTime > 1E-3 && deltaTime < 200)
 	{
 		// apply inertial movement.
-		camera.lastMovement.deltaTime = deltaTime;
-		if (camera.lastMovement.movementType === CODE.movementType.ROTATION)
-		{
-			var angRad = camera.lastMovement.currAngularVelocity;
-			var rotAxis = camera.lastMovement.rotationAxis;
-		}	
+		camera.lastMovement.deltaTime = deltaTime;	
 	}
 	else 
 	{
@@ -493,6 +488,10 @@ MagoWorld.prototype.mousemove = function(event)
 		
 	if (camera.lastMovement === undefined)
 	{ camera.lastMovement = new Movement(); }
+
+	var currTime = magoManager.getCurrentTime();
+	var strTime = mouseAction.strTime;
+	var deltaTime = currTime - strTime;
 	
 	if (magoManager.sceneState.mouseButton === 0)
 	{
@@ -552,13 +551,25 @@ MagoWorld.prototype.mousemove = function(event)
 			var moveVectorWC = mv_inv.rotatePoint3D(moveVectorCC, undefined);
 
 			var moveVecModul = moveVectorWC.getModul();
-			if (moveVecModul > 100.0)// there are error.
+			if (moveVecModul > 100.0 || moveVecModul < 1E-5)// there are error.
 			{ return; }
 			
 			camera.copyPosDirUpFrom(strCamera);
 			camera.position.add(-moveVectorWC.x, -moveVectorWC.y, -moveVectorWC.z);
 			
 			this.updateModelViewMatrixByCamera(camera);
+			
+			// Register the movement of the camera for the case : exist inertial movement.
+			// calculate angular velocity.
+			var moveDir = new Point3D();
+			moveDir.copyFrom(moveVectorWC);
+			moveDir.unitary();
+			
+			var linearVelocity = (moveVecModul/deltaTime)*0.25;
+			
+			camera.lastMovement.movementType = CODE.movementType.TRANSLATION;
+			camera.lastMovement.currLinearVelocity = linearVelocity;
+			camera.lastMovement.translationDir = moveDir;
 		}
 		else
 		{
@@ -620,10 +631,6 @@ MagoWorld.prototype.mousemove = function(event)
 			this.updateModelViewMatrixByCamera(camera);
 			
 			// Register the movement of the camera for the case : exist inertial movement.
-			var currTime = magoManager.getCurrentTime();
-			var strTime = mouseAction.strTime;
-			var deltaTime = currTime - strTime;
-
 			// calculate angular velocity.
 			var angRadVelocity = (angRad/deltaTime)*0.25;
 			
@@ -678,9 +685,6 @@ MagoWorld.prototype.mousemove = function(event)
 		var quatTotalRot = glMatrix.quat.create();
 		quatTotalRot = glMatrix.quat.multiply(quatTotalRot, quatZRot, quatXRot);
 		
-		var rotAxisCartesian = [3];
-		var angRad = glMatrix.quat.getAxisAngle(rotAxisCartesian, quatTotalRot);
-		
 		this.rotMat._floatArrays = glMatrix.mat4.fromQuat(this.rotMat._floatArrays, quatTotalRot);
 		
 		// Alternative calculating by matrices.***************************************************************************************
@@ -699,16 +703,10 @@ MagoWorld.prototype.mousemove = function(event)
 		this.updateModelViewMatrixByCamera(camera);
 		
 		// Register the movement of the camera for the case : exist inertial movement.
-		var currTime = magoManager.getCurrentTime();
-		var strTime = mouseAction.strTime;
-		var deltaTime = currTime - strTime;
-
 		// calculate angular velocity.
 		var angRadVelocity = (angRad/deltaTime)*0.3;
 		
 		camera.lastMovement.movementType = CODE.movementType.ROTATION_ZX;
-		camera.lastMovement.currAngularVelocity = angRadVelocity;
-		camera.lastMovement.rotationAxis = new Point3D(rotAxisCartesian[0], rotAxisCartesian[1], rotAxisCartesian[2]);
 		camera.lastMovement.rotationPoint = rotPoint;
 		camera.lastMovement.xAngVelocity = (-xRotAngRad/deltaTime)*0.3;
 		camera.lastMovement.zAngVelocity = (-zRotAngRad/deltaTime)*0.3;
