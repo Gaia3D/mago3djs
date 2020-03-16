@@ -51,7 +51,7 @@ var MouseAction = function()
 	 * @type {Point3D}
 	 * @default (0,0,0)
 	 */
-	this.strWorldPoint2;
+	//this.strWorldPoint2;
 	
 	/**
 	 * Transformation matrix of start click point location.

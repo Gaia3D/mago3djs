@@ -262,10 +262,10 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 		}
 	}
 	
-	if (!depthDetected)
+	if (!depthDetected && magoManager.scene !== undefined)
 	{
-		var camera = magoManager.scene.frameState.camera;
 		var scene = magoManager.scene;
+		var camera = scene.frameState.camera;
 		var ray = camera.getPickRay(new Cesium.Cartesian2(mouseX, mouseY));
 		var pointWC = scene.globe.pick(ray, scene);
 		mouseAction.strWorldPoint = pointWC;
@@ -280,9 +280,6 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 		//depthFbo.colorBuffer = globeDepthTex;
 		//currentLinearDepth = ManagerUtils.calculatePixelLinearDepthABGR(gl, mouseAction.strX, mouseAction.strY, depthFbo, magoManager);
 	}
-	
-	//if (magoManager.configInformation.geo_view_library === Constant.MAGOWORLD)
-	//{ currentFrustumNear = 0.0; }
 	
 	// determine world position of the X,Y.
 	mouseAction.strLinealDepth = currentLinearDepth;
@@ -305,12 +302,14 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 	mouseAction.strModelViewMatrixInv._floatArrays = glMatrix.mat4.copy(mouseAction.strModelViewMatrixInv._floatArrays, modelViewMatrixInv._floatArrays);
 
 	// save the sphere pick.
+	/*
 	if (magoManager.globe !== undefined)
 	{
 		var camRay;
 		camRay = ManagerUtils.getRayWorldSpace(gl, mouseX, mouseY, camRay, magoManager); // rayWorldSpace.
 		mouseAction.strWorldPoint2 = magoManager.globe.intersectionLineWgs84(camRay, mouseAction.strWorldPoint2);
 	}
+	*/
 };
 
 /**
@@ -573,7 +572,8 @@ MagoWorld.prototype.mousemove = function(event)
 			this.pointSC2.unitary(); // rayWorldSpace.
 			camRay = new Line();
 			var testScale = 0.0001;
-			camRay.setPointAndDir(strCamera.position.x*testScale, strCamera.position.y*testScale, strCamera.position.z*testScale,       this.pointSC2.x, this.pointSC2.y, this.pointSC2.z);// original.
+			var strCamPos = strCamera.position;
+			camRay.setPointAndDir(strCamPos.x*testScale, strCamPos.y*testScale, strCamPos.z*testScale,       this.pointSC2.x, this.pointSC2.y, this.pointSC2.z);// original.
 
 			var nowWorldPoint;
 			nowWorldPoint = this.magoManager.globe.intersectionLineWgs84(camRay, nowWorldPoint, strEarthRadius*testScale);
@@ -602,6 +602,30 @@ MagoWorld.prototype.mousemove = function(event)
 			camera.transformByMatrix4(rotMat);
 
 			this.updateModelViewMatrixByCamera(camera);
+			
+			// Check if must exist inertial movement.
+			/*
+			var currTime = magoManager.getCurrentTime();
+			var strTime = mouseAction.strTime;
+			var deltaTime = currTime - strTime;
+			
+			if (deltaTime > 1E-3 && deltaTime < 200)
+			{
+				if(camera.lastMovement === undefined)
+					camera.lastMovement = new Movement;
+			
+				// apply inertial movement.
+				// calculate angular velocity.
+				var angRadVelocity = angRad/deltaTime;
+				var movOptions = {
+					movementType    : CODE.movementType.ROTATION,
+					angularVelocity : angRadVelocity,
+					rotationAxis    : rotAxis
+				};
+				camera.movement = new Movement(movOptions);
+				
+			}
+			*/
 		}
 	}
 	else if (this.magoManager.sceneState.mouseButton === 1)
@@ -610,9 +634,6 @@ MagoWorld.prototype.mousemove = function(event)
 		var strCamera = mouseAction.strCamera;
 		var camera = this.magoManager.sceneState.camera;
 		camera.copyPosDirUpFrom(strCamera);
-		var camPos = camera.position;
-		var camDir = camera.direction;
-		var camUp = camera.up;
 		
 		// 1rst, determine the point of rotation.
 		var rotPoint = mouseAction.strWorldPoint;

@@ -40,6 +40,9 @@ var Camera = function()
 	this.rightNormal = new Point3D();
 	this.bottomNormal = new Point3D();
 	this.topNormal = new Point3D();
+	
+	// movement.
+	this.lastMovement; // class Movement.
 
 	/**
 	 *  track target node;
@@ -103,18 +106,6 @@ Camera.prototype.translate = function(translationVec)
 Camera.prototype.transformByMatrix4 = function(mat)
 {
 	// transform position, direction and up.
-	/*
-	this.position = this.transformPoint3DByMatrix4(this.position, mat);
-	
-	if (this.rotMat === undefined)
-	{ this.rotMat = mat3.create(); }
-	
-	this.rotMat = mat3.fromMat4(this.rotMat, mat);
-
-	this.direction = this.rotatePoint3DByMatrix3(this.direction, this.rotMat);
-	this.up = this.rotatePoint3DByMatrix3(this.up, this.rotMat);
-	*/
-	// Calculate with our matrix4.
 	this.position = mat.transformPoint3D(this.position, this.position);
 	this.direction = mat.rotatePoint3D(this.direction, this.direction);
 	this.up = mat.rotatePoint3D(this.up, this.up);
@@ -161,38 +152,6 @@ Camera.prototype.getCameraRight = function()
 	
 	this.right = this.direction.crossProduct(this.up, this.right);
 	return this.right;
-};
-
-/**
- * Transforms the vector "point" by given matrix4
- * @param {point3D} point
- * @param {Matrix4} mat
- * @returns {point3D} point 
- */
-Camera.prototype.transformPoint3DByMatrix4 = function(point, mat)
-{
-	var pos = glMatrix.vec3.clone([point.x, point.y, point.z]);
-	var tPos = glMatrix.vec3.create();
-	tPos = glMatrix.vec3.transformMat4(tPos, pos, mat);
-	point.set(tPos[0], tPos[1], tPos[2]);
-	
-	return point;
-};
-
-/**
- * Transforms the vector "point" by given matrix4
- * @param {point3D} point
- * @param {Matrix4} mat
- * @returns {point3D} point 
- */
-Camera.prototype.rotatePoint3DByMatrix3 = function(point, mat)
-{
-	var pos = glMatrix.vec3.clone([point.x, point.y, point.z]);
-	var tPos = glMatrix.vec3.create();
-	tPos = glMatrix.vec3.transformMat3(tPos, pos, mat);
-	point.set(tPos[0], tPos[1], tPos[2]);
-	
-	return point;
 };
 
 /**
