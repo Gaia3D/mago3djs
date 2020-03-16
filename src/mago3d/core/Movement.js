@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * Movement
+ * Movement class for camera.
  * @class Movement
  */
 var Movement = function(options) 
@@ -12,12 +12,18 @@ var Movement = function(options)
 	}
 
 	this.movementType = CODE.movementType.NO_MOVEMENT; // it can be translation, rotation or no movement.
+	this.deltaTime;
 	
 	this.currLinearVelocity;
 	this.translationDir;
 	
 	this.currAngularVelocity;
 	this.rotationAxis;
+	this.xAngVelocity;
+	this.zAngVelocity;
+	//this.angRad;
+	//this.xRotAngRad;
+	//this.zRotAngRad;
 	
 	this.rotationPoint;
 	

@@ -100,6 +100,121 @@ Camera.prototype.translate = function(translationVec)
 };
 
 /**
+ * Does the movent.
+ * @param {Movement} movement
+ */
+Camera.prototype.doInertialMovement = function(magoManager)
+{
+	if (this.lastMovement === undefined)
+	{ return false; }
+
+	var movement = this.lastMovement;
+	
+	var movType = movement.movementType;
+	if (movType === CODE.movementType.ROTATION)
+	{
+		var magoWorld = magoManager.magoWorld;
+		var angVelocity = movement.currAngularVelocity;
+		var deltaTime = movement.deltaTime;
+		movement.angRad = angVelocity * deltaTime;
+		
+		if (Math.abs(movement.angRad) < 1E-11)
+		{ movement.movementType = CODE.movementType.NO_MOVEMENT; }
+		
+		var angRad = movement.angRad;
+		var rotAxis = movement.rotationAxis;
+		
+		// check if there are rotationPoint.
+		var rotPoint = movement.rotationPoint;
+		if (rotPoint)
+		{
+			// camera is rotating respect a point of the scene.
+			var rotMat = new Matrix4();
+			rotMat.rotationAxisAngRad(angRad, rotAxis.x, rotAxis.y, rotAxis.z);
+
+			var translationVec_1 = new Point3D(-rotPoint.x, -rotPoint.y, -rotPoint.z);
+			var translationVec_2 = new Point3D(rotPoint.x, rotPoint.y, rotPoint.z);
+			
+			this.translate(translationVec_1);
+			this.transformByMatrix4(rotMat);
+			this.translate(translationVec_2);
+		}
+		else
+		{
+			// camera is rotating around the world origin.
+			var rotMat = new Matrix4();
+			rotMat.rotationAxisAngRad(-angRad, rotAxis.x, rotAxis.y, rotAxis.z);
+			this.transformByMatrix4(rotMat);
+		}
+		
+		magoWorld.updateModelViewMatrixByCamera(this);
+		movement.currAngularVelocity *= 0.9;
+		if (Math.abs(movement.currAngularVelocity) < 1E-11)
+		{ movement.movementType = CODE.movementType.NO_MOVEMENT; }
+	}
+	else if (movType === CODE.movementType.ROTATION_ZX)
+	{
+		var magoWorld = magoManager.magoWorld;
+		var angVelocity = movement.currAngularVelocity;
+		var deltaTime = movement.deltaTime;
+		movement.angRad = angVelocity * deltaTime;
+		
+		var angRad = movement.angRad;
+		var rotAxis = movement.rotationAxis;
+		
+		// check if there are rotationPoint.
+		var rotPoint = movement.rotationPoint;
+		if (rotPoint)
+		{
+			var pivotPointNormal;
+			pivotPointNormal = Globe.normalAtCartesianPointWgs84(rotPoint.x, rotPoint.y, rotPoint.z, pivotPointNormal);
+			var xAxis = this.getCameraRight();
+			
+			var zRotAngRad = movement.zAngVelocity * deltaTime;
+			var xRotAngRad = movement.xAngVelocity * deltaTime;
+			
+			if (Math.abs(zRotAngRad) < 1E-11 && Math.abs(xRotAngRad) < 1E-11)
+			{ movement.movementType = CODE.movementType.NO_MOVEMENT; }
+			
+			var quatZRot = glMatrix.quat.create();
+			quatZRot = glMatrix.quat.setAxisAngle(quatZRot, pivotPointNormal, zRotAngRad);
+			
+			var quatXRot = glMatrix.quat.create();
+			quatXRot = glMatrix.quat.setAxisAngle(quatXRot, [xAxis.x, xAxis.y, xAxis.z], xRotAngRad);
+			
+			var quatTotalRot = glMatrix.quat.create();
+			quatTotalRot = glMatrix.quat.multiply(quatTotalRot, quatZRot, quatXRot);
+			
+			var rotMat = new Matrix4();
+			rotMat._floatArrays = glMatrix.mat4.fromQuat(rotMat._floatArrays, quatTotalRot);
+		
+
+			var translationVec_1 = new Point3D(-rotPoint.x, -rotPoint.y, -rotPoint.z);
+			var translationVec_2 = new Point3D(rotPoint.x, rotPoint.y, rotPoint.z);
+			
+			this.translate(translationVec_1);
+			this.transformByMatrix4(rotMat);
+			this.translate(translationVec_2);
+		}
+		else
+		{
+			// camera is rotating around the world origin.
+			var rotMat = new Matrix4();
+			rotMat.rotationAxisAngRad(-angRad, rotAxis.x, rotAxis.y, rotAxis.z);
+			this.transformByMatrix4(rotMat);
+		}
+		
+		magoWorld.updateModelViewMatrixByCamera(this);
+		movement.zAngVelocity *= 0.9;
+		movement.xAngVelocity *= 0.9;
+		if (Math.abs(movement.zAngVelocity) < 1E-11 && Math.abs(movement.xAngVelocity) < 1E-11)
+		{ movement.movementType = CODE.movementType.NO_MOVEMENT; }
+	}
+	
+	return true;
+};
+
+/**
  * Transfrom posion, direction and up of the camera
  * @param {Matrix4} mat
  */

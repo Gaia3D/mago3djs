@@ -780,6 +780,8 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
 	{
 		var camera = this.sceneState.camera;
 		
+		camera.doInertialMovement(this);
+		
 		var frustumIdx = 0;
 		var camera = this.sceneState.camera;
 		var frustum = camera.getFrustum(frustumIdx);

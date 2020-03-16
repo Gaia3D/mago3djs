@@ -104,7 +104,8 @@ CODE.trackMode = {
 CODE.movementType = {
 	"NO_MOVEMENT" : 0,
 	"TRANSLATION" : 1,
-	"ROTATION"    : 2
+	"ROTATION"    : 2,
+	"ROTATION_ZX" : 3
 };
 
 CODE.imageryType = {
