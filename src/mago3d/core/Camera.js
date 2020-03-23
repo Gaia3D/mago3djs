@@ -40,6 +40,9 @@ var Camera = function()
 	this.rightNormal = new Point3D();
 	this.bottomNormal = new Point3D();
 	this.topNormal = new Point3D();
+	
+	// movement.
+	this.lastMovement; // class Movement.
 
 	/**
 	 *  track target node;
@@ -97,24 +100,144 @@ Camera.prototype.translate = function(translationVec)
 };
 
 /**
+ * Does the movent.
+ * @param {Movement} movement
+ */
+Camera.prototype.doInertialMovement = function(magoManager)
+{
+	if (this.lastMovement === undefined)
+	{ return false; }
+
+	if (this.lastMovement.movementType === CODE.movementType.NO_MOVEMENT)
+	{ return false; }
+
+	var movement = this.lastMovement;
+	var deltaTime = movement.deltaTime;
+	var magoWorld = magoManager.magoWorld;
+	
+	var movType = movement.movementType;
+	if (movType === CODE.movementType.TRANSLATION) // TRANSLATION.************************************
+	{
+		var linearVelocity = movement.currLinearVelocity;
+		var dir = movement.translationDir;
+		var dist = linearVelocity * deltaTime;
+		
+		if (Math.abs(dist) < 1E-4)
+		{ movement.movementType = CODE.movementType.NO_MOVEMENT; }
+		
+		this.position.add(-dir.x*dist, -dir.y*dist, -dir.z*dist);
+		
+		magoWorld.updateModelViewMatrixByCamera(this);
+		movement.currLinearVelocity *= 0.9;
+		if (Math.abs(movement.currLinearVelocity) < 1E-4)
+		{ movement.movementType = CODE.movementType.NO_MOVEMENT; }
+	}
+	else if (movType === CODE.movementType.ROTATION) // ROTATION.************************************
+	{
+		var angVelocity = movement.currAngularVelocity;
+		movement.angRad = angVelocity * deltaTime;
+		
+		if (Math.abs(movement.angRad) < 1E-11)
+		{ movement.movementType = CODE.movementType.NO_MOVEMENT; }
+		
+		var angRad = movement.angRad;
+		var rotAxis = movement.rotationAxis;
+		
+		// check if there are rotationPoint.
+		var rotPoint = movement.rotationPoint;
+		if (rotPoint)
+		{
+			// camera is rotating respect a point of the scene.
+			var rotMat = new Matrix4();
+			rotMat.rotationAxisAngRad(angRad, rotAxis.x, rotAxis.y, rotAxis.z);
+
+			var translationVec_1 = new Point3D(-rotPoint.x, -rotPoint.y, -rotPoint.z);
+			var translationVec_2 = new Point3D(rotPoint.x, rotPoint.y, rotPoint.z);
+			
+			this.translate(translationVec_1);
+			this.transformByMatrix4(rotMat);
+			this.translate(translationVec_2);
+		}
+		else
+		{
+			// camera is rotating around the world origin.
+			var rotMat = new Matrix4();
+			rotMat.rotationAxisAngRad(-angRad, rotAxis.x, rotAxis.y, rotAxis.z);
+			this.transformByMatrix4(rotMat);
+		}
+		
+		magoWorld.updateModelViewMatrixByCamera(this);
+		movement.currAngularVelocity *= 0.9;
+		if (Math.abs(movement.currAngularVelocity) < 1E-11)
+		{ movement.movementType = CODE.movementType.NO_MOVEMENT; }
+	}
+	else if (movType === CODE.movementType.ROTATION_ZX) // ROTATION_ZX.************************************
+	{
+		var angVelocity = movement.currAngularVelocity;
+		movement.angRad = angVelocity * deltaTime;
+		
+		var angRad = movement.angRad;
+		var rotAxis = movement.rotationAxis;
+		
+		// check if there are rotationPoint.
+		var rotPoint = movement.rotationPoint;
+		if (rotPoint)
+		{
+			var pivotPointNormal;
+			pivotPointNormal = Globe.normalAtCartesianPointWgs84(rotPoint.x, rotPoint.y, rotPoint.z, pivotPointNormal);
+			var xAxis = this.getCameraRight();
+			
+			var zRotAngRad = movement.zAngVelocity * deltaTime;
+			var xRotAngRad = movement.xAngVelocity * deltaTime;
+			
+			if (Math.abs(zRotAngRad) < 1E-11 && Math.abs(xRotAngRad) < 1E-11)
+			{ movement.movementType = CODE.movementType.NO_MOVEMENT; }
+			
+			var quatZRot = glMatrix.quat.create();
+			quatZRot = glMatrix.quat.setAxisAngle(quatZRot, pivotPointNormal, zRotAngRad);
+			
+			var quatXRot = glMatrix.quat.create();
+			quatXRot = glMatrix.quat.setAxisAngle(quatXRot, [xAxis.x, xAxis.y, xAxis.z], xRotAngRad);
+			
+			var quatTotalRot = glMatrix.quat.create();
+			quatTotalRot = glMatrix.quat.multiply(quatTotalRot, quatZRot, quatXRot);
+			
+			var rotMat = new Matrix4();
+			rotMat._floatArrays = glMatrix.mat4.fromQuat(rotMat._floatArrays, quatTotalRot);
+		
+
+			var translationVec_1 = new Point3D(-rotPoint.x, -rotPoint.y, -rotPoint.z);
+			var translationVec_2 = new Point3D(rotPoint.x, rotPoint.y, rotPoint.z);
+			
+			this.translate(translationVec_1);
+			this.transformByMatrix4(rotMat);
+			this.translate(translationVec_2);
+		}
+		else
+		{
+			// camera is rotating around the world origin.
+			var rotMat = new Matrix4();
+			rotMat.rotationAxisAngRad(-angRad, rotAxis.x, rotAxis.y, rotAxis.z);
+			this.transformByMatrix4(rotMat);
+		}
+		
+		magoWorld.updateModelViewMatrixByCamera(this);
+		movement.zAngVelocity *= 0.9;
+		movement.xAngVelocity *= 0.9;
+		if (Math.abs(movement.zAngVelocity) < 1E-11 && Math.abs(movement.xAngVelocity) < 1E-11)
+		{ movement.movementType = CODE.movementType.NO_MOVEMENT; }
+	}
+	
+	return true;
+};
+
+/**
  * Transfrom posion, direction and up of the camera
  * @param {Matrix4} mat
  */
 Camera.prototype.transformByMatrix4 = function(mat)
 {
 	// transform position, direction and up.
-	/*
-	this.position = this.transformPoint3DByMatrix4(this.position, mat);
-	
-	if (this.rotMat === undefined)
-	{ this.rotMat = mat3.create(); }
-	
-	this.rotMat = mat3.fromMat4(this.rotMat, mat);
-
-	this.direction = this.rotatePoint3DByMatrix3(this.direction, this.rotMat);
-	this.up = this.rotatePoint3DByMatrix3(this.up, this.rotMat);
-	*/
-	// Calculate with our matrix4.
 	this.position = mat.transformPoint3D(this.position, this.position);
 	this.direction = mat.rotatePoint3D(this.direction, this.direction);
 	this.up = mat.rotatePoint3D(this.up, this.up);
@@ -161,38 +284,6 @@ Camera.prototype.getCameraRight = function()
 	
 	this.right = this.direction.crossProduct(this.up, this.right);
 	return this.right;
-};
-
-/**
- * Transforms the vector "point" by given matrix4
- * @param {point3D} point
- * @param {Matrix4} mat
- * @returns {point3D} point 
- */
-Camera.prototype.transformPoint3DByMatrix4 = function(point, mat)
-{
-	var pos = glMatrix.vec3.clone([point.x, point.y, point.z]);
-	var tPos = glMatrix.vec3.create();
-	tPos = glMatrix.vec3.transformMat4(tPos, pos, mat);
-	point.set(tPos[0], tPos[1], tPos[2]);
-	
-	return point;
-};
-
-/**
- * Transforms the vector "point" by given matrix4
- * @param {point3D} point
- * @param {Matrix4} mat
- * @returns {point3D} point 
- */
-Camera.prototype.rotatePoint3DByMatrix3 = function(point, mat)
-{
-	var pos = glMatrix.vec3.clone([point.x, point.y, point.z]);
-	var tPos = glMatrix.vec3.create();
-	tPos = glMatrix.vec3.transformMat3(tPos, pos, mat);
-	point.set(tPos[0], tPos[1], tPos[2]);
-	
-	return point;
 };
 
 /**

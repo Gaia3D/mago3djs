@@ -584,11 +584,13 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader,
 		
 		if (renderTexture && vbo_vicky.vboBufferTCoord !== undefined)
 		{
+			gl.uniform1i(shader.textureFlipYAxis_loc, false);
 			// Provisionally flip tex coords here.
-			if (magoManager.isCesiumGlobe())
+			/*if (magoManager.isCesiumGlobe())
 			{ gl.uniform1i(shader.textureFlipYAxis_loc, false); }//.ppp
 			else
 			{ gl.uniform1i(shader.textureFlipYAxis_loc, true); }//.ppp
+			*/
 			//---------------------------------------------------------------------------
 			
 			shader.disableVertexAttribArray(shader.color4_loc); 

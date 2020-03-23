@@ -496,14 +496,7 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	if (data.attributes.flipYTexCoords !== undefined)
 	{ flipYTexCoord = data.attributes.flipYTexCoords; }
 
-	if (!magoManager.isCesiumGlobe())
-	{ 
-		flipYTexCoord = true; 
-	}
-
 	gl.uniform1i(shader.textureFlipYAxis_loc, flipYTexCoord);
-	
-	
 	
 	// Check the geoLocationDatasCount & check if is a ghost-trail-render (trail as ghost).
 	var currRenderingFase = magoManager.renderingFase;

@@ -101,6 +101,13 @@ CODE.trackMode = {
 	"DRIVER"   : 1
 };
 
+CODE.movementType = {
+	"NO_MOVEMENT" : 0,
+	"TRANSLATION" : 1,
+	"ROTATION"    : 2,
+	"ROTATION_ZX" : 3
+};
+
 CODE.imageryType = {
 	"UNKNOWN"      : 0,
 	"CRS84"        : 1,
