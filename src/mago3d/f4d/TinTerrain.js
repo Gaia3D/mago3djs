@@ -615,6 +615,40 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 	return true;
 };
 
+/**
+ * Draw terrain names on scene.
+ */
+TinTerrain.prototype.drawTerrainName = function(magoManager) 
+{
+	var canvas = magoManager.getObjectLabel();
+	var ctx = canvas.getContext("2d");
+
+	var gl = magoManager.getGl();
+	var node;
+	var nodeRoot;
+	var geoLocDataManager;
+	var geoLoc;
+	var neoBuilding;
+	var worldPosition;
+	var screenCoord;
+	
+	// Calculate the middle geoLocation.
+	var midGeoCoord = this.geographicExtent.getMidPoint();
+	worldPosition = nodeRoot.getBBoxCenterPositionWorldCoord(geoLoc);
+	screenCoord = ManagerUtils.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord, magoManager);
+	
+	if (screenCoord.x >= 0 && screenCoord.y >= 0)
+	{
+		ctx.font = "13px Arial";
+		//ctx.strokeText(nodeRoot.data.nodeId, screenCoord.x, screenCoord.y);
+		//ctx.fillText(nodeRoot.data.nodeId, screenCoord.x, screenCoord.y);
+		ctx.strokeText(nodeRoot.data.data_name, screenCoord.x, screenCoord.y);
+		ctx.fillText(nodeRoot.data.data_name, screenCoord.x, screenCoord.y);
+	}
+
+	//ctx.restore(); 
+};
+
 TinTerrain.prototype.extractLowestTinTerrains = function(resultLowestTilesArray)
 {
 	if (hasChildren())
