@@ -330,7 +330,24 @@
 			"longitude": 126.97801,
 			"pitch": 0,
 			"roll": 0
-		}
+		},
+		{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": false
+    },
+    "children": [],
+    "data_key": "madongIC",
+    "data_name": "madongIC",
+    "mapping_type":"origin",
+    "longitude": 126.58794066206333,
+    "latitude": 37.59015807520055,
+    "height": 30.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
    ],
    "parent":0,
    "depth":1,
