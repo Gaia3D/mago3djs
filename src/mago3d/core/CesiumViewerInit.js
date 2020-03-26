@@ -82,7 +82,7 @@ CesiumViewerInit.prototype.geoserverProviderBuild = function()
 	}
 
 	//geoserver 이용시 false로 변경. 현재는 안 쓸 경우 true로 해야함.
-	this.options.baseLayerPicker = true;
+	
 
 	if (geoserverEnable && policy.geoserverImageproviderEnable) 
 	{

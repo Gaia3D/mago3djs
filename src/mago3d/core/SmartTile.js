@@ -1298,7 +1298,7 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 			"isPhysical" : true,
 			"objectType" : "basicF4d"
 		};
-		if (projectFolderName.indexOf('Vegetation') > 0) 
+		if (projectFolderName.indexOf('-tree') > 0) 
 		{
 			attributes.isReference = true;
 			
@@ -1327,6 +1327,9 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		var endBuff = bytesReaded + metadataByteSize;
 		var neoBuildingHeaderData = dataArrayBuffer.slice(startBuff, endBuff);
 		bytesReaded = bytesReaded + metadataByteSize; // updating data.
+
+		var prefix = 'F4D_';
+		var data_name = buildingId.startsWith(prefix) ? buildingId.replace(prefix, '') : buildingId;
 		if (!node)
 		{ 
 			if (!attributes.isReference) 
@@ -1336,7 +1339,7 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 				data = node.data;
 				data.projectFolderName = projectFolderName;
 				data.projectId = savedProjectId;// + ".json";
-				data.data_name = buildingId;
+				data.data_name = data_name;
 				data.attributes = attributes;
 				data.attributes.fromSmartTile = true;
 				data.mapping_type = "origin";
@@ -1457,6 +1460,9 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 
 			intantiatedNode.data.dataId = dataId;
 			intantiatedNode.data.dataGroupId = savedProjectId;
+			intantiatedNode.data.data_name = data_name;
+			intantiatedNode.data.projectFolderName = projectFolderName;
+			this.nodesArray.push(intantiatedNode);
 		}
 	}
 	magoManager.emit(MagoManager.EVENT_TYPE.SMARTTILELOADEND, {
