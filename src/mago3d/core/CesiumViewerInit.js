@@ -17,6 +17,13 @@ var CesiumViewerInit = function(containerId, serverPolicy, options, legacyViewer
 CesiumViewerInit.prototype = Object.create(ViewerInit.prototype);
 CesiumViewerInit.prototype.constructor = CesiumViewerInit;
 
+CesiumViewerInit.TERRAINTYPE = {
+	GEOSERVER          : 'geoserver',
+	CESIUM_DEFAULT     : 'cesium-default',
+	CESIUM_ION_DEFAULT : 'cesium-ion-default',
+	CESIUM_ION_CDN     : 'cesium-ion-cdn',
+	CESIUM_CUSTOMER    : 'cesium-customer'
+};
 CesiumViewerInit.prototype.init = function() 
 {
 	this.setCanvasEventHandler();
@@ -24,8 +31,51 @@ CesiumViewerInit.prototype.init = function()
 	this.options.animation = this.options.animation || false;
 	this.options.timeline = this.options.timeline || false;
 
+	//GEOSERVER BASE LAYER, GEOSERVER TERRAIN SET
 	this.geoserverProviderBuild();
 
+	//PSD, 빼야함.
+	if (this.policy.cesiumIonToken && this.policy.cesiumIonToken.length > 0) 
+	{
+		Cesium.Ion.defaultAccessToken = this.policy.cesiumIonToken;
+	}
+	var terrainType = this.policy.terrainType;
+	var terrainValue = this.policy.terrainValue;
+	this.options.terrainProvider = new Cesium.EllipsoidTerrainProvider();
+	switch (terrainType) 
+	{
+	case CesiumViewerInit.TERRAINTYPE.CESIUM_ION_DEFAULT :{
+		if (this.policy.cesiumIonToken && this.policy.cesiumIonToken.length > 0) 
+		{
+			this.options.terrainProvider = new Cesium.CesiumTerrainProvider({
+				url: Cesium.IonResource.fromAssetId(1)
+			});
+		}
+		break;
+	}
+	case CesiumViewerInit.TERRAINTYPE.CESIUM_ION_CDN :{
+		if (this.policy.cesiumIonToken || this.policy.cesiumIonToken.length > 0) 
+		{
+			this.options.terrainProvider = new Cesium.CesiumTerrainProvider({
+				url: Cesium.IonResource.fromAssetId(parseInt(terrainValue))
+			});
+		}
+		break;
+	}
+	case CesiumViewerInit.TERRAINTYPE.CESIUM_CUSTOMER :{
+		this.options.terrainProvider = new Cesium.CesiumTerrainProvider({
+			url: terrainValue
+		});
+		break;
+	}
+	}
+	if (!this.options.imageryProvider) 
+	{
+		this.options.imageryProvider = new Cesium.ArcGisMapServerImageryProvider({
+			url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+		});
+	}
+	
 	this.options.shouldAnimate = false;
 	this.viewer = new Cesium.Viewer(this.targetId, this.options);
 
@@ -75,6 +125,7 @@ CesiumViewerInit.prototype.geoserverProviderBuild = function()
 	var policy = this.policy;
 	var online = policy.online;
 	var geoserverEnable = policy.geoserverEnable;
+	var terrainType = policy.terrainType;
 
 	if (!online && !geoserverEnable) 
 	{
@@ -89,15 +140,9 @@ CesiumViewerInit.prototype.geoserverProviderBuild = function()
 		this.geoserverImageProviderBuild();
 	}
 
-	if (geoserverEnable && policy.geoserverTerrainproviderEnable) 
+	if (geoserverEnable && terrainType === CesiumViewerInit.TERRAINTYPE.GEOSERVER) 
 	{
 		this.geoserverTerrainProviderBuild();
-	}
-
-	if (policy.cesiumIonToken !== null && policy.cesiumIonToken !== "") 
-	{
-		Cesium.Ion.defaultAccessToken = policy.cesiumIonToken;
-		this.DEFALUT_TERRAIN = "Cesium World Terrain";
 	}
 };
 
@@ -171,7 +216,8 @@ CesiumViewerInit.prototype.geoserverTerrainProviderBuild = function()
 	var terrainParam = {
 		service: 'WMTS'
 	};
-	var terrainUrl = policy.geoserverTerrainproviderUrl;
+
+	var terrainUrl = policy.terrainValue;
     
 	if (!terrainUrl) 
 	{
@@ -206,21 +252,31 @@ CesiumViewerInit.prototype.postProcessDataProvider = function()
 	if (!this.options.imageryProvider) 
 	{
 		var imageryProvider = null;
-		var imageryProviderViewModels = this.viewer.baseLayerPicker.viewModel.imageryProviderViewModels;
-		for (var i in imageryProviderViewModels) 
+		if (this.viewer.baseLayerPicker) 
 		{
-			if (!imageryProviderViewModels.hasOwnProperty(i))	{ continue; }
-
-			var provider = imageryProviderViewModels[i];
-			if (provider.name === this.DEFALUT_IMAGE)
+			var imageryProviderViewModels = this.viewer.baseLayerPicker.viewModel.imageryProviderViewModels;
+			for (var i in imageryProviderViewModels) 
 			{
-				imageryProvider = provider;
-				break;
-			}
-		}
-		if (imageryProvider) { this.viewer.baseLayerPicker.viewModel.selectedImagery = imageryProvider; }
-	}
+				if (!imageryProviderViewModels.hasOwnProperty(i))	{ continue; }
 
+				var provider = imageryProviderViewModels[i];
+				if (provider.name === this.DEFALUT_IMAGE)
+				{
+					imageryProvider = provider;
+					break;
+				}
+			}
+			if (imageryProvider) { this.viewer.baseLayerPicker.viewModel.selectedImagery = imageryProvider; }
+		}
+		else 
+		{
+			this.viewer.imageryLayers.removeAll();
+			this.viewer.imageryLayers.addImageryProvider(new Cesium.ArcGisMapServerImageryProvider({
+				url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+			}), 0);
+		}
+	}
+	//삭제예정. 깔끔하게 삭제하는 법 생각좀하고..
 	if (!this.options.terrainProvider) 
 	{
 		if (this.policy.initDefaultTerrain !== null && this.policy.initDefaultTerrain !== "") 
