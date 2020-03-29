@@ -322,7 +322,8 @@ Ellipsoid.prototype.makeMesh = function(options)
 	var numCols = this.lonSegments + 1;
 	var numRows = this.latSegments + 1;
 
-	this.indices = GeometryUtils.getIndicesTrianglesRegularNet(numCols, numRows, undefined, options);
+	var resultObject = GeometryUtils.getIndicesTrianglesRegularNet(numCols, numRows, undefined, undefined, undefined, undefined, undefined, options);
+	this.indices = resultObject.indicesArray;
 };
 
 

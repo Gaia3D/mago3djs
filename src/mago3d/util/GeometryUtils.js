@@ -105,7 +105,7 @@ GeometryUtils.getPrevIdx = function(currIdx, pointsCount)
  * @param {Object} options 
  * @Return {Uint16Array} resultIndicesArray
  */
-GeometryUtils.getIndicesTrianglesRegularNet = function(numCols, numRows, resultIndicesArray, options)
+GeometryUtils.getIndicesTrianglesRegularNet = function(numCols, numRows, resultIndicesArray, resultSouthIndices, resultEastIndices, resultNorthIndices, resultWestIndices, options)
 {
 	// given a regular net this function returns triangles vertices indices of the net.
 	var verticesCount = numCols * numRows;
@@ -116,6 +116,9 @@ GeometryUtils.getIndicesTrianglesRegularNet = function(numCols, numRows, resultI
 	var idx_1, idx_2, idx_3;
 	var idxCounter = 0;
 	
+	var resultObject = {};
+	
+	// bLoopColumns : if want object like a cilinder or sphere where the 1rstCol touch with the last col.
 	var bLoopColumns = false; // Default.***
 	var bTrianglesSenseCCW = true;
 	if (options !== undefined)
@@ -168,6 +171,67 @@ GeometryUtils.getIndicesTrianglesRegularNet = function(numCols, numRows, resultI
 		}
 	}
 	
+	resultObject.indicesArray = resultIndicesArray;
+	
+	var bCalculateBorderIndices = false;
+	if (options)
+	{
+		if (options.bCalculateBorderIndices !== undefined && options.bCalculateBorderIndices === true)
+		{ bCalculateBorderIndices = true; }
+	}
+	
+	// Border indices.***
+	if (bCalculateBorderIndices)
+	{
+		// South.
+		if (!resultSouthIndices)
+		{ resultSouthIndices = new Uint16Array(numCols); }
+		
+		for (var col=0; col<numCols; col++)
+		{
+			var idx = VertexMatrix.getIndexOfArray(numCols, numRows, col, 0);
+			resultSouthIndices[col] = idx;
+		}
+		
+		resultObject.southIndicesArray = resultSouthIndices;
+		
+		// East.
+		if (!resultEastIndices)
+		{ resultEastIndices = new Uint16Array(numRows); }
+		
+		for (var row = 0; row<numRows; row++)
+		{
+			var idx = VertexMatrix.getIndexOfArray(numCols, numRows, numCols-1, row);
+			resultEastIndices[row] = idx;
+		}
+		
+		resultObject.eastIndicesArray = resultEastIndices;
+		
+		// North.
+		if (!resultNorthIndices)
+		{ resultNorthIndices = new Uint16Array(numCols); }
+		
+		for (var col=numCols-1; col>=0; col--)
+		{
+			var idx = VertexMatrix.getIndexOfArray(numCols, numRows, col, numRows-1);
+			resultNorthIndices[col] = idx;
+		}
+		
+		resultObject.northIndicesArray = resultNorthIndices;
+		
+		// West.
+		if (!resultWestIndices)
+		{ resultWestIndices = new Uint16Array(numRows); }
+		
+		for (var row = numRows-1; row>=0; row--)
+		{
+			var idx = VertexMatrix.getIndexOfArray(numCols, numRows, 0, row);
+			resultWestIndices[row] = idx;
+		}
+		
+		resultObject.westIndicesArray = resultWestIndices;
+	}
+	
 	if (bLoopColumns)
 	{
 		var firstCol = 0;
@@ -210,7 +274,7 @@ GeometryUtils.getIndicesTrianglesRegularNet = function(numCols, numRows, resultI
 		}
 	}
 	
-	return resultIndicesArray;
+	return resultObject;
 };
 
 

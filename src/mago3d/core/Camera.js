@@ -105,6 +105,7 @@ Camera.prototype.translate = function(translationVec)
  */
 Camera.prototype.doInertialMovement = function(magoManager)
 {
+	// Inertial movement is decided in "MagoWorld.prototype.mouseup".
 	if (this.lastMovement === undefined)
 	{ return false; }
 

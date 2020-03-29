@@ -109,10 +109,9 @@ ManagerUtils.pointToGeographicCoord = function(point, resultGeographicCoord)
  * @param {number} latitude latitude.
  * @param {number} altitude altitude.
  * @param {Point3D|undefined} resultWorldPoint Optional. result worldCoord. if undefined, create Point3D instance.
- * @param {MagoManager} magoManager worldwind mode removed, this args is not need. 
  * @returns {Point3D} world coordinate object.
  */
-ManagerUtils.geographicCoordToWorldPoint = function(longitude, latitude, altitude, resultWorldPoint, magoManager) 
+ManagerUtils.geographicCoordToWorldPoint = function(longitude, latitude, altitude, resultWorldPoint) 
 {
 	if (resultWorldPoint === undefined)
 	{ resultWorldPoint = new Point3D(); }
