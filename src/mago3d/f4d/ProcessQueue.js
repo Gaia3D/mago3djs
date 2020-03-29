@@ -497,7 +497,7 @@ ProcessQueue.prototype.manageDeleteQueue = function(magoManager)
 			{ continue; }
 		
 			neoBuilding = node.data.neoBuilding;
-			this.eraseNodeToDeleteModelReferences(neoBuilding);
+			this.eraseNodeToDeleteModelReferences(node);
 			if (neoBuilding === undefined)
 			{ continue; }
 
