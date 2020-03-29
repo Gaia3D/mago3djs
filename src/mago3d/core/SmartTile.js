@@ -1428,6 +1428,30 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		var dataId = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 		var dataGroupId = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 		var endMark = (new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
+		
+		while (endMark > 0)
+		{
+			// There are more data.
+			if (endMark === 5) // the next data is string type data.***
+			{
+				// read the stringKey.
+				var dataKeyLength = (new Uint16Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+2)))[0]; bytesReaded += 2;
+				var dataKey = enc.decode(new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+ dataKeyLength))) ;bytesReaded += dataKeyLength;
+				
+				// read the string value.
+				var dataValueLength = (new Uint16Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+2)))[0]; bytesReaded += 2;
+				var charArray = new Uint8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+ dataValueLength)); bytesReaded += dataValueLength;
+				//var dataValue = enc.decode(new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+ dataValueLength))) ;bytesReaded += dataValueLength;
+				var decoder = new TextDecoder('utf-8');
+				var dataValueUtf8 = decoder.decode(charArray);
+				
+				// Put the readed data into node.data.***
+				data = node.data;
+				data[dataKey] = dataValueUtf8;
+			}
+			
+			endMark = (new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
+		}
 		node.data.dataId = dataId;
 		node.data.dataGroupId = dataGroupId;
 		
