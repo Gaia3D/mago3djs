@@ -129,7 +129,7 @@ void main()\n\
 		vec3 normal = vNormal;\n\
 		float angRad = acos(dot(camDir, normal));\n\
 		float angDeg = angRad*180.0/PI;\n\
-\n\
+		/*\n\
 		if(angDeg > 130.0)\n\
 			textureColor = vec4(1.0, 0.0, 0.0, 1.0);\n\
 		else if(angDeg > 120.0)\n\
@@ -140,6 +140,7 @@ void main()\n\
 			textureColor = vec4(1.0, 1.0, 0.0, 1.0);\n\
 		else if(angDeg > 90.0)\n\
 			textureColor = vec4(1.0, 0.0, 1.0, 1.0);\n\
+			*/\n\
 			\n\
 		//textureColor = vec4(vNormal, 1.0);\n\
 		\n\

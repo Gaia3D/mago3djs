@@ -11,7 +11,7 @@ var TinTerrainManager = function()
 	}
 	
 	//this.maxDepth = 18;
-	this.maxDepth = 15;
+	this.maxDepth = 12;
 	this.currentVisibles_terrName_geoCoords_map = {}; // current visible terrains map[terrainPathName, geographicCoords].
 	this.currentTerrainsMap = {}; // current terrains (that was created) map[terrainPathName, tinTerrain].
 	
@@ -188,6 +188,7 @@ TinTerrainManager.prototype.makeDistanceLimitByDepth = function()
 	this.distLimitByDepth[19] = 800; 
 	this.distLimitByDepth[20] = 500; 
 
+	//this.distLimitByDepth[0] = 5; 
 };
 
 TinTerrainManager.prototype.doFrustumCulling = function(frustum, camPos, magoManager, maxDepth)

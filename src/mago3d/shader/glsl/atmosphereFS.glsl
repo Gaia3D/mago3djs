@@ -127,7 +127,7 @@ void main()
 		vec3 normal = vNormal;
 		float angRad = acos(dot(camDir, normal));
 		float angDeg = angRad*180.0/PI;
-
+		/*
 		if(angDeg > 130.0)
 			textureColor = vec4(1.0, 0.0, 0.0, 1.0);
 		else if(angDeg > 120.0)
@@ -138,6 +138,7 @@ void main()
 			textureColor = vec4(1.0, 1.0, 0.0, 1.0);
 		else if(angDeg > 90.0)
 			textureColor = vec4(1.0, 0.0, 1.0, 1.0);
+			*/
 			
 		//textureColor = vec4(vNormal, 1.0);
 		
