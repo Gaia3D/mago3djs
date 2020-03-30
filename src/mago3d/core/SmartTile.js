@@ -1418,6 +1418,39 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		var dataGroupId = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 		var endMark = (new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
 
+		var externInfo = {};
+		while (endMark > 0)
+		{
+			// There are more data.
+			if (endMark === 5) // the next data is string type data.***
+			{
+				// read the stringKey.
+				var dataKeyLength = (new Uint16Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+2)))[0]; bytesReaded += 2;
+				var dataKey = enc.decode(new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+ dataKeyLength))) ;bytesReaded += dataKeyLength;
+				
+				// read the string value.
+				var dataValueLength = (new Uint16Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+2)))[0]; bytesReaded += 2;
+				var charArray = new Uint8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+ dataValueLength)); bytesReaded += dataValueLength;
+				//var dataValue = enc.decode(new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+ dataValueLength))) ;bytesReaded += dataValueLength;
+				var decoder = new TextDecoder('utf-8');
+				var dataValueUtf8 = decoder.decode(charArray);
+				
+				// Put the readed data into externInfo.***
+				externInfo[dataKey] = dataValueUtf8;
+			}
+			
+			endMark = (new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
+		}
+		node.data.dataId = dataId;
+		node.data.dataGroupId = dataGroupId;
+		
+		// finally put the node into smartTile.
+		//this.putNode(this.depth, node, magoManager);
+		node.data.smartTileOwner = this;
+		this.nodesArray.push(node);
+	
+
+
 		if (!attributes.isReference) 
 		{
 			var lodBuilding = neoBuilding.getOrNewLodBuilding(lodString);
@@ -1433,11 +1466,17 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 			lodBuilding.texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 
 			node.data.geographicCoord = geoCoord;
-			data.rotationsDegree = eulerAngDeg; 
-			data.dataId = dataId;
-			data.dataGroupId = savedProjectId;
+			node.data.rotationsDegree = eulerAngDeg; 
+			node.data.dataId = dataId;
+			node.data.dataGroupId = savedProjectId;
 
 			node.data.smartTileOwner = this;
+			for(var i in externInfo) {
+				if(externInfo.hasOwnProperty(i)) {
+					node.data[i] = externInfo[i];
+				}
+			}
+
 			this.nodesArray.push(node);
 		}
 		else 
@@ -1460,8 +1499,12 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 
 			intantiatedNode.data.dataId = dataId;
 			intantiatedNode.data.dataGroupId = savedProjectId;
-			intantiatedNode.data.data_name = data_name;
 			intantiatedNode.data.projectFolderName = projectFolderName;
+			for(var i in externInfo) {
+				if(externInfo.hasOwnProperty(i)) {
+					intantiatedNode.data[i] = externInfo[i];
+				}
+			}
 			this.nodesArray.push(intantiatedNode);
 		}
 	}
