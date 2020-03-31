@@ -600,59 +600,57 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		// determine frustum near & far.***
 		var camHeight = camera.getCameraElevation();
 		var eqRadius = Globe.equatorialRadius();
-		frustum0.far[0] = (eqRadius + camHeight*10);
-
-		//if (camHeight > eqRadius*1.2)
-		if (camHeight > 1000000)
-		{ frustum0.near[0] = 0.1 + camHeight/1000000; }
+		
+		// Calculate near - far.*******************************************
+		if (camHeight > 3000)
+		{
+			frustum0.near[0] = 0.1 + camHeight*0.8;
+			frustum0.far[0] = eqRadius + camHeight*0.9;
+		}
 		else
-		{ frustum0.near[0] = 0.1 + camHeight / 10000000; }
-	
-		// Test values.****************************
-		frustum0.near[0] = 0.1 + camHeight*0.9; // delete.!!!
-		//frustum0.far[0] = (camHeight+eqRadius)*10000;
-		// End test.-------------------------------
+		{
+			frustum0.near[0] = 0.1;
+			frustum0.far[0] = eqRadius + camHeight*0.9;
+		}
+		
+		// End-------------------------------------------------------------
 		
 		ManagerUtils.calculateSplited3fv([camPos.x, camPos.y, camPos.z], sceneState.encodedCamPosHigh, sceneState.encodedCamPosLow);
 		
 		// projection.***
 		// consider near as zero provisionally.***
-		sceneState.projectionMatrix._floatArrays = glMatrix.mat4.perspective(sceneState.projectionMatrix._floatArrays, frustum0.fovyRad[0], frustum0.aspectRatio[0], frustum0.near[0], frustum0.far[0]);
-		//sceneState.projectionMatrix._floatArrays = glMatrix.mat4.perspective(sceneState.projectionMatrix._floatArrays, frustum0.fovyRad[0], frustum0.aspectRatio[0], 0.0, frustum0.far[0]);
+		var projectionMatrix = sceneState.projectionMatrix;
+		projectionMatrix._floatArrays = glMatrix.mat4.perspective(projectionMatrix._floatArrays, frustum0.fovyRad[0], frustum0.aspectRatio[0], frustum0.near[0], frustum0.far[0]);
 		
 		// modelView.***
-		//sceneState.modelViewMatrix._floatArrays; 
-		sceneState.modelViewMatrixInv._floatArrays = glMatrix.mat4.invert(sceneState.modelViewMatrixInv._floatArrays, sceneState.modelViewMatrix._floatArrays);
+		var modelViewMatrix = sceneState.modelViewMatrix;
+		var modelViewMatrixInv = sceneState.modelViewMatrixInv;
+		modelViewMatrixInv._floatArrays = glMatrix.mat4.invert(modelViewMatrixInv._floatArrays, modelViewMatrix._floatArrays);
 	
 		// normalMat.***
-		sceneState.normalMatrix4._floatArrays = glMatrix.mat4.transpose(sceneState.normalMatrix4._floatArrays, sceneState.modelViewMatrixInv._floatArrays);
+		var normalMatrix4 = sceneState.normalMatrix4;
+		normalMatrix4._floatArrays = glMatrix.mat4.transpose(normalMatrix4._floatArrays, modelViewMatrixInv._floatArrays);
 		
 		// modelViewRelToEye.***
-		///sceneState.modelViewRelToEyeMatrix._floatArrays = glMatrix.mat4.transpose(sceneState.modelViewRelToEyeMatrix._floatArrays, sceneState.modelViewMatrix._floatArrays);
-		sceneState.modelViewRelToEyeMatrix._floatArrays = glMatrix.mat4.copy(sceneState.modelViewRelToEyeMatrix._floatArrays, sceneState.modelViewMatrix._floatArrays);
-		sceneState.modelViewRelToEyeMatrix._floatArrays[12] = 0;
-		sceneState.modelViewRelToEyeMatrix._floatArrays[13] = 0;
-		sceneState.modelViewRelToEyeMatrix._floatArrays[14] = 0;
-		sceneState.modelViewRelToEyeMatrix._floatArrays[15] = 1;
-		sceneState.modelViewRelToEyeMatrixInv._floatArrays = glMatrix.mat4.invert(sceneState.modelViewRelToEyeMatrixInv._floatArrays, sceneState.modelViewRelToEyeMatrix._floatArrays);
+		var modelViewRelToEyeMatrix = sceneState.modelViewRelToEyeMatrix;
+		modelViewRelToEyeMatrix._floatArrays = glMatrix.mat4.copy(modelViewRelToEyeMatrix._floatArrays, modelViewMatrix._floatArrays);
+		modelViewRelToEyeMatrix._floatArrays[12] = 0;
+		modelViewRelToEyeMatrix._floatArrays[13] = 0;
+		modelViewRelToEyeMatrix._floatArrays[14] = 0;
+		modelViewRelToEyeMatrix._floatArrays[15] = 1;
+		
+		var modelViewRelToEyeMatrixInv = sceneState.modelViewRelToEyeMatrixInv;
+		modelViewRelToEyeMatrixInv._floatArrays = glMatrix.mat4.invert(modelViewRelToEyeMatrixInv._floatArrays, modelViewRelToEyeMatrix._floatArrays);
 		
 		// modelViewProjection.***
-		sceneState.modelViewProjMatrix._floatArrays = glMatrix.mat4.multiply(sceneState.modelViewProjMatrix._floatArrays, sceneState.projectionMatrix._floatArrays, sceneState.modelViewMatrix._floatArrays);
+		var modelViewProjMatrix = sceneState.modelViewProjMatrix;
+		modelViewProjMatrix._floatArrays = glMatrix.mat4.multiply(modelViewProjMatrix._floatArrays, projectionMatrix._floatArrays, modelViewMatrix._floatArrays);
 		
 		// modelViewProjectionRelToEye.***
-		//sceneState.modelViewProjRelToEyeMatrix._floatArrays = glMatrix.mat4.multiply(sceneState.modelViewProjRelToEyeMatrix._floatArrays, sceneState.projectionMatrix._floatArrays, sceneState.modelViewRelToEyeMatrix._floatArrays);
+		var modelViewProjRelToEyeMatrix = sceneState.modelViewProjRelToEyeMatrix;
+		modelViewProjRelToEyeMatrix._floatArrays = glMatrix.mat4.multiply(modelViewProjRelToEyeMatrix._floatArrays, projectionMatrix._floatArrays, modelViewRelToEyeMatrix._floatArrays);
 
-		// modelViewProjectionRelToEye.***
-		sceneState.modelViewProjRelToEyeMatrix.copyFromMatrix4(sceneState.modelViewProjMatrix);
-		sceneState.modelViewProjRelToEyeMatrix._floatArrays[12] = 0;
-		sceneState.modelViewProjRelToEyeMatrix._floatArrays[13] = 0;
-		sceneState.modelViewProjRelToEyeMatrix._floatArrays[14] = 0;
-		sceneState.modelViewProjRelToEyeMatrix._floatArrays[15] = 1;
-		
-		
 		frustum0.tangentOfHalfFovy[0] = Math.tan(frustum0.fovyRad[0]/2);
-		
-		//sceneState.modelViewProjRelToEyeMatrix._floatArrays = glMatrix.mat4.multiply(sceneState.modelViewProjRelToEyeMatrix._floatArrays, sceneState.projectionMatrix._floatArrays, sceneState.modelViewRelToEyeMatrix._floatArrays);
 
 	}
 	
