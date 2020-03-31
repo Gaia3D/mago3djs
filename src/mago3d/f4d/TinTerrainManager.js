@@ -187,6 +187,8 @@ TinTerrainManager.prototype.makeDistanceLimitByDepth = function()
 	this.distLimitByDepth[18] = 1000; 
 	this.distLimitByDepth[19] = 800; 
 	this.distLimitByDepth[20] = 500; 
+	
+	//this.distLimitByDepth[0] = 5;
 };
 
 TinTerrainManager.prototype.doFrustumCulling = function(frustum, camPos, magoManager, maxDepth)

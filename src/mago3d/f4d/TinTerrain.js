@@ -360,11 +360,6 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 		// 1rst, try to erase from procesQueue_deleting if exist.
 		magoManager.processQueue.eraseTinTerrainToDelete(this);
 		
-		if (this.depth === 0)
-		{
-			this.fileLoadState = CODE.fileLoadState.LOAD_FAILED;
-		}
-		
 		// Prepare this tinTerrain.
 		if (this.fileLoadState === CODE.fileLoadState.READY)
 		{
@@ -1063,6 +1058,10 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 		skirtDepth          : 50000,
 		texCorrectionFactor : texCorrectionFactor
 	};
+	
+	if (this.depth === 6)
+	{ var hola = 0; }
+	
 	var skirtResultObject = TinTerrain.getSkirtTrianglesStrip(lonArray, latArray, altArray, this.texCoordsArray, this.southIndices, this.eastIndices, this.northIndices, this.westIndices, options);
 	this.skirtCartesiansArray = skirtResultObject.skirtCartesiansArray;
 	this.skirtTexCoordsArray = skirtResultObject.skirtTexCoordsArray;
@@ -1460,93 +1459,6 @@ TinTerrain.prototype.decodeData = function(imageryType)
 			this.texCoordsArray[i*2] = s;
 			this.texCoordsArray[i*2+1] = t;
 		}
-		/*
-		// Texture correction in borders & make skirt data.***
-		var skirtDepth = 5000.0;
-		var skirtLonArray = [];
-		var skirtLatArray = [];
-		var skirtAltArray = [];
-		this.skirtTexCoordsArray = [];
-		for (var j=0; j<this.westVertexCount; j++)
-		{
-			var idx = this.westIndices[j];
-			this.texCoordsArray[idx*2] += texCorrectionFactor/2;
-			
-			skirtLonArray.push(lonArray[idx]);
-			skirtLatArray.push(latArray[idx]);
-			skirtAltArray.push(altArray[idx]);
-			
-			skirtLonArray.push(lonArray[idx]);
-			skirtLatArray.push(latArray[idx]);
-			skirtAltArray.push(altArray[idx]-skirtDepth);
-			
-			// insert texCoords 2 times for the triangles strip.
-			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2]);   // s.
-			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2+1]); // t.
-			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2]);   // s.
-			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2+1]); // t.
-		}
-		
-		for (var j=0; j<this.southVertexCount; j++)
-		{
-			var idx = this.southIndices[j];
-			this.texCoordsArray[idx*2+1] = (texCorrectionFactor);
-			
-			skirtLonArray.push(lonArray[idx]);
-			skirtLatArray.push(latArray[idx]);
-			skirtAltArray.push(altArray[idx]);
-			
-			skirtLonArray.push(lonArray[idx]);
-			skirtLatArray.push(latArray[idx]);
-			skirtAltArray.push(altArray[idx]-skirtDepth);
-			
-			// insert texCoords 2 times for the triangles strip.
-			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2]);   // s.
-			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2+1]); // t.
-			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2]);   // s.
-			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2+1]); // t.
-		}
-		
-		for (var j=0; j<this.eastVertexCount; j++)
-		{
-			var idx = this.eastIndices[j];
-			this.texCoordsArray[idx*2] -= texCorrectionFactor/2;
-			
-			skirtLonArray.push(lonArray[idx]);
-			skirtLatArray.push(latArray[idx]);
-			skirtAltArray.push(altArray[idx]);
-			
-			skirtLonArray.push(lonArray[idx]);
-			skirtLatArray.push(latArray[idx]);
-			skirtAltArray.push(altArray[idx]-skirtDepth);
-			
-			// insert texCoords 2 times for the triangles strip.
-			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2]);   // s.
-			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2+1]); // t.
-			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2]);   // s.
-			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2+1]); // t.
-		}
-
-		for (var j=0; j<this.northVertexCount; j++)
-		{
-			var idx = this.northIndices[j];
-			this.texCoordsArray[idx*2+1] = (1-texCorrectionFactor);
-			
-			skirtLonArray.push(lonArray[idx]);
-			skirtLatArray.push(latArray[idx]);
-			skirtAltArray.push(altArray[idx]);
-			
-			skirtLonArray.push(lonArray[idx]);
-			skirtLatArray.push(latArray[idx]);
-			skirtAltArray.push(altArray[idx]-skirtDepth);
-			
-			// insert texCoords 2 times for the triangles strip.
-			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2]);   // s.
-			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2+1]); // t.
-			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2]);   // s.
-			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2+1]); // t.
-		}
-		*/
 	}
 	else
 	{
@@ -1572,7 +1484,6 @@ TinTerrain.prototype.decodeData = function(imageryType)
 	var skirtResultObject = TinTerrain.getSkirtTrianglesStrip(lonArray, latArray, altArray, this.texCoordsArray, this.southIndices, this.eastIndices, this.northIndices, this.westIndices, options);
 	this.skirtCartesiansArray = skirtResultObject.skirtCartesiansArray;
 	this.skirtTexCoordsArray = skirtResultObject.skirtTexCoordsArray;
-	//this.skirtCartesiansArray = Globe.geographicRadianArrayToFloat32ArrayWgs84(skirtLonArray, skirtLatArray, skirtAltArray, this.skirtCartesiansArray);
 	
 	// free memory.
 	this.uValues = undefined;
