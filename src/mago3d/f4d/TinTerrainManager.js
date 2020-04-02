@@ -3,7 +3,7 @@
 /**
  * @class TinTerrainManager
  */
-var TinTerrainManager = function() 
+var TinTerrainManager = function(options) 
 {
 	if (!(this instanceof TinTerrainManager)) 
 	{
@@ -11,7 +11,7 @@ var TinTerrainManager = function()
 	}
 	
 	//this.maxDepth = 18;
-	this.maxDepth = 12;
+	this.maxDepth = 14;
 	this.currentVisibles_terrName_geoCoords_map = {}; // current visible terrains map[terrainPathName, geographicCoords].
 	this.currentTerrainsMap = {}; // current terrains (that was created) map[terrainPathName, tinTerrain].
 	
@@ -28,7 +28,7 @@ var TinTerrainManager = function()
 	// Elevation model or plain ellipsoid.
 	// terrainType = 0 -> terrainPlainModel.
 	// terrainType = 1 -> terrainElevationModel.
-	this.terrainType = 1; 
+	this.terrainType = 0; 
 	//CODE.imageryType = {
 	//"UNKNOWN"      : 0,
 	//"CRS84"        : 1,
@@ -41,6 +41,12 @@ var TinTerrainManager = function()
 	this.makeTinTerrainWithDEMIndex(); // provisional.
 	
 	//https://www.ngdc.noaa.gov/mgg/global/global.html here there are geotiff of land & ocean 1arc-minute. All earth. size : 21600 x 10800.
+	
+	if(options)
+	{
+		if(options.terrainType !== undefined)
+			this.terrainType = options.terrainType;
+	}
 };
 
 TinTerrainManager.prototype.init = function()
@@ -91,11 +97,6 @@ TinTerrainManager.prototype.init = function()
 		var maxLon = 180;
 		var maxLat = 90;
 		var maxAlt = 0;
-		if (this.imageryType === CODE.imageryType.WEB_MERCATOR)
-		{
-			minLat = -webMercatorMaxLatDeg; 
-			maxLat = webMercatorMaxLatDeg; 
-		}
 		
 		this.tinTerrainsQuadTreeAsia.setGeographicExtent(minLon, minLat, minAlt, maxLon, maxLat, maxAlt);
 		this.tinTerrainsQuadTreeAsia.setWebMercatorExtent(0, -Math.PI, 1, Math.PI); // unitary extension.***
@@ -111,11 +112,7 @@ TinTerrainManager.prototype.init = function()
 		maxLon = 0;
 		maxLat = 90;
 		maxAlt = 0;
-		if (this.imageryType === CODE.imageryType.WEB_MERCATOR)
-		{
-			minLat = -webMercatorMaxLatDeg; 
-			maxLat = webMercatorMaxLatDeg; 
-		}
+
 		this.tinTerrainsQuadTreeAmerica.setGeographicExtent(minLon, minLat, minAlt, maxLon, maxLat, maxAlt);
 		this.tinTerrainsQuadTreeAmerica.setWebMercatorExtent(-1, -Math.PI, 0, Math.PI); // unitary extension.***
 		this.tinTerrainsQuadTreeAmerica.X = 0;
