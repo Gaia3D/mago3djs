@@ -1441,15 +1441,6 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 			
 			endMark = (new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
 		}
-		node.data.dataId = dataId;
-		node.data.dataGroupId = dataGroupId;
-		
-		// finally put the node into smartTile.
-		//this.putNode(this.depth, node, magoManager);
-		node.data.smartTileOwner = this;
-		this.nodesArray.push(node);
-	
-
 
 		if (!attributes.isReference) 
 		{
@@ -1471,9 +1462,11 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 			node.data.dataGroupId = savedProjectId;
 
 			node.data.smartTileOwner = this;
-			for(var i in externInfo) {
-				if(externInfo.hasOwnProperty(i)) {
-					node.data[i] = externInfo[i];
+			for (var j in externInfo) 
+			{
+				if (externInfo.hasOwnProperty(j)) 
+				{
+					node.data[j] = externInfo[j];
 				}
 			}
 
@@ -1500,9 +1493,11 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 			intantiatedNode.data.dataId = dataId;
 			intantiatedNode.data.dataGroupId = savedProjectId;
 			intantiatedNode.data.projectFolderName = projectFolderName;
-			for(var i in externInfo) {
-				if(externInfo.hasOwnProperty(i)) {
-					intantiatedNode.data[i] = externInfo[i];
+			for (var j in externInfo) 
+			{
+				if (externInfo.hasOwnProperty(j)) 
+				{
+					intantiatedNode.data[j] = externInfo[j];
 				}
 			}
 			this.nodesArray.push(intantiatedNode);

@@ -1,6 +1,6 @@
 {
   "geopolicyId": 1,
-  "basicGlobe": "cesium",
+  "basicGlobe": "magoworld",
   "cesiumIonToken": "",
   "geoserverEnable":false,
   "geoserverWmsVersion":"1.1.1",
