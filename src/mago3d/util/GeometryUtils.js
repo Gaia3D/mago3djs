@@ -211,10 +211,12 @@ GeometryUtils.getIndicesTrianglesRegularNet = function(numCols, numRows, resultI
 		if (!resultNorthIndices)
 		{ resultNorthIndices = new Uint16Array(numCols); }
 		
+		var counter = 0;
 		for (var col=numCols-1; col>=0; col--)
 		{
 			var idx = VertexMatrix.getIndexOfArray(numCols, numRows, col, numRows-1);
-			resultNorthIndices[col] = idx;
+			resultNorthIndices[counter] = idx;
+			counter ++;
 		}
 		
 		resultObject.northIndicesArray = resultNorthIndices;
@@ -223,10 +225,12 @@ GeometryUtils.getIndicesTrianglesRegularNet = function(numCols, numRows, resultI
 		if (!resultWestIndices)
 		{ resultWestIndices = new Uint16Array(numRows); }
 		
+		counter = 0;
 		for (var row = numRows-1; row>=0; row--)
 		{
 			var idx = VertexMatrix.getIndexOfArray(numCols, numRows, 0, row);
-			resultWestIndices[row] = idx;
+			resultWestIndices[counter] = idx;
+			counter ++;
 		}
 		
 		resultObject.westIndicesArray = resultWestIndices;

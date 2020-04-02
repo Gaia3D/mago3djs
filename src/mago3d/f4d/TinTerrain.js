@@ -360,11 +360,6 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 		// 1rst, try to erase from procesQueue_deleting if exist.
 		magoManager.processQueue.eraseTinTerrainToDelete(this);
 		
-		if (this.depth === 0)
-		{
-			this.fileLoadState = CODE.fileLoadState.LOAD_FAILED;
-		}
-		
 		// Prepare this tinTerrain.
 		if (this.fileLoadState === CODE.fileLoadState.READY)
 		{
@@ -454,7 +449,10 @@ TinTerrain.prototype.renderBorder = function(currentShader, magoManager)
 };
 
 TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, renderType)
-{		
+{	
+	if (this.depth === 0)
+	{ return true; }
+	
 	if (this.owner === undefined || (this.owner.isPrepared() && this.owner.isChildrenPrepared()))
 	{
 		if (this.isPrepared())
@@ -494,6 +492,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			}
 			// End test.--------------------------------------------------------------------------------------
 			
+
 			// render this tinTerrain.
 			var renderWireframe = false;
 			
@@ -561,12 +560,12 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 				{
 					gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 					gl.uniform4fv(currentShader.oneColor4_loc, [0.0, 0.9, 0.9, 1.0]);
-					//gl.drawElements(gl.LINE_LOOP, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.
-					var trianglesCount = indicesCount;
-					for (var i=0; i<trianglesCount; i++)
-					{
-						gl.drawElements(gl.LINE_LOOP, 3, gl.UNSIGNED_SHORT, i*3); // Fill.
-					}
+					gl.drawElements(gl.LINE_STRIP, indicesCount-1, gl.UNSIGNED_SHORT, 0); 
+					//var trianglesCount = indicesCount/3;
+					//for (var i=0; i<trianglesCount; i++)
+					//{
+					//	gl.drawElements(gl.LINE_LOOP, 3, gl.UNSIGNED_SHORT, i*3); 
+					//}
 					
 					this.drawTerrainName(magoManager);
 				}
@@ -852,21 +851,31 @@ TinTerrain.prototype.calculateCenterPosition = function()
 	// Note: The centerPosition is Float64Array type.
 	// The centerPosition of tiles are calculate with "altitude" = 0;.
 	// Note: if the earth is made in only 1 tile, then this calculations is bad.
-
-	var altitude = 0.0;
-	var resultGeographicCoord;
-	resultGeographicCoord = this.geographicExtent.getMidPoint(resultGeographicCoord);
-	
-	var centerLon = resultGeographicCoord.longitude;
-	var centerLat = resultGeographicCoord.latitude;
-	
-	var resultCartesian;
-	resultCartesian = Globe.geographicToCartesianWgs84(centerLon, centerLat, altitude, resultCartesian);
-	
-	// Float64Array.
-	this.centerX = new Float64Array([resultCartesian[0]]);
-	this.centerY = new Float64Array([resultCartesian[1]]);
-	this.centerZ = new Float64Array([resultCartesian[2]]);
+	if (this.depth === 0)
+	{
+		this.centerX = new Float64Array([0]);
+		this.centerY = new Float64Array([0]);
+		this.centerZ = new Float64Array([0]);
+	}
+	else
+	{
+		var altitude = 0.0;
+		var resultGeographicCoord;
+		resultGeographicCoord = this.geographicExtent.getMidPoint(resultGeographicCoord);
+		
+		var centerLon = resultGeographicCoord.longitude;
+		var centerLat = resultGeographicCoord.latitude;
+		
+		var resultCartesian;
+		resultCartesian = Globe.geographicToCartesianWgs84(centerLon, centerLat, altitude, resultCartesian);
+		
+		// Float64Array.
+		this.centerX = new Float64Array([resultCartesian[0]]);
+		this.centerY = new Float64Array([resultCartesian[1]]);
+		this.centerZ = new Float64Array([resultCartesian[2]]);
+		
+		
+	}
 	
 };
 
@@ -895,6 +904,14 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 	var minLat = this.geographicExtent.minGeographicCoord.latitude * degToRadFactor;
 	var maxLon = this.geographicExtent.maxGeographicCoord.longitude * degToRadFactor;
 	var maxLat = this.geographicExtent.maxGeographicCoord.latitude * degToRadFactor;
+	
+	// Test.*******************************************************************************
+	//var minLon = -60 * degToRadFactor;
+	//var minLat = -45 * degToRadFactor;
+	//var maxLon = -45 * degToRadFactor;
+	//var maxLat = -20 * degToRadFactor;
+	// End test.----------------------------------------------------------------------------
+	
 	var lonRange = maxLon - minLon;
 	var latRange = maxLat - minLat;
 	var depth = this.depth;
@@ -998,34 +1015,27 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 		}
 	}
 	
-	
-	
 	this.cartesiansArray = Globe.geographicRadianArrayToFloat32ArrayWgs84(lonArray, latArray, altArray, this.cartesiansArray);
 	
-	/*
-	// test code.**************************************
-	var cartesianAux = [];
-	var radToDegFactor = 180.0/Math.PI;
-	var coordsCount = lonArray.length;
-	for (var i=0; i<coordsCount; i++)
-	{
-		var lonDeg = lonArray[i] * radToDegFactor;
-		var latDeg = latArray[i] * radToDegFactor;
-		var alt = altArray[i];
-		
-		var posWC = ManagerUtils.geographicCoordToWorldPoint(lonDeg, latDeg, alt, undefined);
-		cartesianAux.push(posWC.x);
-		cartesianAux.push(posWC.y);
-		cartesianAux.push(posWC.z);
-	}
 	
+	// test code.**************************************
+	/*
+	var pointArrayAux = [];
+	var radToDegFactor = 180.0/Math.PI;
+	var coordsCount = this.cartesiansArray.length/3;
 	for (var i=0; i<coordsCount; i++)
 	{
-		if (Math.abs(cartesianAux[i] - this.cartesiansArray[i]) > 10.0)
-		{ var hola = 0; }
+		var x = this.cartesiansArray[i*3];
+		var y = this.cartesiansArray[i*3+1];
+		var z = this.cartesiansArray[i*3+2];
+		
+		var pointAux = new Point3D(x, y, z);
+		pointArrayAux.push(pointAux);
+		
 	}
-	// end test code.----------------------------------
 	*/
+	// end test code.----------------------------------
+	
 	
 	// Make normals using the cartesians.***
 	this.normalsArray = new Int8Array(vertexCount*3);
@@ -1046,6 +1056,8 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 	var options = {
 		bCalculateBorderIndices: true
 	};
+	
+	
 	var resultObject = GeometryUtils.getIndicesTrianglesRegularNet(numCols, numRows, undefined, undefined, undefined, undefined, undefined, options);
 	this.indices = resultObject.indicesArray;
 	this.southIndices = resultObject.southIndicesArray;
@@ -1063,6 +1075,10 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 		skirtDepth          : 50000,
 		texCorrectionFactor : texCorrectionFactor
 	};
+	
+	if (this.depth === 6)
+	{ var hola = 0; }
+	
 	var skirtResultObject = TinTerrain.getSkirtTrianglesStrip(lonArray, latArray, altArray, this.texCoordsArray, this.southIndices, this.eastIndices, this.northIndices, this.westIndices, options);
 	this.skirtCartesiansArray = skirtResultObject.skirtCartesiansArray;
 	this.skirtTexCoordsArray = skirtResultObject.skirtTexCoordsArray;
@@ -1210,6 +1226,7 @@ TinTerrain.prototype.makeVbo = function(vboMemManager)
 	
 	// Positions.
 	vboKey.setDataArrayPos(this.cartesiansArray, vboMemManager);
+
 	
 	// Normals.
 	if (this.normalsArray)
@@ -1365,6 +1382,62 @@ TinTerrain.getSkirtTrianglesStrip = function(lonArray, latArray, altArray, texCo
 	return resultObject;
 };
 
+TinTerrain.getNormals = function(cartesiansArray, indicesArray, resultNormalsArray, options)
+{
+	var idx_1, idx_2, idx_3;
+	var point_1, point_2, point_3;
+	var normal;
+	var normalsArray = [];
+	var trianglesCount = indicesArray.length/3;
+	for (var i=0; i<trianglesCount; i++)
+	{
+		idx_1 = indicesArray[i*3];
+		idx_2 = indicesArray[i*3+1];
+		idx_3 = indicesArray[i*3+2];
+		
+		point_1 = new Point3D(cartesiansArray[idx_1*3], cartesiansArray[idx_1*3+1], cartesiansArray[idx_1*3+2]);
+		point_2 = new Point3D(cartesiansArray[idx_2*3], cartesiansArray[idx_2*3+1], cartesiansArray[idx_2*3+2]);
+		point_3 = new Point3D(cartesiansArray[idx_3*3], cartesiansArray[idx_3*3+1], cartesiansArray[idx_3*3+2]);
+		
+		// Calculate the normal for this triangle.
+		normal = Triangle.calculateNormal(point_1, point_2, point_3, normal);
+		
+		// Accum normals for each points.
+		// Point 1.***
+		if (normalsArray[idx_1] !== undefined)
+		{
+			normalsArray[idx_1].addPoint(normal);
+		}
+		else
+		{
+			normalsArray[idx_1] = normal;
+		}
+		
+		// Point 2.***
+		if (normalsArray[idx_2] !== undefined)
+		{
+			normalsArray[idx_2].addPoint(normal);
+		}
+		else
+		{
+			normalsArray[idx_2] = normal;
+		}
+		
+		// Point 3.***
+		if (normalsArray[idx_3] !== undefined)
+		{
+			normalsArray[idx_3].addPoint(normal);
+		}
+		else
+		{
+			normalsArray[idx_3] = normal;
+		}
+	}
+	
+	// finally, normalize all normals.
+	
+};
+
 TinTerrain.prototype.decodeData = function(imageryType)
 {
 	if (this.geographicExtent === undefined)
@@ -1399,7 +1472,7 @@ TinTerrain.prototype.decodeData = function(imageryType)
 	var vValues = this.vValues;
 	var hValues = this.hValues;
 	
-	var exageration = 5.0;
+	var exageration = 10.0;
 	
 	if (this.depth === 0)
 	{ var hola = 0; }
@@ -1432,9 +1505,6 @@ TinTerrain.prototype.decodeData = function(imageryType)
 		//var texCorrectionFactor = 0.0005;
 		var texCorrectionFactor = 0.003 + (depth * 0.0000001);
 		//var texCorrectionFactor = 0.002 + (1/(depth+1) * 0.008);
-		
-		//if (this.depth === 13)
-		//{ texCorrectionFactor = 0.0033; }
 	
 		for (var i=0; i<vertexCount; i++)
 		{
@@ -1442,7 +1512,9 @@ TinTerrain.prototype.decodeData = function(imageryType)
 			latArray[i] = minLat + vValues[i]*latRangeDivShortMax;
 			altArray[i] = minHeight + hValues[i]*heightRangeDivShortMax;
 			
-			//altArray[i] *= exageration;
+
+			//if (altArray[i] < 0.0)
+			//{ altArray[i] *= exageration; }
 			
 			var currLon = lonArray[i];
 			var currLat = latArray[i];
@@ -1460,93 +1532,6 @@ TinTerrain.prototype.decodeData = function(imageryType)
 			this.texCoordsArray[i*2] = s;
 			this.texCoordsArray[i*2+1] = t;
 		}
-		/*
-		// Texture correction in borders & make skirt data.***
-		var skirtDepth = 5000.0;
-		var skirtLonArray = [];
-		var skirtLatArray = [];
-		var skirtAltArray = [];
-		this.skirtTexCoordsArray = [];
-		for (var j=0; j<this.westVertexCount; j++)
-		{
-			var idx = this.westIndices[j];
-			this.texCoordsArray[idx*2] += texCorrectionFactor/2;
-			
-			skirtLonArray.push(lonArray[idx]);
-			skirtLatArray.push(latArray[idx]);
-			skirtAltArray.push(altArray[idx]);
-			
-			skirtLonArray.push(lonArray[idx]);
-			skirtLatArray.push(latArray[idx]);
-			skirtAltArray.push(altArray[idx]-skirtDepth);
-			
-			// insert texCoords 2 times for the triangles strip.
-			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2]);   // s.
-			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2+1]); // t.
-			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2]);   // s.
-			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2+1]); // t.
-		}
-		
-		for (var j=0; j<this.southVertexCount; j++)
-		{
-			var idx = this.southIndices[j];
-			this.texCoordsArray[idx*2+1] = (texCorrectionFactor);
-			
-			skirtLonArray.push(lonArray[idx]);
-			skirtLatArray.push(latArray[idx]);
-			skirtAltArray.push(altArray[idx]);
-			
-			skirtLonArray.push(lonArray[idx]);
-			skirtLatArray.push(latArray[idx]);
-			skirtAltArray.push(altArray[idx]-skirtDepth);
-			
-			// insert texCoords 2 times for the triangles strip.
-			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2]);   // s.
-			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2+1]); // t.
-			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2]);   // s.
-			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2+1]); // t.
-		}
-		
-		for (var j=0; j<this.eastVertexCount; j++)
-		{
-			var idx = this.eastIndices[j];
-			this.texCoordsArray[idx*2] -= texCorrectionFactor/2;
-			
-			skirtLonArray.push(lonArray[idx]);
-			skirtLatArray.push(latArray[idx]);
-			skirtAltArray.push(altArray[idx]);
-			
-			skirtLonArray.push(lonArray[idx]);
-			skirtLatArray.push(latArray[idx]);
-			skirtAltArray.push(altArray[idx]-skirtDepth);
-			
-			// insert texCoords 2 times for the triangles strip.
-			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2]);   // s.
-			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2+1]); // t.
-			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2]);   // s.
-			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2+1]); // t.
-		}
-
-		for (var j=0; j<this.northVertexCount; j++)
-		{
-			var idx = this.northIndices[j];
-			this.texCoordsArray[idx*2+1] = (1-texCorrectionFactor);
-			
-			skirtLonArray.push(lonArray[idx]);
-			skirtLatArray.push(latArray[idx]);
-			skirtAltArray.push(altArray[idx]);
-			
-			skirtLonArray.push(lonArray[idx]);
-			skirtLatArray.push(latArray[idx]);
-			skirtAltArray.push(altArray[idx]-skirtDepth);
-			
-			// insert texCoords 2 times for the triangles strip.
-			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2]);   // s.
-			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2+1]); // t.
-			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2]);   // s.
-			this.skirtTexCoordsArray.push(this.texCoordsArray[idx*2+1]); // t.
-		}
-		*/
 	}
 	else
 	{
@@ -1572,7 +1557,6 @@ TinTerrain.prototype.decodeData = function(imageryType)
 	var skirtResultObject = TinTerrain.getSkirtTrianglesStrip(lonArray, latArray, altArray, this.texCoordsArray, this.southIndices, this.eastIndices, this.northIndices, this.westIndices, options);
 	this.skirtCartesiansArray = skirtResultObject.skirtCartesiansArray;
 	this.skirtTexCoordsArray = skirtResultObject.skirtTexCoordsArray;
-	//this.skirtCartesiansArray = Globe.geographicRadianArrayToFloat32ArrayWgs84(skirtLonArray, skirtLatArray, skirtAltArray, this.skirtCartesiansArray);
 	
 	// free memory.
 	this.uValues = undefined;
