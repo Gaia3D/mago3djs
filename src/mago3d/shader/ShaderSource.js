@@ -3382,7 +3382,7 @@ uniform sampler2D shadowMapTex;\n\
 uniform sampler2D shadowMapTex2;\n\
 uniform bool textureFlipYAxis;\n\
 uniform bool bIsMakingDepth;\n\
-varying vec3 vNormal;\n\
+uniform bool bExistAltitudes;\n\
 uniform mat4 projectionMatrix;\n\
 uniform mat4 m;\n\
 uniform vec2 noiseScale;\n\
@@ -3418,10 +3418,13 @@ uniform float shadowMapWidth;    \n\
 uniform float shadowMapHeight;\n\
 varying vec3 v3Pos;\n\
 \n\
+varying float applySpecLighting;\n\
 varying vec4 vPosRelToLight; \n\
 varying vec3 vLightDir; \n\
+varying vec3 vNormal;\n\
 varying vec3 vNormalWC;\n\
 varying float currSunIdx;\n\
+varying float vAltitude;\n\
 \n\
 const float equatorialRadius = 6378137.0;\n\
 const float polarRadius = 6356752.3142;\n\
@@ -3521,6 +3524,53 @@ void main()\n\
 				}\n\
 			}\n\
 		}\n\
+		\n\
+		// Do specular lighting.***\n\
+		vec3 normal2 = vNormal;	\n\
+		float lambertian = 1.0;\n\
+		float specular;\n\
+		\n\
+		if(applySpecLighting> 0.0)\n\
+		{\n\
+			vec3 L;\n\
+			if(bApplyShadow)\n\
+			{\n\
+				L = vLightDir;// test.***\n\
+				lambertian = max(dot(normal2, L), 0.0); // original.***\n\
+			}\n\
+			else\n\
+			{\n\
+				vec3 lightPos = vec3(1.0, 1.0, 1.0);\n\
+				L = normalize(lightPos - vertexPos);\n\
+				lambertian = max(dot(normal2, L), 0.0);\n\
+			}\n\
+			\n\
+			specular = 0.0;\n\
+			if(lambertian > 0.0)\n\
+			{\n\
+				vec3 R = reflect(-L, normal2);      // Reflected light vector\n\
+				vec3 V = normalize(-vertexPos); // Vector to viewer\n\
+				\n\
+				// Compute the specular term\n\
+				float specAngle = max(dot(R, V), 0.0);\n\
+				specular = pow(specAngle, shininessValue);\n\
+				\n\
+				if(specular > 1.0)\n\
+				{\n\
+					specular = 1.0;\n\
+				}\n\
+			}\n\
+			\n\
+			if(lambertian < 0.5)\n\
+			{\n\
+				lambertian = 0.5;\n\
+			}\n\
+			\n\
+			// test.\n\
+			lambertian += 0.3;\n\
+		}\n\
+		\n\
+		\n\
 	\n\
 		vec4 textureColor;\n\
 		if(colorType == 0)\n\
@@ -3558,16 +3608,23 @@ void main()\n\
 		float fogParam = v3Pos.z/(far - 100000.0);\n\
 		float fogParam2 = fogParam*fogParam;\n\
 		float fogAmount = fogParam2*fogParam2;\n\
+		\n\
+		if(bExistAltitudes && vAltitude < 0.0)\n\
+		textureColor = vec4(1.0, 0.0, 0.0, 1.0);\n\
+		\n\
 		vec4 finalColor = mix(textureColor, fogColor, fogAmount); \n\
-		gl_FragColor = vec4(finalColor.xyz * shadow_occlusion, 1.0);\n\
+		gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian, 1.0);\n\
+		//gl_FragColor = vec4(vNormal.xyz, 1.0);\n\
 		\n\
 		//if(currSunIdx > 0.0 && currSunIdx < 1.0 && shadow_occlusion<0.9)gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n\
 	}\n\
 }";
-ShaderSource.TinTerrainVS = "attribute vec3 position;\n\
+ShaderSource.TinTerrainVS = "\n\
+attribute vec3 position;\n\
 attribute vec3 normal;\n\
 attribute vec4 color4;\n\
 attribute vec2 texCoord;\n\
+attribute float altitude;\n\
 \n\
 uniform mat4 projectionMatrix;  \n\
 uniform mat4 modelViewMatrix;\n\
@@ -3590,12 +3647,16 @@ uniform vec4 oneColor4;\n\
 uniform bool bUse1Color;\n\
 uniform bool hasTexture;\n\
 uniform bool bIsMakingDepth;\n\
+uniform bool bExistAltitudes;\n\
 uniform float near;\n\
 uniform float far;\n\
 uniform bool bApplyShadow;\n\
 uniform int sunIdx;\n\
+uniform bool bApplySpecularLighting;\n\
 \n\
+varying float applySpecLighting;\n\
 varying vec3 vNormal;\n\
+varying vec3 vertexPos;\n\
 varying vec2 vTexCoord;   \n\
 varying vec3 uAmbientColor;\n\
 varying vec3 vLightWeighting;\n\
@@ -3607,6 +3668,7 @@ varying vec4 vPosRelToLight; \n\
 varying vec3 vLightDir; \n\
 varying vec3 vNormalWC;\n\
 varying float currSunIdx;\n\
+varying float vAltitude;\n\
 \n\
 void main()\n\
 {	\n\
@@ -3616,10 +3678,13 @@ void main()\n\
     vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
     vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
 	\n\
+	vNormal = normalize((normalMatrix4 * vec4(normal.x, normal.y, normal.z, 1.0)).xyz); // original.***\n\
+	vLightDir = sunDirWC;\n\
+	vAltitude = altitude;\n\
+	\n\
 	currSunIdx = -1.0; // initially no apply shadow.\n\
 	if(bApplyShadow && !bIsMakingDepth)\n\
 	{\n\
-		vLightDir = sunDirWC;\n\
 		vec3 rotatedNormal = vec3(0.0, 0.0, 1.0); // provisional.***\n\
 		vNormalWC = rotatedNormal;\n\
 					\n\
@@ -3652,16 +3717,27 @@ void main()\n\
 		vec3 posRelToLightNDC = posRelToLightAux.xyz / posRelToLightAux.w;\n\
 		vPosRelToLight = posRelToLightAux;\n\
 	}\n\
-\n\
+	\n\
+	if(bApplySpecularLighting)\n\
+	{\n\
+		applySpecLighting = 1.0;\n\
+	}\n\
+	else{\n\
+		applySpecLighting = -1.0;\n\
+	}\n\
+	\n\
 	if(bIsMakingDepth)\n\
 	{\n\
+		\n\
 		depthValue = (modelViewMatrixRelToEye * pos4).z/far;\n\
 	}\n\
 	else\n\
 	{\n\
+		\n\
 		vTexCoord = texCoord;\n\
 	}\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+	vertexPos = (modelViewMatrixRelToEye * pos4).xyz;\n\
 	v3Pos = gl_Position.xyz;\n\
 }";
 ShaderSource.update_frag = "precision highp float;\n\

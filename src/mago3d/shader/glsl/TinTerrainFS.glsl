@@ -9,7 +9,7 @@ uniform sampler2D shadowMapTex;
 uniform sampler2D shadowMapTex2;
 uniform bool textureFlipYAxis;
 uniform bool bIsMakingDepth;
-varying vec3 vNormal;
+uniform bool bExistAltitudes;
 uniform mat4 projectionMatrix;
 uniform mat4 m;
 uniform vec2 noiseScale;
@@ -45,10 +45,13 @@ uniform float shadowMapWidth;
 uniform float shadowMapHeight;
 varying vec3 v3Pos;
 
+varying float applySpecLighting;
 varying vec4 vPosRelToLight; 
 varying vec3 vLightDir; 
+varying vec3 vNormal;
 varying vec3 vNormalWC;
 varying float currSunIdx;
+varying float vAltitude;
 
 const float equatorialRadius = 6378137.0;
 const float polarRadius = 6356752.3142;
@@ -148,6 +151,53 @@ void main()
 				}
 			}
 		}
+		
+		// Do specular lighting.***
+		vec3 normal2 = vNormal;	
+		float lambertian = 1.0;
+		float specular;
+		
+		if(applySpecLighting> 0.0)
+		{
+			vec3 L;
+			if(bApplyShadow)
+			{
+				L = vLightDir;// test.***
+				lambertian = max(dot(normal2, L), 0.0); // original.***
+			}
+			else
+			{
+				vec3 lightPos = vec3(1.0, 1.0, 1.0);
+				L = normalize(lightPos - vertexPos);
+				lambertian = max(dot(normal2, L), 0.0);
+			}
+			
+			specular = 0.0;
+			if(lambertian > 0.0)
+			{
+				vec3 R = reflect(-L, normal2);      // Reflected light vector
+				vec3 V = normalize(-vertexPos); // Vector to viewer
+				
+				// Compute the specular term
+				float specAngle = max(dot(R, V), 0.0);
+				specular = pow(specAngle, shininessValue);
+				
+				if(specular > 1.0)
+				{
+					specular = 1.0;
+				}
+			}
+			
+			if(lambertian < 0.5)
+			{
+				lambertian = 0.5;
+			}
+			
+			// test.
+			lambertian += 0.3;
+		}
+		
+		
 	
 		vec4 textureColor;
 		if(colorType == 0)
@@ -185,8 +235,13 @@ void main()
 		float fogParam = v3Pos.z/(far - 100000.0);
 		float fogParam2 = fogParam*fogParam;
 		float fogAmount = fogParam2*fogParam2;
+		
+		if(bExistAltitudes && vAltitude < 0.0)
+		textureColor = vec4(1.0, 0.0, 0.0, 1.0);
+		
 		vec4 finalColor = mix(textureColor, fogColor, fogAmount); 
-		gl_FragColor = vec4(finalColor.xyz * shadow_occlusion, 1.0);
+		gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian, 1.0);
+		//gl_FragColor = vec4(vNormal.xyz, 1.0);
 		
 		//if(currSunIdx > 0.0 && currSunIdx < 1.0 && shadow_occlusion<0.9)gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 	}

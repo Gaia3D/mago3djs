@@ -177,18 +177,15 @@ Triangle.prototype.calculatePlaneNormal = function()
 Triangle.calculateNormal = function(point1, point2, point3, resultNormal) 
 {
 	// Given 3 points, this function calculates the normal.
-	var v1 = new Point3D();
-	var v2 = new Point3D();
-	
 	var currentPoint = point1;
 	var prevPoint = point3;
 	var nextPoint = point2;
 
-	v1.set(currentPoint.x - prevPoint.x,     currentPoint.y - prevPoint.y,     currentPoint.z - prevPoint.z);
-	v2.set(nextPoint.x - currentPoint.x,     nextPoint.y - currentPoint.y,     nextPoint.z - currentPoint.z);
+	var v1 = new Point3D(currentPoint.x - prevPoint.x,     currentPoint.y - prevPoint.y,     currentPoint.z - prevPoint.z);
+	var v2 = new Point3D(nextPoint.x - currentPoint.x,     nextPoint.y - currentPoint.y,     nextPoint.z - currentPoint.z);
 
-	//v1.unitary();
-	//v2.unitary();
+	v1.unitary();
+	v2.unitary();
 	if (resultNormal === undefined)
 	{ resultNormal = new Point3D(); }
 	

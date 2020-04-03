@@ -602,7 +602,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		var eqRadius = Globe.equatorialRadius();
 		
 		// Calculate near - far.*******************************************
-		if (camHeight > 3000)
+		if (camHeight > 4000)
 		{
 			frustum0.near[0] = 0.1 + camHeight*0.8;
 			frustum0.far[0] = eqRadius + camHeight*0.9;
@@ -4511,6 +4511,8 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
 
 	shader.bIsMakingDepth_loc = gl.getUniformLocation(shader.program, "bIsMakingDepth");
+	shader.bExistAltitudes_loc = gl.getUniformLocation(shader.program, "bExistAltitudes");
+	shader.altitude_loc = gl.getAttribLocation(shader.program, "altitude");
 	
 	// 4) PointsCloud shader.****************************************************************************************
 	shaderName = "pointsCloud";

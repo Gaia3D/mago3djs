@@ -769,6 +769,65 @@ Globe.geographicRadianArrayToFloat32ArrayWgs84 = function(lonArray, latArray, al
 	return resultCartesianArray;
 };
 
+/**
+ * This change the array of the absolute coordinates represented as the angle to the array of WGS84
+ * @param {Number} longitude
+ * @param {Number} latitude
+ * @param {Number} altitude
+ * @param {Float32Array} resultCartesian
+ * @returns {Float32Array} resultCartesian
+ */
+
+Globe.geographicRadianArrayToFloat32ArrayWgs84Vec4 = function(lonArray, latArray, altArray, resultCartesianArray)
+{
+	// defined in the LINZ standard LINZS25000 (Standard for New Zealand Geodetic Datum 2000)
+	// https://www.linz.govt.nz/data/geodetic-system/coordinate-conversion/geodetic-datum-conversions/equations-used-datum
+	// a = semi-major axis.
+	// e2 = firstEccentricitySquared.
+	// v = a / sqrt(1 - e2 * sin2(lat)).
+	// x = (v+h)*cos(lat)*cos(lon).
+	// y = (v+h)*cos(lat)*sin(lon).
+	// z = [v*(1-e2)+h]*sin(lat).
+	var equatorialRadius = 6378137.0; // meters.
+	var firstEccentricitySquared = 6.69437999014E-3;
+	
+	var lonRad;
+	var latRad;
+	var cosLon;
+	var cosLat;
+	var sinLon;
+	var sinLat;
+	var a = equatorialRadius;
+	var e2 = firstEccentricitySquared;
+	var e2a = 1.0 - e2;
+	var v;
+	var h;
+	
+	var coordsCount = lonArray.length;
+	if (resultCartesianArray === undefined)
+	{
+		resultCartesianArray = new Float32Array(coordsCount*4);
+	}
+	for (var i=0; i<coordsCount; i++)
+	{
+		lonRad = lonArray[i];
+		latRad = latArray[i];
+		cosLon = Math.cos(lonRad);
+		cosLat = Math.cos(latRad);
+		sinLon = Math.sin(lonRad);
+		sinLat = Math.sin(latRad);
+		v = a/Math.sqrt(1.0 - e2 * sinLat * sinLat);
+		h = altArray[i];
+		
+		resultCartesianArray[i*4] = (v+h)*cosLat*cosLon;
+		resultCartesianArray[i*4+1] = (v+h)*cosLat*sinLon;
+		resultCartesianArray[i*4+2] = (v*e2a+h)*sinLat;
+		resultCartesianArray[i*4+3] = h;
+	}
+	
+	return resultCartesianArray;
+};
+
 		
 		
 		
