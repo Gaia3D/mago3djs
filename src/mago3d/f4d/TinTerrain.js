@@ -616,6 +616,15 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 				}
 			}
 			
+			if (vboKey.bindDataCustom(currentShader, vboMemManager, "altitudes"))
+			{
+				gl.uniform1i(currentShader.bExistAltitudes_loc, true);
+			}
+			else 
+			{
+				gl.uniform1i(currentShader.bExistAltitudes_loc, false);
+			}
+			
 			// Normals.
 			// todo:
 			
@@ -1266,6 +1275,17 @@ TinTerrain.prototype.makeVbo = function(vboMemManager)
 		
 	// Indices.
 	vboKey.setDataArrayIdx(this.indices, vboMemManager);
+	
+	// Aditional data.
+	// Altitudes.
+	if (this.altArray !== undefined)
+	{
+		var dimensions = 1;
+		var name = "altitudes";
+		var attribLoc = 3;
+		vboKey.setDataArrayCustom(this.altArray, vboMemManager, dimensions, name, attribLoc);
+	}
+	
 
 	// Make skirt.
 	if (this.skirtCartesiansArray === undefined)
@@ -1291,14 +1311,13 @@ TinTerrain.prototype.makeVbo = function(vboMemManager)
 		vboKeySkirt.setDataArrayTexCoord(new Float32Array(this.skirtTexCoordsArray), vboMemManager);
 	}
 	
-	// Aditional data.
-	// Altitudes.
-	if (this.altArray !== undefined)
+	// Altitudes for skirtData.
+	if (this.skirtAltitudesArray)
 	{
 		var dimensions = 1;
 		var name = "altitudes";
 		var attribLoc = 3;
-		vboKey.setDataArrayCustom(this.altArray, vboMemManager, dimensions, name, attribLoc);
+		vboKeySkirt.setDataArrayCustom(new Float32Array(this.skirtAltitudesArray), vboMemManager, dimensions, name, attribLoc);
 	}
 };
 
@@ -1322,6 +1341,7 @@ TinTerrain.getSkirtTrianglesStrip = function(lonArray, latArray, altArray, texCo
 	var skirtLatArray = [];
 	var skirtAltArray = [];
 	var skirtTexCoordsArray = [];
+	//var skinAltitudes = [];
 	
 	var westVertexCount = westIndices.length;
 	for (var j=0; j<westVertexCount; j++)
@@ -1410,7 +1430,8 @@ TinTerrain.getSkirtTrianglesStrip = function(lonArray, latArray, altArray, texCo
 	
 	var resultObject = {
 		skirtCartesiansArray : skirtCartesiansArray,
-		skirtTexCoordsArray  : skirtTexCoordsArray
+		skirtTexCoordsArray  : skirtTexCoordsArray,
+		skirtAltitudesArray  : skirtAltArray
 	};
 	
 	return resultObject;
@@ -1599,7 +1620,7 @@ TinTerrain.prototype.decodeData = function(imageryType)
 	
 	this.cartesiansArray = Globe.geographicRadianArrayToFloat32ArrayWgs84(lonArray, latArray, altArray, this.cartesiansArray);
 	
-	this.normalsArray = TinTerrain.getNormalCartesiansArray(this.cartesiansArray, this.indices, undefined, undefined);
+	//this.normalsArray = TinTerrain.getNormalCartesiansArray(this.cartesiansArray, this.indices, undefined, undefined);
 	
 	var options = {
 		skirtDepth          : 50000,
@@ -1608,6 +1629,7 @@ TinTerrain.prototype.decodeData = function(imageryType)
 	var skirtResultObject = TinTerrain.getSkirtTrianglesStrip(lonArray, latArray, altArray, this.texCoordsArray, this.southIndices, this.eastIndices, this.northIndices, this.westIndices, options);
 	this.skirtCartesiansArray = skirtResultObject.skirtCartesiansArray;
 	this.skirtTexCoordsArray = skirtResultObject.skirtTexCoordsArray;
+	this.skirtAltitudesArray = skirtResultObject.skirtAltitudesArray;
 	
 	// free memory.
 	this.uValues = undefined;

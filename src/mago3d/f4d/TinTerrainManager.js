@@ -196,6 +196,12 @@ TinTerrainManager.prototype.makeDistanceLimitByDepth = function()
 	this.distLimitByDepth[20] = 500; 
 	
 	//this.distLimitByDepth[0] = 5;
+	
+	var distLimitByDepthCount = this.distLimitByDepth.length;
+	for (var i=0; i<distLimitByDepthCount; i++)
+	{
+		this.distLimitByDepth[i] *= 2.0;
+	}
 };
 
 TinTerrainManager.prototype.doFrustumCulling = function(frustum, camPos, magoManager, maxDepth)
@@ -307,7 +313,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 		gl.uniform1i(currentShader.refMatrixType_loc, 0); // init referencesMatrix.
 		gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, this.identityMat._floatArrays);
 		
-		gl.uniform1i(currentShader.bApplySpecularLighting_loc, true);
+		gl.uniform1i(currentShader.bApplySpecularLighting_loc, false);
 		
 		var bApplyShadow = false;
 		if (magoManager.sceneState.sunSystem !== undefined && magoManager.sceneState.applySunShadows)

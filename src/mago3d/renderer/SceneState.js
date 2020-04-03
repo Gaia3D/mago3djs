@@ -29,6 +29,10 @@ var SceneState = function()
 	this.identityMatrix4 = new Matrix4(); // created as identity matrix.
 	this.modelViewMatrixLast = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; // Number array.
 	this.projectionMatrixLast = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; // Number array.
+	
+	// Matrices for sky rendering (large far).
+	this.projectionMatrixSky = new Matrix4(); // created as identity matrix.
+	this.modelViewProjRelToEyeMatrixSky = new Matrix4(); // created as identity matrix.
 
 	this.encodedCamPosHigh = new Float32Array([0.0, 0.0, 0.0]);
 	this.encodedCamPosLow = new Float32Array([0.0, 0.0, 0.0]);

@@ -244,6 +244,16 @@ PostFxShader.prototype.bindUniformGenerals = function()
  * @param shaderName 변수
  * @returns shader
  */
+PostFxShader.prototype.getUniformDataPair = function(uniformName)
+{
+	return this.uniformsMapGeneral[uniformName];
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param shaderName 변수
+ * @returns shader
+ */
 PostFxShader.prototype.newUniformDataPair = function(uniformType, uniformName)
 {
 	var uniformDataPair;//

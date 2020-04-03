@@ -3466,6 +3466,72 @@ vec3 getViewRay(vec2 tc)\n\
 //    return unpackDepth(texture2D(depthTex, coord.xy));\n\
 //}  \n\
 \n\
+vec3 getRainbowColor_byHeight(float height)\n\
+{\n\
+	float minHeight_rainbow = -100.0;\n\
+	float maxHeight_rainbow = 0.0;\n\
+	\n\
+	float gray = (height - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);\n\
+	if (gray > 1.0){ gray = 1.0; }\n\
+	else if (gray<0.0){ gray = 0.0; }\n\
+	\n\
+	float r, g, b;\n\
+	\n\
+	if(gray < 0.16666)\n\
+	{\n\
+		b = 0.0;\n\
+		g = gray*6.0;\n\
+		r = 1.0;\n\
+	}\n\
+	else if(gray >= 0.16666 && gray < 0.33333)\n\
+	{\n\
+		b = 0.0;\n\
+		g = 1.0;\n\
+		r = 2.0 - gray*6.0;\n\
+	}\n\
+	else if(gray >= 0.33333 && gray < 0.5)\n\
+	{\n\
+		b = -2.0 + gray*6.0;\n\
+		g = 1.0;\n\
+		r = 0.0;\n\
+	}\n\
+	else if(gray >= 0.5 && gray < 0.66666)\n\
+	{\n\
+		b = 1.0;\n\
+		g = 4.0 - gray*6.0;\n\
+		r = 0.0;\n\
+	}\n\
+	else if(gray >= 0.66666 && gray < 0.83333)\n\
+	{\n\
+		b = 1.0;\n\
+		g = 0.0;\n\
+		r = -4.0 + gray*6.0;\n\
+	}\n\
+	else if(gray >= 0.83333)\n\
+	{\n\
+		b = 6.0 - gray*6.0;\n\
+		g = 0.0;\n\
+		r = 1.0;\n\
+	}\n\
+	\n\
+	float aux = r;\n\
+	r = b;\n\
+	b = aux;\n\
+	\n\
+	//b = -gray + 1.0;\n\
+	//if (gray > 0.5)\n\
+	//{\n\
+	//	g = -gray*2.0 + 2.0; \n\
+	//}\n\
+	//else \n\
+	//{\n\
+	//	g = gray*2.0;\n\
+	//}\n\
+	//r = gray;\n\
+	vec3 resultColor = vec3(r, g, b);\n\
+    return resultColor;\n\
+} \n\
+\n\
 float getDepthShadowMap(vec2 coord)\n\
 {\n\
 	// currSunIdx\n\
@@ -3527,7 +3593,7 @@ void main()\n\
 		\n\
 		// Do specular lighting.***\n\
 		vec3 normal2 = vNormal;	\n\
-		float lambertian = 1.0;\n\
+		float lambertian = 1.3;\n\
 		float specular;\n\
 		\n\
 		if(applySpecLighting> 0.0)\n\
@@ -3605,12 +3671,14 @@ void main()\n\
 		//gl_FragColor = vec4(textureColor.xyz, externalAlpha); \n\
 		textureColor.w = externalAlpha;\n\
 		vec4 fogColor = vec4(0.9, 0.9, 0.9, 1.0);\n\
-		float fogParam = v3Pos.z/(far - 100000.0);\n\
+		float fogParam = v3Pos.z/(far - 10000.0);\n\
 		float fogParam2 = fogParam*fogParam;\n\
 		float fogAmount = fogParam2*fogParam2;\n\
 		\n\
-		if(bExistAltitudes && vAltitude < 0.0)\n\
-		textureColor = vec4(1.0, 0.0, 0.0, 1.0);\n\
+		if(bExistAltitudes && vAltitude < 0.01)\n\
+		{\n\
+			textureColor = vec4(getRainbowColor_byHeight(vAltitude), 1.0);\n\
+		}\n\
 		\n\
 		vec4 finalColor = mix(textureColor, fogColor, fogAmount); \n\
 		gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian, 1.0);\n\
