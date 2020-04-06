@@ -10,8 +10,8 @@ var TinTerrainManager = function(options)
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
-	//this.maxDepth = 18;
-	this.maxDepth = 14;
+	this.maxDepth = 18;
+	//this.maxDepth = 14;
 	this.currentVisibles_terrName_geoCoords_map = {}; // current visible terrains map[terrainPathName, geographicCoords].
 	this.currentTerrainsMap = {}; // current terrains (that was created) map[terrainPathName, tinTerrain].
 	
@@ -42,10 +42,10 @@ var TinTerrainManager = function(options)
 	
 	//https://www.ngdc.noaa.gov/mgg/global/global.html here there are geotiff of land & ocean 1arc-minute. All earth. size : 21600 x 10800.
 	
-	if(options)
+	if (options)
 	{
-		if(options.terrainType !== undefined)
-			this.terrainType = options.terrainType;
+		if (options.terrainType !== undefined)
+		{ this.terrainType = options.terrainType; }
 	}
 };
 

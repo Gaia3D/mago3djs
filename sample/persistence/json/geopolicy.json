@@ -27,7 +27,7 @@
   "initCameraEnable":true,
   "initLatitude":"37.52023780736431",
   "initLongitude":"126.91511673520017",
-  "initAltitude":"600",
+  "initAltitude":"60000",
   "initDuration":"1",
   "initDefaultTerrain":"",
   "initDefaultFov":1,

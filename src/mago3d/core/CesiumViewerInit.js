@@ -40,22 +40,6 @@ CesiumViewerInit.prototype.init = function()
 	this.postProcessDataProvider();
 	this.initMagoManager();
 	//this.setEventHandler();
-
-	if (this.policy.initCameraEnable) 
-	{ 
-		var lon = parseFloat(this.policy.initLongitude);
-		var lat = parseFloat(this.policy.initLatitude);
-		var height = parseFloat(this.policy.initAltitude);
-		var duration = parseInt(this.policy.initDuration);
-
-		if (isNaN(lon) || isNaN(lat) || isNaN(height)) 
-		{
-			throw new Error('Longitude, Latitude, Height must number type.');
-		}
-
-		if (isNaN(duration)) { duration = 3; }
-		this.magoManager.flyTo(lon, lat, height, duration);
-	}
 };
 CesiumViewerInit.prototype.setCanvasEventHandler = function() 
 {

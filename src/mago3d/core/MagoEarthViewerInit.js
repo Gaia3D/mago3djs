@@ -19,14 +19,13 @@ MagoEarthViewerInit.prototype.init = function()
 	//magoManager.upDateSceneStateMatrices(sceneState);
     
 	// Create the tinTerrains(MagoEarth).***
-	//this.magoManager.tinTerrainManager = new TinTerrainManager();
+	this.magoManager.tinTerrainManager = new TinTerrainManager();
 
 	var gl = this.magoManager.sceneState.gl;
 	this.magoManager.vboMemoryManager.gl = gl;
 	this.magoManager.postFxShadersManager.gl = gl;
 	this.magoManager.postFxShadersManager.createDefaultShaders(gl); // A1-OLD.***
 	this.magoManager.createDefaultShaders(gl);// A1-Use this.***
-
 };
 MagoEarthViewerInit.prototype.setEventHandler = function() 
 {

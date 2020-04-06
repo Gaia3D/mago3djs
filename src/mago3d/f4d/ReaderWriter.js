@@ -1703,15 +1703,33 @@ ReaderWriter.prototype.loadWMSImage = function(gl, filePath_inServer, texture, m
 {
 	texture.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	var readWriter = this;
-	loadWithXhr(filePath_inServer).then(function(response) 
+	loadWithXhr(filePath_inServer, undefined, undefined, 'blob').then(function(response) 
 	{
-		var arrayBuffer = response;
-		if (arrayBuffer) 
+		var blob = response;
+		if (blob) 
 		{
-			if (flip_y_texCoords === undefined)
-			{ flip_y_texCoords = false; }
-		
-			readWriter.imageFromArrayBuffer(gl, arrayBuffer, texture, magoManager, flip_y_texCoords);
+			var ibmPromise = createImageBitmap(blob);
+			ibmPromise.then(function(source)
+			{
+				source.blob = blob;
+
+				if (texture.texId === undefined)
+				{ texture.texId = gl.createTexture(); }
+
+				if (flip_y_texCoords === undefined)
+				{ flip_y_texCoords = true; }
+
+				texture.imageWidth = source.width;
+				texture.imageHeight = source.height;
+
+				gl.bindTexture(gl.TEXTURE_2D, texture.texId);
+				gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, flip_y_texCoords); // if need vertical mirror of the image.
+				gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source); // Original.
+				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+				gl.generateMipmap(gl.TEXTURE_2D);
+				gl.bindTexture(gl.TEXTURE_2D, null);
+			});
 			texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 		}
 	}, function(status) 

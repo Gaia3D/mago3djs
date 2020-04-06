@@ -77,7 +77,7 @@ MagoWorld.prototype.renderTest = function()
  * @param {Number} latitude
  * @param {Number} altitude 
  */
-MagoWorld.prototype.goto = function(longitude, latitude, altitude)
+MagoWorld.prototype.goto = function(longitude, latitude, altitude, duration)
 {
 	var resultCartesian;
 	resultCartesian = Globe.geographicToCartesianWgs84(longitude, latitude, altitude, resultCartesian);
@@ -108,7 +108,7 @@ MagoWorld.prototype.goto = function(longitude, latitude, altitude)
 	animData.birthTime = this.magoManager.getCurrentTime();
 	animData.linearVelocityInMetersSecond = 500000.0; // m/s.***
 	animData.acceleration = 2000.0; // m/s2.***
-	animData.durationInSeconds = 2.0;
+	animData.durationInSeconds = defaultValue(duration, 3.0);
 	camera.animationData = animData;
 	
 	if (this.magoManager.animationManager === undefined)

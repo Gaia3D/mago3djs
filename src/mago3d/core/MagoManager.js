@@ -4834,7 +4834,8 @@ MagoManager.prototype.flyTo = function(longitude, latitude, altitude, duration)
 	{
 		this.magoWorld.goto(parseFloat(longitude),
 			parseFloat(latitude),
-			parseFloat(altitude));
+			parseFloat(altitude),
+			parseInt(duration));
 	}
 
 };

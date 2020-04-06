@@ -113,6 +113,8 @@ var Mago3d = function(containerId, serverPolicy, callback, options, legacyViewer
 	};
 
 	magoManagerState = CODE.magoManagerState.READY;
+	//init position
+	viewerInitializer.initPosition();
 	viewerInitializer.setEventHandler();
 
 	this.emit('loadend', returnObj);
