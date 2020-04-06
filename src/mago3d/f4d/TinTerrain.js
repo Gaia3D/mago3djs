@@ -495,6 +495,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 
 			// render this tinTerrain.
 			var renderWireframe = false;
+			var vboMemManager = magoManager.vboMemoryManager;
 			
 			gl.bindTexture(gl.TEXTURE_2D, this.texture.texId);
 			
@@ -504,7 +505,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			var vboKey = this.vboKeyContainer.vboCacheKeysArray[0]; // the idx = 0 is the terrain. idx = 1 is the skirt.
 			
 			// Positions.
-			if (!vboKey.bindDataPosition(currentShader, magoManager.vboMemoryManager))
+			if (!vboKey.bindDataPosition(currentShader, vboMemManager))
 			{ 
 				if (this.owner !== undefined)
 				{ this.owner.render(currentShader, magoManager, bDepth, renderType); }
@@ -514,7 +515,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			// TexCoords (No necessary for depth rendering).
 			if (!bDepth)
 			{
-				if (!vboKey.bindDataTexCoord(currentShader, magoManager.vboMemoryManager))
+				if (!vboKey.bindDataTexCoord(currentShader, vboMemManager))
 				{
 					if (this.owner !== undefined)
 					{ this.owner.render(currentShader, magoManager, bDepth, renderType); }					
@@ -523,13 +524,29 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			}
 			
 			// Normals.
-			// todo:
+			if (!vboKey.bindDataNormal(currentShader, vboMemManager))
+			{ 
+				if (this.owner !== undefined)
+				{ this.owner.render(currentShader, magoManager, bDepth, renderType); }
+				return false; 
+			}
 			
 			// Colors.
 			// todo:
 			
+			// shader.altitude_loc
+			if (vboKey.bindDataCustom(currentShader, vboMemManager, "altitudes"))
+			{
+				gl.uniform1i(currentShader.bExistAltitudes_loc, true);
+			}
+			else 
+			{
+				gl.uniform1i(currentShader.bExistAltitudes_loc, false);
+			}
+			
+			
 			// Indices.
-			if (!vboKey.bindDataIndice(currentShader, magoManager.vboMemoryManager))
+			if (!vboKey.bindDataIndice(currentShader, vboMemManager))
 			{ 
 				if (this.owner !== undefined)
 				{ this.owner.render(currentShader, magoManager, bDepth, renderType); }
@@ -560,13 +577,20 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 				{
 					gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 					gl.uniform4fv(currentShader.oneColor4_loc, [0.0, 0.9, 0.9, 1.0]);
-					gl.drawElements(gl.LINE_STRIP, indicesCount-1, gl.UNSIGNED_SHORT, 0); 
-					//var trianglesCount = indicesCount/3;
-					//for (var i=0; i<trianglesCount; i++)
-					//{
-					//	gl.drawElements(gl.LINE_LOOP, 3, gl.UNSIGNED_SHORT, i*3); 
-					//}
 					
+					if (this.tinTerrainManager.getTerrainType() === 0)
+					{
+						gl.drawElements(gl.LINE_STRIP, indicesCount-1, gl.UNSIGNED_SHORT, 0); 
+					}
+					else 
+					{
+						var trianglesCount = indicesCount;
+						for (var i=0; i<trianglesCount; i++)
+						{
+							gl.drawElements(gl.LINE_LOOP, 3, gl.UNSIGNED_SHORT, i*3); 
+						}
+					}
+
 					this.drawTerrainName(magoManager);
 				}
 			}
@@ -590,6 +614,15 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 				{				
 					return false; 
 				}
+			}
+			
+			if (vboKey.bindDataCustom(currentShader, vboMemManager, "altitudes"))
+			{
+				gl.uniform1i(currentShader.bExistAltitudes_loc, true);
+			}
+			else 
+			{
+				gl.uniform1i(currentShader.bExistAltitudes_loc, false);
 			}
 			
 			// Normals.
@@ -1242,6 +1275,17 @@ TinTerrain.prototype.makeVbo = function(vboMemManager)
 		
 	// Indices.
 	vboKey.setDataArrayIdx(this.indices, vboMemManager);
+	
+	// Aditional data.
+	// Altitudes.
+	if (this.altArray !== undefined)
+	{
+		var dimensions = 1;
+		var name = "altitudes";
+		var attribLoc = 3;
+		vboKey.setDataArrayCustom(this.altArray, vboMemManager, dimensions, name, attribLoc);
+	}
+	
 
 	// Make skirt.
 	if (this.skirtCartesiansArray === undefined)
@@ -1266,6 +1310,15 @@ TinTerrain.prototype.makeVbo = function(vboMemManager)
 	{
 		vboKeySkirt.setDataArrayTexCoord(new Float32Array(this.skirtTexCoordsArray), vboMemManager);
 	}
+	
+	// Altitudes for skirtData.
+	if (this.skirtAltitudesArray)
+	{
+		var dimensions = 1;
+		var name = "altitudes";
+		var attribLoc = 3;
+		vboKeySkirt.setDataArrayCustom(new Float32Array(this.skirtAltitudesArray), vboMemManager, dimensions, name, attribLoc);
+	}
 };
 
 TinTerrain.getSkirtTrianglesStrip = function(lonArray, latArray, altArray, texCoordsArray, southIndices, eastIndices, northIndices, westIndices, options)
@@ -1288,6 +1341,7 @@ TinTerrain.getSkirtTrianglesStrip = function(lonArray, latArray, altArray, texCo
 	var skirtLatArray = [];
 	var skirtAltArray = [];
 	var skirtTexCoordsArray = [];
+	//var skinAltitudes = [];
 	
 	var westVertexCount = westIndices.length;
 	for (var j=0; j<westVertexCount; j++)
@@ -1376,13 +1430,14 @@ TinTerrain.getSkirtTrianglesStrip = function(lonArray, latArray, altArray, texCo
 	
 	var resultObject = {
 		skirtCartesiansArray : skirtCartesiansArray,
-		skirtTexCoordsArray  : skirtTexCoordsArray
+		skirtTexCoordsArray  : skirtTexCoordsArray,
+		skirtAltitudesArray  : skirtAltArray
 	};
 	
 	return resultObject;
 };
 
-TinTerrain.getNormals = function(cartesiansArray, indicesArray, resultNormalsArray, options)
+TinTerrain.getNormalCartesiansArray = function(cartesiansArray, indicesArray, resultNormalCartesiansArray, options)
 {
 	var idx_1, idx_2, idx_3;
 	var point_1, point_2, point_3;
@@ -1400,7 +1455,7 @@ TinTerrain.getNormals = function(cartesiansArray, indicesArray, resultNormalsArr
 		point_3 = new Point3D(cartesiansArray[idx_3*3], cartesiansArray[idx_3*3+1], cartesiansArray[idx_3*3+2]);
 		
 		// Calculate the normal for this triangle.
-		normal = Triangle.calculateNormal(point_1, point_2, point_3, normal);
+		normal = Triangle.calculateNormal(point_1, point_3, point_2, undefined);
 		
 		// Accum normals for each points.
 		// Point 1.***
@@ -1435,6 +1490,21 @@ TinTerrain.getNormals = function(cartesiansArray, indicesArray, resultNormalsArr
 	}
 	
 	// finally, normalize all normals.
+	var normalsCount = normalsArray.length;
+	if (resultNormalCartesiansArray === undefined)
+	{ resultNormalCartesiansArray = new Int8Array(normalsCount*3); }
+	
+	for (var i=0; i<normalsCount; i++)
+	{
+		var normal = normalsArray[i];
+		normal.unitary();
+		
+		resultNormalCartesiansArray[i*3] = Math.floor(normal.x*255);
+		resultNormalCartesiansArray[i*3+1] = Math.floor(normal.y*255);
+		resultNormalCartesiansArray[i*3+2] = Math.floor(normal.z*255);
+	}
+	
+	return resultNormalCartesiansArray;
 	
 };
 
@@ -1472,7 +1542,7 @@ TinTerrain.prototype.decodeData = function(imageryType)
 	var vValues = this.vValues;
 	var hValues = this.hValues;
 	
-	var exageration = 10.0;
+	var exageration = 2.0;
 	
 	if (this.depth === 0)
 	{ var hola = 0; }
@@ -1550,6 +1620,8 @@ TinTerrain.prototype.decodeData = function(imageryType)
 	
 	this.cartesiansArray = Globe.geographicRadianArrayToFloat32ArrayWgs84(lonArray, latArray, altArray, this.cartesiansArray);
 	
+	//this.normalsArray = TinTerrain.getNormalCartesiansArray(this.cartesiansArray, this.indices, undefined, undefined);
+	
 	var options = {
 		skirtDepth          : 50000,
 		texCorrectionFactor : texCorrectionFactor
@@ -1557,15 +1629,18 @@ TinTerrain.prototype.decodeData = function(imageryType)
 	var skirtResultObject = TinTerrain.getSkirtTrianglesStrip(lonArray, latArray, altArray, this.texCoordsArray, this.southIndices, this.eastIndices, this.northIndices, this.westIndices, options);
 	this.skirtCartesiansArray = skirtResultObject.skirtCartesiansArray;
 	this.skirtTexCoordsArray = skirtResultObject.skirtTexCoordsArray;
+	this.skirtAltitudesArray = skirtResultObject.skirtAltitudesArray;
 	
 	// free memory.
 	this.uValues = undefined;
 	this.vValues = undefined;
 	this.hValues = undefined;
 	
+	// store useful data.
+	this.altArray = altArray;
+	
 	lonArray = undefined;
 	latArray = undefined;
-	altArray = undefined;
 	
 };
 

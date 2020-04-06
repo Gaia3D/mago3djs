@@ -769,6 +769,7 @@ Globe.geographicRadianArrayToFloat32ArrayWgs84 = function(lonArray, latArray, al
 	return resultCartesianArray;
 };
 
+
 		
 		
 		

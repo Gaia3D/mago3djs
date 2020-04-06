@@ -264,11 +264,11 @@ VBOVertexIdxCacheKey.prototype.readPosNorIdx = function(arrayBuffer, vboMemManag
  */
 VBOVertexIdxCacheKey.prototype.bindDataCustom = function(shader, vboMemManager, name) 
 {
-	if (shader === undefined)
+	if (shader === undefined || this.vboBufferCustomMap === undefined)
 	{ return false; }
 
 	var vboBufferCustom = this.vboBufferCustomMap[name];
-	return vboBufferCustom.bindData(shader, vboBufferCustom.attribLoc, vboMemManager);
+	return vboBufferCustom.bindData(shader, vboBufferCustom.attribLocation, vboMemManager);
 };
 
 /**

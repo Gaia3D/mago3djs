@@ -331,23 +331,40 @@
 			"pitch": 0,
 			"roll": 0
 		},
+				{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "daejeon",
+				"flipYTexCoords": false
+			},
+			"children": [],
+			"data_key": "madongIC",
+			"data_name": "madongIC",
+			"mapping_type":"origin",
+			"longitude": 126.58794066206333,
+			"latitude": 37.59015807520055,
+			"height": 30.000000,
+			"heading": 0.000000,
+			"pitch": 0.000000,
+			"roll": 0.000000
+		},
 		{
-    "attributes": {
-        "isPhysical": true,
-        "nodeType": "daejeon",
-        "flipYTexCoords": false
-    },
-    "children": [],
-    "data_key": "madongIC",
-    "data_name": "madongIC",
-    "mapping_type":"origin",
-    "longitude": 126.58794066206333,
-    "latitude": 37.59015807520055,
-    "height": 30.000000,
-    "heading": 0.000000,
-    "pitch": 0.000000,
-    "roll": 0.000000
-}
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "default",
+				"flipYTexCoords": false
+			},
+			"children": [],
+			"data_key": "M_DTL",
+			"data_name": "M_DTL",
+			"mapping_type":"origin",
+			"longitude": 128.921971,
+			"latitude": 35.136326,
+			"height": 15.935001,
+			"heading": 0.000000,
+			"pitch": 0.000000,
+			"roll": 0.000000
+		}
    ],
    "parent":0,
    "depth":1,

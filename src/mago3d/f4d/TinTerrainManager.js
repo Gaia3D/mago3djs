@@ -11,7 +11,7 @@ var TinTerrainManager = function(options)
 	}
 	
 	this.maxDepth = 18;
-	//this.maxDepth = 14;
+
 	this.currentVisibles_terrName_geoCoords_map = {}; // current visible terrains map[terrainPathName, geographicCoords].
 	this.currentTerrainsMap = {}; // current terrains (that was created) map[terrainPathName, tinTerrain].
 	
@@ -28,7 +28,7 @@ var TinTerrainManager = function(options)
 	// Elevation model or plain ellipsoid.
 	// terrainType = 0 -> terrainPlainModel.
 	// terrainType = 1 -> terrainElevationModel.
-	this.terrainType = 0; 
+	this.terrainType = 1; 
 	//CODE.imageryType = {
 	//"UNKNOWN"      : 0,
 	//"CRS84"        : 1,
@@ -47,6 +47,16 @@ var TinTerrainManager = function(options)
 		if (options.terrainType !== undefined)
 		{ this.terrainType = options.terrainType; }
 	}
+};
+
+TinTerrainManager.prototype.getTerrainType = function()
+{
+	return this.terrainType;
+};
+
+TinTerrainManager.prototype.setMaxDepth = function(maxDepth)
+{
+	this.maxDepth = maxDepth;
 };
 
 TinTerrainManager.prototype.init = function()
@@ -186,6 +196,12 @@ TinTerrainManager.prototype.makeDistanceLimitByDepth = function()
 	this.distLimitByDepth[20] = 500; 
 	
 	//this.distLimitByDepth[0] = 5;
+	
+	var distLimitByDepthCount = this.distLimitByDepth.length;
+	for (var i=0; i<distLimitByDepthCount; i++)
+	{
+		this.distLimitByDepth[i] *= 2.0;
+	}
 };
 
 TinTerrainManager.prototype.doFrustumCulling = function(frustum, camPos, magoManager, maxDepth)
@@ -265,6 +281,8 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	{ currentShader = magoManager.postFxShadersManager.getShader("tinTerrain"); }
 	var shaderProgram = currentShader.program;
 	
+	currentShader.resetLastBuffersBinded();
+	
 	gl.useProgram(shaderProgram);
 	currentShader.enableVertexAttribArray(currentShader.position3_loc);
 	if (bDepth)
@@ -295,6 +313,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 		gl.uniform1i(currentShader.refMatrixType_loc, 0); // init referencesMatrix.
 		gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, this.identityMat._floatArrays);
 		
+		gl.uniform1i(currentShader.bApplySpecularLighting_loc, false);
 		
 		var bApplyShadow = false;
 		if (magoManager.sceneState.sunSystem !== undefined && magoManager.sceneState.applySunShadows)
@@ -361,6 +380,10 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 		//gl.polygonOffset(1, 3);
 		
 		gl.activeTexture(gl.TEXTURE2); // difusseTex.
+	}
+	else if (renderType === 2)
+	{
+		gl.uniform1i(currentShader.bApplySpecularLighting_loc, false);
 	}
 	
 	var sceneState = magoManager.sceneState;

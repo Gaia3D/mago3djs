@@ -627,17 +627,19 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		var eqRadius = Globe.equatorialRadius();
 		
 		// Calculate near - far.*******************************************
-		if (camHeight > 3000)
+		var degToRad = Math.PI/180;
+		var d = eqRadius + camHeight;
+		var alfaRad = Math.acos(eqRadius / d);
+		var far = d*Math.sin(alfaRad);
+		if (camHeight > 4000)
 		{
 			frustum0.near[0] = 0.1 + camHeight*0.8;
-			frustum0.far[0] = eqRadius + camHeight*0.9;
 		}
 		else
 		{
 			frustum0.near[0] = 0.1;
-			frustum0.far[0] = eqRadius + camHeight*0.9;
 		}
-		
+		frustum0.far[0] = far;
 		// End-------------------------------------------------------------
 		
 		ManagerUtils.calculateSplited3fv([camPos.x, camPos.y, camPos.z], sceneState.encodedCamPosHigh, sceneState.encodedCamPosLow);
@@ -646,6 +648,11 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		// consider near as zero provisionally.***
 		var projectionMatrix = sceneState.projectionMatrix;
 		projectionMatrix._floatArrays = glMatrix.mat4.perspective(projectionMatrix._floatArrays, frustum0.fovyRad[0], frustum0.aspectRatio[0], frustum0.near[0], frustum0.far[0]);
+		
+		// Large far projection for sky.
+		var farSky = eqRadius + camHeight;
+		var projectionMatrixSky = sceneState.projectionMatrixSky;
+		projectionMatrixSky._floatArrays = glMatrix.mat4.perspective(projectionMatrixSky._floatArrays, frustum0.fovyRad[0], frustum0.aspectRatio[0], frustum0.near[0], farSky);
 		
 		// modelView.***
 		var modelViewMatrix = sceneState.modelViewMatrix;
@@ -674,6 +681,10 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		// modelViewProjectionRelToEye.***
 		var modelViewProjRelToEyeMatrix = sceneState.modelViewProjRelToEyeMatrix;
 		modelViewProjRelToEyeMatrix._floatArrays = glMatrix.mat4.multiply(modelViewProjRelToEyeMatrix._floatArrays, projectionMatrix._floatArrays, modelViewRelToEyeMatrix._floatArrays);
+		
+		// Large far modelViewProjectionRelToEyeSky.***
+		var modelViewProjRelToEyeMatrixSky = sceneState.modelViewProjRelToEyeMatrixSky;
+		modelViewProjRelToEyeMatrixSky._floatArrays = glMatrix.mat4.multiply(modelViewProjRelToEyeMatrixSky._floatArrays, projectionMatrixSky._floatArrays, modelViewRelToEyeMatrix._floatArrays);
 
 		frustum0.tangentOfHalfFovy[0] = Math.tan(frustum0.fovyRad[0]/2);
 
@@ -4326,6 +4337,8 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
 
 	shader.bIsMakingDepth_loc = gl.getUniformLocation(shader.program, "bIsMakingDepth");
+	shader.bExistAltitudes_loc = gl.getUniformLocation(shader.program, "bExistAltitudes");
+	shader.altitude_loc = gl.getAttribLocation(shader.program, "altitude");
 	
 	// 4) PointsCloud shader.****************************************************************************************
 	shaderName = "pointsCloud";
@@ -4403,6 +4416,9 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 
 	shader.bIsMakingDepth_loc = gl.getUniformLocation(shader.program, "bIsMakingDepth");
 	shader.equatorialRadius_loc = gl.getUniformLocation(shader.program, "equatorialRadius");
+	// Note: for the atmosphere, change the modelViewProjectionRelToEyeMatrix.
+	var uniformDataPair = shader.getUniformDataPair("mvpMat4RelToEye");
+	uniformDataPair.matrix4fv = this.sceneState.modelViewProjRelToEyeMatrixSky._floatArrays;
 	
 	// 11) ImageViewerRectangle Shader.******************************************************************************
 	var shaderName = "imageViewerRectangle";

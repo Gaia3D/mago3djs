@@ -1,7 +1,9 @@
+
 attribute vec3 position;
 attribute vec3 normal;
 attribute vec4 color4;
 attribute vec2 texCoord;
+attribute float altitude;
 
 uniform mat4 projectionMatrix;  
 uniform mat4 modelViewMatrix;
@@ -24,12 +26,16 @@ uniform vec4 oneColor4;
 uniform bool bUse1Color;
 uniform bool hasTexture;
 uniform bool bIsMakingDepth;
+uniform bool bExistAltitudes;
 uniform float near;
 uniform float far;
 uniform bool bApplyShadow;
 uniform int sunIdx;
+uniform bool bApplySpecularLighting;
 
+varying float applySpecLighting;
 varying vec3 vNormal;
+varying vec3 vertexPos;
 varying vec2 vTexCoord;   
 varying vec3 uAmbientColor;
 varying vec3 vLightWeighting;
@@ -41,6 +47,7 @@ varying vec4 vPosRelToLight;
 varying vec3 vLightDir; 
 varying vec3 vNormalWC;
 varying float currSunIdx;
+varying float vAltitude;
 
 void main()
 {	
@@ -50,10 +57,13 @@ void main()
     vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;
     vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);
 	
+	vNormal = normalize((normalMatrix4 * vec4(normal.x, normal.y, normal.z, 1.0)).xyz); // original.***
+	vLightDir = sunDirWC;
+	vAltitude = altitude;
+	
 	currSunIdx = -1.0; // initially no apply shadow.
 	if(bApplyShadow && !bIsMakingDepth)
 	{
-		vLightDir = sunDirWC;
 		vec3 rotatedNormal = vec3(0.0, 0.0, 1.0); // provisional.***
 		vNormalWC = rotatedNormal;
 					
@@ -86,15 +96,26 @@ void main()
 		vec3 posRelToLightNDC = posRelToLightAux.xyz / posRelToLightAux.w;
 		vPosRelToLight = posRelToLightAux;
 	}
-
+	
+	if(bApplySpecularLighting)
+	{
+		applySpecLighting = 1.0;
+	}
+	else{
+		applySpecLighting = -1.0;
+	}
+	
 	if(bIsMakingDepth)
 	{
+		
 		depthValue = (modelViewMatrixRelToEye * pos4).z/far;
 	}
 	else
 	{
+		
 		vTexCoord = texCoord;
 	}
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;
+	vertexPos = (modelViewMatrixRelToEye * pos4).xyz;
 	v3Pos = gl_Position.xyz;
 }
