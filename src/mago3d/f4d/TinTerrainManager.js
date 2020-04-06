@@ -11,7 +11,7 @@ var TinTerrainManager = function(options)
 	}
 	
 	//this.maxDepth = 18;
-	this.maxDepth = 15;
+	this.maxDepth = 17;
 	this.currentVisibles_terrName_geoCoords_map = {}; // current visible terrains map[terrainPathName, geographicCoords].
 	this.currentTerrainsMap = {}; // current terrains (that was created) map[terrainPathName, tinTerrain].
 	
@@ -175,33 +175,34 @@ TinTerrainManager.prototype.makeDistanceLimitByDepth = function()
 	// For each depth, there are a limit distance.***
 	this.distLimitByDepth[0] = 50000000; 
 	this.distLimitByDepth[1] = 10000000; 
-	this.distLimitByDepth[2] = 5000000; 
-	this.distLimitByDepth[3] = 2000000; 
-	this.distLimitByDepth[4] = 1000000; 
-	this.distLimitByDepth[5] = 500000; 
-	this.distLimitByDepth[6] = 100000; 
-	this.distLimitByDepth[7] = 50000; 
-	this.distLimitByDepth[8] = 20000; 
-	this.distLimitByDepth[9] = 10000; 
-	this.distLimitByDepth[10] = 9000; 
-	this.distLimitByDepth[11] = 8000; 
-	this.distLimitByDepth[12] = 7000; 
-	this.distLimitByDepth[13] = 6000; 
-	this.distLimitByDepth[14] = 5000; 
-	this.distLimitByDepth[15] = 4000; 
-	this.distLimitByDepth[16] = 3000; 
-	this.distLimitByDepth[17] = 2000; 
-	this.distLimitByDepth[18] = 1000; 
-	this.distLimitByDepth[19] = 800; 
-	this.distLimitByDepth[20] = 500; 
+	this.distLimitByDepth[2] = 2500000; 
+	this.distLimitByDepth[3] = 1000000; 
+	this.distLimitByDepth[4] = 500000; 
+	this.distLimitByDepth[5] = 250000; 
+	this.distLimitByDepth[6] = 50000; 
+	this.distLimitByDepth[7] = 25000; 
+	this.distLimitByDepth[8] = 10000; 
+	this.distLimitByDepth[9] = 5000; 
+	this.distLimitByDepth[10] = 4500; 
+	this.distLimitByDepth[11] = 4000; 
+	this.distLimitByDepth[12] = 3500; 
+	this.distLimitByDepth[13] = 3000; 
+	this.distLimitByDepth[14] = 2500; 
+	this.distLimitByDepth[15] = 2000; 
+	this.distLimitByDepth[16] = 1500; 
+	this.distLimitByDepth[17] = 1000; 
+	this.distLimitByDepth[18] = 600; 
+	this.distLimitByDepth[19] = 400; 
+	this.distLimitByDepth[20] = 200; 
 	
 	//this.distLimitByDepth[0] = 5;
-	
+	/*
 	var distLimitByDepthCount = this.distLimitByDepth.length;
 	for (var i=0; i<distLimitByDepthCount; i++)
 	{
 		this.distLimitByDepth[i] *= 2.0;
 	}
+	*/
 };
 
 TinTerrainManager.prototype.doFrustumCulling = function(frustum, camPos, magoManager, maxDepth)

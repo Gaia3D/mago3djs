@@ -1567,6 +1567,7 @@ ReaderWriter.prototype.loadTINTerrain = function(fileName, tinTerrain, magoManag
 {
 	//magoManager.fileRequestControler.modelRefFilesRequestedCount += 1;
 	tinTerrain.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
+	magoManager.fileRequestControler.tinTerrainFilesRequested +=1;
 	
 	loadWithXhr(fileName).then(function(response) 
 	{
@@ -1590,8 +1591,8 @@ ReaderWriter.prototype.loadTINTerrain = function(fileName, tinTerrain, magoManag
 		//else { lowestOctree.neoReferencesMotherAndIndices.fileLoadState = status; }
 	}).finally(function() 
 	{
-		//magoManager.fileRequestControler.modelRefFilesRequestedCount -= 1;
-		//if (magoManager.fileRequestControler.modelRefFilesRequestedCount < 0) { magoManager.fileRequestControler.modelRefFilesRequestedCount = 0; }
+		magoManager.fileRequestControler.tinTerrainFilesRequested -= 1;
+		if (magoManager.fileRequestControler.tinTerrainFilesRequested < 0) { magoManager.fileRequestControler.tinTerrainFilesRequested = 0; }
 	});
 };
 
@@ -1640,6 +1641,8 @@ ReaderWriter.prototype.loadWMSImage = function(gl, filePath_inServer, texture, m
 {
 	texture.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	var readWriter = this;
+	magoManager.fileRequestControler.tinTerrainTexturesRequested += 1;
+	
 	loadWithXhr(filePath_inServer).then(function(response) 
 	{
 		var arrayBuffer = response;
@@ -1659,6 +1662,9 @@ ReaderWriter.prototype.loadWMSImage = function(gl, filePath_inServer, texture, m
 	{
 		magoManager.backGround_fileReadings_count -= 1;
 		if (magoManager.backGround_fileReadings_count < 0) { magoManager.backGround_fileReadings_count = 0; }
+		
+		magoManager.fileRequestControler.tinTerrainTexturesRequested -= 1;
+		if (magoManager.fileRequestControler.tinTerrainTexturesRequested < 0) { magoManager.fileRequestControler.tinTerrainTexturesRequested = 0; }
 	});
 		
 };

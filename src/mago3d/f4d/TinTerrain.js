@@ -338,7 +338,10 @@ TinTerrain.prototype.prepareTinTerrainPlain = function(magoManager, tinTerrainMa
 		}
 		else if (this.texture === undefined)
 		{
-			this.prepareTexture(magoManager, tinTerrainManager);
+			if (magoManager.fileRequestControler.tinTerrainTexturesRequested < 4)
+			{
+				this.prepareTexture(magoManager, tinTerrainManager);
+			}
 		}
 
 		return;
@@ -363,10 +366,13 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 		// Prepare this tinTerrain.
 		if (this.fileLoadState === CODE.fileLoadState.READY)
 		{
-			var pathName = this.getPathName();
-			var geometryDataPath = magoManager.readerWriter.geometryDataPath;
-			var fileName = geometryDataPath + "/Terrain/" + pathName + ".terrain";
-			magoManager.readerWriter.loadTINTerrain(fileName, this, magoManager);
+			if (magoManager.fileRequestControler.tinTerrainFilesRequested < 4)
+			{
+				var pathName = this.getPathName();
+				var geometryDataPath = magoManager.readerWriter.geometryDataPath;
+				var fileName = geometryDataPath + "/Terrain/" + pathName + ".terrain";
+				magoManager.readerWriter.loadTINTerrain(fileName, this, magoManager);
+			}
 			
 		}
 		else if (this.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
@@ -381,7 +387,10 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 		}
 		else if (this.texture === undefined)
 		{
-			this.prepareTexture(magoManager, tinTerrainManager);
+			if (magoManager.fileRequestControler.tinTerrainTexturesRequested < 4)
+			{
+				this.prepareTexture(magoManager, tinTerrainManager);
+			}
 		}
 		else if (this.fileLoadState === CODE.fileLoadState.LOAD_FAILED)
 		{
@@ -1303,21 +1312,21 @@ TinTerrain.prototype.makeVbo = function(vboMemManager)
 	var vboKeySkirt = this.vboKeyContainer.newVBOVertexIdxCacheKey();
 
 	// Positions.
-	vboKeySkirt.setDataArrayPos(new Float32Array(this.skirtCartesiansArray), vboMemManager);
+	vboKeySkirt.setDataArrayPos(this.skirtCartesiansArray, vboMemManager);
 	
 	// TexCoords.
 	if (this.skirtTexCoordsArray)
 	{
-		vboKeySkirt.setDataArrayTexCoord(new Float32Array(this.skirtTexCoordsArray), vboMemManager);
+		vboKeySkirt.setDataArrayTexCoord(this.skirtTexCoordsArray, vboMemManager);
 	}
 	
 	// Altitudes for skirtData.
-	if (this.skirtAltitudesArray)
+	if (this.skirtAltitudesValuesArray)
 	{
 		var dimensions = 1;
 		var name = "altitudes";
 		var attribLoc = 3;
-		vboKeySkirt.setDataArrayCustom(new Float32Array(this.skirtAltitudesArray), vboMemManager, dimensions, name, attribLoc);
+		vboKeySkirt.setDataArrayCustom(this.skirtAltitudesValuesArray, vboMemManager, dimensions, name, attribLoc);
 	}
 };
 
@@ -1337,101 +1346,124 @@ TinTerrain.getSkirtTrianglesStrip = function(lonArray, latArray, altArray, texCo
 	}
 	
 	// Texture correction in borders & make skirt data.***
-	var skirtLonArray = [];
-	var skirtLatArray = [];
-	var skirtAltArray = [];
-	var skirtTexCoordsArray = [];
-	//var skinAltitudes = [];
-	
 	var westVertexCount = westIndices.length;
+	var southVertexCount = southIndices.length;
+	var eastVertexCount = eastIndices.length;
+	var northVertexCount = northIndices.length;
+	
+	var totalVertexCount = westVertexCount + southVertexCount + eastVertexCount + northVertexCount;
+	
+	var skirtLonArray = new Float32Array(totalVertexCount * 2);
+	var skirtLatArray = new Float32Array(totalVertexCount * 2);
+	var skirtAltArray = new Float32Array(totalVertexCount * 2);
+	var skirtTexCoordsArray = new Float32Array(totalVertexCount * 4);
+	var skinAltitudes = new Float32Array(totalVertexCount * 4);
+	var counter = 0;
+	
 	for (var j=0; j<westVertexCount; j++)
 	{
 		var idx = westIndices[j];
 		texCoordsArray[idx*2] += texCorrectionFactor/2;
 		
-		skirtLonArray.push(lonArray[idx]);
-		skirtLatArray.push(latArray[idx]);
-		skirtAltArray.push(altArray[idx]);
+		skirtLonArray[counter] = lonArray[idx];
+		skirtLatArray[counter] = latArray[idx];
+		skirtAltArray[counter] = altArray[idx];
 		
-		skirtLonArray.push(lonArray[idx]);
-		skirtLatArray.push(latArray[idx]);
-		skirtAltArray.push(altArray[idx]-skirtDepth);
+		skirtTexCoordsArray[counter] = texCoordsArray[idx*2];   // s.
+		skirtTexCoordsArray[counter] = texCoordsArray[idx*2+1]; // t.
+		skinAltitudes[counter] = altArray[idx];
+		counter += 1;
 		
-		// insert texCoords 2 times for the triangles strip.
-		skirtTexCoordsArray.push(texCoordsArray[idx*2]);   // s.
-		skirtTexCoordsArray.push(texCoordsArray[idx*2+1]); // t.
-		skirtTexCoordsArray.push(texCoordsArray[idx*2]);   // s.
-		skirtTexCoordsArray.push(texCoordsArray[idx*2+1]); // t.
+		skirtLonArray[counter] = lonArray[idx];
+		skirtLatArray[counter] = latArray[idx];
+		skirtAltArray[counter] = altArray[idx]-skirtDepth;
+		
+		skirtTexCoordsArray[counter] = texCoordsArray[idx*2];   // s.
+		skirtTexCoordsArray[counter] = texCoordsArray[idx*2+1]; // t.
+		skinAltitudes[counter] = altArray[idx];
+		counter += 1;
+
 	}
 	
-	var southVertexCount = southIndices.length;
 	for (var j=0; j<southVertexCount; j++)
 	{
 		var idx = southIndices[j];
 		texCoordsArray[idx*2+1] = (texCorrectionFactor);
 		
-		skirtLonArray.push(lonArray[idx]);
-		skirtLatArray.push(latArray[idx]);
-		skirtAltArray.push(altArray[idx]);
+		skirtLonArray[counter] = lonArray[idx];
+		skirtLatArray[counter] = latArray[idx];
+		skirtAltArray[counter] = altArray[idx];
 		
-		skirtLonArray.push(lonArray[idx]);
-		skirtLatArray.push(latArray[idx]);
-		skirtAltArray.push(altArray[idx]-skirtDepth);
+		skirtTexCoordsArray[counter] = texCoordsArray[idx*2];   // s.
+		skirtTexCoordsArray[counter] = texCoordsArray[idx*2+1]; // t.
+		skinAltitudes[counter] = altArray[idx];
+		counter += 1;
 		
-		// insert texCoords 2 times for the triangles strip.
-		skirtTexCoordsArray.push(texCoordsArray[idx*2]);   // s.
-		skirtTexCoordsArray.push(texCoordsArray[idx*2+1]); // t.
-		skirtTexCoordsArray.push(texCoordsArray[idx*2]);   // s.
-		skirtTexCoordsArray.push(texCoordsArray[idx*2+1]); // t.
+		skirtLonArray[counter] = lonArray[idx];
+		skirtLatArray[counter] = latArray[idx];
+		skirtAltArray[counter] = altArray[idx]-skirtDepth;
+		
+		skirtTexCoordsArray[counter] = texCoordsArray[idx*2];   // s.
+		skirtTexCoordsArray[counter] = texCoordsArray[idx*2+1]; // t.
+		skinAltitudes[counter] = altArray[idx];
+		counter += 1;
 	}
 	
-	var eastVertexCount = eastIndices.length;
 	for (var j=0; j<eastVertexCount; j++)
 	{
 		var idx = eastIndices[j];
 		texCoordsArray[idx*2] -= texCorrectionFactor/2;
 		
-		skirtLonArray.push(lonArray[idx]);
-		skirtLatArray.push(latArray[idx]);
-		skirtAltArray.push(altArray[idx]);
+		skirtLonArray[counter] = lonArray[idx];
+		skirtLatArray[counter] = latArray[idx];
+		skirtAltArray[counter] = altArray[idx];
 		
-		skirtLonArray.push(lonArray[idx]);
-		skirtLatArray.push(latArray[idx]);
-		skirtAltArray.push(altArray[idx]-skirtDepth);
+		skirtTexCoordsArray[counter] = texCoordsArray[idx*2];   // s.
+		skirtTexCoordsArray[counter] = texCoordsArray[idx*2+1]; // t.
+		skinAltitudes[counter] = altArray[idx];
+		counter += 1;
 		
-		// insert texCoords 2 times for the triangles strip.
-		skirtTexCoordsArray.push(texCoordsArray[idx*2]);   // s.
-		skirtTexCoordsArray.push(texCoordsArray[idx*2+1]); // t.
-		skirtTexCoordsArray.push(texCoordsArray[idx*2]);   // s.
-		skirtTexCoordsArray.push(texCoordsArray[idx*2+1]); // t.
+		skirtLonArray[counter] = lonArray[idx];
+		skirtLatArray[counter] = latArray[idx];
+		skirtAltArray[counter] = altArray[idx]-skirtDepth;
+		
+		skirtTexCoordsArray[counter] = texCoordsArray[idx*2];   // s.
+		skirtTexCoordsArray[counter] = texCoordsArray[idx*2+1]; // t.
+		skinAltitudes[counter] = altArray[idx];
+		counter += 1;
 	}
-	var northVertexCount = northIndices.length;
+	
 	for (var j=0; j<northVertexCount; j++)
 	{
 		var idx = northIndices[j];
 		texCoordsArray[idx*2+1] = (1-texCorrectionFactor);
 		
-		skirtLonArray.push(lonArray[idx]);
-		skirtLatArray.push(latArray[idx]);
-		skirtAltArray.push(altArray[idx]);
+		skirtLonArray[counter] = lonArray[idx];
+		skirtLatArray[counter] = latArray[idx];
+		skirtAltArray[counter] = altArray[idx];
 		
-		skirtLonArray.push(lonArray[idx]);
-		skirtLatArray.push(latArray[idx]);
-		skirtAltArray.push(altArray[idx]-skirtDepth);
+		skirtTexCoordsArray[counter] = texCoordsArray[idx*2];   // s.
+		skirtTexCoordsArray[counter] = texCoordsArray[idx*2+1]; // t.
+		skinAltitudes[counter] = altArray[idx];
+		counter += 1;
 		
-		// insert texCoords 2 times for the triangles strip.
-		skirtTexCoordsArray.push(texCoordsArray[idx*2]);   // s.
-		skirtTexCoordsArray.push(texCoordsArray[idx*2+1]); // t.
-		skirtTexCoordsArray.push(texCoordsArray[idx*2]);   // s.
-		skirtTexCoordsArray.push(texCoordsArray[idx*2+1]); // t.
+		skirtLonArray[counter] = lonArray[idx];
+		skirtLatArray[counter] = latArray[idx];
+		skirtAltArray[counter] = altArray[idx]-skirtDepth;
+		
+		skirtTexCoordsArray[counter] = texCoordsArray[idx*2];   // s.
+		skirtTexCoordsArray[counter] = texCoordsArray[idx*2+1]; // t.
+		skinAltitudes[counter] = altArray[idx];
+		counter += 1;
 	}
 	
 	var skirtCartesiansArray = Globe.geographicRadianArrayToFloat32ArrayWgs84(skirtLonArray, skirtLatArray, skirtAltArray, undefined);
 	
 	var resultObject = {
-		skirtCartesiansArray : skirtCartesiansArray,
-		skirtTexCoordsArray  : skirtTexCoordsArray,
-		skirtAltitudesArray  : skirtAltArray
+		skirtCartesiansArray      : skirtCartesiansArray,
+		skirtTexCoordsArray       : skirtTexCoordsArray,
+		skirtAltitudesArray       : skirtAltArray,
+		skirtAltitudesValuesArray : skinAltitudes
 	};
 	
 	return resultObject;
@@ -1630,6 +1662,7 @@ TinTerrain.prototype.decodeData = function(imageryType)
 	this.skirtCartesiansArray = skirtResultObject.skirtCartesiansArray;
 	this.skirtTexCoordsArray = skirtResultObject.skirtTexCoordsArray;
 	this.skirtAltitudesArray = skirtResultObject.skirtAltitudesArray;
+	this.skirtAltitudesValuesArray = skirtResultObject.skirtAltitudesValuesArray;
 	
 	// free memory.
 	this.uValues = undefined;
