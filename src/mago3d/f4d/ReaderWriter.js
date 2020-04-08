@@ -16,6 +16,8 @@ var ReaderWriter = function()
 	if (serverPolicy !== undefined)
 	{ this.geometryDataPath = serverPolicy.geo_data_path; }
 	
+	if (!this.geometryDataPath) { this.geometryDataPath = '/f4d'; }
+
 	this.geometrySubDataPath;
 
 	this.j_counter;
@@ -951,6 +953,67 @@ ReaderWriter.prototype.getObjectIndexFileForSmartTile = function(fileName, magoM
 /**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
  * @param gl gl context
+ * @param {string} fileName 파일명
+ * @param {MagoManager} magoManager 파일 처리를 담당
+ * @param {string} projectId 프로젝트 아이디.
+ * @param {Array<string>} newDataKeys 추가할 데이터 키 목록
+ * @param {Array<object> | object} f4dObject 추가할 데이터 object.
+ */
+ReaderWriter.prototype.getObjectIndexFileForData = function(fileName, magoManager, projectId, newDataKeys, f4dObject) 
+{
+	loadWithXhr(fileName).then(function(response) 
+	{	
+		var arrayBuffer = response;
+		if (arrayBuffer) 
+		{
+			var buildingSeedList = new BuildingSeedList(); 
+			buildingSeedList.dataArrayBuffer = arrayBuffer;
+			buildingSeedList.parseBuildingSeedArrayBuffer();
+
+			var buildingSeedMap = {};
+			var buildingSeedsCount = buildingSeedList.buildingSeedArray.length;
+			for (var i=0; i<buildingSeedsCount; i++)
+			{
+				var buildingSeed = buildingSeedList.buildingSeedArray[i];
+				var buildingId = buildingSeed.buildingId;
+
+				if (newDataKeys.indexOf(buildingId) >= 0) 
+				{
+					buildingSeedMap[buildingId] = buildingSeed;	
+				}
+				
+			}
+			var seedCnt = Object.keys(buildingSeedMap).length;
+
+			//object 인덱스파일에 새로운 데이터에 대한 정보가 없으면 에러 발생.
+			if (seedCnt !== newDataKeys.length) 
+			{
+				throw new Error('ObjectIndexFile is not ready. Please make objectIndexFile and try add data.'); 
+			}
+			
+			magoManager.makeSmartTile(buildingSeedMap, projectId, f4dObject, buildingSeedMap);
+			arrayBuffer = null;
+		}
+		else 
+		{
+			// blocksList.fileLoadState = 500;
+		}
+	},
+	function(status) 
+	{
+		console.log("xhr status = " + status);
+		//		if(status === 0) blocksList.fileLoadState = 500;
+		//		else blocksList.fileLoadState = status;
+	}).finally(function() 
+	{
+		//		magoManager.fileRequestControler.filesRequestedCount -= 1;
+		//		if(magoManager.fileRequestControler.filesRequestedCount < 0) magoManager.fileRequestControler.filesRequestedCount = 0;
+	});
+};
+
+/**
+ * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
+ * @param gl gl context
  * @param fileName 파일명
  * @param readerWriter 파일 처리를 담당
  * @param neoBuildingsList object index 파일을 파싱한 정보를 저장할 배열
@@ -1642,17 +1705,34 @@ ReaderWriter.prototype.loadWMSImage = function(gl, filePath_inServer, texture, m
 	texture.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	var readWriter = this;
 	magoManager.fileRequestControler.tinTerrainTexturesRequested += 1;
-	
-	loadWithXhr(filePath_inServer).then(function(response) 
+	loadWithXhr(filePath_inServer, undefined, undefined, 'blob').then(function(response) 
 	{
-		var arrayBuffer = response;
-		if (arrayBuffer) 
+		var blob = response;
+		if (blob) 
 		{
-			if (flip_y_texCoords === undefined)
-			{ flip_y_texCoords = false; }
-		
-			readWriter.imageFromArrayBuffer(gl, arrayBuffer, texture, magoManager, flip_y_texCoords);
-			texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+			var ibmPromise = createImageBitmap(blob);
+			ibmPromise.then(function(source)
+			{
+				source.blob = blob;
+
+				if (texture.texId === undefined)
+				{ texture.texId = gl.createTexture(); }
+
+				if (flip_y_texCoords === undefined)
+				{ flip_y_texCoords = true; }
+
+				texture.imageWidth = source.width;
+				texture.imageHeight = source.height;
+
+				gl.bindTexture(gl.TEXTURE_2D, texture.texId);
+				gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, flip_y_texCoords); // if need vertical mirror of the image.
+				gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source); // Original.
+				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+				gl.generateMipmap(gl.TEXTURE_2D);
+				gl.bindTexture(gl.TEXTURE_2D, null);
+				texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+			});
 		}
 	}, function(status) 
 	{

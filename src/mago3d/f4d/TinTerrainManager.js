@@ -9,8 +9,7 @@ var TinTerrainManager = function(options)
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
-	//this.maxDepth = 18;
+
 	this.maxDepth = 17;
 	this.currentVisibles_terrName_geoCoords_map = {}; // current visible terrains map[terrainPathName, geographicCoords].
 	this.currentTerrainsMap = {}; // current terrains (that was created) map[terrainPathName, tinTerrain].
@@ -37,6 +36,9 @@ var TinTerrainManager = function(options)
 	this.imageryType = CODE.imageryType.WEB_MERCATOR; // Test.***
 	//this.imageryType = CODE.imageryType.CRS84; // Test.***
 	
+	this.imagerys = [new XYZLayer({url: 'https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'})];
+	//this.imagerys = [new WMSLayer({url: 'http://192.168.10.9:8080/geoserver/mago3d/wms', param: {layers: 'mago3d:gangseogu_5m'}})];
+
 	this.init();
 	this.makeTinTerrainWithDEMIndex(); // provisional.
 	
@@ -279,6 +281,7 @@ TinTerrainManager.prototype.getAltitudes = function(geoCoordsArray, resultGeoCoo
 
 TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, shader) 
 {
+	
 	var gl = magoManager.sceneState.gl;
 	var currentShader;
 	if (shader)
@@ -377,8 +380,6 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 
 		
 		var flipTexCoordY = true;
-		if (magoManager.configInformation.geo_view_library === Constant.CESIUM)
-		{ flipTexCoordY = false; }
 		gl.uniform1i(currentShader.textureFlipYAxis_loc, flipTexCoordY); // false for cesium, true for magoWorld.
 		gl.uniform1f(currentShader.externalAlpha_loc, 1.0);
 		
@@ -441,9 +442,6 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 			tinTerrain.render(currentShader, magoManager, bDepth, renderType);
 		}
 	}
-	
-	
-	
 
 	currentShader.disableVertexAttribArray(currentShader.texCoord2_loc); 
 	currentShader.disableVertexAttribArray(currentShader.position3_loc); 

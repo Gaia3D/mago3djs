@@ -60,7 +60,7 @@ var TinTerrain = function(owner)
 	
 	this.indexName; // example: "LU".
 	this.pathName; // example: "14//4567//516".
-	this.texture;
+	this.texture = {};
 	this.visible;
 	
 	this.tinTerrainManager;
@@ -161,10 +161,17 @@ TinTerrain.prototype.deleteObjects = function(magoManager)
 	this.indexName = undefined;
 	this.pathName = undefined; // example: "14//4567//516".
 	
+	
 	if (this.texture !== undefined)
 	{
-		this.texture.deleteObjects(gl);
-		this.texture = undefined;
+		var textureKeys = Object.keys(this.texture);
+		for (var i=0, len=textureKeys.length;i<len;i++) 
+		{
+			var texture = this.texture[textureKeys[i]];
+			texture.deleteObjects(gl);
+			texture = undefined;
+		}
+		this.texture = {};
 	}
 	this.visible = undefined;
 };
@@ -246,17 +253,34 @@ TinTerrain.prototype.isChildrenPrepared = function()
 	{ return false; }
 };
 
+TinTerrain.prototype.isTexturePrepared = function()
+{
+	var isTexturePrepared = true;
+	var textureKeys = Object.keys(this.texture);
+	var textureLength = textureKeys.length;
+	if (textureLength === 0) 
+	{
+		return false;
+	}
+	for (var i=0;i<textureLength;i++) 
+	{
+		var texture = this.texture[textureKeys[i]];
+		if (texture.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED || !texture.texId) 
+		{
+			isTexturePrepared = false;
+			break;
+		}
+	}
+	return isTexturePrepared;
+};
 TinTerrain.prototype.isPrepared = function()
 {
 	// a tinTerrain is prepared if this is parsed and vbo maked and texture binded.
 	if (this.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
 	{ return false; }
 	
-	if (this.texture === undefined || this.texture.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
-	{ return false; }
-
-	if (this.texture.texId === undefined)
-	{ return false; }
+	
+	if (!this.isTexturePrepared()) { return false; }
 	
 	if (this.vboKeyContainer === undefined || 
 		this.vboKeyContainer.vboCacheKeysArray === undefined || 
@@ -269,39 +293,38 @@ TinTerrain.prototype.isPrepared = function()
 TinTerrain.prototype.prepareTexture = function(magoManager, tinTerrainManager)
 {
 	var gl = magoManager.sceneState.gl;
-	this.texture = new Texture();
-	
-	// Provisionally test.******************************************************************************************
-	//var imagesDataPath = "\\images\\ko";
-	//var textureFilePath = imagesDataPath +  "\\funny" + ".jpg";
-	//magoManager.readerWriter.readLegoSimpleBuildingTexture(gl, textureFilePath, this.texture, magoManager);
-	//return;
-	// End test.----------------------------------------------------------------------------------------------------
-			
-	var geoServURL = tinTerrainManager.geoServURL;
+
 	var L = this.depth.toString();
 	var X = this.X.toString();
 	var Y = this.Y.toString();
-	
-	//var tilePath = L + "&TileRow=" + Y + "&TileCol=" + X;
-	//var textureFilePath = geoServURL + "?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&Layer=mago3d:SejongBGM&Format=image/png&TileMatrixSet=EPSG:4326&TileMatrix=EPSG:4326:" + tilePath;
-	//https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
 
+	var imagerys = tinTerrainManager.imagerys;
 
-	//https://a.tile.openstreetmap.org/${z}/${x}/${y}.png 
-	//https://b.tile.openstreetmap.org/${z}/${x}/${y}.png 
-	//https://c.tile.openstreetmap.org/${z}/${x}/${y}.png
+	for (var i=0, len=imagerys.length;i<len;i++) 
+	{
+		var imagery = imagerys[i];
+		if (imagery.maxZoom < parseInt(L) || imagery.minZoom > parseInt(L)) { continue; }
+		if (this.texture[imagery._id]) { continue; }
+
+		var texture = new Texture();
+		var textureUrl = imagery.getUrl({x: X, y: Y, z: L});
+
+		this.texFilePath__TEST = textureUrl;
+		var flip_y_texCoords = false;
+		magoManager.readerWriter.loadWMSImage(gl, textureUrl, texture, magoManager, flip_y_texCoords);
+		this.texture[imagery._id] = texture;
+	}
 		
-	var textureFilePath = "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/" + L + "/" + Y + "/" + X + ".png";
+	//var textureFilePath = "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/" + L + "/" + Y + "/" + X;
 	//var textureFilePath = "https://services.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer/tile/" + L + "/" + Y + "/" + X + ".png";
 	//var textureFilePath = "https://services.arcgisonline.com/arcgis/rest/services/World_Physical_Map/MapServer/tile/" + L + "/" + Y + "/" + X + ".png"; // low res.
 	//var textureFilePath = "https://services.arcgisonline.com/arcgis/rest/services/NatGeo_World_Map/MapServer/tile/" + L + "/" + Y + "/" + X + ".png"; // low res.
 	//var textureFilePath = "https://c.tile.openstreetmap.org/" + L + "/" + X + "/" + Y + ".png";
 	
 	// Provisionally, for debug, save textureFilePath.***
-	this.texFilePath__TEST = textureFilePath;
-	var flip_y_texCoords = false;
-	magoManager.readerWriter.loadWMSImage(gl, textureFilePath, this.texture, magoManager, flip_y_texCoords);
+	//this.texFilePath__TEST = textureFilePath;
+	//var flip_y_texCoords = false;
+	//magoManager.readerWriter.loadWMSImage(gl, textureFilePath, this.texture, magoManager, flip_y_texCoords);
 };
 
 TinTerrain.prototype.prepareTinTerrainPlain = function(magoManager, tinTerrainManager)
@@ -336,7 +359,7 @@ TinTerrain.prototype.prepareTinTerrainPlain = function(magoManager, tinTerrainMa
 			this.makeMeshVirtually(20, 20, undefined, undefined);
 			this.makeVbo(magoManager.vboMemoryManager);
 		}
-		else if (this.texture === undefined)
+		else if (!this.isTexturePrepared())
 		{
 			//if (magoManager.fileRequestControler.tinTerrainTexturesRequested < 2)
 			{
@@ -385,7 +408,7 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 			this.decodeData(tinTerrainManager.imageryType);
 			this.makeVbo(magoManager.vboMemoryManager);
 		}
-		else if (this.texture === undefined)
+		else if (!this.isTexturePrepared())
 		{
 			//if (magoManager.fileRequestControler.tinTerrainTexturesRequested < 2)
 			{
@@ -469,13 +492,10 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			if (this.fileLoadState === CODE.fileLoadState.LOAD_FAILED) // provisional solution.
 			{ return false; }
 		
-			if (this.texture.texId === undefined)
+			if (!this.isTexturePrepared())
 			{ return false; }
 		
 			var gl = magoManager.getGl();
-			
-			
-		
 			if (renderType === 2)
 			{
 				var colorAux;
@@ -506,7 +526,13 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			var renderWireframe = false;
 			var vboMemManager = magoManager.vboMemoryManager;
 			
-			gl.bindTexture(gl.TEXTURE_2D, this.texture.texId);
+			var textureKeys = Object.keys(this.texture);
+			var textureLength = textureKeys.length; 
+			for (var i=0;i<textureLength;i++) 
+			{
+				var texture = this.texture[textureKeys[i]];
+				gl.bindTexture(gl.TEXTURE_2D, texture.texId);
+			}
 			
 			gl.uniform3fv(currentShader.buildingPosHIGH_loc, this.terrainPositionHIGH);
 			gl.uniform3fv(currentShader.buildingPosLOW_loc, this.terrainPositionLOW);
