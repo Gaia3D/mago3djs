@@ -18,6 +18,8 @@ var FileRequestControler = function()
 	this.lowLodDataRequestedCount = 0;
 	this.lowLodImagesRequestedCount = 0;
 	this.multiBuildingsDataRequestedCount = 0;
+	this.tinTerrainFilesRequested = 0;
+	this.tinTerrainTexturesRequested = 0;
 };
 
 FileRequestControler.prototype.isFull = function ()

@@ -3593,7 +3593,7 @@ void main()\n\
 		\n\
 		// Do specular lighting.***\n\
 		vec3 normal2 = vNormal;	\n\
-		float lambertian = 1.3;\n\
+		float lambertian = 1.0;\n\
 		float specular;\n\
 		\n\
 		if(applySpecLighting> 0.0)\n\
@@ -3677,7 +3677,8 @@ void main()\n\
 		\n\
 		if(bExistAltitudes && vAltitude < 0.01)\n\
 		{\n\
-			textureColor = vec4(getRainbowColor_byHeight(vAltitude), 1.0);\n\
+			fogColor = vec4(getRainbowColor_byHeight(vAltitude), 1.0);\n\
+			fogAmount = 0.6;\n\
 		}\n\
 		\n\
 		vec4 finalColor = mix(textureColor, fogColor, fogAmount); \n\
