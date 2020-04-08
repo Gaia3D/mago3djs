@@ -142,9 +142,10 @@ void main()
 			
 		//textureColor = vec4(vNormal, 1.0);
 		
-		float maxAngDeg = 102.5;
-		float A = 1.0/(maxAngDeg-95.0);
-		float B = -A*95.0;
+		float maxAngDeg = 100.5;
+		float minAngDeg = 95.0;
+		float A = 1.0/(maxAngDeg-minAngDeg);
+		float B = -A*minAngDeg;
 		float alpha = A*angDeg+B;
 		if(alpha < 0.0 )
 		alpha = 0.0;

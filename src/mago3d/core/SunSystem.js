@@ -308,7 +308,6 @@ SunSystem.prototype.updateSun = function(magoManager, options)
 SunSystem.prototype.updateLight = function(light) 
 {
 	var sunGeoLocData = this.sunGeoLocDataManager.getCurrentGeoLocationData();
-	//var sunTMatrix = sunGeoLocData.rotMatrix;
 	var sunTMatrix = sunGeoLocData.getRotMatrixInv();
 	if (light.tMatrix === undefined)
 	{ light.tMatrix = new Matrix4(); }

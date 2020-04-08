@@ -338,7 +338,7 @@ TinTerrain.prototype.prepareTinTerrainPlain = function(magoManager, tinTerrainMa
 		}
 		else if (this.texture === undefined)
 		{
-			if (magoManager.fileRequestControler.tinTerrainTexturesRequested < 4)
+			//if (magoManager.fileRequestControler.tinTerrainTexturesRequested < 2)
 			{
 				this.prepareTexture(magoManager, tinTerrainManager);
 			}
@@ -366,7 +366,7 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 		// Prepare this tinTerrain.
 		if (this.fileLoadState === CODE.fileLoadState.READY)
 		{
-			if (magoManager.fileRequestControler.tinTerrainFilesRequested < 4)
+			//if (magoManager.fileRequestControler.tinTerrainFilesRequested < 2)
 			{
 				var pathName = this.getPathName();
 				var geometryDataPath = magoManager.readerWriter.geometryDataPath;
@@ -387,7 +387,7 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 		}
 		else if (this.texture === undefined)
 		{
-			if (magoManager.fileRequestControler.tinTerrainTexturesRequested < 4)
+			//if (magoManager.fileRequestControler.tinTerrainTexturesRequested < 2)
 			{
 				this.prepareTexture(magoManager, tinTerrainManager);
 			}
@@ -587,6 +587,8 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 					gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 					gl.uniform4fv(currentShader.oneColor4_loc, [0.0, 0.9, 0.9, 1.0]);
 					
+					gl.drawElements(gl.LINES, indicesCount-1, gl.UNSIGNED_SHORT, 0); 
+					/*
 					if (this.tinTerrainManager.getTerrainType() === 0)
 					{
 						gl.drawElements(gl.LINE_STRIP, indicesCount-1, gl.UNSIGNED_SHORT, 0); 
@@ -594,12 +596,12 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 					else 
 					{
 						var trianglesCount = indicesCount;
-						for (var i=0; i<trianglesCount; i++)
+						for (var i=0; i<trianglesCount-1; i++)
 						{
 							gl.drawElements(gl.LINE_LOOP, 3, gl.UNSIGNED_SHORT, i*3); 
 						}
 					}
-
+					*/
 					this.drawTerrainName(magoManager);
 				}
 			}
@@ -712,6 +714,7 @@ TinTerrain.prototype.extractLowestTinTerrains = function(resultLowestTilesArray)
 
 TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum, maxDepth, camPos, magoManager, visibleTilesArray, noVisibleTilesArray)
 {
+	// Note: this is NO frustum intersection. Select tiles by distance to camera. Function name must to be change.
 	if (this.geographicExtent === undefined || this.geographicExtent.minGeographicCoord === undefined || this.geographicExtent.maxGeographicCoord === undefined)
 	{ return; }
 	
@@ -724,168 +727,149 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 	}
 	
 	var sphereExtentAux = this.sphereExtent;
-	/*
-	var intersectionType = frustum.intersectionSphere(sphereExtentAux);
+
+	var currDepth = this.depth;
 	
-	if (intersectionType === Constant.INTERSECTION_OUTSIDE)
-	{ 
-		this.visible = false;
-		noVisibleTilesArray.push(this); // collect no visible tiles to delete it.
-		return; 
-	}
-	*/
-	//else if (intersectionType === Constant.INTERSECTION_INSIDE)
-	//{
-	//	// finish the process.
-	//	this.visible = true;
-	//	visibleTilesArray.push(this);
-	//	return;
-	//}
-	//else if (intersectionType === Constant.INTERSECTION_INTERSECT || intersectionType === Constant.INTERSECTION_INSIDE)
+	// check distance to camera.
+	this.distToCam = camPos.distToSphere(sphereExtentAux);
+	var distLimit = this.tinTerrainManager.distLimitByDepth[currDepth];
+	
+	if (this.distToCam > distLimit)
 	{
-		var currDepth = this.depth;
+		// finish the process.
+		this.visible = true;
+		visibleTilesArray.push(this);
 		
-		// check distance to camera.
-		this.distToCam = camPos.distToSphere(sphereExtentAux);
-		var distLimit = this.tinTerrainManager.distLimitByDepth[currDepth];
-		
-		if (this.distToCam > distLimit)// && this.depth > 1)
+		// Now, extract all lowest-child and put into "noVisibleTilesArray".***
+		if (this.hasChildren())
 		{
-			// finish the process.
-			this.visible = true;
-			visibleTilesArray.push(this);
-			
-			// Now, extract all lowest-child and put into "noVisibleTilesArray".***
-			if (this.hasChildren())
-			{
-				//this.extractLowestTinTerrains(noVisibleTilesArray);
-				noVisibleTilesArray.push(this.childMap.LU);
-				noVisibleTilesArray.push(this.childMap.LD);
-				noVisibleTilesArray.push(this.childMap.RU);
-				noVisibleTilesArray.push(this.childMap.RD);
-			}
-			//noVisibleTilesArray.push(this); // collect no visible tiles to delete it.
-			return;
+			//this.extractLowestTinTerrains(noVisibleTilesArray);
+			noVisibleTilesArray.push(this.childMap.LU);
+			noVisibleTilesArray.push(this.childMap.LD);
+			noVisibleTilesArray.push(this.childMap.RU);
+			noVisibleTilesArray.push(this.childMap.RD);
 		}
-		
-		if (currDepth < maxDepth)
-		{
-			// must descend.
-			var curX = this.X;
-			var curY = this.Y;
-			var minLon = currMinGeographicCoords.longitude;
-			var minLat = currMinGeographicCoords.latitude;
-			var minAlt = currMinGeographicCoords.altitude;
-			var maxLon = currMaxGeographicCoords.longitude;
-			var maxLat = currMaxGeographicCoords.latitude;
-			var maxAlt = currMaxGeographicCoords.altitude;
-			var midLon = (minLon + maxLon)/ 2;
-			var midLat = (minLat + maxLat)/ 2;
-		
-			// create children if no exist.
-			// +--------------+--------------+
-			// | subTile 0(LU)| subTile 2(RU)|
-			// | X = curX*2   | X = curX*2+1 |
-			// | Y = curY*2   | Y = curY*2   |
-			// |              |              |
-			// +--------------+--------------+
-			// | subTile 1(LD)| subTile 3(RD)|
-			// | X = curX*2   | X = curX*2+1 |
-			// | Y = curY*2+1 | Y = curY*2+1 |
-			// |              |              |
-			// +--------------+--------------+
-			
-			if (this.tinTerrainManager.imageryType === CODE.imageryType.WEB_MERCATOR)
-			{
-				midLat = this.getMidLatitudeRadWebMercator()*180/Math.PI;
-			}
-			
-			var wmMinX = this.webMercatorExtent.minX;
-			var wmMinY = this.webMercatorExtent.minY;
-			var wmMaxX = this.webMercatorExtent.maxX;
-			var wmMaxY = this.webMercatorExtent.maxY;
-			var wmMidX = (wmMaxX + wmMinX)/2.0;
-			var wmMidY = (wmMaxY + wmMinY)/2.0;
-				
-			if (this.childMap === undefined)
-			{ this.childMap = {}; }
-			
-			// subTile 0 (Left-Up).
-			var subTile_LU = this.childMap.LU;
-			if (subTile_LU === undefined)
-			{
-				// if no exist -> create it.
-				subTile_LU = new TinTerrain(this);
-				subTile_LU.X = curX*2;
-				subTile_LU.Y = curY*2;
-				subTile_LU.setGeographicExtent(minLon, midLat, minAlt,  midLon, maxLat, maxAlt); 
-				subTile_LU.indexName = "LU";
-				subTile_LU.tinTerrainManager = this.tinTerrainManager;
-				this.childMap.LU = subTile_LU;
-				
-				subTile_LU.setWebMercatorExtent(wmMinX, wmMidY, wmMidX, wmMaxY);
-			}
-			
-			// subTile 1 (Left-Down).
-			var subTile_LD = this.childMap.LD;
-			if (subTile_LD === undefined)
-			{
-				// if no exist -> create it.
-				subTile_LD = new TinTerrain(this);
-				subTile_LD.X = curX*2;
-				subTile_LD.Y = curY*2+1;
-				subTile_LD.setGeographicExtent(minLon, minLat, minAlt,  midLon, midLat, maxAlt); 
-				subTile_LD.indexName = "LD";
-				subTile_LD.tinTerrainManager = this.tinTerrainManager;
-				this.childMap.LD = subTile_LD;
-				
-				subTile_LD.setWebMercatorExtent(wmMinX, wmMinY, wmMidX, wmMidY);
-			}
-			
-			// subTile 2 (Right-Up).
-			var subTile_RU = this.childMap.RU;
-			if (subTile_RU === undefined)
-			{
-				subTile_RU = new TinTerrain(this);
-				subTile_RU.X = curX*2+1;
-				subTile_RU.Y = curY*2;
-				subTile_RU.setGeographicExtent(midLon, midLat, minAlt,  maxLon, maxLat, maxAlt); 
-				subTile_RU.indexName = "RU";
-				subTile_RU.tinTerrainManager = this.tinTerrainManager;
-				this.childMap.RU = subTile_RU;
-				
-				subTile_RU.setWebMercatorExtent(wmMidX, wmMidY, wmMaxX, wmMaxY);
-			}
-			
-			// subTile 3 (Right-Down).
-			var subTile_RD = this.childMap.RD;
-			if (subTile_RD === undefined)
-			{
-				subTile_RD = new TinTerrain(this);
-				subTile_RD.X = curX*2+1;
-				subTile_RD.Y = curY*2+1;
-				subTile_RD.setGeographicExtent(midLon, minLat, minAlt,  maxLon, midLat, maxAlt);
-				subTile_RD.indexName = "RD";
-				subTile_RD.tinTerrainManager = this.tinTerrainManager;
-				this.childMap.RD = subTile_RD;
-				
-				subTile_RD.setWebMercatorExtent(wmMidX, wmMinY, wmMaxX, wmMidY);
-			}
-			
-			// now, do frustumCulling for each childTiles.
-			subTile_LU.getFrustumIntersectedTinTerrainsQuadTree(frustum, maxDepth, camPos, magoManager, visibleTilesArray, noVisibleTilesArray);
-			subTile_LD.getFrustumIntersectedTinTerrainsQuadTree(frustum, maxDepth, camPos, magoManager, visibleTilesArray, noVisibleTilesArray);
-			subTile_RU.getFrustumIntersectedTinTerrainsQuadTree(frustum, maxDepth, camPos, magoManager, visibleTilesArray, noVisibleTilesArray);
-			subTile_RD.getFrustumIntersectedTinTerrainsQuadTree(frustum, maxDepth, camPos, magoManager, visibleTilesArray, noVisibleTilesArray);
-		}
-		else 
-		{
-			// finish the process.
-			this.visible = true;
-			visibleTilesArray.push(this);
-			return;
-		}
+		return;
 	}
+	
+	if (currDepth < maxDepth)
+	{
+		// must descend.
+		var curX = this.X;
+		var curY = this.Y;
+		var minLon = currMinGeographicCoords.longitude;
+		var minLat = currMinGeographicCoords.latitude;
+		var minAlt = currMinGeographicCoords.altitude;
+		var maxLon = currMaxGeographicCoords.longitude;
+		var maxLat = currMaxGeographicCoords.latitude;
+		var maxAlt = currMaxGeographicCoords.altitude;
+		var midLon = (minLon + maxLon)/ 2;
+		var midLat = (minLat + maxLat)/ 2;
+	
+		// create children if no exist.
+		// +--------------+--------------+
+		// | subTile 0(LU)| subTile 2(RU)|
+		// | X = curX*2   | X = curX*2+1 |
+		// | Y = curY*2   | Y = curY*2   |
+		// |              |              |
+		// +--------------+--------------+
+		// | subTile 1(LD)| subTile 3(RD)|
+		// | X = curX*2   | X = curX*2+1 |
+		// | Y = curY*2+1 | Y = curY*2+1 |
+		// |              |              |
+		// +--------------+--------------+
+		
+		if (this.tinTerrainManager.imageryType === CODE.imageryType.WEB_MERCATOR)
+		{
+			midLat = this.getMidLatitudeRadWebMercator()*180/Math.PI;
+		}
+		
+		var wmMinX = this.webMercatorExtent.minX;
+		var wmMinY = this.webMercatorExtent.minY;
+		var wmMaxX = this.webMercatorExtent.maxX;
+		var wmMaxY = this.webMercatorExtent.maxY;
+		var wmMidX = (wmMaxX + wmMinX)/2.0;
+		var wmMidY = (wmMaxY + wmMinY)/2.0;
+			
+		if (this.childMap === undefined)
+		{ this.childMap = {}; }
+		
+		// subTile 0 (Left-Up).
+		var subTile_LU = this.childMap.LU;
+		if (subTile_LU === undefined)
+		{
+			// if no exist -> create it.
+			subTile_LU = new TinTerrain(this);
+			subTile_LU.X = curX*2;
+			subTile_LU.Y = curY*2;
+			subTile_LU.setGeographicExtent(minLon, midLat, minAlt,  midLon, maxLat, maxAlt); 
+			subTile_LU.indexName = "LU";
+			subTile_LU.tinTerrainManager = this.tinTerrainManager;
+			this.childMap.LU = subTile_LU;
+			
+			subTile_LU.setWebMercatorExtent(wmMinX, wmMidY, wmMidX, wmMaxY);
+		}
+		
+		// subTile 1 (Left-Down).
+		var subTile_LD = this.childMap.LD;
+		if (subTile_LD === undefined)
+		{
+			// if no exist -> create it.
+			subTile_LD = new TinTerrain(this);
+			subTile_LD.X = curX*2;
+			subTile_LD.Y = curY*2+1;
+			subTile_LD.setGeographicExtent(minLon, minLat, minAlt,  midLon, midLat, maxAlt); 
+			subTile_LD.indexName = "LD";
+			subTile_LD.tinTerrainManager = this.tinTerrainManager;
+			this.childMap.LD = subTile_LD;
+			
+			subTile_LD.setWebMercatorExtent(wmMinX, wmMinY, wmMidX, wmMidY);
+		}
+		
+		// subTile 2 (Right-Up).
+		var subTile_RU = this.childMap.RU;
+		if (subTile_RU === undefined)
+		{
+			subTile_RU = new TinTerrain(this);
+			subTile_RU.X = curX*2+1;
+			subTile_RU.Y = curY*2;
+			subTile_RU.setGeographicExtent(midLon, midLat, minAlt,  maxLon, maxLat, maxAlt); 
+			subTile_RU.indexName = "RU";
+			subTile_RU.tinTerrainManager = this.tinTerrainManager;
+			this.childMap.RU = subTile_RU;
+			
+			subTile_RU.setWebMercatorExtent(wmMidX, wmMidY, wmMaxX, wmMaxY);
+		}
+		
+		// subTile 3 (Right-Down).
+		var subTile_RD = this.childMap.RD;
+		if (subTile_RD === undefined)
+		{
+			subTile_RD = new TinTerrain(this);
+			subTile_RD.X = curX*2+1;
+			subTile_RD.Y = curY*2+1;
+			subTile_RD.setGeographicExtent(midLon, minLat, minAlt,  maxLon, midLat, maxAlt);
+			subTile_RD.indexName = "RD";
+			subTile_RD.tinTerrainManager = this.tinTerrainManager;
+			this.childMap.RD = subTile_RD;
+			
+			subTile_RD.setWebMercatorExtent(wmMidX, wmMinY, wmMaxX, wmMidY);
+		}
+		
+		// now, do frustumCulling for each childTiles.
+		subTile_LU.getFrustumIntersectedTinTerrainsQuadTree(frustum, maxDepth, camPos, magoManager, visibleTilesArray, noVisibleTilesArray);
+		subTile_LD.getFrustumIntersectedTinTerrainsQuadTree(frustum, maxDepth, camPos, magoManager, visibleTilesArray, noVisibleTilesArray);
+		subTile_RU.getFrustumIntersectedTinTerrainsQuadTree(frustum, maxDepth, camPos, magoManager, visibleTilesArray, noVisibleTilesArray);
+		subTile_RD.getFrustumIntersectedTinTerrainsQuadTree(frustum, maxDepth, camPos, magoManager, visibleTilesArray, noVisibleTilesArray);
+	}
+	else 
+	{
+		// finish the process.
+		this.visible = true;
+		visibleTilesArray.push(this);
+		return;
+	}
+	
 };
 
 TinTerrain.prototype.calculateCenterPosition = function()
@@ -1540,6 +1524,129 @@ TinTerrain.getNormalCartesiansArray = function(cartesiansArray, indicesArray, re
 	
 };
 
+TinTerrain.prototype.getAltitudes = function(geoCoordsArray, resultGeoCoordsArray, magoManager)
+{
+	if (this.altitudesFbo === undefined) 
+	{ 
+		this.makeAltitudesMap(magoManager);
+	}
+	
+	// Bind this.altitudesFbo and read pixels, then decode the altitude.
+	// Convert longitude & latitude to normalized coordinates.
+	var minLon = this.geographicExtent.minGeographicCoord.longitude;
+	var minLat = this.geographicExtent.minGeographicCoord.latitude;
+	var maxLon = this.geographicExtent.maxGeographicCoord.longitude;
+	var maxLat = this.geographicExtent.maxGeographicCoord.latitude;
+	var lonRange = maxLon - minLon;
+	var latRange = maxLat - minLat;
+	
+	var minHeight = this.minHeight[0];
+	var maxHeight = this.maxHeight[0];
+	var heightRange = maxHeight - minHeight;
+	
+	var uValue; // normalized longitude.
+	var vValue; // normalized latitude.
+	var pixels = new Uint8Array(4); // 4 RGBA.***
+	
+	var imageWidth = this.altitudesFbo.width;
+	var imageHeight = this.altitudesFbo.height;
+	
+	if (resultGeoCoordsArray === undefined)
+	{ resultGeoCoordsArray = []; }
+
+	this.altitudesFbo.bind();
+		
+	var geoCoordsCount = geoCoordsArray.length;
+	for (var i=0; i<geoCoordsCount; i++)
+	{
+		var geoCoord = geoCoordsArray[i];
+		
+		uValue = (geoCoord.longitude - minLon)/lonRange;
+		vValue = (geoCoord.latitude - minLat)/latRange;
+		
+		var pixelX = uValue * imageWidth;
+		var pixelY = vValue * imageHeight;
+		
+		gl.readPixels(pixelX, pixelY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+		
+		var decodedAltitude = pixels[0]/(256.0*256.0*256.0) + pixels[1]/(256.0*256.0) + pixels[2]/256.0 + pixels[3]; // 0 to 256 range depth.
+		var linearAltitude = decodedAltitude / 256.0; // LinearDepth. Convert to [0.0, 1.0] range depth.
+		var realAltitude = minHeight + linearAltitude * heightRange;
+		geoCoord.altitude = realAltitude;
+		resultGeoCoordsArray.push(geoCoord);
+	}
+	
+	this.altitudesFbo.unbind();
+	
+	return resultGeoCoordsArray;
+};
+
+TinTerrain.prototype.makeAltitudesMap = function(magoManager)
+{
+	var gl = magoManager.getGl();
+	
+	if (this.altitudesFbo === undefined) 
+	{ 
+		var imageWidth = 256;
+		var imageHeight = 256;
+		this.altitudesFbo = new FBO(gl, imageWidth, imageHeight ); 
+	}
+	
+	var uValues = this.uValues;
+	var vValues = this.vValues;
+	var hValues = this.hValues;
+	var indices = this.indices;
+	
+	// Make VBO.
+	var shortMax = 32767;
+	var vertexCount = uValues.length;
+	var cartesiansArray = new Float32Array(vertexCount*3);
+	for (var i=0; i<vertexCount; i++)
+	{
+		cartesiansArray[i*3] = uValues[i]/shortMax;
+		cartesiansArray[i*3+1] = vValues[i]/shortMax;
+		cartesiansArray[i*3+2] = hValues[i]/shortMax;
+	}
+	
+	if (this.vboKeyContainerAltitudes === undefined)
+	{ this.vboKeyContainerAltitudes = new VBOVertexIdxCacheKeysContainer(); }
+	
+	var vboKeyAltitudes = this.vboKeyContainerAltitudes.newVBOVertexIdxCacheKey();
+	var vboKey = this.vboKeyContainer.vboCacheKeysArray[0]; // the idx = 0 is the terrain. idx = 1 is the skirt.
+	var vboMemManager = magoManager.vboMemoryManager;
+	
+	// Positions.
+	vboKeyAltitudes.setDataArrayPos(cartesiansArray, vboMemManager);
+	
+	// Indices. 
+	// For indices use the tinTerrain VBO indices.
+	
+	// Now render.
+	this.altitudesFbo.bind();
+	
+	var shaderName = "tinTerrainAltitudes";
+	var shader = magoManager.postFxShadersManager.getShader(shaderName); 
+	shader.useProgram();
+	shader.enableVertexAttribArray(shader.position3_loc);
+	
+	// Positions.
+	if (!vboKeyAltitudes.bindDataPosition(shader, vboMemManager))
+	{ 
+		return false; 
+	}
+	
+	// Indices.
+	if (!vboKey.bindDataIndice(shader, vboMemManager))
+	{ 
+		return false; 
+	}
+	
+	var indicesCount = vboKey.indicesCount;
+	gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.
+	
+	this.altitudesFbo.unbind();
+};
+
 TinTerrain.prototype.decodeData = function(imageryType)
 {
 	if (this.geographicExtent === undefined)
@@ -1665,15 +1772,15 @@ TinTerrain.prototype.decodeData = function(imageryType)
 	this.skirtAltitudesValuesArray = skirtResultObject.skirtAltitudesValuesArray;
 	
 	// free memory.
-	this.uValues = undefined;
-	this.vValues = undefined;
-	this.hValues = undefined;
+	//this.uValues = undefined; // keep values to make altitudesMap.
+	//this.vValues = undefined; // keep values to make altitudesMap.
+	//this.hValues = undefined; // keep values to make altitudesMap.
 	
 	// store useful data.
 	this.altArray = altArray;
+	//this.lonArray = lonArray;
+	//this.latArray = latArray;
 	
-	lonArray = undefined;
-	latArray = undefined;
 	
 };
 
@@ -1689,6 +1796,9 @@ TinTerrain.prototype.parseData = function(dataArrayBuffer)
 	
 	this.minHeight = new Float32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed+=4;
 	this.maxHeight = new Float32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed+=4;
+	
+	// In this moment set the altitudes for the geographicExtension.
+	this.geographicExtent.setExtent(undefined, undefined, this.minHeight[0], undefined, undefined, this.maxHeight[0]);
 	
 	this.boundingSphereCenterX = new Float64Array(dataArrayBuffer.slice(bytes_readed, bytes_readed+8)); bytes_readed+=8;
 	this.boundingSphereCenterY = new Float64Array(dataArrayBuffer.slice(bytes_readed, bytes_readed+8)); bytes_readed+=8;

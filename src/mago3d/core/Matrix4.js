@@ -694,6 +694,23 @@ Matrix4.copyArray = function(arrayOrigin, arrayDest)
  * @param {Number} error
  * @returns {Boolean}
  */
+Matrix4.prototype.isNAN = function() 
+{
+	for (var i=0; i<16; i++)
+	{
+		if (isNaN(this._floatArrays[i]))
+		{ return true; }
+	}
+	
+	return false;
+};
+
+/**
+ * 회전/이동을 위한 단위행렬 여부를 확인한다.
+ *
+ * @param {Number} error
+ * @returns {Boolean}
+ */
 Matrix4.prototype.isRotationIdentity = function(error) 
 {
 	if (this.aproxEqual(this._floatArrays[0], 1, error))

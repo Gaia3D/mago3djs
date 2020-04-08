@@ -734,7 +734,7 @@ Renderer.prototype.renderDepthSunPointOfView = function(gl, visibleObjControlerN
 	var shaderName = "orthogonalDepth";
 	var currentShader = magoManager.postFxShadersManager.getShader(shaderName); 
 	currentShader.resetLastBuffersBinded();
-	var shaderProgram = currentShader.program;
+	//var shaderProgram = currentShader.program;
 
 	currentShader.useProgram();
 	magoManager.effectsManager.setCurrentShader(currentShader);
