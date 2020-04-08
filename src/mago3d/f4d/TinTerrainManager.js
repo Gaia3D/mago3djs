@@ -198,13 +198,13 @@ TinTerrainManager.prototype.makeDistanceLimitByDepth = function()
 	this.distLimitByDepth[20] = 200; 
 	
 	//this.distLimitByDepth[0] = 5;
-	/*
+	
 	var distLimitByDepthCount = this.distLimitByDepth.length;
 	for (var i=0; i<distLimitByDepthCount; i++)
 	{
-		this.distLimitByDepth[i] *= 0.3;
+		this.distLimitByDepth[i] *= 0.65;
 	}
-	*/
+	
 };
 
 TinTerrainManager.prototype.doFrustumCulling = function(frustum, camPos, magoManager, maxDepth)
@@ -272,6 +272,11 @@ TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager)
 		{ break; }
 	}
 	
+};
+
+TinTerrainManager.prototype.getAltitudes = function(geoCoordsArray, resultGeoCoordsArray) 
+{
+	//
 };
 
 TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, shader) 

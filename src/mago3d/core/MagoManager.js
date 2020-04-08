@@ -627,10 +627,12 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		var eqRadius = Globe.equatorialRadius();
 		
 		// Calculate near - far.*******************************************
+		if (camHeight < 0){ camHeight *= -1; }
+		
 		var degToRad = Math.PI/180;
 		var d = eqRadius + camHeight;
 		var alfaRad = Math.acos(eqRadius / d);
-		var far = d*Math.sin(alfaRad);
+		var far = d*Math.sin(alfaRad)*0.8;
 		if (camHeight > 4000)
 		{
 			frustum0.near[0] = 0.1 + camHeight*0.8;
@@ -650,7 +652,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		projectionMatrix._floatArrays = glMatrix.mat4.perspective(projectionMatrix._floatArrays, frustum0.fovyRad[0], frustum0.aspectRatio[0], frustum0.near[0], frustum0.far[0]);
 		
 		// Large far projection for sky.
-		var farSky = eqRadius + camHeight;
+		var farSky = eqRadius + camHeight * 1.5;
 		var projectionMatrixSky = sceneState.projectionMatrixSky;
 		projectionMatrixSky._floatArrays = glMatrix.mat4.perspective(projectionMatrixSky._floatArrays, frustum0.fovyRad[0], frustum0.aspectRatio[0], frustum0.near[0], farSky);
 		
@@ -1839,7 +1841,7 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, resultSe
 	resultSelectedArray[2] = selectionManager.currentReferenceSelected;
 	resultSelectedArray[3] = selectionManager.currentNodeSelected;
 	
-	// Aditionally check if selected an edge of topology.***
+	// Additionally check if selected an edge of topology.***
 	var selNetworkEdges = selectionManager.getSelectionCandidatesFamily("networkEdges");
 	if (selNetworkEdges)
 	{
@@ -4339,6 +4341,16 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.bIsMakingDepth_loc = gl.getUniformLocation(shader.program, "bIsMakingDepth");
 	shader.bExistAltitudes_loc = gl.getUniformLocation(shader.program, "bExistAltitudes");
 	shader.altitude_loc = gl.getAttribLocation(shader.program, "altitude");
+	
+	// 3.1) TinTerrain Altitudes shader.****************************************************************************************
+	shaderName = "tinTerrainAltitudes";
+	ssao_vs_source = ShaderSource.TinTerrainAltitudesVS;
+	ssao_fs_source = ShaderSource.TinTerrainAltitudesFS;
+	shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
+
+	//shader.bIsMakingDepth_loc = gl.getUniformLocation(shader.program, "bIsMakingDepth");
+	//shader.bExistAltitudes_loc = gl.getUniformLocation(shader.program, "bExistAltitudes");
+	//shader.altitude_loc = gl.getAttribLocation(shader.program, "altitude");
 	
 	// 4) PointsCloud shader.****************************************************************************************
 	shaderName = "pointsCloud";

@@ -144,9 +144,10 @@ void main()\n\
 			\n\
 		//textureColor = vec4(vNormal, 1.0);\n\
 		\n\
-		float maxAngDeg = 102.5;\n\
-		float A = 1.0/(maxAngDeg-95.0);\n\
-		float B = -A*95.0;\n\
+		float maxAngDeg = 100.5;\n\
+		float minAngDeg = 95.0;\n\
+		float A = 1.0/(maxAngDeg-minAngDeg);\n\
+		float B = -A*minAngDeg;\n\
 		float alpha = A*angDeg+B;\n\
 		if(alpha < 0.0 )\n\
 		alpha = 0.0;\n\
@@ -3371,6 +3372,46 @@ void main(){\n\
 \n\
 \n\
 ";
+ShaderSource.TinTerrainAltitudesFS = "#ifdef GL_ES\n\
+precision highp float;\n\
+#endif\n\
+\n\
+varying float vAltitude;  \n\
+\n\
+vec4 packDepth(const in float depth)\n\
+{\n\
+    const vec4 bit_shift = vec4(16777216.0, 65536.0, 256.0, 1.0);\n\
+    const vec4 bit_mask  = vec4(0.0, 0.00390625, 0.00390625, 0.00390625); \n\
+    //vec4 res = fract(depth * bit_shift); // Is not precise.\n\
+	vec4 res = mod(depth * bit_shift * vec4(255), vec4(256) ) / vec4(255); // Is better.\n\
+    res -= res.xxyz * bit_mask;\n\
+    return res;  \n\
+}\n\
+\n\
+vec4 PackDepth32( in float depth )\n\
+{\n\
+    depth *= (16777216.0 - 1.0) / (16777216.0);\n\
+    vec4 encode = fract( depth * vec4(1.0, 256.0, 256.0*256.0, 16777216.0) );// 256.0*256.0*256.0 = 16777216.0\n\
+    return vec4( encode.xyz - encode.yzw / 256.0, encode.w ) + 1.0/512.0;\n\
+}\n\
+\n\
+void main()\n\
+{     \n\
+    gl_FragData[0] = PackDepth32(vAltitude);\n\
+	//gl_FragData[0] = packDepth(-depth);\n\
+}";
+ShaderSource.TinTerrainAltitudesVS = "attribute vec3 position;\n\
+uniform mat4 ModelViewProjectionMatrix;\n\
+\n\
+varying float vAltitude;\n\
+  \n\
+void main()\n\
+{	\n\
+    vec4 pos4 = vec4(position.xyz, 1.0);\n\
+	gl_Position = ModelViewProjectionMatrix * pos4;\n\
+	vAltitude = position.z;\n\
+}\n\
+";
 ShaderSource.TinTerrainFS = "#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\
@@ -3677,7 +3718,13 @@ void main()\n\
 		\n\
 		if(bExistAltitudes && vAltitude < 0.01)\n\
 		{\n\
-			fogColor = vec4(getRainbowColor_byHeight(vAltitude), 1.0);\n\
+			float minHeight_rainbow = -80.0;\n\
+			float maxHeight_rainbow = 0.0;\n\
+			float gray = (vAltitude - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);\n\
+			if(gray < 0.0)\n\
+			gray = 0.0;\n\
+			//fogColor = vec4(getRainbowColor_byHeight(vAltitude), 1.0);\n\
+			fogColor = vec4(gray, gray, gray, 1.0);\n\
 			fogAmount = 0.6;\n\
 		}\n\
 		\n\

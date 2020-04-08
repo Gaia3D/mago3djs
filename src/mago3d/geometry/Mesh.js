@@ -55,7 +55,7 @@ Mesh.fromVbo = function(vboCacheKey)
 	if (vboCacheKey.vboBufferIdx !== undefined)
 	{
 		// the vbo is elementType.
-		
+		// TODO:
 	}
 	else
 	{

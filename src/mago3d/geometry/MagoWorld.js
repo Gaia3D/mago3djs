@@ -324,6 +324,7 @@ MagoWorld.prototype.updateModelViewMatrixByCamera = function(camera)
 	modelViewMatrix._floatArrays = Matrix4.lookAt(modelViewMatrix._floatArrays, [camPos.x, camPos.y, camPos.z], 
 		[tergetX, tergetY, tergetZ], 
 		[camUp.x, camUp.y, camUp.z]);
+
 };
 
 /**
@@ -377,7 +378,7 @@ MagoWorld.prototype.mouseup = function(event)
 		camera.lastMovement.movementType = CODE.movementType.NO_MOVEMENT;
 	}
 
-			
+	magoManager.mustCheckIfDragging = true;
 };
 
 /**
@@ -474,6 +475,21 @@ MagoWorld.prototype.mousewheel = function(event)
 MagoWorld.prototype.mousemove = function(event)
 {
 	var magoManager = this.magoManager;
+	
+	// Check if is dragging.
+	/*
+	if (magoManager.mustCheckIfDragging) 
+	{
+		if (magoManager.isDragging()) 
+		{
+			magoManager.mouseDragging = true;
+			//magoManager.setCameraMotion(false);
+		}
+		magoManager.mustCheckIfDragging = false;
+	}
+	*/
+	// End check if is dragging.---
+	
 	var mouseAction = magoManager.sceneState.mouseAction;
 	
 	var camera = this.magoManager.sceneState.camera;

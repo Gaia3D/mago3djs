@@ -25,7 +25,7 @@ Sky.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 	// To avoid z-fight, split the sky in 8 regions.***
 	if (this.ellipsoid === undefined)
 	{ 
-		var atmosphereHeight = 200000.0;
+		var atmosphereHeight = 150000.0;
 		var equatorialRadius = Globe.equatorialRadius() + atmosphereHeight;
 		var polarRadius = Globe.polarRadius() + atmosphereHeight;
 		

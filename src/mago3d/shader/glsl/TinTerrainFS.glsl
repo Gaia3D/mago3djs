@@ -304,7 +304,13 @@ void main()
 		
 		if(bExistAltitudes && vAltitude < 0.01)
 		{
-			fogColor = vec4(getRainbowColor_byHeight(vAltitude), 1.0);
+			float minHeight_rainbow = -80.0;
+			float maxHeight_rainbow = 0.0;
+			float gray = (vAltitude - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);
+			if(gray < 0.0)
+			gray = 0.0;
+			//fogColor = vec4(getRainbowColor_byHeight(vAltitude), 1.0);
+			fogColor = vec4(gray, gray, gray, 1.0);
 			fogAmount = 0.6;
 		}
 		
