@@ -1729,8 +1729,8 @@ ReaderWriter.prototype.loadWMSImage = function(gl, filePath_inServer, texture, m
 				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
 				gl.generateMipmap(gl.TEXTURE_2D);
 				gl.bindTexture(gl.TEXTURE_2D, null);
+				texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 			});
-			texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 		}
 	}, function(status) 
 	{

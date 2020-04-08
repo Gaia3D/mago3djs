@@ -37,6 +37,9 @@ var TinTerrainManager = function(options)
 	this.imageryType = CODE.imageryType.WEB_MERCATOR; // Test.***
 	//this.imageryType = CODE.imageryType.CRS84; // Test.***
 	
+	this.imagerys = [new XYZLayer({url: 'https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'})];
+	//this.imagerys = [new WMSLayer({url: 'http://192.168.10.9:8080/geoserver/mago3d/wms', param: {layers: 'mago3d:gangseogu_5m'}})];
+
 	this.init();
 	this.makeTinTerrainWithDEMIndex(); // provisional.
 	
@@ -200,7 +203,7 @@ TinTerrainManager.prototype.makeDistanceLimitByDepth = function()
 	var distLimitByDepthCount = this.distLimitByDepth.length;
 	for (var i=0; i<distLimitByDepthCount; i++)
 	{
-		this.distLimitByDepth[i] *= 2.0;
+		this.distLimitByDepth[i] *= 0.3;
 	}
 };
 
@@ -435,9 +438,6 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 			tinTerrain.render(currentShader, magoManager, bDepth, renderType);
 		}
 	}
-	
-	
-	
 
 	currentShader.disableVertexAttribArray(currentShader.texCoord2_loc); 
 	currentShader.disableVertexAttribArray(currentShader.position3_loc); 

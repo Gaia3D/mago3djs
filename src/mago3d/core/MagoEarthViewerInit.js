@@ -12,6 +12,7 @@ MagoEarthViewerInit.prototype.init = function()
 {
 	this.magoManager = new MagoManager();
 	this.viewer = new MagoWorld(this.magoManager);
+	
 	this.magoManager.magoWorld = this.viewer;
 	this.magoManager.globe = new Globe();
 	// init matrices.***
@@ -26,6 +27,39 @@ MagoEarthViewerInit.prototype.init = function()
 	this.magoManager.postFxShadersManager.gl = gl;
 	this.magoManager.postFxShadersManager.createDefaultShaders(gl); // A1-OLD.***
 	this.magoManager.createDefaultShaders(gl);// A1-Use this.***
+
+	var viewer = this.viewer;
+	setRequestAnimFrame();
+	
+	function setRequestAnimFrame() 
+	{
+		window.requestAnimFrame = (function() 
+		{
+			return  window.requestAnimationFrame || 
+					window.webkitRequestAnimationFrame ||  
+					window.mozRequestAnimationFrame || 
+					window.oRequestAnimationFrame || 
+					window.msRequestAnimationFrame ||
+			// if none of the above, use non-native timeout method
+			function(callback) 
+			{
+			  window.setTimeout(callback, 1000 / 60);
+			};
+		})(); 
+		  
+		function animationLoop()
+		{
+			// feedback loop requests new frame
+			requestAnimFrame( animationLoop );
+			// render function is defined below
+			render(); 
+		}
+		function render()
+		{
+			viewer.renderScene();
+		}
+		animationLoop();
+	}	
 };
 MagoEarthViewerInit.prototype.setEventHandler = function() 
 {
