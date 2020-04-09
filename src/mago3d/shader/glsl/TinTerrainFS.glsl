@@ -1,19 +1,22 @@
 #ifdef GL_ES
     precision highp float;
 #endif
+  
 
-//uniform sampler2D depthTex;
-//uniform sampler2D noiseTex;  
-uniform sampler2D diffuseTex;
-uniform sampler2D shadowMapTex;
-uniform sampler2D shadowMapTex2;
+uniform sampler2D shadowMapTex;// 0
+uniform sampler2D shadowMapTex2;// 1
+uniform sampler2D diffuseTex;  // 2
+uniform sampler2D diffuseTex_1;// 3
+uniform sampler2D diffuseTex_2;// 4
+uniform sampler2D diffuseTex_3;// 5
+uniform sampler2D diffuseTex_4;// 6
+uniform sampler2D diffuseTex_5;// 7
 uniform bool textureFlipYAxis;
 uniform bool bIsMakingDepth;
 uniform bool bExistAltitudes;
 uniform mat4 projectionMatrix;
-uniform mat4 m;
-uniform vec2 noiseScale;
-uniform float near;
+//uniform vec2 noiseScale;
+//uniform float near;
 uniform float far;            
 uniform float fov;
 uniform float aspectRatio;    
@@ -21,6 +24,7 @@ uniform float screenWidth;
 uniform float screenHeight;    
 uniform float shininessValue;
 uniform vec3 kernel[16];   
+uniform int uActiveTextures[8];
 
 uniform vec4 oneColor4;
 uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.
@@ -277,12 +281,76 @@ void main()
 		}
 		else if(colorType == 2)
 		{
+			vec2 texCoord;
 			if(textureFlipYAxis)
 			{
-				textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));
+				//textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));
+				texCoord = vec2(vTexCoord.s, 1.0 - vTexCoord.t);
 			}
 			else{
-				textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));
+				//textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));
+				texCoord = vec2(vTexCoord.s, vTexCoord.t);
+			}
+			
+			bool firstColorSetted = false;
+			if(uActiveTextures[7] == 1)
+			{
+				vec4 layersTextureColor = texture2D(diffuseTex_5, texCoord);
+				if(layersTextureColor.w > 0.0)
+				{
+					textureColor = layersTextureColor;
+					firstColorSetted = true;
+				}
+			}
+			
+			if(!firstColorSetted && uActiveTextures[6] == 1)
+			{
+				vec4 layersTextureColor = texture2D(diffuseTex_4, texCoord);
+				if(layersTextureColor.w > 0.0)
+				{
+					textureColor = layersTextureColor;
+					firstColorSetted = true;
+				}
+			}
+			
+			if(!firstColorSetted && uActiveTextures[5] == 1)
+			{
+				vec4 layersTextureColor = texture2D(diffuseTex_3, texCoord);
+				if(layersTextureColor.w > 0.0)
+				{
+					textureColor = layersTextureColor;
+					firstColorSetted = true;
+				}
+			}
+			
+			if(!firstColorSetted && uActiveTextures[4] == 1)
+			{
+				vec4 layersTextureColor = texture2D(diffuseTex_2, texCoord);
+				if(layersTextureColor.w > 0.0)
+				{
+					textureColor = layersTextureColor;
+					firstColorSetted = true;
+				}
+			}
+			
+			if(!firstColorSetted && uActiveTextures[3] == 1)
+			{
+				vec4 layersTextureColor = texture2D(diffuseTex_1, texCoord);
+				if(layersTextureColor.w > 0.0)
+				{
+					textureColor = layersTextureColor;
+					firstColorSetted = true;
+				}
+			}
+			
+			if(!firstColorSetted && uActiveTextures[2] == 1)
+			{
+				vec4 layersTextureColor = texture2D(diffuseTex, texCoord);
+				if(layersTextureColor.w > 0.0)
+				{
+					textureColor = layersTextureColor;
+					firstColorSetted = true;
+				}
 			}
 			
 			if(textureColor.w == 0.0)
@@ -294,8 +362,6 @@ void main()
 			textureColor = oneColor4;
 		}
 		
-		//vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);
-		//gl_FragColor = vec4(textureColor.xyz, externalAlpha); 
 		textureColor.w = externalAlpha;
 		vec4 fogColor = vec4(0.9, 0.9, 0.9, 1.0);
 		float fogParam = v3Pos.z/(far - 10000.0);

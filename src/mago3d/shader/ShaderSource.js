@@ -3415,19 +3415,22 @@ void main()\n\
 ShaderSource.TinTerrainFS = "#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\
+  \n\
 \n\
-//uniform sampler2D depthTex;\n\
-//uniform sampler2D noiseTex;  \n\
-uniform sampler2D diffuseTex;\n\
-uniform sampler2D shadowMapTex;\n\
-uniform sampler2D shadowMapTex2;\n\
+uniform sampler2D shadowMapTex;// 0\n\
+uniform sampler2D shadowMapTex2;// 1\n\
+uniform sampler2D diffuseTex;  // 2\n\
+uniform sampler2D diffuseTex_1;// 3\n\
+uniform sampler2D diffuseTex_2;// 4\n\
+uniform sampler2D diffuseTex_3;// 5\n\
+uniform sampler2D diffuseTex_4;// 6\n\
+uniform sampler2D diffuseTex_5;// 7\n\
 uniform bool textureFlipYAxis;\n\
 uniform bool bIsMakingDepth;\n\
 uniform bool bExistAltitudes;\n\
 uniform mat4 projectionMatrix;\n\
-uniform mat4 m;\n\
-uniform vec2 noiseScale;\n\
-uniform float near;\n\
+//uniform vec2 noiseScale;\n\
+//uniform float near;\n\
 uniform float far;            \n\
 uniform float fov;\n\
 uniform float aspectRatio;    \n\
@@ -3435,6 +3438,7 @@ uniform float screenWidth;    \n\
 uniform float screenHeight;    \n\
 uniform float shininessValue;\n\
 uniform vec3 kernel[16];   \n\
+uniform int uActiveTextures[8];\n\
 \n\
 uniform vec4 oneColor4;\n\
 uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
@@ -3691,12 +3695,76 @@ void main()\n\
 		}\n\
 		else if(colorType == 2)\n\
 		{\n\
+			vec2 texCoord;\n\
 			if(textureFlipYAxis)\n\
 			{\n\
-				textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));\n\
+				//textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));\n\
+				texCoord = vec2(vTexCoord.s, 1.0 - vTexCoord.t);\n\
 			}\n\
 			else{\n\
-				textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));\n\
+				//textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));\n\
+				texCoord = vec2(vTexCoord.s, vTexCoord.t);\n\
+			}\n\
+			\n\
+			bool firstColorSetted = false;\n\
+			if(uActiveTextures[7] == 1)\n\
+			{\n\
+				vec4 layersTextureColor = texture2D(diffuseTex_5, texCoord);\n\
+				if(layersTextureColor.w > 0.0)\n\
+				{\n\
+					textureColor = layersTextureColor;\n\
+					firstColorSetted = true;\n\
+				}\n\
+			}\n\
+			\n\
+			if(!firstColorSetted && uActiveTextures[6] == 1)\n\
+			{\n\
+				vec4 layersTextureColor = texture2D(diffuseTex_4, texCoord);\n\
+				if(layersTextureColor.w > 0.0)\n\
+				{\n\
+					textureColor = layersTextureColor;\n\
+					firstColorSetted = true;\n\
+				}\n\
+			}\n\
+			\n\
+			if(!firstColorSetted && uActiveTextures[5] == 1)\n\
+			{\n\
+				vec4 layersTextureColor = texture2D(diffuseTex_3, texCoord);\n\
+				if(layersTextureColor.w > 0.0)\n\
+				{\n\
+					textureColor = layersTextureColor;\n\
+					firstColorSetted = true;\n\
+				}\n\
+			}\n\
+			\n\
+			if(!firstColorSetted && uActiveTextures[4] == 1)\n\
+			{\n\
+				vec4 layersTextureColor = texture2D(diffuseTex_2, texCoord);\n\
+				if(layersTextureColor.w > 0.0)\n\
+				{\n\
+					textureColor = layersTextureColor;\n\
+					firstColorSetted = true;\n\
+				}\n\
+			}\n\
+			\n\
+			if(!firstColorSetted && uActiveTextures[3] == 1)\n\
+			{\n\
+				vec4 layersTextureColor = texture2D(diffuseTex_1, texCoord);\n\
+				if(layersTextureColor.w > 0.0)\n\
+				{\n\
+					textureColor = layersTextureColor;\n\
+					firstColorSetted = true;\n\
+				}\n\
+			}\n\
+			\n\
+			if(!firstColorSetted && uActiveTextures[2] == 1)\n\
+			{\n\
+				vec4 layersTextureColor = texture2D(diffuseTex, texCoord);\n\
+				if(layersTextureColor.w > 0.0)\n\
+				{\n\
+					textureColor = layersTextureColor;\n\
+					firstColorSetted = true;\n\
+				}\n\
 			}\n\
 			\n\
 			if(textureColor.w == 0.0)\n\
@@ -3708,8 +3776,6 @@ void main()\n\
 			textureColor = oneColor4;\n\
 		}\n\
 		\n\
-		//vec3 ambientColor = vec3(textureColor.x, textureColor.y, textureColor.z);\n\
-		//gl_FragColor = vec4(textureColor.xyz, externalAlpha); \n\
 		textureColor.w = externalAlpha;\n\
 		vec4 fogColor = vec4(0.9, 0.9, 0.9, 1.0);\n\
 		float fogParam = v3Pos.z/(far - 10000.0);\n\

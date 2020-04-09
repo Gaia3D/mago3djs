@@ -506,33 +506,29 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 				gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 				gl.uniform4fv(currentShader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
 			}
-			
-			// Test.******************************************************************************************
-			if (renderType === 1)
+			else if (renderType === 1)
 			{
+				var activeTexturesLayers = new Int32Array([1, 1, 0, 0, 0, 0, 0, 0]);
 				gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
 				gl.uniform1f(currentShader.externalAlpha_loc, 1);
-				//var currSelObject = magoManager.selectionManager.getSelectedGeneral();
-				//if (currSelObject === this)
-				//{
-				//	gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
-				//	gl.uniform4fv(currentShader.oneColor4_loc, [0.8, 0.3, 0.1, 1.0]);
+
+				var textureKeys = Object.keys(this.texture);
+				var textureLength = textureKeys.length; 
+				for (var i=0;i<textureLength;i++) 
+				{
+					gl.activeTexture(gl.TEXTURE2 + i); 
+					var texture = this.texture[textureKeys[i]];
+					gl.bindTexture(gl.TEXTURE_2D, texture.texId);
 					
+					activeTexturesLayers[2+i] = 1;
+				}	
+
+				gl.uniform1iv(currentShader.uActiveTextures_loc, activeTexturesLayers);
 			}
-			// End test.--------------------------------------------------------------------------------------
-			
 
 			// render this tinTerrain.
 			var renderWireframe = false;
 			var vboMemManager = magoManager.vboMemoryManager;
-			
-			var textureKeys = Object.keys(this.texture);
-			var textureLength = textureKeys.length; 
-			for (var i=0;i<textureLength;i++) 
-			{
-				var texture = this.texture[textureKeys[i]];
-				gl.bindTexture(gl.TEXTURE_2D, texture.texId);
-			}
 			
 			gl.uniform3fv(currentShader.buildingPosHIGH_loc, this.terrainPositionHIGH);
 			gl.uniform3fv(currentShader.buildingPosLOW_loc, this.terrainPositionLOW);
@@ -1624,6 +1620,14 @@ TinTerrain.prototype.makeAltitudesMap = function(magoManager)
 	var indices = this.indices;
 	
 	// Make VBO.
+	var test_maxUValue;
+	var test_maxVValue;
+	var test_maxHValue;
+	
+	var test_minUValue;
+	var test_minVValue;
+	var test_minHValue;
+	
 	var shortMax = 32767;
 	var vertexCount = uValues.length;
 	var cartesiansArray = new Float32Array(vertexCount*3);
@@ -1632,6 +1636,35 @@ TinTerrain.prototype.makeAltitudesMap = function(magoManager)
 		cartesiansArray[i*3] = uValues[i]/shortMax;
 		cartesiansArray[i*3+1] = vValues[i]/shortMax;
 		cartesiansArray[i*3+2] = hValues[i]/shortMax;
+		
+		// Test to debug.
+		if (i === 0)
+		{
+			test_maxUValue = cartesiansArray[i*3];
+			test_maxVValue = cartesiansArray[i*3+1];
+			test_maxHValue = cartesiansArray[i*3+2];
+			
+			test_minUValue = cartesiansArray[i*3];
+			test_minVValue = cartesiansArray[i*3+1];
+			test_minHValue = cartesiansArray[i*3+2];
+		}
+		else
+		{
+			if (cartesiansArray[i*3] < test_minUValue)
+			{ test_minUValue = cartesiansArray[i*3]; }
+			else if (cartesiansArray[i*3] > test_maxUValue)
+			{ test_maxUValue = cartesiansArray[i*3]; }
+				
+			if (cartesiansArray[i*3+1] < test_minVValue)
+			{ test_minVValue = cartesiansArray[i*3+1]; }
+			else if (cartesiansArray[i*3+1] > test_maxVValue)
+			{ test_maxVValue = cartesiansArray[i*3+1]; }
+				
+			if (cartesiansArray[i*3+2] < test_minHValue)
+			{ test_minHValue = cartesiansArray[i*3+2]; }
+			else if (cartesiansArray[i*3+2] > test_maxHValue)
+			{ test_maxHValue = cartesiansArray[i*3+2]; }
+		}
 	}
 	
 	if (this.vboKeyContainerAltitudes === undefined)
@@ -1646,6 +1679,16 @@ TinTerrain.prototype.makeAltitudesMap = function(magoManager)
 	
 	// Indices. 
 	// For indices use the tinTerrain VBO indices.
+	
+	// Calculate the modelViewProjectionMatrix.
+	var mvMat = new Matrix4();
+	var ortho = new Matrix4();
+	this.altitudesMapMVPMat = new Matrix4();
+	var nRange = 1.0;
+	var left = -nRange, right = nRange, bottom = -nRange, top = nRange, near = -depthFactor*nRange, far = depthFactor*nRange;
+	ortho._floatArrays = glMatrix.mat4.ortho(ortho._floatArrays, left, right, bottom, top, near, far);
+	
+	this.altitudesMapMVPMat = mvMat.getMultipliedByMatrix(ortho, this.altitudesMapMVPMat);
 	
 	// Now render.
 	this.altitudesFbo.bind();

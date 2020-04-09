@@ -36,7 +36,8 @@ var TinTerrainManager = function(options)
 	this.imageryType = CODE.imageryType.WEB_MERCATOR; // Test.***
 	//this.imageryType = CODE.imageryType.CRS84; // Test.***
 	
-	this.imagerys = [new XYZLayer({url: 'https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'})];
+	this.imagerys = [new XYZLayer({url: 'https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'}),
+					 new XYZLayer({url: 'https://services.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'})];
 	//this.imagerys = [new WMSLayer({url: 'http://192.168.10.9:8080/geoserver/mago3d/wms', param: {layers: 'mago3d:gangseogu_5m'}})];
 
 	this.init();
@@ -281,7 +282,6 @@ TinTerrainManager.prototype.getAltitudes = function(geoCoordsArray, resultGeoCoo
 
 TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, shader) 
 {
-	
 	var gl = magoManager.sceneState.gl;
 	var currentShader;
 	if (shader)
@@ -302,18 +302,23 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	//gl.disableVertexAttribArray(currentShader.color4_loc);
 	
 	currentShader.bindUniformGenerals();
-
-	var tex = magoManager.texturesStore.getTextureAux1x1(); // provisional.
-	gl.activeTexture(gl.TEXTURE2); 
-	gl.bindTexture(gl.TEXTURE_2D, tex.texId);
-
 	
+	for (var i=0; i<8; i++)
+	{
+		gl.activeTexture(gl.TEXTURE0+i); 
+		gl.bindTexture(gl.TEXTURE_2D, null);
+	}
+
 	if (this.identityMat === undefined)
 	{ this.identityMat = new Matrix4(); }
 	
 	gl.uniform1i(currentShader.bIsMakingDepth_loc, bDepth); //.
 	if (renderType === 1)
 	{
+		var tex = magoManager.texturesStore.getTextureAux1x1(); // provisional.
+		gl.activeTexture(gl.TEXTURE2); 
+		gl.bindTexture(gl.TEXTURE_2D, tex.texId);
+	
 		var textureAux1x1 = magoManager.texturesStore.getTextureAux1x1();
 		var noiseTexture = magoManager.texturesStore.getNoiseTexture4x4();
 		
@@ -349,13 +354,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 				gl.uniform1i(currentShader.sunIdx_loc, 1);
 			}
 			
-			//var sunTexLoc = gl.getUniformLocation(currentShader.program, 'shadowMapTex');
-			//gl.uniform1i(sunTexLoc, 3);
-			
-			//var sunTex2Loc = gl.getUniformLocation(currentShader.program, 'shadowMapTex2');
-			//gl.uniform1i(sunTex2Loc, 4);
-			
-			gl.activeTexture(gl.TEXTURE3); 
+			gl.activeTexture(gl.TEXTURE0); 
 			if (bApplyShadow && sunLight.depthFbo)
 			{
 				var sunLight = sunSystem.getLight(0);
@@ -366,7 +365,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 				gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
 			}
 			
-			gl.activeTexture(gl.TEXTURE4); 
+			gl.activeTexture(gl.TEXTURE1); 
 			if (bApplyShadow && sunLight.depthFbo)
 			{
 				var sunLight = sunSystem.getLight(1);
@@ -376,6 +375,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 			{
 				gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
 			}
+			
 		}
 
 		
