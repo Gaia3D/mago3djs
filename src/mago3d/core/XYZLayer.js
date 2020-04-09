@@ -15,7 +15,6 @@ var XYZLayer = function(options)
 
 XYZLayer.prototype.getUrl = function(info) 
 {
-	var rectangle = SmartTile.getGeographicExtentOfTileLXY(parseInt(info.z), parseInt(info.x), parseInt(info.y));
 	var matchs = this.url.match(this.reg);
 	var auxUrl = this.url;
 	for (var i=0, len=matchs.length;i<len;i++) 

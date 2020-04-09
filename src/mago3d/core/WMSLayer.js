@@ -35,7 +35,7 @@ WMSLayer.DEAFULT_PARAM = {
 };
 WMSLayer.prototype.getUrl = function(info) 
 {
-	var rectangle = SmartTile.getGeographicExtentOfTileLXY(parseInt(info.z), parseInt(info.x), parseInt(info.y));
+	var rectangle = SmartTile.getGeographicExtentOfTileLXY(parseInt(info.z), parseInt(info.x), parseInt(info.y), CODE.imageryType.WEB_MERCATOR);
 
 	var minGeographicCoord = rectangle.minGeographicCoord;
 	var maxGeographicCoord = rectangle.maxGeographicCoord;

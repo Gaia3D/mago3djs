@@ -1587,19 +1587,93 @@ SmartTile.selectTileName = function(depth, longitude, latitude, resultTileName)
  * 어떤 일을 하고 있습니까?
  * @param frustum 변수
  */
-SmartTile.getGeographicExtentOfTileLXY = function(L, X, Y, resultGeoExtend) 
+SmartTile.getGeographicExtentOfTileLXY = function(L, X, Y, resultGeoExtend, imageryType) 
 {
-	var angRange = SmartTile.selectTileAngleRangeByDepth(L);
-	var minLon = angRange*X - 180.0;
-	var maxLon = angRange*(X+1) - 180.0;
-	var minLat = 90.0 - angRange*(Y+1);
-	var maxLat = 90.0 - angRange*(Y);
-	
 	if (resultGeoExtend === undefined)
 	{ resultGeoExtend = new GeographicExtent(); }
 	
-	resultGeoExtend.setExtent(minLon, minLat, 0, maxLon, maxLat, 0);
-	return resultGeoExtend;
+	if (imageryType === CODE.imageryType.CRS84)
+	{
+		var angRange = SmartTile.selectTileAngleRangeByDepth(L);
+		var minLon = angRange*X - 180.0;
+		var maxLon = angRange*(X+1) - 180.0;
+		var minLat = 90.0 - angRange*(Y+1);
+		var maxLat = 90.0 - angRange*(Y);
+		
+		resultGeoExtend.setExtent(minLon, minLat, 0, maxLon, maxLat, 0);
+		return resultGeoExtend;
+	}
+	else if (imageryType === CODE.imageryType.WEB_MERCATOR)
+	{
+		var webMercatorMaxLatRad = 1.4844222297453324; // = 2*Math.atan(Math.pow(Math.E, Math.PI)) - (Math.PI/2);
+
+		// 1rst, must know how many colums & rows there are in depth "L".***
+		var numCols = Math.pow(2, L);
+		var numRows = numCols;
+
+		// calculate the angles of the tiles.
+		var lonAngDegRange = 360.0 / numCols; // the longitude are lineal.***
+		var latAngDegRange;
+
+		// In depth L=0, the latitude range is (-webMercatorMaxLatRad, webMercatorMaxLatRad).***
+		var M_PI = Math.PI;
+		var M_E = Math.E;
+		var maxMercatorY = M_PI;
+		var minMercatorY = -M_PI;
+		var maxLadRad = webMercatorMaxLatRad;
+		var minLadRad = -webMercatorMaxLatRad;
+		var midLatRad;
+		var midLatRadMercator;
+		var y_ratio = ( Y + 0.005 ) / numRows;
+		var currL = 0;
+		var finished = false;
+		while (!finished && currL <= 22)
+		{
+			if (currL === L)
+			{
+				var min_longitude = lonAngDegRange * X - 180.0;
+				var max_longitude = min_longitude + lonAngDegRange;
+
+				var min_latitude = minLadRad * 180.0 / M_PI;
+				var max_latitude = maxLadRad * 180.0 / M_PI;
+
+				resultGeoExtend.setExtent(min_longitude, min_latitude, 0, max_longitude, max_latitude, 0);
+				finished = true;
+			}
+			else
+			{
+				var midMercatorY = (maxMercatorY + minMercatorY) / 2.0;
+				midLatRad = 2.0 * Math.atan(Math.pow(M_E, midMercatorY)) - M_PI / 2.0;
+				var midLatRatio = (M_PI - midMercatorY) / (M_PI - (-M_PI));
+
+				// must choice : the up_side of midLatRadMercator, or the down_side.***
+				if (midLatRatio > y_ratio)
+				{
+					// choice the up_side of midLatRadMercator.***
+					// maxLatRad no changes.***
+					minLadRad = midLatRad;
+					minMercatorY = midMercatorY;
+				}
+				else
+				{
+					// choice the down_side of midLatRadMercator.***
+					maxLadRad = midLatRad;
+					maxMercatorY = midMercatorY;
+					// minLadRad no changes.***
+				}
+			}
+
+			var min_longitude = lonAngDegRange * X - 180.0;
+			var max_longitude = min_longitude + lonAngDegRange;
+
+			var min_latitude = minLadRad * 180.0 / M_PI;
+			var max_latitude = maxLadRad * 180.0 / M_PI;
+
+			currL++;
+		}
+		
+		return resultGeoExtend;
+	}
 };
 
 

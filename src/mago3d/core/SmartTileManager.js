@@ -237,7 +237,7 @@ SmartTileManager.prototype.parseSmartTilesMultiBuildingsIndexFile = function(dat
 		var bbox = new BoundingBox();
 		bytes_readed = bbox.readData(dataBuffer, bytes_readed);
 		
-		var geoExtent = SmartTile.getGeographicExtentOfTileLXY(L, X, Y, undefined);
+		var geoExtent = SmartTile.getGeographicExtentOfTileLXY(L, X, Y, undefined, CODE.imageryType.CRS84);
 		var centerGeoCoord = geoExtent.getMidPoint();
 		//centerGeoCoord.altitude += 20.0;// test. delete!!!
 		var multiBuildingId = "";
@@ -286,7 +286,7 @@ SmartTileManager.prototype.parseSmartTilesF4dIndexFile = function(dataBuffer, pr
 		//var bbox = new BoundingBox();
 		//bytes_readed = bbox.readData(dataBuffer, bytes_readed);
 		
-		var geoExtent = SmartTile.getGeographicExtentOfTileLXY(L, X, Y, undefined);
+		var geoExtent = SmartTile.getGeographicExtentOfTileLXY(L, X, Y, undefined, CODE.imageryType.CRS84);
 		var centerGeoCoord = geoExtent.getMidPoint();
 		//centerGeoCoord.altitude += 20.0;// test. delete!!!
 		var f4dTileId = "";
