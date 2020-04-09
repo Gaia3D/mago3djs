@@ -11,6 +11,7 @@ var XYZLayer = function(options)
 	this.reg = /{[^}]+}/g;
 	this.maxZoom = defaultValue(options.maxZoom, 18);
 	this.minZoom = defaultValue(options.minZoom, 0);
+	this.show = defaultValue(options.show, true);
 };
 
 XYZLayer.prototype.getUrl = function(info) 

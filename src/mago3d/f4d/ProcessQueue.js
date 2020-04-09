@@ -24,6 +24,9 @@ var ProcessQueue = function()
 	
 	// Test.
 	this.octreeToDeletePCloudsMap = {};
+
+	this.textureIdCntMap = {};
+	this.textureIdDeleteMap = {};
 };
 
 ProcessQueue.prototype.putSmartTileToDelete = function(smartTile, aValue)
@@ -653,3 +656,19 @@ ProcessQueue.prototype.manageDeleteQueue = function(magoManager)
 		}
 	}
 };
+/**
+ * 텍스처 등록 갯수 관리
+ * @param {number} textureId
+ */
+ProcessQueue.prototype.addTextureId = function(textureId) 
+{
+	if (!this.textureIdCntMap[textureId]) 
+	{
+		this.textureIdCntMap[textureId] = 1;
+	}
+	this.textureIdCntMap[textureId] += 1;
+};
+
+
+//this.textureIdCntMap = {};
+//	this.textureIdDeleteMap = {};

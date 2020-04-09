@@ -5713,6 +5713,14 @@ MagoManager.prototype.isExistStaticModel = function(projectId)
 	return isExist;
 };
 /**
+ * add image layer
+ * @param {layer} layer. now support type : wms, xyz
+ */
+MagoManager.prototype.addLayer = function(layer) 
+{
+	this.tinTerrainManager.imagerys.push(layer);
+};
+/**
  * api gateway
  */
 MagoManager.prototype.callAPI = function(api) 

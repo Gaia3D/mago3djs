@@ -15,13 +15,11 @@ MagoEarthViewerInit.prototype.init = function()
 	
 	this.magoManager.magoWorld = this.viewer;
 	this.magoManager.globe = new Globe();
+	// Create the tinTerrains(MagoEarth).***
+	if (!this.magoManager.tinTerrainManager) { this.magoManager.tinTerrainManager = new TinTerrainManager(); }
+
 	// init matrices.***
 	this.viewer.updateModelViewMatrixByCamera(this.magoManager.sceneState.camera);
-	//magoManager.upDateSceneStateMatrices(sceneState);
-    
-	// Create the tinTerrains(MagoEarth).***
-	this.magoManager.tinTerrainManager = new TinTerrainManager();
-
 	var gl = this.magoManager.sceneState.gl;
 	this.magoManager.vboMemoryManager.gl = gl;
 	this.magoManager.postFxShadersManager.gl = gl;

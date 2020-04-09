@@ -258,7 +258,8 @@ TinTerrain.prototype.isTexturePrepared = function()
 	var isTexturePrepared = true;
 	var textureKeys = Object.keys(this.texture);
 	var textureLength = textureKeys.length;
-	if (textureLength === 0) 
+	
+	if (textureLength === 0 || this.tinTerrainManager.imagerys.length !== textureLength) 
 	{
 		return false;
 	}
@@ -303,8 +304,9 @@ TinTerrain.prototype.prepareTexture = function(magoManager, tinTerrainManager)
 	for (var i=0, len=imagerys.length;i<len;i++) 
 	{
 		var imagery = imagerys[i];
-		if (imagery.maxZoom < parseInt(L) || imagery.minZoom > parseInt(L)) { continue; }
-		if (this.texture[imagery._id]) { continue; }
+		if (!imagery.show || imagery.maxZoom < parseInt(L) || imagery.minZoom > parseInt(L)) { continue; }
+		var id = imagery._id;
+		if (this.texture[id]) { continue; }
 
 		var texture = new Texture();
 		var textureUrl = imagery.getUrl({x: X, y: Y, z: L});
@@ -312,7 +314,14 @@ TinTerrain.prototype.prepareTexture = function(magoManager, tinTerrainManager)
 		this.texFilePath__TEST = textureUrl;
 		var flip_y_texCoords = false;
 		magoManager.readerWriter.loadWMSImage(gl, textureUrl, texture, magoManager, flip_y_texCoords);
-		this.texture[imagery._id] = texture;
+		this.texture[id] = texture;
+		this.texture[id].imagery = imagery;
+
+		magoManager.processQueue.addTextureId(id);
+	}
+	var textureKeys = Object.keys(this.texture);
+	if(textureKeys > imagerys.length) {
+		magoManager.processQueue.eraseTexture(this.texture);
 	}
 		
 	//var textureFilePath = "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/" + L + "/" + Y + "/" + X;
@@ -531,6 +540,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			for (var i=0;i<textureLength;i++) 
 			{
 				var texture = this.texture[textureKeys[i]];
+				if (!texture.imagery.show) { continue; }
 				gl.bindTexture(gl.TEXTURE_2D, texture.texId);
 			}
 			

@@ -27,7 +27,7 @@ var TinTerrainManager = function(options)
 	// Elevation model or plain ellipsoid.
 	// terrainType = 0 -> terrainPlainModel.
 	// terrainType = 1 -> terrainElevationModel.
-	this.terrainType = 1; 
+	this.terrainType = 0; 
 	//CODE.imageryType = {
 	//"UNKNOWN"      : 0,
 	//"CRS84"        : 1,
@@ -36,8 +36,8 @@ var TinTerrainManager = function(options)
 	this.imageryType = CODE.imageryType.WEB_MERCATOR; // Test.***
 	//this.imageryType = CODE.imageryType.CRS84; // Test.***
 	
-	this.imagerys = [new XYZLayer({url: 'https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'})];
-	//this.imagerys = [new WMSLayer({url: 'http://192.168.10.9:8080/geoserver/mago3d/wms', param: {layers: 'mago3d:gangseogu_5m'}})];
+	//this.imagerys = [];
+	this.imagerys = [];
 
 	this.init();
 	this.makeTinTerrainWithDEMIndex(); // provisional.
@@ -453,41 +453,3 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	currentShader.disableVertexAttribArray(currentShader.color4_loc); 
 	gl.useProgram(null);
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

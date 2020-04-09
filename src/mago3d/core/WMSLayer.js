@@ -11,37 +11,44 @@ var WMSLayer = function(options)
 	this.param = Object.assign({}, WMSLayer.DEAFULT_PARAM, options.param||{});
 
 	this.maxZoom = defaultValue(options.maxZoom, 18);
-	this.minZoom = defaultValue(options.minZoom, 0);
-    
+	this.minZoom = defaultValue(options.minZoom, 2);
+	this.show = defaultValue(options.show, true);
 	this._requestParam = new URLSearchParams(this.param);
-	if (this._requestParam.get('version') === '1.3.0') 
+	if (this._requestParam.get('VERSION') === '1.3.0') 
 	{
-		this._requestParam.delete('srs');
+		this._requestParam.delete('SRS');
 	}
 	else 
 	{
-		this._requestParam.delete('crs');
+		this._requestParam.delete('CRS');
 	}
 };
 WMSLayer.DEAFULT_PARAM = {
-	service : 'WMS',
-	version : '1.3.0',
-	request : 'GetMap',
-	srs     : 'EPSG:4326',
-	crs     : 'EPSG:4326',
-	width   : 256,
-	height  : 256,
-	format  : 'image/png'
+	SERVICE     : 'WMS',
+	VERSION     : '1.3.0',
+	REQUEST     : 'GetMap',
+	SRS         : 'EPSG:4326',
+	CRS         : 'EPSG:4326',
+	WIDTH       : 256,
+	HEIGHT      : 256,
+	FORMAT      : 'image/png',
+	TRANSPARENT : true
 };
 WMSLayer.prototype.getUrl = function(info) 
 {
-	var rectangle = SmartTile.getGeographicExtentOfTileLXY(parseInt(info.z), parseInt(info.x), parseInt(info.y), CODE.imageryType.WEB_MERCATOR);
+	var rectangle = SmartTile.getGeographicExtentOfTileLXY(parseInt(info.z), parseInt(info.x), parseInt(info.y), undefined, CODE.imageryType.WEB_MERCATOR);
 
 	var minGeographicCoord = rectangle.minGeographicCoord;
 	var maxGeographicCoord = rectangle.maxGeographicCoord;
-	var bbox = minGeographicCoord.longitude + ',' + minGeographicCoord.latitude + ',' + maxGeographicCoord.longitude + ',' + maxGeographicCoord.latitude;
 
-	var reqParam = this._requestParam.toString();
-	reqParam  += '&bbox='+bbox;
-	return this.url + '?' + reqParam;
+	var isLatest = this._requestParam.get('VERSION') === '1.3.0';
+	
+	var minx = isLatest ? minGeographicCoord.latitude : minGeographicCoord.longitude;
+	var miny = isLatest ? minGeographicCoord.longitude : minGeographicCoord.latitude;
+	var maxx = isLatest ? maxGeographicCoord.latitude : maxGeographicCoord.longitude;
+	var maxy = isLatest ? maxGeographicCoord.longitude : maxGeographicCoord.latitude;
+	var bbox = minx + ',' + miny + ',' + maxx + ',' + maxy;
+
+	this._requestParam.set('BBOX', bbox);
+	return this.url + '?' + this._requestParam.toString();
 };
