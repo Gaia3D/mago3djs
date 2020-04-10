@@ -511,7 +511,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 				var activeTexturesLayers = new Int32Array([1, 1, 0, 0, 0, 0, 0, 0]);
 				gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
 				gl.uniform1f(currentShader.externalAlpha_loc, 1);
-				gl.uniform2fv(currentShader.uMinMaxAltitudes_loc, [this.minHeight[0], this.maxHeight[0]]);
+				gl.uniform2fv(currentShader.uMinMaxAltitudes_loc, [-200.0, 1943.14]);
 
 				var textureKeys = Object.keys(this.texture);
 				var textureLength = textureKeys.length; 
@@ -534,7 +534,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 
 				gl.uniform1iv(currentShader.uActiveTextures_loc, activeTexturesLayers);
 			}
-
+			
 			// render this tinTerrain.
 			var renderWireframe = false;
 			var vboMemManager = magoManager.vboMemoryManager;
@@ -575,14 +575,15 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			// todo:
 			
 			// shader.altitude_loc
-			if (vboKey.bindDataCustom(currentShader, vboMemManager, "altitudes"))
-			{
-				gl.uniform1i(currentShader.bExistAltitudes_loc, true);
-			}
-			else 
-			{
-				gl.uniform1i(currentShader.bExistAltitudes_loc, false);
-			}
+			gl.uniform1i(currentShader.bExistAltitudes_loc, false);
+			//if (vboKey.bindDataCustom(currentShader, vboMemManager, "altitudes"))
+			//{
+			//	gl.uniform1i(currentShader.bExistAltitudes_loc, true);
+			//}
+			//else 
+			//{
+			//	gl.uniform1i(currentShader.bExistAltitudes_loc, false);
+			//}
 			
 			
 			// Indices.
@@ -595,19 +596,22 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			
 			var indicesCount = vboKey.indicesCount;
 			
-			if (renderWireframe)
+			//var currSelObject = magoManager.selectionManager.getSelectedGeneral();
+			//if (currSelObject !== this)
 			{
-				var trianglesCount = indicesCount;
-				for (var i=0; i<trianglesCount; i++)
+				if (renderWireframe)
 				{
-					gl.drawElements(gl.LINE_LOOP, 3, gl.UNSIGNED_SHORT, i*3); // Fill.
+					var trianglesCount = indicesCount;
+					for (var i=0; i<trianglesCount; i++)
+					{
+						gl.drawElements(gl.LINE_LOOP, 3, gl.UNSIGNED_SHORT, i*3); // Fill.
+					}
+				}
+				else
+				{
+					gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.
 				}
 			}
-			else
-			{
-				gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.
-			}
-			
 			// Test Render wireframe if selected.*************************************************************
 			if (renderType === 1)
 			{
@@ -658,14 +662,14 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 				}
 			}
 			
-			if (vboKey.bindDataCustom(currentShader, vboMemManager, "altitudes"))
-			{
-				gl.uniform1i(currentShader.bExistAltitudes_loc, true);
-			}
-			else 
-			{
-				gl.uniform1i(currentShader.bExistAltitudes_loc, false);
-			}
+			//if (vboKey.bindDataCustom(currentShader, vboMemManager, "altitudes"))
+			//{
+			//	gl.uniform1i(currentShader.bExistAltitudes_loc, true);
+			//}
+			//else 
+			//{
+			//	gl.uniform1i(currentShader.bExistAltitudes_loc, false);
+			//}
 			
 			// Normals.
 			// todo:
@@ -1279,13 +1283,13 @@ TinTerrain.prototype.makeVbo = function(vboMemManager)
 	
 	// Aditional data.
 	// Altitudes.
-	if (this.altArray !== undefined)
-	{
-		var dimensions = 1;
-		var name = "altitudes";
-		var attribLoc = 3;
-		vboKey.setDataArrayCustom(this.altArray, vboMemManager, dimensions, name, attribLoc);
-	}
+	//if (this.altArray !== undefined)
+	//{
+	//	var dimensions = 1;
+	//	var name = "altitudes";
+	//	var attribLoc = 3;
+	//	vboKey.setDataArrayCustom(this.altArray, vboMemManager, dimensions, name, attribLoc);
+	//}
 	
 
 	// Make skirt.
@@ -1313,20 +1317,20 @@ TinTerrain.prototype.makeVbo = function(vboMemManager)
 	}
 	
 	// Altitudes for skirtData.
-	if (this.skirtAltitudesValuesArray)
-	{
-		var dimensions = 1;
-		var name = "altitudes";
-		var attribLoc = 3;
-		vboKeySkirt.setDataArrayCustom(this.skirtAltitudesValuesArray, vboMemManager, dimensions, name, attribLoc);
-	}
+	//if (this.skirtAltitudesValuesArray)
+	//{
+	//	var dimensions = 1;
+	//	var name = "altitudes";
+	//	var attribLoc = 3;
+	//	vboKeySkirt.setDataArrayCustom(this.skirtAltitudesValuesArray, vboMemManager, dimensions, name, attribLoc);
+	//}
 };
 
 TinTerrain.getSkirtTrianglesStrip = function(lonArray, latArray, altArray, texCoordsArray, southIndices, eastIndices, northIndices, westIndices, options)
 {
 	// Given "lonArray", "latArray" & "altArray", this function makes skirtCartesiansArray & skirtTexCoordsArray.***
 	// Note: skirtMesh is trianglesStrip, so, there are no indices.***
-	var skirtDepth = 5000.0;
+	var skirtDepth = 1000.0;
 	var texCorrectionFactor = 1.0;
 	if (options)
 	{
@@ -1349,13 +1353,17 @@ TinTerrain.getSkirtTrianglesStrip = function(lonArray, latArray, altArray, texCo
 	var skirtLatArray = new Float32Array(totalVertexCount * 2);
 	var skirtAltArray = new Float32Array(totalVertexCount * 2);
 	var skirtTexCoordsArray = new Float32Array(totalVertexCount * 4);
-	var skinAltitudes = new Float32Array(totalVertexCount * 4);
+	//var skinAltitudes = new Float32Array(totalVertexCount * 4);
 	var counter = 0;
 	
 	for (var j=0; j<westVertexCount; j++)
 	{
 		var idx = westIndices[j];
-		texCoordsArray[idx*2] += texCorrectionFactor/2;
+		
+		texCoordsArray[idx*2] += texCorrectionFactor;
+		//var texCoord_x = texCoordsArray[idx*2];
+		//var texCoord_y = texCoordsArray[idx*2+1];
+		
 		
 		skirtLonArray[counter] = lonArray[idx];
 		skirtLatArray[counter] = latArray[idx];
@@ -1363,7 +1371,7 @@ TinTerrain.getSkirtTrianglesStrip = function(lonArray, latArray, altArray, texCo
 		
 		skirtTexCoordsArray[counter*2] = texCoordsArray[idx*2];   // s.
 		skirtTexCoordsArray[counter*2+1] = texCoordsArray[idx*2+1]; // t.
-		skinAltitudes[counter] = altArray[idx];
+		//skinAltitudes[counter] = altArray[idx];
 		counter += 1;
 		
 		skirtLonArray[counter] = lonArray[idx];
@@ -1372,7 +1380,7 @@ TinTerrain.getSkirtTrianglesStrip = function(lonArray, latArray, altArray, texCo
 		
 		skirtTexCoordsArray[counter*2] = texCoordsArray[idx*2];   // s.
 		skirtTexCoordsArray[counter*2+1] = texCoordsArray[idx*2+1]; // t.
-		skinAltitudes[counter] = altArray[idx];
+		//skinAltitudes[counter] = altArray[idx];
 		counter += 1;
 
 	}
@@ -1380,7 +1388,10 @@ TinTerrain.getSkirtTrianglesStrip = function(lonArray, latArray, altArray, texCo
 	for (var j=0; j<southVertexCount; j++)
 	{
 		var idx = southIndices[j];
+		
 		texCoordsArray[idx*2+1] = (texCorrectionFactor);
+		//var texCoord_x = texCoordsArray[idx*2];
+		//var texCoord_y = texCoordsArray[idx*2+1]
 		
 		skirtLonArray[counter] = lonArray[idx];
 		skirtLatArray[counter] = latArray[idx];
@@ -1388,7 +1399,7 @@ TinTerrain.getSkirtTrianglesStrip = function(lonArray, latArray, altArray, texCo
 		
 		skirtTexCoordsArray[counter*2] = texCoordsArray[idx*2];   // s.
 		skirtTexCoordsArray[counter*2+1] = texCoordsArray[idx*2+1]; // t.
-		skinAltitudes[counter] = altArray[idx];
+		//skinAltitudes[counter] = altArray[idx];
 		counter += 1;
 		
 		skirtLonArray[counter] = lonArray[idx];
@@ -1397,14 +1408,17 @@ TinTerrain.getSkirtTrianglesStrip = function(lonArray, latArray, altArray, texCo
 		
 		skirtTexCoordsArray[counter*2] = texCoordsArray[idx*2];   // s.
 		skirtTexCoordsArray[counter*2+1] = texCoordsArray[idx*2+1]; // t.
-		skinAltitudes[counter] = altArray[idx];
+		//skinAltitudes[counter] = altArray[idx];
 		counter += 1;
 	}
 	
 	for (var j=0; j<eastVertexCount; j++)
 	{
 		var idx = eastIndices[j];
-		texCoordsArray[idx*2] -= texCorrectionFactor/2;
+		
+		texCoordsArray[idx*2] -= texCorrectionFactor;
+		var texCoord_x = texCoordsArray[idx*2];
+		var texCoord_y = texCoordsArray[idx*2+1];
 		
 		skirtLonArray[counter] = lonArray[idx];
 		skirtLatArray[counter] = latArray[idx];
@@ -1412,7 +1426,7 @@ TinTerrain.getSkirtTrianglesStrip = function(lonArray, latArray, altArray, texCo
 		
 		skirtTexCoordsArray[counter*2] = texCoordsArray[idx*2];   // s.
 		skirtTexCoordsArray[counter*2+1] = texCoordsArray[idx*2+1]; // t.
-		skinAltitudes[counter] = altArray[idx];
+		//skinAltitudes[counter] = altArray[idx];
 		counter += 1;
 		
 		skirtLonArray[counter] = lonArray[idx];
@@ -1421,14 +1435,18 @@ TinTerrain.getSkirtTrianglesStrip = function(lonArray, latArray, altArray, texCo
 		
 		skirtTexCoordsArray[counter*2] = texCoordsArray[idx*2];   // s.
 		skirtTexCoordsArray[counter*2+1] = texCoordsArray[idx*2+1]; // t.
-		skinAltitudes[counter] = altArray[idx];
+		//skinAltitudes[counter] = altArray[idx];
 		counter += 1;
 	}
 	
 	for (var j=0; j<northVertexCount; j++)
 	{
 		var idx = northIndices[j];
+		
+		
 		texCoordsArray[idx*2+1] = (1-texCorrectionFactor);
+		//var texCoord_x = texCoordsArray[idx*2];
+		//var texCoord_y = texCoordsArray[idx*2+1];
 		
 		skirtLonArray[counter] = lonArray[idx];
 		skirtLatArray[counter] = latArray[idx];
@@ -1436,7 +1454,7 @@ TinTerrain.getSkirtTrianglesStrip = function(lonArray, latArray, altArray, texCo
 		
 		skirtTexCoordsArray[counter*2] = texCoordsArray[idx*2];   // s.
 		skirtTexCoordsArray[counter*2+1] = texCoordsArray[idx*2+1]; // t.
-		skinAltitudes[counter] = altArray[idx];
+		//skinAltitudes[counter] = altArray[idx];
 		counter += 1;
 		
 		skirtLonArray[counter] = lonArray[idx];
@@ -1445,17 +1463,16 @@ TinTerrain.getSkirtTrianglesStrip = function(lonArray, latArray, altArray, texCo
 		
 		skirtTexCoordsArray[counter*2] = texCoordsArray[idx*2];   // s.
 		skirtTexCoordsArray[counter*2+1] = texCoordsArray[idx*2+1]; // t.
-		skinAltitudes[counter] = altArray[idx];
+		//skinAltitudes[counter] = altArray[idx];
 		counter += 1;
 	}
 	
 	var skirtCartesiansArray = Globe.geographicRadianArrayToFloat32ArrayWgs84(skirtLonArray, skirtLatArray, skirtAltArray, undefined);
 	
 	var resultObject = {
-		skirtCartesiansArray      : skirtCartesiansArray,
-		skirtTexCoordsArray       : skirtTexCoordsArray,
-		skirtAltitudesArray       : skirtAltArray,
-		skirtAltitudesValuesArray : skinAltitudes
+		skirtCartesiansArray : skirtCartesiansArray,
+		skirtTexCoordsArray  : skirtTexCoordsArray,
+		skirtAltitudesArray  : skirtAltArray
 	};
 	
 	return resultObject;
@@ -1765,11 +1782,13 @@ TinTerrain.prototype.decodeData = function(imageryType)
 		// Flip texCoordY for minT & maxT.***
 		minT = 1.0 - minT;
 		maxT = 1.0 - maxT;
+
 		
-		//var texCorrectionFactor = 0.0005;
-		var texCorrectionFactor = 0.003 + (depth * 0.0000001);
-		//var texCorrectionFactor = 0.002 + (1/(depth+1) * 0.008);
-	
+
+		var test_min_s;
+		var test_max_s;
+		var test_min_t;
+		var test_max_t;
 		for (var i=0; i<vertexCount; i++)
 		{
 			lonArray[i] = minLon + uValues[i]*lonRangeDivShortMax;
@@ -1815,6 +1834,10 @@ TinTerrain.prototype.decodeData = function(imageryType)
 	this.cartesiansArray = Globe.geographicRadianArrayToFloat32ArrayWgs84(lonArray, latArray, altArray, this.cartesiansArray);
 	
 	//this.normalsArray = TinTerrain.getNormalCartesiansArray(this.cartesiansArray, this.indices, undefined, undefined);
+	//if (this.depth === 17 && this.X === 111517 && this.Y === 52705)
+	//{ var hola = 0; }
+
+	var texCorrectionFactor = this.tinTerrainManager.getTexCorrection(depth);
 	
 	var options = {
 		skirtDepth          : 50000,
@@ -1824,7 +1847,7 @@ TinTerrain.prototype.decodeData = function(imageryType)
 	this.skirtCartesiansArray = skirtResultObject.skirtCartesiansArray;
 	this.skirtTexCoordsArray = skirtResultObject.skirtTexCoordsArray;
 	this.skirtAltitudesArray = skirtResultObject.skirtAltitudesArray;
-	this.skirtAltitudesValuesArray = skirtResultObject.skirtAltitudesValuesArray;
+	//this.skirtAltitudesValuesArray = skirtResultObject.skirtAltitudesValuesArray;
 	
 	// free memory.
 	//this.uValues = undefined; // keep values to make altitudesMap.

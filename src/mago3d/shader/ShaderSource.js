@@ -3796,7 +3796,7 @@ void main()\n\
 		}\n\
 		// End test dem image.---\n\
 		\n\
-		if(bExistAltitudes && altitude < 0.001)\n\
+		if(altitude < 0.0)\n\
 		{\n\
 			float minHeight_rainbow = -80.0;\n\
 			float maxHeight_rainbow = 0.0;\n\
@@ -3810,8 +3810,9 @@ void main()\n\
 		\n\
 		\n\
 		vec4 finalColor = mix(textureColor, fogColor, fogAmount); \n\
-		gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian, 1.0);\n\
-		//gl_FragColor = vec4(vNormal.xyz, 1.0);\n\
+		gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian, 1.0); // original.***\n\
+		//gl_FragColor = textureColor; // test.***\n\
+		//gl_FragColor = vec4(vNormal.xyz, 1.0); // test.***\n\
 		\n\
 		//if(currSunIdx > 0.0 && currSunIdx < 1.0 && shadow_occlusion<0.9)gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n\
 	}\n\
