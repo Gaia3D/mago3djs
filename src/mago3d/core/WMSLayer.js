@@ -24,18 +24,19 @@ var WMSLayer = function(options)
 	}
 };
 WMSLayer.DEAFULT_PARAM = {
-	service : 'WMS',
-	version : '1.3.0',
-	request : 'GetMap',
-	srs     : 'EPSG:4326',
-	crs     : 'EPSG:4326',
-	width   : 256,
-	height  : 256,
-	format  : 'image/png'
+	service     : 'WMS',
+	version     : '1.1.1',
+	request     : 'GetMap',
+	srs         : 'EPSG:4326',
+	crs         : 'EPSG:4326',
+	width       : 256,
+	height      : 256,
+	format      : 'image/png',
+	transparent : true
 };
 WMSLayer.prototype.getUrl = function(info) 
 {
-	var rectangle = SmartTile.getGeographicExtentOfTileLXY(parseInt(info.z), parseInt(info.x), parseInt(info.y), CODE.imageryType.WEB_MERCATOR);
+	var rectangle = SmartTile.getGeographicExtentOfTileLXY(parseInt(info.z), parseInt(info.x), parseInt(info.y), undefined, CODE.imageryType.WEB_MERCATOR);
 
 	var minGeographicCoord = rectangle.minGeographicCoord;
 	var maxGeographicCoord = rectangle.maxGeographicCoord;

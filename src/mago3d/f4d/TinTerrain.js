@@ -511,6 +511,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 				var activeTexturesLayers = new Int32Array([1, 1, 0, 0, 0, 0, 0, 0]);
 				gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
 				gl.uniform1f(currentShader.externalAlpha_loc, 1);
+				gl.uniform2fv(currentShader.uMinMaxAltitudes_loc, [this.minHeight[0], this.maxHeight[0]]);
 
 				var textureKeys = Object.keys(this.texture);
 				var textureLength = textureKeys.length; 
@@ -520,7 +521,15 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 					var texture = this.texture[textureKeys[i]];
 					gl.bindTexture(gl.TEXTURE_2D, texture.texId);
 					
-					activeTexturesLayers[2+i] = 1;
+					if (i === 1)
+					{
+						// Test to use image as DEM map.
+						activeTexturesLayers[2+i] = 10;
+					}
+					else 
+					{
+						activeTexturesLayers[2+i] = 1;
+					}
 				}	
 
 				gl.uniform1iv(currentShader.uActiveTextures_loc, activeTexturesLayers);
@@ -953,12 +962,8 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 	var maxLon = this.geographicExtent.maxGeographicCoord.longitude * degToRadFactor;
 	var maxLat = this.geographicExtent.maxGeographicCoord.latitude * degToRadFactor;
 	
-	// Test.*******************************************************************************
-	//var minLon = -60 * degToRadFactor;
-	//var minLat = -45 * degToRadFactor;
-	//var maxLon = -45 * degToRadFactor;
-	//var maxLat = -20 * degToRadFactor;
-	// End test.----------------------------------------------------------------------------
+	this.minHeight = new Float32Array(0); 
+	this.maxHeight = new Float32Array(0); 
 	
 	var lonRange = maxLon - minLon;
 	var latRange = maxLat - minLat;
@@ -1064,25 +1069,6 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 	}
 	
 	this.cartesiansArray = Globe.geographicRadianArrayToFloat32ArrayWgs84(lonArray, latArray, altArray, this.cartesiansArray);
-	
-	
-	// test code.**************************************
-	/*
-	var pointArrayAux = [];
-	var radToDegFactor = 180.0/Math.PI;
-	var coordsCount = this.cartesiansArray.length/3;
-	for (var i=0; i<coordsCount; i++)
-	{
-		var x = this.cartesiansArray[i*3];
-		var y = this.cartesiansArray[i*3+1];
-		var z = this.cartesiansArray[i*3+2];
-		
-		var pointAux = new Point3D(x, y, z);
-		pointArrayAux.push(pointAux);
-		
-	}
-	*/
-	// end test code.----------------------------------
 	
 	
 	// Make normals using the cartesians.***
@@ -1375,8 +1361,8 @@ TinTerrain.getSkirtTrianglesStrip = function(lonArray, latArray, altArray, texCo
 		skirtLatArray[counter] = latArray[idx];
 		skirtAltArray[counter] = altArray[idx];
 		
-		skirtTexCoordsArray[counter] = texCoordsArray[idx*2];   // s.
-		skirtTexCoordsArray[counter] = texCoordsArray[idx*2+1]; // t.
+		skirtTexCoordsArray[counter*2] = texCoordsArray[idx*2];   // s.
+		skirtTexCoordsArray[counter*2+1] = texCoordsArray[idx*2+1]; // t.
 		skinAltitudes[counter] = altArray[idx];
 		counter += 1;
 		
@@ -1384,8 +1370,8 @@ TinTerrain.getSkirtTrianglesStrip = function(lonArray, latArray, altArray, texCo
 		skirtLatArray[counter] = latArray[idx];
 		skirtAltArray[counter] = altArray[idx]-skirtDepth;
 		
-		skirtTexCoordsArray[counter] = texCoordsArray[idx*2];   // s.
-		skirtTexCoordsArray[counter] = texCoordsArray[idx*2+1]; // t.
+		skirtTexCoordsArray[counter*2] = texCoordsArray[idx*2];   // s.
+		skirtTexCoordsArray[counter*2+1] = texCoordsArray[idx*2+1]; // t.
 		skinAltitudes[counter] = altArray[idx];
 		counter += 1;
 
@@ -1400,8 +1386,8 @@ TinTerrain.getSkirtTrianglesStrip = function(lonArray, latArray, altArray, texCo
 		skirtLatArray[counter] = latArray[idx];
 		skirtAltArray[counter] = altArray[idx];
 		
-		skirtTexCoordsArray[counter] = texCoordsArray[idx*2];   // s.
-		skirtTexCoordsArray[counter] = texCoordsArray[idx*2+1]; // t.
+		skirtTexCoordsArray[counter*2] = texCoordsArray[idx*2];   // s.
+		skirtTexCoordsArray[counter*2+1] = texCoordsArray[idx*2+1]; // t.
 		skinAltitudes[counter] = altArray[idx];
 		counter += 1;
 		
@@ -1409,8 +1395,8 @@ TinTerrain.getSkirtTrianglesStrip = function(lonArray, latArray, altArray, texCo
 		skirtLatArray[counter] = latArray[idx];
 		skirtAltArray[counter] = altArray[idx]-skirtDepth;
 		
-		skirtTexCoordsArray[counter] = texCoordsArray[idx*2];   // s.
-		skirtTexCoordsArray[counter] = texCoordsArray[idx*2+1]; // t.
+		skirtTexCoordsArray[counter*2] = texCoordsArray[idx*2];   // s.
+		skirtTexCoordsArray[counter*2+1] = texCoordsArray[idx*2+1]; // t.
 		skinAltitudes[counter] = altArray[idx];
 		counter += 1;
 	}
@@ -1424,8 +1410,8 @@ TinTerrain.getSkirtTrianglesStrip = function(lonArray, latArray, altArray, texCo
 		skirtLatArray[counter] = latArray[idx];
 		skirtAltArray[counter] = altArray[idx];
 		
-		skirtTexCoordsArray[counter] = texCoordsArray[idx*2];   // s.
-		skirtTexCoordsArray[counter] = texCoordsArray[idx*2+1]; // t.
+		skirtTexCoordsArray[counter*2] = texCoordsArray[idx*2];   // s.
+		skirtTexCoordsArray[counter*2+1] = texCoordsArray[idx*2+1]; // t.
 		skinAltitudes[counter] = altArray[idx];
 		counter += 1;
 		
@@ -1433,8 +1419,8 @@ TinTerrain.getSkirtTrianglesStrip = function(lonArray, latArray, altArray, texCo
 		skirtLatArray[counter] = latArray[idx];
 		skirtAltArray[counter] = altArray[idx]-skirtDepth;
 		
-		skirtTexCoordsArray[counter] = texCoordsArray[idx*2];   // s.
-		skirtTexCoordsArray[counter] = texCoordsArray[idx*2+1]; // t.
+		skirtTexCoordsArray[counter*2] = texCoordsArray[idx*2];   // s.
+		skirtTexCoordsArray[counter*2+1] = texCoordsArray[idx*2+1]; // t.
 		skinAltitudes[counter] = altArray[idx];
 		counter += 1;
 	}
@@ -1448,8 +1434,8 @@ TinTerrain.getSkirtTrianglesStrip = function(lonArray, latArray, altArray, texCo
 		skirtLatArray[counter] = latArray[idx];
 		skirtAltArray[counter] = altArray[idx];
 		
-		skirtTexCoordsArray[counter] = texCoordsArray[idx*2];   // s.
-		skirtTexCoordsArray[counter] = texCoordsArray[idx*2+1]; // t.
+		skirtTexCoordsArray[counter*2] = texCoordsArray[idx*2];   // s.
+		skirtTexCoordsArray[counter*2+1] = texCoordsArray[idx*2+1]; // t.
 		skinAltitudes[counter] = altArray[idx];
 		counter += 1;
 		
@@ -1457,8 +1443,8 @@ TinTerrain.getSkirtTrianglesStrip = function(lonArray, latArray, altArray, texCo
 		skirtLatArray[counter] = latArray[idx];
 		skirtAltArray[counter] = altArray[idx]-skirtDepth;
 		
-		skirtTexCoordsArray[counter] = texCoordsArray[idx*2];   // s.
-		skirtTexCoordsArray[counter] = texCoordsArray[idx*2+1]; // t.
+		skirtTexCoordsArray[counter*2] = texCoordsArray[idx*2];   // s.
+		skirtTexCoordsArray[counter*2+1] = texCoordsArray[idx*2+1]; // t.
 		skinAltitudes[counter] = altArray[idx];
 		counter += 1;
 	}
@@ -1750,7 +1736,7 @@ TinTerrain.prototype.decodeData = function(imageryType)
 	var vValues = this.vValues;
 	var hValues = this.hValues;
 	
-	var exageration = 2.0;
+	var exageration = 5.0;
 	
 	if (this.depth === 0)
 	{ var hola = 0; }

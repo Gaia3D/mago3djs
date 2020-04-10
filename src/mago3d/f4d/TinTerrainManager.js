@@ -37,7 +37,8 @@ var TinTerrainManager = function(options)
 	//this.imageryType = CODE.imageryType.CRS84; // Test.***
 	
 	this.imagerys = [new XYZLayer({url: 'https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'}),
-					 new XYZLayer({url: 'https://services.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'})];
+		new WMSLayer({url: 'http://192.168.10.98:8080/geoserver/mago3d/wms', minZoom: 3, param: {layers: 'mago3d:15m_susim', tiled: true}})];
+	// new XYZLayer({url: 'https://services.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'})];
 	//this.imagerys = [new WMSLayer({url: 'http://192.168.10.9:8080/geoserver/mago3d/wms', param: {layers: 'mago3d:gangseogu_5m'}})];
 
 	this.init();
@@ -277,7 +278,13 @@ TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager)
 
 TinTerrainManager.prototype.getAltitudes = function(geoCoordsArray, resultGeoCoordsArray) 
 {
-	//
+	var geoCoordsCount = geoCoordsArray.length;
+	for (var i=0; i<geoCoordsCount; i++)
+	{
+		var geoCoord = geoCoordsArray[i];
+		
+		//this.visibleTilesArray
+	}
 };
 
 TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, shader) 
