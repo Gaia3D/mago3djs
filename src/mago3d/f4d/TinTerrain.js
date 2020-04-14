@@ -258,11 +258,22 @@ TinTerrain.prototype.isTexturePrepared = function()
 	var isTexturePrepared = true;
 	var textureKeys = Object.keys(this.texture);
 	var textureLength = textureKeys.length;
-	
-	if (textureLength === 0 || this.tinTerrainManager.imagerys.length !== textureLength) 
+
+	var L = this.depth.toString();
+	var imageryLength = this.tinTerrainManager.imagerys.length;
+	for (var i=0;i<imageryLength;i++) 
 	{
-		return false;
+		var imagery = this.tinTerrainManager.imagerys[i];
+		if (!this.texture[imagery._id] && (imagery.show && imagery.maxZoom > parseInt(L) && imagery.minZoom < parseInt(L))) 
+		{
+			isTexturePrepared = false;
+			break;
+		}
 	}
+	if (!isTexturePrepared) { return isTexturePrepared; }
+
+	//if (!imagery.show || imagery.maxZoom < parseInt(L) || imagery.minZoom > parseInt(L)) { continue; }
+	
 	for (var i=0;i<textureLength;i++) 
 	{
 		var texture = this.texture[textureKeys[i]];
@@ -317,23 +328,8 @@ TinTerrain.prototype.prepareTexture = function(magoManager, tinTerrainManager)
 		this.texture[id] = texture;
 		this.texture[id].imagery = imagery;
 
-		magoManager.processQueue.addTextureId(id);
-	}
-	var textureKeys = Object.keys(this.texture);
-	if(textureKeys > imagerys.length) {
-		magoManager.processQueue.eraseTexture(this.texture);
-	}
-		
-	//var textureFilePath = "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/" + L + "/" + Y + "/" + X;
-	//var textureFilePath = "https://services.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer/tile/" + L + "/" + Y + "/" + X + ".png";
-	//var textureFilePath = "https://services.arcgisonline.com/arcgis/rest/services/World_Physical_Map/MapServer/tile/" + L + "/" + Y + "/" + X + ".png"; // low res.
-	//var textureFilePath = "https://services.arcgisonline.com/arcgis/rest/services/NatGeo_World_Map/MapServer/tile/" + L + "/" + Y + "/" + X + ".png"; // low res.
-	//var textureFilePath = "https://c.tile.openstreetmap.org/" + L + "/" + X + "/" + Y + ".png";
-	
-	// Provisionally, for debug, save textureFilePath.***
-	//this.texFilePath__TEST = textureFilePath;
-	//var flip_y_texCoords = false;
-	//magoManager.readerWriter.loadWMSImage(gl, textureFilePath, this.texture, magoManager, flip_y_texCoords);
+		tinTerrainManager.addTextureId(id);
+	}	
 };
 
 TinTerrain.prototype.prepareTinTerrainPlain = function(magoManager, tinTerrainManager)
@@ -515,34 +511,39 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 				gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 				gl.uniform4fv(currentShader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
 			}
-			
-			// Test.******************************************************************************************
-			if (renderType === 1)
+			else if (renderType === 1)
 			{
+				var activeTexturesLayers = new Int32Array([1, 1, 0, 0, 0, 0, 0, 0]);
 				gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
 				gl.uniform1f(currentShader.externalAlpha_loc, 1);
-				//var currSelObject = magoManager.selectionManager.getSelectedGeneral();
-				//if (currSelObject === this)
-				//{
-				//	gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
-				//	gl.uniform4fv(currentShader.oneColor4_loc, [0.8, 0.3, 0.1, 1.0]);
+
+				var textureKeys = Object.keys(this.texture);
+				var textureLength = textureKeys.length; 
+				for (var i=0;i<textureLength;i++) 
+				{
+					var textureKey = textureKeys[i];
+					var texture = this.texture[textureKey];
+					if (this.tinTerrainManager.textureIdDeleteMap[textureKey]) 
+					{
+						this.tinTerrainManager.eraseTexture(texture, magoManager);
+						delete this.texture[textureKey];
+						continue;
+					}
 					
+					if (!texture.imagery.show) { continue; }
+
+					gl.activeTexture(gl.TEXTURE2 + i); 
+					gl.bindTexture(gl.TEXTURE_2D, texture.texId);
+					
+					activeTexturesLayers[2+i] = 1;
+				}	
+
+				gl.uniform1iv(currentShader.uActiveTextures_loc, activeTexturesLayers);
 			}
-			// End test.--------------------------------------------------------------------------------------
-			
 
 			// render this tinTerrain.
 			var renderWireframe = false;
 			var vboMemManager = magoManager.vboMemoryManager;
-			
-			var textureKeys = Object.keys(this.texture);
-			var textureLength = textureKeys.length; 
-			for (var i=0;i<textureLength;i++) 
-			{
-				var texture = this.texture[textureKeys[i]];
-				if (!texture.imagery.show) { continue; }
-				gl.bindTexture(gl.TEXTURE_2D, texture.texId);
-			}
 			
 			gl.uniform3fv(currentShader.buildingPosHIGH_loc, this.terrainPositionHIGH);
 			gl.uniform3fv(currentShader.buildingPosLOW_loc, this.terrainPositionLOW);
@@ -1634,6 +1635,14 @@ TinTerrain.prototype.makeAltitudesMap = function(magoManager)
 	var indices = this.indices;
 	
 	// Make VBO.
+	var test_maxUValue;
+	var test_maxVValue;
+	var test_maxHValue;
+	
+	var test_minUValue;
+	var test_minVValue;
+	var test_minHValue;
+	
 	var shortMax = 32767;
 	var vertexCount = uValues.length;
 	var cartesiansArray = new Float32Array(vertexCount*3);
@@ -1642,6 +1651,35 @@ TinTerrain.prototype.makeAltitudesMap = function(magoManager)
 		cartesiansArray[i*3] = uValues[i]/shortMax;
 		cartesiansArray[i*3+1] = vValues[i]/shortMax;
 		cartesiansArray[i*3+2] = hValues[i]/shortMax;
+		
+		// Test to debug.
+		if (i === 0)
+		{
+			test_maxUValue = cartesiansArray[i*3];
+			test_maxVValue = cartesiansArray[i*3+1];
+			test_maxHValue = cartesiansArray[i*3+2];
+			
+			test_minUValue = cartesiansArray[i*3];
+			test_minVValue = cartesiansArray[i*3+1];
+			test_minHValue = cartesiansArray[i*3+2];
+		}
+		else
+		{
+			if (cartesiansArray[i*3] < test_minUValue)
+			{ test_minUValue = cartesiansArray[i*3]; }
+			else if (cartesiansArray[i*3] > test_maxUValue)
+			{ test_maxUValue = cartesiansArray[i*3]; }
+				
+			if (cartesiansArray[i*3+1] < test_minVValue)
+			{ test_minVValue = cartesiansArray[i*3+1]; }
+			else if (cartesiansArray[i*3+1] > test_maxVValue)
+			{ test_maxVValue = cartesiansArray[i*3+1]; }
+				
+			if (cartesiansArray[i*3+2] < test_minHValue)
+			{ test_minHValue = cartesiansArray[i*3+2]; }
+			else if (cartesiansArray[i*3+2] > test_maxHValue)
+			{ test_maxHValue = cartesiansArray[i*3+2]; }
+		}
 	}
 	
 	if (this.vboKeyContainerAltitudes === undefined)
@@ -1656,6 +1694,16 @@ TinTerrain.prototype.makeAltitudesMap = function(magoManager)
 	
 	// Indices. 
 	// For indices use the tinTerrain VBO indices.
+	
+	// Calculate the modelViewProjectionMatrix.
+	var mvMat = new Matrix4();
+	var ortho = new Matrix4();
+	this.altitudesMapMVPMat = new Matrix4();
+	var nRange = 1.0;
+	var left = -nRange, right = nRange, bottom = -nRange, top = nRange, near = -depthFactor*nRange, far = depthFactor*nRange;
+	ortho._floatArrays = glMatrix.mat4.ortho(ortho._floatArrays, left, right, bottom, top, near, far);
+	
+	this.altitudesMapMVPMat = mvMat.getMultipliedByMatrix(ortho, this.altitudesMapMVPMat);
 	
 	// Now render.
 	this.altitudesFbo.bind();
@@ -1718,13 +1766,7 @@ TinTerrain.prototype.decodeData = function(imageryType)
 	var hValues = this.hValues;
 	
 	var exageration = 2.0;
-	
-	if (this.depth === 0)
-	{ var hola = 0; }
 
-	if (this.depth === 1)
-	{ var hola = 0; }
-	
 	if (imageryType === undefined)
 	{ imageryType = CODE.imageryType.CRS84; }
 	
@@ -1746,7 +1788,10 @@ TinTerrain.prototype.decodeData = function(imageryType)
 		// Flip texCoordY for minT & maxT.***
 		minT = 1.0 - minT;
 		maxT = 1.0 - maxT;
-		
+		if (depth > 6) 
+		{
+			var hola=0;
+		}
 		//var texCorrectionFactor = 0.0005;
 		var texCorrectionFactor = 0.003 + (depth * 0.0000001);
 		//var texCorrectionFactor = 0.002 + (1/(depth+1) * 0.008);
@@ -1822,8 +1867,70 @@ TinTerrain.prototype.decodeData = function(imageryType)
 
 TinTerrain.prototype.parseData = function(dataArrayBuffer)
 {
+	var that = this;
 	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
-	var bytes_readed = 0;
+	if (!this.tinTerrainManager.worker) { this.tinTerrainManager.worker = new Worker('/build/mago3d/worker/workerParseTerrain.js'); }
+	this.tinTerrainManager.worker.postMessage({test: dataArrayBuffer, info: {x: this.X, y: this.Y, z: this.depth}});
+	
+	this.tinTerrainManager.worker.onmessage = function(e)
+	{
+		var result = e.data.tt;
+		that.centerX = result.centerX;
+		that.centerY = result.centerY;
+		that.centerZ = result.centerZ;
+		
+		that.minHeight = result.minHeight;
+		that.maxHeight = result.maxHeight;
+		
+		// In this moment set the altitudes for the geographicExtension.
+		that.geographicExtent.setExtent(undefined, undefined, that.minHeight[0], undefined, undefined, that.maxHeight[0]);
+		
+		that.boundingSphereCenterX = result.boundingSphereCenterX;
+		that.boundingSphereCenterY = result.boundingSphereCenterY;
+		that.boundingSphereCenterZ = result.boundingSphereCenterZ;
+		that.boundingSphereRadius = result.boundingSphereRadius;
+		
+		that.horizonOcclusionPointX = result.horizonOcclusionPointX;
+		that.horizonOcclusionPointY = result.horizonOcclusionPointY;
+		that.horizonOcclusionPointZ = result.horizonOcclusionPointZ;
+		
+		// 2. vertex data.
+		that.vertexCount = result.vertexCount;
+		that.uValues = result.uValues;
+		that.vValues = result.vValues;
+		that.hValues = result.hValues;
+		
+		// 3. indices.
+		that.trianglesCount = result.trianglesCount;
+		that.indices = result.indices;
+		
+		// 4. edges indices.
+		that.westVertexCount = result.westVertexCount;
+		that.westIndices = result.westIndices;
+		
+		that.southVertexCount = result.southVertexCount;
+		that.southIndices = result.southIndices;
+		
+		that.eastVertexCount = result.eastVertexCount; 
+		that.eastIndices = result.eastIndices;
+		
+		that.northVertexCount = result.northVertexCount;
+		that.northIndices = result.northIndices;
+
+		// 5. extension header.
+		that.extensionId = result.extensionId;
+		that.extensionLength = result.extensionLength;
+		
+		that.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
+		
+		if (that.extensionId.length === 0)
+		{
+			dataArrayBuffer = undefined;
+		}
+		
+		dataArrayBuffer = undefined;
+	};
+	/*var bytes_readed = 0;
 	
 	// 1. header.
 	this.centerX = new Float64Array(dataArrayBuffer.slice(bytes_readed, bytes_readed+8)); bytes_readed+=8;
@@ -1935,7 +2042,7 @@ TinTerrain.prototype.parseData = function(dataArrayBuffer)
 		return;
 	}
 	
-	dataArrayBuffer = undefined;
+	dataArrayBuffer = undefined;*/
 };
 
 

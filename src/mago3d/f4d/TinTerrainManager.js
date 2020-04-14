@@ -10,7 +10,7 @@ var TinTerrainManager = function(options)
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	this.maxDepth = 17;
+	this.maxDepth = 18;
 	this.currentVisibles_terrName_geoCoords_map = {}; // current visible terrains map[terrainPathName, geographicCoords].
 	this.currentTerrainsMap = {}; // current terrains (that was created) map[terrainPathName, tinTerrain].
 	
@@ -27,7 +27,7 @@ var TinTerrainManager = function(options)
 	// Elevation model or plain ellipsoid.
 	// terrainType = 0 -> terrainPlainModel.
 	// terrainType = 1 -> terrainElevationModel.
-	this.terrainType = 0; 
+	this.terrainType = 1; 
 	//CODE.imageryType = {
 	//"UNKNOWN"      : 0,
 	//"CRS84"        : 1,
@@ -35,9 +35,10 @@ var TinTerrainManager = function(options)
 	//};
 	this.imageryType = CODE.imageryType.WEB_MERCATOR; // Test.***
 	//this.imageryType = CODE.imageryType.CRS84; // Test.***
-	
-	//this.imagerys = [];
 	this.imagerys = [];
+
+	this.textureIdCntMap = {};
+	this.textureIdDeleteMap = {};
 
 	this.init();
 	this.makeTinTerrainWithDEMIndex(); // provisional.
@@ -281,7 +282,6 @@ TinTerrainManager.prototype.getAltitudes = function(geoCoordsArray, resultGeoCoo
 
 TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, shader) 
 {
-	
 	var gl = magoManager.sceneState.gl;
 	var currentShader;
 	if (shader)
@@ -302,18 +302,23 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	//gl.disableVertexAttribArray(currentShader.color4_loc);
 	
 	currentShader.bindUniformGenerals();
-
-	var tex = magoManager.texturesStore.getTextureAux1x1(); // provisional.
-	gl.activeTexture(gl.TEXTURE2); 
-	gl.bindTexture(gl.TEXTURE_2D, tex.texId);
-
 	
+	for (var i=0; i<8; i++)
+	{
+		gl.activeTexture(gl.TEXTURE0+i); 
+		gl.bindTexture(gl.TEXTURE_2D, null);
+	}
+
 	if (this.identityMat === undefined)
 	{ this.identityMat = new Matrix4(); }
 	
 	gl.uniform1i(currentShader.bIsMakingDepth_loc, bDepth); //.
 	if (renderType === 1)
 	{
+		var tex = magoManager.texturesStore.getTextureAux1x1(); // provisional.
+		gl.activeTexture(gl.TEXTURE2); 
+		gl.bindTexture(gl.TEXTURE_2D, tex.texId);
+	
 		var textureAux1x1 = magoManager.texturesStore.getTextureAux1x1();
 		var noiseTexture = magoManager.texturesStore.getNoiseTexture4x4();
 		
@@ -349,13 +354,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 				gl.uniform1i(currentShader.sunIdx_loc, 1);
 			}
 			
-			//var sunTexLoc = gl.getUniformLocation(currentShader.program, 'shadowMapTex');
-			//gl.uniform1i(sunTexLoc, 3);
-			
-			//var sunTex2Loc = gl.getUniformLocation(currentShader.program, 'shadowMapTex2');
-			//gl.uniform1i(sunTex2Loc, 4);
-			
-			gl.activeTexture(gl.TEXTURE3); 
+			gl.activeTexture(gl.TEXTURE0); 
 			if (bApplyShadow && sunLight.depthFbo)
 			{
 				var sunLight = sunSystem.getLight(0);
@@ -366,7 +365,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 				gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
 			}
 			
-			gl.activeTexture(gl.TEXTURE4); 
+			gl.activeTexture(gl.TEXTURE1); 
 			if (bApplyShadow && sunLight.depthFbo)
 			{
 				var sunLight = sunSystem.getLight(1);
@@ -376,6 +375,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 			{
 				gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
 			}
+			
 		}
 
 		
@@ -452,4 +452,54 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	currentShader.disableVertexAttribArray(currentShader.normal3_loc); 
 	currentShader.disableVertexAttribArray(currentShader.color4_loc); 
 	gl.useProgram(null);
+};
+/**
+ * 텍스처 등록 갯수 관리
+ * @param {number} textureId
+ */
+TinTerrainManager.prototype.addTextureId = function(textureId) 
+{
+	if (!this.textureIdCntMap[textureId]) 
+	{
+		this.textureIdCntMap[textureId] = 0;
+	}
+	this.textureIdCntMap[textureId] += 1;
+};
+/**
+ * 텍스처 제거 목록 등록
+ * @param {number} textureId
+ */
+TinTerrainManager.prototype.addDeleteTextureId = function(textureId) 
+{
+	if (!this.textureIdDeleteMap[textureId]) 
+	{
+		this.textureIdDeleteMap[textureId] = 0;
+	}
+	this.textureIdDeleteMap[textureId] += 1;
+};
+/**
+ * 텍스처 제거 맵에 등록된 텍스처를 제거
+ * @param {Texture} texture
+ */
+TinTerrainManager.prototype.eraseTexture = function(texture, magoManager)
+{
+	var gl = magoManager.sceneState.gl;
+	
+	var id = texture.imagery._id;
+	texture.deleteObjects(gl);
+	this.addDeleteTextureId(id);
+
+	this.clearMap(id);
+};
+/**
+ * 텍스처 제거 맵에 등록된 텍스처를 제거
+ * @param {Texture} texture
+ */
+TinTerrainManager.prototype.clearMap = function(id)
+{
+	if (this.textureIdDeleteMap[id] === this.textureIdCntMap[id]) 
+	{
+		delete this.textureIdDeleteMap[id];
+		delete this.textureIdCntMap[id];
+	}
 };

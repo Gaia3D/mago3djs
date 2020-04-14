@@ -58,6 +58,7 @@ var Mago3d = function(containerId, serverPolicy, callback, options, legacyViewer
 	var magoManagerState = CODE.magoManagerState.INIT;
 	//this.emit('loadstart', this);
 
+	serverPolicy = validPolicy(serverPolicy);
 	var viewerInitializer;
 
 	if (serverPolicy.basicGlobe === Constant.CESIUM) 
@@ -120,6 +121,38 @@ var Mago3d = function(containerId, serverPolicy, callback, options, legacyViewer
 	this.emit('loadend', returnObj);
 
 	return returnObj;
+
+	function validPolicy(policy) 
+	{
+		var defaultPolicy = {};
+		defaultPolicy.basicGlobe = Constant.CESIUM;
+		defaultPolicy.online = true;
+		defaultPolicy.lod0 = 15;
+		defaultPolicy.lod1 = 60;
+		defaultPolicy.lod2 = 90;
+		defaultPolicy.lod3 = 200;
+		defaultPolicy.lod4 = 1000;
+		defaultPolicy.lod5 = 50000;
+		defaultPolicy.ssaoRadius = 0.15;
+		defaultPolicy.initDefaultFov = 1;
+		defaultPolicy.maxPartitionsLod0 = 8;
+		defaultPolicy.maxPartitionsLod1 = 4;
+		defaultPolicy.maxPartitionsLod2OrLess = 2;
+		defaultPolicy.maxRatioPointsDist0m = 1.0;
+		defaultPolicy.maxRatioPointsDist100m = 10.0;
+		defaultPolicy.maxRatioPointsDist200m = 20.0;
+		defaultPolicy.maxRatioPointsDist400m = 40.0;
+		defaultPolicy.maxRatioPointsDist800m = 80.0;
+		defaultPolicy.maxRatioPointsDist1600m = 160.0;
+		defaultPolicy.maxRatioPointsDistOver1600m = 320.0;
+		defaultPolicy.maxPointSizeForPc = 10.0;
+		defaultPolicy.minPointSizeForPc = 2.0;
+		defaultPolicy.pendentPointSizeForPc = 60.0;
+		defaultPolicy.minHeight_rainbow_loc = 0.0;
+		defaultPolicy.maxHeight_rainbow_loc = 100.0;
+
+		return Object.assign({}, defaultPolicy, policy||{});
+	}
 };
 Mago3d.prototype = Object.create(Emitter.prototype);
 Mago3d.prototype.constructor = Mago3d;

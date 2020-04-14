@@ -2,7 +2,7 @@
 
 var CesiumViewerInit = function(containerId, serverPolicy, options, legacyViewer) 
 {
-	if (!Cesium) 
+	if (!window.Cesium) 
 	{
 		throw new Error('if basicGlobe is Cesium, add Cesium Library');
 	}
@@ -35,6 +35,7 @@ CesiumViewerInit.prototype.init = function()
 	this.providerBuild();
 
 	this.options.shouldAnimate = false;
+	this.options.baseLayerPicker = false;
 	this.viewer = new Cesium.Viewer(this.targetId, this.options);
 
 	this.postProcessDataProvider();

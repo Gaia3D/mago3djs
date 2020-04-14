@@ -3010,29 +3010,6 @@ MagoManager.prototype.manageMouseDragging = function(mouseX, mouseY)
 		this.moveSelectedObjectAsimetricMode(this.sceneState.gl);
 	}
 };
-MagoManager.prototype.cameraChanged = function(e) 
-{
-	this.emit(MagoManager.EVENT_TYPE.CAMERACHANGED, {
-		type      : MagoManager.EVENT_TYPE.CAMERACHANGED,
-		timestamp : new Date()
-	});
-};
-
-MagoManager.prototype.cameraMoveStart = function() 
-{
-	this.emit(MagoManager.EVENT_TYPE.CAMERAMOVESTART, {
-		type      : MagoManager.EVENT_TYPE.CAMERAMOVESTART,
-		timestamp : new Date()
-	});
-};
-
-MagoManager.prototype.cameraMoveEnd = function() 
-{
-	this.emit(MagoManager.EVENT_TYPE.CAMERAMOVEEND, {
-		type      : MagoManager.EVENT_TYPE.CAMERAMOVEEND,
-		timestamp : new Date()
-	});
-};
 
 /**
  * Moves an object.
@@ -4341,6 +4318,72 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.bIsMakingDepth_loc = gl.getUniformLocation(shader.program, "bIsMakingDepth");
 	shader.bExistAltitudes_loc = gl.getUniformLocation(shader.program, "bExistAltitudes");
 	shader.altitude_loc = gl.getAttribLocation(shader.program, "altitude");
+	
+	// In fragment shader:
+	//uniform sampler2D diffuseTex;    // 0
+	//uniform sampler2D shadowMapTex;  // 1
+	//uniform sampler2D shadowMapTex2; // 2
+	//uniform sampler2D diffuseTex_1;  // 3
+	//uniform sampler2D diffuseTex_2;  // 4
+	//uniform sampler2D diffuseTex_3;  // 5
+	//uniform sampler2D diffuseTex_4;  // 6
+	//uniform sampler2D diffuseTex_5;  // 7
+	
+	shader.uActiveTextures_loc = gl.getUniformLocation(shader.program, "uActiveTextures");
+
+	var uniformLocation;
+	var uniformDataPair;
+	
+	// reassign samplers2d locations.
+	uniformDataPair = shader.getUniformDataPair("shadowMapTex");
+	uniformDataPair.intValue = 0; // reassign.***
+	
+	uniformDataPair = shader.getUniformDataPair("shadowMapTex2");
+	uniformDataPair.intValue = 1; // reassign.***
+	
+	uniformDataPair = shader.getUniformDataPair("diffuseTex");
+	uniformDataPair.intValue = 2; // reassign.***
+	
+	uniformLocation = gl.getUniformLocation(shader.program, "diffuseTex_1");
+	if (uniformLocation !== null && uniformLocation !== undefined)
+	{
+		uniformDataPair = shader.newUniformDataPair("1i", "diffuseTex_1");
+		uniformDataPair.uniformLocation = uniformLocation;
+		uniformDataPair.intValue = 3;
+	}
+	
+	uniformLocation = gl.getUniformLocation(shader.program, "diffuseTex_2");
+	if (uniformLocation !== null && uniformLocation !== undefined)
+	{
+		uniformDataPair = shader.newUniformDataPair("1i", "diffuseTex_2");
+		uniformDataPair.uniformLocation = uniformLocation;
+		uniformDataPair.intValue = 4;
+	}
+	
+	uniformLocation = gl.getUniformLocation(shader.program, "diffuseTex_3");
+	if (uniformLocation !== null && uniformLocation !== undefined)
+	{
+		uniformDataPair = shader.newUniformDataPair("1i", "diffuseTex_3");
+		uniformDataPair.uniformLocation = uniformLocation;
+		uniformDataPair.intValue = 5;
+	}
+	
+	uniformLocation = gl.getUniformLocation(shader.program, "diffuseTex_4");
+	if (uniformLocation !== null && uniformLocation !== undefined)
+	{
+		uniformDataPair = shader.newUniformDataPair("1i", "diffuseTex_4");
+		uniformDataPair.uniformLocation = uniformLocation;
+		uniformDataPair.intValue = 6;
+	}
+	
+	uniformLocation = gl.getUniformLocation(shader.program, "diffuseTex_5");
+	if (uniformLocation !== null && uniformLocation !== undefined)
+	{
+		uniformDataPair = shader.newUniformDataPair("1i", "diffuseTex_5");
+		uniformDataPair.uniformLocation = uniformLocation;
+		uniformDataPair.intValue = 7;
+	}
+	
 	
 	// 3.1) TinTerrain Altitudes shader.****************************************************************************************
 	shaderName = "tinTerrainAltitudes";
@@ -5719,6 +5762,43 @@ MagoManager.prototype.isExistStaticModel = function(projectId)
 MagoManager.prototype.addLayer = function(layer) 
 {
 	this.tinTerrainManager.imagerys.push(layer);
+};
+
+/**
+ * get image layer by id
+ * @param {string} id
+ */
+MagoManager.prototype.getLayerById = function(id) 
+{
+	//todo
+};
+
+/**
+ * remove image layer by id
+ * @param {string} id
+ */
+MagoManager.prototype.removeLayerById = function(id) 
+{
+	this.tinTerrainManager.imagerys = this.tinTerrainManager.imagerys.filter(function(layer, idx)
+	{
+		return layer._id !== id;
+	});
+	this.tinTerrainManager.addDeleteTextureId(id);
+};
+
+/**
+ * add image layer by layer object
+ * @param {layer} layer
+ */
+MagoManager.prototype.removeLayer = function(removeLayer) 
+{
+	var id;
+	this.tinTerrainManager.imagerys = this.tinTerrainManager.imagerys.filter(function(layer, idx)
+	{
+		if (layer === removeLayer) { id = layer._id; }
+		return layer !== removeLayer;
+	});
+	this.tinTerrainManager.addDeleteTextureId(id);
 };
 /**
  * api gateway

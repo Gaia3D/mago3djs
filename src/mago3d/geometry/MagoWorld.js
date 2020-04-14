@@ -154,7 +154,6 @@ MagoWorld.prototype.mousedown = function(event)
  * @param {MagoManager} magoManager
  * 
  */
-
 MagoWorld.updateMouseClick = function(mouseX, mouseY, magoManager)
 {
 	var mouseAction = magoManager.sceneState.mouseAction;
@@ -162,170 +161,6 @@ MagoWorld.updateMouseClick = function(mouseX, mouseY, magoManager)
 	mouseAction.curY = mouseY;
 };
 
-/**
- * 마우스를 드래그하기 시작하는 시점을 저장
- * @param {Number} mouseX the x coordi of the start point 
- * @param {Number} mouseY the y coordi of the start point
- * @param {MagoManager} magoManager
- */
-MagoWorld.screenToCamCoord = function(mouseX, mouseY, magoManager, resultPointCamCoord)
-{
-	var gl = magoManager.sceneState.gl;
-	var camera = magoManager.sceneState.camera;
-	
-	if (resultPointCamCoord === undefined)
-	{ resultPointCamCoord = new Point3D(); }
-	
-	// Must find the frustum on pick(mouseX, mouseY) detected depth value.***
-	var currentDepthFbo;
-	var currentFrustumFar;
-	var currentFrustumNear;
-	var currentLinearDepth;
-	var depthDetected = false;
-	var frustumsCount = magoManager.numFrustums;
-	for (var i = 0; i < frustumsCount; i++)
-	{
-		var frustumVolume = magoManager.frustumVolumeControl.getFrustumVolumeCulling(i); 
-		var depthFbo = frustumVolume.depthFbo;
-
-		currentLinearDepth = ManagerUtils.calculatePixelLinearDepth(gl, mouseX, mouseY, depthFbo, magoManager);
-		if (currentLinearDepth < 0.996) // maxDepth/255 = 0.99607...
-		{ 
-			currentDepthFbo = depthFbo;
-			var frustum = camera.getFrustum(i);
-			currentFrustumFar = frustum.far[0];
-			currentFrustumNear = frustum.near[0];
-			depthDetected = true;
-			break;
-		}
-	}
-	
-	if (!magoManager.isCesiumGlobe())
-	{ currentFrustumNear = 0.0; }
-	
-	//currentFrustumFar = 30000.0; // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
-	//currentDepthFbo = magoManager.depthFboNeo;
-	resultPointCamCoord = ManagerUtils.calculatePixelPositionCamCoord(gl, mouseX, mouseY, resultPointCamCoord, currentDepthFbo, currentFrustumNear, currentFrustumFar, magoManager);
-	return resultPointCamCoord;
-};
-
-/**
- * 마우스를 드래그하기 시작하는 시점을 저장
- * @param {Number} mouseX the x coordi of the start point 
- * @param {Number} mouseY the y coordi of the start point
- * @param {MagoManager} magoManager
- */
-MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
-{
-	var sceneState = magoManager.sceneState;
-	var gl = sceneState.gl;
-	var mouseAction = sceneState.mouseAction;
-	
-	MagoWorld.updateMouseClick(mouseX, mouseY, magoManager);
-	
-	var date = new Date();
-	mouseAction.strTime = date.getTime();
-	
-	// if button = 1 (middleButton), then rotate camera.
-	mouseAction.strX = mouseX;
-	mouseAction.strY = mouseY;
-	if (sceneState.mouseButton === 0)
-	{
-		magoManager.bPicking = true;
-	}
-	
-	var camera = sceneState.camera;
-	
-	// Must find the frustum on pick(mouseX, mouseY) detected depth value.***
-	var maxDepth = 0.996;
-	//maxDepth = 0.996094;
-	var currentDepthFbo;
-	var currentFrustumFar;
-	var currentFrustumNear;
-	var currentLinearDepth;
-	var depthDetected = false;
-	var frustumsCount = magoManager.numFrustums;
-	for (var i = 0; i < frustumsCount; i++)
-	{
-		var frustumVolume = magoManager.frustumVolumeControl.getFrustumVolumeCulling(i); 
-		var depthFbo = frustumVolume.depthFbo;
-
-		currentLinearDepth = ManagerUtils.calculatePixelLinearDepth(gl, mouseAction.strX, mouseAction.strY, depthFbo, magoManager);
-		if (currentLinearDepth < maxDepth) // maxDepth/255 = 0.99607...
-		{ 
-			currentDepthFbo = depthFbo;
-			var frustum = camera.getFrustum(i);
-			currentFrustumFar = frustum.far[0];
-			currentFrustumNear = frustum.near[0];
-			depthDetected = true;
-			break;
-		}
-	}
-	
-
-	if (!depthDetected && magoManager.scene !== undefined)
-	{
-		var scene = magoManager.scene;
-		var camera = scene.frameState.camera;
-		var ray = camera.getPickRay(new Cesium.Cartesian2(mouseX, mouseY));
-		var pointWC = scene.globe.pick(ray, scene);
-		mouseAction.strWorldPoint = pointWC;
-		return;
-	}
-	
-	// determine world position of the X,Y.
-	mouseAction.strLinealDepth = currentLinearDepth;
-	//mouseAction.strCamCoordPoint = ManagerUtils.calculatePixelPositionCamCoord(gl, mouseAction.strX, mouseAction.strY, mouseAction.strCamCoordPoint, currentDepthFbo, currentFrustumNear, currentFrustumFar, magoManager);
-	mouseAction.strCamCoordPoint = MagoWorld.screenToCamCoord(mouseX, mouseY, magoManager, mouseAction.strCamCoordPoint);
-	if (!mouseAction.strCamCoordPoint) 
-	{
-		return;
-	}
-	mouseAction.strWorldPoint = ManagerUtils.cameraCoordPositionToWorldCoord(mouseAction.strCamCoordPoint, mouseAction.strWorldPoint, magoManager);
-	
-	// now, copy camera to curCamera.
-	var strCamera = mouseAction.strCamera;
-	strCamera.copyPosDirUpFrom(camera);
-	
-	// copy modelViewMatrix.
-	var modelViewMatrix = sceneState.modelViewMatrix;
-	var modelViewMatrixInv = sceneState.modelViewMatrixInv;
-	mouseAction.strModelViewMatrix._floatArrays = glMatrix.mat4.copy(mouseAction.strModelViewMatrix._floatArrays, modelViewMatrix._floatArrays);
-	mouseAction.strModelViewMatrixInv._floatArrays = glMatrix.mat4.copy(mouseAction.strModelViewMatrixInv._floatArrays, modelViewMatrixInv._floatArrays);
-
-	// save the sphere pick.
-	/*
-	if (magoManager.globe !== undefined)
-	{
-		var camRay;
-		camRay = ManagerUtils.getRayWorldSpace(gl, mouseX, mouseY, camRay, magoManager); // rayWorldSpace.
-		mouseAction.strWorldPoint2 = magoManager.globe.intersectionLineWgs84(camRay, mouseAction.strWorldPoint2);
-	}
-	*/
-};
-
-/**
- * 만약 마우스 핸들링으로 화면이 바뀌었을 경우, 다음 함수가 활성화 된다
- * @param {Camera} camera
- */
-MagoWorld.prototype.updateModelViewMatrixByCamera = function(camera)
-{
-	var camera = this.magoManager.sceneState.camera;
-	var camPos = camera.position;
-	var camDir = camera.direction;
-	var camUp = camera.up;
-	var far = camera.frustum.far[0];
-	
-	var tergetX = camPos.x + camDir.x * far;
-	var tergetY = camPos.y + camDir.y * far;
-	var tergetZ = camPos.z + camDir.z * far;
-	
-	var modelViewMatrix = this.magoManager.sceneState.modelViewMatrix;																	
-	modelViewMatrix._floatArrays = Matrix4.lookAt(modelViewMatrix._floatArrays, [camPos.x, camPos.y, camPos.z], 
-		[tergetX, tergetY, tergetZ], 
-		[camUp.x, camUp.y, camUp.z]);
-
-};
 
 /**
  * 마우스를 꾹 눌렀다가 땔 때의 동작을 감지
@@ -723,6 +558,171 @@ MagoWorld.prototype.mousemove = function(event)
 };
 
 /**
+ * 마우스를 드래그하기 시작하는 시점을 저장
+ * @param {Number} mouseX the x coordi of the start point 
+ * @param {Number} mouseY the y coordi of the start point
+ * @param {MagoManager} magoManager
+ */
+MagoWorld.screenToCamCoord = function(mouseX, mouseY, magoManager, resultPointCamCoord)
+{
+	var gl = magoManager.sceneState.gl;
+	var camera = magoManager.sceneState.camera;
+	
+	if (resultPointCamCoord === undefined)
+	{ resultPointCamCoord = new Point3D(); }
+	
+	// Must find the frustum on pick(mouseX, mouseY) detected depth value.***
+	var currentDepthFbo;
+	var currentFrustumFar;
+	var currentFrustumNear;
+	var currentLinearDepth;
+	var depthDetected = false;
+	var frustumsCount = magoManager.numFrustums;
+	for (var i = 0; i < frustumsCount; i++)
+	{
+		var frustumVolume = magoManager.frustumVolumeControl.getFrustumVolumeCulling(i); 
+		var depthFbo = frustumVolume.depthFbo;
+
+		currentLinearDepth = ManagerUtils.calculatePixelLinearDepth(gl, mouseX, mouseY, depthFbo, magoManager);
+		if (currentLinearDepth < 0.996) // maxDepth/255 = 0.99607...
+		{ 
+			currentDepthFbo = depthFbo;
+			var frustum = camera.getFrustum(i);
+			currentFrustumFar = frustum.far[0];
+			currentFrustumNear = frustum.near[0];
+			depthDetected = true;
+			break;
+		}
+	}
+	
+	if (!magoManager.isCesiumGlobe())
+	{ currentFrustumNear = 0.0; }
+	
+	//currentFrustumFar = 30000.0; // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
+	//currentDepthFbo = magoManager.depthFboNeo;
+	resultPointCamCoord = ManagerUtils.calculatePixelPositionCamCoord(gl, mouseX, mouseY, resultPointCamCoord, currentDepthFbo, currentFrustumNear, currentFrustumFar, magoManager);
+	return resultPointCamCoord;
+};
+
+/**
+ * 마우스를 드래그하기 시작하는 시점을 저장
+ * @param {Number} mouseX the x coordi of the start point 
+ * @param {Number} mouseY the y coordi of the start point
+ * @param {MagoManager} magoManager
+ */
+MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
+{
+	var sceneState = magoManager.sceneState;
+	var gl = sceneState.gl;
+	var mouseAction = sceneState.mouseAction;
+	
+	MagoWorld.updateMouseClick(mouseX, mouseY, magoManager);
+	
+	var date = new Date();
+	mouseAction.strTime = date.getTime();
+	
+	// if button = 1 (middleButton), then rotate camera.
+	mouseAction.strX = mouseX;
+	mouseAction.strY = mouseY;
+	if (sceneState.mouseButton === 0)
+	{
+		magoManager.bPicking = true;
+	}
+	
+	var camera = sceneState.camera;
+	
+	// Must find the frustum on pick(mouseX, mouseY) detected depth value.***
+	var maxDepth = 0.996;
+	//maxDepth = 0.996094;
+	var currentDepthFbo;
+	var currentFrustumFar;
+	var currentFrustumNear;
+	var currentLinearDepth;
+	var depthDetected = false;
+	var frustumsCount = magoManager.numFrustums;
+	for (var i = 0; i < frustumsCount; i++)
+	{
+		var frustumVolume = magoManager.frustumVolumeControl.getFrustumVolumeCulling(i); 
+		var depthFbo = frustumVolume.depthFbo;
+
+		currentLinearDepth = ManagerUtils.calculatePixelLinearDepth(gl, mouseAction.strX, mouseAction.strY, depthFbo, magoManager);
+		if (currentLinearDepth < maxDepth) // maxDepth/255 = 0.99607...
+		{ 
+			currentDepthFbo = depthFbo;
+			var frustum = camera.getFrustum(i);
+			currentFrustumFar = frustum.far[0];
+			currentFrustumNear = frustum.near[0];
+			depthDetected = true;
+			break;
+		}
+	}
+	
+
+	if (!depthDetected && magoManager.scene !== undefined)
+	{
+		var scene = magoManager.scene;
+		var camera = scene.frameState.camera;
+		var ray = camera.getPickRay(new Cesium.Cartesian2(mouseX, mouseY));
+		var pointWC = scene.globe.pick(ray, scene);
+		mouseAction.strWorldPoint = pointWC;
+		return;
+	}
+	
+	// determine world position of the X,Y.
+	mouseAction.strLinealDepth = currentLinearDepth;
+	//mouseAction.strCamCoordPoint = ManagerUtils.calculatePixelPositionCamCoord(gl, mouseAction.strX, mouseAction.strY, mouseAction.strCamCoordPoint, currentDepthFbo, currentFrustumNear, currentFrustumFar, magoManager);
+	mouseAction.strCamCoordPoint = MagoWorld.screenToCamCoord(mouseX, mouseY, magoManager, mouseAction.strCamCoordPoint);
+	if (!mouseAction.strCamCoordPoint) 
+	{
+		return;
+	}
+	mouseAction.strWorldPoint = ManagerUtils.cameraCoordPositionToWorldCoord(mouseAction.strCamCoordPoint, mouseAction.strWorldPoint, magoManager);
+	
+	// now, copy camera to curCamera.
+	var strCamera = mouseAction.strCamera;
+	strCamera.copyPosDirUpFrom(camera);
+	
+	// copy modelViewMatrix.
+	var modelViewMatrix = sceneState.modelViewMatrix;
+	var modelViewMatrixInv = sceneState.modelViewMatrixInv;
+	mouseAction.strModelViewMatrix._floatArrays = glMatrix.mat4.copy(mouseAction.strModelViewMatrix._floatArrays, modelViewMatrix._floatArrays);
+	mouseAction.strModelViewMatrixInv._floatArrays = glMatrix.mat4.copy(mouseAction.strModelViewMatrixInv._floatArrays, modelViewMatrixInv._floatArrays);
+
+	// save the sphere pick.
+	/*
+	if (magoManager.globe !== undefined)
+	{
+		var camRay;
+		camRay = ManagerUtils.getRayWorldSpace(gl, mouseX, mouseY, camRay, magoManager); // rayWorldSpace.
+		mouseAction.strWorldPoint2 = magoManager.globe.intersectionLineWgs84(camRay, mouseAction.strWorldPoint2);
+	}
+	*/
+};
+
+/**
+ * 만약 마우스 핸들링으로 화면이 바뀌었을 경우, 다음 함수가 활성화 된다
+ * @param {Camera} camera
+ */
+MagoWorld.prototype.updateModelViewMatrixByCamera = function(camera)
+{
+	var camera = this.magoManager.sceneState.camera;
+	var camPos = camera.position;
+	var camDir = camera.direction;
+	var camUp = camera.up;
+	var far = camera.frustum.far[0];
+	
+	var tergetX = camPos.x + camDir.x * far;
+	var tergetY = camPos.y + camDir.y * far;
+	var tergetZ = camPos.z + camDir.z * far;
+	
+	var modelViewMatrix = this.magoManager.sceneState.modelViewMatrix;																	
+	modelViewMatrix._floatArrays = Matrix4.lookAt(modelViewMatrix._floatArrays, [camPos.x, camPos.y, camPos.z], 
+		[tergetX, tergetY, tergetZ], 
+		[camUp.x, camUp.y, camUp.z]);
+
+};
+
+/**
  *
  *
  * @param {*} event
@@ -732,31 +732,3 @@ MagoWorld.prototype.keydown = function(event)
 	// TODO: keydown()
 	console.log("keydown");
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

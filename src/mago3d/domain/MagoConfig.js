@@ -119,9 +119,6 @@ MagoConfig.init = function(serverPolicy, projectIdArray, projectDataArray)
 
 	this.serverPolicy = serverPolicy;
 	this.twoDimension = false;
-	if (!this.serverPolicy.basicGlobe) { this.serverPolicy.basicGlobe = Constant.CESIUM; }
-
-	this.serverPolicy.online = true;
 
 	if (this.serverPolicy.geoserverEnable) 
 	{

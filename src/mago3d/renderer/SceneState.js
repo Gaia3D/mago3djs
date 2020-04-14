@@ -158,7 +158,11 @@ var SceneState = function()
  */
 SceneState.prototype.initMagoSceneState = function() 
 {
-	var canvas = document.getElementById(MagoConfig.getContainerId());
+	var containerDiv = document.getElementById(MagoConfig.getContainerId());
+	var canvas = document.createElement('canvas');
+	canvas.style.width = '100%';
+	canvas.style.height = '100%';
+	containerDiv.appendChild(canvas);
 	var glAttrs = {antialias          : true, 
 		stencil            : true,
 		premultipliedAlpha : false};

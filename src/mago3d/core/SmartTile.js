@@ -1663,11 +1663,13 @@ SmartTile.getGeographicExtentOfTileLXY = function(L, X, Y, resultGeoExtend, imag
 				}
 			}
 
-			var min_longitude = lonAngDegRange * X - 180.0;
-			var max_longitude = min_longitude + lonAngDegRange;
+			// Code to debug.************************************
+			//var min_longitude = lonAngDegRange * X - 180.0;
+			//var max_longitude = min_longitude + lonAngDegRange;
 
-			var min_latitude = minLadRad * 180.0 / M_PI;
-			var max_latitude = maxLadRad * 180.0 / M_PI;
+			//var min_latitude = minLadRad * 180.0 / M_PI;
+			//var max_latitude = maxLadRad * 180.0 / M_PI;
+			//---------------------------------------------------
 
 			currL++;
 		}
