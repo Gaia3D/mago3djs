@@ -35,6 +35,7 @@ var TinTerrainManager = function(options)
 	//};
 	this.imageryType = CODE.imageryType.WEB_MERCATOR; // Test.***
 	//this.imageryType = CODE.imageryType.CRS84; // Test.***
+
 	this.imagerys = [];
 
 	this.textureIdCntMap = {};
@@ -208,6 +209,40 @@ TinTerrainManager.prototype.makeDistanceLimitByDepth = function()
 	
 };
 
+TinTerrainManager.prototype.getTexCorrection = function(depth)
+{
+	if (this.texCorrection === undefined)
+	{
+		this.texCorrection = [];
+		
+		this.texCorrection[0] = 0.003;
+		this.texCorrection[1] = 0.003;
+		this.texCorrection[2] = 0.003;
+		this.texCorrection[3] = 0.003;
+		this.texCorrection[4] = 0.003;
+		this.texCorrection[5] = 0.003;
+		this.texCorrection[6] = 0.003;
+		this.texCorrection[7] = 0.003;
+		this.texCorrection[8] = 0.003;
+		this.texCorrection[9] = 0.003;
+		this.texCorrection[10] = 0.004;
+		this.texCorrection[11] = 0.004;
+		this.texCorrection[12] = 0.004;
+		this.texCorrection[13] = 0.004;
+		this.texCorrection[14] = 0.004;
+		this.texCorrection[15] = 0.004;
+		this.texCorrection[16] = 0.004;
+		this.texCorrection[17] = 0.004;
+		this.texCorrection[18] = 0.004;
+		this.texCorrection[19] = 0.004;
+		this.texCorrection[20] = 0.004;
+		this.texCorrection[21] = 0.004;
+		this.texCorrection[22] = 0.004;
+	}
+	
+	return this.texCorrection[depth];
+};
+
 TinTerrainManager.prototype.doFrustumCulling = function(frustum, camPos, magoManager, maxDepth)
 {
 	if (maxDepth === undefined)
@@ -277,7 +312,13 @@ TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager)
 
 TinTerrainManager.prototype.getAltitudes = function(geoCoordsArray, resultGeoCoordsArray) 
 {
-	//
+	var geoCoordsCount = geoCoordsArray.length;
+	for (var i=0; i<geoCoordsCount; i++)
+	{
+		var geoCoord = geoCoordsArray[i];
+		
+		//this.visibleTilesArray
+	}
 };
 
 TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, shader) 

@@ -4317,6 +4317,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 
 	shader.bIsMakingDepth_loc = gl.getUniformLocation(shader.program, "bIsMakingDepth");
 	shader.bExistAltitudes_loc = gl.getUniformLocation(shader.program, "bExistAltitudes");
+	shader.uMinMaxAltitudes_loc = gl.getUniformLocation(shader.program, "uMinMaxAltitudes");
 	shader.altitude_loc = gl.getAttribLocation(shader.program, "altitude");
 	
 	// In fragment shader:

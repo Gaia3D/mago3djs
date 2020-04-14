@@ -3439,6 +3439,7 @@ uniform float screenHeight;    \n\
 uniform float shininessValue;\n\
 uniform vec3 kernel[16];   \n\
 uniform int uActiveTextures[8];\n\
+uniform vec2 uMinMaxAltitudes;\n\
 \n\
 uniform vec4 oneColor4;\n\
 uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
@@ -3640,7 +3641,7 @@ void main()\n\
 		vec3 normal2 = vNormal;	\n\
 		float lambertian = 1.0;\n\
 		float specular;\n\
-		\n\
+		vec2 texCoord;\n\
 		if(applySpecLighting> 0.0)\n\
 		{\n\
 			vec3 L;\n\
@@ -3695,7 +3696,7 @@ void main()\n\
 		}\n\
 		else if(colorType == 2)\n\
 		{\n\
-			vec2 texCoord;\n\
+			\n\
 			if(textureFlipYAxis)\n\
 			{\n\
 				//textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));\n\
@@ -3782,21 +3783,36 @@ void main()\n\
 		float fogParam2 = fogParam*fogParam;\n\
 		float fogAmount = fogParam2*fogParam2;\n\
 		\n\
-		if(bExistAltitudes && vAltitude < 0.01)\n\
+		// Test dem image.***\n\
+		float altitude = 1000000.0;\n\
+		if(uActiveTextures[3] == 10)\n\
+		{\n\
+			vec4 layersTextureColor = texture2D(diffuseTex_1, texCoord);\n\
+			if(layersTextureColor.w > 0.0)\n\
+			{\n\
+				// decode the grayScale.***\n\
+				altitude = uMinMaxAltitudes.x + layersTextureColor.r * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);\n\
+			}\n\
+		}\n\
+		// End test dem image.---\n\
+		\n\
+		if(altitude < 0.0)\n\
 		{\n\
 			float minHeight_rainbow = -80.0;\n\
 			float maxHeight_rainbow = 0.0;\n\
-			float gray = (vAltitude - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);\n\
+			float gray = (altitude - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);\n\
 			if(gray < 0.0)\n\
 			gray = 0.0;\n\
-			//fogColor = vec4(getRainbowColor_byHeight(vAltitude), 1.0);\n\
-			fogColor = vec4(gray, gray, gray, 1.0);\n\
+			fogColor = vec4(gray, gray*1.1, gray*1.1, 1.0);\n\
 			fogAmount = 0.6;\n\
 		}\n\
 		\n\
+		\n\
+		\n\
 		vec4 finalColor = mix(textureColor, fogColor, fogAmount); \n\
-		gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian, 1.0);\n\
-		//gl_FragColor = vec4(vNormal.xyz, 1.0);\n\
+		gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian, 1.0); // original.***\n\
+		//gl_FragColor = textureColor; // test.***\n\
+		//gl_FragColor = vec4(vNormal.xyz, 1.0); // test.***\n\
 		\n\
 		//if(currSunIdx > 0.0 && currSunIdx < 1.0 && shadow_occlusion<0.9)gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n\
 	}\n\
