@@ -2,6 +2,7 @@
 'use strict';
 
 var fs = require('fs');
+var ncp = require('ncp');
 var path = require('path');
 var gulp = require('gulp');
 
@@ -26,6 +27,7 @@ var paths = {
 	data      : './data',
 	source_js : [ './src/mago3d/*.js', './src/mago3d/**/*.js', '!./src/engine/cesium', '!./src/mago3d/Demo*.js', '!./src/mago3d/extern/*.js' ],
 	dest_js   : './build/mago3d',
+	worker_js : './build/mago3d/Worker',
 	test      : ['./test/*.js', './test/mago3d/*.js', './test/mago3d/**/*.js'],
 	build     : './build'
 };
@@ -176,6 +178,7 @@ function createMago3D(minify, minifyStateFilePath)
 	var list = paths.source_js.slice(0);
 	list.push('!./src/mago3d/api/APIGateway.js');
 	list.push('!./src/mago3d/domain/Callback.js');
+	list.push('!./src/mago3d/worker/*');
 	globby.sync(list).forEach(function(file)
 	{
 		file = path.relative('src/mago3d', file);
@@ -228,6 +231,7 @@ gulp.task('merge:js', gulp.series( 'clean', 'build', function()
 	var list = paths.source_js.slice(0);
 	list.push('!./src/mago3d/api/APIGateway.js');
 	list.push('!./src/mago3d/domain/Callback.js');
+	list.push('!./src/mago3d/worker/*');
 	return gulp.src(list)
 		.pipe(concat('mago3d.js'))
 		.pipe(gulp.dest(paths.dest_js));
@@ -250,12 +254,23 @@ gulp.task('combine:js', gulp.series( 'merge:js', function()
 
 gulp.task('uglify:js', gulp.series( 'combine:js', function () 
 {
+	copyWorker();
 	return gulp.src(path.join(path.normalize(paths.dest_js), 'mago3d.js'))
 		//.pipe(stripDebug())
 		.pipe(uglify())
 		.pipe(rename({extname: '.min.js'}))
 		.pipe(gulp.dest('./'));
 }));
+
+function copyWorker()
+{
+	mkdirp.sync(paths.worker_js);
+	ncp('./src/mago3d/worker/',paths.worker_js, function(err){
+		if(err) {
+			return console.error(err);
+		}
+	});
+}
 
 function isFixed(file) 
 {

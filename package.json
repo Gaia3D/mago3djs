@@ -48,5 +48,8 @@
     "uglify-es": "^3.3.9",
     "watchify": "^3.11.1",
     "yargs": "^13.2.4"
+  },
+  "dependencies": {
+    "ncp": "^2.0.0"
   }
 }
