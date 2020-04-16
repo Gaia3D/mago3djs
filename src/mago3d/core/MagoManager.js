@@ -4526,7 +4526,10 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.bIsMakingDepth_loc = gl.getUniformLocation(shader.program, "bIsMakingDepth");
 	shader.bExistAltitudes_loc = gl.getUniformLocation(shader.program, "bExistAltitudes");
 	shader.uMinMaxAltitudes_loc = gl.getUniformLocation(shader.program, "uMinMaxAltitudes");
+	shader.uTileDepth_loc = gl.getUniformLocation(shader.program, "uTileDepth");
 	shader.altitude_loc = gl.getAttribLocation(shader.program, "altitude");
+	shader.uSeaOrTerrainType_loc = gl.getUniformLocation(shader.program, "uSeaOrTerrainType");
+	
 	
 	// In fragment shader:
 	//uniform sampler2D diffuseTex;    // 0

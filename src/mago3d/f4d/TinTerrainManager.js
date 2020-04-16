@@ -27,7 +27,9 @@ var TinTerrainManager = function(options)
 	// Elevation model or plain ellipsoid.
 	// terrainType = 0 -> terrainPlainModel.
 	// terrainType = 1 -> terrainElevationModel.
+	// terrainType = 2 -> real time terrainElevationModel.
 	this.terrainType = 1; 
+	
 	//CODE.imageryType = {
 	//"UNKNOWN"      : 0,
 	//"CRS84"        : 1,
@@ -40,6 +42,8 @@ var TinTerrainManager = function(options)
 		new WMSLayer({url: 'http://192.168.10.98:8080/geoserver/mago3d/wms', minZoom: 3, param: {layers: 'mago3d:15m_susim', tiled: true}})];
 	// new XYZLayer({url: 'https://services.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'})];
 	//this.imagerys = [new WMSLayer({url: 'http://192.168.10.9:8080/geoserver/mago3d/wms', param: {layers: 'mago3d:gangseogu_5m'}})];
+	
+	this.imagerysDEM = [new WMSLayer({url: 'http://192.168.10.98:8080/geoserver/mago3d/wms', minZoom: 3, param: {layers: 'mago3d:15m_susim', tiled: true}})];
 
 	this.init();
 	this.makeTinTerrainWithDEMIndex(); // provisional.
@@ -281,10 +285,28 @@ TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager)
 	}
 	else if (this.terrainType === 1)// ElevationTerrain.
 	{
+		var maxProcessCounter = 0;
 		for (var i=0; i<visiblesTilesCount; i++)
 		{
 			tinTerrain = this.visibleTilesArray[i];
-			tinTerrain.prepareTinTerrain(magoManager, this);
+			if (!tinTerrain.prepareTinTerrain(magoManager, this))
+			{ maxProcessCounter += 1; }
+		
+			//if (maxProcessCounter > 50)
+			//{ break; }
+		}
+	}
+	else if (this.terrainType === 2)// Real time ElevationTerrain.
+	{
+		var maxProcessCounter = 0;
+		for (var i=0; i<visiblesTilesCount; i++)
+		{
+			tinTerrain = this.visibleTilesArray[i];
+			if (!tinTerrain.prepareTinTerrainRealTimeElevation(magoManager, this))
+			{ maxProcessCounter += 1; }
+		
+			if (maxProcessCounter > 10)
+			{ break; }
 		}
 	}
 	
@@ -344,6 +366,8 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	
 	currentShader.bindUniformGenerals();
 	
+	magoManager.test__makingTerrainByAltitudesImage = 0;
+	
 	for (var i=0; i<8; i++)
 	{
 		gl.activeTexture(gl.TEXTURE0+i); 
@@ -368,7 +392,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 		gl.uniform1i(currentShader.refMatrixType_loc, 0); // init referencesMatrix.
 		gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, this.identityMat._floatArrays);
 		
-		gl.uniform1i(currentShader.bApplySpecularLighting_loc, false);
+		gl.uniform1i(currentShader.bApplySpecularLighting_loc, true);
 		
 		var bApplyShadow = false;
 		if (magoManager.sceneState.sunSystem !== undefined && magoManager.sceneState.applySunShadows)
@@ -447,6 +471,8 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	if (light0BSphere === undefined)
 	{ bApplyShadow = false; } // cant apply shadow anyway.
 	
+	var succesfullyRenderedTilesArray = [];
+	
 	if (bApplyShadow)
 	{
 		var light0Radius = light0BSphere.getRadius();
@@ -468,7 +494,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 			{
 				gl.uniform1i(currentShader.sunIdx_loc, 1);
 			}
-			tinTerrain.render(currentShader, magoManager, bDepth, renderType);
+			tinTerrain.render(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray);
 		}
 	}
 	else
@@ -480,9 +506,24 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 			if (tinTerrain === undefined)
 			{ continue; }
 		
-			tinTerrain.render(currentShader, magoManager, bDepth, renderType);
+			tinTerrain.render(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray);
 		}
 	}
+	
+	// Render the sea.
+	/*
+	gl.uniform1i(currentShader.bApplySpecularLighting_loc, false);
+	var renderedTilesCount = succesfullyRenderedTilesArray.length;
+	for (var i=0; i<renderedTilesCount; i++)
+	{
+		tinTerrain = succesfullyRenderedTilesArray[i];
+		
+		if (tinTerrain === undefined)
+		{ continue; }
+	
+		tinTerrain.renderSea(currentShader, magoManager, bDepth, renderType);
+	}
+	*/
 
 	currentShader.disableVertexAttribArray(currentShader.texCoord2_loc); 
 	currentShader.disableVertexAttribArray(currentShader.position3_loc); 

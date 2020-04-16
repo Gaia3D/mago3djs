@@ -1687,7 +1687,7 @@ SmartTile.getGeographicExtentOfTileLXY = function(L, X, Y, resultGeoExtend, imag
 		var minLadRad = -webMercatorMaxLatRad;
 		var midLatRad;
 		var midLatRadMercator;
-		var y_ratio = ( Y + 0.005 ) / numRows;
+		var y_ratio = ( Y + 0.0005 ) / numRows;
 		var currL = 0;
 		var finished = false;
 		while (!finished && currL <= 22)
@@ -1696,7 +1696,6 @@ SmartTile.getGeographicExtentOfTileLXY = function(L, X, Y, resultGeoExtend, imag
 			{
 				var min_longitude = lonAngDegRange * X - 180.0;
 				var max_longitude = min_longitude + lonAngDegRange;
-
 				var min_latitude = minLadRad * 180.0 / M_PI;
 				var max_latitude = maxLadRad * 180.0 / M_PI;
 

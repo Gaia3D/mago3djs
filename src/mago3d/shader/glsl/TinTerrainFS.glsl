@@ -26,6 +26,8 @@ uniform float shininessValue;
 uniform vec3 kernel[16];   
 uniform int uActiveTextures[8];
 uniform vec2 uMinMaxAltitudes;
+uniform int uTileDepth;
+uniform int uSeaOrTerrainType;
 
 uniform vec4 oneColor4;
 uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.
@@ -178,6 +180,24 @@ float getDepthShadowMap(vec2 coord)
 	else
 		return 1000.0;
 } 
+
+float getGridLineWidth(int depth)
+{
+	float gridLineWidth = 0.025;
+	
+	if(depth == 17)
+	{
+		gridLineWidth = 0.025;
+	}
+	else{
+		int dif = 18 - depth;
+		if(dif < 1)
+		dif = 1;
+		gridLineWidth = (0.04/17.0) * float(depth/dif);
+	}
+	
+	return gridLineWidth;
+}
 
 void main()
 {           
@@ -362,7 +382,7 @@ void main()
 		else{
 			textureColor = oneColor4;
 		}
-		
+
 		textureColor.w = externalAlpha;
 		vec4 fogColor = vec4(0.9, 0.9, 0.9, 1.0);
 		float fogParam = v3Pos.z/(far - 10000.0);
@@ -382,15 +402,50 @@ void main()
 		}
 		// End test dem image.---
 		
+		
 		if(altitude < 0.0)
 		{
-			float minHeight_rainbow = -80.0;
+			if(uSeaOrTerrainType == 1)
+			{
+				gl_FragColor = vec4(oneColor4.xyz * shadow_occlusion * lambertian, 0.5); // original.***
+				return;
+			}
+			
+			float minHeight_rainbow = -100.0;
 			float maxHeight_rainbow = 0.0;
 			float gray = (altitude - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);
-			if(gray < 0.0)
-			gray = 0.0;
-			fogColor = vec4(gray, gray*1.1, gray*1.1, 1.0);
-			fogAmount = 0.6;
+			//float grayMeshAltitude = (vAltitude - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);
+			
+			//if(grayMeshAltitude * 1.1 < gray)
+			//gray = grayMeshAltitude;
+			
+			if(gray < 0.1)
+			gray = 0.1;
+			//fogColor = vec4(gray, gray*1.3, gray*1.6, 1.0);
+			fogColor = vec4(gray*1.3, gray*1.5, gray*1.7, 1.0);
+			fogAmount = 0.7;
+			
+			// Test drawing grid.***
+			if(uTileDepth > 7)
+			{
+				float numSegs = 5.0;
+				float fX = fract(texCoord.x * numSegs);
+
+				float gridLineWidth = getGridLineWidth(uTileDepth);
+				if( fX < gridLineWidth || fX > 1.0-gridLineWidth)
+				{
+					gl_FragColor = vec4(0.99, 0.5, 0.5, 1.0);
+					return;
+				}
+				
+				float fY = fract(texCoord.y * numSegs);
+				if( fY < gridLineWidth|| fY > 1.0-gridLineWidth)
+				{
+					gl_FragColor = vec4(0.3, 0.5, 0.99, 1.0);
+					return;
+				}
+			}
+			// End test drawing grid.---
 		}
 		
 		
