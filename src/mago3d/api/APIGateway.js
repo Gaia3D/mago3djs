@@ -3,7 +3,7 @@
 
 /**
  * 
- * @module APIGateway
+ * @class APIGateway
  */
 
 /**
@@ -99,7 +99,7 @@ function changeShadowAPI(managerFactoryInstance, isShow)
  * @param {ManagerFactory} managerFactoryInstance
  * @param {string} projectId 프로젝트 아이디
  * @param {string} dataKey data key
- * @param {Array[string]} objectIds object id. 복수개의 경우 , 로 입력
+ * @param {Array<string>} objectIds object id. 복수개의 경우 , 로 입력
  * @param {string} property 속성값 예)isPhysical=true
  * @param {string} color R, G, B, Alpha 색깔을 ',' 로 연결한 string 값을 받음.
  */
@@ -542,9 +542,10 @@ function getDataInfoByDataKeyAPI(managerFactoryInstance, projectId, dataKey)
 	if (managerFactoryInstance === null) { return; }
 
 	var api = new Mago3D.API("getDataInfoByDataKey");
+	api.setReturnable(true);
 	api.setProjectId(projectId);
 	api.setDataKey(dataKey);
-	managerFactoryInstance.callAPI(api);
+	return managerFactoryInstance.callAPI(api);
 }
 
 /**
@@ -828,4 +829,18 @@ function togglePointCloudColorAPI(managerFactoryInstance)
 {
 	var api = new Mago3D.API("togglePointCloudColor");
 	managerFactoryInstance.callAPI(api);
+}
+
+/**
+ * select f4d
+ * @param {ManagerFactory} managerFactoryInstance
+ */
+function selectF4dAPI(managerFactoryInstance, projectId, dataKey) 
+{
+	var api = new Mago3D.API("selectF4d");
+	api.setProjectId(projectId);
+	api.setDataKey(dataKey);
+	managerFactoryInstance.callAPI(api);
+
+	
 }

@@ -284,6 +284,15 @@ Renderer.prototype.renderNeoBuildingsPCloud = function(gl, visibleNodesArray, ma
 	{
 		node = visibleNodesArray[i];
 		
+		var attributes = node.data.attributes;
+		if (attributes)
+		{
+			if (attributes.isVisible !== undefined && attributes.isVisible === false) 
+			{
+				continue;
+			}
+		}
+
 		rootNode = node.getRoot();
 		geoLocDataManager = rootNode.data.geoLocDataManager;
 		neoBuilding = node.data.neoBuilding;
@@ -660,10 +669,11 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 	{
 		var node = magoManager.nodeSelected;
 		var neoBuilding = magoManager.buildingSelected;
-		if (node !== undefined && neoBuilding !== undefined) // test code.***
+		if (magoManager.objectSelected instanceof NeoReference && node !== undefined && neoBuilding !== undefined) // test code.***
 		{
 			magoManager.currentProcess = CODE.magoCurrentProcess.SilhouetteDepthRendering;
 			var geoLocDataManager = node.getNodeGeoLocDataManager();
+
 			var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
 			var neoReferencesMotherAndIndices = magoManager.octreeSelected.neoReferencesMotherAndIndices;
 			var glPrimitive = gl.POINTS;
@@ -708,7 +718,6 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 			silhouetteDepthFbo.unbind(); 
 			
 			gl.enable(gl.CULL_FACE);
-			//magoManager.swapRenderingFase();
 		}
 	}
 };
@@ -1500,11 +1509,9 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			
 			this.renderAxisNodes(nodes, renderType);
 		}
-		
 
 		var sceneState = magoManager.sceneState;
 		//sceneState.applySunShadows = true;
-		
 		// SunLight.***
 		if (sceneState.applySunShadows && !this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
 		{
@@ -2288,7 +2295,7 @@ Renderer.prototype.renderMagoGeometries = function(renderType)
 	var magoManager = this.magoManager;
 	
 	// 1rst, make the test object if no exist.***
-	return;
+	//return;
 	
 	if (magoManager.nativeProjectsArray === undefined)
 	{

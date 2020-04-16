@@ -23,7 +23,11 @@ DrawAPI.drawInsertIssueImage = function(api, magoManager)
 			undefined, undefined, undefined, magoManager.objMarkerSC.geoLocationData, magoManager);
 	}
 	
-	var objMarker = magoManager.objMarkerManager.newObjectMarker();
+	var objMarker = magoManager.objMarkerManager.newObjectMarker({
+		imageFilePath : 'defaultRed',
+		sizeX         : 64,
+		sizeY         : 64
+	});
 	
 	magoManager.objMarkerSC.issue_id = api.getIssueId();
 	magoManager.objMarkerSC.issue_type = api.getIssueType();

@@ -1626,8 +1626,6 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 	
 	return true;
 };
-
-
 /**
  * 어떤 일을 하고 있습니까?
  */

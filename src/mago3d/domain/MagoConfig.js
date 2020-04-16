@@ -6,9 +6,24 @@
  */
 var MagoConfig = {};
 
+MagoConfig.setContainerId = function(containerId) 
+{
+	this.containerId = containerId;
+};
+
+MagoConfig.getContainerId = function() 
+{
+	return this.containerId;
+};
+
 MagoConfig.getPolicy = function() 
 {
 	return this.serverPolicy;
+};
+
+MagoConfig.getGeoserver = function() 
+{
+	return this.geoserver;
 };
 
 MagoConfig.getData = function(key) 
@@ -91,15 +106,37 @@ MagoConfig.setProjectDataFolder = function(projectDataFolder, value)
  */
 MagoConfig.init = function(serverPolicy, projectIdArray, projectDataArray) 
 {
+	if (!serverPolicy || !serverPolicy instanceof Object) 
+	{
+		throw new Error('geopolicy is required object.');
+	}
 	this.dataObject = {};
 	
 	this.selectHistoryObject = {};
 	this.movingHistoryObject = {};
 	this.colorHistoryObject = {};
 	this.locationAndRotationHistoryObject = {};
-	
+
 	this.serverPolicy = serverPolicy;
-	if (projectIdArray !== null && projectIdArray.length > 0) 
+	this.twoDimension = false;
+
+	if (this.serverPolicy.geoserverEnable) 
+	{
+		this.geoserver = new GeoServer();
+
+		var info = {
+			"wmsVersion"    : this.serverPolicy.geoserverWmsVersion,
+			"dataUrl"       : this.serverPolicy.geoserverDataUrl,
+			"dataWorkspace" : this.serverPolicy.geoserverDataWorkspace,
+			"dataStore"     : this.serverPolicy.geoserverDataStore,
+			"user"          : this.serverPolicy.geoserverUser,
+			"password"      : this.serverPolicy.geoserverPassword
+		};
+		this.geoserver.setServerInfo(info);
+	}
+
+
+	if (projectIdArray && projectIdArray.length > 0) 
 	{
 		for (var i=0; i<projectIdArray.length; i++) 
 		{
@@ -484,3 +521,12 @@ MagoConfig.clearLocationAndRotationHistory = function()
 		}
 	}
 };*/
+
+MagoConfig.setTwoDimension = function(twoDimension) 
+{
+	this.twoDimension = twoDimension;
+};
+MagoConfig.isTwoDimension = function()
+{
+	return this.twoDimension;
+};

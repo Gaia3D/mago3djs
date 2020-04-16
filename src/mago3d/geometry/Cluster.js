@@ -1,183 +1,151 @@
 'use strict';
 /**
- * point3d 데이터 cluster
+ * point2d 데이터 cluster
  *
- * @param {Point3DList} point3DList 
- * @param {number} pixelRange cluster 범위, 사각형의 한변의 길이, default 20m
- * @param {number} minSize cluster 표현의 최소 크기, 기본값은 2
+ * @param {Point3DList} point2DList 
+ * @param {number} depth
+ * @param {MagoManager} magoMangaer
+ * @param {function} customRenderFunc optional
  */
-var Cluster = function(point3DList, range, minSize) 
+var Cluster = function(point2DList, depth, magoMangaer, customRenderFunc) 
 {
-	MagoRenderable.call(this);
     
-	if (point3DList && point3DList instanceof Point3DList) 
+	if (!point2DList || !point2DList instanceof Point2DList) 
 	{
-		this.point3DList = point3DList;
-		this.bush = rbush();
-		for (var i=0, len=point3DList.getPointsCount();i<len;i++) 
-		{
-			var p3d = point3DList.getPoint(i);
-			p3d.id = i;
-			var geoCoord = ManagerUtils.pointToGeographicCoord(p3d);
-			geoCoord.id = i;
-			var item = {
-				minX  : geoCoord.longitude,
-				minY  : geoCoord.latitude,
-				maxX  : geoCoord.longitude,
-				maxY  : geoCoord.latitude,
-				value : geoCoord
-			};
-			this.bush.insert(item);
-		}
+		throw new Error('point2DList is required');
+	}
+	this.point2DList = point2DList;
+	this.depth = defaultValueCheckLength(depth, 8);
+
+	this.quatTree;
+	this.magoMangaer = magoMangaer;
+
+	this.renderFunction = (customRenderFunc && typeof customRenderFunc === 'function') ? customRenderFunc : this.defaultRenderFunc;
+
+	this.initQuatTree();
+};
+
+Cluster.prototype.initQuatTree = function() 
+{
+	var treeOption = this.getTreeOption();
+	this.quatTree = new QuatTree(treeOption);
+	this.quatTree.data = this.point2DList.pointsArray;
+
+	this.makeTreeByDepth();
+};
+
+Cluster.prototype.getTreeOption = function() 
+{
+	var br = this.point2DList.getBoundingRectangle();
+
+	var xLength = br.getXLength();
+	var yLength = br.getYLength();
+	var center = br.getCenterPoint();
+	
+	if (xLength < 0.03) { xLength = 0.03; }
+	if (yLength < 0.03) { yLength = 0.03; }
+	return {
+		halfWidth  : xLength/2,
+		halfHeight : yLength/2,
+		center     : center
+	};
+};
+
+Cluster.prototype.addPoint = function(point) 
+{
+	this.point2DList.addPoint(point);
+	this.initQuatTree();
+};
+
+Cluster.prototype.deletePointByCondition = function(condition)
+{
+	this.point2DList.deletePointByCondition(condition);
+
+	if (this.point2DList.getPointsCount() > 0 ) 
+	{
+		this.initQuatTree();
 	}
 	else 
 	{
-		throw new Error('point3DList is required');
-	}
-    
-	this.range = defaultValue(range, 10);
-	this.minSize = defaultValue(minSize, 2);
-	this.isMaking = false;
-	this.prevHeight;
-};
-Cluster.prototype = Object.create(MagoRenderable.prototype);
-Cluster.prototype.constructor = Cluster;
+		this.quatTree = undefined;
 
-Cluster.prototype.setRange = function(range) 
-{
-	if (isNaN(range))
-	{
-		throw new Error('range must number.');
-	}
-
-	this.range = range;
-	this.setDirty(true);
-};
-
-Cluster.prototype.render = function(magoManager, shader, renderType, glPrimitive, bIsSelected) 
-{
-	if (this.attributes && this.attributes.isVisible !== undefined && this.attributes.isVisible === false) 
-	{
-		return;
-	}
-    
-	if (this.dirty)
-	{ this.makeCluster(magoManager); }
-	
-	if (this.objectsArray.length === 0)
-	{ return false; }
-
-	var objectsCount = this.objectsArray.length;
-	for (var i=0; i<objectsCount; i++)
-	{
-		this.objectsArray[i].render(magoManager, shader, renderType, glPrimitive, bIsSelected);
-	}
-};
-
-Cluster.prototype.makeCluster = function(magoManager) 
-{
-	this.objectsArray = [];
-	var pointCnt = this.point3DList.getPointsCount();
-	if (pointCnt < 1) { return false; }
-	
-	this.isMaking = true;
-	var gl = magoManager.getGl();
-	var dbWidth = gl.drawingBufferWidth;
-	var dbHeight = gl.drawingBufferHeight;
-
-	var clusterObj = {};
-	
-	for (var i = 0;i<pointCnt;i++) 
-	{
-		if (!clusterObj[i]) 
+		this.magoMangaer.objMarkerManager.setMarkerByCondition(function(om)
 		{
-			var point3D = this.point3DList.getPoint(i);
-        
-			var pixel = ManagerUtils.calculateWorldPositionToScreenCoord(gl, point3D.x, point3D.y, point3D.z, undefined, magoManager);
-
-			if (!isInScreen(pixel, dbWidth, dbHeight)) { continue; }
-			var screenExtent = BoundingBox.getBBoxByPonintAndSize(pixel, this.range);
-			//ManagerUtils.screenCoordToWorldCoord = function(gl, pixelX, pixelY, resultWCPos, depthFbo, frustumNear, frustumFar, magoManager) 
-			var leftBottom = ManagerUtils.screenCoordToWorldCoord(gl, screenExtent.minX, screenExtent.minY, leftBottom, undefined, undefined, undefined, magoManager);
-			var rightTop = ManagerUtils.screenCoordToWorldCoord(gl, screenExtent.maxX, screenExtent.maxY, rightTop, undefined, undefined, undefined, magoManager);
-
-			
-			if (!leftBottom || !rightTop) 
-			{
-				continue;
-			}
-
-			var leftBottomGeoCoord = ManagerUtils.pointToGeographicCoord(leftBottom);
-			var rightTopGeoCoord = ManagerUtils.pointToGeographicCoord(rightTop);
-
-			var searchObj = {
-				minX : leftBottomGeoCoord.longitude,
-				minY : rightTopGeoCoord.latitude,
-				maxX : rightTopGeoCoord.longitude,
-				maxY : leftBottomGeoCoord.latitude
-			};
-
-			var clusterPoint3D;
-			var clusterCnt = 0;
-			
-			var searched = this.bush.search(searchObj);
-			if (searched.length > 0 )
-			{
-				var auxP3d = new Point3D(0, 0, 0);
-				for (var j=0, searchedLen=searched.length;j<searchedLen;j++) 
-				{
-					var searchedValue = searched[j].value;
-					var id = searchedValue.id;
-
-					if (!clusterObj[id]) 
-					{
-						clusterObj[id] = true;
-
-						var auxPoint3D = this.point3DList.getPoint(id);
-						auxP3d.add(auxPoint3D.x, auxPoint3D.y, auxPoint3D.z);
-						
-						clusterCnt++;
-					}
-				}
-				auxP3d.scale(1/clusterCnt);
-				clusterPoint3D = auxP3d;
-			}
-			else 
-			{
-				clusterCnt = 1;
-				clusterObj[point3D.id] = true;
-				clusterPoint3D = new Point3D(point3D.x, point3D.y, point3D.z);
-			}
-
-			var sphereOptions = {};
-			var color = new Color();
-			color.setRGB(0.99, 0.1, 0.1);
-			sphereOptions.color = color;
-			
-			var s = new Sphere(sphereOptions);
-			s.setRadius(clusterCnt * 100);
-
-			var geoCoord = ManagerUtils.pointToGeographicCoord(clusterPoint3D);
-			var geoLocDataManager = new GeoLocationDataManager();
-			var geoLocData = geoLocDataManager.newGeoLocationData('noName');
-			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, 0, 0, 0, 0, geoLocData);
-			s.geoLocDataManager = geoLocDataManager;
-
-			this.objectsArray.push(s);
-		}
+			return !om.tree;
+		});
 	}
 	
-	this.dirty = false;
-	this.isMaking = false;
-	
-	function isInScreen(pxl, glWidth, glHeight) 
+};
+
+Cluster.prototype.updatePoint = function(point, findOption)
+{
+	var findPoint = this.point2DList.findPointArray(findOption)[0];
+	findPoint.set(point.getX(), point.getY());
+	var keys = Object.keys(findPoint);
+
+	for (var i=0, len=keys.length;i<len;i++) 
 	{
-		var offset = 100;
-		var pxlX = pxl.x;
-		var pxlY = pxl.y;
+		var key = keys[i];
+		findPoint[key] = point[key];
+	}
 
-		if (pxlX < -offset || pxlX > glWidth + offset || pxlY < -offset || pxlY > glHeight + offset) { return false; }
+	this.initQuatTree();
+};
 
-		return true;
+Cluster.prototype.makeTreeByDepth = function() 
+{
+	this.quatTree.makeTreeByDepth(this.depth);
+};
+
+Cluster.prototype.defaultRenderFunc = function(trees, magoManager) 
+{
+	magoManager.objMarkerManager.loadDefaultImages(magoManager);
+	magoManager.objMarkerManager.objectMarkerArray = [];
+
+	var treeLength = trees.length;
+	for (var i=0;i<treeLength;i++) 
+	{
+		var tree = trees[i];
+		if (tree.hasChildren()) 
+		{
+			var points = tree.displayPointsArray;
+
+			var pointLength = points.length;
+			for (var j=0;j<pointLength;j++) 
+			{
+				var point = points[j];
+				var mass = point.mass;
+
+				if (mass > 50) { mass=50; }
+				if (mass < 15) { mass = 15; }
+				var options = {
+					positionWC    : point,
+					imageFilePath : "defaultRed",
+					sizeX         : mass,
+					sizeY         : mass
+				};
+				magoManager.objMarkerManager.newObjectMarker(options, magoManager);
+			}
+		}
+		else 
+		{
+			var points = tree.data;
+			if (points) 
+			{
+				var pointLength = points.length;
+				for (var j=0;j<pointLength;j++) 
+				{
+					var point = points[j];
+					
+					var options = {
+						positionWC    : ManagerUtils.geographicCoordToWorldPoint(point.x, point.y, 0),
+						imageFilePath : "defaultBlue",
+						sizeX         : 8,
+						sizeY         : 8
+					};
+					magoManager.objMarkerManager.newObjectMarker(options, magoManager);
+				}
+			}
+		}
 	}
 };

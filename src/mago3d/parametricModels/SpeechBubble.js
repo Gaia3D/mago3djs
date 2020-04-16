@@ -67,10 +67,10 @@ SpeechBubble.prototype.makeDefault = function(imageSize)
 SpeechBubble.prototype.getPng = function (imageSize, color, textOption) 
 {
 	//need validation
-	var hexColor = color.getHexCode();
+	//var hexColor = color.getHexCode();
 	var aux = [];
 	aux.push(imageSize);
-	aux.push(hexColor);
+	aux.push(color);
 	aux.push(textOption);
 	var id = JSON.stringify(aux);
 
@@ -80,7 +80,7 @@ SpeechBubble.prototype.getPng = function (imageSize, color, textOption)
 	}
 
 	this.makeDefault(imageSize);
-	var canvas = makeCanvas(imageSize, hexColor, textOption, this.point2dArray);
+	var canvas = makeCanvas(imageSize, color, textOption, this.point2dArray);
 	this.repository[id] = canvas;
 	return canvas.toDataURL();
 
@@ -125,7 +125,7 @@ SpeechBubble.prototype.getPng = function (imageSize, color, textOption)
 			var fontColor = defaultValue(tOption.color, 'white');
 			var fontBorderColor = defaultValue(tOption.borderColor, 'black');
 
-			ctx.font = fontPixel + "px " + fontType;
+			ctx.font = 'bold ' + fontPixel + "px " + fontType;
 			ctx.fillStyle = fontColor;
 			ctx.strokeStyle = fontBorderColor;
 			ctx.textAlign = "center";

@@ -6,12 +6,15 @@
  * @alias SelectionManager
  * @class SelectionManager
  */
-var SelectionManager = function() 
+var SelectionManager = function(magoManager) 
 {
 	if (!(this instanceof SelectionManager)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
+
+	//2020 01 24 추가
+	this.magoManager = magoManager;
 
 	// General candidates. 
 	this.selCandidatesMap = {};
@@ -176,7 +179,7 @@ SelectionManager.prototype.selectObjects = function(idxKey)
 	this.currentOctreeSelected = this.octreesMap[idxKey];
 	this.currentBuildingSelected = this.buildingsMap[idxKey];
 	this.currentNodeSelected = this.nodesMap[idxKey];
-	
+
 	for (var key in this.selCandidatesFamilyMap)
 	{
 		if (Object.prototype.hasOwnProperty.call(this.selCandidatesFamilyMap, key))

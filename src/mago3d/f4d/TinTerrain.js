@@ -259,10 +259,22 @@ TinTerrain.prototype.isTexturePrepared = function(texturesMap)
 	var isTexturePrepared = true;
 	var textureKeys = Object.keys(texturesMap);
 	var textureLength = textureKeys.length;
-	if (textureLength === 0) 
+
+	var L = this.depth.toString();
+	var imageryLength = this.tinTerrainManager.imagerys.length;
+	for (var i=0;i<imageryLength;i++) 
 	{
-		return false;
+		var imagery = this.tinTerrainManager.imagerys[i];
+		if (!this.texture[imagery._id] && (imagery.show && imagery.maxZoom > parseInt(L) && imagery.minZoom < parseInt(L))) 
+		{
+			isTexturePrepared = false;
+			break;
+		}
 	}
+	if (!isTexturePrepared) { return isTexturePrepared; }
+
+	//if (!imagery.show || imagery.maxZoom < parseInt(L) || imagery.minZoom > parseInt(L)) { continue; }
+	
 	for (var i=0;i<textureLength;i++) 
 	{
 		var texture = texturesMap[textureKeys[i]];
@@ -305,8 +317,9 @@ TinTerrain.prototype.prepareTexture = function(texturesMap, imagerys, magoManage
 	for (var i=0, len=imagerys.length;i<len;i++) 
 	{
 		var imagery = imagerys[i];
-		if (imagery.maxZoom < parseInt(L) || imagery.minZoom > parseInt(L)) { continue; }
-		if (texturesMap[imagery._id]) { continue; }
+		if (!imagery.show || imagery.maxZoom < parseInt(L) || imagery.minZoom > parseInt(L)) { continue; }
+		var id = imagery._id;
+		if (this.texture[id]) { continue; }
 
 		var texture = new Texture();
 		var textureUrl = imagery.getUrl({x: X, y: Y, z: L});
@@ -314,19 +327,12 @@ TinTerrain.prototype.prepareTexture = function(texturesMap, imagerys, magoManage
 		this.texFilePath__TEST = textureUrl;
 		var flip_y_texCoords = false;
 		magoManager.readerWriter.loadWMSImage(gl, textureUrl, texture, magoManager, flip_y_texCoords);
-		texturesMap[imagery._id] = texture;
-	}
-		
-	//var textureFilePath = "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/" + L + "/" + Y + "/" + X;
-	//var textureFilePath = "https://services.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer/tile/" + L + "/" + Y + "/" + X + ".png";
-	//var textureFilePath = "https://services.arcgisonline.com/arcgis/rest/services/World_Physical_Map/MapServer/tile/" + L + "/" + Y + "/" + X + ".png"; // low res.
-	//var textureFilePath = "https://services.arcgisonline.com/arcgis/rest/services/NatGeo_World_Map/MapServer/tile/" + L + "/" + Y + "/" + X + ".png"; // low res.
-	//var textureFilePath = "https://c.tile.openstreetmap.org/" + L + "/" + X + "/" + Y + ".png";
-	
-	// Provisionally, for debug, save textureFilePath.***
-	//this.texFilePath__TEST = textureFilePath;
-	//var flip_y_texCoords = false;
-	//magoManager.readerWriter.loadWMSImage(gl, textureFilePath, this.texture, magoManager, flip_y_texCoords);
+
+		this.texture[id] = texture;
+		this.texture[id].imagery = imagery;
+
+		tinTerrainManager.addTextureId(id);
+	}	
 };
 
 TinTerrain.prototype.prepareTinTerrainPlain = function(magoManager, tinTerrainManager)
@@ -391,9 +397,93 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 			magoManager.parseQueue.putTinTerrainToParse(this, 0);
 			return false;
 		}
+		else if (this.fileLoadState === CODE.fileLoadState.PARSE_STARTED) 
+		{
+			var parsedTerrainMap = tinTerrainManager.textureParsedTerrainMap;
+			var z = this.depth;
+			var x = this.X;
+			var y = this.Y;
+			if (!parsedTerrainMap[z]) { return; }
+			if (!parsedTerrainMap[z][x]) { return; }
+			if (!parsedTerrainMap[z][x][y]) { return; }
+
+			var result = parsedTerrainMap[z][x][y];
+
+			this.centerX = result.centerX;
+			this.centerY = result.centerY;
+			this.centerZ = result.centerZ;
+			
+			this.minHeight = result.minHeight;
+			this.maxHeight = result.maxHeight;
+			
+			// In this moment set the altitudes for the geographicExtension.
+			this.geographicExtent.setExtent(undefined, undefined, this.minHeight[0], undefined, undefined, this.maxHeight[0]);
+			
+			this.boundingSphereCenterX = result.boundingSphereCenterX;
+			this.boundingSphereCenterY = result.boundingSphereCenterY;
+			this.boundingSphereCenterZ = result.boundingSphereCenterZ;
+			this.boundingSphereRadius = result.boundingSphereRadius;
+			
+			this.horizonOcclusionPointX = result.horizonOcclusionPointX;
+			this.horizonOcclusionPointY = result.horizonOcclusionPointY;
+			this.horizonOcclusionPointZ = result.horizonOcclusionPointZ;
+			
+			// 2. vertex data.
+			this.vertexCount = result.vertexCount;
+			this.uValues = result.uValues;
+			this.vValues = result.vValues;
+			this.hValues = result.hValues;
+			
+			// 3. indices.
+			this.trianglesCount = result.trianglesCount;
+			this.indices = result.indices;
+			
+			// 4. edges indices.
+			this.westVertexCount = result.westVertexCount;
+			this.westIndices = result.westIndices;
+			
+			this.southVertexCount = result.southVertexCount;
+			this.southIndices = result.southIndices;
+			
+			this.eastVertexCount = result.eastVertexCount; 
+			this.eastIndices = result.eastIndices;
+			
+			this.northVertexCount = result.northVertexCount;
+			this.northIndices = result.northIndices;
+
+			// 5. extension header.
+			this.extensionId = result.extensionId;
+			this.extensionLength = result.extensionLength;
+			
+			this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
+			delete this.tinTerrainManager.textureParsedTerrainMap[z][x][y];
+		}
 		else if (this.fileLoadState === CODE.fileLoadState.PARSE_FINISHED && this.vboKeyContainer === undefined)
 		{
-			this.decodeData(tinTerrainManager.imageryType);
+			if (!this.requestDecodeData) 
+			{ 
+				this.decodeData(tinTerrainManager.imageryType); 
+				return;
+			}
+			
+			var z = this.depth;
+			var x = this.X;
+			var y = this.Y;
+			var decodedTerrainMap = tinTerrainManager.textureDecodedTerrainMap;
+			if (!decodedTerrainMap[z]) { return; }
+			if (!decodedTerrainMap[z][x]) { return; }
+			if (!decodedTerrainMap[z][x][y]) { return; }
+
+			var result = decodedTerrainMap[z][x][y];
+
+			this.texCoordsArray = result.texCoordsArray;
+			this.cartesiansArray = result.cartesiansArray;
+			this.skirtCartesiansArray = result.skirtCartesiansArray;
+			this.skirtTexCoordsArray = result.skirtTexCoordsArray;
+			this.skirtAltitudesArray = result.skirtAltitudesArray;
+			this.altArray = result.altArray;
+
+			delete this.tinTerrainManager.textureDecodedTerrainMap[z][x][y];
 			this.makeVbo(magoManager.vboMemoryManager);
 			return false;
 		}
@@ -583,8 +673,18 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 				var textureLength = textureKeys.length; 
 				for (var i=0;i<textureLength;i++) 
 				{
+					var textureKey = textureKeys[i];
+					var texture = this.texture[textureKey];
+					if (this.tinTerrainManager.textureIdDeleteMap[textureKey]) 
+					{
+						this.tinTerrainManager.eraseTexture(texture, magoManager);
+						delete this.texture[textureKey];
+						continue;
+					}
+					
+					if (!texture.imagery.show) { continue; }
+
 					gl.activeTexture(gl.TEXTURE2 + i); 
-					var texture = this.texture[textureKeys[i]];
 					gl.bindTexture(gl.TEXTURE_2D, texture.texId);
 					
 					if (i === 1)
@@ -2122,265 +2222,64 @@ TinTerrain.prototype.decodeData = function(imageryType)
 	
 	if (this.vertexArray === undefined)
 	{ this.vertexArray = []; }
-	
-	var degToRadFactor = Math.PI/180.0;
-	// latitude & longitude in RADIANS.
-	var minLon = this.geographicExtent.minGeographicCoord.longitude * degToRadFactor;
-	var minLat = this.geographicExtent.minGeographicCoord.latitude * degToRadFactor;
-	var maxLon = this.geographicExtent.maxGeographicCoord.longitude * degToRadFactor;
-	var maxLat = this.geographicExtent.maxGeographicCoord.latitude * degToRadFactor;
-	var lonRange = maxLon - minLon;
-	var latRange = maxLat - minLat;
-	
-	var minHeight = this.minHeight[0];
-	var maxHeight = this.maxHeight[0];
-	var heightRange = maxHeight - minHeight;
-	
-	var vertexCount = this.vertexCount[0];
-	this.texCoordsArray = new Float32Array(vertexCount*2);
-	var lonArray = new Float32Array(vertexCount);
-	var latArray = new Float32Array(vertexCount);
-	var altArray = new Float32Array(vertexCount);
-	
-	var shortMax = 32767; // 65536
-	var lonRangeDivShortMax = lonRange/shortMax;
-	var latRangeDivShortMax = latRange/shortMax;
-	var heightRangeDivShortMax = heightRange/shortMax;
-	var uValues = this.uValues;
-	var vValues = this.vValues;
-	var hValues = this.hValues;
-	
-	var exageration = 5.0;
-	
-	if (this.depth === 0)
-	{ var hola = 0; }
 
-	if (this.depth === 1)
-	{ var hola = 0; }
-	
-	if (imageryType === undefined)
-	{ imageryType = CODE.imageryType.CRS84; }
-	
-	if (imageryType === CODE.imageryType.WEB_MERCATOR)
-	{
-		// web_mercator.
-		// https://en.wikipedia.org/wiki/Web_Mercator_projection
-		var depth = this.depth;
-		var PI = Math.PI;
-		var aConst = (1.0/(2.0*PI))*Math.pow(2.0, depth);
-		var PI_DIV_4 = PI/4;
-		var minT = aConst*(PI-Math.log(Math.tan(PI_DIV_4+minLat/2)));
-		var maxT = aConst*(PI-Math.log(Math.tan(PI_DIV_4+maxLat/2)));
-		var minS = aConst*(minLon+PI);
-		var maxS = aConst*(maxLon+PI);
-		var floorMinS = Math.floor(minS);
-		var t, s;
-		
-		// Flip texCoordY for minT & maxT.***
-		minT = 1.0 - minT;
-		maxT = 1.0 - maxT;
-
-		var test_min_s;
-		var test_max_s;
-		var test_min_t;
-		var test_max_t;
-		for (var i=0; i<vertexCount; i++)
+	var tinTerrainManager = this.tinTerrainManager;
+	if (!this.tinTerrainManager.workerDecodedTerrain) 
+	{ 
+		this.tinTerrainManager.workerDecodedTerrain = new Worker('/build/mago3d/Worker/workerDecodeTerrain.js'); 
+		this.tinTerrainManager.workerDecodedTerrain.onmessage = function(e)
 		{
-			lonArray[i] = minLon + uValues[i]*lonRangeDivShortMax;
-			latArray[i] = minLat + vValues[i]*latRangeDivShortMax;
-			altArray[i] = minHeight + hValues[i]*heightRangeDivShortMax;
-			
-
-			//if (altArray[i] < 0.0)
-			//{ altArray[i] *= exageration; }
-			
-			var currLon = lonArray[i];
-			var currLat = latArray[i];
-			
-			// make texcoords.
-			t = aConst*(PI-Math.log(Math.tan(PI_DIV_4+currLat/2)));
-			t = 1.0 - t;
-				
-			// Substract minT to "t" to make range [0 to 1].***
-			t -= minT; 
-			
-			s = aConst*(currLon+PI);
-			s -= floorMinS;
-			
-			this.texCoordsArray[i*2] = s;
-			this.texCoordsArray[i*2+1] = t;
-		}
+			var tileInfo = e.data.info;
+			var result = e.data.decodedTerrain;
+			var decodedTerrainMap = tinTerrainManager.textureDecodedTerrainMap;
+			if (!decodedTerrainMap[tileInfo.z]) { decodedTerrainMap[tileInfo.z] = {}; }
+			if (!decodedTerrainMap[tileInfo.z][tileInfo.x]) { decodedTerrainMap[tileInfo.z][tileInfo.x] = {}; }
+			if (!decodedTerrainMap[tileInfo.z][tileInfo.x][tileInfo.y]) { decodedTerrainMap[tileInfo.z][tileInfo.x][tileInfo.y] = result; }
+		};
 	}
-	else
-	{
-		// crs84.
-		for (var i=0; i<vertexCount; i++)
-		{
-			lonArray[i] = minLon + uValues[i]*lonRangeDivShortMax;
-			latArray[i] = minLat + vValues[i]*latRangeDivShortMax;
-			altArray[i] = minHeight + hValues[i]*heightRangeDivShortMax;
-			
-			// make texcoords.
-			this.texCoordsArray[i*2] = uValues[i]/shortMax;
-			this.texCoordsArray[i*2+1] = vValues[i]/shortMax;
-		}
-	}
-	
-	this.cartesiansArray = Globe.geographicRadianArrayToFloat32ArrayWgs84(lonArray, latArray, altArray, undefined);
-	
-	//if (this.minHeight[0] < 0.0)
-	//{
-	//	var altZeroArray = new Float32Array(vertexCount);
-	//	this.seaCartesiansArray = Globe.geographicRadianArrayToFloat32ArrayWgs84(lonArray, latArray, altZeroArray, undefined);
-	//}
-	
-	//this.normalsArray = TinTerrain.getNormalCartesiansArray(this.cartesiansArray, this.indices, undefined, undefined);
-	//if (this.depth === 17 && this.X === 111517 && this.Y === 52705)
-	//{ var hola = 0; }
 
-	var texCorrectionFactor = this.tinTerrainManager.getTexCorrection(depth);
-	
-	var options = {
-		skirtDepth          : 10000,
-		texCorrectionFactor : texCorrectionFactor,
-		bMakeAltitudesArray : false
-		
-	};
-	var skirtResultObject = TinTerrain.getSkirtTrianglesStrip(lonArray, latArray, altArray, this.texCoordsArray, this.southIndices, this.eastIndices, this.northIndices, this.westIndices, options);
-	this.skirtCartesiansArray = skirtResultObject.skirtCartesiansArray;
-	this.skirtTexCoordsArray = skirtResultObject.skirtTexCoordsArray;
-	this.skirtAltitudesArray = skirtResultObject.skirtAltitudesArray;
-	//this.skirtAltitudesValuesArray = skirtResultObject.skirtAltitudesValuesArray;
-	
-	// free memory.
-	//this.uValues = undefined; // keep values to make altitudesMap.
-	//this.vValues = undefined; // keep values to make altitudesMap.
-	//this.hValues = undefined; // keep values to make altitudesMap.
-	
-	// store useful data.
-	this.altArray = altArray;
-	//this.lonArray = lonArray;
-	//this.latArray = latArray;
-	
-	
+	this.tinTerrainManager.workerDecodedTerrain.postMessage({
+		param: {
+			minGeographicLongitude : this.geographicExtent.minGeographicCoord.longitude,
+			minGeographicLatitude  : this.geographicExtent.minGeographicCoord.latitude,
+			maxGeographicLongitude : this.geographicExtent.maxGeographicCoord.longitude,
+			maxGeographicLatitude  : this.geographicExtent.maxGeographicCoord.latitude,
+			minHeight              : this.minHeight,
+			maxHeight              : this.maxHeight,
+			vertexCount            : this.vertexCount,
+			uValues                : this.uValues,
+			vValues                : this.vValues,
+			hValues                : this.hValues,
+			imageryType            : imageryType,
+			depth                  : this.depth,
+			southIndices           : this.southIndices,
+			eastIndices            : this.eastIndices,
+			northIndices           : this.northIndices,
+			westIndices            : this.westIndices
+		}, 
+		info: {x: this.X, y: this.Y, z: this.depth}
+	});
+	this.requestDecodeData = true;
 };
 
 TinTerrain.prototype.parseData = function(dataArrayBuffer)
 {
+	var tinTerrainManager = this.tinTerrainManager;
 	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
-	var bytes_readed = 0;
-	
-	// 1. header.
-	this.centerX = new Float64Array(dataArrayBuffer.slice(bytes_readed, bytes_readed+8)); bytes_readed+=8;
-	this.centerY = new Float64Array(dataArrayBuffer.slice(bytes_readed, bytes_readed+8)); bytes_readed+=8;
-	this.centerZ = new Float64Array(dataArrayBuffer.slice(bytes_readed, bytes_readed+8)); bytes_readed+=8;
-	
-	this.minHeight = new Float32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed+=4;
-	this.maxHeight = new Float32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed+=4;
-	
-	// In this moment set the altitudes for the geographicExtension.
-	this.geographicExtent.setExtent(undefined, undefined, this.minHeight[0], undefined, undefined, this.maxHeight[0]);
-	
-	this.boundingSphereCenterX = new Float64Array(dataArrayBuffer.slice(bytes_readed, bytes_readed+8)); bytes_readed+=8;
-	this.boundingSphereCenterY = new Float64Array(dataArrayBuffer.slice(bytes_readed, bytes_readed+8)); bytes_readed+=8;
-	this.boundingSphereCenterZ = new Float64Array(dataArrayBuffer.slice(bytes_readed, bytes_readed+8)); bytes_readed+=8;
-	this.boundingSphereRadius = new Float64Array(dataArrayBuffer.slice(bytes_readed, bytes_readed+8)); bytes_readed+=8;
-	
-	this.horizonOcclusionPointX = new Float64Array(dataArrayBuffer.slice(bytes_readed, bytes_readed+8)); bytes_readed+=8;
-	this.horizonOcclusionPointY = new Float64Array(dataArrayBuffer.slice(bytes_readed, bytes_readed+8)); bytes_readed+=8;
-	this.horizonOcclusionPointZ = new Float64Array(dataArrayBuffer.slice(bytes_readed, bytes_readed+8)); bytes_readed+=8;
-	
-	// 2. vertex data.
-	this.vertexCount = new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed+4)); bytes_readed+=4;
-	var vertexCount = this.vertexCount[0];
-	this.uValues = new Uint16Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 2 * vertexCount)); bytes_readed += 2 * vertexCount;
-	this.vValues = new Uint16Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 2 * vertexCount)); bytes_readed += 2 * vertexCount;
-	this.hValues = new Uint16Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 2 * vertexCount)); bytes_readed += 2 * vertexCount;
-	
-	// decode data.
-	var u = 0;
-	var v = 0;
-	var height = 0;
-	for (var i=0; i<vertexCount; i++)
-	{
-		u += this.zigZagDecode(this.uValues[i]);
-		v += this.zigZagDecode(this.vValues[i]);
-		height += this.zigZagDecode(this.hValues[i]);
-		
-		this.uValues[i] = u;
-		this.vValues[i] = v;
-		this.hValues[i] = height;
-	}
-	
-	// 3. indices.
-	this.trianglesCount = new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4)); bytes_readed += 4;
-	var trianglesCount = this.trianglesCount;
-	if (vertexCount > 65536 )
-	{
-		this.indices = new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4 * trianglesCount * 3)); bytes_readed += 4 * trianglesCount * 3;
-	}
-	else 
-	{
-		this.indices = new Uint16Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 2 * trianglesCount * 3)); bytes_readed += 2 * trianglesCount * 3;
-	}
-	
-	// decode indices.
-	var code;
-	var highest = 0;
-	var indicesCount = this.indices.length;
-	for (var i=0; i<indicesCount; i++)
-	{
-		code = this.indices[i];
-		this.indices[i] = highest - code;
-		if (code === 0) 
+	if (!this.tinTerrainManager.workerParseTerrain) 
+	{ 
+		this.tinTerrainManager.workerParseTerrain = new Worker('/build/mago3d/Worker/workerParseTerrain.js'); 
+		this.tinTerrainManager.workerParseTerrain.onmessage = function(e)
 		{
-			++highest;
-		}
+			var tileInfo = e.data.info;
+			var result = e.data.parsedTerrain;
+			var parsedTerrainMap = tinTerrainManager.textureParsedTerrainMap;
+			if (!parsedTerrainMap[tileInfo.z]) { parsedTerrainMap[tileInfo.z] = {}; }
+			if (!parsedTerrainMap[tileInfo.z][tileInfo.x]) { parsedTerrainMap[tileInfo.z][tileInfo.x] = {}; }
+			if (!parsedTerrainMap[tileInfo.z][tileInfo.x][tileInfo.y]) { parsedTerrainMap[tileInfo.z][tileInfo.x][tileInfo.y] = result; }
+		};
 	}
-	
-	// 4. edges indices.
-	if (vertexCount > 65536 )
-	{
-		this.westVertexCount = new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4)); bytes_readed += 4;
-		this.westIndices = new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4 * this.westVertexCount)); bytes_readed += 4 * this.westVertexCount;
-		
-		this.southVertexCount = new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4)); bytes_readed += 4;
-		this.southIndices = new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4 * this.southVertexCount)); bytes_readed += 4 * this.southVertexCount;
-		
-		this.eastVertexCount = new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4)); bytes_readed += 4;
-		this.eastIndices = new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4 * this.eastVertexCount)); bytes_readed += 4 * this.eastVertexCount;
-		
-		this.northVertexCount = new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4)); bytes_readed += 4;
-		this.northIndices = new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4 * this.northVertexCount)); bytes_readed += 4 * this.northVertexCount;
-	}
-	else
-	{
-		this.westVertexCount = new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4)); bytes_readed += 4;
-		this.westIndices = new Uint16Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 2 * this.westVertexCount)); bytes_readed += 2 * this.westVertexCount;
-		
-		this.southVertexCount = new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4)); bytes_readed += 4;
-		this.southIndices = new Uint16Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 2 * this.southVertexCount)); bytes_readed += 2 * this.southVertexCount;
-		
-		this.eastVertexCount = new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4)); bytes_readed += 4;
-		this.eastIndices = new Uint16Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 2 * this.eastVertexCount)); bytes_readed += 2 * this.eastVertexCount;
-		
-		this.northVertexCount = new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4)); bytes_readed += 4;
-		this.northIndices = new Uint16Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 2 * this.northVertexCount)); bytes_readed += 2 * this.northVertexCount;
-	}
-	
-	// 5. extension header.
-	this.extensionId = new Uint8Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 1)); bytes_readed += 1;
-	this.extensionLength = new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4)); bytes_readed += 4;
-	
-	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
-	
-	if (this.extensionId.length === 0)
-	{
-		dataArrayBuffer = undefined;
-		return;
-	}
-	
-	dataArrayBuffer = undefined;
+	this.tinTerrainManager.workerParseTerrain.postMessage({dataArrayBuffer: dataArrayBuffer, info: {x: this.X, y: this.Y, z: this.depth}});
 };
 
 

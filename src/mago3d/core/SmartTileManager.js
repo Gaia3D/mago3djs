@@ -239,7 +239,7 @@ SmartTileManager.prototype.parseSmartTilesMultiBuildingsIndexFile = function(dat
 		
 		var geoExtent = SmartTile.getGeographicExtentOfTileLXY(L, X, Y, undefined, CODE.imageryType.CRS84);
 		var centerGeoCoord = geoExtent.getMidPoint();
-		centerGeoCoord.altitude += 20.0;// test. delete!!!
+		//centerGeoCoord.altitude += 20.0;// test. delete!!!
 		var multiBuildingId = "";
 		this.objectSeedsMap[name] = {
 			"L"                        : L,

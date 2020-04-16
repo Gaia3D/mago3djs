@@ -400,6 +400,11 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	if (data === undefined)
 	{ return; }
 
+	if (this.renderCondition && typeof this.renderCondition === 'function') 
+	{
+		this.renderCondition.call(this, data);
+	}
+
 	// Check if there are renderables.***
 	var renderable = data.renderable;
 	if (renderable)
@@ -492,8 +497,6 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	{ flipYTexCoord = data.attributes.flipYTexCoords; }
 
 	gl.uniform1i(shader.textureFlipYAxis_loc, flipYTexCoord);
-	
-	
 	
 	// Check the geoLocationDatasCount & check if is a ghost-trail-render (trail as ghost).
 	var currRenderingFase = magoManager.renderingFase;
@@ -634,6 +637,25 @@ Node.prototype.getRoot = function()
 };
 
 /**
+ * @param {function} renderCondition
+ */
+Node.prototype.setRenderCondition = function(renderCondition) 
+{
+	if (!renderCondition || typeof renderCondition !== 'function') 
+	{
+		throw new Error('renderCondition is required.');
+	}
+	this.renderCondition = renderCondition;
+};
+/**
+ * @return {function}
+ */
+Node.prototype.getRenderCondition = function() 
+{
+	return this.renderCondition;
+};
+
+/**
  * 어떤 일을 하고 있습니까?
  */
 Node.prototype.getClosestParentWithData = function(dataName) 
@@ -745,6 +767,7 @@ Node.prototype.getBBoxCenterPositionWorldCoord = function(geoLoc)
 Node.prototype.calculateBBoxCenterPositionWorldCoord = function(geoLoc) 
 {
 	var data = this.data;
+
 	var mapping_type = data.mapping_type;
 	
 	if (mapping_type === undefined)
@@ -1393,10 +1416,10 @@ Node.prototype.changeLocationAndRotation = function(latitude, longitude, elevati
 		}
 		neoBuilding.calculateBBoxCenterPositionWorldCoord(geoLocationData);
 		nodeRoot.bboxAbsoluteCenterPos = undefined; // provisional.
-		nodeRoot.calculateBBoxCenterPositionWorldCoord(geoLocationData); // provisional.
+		nodeRoot.bboxAbsoluteCenterPos = nodeRoot.calculateBBoxCenterPositionWorldCoord(geoLocationData); // provisional.
 		
 		aNode.bboxAbsoluteCenterPos = undefined; // provisional.
-		aNode.calculateBBoxCenterPositionWorldCoord(geoLocationData); // provisional.
+		aNode.bboxAbsoluteCenterPos = aNode.calculateBBoxCenterPositionWorldCoord(geoLocationData); // provisional.
 		
 		// Now, calculate the geoCoords of the bbox.
 		if (nodeRoot.data.bbox.geographicCoord === undefined)

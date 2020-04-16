@@ -1,0 +1,205 @@
+'use strict';
+
+/**
+ * Mago3d's format 'F4D' type data controller.
+ * @class F4dController
+ * 
+ * @param {MagoManager} magoManager
+ */
+var F4dController = function(magoManager) 
+{
+
+	if (!(this instanceof F4dController)) 
+	{
+		throw new Error(Messages.CONSTRUCT_ERROR);
+	}
+	if (!magoManager || !magoManager instanceof MagoManager) 
+	{
+		throw new Error('magoManager is required.');
+	}
+	Emitter.call(this);
+
+	this.magoManager = magoManager;
+
+	this.smartTilePathInfo = {};
+
+};
+
+F4dController.prototype = Object.create(Emitter.prototype);
+F4dController.prototype.constructor = F4dController;
+
+/**
+ * f4d smarttile data group 등록
+ * @param {Array<object> | object} f4dObject f4d smarttile data group
+ */
+F4dController.prototype.addSmartTileGroup = function(f4dObject) 
+{
+	var magoManager = this.magoManager;
+	if (Array.isArray(f4dObject)) 
+	{
+		for (var i=0, len=f4dObject.length;i<len;i++) 
+		{
+			this.addSmartTileGroup(f4dObject[i]);
+		}
+	} 
+	else 
+	{
+		var groupId = f4dObject.data_key || f4dObject.dataGroupId;
+		var groupDataFolder;
+		var groupKey;
+		if (f4dObject.data_key) 
+		{
+			groupDataFolder = groupId;
+			groupKey = groupId;
+		}
+		else 
+		{
+			groupDataFolder = f4dObject.dataGroupPath;
+			groupDataFolder = groupDataFolder.replace(/\/+$/, '');
+
+			groupKey = f4dObject.dataGroupKey;
+		}
+
+		if (!this.smartTilePathInfo[groupKey])
+		{
+			this.smartTilePathInfo[groupKey] = {};
+		}
+
+		this.smartTilePathInfo[groupKey].projectId = groupId;
+		this.smartTilePathInfo[groupKey].projectFolderPath = groupDataFolder;
+		//this.smartTilePathInfo[groupKey].smartTileIndexPath = groupDataFolder + '/' + groupKey + '_TILE';
+
+		if (f4dObject.smartTileIndexPath) 
+		{
+			magoManager.getObjectIndexFileSmartTileF4d(f4dObject.smartTileIndexPath);
+		}
+	}
+};
+/**
+ * f4d data group 등록
+ * @param {Array<object> | object} f4dObject f4d data definition object
+ */
+F4dController.prototype.addF4dGroup = function(f4dObject) 
+{
+	// TODO : validate f4dObject.
+	//F4dController.f4dObjectValidate()
+	//do add f4d group
+	var magoManager = this.magoManager;
+	if (Array.isArray(f4dObject)) 
+	{
+		for (var i=0, len=f4dObject.length;i<len;i++) 
+		{
+			this.addF4dGroup(f4dObject[i]);
+		}
+	}
+	else 
+	{
+		var groupId = f4dObject.data_key || f4dObject.dataKey || f4dObject.dataGroupId;
+		var groupDataFolder;
+
+		if (f4dObject.data_key) 
+		{
+			groupDataFolder = groupId;
+		}
+		else 
+		{
+			groupDataFolder = f4dObject.dataGroupPath;
+			groupDataFolder = groupDataFolder.replace(/\/+$/, '');
+		}
+
+		MagoConfig.setData(CODE.PROJECT_ID_PREFIX + groupId, f4dObject);
+		MagoConfig.setProjectDataFolder(CODE.PROJECT_DATA_FOLDER_PREFIX + groupDataFolder, groupDataFolder);
+        
+		magoManager.getObjectIndexFile(groupId, groupDataFolder);
+	}
+};
+
+/**
+ * f4d data를 등록
+ * @param {string} groupId required. target group id
+ * @param {Array<object> | object} f4dObject f4d data definition object
+ */
+F4dController.prototype.addF4dMember = function(groupId, f4dObject) 
+{
+	if (!groupId) 
+	{
+		throw new Error('groupId is required.');
+	}
+
+	this.magoManager.getObjectIndexFileForData(groupId, f4dObject);
+};
+
+/**
+ * f4d group 삭제
+ * @param {string} groupId required. target group id
+ * @param {Array<object>} f4dObjectArray f4d data definition object
+ */
+F4dController.prototype.deleteF4dGroup = function(groupId) 
+{
+	if (!groupId) 
+	{
+		throw new Error('groupId is required.');
+	}
+
+	var nodeMap = this.magoManager.hierarchyManager.getNodesMap(groupId);
+	if (!nodeMap) 
+	{
+		throw new Error(groupId + ' group is no exists.');
+	}
+
+	var keys = Object.keys(nodeMap);
+	for (var i=0, len=keys.length;i<len;i++) 
+	{
+		var key = keys[i];
+		if (key === 'attributes') 
+		{
+			continue;
+		}
+		
+		var item = nodeMap[keys[i]];
+		if (!item.data.attributes.isPhysical) 
+		{
+			continue;
+		}
+
+		this.deleteF4dMember(groupId, key);
+	}
+
+	delete this.magoManager.hierarchyManager.projectsMap[groupId];
+};
+
+/**
+ * f4d data를 삭제
+ * @param {string} groupId required. target group id
+ * @param {string} memberId f4d data definition object
+ */
+F4dController.prototype.deleteF4dMember = function(groupId, memberId) 
+{
+	if (!groupId) 
+	{
+		throw new Error('groupId is required.');
+	}
+	if (!memberId) 
+	{
+		throw new Error('memberId is required.');
+	}
+
+	var node = this.magoManager.hierarchyManager.getNodeByDataKey(groupId, memberId);
+	if (!node) 
+	{
+		throw new Error('node is no exists.');
+	}
+
+	var smartTile = node.data.smartTileOwner;
+	if (smartTile) 
+	{
+		smartTile.eraseNode(node);
+	}
+	node.deleteObjects(this.magoManager.sceneState.gl, this.magoManager.vboMemoryManager);
+	delete this.magoManager.hierarchyManager.projectsMap[groupId][memberId];
+};
+
+F4dController.f4dObjectValidate = function(f4dObject) 
+{
+	console.info(f4dObject);
+};

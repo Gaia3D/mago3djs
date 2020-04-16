@@ -32,7 +32,15 @@ ObjectMarkerManager.prototype.deleteObjects = function()
 	}
 	this.objectMarkerArray = [];
 };
-
+ObjectMarkerManager.prototype.setMarkerByCondition = function(condition)
+{
+	var that = this;
+	var arr = that.objectMarkerArray.filter(function(om)
+	{
+		return condition.call(that, om);
+	});
+	that.objectMarkerArray = arr;
+};
 /**
  * start rendering.
  * @param scene 변수
@@ -129,7 +137,7 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 	if (objectsMarkersCount > 0)
 	{
 		// Check if defaultImages are loaded.
-		this.loadDefaultImages(magoManager);
+		//this.loadDefaultImages(magoManager);
 		var gl = magoManager.getGl();
 		
 		// now repeat the objects markers for png images.***
@@ -138,12 +146,12 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 		{ this.pin.createPinCenterBottom(gl); }
 		
 		// check if pin textures is loaded.
-		var currentTexture = this.pin.texturesArray[0];
+		/*var currentTexture = this.pin.texturesArray[0];
 		if (!currentTexture || !currentTexture.texId)
 		{
 			//magoManager.load_testTextures();
 			return;
-		}
+		}*/
 		
 		var shader = magoManager.postFxShadersManager.getShader("pin"); 
 		shader.resetLastBuffersBinded();
@@ -184,6 +192,7 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 		gl.uniform3fv(shader.aditionalOffset_loc, [0.0, 0.0, 0.0]);
 		
 		gl.depthMask(false);
+		gl.disable(gl.BLEND);
 		var selectionManager = magoManager.selectionManager;
 		var lastTexId = undefined;
 		if (renderType === 1)
@@ -202,7 +211,7 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 				
 				if (selectionManager.isObjectSelected(objMarker))
 				{
-					gl.uniform2fv(shader.scale2d_loc, [1.5, 1.5]);
+					gl.uniform2fv(shader.scale2d_loc, new Float32Array([1.5, 1.5]));
 					if (objMarker.imageFilePathSelected)
 					{
 						var selectedTexture = this.pin.getTexture(objMarker.imageFilePathSelected);
@@ -217,7 +226,7 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 				}
 				else
 				{
-					gl.uniform2fv(shader.scale2d_loc, [1.0, 1.0]);
+					gl.uniform2fv(shader.scale2d_loc, new Float32Array([1.0, 1.0]));
 				}
 				gl.uniform1i(shader.bUseOriginalImageSize_loc, objMarker.bUseOriginalImageSize);
 				if (!objMarker.bUseOriginalImageSize)
@@ -276,6 +285,7 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 			gl.enable(gl.BLEND);
 		}
 		
+		gl.enable(gl.BLEND);
 		gl.depthRange(0, 1);
 		gl.depthMask(true);
 		gl.useProgram(null);

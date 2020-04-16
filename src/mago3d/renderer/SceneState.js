@@ -54,7 +54,7 @@ var SceneState = function()
 	this.diffuseReflectionCoef = new Float32Array([1.0]); // 0.4
 	this.specularReflectionCoef = new Float32Array([0.6]); // 0.6
 	this.specularColor = new Float32Array([0.7, 0.7, 0.7]);
-	this.ambientColor = new Float32Array([0.7, 0.7, 0.7]);
+	this.ambientColor = new Float32Array([1.0, 1.0, 1.0]);
 	this.ssaoRadius = new Float32Array([0.15]);
 	this.shininessValue = new Float32Array([40.0]);
 	this.ssaoNoiseScale2 = new Float32Array([1.0, 1.0]); // [this.depthFboNeo.width[0]/this.noiseTexture.width, this.depthFboNeo.height[0]/this.noiseTexture.height]
@@ -146,7 +146,58 @@ var SceneState = function()
 	this.trianglesRenderedCount = 0;
 	this.pointsRenderedCount = 0;
 	this.fps = 0.0;
-	
+
+	//mago earth 사용 시 초기 scene 세팅
+	if (MagoConfig.getPolicy().basicGlobe !== 'cesium') 
+	{
+		this.initMagoSceneState();
+	}
+};
+/**
+ * mago earth 사용 시 초기 scene 세팅
+ */
+SceneState.prototype.initMagoSceneState = function() 
+{
+	var containerDiv = document.getElementById(MagoConfig.getContainerId());
+	var canvas = document.createElement('canvas');
+	canvas.style.width = '100%';
+	canvas.style.height = '100%';
+	containerDiv.appendChild(canvas);
+	var glAttrs = {antialias          : true, 
+		stencil            : true,
+		premultipliedAlpha : false};
+	var gl = canvas.getContext("webgl", glAttrs);
+	if (!gl)
+	{ gl = canvas.getContext("experimental-webgl", glAttrs); }
+    
+	// Problem: canvas-width initially is 300 and canvas-height = 150.***
+	canvas.width = canvas.clientWidth;
+	canvas.height = canvas.clientHeight;
+
+	this.canvas = canvas;
+	this.textureFlipYAxis = true;
+	this.gl = gl;
+	this.drawingBufferWidth[0] = canvas.clientWidth;
+	this.drawingBufferHeight[0] = canvas.clientHeight;
+	this.camera.frustum.aspectRatio[0] = canvas.clientWidth/canvas.clientHeight;
+	this.camera.frustum.fovRad[0] = Math.PI/3*1.8;
+	this.camera.frustum.fovyRad[0] = this.camera.frustum.fovRad[0]/this.camera.frustum.aspectRatio;
+	this.camera.frustum.tangentOfHalfFovy[0] = Math.tan(this.camera.frustum.fovyRad[0]/2);
+    
+	// initial camera position.***
+	this.camera.position.set(-7586937.743019165, 10881859.054284709, 5648264.99911627);
+	this.camera.direction.set(0.5307589970384617, -0.7598419113077192, -0.3754132585133587);
+	this.camera.up.set(0.23477224008249162, -0.29380469331271475, 0.9265855321012102);
+    
+	// test init camera position.***
+	//sphere.r = 6378137.0;
+	this.encodedCamPosHigh[0] = -7536640;
+	this.encodedCamPosHigh[1] = 10878976;
+	this.encodedCamPosHigh[2] = 5636096;
+    
+	this.encodedCamPosLow[0] = -50297.7421875;
+	this.encodedCamPosLow[1] = 2883.05419921875;
+	this.encodedCamPosLow[2] = 12168.9990234375;
 };
 
 /**

@@ -11,11 +11,11 @@ var XYZLayer = function(options)
 	this.reg = /{[^}]+}/g;
 	this.maxZoom = defaultValue(options.maxZoom, 18);
 	this.minZoom = defaultValue(options.minZoom, 0);
+	this.show = defaultValue(options.show, true);
 };
 
 XYZLayer.prototype.getUrl = function(info) 
 {
-	var rectangle = SmartTile.getGeographicExtentOfTileLXY(parseInt(info.z), parseInt(info.x), parseInt(info.y), CODE.imageryType.WEB_MERCATOR);
 	var matchs = this.url.match(this.reg);
 	var auxUrl = this.url;
 	for (var i=0, len=matchs.length;i<len;i++) 

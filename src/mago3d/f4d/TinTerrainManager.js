@@ -10,7 +10,7 @@ var TinTerrainManager = function(options)
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	this.maxDepth = 17;
+	this.maxDepth = 15;
 	this.currentVisibles_terrName_geoCoords_map = {}; // current visible terrains map[terrainPathName, geographicCoords].
 	this.currentTerrainsMap = {}; // current terrains (that was created) map[terrainPathName, tinTerrain].
 	
@@ -37,13 +37,13 @@ var TinTerrainManager = function(options)
 	//};
 	this.imageryType = CODE.imageryType.WEB_MERCATOR; // Test.***
 	//this.imageryType = CODE.imageryType.CRS84; // Test.***
-	
-	this.imagerys = [new XYZLayer({url: 'https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'}),
-		new WMSLayer({url: 'http://192.168.10.98:8080/geoserver/mago3d/wms', minZoom: 3, param: {layers: 'mago3d:15m_susim', tiled: true}})];
-	// new XYZLayer({url: 'https://services.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'})];
-	//this.imagerys = [new WMSLayer({url: 'http://192.168.10.9:8080/geoserver/mago3d/wms', param: {layers: 'mago3d:gangseogu_5m'}})];
-	
-	this.imagerysDEM = [new WMSLayer({url: 'http://192.168.10.98:8080/geoserver/mago3d/wms', minZoom: 3, param: {layers: 'mago3d:15m_susim', tiled: true}})];
+
+	this.imagerys = [];
+
+	this.textureParsedTerrainMap = {};
+	this.textureDecodedTerrainMap = {};
+	this.textureIdCntMap = {};
+	this.textureIdDeleteMap = {};
 
 	this.init();
 	this.makeTinTerrainWithDEMIndex(); // provisional.
@@ -445,6 +445,10 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 
 		
 		var flipTexCoordY = true;
+
+		if (magoManager.isCesiumGlobe())
+		{ flipTexCoordY = false; }
+
 		gl.uniform1i(currentShader.textureFlipYAxis_loc, flipTexCoordY); // false for cesium, true for magoWorld.
 		gl.uniform1f(currentShader.externalAlpha_loc, 1.0);
 		
@@ -531,41 +535,53 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	currentShader.disableVertexAttribArray(currentShader.color4_loc); 
 	gl.useProgram(null);
 };
+/**
+ * 텍스처 등록 갯수 관리
+ * @param {number} textureId
+ */
+TinTerrainManager.prototype.addTextureId = function(textureId) 
+{
+	if (!this.textureIdCntMap[textureId]) 
+	{
+		this.textureIdCntMap[textureId] = 0;
+	}
+	this.textureIdCntMap[textureId] += 1;
+};
+/**
+ * 텍스처 제거 목록 등록
+ * @param {number} textureId
+ */
+TinTerrainManager.prototype.addDeleteTextureId = function(textureId) 
+{
+	if (!this.textureIdDeleteMap[textureId]) 
+	{
+		this.textureIdDeleteMap[textureId] = 0;
+	}
+	this.textureIdDeleteMap[textureId] += 1;
+};
+/**
+ * 텍스처 제거 맵에 등록된 텍스처를 제거
+ * @param {Texture} texture
+ */
+TinTerrainManager.prototype.eraseTexture = function(texture, magoManager)
+{
+	var gl = magoManager.sceneState.gl;
+	
+	var id = texture.imagery._id;
+	texture.deleteObjects(gl);
+	this.addDeleteTextureId(id);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	this.clearMap(id);
+};
+/**
+ * 텍스처 제거 맵에 등록된 텍스처를 제거
+ * @param {Texture} texture
+ */
+TinTerrainManager.prototype.clearMap = function(id)
+{
+	if (this.textureIdDeleteMap[id] === this.textureIdCntMap[id]) 
+	{
+		delete this.textureIdDeleteMap[id];
+		delete this.textureIdCntMap[id];
+	}
+};

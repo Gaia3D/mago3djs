@@ -272,7 +272,7 @@ ProcessQueue.prototype.putNodeToDeleteModelReferences = function(node, aValue)
 ProcessQueue.prototype.eraseNodeToDeleteModelReferences = function(node)
 {
 	// this erases the node from the "nodesToDeleteModelReferencesMap".
-	if (node.data === undefined || node.data.neoBuilding === undefined)
+	if (!node || node.data === undefined || node.data.neoBuilding === undefined)
 	{ return; }
 	
 	var key = node.data.neoBuilding.buildingId;
