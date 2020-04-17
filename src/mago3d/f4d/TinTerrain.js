@@ -2124,8 +2124,15 @@ TinTerrain.getNormalCartesiansArray = function(cartesiansArray, indicesArray, re
 	
 };
 
+TinTerrain.prototype.getAltitudes_byAltitudesMap = function(geoCoordsArray, resultGeoCoordsArray, magoManager)
+{
+	// To call this function, must exist DEM image in this tile.
+	
+};
+
 TinTerrain.prototype.getAltitudes_byAltitudesOwnMap = function(geoCoordsArray, resultGeoCoordsArray, magoManager)
 {
+	// No used yet.
 	if (this.altitudesFbo === undefined) 
 	{ 
 		this.makeAltitudesOwnMap(magoManager);

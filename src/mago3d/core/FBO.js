@@ -7,7 +7,7 @@
  * @param {Number} width Framebuffer width.
  * @param {Number} height Framebuffer height.
  */
-var FBO = function(gl, width, height) 
+var FBO = function(gl, width, height, options) 
 {
 	if (!(this instanceof FBO)) 
 	{
@@ -55,7 +55,19 @@ var FBO = function(gl, width, height)
 	 * @type {WebGLTexture}
 	 * @default WebGLTexture
 	 */
-	this.colorBuffer = gl.createTexture();
+	var colorBuffer;
+	if (options)
+	{
+		if (options.colorBuffer !== undefined)
+		{
+			colorBuffer = options.colorBuffer;
+		}
+	}
+
+	if (colorBuffer !== undefined)
+	{ this.colorBuffer = colorBuffer; }
+	else
+	{ this.colorBuffer = gl.createTexture(); }
 	
 	/**
 	 * Boolean var that indicates that the parameters must be updated.

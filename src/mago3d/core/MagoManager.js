@@ -2608,6 +2608,11 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		}
 	}
 
+	var currSelObject = this.selectionManager.getSelectedGeneral();
+	if (currSelObject instanceof(TinTerrain))
+	{
+		var hola = 0;
+	}
 	// Check modeler mode.
 	/*
 	this.magoMode = CODE.magoMode.DRAWING;
