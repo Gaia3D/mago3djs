@@ -11,7 +11,7 @@ var WMSLayer = function(options)
 	this.param = Object.assign({}, WMSLayer.DEAFULT_PARAM, options.param||{});
 
 	var maxZoom = defaultValue(options.maxZoom, 18);
-	var minZoom = defaultValue(options.minZoom, 6);
+	var minZoom = defaultValue(options.minZoom, 3);
 	
 	Object.defineProperty(this, 'maxZoom', {
 		get: function()

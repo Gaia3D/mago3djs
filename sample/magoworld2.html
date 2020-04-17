@@ -831,12 +831,12 @@
 		intervalCount++;
 		if(managerFactory != null && managerFactory.getMagoManagerState() === Mago3D.CODE.magoManagerState.READY) {
 			clearInterval(timerId);
-			tt = new Mago3D.WMSLayer({url: 'http://localhost:8080/geoserver/mago3d/wms', show: true,  param: {layers: 'mago3d:15m_susim', tiled: true}});
+			tt = new Mago3D.WMSLayer({url: 'http://192.168.10.98:8080/geoserver/mago3d/wms', show: true,  param: {layers: 'mago3d:15m_susim', tiled: true}});
 			ttt = new Mago3D.WMSLayer({url: 'http://localhost:8080/geoserver/mago3d/wms', show: true,  param: {layers: 'mago3d:mj1m', tiled: true}});
 			//tttt = new Mago3D.WMSLayer({url: 'http://localhost:8080/geoserver/mago3d/wms', show: true,  param: {layers: 'mago3d:mj1m', tiled: true}});
 			var magoManager = managerFactory.getMagoManager();
 			magoManager.addLayer(new Mago3D.XYZLayer({url: 'https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'}));
-			//magoManager.addLayer(tt);
+			magoManager.addLayer(tt);
 			//magoManager.addLayer(ttt);
 			
 			console.log(" managerFactory != null, managerFactory.getMagoManagerState() = " + managerFactory.getMagoManagerState() + ", intervalCount = " + intervalCount);

@@ -2607,6 +2607,48 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 
 		}
 	}
+
+	// Check modeler mode.
+	/*
+	this.magoMode = CODE.magoMode.DRAWING;
+	if (this.magoMode === CODE.magoMode.DRAWING)// then process to draw.***
+	{
+		if (this.modeler === undefined)
+		{ this.modeler = new Modeler(this); }
+
+		this.modeler.mode = CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS;
+
+		var geoCoord;
+		var strWorldPoint;
+		
+		if (this.configInformation.geo_view_library === Constant.CESIUM)
+		{
+			var camera = this.scene.frameState.camera;
+			var scene = this.scene;
+			var ray = camera.getPickRay(new Cesium.Cartesian2(mouseX, mouseY));
+			strWorldPoint = scene.globe.pick(ray, scene);
+		}
+		else 
+		{
+			var mouseAction = this.sceneState.mouseAction;
+			strWorldPoint = mouseAction.strWorldPoint;
+		}
+		if (strWorldPoint === undefined)
+		{ return; }
+
+		// create a geoCoord on click position.
+		geoCoord = Globe.CartesianToGeographicWgs84(strWorldPoint.x, strWorldPoint.y, strWorldPoint.z, undefined, true);
+		geoCoord.absolutePoint = strWorldPoint;
+
+		if (this.modeler.mode === CODE.modelerMode.DRAWING_GEOGRAPHICPOINTS)
+		{
+			geoCoord.makeDefaultGeoLocationData();
+
+			var geoCoordsList = this.modeler.getGeographicCoordsList();
+			geoCoordsList.addGeoCoord(geoCoord);
+		}
+	}
+	*/
 };
 
 /**

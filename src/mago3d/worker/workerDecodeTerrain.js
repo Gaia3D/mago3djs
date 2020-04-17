@@ -32,6 +32,8 @@ worker.onmessage = function(e)
 	var vValues = param.vValues;
 	var hValues = param.hValues;
 	var depth = param.depth;
+	var bMakeNormals = param.bMakeNormals;
+	var indices = param.indices;
 
 	var exageration = 2.0;
 	var imageryType = param.imageryType;
@@ -99,6 +101,11 @@ worker.onmessage = function(e)
 	}
 	//넘길거
 	var cartesiansArray = geographicRadianArrayToFloat32ArrayWgs84(lonArray, latArray, altArray);
+	var normalsArray;
+	if (bMakeNormals)
+	{	
+		normalsArray = getNormalCartesiansArray(cartesiansArray, indices, undefined, undefined);
+	}
 
 	var texCorrectionFactor = getTexCorrection(depth);
 
@@ -124,8 +131,103 @@ worker.onmessage = function(e)
 		skirtCartesiansArray : skirtCartesiansArray,
 		skirtTexCoordsArray  : skirtTexCoordsArray, 
 		skirtAltitudesArray  : skirtAltitudesArray,
-		altArray             : altArray
+		altArray             : altArray,
+		normalsArray         : normalsArray,
+		longitudesArray      : lonArray,
+		latitudesArray       : latArray
 	}, info: e.data.info});
+};
+
+function getNormalCartesiansArray(cartesiansArray, indicesArray, resultNormalCartesiansArray, options)
+{
+	var idx_1, idx_2, idx_3;
+	var point_1, point_2, point_3;
+	var normal;
+	var normalsArray = [];
+	var trianglesCount = indicesArray.length/3;
+	for (var i=0; i<trianglesCount; i++)
+	{
+		idx_1 = indicesArray[i*3];
+		idx_2 = indicesArray[i*3+1];
+		idx_3 = indicesArray[i*3+2];
+		
+		point_1 = new Point3D(cartesiansArray[idx_1*3], cartesiansArray[idx_1*3+1], cartesiansArray[idx_1*3+2]);
+		point_2 = new Point3D(cartesiansArray[idx_2*3], cartesiansArray[idx_2*3+1], cartesiansArray[idx_2*3+2]);
+		point_3 = new Point3D(cartesiansArray[idx_3*3], cartesiansArray[idx_3*3+1], cartesiansArray[idx_3*3+2]);
+		
+		// Calculate the normal for this triangle.
+		normal = calculateNormal(point_1, point_3, point_2, undefined);
+		
+		// Accum normals for each points.
+		// Point 1.***
+		if (normalsArray[idx_1] !== undefined)
+		{
+			normalsArray[idx_1].addPoint(normal);
+		}
+		else
+		{
+			normalsArray[idx_1] = normal;
+		}
+		
+		// Point 2.***
+		if (normalsArray[idx_2] !== undefined)
+		{
+			normalsArray[idx_2].addPoint(normal);
+		}
+		else
+		{
+			normalsArray[idx_2] = normal;
+		}
+		
+		// Point 3.***
+		if (normalsArray[idx_3] !== undefined)
+		{
+			normalsArray[idx_3].addPoint(normal);
+		}
+		else
+		{
+			normalsArray[idx_3] = normal;
+		}
+	}
+	
+	// finally, normalize all normals.
+	var normalsCount = normalsArray.length;
+	if (resultNormalCartesiansArray === undefined)
+	{ resultNormalCartesiansArray = new Int8Array(normalsCount*3); }
+	
+	for (var i=0; i<normalsCount; i++)
+	{
+		var normal = normalsArray[i];
+		normal.unitary();
+		
+		resultNormalCartesiansArray[i*3] = Math.floor(normal.x*255);
+		resultNormalCartesiansArray[i*3+1] = Math.floor(normal.y*255);
+		resultNormalCartesiansArray[i*3+2] = Math.floor(normal.z*255);
+	}
+	
+	return resultNormalCartesiansArray;
+	
+};
+
+function calculateNormal(point1, point2, point3, resultNormal) 
+{
+	// Given 3 points, this function calculates the normal.
+	var currentPoint = point1;
+	var prevPoint = point3;
+	var nextPoint = point2;
+
+	var v1 = new Point3D(currentPoint.x - prevPoint.x,     currentPoint.y - prevPoint.y,     currentPoint.z - prevPoint.z);
+	var v2 = new Point3D(nextPoint.x - currentPoint.x,     nextPoint.y - currentPoint.y,     nextPoint.z - currentPoint.z);
+
+	v1.unitary();
+	v2.unitary();
+	if (resultNormal === undefined)
+	{ resultNormal = new Point3D(); }
+	
+	resultNormal = v1.crossProduct(v2, resultNormal);
+	resultNormal.unitary();
+	
+	return resultNormal;
 };
  
 function geographicRadianArrayToFloat32ArrayWgs84(lonArray, latArray, altArray, resultCartesianArray)
@@ -345,4 +447,101 @@ function getSkirtTrianglesStrip(lonArray, latArray, altArray, texCoordsArray, so
 	};
 	
 	return resultObject;
+};
+
+'use strict';
+
+/**
+ * a point feature which will be used at three degree world
+ * @class Point3D 
+ * @param {Number} x 
+ * @param {Number} y 
+ * @param {Number} z 
+ */
+
+var Point3D = function(x, y, z) 
+{
+	if (!(this instanceof Point3D)) 
+	{
+		// throw new Error(Messages.CONSTRUCT_ERROR);
+		throw new Error(i18next.t('error.construct.create'));
+	}
+
+	if (x !== undefined)
+	{ this.x = x; }
+	else
+	{ this.x = 0.0; }
+	
+	if (y !== undefined)
+	{ this.y = y; }
+	else
+	{ this.y = 0.0; }
+	
+	if (z !== undefined)
+	{ this.z = z; }
+	else
+	{ this.z = 0.0; }
+	
+	this.pointType; // 1 = important point.
+};
+
+
+
+/**
+ * Calculate [this.x*this.x + this.y*this.y + this.z*this.z] to prepare squared module 
+ * @returns {Number}
+ */
+Point3D.prototype.getSquaredModul = function() 
+{
+	return this.x*this.x + this.y*this.y + this.z*this.z;
+};
+
+/**
+ * Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z );
+ * @returns {Number}
+ */
+Point3D.prototype.getModul = function() 
+{
+	return Math.sqrt(this.getSquaredModul());
+};
+
+/**
+ * 
+ * get the unitary value
+ */
+Point3D.prototype.unitary = function() 
+{
+	var modul = this.getModul();
+	this.x /= modul;
+	this.y /= modul;
+	this.z /= modul;
+};
+
+
+
+/**
+ * Calculate vector product
+ * @param {Point3D} point the point which will be used at this calculate.
+ * @param {Point3D} resultPoint the point which will save the calculated value.
+ * @returns {Number} calculated result
+ */
+Point3D.prototype.crossProduct = function(point, resultPoint) 
+{
+	if (resultPoint === undefined) { resultPoint = new Point3D(); }
+
+	resultPoint.x = this.y * point.z - point.y * this.z;
+	resultPoint.y = point.x * this.z - this.x * point.z;
+	resultPoint.z = this.x * point.y - point.x * this.y;
+
+	return resultPoint;
+};
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param x 변수
+ * @param y 변수
+ * @param z 변수
+ */
+Point3D.prototype.addPoint = function(point) 
+{
+	this.x += point.x; this.y += point.y; this.z += point.z;
 };

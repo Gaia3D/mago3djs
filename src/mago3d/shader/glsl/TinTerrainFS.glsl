@@ -102,7 +102,7 @@ vec3 getViewRay(vec2 tc)
 
 vec3 getRainbowColor_byHeight(float height)
 {
-	float minHeight_rainbow = -100.0;
+	float minHeight_rainbow = -200.0;
 	float maxHeight_rainbow = 0.0;
 	
 	float gray = (height - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);
@@ -403,6 +403,7 @@ void main()
 		// End test dem image.---
 		
 		
+		
 		if(altitude < 0.0)
 		{
 			if(uSeaOrTerrainType == 1)
@@ -414,15 +415,17 @@ void main()
 			float minHeight_rainbow = -100.0;
 			float maxHeight_rainbow = 0.0;
 			float gray = (altitude - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);
-			//float grayMeshAltitude = (vAltitude - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);
+			//float gray = (vAltitude - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);
+			//vec3 rainbowColor = getRainbowColor_byHeight(altitude);
 			
 			//if(grayMeshAltitude * 1.1 < gray)
 			//gray = grayMeshAltitude;
 			
-			if(gray < 0.1)
-			gray = 0.1;
+			if(gray < 0.05)
+			gray = 0.05;
 			//fogColor = vec4(gray, gray*1.3, gray*1.6, 1.0);
 			fogColor = vec4(gray*1.3, gray*1.5, gray*1.7, 1.0);
+			//fogColor = vec4(rainbowColor.rgb, 1.0);
 			fogAmount = 0.7;
 			
 			// Test drawing grid.***
@@ -447,7 +450,11 @@ void main()
 			}
 			// End test drawing grid.---
 		}
+		else{
+			if(uSeaOrTerrainType == 1)
+			discard;
 		
+		}
 		
 		
 		vec4 finalColor = mix(textureColor, fogColor, fogAmount); 

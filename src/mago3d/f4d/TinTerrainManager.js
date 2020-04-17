@@ -16,6 +16,9 @@ var TinTerrainManager = function(options)
 	
 	this.visibleTilesArray = [];
 	this.noVisibleTilesArray = [];
+
+	this.visibleSeaTilesArray = [];
+	this.noVisibleSeaTilesArray = [];
 	
 	// TinTerrainQuadTrees.
 	this.tinTerrainsQuadTreeAsia; // Use if this imageryType = CODE.imageryType.CRS84.
@@ -44,6 +47,7 @@ var TinTerrainManager = function(options)
 	this.textureDecodedTerrainMap = {};
 	this.textureIdCntMap = {};
 	this.textureIdDeleteMap = {};
+	this.bRenderSea = true;
 
 	this.init();
 	this.makeTinTerrainWithDEMIndex(); // provisional.
@@ -54,6 +58,9 @@ var TinTerrainManager = function(options)
 	{
 		if (options.terrainType !== undefined)
 		{ this.terrainType = options.terrainType; }
+
+		if (options.createSea !== undefined)
+		{ this.bRenderSea = options.createSea; }
 	}
 };
 
@@ -329,7 +336,6 @@ TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager)
 		if (deletedCount > 5)
 		{ break; }
 	}
-	
 };
 
 TinTerrainManager.prototype.getAltitudes = function(geoCoordsArray, resultGeoCoordsArray) 
@@ -515,17 +521,29 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	}
 	
 	// Render the sea.
-	/*
-	gl.uniform1i(currentShader.bApplySpecularLighting_loc, false);
-	var renderedTilesCount = succesfullyRenderedTilesArray.length;
-	for (var i=0; i<renderedTilesCount; i++)
+	var currSelObject = magoManager.selectionManager.getSelectedGeneral();
+	if (currSelObject instanceof(TinTerrain))
 	{
-		tinTerrain = succesfullyRenderedTilesArray[i];
+		currSelObject.renderSea(currentShader, magoManager, bDepth, renderType);
+	}
+	/*
+	if (renderType === 1)
+	{
+		gl.uniform1i(currentShader.bApplySpecularLighting_loc, true);
+		gl.enable(gl.BLEND);
+		gl.disable(gl.CULL_FACE);
+		var seaTilesCount = succesfullyRenderedTilesArray.length;
+		for (var i=0; i<seaTilesCount; i++)
+		{
+			tinTerrain = succesfullyRenderedTilesArray[i];
+			
+			if (tinTerrain === undefined)
+			{ continue; }
 		
-		if (tinTerrain === undefined)
-		{ continue; }
-	
-		tinTerrain.renderSea(currentShader, magoManager, bDepth, renderType);
+			tinTerrain.renderSea(currentShader, magoManager, bDepth, renderType);
+		}
+		gl.disable(gl.BLEND);
+		gl.enable(gl.CULL_FACE);
 	}
 	*/
 
