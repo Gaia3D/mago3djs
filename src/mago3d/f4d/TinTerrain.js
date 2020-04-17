@@ -698,7 +698,15 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 					gl.activeTexture(gl.TEXTURE2 + i); 
 					gl.bindTexture(gl.TEXTURE_2D, texture.texId);
 					
-					if (i === 1)
+					activeTexturesLayers[2+i] = 1;
+					var filter = texture.imagery.filter;
+					if(filter) {
+						if(filter === CODE.imageFilter.BATHYMETRY) {
+							activeTexturesLayers[2+i] = 10;
+						}
+					}
+
+					/*if (i === 1)
 					{
 						// Test to use image as DEM map.
 						activeTexturesLayers[2+i] = 10;
@@ -706,7 +714,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 					else 
 					{
 						activeTexturesLayers[2+i] = 1;
-					}
+					}*/
 				}	
 
 				gl.uniform1iv(currentShader.uActiveTextures_loc, activeTexturesLayers);

@@ -147,6 +147,21 @@ MagoConfig.init = function(serverPolicy, projectIdArray, projectDataArray)
 			}
 		}
 	}
+
+	//var magoScriptRegex = /((?:.*\/)|^)mago3d\.js\?(?:&?[^=&]*=[^=&]*)*/;
+	var magoScriptRegex = /((?:.*\/)|^)mago3d\.js$/;
+	var magoScriptPath;
+	var scripts = document.getElementsByTagName('script');
+	for ( var i = 0, len = scripts.length; i < len; ++i) 
+	{
+		var src = scripts[i].getAttribute('src');
+		var result = magoScriptRegex.exec(src);
+		if (result !== null) 
+		{
+			magoScriptPath = result[1];
+		}
+	}
+	console.info(magoScriptPath);
 };
 
 /**

@@ -52,5 +52,7 @@
   "minPointSizeForPc":"3.0",
   "pendentPointSizeForPc":"60.0",
   "enableMemoryManagement":false,
-  "insertDate":""
+  "insertDate":"",
+  "terrainType":"cesium-customer",
+  "terrainValue":"http://192.168.10.98:9998/tilesets/terrain/"
 }

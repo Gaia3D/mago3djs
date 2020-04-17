@@ -9,6 +9,7 @@ var WMSLayer = function(options)
 	this._id = createGuid();
 	this.url = options.url;
 	this.param = Object.assign({}, WMSLayer.DEAFULT_PARAM, options.param||{});
+	this.filter = defaultValue(options.filter, undefined);
 
 	var maxZoom = defaultValue(options.maxZoom, 18);
 	var minZoom = defaultValue(options.minZoom, 3);
