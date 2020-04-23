@@ -325,17 +325,6 @@ TinTerrain.prototype.prepareTexture = function(texturesMap, imagerys, magoManage
 		var id = imagery._id;
 		if (this.texture[id]) { continue; }
 
-		// Test code:
-		var testPathName = this.getPathName();
-		if (testPathName === "2\\3\\1" || testPathName === "3\\6\\3")
-		{ 
-			var minGeoCoord = this.geographicExtent.minGeographicCoord;
-			var maxGeoCoord = this.geographicExtent.maxGeographicCoord;
-			var minMercatorCoord = Globe.geographicToMercatorProjection(minGeoCoord.longitude, minGeoCoord.latitude, undefined);
-			var maxMercatorCoord = Globe.geographicToMercatorProjection(maxGeoCoord.longitude, maxGeoCoord.latitude, undefined);
-			var hola = 0; 
-		}
-
 		var texture = new Texture();
 		var textureUrl = imagery.getUrl({x: X, y: Y, z: L});
 
