@@ -325,6 +325,17 @@ TinTerrain.prototype.prepareTexture = function(texturesMap, imagerys, magoManage
 		var id = imagery._id;
 		if (this.texture[id]) { continue; }
 
+		// Test code:
+		var testPathName = this.getPathName();
+		if (testPathName === "2\\3\\1" || testPathName === "3\\6\\3")
+		{ 
+			var minGeoCoord = this.geographicExtent.minGeographicCoord;
+			var maxGeoCoord = this.geographicExtent.maxGeographicCoord;
+			var minMercatorCoord = Globe.geographicToMercatorProjection(minGeoCoord.longitude, minGeoCoord.latitude, undefined);
+			var maxMercatorCoord = Globe.geographicToMercatorProjection(maxGeoCoord.longitude, maxGeoCoord.latitude, undefined);
+			var hola = 0; 
+		}
+
 		var texture = new Texture();
 		var textureUrl = imagery.getUrl({x: X, y: Y, z: L});
 
@@ -700,21 +711,13 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 					
 					activeTexturesLayers[2+i] = 1;
 					var filter = texture.imagery.filter;
-					if(filter) {
-						if(filter === CODE.imageFilter.BATHYMETRY) {
+					if (filter) 
+					{
+						if (filter === CODE.imageFilter.BATHYMETRY) 
+						{
 							activeTexturesLayers[2+i] = 10;
 						}
 					}
-
-					/*if (i === 1)
-					{
-						// Test to use image as DEM map.
-						activeTexturesLayers[2+i] = 10;
-					}
-					else 
-					{
-						activeTexturesLayers[2+i] = 1;
-					}*/
 				}	
 
 				gl.uniform1iv(currentShader.uActiveTextures_loc, activeTexturesLayers);
@@ -930,14 +933,14 @@ TinTerrain.prototype.renderSea = function(currentShader, magoManager, bDepth, re
 					var texture = this.texture[textureKeys[i]];
 					gl.bindTexture(gl.TEXTURE_2D, texture.texId);
 					
-					if (i === 1)
+					activeTexturesLayers[2+i] = 1;
+					var filter = texture.imagery.filter;
+					if (filter) 
 					{
-						// Test to use image as DEM map.
-						activeTexturesLayers[2+i] = 10;
-					}
-					else 
-					{
-						activeTexturesLayers[2+i] = 1;
+						if (filter === CODE.imageFilter.BATHYMETRY) 
+						{
+							activeTexturesLayers[2+i] = 10;
+						}
 					}
 				}	
 
@@ -1007,6 +1010,30 @@ TinTerrain.prototype.renderSea = function(currentShader, magoManager, bDepth, re
 				{
 					gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.
 				}
+
+				// Render skirt if exist.
+				/*
+				var vboKeySeaSkirt = this.vboKeyContainer.vboCacheKeysArray[3]; // the idx = 0 is the terrain. idx = 1 is the skirt.
+				if (vboKeySeaSkirt === undefined)
+				{ return; }
+				
+				// Positions.
+				if (!vboKeySeaSkirt.bindDataPosition(currentShader, vboMemManager))
+				{ 
+					return false; 
+				}
+			
+				// TexCoords (No necessary for depth rendering).
+				if (!bDepth)
+				{
+					if (!vboKeySeaSkirt.bindDataTexCoord(currentShader, vboMemManager))
+					{				
+						return false; 
+					}
+				}
+				
+				gl.drawArrays(gl.TRIANGLE_STRIP, 0, vboKeySeaSkirt.vertexCount); // Fill.
+				*/
 			}
 
 		}
@@ -1474,10 +1501,8 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 	// Flip texCoordY for minT & maxT.***
 	minT = 1.0 - minT;
 	maxT = 1.0 - maxT;
-	
-	//var texCorrectionFactor = 0.0005;
-	var texCorrectionFactor = 0.003 + (depth * 0.0000001);
-	//var texCorrectionFactor = 0.002 + (1/(depth+1) * 0.008);
+
+	var texCorrectionFactor = this.tinTerrainManager.getTexCorrection(depth);
 	
 	for (var currLatSeg = 0; currLatSeg<latSegments+1; currLatSeg++)
 	{
@@ -1587,9 +1612,6 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 		texCorrectionFactor : texCorrectionFactor
 	};
 	
-	if (this.depth === 6)
-	{ var hola = 0; }
-	
 	var skirtResultObject = TinTerrain.getSkirtTrianglesStrip(lonArray, latArray, altArray, this.texCoordsArray, this.southIndices, this.eastIndices, this.northIndices, this.westIndices, options);
 	this.skirtCartesiansArray = skirtResultObject.skirtCartesiansArray;
 	this.skirtTexCoordsArray = skirtResultObject.skirtTexCoordsArray;
@@ -1616,6 +1638,17 @@ TinTerrain.prototype.makeSeaMeshVirtually = function(options)
 		this.normalsArraySea[i*3+1] = point.y*126;
 		this.normalsArraySea[i*3+2] = point.z*126;
 	}
+
+	var texCorrectionFactor = this.tinTerrainManager.getTexCorrection(this.depth);
+	// make skirtMesh data.
+	var options = {
+		skirtDepth          : 10000,
+		texCorrectionFactor : texCorrectionFactor
+	};
+	
+	var skirtResultObject = TinTerrain.getSkirtTrianglesStrip(this.lonArray, this.latArray, altArray, this.texCoordsArray, this.southIndices, this.eastIndices, this.northIndices, this.westIndices, options);
+	this.skirtCartesiansArraySea = skirtResultObject.skirtCartesiansArray;
+	this.skirtTexCoordsArraySea = skirtResultObject.skirtTexCoordsArray;
 };
 
 TinTerrain.prototype.makeMeshVirtuallyCRS84 = function(lonSegments, latSegments, altitude, altitudesSlice)
@@ -1871,33 +1904,33 @@ TinTerrain.prototype.makeVboSea = function(vboMemManager)
 	// Indices.
 	vboKey.setDataArrayIdx(this.indicesSea, vboMemManager);
 	
-	/*
+	
 
 	// Make skirt.
-	if (this.skirtCartesiansArray === undefined)
+	if (this.skirtCartesiansArraySea === undefined)
 	{ return; }
 
-	var skirtCartasiansCount = this.skirtCartesiansArray.length;
+	var skirtCartasiansCount = this.skirtCartesiansArraySea.length;
 	for (var i=0; i<skirtCartasiansCount; i++)
 	{
-		this.skirtCartesiansArray[i*3] -= this.centerX[0];
-		this.skirtCartesiansArray[i*3+1] -= this.centerY[0];
-		this.skirtCartesiansArray[i*3+2] -= this.centerZ[0];
+		this.skirtCartesiansArraySea[i*3] -= this.centerX[0];
+		this.skirtCartesiansArraySea[i*3+1] -= this.centerY[0];
+		this.skirtCartesiansArraySea[i*3+2] -= this.centerZ[0];
 	}
 
 	
 	var vboKeySkirt = this.vboKeyContainer.newVBOVertexIdxCacheKey();
 
 	// Positions.
-	vboKeySkirt.setDataArrayPos(this.skirtCartesiansArray, vboMemManager);
+	vboKeySkirt.setDataArrayPos(this.skirtCartesiansArraySea, vboMemManager);
 	
 	// TexCoords.
-	if (this.skirtTexCoordsArray)
+	if (this.skirtTexCoordsArraySea)
 	{
-		vboKeySkirt.setDataArrayTexCoord(this.skirtTexCoordsArray, vboMemManager);
+		vboKeySkirt.setDataArrayTexCoord(this.skirtTexCoordsArraySea, vboMemManager);
 	}
 
-	*/
+	
 };
 
 TinTerrain.getSkirtTrianglesStrip = function(lonArray, latArray, altArray, texCoordsArray, southIndices, eastIndices, northIndices, westIndices, options)
@@ -1995,8 +2028,8 @@ TinTerrain.getSkirtTrianglesStrip = function(lonArray, latArray, altArray, texCo
 		var idx = eastIndices[j];
 		
 		texCoordsArray[idx*2] -= texCorrectionFactor;
-		var texCoord_x = texCoordsArray[idx*2];
-		var texCoord_y = texCoordsArray[idx*2+1];
+		//var texCoord_x = texCoordsArray[idx*2];
+		//var texCoord_y = texCoordsArray[idx*2+1];
 		
 		skirtLonArray[counter] = lonArray[idx];
 		skirtLatArray[counter] = latArray[idx];

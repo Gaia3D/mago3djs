@@ -127,8 +127,8 @@ CODE.relativePosition2D = {
 	"COINCIDENT" : 3
 };
 CODE.imageFilter = {
-    "UNKNOWN" : 0,
-    "BATHYMETRY" : 1
+	"UNKNOWN"    : 0,
+	"BATHYMETRY" : 1
 };
 CODE.PROJECT_ID_PREFIX = "projectId_";
 CODE.PROJECT_DATA_FOLDER_PREFIX = "projectDataFolder_";
