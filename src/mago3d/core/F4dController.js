@@ -76,38 +76,71 @@ F4dController.prototype.addSmartTileGroup = function(f4dObject)
 	}
 };
 /**
- * f4d data group 등록
- * @param {Array<object> | object} f4dObject f4d data definition object
+ * Object literal with config options for f4d layer.
+ * @typedef {Object} f4dLayerObject
+ * @property {string} dataGroupId Required. f4d 레이어의 고유 아이디.
+ * @property {string} dataGroupKey Required. 레이어 폴더 매칭 키
+ * @property {string} dataGroupName Required. 레이어 명
+ * @property {string} dataGroupPath Required. 레이어 폴더 경로
+ * @property {boolean} tiling optional. 타일링 유무
+ * @property {Array<f4dObject>} datas optional. 해당 레이어에 포함된 f4d 목록
+ * @property {number} longitude optional. 데이터 그룹 대표 경도, big decimal을 희망함..
+ * @property {number} latitude optional. 데이터 그룹 대표 위도, big decimal을 희망함..
+ * @property {number} altitude optional. 데이터 그룹 대표 높이, 숫자형태면 무관.
+ * @property {Untitled} Untitled optional. 데이터 표출 옵션.
  */
-F4dController.prototype.addF4dGroup = function(f4dObject) 
+
+/**
+ * Object literal with config options for f4d data.
+ * @typedef {Object} f4dObject
+ * @property {string} dataId Required. 데이터  고유 아이디
+ * @property {string} dataGroupId Required. 데이터의 레이어 아이디
+ * @property {string} dataKey Required. 데이터 폴더명
+ * @property {string} dataName Required. 데이터 이름
+ * @property {string} dataType optional. 데이터 타입. 
+ * @property {string} mappingType optional. case 'origin', 'boundingboxcenter', boudingboxbottomcenter'. default is 'origin' 
+ * @property {number} longitude Required. 경도, big decimal을 희망함..
+ * @property {number} latitude Required. 위도, big decimal을 희망함..
+ * @property {number} altitude optional. 높이, 숫자형태면 무관. default is 0.
+ * @property {number} heading optional. heading, big decimal을 희망함.. default is 0.
+ * @property {number} pitch optional. pitch, big decimal을 희망함.. default is 0.
+ * @property {number} roll optional. roll, big decimal을 희망함.. default is 0.
+ * @property {Untitled} Untitled optional. 데이터 표출 옵션.
+ */
+
+/**
+ * f4d data group 등록
+ * @param {Array<f4dLayerObject> | f4dLayerObject} f4dLayerObject f4d data definition object
+ */
+F4dController.prototype.addF4dGroup = function(f4dLayerObject) 
 {
 	// TODO : validate f4dObject.
 	//F4dController.f4dObjectValidate()
 	//do add f4d group
 	var magoManager = this.magoManager;
-	if (Array.isArray(f4dObject)) 
+	if (Array.isArray(f4dLayerObject)) 
 	{
-		for (var i=0, len=f4dObject.length;i<len;i++) 
+		for (var i=0, len=f4dLayerObject.length;i<len;i++) 
 		{
-			this.addF4dGroup(f4dObject[i]);
+			this.addF4dGroup(f4dLayerObject[i]);
 		}
 	}
 	else 
 	{
-		var groupId = f4dObject.data_key || f4dObject.dataKey || f4dObject.dataGroupId;
+		var groupId = f4dLayerObject.data_key || f4dLayerObject.dataKey || f4dLayerObject.dataGroupId;
 		var groupDataFolder;
 
-		if (f4dObject.data_key) 
+		if (f4dLayerObject.data_key) 
 		{
 			groupDataFolder = groupId;
 		}
 		else 
 		{
-			groupDataFolder = f4dObject.dataGroupPath;
+			groupDataFolder = f4dLayerObject.dataGroupPath;
 			groupDataFolder = groupDataFolder.replace(/\/+$/, '');
 		}
 
-		MagoConfig.setData(CODE.PROJECT_ID_PREFIX + groupId, f4dObject);
+		MagoConfig.setData(CODE.PROJECT_ID_PREFIX + groupId, f4dLayerObject);
 		MagoConfig.setProjectDataFolder(CODE.PROJECT_DATA_FOLDER_PREFIX + groupDataFolder, groupDataFolder);
         
 		magoManager.getObjectIndexFile(groupId, groupDataFolder);
@@ -117,7 +150,7 @@ F4dController.prototype.addF4dGroup = function(f4dObject)
 /**
  * f4d data를 등록
  * @param {string} groupId required. target group id
- * @param {Array<object> | object} f4dObject f4d data definition object
+ * @param {Array<f4dObject> | f4dObject} f4dObject f4d data definition object
  */
 F4dController.prototype.addF4dMember = function(groupId, f4dObject) 
 {

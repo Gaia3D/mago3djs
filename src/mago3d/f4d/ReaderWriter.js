@@ -927,10 +927,14 @@ ReaderWriter.prototype.getObjectIndexFileForSmartTile = function(fileName, magoM
 		var arrayBuffer = response;
 		if (arrayBuffer) 
 		{
-			buildingSeedList.dataArrayBuffer = arrayBuffer;
-			buildingSeedList.parseBuildingSeedArrayBuffer();
+			//buildingSeedList.dataArrayBuffer = arrayBuffer;
+			//buildingSeedList.parseBuildingSeedArrayBuffer();
 			
-			magoManager.makeSmartTile(buildingSeedList, projectId);
+			var buildingSeedMap = new BuildingSeedMap();
+			buildingSeedMap.dataArrayBuffer = arrayBuffer;
+			buildingSeedMap.parseBuildingSeedArrayBuffer();
+
+			magoManager.makeSmartTile(buildingSeedMap, projectId);
 			arrayBuffer = null;
 		}
 		else 

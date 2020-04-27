@@ -9,7 +9,7 @@ var TinTerrainManager = function(options)
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-
+	this.ready = true;
 	this.maxDepth = 17;
 	this.currentVisibles_terrName_geoCoords_map = {}; // current visible terrains map[terrainPathName, geographicCoords].
 	this.currentTerrainsMap = {}; // current terrains (that was created) map[terrainPathName, tinTerrain].
@@ -25,13 +25,18 @@ var TinTerrainManager = function(options)
 	this.tinTerrainsQuadTreeAmerica; // Use if this imageryType = CODE.imageryType.CRS84.
 	this.tinTerrainQuadTreeMercator; // Use if this imageryType = CODE.imageryType.WEB_MERCATOR.
 	
-	this.geoServURL = "http://192.168.10.57:9090/geoserver/gwc/service/wmts";
-	
 	// Elevation model or plain ellipsoid.
-	// terrainType = 0 -> terrainPlainModel.
-	// terrainType = 1 -> terrainElevationModel.
-	// terrainType = 2 -> real time terrainElevationModel.
-	this.terrainType = 1; 
+	// terrainType = 'plain' -> terrainPlainModel. CODE.magoEarthTerrainType.PLAIN
+	// terrainType = 'elevation' -> terrainElevationModel. CODE.magoEarthTerrainType.ELEVATION
+	// terrainType = 'realtime' -> real time terrainElevationModel. CODE.magoEarthTerrainType.REALTIME
+	var policy = MagoConfig.getPolicy();
+	this.terrainType = defaultValue(policy.terrainType, CODE.magoEarthTerrainType.PLAIN);
+	this.terrainValue = policy.terrainValue;
+
+	if (this.terrainType !== CODE.magoEarthTerrainType.PLAIN && !this.terrainValue)
+	{
+		throw new Error('If use elevation model, require terrain value.');
+	}
 	
 	//CODE.imageryType = {
 	//"UNKNOWN"      : 0,
@@ -42,6 +47,17 @@ var TinTerrainManager = function(options)
 	//this.imageryType = CODE.imageryType.CRS84; // Test.***
 
 	this.imagerys = [];
+	if (options.layers && Array.isArray(options.layers)) 
+	{
+		for (var i=0, len=options.layers.length;i<len;i++)
+		{
+			var layer = options.layers[i];
+			if (layer instanceof WMSLayer || layer instanceof XYZLayer)
+			{
+				this.imagerys.push(layer);
+			}
+		}
+	}
 
 	this.textureParsedTerrainMap = {};
 	this.textureDecodedTerrainMap = {};
@@ -56,9 +72,6 @@ var TinTerrainManager = function(options)
 	
 	if (options)
 	{
-		if (options.terrainType !== undefined)
-		{ this.terrainType = options.terrainType; }
-
 		if (options.createSea !== undefined)
 		{ this.bRenderSea = options.createSea; }
 	}
@@ -282,7 +295,7 @@ TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager)
 	// For the visible tinTerrains prepare its.
 	// Preparing rule: First prepare the tinTerrain-owner if the owner is no prepared yet.
 	var visiblesTilesCount = this.visibleTilesArray.length;
-	if (this.terrainType === 0) // PlainTerrain.
+	if (this.terrainType === CODE.magoEarthTerrainType.PLAIN) // PlainTerrain.
 	{
 		for (var i=0; i<visiblesTilesCount; i++)
 		{
@@ -290,7 +303,7 @@ TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager)
 			tinTerrain.prepareTinTerrainPlain(magoManager, this);
 		}
 	}
-	else if (this.terrainType === 1)// ElevationTerrain.
+	else if (this.terrainType === CODE.magoEarthTerrainType.ELEVATION)// ElevationTerrain.
 	{
 		var maxProcessCounter = 0;
 		for (var i=0; i<visiblesTilesCount; i++)
@@ -303,7 +316,7 @@ TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager)
 			//{ break; }
 		}
 	}
-	else if (this.terrainType === 2)// Real time ElevationTerrain.
+	else if (this.terrainType === CODE.magoEarthTerrainType.REALTIME)// Real time ElevationTerrain.
 	{
 		var maxProcessCounter = 0;
 		for (var i=0; i<visiblesTilesCount; i++)

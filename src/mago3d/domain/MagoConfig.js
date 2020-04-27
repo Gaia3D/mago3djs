@@ -118,6 +118,7 @@ MagoConfig.init = function(serverPolicy, projectIdArray, projectDataArray)
 	this.locationAndRotationHistoryObject = {};
 
 	this.serverPolicy = serverPolicy;
+	this.scriptRootPath = getScriptRootPath();
 	this.twoDimension = false;
 
 	if (this.serverPolicy.geoserverEnable) 
@@ -148,20 +149,26 @@ MagoConfig.init = function(serverPolicy, projectIdArray, projectDataArray)
 		}
 	}
 
-	//var magoScriptRegex = /((?:.*\/)|^)mago3d\.js\?(?:&?[^=&]*=[^=&]*)*/;
-	var magoScriptRegex = /((?:.*\/)|^)mago3d\.js$/;
-	var magoScriptPath;
-	var scripts = document.getElementsByTagName('script');
-	for ( var i = 0, len = scripts.length; i < len; ++i) 
+	function getScriptRootPath() 
 	{
-		var src = scripts[i].getAttribute('src');
-		var result = magoScriptRegex.exec(src);
-		if (result !== null) 
+		var magoScriptQueryStrRegex = /((?:.*\/)|^)mago3d\.js\?(?:&?[^=&]*=[^=&]*)*/;
+		var magoScriptRegex = /((?:.*\/)|^)mago3d\.js$/;
+		var magoScriptPath;
+		var scripts = document.getElementsByTagName('script');
+		for ( var j = 0, len = scripts.length; j < len; ++j) 
 		{
-			magoScriptPath = result[1];
+			var src = scripts[j].getAttribute('src');
+			var nomalResult = magoScriptRegex.exec(src);
+			var queryStrResult = magoScriptQueryStrRegex.exec(src);
+
+			var result = nomalResult||queryStrResult;
+			if (result !== null) 
+			{
+				magoScriptPath = result[1];
+			}
 		}
+		return magoScriptPath;
 	}
-	console.info(magoScriptPath);
 };
 
 /**
