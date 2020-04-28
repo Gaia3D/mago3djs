@@ -192,6 +192,9 @@ MagoWorld.prototype.mouseup = function(event)
 				// Considere as "click".***
 				magoManager.bPicking = true;
 				magoManager.managePickingProcess();
+
+				// Test. process leftClick in magoManager.
+				this.magoManager.mouseActionLeftClick(event.clientX, event.clientY);
 			}
 		}
 	}
@@ -222,12 +225,14 @@ MagoWorld.prototype.mouseup = function(event)
  */
 MagoWorld.prototype.mouseclick = function(event)
 {
+	/*
 	if (event.button === 0)
 	{
 		var mouseX = event.clientX;
 		var mouseY = event.clientY;
 		this.magoManager.mouseActionLeftClick(mouseX, mouseY);
 	}
+	*/
 };
 
 /**
@@ -729,6 +734,60 @@ MagoWorld.prototype.updateModelViewMatrixByCamera = function(camera)
  */
 MagoWorld.prototype.keydown = function(event)
 {
-	// TODO: keydown()
-	console.log("keydown");
+	var key = event.key;
+	var magoManager = this.magoManager;
+	var modeler = magoManager.modeler;
+	if (key === 'm')
+	{
+		// Switch mago mode.***
+		if (magoManager.magoMode === undefined)
+		{ magoManager.magoMode = CODE.magoMode.NORMAL; }
+
+		if (magoManager.magoMode === CODE.magoMode.DRAWING)
+		{
+			magoManager.magoMode = CODE.magoMode.NORMAL;
+		}
+		else if (magoManager.magoMode === CODE.magoMode.NORMAL)
+		{
+			magoManager.magoMode = CODE.magoMode.DRAWING;
+		}
+		
+	}
+	else if (key === 't')
+	{
+		//this.magoManager.TEST__RenderGeoCoords();
+
+		// Another test: BSplineCubic3d.***
+		if (modeler.bSplineCubic3d === undefined)
+		{ modeler.bSplineCubic3d = new BSplineCubic3D(); }
+
+		var bSplineCubic3d = modeler.bSplineCubic3d;
+		if (bSplineCubic3d !== undefined)
+		{
+			if (bSplineCubic3d.geoCoordsList === undefined)
+			{ bSplineCubic3d.geoCoordsList = new GeographicCoordsList(); }
+
+			bSplineCubic3d.geoCoordsList = modeler.geoCoordsList;
+			
+			//var maxLengthDegree = 0.001;
+			//Path3D.insertPointsOnLargeSegments(bSplineCubic3d.geoCoordsList.geographicCoordsArray, maxLengthDegree, magoManager);
+			
+			var coordsCount = bSplineCubic3d.geoCoordsList.geographicCoordsArray.length;
+			for (var i=0; i<coordsCount; i++)
+			{
+				var geoCoord = bSplineCubic3d.geoCoordsList.geographicCoordsArray[i];
+				var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+				var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+				geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude, undefined, undefined, undefined, geoLocData, magoManager);
+			}
+			
+			var geoCoordsList = bSplineCubic3d.getGeographicCoordsList();
+			geoCoordsList.makeLines(magoManager);
+		
+			// Make the controlPoints.***
+			var controlPointArmLength = 0.2;
+			bSplineCubic3d.makeControlPoints(controlPointArmLength, magoManager);
+			bSplineCubic3d.makeInterpolatedPoints();
+		}
+	}
 };

@@ -2547,16 +2547,23 @@ void main()\n\
 		vColor=color4;\n\
 	\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
-	float z_b = gl_Position.z/gl_Position.w;\n\
-	float z_n = 2.0 * z_b - 1.0;\n\
-    float z_e = 2.0 * near * far / (far + near - z_n * (far - near));\n\
-	gl_PointSize = minPointSize + pendentPointSize/z_e; // Original.***\n\
-    if(gl_PointSize > maxPointSize)\n\
-        gl_PointSize = maxPointSize;\n\
-	if(gl_PointSize < 2.0)\n\
-		gl_PointSize = 2.0;\n\
-		\n\
-	glPointSize = gl_PointSize;\n\
+\n\
+	if(bUseFixPointSize)\n\
+	{\n\
+		gl_PointSize = fixPointSize;\n\
+	}\n\
+	else{\n\
+		float z_b = gl_Position.z/gl_Position.w;\n\
+		float z_n = 2.0 * z_b - 1.0;\n\
+		float z_e = 2.0 * near * far / (far + near - z_n * (far - near));\n\
+		gl_PointSize = minPointSize + pendentPointSize/z_e; // Original.***\n\
+		if(gl_PointSize > maxPointSize)\n\
+			gl_PointSize = maxPointSize;\n\
+		if(gl_PointSize < 2.0)\n\
+			gl_PointSize = 2.0;\n\
+			\n\
+		glPointSize = gl_PointSize;\n\
+	}\n\
 }";
 ShaderSource.PointCloudVS_rainbow = "attribute vec3 position;\n\
 attribute vec3 normal;\n\

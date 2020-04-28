@@ -236,19 +236,19 @@ TinTerrainManager.prototype.getTexCorrection = function(depth)
 		this.texCorrection[7] = 0.003;
 		this.texCorrection[8] = 0.003;
 		this.texCorrection[9] = 0.003;
-		this.texCorrection[10] = 0.004;
-		this.texCorrection[11] = 0.004;
-		this.texCorrection[12] = 0.004;
-		this.texCorrection[13] = 0.004;
-		this.texCorrection[14] = 0.004;
-		this.texCorrection[15] = 0.004;
-		this.texCorrection[16] = 0.004;
-		this.texCorrection[17] = 0.004;
-		this.texCorrection[18] = 0.004;
-		this.texCorrection[19] = 0.004;
-		this.texCorrection[20] = 0.004;
-		this.texCorrection[21] = 0.004;
-		this.texCorrection[22] = 0.004;
+		this.texCorrection[10] = 0.003;
+		this.texCorrection[11] = 0.003;
+		this.texCorrection[12] = 0.003;
+		this.texCorrection[13] = 0.003;
+		this.texCorrection[14] = 0.002;
+		this.texCorrection[15] = 0.002;
+		this.texCorrection[16] = 0.002;
+		this.texCorrection[17] = 0.002;
+		this.texCorrection[18] = 0.002;
+		this.texCorrection[19] = 0.002;
+		this.texCorrection[20] = 0.002;
+		this.texCorrection[21] = 0.002;
+		this.texCorrection[22] = 0.002;
 	}
 	
 	return this.texCorrection[depth];

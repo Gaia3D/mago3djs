@@ -399,7 +399,7 @@ VBOVertexIdxCacheKey.prototype.setDataArrayCustom = function(customDataArray, vb
 /**
  * 어떤 일을 하고 있습니까?
  */
-VBOVertexIdxCacheKey.prototype.setDataArrayPos = function(posDataArray, vboMemManager, dimensions) 
+VBOVertexIdxCacheKey.prototype.setDataArrayPos = function(posDataArray, vboMemManager, dimensions, options) 
 {
 	if (posDataArray === undefined)
 	{ return; }

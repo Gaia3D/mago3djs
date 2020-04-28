@@ -2,6 +2,7 @@
 
 /**
  * RenderableObject geometry.
+ * This class replaces parametricObjects. Used to created custom parametricObject on fly.
  * @class RenderableObject
  */
 var RenderableObject = function(options) 

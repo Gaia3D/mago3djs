@@ -73,6 +73,7 @@ MagoRenderable.prototype.addEventListener = function(event)
 
 	this.eventObject[type].push(event);
 };
+
 /**
  * 이벤트 실행
  * @param {String} type 
@@ -98,6 +99,7 @@ MagoRenderable.prototype.dispatchEvent = function(type, magoManager)
 		}
 	}
 };
+
 MagoRenderable.prototype.getRootOwner = function() 
 {
 	if (this.owner === undefined)

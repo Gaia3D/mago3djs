@@ -479,7 +479,7 @@ Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive
 	
 	if (this.bSplineCubic3d !== undefined)
 	{
-		this.bSplineCubic3d.renderPoints(magoManager, shader, renderType);
+		this.bSplineCubic3d.render(magoManager, shader, renderType);
 	}
 	
 	if (this.sphere !== undefined)

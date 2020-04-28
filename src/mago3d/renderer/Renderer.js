@@ -1713,10 +1713,13 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			magoManager.modeler.render(magoManager, currentShader, renderType);
 			// excavation objects.
 			
+			// after render native geometries, set current shader with "modelRefSsao" shader.
+			currentShader = magoManager.postFxShadersManager.getShader("modelRefSsao"); 
+			currentShader.useProgram();
+			
 			this.renderExcavationObjects(gl, currentShader, renderType, visibleObjControlerNodes);
 			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 			
-			//bApplySsao = false;
 			gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); 
 			
 			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);

@@ -94,9 +94,11 @@ MagoEarthViewerInit.prototype.setEventHandler = function()
 		// TODO:
 		console.log("resize");
 	}, false);
-    
-	canvas.addEventListener('keydown', function(event) // no works.***
+	
+	var handlekeydown = function(event) 
 	{
-		viewer.keydown(event); // no works.***
-	}, false);
+		viewer.keydown(event); 
+	};
+
+	document.addEventListener('keydown', handlekeydown, false);
 };

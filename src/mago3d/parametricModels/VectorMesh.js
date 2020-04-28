@@ -112,13 +112,13 @@ VectorMesh.prototype.render = function(magoManager, shader, renderType, glPrimit
 			return;
 		}
 		gl.uniform1i(shader.colorType_loc, 1);
+		//gl.enableVertexAttribArray(shader.color4_loc);
 	}
 	else 
 	{
 		gl.uniform1i(shader.colorType_loc, 0);
 		gl.disableVertexAttribArray(shader.color4_loc);
 	}
-	gl.enableVertexAttribArray(shader.color4_loc);
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, vboPos.key);
 	gl.vertexAttribPointer(shader.prev_loc, dim, gl.FLOAT, false, 16, 0);

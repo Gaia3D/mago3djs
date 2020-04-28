@@ -1753,6 +1753,26 @@ MagoManager.prototype.cameraMoved = function()
 
 /**
  */
+MagoManager.prototype.TEST__RenderGeoCoords = function() 
+{
+	if (this.test_geoCoords === undefined)
+	{
+		this.test_geoCoords = true;
+		//--------------------------------
+		var options = {};
+
+		var geoCoordsList = this.modeler.getGeographicCoordsList();
+		var geoCoordsArray = geoCoordsList.geographicCoordsArray;
+		
+		var renderable = GeographicCoordsList.getRenderableObjectOfGeoCoordsArray(geoCoordsArray, this, undefined);
+		this.modeler.addObject(renderable, 12);
+
+		geoCoordsList.geographicCoordsArray.length = 0;
+	}
+};
+
+/**
+ */
 MagoManager.prototype.TEST__SelectionBuffer = function() 
 {
 	if (this.selectionFbo === undefined)
@@ -2614,8 +2634,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		var hola = 0;
 	}
 	// Check modeler mode.
-	/*
-	this.magoMode = CODE.magoMode.DRAWING;
+	
 	if (this.magoMode === CODE.magoMode.DRAWING)// then process to draw.***
 	{
 		if (this.modeler === undefined)
@@ -2653,7 +2672,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			geoCoordsList.addGeoCoord(geoCoord);
 		}
 	}
-	*/
+	
 };
 
 /**

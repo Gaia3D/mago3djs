@@ -91,7 +91,7 @@ BSplineCubic3D.prototype.getGeoLocationDataManager = function(magoManager)
 /**
  * 어떤 일을 하고 있습니까?
  */
-BSplineCubic3D.prototype.renderPoints = function(magoManager, shader, renderType) 
+BSplineCubic3D.prototype.renderKnotPoints = function(magoManager, shader, renderType) 
 {
 	if (this.geoCoordsList === undefined)
 	{ return false; }
@@ -99,7 +99,110 @@ BSplineCubic3D.prototype.renderPoints = function(magoManager, shader, renderType
 	var bLoop = false, bEnableDepth = false;
 	
 	this.geoCoordsList.renderPoints(magoManager, shader, renderType, bEnableDepth);
-	this.geoCoordsList.renderLines(magoManager, shader, renderType, bLoop, bEnableDepth);
+	//this.geoCoordsList.renderLines(magoManager, shader, renderType, bLoop, bEnableDepth);
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+BSplineCubic3D.prototype.renderControlPoints = function(magoManager, shader, renderType) 
+{
+	//this.controlPoints3dMap
+	if (this.controlPoints3dList === undefined)
+	{
+		this.controlPoints3dList = new Point3DList();
+
+		var knotPointsCount = this.knotPoints3dList.getPointsCount();
+		for (var i = 0; i<knotPointsCount; i++)
+		{
+			var controlPointPair = this.controlPoints3dMap[i];
+			var point1 = controlPointPair.inningControlPoint;
+			var point2 = controlPointPair.outingControlPoint;
+
+			if (point1)
+			{ 
+				this.controlPoints3dList.addPoint(point1); 
+			}
+
+			if (point2)
+			{ 
+				this.controlPoints3dList.addPoint(point2); 
+			}
+		}
+
+		// Set the geoLocDataManager.***
+		//this.controlPoints3dList.geoLocDataManager = this.geoCoordsList.points3dList.geoLocDataManager;
+		this.controlPoints3dList.geoLocDataManager = this.knotPoints3dList.geoLocDataManager;
+	}
+
+	var bEnableDepth = false;
+	var gl = magoManager.getGl();
+
+	var shaderLocal = magoManager.postFxShadersManager.getShader("pointsCloud"); // provisional. Use the currentShader of argument.
+	shaderLocal.useProgram();
+	shaderLocal.disableVertexAttribArrayAll();
+	shaderLocal.resetLastBuffersBinded();
+	shaderLocal.enableVertexAttribArray(shaderLocal.position3_loc);
+	shaderLocal.bindUniformGenerals();
+	
+	gl.uniform1i(shaderLocal.bPositionCompressed_loc, false);
+	gl.uniform1i(shaderLocal.bUse1Color_loc, true);
+	gl.uniform4fv(shaderLocal.oneColor4_loc, [0.3, 0.9, 0.9, 1.0]); //.
+	gl.uniform1f(shaderLocal.fixPointSize_loc, 5.0);
+	gl.uniform1i(shaderLocal.bUseFixPointSize_loc, 1);
+
+	this.controlPoints3dList.renderPoints(magoManager, shaderLocal, renderType, bEnableDepth);
+
+	// Now, render the control points arms (lines).***
+	if (this.armsLinesPoints3dList === undefined)
+	{
+		this.armsLinesPoints3dList = new Point3DList();
+
+		// 1rst, recollect the lines points.
+		var armsLinesPointsArray = [];
+		var controlArmsCount = this.knotPoints3dList.getPointsCount();
+		for (var i=0; i<controlArmsCount; i++)
+		{
+			var controlPointPair = this.controlPoints3dMap[i];
+			var point1 = controlPointPair.inningControlPoint;
+			var point2 = controlPointPair.outingControlPoint;
+			var knotPoint = this.knotPoints3dList.getPoint(i);
+
+			if (point1)
+			{
+				armsLinesPointsArray.push(knotPoint);
+				armsLinesPointsArray.push(point1);
+
+			}
+
+			if (point2)
+			{
+				armsLinesPointsArray.push(knotPoint);
+				armsLinesPointsArray.push(point2);
+			}
+		}
+
+		this.armsLinesPoints3dList.pointsArray = armsLinesPointsArray;
+		this.armsLinesPoints3dList.geoLocDataManager = this.knotPoints3dList.geoLocDataManager;
+	}
+	var bLoop = false;
+	var bEnableDepth = true;
+	var glPrimitive = gl.LINES;
+	this.armsLinesPoints3dList.renderLines(magoManager, shaderLocal, renderType, bLoop, bEnableDepth, glPrimitive);
+};
+
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+BSplineCubic3D.prototype.render = function(magoManager, shader, renderType) 
+{
+	if (this.geoCoordsList === undefined)
+	{ return false; }
+	
+	var bLoop = false, bEnableDepth = false;
+	this.renderKnotPoints(magoManager, shader, renderType);
+	this.renderControlPoints(magoManager, shader, renderType);
 	
 	var gl = magoManager.sceneState.gl;
 	
