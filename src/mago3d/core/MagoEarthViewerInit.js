@@ -1,7 +1,8 @@
 'use strict';
 
-var MagoEarthViewerInit = function(containerId, serverPolicy) 
+var MagoEarthViewerInit = function(containerId, serverPolicy, options) 
 {
+	this.options = options || {};
 	ViewerInit.call(this, containerId, serverPolicy);
 };
 
@@ -16,7 +17,10 @@ MagoEarthViewerInit.prototype.init = function()
 	this.magoManager.magoWorld = this.viewer;
 	this.magoManager.globe = new Globe();
 	// Create the tinTerrains(MagoEarth).***
-	if (!this.magoManager.tinTerrainManager) { this.magoManager.tinTerrainManager = new TinTerrainManager(); }
+
+	
+	this.magoManager.tinTerrainManager = new TinTerrainManager(this.options);
+	//if (!this.magoManager.tinTerrainManager) { this.magoManager.tinTerrainManager = new TinTerrainManager(); }
 
 	// init matrices.***
 	this.viewer.updateModelViewMatrixByCamera(this.magoManager.sceneState.camera);
@@ -74,7 +78,7 @@ MagoEarthViewerInit.prototype.setEventHandler = function()
 		viewer.mouseup(event);			
 	}, false);
     
-	canvas.addEventListener('mousewheel', function(event)
+	canvas.addEventListener('wheel', function(event)
 	{
 		viewer.mousewheel(event); 
 	}, false);

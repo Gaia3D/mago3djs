@@ -241,7 +241,18 @@ MagoWorld.prototype.mouseclick = function(event)
  */
 MagoWorld.prototype.mousewheel = function(event)
 {
-	var delta = event.wheelDelta / 10;
+
+	var delta;
+	//firefox wheelDelta not support.
+	if (event.wheelDelta) 
+	{
+		delta = event.wheelDelta / 10;
+		if (window.opera) { delta = -delta; }
+	}
+	else
+	{
+		delta = -event.deltaY / 3 * 12;
+	}
 	var magoManager = this.magoManager;
 	var mouseAction = magoManager.sceneState.mouseAction;
 	

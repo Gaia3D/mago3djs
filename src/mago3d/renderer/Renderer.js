@@ -422,10 +422,6 @@ Renderer.prototype.renderObject = function(gl, renderable, magoManager, shader, 
 			gl.drawArrays(gl.LINE_STRIP, 0, vertices_count);
 			//gl.drawArrays(gl.TRIANGLES, 0, vertices_count);
 		}
-		
-		var glError = gl.getError();
-		if (glError !== gl.NO_ERROR)
-		{ var hola = 0; }
 	}
 };
 

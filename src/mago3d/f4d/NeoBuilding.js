@@ -1682,10 +1682,6 @@ NeoBuilding.prototype.render = function(magoManager, shader, renderType, refMatr
 	{
 		// There are buildings that are only skin, so check projectType of the building.
 		var lodBuildingData = this.getLodBuildingData(this.currentLod);
-		
-		if (this.currentLod === 2 && this.buildingId === "7D6_1")
-		{ var hola = 0; }
-		
 		if (lodBuildingData && !lodBuildingData.isModelRef)
 		{
 			// This building is skinType data.
@@ -2029,10 +2025,7 @@ NeoBuilding.prototype.renderDetailed = function(magoManager, shader, renderType,
 		relCamPosY = this.myCameraRelative.position.y;
 		relCamPosZ = this.myCameraRelative.position.z;
 	}
-	
-	if (this.buildingId === "gangnam_del")
-	{ var hola = 0; }
-	
+
 	// LOD0.
 	var minSize = 0.0;
 	var lowestOctreesCount = this.currentVisibleOctreesControler.currentVisibles0.length;

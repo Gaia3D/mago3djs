@@ -25,9 +25,9 @@
   "geoserverTerrainproviderParametersFormat":"",
   "dataChangeRequestDecision":"1",
   "initCameraEnable":true,
-  "initLatitude":"35.12329",
-  "initLongitude":"128.83633",
-  "initAltitude":"600",
+  "initLatitude":"35.127464",
+  "initLongitude":"128.915708",
+  "initAltitude":"60000",
   "initDuration":"1",
   "initDefaultTerrain":"",
   "initDefaultFov":1,
@@ -53,6 +53,6 @@
   "pendentPointSizeForPc":"60.0",
   "enableMemoryManagement":false,
   "insertDate":"",
-  "terrainType":"cesium-customer",
+  "terrainType":"plain",
   "terrainValue":"http://192.168.10.98:9998/tilesets/terrain/"
 }

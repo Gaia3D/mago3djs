@@ -17,13 +17,6 @@ var CesiumViewerInit = function(containerId, serverPolicy, options, legacyViewer
 CesiumViewerInit.prototype = Object.create(ViewerInit.prototype);
 CesiumViewerInit.prototype.constructor = CesiumViewerInit;
 
-CesiumViewerInit.TERRAINTYPE = {
-	GEOSERVER          : 'geoserver',
-	CESIUM_DEFAULT     : 'cesium-default',
-	CESIUM_ION_DEFAULT : 'cesium-ion-default',
-	CESIUM_ION_CDN     : 'cesium-ion-cdn',
-	CESIUM_CUSTOMER    : 'cesium-customer'
-};
 CesiumViewerInit.prototype.init = function() 
 {
 	this.setCanvasEventHandler();
@@ -76,7 +69,7 @@ CesiumViewerInit.prototype.providerBuild = function()
 		this.geoserverImageProviderBuild();
 	}
 
-	if (geoserverEnable && terrainType === CesiumViewerInit.TERRAINTYPE.GEOSERVER) 
+	if (geoserverEnable && terrainType === CODE.cesiumTerrainType.GEOSERVER) 
 	{
 		this.geoserverTerrainProviderBuild();
 	}
@@ -88,12 +81,12 @@ CesiumViewerInit.prototype.providerBuild = function()
 	}
 	var terrainType = policy.terrainType;
 	var terrainValue = policy.terrainValue;
-	if (terrainType !== CesiumViewerInit.TERRAINTYPE.GEOSERVER && !this.options.terrainProvider) 
+	if (terrainType !== CODE.cesiumTerrainType.GEOSERVER && !this.options.terrainProvider) 
 	{
 		this.options.terrainProvider = new Cesium.EllipsoidTerrainProvider();
 		switch (terrainType) 
 		{
-		case CesiumViewerInit.TERRAINTYPE.CESIUM_ION_DEFAULT :{
+		case CODE.cesiumTerrainType.CESIUM_ION_DEFAULT :{
 			if (policy.cesiumIonToken && policy.cesiumIonToken.length > 0) 
 			{
 				this.options.terrainProvider = new Cesium.CesiumTerrainProvider({
@@ -102,7 +95,7 @@ CesiumViewerInit.prototype.providerBuild = function()
 			}
 			break;
 		}
-		case CesiumViewerInit.TERRAINTYPE.CESIUM_ION_CDN :{
+		case CODE.cesiumTerrainType.CESIUM_ION_CDN :{
 			if (policy.cesiumIonToken || policy.cesiumIonToken.length > 0) 
 			{
 				this.options.terrainProvider = new Cesium.CesiumTerrainProvider({
@@ -111,7 +104,7 @@ CesiumViewerInit.prototype.providerBuild = function()
 			}
 			break;
 		}
-		case CesiumViewerInit.TERRAINTYPE.CESIUM_CUSTOMER :{
+		case CODE.cesiumTerrainType.CESIUM_CUSTOMER :{
 			this.options.terrainProvider = new Cesium.CesiumTerrainProvider({
 				url: terrainValue
 			});

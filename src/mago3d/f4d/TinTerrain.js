@@ -1352,13 +1352,9 @@ TinTerrain.prototype.getMidLatitudeRadWebMercator = function()
 	if (this.webMercatorExtent === undefined)
 	{ return undefined; }
 	
-	
 	var midMercatorY = (this.webMercatorExtent.maxY + this.webMercatorExtent.minY)/2.0;
 	var latRad = 2*Math.atan(Math.pow(Math.E, midMercatorY)) - Math.PI/2;
-	
-	
-	if (isNaN(latRad))
-	{ var hola = 0; }
+
 	return latRad;
 };
 
@@ -1600,7 +1596,7 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 		skirtDepth          : 10000,
 		texCorrectionFactor : texCorrectionFactor
 	};
-	
+
 	var skirtResultObject = TinTerrain.getSkirtTrianglesStrip(lonArray, latArray, altArray, this.texCoordsArray, this.southIndices, this.eastIndices, this.northIndices, this.westIndices, options);
 	this.skirtCartesiansArray = skirtResultObject.skirtCartesiansArray;
 	this.skirtTexCoordsArray = skirtResultObject.skirtTexCoordsArray;
@@ -2342,7 +2338,7 @@ TinTerrain.prototype.decodeData = function(imageryType)
 	var tinTerrainManager = this.tinTerrainManager;
 	if (!this.tinTerrainManager.workerDecodedTerrain) 
 	{ 
-		this.tinTerrainManager.workerDecodedTerrain = new Worker('/build/mago3d/Worker/workerDecodeTerrain.js'); 
+		this.tinTerrainManager.workerDecodedTerrain = new Worker(MagoConfig.scriptRootPath + 'Worker/workerDecodeTerrain.js'); 
 		this.tinTerrainManager.workerDecodedTerrain.onmessage = function(e)
 		{
 			var tileInfo = e.data.info;
@@ -2388,7 +2384,7 @@ TinTerrain.prototype.parseData = function(dataArrayBuffer)
 	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 	if (!this.tinTerrainManager.workerParseTerrain) 
 	{ 
-		this.tinTerrainManager.workerParseTerrain = new Worker('/build/mago3d/Worker/workerParseTerrain.js'); 
+		this.tinTerrainManager.workerParseTerrain = new Worker(MagoConfig.scriptRootPath + 'Worker/workerParseTerrain.js'); 
 		this.tinTerrainManager.workerParseTerrain.onmessage = function(e)
 		{
 			var tileInfo = e.data.info;

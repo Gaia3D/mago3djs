@@ -67,7 +67,7 @@ var Mago3d = function(containerId, serverPolicy, callback, options, legacyViewer
 	}
 	else 
 	{
-		viewerInitializer = new MagoEarthViewerInit(containerId, serverPolicy);
+		viewerInitializer = new MagoEarthViewerInit(containerId, serverPolicy, options);
 	}
 
 	viewer = viewerInitializer.viewer;

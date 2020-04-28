@@ -605,10 +605,6 @@ SmartTile.prototype.makeTreeByDepth = function(targetDepth, magoManager)
 		}
 		
 	}
-	else 
-	{
-		var hola = 0;
-	}
 };
 
 /**
@@ -1289,6 +1285,8 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		var buildingId = "";
 		wordLength = (new Uint16Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+2)))[0]; bytesReaded += 2;
 		buildingId = enc.decode(new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+ wordLength))) ;bytesReaded += wordLength;
+
+		if(!smartTilePathInfo[projectId]) continue;
 
 		var projectFolderName = smartTilePathInfo[projectId].projectFolderPath;
 		var savedProjectId = smartTilePathInfo[projectId].projectId;

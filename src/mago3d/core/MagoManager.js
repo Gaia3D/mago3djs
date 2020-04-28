@@ -347,33 +347,23 @@ MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums)
 		this.isLastFrustum = true;
 	}
 
-	// cesium 새 버전에서 지원하지 않음
-	var picking = pass.pick;
-	if (picking) 
+	if (this.configInformation === undefined)
 	{
-		//
+		this.configInformation = MagoConfig.getPolicy();
 	}
-	else 
+	if (scene)
 	{
-		if (this.configInformation === undefined)
-		{
-			this.configInformation = MagoConfig.getPolicy();
-		}
-		if (scene)
-		{
-			var gl = scene.context._gl;
-			gl.getExtension("EXT_frag_depth");
-			
-			if (!this.bInit)
-			{ this.init(gl); }
+		var gl = scene.context._gl;
+		gl.getExtension("EXT_frag_depth");
 		
-			if (gl.isContextLost())
-			{ return; }
-		}
-
-		this.startRender(isLastFrustum, this.currentFrustumIdx, numFrustums);
-			
+		if (!this.bInit)
+		{ this.init(gl); }
+	
+		if (gl.isContextLost())
+		{ return; }
 	}
+
+	this.startRender(isLastFrustum, this.currentFrustumIdx, numFrustums);
 };
 
 MagoManager.prototype.isCesiumGlobe = function() 
@@ -921,11 +911,6 @@ MagoManager.prototype.loadAndPrepareData = function()
 				nodesCount = this.visibleObjControlerNodes.currentVisibles0.length;
 			}
 		}
-		//else if (attributes.objectType === "multiBuildingsTile")
-		//{
-		//	// Load data if necessary.
-		//	var hola = 0;
-		//}
 	}
 	
 	this.prepareVisibleOctreesSortedByDistance(gl, this.visibleObjControlerOctrees); 
@@ -969,7 +954,7 @@ MagoManager.prototype.loadAndPrepareData = function()
 	// TinTerrain.*******************************************************************************************************************************
 	if (this.isFarestFrustum())
 	{
-		if (this.tinTerrainManager !== undefined)
+		if (this.tinTerrainManager !== undefined && this.tinTerrainManager.ready)
 		{ this.tinTerrainManager.prepareVisibleTinTerrains(this); }
 	}
 	//if(this.isFarestFrustum())
@@ -1498,52 +1483,6 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 		this.managePickingProcess();
 	}
 	
-	if (this.bPicking === true && isLastFrustum)
-	{
-		var posWC;
-	
-		/*if (this.magoPolicy.issueInsertEnable === true)
-		{
-			if (this.objMarkerSC === undefined)
-			{ this.objMarkerSC = new ObjectMarker(); }
-			
-			var mouseAction = this.sceneState.mouseAction;
-			var strWC = mouseAction.getStartWorldPoint();
-			posWC = new Point3D(strWC.x, strWC.y, strWC.z);
-			
-			var options = {
-				positionWC            : posWC,
-				imageFilePath         : "defaultBlue",
-				imageFilePathSelected : "defaultRed",
-				sizeX                 : 20.0,
-				sizeY                 : 20.0
-			};
-			var objMarker = this.objMarkerManager.newObjectMarker(options, this);
-		}
-
-		if (this.magoPolicy.objectInfoViewEnable === true)
-		{
-			if (this.objMarkerSC === undefined)
-			{ 
-				if (posWC === undefined)
-				{
-					var mouseAction = this.sceneState.mouseAction;
-					var strWC = mouseAction.getStartWorldPoint();
-					posWC = new Point3D(strWC.x, strWC.y, strWC.z);
-				}
-				
-				var options = {
-					positionWC            : posWC,
-					imageFilePath         : "defaultBlue",
-					imageFilePathSelected : "defaultRed"
-				};
-			
-				this.objMarkerSC = this.objMarkerManager.newObjectMarker(options, this);
-				this.objMarkerManager.objectMarkerArray.pop();
-			}
-		}*/
-	}
-
 	// Render process.***
 	this.doRender(frustumVolumenObject);
 
@@ -1803,8 +1742,6 @@ MagoManager.prototype.TEST__SelectionBuffer = function()
 	// The center pixel of the selection is 12, 13, 14.***
 	var centerPixel = Math.floor(totalPixelsCount/2);
 	var idx = this.selectionColor.decodeColor3(pixels[centerPixel*3], pixels[centerPixel*3+1], pixels[centerPixel*3+2]);
-	if (idx === 0)
-	{ var hola = 0; }
 	//////////////////////////////////////////////////////////////////////////////
 	this.selectionFbo.unbind();
 };
@@ -2365,7 +2302,6 @@ MagoManager.prototype.keyDown = function(key)
 					
 					geoCoordsList.geographicCoordsArray.length = 0;
 				}
-				var hola = 0;
 			}
 			
 			//var excavation = this.modeler.getExcavation();
@@ -3171,9 +3107,6 @@ MagoManager.prototype.moveSelectedObjectGeneral = function(gl, object)
 		var newLongitude = difX;
 		var newlatitude = difY;
 		var newAltitude = difZ;
-		
-		if (Math.abs(newAltitude) > 50)
-		{ var hola = 0; }
 		
 		// Must check if there are restrictions.***
 		var attributes = object.attributes;
@@ -4709,7 +4642,7 @@ MagoManager.prototype.doMultiFrustumCullingSmartTiles = function(camera)
 	
 	// TinTerranTiles.*************************************************************************
 	// Provisionally:
-	if (this.tinTerrainManager !== undefined)
+	if (this.tinTerrainManager !== undefined && this.tinTerrainManager.ready)
 	{ this.tinTerrainManager.doFrustumCulling(frustumVolume, camera.position, this); }
 };
 
@@ -5154,11 +5087,11 @@ MagoManager.prototype.getObjectIndexFile = function(projectId, projectDataFolder
 		this.configInformation = MagoConfig.getPolicy();
 	}
 	
-	this.buildingSeedList = new BuildingSeedList();
+	//this.buildingSeedList = new BuildingSeedList();
 	var fileName;
 	var geometrySubDataPath = projectDataFolder;
 	fileName = this.readerWriter.geometryDataPath + "/" + geometrySubDataPath + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + new Date().getTime();
-	this.readerWriter.getObjectIndexFileForSmartTile(fileName, this, this.buildingSeedList, projectId);
+	this.readerWriter.getObjectIndexFileForSmartTile(fileName, this, undefined, projectId);
 };
 
 /**
@@ -5211,22 +5144,6 @@ MagoManager.prototype.getObjectIndexFileForData = function(projectId, f4dObject)
 	var geometrySubDataPath = groupDataFolder;
 	var fileName = this.readerWriter.geometryDataPath + "/" + geometrySubDataPath + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + MagoConfig.getPolicy().content_cache_version;
 	this.readerWriter.getObjectIndexFileForData(fileName, this, projectId, newDataKeys, f4dObject);
-};
-
-/**
- * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
- */
-MagoManager.prototype.getObjectIndexFile_xxxx = function() 
-{
-	if (this.configInformation === undefined)
-	{
-		this.configInformation = MagoConfig.getPolicy();
-	}
-
-	this.buildingSeedList = new BuildingSeedList();
-	this.readerWriter.getObjectIndexFileForSmartTile(
-		this.readerWriter.getCurrentDataPath() + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + MagoConfig.getPolicy().content_cache_version, this, this.buildingSeedList);
-		
 };
 
 /**
@@ -5350,7 +5267,7 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 			if (attributes.isPhysical)
 			{
 				// find the buildingSeed.
-				buildingSeed = buildingSeedMap[buildingId];
+				buildingSeed = buildingSeedMap.getBuildingSeed(buildingId);
 				if (buildingSeed)
 				{
 					data.buildingSeed = buildingSeed;
@@ -5599,11 +5516,11 @@ MagoManager.prototype.calculateBoundingBoxesNodes = function(projectId)
 /**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
  */
-MagoManager.prototype.makeSmartTile = function(buildingSeedList, projectId, f4dObjectJson, seedMap) 
+MagoManager.prototype.makeSmartTile = function(buildingSeedMap, projectId, f4dObjectJson, seedMap) 
 {
-	if (!buildingSeedList && !seedMap) 
+	if (!buildingSeedMap && !seedMap) 
 	{
-		throw new Error('buildingSeedList or seedMap is required'); 
+		throw new Error('buildingSeedMap or seedMap is required'); 
 	}
 	//var realTimeLocBlocksList = MagoConfig.getData().alldata; // original.***
 	// "projectId" = json file name.
@@ -5615,7 +5532,7 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList, projectId, f4dO
 	// now, read all hierarchyJason and make the hierarchy tree.
 	var physicalNodesArray = []; // put here the nodes that has geometry data.
 	// make a buildingSeedMap.
-	var buildingSeedMap = seedMap || {};
+	/*var buildingSeedMap = seedMap || {};
 	var buildingSeedMapLength = Object.keys(buildingSeedMap).length;
 	if (buildingSeedMapLength === 0) 
 	{
@@ -5626,7 +5543,7 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList, projectId, f4dO
 			buildingId = buildingSeed.buildingId;
 			buildingSeedMap[buildingId] = buildingSeed;
 		}
-	}
+	}*/
 	
 	var projectFolderName = getProjectFolderName(realTimeLocBlocksList);
 	if (!Array.isArray(realTimeLocBlocksList)) 
@@ -5650,7 +5567,7 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedList, projectId, f4dO
 	var targetDepth = 15;
 	this.smartTileManager.makeTreeByDepth(targetDepth, physicalNodesArray, this);
 
-	this.buildingSeedList.buildingSeedArray.length = 0; // init.
+	//this.buildingSeedList.buildingSeedArray.length = 0; // init.
 
 	
 	this.emit(MagoManager.EVENT_TYPE.F4DLOADEND, {

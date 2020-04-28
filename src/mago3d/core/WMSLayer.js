@@ -13,19 +13,11 @@ var WMSLayer = function(options)
 
 	var maxZoom = defaultValue(options.maxZoom, 18);
 	var minZoom = defaultValue(options.minZoom, 0);
-	
-	Object.defineProperty(this, 'maxZoom', {
-		get: function()
-		{
-			return maxZoom;
-		}
-	});
-	Object.defineProperty(this, 'minZoom', {
-		get: function()
-		{
-			return minZoom;
-		}
-	});
+	this._freezeAttr = {
+		maxZoom : maxZoom,
+		minZoom : minZoom
+	};
+	Object.freeze(this._freezeAttr);
 
 	this.show = defaultValue(options.show, true);
 	this._requestParam = new URLSearchParams(this.param);
@@ -38,6 +30,21 @@ var WMSLayer = function(options)
 		this._requestParam.delete('CRS');
 	}
 };
+
+Object.defineProperties(WMSLayer.prototype, {
+	maxZoom: {
+		get: function()
+		{
+			return this._freezeAttr.maxZoom;
+		}
+	},
+	minZoom: {
+		get: function()
+		{
+			return this._freezeAttr.minZoom;
+		}
+	}
+});
 
 WMSLayer.DEAFULT_PARAM = {
 	SERVICE     : 'WMS',

@@ -659,12 +659,7 @@ GeoLocationData.prototype.getTransformedRelativePositionsArray = function(absolu
  */
 GeoLocationData.prototype.bindGeoLocationUniforms = function(gl, shader) 
 {
-	if (this.rotMatrix === undefined)
-	{ var hola = 0; }
-	
 	gl.uniformMatrix4fv(shader.buildingRotMatrix_loc, false, this.rotMatrix._floatArrays);
 	gl.uniform3fv(shader.buildingPosHIGH_loc, [this.positionHIGH[0], this.positionHIGH[1], this.positionHIGH[2]]);
 	gl.uniform3fv(shader.buildingPosLOW_loc, [this.positionLOW[0], this.positionLOW[1], this.positionLOW[2]]);
 };
-
-

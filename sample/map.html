@@ -83,7 +83,9 @@
 			type: "GET",
 			dataType: "json",
 			success: function(serverPolicy){
+				serverPolicy.basicGlobe = 'cesium';
 				MAGO3D_INSTANCE = new Mago3D.Mago3d(renderDivId, serverPolicy, {loadend : loadend});
+				console.info(MAGO3D_INSTANCE.getMagoManager());
 			},
 			error: function(e){
 				alert(e.responseText);
@@ -131,7 +133,7 @@
 		});
 
 		$.ajax({
-			url: dataInformationUrl + "mipo.json",
+			url: dataInformationUrl + "edc.json",
 			type: "GET",
 			dataType: "json",
 			success: function(f4dObject){

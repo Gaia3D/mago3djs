@@ -130,5 +130,17 @@ CODE.imageFilter = {
 	"UNKNOWN"    : 0,
 	"BATHYMETRY" : 1
 };
+CODE.cesiumTerrainType = {
+	GEOSERVER          : 'geoserver',
+	CESIUM_DEFAULT     : 'cesium-default',
+	CESIUM_ION_DEFAULT : 'cesium-ion-default',
+	CESIUM_ION_CDN     : 'cesium-ion-cdn',
+	CESIUM_CUSTOMER    : 'cesium-customer'
+};
+CODE.magoEarthTerrainType = {
+	PLAIN     : 'plain',
+	ELEVATION : 'elevation',
+	REALTIME  : 'realtime'
+};
 CODE.PROJECT_ID_PREFIX = "projectId_";
 CODE.PROJECT_DATA_FOLDER_PREFIX = "projectDataFolder_";
