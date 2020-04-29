@@ -35,13 +35,13 @@ uniform bool bApplySpecularLighting;
 
 varying float applySpecLighting;
 varying vec3 vNormal;
-varying vec3 vertexPos;
 varying vec2 vTexCoord;   
 varying vec3 uAmbientColor;
 varying vec3 vLightWeighting;
 varying vec4 vcolor4;
 varying vec3 v3Pos;
 varying float depthValue;
+varying float vFogAmount;
 
 varying vec4 vPosRelToLight; 
 varying vec3 vLightDir; 
@@ -116,6 +116,10 @@ void main()
 		vTexCoord = texCoord;
 	}
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;
-	vertexPos = (modelViewMatrixRelToEye * pos4).xyz;
-	v3Pos = gl_Position.xyz;
+	v3Pos = (modelViewMatrixRelToEye * pos4).xyz;
+
+	// calculate fog amount.
+	float fogParam = 1.15 * v3Pos.z/(far - 10000.0);
+	float fogParam2 = fogParam*fogParam;
+	vFogAmount = fogParam2*fogParam2;
 }

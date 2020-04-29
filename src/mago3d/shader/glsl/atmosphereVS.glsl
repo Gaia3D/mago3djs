@@ -101,5 +101,5 @@ void main()
 	alphaPlusPerDist = 1.0;
 	//alphaPlusPerDist = 1.0;
 
-	vcolor4 = vec4(alpha*0.7*alphaPlusPerDist, alpha*0.86*alphaPlusPerDist, alpha*alphaPlusPerDist, 1.0);
+	vcolor4 = vec4(alpha*0.75*alphaPlusPerDist, alpha*0.88*alphaPlusPerDist, alpha*alphaPlusPerDist, 1.0);
 }

@@ -213,7 +213,7 @@ void main()\n\
 	alphaPlusPerDist = 1.0;\n\
 	//alphaPlusPerDist = 1.0;\n\
 \n\
-	vcolor4 = vec4(alpha*0.7*alphaPlusPerDist, alpha*0.86*alphaPlusPerDist, alpha*alphaPlusPerDist, 1.0);\n\
+	vcolor4 = vec4(alpha*0.75*alphaPlusPerDist, alpha*0.88*alphaPlusPerDist, alpha*alphaPlusPerDist, 1.0);\n\
 }";
 ShaderSource.BlendingCubeFS = "	precision lowp float;\n\
 	varying vec4 vColor;\n\
@@ -3447,7 +3447,6 @@ varying vec3 vLightWeighting;\n\
 \n\
 varying vec3 diffuseColor;\n\
 uniform vec3 specularColor;\n\
-varying vec3 vertexPos;\n\
 varying float depthValue;\n\
 \n\
 const int kernelSize = 16;  \n\
@@ -3461,6 +3460,7 @@ uniform bool bApplyShadow;\n\
 uniform float shadowMapWidth;    \n\
 uniform float shadowMapHeight;\n\
 varying vec3 v3Pos;\n\
+varying float vFogAmount;\n\
 \n\
 varying float applySpecLighting;\n\
 varying vec4 vPosRelToLight; \n\
@@ -3669,7 +3669,7 @@ void main()\n\
 			else\n\
 			{\n\
 				vec3 lightPos = vec3(1.0, 1.0, 1.0);\n\
-				L = normalize(lightPos - vertexPos);\n\
+				L = normalize(lightPos - v3Pos);\n\
 				lambertian = max(dot(normal2, L), 0.0);\n\
 			}\n\
 			\n\
@@ -3677,7 +3677,7 @@ void main()\n\
 			if(lambertian > 0.0)\n\
 			{\n\
 				vec3 R = reflect(-L, normal2);      // Reflected light vector\n\
-				vec3 V = normalize(-vertexPos); // Vector to viewer\n\
+				vec3 V = normalize(-v3Pos); // Vector to viewer\n\
 				\n\
 				// Compute the specular term\n\
 				float specAngle = max(dot(R, V), 0.0);\n\
@@ -3795,9 +3795,6 @@ void main()\n\
 \n\
 		textureColor.w = externalAlpha;\n\
 		vec4 fogColor = vec4(0.9, 0.9, 0.9, 1.0);\n\
-		float fogParam = v3Pos.z/(far - 10000.0);\n\
-		float fogParam2 = fogParam*fogParam;\n\
-		float fogAmount = fogParam2*fogParam2;\n\
 		\n\
 		// Test dem image.***\n\
 		float altitude = 1000000.0;\n\
@@ -3833,10 +3830,7 @@ void main()\n\
 			\n\
 			if(gray < 0.05)\n\
 			gray = 0.05;\n\
-			//fogColor = vec4(gray, gray*1.3, gray*1.6, 1.0);\n\
 			fogColor = vec4(gray*1.3, gray*1.5, gray*1.7, 1.0);\n\
-			//fogColor = vec4(rainbowColor.rgb, 1.0);\n\
-			fogAmount = 0.7;\n\
 			\n\
 			// Test drawing grid.***\n\
 			if(uTileDepth > 7)\n\
@@ -3867,7 +3861,7 @@ void main()\n\
 		}\n\
 		\n\
 		\n\
-		vec4 finalColor = mix(textureColor, fogColor, fogAmount); \n\
+		vec4 finalColor = mix(textureColor, fogColor, vFogAmount); \n\
 		gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian, 1.0); // original.***\n\
 		//gl_FragColor = textureColor; // test.***\n\
 		//gl_FragColor = vec4(vNormal.xyz, 1.0); // test.***\n\
@@ -3912,13 +3906,13 @@ uniform bool bApplySpecularLighting;\n\
 \n\
 varying float applySpecLighting;\n\
 varying vec3 vNormal;\n\
-varying vec3 vertexPos;\n\
 varying vec2 vTexCoord;   \n\
 varying vec3 uAmbientColor;\n\
 varying vec3 vLightWeighting;\n\
 varying vec4 vcolor4;\n\
 varying vec3 v3Pos;\n\
 varying float depthValue;\n\
+varying float vFogAmount;\n\
 \n\
 varying vec4 vPosRelToLight; \n\
 varying vec3 vLightDir; \n\
@@ -3993,8 +3987,12 @@ void main()\n\
 		vTexCoord = texCoord;\n\
 	}\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
-	vertexPos = (modelViewMatrixRelToEye * pos4).xyz;\n\
-	v3Pos = gl_Position.xyz;\n\
+	v3Pos = (modelViewMatrixRelToEye * pos4).xyz;\n\
+\n\
+	// calculate fog amount.\n\
+	float fogParam = 1.15 * v3Pos.z/(far - 10000.0);\n\
+	float fogParam2 = fogParam*fogParam;\n\
+	vFogAmount = fogParam2*fogParam2;\n\
 }";
 ShaderSource.update_frag = "precision highp float;\n\
 \n\

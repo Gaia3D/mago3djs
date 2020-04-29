@@ -37,7 +37,6 @@ varying vec3 vLightWeighting;
 
 varying vec3 diffuseColor;
 uniform vec3 specularColor;
-varying vec3 vertexPos;
 varying float depthValue;
 
 const int kernelSize = 16;  
@@ -51,6 +50,7 @@ uniform bool bApplyShadow;
 uniform float shadowMapWidth;    
 uniform float shadowMapHeight;
 varying vec3 v3Pos;
+varying float vFogAmount;
 
 varying float applySpecLighting;
 varying vec4 vPosRelToLight; 
@@ -259,7 +259,7 @@ void main()
 			else
 			{
 				vec3 lightPos = vec3(1.0, 1.0, 1.0);
-				L = normalize(lightPos - vertexPos);
+				L = normalize(lightPos - v3Pos);
 				lambertian = max(dot(normal2, L), 0.0);
 			}
 			
@@ -267,7 +267,7 @@ void main()
 			if(lambertian > 0.0)
 			{
 				vec3 R = reflect(-L, normal2);      // Reflected light vector
-				vec3 V = normalize(-vertexPos); // Vector to viewer
+				vec3 V = normalize(-v3Pos); // Vector to viewer
 				
 				// Compute the specular term
 				float specAngle = max(dot(R, V), 0.0);
@@ -385,9 +385,6 @@ void main()
 
 		textureColor.w = externalAlpha;
 		vec4 fogColor = vec4(0.9, 0.9, 0.9, 1.0);
-		float fogParam = v3Pos.z/(far - 10000.0);
-		float fogParam2 = fogParam*fogParam;
-		float fogAmount = fogParam2*fogParam2;
 		
 		// Test dem image.***
 		float altitude = 1000000.0;
@@ -423,10 +420,7 @@ void main()
 			
 			if(gray < 0.05)
 			gray = 0.05;
-			//fogColor = vec4(gray, gray*1.3, gray*1.6, 1.0);
 			fogColor = vec4(gray*1.3, gray*1.5, gray*1.7, 1.0);
-			//fogColor = vec4(rainbowColor.rgb, 1.0);
-			fogAmount = 0.7;
 			
 			// Test drawing grid.***
 			if(uTileDepth > 7)
@@ -457,7 +451,7 @@ void main()
 		}
 		
 		
-		vec4 finalColor = mix(textureColor, fogColor, fogAmount); 
+		vec4 finalColor = mix(textureColor, fogColor, vFogAmount); 
 		gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian, 1.0); // original.***
 		//gl_FragColor = textureColor; // test.***
 		//gl_FragColor = vec4(vNormal.xyz, 1.0); // test.***

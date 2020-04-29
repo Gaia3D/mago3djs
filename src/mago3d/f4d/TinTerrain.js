@@ -1555,7 +1555,7 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 	
 	// Make normals using the cartesians.***
 	
-	/*
+	
 	this.normalsArray = new Int8Array(vertexCount*3);
 	var point = new Point3D();
 	for (var i=0; i<vertexCount; i++)
@@ -1567,7 +1567,7 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 		this.normalsArray[i*3+1] = point.y*126;
 		this.normalsArray[i*3+2] = point.z*126;
 	}
-	*/
+	
 	
 	// finally make indicesArray.
 	var numCols = lonSegments + 1;
@@ -1589,7 +1589,7 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 	this.eastVertexCount = this.eastIndices.length;
 	this.northVertexCount = this.northIndices.length;
 	
-	this.normalsArray = TinTerrain.getNormalCartesiansArray(this.cartesiansArray, this.indices, undefined, undefined);
+	//this.normalsArray = TinTerrain.getNormalCartesiansArray(this.cartesiansArray, this.indices, undefined, undefined);
 	
 	// make skirtMesh data.
 	var options = {
