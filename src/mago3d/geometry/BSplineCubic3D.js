@@ -36,6 +36,8 @@ var BSplineCubic3D = function(options)
 	this.vtxProfilesList;
 	this.vboKeysContainer;
 	this.vboKeysContainerEdges;
+
+	this.state = CODE.parametricCurveState.NORMAL; // or EDITED.
 	
 	if (options)
 	{
@@ -99,7 +101,6 @@ BSplineCubic3D.prototype.renderKnotPoints = function(magoManager, shader, render
 	var bLoop = false, bEnableDepth = false;
 	
 	this.geoCoordsList.renderPoints(magoManager, shader, renderType, bEnableDepth);
-	//this.geoCoordsList.renderLines(magoManager, shader, renderType, bLoop, bEnableDepth);
 };
 
 /**
@@ -151,44 +152,54 @@ BSplineCubic3D.prototype.renderControlPoints = function(magoManager, shader, ren
 	gl.uniform1f(shaderLocal.fixPointSize_loc, 5.0);
 	gl.uniform1i(shaderLocal.bUseFixPointSize_loc, 1);
 
-	this.controlPoints3dList.renderPoints(magoManager, shaderLocal, renderType, bEnableDepth);
+	if (renderType === 2)
+	{
+		this.controlPoints3dList.renderPointsIndividually(magoManager, shaderLocal, renderType, bEnableDepth);
+	}
+	else
+	{
+		this.controlPoints3dList.renderPoints(magoManager, shaderLocal, renderType, bEnableDepth);
+	}
 
 	// Now, render the control points arms (lines).***
-	if (this.armsLinesPoints3dList === undefined)
+	if (renderType !== 2)
 	{
-		this.armsLinesPoints3dList = new Point3DList();
-
-		// 1rst, recollect the lines points.
-		var armsLinesPointsArray = [];
-		var controlArmsCount = this.knotPoints3dList.getPointsCount();
-		for (var i=0; i<controlArmsCount; i++)
+		if (this.armsLinesPoints3dList === undefined)
 		{
-			var controlPointPair = this.controlPoints3dMap[i];
-			var point1 = controlPointPair.inningControlPoint;
-			var point2 = controlPointPair.outingControlPoint;
-			var knotPoint = this.knotPoints3dList.getPoint(i);
+			this.armsLinesPoints3dList = new Point3DList();
 
-			if (point1)
+			// 1rst, recollect the lines points.
+			var armsLinesPointsArray = [];
+			var controlArmsCount = this.knotPoints3dList.getPointsCount();
+			for (var i=0; i<controlArmsCount; i++)
 			{
-				armsLinesPointsArray.push(knotPoint);
-				armsLinesPointsArray.push(point1);
+				var controlPointPair = this.controlPoints3dMap[i];
+				var point1 = controlPointPair.inningControlPoint;
+				var point2 = controlPointPair.outingControlPoint;
+				var knotPoint = this.knotPoints3dList.getPoint(i);
 
+				if (point1)
+				{
+					armsLinesPointsArray.push(knotPoint);
+					armsLinesPointsArray.push(point1);
+
+				}
+
+				if (point2)
+				{
+					armsLinesPointsArray.push(knotPoint);
+					armsLinesPointsArray.push(point2);
+				}
 			}
 
-			if (point2)
-			{
-				armsLinesPointsArray.push(knotPoint);
-				armsLinesPointsArray.push(point2);
-			}
+			this.armsLinesPoints3dList.pointsArray = armsLinesPointsArray;
+			this.armsLinesPoints3dList.geoLocDataManager = this.knotPoints3dList.geoLocDataManager;
 		}
-
-		this.armsLinesPoints3dList.pointsArray = armsLinesPointsArray;
-		this.armsLinesPoints3dList.geoLocDataManager = this.knotPoints3dList.geoLocDataManager;
+		var bLoop = false;
+		var bEnableDepth = true;
+		var glPrimitive = gl.LINES;
+		this.armsLinesPoints3dList.renderLines(magoManager, shaderLocal, renderType, bLoop, bEnableDepth, glPrimitive);
 	}
-	var bLoop = false;
-	var bEnableDepth = true;
-	var glPrimitive = gl.LINES;
-	this.armsLinesPoints3dList.renderLines(magoManager, shaderLocal, renderType, bLoop, bEnableDepth, glPrimitive);
 };
 
 
@@ -204,6 +215,9 @@ BSplineCubic3D.prototype.render = function(magoManager, shader, renderType)
 	this.renderKnotPoints(magoManager, shader, renderType);
 	this.renderControlPoints(magoManager, shader, renderType);
 	
+	if (renderType === 2)
+	{ return; }
+
 	var gl = magoManager.sceneState.gl;
 	
 	// Render interpolated points.***
@@ -227,14 +241,6 @@ BSplineCubic3D.prototype.render = function(magoManager, shader, renderType)
 		gl.uniform1f(shader.fixPointSize_loc, 5.0);
 		gl.uniform1i(shader.bUseFixPointSize_loc, true);
 		this.interpolatedPoints3dList.renderLines(magoManager, shader, renderType, bLoop, bEnableDepth);
-	}
-	
-	// Render controlPoints.***
-	if (this.controlPoints3dMap !== undefined)
-	{
-		// Check if exist control points.***
-		//var lineWidthRange = gl.getParameter(gl.ALIASED_LINE_WIDTH_RANGE);
-		
 	}
 };
 

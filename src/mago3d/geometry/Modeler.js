@@ -467,8 +467,6 @@ Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive
 		
 	if (renderType === 1 || renderType === 2)
 	{
-		
-		
 		if (this.clippingBox !== undefined)
 		{
 			var glPrimitive = undefined;
@@ -479,6 +477,17 @@ Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive
 	
 	if (this.bSplineCubic3d !== undefined)
 	{
+		if (renderType === 0)
+		{
+			shader = magoManager.postFxShadersManager.getShader("pointsCloudDepth");
+			shader.useProgram();
+			shader.disableVertexAttribArrayAll();
+			shader.resetLastBuffersBinded();
+			shader.enableVertexAttribArray(shader.position3_loc);
+			shader.bindUniformGenerals();
+		
+			//gl.uniform1i(shader.bPositionCompressed_loc, false);
+		}
 		this.bSplineCubic3d.render(magoManager, shader, renderType);
 	}
 	

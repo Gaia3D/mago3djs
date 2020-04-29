@@ -50,6 +50,8 @@ Sky.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 	gl.uniform1f(shader.equatorialRadius_loc, equatorialRadius);
 	
 	gl.depthRange(1.0, 1.0);
+	gl.enable(gl.BLEND);
 	this.ellipsoid.render(magoManager, shader, renderType, glPrimitive);
 	gl.depthRange(0.0, 1.0);
+	gl.disable(gl.BLEND);
 };

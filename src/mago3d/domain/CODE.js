@@ -144,3 +144,8 @@ CODE.magoEarthTerrainType = {
 };
 CODE.PROJECT_ID_PREFIX = "projectId_";
 CODE.PROJECT_DATA_FOLDER_PREFIX = "projectDataFolder_";
+
+CODE.parametricCurveState = {
+	"NORMAL" : 0,
+	"EDITED" : 1
+};

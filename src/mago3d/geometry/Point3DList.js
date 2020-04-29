@@ -894,6 +894,74 @@ Point3DList.prototype.renderPoints = function(magoManager, shader, renderType, b
 	gl.enable(gl.DEPTH_TEST);
 };
 
+Point3DList.prototype.renderPointsIndividually = function(magoManager, shader, renderType, bEnableDepth)
+{
+	if (this.pointsArray === undefined)
+	{ return false; }
+
+	if (this.geoLocDataManager === undefined)
+	{ return false; }
+	
+	var gl = magoManager.sceneState.gl;
+	
+	if (this.vboKeysContainer === undefined || this.vboKeysContainer.getVbosCount() === 0)
+	{
+		this.makeVbo(magoManager);
+		return;
+	}
+
+	shader.enableVertexAttribArray(shader.position3_loc);
+	
+	if (bEnableDepth === undefined)
+	{ bEnableDepth = true; }
+	
+	if (bEnableDepth)
+	{ gl.enable(gl.DEPTH_TEST); }
+	else
+	{ gl.disable(gl.DEPTH_TEST); }
+
+	// Render the line.
+	var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
+	buildingGeoLocation.bindGeoLocationUniforms(gl, shader);
+	
+	if (renderType === 2)
+	{
+		var selectionManager = magoManager.selectionManager;
+		var selectionColor = magoManager.selectionColor;
+
+		var selColor = selectionColor.getAvailableColor(undefined); 
+		var idxKey = selectionColor.decodeColor3(selColor.r, selColor.g, selColor.b);
+
+		selectionManager.setCandidateGeneral(idxKey, this);
+		gl.uniform4fv(shader.oneColor4_loc, [selColor.r/255.0, selColor.g/255.0, selColor.b/255.0, 1.0]);
+	}
+	
+	var vbo_vicky = this.vboKeysContainer.vboCacheKeysArray[0]; // there are only one.
+	if (!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
+	{ return false; }
+
+	var selectionManager = magoManager.selectionManager;
+	var selectionColor = magoManager.selectionColor;
+
+	var pointsCount = this.pointsArray.length;
+	for (var i=0; i<pointsCount; i++)
+	{
+		if (renderType === 2)
+		{
+			var selColor = selectionColor.getAvailableColor(undefined); 
+			var idxKey = selectionColor.decodeColor3(selColor.r, selColor.g, selColor.b);
+
+			selectionManager.setCandidateGeneral(idxKey, this.pointsArray[i]);
+			gl.uniform4fv(shader.oneColor4_loc, [selColor.r/255.0, selColor.g/255.0, selColor.b/255.0, 1.0]);
+		}
+
+		gl.drawArrays(gl.POINTS, i, 1);
+
+	}
+	
+	gl.enable(gl.DEPTH_TEST);
+};
+
 
 
 

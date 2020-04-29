@@ -393,6 +393,8 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		viewer.scene.magoManager = new MagoManager();
 		viewer.scene.magoManager.sceneState.textureFlipYAxis = false;
 		viewer.camera.frustum.fov = Cesium.Math.PI_OVER_THREE*1.8;
+
+		//magoManager = viewer.scene.magoManager; // Added by Son 20200428_1549.***
 		if (MagoConfig.getPolicy().initDefaultFov > 0) 
 		{
 			viewer.camera.frustum.fov = Cesium.Math.PI_OVER_THREE * MagoConfig.getPolicy().initDefaultFov;

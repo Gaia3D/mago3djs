@@ -623,6 +623,9 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		var d = eqRadius + camHeight;
 		var alfaRad = Math.acos(eqRadius / d);
 		var far = d*Math.sin(alfaRad)*0.8;
+		if (camHeight > 50000)
+		{ far *= 1.5; }
+
 		if (camHeight > 4000)
 		{
 			frustum0.near[0] = 0.1 + camHeight*0.8;

@@ -323,12 +323,25 @@ MagoWorld.prototype.mousewheel = function(event)
 /**
  * 어떻게 화면을 변화시키는지를 처리할 수 있다. 마우스 왼쪽 또는 마우스 휠로 회전 가능.
  */
+MagoWorld.prototype.moveSelectedObject = function(event)
+{
+	// Check if exist selected object.
+	var magoManager = this.magoManager;
+	var selectionManager = magoManager.selectionManager;
+	var currSelObject = selectionManager.getSelectedGeneral();
+	magoManager.moveSelectedObjectGeneral(undefined, currSelObject);
+};
+
+/**
+ * 어떻게 화면을 변화시키는지를 처리할 수 있다. 마우스 왼쪽 또는 마우스 휠로 회전 가능.
+ */
 MagoWorld.prototype.mousemove = function(event)
 {
 	var magoManager = this.magoManager;
+	magoManager.mouse_x = event.clientX;
+	magoManager.mouse_y = event.clientY;
 	
 	// Check if is dragging.
-	/*
 	if (magoManager.mustCheckIfDragging) 
 	{
 		if (magoManager.isDragging()) 
@@ -336,13 +349,22 @@ MagoWorld.prototype.mousemove = function(event)
 			magoManager.mouseDragging = true;
 			//magoManager.setCameraMotion(false);
 		}
+		else 
+		{
+			magoManager.mouseDragging = false;
+		}
 		magoManager.mustCheckIfDragging = false;
+		// Note: "mustCheckIfDragging" is assigned true in "onMouseUp".
 	}
-	*/
+	if (magoManager.mouseDragging)
+	{
+		// Move selected object:
+		this.moveSelectedObject(event);
+		return;
+	}
 	// End check if is dragging.---
 	
 	var mouseAction = magoManager.sceneState.mouseAction;
-	
 	var camera = this.magoManager.sceneState.camera;
 		
 	if (camera.lastMovement === undefined)
@@ -799,6 +821,21 @@ MagoWorld.prototype.keydown = function(event)
 			var controlPointArmLength = 0.2;
 			bSplineCubic3d.makeControlPoints(controlPointArmLength, magoManager);
 			bSplineCubic3d.makeInterpolatedPoints();
+		}
+
+	}
+	else if (key === 'p')
+	{
+
+		if (this.smartTile_f4d_tested === undefined)
+		{
+			this.smartTile_f4d_tested = 1;
+			//var projectFolderName = "smartTile_f4d_Korea";
+			//var projectFolderName = "SejongParkJinWoo_20191101";
+			var projectFolderName = "SmartTilesF4D_WorkFolder";
+			var fileName = magoManager.readerWriter.geometryDataPath + "/" + projectFolderName + "/" + "smartTile_f4d_indexFile.sii";
+			magoManager.readerWriter.getObjectIndexFileSmartTileF4d(fileName, projectFolderName, magoManager);
+
 		}
 	}
 };

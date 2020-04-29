@@ -32,6 +32,7 @@ var TinTerrainManager = function(options)
 	var policy = MagoConfig.getPolicy();
 	this.terrainType = defaultValue(policy.terrainType, CODE.magoEarthTerrainType.PLAIN);
 	this.terrainValue = policy.terrainValue;
+	this.selectable = false;
 
 	if (this.terrainType !== CODE.magoEarthTerrainType.PLAIN && !this.terrainValue)
 	{

@@ -2194,7 +2194,7 @@ Renderer.prototype.renderGeometryColorCoding = function(visibleObjControlerNodes
 	magoManager.currentProcess = CODE.magoCurrentProcess.ColorCodeRendering;
 	
 	// Render mago modeler objects.***
-	/*
+	
 	if (magoManager.modeler !== undefined)
 	{
 		currentShader = magoManager.postFxShadersManager.getShader("modelRefColorCoding"); 
@@ -2213,7 +2213,7 @@ Renderer.prototype.renderGeometryColorCoding = function(visibleObjControlerNodes
 		currentShader.disableVertexAttribArrayAll();
 		gl.useProgram(null);
 	}
-	*/
+	
 	
 	// Render f4d objects.***
 	//if (magoManager.selectionFbo.dirty) // todo.
@@ -2272,7 +2272,7 @@ Renderer.prototype.renderGeometryColorCoding = function(visibleObjControlerNodes
 	}
 	
 	// tin terrain.***
-	if (magoManager.tinTerrainManager !== undefined)
+	if (magoManager.tinTerrainManager !== undefined && magoManager.tinTerrainManager.selectable)
 	{
 		var bDepth = false;
 		magoManager.tinTerrainManager.render(magoManager, bDepth, renderType);
