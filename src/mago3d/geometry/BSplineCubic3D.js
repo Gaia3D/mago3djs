@@ -25,7 +25,7 @@ var BSplineCubic3D = function(options)
 	 */
 	this.geoLocDataManager;
 	
-	
+	this.bLoop = false; // open or close curve. Default false.
 	this.knotPoints3dList;
 	this.interpolatedPoints3dList;
 	this.controlPoints3dMap; // idxPoint : {prevCPoint, nextCPoint}
@@ -49,6 +49,9 @@ var BSplineCubic3D = function(options)
 				this.knotPoints3dList.pointsArray = options.knotPoints3dArray;
 			}
 		}
+
+		if (options.bLoop !== undefined)
+		{ this.bLoop = options.bLoop; }
 	}
 };
 
@@ -285,7 +288,7 @@ BSplineCubic3D.prototype.makeControlPoints = function(controlPointArmLength, mag
 
 	this.controlPoints3dMap = {};
 	
-	var bLoop = false;
+	var bLoop = this.bLoop;
 	
 	var currPoint;
 	var prevPoint;
@@ -376,7 +379,7 @@ BSplineCubic3D.prototype.makeInterpolatedPoints = function()
 	var t;
 	var interpolatedPointsArray = [];
 	
-	var bLoop = false;
+	var bLoop = this.bLoop;
 	
 	// For each segment, make the bezier curve interpolated points.***
 	var pointsCount = this.knotPoints3dList.getPointsCount();

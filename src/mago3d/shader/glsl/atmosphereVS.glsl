@@ -83,23 +83,29 @@ void main()
 	//textureColor = vec4(vNormal, 1.0);
 
 	//float maxAngDeg = 100.5;
-	float maxAngDeg = 101.5;
+	float maxAngDeg = 101.2;
 	float minAngDeg = 90.0;
 
 	float A = 1.0/(maxAngDeg-minAngDeg);
 	float B = -A*minAngDeg;
-	float alpha = A*angDeg+B;
-
-	alpha *= alpha*alpha*alpha;
+	float alphaReal = A*angDeg+B;
+	float alpha2 = alphaReal*alphaReal;
+	float alpha = alpha2*alpha2;
 	if(alpha < 0.0 )
 	alpha = 0.0;
-	else if(alpha > 3.0 )
-	alpha = 3.0;
+	else if(alpha > 2.0 )
+	alpha = 2.0;
 	
 	float alphaPlusPerDist = 4.0*(distToCam/equatorialRadius);
 	if(alphaPlusPerDist > 1.0)
 	alphaPlusPerDist = 1.0;
-	//alphaPlusPerDist = 1.0;
 
-	vcolor4 = vec4(alpha*0.75*alphaPlusPerDist, alpha*0.88*alphaPlusPerDist, alpha*alphaPlusPerDist, 1.0);
+	float extra = (1.0-alpha);
+	if(extra < 0.0)
+	extra = 0.0;
+
+	float extraPerDist = (1.0-alphaPlusPerDist); // near -> more blue.
+
+	alpha *= alphaPlusPerDist;
+	vcolor4 = vec4(alpha*0.75, alpha*0.88 + extra*0.4 + extraPerDist*0.1, alpha + extra*2.5 + extraPerDist*0.8, alpha);
 }

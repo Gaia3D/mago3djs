@@ -195,25 +195,31 @@ void main()\n\
 	//textureColor = vec4(vNormal, 1.0);\n\
 \n\
 	//float maxAngDeg = 100.5;\n\
-	float maxAngDeg = 101.5;\n\
+	float maxAngDeg = 101.2;\n\
 	float minAngDeg = 90.0;\n\
 \n\
 	float A = 1.0/(maxAngDeg-minAngDeg);\n\
 	float B = -A*minAngDeg;\n\
-	float alpha = A*angDeg+B;\n\
-\n\
-	alpha *= alpha*alpha*alpha;\n\
+	float alphaReal = A*angDeg+B;\n\
+	float alpha2 = alphaReal*alphaReal;\n\
+	float alpha = alpha2*alpha2;\n\
 	if(alpha < 0.0 )\n\
 	alpha = 0.0;\n\
-	else if(alpha > 3.0 )\n\
-	alpha = 3.0;\n\
+	else if(alpha > 2.0 )\n\
+	alpha = 2.0;\n\
 	\n\
 	float alphaPlusPerDist = 4.0*(distToCam/equatorialRadius);\n\
 	if(alphaPlusPerDist > 1.0)\n\
 	alphaPlusPerDist = 1.0;\n\
-	//alphaPlusPerDist = 1.0;\n\
 \n\
-	vcolor4 = vec4(alpha*0.75*alphaPlusPerDist, alpha*0.88*alphaPlusPerDist, alpha*alphaPlusPerDist, 1.0);\n\
+	float extra = (1.0-alpha);\n\
+	if(extra < 0.0)\n\
+	extra = 0.0;\n\
+\n\
+	float extraPerDist = (1.0-alphaPlusPerDist); // near -> more blue.\n\
+\n\
+	alpha *= alphaPlusPerDist;\n\
+	vcolor4 = vec4(alpha*0.75, alpha*0.88 + extra*0.4 + extraPerDist*0.1, alpha + extra*2.5 + extraPerDist*0.8, alpha);\n\
 }";
 ShaderSource.BlendingCubeFS = "	precision lowp float;\n\
 	varying vec4 vColor;\n\

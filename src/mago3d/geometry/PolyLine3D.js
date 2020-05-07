@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * This is similar with Point23List, but this one represents real polyline geometry feature.
+ * This is similar with Point3DList, but this one represents real polyline geometry feature.
  * @class PolyLine3D
  */
 var PolyLine3D = function() 

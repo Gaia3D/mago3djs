@@ -219,7 +219,7 @@ TinTerrainManager.prototype.makeDistanceLimitByDepth = function()
 	this.distLimitByDepth[14] = 2500; 
 	this.distLimitByDepth[15] = 2000; 
 	this.distLimitByDepth[16] = 1500; 
-	this.distLimitByDepth[17] = 1000; 
+	this.distLimitByDepth[17] = 1200; 
 	this.distLimitByDepth[18] = 600; 
 	this.distLimitByDepth[19] = 400; 
 	this.distLimitByDepth[20] = 200; 
@@ -229,7 +229,7 @@ TinTerrainManager.prototype.makeDistanceLimitByDepth = function()
 	var distLimitByDepthCount = this.distLimitByDepth.length;
 	for (var i=0; i<distLimitByDepthCount; i++)
 	{
-		this.distLimitByDepth[i] *= 0.65;
+		this.distLimitByDepth[i] *= 0.7;
 	}
 	
 };

@@ -3055,20 +3055,19 @@ MagoManager.prototype.moveSelectedObjectGeneral = function(gl, object)
 		var mvMat = this.sceneState.modelViewMatrix;
 		var mvMatRelToEye = this.sceneState.modelViewRelToEyeMatrix;
 		var pixelPosCC = mvMat.transformPoint3D(mouseAction.strWorldPoint, undefined);
-		
-		var globeYaxisWC = new Point3D(geoLocMatrix._floatArrays[4], geoLocMatrix._floatArrays[5], geoLocMatrix._floatArrays[6]);
-		var globeYaxisCC = mvMatRelToEye.transformPoint3D(globeYaxisWC, undefined);
-		
-		var globeZaxisWC = new Point3D(geoLocMatrix._floatArrays[8], geoLocMatrix._floatArrays[9], geoLocMatrix._floatArrays[10]);
-		var globeZaxisCC = mvMatRelToEye.transformPoint3D(globeZaxisWC, undefined);
-		
+
 		if (attributes.movementInAxisZ)
 		{
+			// movement in plane XZ.
+			var globeYaxisWC = new Point3D(geoLocMatrix._floatArrays[4], geoLocMatrix._floatArrays[5], geoLocMatrix._floatArrays[6]);
+			var globeYaxisCC = mvMatRelToEye.transformPoint3D(globeYaxisWC, undefined);
 			this.selObjMovePlaneCC.setPointAndNormal(pixelPosCC.x, pixelPosCC.y, pixelPosCC.z,    globeYaxisCC.x, globeYaxisCC.y, globeYaxisCC.z); 
 		}
 		else 
 		{
 			// movement in plane XY.
+			var globeZaxisWC = new Point3D(geoLocMatrix._floatArrays[8], geoLocMatrix._floatArrays[9], geoLocMatrix._floatArrays[10]);
+			var globeZaxisCC = mvMatRelToEye.transformPoint3D(globeZaxisWC, undefined);
 			this.selObjMovePlaneCC.setPointAndNormal(pixelPosCC.x, pixelPosCC.y, pixelPosCC.z,    globeZaxisCC.x, globeZaxisCC.y, globeZaxisCC.z); 
 		}
 	}
@@ -3220,20 +3219,19 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 			var mvMat = this.sceneState.modelViewMatrix;
 			var mvMatRelToEye = this.sceneState.modelViewRelToEyeMatrix;
 			var pixelPosCC = mvMat.transformPoint3D(mouseAction.strWorldPoint, undefined);
-			
-			var globeYaxisWC = new Point3D(geoLocMatrix._floatArrays[4], geoLocMatrix._floatArrays[5], geoLocMatrix._floatArrays[6]);
-			var globeYaxisCC = mvMatRelToEye.transformPoint3D(globeYaxisWC, undefined);
-			
-			var globeZaxisWC = new Point3D(geoLocMatrix._floatArrays[8], geoLocMatrix._floatArrays[9], geoLocMatrix._floatArrays[10]);
-			var globeZaxisCC = mvMatRelToEye.transformPoint3D(globeZaxisWC, undefined);
-			
+
 			if (attributes.movementInAxisZ)
 			{
+				// movement in plane XZ.
+				var globeYaxisWC = new Point3D(geoLocMatrix._floatArrays[4], geoLocMatrix._floatArrays[5], geoLocMatrix._floatArrays[6]);
+				var globeYaxisCC = mvMatRelToEye.transformPoint3D(globeYaxisWC, undefined);
 				this.selObjMovePlaneCC.setPointAndNormal(pixelPosCC.x, pixelPosCC.y, pixelPosCC.z,    globeYaxisCC.x, globeYaxisCC.y, globeYaxisCC.z); 
 			}
 			else 
 			{
 				// movement in plane XY.
+				var globeZaxisWC = new Point3D(geoLocMatrix._floatArrays[8], geoLocMatrix._floatArrays[9], geoLocMatrix._floatArrays[10]);
+				var globeZaxisCC = mvMatRelToEye.transformPoint3D(globeZaxisWC, undefined);
 				this.selObjMovePlaneCC.setPointAndNormal(pixelPosCC.x, pixelPosCC.y, pixelPosCC.z,    globeZaxisCC.x, globeZaxisCC.y, globeZaxisCC.z); 
 			}
 		}

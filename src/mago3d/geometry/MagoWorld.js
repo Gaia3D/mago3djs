@@ -791,6 +791,7 @@ MagoWorld.prototype.keydown = function(event)
 		//this.magoManager.TEST__RenderGeoCoords();
 
 		// Another test: BSplineCubic3d.***
+		/*
 		if (modeler.bSplineCubic3d === undefined)
 		{ modeler.bSplineCubic3d = new BSplineCubic3D(); }
 
@@ -823,19 +824,57 @@ MagoWorld.prototype.keydown = function(event)
 			bSplineCubic3d.makeInterpolatedPoints();
 		}
 
+		*/
+		// Extruded object test.***
+		var geoCoordsList = magoManager.modeler.getGeographicCoordsList();
+		if (geoCoordsList)
+		{
+			var extrudeDirWC = undefined;
+			var bLoop = true;
+			var height = 100.0;
+			var extrudedRenderable = geoCoordsList.getExtrudedMeshRenderableObject(height, bLoop, undefined, magoManager, extrudeDirWC);
+
+			extrudedRenderable.setOneColor(0.2, 0.7, 0.8, 0.3);
+			extrudedRenderable.attributes.isMovable = true;
+			extrudedRenderable.attributes.isSelectable = true;
+			extrudedRenderable.attributes.name = "extrudedObject";
+			extrudedRenderable.attributes.selectedColor4 = new Color(1.0, 1.0, 0.0, 0.0); // selectedColor fully transparent.
+
+			if (extrudedRenderable.options === undefined)
+			{ extrudedRenderable.options = {}; }
+			
+			extrudedRenderable.options.renderWireframe = true;
+			extrudedRenderable.options.renderShaded = true;
+			extrudedRenderable.options.depthMask = true;
+
+			magoManager.smartTileManager.putObject(10, extrudedRenderable);
+		}
 	}
 	else if (key === 'p')
 	{
 
 		if (this.smartTile_f4d_tested === undefined)
 		{
+			var fc = magoManager.f4dController;
 			this.smartTile_f4d_tested = 1;
 			//var projectFolderName = "smartTile_f4d_Korea";
 			//var projectFolderName = "SejongParkJinWoo_20191101";
 			var projectFolderName = "SmartTilesF4D_WorkFolder";
 			var fileName = magoManager.readerWriter.geometryDataPath + "/" + projectFolderName + "/" + "smartTile_f4d_indexFile.sii";
-			magoManager.readerWriter.getObjectIndexFileSmartTileF4d(fileName, projectFolderName, magoManager);
 
+			var smartTilePathInfo = fileName;//fc.smartTilePathInfo;
+			var projectId = 'busan-mj';
+
+			if (!fc.smartTilePathInfo[projectId])
+			{
+				fc.smartTilePathInfo[projectId] = {};
+			}
+
+			fc.smartTilePathInfo[projectId].projectId = projectId;
+			fc.smartTilePathInfo[projectId].projectFolderPath = projectId;
+			//fc.smartTilePathInfo[groupKey].smartTileIndexPath = groupDataFolder + '/' + groupKey + '_TILE';
+
+			magoManager.getObjectIndexFileSmartTileF4d(projectFolderName);
 		}
 	}
 };
