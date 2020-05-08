@@ -159,7 +159,8 @@ var SceneState = function()
 SceneState.prototype.initMagoSceneState = function() 
 {
 	var containerDiv = document.getElementById(MagoConfig.getContainerId());
-	if(!containerDiv) {
+	if (!containerDiv) 
+	{
 		throw new Error('container is empty.');
 	}
 	var canvas = document.createElement('canvas');

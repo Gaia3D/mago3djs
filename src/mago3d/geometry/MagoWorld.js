@@ -225,14 +225,12 @@ MagoWorld.prototype.mouseup = function(event)
  */
 MagoWorld.prototype.mouseclick = function(event)
 {
-	/*
 	if (event.button === 0)
 	{
 		var mouseX = event.clientX;
 		var mouseY = event.clientY;
 		this.magoManager.mouseActionLeftClick(mouseX, mouseY);
 	}
-	*/
 };
 
 /**
