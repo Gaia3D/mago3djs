@@ -404,14 +404,6 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	{
 		this.renderCondition.call(this, data);
 	}
-
-	// Check if there are renderables.***
-	var renderable = data.renderable;
-	if (renderable)
-	{
-		renderable.render(magoManager, shader, renderType);
-		return;
-	}
 	
 	var attributes = data.attributes;
 	
@@ -435,15 +427,6 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	if (renderType !== 2 && magoManager.currentProcess !== CODE.magoCurrentProcess.StencilSilhouetteRendering)
 	{ var executedEffects = magoManager.effectsManager.executeEffects(data.nodeId, magoManager.getCurrentTime()); }
 	
-	// check if this is a multiBuildings.
-	//if(data.attributes.objectType === "multiBuildingsTile")
-	var multiBuildings = data.multiBuildings;
-	if (multiBuildings)
-	{
-		multiBuildings.render(magoManager, shader);
-		return;
-	}
-
 	// Check if we are under selected data structure.***
 	var selectionManager = magoManager.selectionManager;
 	if (magoManager.nodeSelected === this)
@@ -498,11 +481,11 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 
 	gl.uniform1i(shader.textureFlipYAxis_loc, flipYTexCoord);
 	
-	// Check the geoLocationDatasCount & check if is a ghost-trail-render (trail as ghost).
 	var currRenderingFase = magoManager.renderingFase;
 	if (this.isReferenceNode())
 	{ magoManager.renderingFase = -10; } // set a strange value to skip avoiding rendering fase of references objects.
-	
+
+	// Check the geoLocationDatasCount & check if is a ghost-trail-render (trail as ghost).
 	// Check if is trail-render.*
 	var isTrailRender = this.data.isTrailRender;
 	if (isTrailRender !== undefined && isTrailRender === true)
@@ -841,17 +824,7 @@ Node.prototype.getBoundingSphereWC = function(resultBoundingSphere)
 Node.prototype.getDistToCamera = function(cameraPosition, boundingSphere_Aux) 
 {
 	var data = this.data;
-	var attributes = data.attributes;
-	
-	if (attributes.objectType === "basicF4d")
-	{
-		// Traditional f4d data.
-	}
-	else if (attributes.objectType === "multiBuildingsTile")
-	{
-		// MultiBuildingsTile from cityGML style data.
-	}
-	
+
 	var nodeRoot = this.getRoot();
 	var geoLocDataManager = nodeRoot.data.geoLocDataManager;
 	var geoLoc = geoLocDataManager.getCurrentGeoLocationData();
@@ -895,34 +868,24 @@ Node.prototype.getDistToCamera = function(cameraPosition, boundingSphere_Aux)
 	boundingSphere_Aux.setRadius(radiusAprox);
 	
 	// Special treatment for point-cloud data. 
-	if (attributes.objectType === "basicF4d")
+	var neoBuilding = data.neoBuilding;
+	var metaData = neoBuilding.metaData;
+	var projectsType = metaData.projectDataType;
+	if (projectsType && (projectsType === 4 || projectsType === 5))
 	{
-		var neoBuilding = data.neoBuilding;
-		var metaData = neoBuilding.metaData;
-		var projectsType = metaData.projectDataType;
-		if (projectsType && (projectsType === 4 || projectsType === 5))
-		{
-			// This is pointsCloud projectType.
-			// Calculate the distance to camera with lowestOctrees.
-			var octree = neoBuilding.octree;
-			if (octree === undefined)
-			{ return undefined; }
-			
-			var relativeCamPos;
-			relativeCamPos = geoLoc.getTransformedRelativePosition(cameraPosition, relativeCamPos);
-			//relativeCam = neoBuilding.getTransformedRelativeEyePositionToBuilding(cameraPosition.x, cameraPosition.y, cameraPosition.z, relativeCam);
-			var octreesMaxSize = 120;
-			data.distToCam = octree.getMinDistToCameraInTree(relativeCamPos, boundingSphere_Aux, octreesMaxSize);
-			boundingSphere_Aux.setCenterPoint(realBuildingPos.x, realBuildingPos.y, realBuildingPos.z);
-			boundingSphere_Aux.setRadius(neoBuilding.bbox.getRadiusAprox());
-		}
-		/*
-		else 
-		{
-			// This is mesh projectType.
-			data.distToCam = cameraPosition.distToSphere(boundingSphere_Aux);
-		}
-		*/
+		// This is pointsCloud projectType.
+		// Calculate the distance to camera with lowestOctrees.
+		var octree = neoBuilding.octree;
+		if (octree === undefined)
+		{ return undefined; }
+		
+		var relativeCamPos;
+		relativeCamPos = geoLoc.getTransformedRelativePosition(cameraPosition, relativeCamPos);
+		//relativeCam = neoBuilding.getTransformedRelativeEyePositionToBuilding(cameraPosition.x, cameraPosition.y, cameraPosition.z, relativeCam);
+		var octreesMaxSize = 120;
+		data.distToCam = octree.getMinDistToCameraInTree(relativeCamPos, boundingSphere_Aux, octreesMaxSize);
+		boundingSphere_Aux.setCenterPoint(realBuildingPos.x, realBuildingPos.y, realBuildingPos.z);
+		boundingSphere_Aux.setRadius(neoBuilding.bbox.getRadiusAprox());
 	}
 	
 	data.distToCam = cameraPosition.distToSphere(boundingSphere_Aux);

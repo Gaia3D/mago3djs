@@ -151,9 +151,9 @@ function getNormalCartesiansArray(cartesiansArray, indicesArray, resultNormalCar
 		idx_2 = indicesArray[i*3+1];
 		idx_3 = indicesArray[i*3+2];
 		
-		point_1 = new Point3D(cartesiansArray[idx_1*3], cartesiansArray[idx_1*3+1], cartesiansArray[idx_1*3+2]);
-		point_2 = new Point3D(cartesiansArray[idx_2*3], cartesiansArray[idx_2*3+1], cartesiansArray[idx_2*3+2]);
-		point_3 = new Point3D(cartesiansArray[idx_3*3], cartesiansArray[idx_3*3+1], cartesiansArray[idx_3*3+2]);
+		point_1 = new _Point3D(cartesiansArray[idx_1*3], cartesiansArray[idx_1*3+1], cartesiansArray[idx_1*3+2]);
+		point_2 = new _Point3D(cartesiansArray[idx_2*3], cartesiansArray[idx_2*3+1], cartesiansArray[idx_2*3+2]);
+		point_3 = new _Point3D(cartesiansArray[idx_3*3], cartesiansArray[idx_3*3+1], cartesiansArray[idx_3*3+2]);
 		
 		// Calculate the normal for this triangle.
 		normal = calculateNormal(point_1, point_3, point_2, undefined);
@@ -216,13 +216,13 @@ function calculateNormal(point1, point2, point3, resultNormal)
 	var prevPoint = point3;
 	var nextPoint = point2;
 
-	var v1 = new Point3D(currentPoint.x - prevPoint.x,     currentPoint.y - prevPoint.y,     currentPoint.z - prevPoint.z);
-	var v2 = new Point3D(nextPoint.x - currentPoint.x,     nextPoint.y - currentPoint.y,     nextPoint.z - currentPoint.z);
+	var v1 = new _Point3D(currentPoint.x - prevPoint.x,     currentPoint.y - prevPoint.y,     currentPoint.z - prevPoint.z);
+	var v2 = new _Point3D(nextPoint.x - currentPoint.x,     nextPoint.y - currentPoint.y,     nextPoint.z - currentPoint.z);
 
 	v1.unitary();
 	v2.unitary();
 	if (resultNormal === undefined)
-	{ resultNormal = new Point3D(); }
+	{ resultNormal = new _Point3D(); }
 	
 	resultNormal = v1.crossProduct(v2, resultNormal);
 	resultNormal.unitary();
@@ -453,15 +453,15 @@ function getSkirtTrianglesStrip(lonArray, latArray, altArray, texCoordsArray, so
 
 /**
  * a point feature which will be used at three degree world
- * @class Point3D 
+ * @class _Point3D 
  * @param {Number} x 
  * @param {Number} y 
  * @param {Number} z 
  */
 
-var Point3D = function(x, y, z) 
+var _Point3D = function(x, y, z) 
 {
-	if (!(this instanceof Point3D)) 
+	if (!(this instanceof _Point3D)) 
 	{
 		// throw new Error(Messages.CONSTRUCT_ERROR);
 		throw new Error(i18next.t('error.construct.create'));
@@ -491,7 +491,7 @@ var Point3D = function(x, y, z)
  * Calculate [this.x*this.x + this.y*this.y + this.z*this.z] to prepare squared module 
  * @returns {Number}
  */
-Point3D.prototype.getSquaredModul = function() 
+_Point3D.prototype.getSquaredModul = function() 
 {
 	return this.x*this.x + this.y*this.y + this.z*this.z;
 };
@@ -500,7 +500,7 @@ Point3D.prototype.getSquaredModul = function()
  * Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z );
  * @returns {Number}
  */
-Point3D.prototype.getModul = function() 
+_Point3D.prototype.getModul = function() 
 {
 	return Math.sqrt(this.getSquaredModul());
 };
@@ -509,7 +509,7 @@ Point3D.prototype.getModul = function()
  * 
  * get the unitary value
  */
-Point3D.prototype.unitary = function() 
+_Point3D.prototype.unitary = function() 
 {
 	var modul = this.getModul();
 	this.x /= modul;
@@ -521,13 +521,13 @@ Point3D.prototype.unitary = function()
 
 /**
  * Calculate vector product
- * @param {Point3D} point the point which will be used at this calculate.
- * @param {Point3D} resultPoint the point which will save the calculated value.
+ * @param {_Point3D} point the point which will be used at this calculate.
+ * @param {_Point3D} resultPoint the point which will save the calculated value.
  * @returns {Number} calculated result
  */
-Point3D.prototype.crossProduct = function(point, resultPoint) 
+_Point3D.prototype.crossProduct = function(point, resultPoint) 
 {
-	if (resultPoint === undefined) { resultPoint = new Point3D(); }
+	if (resultPoint === undefined) { resultPoint = new _Point3D(); }
 
 	resultPoint.x = this.y * point.z - point.y * this.z;
 	resultPoint.y = point.x * this.z - this.x * point.z;
@@ -541,7 +541,7 @@ Point3D.prototype.crossProduct = function(point, resultPoint)
  * @param y 변수
  * @param z 변수
  */
-Point3D.prototype.addPoint = function(point) 
+_Point3D.prototype.addPoint = function(point) 
 {
 	this.x += point.x; this.y += point.y; this.z += point.z;
 };

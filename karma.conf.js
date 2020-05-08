@@ -43,9 +43,6 @@ module.exports = function(config) {
     reporters: ['progress'],
 
 
-    // web server port
-    port: 9876,
-
 
     // enable / disable colors in the output (reporters and logs)
     colors: true,
@@ -54,7 +51,9 @@ module.exports = function(config) {
     // level of logging
     // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
     logLevel: config.LOG_INFO,
-
+    
+    // web server port
+    port: 9876,
 
     // enable / disable watching file and executing tests whenever any file changes
     autoWatch: true,
@@ -71,6 +70,21 @@ module.exports = function(config) {
 
     // Concurrency level
     // how many browser should be started simultaneous
-    concurrency: Infinity
+    concurrency: Infinity,
+
+    // add jasmine configuration
+    client: {
+      jasmine: {
+        random : false
+      }
+    },
+
+    customLaunchers: {
+      Chrome_with_debugging: {
+        base: 'Chrome',
+        flags: ['--remote-debugging-port=9222'],
+        debug: true
+      }
+    }
   })
 }

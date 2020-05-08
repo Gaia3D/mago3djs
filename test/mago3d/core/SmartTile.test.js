@@ -4,6 +4,7 @@ describe("SmartTile 테스트", function ()
 {
 	var smartTile;
 	var testTileName = 'testTile';
+	MagoConfig.serverPolicy.basicGlobe = 'cesium';
 	var magoManager = new MagoManager();
 
 	var minLongitude = -180;

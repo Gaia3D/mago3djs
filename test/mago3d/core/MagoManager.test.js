@@ -2,12 +2,14 @@
 
 describe("MagoManager 테스트", function () 
 {
-	var magoManager = new MagoManager();
+	//var magoManager = new MagoManager();
 	MagoConfig.serverPolicy = {};
 	describe('메소드 테스트 : ', function () 
 	{
 		describe('getObjectIndexFile(projectId, projectDataFolder)', function()
 		{
+			
+			/*
 			var rw;
 			beforeEach(function()
 			{
@@ -20,6 +22,7 @@ describe("MagoManager 테스트", function ()
 				magoManager.getObjectIndexFile('', '');
 				expect(rw.getObjectIndexFileForSmartTile).toHaveBeenCalled();
 			});
+			*/
 		});
 	});
 });
