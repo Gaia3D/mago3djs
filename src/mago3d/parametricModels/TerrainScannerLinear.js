@@ -21,7 +21,9 @@ TerrainScannerLinear.prototype.constructor = TerrainScannerLinear;
 
 /**
  */
-TerrainScannerLinear.prototype.render = function()
+TerrainScannerLinear.prototype.makeMesh = function()
 {
+	// Create 2 geoCoord objects to render.***
 	
+	var hola = 0;
 };

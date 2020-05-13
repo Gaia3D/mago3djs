@@ -828,6 +828,27 @@ MagoWorld.prototype.doTest__ExtrudedObject = function(event)
 	}
 };
 
+MagoWorld.prototype.doTest__TerrainScanner = function()
+{
+	// create a terrainScanner.
+	// geoCoord_1 = (126.31394, 33.18262)
+	// geoCoord_2 = (126.34513, 33.21500)
+	var startGeoCoord = new GeographicCoord(126.31394, 33.18262, 0.0);
+	var endGeoCoord = new GeographicCoord(126.34513, 33.21500, 0.0);
+	var geoCoordSegment = new GeographicCoordSegment(startGeoCoord, endGeoCoord);
+	var terrainScanner = new TerrainScannerLinear(geoCoordSegment);
+
+	var geoLocDataManager = new GeoLocationDataManager();
+	var geoLocData = geoLocDataManager.newGeoLocationData();
+	geoLocData.setGeographicCoordsLonLatAlt(startGeoCoord.longitude, startGeoCoord.latitude, startGeoCoord.altitude);
+
+	// set the geoLocDataManager of the terrainScanner.
+	terrainScanner.geoLocDataManager = geoLocDataManager;
+
+	var targetDepth = 10;
+	this.magoManager.modeler.addObject(terrainScanner, targetDepth);
+};
+
 MagoWorld.prototype.doTest__ObjectMarker = function()
 {
 	//magoManager 가져오기
@@ -907,10 +928,11 @@ MagoWorld.prototype.keydown = function(event)
 	{
 		//this.magoManager.TEST__RenderGeoCoords();
 
-		// Another test: BSplineCubic3d.***
 		//this.doTest__BSpline3DCubic();
-		this.doTest__ExtrudedObject();
+		//this.doTest__ExtrudedObject();
 		//this.doTest__ObjectMarker();
+		this.doTest__TerrainScanner();
+
 	}
 	else if (key === 'p')
 	{

@@ -675,10 +675,11 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			}
 			else if (renderType === 1)
 			{
-				var activeTexturesLayers = new Int32Array([1, 1, 0, 0, 0, 0, 0, 0]);
+				var activeTexturesLayers = new Int32Array([1, 1, 0, 0, 0, 0, 0, 0]); // note: the 1rst & 2nd are shadowMap textures.
 				gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
 				gl.uniform1f(currentShader.externalAlpha_loc, 1);
 				gl.uniform2fv(currentShader.uMinMaxAltitudes_loc, [-200.0, 1943.14]);
+				gl.uniform1i(currentShader.bApplySsao_loc, true); // apply ssao default.***
 
 				var textureKeys = Object.keys(this.texture);
 				var textureLength = textureKeys.length; 
@@ -695,16 +696,16 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 					
 					if (!texture.imagery.show) { continue; }
 
-					gl.activeTexture(gl.TEXTURE2 + i); 
+					gl.activeTexture(gl.TEXTURE4 + i); 
 					gl.bindTexture(gl.TEXTURE_2D, texture.texId);
 					
-					activeTexturesLayers[2+i] = 1;
+					activeTexturesLayers[4+i] = 1;
 					var filter = texture.imagery.filter;
 					if (filter) 
 					{
 						if (filter === CODE.imageFilter.BATHYMETRY) 
 						{
-							activeTexturesLayers[2+i] = 10;
+							activeTexturesLayers[4+i] = 10;
 						}
 					}
 				}	
@@ -856,7 +857,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			//	gl.uniform1i(currentShader.bExistAltitudes_loc, false);
 			//}
 			
-			
+			gl.uniform1i(currentShader.bApplySsao_loc, false); // apply ssao default.***
 			gl.drawArrays(gl.TRIANGLE_STRIP, 0, vboKey.vertexCount); // Fill.
 
 			

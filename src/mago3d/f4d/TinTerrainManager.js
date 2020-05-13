@@ -419,6 +419,9 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 		if (magoManager.sceneState.sunSystem !== undefined && magoManager.sceneState.applySunShadows)
 		{ bApplyShadow = true; }
 		gl.uniform1i(currentShader.bApplyShadow_loc, bApplyShadow);
+
+		var bApplySsao = true;
+
 		
 		if (bApplyShadow)
 		{
@@ -462,6 +465,23 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 				gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
 			}
 			
+		}
+
+		gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
+		if (bApplySsao)
+		{
+			gl.uniform1f(currentShader.aspectRatio_loc, magoManager.sceneState.camera.frustum.aspectRatio);
+			gl.uniform1f(currentShader.screenWidth_loc, magoManager.sceneState.drawingBufferWidth);	
+
+			// bind depthTex & noiseTex. channels 2 & 3.
+			var noiseTexture = magoManager.texturesStore.getNoiseTexture4x4();
+			gl.uniform2fv(currentShader.noiseScale2_loc, [magoManager.depthFboNeo.width/noiseTexture.width, magoManager.depthFboNeo.height/noiseTexture.height]);
+			gl.uniform3fv(currentShader.kernel16_loc, magoManager.sceneState.ssaoKernel16);
+
+			gl.activeTexture(gl.TEXTURE2);
+			gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);  // original.***
+			gl.activeTexture(gl.TEXTURE3);
+			gl.bindTexture(gl.TEXTURE_2D, noiseTexture);
 		}
 
 		
@@ -537,11 +557,14 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	}
 	
 	// Render the sea.
+	/*
 	var currSelObject = magoManager.selectionManager.getSelectedGeneral();
 	if (currSelObject instanceof(TinTerrain))
 	{
 		currSelObject.renderSea(currentShader, magoManager, bDepth, renderType);
 	}
+	*/
+	
 	/*
 	if (renderType === 1)
 	{

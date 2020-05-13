@@ -2739,7 +2739,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		}
 
 		///////////////////////////////////////////////
-		this.doTest__ObjectMarker();
+		//this.doTest__ObjectMarker();
 	}
 	
 };
@@ -4522,6 +4522,14 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	
 	uniformDataPair = shader.getUniformDataPair("shadowMapTex2");
 	uniformDataPair.intValue = 1; // reassign.***
+
+	//"depthTex" 
+	//uniformDataPair = shader.getUniformDataPair("depthTex");
+	//uniformDataPair.intValue = 2; // reassign.***
+
+	//"noiseTex" 
+	//uniformDataPair = shader.getUniformDataPair("noiseTex");
+	//uniformDataPair.intValue = 3; // reassign.***
 	
 	uniformDataPair = shader.getUniformDataPair("diffuseTex");
 	uniformDataPair.intValue = 2; // reassign.***

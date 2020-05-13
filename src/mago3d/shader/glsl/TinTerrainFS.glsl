@@ -2,21 +2,22 @@
     precision highp float;
 #endif
   
-
 uniform sampler2D shadowMapTex;// 0
 uniform sampler2D shadowMapTex2;// 1
-uniform sampler2D diffuseTex;  // 2
-uniform sampler2D diffuseTex_1;// 3
-uniform sampler2D diffuseTex_2;// 4
-uniform sampler2D diffuseTex_3;// 5
-uniform sampler2D diffuseTex_4;// 6
-uniform sampler2D diffuseTex_5;// 7
+//uniform sampler2D depthTex;//2
+//uniform sampler2D noiseTex;//3
+uniform sampler2D diffuseTex;  // 4
+uniform sampler2D diffuseTex_1;// 5
+uniform sampler2D diffuseTex_2;// 6
+uniform sampler2D diffuseTex_3;// 7
+uniform sampler2D diffuseTex_4;// 8
+uniform sampler2D diffuseTex_5;// 9
 uniform bool textureFlipYAxis;
 uniform bool bIsMakingDepth;
 uniform bool bExistAltitudes;
 uniform mat4 projectionMatrix;
-//uniform vec2 noiseScale;
-//uniform float near;
+uniform vec2 noiseScale;
+uniform float near;
 uniform float far;            
 uniform float fov;
 uniform float aspectRatio;    
@@ -48,6 +49,7 @@ uniform float diffuseReflectionCoef;
 uniform float specularReflectionCoef; 
 uniform float externalAlpha;
 uniform bool bApplyShadow;
+uniform bool bApplySsao;
 uniform float shadowMapWidth;    
 uniform float shadowMapHeight;
 varying vec3 v3Pos;
@@ -93,6 +95,13 @@ vec3 getViewRay(vec2 tc)
     float wfar = hfar * aspectRatio;    
     vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    
     return ray;                      
+}
+
+//linear view space depth
+float getDepth(vec2 coord)
+{
+	// in this shader the depthTex is "diffuseTex"
+	return unpackDepth(texture2D(diffuseTex, coord.xy));
 }
 
 //linear view space depth
@@ -206,7 +215,8 @@ void main()
 	{
 		gl_FragColor = packDepth(-depthValue);
 	}
-	else{
+	else
+	{
 		if(uRenderType == 2)
 		{
 			gl_FragColor = oneColor4; 
@@ -295,10 +305,63 @@ void main()
 			lambertian += 0.3;
 		}
 		
-		
+		// check if apply ssao.
+		float occlusion = 1.0;
+		//vec3 normal2 = vNormal;	
+		if(bApplySsao)
+		{
+			// must find depthTex & noiseTex.***
+			////float farForDepth = 30000.0;
+			vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
+			float linearDepth = getDepth(screenPos);  
+			vec3 ray = getViewRay(screenPos); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
+			vec3 origin = ray * linearDepth;  
+			float ssaoRadius = radius*20.0;
+			float tolerance = ssaoRadius/far; // original.***
+			////float tolerance = radius/(far-near);// test.***
+			////float tolerance = radius/farForDepth;
+
+			// in this shader noiseTex is "diffusse_1".
+			vec3 rvec = texture2D(diffuseTex_1, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;
+			vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));
+			vec3 bitangent = cross(normal2, tangent);
+			mat3 tbn = mat3(tangent, bitangent, normal2);   
+			float minDepthBuffer;
+			float maxDepthBuffer;
+			for(int i = 0; i < kernelSize; ++i)
+			{    	 
+				vec3 sample = origin + (tbn * vec3(kernel[i].x*3.0, kernel[i].y*3.0, kernel[i].z)) * ssaoRadius*2.0; // original.***
+				vec4 offset = projectionMatrix * vec4(sample, 1.0);					
+				offset.xy /= offset.w;
+				offset.xy = offset.xy * 0.5 + 0.5;  				
+				float sampleDepth = -sample.z/far;// original.***
+				////float sampleDepth = -sample.z/(far-near);// test.***
+				////float sampleDepth = -sample.z/farForDepth;
+
+				float depthBufferValue = getDepth(offset.xy);
+				/*
+				if(depthBufferValue > 0.00391 && depthBufferValue < 0.00393)
+				{
+					if (depthBufferValue < sampleDepth-tolerance*1000.0)
+					{
+						occlusion +=  0.5;
+					}
+					
+					continue;
+				}			
+				*/
+				if (depthBufferValue < sampleDepth)//-tolerance)
+				{
+					occlusion +=  1.0;
+				}
+			} 
+
+			occlusion = 1.0 - occlusion / float(kernelSize);
+			shadow_occlusion *= occlusion;
+		}
 	
 		vec4 textureColor;
-		if(colorType == 0)
+		if(colorType == 0) // one color.
 		{
 			textureColor = oneColor4;
 			
@@ -307,16 +370,14 @@ void main()
 				discard;
 			}
 		}
-		else if(colorType == 2)
+		else if(colorType == 2) // texture color.
 		{
 			
 			if(textureFlipYAxis)
 			{
-				//textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));
 				texCoord = vec2(vTexCoord.s, 1.0 - vTexCoord.t);
 			}
 			else{
-				//textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));
 				texCoord = vec2(vTexCoord.s, vTexCoord.t);
 			}
 			
@@ -393,18 +454,18 @@ void main()
 		textureColor.w = externalAlpha;
 		vec4 fogColor = vec4(0.9, 0.9, 0.9, 1.0);
 		
-		// Test dem image.***
+		// Test dem image.***************************************************************************************************************
 		float altitude = 1000000.0;
-		if(uActiveTextures[3] == 10)
+		if(uActiveTextures[5] == 10)
 		{
-			vec4 layersTextureColor = texture2D(diffuseTex_1, texCoord);
+			vec4 layersTextureColor = texture2D(diffuseTex_3, texCoord);
 			if(layersTextureColor.w > 0.0)
 			{
 				// decode the grayScale.***
 				altitude = uMinMaxAltitudes.x + layersTextureColor.r * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);
 			}
 		}
-		// End test dem image.---
+		// End test dem image.------------------------------------------------------------------------------------------------------------
 		
 		
 		

@@ -382,3 +382,5 @@ GeographicCoord.prototype.renderPoint = function(magoManager, shader, gl, render
 
 
 
+
+
