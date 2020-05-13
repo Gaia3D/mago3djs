@@ -15,7 +15,7 @@ var Line = function(point, direction)
 	
 	// (x,y,z) = (x0,y0,z0) + lambda * (u, v, w);
 	if (point !== undefined)
-	{ this.point = point; }
+	{ this.point = new Point3D(point.x, point.y, point.z); }
 	else
 	{ this.point = new Point3D(); }
 	

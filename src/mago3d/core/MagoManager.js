@@ -417,18 +417,7 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 		{ continue; }
 	
 		neoBuilding = currentVisibleNodes[i].data.neoBuilding;
-		
-		/*
-		if (attributes.objectType === "basicF4d")
-		{
-			
-		}
-		else if (attributes.objectType === "multiBuildingsTile")
-		{
-			
-		}
-		*/
-		
+
 		if (attributes.projectId !== undefined && attributes.isReference !== undefined && attributes.isReference === true)
 		{
 			StaticModelsManager.manageStaticModel(node, this);
@@ -1445,7 +1434,6 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 		{
 			this.upDateCamera(this.myCameraSCX);
 			this.doMultiFrustumCullingSmartTiles(this.myCameraSCX);
-			this.smartTileManager.doPendentProcess(this);
 		}
 		
 		gl.clearStencil(0); // provisionally here.***
@@ -4916,120 +4904,81 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 					continue;
 				}
 				
-				var data = node.data;
-					
-				if (attributes.objectType === "basicF4d")
-				{					
-					neoBuilding = node.data.neoBuilding;
-					if (neoBuilding === undefined) // attributes.isReference === true
-					{
-						// This node is a reference node.***
-						visibleNodes.currentVisiblesToPrepare.push(node);
-						continue;
-					}
-					
-					//check if parsed header.***
-					//neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-					if (neoBuilding.metaData !== undefined && neoBuilding.metaData.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
-					{
-						visibleNodes.currentVisiblesToPrepare.push(node);
-						continue;
-					}
+				var data = node.data;				
+				neoBuilding = node.data.neoBuilding;
+				if (neoBuilding === undefined) // attributes.isReference === true
+				{
+					// This node is a reference node.***
+					visibleNodes.currentVisiblesToPrepare.push(node);
+					continue;
+				}
+				
+				//check if parsed header.***
+				//neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+				if (neoBuilding.metaData !== undefined && neoBuilding.metaData.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
+				{
+					visibleNodes.currentVisiblesToPrepare.push(node);
+					continue;
+				}
 
-					distToCamera = node.getDistToCamera(cameraPosition, this.boundingSphere_Aux);
-					var lodByDist = magoPolicy.getLod(distToCamera);
-					
-					// Set the current LOD of node.
-					data.distToCam = distToCamera;
-					data.currentLod = magoPolicy.getLod(data.distToCam);
-					
-					
-					if (distToCamera > frustumFar)// || distToCamera > 1500)
-					{ 
-						// put this node to delete into queue.***
-						//this.processQueue.putNodeToDelete(node, 0);
-						continue; 
-					}
-					
-					// If necessary do frustum culling.**********************************************************
-					if (doFrustumCullingToBuildings)
+				distToCamera = node.getDistToCamera(cameraPosition, this.boundingSphere_Aux);
+				var lodByDist = magoPolicy.getLod(distToCamera);
+				
+				// Set the current LOD of node.
+				data.distToCam = distToCamera;
+				data.currentLod = magoPolicy.getLod(data.distToCam);
+				
+				
+				if (distToCamera > frustumFar)// || distToCamera > 1500)
+				{ 
+					// put this node to delete into queue.***
+					//this.processQueue.putNodeToDelete(node, 0);
+					continue; 
+				}
+				
+				// If necessary do frustum culling.**********************************************************
+				if (doFrustumCullingToBuildings)
+				{
+					var frustumCull = frustumVolume.intersectionSphere(this.boundingSphere_Aux); // cesium.***
+					// intersect with Frustum
+					if (frustumCull === Constant.INTERSECTION_OUTSIDE) 
 					{
-						var frustumCull = frustumVolume.intersectionSphere(this.boundingSphere_Aux); // cesium.***
-						// intersect with Frustum
-						if (frustumCull === Constant.INTERSECTION_OUTSIDE) 
-						{
-							// put this node to delete into queue.***
-							////this.processQueue.putNodeToDeleteModelReferences(node, 0);
-							//this.processQueue.putNodeToDeleteLessThanLod3(node, 0);
-							continue;
-						}
+						// put this node to delete into queue.***
+						////this.processQueue.putNodeToDeleteModelReferences(node, 0);
+						//this.processQueue.putNodeToDeleteLessThanLod3(node, 0);
+						continue;
 					}
-					//-------------------------------------------------------------------------------------------
-					
-					// provisionally fork versions.***
-					var version = neoBuilding.getHeaderVersion();
-					if (version === undefined)
-					{ continue; }
-					
-					if (version[0] === 'v')
+				}
+				//-------------------------------------------------------------------------------------------
+				
+				// provisionally fork versions.***
+				var version = neoBuilding.getHeaderVersion();
+				if (version === undefined)
+				{ continue; }
+				
+				if (version[0] === 'v')
+				{
+					visibleNodes.putNodeByLod(node, lodByDist);
+				}
+				else 
+				{
+					// provisional test for pointsCloud data.************
+					var metaData = neoBuilding.metaData;
+					var projectsType = metaData.projectDataType;
+					if (projectsType && (projectsType === 4 || projectsType === 5))
+					{
+						// Project_data_type (new in version 002).***
+						// 1 = 3d model data type (normal 3d with interior & exterior data).***
+						// 2 = single building skin data type (as vWorld or googleEarth data).***
+						// 3 = multi building skin data type (as Shibuya & Odaiba data).***
+						// 4, 5 = pointsCloud data type.***
+						visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisiblesAux, node);
+					}
+					// end provisional test.-----------------------------
+					else
 					{
 						visibleNodes.putNodeByLod(node, lodByDist);
 					}
-					else 
-					{
-						// provisional test for pointsCloud data.************
-						var metaData = neoBuilding.metaData;
-						var projectsType = metaData.projectDataType;
-						if (projectsType && (projectsType === 4 || projectsType === 5))
-						{
-							// Project_data_type (new in version 002).***
-							// 1 = 3d model data type (normal 3d with interior & exterior data).***
-							// 2 = single building skin data type (as vWorld or googleEarth data).***
-							// 3 = multi building skin data type (as Shibuya & Odaiba data).***
-							// 4, 5 = pointsCloud data type.***
-							visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisiblesAux, node);
-						}
-						// end provisional test.-----------------------------
-						else
-						{
-							visibleNodes.putNodeByLod(node, lodByDist);
-						}
-					}
-				
-				}
-				else if (attributes.objectType === "multiBuildingsTile")
-				{
-					// Put node into visibleNodes.
-					distToCamera = node.getDistToCamera(cameraPosition, this.boundingSphere_Aux);
-					var lodByDist = magoPolicy.getLod(distToCamera);
-					
-					// Set the current LOD of node.
-					data.distToCam = distToCamera;
-					data.currentLod = magoPolicy.getLod(data.distToCam);
-					
-					var frustumFar = magoPolicy.getFrustumFarDistance();
-					if (distToCamera > frustumFar)
-					{ 
-						// put this node to delete into queue.***
-						this.processQueue.putNodeToDelete(node, 1);
-						continue; 
-					}
-					
-					// If necessary do frustum culling.**********************************************************
-					//if (doFrustumCullingToBuildings)
-					//{
-					//	var frustumCull = frustumVolume.intersectionSphere(this.boundingSphere_Aux); // cesium.***
-					//	// intersect with Frustum
-					//	if (frustumCull === Constant.INTERSECTION_OUTSIDE) 
-					//	{
-					//		// put this node to delete into queue.***
-					//		//this.processQueue.putNodeToDeleteLessThanLod3(node, 0);
-					//		continue;
-					//	}
-					//}
-					//-------------------------------------------------------------------------------------------
-					
-					visibleNodes.putNodeByLod(node, lodByDist);
 				}
 			}
 		}

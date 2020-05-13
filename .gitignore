@@ -10,3 +10,6 @@ sample/persistence/json/2119_deploy.json
 f4d
 !/src/mago3d/f4d
 sample/persistence/json/songpa.json
+.vscode/
+sample/test.html
+sample/test/

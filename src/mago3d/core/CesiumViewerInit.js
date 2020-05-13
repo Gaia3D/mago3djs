@@ -90,7 +90,7 @@ CesiumViewerInit.prototype.providerBuild = function()
 			if (policy.cesiumIonToken && policy.cesiumIonToken.length > 0) 
 			{
 				this.options.terrainProvider = new Cesium.CesiumTerrainProvider({
-					url: Cesium.createWorldTerrain()
+					url: Cesium.IonResource.fromAssetId(1)
 				});
 			}
 			break;

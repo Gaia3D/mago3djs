@@ -118,7 +118,6 @@ ManagerUtils.geographicCoordToWorldPoint = function(longitude, latitude, altitud
 
 	var cartesian = Globe.geographicToCartesianWgs84(longitude, latitude, altitude, undefined);
 	resultWorldPoint.set(cartesian[0], cartesian[1], cartesian[2]);
-	
 	return resultWorldPoint;
 };
 

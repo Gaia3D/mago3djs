@@ -5,7 +5,8 @@
   "main": "mago3d.js",
   "scripts": {
     "test": "jasmine",
-    "start": "node server.js"
+    "start": "node server.js",
+    "test:debug": "karma start --browsers Chrome_with_debugging"
   },
   "author": "Gaia3d",
   "license": "Apache-2.0",
