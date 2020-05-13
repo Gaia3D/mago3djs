@@ -15,9 +15,9 @@ var ObjectMarker = function()
 	this.geoLocationData = new GeoLocationData();
 	this.issue_id = null;
 	this.issue_type = null;
-	//this.latitude = 0;
-	//this.longitude = 0;
-	//this.height = 0;
+	
+	// ObjectMakers can be absolute or relative.
+	this.target;
 	
 	this.imageFilePath;
 	this.size2d = new Float32Array([25.0, 25.0]);
@@ -27,7 +27,9 @@ var ObjectMarker = function()
 ObjectMarker.prototype.deleteObjects = function() 
 {
 	if (this.geoLocationData)
-	{ this.geoLocationData.deleteObjects(); }
+	{ 
+		this.geoLocationData.deleteObjects(); 
+	}
 };
 
 ObjectMarker.prototype.setImageFilePath = function(imageFilePath) 
@@ -46,6 +48,63 @@ ObjectMarker.prototype.copyFrom = function(objMarker)
 	
 	this.issue_id = objMarker.issue_id;
 	this.issue_type = objMarker.issue_type;
+};
+
+ObjectMarker.prototype.getGeoLocationData = function(magoManager) 
+{
+	var geoLocationData;
+	var target = this.target;
+
+	if (target)
+	{
+		if (target.buildingId !== undefined && target.projectId !== undefined)
+		{
+			var projectId = target.projectId;
+			var buildingId = target.buildingId;
+			var hierarchyManager = magoManager.hierarchyManager;
+			var node = hierarchyManager.getNodeByDataKey(projectId, buildingId);
+			if (node)
+			{
+				var neoBuilding = node.data.neoBuilding;
+				var geoLocDataManager = node.data.geoLocDataManager;
+				if (geoLocDataManager)
+				{
+					var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
+					if (target.objectId !== undefined && neoBuilding)
+					{
+						var neoReferencesArray = neoBuilding.getReferenceObjectsArrayByObjectId(target.objectId);
+						if (neoReferencesArray && neoReferencesArray.length > 0)
+						{
+							var neoReference = neoReferencesArray[0];
+							var centerPosWC = neoReference.getCenterPositionWC(neoBuilding, undefined);
+							if (centerPosWC)
+							{
+								if (geoLocationData === undefined)
+								{ geoLocationData = new GeoLocationData(); }
+
+								// High and Low values of the position.**
+								if (geoLocationData.positionHIGH === undefined)
+								{ geoLocationData.positionHIGH = new Float32Array([0.0, 0.0, 0.0]); }
+								if (geoLocationData.positionLOW === undefined)
+								{ geoLocationData.positionLOW = new Float32Array([0.0, 0.0, 0.0]); }
+								ManagerUtils.calculateSplited3fv([centerPosWC.x, centerPosWC.y, centerPosWC.z], geoLocationData.positionHIGH, geoLocationData.positionLOW);
+							}
+						}
+					}
+					else 
+					{
+						geoLocationData = buildingGeoLocation;
+					}
+				}
+			}
+		}
+	}
+	else 
+	{
+		geoLocationData = this.geoLocationData;
+	}
+
+	return geoLocationData;
 };
 
 

@@ -721,6 +721,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			
 			gl.uniform1i(currentShader.uTileDepth_loc, this.depth);
 			gl.uniform1i(currentShader.uSeaOrTerrainType_loc, 0); // terrain.
+			//gl.uniform1i(currentShader.uSeaOrTerrainType_loc, 1); // ocean.
 			
 			var vboKey = this.vboKeyContainer.vboCacheKeysArray[0]; // the idx = 0 is the terrain. idx = 1 is the skirt.
 			
@@ -2350,7 +2351,7 @@ TinTerrain.prototype.decodeData = function(imageryType)
 		};
 	}
 	
-	var bMakeNormals = false;
+	var bMakeNormals = true;
 
 	this.tinTerrainManager.workerDecodedTerrain.postMessage({
 		param: {

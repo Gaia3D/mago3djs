@@ -30,8 +30,6 @@ SpeechBubble.prototype.makeDefault = function(imageSize)
 	var center = 0.5 * width;
 	var cornerRadius = minSize * 0.20;
 
-
-
 	this.point2dArray[0] = getObj(center, height-offset, 'moveTo');
 	this.point2dArray[1] = getObj(center + tailWidth/2, bubbleHeight, 'lineTo');
 	this.point2dArray[2] = getObj(width - cornerRadius, bubbleHeight, 'lineTo');

@@ -158,7 +158,6 @@ void main()\n\
     vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
     vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
     vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-	\n\
 	vNormal = (normalMatrix4 * vec4(normal, 1.0)).xyz;\n\
 \n\
 	if(bIsMakingDepth)\n\
@@ -1936,7 +1935,8 @@ void main()\n\
 		{\n\
 			textureColor = texture2D(u_texture, v_texcoord);\n\
 		}\n\
-		if(textureColor.w < 0.05)\n\
+		//if(textureColor.w < 0.005)\n\
+		if(textureColor.w == 0.0)\n\
 		{\n\
 			discard;\n\
 		}\n\
@@ -3444,6 +3444,7 @@ uniform int uActiveTextures[8];\n\
 uniform vec2 uMinMaxAltitudes;\n\
 uniform int uTileDepth;\n\
 uniform int uSeaOrTerrainType;\n\
+uniform int uRenderType;\n\
 \n\
 uniform vec4 oneColor4;\n\
 uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
@@ -3622,6 +3623,12 @@ void main()\n\
 		gl_FragColor = packDepth(-depthValue);\n\
 	}\n\
 	else{\n\
+		if(uRenderType == 2)\n\
+		{\n\
+			gl_FragColor = oneColor4; \n\
+			return;\n\
+		}\n\
+\n\
 		float shadow_occlusion = 1.0;\n\
 		if(bApplyShadow)\n\
 		{\n\
@@ -3674,7 +3681,7 @@ void main()\n\
 			}\n\
 			else\n\
 			{\n\
-				vec3 lightPos = vec3(1.0, 1.0, 1.0);\n\
+				vec3 lightPos = vec3(0.0, 0.0, 0.0);\n\
 				L = normalize(lightPos - v3Pos);\n\
 				lambertian = max(dot(normal2, L), 0.0);\n\
 			}\n\
@@ -3836,7 +3843,11 @@ void main()\n\
 			\n\
 			if(gray < 0.05)\n\
 			gray = 0.05;\n\
-			fogColor = vec4(gray*1.3, gray*1.5, gray*1.7, 1.0);\n\
+			float red = gray + 0.2;\n\
+			float green = gray + 0.6;\n\
+			float blue = gray*2.0 + 2.0;\n\
+			//fogColor = vec4(gray*1.3, gray*2.1, gray*2.7, 1.0);\n\
+			fogColor = vec4(red, green, blue, 1.0);\n\
 			\n\
 			// Test drawing grid.***\n\
 			if(uTileDepth > 7)\n\
@@ -3859,6 +3870,9 @@ void main()\n\
 				}\n\
 			}\n\
 			// End test drawing grid.---\n\
+			vec4 finalColor = mix(textureColor, fogColor, 0.7); \n\
+			gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian, 1.0); // original.***\n\
+			return;\n\
 		}\n\
 		else{\n\
 			if(uSeaOrTerrainType == 1)\n\
@@ -3935,7 +3949,7 @@ void main()\n\
     vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
 	\n\
 	vNormal = normalize((normalMatrix4 * vec4(normal.x, normal.y, normal.z, 1.0)).xyz); // original.***\n\
-	vLightDir = sunDirWC;\n\
+	vLightDir = vec3(normalMatrix4*vec4(sunDirWC.xyz, 1.0)).xyz;\n\
 	vAltitude = altitude;\n\
 	\n\
 	currSunIdx = -1.0; // initially no apply shadow.\n\
@@ -3994,6 +4008,7 @@ void main()\n\
 	}\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 	v3Pos = (modelViewMatrixRelToEye * pos4).xyz;\n\
+	//v3Pos = (pos4).xyz;\n\
 \n\
 	// calculate fog amount.\n\
 	float fogParam = 1.15 * v3Pos.z/(far - 10000.0);\n\

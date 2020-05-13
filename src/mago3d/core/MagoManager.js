@@ -146,6 +146,10 @@ var MagoManager = function()
 
 	// Vars.****************************************************************
 	this.sceneState = new SceneState(); // this contains all scene mtrices and camera position.***
+	this.sceneState.setApplySunShadows(false);
+
+	this.magoPolicy.objectMoveMode = CODE.moveMode.OBJECT;
+
 	this.selectionColor = new SelectionColor();
 	this.vboMemoryManager = new VBOMemoryManager();
 	
@@ -1519,6 +1523,40 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 	
 		this.canvasDirty = true;
 	}
+
+	// Test.***
+	if (!this.objectMarkerTest)
+	{
+		this.TEST__ObjectMarker_toNeoReference();
+		this.objectMarkerTest = true;
+	}
+
+	/*
+	// Test.***********************************
+	// Test.**********************
+	// do wind test.
+	if (this.windTest === undefined)
+	{
+		if (this.weatherStation === undefined)
+		{ this.weatherStation = new WeatherStation(); }
+	
+		var geometryDataPath = this.readerWriter.geometryDataPath;
+		var windDataFilesNamesArray = ["OBS-QWM_2016062000.grib2_wind_000", "OBS-QWM_2016062001.grib2_wind_000", "OBS-QWM_2016062002.grib2_wind_000", "OBS-QWM_2016062003.grib2_wind_000",
+			"OBS-QWM_2016062004.grib2_wind_000", "OBS-QWM_2016062005.grib2_wind_000", "OBS-QWM_2016062006.grib2_wind_000", "OBS-QWM_2016062007.grib2_wind_000",
+			"OBS-QWM_2016062008.grib2_wind_000", "OBS-QWM_2016062009.grib2_wind_000", "OBS-QWM_2016062010.grib2_wind_000", "OBS-QWM_2016062011.grib2_wind_000",
+			"OBS-QWM_2016062012.grib2_wind_000", "OBS-QWM_2016062013.grib2_wind_000", "OBS-QWM_2016062014.grib2_wind_000", "OBS-QWM_2016062015.grib2_wind_000",
+			"OBS-QWM_2016062016.grib2_wind_000", "OBS-QWM_2016062017.grib2_wind_000", "OBS-QWM_2016062018.grib2_wind_000", "OBS-QWM_2016062019.grib2_wind_000",
+			"OBS-QWM_2016062020.grib2_wind_000", "OBS-QWM_2016062021.grib2_wind_000", "OBS-QWM_2016062022.grib2_wind_000", "OBS-QWM_2016062023.grib2_wind_000"];
+			
+		//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_20191127";
+		var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_Airport";
+		//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_GolfPark_NineBridge1";
+		
+		this.weatherStation.test_loadWindData3d(this, windDataFilesNamesArray, windMapFilesFolderPath);
+		//this.TEST__golfPark();
+		this.windTest = true;
+	}
+	*/
 };
 
 /**
@@ -1747,6 +1785,107 @@ MagoManager.prototype.TEST__SelectionBuffer = function()
 	var idx = this.selectionColor.decodeColor3(pixels[centerPixel*3], pixels[centerPixel*3+1], pixels[centerPixel*3+2]);
 	//////////////////////////////////////////////////////////////////////////////
 	this.selectionFbo.unbind();
+};
+
+MagoManager.prototype.TEST__ObjectMarker_toNeoReference = function() 
+{
+	
+	// buildingId: "SD_COUNCIL_del"
+	// projectId: "3ds.json"
+
+	// objectId: "11011" -> refMatrixType: 0 // sostre verd mig circular
+	// objectId: "2953" -> refMatrixType: 1 // cadira vermella a l'interior.
+	// objectId: "2837" -> refMatrixType: 2 // cadira vermella a l'interior.
+	
+
+	var objMarkerManager = this.objMarkerManager;
+	var bubbleWidth = 128;
+	var bubbleHeight = 128;
+	var textSize = 36;
+
+	// 1rst object.***************************************************************
+	var target = {
+		projectId  : "3ds",
+		buildingId : "SD_COUNCIL_del",
+		objectId   : "11011"
+	};
+
+	var commentTextOption = {
+		pixel       : textSize,
+		color       : 'blue',
+		borderColor : 'white',
+		text        : '11011'
+	};
+
+	var speechBubbleOptions = {
+		width             : bubbleWidth,
+		height            : bubbleHeight,
+		commentTextOption : commentTextOption,
+		bubbleColor       : {r: 1, g: 1, b: 1}
+	};
+
+	var options = {
+		speechBubbleOptions : speechBubbleOptions,
+		target              : target
+	};
+
+	objMarkerManager.newObjectMarkerSpeechBubble(options, this);
+
+	// 2nd object.***************************************************************
+	var target = {
+		projectId  : "3ds",
+		buildingId : "SD_COUNCIL_del",
+		objectId   : "2953"
+	};
+
+	var commentTextOption = {
+		pixel       : textSize,
+		color       : 'blue',
+		borderColor : 'white',
+		text        : '2953'
+	};
+
+	var speechBubbleOptions = {
+		width             : bubbleWidth,
+		height            : bubbleHeight,
+		commentTextOption : commentTextOption,
+		bubbleColor       : {r: 1, g: 1, b: 1}
+	};
+
+	var options = {
+		speechBubbleOptions : speechBubbleOptions,
+		target              : target
+	};
+
+	objMarkerManager.newObjectMarkerSpeechBubble(options, this);
+
+	// 3rd object.***************************************************************
+	var target = {
+		projectId  : "3ds",
+		buildingId : "SD_COUNCIL_del",
+		objectId   : "2837"
+	};
+
+	var commentTextOption = {
+		pixel       : textSize,
+		color       : 'blue',
+		borderColor : 'white',
+		text        : '2837'
+	};
+
+	var speechBubbleOptions = {
+		width             : bubbleWidth,
+		height            : bubbleHeight,
+		commentTextOption : commentTextOption,
+		bubbleColor       : {r: 1, g: 1, b: 1}
+	};
+
+	var options = {
+		speechBubbleOptions : speechBubbleOptions,
+		target              : target
+	};
+
+	objMarkerManager.newObjectMarkerSpeechBubble(options, this);
 };
 
 /**
@@ -2573,7 +2712,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		var hola = 0;
 	}
 	// Check modeler mode.
-	
+	//this.magoMode = CODE.magoMode.DRAWING;
 	if (this.magoMode === CODE.magoMode.DRAWING)// then process to draw.***
 	{
 		if (this.modeler === undefined)
@@ -2610,8 +2749,59 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			var geoCoordsList = this.modeler.getGeographicCoordsList();
 			geoCoordsList.addGeoCoord(geoCoord);
 		}
+
+		///////////////////////////////////////////////
+		this.doTest__ObjectMarker();
 	}
 	
+};
+
+MagoManager.prototype.doTest__ObjectMarker = function()
+{
+	//magoManager 가져오기
+	var magoManager = this;
+	var modeler = magoManager.modeler;
+
+	var geoCoordsList = modeler.getGeographicCoordsList();
+
+	if (geoCoordsList)
+	{
+		var geoCoordsCount = geoCoordsList.getGeoCoordsCount();
+		for (var i=geoCoordsCount-1; i<geoCoordsCount; i++)
+		{
+			//magoManager에 SpeechBubble 객체 없으면 생성하여 등록
+			if (!magoManager.speechBubble) 
+			{
+				magoManager.speechBubble = new Mago3D.SpeechBubble();
+			}
+
+			var sb = magoManager.speechBubble;
+			var bubbleColor = Color.getHexCode(1.0, 1.0, 1.0);
+			//SpeechBubble 옵션
+			var commentTextOption = {
+				pixel       : 12,
+				color       : 'blue',
+				borderColor : 'white',
+				text        : 'blabla'
+			};
+
+			//SpeechBubble을 통해서 png 만들어서 가져오기
+			var img = sb.getPng([64, 64], bubbleColor, commentTextOption);
+
+			//ObjectMarker 옵션, 위치정보와 이미지 정보
+			var geoCoord = geoCoordsList.getGeoCoord(i);
+			var lon = geoCoord.longitude;
+			var lat = geoCoord.latitude;
+			var alt = geoCoord.altitude;
+			var options = {
+				positionWC    : Mago3D.ManagerUtils.geographicCoordToWorldPoint(lon, lat, alt),
+				imageFilePath : img
+			};
+
+			//지도에 ObjectMarker생성하여 표출
+			magoManager.objMarkerManager.newObjectMarker(options, magoManager);
+		}
+	}
 };
 
 /**

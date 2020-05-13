@@ -164,6 +164,51 @@ var NeoReference = function()
 /**
  * Commutate the renderingFase value: true - false.
  */
+NeoReference.prototype.getCenterPositionWC = function(neoBuilding, resultCenterPos) 
+{
+	// Calculate the bbox localCoord by blockModel.
+	var neoReference = this;
+	var block_idx = neoReference._block_idx;
+	var block = neoBuilding.motherBlocksArray[block_idx];
+
+	if (block === undefined)
+	{ return resultCenterPos; }
+
+	var nodeOwner = neoBuilding.nodeOwner;
+	if (nodeOwner === undefined)
+	{ return resultCenterPos; }
+
+	var blockBbox = block.bbox;
+	var blockCenterPos = blockBbox.getCenterPoint();
+
+	// Now, check tMatrixType of this neoReference.***
+	// 0 = identity matrix, 1 = translation matrix, 2 = transformation matrix.
+	//if (this.refMatrixType === 0) in this case do nothing.
+	if (this.refMatrixType === 1)
+	{
+		// translate the refObject.
+		blockCenterPos.add(this.refTranslationVec[0], this.refTranslationVec[1], this.refTranslationVec[2]);
+	}
+	else if (this.refMatrixType === 2)
+	{
+		// transform the refObject.
+		blockCenterPos = this._originalMatrix4.transformPoint3D(blockCenterPos, blockCenterPos);
+	}
+
+	// must add objectMoveVector.
+	if (this.moveVectorRelToBuilding)
+	{
+		blockCenterPos.add(this.moveVectorRelToBuilding.x, this.moveVectorRelToBuilding.y, this.moveVectorRelToBuilding.z);
+	}
+
+	var geoLocData = nodeOwner.data.geoLocDataManager.getCurrentGeoLocationData();
+	resultCenterPos = geoLocData.tMatrix.transformPoint3D(blockCenterPos, resultCenterPos);
+	return resultCenterPos;
+};
+
+/**
+ * Commutate the renderingFase value: true - false.
+ */
 NeoReference.prototype.swapRenderingFase = function() 
 {
 	this.renderingFase = !this.renderingFase;

@@ -216,6 +216,19 @@ Color.prototype.getHexCode = function()
 	var g = this.g * 255;
 	var b = this.b * 255;
 	
+	return Color.getHexCode(r, g, b);
+};
+
+/**
+ * return hexCode
+ * @return {string}
+ */
+Color.getHexCode = function(red, green, blue) 
+{	
+	var r = red * 255;
+	var g = green * 255;
+	var b = blue * 255;
+	
 	var hexR = r.toString(16).padStart(2, '0'); //String.padStart i.e no support..TT 
 	var hexG = g.toString(16).padStart(2, '0');
 	var hexB = b.toString(16).padStart(2, '0');

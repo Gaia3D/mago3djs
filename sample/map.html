@@ -20,6 +20,9 @@
 	<li id="homeMenu" class="home">
 		<img src="/images/ko/homepage/home-icon.png" style="width: 35px; height: 35px; padding-right: 2px;" title="Home" />
 	</li>
+	<li onclick="doTest();">
+		test
+	</li>
 </ul>
 <div id="magoContainer" class="mapWrap"></div>
 <canvas id="objectLabel"></canvas>
@@ -131,9 +134,13 @@
 		magoManager.on(Mago3D.MagoManager.EVENT_TYPE.CAMERAMOVEEND, function(){
 			console.info('CAMERAMOVEEND');
 		});
+ 
+	}
 
-		/*$.ajax({
-			url: dataInformationUrl + "edc.json",
+	function doTest(){
+		var f4dController = MAGO3D_INSTANCE.getF4dController();
+		$.ajax({
+			url: dataInformationUrl + "3ds.json",
 			type: "GET",
 			dataType: "json",
 			success: function(f4dObject){
@@ -143,7 +150,7 @@
 			error: function(e){
 				alert(e.responseText);
 			}
-		});*/
+		});
 	}
 </script>
 </body>

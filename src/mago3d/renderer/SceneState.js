@@ -175,7 +175,6 @@ SceneState.prototype.initMagoSceneState = function()
 	canvas.height = canvas.clientHeight;
 
 	this.canvas = canvas;
-	this.textureFlipYAxis = true;
 	this.gl = gl;
 	this.drawingBufferWidth[0] = canvas.clientWidth;
 	this.drawingBufferHeight[0] = canvas.clientHeight;

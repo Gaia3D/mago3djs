@@ -28,6 +28,7 @@ uniform int uActiveTextures[8];
 uniform vec2 uMinMaxAltitudes;
 uniform int uTileDepth;
 uniform int uSeaOrTerrainType;
+uniform int uRenderType;
 
 uniform vec4 oneColor4;
 uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.
@@ -206,6 +207,12 @@ void main()
 		gl_FragColor = packDepth(-depthValue);
 	}
 	else{
+		if(uRenderType == 2)
+		{
+			gl_FragColor = oneColor4; 
+			return;
+		}
+
 		float shadow_occlusion = 1.0;
 		if(bApplyShadow)
 		{
@@ -258,7 +265,7 @@ void main()
 			}
 			else
 			{
-				vec3 lightPos = vec3(1.0, 1.0, 1.0);
+				vec3 lightPos = vec3(0.0, 0.0, 0.0);
 				L = normalize(lightPos - v3Pos);
 				lambertian = max(dot(normal2, L), 0.0);
 			}
@@ -420,7 +427,11 @@ void main()
 			
 			if(gray < 0.05)
 			gray = 0.05;
-			fogColor = vec4(gray*1.3, gray*1.5, gray*1.7, 1.0);
+			float red = gray + 0.2;
+			float green = gray + 0.6;
+			float blue = gray*2.0 + 2.0;
+			//fogColor = vec4(gray*1.3, gray*2.1, gray*2.7, 1.0);
+			fogColor = vec4(red, green, blue, 1.0);
 			
 			// Test drawing grid.***
 			if(uTileDepth > 7)
@@ -443,6 +454,9 @@ void main()
 				}
 			}
 			// End test drawing grid.---
+			vec4 finalColor = mix(textureColor, fogColor, 0.7); 
+			gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian, 1.0); // original.***
+			return;
 		}
 		else{
 			if(uSeaOrTerrainType == 1)

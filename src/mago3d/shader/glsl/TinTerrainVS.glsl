@@ -58,7 +58,7 @@ void main()
     vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);
 	
 	vNormal = normalize((normalMatrix4 * vec4(normal.x, normal.y, normal.z, 1.0)).xyz); // original.***
-	vLightDir = sunDirWC;
+	vLightDir = vec3(normalMatrix4*vec4(sunDirWC.xyz, 1.0)).xyz;
 	vAltitude = altitude;
 	
 	currSunIdx = -1.0; // initially no apply shadow.
@@ -117,6 +117,7 @@ void main()
 	}
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;
 	v3Pos = (modelViewMatrixRelToEye * pos4).xyz;
+	//v3Pos = (pos4).xyz;
 
 	// calculate fog amount.
 	float fogParam = 1.15 * v3Pos.z/(far - 10000.0);

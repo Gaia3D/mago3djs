@@ -32,6 +32,7 @@ ObjectMarkerManager.prototype.deleteObjects = function()
 	}
 	this.objectMarkerArray = [];
 };
+
 ObjectMarkerManager.prototype.setMarkerByCondition = function(condition)
 {
 	var that = this;
@@ -82,6 +83,7 @@ ObjectMarkerManager.prototype.loadDefaultImages = function(magoManager)
  */
 ObjectMarkerManager.prototype.newObjectMarker = function(options, magoManager)
 {
+	// This function creates 
 	var objMarker = new ObjectMarker();
 	this.objectMarkerArray.push(objMarker);
 	
@@ -121,9 +123,120 @@ ObjectMarkerManager.prototype.newObjectMarker = function(options, magoManager)
 		{
 			objMarker.bUseOriginalImageSize = true;
 		}
+
+		if (options.target)
+		{ objMarker.target = options.target; }
 	}
 	
 	return objMarker;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class ObjectMarkerManager
+ *
+ */
+ObjectMarkerManager.prototype.newObjectMarkerSpeechBubble = function(options, magoManager)
+{
+	// This function creates a speechBubble type object marker.
+	if (!options)
+	{ return undefined; }
+
+	//magoManager에 SpeechBubble 객체 없으면 생성하여 등록
+	if (!magoManager.speechBubble) 
+	{
+		magoManager.speechBubble = new Mago3D.SpeechBubble();
+	}
+
+	var sb = magoManager.speechBubble;
+	//var bubbleColor = Color.getHexCode(1.0, 1.0, 1.0);
+	//SpeechBubble 옵션
+	//var commentTextOption = {
+	//	pixel       : 12,
+	//	color       : 'blue',
+	//	borderColor : 'white',
+	//	text        : 'blabla'
+	//};
+
+	//SpeechBubble을 통해서 png 만들어서 가져오기
+	//var img = sb.getPng([64, 64], bubbleColor, commentTextOption);
+
+
+	var speechBubbleOptions = options.speechBubbleOptions;
+	if (!speechBubbleOptions)
+	{ return undefined; }
+
+	var sbWidht = speechBubbleOptions.width;
+	var sbHeight = speechBubbleOptions.height;
+	var commentTextOption = speechBubbleOptions.commentTextOption;
+	var bubbleColor = speechBubbleOptions.bubbleColor;
+	var bubbleHexColor = Color.getHexCode(bubbleColor.r, bubbleColor.g, bubbleColor.b);
+	var img = sb.getPng([sbWidht, sbHeight], bubbleHexColor, commentTextOption);
+
+	var target = options.target;
+	if (target)
+	{
+		// Check the target type.
+		//,
+		//	sizeX         : sbWidht,
+		//	sizeY         : sbHeight
+
+		var optionsObjectMarker = {
+			target        : target,
+			imageFilePath : img
+		};
+
+		//지도에 ObjectMarker생성하여 표출
+		this.newObjectMarker(optionsObjectMarker, magoManager);
+	}
+	else
+	{
+		// Independent objectMarker.
+		//ObjectMarker 옵션, 위치정보와 이미지 정보
+		var lon = options.longitude;
+		var lat = options.latitude;
+		var alt = options.altitude;
+		var optionsObjectMarker = {
+			positionWC    : Mago3D.ManagerUtils.geographicCoordToWorldPoint(lon, lat, alt),
+			imageFilePath : img
+		};
+
+		//지도에 ObjectMarker생성하여 표출
+		this.newObjectMarker(optionsObjectMarker, magoManager);
+	}
+
+	/*
+	if (!magoManager.speechBubble) 
+	{
+		magoManager.speechBubble = new Mago3D.SpeechBubble();
+	}
+
+	var sb = magoManager.speechBubble;
+	var bubbleColor = Color.getHexCode(1.0, 1.0, 1.0);
+	//SpeechBubble 옵션
+	var commentTextOption = {
+		pixel       : 12,
+		color       : 'blue',
+		borderColor : 'white',
+		text        : 'blabla'
+	};
+
+	//SpeechBubble을 통해서 png 만들어서 가져오기
+	var img = sb.getPng([64, 64], bubbleColor, commentTextOption);
+
+	//ObjectMarker 옵션, 위치정보와 이미지 정보
+	var geoCoord = geoCoordsList.getGeoCoord(i);
+	var lon = geoCoord.longitude;
+	var lat = geoCoord.latitude;
+	var alt = geoCoord.altitude;
+	var options = {
+		positionWC    : Mago3D.ManagerUtils.geographicCoordToWorldPoint(lon, lat, alt),
+		imageFilePath : img
+	};
+
+	//지도에 ObjectMarker생성하여 표출
+	this.newObjectMarker(options, magoManager);
+	*/
 };
 
 /**
@@ -238,14 +351,17 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 			
 				gl.uniform2fv(shader.imageSize_loc, [currentTexture.texId.imageWidth, currentTexture.texId.imageHeight]);
 				
-				var objMarkerGeoLocation = objMarker.geoLocationData;
+				//var objMarkerGeoLocation = objMarker.geoLocationData; // original.
+				var objMarkerGeoLocation = objMarker.getGeoLocationData(magoManager);
+				if (objMarkerGeoLocation === undefined)
+				{ continue; }
 				
 				if (currentTexture.texId !== lastTexId)
 				{
 					gl.bindTexture(gl.TEXTURE_2D, currentTexture.texId);
 					lastTexId = currentTexture.texId;
 				}
-					
+				
 				gl.uniform3fv(shader.buildingPosHIGH_loc, objMarkerGeoLocation.positionHIGH);
 				gl.uniform3fv(shader.buildingPosLOW_loc, objMarkerGeoLocation.positionLOW);
 
@@ -269,7 +385,9 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 			for (var i=0; i<objectsMarkersCount; i++)
 			{
 				var objMarker = magoManager.objMarkerManager.objectMarkerArray[i];
-				var objMarkerGeoLocation = objMarker.geoLocationData;
+				var objMarkerGeoLocation = objMarker.getGeoLocationData(magoManager);
+				if (objMarkerGeoLocation === undefined)
+				{ continue; }
 				
 				var colorAux = selectionColor.getAvailableColor(undefined);
 				var idxKey = selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);

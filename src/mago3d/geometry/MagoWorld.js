@@ -356,12 +356,14 @@ MagoWorld.prototype.mousemove = function(event)
 		magoManager.mustCheckIfDragging = false;
 		// Note: "mustCheckIfDragging" is assigned true in "onMouseUp".
 	}
+	/*
 	if (magoManager.mouseDragging)
 	{
 		// Move selected object:
 		this.moveSelectedObject(event);
 		return;
 	}
+	*/
 	// End check if is dragging.---
 	
 	var mouseAction = magoManager.sceneState.mouseAction;
@@ -760,6 +762,123 @@ MagoWorld.prototype.updateModelViewMatrixByCamera = function(camera)
 
 };
 
+MagoWorld.prototype.doTest__BSpline3DCubic = function(event)
+{
+	var magoManager = this.magoManager;
+	var modeler = magoManager.modeler;
+
+	if (modeler.bSplineCubic3d === undefined)
+	{ modeler.bSplineCubic3d = new BSplineCubic3D(); }
+
+	var bSplineCubic3d = modeler.bSplineCubic3d;
+	if (bSplineCubic3d !== undefined)
+	{
+		if (bSplineCubic3d.geoCoordsList === undefined)
+		{ bSplineCubic3d.geoCoordsList = new GeographicCoordsList(); }
+
+		bSplineCubic3d.geoCoordsList = modeler.geoCoordsList;
+			
+		//var maxLengthDegree = 0.001;
+		//Path3D.insertPointsOnLargeSegments(bSplineCubic3d.geoCoordsList.geographicCoordsArray, maxLengthDegree, magoManager);
+			
+		var coordsCount = bSplineCubic3d.geoCoordsList.geographicCoordsArray.length;
+		for (var i=0; i<coordsCount; i++)
+		{
+			var geoCoord = bSplineCubic3d.geoCoordsList.geographicCoordsArray[i];
+			var geoLocDataManager = geoCoord.getGeoLocationDataManager();
+			var geoLocData = geoLocDataManager.newGeoLocationData("noName");
+			geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude, undefined, undefined, undefined, geoLocData, magoManager);
+		}
+			
+		var geoCoordsList = bSplineCubic3d.getGeographicCoordsList();
+		geoCoordsList.makeLines(magoManager);
+		
+		// Make the controlPoints.***
+		var controlPointArmLength = 0.2;
+		bSplineCubic3d.makeControlPoints(controlPointArmLength, magoManager);
+		bSplineCubic3d.makeInterpolatedPoints();
+	}
+};
+
+MagoWorld.prototype.doTest__ExtrudedObject = function(event)
+{
+	var magoManager = this.magoManager;
+	var modeler = magoManager.modeler;
+
+	var geoCoordsList = modeler.getGeographicCoordsList();
+	if (geoCoordsList)
+	{
+		var extrudeDirWC = undefined;
+		var bLoop = true;
+		var height = 100.0;
+		var extrudedRenderable = geoCoordsList.getExtrudedMeshRenderableObject(height, bLoop, undefined, magoManager, extrudeDirWC);
+
+		extrudedRenderable.setOneColor(0.2, 0.7, 0.8, 0.3);
+		extrudedRenderable.attributes.isMovable = true;
+		extrudedRenderable.attributes.isSelectable = true;
+		extrudedRenderable.attributes.name = "extrudedObject";
+		extrudedRenderable.attributes.selectedColor4 = new Color(1.0, 1.0, 0.0, 0.0); // selectedColor fully transparent.
+
+		if (extrudedRenderable.options === undefined)
+		{ extrudedRenderable.options = {}; }
+		
+		extrudedRenderable.options.renderWireframe = true;
+		extrudedRenderable.options.renderShaded = true;
+		extrudedRenderable.options.depthMask = true;
+
+		magoManager.smartTileManager.putObject(10, extrudedRenderable);
+	}
+};
+
+MagoWorld.prototype.doTest__ObjectMarker = function()
+{
+	//magoManager 가져오기
+	var magoManager = this.magoManager;
+	var modeler = magoManager.modeler;
+
+	var geoCoordsList = modeler.getGeographicCoordsList();
+
+	if (geoCoordsList)
+	{
+		var geoCoordsCount = geoCoordsList.getGeoCoordsCount();
+		for (var i=0; i<geoCoordsCount; i++)
+		{
+			//magoManager에 SpeechBubble 객체 없으면 생성하여 등록
+			if (!magoManager.speechBubble) 
+			{
+				magoManager.speechBubble = new Mago3D.SpeechBubble();
+			}
+
+			var sb = magoManager.speechBubble;
+			var bubbleColor = Color.getHexCode(1.0, 1.0, 1.0);
+
+			//SpeechBubble 옵션
+			var commentTextOption = {
+				pixel       : 12,
+				color       : 'blue',
+				borderColor : 'white',
+				text        : 'blabla'
+			};
+
+			//SpeechBubble을 통해서 png 만들어서 가져오기
+			var img = sb.getPng([64, 64], bubbleColor, commentTextOption);
+
+			//ObjectMarker 옵션, 위치정보와 이미지 정보
+			var geoCoord = geoCoordsList.getGeoCoord(i);
+			var lon = geoCoord.longitude;
+			var lat = geoCoord.latitude;
+			var alt = geoCoord.altitude;
+			var options = {
+				positionWC    : Mago3D.ManagerUtils.geographicCoordToWorldPoint(lon, lat, alt),
+				imageFilePath : img
+			};
+
+			//지도에 ObjectMarker생성하여 표출
+			magoManager.objMarkerManager.newObjectMarker(options, magoManager);
+		}
+	}
+};
+
 /**
  *
  *
@@ -791,64 +910,9 @@ MagoWorld.prototype.keydown = function(event)
 		//this.magoManager.TEST__RenderGeoCoords();
 
 		// Another test: BSplineCubic3d.***
-		/*
-		if (modeler.bSplineCubic3d === undefined)
-		{ modeler.bSplineCubic3d = new BSplineCubic3D(); }
-
-		var bSplineCubic3d = modeler.bSplineCubic3d;
-		if (bSplineCubic3d !== undefined)
-		{
-			if (bSplineCubic3d.geoCoordsList === undefined)
-			{ bSplineCubic3d.geoCoordsList = new GeographicCoordsList(); }
-
-			bSplineCubic3d.geoCoordsList = modeler.geoCoordsList;
-			
-			//var maxLengthDegree = 0.001;
-			//Path3D.insertPointsOnLargeSegments(bSplineCubic3d.geoCoordsList.geographicCoordsArray, maxLengthDegree, magoManager);
-			
-			var coordsCount = bSplineCubic3d.geoCoordsList.geographicCoordsArray.length;
-			for (var i=0; i<coordsCount; i++)
-			{
-				var geoCoord = bSplineCubic3d.geoCoordsList.geographicCoordsArray[i];
-				var geoLocDataManager = geoCoord.getGeoLocationDataManager();
-				var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-				geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude, undefined, undefined, undefined, geoLocData, magoManager);
-			}
-			
-			var geoCoordsList = bSplineCubic3d.getGeographicCoordsList();
-			geoCoordsList.makeLines(magoManager);
-		
-			// Make the controlPoints.***
-			var controlPointArmLength = 0.2;
-			bSplineCubic3d.makeControlPoints(controlPointArmLength, magoManager);
-			bSplineCubic3d.makeInterpolatedPoints();
-		}
-
-		*/
-		// Extruded object test.***
-		var geoCoordsList = magoManager.modeler.getGeographicCoordsList();
-		if (geoCoordsList)
-		{
-			var extrudeDirWC = undefined;
-			var bLoop = true;
-			var height = 100.0;
-			var extrudedRenderable = geoCoordsList.getExtrudedMeshRenderableObject(height, bLoop, undefined, magoManager, extrudeDirWC);
-
-			extrudedRenderable.setOneColor(0.2, 0.7, 0.8, 0.3);
-			extrudedRenderable.attributes.isMovable = true;
-			extrudedRenderable.attributes.isSelectable = true;
-			extrudedRenderable.attributes.name = "extrudedObject";
-			extrudedRenderable.attributes.selectedColor4 = new Color(1.0, 1.0, 0.0, 0.0); // selectedColor fully transparent.
-
-			if (extrudedRenderable.options === undefined)
-			{ extrudedRenderable.options = {}; }
-			
-			extrudedRenderable.options.renderWireframe = true;
-			extrudedRenderable.options.renderShaded = true;
-			extrudedRenderable.options.depthMask = true;
-
-			magoManager.smartTileManager.putObject(10, extrudedRenderable);
-		}
+		//this.doTest__BSpline3DCubic();
+		this.doTest__ExtrudedObject();
+		//this.doTest__ObjectMarker();
 	}
 	else if (key === 'p')
 	{

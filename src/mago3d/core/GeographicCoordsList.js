@@ -346,6 +346,9 @@ GeographicCoordsList.prototype.addAltitude = function(length)
  */
 GeographicCoordsList.prototype.getExtrudedMeshRenderableObject = function(height, bLoop, resultRenderableObject, magoManager, extrudeDirWC) 
 {
+	if (!this.geographicCoordsArray || this.geographicCoordsArray.length === 0)
+	{ return resultRenderableObject; }
+	
 	if (!resultRenderableObject)
 	{
 		resultRenderableObject = new RenderableObject();
@@ -512,6 +515,7 @@ GeographicCoordsList.prototype.renderPoints = function(magoManager, shader, rend
 	gl.enable(gl.DEPTH_TEST);
 	
 	// Write coords.
+	/*
 	var canvas = magoManager.getObjectLabel();
 	var ctx = canvas.getContext("2d");
 	ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -537,8 +541,9 @@ GeographicCoordsList.prototype.renderPoints = function(magoManager, shader, rend
 			ctx.fillText(word, screenCoord.x, screenCoord.y);
 		}
 	}
-	ctx.restore();
 	
+	ctx.restore();
+	*/
 	// return the current shader.
 	shader.useProgram();
 };

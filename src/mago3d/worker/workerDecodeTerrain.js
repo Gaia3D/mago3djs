@@ -156,7 +156,7 @@ function getNormalCartesiansArray(cartesiansArray, indicesArray, resultNormalCar
 		point_3 = new Point3D(cartesiansArray[idx_3*3], cartesiansArray[idx_3*3+1], cartesiansArray[idx_3*3+2]);
 		
 		// Calculate the normal for this triangle.
-		normal = calculateNormal(point_1, point_3, point_2, undefined);
+		normal = calculateNormal(point_1, point_2, point_3, undefined);
 		
 		// Accum normals for each points.
 		// Point 1.***
@@ -166,7 +166,7 @@ function getNormalCartesiansArray(cartesiansArray, indicesArray, resultNormalCar
 		}
 		else
 		{
-			normalsArray[idx_1] = normal;
+			normalsArray[idx_1] = new Point3D(normal.x, normal.y, normal.z);
 		}
 		
 		// Point 2.***
@@ -176,7 +176,7 @@ function getNormalCartesiansArray(cartesiansArray, indicesArray, resultNormalCar
 		}
 		else
 		{
-			normalsArray[idx_2] = normal;
+			normalsArray[idx_2] = new Point3D(normal.x, normal.y, normal.z);
 		}
 		
 		// Point 3.***
@@ -186,7 +186,7 @@ function getNormalCartesiansArray(cartesiansArray, indicesArray, resultNormalCar
 		}
 		else
 		{
-			normalsArray[idx_3] = normal;
+			normalsArray[idx_3] = new Point3D(normal.x, normal.y, normal.z);
 		}
 	}
 	
@@ -200,9 +200,9 @@ function getNormalCartesiansArray(cartesiansArray, indicesArray, resultNormalCar
 		var normal = normalsArray[i];
 		normal.unitary();
 		
-		resultNormalCartesiansArray[i*3] = Math.floor(normal.x*255);
-		resultNormalCartesiansArray[i*3+1] = Math.floor(normal.y*255);
-		resultNormalCartesiansArray[i*3+2] = Math.floor(normal.z*255);
+		resultNormalCartesiansArray[i*3] = Math.floor(normal.x*127);
+		resultNormalCartesiansArray[i*3+1] = Math.floor(normal.y*127);
+		resultNormalCartesiansArray[i*3+2] = Math.floor(normal.z*127);
 	}
 	
 	return resultNormalCartesiansArray;

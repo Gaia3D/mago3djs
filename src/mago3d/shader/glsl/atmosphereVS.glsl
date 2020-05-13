@@ -46,7 +46,6 @@ void main()
     vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;
     vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;
     vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);
-	
 	vNormal = (normalMatrix4 * vec4(normal, 1.0)).xyz;
 
 	if(bIsMakingDepth)

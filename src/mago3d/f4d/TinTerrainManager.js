@@ -32,7 +32,7 @@ var TinTerrainManager = function(options)
 	var policy = MagoConfig.getPolicy();
 	this.terrainType = defaultValue(policy.terrainType, CODE.magoEarthTerrainType.PLAIN);
 	this.terrainValue = policy.terrainValue;
-	this.selectable = false;
+	this.selectable = true;
 
 	if (this.terrainType !== CODE.magoEarthTerrainType.PLAIN && !this.terrainValue)
 	{
@@ -397,7 +397,8 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	if (this.identityMat === undefined)
 	{ this.identityMat = new Matrix4(); }
 	
-	gl.uniform1i(currentShader.bIsMakingDepth_loc, bDepth); //.
+	gl.uniform1i(currentShader.bIsMakingDepth_loc, bDepth); //. old. use uRenderType_loc = 0. ***
+	gl.uniform1i(currentShader.uRenderType_loc, 1);
 	if (renderType === 1)
 	{
 		var tex = magoManager.texturesStore.getTextureAux1x1(); // provisional.
@@ -480,6 +481,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	else if (renderType === 2)
 	{
 		gl.uniform1i(currentShader.bApplySpecularLighting_loc, false);
+		gl.uniform1i(currentShader.uRenderType_loc, 2);
 	}
 	
 	var sceneState = magoManager.sceneState;
