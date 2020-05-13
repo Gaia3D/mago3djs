@@ -166,7 +166,7 @@ function getNormalCartesiansArray(cartesiansArray, indicesArray, resultNormalCar
 		}
 		else
 		{
-			normalsArray[idx_1] = new Point3D(normal.x, normal.y, normal.z);
+			normalsArray[idx_1] = new Point3D_(normal.x, normal.y, normal.z);
 		}
 		
 		// Point 2.***
@@ -176,7 +176,7 @@ function getNormalCartesiansArray(cartesiansArray, indicesArray, resultNormalCar
 		}
 		else
 		{
-			normalsArray[idx_2] = new Point3D(normal.x, normal.y, normal.z);
+			normalsArray[idx_2] = new Point3D_(normal.x, normal.y, normal.z);
 		}
 		
 		// Point 3.***
@@ -186,7 +186,7 @@ function getNormalCartesiansArray(cartesiansArray, indicesArray, resultNormalCar
 		}
 		else
 		{
-			normalsArray[idx_3] = new Point3D(normal.x, normal.y, normal.z);
+			normalsArray[idx_3] = new Point3D_(normal.x, normal.y, normal.z);
 		}
 	}
 	
