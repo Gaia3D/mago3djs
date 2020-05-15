@@ -3,6 +3,7 @@
 /**
  * This show x, y ,z axises of the given feature to visualize them
  * @class AxisXYZ
+ * @constructor
  * 
  * @param {number} length
  */

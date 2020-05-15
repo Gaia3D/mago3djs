@@ -5,6 +5,7 @@
  * @exception {Error} Messages.CONSTRUCT_ERROR
  * 
  * @class VtxSegment
+ * @constructor
  * 
  * @param {Vertex} startVertex Optional. start vertex.
  * @param {Vertex} endVertex Optional. end vertex.

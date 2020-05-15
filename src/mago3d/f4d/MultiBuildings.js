@@ -3,6 +3,8 @@
 /**
  * This is a group of skin-type buildings.
  * @class MultiBuildings
+ * @constructor
+ * 
  */
 var MultiBuildings = function() 
 {

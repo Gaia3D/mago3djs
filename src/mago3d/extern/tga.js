@@ -32,6 +32,7 @@
   'use strict';
 
   /**
+   * @enum
    * @var {object} TGA type constants
    */
   Targa.Type = {
@@ -45,6 +46,7 @@
   };
 
   /**
+   * @enum
    * @var {object} TGA origin constants
    */
   Targa.Origin = {

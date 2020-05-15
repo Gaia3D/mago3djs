@@ -3,7 +3,8 @@
 
 /**
  * 열우선 배열 방식의 4차원 행렬
- *
+ * @class Matrix4
+ * @constructor
  */
 var Matrix4 = function() 
 {

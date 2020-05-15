@@ -3,6 +3,7 @@
 /**
  * This class contains rendering settings.
  * @class RenderingSettings
+ * @constructor
  */
 var RenderingSettings = function() 
 {

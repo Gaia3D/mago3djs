@@ -5,6 +5,7 @@
  * 
  * @alias API
  * @class API
+ * @constructor
  * 
  * @param {any} apiName api이름
  */

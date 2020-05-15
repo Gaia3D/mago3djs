@@ -1,6 +1,8 @@
 'use strict';
 /**
  * 어떤 일을 하고 있습니까?
+ * @class VBOKeysWorld
+ * @constructor
  */
 var VBOKeysWorld = function() 
 {

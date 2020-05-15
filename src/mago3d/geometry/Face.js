@@ -10,6 +10,7 @@
  * @exception {Error} Messages.CONSTRUCT_ERROR
  * 
  * @class Face
+ * @constructor
  */
 var Face = function() 
 {

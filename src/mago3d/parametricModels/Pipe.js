@@ -3,6 +3,7 @@
 /**
  * Pipe.
  * @class Pipe
+ * @constructor
  */
 var Pipe = function(interiorRadius, exteriorRadius, height, options) 
 {

@@ -3,6 +3,7 @@
 /**
  * GolfHoleFlag.
  * @class GolfHoleFlag
+ * @constructor
  */
 var GolfHoleFlag = function(radius, height, options) 
 {

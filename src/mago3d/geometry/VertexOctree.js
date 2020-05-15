@@ -4,6 +4,7 @@
 /**
  * VertexOctree
  * @see Vertex
+ * @constructor
  * 
  * @exception {Error} Messages.CONSTRUCT_ERROR
  * 

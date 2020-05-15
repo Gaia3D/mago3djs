@@ -3,6 +3,7 @@
 /**
  * This is the geometry container. Is the minimum independent project.
  * @class Node
+ * @constructor
  */
 var Node = function() 
 {

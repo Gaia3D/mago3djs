@@ -3,6 +3,7 @@
 /**
  * Manages materials of the Mago3D.
  * @class MaterialsManager
+ * @constructor
  */
 var MaterialsManager = function(magoManager) 
 {

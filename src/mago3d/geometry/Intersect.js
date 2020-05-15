@@ -7,7 +7,8 @@
  * A 지점에 포함된 경우: POINT_A
  * B 지점에 포함된 경우: POINT_B
  * 
- * @enum
+ * @enum Intersect
+ * @global
  */
 var Intersect = {
 	/**

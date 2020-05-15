@@ -1,5 +1,10 @@
 'use strict';
-
+/**
+ * This class is vehicle model
+ * @class Vehicle
+ * @constructor
+ * 
+ */
 var Vehicle = function(width, length, height, options) 
 {
 	MagoRenderable.call(this);

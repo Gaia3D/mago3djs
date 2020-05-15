@@ -9,14 +9,14 @@
 		"plugins/markdown"
 		],
 	"templates": {
-		"cleverLinks": false,
-		"monospaceLinks": false,
+		"cleverLinks": true,
+		"monospaceLinks": true,
 		"default": {
 			"outputSourceFiles": true
 		},
 		"path": "ink-docstrap",
 		"theme": "cerulean",
-		"navType": "vertical",
+		"navType": "inline",
 		"linenums": true,
 		"dateFormat": "YYYY, MMMM Do h:mm:ss a"
 	}

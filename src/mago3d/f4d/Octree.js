@@ -3,6 +3,8 @@
 /**
  * Octree class object. The octree contains detailed geometry data (meshes, points cloud, etc.).
  * @class Octree
+ * @constructor
+ * 
  * @param {Octree} octreeOwner If octreeOwner is undefined, then this octree is the mother octree.
  */
 var Octree = function(octreeOwner) 

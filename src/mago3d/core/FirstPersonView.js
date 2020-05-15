@@ -58,7 +58,8 @@ function onKeyUp(event)
 
 /**
  * 카메라 1인칭 시점 모드
- * 
+ * @class FirstPersonView
+ * @constructor
  */
 function FirstPersonView ()
 {

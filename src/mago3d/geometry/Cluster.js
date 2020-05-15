@@ -1,7 +1,9 @@
 'use strict';
 /**
  * point2d 데이터 cluster
- *
+ * @class Cluster
+ * @constructor
+ * 
  * @param {Point3DList} point2DList 
  * @param {number} depth
  * @param {MagoManager} magoMangaer

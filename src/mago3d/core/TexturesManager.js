@@ -3,6 +3,7 @@
 /**
  * Manages textures of the Mago3D.
  * @class TexturesManager
+ * @constructor
  */
 var TexturesManager = function(magoManager) 
 {
@@ -23,7 +24,8 @@ var TexturesManager = function(magoManager)
 
 /**
  * Handles the loaded image.
- * 
+ * @memberof TexturesManager
+ * @static
  * @param {WebGLRenderingContext} gl WebGL rendering context.
  * @param {image} image 
  * @param {WebGLTexture} texture 

@@ -9,6 +9,7 @@
  * @exception {Error} Messages.CONSTRUCT_ERROR
  * 
  * @class HalfEdge
+ * @constructor
  */
 var HalfEdge = function() 
 {

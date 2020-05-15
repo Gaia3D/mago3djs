@@ -3,6 +3,8 @@
 /**
  * This class is used to render the earth.
  * @class TinTerrain
+ * @constructor
+ * 
  */
 var TinTerrain = function(owner) 
 {

@@ -3,6 +3,7 @@
 /**
  * Cylinder.
  * @class Cylinder
+ * @constructor
  */
 var Cylinder = function(radius, height, options) 
 {

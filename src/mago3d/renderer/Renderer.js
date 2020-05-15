@@ -3,6 +3,7 @@
 /**
  * This class contains the current objects that are rendering. 
  * @class CurrentObjectsRendering
+ * @constructor
  */
 var CurrentObjectsRendering = function() 
 {
@@ -44,6 +45,7 @@ var CurrentObjectsRendering = function()
 /**
  * This class manages the rendering of all classes.
  * @class Renderer
+ * @constructor
  */
 var Renderer = function(manoManager) 
 {

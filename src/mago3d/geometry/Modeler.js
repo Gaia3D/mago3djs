@@ -5,6 +5,7 @@
 /**
  * Now under implementation
  * @class Modeler
+ * @constructor
  */
 var Modeler = function(magoManager) 
 {

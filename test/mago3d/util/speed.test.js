@@ -80,4 +80,29 @@ describe('speed test : ', function()
 			let endGetObjTime = new Date().getTime();
 		});    
 	});
+
+	describe('filter vs for', function()
+	{
+		it('for', function()
+		{
+			let startTime = new Date().getTime();
+			for (var i=keys.length;i>0;i--)
+			{
+				if (i===10000)
+				{
+					keys.slice(i, 1);
+				}
+			}
+			let endTime = new Date().getTime();
+		});
+		it('filter', function()
+		{
+			let startTime = new Date().getTime();
+			var a = values.filter(function(v, i)
+			{
+				return i!==10000;
+			});
+			let endTime = new Date().getTime();
+		});
+	});
 });

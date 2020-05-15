@@ -8,7 +8,6 @@
 
 /**
  * mago3d 활성화/비활성화
- * @namespace
  * @param {ManagerFactory} managerFactoryInstance 
  * @param {Boolean} isShow true = show, false = hide
  */

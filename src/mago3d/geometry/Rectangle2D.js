@@ -4,6 +4,7 @@
  * @exception {Error} Messages.CONSTRUCT_ERROR
  * 
  * @class Rectangle2D
+ * @constructor
  */
 var Rectangle2D = function() 
 {

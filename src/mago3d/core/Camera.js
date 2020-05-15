@@ -3,6 +3,7 @@
 /**
  * 카메라
  * @class Camera
+ * @constructor
  */
 var Camera = function() 
 {

@@ -5,6 +5,7 @@
  * @exception {Error} Messages.CONSTRUCT_ERROR
  * 
  * @class HierarchyManager
+ * @constructor
  */
 var HierarchyManager = function() 
 {

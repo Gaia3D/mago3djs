@@ -5,6 +5,7 @@
  * @exception {Error} Messages.CONSTRUCT_ERROR
  * 
  * @class Star2D
+ * @constructor
  */
 var Star2D = function() 
 {

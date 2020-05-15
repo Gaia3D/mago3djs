@@ -8,6 +8,7 @@
  * @exception {Error} Messages.CONSTRUCT_ERROR
  * 
  * @class VertexList
+ * @constructor
  */
 var VertexList = function() 
 {

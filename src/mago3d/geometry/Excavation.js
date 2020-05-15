@@ -5,6 +5,7 @@
 /**
  * This class draws an excavation on the grown.
  * @class Excavation
+ * @constructor
  */
 var Excavation = function(options) 
 {

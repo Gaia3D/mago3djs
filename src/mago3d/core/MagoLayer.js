@@ -2,7 +2,7 @@
 
 /**
  * This is the layer for MagoModel.
- * @class MagoModel
+ * @class MagoLayer
  * 
  * @param {object} layer layer object.
  */
@@ -43,5 +43,9 @@ var MagoLayer = function(layer)
 	var longitude = layer.longitude;
 	var latitude = layer.latitude;
 	var altitude = layer.altitude;
+
+	if(!isNaN(longitude) && !isNaN(latitude) && !isNaN(altitude)) {
+		//
+	}
 	//datas
 }; 

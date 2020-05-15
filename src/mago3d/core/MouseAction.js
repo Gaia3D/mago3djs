@@ -3,6 +3,7 @@
 /**
  * Manages & controls all mouse actions.
  * @class MouseAction
+ * @constructor
  */
 var MouseAction = function() 
 {

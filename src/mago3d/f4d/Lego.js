@@ -2,13 +2,15 @@
 
 /**
  * F4D Lego 클래스
- * @exception {Error} Messages.CONSTRUCT_ERROR
- * 
- * @alias Lego
- * @class Lego
- * 
  * 아래 문서의 Table 2 (Overall Structure of LOD2 file) 참조
  * @link https://github.com/Gaia3D/F4DConverter/blob/master/doc/F4D_SpecificationV1.pdf
+ * 
+ * @exception {Error} Messages.CONSTRUCT_ERROR
+ * 
+ * @class Lego
+ * @constructor
+ * 
+ * 
  */
 var Lego = function() 
 {
