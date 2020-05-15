@@ -461,22 +461,24 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 			
 			this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 			delete this.tinTerrainManager.textureParsedTerrainMap[z][x][y];
+
+			return false;
 		}
 		else if (this.fileLoadState === CODE.fileLoadState.PARSE_FINISHED && this.vboKeyContainer === undefined)
 		{
 			if (!this.requestDecodeData) 
 			{ 
 				this.decodeData(tinTerrainManager.imageryType); 
-				return;
+				return false;
 			}
 			
 			var z = this.depth;
 			var x = this.X;
 			var y = this.Y;
 			var decodedTerrainMap = tinTerrainManager.textureDecodedTerrainMap;
-			if (!decodedTerrainMap[z]) { return; }
-			if (!decodedTerrainMap[z][x]) { return; }
-			if (!decodedTerrainMap[z][x][y]) { return; }
+			if (!decodedTerrainMap[z]) { return false; }
+			if (!decodedTerrainMap[z][x]) { return false; }
+			if (!decodedTerrainMap[z][x][y]) { return false; }
 
 			var result = decodedTerrainMap[z][x][y];
 
@@ -507,6 +509,7 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 		{
 			// Test.***
 			return this.prepareTinTerrainPlain(magoManager, tinTerrainManager);
+			return false;
 			// End test.---
 		}
 
@@ -679,7 +682,21 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 				gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
 				gl.uniform1f(currentShader.externalAlpha_loc, 1);
 				gl.uniform2fv(currentShader.uMinMaxAltitudes_loc, [-200.0, 1943.14]);
-				gl.uniform1i(currentShader.bApplySsao_loc, true); // apply ssao default.***
+				gl.uniform1i(currentShader.bApplySsao_loc, this.depth > 8); // apply ssao default.***
+
+				// Caustics.***************************************
+				var time = new Date().getTime()/1000.0;
+				var fractionalTime = (time%1000);
+
+				if (this.timeRandomFactor === undefined)
+				{ this.timeRandomFactor = Math.random()*1000.0; }
+
+				fractionalTime += this.timeRandomFactor;
+				if (fractionalTime > 1000.0)
+				{ fractionalTime -= 1000.0; }
+
+				gl.uniform1f(currentShader.uTime_loc, fractionalTime);
+				// End caustics.----------------------------------------
 
 				var textureKeys = Object.keys(this.texture);
 				var textureLength = textureKeys.length; 
@@ -915,6 +932,9 @@ TinTerrain.prototype.renderSea = function(currentShader, magoManager, bDepth, re
 				gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
 				gl.uniform1f(currentShader.externalAlpha_loc, 1);
 				gl.uniform2fv(currentShader.uMinMaxAltitudes_loc, [-200.0, 1943.14]);
+				
+				
+
 
 				var textureKeys = Object.keys(this.texture);
 				var textureLength = textureKeys.length; 

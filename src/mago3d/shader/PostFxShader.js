@@ -706,4 +706,5 @@ PostFxShader.prototype.createUniformLocals = function(gl, shader, sceneState)
 	shader.modelViewMatrixRelToEyeInv_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEyeInv");
 
 	shader.uRenderType_loc = gl.getUniformLocation(shader.program, "uRenderType");
+	shader.uTime_loc = gl.getUniformLocation(shader.program, "uTime");
 };

@@ -3459,6 +3459,7 @@ varying float depthValue;\n\
 \n\
 const int kernelSize = 16;  \n\
 uniform float radius;      \n\
+uniform float uTime;  \n\
 \n\
 uniform float ambientReflectionCoef;\n\
 uniform float diffuseReflectionCoef;  \n\
@@ -3481,6 +3482,8 @@ varying float vAltitude;\n\
 \n\
 const float equatorialRadius = 6378137.0;\n\
 const float polarRadius = 6356752.3142;\n\
+\n\
+// water caustics: https://catlikecoding.com/unity/tutorials/flow/texture-distortion/\n\
 \n\
 float unpackDepth(const in vec4 rgba_depth)\n\
 {\n\
@@ -3625,6 +3628,64 @@ float getGridLineWidth(int depth)\n\
 	return gridLineWidth;\n\
 }\n\
 \n\
+//#define SHOW_TILING\n\
+#define TAU 6.28318530718 // https://www.shadertoy.com/view/4sXfDj\n\
+#define MAX_ITER 5 // https://www.shadertoy.com/view/4sXfDj\n\
+\n\
+vec3 causticColor(vec2 texCoord)\n\
+{\n\
+	// To avoid mosaic repetitions.******************\n\
+	float uPlus = texCoord.x - 1.0;\n\
+	float vPlus = texCoord.y - 1.0;\n\
+	//float timePlus = max(uPlus, vPlus);\n\
+	float timePlus = uPlus + vPlus;\n\
+	if(timePlus < 0.0)\n\
+	timePlus = 0.0;\n\
+	// End avoid mosaic repetitions.-------------------------\n\
+	\n\
+	// Water turbulence effect by joltz0r 2013-07-04, improved 2013-07-07\n\
+	float time = (uTime+timePlus) * .5+23.0;\n\
+    // uv should be the 0-1 uv of texture...\n\
+\n\
+	\n\
+\n\
+	vec2 uv = texCoord;\n\
+    \n\
+#ifdef SHOW_TILING\n\
+	vec2 p = mod(uv*TAU*2.0, TAU)-250.0;\n\
+#else\n\
+    vec2 p = mod(uv*TAU, TAU)-250.0;\n\
+#endif\n\
+	vec2 i = vec2(p);\n\
+	float c = 1.0;\n\
+	float inten = .005;\n\
+\n\
+	for (int n = 0; n < MAX_ITER; n++) \n\
+	{\n\
+		float t = time * (1.0 - (3.5 / float(n+1)));\n\
+		i = p + vec2(cos(t - i.x) + sin(t + i.y), sin(t - i.y) + cos(t + i.x));\n\
+		c += 1.0/length(vec2(p.x / (sin(i.x+t)/inten),p.y / (cos(i.y+t)/inten)));\n\
+	}\n\
+	c /= float(MAX_ITER);\n\
+	c = 1.17-pow(c, 1.4);\n\
+	vec3 colour = vec3(pow(abs(c), 8.0));\n\
+    colour = clamp(colour + vec3(0.0, 0.35, 0.5), 0.0, 1.0);\n\
+\n\
+	#ifdef SHOW_TILING\n\
+	// Flash tile borders...\n\
+	vec2 pixel = 2.0 / vec2(screenWidth, screenHeight);//iResolution.xy;\n\
+	uv *= 2.0;\n\
+\n\
+	float f = floor(mod(time*.5, 2.0)); 	// Flash value.\n\
+	vec2 first = step(pixel, uv) * f;		   	// Rule out first screen pixels and flash.\n\
+	uv  = step(fract(uv), pixel);				// Add one line of pixels per tile.\n\
+	colour = mix(colour, vec3(1.0, 1.0, 0.0), (uv.x + uv.y) * first.x * first.y); // Yellow line\n\
+	\n\
+	#endif\n\
+\n\
+	return colour;\n\
+}\n\
+\n\
 void main()\n\
 {           \n\
 	if(bIsMakingDepth)\n\
@@ -3695,7 +3756,7 @@ void main()\n\
 				L = normalize(lightPos - v3Pos);\n\
 				lambertian = max(dot(normal2, L), 0.0);\n\
 			}\n\
-			\n\
+			/*\n\
 			specular = 0.0;\n\
 			if(lambertian > 0.0)\n\
 			{\n\
@@ -3711,14 +3772,18 @@ void main()\n\
 					specular = 1.0;\n\
 				}\n\
 			}\n\
-			\n\
-			if(lambertian < 0.5)\n\
-			{\n\
-				lambertian = 0.5;\n\
-			}\n\
-			\n\
+			*/\n\
 			// test.\n\
 			lambertian += 0.3;\n\
+\n\
+			if(lambertian < 0.8)\n\
+			{\n\
+				lambertian = 0.8;\n\
+			}\n\
+			else if(lambertian > 1.1)\n\
+			{\n\
+				lambertian = 1.1;\n\
+			}\n\
 		}\n\
 		\n\
 		// check if apply ssao.\n\
@@ -3751,8 +3816,6 @@ void main()\n\
 				offset.xy /= offset.w;\n\
 				offset.xy = offset.xy * 0.5 + 0.5;  				\n\
 				float sampleDepth = -sample.z/far;// original.***\n\
-				////float sampleDepth = -sample.z/(far-near);// test.***\n\
-				////float sampleDepth = -sample.z/farForDepth;\n\
 \n\
 				float depthBufferValue = getDepth(offset.xy);\n\
 				/*\n\
@@ -3893,14 +3956,27 @@ void main()\n\
 				return;\n\
 			}\n\
 			\n\
+			\n\
+\n\
 			float minHeight_rainbow = -100.0;\n\
 			float maxHeight_rainbow = 0.0;\n\
 			float gray = (altitude - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);\n\
 			//float gray = (vAltitude - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);\n\
 			//vec3 rainbowColor = getRainbowColor_byHeight(altitude);\n\
-			\n\
-			//if(grayMeshAltitude * 1.1 < gray)\n\
-			//gray = grayMeshAltitude;\n\
+\n\
+			// caustics.*********************\n\
+			if(uTime > 0.0 && uTileDepth > 9 && altitude > -120.0)\n\
+			{\n\
+				// Take tileDepth 14 as the unitary tile depth.\n\
+				float tileDethDiff = float(16 - uTileDepth);\n\
+\n\
+				//vec2 cauticsTexCoord = texCoord*pow(2.0, tileDethDiff);\n\
+				vec2 cauticsTexCoord = texCoord;\n\
+				vec3 causticColor = causticColor(cauticsTexCoord);\n\
+				textureColor = vec4(mix(textureColor.rgb, causticColor, gray), externalAlpha);\n\
+			}\n\
+			// End caustics.--------------------------\n\
+\n\
 			\n\
 			if(gray < 0.05)\n\
 			gray = 0.05;\n\
@@ -3919,20 +3995,26 @@ void main()\n\
 				float gridLineWidth = getGridLineWidth(uTileDepth);\n\
 				if( fX < gridLineWidth || fX > 1.0-gridLineWidth)\n\
 				{\n\
-					gl_FragColor = vec4(0.99, 0.5, 0.5, 1.0);\n\
+					vec3 color = vec3(0.99, 0.5, 0.5);\n\
+					gl_FragColor = vec4(color.rgb* shadow_occlusion * lambertian, 1.0);\n\
 					return;\n\
 				}\n\
 				\n\
 				float fY = fract(texCoord.y * numSegs);\n\
 				if( fY < gridLineWidth|| fY > 1.0-gridLineWidth)\n\
 				{\n\
-					gl_FragColor = vec4(0.3, 0.5, 0.99, 1.0);\n\
+					vec3 color = vec3(0.3, 0.5, 0.99);\n\
+					gl_FragColor = vec4(color.rgb* shadow_occlusion * lambertian, 1.0);\n\
 					return;\n\
 				}\n\
 			}\n\
 			// End test drawing grid.---\n\
+			float specularReflectionCoef = 0.6;\n\
+			vec3 specularColor = vec3(0.8, 0.8, 0.8);\n\
 			vec4 finalColor = mix(textureColor, fogColor, 0.7); \n\
+			//gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian + specularReflectionCoef * specular * specularColor * shadow_occlusion, 1.0); // with specular.***\n\
 			gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian, 1.0); // original.***\n\
+			//gl_FragColor = vec4(fogColor.xyz * shadow_occlusion * lambertian, 1.0); // original.***\n\
 			return;\n\
 		}\n\
 		else{\n\

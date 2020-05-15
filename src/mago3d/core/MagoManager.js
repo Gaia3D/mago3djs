@@ -4499,7 +4499,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.uTileDepth_loc = gl.getUniformLocation(shader.program, "uTileDepth");
 	shader.altitude_loc = gl.getAttribLocation(shader.program, "altitude");
 	shader.uSeaOrTerrainType_loc = gl.getUniformLocation(shader.program, "uSeaOrTerrainType");
-	
+	//shader.uSsaoRadius_loc = gl.getUniformLocation(shader.program, "radius");
 	
 	// In fragment shader:
 	//uniform sampler2D diffuseTex;    // 0

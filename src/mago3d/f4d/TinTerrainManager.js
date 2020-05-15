@@ -313,8 +313,8 @@ TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager)
 			if (!tinTerrain.prepareTinTerrain(magoManager, this))
 			{ maxProcessCounter += 1; }
 		
-			//if (maxProcessCounter > 50)
-			//{ break; }
+			if (maxProcessCounter > 5)
+			{ break; }
 		}
 	}
 	else if (this.terrainType === CODE.magoEarthTerrainType.REALTIME)// Real time ElevationTerrain.
@@ -326,7 +326,7 @@ TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager)
 			if (!tinTerrain.prepareTinTerrainRealTimeElevation(magoManager, this))
 			{ maxProcessCounter += 1; }
 		
-			if (maxProcessCounter > 10)
+			if (maxProcessCounter > 5)
 			{ break; }
 		}
 	}
@@ -399,6 +399,20 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	
 	gl.uniform1i(currentShader.bIsMakingDepth_loc, bDepth); //. old. use uRenderType_loc = 0. ***
 	gl.uniform1i(currentShader.uRenderType_loc, 1);
+	//var time = magoManager.getCurrentTime()/1000.0;
+	/*
+	var time = new Date().getTime()/1000.0;
+	var fractionalTime = (time%1000);
+
+	if (this.timeRandomFactor === undefined)
+	{ this.timeRandomFactor = Math.random(); }
+
+	fractionalTime *= this.timeRandomFactor;
+	if (fractionalTime > 1000.0)
+	{ fractionalTime -= 1000.0; }
+
+	gl.uniform1f(currentShader.uTime_loc, fractionalTime);
+	*/
 	if (renderType === 1)
 	{
 		var tex = magoManager.texturesStore.getTextureAux1x1(); // provisional.
