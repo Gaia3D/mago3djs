@@ -186,6 +186,54 @@ TinTerrain.prototype.getPathName = function()
 	return this.depth.toString() + "\\" + this.X.toString() + "\\" + this.Y.toString();
 };
 
+TinTerrain.prototype.getPathInfo = function()
+{
+	return {z: this.depth.toString(), x: this.X.toString(), y: this.Y.toString()};
+};
+
+TinTerrain.prototype.checkValidTerrain = function()
+{
+	var pathInfo = this.getPathInfo();
+
+	var terrainInfoObject = this.tinTerrainManager.terrainTilesInfo;
+	var availables = terrainInfoObject.available;
+	
+	var valid = true;
+	var z = pathInfo.z;
+	var x = pathInfo.x;
+	var y = pathInfo.y;
+	for (var i=0, availableLen = availables.length; i<availableLen; i++) 
+	{
+		var available = availables[i];
+		if (!available.hasOwnProperty(z))
+		{
+			valid = false;
+			break;
+		}
+
+		var terrainInfos = available[z];
+
+		for (var j=0, infoLen=terrainInfos.length; j<infoLen; j++ ) 
+		{
+			var terrainInfo = terrainInfos[j];
+
+			var minx = terrainInfo.startX;
+			var miny = terrainInfo.startY;
+			var maxx = terrainInfo.endX;
+			var maxy = terrainInfo.endY;
+
+			if (x < minx || x>maxx || y<miny || y>maxy) 
+			{
+				valid = false;
+				break;
+			}
+		}
+	}
+
+	return valid;
+};
+
+
 /**
  * Returns the blending alpha value in current time.
  * 
@@ -343,6 +391,11 @@ TinTerrain.prototype.prepareTexture = function(texturesMap, imagerys, magoManage
 
 TinTerrain.prototype.prepareTinTerrainPlain = function(magoManager, tinTerrainManager)
 {
+	// first, read terrainTiles-info.json
+	if (!this.tinTerrainManager.terrainReady) 
+	{
+		return false;
+	}
 	// Earth considering as an ellipsoid (no elevation data of terrain).***
 	// This function 1- loads file & 2- parses file & 3- makes vbo.
 	// 1rst, check if the parent is prepared. If parent is not prepared, then prepare the parent.
@@ -353,7 +406,7 @@ TinTerrain.prototype.prepareTinTerrainPlain = function(magoManager, tinTerrainMa
 		magoManager.processQueue.eraseTinTerrainToDelete(this);
 		
 		// Prepare this tinTerrain.
-		this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED; 
+		this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 		if (this.fileLoadState === CODE.fileLoadState.PARSE_FINISHED && this.vboKeyContainer === undefined)
 		{
 			this.calculateCenterPosition();
@@ -380,6 +433,12 @@ TinTerrain.prototype.prepareTinTerrainPlain = function(magoManager, tinTerrainMa
 
 TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager)
 {
+	// first, read terrainTiles-info.json
+	if (!this.tinTerrainManager.terrainReady) 
+	{
+		return false;
+	}
+
 	// This function 1- loads file & 2- parses file & 3- makes vbo.
 	// 1rst, check if the parent is prepared. If parent is not prepared, then prepare the parent.
 	if (this.owner === undefined || this.owner.isPrepared())
@@ -390,6 +449,13 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 		// Prepare this tinTerrain.
 		if (this.fileLoadState === CODE.fileLoadState.READY)
 		{
+			//해당 터레인 xyz를 terrainInfo와 비교하여 유효한 파일이면 통과, 아닐시 plain으로 처리
+			if (!this.checkValidTerrain()) 
+			{
+				this.fileLoadState = CODE.fileLoadState.LOAD_FAILED;
+				return false;
+			}
+
 			var pathName = this.getPathName();
 			var geometryDataPath = magoManager.readerWriter.geometryDataPath;
 			var fileName = geometryDataPath + "/Terrain/" + pathName + ".terrain";

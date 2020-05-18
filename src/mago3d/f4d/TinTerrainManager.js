@@ -32,6 +32,8 @@ var TinTerrainManager = function(options)
 	var policy = MagoConfig.getPolicy();
 	this.terrainType = defaultValue(policy.terrainType, CODE.magoEarthTerrainType.PLAIN);
 	this.terrainValue = policy.terrainValue;
+	this.terrainReady = false;
+	this.terrainTilesInfo;
 	this.selectable = true;
 
 	if (this.terrainType !== CODE.magoEarthTerrainType.PLAIN && !this.terrainValue)
@@ -77,6 +79,7 @@ var TinTerrainManager = function(options)
 		{ this.bRenderSea = options.createSea; }
 	}
 };
+TinTerrainManager.INFO_FILE = 'terrainTiles-info.json';
 
 TinTerrainManager.prototype.getTerrainType = function()
 {
@@ -166,6 +169,33 @@ TinTerrainManager.prototype.init = function()
 	}
 	
 	this.makeDistanceLimitByDepth();
+
+	this.loadTerrainMeta();
+};
+
+TinTerrainManager.prototype.loadTerrainMeta = function() 
+{
+	var that = this;
+	if (that.terrainType === CODE.magoEarthTerrainType.ELEVATION && that.terrainValue && !that.terrainReady) 
+	{
+		var infoPath = that.terrainValue + TinTerrainManager.INFO_FILE;
+		var infoPromise = loadWithXhr(infoPath, undefined, undefined, 'json');
+
+		infoPromise.done(function(e)
+		{
+			/**
+			 * TODO : INFO JSON VALIDATE 추가해야함.
+			 */
+			that.terrainTilesInfo = e;
+			that.terrainReady = true;
+		},
+		function(f)
+		{
+			console.warn('Invalid or not exist ' + TinTerrainManager.INFO_FILE);
+			that.terrainType = CODE.magoEarthTerrainType.PLAIN;
+			that.terrainReady = true;
+		});
+	}
 };
 
 TinTerrainManager.prototype.makeTinTerrainWithDEMIndex = function()

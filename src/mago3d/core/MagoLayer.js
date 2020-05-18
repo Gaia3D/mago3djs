@@ -44,7 +44,8 @@ var MagoLayer = function(layer)
 	var latitude = layer.latitude;
 	var altitude = layer.altitude;
 
-	if(!isNaN(longitude) && !isNaN(latitude) && !isNaN(altitude)) {
+	if (!isNaN(longitude) && !isNaN(latitude) && !isNaN(altitude)) 
+	{
 		//
 	}
 	//datas
