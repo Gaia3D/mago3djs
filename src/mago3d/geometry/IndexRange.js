@@ -6,6 +6,7 @@
  * @exception {Error} Messages.CONSTRUCT_ERROR
  * 
  * @class IndexRange
+ * @constructor
  */
 var IndexRange = function() 
 {

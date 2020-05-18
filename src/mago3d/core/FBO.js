@@ -3,6 +3,8 @@
 /**
  * Frame Buffer Object
  * @class FBO
+ * @constructor
+ * 
  * @param {WebGLRenderingContext} gl WebGL rendering context.
  * @param {Number} width Framebuffer width.
  * @param {Number} height Framebuffer height.

@@ -3,6 +3,7 @@
 /**
  * Main Mago class.
  * @class MagoManager
+ * @constructor
  */
 var MagoManager = function() 
 {

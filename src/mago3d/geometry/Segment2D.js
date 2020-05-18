@@ -1,7 +1,8 @@
 'use strict';
 /**
  * 선분 생성을 위한 클래스
- *
+ * @class Segment2D
+ * @constructor
  * @param {Point2D} strPoint2D 시작 포인트
  * @param {Point2D} endPoint2D 종료 포인트
  */

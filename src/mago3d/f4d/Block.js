@@ -4,7 +4,7 @@
  * 블럭 모델
  * 
  * @class Block
- * 
+ * @constructor
  * @exception {Error} Messages.CONSTRUCT_ERROR
  * 아래 문서의 1.3 Models Folder의 항목 참조
  * @link https://github.com/Gaia3D/F4DConverter/blob/master/doc/F4D_SpecificationV1.pdf

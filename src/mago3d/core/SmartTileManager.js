@@ -4,6 +4,7 @@
  * 4분할 타일링 수행 및 타일 객체 보관 객체
  * 인스턴스 생성 시 mother tile 생성
  * @class SmartTileManager
+ * @constructor
  * 
  * @exception {Error} Messages.CONSTRUCT_ERROR
  * @see SmartTile

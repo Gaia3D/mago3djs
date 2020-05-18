@@ -53,6 +53,10 @@
       }
     }
     module.exports = Promise;
+    /**
+     * Common utilities
+     * @module Promise
+     */
     function Promise(fn) {
       if (typeof this !== "object") {
         throw new TypeError("Promises must be constructed via new");

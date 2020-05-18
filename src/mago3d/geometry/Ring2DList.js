@@ -1,6 +1,8 @@
 'use strict';
 /**
  * Ring2D 의 리스트 {@link Ring2D}
+ * @class Ring2DList
+ * @constructor
  */
 var Ring2DList = function() 
 {

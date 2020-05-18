@@ -4,6 +4,7 @@
  * @exception {Error} Messages.CONSTRUCT_ERROR
  * 
  * @class VtxProfile
+ * @constructor
  * 
  * @see VtxRing
  */

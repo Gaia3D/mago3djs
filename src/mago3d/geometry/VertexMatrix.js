@@ -10,6 +10,7 @@
  * @exception {Error} Messages.CONSTRUCT_ERROR
  * 
  * @class VertexMatrix
+ * @constructor
  */
 var VertexMatrix = function() 
 {

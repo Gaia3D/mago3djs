@@ -2,7 +2,7 @@
 /**
  * 같은 중심을 가진 튜브들의 모임. 우측과 같이 생긴 모양을 뜻함.-> ◎ 
  * @class ConcetricTubes
- * 
+ * @constructor
  * @param {Object} option 
  * @param {GeoLocationDataManager} geoLocDataManager Optional
  */

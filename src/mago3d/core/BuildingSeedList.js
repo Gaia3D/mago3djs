@@ -3,6 +3,7 @@
 /**
  * buildings seed list
  * @class BuildingSeedList
+ * @constructor
  */
 var BuildingSeedList = function() 
 {

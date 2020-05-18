@@ -3,6 +3,7 @@
 /**
  * buildings seed map
  * @class BuildingSeedMap
+ * @constructor
  */
 var BuildingSeedMap = function() 
 {

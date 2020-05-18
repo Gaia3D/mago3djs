@@ -27,7 +27,7 @@
     "gulp-jsdoc3": "^2.0.0",
     "gulp-rename": "^1.4.0",
     "gulp-uglify": "^3.0.2",
-    "jasmine-core": "^3.4.0",
+    "jasmine-core": "^3.5.0",
     "jshint": "^2.10.2",
     "jshint-stylish": "^2.2.1",
     "karma": "^4.4.1",

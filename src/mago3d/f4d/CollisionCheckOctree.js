@@ -3,6 +3,8 @@
 /**
  * CollisionCheckOctree class object. 
  * @class CollisionCheckOctree
+ * @constructor
+ * 
  * @param {CollisionCheckOctree} octreeOwner If octreeOwner is undefined, then this CollisionCheckOctree is the mother CollisionCheckOctree.
  */
 var CollisionCheckOctree = function(octreeOwner) 

@@ -3,6 +3,7 @@
 /**
  * Factory shaped object.
  * @class BasicFactory
+ * @constructor
  */
 var BasicFactory = function(factoryWidth, factoryLength, factoryHeight, options) 
 {

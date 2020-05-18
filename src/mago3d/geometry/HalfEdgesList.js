@@ -6,6 +6,7 @@
  * @exception {Error} Messages.CONSTRUCT_ERROR
  * 
  * @class HalfEdgesList
+ * @constructor
  */
 var HalfEdgesList = function() 
 {

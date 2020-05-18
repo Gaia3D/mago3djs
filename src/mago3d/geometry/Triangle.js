@@ -4,7 +4,7 @@
  * Triangle(삼각형)를 생성하기 위한 클래스
  * 
  * @class Triangle
- *  
+ * @constructor
  * @param {Vertex} vertex0
  * @param {Vertex} vertex1
  * @param {Vertex} vertex2

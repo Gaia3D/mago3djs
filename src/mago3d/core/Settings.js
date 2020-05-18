@@ -3,6 +3,7 @@
 /**
  * This class contains settings.
  * @class Settings
+ * @constructor
  */
 var Settings = function() 
 {

@@ -2,9 +2,9 @@
 /**
 * Vertex Profile List
 * @exception {Error} Messages.CONSTRUCT_ERROR
-
+*
 * @class VtxProfilesList
-
+* @constructor
 * @param {number} x not used
 * @param {number} y not used
 *

@@ -54,5 +54,5 @@
   "enableMemoryManagement":false,
   "insertDate":"",
   "terrainType":"elevation",
-  "terrainValue":"http://192.168.10.98:9998/tilesets/terrain/"
+  "terrainValue":"/f4d/terrain/"
 }

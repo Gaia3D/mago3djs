@@ -3,6 +3,7 @@
 /**
  * Tube.
  * @class Tube
+ * @constructor
  */
 var Tube = function(interiorRadius, exteriorRadius, height, options) 
 {

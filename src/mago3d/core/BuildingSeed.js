@@ -4,6 +4,7 @@
  * buildings seed.
  * Represent single building feature.
  * @class BuildingSeed
+ * @constructor
  */
 var BuildingSeed = function() 
 {

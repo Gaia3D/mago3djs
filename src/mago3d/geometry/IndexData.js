@@ -6,6 +6,7 @@
 *
 * @exception {Error} Messages.CONSTRUCT_ERROR
 * @class IndexData
+* @constructor
 *
 * @see Ring2D#getPolygon
 */

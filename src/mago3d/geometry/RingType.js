@@ -2,6 +2,7 @@
 
 /**
  * 링폴리곤의 형태를 정의
+ * @enum RingType
  */
 var RingType = {
 	/**

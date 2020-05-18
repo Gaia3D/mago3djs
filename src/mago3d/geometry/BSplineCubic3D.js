@@ -3,6 +3,7 @@
 /**
  * BSplineCubic3D represented in 3D
  * @class BSplineCubic3D
+ * @constructor
  */
 var BSplineCubic3D = function(options) 
 {

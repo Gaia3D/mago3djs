@@ -5,6 +5,7 @@
  * @exception {Error} Messages.CONSTRUCT_ERROR
  * 
  * @class Vertex
+ * @constructor
  * 
  * @param {Point3D} position vertex postion.
  */

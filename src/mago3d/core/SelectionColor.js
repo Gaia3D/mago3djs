@@ -3,6 +3,7 @@
 /**
  * This class is used for color code of GL
  * @class SelectionColor
+ * @constructor
  */
 var SelectionColor = function() 
 {

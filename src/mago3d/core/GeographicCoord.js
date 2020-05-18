@@ -3,6 +3,7 @@
 /**
  * This class represents the coordinate as geographic coordinate system
  * @class GeographicCoord
+ * @constructor
  */
 var GeographicCoord = function(lon, lat, alt) 
 {

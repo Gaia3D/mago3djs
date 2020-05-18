@@ -5,7 +5,7 @@
  * - 이 클래스는 Octree 클래스의 prepareModelReferencesListData 호출 통해 생성된다
  * 
  * @class BlocksList
- * 
+ * @constructor
  * @param {String} version
  * @exception {Error} Messages.CONSTRUCT_ERROR
  * 

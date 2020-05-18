@@ -65,7 +65,10 @@ var MagoModel = function(model, seed)
 
 MagoModel.prototype._calculate = function() 
 {
-	this.buildingSeed.geographicCoord.setLonLatAlt(this.geographicCoord.longitude, this.geographicCoord.latitude, this.geographicCoord.altitude);
+	var longitude = this.geographicCoord.longitude;
+	var latitude = this.geographicCoord.latitude;
+	var altitude = this.geographicCoord.altitude;
+	this.buildingSeed.geographicCoord.setLonLatAlt(longitude, latitude, altitude);
 	this.buildingSeed.rotationsDegree.set(this.rotationsDegree.pitch, this.rotationsDegree.roll, this.rotationsDegree.heading);
 
 	var tMatrix = this.getTmatrix();
@@ -84,16 +87,21 @@ MagoModel.prototype._calculate = function()
 	// calculate the geographicCoordOfTheBBox.***
 	if (tMatrix !== undefined)
 	{
-		if (this.mappingType.toLowerCase() === MagoModel.MAPPING_TYPE.ORIGIN)
+		var mappingType = this.mappingType.toLowerCase();
+
+		switch (mappingType)
 		{
+		case MagoModel.MAPPING_TYPE.BOUNDINGBOXCENTER : {
+			this.bbox.geographicCoord = new GeographicCoord();
+			this.bbox.geographicCoord.setLonLatAlt(longitude, latitude, height);
+			break;
+		}
+		case MagoModel.MAPPING_TYPE.ORIGIN : 
+		default : {
 			bboxCenterPoint = this.bbox.getCenterPoint(bboxCenterPoint);
 			var bboxCenterPointWorldCoord = tMatrix.transformPoint3D(bboxCenterPoint, bboxCenterPointWorldCoord);
 			this.bbox.geographicCoord = ManagerUtils.pointToGeographicCoord(bboxCenterPointWorldCoord, this.bbox.geographicCoord);
 		}
-		else if (this.mappingType.toLowerCase() === MagoModel.MAPPING_TYPE.BOUNDINGBOXCENTER)
-		{
-			this.bbox.geographicCoord = new GeographicCoord();
-			this.bbox.geographicCoord.setLonLatAlt(longitude, latitude, height);
 		}
 	}
 };

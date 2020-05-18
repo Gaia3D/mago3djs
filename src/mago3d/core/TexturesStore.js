@@ -3,6 +3,7 @@
 /**
  * Manages textures of the Mago3D.
  * @class TexturesStore
+ * @constructor
  */
 var TexturesStore = function(magoManager) 
 {
@@ -63,7 +64,8 @@ function isPowerOf2(number)
 
 /**
  * Handles the loaded image.
- * 
+ * @memberof window
+ * @static
  * @param {WebGLRenderingContext} gl WebGL rendering context.
  * @param {image} image 
  * @param {WebGLTexture} texture 

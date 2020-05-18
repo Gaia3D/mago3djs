@@ -1,7 +1,8 @@
 /**
   DataStream reads scalars, arrays and structs of data from an ArrayBuffer.
   It's like a file-like DataView on steroids.
-
+  @module DataStream
+  @constructor
   @param {ArrayBuffer} arrayBuffer ArrayBuffer to read from.
   @param {?Number} byteOffset Offset from arrayBuffer beginning for the DataStream.
   @param {?Boolean} endianness DataStream.BIG_ENDIAN or DataStream.LITTLE_ENDIAN (the default).

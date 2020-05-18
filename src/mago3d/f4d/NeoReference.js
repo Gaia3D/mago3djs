@@ -7,7 +7,7 @@
  * Geometry object. The real geometry data is a model, and this referenceObject has the model's index.
  * 
  * @class NeoReference
- * 
+ * @constructor
  * @exception {Error} Messages.CONSTRUCT_ERROR
  * 
  * 아래 문서 1.4 Reference Folder 참조

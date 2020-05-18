@@ -26,7 +26,6 @@ var Arc2D = function()
 
 /**
  * Set the center position of Arc2D.
- * @class Arc2D
  */
 Arc2D.prototype.deleteObjects = function()
 {
@@ -97,7 +96,6 @@ Arc2D.prototype.setStartPoint = function(x, y)
 
 /**
  * Set the start angle of the arc.
- * @class Arc2D
  */
 Arc2D.prototype.setEndPoint = function(x, y)
 {

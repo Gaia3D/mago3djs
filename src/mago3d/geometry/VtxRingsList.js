@@ -4,7 +4,7 @@
  * @exception {Error} Messages.CONSTRUCT_ERROR
  * 
  * @class VtxRing
- * 
+ * @constructor
  */
 var VtxRingsList = function() 
 {
