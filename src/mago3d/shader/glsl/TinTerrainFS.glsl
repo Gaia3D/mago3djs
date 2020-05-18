@@ -216,6 +216,8 @@ float getGridLineWidth(int depth)
 #define TAU 6.28318530718 // https://www.shadertoy.com/view/4sXfDj
 #define MAX_ITER 5 // https://www.shadertoy.com/view/4sXfDj
 
+// Water Caustics with BCC-Noise :https://www.shadertoy.com/view/wlc3zr
+
 vec3 causticColor(vec2 texCoord)
 {
 	// To avoid mosaic repetitions.******************
@@ -281,6 +283,15 @@ void main()
 		if(uRenderType == 2)
 		{
 			gl_FragColor = oneColor4; 
+			return;
+		}
+
+		if(uSeaOrTerrainType == 1)
+		{
+			//gl_FragColor = vec4(oneColor4.xyz * shadow_occlusion * lambertian, 0.5); // original.***
+			// Render a dot matrix in the sea surface.***
+			
+
 			return;
 		}
 
@@ -534,11 +545,11 @@ void main()
 		
 		if(altitude < 0.0)
 		{
-			if(uSeaOrTerrainType == 1)
-			{
-				gl_FragColor = vec4(oneColor4.xyz * shadow_occlusion * lambertian, 0.5); // original.***
-				return;
-			}
+			//if(uSeaOrTerrainType == 1)
+			//{
+			//	gl_FragColor = vec4(oneColor4.xyz * shadow_occlusion * lambertian, 0.5); // original.***
+			//	return;
+			//}
 			
 			
 
@@ -549,12 +560,13 @@ void main()
 			//vec3 rainbowColor = getRainbowColor_byHeight(altitude);
 
 			// caustics.*********************
-			if(uTime > 0.0 && uTileDepth > 9 && altitude > -120.0)
+			if(uTime > 0.0 && uTileDepth > 6 && altitude > -120.0)
 			{
+				// Active this code if want same size caustic effects for different tileDepths.***
 				// Take tileDepth 14 as the unitary tile depth.
-				float tileDethDiff = float(16 - uTileDepth);
-
+				//float tileDethDiff = float(16 - uTileDepth);
 				//vec2 cauticsTexCoord = texCoord*pow(2.0, tileDethDiff);
+				//-----------------------------------------------------------------------
 				vec2 cauticsTexCoord = texCoord;
 				vec3 causticColor = causticColor(cauticsTexCoord);
 				textureColor = vec4(mix(textureColor.rgb, causticColor, gray), externalAlpha);

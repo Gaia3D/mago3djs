@@ -3632,6 +3632,8 @@ float getGridLineWidth(int depth)\n\
 #define TAU 6.28318530718 // https://www.shadertoy.com/view/4sXfDj\n\
 #define MAX_ITER 5 // https://www.shadertoy.com/view/4sXfDj\n\
 \n\
+// Water Caustics with BCC-Noise :https://www.shadertoy.com/view/wlc3zr\n\
+\n\
 vec3 causticColor(vec2 texCoord)\n\
 {\n\
 	// To avoid mosaic repetitions.******************\n\
@@ -3697,6 +3699,15 @@ void main()\n\
 		if(uRenderType == 2)\n\
 		{\n\
 			gl_FragColor = oneColor4; \n\
+			return;\n\
+		}\n\
+\n\
+		if(uSeaOrTerrainType == 1)\n\
+		{\n\
+			//gl_FragColor = vec4(oneColor4.xyz * shadow_occlusion * lambertian, 0.5); // original.***\n\
+			// Render a dot matrix in the sea surface.***\n\
+			\n\
+\n\
 			return;\n\
 		}\n\
 \n\
@@ -3950,11 +3961,11 @@ void main()\n\
 		\n\
 		if(altitude < 0.0)\n\
 		{\n\
-			if(uSeaOrTerrainType == 1)\n\
-			{\n\
-				gl_FragColor = vec4(oneColor4.xyz * shadow_occlusion * lambertian, 0.5); // original.***\n\
-				return;\n\
-			}\n\
+			//if(uSeaOrTerrainType == 1)\n\
+			//{\n\
+			//	gl_FragColor = vec4(oneColor4.xyz * shadow_occlusion * lambertian, 0.5); // original.***\n\
+			//	return;\n\
+			//}\n\
 			\n\
 			\n\
 \n\
@@ -3965,12 +3976,13 @@ void main()\n\
 			//vec3 rainbowColor = getRainbowColor_byHeight(altitude);\n\
 \n\
 			// caustics.*********************\n\
-			if(uTime > 0.0 && uTileDepth > 9 && altitude > -120.0)\n\
+			if(uTime > 0.0 && uTileDepth > 6 && altitude > -120.0)\n\
 			{\n\
+				// Active this code if want same size caustic effects for different tileDepths.***\n\
 				// Take tileDepth 14 as the unitary tile depth.\n\
-				float tileDethDiff = float(16 - uTileDepth);\n\
-\n\
+				//float tileDethDiff = float(16 - uTileDepth);\n\
 				//vec2 cauticsTexCoord = texCoord*pow(2.0, tileDethDiff);\n\
+				//-----------------------------------------------------------------------\n\
 				vec2 cauticsTexCoord = texCoord;\n\
 				vec3 causticColor = causticColor(cauticsTexCoord);\n\
 				textureColor = vec4(mix(textureColor.rgb, causticColor, gray), externalAlpha);\n\

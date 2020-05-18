@@ -554,6 +554,13 @@ SmartTile.prototype.putObject = function(targetDepth, object, magoManager)
 				this.nativeObjects.vectorTypeArray.push(object);
 			}
 		}
+		else if (object instanceof GeographicCoord)
+		{
+			if (this.nativeObjects.pointTypeArray === undefined)
+			{ this.nativeObjects.pointTypeArray = []; }
+			
+			this.nativeObjects.pointTypeArray.push(object);
+		}
 		else if (object instanceof Excavation) 
 		{
 			this.nativeObjects.excavationsArray.push(object);
@@ -1001,6 +1008,10 @@ SmartTile.prototype.hasRenderables = function()
 	// check native objects.
 	var nativeObjects = this.nativeObjects;
 	if (nativeObjects.opaquesArray.length > 0 || nativeObjects.transparentsArray.length > 0 || nativeObjects.excavationsArray.length > 0 || nativeObjects.vectorTypeArray.length > 0)
+	{ return true; }
+
+	// Check geographicCoords.***
+	if (nativeObjects.pointTypeArray && nativeObjects.pointTypeArray.length > 0)
 	{ return true; }
 	
 	//if (this.objectsArray !== undefined && this.objectsArray.length > 0)

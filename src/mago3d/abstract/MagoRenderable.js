@@ -45,7 +45,8 @@ MagoRenderable.EVENT_TYPE = {
 
 MagoRenderable.OBJECT_TYPE = {
 	'MESH'       : 0,
-	'VECTORMESH' : 1
+	'VECTORMESH' : 1,
+	'POINTMESH'  : 2
 };
 
 /**

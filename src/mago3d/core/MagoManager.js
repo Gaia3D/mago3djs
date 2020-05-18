@@ -4998,6 +4998,8 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 		Array.prototype.push.apply(currVisibleNativeObjects.transparentsArray, nativeObjects.transparentsArray);
 		Array.prototype.push.apply(currVisibleNativeObjects.excavationsArray, nativeObjects.excavationsArray);
 		Array.prototype.push.apply(currVisibleNativeObjects.vectorTypeArray, nativeObjects.vectorTypeArray);
+		if (nativeObjects.pointTypeArray)
+		{ Array.prototype.push.apply(currVisibleNativeObjects.pointTypeArray, nativeObjects.pointTypeArray); }
 
 		if (lowestTile.isNeededToCreateGeometriesFromSeeds())
 		{

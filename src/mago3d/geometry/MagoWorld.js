@@ -847,6 +847,13 @@ MagoWorld.prototype.doTest__TerrainScanner = function()
 
 	var targetDepth = 10;
 	this.magoManager.modeler.addObject(terrainScanner, targetDepth);
+
+	// test adding geoCoords to objectsList.***
+	startGeoCoord.makeDefaultGeoLocationData();
+	endGeoCoord.makeDefaultGeoLocationData();
+	this.magoManager.modeler.addObject(startGeoCoord, targetDepth);
+	this.magoManager.modeler.addObject(endGeoCoord, targetDepth);
+
 };
 
 MagoWorld.prototype.doTest__ObjectMarker = function()

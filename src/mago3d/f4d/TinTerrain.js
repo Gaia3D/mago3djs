@@ -685,7 +685,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 				gl.uniform1i(currentShader.bApplySsao_loc, this.depth > 8); // apply ssao default.***
 
 				// Caustics.***************************************
-				var time = new Date().getTime()/1000.0;
+				var time = new Date().getTime()/(1000.0);
 				var fractionalTime = (time%1000);
 
 				if (this.timeRandomFactor === undefined)
@@ -933,9 +933,6 @@ TinTerrain.prototype.renderSea = function(currentShader, magoManager, bDepth, re
 				gl.uniform1f(currentShader.externalAlpha_loc, 1);
 				gl.uniform2fv(currentShader.uMinMaxAltitudes_loc, [-200.0, 1943.14]);
 				
-				
-
-
 				var textureKeys = Object.keys(this.texture);
 				var textureLength = textureKeys.length; 
 				for (var i=0;i<textureLength;i++) 

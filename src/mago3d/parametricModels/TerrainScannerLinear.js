@@ -13,6 +13,7 @@ var TerrainScannerLinear = function(geoCoordSegment)
 	}
 	
 	this.geoCoordSegment = geoCoordSegment;
+	//this.geoCoordsList;
 
 };
 
@@ -21,9 +22,14 @@ TerrainScannerLinear.prototype.constructor = TerrainScannerLinear;
 
 /**
  */
-TerrainScannerLinear.prototype.makeMesh = function()
+TerrainScannerLinear.prototype.makeMesh = function(magoManager)
 {
-	// Create 2 geoCoord objects to render.***
-	
+	//var geoCoordsArray = [];
+	//var renderableObject = GeographicCoordsList.getRenderableObjectOfGeoCoordsArray(geoCoordsArray, magoManager, options);
+
+	// create a vectorMesh segment.
+
+
 	var hola = 0;
 };
+

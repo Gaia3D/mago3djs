@@ -20,7 +20,8 @@ var VisibleObjectsController = function()
 		opaquesArray      : [],
 		transparentsArray : [],
 		excavationsArray  : [],
-		vectorTypeArray   : []
+		vectorTypeArray   : [],
+		pointTypeArray    : []
 	};
 	this.currentVisiblesToPrepare = [];
 	
@@ -39,7 +40,8 @@ VisibleObjectsController.prototype.initArrays = function()
 		opaquesArray      : [],
 		transparentsArray : [],
 		excavationsArray  : [],
-		vectorTypeArray   : []
+		vectorTypeArray   : [],
+		pointTypeArray    : []
 	};
 	this.currentVisiblesToPrepare = [];
 	
@@ -60,6 +62,7 @@ VisibleObjectsController.prototype.clear = function()
 	this.currentVisibleNativeObjects.transparentsArray.length = 0;
 	this.currentVisibleNativeObjects.excavationsArray.length = 0;
 	this.currentVisibleNativeObjects.vectorTypeArray.length = 0;
+	this.currentVisibleNativeObjects.pointTypeArray.length = 0;
 	this.currentVisiblesToPrepare.length = 0;
 	
 	
@@ -100,7 +103,8 @@ VisibleObjectsController.prototype.hasRenderables = function()
 		this.currentVisibleNativeObjects.opaquesArray.length > 0 ||
 		this.currentVisibleNativeObjects.transparentsArray.length > 0 ||
 		this.currentVisibleNativeObjects.excavationsArray.length > 0 ||
-		this.currentVisibleNativeObjects.vectorTypeArray.length > 0)
+		this.currentVisibleNativeObjects.vectorTypeArray.length > 0||
+		this.currentVisibleNativeObjects.pointTypeArray.length > 0)
 	{ return true; }
 	else
 	{ return false; }

@@ -961,6 +961,51 @@ Renderer.prototype.renderNativeObjects = function(gl, shader, renderType, visibl
 			// return to the current shader.
 			shader.useProgram();
 		}
+
+		// Test. Check pointsTypeObjectsArray. Test.***
+		var pointTypeObjectsArray = visibleObjControlerNodes.currentVisibleNativeObjects.pointTypeArray;
+		if (pointTypeObjectsArray)
+		{
+			var pointTypeObjectsCount = pointTypeObjectsArray.length;
+			if (pointTypeObjectsCount > 0)
+			{
+
+				// change shader. use "thickLines" shader.
+				//var sceneState = magoManager.sceneState;
+				var shaderLocal = magoManager.postFxShadersManager.getShader("pointsCloud"); // provisional. Use the currentShader of argument.
+				shaderLocal.useProgram();
+				shaderLocal.disableVertexAttribArrayAll();
+				shaderLocal.resetLastBuffersBinded();
+				shaderLocal.enableVertexAttribArray(shaderLocal.position3_loc);
+				shaderLocal.bindUniformGenerals();
+				
+				gl.uniform1i(shaderLocal.bPositionCompressed_loc, false);
+				gl.uniform1i(shaderLocal.bUse1Color_loc, true);
+				gl.uniform4fv(shaderLocal.oneColor4_loc, [1.0, 1.0, 0.1, 1.0]); //.
+				gl.uniform1f(shaderLocal.fixPointSize_loc, 5.0);
+				gl.uniform1i(shaderLocal.bUseFixPointSize_loc, 1);
+				
+				var bEnableDepth = true;
+				if (bEnableDepth === undefined)
+				{ bEnableDepth = true; }
+				
+				if (bEnableDepth)
+				{ gl.enable(gl.DEPTH_TEST); }
+				else
+				{ gl.disable(gl.DEPTH_TEST); }
+
+				// Render pClouds.
+				var geoCoord;
+				for (var i=0; i<pointTypeObjectsCount; i++)
+				{
+					geoCoord = pointTypeObjectsArray[i];
+					geoCoord.renderPoint(magoManager, shaderLocal, gl, renderType);
+				}
+				
+				// return to the current shader.
+				shader.useProgram();
+			}
+		}
 	}
 };
 
