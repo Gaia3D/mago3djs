@@ -277,6 +277,7 @@ var MagoManager = function()
 
 	this.currentProcess = CODE.magoCurrentProcess.Unknown;
 
+	this.interactions = new InteractionCollection(this);
 };
 MagoManager.prototype = Object.create(Emitter.prototype);
 MagoManager.prototype.constructor = MagoManager;
@@ -286,6 +287,8 @@ MagoManager.EVENT_TYPE = {
 	'DBCLICK'                	: 'dbclick',
 	'RIGHTCLICK'             	: 'rightclick',
 	'MOUSEMOVE'              	: 'mousemove',
+	'LEFTDOWN'           					: 'leftdown',
+	'LEFTUP'             					: 'leftup',
 	'SMARTTILELOADSTART'     	: 'smarttileloadstart',
 	'SMARTTILELOADEND'       	: 'smarttileloadend',
 	'F4DLOADSTART'          		: 'f4dloadstart',
@@ -2165,6 +2168,16 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
 		
 		this.saveHistoryObjectMovement(this.objectSelected, nodeSelected);
 	}
+
+	var eventCoordinate = ManagerUtils.getComplexCoordinateByScreenCoord(this.getGl(), mouseX, mouseY, undefined, undefined, undefined, this);
+	if (eventCoordinate) 
+	{
+		this.emit(MagoManager.EVENT_TYPE.LEFTUP, {
+			type      : MagoManager.EVENT_TYPE.LEFTUP,
+			point     : eventCoordinate,
+			timestamp : new Date()
+		});
+	}
 	
 	/*if (!this.isCameraMoving) 
 	{
@@ -2877,6 +2890,17 @@ MagoManager.prototype.mouseActionLeftDown = function(mouseX, mouseY)
 	this.mouseLeftDown = true;
 	//this.isCameraMoving = true;
 	MagoWorld.updateMouseStartClick(mouseX, mouseY, this);
+
+	var eventCoordinate = ManagerUtils.getComplexCoordinateByScreenCoord(this.getGl(), mouseX, mouseY, undefined, undefined, undefined, this);
+	if (eventCoordinate) 
+	{
+		this.emit(MagoManager.EVENT_TYPE.LEFTDOWN, {
+			type      : MagoManager.EVENT_TYPE.LEFTDOWN,
+			point     : eventCoordinate,
+			timestamp : new Date()
+		});
+	}
+	
 	this.setBPicking(mouseX, mouseY);
 };
 

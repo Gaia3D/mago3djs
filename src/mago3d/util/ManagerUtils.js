@@ -842,7 +842,8 @@ ManagerUtils.screenCoordToWorldCoord = function(gl, pixelX, pixelY, resultWCPos,
 	else/* if (magoManager.configInformation.basicGlobe === Constant.MAGOWORLD)*/
 	{
 		// todo:
-		
+		var camCoord = MagoWorld.screenToCamCoord(pixelX, pixelY, magoManager);
+		return ManagerUtils.cameraCoordPositionToWorldCoord(camCoord, undefined, magoManager);
 	}
 };
 
