@@ -874,12 +874,14 @@ MagoWorld.prototype.doTest__MagoRectangle = function()
 	var style = {
 		strokeWidth : 2,
 		strokeColor : '#000000',
-		fillColor : '#FFFFFF',
-		imageUrl : 'BLABLA',
-		opacity : 1,
-	}
+		fillColor   : '#FFFFFF',
+		imageUrl    : 'BLABLA',
+		opacity     : 1,
+	};
 
 	var magoRect = new MagoRectangle(options, style);
+	magoRect.setOneColor(0.5, 1.0, 0.8);
+
 
 
 	var targetDepth = 10;

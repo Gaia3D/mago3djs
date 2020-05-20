@@ -41,6 +41,18 @@ var MagoRectangle = function(options)
 		}
 		// Check if exist material (texture).
 	}
+    
+	var resultGeographicCoord;
+	resultGeographicCoord = GeographicCoord.getMidPoint(this.minGeographicCoord, this.maxGeographicCoord, resultGeographicCoord);
+    
+	var geoLocDataManager = new GeoLocationDataManager();
+	var geoLocData = geoLocDataManager.newGeoLocationData();
+	geoLocData = ManagerUtils.calculateGeoLocationData(resultGeographicCoord.longitude, resultGeographicCoord.latitude, resultGeographicCoord.altitude, undefined, undefined, undefined, geoLocData);
+	// set the geoLocDataManager of the terrainScanner.
+	this.geoLocDataManager = geoLocDataManager;
+    
+	// Note: the cartesianCoords are rotated, so :
+	geoLocData.rotMatrix.Identity();
 };
 
 MagoRectangle.prototype = Object.create(MagoRenderable.prototype);
@@ -161,21 +173,10 @@ MagoRectangle.prototype.makeMesh = function(magoManager)
 	this.southVertexCount = this.southIndices.length;
 	this.eastVertexCount = this.eastIndices.length;
 	this.northVertexCount = this.northIndices.length;
-	
-	// Calculate buildingPosHIGH & buildingPosLOW.************************************************************************************
-	var resultGeographicCoord;
-	resultGeographicCoord = GeographicCoord.getMidPoint(this.minGeographicCoord, this.maxGeographicCoord, resultGeographicCoord);
-    
-	var geoLocDataManager = new GeoLocationDataManager();
-	var geoLocData = geoLocDataManager.newGeoLocationData();
-	geoLocData = ManagerUtils.calculateGeoLocationData(resultGeographicCoord.longitude, resultGeographicCoord.latitude, resultGeographicCoord.altitude, undefined, undefined, undefined, geoLocData);
-	// set the geoLocDataManager of the terrainScanner.
-	this.geoLocDataManager = geoLocDataManager;
-    
-	// Note: the cartesianCoords are rotated, so :
-	geoLocData.rotMatrix.Identity();
-    
-	// Make vbos.*** Make vbos.*** Make vbos.*** Make vbos.*** Make vbos.*** Make vbos.*** Make vbos.*** Make vbos.*** Make vbos.*** Make vbos.***
+
+    // Make vbos.*** Make vbos.*** Make vbos.*** Make vbos.*** Make vbos.*** Make vbos.*** Make vbos.*** Make vbos.*** Make vbos.*** Make vbos.***
+    var geoLocData = this.geoLocDataManager.getCurrentGeoLocationData();
+
 	if (this.cartesiansArray === undefined)
 	{ return; }
 
