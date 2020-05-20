@@ -73,7 +73,7 @@ var Policy = function()
 	
 	this.ssaoRadius = 0.15;
 
-	this.modelMovable = false;
+	this.modelMovable = true;
 	
 	var policy = MagoConfig.getPolicy();
 	// PointsCloud.

@@ -15,6 +15,8 @@ var MagoWorld = function(magoManager)
 	}
 	
 	this.magoManager = magoManager;
+
+	this.enableDrag = true;
 	
 	// Set the start position of the camera.***
 	/*
@@ -342,6 +344,7 @@ MagoWorld.prototype.mousemove = function(event)
 	// Check if is dragging.
 	if (magoManager.mustCheckIfDragging) 
 	{
+		//first check enable drag
 		if (magoManager.isDragging()) 
 		{
 			magoManager.mouseDragging = true;
