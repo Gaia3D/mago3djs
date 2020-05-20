@@ -2691,7 +2691,6 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		if (eventCoordinate) 
 		{
 			this.emit(MagoManager.EVENT_TYPE.CLICK, {type: MagoManager.EVENT_TYPE.CLICK, clickCoordinate: eventCoordinate, timestamp: this.getCurrentTime()});
-
 		}
 	}
 
@@ -3373,6 +3372,8 @@ MagoManager.prototype.moveSelectedObjectGeneral = function(gl, object)
  */
 MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl) 
 {
+	if (!this.magoPolicy.isModelMovable()) { return; }
+
 	var currSelected = this.selectionManager.getSelectedGeneral();
 	var currSelectedClassName = "";
 	if (currSelected)

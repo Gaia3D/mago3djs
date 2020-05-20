@@ -191,7 +191,7 @@ TinTerrain.prototype.getPathInfo = function()
 	return {z: this.depth.toString(), x: this.X.toString(), y: this.Y.toString()};
 };
 
-TinTerrain.prototype.checkValidTerrain = function()
+TinTerrain.prototype.checkAvailableTerrain = function()
 {
 	var pathInfo = this.getPathInfo();
 
@@ -450,7 +450,7 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 		if (this.fileLoadState === CODE.fileLoadState.READY)
 		{
 			//해당 터레인 xyz를 terrainInfo와 비교하여 유효한 파일이면 통과, 아닐시 plain으로 처리
-			if (!this.checkValidTerrain()) 
+			if (!this.checkAvailableTerrain()) 
 			{
 				this.fileLoadState = CODE.fileLoadState.LOAD_FAILED;
 				return false;

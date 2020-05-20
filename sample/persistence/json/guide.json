@@ -1,0 +1,43 @@
+{
+    "attributes": {
+    "isPhysical": false
+    },
+    "data_key":"guide",
+    "data_name":"guide",
+    "children": [
+    {
+        "attributes": {
+            "isPhysical": true,
+            "nodeType": "daejeon",
+            "flipYTexCoords": true
+        },
+        "children": [],
+        "data_key": "SOCIALROOM",
+        "data_name": "SOCIALROOM",
+        "mapping_type":"origin",
+        "longitude": 128.917656,
+        "latitude": 35.139482,
+        "height": 14.177629,
+        "heading": 0.000000,
+        "pitch": 0.000000,
+        "roll": 0.000000
+    },
+    {
+        "attributes": {
+            "isPhysical": true,
+            "nodeType": "daejeon",
+            "flipYTexCoords": true
+        },
+        "children": [],
+        "data_key": "STUDENTROOM",
+        "data_name": "STUDENTROOM",
+        "mapping_type":"origin",
+        "longitude": 128.927656,
+        "latitude": 35.138482,
+        "height": 14.177629,
+        "heading": 0.000000,
+        "pitch": 0.000000,
+        "roll": 0.000000
+    }
+    ]
+    }
