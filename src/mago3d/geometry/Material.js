@@ -4,7 +4,7 @@
  * This is a material.
  * @class Material
  */
-var Material = function(name) 
+var Material = function(name, options) 
 {
 	if (!(this instanceof Material)) 
 	{
@@ -20,4 +20,13 @@ var Material = function(name)
 	
 	this.diffuseTexture; // class Texture.
 	this.color4;
+};
+
+Material.prototype.setDiffuseTextureUrl = function(url)
+{
+	if (this.diffuseTexture === undefined)
+	{ this.diffuseTexture = new Texture(); }
+
+	this.diffuseTexture.url = url;
+
 };

@@ -160,9 +160,10 @@ function getNormalCartesiansArray(cartesiansArray, indicesArray, resultNormalCar
 			area: 0
 		};
 		normal = calculateNormal(point_1, point_2, point_3, undefined, resultObject);
-		normal.x *= resultObject.area;
-		normal.y *= resultObject.area;
-		normal.z *= resultObject.area;
+		var area = resultObject.area/1000.0;
+		normal.x *= area;
+		normal.y *= area;
+		normal.z *= area;
 
 		// test calculate triangle perimeter to ponderate the normal.
 		//var perimeter = point_1.squareDistTo(point_2.x, point_2.y, point_2.z) + point_2.squareDistTo(point_3.x, point_3.y, point_3.z) + point_3.squareDistTo(point_1.x, point_1.y, point_1.z);

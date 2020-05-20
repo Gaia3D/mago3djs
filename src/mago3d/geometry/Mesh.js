@@ -861,18 +861,40 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive, i
 		if (!isSelected)
 		{
 			// Color render.***
-			if (this.material !== undefined && this.material.diffuseTexture !== undefined && this.material.diffuseTexture.texId !== undefined)
+			var textureBinded = false;
+			var material = this.material;
+			if (material !== undefined)
 			{
-				var texture = this.material.diffuseTexture;
-				gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
-				if (shader.last_tex_id !== texture.texId) 
+				var diffuseTexture = material.diffuseTexture;
+				if (diffuseTexture !== undefined)
 				{
-					gl.activeTexture(gl.TEXTURE2);
-					gl.bindTexture(gl.TEXTURE_2D, texture.texId);
-					shader.last_tex_id = texture.texId;
+					if (diffuseTexture.texId !== undefined)
+					{
+						gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
+						if (shader.last_tex_id !== diffuseTexture.texId) 
+						{
+							gl.activeTexture(gl.TEXTURE2);
+							gl.bindTexture(gl.TEXTURE_2D, diffuseTexture.texId);
+							shader.last_tex_id = diffuseTexture.texId;
+							textureBinded = true;
+						}
+					}
+					else 
+					{
+						// check texture fileLoadState.
+						if (diffuseTexture.fileLoadState === CODE.fileLoadState.READY)
+						{
+							// proceed to load texture image.
+							var url = diffuseTexture.url;
+							var flipYTexCoord = false;
+							TexturesManager.loadTexture(url, diffuseTexture, magoManager, flipYTexCoord);
+							return;
+						}
+					}
 				}
 			}
-			else if (this.color4)
+			
+			if (!textureBinded && this.color4)
 			{ 
 				gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 				gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, this.color4.a]); 

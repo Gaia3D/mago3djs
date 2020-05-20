@@ -889,11 +889,11 @@ MagoWorld.prototype.doTest__MagoRectangle = function()
 	};
 
 	var style = {
-		strokeWidth : 2,
-		strokeColor : '#000000',
-		fillColor   : '#FFFFFF',
-		imageUrl    : 'BLABLA',
-		opacity     : 1,
+		strokeWidth     : 2,
+		strokeColor     : '#000000',
+		fillColor       : '#FFFFFF',
+		diffuseImageUrl : '/images/materialImages//factoryRoof.jpg',
+		opacity         : 1,
 	};
 
 	var magoRect = new MagoRectangle(position, style);

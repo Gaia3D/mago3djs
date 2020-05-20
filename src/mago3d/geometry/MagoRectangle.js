@@ -26,6 +26,8 @@ var MagoRectangle = function(position, style)
 	 */
 	this.maxGeographicCoord;
     
+	this.style;
+    
 	if (position)
 	{
 		var altitude = position.altitude;
@@ -40,6 +42,11 @@ var MagoRectangle = function(position, style)
 			this.maxGeographicCoord = new GeographicCoord(position.maxLongitude, position.maxLatitude, altitude);
 		}
 		// Check if exist material (texture).
+	}
+    
+	if (style)
+	{
+		this.style = style;
 	}
     
 	// Calculate geoLocationData.
@@ -218,6 +225,14 @@ MagoRectangle.prototype.makeMesh = function(magoManager)
 	// Create a mesh.*******************************************************************************
 	var mesh = new Mesh();
 	mesh.vboKeysContainer = vboKeyContainer;
+    
+	// assign style to mesh.
+	mesh.material = new Material();
+	if (this.style.diffuseImageUrl)
+	{
+		var imagesPath = this.style.diffuseImageUrl;
+		mesh.material.setDiffuseTextureUrl(imagesPath);
+	}
 
 	this.objectsArray.push(mesh);
     

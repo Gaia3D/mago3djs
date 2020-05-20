@@ -21,6 +21,7 @@ var Texture = function()
 	this.imageBinaryData;
 	this.imageWidth = 32;
 	this.imageHeight = 32;
+	this.url;
 };
 
 /**
