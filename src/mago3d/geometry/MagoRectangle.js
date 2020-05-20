@@ -6,7 +6,7 @@
  * @class MagoRectangle
  * @constructor
  */
-var MagoRectangle = function(options) 
+var MagoRectangle = function(position, style) 
 {
 	MagoRenderable.call(this);
 	if (!(this instanceof MagoRectangle)) 
@@ -26,22 +26,23 @@ var MagoRectangle = function(options)
 	 */
 	this.maxGeographicCoord;
     
-	if (options)
+	if (position)
 	{
-		var altitude = options.altitude;
+		var altitude = position.altitude;
         
-		if (options.minLongitude && options.minLatitude)
+		if (position.minLongitude && position.minLatitude)
 		{
-			this.minGeographicCoord = new GeographicCoord(options.minLongitude, options.minLatitude, altitude);
+			this.minGeographicCoord = new GeographicCoord(position.minLongitude, position.minLatitude, altitude);
 		}
 
-		if (options.maxLongitude && options.maxLatitude)
+		if (position.maxLongitude && position.maxLatitude)
 		{
-			this.maxGeographicCoord = new GeographicCoord(options.maxLongitude, options.maxLatitude, altitude);
+			this.maxGeographicCoord = new GeographicCoord(position.maxLongitude, position.maxLatitude, altitude);
 		}
 		// Check if exist material (texture).
 	}
     
+	// Calculate geoLocationData.
 	var resultGeographicCoord;
 	resultGeographicCoord = GeographicCoord.getMidPoint(this.minGeographicCoord, this.maxGeographicCoord, resultGeographicCoord);
     
@@ -174,8 +175,8 @@ MagoRectangle.prototype.makeMesh = function(magoManager)
 	this.eastVertexCount = this.eastIndices.length;
 	this.northVertexCount = this.northIndices.length;
 
-    // Make vbos.*** Make vbos.*** Make vbos.*** Make vbos.*** Make vbos.*** Make vbos.*** Make vbos.*** Make vbos.*** Make vbos.*** Make vbos.***
-    var geoLocData = this.geoLocDataManager.getCurrentGeoLocationData();
+	// Make vbos.*** Make vbos.*** Make vbos.*** Make vbos.*** Make vbos.*** Make vbos.*** Make vbos.*** Make vbos.*** Make vbos.*** Make vbos.***
+	var geoLocData = this.geoLocDataManager.getCurrentGeoLocationData();
 
 	if (this.cartesiansArray === undefined)
 	{ return; }

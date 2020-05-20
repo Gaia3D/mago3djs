@@ -101,6 +101,16 @@ MagoRenderable.prototype.dispatchEvent = function(type, magoManager)
 	}
 };
 
+MagoRenderable.prototype.init = function(magoManager) 
+{
+	// todo:
+};
+
+MagoRenderable.prototype.deleteObjects = function(magoManager) 
+{
+	// todo:
+};
+
 MagoRenderable.prototype.getRootOwner = function() 
 {
 	if (this.owner === undefined)

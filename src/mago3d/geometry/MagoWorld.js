@@ -880,7 +880,7 @@ MagoWorld.prototype.doTest__TerrainScanner = function()
 MagoWorld.prototype.doTest__MagoRectangle = function()
 {
 	// create a magoRectangle.***
-	var options = {
+	var position = {
 		minLongitude : 126.31394,
 		minLatitude  : 33.18262,
 		maxLongitude : 126.34513,
@@ -896,7 +896,7 @@ MagoWorld.prototype.doTest__MagoRectangle = function()
 		opacity     : 1,
 	};
 
-	var magoRect = new MagoRectangle(options, style);
+	var magoRect = new MagoRectangle(position, style);
 	magoRect.setOneColor(0.5, 1.0, 0.8);
 
 
