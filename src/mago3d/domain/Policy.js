@@ -72,6 +72,8 @@ var Policy = function()
 	this.specularColor = new Float32Array([0.6, 0.6, 0.6]);
 	
 	this.ssaoRadius = 0.15;
+
+	this.modelMovable = true;
 	
 	var policy = MagoConfig.getPolicy();
 	// PointsCloud.
@@ -398,4 +400,12 @@ Policy.prototype.getSsaoRadius = function()
 Policy.prototype.setSsaoRadius = function(ssaoRadius) 
 {
 	this.ssaoRadius = ssaoRadius;
+};
+Policy.prototype.setModelMovable = function(movable)
+{
+	this.modelMovable = movable;
+};
+Policy.prototype.isModelMovable = function()
+{
+	return this.modelMovable;
 };
