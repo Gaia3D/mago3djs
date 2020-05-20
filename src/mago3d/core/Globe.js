@@ -774,6 +774,36 @@ Globe.geographicRadianArrayToFloat32ArrayWgs84 = function(lonArray, latArray, al
 	return resultCartesianArray;
 };
 
+/**
+ * Returns the arc distance between the geographic coords.
+ * @param {GeographicCoord} startGeoCoord.
+ * @param {GeographicCoord} endGeoCoord.
+ */
+Globe.getArcDistanceBetweenGeographicCoords = function(startGeoCoord, endGeoCoord)
+{
+	// calculate the arc-perimeter in meters.
+	var degToRad = Math.PI/180.0;
+
+	// take the earth radius at middle latitude.
+	var midLat = ( startGeoCoord.latitude + endGeoCoord.latitude ) / 2.0;
+	var earthRadius = Globe.radiusAtLatitudeDeg(midLat);
+
+	var lonDifRad = (endGeoCoord.longitude - startGeoCoord.longitude)*degToRad;
+	var latDifRad = (endGeoCoord.latitude - startGeoCoord.latitude)*degToRad;
+	var latRad1 = startGeoCoord.latitude*degToRad;
+	var latRad2 = endGeoCoord.latitude*degToRad;
+
+	var sinDLon = Math.sin(lonDifRad/2.0);
+	var sinDLat = Math.sin(latDifRad/2.0);
+
+	var a = sinDLat * sinDLat + sinDLon * sinDLon * Math.cos(latRad1) * Math.cos(latRad2);
+	var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1.0 - a));
+
+	var distMeters = earthRadius * c;
+
+	return distMeters;
+};
+
 
 		
 		

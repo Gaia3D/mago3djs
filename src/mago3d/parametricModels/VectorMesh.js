@@ -53,9 +53,11 @@ VectorMesh.prototype.renderAsChild = function (magoManager, shader, renderType, 
 		}
 	}
 
+	//---------------------------------------------------------------------------
 	gl.depthMask(depthMask);
 	this.render(magoManager, shader, renderType, glPrimitive, isSelected);
 	gl.depthMask(true);
+	//---------------------------------------------------------------------------
 
 };
 

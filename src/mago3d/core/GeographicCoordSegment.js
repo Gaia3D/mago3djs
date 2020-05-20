@@ -64,6 +64,7 @@ GeographicCoordSegment.calculateHeadingAngRadToNorthOfSegment = function(geoCoor
  */
 GeographicCoordSegment.getLengthInMeters = function(geoCoordSegment, magoManager) 
 {
+	// Note: this calculates the linear distance.
 	var strGeoCoord = geoCoordSegment.strGeoCoord;
 	var endGeoCoord = geoCoordSegment.endGeoCoord;
 	
@@ -179,6 +180,44 @@ GeographicCoordSegment.getNearestGeoCoord = function(geoCoordSegment, geoCoord)
 	{ return strGeoCoord; }
 	else
 	{ return endGeoCoord; }
+};
+
+/**
+ * Returns the nearest geoCoord of this segment to ""geoCoord.
+ * @param {GeographicCoord} geoCoord.
+ */
+GeographicCoordSegment.getArcInterpolatedGeoCoords = function(startGeoCoord, endGeoCoord, maxDist, resultInterpolatedGeoCoordsArray) 
+{
+	// check maxDist.
+	if (maxDist === undefined)
+	{ maxDist = 2000.0; } // 2km.
+
+	// calculate the arc-perimeter in meters.
+	var segmentArcLength = Globe.getArcDistanceBetweenGeographicCoords(startGeoCoord, endGeoCoord);
+	var segmentsCount = Math.ceil(segmentArcLength/maxDist);
+
+	var strLon = startGeoCoord.longitude;
+	var strLat = startGeoCoord.latitude;
+	var strAlt = startGeoCoord.altitude;
+
+	var lonDif = endGeoCoord.longitude - strLon;
+	var latDif = endGeoCoord.latitude - strLat;
+	var altDif = endGeoCoord.altitude - strAlt;
+
+	var increLon = lonDif/segmentsCount;
+	var increLat = latDif/segmentsCount;
+	var increAlt = altDif/segmentsCount;
+
+	if (resultInterpolatedGeoCoordsArray === undefined)
+	{ resultInterpolatedGeoCoordsArray = []; }
+
+	for (var i=0; i<segmentsCount+1; i++)
+	{
+		var geoCoord = new GeographicCoord(strLon+(increLon*i), strLat+(increLat*i), strAlt+(increAlt*i));
+		resultInterpolatedGeoCoordsArray.push(geoCoord);
+	}
+
+	return resultInterpolatedGeoCoordsArray;
 };
 
 

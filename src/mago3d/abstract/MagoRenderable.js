@@ -141,7 +141,7 @@ MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPr
 	}
 
 	if (this.dirty)
-	{ this.makeMesh(); }
+	{ this.makeMesh(magoManager); }
 	
 	if (this.objectsArray.length === 0)
 	{ return false; }
@@ -202,7 +202,7 @@ MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPr
 MagoRenderable.prototype.renderAsChild = function(magoManager, shader, renderType, glPrimitive, bIsSelected, options, bWireframe) 
 {
 	if (this.dirty)
-	{ this.makeMesh(); }
+	{ this.makeMesh(magoManager); }
 
 	// Set geoLocation uniforms.***
 	var gl = magoManager.getGl();
@@ -279,7 +279,43 @@ MagoRenderable.prototype.renderAsChild = function(magoManager, shader, renderTyp
 	var objectsCount = this.objectsArray.length;
 	for (var i=0; i<objectsCount; i++)
 	{
-		this.objectsArray[i].renderAsChild(magoManager, shader, renderType, glPrimitive, bIsSelected, options, bWireframe);
+		var object = this.objectsArray[i];
+		if (object instanceof VectorMesh)
+		{
+			var shaderThickLine = magoManager.postFxShadersManager.getShader("thickLine");
+			shaderThickLine.useProgram();
+			shaderThickLine.bindUniformGenerals();
+			var gl = magoManager.getGl();
+
+			gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
+			gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+			gl.disable(gl.CULL_FACE);
+			
+			gl.enableVertexAttribArray(shaderThickLine.prev_loc);
+			gl.enableVertexAttribArray(shaderThickLine.current_loc);
+			gl.enableVertexAttribArray(shaderThickLine.next_loc);
+			
+			var geoLocData = this.geoLocDataManager.getCurrentGeoLocationData();
+			geoLocData.bindGeoLocationUniforms(gl, shaderThickLine);
+
+			var sceneState = magoManager.sceneState;
+			var drawingBufferWidth = sceneState.drawingBufferWidth;
+			var drawingBufferHeight = sceneState.drawingBufferHeight;
+			if (this.wireframeColor4)
+			{ gl.uniform4fv(shaderThickLine.oneColor4_loc, [this.wireframeColor4.r, this.wireframeColor4.g, this.wireframeColor4.b, this.wireframeColor4.a]); }
+			else
+			{ gl.uniform4fv(shaderThickLine.oneColor4_loc, [0.2, 0.4, 0.9, 1.0]); }
+			gl.uniform2fv(shaderThickLine.viewport_loc, [drawingBufferWidth[0], drawingBufferHeight[0]]);
+
+			object.renderAsChild(magoManager, shaderThickLine, renderType, glPrimitive, bIsSelected, options, bWireframe);
+
+			// Return to the currentShader.
+			shader.useProgram();
+		}
+		else
+		{
+			object.renderAsChild(magoManager, shader, renderType, glPrimitive, bIsSelected, options, bWireframe);
+		}
 	}
 	
 	gl.disable(gl.BLEND);
@@ -287,7 +323,7 @@ MagoRenderable.prototype.renderAsChild = function(magoManager, shader, renderTyp
 	this.dispatchEvent('RENDER_END', magoManager);
 };
 
-MagoRenderable.prototype.makeMesh = function() 
+MagoRenderable.prototype.makeMesh = function(magoManager) 
 {
 	return abstract();
 };

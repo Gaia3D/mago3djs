@@ -1256,6 +1256,20 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 	var sphereExtentAux = this.sphereExtent;
 
 	var currDepth = this.depth;
+
+	// Test frustumCulling.***************************************************
+	//this.intersectionType = frustum.intersectionSphere(this.sphereExtent);
+	//if (this.intersectionType === Constant.INTERSECTION_OUTSIDE)
+	//{ return; }
+	//else if (this.intersectionType === Constant.INTERSECTION_INSIDE)
+	//{
+	//	resultFullyIntersectedTilesArray.push(this);
+	//	return;
+	//}
+	//else if (this.intersectionType === Constant.INTERSECTION_INTERSECT)
+	//{
+	//}
+	// End frustumCulling.--------------------------------------------------
 	
 	// check distance to camera.
 	this.distToCam = camPos.distToSphere(sphereExtentAux);
@@ -1265,7 +1279,6 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 	{
 		// finish the process.
 		this.visible = true;
-		//visibleTilesArray.push(this);
 		this.putObjectToArraySortedByDist(visibleTilesArray, this);
 		
 		// Now, extract all lowest-child and put into "noVisibleTilesArray".***
@@ -1282,6 +1295,13 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 	
 	if (currDepth < maxDepth)
 	{
+		if (!this.isPrepared())
+		{
+			this.visible = true;
+			this.putObjectToArraySortedByDist(visibleTilesArray, this);
+			return;
+		}
+
 		// must descend.
 		var curX = this.X;
 		var curY = this.Y;

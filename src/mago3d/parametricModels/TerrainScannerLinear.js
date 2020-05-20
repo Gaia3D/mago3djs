@@ -24,12 +24,18 @@ TerrainScannerLinear.prototype.constructor = TerrainScannerLinear;
  */
 TerrainScannerLinear.prototype.makeMesh = function(magoManager)
 {
-	//var geoCoordsArray = [];
-	//var renderableObject = GeographicCoordsList.getRenderableObjectOfGeoCoordsArray(geoCoordsArray, magoManager, options);
-
 	// create a vectorMesh segment.
+	var maxDist = 1500;
+	var geoCoordsArray = GeographicCoordSegment.getArcInterpolatedGeoCoords(this.geoCoordSegment.strGeoCoord, this.geoCoordSegment.endGeoCoord, maxDist, undefined);
 
+	var options = {};
+	var renderableObject = GeographicCoordsList.getRenderableObjectOfGeoCoordsArray(geoCoordsArray, magoManager, options);
 
-	var hola = 0;
+	if (this.objectsArray === undefined)
+	{ this.objectsArray = []; }
+	
+	this.objectsArray.push(renderableObject);
+
+	this.setDirty(false);
 };
 

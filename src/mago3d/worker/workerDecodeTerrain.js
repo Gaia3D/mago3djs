@@ -154,9 +154,22 @@ function getNormalCartesiansArray(cartesiansArray, indicesArray, resultNormalCar
 		point_1 = new Point3D_(cartesiansArray[idx_1*3], cartesiansArray[idx_1*3+1], cartesiansArray[idx_1*3+2]);
 		point_2 = new Point3D_(cartesiansArray[idx_2*3], cartesiansArray[idx_2*3+1], cartesiansArray[idx_2*3+2]);
 		point_3 = new Point3D_(cartesiansArray[idx_3*3], cartesiansArray[idx_3*3+1], cartesiansArray[idx_3*3+2]);
-		
+
 		// Calculate the normal for this triangle.
-		normal = calculateNormal(point_1, point_2, point_3, undefined);
+		var resultObject = {
+			area: 0
+		};
+		normal = calculateNormal(point_1, point_2, point_3, undefined, resultObject);
+		normal.x *= resultObject.area;
+		normal.y *= resultObject.area;
+		normal.z *= resultObject.area;
+
+		// test calculate triangle perimeter to ponderate the normal.
+		//var perimeter = point_1.squareDistTo(point_2.x, point_2.y, point_2.z) + point_2.squareDistTo(point_3.x, point_3.y, point_3.z) + point_3.squareDistTo(point_1.x, point_1.y, point_1.z);
+		//perimeter /= 1000.0;
+		//normal.x *= perimeter;
+		//normal.y *= perimeter;
+		//normal.z *= perimeter;
 		
 		// Accum normals for each points.
 		// Point 1.***
@@ -209,7 +222,9 @@ function getNormalCartesiansArray(cartesiansArray, indicesArray, resultNormalCar
 	
 };
 
-function calculateNormal(point1, point2, point3, resultNormal) 
+
+
+function calculateNormal(point1, point2, point3, resultNormal, resultObject) 
 {
 	// Given 3 points, this function calculates the normal.
 	var currentPoint = point1;
@@ -219,12 +234,14 @@ function calculateNormal(point1, point2, point3, resultNormal)
 	var v1 = new Point3D_(currentPoint.x - prevPoint.x,     currentPoint.y - prevPoint.y,     currentPoint.z - prevPoint.z);
 	var v2 = new Point3D_(nextPoint.x - currentPoint.x,     nextPoint.y - currentPoint.y,     nextPoint.z - currentPoint.z);
 
-	v1.unitary();
-	v2.unitary();
+	//v1.unitary();
+	//v2.unitary();
 	if (resultNormal === undefined)
 	{ resultNormal = new Point3D_(); }
 	
 	resultNormal = v1.crossProduct(v2, resultNormal);
+
+	resultObject.area = resultNormal.getModul() / 2;
 	resultNormal.unitary();
 	
 	return resultNormal;
@@ -479,6 +496,15 @@ Point3D_.prototype.getSquaredModul = function()
 Point3D_.prototype.getModul = function() 
 {
 	return Math.sqrt(this.getSquaredModul());
+};
+
+Point3D_.prototype.squareDistTo = function(x, y, z) 
+{
+	var dx = this.x - x;
+	var dy = this.y - y;
+	var dz = this.z - z;
+
+	return dx*dx + dy*dy + dz*dz;
 };
 
 Point3D_.prototype.unitary = function() 

@@ -828,10 +828,7 @@ Mesh.prototype.renderAsChild = function (magoManager, shader, renderType, glPrim
 			gl.depthMask(true);
 		}
 	}
-	
-	
-	
-	
+
 };
 
 /**

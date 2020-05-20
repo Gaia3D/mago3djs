@@ -840,7 +840,8 @@ MagoWorld.prototype.doTest__TerrainScanner = function()
 
 	var geoLocDataManager = new GeoLocationDataManager();
 	var geoLocData = geoLocDataManager.newGeoLocationData();
-	geoLocData.setGeographicCoordsLonLatAlt(startGeoCoord.longitude, startGeoCoord.latitude, startGeoCoord.altitude);
+	geoLocData = ManagerUtils.calculateGeoLocationData(startGeoCoord.longitude, startGeoCoord.latitude, startGeoCoord.altitude, undefined, undefined, undefined, geoLocData);
+	//geoLocData.setGeographicCoordsLonLatAlt(startGeoCoord.longitude, startGeoCoord.latitude, startGeoCoord.altitude);
 
 	// set the geoLocDataManager of the terrainScanner.
 	terrainScanner.geoLocDataManager = geoLocDataManager;
@@ -854,6 +855,32 @@ MagoWorld.prototype.doTest__TerrainScanner = function()
 	this.magoManager.modeler.addObject(startGeoCoord, targetDepth);
 	this.magoManager.modeler.addObject(endGeoCoord, targetDepth);
 
+};
+
+MagoWorld.prototype.doTest__MagoRectangle = function()
+{
+	// create a magoRectangle.***
+	var options = {
+		minLongitude : 126.31394,
+		minLatitude  : 33.18262,
+		maxLongitude : 126.34513,
+		maxLatitude  : 33.21500,
+		altitude     : 200.0
+	};
+
+	var style = {
+		strokeWidth : 2,
+		strokeColor : '#000000',
+		fillColor : '#FFFFFF',
+		imageUrl : 'BLABLA',
+		opacity : 1,
+	}
+
+	var magoRect = new MagoRectangle(options, style);
+
+
+	var targetDepth = 10;
+	this.magoManager.modeler.addObject(magoRect, targetDepth);
 };
 
 MagoWorld.prototype.doTest__ObjectMarker = function()
@@ -938,7 +965,8 @@ MagoWorld.prototype.keydown = function(event)
 		//this.doTest__BSpline3DCubic();
 		//this.doTest__ExtrudedObject();
 		//this.doTest__ObjectMarker();
-		this.doTest__TerrainScanner();
+		//this.doTest__TerrainScanner();
+		this.doTest__MagoRectangle();
 
 	}
 	else if (key === 'p')
