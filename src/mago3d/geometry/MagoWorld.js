@@ -16,7 +16,7 @@ var MagoWorld = function(magoManager)
 	
 	this.magoManager = magoManager;
 
-	this.enableDrag = true;
+	this.cameraMovable = true;
 	
 	// Set the start position of the camera.***
 	/*
@@ -147,6 +147,7 @@ MagoWorld.prototype.mousedown = function(event)
 	this.magoManager.mouse_x = event.clientX;
 	this.magoManager.mouse_y = event.clientY;
 	
+	this.magoManager.mouseActionLeftDown(event.clientX, event.clientY);
 };
 
 /**
@@ -194,11 +195,11 @@ MagoWorld.prototype.mouseup = function(event)
 				// Considere as "click".***
 				magoManager.bPicking = true;
 				magoManager.managePickingProcess();
-
 				// Test. process leftClick in magoManager.
-				this.magoManager.mouseActionLeftClick(event.clientX, event.clientY);
+				this.magoManager.mouseActionLeftClick(event.clientX, event.clientY);				
 			}
 		}
+		this.magoManager.mouseActionLeftUp(event.clientX, event.clientY);
 	}
 	
 	sceneState.mouseButton = -1;
@@ -241,6 +242,11 @@ MagoWorld.prototype.mouseclick = function(event)
  */
 MagoWorld.prototype.mousewheel = function(event)
 {
+	//check enable camera movable
+	if (!this.cameraMovable)
+	{
+		return;
+	}
 
 	var delta;
 	//firefox wheelDelta not support.
@@ -338,13 +344,14 @@ MagoWorld.prototype.moveSelectedObject = function(event)
 MagoWorld.prototype.mousemove = function(event)
 {
 	var magoManager = this.magoManager;
-	magoManager.mouse_x = event.clientX;
-	magoManager.mouse_y = event.clientY;
+	var nowX = event.clientX;
+	var nowY = event.clientY;
+	magoManager.mouse_x = nowX;
+	magoManager.mouse_y = nowY;
 	
 	// Check if is dragging.
 	if (magoManager.mustCheckIfDragging) 
 	{
-		//first check enable drag
 		if (magoManager.isDragging()) 
 		{
 			magoManager.mouseDragging = true;
@@ -367,8 +374,20 @@ MagoWorld.prototype.mousemove = function(event)
 	*/
 	// End check if is dragging.---
 	
+	
+
 	var mouseAction = magoManager.sceneState.mouseAction;
 	var camera = this.magoManager.sceneState.camera;
+	
+	var oldX = mouseAction.strX;
+	var oldY = mouseAction.strY;
+
+	this.magoManager.mouseActionMove({x: nowX, y: nowY}, {x: oldX, y: oldY});
+	//check enable camera movable
+	if (!this.cameraMovable)
+	{
+		return;
+	}
 		
 	if (camera.lastMovement === undefined)
 	{ camera.lastMovement = new Movement(); }
@@ -380,8 +399,6 @@ MagoWorld.prototype.mousemove = function(event)
 	if (magoManager.sceneState.mouseButton === 0)
 	{
 		// left button pressed.
-		var nowX = event.clientX;
-		var nowY = event.clientY;
 		if (nowX === mouseAction.strX && nowY === mouseAction.strY)
 		{ return; }
 

@@ -142,6 +142,14 @@ CODE.magoEarthTerrainType = {
 	ELEVATION : 'elevation',
 	REALTIME  : 'realtime'
 };
+
+CODE.drawGeometryType = {
+	POINT     : 'point',
+	LINE    	 : 'line',
+	POLYGON   : 'polygon',
+	RECTANGLE : 'rectangle'
+};
+
 CODE.PROJECT_ID_PREFIX = "projectId_";
 CODE.PROJECT_DATA_FOLDER_PREFIX = "projectDataFolder_";
 
