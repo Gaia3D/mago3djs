@@ -26,7 +26,7 @@ var MagoRectangle = function(position, style)
 	 */
 	this.maxGeographicCoord;
     
-	this.style;
+	this.style = {};
     
 	if (position)
 	{
@@ -228,12 +228,74 @@ MagoRectangle.prototype.makeMesh = function(magoManager)
     
 	// assign style to mesh.
 	mesh.material = new Material();
-	if (this.style.diffuseImageUrl)
+	if (this.style.imageUrl)
 	{
-		var imagesPath = this.style.diffuseImageUrl;
+		var imagesPath = this.style.imageUrl;
 		mesh.material.setDiffuseTextureUrl(imagesPath);
 	}
 
+	// check if exist outline.
+	if (this.style.strokeWidth !== undefined)
+	{
+		// create a contour-line.
+		// create contourIndices.
+		this.contourIndices = [];
+		Array.prototype.push.apply(this.contourIndices, this.southIndices);
+
+		var eastIndicesCount = this.eastIndices.length;
+		for (var i=1; i<eastIndicesCount; i++)
+		{
+			this.contourIndices.push(this.eastIndices[i]);
+		}
+
+		var northIndicesCount = this.northIndices.length;
+		for (var i=1; i<northIndicesCount; i++)
+		{
+			this.contourIndices.push(this.northIndices[i]);
+		}
+
+		var westIndicesCount = this.westIndices.length;
+		for (var i=1; i<westIndicesCount; i++)
+		{
+			this.contourIndices.push(this.westIndices[i]);
+		}
+
+		// create contour points3d.
+		// var resultVboKeysContainer = Point3DList.getVboThickLines(magoManager, pointsArray, undefined);
+		var pointsArray = [];
+		var contourPointsCount = this.contourIndices.length;
+		for (var i=0; i<contourPointsCount; i++)
+		{
+			var idx = this.contourIndices[i];
+			var x = this.cartesiansArray[idx*3];
+			var y = this.cartesiansArray[idx*3+1];
+			var z = this.cartesiansArray[idx*3+2];
+			var point3d = new Point3D(x, y, z);
+			pointsArray.push(point3d);
+		}
+
+		// Create a vectorMesh.
+		var options = {
+			thickness: this.style.strokeWidth
+		};
+
+		//Color.fromHexCode = function(hexCode, resultColor4)
+		if (this.style.strokeColor !== undefined)
+		{
+			var color4 = Color.fromHexCode(this.style.strokeColor, undefined);
+			options.color = color4;
+		}
+
+		var vectorMesh = new VectorMesh(options);
+		
+		var optionsThickLine = {
+			colorType: "alphaGradient"
+		};
+		vectorMesh.vboKeysContainer = Point3DList.getVboThickLines(magoManager, pointsArray, vectorMesh.vboKeysContainer, options);
+		this.objectsArray.push(vectorMesh);
+	}
+
+	// Finally put the mesh into magoRenderables-objectsArray.
 	this.objectsArray.push(mesh);
     
 	this.setDirty(false);

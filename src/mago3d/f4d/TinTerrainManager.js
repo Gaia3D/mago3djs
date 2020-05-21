@@ -343,8 +343,8 @@ TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager)
 			if (!tinTerrain.prepareTinTerrain(magoManager, this))
 			{ maxProcessCounter += 1; }
 		
-			if (maxProcessCounter > 5)
-			{ break; }
+			//if (maxProcessCounter > 5)
+			//{ break; }
 		}
 	}
 	else if (this.terrainType === CODE.magoEarthTerrainType.REALTIME)// Real time ElevationTerrain.

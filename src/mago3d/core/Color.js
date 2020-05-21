@@ -235,3 +235,21 @@ Color.getHexCode = function(red, green, blue)
 	
 	return '#'+hexR+hexG+hexB;
 };
+
+/**
+ * return hexCode
+ * @return {string}
+ */
+Color.fromHexCode = function(hex, resultColor4) 
+{
+	var r = parseInt(hex.slice(1, 3), 16),
+		g = parseInt(hex.slice(3, 5), 16),
+		b = parseInt(hex.slice(5, 7), 16);
+
+	if (resultColor4 === undefined)
+	{ resultColor4 = new Color(); }
+
+	resultColor4.setRGB(r/256, g/256, b/256);
+	return resultColor4;
+		
+};
