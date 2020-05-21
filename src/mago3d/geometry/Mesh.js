@@ -892,13 +892,25 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive, i
 						}
 					}
 				}
+				else
+				{
+					// Apply fillColor.
+					var color4 = material.color4;
+					if (color4)
+					{
+						gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
+						gl.uniform4fv(shader.oneColor4_loc, [color4.r, color4.g, color4.b, color4.a]); 
+					}
+				}
 			}
 			
-			if (!textureBinded && this.color4)
+			if (!textureBinded && this.color4) // old.***
 			{ 
 				gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 				gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, this.color4.a]); 
 			}
+
+			
 		}
 	}
 	else if (renderType === 2)

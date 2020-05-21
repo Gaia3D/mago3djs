@@ -234,6 +234,17 @@ MagoRectangle.prototype.makeMesh = function(magoManager)
 		mesh.material.setDiffuseTextureUrl(imagesPath);
 	}
 
+	if (this.style.fillColor)
+	{
+		var color4 = Color.fromHexCode(this.style.fillColor, undefined);
+		mesh.material.setColor4(color4.r, color4.g, color4.b, 1.0);
+	}
+
+	if (this.style.opacity)
+	{
+		this.attributes.opacity = this.style.opacity;
+	}
+
 	// check if exist outline.
 	if (this.style.strokeWidth !== undefined)
 	{

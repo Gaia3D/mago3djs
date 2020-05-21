@@ -30,3 +30,11 @@ Material.prototype.setDiffuseTextureUrl = function(url)
 	this.diffuseTexture.url = url;
 
 };
+
+Material.prototype.setColor4 = function(r, g, b, a)
+{
+	if (this.color4 === undefined)
+	{ this.color4 = new Color(); }
+
+	this.color4.setRGBA(r, g, b, a);
+};

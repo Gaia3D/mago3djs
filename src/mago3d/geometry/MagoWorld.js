@@ -891,15 +891,13 @@ MagoWorld.prototype.doTest__MagoRectangle = function()
 	var style = {
 		strokeWidth : 2,
 		strokeColor : '#FF0000',
-		fillColor   : '#FFFFFF',
-		imageUrl    : '/images/materialImages//factoryRoof.jpg',
-		opacity     : 1,
+		fillColor   : '#00FF00',
+		//imageUrl    : '/images/materialImages//factoryRoof.jpg',
+		opacity     : 0.7,
 	};
 
 	var magoRect = new MagoRectangle(position, style);
-	magoRect.setOneColor(0.5, 1.0, 0.8);
-
-
+	//magoRect.setOneColor(0.5, 1.0, 0.8);
 
 	var targetDepth = 10;
 	this.magoManager.modeler.addObject(magoRect, targetDepth);

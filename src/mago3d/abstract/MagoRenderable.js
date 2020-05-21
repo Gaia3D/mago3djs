@@ -156,8 +156,14 @@ MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPr
 	if (this.objectsArray.length === 0)
 	{ return false; }
 
-	// Set geoLocation uniforms.***
 	var gl = magoManager.getGl();
+	if (this.attributes.opacity !== undefined)
+	{
+		gl.uniform1f(shader.externalAlpha_loc, this.attributes.opacity);
+	}
+
+	// Set geoLocation uniforms.***
+	
 	var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
 	buildingGeoLocation.bindGeoLocationUniforms(gl, shader); // rotMatrix, positionHIGH, positionLOW.
 	
@@ -169,6 +175,9 @@ MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPr
 	
 	if (renderShaded)
 	{ this.renderAsChild(magoManager, shader, renderType, glPrimitive, bIsSelected, this.options); }
+
+	// Return the opacity to 1.
+	gl.uniform1f(shader.externalAlpha_loc, 1.0);
 	
 	// check options provisionally here.
 	if (this.options)
