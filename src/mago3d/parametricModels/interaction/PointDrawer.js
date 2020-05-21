@@ -66,7 +66,8 @@ PointDrawer.prototype.start = function()
 		{
 			var position = e.point.geographicCoordinate;
             
-			if (!that.style) 
+
+			if (Object.keys(that.style).length < 1) 
 			{
 				that.style = {
 					size  : 10,

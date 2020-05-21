@@ -515,6 +515,9 @@ Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive
 		this.sphere.render(magoManager, shader, renderType);
 	}
 	
+	if (renderType === 0)
+	{ return; }
+	
 	if (this.magoRectangle) 
 	{
 		this.magoRectangle.render(magoManager, shader, renderType, glPrimitive, bIsSelected);
