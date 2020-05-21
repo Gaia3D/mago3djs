@@ -778,6 +778,11 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 				{
 					var textureKey = textureKeys[i];
 					var texture = this.texture[textureKey];
+					if (!(texture.texId instanceof WebGLTexture)) 
+					{
+						continue;
+					}
+
 					if (this.tinTerrainManager.textureIdDeleteMap[textureKey]) 
 					{
 						this.tinTerrainManager.eraseTexture(texture, magoManager);

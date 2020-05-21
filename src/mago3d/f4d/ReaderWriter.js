@@ -1677,7 +1677,7 @@ ReaderWriter.prototype.loadWMSImage = function(gl, filePath_inServer, texture, m
 	loadWithXhr(filePath_inServer, undefined, undefined, 'blob').then(function(response) 
 	{
 		var blob = response;
-		if (blob) 
+		if (blob && (blob.type === 'image/png' || blob.type === 'image/jpeg')) 
 		{
 			var ibmPromise = createImageBitmap(blob);
 			ibmPromise.then(function(source)
@@ -1703,6 +1703,11 @@ ReaderWriter.prototype.loadWMSImage = function(gl, filePath_inServer, texture, m
 				gl.bindTexture(gl.TEXTURE_2D, null);
 				texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 			});
+		}
+		else 
+		{
+			texture.texId = 'failed';
+			texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 		}
 	}, function(status) 
 	{
