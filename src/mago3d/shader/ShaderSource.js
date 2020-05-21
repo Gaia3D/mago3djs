@@ -2189,8 +2189,8 @@ ShaderSource.PointCloudFS = "	precision lowp float;\n\
 	void main()\n\
     {\n\
 		vec2 pt = gl_PointCoord - vec2(0.5);\n\
-if(pt.x*pt.x+pt.y*pt.y > 0.25)\n\
-    discard;\n\
+		if(pt.x*pt.x+pt.y*pt.y > 0.25)\n\
+			discard;\n\
 		gl_FragColor = vColor;\n\
 	}";
 ShaderSource.PointCloudSsaoFS = "#ifdef GL_ES\n\
@@ -2241,8 +2241,8 @@ float getDepth(vec2 coord)\n\
 void main()\n\
 {\n\
 	vec2 pt = gl_PointCoord - vec2(0.5);\n\
-if(pt.x*pt.x+pt.y*pt.y > 0.25)\n\
-    discard;\n\
+	if(pt.x*pt.x+pt.y*pt.y > 0.25)\n\
+		discard;\n\
 	\n\
 	float occlusion = 0.0;\n\
 	if(bApplySsao)\n\

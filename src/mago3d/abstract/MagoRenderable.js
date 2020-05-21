@@ -342,6 +342,32 @@ MagoRenderable.prototype.renderAsChild = function(magoManager, shader, renderTyp
 			// Return to the currentShader.
 			shader.useProgram();
 		}
+		else if (object instanceof PointMesh)
+		{
+			var shaderLocal = magoManager.postFxShadersManager.getShader("pointsCloud"); // provisional. Use the currentShader of argument.
+			shaderLocal.useProgram();
+			
+			shaderLocal.disableVertexAttribArrayAll();
+			shaderLocal.resetLastBuffersBinded();
+
+			shaderLocal.enableVertexAttribArray(shaderLocal.position3_loc);
+			
+			shaderLocal.bindUniformGenerals();
+
+			var geoLocData = this.geoLocDataManager.getCurrentGeoLocationData();
+			geoLocData.bindSplitedPositionUniforms(gl, shaderLocal);
+			
+			gl.uniform1i(shaderLocal.bPositionCompressed_loc, false);
+			gl.uniform1i(shaderLocal.bUse1Color_loc, true);
+			//gl.uniform4fv(shaderLocal.oneColor4_loc, [1.0, 1.0, 0.1, 1.0]); //.
+			//gl.uniform1f(shaderLocal.fixPointSize_loc, 10.0);
+			gl.uniform1i(shaderLocal.bUseFixPointSize_loc, 1);
+
+			object.renderAsChild(magoManager, shaderLocal, renderType, glPrimitive, bIsSelected, options, bWireframe);
+
+			// Return to the currentShader.
+			shader.useProgram();
+		}
 		else
 		{
 			object.renderAsChild(magoManager, shader, renderType, glPrimitive, bIsSelected, options, bWireframe);

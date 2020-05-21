@@ -903,6 +903,30 @@ MagoWorld.prototype.doTest__MagoRectangle = function()
 	this.magoManager.modeler.addObject(magoRect, targetDepth);
 };
 
+MagoWorld.prototype.doTest__MagoPoint = function()
+{
+	// create a magoRectangle.***
+	var position = {
+		longitude : 126.31394,
+		latitude  : 33.18262,
+		altitude  : 200.0
+	};
+
+	var style = {
+		size        : 10,
+		strokeColor : '#FF0000',
+		color       : '#00FF00',
+		//imageUrl    : '/images/materialImages//factoryRoof.jpg',
+		opacity     : 0.7,
+	};
+
+	var magoPoint = new MagoPoint(position, style);
+	//magoPoint.setOneColor(0.5, 1.0, 0.8);
+
+	var targetDepth = 10;
+	this.magoManager.modeler.addObject(magoPoint, targetDepth);
+};
+
 MagoWorld.prototype.doTest__ObjectMarker = function()
 {
 	//magoManager 가져오기
@@ -985,9 +1009,9 @@ MagoWorld.prototype.keydown = function(event)
 		//this.doTest__BSpline3DCubic();
 		//this.doTest__ExtrudedObject();
 		//this.doTest__ObjectMarker();
-		this.doTest__TerrainScanner();
+		//this.doTest__TerrainScanner();
 		//this.doTest__MagoRectangle();
-
+		this.doTest__MagoPoint();
 	}
 	else if (key === 'p')
 	{

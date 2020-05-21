@@ -21,6 +21,17 @@ var MagoPoint = function(position, style)
 	this.geoCoord;
     
 	this.setPosition(position);
+	this.style = {};
+
+	if (style)
+	{ this.style = style; }
+
+	// Calculate geoLocationData.
+	var geoLocDataManager = new GeoLocationDataManager();
+	var geoLocData = geoLocDataManager.newGeoLocationData();
+	geoLocData = ManagerUtils.calculateGeoLocationData(this.geoCoord.longitude, this.geoCoord.latitude, this.geoCoord.altitude, undefined, undefined, undefined, geoLocData);
+	// set the geoLocDataManager of the terrainScanner.
+	this.geoLocDataManager = geoLocDataManager;
 };
 
 MagoPoint.prototype = Object.create(MagoRenderable.prototype);
@@ -35,5 +46,36 @@ MagoPoint.prototype.setPosition = function(position)
 	if (!position)
 	{ return; } // error.
 
+	this.geoCoord = new GeographicCoord(position.longitude, position.latitude, position.altitude);
+
+};
+
+/**
+ * Makes the geometry mesh.
+ */
+MagoPoint.prototype.makeMesh = function(magoManager)
+{
+	// there are no mesh to make.
+	var vboKeyContainer = new VBOVertexIdxCacheKeysContainer();
+	var vboKey = vboKeyContainer.newVBOVertexIdxCacheKey();
+	var vboMemManager = magoManager.vboMemoryManager;
+	
+	// Positions.
+	var positions = new Float32Array([0.0, 0.0, 0.0]);
+	vboKey.setDataArrayPos(positions, vboMemManager);
+
+	var color =  Color.fromHexCode(this.style.color, undefined);
+	var options = {
+		size    : this.style.size,
+		color   : color,
+		opacity : this.style.opacity
+	};
+
+	var pointMesh = new PointMesh(options);
+	pointMesh.vboKeysContainer = vboKeyContainer;
     
+	// Finally put the mesh into magoRenderables-objectsArray.
+	this.objectsArray.push(pointMesh);
+    
+	this.setDirty(false);
 };
