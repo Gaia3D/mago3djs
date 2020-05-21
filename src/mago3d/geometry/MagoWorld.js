@@ -313,6 +313,9 @@ MagoWorld.prototype.mousewheel = function(event)
 	var angRad = oldCamPos.angleRadToVector(camNewPos);
 	if (angRad === 0 || isNaN(angRad))
 	{ return; }
+
+	if (angRad *180/Math.PI> 180)
+	{ var hola = 0; }
 		
 	var rotMat = new Matrix4();
 	rotMat.rotationAxisAngRad(angRad, rotAxis.x, rotAxis.y, rotAxis.z);

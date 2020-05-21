@@ -342,6 +342,10 @@ TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager)
 			tinTerrain = this.visibleTilesArray[i];
 			if (!tinTerrain.prepareTinTerrain(magoManager, this))
 			{ maxProcessCounter += 1; }
+
+			if (magoManager.fileRequestControler.tinTerrainFilesRequested >= 2 || magoManager.fileRequestControler.tinTerrainTexturesRequested >= 2)
+			{ break; }
+
 		
 			//if (maxProcessCounter > 5)
 			//{ break; }

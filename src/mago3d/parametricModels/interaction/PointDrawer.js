@@ -64,15 +64,15 @@ PointDrawer.prototype.start = function()
 		if (!that.getActive()) { return; }
 		if (that.startDraw) 
 		{
-            var position = e.point.geographicCoordinate;
+			var position = e.point.geographicCoordinate;
             
-            if (!that.style) 
-            {
-                that.style = {
-                    size  : 10,
-                    color : '#00FF00'
-                };
-            }
+			if (!that.style) 
+			{
+				that.style = {
+					size  : 10,
+					color : '#00FF00'
+				};
+			}
 
 			that.end(new MagoPoint(position, that.style));
 		}
