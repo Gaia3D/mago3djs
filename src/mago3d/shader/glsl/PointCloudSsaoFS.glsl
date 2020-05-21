@@ -45,6 +45,10 @@ float getDepth(vec2 coord)
 
 void main()
 {
+	vec2 pt = gl_PointCoord - vec2(0.5);
+	if(pt.x*pt.x+pt.y*pt.y > 0.25)
+		discard;
+	
 	float occlusion = 0.0;
 	if(bApplySsao)
 	{          

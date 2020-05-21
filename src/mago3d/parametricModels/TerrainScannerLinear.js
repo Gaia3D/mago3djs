@@ -28,7 +28,10 @@ TerrainScannerLinear.prototype.makeMesh = function(magoManager)
 	var maxDist = 1500;
 	var geoCoordsArray = GeographicCoordSegment.getArcInterpolatedGeoCoords(this.geoCoordSegment.strGeoCoord, this.geoCoordSegment.endGeoCoord, maxDist, undefined);
 
-	var options = {};
+	var options = {
+		color     : '#ffff00',
+		thickness : 2.0
+	};
 	var renderableObject = GeographicCoordsList.getRenderableObjectOfGeoCoordsArray(geoCoordsArray, magoManager, options);
 
 	if (this.objectsArray === undefined)

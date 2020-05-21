@@ -984,7 +984,7 @@ Renderer.prototype.renderNativeObjects = function(gl, shader, renderType, visibl
 				gl.uniform1i(shaderLocal.bPositionCompressed_loc, false);
 				gl.uniform1i(shaderLocal.bUse1Color_loc, true);
 				gl.uniform4fv(shaderLocal.oneColor4_loc, [1.0, 1.0, 0.1, 1.0]); //.
-				gl.uniform1f(shaderLocal.fixPointSize_loc, 5.0);
+				gl.uniform1f(shaderLocal.fixPointSize_loc, 10.0);
 				gl.uniform1i(shaderLocal.bUseFixPointSize_loc, 1);
 				
 				var bEnableDepth = true;

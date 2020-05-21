@@ -27,8 +27,8 @@ RectangleDrawer.prototype = Object.create(DrawGeometryInteraction.prototype);
 RectangleDrawer.prototype.constructor = RectangleDrawer;
 
 RectangleDrawer.EVENT_TYPE = {
-	'DRAWEND' : 'drawend'
-}
+	'DRAWEND': 'drawend'
+};
 
 RectangleDrawer.prototype.init = function() 
 {
