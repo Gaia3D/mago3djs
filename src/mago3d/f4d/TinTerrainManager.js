@@ -343,8 +343,8 @@ TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager)
 			if (!tinTerrain.prepareTinTerrain(magoManager, this))
 			{ maxProcessCounter += 1; }
 
-			if (magoManager.fileRequestControler.tinTerrainFilesRequested >= 2 || magoManager.fileRequestControler.tinTerrainTexturesRequested >= 2)
-			{ break; }
+			//if (magoManager.fileRequestControler.tinTerrainFilesRequested >= 2 || magoManager.fileRequestControler.tinTerrainTexturesRequested >= 2)
+			//{ break; }
 
 		
 			//if (maxProcessCounter > 2)

@@ -456,6 +456,9 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 				return false;
 			}
 
+			if (magoManager.fileRequestControler.tinTerrainFilesRequested >= 6)
+			{ return false; }
+
 			var pathName = this.getPathName();
 			var geometryDataPath = magoManager.readerWriter.geometryDataPath;
 			var fileName = geometryDataPath + "/Terrain/" + pathName + ".terrain";
@@ -570,6 +573,9 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 		}
 		else if (!this.isTexturePrepared(this.texture))
 		{
+			if (magoManager.fileRequestControler.tinTerrainTexturesRequested >= 6)
+			{ return false; }
+
 			this.prepareTexture(this.texture, tinTerrainManager.imagerys, magoManager, tinTerrainManager);
 			return false;
 		}
