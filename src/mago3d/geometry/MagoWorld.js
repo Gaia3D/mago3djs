@@ -927,6 +927,42 @@ MagoWorld.prototype.doTest__MagoPoint = function()
 	this.magoManager.modeler.addObject(magoPoint, targetDepth);
 };
 
+MagoWorld.prototype.doTest__MagoPolyline = function()
+{
+	var position = {
+		coordinates: [{
+			longitude : 126.31394,
+			latitude  : 33.18262,
+			altitude  : 200.0
+		},
+		{
+			longitude : 126.34513,
+			latitude  : 33.21500,
+			altitude  : 200.0
+		},
+		{
+			longitude : 126.33,
+			latitude  : 33.18,
+			altitude  : 200.0
+		},
+		{
+			longitude : 126.35,
+			latitude  : 33.18262,
+			altitude  : 200.0
+		}]
+	};
+
+	var style = {
+		color     : '#ff0000',
+		thickness : 2.0
+	};
+
+	var magoPolyline = new MagoPolyline(position, style);
+
+	var targetDepth = 10;
+	this.magoManager.modeler.addObject(magoPolyline, targetDepth);
+};
+
 MagoWorld.prototype.doTest__ObjectMarker = function()
 {
 	//magoManager 가져오기
@@ -1011,7 +1047,8 @@ MagoWorld.prototype.keydown = function(event)
 		//this.doTest__ObjectMarker();
 		//this.doTest__TerrainScanner();
 		//this.doTest__MagoRectangle();
-		this.doTest__MagoPoint();
+		//this.doTest__MagoPoint();
+		this.doTest__MagoPolyline();
 	}
 	else if (key === 'p')
 	{

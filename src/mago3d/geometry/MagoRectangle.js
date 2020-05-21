@@ -326,6 +326,7 @@ MagoRectangle.prototype.makeMesh = function(magoManager)
 		var optionsThickLine = {
 			colorType: "alphaGradient"
 		};
+
 		vectorMesh.vboKeysContainer = Point3DList.getVboThickLines(magoManager, pointsArray, vectorMesh.vboKeysContainer, options);
 		this.objectsArray.push(vectorMesh);
 	}
