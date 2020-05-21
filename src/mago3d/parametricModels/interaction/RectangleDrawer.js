@@ -113,13 +113,9 @@ RectangleDrawer.prototype.start = function()
 	});
 };
 
-RectangleDrawer.prototype.end = function(start, end)
+RectangleDrawer.prototype.end = function()
 {
 	this.manager.magoWorld.cameraMovable = true;
-    
-	console.info(this.startPoint);
-	console.info(this.endPoint);
-
 
 	this.result.push(this.tempRectangle);
 	this.init();
