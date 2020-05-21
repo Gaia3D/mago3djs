@@ -21,6 +21,10 @@ var PointDrawer = function(style)
 PointDrawer.prototype = Object.create(DrawGeometryInteraction.prototype);
 PointDrawer.prototype.constructor = PointDrawer;
 
+PointDrawer.EVENT_TYPE = {
+	'DRAWEND': 'drawend'
+};
+
 PointDrawer.prototype.init = function() 
 {
 	this.startDraw = false;
@@ -60,17 +64,26 @@ PointDrawer.prototype.start = function()
 		if (!that.getActive()) { return; }
 		if (that.startDraw) 
 		{
-			var position = e.point.geographicCoordinate;
-			var geoCoord = new GeographicCoord(position.longitude, position.latitude, 200);
-			geoCoord.makeDefaultGeoLocationData();
-			that.end(geoCoord);
-			that.startDraw = true;
+            var position = e.point.geographicCoordinate;
+            
+            if (!that.style) 
+            {
+                that.style = {
+                    size  : 10,
+                    color : '#00FF00'
+                };
+            }
+
+			that.end(new MagoPoint(position, that.style));
 		}
 	});
 };
 
-PointDrawer.prototype.end = function(geoCoord)
+PointDrawer.prototype.end = function(point)
 {
+	this.result.push(point);
+	this.manager.modeler.addObject(point, 1);
+    
+	this.emit(PointDrawer.EVENT_TYPE.DRAWEND, point);
 	this.init();
-	this.manager.modeler.addObject(geoCoord, 1);
 };
