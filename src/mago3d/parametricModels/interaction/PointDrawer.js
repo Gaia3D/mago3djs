@@ -15,7 +15,7 @@ var PointDrawer = function()
 	}
 	DrawGeometryInteraction.call(this);
 
-    this.startDraw = false;
+	this.startDraw = false;
 	this.result = [];
 };
 PointDrawer.prototype = Object.create(DrawGeometryInteraction.prototype);
@@ -47,26 +47,30 @@ PointDrawer.prototype.start = function()
 	var that = this;
 	var manager = that.manager;
 
-    manager.on(MagoManager.EVENT_TYPE.LEFTDOWN, function(e)
+	manager.on(MagoManager.EVENT_TYPE.LEFTDOWN, function(e)
 	{
-        if (!that.getActive()) { return; }
-        if(!that.startDraw) {
-            that.startDraw = true;
-        }
-		console.info(e);
+		if (!that.getActive()) { return; }
+		if (!that.startDraw) 
+		{
+			that.startDraw = true;
+		}
 	});
 	manager.on(MagoManager.EVENT_TYPE.LEFTUP, function(e)
 	{
-        if (!that.getActive()) { return; }
-        if(that.startDraw) {
-            this.end();
-            that.startDraw = true;
-        }
-		console.info(e);
+		if (!that.getActive()) { return; }
+		if (that.startDraw) 
+		{
+			var position = e.point.geographicCoordinate;
+			var geoCoord = new GeographicCoord(position.longitude, position.latitude, 200);
+			geoCoord.makeDefaultGeoLocationData();
+			that.end(geoCoord);
+			that.startDraw = true;
+		}
 	});
 };
 
-PointDrawer.prototype.end = function(start, end)
+PointDrawer.prototype.end = function(geoCoord)
 {
 	this.init();
+	this.manager.modeler.addObject(geoCoord, 1);
 };

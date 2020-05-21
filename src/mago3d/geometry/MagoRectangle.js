@@ -28,21 +28,7 @@ var MagoRectangle = function(position, style)
     
 	this.style = {};
     
-	if (position)
-	{
-		var altitude = position.altitude;
-        
-		if (position.minLongitude && position.minLatitude)
-		{
-			this.minGeographicCoord = new GeographicCoord(position.minLongitude, position.minLatitude, altitude);
-		}
-
-		if (position.maxLongitude && position.maxLatitude)
-		{
-			this.maxGeographicCoord = new GeographicCoord(position.maxLongitude, position.maxLatitude, altitude);
-		}
-		// Check if exist material (texture).
-	}
+	this.setPosition(position);
     
 	if (style)
 	{
@@ -66,6 +52,31 @@ var MagoRectangle = function(position, style)
 MagoRectangle.prototype = Object.create(MagoRenderable.prototype);
 MagoRectangle.prototype.constructor = MagoRectangle;
 
+/**
+ * set position
+ * @param {object} position
+ */
+MagoRectangle.prototype.setPosition = function(position) 
+{
+	if (!position)
+	{
+		throw new Error(Messages.REQUIRED_EMPTY_ERROR('position'));
+	}
+
+	var altitude = position.altitude;
+	
+	if (position.minLongitude && position.minLatitude)
+	{
+		this.minGeographicCoord = new GeographicCoord(position.minLongitude, position.minLatitude, altitude);
+	}
+
+	if (position.maxLongitude && position.maxLatitude)
+	{
+		this.maxGeographicCoord = new GeographicCoord(position.maxLongitude, position.maxLatitude, altitude);
+	}
+	// Check if exist material (texture).
+	
+};
 /**
  * Makes the geometry mesh.
  */
@@ -148,7 +159,7 @@ MagoRectangle.prototype.makeMesh = function(magoManager)
 			idx++;
 		}
 	}
-	
+	this.cartesiansArray = undefined;
 	this.cartesiansArray = Globe.geographicRadianArrayToFloat32ArrayWgs84(lonArray, latArray, altArray, this.cartesiansArray);
 	
 	// Make normals using the cartesians.***

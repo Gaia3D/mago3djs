@@ -117,7 +117,9 @@ MagoRenderable.prototype.deleteObjects = function(vboMemManager)
 	for (var i=0; i<objectsCount; i++)
 	{
 		this.objectsArray[i].deleteObjects(vboMemManager);
+		this.objectsArray[i] = undefined;
 	}
+	this.objectsArray.length = 0;
 };
 
 MagoRenderable.prototype.getRootOwner = function() 

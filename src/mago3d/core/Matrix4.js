@@ -288,6 +288,10 @@ Matrix4.prototype.set = function(col, row, value)
  */
 Matrix4.prototype.transformPoint3D = function(point3d, result) 
 {
+	if (!point3d) 
+	{
+		return result;
+	}
 	if (result === undefined) { result = new Point3D(); }
 
 	var x = point3d.x;

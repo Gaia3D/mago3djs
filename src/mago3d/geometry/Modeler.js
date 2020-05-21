@@ -34,6 +34,7 @@ var Modeler = function(magoManager)
 	this.bSplineCubic3d;
 	this.sphere; // class : Sphere.
 	this.clippingBox;
+	this.magoRectangle;
 	
 	this.testObjectsArray;
 	
@@ -160,7 +161,7 @@ Modeler.prototype.removeObject = function(target)
 	if (target === undefined)
 	{ return false; }
 
-	target.deleteObjects();
+	target.deleteObjects(this.magoManager.vboMemoryManager);
 
 	var tile = target.smartTileOwner;
 
@@ -514,7 +515,10 @@ Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive
 		this.sphere.render(magoManager, shader, renderType);
 	}
 	
-	
+	if (this.magoRectangle) 
+	{
+		this.magoRectangle.render(magoManager, shader, renderType, glPrimitive, bIsSelected);
+	}
 	
 };
 

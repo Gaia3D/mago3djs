@@ -26,6 +26,10 @@ var RectangleDrawer = function()
 RectangleDrawer.prototype = Object.create(DrawGeometryInteraction.prototype);
 RectangleDrawer.prototype.constructor = RectangleDrawer;
 
+RectangleDrawer.EVENT_TYPE = {
+	'DRAWEND' : 'drawend'
+}
+
 RectangleDrawer.prototype.init = function() 
 {
 	this.startDraw = false;
@@ -65,7 +69,6 @@ RectangleDrawer.prototype.start = function()
 			manager.magoWorld.cameraMovable = false;
 			that.startDraw = true;
 			that.startPoint = e.point.geographicCoordinate;
-			console.info(e);
 		}
 	});
     
@@ -83,21 +86,28 @@ RectangleDrawer.prototype.start = function()
 			var maxLon = (that.startPoint.longitude < auxPoint.longitude) ? auxPoint.longitude : that.startPoint.longitude;
 			var maxLat = (that.startPoint.latitude < auxPoint.latitude) ? auxPoint.latitude : that.startPoint.latitude;
 
+			var position = {
+				minLongitude : minLon,
+				minLatitude  : minLat,
+				maxLongitude : maxLon,
+				maxLatitude  : maxLat,
+				altitude     : 200.0
+			};
+
 			if (!that.tempRectangle)
 			{
-				var options = {
-					minLongitude : minLon,
-					minLatitude  : minLat,
-					maxLongitude : maxLon,
-					maxLatitude  : maxLat,
-					altitude     : 200.0
+				
+				var style = {
+					fillColor: '#ff0000'
 				};
-				that.tempRectangle = new MagoRectangle(options);
-            
-				var targetDepth = 10;
-				manager.modeler.addObject(that.tempRectangle, targetDepth);
+				that.tempRectangle = new MagoRectangle(position, style);
+				manager.modeler.magoRectangle = that.tempRectangle;
 			}
-			console.info(e);
+			else 
+			{
+				that.tempRectangle.init(manager);
+				that.tempRectangle.setPosition(position);
+			}
 		}
 	});
     
@@ -106,7 +116,6 @@ RectangleDrawer.prototype.start = function()
 		if (!that.getActive()) { return; }
 		if (that.dragging) 
 		{
-			console.info(e);
 			that.endPoint = e.point;
 			that.end();
 		}
@@ -118,5 +127,9 @@ RectangleDrawer.prototype.end = function()
 	this.manager.magoWorld.cameraMovable = true;
 
 	this.result.push(this.tempRectangle);
+
+	this.manager.modeler.addObject(this.tempRectangle, 1);
+
+	//this.emit(RectangleDrawer.EVENT_TYPE.DRAWEND ,{})
 	this.init();
 };
