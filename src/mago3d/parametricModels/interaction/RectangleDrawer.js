@@ -21,7 +21,7 @@ var RectangleDrawer = function()
 	this.endPoint;
 
 	this.tempRectangle;
-	this.result;
+	this.result = [];
 };
 RectangleDrawer.prototype = Object.create(DrawGeometryInteraction.prototype);
 RectangleDrawer.prototype.constructor = RectangleDrawer;
@@ -34,6 +34,18 @@ RectangleDrawer.prototype.init = function()
 	this.endPoint = undefined;
 	this.tempRectangle = undefined;
 	this.manager.magoWorld.cameraMovable = true;
+};
+RectangleDrawer.prototype.clear = function() 
+{
+	this.init();
+	var modeler = this.manager.modeler;
+	var result = this.result;
+	for (var i=0, len=result.length;i < len; i++) 
+	{
+		var rec = result[i];
+		modeler.removeObject(rec);
+	}
+	this.result.length = 0;
 };
 RectangleDrawer.prototype.start = function() 
 {
@@ -109,6 +121,6 @@ RectangleDrawer.prototype.end = function(start, end)
 	console.info(this.endPoint);
 
 
-	this.result = this.tempRectangle;
+	this.result.push(this.tempRectangle);
 	this.init();
 };

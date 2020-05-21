@@ -50,6 +50,7 @@ var InteractionCollection = function(magoManager)
 	{
 		for (var i=0, len = that.array.length; i<len; i++)
 		{
+			that.array[i].clear();
 			that.array[i].active = false;
 		}
 	});

@@ -152,7 +152,7 @@ Modeler.prototype.addBoundingSpheres__TEST = function(boundingSpheresArray, dept
 };
 
 /**
- * 모델러에 콘센트릭튜브 추가
+ * 모델러에서 모델 삭제
  * @param {Object}
  */
 Modeler.prototype.removeObject = function(target) 
@@ -160,27 +160,24 @@ Modeler.prototype.removeObject = function(target)
 	if (target === undefined)
 	{ return false; }
 
+	target.deleteObjects();
+
 	var tile = target.smartTileOwner;
 
-	var opaqArray = tile.nativeObjects.opaquesArray;
-	opaqArray = opaqArray.filter(function(opaq)
+	tile.nativeObjects.opaquesArray = tile.nativeObjects.opaquesArray.filter(function(opaq)
 	{
 		return opaq !== target;
 	});
-	var tArray = tile.nativeObjects.transparentsArray;
-	tArray = tArray.filter(function(t)
+	
+	tile.nativeObjects.transparentsArray = tile.nativeObjects.transparentsArray.filter(function(t)
 	{
 		return t !== target;
 	});
-
+	
 	this.objectsArray = this.objectsArray.filter(function(object)
 	{
 		return object !== target;
 	});
-	// Note: the targetDepth must be calculated by the objects bbox size.
-	//var targetDepth = depth ? depth : 16;
-	//smartTileManager.putObject(targetDepth, object, this.magoManager);
-	// todo:
 };
 
 /**
