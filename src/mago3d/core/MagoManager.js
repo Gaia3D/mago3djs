@@ -2698,14 +2698,16 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 {
 	if (!this.magoPolicy.getMagoEnable()) { return; }
 
-	if (!this.isDragging()) 
+	var eventCoordinate = ManagerUtils.getComplexCoordinateByScreenCoord(this.getGl(), mouseX, mouseY, undefined, undefined, undefined, this);
+	if (eventCoordinate) 
 	{
-		var eventCoordinate = ManagerUtils.getComplexCoordinateByScreenCoord(this.getGl(), mouseX, mouseY, undefined, undefined, undefined, this);
-		if (eventCoordinate) 
-		{
-			this.emit(MagoManager.EVENT_TYPE.CLICK, {type: MagoManager.EVENT_TYPE.CLICK, clickCoordinate: eventCoordinate, timestamp: this.getCurrentTime()});
-		}
+		this.emit(MagoManager.EVENT_TYPE.CLICK, {type: MagoManager.EVENT_TYPE.CLICK, clickCoordinate: eventCoordinate, timestamp: this.getCurrentTime()});
 	}
+		
+	//if (!this.isDragging()) 
+	//	{
+		
+	//	}
 
 	var currSelObject = this.selectionManager.getSelectedGeneral();
 	if (currSelObject instanceof(TinTerrain))

@@ -41,6 +41,7 @@ var InteractionCollection = function(magoManager)
 			else 
 			{
 				interaction.active = false;
+				interaction.init();
 			}
 		}
 	});

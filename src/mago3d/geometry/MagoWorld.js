@@ -147,7 +147,10 @@ MagoWorld.prototype.mousedown = function(event)
 	this.magoManager.mouse_x = event.clientX;
 	this.magoManager.mouse_y = event.clientY;
 	
-	this.magoManager.mouseActionLeftDown(event.clientX, event.clientY);
+	if (this.magoManager.sceneState.mouseButton === 0) 
+	{
+		this.magoManager.mouseActionLeftDown(event.clientX, event.clientY);
+	}
 };
 
 /**
@@ -373,9 +376,6 @@ MagoWorld.prototype.mousemove = function(event)
 	}
 	*/
 	// End check if is dragging.---
-	
-	
-
 	var mouseAction = magoManager.sceneState.mouseAction;
 	var camera = this.magoManager.sceneState.camera;
 	

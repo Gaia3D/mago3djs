@@ -159,7 +159,13 @@ Modeler.prototype.removeObject = function(object)
 {
 	if (object === undefined)
 	{ return false; }
-	
+	//console.info(this.objectsArray);
+
+	var smartTileManager = this.magoManager.smartTileManager;
+	//console.info(smartTileManager);
+	// Note: the targetDepth must be calculated by the objects bbox size.
+	//var targetDepth = depth ? depth : 16;
+	//smartTileManager.putObject(targetDepth, object, this.magoManager);
 	// todo:
 };
 
