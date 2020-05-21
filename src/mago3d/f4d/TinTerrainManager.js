@@ -347,7 +347,7 @@ TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager)
 			{ break; }
 
 		
-			//if (maxProcessCounter > 5)
+			//if (maxProcessCounter > 2)
 			//{ break; }
 		}
 	}

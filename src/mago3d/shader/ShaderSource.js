@@ -4006,6 +4006,7 @@ void main()\n\
 			fogColor = vec4(red, green, blue, 1.0);\n\
 			\n\
 			// Test drawing grid.***\n\
+			/*\n\
 			if(uTileDepth > 7)\n\
 			{\n\
 				float numSegs = 5.0;\n\
@@ -4027,6 +4028,7 @@ void main()\n\
 					return;\n\
 				}\n\
 			}\n\
+			*/\n\
 			// End test drawing grid.---\n\
 			float specularReflectionCoef = 0.6;\n\
 			vec3 specularColor = vec3(0.8, 0.8, 0.8);\n\
