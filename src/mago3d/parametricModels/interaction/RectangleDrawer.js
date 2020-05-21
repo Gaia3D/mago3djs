@@ -96,7 +96,7 @@ RectangleDrawer.prototype.start = function()
 
 			if (!that.tempRectangle)
 			{
-				if (!that.style) 
+				if (Object.keys(that.style).length < 1) 
 				{
 					that.style = {
 						fillColor: '#ff0000'
