@@ -133,3 +133,16 @@ VectorMesh.prototype.render = function(magoManager, shader, renderType, glPrimit
 	gl.enable(gl.CULL_FACE);
 	
 };
+
+/**
+ * Clear the data of this feature
+ * @param {VBOMemManager} vboMemManager 
+ */
+VectorMesh.prototype.deleteObjects = function(vboMemManager)
+{
+	if (this.vboKeysContainer !== undefined)
+	{
+		this.vboKeysContainer.deleteGlObjects(vboMemManager.gl, vboMemManager);
+		this.vboKeysContainer = undefined;
+	}
+};

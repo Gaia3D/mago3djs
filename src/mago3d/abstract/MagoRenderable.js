@@ -103,12 +103,21 @@ MagoRenderable.prototype.dispatchEvent = function(type, magoManager)
 
 MagoRenderable.prototype.init = function(magoManager) 
 {
-	// todo:
+	// 1rst delete all objects.
+	var vboMemManager = magoManager.vboMemoryManager;
+	this.deleteObjects(vboMemManager);
+
+	// Now set dirty true.
+	this.setDirty(true);
 };
 
-MagoRenderable.prototype.deleteObjects = function(magoManager) 
+MagoRenderable.prototype.deleteObjects = function(vboMemManager) 
 {
-	// todo:
+	var objectsCount = this.objectsArray.length;
+	for (var i=0; i<objectsCount; i++)
+	{
+		this.objectsArray[i].deleteObjects(vboMemManager);
+	}
 };
 
 MagoRenderable.prototype.getRootOwner = function() 
