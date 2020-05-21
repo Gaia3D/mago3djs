@@ -1295,12 +1295,12 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 	
 	if (currDepth < maxDepth)
 	{
-		//if (!this.isPrepared())
-		//{
-		//	this.visible = true;
-		//	this.putObjectToArraySortedByDist(visibleTilesArray, this);
-		//	return;
-		//}
+		if (!this.isPrepared())
+		{
+			this.visible = true;
+			this.putObjectToArraySortedByDist(visibleTilesArray, this);
+			return;
+		}
 
 		// must descend.
 		var curX = this.X;
