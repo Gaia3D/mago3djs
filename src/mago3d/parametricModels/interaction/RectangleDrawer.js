@@ -80,7 +80,7 @@ RectangleDrawer.prototype.start = function()
 			that.dragging = true;
             
 			var auxPoint = e.endEvent.geographicCoordinate;
-
+			console.info(auxPoint);
 			var minLon = (that.startPoint.longitude < auxPoint.longitude) ? that.startPoint.longitude : auxPoint.longitude;
 			var minLat = (that.startPoint.latitude < auxPoint.latitude) ? that.startPoint.latitude : auxPoint.latitude;
 			var maxLon = (that.startPoint.longitude < auxPoint.longitude) ? auxPoint.longitude : that.startPoint.longitude;
