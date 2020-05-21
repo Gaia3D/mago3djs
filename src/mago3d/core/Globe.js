@@ -667,7 +667,12 @@ Globe.geographicRadianToMercatorProjection = function(lonRad, latRad, resultPoin
 
 	var PI = Math.PI;
 	var x = equatorialRadius * lonRad;
-	var scale = x/(lonRad * 180/PI);
+	var scale = 0;
+	if (x !== 0) 
+	{
+		scale = x/(lonRad * 180/PI);
+	}
+	
 	var y = 180.0/PI * Math.log(Math.tan(PI/4.0 + latRad/2.0)) * scale;
 
 	resultPoint2d.set(x, y);
