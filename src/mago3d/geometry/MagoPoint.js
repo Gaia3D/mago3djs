@@ -80,15 +80,4 @@ MagoPoint.prototype.makeMesh = function(magoManager)
 	this.setDirty(false);
 };
 
-/**
- * Clear the data of this feature
- * @param {VBOMemManager} vboMemManager 
- */
-MagoPoint.prototype.deleteObjects = function(vboMemManager)
-{
-	if (this.vboKeysContainer !== undefined)
-	{
-		this.vboKeysContainer.deleteGlObjects(vboMemManager.gl, vboMemManager);
-		this.vboKeysContainer = undefined;
-	}
-};
+

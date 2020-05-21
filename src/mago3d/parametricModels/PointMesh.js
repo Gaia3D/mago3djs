@@ -71,3 +71,16 @@ PointMesh.prototype.renderAsChild = function (magoManager, shader, renderType, g
 
 };
 
+/**
+ * Clear the data of this feature
+ * @param {VBOMemManager} vboMemManager 
+ */
+PointMesh.prototype.deleteObjects = function(vboMemManager)
+{
+	if (this.vboKeysContainer !== undefined)
+	{
+		this.vboKeysContainer.deleteGlObjects(vboMemManager.gl, vboMemManager);
+		this.vboKeysContainer = undefined;
+	}
+};
+
