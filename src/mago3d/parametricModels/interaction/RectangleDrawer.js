@@ -4,16 +4,16 @@
  * This is the interaction for draw rectangle.
  * @class RectangleDrawer
  * 
- * @param {object} layer layer object.
+ * @param {object} style style object.
  */
 
-var RectangleDrawer = function() 
+var RectangleDrawer = function(style) 
 {
 	if (!(this instanceof RectangleDrawer)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	DrawGeometryInteraction.call(this);
+	DrawGeometryInteraction.call(this, style);
     
 	this.startDraw = false;
 	this.dragging = false;
@@ -96,11 +96,14 @@ RectangleDrawer.prototype.start = function()
 
 			if (!that.tempRectangle)
 			{
+				if (!that.style) 
+				{
+					that.style = {
+						fillColor: '#ff0000'
+					};
+				}
 				
-				var style = {
-					fillColor: '#ff0000'
-				};
-				that.tempRectangle = new MagoRectangle(position, style);
+				that.tempRectangle = new MagoRectangle(position, that.style);
 				manager.modeler.magoRectangle = that.tempRectangle;
 			}
 			else 
@@ -130,6 +133,6 @@ RectangleDrawer.prototype.end = function()
 
 	this.manager.modeler.addObject(this.tempRectangle, 1);
 
-	//this.emit(RectangleDrawer.EVENT_TYPE.DRAWEND ,{})
+	this.emit(RectangleDrawer.EVENT_TYPE.DRAWEND, this.tempRectangle);
 	this.init();
 };
