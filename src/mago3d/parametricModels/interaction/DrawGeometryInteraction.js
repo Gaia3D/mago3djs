@@ -7,13 +7,18 @@
  * @param {object} layer layer object.
  */
 
-var DrawGeometryInteraction = function() 
+var DrawGeometryInteraction = function(style) 
 {
 	if (!(this instanceof DrawGeometryInteraction)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	Emitter.call(this);
+	this.style = {};
+	if (style) 
+	{
+		this.setStyle(style);
+	}
 	this.manager;
 	this.collection;
 	this.active = false;
@@ -21,6 +26,16 @@ var DrawGeometryInteraction = function()
 };
 DrawGeometryInteraction.prototype = Object.create(Emitter.prototype);
 DrawGeometryInteraction.prototype.constructor = DrawGeometryInteraction;
+
+DrawGeometryInteraction.prototype.getStyle = function() 
+{
+	return this.style;
+};
+
+DrawGeometryInteraction.prototype.setStyle = function(style) 
+{
+	this.style = style;
+};
 
 DrawGeometryInteraction.prototype.setActive = function(active) 
 {

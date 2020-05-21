@@ -7,13 +7,13 @@
  * @param {object} layer layer object.
  */
 
-var PointDrawer = function() 
+var PointDrawer = function(style) 
 {
 	if (!(this instanceof PointDrawer)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	DrawGeometryInteraction.call(this);
+	DrawGeometryInteraction.call(this, style);
 
 	this.startDraw = false;
 	this.result = [];

@@ -77,6 +77,19 @@ MagoRectangle.prototype.setPosition = function(position)
 	// Check if exist material (texture).
 	
 };
+
+/**
+ * return area
+ * @return {number} 
+ */
+MagoRectangle.prototype.getArea = function() 
+{
+	var area = 0;
+	var edge = new GeographicCoord(this.minGeographicCoord.longitude, this.maxGeographicCoord.latitude, this.maxGeographicCoord.altitude);
+	var width = Globe.getArcDistanceBetweenGeographicCoords(this.minGeographicCoord, edge);
+	var height = Globe.getArcDistanceBetweenGeographicCoords(edge, this.maxGeographicCoord);
+	return Math.abs(width * height);
+};
 /**
  * Makes the geometry mesh.
  */
@@ -153,7 +166,7 @@ MagoRectangle.prototype.makeMesh = function(magoManager)
 			t = (currLat - minLat)/latRange;
 			
 			this.texCoordsArray[idx*2] = s;
-			this.texCoordsArray[idx*2+1] = t;
+			this.texCoordsArray[idx*2+1] = 1.0 - t;
 			
 			// actualize current values.
 			idx++;
