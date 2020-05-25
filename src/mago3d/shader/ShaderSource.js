@@ -3861,6 +3861,7 @@ void main()\n\
 			} \n\
 \n\
 			occlusion = 1.0 - occlusion / float(kernelSize);\n\
+			\n\
 			shadow_occlusion *= occlusion;\n\
 		}\n\
 	\n\

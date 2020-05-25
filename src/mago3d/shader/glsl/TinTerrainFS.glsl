@@ -438,6 +438,7 @@ void main()
 			} 
 
 			occlusion = 1.0 - occlusion / float(kernelSize);
+			
 			shadow_occlusion *= occlusion;
 		}
 	

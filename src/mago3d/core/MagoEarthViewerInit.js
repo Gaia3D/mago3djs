@@ -100,8 +100,10 @@ MagoEarthViewerInit.prototype.setEventHandler = function()
 		canvas.width = canvas.offsetWidth;
 		canvas.height = canvas.offsetHeight;
 
-		//magoWorld
-		//viewer
+		var magoWorld = viewer;
+		var magomanager = magoWorld.magoManager;
+		var sceneState = magomanager.sceneState;
+		sceneState.setDrawingBufferSize(canvas.offsetWidth, canvas.offsetHeight);
 	}, false);
 	
 	var handlekeydown = function(event) 

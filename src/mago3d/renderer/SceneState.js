@@ -290,6 +290,15 @@ SceneState.prototype.setApplySunShadows = function(bApplySunShadows)
 	this.applySunShadows = bApplySunShadows;
 };
 
+/**
+ * Returns the camera.
+ */
+SceneState.prototype.setDrawingBufferSize = function(width, height) 
+{
+	this.drawingBufferWidth[0] = width;
+	this.drawingBufferHeight[0] = height;
+};
+
 
 
 

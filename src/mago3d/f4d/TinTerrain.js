@@ -962,7 +962,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			//	gl.uniform1i(currentShader.bExistAltitudes_loc, false);
 			//}
 			
-			gl.uniform1i(currentShader.bApplySsao_loc, false); // apply ssao default.***
+			gl.uniform1i(currentShader.bApplySsao_loc, false); // no apply ssao on skirt.***
 			gl.drawArrays(gl.TRIANGLE_STRIP, 0, vboKey.vertexCount); // Fill.
 
 			//this.swapRenderingFase();

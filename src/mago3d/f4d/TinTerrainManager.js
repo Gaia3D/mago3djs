@@ -265,7 +265,7 @@ TinTerrainManager.prototype.makeDistanceLimitByDepth = function()
 
 	for (var i=0; i<distLimitByDepthCount; i++)
 	{
-		this.distLimitByDepth[i] *= 3;
+		this.distLimitByDepth[i] *= 2.5;
 	}
 
 	
