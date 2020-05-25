@@ -165,6 +165,7 @@ SceneState.prototype.initMagoSceneState = function()
 		throw new Error('container is empty.');
 	}
 	var canvas = document.createElement('canvas');
+	canvas.id = '_mago3dCanvas';
 	canvas.style.width = '100%';
 	canvas.style.height = '100%';
 	containerDiv.appendChild(canvas);
