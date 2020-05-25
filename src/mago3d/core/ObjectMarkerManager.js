@@ -94,7 +94,7 @@ ObjectMarkerManager.prototype.newObjectMarker = function(options, magoManager)
 		if (options.id !== undefined)
 		{
 			objMarker.id = options.id;
-			this.objectMarkerDynamicMap[objMarker.id] = objMarker;
+			this.objectMarkerMap[objMarker.id] = objMarker;
 		}
 
 		if (options.positionWC)
@@ -163,7 +163,7 @@ ObjectMarkerManager.prototype.getObjectMarkerById = function(id)
 		}
 	}
 
-	return this.objectMarkerDynamicMap[id];
+	return this.objectMarkerMap[id];
 };
 
 /**
