@@ -14,6 +14,7 @@ var ObjectMarkerManager = function(magoManager)
 	}
 	this.magoManager = magoManager;
 	this.objectMarkerArray = [];
+	this.objectMarkerMap = {};
 	this.pin = new Pin();
 };
 
@@ -31,6 +32,7 @@ ObjectMarkerManager.prototype.deleteObjects = function()
 		this.objectMarkerArray[i] = undefined;
 	}
 	this.objectMarkerArray = [];
+	this.objectMarkerMap = {};
 };
 
 ObjectMarkerManager.prototype.setMarkerByCondition = function(condition)
@@ -89,6 +91,12 @@ ObjectMarkerManager.prototype.newObjectMarker = function(options, magoManager)
 	
 	if (options)
 	{
+		if (options.id !== undefined)
+		{
+			objMarker.id = options.id;
+			this.objectMarkerDynamicMap[objMarker.id] = objMarker;
+		}
+
 		if (options.positionWC)
 		{
 			var posWC = options.positionWC;
@@ -129,6 +137,33 @@ ObjectMarkerManager.prototype.newObjectMarker = function(options, magoManager)
 	}
 	
 	return objMarker;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @class ObjectMarkerManager
+ *
+ */
+ObjectMarkerManager.prototype.getObjectMarkerById = function(id)
+{
+	if (this.objectMarkerMap[id] === undefined)
+	{
+		// find objectMarker by id.
+		var objectsCount = this.objectMarkerArray.length;
+		var find = false;
+		var i=0; 
+		while (!find && i<objectsCount)
+		{
+			if (this.objectMarkerArray.id === id)
+			{
+				find = true;
+				this.objectMarkerMap[id] = this.objectMarkerArray;
+			}
+			i++;
+		}
+	}
+
+	return this.objectMarkerDynamicMap[id];
 };
 
 /**

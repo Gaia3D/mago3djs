@@ -439,6 +439,13 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 		return false;
 	}
 
+	if (magoManager.fileRequestControler.tinTerrainFilesRequested >= 4)
+	{ return false; }
+
+	if (magoManager.fileRequestControler.tinTerrainTexturesRequested >= 2)
+	{ return false; }
+
+
 	// This function 1- loads file & 2- parses file & 3- makes vbo.
 	// 1rst, check if the parent is prepared. If parent is not prepared, then prepare the parent.
 	if (this.owner === undefined || this.owner.isPrepared())
@@ -456,7 +463,7 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 				return false;
 			}
 
-			if (magoManager.fileRequestControler.tinTerrainFilesRequested >= 6)
+			if (magoManager.fileRequestControler.tinTerrainFilesRequested >= 4)
 			{ return false; }
 
 			var pathName = this.getPathName();
@@ -573,7 +580,7 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 		}
 		else if (!this.isTexturePrepared(this.texture))
 		{
-			if (magoManager.fileRequestControler.tinTerrainTexturesRequested >= 6)
+			if (magoManager.fileRequestControler.tinTerrainTexturesRequested >= 2)
 			{ return false; }
 
 			this.prepareTexture(this.texture, tinTerrainManager.imagerys, magoManager, tinTerrainManager);
@@ -726,7 +733,7 @@ TinTerrain.prototype.renderBorder = function(currentShader, magoManager)
 
 TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray)
 {	
-	if (this.depth === 0)
+	if (this.depth === 0)// || this.intersectionType === Constant.INTERSECTION_OUTSIDE)
 	{ return true; }
 	
 	if (this.owner === undefined || (this.owner.isPrepared() && this.owner.isChildrenPrepared()))
@@ -1269,7 +1276,7 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 	var currDepth = this.depth;
 
 	// Test frustumCulling.***************************************************
-	//this.intersectionType = frustum.intersectionSphere(this.sphereExtent);
+	this.intersectionType = frustum.intersectionSphere(this.sphereExtent);
 	//if (this.intersectionType === Constant.INTERSECTION_OUTSIDE)
 	//{ return; }
 	//else if (this.intersectionType === Constant.INTERSECTION_INSIDE)
@@ -1281,9 +1288,17 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 	//{
 	//}
 	// End frustumCulling.--------------------------------------------------
+
+	//if (this.intersectionType === Constant.INTERSECTION_OUTSIDE)
+	//{ return; }
 	
 	// check distance to camera.
-	this.distToCam = camPos.distToSphere(sphereExtentAux);
+	var cameraSphere = new Sphere();
+	cameraSphere.setCenterPoint(camPos.x, camPos.y, camPos.z);
+	cameraSphere.setRadius(camPos.camElevation/2);
+
+	//this.distToCam = camPos.distToSphere(sphereExtentAux);
+	this.distToCam = cameraSphere.distToSphere(sphereExtentAux);
 	var distLimit = this.tinTerrainManager.distLimitByDepth[currDepth];
 	
 	if (this.distToCam > distLimit)
@@ -1306,12 +1321,7 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 	
 	if (currDepth < maxDepth)
 	{
-		if (!this.isPrepared())
-		{
-			this.visible = true;
-			this.putObjectToArraySortedByDist(visibleTilesArray, this);
-			return;
-		}
+
 
 		// must descend.
 		var curX = this.X;
@@ -1414,6 +1424,22 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 			
 			subTile_RD.setWebMercatorExtent(wmMidX, wmMinY, wmMaxX, wmMidY);
 		}
+
+		// If this is no prepared then stop process.
+		
+		if (!this.isPrepared())
+		{
+			this.visible = true;
+			this.putObjectToArraySortedByDist(visibleTilesArray, this);
+
+			this.putObjectToArraySortedByDist(visibleTilesArray, this.childMap.LU);
+			this.putObjectToArraySortedByDist(visibleTilesArray, this.childMap.LD);
+			this.putObjectToArraySortedByDist(visibleTilesArray, this.childMap.RU);
+			this.putObjectToArraySortedByDist(visibleTilesArray, this.childMap.RD);
+
+			return;
+		}
+		
 		
 		// now, do frustumCulling for each childTiles.
 		subTile_LU.getFrustumIntersectedTinTerrainsQuadTree(frustum, maxDepth, camPos, magoManager, visibleTilesArray, noVisibleTilesArray);

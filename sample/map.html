@@ -134,7 +134,7 @@
 			console.info('CAMERAMOVEEND');
 		});
 	}
-
+	/*
 	function doTest(){
 		var f4dController = MAGO3D_INSTANCE.getF4dController();
 		$.ajax({
@@ -150,6 +150,24 @@
 			}
 		});
 	}
+	*/
+
+	function doTest(){
+		var f4dController = MAGO3D_INSTANCE.getF4dController();
+		$.ajax({
+			url: dataInformationUrl + "3ds.json",
+			type: "GET",
+			dataType: "json",
+			success: function(f4dObject){
+				console.info(f4dObject);
+				f4dController.addF4dGroup(f4dObject);
+			},
+			error: function(e){
+				alert(e.responseText);
+			}
+		});
+	}
+
 </script>
 </body>
 </html>

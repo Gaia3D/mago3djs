@@ -38,6 +38,7 @@ var SceneState = function()
 	this.encodedCamPosLow = new Float32Array([0.0, 0.0, 0.0]);
 	
 	this.camera = new Camera();
+	this.camera.id = "mainCamera";
 	this.drawingBufferWidth = new Int32Array([1000]);
 	this.drawingBufferHeight = new Int32Array([1000]);
 	this.mouseAction = new MouseAction();

@@ -750,6 +750,19 @@ Camera.prototype.getUp = function()
 	return this.up;
 };
 
+Camera.prototype.getTargetPositionAtDistance = function (dist, resultTargetPos) 
+{
+	if (resultTargetPos === undefined)
+	{ resultTargetPos = new Point3D(); }
+
+	var dir = this.direction;
+	var pos = this.position;
+
+	resultTargetPos.set(pos.x + dir.x*dist, pos.y + dir.y*dist, pos.z + dir.z*dist);
+
+	return resultTargetPos;
+};
+
 /**
  * set position and orientation ( direction, up) of the camera
  * only cesium

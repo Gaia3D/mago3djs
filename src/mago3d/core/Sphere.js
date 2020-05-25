@@ -80,6 +80,16 @@ Sphere.prototype.distToPoint3D = function(point3d)
 };
 
 /**
+ * 포인트값 삭제
+ * 어떤 일을 하고 있습니까?
+ */
+Sphere.prototype.distToSphere = function(sphere) 
+{
+	var sphereCenter = sphere.centerPoint;
+	return this.centerPoint.distToPoint(sphereCenter) - this.r - sphere.r;
+};
+
+/**
  */
 Sphere.prototype.getVbo = function(resultVboContainer, bTexCoords)
 {

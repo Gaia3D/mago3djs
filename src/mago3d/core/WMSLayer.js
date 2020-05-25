@@ -64,6 +64,14 @@ WMSLayer.prototype.getUrl = function(info)
 	var minGeographicCoord = rectangle.minGeographicCoord;
 	var maxGeographicCoord = rectangle.maxGeographicCoord;
 
+	// Debug.
+	if (minGeographicCoord.longitude > maxGeographicCoord.longitude)
+	{ var hola = 0; }
+
+	if (minGeographicCoord.latitude > maxGeographicCoord.latitude)
+	{ var hola = 0; }
+	// End debug.
+
 	// Test to convert coords to meters.***********************************
 	var minMercator = Globe.geographicToMercatorProjection(minGeographicCoord.longitude, minGeographicCoord.latitude, undefined);
 	var maxMercator = Globe.geographicToMercatorProjection(maxGeographicCoord.longitude, maxGeographicCoord.latitude, undefined);

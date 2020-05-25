@@ -257,10 +257,18 @@ TinTerrainManager.prototype.makeDistanceLimitByDepth = function()
 	//this.distLimitByDepth[0] = 5;
 	
 	var distLimitByDepthCount = this.distLimitByDepth.length;
+
 	for (var i=0; i<distLimitByDepthCount; i++)
 	{
-		this.distLimitByDepth[i] *= 0.7;
+		this.distLimitByDepth[i] -= 2000.0;
 	}
+
+	for (var i=0; i<distLimitByDepthCount; i++)
+	{
+		this.distLimitByDepth[i] *= 0.05;
+	}
+
+	
 	
 };
 
@@ -298,10 +306,23 @@ TinTerrainManager.prototype.getTexCorrection = function(depth)
 	return this.texCorrection[depth];
 };
 
-TinTerrainManager.prototype.doFrustumCulling = function(frustum, camPos, magoManager, maxDepth)
+TinTerrainManager.prototype.doFrustumCulling = function(frustum, camera, magoManager, maxDepth)
 {
 	if (maxDepth === undefined)
 	{ maxDepth = this.maxDepth; }
+
+	var camPos = camera.position;
+	var camElevation = camera.getCameraElevation();
+	var camTarget = camera.getTargetPositionAtDistance(camElevation/2, undefined);
+	camPos = camTarget;
+	camPos.camElevation = camElevation;
+
+	// Test.
+	//var sceneState = magoManager.sceneState;
+	//var drawingBufferWidth = sceneState.drawingBufferWidth[0];
+	//var drawingBufferHeight = sceneState.drawingBufferHeight[0];
+	//var pixelPosWC = ManagerUtils.calculatePixelPositionWorldCoord(magoManager.getGl(), drawingBufferWidth/2, drawingBufferHeight, undefined, undefined, undefined, undefined, magoManager);
+	//camPos = pixelPosWC;
 	
 	this.visibleTilesArray.length = 0;
 	this.noVisibleTilesArray.length = 0;
