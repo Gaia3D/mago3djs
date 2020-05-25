@@ -163,7 +163,7 @@ ObjectMarkerManager.prototype.getObjectMarkerById = function(id)
 		}
 	}
 
-	return this.objectMarkerDynamicMap[id];
+	return this.objectMarkerMap[id];
 };
 
 /**

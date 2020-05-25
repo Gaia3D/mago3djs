@@ -76,6 +76,13 @@ float unpackDepth(const in vec4 rgba_depth)
     return depth;
 } 
 
+float unpackDepthOcean(const in vec4 rgba_depth)
+{
+    const vec4 bit_shift = vec4(1.0, 0.00390625, 0.000015258789, 0.000000059605);
+    float depth = dot(rgba_depth, bit_shift);
+    return depth;
+} 
+
 float UnpackDepth32( in vec4 pack )
 {
     float depth = dot( pack, 1.0 / vec4(1.0, 256.0, 256.0*256.0, 16777216.0) );// 256.0*256.0*256.0 = 16777216.0
@@ -538,6 +545,13 @@ void main()
 				// decode the grayScale.***
 				altitude = uMinMaxAltitudes.x + layersTextureColor.r * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);
 			}
+
+			//if(layersTextureColor.w > 0.0)
+			//{
+			//	// decode the grayScale.***
+			//	float depth = unpackDepthOcean(layersTextureColor);
+			//	altitude = uMinMaxAltitudes.x + depth * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);
+			//}
 		}
 		// End test dem image.------------------------------------------------------------------------------------------------------------
 		
