@@ -912,20 +912,20 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 					gl.uniform4fv(currentShader.oneColor4_loc, [0.0, 0.9, 0.9, 1.0]);
 					
 					gl.drawElements(gl.LINES, indicesCount-1, gl.UNSIGNED_SHORT, 0); 
-					/*
-					if (this.tinTerrainManager.getTerrainType() === 0)
-					{
-						gl.drawElements(gl.LINE_STRIP, indicesCount-1, gl.UNSIGNED_SHORT, 0); 
-					}
-					else 
-					{
-						var trianglesCount = indicesCount;
-						for (var i=0; i<trianglesCount-1; i++)
-						{
-							gl.drawElements(gl.LINE_LOOP, 3, gl.UNSIGNED_SHORT, i*3); 
-						}
-					}
-					*/
+					
+					//if (this.tinTerrainManager.getTerrainType() === 0)
+					//{
+					//	gl.drawElements(gl.LINE_STRIP, indicesCount-1, gl.UNSIGNED_SHORT, 0); 
+					//}
+					//else 
+					//{
+					//	var trianglesCount = indicesCount;
+					//	for (var i=0; i<trianglesCount-1; i++)
+					//	{
+					//		gl.drawElements(gl.LINE_LOOP, 3, gl.UNSIGNED_SHORT, i*3); 
+					//	}
+					//}
+					
 					this.drawTerrainName(magoManager);
 				}
 			}
@@ -963,8 +963,8 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			gl.uniform1i(currentShader.bApplySsao_loc, false); // apply ssao default.***
 			gl.drawArrays(gl.TRIANGLE_STRIP, 0, vboKey.vertexCount); // Fill.
 
-			this.swapRenderingFase();
-
+			//this.swapRenderingFase();
+			this.renderingFase = !magoManager.renderingFase;
 		}
 		else 
 		{
