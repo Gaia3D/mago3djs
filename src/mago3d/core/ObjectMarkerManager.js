@@ -218,7 +218,8 @@ ObjectMarkerManager.prototype.newObjectMarkerSpeechBubble = function(options, ma
 
 		var optionsObjectMarker = {
 			target        : target,
-			imageFilePath : img
+			imageFilePath : img,
+			id            : options.id
 		};
 
 		//지도에 ObjectMarker생성하여 표출
@@ -233,7 +234,8 @@ ObjectMarkerManager.prototype.newObjectMarkerSpeechBubble = function(options, ma
 		var alt = options.altitude;
 		var optionsObjectMarker = {
 			positionWC    : Mago3D.ManagerUtils.geographicCoordToWorldPoint(lon, lat, alt),
-			imageFilePath : img
+			imageFilePath : img,
+			id            : options.id
 		};
 
 		//지도에 ObjectMarker생성하여 표출

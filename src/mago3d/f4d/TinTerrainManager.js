@@ -260,12 +260,12 @@ TinTerrainManager.prototype.makeDistanceLimitByDepth = function()
 
 	for (var i=0; i<distLimitByDepthCount; i++)
 	{
-		this.distLimitByDepth[i] -= 2000.0;
+		this.distLimitByDepth[i] -= 1000.0;
 	}
 
 	for (var i=0; i<distLimitByDepthCount; i++)
 	{
-		this.distLimitByDepth[i] *= 0.05;
+		this.distLimitByDepth[i] *= 0.5;
 	}
 
 	
@@ -312,10 +312,10 @@ TinTerrainManager.prototype.doFrustumCulling = function(frustum, camera, magoMan
 	{ maxDepth = this.maxDepth; }
 
 	var camPos = camera.position;
-	var camElevation = camera.getCameraElevation();
-	var camTarget = camera.getTargetPositionAtDistance(camElevation/2, undefined);
-	camPos = camTarget;
-	camPos.camElevation = camElevation;
+	//var camElevation = camera.getCameraElevation();
+	//var camTarget = camera.getTargetPositionAtDistance(camElevation/2, undefined);
+	//camPos = camTarget;
+	//camPos.camElevation = camElevation;
 
 	// Test.
 	//var sceneState = magoManager.sceneState;

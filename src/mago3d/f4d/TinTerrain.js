@@ -1257,6 +1257,216 @@ TinTerrain.prototype.putObjectToArraySortedByDist = function(objectsArray, objec
 	}
 };
 
+
+TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree__testing = function(frustum, maxDepth, camPos, magoManager, visibleTilesArrayMap, noVisibleTilesArray)
+{
+	// Note: this is NO frustum intersection. Select tiles by distance to camera. Function name must to be change.
+	if (this.geographicExtent === undefined || this.geographicExtent.minGeographicCoord === undefined || this.geographicExtent.maxGeographicCoord === undefined)
+	{ return; }
+	
+	var currMinGeographicCoords = this.geographicExtent.minGeographicCoord;
+	var currMaxGeographicCoords = this.geographicExtent.maxGeographicCoord;
+		
+	if (this.sphereExtent === undefined)
+	{
+		this.sphereExtent = SmartTile.computeSphereExtent(magoManager, currMinGeographicCoords, currMaxGeographicCoords, this.sphereExtent);
+	}
+	
+	var sphereExtentAux = this.sphereExtent;
+
+	var currDepth = this.depth;
+
+	// Test frustumCulling.***************************************************
+	//this.intersectionType = frustum.intersectionSphere(this.sphereExtent);
+	//if (this.intersectionType === Constant.INTERSECTION_OUTSIDE)
+	//{ return; }
+	//else if (this.intersectionType === Constant.INTERSECTION_INSIDE)
+	//{
+	//	resultFullyIntersectedTilesArray.push(this);
+	//	return;
+	//}
+	//else if (this.intersectionType === Constant.INTERSECTION_INTERSECT)
+	//{
+	//}
+	// End frustumCulling.--------------------------------------------------
+
+	//if (this.intersectionType === Constant.INTERSECTION_OUTSIDE)
+	//{ return; }
+	
+	// check distance to camera.
+	//var cameraSphere = new Sphere();
+	//cameraSphere.setCenterPoint(camPos.x, camPos.y, camPos.z);
+	//cameraSphere.setRadius(camPos.camElevation/2);
+
+	this.distToCam = camPos.distToSphere(sphereExtentAux);
+	//this.distToCam = cameraSphere.distToSphere(sphereExtentAux);
+	var distLimit = this.tinTerrainManager.distLimitByDepth[currDepth];
+	
+	if (this.distToCam > distLimit)
+	{
+		// finish the process.
+		this.visible = true;
+		if (visibleTilesArrayMap[this.depth] === undefined)
+		{ visibleTilesArrayMap[this.depth] = []; }
+
+		this.putObjectToArraySortedByDist(visibleTilesArrayMap[this.depth], this);
+		
+		// Now, extract all lowest-child and put into "noVisibleTilesArray".***
+		if (this.hasChildren())
+		{
+			//this.extractLowestTinTerrains(noVisibleTilesArray);
+			noVisibleTilesArray.push(this.childMap.LU);
+			noVisibleTilesArray.push(this.childMap.LD);
+			noVisibleTilesArray.push(this.childMap.RU);
+			noVisibleTilesArray.push(this.childMap.RD);
+		}
+		return;
+	}
+	
+	if (currDepth < maxDepth)
+	{
+
+
+		// must descend.
+		var curX = this.X;
+		var curY = this.Y;
+		var minLon = currMinGeographicCoords.longitude;
+		var minLat = currMinGeographicCoords.latitude;
+		var minAlt = currMinGeographicCoords.altitude;
+		var maxLon = currMaxGeographicCoords.longitude;
+		var maxLat = currMaxGeographicCoords.latitude;
+		var maxAlt = currMaxGeographicCoords.altitude;
+		var midLon = (minLon + maxLon)/ 2;
+		var midLat = (minLat + maxLat)/ 2;
+	
+		// create children if no exist.
+		// +--------------+--------------+
+		// | subTile 0(LU)| subTile 2(RU)|
+		// | X = curX*2   | X = curX*2+1 |
+		// | Y = curY*2   | Y = curY*2   |
+		// |              |              |
+		// +--------------+--------------+
+		// | subTile 1(LD)| subTile 3(RD)|
+		// | X = curX*2   | X = curX*2+1 |
+		// | Y = curY*2+1 | Y = curY*2+1 |
+		// |              |              |
+		// +--------------+--------------+
+		
+		if (this.tinTerrainManager.imageryType === CODE.imageryType.WEB_MERCATOR)
+		{
+			midLat = this.getMidLatitudeRadWebMercator()*180/Math.PI;
+		}
+		
+		var wmMinX = this.webMercatorExtent.minX;
+		var wmMinY = this.webMercatorExtent.minY;
+		var wmMaxX = this.webMercatorExtent.maxX;
+		var wmMaxY = this.webMercatorExtent.maxY;
+		var wmMidX = (wmMaxX + wmMinX)/2.0;
+		var wmMidY = (wmMaxY + wmMinY)/2.0;
+			
+		if (this.childMap === undefined)
+		{ this.childMap = {}; }
+		
+		// subTile 0 (Left-Up).
+		var subTile_LU = this.childMap.LU;
+		if (subTile_LU === undefined)
+		{
+			// if no exist -> create it.
+			subTile_LU = new TinTerrain(this);
+			subTile_LU.X = curX*2;
+			subTile_LU.Y = curY*2;
+			subTile_LU.setGeographicExtent(minLon, midLat, minAlt,  midLon, maxLat, maxAlt); 
+			subTile_LU.indexName = "LU";
+			subTile_LU.tinTerrainManager = this.tinTerrainManager;
+			this.childMap.LU = subTile_LU;
+			
+			subTile_LU.setWebMercatorExtent(wmMinX, wmMidY, wmMidX, wmMaxY);
+		}
+		
+		// subTile 1 (Left-Down).
+		var subTile_LD = this.childMap.LD;
+		if (subTile_LD === undefined)
+		{
+			// if no exist -> create it.
+			subTile_LD = new TinTerrain(this);
+			subTile_LD.X = curX*2;
+			subTile_LD.Y = curY*2+1;
+			subTile_LD.setGeographicExtent(minLon, minLat, minAlt,  midLon, midLat, maxAlt); 
+			subTile_LD.indexName = "LD";
+			subTile_LD.tinTerrainManager = this.tinTerrainManager;
+			this.childMap.LD = subTile_LD;
+			
+			subTile_LD.setWebMercatorExtent(wmMinX, wmMinY, wmMidX, wmMidY);
+		}
+		
+		// subTile 2 (Right-Up).
+		var subTile_RU = this.childMap.RU;
+		if (subTile_RU === undefined)
+		{
+			subTile_RU = new TinTerrain(this);
+			subTile_RU.X = curX*2+1;
+			subTile_RU.Y = curY*2;
+			subTile_RU.setGeographicExtent(midLon, midLat, minAlt,  maxLon, maxLat, maxAlt); 
+			subTile_RU.indexName = "RU";
+			subTile_RU.tinTerrainManager = this.tinTerrainManager;
+			this.childMap.RU = subTile_RU;
+			
+			subTile_RU.setWebMercatorExtent(wmMidX, wmMidY, wmMaxX, wmMaxY);
+		}
+		
+		// subTile 3 (Right-Down).
+		var subTile_RD = this.childMap.RD;
+		if (subTile_RD === undefined)
+		{
+			subTile_RD = new TinTerrain(this);
+			subTile_RD.X = curX*2+1;
+			subTile_RD.Y = curY*2+1;
+			subTile_RD.setGeographicExtent(midLon, minLat, minAlt,  maxLon, midLat, maxAlt);
+			subTile_RD.indexName = "RD";
+			subTile_RD.tinTerrainManager = this.tinTerrainManager;
+			this.childMap.RD = subTile_RD;
+			
+			subTile_RD.setWebMercatorExtent(wmMidX, wmMinY, wmMaxX, wmMidY);
+		}
+
+		// If this is no prepared then stop process.
+		
+		if (!this.isPrepared())
+		{
+			this.visible = true;
+			if (visibleTilesArrayMap[this.depth] === undefined)
+			{ visibleTilesArrayMap[this.depth] = []; }
+			this.putObjectToArraySortedByDist(visibleTilesArray, this);
+
+			//var childrenDepth = 
+			//if(visibleTilesArrayMap[this.childMap.LU.depth] === undefined)
+			//visibleTilesArrayMap[this.childMap.LU.depth] = [];
+			this.putObjectToArraySortedByDist(visibleTilesArray, this.childMap.LU);
+			this.putObjectToArraySortedByDist(visibleTilesArray, this.childMap.LD);
+			this.putObjectToArraySortedByDist(visibleTilesArray, this.childMap.RU);
+			this.putObjectToArraySortedByDist(visibleTilesArray, this.childMap.RD);
+
+			return;
+		}
+		
+		
+		// now, do frustumCulling for each childTiles.
+		subTile_LU.getFrustumIntersectedTinTerrainsQuadTree(frustum, maxDepth, camPos, magoManager, visibleTilesArray, noVisibleTilesArray);
+		subTile_LD.getFrustumIntersectedTinTerrainsQuadTree(frustum, maxDepth, camPos, magoManager, visibleTilesArray, noVisibleTilesArray);
+		subTile_RU.getFrustumIntersectedTinTerrainsQuadTree(frustum, maxDepth, camPos, magoManager, visibleTilesArray, noVisibleTilesArray);
+		subTile_RD.getFrustumIntersectedTinTerrainsQuadTree(frustum, maxDepth, camPos, magoManager, visibleTilesArray, noVisibleTilesArray);
+	}
+	else 
+	{
+		// finish the process.
+		this.visible = true;
+		//visibleTilesArray.push(this);
+		this.putObjectToArraySortedByDist(visibleTilesArray, this);
+		return;
+	}
+	
+};
+
 TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum, maxDepth, camPos, magoManager, visibleTilesArray, noVisibleTilesArray)
 {
 	// Note: this is NO frustum intersection. Select tiles by distance to camera. Function name must to be change.
@@ -1276,7 +1486,7 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 	var currDepth = this.depth;
 
 	// Test frustumCulling.***************************************************
-	this.intersectionType = frustum.intersectionSphere(this.sphereExtent);
+	//this.intersectionType = frustum.intersectionSphere(this.sphereExtent);
 	//if (this.intersectionType === Constant.INTERSECTION_OUTSIDE)
 	//{ return; }
 	//else if (this.intersectionType === Constant.INTERSECTION_INSIDE)
@@ -1293,12 +1503,12 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 	//{ return; }
 	
 	// check distance to camera.
-	var cameraSphere = new Sphere();
-	cameraSphere.setCenterPoint(camPos.x, camPos.y, camPos.z);
-	cameraSphere.setRadius(camPos.camElevation/2);
+	//var cameraSphere = new Sphere();
+	//cameraSphere.setCenterPoint(camPos.x, camPos.y, camPos.z);
+	//cameraSphere.setRadius(camPos.camElevation/2);
 
-	//this.distToCam = camPos.distToSphere(sphereExtentAux);
-	this.distToCam = cameraSphere.distToSphere(sphereExtentAux);
+	this.distToCam = camPos.distToSphere(sphereExtentAux);
+	//this.distToCam = cameraSphere.distToSphere(sphereExtentAux);
 	var distLimit = this.tinTerrainManager.distLimitByDepth[currDepth];
 	
 	if (this.distToCam > distLimit)
