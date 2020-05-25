@@ -6,6 +6,11 @@ var XYZLayer = function(options)
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
+
+	if (isEmpty(options.url) && isEmpty(options.urlFunction)) 
+	{
+		throw new Error(Messages.REQUIRED_EMPTY_ERROR('url or urlFunction'));
+	}
 	this._id = createGuid();
 	this.url = options.url;
 	this.reg = /{[^}]+}/g;
@@ -18,6 +23,7 @@ var XYZLayer = function(options)
 	};
 	Object.freeze(this._freezeAttr);
 	this.show = defaultValue(options.show, true);
+	this.urlFunction = defaultValue(options.urlFunction, undefined);
 };
 
 Object.defineProperties(XYZLayer.prototype, {
@@ -37,17 +43,23 @@ Object.defineProperties(XYZLayer.prototype, {
 
 
 XYZLayer.prototype.getUrl = function(info) 
-{
-	var rectangle = SmartTile.getGeographicExtentOfTileLXY(parseInt(info.z), parseInt(info.x), parseInt(info.y), undefined, CODE.imageryType.WEB_MERCATOR);
-	
-	var matchs = this.url.match(this.reg);
-	var auxUrl = this.url;
-	for (var i=0, len=matchs.length;i<len;i++) 
+{	
+
+	if (this.urlFunction && typeof this.urlFunction ==='function')
 	{
-		var match = matchs[i];
-		var key = match.substring(1, match.length - 1);
-		var value = info[key.toLowerCase()];
-		auxUrl = auxUrl.replace(match, value);
+		return this.urlFunction.call(this, info);
 	}
-	return auxUrl;
+	else 
+	{
+		var matchs = this.url.match(this.reg);
+		var auxUrl = this.url;
+		for (var i=0, len=matchs.length;i<len;i++) 
+		{
+			var match = matchs[i];
+			var key = match.substring(1, match.length - 1);
+			var value = info[key.toLowerCase()];
+			auxUrl = auxUrl.replace(match, value);
+		}
+		return auxUrl;
+	}
 };

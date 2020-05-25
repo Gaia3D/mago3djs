@@ -19,6 +19,7 @@ var RectangleDrawer = function(style)
 	this.dragging = false;
 	this.startPoint;
 	this.endPoint;
+	this.height = 200;
 
 	this.tempRectangle;
 	this.result = [];
@@ -28,6 +29,15 @@ RectangleDrawer.prototype.constructor = RectangleDrawer;
 
 RectangleDrawer.EVENT_TYPE = {
 	'DRAWEND': 'drawend'
+};
+
+RectangleDrawer.prototype.setHeight = function(height) 
+{
+	this.height = height;
+};
+RectangleDrawer.prototype.getHeight = function() 
+{
+	return this.height;
 };
 
 RectangleDrawer.prototype.init = function() 
@@ -90,7 +100,7 @@ RectangleDrawer.prototype.start = function()
 				minLatitude  : minLat,
 				maxLongitude : maxLon,
 				maxLatitude  : maxLat,
-				altitude     : 200.0
+				altitude     : that.height
 			};
 
 			if (!that.tempRectangle)
