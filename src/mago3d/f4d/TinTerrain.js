@@ -183,7 +183,7 @@ TinTerrain.prototype.getPathName = function()
 {
 	// this returns a string as: L//X//Y.
 	// example: "14//4567//516".
-	return this.depth.toString() + "\\" + this.X.toString() + "\\" + this.Y.toString();
+	return this.depth.toString() + "/" + this.X.toString() + "/" + this.Y.toString();
 };
 
 TinTerrain.prototype.getPathInfo = function()
@@ -465,7 +465,9 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 
 			var pathName = this.getPathName();
 			var geometryDataPath = magoManager.readerWriter.geometryDataPath;
-			var fileName = geometryDataPath + "/Terrain/" + pathName + ".terrain";
+			//var fileName = geometryDataPath + "/Terrain/" + pathName + ".terrain";
+
+			var fileName = this.tinTerrainManager.terrainValue + pathName + ".terrain";
 			magoManager.readerWriter.loadTINTerrain(fileName, this, magoManager);
 			
 			return false;

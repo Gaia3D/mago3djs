@@ -65,8 +65,9 @@ MagoEarthViewerInit.prototype.init = function()
 };
 MagoEarthViewerInit.prototype.setEventHandler = function() 
 {
-	var canvas = this.magoManager.sceneState.canvas;
-	var viewer = this.viewer;
+	var that =this;
+	var canvas = that.magoManager.sceneState.canvas;
+	var viewer = that.viewer;
 	// event listener.***
 	canvas.addEventListener('mousedown', function(event)
 	{
@@ -93,10 +94,14 @@ MagoEarthViewerInit.prototype.setEventHandler = function()
 		viewer.mouseclick(event);
 	}, false);
     
-	canvas.addEventListener('resize', function(event)
+	window.addEventListener('resize', function(event)
 	{
 		// TODO:
-		console.log("resize");
+		canvas.width = canvas.offsetWidth;
+		canvas.height = canvas.offsetHeight;
+
+		//magoWorld
+		//viewer
 	}, false);
 	
 	var handlekeydown = function(event) 

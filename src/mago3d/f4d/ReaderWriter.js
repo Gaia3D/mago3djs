@@ -1712,6 +1712,8 @@ ReaderWriter.prototype.loadWMSImage = function(gl, filePath_inServer, texture, m
 	}, function(status) 
 	{
 		console.log(status);
+		texture.texId = 'failed';
+		texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 		
 	}).finally(function() 
 	{
