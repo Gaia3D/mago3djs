@@ -78,6 +78,36 @@ MagoPolyline.prototype.makeMesh = function(magoManager)
 		color     : color
 	};
 	var vectorMesh = GeographicCoordsList.getRenderableObjectOfGeoCoordsArray(this.knotGeoCoordsArray, magoManager, options);
+
+	// Check style. If exist points, then create points.
+	//var magoPoint = new MagoPoint(position, style);
+	if (this.style.point)
+	{
+		//var position = {
+		//	longitude : 126.31394,
+		//	latitude  : 33.18262,
+		//	altitude  : 200.0
+		//};
+		var pointsStyle = this.style.point;
+		//var magoPoint = new MagoPoint(position, pointsStyle);
+		//this.objectsArray.push(magoPoint);
+
+		var coordsCount = this.knotGeoCoordsArray.length;
+		if (coordsCount > 1)
+		{
+			for (var i=0; i<coordsCount; i++)
+			{
+				var coord = this.knotGeoCoordsArray[i];
+				var position = {
+					longitude : coord.longitude,
+					latitude  : coord.latitude,
+					altitude  : coord.altitude
+				};
+				var magoPoint = new MagoPoint(position, pointsStyle);
+				this.objectsArray.push(magoPoint);
+			}
+		}
+	}
 	
 	//vectorMesh.color4 = color;
 	this.objectsArray.push(vectorMesh);

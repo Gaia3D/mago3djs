@@ -302,6 +302,8 @@ void main()
 			return;
 		}
 
+		
+
 		float shadow_occlusion = 1.0;
 		if(bApplyShadow)
 		{
@@ -391,56 +393,7 @@ void main()
 		// check if apply ssao.
 		float occlusion = 1.0;
 		//vec3 normal2 = vNormal;	
-		if(bApplySsao)
-		{
-			// must find depthTex & noiseTex.***
-			////float farForDepth = 30000.0;
-			vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
-			float linearDepth = getDepth(screenPos);  
-			vec3 ray = getViewRay(screenPos); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
-			vec3 origin = ray * linearDepth;  
-			float ssaoRadius = radius*20.0;
-			float tolerance = ssaoRadius/far; // original.***
-			////float tolerance = radius/(far-near);// test.***
-			////float tolerance = radius/farForDepth;
-
-			// in this shader noiseTex is "diffusse_1".
-			vec3 rvec = texture2D(diffuseTex_1, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;
-			vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));
-			vec3 bitangent = cross(normal2, tangent);
-			mat3 tbn = mat3(tangent, bitangent, normal2);   
-			float minDepthBuffer;
-			float maxDepthBuffer;
-			for(int i = 0; i < kernelSize; ++i)
-			{    	 
-				vec3 sample = origin + (tbn * vec3(kernel[i].x*3.0, kernel[i].y*3.0, kernel[i].z)) * ssaoRadius*2.0; // original.***
-				vec4 offset = projectionMatrix * vec4(sample, 1.0);					
-				offset.xy /= offset.w;
-				offset.xy = offset.xy * 0.5 + 0.5;  				
-				float sampleDepth = -sample.z/far;// original.***
-
-				float depthBufferValue = getDepth(offset.xy);
-				/*
-				if(depthBufferValue > 0.00391 && depthBufferValue < 0.00393)
-				{
-					if (depthBufferValue < sampleDepth-tolerance*1000.0)
-					{
-						occlusion +=  0.5;
-					}
-					
-					continue;
-				}			
-				*/
-				if (depthBufferValue < sampleDepth)//-tolerance)
-				{
-					occlusion +=  1.0;
-				}
-			} 
-
-			occlusion = 1.0 - occlusion / float(kernelSize);
-			
-			shadow_occlusion *= occlusion;
-		}
+		
 	
 		vec4 textureColor;
 		if(colorType == 0) // one color.
@@ -536,6 +489,7 @@ void main()
 		textureColor.w = externalAlpha;
 		vec4 fogColor = vec4(0.9, 0.9, 0.9, 1.0);
 		
+		
 		// Test dem image.***************************************************************************************************************
 		float altitude = 1000000.0;
 		if(uActiveTextures[5] == 10)
@@ -555,8 +509,56 @@ void main()
 			//}
 		}
 		// End test dem image.------------------------------------------------------------------------------------------------------------
-		
-		
+		if(bApplySsao && altitude<0.0)
+		{
+			// must find depthTex & noiseTex.***
+			////float farForDepth = 30000.0;
+			vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
+			float linearDepth = getDepth(screenPos);  
+			vec3 ray = getViewRay(screenPos); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
+			vec3 origin = ray * linearDepth;  
+			float ssaoRadius = radius*20.0;
+			float tolerance = ssaoRadius/far; // original.***
+			////float tolerance = radius/(far-near);// test.***
+			////float tolerance = radius/farForDepth;
+
+			// in this shader noiseTex is "diffusse_1".
+			vec3 rvec = texture2D(diffuseTex_1, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;
+			vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));
+			vec3 bitangent = cross(normal2, tangent);
+			mat3 tbn = mat3(tangent, bitangent, normal2);   
+			float minDepthBuffer;
+			float maxDepthBuffer;
+			for(int i = 0; i < kernelSize; ++i)
+			{    	 
+				vec3 sample = origin + (tbn * vec3(kernel[i].x*3.0, kernel[i].y*3.0, kernel[i].z)) * ssaoRadius*2.0; // original.***
+				vec4 offset = projectionMatrix * vec4(sample, 1.0);					
+				offset.xy /= offset.w;
+				offset.xy = offset.xy * 0.5 + 0.5;  				
+				float sampleDepth = -sample.z/far;// original.***
+
+				float depthBufferValue = getDepth(offset.xy);
+				/*
+				if(depthBufferValue > 0.00391 && depthBufferValue < 0.00393)
+				{
+					if (depthBufferValue < sampleDepth-tolerance*1000.0)
+					{
+						occlusion +=  0.5;
+					}
+					
+					continue;
+				}			
+				*/
+				if (depthBufferValue < sampleDepth)//-tolerance)
+				{
+					occlusion +=  1.0;
+				}
+			} 
+
+			occlusion = 1.0 - occlusion / float(kernelSize);
+			
+			shadow_occlusion *= occlusion;
+		}
 		
 		if(altitude < 0.0)
 		{

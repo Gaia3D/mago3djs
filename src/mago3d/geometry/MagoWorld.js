@@ -919,8 +919,7 @@ MagoWorld.prototype.doTest__MagoPoint = function()
 		size        : 10,
 		strokeColor : '#FF0000',
 		color       : '#00FF00',
-		//imageUrl    : '/images/materialImages//factoryRoof.jpg',
-		opacity     : 0.7,
+		opacity     : 0.7
 	};
 
 	var magoPoint = new MagoPoint(position, style);
@@ -952,17 +951,28 @@ MagoWorld.prototype.doTest__MagoPolyline = function()
 			longitude : 126.35,
 			latitude  : 33.18262,
 			altitude  : 200.0
+		},
+		{
+			longitude : 126.38,
+			latitude  : 33.195,
+			altitude  : 200.0
 		}]
 	};
 
 	var style = {
 		color     : '#ff0000',
-		thickness : 2.0
+		thickness : 2.0,
+		point     : {
+			size        : 7,
+			strokeColor : '#FF0000',
+			color       : '#00FF00',
+			opacity     : 0.7
+		}
 	};
 
 	var magoPolyline = new MagoPolyline(position, style);
 
-	var targetDepth = 10;
+	var targetDepth = 1;
 	this.magoManager.modeler.addObject(magoPolyline, targetDepth);
 };
 

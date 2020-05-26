@@ -3725,6 +3725,8 @@ void main()\n\
 			return;\n\
 		}\n\
 \n\
+		\n\
+\n\
 		float shadow_occlusion = 1.0;\n\
 		if(bApplyShadow)\n\
 		{\n\
@@ -3814,56 +3816,7 @@ void main()\n\
 		// check if apply ssao.\n\
 		float occlusion = 1.0;\n\
 		//vec3 normal2 = vNormal;	\n\
-		if(bApplySsao)\n\
-		{\n\
-			// must find depthTex & noiseTex.***\n\
-			////float farForDepth = 30000.0;\n\
-			vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
-			float linearDepth = getDepth(screenPos);  \n\
-			vec3 ray = getViewRay(screenPos); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
-			vec3 origin = ray * linearDepth;  \n\
-			float ssaoRadius = radius*20.0;\n\
-			float tolerance = ssaoRadius/far; // original.***\n\
-			////float tolerance = radius/(far-near);// test.***\n\
-			////float tolerance = radius/farForDepth;\n\
-\n\
-			// in this shader noiseTex is \"diffusse_1\".\n\
-			vec3 rvec = texture2D(diffuseTex_1, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
-			vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
-			vec3 bitangent = cross(normal2, tangent);\n\
-			mat3 tbn = mat3(tangent, bitangent, normal2);   \n\
-			float minDepthBuffer;\n\
-			float maxDepthBuffer;\n\
-			for(int i = 0; i < kernelSize; ++i)\n\
-			{    	 \n\
-				vec3 sample = origin + (tbn * vec3(kernel[i].x*3.0, kernel[i].y*3.0, kernel[i].z)) * ssaoRadius*2.0; // original.***\n\
-				vec4 offset = projectionMatrix * vec4(sample, 1.0);					\n\
-				offset.xy /= offset.w;\n\
-				offset.xy = offset.xy * 0.5 + 0.5;  				\n\
-				float sampleDepth = -sample.z/far;// original.***\n\
-\n\
-				float depthBufferValue = getDepth(offset.xy);\n\
-				/*\n\
-				if(depthBufferValue > 0.00391 && depthBufferValue < 0.00393)\n\
-				{\n\
-					if (depthBufferValue < sampleDepth-tolerance*1000.0)\n\
-					{\n\
-						occlusion +=  0.5;\n\
-					}\n\
-					\n\
-					continue;\n\
-				}			\n\
-				*/\n\
-				if (depthBufferValue < sampleDepth)//-tolerance)\n\
-				{\n\
-					occlusion +=  1.0;\n\
-				}\n\
-			} \n\
-\n\
-			occlusion = 1.0 - occlusion / float(kernelSize);\n\
-			\n\
-			shadow_occlusion *= occlusion;\n\
-		}\n\
+		\n\
 	\n\
 		vec4 textureColor;\n\
 		if(colorType == 0) // one color.\n\
@@ -3959,6 +3912,7 @@ void main()\n\
 		textureColor.w = externalAlpha;\n\
 		vec4 fogColor = vec4(0.9, 0.9, 0.9, 1.0);\n\
 		\n\
+		\n\
 		// Test dem image.***************************************************************************************************************\n\
 		float altitude = 1000000.0;\n\
 		if(uActiveTextures[5] == 10)\n\
@@ -3978,8 +3932,56 @@ void main()\n\
 			//}\n\
 		}\n\
 		// End test dem image.------------------------------------------------------------------------------------------------------------\n\
-		\n\
-		\n\
+		if(bApplySsao && altitude<0.0)\n\
+		{\n\
+			// must find depthTex & noiseTex.***\n\
+			////float farForDepth = 30000.0;\n\
+			vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
+			float linearDepth = getDepth(screenPos);  \n\
+			vec3 ray = getViewRay(screenPos); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
+			vec3 origin = ray * linearDepth;  \n\
+			float ssaoRadius = radius*20.0;\n\
+			float tolerance = ssaoRadius/far; // original.***\n\
+			////float tolerance = radius/(far-near);// test.***\n\
+			////float tolerance = radius/farForDepth;\n\
+\n\
+			// in this shader noiseTex is \"diffusse_1\".\n\
+			vec3 rvec = texture2D(diffuseTex_1, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
+			vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
+			vec3 bitangent = cross(normal2, tangent);\n\
+			mat3 tbn = mat3(tangent, bitangent, normal2);   \n\
+			float minDepthBuffer;\n\
+			float maxDepthBuffer;\n\
+			for(int i = 0; i < kernelSize; ++i)\n\
+			{    	 \n\
+				vec3 sample = origin + (tbn * vec3(kernel[i].x*3.0, kernel[i].y*3.0, kernel[i].z)) * ssaoRadius*2.0; // original.***\n\
+				vec4 offset = projectionMatrix * vec4(sample, 1.0);					\n\
+				offset.xy /= offset.w;\n\
+				offset.xy = offset.xy * 0.5 + 0.5;  				\n\
+				float sampleDepth = -sample.z/far;// original.***\n\
+\n\
+				float depthBufferValue = getDepth(offset.xy);\n\
+				/*\n\
+				if(depthBufferValue > 0.00391 && depthBufferValue < 0.00393)\n\
+				{\n\
+					if (depthBufferValue < sampleDepth-tolerance*1000.0)\n\
+					{\n\
+						occlusion +=  0.5;\n\
+					}\n\
+					\n\
+					continue;\n\
+				}			\n\
+				*/\n\
+				if (depthBufferValue < sampleDepth)//-tolerance)\n\
+				{\n\
+					occlusion +=  1.0;\n\
+				}\n\
+			} \n\
+\n\
+			occlusion = 1.0 - occlusion / float(kernelSize);\n\
+			\n\
+			shadow_occlusion *= occlusion;\n\
+		}\n\
 		\n\
 		if(altitude < 0.0)\n\
 		{\n\
