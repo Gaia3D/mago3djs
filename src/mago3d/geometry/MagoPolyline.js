@@ -8,22 +8,16 @@
  */
 var MagoPolyline = function(position, style) 
 {
-	MagoRenderable.call(this);
+	
 	if (!(this instanceof MagoPolyline)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-    
-	this.style = {};
-	this.style.thickness = 2.0;
-    
+
 	this.knotGeoCoordsArray;
-	this.setPosition(position);
-    
-	if (style)
-	{
-		this.style = style;
-	}
+	MagoGeometry.call(this, position, style);
+
+	if (!this.style.thickness) { this.style.thickness = 2.0; }
     
 	// Calculate geoLocationData.
 	var resultGeographicCoord;
@@ -39,7 +33,7 @@ var MagoPolyline = function(position, style)
 	geoLocData.rotMatrix.Identity();
 };
 
-MagoPolyline.prototype = Object.create(MagoRenderable.prototype);
+MagoPolyline.prototype = Object.create(MagoGeometry.prototype);
 MagoPolyline.prototype.constructor = MagoPolyline;
 
 /**
@@ -114,3 +108,35 @@ MagoPolyline.prototype.makeMesh = function(magoManager)
 	this.setDirty(false);
 };
 
+/**
+ * get MagoPoint by index
+ * @param {number} index
+ * 
+ * @return {MagoPoint}
+ */
+MagoPolyline.prototype.getPointByIndex = function(index) 
+{
+	var points = this.getPoints();
+	if (points.length <= index) 
+	{
+		throw new Error('Out of range');
+	}
+
+	if (points.length > 0) 
+	{
+		return points[index];
+	}
+	return;
+};
+
+/**
+ * get MagoPoint array
+ * @return {Array<MagoPoint>}
+ */
+MagoPolyline.prototype.getPoints = function() 
+{
+	return this.objectsArray.filter(function(mesh) 
+	{
+		return mesh instanceof MagoPoint;
+	});
+};
