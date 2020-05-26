@@ -67,6 +67,7 @@ var TinTerrainManager = function(options)
 	this.textureIdCntMap = {};
 	this.textureIdDeleteMap = {};
 	this.bRenderSea = true;
+	this.renderingFase = 0;
 
 	this.init();
 	this.makeTinTerrainWithDEMIndex(); // provisional.
@@ -682,6 +683,10 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	currentShader.disableVertexAttribArray(currentShader.normal3_loc); 
 	currentShader.disableVertexAttribArray(currentShader.color4_loc); 
 	gl.useProgram(null);
+
+	this.renderingFase +=1;
+	if (this.renderingFase > 10)
+	{ this.renderingFase = 0; }
 };
 /**
  * 텍스처 등록 갯수 관리

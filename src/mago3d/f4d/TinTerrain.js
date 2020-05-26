@@ -76,7 +76,7 @@ var TinTerrain = function(owner)
 	 * @type {Boolean}
 	 * @default false
 	 */
-	this.renderingFase = false;
+	this.renderingFase = 0;
 };
 
 TinTerrain.prototype.deleteObjects = function(magoManager)
@@ -725,11 +725,6 @@ TinTerrain.prototype.renderBorder = function(currentShader, magoManager)
 	// TODO:
 };
 
-TinTerrain.prototype.swapRenderingFase = function()
-{
-	this.renderingFase = !this.renderingFase;
-};
-
 TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray)
 {	
 	if (this.depth === 0)// || this.intersectionType === Constant.INTERSECTION_OUTSIDE)
@@ -745,8 +740,10 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			if (!this.isTexturePrepared(this.texture))
 			{ return false; }
 
-			if (this.renderingFase !== magoManager.renderingFase)
-			{ return; }
+			if (this.renderingFase === this.tinTerrainManager.renderingFase)
+			{ 
+				return; 
+			}
 		
 			var gl = magoManager.getGl();
 			if (renderType === 2)
@@ -965,8 +962,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			gl.uniform1i(currentShader.bApplySsao_loc, false); // no apply ssao on skirt.***
 			gl.drawArrays(gl.TRIANGLE_STRIP, 0, vboKey.vertexCount); // Fill.
 
-			//this.swapRenderingFase();
-			this.renderingFase = !magoManager.renderingFase;
+			this.renderingFase = this.tinTerrainManager.renderingFase;
 		}
 		else 
 		{
