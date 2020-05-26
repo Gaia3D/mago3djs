@@ -31,8 +31,25 @@ ObjectMarkerManager.prototype.deleteObjects = function()
 		this.objectMarkerArray[i].deleteObjects();
 		this.objectMarkerArray[i] = undefined;
 	}
-	this.objectMarkerArray = [];
+	this.objectMarkerArray.length = 0;
 	this.objectMarkerMap = {};
+};
+
+ObjectMarkerManager.prototype.deleteObject = function(objMarkerId)
+{
+	var objectsMarkersCount = this.objectMarkerArray.length;
+	for (var i=0; i<objectsMarkersCount; i++)
+	{
+		if (this.objectMarkerArray[i].id === objMarkerId)
+		{
+			this.objectMarkerArray[i].deleteObjects();
+			//this.objectMarkerArray[i] = undefined;
+			delete this.objectMarderMap.objMarkerId;
+			this.objectMarkerArray.splice(i, 1);
+			break;
+		}
+	}
+		
 };
 
 ObjectMarkerManager.prototype.setMarkerByCondition = function(condition)
@@ -154,10 +171,10 @@ ObjectMarkerManager.prototype.getObjectMarkerById = function(id)
 		var i=0; 
 		while (!find && i<objectsCount)
 		{
-			if (this.objectMarkerArray.id === id)
+			if (this.objectMarkerArray[i].id === id)
 			{
 				find = true;
-				this.objectMarkerMap[id] = this.objectMarkerArray;
+				this.objectMarkerMap[id] = this.objectMarkerArray[i];
 			}
 			i++;
 		}
