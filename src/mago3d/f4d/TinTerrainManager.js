@@ -685,7 +685,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	gl.useProgram(null);
 
 	this.renderingFase +=1;
-	if (this.renderingFase > 10)
+	if (this.renderingFase > 1000000)
 	{ this.renderingFase = 0; }
 };
 /**
