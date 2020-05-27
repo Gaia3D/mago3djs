@@ -8,7 +8,6 @@
  */
 var MagoRectangle = function(position, style) 
 {
-	MagoRenderable.call(this);
 	if (!(this instanceof MagoRectangle)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
@@ -26,14 +25,7 @@ var MagoRectangle = function(position, style)
 	 */
 	this.maxGeographicCoord;
     
-	this.style = {};
-    
-	this.setPosition(position);
-    
-	if (style)
-	{
-		this.style = style;
-	}
+	MagoGeometry.call(this, position, style);
     
 	// Calculate geoLocationData.
 	var resultGeographicCoord;
@@ -49,7 +41,7 @@ var MagoRectangle = function(position, style)
 	geoLocData.rotMatrix.Identity();
 };
 
-MagoRectangle.prototype = Object.create(MagoRenderable.prototype);
+MagoRectangle.prototype = Object.create(MagoGeometry.prototype);
 MagoRectangle.prototype.constructor = MagoRectangle;
 
 /**

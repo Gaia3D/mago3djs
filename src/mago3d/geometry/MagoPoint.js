@@ -8,7 +8,7 @@
  */
 var MagoPoint = function(position, style) 
 {
-	MagoRenderable.call(this);
+	
 	if (!(this instanceof MagoPoint)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
@@ -19,12 +19,8 @@ var MagoPoint = function(position, style)
 	 * @type {GeographicCoord}
 	 */
 	this.geoCoord;
-    
-	this.setPosition(position);
-	this.style = {};
-
-	if (style)
-	{ this.style = style; }
+	
+	MagoGeometry.call(this, position, style);
 
 	// Calculate geoLocationData.
 	var geoLocDataManager = new GeoLocationDataManager();
@@ -34,7 +30,7 @@ var MagoPoint = function(position, style)
 	this.geoLocDataManager = geoLocDataManager;
 };
 
-MagoPoint.prototype = Object.create(MagoRenderable.prototype);
+MagoPoint.prototype = Object.create(MagoGeometry.prototype);
 MagoPoint.prototype.constructor = MagoPoint;
 
 /**
