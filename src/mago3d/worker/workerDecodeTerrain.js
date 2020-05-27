@@ -39,6 +39,7 @@ worker.onmessage = function(e)
 	var imageryType = param.imageryType;
 
 	//WEB_MERCATOR
+	var realmaxS, realmaxT, realminS, realminT;
 	if (imageryType === 2)
 	{
 		// web_mercator.
@@ -47,10 +48,10 @@ worker.onmessage = function(e)
 		
 		var aConst = (1.0/(2.0*PI))*Math.pow(2.0, depth);
 		var PI_DIV_4 = PI/4;
-		var minT = aConst*(PI-Math.log(Math.tan(PI_DIV_4+minLat/2)));
-		var maxT = aConst*(PI-Math.log(Math.tan(PI_DIV_4+maxLat/2)));
-		var minS = aConst*(minLon+PI);
-		var maxS = aConst*(maxLon+PI);
+		var minT = Math.round(aConst*(PI-Math.log(Math.tan(PI_DIV_4+minLat/2))));
+		var maxT = Math.round(aConst*(PI-Math.log(Math.tan(PI_DIV_4+maxLat/2))));
+		var minS = Math.round(aConst*(minLon+PI));
+		var maxS = Math.round(aConst*(maxLon+PI));
 		var floorMinS = Math.floor(minS);
 		var t, s;
 		
@@ -81,8 +82,40 @@ worker.onmessage = function(e)
 			s = aConst*(currLon+PI);
 			s -= floorMinS;
 			
+			if (s<0.0)
+			{ s = 0.0; }
+			else if (s>1.0)
+			{ s = 1.0; }
+
+			if (t<0.0)
+			{ t = 0.0; }
+			else if (t>1.0)
+			{ t = 1.0; }
+			
+			
 			texCoordsArray[i*2] = s;
 			texCoordsArray[i*2+1] = t;
+			/*
+			if (i === 0)
+			{
+				realmaxS = s;
+				realmaxT = t;
+				realminS = s;
+				realminT = t;
+			}
+			else
+			{
+				if (s < realminS)
+				{ realminS = s; }
+				else if (s > realmaxS)
+				{ realmaxS = s; }
+
+				if (t < realminT)
+				{ realminT = t; }
+				else if (t > realmaxT)
+				{ realmaxT = t; }
+			}
+			*/
 		}
 	}
 	else
@@ -99,6 +132,8 @@ worker.onmessage = function(e)
 			texCoordsArray[i*2+1] = vValues[i]/shortMax;
 		}
 	}
+
+
 	//넘길거
 	var cartesiansArray = geographicRadianArrayToFloat32ArrayWgs84(lonArray, latArray, altArray);
 	var normalsArray;
@@ -109,11 +144,49 @@ worker.onmessage = function(e)
 
 	var texCorrectionFactor = getTexCorrection(depth);
 
+	// Do overlap for tiles.***
+	/*
+	var southIndices = param.southIndices;
+	var indicesCount = southIndices.length;
+	for (var i=0; i<indicesCount; i++)
+	{
+		var idx = southIndices[i];
+		latArray[idx] -= latRange*0.05;
+		altArray[idx] -= 3.0;
+	}
+
+	var northIndices = param.northIndices;
+	var indicesCount = northIndices.length;
+	for (var i=0; i<indicesCount; i++)
+	{
+		var idx = northIndices[i];
+		latArray[idx] += latRange*0.05;
+		altArray[idx] -= 3.0;
+	}
+
+	var westIndices = param.westIndices;
+	var indicesCount = westIndices.length;
+	for (var i=0; i<indicesCount; i++)
+	{
+		var idx = westIndices[i];
+		lonArray[idx] -= latRange*0.05;
+		altArray[idx] -= 3.0;
+	}
+
+	var eastIndices = param.eastIndices;
+	var indicesCount = westIndices.length;
+	for (var i=0; i<indicesCount; i++)
+	{
+		var idx = eastIndices[i];
+		lonArray[idx] += latRange*0.05;
+		altArray[idx] -= 3.0;
+	}
+	*/
+
 	var options = {
-		skirtDepth          : 50000,
+		skirtDepth          : 500,
 		texCorrectionFactor : texCorrectionFactor
 	};
-    
 	var skirtResultObject = getSkirtTrianglesStrip(lonArray, latArray, altArray, texCoordsArray, param.southIndices, param.eastIndices, param.northIndices, param.westIndices, options);
 	//넘길거
 	var skirtCartesiansArray = skirtResultObject.skirtCartesiansArray;
@@ -298,29 +371,29 @@ function geographicRadianArrayToFloat32ArrayWgs84(lonArray, latArray, altArray, 
 };
 
 var texCorrection = [];
-texCorrection[0] = 0.003;
-texCorrection[1] = 0.003;
-texCorrection[2] = 0.003;
-texCorrection[3] = 0.003;
-texCorrection[4] = 0.003;
-texCorrection[5] = 0.003;
-texCorrection[6] = 0.003;
-texCorrection[7] = 0.003;
-texCorrection[8] = 0.003;
-texCorrection[9] = 0.003;
-texCorrection[10] = 0.004;
-texCorrection[11] = 0.004;
-texCorrection[12] = 0.004;
-texCorrection[13] = 0.004;
-texCorrection[14] = 0.004;
-texCorrection[15] = 0.004;
-texCorrection[16] = 0.004;
-texCorrection[17] = 0.004;
-texCorrection[18] = 0.004;
-texCorrection[19] = 0.004;
-texCorrection[20] = 0.004;
-texCorrection[21] = 0.004;
-texCorrection[22] = 0.004;
+texCorrection[0] = 0.006;
+texCorrection[1] = 0.006;
+texCorrection[2] = 0.006;
+texCorrection[3] = 0.006;
+texCorrection[4] = 0.006;
+texCorrection[5] = 0.006;
+texCorrection[6] = 0.006;
+texCorrection[7] = 0.006;
+texCorrection[8] = 0.006;
+texCorrection[9] = 0.006;
+texCorrection[10] = 0.008;
+texCorrection[11] = 0.008;
+texCorrection[12] = 0.016;
+texCorrection[13] = 0.016;
+texCorrection[14] = 0.016;
+texCorrection[15] = 0.016;
+texCorrection[16] = 0.016;
+texCorrection[17] = 0.016;
+texCorrection[18] = 0.016;
+texCorrection[19] = 0.016;
+texCorrection[20] = 0.016;
+texCorrection[21] = 0.016;
+texCorrection[22] = 0.016;
 
 function getTexCorrection(depth)
 {
@@ -331,7 +404,7 @@ function getSkirtTrianglesStrip(lonArray, latArray, altArray, texCoordsArray, so
 {
 	// Given "lonArray", "latArray" & "altArray", this function makes skirtCartesiansArray & skirtTexCoordsArray.***
 	// Note: skirtMesh is trianglesStrip, so, there are no indices.***
-	var skirtDepth = 1000.0;
+	var skirtDepth = 500.0;
 	var texCorrectionFactor = 1.0;
 	if (options)
 	{
@@ -342,6 +415,7 @@ function getSkirtTrianglesStrip(lonArray, latArray, altArray, texCoordsArray, so
 		{ texCorrectionFactor = options.texCorrectionFactor; }
 	}
 	
+
 	// Texture correction in borders & make skirt data.***
 	var westVertexCount = westIndices.length;
 	var southVertexCount = southIndices.length;
@@ -355,20 +429,26 @@ function getSkirtTrianglesStrip(lonArray, latArray, altArray, texCoordsArray, so
 	var skirtAltArray = new Float32Array(totalVertexCount * 2);
 	var skirtTexCoordsArray = new Float32Array(totalVertexCount * 4);
 	//var skinAltitudes = new Float32Array(totalVertexCount * 4);
+
+	//texCorrectionFactor *= 0.1;
+
 	var counter = 0;
+	var s, t;
 	
 	for (var j=0; j<westVertexCount; j++)
 	{
 		var idx = westIndices[j];
 		
 		texCoordsArray[idx*2] += texCorrectionFactor;
+		s = texCoordsArray[idx*2];
+		t = texCoordsArray[idx*2+1];
 
 		skirtLonArray[counter] = lonArray[idx];
 		skirtLatArray[counter] = latArray[idx];
 		skirtAltArray[counter] = altArray[idx];
 		
-		skirtTexCoordsArray[counter*2] = texCoordsArray[idx*2];   // s.
-		skirtTexCoordsArray[counter*2+1] = texCoordsArray[idx*2+1]; // t.
+		skirtTexCoordsArray[counter*2] = s;   // s.
+		skirtTexCoordsArray[counter*2+1] = t; // t.
 
 		counter += 1;
 		
@@ -376,8 +456,8 @@ function getSkirtTrianglesStrip(lonArray, latArray, altArray, texCoordsArray, so
 		skirtLatArray[counter] = latArray[idx];
 		skirtAltArray[counter] = altArray[idx]-skirtDepth;
 		
-		skirtTexCoordsArray[counter*2] = texCoordsArray[idx*2];   // s.
-		skirtTexCoordsArray[counter*2+1] = texCoordsArray[idx*2+1]; // t.
+		skirtTexCoordsArray[counter*2] = s;   // s.
+		skirtTexCoordsArray[counter*2+1] = t; // t.
 
 		counter += 1;
 	}
@@ -386,14 +466,16 @@ function getSkirtTrianglesStrip(lonArray, latArray, altArray, texCoordsArray, so
 	{
 		var idx = southIndices[j];
 		
-		texCoordsArray[idx*2+1] = (texCorrectionFactor);
+		texCoordsArray[idx*2+1] += (texCorrectionFactor);
+		s = texCoordsArray[idx*2];
+		t = texCoordsArray[idx*2+1];
 
 		skirtLonArray[counter] = lonArray[idx];
 		skirtLatArray[counter] = latArray[idx];
 		skirtAltArray[counter] = altArray[idx];
 		
-		skirtTexCoordsArray[counter*2] = texCoordsArray[idx*2];   // s.
-		skirtTexCoordsArray[counter*2+1] = texCoordsArray[idx*2+1]; // t.
+		skirtTexCoordsArray[counter*2] = s;   // s.
+		skirtTexCoordsArray[counter*2+1] = t; // t.
 
 		counter += 1;
 		
@@ -401,8 +483,8 @@ function getSkirtTrianglesStrip(lonArray, latArray, altArray, texCoordsArray, so
 		skirtLatArray[counter] = latArray[idx];
 		skirtAltArray[counter] = altArray[idx]-skirtDepth;
 		
-		skirtTexCoordsArray[counter*2] = texCoordsArray[idx*2];   // s.
-		skirtTexCoordsArray[counter*2+1] = texCoordsArray[idx*2+1]; // t.
+		skirtTexCoordsArray[counter*2] = s;   // s.
+		skirtTexCoordsArray[counter*2+1] = t; // t.
 
 		counter += 1;
 	}
@@ -412,6 +494,9 @@ function getSkirtTrianglesStrip(lonArray, latArray, altArray, texCoordsArray, so
 		var idx = eastIndices[j];
 		
 		texCoordsArray[idx*2] -= texCorrectionFactor;
+		s = texCoordsArray[idx*2];
+		t = texCoordsArray[idx*2+1];
+
 		var texCoord_x = texCoordsArray[idx*2];
 		var texCoord_y = texCoordsArray[idx*2+1];
 		
@@ -419,8 +504,8 @@ function getSkirtTrianglesStrip(lonArray, latArray, altArray, texCoordsArray, so
 		skirtLatArray[counter] = latArray[idx];
 		skirtAltArray[counter] = altArray[idx];
 		
-		skirtTexCoordsArray[counter*2] = texCoordsArray[idx*2];   // s.
-		skirtTexCoordsArray[counter*2+1] = texCoordsArray[idx*2+1]; // t.
+		skirtTexCoordsArray[counter*2] = s;   // s.
+		skirtTexCoordsArray[counter*2+1] = t; // t.
 
 		counter += 1;
 		
@@ -428,8 +513,8 @@ function getSkirtTrianglesStrip(lonArray, latArray, altArray, texCoordsArray, so
 		skirtLatArray[counter] = latArray[idx];
 		skirtAltArray[counter] = altArray[idx]-skirtDepth;
 		
-		skirtTexCoordsArray[counter*2] = texCoordsArray[idx*2];   // s.
-		skirtTexCoordsArray[counter*2+1] = texCoordsArray[idx*2+1]; // t.
+		skirtTexCoordsArray[counter*2] = s;   // s.
+		skirtTexCoordsArray[counter*2+1] = t; // t.
 
 		counter += 1;
 	}
@@ -437,22 +522,24 @@ function getSkirtTrianglesStrip(lonArray, latArray, altArray, texCoordsArray, so
 	for (var j=0; j<northVertexCount; j++)
 	{
 		var idx = northIndices[j];
-		texCoordsArray[idx*2+1] = (1-texCorrectionFactor);
+		texCoordsArray[idx*2+1] -= (texCorrectionFactor);
+		s = texCoordsArray[idx*2];
+		t = texCoordsArray[idx*2+1];
 
 		skirtLonArray[counter] = lonArray[idx];
 		skirtLatArray[counter] = latArray[idx];
 		skirtAltArray[counter] = altArray[idx];
 		
-		skirtTexCoordsArray[counter*2] = texCoordsArray[idx*2];   // s.
-		skirtTexCoordsArray[counter*2+1] = texCoordsArray[idx*2+1]; // t.
+		skirtTexCoordsArray[counter*2] = s;   // s.
+		skirtTexCoordsArray[counter*2+1] = t; // t.
 		counter += 1;
 		
 		skirtLonArray[counter] = lonArray[idx];
 		skirtLatArray[counter] = latArray[idx];
 		skirtAltArray[counter] = altArray[idx]-skirtDepth;
 		
-		skirtTexCoordsArray[counter*2] = texCoordsArray[idx*2];   // s.
-		skirtTexCoordsArray[counter*2+1] = texCoordsArray[idx*2+1]; // t.
+		skirtTexCoordsArray[counter*2] = s;   // s.
+		skirtTexCoordsArray[counter*2+1] = t; // t.
 		counter += 1;
 	}
 	

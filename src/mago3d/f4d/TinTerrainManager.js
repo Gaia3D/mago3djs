@@ -364,6 +364,9 @@ TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager)
 	// Preparing rule: First prepare the tinTerrain-owner if the owner is no prepared yet.
 	for (var depth = 0; depth <= this.maxDepth; depth++) 
 	{
+		if (magoManager.fileRequestControler.tinTerrainFilesRequested >= 4 || magoManager.fileRequestControler.tinTerrainTexturesRequested >= 2)
+		{ break; }
+
 		var visibleTilesArray = this.visibleTilesArrayMap[depth];
 		if (visibleTilesArray && visibleTilesArray.length > 0)
 		{
@@ -424,8 +427,7 @@ TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager)
 			//---------------------------------------------------------
 		}
 
-		if (magoManager.fileRequestControler.tinTerrainFilesRequested >= 4 || magoManager.fileRequestControler.tinTerrainTexturesRequested >= 2)
-		{ break; }
+		
 	}
 	
 };
@@ -506,6 +508,9 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 		gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, this.identityMat._floatArrays);
 		
 		gl.uniform1i(currentShader.bApplySpecularLighting_loc, true);
+
+		// shader.altitude_loc
+		gl.uniform1i(currentShader.bExistAltitudes_loc, false);
 		
 		var bApplyShadow = false;
 		if (magoManager.sceneState.sunSystem !== undefined && magoManager.sceneState.applySunShadows)

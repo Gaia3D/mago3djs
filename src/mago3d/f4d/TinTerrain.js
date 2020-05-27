@@ -858,8 +858,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			// Colors.
 			// todo:
 			
-			// shader.altitude_loc
-			gl.uniform1i(currentShader.bExistAltitudes_loc, false);
+			
 			/*
 			if (vboKey.bindDataCustom(currentShader, vboMemManager, "altitudes"))
 			{
@@ -894,13 +893,16 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 				}
 				else
 				{
-					gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.
+					var currSelObject = magoManager.selectionManager.getSelectedGeneral();
+					if (currSelObject !== this)
+					{ gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); } // Fill.
 				}
 			}
 			
 			succesfullyRenderedTilesArray.push(this);
 			
 			// Test Render wireframe if selected.*************************************************************
+			
 			if (renderType === 1)
 			{
 				gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
@@ -928,9 +930,11 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 					this.drawTerrainName(magoManager);
 				}
 			}
+			
 			// End test.--------------------------------------------------------------------------------------
 			
 			// Render skirt if exist.
+			
 			var vboKey = this.vboKeyContainer.vboCacheKeysArray[1]; // the idx = 0 is the terrain. idx = 1 is the skirt.
 			if (vboKey === undefined)
 			{ return; }
@@ -942,7 +946,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			}
 		
 			// TexCoords (No necessary for depth rendering).
-			if (!bDepth)
+			if (renderType === 1)
 			{
 				if (!vboKey.bindDataTexCoord(currentShader, vboMemManager))
 				{				
@@ -958,10 +962,12 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			//{
 			//	gl.uniform1i(currentShader.bExistAltitudes_loc, false);
 			//}
-			
 			gl.uniform1i(currentShader.bApplySsao_loc, false); // no apply ssao on skirt.***
-			gl.drawArrays(gl.TRIANGLE_STRIP, 0, vboKey.vertexCount); // Fill.
 
+			var currSelObject = magoManager.selectionManager.getSelectedGeneral();
+			if (currSelObject !== this)// && renderType !== 0)
+			{ gl.drawArrays(gl.TRIANGLE_STRIP, 0, vboKey.vertexCount); } // Fill.
+			
 			this.renderingFase = this.tinTerrainManager.renderingFase;
 		}
 		else 
@@ -2524,7 +2530,9 @@ TinTerrain.prototype.decodeData = function(imageryType)
 			northIndices           : this.northIndices,
 			westIndices            : this.westIndices,
 			bMakeNormals           : bMakeNormals,
-			indices                : this.indices
+			indices                : this.indices,
+			X                      : this.X,
+			Y                      : this.Y
 		}, 
 		info: {x: this.X, y: this.Y, z: this.depth}
 	});

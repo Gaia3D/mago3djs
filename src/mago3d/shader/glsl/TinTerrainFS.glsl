@@ -629,7 +629,7 @@ void main()
 			vec4 finalColor = mix(textureColor, fogColor, 0.7); 
 			//gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian + specularReflectionCoef * specular * specularColor * shadow_occlusion, 1.0); // with specular.***
 			gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian, 1.0); // original.***
-			//gl_FragColor = vec4(fogColor.xyz * shadow_occlusion * lambertian, 1.0); // original.***
+
 			return;
 		}
 		else{
