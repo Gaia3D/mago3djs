@@ -386,9 +386,9 @@ MagoRenderable.prototype.renderAsChild = function(magoManager, shader, renderTyp
 			//gl.uniform1f(shaderLocal.fixPointSize_loc, 10.0);
 			gl.uniform1i(shaderLocal.bUseFixPointSize_loc, 1);
 			gl.uniform1i(shaderLocal.uStrokeSize_loc, this.style.strokeSize);
-
+			gl.depthRange(0, 0);
 			object.renderAsChild(magoManager, shaderLocal, renderType, glPrimitive, bIsSelected, options, bWireframe);
-
+			gl.depthRange(0, 1);
 			// Return to the currentShader.
 			magoManager.postFxShadersManager.useProgram(shader);
 		}
