@@ -28,7 +28,16 @@ var VectorMesh = function(options)
 		{ this.thickness = options.thickness; }
 		
 		if (options.color)
-		{ this.color4 = options.color; }
+		{ 
+			// Check if "color" is hexCode or class Color.
+			if (typeof options.color === "string")
+			{
+				var color = Color.fromHexCode(options.color, undefined);
+				this.color4 = color; 
+			}
+			else
+			{ this.color4 = options.color; } 
+		}
 	}
 };
 

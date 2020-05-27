@@ -19,7 +19,7 @@ var PostFxShadersManager = function()
 	this.modelRefSilhouetteShader;
 	this.lodBuildingShader;
 	
-	this.currentShaderUsing = undefined;
+	this.currentShaderUsing = undefined; // current active shader.
 };
 
 /**
@@ -34,6 +34,40 @@ PostFxShadersManager.prototype.newShader = function(shaderName)
 	shader.shaderManager = this;
 	this.shadersMap[shaderName] = shader;
 	return shader;
+};
+
+/**
+ * Returns true if the shader is the this.currentShaderUsing.
+ * @returns shader
+ */
+PostFxShadersManager.prototype.getCurrentShader = function() 
+{
+	return this.currentShaderUsing;
+};
+
+
+/**
+ * Returns the current active shader.
+ * @param {PostFxShader} shader
+ * @returns {BOOL}}
+ */
+PostFxShadersManager.prototype.isCurrentShader = function(shader) 
+{
+	return (this.currentShaderUsing === shader);
+};
+
+/**
+ * Returns the current active shader.
+ * @param {PostFxShader} shader
+ * @returns {BOOL}}
+ */
+PostFxShadersManager.prototype.useProgram = function(shader) 
+{
+	if (!this.isCurrentShader(shader))
+	{
+		shader.useProgram();
+		this.currentShaderUsing = shader;
+	}
 };
 
 /**

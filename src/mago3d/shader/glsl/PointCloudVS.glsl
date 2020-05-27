@@ -66,7 +66,6 @@ void main()
 			gl_PointSize = maxPointSize;
 		if(gl_PointSize < 2.0)
 			gl_PointSize = 2.0;
-			
-		glPointSize = gl_PointSize;
 	}
+	glPointSize = gl_PointSize;
 }

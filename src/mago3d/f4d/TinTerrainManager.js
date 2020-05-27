@@ -34,11 +34,23 @@ var TinTerrainManager = function(options)
 	this.terrainValue = policy.terrainValue;
 	this.terrainReady = false;
 	this.terrainTilesInfo;
-	this.selectable = true;
+	this.selectable = false;
 
 	if (this.terrainType !== CODE.magoEarthTerrainType.PLAIN && !this.terrainValue)
 	{
 		throw new Error('If use elevation model, require terrain value.');
+	}
+
+	if (options)
+	{
+		if (options.createSea !== undefined)
+		{ this.bRenderSea = options.createSea; }
+
+		if (options.terrainSelectable !== undefined)
+		{ this.selectable = options.terrainSelectable; }
+
+		if (options.mexDepth !== undefined)
+		{ this.maxDepth = options.mexDepth; }
 	}
 	
 	//CODE.imageryType = {
@@ -74,11 +86,7 @@ var TinTerrainManager = function(options)
 	
 	//https://www.ngdc.noaa.gov/mgg/global/global.html here there are geotiff of land & ocean 1arc-minute. All earth. size : 21600 x 10800.
 	
-	if (options)
-	{
-		if (options.createSea !== undefined)
-		{ this.bRenderSea = options.createSea; }
-	}
+	
 };
 TinTerrainManager.INFO_FILE = 'terrainTiles-info.json';
 
@@ -233,43 +241,27 @@ TinTerrainManager.prototype.makeDistanceLimitByDepth = function()
 	{ this.distLimitByDepth = []; }
 		
 	// For each depth, there are a limit distance.***
-	this.distLimitByDepth[0] = 50000000; 
-	this.distLimitByDepth[1] = 10000000; 
-	this.distLimitByDepth[2] = 2500000; 
-	this.distLimitByDepth[3] = 1000000; 
-	this.distLimitByDepth[4] = 500000; 
-	this.distLimitByDepth[5] = 250000; 
-	this.distLimitByDepth[6] = 50000; 
-	this.distLimitByDepth[7] = 25000; 
-	this.distLimitByDepth[8] = 10000; 
-	this.distLimitByDepth[9] = 5000; 
-	this.distLimitByDepth[10] = 4500; 
-	this.distLimitByDepth[11] = 4000; 
-	this.distLimitByDepth[12] = 3500; 
-	this.distLimitByDepth[13] = 3000; 
-	this.distLimitByDepth[14] = 2500; 
-	this.distLimitByDepth[15] = 2000; 
-	this.distLimitByDepth[16] = 1500; 
-	this.distLimitByDepth[17] = 1200; 
-	this.distLimitByDepth[18] = 600; 
-	this.distLimitByDepth[19] = 400; 
-	this.distLimitByDepth[20] = 200; 
-	
-	//this.distLimitByDepth[0] = 5;
-	
-	var distLimitByDepthCount = this.distLimitByDepth.length;
-
-	//for (var i=0; i<distLimitByDepthCount; i++)
-	//{
-	//	this.distLimitByDepth[i] -= 1000.0;
-	//}
-
-	for (var i=0; i<distLimitByDepthCount; i++)
-	{
-		this.distLimitByDepth[i] *= 2.5;
-	}
-
-	
+	this.distLimitByDepth[0] = 50000000*2.0; 
+	this.distLimitByDepth[1] = 10000000*2.0; 
+	this.distLimitByDepth[2] = 2500000*2.0; 
+	this.distLimitByDepth[3] = 1000000*2.0; 
+	this.distLimitByDepth[4] = 500000*2.0; 
+	this.distLimitByDepth[5] = 250000*2.0; 
+	this.distLimitByDepth[6] = 50000*2.0; 
+	this.distLimitByDepth[7] = 25000*2.0; 
+	this.distLimitByDepth[8] = 18000*2.0; 
+	this.distLimitByDepth[9] = 16000*2.0; 
+	this.distLimitByDepth[10] = 8000*2.0; 
+	this.distLimitByDepth[11] = 6000*2.0; 
+	this.distLimitByDepth[12] = 4000*2.0; 
+	this.distLimitByDepth[13] = 3000*2.0; 
+	this.distLimitByDepth[14] = 2500*2.0; 
+	this.distLimitByDepth[15] = 2000*2.0; 
+	this.distLimitByDepth[16] = 1500*2.0; 
+	this.distLimitByDepth[17] = 1200*2.0; 
+	this.distLimitByDepth[18] = 600*2.0; 
+	this.distLimitByDepth[19] = 400*2.0; 
+	this.distLimitByDepth[20] = 200*2.0; 
 	
 };
 

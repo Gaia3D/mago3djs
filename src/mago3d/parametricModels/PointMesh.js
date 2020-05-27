@@ -17,6 +17,7 @@ var PointMesh = function(options)
 	this.id;
 	this.size = 1.0;
 	this.color4;
+	this.strokeColor4;
 	this.opacity = 1.0;
 	
 	this.vertexList;
@@ -29,7 +30,28 @@ var PointMesh = function(options)
 		{ this.size = options.size; }
 		
 		if (options.color)
-		{ this.color4 = options.color; }
+		{ 
+			// Check if "color" is hexCode or class Color.
+			if (typeof options.color === "string")
+			{
+				var color = Color.fromHexCode(options.color, undefined);
+				this.color4 = color; 
+			}
+			else
+			{ this.color4 = options.color; } 
+		}
+		//strokeColor
+		if (options.strokeColor)
+		{ 
+			// Check if "color" is hexCode or class Color.
+			if (typeof options.strokeColor === "string")
+			{
+				var color = Color.fromHexCode(options.strokeColor, undefined);
+				this.strokeColor4 = color; 
+			}
+			else
+			{ this.strokeColor4 = options.strokeColor; } 
+		}
         
 		if (options.opacity)
 		{ this.opacity = options.opacity; }
@@ -50,6 +72,12 @@ PointMesh.prototype.renderAsChild = function (magoManager, shader, renderType, g
     
 	gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, this.color4.a]); //.
 	gl.uniform1f(shader.fixPointSize_loc, this.size);
+
+	var strokeColor = this.strokeColor4;
+	if (strokeColor)
+	{ gl.uniform4fv(shader.uStrokeColor_loc, new Float32Array([strokeColor.r, strokeColor.g, strokeColor.b, strokeColor.a])); }
+
+	
     
 	if (renderType === 2)
 	{

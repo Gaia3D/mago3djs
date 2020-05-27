@@ -963,8 +963,9 @@ MagoWorld.prototype.doTest__MagoPolyline = function()
 		color     : '#ff0000',
 		thickness : 2.0,
 		point     : {
-			size        : 7,
-			strokeColor : '#FF0000',
+			size        : 20,
+			strokeColor : '#000000',
+			strokeSize  : 1,
 			color       : '#00FF00',
 			opacity     : 0.7
 		}

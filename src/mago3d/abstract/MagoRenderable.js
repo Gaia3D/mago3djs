@@ -312,8 +312,18 @@ MagoRenderable.prototype.renderAsChild = function(magoManager, shader, renderTyp
 		var object = this.objectsArray[i];
 		if (object instanceof VectorMesh)
 		{
-			var shaderThickLine = magoManager.postFxShadersManager.getShader("thickLine");
-			shaderThickLine.useProgram();
+			var shaderThickLine;
+			if (renderType === 0)
+			{
+				//shaderThickLine = magoManager.postFxShadersManager.getShader("thickLineDepth");
+				// do not renderDepth for thickLine objects.
+				continue;
+			}
+			else if (renderType === 1 || renderType === 2)
+			{
+				shaderThickLine = magoManager.postFxShadersManager.getShader("thickLine");
+			}
+			magoManager.postFxShadersManager.useProgram(shaderThickLine);
 			shaderThickLine.bindUniformGenerals();
 			var gl = magoManager.getGl();
 
@@ -340,12 +350,21 @@ MagoRenderable.prototype.renderAsChild = function(magoManager, shader, renderTyp
 			object.renderAsChild(magoManager, shaderThickLine, renderType, glPrimitive, bIsSelected, options, bWireframe);
 
 			// Return to the currentShader.
-			shader.useProgram();
+			magoManager.postFxShadersManager.useProgram(shader);
 		}
 		else if (object instanceof PointMesh)
 		{
-			var shaderLocal = magoManager.postFxShadersManager.getShader("pointsCloud"); // provisional. Use the currentShader of argument.
-			shaderLocal.useProgram();
+			var shaderLocal; 
+			if (renderType === 0)
+			{
+				shaderLocal = magoManager.postFxShadersManager.getShader("pointsCloudDepth"); 
+			}
+			else if (renderType === 1 || renderType === 2)
+			{
+				shaderLocal = magoManager.postFxShadersManager.getShader("pointsCloud"); 
+			}
+
+			magoManager.postFxShadersManager.useProgram(shaderLocal);
 			
 			shaderLocal.disableVertexAttribArrayAll();
 			shaderLocal.resetLastBuffersBinded();
@@ -362,11 +381,12 @@ MagoRenderable.prototype.renderAsChild = function(magoManager, shader, renderTyp
 			//gl.uniform4fv(shaderLocal.oneColor4_loc, [1.0, 1.0, 0.1, 1.0]); //.
 			//gl.uniform1f(shaderLocal.fixPointSize_loc, 10.0);
 			gl.uniform1i(shaderLocal.bUseFixPointSize_loc, 1);
+			gl.uniform1i(shaderLocal.uStrokeSize_loc, this.style.strokeSize);
 
 			object.renderAsChild(magoManager, shaderLocal, renderType, glPrimitive, bIsSelected, options, bWireframe);
 
 			// Return to the currentShader.
-			shader.useProgram();
+			magoManager.postFxShadersManager.useProgram(shader);
 		}
 		else
 		{

@@ -60,13 +60,7 @@ MagoPoint.prototype.makeMesh = function(magoManager)
 	var positions = new Float32Array([0.0, 0.0, 0.0]);
 	vboKey.setDataArrayPos(positions, vboMemManager);
 
-	var color =  Color.fromHexCode(this.style.color, undefined);
-	var options = {
-		size    : this.style.size,
-		color   : color,
-		opacity : this.style.opacity
-	};
-
+	var options = this.style;
 	var pointMesh = new PointMesh(options);
 	pointMesh.vboKeysContainer = vboKeyContainer;
     

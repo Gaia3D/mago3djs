@@ -4625,6 +4625,8 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.maxPointSize_loc = gl.getUniformLocation(shader.program, "maxPointSize");
 	shader.minPointSize_loc = gl.getUniformLocation(shader.program, "minPointSize");
 	shader.pendentPointSize_loc = gl.getUniformLocation(shader.program, "pendentPointSize");
+	shader.uStrokeColor_loc = gl.getUniformLocation(shader.program, "uStrokeColor");
+	shader.uStrokeSize_loc = gl.getUniformLocation(shader.program, "uStrokeSize");
 
 	// 5) Test Quad shader.****************************************************************************************
 	shaderName = "testQuad"; // used by temperatura layer.***
@@ -4718,6 +4720,25 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	var shaderName = "thickLine";
 	var ssao_vs_source = ShaderSource.thickLineVS;
 	var ssao_fs_source = ShaderSource.thickLineFS;
+	shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
+	// ThickLine shader locations.***
+	shader.projectionMatrix_loc = gl.getUniformLocation(shader.program, "projectionMatrix");
+	shader.modelViewMatrix_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
+	shader.viewport_loc = gl.getUniformLocation(shader.program, "viewport");
+	shader.thickness_loc = gl.getUniformLocation(shader.program, "thickness");
+	gl.bindAttribLocation(shader.program, 0, "prev");
+	gl.bindAttribLocation(shader.program, 1, "current");
+	gl.bindAttribLocation(shader.program, 2, "next");
+	gl.bindAttribLocation(shader.program, 3, "color4");
+	shader.prev_loc = 0;
+	shader.current_loc = 1;
+	shader.next_loc = 2;
+	shader.color4_loc = 3;
+
+	// 13) ThickLine Shader.******************************************************************************
+	var shaderName = "thickLineDepth";
+	var ssao_vs_source = ShaderSource.thickLineDepthVS;
+	var ssao_fs_source = ShaderSource.PointCloudDepthFS;
 	shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
 	// ThickLine shader locations.***
 	shader.projectionMatrix_loc = gl.getUniformLocation(shader.program, "projectionMatrix");
