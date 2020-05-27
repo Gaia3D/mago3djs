@@ -93,6 +93,17 @@ MagoEarthViewerInit.prototype.setEventHandler = function()
 	{
 		viewer.mouseclick(event);
 	}, false);
+
+	canvas.addEventListener('contextmenu', function(event) 
+	{
+		event.preventDefault();
+		viewer.mouseRightClick(event);
+	}, false);
+
+	canvas.addEventListener('dblclick', function(event)
+	{
+		viewer.mouseDblClick(event);
+	}, false);
     
 	window.addEventListener('resize', function(event)
 	{
