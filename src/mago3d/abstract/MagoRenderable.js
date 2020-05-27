@@ -107,6 +107,10 @@ MagoRenderable.prototype.init = function(magoManager)
 	var vboMemManager = magoManager.vboMemoryManager;
 	this.deleteObjects(vboMemManager);
 
+	if (this instanceof MagoPolyline) 
+	{
+		this.knotGeoCoordsArray.length = 0;
+	}
 	// Now set dirty true.
 	this.setDirty(true);
 };

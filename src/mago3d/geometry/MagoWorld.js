@@ -199,7 +199,7 @@ MagoWorld.prototype.mouseup = function(event)
 				magoManager.bPicking = true;
 				magoManager.managePickingProcess();
 				// Test. process leftClick in magoManager.
-				this.magoManager.mouseActionLeftClick(event.clientX, event.clientY);				
+				//this.magoManager.mouseActionLeftClick(event.clientX, event.clientY);				
 			}
 		}
 		this.magoManager.mouseActionLeftUp(event.clientX, event.clientY);
@@ -231,11 +231,50 @@ MagoWorld.prototype.mouseup = function(event)
  */
 MagoWorld.prototype.mouseclick = function(event)
 {
+	//detail 2 = double click
+	if (event.detail === 2) 
+	{
+		return;
+	}
+
+
 	if (event.button === 0)
 	{
 		var mouseX = event.clientX;
 		var mouseY = event.clientY;
 		this.magoManager.mouseActionLeftClick(mouseX, mouseY);
+	}
+};
+
+
+MagoWorld.prototype.mouseRightClick = function(event)
+{
+	//detail 2 = double click
+	if (event.detail === 2) 
+	{
+		return;
+	}
+	
+	if (event.button === 2)
+	{
+		var mouseX = event.clientX;
+		var mouseY = event.clientY;
+		this.magoManager.mouseActionRightClick(mouseX, mouseY);
+	}
+};
+/**
+ * 마우스 더블클릭 동작을 감지
+ * @param {type}event 
+ */
+MagoWorld.prototype.mouseDblClick = function(event)
+{
+	event.preventDefault();
+	event.stopPropagation();
+	if (event.button === 0)
+	{
+		var mouseX = event.clientX;
+		var mouseY = event.clientY;
+		this.magoManager.mouseActionLeftDoubleClick(mouseX, mouseY);
 	}
 };
 

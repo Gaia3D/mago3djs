@@ -2845,7 +2845,7 @@ MagoManager.prototype.mouseActionRightClick = function(mouseX, mouseY)
 		var eventCoordinate = ManagerUtils.getComplexCoordinateByScreenCoord(this.getGl(), mouseX, mouseY, undefined, undefined, undefined, this);
 		if (eventCoordinate) 
 		{
-			this.emit(MagoManager.EVENT_TYPE.RIGHTCLICK, {type: MagoManager.EVENT_TYPE.CLICK, clickCoordinate: eventCoordinate, timestamp: this.getCurrentTime()});
+			this.emit(MagoManager.EVENT_TYPE.RIGHTCLICK, {type: MagoManager.EVENT_TYPE.RIGHTCLICK, clickCoordinate: eventCoordinate, timestamp: this.getCurrentTime()});
 		}
 	}
 };
