@@ -911,6 +911,16 @@ MagoWorld.prototype.doTest__ExtrudedObject = function(event)
 	}
 };
 
+MagoWorld.prototype.doTest__GoTo = function()
+{
+	var longitude = 127;
+	var latitude = 36;
+	var altitude = 1500;
+	var duration = 3;
+
+	this.goto(longitude, latitude, altitude, duration);
+};
+
 MagoWorld.prototype.doTest__TerrainScanner = function()
 {
 	// create a terrainScanner.
@@ -1122,12 +1132,9 @@ MagoWorld.prototype.keydown = function(event)
 		//this.doTest__TerrainScanner();
 		//this.doTest__MagoRectangle();
 		//this.doTest__MagoPoint();
-		this.doTest__MagoPolyline();
+		//this.doTest__MagoPolyline();
 
-		// test camera.getTargetOnTerrain.
-		var camera = this.magoManager.sceneState.getCamera();
-		var targetPosOnTerrain = camera.getTargetOnTerrain(this.magoManager);
-		var hola = 0;
+		this.doTest__GoTo();
 	}
 	else if (key === 'p')
 	{

@@ -819,7 +819,7 @@ Camera.setByPositionAndTarget = function (camera, camTarget, camPos, aproxCamUp)
 Camera.setOrientation = function (camera, heading, pitch, roll) 
 {
 	// calculate the camera direction and the up.
-	
+
 };
 
 /**
@@ -837,6 +837,87 @@ Camera.prototype.calculateUp = function(aproxCamUp)
  * 어떤 일을 하고 있습니까?
  */
 Camera.prototype.finishedAnimation = function(magoManager) 
+{
+	var finished = false;
+	var animData = this.animationData;
+	
+	if (animData === undefined)
+	{ return true; }
+
+	var currTime = magoManager.getCurrentTime();
+	
+	var nextLongitude;
+	var nextLatitude;
+	var nextAltitude;
+	var nextHeading;
+	var nextPitch;
+	var nextRoll;
+
+	// Check animationType.***
+	var animType = animData.animationType;
+	if (animType === CODE.animationType.PATH)
+	{
+		// Test.***
+		var nextPosLine = AnimationManager.getNextPosition(animData, currTime, magoManager);
+		
+		if (nextPosLine === undefined)
+		{ 
+			animData.finished = true;
+			return true; 
+		}
+
+		var camera = this;
+		var camPos = camera.position;
+		var camDir = camera.direction;
+		var camUp = camera.up;
+
+		var path = animData.path;
+		var pathGeoLocDataManager = path.getGeoLocationDataManager();
+		var pathGeoLocData = pathGeoLocDataManager.getCurrentGeoLocationData();
+
+		// Now, calculate the geographic coords of the position.***
+		var posLocal = nextPosLine.point;
+		//var dir = nextPosLine.direction;
+
+		// calculate worldPos.***
+		var tMat = pathGeoLocData.tMatrix;
+		var posWC = tMat.transformPoint3D(posLocal, undefined);
+	
+		var oldCamPos = new Point3D(camPos.x, camPos.y, camPos.z);
+		var camNewPos = new Point3D(posWC.x, posWC.y, posWC.z);
+		camPos.set(camNewPos.x,  camNewPos.y,  camNewPos.z);
+		
+		// calculate the camera's global rotation, and then rotate de cam's direction.
+		var rotAxis;
+		rotAxis = oldCamPos.crossProduct(camNewPos, rotAxis);
+		rotAxis.unitary();
+		if (rotAxis.isNAN())
+		{ return; }
+			
+		var angRad = oldCamPos.angleRadToVector(camNewPos);
+		if (angRad === 0 || isNaN(angRad))
+		{ return; }
+			
+		var rotMat = new Matrix4();
+		rotMat.rotationAxisAngRad(angRad, rotAxis.x, rotAxis.y, rotAxis.z);
+		camDir = rotMat.transformPoint3D(camDir, camDir);
+		camUp = rotMat.transformPoint3D(camUp, camUp);
+
+		var magoWorld = magoManager.magoWorld;
+		magoWorld.updateModelViewMatrixByCamera(this);
+		
+		// finally update "lastTime".
+		animData.lastTime = currTime;
+		return finished;
+	}
+
+	return finished;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
+Camera.prototype.finishedAnimation__original = function(magoManager) 
 {
 	var finished = false;
 	var animData = this.animationData;
