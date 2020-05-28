@@ -301,11 +301,41 @@ TinTerrain.prototype.isChildrenPrepared = function()
 	
 	if (this.childMap.length < 4)
 	{ return false; }
-	
-	if (this.childMap.LU.isPrepared() && this.childMap.LD.isPrepared() && this.childMap.RU.isPrepared() &&  this.childMap.RD.isPrepared())
+
+	var luVisible = this.childMap.LU.isVisible();
+	var ldVisible = this.childMap.LD.isVisible();
+	var ruVisible = this.childMap.RU.isVisible();
+	var rdVisible = this.childMap.RD.isVisible();
+
+	if ((this.childMap.LU.isPrepared() || !luVisible) && (this.childMap.LD.isPrepared() || !ldVisible) && (this.childMap.RU.isPrepared() || !ruVisible) &&  (this.childMap.RD.isPrepared() || !rdVisible))
 	{ return true; }
 	else
 	{ return false; }
+};
+
+TinTerrain.prototype.hasAnyChildVisible = function()
+{
+	if (this.childMap === undefined)
+	{ return false; }
+	
+	if (this.childMap.length < 4)
+	{ return false; }
+
+	if (this.childMap.LU.isVisible())
+	{ return true; }
+	else if (this.childMap.LD.isVisible())
+	{ return true; }
+	else if (this.childMap.RU.isVisible())
+	{ return true; }
+	else if (this.childMap.RD.isVisible())
+	{ return true; }
+	
+	return false;
+};
+
+TinTerrain.prototype.isVisible = function()
+{
+	return this.intersectionType !== Constant.INTERSECTION_OUTSIDE;
 };
 
 TinTerrain.prototype.isTexturePrepared = function(texturesMap)
@@ -445,10 +475,9 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 	if (magoManager.fileRequestControler.tinTerrainTexturesRequested >= 2)
 	{ return false; }
 
-
 	// This function 1- loads file & 2- parses file & 3- makes vbo.
 	// 1rst, check if the parent is prepared. If parent is not prepared, then prepare the parent.
-	if (this.owner === undefined || this.owner.isPrepared())
+	if (this.owner === undefined || (this.owner.isPrepared() &&  this.owner.hasAnyChildVisible()))
 	{
 		// 1rst, try to erase from procesQueue_deleting if exist.
 		magoManager.processQueue.eraseTinTerrainToDelete(this);
@@ -1281,7 +1310,7 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 	var currDepth = this.depth;
 
 	// Test frustumCulling.***************************************************
-	//this.intersectionType = frustum.intersectionSphere(this.sphereExtent);
+	this.intersectionType = frustum.intersectionSphere(this.sphereExtent);
 	//if (this.intersectionType === Constant.INTERSECTION_OUTSIDE)
 	//{ return; }
 	//else if (this.intersectionType === Constant.INTERSECTION_INSIDE)

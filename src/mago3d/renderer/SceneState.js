@@ -283,6 +283,22 @@ SceneState.prototype.getCamera = function()
 };
 
 /**
+ * Returns the center position of the screen in pixels.
+ */
+SceneState.prototype.getScreenCenterPositionPixels = function(resultScreenPixelPos) 
+{
+	var screenW = this.drawingBufferWidth[0];
+	var screenH = this.drawingBufferHeight[0];
+
+	if (resultScreenPixelPos === undefined)
+	{ resultScreenPixelPos = new Point2D(); }
+
+	resultScreenPixelPos.set(Math.floor(screenW/2), Math.floor(screenH/2));
+
+	return resultScreenPixelPos;
+};
+
+/**
  * Returns the camera.
  */
 SceneState.prototype.setApplySunShadows = function(bApplySunShadows) 

@@ -763,6 +763,22 @@ Camera.prototype.getTargetPositionAtDistance = function (dist, resultTargetPos)
 	return resultTargetPos;
 };
 
+Camera.prototype.getTargetOnTerrain = function (magoManager, resultTargetPos) 
+{
+	if (resultTargetPos === undefined)
+	{ resultTargetPos = new Point3D(); }
+
+	//ManagerUtils.calculatePixelPositionWorldCoord = function(gl, pixelX, pixelY, resultPixelPos, depthFbo, frustumNear, frustumFar, magoManager) 
+	// 1rst, calculate the center position of the screen.
+	var sceneState = magoManager.sceneState;
+	var screenCenterPixels = sceneState.getScreenCenterPositionPixels(undefined);
+
+	var gl = magoManager.getGl();
+	resultTargetPos = ManagerUtils.calculatePixelPositionWorldCoord(gl, screenCenterPixels.x, screenCenterPixels.y, resultTargetPos, undefined, undefined, undefined, magoManager);
+
+	return resultTargetPos;
+};
+
 /**
  * set position and orientation ( direction, up) of the camera
  * only cesium

@@ -1102,6 +1102,11 @@ MagoWorld.prototype.keydown = function(event)
 		//this.doTest__MagoRectangle();
 		//this.doTest__MagoPoint();
 		this.doTest__MagoPolyline();
+
+		// test camera.getTargetOnTerrain.
+		var camera = this.magoManager.sceneState.getCamera();
+		var targetPosOnTerrain = camera.getTargetOnTerrain(this.magoManager);
+		var hola = 0;
 	}
 	else if (key === 'p')
 	{
