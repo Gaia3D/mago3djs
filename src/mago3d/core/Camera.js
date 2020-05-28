@@ -808,6 +808,21 @@ Camera.setByPositionAndTarget = function (camera, camTarget, camPos, aproxCamUp)
 };
 
 /**
+ * sets orientation ( direction, up) of the camera
+ * 
+ * @static
+ * @param {Cesium.Camera} camera cesium camera object.
+ * @param {Number} heading
+ * @param {Number} pitch
+ * @param {Number} roll
+ */
+Camera.setOrientation = function (camera, heading, pitch, roll) 
+{
+	// calculate the camera direction and the up.
+	
+};
+
+/**
  * 어떤 일을 하고 있습니까?
  */
 Camera.prototype.calculateUp = function(aproxCamUp) 

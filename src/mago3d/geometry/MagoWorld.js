@@ -337,6 +337,7 @@ MagoWorld.prototype.mousewheel = function(event)
 	var camera = magoManager.sceneState.camera;
 	var camPos = camera.position;
 	var camDir = camera.direction;
+	var camUp = camera.up;
 	
 	// calculate the direction of the cursor.
 	var nowX = event.clientX;
@@ -381,21 +382,12 @@ MagoWorld.prototype.mousewheel = function(event)
 	var angRad = oldCamPos.angleRadToVector(camNewPos);
 	if (angRad === 0 || isNaN(angRad))
 	{ return; }
-
-	if (angRad *180/Math.PI> 180)
-	{ var hola = 0; }
 		
 	var rotMat = new Matrix4();
 	rotMat.rotationAxisAngRad(angRad, rotAxis.x, rotAxis.y, rotAxis.z);
 	camDir = rotMat.transformPoint3D(camDir, camDir);
-	
-	// now, must check the camera's up.
-	var globeNormalCartesian = Globe.normalAtCartesianPointWgs84(camPos.x, camPos.y, camPos.z, undefined);
-	var globeNormal = new Point3D(globeNormalCartesian[0], globeNormalCartesian[1], globeNormalCartesian[2]);
-	
-	var camRight = camDir.crossProduct(globeNormal);
-	camRight.unitary();
-	camera.up = camRight.crossProduct(camDir, camera.up);
+	camUp = rotMat.transformPoint3D(camUp, camUp);
+
 	
 	this.updateModelViewMatrixByCamera(camera);
 };
