@@ -623,7 +623,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		if (camHeight > 50000)
 		{ far *= 1.5; }
 
-		if (camHeight > 4000)
+		if (camHeight > 10000)
 		{
 			frustum0.near[0] = 0.1 + camHeight*0.8;
 		}
