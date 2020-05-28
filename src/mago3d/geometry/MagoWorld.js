@@ -81,58 +81,87 @@ MagoWorld.prototype.renderTest = function()
  */
 MagoWorld.prototype.goto = function(longitude, latitude, altitude, duration)
 {
-	var resultCartesian;
-	resultCartesian = Globe.geographicToCartesianWgs84(longitude, latitude, altitude, resultCartesian);
+	var resultCartesian = Globe.geographicToCartesianWgs84(longitude, latitude, altitude, resultCartesian);
 	
 	var camera = this.magoManager.sceneState.camera;
 	var camPos = camera.position;
-	
-	// Make an animationData.***
-	// Make 3 points & then make a bSpline.***
-	var bStoreAbsolutePosition = false;
-	var currGeoCoord = Globe.CartesianToGeographicWgs84(camPos.x, camPos.y, camPos.z, undefined, bStoreAbsolutePosition);
-	var targetGeoCoord = new GeographicCoord(longitude, latitude, altitude);
-	var midGeoCoord = GeographicCoord.getMidPoint(currGeoCoord, targetGeoCoord, undefined);
-	
-	// For the "midGeoCoord", increment the altitude a little, to fly like bouncing.***
-	var angleDistDeg = GeographicCoord.getAngleBetweenCoords(currGeoCoord, targetGeoCoord);
-	if (midGeoCoord.altitude < 30000.0 * angleDistDeg)
-	{ midGeoCoord.altitude = 30000.0 * angleDistDeg; }
-	
-	var bSpline = new BSplineCubic3D();
-	var geoCoordsList = bSpline.getGeographicCoordsList();
-	geoCoordsList.addGeoCoordsArray([currGeoCoord, midGeoCoord, targetGeoCoord]);
-	
-	//var path = new Path3D([currGeoCoord, midGeoCoord, targetGeoCoord]);
-	
-	var animData = {animationType: CODE.animationType.PATH};
-	animData.path = bSpline;
-	animData.birthTime = this.magoManager.getCurrentTime();
-	animData.linearVelocityInMetersSecond = 500000.0; // m/s.***
-	animData.acceleration = 2000.0; // m/s2.***
-	animData.durationInSeconds = defaultValue(duration, 3.0);
-	camera.animationData = animData;
-	
-	if (this.magoManager.animationManager === undefined)
-	{ this.magoManager.animationManager = new AnimationManager(); }
 
-	this.magoManager.animationManager.putObject(camera);
-	/*
-	//----------------------------------------------------------------------------------------------
+	if (duration) 
+	{
+		// Make an animationData.***
+		// Make 3 points & then make a bSpline.***
+		var bStoreAbsolutePosition = false;
+		var currGeoCoord = Globe.CartesianToGeographicWgs84(camPos.x, camPos.y, camPos.z, undefined, bStoreAbsolutePosition);
+		var targetGeoCoord = new GeographicCoord(longitude, latitude, altitude);
+		var midGeoCoord = GeographicCoord.getMidPoint(currGeoCoord, targetGeoCoord, undefined);
+		
+		// For the "midGeoCoord", increment the altitude a little, to fly like bouncing.***
+		var angleDistDeg = GeographicCoord.getAngleBetweenCoords(currGeoCoord, targetGeoCoord);
+		if (midGeoCoord.altitude < 30000.0 * angleDistDeg)
+		{ midGeoCoord.altitude = 30000.0 * angleDistDeg; }
+		
+		var bSpline = new BSplineCubic3D();
+		var geoCoordsList = bSpline.getGeographicCoordsList();
+		geoCoordsList.addGeoCoordsArray([currGeoCoord, midGeoCoord, targetGeoCoord]);
+		
+		//var path = new Path3D([currGeoCoord, midGeoCoord, targetGeoCoord]);
+		
+		var animData = {animationType: CODE.animationType.PATH};
+		animData.path = bSpline;
+		animData.birthTime = this.magoManager.getCurrentTime();
+		animData.linearVelocityInMetersSecond = 500000.0; // m/s.***
+		animData.acceleration = 2000.0; // m/s2.***
+		animData.durationInSeconds = defaultValue(duration, 3.0);
+		camera.animationData = animData;
+		
+		if (this.magoManager.animationManager === undefined)
+		{ this.magoManager.animationManager = new AnimationManager(); }
+
+		this.magoManager.animationManager.putObject(camera);
+	}
+	else 
+	{
+		this.changeCameraPosition(resultCartesian);
+	}
+};
+/**
+ * 들어온 값만큼 뒤로 이동
+ * @param {number} amount
+ */
+MagoWorld.prototype.moveBackward = function(amount)
+{
+	var camera = this.magoManager.sceneState.camera;
+	var camPos = camera.position;
+	var camDir = camera.direction;
+
+	amount = amount * -1;
+	var scaled = Point3D.scale(camDir, amount);
+	var addScaled = Point3D.add(camPos, scaled);
+	
+	this.changeCameraPosition(Point3D.toArray(addScaled));
+};
+
+/**
+ * adjust change camera position
+ * @param {Array<number>} cartesian3 cartesian3
+ */
+MagoWorld.prototype.changeCameraPosition = function(cartesian3) 
+{
+	var camera = this.magoManager.sceneState.camera;
+
+	var camPos = camera.position;
 	var camDir = camera.direction;
 	var camUp = camera.up;
 	
-	var matrixAux;
-	matrixAux = this.magoManager.globe.transformMatrixAtCartesianPointWgs84(resultCartesian[0], resultCartesian[1], resultCartesian[2], matrixAux);
+	var matrixAux = this.magoManager.globe.transformMatrixAtCartesianPointWgs84(cartesian3[0], cartesian3[1], cartesian3[2], matrixAux);
 	
-	camPos.set(resultCartesian[0], resultCartesian[1], resultCartesian[2]);
-	
+	camPos.set(cartesian3[0], cartesian3[1], cartesian3[2]);
+
 	// calculate camDir & camUp.
 	camDir.set(-matrixAux[8], -matrixAux[9], -matrixAux[10]);
 	camUp.set(matrixAux[4], matrixAux[5], matrixAux[6]); // tangent north direction.
-	
+
 	this.updateModelViewMatrixByCamera(camera);
-	*/
 };
 
 /**

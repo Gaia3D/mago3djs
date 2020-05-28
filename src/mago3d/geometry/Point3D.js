@@ -473,32 +473,52 @@ Point3D.prototype.scale = function(scaleFactor)
 	this.x *= scaleFactor; this.y *= scaleFactor; this.z *= scaleFactor;
 };
 
+/**
+ * @static
+ * @param {Point3D} point3d
+ * @param {number} scaleFactor
+ * @return {Point3D}
+ */
+Point3D.scale = function(point3d, scaleFactor) 
+{
+	var x = point3d.x * scaleFactor;
+	var y = point3d.y * scaleFactor;
+	var z = point3d.z * scaleFactor;
+	
+	return new Point3D(x, y, z);
+};
 
+/**
+ * @static
+ * @param {Point3D} left
+ * @param {Point3D} right
+ * @return {Point3D}
+ */
+Point3D.add = function(left, right) 
+{
+	var x = left.x + right.x;
+	var y = left.y + right.y;
+	var z = left.z + right.z;
+	
+	return new Point3D(x, y, z);
+};
 
+/**
+ * @static
+ * @param {Array<number>} array
+ * @return {Point3D}
+ */
+Point3D.fromArray = function(array) 
+{
+	return new Point3D(array[0], array[1], array[2]);
+};
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/**
+ * @static
+ * @param {Point3D} point3d
+ * @return {Array<number>}
+ */
+Point3D.toArray = function(point3d) 
+{
+	return [point3d.x, point3d.y, point3d.z];
+};
