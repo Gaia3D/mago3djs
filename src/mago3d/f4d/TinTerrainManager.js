@@ -241,27 +241,27 @@ TinTerrainManager.prototype.makeDistanceLimitByDepth = function()
 	{ this.distLimitByDepth = []; }
 		
 	// For each depth, there are a limit distance.***
-	this.distLimitByDepth[0] = 50000000*2.0; 
-	this.distLimitByDepth[1] = 10000000*2.0; 
-	this.distLimitByDepth[2] = 2500000*2.0; 
-	this.distLimitByDepth[3] = 1000000*2.0; 
-	this.distLimitByDepth[4] = 800000*2.0; 
-	this.distLimitByDepth[5] = 600000*2.0; 
-	this.distLimitByDepth[6] = 400000*2.0; 
-	this.distLimitByDepth[7] = 200000*2.0; 
-	this.distLimitByDepth[8] = 100000*2.0; 
-	this.distLimitByDepth[9] = 50000*2.0; 
-	this.distLimitByDepth[10] = 30000*2.0; 
-	this.distLimitByDepth[11] = 10000*2.0; 
-	this.distLimitByDepth[12] = 6000*2.0; 
-	this.distLimitByDepth[13] = 3000*2.0; 
-	this.distLimitByDepth[14] = 2500*2.0; 
-	this.distLimitByDepth[15] = 2000*2.0; 
-	this.distLimitByDepth[16] = 1500*2.0; 
-	this.distLimitByDepth[17] = 1200*2.0; 
-	this.distLimitByDepth[18] = 600*2.0; 
-	this.distLimitByDepth[19] = 400*2.0; 
-	this.distLimitByDepth[20] = 200*2.0; 
+	this.distLimitByDepth[0] = 100000000; 
+	this.distLimitByDepth[1] = 20000000; 
+	this.distLimitByDepth[2] = 10000000; 
+	this.distLimitByDepth[3] = 6000000; 
+	this.distLimitByDepth[4] = 2000000; 
+	this.distLimitByDepth[5] = 1600000; 
+	this.distLimitByDepth[6] = 1000000; 
+	this.distLimitByDepth[7] = 600000; 
+	this.distLimitByDepth[8] = 200000; 
+	this.distLimitByDepth[9] = 100000; 
+	this.distLimitByDepth[10] = 60000; 
+	this.distLimitByDepth[11] = 10000; 
+	this.distLimitByDepth[12] = 12000; 
+	this.distLimitByDepth[13] = 6000; 
+	this.distLimitByDepth[14] = 5000; 
+	this.distLimitByDepth[15] = 1200; 
+	this.distLimitByDepth[16] = 900; 
+	this.distLimitByDepth[17] = 600; 
+	this.distLimitByDepth[18] = 400; 
+	this.distLimitByDepth[19] = 200; 
+	this.distLimitByDepth[20] = 100; 
 	
 };
 

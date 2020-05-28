@@ -475,6 +475,16 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 	if (magoManager.fileRequestControler.tinTerrainTexturesRequested >= 2)
 	{ return false; }
 
+	//if (!this.isVisible())
+	//{
+	//	if (this.owner.isVisible())
+	////	{
+	//		return this.owner.prepareTinTerrain(magoManager, tinTerrainManager);
+	//	}
+	//
+	//	return false;
+	//}
+
 	// This function 1- loads file & 2- parses file & 3- makes vbo.
 	// 1rst, check if the parent is prepared. If parent is not prepared, then prepare the parent.
 	if (this.owner === undefined || (this.owner.isPrepared() &&  this.owner.hasAnyChildVisible()))
@@ -1325,14 +1335,18 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 
 	//if (this.intersectionType === Constant.INTERSECTION_OUTSIDE)
 	//{ return; }
-	
-	// check distance to camera.
-	//var cameraSphere = new Sphere();
-	//cameraSphere.setCenterPoint(camPos.x, camPos.y, camPos.z);
-	//cameraSphere.setRadius(camPos.camElevation/2);
 
 	this.distToCam = camPos.distToSphere(sphereExtentAux);
-	//this.distToCam = cameraSphere.distToSphere(sphereExtentAux);
+
+	if (this.intersectionType === Constant.INTERSECTION_OUTSIDE)
+	{
+		if (this.distToCam < 0.0)
+		{ this.distToCam =1; }
+		
+		this.distToCam *= 100000;
+	}
+
+
 	var distLimit = this.tinTerrainManager.distLimitByDepth[currDepth];
 	
 	if (this.distToCam > distLimit)
