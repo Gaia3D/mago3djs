@@ -34,7 +34,7 @@ var TinTerrainManager = function(options)
 	this.terrainValue = policy.terrainValue;
 	this.terrainReady = false;
 	this.terrainTilesInfo;
-	this.selectable = true;
+	this.selectable = false;
 
 	if (this.terrainType !== CODE.magoEarthTerrainType.PLAIN && !this.terrainValue)
 	{
