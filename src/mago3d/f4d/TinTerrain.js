@@ -1684,10 +1684,10 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 	
 	// https://en.wikipedia.org/wiki/Web_Mercator_projection
 	var PI_DIV_4 = PI/4;
-	var minT = aConst*(PI-Math.log(Math.tan(PI_DIV_4+minLat/2)));
-	var maxT = aConst*(PI-Math.log(Math.tan(PI_DIV_4+maxLat/2)));
-	var minS = aConst*(minLon+PI);
-	var maxS = aConst*(maxLon+PI);
+	var minT = Math.round(aConst*(PI-Math.log(Math.tan(PI_DIV_4+minLat/2))));
+	var maxT = Math.round(aConst*(PI-Math.log(Math.tan(PI_DIV_4+maxLat/2))));
+	var minS = Math.round(aConst*(minLon+PI));
+	var maxS = Math.round(aConst*(maxLon+PI));
 	var floorMinS = Math.floor(minS);
 	
 	// Flip texCoordY for minT & maxT.***
@@ -1707,8 +1707,19 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 			
 		// Substract minT to "t" to make range [0 to 1].***
 		t -= minT; 
+
+		if (s<0.0)
+		{ s = 0.0; }
+		else if (s>1.0)
+		{ s = 1.0; }
+
+		if (t<0.0)
+		{ t = 0.0; }
+		else if (t>1.0)
+		{ t = 1.0; }
 		
 		// Texture correction in borders.***
+		/*
 		if (currLatSeg === 0)
 		{
 			t = (texCorrectionFactor);
@@ -1717,6 +1728,7 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 		{
 			t = (1-texCorrectionFactor);
 		}
+		*/
 		
 		for (var currLonSeg = 0; currLonSeg<lonSegments+1; currLonSeg++)
 		{
