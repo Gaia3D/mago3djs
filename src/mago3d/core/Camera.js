@@ -892,11 +892,11 @@ Camera.prototype.finishedAnimation = function(magoManager)
 		rotAxis = oldCamPos.crossProduct(camNewPos, rotAxis);
 		rotAxis.unitary();
 		if (rotAxis.isNAN())
-		{ return; }
+		{ return finished; }
 			
 		var angRad = oldCamPos.angleRadToVector(camNewPos);
 		if (angRad === 0 || isNaN(angRad))
-		{ return; }
+		{ return finished; }
 			
 		var rotMat = new Matrix4();
 		rotMat.rotationAxisAngRad(angRad, rotAxis.x, rotAxis.y, rotAxis.z);

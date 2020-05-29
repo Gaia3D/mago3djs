@@ -783,6 +783,11 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			{ 
 				return; 
 			}
+
+			if (this.owner.renderingFase === this.tinTerrainManager.renderingFase)
+			{ 
+				return; 
+			}
 		
 			var gl = magoManager.getGl();
 			if (renderType === 2)
@@ -1005,7 +1010,11 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 
 			var currSelObject = magoManager.selectionManager.getSelectedGeneral();
 			if (currSelObject !== this)// && renderType !== 0)
-			{ gl.drawArrays(gl.TRIANGLE_STRIP, 0, vboKey.vertexCount); } // Fill.
+			{ 
+				gl.depthRange(0.5, 1);
+				gl.drawArrays(gl.TRIANGLE_STRIP, 0, vboKey.vertexCount); 
+				gl.depthRange(0, 1);
+			} 
 			
 			this.renderingFase = this.tinTerrainManager.renderingFase;
 		}
