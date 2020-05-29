@@ -335,7 +335,10 @@ TinTerrain.prototype.hasAnyChildVisible = function()
 
 TinTerrain.prototype.isVisible = function()
 {
-	return this.intersectionType !== Constant.INTERSECTION_OUTSIDE;
+	if (this.intersectionType === Constant.INTERSECTION_INTERSECT || this.intersectionType === Constant.INTERSECTION_INSIDE )
+	{ return true; }
+	else { return false; }
+	//return this.intersectionType !== Constant.INTERSECTION_OUTSIDE;
 };
 
 TinTerrain.prototype.isTexturePrepared = function(texturesMap)
@@ -469,21 +472,16 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 		return false;
 	}
 
-	if (magoManager.fileRequestControler.tinTerrainFilesRequested >= 4)
-	{ return false; }
-
-	if (magoManager.fileRequestControler.tinTerrainTexturesRequested >= 2)
-	{ return false; }
-
-	//if (!this.isVisible())
-	//{
-	//	if (this.owner.isVisible())
-	////	{
-	//		return this.owner.prepareTinTerrain(magoManager, tinTerrainManager);
-	//	}
-	//
-	//	return false;
-	//}
+	/*
+	if (!this.isVisible())
+	{
+		if (this.owner.isVisible())
+		{
+			return this.owner.prepareTinTerrain(magoManager, tinTerrainManager);
+		}
+	
+		return false;
+	}*/
 
 	// This function 1- loads file & 2- parses file & 3- makes vbo.
 	// 1rst, check if the parent is prepared. If parent is not prepared, then prepare the parent.
@@ -766,8 +764,14 @@ TinTerrain.prototype.renderBorder = function(currentShader, magoManager)
 
 TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray)
 {	
-	if (this.depth === 0)// || this.intersectionType === Constant.INTERSECTION_OUTSIDE)
+	if (this.depth === 0)
 	{ return true; }
+
+	//if (this.isChildrenPrepared())
+	//{ 
+	//	this.subTile_LU.
+	//	return false; 
+	//}
 	
 	if (this.owner === undefined || (this.owner.isPrepared() && this.owner.isChildrenPrepared()))
 	{
@@ -786,6 +790,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 
 			if (this.owner.renderingFase === this.tinTerrainManager.renderingFase)
 			{ 
+				// If my owner rendered, then do no render me.
 				return; 
 			}
 		
@@ -944,6 +949,9 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			}
 			
 			succesfullyRenderedTilesArray.push(this);
+
+			// Init the intersectionType.
+			this.intersectionType = Constant.INTERSECTION_OUTSIDE;
 			
 			// Test Render wireframe if selected.*************************************************************
 			
@@ -1328,26 +1336,16 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 
 	var currDepth = this.depth;
 
-	// Test frustumCulling.***************************************************
+	// FrustumCulling.***************************************************
 	this.intersectionType = frustum.intersectionSphere(this.sphereExtent);
-	//if (this.intersectionType === Constant.INTERSECTION_OUTSIDE)
-	//{ return; }
-	//else if (this.intersectionType === Constant.INTERSECTION_INSIDE)
-	//{
-	//	resultFullyIntersectedTilesArray.push(this);
-	//	return;
-	//}
-	//else if (this.intersectionType === Constant.INTERSECTION_INTERSECT)
-	//{
-	//}
+	//this.intersectionType === Constant.INTERSECTION_OUTSIDE
+	//this.intersectionType === Constant.INTERSECTION_INSIDE
+	//this.intersectionType === Constant.INTERSECTION_INTERSECT
 	// End frustumCulling.--------------------------------------------------
-
-	//if (this.intersectionType === Constant.INTERSECTION_OUTSIDE)
-	//{ return; }
 
 	this.distToCam = camPos.distToSphere(sphereExtentAux);
 
-	if (this.intersectionType === Constant.INTERSECTION_OUTSIDE)
+	if (this.intersectionType === Constant.INTERSECTION_OUTSIDE && this.depth > 0)
 	{
 		if (this.distToCam < 0.0)
 		{ this.distToCam =1; }
@@ -1381,8 +1379,6 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 	
 	if (currDepth < maxDepth)
 	{
-
-
 		// must descend.
 		var curX = this.X;
 		var curY = this.Y;

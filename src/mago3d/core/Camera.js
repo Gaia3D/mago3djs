@@ -845,6 +845,9 @@ Camera.prototype.finishedAnimation = function(magoManager)
 	{ return true; }
 
 	var currTime = magoManager.getCurrentTime();
+
+	//var date = new Date();
+	//var currTime = date.getTime();
 	
 	var nextLongitude;
 	var nextLatitude;

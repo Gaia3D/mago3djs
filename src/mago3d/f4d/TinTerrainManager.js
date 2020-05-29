@@ -34,7 +34,7 @@ var TinTerrainManager = function(options)
 	this.terrainValue = policy.terrainValue;
 	this.terrainReady = false;
 	this.terrainTilesInfo;
-	this.selectable = false;
+	this.selectable = true;
 
 	if (this.terrainType !== CODE.magoEarthTerrainType.PLAIN && !this.terrainValue)
 	{
@@ -650,6 +650,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 			tinTerrain.render(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray);
 		}
 	}
+	
 	
 	// Render the sea.
 	/*

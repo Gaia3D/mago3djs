@@ -371,6 +371,7 @@ function geographicRadianArrayToFloat32ArrayWgs84(lonArray, latArray, altArray, 
 };
 
 var texCorrection = [];
+
 texCorrection[0] = 0.006;
 texCorrection[1] = 0.006;
 texCorrection[2] = 0.006;
@@ -394,6 +395,10 @@ texCorrection[19] = 0.016;
 texCorrection[20] = 0.016;
 texCorrection[21] = 0.016;
 texCorrection[22] = 0.016;
+
+//for (var i=0; i<23; i++)
+//{ texCorrection[i] *= 2; }
+
 
 function getTexCorrection(depth)
 {
@@ -439,7 +444,7 @@ function getSkirtTrianglesStrip(lonArray, latArray, altArray, texCoordsArray, so
 	{
 		var idx = westIndices[j];
 		
-		texCoordsArray[idx*2] += texCorrectionFactor;
+		//texCoordsArray[idx*2] += texCorrectionFactor;
 		s = texCoordsArray[idx*2];
 		t = texCoordsArray[idx*2+1];
 
@@ -466,7 +471,7 @@ function getSkirtTrianglesStrip(lonArray, latArray, altArray, texCoordsArray, so
 	{
 		var idx = southIndices[j];
 		
-		texCoordsArray[idx*2+1] += (texCorrectionFactor);
+		//texCoordsArray[idx*2+1] += (texCorrectionFactor);
 		s = texCoordsArray[idx*2];
 		t = texCoordsArray[idx*2+1];
 
@@ -493,7 +498,7 @@ function getSkirtTrianglesStrip(lonArray, latArray, altArray, texCoordsArray, so
 	{
 		var idx = eastIndices[j];
 		
-		texCoordsArray[idx*2] -= texCorrectionFactor;
+		//texCoordsArray[idx*2] -= texCorrectionFactor;
 		s = texCoordsArray[idx*2];
 		t = texCoordsArray[idx*2+1];
 
@@ -522,7 +527,7 @@ function getSkirtTrianglesStrip(lonArray, latArray, altArray, texCoordsArray, so
 	for (var j=0; j<northVertexCount; j++)
 	{
 		var idx = northIndices[j];
-		texCoordsArray[idx*2+1] -= (texCorrectionFactor);
+		//texCoordsArray[idx*2+1] -= (texCorrectionFactor);
 		s = texCoordsArray[idx*2];
 		t = texCoordsArray[idx*2+1];
 
