@@ -22,7 +22,7 @@ var LineDrawer = function(style)
 	this.result = [];
 };
 LineDrawer.prototype = Object.create(DrawGeometryInteraction.prototype);
-LineDrawer.prototype.constructor = RectangleDrawer;
+LineDrawer.prototype.constructor = LineDrawer;
 
 LineDrawer.EVENT_TYPE = {
 	'DRAWEND': 'drawend'

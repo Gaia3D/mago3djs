@@ -185,6 +185,12 @@ TinTerrainManager.prototype.init = function()
 TinTerrainManager.prototype.loadTerrainMeta = function() 
 {
 	var that = this;
+	if (that.terrainType === CODE.magoEarthTerrainType.PLAIN)
+	{
+		that.terrainReady = true;
+		return;
+	}
+
 	if (that.terrainType === CODE.magoEarthTerrainType.ELEVATION && that.terrainValue && !that.terrainReady) 
 	{
 		var infoPath = that.terrainValue + TinTerrainManager.INFO_FILE;
