@@ -981,6 +981,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 					
 					this.drawTerrainName(magoManager);
 				}
+
 			}
 			
 			// End test.--------------------------------------------------------------------------------------

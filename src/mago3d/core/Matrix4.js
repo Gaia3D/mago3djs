@@ -93,6 +93,51 @@ Matrix4.prototype.getRowMajorMatrix = function()
 };
 
 /**
+ * Returns the x axis
+ *
+ * @returns {Point3D} xAxis
+ */
+Matrix4.prototype.getXAxis = function(resultXAxis) 
+{
+	if (resultXAxis === undefined)
+	{ resultXAxis = new Point3D(); }
+
+	resultXAxis.set(this._floatArrays[0], this._floatArrays[1], this._floatArrays[2]);
+
+	return resultXAxis;
+};
+
+/**
+ * Returns the y axis
+ *
+ * @returns {Point3D} yAxis
+ */
+Matrix4.prototype.getYAxis = function(resultYAxis) 
+{
+	if (resultYAxis === undefined)
+	{ resultYAxis = new Point3D(); }
+
+	resultYAxis.set(this._floatArrays[4], this._floatArrays[5], this._floatArrays[6]);
+
+	return resultYAxis;
+};
+
+/**
+ * Returns the z axis
+ *
+ * @returns {Point3D} zAxis
+ */
+Matrix4.prototype.getZAxis = function(resultZAxis) 
+{
+	if (resultZAxis === undefined)
+	{ resultZAxis = new Point3D(); }
+
+	resultZAxis.set(this._floatArrays[8], this._floatArrays[9], this._floatArrays[10]);
+
+	return resultZAxis;
+};
+
+/**
  * XYZ축에 대한 회전양에 따라 회전된 4차원 행렬을 구한다.
  *
  * @param {Number} zRotDeg z축에 대한 회전양(Degree)

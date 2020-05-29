@@ -819,7 +819,23 @@ Camera.setByPositionAndTarget = function (camera, camTarget, camPos, aproxCamUp)
 Camera.setOrientation = function (camera, heading, pitch, roll) 
 {
 	// calculate the camera direction and the up.
+	var camPos = camera.position;
 
+	// calculate geoLocMatrix at the camera position.
+	var geoLocMat = new Matrix4();
+
+	// calculate camera direction & up for heading, pitch & roll.
+	var tMat = ManagerUtils.calculateTransformMatrixAtWorldPosition(camPos, heading, pitch, roll, geoLocMat, undefined);
+
+	// take the initial camDir & camUp.
+	var newCamDir = tMat.getZAxis(undefined);
+	newCamDir.scale(-1.0); // invert sense.
+
+	var newCamUp = tMat.getYAxis(undefined);
+
+	// Now, set the camera direction & up.
+	camera.direction.set(newCamDir.x, newCamDir.y, newCamDir.z);
+	camera.up.set(newCamUp.x, newCamUp.y, newCamUp.z);
 };
 
 /**

@@ -911,7 +911,17 @@ MagoWorld.prototype.doTest__ExtrudedObject = function(event)
 	}
 };
 
-MagoWorld.prototype.doTest__GoTo = function()
+MagoWorld.prototype.doTest__CameraOrientation = function()
+{
+	var heading = 45;
+	var pitch = 80;
+	var camera = this.magoManager.sceneState.camera;
+	Camera.setOrientation(camera, heading, pitch, undefined);
+
+	this.updateModelViewMatrixByCamera(camera);
+};
+
+MagoWorld.prototype.doTest__GoTo = function(camera)
 {
 	var longitude = 127;
 	var latitude = 36;
@@ -1133,8 +1143,8 @@ MagoWorld.prototype.keydown = function(event)
 		//this.doTest__MagoRectangle();
 		//this.doTest__MagoPoint();
 		//this.doTest__MagoPolyline();
-
-		this.doTest__GoTo();
+		//this.doTest__GoTo();
+		this.doTest__CameraOrientation();
 	}
 	else if (key === 'p')
 	{
