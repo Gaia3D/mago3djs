@@ -340,55 +340,7 @@ SceneState.prototype.setDrawingBufferSize = function(width, height)
 	}
 };
 
-/**
- * Returns the camera.
- */
-SceneState.prototype.getCameraOrientation = function(resultAngles) 
-{
-	// Extract the heading, pitch & roll from this.modelViewMatrix.
-	var camera = this.camera;
-	var dir = camera.direction;
-	var up = camera.up;
-	var right = camera.getRight();
 
-	// Must find dir, up & right relative to the axis for the geoLocation of the camera.
-	var modelViewInv = this.getModelViewMatrixInv();
-
-	var dirRel = modelViewInv.rotatePoint3D(dir, undefined);
-
-	// Heading.
-	// Check if camDir is parallel to absoluteAxisZ.
-	var headingRad;
-	var absDirZ = Math.abs(dirRel.z);
-	if (Math.abs(absDirZ - 1.0) > 10E-6)
-	{
-		headingRad = Math.atan2(dirRel.y, dirRel.x) - Math.PI/2;
-	}
-	else
-	{
-		headingRad = Math.atan2(up.y, up.x) - Math.PI/2;
-	}
-
-	// Pitch.
-	var pitchRad;
-	pitchRad = Math.PI/2 - Math.acos(dirRel.z);
-
-	// Roll.
-	var rollRad;
-	if (Math.abs(Math.abs(dirRel.z) - 1.0) > 10E-6)
-	{
-		rollRad = Math.atan2(-right.z, up.z);
-	}
-
-	if (resultAngles === undefined)
-	{ resultAngles = {}; }
-	
-	resultAngles.headingRad = headingRad;
-	resultAngles.pitchRad = pitchRad;
-	resultAngles.rollRad = rollRad;
-
-	return resultAngles;
-};
 
 
 

@@ -919,7 +919,7 @@ MagoWorld.prototype.doTest__CameraOrientation = function()
 	Camera.setOrientation(camera, heading, pitch, undefined);
 	this.updateModelViewMatrixByCamera(camera);
 
-	var camOrientation = this.magoManager.sceneState.getCameraOrientation();
+	var camOrientation = camera.getOrientation();
 	var heading2 = camOrientation.headingRad * 180/Math.PI;
 	var pitch2 = camOrientation.pitchRad * 180/Math.PI;
 	var roll2 = camOrientation.rollRad * 180/Math.PI;

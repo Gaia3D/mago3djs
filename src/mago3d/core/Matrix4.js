@@ -331,6 +331,22 @@ Matrix4.prototype.set = function(col, row, value)
  * @param {Point3D} result 출력 포인트
  * @returns {Point3D} 출력 포인트
  */
+Matrix4.prototype.getInverse = function(resultInverseMat) 
+{
+	if (resultInverseMat === undefined)
+	{ resultInverseMat = new Matrix4(); }
+
+	resultInverseMat._floatArrays = glMatrix.mat4.invert(resultInverseMat._floatArrays, this._floatArrays);
+	return resultInverseMat;
+};
+
+/**
+ * 행렬연산을 통해 주어진 포인트를 이동한다.
+ *
+ * @param {Point3D} point3d 입력 포인트
+ * @param {Point3D} result 출력 포인트
+ * @returns {Point3D} 출력 포인트
+ */
 Matrix4.prototype.transformPoint3D = function(point3d, result) 
 {
 	if (!point3d) 

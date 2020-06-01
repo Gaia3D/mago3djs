@@ -849,6 +849,60 @@ Camera.setOrientation = function (camera, heading, pitch, roll)
 };
 
 /**
+ * Returns the camera's orientation (heading, pitch & roll).
+ */
+Camera.prototype.getOrientation = function(resultAngles) 
+{
+	// Extract the heading, pitch & roll from this camera.
+	var camera = this;
+	var camPos = camera.position;
+	var dir = camera.direction;
+	var up = camera.up;
+	var right = camera.getRight();
+
+	// Must find dir, up & right relative to the axis for the geoLocation of the camera.
+	var geoLocMat = ManagerUtils.calculateGeoLocationMatrixAtWorldPosition(camPos, undefined);
+	var geoLocMatInv = geoLocMat.getInverse();
+
+	var dirRel = geoLocMatInv.rotatePoint3D(dir, undefined);
+	var upRel = geoLocMatInv.rotatePoint3D(up, undefined);
+	var rightRel = geoLocMatInv.rotatePoint3D(right, undefined);
+
+	// Heading.
+	// Check if camDir is parallel to absoluteAxisZ.
+	var headingRad;
+	var absDirZ = Math.abs(dirRel.z);
+	if (Math.abs(absDirZ - 1.0) > 10E-6)
+	{
+		headingRad = Math.atan2(dirRel.y, dirRel.x) + Math.PI + Math.PI/2;
+	}
+	else
+	{
+		headingRad = Math.atan2(upRel.y, upRel.x) + Math.PI + Math.PI/2;
+	}
+
+	// Pitch.
+	var pitchRad;
+	pitchRad = Math.PI - Math.acos(dirRel.z);
+
+	// Roll.
+	var rollRad;
+	if (Math.abs(absDirZ - 1.0) > 10E-6)
+	{
+		rollRad = Math.atan2(-rightRel.z, upRel.z);
+	}
+
+	if (resultAngles === undefined)
+	{ resultAngles = {}; }
+	
+	resultAngles.headingRad = headingRad;
+	resultAngles.pitchRad = pitchRad;
+	resultAngles.rollRad = rollRad;
+
+	return resultAngles;
+};
+
+/**
  * 어떤 일을 하고 있습니까?
  */
 Camera.prototype.getRight = function() 
