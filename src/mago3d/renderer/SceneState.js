@@ -182,12 +182,7 @@ SceneState.prototype.initMagoSceneState = function()
 
 	this.canvas = canvas;
 	this.gl = gl;
-	this.drawingBufferWidth[0] = canvas.clientWidth;
-	this.drawingBufferHeight[0] = canvas.clientHeight;
-	this.camera.frustum.aspectRatio[0] = canvas.clientWidth/canvas.clientHeight;
-	this.camera.frustum.fovRad[0] = Math.PI/3*1.8;
-	this.camera.frustum.fovyRad[0] = this.camera.frustum.fovRad[0]/this.camera.frustum.aspectRatio;
-	this.camera.frustum.tangentOfHalfFovy[0] = Math.tan(this.camera.frustum.fovyRad[0]/2);
+	this.setDrawingBufferSize(canvas.offsetWidth, canvas.offsetHeight);
     
 	// initial camera position.***
 	this.camera.position.set(-7586937.743019165, 10881859.054284709, 5648264.99911627);
@@ -203,6 +198,8 @@ SceneState.prototype.initMagoSceneState = function()
 	this.encodedCamPosLow[0] = -50297.7421875;
 	this.encodedCamPosLow[1] = 2883.05419921875;
 	this.encodedCamPosLow[2] = 12168.9990234375;
+
+	
 };
 
 /**
@@ -322,20 +319,16 @@ SceneState.prototype.setDrawingBufferSize = function(width, height)
 		var frustum0 = camera.getFrustum(0);
 		camera.frustum.aspectRatio[0] = width / height;
 
-		if (width > height)
-		{
-			// maintain fovx constant and recalculate fovy.
-			var fovxRad = camera.frustum.fovRad[0];
-			var fovyRad = fovxRad/camera.frustum.aspectRatio[0];
-			camera.frustum.fovyRad[0] = fovyRad;
-		}
-		else 
-		{
-			// maintain fovy constant and recalculate fovx.
-			var fovyRad = camera.frustum.fovyRad[0];
-			var fovxRad = fovyRad * camera.frustum.aspectRatio[0];
-			camera.frustum.fovRad[0] = fovxRad;
-		}
+		// maintain fovx constant and recalculate fovy.
+		var fovxRad = camera.frustum.fovRad[0];
+		var fovyRad = fovxRad/camera.frustum.aspectRatio[0];
+		camera.frustum.fovyRad[0] = fovyRad;
+		
+		// maintain fovy constant and recalculate fovx.***************
+		//var fovyRad = camera.frustum.fovyRad[0];
+		//var fovxRad = fovyRad * camera.frustum.aspectRatio[0];
+		//camera.frustum.fovRad[0] = fovxRad;
+		//------------------------------------------------------------
 
 		// recalculate tangentOfHalfFovy.
 		camera.frustum.tangentOfHalfFovy[0] = Math.tan(camera.frustum.fovyRad[0]/2);
@@ -345,6 +338,56 @@ SceneState.prototype.setDrawingBufferSize = function(width, height)
 		frustum0.fovyRad[0] = camera.frustum.fovyRad[0];
 		frustum0.tangentOfHalfFovy[0] = camera.frustum.tangentOfHalfFovy[0];
 	}
+};
+
+/**
+ * Returns the camera.
+ */
+SceneState.prototype.getCameraOrientation = function(resultAngles) 
+{
+	// Extract the heading, pitch & roll from this.modelViewMatrix.
+	var camera = this.camera;
+	var dir = camera.direction;
+	var up = camera.up;
+	var right = camera.getRight();
+
+	// Must find dir, up & right relative to the axis for the geoLocation of the camera.
+	var modelViewInv = this.getModelViewMatrixInv();
+
+	var dirRel = modelViewInv.rotatePoint3D(dir, undefined);
+
+	// Heading.
+	// Check if camDir is parallel to absoluteAxisZ.
+	var headingRad;
+	var absDirZ = Math.abs(dirRel.z);
+	if (Math.abs(absDirZ - 1.0) > 10E-6)
+	{
+		headingRad = Math.atan2(dirRel.y, dirRel.x) - Math.PI/2;
+	}
+	else
+	{
+		headingRad = Math.atan2(up.y, up.x) - Math.PI/2;
+	}
+
+	// Pitch.
+	var pitchRad;
+	pitchRad = Math.PI/2 - Math.acos(dirRel.z);
+
+	// Roll.
+	var rollRad;
+	if (Math.abs(Math.abs(dirRel.z) - 1.0) > 10E-6)
+	{
+		rollRad = Math.atan2(-right.z, up.z);
+	}
+
+	if (resultAngles === undefined)
+	{ resultAngles = {}; }
+	
+	resultAngles.headingRad = headingRad;
+	resultAngles.pitchRad = pitchRad;
+	resultAngles.rollRad = rollRad;
+
+	return resultAngles;
 };
 
 

@@ -851,6 +851,15 @@ Camera.setOrientation = function (camera, heading, pitch, roll)
 /**
  * 어떤 일을 하고 있습니까?
  */
+Camera.prototype.getRight = function() 
+{
+	this.right = this.direction.crossProduct(this.up, this.right);
+	return this.right;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ */
 Camera.prototype.calculateUp = function(aproxCamUp) 
 {
 	this.right = this.direction.crossProduct(aproxCamUp, this.right);
