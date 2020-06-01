@@ -913,11 +913,10 @@ MagoWorld.prototype.doTest__ExtrudedObject = function(event)
 
 MagoWorld.prototype.doTest__CameraOrientation = function()
 {
-	var heading = 45;
+	var heading = 145;
 	var pitch = 80;
 	var camera = this.magoManager.sceneState.camera;
 	Camera.setOrientation(camera, heading, pitch, undefined);
-
 	this.updateModelViewMatrixByCamera(camera);
 };
 

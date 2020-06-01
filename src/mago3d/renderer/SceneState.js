@@ -311,8 +311,40 @@ SceneState.prototype.setApplySunShadows = function(bApplySunShadows)
  */
 SceneState.prototype.setDrawingBufferSize = function(width, height) 
 {
-	this.drawingBufferWidth[0] = width;
-	this.drawingBufferHeight[0] = height;
+	// Check if drawingBufferSize changed.
+	if (width !== this.drawingBufferWidth[0] || height !== this.drawingBufferHeight[0])
+	{
+		this.drawingBufferWidth[0] = width;
+		this.drawingBufferHeight[0] = height;
+
+		// recalculate frustum fovyRad & tangentOfHalfFovy.
+		var camera = this.camera;
+		var frustum0 = camera.getFrustum(0);
+		camera.frustum.aspectRatio[0] = width / height;
+
+		if (width > height)
+		{
+			// maintain fovx constant and recalculate fovy.
+			var fovxRad = camera.frustum.fovRad[0];
+			var fovyRad = fovxRad/camera.frustum.aspectRatio[0];
+			camera.frustum.fovyRad[0] = fovyRad;
+		}
+		else 
+		{
+			// maintain fovy constant and recalculate fovx.
+			var fovyRad = camera.frustum.fovyRad[0];
+			var fovxRad = fovyRad * camera.frustum.aspectRatio[0];
+			camera.frustum.fovRad[0] = fovxRad;
+		}
+
+		// recalculate tangentOfHalfFovy.
+		camera.frustum.tangentOfHalfFovy[0] = Math.tan(camera.frustum.fovyRad[0]/2);
+
+		// transfer to frustum0.
+		frustum0.aspectRatio[0] = camera.frustum.aspectRatio[0];
+		frustum0.fovyRad[0] = camera.frustum.fovyRad[0];
+		frustum0.tangentOfHalfFovy[0] = camera.frustum.tangentOfHalfFovy[0];
+	}
 };
 
 

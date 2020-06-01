@@ -503,7 +503,7 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 MagoManager.prototype.upDateSceneStateMatrices = function(sceneState) 
 {
 	if (this.myCameraSCX === undefined) 
-	{ this.myCameraSCX = new Camera(); }
+	{ this.myCameraSCX = new Camera({name: "cameraSCX"}); }
 
 	if (this.configInformation === undefined) 
 	{
@@ -608,7 +608,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		var camera = sceneState.camera;
 		var camPos = camera.position;
 		var frustum0 = camera.getFrustum(0);
-		sceneState.camera.frustum.aspectRatio[0] = sceneState.drawingBufferWidth / sceneState.drawingBufferHeight;
+
 		// determine frustum near & far.***
 		var camHeight = camera.getCameraElevation();
 		var eqRadius = Globe.equatorialRadius();
@@ -677,9 +677,6 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		// Large far modelViewProjectionRelToEyeSky.***
 		var modelViewProjRelToEyeMatrixSky = sceneState.modelViewProjRelToEyeMatrixSky;
 		modelViewProjRelToEyeMatrixSky._floatArrays = glMatrix.mat4.multiply(modelViewProjRelToEyeMatrixSky._floatArrays, projectionMatrixSky._floatArrays, modelViewRelToEyeMatrix._floatArrays);
-
-		frustum0.tangentOfHalfFovy[0] = Math.tan(frustum0.fovyRad[0]/2);
-
 	}
 	
 	
@@ -1432,7 +1429,7 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 		{ this.animationManager.checkAnimation(this); }
 
 		if (this.myCameraSCX === undefined) 
-		{ this.myCameraSCX = new Camera(); }
+		{ this.myCameraSCX = new Camera({name: "cameraSCX"}); }
 		
 		if (!this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
 		{

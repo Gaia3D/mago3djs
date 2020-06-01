@@ -5,7 +5,7 @@
  * @class Camera
  * @constructor
  */
-var Camera = function() 
+var Camera = function(options) 
 {
 	if (!(this instanceof Camera)) 
 	{
@@ -13,6 +13,7 @@ var Camera = function()
 	}
 
 	this.id = "camera";
+	this.name = "noName";
 	this.position = new Point3D(); 
 	this.direction = new Point3D(); 
 	this.up = new Point3D();
@@ -78,6 +79,15 @@ var Camera = function()
 	* @default 12
 	*/
 	this.trackCameraOffsetZ = 12;
+
+	if (options)
+	{
+		if (options.name !== undefined)
+		{ this.name = options.name; }
+
+		if (options.id !== undefined)
+		{ this.id = options.id; }
+	}
 };
 
 /**
