@@ -681,8 +681,10 @@ MagoWorld.prototype.mousemove = function(event)
 		var xRotAngRad = increY * 0.003;
 
 		// limit the pitch.
-		if (xRotAngRad > 0.0)
-		{ xRotAngRad = 0.0; }
+		var startCamPitchRad = -mouseAction.startCamOrintation.pitchRad;
+		var totalPitchRad = xRotAngRad + startCamPitchRad;
+		if (totalPitchRad > -0.0000001)
+		{ xRotAngRad = -startCamPitchRad; }
 		
 		if (zRotAngRad === 0 && xRotAngRad === 0)
 		{ return; }
@@ -853,6 +855,9 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 	// now, copy camera to curCamera.
 	var strCamera = mouseAction.strCamera;
 	strCamera.copyPosDirUpFrom(camera);
+
+	// save startCameraOrientation.
+	mouseAction.startCamOrintation = camera.getOrientation();
 	
 	// copy modelViewMatrix.
 	var modelViewMatrix = sceneState.modelViewMatrix;

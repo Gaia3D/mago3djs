@@ -410,6 +410,9 @@ TinTerrain.prototype.makeTextureMaster = function()
 	}
 
 	var shader;
+	//shader.position2_loc = gl.getAttribLocation(shader.program, "a_pos");
+	//shader.uActiveTextures_loc = gl.getUniformLocation(shader.program, "uActiveTextures");
+	//shader.externalAlphasArray_loc = gl.getUniformLocation(shader.program, "externalAlphasArray");
 
 	var activeTexturesLayers = new Int32Array([1, 0, 0, 0, 0, 0, 0, 0]); // note: the 1rst & 2nd are shadowMap textures.
 	var textureKeys = Object.keys(this.texture);
