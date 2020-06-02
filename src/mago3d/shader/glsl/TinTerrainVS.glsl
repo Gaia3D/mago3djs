@@ -116,8 +116,17 @@ void main()
 		vTexCoord = texCoord;
 	}
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;
+
+	// logarithmic zBuffer:
+	// https://www.gamasutra.com/blogs/BranoKemen/20090812/85207/Logarithmic_Depth_Buffer.php
+	// z = log(C*z + 1) / log(C*Far + 1) * w
+	float z = gl_Position.z;
+	float C = 1.0;
+	float w = gl_Position.w;
+	//gl_Position.z = log(C*z + 1.0) / log(C*far + 1.0) * w;
+	gl_Position.z = log(z/near) / log(far/near)*w; // another way.
+
 	v3Pos = (modelViewMatrixRelToEye * pos4).xyz;
-	//v3Pos = (pos4).xyz;
 
 	// calculate fog amount.
 	float fogParam = 1.15 * v3Pos.z/(far - 10000.0);

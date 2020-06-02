@@ -1668,6 +1668,8 @@ ShaderSource.ModelRefSsaoVS = "\n\
 	uniform mat4 sunMatrix[2]; \n\
 	uniform vec3 buildingPosHIGH;\n\
 	uniform vec3 buildingPosLOW;\n\
+	uniform float near;\n\
+	uniform float far;\n\
 	uniform vec3 scaleLC;\n\
 	uniform vec3 sunPosHIGH[2];\n\
 	uniform vec3 sunPosLOW[2];\n\
@@ -1827,6 +1829,7 @@ ShaderSource.ModelRefSsaoVS = "\n\
 			applySpecLighting = -1.0;\n\
 \n\
         gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+\n\
 		vertexPos = (modelViewMatrixRelToEye * pos4).xyz;\n\
 		//vertexPos = objPosHigh + objPosLow;\n\
 		\n\
@@ -3230,6 +3233,118 @@ void main()\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
 }\n\
 ";
+ShaderSource.texturesMergerFS = "#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+uniform sampler2D texture_0;  \n\
+uniform sampler2D texture_1;\n\
+uniform sampler2D texture_2;\n\
+uniform sampler2D texture_3;\n\
+uniform sampler2D texture_4;\n\
+uniform sampler2D texture_5;\n\
+uniform sampler2D texture_6;\n\
+uniform sampler2D texture_7;\n\
+\n\
+uniform float externalAlphasArray[8];\n\
+uniform int uActiveTextures[8];\n\
+\n\
+varying vec2 v_tex_pos;\n\
+\n\
+//vec4 mixColor(sampler2D tex)\n\
+\n\
+void main()\n\
+{           \n\
+    vec2 texCoord = v_tex_pos;\n\
+\n\
+    // Take the base color.\n\
+    vec4 textureColor = texture2D(texture_0, texCoord);\n\
+    vec4 currColor4;\n\
+    float externalAlpha;\n\
+    \n\
+    if(uActiveTextures[1] == 1)\n\
+    {\n\
+        currColor4 = texture2D(texture_1, texCoord);\n\
+        externalAlpha = externalAlphasArray[1];\n\
+        if(currColor4.w > 0.0 && externalAlpha > 0.0)\n\
+        {\n\
+            textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);\n\
+        }\n\
+    }\n\
+    \n\
+    if(uActiveTextures[2] == 1)\n\
+    {\n\
+        currColor4 = texture2D(texture_2, texCoord);\n\
+        externalAlpha = externalAlphasArray[2];\n\
+        if(currColor4.w > 0.0 && externalAlpha > 0.0)\n\
+        {\n\
+            textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);\n\
+        }\n\
+    }\n\
+\n\
+    if(uActiveTextures[3] == 1)\n\
+    {\n\
+        currColor4 = texture2D(texture_3, texCoord);\n\
+        externalAlpha = externalAlphasArray[3];\n\
+        if(currColor4.w > 0.0 && externalAlpha > 0.0)\n\
+        {\n\
+            textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);\n\
+        }\n\
+    }\n\
+\n\
+    if(uActiveTextures[4] == 1)\n\
+    {\n\
+        currColor4 = texture2D(texture_4, texCoord);\n\
+        externalAlpha = externalAlphasArray[4];\n\
+        if(currColor4.w > 0.0 && externalAlpha > 0.0)\n\
+        {\n\
+            textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);\n\
+        }\n\
+    }\n\
+\n\
+    if(uActiveTextures[5] == 1)\n\
+    {\n\
+        currColor4 = texture2D(texture_5, texCoord);\n\
+        externalAlpha = externalAlphasArray[5];\n\
+        if(currColor4.w > 0.0 && externalAlpha > 0.0)\n\
+        {\n\
+            textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);\n\
+        }\n\
+    }\n\
+\n\
+    if(uActiveTextures[6] == 1)\n\
+    {\n\
+        currColor4 = texture2D(texture_6, texCoord);\n\
+        externalAlpha = externalAlphasArray[6];\n\
+        if(currColor4.w > 0.0 && externalAlpha > 0.0)\n\
+        {\n\
+            textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);\n\
+        }\n\
+    }\n\
+\n\
+    if(uActiveTextures[7] == 1)\n\
+    {\n\
+        currColor4 = texture2D(texture_7, texCoord);\n\
+        externalAlpha = externalAlphasArray[7];\n\
+        if(currColor4.w > 0.0 && externalAlpha > 0.0)\n\
+        {\n\
+            textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);\n\
+        }\n\
+    }\n\
+    \n\
+    gl_FragColor = textureColor;\n\
+	\n\
+}";
+ShaderSource.texturesMergerVS = "precision mediump float;\n\
+\n\
+attribute vec2 a_pos;\n\
+\n\
+varying vec2 v_tex_pos;\n\
+\n\
+void main() {\n\
+    v_tex_pos = a_pos;\n\
+    gl_Position = vec4(1.0 - 2.0 * a_pos, 0, 1);\n\
+}";
 ShaderSource.TextureVS = "attribute vec3 position;\n\
 attribute vec4 aVertexColor;\n\
 attribute vec2 aTextureCoord;\n\
@@ -4345,8 +4460,17 @@ void main()\n\
 		vTexCoord = texCoord;\n\
 	}\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+\n\
+	// logarithmic zBuffer:\n\
+	// https://www.gamasutra.com/blogs/BranoKemen/20090812/85207/Logarithmic_Depth_Buffer.php\n\
+	// z = log(C*z + 1) / log(C*Far + 1) * w\n\
+	float z = gl_Position.z;\n\
+	float C = 1.0;\n\
+	float w = gl_Position.w;\n\
+	//gl_Position.z = log(C*z + 1.0) / log(C*far + 1.0) * w;\n\
+	gl_Position.z = log(z/near) / log(far/near)*w; // another way.\n\
+\n\
 	v3Pos = (modelViewMatrixRelToEye * pos4).xyz;\n\
-	//v3Pos = (pos4).xyz;\n\
 \n\
 	// calculate fog amount.\n\
 	float fogParam = 1.15 * v3Pos.z/(far - 10000.0);\n\

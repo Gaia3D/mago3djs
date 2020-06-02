@@ -623,6 +623,8 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		if (camHeight > 50000)
 		{ far *= 1.5; }
 
+		frustum0.near[0] = 0.0001;
+		/*
 		if (camHeight > 10000)
 		{
 			frustum0.near[0] = 0.1 + camHeight*0.8;
@@ -631,6 +633,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		{
 			frustum0.near[0] = 0.1;
 		}
+		*/
 		frustum0.far[0] = far;
 		// End-------------------------------------------------------------
 		
@@ -4769,6 +4772,15 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.imageSize_loc = gl.getUniformLocation(shader.program, "imageSize");
 	shader.bUseOriginalImageSize_loc = gl.getUniformLocation(shader.program, "bUseOriginalImageSize");
 	shader.aditionalOffset_loc = gl.getUniformLocation(shader.program, "aditionalOffset");
+
+	// TexturesMerger shader.******************************************************************************************
+	var shaderName = "texturesMerger";
+	var ssao_vs_source = ShaderSource.texturesMergerVS;
+	var ssao_fs_source = ShaderSource.texturesMergerFS;
+	var shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
+	shader.position2_loc = gl.getAttribLocation(shader.program, "a_pos");
+	shader.uActiveTextures_loc = gl.getUniformLocation(shader.program, "uActiveTextures");
+	shader.externalAlphasArray_loc = gl.getUniformLocation(shader.program, "externalAlphasArray");
 };
 
 /**

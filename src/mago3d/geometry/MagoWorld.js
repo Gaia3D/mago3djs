@@ -632,6 +632,10 @@ MagoWorld.prototype.mousemove = function(event)
 		
 		var zRotAngRad = increX * 0.003;
 		var xRotAngRad = increY * 0.003;
+
+		// limit the pitch.
+		if (xRotAngRad > 0.0)
+		{ xRotAngRad = 0.0; }
 		
 		if (zRotAngRad === 0 && xRotAngRad === 0)
 		{ return; }

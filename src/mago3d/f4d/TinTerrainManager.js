@@ -3,7 +3,7 @@
 /**
  * @class TinTerrainManager
  */
-var TinTerrainManager = function(options) 
+var TinTerrainManager = function(magoManager, options) 
 {
 	if (!(this instanceof TinTerrainManager)) 
 	{
@@ -35,6 +35,10 @@ var TinTerrainManager = function(options)
 	this.terrainReady = false;
 	this.terrainTilesInfo;
 	this.selectable = true;
+
+	this.magoManager = magoManager;
+	var gl = magoManager.getGl();
+	this.texturesMergerFbo = new FBO(gl, new Float32Array([256]), new Float32Array([256]));
 
 	if (this.terrainType !== CODE.magoEarthTerrainType.PLAIN && !this.terrainValue)
 	{
@@ -268,6 +272,12 @@ TinTerrainManager.prototype.makeDistanceLimitByDepth = function()
 	this.distLimitByDepth[18] = 400; 
 	this.distLimitByDepth[19] = 200; 
 	this.distLimitByDepth[20] = 100; 
+
+	var count = this.distLimitByDepth.length;
+	for (var i=0; i<count; i++)
+	{
+		this.distLimitByDepth[i] *= 1.5;
+	}
 	
 };
 

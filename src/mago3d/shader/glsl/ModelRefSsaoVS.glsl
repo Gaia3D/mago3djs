@@ -14,6 +14,8 @@
 	uniform mat4 sunMatrix[2]; 
 	uniform vec3 buildingPosHIGH;
 	uniform vec3 buildingPosLOW;
+	uniform float near;
+	uniform float far;
 	uniform vec3 scaleLC;
 	uniform vec3 sunPosHIGH[2];
 	uniform vec3 sunPosLOW[2];
@@ -173,6 +175,7 @@
 			applySpecLighting = -1.0;
 
         gl_Position = ModelViewProjectionMatrixRelToEye * pos4;
+
 		vertexPos = (modelViewMatrixRelToEye * pos4).xyz;
 		//vertexPos = objPosHigh + objPosLow;
 		

@@ -104,7 +104,12 @@ var FBO = function(gl, width, height, options)
 	}
 
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-};    
+};   
+
+FBO.prototype.setColorBuffer = function(colorBuffer) 
+{
+	
+};
 
 /**
  * Binds the framebuffer.

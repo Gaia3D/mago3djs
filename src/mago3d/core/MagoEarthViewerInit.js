@@ -18,8 +18,7 @@ MagoEarthViewerInit.prototype.init = function()
 	this.magoManager.globe = new Globe();
 	// Create the tinTerrains(MagoEarth).***
 
-	
-	this.magoManager.tinTerrainManager = new TinTerrainManager(this.options);
+	this.magoManager.tinTerrainManager = new TinTerrainManager(this.magoManager, this.options);
 	//if (!this.magoManager.tinTerrainManager) { this.magoManager.tinTerrainManager = new TinTerrainManager(); }
 
 	// init matrices.***

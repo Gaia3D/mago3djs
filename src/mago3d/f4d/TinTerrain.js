@@ -62,7 +62,8 @@ var TinTerrain = function(owner)
 	
 	this.indexName; // example: "LU".
 	this.pathName; // example: "14//4567//516".
-	this.texture = {};
+	this.texture = {};// must change name.***
+	this.textureMaster;
 	this.textureElevation = {};
 	this.visible;
 	
@@ -391,6 +392,107 @@ TinTerrain.prototype.isPrepared = function()
 	return true;
 };
 
+TinTerrain.prototype.makeTextureMaster = function()
+{
+	// If there are 2 or more layers, then merge all layers into one texture.
+	var magomanager = this.tinTerrainManager.magoManager;
+	var gl = magomanager.getGl();
+
+	if (this.textureMaster === undefined)
+	{ this.textureMaster = gl.createTexture(); }
+
+	var texturesMergerFbo = this.tinTerrainManager.texturesMergerFbo;
+
+	if (this.tinTerrainManager.quadBuffer === undefined)
+	{
+		var data = new Float32Array([0, 0,   1, 0,   0, 1,   0, 1,   1, 0,   1, 1]);
+		this.tinTerrainManager.quadBuffer = FBO.createBuffer(gl, data);
+	}
+
+	var shader;
+
+	var activeTexturesLayers = new Int32Array([1, 0, 0, 0, 0, 0, 0, 0]); // note: the 1rst & 2nd are shadowMap textures.
+	var textureKeys = Object.keys(this.texture);
+	var textureLength = textureKeys.length; 
+	for (var i=0;i<textureLength;i++) 
+	{
+		if (i === 8)
+		{ break; }
+
+		var textureKey = textureKeys[i];
+		var texture = this.texture[textureKey];
+		if (!(texture.texId instanceof WebGLTexture)) 
+		{
+			continue;
+		}
+
+		if (this.tinTerrainManager.textureIdDeleteMap[textureKey]) 
+		{
+			this.tinTerrainManager.eraseTexture(texture, magoManager);
+			delete this.texture[textureKey];
+			continue;
+		}
+		
+		if (!texture.imagery.show) { continue; }
+
+		var filter = texture.imagery.filter;
+		if (filter === CODE.imageFilter.BATHYMETRY) 
+		{ continue; }
+
+		gl.activeTexture(gl.TEXTURE0 + i); 
+		gl.bindTexture(gl.TEXTURE_2D, texture.texId);
+		
+		activeTexturesLayers[i] = 1;
+	}
+
+	gl.uniform1iv(shader.uActiveTextures_loc, activeTexturesLayers);
+
+};
+
+TinTerrain.prototype.bindTexture = function(gl, shader)
+{
+	var activeTexturesLayers = new Int32Array([1, 1, 0, 0, 0, 0, 0, 0]); // note: the 1rst & 2nd are shadowMap textures.
+
+	var textureKeys = Object.keys(this.texture);
+	var textureLength = textureKeys.length; 
+	for (var i=0;i<textureLength;i++) 
+	{
+		var textureKey = textureKeys[i];
+		var texture = this.texture[textureKey];
+		if (!(texture.texId instanceof WebGLTexture)) 
+		{
+			continue;
+		}
+
+		if (this.tinTerrainManager.textureIdDeleteMap[textureKey]) 
+		{
+			this.tinTerrainManager.eraseTexture(texture, magoManager);
+			delete this.texture[textureKey];
+			continue;
+		}
+		
+		if (!texture.imagery.show) { continue; }
+
+		gl.activeTexture(gl.TEXTURE4 + i); 
+		gl.bindTexture(gl.TEXTURE_2D, texture.texId);
+		
+		activeTexturesLayers[4+i] = 1;
+		var filter = texture.imagery.filter;
+		if (filter) 
+		{
+			if (filter === CODE.imageFilter.BATHYMETRY) 
+			{
+				activeTexturesLayers[4+i] = 10;
+			}
+		}
+	}	
+
+	gl.uniform1iv(shader.uActiveTextures_loc, activeTexturesLayers);
+
+	// If there are 2 or more layers, then must create textureMaster.
+
+};
+
 TinTerrain.prototype.prepareTexture = function(texturesMap, imagerys, magoManager, tinTerrainManager)
 {
 	var gl = magoManager.sceneState.gl;
@@ -401,7 +503,7 @@ TinTerrain.prototype.prepareTexture = function(texturesMap, imagerys, magoManage
 
 	//var imagerys = tinTerrainManager.imagerys;
 
-	for (var i=0, len=imagerys.length;i<len;i++) 
+	for (var i = 0, len = imagerys.length; i < len; i++) 
 	{
 		var imagery = imagerys[i];
 		if (!imagery.show || imagery.maxZoom < parseInt(L) || imagery.minZoom > parseInt(L)) { continue; }
@@ -827,41 +929,8 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 				gl.uniform1f(currentShader.uTime_loc, fractionalTime);
 				// End caustics.----------------------------------------
 
-				var textureKeys = Object.keys(this.texture);
-				var textureLength = textureKeys.length; 
-				for (var i=0;i<textureLength;i++) 
-				{
-					var textureKey = textureKeys[i];
-					var texture = this.texture[textureKey];
-					if (!(texture.texId instanceof WebGLTexture)) 
-					{
-						continue;
-					}
+				this.bindTexture(gl, currentShader);
 
-					if (this.tinTerrainManager.textureIdDeleteMap[textureKey]) 
-					{
-						this.tinTerrainManager.eraseTexture(texture, magoManager);
-						delete this.texture[textureKey];
-						continue;
-					}
-					
-					if (!texture.imagery.show) { continue; }
-
-					gl.activeTexture(gl.TEXTURE4 + i); 
-					gl.bindTexture(gl.TEXTURE_2D, texture.texId);
-					
-					activeTexturesLayers[4+i] = 1;
-					var filter = texture.imagery.filter;
-					if (filter) 
-					{
-						if (filter === CODE.imageFilter.BATHYMETRY) 
-						{
-							activeTexturesLayers[4+i] = 10;
-						}
-					}
-				}	
-
-				gl.uniform1iv(currentShader.uActiveTextures_loc, activeTexturesLayers);
 			}
 			
 			// render this tinTerrain.
@@ -1020,9 +1089,9 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			var currSelObject = magoManager.selectionManager.getSelectedGeneral();
 			if (currSelObject !== this)// && renderType !== 0)
 			{ 
-				gl.depthRange(0.5, 1);
+				//gl.depthRange(0.5, 1);
 				gl.drawArrays(gl.TRIANGLE_STRIP, 0, vboKey.vertexCount); 
-				gl.depthRange(0, 1);
+				//gl.depthRange(0, 1);
 			} 
 			
 			this.renderingFase = this.tinTerrainManager.renderingFase;
