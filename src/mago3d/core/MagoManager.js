@@ -374,6 +374,18 @@ MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums)
 	this.startRender(isLastFrustum, this.currentFrustumIdx, numFrustums);
 };
 
+MagoManager.prototype.updateSize = function() 
+{
+
+	var sceneState = this.sceneState;
+	var canvas = sceneState.canvas;
+	canvas.width = canvas.offsetWidth;
+	canvas.height = canvas.offsetHeight;
+
+	sceneState.setDrawingBufferSize(canvas.offsetWidth, canvas.offsetHeight);
+};
+
+
 MagoManager.prototype.isCesiumGlobe = function() 
 {
 	return this.configInformation.basicGlobe === Constant.CESIUM;
