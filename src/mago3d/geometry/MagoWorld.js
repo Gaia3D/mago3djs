@@ -200,13 +200,20 @@ MagoWorld.prototype.changeCameraPosition = function(cartesian3, silent)
 	var camDir = camera.direction;
 	var camUp = camera.up;
 	
-	var matrixAux = this.magoManager.globe.transformMatrixAtCartesianPointWgs84(cartesian3[0], cartesian3[1], cartesian3[2], matrixAux);
-	
+	var orientation = camera.getOrientation();
+	var heading = orientation.headingRad * 180 /Math.PI;
+	var pitch = orientation.pitchRad * 180 /Math.PI;
+	var roll = orientation.rollRad * 180 /Math.PI;
+
 	camPos.set(cartesian3[0], cartesian3[1], cartesian3[2]);
+	var matrixAux = ManagerUtils.calculateTransformMatrixAtWorldPosition(camPos, heading, pitch, roll);
+
+	//var matrixAux = this.magoManager.globe.transformMatrixAtCartesianPointWgs84(cartesian3[0], cartesian3[1], cartesian3[2], matrixAux);
 
 	// calculate camDir & camUp.
-	camDir.set(-matrixAux[8], -matrixAux[9], -matrixAux[10]);
-	camUp.set(matrixAux[4], matrixAux[5], matrixAux[6]); // tangent north direction.
+	var matFArray = matrixAux._floatArrays;
+	camDir.set(-matFArray[8], -matFArray[9], -matFArray[10]);
+	camUp.set(matFArray[4], matFArray[5], matFArray[6]); // tangent north direction.
 
 	this.updateModelViewMatrixByCamera(camera, silent);
 };
@@ -686,6 +693,7 @@ MagoWorld.prototype.mousemove = function(event)
 		if (totalPitchRad > -0.0000001)
 		{ xRotAngRad = -startCamPitchRad; }
 		
+
 		if (zRotAngRad === 0 && xRotAngRad === 0)
 		{ return; }
 		
