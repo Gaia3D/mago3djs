@@ -48,13 +48,22 @@ MagoWorld.prototype.prepareVisibles = function()
 MagoWorld.prototype.renderScene = function()
 {
 	//this.renderTest();
-	var gl = this.magoManager.sceneState.gl;
+	var magoManager = this.magoManager; 
+	var sceneState = magoManager.sceneState;
+	var container = sceneState.canvas.parentElement;
+
+	if (container.style.display === 'none')
+	{
+		return;
+	}
+	
+	var gl = sceneState.gl;
 	//gl.clearColor(0, 0, 0, 1);
 	gl.enable(gl.DEPTH_TEST);
 	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	
-	this.magoManager.start(undefined, true, 0, 1);
+	magoManager.start(undefined, true, 0, 1);
 };
 
 /**
@@ -78,8 +87,10 @@ MagoWorld.prototype.renderTest = function()
  * @param {Number} longitude 
  * @param {Number} latitude
  * @param {Number} altitude 
+ * @param {Number} duration
+ * @param {boolean} silent
  */
-MagoWorld.prototype.goto = function(longitude, latitude, altitude, duration)
+MagoWorld.prototype.goto = function(longitude, latitude, altitude, duration, silent)
 {
 	var resultCartesian = Globe.geographicToCartesianWgs84(longitude, latitude, altitude, resultCartesian);
 	
@@ -121,14 +132,49 @@ MagoWorld.prototype.goto = function(longitude, latitude, altitude, duration)
 	}
 	else 
 	{
-		this.changeCameraPosition(resultCartesian);
+		this.changeCameraPosition(resultCartesian, silent);
 	}
 };
 /**
+ * change camera orientation
+ * @param {number} heading
+ * @param {number} pitch
+ * @param {number} roll
+ * @param {boolean} silent
+ */
+MagoWorld.prototype.changeCameraOrientation = function(heading, pitch, roll, silent)
+{
+	heading = parseFloat(heading);
+	pitch = parseFloat(pitch);
+	roll = parseFloat(roll);
+	if (isNaN(heading)) 
+	{
+		throw new Error('Heading require number type.');
+	}
+
+	if (isNaN(pitch)) 
+	{
+		throw new Error('Pitch require number type.');
+	}
+
+	if (isNaN(roll)) 
+	{
+		throw new Error('Roll require number type.');
+	}
+
+	var camera = this.magoManager.sceneState.camera;
+	Camera.setOrientation(camera, heading, pitch, roll);
+
+	this.updateModelViewMatrixByCamera(camera, silent);
+};
+
+
+/**
  * 들어온 값만큼 뒤로 이동
  * @param {number} amount
+ * @param {boolean} silent
  */
-MagoWorld.prototype.moveBackward = function(amount)
+MagoWorld.prototype.moveBackward = function(amount, silent)
 {
 	var camera = this.magoManager.sceneState.camera;
 	var camPos = camera.position;
@@ -138,14 +184,15 @@ MagoWorld.prototype.moveBackward = function(amount)
 	var scaled = Point3D.scale(camDir, amount);
 	var addScaled = Point3D.add(camPos, scaled);
 	
-	this.changeCameraPosition(Point3D.toArray(addScaled));
+	this.changeCameraPosition(Point3D.toArray(addScaled), silent);
 };
 
 /**
  * adjust change camera position
  * @param {Array<number>} cartesian3 cartesian3
+ * @param {boolean} silent
  */
-MagoWorld.prototype.changeCameraPosition = function(cartesian3) 
+MagoWorld.prototype.changeCameraPosition = function(cartesian3, silent) 
 {
 	var camera = this.magoManager.sceneState.camera;
 
@@ -161,7 +208,7 @@ MagoWorld.prototype.changeCameraPosition = function(cartesian3)
 	camDir.set(-matrixAux[8], -matrixAux[9], -matrixAux[10]);
 	camUp.set(matrixAux[4], matrixAux[5], matrixAux[6]); // tangent north direction.
 
-	this.updateModelViewMatrixByCamera(camera);
+	this.updateModelViewMatrixByCamera(camera, silent);
 };
 
 /**
@@ -827,9 +874,15 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 /**
  * 만약 마우스 핸들링으로 화면이 바뀌었을 경우, 다음 함수가 활성화 된다
  * @param {Camera} camera
+ * @param {boolean} silent
  */
-MagoWorld.prototype.updateModelViewMatrixByCamera = function(camera)
+MagoWorld.prototype.updateModelViewMatrixByCamera = function(camera, silent)
 {
+	if (!silent) 
+	{
+		this.magoManager.cameraMoveStart();
+	}
+	
 	var camera = this.magoManager.sceneState.camera;
 	var camPos = camera.position;
 	var camDir = camera.direction;
@@ -845,6 +898,10 @@ MagoWorld.prototype.updateModelViewMatrixByCamera = function(camera)
 		[tergetX, tergetY, tergetZ], 
 		[camUp.x, camUp.y, camUp.z]);
 
+	if (!silent) 
+	{
+		this.magoManager.cameraMoveEnd();
+	}
 };
 
 MagoWorld.prototype.doTest__BSpline3DCubic = function(event)
