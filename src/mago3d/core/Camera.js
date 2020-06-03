@@ -153,6 +153,9 @@ Camera.prototype.doInertialMovement = function(magoManager)
 		{ movement.movementType = CODE.movementType.NO_MOVEMENT; }
 		
 		var angRad = movement.angRad;
+
+		
+
 		var rotAxis = movement.rotationAxis;
 		
 		// check if there are rotationPoint.
@@ -201,6 +204,18 @@ Camera.prototype.doInertialMovement = function(magoManager)
 			
 			var zRotAngRad = movement.zAngVelocity * deltaTime;
 			var xRotAngRad = movement.xAngVelocity * deltaTime;
+
+			// limit the pitch.
+			var rotation = this.getOrientation();
+			var startCamPitchRad = -rotation.pitchRad;
+			var totalPitchRad = xRotAngRad + startCamPitchRad;
+			if (totalPitchRad > -0.01)
+			{ 
+				if (startCamPitchRad < 0.0)
+				{ xRotAngRad = -startCamPitchRad - 0.01; } 
+				else
+				{ xRotAngRad = startCamPitchRad - 0.01; } 
+			}
 			
 			if (Math.abs(zRotAngRad) < 1E-11 && Math.abs(xRotAngRad) < 1E-11)
 			{ movement.movementType = CODE.movementType.NO_MOVEMENT; }
