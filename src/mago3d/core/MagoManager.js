@@ -567,10 +567,11 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		Cesium.Matrix4.toArray(uniformState._projection, sceneState.projectionMatrix._floatArrays); // original.***
 
 		// Given ModelViewMatrix & ProjectionMatrix, calculate all sceneState matrix.
-		sceneState.modelViewMatrixInv._floatArrays = glMatrix.mat4.invert(sceneState.modelViewMatrixInv._floatArrays, sceneState.modelViewMatrix._floatArrays);
+		var modelViewMatrixInv = sceneState.getModelViewMatrixInv();
+		modelViewMatrixInv._floatArrays = glMatrix.mat4.invert(modelViewMatrixInv._floatArrays, sceneState.modelViewMatrix._floatArrays);
 	
 		// normalMat.***
-		sceneState.normalMatrix4._floatArrays = glMatrix.mat4.transpose(sceneState.normalMatrix4._floatArrays, sceneState.modelViewMatrixInv._floatArrays);
+		sceneState.normalMatrix4._floatArrays = glMatrix.mat4.transpose(sceneState.normalMatrix4._floatArrays, modelViewMatrixInv._floatArrays);
 			
 		// modelViewRelToEye.***
 		sceneState.modelViewRelToEyeMatrix._floatArrays = glMatrix.mat4.copy(sceneState.modelViewRelToEyeMatrix._floatArrays, sceneState.modelViewMatrix._floatArrays);
@@ -663,7 +664,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		
 		// modelView.***
 		var modelViewMatrix = sceneState.modelViewMatrix;
-		var modelViewMatrixInv = sceneState.modelViewMatrixInv;
+		var modelViewMatrixInv = sceneState.getModelViewMatrixInv();
 		modelViewMatrixInv._floatArrays = glMatrix.mat4.invert(modelViewMatrixInv._floatArrays, modelViewMatrix._floatArrays);
 	
 		// normalMat.***
@@ -792,7 +793,7 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
 		
 		// Set cam dir & up by modelViewMatrix.***
 		var sceneState = this.sceneState;
-		var modelViewMatInv = sceneState.modelViewMatrixInv;
+		var modelViewMatInv = sceneState.getModelViewMatrixInv();
 		//var camPosX = modelViewMatInv._floatArrays[12]; // No enough precision. 
 		//var camPosY = modelViewMatInv._floatArrays[13]; // No enough precision. 
 		//var camPosZ = modelViewMatInv._floatArrays[14]; // No enough precision. 
@@ -3300,7 +3301,7 @@ MagoManager.prototype.moveSelectedObjectGeneral = function(gl, object)
 	intersectionPointCC = this.selObjMovePlaneCC.intersectionLine(this.lineCC, intersectionPointCC);
 	//------------------------------------------------------------------------------------------------
 
-	var mvMat = this.sceneState.modelViewMatrixInv;
+	var mvMat = this.sceneState.getModelViewMatrixInv();
 	var intersectionPointWC = mvMat.transformPoint3D(intersectionPointCC, intersectionPointWC);
 
 	
@@ -3465,7 +3466,7 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 		intersectionPointCC = this.selObjMovePlaneCC.intersectionLine(this.lineCC, intersectionPointCC);
 		//------------------------------------------------------------------------------------------------
 
-		var mvMat = this.sceneState.modelViewMatrixInv;
+		var mvMat = this.sceneState.getModelViewMatrixInv();
 		var intersectionPointWC = mvMat.transformPoint3D(intersectionPointCC, intersectionPointWC);
 	
 		// register the movement.***

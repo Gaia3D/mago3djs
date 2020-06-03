@@ -988,7 +988,9 @@ ManagerUtils.getRayWorldSpace = function(gl, pixelX, pixelY, resultRay, magoMana
 	pointSC.set(rayCamSpace[0], rayCamSpace[1], rayCamSpace[2]);
 
 	// now, must transform this posCamCoord to world coord.
-	pointSC2 = magoManager.sceneState.modelViewMatrixInv.rotatePoint3D(pointSC, pointSC2); // rayWorldSpace.
+
+	var mvMatInv = magoManager.sceneState.getModelViewMatrixInv();
+	pointSC2 = mvMatInv.rotatePoint3D(pointSC, pointSC2); // rayWorldSpace.
 	pointSC2.unitary(); // rayWorldSpace.
 	resultRay.setPointAndDir(camPos.x, camPos.y, camPos.z,       pointSC2.x, pointSC2.y, pointSC2.z);// original.
 

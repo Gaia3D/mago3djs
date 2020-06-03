@@ -73,7 +73,7 @@ ClippingBox.prototype.getPlanesRelToEye = function(resultPlanesArray, magoManage
 	var mvMatRelToEye = sceneState.modelViewRelToEyeMatrix;
 	var camera = sceneState.camera;
 	var camPos = camera.position;
-	var mvMat_inv = sceneState.modelViewMatrixInv;
+	var mvMat_inv = sceneState.getModelViewMatrixInv();
 	
 	var geoLocDataManager = this.getGeoLocDataManager();
 	var geoLocData = geoLocDataManager.getCurrentGeoLocationData();

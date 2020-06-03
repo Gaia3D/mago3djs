@@ -203,7 +203,7 @@ MagoWorld.prototype.changeCameraPosition = function(cartesian3, silent)
 	var orientation = camera.getOrientation();
 	var heading = orientation.headingRad * 180 /Math.PI;
 	var pitch = orientation.pitchRad * 180 /Math.PI;
-	var roll = orientation.rollRad * 180 /Math.PI;
+	var roll = 0;
 
 	camPos.set(cartesian3[0], cartesian3[1], cartesian3[2]);
 	var matrixAux = ManagerUtils.calculateTransformMatrixAtWorldPosition(camPos, heading, pitch, roll);
@@ -565,7 +565,7 @@ MagoWorld.prototype.mousemove = function(event)
 			var moveVectorCC = new Point3D(nowCamCoordPoint.x - strCamCoordPoint.x, nowCamCoordPoint.y - strCamCoordPoint.y, nowCamCoordPoint.z - strCamCoordPoint.z);
 			
 			//var mv_inv = mouseAction.strModelViewMatrixInv;
-			var mv_inv = sceneState.modelViewMatrixInv;
+			var mv_inv = sceneState.getModelViewMatrixInv();
 			var moveVectorWC = mv_inv.rotatePoint3D(moveVectorCC, undefined);
 
 			var moveVecModul = moveVectorWC.getModul();
@@ -869,7 +869,7 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 	
 	// copy modelViewMatrix.
 	var modelViewMatrix = sceneState.modelViewMatrix;
-	var modelViewMatrixInv = sceneState.modelViewMatrixInv;
+	var modelViewMatrixInv = sceneState.getModelViewMatrixInv();
 	mouseAction.strModelViewMatrix._floatArrays = glMatrix.mat4.copy(mouseAction.strModelViewMatrix._floatArrays, modelViewMatrix._floatArrays);
 	mouseAction.strModelViewMatrixInv._floatArrays = glMatrix.mat4.copy(mouseAction.strModelViewMatrixInv._floatArrays, modelViewMatrixInv._floatArrays);
 
@@ -911,9 +911,16 @@ MagoWorld.prototype.updateModelViewMatrixByCamera = function(camera, silent)
 		[tergetX, tergetY, tergetZ], 
 		[camUp.x, camUp.y, camUp.z]);
 
+	this.magoManager.sceneState.modelViewMatrixInv.dirty = true;
+
 	if (!silent) 
 	{
+		var that = this;
 		this.magoManager.cameraMoveEnd();
+		setTimeout(function()
+		{
+			
+		}, 10);
 	}
 };
 

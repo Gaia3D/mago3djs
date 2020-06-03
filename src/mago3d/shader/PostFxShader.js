@@ -397,7 +397,8 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 	{
 		uniformDataPair = shader.newUniformDataPair("Matrix4fv", "modelViewMatrixInv");
 		uniformDataPair.uniformLocation = uniformLocation;
-		uniformDataPair.matrix4fv = sceneState.modelViewMatrixInv._floatArrays;
+		var mvMatInv = sceneState.getModelViewMatrixInv();
+		uniformDataPair.matrix4fv = mvMatInv._floatArrays;
 	}
 	
 	// 4. projectionMatrix.
