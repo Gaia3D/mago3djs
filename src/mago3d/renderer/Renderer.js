@@ -2319,14 +2319,14 @@ Renderer.prototype.renderGeometryColorCoding = function(visibleObjControlerNodes
 	}
 	
 	// tin terrain.***
-	
+	/*
 	if (magoManager.tinTerrainManager !== undefined && magoManager.tinTerrainManager.selectable)
 	{
 		var bDepth = false;
 		magoManager.tinTerrainManager.render(magoManager, bDepth, renderType);
 		gl.useProgram(null);
 	}
-	
+	*/
 	// pins.**********************************************************************
 	magoManager.objMarkerManager.render(magoManager, renderType);
 	

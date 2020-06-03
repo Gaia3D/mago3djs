@@ -739,7 +739,7 @@ TemperatureLayer.prototype.render = function(magoManager)
 	{ return; }
 
 	var sceneState = magoManager.sceneState;
-	var mvInv = sceneState.modelViewMatrixInv;
+	var mvInv = sceneState.getModelViewMatrixInv();
 	var projectionMat = sceneState.projectionMatrix;
 	var camera = magoManager.myCameraSCX;
 	var frustum = camera.bigFrustum;

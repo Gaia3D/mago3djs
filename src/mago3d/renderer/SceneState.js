@@ -226,6 +226,12 @@ SceneState.prototype.restoreDefaultValuesAmbientDiffuseSpecularCoeficients = fun
  */
 SceneState.prototype.getModelViewMatrixInv = function() 
 {
+	if (this.modelViewMatrixInv.dirty)
+	{
+		this.modelViewMatrixInv._floatArrays = glMatrix.mat4.invert(this.modelViewMatrixInv._floatArrays, this.modelViewMatrix._floatArrays);
+		this.modelViewMatrixInv.dirty = false;
+	}
+
 	return this.modelViewMatrixInv;
 };
 

@@ -20,6 +20,11 @@ var Matrix4 = function()
 										   0, 1, 0, 0,
 										   0, 0, 1, 0,
 										   0, 0, 0, 1]);
+	/**
+	 * recalculate flag
+	 * @type {boolean}
+	 */
+	this.dirty = true;
 };
 
 /**
