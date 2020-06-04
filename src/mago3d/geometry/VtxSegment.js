@@ -124,7 +124,8 @@ VtxSegment.prototype.getLength = function()
  * get intersection info with point. 
  * @param {Point3D} point
  * @param {Number} error default is 10E-8.
- * @returns {Number} Constant.INTERSECTION_*
+ * @returns {Number} 
+ * Constant.INTERSECTION_*
  * Constant.INTERSECTION_OUTSIDE = 0
  * Constant.INTERSECTION_INTERSECT= 1
  * Constant.INTERSECTION_INSIDE = 2
@@ -165,50 +166,3 @@ VtxSegment.prototype.intersectionWithPoint = function(point, error)
 	if (Math.abs(distA + distB - distTotal) < error)
 	{ return Constant.INTERSECTION_INSIDE; }	
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

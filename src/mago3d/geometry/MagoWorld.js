@@ -916,10 +916,10 @@ MagoWorld.prototype.updateModelViewMatrixByCamera = function(camera, silent)
 	if (!silent) 
 	{
 		var that = this;
-		this.magoManager.cameraMoveEnd();
+		
 		setTimeout(function()
 		{
-			
+			that.magoManager.cameraMoveEnd();
 		}, 10);
 	}
 };

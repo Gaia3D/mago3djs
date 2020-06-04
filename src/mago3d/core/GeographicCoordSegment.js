@@ -76,8 +76,8 @@ GeographicCoordSegment.getLengthInMeters = function(geoCoordSegment, magoManager
 
 /**
  * Returns the direction of this segment.
- * @param {GeographicCoordSegment} geoCoordSegment.
- * @param {Point3D} resultDirection. 
+ * @param {GeographicCoordSegment} geoCoordSegment
+ * @param {Point3D} resultDirection
  */
 GeographicCoordSegment.getDirection = function(geoCoordSegment, resultDirection) 
 {
@@ -99,8 +99,8 @@ GeographicCoordSegment.getDirection = function(geoCoordSegment, resultDirection)
 
 /**
  * Returns the line3d of the "geoCoordSegment".
- * @param {GeographicCoordSegment} geoCoordSegment.
- * @param {Point3D} resultLine3d. 
+ * @param {GeographicCoordSegment} geoCoordSegment
+ * @param {Point3D} resultLine3d
  */
 GeographicCoordSegment.getLine = function(geoCoordSegment, resultLine3d) 
 {
@@ -117,9 +117,9 @@ GeographicCoordSegment.getLine = function(geoCoordSegment, resultLine3d)
 
 /**
  * Returns the projected coord of "geoCoord" into the line of this segment.
- * @param {GeographicCoordSegment} geoCoordSegment.
- * @param {GeographicCoord} geoCoord.
- * @param {GeographicCoord} resultGeoCoord. 
+ * @param {GeographicCoordSegment} geoCoordSegment
+ * @param {GeographicCoord} geoCoord
+ * @param {GeographicCoord} resultGeoCoord
  */
 GeographicCoordSegment.getProjectedCoordToLine = function(geoCoordSegment, geoCoord, resultGeoCoord) 
 {
@@ -136,8 +136,8 @@ GeographicCoordSegment.getProjectedCoordToLine = function(geoCoordSegment, geoCo
 
 /**
  * Returns the projected coord of "geoCoord" into the line of this segment.
- * @param {GeographicCoordSegment} geoCoordSegment.
- * @param {GeographicCoord} geoCoord.
+ * @param {GeographicCoordSegment} geoCoordSegment
+ * @param {GeographicCoord} geoCoord
  */
 GeographicCoordSegment.intersectionWithGeoCoord = function(geoCoordSegment, geoCoord) 
 {
@@ -162,7 +162,7 @@ GeographicCoordSegment.intersectionWithGeoCoord = function(geoCoordSegment, geoC
 
 /**
  * Returns the nearest geoCoord of this segment to ""geoCoord.
- * @param {GeographicCoord} geoCoord.
+ * @param {GeographicCoord} geoCoord
  */
 GeographicCoordSegment.getNearestGeoCoord = function(geoCoordSegment, geoCoord) 
 {
@@ -184,7 +184,7 @@ GeographicCoordSegment.getNearestGeoCoord = function(geoCoordSegment, geoCoord)
 
 /**
  * Returns the nearest geoCoord of this segment to ""geoCoord.
- * @param {GeographicCoord} geoCoord.
+ * @param {GeographicCoord} geoCoord
  */
 GeographicCoordSegment.getArcInterpolatedGeoCoords = function(startGeoCoord, endGeoCoord, maxDist, resultInterpolatedGeoCoordsArray) 
 {

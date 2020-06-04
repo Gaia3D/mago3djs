@@ -537,7 +537,7 @@ VertexList.prototype.setIdxInList = function()
 /**
  * set vertex idxInList
  * @static
- * @param {VertexList} Required.
+ * @param {VertexList} Required
  */
 VertexList.setIdxInList = function(vertexArray)
 {
