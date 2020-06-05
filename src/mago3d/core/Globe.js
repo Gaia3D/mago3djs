@@ -781,8 +781,8 @@ Globe.geographicRadianArrayToFloat32ArrayWgs84 = function(lonArray, latArray, al
 
 /**
  * Returns the arc distance between the geographic coords.
- * @param {GeographicCoord} startGeoCoord.
- * @param {GeographicCoord} endGeoCoord.
+ * @param {GeographicCoord} startGeoCoord
+ * @param {GeographicCoord} endGeoCoord
  */
 Globe.getArcDistanceBetweenGeographicCoords = function(startGeoCoord, endGeoCoord)
 {

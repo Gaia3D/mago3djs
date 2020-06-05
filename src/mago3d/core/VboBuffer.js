@@ -71,7 +71,7 @@ var VboBuffer = function(dataTarget, options)
 
 /**
  * Deletes all objects.
- * @param {VboMemoryManager} vboMemManager.
+ * @param {VboMemoryManager} vboMemManager
  */
 VboBuffer.prototype.deleteGlObjects = function(vboMemManager) 
 {
@@ -95,7 +95,7 @@ VboBuffer.prototype.deleteGlObjects = function(vboMemManager)
 /**
  * Sets the data array.
  * @param {TypedArray} dataArray The heading value in degrees.
- * @param {VboMemoryManager} vboMemManager.
+ * @param {VboMemoryManager} vboMemManager
  */
 VboBuffer.prototype.setDataArray = function(dataArray, dimensions, normalized, vboMemManager, attribLocation) 
 {

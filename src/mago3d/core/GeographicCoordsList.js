@@ -85,7 +85,7 @@ GeographicCoordsList.prototype.getGeoCoordsCount = function()
 /**
  * get single point
  * @param {Number} idx the index of target
- * @param {GeographicCoordSegment} resultGeoCoordSegment.
+ * @param {GeographicCoordSegment} resultGeoCoordSegment
  */
 GeographicCoordsList.prototype.getGeoCoordSegment = function(idx, resultGeoCoordSegment) 
 {
