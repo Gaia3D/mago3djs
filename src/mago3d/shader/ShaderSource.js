@@ -1928,21 +1928,22 @@ varying vec2 imageSizeInPixels;\n\
 void main()\n\
 {\n\
     vec4 textureColor;\n\
+	if(textureFlipYAxis)\n\
+	{\n\
+		textureColor = texture2D(u_texture, vec2(v_texcoord.s, 1.0 - v_texcoord.t));\n\
+	}\n\
+	else\n\
+	{\n\
+		textureColor = texture2D(u_texture, v_texcoord);\n\
+	}\n\
+	//if(textureColor.w < 0.005)\n\
+	if(textureColor.w == 0.0)\n\
+	{\n\
+		discard;\n\
+	}\n\
 	if(colorType == 2)\n\
 	{\n\
-		if(textureFlipYAxis)\n\
-		{\n\
-			textureColor = texture2D(u_texture, vec2(v_texcoord.s, 1.0 - v_texcoord.t));\n\
-		}\n\
-		else\n\
-		{\n\
-			textureColor = texture2D(u_texture, v_texcoord);\n\
-		}\n\
-		//if(textureColor.w < 0.005)\n\
-		if(textureColor.w == 0.0)\n\
-		{\n\
-			discard;\n\
-		}\n\
+		// do nothing.\n\
 	}\n\
 	else if( colorType == 0)\n\
 	{\n\
