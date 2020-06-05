@@ -7,7 +7,7 @@
  * This class deals the image of the map which will express the texture
  * @class Texture
  */
-var Texture = function() 
+var Texture = function(options) 
 {
 	if (!(this instanceof Texture)) 
 	{
@@ -22,6 +22,24 @@ var Texture = function()
 	this.imageWidth = 32;
 	this.imageHeight = 32;
 	this.url;
+	this.opacity = 1.0;
+
+	if (options)
+	{
+		if (options.opacity !== undefined)
+		{
+			this.opacity = options.opacity;
+		}
+	}
+};
+
+/**
+ * Sets the opacity of the texture.
+ * @param {Number} opacity
+ */
+Texture.prototype.setOpacity = function(opacity)
+{
+	this.opacity = opacity;
 };
 
 /**

@@ -23,6 +23,7 @@ var XYZLayer = function(options)
 	};
 	Object.freeze(this._freezeAttr);
 	this.show = defaultValue(options.show, true);
+	this.opacity = defaultValue(options.opacity, 1.0);
 	this.urlFunction = defaultValue(options.urlFunction, undefined);
 };
 

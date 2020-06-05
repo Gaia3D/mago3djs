@@ -209,7 +209,7 @@ Camera.prototype.doInertialMovement = function(magoManager)
 			var rotation = this.getOrientation();
 			var startCamPitchRad = -rotation.pitchRad;
 			var totalPitchRad = xRotAngRad + startCamPitchRad;
-			if (totalPitchRad > -0.01)
+			if (totalPitchRad > -0.1)
 			{ 
 				if (startCamPitchRad < 0.0)
 				{ xRotAngRad = -startCamPitchRad - 0.01; } 

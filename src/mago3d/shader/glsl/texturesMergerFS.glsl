@@ -20,12 +20,21 @@ varying vec2 v_tex_pos;
 
 void main()
 {           
-    vec2 texCoord = v_tex_pos;
+    vec2 texCoord = vec2(1.0 - v_tex_pos.x, 1.0 - v_tex_pos.y);
 
     // Take the base color.
-    vec4 textureColor = texture2D(texture_0, texCoord);
-    vec4 currColor4;
+    vec4 textureColor = vec4(0.0, 0.0, 0.0, 0.0);
+    vec4 currColor4 = vec4(0.0, 0.0, 0.0, 0.0);
     float externalAlpha;
+    if(uActiveTextures[0] == 1)
+    {
+        currColor4 = texture2D(texture_0, texCoord);
+        externalAlpha = externalAlphasArray[1];
+        if(currColor4.w > 0.0 && externalAlpha > 0.0)
+        {
+            textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);
+        }
+    }
     
     if(uActiveTextures[1] == 1)
     {

@@ -689,21 +689,22 @@ MagoWorld.prototype.mousemove = function(event)
 
 		// limit the pitch.
 		var startCamPitchRad = -mouseAction.startCamOrintation.pitchRad;
+		var startCamPitchDeg = startCamPitchRad * 180/Math.PI;
 		if (startCamPitchRad < 0.0)
 		{
-
+			var hola = 0;
 		}
 		else
 		{
-
+			var hola = 0;
 		}
 		var totalPitchRad = xRotAngRad + startCamPitchRad;
-		if (totalPitchRad > -0.01)
+		if (totalPitchRad > -0.1)
 		{ 
 			if (startCamPitchRad < 0.0)
-			{ xRotAngRad = -startCamPitchRad - 0.01; } 
+			{ xRotAngRad = -startCamPitchRad; } 
 			else
-			{ xRotAngRad = startCamPitchRad - 0.01; } 
+			{ xRotAngRad = startCamPitchRad; } 
 		}
 		
 		

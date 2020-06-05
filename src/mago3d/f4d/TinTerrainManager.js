@@ -38,7 +38,8 @@ var TinTerrainManager = function(magoManager, options)
 
 	this.magoManager = magoManager;
 	var gl = magoManager.getGl();
-	this.texturesMergerFbo = new FBO(gl, new Float32Array([256]), new Float32Array([256]));
+	//this.texturesMergerFbo = new FBO(gl, new Float32Array([256]), new Float32Array([256]));
+	this.texturesMergerFbo = gl.createFramebuffer();
 
 	if (this.terrainType !== CODE.magoEarthTerrainType.PLAIN && !this.terrainValue)
 	{
@@ -93,6 +94,56 @@ var TinTerrainManager = function(magoManager, options)
 	
 };
 TinTerrainManager.INFO_FILE = 'terrainTiles-info.json';
+
+TinTerrainManager.prototype.getImageryLayers = function()
+{
+	return this.imagerys;
+};
+
+TinTerrainManager.prototype.imageryLayersChanged = function()
+{
+	// Call this function when imagery layers added, erased, deleted or changed.
+	this.noFilterImageryLayers = undefined;
+	this.filterImageryLayers = undefined;
+};
+
+TinTerrainManager.prototype.getFilterImageryLayers = function()
+{
+	if (this.filterImageryLayers === undefined)
+	{ 
+		this.filterImageryLayers = []; 
+		var layersCount = this.imagerys.length;
+		for (var i=0; i<layersCount; i++)
+		{
+			var layer = this.imagerys[i];
+			if (layer.filter !== undefined)
+			{
+				this.filterImageryLayers.push(layer);
+			}
+		}
+	}
+
+	return this.filterImageryLayers;
+};
+
+TinTerrainManager.prototype.getNoFilterImageryLayers = function()
+{
+	if (this.noFilterImageryLayers === undefined)
+	{ 
+		this.noFilterImageryLayers = []; 
+		var layersCount = this.imagerys.length;
+		for (var i=0; i<layersCount; i++)
+		{
+			var layer = this.imagerys[i];
+			if (layer.filter === undefined)
+			{
+				this.noFilterImageryLayers.push(layer);
+			}
+		}
+	}
+
+	return this.noFilterImageryLayers;
+};
 
 TinTerrainManager.prototype.getTerrainType = function()
 {
@@ -713,6 +764,7 @@ TinTerrainManager.prototype.addTextureId = function(textureId)
 		this.textureIdCntMap[textureId] = 0;
 	}
 	this.textureIdCntMap[textureId] += 1;
+	this.imageryLayersChanged();
 };
 /**
  * 텍스처 제거 목록 등록
@@ -739,6 +791,7 @@ TinTerrainManager.prototype.eraseTexture = function(texture, magoManager)
 	this.addDeleteTextureId(id);
 
 	this.clearMap(id);
+	this.imageryLayersChanged();
 };
 /**
  * 텍스처 제거 맵에 등록된 텍스처를 제거
@@ -751,4 +804,6 @@ TinTerrainManager.prototype.clearMap = function(id)
 		delete this.textureIdDeleteMap[id];
 		delete this.textureIdCntMap[id];
 	}
+
+	this.imageryLayersChanged();
 };

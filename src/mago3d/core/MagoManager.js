@@ -149,6 +149,8 @@ var MagoManager = function()
 	this.sceneState = new SceneState(); // this contains all scene mtrices and camera position.***
 	this.sceneState.setApplySunShadows(false);
 
+	
+
 	this.magoPolicy.objectMoveMode = CODE.moveMode.OBJECT;
 
 	this.selectionColor = new SelectionColor();
@@ -4794,6 +4796,23 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.position2_loc = gl.getAttribLocation(shader.program, "a_pos");
 	shader.uActiveTextures_loc = gl.getUniformLocation(shader.program, "uActiveTextures");
 	shader.externalAlphasArray_loc = gl.getUniformLocation(shader.program, "externalAlphasArray");
+	shader.tex_0_loc = gl.getUniformLocation(shader.program, "texture_0");
+	shader.tex_1_loc = gl.getUniformLocation(shader.program, "texture_1");
+	shader.tex_2_loc = gl.getUniformLocation(shader.program, "texture_2");
+	shader.tex_3_loc = gl.getUniformLocation(shader.program, "texture_3");
+	shader.tex_4_loc = gl.getUniformLocation(shader.program, "texture_4");
+	shader.tex_5_loc = gl.getUniformLocation(shader.program, "texture_5");
+	shader.tex_6_loc = gl.getUniformLocation(shader.program, "texture_6");
+	shader.tex_7_loc = gl.getUniformLocation(shader.program, "texture_7");
+	this.postFxShadersManager.useProgram(shader);
+	gl.uniform1i(shader.tex_0_loc, 0);
+	gl.uniform1i(shader.tex_1_loc, 1);
+	gl.uniform1i(shader.tex_2_loc, 2);
+	gl.uniform1i(shader.tex_3_loc, 3);
+	gl.uniform1i(shader.tex_4_loc, 4);
+	gl.uniform1i(shader.tex_5_loc, 5);
+	gl.uniform1i(shader.tex_6_loc, 6);
+	gl.uniform1i(shader.tex_7_loc, 7);
 };
 
 /**

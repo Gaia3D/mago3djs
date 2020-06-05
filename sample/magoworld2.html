@@ -50,8 +50,26 @@
 						.replace('{x}',coordinate.x);
 					}
 				});
+
+				var osmCycleLayer = new Mago3D.XYZLayer({
+					urlFunction : function(coordinate) {
+						var url = 'https://{a-c}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png';
+						return url.replace('{a-c}',getDomainSharding())
+						.replace('{z}',coordinate.z)
+						.replace('{y}',coordinate.y)
+						.replace('{x}',coordinate.x);
+						
+						function getDomainSharding() {
+							var shardingList = ['a','b','c'];
+							var randomIndex = Math.floor( (Math.random() * (3)));
+							
+							return shardingList[randomIndex];
+						}
+					}
+				});
 				
-				tt = new Mago3D.WMSLayer({url: 'http://localhost:8080/geoserver/mago3d/gwc/service/wms', show: true, filter:Mago3D.CODE.imageFilter.BATHYMETRY,  param: {layers: 'mago3d:15m_susim', tiled: true}});
+				tt = new Mago3D.WMSLayer({url: 'http://localhost:8080/geoserver/mago3d/gwc/service/wms', show: true, filter:Mago3D.CODE.imageFilter.BATHYMETRY,  param: {layers: 'mago3d:15m_susim', tiled: true}}); // original.*(**)
+				//tt = new Mago3D.WMSLayer({url: 'http://localhost:8080/geoserver/mago3d/gwc/service/wms', show: true,  param: {layers: 'mago3d:15m_susim', tiled: true}});
 				ttt = new Mago3D.WMSLayer({url: 'http://localhost:8080/geoserver/mago3d/wms', show: true, minZoom:10,   param: {layers: 'mago3d:mj1m', tiled: true}});
 
 
@@ -60,7 +78,25 @@
 				managerFactory = new Mago3D.Mago3d(renderDivId,serverPolicy,undefined,{
 					layers : [
 						new Mago3D.XYZLayer({url: 'https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'}),
-						tt, new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true, minZoom:10,   param: {layers: 'ndtp:sk_emd', tiled: true}})
+						tt, 
+						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'sk_emd', tiled: true}}),
+						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'basemap', tiled: true}}),
+						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'echodelta_25m', tiled: true}}),
+						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'gangseogu_4326', tiled: true}}),
+						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'land_block', tiled: true}}),
+						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'sk_sdo', tiled: true}}),
+						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'sk_sgg', tiled: true}}),
+						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'utmk_lsmd_cont_ldreg', tiled: true}}),
+						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'dem', tiled: true}})/*,
+						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'district', tiled: true}}),
+						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'ndtp:sk_emd', tiled: true}}),
+						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'ndtp:sk_emd', tiled: true}}),
+						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'ndtp:sk_emd', tiled: true}}),
+						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'ndtp:sk_emd', tiled: true}}),
+						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'ndtp:sk_emd', tiled: true}}),
+						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'ndtp:sk_emd', tiled: true}}),
+						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'ndtp:sk_emd', tiled: true}}),
+						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'ndtp:sk_emd', tiled: true}}),*/
 					]
 				});
 				

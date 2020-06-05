@@ -349,10 +349,11 @@ TinTerrain.prototype.isTexturePrepared = function(texturesMap)
 	var textureLength = textureKeys.length;
 
 	var L = this.depth.toString();
-	var imageryLength = this.tinTerrainManager.imagerys.length;
+	var imageryLayers = this.tinTerrainManager.getImageryLayers();
+	var imageryLength = imageryLayers.length;
 	for (var i=0;i<imageryLength;i++) 
 	{
-		var imagery = this.tinTerrainManager.imagerys[i];
+		var imagery = imageryLayers[i];
 		if (!this.texture[imagery._id] && (imagery.show && imagery.maxZoom > parseInt(L) && imagery.minZoom < parseInt(L))) 
 		{
 			isTexturePrepared = false;
@@ -392,36 +393,87 @@ TinTerrain.prototype.isPrepared = function()
 	return true;
 };
 
+TinTerrain.prototype.mergeTexturesToTextureMaster = function(gl, shader, texturesArray)
+{
+	// Private function.
+	// Note: the max length is 8 textures in the texturesArray.
+	var texturesCount = texturesArray.length;
+	if (texturesCount > 8)
+	{ texturesCount = 8; }
+
+	var activeTexturesLayers = new Int32Array([0, 0, 0, 0, 0, 0, 0, 0]); 
+	var externalAlphaLayers = new Float32Array([1, 1, 1, 1, 1, 1, 1, 1]); 
+
+	for (var i=0; i<texturesCount; i++)
+	{
+		var texture = texturesArray[i];
+		gl.activeTexture(gl.TEXTURE0 + i); 
+		gl.bindTexture(gl.TEXTURE_2D, texture.texId);
+		
+		activeTexturesLayers[i] = 1;
+		externalAlphaLayers[i] = texture.opacity;
+	}
+
+	gl.uniform1iv(shader.uActiveTextures_loc, activeTexturesLayers);
+	gl.uniform1fv(shader.externalAlphasArray_loc, externalAlphaLayers);
+	gl.drawArrays(gl.TRIANGLES, 0, 6);
+};
+
 TinTerrain.prototype.makeTextureMaster = function()
 {
+	if (this.textureMasterPrepared)
+	{ return; }
+
+	// 1rst, check the imagery layers count.
+	var imageryLayers = this.tinTerrainManager.getImageryLayers();
+	var noFilterImageryLayers = this.tinTerrainManager.getNoFilterImageryLayers();
+
 	// If there are 2 or more layers, then merge all layers into one texture.
-	var magomanager = this.tinTerrainManager.magoManager;
-	var gl = magomanager.getGl();
+	var magoManager = this.tinTerrainManager.magoManager;
+	var postFxShaderManager = magoManager.postFxShadersManager;
+	var gl = magoManager.getGl();
 
 	if (this.textureMaster === undefined)
-	{ this.textureMaster = gl.createTexture(); }
+	{ 
+		var emptyPixels = new Uint8Array(256* 256 * 4);
+		this.textureMaster = Texture.createTexture(gl, gl.LINEAR, emptyPixels, 256, 256); 
+		this.textureMasterMergedLayers = [];
+	}
+
+	var bindedTexturesCount = 0;
+	this.textureMasterMergedLayers.length = 0; // init.
 
 	var texturesMergerFbo = this.tinTerrainManager.texturesMergerFbo;
+	FBO.bindFramebuffer(gl, texturesMergerFbo, this.textureMaster);
+	gl.viewport(0, 0, 256, 256);
 
 	if (this.tinTerrainManager.quadBuffer === undefined)
 	{
 		var data = new Float32Array([0, 0,   1, 0,   0, 1,   0, 1,   1, 0,   1, 1]);
 		this.tinTerrainManager.quadBuffer = FBO.createBuffer(gl, data);
 	}
+	
+	var currShader = postFxShaderManager.getCurrentShader(); // to restore current active shader.
+	var shader =  postFxShaderManager.getShader("texturesMerger");
+	postFxShaderManager.useProgram(shader);
 
-	var shader;
-	//shader.position2_loc = gl.getAttribLocation(shader.program, "a_pos");
-	//shader.uActiveTextures_loc = gl.getUniformLocation(shader.program, "uActiveTextures");
-	//shader.externalAlphasArray_loc = gl.getUniformLocation(shader.program, "externalAlphasArray");
+	var textureAux1x1 = magoManager.texturesStore.getTextureAux1x1();
+	for (var i=0; i<8; i++)
+	{
+		gl.activeTexture(gl.TEXTURE0 + i); 
+		gl.bindTexture(gl.TEXTURE_2D, null);
+	}
 
-	var activeTexturesLayers = new Int32Array([1, 0, 0, 0, 0, 0, 0, 0]); // note: the 1rst & 2nd are shadowMap textures.
+	gl.enableVertexAttribArray(shader.position2_loc);
+	FBO.bindAttribute(gl, this.tinTerrainManager.quadBuffer, shader.position2_loc, 2);
+	
 	var textureKeys = Object.keys(this.texture);
 	var textureLength = textureKeys.length; 
-	for (var i=0;i<textureLength;i++) 
+	var texturesToMergeMatrix = []; // array of "texturesToMergeArray".
+	var texturesToMergeArray = [];
+	
+	for (var i=0; i<textureLength; i++) 
 	{
-		if (i === 8)
-		{ break; }
-
 		var textureKey = textureKeys[i];
 		var texture = this.texture[textureKey];
 		if (!(texture.texId instanceof WebGLTexture)) 
@@ -441,21 +493,94 @@ TinTerrain.prototype.makeTextureMaster = function()
 		var filter = texture.imagery.filter;
 		if (filter === CODE.imageFilter.BATHYMETRY) 
 		{ continue; }
-
-		gl.activeTexture(gl.TEXTURE0 + i); 
-		gl.bindTexture(gl.TEXTURE_2D, texture.texId);
 		
-		activeTexturesLayers[i] = 1;
+		//activeTexturesLayers[i] = 1;
+		bindedTexturesCount++;
+
+		texture.setOpacity(texture.imagery.opacity); // update to the current imagery opacity.
+		texturesToMergeArray.push(texture);
+		if (texturesToMergeArray.length === 8)
+		{
+			texturesToMergeMatrix.push(texturesToMergeArray);
+			texturesToMergeArray = [];
+		}
 	}
 
-	gl.uniform1iv(shader.uActiveTextures_loc, activeTexturesLayers);
+	// finally, if there are any texture in the "texturesToMergeArray", then push it.
+	if (texturesToMergeArray.length > 0)
+	{ texturesToMergeMatrix.push(texturesToMergeArray); }
 
+	gl.enable(gl.BLEND);
+	var texturesArraysCount = texturesToMergeMatrix.length;
+	if (texturesArraysCount > 1)
+	{ var hola = 0; }
+	for (var i=0; i<texturesArraysCount; i++)
+	{
+		this.mergeTexturesToTextureMaster(gl, shader, texturesToMergeMatrix[i]);
+	}
+	gl.disable(gl.BLEND);
+
+
+	if (bindedTexturesCount >= 8)
+	{ 
+		this.textureMasterPrepared = true; 
+	}
+
+	FBO.bindFramebuffer(gl, null);
 };
 
 TinTerrain.prototype.bindTexture = function(gl, shader)
 {
-	var activeTexturesLayers = new Int32Array([1, 1, 0, 0, 0, 0, 0, 0]); // note: the 1rst & 2nd are shadowMap textures.
+	// Binding textureMaster.
+	var activeTexturesLayers = new Int32Array([1, 1, 0, 0, 1, 0, 0, 0]); // note: the 1rst & 2nd are shadowMap textures.
 
+	if (this.textureMaster)// && this.textureMasterPrepared === true)
+	{
+		gl.activeTexture(gl.TEXTURE4 + 0); 
+		gl.bindTexture(gl.TEXTURE_2D, this.textureMaster);
+
+		// bind filter texture (Bathymetry).
+		var textureKeys = Object.keys(this.texture);
+		var textureLength = textureKeys.length; 
+		for (var i=0;i<textureLength;i++) 
+		{
+			var textureKey = textureKeys[i];
+			var texture = this.texture[textureKey];
+			if (!(texture.texId instanceof WebGLTexture)) 
+			{
+				continue;
+			}
+
+			if (this.tinTerrainManager.textureIdDeleteMap[textureKey]) 
+			{
+				this.tinTerrainManager.eraseTexture(texture, magoManager);
+				delete this.texture[textureKey];
+				continue;
+			}
+			
+			if (!texture.imagery.show) { continue; }
+			
+			var filter = texture.imagery.filter;
+			if (filter) 
+			{
+				if (filter === CODE.imageFilter.BATHYMETRY) 
+				{
+					activeTexturesLayers[4+i] = 10;
+					gl.activeTexture(gl.TEXTURE4 + i);
+					gl.bindTexture(gl.TEXTURE_2D, texture.texId);
+				}
+			}
+		}	
+
+		gl.uniform1iv(shader.uActiveTextures_loc, activeTexturesLayers);
+		//////////////////////////////////
+
+		return;
+	}
+	
+
+	
+	// If no exist textureMaster, then provisionally render textures individually.
 	var textureKeys = Object.keys(this.texture);
 	var textureLength = textureKeys.length; 
 	for (var i=0;i<textureLength;i++) 
@@ -475,7 +600,7 @@ TinTerrain.prototype.bindTexture = function(gl, shader)
 		}
 		
 		if (!texture.imagery.show) { continue; }
-
+		
 		gl.activeTexture(gl.TEXTURE4 + i); 
 		gl.bindTexture(gl.TEXTURE_2D, texture.texId);
 		
@@ -486,14 +611,14 @@ TinTerrain.prototype.bindTexture = function(gl, shader)
 			if (filter === CODE.imageFilter.BATHYMETRY) 
 			{
 				activeTexturesLayers[4+i] = 10;
+				gl.bindTexture(gl.TEXTURE_2D, texture.texId);
 			}
 		}
 	}	
 
 	gl.uniform1iv(shader.uActiveTextures_loc, activeTexturesLayers);
 
-	// If there are 2 or more layers, then must create textureMaster.
-
+	
 };
 
 TinTerrain.prototype.prepareTexture = function(texturesMap, imagerys, magoManager, tinTerrainManager)
@@ -512,7 +637,7 @@ TinTerrain.prototype.prepareTexture = function(texturesMap, imagerys, magoManage
 		if (!imagery.show || imagery.maxZoom < parseInt(L) || imagery.minZoom > parseInt(L)) { continue; }
 		var id = imagery._id;
 		if (this.texture[id]) { continue; }
-
+		
 		var texture = new Texture();
 		var textureUrl = imagery.getUrl({x: X, y: Y, z: L});
 
@@ -731,6 +856,14 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 			return false;
 			// End test.---
 		}
+
+		// Test making textureMaster.
+		// If there are 2 or more layers, then must create textureMaster.
+		if (this.textureMasterPrepared === undefined)
+		{
+			this.makeTextureMaster();
+		}
+
 
 		return true;
 	}
@@ -1036,7 +1169,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 					gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 					gl.uniform4fv(currentShader.oneColor4_loc, [0.0, 0.9, 0.9, 1.0]);
 					
-					gl.drawElements(gl.LINES, indicesCount-1, gl.UNSIGNED_SHORT, 0); 
+					//gl.drawElements(gl.LINES, indicesCount-1, gl.UNSIGNED_SHORT, 0); 
 					
 					//if (this.tinTerrainManager.getTerrainType() === 0)
 					//{
@@ -1044,11 +1177,11 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 					//}
 					//else 
 					//{
-					//	var trianglesCount = indicesCount;
-					//	for (var i=0; i<trianglesCount-1; i++)
-					//	{
-					//		gl.drawElements(gl.LINE_LOOP, 3, gl.UNSIGNED_SHORT, i*3); 
-					//	}
+					var trianglesCount = indicesCount;
+					for (var i=0; i<trianglesCount-1; i++)
+					{
+						gl.drawElements(gl.LINE_LOOP, 3, gl.UNSIGNED_SHORT, i*3); 
+					}
 					//}
 					
 					this.drawTerrainName(magoManager);
@@ -2598,6 +2731,7 @@ TinTerrain.prototype.makeAltitudesOwnMap = function(magoManager)
 	
 	var shaderName = "tinTerrainAltitudes";
 	var shader = magoManager.postFxShadersManager.getShader(shaderName); 
+
 	shader.useProgram();
 	shader.enableVertexAttribArray(shader.position3_loc);
 	

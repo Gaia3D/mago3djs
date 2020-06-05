@@ -20,6 +20,7 @@ var WMSLayer = function(options)
 	Object.freeze(this._freezeAttr);
 
 	this.show = defaultValue(options.show, true);
+	this.opacity = defaultValue(options.opacity, 1.0);
 	this._requestParam = new URLSearchParams(this.param);
 	if (this._requestParam.get('VERSION') === '1.3.0') 
 	{

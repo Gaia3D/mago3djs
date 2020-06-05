@@ -3255,12 +3255,21 @@ varying vec2 v_tex_pos;\n\
 \n\
 void main()\n\
 {           \n\
-    vec2 texCoord = v_tex_pos;\n\
+    vec2 texCoord = vec2(1.0 - v_tex_pos.x, 1.0 - v_tex_pos.y);\n\
 \n\
     // Take the base color.\n\
-    vec4 textureColor = texture2D(texture_0, texCoord);\n\
-    vec4 currColor4;\n\
+    vec4 textureColor = vec4(0.0, 0.0, 0.0, 0.0);\n\
+    vec4 currColor4 = vec4(0.0, 0.0, 0.0, 0.0);\n\
     float externalAlpha;\n\
+    if(uActiveTextures[0] == 1)\n\
+    {\n\
+        currColor4 = texture2D(texture_0, texCoord);\n\
+        externalAlpha = externalAlphasArray[1];\n\
+        if(currColor4.w > 0.0 && externalAlpha > 0.0)\n\
+        {\n\
+            textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);\n\
+        }\n\
+    }\n\
     \n\
     if(uActiveTextures[1] == 1)\n\
     {\n\
