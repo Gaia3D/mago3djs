@@ -1,10 +1,37 @@
 'use strict';
 /**
- * 중심점과 가로, 세로 길이를 가진 클래스
+ * 
+ * @typedef {object} MagoRectangle~MagoRectanglePosition MagoRectangle position 옵션.
+ * @property {number} minLongitude 
+ * @property {number} minLatitude 
+ * @property {number} maxLongitude 
+ * @property {number} maxLatitude 
+ * @property {number} altitude default is 0.
+ */
+ /** 
+ * @typedef {object} MagoRectangle~MagoRectangleStyle MagoRectangle position 옵션.
+ * @property {string} imageUrl image url. 
+ * @property {string} fillColor html color code. if imageUrl defined, ignore this value.
+ * @property {number} opacity range 0-1. default is 1.
+ * @property {number} strokeWidth stroke width.
+ * @property {number} strokeColor stroke color. if strokeWidth isn't define, ignore this value.
+ */
+/**
+ * 직사각형을 표현하는 클래스
  * @exception {Error} Messages.CONSTRUCT_ERROR
  * 
- * @class MagoRectangle
  * @constructor
+ * @class MagoRectangle
+ * @param {MagoRectangle~MagoRectanglePosition} position position info. min max coordinate and altitude. required.
+ * @param {MagoRectangle~MagoRectangleStyle} style rectangle style. optional.
+ *  
+ * @extends MagoGeometry
+ * 
+ * @example
+ * var position = {minLongitude : 0, minLatitude : 0, maxLongitude : 1, maxLatitude : 1, altitude : 2};
+ * var style = {fillColor:'ff0000',opacity:0.8};
+ * 
+ * var magoRectangle = new MagoRectangle(position, style);
  */
 var MagoRectangle = function(position, style) 
 {
@@ -16,12 +43,14 @@ var MagoRectangle = function(position, style)
 	/**
 	 * Minimum coord of this rectangle
 	 * @type {GeographicCoord}
+	 * @private
 	 */
 	this.minGeographicCoord;
     
 	/**
 	 * Maximum coord of this rectangle
 	 * @type {GeographicCoord}
+	 * @private
 	 */
 	this.maxGeographicCoord;
     
@@ -46,7 +75,11 @@ MagoRectangle.prototype.constructor = MagoRectangle;
 
 /**
  * set position
- * @param {object} position
+ * @param {MagoRectangle~MagoRectanglePosition} position
+ * 
+ * @example
+ * var position = {minLongitude : 0, minLatitude : 0, maxLongitude : 1, maxLatitude : 1, altitude : 2};
+ * magoRectangle.setPosition(position);
  */
 MagoRectangle.prototype.setPosition = function(position) 
 {
@@ -72,11 +105,10 @@ MagoRectangle.prototype.setPosition = function(position)
 
 /**
  * return area
- * @return {number} 
+ * @return {number}
  */
 MagoRectangle.prototype.getArea = function() 
 {
-	var area = 0;
 	var edge = new GeographicCoord(this.minGeographicCoord.longitude, this.maxGeographicCoord.latitude, this.maxGeographicCoord.altitude);
 	var width = Globe.getArcDistanceBetweenGeographicCoords(this.minGeographicCoord, edge);
 	var height = Globe.getArcDistanceBetweenGeographicCoords(edge, this.maxGeographicCoord);
@@ -84,6 +116,7 @@ MagoRectangle.prototype.getArea = function()
 };
 /**
  * Makes the geometry mesh.
+ * @private
  */
 MagoRectangle.prototype.makeMesh = function(magoManager)
 {

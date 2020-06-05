@@ -3,9 +3,11 @@
  * 
  * @exception {Error} Messages.CONSTRUCT_ERROR
  * 
- * @class MagoGeometry
+ * @class MagoGeometry. abstract class
  * @constructor
  * @abstract
+ * 
+ * @extends MagoRenderable
  */
 var MagoGeometry = function(position, style) 
 {
@@ -28,7 +30,7 @@ MagoGeometry.prototype.constructor = MagoGeometry;
 /**
  * set geometry position
  * @abstract
- * @param {object} position
+ * @param {MagoGeometry~MagoGeometryPosition} position
  */
 MagoGeometry.prototype.setPosition = function(position) 
 {
@@ -37,7 +39,7 @@ MagoGeometry.prototype.setPosition = function(position)
 
 /**
  * set geometry style, if this geometry has been renderd, init use magomanager.
- * @param {object} style
+ * @param {MagoGeometryStyle} style
  * @param {MagoManager} magoManager
  */
 MagoGeometry.prototype.setStyle = function(style, magoManager) 

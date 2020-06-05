@@ -34,16 +34,8 @@ var MagoWorld = function(magoManager)
 };
 
 /**
- * 시각화 준비 함수
- */
-MagoWorld.prototype.prepareVisibles = function()
-{
-	// 1rst, do terrain frustum culling.
-	// TODO:
-};
-
-/**
  * 첫 번째 시야를 그릴 준비
+ * @private
  */
 MagoWorld.prototype.renderScene = function()
 {
@@ -66,29 +58,15 @@ MagoWorld.prototype.renderScene = function()
 	magoManager.start(undefined, true, 0, 1);
 };
 
-/**
- * 첫 번째 시야를 그릴 준비
- * @TODO : 리팩토링 필요
- */
-MagoWorld.prototype.renderTest = function()
-{
-	var gl = this.magoManager.sceneState.gl;
-	gl.clearColor(0.0, 0.0, 0.0, 1.0);
-	gl.enable(gl.DEPTH_TEST);
-	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	
-	this.magoManager.start(undefined, true, 0, 1);
-	
-};
 
 /**
  * 카메라를 지구의 특정 위치에 위치시키는 함수
  * @param {Number} longitude 
  * @param {Number} latitude
  * @param {Number} altitude 
- * @param {Number} duration
- * @param {boolean} silent
+ * @param {Number} duration optional.
+ * @param {boolean} silent optional.
+ * @api
  */
 MagoWorld.prototype.goto = function(longitude, latitude, altitude, duration, silent)
 {
@@ -170,7 +148,7 @@ MagoWorld.prototype.changeCameraOrientation = function(heading, pitch, roll, sil
 
 
 /**
- * 들어온 값만큼 뒤로 이동
+ * amount만큼 카메라를 뒤로 이동
  * @param {number} amount
  * @param {boolean} silent
  */
@@ -191,6 +169,7 @@ MagoWorld.prototype.moveBackward = function(amount, silent)
  * adjust change camera position
  * @param {Array<number>} cartesian3 cartesian3
  * @param {boolean} silent
+ * @private
  */
 MagoWorld.prototype.changeCameraPosition = function(cartesian3, silent) 
 {
@@ -220,7 +199,8 @@ MagoWorld.prototype.changeCameraPosition = function(cartesian3, silent)
 
 /**
  * 마우스 꾹 누르는 동작을 핸들링
- * @param {type}event 
+ * @param {event} event 
+ * @private
  */
 MagoWorld.prototype.mousedown = function(event)
 {
@@ -241,7 +221,7 @@ MagoWorld.prototype.mousedown = function(event)
  * @param {Number} mouseX 최신 마우스 클릭 위치의 x 좌표
  * @param {Number} mouseY 최신 마우스 클릭 위치의 y 좌표
  * @param {MagoManager} magoManager
- * 
+ * @private
  */
 MagoWorld.updateMouseClick = function(mouseX, mouseY, magoManager)
 {
@@ -254,7 +234,7 @@ MagoWorld.updateMouseClick = function(mouseX, mouseY, magoManager)
 /**
  * 마우스를 꾹 눌렀다가 땔 때의 동작을 감지
  * @param {type}event 
- * 
+ * @private
  */
 MagoWorld.prototype.mouseup = function(event)
 {
@@ -311,6 +291,7 @@ MagoWorld.prototype.mouseup = function(event)
 /**
  * 마우스 클릭 동작을 감지
  * @param {type}event 
+ * @private
  */
 MagoWorld.prototype.mouseclick = function(event)
 {
@@ -348,6 +329,7 @@ MagoWorld.prototype.mouseRightClick = function(event)
 /**
  * 마우스 더블클릭 동작을 감지
  * @param {type}event 
+ * @private
  */
 MagoWorld.prototype.mouseDblClick = function(event)
 {
@@ -364,6 +346,7 @@ MagoWorld.prototype.mouseDblClick = function(event)
 /**
  * 마우스 휠 동작을 감지
  * @param {type}event 
+ * @private
  */
 MagoWorld.prototype.mousewheel = function(event)
 {
@@ -448,6 +431,7 @@ MagoWorld.prototype.mousewheel = function(event)
 
 /**
  * 어떻게 화면을 변화시키는지를 처리할 수 있다. 마우스 왼쪽 또는 마우스 휠로 회전 가능.
+ * @private
  */
 MagoWorld.prototype.moveSelectedObject = function(event)
 {
@@ -460,6 +444,7 @@ MagoWorld.prototype.moveSelectedObject = function(event)
 
 /**
  * 어떻게 화면을 변화시키는지를 처리할 수 있다. 마우스 왼쪽 또는 마우스 휠로 회전 가능.
+ * @private
  */
 MagoWorld.prototype.mousemove = function(event)
 {
@@ -759,6 +744,7 @@ MagoWorld.prototype.mousemove = function(event)
  * @param {Number} mouseX the x coordi of the start point 
  * @param {Number} mouseY the y coordi of the start point
  * @param {MagoManager} magoManager
+ * @private
  */
 MagoWorld.screenToCamCoord = function(mouseX, mouseY, magoManager, resultPointCamCoord)
 {
@@ -806,6 +792,7 @@ MagoWorld.screenToCamCoord = function(mouseX, mouseY, magoManager, resultPointCa
  * @param {Number} mouseX the x coordi of the start point 
  * @param {Number} mouseY the y coordi of the start point
  * @param {MagoManager} magoManager
+ * @private
  */
 MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 {
@@ -903,6 +890,7 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
  * 만약 마우스 핸들링으로 화면이 바뀌었을 경우, 다음 함수가 활성화 된다
  * @param {Camera} camera
  * @param {boolean} silent
+ * @private
  */
 MagoWorld.prototype.updateModelViewMatrixByCamera = function(camera, silent)
 {
@@ -1208,9 +1196,8 @@ MagoWorld.prototype.doTest__ObjectMarker = function()
 };
 
 /**
- *
- *
  * @param {*} event
+ * @private
  */
 MagoWorld.prototype.keydown = function(event)
 {

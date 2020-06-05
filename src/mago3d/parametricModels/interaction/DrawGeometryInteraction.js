@@ -2,11 +2,12 @@
 
 /**
  * This is the interaction for draw geometry.
+ * @constructor
  * @class DrawGeometryInteraction
  * 
+ * @abstract
  * @param {object} layer layer object.
  */
-
 var DrawGeometryInteraction = function(style) 
 {
 	if (!(this instanceof DrawGeometryInteraction)) 
@@ -14,10 +15,19 @@ var DrawGeometryInteraction = function(style)
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	Emitter.call(this);
-	this.style = {};
+
+	/**
+	 * geometry style
+	 * @type {Object}
+	 * @default {}
+	 */
+	this.style;
+
 	if (style) 
 	{
 		this.setStyle(style);
+	} else {
+		this.style = {}
 	}
 	this.manager;
 	this.collection;
@@ -27,16 +37,30 @@ var DrawGeometryInteraction = function(style)
 DrawGeometryInteraction.prototype = Object.create(Emitter.prototype);
 DrawGeometryInteraction.prototype.constructor = DrawGeometryInteraction;
 
+/**
+ * get style
+ * @return {object}
+ */
 DrawGeometryInteraction.prototype.getStyle = function() 
 {
 	return this.style;
 };
 
+/**
+ * set style
+ * @param {object} style
+ */
 DrawGeometryInteraction.prototype.setStyle = function(style) 
 {
 	this.style = style;
 };
 
+/**
+ * set active. set true, this interaction active, another interaction deactive.
+ * @param {boolean} active
+ * @fires DrawGeometryInteraction#ACTIVE
+ * @fires DrawGeometryInteraction#DEACTIVE
+ */
 DrawGeometryInteraction.prototype.setActive = function(active) 
 {
 	if (!this.manager || !(this.manager instanceof MagoManager)) 
@@ -59,17 +83,29 @@ DrawGeometryInteraction.prototype.setActive = function(active)
 		this.collection.emit(InteractionCollection.EVENT_TYPE.DEACTIVE);
 	}
 };
-
+/**
+ * get active
+ * @return {boolean}
+ */
 DrawGeometryInteraction.prototype.getActive = function() 
 {
 	return this.active;
 };
 
+/**
+ * @private
+ */
 DrawGeometryInteraction.prototype.handle = function()
 {
 	return abstract();
 };
 
+/**
+ * make DrawGeometryInteraction. PointDrawer, LineDrawer, RectangleDrawer
+ * @static
+ * @param {string} type point, line, polygon, rectangle. polygon is not  ready.
+ * @return {DrawGeometryInteraction}
+ */
 DrawGeometryInteraction.createDrawGeometryInteraction = function(type) 
 {
 	if (!type) 

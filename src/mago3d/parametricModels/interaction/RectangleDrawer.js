@@ -4,9 +4,9 @@
  * This is the interaction for draw rectangle.
  * @class RectangleDrawer
  * 
- * @param {object} style style object.
+ * @param {MagoRectangle~MagoRectangleStyle} style style object.
+ * @extends {DrawGeometryInteraction}
  */
-
 var RectangleDrawer = function(style) 
 {
 	if (!(this instanceof RectangleDrawer)) 
@@ -30,16 +30,23 @@ RectangleDrawer.prototype.constructor = RectangleDrawer;
 RectangleDrawer.EVENT_TYPE = {
 	'DRAWEND': 'drawend'
 };
-
+/**
+ * @private
+ */
 RectangleDrawer.prototype.setHeight = function(height) 
 {
 	this.height = height;
 };
+/**
+ * @private
+ */
 RectangleDrawer.prototype.getHeight = function() 
 {
 	return this.height;
 };
-
+/**
+ * @private
+ */
 RectangleDrawer.prototype.init = function() 
 {
 	this.startDraw = false;
@@ -49,6 +56,9 @@ RectangleDrawer.prototype.init = function()
 	this.tempRectangle = undefined;
 	this.manager.magoWorld.cameraMovable = true;
 };
+/**
+ * @private
+ */
 RectangleDrawer.prototype.clear = function() 
 {
 	this.init();
@@ -61,6 +71,9 @@ RectangleDrawer.prototype.clear = function()
 	}
 	this.result.length = 0;
 };
+/**
+ * @private
+ */
 RectangleDrawer.prototype.start = function() 
 {
 	if (!this.manager || !(this.manager instanceof MagoManager)) 
@@ -133,7 +146,9 @@ RectangleDrawer.prototype.start = function()
 		}
 	});
 };
-
+/**
+ * @private
+ */
 RectangleDrawer.prototype.end = function()
 {
 	this.manager.magoWorld.cameraMovable = true;

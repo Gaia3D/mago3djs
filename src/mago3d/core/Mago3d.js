@@ -1,30 +1,32 @@
 'use strict';
 /**
  * Mago3D return object
- * @property {object} callAPI function. 
- * @property {object} getViewer function. get this map viewr. Cesium.Viewer or Mago3d.MagoWorld
- * @property {object} getMagoManagerState function. get magoManager starte
- * @property {object} getMagoManager function. get magoManager
- * @property {object} setBaseUrl function. set F4d Date base url.
+ * @typedef {object} Mago3d~returnObj
+ * @property {function()} callAPI function. 
+ * @property {function()} getViewer function. get this map viewr. Cesium.Viewer or Mago3d.MagoWorld
+ * @property {function()} getMagoManagerState function. get magoManager starte
+ * @property {function()} getMagoManager function. get magoManager
+ * @property {function(string)} setBaseUrl function. set F4d Date base url.
  */
 
 /**
  * callback parameter info 
- * @property {object} loadstart Optional. when mago3d load start trigger. return magostate.
- * @property {object} loadend Optional. when mago3d load end trigger. return magostate.
+ * @typedef {object} Mago3d~callback
+ * @property {function()} loadstart Optional. when mago3d load start trigger. return magostate.
+ * @property {function(Mago3d~returnObj)} loadend Optional. when mago3d load end trigger. return magostate.
  */
 
 /**
  * This is mago3d entrypoint.
- * @class Mago3D
+ * @class Mago3d
  * 
  * @param {Stirng} containerId container div id. required.
  * @param {object} serverPolicy mage3d geopolicy
- * @param {object} callback loadstart callback, loadend callback.
+ * @param {Mago3d~callback} callback loadstart callback, loadend callback.
  * @param {object} options Cesium viewer parameter.
  * @param {Cesium.Viewer} legacyViewer 타 시스템과의 연동의 경우 view 객체가 생성되어서 넘어 오는 경우가 있음
  * 
- * @return {object} 
+ * @return {Mago3d~returnObj} 
  */
 var Mago3d = function(containerId, serverPolicy, callback, options, legacyViewer) 
 {

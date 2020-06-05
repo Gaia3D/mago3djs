@@ -2,11 +2,13 @@
 
 /**
  * This is the interaction for draw polyline.
+ * Last point use 'right click'
  * @class LineDrawer
  * 
- * @param {object} style line style object.
+ * @param {MagoPolyline~MagoPolylineStyle} style line style object.
+ * 
+ * @extends {DrawGeometryInteraction}
  */
-
 var LineDrawer = function(style) 
 {
 	if (!(this instanceof LineDrawer)) 
@@ -27,22 +29,32 @@ LineDrawer.prototype.constructor = LineDrawer;
 LineDrawer.EVENT_TYPE = {
 	'DRAWEND': 'drawend'
 };
-
+/**
+ * @private
+ */
 LineDrawer.prototype.setHeight = function(height) 
 {
 	this.height = height;
 };
+/**
+ * @private
+ */
 LineDrawer.prototype.getHeight = function() 
 {
 	return this.height;
 };
-
+/**
+ * @private
+ */
 LineDrawer.prototype.init = function() 
 {
 	this.points = [];
 	this.tempLine = undefined;
 	clearTimeout(this.timeout);
 };
+/**
+ * @private
+ */
 LineDrawer.prototype.clear = function() 
 {
 	this.init();
@@ -55,6 +67,9 @@ LineDrawer.prototype.clear = function()
 	}
 	this.result.length = 0;
 };
+/**
+ * @private
+ */
 LineDrawer.prototype.start = function() 
 {
 	if (!this.manager || !(this.manager instanceof MagoManager)) 
@@ -115,7 +130,9 @@ LineDrawer.prototype.start = function()
 		that.end();
 	});
 };
-
+/**
+ * @private
+ */
 LineDrawer.prototype.end = function()
 {
 	this.result.push(this.tempLine);
