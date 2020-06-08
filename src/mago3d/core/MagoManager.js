@@ -688,7 +688,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		{ far *= 1.5; }
 
 		frustum0.near[0] = 0.0001;
-		/*
+		
 		if (camHeight > 10000)
 		{
 			frustum0.near[0] = 0.1 + camHeight*0.8;
@@ -697,7 +697,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		{
 			frustum0.near[0] = 0.1;
 		}
-		*/
+		
 		frustum0.far[0] = far;
 		// End-------------------------------------------------------------
 		
