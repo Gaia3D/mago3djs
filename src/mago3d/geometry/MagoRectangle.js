@@ -31,7 +31,7 @@
  * var position = {minLongitude : 0, minLatitude : 0, maxLongitude : 1, maxLatitude : 1, altitude : 2};
  * var style = {fillColor:'ff0000',opacity:0.8};
  * 
- * var magoRectangle = new MagoRectangle(position, style);
+ * var magoRectangle = new Mago3D.MagoRectangle(position, style);
  */
 var MagoRectangle = function(position, style) 
 {

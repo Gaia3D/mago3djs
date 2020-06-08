@@ -1,5 +1,34 @@
 'use strict';
-
+/**
+ * @typedef {TextureLayer~option} WMSLayer~option
+ * @property {string} url wms request url. required.
+ * @property {string} param wms GetMap paramter. Optional.
+ * @property {string} filter Optional. we can support only BATHYMETRY, when call dem data.
+ */
+/**
+ * @constructor
+ * @class this layer is imager service class for web map service (WMS).
+ * @extends TextureLayer
+ * 
+ * @param {WMSLayer~option} options
+ * 
+ * @example
+ *  var wmsLayer = new Mago3D.WMSLayer({
+ *  	url: 'http://localhost:8080/geoserver/mago3d/wms/', 
+ *      param: {layers: 'mago3d:dem', tiled: true}
+ *  });
+ *  magoManager.addLayer(wmsLayer);
+ * 
+ *  //GeoWebCache 사용 시.
+ *  var wmsLayer = new Mago3D.WMSLayer({
+ *      url: 'http://localhost:8080/geoserver/mago3d/gwc/service/wms', 
+ *      show: true, 
+ *      //BATHYMETRY filter는 dem 형태의 데이터에서만 사용. 
+ *      filter:Mago3D.CODE.imageFilter.BATHYMETRY,  
+ *      param: {layers: 'mago3d:dem', tiled: true}
+ *  });
+ *  magoManager.addLayer(wmsLayer);
+ */
 var WMSLayer = function(options) 
 {
 	if (!(this instanceof WMSLayer)) 
@@ -25,6 +54,10 @@ var WMSLayer = function(options)
 WMSLayer.prototype = Object.create(TextureLayer.prototype);
 WMSLayer.prototype.constructor = WMSLayer;
 
+/**
+ * DEFAULT WMS REQUEST PARAMETER.
+ * @static
+ */
 WMSLayer.DEAFULT_PARAM = {
 	SERVICE     : 'WMS',
 	VERSION     : '1.1.1',
@@ -36,6 +69,10 @@ WMSLayer.DEAFULT_PARAM = {
 	FORMAT      : 'image/png',
 	TRANSPARENT : true
 };
+
+/**
+ * @private
+ */
 WMSLayer.prototype.getUrl = function(info) 
 {
 	var rectangle = SmartTile.getGeographicExtentOfTileLXY(parseInt(info.z), parseInt(info.x), parseInt(info.y), undefined, CODE.imageryType.WEB_MERCATOR);

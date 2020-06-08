@@ -33,16 +33,12 @@ var LodBuildingData = function()
 	/**
 	 * geometry 파일명, isModelRef가 0일 경우 선언.
 	 * @type {String}
-	 * 
-	 * @example lod0, lod1
 	 */
 	this.geometryFileName;
 
 	/**
 	 * texture 파일명 lod가 2일 경우 혹은 isModelRef가 0일 경우 선언
 	 * @type {String}
-	 * 
-	 * @example mosaicTextureLod0.jpg
 	 */
 	this.textureFileName;
 	//this.dataType; // no used yet.

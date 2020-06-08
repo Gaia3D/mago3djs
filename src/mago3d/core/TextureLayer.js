@@ -1,5 +1,20 @@
 'use strict';
+/**
+ * 
+ * @typedef {object} TextureLayer~option
+ * @property {number} maxZoom The max level of this layer. This value can't change after constructed. default is 18.
+ * @property {number} minZoom The min level of this layer. This value can't change after constructed. default is 0.
+ * @property {boolean} show True if the layer is shown; otherwise, false. default is true.
+ * @property {number} opacity The opacity value, from 0.0 to 1.0. default is 1.0.
+ */
 
+/**
+ * @constructor
+ * @abstract
+ * @class 2d image layer abstract class, drawed on gl texture.
+ * 
+ * @param {TextureLayer~option} options 
+ */
 var TextureLayer = function(options) 
 {
 	if (isEmpty(options)) 
@@ -71,7 +86,9 @@ Object.defineProperties(TextureLayer.prototype, {
 });
 
 /**
+ * abstract method. implement child class.
  * @abstract
+ * @private
  */
 TextureLayer.prototype.getUrl = function() 
 {

@@ -28,7 +28,7 @@
  * var position = {longitude : 0, latitude : 0, altitude : 1};
  * var style = {color:'ff0000',thickness:0.8};
  * 
- * var magoPoint = new MagoPoint(position, style);
+ * var magoPoint = new Mago3D.MagoPoint(position, style);
  */
 var MagoPoint = function(position, style) 
 {

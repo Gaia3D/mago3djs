@@ -31,7 +31,7 @@
  * 				};
  * var style = {color:'ff0000',thickness:0.8};
  * 
- * var magoPolyline = new MagoPolyline(position, style);
+ * var magoPolyline = new Mago3D.MagoPolyline(position, style);
  */
 var MagoPolyline = function(position, style) 
 {
