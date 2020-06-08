@@ -1997,9 +1997,8 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 	}
 
 	// Test render screenRectangle.
-	//if(magoManager.renderScreenRectangle === true)
-	if (renderType === 1)
-	{ this.renderScreenRectangle(gl); }
+	//if (renderType === 1)
+	//{ this.renderScreenRectangle(gl); }
 
 	
 	gl.disable(gl.BLEND);
