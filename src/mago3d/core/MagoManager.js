@@ -2381,7 +2381,7 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
 	this.mustCheckIfDragging = true;
 	this.thereAreStartMovePoint = false;
 
-	this.setBPicking(mouseX, mouseY);
+	//this.setBPicking(mouseX, mouseY);
 
 	this.setCameraMotion(true);
 	
@@ -3078,7 +3078,7 @@ MagoManager.prototype.mouseActionLeftDown = function(mouseX, mouseY)
 		});
 	}
 	
-	//this.setBPicking(mouseX, mouseY);
+	this.setBPicking(mouseX, mouseY);
 };
 
 /**
