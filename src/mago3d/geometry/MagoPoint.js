@@ -1,10 +1,34 @@
 'use strict';
 /**
- * 중심점과 가로, 세로 길이를 가진 클래스
+ * 
+ * @typedef {object} MagoPoint~Coordinate MagoPoint coordinate scheme.
+ * @property {number} longitude 
+ * @property {number} latitude 
+ * @property {number} altitude 
+ */
+ /** 
+ * @typedef {object} MagoPoint~MagoPointStyle MagoPoint style 옵션.
+ * @property {number} size point size.
+ * @property {number} opacity range 0-1. default is 1.
+ * @property {string} color html color code.
+ * @property {string} strokeColor point stroke color. html color code.
+ */
+/**
+ * 폴리라인을 표현하는 클래스
  * @exception {Error} Messages.CONSTRUCT_ERROR
  * 
- * @class MagoRectangle
  * @constructor
+ * @class MagoPoint
+ * @param {MagoPoint~Coordinate} position position info. coordinate. required.
+ * @param {MagoPoint~MagoPointStyle} style point style. optional.
+ *  
+ * @extends MagoGeometry
+ * 
+ * @example
+ * var position = {longitude : 0, latitude : 0, altitude : 1};
+ * var style = {color:'ff0000',thickness:0.8};
+ * 
+ * var magoPoint = new MagoPoint(position, style);
  */
 var MagoPoint = function(position, style) 
 {
@@ -35,7 +59,7 @@ MagoPoint.prototype.constructor = MagoPoint;
 
 /**
  * set position
- * @param {object} position
+ * @param {MagoPoint~Coordinate} position
  */
 MagoPoint.prototype.setPosition = function(position) 
 {
@@ -48,6 +72,7 @@ MagoPoint.prototype.setPosition = function(position)
 
 /**
  * Makes the geometry mesh.
+ * @private
  */
 MagoPoint.prototype.makeMesh = function(magoManager)
 {
@@ -69,5 +94,3 @@ MagoPoint.prototype.makeMesh = function(magoManager)
     
 	this.setDirty(false);
 };
-
-

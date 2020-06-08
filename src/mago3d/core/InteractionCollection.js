@@ -2,6 +2,7 @@
 
 /**
  * This is the collection for Interaction.
+ * @constructor
  * @class InteractionCollection
  * 
  * @param {MagoManager} magoManager magoManager.
@@ -65,6 +66,12 @@ InteractionCollection.EVENT_TYPE = {
 	'DEACTIVE' : 'deactive'
 };
 
+/**
+ * add interaction.
+ * @param {DrawGeometryInteraction} interaction
+ * 
+ * @fires InteractionCollection#EVENT_TYPE.ADD
+ */
 InteractionCollection.prototype.add = function(interaction) 
 {
 	this.array.push(interaction);

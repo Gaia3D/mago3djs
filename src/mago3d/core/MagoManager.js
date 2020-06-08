@@ -16,6 +16,8 @@ var MagoManager = function()
 	 * Auxiliary renderer.
 	 * @type {Renderer}
 	 * @default Renderer.
+	 * 
+	 * @private
 	 */
 	this.renderer = new Renderer(this);
 	
@@ -23,6 +25,8 @@ var MagoManager = function()
 	 * Manages the selected objects.
 	 * @type {SelectionManager}
 	 * @default SelectionManager.
+	 * 
+	 * @private
 	 */
 	this.selectionManager = new SelectionManager(this);
 	
@@ -30,6 +34,8 @@ var MagoManager = function()
 	 * Manages the shaders.
 	 * @type {PostFxShadersManager}
 	 * @default PostFxShadersManager.
+	 * 
+	 * @private
 	 */
 	this.postFxShadersManager = new PostFxShadersManager();
 	
@@ -37,90 +43,116 @@ var MagoManager = function()
 	 * Manages the request & loading files.
 	 * @type {ReaderWriter}
 	 * @default ReaderWriter.
+	 * 
+	 * @private
 	 */
 	this.readerWriter = new ReaderWriter();
 	
 	/**
 	 * Contains the Mago3D policy data.
 	 * @type {Policy}
-	 * @default Policy.
+	 * @default Policy
+	 * 
+	 * @private
 	 */
 	this.magoPolicy = new Policy();
 	
 	/**
 	 * Manages & controls the movement of the objects in the scene.
 	 * @type {AnimationManager}
-	 * @default undefined.
+	 * @default undefined
+	 * 
+	 * @private
 	 */
 	this.animationManager; 
 	
 	/**
 	 * Manages & controls all the textures.
 	 * @type {texturesStore}
-	 * @default texturesStore.
+	 * @default texturesStore
+	 * 
+	 * @private
 	 */
 	this.texturesStore = new TexturesStore(this);
 	
 	/**
 	 * Manages & controls the tiles.
 	 * @type {SmartTileManager}
-	 * @default SmartTileManager.
+	 * @default SmartTileManager
+	 * 
+	 * @private
 	 */
 	this.smartTileManager = new SmartTileManager();
 	
 	/**
 	 * Manages & controls the deleting objects queue.
 	 * @type {ProcessQueue}
-	 * @default ProcessQueue.
+	 * @default ProcessQueue
+	 * 
+	 * @private
 	 */
 	this.processQueue = new ProcessQueue();
 	
 	/**
 	 * Manages & controls the parsing of loaded files.
 	 * @type {ParseQueue}
-	 * @default ParseQueue.
+	 * @default ParseQueue
+	 * 
+	 * @private
 	 */
 	this.parseQueue = new ParseQueue();
 	
 	/**
 	 * Manages & controls the creation of the nodes (node = main object in Mago3D).
 	 * @type {HierarchyManager}
-	 * @default HierarchyManager.
+	 * @default HierarchyManager
+	 * 
+	 * @private
 	 */
 	this.hierarchyManager = new HierarchyManager();
 
 	/**
 	 * Depth framebuffer object.
 	 * @type {FBO}
-	 * @default undefined.
+	 * @default undefined
+	 * 
+	 * @private
 	 */
 	this.depthFboNeo;
 	
 	/**
 	 * Depth framebuffer object for auxiliary and test use.
 	 * @type {FBO}
-	 * @default undefined.
+	 * @default undefined
+	 * 
+	 * @private
 	 */
 	this.depthFboAux;
 	
 	/**
 	 * Framebuffer object used for color coding selection.
 	 * @type {FBO}
-	 * @default undefined.
+	 * @default undefined
+	 * 
+	 * @private
 	 */
 	this.selectionFbo; 
 	
 	/**
 	 * Current x position of the mouse in screen coordinates.
 	 * @type {Number}
-	 * @default 0.
+	 * @default 0
+	 * 
+	 * @private
 	 */
 	this.mouse_x = 0;
 	
 	/**
 	 * Current y position of the mouse in screen coordinates.
 	 * @type {Number}
-	 * @default 0.
+	 * @default 0
+	 * 
+	 * @private
 	 */
 	this.mouse_y = 0;
 	
@@ -256,11 +288,16 @@ var MagoManager = function()
 	/**
 	 * This class contains general settings.
 	 * @type {Settings}
+	 * @private
 	 */
 	this._settings = new Settings();
 	
 	this.tinTerrainManager;
 	
+	/**
+	 * Modeler
+	 * @type {Modeler}
+	 */
 	this.modeler = new Modeler(this);
 	this.materialsManager = new MaterialsManager(this);
 	this.idManager = new IdentifierManager();
@@ -279,6 +316,10 @@ var MagoManager = function()
 
 	this.currentProcess = CODE.magoCurrentProcess.Unknown;
 
+	/**
+	 * Interaction collection.
+	 * @type {InteractionCollection}
+	 */
 	this.interactions = new InteractionCollection(this);
 };
 MagoManager.prototype = Object.create(Emitter.prototype);
@@ -310,6 +351,7 @@ MagoManager.EVENT_TYPE = {
 
 /**
  * object 를 그리는 두가지 종류의 function을 호출
+ * @private
  */
 MagoManager.prototype.init = function(gl) 
 {
@@ -339,6 +381,8 @@ MagoManager.prototype.init = function(gl)
  * @param pass 변수
  * @param frustumIdx 변수
  * @param numFrustums 변수
+ * 
+ * @private
  */
 MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums) 
 {
@@ -375,7 +419,9 @@ MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums)
 
 	this.startRender(isLastFrustum, this.currentFrustumIdx, numFrustums);
 };
-
+/**
+ * changed container size. call this method.
+ */
 MagoManager.prototype.updateSize = function() 
 {
 
@@ -396,6 +442,7 @@ MagoManager.prototype.isCesiumGlobe = function()
 /**
  * Swaps the current rendering Phase.
  * 중복 그리기를 방지하기 위하여... (각기 다른 frustum에 걸쳤을 때 여러번 그리는 것을 방지하기 위하여.)
+ * @private
  */
 MagoManager.prototype.swapRenderingFase = function() 
 {
@@ -405,6 +452,7 @@ MagoManager.prototype.swapRenderingFase = function()
 /**
  * 빌딩을 준비(새버전)
  * @param {gl} gl
+ * @private
  */
 MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visibleObjControlerNodes) 
 {
@@ -513,6 +561,7 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 /**
  * Here updates the modelView matrices.
  * @param {SceneState} sceneState
+ * @private
  */
 MagoManager.prototype.upDateSceneStateMatrices = function(sceneState) 
 {
@@ -755,6 +804,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 /**
  * Here updates the camera's parameters and frustum planes.
  * @param {Camera} camera
+ * @private
  */
 MagoManager.prototype.upDateCamera = function(resultCamera) 
 {
@@ -873,6 +923,7 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
  * start rendering.
  * @param scene 변수
  * @param isLastFrustum 변수
+ * @private
  */
 MagoManager.prototype.getCurrentTime = function() 
 {
@@ -886,6 +937,7 @@ MagoManager.prototype.getCurrentTime = function()
 
 /**
  * Returns WebGL Rendering Context.
+ * @private
  */
 MagoManager.prototype.getGl = function() 
 {
@@ -897,6 +949,7 @@ MagoManager.prototype.getGl = function()
 
 /**
  * Loads necessary data.
+ * @private
  */
 MagoManager.prototype.loadAndPrepareData = function() 
 {
@@ -979,6 +1032,7 @@ MagoManager.prototype.loadAndPrepareData = function()
 
 /**
  * Manages the selection process.
+ * @private
  */
 MagoManager.prototype.managePickingProcess = function() 
 {
@@ -1220,6 +1274,7 @@ MagoManager.prototype.managePickingProcess = function()
 
 /**
  * Provisional function.
+ * @private
  */
 MagoManager.prototype.getSilhouetteDepthFbo = function() 
 {
@@ -1242,6 +1297,7 @@ MagoManager.prototype.getSilhouetteDepthFbo = function()
 
 /**
  * Main rendering function.
+ * @private
  */
 MagoManager.prototype.doRender = function(frustumVolumenObject) 
 {
@@ -1412,7 +1468,7 @@ MagoManager.prototype.renderCluster = function()
 };
 
 /**
- * 
+ * @private
  */
 MagoManager.prototype.initCounters = function() 
 {
@@ -1424,6 +1480,8 @@ MagoManager.prototype.initCounters = function()
  * @param {Boolean} isLastFrustum Indicates if this is the last frustum in the render pipe-line.
  * @param {Number} frustumIdx Current frustum indice.
  * @param {Number} numFrustums Total frustums count in current rendering pipe-line.
+ * 
+ * @private
  */
 MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrustums) 
 {
@@ -1569,7 +1627,9 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 };
 
 /**
- * Prepare current visibles low LOD nodes.***
+ * Prepare current visibles low LOD nodes.
+ * 
+ * @private
  */
 MagoManager.prototype.clearCanvas2D = function() 
 {
@@ -1587,7 +1647,8 @@ MagoManager.prototype.clearCanvas2D = function()
 
 
 /**
- * Prepare current visibles low LOD nodes.***
+ * Prepare current visibles low LOD nodes
+ * @private
  */
 MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray) 
 {
@@ -1628,6 +1689,7 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 
 /**
  * Draw building names on scene.
+ * @private
  */
 MagoManager.prototype.drawStadistics = function() 
 {
@@ -1656,6 +1718,7 @@ MagoManager.prototype.drawStadistics = function()
 
 /**
  * Draw building names on scene.
+ * @private
  */
 MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes) 
 {
@@ -1722,6 +1785,7 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 
 /**
  * The camera was moved.
+ * @private
  */
 MagoManager.prototype.cameraMoved = function() 
 {
@@ -1741,6 +1805,7 @@ MagoManager.prototype.cameraMoved = function()
 };
 
 /**
+ * @private
  */
 MagoManager.prototype.TEST__RenderGeoCoords = function() 
 {
@@ -1761,6 +1826,7 @@ MagoManager.prototype.TEST__RenderGeoCoords = function()
 };
 
 /**
+ * @private
  */
 MagoManager.prototype.TEST__SelectionBuffer = function() 
 {
@@ -1904,6 +1970,8 @@ MagoManager.prototype.TEST__ObjectMarker_toNeoReference = function()
  * @param {int} mouseY Screen y position of the mouse.
  * @param {VisibleObjectsControler} visibleObjControlerBuildings Contains the current visible objects clasified by LOD.
  * @returns {Array} resultSelectedArray 
+ * 
+ * @private
  */
 MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, resultSelectedArray, bSelectObjects) 
 {
@@ -1997,6 +2065,8 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, resultSe
  * @param {int} pixelX Screen x position of the pixel.
  * @param {int} pixelY Screen y position of the pixel.
  * @returns {Plane} resultSelObjMovePlane Calculated plane.
+ * 
+ * @private
  */
 MagoManager.prototype.calculateSelObjMovePlaneAsimetricMode = function(gl, pixelX, pixelY, resultSelObjMovePlane) 
 {
@@ -2024,6 +2094,8 @@ MagoManager.prototype.calculateSelObjMovePlaneAsimetricMode = function(gl, pixel
  * Returns true if is dragging.
  * 
  * @returns {Boolean} 드래그 여부
+ * 
+ * @private
  */
 MagoManager.prototype.isDragging = function() 
 {
@@ -2155,6 +2227,8 @@ MagoManager.prototype.isDragging = function()
  * 카메라 motion 활성 또는 비활성
  * 
  * @param {Boolean} state 카메라 모션 활성화 여부
+ * 
+ * @private
  */
 MagoManager.prototype.setCameraMotion = function(state)
 {
@@ -2176,6 +2250,8 @@ MagoManager.prototype.setCameraMotion = function(state)
  * 선택 객체를 asimetric mode 로 이동
  * @param gl 변수
  * @param scene 변수
+ * 
+ * @private
  */
 MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY) 
 {
@@ -2271,6 +2347,8 @@ MagoManager.prototype.setBPicking = function(mouseX, mouseY)
  * 선택 객체를 asimetric mode 로 이동
  * @param gl 변수
  * @param scene 변수
+ * 
+ * @private
  */
 MagoManager.prototype.keyDown = function(key) 
 {
@@ -2658,6 +2736,8 @@ MagoManager.prototype.keyDown = function(key)
  * 마우스 클릭 이벤트 처리
  * @param gl 변수
  * @param scene 변수
+ * 
+ * @private
  */
 MagoManager.prototype.TEST__golfPark = function() 
 {
@@ -2714,6 +2794,8 @@ MagoManager.prototype.TEST__golfPark = function()
  * 선택 객체를 asimetric mode 로 이동
  * @param gl 변수
  * @param scene 변수
+ * 
+ * @private
  */
 MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY) 
 {
@@ -2832,6 +2914,8 @@ MagoManager.prototype.doTest__ObjectMarker = function()
  * 마우스 더블 클릭 이벤트 처리
  * @param gl 변수
  * @param scene 변수
+ * 
+ * @private
  */
 MagoManager.prototype.mouseActionLeftDoubleClick = function(mouseX, mouseY) 
 {
@@ -2856,6 +2940,8 @@ MagoManager.prototype.mouseActionLeftDoubleClick = function(mouseX, mouseY)
  * 마우스 더블 클릭 이벤트 처리
  * @param gl 변수
  * @param scene 변수
+ * 
+ * @private
  */
 MagoManager.prototype.mouseActionRightClick = function(mouseX, mouseY) 
 {
@@ -2901,6 +2987,8 @@ MagoManager.prototype.cameraMoveEnd = function()
  * 선택 객체를 asimetric mode 로 이동
  * @param gl 변수
  * @param scene 변수
+ * 
+ * @private
  */
 MagoManager.prototype.mouseActionLeftDown = function(mouseX, mouseY) 
 {
@@ -2931,6 +3019,8 @@ MagoManager.prototype.mouseActionLeftDown = function(mouseX, mouseY)
  * 선택 객체를 asimetric mode 로 이동
  * @param gl 변수
  * @param scene 변수
+ * 
+ * @private
  */
 MagoManager.prototype.saveHistoryObjectMovement = function(refObject, node) 
 {
@@ -2965,6 +3055,8 @@ MagoManager.prototype.saveHistoryObjectMovement = function(refObject, node)
  * 선택 객체를 asimetric mode 로 이동
  * @param gl 변수
  * @param scene 변수
+ * 
+ * @private
  */
 MagoManager.prototype.mouseActionMiddleDown = function(mouseX, mouseY) 
 {
@@ -2982,6 +3074,8 @@ MagoManager.prototype.mouseActionMiddleDown = function(mouseX, mouseY)
  * 선택 객체를 asimetric mode 로 이동
  * @param gl 변수
  * @param scene 변수
+ * 
+ * @private
  */
 MagoManager.prototype.mouseActionMiddleUp = function(mouseX, mouseY) 
 {
@@ -2999,6 +3093,8 @@ MagoManager.prototype.mouseActionMiddleUp = function(mouseX, mouseY)
  * 선택 객체를 asimetric mode 로 이동
  * @param gl 변수
  * @param scene 변수
+ * 
+ * @private
  */
 MagoManager.prototype.mouseActionRightDown = function(mouseX, mouseY) 
 {
@@ -3017,6 +3113,8 @@ MagoManager.prototype.mouseActionRightDown = function(mouseX, mouseY)
  * 선택 객체를 asimetric mode 로 이동
  * @param gl 변수
  * @param scene 변수
+ * 
+ * @private
  */
 MagoManager.prototype.mouseActionRightUp = function(mouseX, mouseY) 
 {
@@ -3031,6 +3129,8 @@ MagoManager.prototype.mouseActionRightUp = function(mouseX, mouseY)
  * @param gl 변수
  * @param {Point2D} newPixel
  * @param {Point2D} oldPixel
+ * 
+ * @private
  */
 MagoManager.prototype.mouseActionMove = function(newPixel, oldPixel) 
 {
@@ -3104,6 +3204,8 @@ MagoManager.prototype.mouseActionMove = function(newPixel, oldPixel)
  * @param gl 변수
  * @param scene 변수
  * @param renderables_neoRefLists_array 변수
+ * 
+ * @private
  */
 MagoManager.prototype.manageMouseDragging = function(mouseX, mouseY) 
 {
@@ -3244,6 +3346,8 @@ MagoManager.prototype.manageMouseDragging = function(mouseX, mouseY)
 /**
  * Moves an object.
  * @param {WebGLRenderingContext} gl WebGLRenderingContext.
+ * 
+ * @private
  */
 MagoManager.prototype.moveSelectedObjectGeneral = function(gl, object) 
 {
@@ -3416,6 +3520,8 @@ MagoManager.prototype.moveSelectedObjectGeneral = function(gl, object)
 /**
  * Moves an object.
  * @param {WebGLRenderingContext} gl WebGLRenderingContext.
+ * 
+ * @private
  */
 MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl) 
 {
@@ -3762,6 +3868,8 @@ MagoManager.prototype.test_renderDepth_objectSelected = function(currObjectSelec
  * @param {any} neoBuilding 
  * @param {VisibleObjectsController} visibleObjControlerOctrees 
  * @param {any} lod 
+ * 
+ * @private
  */
 MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = function(gl, node, globalVisibleObjControlerOctrees, lod) 
 {
@@ -3851,6 +3959,8 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
  * @param {any} gl 
  * @param {any} scene 
  * @param {any} neoBuilding 
+ * 
+ * @private
  */
 MagoManager.prototype.manageQueue = function() 
 {
@@ -3935,6 +4045,7 @@ MagoManager.prototype.manageQueue = function()
 };
 
 /**
+ * @private
  */
 MagoManager.prototype.prepareVisibleOctreesSortedByDistancePointsCloudType = function(gl, globalVisibleObjControlerOctrees, fileRequestExtraCount) 
 {
@@ -4007,6 +4118,8 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistancePointsCloudType = fun
  * @param {any} gl 
  * @param {any} scene 
  * @param {any} neoBuilding 
+ * 
+ * @private
  */
 MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, globalVisibleObjControlerOctrees) 
 {
@@ -4078,6 +4191,8 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistance = function(gl, globa
  * @param {any} gl 
  * @param {any} scene 
  * @param {any} neoBuilding 
+ * 
+ * @private
  */
 MagoManager.prototype.prepareVisibleOctreesSortedByDistanceLOD2 = function(gl, currentVisibles) 
 {
@@ -4115,8 +4230,9 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistanceLOD2 = function(gl, c
  * @param renderTexture 변수
  * @param ssao_idx 변수
  * @param neoRefLists_array 변수
+ * 
+ * @private
  */
-
 MagoManager.prototype.checkChangesHistoryMovements = function(nodesArray) 
 {
 	var nodesCount = nodesArray.length;
@@ -4191,8 +4307,8 @@ MagoManager.prototype.checkChangesHistoryMovements = function(nodesArray)
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @private
  */
-
 MagoManager.prototype.checkPropertyFilters = function(nodesArray) 
 {
 	if (this.propertyFilterSC === undefined)
@@ -4246,8 +4362,8 @@ MagoManager.prototype.checkPropertyFilters = function(nodesArray)
 
 /**
  * 어떤 일을 하고 있습니까?
+ * @private
  */
-
 MagoManager.prototype.checkChangesHistoryColors = function(nodesArray) 
 {
 	var nodesCount = nodesArray.length;
@@ -4374,6 +4490,7 @@ MagoManager.prototype.checkChangesHistoryColors = function(nodesArray)
 
 /**
  * Draw building names on scene.
+ * @private
  */
 MagoManager.prototype.getObjectLabel = function() 
 {
@@ -4423,6 +4540,7 @@ MagoManager.prototype.getObjectLabel = function()
 
 /**
  * Draw building names on scene.
+ * @private
  */
 MagoManager.prototype.drawCCTVNames = function(cctvArray) 
 {
@@ -4468,6 +4586,8 @@ MagoManager.prototype.drawCCTVNames = function(cctvArray)
  * @param {string} projectId required.
  * @param {string} dataKey option. 키 존재 시 해당 노드만 컨디션 들어감.
  * @param {function} condition required.
+ * 
+ * @private
  */
 MagoManager.prototype.setRenderCondition = function(projectId, dataKey, condition) 
 {
@@ -4514,6 +4634,8 @@ MagoManager.prototype.setRenderCondition = function(projectId, dataKey, conditio
 /**
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
+ * 
+ * @private
  */
 MagoManager.prototype.createDefaultShaders = function(gl) 
 {
@@ -4823,6 +4945,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 
 /**
  * 카메라 영역에 벗어난 오브젝트의 렌더링은 비 활성화
+ * @private
  */
 MagoManager.prototype.isFarestFrustum = function() 
 {
@@ -4837,6 +4960,7 @@ MagoManager.prototype.isFarestFrustum = function()
  * 
  * @param frustumVolume 변수
  * @param cameraPosition 변수
+ * @private
  */
 MagoManager.prototype.doMultiFrustumCullingSmartTiles = function(camera) 
 {
@@ -4932,6 +5056,7 @@ MagoManager.prototype.doMultiFrustumCullingSmartTiles = function(camera)
 /**
  * dataKey 이용해서 data 검색
  * @param dataKey
+ * @private
  */
 MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLowestTilesArray, visibleNodes, cameraPosition, frustumVolume) 
 {
@@ -5105,6 +5230,7 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 };
 
 /**
+ * @private
  */
 MagoManager.prototype.flyToTopology = function(worldPoint3d, duration) 
 {
@@ -5230,6 +5356,7 @@ MagoManager.prototype.displayLocationAndRotation = function(neoBuilding)
 
 /**
  * 변환 행렬
+ * @private
  */
 MagoManager.prototype.selectedObjectNotice = function(neoBuilding) 
 {
@@ -5285,6 +5412,7 @@ MagoManager.prototype.selectedObjectNotice = function(neoBuilding)
 
 /**
  * 변환 행렬
+ * @private
  */
 MagoManager.prototype.changeLocationAndRotation = function(projectId, dataKey, latitude, longitude, elevation, heading, pitch, roll, animationOption) 
 {
@@ -5296,6 +5424,7 @@ MagoManager.prototype.changeLocationAndRotation = function(projectId, dataKey, l
 
 /**
  * 변환 행렬
+ * @private
  */
 MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, longitude, elevation, heading, pitch, roll, animationOption) 
 {
@@ -5411,6 +5540,7 @@ MagoManager.prototype.getObjectIndexFileSmartTileF4d = function(projectDataFolde
 
 /**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
+ * @private
  */
 MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray, buildingSeedMap, projectFolderName, projectId) 
 {
@@ -5634,6 +5764,7 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 
 /**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
+ * @private
  */
 MagoManager.prototype.calculateBoundingBoxesNodes = function(projectId) 
 {
@@ -5761,6 +5892,7 @@ MagoManager.prototype.calculateBoundingBoxesNodes = function(projectId)
 
 /**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
+ * @private
  */
 MagoManager.prototype.makeSmartTile = function(buildingSeedMap, projectId, f4dObjectJson, seedMap) 
 {
@@ -5851,6 +5983,7 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedMap, projectId, f4dOb
 /**
  * instantiate static model
  * @param {instantiateOption} attributes
+ * @private
  */
 MagoManager.prototype.instantiateStaticModel = function(attributes)
 {
@@ -5990,7 +6123,7 @@ MagoManager.prototype.isExistStaticModel = function(projectId)
 };
 /**
  * add image layer
- * @param {layer} layer. now support type : wms, xyz
+ * @param {WMSLayer|XYZLayer} layer. now support type : wms, xyz
  */
 MagoManager.prototype.addLayer = function(layer) 
 {
@@ -6021,7 +6154,7 @@ MagoManager.prototype.removeLayerById = function(id)
 
 /**
  * add image layer by layer object
- * @param {layer} layer
+ * @param {WMSLayer | XYZLayer} layer
  */
 MagoManager.prototype.removeLayer = function(removeLayer) 
 {
@@ -6035,6 +6168,7 @@ MagoManager.prototype.removeLayer = function(removeLayer)
 };
 /**
  * api gateway
+ * @private
  */
 MagoManager.prototype.callAPI = function(api) 
 {

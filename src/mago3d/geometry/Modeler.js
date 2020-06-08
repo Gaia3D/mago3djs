@@ -3,7 +3,7 @@
 
 
 /**
- * Now under implementation
+ * 파라미터로 이루어진 데이터를 표출하기 위해 관리하는 클래스.
  * @class Modeler
  * @constructor
  */
@@ -16,7 +16,7 @@ var Modeler = function(magoManager)
 	
 	this.magoManager = magoManager;
 	
-	/**
+	/*
 	 * Current modeler's mode. 
 	 * @type {Enumeration}
 	 * @default CODE.modelerMode.INACTIVE
@@ -43,9 +43,6 @@ var Modeler = function(magoManager)
 	this.currentVisibleObjectsArray;
 };
 
-/**
- * 어떤 일을 하고 있습니까?
- */
 Modeler.prototype.extractObjectsByClassName = function(className, resultObjectsArray) 
 {
 	if (this.objectsArray === undefined)
@@ -67,9 +64,6 @@ Modeler.prototype.extractObjectsByClassName = function(className, resultObjectsA
 	return resultObjectsArray;
 };
 
-/**
- * 어떤 일을 하고 있습니까?
- */
 Modeler.prototype.newPipe = function(options) 
 {
 	var interiorRadius = options.interiorRadius;
@@ -85,9 +79,6 @@ Modeler.prototype.newPipe = function(options)
 	return pipe;
 };
 
-/**
- * 어떤 일을 하고 있습니까?
- */
 Modeler.prototype.newTube = function(options) 
 {
 	var interiorRadius = options.interiorRadius;
@@ -104,9 +95,9 @@ Modeler.prototype.newTube = function(options)
 };
 
 /**
- * 모델러에 콘센트릭튜브 추가
- * @param {Object}
- * @param {number}} depth Optional. 설정 시 해당 depth로 targetDepth 설정
+ * 모델러에 그려야할 객체 추가
+ * @param {MagoRenderable} object
+ * @param {number} depth Optional. 설정 시 해당 depth로 targetDepth 설정, targetDepth부터 화면에 나타남.
  */
 Modeler.prototype.addObject = function(object, depth) 
 {
@@ -122,38 +113,7 @@ Modeler.prototype.addObject = function(object, depth)
 };
 
 /**
- * 모델러에 콘센트릭튜브 추가
- * @param {Object}
- * @param {number}} depth Optional. 설정 시 해당 depth로 targetDepth 설정
- */
-Modeler.prototype.addBoundingSpheres__TEST = function(boundingSpheresArray, depth) 
-{
-	if (boundingSpheresArray === undefined || boundingSpheresArray.length === 0)
-	{ return; }
-	
-	var bSpheresCount = boundingSpheresArray.length;
-	for (var i=0; i<bSpheresCount; i++)
-	{
-		var bSphere = boundingSpheresArray[i];
-		var geoCoord = ManagerUtils.pointToGeographicCoord(bSphere.centerPoint, undefined, this.magoManager);
-		var geoLocDataManager = new GeoLocationDataManager();
-		
-		var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-		geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude, undefined, undefined, undefined, geoLocData, this);
-		
-		var options = {};
-		var color = new Color();
-		color.setRGB(0.99, 0.1, 0.1);
-		options.color = color;
-		var sphere = new Sphere(options);
-		sphere.geoLocDataManager = geoLocDataManager;
-		sphere.setRadius(bSphere.r * 2);
-		this.addObject(sphere, depth);
-	}
-};
-
-/**
- * 모델러에서 모델 삭제
+ * 모델러에 등록된 객체 삭제
  * @param {Object}
  */
 Modeler.prototype.removeObject = function(target) 
@@ -181,9 +141,6 @@ Modeler.prototype.removeObject = function(target)
 	});
 };
 
-/**
- * 어떤 일을 하고 있습니까?
- */
 Modeler.prototype.newPerson = function(options) 
 {
 	if (this.testObjectsArray === undefined)
@@ -194,9 +151,6 @@ Modeler.prototype.newPerson = function(options)
 	return person;
 };
 
-/**
- * 어떤 일을 하고 있습니까?
- */
 Modeler.prototype.newBasicFactory = function(factoryWidth, factoryLength, factoryHeight, options) 
 {
 	// set material for the roof of the factory.
@@ -234,9 +188,6 @@ Modeler.prototype.newBasicFactory = function(factoryWidth, factoryLength, factor
 	return basicFactory;
 };
 
-/**
- * 어떤 일을 하고 있습니까?
- */
 Modeler.getExtrudedSolidMesh = function(profile2d, extrusionDist, extrudeSegmentsCount, extrusionVector, bIncludeBottomCap, bIncludeTopCap, resultMesh) 
 {
 	if (profile2d === undefined || extrusionDist === undefined)
@@ -271,9 +222,6 @@ Modeler.getExtrudedSolidMesh = function(profile2d, extrusionDist, extrudeSegment
 	return resultMesh;
 };
 
-/**
- * 어떤 일을 하고 있습니까?
- */
 Modeler.getExtrudedMesh = function(profile2d, extrusionDist, extrudeSegmentsCount, extrusionVector, bIncludeBottomCap, bIncludeTopCap, resultMesh) 
 {
 	if (profile2d === undefined || extrusionDist === undefined)
@@ -377,9 +325,6 @@ Modeler.getPoints3DList_fromPoints3dArray = function(points3dArray, resultPoints
 	return resultPoints3dList;
 };
 
-/**
- * 어떤 일을 하고 있습니까?
- */
 Modeler.prototype.getGeographicCoordsList = function() 
 {
 	if (this.geoCoordsList === undefined)
@@ -388,9 +333,6 @@ Modeler.prototype.getGeographicCoordsList = function()
 	return this.geoCoordsList;
 };
 
-/**
- * 어떤 일을 하고 있습니까?
- */
 Modeler.prototype.getExcavation = function() 
 {
 	//if (this.excavation === undefined)
@@ -399,9 +341,6 @@ Modeler.prototype.getExcavation = function()
 	return this.excavation;
 };
 
-/**
- * 어떤 일을 하고 있습니까?
- */
 Modeler.prototype.getTunnel = function() 
 {
 	//if (this.tunnel === undefined)
@@ -410,9 +349,6 @@ Modeler.prototype.getTunnel = function()
 	return this.tunnel;
 };
 
-/**
- * 어떤 일을 하고 있습니까?
- */
 Modeler.prototype.addPointToPolyline = function(point2d) 
 {
 	if (this.polyLine2d === undefined)
@@ -422,9 +358,6 @@ Modeler.prototype.addPointToPolyline = function(point2d)
 };
 
 
-/**
- * 어떤 일을 하고 있습니까?
- */
 Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive) 
 {
 	// Generic objects.***
@@ -525,9 +458,6 @@ Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive
 	
 };
 
-/**
- * 어떤 일을 하고 있습니까?
- */
 Modeler.prototype.createPlaneGrid = function(width, height, numCols, numRows) 
 {
 	// Test function.
@@ -547,49 +477,4 @@ Modeler.prototype.createPlaneGrid = function(width, height, numCols, numRows)
 	{
 		this.planeGrid = new PlaneGrid(width, height, numCols, numRows);
 	}
-	
-	
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

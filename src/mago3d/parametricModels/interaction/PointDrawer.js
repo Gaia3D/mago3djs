@@ -4,9 +4,10 @@
  * This is the interaction for draw point.
  * @class PointDrawer
  * 
- * @param {object} layer layer object.
+ * @param {MagoPoint~MagoPointStyle} style layer object.
+ * 
+ * @extends {DrawGeometryInteraction}
  */
-
 var PointDrawer = function(style) 
 {
 	if (!(this instanceof PointDrawer)) 
@@ -24,11 +25,16 @@ PointDrawer.prototype.constructor = PointDrawer;
 PointDrawer.EVENT_TYPE = {
 	'DRAWEND': 'drawend'
 };
-
+/**
+ * @private
+ */
 PointDrawer.prototype.init = function() 
 {
 	this.startDraw = false;
 };
+/**
+ * @private
+ */
 PointDrawer.prototype.clear = function() 
 {
 	this.init();
@@ -41,6 +47,9 @@ PointDrawer.prototype.clear = function()
 	}
 	this.result.length = 0;
 };
+/**
+ * @private
+ */
 PointDrawer.prototype.start = function() 
 {
 	if (!this.manager || !(this.manager instanceof MagoManager)) 
@@ -79,7 +88,9 @@ PointDrawer.prototype.start = function()
 		}
 	});
 };
-
+/**
+ * @private
+ */
 PointDrawer.prototype.end = function(point)
 {
 	this.result.push(point);

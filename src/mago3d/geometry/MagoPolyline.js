@@ -1,10 +1,37 @@
 'use strict';
 /**
- * 중심점과 가로, 세로 길이를 가진 클래스
+ * 
+ * @typedef {object} MagoPolyline~MagoPolylinePosition MagoPolyline position 옵션.
+ * @property {Array<MagoPoint~Coordinate>} coordinates 
+ */
+ /** 
+ * @typedef {object} MagoPolyline~MagoPolylineStyle MagoPolyline style 옵션.
+ * @property {number} thickness line thickness. default is 2.
+ * @property {string} color html color code.
+ * @property {MagoPoint~PointStyle} point line vertex style. if this option is defined, line vertex render.
+ */
+/**
+ * 폴리라인을 표현하는 클래스
  * @exception {Error} Messages.CONSTRUCT_ERROR
  * 
- * @class MagoPolyline
  * @constructor
+ * @class MagoPolyline
+ * @param {MagoPolyline~MagoPolylinePosition} position position info. coordinate list. required.
+ * @param {MagoPolyline~MagoPolylineStyle} style polyline style. optional.
+ *  
+ * @extends MagoGeometry
+ * 
+ * @example
+ * var position = {
+ * 					coordinates : [
+ * 						{longitude : 0, latitude : 0, altitude : 1},
+ * 						{longitude : 0, latitude : 1, altitude : 1},
+ * 						{longitude : 1, latitude : 1, altitude : 1}
+ * 					]
+ * 				};
+ * var style = {color:'ff0000',thickness:0.8};
+ * 
+ * var magoPolyline = new MagoPolyline(position, style);
  */
 var MagoPolyline = function(position, style) 
 {
@@ -38,7 +65,7 @@ MagoPolyline.prototype.constructor = MagoPolyline;
 
 /**
  * set position
- * @param {object} position
+ * @param {MagoPolyline~MagoPolylinePosition} position
  */
 MagoPolyline.prototype.setPosition = function(position) 
 {
@@ -59,6 +86,7 @@ MagoPolyline.prototype.setPosition = function(position)
 
 /**
  * Makes the geometry mesh.
+ * @private
  */
 MagoPolyline.prototype.makeMesh = function(magoManager)
 {
