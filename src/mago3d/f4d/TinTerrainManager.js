@@ -54,8 +54,8 @@ var TinTerrainManager = function(magoManager, options)
 		if (options.terrainSelectable !== undefined)
 		{ this.selectable = options.terrainSelectable; }
 
-		if (options.mexDepth !== undefined)
-		{ this.maxDepth = options.mexDepth; }
+		if (options.maxDepth !== undefined)
+		{ this.maxDepth = options.maxDepth; }
 	}
 	
 	//CODE.imageryType = {
