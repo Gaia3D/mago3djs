@@ -3355,7 +3355,8 @@ varying vec2 v_tex_pos;\n\
 \n\
 void main() {\n\
     v_tex_pos = a_pos;\n\
-    gl_Position = vec4(1.0 - 2.0 * a_pos, 0, 1);\n\
+    vec2 pos = a_pos*0.5;\n\
+    gl_Position = vec4(1.0 - 2.0 * pos, 0, 1);\n\
 }";
 ShaderSource.TextureVS = "attribute vec3 position;\n\
 attribute vec4 aVertexColor;\n\

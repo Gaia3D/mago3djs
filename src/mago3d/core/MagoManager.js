@@ -1046,19 +1046,32 @@ MagoManager.prototype.renderToSelectionBuffer = function()
 		this.selectionFbo.bind(); // framebuffer for color selection.***
 		gl.enable(gl.DEPTH_TEST);
 		gl.depthFunc(gl.LEQUAL);
-		gl.depthRange(0, 1);
+		if (this.currentFrustumIdx === 0)
+		{ gl.depthRange(0, 0.25); }
+		else if (this.currentFrustumIdx === 1)
+		{ gl.depthRange(0.25, 0.5); }
+		else if (this.currentFrustumIdx === 2)
+		{ gl.depthRange(0.5, 0.75); }
+		else if (this.currentFrustumIdx === 3)
+		{ gl.depthRange(0.75, 1); }
+
 		gl.disable(gl.CULL_FACE);
 		if (this.isLastFrustum)
 		{
 			// this is the farest frustum, so init selection process.***
 			gl.clearColor(1, 1, 1, 1); // white background.***
+			gl.clearDepth(1); // white background.***
 			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // clear buffer.***
 			this.selectionManager.clearCandidates();
 			gl.clearColor(0, 0, 0, 1); // return to black background.***
 		}
+
 		
-		this.renderer.renderGeometryColorCoding(this.visibleObjControlerNodes);
+		
+		this.renderer.renderGeometryColorCoding(this.visibleObjControlerNodes); 
 		this.swapRenderingFase();
+
+		gl.depthRange(0, 1);
 		
 		if (this.currentFrustumIdx === 0)
 		{
@@ -2368,7 +2381,7 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
 	this.mustCheckIfDragging = true;
 	this.thereAreStartMovePoint = false;
 
-	//this.setBPicking(mouseX, mouseY);
+	this.setBPicking(mouseX, mouseY);
 
 	this.setCameraMotion(true);
 	
@@ -2383,6 +2396,7 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
 };
 MagoManager.prototype.setBPicking = function(mouseX, mouseY) 
 {
+	this.bPicking = false;
 	this.dateSC = new Date();
 	this.currentTimeSC = this.dateSC.getTime();
 	var miliSecondsUsed = this.currentTimeSC - this.startTimeSC;
@@ -3064,7 +3078,7 @@ MagoManager.prototype.mouseActionLeftDown = function(mouseX, mouseY)
 		});
 	}
 	
-	this.setBPicking(mouseX, mouseY);
+	//this.setBPicking(mouseX, mouseY);
 };
 
 /**
@@ -4993,6 +5007,8 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	gl.uniform1i(shader.tex_5_loc, 5);
 	gl.uniform1i(shader.tex_6_loc, 6);
 	gl.uniform1i(shader.tex_7_loc, 7);
+
+
 };
 
 /**

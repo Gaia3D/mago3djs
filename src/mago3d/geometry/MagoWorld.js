@@ -324,6 +324,7 @@ MagoWorld.prototype.mouseRightClick = function(event)
 		var mouseX = event.clientX;
 		var mouseY = event.clientY;
 		this.magoManager.mouseActionRightClick(mouseX, mouseY);
+		//this.magoManager.managePickingProcess();
 	}
 };
 /**

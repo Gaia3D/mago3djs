@@ -1514,6 +1514,63 @@ Renderer.prototype.renderGeometryStencilShadowMeshes__original = function(gl, re
 	gl.depthRange(0.0, 1.0);	
 };
 
+/**
+ * This function is debug function
+ * @param {WebGLRenderingContext} gl WebGL Rendering Context.
+ */
+Renderer.prototype.renderScreenRectangle = function(gl) 
+{
+	if (this.quadBuffer === undefined)
+	{
+		var data = new Float32Array([0, 0,   1, 0,   0, 1,   0, 1,   1, 0,   1, 1]);
+		this.quadBuffer = FBO.createBuffer(gl, data);
+	}
+
+	// use a simple shader.
+	var magoManager = this.magoManager;
+	var postFxShadersManager = magoManager.postFxShadersManager;
+
+	if (postFxShadersManager === undefined)
+	{ return; }
+	
+	var currShader = postFxShadersManager.getCurrentShader(); // to restore current active shader.
+	var shader =  postFxShadersManager.getShader("texturesMerger");
+	postFxShadersManager.useProgram(shader);
+
+	var textureAux1x1 = magoManager.texturesStore.getTextureAux1x1();
+	for (var i=0; i<8; i++)
+	{
+		gl.activeTexture(gl.TEXTURE0 + i); 
+		gl.bindTexture(gl.TEXTURE_2D, null);
+	}
+
+	gl.enableVertexAttribArray(shader.position2_loc);
+	FBO.bindAttribute(gl, this.quadBuffer, shader.position2_loc, 2);
+	
+	var activeTexturesLayers = new Int32Array([0, 0, 0, 0, 0, 0, 0, 0]); 
+	var externalAlphaLayers = new Float32Array([1, 1, 1, 1, 1, 1, 1, 1]); 
+
+	
+	var texture = magoManager.selectionFbo.colorBuffer; // framebuffer for color selection.***
+
+	if (texture === undefined)
+	{ return; }
+
+	gl.activeTexture(gl.TEXTURE0 + 0); 
+	gl.bindTexture(gl.TEXTURE_2D, texture);
+	
+	activeTexturesLayers[0] = 1;
+	//externalAlphaLayers[0] = texture.opacity;
+
+	gl.uniform1iv(shader.uActiveTextures_loc, activeTexturesLayers);
+	gl.uniform1fv(shader.externalAlphasArray_loc, externalAlphaLayers);
+	gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+
+
+
+};
+
 
 /**
  * This function renders provisional ParametricMesh objects that has no self render function.
@@ -1938,6 +1995,11 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		}
 		
 	}
+
+	// Test render screenRectangle.
+	//if(magoManager.renderScreenRectangle === true)
+	if (renderType === 1)
+	{ this.renderScreenRectangle(gl); }
 
 	
 	gl.disable(gl.BLEND);
