@@ -1034,7 +1034,7 @@ MagoManager.prototype.loadAndPrepareData = function()
  * Manages the selection process.
  * @private
  */
-MagoManager.prototype.managePickingProcess = function() 
+MagoManager.prototype.renderToSelectionBuffer = function() 
 {
 	var gl = this.getGl();
 	
@@ -1078,6 +1078,57 @@ MagoManager.prototype.managePickingProcess = function()
 			//}
 		}
 	}
+};
+
+/**
+ * Manages the selection process.
+ * @private
+ */
+MagoManager.prototype.managePickingProcess = function() 
+{
+	var gl = this.getGl();
+	
+	if (this.selectionFbo === undefined) 
+	{ this.selectionFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
+	/*
+	if (this.isCameraMoved || this.bPicking) // 
+	{
+		this.selectionFbo.bind(); // framebuffer for color selection.***
+		gl.enable(gl.DEPTH_TEST);
+		gl.depthFunc(gl.LEQUAL);
+		gl.depthRange(0, 1);
+		gl.disable(gl.CULL_FACE);
+		if (this.isLastFrustum)
+		{
+			// this is the farest frustum, so init selection process.***
+			gl.clearColor(1, 1, 1, 1); // white background.***
+			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // clear buffer.***
+			this.selectionManager.clearCandidates();
+			gl.clearColor(0, 0, 0, 1); // return to black background.***
+		}
+		
+		this.renderer.renderGeometryColorCoding(this.visibleObjControlerNodes);
+		this.swapRenderingFase();
+		
+		if (this.currentFrustumIdx === 0)
+		{
+			this.isCameraMoved = false;
+
+			//TODO : MOVEEND EVENT TRIGGER
+			//PSEUDO CODE FOR CLUSTER
+			//if (this.modeler && this.modeler.objectsArray) 
+			//{
+			//	for (var i=0, len=this.modeler.objectsArray.length;i<len;i++) 
+			//	{
+			//		var obj = this.modeler.objectsArray[i];
+			//		if (!obj instanceof Cluster) { continue; }
+			//
+			//		if (!obj.dirty && !obj.isMaking) { obj.setDirty(true); }
+			//	}
+			//}
+		}
+	}
+	*/
 	
 	if (this.currentFrustumIdx === 0)
 	{
@@ -1552,7 +1603,8 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 	if (!this.isCameraMoving && !this.mouseMiddleDown)
 	{
 		this.loadAndPrepareData();
-		this.managePickingProcess();
+		//this.managePickingProcess();
+		this.renderToSelectionBuffer();
 	}
 	
 	// Render process.***
