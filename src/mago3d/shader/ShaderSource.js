@@ -1928,6 +1928,8 @@ varying vec2 imageSizeInPixels;\n\
 void main()\n\
 {\n\
     vec4 textureColor;\n\
+\n\
+	// 1rst, check if the texture.w != 0.\n\
 	if(textureFlipYAxis)\n\
 	{\n\
 		textureColor = texture2D(u_texture, vec2(v_texcoord.s, 1.0 - v_texcoord.t));\n\

@@ -1454,7 +1454,7 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 			this.upDateCamera(this.myCameraSCX);
 			this.doMultiFrustumCullingSmartTiles(this.myCameraSCX);
 		}
-		
+
 		gl.clearStencil(0); // provisionally here.***
 		gl.clear(gl.STENCIL_BUFFER_BIT);
 
@@ -1475,7 +1475,7 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 	this.myCameraSCX.setCurrentFrustum(frustumIdx);
 	this.sceneState.camera.setCurrentFrustum(frustumIdx);
 	var visibleNodes = frustumVolumenObject.visibleNodes; // class: VisibleObjectsController.
-	
+
 	if (!this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
 	{
 		if (this.frustumVolumeControl === undefined)
@@ -1531,12 +1531,14 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 		this.canvasDirty = true;
 	}
 
+
 	// Test.***
 	if (!this.objectMarkerTest)
 	{
-		this.TEST__ObjectMarker_toNeoReference();
-		this.objectMarkerTest = true;
+		//this.TEST__ObjectMarker_toNeoReference();
+		//this.objectMarkerTest = true;
 	}
+
 
 	/*
 	// Test.***********************************
@@ -1907,6 +1909,12 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, resultSe
 {
 	if (bSelectObjects === undefined)
 	{ bSelectObjects = false; }
+
+	this.selectionFbo.bind(); // framebuffer for color selection.***
+	gl.enable(gl.DEPTH_TEST);
+	gl.depthFunc(gl.LEQUAL);
+	gl.depthRange(0, 1);
+	gl.disable(gl.CULL_FACE);
 	
 	// Read the picked pixel and find the object.*********************************************************
 	var mosaicWidth = 1;
@@ -1978,9 +1986,7 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, resultSe
 	// Check general objects.***
 	if (selectedObject === undefined)
 	{ selectedObject = selectionManager.selCandidatesMap[idx]; }
-	selectionManager.currentGeneralObjectSelected = selectionManager.selCandidatesMap[idx];
-	//if (selectionManager.currentGeneralObjectSelected)
-	//{ var hola =0; }
+	selectionManager.setSelectedGeneral(selectionManager.selCandidatesMap[idx]);
 	
 	return selectedObject;
 };

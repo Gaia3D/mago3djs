@@ -117,6 +117,17 @@ SelectionManager.prototype.getSelectedGeneral = function()
  * @alias SelectionManager
  * @class SelectionManager
  */
+SelectionManager.prototype.setSelectedGeneral = function(selectedObject)
+{
+	this.currentGeneralObjectSelected = selectedObject;
+};
+
+/**
+ * SelectionManager
+ * 
+ * @alias SelectionManager
+ * @class SelectionManager
+ */
 SelectionManager.prototype.setCandidates = function(idxKey, reference, octree, building, node)
 {
 	if (reference)
