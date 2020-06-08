@@ -1227,11 +1227,11 @@ MagoWorld.prototype.keydown = function(event)
 
 		//this.doTest__BSpline3DCubic();
 		//this.doTest__ExtrudedObject();
-		this.doTest__ObjectMarker();
+		//this.doTest__ObjectMarker();
 		//this.doTest__TerrainScanner();
 		//this.doTest__MagoRectangle();
 		//this.doTest__MagoPoint();
-		//this.doTest__MagoPolyline();
+		this.doTest__MagoPolyline();
 		//this.doTest__GoTo();
 		//this.doTest__CameraOrientation();
 	}
