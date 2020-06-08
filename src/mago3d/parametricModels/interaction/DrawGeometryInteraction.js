@@ -26,8 +26,10 @@ var DrawGeometryInteraction = function(style)
 	if (style) 
 	{
 		this.setStyle(style);
-	} else {
-		this.style = {}
+	}
+	else 
+	{
+		this.style = {};
 	}
 	this.manager;
 	this.collection;

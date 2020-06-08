@@ -8,7 +8,7 @@
  * @property {number} maxLatitude 
  * @property {number} altitude default is 0.
  */
- /** 
+/** 
  * @typedef {object} MagoRectangle~MagoRectangleStyle MagoRectangle position 옵션.
  * @property {string} imageUrl image url. 
  * @property {string} fillColor html color code. if imageUrl defined, ignore this value.

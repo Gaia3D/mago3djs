@@ -1,5 +1,22 @@
 'use strict';
-
+   
+/**
+ * 
+ * @typedef {object} XYZLayer~option
+ * @property {string} url
+ * @property {function()} urlFunction
+ * @property {number} maxZoom
+ * @property {number} minZoom
+ * @property {boolean} show
+ * @property {number} opacity
+ */
+/**
+ * @constructor
+ * @class XYZLayer
+ * @extends TextureLayer
+ * 
+ * @param {XYZLayer~option} options 
+ */
 var XYZLayer = function(options) 
 {
 	if (!(this instanceof XYZLayer)) 
@@ -7,41 +24,21 @@ var XYZLayer = function(options)
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	if (isEmpty(options.url) && isEmpty(options.urlFunction)) 
+	TextureLayer.call(this, options);
+
+	var url = options.url;
+	var urlFunction = options.urlFunction;
+	if (isEmpty(url) && isEmpty(urlFunction)) 
 	{
 		throw new Error(Messages.REQUIRED_EMPTY_ERROR('url or urlFunction'));
 	}
-	this._id = createGuid();
-	this.url = options.url;
+
+	this.url = url;
 	this.reg = /{[^}]+}/g;
-
-	var maxZoom = defaultValue(options.maxZoom, 18);
-	var minZoom = defaultValue(options.minZoom, 0);
-	this._freezeAttr = {
-		maxZoom : maxZoom,
-		minZoom : minZoom
-	};
-	Object.freeze(this._freezeAttr);
-	this.show = defaultValue(options.show, true);
-	this.opacity = defaultValue(options.opacity, 1.0);
-	this.urlFunction = defaultValue(options.urlFunction, undefined);
+	this.urlFunction = defaultValue(urlFunction, undefined);
 };
-
-Object.defineProperties(XYZLayer.prototype, {
-	maxZoom: {
-		get: function()
-		{
-			return this._freezeAttr.maxZoom;
-		}
-	},
-	minZoom: {
-		get: function()
-		{
-			return this._freezeAttr.minZoom;
-		}
-	}
-});
-
+XYZLayer.prototype = Object.create(TextureLayer.prototype);
+XYZLayer.prototype.constructor = XYZLayer;
 
 XYZLayer.prototype.getUrl = function(info) 
 {	

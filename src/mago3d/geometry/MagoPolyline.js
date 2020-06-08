@@ -4,7 +4,7 @@
  * @typedef {object} MagoPolyline~MagoPolylinePosition MagoPolyline position 옵션.
  * @property {Array<MagoPoint~Coordinate>} coordinates 
  */
- /** 
+/** 
  * @typedef {object} MagoPolyline~MagoPolylineStyle MagoPolyline style 옵션.
  * @property {number} thickness line thickness. default is 2.
  * @property {string} color html color code.

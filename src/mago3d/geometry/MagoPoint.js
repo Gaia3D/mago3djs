@@ -6,7 +6,7 @@
  * @property {number} latitude 
  * @property {number} altitude 
  */
- /** 
+/** 
  * @typedef {object} MagoPoint~MagoPointStyle MagoPoint style 옵션.
  * @property {number} size point size.
  * @property {number} opacity range 0-1. default is 1.
