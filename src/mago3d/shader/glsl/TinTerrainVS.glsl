@@ -127,8 +127,8 @@ void main()
 		float C = 0.001;
 		float w = gl_Position.w;
 		////gl_Position.z = log(C*z + 1.0) / log(C*far + 1.0) * w;
-		gl_Position.z = (2.0*log(C*w + 1.0) / log(C*far + 1.0) - 1.0) * w; // https://outerra.blogspot.com/2009/08/logarithmic-z-buffer.html
-		//gl_Position.z = log(z/near) / log(far/near)*w; // another way.
+		//gl_Position.z = (2.0*log(C*w + 1.0) / log(C*far + 1.0) - 1.0) * w; // https://outerra.blogspot.com/2009/08/logarithmic-z-buffer.html
+		gl_Position.z = log(z/near) / log(far/near)*w; // another way.
 	}
 
 	v3Pos = (modelViewMatrixRelToEye * pos4).xyz;

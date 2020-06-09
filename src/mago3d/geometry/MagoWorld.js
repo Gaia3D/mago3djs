@@ -1072,7 +1072,7 @@ MagoWorld.prototype.doTest__MagoRectangle = function()
 	var magoRect = new MagoRectangle(position, style);
 	//magoRect.setOneColor(0.5, 1.0, 0.8);
 
-	var targetDepth = 10;
+	var targetDepth = 3;
 	this.magoManager.modeler.addObject(magoRect, targetDepth);
 };
 
