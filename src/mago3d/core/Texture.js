@@ -52,7 +52,10 @@ Texture.prototype.deleteObjects = function(gl)
 	this.textureImageFileName = undefined;
 	if (this.texId !== undefined)
 	{
-		gl.deleteTexture(this.texId);
+		if (this.texId instanceof WebGLTexture)
+		{ gl.deleteTexture(this.texId); }
+		else 
+		{ var hola = 0; }
 	}
 	this.texId = undefined;
 	this.fileLoadState = undefined;

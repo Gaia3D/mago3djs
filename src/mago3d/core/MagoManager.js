@@ -1046,21 +1046,14 @@ MagoManager.prototype.renderToSelectionBuffer = function()
 		this.selectionFbo.bind(); // framebuffer for color selection.***
 		gl.enable(gl.DEPTH_TEST);
 		gl.depthFunc(gl.LEQUAL);
-		if (this.currentFrustumIdx === 0)
-		{ gl.depthRange(0, 0.25); }
-		else if (this.currentFrustumIdx === 1)
-		{ gl.depthRange(0.25, 0.5); }
-		else if (this.currentFrustumIdx === 2)
-		{ gl.depthRange(0.5, 0.75); }
-		else if (this.currentFrustumIdx === 3)
-		{ gl.depthRange(0.75, 1); }
+		gl.depthRange(0, 1);
 
 		gl.disable(gl.CULL_FACE);
+		gl.clear(gl.DEPTH_BUFFER_BIT); // clear only depth buffer.***
 		if (this.isLastFrustum)
 		{
 			// this is the farest frustum, so init selection process.***
 			gl.clearColor(1, 1, 1, 1); // white background.***
-			gl.clearDepth(1); // white background.***
 			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // clear buffer.***
 			this.selectionManager.clearCandidates();
 			gl.clearColor(0, 0, 0, 1); // return to black background.***
@@ -1071,7 +1064,7 @@ MagoManager.prototype.renderToSelectionBuffer = function()
 		this.renderer.renderGeometryColorCoding(this.visibleObjControlerNodes); 
 		this.swapRenderingFase();
 
-		gl.depthRange(0, 1);
+		
 		
 		if (this.currentFrustumIdx === 0)
 		{

@@ -123,7 +123,7 @@ TinTerrain.prototype.deleteObjects = function(magoManager)
 	}
 	
 	// no delete tiles if depth < 2.
-	if (this.depth < 2)
+	if (this.depth < 3)
 	{ return; }
 		
 	// now delete objects of this tinTerrain.
@@ -173,11 +173,64 @@ TinTerrain.prototype.deleteObjects = function(magoManager)
 		{
 			var texture = this.texture[textureKeys[i]];
 			texture.deleteObjects(gl);
+			delete this.texture[textureKeys[i]];
 			texture = undefined;
 		}
 		this.texture = {};
 	}
 	this.visible = undefined;
+
+	delete this.altArray;
+	delete this.boundingSphereCenterX;
+	delete this.boundingSphereCenterY;
+	delete this.boundingSphereCenterZ;
+	delete this.boundingSphereRadius;
+
+	delete this.cartesiansArray;
+	delete this.cartesiansArraySea;
+	delete this.centerX;
+	delete this.centerY;
+	delete this.centerZ;
+
+	delete this.eastIndices;
+	delete this.eastVertexCount;
+	delete this.westIndices;
+	delete this.westVertexCount;
+	delete this.extensionId;
+	delete this.extensionLength;
+
+	delete this.hValues;
+	delete this.uValues;
+	delete this.vValues;
+	delete this.horizonOcclusionPointX;
+	delete this.horizonOcclusionPointY;
+	delete this.horizonOcclusionPointZ;
+
+	delete this.indices;
+	delete this.latArray;
+	delete this.lonArray;
+	delete this.maxHeight;
+	delete this.minHeight;
+	delete this.normalsArray;
+	delete this.normalsArraySea;
+	delete this.northIndices;
+	delete this.northVertexCount;
+	delete this.skirtAltitudesArray;
+	delete this.skirtCartesiansArray;
+	delete this.skirtCartesiansArraySea;
+	delete this.skirtTexCoordsArray;
+	delete this.skirtTexCoordsArraySea;
+	delete this.southIndices;
+	delete this.southVertexCount;
+	delete this.texCoordsArray;
+	delete this.texture;
+	delete this.textureElevation;
+
+	if (this.textureMaster)
+	{  gl.deleteTexture(this.textureMaster); }
+
+	delete this.textureMaster;
+	delete this.vertexCount;
 };
 
 TinTerrain.prototype.getPathName = function()
@@ -954,8 +1007,11 @@ TinTerrain.prototype.prepareTinTerrainRealTimeElevation = function(magoManager, 
 
 TinTerrain.prototype.hasChildren = function()
 {
-	if (this.childMap !== undefined && this.childMap.length > 0)
-	{ return true; }
+	if (this.childMap !== undefined )
+	{ 
+		if (this.childMap.LD || this.childMap.RD || this.childMap.RU || this.childMap.LU)
+		{ return true; } 
+	}
 	
 	return false;
 };
@@ -986,10 +1042,10 @@ TinTerrain.prototype.deleteTinTerrain = function(magoManager)
 		magoManager.processQueue.putTinTerrainToDelete(this, 0);
 		
 		// now, must erase from myOwner-childrenMap.
-		delete this.owner.childMap[this.indexName];
+		//delete this.owner.childMap[this.indexName];
 		
-		if (this.owner.childMap.length === 0)
-		{ this.owner.childMap = undefined; }
+		//if (this.owner.childMap.length === 0)
+		//{ this.owner.childMap = undefined; }
 		
 		return true;
 	}

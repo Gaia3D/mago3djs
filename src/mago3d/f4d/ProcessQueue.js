@@ -621,6 +621,12 @@ ProcessQueue.prototype.manageDeleteQueue = function(magoManager)
 			
 			if (this.eraseTinTerrainToDelete(tinTerrain))
 			{
+				// now, must erase from myOwner-childrenMap.
+				delete tinTerrain.owner.childMap[tinTerrain.indexName];
+				
+				//if (tinTerrain.owner.childMap.length === 0)
+				//{ tinTerrain.owner.childMap = undefined; }
+
 				tinTerrain.deleteObjects(magoManager);
 				tinTerrain = undefined;
 				deletedCount++;
