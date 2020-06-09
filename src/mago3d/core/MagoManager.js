@@ -669,6 +669,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 	}
 	else/* if (this.configInformation.basicGlobe === Constant.MAGOWORLD)*/
 	{
+		this.postFxShadersManager.bUseLogarithmicDepth = true;
 		var camera = sceneState.camera;
 		var camPos = camera.position;
 		var frustum0 = camera.getFrustum(0);
@@ -6199,6 +6200,9 @@ MagoManager.prototype.isExistStaticModel = function(projectId)
  */
 MagoManager.prototype.addLayer = function(layer) 
 {
+	//layer.on(TextureLayer.EVENT_TYPE.CHANGESHOW ,function(e){
+	//    console.info(e);
+	//})
 	this.tinTerrainManager.imagerys.push(layer);
 };
 

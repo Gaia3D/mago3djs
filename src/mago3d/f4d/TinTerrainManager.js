@@ -413,6 +413,15 @@ TinTerrainManager.prototype.doFrustumCulling = function(frustum, camera, magoMan
 /**
  * Prepare tinTerrains.
  */
+TinTerrainManager.prototype.layersStyleChanged = function() 
+{
+	// must remake the texturemaster of tinTerrains.
+	
+};
+
+/**
+ * Prepare tinTerrains.
+ */
 TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager) 
 {
 	var tinTerrain;
@@ -478,7 +487,7 @@ TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager)
 					}
 				}
 				
-				if (deletedCount > 5)
+				if (deletedCount > 25)
 				{ break; }
 			}
 			//---------------------------------------------------------
