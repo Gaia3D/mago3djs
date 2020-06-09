@@ -1244,7 +1244,6 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 				}
 
 			}
-			
 			// End test.--------------------------------------------------------------------------------------
 			
 			// Render skirt if exist.

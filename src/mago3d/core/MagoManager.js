@@ -699,6 +699,11 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		}
 		
 		frustum0.far[0] = far;
+
+		if (this.postFxShadersManager.bUseLogarithmicDepth)
+		{
+			frustum0.near[0] = 0.0001;
+		}
 		// End-------------------------------------------------------------
 		
 		ManagerUtils.calculateSplited3fv([camPos.x, camPos.y, camPos.z], sceneState.encodedCamPosHigh, sceneState.encodedCamPosLow);
@@ -4704,6 +4709,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	var ssao_vs_source = ShaderSource.ModelRefSsaoVS;
 	var ssao_fs_source = ShaderSource.ModelRefSsaoFS;
 	var shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
+	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
 
 	// 1.1) ModelReferences depthShader.******************************************************************************
 	var shaderName = "modelRefDepth";
@@ -4729,6 +4735,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.uTileDepth_loc = gl.getUniformLocation(shader.program, "uTileDepth");
 	shader.altitude_loc = gl.getAttribLocation(shader.program, "altitude");
 	shader.uSeaOrTerrainType_loc = gl.getUniformLocation(shader.program, "uSeaOrTerrainType");
+	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
 	//shader.uSsaoRadius_loc = gl.getUniformLocation(shader.program, "radius");
 	
 	// In fragment shader:
@@ -4829,6 +4836,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.pendentPointSize_loc = gl.getUniformLocation(shader.program, "pendentPointSize");
 	shader.uStrokeColor_loc = gl.getUniformLocation(shader.program, "uStrokeColor");
 	shader.uStrokeSize_loc = gl.getUniformLocation(shader.program, "uStrokeSize");
+	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
 
 	// 5) Test Quad shader.****************************************************************************************
 	shaderName = "testQuad"; // used by temperatura layer.***
@@ -4868,6 +4876,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.maxPointSize_loc = gl.getUniformLocation(shader.program, "maxPointSize");
 	shader.minPointSize_loc = gl.getUniformLocation(shader.program, "minPointSize");
 	shader.pendentPointSize_loc = gl.getUniformLocation(shader.program, "pendentPointSize");
+	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
 
 	// 9) PointsCloud shader RAINBOW.****************************************************************************************
 	shaderName = "pointsCloudSsao_rainbow";
@@ -4884,6 +4893,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.maxPointSize_loc = gl.getUniformLocation(shader.program, "maxPointSize");
 	shader.minPointSize_loc = gl.getUniformLocation(shader.program, "minPointSize");
 	shader.pendentPointSize_loc = gl.getUniformLocation(shader.program, "pendentPointSize");
+	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
 	
 	// 10) Atmosphere shader.****************************************************************************************
 	shaderName = "atmosphere";
@@ -4928,6 +4938,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.modelViewMatrix_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
 	shader.viewport_loc = gl.getUniformLocation(shader.program, "viewport");
 	shader.thickness_loc = gl.getUniformLocation(shader.program, "thickness");
+	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
 	gl.bindAttribLocation(shader.program, 0, "prev");
 	gl.bindAttribLocation(shader.program, 1, "current");
 	gl.bindAttribLocation(shader.program, 2, "next");

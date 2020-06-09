@@ -17,6 +17,9 @@ uniform vec3 encodedCameraPositionMCHigh;
 uniform vec3 encodedCameraPositionMCLow;
 uniform vec4 oneColor4;
 uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.
+uniform float near;
+uniform float far;
+uniform bool bUseLogarithmicDepth;
 
 varying vec4 vColor;
 
@@ -111,6 +114,17 @@ void main(){
 	vec4 offset = vec4(normal * direction, 0.0, 1.0);
 	gl_Position = currentProjected + offset; 
 
+	if(bUseLogarithmicDepth)
+	{
+		// logarithmic zBuffer:
+		// https://www.gamasutra.com/blogs/BranoKemen/20090812/85207/Logarithmic_Depth_Buffer.php
+		// z = log(C*z + 1) / log(C*Far + 1) * w
+		float z = gl_Position.z;
+		//float C = 1.0;
+		float w = gl_Position.w;
+		////gl_Position.z = log(C*z + 1.0) / log(C*far + 1.0) * w;
+		gl_Position.z = log(z/near) / log(far/near)*w; // another way.
+	}
 	
 	if(colorType == 0)
 		vColor = oneColor4;

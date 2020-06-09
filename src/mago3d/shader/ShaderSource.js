@@ -1684,6 +1684,7 @@ ShaderSource.ModelRefSsaoVS = "\n\
 	uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
 	\n\
 	uniform bool bApplyShadow;\n\
+	uniform bool bUseLogarithmicDepth;\n\
 	\n\
 	// clipping planes.***\n\
 	uniform mat4 clippingPlanesRotMatrix; \n\
@@ -1829,6 +1830,18 @@ ShaderSource.ModelRefSsaoVS = "\n\
 			applySpecLighting = -1.0;\n\
 \n\
         gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+\n\
+		if(bUseLogarithmicDepth)\n\
+		{\n\
+			// logarithmic zBuffer:\n\
+			// https://www.gamasutra.com/blogs/BranoKemen/20090812/85207/Logarithmic_Depth_Buffer.php\n\
+			// z = log(C*z + 1) / log(C*Far + 1) * w\n\
+			float z = gl_Position.z;\n\
+			//float C = 1.0;\n\
+			float w = gl_Position.w;\n\
+			////gl_Position.z = log(C*z + 1.0) / log(C*far + 1.0) * w;\n\
+			gl_Position.z = log(z/near) / log(far/near)*w; // another way.\n\
+		}\n\
 \n\
 		vertexPos = (modelViewMatrixRelToEye * pos4).xyz;\n\
 		//vertexPos = objPosHigh + objPosLow;\n\
@@ -2542,6 +2555,7 @@ uniform float minPointSize;\n\
 uniform float pendentPointSize;\n\
 uniform bool bUseFixPointSize;\n\
 uniform bool bUseColorCodingByHeight;\n\
+uniform bool bUseLogarithmicDepth;\n\
 varying vec4 vColor;\n\
 varying float glPointSize;\n\
 \n\
@@ -2573,6 +2587,18 @@ void main()\n\
 		vColor=color4;\n\
 	\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
+\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		// logarithmic zBuffer:\n\
+		// https://www.gamasutra.com/blogs/BranoKemen/20090812/85207/Logarithmic_Depth_Buffer.php\n\
+		// z = log(C*z + 1) / log(C*Far + 1) * w\n\
+		float z = gl_Position.z;\n\
+		//float C = 1.0;\n\
+		float w = gl_Position.w;\n\
+		////gl_Position.z = log(C*z + 1.0) / log(C*far + 1.0) * w;\n\
+		gl_Position.z = log(z/near) / log(far/near)*w; // another way.\n\
+	}\n\
 \n\
 	if(bUseFixPointSize)\n\
 	{\n\
@@ -3551,6 +3577,9 @@ uniform vec3 encodedCameraPositionMCHigh;\n\
 uniform vec3 encodedCameraPositionMCLow;\n\
 uniform vec4 oneColor4;\n\
 uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
+uniform float near;\n\
+uniform float far;\n\
+uniform bool bUseLogarithmicDepth;\n\
 \n\
 varying vec4 vColor;\n\
 \n\
@@ -3645,6 +3674,17 @@ void main(){\n\
 	vec4 offset = vec4(normal * direction, 0.0, 1.0);\n\
 	gl_Position = currentProjected + offset; \n\
 \n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		// logarithmic zBuffer:\n\
+		// https://www.gamasutra.com/blogs/BranoKemen/20090812/85207/Logarithmic_Depth_Buffer.php\n\
+		// z = log(C*z + 1) / log(C*Far + 1) * w\n\
+		float z = gl_Position.z;\n\
+		//float C = 1.0;\n\
+		float w = gl_Position.w;\n\
+		////gl_Position.z = log(C*z + 1.0) / log(C*far + 1.0) * w;\n\
+		gl_Position.z = log(z/near) / log(far/near)*w; // another way.\n\
+	}\n\
 	\n\
 	if(colorType == 0)\n\
 		vColor = oneColor4;\n\
@@ -4389,6 +4429,7 @@ uniform float far;\n\
 uniform bool bApplyShadow;\n\
 uniform int sunIdx;\n\
 uniform bool bApplySpecularLighting;\n\
+uniform bool bUseLogarithmicDepth;\n\
 \n\
 varying float applySpecLighting;\n\
 varying vec3 vNormal;\n\
@@ -4474,14 +4515,17 @@ void main()\n\
 	}\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 \n\
-	// logarithmic zBuffer:\n\
-	// https://www.gamasutra.com/blogs/BranoKemen/20090812/85207/Logarithmic_Depth_Buffer.php\n\
-	// z = log(C*z + 1) / log(C*Far + 1) * w\n\
-	//float z = gl_Position.z;\n\
-	//float C = 1.0;\n\
-	//float w = gl_Position.w;\n\
-	////gl_Position.z = log(C*z + 1.0) / log(C*far + 1.0) * w;\n\
-	//gl_Position.z = log(z/near) / log(far/near)*w; // another way.\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		// logarithmic zBuffer:\n\
+		// https://www.gamasutra.com/blogs/BranoKemen/20090812/85207/Logarithmic_Depth_Buffer.php\n\
+		// z = log(C*z + 1) / log(C*Far + 1) * w\n\
+		float z = gl_Position.z;\n\
+		//float C = 1.0;\n\
+		float w = gl_Position.w;\n\
+		////gl_Position.z = log(C*z + 1.0) / log(C*far + 1.0) * w;\n\
+		gl_Position.z = log(z/near) / log(far/near)*w; // another way.\n\
+	}\n\
 \n\
 	v3Pos = (modelViewMatrixRelToEye * pos4).xyz;\n\
 \n\

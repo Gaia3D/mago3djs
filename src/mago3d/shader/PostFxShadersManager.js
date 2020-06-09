@@ -4,7 +4,7 @@
  * 어떤 일을 하고 있습니까?
  * @class PostFxShadersManager
  */
-var PostFxShadersManager = function() 
+var PostFxShadersManager = function(options) 
 {
 	if (!(this instanceof PostFxShadersManager)) 
 	{
@@ -20,6 +20,14 @@ var PostFxShadersManager = function()
 	this.lodBuildingShader;
 	
 	this.currentShaderUsing = undefined; // current active shader.
+
+	this.bUseLogarithmicDepth = true;
+
+	if (options)
+	{
+		if (options.useLogarithmicDepth)
+		{ this.bUseLogarithmicDepth = options.useLogarithmicDepth; }
+	}
 };
 
 /**

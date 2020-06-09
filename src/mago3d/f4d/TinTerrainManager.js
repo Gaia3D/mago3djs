@@ -90,8 +90,6 @@ var TinTerrainManager = function(magoManager, options)
 	this.makeTinTerrainWithDEMIndex(); // provisional.
 	
 	//https://www.ngdc.noaa.gov/mgg/global/global.html here there are geotiff of land & ocean 1arc-minute. All earth. size : 21600 x 10800.
-	
-	
 };
 TinTerrainManager.INFO_FILE = 'terrainTiles-info.json';
 
@@ -524,6 +522,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	//gl.disableVertexAttribArray(currentShader.color4_loc);
 	
 	currentShader.bindUniformGenerals();
+	gl.uniform1i(currentShader.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
 	
 	magoManager.test__makingTerrainByAltitudesImage = 0;
 	

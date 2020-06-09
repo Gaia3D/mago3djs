@@ -30,6 +30,7 @@
 	uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.
 	
 	uniform bool bApplyShadow;
+	uniform bool bUseLogarithmicDepth;
 	
 	// clipping planes.***
 	uniform mat4 clippingPlanesRotMatrix; 
@@ -175,6 +176,18 @@
 			applySpecLighting = -1.0;
 
         gl_Position = ModelViewProjectionMatrixRelToEye * pos4;
+
+		if(bUseLogarithmicDepth)
+		{
+			// logarithmic zBuffer:
+			// https://www.gamasutra.com/blogs/BranoKemen/20090812/85207/Logarithmic_Depth_Buffer.php
+			// z = log(C*z + 1) / log(C*Far + 1) * w
+			float z = gl_Position.z;
+			//float C = 1.0;
+			float w = gl_Position.w;
+			////gl_Position.z = log(C*z + 1.0) / log(C*far + 1.0) * w;
+			gl_Position.z = log(z/near) / log(far/near)*w; // another way.
+		}
 
 		vertexPos = (modelViewMatrixRelToEye * pos4).xyz;
 		//vertexPos = objPosHigh + objPosLow;

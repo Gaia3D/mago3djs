@@ -396,6 +396,7 @@ Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive
 			
 			
 			var gl = this.magoManager.getGl();
+			gl.uniform1i(thickLineShader.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
 			var sceneState = this.magoManager.sceneState;
 			gl.uniform4fv(thickLineShader.oneColor4_loc, [0.9, 0.5, 0.3, 1.0]);
 			gl.uniform2fv(thickLineShader.viewport_loc, [sceneState.drawingBufferWidth, sceneState.drawingBufferHeight]);
