@@ -416,7 +416,7 @@ TinTerrainManager.prototype.doFrustumCulling = function(frustum, camera, magoMan
 TinTerrainManager.prototype.layersStyleChanged = function() 
 {
 	// must remake the texturemaster of tinTerrains.
-	
+
 };
 
 /**
@@ -560,6 +560,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 
 	gl.uniform1f(currentShader.uTime_loc, fractionalTime);
 	*/
+
 	if (renderType === 1)
 	{
 		var tex = magoManager.texturesStore.getTextureAux1x1(); // provisional.

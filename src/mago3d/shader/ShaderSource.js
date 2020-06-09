@@ -4521,10 +4521,11 @@ void main()\n\
 		// https://www.gamasutra.com/blogs/BranoKemen/20090812/85207/Logarithmic_Depth_Buffer.php\n\
 		// z = log(C*z + 1) / log(C*Far + 1) * w\n\
 		float z = gl_Position.z;\n\
-		//float C = 1.0;\n\
+		float C = 0.001;\n\
 		float w = gl_Position.w;\n\
 		////gl_Position.z = log(C*z + 1.0) / log(C*far + 1.0) * w;\n\
-		gl_Position.z = log(z/near) / log(far/near)*w; // another way.\n\
+		gl_Position.z = (2.0*log(C*w + 1.0) / log(C*far + 1.0) - 1.0) * w; // https://outerra.blogspot.com/2009/08/logarithmic-z-buffer.html\n\
+		//gl_Position.z = log(z/near) / log(far/near)*w; // another way.\n\
 	}\n\
 \n\
 	v3Pos = (modelViewMatrixRelToEye * pos4).xyz;\n\

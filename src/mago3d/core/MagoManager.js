@@ -1393,6 +1393,10 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		frustumVolumenObject.depthFbo.deleteObjects(gl);
 		frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
 		this.sceneState.camera.frustum.dirty = true;
+
+		// delete selection buffer too.
+		this.selectionFbo.deleteObjects(gl);
+		this.selectionFbo = undefined;
 	}
 	
 	// test silhouette depthFbo.***

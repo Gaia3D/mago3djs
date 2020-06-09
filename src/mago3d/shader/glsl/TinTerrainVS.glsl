@@ -124,10 +124,11 @@ void main()
 		// https://www.gamasutra.com/blogs/BranoKemen/20090812/85207/Logarithmic_Depth_Buffer.php
 		// z = log(C*z + 1) / log(C*Far + 1) * w
 		float z = gl_Position.z;
-		//float C = 1.0;
+		float C = 0.001;
 		float w = gl_Position.w;
 		////gl_Position.z = log(C*z + 1.0) / log(C*far + 1.0) * w;
-		gl_Position.z = log(z/near) / log(far/near)*w; // another way.
+		gl_Position.z = (2.0*log(C*w + 1.0) / log(C*far + 1.0) - 1.0) * w; // https://outerra.blogspot.com/2009/08/logarithmic-z-buffer.html
+		//gl_Position.z = log(z/near) / log(far/near)*w; // another way.
 	}
 
 	v3Pos = (modelViewMatrixRelToEye * pos4).xyz;
