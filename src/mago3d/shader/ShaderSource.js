@@ -3290,13 +3290,23 @@ void main()\n\
     vec4 textureColor = vec4(0.0, 0.0, 0.0, 0.0);\n\
     vec4 currColor4 = vec4(0.0, 0.0, 0.0, 0.0);\n\
     float externalAlpha;\n\
+    bool victory = false;\n\
     if(uActiveTextures[0] == 1)\n\
     {\n\
         currColor4 = texture2D(texture_0, texCoord);\n\
-        externalAlpha = externalAlphasArray[1];\n\
+        externalAlpha = externalAlphasArray[0];\n\
         if(currColor4.w > 0.0 && externalAlpha > 0.0)\n\
         {\n\
-            textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);\n\
+            if(victory)\n\
+            {\n\
+                textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);\n\
+            }\n\
+            else{\n\
+                currColor4.w *= externalAlpha;\n\
+                textureColor = currColor4;\n\
+            }\n\
+            \n\
+            victory = true;\n\
         }\n\
     }\n\
     \n\
@@ -3306,7 +3316,15 @@ void main()\n\
         externalAlpha = externalAlphasArray[1];\n\
         if(currColor4.w > 0.0 && externalAlpha > 0.0)\n\
         {\n\
-            textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);\n\
+             if(victory)\n\
+            {\n\
+                textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);\n\
+            }\n\
+            else{\n\
+                currColor4.w *= externalAlpha;\n\
+                textureColor = currColor4;\n\
+            }\n\
+            victory = true;\n\
         }\n\
     }\n\
     \n\
@@ -3316,7 +3334,15 @@ void main()\n\
         externalAlpha = externalAlphasArray[2];\n\
         if(currColor4.w > 0.0 && externalAlpha > 0.0)\n\
         {\n\
-            textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);\n\
+             if(victory)\n\
+            {\n\
+                textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);\n\
+            }\n\
+            else{\n\
+                currColor4.w *= externalAlpha;\n\
+                textureColor = currColor4;\n\
+            }\n\
+            victory = true;\n\
         }\n\
     }\n\
 \n\
@@ -3326,7 +3352,15 @@ void main()\n\
         externalAlpha = externalAlphasArray[3];\n\
         if(currColor4.w > 0.0 && externalAlpha > 0.0)\n\
         {\n\
-            textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);\n\
+             if(victory)\n\
+            {\n\
+                textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);\n\
+            }\n\
+            else{\n\
+                currColor4.w *= externalAlpha;\n\
+                textureColor = currColor4;\n\
+            }\n\
+            victory = true;\n\
         }\n\
     }\n\
 \n\
@@ -3336,7 +3370,15 @@ void main()\n\
         externalAlpha = externalAlphasArray[4];\n\
         if(currColor4.w > 0.0 && externalAlpha > 0.0)\n\
         {\n\
-            textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);\n\
+             if(victory)\n\
+            {\n\
+                textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);\n\
+            }\n\
+            else{\n\
+                currColor4.w *= externalAlpha;\n\
+                textureColor = currColor4;\n\
+            }\n\
+            victory = true;\n\
         }\n\
     }\n\
 \n\
@@ -3346,7 +3388,15 @@ void main()\n\
         externalAlpha = externalAlphasArray[5];\n\
         if(currColor4.w > 0.0 && externalAlpha > 0.0)\n\
         {\n\
-            textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);\n\
+             if(victory)\n\
+            {\n\
+                textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);\n\
+            }\n\
+            else{\n\
+                currColor4.w *= externalAlpha;\n\
+                textureColor = currColor4;\n\
+            }\n\
+            victory = true;\n\
         }\n\
     }\n\
 \n\
@@ -3356,7 +3406,15 @@ void main()\n\
         externalAlpha = externalAlphasArray[6];\n\
         if(currColor4.w > 0.0 && externalAlpha > 0.0)\n\
         {\n\
-            textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);\n\
+             if(victory)\n\
+            {\n\
+                textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);\n\
+            }\n\
+            else{\n\
+                currColor4.w *= externalAlpha;\n\
+                textureColor = currColor4;\n\
+            }\n\
+            victory = true;\n\
         }\n\
     }\n\
 \n\
@@ -3366,9 +3424,19 @@ void main()\n\
         externalAlpha = externalAlphasArray[7];\n\
         if(currColor4.w > 0.0 && externalAlpha > 0.0)\n\
         {\n\
-            textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);\n\
+             if(victory)\n\
+            {\n\
+                textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);\n\
+            }\n\
+            else{\n\
+                currColor4.w *= externalAlpha;\n\
+                textureColor = currColor4;\n\
+            }\n\
+            victory = true;\n\
         }\n\
     }\n\
+    if(!victory)\n\
+    discard;\n\
     \n\
     gl_FragColor = textureColor;\n\
 	\n\

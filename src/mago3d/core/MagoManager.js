@@ -6204,15 +6204,6 @@ MagoManager.prototype.isExistStaticModel = function(projectId)
  */
 MagoManager.prototype.addLayer = function(layer) 
 {
-	var that = this;
-	layer.on(TextureLayer.EVENT_TYPE.CHANGEOPACITY, function(e)
-	{
-	    that.tinTerrainManager.imageryLayersChanged();
-	});
-	layer.on(TextureLayer.EVENT_TYPE.CHANGESHOW, function(e)
-	{
-	    that.tinTerrainManager.imageryLayersChanged();
-	});
 	this.tinTerrainManager.addImageryLayer(layer);
 };
 

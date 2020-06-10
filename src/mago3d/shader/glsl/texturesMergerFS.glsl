@@ -26,13 +26,23 @@ void main()
     vec4 textureColor = vec4(0.0, 0.0, 0.0, 0.0);
     vec4 currColor4 = vec4(0.0, 0.0, 0.0, 0.0);
     float externalAlpha;
+    bool victory = false;
     if(uActiveTextures[0] == 1)
     {
         currColor4 = texture2D(texture_0, texCoord);
         externalAlpha = externalAlphasArray[0];
         if(currColor4.w > 0.0 && externalAlpha > 0.0)
         {
-            textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);
+            if(victory)
+            {
+                textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);
+            }
+            else{
+                currColor4.w *= externalAlpha;
+                textureColor = currColor4;
+            }
+            
+            victory = true;
         }
     }
     
@@ -42,7 +52,15 @@ void main()
         externalAlpha = externalAlphasArray[1];
         if(currColor4.w > 0.0 && externalAlpha > 0.0)
         {
-            textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);
+             if(victory)
+            {
+                textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);
+            }
+            else{
+                currColor4.w *= externalAlpha;
+                textureColor = currColor4;
+            }
+            victory = true;
         }
     }
     
@@ -52,7 +70,15 @@ void main()
         externalAlpha = externalAlphasArray[2];
         if(currColor4.w > 0.0 && externalAlpha > 0.0)
         {
-            textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);
+             if(victory)
+            {
+                textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);
+            }
+            else{
+                currColor4.w *= externalAlpha;
+                textureColor = currColor4;
+            }
+            victory = true;
         }
     }
 
@@ -62,7 +88,15 @@ void main()
         externalAlpha = externalAlphasArray[3];
         if(currColor4.w > 0.0 && externalAlpha > 0.0)
         {
-            textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);
+             if(victory)
+            {
+                textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);
+            }
+            else{
+                currColor4.w *= externalAlpha;
+                textureColor = currColor4;
+            }
+            victory = true;
         }
     }
 
@@ -72,7 +106,15 @@ void main()
         externalAlpha = externalAlphasArray[4];
         if(currColor4.w > 0.0 && externalAlpha > 0.0)
         {
-            textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);
+             if(victory)
+            {
+                textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);
+            }
+            else{
+                currColor4.w *= externalAlpha;
+                textureColor = currColor4;
+            }
+            victory = true;
         }
     }
 
@@ -82,7 +124,15 @@ void main()
         externalAlpha = externalAlphasArray[5];
         if(currColor4.w > 0.0 && externalAlpha > 0.0)
         {
-            textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);
+             if(victory)
+            {
+                textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);
+            }
+            else{
+                currColor4.w *= externalAlpha;
+                textureColor = currColor4;
+            }
+            victory = true;
         }
     }
 
@@ -92,7 +142,15 @@ void main()
         externalAlpha = externalAlphasArray[6];
         if(currColor4.w > 0.0 && externalAlpha > 0.0)
         {
-            textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);
+             if(victory)
+            {
+                textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);
+            }
+            else{
+                currColor4.w *= externalAlpha;
+                textureColor = currColor4;
+            }
+            victory = true;
         }
     }
 
@@ -102,9 +160,19 @@ void main()
         externalAlpha = externalAlphasArray[7];
         if(currColor4.w > 0.0 && externalAlpha > 0.0)
         {
-            textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);
+             if(victory)
+            {
+                textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);
+            }
+            else{
+                currColor4.w *= externalAlpha;
+                textureColor = currColor4;
+            }
+            victory = true;
         }
     }
+    if(!victory)
+    discard;
     
     gl_FragColor = textureColor;
 	

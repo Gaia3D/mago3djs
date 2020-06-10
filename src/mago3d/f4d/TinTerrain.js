@@ -486,11 +486,7 @@ TinTerrain.prototype.makeTextureMaster = function()
 	{ 
 		var emptyPixels = new Uint8Array(256* 256 * 4);
 		this.textureMaster = Texture.createTexture(gl, gl.LINEAR, emptyPixels, 256, 256); 
-		this.textureMasterMergedLayers = [];
 	}
-
-	var bindedTexturesCount = 0;
-	this.textureMasterMergedLayers.length = 0; // init.
 
 	var texturesMergerFbo = this.tinTerrainManager.texturesMergerFbo;
 	FBO.bindFramebuffer(gl, texturesMergerFbo, this.textureMaster);
@@ -507,7 +503,6 @@ TinTerrain.prototype.makeTextureMaster = function()
 	var shader =  postFxShaderManager.getShader("texturesMerger");
 	postFxShaderManager.useProgram(shader);
 
-	//var textureAux1x1 = magoManager.texturesStore.getTextureAux1x1();
 	for (var i=0; i<8; i++)
 	{
 		gl.activeTexture(gl.TEXTURE0 + i); 
@@ -523,11 +518,22 @@ TinTerrain.prototype.makeTextureMaster = function()
 	var textureLength = textureKeys.length; 
 	var texturesToMergeMatrix = []; // array of "texturesToMergeArray".
 	var texturesToMergeArray = [];
-	
-	for (var i=0; i<textureLength; i++) 
+
+
+	var imageryLayers = this.tinTerrainManager.imagerys;
+	var layersCount = imageryLayers.length;
+	for (var i=0; i<layersCount; i++)
 	{
+		var layer = imageryLayers[i];
+		var texture = this.texture[layer._id];
+		if (!texture)
+		{ continue; }
+		//}
+	
+		//for (var i=0; i<textureLength; i++) 
+		//{
 		var textureKey = textureKeys[i];
-		var texture = this.texture[textureKey];
+		//var texture = this.texture[textureKey];
 
 		var filter = texture.imagery.filter;
 		if (filter === CODE.imageFilter.BATHYMETRY) 
@@ -545,8 +551,6 @@ TinTerrain.prototype.makeTextureMaster = function()
 		
 		if (!texture.imagery.show) { continue; }
 
-		bindedTexturesCount++;
-
 		texture.setOpacity(texture.imagery.opacity); // update to the current imagery opacity.
 		texturesToMergeArray.push(texture);
 		if (texturesToMergeArray.length === 8)
@@ -562,8 +566,6 @@ TinTerrain.prototype.makeTextureMaster = function()
 
 	gl.enable(gl.BLEND);
 	var texturesArraysCount = texturesToMergeMatrix.length;
-	if (texturesArraysCount > 1)
-	{ var hola = 0; }
 	for (var i=0; i<texturesArraysCount; i++)
 	{
 		this.mergeTexturesToTextureMaster(gl, shader, texturesToMergeMatrix[i]);

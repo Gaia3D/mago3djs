@@ -74,7 +74,7 @@ var TinTerrainManager = function(magoManager, options)
 			var layer = options.layers[i];
 			if (layer instanceof WMSLayer || layer instanceof XYZLayer)
 			{
-				this.imagerys.push(layer);
+				this.addImageryLayer(layer);
 			}
 		}
 	}
@@ -727,6 +727,15 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
  */
 TinTerrainManager.prototype.addImageryLayer = function(layer) 
 {
+	var that = this;
+	layer.on(TextureLayer.EVENT_TYPE.CHANGEOPACITY, function(e)
+	{
+	    that.imageryLayersChanged();
+	});
+	layer.on(TextureLayer.EVENT_TYPE.CHANGESHOW, function(e)
+	{
+	    that.imageryLayersChanged();
+	});
 	this.imagerys.push(layer);
 	this.imageryLayersChanged();
 };
@@ -742,7 +751,6 @@ TinTerrainManager.prototype.addTextureId = function(textureId)
 		this.textureIdCntMap[textureId] = 0;
 	}
 	this.textureIdCntMap[textureId] += 1;
-	this.imageryLayersChanged();
 };
 /**
  * 텍스처 제거 목록 등록
