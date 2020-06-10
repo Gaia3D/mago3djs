@@ -532,7 +532,7 @@ TinTerrain.prototype.makeTextureMaster = function()
 	
 		//for (var i=0; i<textureLength; i++) 
 		//{
-		var textureKey = textureKeys[i];
+		var textureKey = layer._id;
 		//var texture = this.texture[textureKey];
 
 		var filter = texture.imagery.filter;
