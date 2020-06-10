@@ -503,11 +503,11 @@ TinTerrain.prototype.makeTextureMaster = function()
 		this.tinTerrainManager.quadBuffer = FBO.createBuffer(gl, data);
 	}
 	
-	var currShader = postFxShaderManager.getCurrentShader(); // to restore current active shader.
+	//var currShader = postFxShaderManager.getCurrentShader(); // to restore current active shader.
 	var shader =  postFxShaderManager.getShader("texturesMerger");
 	postFxShaderManager.useProgram(shader);
 
-	var textureAux1x1 = magoManager.texturesStore.getTextureAux1x1();
+	//var textureAux1x1 = magoManager.texturesStore.getTextureAux1x1();
 	for (var i=0; i<8; i++)
 	{
 		gl.activeTexture(gl.TEXTURE0 + i); 
@@ -911,7 +911,10 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 		// Test making textureMaster.
 		// If there are 2 or more layers, then must create textureMaster.
 		// Check if tinTerrain is syncronized with this.tinTerrainManager.
-		if (this.textureMasterPrepared === undefined || this.layersStyleId !== this.tinTerrainManager.layersStyleId)
+		if(this.layersStyleId !== this.tinTerrainManager.layersStyleId)
+		this.textureMasterPrepared = undefined;
+
+		if (this.textureMasterPrepared === undefined)
 		{
 			this.makeTextureMaster();
 		}
