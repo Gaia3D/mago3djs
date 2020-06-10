@@ -102,7 +102,10 @@ TinTerrainManager.prototype.getImageryLayers = function()
 TinTerrainManager.prototype.imageryLayersChanged = function()
 {
 	// Call this function when imagery layers added, erased, deleted or changed.
+	// must remake the texturemaster of tinTerrains.
 	this.layersStyleId += 1;
+	if (this.layersStyleId > 1000000)
+	{ this.layersStyleId = 0; }
 };
 
 
@@ -373,16 +376,6 @@ TinTerrainManager.prototype.doFrustumCulling = function(frustum, camera, magoMan
 	}
 };
 
-/**
- * Prepare tinTerrains.
- */
-TinTerrainManager.prototype.layersStyleChanged = function() 
-{
-	// must remake the texturemaster of tinTerrains.
-	this.layersStyleId += 1;
-	if (this.layersStyleId > 1000000)
-	{ this.layersStyleId = 0; }
-};
 
 /**
  * Prepare tinTerrains.

@@ -1040,12 +1040,6 @@ TinTerrain.prototype.deleteTinTerrain = function(magoManager)
 		// put this tinTerrain into deleteQueue.
 		magoManager.processQueue.putTinTerrainToDelete(this, 0);
 		
-		// now, must erase from myOwner-childrenMap.
-		//delete this.owner.childMap[this.indexName];
-		
-		//if (this.owner.childMap.length === 0)
-		//{ this.owner.childMap = undefined; }
-		
 		return true;
 	}
 };
