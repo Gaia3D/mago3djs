@@ -632,7 +632,7 @@ ProcessQueue.prototype.manageDeleteQueue = function(magoManager)
 				deletedCount++;
 			}
 			
-			if (deletedCount > 10)
+			if (deletedCount > 20)
 			{ break; }
 		}
 	}

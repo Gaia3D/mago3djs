@@ -85,6 +85,7 @@ var TinTerrainManager = function(magoManager, options)
 	this.textureIdDeleteMap = {};
 	this.bRenderSea = true;
 	this.renderingFase = 0;
+	this.layersStyleId = 0;
 
 	this.init();
 	this.makeTinTerrainWithDEMIndex(); // provisional.
@@ -101,47 +102,9 @@ TinTerrainManager.prototype.getImageryLayers = function()
 TinTerrainManager.prototype.imageryLayersChanged = function()
 {
 	// Call this function when imagery layers added, erased, deleted or changed.
-	this.noFilterImageryLayers = undefined;
-	this.filterImageryLayers = undefined;
+	this.layersStyleId += 1;
 };
 
-TinTerrainManager.prototype.getFilterImageryLayers = function()
-{
-	if (this.filterImageryLayers === undefined)
-	{ 
-		this.filterImageryLayers = []; 
-		var layersCount = this.imagerys.length;
-		for (var i=0; i<layersCount; i++)
-		{
-			var layer = this.imagerys[i];
-			if (layer.filter !== undefined)
-			{
-				this.filterImageryLayers.push(layer);
-			}
-		}
-	}
-
-	return this.filterImageryLayers;
-};
-
-TinTerrainManager.prototype.getNoFilterImageryLayers = function()
-{
-	if (this.noFilterImageryLayers === undefined)
-	{ 
-		this.noFilterImageryLayers = []; 
-		var layersCount = this.imagerys.length;
-		for (var i=0; i<layersCount; i++)
-		{
-			var layer = this.imagerys[i];
-			if (layer.filter === undefined)
-			{
-				this.noFilterImageryLayers.push(layer);
-			}
-		}
-	}
-
-	return this.noFilterImageryLayers;
-};
 
 TinTerrainManager.prototype.getTerrainType = function()
 {
@@ -416,7 +379,9 @@ TinTerrainManager.prototype.doFrustumCulling = function(frustum, camera, magoMan
 TinTerrainManager.prototype.layersStyleChanged = function() 
 {
 	// must remake the texturemaster of tinTerrains.
-
+	this.layersStyleId += 1;
+	if (this.layersStyleId > 1000000)
+	{ this.layersStyleId = 0; }
 };
 
 /**
@@ -487,7 +452,7 @@ TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager)
 					}
 				}
 				
-				if (deletedCount > 25)
+				if (deletedCount > 50)
 				{ break; }
 			}
 			//---------------------------------------------------------
@@ -762,6 +727,17 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	if (this.renderingFase > 1000000)
 	{ this.renderingFase = 0; }
 };
+
+/**
+ * Add imagery layer.
+ * @param {imageryLayer} layer
+ */
+TinTerrainManager.prototype.addImageryLayer = function(layer) 
+{
+	this.imagerys.push(layer);
+	this.imageryLayersChanged();
+};
+
 /**
  * 텍스처 등록 갯수 관리
  * @param {number} textureId

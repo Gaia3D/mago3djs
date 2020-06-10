@@ -477,10 +477,6 @@ TinTerrain.prototype.makeTextureMaster = function()
 	if (this.textureMasterPrepared)
 	{ return; }
 
-	// 1rst, check the imagery layers count.
-	var imageryLayers = this.tinTerrainManager.getImageryLayers();
-	var noFilterImageryLayers = this.tinTerrainManager.getNoFilterImageryLayers();
-
 	// If there are 2 or more layers, then merge all layers into one texture.
 	var magoManager = this.tinTerrainManager.magoManager;
 	var postFxShaderManager = magoManager.postFxShadersManager;
@@ -499,6 +495,7 @@ TinTerrain.prototype.makeTextureMaster = function()
 	var texturesMergerFbo = this.tinTerrainManager.texturesMergerFbo;
 	FBO.bindFramebuffer(gl, texturesMergerFbo, this.textureMaster);
 	gl.viewport(0, 0, 256, 256);
+	// must clear the colorBuffer. todo:
 
 	if (this.tinTerrainManager.quadBuffer === undefined)
 	{
@@ -520,6 +517,8 @@ TinTerrain.prototype.makeTextureMaster = function()
 	gl.enableVertexAttribArray(shader.position2_loc);
 	FBO.bindAttribute(gl, this.tinTerrainManager.quadBuffer, shader.position2_loc, 2);
 	
+	// Now, make texturesArrayMatrix. 
+	// texturesArrayMatrix is an array that contains textures array with 8 textures as maximum.
 	var textureKeys = Object.keys(this.texture);
 	var textureLength = textureKeys.length; 
 	var texturesToMergeMatrix = []; // array of "texturesToMergeArray".
@@ -529,10 +528,13 @@ TinTerrain.prototype.makeTextureMaster = function()
 	{
 		var textureKey = textureKeys[i];
 		var texture = this.texture[textureKey];
+
+		var filter = texture.imagery.filter;
+		if (filter === CODE.imageFilter.BATHYMETRY) 
+		{ continue; }
+		
 		if (!(texture.texId instanceof WebGLTexture)) 
-		{
-			continue;
-		}
+		{ continue; }
 
 		if (this.tinTerrainManager.textureIdDeleteMap[textureKey]) 
 		{
@@ -543,11 +545,6 @@ TinTerrain.prototype.makeTextureMaster = function()
 		
 		if (!texture.imagery.show) { continue; }
 
-		var filter = texture.imagery.filter;
-		if (filter === CODE.imageFilter.BATHYMETRY) 
-		{ continue; }
-		
-		//activeTexturesLayers[i] = 1;
 		bindedTexturesCount++;
 
 		texture.setOpacity(texture.imagery.opacity); // update to the current imagery opacity.
@@ -559,7 +556,7 @@ TinTerrain.prototype.makeTextureMaster = function()
 		}
 	}
 
-	// finally, if there are any texture in the "texturesToMergeArray", then push it.
+	// Last step: finally, if there are any texture in the "texturesToMergeArray", then push it.
 	if (texturesToMergeArray.length > 0)
 	{ texturesToMergeMatrix.push(texturesToMergeArray); }
 
@@ -573,10 +570,11 @@ TinTerrain.prototype.makeTextureMaster = function()
 	}
 	gl.disable(gl.BLEND);
 
-
-	if (bindedTexturesCount >= 8)
+	if (this.isTexturePrepared(this.texture))
 	{ 
+		// If this textures are prepared => all textures was merged into textureMaster.
 		this.textureMasterPrepared = true; 
+		this.layersStyleId = this.tinTerrainManager.layersStyleId;
 	}
 
 	FBO.bindFramebuffer(gl, null);
@@ -913,7 +911,7 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 		// Test making textureMaster.
 		// If there are 2 or more layers, then must create textureMaster.
 		// Check if tinTerrain is syncronized with this.tinTerrainManager.
-		if (this.textureMasterPrepared === undefined)
+		if (this.textureMasterPrepared === undefined || this.layersStyleId !== this.tinTerrainManager.layersStyleId)
 		{
 			this.makeTextureMaster();
 		}

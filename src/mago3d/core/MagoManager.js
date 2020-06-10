@@ -6207,7 +6207,7 @@ MagoManager.prototype.addLayer = function(layer)
 	//layer.on(TextureLayer.EVENT_TYPE.CHANGESHOW ,function(e){
 	//    console.info(e);
 	//})
-	this.tinTerrainManager.imagerys.push(layer);
+	this.tinTerrainManager.addImageryLayer(layer);
 };
 
 /**
