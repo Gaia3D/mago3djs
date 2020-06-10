@@ -495,7 +495,7 @@ TinTerrain.prototype.makeTextureMaster = function()
 	var texturesMergerFbo = this.tinTerrainManager.texturesMergerFbo;
 	FBO.bindFramebuffer(gl, texturesMergerFbo, this.textureMaster);
 	gl.viewport(0, 0, 256, 256);
-	// must clear the colorBuffer. todo:
+	gl.clear(gl.COLOR_BUFFER_BIT);
 
 	if (this.tinTerrainManager.quadBuffer === undefined)
 	{
@@ -911,8 +911,8 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 		// Test making textureMaster.
 		// If there are 2 or more layers, then must create textureMaster.
 		// Check if tinTerrain is syncronized with this.tinTerrainManager.
-		if(this.layersStyleId !== this.tinTerrainManager.layersStyleId)
-		this.textureMasterPrepared = undefined;
+		if (this.layersStyleId !== this.tinTerrainManager.layersStyleId)
+		{ this.textureMasterPrepared = undefined; }
 
 		if (this.textureMasterPrepared === undefined)
 		{

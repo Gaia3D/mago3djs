@@ -29,7 +29,7 @@ void main()
     if(uActiveTextures[0] == 1)
     {
         currColor4 = texture2D(texture_0, texCoord);
-        externalAlpha = externalAlphasArray[1];
+        externalAlpha = externalAlphasArray[0];
         if(currColor4.w > 0.0 && externalAlpha > 0.0)
         {
             textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);
