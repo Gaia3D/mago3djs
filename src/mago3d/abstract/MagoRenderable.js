@@ -193,6 +193,8 @@ MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPr
 
 	// Return the opacity to 1.
 	gl.uniform1f(shader.externalAlpha_loc, 1.0);
+	// delete specularLighting
+	gl.uniform1i(shader.bApplySpecularLighting_loc, false);
 	
 	// check options provisionally here.
 	if (this.options)
