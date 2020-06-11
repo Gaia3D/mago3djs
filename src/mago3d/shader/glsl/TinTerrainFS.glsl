@@ -419,10 +419,20 @@ void main()
 			
 			bool firstColorSetted = false;
 			float externalAlpha = 0.0;
-			if(uActiveTextures[7] == 1)
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			if(uActiveTextures[2] == 1)
 			{
-				vec4 layersTextureColor = texture2D(diffuseTex_5, texCoord);
-				externalAlpha = externalAlphasArray[7];
+				vec4 layersTextureColor = texture2D(diffuseTex, texCoord);
+				externalAlpha = externalAlphasArray[2];
 				if(layersTextureColor.w > 0.0 && externalAlpha > 0.0)
 				{
 					if(firstColorSetted)
@@ -437,7 +447,64 @@ void main()
 					firstColorSetted = true;
 				}
 			}
-			
+
+			if(uActiveTextures[3] == 1)
+			{
+				vec4 layersTextureColor = texture2D(diffuseTex_1, texCoord);
+				externalAlpha = externalAlphasArray[3];
+				if(layersTextureColor.w > 0.0 && externalAlpha > 0.0)
+				{
+					if(firstColorSetted)
+					{
+ 						textureColor = mix(textureColor, layersTextureColor, layersTextureColor.w*externalAlpha);
+					}
+					else{
+						textureColor = layersTextureColor;
+						textureColor.w *= externalAlpha;
+					}
+					
+					firstColorSetted = true;
+				}
+			}
+
+			if(uActiveTextures[4] == 1)
+			{
+				vec4 layersTextureColor = texture2D(diffuseTex_2, texCoord);
+				externalAlpha = externalAlphasArray[4];
+				if(layersTextureColor.w > 0.0 && externalAlpha > 0.0)
+				{
+					if(firstColorSetted)
+					{
+ 						textureColor = mix(textureColor, layersTextureColor, layersTextureColor.w*externalAlpha);
+					}
+					else{
+						textureColor = layersTextureColor;
+						textureColor.w *= externalAlpha;
+					}
+					
+					firstColorSetted = true;
+				}
+			}
+
+			if(uActiveTextures[5] == 1)
+			{
+				vec4 layersTextureColor = texture2D(diffuseTex_3, texCoord);
+				externalAlpha = externalAlphasArray[5];
+				if(layersTextureColor.w > 0.0 && externalAlpha > 0.0)
+				{
+					if(firstColorSetted)
+					{
+ 						textureColor = mix(textureColor, layersTextureColor, layersTextureColor.w*externalAlpha);
+					}
+					else{
+						textureColor = layersTextureColor;
+						textureColor.w *= externalAlpha;
+					}
+					
+					firstColorSetted = true;
+				}
+			}
+
 			if(uActiveTextures[6] == 1)
 			{
 				vec4 layersTextureColor = texture2D(diffuseTex_4, texCoord);
@@ -456,68 +523,11 @@ void main()
 					firstColorSetted = true;
 				}
 			}
-			
-			if(!firstColorSetted && uActiveTextures[5] == 1)
+
+			if(uActiveTextures[7] == 1)
 			{
-				vec4 layersTextureColor = texture2D(diffuseTex_3, texCoord);
-				externalAlpha = externalAlphasArray[5];
-				if(layersTextureColor.w > 0.0 && externalAlpha > 0.0)
-				{
-					if(firstColorSetted)
-					{
- 						textureColor = mix(textureColor, layersTextureColor, layersTextureColor.w*externalAlpha);
-					}
-					else{
-						textureColor = layersTextureColor;
-						textureColor.w *= externalAlpha;
-					}
-					
-					firstColorSetted = true;
-				}
-			}
-			
-			if(!firstColorSetted && uActiveTextures[4] == 1)
-			{
-				vec4 layersTextureColor = texture2D(diffuseTex_2, texCoord);
-				externalAlpha = externalAlphasArray[4];
-				if(layersTextureColor.w > 0.0 && externalAlpha > 0.0)
-				{
-					if(firstColorSetted)
-					{
- 						textureColor = mix(textureColor, layersTextureColor, layersTextureColor.w*externalAlpha);
-					}
-					else{
-						textureColor = layersTextureColor;
-						textureColor.w *= externalAlpha;
-					}
-					
-					firstColorSetted = true;
-				}
-			}
-			
-			if(!firstColorSetted && uActiveTextures[3] == 1)
-			{
-				vec4 layersTextureColor = texture2D(diffuseTex_1, texCoord);
-				externalAlpha = externalAlphasArray[3];
-				if(layersTextureColor.w > 0.0 && externalAlpha > 0.0)
-				{
-					if(firstColorSetted)
-					{
- 						textureColor = mix(textureColor, layersTextureColor, layersTextureColor.w*externalAlpha);
-					}
-					else{
-						textureColor = layersTextureColor;
-						textureColor.w *= externalAlpha;
-					}
-					
-					firstColorSetted = true;
-				}
-			}
-			
-			if(!firstColorSetted && uActiveTextures[2] == 1)
-			{
-				vec4 layersTextureColor = texture2D(diffuseTex, texCoord);
-				externalAlpha = externalAlphasArray[2];
+				vec4 layersTextureColor = texture2D(diffuseTex_5, texCoord);
+				externalAlpha = externalAlphasArray[7];
 				if(layersTextureColor.w > 0.0 && externalAlpha > 0.0)
 				{
 					if(firstColorSetted)
