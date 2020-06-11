@@ -74,6 +74,24 @@ MagoRectangle.prototype = Object.create(MagoGeometry.prototype);
 MagoRectangle.prototype.constructor = MagoRectangle;
 
 /**
+ * make clone this instance
+ * @return {MagoRectangle}
+ */
+MagoRectangle.prototype.clone = function()
+{
+	var position = {
+		minLongitude : this.minGeographicCoord.longitude,
+		minLatitude  : this.minGeographicCoord.latitude,
+		maxLongitude : this.maxGeographicCoord.longitude,
+		maxLatitude  : this.maxGeographicCoord.latitude,
+		altitude     : this.maxGeographicCoord.altitude
+	};
+	var style = this.style;
+
+	return new MagoRectangle(position, style);
+};
+
+/**
  * set position
  * @param {MagoRectangle~MagoRectanglePosition} position
  * 

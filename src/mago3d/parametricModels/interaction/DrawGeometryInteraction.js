@@ -69,6 +69,8 @@ DrawGeometryInteraction.prototype.setActive = function(active)
 	{
 		throw new Error(Messages.REQUIRED_EMPTY_ERROR('MagoManager'));
 	}
+
+	if (this.active === active) { return; }
     
 	if (!this.collection) 
 	{
@@ -79,10 +81,12 @@ DrawGeometryInteraction.prototype.setActive = function(active)
 	if (active) 
 	{
 		this.collection.emit(InteractionCollection.EVENT_TYPE.ACTIVE, that);
+		this.emit(this.constructor.EVENT_TYPE.ACTIVE, this);
 	}
 	else 
 	{
 		this.collection.emit(InteractionCollection.EVENT_TYPE.DEACTIVE);
+		this.emit(this.constructor.EVENT_TYPE.DEACTIVE);
 	}
 };
 /**
