@@ -127,7 +127,7 @@ void main()
 		float z = gl_Position.z;
 		float C = 0.001;
 		float w = gl_Position.w;
-		gl_Position.z = log(C*z + 1.0) / log(C*far + 1.0) * w; // https://outerra.blogspot.com/2009/08/logarithmic-z-buffer.html
+		//gl_Position.z = log(C*z + 1.0) / log(C*far + 1.0) * w; // https://outerra.blogspot.com/2009/08/logarithmic-z-buffer.html
 		//gl_Position.z = log(C*z + 1.0) / log(C*far + 1.0) * w + 1000.0/z; // son
 		//if(gl_Position.z/gl_Position.w < -1.0 && gl_Position.z/gl_Position.w > -20000.0)
 		//{
@@ -135,7 +135,7 @@ void main()
 		//	gl_Position.w = 1.0;
 		//}
 		////gl_Position.z = (2.0*log(C*w + 1.0) / log(C*far + 1.0) - 1.0) * w; // for openGL with depthRange(-1, 1);// https://outerra.blogspot.com/2009/08/logarithmic-z-buffer.html
-		//gl_Position.z = log(z/near) / log(far/near)*w; // another way.
+		gl_Position.z = log(z/near) / log(far/near)*w; // another way.
 
 		//**************************************************************
 		// https://android.developreference.com/article/21119961/Logarithmic+Depth+Buffer+OpenGL
