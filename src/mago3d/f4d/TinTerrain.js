@@ -528,12 +528,8 @@ TinTerrain.prototype.makeTextureMaster = function()
 		var texture = this.texture[layer._id];
 		if (!texture)
 		{ continue; }
-		//}
-	
-		//for (var i=0; i<textureLength; i++) 
-		//{
+
 		var textureKey = layer._id;
-		//var texture = this.texture[textureKey];
 
 		var filter = texture.imagery.filter;
 		if (filter === CODE.imageFilter.BATHYMETRY) 
@@ -634,6 +630,7 @@ TinTerrain.prototype.bindTexture = function(gl, shader)
 
 	
 	// If no exist textureMaster, then provisionally render textures individually.
+	var externalAlphaLayers = new Float32Array([1, 1, 1, 1, 1, 1, 1, 1]); 
 	var textureKeys = Object.keys(this.texture);
 	var textureLength = textureKeys.length; 
 	for (var i=0;i<textureLength;i++) 
@@ -658,6 +655,7 @@ TinTerrain.prototype.bindTexture = function(gl, shader)
 		gl.bindTexture(gl.TEXTURE_2D, texture.texId);
 		
 		activeTexturesLayers[4+i] = 1;
+		externalAlphaLayers[4+i] = texture.imagery.opacity;
 		var filter = texture.imagery.filter;
 		if (filter) 
 		{
@@ -670,7 +668,7 @@ TinTerrain.prototype.bindTexture = function(gl, shader)
 	}	
 
 	gl.uniform1iv(shader.uActiveTextures_loc, activeTexturesLayers);
-
+	gl.uniform1fv(shader.externalAlphasArray_loc, externalAlphaLayers);
 	
 };
 

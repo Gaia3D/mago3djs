@@ -703,7 +703,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 
 		if (this.postFxShadersManager.bUseLogarithmicDepth)
 		{
-			frustum0.near[0] = 0.0001;
+			frustum0.near[0] = 1e-6;
 		}
 		// End-------------------------------------------------------------
 		
@@ -4741,6 +4741,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.altitude_loc = gl.getAttribLocation(shader.program, "altitude");
 	shader.uSeaOrTerrainType_loc = gl.getUniformLocation(shader.program, "uSeaOrTerrainType");
 	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
+	
 	//shader.uSsaoRadius_loc = gl.getUniformLocation(shader.program, "radius");
 	
 	// In fragment shader:
@@ -4754,6 +4755,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	//uniform sampler2D diffuseTex_5;  // 7
 	
 	shader.uActiveTextures_loc = gl.getUniformLocation(shader.program, "uActiveTextures");
+	shader.externalAlphasArray_loc = gl.getUniformLocation(shader.program, "externalAlphasArray");
 
 	var uniformLocation;
 	var uniformDataPair;

@@ -120,15 +120,36 @@ void main()
 
 	if(bUseLogarithmicDepth)
 	{
+		
 		// logarithmic zBuffer:
 		// https://www.gamasutra.com/blogs/BranoKemen/20090812/85207/Logarithmic_Depth_Buffer.php
 		// z = log(C*z + 1) / log(C*Far + 1) * w
 		float z = gl_Position.z;
 		float C = 0.001;
 		float w = gl_Position.w;
-		////gl_Position.z = log(C*z + 1.0) / log(C*far + 1.0) * w;
-		//gl_Position.z = (2.0*log(C*w + 1.0) / log(C*far + 1.0) - 1.0) * w; // https://outerra.blogspot.com/2009/08/logarithmic-z-buffer.html
-		gl_Position.z = log(z/near) / log(far/near)*w; // another way.
+		gl_Position.z = log(C*z + 1.0) / log(C*far + 1.0) * w; // https://outerra.blogspot.com/2009/08/logarithmic-z-buffer.html
+		//gl_Position.z = log(C*z + 1.0) / log(C*far + 1.0) * w + 1000.0/z; // son
+		//if(gl_Position.z/gl_Position.w < -1.0 && gl_Position.z/gl_Position.w > -20000.0)
+		//{
+		//	gl_Position.z = -0.99;
+		//	gl_Position.w = 1.0;
+		//}
+		////gl_Position.z = (2.0*log(C*w + 1.0) / log(C*far + 1.0) - 1.0) * w; // for openGL with depthRange(-1, 1);// https://outerra.blogspot.com/2009/08/logarithmic-z-buffer.html
+		//gl_Position.z = log(z/near) / log(far/near)*w; // another way.
+
+		//**************************************************************
+		// https://android.developreference.com/article/21119961/Logarithmic+Depth+Buffer+OpenGL
+		// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html
+		//float Fcoef = 2.0 / log2(far + 1.0);
+		//float Fcoef_half = 0.5 * Fcoef;
+		//float flogz = 1.0 + w;
+		//float fragDepth = log2(flogz) * Fcoef_half;
+		//gl_Position.z = log2(max(1e-6, 1.0 + w)) * Fcoef - 1.0;
+		//gl_Position.z = fragDepth;
+		
+		// Reverse depth buffer
+		// https://outerra.blogspot.com/2012/11/maximizing-depth-buffer-range-and.html
+		// https://forum.babylonjs.com/t/reverse-depth-buffer-z-buffer/6905
 	}
 
 	v3Pos = (modelViewMatrixRelToEye * pos4).xyz;
