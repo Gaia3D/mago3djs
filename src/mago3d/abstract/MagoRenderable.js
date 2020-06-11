@@ -187,7 +187,7 @@ MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPr
 	{
 		renderShaded = false;
 	}
-	
+	gl.uniform1i(shader.bApplySpecularLighting_loc, false);
 	if (renderShaded)
 	{ this.renderAsChild(magoManager, shader, renderType, glPrimitive, bIsSelected, this.options); }
 
