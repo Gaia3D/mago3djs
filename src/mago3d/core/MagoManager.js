@@ -4745,6 +4745,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	var showDepth_vs_source = ShaderSource.RenderShowDepthVS;
 	var showDepth_fs_source = ShaderSource.RenderShowDepthFS;
 	shader = this.postFxShadersManager.createShaderProgram(gl, showDepth_vs_source, showDepth_fs_source, shaderName, this);
+	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
 
 	// 2) ModelReferences colorCoding shader.***********************************************************************
 	var shaderName = "modelRefColorCoding";

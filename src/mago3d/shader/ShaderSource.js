@@ -1830,20 +1830,24 @@ ShaderSource.ModelRefSsaoVS = "\n\
 			applySpecLighting = -1.0;\n\
 \n\
         gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
-\n\
+		vertexPos = (modelViewMatrixRelToEye * pos4).xyz;\n\
 		if(bUseLogarithmicDepth)\n\
 		{\n\
 			// logarithmic zBuffer:\n\
 			// https://www.gamasutra.com/blogs/BranoKemen/20090812/85207/Logarithmic_Depth_Buffer.php\n\
 			// z = log(C*z + 1) / log(C*Far + 1) * w\n\
-			float z = gl_Position.z;\n\
-			//float C = 1.0;\n\
-			float w = gl_Position.w;\n\
-			////gl_Position.z = log(C*z + 1.0) / log(C*far + 1.0) * w;\n\
-			gl_Position.z = log(z/near) / log(far/near)*w; // another way.\n\
+\n\
+			if(vertexPos.z < 0.0)\n\
+			{\n\
+				float z = gl_Position.z;\n\
+				float C = 0.001;\n\
+				float w = gl_Position.w;\n\
+				//gl_Position.z = log(C*z + 1.0) / log(C*far + 1.0) * w; // https://outerra.blogspot.com/2009/08/logarithmic-z-buffer.html\n\
+				gl_Position.z = log(z/near) / log(far/near)*w; // another way.\n\
+			}\n\
 		}\n\
 \n\
-		vertexPos = (modelViewMatrixRelToEye * pos4).xyz;\n\
+		\n\
 		//vertexPos = objPosHigh + objPosLow;\n\
 		\n\
 		if(colorType == 1)\n\
@@ -2778,6 +2782,7 @@ uniform float far;\n\
 uniform vec3 aditionalPosition;\n\
 uniform vec3 refTranslationVec;\n\
 uniform int refMatrixType; // 0= identity, 1= translate, 2= transform\n\
+uniform bool bUseLogarithmicDepth;\n\
 \n\
 varying float depth;\n\
 varying vec3 vertexPos;\n\
@@ -2814,6 +2819,16 @@ void main()\n\
 	//depth = posCC.z/farForDepth; // test.***\n\
 \n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+\n\
+	if(bUseLogarithmicDepth && posCC.z < 0.0)\n\
+	{\n\
+		float z = gl_Position.z;\n\
+		float C = 0.001;\n\
+		float w = gl_Position.w;\n\
+		//gl_Position.z = log(C*z + 1.0) / log(C*far + 1.0) * w; // https://outerra.blogspot.com/2009/08/logarithmic-z-buffer.html\n\
+		gl_Position.z = log(gl_Position.z/near) / log(far/near)*gl_Position.w; // another way.\n\
+	}\n\
+\n\
 	vertexPos = posCC.xyz;\n\
 }";
 ShaderSource.ScreenQuadFS = "#ifdef GL_ES\n\
@@ -4655,13 +4670,14 @@ void main()\n\
 		// logarithmic zBuffer:\n\
 		// https://www.gamasutra.com/blogs/BranoKemen/20090812/85207/Logarithmic_Depth_Buffer.php\n\
 		// z = log(C*z + 1) / log(C*Far + 1) * w\n\
-		float z = gl_Position.z;\n\
-		//float C = 0.001;\n\
-		float w = gl_Position.w;\n\
-		//gl_Position.z = log(C*z + 1.0) / log(C*far + 1.0) * w; // https://outerra.blogspot.com/2009/08/logarithmic-z-buffer.html\n\
-\n\
+		// https://android.developreference.com/article/21119961/Logarithmic+Depth+Buffer+OpenGL\n\
+		// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
 		if(v3Pos.z < 0.0)\n\
 		{\n\
+			float z = gl_Position.z;\n\
+			float C = 0.001;\n\
+			float w = gl_Position.w;\n\
+			//gl_Position.z = log(C*z + 1.0) / log(C*far + 1.0) * w; // https://outerra.blogspot.com/2009/08/logarithmic-z-buffer.html\n\
 			gl_Position.z = log(z/near) / log(far/near)*w; // another way.\n\
 		}\n\
 	}\n\

@@ -15,6 +15,7 @@ uniform float far;
 uniform vec3 aditionalPosition;
 uniform vec3 refTranslationVec;
 uniform int refMatrixType; // 0= identity, 1= translate, 2= transform
+uniform bool bUseLogarithmicDepth;
 
 varying float depth;
 varying vec3 vertexPos;
@@ -51,5 +52,15 @@ void main()
 	//depth = posCC.z/farForDepth; // test.***
 
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;
+
+	if(bUseLogarithmicDepth && posCC.z < 0.0)
+	{
+		float z = gl_Position.z;
+		float C = 0.001;
+		float w = gl_Position.w;
+		//gl_Position.z = log(C*z + 1.0) / log(C*far + 1.0) * w; // https://outerra.blogspot.com/2009/08/logarithmic-z-buffer.html
+		gl_Position.z = log(gl_Position.z/near) / log(far/near)*gl_Position.w; // another way.
+	}
+
 	vertexPos = posCC.xyz;
 }
