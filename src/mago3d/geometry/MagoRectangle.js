@@ -128,8 +128,8 @@ MagoRectangle.prototype.setPosition = function(position)
 MagoRectangle.prototype.getArea = function() 
 {
 	var edge = new GeographicCoord(this.minGeographicCoord.longitude, this.maxGeographicCoord.latitude, this.maxGeographicCoord.altitude);
-	var width = Globe.getArcDistanceBetweenGeographicCoords(this.minGeographicCoord, edge);
-	var height = Globe.getArcDistanceBetweenGeographicCoords(edge, this.maxGeographicCoord);
+	var height = Globe.getArcDistanceBetweenGeographicCoords(this.minGeographicCoord, edge);
+	var width = Globe.getArcDistanceBetweenGeographicCoords(edge, this.maxGeographicCoord);
 	return Math.abs(width * height);
 };
 /**

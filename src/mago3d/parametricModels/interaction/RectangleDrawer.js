@@ -162,3 +162,14 @@ RectangleDrawer.prototype.end = function()
 	this.emit(RectangleDrawer.EVENT_TYPE.DRAWEND, this.tempRectangle);
 	this.init();
 };
+
+/**
+ * remove last drawed rectangle
+ */
+RectangleDrawer.prototype.cancle = function()
+{
+	var idx = this.result.length - 1;
+	var removalRectangle = this.result[idx];
+	this.manager.modeler.removeObject(removalRectangle);
+	this.result = this.result.slice(0, idx);
+};
