@@ -713,6 +713,29 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		// consider near as zero provisionally.***
 		var projectionMatrix = sceneState.projectionMatrix;
 		projectionMatrix._floatArrays = glMatrix.mat4.perspective(projectionMatrix._floatArrays, frustum0.fovyRad[0], frustum0.aspectRatio[0], frustum0.near[0], frustum0.far[0]);
+
+		// perspective for reverseDepthRange:
+		/*
+		projectionMatrix.set(2, 2, -projectionMatrix.get(2, 2));
+		projectionMatrix.set(2, 3, -projectionMatrix.get(2, 3));
+		var frustum0 = this.myCameraSCX.getFrustum(0);
+		var sceneCamFurustum0 = sceneState.camera.getFrustum(0);
+		frustum0.near[0] = sceneCamFurustum0.near[0];
+		frustum0.far[0] = sceneCamFurustum0.far[0];
+		frustum0.fovyRad[0] = sceneCamFurustum0.fovyRad[0];
+		frustum0.tangentOfHalfFovy[0] = sceneCamFurustum0.tangentOfHalfFovy[0];
+		frustum0.fovRad[0] = sceneCamFurustum0.fovRad[0];
+		frustum0.aspectRatio[0] = sceneCamFurustum0.aspectRatio[0];
+
+		var t = 1.0 / (Math.tan(sceneCamFurustum0.fovRad[0] * 0.5));
+		var a = t;
+		var b = (t * sceneCamFurustum0.aspectRatio[0]);
+		projectionMatrix.setByFloat32Array(new Float32Array([
+			a, 0.0, 0.0, 0.0,
+			0.0, b, 0.0, 0.0,
+			0.0, 0.0, -frustum0.near[0], 1.0,
+			0.0, 0.0, 1.0, 0.0]));
+			*/
 		
 		// Large far projection for sky.
 		var farSky = eqRadius + camHeight * 1.5;
@@ -1419,6 +1442,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	{
 		gl.clearColor(0, 0, 0, 1);
 		gl.clearDepth(1);
+		//gl.clearDepth(0);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		gl.clearStencil(0); // provisionally here.***
 	}

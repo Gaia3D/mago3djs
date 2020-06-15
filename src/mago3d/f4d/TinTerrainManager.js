@@ -641,6 +641,9 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	{ bApplyShadow = false; } // cant apply shadow anyway.
 	
 	var succesfullyRenderedTilesArray = [];
+
+	gl.depthRange(0, 1);
+	//gl.depthFunc(gl.GREATER);
 	
 	if (bApplyShadow)
 	{
@@ -709,7 +712,8 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 		gl.enable(gl.CULL_FACE);
 	}
 	*/
-
+	gl.depthRange(0, 1);
+	gl.depthFunc(gl.LEQUAL);
 	currentShader.disableVertexAttribArray(currentShader.texCoord2_loc); 
 	currentShader.disableVertexAttribArray(currentShader.position3_loc); 
 	currentShader.disableVertexAttribArray(currentShader.normal3_loc); 

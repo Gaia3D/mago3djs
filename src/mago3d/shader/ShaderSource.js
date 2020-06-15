@@ -4648,42 +4648,23 @@ void main()\n\
 		vTexCoord = texCoord;\n\
 	}\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+	v3Pos = (modelViewMatrixRelToEye * pos4).xyz;\n\
 \n\
 	if(bUseLogarithmicDepth)\n\
 	{\n\
-		\n\
 		// logarithmic zBuffer:\n\
 		// https://www.gamasutra.com/blogs/BranoKemen/20090812/85207/Logarithmic_Depth_Buffer.php\n\
 		// z = log(C*z + 1) / log(C*Far + 1) * w\n\
 		float z = gl_Position.z;\n\
-		float C = 0.001;\n\
+		//float C = 0.001;\n\
 		float w = gl_Position.w;\n\
 		//gl_Position.z = log(C*z + 1.0) / log(C*far + 1.0) * w; // https://outerra.blogspot.com/2009/08/logarithmic-z-buffer.html\n\
-		//gl_Position.z = log(C*z + 1.0) / log(C*far + 1.0) * w + 1000.0/z; // son\n\
-		//if(gl_Position.z/gl_Position.w < -1.0 && gl_Position.z/gl_Position.w > -20000.0)\n\
-		//{\n\
-		//	gl_Position.z = -0.99;\n\
-		//	gl_Position.w = 1.0;\n\
-		//}\n\
-		////gl_Position.z = (2.0*log(C*w + 1.0) / log(C*far + 1.0) - 1.0) * w; // for openGL with depthRange(-1, 1);// https://outerra.blogspot.com/2009/08/logarithmic-z-buffer.html\n\
-		gl_Position.z = log(z/near) / log(far/near)*w; // another way.\n\
 \n\
-		//**************************************************************\n\
-		// https://android.developreference.com/article/21119961/Logarithmic+Depth+Buffer+OpenGL\n\
-		// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
-		//float Fcoef = 2.0 / log2(far + 1.0);\n\
-		//float Fcoef_half = 0.5 * Fcoef;\n\
-		//float flogz = 1.0 + w;\n\
-		//float fragDepth = log2(flogz) * Fcoef_half;\n\
-		//gl_Position.z = log2(max(1e-6, 1.0 + w)) * Fcoef - 1.0;\n\
-		//gl_Position.z = fragDepth;\n\
-		\n\
-		// Reverse depth buffer\n\
-		// https://outerra.blogspot.com/2012/11/maximizing-depth-buffer-range-and.html\n\
-		// https://forum.babylonjs.com/t/reverse-depth-buffer-z-buffer/6905\n\
+		if(v3Pos.z < 0.0)\n\
+		{\n\
+			gl_Position.z = log(z/near) / log(far/near)*w; // another way.\n\
+		}\n\
 	}\n\
-\n\
-	v3Pos = (modelViewMatrixRelToEye * pos4).xyz;\n\
 \n\
 	// calculate fog amount.\n\
 	float fogParam = 1.15 * v3Pos.z/(far - 10000.0);\n\
