@@ -1,21 +1,5 @@
 'use strict';
-/**
- * 
- * @typedef {object} MagoRectangle~MagoRectanglePosition MagoRectangle position 옵션.
- * @property {number} minLongitude 
- * @property {number} minLatitude 
- * @property {number} maxLongitude 
- * @property {number} maxLatitude 
- * @property {number} altitude default is 0.
- */
-/** 
- * @typedef {object} MagoRectangle~MagoRectangleStyle MagoRectangle position 옵션.
- * @property {string} imageUrl image url. 
- * @property {string} fillColor html color code. if imageUrl defined, ignore this value.
- * @property {number} opacity range 0-1. default is 1.
- * @property {number} strokeWidth stroke width.
- * @property {number} strokeColor stroke color. if strokeWidth isn't define, ignore this value.
- */
+
 /**
  * 직사각형을 표현하는 클래스
  * @exception {Error} Messages.CONSTRUCT_ERROR
@@ -35,6 +19,23 @@
  */
 var MagoRectangle = function(position, style) 
 {
+	/**
+	 * 
+	 * @typedef {object} MagoRectangle~MagoRectanglePosition MagoRectangle position 옵션.
+	 * @property {number} minLongitude 
+	 * @property {number} minLatitude 
+	 * @property {number} maxLongitude 
+	 * @property {number} maxLatitude 
+	 * @property {number} altitude default is 0.
+	 */
+	/** 
+	 * @typedef {object} MagoRectangle~MagoRectangleStyle MagoRectangle position 옵션.
+	 * @property {string} imageUrl image url. 
+	 * @property {string} fillColor html color code. if imageUrl defined, ignore this value.
+	 * @property {number} opacity range 0-1. default is 1.
+	 * @property {number} strokeWidth stroke width.
+	 * @property {number} strokeColor stroke color. if strokeWidth isn't define, ignore this value.
+	 */
 	if (!(this instanceof MagoRectangle)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
