@@ -18,7 +18,7 @@ uniform int refMatrixType; // 0= identity, 1= translate, 2= transform
 uniform bool bUseLogarithmicDepth;
 
 varying float flogz;
-	varying float Fcoef_half;
+varying float Fcoef_half;
 
 varying float depth;
 varying vec3 vertexPos;

@@ -2,7 +2,7 @@
     precision highp float;
 #endif
 
-#extension GL_EXT_frag_depth : disable
+#extension GL_EXT_frag_depth : enable
   
 uniform sampler2D shadowMapTex;// 0
 uniform sampler2D shadowMapTex2;// 1
@@ -56,6 +56,8 @@ uniform bool bApplyShadow;
 uniform bool bApplySsao;
 uniform float shadowMapWidth;    
 uniform float shadowMapHeight;
+uniform bool bUseLogarithmicDepth;
+
 varying vec3 v3Pos;
 varying float vFogAmount;
 
@@ -66,6 +68,9 @@ varying vec3 vNormal;
 varying vec3 vNormalWC;
 varying float currSunIdx;
 varying float vAltitude;
+
+varying float flogz;
+varying float Fcoef_half;
 
 const float equatorialRadius = 6378137.0;
 const float polarRadius = 6356752.3142;
@@ -283,7 +288,12 @@ vec3 causticColor(vec2 texCoord)
 }
 
 void main()
-{           
+{    
+	if(bUseLogarithmicDepth)
+	{
+		gl_FragDepthEXT = log2(flogz) * Fcoef_half;
+	}
+
 	if(bIsMakingDepth)
 	{
 		gl_FragColor = packDepth(-depthValue);
@@ -713,5 +723,6 @@ void main()
 		//gl_FragColor = vec4(vNormal.xyz, 1.0); // test.***
 		
 		//if(currSunIdx > 0.0 && currSunIdx < 1.0 && shadow_occlusion<0.9)gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+		
 	}
 }

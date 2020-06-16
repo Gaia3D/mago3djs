@@ -2822,7 +2822,7 @@ uniform int refMatrixType; // 0= identity, 1= translate, 2= transform\n\
 uniform bool bUseLogarithmicDepth;\n\
 \n\
 varying float flogz;\n\
-	varying float Fcoef_half;\n\
+varying float Fcoef_half;\n\
 \n\
 varying float depth;\n\
 varying vec3 vertexPos;\n\
@@ -3895,7 +3895,7 @@ ShaderSource.TinTerrainFS = "#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\
 \n\
-#extension GL_EXT_frag_depth : disable\n\
+#extension GL_EXT_frag_depth : enable\n\
   \n\
 uniform sampler2D shadowMapTex;// 0\n\
 uniform sampler2D shadowMapTex2;// 1\n\
@@ -3949,6 +3949,8 @@ uniform bool bApplyShadow;\n\
 uniform bool bApplySsao;\n\
 uniform float shadowMapWidth;    \n\
 uniform float shadowMapHeight;\n\
+uniform bool bUseLogarithmicDepth;\n\
+\n\
 varying vec3 v3Pos;\n\
 varying float vFogAmount;\n\
 \n\
@@ -3959,6 +3961,9 @@ varying vec3 vNormal;\n\
 varying vec3 vNormalWC;\n\
 varying float currSunIdx;\n\
 varying float vAltitude;\n\
+\n\
+varying float flogz;\n\
+varying float Fcoef_half;\n\
 \n\
 const float equatorialRadius = 6378137.0;\n\
 const float polarRadius = 6356752.3142;\n\
@@ -4176,7 +4181,12 @@ vec3 causticColor(vec2 texCoord)\n\
 }\n\
 \n\
 void main()\n\
-{           \n\
+{    \n\
+	if(bUseLogarithmicDepth)\n\
+		{\n\
+			gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
+		}\n\
+		       \n\
 	if(bIsMakingDepth)\n\
 	{\n\
 		gl_FragColor = packDepth(-depthValue);\n\
@@ -4606,6 +4616,7 @@ void main()\n\
 		//gl_FragColor = vec4(vNormal.xyz, 1.0); // test.***\n\
 		\n\
 		//if(currSunIdx > 0.0 && currSunIdx < 1.0 && shadow_occlusion<0.9)gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n\
+		\n\
 	}\n\
 }";
 ShaderSource.TinTerrainVS = "\n\
@@ -4659,6 +4670,8 @@ varying vec3 vLightDir; \n\
 varying vec3 vNormalWC;\n\
 varying float currSunIdx;\n\
 varying float vAltitude;\n\
+varying float flogz;\n\
+varying float Fcoef_half;\n\
 \n\
 void main()\n\
 {	\n\
@@ -4736,14 +4749,15 @@ void main()\n\
 		// z = log(C*z + 1) / log(C*Far + 1) * w\n\
 		// https://android.developreference.com/article/21119961/Logarithmic+Depth+Buffer+OpenGL\n\
 		// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
-		if(v3Pos.z < 0.0)\n\
+		//if(v3Pos.z < 0.0)\n\
 		{\n\
-			float z = gl_Position.z;\n\
-			float C = 0.001;\n\
-			float w = gl_Position.w;\n\
-			//gl_Position.z = (2.0*log(C*w + 1.0) / log(C*far + 1.0) - 1.0) * w; // https://outerra.blogspot.com/2009/08/logarithmic-z-buffer.html\n\
-			gl_Position.z = 2.0*log(z/near) / log(far/near)-1.0; // another way.\n\
-				gl_Position.z *= w;\n\
+			// logarithmic zBuffer:\n\
+			// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
+			float Fcoef = 2.0 / log2(far + 1.0);\n\
+			gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;\n\
+\n\
+			flogz = 1.0 + gl_Position.w;\n\
+			Fcoef_half = 0.5 * Fcoef;\n\
 		}\n\
 	}\n\
 \n\
