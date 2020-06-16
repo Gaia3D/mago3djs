@@ -1,6 +1,8 @@
 #ifdef GL_ES
 precision highp float;
 #endif
+#extension GL_EXT_frag_depth : enable
+
 uniform float near;
 uniform float far;
 
@@ -8,9 +10,12 @@ uniform float far;
 uniform bool bApplyClippingPlanes;
 uniform int clippingPlanesCount;
 uniform vec4 clippingPlanes[6];
+uniform bool bUseLogarithmicDepth;
 
 varying float depth;  
 varying vec3 vertexPos;
+varying float flogz;
+varying float Fcoef_half;
 
 vec4 packDepth(const in float depth)
 {
@@ -64,4 +69,8 @@ void main()
 	
     gl_FragData[0] = packDepth(-depth);
 	//gl_FragData[0] = PackDepth32(depth);
+	if(bUseLogarithmicDepth)
+	{
+		gl_FragDepthEXT = log2(flogz) * Fcoef_half;
+	}
 }

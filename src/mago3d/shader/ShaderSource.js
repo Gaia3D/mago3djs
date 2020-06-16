@@ -1323,9 +1323,11 @@ ShaderSource.InvertedBoxVS = "	attribute vec3 position;\n\
         gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 	}\n\
 ";
-ShaderSource.ModelRefSsaoFS = "#ifdef GL_ES\n\
+ShaderSource.ModelRefSsaoFS = "\n\
+#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\
+#extension GL_EXT_frag_depth : enable\n\
 \n\
 uniform sampler2D depthTex;\n\
 uniform sampler2D noiseTex;  \n\
@@ -1348,7 +1350,7 @@ uniform float shadowMapHeight; \n\
 uniform float shininessValue;\n\
 uniform vec3 kernel[16];   \n\
 uniform vec4 oneColor4;\n\
-varying vec4 aColor4; // color from attributes\n\
+\n\
 uniform bool bApplyScpecularLighting;\n\
 uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
 \n\
@@ -1365,6 +1367,7 @@ uniform bool bApplySsao;\n\
 uniform bool bApplyShadow;\n\
 uniform float externalAlpha;\n\
 uniform vec4 colorMultiplier;\n\
+uniform bool bUseLogarithmicDepth;\n\
 \n\
 //uniform int sunIdx;\n\
 \n\
@@ -1374,6 +1377,7 @@ uniform vec4 colorMultiplier;\n\
 //uniform vec4 clippingPlanes[6];\n\
 \n\
 varying vec3 vNormal;\n\
+varying vec4 vColor4; // color from attributes\n\
 varying vec2 vTexCoord;   \n\
 varying vec3 vLightWeighting;\n\
 varying vec3 diffuseColor;\n\
@@ -1384,6 +1388,9 @@ varying vec3 vLightDir; \n\
 varying vec3 vNormalWC;\n\
 varying float currSunIdx; \n\
 varying float discardFrag;\n\
+\n\
+varying float flogz;\n\
+varying float Fcoef_half;\n\
 \n\
 float unpackDepth(const in vec4 rgba_depth)\n\
 {\n\
@@ -1449,6 +1456,8 @@ bool clipVertexByPlane(in vec4 plane, in vec3 point)\n\
 \n\
 void main()\n\
 {\n\
+	//gl_FragColor = vColor4; \n\
+	//return;\n\
 	// 1rst, check if there are clipping planes.\n\
 	/*\n\
 	if(bApplyClippingPlanes)\n\
@@ -1623,7 +1632,7 @@ void main()\n\
     }\n\
 	else if(colorType == 1)\n\
 	{\n\
-        textureColor = aColor4;\n\
+        textureColor = vColor4;\n\
     }\n\
 	\n\
 	//textureColor = vec4(0.85, 0.85, 0.85, 1.0);\n\
@@ -1650,6 +1659,10 @@ void main()\n\
 \n\
 	//finalColor = vec4(linearDepth, linearDepth, linearDepth, 1.0); // test to render depth color coded.***\n\
     gl_FragColor = finalColor; \n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
+	}\n\
 \n\
 }";
 ShaderSource.ModelRefSsaoVS = "\n\
@@ -1700,12 +1713,14 @@ ShaderSource.ModelRefSsaoVS = "\n\
 	varying vec3 vLightWeighting;\n\
 	varying vec3 vertexPos;\n\
 	varying float applySpecLighting;\n\
-	varying vec4 aColor4; // color from attributes\n\
+	varying vec4 vColor4; // color from attributes\n\
 	varying vec4 vPosRelToLight; \n\
 	varying vec3 vLightDir; \n\
 	varying vec3 vNormalWC; \n\
 	varying float currSunIdx;  \n\
 	varying float discardFrag;\n\
+	varying float flogz;\n\
+	varying float Fcoef_half;\n\
 	\n\
 	bool clipVertexByPlane(in vec4 plane, in vec3 point)\n\
 	{\n\
@@ -1830,28 +1845,41 @@ ShaderSource.ModelRefSsaoVS = "\n\
 			applySpecLighting = -1.0;\n\
 \n\
         gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
-		vertexPos = (modelViewMatrixRelToEye * pos4).xyz;\n\
+		vec4 orthoPos = modelViewMatrixRelToEye * pos4;\n\
+		vertexPos = orthoPos.xyz;\n\
 		if(bUseLogarithmicDepth)\n\
 		{\n\
 			// logarithmic zBuffer:\n\
+			// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
+			float Fcoef = 2.0 / log2(far + 1.0);\n\
+			gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;\n\
+\n\
+			flogz = 1.0 + gl_Position.w;\n\
+			Fcoef_half = 0.5 * Fcoef;\n\
+\n\
 			// https://www.gamasutra.com/blogs/BranoKemen/20090812/85207/Logarithmic_Depth_Buffer.php\n\
 			// z = log(C*z + 1) / log(C*Far + 1) * w\n\
-\n\
-			if(vertexPos.z < 0.0)\n\
+			/*\n\
+			if(orthoPos.z < 0.0)\n\
 			{\n\
 				float z = gl_Position.z;\n\
 				float C = 0.001;\n\
 				float w = gl_Position.w;\n\
-				//gl_Position.z = log(C*z + 1.0) / log(C*far + 1.0) * w; // https://outerra.blogspot.com/2009/08/logarithmic-z-buffer.html\n\
-				gl_Position.z = log(z/near) / log(far/near)*w; // another way.\n\
+				//gl_Position.z = (2.0*log(C*w + 1.0) / log(C*far + 1.0) - 1.0) * w; // https://outerra.blogspot.com/2009/08/logarithmic-z-buffer.html\n\
+				gl_Position.z = 2.0*log(z/near) / log(far/near)-1.0; // another way.\n\
+				gl_Position.z *= w;\n\
 			}\n\
+			*/\n\
+			//https://www.shaderific.com/blog/2014/3/13/tutorial-how-to-update-a-shader-for-opengl-es-30\n\
 		}\n\
-\n\
-		\n\
-		//vertexPos = objPosHigh + objPosLow;\n\
 		\n\
 		if(colorType == 1)\n\
-			aColor4 = color4;\n\
+			vColor4 = color4;\n\
+\n\
+		//if(orthoPos.z < 0.0)\n\
+		//aColor4 = vec4(1.0, 0.0, 0.0, 1.0);\n\
+		//else\n\
+		//aColor4 = vec4(0.0, 1.0, 0.0, 1.0);\n\
 		gl_PointSize = 5.0;\n\
 	}";
 ShaderSource.OrthogonalDepthShaderFS = "#ifdef GL_ES\n\
@@ -2701,6 +2729,8 @@ void main() {\n\
 ShaderSource.RenderShowDepthFS = "#ifdef GL_ES\n\
 precision highp float;\n\
 #endif\n\
+#extension GL_EXT_frag_depth : enable\n\
+\n\
 uniform float near;\n\
 uniform float far;\n\
 \n\
@@ -2708,9 +2738,12 @@ uniform float far;\n\
 uniform bool bApplyClippingPlanes;\n\
 uniform int clippingPlanesCount;\n\
 uniform vec4 clippingPlanes[6];\n\
+uniform bool bUseLogarithmicDepth;\n\
 \n\
 varying float depth;  \n\
 varying vec3 vertexPos;\n\
+varying float flogz;\n\
+varying float Fcoef_half;\n\
 \n\
 vec4 packDepth(const in float depth)\n\
 {\n\
@@ -2764,6 +2797,10 @@ void main()\n\
 	\n\
     gl_FragData[0] = packDepth(-depth);\n\
 	//gl_FragData[0] = PackDepth32(depth);\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
+	}\n\
 }";
 ShaderSource.RenderShowDepthVS = "attribute vec3 position;\n\
 \n\
@@ -2783,6 +2820,9 @@ uniform vec3 aditionalPosition;\n\
 uniform vec3 refTranslationVec;\n\
 uniform int refMatrixType; // 0= identity, 1= translate, 2= transform\n\
 uniform bool bUseLogarithmicDepth;\n\
+\n\
+varying float flogz;\n\
+	varying float Fcoef_half;\n\
 \n\
 varying float depth;\n\
 varying vec3 vertexPos;\n\
@@ -2812,24 +2852,24 @@ void main()\n\
     vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
     \n\
     //linear depth in camera space (0..far)\n\
-	vec4 posCC = modelViewMatrixRelToEye * pos4;\n\
-    depth = posCC.z/far; // original.***\n\
-	//depth = posCC.z/(far-near); // test.***\n\
-	//float farForDepth = 30000.0;\n\
-	//depth = posCC.z/farForDepth; // test.***\n\
+	vec4 orthoPos = modelViewMatrixRelToEye * pos4;\n\
+    depth = orthoPos.z/far; // original.***\n\
+\n\
 \n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 \n\
-	if(bUseLogarithmicDepth && posCC.z < 0.0)\n\
+	if(bUseLogarithmicDepth)\n\
 	{\n\
-		float z = gl_Position.z;\n\
-		float C = 0.001;\n\
-		float w = gl_Position.w;\n\
-		//gl_Position.z = log(C*z + 1.0) / log(C*far + 1.0) * w; // https://outerra.blogspot.com/2009/08/logarithmic-z-buffer.html\n\
-		gl_Position.z = log(gl_Position.z/near) / log(far/near)*gl_Position.w; // another way.\n\
+		// logarithmic zBuffer:\n\
+		// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
+		float Fcoef = 2.0 / log2(far + 1.0);\n\
+		gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;\n\
+\n\
+		flogz = 1.0 + gl_Position.w;\n\
+		Fcoef_half = 0.5 * Fcoef;\n\
 	}\n\
 \n\
-	vertexPos = posCC.xyz;\n\
+	vertexPos = orthoPos.xyz;\n\
 }";
 ShaderSource.ScreenQuadFS = "#ifdef GL_ES\n\
     precision highp float;\n\
@@ -3516,9 +3556,12 @@ uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
 \n\
 uniform float near;\n\
 uniform float far;\n\
+uniform bool bUseLogarithmicDepth;\n\
 \n\
 varying vec4 vColor;\n\
 varying float depth;\n\
+varying float flogz;\n\
+varying float Fcoef_half;\n\
 \n\
 const float error = 0.001;\n\
 \n\
@@ -3610,6 +3653,16 @@ void main(){\n\
 	// Offset our position along the normal\n\
 	vec4 offset = vec4(normal * direction, 0.0, 1.0);\n\
 	gl_Position = currentProjected + offset; \n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		// logarithmic zBuffer:\n\
+			// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
+			float Fcoef = 2.0 / log2(far + 1.0);\n\
+			gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;\n\
+\n\
+			flogz = 1.0 + gl_Position.w;\n\
+			Fcoef_half = 0.5 * Fcoef;\n\
+	}\n\
 \n\
     depth = (modelViewMatrixRelToEye * current).z/far; // original.***\n\
 \n\
@@ -3635,11 +3688,19 @@ void main(){\n\
 \n\
 ";
 ShaderSource.thickLineFS = "precision highp float;\n\
+#extension GL_EXT_frag_depth : enable\n\
 \n\
+uniform bool bUseLogarithmicDepth;\n\
 varying vec4 vColor;\n\
+varying float flogz;\n\
+varying float Fcoef_half;\n\
 \n\
 void main() {\n\
 	gl_FragColor = vColor;\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
+	}\n\
 }";
 ShaderSource.thickLineVS = "\n\
 attribute vec4 prev;\n\
@@ -3665,6 +3726,8 @@ uniform float far;\n\
 uniform bool bUseLogarithmicDepth;\n\
 \n\
 varying vec4 vColor;\n\
+varying float flogz;\n\
+varying float Fcoef_half;\n\
 \n\
 const float error = 0.001;\n\
 \n\
@@ -3760,13 +3823,12 @@ void main(){\n\
 	if(bUseLogarithmicDepth)\n\
 	{\n\
 		// logarithmic zBuffer:\n\
-		// https://www.gamasutra.com/blogs/BranoKemen/20090812/85207/Logarithmic_Depth_Buffer.php\n\
-		// z = log(C*z + 1) / log(C*Far + 1) * w\n\
-		float z = gl_Position.z;\n\
-		//float C = 1.0;\n\
-		float w = gl_Position.w;\n\
-		////gl_Position.z = log(C*z + 1.0) / log(C*far + 1.0) * w;\n\
-		gl_Position.z = log(z/near) / log(far/near)*w; // another way.\n\
+			// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
+			float Fcoef = 2.0 / log2(far + 1.0);\n\
+			gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;\n\
+\n\
+			flogz = 1.0 + gl_Position.w;\n\
+			Fcoef_half = 0.5 * Fcoef;\n\
 	}\n\
 	\n\
 	if(colorType == 0)\n\
@@ -3832,6 +3894,8 @@ void main()\n\
 ShaderSource.TinTerrainFS = "#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\
+\n\
+#extension GL_EXT_frag_depth : disable\n\
   \n\
 uniform sampler2D shadowMapTex;// 0\n\
 uniform sampler2D shadowMapTex2;// 1\n\
@@ -4677,8 +4741,9 @@ void main()\n\
 			float z = gl_Position.z;\n\
 			float C = 0.001;\n\
 			float w = gl_Position.w;\n\
-			//gl_Position.z = log(C*z + 1.0) / log(C*far + 1.0) * w; // https://outerra.blogspot.com/2009/08/logarithmic-z-buffer.html\n\
-			gl_Position.z = log(z/near) / log(far/near)*w; // another way.\n\
+			//gl_Position.z = (2.0*log(C*w + 1.0) / log(C*far + 1.0) - 1.0) * w; // https://outerra.blogspot.com/2009/08/logarithmic-z-buffer.html\n\
+			gl_Position.z = 2.0*log(z/near) / log(far/near)-1.0; // another way.\n\
+				gl_Position.z *= w;\n\
 		}\n\
 	}\n\
 \n\

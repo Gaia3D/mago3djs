@@ -20,9 +20,12 @@ uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.
 
 uniform float near;
 uniform float far;
+uniform bool bUseLogarithmicDepth;
 
 varying vec4 vColor;
 varying float depth;
+varying float flogz;
+varying float Fcoef_half;
 
 const float error = 0.001;
 
@@ -114,6 +117,16 @@ void main(){
 	// Offset our position along the normal
 	vec4 offset = vec4(normal * direction, 0.0, 1.0);
 	gl_Position = currentProjected + offset; 
+	if(bUseLogarithmicDepth)
+	{
+		// logarithmic zBuffer:
+			// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html
+			float Fcoef = 2.0 / log2(far + 1.0);
+			gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;
+
+			flogz = 1.0 + gl_Position.w;
+			Fcoef_half = 0.5 * Fcoef;
+	}
 
     depth = (modelViewMatrixRelToEye * current).z/far; // original.***
 

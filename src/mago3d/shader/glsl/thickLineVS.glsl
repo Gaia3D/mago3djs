@@ -22,6 +22,8 @@ uniform float far;
 uniform bool bUseLogarithmicDepth;
 
 varying vec4 vColor;
+varying float flogz;
+varying float Fcoef_half;
 
 const float error = 0.001;
 
@@ -117,13 +119,12 @@ void main(){
 	if(bUseLogarithmicDepth)
 	{
 		// logarithmic zBuffer:
-		// https://www.gamasutra.com/blogs/BranoKemen/20090812/85207/Logarithmic_Depth_Buffer.php
-		// z = log(C*z + 1) / log(C*Far + 1) * w
-		float z = gl_Position.z;
-		//float C = 1.0;
-		float w = gl_Position.w;
-		////gl_Position.z = log(C*z + 1.0) / log(C*far + 1.0) * w;
-		gl_Position.z = log(z/near) / log(far/near)*w; // another way.
+			// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html
+			float Fcoef = 2.0 / log2(far + 1.0);
+			gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;
+
+			flogz = 1.0 + gl_Position.w;
+			Fcoef_half = 0.5 * Fcoef;
 	}
 	
 	if(colorType == 0)

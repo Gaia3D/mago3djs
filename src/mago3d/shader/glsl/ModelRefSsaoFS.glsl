@@ -1,6 +1,8 @@
+
 #ifdef GL_ES
     precision highp float;
 #endif
+#extension GL_EXT_frag_depth : enable
 
 uniform sampler2D depthTex;
 uniform sampler2D noiseTex;  
@@ -23,7 +25,7 @@ uniform float shadowMapHeight;
 uniform float shininessValue;
 uniform vec3 kernel[16];   
 uniform vec4 oneColor4;
-varying vec4 aColor4; // color from attributes
+
 uniform bool bApplyScpecularLighting;
 uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.
 
@@ -40,6 +42,7 @@ uniform bool bApplySsao;
 uniform bool bApplyShadow;
 uniform float externalAlpha;
 uniform vec4 colorMultiplier;
+uniform bool bUseLogarithmicDepth;
 
 //uniform int sunIdx;
 
@@ -49,6 +52,7 @@ uniform vec4 colorMultiplier;
 //uniform vec4 clippingPlanes[6];
 
 varying vec3 vNormal;
+varying vec4 vColor4; // color from attributes
 varying vec2 vTexCoord;   
 varying vec3 vLightWeighting;
 varying vec3 diffuseColor;
@@ -59,6 +63,9 @@ varying vec3 vLightDir;
 varying vec3 vNormalWC;
 varying float currSunIdx; 
 varying float discardFrag;
+
+varying float flogz;
+varying float Fcoef_half;
 
 float unpackDepth(const in vec4 rgba_depth)
 {
@@ -124,6 +131,8 @@ bool clipVertexByPlane(in vec4 plane, in vec3 point)
 
 void main()
 {
+	//gl_FragColor = vColor4; 
+	//return;
 	// 1rst, check if there are clipping planes.
 	/*
 	if(bApplyClippingPlanes)
@@ -298,7 +307,7 @@ void main()
     }
 	else if(colorType == 1)
 	{
-        textureColor = aColor4;
+        textureColor = vColor4;
     }
 	
 	//textureColor = vec4(0.85, 0.85, 0.85, 1.0);
@@ -325,5 +334,9 @@ void main()
 
 	//finalColor = vec4(linearDepth, linearDepth, linearDepth, 1.0); // test to render depth color coded.***
     gl_FragColor = finalColor; 
+	if(bUseLogarithmicDepth)
+	{
+		gl_FragDepthEXT = log2(flogz) * Fcoef_half;
+	}
 
 }

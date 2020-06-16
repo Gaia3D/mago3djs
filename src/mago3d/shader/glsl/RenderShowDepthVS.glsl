@@ -17,6 +17,9 @@ uniform vec3 refTranslationVec;
 uniform int refMatrixType; // 0= identity, 1= translate, 2= transform
 uniform bool bUseLogarithmicDepth;
 
+varying float flogz;
+	varying float Fcoef_half;
+
 varying float depth;
 varying vec3 vertexPos;
   
@@ -45,22 +48,22 @@ void main()
     vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);
     
     //linear depth in camera space (0..far)
-	vec4 posCC = modelViewMatrixRelToEye * pos4;
-    depth = posCC.z/far; // original.***
-	//depth = posCC.z/(far-near); // test.***
-	//float farForDepth = 30000.0;
-	//depth = posCC.z/farForDepth; // test.***
+	vec4 orthoPos = modelViewMatrixRelToEye * pos4;
+    depth = orthoPos.z/far; // original.***
+
 
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;
 
-	if(bUseLogarithmicDepth && posCC.z < 0.0)
+	if(bUseLogarithmicDepth)
 	{
-		float z = gl_Position.z;
-		float C = 0.001;
-		float w = gl_Position.w;
-		//gl_Position.z = log(C*z + 1.0) / log(C*far + 1.0) * w; // https://outerra.blogspot.com/2009/08/logarithmic-z-buffer.html
-		gl_Position.z = log(gl_Position.z/near) / log(far/near)*gl_Position.w; // another way.
+		// logarithmic zBuffer:
+		// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html
+		float Fcoef = 2.0 / log2(far + 1.0);
+		gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;
+
+		flogz = 1.0 + gl_Position.w;
+		Fcoef_half = 0.5 * Fcoef;
 	}
 
-	vertexPos = posCC.xyz;
+	vertexPos = orthoPos.xyz;
 }

@@ -773,6 +773,8 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		// Large far modelViewProjectionRelToEyeSky.***
 		var modelViewProjRelToEyeMatrixSky = sceneState.modelViewProjRelToEyeMatrixSky;
 		modelViewProjRelToEyeMatrixSky._floatArrays = glMatrix.mat4.multiply(modelViewProjRelToEyeMatrixSky._floatArrays, projectionMatrixSky._floatArrays, modelViewRelToEyeMatrix._floatArrays);
+
+		
 	}
 	
 	
@@ -4732,6 +4734,16 @@ MagoManager.prototype.setRenderCondition = function(projectId, dataKey, conditio
  */
 MagoManager.prototype.createDefaultShaders = function(gl) 
 {
+	if (this.EXTENSIONS_init === undefined)
+	{
+		var supportEXT = gl.getSupportedExtensions().indexOf("EXT_frag_depth");
+		if (supportEXT)
+		{
+			gl.getExtension("EXT_frag_depth");
+		}
+		this.EXTENSIONS_init = true;
+	}
+
 	// here creates the necessary shaders for mago3d.***
 	// 1) ModelReferences ssaoShader.******************************************************************************
 	var shaderName = "modelRefSsao";

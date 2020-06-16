@@ -46,12 +46,14 @@
 	varying vec3 vLightWeighting;
 	varying vec3 vertexPos;
 	varying float applySpecLighting;
-	varying vec4 aColor4; // color from attributes
+	varying vec4 vColor4; // color from attributes
 	varying vec4 vPosRelToLight; 
 	varying vec3 vLightDir; 
 	varying vec3 vNormalWC; 
 	varying float currSunIdx;  
 	varying float discardFrag;
+	varying float flogz;
+	varying float Fcoef_half;
 	
 	bool clipVertexByPlane(in vec4 plane, in vec3 point)
 	{
@@ -176,27 +178,40 @@
 			applySpecLighting = -1.0;
 
         gl_Position = ModelViewProjectionMatrixRelToEye * pos4;
-		vertexPos = (modelViewMatrixRelToEye * pos4).xyz;
+		vec4 orthoPos = modelViewMatrixRelToEye * pos4;
+		vertexPos = orthoPos.xyz;
 		if(bUseLogarithmicDepth)
 		{
 			// logarithmic zBuffer:
+			// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html
+			float Fcoef = 2.0 / log2(far + 1.0);
+			gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;
+
+			flogz = 1.0 + gl_Position.w;
+			Fcoef_half = 0.5 * Fcoef;
+
 			// https://www.gamasutra.com/blogs/BranoKemen/20090812/85207/Logarithmic_Depth_Buffer.php
 			// z = log(C*z + 1) / log(C*Far + 1) * w
-
-			if(vertexPos.z < 0.0)
+			/*
+			if(orthoPos.z < 0.0)
 			{
 				float z = gl_Position.z;
 				float C = 0.001;
 				float w = gl_Position.w;
-				//gl_Position.z = log(C*z + 1.0) / log(C*far + 1.0) * w; // https://outerra.blogspot.com/2009/08/logarithmic-z-buffer.html
-				gl_Position.z = log(z/near) / log(far/near)*w; // another way.
+				//gl_Position.z = (2.0*log(C*w + 1.0) / log(C*far + 1.0) - 1.0) * w; // https://outerra.blogspot.com/2009/08/logarithmic-z-buffer.html
+				gl_Position.z = 2.0*log(z/near) / log(far/near)-1.0; // another way.
+				gl_Position.z *= w;
 			}
+			*/
+			//https://www.shaderific.com/blog/2014/3/13/tutorial-how-to-update-a-shader-for-opengl-es-30
 		}
-
-		
-		//vertexPos = objPosHigh + objPosLow;
 		
 		if(colorType == 1)
-			aColor4 = color4;
+			vColor4 = color4;
+
+		//if(orthoPos.z < 0.0)
+		//aColor4 = vec4(1.0, 0.0, 0.0, 1.0);
+		//else
+		//aColor4 = vec4(0.0, 1.0, 0.0, 1.0);
 		gl_PointSize = 5.0;
 	}

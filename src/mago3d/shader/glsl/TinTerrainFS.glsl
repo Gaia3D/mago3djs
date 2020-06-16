@@ -1,6 +1,8 @@
 #ifdef GL_ES
     precision highp float;
 #endif
+
+#extension GL_EXT_frag_depth : disable
   
 uniform sampler2D shadowMapTex;// 0
 uniform sampler2D shadowMapTex2;// 1
