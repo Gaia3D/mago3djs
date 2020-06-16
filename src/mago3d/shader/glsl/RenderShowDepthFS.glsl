@@ -1,7 +1,11 @@
 #ifdef GL_ES
 precision highp float;
 #endif
+
+#define %USE_LOGARITHMIC_DEPTH%
+#ifdef USE_LOGARITHMIC_DEPTH
 #extension GL_EXT_frag_depth : enable
+#endif
 
 uniform float near;
 uniform float far;
@@ -69,8 +73,10 @@ void main()
 	
     gl_FragData[0] = packDepth(-depth);
 	//gl_FragData[0] = PackDepth32(depth);
+	#ifdef USE_LOGARITHMIC_DEPTH
 	if(bUseLogarithmicDepth)
 	{
 		gl_FragDepthEXT = log2(flogz) * Fcoef_half;
 	}
+	#endif
 }

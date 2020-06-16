@@ -2,7 +2,11 @@
 #ifdef GL_ES
     precision highp float;
 #endif
+
+#define %USE_LOGARITHMIC_DEPTH%
+#ifdef USE_LOGARITHMIC_DEPTH
 #extension GL_EXT_frag_depth : enable
+#endif
 
 uniform sampler2D depthTex;
 uniform sampler2D noiseTex;  
@@ -334,9 +338,10 @@ void main()
 
 	//finalColor = vec4(linearDepth, linearDepth, linearDepth, 1.0); // test to render depth color coded.***
     gl_FragColor = finalColor; 
+	#ifdef USE_LOGARITHMIC_DEPTH
 	if(bUseLogarithmicDepth)
 	{
 		gl_FragDepthEXT = log2(flogz) * Fcoef_half;
 	}
-
+	#endif
 }

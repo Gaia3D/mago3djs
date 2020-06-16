@@ -1327,7 +1327,11 @@ ShaderSource.ModelRefSsaoFS = "\n\
 #ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
 #extension GL_EXT_frag_depth : enable\n\
+#endif\n\
 \n\
 uniform sampler2D depthTex;\n\
 uniform sampler2D noiseTex;  \n\
@@ -1659,11 +1663,12 @@ void main()\n\
 \n\
 	//finalColor = vec4(linearDepth, linearDepth, linearDepth, 1.0); // test to render depth color coded.***\n\
     gl_FragColor = finalColor; \n\
+	#ifdef USE_LOGARITHMIC_DEPTH\n\
 	if(bUseLogarithmicDepth)\n\
 	{\n\
 		gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
 	}\n\
-\n\
+	#endif\n\
 }";
 ShaderSource.ModelRefSsaoVS = "\n\
 	attribute vec3 position;\n\
@@ -2729,7 +2734,11 @@ void main() {\n\
 ShaderSource.RenderShowDepthFS = "#ifdef GL_ES\n\
 precision highp float;\n\
 #endif\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
 #extension GL_EXT_frag_depth : enable\n\
+#endif\n\
 \n\
 uniform float near;\n\
 uniform float far;\n\
@@ -2797,10 +2806,12 @@ void main()\n\
 	\n\
     gl_FragData[0] = packDepth(-depth);\n\
 	//gl_FragData[0] = PackDepth32(depth);\n\
+	#ifdef USE_LOGARITHMIC_DEPTH\n\
 	if(bUseLogarithmicDepth)\n\
 	{\n\
 		gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
 	}\n\
+	#endif\n\
 }";
 ShaderSource.RenderShowDepthVS = "attribute vec3 position;\n\
 \n\
@@ -3688,7 +3699,11 @@ void main(){\n\
 \n\
 ";
 ShaderSource.thickLineFS = "precision highp float;\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
 #extension GL_EXT_frag_depth : enable\n\
+#endif\n\
 \n\
 uniform bool bUseLogarithmicDepth;\n\
 varying vec4 vColor;\n\
@@ -3697,10 +3712,12 @@ varying float Fcoef_half;\n\
 \n\
 void main() {\n\
 	gl_FragColor = vColor;\n\
+	#ifdef USE_LOGARITHMIC_DEPTH\n\
 	if(bUseLogarithmicDepth)\n\
 	{\n\
 		gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
 	}\n\
+	#endif\n\
 }";
 ShaderSource.thickLineVS = "\n\
 attribute vec4 prev;\n\
@@ -3895,7 +3912,10 @@ ShaderSource.TinTerrainFS = "#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\
 \n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
 #extension GL_EXT_frag_depth : enable\n\
+#endif\n\
   \n\
 uniform sampler2D shadowMapTex;// 0\n\
 uniform sampler2D shadowMapTex2;// 1\n\
@@ -4182,11 +4202,13 @@ vec3 causticColor(vec2 texCoord)\n\
 \n\
 void main()\n\
 {    \n\
+	#ifdef USE_LOGARITHMIC_DEPTH\n\
 	if(bUseLogarithmicDepth)\n\
-		{\n\
-			gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
-		}\n\
-		       \n\
+	{\n\
+		gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
+	}\n\
+	#endif\n\
+\n\
 	if(bIsMakingDepth)\n\
 	{\n\
 		gl_FragColor = packDepth(-depthValue);\n\
@@ -4748,7 +4770,6 @@ void main()\n\
 		// https://www.gamasutra.com/blogs/BranoKemen/20090812/85207/Logarithmic_Depth_Buffer.php\n\
 		// z = log(C*z + 1) / log(C*Far + 1) * w\n\
 		// https://android.developreference.com/article/21119961/Logarithmic+Depth+Buffer+OpenGL\n\
-		// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
 		//if(v3Pos.z < 0.0)\n\
 		{\n\
 			// logarithmic zBuffer:\n\

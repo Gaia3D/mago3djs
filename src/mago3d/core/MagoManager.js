@@ -4734,7 +4734,8 @@ MagoManager.prototype.setRenderCondition = function(projectId, dataKey, conditio
  */
 MagoManager.prototype.createDefaultShaders = function(gl) 
 {
-	if (this.EXTENSIONS_init === undefined)
+	var use_linearOrLogarithmicDepth = "USE_LINEAR_DEPTH";
+	if (!this.isCesiumGlobe())
 	{
 		var supportEXT = gl.getSupportedExtensions().indexOf("EXT_frag_depth");
 		if (supportEXT)
@@ -4742,6 +4743,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 			gl.getExtension("EXT_frag_depth");
 		}
 		this.EXTENSIONS_init = true;
+		use_linearOrLogarithmicDepth = "USE_LOGARITHMIC_DEPTH";
 	}
 
 	// here creates the necessary shaders for mago3d.***
@@ -4749,6 +4751,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	var shaderName = "modelRefSsao";
 	var ssao_vs_source = ShaderSource.ModelRefSsaoVS;
 	var ssao_fs_source = ShaderSource.ModelRefSsaoFS;
+	ssao_fs_source = ssao_fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
 	var shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
 	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
 
@@ -4756,6 +4759,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	var shaderName = "modelRefDepth";
 	var showDepth_vs_source = ShaderSource.RenderShowDepthVS;
 	var showDepth_fs_source = ShaderSource.RenderShowDepthFS;
+	showDepth_fs_source = showDepth_fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
 	shader = this.postFxShadersManager.createShaderProgram(gl, showDepth_vs_source, showDepth_fs_source, shaderName, this);
 	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
 
@@ -4769,6 +4773,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shaderName = "tinTerrain";
 	ssao_vs_source = ShaderSource.TinTerrainVS;
 	ssao_fs_source = ShaderSource.TinTerrainFS;
+	ssao_fs_source = ssao_fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
 	shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
 
 	shader.bIsMakingDepth_loc = gl.getUniformLocation(shader.program, "bIsMakingDepth");
@@ -4976,6 +4981,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	var shaderName = "thickLine";
 	var ssao_vs_source = ShaderSource.thickLineVS;
 	var ssao_fs_source = ShaderSource.thickLineFS;
+	ssao_fs_source = ssao_fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
 	shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
 	// ThickLine shader locations.***
 	shader.projectionMatrix_loc = gl.getUniformLocation(shader.program, "projectionMatrix");

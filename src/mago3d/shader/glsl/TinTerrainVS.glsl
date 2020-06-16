@@ -127,7 +127,6 @@ void main()
 		// https://www.gamasutra.com/blogs/BranoKemen/20090812/85207/Logarithmic_Depth_Buffer.php
 		// z = log(C*z + 1) / log(C*Far + 1) * w
 		// https://android.developreference.com/article/21119961/Logarithmic+Depth+Buffer+OpenGL
-		// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html
 		//if(v3Pos.z < 0.0)
 		{
 			// logarithmic zBuffer:
