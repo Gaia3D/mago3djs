@@ -6249,7 +6249,15 @@ MagoManager.prototype.isExistStaticModel = function(projectId)
  */
 MagoManager.prototype.addLayer = function(layer) 
 {
-	this.tinTerrainManager.addImageryLayer(layer);
+	if(!layer)
+	{
+		throw new Error('layer is empty'); 
+	}
+
+	if(layer instanceof TextureLayer)
+	{
+		this.tinTerrainManager.addImageryLayer(layer);
+	}
 };
 
 /**
