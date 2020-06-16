@@ -104,11 +104,23 @@ Modeler.prototype.addObject = function(object, depth)
 	if (this.objectsArray === undefined)
 	{ this.objectsArray = []; }
 
+	// Check object's style.
+	if (object instanceof MagoRectangle)
+	{
+		var style = object.style;
+		if (style && style.clampToTerrain)
+		{
+			// put this object into tinTerrainManager.
+			this.magoManager.tinTerrainManager.addObjectToClampToTerrain(object);
+			return;
+		}
+	}
+
 	this.objectsArray.push(object);
 	
 	var smartTileManager = this.magoManager.smartTileManager;
 	// Note: the targetDepth must be calculated by the objects bbox size.
-	var targetDepth = depth ? depth : 16;
+	var targetDepth = depth ? depth : 12;
 	smartTileManager.putObject(targetDepth, object, this.magoManager);
 };
 

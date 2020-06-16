@@ -446,6 +446,36 @@ TinTerrain.prototype.isPrepared = function()
 	return true;
 };
 
+TinTerrain.prototype.getTexCoordsOfGeoExtent = function(geoExtent)
+{
+	// Calculate the texCoords of geoExtent relative to this tile.
+	var minGeoCoord = geoExtent.geographicExtent.minGeographicCoord;
+	var maxGeoCoord = geoExtent.geographicExtent.maxGeographicCoord;
+	
+	var minLon = minGeoCoord.longitude;
+	var minLat = minGeoCoord.latitude;
+	var maxLon = maxGeoCoord.longitude;
+	var maxLat = maxGeoCoord.latitude;
+
+	// This tile geoExtent.
+	var thisMinGeoCoord = this.geographicExtent.minGeographicCoord;
+	var thisMaxGeoCoord = this.geographicExtent.maxGeographicCoord;
+	
+	var thisMinLon = thisMinGeoCoord.longitude;
+	var thisMinLat = thisMinGeoCoord.latitude;
+	var thisMaxLon = thisMaxGeoCoord.longitude;
+	var thisMaxLat = thisMaxGeoCoord.latitude;
+	var thisLonRange = thisMaxLon - thisMinLon;
+	var thisLatRange = thisMaxLat - thisMinLat;
+
+	var minS = (minLon - thisMinLon)/thisLonRange;
+	var maxS = (maxLon - thisMinLon)/thisLonRange;
+	var minT = (minLat - thisMinLat)/thisLatRange;
+	var maxT = (maxLat - thisMinLat)/thisLatRange;
+	
+
+};
+
 TinTerrain.prototype.mergeTexturesToTextureMaster = function(gl, shader, texturesArray)
 {
 	// Private function.
@@ -456,6 +486,20 @@ TinTerrain.prototype.mergeTexturesToTextureMaster = function(gl, shader, texture
 
 	var activeTexturesLayers = new Int32Array([0, 0, 0, 0, 0, 0, 0, 0]); 
 	var externalAlphaLayers = new Float32Array([1, 1, 1, 1, 1, 1, 1, 1]); 
+
+	// externalTexCoordsArray = (minS, minT, maxS, maxT, 
+	// minS, minT, maxS, maxT, 
+	// minS, minT, maxS, maxT, ...)
+	var externalTexCoordsArray = new Float32Array([0, 0, 1, 1, 
+		0, 0, 1, 1, 
+		0, 0, 1, 1, 
+		0, 0, 1, 1, 
+		0, 0, 1, 1, 
+		0, 0, 1, 1, 
+		0, 0, 1, 1,
+		0, 0, 1, 1]); 
+
+	//shader.uExternalTexCoordsArray_loc
 
 	for (var i=0; i<texturesCount; i++)
 	{
@@ -469,6 +513,7 @@ TinTerrain.prototype.mergeTexturesToTextureMaster = function(gl, shader, texture
 
 	gl.uniform1iv(shader.uActiveTextures_loc, activeTexturesLayers);
 	gl.uniform1fv(shader.externalAlphasArray_loc, externalAlphaLayers);
+	//shader.uExternalTexCoordsArray_loc
 	gl.drawArrays(gl.TRIANGLES, 0, 6);
 };
 
@@ -560,6 +605,20 @@ TinTerrain.prototype.makeTextureMaster = function()
 	if (texturesToMergeArray.length > 0)
 	{ texturesToMergeMatrix.push(texturesToMergeArray); }
 
+	// Now, check if exist objects to clamp to terrain.
+	var objectsToClampToTerrain = this.tinTerrainManager.objectsToClampToTerrainArray;
+	if (objectsToClampToTerrain && objectsToClampToTerrain.length > 0)
+	{
+		// check if objects intersects with this tile.
+		var objToClampCount = objectsToClampToTerrain.length;
+		for (var i=0; i<objToClampCount; i++)
+		{
+			var objToClamp = objectsToClampToTerrain[i];
+			//var geoExtent = 
+			var hola = 0;
+		} 
+	}
+
 	gl.enable(gl.BLEND);
 	var texturesArraysCount = texturesToMergeMatrix.length;
 	for (var i=0; i<texturesArraysCount; i++)
@@ -582,6 +641,7 @@ TinTerrain.prototype.bindTexture = function(gl, shader)
 {
 	// Binding textureMaster.
 	var activeTexturesLayers = new Int32Array([1, 1, 0, 0, 1, 0, 0, 0]); // note: the 1rst & 2nd are shadowMap textures.
+	var externalAlphaLayers = new Float32Array([1, 1, 1, 1, 1, 1, 1, 1]); 
 
 	if (this.textureMaster)// && this.textureMasterPrepared === true)
 	{
@@ -622,15 +682,14 @@ TinTerrain.prototype.bindTexture = function(gl, shader)
 		}	
 
 		gl.uniform1iv(shader.uActiveTextures_loc, activeTexturesLayers);
+		gl.uniform1fv(shader.externalAlphasArray_loc, externalAlphaLayers);
 		//////////////////////////////////
 
 		return;
 	}
-	
 
-	
 	// If no exist textureMaster, then provisionally render textures individually.
-	var externalAlphaLayers = new Float32Array([1, 1, 1, 1, 1, 1, 1, 1]); 
+	
 	var textureKeys = Object.keys(this.texture);
 	var textureLength = textureKeys.length; 
 	for (var i=0;i<textureLength;i++) 
@@ -680,14 +739,14 @@ TinTerrain.prototype.prepareTexture = function(texturesMap, imagerys, magoManage
 	var X = this.X.toString();
 	var Y = this.Y.toString();
 
-	//var imagerys = tinTerrainManager.imagerys;
-
 	for (var i = 0, len = imagerys.length; i < len; i++) 
 	{
 		var imagery = imagerys[i];
 		if (!imagery.show || imagery.maxZoom < parseInt(L) || imagery.minZoom > parseInt(L)) { continue; }
 		var id = imagery._id;
 		if (this.texture[id]) { continue; }
+
+		// In the new version check if exist blob : todo.***
 		
 		var texture = new Texture();
 		var textureUrl = imagery.getUrl({x: X, y: Y, z: L});

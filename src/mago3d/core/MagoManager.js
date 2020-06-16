@@ -5044,6 +5044,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.position2_loc = gl.getAttribLocation(shader.program, "a_pos");
 	shader.uActiveTextures_loc = gl.getUniformLocation(shader.program, "uActiveTextures");
 	shader.externalAlphasArray_loc = gl.getUniformLocation(shader.program, "externalAlphasArray");
+	shader.uExternalTexCoordsArray_loc = gl.getUniformLocation(shader.program, "uExternalTexCoordsArray");
 	shader.tex_0_loc = gl.getUniformLocation(shader.program, "texture_0");
 	shader.tex_1_loc = gl.getUniformLocation(shader.program, "texture_1");
 	shader.tex_2_loc = gl.getUniformLocation(shader.program, "texture_2");
@@ -6249,12 +6250,12 @@ MagoManager.prototype.isExistStaticModel = function(projectId)
  */
 MagoManager.prototype.addLayer = function(layer) 
 {
-	if(!layer)
+	if (!layer)
 	{
 		throw new Error('layer is empty'); 
 	}
 
-	if(layer instanceof TextureLayer)
+	if (layer instanceof TextureLayer)
 	{
 		this.tinTerrainManager.addImageryLayer(layer);
 	}

@@ -1062,11 +1062,12 @@ MagoWorld.prototype.doTest__MagoRectangle = function()
 	};
 
 	var style = {
-		strokeWidth : 2,
-		strokeColor : '#FF0000',
-		fillColor   : '#00FF00',
-		//imageUrl    : '/images/materialImages//factoryRoof.jpg',
-		opacity     : 0.7,
+		strokeWidth    : 2,
+		strokeColor    : '#FF0000',
+		fillColor      : '#00FF00',
+		imageUrl       : '/images/materialImages/factoryRoof.jpg',
+		opacity        : 0.7,
+		clampToTerrain : true
 	};
 
 	var magoRect = new MagoRectangle(position, style);
@@ -1231,7 +1232,7 @@ MagoWorld.prototype.keydown = function(event)
 		//this.doTest__TerrainScanner();
 		this.doTest__MagoRectangle();
 		//this.doTest__MagoPoint();
-		this.doTest__MagoPolyline();
+		//this.doTest__MagoPolyline();
 		//this.doTest__GoTo();
 		//this.doTest__CameraOrientation();
 	}

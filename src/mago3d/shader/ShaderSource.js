@@ -3343,10 +3343,52 @@ uniform sampler2D texture_7;\n\
 \n\
 uniform float externalAlphasArray[8];\n\
 uniform int uActiveTextures[8];\n\
+uniform vec4 uExternalTexCoordsArray[8]; // vec4 (minS, minT, maxS, maxT).\n\
 \n\
 varying vec2 v_tex_pos;\n\
 \n\
 //vec4 mixColor(sampler2D tex)\n\
+bool intersects(vec2 texCoord, vec4 extension)\n\
+{\n\
+    bool bIntersects = true;\n\
+    float minS = extension.x;\n\
+    float minT = extension.y;\n\
+    float maxS = extension.z;\n\
+    float maxT = extension.w;\n\
+\n\
+    if(texCoord.x < minS || texCoord.x > maxS)\n\
+    return false;\n\
+    else if(texCoord.y < minT || texCoord.y > maxT)\n\
+    return false;\n\
+\n\
+    return bIntersects;\n\
+}\n\
+\n\
+void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord,  inout bool victory, in float externalAlpha, inout vec4 resultTextureColor)\n\
+{\n\
+    if(activeNumber == 1)\n\
+    {\n\
+        if(currColor4.w > 0.0 && externalAlpha > 0.0)\n\
+        {\n\
+            if(victory)\n\
+            {\n\
+                resultTextureColor = mix(resultTextureColor, currColor4, currColor4.w*externalAlpha);\n\
+            }\n\
+            else{\n\
+                currColor4.w *= externalAlpha;\n\
+                resultTextureColor = currColor4;\n\
+            }\n\
+            \n\
+            victory = true;\n\
+        }\n\
+    }\n\
+    else if(activeNumber == 2)\n\
+    {\n\
+        // custom image.\n\
+        // Check uExternalTexCoordsArray.\n\
+        \n\
+    }\n\
+}\n\
 \n\
 void main()\n\
 {           \n\
@@ -3354,153 +3396,25 @@ void main()\n\
 \n\
     // Take the base color.\n\
     vec4 textureColor = vec4(0.0, 0.0, 0.0, 0.0);\n\
-    vec4 currColor4 = vec4(0.0, 0.0, 0.0, 0.0);\n\
-    float externalAlpha;\n\
     bool victory = false;\n\
-    if(uActiveTextures[0] == 1)\n\
-    {\n\
-        currColor4 = texture2D(texture_0, texCoord);\n\
-        externalAlpha = externalAlphasArray[0];\n\
-        if(currColor4.w > 0.0 && externalAlpha > 0.0)\n\
-        {\n\
-            if(victory)\n\
-            {\n\
-                textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);\n\
-            }\n\
-            else{\n\
-                currColor4.w *= externalAlpha;\n\
-                textureColor = currColor4;\n\
-            }\n\
-            \n\
-            victory = true;\n\
-        }\n\
-    }\n\
+\n\
+    if(uActiveTextures[0] > 0)\n\
+        getTextureColor(uActiveTextures[0], texture2D(texture_0, texCoord), texCoord,  victory, externalAlphasArray[0], textureColor);\n\
+    if(uActiveTextures[1] > 0)\n\
+        getTextureColor(uActiveTextures[1], texture2D(texture_1, texCoord), texCoord,  victory, externalAlphasArray[1], textureColor);\n\
+    if(uActiveTextures[2] > 0)\n\
+        getTextureColor(uActiveTextures[2], texture2D(texture_2, texCoord), texCoord,  victory, externalAlphasArray[2], textureColor);\n\
+    if(uActiveTextures[3] > 0)\n\
+        getTextureColor(uActiveTextures[3], texture2D(texture_3, texCoord), texCoord,  victory, externalAlphasArray[3], textureColor);\n\
+    if(uActiveTextures[4] > 0)\n\
+        getTextureColor(uActiveTextures[4], texture2D(texture_4, texCoord), texCoord,  victory, externalAlphasArray[4], textureColor);\n\
+    if(uActiveTextures[5] > 0)\n\
+        getTextureColor(uActiveTextures[5], texture2D(texture_5, texCoord), texCoord,  victory, externalAlphasArray[5], textureColor);\n\
+    if(uActiveTextures[6] > 0)\n\
+        getTextureColor(uActiveTextures[6], texture2D(texture_6, texCoord), texCoord,  victory, externalAlphasArray[6], textureColor);\n\
+    if(uActiveTextures[7] > 0)\n\
+        getTextureColor(uActiveTextures[7], texture2D(texture_7, texCoord), texCoord,  victory, externalAlphasArray[7], textureColor);\n\
     \n\
-    if(uActiveTextures[1] == 1)\n\
-    {\n\
-        currColor4 = texture2D(texture_1, texCoord);\n\
-        externalAlpha = externalAlphasArray[1];\n\
-        if(currColor4.w > 0.0 && externalAlpha > 0.0)\n\
-        {\n\
-             if(victory)\n\
-            {\n\
-                textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);\n\
-            }\n\
-            else{\n\
-                currColor4.w *= externalAlpha;\n\
-                textureColor = currColor4;\n\
-            }\n\
-            victory = true;\n\
-        }\n\
-    }\n\
-    \n\
-    if(uActiveTextures[2] == 1)\n\
-    {\n\
-        currColor4 = texture2D(texture_2, texCoord);\n\
-        externalAlpha = externalAlphasArray[2];\n\
-        if(currColor4.w > 0.0 && externalAlpha > 0.0)\n\
-        {\n\
-             if(victory)\n\
-            {\n\
-                textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);\n\
-            }\n\
-            else{\n\
-                currColor4.w *= externalAlpha;\n\
-                textureColor = currColor4;\n\
-            }\n\
-            victory = true;\n\
-        }\n\
-    }\n\
-\n\
-    if(uActiveTextures[3] == 1)\n\
-    {\n\
-        currColor4 = texture2D(texture_3, texCoord);\n\
-        externalAlpha = externalAlphasArray[3];\n\
-        if(currColor4.w > 0.0 && externalAlpha > 0.0)\n\
-        {\n\
-             if(victory)\n\
-            {\n\
-                textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);\n\
-            }\n\
-            else{\n\
-                currColor4.w *= externalAlpha;\n\
-                textureColor = currColor4;\n\
-            }\n\
-            victory = true;\n\
-        }\n\
-    }\n\
-\n\
-    if(uActiveTextures[4] == 1)\n\
-    {\n\
-        currColor4 = texture2D(texture_4, texCoord);\n\
-        externalAlpha = externalAlphasArray[4];\n\
-        if(currColor4.w > 0.0 && externalAlpha > 0.0)\n\
-        {\n\
-             if(victory)\n\
-            {\n\
-                textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);\n\
-            }\n\
-            else{\n\
-                currColor4.w *= externalAlpha;\n\
-                textureColor = currColor4;\n\
-            }\n\
-            victory = true;\n\
-        }\n\
-    }\n\
-\n\
-    if(uActiveTextures[5] == 1)\n\
-    {\n\
-        currColor4 = texture2D(texture_5, texCoord);\n\
-        externalAlpha = externalAlphasArray[5];\n\
-        if(currColor4.w > 0.0 && externalAlpha > 0.0)\n\
-        {\n\
-             if(victory)\n\
-            {\n\
-                textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);\n\
-            }\n\
-            else{\n\
-                currColor4.w *= externalAlpha;\n\
-                textureColor = currColor4;\n\
-            }\n\
-            victory = true;\n\
-        }\n\
-    }\n\
-\n\
-    if(uActiveTextures[6] == 1)\n\
-    {\n\
-        currColor4 = texture2D(texture_6, texCoord);\n\
-        externalAlpha = externalAlphasArray[6];\n\
-        if(currColor4.w > 0.0 && externalAlpha > 0.0)\n\
-        {\n\
-             if(victory)\n\
-            {\n\
-                textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);\n\
-            }\n\
-            else{\n\
-                currColor4.w *= externalAlpha;\n\
-                textureColor = currColor4;\n\
-            }\n\
-            victory = true;\n\
-        }\n\
-    }\n\
-\n\
-    if(uActiveTextures[7] == 1)\n\
-    {\n\
-        currColor4 = texture2D(texture_7, texCoord);\n\
-        externalAlpha = externalAlphasArray[7];\n\
-        if(currColor4.w > 0.0 && externalAlpha > 0.0)\n\
-        {\n\
-             if(victory)\n\
-            {\n\
-                textureColor = mix(textureColor, currColor4, currColor4.w*externalAlpha);\n\
-            }\n\
-            else{\n\
-                currColor4.w *= externalAlpha;\n\
-                textureColor = currColor4;\n\
-            }\n\
-            victory = true;\n\
-        }\n\
-    }\n\
     if(!victory)\n\
     discard;\n\
     \n\
@@ -4200,6 +4114,32 @@ vec3 causticColor(vec2 texCoord)\n\
 	return colour;\n\
 }\n\
 \n\
+void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord,  inout bool victory, in float externalAlpha, inout vec4 resultTextureColor)\n\
+{\n\
+    if(activeNumber == 1)\n\
+    {\n\
+        if(currColor4.w > 0.0 && externalAlpha > 0.0)\n\
+        {\n\
+            if(victory)\n\
+            {\n\
+                resultTextureColor = mix(resultTextureColor, currColor4, currColor4.w*externalAlpha);\n\
+            }\n\
+            else{\n\
+                currColor4.w *= externalAlpha;\n\
+                resultTextureColor = currColor4;\n\
+            }\n\
+            \n\
+            victory = true;\n\
+        }\n\
+    }\n\
+    else if(activeNumber == 2)\n\
+    {\n\
+        // custom image.\n\
+        // Check uExternalTexCoordsArray.\n\
+        \n\
+    }\n\
+}\n\
+\n\
 void main()\n\
 {    \n\
 	#ifdef USE_LOGARITHMIC_DEPTH\n\
@@ -4346,130 +4286,20 @@ void main()\n\
 			\n\
 			bool firstColorSetted = false;\n\
 			float externalAlpha = 0.0;\n\
-			\n\
-			\n\
-			\n\
-			\n\
-			\n\
-			\n\
-			\n\
-			\n\
-			\n\
-			\n\
-			if(uActiveTextures[2] == 1)\n\
-			{\n\
-				vec4 layersTextureColor = texture2D(diffuseTex, texCoord);\n\
-				externalAlpha = externalAlphasArray[2];\n\
-				if(layersTextureColor.w > 0.0 && externalAlpha > 0.0)\n\
-				{\n\
-					if(firstColorSetted)\n\
-					{\n\
- 						textureColor = mix(textureColor, layersTextureColor, layersTextureColor.w*externalAlpha);\n\
-					}\n\
-					else{\n\
-						textureColor = layersTextureColor;\n\
-						textureColor.w *= externalAlpha;\n\
-					}\n\
-					\n\
-					firstColorSetted = true;\n\
-				}\n\
-			}\n\
 \n\
-			if(uActiveTextures[3] == 1)\n\
-			{\n\
-				vec4 layersTextureColor = texture2D(diffuseTex_1, texCoord);\n\
-				externalAlpha = externalAlphasArray[3];\n\
-				if(layersTextureColor.w > 0.0 && externalAlpha > 0.0)\n\
-				{\n\
-					if(firstColorSetted)\n\
-					{\n\
- 						textureColor = mix(textureColor, layersTextureColor, layersTextureColor.w*externalAlpha);\n\
-					}\n\
-					else{\n\
-						textureColor = layersTextureColor;\n\
-						textureColor.w *= externalAlpha;\n\
-					}\n\
-					\n\
-					firstColorSetted = true;\n\
-				}\n\
-			}\n\
+			if(uActiveTextures[2] > 0 && uActiveTextures[2] != 10)\n\
+				getTextureColor(uActiveTextures[2], texture2D(diffuseTex, texCoord), texCoord,  firstColorSetted, externalAlphasArray[2], textureColor);\n\
+			if(uActiveTextures[3] > 0 && uActiveTextures[3] != 10)\n\
+				getTextureColor(uActiveTextures[3], texture2D(diffuseTex_1, texCoord), texCoord,  firstColorSetted, externalAlphasArray[3], textureColor);\n\
+			if(uActiveTextures[4] > 0 && uActiveTextures[4] != 10)\n\
+				getTextureColor(uActiveTextures[4], texture2D(diffuseTex_2, texCoord), texCoord,  firstColorSetted, externalAlphasArray[4], textureColor);\n\
+			if(uActiveTextures[5] > 0 && uActiveTextures[5] != 10)\n\
+				getTextureColor(uActiveTextures[5], texture2D(diffuseTex_3, texCoord), texCoord,  firstColorSetted, externalAlphasArray[5], textureColor);\n\
+			if(uActiveTextures[6] > 0 && uActiveTextures[6] != 10)\n\
+				getTextureColor(uActiveTextures[6], texture2D(diffuseTex_4, texCoord), texCoord,  firstColorSetted, externalAlphasArray[6], textureColor);\n\
+			if(uActiveTextures[7] > 0 && uActiveTextures[7] != 10)\n\
+				getTextureColor(uActiveTextures[7], texture2D(diffuseTex_5, texCoord), texCoord,  firstColorSetted, externalAlphasArray[7], textureColor);\n\
 \n\
-			if(uActiveTextures[4] == 1)\n\
-			{\n\
-				vec4 layersTextureColor = texture2D(diffuseTex_2, texCoord);\n\
-				externalAlpha = externalAlphasArray[4];\n\
-				if(layersTextureColor.w > 0.0 && externalAlpha > 0.0)\n\
-				{\n\
-					if(firstColorSetted)\n\
-					{\n\
- 						textureColor = mix(textureColor, layersTextureColor, layersTextureColor.w*externalAlpha);\n\
-					}\n\
-					else{\n\
-						textureColor = layersTextureColor;\n\
-						textureColor.w *= externalAlpha;\n\
-					}\n\
-					\n\
-					firstColorSetted = true;\n\
-				}\n\
-			}\n\
-\n\
-			if(uActiveTextures[5] == 1)\n\
-			{\n\
-				vec4 layersTextureColor = texture2D(diffuseTex_3, texCoord);\n\
-				externalAlpha = externalAlphasArray[5];\n\
-				if(layersTextureColor.w > 0.0 && externalAlpha > 0.0)\n\
-				{\n\
-					if(firstColorSetted)\n\
-					{\n\
- 						textureColor = mix(textureColor, layersTextureColor, layersTextureColor.w*externalAlpha);\n\
-					}\n\
-					else{\n\
-						textureColor = layersTextureColor;\n\
-						textureColor.w *= externalAlpha;\n\
-					}\n\
-					\n\
-					firstColorSetted = true;\n\
-				}\n\
-			}\n\
-\n\
-			if(uActiveTextures[6] == 1)\n\
-			{\n\
-				vec4 layersTextureColor = texture2D(diffuseTex_4, texCoord);\n\
-				externalAlpha = externalAlphasArray[6];\n\
-				if(layersTextureColor.w > 0.0 && externalAlpha > 0.0)\n\
-				{\n\
-					if(firstColorSetted)\n\
-					{\n\
- 						textureColor = mix(textureColor, layersTextureColor, layersTextureColor.w*externalAlpha);\n\
-					}\n\
-					else{\n\
-						textureColor = layersTextureColor;\n\
-						textureColor.w *= externalAlpha;\n\
-					}\n\
-					\n\
-					firstColorSetted = true;\n\
-				}\n\
-			}\n\
-\n\
-			if(uActiveTextures[7] == 1)\n\
-			{\n\
-				vec4 layersTextureColor = texture2D(diffuseTex_5, texCoord);\n\
-				externalAlpha = externalAlphasArray[7];\n\
-				if(layersTextureColor.w > 0.0 && externalAlpha > 0.0)\n\
-				{\n\
-					if(firstColorSetted)\n\
-					{\n\
- 						textureColor = mix(textureColor, layersTextureColor, layersTextureColor.w*externalAlpha);\n\
-					}\n\
-					else{\n\
-						textureColor = layersTextureColor;\n\
-						textureColor.w *= externalAlpha;\n\
-					}\n\
-					\n\
-					firstColorSetted = true;\n\
-				}\n\
-			}\n\
-			\n\
 			if(textureColor.w == 0.0)\n\
 			{\n\
 				discard;\n\

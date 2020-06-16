@@ -84,8 +84,13 @@ var TinTerrainManager = function(magoManager, options)
 	this.textureIdCntMap = {};
 	this.textureIdDeleteMap = {};
 	this.bRenderSea = true;
+
+	// Vars to maintain syncronization between this & tinTerrains.
 	this.renderingFase = 0;
 	this.layersStyleId = 0;
+
+	// Objects to clampToTerrain.
+	this.objectsToClampToTerrainArray;
 
 	this.init();
 	this.makeTinTerrainWithDEMIndex(); // provisional.
@@ -108,6 +113,13 @@ TinTerrainManager.prototype.imageryLayersChanged = function()
 	{ this.layersStyleId = 0; }
 };
 
+TinTerrainManager.prototype.addObjectToClampToTerrain = function(object)
+{
+	if (this.objectsToClampToTerrainArray === undefined)
+	{ this.objectsToClampToTerrainArray = []; }
+
+	this.objectsToClampToTerrainArray.push(object);
+};
 
 TinTerrainManager.prototype.getTerrainType = function()
 {
