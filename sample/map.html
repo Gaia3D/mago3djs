@@ -72,9 +72,6 @@
 	});
 
 	var MAGO3D_INSTANCE;
-	var a = function(result) {
-			console.info(result);
-		}
 	var imagePath = "/images/ko";
 	var dataInformationUrl = "/sample/persistence/json/";
 	magoStart(null, "magoContainer", imagePath);
@@ -88,38 +85,12 @@
 			success: function(serverPolicy){
 				serverPolicy.basicGlobe = 'cesium';
 				MAGO3D_INSTANCE = new Mago3D.Mago3d(renderDivId, serverPolicy, {loadend : loadend});
-				console.info(MAGO3D_INSTANCE.getMagoManager());
 			},
 			error: function(e){
 				alert(e.responseText);
 			}
 		});
 	}
-
-	function gotoProject(projectId, longitude, latitude, height, duration) {
-		var projectData = getDataAPI(Mago3D.CODE.PROJECT_ID_PREFIX + projectId);
-		if (projectData === null || projectData === undefined) {
-			$.ajax({
-				url: dataInformationUrl + projectId,
-				type: "GET",
-				dataType: "json",
-				success: function(serverData) {
-					gotoProjectAPI(MAGO3D_INSTANCE, projectId, serverData, serverData.data_key, longitude, latitude, height, duration);		
-				},
-				error : function(request, status, error) {
-					console.log("code : " + request.status + "\n" + "message : " + request.responseText + "\n" + "error : " + error);
-				}
-			});
-		} else {
-			gotoProjectAPI(MAGO3D_INSTANCE, projectId, projectData, projectData.data_key, longitude, latitude, height, duration);	
-		}
-	}
-
-
-	function loadstart(e) {
-		console.info('mago3d start!');
-	}
-
 	function loadend(e) {
 		console.info('Complete construct mago3d instance. Enjoy!');
 		
@@ -128,7 +99,15 @@
 		magoInstance.setBaseUrl(dataInfo.baseUrl);
 
 		var magoManager = magoInstance.getMagoManager();
-		var f4dController = magoInstance.getF4dController();
+		
+		var layer = new Mago3D.MagoLayer({
+			dataGroupId : 1,
+			dataGroupKey : '3ds',
+			dataGroupName : '삼디에스',
+			dataGroupPath : '/3ds'
+		});
+		
+		magoManager.addLayer(layer);
 		
 		magoManager.on(Mago3D.MagoManager.EVENT_TYPE.CLICK, function(e){
 			console.info(e);

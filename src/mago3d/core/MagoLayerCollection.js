@@ -42,6 +42,12 @@ MagoLayerCollection.prototype.add = function(layer)
 	{
 		layer = new MagoLayer(layer);
 	}
+	
+	//일반 f4d 사용시
+	if (!layer.tiling)
+	{
+		layer.getObjectIndexFile();
+	}
    
 	this.layers.push(layer);
 
