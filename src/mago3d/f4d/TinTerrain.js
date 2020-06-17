@@ -442,6 +442,9 @@ TinTerrain.prototype.isPrepared = function()
 		this.vboKeyContainer.vboCacheKeysArray === undefined || 
 		this.vboKeyContainer.vboCacheKeysArray.length === 0)
 	{ return false; }
+
+	if (this.depth > 2 && !this.textureMasterPrepared)
+	{ return false; }
 	
 	return true;
 };
@@ -507,8 +510,13 @@ TinTerrain.prototype.mergeTexturesToTextureMaster = function(gl, shader, texture
 		gl.activeTexture(gl.TEXTURE0 + i); 
 		gl.bindTexture(gl.TEXTURE_2D, texture.texId);
 		
-		activeTexturesLayers[i] = 1;
+		activeTexturesLayers[i] = texture.activeTextureType;
 		externalAlphaLayers[i] = texture.opacity;
+
+		if (texture.activeTextureType === 10)
+		{
+			gl.uniform2fv(shader.uMinMaxAltitudes_loc, [texture.minAltitude, texture.maxAltitude]);
+		}
 	}
 
 	gl.uniform1iv(shader.uActiveTextures_loc, activeTexturesLayers);
@@ -575,10 +583,17 @@ TinTerrain.prototype.makeTextureMaster = function()
 		{ continue; }
 
 		var textureKey = layer._id;
+		var activeTexType = 1;
 
 		var filter = texture.imagery.filter;
 		if (filter === CODE.imageFilter.BATHYMETRY) 
-		{ continue; }
+		{ 
+			activeTexType = 10;
+			texture.minAltitude = texture.imagery.minAltitude;
+			texture.maxAltitude = texture.imagery.maxAltitude;
+			//continue; 
+		
+		}
 		
 		if (!(texture.texId instanceof WebGLTexture)) 
 		{ continue; }
@@ -593,6 +608,7 @@ TinTerrain.prototype.makeTextureMaster = function()
 		if (!texture.imagery.show) { continue; }
 
 		texture.setOpacity(texture.imagery.opacity); // update to the current imagery opacity.
+		texture.setActiveTextureType(activeTexType);
 		texturesToMergeArray.push(texture);
 		if (texturesToMergeArray.length === 8)
 		{
@@ -605,6 +621,7 @@ TinTerrain.prototype.makeTextureMaster = function()
 	if (texturesToMergeArray.length > 0)
 	{ texturesToMergeMatrix.push(texturesToMergeArray); }
 
+	/*
 	// Now, check if exist objects to clamp to terrain.
 	var objectsToClampToTerrain = this.tinTerrainManager.objectsToClampToTerrainArray;
 	if (objectsToClampToTerrain && objectsToClampToTerrain.length > 0)
@@ -614,11 +631,23 @@ TinTerrain.prototype.makeTextureMaster = function()
 		for (var i=0; i<objToClampCount; i++)
 		{
 			var objToClamp = objectsToClampToTerrain[i];
-			//var geoExtent = 
-			var hola = 0;
+			if (objToClamp instanceof MagoRectangle)
+			{
+				var minGeoCoord = objToClamp.minGeographicCoord;
+				var maxGeoCoord = objToClamp.maxGeographicCoord;
+				var geoExtent = new GeographicExtent(minGeoCoord.longitude, minGeoCoord.latitude, minGeoCoord.altitude, maxGeoCoord.longitude, maxGeoCoord.latitude, maxGeoCoord.altitude);
+				if (this.geographicExtent.intersects2dWithGeoExtent(geoExtent))
+				{
+					// calculate the relative texCoords of the rectangle.
+					
+					var hola = 0;
+				}
+			}
 		} 
 	}
+	*/
 
+	// Merge textures into textureMaster.
 	gl.enable(gl.BLEND);
 	var texturesArraysCount = texturesToMergeMatrix.length;
 	for (var i=0; i<texturesArraysCount; i++)
@@ -674,8 +703,8 @@ TinTerrain.prototype.bindTexture = function(gl, shader)
 			{
 				if (filter === CODE.imageFilter.BATHYMETRY) 
 				{
-					activeTexturesLayers[4+i] = 10;
-					gl.activeTexture(gl.TEXTURE4 + i);
+					activeTexturesLayers[4+1] = 10;
+					gl.activeTexture(gl.TEXTURE4 + 1);
 					gl.bindTexture(gl.TEXTURE_2D, texture.texId);
 				}
 			}

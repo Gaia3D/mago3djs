@@ -34,6 +34,18 @@ var TextureLayer = function(options)
 	Object.freeze(this._freezeAttr);
 	this._show = defaultValue(options.show, true);
 	this._opacity = defaultValue(options.opacity, 1.0);
+
+
+	// Note: if filter === BATHYMETRY, then need minAltitude & maxAltitude.
+	if (options.minAltitude)
+	{
+		this.minAltitude = options.minAltitude;
+	}
+	if (options.maxAltitude)
+	{
+		this.maxAltitude = options.maxAltitude;
+	}
+
 };
 
 TextureLayer.prototype = Object.create(Emitter.prototype);

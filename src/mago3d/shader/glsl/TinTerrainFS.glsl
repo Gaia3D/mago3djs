@@ -428,9 +428,9 @@ void main()
 			{
 				lambertian = 0.8;
 			}
-			else if(lambertian > 1.1)
+			else if(lambertian > 1.0)
 			{
-				lambertian = 1.1;
+				lambertian = 1.0;
 			}
 		}
 		
@@ -526,8 +526,8 @@ void main()
 			vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));
 			vec3 bitangent = cross(normal2, tangent);
 			mat3 tbn = mat3(tangent, bitangent, normal2);   
-			float minDepthBuffer;
-			float maxDepthBuffer;
+			//float minDepthBuffer;
+			//float maxDepthBuffer;
 			for(int i = 0; i < kernelSize; ++i)
 			{    	 
 				vec3 sample = origin + (tbn * vec3(kernel[i].x*3.0, kernel[i].y*3.0, kernel[i].z)) * ssaoRadius*2.0; // original.***
@@ -566,8 +566,6 @@ void main()
 			//	gl_FragColor = vec4(oneColor4.xyz * shadow_occlusion * lambertian, 0.5); // original.***
 			//	return;
 			//}
-			
-			
 
 			float minHeight_rainbow = -100.0;
 			float maxHeight_rainbow = 0.0;
@@ -576,7 +574,7 @@ void main()
 			//vec3 rainbowColor = getRainbowColor_byHeight(altitude);
 
 			// caustics.*********************
-			if(uTime > 0.0 && uTileDepth > 6 && altitude > -120.0)
+			if(uTime > 0.0 && uTileDepth > 6 && gray > 0.0)//&& altitude > -120.0)
 			{
 				// Active this code if want same size caustic effects for different tileDepths.***
 				// Take tileDepth 14 as the unitary tile depth.
@@ -584,8 +582,9 @@ void main()
 				//vec2 cauticsTexCoord = texCoord*pow(2.0, tileDethDiff);
 				//-----------------------------------------------------------------------
 				vec2 cauticsTexCoord = texCoord;
-				vec3 causticColor = causticColor(cauticsTexCoord);
-				textureColor = vec4(mix(textureColor.rgb, causticColor, gray), externalAlpha);
+				vec3 causticColor = causticColor(cauticsTexCoord)*gray*0.4;
+				//textureColor = vec4(mix(textureColor.rgb, causticColor, gray), externalAlpha);
+				textureColor = vec4(textureColor.r+ causticColor.x, textureColor.g+ causticColor.y, textureColor.b+ causticColor.z, 1.0);
 			}
 			// End caustics.--------------------------
 
@@ -599,35 +598,35 @@ void main()
 			fogColor = vec4(red, green, blue, 1.0);
 			
 			// Test drawing grid.***
-			/*
-			if(uTileDepth > 7)
-			{
-				float numSegs = 5.0;
-				float fX = fract(texCoord.x * numSegs);
-
-				float gridLineWidth = getGridLineWidth(uTileDepth);
-				if( fX < gridLineWidth || fX > 1.0-gridLineWidth)
-				{
-					vec3 color = vec3(0.99, 0.5, 0.5);
-					gl_FragColor = vec4(color.rgb* shadow_occlusion * lambertian, 1.0);
-					return;
-				}
-				
-				float fY = fract(texCoord.y * numSegs);
-				if( fY < gridLineWidth|| fY > 1.0-gridLineWidth)
-				{
-					vec3 color = vec3(0.3, 0.5, 0.99);
-					gl_FragColor = vec4(color.rgb* shadow_occlusion * lambertian, 1.0);
-					return;
-				}
-			}
-			*/
+			//if(uTileDepth > 7)
+			//{
+			//	float numSegs = 5.0;
+			//	float fX = fract(texCoord.x * numSegs);
+			//
+			//	float gridLineWidth = getGridLineWidth(uTileDepth);
+			//	if( fX < gridLineWidth || fX > 1.0-gridLineWidth)
+			//	{
+			//		vec3 color = vec3(0.99, 0.5, 0.5);
+			//		gl_FragColor = vec4(color.rgb* shadow_occlusion * lambertian, 1.0);
+			//		return;
+			//	}
+			//	
+			//	float fY = fract(texCoord.y * numSegs);
+			//	if( fY < gridLineWidth|| fY > 1.0-gridLineWidth)
+			//	{
+			//		vec3 color = vec3(0.3, 0.5, 0.99);
+			//		gl_FragColor = vec4(color.rgb* shadow_occlusion * lambertian, 1.0);
+			//		return;
+			//	}
+			//}
+			
 			// End test drawing grid.---
 			float specularReflectionCoef = 0.6;
 			vec3 specularColor = vec3(0.8, 0.8, 0.8);
-			vec4 finalColor = mix(textureColor, fogColor, 0.7); 
+			textureColor = mix(textureColor, fogColor, 0.2); 
 			//gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian + specularReflectionCoef * specular * specularColor * shadow_occlusion, 1.0); // with specular.***
-			gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian, 1.0); // original.***
+			//gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian, 1.0); // original.***
+			gl_FragColor = vec4(textureColor.xyz * shadow_occlusion * lambertian, 1.0); // original.***
 
 			return;
 		}

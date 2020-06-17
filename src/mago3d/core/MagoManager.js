@@ -5045,6 +5045,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.uActiveTextures_loc = gl.getUniformLocation(shader.program, "uActiveTextures");
 	shader.externalAlphasArray_loc = gl.getUniformLocation(shader.program, "externalAlphasArray");
 	shader.uExternalTexCoordsArray_loc = gl.getUniformLocation(shader.program, "uExternalTexCoordsArray");
+	shader.uMinMaxAltitudes_loc = gl.getUniformLocation(shader.program, "uMinMaxAltitudes");
 	shader.tex_0_loc = gl.getUniformLocation(shader.program, "texture_0");
 	shader.tex_1_loc = gl.getUniformLocation(shader.program, "texture_1");
 	shader.tex_2_loc = gl.getUniformLocation(shader.program, "texture_2");

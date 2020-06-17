@@ -23,6 +23,7 @@ var Texture = function(options)
 	this.imageHeight = 32;
 	this.url;
 	this.opacity = 1.0;
+	this.activeTextureType = 1; // 0= inactive. 1= XYZLayer, WMSLayer. 2= Custom image. 10= Bathymetry.
 
 	if (options)
 	{
@@ -31,6 +32,16 @@ var Texture = function(options)
 			this.opacity = options.opacity;
 		}
 	}
+};
+
+/**
+ * Sets the activeTextureType of the texture.
+ * 0= inactive. 1= XYZLayer, WMSLayer. 2= Custom image. 10= Bathymetry.
+ * @param {Number} activeTextureType
+ */
+Texture.prototype.setActiveTextureType = function(activeTextureType)
+{
+	this.activeTextureType = activeTextureType;
 };
 
 /**

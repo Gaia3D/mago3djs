@@ -3344,6 +3344,7 @@ uniform sampler2D texture_7;\n\
 uniform float externalAlphasArray[8];\n\
 uniform int uActiveTextures[8];\n\
 uniform vec4 uExternalTexCoordsArray[8]; // vec4 (minS, minT, maxS, maxT).\n\
+uniform vec2 uMinMaxAltitudes; // used for altitudes textures as bathymetry.\n\
 \n\
 varying vec2 v_tex_pos;\n\
 \n\
@@ -3387,6 +3388,33 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
         // custom image.\n\
         // Check uExternalTexCoordsArray.\n\
         \n\
+    }\n\
+    else if(activeNumber == 10)\n\
+    {\n\
+        // Bathymetry texture.\n\
+        float altitude = 1000000.0;\n\
+        if(currColor4.w > 0.0)\n\
+        {\n\
+            // decode the grayScale.***\n\
+            altitude = uMinMaxAltitudes.x + currColor4.r * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);\n\
+        \n\
+            if(altitude < 0.0)\n\
+            {\n\
+                float minHeight_rainbow = -100.0;\n\
+                float maxHeight_rainbow = 0.0;\n\
+                float gray = (altitude - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);\n\
+                //vec3 rainbowColor = getRainbowColor_byHeight(altitude);\n\
+\n\
+                if(gray < 0.05)\n\
+                gray = 0.05;\n\
+                float red = gray + 0.1;//float red = gray + 0.2;\n\
+                float green = gray + 0.5;//float green = gray + 0.6;\n\
+                float blue = gray*2.0 + 2.0;\n\
+                vec4 fogColor = vec4(red, green, blue, 1.0);\n\
+                \n\
+                resultTextureColor = mix(resultTextureColor, fogColor, 0.7); \n\
+            }\n\
+        }\n\
     }\n\
 }\n\
 \n\
@@ -4252,9 +4280,9 @@ void main()\n\
 			{\n\
 				lambertian = 0.8;\n\
 			}\n\
-			else if(lambertian > 1.1)\n\
+			else if(lambertian > 1.0)\n\
 			{\n\
-				lambertian = 1.1;\n\
+				lambertian = 1.0;\n\
 			}\n\
 		}\n\
 		\n\
@@ -4350,8 +4378,8 @@ void main()\n\
 			vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
 			vec3 bitangent = cross(normal2, tangent);\n\
 			mat3 tbn = mat3(tangent, bitangent, normal2);   \n\
-			float minDepthBuffer;\n\
-			float maxDepthBuffer;\n\
+			//float minDepthBuffer;\n\
+			//float maxDepthBuffer;\n\
 			for(int i = 0; i < kernelSize; ++i)\n\
 			{    	 \n\
 				vec3 sample = origin + (tbn * vec3(kernel[i].x*3.0, kernel[i].y*3.0, kernel[i].z)) * ssaoRadius*2.0; // original.***\n\
@@ -4390,8 +4418,6 @@ void main()\n\
 			//	gl_FragColor = vec4(oneColor4.xyz * shadow_occlusion * lambertian, 0.5); // original.***\n\
 			//	return;\n\
 			//}\n\
-			\n\
-			\n\
 \n\
 			float minHeight_rainbow = -100.0;\n\
 			float maxHeight_rainbow = 0.0;\n\
@@ -4400,7 +4426,7 @@ void main()\n\
 			//vec3 rainbowColor = getRainbowColor_byHeight(altitude);\n\
 \n\
 			// caustics.*********************\n\
-			if(uTime > 0.0 && uTileDepth > 6 && altitude > -120.0)\n\
+			if(uTime > 0.0 && uTileDepth > 6 && gray > 0.0)//&& altitude > -120.0)\n\
 			{\n\
 				// Active this code if want same size caustic effects for different tileDepths.***\n\
 				// Take tileDepth 14 as the unitary tile depth.\n\
@@ -4408,8 +4434,9 @@ void main()\n\
 				//vec2 cauticsTexCoord = texCoord*pow(2.0, tileDethDiff);\n\
 				//-----------------------------------------------------------------------\n\
 				vec2 cauticsTexCoord = texCoord;\n\
-				vec3 causticColor = causticColor(cauticsTexCoord);\n\
-				textureColor = vec4(mix(textureColor.rgb, causticColor, gray), externalAlpha);\n\
+				vec3 causticColor = causticColor(cauticsTexCoord)*gray*0.4;\n\
+				//textureColor = vec4(mix(textureColor.rgb, causticColor, gray), externalAlpha);\n\
+				textureColor = vec4(textureColor.r+ causticColor.x, textureColor.g+ causticColor.y, textureColor.b+ causticColor.z, 1.0);\n\
 			}\n\
 			// End caustics.--------------------------\n\
 \n\
@@ -4423,35 +4450,35 @@ void main()\n\
 			fogColor = vec4(red, green, blue, 1.0);\n\
 			\n\
 			// Test drawing grid.***\n\
-			/*\n\
-			if(uTileDepth > 7)\n\
-			{\n\
-				float numSegs = 5.0;\n\
-				float fX = fract(texCoord.x * numSegs);\n\
-\n\
-				float gridLineWidth = getGridLineWidth(uTileDepth);\n\
-				if( fX < gridLineWidth || fX > 1.0-gridLineWidth)\n\
-				{\n\
-					vec3 color = vec3(0.99, 0.5, 0.5);\n\
-					gl_FragColor = vec4(color.rgb* shadow_occlusion * lambertian, 1.0);\n\
-					return;\n\
-				}\n\
-				\n\
-				float fY = fract(texCoord.y * numSegs);\n\
-				if( fY < gridLineWidth|| fY > 1.0-gridLineWidth)\n\
-				{\n\
-					vec3 color = vec3(0.3, 0.5, 0.99);\n\
-					gl_FragColor = vec4(color.rgb* shadow_occlusion * lambertian, 1.0);\n\
-					return;\n\
-				}\n\
-			}\n\
-			*/\n\
+			//if(uTileDepth > 7)\n\
+			//{\n\
+			//	float numSegs = 5.0;\n\
+			//	float fX = fract(texCoord.x * numSegs);\n\
+			//\n\
+			//	float gridLineWidth = getGridLineWidth(uTileDepth);\n\
+			//	if( fX < gridLineWidth || fX > 1.0-gridLineWidth)\n\
+			//	{\n\
+			//		vec3 color = vec3(0.99, 0.5, 0.5);\n\
+			//		gl_FragColor = vec4(color.rgb* shadow_occlusion * lambertian, 1.0);\n\
+			//		return;\n\
+			//	}\n\
+			//	\n\
+			//	float fY = fract(texCoord.y * numSegs);\n\
+			//	if( fY < gridLineWidth|| fY > 1.0-gridLineWidth)\n\
+			//	{\n\
+			//		vec3 color = vec3(0.3, 0.5, 0.99);\n\
+			//		gl_FragColor = vec4(color.rgb* shadow_occlusion * lambertian, 1.0);\n\
+			//		return;\n\
+			//	}\n\
+			//}\n\
+			\n\
 			// End test drawing grid.---\n\
 			float specularReflectionCoef = 0.6;\n\
 			vec3 specularColor = vec3(0.8, 0.8, 0.8);\n\
-			vec4 finalColor = mix(textureColor, fogColor, 0.7); \n\
+			textureColor = mix(textureColor, fogColor, 0.2); \n\
 			//gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian + specularReflectionCoef * specular * specularColor * shadow_occlusion, 1.0); // with specular.***\n\
-			gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian, 1.0); // original.***\n\
+			//gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian, 1.0); // original.***\n\
+			gl_FragColor = vec4(textureColor.xyz * shadow_occlusion * lambertian, 1.0); // original.***\n\
 \n\
 			return;\n\
 		}\n\

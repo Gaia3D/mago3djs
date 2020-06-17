@@ -249,6 +249,22 @@ GeographicExtent.prototype.intersects2dWithGeoCoord = function(geoCoord)
 	return false;
 };
 
+GeographicExtent.prototype.intersects2dWithGeoExtent = function(geoExtent) 
+{
+	// In 2D intersection do not considere "altitude".
+	var thisMinGeoCoord = this.minGeographicCoord;
+	var thisMaxGeoCoord = this.maxGeographicCoord;
+	var minGeoCoord = geoExtent.minGeographicCoord;
+	var maxGeoCoord = geoExtent.maxGeographicCoord;
+
+	if (thisMinGeoCoord.longitude > maxGeoCoord.longitude || thisMaxGeoCoord.longitude < minGeoCoord.longitude)
+	{ return false; }
+	else if (thisMinGeoCoord.latitude > maxGeoCoord.latitude || thisMaxGeoCoord.latitude < minGeoCoord.latitude)
+	{ return false; }
+
+	return true;
+};
+
 
 
 

@@ -14,6 +14,7 @@ uniform sampler2D texture_7;
 uniform float externalAlphasArray[8];
 uniform int uActiveTextures[8];
 uniform vec4 uExternalTexCoordsArray[8]; // vec4 (minS, minT, maxS, maxT).
+uniform vec2 uMinMaxAltitudes; // used for altitudes textures as bathymetry.
 
 varying vec2 v_tex_pos;
 
@@ -57,6 +58,33 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
         // custom image.
         // Check uExternalTexCoordsArray.
         
+    }
+    else if(activeNumber == 10)
+    {
+        // Bathymetry texture.
+        float altitude = 1000000.0;
+        if(currColor4.w > 0.0)
+        {
+            // decode the grayScale.***
+            altitude = uMinMaxAltitudes.x + currColor4.r * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);
+        
+            if(altitude < 0.0)
+            {
+                float minHeight_rainbow = -100.0;
+                float maxHeight_rainbow = 0.0;
+                float gray = (altitude - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);
+                //vec3 rainbowColor = getRainbowColor_byHeight(altitude);
+
+                if(gray < 0.05)
+                gray = 0.05;
+                float red = gray + 0.1;//float red = gray + 0.2;
+                float green = gray + 0.5;//float green = gray + 0.6;
+                float blue = gray*2.0 + 2.0;
+                vec4 fogColor = vec4(red, green, blue, 1.0);
+                
+                resultTextureColor = mix(resultTextureColor, fogColor, 0.7); 
+            }
+        }
     }
 }
 
