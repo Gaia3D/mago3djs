@@ -321,6 +321,12 @@ var MagoManager = function()
 	 * @type {InteractionCollection}
 	 */
 	this.interactions = new InteractionCollection(this);
+
+	/**
+	 * MagoLayer collection
+	 * @type {MagoLayerCollection}
+	 */
+	this.magoLayerCollection = new MagoLayerCollection();
 };
 MagoManager.prototype = Object.create(Emitter.prototype);
 MagoManager.prototype.constructor = MagoManager;
@@ -5587,9 +5593,9 @@ MagoManager.prototype.getObjectIndexFile = function(projectId, projectDataFolder
 	}
 	
 	//this.buildingSeedList = new BuildingSeedList();
-	var fileName;
+	
 	var geometrySubDataPath = projectDataFolder;
-	fileName = this.readerWriter.geometryDataPath + "/" + geometrySubDataPath + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + new Date().getTime();
+	var fileName = this.readerWriter.geometryDataPath + "/" + geometrySubDataPath + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + new Date().getTime();
 	this.readerWriter.getObjectIndexFileForSmartTile(fileName, this, undefined, projectId);
 };
 
@@ -6259,6 +6265,21 @@ MagoManager.prototype.addLayer = function(layer)
 	if (layer instanceof TextureLayer)
 	{
 		this.tinTerrainManager.addImageryLayer(layer);
+	}
+	else if (isMagoLayer(layer))
+	{
+
+		if (!this.magoLayerCollection)
+		{
+			this.magoLayerCollection = new MagoLayerCollection();
+		}
+
+		this.magoLayerCollection.add(layer);
+	}
+
+	function isMagoLayer(l) 
+	{
+		return l instanceof MagoLayer || (l.hasOwnProperty(dataGroupId) && l.hasOwnProperty(dataGroupKey) && l.hasOwnProperty(dataGroupPath));
 	}
 };
 
