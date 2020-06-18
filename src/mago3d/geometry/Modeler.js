@@ -120,7 +120,7 @@ Modeler.prototype.addObject = function(object, depth)
 	
 	var smartTileManager = this.magoManager.smartTileManager;
 	// Note: the targetDepth must be calculated by the objects bbox size.
-	var targetDepth = depth ? depth : 12;
+	var targetDepth = depth ? depth : 5;
 	smartTileManager.putObject(targetDepth, object, this.magoManager);
 };
 
