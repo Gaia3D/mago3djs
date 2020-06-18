@@ -493,16 +493,8 @@ TinTerrain.prototype.mergeTexturesToTextureMaster = function(gl, shader, texture
 	// externalTexCoordsArray = (minS, minT, maxS, maxT, 
 	// minS, minT, maxS, maxT, 
 	// minS, minT, maxS, maxT, ...)
-	var externalTexCoordsArray = new Float32Array([0, 0, 1, 1, 
-		0, 0, 1, 1, 
-		0, 0, 1, 1, 
-		0, 0, 1, 1, 
-		0, 0, 1, 1, 
-		0, 0, 1, 1, 
-		0, 0, 1, 1,
-		0, 0, 1, 1]); 
-
-	//shader.uExternalTexCoordsArray_loc
+	var externalTexCoordsArray; 
+	var thereAreCustomImages = false;
 
 	for (var i=0; i<texturesCount; i++)
 	{
@@ -512,16 +504,38 @@ TinTerrain.prototype.mergeTexturesToTextureMaster = function(gl, shader, texture
 		
 		activeTexturesLayers[i] = texture.activeTextureType;
 		externalAlphaLayers[i] = texture.opacity;
-
-		if (texture.activeTextureType === 10)
+		if (texture.activeTextureType === 2)
 		{
-			gl.uniform2fv(shader.uMinMaxAltitudes_loc, [texture.minAltitude, texture.maxAltitude]);
+			// custom image.
+			if (externalTexCoordsArray === undefined)
+			{
+				externalTexCoordsArray = new Float32Array([0, 0, 1, 1, 
+					0, 0, 1, 1, 
+					0, 0, 1, 1, 
+					0, 0, 1, 1, 
+					0, 0, 1, 1, 
+					0, 0, 1, 1, 
+					0, 0, 1, 1,
+					0, 0, 1, 1]); 
+			}
+			thereAreCustomImages = true;
+
+			externalTexCoordsArray[i*4] = texture.temp_clampToTerrainTexCoord[0];
+			externalTexCoordsArray[i*4+1] = texture.temp_clampToTerrainTexCoord[1];
+			externalTexCoordsArray[i*4+2] = texture.temp_clampToTerrainTexCoord[2];
+			externalTexCoordsArray[i*4+3] = texture.temp_clampToTerrainTexCoord[3];
+		}
+		else if (texture.activeTextureType === 10)
+		{
+			// bathymetry image.
+			gl.uniform2fv(shader.uMinMaxAltitudes_loc, [texture.imagery.minAltitude, texture.imagery.maxAltitude]);
 		}
 	}
 
 	gl.uniform1iv(shader.uActiveTextures_loc, activeTexturesLayers);
 	gl.uniform1fv(shader.externalAlphasArray_loc, externalAlphaLayers);
-	//shader.uExternalTexCoordsArray_loc
+	if (thereAreCustomImages)
+	{ gl.uniform4fv(shader.uExternalTexCoordsArray_loc, externalTexCoordsArray); }
 	gl.drawArrays(gl.TRIANGLES, 0, 6);
 };
 
@@ -589,10 +603,6 @@ TinTerrain.prototype.makeTextureMaster = function()
 		if (filter === CODE.imageFilter.BATHYMETRY) 
 		{ 
 			activeTexType = 10;
-			texture.minAltitude = texture.imagery.minAltitude;
-			texture.maxAltitude = texture.imagery.maxAltitude;
-			//continue; 
-		
 		}
 		
 		if (!(texture.texId instanceof WebGLTexture)) 
@@ -621,7 +631,7 @@ TinTerrain.prototype.makeTextureMaster = function()
 	if (texturesToMergeArray.length > 0)
 	{ texturesToMergeMatrix.push(texturesToMergeArray); }
 
-	/*
+	
 	// Now, check if exist objects to clamp to terrain.
 	var objectsToClampToTerrain = this.tinTerrainManager.objectsToClampToTerrainArray;
 	if (objectsToClampToTerrain && objectsToClampToTerrain.length > 0)
@@ -633,19 +643,68 @@ TinTerrain.prototype.makeTextureMaster = function()
 			var objToClamp = objectsToClampToTerrain[i];
 			if (objToClamp instanceof MagoRectangle)
 			{
+				
 				var minGeoCoord = objToClamp.minGeographicCoord;
 				var maxGeoCoord = objToClamp.maxGeographicCoord;
-				var geoExtent = new GeographicExtent(minGeoCoord.longitude, minGeoCoord.latitude, minGeoCoord.altitude, maxGeoCoord.longitude, maxGeoCoord.latitude, maxGeoCoord.altitude);
+				var objMinLon = minGeoCoord.longitude;
+				var objMinLat = minGeoCoord.latitude;
+				var objMaxLon = maxGeoCoord.longitude;
+				var objMaxLat = maxGeoCoord.latitude;
+				var geoExtent = new GeographicExtent(objMinLon, objMinLat, minGeoCoord.altitude, objMaxLon, objMaxLat, maxGeoCoord.altitude);
 				if (this.geographicExtent.intersects2dWithGeoExtent(geoExtent))
 				{
+					if (objToClamp.texture === undefined)
+					{
+						// load texture 1rst.
+						objToClamp.texture = new Texture();
+						objToClamp.texture.setActiveTextureType(2);
+						var style = objToClamp.style;
+						if (style)
+						{
+							//clampToTerrain: true
+							//fillColor: "#00FF00"
+							var imageUrl = style.imageUrl;//: "/images/materialImages/factoryRoof.jpg"
+							var flipYTexCoord = false;
+							TexturesManager.loadTexture(imageUrl, objToClamp.texture, magoManager, flipYTexCoord);
+						}
+
+						continue;
+					}
+
 					// calculate the relative texCoords of the rectangle.
+					var thisMinLon = this.geographicExtent.minGeographicCoord.longitude;
+					var thisMinLat = this.geographicExtent.minGeographicCoord.latitude;
+					var thisMaxLon = this.geographicExtent.maxGeographicCoord.longitude;
+					var thisMaxLat = this.geographicExtent.maxGeographicCoord.latitude;
+					var thisLonRange = thisMaxLon - thisMinLon;
+					var thisLatRange = thisMaxLat - thisMinLat;
+
+					var minS = (objMinLon - thisMinLon)/thisLonRange;
+					var minT = (objMinLat - thisMinLat)/thisLatRange;
+
+					var maxS = (objMaxLon - thisMinLon)/thisLonRange;
+					var maxT = (objMaxLat - thisMinLat)/thisLatRange;
+
+					objToClamp.texture.temp_clampToTerrainTexCoord = [minS, minT, maxS, maxT];
+					//objToClamp.texture.temp_clampToTerrainTexCoord = [1.0-maxS, 1.0-maxT, 1.0-minS, 1.0-minT];
+
+					if (texturesToMergeArray.length === 8)
+					{
+						texturesToMergeMatrix.push(texturesToMergeArray);
+						texturesToMergeArray = [];
+					}
+					texturesToMergeArray.push(objToClamp.texture);
 					
 					var hola = 0;
 				}
 			}
 		} 
 	}
-	*/
+
+	// Last step: finally, if there are any texture in the "texturesToMergeArray", then push it.
+	if (texturesToMergeArray.length > 0)
+	{ texturesToMergeMatrix.push(texturesToMergeArray); }
+	
 
 	// Merge textures into textureMaster.
 	gl.enable(gl.BLEND);

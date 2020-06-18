@@ -78,12 +78,12 @@
 				managerFactory = new Mago3D.Mago3d(renderDivId,serverPolicy,undefined,{
 					layers : [
 						new Mago3D.XYZLayer({url: 'https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'}),
+						tt,
 						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'sk_emd', tiled: true}}),
 						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'basemap', tiled: true}}),
 						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'echodelta_25m', tiled: true}}),
 						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'gangseogu_4326', tiled: true}}),
 						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'land_block', tiled: true}}),
-						tt,
 						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'sk_sdo', tiled: true}}),
 						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'sk_sgg', tiled: true}}),
 						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'utmk_lsmd_cont_ldreg', tiled: true}}),
@@ -99,6 +99,7 @@
 						//new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'ndtp:sk_emd', tiled: true}}),
 					]
 				});
+				
 				
 				
 				/*

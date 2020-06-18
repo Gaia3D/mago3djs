@@ -3365,9 +3365,9 @@ bool intersects(vec2 texCoord, vec4 extension)\n\
     return bIntersects;\n\
 }\n\
 \n\
-void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord,  inout bool victory, in float externalAlpha, inout vec4 resultTextureColor)\n\
+void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord,  inout bool victory, in float externalAlpha, in vec4 externalTexCoords, inout vec4 resultTextureColor)\n\
 {\n\
-    if(activeNumber == 1)\n\
+    if(activeNumber == 1 || activeNumber == 2)\n\
     {\n\
         if(currColor4.w > 0.0 && externalAlpha > 0.0)\n\
         {\n\
@@ -3382,12 +3382,6 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
             \n\
             victory = true;\n\
         }\n\
-    }\n\
-    else if(activeNumber == 2)\n\
-    {\n\
-        // custom image.\n\
-        // Check uExternalTexCoordsArray.\n\
-        \n\
     }\n\
     else if(activeNumber == 10)\n\
     {\n\
@@ -3420,6 +3414,21 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
 \n\
 void main()\n\
 {           \n\
+    // Debug.\n\
+    /*\n\
+    if(v_tex_pos.x < 0.002 || v_tex_pos.x > 0.998)\n\
+    {\n\
+        gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);\n\
+        return;\n\
+    }\n\
+\n\
+    if(v_tex_pos.y < 0.002 || v_tex_pos.y > 0.998)\n\
+    {\n\
+        gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);\n\
+        return;\n\
+    }\n\
+    */\n\
+\n\
     vec2 texCoord = vec2(1.0 - v_tex_pos.x, 1.0 - v_tex_pos.y);\n\
 \n\
     // Take the base color.\n\
@@ -3427,21 +3436,206 @@ void main()\n\
     bool victory = false;\n\
 \n\
     if(uActiveTextures[0] > 0)\n\
-        getTextureColor(uActiveTextures[0], texture2D(texture_0, texCoord), texCoord,  victory, externalAlphasArray[0], textureColor);\n\
+    {\n\
+        if(uActiveTextures[0] == 2)\n\
+        {\n\
+            // CustomImage. Must recalculate texCoords.\n\
+            vec4 externalTexCoord = uExternalTexCoordsArray[0];\n\
+            \n\
+            // check if intersects.\n\
+            vec2 texCoordAux = vec2(texCoord.x, 1.0-texCoord.y);\n\
+            if(intersects(texCoordAux, externalTexCoord))\n\
+            {\n\
+                // convert myTexCoord to customImageTexCoord.\n\
+                vec2 minTexCoord = vec2(externalTexCoord.x, externalTexCoord.y);\n\
+                vec2 maxTexCoord = vec2(externalTexCoord.z, externalTexCoord.w);\n\
+\n\
+                texCoord.x = (texCoordAux.x - minTexCoord.x)/(maxTexCoord.x - minTexCoord.x);\n\
+                texCoord.y = (texCoordAux.y - minTexCoord.y)/(maxTexCoord.y - minTexCoord.y);\n\
+\n\
+                texCoord.y = 1.0 - texCoord.y;\n\
+                getTextureColor(uActiveTextures[0], texture2D(texture_0, texCoord), texCoord,  victory, externalAlphasArray[0], uExternalTexCoordsArray[0], textureColor);\n\
+            }\n\
+        }\n\
+        else\n\
+            getTextureColor(uActiveTextures[0], texture2D(texture_0, texCoord), texCoord,  victory, externalAlphasArray[0], uExternalTexCoordsArray[0], textureColor);\n\
+        \n\
+    }\n\
     if(uActiveTextures[1] > 0)\n\
-        getTextureColor(uActiveTextures[1], texture2D(texture_1, texCoord), texCoord,  victory, externalAlphasArray[1], textureColor);\n\
+    {\n\
+        if(uActiveTextures[1] == 2)\n\
+        {\n\
+            // CustomImage. Must recalculate texCoords.\n\
+            vec4 externalTexCoord = uExternalTexCoordsArray[1];\n\
+            \n\
+            // check if intersects.\n\
+            vec2 texCoordAux = vec2(texCoord.x, 1.0-texCoord.y);\n\
+            if(intersects(texCoordAux, externalTexCoord))\n\
+            {\n\
+                // convert myTexCoord to customImageTexCoord.\n\
+                vec2 minTexCoord = vec2(externalTexCoord.x, externalTexCoord.y);\n\
+                vec2 maxTexCoord = vec2(externalTexCoord.z, externalTexCoord.w);\n\
+\n\
+                texCoord.x = (texCoordAux.x - minTexCoord.x)/(maxTexCoord.x - minTexCoord.x);\n\
+                texCoord.y = (texCoordAux.y - minTexCoord.y)/(maxTexCoord.y - minTexCoord.y);\n\
+\n\
+                texCoord.y = 1.0 - texCoord.y;\n\
+                getTextureColor(uActiveTextures[1], texture2D(texture_1, texCoord), texCoord,  victory, externalAlphasArray[1], uExternalTexCoordsArray[1], textureColor);\n\
+            }\n\
+        }\n\
+        else\n\
+            getTextureColor(uActiveTextures[1], texture2D(texture_1, texCoord), texCoord,  victory, externalAlphasArray[1], uExternalTexCoordsArray[1], textureColor);\n\
+    }\n\
     if(uActiveTextures[2] > 0)\n\
-        getTextureColor(uActiveTextures[2], texture2D(texture_2, texCoord), texCoord,  victory, externalAlphasArray[2], textureColor);\n\
+    {\n\
+        if(uActiveTextures[2] == 2)\n\
+        {\n\
+            // CustomImage. Must recalculate texCoords.\n\
+            vec4 externalTexCoord = uExternalTexCoordsArray[2];\n\
+            \n\
+            // check if intersects.\n\
+            vec2 texCoordAux = vec2(texCoord.x, 1.0-texCoord.y);\n\
+            if(intersects(texCoordAux, externalTexCoord))\n\
+            {\n\
+                // convert myTexCoord to customImageTexCoord.\n\
+                vec2 minTexCoord = vec2(externalTexCoord.x, externalTexCoord.y);\n\
+                vec2 maxTexCoord = vec2(externalTexCoord.z, externalTexCoord.w);\n\
+\n\
+                texCoord.x = (texCoordAux.x - minTexCoord.x)/(maxTexCoord.x - minTexCoord.x);\n\
+                texCoord.y = (texCoordAux.y - minTexCoord.y)/(maxTexCoord.y - minTexCoord.y);\n\
+\n\
+                texCoord.y = 1.0 - texCoord.y;\n\
+                getTextureColor(uActiveTextures[2], texture2D(texture_2, texCoord), texCoord,  victory, externalAlphasArray[2], uExternalTexCoordsArray[2], textureColor);\n\
+            }\n\
+        }\n\
+        else\n\
+            getTextureColor(uActiveTextures[2], texture2D(texture_2, texCoord), texCoord,  victory, externalAlphasArray[2], uExternalTexCoordsArray[2], textureColor);\n\
+    }\n\
     if(uActiveTextures[3] > 0)\n\
-        getTextureColor(uActiveTextures[3], texture2D(texture_3, texCoord), texCoord,  victory, externalAlphasArray[3], textureColor);\n\
+    {\n\
+        if(uActiveTextures[3] == 2)\n\
+        {\n\
+            // CustomImage. Must recalculate texCoords.\n\
+            vec4 externalTexCoord = uExternalTexCoordsArray[3];\n\
+            \n\
+            // check if intersects.\n\
+            vec2 texCoordAux = vec2(texCoord.x, 1.0-texCoord.y);\n\
+            if(intersects(texCoordAux, externalTexCoord))\n\
+            {\n\
+                // convert myTexCoord to customImageTexCoord.\n\
+                vec2 minTexCoord = vec2(externalTexCoord.x, externalTexCoord.y);\n\
+                vec2 maxTexCoord = vec2(externalTexCoord.z, externalTexCoord.w);\n\
+\n\
+                texCoord.x = (texCoordAux.x - minTexCoord.x)/(maxTexCoord.x - minTexCoord.x);\n\
+                texCoord.y = (texCoordAux.y - minTexCoord.y)/(maxTexCoord.y - minTexCoord.y);\n\
+\n\
+                texCoord.y = 1.0 - texCoord.y;\n\
+                getTextureColor(uActiveTextures[3], texture2D(texture_3, texCoord), texCoord,  victory, externalAlphasArray[3], uExternalTexCoordsArray[3], textureColor);\n\
+            }\n\
+        }\n\
+        else\n\
+            getTextureColor(uActiveTextures[3], texture2D(texture_3, texCoord), texCoord,  victory, externalAlphasArray[3], uExternalTexCoordsArray[3], textureColor);\n\
+    }\n\
     if(uActiveTextures[4] > 0)\n\
-        getTextureColor(uActiveTextures[4], texture2D(texture_4, texCoord), texCoord,  victory, externalAlphasArray[4], textureColor);\n\
+    {\n\
+        if(uActiveTextures[4] == 2)\n\
+        {\n\
+            // CustomImage. Must recalculate texCoords.\n\
+            vec4 externalTexCoord = uExternalTexCoordsArray[4];\n\
+            \n\
+            // check if intersects.\n\
+            vec2 texCoordAux = vec2(texCoord.x, 1.0-texCoord.y);\n\
+            if(intersects(texCoordAux, externalTexCoord))\n\
+            {\n\
+                // convert myTexCoord to customImageTexCoord.\n\
+                vec2 minTexCoord = vec2(externalTexCoord.x, externalTexCoord.y);\n\
+                vec2 maxTexCoord = vec2(externalTexCoord.z, externalTexCoord.w);\n\
+\n\
+                texCoord.x = (texCoordAux.x - minTexCoord.x)/(maxTexCoord.x - minTexCoord.x);\n\
+                texCoord.y = (texCoordAux.y - minTexCoord.y)/(maxTexCoord.y - minTexCoord.y);\n\
+\n\
+                texCoord.y = 1.0 - texCoord.y;\n\
+                getTextureColor(uActiveTextures[4], texture2D(texture_4, texCoord), texCoord,  victory, externalAlphasArray[4], uExternalTexCoordsArray[4], textureColor);\n\
+            }\n\
+        }\n\
+        else\n\
+            getTextureColor(uActiveTextures[4], texture2D(texture_4, texCoord), texCoord,  victory, externalAlphasArray[4], uExternalTexCoordsArray[4], textureColor);\n\
+    }\n\
     if(uActiveTextures[5] > 0)\n\
-        getTextureColor(uActiveTextures[5], texture2D(texture_5, texCoord), texCoord,  victory, externalAlphasArray[5], textureColor);\n\
+    {\n\
+        if(uActiveTextures[5] == 2)\n\
+        {\n\
+            // CustomImage. Must recalculate texCoords.\n\
+            vec4 externalTexCoord = uExternalTexCoordsArray[5];\n\
+            \n\
+            // check if intersects.\n\
+            vec2 texCoordAux = vec2(texCoord.x, 1.0-texCoord.y);\n\
+            if(intersects(texCoordAux, externalTexCoord))\n\
+            {\n\
+                // convert myTexCoord to customImageTexCoord.\n\
+                vec2 minTexCoord = vec2(externalTexCoord.x, externalTexCoord.y);\n\
+                vec2 maxTexCoord = vec2(externalTexCoord.z, externalTexCoord.w);\n\
+\n\
+                texCoord.x = (texCoordAux.x - minTexCoord.x)/(maxTexCoord.x - minTexCoord.x);\n\
+                texCoord.y = (texCoordAux.y - minTexCoord.y)/(maxTexCoord.y - minTexCoord.y);\n\
+\n\
+                texCoord.y = 1.0 - texCoord.y;\n\
+                getTextureColor(uActiveTextures[5], texture2D(texture_5, texCoord), texCoord,  victory, externalAlphasArray[5], uExternalTexCoordsArray[5], textureColor);\n\
+            }\n\
+        }\n\
+        else\n\
+            getTextureColor(uActiveTextures[5], texture2D(texture_5, texCoord), texCoord,  victory, externalAlphasArray[5], uExternalTexCoordsArray[5], textureColor);\n\
+    }\n\
     if(uActiveTextures[6] > 0)\n\
-        getTextureColor(uActiveTextures[6], texture2D(texture_6, texCoord), texCoord,  victory, externalAlphasArray[6], textureColor);\n\
+    {\n\
+        if(uActiveTextures[6] == 2)\n\
+        {\n\
+            // CustomImage. Must recalculate texCoords.\n\
+            vec4 externalTexCoord = uExternalTexCoordsArray[6];\n\
+            \n\
+            // check if intersects.\n\
+            vec2 texCoordAux = vec2(texCoord.x, 1.0-texCoord.y);\n\
+            if(intersects(texCoordAux, externalTexCoord))\n\
+            {\n\
+                // convert myTexCoord to customImageTexCoord.\n\
+                vec2 minTexCoord = vec2(externalTexCoord.x, externalTexCoord.y);\n\
+                vec2 maxTexCoord = vec2(externalTexCoord.z, externalTexCoord.w);\n\
+\n\
+                texCoord.x = (texCoordAux.x - minTexCoord.x)/(maxTexCoord.x - minTexCoord.x);\n\
+                texCoord.y = (texCoordAux.y - minTexCoord.y)/(maxTexCoord.y - minTexCoord.y);\n\
+\n\
+                texCoord.y = 1.0 - texCoord.y;\n\
+                getTextureColor(uActiveTextures[6], texture2D(texture_2, texCoord), texCoord,  victory, externalAlphasArray[6], uExternalTexCoordsArray[6], textureColor);\n\
+            }\n\
+        }\n\
+        else\n\
+            getTextureColor(uActiveTextures[6], texture2D(texture_2, texCoord), texCoord,  victory, externalAlphasArray[6], uExternalTexCoordsArray[6], textureColor);\n\
+    }\n\
     if(uActiveTextures[7] > 0)\n\
-        getTextureColor(uActiveTextures[7], texture2D(texture_7, texCoord), texCoord,  victory, externalAlphasArray[7], textureColor);\n\
+    {\n\
+        if(uActiveTextures[7] == 2)\n\
+        {\n\
+            // CustomImage. Must recalculate texCoords.\n\
+            vec4 externalTexCoord = uExternalTexCoordsArray[7];\n\
+            \n\
+            // check if intersects.\n\
+            vec2 texCoordAux = vec2(texCoord.x, 1.0-texCoord.y);\n\
+            if(intersects(texCoordAux, externalTexCoord))\n\
+            {\n\
+                // convert myTexCoord to customImageTexCoord.\n\
+                vec2 minTexCoord = vec2(externalTexCoord.x, externalTexCoord.y);\n\
+                vec2 maxTexCoord = vec2(externalTexCoord.z, externalTexCoord.w);\n\
+\n\
+                texCoord.x = (texCoordAux.x - minTexCoord.x)/(maxTexCoord.x - minTexCoord.x);\n\
+                texCoord.y = (texCoordAux.y - minTexCoord.y)/(maxTexCoord.y - minTexCoord.y);\n\
+\n\
+                texCoord.y = 1.0 - texCoord.y;\n\
+                getTextureColor(uActiveTextures[7], texture2D(texture_7, texCoord), texCoord,  victory, externalAlphasArray[7], uExternalTexCoordsArray[7], textureColor);\n\
+            }\n\
+        }\n\
+        else\n\
+            getTextureColor(uActiveTextures[7], texture2D(texture_7, texCoord), texCoord,  victory, externalAlphasArray[7], uExternalTexCoordsArray[7], textureColor);\n\
+    }\n\
     \n\
     if(!victory)\n\
     discard;\n\
@@ -4351,13 +4545,6 @@ void main()\n\
 				// decode the grayScale.***\n\
 				altitude = uMinMaxAltitudes.x + layersTextureColor.r * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);\n\
 			}\n\
-\n\
-			//if(layersTextureColor.w > 0.0)\n\
-			//{\n\
-			//	// decode the grayScale.***\n\
-			//	float depth = unpackDepthOcean(layersTextureColor);\n\
-			//	altitude = uMinMaxAltitudes.x + depth * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);\n\
-			//}\n\
 		}\n\
 		// End test dem image.------------------------------------------------------------------------------------------------------------\n\
 		if(bApplySsao && altitude<0.0)\n\
@@ -4413,12 +4600,6 @@ void main()\n\
 		\n\
 		if(altitude < 0.0)\n\
 		{\n\
-			//if(uSeaOrTerrainType == 1)\n\
-			//{\n\
-			//	gl_FragColor = vec4(oneColor4.xyz * shadow_occlusion * lambertian, 0.5); // original.***\n\
-			//	return;\n\
-			//}\n\
-\n\
 			float minHeight_rainbow = -100.0;\n\
 			float maxHeight_rainbow = 0.0;\n\
 			float gray = (altitude - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);\n\
@@ -4435,7 +4616,6 @@ void main()\n\
 				//-----------------------------------------------------------------------\n\
 				vec2 cauticsTexCoord = texCoord;\n\
 				vec3 causticColor = causticColor(cauticsTexCoord)*gray*0.4;\n\
-				//textureColor = vec4(mix(textureColor.rgb, causticColor, gray), externalAlpha);\n\
 				textureColor = vec4(textureColor.r+ causticColor.x, textureColor.g+ causticColor.y, textureColor.b+ causticColor.z, 1.0);\n\
 			}\n\
 			// End caustics.--------------------------\n\
@@ -4446,7 +4626,6 @@ void main()\n\
 			float red = gray + 0.2;\n\
 			float green = gray + 0.6;\n\
 			float blue = gray*2.0 + 2.0;\n\
-			//fogColor = vec4(gray*1.3, gray*2.1, gray*2.7, 1.0);\n\
 			fogColor = vec4(red, green, blue, 1.0);\n\
 			\n\
 			// Test drawing grid.***\n\
@@ -4477,7 +4656,6 @@ void main()\n\
 			vec3 specularColor = vec3(0.8, 0.8, 0.8);\n\
 			textureColor = mix(textureColor, fogColor, 0.2); \n\
 			//gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian + specularReflectionCoef * specular * specularColor * shadow_occlusion, 1.0); // with specular.***\n\
-			//gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian, 1.0); // original.***\n\
 			gl_FragColor = vec4(textureColor.xyz * shadow_occlusion * lambertian, 1.0); // original.***\n\
 \n\
 			return;\n\

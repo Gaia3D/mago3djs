@@ -1052,7 +1052,7 @@ MagoWorld.prototype.doTest__TerrainScanner = function()
 
 MagoWorld.prototype.doTest__MagoRectangle = function()
 {
-	// create a magoRectangle.***
+	// create a magoRectangle to clamp to terrain.***
 	var position = {
 		minLongitude : 126.31394,
 		minLatitude  : 33.18262,
@@ -1068,6 +1068,30 @@ MagoWorld.prototype.doTest__MagoRectangle = function()
 		imageUrl       : '/images/materialImages/factoryRoof.jpg',
 		opacity        : 0.7,
 		clampToTerrain : true
+	};
+
+	var magoRect = new MagoRectangle(position, style);
+	//magoRect.setOneColor(0.5, 1.0, 0.8);
+
+	var targetDepth = 3;
+	this.magoManager.modeler.addObject(magoRect, targetDepth);
+
+	// create another magoRectangle that NO clampToTerrain.***
+	var position = {
+		minLongitude : 126.31394,
+		minLatitude  : 33.18262,
+		maxLongitude : 126.34513,
+		maxLatitude  : 33.21500,
+		altitude     : 400.0
+	};
+
+	var style = {
+		strokeWidth    : 2,
+		strokeColor    : '#FF0000',
+		fillColor      : '#00FF00',
+		imageUrl       : '/images/materialImages/factoryRoof.jpg',
+		opacity        : 0.7,
+		clampToTerrain : false
 	};
 
 	var magoRect = new MagoRectangle(position, style);

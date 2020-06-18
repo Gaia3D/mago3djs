@@ -499,13 +499,6 @@ void main()
 				// decode the grayScale.***
 				altitude = uMinMaxAltitudes.x + layersTextureColor.r * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);
 			}
-
-			//if(layersTextureColor.w > 0.0)
-			//{
-			//	// decode the grayScale.***
-			//	float depth = unpackDepthOcean(layersTextureColor);
-			//	altitude = uMinMaxAltitudes.x + depth * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);
-			//}
 		}
 		// End test dem image.------------------------------------------------------------------------------------------------------------
 		if(bApplySsao && altitude<0.0)
@@ -561,12 +554,6 @@ void main()
 		
 		if(altitude < 0.0)
 		{
-			//if(uSeaOrTerrainType == 1)
-			//{
-			//	gl_FragColor = vec4(oneColor4.xyz * shadow_occlusion * lambertian, 0.5); // original.***
-			//	return;
-			//}
-
 			float minHeight_rainbow = -100.0;
 			float maxHeight_rainbow = 0.0;
 			float gray = (altitude - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);
@@ -583,7 +570,6 @@ void main()
 				//-----------------------------------------------------------------------
 				vec2 cauticsTexCoord = texCoord;
 				vec3 causticColor = causticColor(cauticsTexCoord)*gray*0.4;
-				//textureColor = vec4(mix(textureColor.rgb, causticColor, gray), externalAlpha);
 				textureColor = vec4(textureColor.r+ causticColor.x, textureColor.g+ causticColor.y, textureColor.b+ causticColor.z, 1.0);
 			}
 			// End caustics.--------------------------
@@ -594,7 +580,6 @@ void main()
 			float red = gray + 0.2;
 			float green = gray + 0.6;
 			float blue = gray*2.0 + 2.0;
-			//fogColor = vec4(gray*1.3, gray*2.1, gray*2.7, 1.0);
 			fogColor = vec4(red, green, blue, 1.0);
 			
 			// Test drawing grid.***
@@ -625,7 +610,6 @@ void main()
 			vec3 specularColor = vec3(0.8, 0.8, 0.8);
 			textureColor = mix(textureColor, fogColor, 0.2); 
 			//gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian + specularReflectionCoef * specular * specularColor * shadow_occlusion, 1.0); // with specular.***
-			//gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian, 1.0); // original.***
 			gl_FragColor = vec4(textureColor.xyz * shadow_occlusion * lambertian, 1.0); // original.***
 
 			return;
