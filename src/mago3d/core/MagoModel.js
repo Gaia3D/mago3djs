@@ -5,9 +5,8 @@
  * @class MagoModel
  * 
  * @param {object} model model object.
- * @param {BuildingSeed} seed require. model bounding box seed.
  */
-var MagoModel = function(model, seed) 
+var MagoModel = function(model) 
 {
 	if (!(this instanceof MagoModel)) 
 	{
@@ -19,6 +18,11 @@ var MagoModel = function(model, seed)
 		throw new Error(Messages.REQUIRED_EMPTY_ERROR('dataId'));
 	}
 
+	if (isEmpty(model.dataKey))
+	{
+		throw new Error(Messages.REQUIRED_EMPTY_ERROR('dataKey'));
+	}
+
 	if (isEmpty(model.dataGroupId))
 	{
 		throw new Error(Messages.REQUIRED_EMPTY_ERROR('dataGroupId'));
@@ -28,14 +32,16 @@ var MagoModel = function(model, seed)
 	{
 		throw new Error(Messages.REQUIRED_EMPTY_ERROR('longitude', 'latitude'));
 	}
-
+	/*
 	if (!seed || (seed instanceof BuildingSeed && !seed.hasOwnProperty('bBox'))) 
 	{
 		throw new Error(Messages.REQUIRED_EMPTY_ERROR('BuildingSeed'));
 	}
-
+*/
+	this.ready = false;
 	this.id = model.dataId;
 	this.layerId = model.dataGroupId;
+	this.layerKey = model.dataGroupKey;
 	this.key = model.dataKey;
 	this.name = model.dataName;
 	this.dataType = model.dataType;
@@ -46,30 +52,52 @@ var MagoModel = function(model, seed)
 	this.rotationsDegree = new Point3D(defaultValue(model.pitch, 0), defaultValue(model.roll, 0), defaultValue(model.heading, 0));
 	this.bbox = new BoundingBox();
 
-	this.buildingSeed = seed; 
-
-	if (this.buildingSeed.geographicCoord === undefined)
-	{ this.buildingSeed.geographicCoord = new GeographicCoord(); }
-
-	if (this.buildingSeed.rotationsDegree === undefined)
-	{ this.buildingSeed.rotationsDegree = new Point3D(); }
-	// now calculate the geographic coord of the center of the bbox.
-	if (this.buildingSeed.geographicCoordOfBBox === undefined) 
-	{ this.buildingSeed.geographicCoordOfBBox = new GeographicCoord(); }
-
-	//값
-	this._calculate();
-
 	this.style = Object.assign({}, MagoModel.DEFAULT_STYLE, model.style||{});
+
+	this._buildingSeed; 
 };
 
+Object.defineProperties(MagoModel.prototype, {
+	buildingSeed: {
+		get: function()
+		{
+			return this._buildingSeed;
+		},
+		set: function(seed)
+		{
+			if (!(seed instanceof BuildingSeed))
+			{
+				return;
+			}
+			this._buildingSeed = seed;
+			if (this._buildingSeed.geographicCoord === undefined)
+			{ this._buildingSeed.geographicCoord = new GeographicCoord(); }
+		
+			if (this._buildingSeed.rotationsDegree === undefined)
+			{ this._buildingSeed.rotationsDegree = new Point3D(); }
+			// now calculate the geographic coord of the center of the bbox.
+			if (this._buildingSeed.geographicCoordOfBBox === undefined) 
+			{ this._buildingSeed.geographicCoordOfBBox = new GeographicCoord(); }
+		
+			//값
+			this._calculate();
+
+			this.ready = true;
+		}
+	}
+});
+/**
+ * 기존의 makenode와 같은 역할
+ * @private
+ */
 MagoModel.prototype._calculate = function() 
 {
 	var longitude = this.geographicCoord.longitude;
 	var latitude = this.geographicCoord.latitude;
 	var altitude = this.geographicCoord.altitude;
 	this.buildingSeed.geographicCoord.setLonLatAlt(longitude, latitude, altitude);
-	this.buildingSeed.rotationsDegree.set(this.rotationsDegree.pitch, this.rotationsDegree.roll, this.rotationsDegree.heading);
+	//x : pitch, y : roll, z : heading
+	this.buildingSeed.rotationsDegree.set(this.rotationsDegree.x, this.rotationsDegree.y, this.rotationsDegree.z);
 
 	var tMatrix = this.getTmatrix();
 
@@ -105,7 +133,9 @@ MagoModel.prototype._calculate = function()
 		}
 	}
 };
-
+/**
+ * @private
+ */
 MagoModel.prototype.getTmatrix = function() 
 {
 	var geoCoord = this.geographicCoord;
