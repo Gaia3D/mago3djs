@@ -65,8 +65,16 @@ var MagoLayer = function(option)
 		//TODO
 	}
 	//datas
-
 	this.datas = [];
+
+	if (option.datas && Array.isArray(option.datas))
+	{
+		for (var i=0, len = option.datas.length; i<len; i++)
+		{
+			var data = option.datas[i];
+			this.addData(data);
+		}
+	}
 }; 
 
 MagoLayer.prototype.getObjectIndexFile = function()
@@ -85,32 +93,58 @@ MagoLayer.prototype.getObjectIndexFile = function()
 			that.ready = true;
 			that.buildingSeedMap = buildingSeedMap;
 			
-			if (that.datas.length > 0) 
+			var dataLength = that.datas.length;
+			if (dataLength > 0) 
 			{
-				//
+				for (var i=0;i<dataLength;i++ )
+				{
+					that.readyData(that.datas[i]);
+				}
 			}
 		}
 	},
 	function(status) 
 	{
 		console.log("xhr status = " + status);
-	}).finally(function() 
-	{
-		//
 	});
-	/*
-	MagoManager.prototype.getObjectIndexFile = function(projectId, projectDataFolder) 
+};
+
+/**
+ * Layer에 f4d 데이터 추가.
+ * @param {MagoModel | Object} data
+ */
+MagoLayer.prototype.addData = function(data) 
+{
+	if (!(data instanceof MagoModel))
 	{
-		if (this.configInformation === undefined)
+		data = new MagoModel(data);
+	}
+
+	this.datas.push(data);
+	if (this.ready && that.buildingSeedMap)
+	{
+		this.readyData(data);
+	}
+};
+
+/**
+ * data를 표출하기 위한 값계산. 기존의 makenode와 같은 역할
+ * @param {MagoModel} data
+ */
+MagoLayer.prototype.readyData = function(data) 
+{
+	try 
+	{
+		var seed = this.buildingSeedMap.map.get(data.key);
+		if (!seed)
 		{
-			this.configInformation = MagoConfig.getPolicy();
+			throw new Error('This data(' + data.key + ') is seedless!');
 		}
-		
-		//this.buildingSeedList = new BuildingSeedList();
-		
-		var geometrySubDataPath = projectDataFolder;
-		var fileName = this.readerWriter.geometryDataPath + "/" + geometrySubDataPath + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + new Date().getTime();
-		this.readerWriter.getObjectIndexFileForSmartTile(fileName, this, undefined, projectId);
-	};
-	*/
+		//When set seed, calculate model geolocation.
+		data.buildingSeed = seed;
+	}
+	catch (e)
+	{
+		console.warn(e);
+	}
 };
