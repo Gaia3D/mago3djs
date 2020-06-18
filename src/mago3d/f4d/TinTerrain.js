@@ -542,7 +542,9 @@ TinTerrain.prototype.mergeTexturesToTextureMaster = function(gl, shader, texture
 TinTerrain.prototype.makeTextureMaster = function()
 {
 	if (this.textureMasterPrepared)
-	{ return; }
+	{ 
+		return; 
+	}
 
 	// If there are 2 or more layers, then merge all layers into one texture.
 	var magoManager = this.tinTerrainManager.magoManager;
@@ -633,6 +635,7 @@ TinTerrain.prototype.makeTextureMaster = function()
 
 	
 	// Now, check if exist objects to clamp to terrain.
+	var objectsToClampToTerrainExistsAndBibded = true;
 	var objectsToClampToTerrain = this.tinTerrainManager.objectsToClampToTerrainArray;
 	if (objectsToClampToTerrain && objectsToClampToTerrain.length > 0)
 	{
@@ -664,8 +667,27 @@ TinTerrain.prototype.makeTextureMaster = function()
 							//clampToTerrain: true
 							//fillColor: "#00FF00"
 							var imageUrl = style.imageUrl;//: "/images/materialImages/factoryRoof.jpg"
+							objToClamp.texture.url = imageUrl;
 							var flipYTexCoord = false;
 							TexturesManager.loadTexture(imageUrl, objToClamp.texture, magoManager, flipYTexCoord);
+						}
+
+						continue;
+					}
+					else if (!(objToClamp.texture.texId instanceof WebGLTexture))
+					{
+						// there are 2 possibilities.
+						// 1- there are a blob.
+						// 2- there are a imageUrl.
+						if (objToClamp.texture.blob)
+						{
+							// load by blob.
+							TexturesManager.newWebGlTextureByBlob(gl, objToClamp.texture.blob, objToClamp.texture);
+						}
+						else if (objToClamp.texture.url)
+						{
+							// load by url.
+							TexturesManager.loadTexture(objToClamp.texture.url, objToClamp.texture, magoManager, flipYTexCoord);
 						}
 
 						continue;
@@ -686,14 +708,21 @@ TinTerrain.prototype.makeTextureMaster = function()
 					var maxT = (objMaxLat - thisMinLat)/thisLatRange;
 
 					objToClamp.texture.temp_clampToTerrainTexCoord = [minS, minT, maxS, maxT];
-					//objToClamp.texture.temp_clampToTerrainTexCoord = [1.0-maxS, 1.0-maxT, 1.0-minS, 1.0-minT];
 
 					if (texturesToMergeArray.length === 8)
 					{
 						texturesToMergeMatrix.push(texturesToMergeArray);
 						texturesToMergeArray = [];
 					}
-					texturesToMergeArray.push(objToClamp.texture);
+
+					if (objToClamp.texture.fileLoadState === CODE.fileLoadState.BINDING_FINISHED)
+					{ 
+						texturesToMergeArray.push(objToClamp.texture); 
+					}
+					else
+					{
+						objectsToClampToTerrainExistsAndBibded = false;
+					}
 					
 					var hola = 0;
 				}
@@ -715,7 +744,7 @@ TinTerrain.prototype.makeTextureMaster = function()
 	}
 	gl.disable(gl.BLEND);
 
-	if (this.isTexturePrepared(this.texture))
+	if (objectsToClampToTerrainExistsAndBibded && this.isTexturePrepared(this.texture))
 	{ 
 		// If this textures are prepared => all textures was merged into textureMaster.
 		this.textureMasterPrepared = true; 

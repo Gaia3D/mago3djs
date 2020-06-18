@@ -102,7 +102,7 @@ TexturesManager.loadTexture = function(imagePath, texture, magoManager, flip_y_t
 		{ flip_y_texCoord = false; }
 		
 		handleTextureLoaded(gl, imageToLoad, texture.texId, flip_y_texCoord);
-		texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+		texture.fileLoadState = CODE.fileLoadState.BINDING_FINISHED;
 	};
 
 	imageToLoad.onerror = function() 
@@ -113,9 +113,8 @@ TexturesManager.loadTexture = function(imagePath, texture, magoManager, flip_y_t
 	imageToLoad.src = imagePath;
 };
 
-TexturesManager.newWebGlTextureByEmbeddedImage = function(gl, embeddedImage, texture)
+TexturesManager.newWebGlTextureByBlob = function(gl, blob, texture)
 {
-	var blob = new Blob([embeddedImage], {type: 'application/octet-binary'});
 	var url = URL.createObjectURL(blob);
 	texture.fileLoadState = CODE.fileLoadState.BINDING_STARTED;
 	
@@ -127,6 +126,13 @@ TexturesManager.newWebGlTextureByEmbeddedImage = function(gl, embeddedImage, tex
 		texture.fileLoadState = CODE.fileLoadState.BINDING_FINISHED; // file load finished.***
 	};
 	img.src = url;
+};
+
+TexturesManager.newWebGlTextureByEmbeddedImage = function(gl, embeddedImage, texture)
+{
+	// Function called in NeoBuilding.prototype.prepareSkin = function(magoManager).
+	var blob = new Blob([embeddedImage], {type: 'application/octet-binary'});
+	TexturesManager.newWebGlTextureByBlob(gl, blob, texture);
 };
 
 

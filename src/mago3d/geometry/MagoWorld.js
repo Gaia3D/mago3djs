@@ -1055,10 +1055,10 @@ MagoWorld.prototype.doTest__MagoRectangle = function()
 	// create a magoRectangle to clamp to terrain.***
 	var position = {
 		minLongitude : 126.31394,
-		minLatitude  : 33.18262,
+		minLatitude  : 33.22,
 		maxLongitude : 126.34513,
-		maxLatitude  : 33.21500,
-		altitude     : 200.0
+		maxLatitude  : 33.25,
+		altitude     : 800.0
 	};
 
 	var style = {
@@ -1079,10 +1079,10 @@ MagoWorld.prototype.doTest__MagoRectangle = function()
 	// create another magoRectangle that NO clampToTerrain.***
 	var position = {
 		minLongitude : 126.31394,
-		minLatitude  : 33.18262,
+		minLatitude  : 33.22,
 		maxLongitude : 126.34513,
-		maxLatitude  : 33.21500,
-		altitude     : 400.0
+		maxLatitude  : 33.25,
+		altitude     : 800.0
 	};
 
 	var style = {

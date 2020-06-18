@@ -22,6 +22,7 @@ var Texture = function(options)
 	this.imageWidth = 32;
 	this.imageHeight = 32;
 	this.url;
+	this.blob; 
 	this.opacity = 1.0;
 	this.activeTextureType = 1; // 0= inactive. 1= XYZLayer, WMSLayer. 2= Custom image. 10= Bathymetry.
 
