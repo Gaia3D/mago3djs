@@ -1088,9 +1088,11 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 		// If there are 2 or more layers, then must create textureMaster.
 		// Check if tinTerrain is syncronized with this.tinTerrainManager.
 		if (this.layersStyleId !== this.tinTerrainManager.layersStyleId)
-		{ this.textureMasterPrepared = undefined; }
+		{ 
+			this.textureMasterPrepared = undefined; 
+		}
 
-		if (this.textureMasterPrepared === undefined)
+		if (this.textureMasterPrepared === undefined && this.isTexturePrepared(this.texture))
 		{
 			this.makeTextureMaster();
 		}
