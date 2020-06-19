@@ -143,4 +143,9 @@ void main()
 	float fogParam = 1.15 * v3Pos.z/(far - 10000.0);
 	float fogParam2 = fogParam*fogParam;
 	vFogAmount = fogParam2*fogParam2;
+	if(vFogAmount < 0.0)
+	vFogAmount = 0.0;
+	else if(vFogAmount > 1.0)
+	vFogAmount = 1.0;
+	//vFogAmount = ((-v3Pos.z))/(far);
 }

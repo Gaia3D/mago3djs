@@ -435,10 +435,10 @@ TinTerrain.prototype.isPrepared = function()
 	if (this.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
 	{ return false; }
 	
-	if (this.layersStyleId !== this.tinTerrainManager.layersStyleId)
-	{ 
-		return false;
-	}
+	//if (this.depth > 2 && this.layersStyleId !== this.tinTerrainManager.layersStyleId)
+	//{ 
+	//	return false;
+	//}
 	
 	if (!this.isTexturePrepared(this.texture)) { return false; }
 	
@@ -549,6 +549,8 @@ TinTerrain.prototype.makeTextureMaster = function()
 	{ 
 		return; 
 	}
+
+	//if()
 
 	// If there are 2 or more layers, then merge all layers into one texture.
 	var magoManager = this.tinTerrainManager.magoManager;
@@ -1264,6 +1266,11 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			{ 
 				// If my owner rendered, then do no render me.
 				return; 
+			}
+
+			if (this.depth > 2 && this.layersStyleId !== this.tinTerrainManager.layersStyleId)
+			{ 
+				this.makeTextureMaster();
 			}
 		
 			var gl = magoManager.getGl();

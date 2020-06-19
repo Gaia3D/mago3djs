@@ -4821,6 +4821,11 @@ void main()\n\
 	float fogParam = 1.15 * v3Pos.z/(far - 10000.0);\n\
 	float fogParam2 = fogParam*fogParam;\n\
 	vFogAmount = fogParam2*fogParam2;\n\
+	if(vFogAmount < 0.0)\n\
+	vFogAmount = 0.0;\n\
+	else if(vFogAmount > 1.0)\n\
+	vFogAmount = 1.0;\n\
+	//vFogAmount = ((-v3Pos.z))/(far);\n\
 }";
 ShaderSource.update_frag = "precision highp float;\n\
 \n\
