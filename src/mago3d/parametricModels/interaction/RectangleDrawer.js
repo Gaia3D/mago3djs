@@ -57,6 +57,12 @@ RectangleDrawer.prototype.init = function()
 	this.endPoint = undefined;
 	this.tempRectangle = undefined;
 	this.manager.magoWorld.cameraMovable = true;
+
+	if (this.manager.modeler.magoRectangle) 
+	{
+		this.manager.modeler.magoRectangle.deleteObjects(this.manager.vboMemoryManager);
+		this.manager.modeler.magoRectangle = undefined;
+	}
 };
 /**
  * @private
@@ -126,12 +132,13 @@ RectangleDrawer.prototype.start = function()
 						fillColor: '#ff0000'
 					};
 				}
-				
+				console.info('init : ' + that.style.imageUrl);
 				that.tempRectangle = new MagoRectangle(position, that.style);
 				manager.modeler.magoRectangle = that.tempRectangle;
 			}
 			else 
 			{
+				console.info('as : ' + that.style.imageUrl);
 				that.tempRectangle.init(manager);
 				that.tempRectangle.setPosition(position);
 			}

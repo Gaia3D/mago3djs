@@ -133,6 +133,12 @@ Modeler.prototype.removeObject = function(target)
 	if (target === undefined)
 	{ return false; }
 
+	if (target instanceof MagoRectangle && target.style.clampToTerrain) 
+	{
+		this.magoManager.tinTerrainManager.removeObjectToClampToTerrain(target);
+		target.deleteObjects(this.magoManager.vboMemoryManager);
+		return;
+	}
 	target.deleteObjects(this.magoManager.vboMemoryManager);
 
 	var tile = target.smartTileOwner;

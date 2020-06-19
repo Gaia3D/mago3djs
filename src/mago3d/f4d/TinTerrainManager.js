@@ -124,7 +124,17 @@ TinTerrainManager.prototype.addObjectToClampToTerrain = function(object)
 	// textureMaster, so call "imageryLayersChanged".
 	this.imageryLayersChanged();
 };
+TinTerrainManager.prototype.removeObjectToClampToTerrain = function(object)
+{
+	this.objectsToClampToTerrainArray = this.objectsToClampToTerrainArray.filter(function(obj)
+	{
+		return obj !== object;
+	});
 
+	// An objectToClampToTerrain is not a imageryLayer, but this objects must be merged into
+	// textureMaster, so call "imageryLayersChanged".
+	this.imageryLayersChanged();
+};
 TinTerrainManager.prototype.getTerrainType = function()
 {
 	return this.terrainType;
