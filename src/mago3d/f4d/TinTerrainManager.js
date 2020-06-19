@@ -319,12 +319,13 @@ TinTerrainManager.prototype.makeDistanceLimitByDepth = function()
 	//	this.distLimitByDepth[i] = this.distLimitByDepth[i+1]*2; 
 	//}
 
+	/*
 	var count = this.distLimitByDepth.length;
 	for (var i=0; i<count; i++)
 	{
 		this.distLimitByDepth[i] *= 1.5;
 	}
-	
+	*/
 };
 
 TinTerrainManager.prototype.getTexCorrection = function(depth)
