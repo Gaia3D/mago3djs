@@ -435,6 +435,10 @@ TinTerrain.prototype.isPrepared = function()
 	if (this.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
 	{ return false; }
 	
+	if (this.layersStyleId !== this.tinTerrainManager.layersStyleId)
+	{ 
+		return false;
+	}
 	
 	if (!this.isTexturePrepared(this.texture)) { return false; }
 	
