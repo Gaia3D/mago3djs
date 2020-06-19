@@ -87,7 +87,7 @@ MagoRectangle.prototype.clone = function()
 		maxLatitude  : this.maxGeographicCoord.latitude,
 		altitude     : this.maxGeographicCoord.altitude
 	};
-	var style = this.style;
+	var style = JSON.parse(JSON.stringify(this.style));
 
 	return new MagoRectangle(position, style);
 };
