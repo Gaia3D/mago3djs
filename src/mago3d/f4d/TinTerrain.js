@@ -694,8 +694,6 @@ TinTerrain.prototype.makeTextureMaster = function()
 						texturesToMergeArray = [];
 					}
 					texturesToMergeArray.push(objToClamp.texture);
-					
-					var hola = 0;
 				}
 			}
 		} 
@@ -1051,7 +1049,7 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 		{
 			// Test.***
 			return this.prepareTinTerrainPlain(magoManager, tinTerrainManager);
-			return false;
+			//return false;
 			// End test.---
 		}
 
