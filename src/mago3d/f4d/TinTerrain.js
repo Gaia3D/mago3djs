@@ -672,6 +672,7 @@ TinTerrain.prototype.makeTextureMaster = function()
 							TexturesManager.loadTexture(imageUrl, objToClamp.texture, magoManager, flipYTexCoord);
 						}
 
+						objectsToClampToTerrainExistsAndBibded = false;
 						continue;
 					}
 					else if (!(objToClamp.texture.texId instanceof WebGLTexture))
@@ -690,6 +691,7 @@ TinTerrain.prototype.makeTextureMaster = function()
 							TexturesManager.loadTexture(objToClamp.texture.url, objToClamp.texture, magoManager, flipYTexCoord);
 						}
 
+						objectsToClampToTerrainExistsAndBibded = false;
 						continue;
 					}
 
