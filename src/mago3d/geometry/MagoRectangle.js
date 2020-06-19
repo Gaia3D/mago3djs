@@ -380,3 +380,35 @@ MagoRectangle.prototype.makeMesh = function(magoManager)
     
 	this.setDirty(false);
 };
+
+/**
+ * set geometry style, if this geometry has been renderd, init use magomanager.
+ * @param {MagoGeometryStyle} style
+ * @param {MagoManager} magoManager
+ */
+MagoGeometry.prototype.setStyle = function(style, magoManager) 
+{
+	if (!style) 
+	{
+		throw new Error(Messages.REQUIRED_EMPTY_ERROR('style'));
+	}
+
+	if (magoManager && magoManager instanceof MagoManager) 
+	{
+		this.init(magoManager);
+	}
+
+	for (var key in style)
+	{
+		if (style.hasOwnProperty(key))
+		{
+			this.style[key] = style[key];
+		}
+	}
+
+	if (this.style.clampToTerrain)
+	{
+		this.texture = undefined;
+		magoManager.tinTerrainManager.imageryLayersChanged();
+	}
+};

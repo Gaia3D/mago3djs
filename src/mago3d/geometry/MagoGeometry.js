@@ -54,5 +54,11 @@ MagoGeometry.prototype.setStyle = function(style, magoManager)
 		this.init(magoManager);
 	}
 
-	this.style = style;
+	for (var key in style)
+	{
+		if (style.hasOwnProperty(key))
+		{
+			this.style[key] = style[key];
+		}
+	}
 };
