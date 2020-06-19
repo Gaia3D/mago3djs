@@ -723,8 +723,6 @@ TinTerrain.prototype.makeTextureMaster = function()
 					{
 						objectsToClampToTerrainExistsAndBibded = false;
 					}
-					
-					var hola = 0;
 				}
 			}
 		} 
@@ -1080,7 +1078,7 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 		{
 			// Test.***
 			return this.prepareTinTerrainPlain(magoManager, tinTerrainManager);
-			return false;
+			//return false;
 			// End test.---
 		}
 
