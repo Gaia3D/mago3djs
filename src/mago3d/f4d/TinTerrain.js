@@ -1270,6 +1270,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 
 			if (this.depth > 2 && this.layersStyleId !== this.tinTerrainManager.layersStyleId)
 			{ 
+				this.textureMasterPrepared = false;
 				this.makeTextureMaster();
 			}
 		
