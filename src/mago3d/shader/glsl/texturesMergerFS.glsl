@@ -85,7 +85,7 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
 void main()
 {           
     // Debug.
-    /*
+    
     if(v_tex_pos.x < 0.002 || v_tex_pos.x > 0.998)
     {
         gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
@@ -97,7 +97,7 @@ void main()
         gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
         return;
     }
-    */
+    
 
     vec2 texCoord = vec2(1.0 - v_tex_pos.x, 1.0 - v_tex_pos.y);
 

@@ -88,6 +88,7 @@ var TinTerrainManager = function(magoManager, options)
 	// Vars to maintain syncronization between this & tinTerrains.
 	this.renderingFase = 0;
 	this.layersStyleId = 0;
+	this.objToClampToTerrainStyleId = 0;
 
 	// Objects to clampToTerrain.
 	this.objectsToClampToTerrainArray;
@@ -113,6 +114,15 @@ TinTerrainManager.prototype.imageryLayersChanged = function()
 	{ this.layersStyleId = 0; }
 };
 
+TinTerrainManager.prototype.objectsClampToTerrainChanged = function()
+{
+	// Call this function when imagery layers added, erased, deleted or changed.
+	// must remake the texturemaster of tinTerrains.
+	this.objToClampToTerrainStyleId += 1;
+	if (this.objToClampToTerrainStyleId > 1000000)
+	{ this.objToClampToTerrainStyleId = 0; }
+};
+
 TinTerrainManager.prototype.addObjectToClampToTerrain = function(object)
 {
 	if (this.objectsToClampToTerrainArray === undefined)
@@ -122,7 +132,7 @@ TinTerrainManager.prototype.addObjectToClampToTerrain = function(object)
 
 	// An objectToClampToTerrain is not a imageryLayer, but this objects must be merged into
 	// textureMaster, so call "imageryLayersChanged".
-	this.imageryLayersChanged();
+	this.objectsClampToTerrainChanged();
 };
 TinTerrainManager.prototype.removeObjectToClampToTerrain = function(object)
 {
@@ -135,6 +145,145 @@ TinTerrainManager.prototype.removeObjectToClampToTerrain = function(object)
 	// textureMaster, so call "imageryLayersChanged".
 	this.imageryLayersChanged();
 };
+
+TinTerrainManager.prototype.prepareObjectToClampToTerrain = function()
+{
+	var objectsToClampToTerrain = this.objectsToClampToTerrainArray;
+	if (objectsToClampToTerrain && objectsToClampToTerrain.length > 0)
+	{
+		// check if objects intersects with this tile.
+		var objToClampCount = objectsToClampToTerrain.length;
+		for (var i=0; i<objToClampCount; i++)
+		{
+			var objToClamp = objectsToClampToTerrain[i];
+			if (objToClamp instanceof MagoRectangle)
+			{
+				if (objToClamp.texture === undefined)
+				{
+					// load texture 1rst.
+					objToClamp.texture = new Texture();
+					objToClamp.texture.setActiveTextureType(2);
+					var style = objToClamp.style;
+					if (style)
+					{
+						//clampToTerrain: true
+						//fillColor: "#00FF00"
+						var imageUrl = style.imageUrl;//: "/images/materialImages/factoryRoof.jpg"
+						objToClamp.texture.url = imageUrl;
+						var flipYTexCoord = false;
+						TexturesManager.loadTexture(imageUrl, objToClamp.texture, magoManager, flipYTexCoord);
+					}
+				}
+				else if (!(objToClamp.texture.texId instanceof WebGLTexture))
+				{
+					// there are 2 possibilities.
+					// 1- there are a blob.
+					// 2- there are a imageUrl.
+					if (objToClamp.texture.blob)
+					{
+						// load by blob.
+						TexturesManager.newWebGlTextureByBlob(gl, objToClamp.texture.blob, objToClamp.texture);
+					}
+					else if (objToClamp.texture.url)
+					{
+						// load by url.
+						TexturesManager.loadTexture(objToClamp.texture.url, objToClamp.texture, magoManager, flipYTexCoord);
+					}
+				}
+			}
+		} 
+	}
+};
+
+TinTerrainManager.prototype.getIntersectedObjectToClampToTerrain = function(geoExtent, resultObjectsArray)
+{
+	var objectsToClampToTerrain = this.objectsToClampToTerrainArray;
+	if (objectsToClampToTerrain && objectsToClampToTerrain.length > 0)
+	{
+		// check if objects intersects with this tile.
+		var objToClampCount = objectsToClampToTerrain.length;
+		for (var i=0; i<objToClampCount; i++)
+		{
+			var objToClamp = objectsToClampToTerrain[i];
+			if (objToClamp instanceof MagoRectangle)
+			{
+				
+				var minGeoCoord = objToClamp.minGeographicCoord;
+				var maxGeoCoord = objToClamp.maxGeographicCoord;
+				var objMinLon = minGeoCoord.longitude;
+				var objMinLat = minGeoCoord.latitude;
+				var objMaxLon = maxGeoCoord.longitude;
+				var objMaxLat = maxGeoCoord.latitude;
+				var objGeoExtent = new GeographicExtent(objMinLon, objMinLat, minGeoCoord.altitude, objMaxLon, objMaxLat, maxGeoCoord.altitude);
+				if (objGeoExtent.intersects2dWithGeoExtent(geoExtent))
+				{
+					if (objToClamp.texture === undefined)
+					{
+						// load texture 1rst.
+						objToClamp.texture = new Texture();
+						objToClamp.texture.setActiveTextureType(2);
+						var style = objToClamp.style;
+						if (style)
+						{
+							//clampToTerrain: true
+							//fillColor: "#00FF00"
+							var imageUrl = style.imageUrl;//: "/images/materialImages/factoryRoof.jpg"
+							objToClamp.texture.url = imageUrl;
+							var flipYTexCoord = false;
+							TexturesManager.loadTexture(imageUrl, objToClamp.texture, magoManager, flipYTexCoord);
+						}
+
+						//continue;
+					}
+					else if (!(objToClamp.texture.texId instanceof WebGLTexture))
+					{
+						// there are 2 possibilities.
+						// 1- there are a blob.
+						// 2- there are a imageUrl.
+						if (objToClamp.texture.blob)
+						{
+							// load by blob.
+							TexturesManager.newWebGlTextureByBlob(gl, objToClamp.texture.blob, objToClamp.texture);
+						}
+						else if (objToClamp.texture.url)
+						{
+							// load by url.
+							TexturesManager.loadTexture(objToClamp.texture.url, objToClamp.texture, magoManager, flipYTexCoord);
+						}
+						//continue;
+					}
+
+					// calculate the relative texCoords of the rectangle.
+					var thisMinLon = geoExtent.minGeographicCoord.longitude;
+					var thisMinLat = geoExtent.minGeographicCoord.latitude;
+					var thisMaxLon = geoExtent.maxGeographicCoord.longitude;
+					var thisMaxLat = geoExtent.maxGeographicCoord.latitude;
+					var thisLonRange = thisMaxLon - thisMinLon;
+					var thisLatRange = thisMaxLat - thisMinLat;
+
+					var minS = (objMinLon - thisMinLon)/thisLonRange;
+					var minT = (objMinLat - thisMinLat)/thisLatRange;
+
+					var maxS = (objMaxLon - thisMinLon)/thisLonRange;
+					var maxT = (objMaxLat - thisMinLat)/thisLatRange;
+
+					objToClamp.texture.temp_clampToTerrainTexCoord = [minS, minT, maxS, maxT];
+
+					//if (objToClamp.texture.fileLoadState === CODE.fileLoadState.BINDING_FINISHED)
+					{ 
+						if (resultObjectsArray === undefined)
+						{ resultObjectsArray = []; }
+
+						resultObjectsArray.push(objToClamp); 
+					}
+				}
+			}
+		} 
+	}
+
+	return resultObjectsArray;
+};
+
 TinTerrainManager.prototype.getTerrainType = function()
 {
 	return this.terrainType;
@@ -398,7 +547,8 @@ TinTerrainManager.prototype.doFrustumCulling = function(frustum, camera, magoMan
 	}
 
 	// now, put all tinTerrains into "this.visibleTilesArray".
-	for (var depth = 0; depth <= this.maxDepth; depth++) 
+	//for (var depth = 0; depth <= this.maxDepth; depth++) 
+	for (var depth = this.maxDepth; depth >=0; depth--) 
 	{
 		var visibleTilesArray = this.visibleTilesArrayMap[depth];
 		if (visibleTilesArray && visibleTilesArray.length > 0)
@@ -485,7 +635,8 @@ TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager)
 
 		
 	}
-	
+
+	this.prepareObjectToClampToTerrain();
 };
 
 TinTerrainManager.prototype.getAltitudes = function(geoCoordsArray, resultGeoCoordsArray) 
@@ -507,11 +658,9 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	{ currentShader = shader; }
 	else
 	{ currentShader = magoManager.postFxShadersManager.getShader("tinTerrain"); }
-	var shaderProgram = currentShader.program;
 	
 	currentShader.resetLastBuffersBinded();
-	
-	gl.useProgram(shaderProgram);
+	magoManager.postFxShadersManager.useProgram(currentShader);
 	currentShader.enableVertexAttribArray(currentShader.position3_loc);
 	if (bDepth)
 	{ currentShader.disableVertexAttribArray(currentShader.texCoord2_loc); }

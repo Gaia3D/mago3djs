@@ -1052,11 +1052,14 @@ MagoWorld.prototype.doTest__TerrainScanner = function()
 
 MagoWorld.prototype.doTest__MagoRectangle = function()
 {
+	if (this.countAux === undefined)
+	{ this.countAux = 0; }
+
 	// create a magoRectangle to clamp to terrain.***
 	var position = {
-		minLongitude : 126.31394,
+		minLongitude : 126.31394 + this.countAux*0.06,
 		minLatitude  : 33.22,
-		maxLongitude : 126.34513,
+		maxLongitude : 126.34513 + this.countAux*0.06,
 		maxLatitude  : 33.25,
 		altitude     : 800.0
 	};
@@ -1078,9 +1081,9 @@ MagoWorld.prototype.doTest__MagoRectangle = function()
 
 	// create another magoRectangle that NO clampToTerrain.***
 	var position = {
-		minLongitude : 126.31394,
+		minLongitude : 126.31394 + this.countAux*0.06,
 		minLatitude  : 33.22,
-		maxLongitude : 126.34513,
+		maxLongitude : 126.34513 + this.countAux*0.06,
 		maxLatitude  : 33.25,
 		altitude     : 800.0
 	};
@@ -1099,6 +1102,8 @@ MagoWorld.prototype.doTest__MagoRectangle = function()
 
 	var targetDepth = 3;
 	this.magoManager.modeler.addObject(magoRect, targetDepth);
+
+	this.countAux++;
 };
 
 MagoWorld.prototype.doTest__MagoPoint = function()

@@ -543,14 +543,243 @@ TinTerrain.prototype.mergeTexturesToTextureMaster = function(gl, shader, texture
 	gl.drawArrays(gl.TRIANGLES, 0, 6);
 };
 
+TinTerrain.prototype.makeTextureMasterImageryLayers = function()
+{
+	if (this.textureMasterImageryLayersPrepared)
+	{ 
+		return; 
+	}
+
+	// If there are 2 or more layers, then merge all layers into one texture.
+	var magoManager = this.tinTerrainManager.magoManager;
+	var postFxShaderManager = magoManager.postFxShadersManager;
+	var gl = magoManager.getGl();
+
+	if (this.textureMasterImageryLayers === undefined)
+	{ 
+		this.textureMasterImageryLayers = new Texture();
+		var emptyPixels = new Uint8Array(256* 256 * 4);
+		this.textureMasterImageryLayers.texId = Texture.createTexture(gl, gl.LINEAR, emptyPixels, 256, 256); 
+	}
+
+	var texturesMergerFbo = this.tinTerrainManager.texturesMergerFbo;
+	FBO.bindFramebuffer(gl, texturesMergerFbo, this.textureMasterImageryLayers.texId);
+	gl.viewport(0, 0, 256, 256);
+	gl.clear(gl.COLOR_BUFFER_BIT);
+
+	if (this.tinTerrainManager.quadBuffer === undefined)
+	{
+		var data = new Float32Array([0, 0,   1, 0,   0, 1,   0, 1,   1, 0,   1, 1]);
+		this.tinTerrainManager.quadBuffer = FBO.createBuffer(gl, data);
+	}
+	
+	var currShader = postFxShaderManager.getCurrentShader(); // to restore current active shader.
+	var shader =  postFxShaderManager.getShader("texturesMerger");
+	postFxShaderManager.useProgram(shader);
+
+	for (var i=0; i<8; i++)
+	{
+		gl.activeTexture(gl.TEXTURE0 + i); 
+		gl.bindTexture(gl.TEXTURE_2D, null);
+	}
+
+	gl.enableVertexAttribArray(shader.position2_loc);
+	FBO.bindAttribute(gl, this.tinTerrainManager.quadBuffer, shader.position2_loc, 2);
+	
+	// Now, make texturesArrayMatrix. 
+	// texturesArrayMatrix is an array that contains textures array with 8 textures as maximum.
+	var textureKeys = Object.keys(this.texture);
+	var textureLength = textureKeys.length; 
+	var texturesToMergeMatrix = []; // array of "texturesToMergeArray".
+	var texturesToMergeArray = [];
+
+
+	var imageryLayers = this.tinTerrainManager.imagerys;
+	var layersCount = imageryLayers.length;
+	for (var i=0; i<layersCount; i++)
+	{
+		var layer = imageryLayers[i];
+		var texture = this.texture[layer._id];
+		if (!texture)
+		{ continue; }
+
+		var textureKey = layer._id;
+		var activeTexType = 1;
+
+		var filter = texture.imagery.filter;
+		if (filter === CODE.imageFilter.BATHYMETRY) 
+		{ 
+			activeTexType = 10;
+		}
+		
+		if (!(texture.texId instanceof WebGLTexture)) 
+		{ continue; }
+
+		if (this.tinTerrainManager.textureIdDeleteMap[textureKey]) 
+		{
+			this.tinTerrainManager.eraseTexture(texture, magoManager);
+			delete this.texture[textureKey];
+			continue;
+		}
+		
+		if (!texture.imagery.show) { continue; }
+
+		texture.setOpacity(texture.imagery.opacity); // update to the current imagery opacity.
+		texture.setActiveTextureType(activeTexType);
+		texturesToMergeArray.push(texture);
+		if (texturesToMergeArray.length === 8)
+		{
+			texturesToMergeMatrix.push(texturesToMergeArray);
+			texturesToMergeArray = [];
+		}
+	}
+
+	// Last step: finally, if there are any texture in the "texturesToMergeArray", then push it.
+	if (texturesToMergeArray.length > 0)
+	{ texturesToMergeMatrix.push(texturesToMergeArray); }
+	
+
+	// Merge textures into textureMaster.
+	gl.enable(gl.BLEND);
+	var texturesArraysCount = texturesToMergeMatrix.length;
+	for (var i=0; i<texturesArraysCount; i++)
+	{
+		this.mergeTexturesToTextureMaster(gl, shader, texturesToMergeMatrix[i]);
+	}
+	gl.disable(gl.BLEND);
+
+	if (this.isTexturePrepared(this.texture))
+	{ 
+		// If this textures are prepared => all textures was merged into textureMaster.
+		this.textureMasterImageryLayersPrepared = true; 
+		this.layersStyleId = this.tinTerrainManager.layersStyleId;
+	}
+
+	FBO.bindFramebuffer(gl, null);
+	postFxShaderManager.useProgram(currShader);
+};
+
 TinTerrain.prototype.makeTextureMaster = function()
+{
+	//if (this.textureMasterPrepared)
+	//{ 
+	//	return; 
+	//}
+
+	// 1rst, make textureMasterImageryLayers.
+	this.makeTextureMasterImageryLayers();
+
+	// Now, clampToTerrainObjects.
+	var objectsToClampToTerrain = this.tinTerrainManager.getIntersectedObjectToClampToTerrain(this.geographicExtent);
+	//if (objectsToClampToTerrain === undefined || objectsToClampToTerrain.length === 0)
+	//{ return; }
+
+	// If there are 2 or more layers, then merge all layers into one texture.
+	var magoManager = this.tinTerrainManager.magoManager;
+	var postFxShaderManager = magoManager.postFxShadersManager;
+	var gl = magoManager.getGl();
+
+	if (this.textureMaster === undefined)
+	{ 
+		var emptyPixels = new Uint8Array(256* 256 * 4);
+		this.textureMaster = Texture.createTexture(gl, gl.LINEAR, emptyPixels, 256, 256); 
+	}
+
+	var texturesMergerFbo = this.tinTerrainManager.texturesMergerFbo;
+	FBO.bindFramebuffer(gl, texturesMergerFbo, this.textureMaster);
+	gl.viewport(0, 0, 256, 256);
+	
+
+	if (this.tinTerrainManager.quadBuffer === undefined)
+	{
+		var data = new Float32Array([0, 0,   1, 0,   0, 1,   0, 1,   1, 0,   1, 1]);
+		this.tinTerrainManager.quadBuffer = FBO.createBuffer(gl, data);
+	}
+	
+	var currShader = postFxShaderManager.getCurrentShader(); // to restore current active shader.
+	var shader =  postFxShaderManager.getShader("texturesMerger");
+	postFxShaderManager.useProgram(shader);
+
+	for (var i=0; i<8; i++)
+	{
+		gl.activeTexture(gl.TEXTURE0 + i); 
+		gl.bindTexture(gl.TEXTURE_2D, null);
+	}
+
+	gl.enableVertexAttribArray(shader.position2_loc);
+	FBO.bindAttribute(gl, this.tinTerrainManager.quadBuffer, shader.position2_loc, 2);
+	
+	// Now, make texturesArrayMatrix. 
+	// texturesArrayMatrix is an array that contains textures array with 8 textures as maximum.
+	var textureKeys = Object.keys(this.texture);
+	var textureLength = textureKeys.length; 
+	var texturesToMergeMatrix = []; // array of "texturesToMergeArray".
+	var texturesToMergeArray = [];
+
+	// put the textureMasterImageryLayers as background.
+	texturesToMergeArray.push(this.textureMasterImageryLayers);
+
+	// Now, check if exist objects to clamp to terrain.
+	var objectsToClampToTerrainExistsAndBibded = true;
+	if (objectsToClampToTerrain && objectsToClampToTerrain.length > 0)
+	{
+		// check if objects intersects with this tile.
+		var objToClampCount = objectsToClampToTerrain.length;
+		for (var i=0; i<objToClampCount; i++)
+		{
+			var objToClamp = objectsToClampToTerrain[i];
+			if (texturesToMergeArray.length === 8)
+			{
+				texturesToMergeMatrix.push(texturesToMergeArray);
+				texturesToMergeArray = [];
+			}
+
+			if (objToClamp.texture && objToClamp.texture.fileLoadState === CODE.fileLoadState.BINDING_FINISHED)
+			{ 
+				texturesToMergeArray.push(objToClamp.texture); 
+			}
+			else
+			{
+				objectsToClampToTerrainExistsAndBibded = false;
+			}
+		} 
+	}
+
+	// Last step: finally, if there are any texture in the "texturesToMergeArray", then push it.
+	if (texturesToMergeArray.length > 0)
+	{ texturesToMergeMatrix.push(texturesToMergeArray); }
+	
+
+	// Merge textures into textureMaster.
+	if (objectsToClampToTerrainExistsAndBibded)
+	{
+		gl.clear(gl.COLOR_BUFFER_BIT);
+		gl.enable(gl.BLEND);
+		var texturesArraysCount = texturesToMergeMatrix.length;
+		for (var i=0; i<texturesArraysCount; i++)
+		{
+			this.mergeTexturesToTextureMaster(gl, shader, texturesToMergeMatrix[i]);
+		}
+		gl.disable(gl.BLEND);
+	}
+
+	if (objectsToClampToTerrainExistsAndBibded && this.isTexturePrepared(this.texture))
+	{ 
+		// If this textures are prepared => all textures was merged into textureMaster.
+		this.textureMasterPrepared = true; 
+		this.objToClampToTerrainStyleId = this.tinTerrainManager.objToClampToTerrainStyleId;
+	}
+
+	FBO.bindFramebuffer(gl, null);
+	postFxShaderManager.useProgram(currShader);
+};
+
+TinTerrain.prototype.makeTextureMaster__original = function()
 {
 	if (this.textureMasterPrepared)
 	{ 
 		return; 
 	}
-
-	//if()
 
 	// If there are 2 or more layers, then merge all layers into one texture.
 	var magoManager = this.tinTerrainManager.magoManager;
@@ -948,6 +1177,199 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 
 	// This function 1- loads file & 2- parses file & 3- makes vbo.
 	// 1rst, check if the parent is prepared. If parent is not prepared, then prepare the parent.
+	
+	// 1rst, try to erase from procesQueue_deleting if exist.
+	magoManager.processQueue.eraseTinTerrainToDelete(this);
+		
+	// Prepare this tinTerrain.
+	if (this.fileLoadState === CODE.fileLoadState.READY)
+	{
+		//해당 터레인 xyz를 terrainInfo와 비교하여 유효한 파일이면 통과, 아닐시 plain으로 처리
+		if (!this.checkAvailableTerrain()) 
+		{
+			this.fileLoadState = CODE.fileLoadState.LOAD_FAILED;
+			return false;
+		}
+
+		var pathName = this.getPathName();
+		var geometryDataPath = magoManager.readerWriter.geometryDataPath;
+		//var fileName = geometryDataPath + "/Terrain/" + pathName + ".terrain";
+
+		var fileName = this.tinTerrainManager.terrainValue + pathName + ".terrain";
+		magoManager.readerWriter.loadTINTerrain(fileName, this, magoManager);
+			
+		return false;
+	}
+	else if (this.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
+	{
+		// put the terrain into parseQueue.
+		magoManager.parseQueue.putTinTerrainToParse(this, 0);
+		return false;
+	}
+	else if (this.fileLoadState === CODE.fileLoadState.PARSE_STARTED) 
+	{
+		var parsedTerrainMap = tinTerrainManager.textureParsedTerrainMap;
+		var z = this.depth;
+		var x = this.X;
+		var y = this.Y;
+		if (!parsedTerrainMap[z]) { return; }
+		if (!parsedTerrainMap[z][x]) { return; }
+		if (!parsedTerrainMap[z][x][y]) { return; }
+
+		var result = parsedTerrainMap[z][x][y];
+
+		this.centerX = result.centerX;
+		this.centerY = result.centerY;
+		this.centerZ = result.centerZ;
+			
+		this.minHeight = result.minHeight;
+		this.maxHeight = result.maxHeight;
+			
+		// In this moment set the altitudes for the geographicExtension.
+		this.geographicExtent.setExtent(undefined, undefined, this.minHeight[0], undefined, undefined, this.maxHeight[0]);
+			
+		this.boundingSphereCenterX = result.boundingSphereCenterX;
+		this.boundingSphereCenterY = result.boundingSphereCenterY;
+		this.boundingSphereCenterZ = result.boundingSphereCenterZ;
+		this.boundingSphereRadius = result.boundingSphereRadius;
+			
+		this.horizonOcclusionPointX = result.horizonOcclusionPointX;
+		this.horizonOcclusionPointY = result.horizonOcclusionPointY;
+		this.horizonOcclusionPointZ = result.horizonOcclusionPointZ;
+			
+		// 2. vertex data.
+		this.vertexCount = result.vertexCount;
+		this.uValues = result.uValues;
+		this.vValues = result.vValues;
+		this.hValues = result.hValues;
+			
+		// 3. indices.
+		this.trianglesCount = result.trianglesCount;
+		this.indices = result.indices;
+			
+		// 4. edges indices.
+		this.westVertexCount = result.westVertexCount;
+		this.westIndices = result.westIndices;
+			
+		this.southVertexCount = result.southVertexCount;
+		this.southIndices = result.southIndices;
+			
+		this.eastVertexCount = result.eastVertexCount; 
+		this.eastIndices = result.eastIndices;
+			
+		this.northVertexCount = result.northVertexCount;
+		this.northIndices = result.northIndices;
+
+		// 5. extension header.
+		this.extensionId = result.extensionId;
+		this.extensionLength = result.extensionLength;
+			
+		this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
+		delete this.tinTerrainManager.textureParsedTerrainMap[z][x][y];
+
+		return false;
+	}
+	else if (this.fileLoadState === CODE.fileLoadState.PARSE_FINISHED && this.vboKeyContainer === undefined)
+	{
+		if (!this.requestDecodeData) 
+		{ 
+			this.decodeData(tinTerrainManager.imageryType); 
+			return false;
+		}
+			
+		var z = this.depth;
+		var x = this.X;
+		var y = this.Y;
+		var decodedTerrainMap = tinTerrainManager.textureDecodedTerrainMap;
+		if (!decodedTerrainMap[z]) { return false; }
+		if (!decodedTerrainMap[z][x]) { return false; }
+		if (!decodedTerrainMap[z][x][y]) { return false; }
+
+		var result = decodedTerrainMap[z][x][y];
+
+		this.texCoordsArray = result.texCoordsArray;
+		this.cartesiansArray = result.cartesiansArray;
+		this.skirtCartesiansArray = result.skirtCartesiansArray;
+		this.skirtTexCoordsArray = result.skirtTexCoordsArray;
+		this.skirtAltitudesArray = result.skirtAltitudesArray;
+		this.altArray = result.altArray;
+		this.normalsArray = result.normalsArray;
+		this.lonArray = result.longitudesArray;
+		this.latArray = result.latitudesArray;
+
+		delete this.tinTerrainManager.textureDecodedTerrainMap[z][x][y];
+		this.makeVbo(magoManager.vboMemoryManager);
+
+		// Make sea mesh too.
+		this.makeSeaMeshVirtually(undefined);
+		this.makeVboSea(magoManager.vboMemoryManager);
+		return false;
+	}
+	else if (!this.isTexturePrepared(this.texture))
+	{
+		this.prepareTexture(this.texture, tinTerrainManager.imagerys, magoManager, tinTerrainManager);
+		return false;
+	}
+	else if (this.fileLoadState === CODE.fileLoadState.LOAD_FAILED)
+	{
+		// Test.***
+		return this.prepareTinTerrainPlain(magoManager, tinTerrainManager);
+		//return false;
+		// End test.---
+	}
+
+	// Test making textureMaster.
+	// If there are 2 or more layers, then must create textureMaster.
+	// Check if tinTerrain is syncronized with this.tinTerrainManager.
+	if (this.layersStyleId !== this.tinTerrainManager.layersStyleId)
+	{ 
+		this.textureMasterImageryLayersPrepared = undefined; 
+		this.textureMasterPrepared = undefined; 
+	}
+
+	//if (this.objToClampToTerrainStyleId !== this.tinTerrainManager.objToClampToTerrainStyleId)
+	//{ 
+	//	this.textureMasterPrepared = undefined; 
+	//}
+
+	if (!this.textureMasterPrepared && this.isTexturePrepared(this.texture))
+	{
+		this.makeTextureMaster();
+	}
+
+
+		
+	if (this.owner !== undefined && !this.owner.isPrepared())// &&  this.owner.hasAnyChildVisible()))
+	{
+
+		// Prepare ownerTinTerrain.
+		return this.owner.prepareTinTerrain(magoManager, tinTerrainManager);
+	}
+
+	return true;
+};
+
+TinTerrain.prototype.prepareTinTerrain__original = function(magoManager, tinTerrainManager)
+{
+	// first, read terrainTiles-info.json
+	if (!this.tinTerrainManager.terrainReady) 
+	{
+		return false;
+	}
+
+	/*
+	if (!this.isVisible())
+	{
+		if (this.owner.isVisible())
+		{
+			return this.owner.prepareTinTerrain(magoManager, tinTerrainManager);
+		}
+	
+		return false;
+	}*/
+
+	// This function 1- loads file & 2- parses file & 3- makes vbo.
+	// 1rst, check if the parent is prepared. If parent is not prepared, then prepare the parent.
 	if (this.owner === undefined || (this.owner.isPrepared() &&  this.owner.hasAnyChildVisible()))
 	{
 		// 1rst, try to erase from procesQueue_deleting if exist.
@@ -1268,11 +1690,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 				return; 
 			}
 
-			if (this.depth > 2 && this.layersStyleId !== this.tinTerrainManager.layersStyleId)
-			{ 
-				this.textureMasterPrepared = false;
-				this.makeTextureMaster();
-			}
+			
 		
 			var gl = magoManager.getGl();
 			if (renderType === 2)
@@ -1287,6 +1705,81 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 			}
 			else if (renderType === 1)
 			{
+				var mustMakeTextureMaster = false;
+				if (this.objToClampToTerrainStyleId !== this.tinTerrainManager.objToClampToTerrainStyleId)
+				{ mustMakeTextureMaster = true; }
+
+				if (this.layersStyleId !== this.tinTerrainManager.layersStyleId)
+				{ mustMakeTextureMaster = true; }
+
+				if (mustMakeTextureMaster && this.isTexturePrepared(this.texture))
+				{
+					//this.textureMasterPrepared = undefined;
+					this.makeTextureMaster();
+
+					currentShader.resetLastBuffersBinded();
+					magoManager.postFxShadersManager.useProgram(currentShader);
+					currentShader.enableVertexAttribArray(currentShader.position3_loc);
+					if (bDepth)
+					{ currentShader.disableVertexAttribArray(currentShader.texCoord2_loc); }
+					else
+					{ currentShader.enableVertexAttribArray(currentShader.texCoord2_loc); }
+
+					gl.viewport(0, 0, magoManager.sceneState.drawingBufferWidth[0], magoManager.sceneState.drawingBufferHeight[0]);
+					/*
+					currentShader.bindUniformGenerals();
+					gl.uniform1i(currentShader.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
+
+					var tex = magoManager.texturesStore.getTextureAux1x1(); // provisional.
+					gl.activeTexture(gl.TEXTURE2); 
+					gl.bindTexture(gl.TEXTURE_2D, tex.texId);
+	
+					var textureAux1x1 = magoManager.texturesStore.getTextureAux1x1();
+					var noiseTexture = magoManager.texturesStore.getNoiseTexture4x4();
+		
+					gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture. Initially set as texture color type.***
+					gl.uniform4fv(currentShader.oneColor4_loc, [0.5, 0.5, 0.5, 1.0]);
+					gl.uniform1i(currentShader.refMatrixType_loc, 0); // init referencesMatrix.
+					gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, this.tinTerrainManager.identityMat._floatArrays);
+		
+					gl.uniform1i(currentShader.bApplySpecularLighting_loc, true);
+
+					// shader.altitude_loc
+					gl.uniform1i(currentShader.bExistAltitudes_loc, false);
+		
+					var bApplyShadow = false;
+					if (magoManager.sceneState.sunSystem !== undefined && magoManager.sceneState.applySunShadows)
+					{ bApplyShadow = true; }
+					gl.uniform1i(currentShader.bApplyShadow_loc, bApplyShadow);
+
+
+					for (var i=0; i<8; i++)
+					{
+						gl.activeTexture(gl.TEXTURE0+i); 
+						gl.bindTexture(gl.TEXTURE_2D, null);
+					}
+					
+					var bApplySsao = true;
+					gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
+					if (bApplySsao)
+					{
+						gl.uniform1f(currentShader.aspectRatio_loc, magoManager.sceneState.camera.frustum.aspectRatio);
+						gl.uniform1f(currentShader.screenWidth_loc, magoManager.sceneState.drawingBufferWidth);	
+
+						// bind depthTex & noiseTex. channels 2 & 3.
+						var noiseTexture = magoManager.texturesStore.getNoiseTexture4x4();
+						gl.uniform2fv(currentShader.noiseScale2_loc, [magoManager.depthFboNeo.width/noiseTexture.width, magoManager.depthFboNeo.height/noiseTexture.height]);
+						gl.uniform3fv(currentShader.kernel16_loc, magoManager.sceneState.ssaoKernel16);
+
+						gl.activeTexture(gl.TEXTURE2);
+						gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);  // original.***
+						gl.activeTexture(gl.TEXTURE3);
+						gl.bindTexture(gl.TEXTURE_2D, noiseTexture);
+					}
+					*/
+				}
+				
+
 				var activeTexturesLayers = new Int32Array([1, 1, 0, 0, 0, 0, 0, 0]); // note: the 1rst & 2nd are shadowMap textures.
 				gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
 				gl.uniform1f(currentShader.externalAlpha_loc, 1);
@@ -1428,7 +1921,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 					
 					this.drawTerrainName(magoManager);
 				}
-				//this.drawTerrainName(magoManager); // test. delete.
+				this.drawTerrainName(magoManager); // test. delete.
 			}
 			// End test.--------------------------------------------------------------------------------------
 			
