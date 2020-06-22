@@ -117,6 +117,8 @@ MagoRenderable.prototype.init = function(magoManager)
 
 MagoRenderable.prototype.deleteObjects = function(vboMemManager) 
 {
+	if (this.texture) { this.texture.deleteObjects(vboMemManager.gl); } 
+	
 	var objectsCount = this.objectsArray.length;
 	for (var i=0; i<objectsCount; i++)
 	{
