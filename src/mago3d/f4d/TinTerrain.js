@@ -536,7 +536,6 @@ TinTerrain.prototype.mergeTexturesToTextureMaster = function(gl, shader, texture
 			// bathymetry image.
 			var properties = texture.imagery.filter.properties;
 			gl.uniform2fv(shader.uMinMaxAltitudes_loc, [properties.minAltitude, properties.maxAltitude]);
-			//gl.uniform2fv(shader.uMinMaxAltitudes_loc, [-200, 1944]);
 		}
 	}
 
@@ -828,12 +827,17 @@ TinTerrain.prototype.bindTexture = function(gl, shader)
 					activeTexturesLayers[4+1] = 10;
 					gl.activeTexture(gl.TEXTURE4 + 1);
 					gl.bindTexture(gl.TEXTURE_2D, texture.texId);
+
+					var properties = filter.properties;
+					gl.uniform2fv(shader.uMinMaxAltitudes_loc, new Float32Array([properties.minAltitude, properties.maxAltitude]));
+					gl.uniform1i(shader.bApplyCaustics_loc, properties.caustics);
 				}
 			}
 		}	
 
 		gl.uniform1iv(shader.uActiveTextures_loc, activeTexturesLayers);
 		gl.uniform1fv(shader.externalAlphasArray_loc, externalAlphaLayers);
+		
 		//////////////////////////////////
 
 		return;
@@ -1582,8 +1586,8 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 				var activeTexturesLayers = new Int32Array([1, 1, 0, 0, 0, 0, 0, 0]); // note: the 1rst & 2nd are shadowMap textures.
 				gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
 				gl.uniform1f(currentShader.externalAlpha_loc, 1);
-				gl.uniform2fv(currentShader.uMinMaxAltitudes_loc, [-200.0, 1943.14]);
 				gl.uniform1i(currentShader.bApplySsao_loc, this.depth > 8); // apply ssao default.***
+				
 
 				// Caustics.***************************************
 				var time = new Date().getTime()/(1000.0);
@@ -1816,7 +1820,6 @@ TinTerrain.prototype.renderSea = function(currentShader, magoManager, bDepth, re
 				var activeTexturesLayers = new Int32Array([1, 1, 0, 0, 0, 0, 0, 0]);
 				gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
 				gl.uniform1f(currentShader.externalAlpha_loc, 1);
-				gl.uniform2fv(currentShader.uMinMaxAltitudes_loc, [-200.0, 1943.14]);
 				
 				var textureKeys = Object.keys(this.texture);
 				var textureLength = textureKeys.length; 

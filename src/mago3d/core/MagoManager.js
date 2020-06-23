@@ -4789,6 +4789,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.altitude_loc = gl.getAttribLocation(shader.program, "altitude");
 	shader.uSeaOrTerrainType_loc = gl.getUniformLocation(shader.program, "uSeaOrTerrainType");
 	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
+	shader.bApplyCaustics_loc = gl.getUniformLocation(shader.program, "bApplyCaustics");
 	
 	//shader.uSsaoRadius_loc = gl.getUniformLocation(shader.program, "radius");
 	

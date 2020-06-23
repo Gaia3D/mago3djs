@@ -20,6 +20,7 @@ uniform sampler2D diffuseTex_5;// 9
 uniform bool textureFlipYAxis;
 uniform bool bIsMakingDepth;
 uniform bool bExistAltitudes;
+uniform bool bApplyCaustics;
 uniform mat4 projectionMatrix;
 uniform vec2 noiseScale;
 uniform float near;
@@ -561,16 +562,19 @@ void main()
 			//vec3 rainbowColor = getRainbowColor_byHeight(altitude);
 
 			// caustics.*********************
-			if(uTime > 0.0 && uTileDepth > 6 && gray > 0.0)//&& altitude > -120.0)
+			if(bApplyCaustics)
 			{
-				// Active this code if want same size caustic effects for different tileDepths.***
-				// Take tileDepth 14 as the unitary tile depth.
-				//float tileDethDiff = float(16 - uTileDepth);
-				//vec2 cauticsTexCoord = texCoord*pow(2.0, tileDethDiff);
-				//-----------------------------------------------------------------------
-				vec2 cauticsTexCoord = texCoord;
-				vec3 causticColor = causticColor(cauticsTexCoord)*gray*0.4;
-				textureColor = vec4(textureColor.r+ causticColor.x, textureColor.g+ causticColor.y, textureColor.b+ causticColor.z, 1.0);
+				if(uTime > 0.0 && uTileDepth > 6 && gray > 0.0)//&& altitude > -120.0)
+				{
+					// Active this code if want same size caustic effects for different tileDepths.***
+					// Take tileDepth 14 as the unitary tile depth.
+					//float tileDethDiff = float(16 - uTileDepth);
+					//vec2 cauticsTexCoord = texCoord*pow(2.0, tileDethDiff);
+					//-----------------------------------------------------------------------
+					vec2 cauticsTexCoord = texCoord;
+					vec3 causticColor = causticColor(cauticsTexCoord)*gray*0.4;
+					textureColor = vec4(textureColor.r+ causticColor.x, textureColor.g+ causticColor.y, textureColor.b+ causticColor.z, 1.0);
+				}
 			}
 			// End caustics.--------------------------
 

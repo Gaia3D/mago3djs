@@ -717,6 +717,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 		gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, this.identityMat._floatArrays);
 		
 		gl.uniform1i(currentShader.bApplySpecularLighting_loc, true);
+		gl.uniform1i(currentShader.bApplyCaustics_loc, false);
 
 		// shader.altitude_loc
 		gl.uniform1i(currentShader.bExistAltitudes_loc, false);
