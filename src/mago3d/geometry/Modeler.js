@@ -142,16 +142,18 @@ Modeler.prototype.removeObject = function(target)
 	target.deleteObjects(this.magoManager.vboMemoryManager);
 
 	var tile = target.smartTileOwner;
-
-	tile.nativeObjects.opaquesArray = tile.nativeObjects.opaquesArray.filter(function(opaq)
+	if (tile)
 	{
-		return opaq !== target;
-	});
-	
-	tile.nativeObjects.transparentsArray = tile.nativeObjects.transparentsArray.filter(function(t)
-	{
-		return t !== target;
-	});
+		tile.nativeObjects.opaquesArray = tile.nativeObjects.opaquesArray.filter(function(opaq)
+		{
+			return opaq !== target;
+		});
+		
+		tile.nativeObjects.transparentsArray = tile.nativeObjects.transparentsArray.filter(function(t)
+		{
+			return t !== target;
+		});
+	}
 	
 	this.objectsArray = this.objectsArray.filter(function(object)
 	{
