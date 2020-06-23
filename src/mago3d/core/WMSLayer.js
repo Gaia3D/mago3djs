@@ -40,6 +40,13 @@ var WMSLayer = function(options)
 
 	this.url = options.url;
 	this.param = Object.assign({}, WMSLayer.DEAFULT_PARAM, options.param||{});
+	/**
+  * 
+  * filter : {
+  * 	type : Mago3D.CODE.imageFilter.BATHYMETRY,
+  * 	property : {min, max, caustics}
+  * }
+  */
 	this.filter = defaultValue(options.filter, undefined);
 	this._requestParam = new URLSearchParams(this.param);
 	if (this._requestParam.get('VERSION') === '1.3.0') 
