@@ -67,8 +67,17 @@
 						}
 					}
 				});
-
-				tt = new Mago3D.WMSLayer({url: 'http://localhost:8080/geoserver/mago3d/gwc/service/wms', show: true, filter:Mago3D.CODE.imageFilter.BATHYMETRY, minAltitude : -200.0, maxAltitude: 1943.14, param: {layers: 'mago3d:15m_susim', tiled: true}}); // original.*(**)
+				var bathymetryFilter = {
+					type: Mago3D.CODE.imageFilter.BATHYMETRY,
+					properties : {
+						minAltitude: -200,
+						maxAltitude: 1943.14,
+						caustics: true
+					}
+				};
+				//tt = new Mago3D.WMSLayer({url: 'http://localhost:8080/geoserver/mago3d/gwc/service/wms', show: true, filter:Mago3D.CODE.imageFilter.BATHYMETRY, minAltitude : -200.0, maxAltitude: 1943.14, param: {layers: 'mago3d:15m_susim', tiled: true}}); // original.*(**)
+				tt = new Mago3D.WMSLayer({url: 'http://localhost:8080/geoserver/mago3d/gwc/service/wms', show: true, filter: bathymetryFilter, param: {layers: 'mago3d:15m_susim', tiled: true}}); // new version.
+				
 				//tt = new Mago3D.WMSLayer({url: 'http://localhost:8080/geoserver/mago3d/gwc/service/wms', show: true, opacity: 0.5, param: {layers: 'mago3d:15m_susim', tiled: true}});
 				ttt = new Mago3D.WMSLayer({url: 'http://localhost:8080/geoserver/mago3d/wms', show: true, minZoom:10,   param: {layers: 'mago3d:mj1m', tiled: true}});
 

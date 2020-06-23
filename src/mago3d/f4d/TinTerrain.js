@@ -534,8 +534,9 @@ TinTerrain.prototype.mergeTexturesToTextureMaster = function(gl, shader, texture
 		else if (texture.activeTextureType === 10)
 		{
 			// bathymetry image.
-			//gl.uniform2fv(shader.uMinMaxAltitudes_loc, [texture.imagery.minAltitude, texture.imagery.maxAltitude]);
-			gl.uniform2fv(shader.uMinMaxAltitudes_loc, [-200, 1944]);
+			var properties = texture.imagery.filter.properties;
+			gl.uniform2fv(shader.uMinMaxAltitudes_loc, [properties.minAltitude, properties.maxAltitude]);
+			//gl.uniform2fv(shader.uMinMaxAltitudes_loc, [-200, 1944]);
 		}
 	}
 
@@ -617,9 +618,12 @@ TinTerrain.prototype.makeTextureMasterImageryLayers = function()
 		var activeTexType = 1;
 
 		var filter = texture.imagery.filter;
-		if (filter === CODE.imageFilter.BATHYMETRY) 
-		{ 
-			activeTexType = 10;
+		if (filter)
+		{
+			if (filter.type === CODE.imageFilter.BATHYMETRY) 
+			{ 
+				activeTexType = 10;
+			}
 		}
 		
 		if (!(texture.texId instanceof WebGLTexture)) 
@@ -819,7 +823,7 @@ TinTerrain.prototype.bindTexture = function(gl, shader)
 			var filter = texture.imagery.filter;
 			if (filter) 
 			{
-				if (filter === CODE.imageFilter.BATHYMETRY) 
+				if (filter.type === CODE.imageFilter.BATHYMETRY) 
 				{
 					activeTexturesLayers[4+1] = 10;
 					gl.activeTexture(gl.TEXTURE4 + 1);
@@ -865,7 +869,7 @@ TinTerrain.prototype.bindTexture = function(gl, shader)
 		var filter = texture.imagery.filter;
 		if (filter) 
 		{
-			if (filter === CODE.imageFilter.BATHYMETRY) 
+			if (filter.type === CODE.imageFilter.BATHYMETRY) 
 			{
 				activeTexturesLayers[4+i] = 10;
 				gl.bindTexture(gl.TEXTURE_2D, texture.texId);
@@ -1826,7 +1830,7 @@ TinTerrain.prototype.renderSea = function(currentShader, magoManager, bDepth, re
 					var filter = texture.imagery.filter;
 					if (filter) 
 					{
-						if (filter === CODE.imageFilter.BATHYMETRY) 
+						if (filter.type === CODE.imageFilter.BATHYMETRY) 
 						{
 							activeTexturesLayers[2+i] = 10;
 						}

@@ -4654,7 +4654,7 @@ void main()\n\
 			// End test drawing grid.---\n\
 			float specularReflectionCoef = 0.6;\n\
 			vec3 specularColor = vec3(0.8, 0.8, 0.8);\n\
-			textureColor = mix(textureColor, fogColor, 0.2); \n\
+			//textureColor = mix(textureColor, fogColor, 0.2); \n\
 			//gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian + specularReflectionCoef * specular * specularColor * shadow_occlusion, 1.0); // with specular.***\n\
 			gl_FragColor = vec4(textureColor.xyz * shadow_occlusion * lambertian, 1.0); // original.***\n\
 \n\
