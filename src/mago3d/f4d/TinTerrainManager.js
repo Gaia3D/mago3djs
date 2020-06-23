@@ -217,6 +217,7 @@ TinTerrainManager.prototype.getIntersectedObjectToClampToTerrain = function(geoE
 				var objGeoExtent = new GeographicExtent(objMinLon, objMinLat, minGeoCoord.altitude, objMaxLon, objMaxLat, maxGeoCoord.altitude);
 				if (objGeoExtent.intersects2dWithGeoExtent(geoExtent))
 				{
+					
 					if (objToClamp.texture === undefined)
 					{
 						// load texture 1rst.
@@ -252,6 +253,7 @@ TinTerrainManager.prototype.getIntersectedObjectToClampToTerrain = function(geoE
 						}
 						//continue;
 					}
+					
 
 					// calculate the relative texCoords of the rectangle.
 					var thisMinLon = geoExtent.minGeographicCoord.longitude;
@@ -267,7 +269,7 @@ TinTerrainManager.prototype.getIntersectedObjectToClampToTerrain = function(geoE
 					var maxS = (objMaxLon - thisMinLon)/thisLonRange;
 					var maxT = (objMaxLat - thisMinLat)/thisLatRange;
 
-					objToClamp.texture.temp_clampToTerrainTexCoord = [minS, minT, maxS, maxT];
+					objToClamp.texture.temp_clampToTerrainTexCoord = new Float32Array([minS, minT, maxS, maxT]);
 
 					//if (objToClamp.texture.fileLoadState === CODE.fileLoadState.BINDING_FINISHED)
 					{ 
@@ -636,7 +638,7 @@ TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager)
 		
 	}
 
-	this.prepareObjectToClampToTerrain();
+	//this.prepareObjectToClampToTerrain();
 };
 
 TinTerrainManager.prototype.getAltitudes = function(geoCoordsArray, resultGeoCoordsArray) 
