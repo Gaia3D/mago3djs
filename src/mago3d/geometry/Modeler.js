@@ -125,6 +125,39 @@ Modeler.prototype.addObject = function(object, depth)
 };
 
 /**
+ * 모델러에 객체 존재여부 반환
+ * @param {MagoRenderable} object
+ * @return {boolean} 
+ */
+Modeler.prototype.existObject = function(object)
+{
+	if (!this.objectsArray || (Array.isArray(this.objectsArray) && this.objectsArray.length === 0))
+	{ return false; }
+
+	// Check object's style.
+	if (object instanceof MagoRectangle)
+	{
+		var style = object.style;
+		if (style && style.clampToTerrain)
+		{
+			var find = this.magoManager.tinTerrainManager.objectsToClampToTerrainArray.filter(function(obj)
+			{
+				return obj !== object;
+			});
+			
+			return find.length > 0;
+		}
+	}
+
+	var find = this.objectsArray.filter(function(obj)
+	{
+		return obj !== object;
+	});
+
+	return find.length > 0;
+};
+
+/**
  * 모델러에 등록된 객체 삭제
  * @param {Object}
  */
