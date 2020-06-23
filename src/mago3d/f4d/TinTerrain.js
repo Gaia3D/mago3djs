@@ -1758,7 +1758,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 						gl.activeTexture(gl.TEXTURE0+i); 
 						gl.bindTexture(gl.TEXTURE_2D, null);
 					}
-					
+					*/
 					var bApplySsao = true;
 					gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
 					if (bApplySsao)
@@ -1776,7 +1776,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 						gl.activeTexture(gl.TEXTURE3);
 						gl.bindTexture(gl.TEXTURE_2D, noiseTexture);
 					}
-					*/
+					
 				}
 				
 
