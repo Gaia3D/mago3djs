@@ -202,7 +202,6 @@ TinTerrainManager.prototype.getIntersectedObjectToClampToTerrain = function(geoE
 	{
 		// check if objects intersects with this tile.
 		var objToClampCount = objectsToClampToTerrain.length;
-		objToClampCount = 1;
 		for (var i=0; i<objToClampCount; i++)
 		{
 			var objToClamp = objectsToClampToTerrain[i];
