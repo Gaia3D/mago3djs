@@ -510,6 +510,8 @@ TinTerrain.prototype.mergeTexturesToTextureMaster = function(gl, shader, texture
 		externalAlphaLayers[i] = texture.opacity;
 		if (texture.activeTextureType === 2)
 		{
+			if (texture.temp_clampToTerrainTexCoord === undefined)
+			{ var hola = 0; }
 			// custom image.
 			if (externalTexCoordsArray === undefined)
 			{
@@ -541,6 +543,13 @@ TinTerrain.prototype.mergeTexturesToTextureMaster = function(gl, shader, texture
 	if (thereAreCustomImages)
 	{ gl.uniform4fv(shader.uExternalTexCoordsArray_loc, externalTexCoordsArray); }
 	gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+	// debug....
+	for (var i=0; i<texturesCount; i++)
+	{
+		var texture = texturesArray[i];
+		texture.temp_clampToTerrainTexCoord = undefined;
+	}
 };
 
 TinTerrain.prototype.makeTextureMasterImageryLayers = function()
