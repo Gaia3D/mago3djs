@@ -132,13 +132,11 @@ RectangleDrawer.prototype.start = function()
 						fillColor: '#ff0000'
 					};
 				}
-				console.info('init : ' + that.style.imageUrl);
 				that.tempRectangle = new MagoRectangle(position, that.style);
 				manager.modeler.magoRectangle = that.tempRectangle;
 			}
 			else 
 			{
-				console.info('as : ' + that.style.imageUrl);
 				that.tempRectangle.init(manager);
 				that.tempRectangle.setPosition(position);
 			}

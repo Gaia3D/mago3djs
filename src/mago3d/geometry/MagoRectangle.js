@@ -397,23 +397,23 @@ MagoRectangle.prototype.setStyle = function(style, magoManager)
 	{
 		this.init(magoManager);
 	}
-
+	var existModel = magoManager.modeler.existObject(this);
 	for (var key in style)
 	{
 		if (style.hasOwnProperty(key))
 		{
 			var changedClampToTerrain = (key === 'clampToTerrain') && (style[key] !== this.style[key]);
-
+			
 			if (changedClampToTerrain)
 			{	
-				magoManager.modeler.removeObject(this);
+				if (existModel) { magoManager.modeler.removeObject(this); }
 			}
 
 			this.style[key] = style[key];
 
 			if (changedClampToTerrain)
 			{	
-				magoManager.modeler.addObject(this, 1);
+				if (existModel) { magoManager.modeler.addObject(this, 1); }
 			}
 
 			if (this.style.clampToTerrain && key === 'imageUrl')
