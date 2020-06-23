@@ -386,7 +386,7 @@ MagoRectangle.prototype.makeMesh = function(magoManager)
  * @param {MagoGeometryStyle} style
  * @param {MagoManager} magoManager
  */
-MagoGeometry.prototype.setStyle = function(style, magoManager) 
+MagoRectangle.prototype.setStyle = function(style, magoManager) 
 {
 	if (!style) 
 	{
@@ -402,13 +402,25 @@ MagoGeometry.prototype.setStyle = function(style, magoManager)
 	{
 		if (style.hasOwnProperty(key))
 		{
-			this.style[key] = style[key];
-		}
-	}
+			var changedClampToTerrain = (key === 'clampToTerrain') && (style[key] !== this.style[key]);
 
-	if (this.style.clampToTerrain)
-	{
-		this.texture = undefined;
-		magoManager.tinTerrainManager.imageryLayersChanged();
+			if (changedClampToTerrain)
+			{	
+				magoManager.modeler.removeObject(this);
+			}
+
+			this.style[key] = style[key];
+
+			if (changedClampToTerrain)
+			{	
+				magoManager.modeler.addObject(this, 1);
+			}
+
+			if (this.style.clampToTerrain && key === 'imageUrl')
+			{
+				this.texture = undefined;
+				magoManager.tinTerrainManager.imageryLayersChanged();
+			}
+		}
 	}
 };
