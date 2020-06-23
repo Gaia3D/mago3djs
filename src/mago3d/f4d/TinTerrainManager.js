@@ -171,7 +171,7 @@ TinTerrainManager.prototype.prepareObjectToClampToTerrain = function()
 						var imageUrl = style.imageUrl;//: "/images/materialImages/factoryRoof.jpg"
 						objToClamp.texture.url = imageUrl;
 						var flipYTexCoord = false;
-						TexturesManager.loadTexture(imageUrl, objToClamp.texture, magoManager, flipYTexCoord);
+						TexturesManager.loadTexture(imageUrl, objToClamp.texture, this.magoManager, flipYTexCoord);
 					}
 				}
 				else if (!(objToClamp.texture.texId instanceof WebGLTexture))
@@ -187,7 +187,7 @@ TinTerrainManager.prototype.prepareObjectToClampToTerrain = function()
 					else if (objToClamp.texture.url)
 					{
 						// load by url.
-						TexturesManager.loadTexture(objToClamp.texture.url, objToClamp.texture, magoManager, flipYTexCoord);
+						TexturesManager.loadTexture(objToClamp.texture.url, objToClamp.texture, this.magoManager, flipYTexCoord);
 					}
 				}
 			}
@@ -230,7 +230,7 @@ TinTerrainManager.prototype.getIntersectedObjectToClampToTerrain = function(geoE
 							var imageUrl = style.imageUrl;//: "/images/materialImages/factoryRoof.jpg"
 							objToClamp.texture.url = imageUrl;
 							var flipYTexCoord = false;
-							TexturesManager.loadTexture(imageUrl, objToClamp.texture, magoManager, flipYTexCoord);
+							TexturesManager.loadTexture(imageUrl, objToClamp.texture, this.magoManager, flipYTexCoord);
 						}
 
 						//continue;
@@ -248,7 +248,7 @@ TinTerrainManager.prototype.getIntersectedObjectToClampToTerrain = function(geoE
 						else if (objToClamp.texture.url)
 						{
 							// load by url.
-							TexturesManager.loadTexture(objToClamp.texture.url, objToClamp.texture, magoManager, flipYTexCoord);
+							TexturesManager.loadTexture(objToClamp.texture.url, objToClamp.texture, this.magoManager, flipYTexCoord);
 						}
 						//continue;
 					}
