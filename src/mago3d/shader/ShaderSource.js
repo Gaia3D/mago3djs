@@ -3470,10 +3470,10 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
                 float red = gray + 0.1;//float red = gray + 0.2;\n\
                 float green = gray + 0.5;//float green = gray + 0.6;\n\
                 float blue = gray*2.0 + 2.0;\n\
-                vec4 fogColor = vec4(red, green, blue, 1.0);\n\
-                //vec4 fogColor = vec4(getRainbowColor_byHeight(altitude, uMinMaxAltitudes.x, 0.0).xyz, 1.0);\n\
+                vec4 seaColor = vec4(red, green, blue, 1.0);\n\
+                //vec4 seaColor = vec4(getRainbowColor_byHeight(altitude, uMinMaxAltitudes.x, 0.0).xyz, 1.0);\n\
                 \n\
-                resultTextureColor = mix(resultTextureColor, fogColor, 0.7); \n\
+                resultTextureColor = mix(resultTextureColor, seaColor, 0.7); \n\
             }\n\
         }\n\
     }\n\

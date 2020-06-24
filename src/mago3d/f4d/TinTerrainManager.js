@@ -832,7 +832,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 			if (tinTerrain === undefined)
 			{ continue; }
 		
-			var sphereExtent = tinTerrain.sphereExtent;
+			var sphereExtent = tinTerrain.getSphereExtent(magoManager);
 			var distToLight0 = light0CenterPoint.distToPoint(sphereExtent.centerPoint)+sphereExtent.r;
 			if (distToLight0 < light0Radius*5.0)
 			{

@@ -583,7 +583,7 @@ TinTerrain.prototype.makeTextureMasterImageryLayers = function()
 		this.tinTerrainManager.quadBuffer = FBO.createBuffer(gl, data);
 	}
 	
-	var currShader = postFxShaderManager.getCurrentShader(); // to restore current active shader.
+	//var currShader = postFxShaderManager.getCurrentShader(); // to restore current active shader.
 	var shader =  postFxShaderManager.getShader("texturesMerger");
 	postFxShaderManager.useProgram(shader);
 
@@ -701,7 +701,7 @@ TinTerrain.prototype.makeTextureMaster = function()
 		this.tinTerrainManager.quadBuffer = FBO.createBuffer(gl, data);
 	}
 	
-	var currShader = postFxShaderManager.getCurrentShader(); // to restore current active shader.
+	//var currShader = postFxShaderManager.getCurrentShader(); // to restore current active shader.
 	var shader =  postFxShaderManager.getShader("texturesMerger");
 	postFxShaderManager.useProgram(shader);
 
@@ -717,7 +717,7 @@ TinTerrain.prototype.makeTextureMaster = function()
 	// Now, make texturesArrayMatrix. 
 	// texturesArrayMatrix is an array that contains textures array with 8 textures as maximum.
 	var texturesToMergeMatrix = []; // array of "texturesToMergeArray".
-	var texturesToMergeArray = [];
+	var texturesToMergeArray = []; // can contain 8 textures as maximum.
 
 	// put the textureMasterImageryLayers as background.
 	texturesToMergeArray.push(this.textureMasterImageryLayers);
@@ -2050,6 +2050,18 @@ TinTerrain.prototype.putObjectToArraySortedByDist = function(objectsArray, objec
 	}
 };
 
+TinTerrain.prototype.getSphereExtent = function(magoManager)
+{
+	if (this.sphereExtent === undefined)
+	{
+		var currMinGeographicCoords = this.geographicExtent.minGeographicCoord;
+		var currMaxGeographicCoords = this.geographicExtent.maxGeographicCoord;
+
+		this.sphereExtent = SmartTile.computeSphereExtent(magoManager, currMinGeographicCoords, currMaxGeographicCoords, this.sphereExtent);
+	}
+
+	return this.sphereExtent;
+};
 
 TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum, maxDepth, camPos, magoManager, visibleTilesArrayMap, noVisibleTilesArray)
 {
@@ -2060,13 +2072,8 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 	var currMinGeographicCoords = this.geographicExtent.minGeographicCoord;
 	var currMaxGeographicCoords = this.geographicExtent.maxGeographicCoord;
 		
-	if (this.sphereExtent === undefined)
-	{
-		this.sphereExtent = SmartTile.computeSphereExtent(magoManager, currMinGeographicCoords, currMaxGeographicCoords, this.sphereExtent);
-	}
-	
+	this.sphereExtent = this.getSphereExtent(magoManager);
 	var sphereExtentAux = this.sphereExtent;
-
 	var currDepth = this.depth;
 
 	// FrustumCulling.***************************************************

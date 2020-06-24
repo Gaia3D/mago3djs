@@ -179,7 +179,7 @@ var MagoManager = function()
 
 	// Vars.****************************************************************
 	this.sceneState = new SceneState(); // this contains all scene mtrices and camera position.***
-	this.sceneState.setApplySunShadows(false);
+	this.sceneState.setApplySunShadows(true);
 
 	
 
