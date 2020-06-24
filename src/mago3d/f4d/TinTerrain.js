@@ -598,8 +598,6 @@ TinTerrain.prototype.makeTextureMasterImageryLayers = function()
 	
 	// Now, make texturesArrayMatrix. 
 	// texturesArrayMatrix is an array that contains textures array with 8 textures as maximum.
-	var textureKeys = Object.keys(this.texture);
-	var textureLength = textureKeys.length; 
 	var texturesToMergeMatrix = []; // array of "texturesToMergeArray".
 	var texturesToMergeArray = [];
 
@@ -669,16 +667,10 @@ TinTerrain.prototype.makeTextureMasterImageryLayers = function()
 	}
 
 	FBO.bindFramebuffer(gl, null);
-	postFxShaderManager.useProgram(currShader);
 };
 
 TinTerrain.prototype.makeTextureMaster = function()
 {
-	//if (this.textureMasterPrepared)
-	//{ 
-	//	return; 
-	//}
-
 	// 1rst, make textureMasterImageryLayers.
 	this.makeTextureMasterImageryLayers();
 
@@ -724,8 +716,6 @@ TinTerrain.prototype.makeTextureMaster = function()
 	
 	// Now, make texturesArrayMatrix. 
 	// texturesArrayMatrix is an array that contains textures array with 8 textures as maximum.
-	var textureKeys = Object.keys(this.texture);
-	var textureLength = textureKeys.length; 
 	var texturesToMergeMatrix = []; // array of "texturesToMergeArray".
 	var texturesToMergeArray = [];
 
@@ -784,7 +774,6 @@ TinTerrain.prototype.makeTextureMaster = function()
 	}
 
 	FBO.bindFramebuffer(gl, null);
-	postFxShaderManager.useProgram(currShader);
 };
 
 TinTerrain.prototype.bindTexture = function(gl, shader)
@@ -877,6 +866,10 @@ TinTerrain.prototype.bindTexture = function(gl, shader)
 			{
 				activeTexturesLayers[4+i] = 10;
 				gl.bindTexture(gl.TEXTURE_2D, texture.texId);
+
+				var properties = filter.properties;
+				gl.uniform2fv(shader.uMinMaxAltitudes_loc, new Float32Array([properties.minAltitude, properties.maxAltitude]));
+				gl.uniform1i(shader.bApplyCaustics_loc, properties.caustics);
 			}
 		}
 	}	
@@ -1582,8 +1575,6 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 					
 				}
 				
-
-				var activeTexturesLayers = new Int32Array([1, 1, 0, 0, 0, 0, 0, 0]); // note: the 1rst & 2nd are shadowMap textures.
 				gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
 				gl.uniform1f(currentShader.externalAlpha_loc, 1);
 				gl.uniform1i(currentShader.bApplySsao_loc, this.depth > 8); // apply ssao default.***

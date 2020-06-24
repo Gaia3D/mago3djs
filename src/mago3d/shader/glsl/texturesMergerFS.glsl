@@ -18,6 +18,72 @@ uniform vec2 uMinMaxAltitudes; // used for altitudes textures as bathymetry.
 
 varying vec2 v_tex_pos;
 
+vec3 getRainbowColor_byHeight(float height, float minHeight, float maxHeight)
+{
+	float minHeight_rainbow = minHeight;
+	float maxHeight_rainbow = maxHeight;
+	
+	float gray = (height - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);
+	if (gray > 1.0){ gray = 1.0; }
+	else if (gray<0.0){ gray = 0.0; }
+	
+	float r, g, b;
+	
+	if(gray < 0.16666)
+	{
+		b = 0.0;
+		g = gray*6.0;
+		r = 1.0;
+	}
+	else if(gray >= 0.16666 && gray < 0.33333)
+	{
+		b = 0.0;
+		g = 1.0;
+		r = 2.0 - gray*6.0;
+	}
+	else if(gray >= 0.33333 && gray < 0.5)
+	{
+		b = -2.0 + gray*6.0;
+		g = 1.0;
+		r = 0.0;
+	}
+	else if(gray >= 0.5 && gray < 0.66666)
+	{
+		b = 1.0;
+		g = 4.0 - gray*6.0;
+		r = 0.0;
+	}
+	else if(gray >= 0.66666 && gray < 0.83333)
+	{
+		b = 1.0;
+		g = 0.0;
+		r = -4.0 + gray*6.0;
+	}
+	else if(gray >= 0.83333)
+	{
+		b = 6.0 - gray*6.0;
+		g = 0.0;
+		r = 1.0;
+	}
+	
+	float aux = r;
+	r = b;
+	b = aux;
+	
+	//b = -gray + 1.0;
+	//if (gray > 0.5)
+	//{
+	//	g = -gray*2.0 + 2.0; 
+	//}
+	//else 
+	//{
+	//	g = gray*2.0;
+	//}
+	//r = gray;
+	vec3 resultColor = vec3(r, g, b);
+    return resultColor;
+} 
+
 //vec4 mixColor(sampler2D tex)
 bool intersects(vec2 texCoord, vec4 extension)
 {
@@ -64,10 +130,10 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
         
             if(altitude < 0.0)
             {
-                float minHeight_rainbow = -100.0;
+                float minHeight_rainbow = -150.0;
+                //float minHeight_rainbow = uMinMaxAltitudes.x;
                 float maxHeight_rainbow = 0.0;
                 float gray = (altitude - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);
-                //vec3 rainbowColor = getRainbowColor_byHeight(altitude);
 
                 if(gray < 0.05)
                 gray = 0.05;
@@ -75,6 +141,7 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
                 float green = gray + 0.5;//float green = gray + 0.6;
                 float blue = gray*2.0 + 2.0;
                 vec4 fogColor = vec4(red, green, blue, 1.0);
+                //vec4 fogColor = vec4(getRainbowColor_byHeight(altitude, uMinMaxAltitudes.x, 0.0).xyz, 1.0);
                 
                 resultTextureColor = mix(resultTextureColor, fogColor, 0.7); 
             }

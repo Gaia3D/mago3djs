@@ -33,6 +33,7 @@ uniform bool bApplyShadow;
 uniform int sunIdx;
 uniform bool bApplySpecularLighting;
 uniform bool bUseLogarithmicDepth;
+uniform float uFCoef_logDepth;
 
 varying float applySpecLighting;
 varying vec3 vNormal;
@@ -131,11 +132,10 @@ void main()
 		{
 			// logarithmic zBuffer:
 			// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html
-			float Fcoef = 2.0 / log2(far + 1.0);
-			gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;
+			gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;
 
 			flogz = 1.0 + gl_Position.w;
-			Fcoef_half = 0.5 * Fcoef;
+			Fcoef_half = 0.5 * uFCoef_logDepth;
 		}
 	}
 
@@ -143,6 +143,7 @@ void main()
 	float fogParam = 1.15 * v3Pos.z/(far - 10000.0);
 	float fogParam2 = fogParam*fogParam;
 	vFogAmount = fogParam2*fogParam2;
+
 	if(vFogAmount < 0.0)
 	vFogAmount = 0.0;
 	else if(vFogAmount > 1.0)

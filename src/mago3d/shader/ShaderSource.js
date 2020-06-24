@@ -3348,6 +3348,72 @@ uniform vec2 uMinMaxAltitudes; // used for altitudes textures as bathymetry.\n\
 \n\
 varying vec2 v_tex_pos;\n\
 \n\
+vec3 getRainbowColor_byHeight(float height, float minHeight, float maxHeight)\n\
+{\n\
+	float minHeight_rainbow = minHeight;\n\
+	float maxHeight_rainbow = maxHeight;\n\
+	\n\
+	float gray = (height - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);\n\
+	if (gray > 1.0){ gray = 1.0; }\n\
+	else if (gray<0.0){ gray = 0.0; }\n\
+	\n\
+	float r, g, b;\n\
+	\n\
+	if(gray < 0.16666)\n\
+	{\n\
+		b = 0.0;\n\
+		g = gray*6.0;\n\
+		r = 1.0;\n\
+	}\n\
+	else if(gray >= 0.16666 && gray < 0.33333)\n\
+	{\n\
+		b = 0.0;\n\
+		g = 1.0;\n\
+		r = 2.0 - gray*6.0;\n\
+	}\n\
+	else if(gray >= 0.33333 && gray < 0.5)\n\
+	{\n\
+		b = -2.0 + gray*6.0;\n\
+		g = 1.0;\n\
+		r = 0.0;\n\
+	}\n\
+	else if(gray >= 0.5 && gray < 0.66666)\n\
+	{\n\
+		b = 1.0;\n\
+		g = 4.0 - gray*6.0;\n\
+		r = 0.0;\n\
+	}\n\
+	else if(gray >= 0.66666 && gray < 0.83333)\n\
+	{\n\
+		b = 1.0;\n\
+		g = 0.0;\n\
+		r = -4.0 + gray*6.0;\n\
+	}\n\
+	else if(gray >= 0.83333)\n\
+	{\n\
+		b = 6.0 - gray*6.0;\n\
+		g = 0.0;\n\
+		r = 1.0;\n\
+	}\n\
+	\n\
+	float aux = r;\n\
+	r = b;\n\
+	b = aux;\n\
+	\n\
+	//b = -gray + 1.0;\n\
+	//if (gray > 0.5)\n\
+	//{\n\
+	//	g = -gray*2.0 + 2.0; \n\
+	//}\n\
+	//else \n\
+	//{\n\
+	//	g = gray*2.0;\n\
+	//}\n\
+	//r = gray;\n\
+	vec3 resultColor = vec3(r, g, b);\n\
+    return resultColor;\n\
+} \n\
+\n\
 //vec4 mixColor(sampler2D tex)\n\
 bool intersects(vec2 texCoord, vec4 extension)\n\
 {\n\
@@ -3394,10 +3460,10 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
         \n\
             if(altitude < 0.0)\n\
             {\n\
-                float minHeight_rainbow = -100.0;\n\
+                float minHeight_rainbow = -150.0;\n\
+                //float minHeight_rainbow = uMinMaxAltitudes.x;\n\
                 float maxHeight_rainbow = 0.0;\n\
                 float gray = (altitude - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);\n\
-                //vec3 rainbowColor = getRainbowColor_byHeight(altitude);\n\
 \n\
                 if(gray < 0.05)\n\
                 gray = 0.05;\n\
@@ -3405,6 +3471,7 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
                 float green = gray + 0.5;//float green = gray + 0.6;\n\
                 float blue = gray*2.0 + 2.0;\n\
                 vec4 fogColor = vec4(red, green, blue, 1.0);\n\
+                //vec4 fogColor = vec4(getRainbowColor_byHeight(altitude, uMinMaxAltitudes.x, 0.0).xyz, 1.0);\n\
                 \n\
                 resultTextureColor = mix(resultTextureColor, fogColor, 0.7); \n\
             }\n\
@@ -4715,6 +4782,7 @@ uniform bool bApplyShadow;\n\
 uniform int sunIdx;\n\
 uniform bool bApplySpecularLighting;\n\
 uniform bool bUseLogarithmicDepth;\n\
+uniform float uFCoef_logDepth;\n\
 \n\
 varying float applySpecLighting;\n\
 varying vec3 vNormal;\n\
@@ -4813,11 +4881,10 @@ void main()\n\
 		{\n\
 			// logarithmic zBuffer:\n\
 			// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
-			float Fcoef = 2.0 / log2(far + 1.0);\n\
-			gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;\n\
+			gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;\n\
 \n\
 			flogz = 1.0 + gl_Position.w;\n\
-			Fcoef_half = 0.5 * Fcoef;\n\
+			Fcoef_half = 0.5 * uFCoef_logDepth;\n\
 		}\n\
 	}\n\
 \n\
@@ -4825,6 +4892,7 @@ void main()\n\
 	float fogParam = 1.15 * v3Pos.z/(far - 10000.0);\n\
 	float fogParam2 = fogParam*fogParam;\n\
 	vFogAmount = fogParam2*fogParam2;\n\
+\n\
 	if(vFogAmount < 0.0)\n\
 	vFogAmount = 0.0;\n\
 	else if(vFogAmount > 1.0)\n\

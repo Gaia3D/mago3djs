@@ -444,11 +444,11 @@ TinTerrainManager.prototype.makeDistanceLimitByDepth = function()
 		
 	// For each depth, there are a limit distance.***
 	this.distLimitByDepth[0] = 100000000; 
-	this.distLimitByDepth[1] = 20000000; 
-	this.distLimitByDepth[2] = 10000000; 
-	this.distLimitByDepth[3] = 6000000; 
-	this.distLimitByDepth[4] = 2000000; 
-	this.distLimitByDepth[5] = 1600000; 
+	this.distLimitByDepth[1] = 40000000; 
+	this.distLimitByDepth[2] = 20000000; 
+	this.distLimitByDepth[3] = 12000000; 
+	this.distLimitByDepth[4] = 6000000; 
+	this.distLimitByDepth[5] = 3000000; 
 	this.distLimitByDepth[6] = 1000000; 
 	this.distLimitByDepth[7] = 600000; 
 	this.distLimitByDepth[8] = 200000; 
@@ -687,20 +687,12 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	
 	gl.uniform1i(currentShader.bIsMakingDepth_loc, bDepth); //. old. use uRenderType_loc = 0. ***
 	gl.uniform1i(currentShader.uRenderType_loc, 1);
-	//var time = magoManager.getCurrentTime()/1000.0;
-	/*
-	var time = new Date().getTime()/1000.0;
-	var fractionalTime = (time%1000);
 
-	if (this.timeRandomFactor === undefined)
-	{ this.timeRandomFactor = Math.random(); }
+	var camera = magoManager.sceneState.camera;
+	var frustum0 = camera.getFrustum(0);
+	var fCoef = 2.0 / Math.log2(frustum0.far + 1.0);
+	gl.uniform1f(currentShader.uFCoef_logDepth_loc, fCoef);
 
-	fractionalTime *= this.timeRandomFactor;
-	if (fractionalTime > 1000.0)
-	{ fractionalTime -= 1000.0; }
-
-	gl.uniform1f(currentShader.uTime_loc, fractionalTime);
-	*/
 
 	if (renderType === 1)
 	{
