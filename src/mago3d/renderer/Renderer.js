@@ -441,6 +441,7 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 	var renderTexture = false;
 	
 	var magoManager = this.magoManager;
+	var sceneState = this.magoManager.sceneState;
 	var renderType = 0;
 	magoManager.currentProcess = CODE.magoCurrentProcess.DepthRendering;
 	
@@ -466,6 +467,7 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 		currentShader.disableVertexAttribArrayAll();
 		currentShader.enableVertexAttribArray(currentShader.position3_loc);
 		gl.uniform1i(currentShader.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
+		gl.uniform1f(currentShader.uFCoef_logDepth_loc, sceneState.fCoef_logDepth[0]);
 
 		currentShader.bindUniformGenerals();
 		gl.uniform3fv(currentShader.scaleLC_loc, [1.0, 1.0, 1.0]); // init referencesMatrix.
@@ -1593,6 +1595,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 	var rootNode;
 	var geoLocDataManager;
 	var magoManager = this.magoManager;
+	var sceneState = magoManager.sceneState;
 	var renderingSettings = magoManager._settings.getRenderingSettings();
 
 	var renderTexture = false;
@@ -1611,7 +1614,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			this.renderAxisNodes(nodes, renderType);
 		}
 
-		var sceneState = magoManager.sceneState;
+		
 		//sceneState.applySunShadows = true;
 		// SunLight.***
 		if (sceneState.applySunShadows && !this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
@@ -1688,7 +1691,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		{ bApplySsao = true; }
 	
 	
-		if (magoManager.sceneState.sunSystem !== undefined && magoManager.sceneState.applySunShadows)
+		if (sceneState.sunSystem !== undefined && sceneState.applySunShadows)
 		{ bApplyShadow = true; }
 	
 		
@@ -1715,6 +1718,8 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
 			gl.uniform1i(currentShader.bApplyShadow_loc, bApplyShadow);
 			gl.uniform1i(currentShader.bApplySpecularLighting_loc, true);
+			gl.uniform1f(currentShader.uFCoef_logDepth_loc, sceneState.fCoef_logDepth[0]);
+
 			var sunSystem = magoManager.sceneState.sunSystem;
 			var sunLight = sunSystem.getLight(0);
 			if (bApplyShadow)

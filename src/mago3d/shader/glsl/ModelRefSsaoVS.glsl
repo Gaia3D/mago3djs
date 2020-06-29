@@ -31,6 +31,7 @@
 	
 	uniform bool bApplyShadow;
 	uniform bool bUseLogarithmicDepth;
+	uniform float uFCoef_logDepth;
 	
 	// clipping planes.***
 	uniform mat4 clippingPlanesRotMatrix; 
@@ -184,26 +185,11 @@
 		{
 			// logarithmic zBuffer:
 			// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html
-			float Fcoef = 2.0 / log2(far + 1.0);
-			gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;
+			//float Fcoef = 2.0 / log2(far + 1.0);
+			gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;
 
 			flogz = 1.0 + gl_Position.w;
-			Fcoef_half = 0.5 * Fcoef;
-
-			// https://www.gamasutra.com/blogs/BranoKemen/20090812/85207/Logarithmic_Depth_Buffer.php
-			// z = log(C*z + 1) / log(C*Far + 1) * w
-			/*
-			if(orthoPos.z < 0.0)
-			{
-				float z = gl_Position.z;
-				float C = 0.001;
-				float w = gl_Position.w;
-				//gl_Position.z = (2.0*log(C*w + 1.0) / log(C*far + 1.0) - 1.0) * w; // https://outerra.blogspot.com/2009/08/logarithmic-z-buffer.html
-				gl_Position.z = 2.0*log(z/near) / log(far/near)-1.0; // another way.
-				gl_Position.z *= w;
-			}
-			*/
-			//https://www.shaderific.com/blog/2014/3/13/tutorial-how-to-update-a-shader-for-opengl-es-30
+			Fcoef_half = 0.5 * uFCoef_logDepth;
 		}
 		
 		if(colorType == 1)

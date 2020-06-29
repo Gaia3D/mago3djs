@@ -16,6 +16,7 @@ uniform vec3 aditionalPosition;
 uniform vec3 refTranslationVec;
 uniform int refMatrixType; // 0= identity, 1= translate, 2= transform
 uniform bool bUseLogarithmicDepth;
+uniform float uFCoef_logDepth;
 
 varying float flogz;
 varying float Fcoef_half;
@@ -58,11 +59,11 @@ void main()
 	{
 		// logarithmic zBuffer:
 		// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html
-		float Fcoef = 2.0 / log2(far + 1.0);
-		gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;
+		//float Fcoef = 2.0 / log2(far + 1.0);
+		gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;
 
 		flogz = 1.0 + gl_Position.w;
-		Fcoef_half = 0.5 * Fcoef;
+		Fcoef_half = 0.5 * uFCoef_logDepth;
 	}
 
 	vertexPos = orthoPos.xyz;

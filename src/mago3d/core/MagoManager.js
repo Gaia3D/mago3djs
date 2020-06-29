@@ -5,7 +5,7 @@
  * @class MagoManager
  * @constructor
  */
-var MagoManager = function() 
+var MagoManager = function(options) 
 {
 	if (!(this instanceof MagoManager)) 
 	{
@@ -179,7 +179,7 @@ var MagoManager = function()
 
 	// Vars.****************************************************************
 	this.sceneState = new SceneState(); // this contains all scene mtrices and camera position.***
-	this.sceneState.setApplySunShadows(true);
+	this.sceneState.setApplySunShadows(false);
 
 	
 
@@ -780,7 +780,8 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		var modelViewProjRelToEyeMatrixSky = sceneState.modelViewProjRelToEyeMatrixSky;
 		modelViewProjRelToEyeMatrixSky._floatArrays = glMatrix.mat4.multiply(modelViewProjRelToEyeMatrixSky._floatArrays, projectionMatrixSky._floatArrays, modelViewRelToEyeMatrix._floatArrays);
 
-		
+		// Parameters for logarithmic depth buffer.
+		sceneState.fCoef_logDepth[0] = 2.0 / Math.log2(frustum0.far + 1.0);
 	}
 	
 	
@@ -4760,6 +4761,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	ssao_fs_source = ssao_fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
 	var shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
 	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
+	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
 
 	// 1.1) ModelReferences depthShader.******************************************************************************
 	var shaderName = "modelRefDepth";
@@ -4768,6 +4770,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	showDepth_fs_source = showDepth_fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
 	shader = this.postFxShadersManager.createShaderProgram(gl, showDepth_vs_source, showDepth_fs_source, shaderName, this);
 	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
+	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
 
 	// 2) ModelReferences colorCoding shader.***********************************************************************
 	var shaderName = "modelRefColorCoding";

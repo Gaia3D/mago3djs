@@ -654,7 +654,8 @@ TinTerrainManager.prototype.getAltitudes = function(geoCoordsArray, resultGeoCoo
 
 TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, shader) 
 {
-	var gl = magoManager.sceneState.gl;
+	var sceneState = magoManager.sceneState;
+	var gl = sceneState.gl;
 	var currentShader;
 	if (shader)
 	{ currentShader = shader; }
@@ -687,11 +688,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	
 	gl.uniform1i(currentShader.bIsMakingDepth_loc, bDepth); //. old. use uRenderType_loc = 0. ***
 	gl.uniform1i(currentShader.uRenderType_loc, 1);
-
-	var camera = magoManager.sceneState.camera;
-	var frustum0 = camera.getFrustum(0);
-	var fCoef = 2.0 / Math.log2(frustum0.far + 1.0);
-	gl.uniform1f(currentShader.uFCoef_logDepth_loc, fCoef);
+	gl.uniform1f(currentShader.uFCoef_logDepth_loc, sceneState.fCoef_logDepth[0]);
 
 
 	if (renderType === 1)

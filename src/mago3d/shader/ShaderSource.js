@@ -1703,6 +1703,7 @@ ShaderSource.ModelRefSsaoVS = "\n\
 	\n\
 	uniform bool bApplyShadow;\n\
 	uniform bool bUseLogarithmicDepth;\n\
+	uniform float uFCoef_logDepth;\n\
 	\n\
 	// clipping planes.***\n\
 	uniform mat4 clippingPlanesRotMatrix; \n\
@@ -1856,26 +1857,11 @@ ShaderSource.ModelRefSsaoVS = "\n\
 		{\n\
 			// logarithmic zBuffer:\n\
 			// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
-			float Fcoef = 2.0 / log2(far + 1.0);\n\
-			gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;\n\
+			//float Fcoef = 2.0 / log2(far + 1.0);\n\
+			gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;\n\
 \n\
 			flogz = 1.0 + gl_Position.w;\n\
-			Fcoef_half = 0.5 * Fcoef;\n\
-\n\
-			// https://www.gamasutra.com/blogs/BranoKemen/20090812/85207/Logarithmic_Depth_Buffer.php\n\
-			// z = log(C*z + 1) / log(C*Far + 1) * w\n\
-			/*\n\
-			if(orthoPos.z < 0.0)\n\
-			{\n\
-				float z = gl_Position.z;\n\
-				float C = 0.001;\n\
-				float w = gl_Position.w;\n\
-				//gl_Position.z = (2.0*log(C*w + 1.0) / log(C*far + 1.0) - 1.0) * w; // https://outerra.blogspot.com/2009/08/logarithmic-z-buffer.html\n\
-				gl_Position.z = 2.0*log(z/near) / log(far/near)-1.0; // another way.\n\
-				gl_Position.z *= w;\n\
-			}\n\
-			*/\n\
-			//https://www.shaderific.com/blog/2014/3/13/tutorial-how-to-update-a-shader-for-opengl-es-30\n\
+			Fcoef_half = 0.5 * uFCoef_logDepth;\n\
 		}\n\
 		\n\
 		if(colorType == 1)\n\
@@ -2831,6 +2817,7 @@ uniform vec3 aditionalPosition;\n\
 uniform vec3 refTranslationVec;\n\
 uniform int refMatrixType; // 0= identity, 1= translate, 2= transform\n\
 uniform bool bUseLogarithmicDepth;\n\
+uniform float uFCoef_logDepth;\n\
 \n\
 varying float flogz;\n\
 varying float Fcoef_half;\n\
@@ -2873,11 +2860,11 @@ void main()\n\
 	{\n\
 		// logarithmic zBuffer:\n\
 		// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
-		float Fcoef = 2.0 / log2(far + 1.0);\n\
-		gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;\n\
+		//float Fcoef = 2.0 / log2(far + 1.0);\n\
+		gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;\n\
 \n\
 		flogz = 1.0 + gl_Position.w;\n\
-		Fcoef_half = 0.5 * Fcoef;\n\
+		Fcoef_half = 0.5 * uFCoef_logDepth;\n\
 	}\n\
 \n\
 	vertexPos = orthoPos.xyz;\n\

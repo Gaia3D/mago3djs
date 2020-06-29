@@ -42,6 +42,7 @@ var SceneState = function()
 	this.drawingBufferWidth = new Int32Array([1000]);
 	this.drawingBufferHeight = new Int32Array([1000]);
 	this.mouseAction = new MouseAction();
+	this.fCoef_logDepth = new Float32Array([1.0]);
 	
 	// Sun.***
 	// omni = 0, spot = 1, directional = 2, area = 3, volume = 4.
