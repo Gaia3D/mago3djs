@@ -128,15 +128,13 @@ void main()
 		// https://www.gamasutra.com/blogs/BranoKemen/20090812/85207/Logarithmic_Depth_Buffer.php
 		// z = log(C*z + 1) / log(C*Far + 1) * w
 		// https://android.developreference.com/article/21119961/Logarithmic+Depth+Buffer+OpenGL
-		//if(v3Pos.z < 0.0)
-		{
-			// logarithmic zBuffer:
-			// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html
-			gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;
 
-			flogz = 1.0 + gl_Position.w;
-			Fcoef_half = 0.5 * uFCoef_logDepth;
-		}
+		// logarithmic zBuffer:
+		// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html
+		gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;
+
+		flogz = 1.0 + gl_Position.w;
+		Fcoef_half = 0.5 * uFCoef_logDepth;
 	}
 
 	// calculate fog amount.

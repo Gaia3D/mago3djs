@@ -20,6 +20,7 @@ uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.
 uniform float near;
 uniform float far;
 uniform bool bUseLogarithmicDepth;
+uniform float uFCoef_logDepth;
 
 varying vec4 vColor;
 varying float flogz;

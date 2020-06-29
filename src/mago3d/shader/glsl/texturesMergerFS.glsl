@@ -84,6 +84,77 @@ vec3 getRainbowColor_byHeight(float height, float minHeight, float maxHeight)
     return resultColor;
 } 
 
+vec3 getWhiteToBlueColor_byHeight(float height, float minHeight, float maxHeight)
+{
+    // White to Blue in 32 steps.
+    float gray = (height - minHeight)/(maxHeight - minHeight);
+    //gray = 1.0 - gray; // invert gray value (white to blue).
+    // calculate r, g, b values by gray.
+
+    float r, g, b;
+
+    // Red.
+    if(gray >= 0.0 && gray < 0.15625) // [1, 5] from 32 divisions.
+    {
+        float minGray = 0.0;
+        float maxGray = 0.15625;
+        //float maxR = 0.859375; // 220/256.
+        float maxR = 1.0;
+        float minR = 0.3515625; // 90/256.
+        float relativeGray = (gray- minGray)/(maxGray - minGray);
+        r = maxR - relativeGray*(maxR - minR);
+    }
+    else if(gray >= 0.15625 && gray < 0.40625) // [6, 13] from 32 divisions.
+    {
+        float minGray = 0.15625;
+        float maxGray = 0.40625;
+        float maxR = 0.3515625; // 90/256.
+        float minR = 0.0; // 0/256.
+        float relativeGray = (gray- minGray)/(maxGray - minGray);
+        r = maxR - relativeGray*(maxR - minR);
+    }
+    else  // [14, 32] from 32 divisions.
+    {
+        r = 0.0;
+    }
+
+    // Green.
+    if(gray >= 0.0 && gray < 0.15625) // [1, 5] from 32 divisions.
+    {
+        g = 1.0; // 256.
+    }
+    else if(gray >= 0.15625 && gray < 0.5625) // [6, 18] from 32 divisions.
+    {
+        float minGray = 0.15625;
+        float maxGray = 0.5625;
+        float maxG = 1.0; // 256/256.
+        float minG = 0.0; // 0/256.
+        float relativeGray = (gray- minGray)/(maxGray - minGray);
+        g = maxG - relativeGray*(maxG - minG);
+    }
+    else  // [18, 32] from 32 divisions.
+    {
+        g = 0.0;
+    }
+
+    // Blue.
+    if(gray < 0.5625)
+    {
+        b = 1.0;
+    }
+    else // gray >= 0.5625 && gray <= 1.0
+    {
+        float minGray = 0.5625;
+        float maxGray = 1.0;
+        float maxB = 1.0; // 256/256.
+        float minB = 0.0; // 0/256.
+        float relativeGray = (gray- minGray)/(maxGray - minGray);
+        b = maxB - relativeGray*(maxB - minB);
+    }
+
+    return vec3(r, g, b);
+}
+
 //vec4 mixColor(sampler2D tex)
 bool intersects(vec2 texCoord, vec4 extension)
 {
@@ -130,20 +201,21 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
         
             if(altitude < 0.0)
             {
-                float minHeight_rainbow = -150.0;
-                //float minHeight_rainbow = uMinMaxAltitudes.x;
+                /*
+                float minHeight_rainbow = uMinMaxAltitudes.x;
                 float maxHeight_rainbow = 0.0;
                 float gray = (altitude - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);
+                vec4 seaColor;
 
-                if(gray < 0.05)
-                gray = 0.05;
                 float red = gray + 0.1;//float red = gray + 0.2;
                 float green = gray + 0.5;//float green = gray + 0.6;
                 float blue = gray*2.0 + 2.0;
-                vec4 seaColor = vec4(red, green, blue, 1.0);
-                //vec4 seaColor = vec4(getRainbowColor_byHeight(altitude, uMinMaxAltitudes.x, 0.0).xyz, 1.0);
+                seaColor = vec4(red, green, blue, 1.0);
+                */
+                vec3 seaColorRGB = getWhiteToBlueColor_byHeight(altitude, 0.0, uMinMaxAltitudes.x);
+                vec4 seaColor = vec4(seaColorRGB, 1.0);
                 
-                resultTextureColor = mix(resultTextureColor, seaColor, 0.7); 
+                resultTextureColor = mix(resultTextureColor, seaColor, 0.99); 
             }
         }
     }

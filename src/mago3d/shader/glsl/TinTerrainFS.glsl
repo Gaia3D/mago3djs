@@ -340,9 +340,8 @@ void main()
 
 		if(uSeaOrTerrainType == 1)
 		{
-			//gl_FragColor = vec4(oneColor4.xyz * shadow_occlusion * lambertian, 0.5); // original.***
-			// Render a dot matrix in the sea surface.***
-			
+			gl_FragColor = vec4(oneColor4.xyz, 0.5); // original.***
+			// Render a dot matrix in the sea surface. TODO.***
 
 			return;
 		}

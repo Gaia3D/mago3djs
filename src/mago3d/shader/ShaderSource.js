@@ -3401,6 +3401,77 @@ vec3 getRainbowColor_byHeight(float height, float minHeight, float maxHeight)\n\
     return resultColor;\n\
 } \n\
 \n\
+vec3 getWhiteToBlueColor_byHeight(float height, float minHeight, float maxHeight)\n\
+{\n\
+    // White to Blue in 32 steps.\n\
+    float gray = (height - minHeight)/(maxHeight - minHeight);\n\
+    //gray = 1.0 - gray; // invert gray value (white to blue).\n\
+    // calculate r, g, b values by gray.\n\
+\n\
+    float r, g, b;\n\
+\n\
+    // Red.\n\
+    if(gray >= 0.0 && gray < 0.15625) // [1, 5] from 32 divisions.\n\
+    {\n\
+        float minGray = 0.0;\n\
+        float maxGray = 0.15625;\n\
+        float maxR = 0.859375; // 220/256.\n\
+        maxR = 1.0;\n\
+        float minR = 0.3515625; // 90/256.\n\
+        float relativeGray = (gray- minGray)/(maxGray - minGray);\n\
+        r = maxR - relativeGray*(maxR - minR);\n\
+    }\n\
+    else if(gray >= 0.15625 && gray < 0.40625) // [6, 13] from 32 divisions.\n\
+    {\n\
+        float minGray = 0.15625;\n\
+        float maxGray = 0.40625;\n\
+        float maxR = 0.3515625; // 90/256.\n\
+        float minR = 0.0; // 0/256.\n\
+        float relativeGray = (gray- minGray)/(maxGray - minGray);\n\
+        r = maxR - relativeGray*(maxR - minR);\n\
+    }\n\
+    else  // [14, 32] from 32 divisions.\n\
+    {\n\
+        r = 0.0;\n\
+    }\n\
+\n\
+    // Green.\n\
+    if(gray >= 0.0 && gray < 0.15625) // [1, 5] from 32 divisions.\n\
+    {\n\
+        g = 1.0; // 256.\n\
+    }\n\
+    else if(gray >= 0.15625 && gray < 0.5625) // [6, 18] from 32 divisions.\n\
+    {\n\
+        float minGray = 0.15625;\n\
+        float maxGray = 0.5625;\n\
+        float maxG = 1.0; // 256/256.\n\
+        float minG = 0.0; // 0/256.\n\
+        float relativeGray = (gray- minGray)/(maxGray - minGray);\n\
+        g = maxG - relativeGray*(maxG - minG);\n\
+    }\n\
+    else  // [18, 32] from 32 divisions.\n\
+    {\n\
+        g = 0.0;\n\
+    }\n\
+\n\
+    // Blue.\n\
+    if(gray < 0.5625)\n\
+    {\n\
+        b = 1.0;\n\
+    }\n\
+    else // gray >= 0.5625 && gray <= 1.0\n\
+    {\n\
+        float minGray = 0.5625;\n\
+        float maxGray = 1.0;\n\
+        float maxB = 1.0; // 256/256.\n\
+        float minB = 0.0; // 0/256.\n\
+        float relativeGray = (gray- minGray)/(maxGray - minGray);\n\
+        b = maxB - relativeGray*(maxB - minB);\n\
+    }\n\
+\n\
+    return vec3(r, g, b);\n\
+}\n\
+\n\
 //vec4 mixColor(sampler2D tex)\n\
 bool intersects(vec2 texCoord, vec4 extension)\n\
 {\n\
@@ -3447,20 +3518,24 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
         \n\
             if(altitude < 0.0)\n\
             {\n\
-                float minHeight_rainbow = -150.0;\n\
-                //float minHeight_rainbow = uMinMaxAltitudes.x;\n\
+                /*\n\
+                float minHeight_rainbow = uMinMaxAltitudes.x;\n\
                 float maxHeight_rainbow = 0.0;\n\
                 float gray = (altitude - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);\n\
+                vec4 seaColor;\n\
 \n\
-                if(gray < 0.05)\n\
-                gray = 0.05;\n\
                 float red = gray + 0.1;//float red = gray + 0.2;\n\
                 float green = gray + 0.5;//float green = gray + 0.6;\n\
                 float blue = gray*2.0 + 2.0;\n\
-                vec4 seaColor = vec4(red, green, blue, 1.0);\n\
-                //vec4 seaColor = vec4(getRainbowColor_byHeight(altitude, uMinMaxAltitudes.x, 0.0).xyz, 1.0);\n\
+                seaColor = vec4(red, green, blue, 1.0);\n\
+                */\n\
+                vec3 seaColorRGB = getWhiteToBlueColor_byHeight(altitude, 0.0, uMinMaxAltitudes.x);\n\
+                vec4 seaColor = vec4(seaColorRGB, 1.0);\n\
                 \n\
-                resultTextureColor = mix(resultTextureColor, seaColor, 0.7); \n\
+                resultTextureColor = mix(resultTextureColor, seaColor, 0.99); \n\
+                //resultTextureColor = mix(resultTextureColor, seaColor, 1.0 - gray); \n\
+\n\
+                \n\
             }\n\
         }\n\
     }\n\
@@ -3758,6 +3833,7 @@ uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
 uniform float near;\n\
 uniform float far;\n\
 uniform bool bUseLogarithmicDepth;\n\
+uniform float uFCoef_logDepth;\n\
 \n\
 varying vec4 vColor;\n\
 varying float depth;\n\
@@ -3931,6 +4007,7 @@ uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
 uniform float near;\n\
 uniform float far;\n\
 uniform bool bUseLogarithmicDepth;\n\
+uniform float uFCoef_logDepth;\n\
 \n\
 varying vec4 vColor;\n\
 varying float flogz;\n\
@@ -4440,9 +4517,8 @@ void main()\n\
 \n\
 		if(uSeaOrTerrainType == 1)\n\
 		{\n\
-			//gl_FragColor = vec4(oneColor4.xyz * shadow_occlusion * lambertian, 0.5); // original.***\n\
-			// Render a dot matrix in the sea surface.***\n\
-			\n\
+			gl_FragColor = vec4(oneColor4.xyz, 0.5); // original.***\n\
+			// Render a dot matrix in the sea surface. TODO.***\n\
 \n\
 			return;\n\
 		}\n\
@@ -4864,15 +4940,13 @@ void main()\n\
 		// https://www.gamasutra.com/blogs/BranoKemen/20090812/85207/Logarithmic_Depth_Buffer.php\n\
 		// z = log(C*z + 1) / log(C*Far + 1) * w\n\
 		// https://android.developreference.com/article/21119961/Logarithmic+Depth+Buffer+OpenGL\n\
-		//if(v3Pos.z < 0.0)\n\
-		{\n\
-			// logarithmic zBuffer:\n\
-			// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
-			gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;\n\
 \n\
-			flogz = 1.0 + gl_Position.w;\n\
-			Fcoef_half = 0.5 * uFCoef_logDepth;\n\
-		}\n\
+		// logarithmic zBuffer:\n\
+		// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
+		gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;\n\
+\n\
+		flogz = 1.0 + gl_Position.w;\n\
+		Fcoef_half = 0.5 * uFCoef_logDepth;\n\
 	}\n\
 \n\
 	// calculate fog amount.\n\

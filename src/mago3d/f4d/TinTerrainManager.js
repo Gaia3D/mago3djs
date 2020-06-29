@@ -857,13 +857,13 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	
 	
 	// Render the sea.
-	/*
-	var currSelObject = magoManager.selectionManager.getSelectedGeneral();
-	if (currSelObject instanceof(TinTerrain))
-	{
-		currSelObject.renderSea(currentShader, magoManager, bDepth, renderType);
-	}
-	*/
+	
+	//var currSelObject = magoManager.selectionManager.getSelectedGeneral();
+	//if (currSelObject instanceof(TinTerrain))
+	//{
+	//	currSelObject.renderSea(currentShader, magoManager, bDepth, renderType);
+	//}
+	
 	
 	/*
 	if (renderType === 1)
@@ -885,6 +885,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 		gl.enable(gl.CULL_FACE);
 	}
 	*/
+	
 	gl.depthRange(0, 1);
 	gl.depthFunc(gl.LEQUAL);
 	currentShader.disableVertexAttribArray(currentShader.texCoord2_loc); 
