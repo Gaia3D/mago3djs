@@ -1611,6 +1611,7 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 		{
 			this.upDateCamera(this.myCameraSCX);
 			this.doMultiFrustumCullingSmartTiles(this.myCameraSCX);
+			this.smartTileManager.doPendentProcess(this);
 		}
 
 		gl.clearStencil(0); // provisionally here.***

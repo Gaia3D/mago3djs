@@ -1287,16 +1287,50 @@ MagoWorld.prototype.keydown = function(event)
 			var fileName = magoManager.readerWriter.geometryDataPath + "/" + projectFolderName + "/" + "smartTile_f4d_indexFile.sii";
 
 			var smartTilePathInfo = fileName;//fc.smartTilePathInfo;
-			var projectId = 'busan-mj';
 
-			if (!fc.smartTilePathInfo[projectId])
+			var projectIdArray = ["busan-apartment",
+				"busan-curture",
+				"busan-edc",
+				"busan-etc",
+				"busan-general-house",
+				"busan-industry",
+				"busan-mj",
+				"busan-public",
+				"busan-service",
+				"busan-sv",
+				"busan-welfare",
+				"sejong-apartment",
+				"sejong-bus-sign",
+				"sejong-curture",
+				"sejong-etc",
+				"sejong-general-house",
+				"sejong-industry",
+				"sejong-jeonju",
+				"sejong-pedestrian-light",
+				"sejong-public",
+				"sejong-road-sign",
+				"sejong-safe-sign",
+				"sejong-service",
+				"sejong-special",
+				"sejong-street-lamp",
+				"sejong-taxi-sign",
+				"sejong-traffic-light",
+				"sejong-tree",
+				"sejong-welfare"];
+			
+			var projectsCount = projectIdArray.length;
+			for (var i=0; i<projectsCount; i++)
 			{
-				fc.smartTilePathInfo[projectId] = {};
-			}
+				var projectId = projectIdArray[i];
+				if (!fc.smartTilePathInfo[projectId])
+				{
+					fc.smartTilePathInfo[projectId] = {};
+				}
 
-			fc.smartTilePathInfo[projectId].projectId = projectId;
-			fc.smartTilePathInfo[projectId].projectFolderPath = projectId;
-			//fc.smartTilePathInfo[groupKey].smartTileIndexPath = groupDataFolder + '/' + groupKey + '_TILE';
+				fc.smartTilePathInfo[projectId].projectId = projectId;
+				fc.smartTilePathInfo[projectId].projectFolderPath = projectId;
+				//fc.smartTilePathInfo[groupKey].smartTileIndexPath = groupDataFolder + '/' + groupKey + '_TILE';
+			}
 
 			magoManager.getObjectIndexFileSmartTileF4d(projectFolderName);
 		}

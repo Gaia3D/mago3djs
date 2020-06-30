@@ -350,3 +350,70 @@ SmartTileManager.prototype.getBuildingSeedById = function(buildingType, building
 	
 	return resultNeoBuilding;
 };
+
+SmartTileManager.prototype.doPendentProcess = function(magoManager) 
+{
+	// This function does pendent process.
+	if (this.objectSeedsMap !== undefined)
+	{
+		var hierarchyManager = magoManager.hierarchyManager;
+		var tilesCount = this.tilesArray.length; // allways tilesCount = 2. (Asia & America sides).
+		for (var key in this.objectSeedsMap)
+		{
+			if (Object.prototype.hasOwnProperty.call(this.objectSeedsMap, key))
+			{
+				var objectSeed = this.objectSeedsMap[key];
+				var targetDepth = objectSeed.L;
+				var projectId = objectSeed.objectType;
+				var nodesMap = hierarchyManager.getNodesMap(projectId, undefined);
+
+				var multiBuildingId = objectSeed.id;
+				if (multiBuildingId === "")
+				{
+					// Assign a default id.
+					var existNodesCount = Object.keys(nodesMap).length; 
+					multiBuildingId = objectSeed.objectType + "_" + existNodesCount;
+				}
+
+				var node = magoManager.hierarchyManager.newNode(multiBuildingId, projectId, undefined);
+
+				// Now, create the basic node data.
+				node.data.attributes = {objectType: "multiBuildingsTile"};
+				node.data.geographicCoord = objectSeed.geographicCoord;
+				node.data.bbox = objectSeed.boundingBox;
+				node.data.projectFolderName = objectSeed.projectFolderName;
+				node.data.multiBuildingsFolderName = objectSeed.multiBuildingsFolderName;
+
+				for (var i=0; i<tilesCount; i++)
+				{
+					//this.tilesArray[i].putObjectSeed(targetDepth, objectSeed, magoManager);
+					this.tilesArray[i].putNode(targetDepth, node, magoManager);
+				}
+			}
+		}
+
+		// finally clear the this.objectSeedsMap.
+		this.objectSeedsMap = undefined;
+	}
+
+	if (this.smartTileF4dSeedMap !== undefined)
+	{
+		var tilesCount = this.tilesArray.length; // allways tilesCount = 2. (Asia & America sides).
+
+		// insert into smartTiles the smartTileF4d.***
+		for (var key in this.smartTileF4dSeedMap)
+		{
+			if (Object.prototype.hasOwnProperty.call(this.smartTileF4dSeedMap, key))
+			{
+				var smartTileF4dSeed = this.smartTileF4dSeedMap[key];
+				var targetDepth = smartTileF4dSeed.L;
+				for (var i=0; i<tilesCount; i++)
+				{
+					this.tilesArray[i].putSmartTileF4dSeed(targetDepth, smartTileF4dSeed, magoManager);
+				}
+			}
+		}
+
+		this.smartTileF4dSeedMap = undefined;
+	}
+};
