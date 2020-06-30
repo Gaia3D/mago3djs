@@ -120,7 +120,7 @@ LineDrawer.prototype.start = function()
     
 	manager.on(MagoManager.EVENT_TYPE.RIGHTCLICK, function(e)
 	{
-		if (!that.getActive()) { return; }
+		if (!that.getActive() || !that.tempLine) { return; }
 		that.points.push(e.clickCoordinate.geographicCoordinate);
 
 		var position = {coordinates: that.points};

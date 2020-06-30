@@ -121,7 +121,9 @@ Color.grayToRGBYCM_MagoStyle = function(gray, resultColor)
 Color.getWhiteToBlueColor_byHeight = function(height, minHeight, maxHeight, resultColor)
 {
 	// White to Blue in 32 steps.
-	var gray = (height - minHeight)/(maxHeight - minHeight);
+	var minH = maxHeight;
+	var maxH = minHeight;
+	var gray = (height - minH)/(maxH - minH);
 	//gray = 1.0 - gray; // invert gray value (white to blue).
 	// calculate r, g, b values by gray.
 
