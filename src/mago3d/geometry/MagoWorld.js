@@ -1264,6 +1264,15 @@ MagoWorld.prototype.keydown = function(event)
 		this.doTest__MagoPolyline();
 		//this.doTest__GoTo();
 		//this.doTest__CameraOrientation();
+
+		var minHeight = 0.0;
+		var maxHeight = -200;
+
+		var colorTest1 = Color.getWhiteToBlueColor_byHeight(-10, minHeight, maxHeight, undefined);
+		var colorTest2 = Color.getWhiteToBlueColor_byHeight(-50, minHeight, maxHeight, undefined);
+		var colorTest3 = Color.getWhiteToBlueColor_byHeight(-80, minHeight, maxHeight, undefined);
+		var colorTest4 = Color.getWhiteToBlueColor_byHeight(-150, minHeight, maxHeight, undefined);
+		var colorTest5 = Color.getWhiteToBlueColor_byHeight(-199, minHeight, maxHeight, undefined);
 	}
 	else if (key === 'p')
 	{

@@ -225,13 +225,13 @@ void main()
 {           
     // Debug.
     /*
-    if(v_tex_pos.x < 0.002 || v_tex_pos.x > 0.998)
+    if(v_tex_pos.x < 0.004 || v_tex_pos.x > 0.996)
     {
         gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
         return;
     }
 
-    if(v_tex_pos.y < 0.002 || v_tex_pos.y > 0.998)
+    if(v_tex_pos.y < 0.004 || v_tex_pos.y > 0.996)
     {
         gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
         return;

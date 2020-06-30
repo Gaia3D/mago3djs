@@ -3415,8 +3415,8 @@ vec3 getWhiteToBlueColor_byHeight(float height, float minHeight, float maxHeight
     {\n\
         float minGray = 0.0;\n\
         float maxGray = 0.15625;\n\
-        float maxR = 0.859375; // 220/256.\n\
-        maxR = 1.0;\n\
+        //float maxR = 0.859375; // 220/256.\n\
+        float maxR = 1.0;\n\
         float minR = 0.3515625; // 90/256.\n\
         float relativeGray = (gray- minGray)/(maxGray - minGray);\n\
         r = maxR - relativeGray*(maxR - minR);\n\
@@ -3533,9 +3533,6 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
                 vec4 seaColor = vec4(seaColorRGB, 1.0);\n\
                 \n\
                 resultTextureColor = mix(resultTextureColor, seaColor, 0.99); \n\
-                //resultTextureColor = mix(resultTextureColor, seaColor, 1.0 - gray); \n\
-\n\
-                \n\
             }\n\
         }\n\
     }\n\
@@ -3545,13 +3542,13 @@ void main()\n\
 {           \n\
     // Debug.\n\
     /*\n\
-    if(v_tex_pos.x < 0.002 || v_tex_pos.x > 0.998)\n\
+    if(v_tex_pos.x < 0.004 || v_tex_pos.x > 0.996)\n\
     {\n\
         gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);\n\
         return;\n\
     }\n\
 \n\
-    if(v_tex_pos.y < 0.002 || v_tex_pos.y > 0.998)\n\
+    if(v_tex_pos.y < 0.004 || v_tex_pos.y > 0.996)\n\
     {\n\
         gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);\n\
         return;\n\
