@@ -65,12 +65,15 @@ TextureLayerFilter.prototype.getLegendImage = function(width, height, step)
 		ctx.font = titleHeight * 0.7 + "px Arial";
         
 		canvasHeight = canvasHeight - titleHeight;
+		// Create gradient
+		var grd = ctx.createLinearGradient(0, titleHeight, 0, canvasHeight);
 		for (var i=0;i<legendStep;i++)
 		{
 			level = i * offset;
 			var color = Color.getWhiteToBlueColor_byHeight(level, minAlt, maxAlt);
+			grd.addColorStop((1 / legendStep) * i, 'rgba(' + color.r * 255 +', ' + color.g * 255 +', ' + color.b * 255 +', 1.0)');
             
-			if (color.r === 1 && color.g === 1 && color.b === 1)
+			/*if (color.r === 1 && color.g === 1 && color.b === 1)
 			{
 				ctx.lineWidth = 0.2;
 				ctx.strokeStyle = '#404040';
@@ -80,11 +83,14 @@ TextureLayerFilter.prototype.getLegendImage = function(width, height, step)
 			{
 				ctx.fillStyle = 'rgba(' + color.r * 255 +', ' + color.g * 255 +', ' + color.b * 255 +', 1.0)';    
 			    ctx.fillRect(0, titleHeight + i * canvasHeight * (1/legendStep), canvasWidth * 0.75, canvasHeight * (1/legendStep));
-			}
+			}*/
 
 			ctx.fillStyle = 'rgba(0, 0, 0, 1.0)';
 			ctx.fillText(parseInt(level, 10), canvasWidth*0.75+2, titleHeight + (i+1) * canvasHeight * (1/legendStep) - canvasHeight * (1/legendStep)/legendStep, canvasWidth * 0.25 - 2);
 		}
+        
+		ctx.fillStyle = grd;
+		ctx.fillRect(0, titleHeight, canvasWidth * 0.75, canvasHeight);
 
 		return canvas.toDataURL();
 	}
