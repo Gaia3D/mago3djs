@@ -47,7 +47,8 @@ var WMSLayer = function(options)
   * 	property : {min, max, caustics}
   * }
   */
-	this.filter = defaultValue(options.filter, undefined);
+	var filter = defaultValue(options.filter, undefined);
+	this.filter = filter ? new TextureLayerFilter(filter) : undefined;
 	this._requestParam = new URLSearchParams(this.param);
 	if (this._requestParam.get('VERSION') === '1.3.0') 
 	{
