@@ -84,7 +84,8 @@ void main() {
 	float maxLat = u_geoCoordRadiansMax.y;
 	float latRange = maxLat - minLat;
 	float distortion = cos((minLat + pos.y * latRange ));
-    vec2 offset = vec2(velocity.x / distortion, -velocity.y) * 0.0001 * u_speed_factor * u_interpolation;
+    //vec2 offset = vec2(velocity.x / distortion, -velocity.y) * 0.0001 * u_speed_factor * u_interpolation; // original.
+	vec2 offset = vec2(velocity.x / distortion, -velocity.y) * 0.0002 * u_speed_factor * u_interpolation;
 
     // update particle position, wrapping around the date line
     pos = fract(1.0 + pos + offset);

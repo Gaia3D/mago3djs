@@ -37,13 +37,47 @@ var SmartTileManager = function()
 /**
  * Returns the depth of smartTile that corresponds by bbox size.
  */
-SmartTileManager.getDepthByBoundingBoxMaxSize = function(bboxMaxSize) 
+SmartTileManager.getDepthByBoundingBoxMaxSize = function(bboxMaxLength) 
 {
-	if (bboxMaxSize === undefined)
+	if (bboxMaxLength === undefined)
 	{ return undefined; }
 	
 	var smartTileDepth;
-	
+
+	if (bboxMaxLength < 5.0)
+	{
+		smartTileDepth = 18;
+	}
+	else if (bboxMaxLength >= 5.0 && bboxMaxLength < 10.0)
+	{
+		smartTileDepth = 17;
+	}
+	else if (bboxMaxLength >= 10.0 && bboxMaxLength < 30.0)
+	{
+		smartTileDepth = 16;
+	}
+	else if (bboxMaxLength >= 30.0 && bboxMaxLength < 50.0)
+	{
+		smartTileDepth = 15;
+	}
+	else if (bboxMaxLength >= 50.0 && bboxMaxLength < 100.0)
+	{
+		smartTileDepth = 14;
+	}
+	else if (bboxMaxLength >= 100.0 && bboxMaxLength < 200.0)
+	{
+		smartTileDepth = 13;
+	}
+	else if (bboxMaxLength >= 200.0 && bboxMaxLength < 400.0)
+	{
+		smartTileDepth = 12;
+	}
+	else if (bboxMaxLength >= 400.0)
+	{
+		smartTileDepth = 11;
+	}
+
+	/*
 	if (bboxMaxSize < 30.0)
 	{
 		smartTileDepth = 16;
@@ -60,6 +94,7 @@ SmartTileManager.getDepthByBoundingBoxMaxSize = function(bboxMaxSize)
 	{
 		smartTileDepth = 13;
 	}
+	*/
 	
 	return smartTileDepth;
 };

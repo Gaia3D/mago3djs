@@ -19,7 +19,12 @@ uniform float pendentPointSize;
 uniform float u_tailAlpha;
 uniform float u_layerAltitude;
 
+uniform bool bUseLogarithmicDepth;
+uniform float uFCoef_logDepth;
+
 varying vec2 v_particle_pos;
+varying float flogz;
+varying float Fcoef_half;
 
 #define M_PI 3.1415926535897932384626433832795
 
@@ -45,6 +50,7 @@ vec2 splitValue(float value)
 	
 vec3 geographicToWorldCoord(float lonRad, float latRad, float alt)
 {
+	// NO USED.
 	// defined in the LINZ standard LINZS25000 (Standard for New Zealand Geodetic Datum 2000)
 	// https://www.linz.govt.nz/data/geodetic-system/coordinate-conversion/geodetic-datum-conversions/equations-used-datum
 	// a = semi-major axis.
@@ -118,6 +124,16 @@ void main() {
 	gl_Position = ModelViewProjectionMatrixRelToEye * posCC;
 	//gl_Position = vec4(2.0 * v_particle_pos.x - 1.0, 1.0 - 2.0 * v_particle_pos.y, 0, 1);
 	//gl_Position = vec4(v_particle_pos.x, v_particle_pos.y, 0, 1);
+
+	if(bUseLogarithmicDepth)
+	{
+		// logarithmic zBuffer:
+		// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html
+		gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;
+
+		flogz = 1.0 + gl_Position.w;
+		Fcoef_half = 0.5 * uFCoef_logDepth;
+	}
 	
 	// Now calculate the point size.
 	float dist = distance(vec4(u_camPosWC.xyz, 1.0), vec4(posWC.xyz, 1.0));

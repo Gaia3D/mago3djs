@@ -1251,8 +1251,14 @@ MagoWorld.prototype.keydown = function(event)
 		}
 		
 	}
+	else if (key === 's')
+	{
+		var bApplyShadow = magoManager.sceneState.applySunShadows;
+		magoManager.sceneState.setApplySunShadows(!bApplyShadow);
+	}
 	else if (key === 't')
 	{
+		//setApplySunShadows
 		//this.magoManager.TEST__RenderGeoCoords();
 
 		//this.doTest__BSpline3DCubic();

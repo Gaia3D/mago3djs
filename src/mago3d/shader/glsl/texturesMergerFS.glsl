@@ -18,6 +18,121 @@ uniform vec2 uMinMaxAltitudes; // used for altitudes textures as bathymetry.
 
 varying vec2 v_tex_pos;
 
+float getMinValue(float a, float b, float c)
+{
+    float x = min(a, b);
+    return min(x, c);
+}
+
+float getMaxValue(float a, float b, float c)
+{
+    float x = max(a, b);
+    return max(x, c);
+}
+
+bool isNan(float val)
+{
+  return (val <= 0.0 || 0.0 <= val) ? false : true;
+}
+
+vec3 RGBtoHSV(vec3 color)
+{
+    // https://stackoverflow.com/questions/13806483/increase-or-decrease-color-saturation
+    float r,g,b,h,s,v;
+    r= color.r;
+    g= color.g;
+    b= color.b;
+    float minVal = getMinValue( r, g, b );
+    float maxVal = getMaxValue( r, g, b );
+
+    v = maxVal;
+    float delta = maxVal - minVal;
+    if( maxVal != 0.0 )
+        s = delta / maxVal;        // s
+    else {
+        // r = g = b = 0        // s = 0, v is undefined
+        s = 0.0;
+        h = -1.0;
+        return vec3(h, s, 0.0);
+    }
+    if( r == maxVal )
+        h = ( g - b ) / delta;      // between yellow & magenta
+    else if( g == maxVal )
+        h = 2.0 + ( b - r ) / delta;  // between cyan & yellow
+    else
+        h = 4.0 + ( r - g ) / delta;  // between magenta & cyan
+    h *= 60.0;                // degrees
+    if( h < 0.0 )
+        h += 360.0;
+    if ( isNan(h) )
+        h = 0.0;
+    return vec3(h,s,v);
+}
+
+vec3 HSVtoRGB(vec3 color)
+{
+    int i;
+    float h,s,v,r,g,b;
+    h= color.r;
+    s= color.g;
+    v= color.b;
+    if(s == 0.0 ) {
+        // achromatic (grey)
+        r = g = b = v;
+        return vec3(r,g,b);
+    }
+    h /= 60.0;            // sector 0 to 5
+    i = int(floor( h ));
+    float f = h - float(i);          // factorial part of h
+    float p = v * ( 1.0 - s );
+    float q = v * ( 1.0 - s * f );
+    float t = v * ( 1.0 - s * ( 1.0 - f ) );
+    if( i == 0 ) 
+    {
+        r = v;
+        g = t;
+        b = p;
+    }
+    else if(i == 1)
+    {
+        r = q;
+        g = v;
+        b = p;
+    }
+    else if(i == 2)
+    {
+        r = p;
+        g = v;
+        b = t;
+    }
+    else if(i == 3)
+    {
+        r = p;
+        g = q;
+        b = v;
+    }
+    else if(i == 4)
+    {
+        r = t;
+        g = p;
+        b = v;
+    }
+    else
+    {       // case 5:
+        r = v;
+        g = p;
+        b = q;
+    }
+    return vec3(r,g,b);
+}
+
+vec3 getSaturatedColor(vec3 color, float saturation)
+{
+    vec3 hsv = RGBtoHSV(color);
+    hsv.y *= saturation;
+    return HSVtoRGB(hsv);
+}
+
 vec3 getRainbowColor_byHeight(float height, float minHeight, float maxHeight)
 {
 	float minHeight_rainbow = minHeight;
@@ -188,6 +303,9 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
             }
             
             victory = true;
+
+            // debug.
+            //resultTextureColor = mix(resultTextureColor, vec4(1.0, 1.0, 1.0, 1.0), 0.4);
         }
     }
     else if(activeNumber == 10)
@@ -225,15 +343,9 @@ void main()
 {           
     // Debug.
     /*
-    if(v_tex_pos.x < 0.004 || v_tex_pos.x > 0.996)
+    if((v_tex_pos.x < 0.006 || v_tex_pos.x > 0.994) || (v_tex_pos.y < 0.006 || v_tex_pos.y > 0.994))
     {
-        gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
-        return;
-    }
-
-    if(v_tex_pos.y < 0.004 || v_tex_pos.y > 0.996)
-    {
-        gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+        gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
         return;
     }
     */

@@ -346,9 +346,39 @@ SmartTile.computeSphereExtent = function(magoManager, minGeographicCoord, maxGeo
 	// calculate an aproximate radius.
 	var cornerPoint;
 	cornerPoint = ManagerUtils.geographicCoordToWorldPoint(minGeographicCoord.longitude, minGeographicCoord.latitude, minGeographicCoord.altitude, cornerPoint, magoManager);
-
 	resultSphereExtent.r = resultSphereExtent.centerPoint.distTo(cornerPoint.x, cornerPoint.y, cornerPoint.z) * 1.1;
+
 	return resultSphereExtent;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param geoLocData 변수
+ */
+SmartTile.prototype.calculateRectangleSize = function(magoManager, resultSize) 
+{
+	var maxGeographicCoord = this.maxGeographicCoord;
+	var minGeographicCoord = this.minGeographicCoord;
+
+	// calculate worldCoord center position.
+	var midLongitude = (maxGeographicCoord.longitude + minGeographicCoord.longitude)/2;
+	var midLatitude = (maxGeographicCoord.latitude + minGeographicCoord.latitude)/2;
+
+	// calculate width & height aproximate.
+	var point_LM = ManagerUtils.geographicCoordToWorldPoint(minGeographicCoord.longitude, midLatitude, 0.0, point_LM, magoManager);
+	var point_RM = ManagerUtils.geographicCoordToWorldPoint(maxGeographicCoord.longitude, midLatitude, 0.0, point_RM, magoManager);
+
+	var point_DM = ManagerUtils.geographicCoordToWorldPoint(midLongitude, minGeographicCoord.latitude, 0.0, point_DM, magoManager);
+	var point_TM = ManagerUtils.geographicCoordToWorldPoint(midLongitude, maxGeographicCoord.latitude, 0.0, point_TM, magoManager);
+
+	var tileWidth = point_LM.distToPoint(point_RM);
+	var tileHeight = point_DM.distToPoint(point_TM);
+
+	if (resultSize === undefined)
+	{ resultSize = new Point2D(); }
+
+	resultSize.set(tileWidth, tileHeight);
+	return resultSize;
 };
 
 /**
@@ -372,6 +402,30 @@ SmartTile.prototype.putSmartTileF4dSeed = function(targetDepth, smartTileF4dSeed
 		
 		// set the sizes to subTiles (The minLongitude, MaxLongitude, etc. is constant, but the minAlt & maxAlt can will be modified every time that insert new buildingSeeds).
 		this.setSizesToSubTiles();
+
+		/*
+		// debug.***********************************
+		if (this.depth === 18)
+		{ var hola = 0; }
+		else if (this.depth === 17)
+		{ var hola = 0; }
+		else if (this.depth === 16)
+		{ var hola = 0; }
+		else if (this.depth === 15)
+		{ var hola = 0; }
+		else if (this.depth === 14)
+		{ var hola = 0; }
+		else if (this.depth === 13)
+		{ var hola = 0; }
+		else if (this.depth === 12)
+		{ var hola = 0; }
+		else if (this.depth === 11)
+		{ var hola = 0; }
+
+		var size = this.calculateRectangleSize(magoManager);
+		var hola = 0;
+		// End debug.--------------------------------------
+		*/
 
 		// intercept buildingSeeds for each subTiles.
 		var geoCoord = smartTileF4dSeed.geographicCoord;
@@ -598,6 +652,9 @@ SmartTile.prototype.makeTreeByDepth = function(targetDepth, magoManager)
 		
 		// set the sizes to subTiles (The minLongitude, MaxLongitude, etc. is constant, but the minAlt & maxAlt can will be modified every time that insert new buildingSeeds).
 		this.setSizesToSubTiles();
+
+		
+
 
 		// intercept buildingSeeds for each subTiles.
 		for (var i=0; i<4; i++)

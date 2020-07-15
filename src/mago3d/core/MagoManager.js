@@ -183,7 +183,7 @@ var MagoManager = function(options)
 
 	
 
-	this.magoPolicy.objectMoveMode = CODE.moveMode.OBJECT;
+	this.magoPolicy.objectMoveMode = CODE.moveMode.NONE;
 
 	this.selectionColor = new SelectionColor();
 	this.vboMemoryManager = new VBOMemoryManager();
@@ -336,13 +336,13 @@ MagoManager.EVENT_TYPE = {
 	'DBCLICK'                	: 'dbclick',
 	'RIGHTCLICK'             	: 'rightclick',
 	'MOUSEMOVE'              	: 'mousemove',
-	'LEFTDOWN'           					: 'leftdown',
-	'LEFTUP'             					: 'leftup',
+	'LEFTDOWN'              		: 'leftdown',
+	'LEFTUP'                		: 'leftup',
 	'SMARTTILELOADSTART'     	: 'smarttileloadstart',
 	'SMARTTILELOADEND'       	: 'smarttileloadend',
-	'F4DLOADSTART'          		: 'f4dloadstart',
-	'F4DLOADEND'           			: 'f4dloadend',
-	'F4DRENDERREADY'       			: 'f4drenderready',
+	'F4DLOADSTART'           	: 'f4dloadstart',
+	'F4DLOADEND'            		: 'f4dloadend',
+	'F4DRENDERREADY'        		: 'f4drenderready',
 	'SELECTEDF4D'          	 	: 'selectedf4d',
 	'SELECTEDF4DMOVED'        : 'selectedf4dmoved',
 	'SELECTEDF4DOBJECT'      	: 'selectedf4dobject',
@@ -1496,48 +1496,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		//this.weatherStation.test_renderWindLayer(this);
 		//this.weatherStation.test_renderTemperatureLayer(this);
 		//this.weatherStation.test_renderCuttingPlanes(this, renderType);
-		/*
-		var renderType = 1;
-		var currentShader;
-			currentShader = this.postFxShadersManager.getShader("modelRefSsao"); 
-			currentShader.useProgram();
-			gl.uniform1i(currentShader.bApplySsao_loc, true); // apply ssao default.***
-			gl.enable(gl.BLEND);
-			
-			var noiseTexture = this.texturesStore.getNoiseTexture4x4();
-			var textureAux_1x1 = this.texturesStore.getTextureAux1x1();
-			
-			gl.uniform1i(currentShader.bApplySpecularLighting_loc, true);
-			gl.enableVertexAttribArray(currentShader.texCoord2_loc);
-			gl.enableVertexAttribArray(currentShader.position3_loc);
-			gl.enableVertexAttribArray(currentShader.normal3_loc);
-			
-			gl.uniform1i(currentShader.colorType_loc, 1); // 0= oneColor, 1= attribColor, 2= texture.***
-			gl.uniform1i(currentShader.bApplySsao_loc, false); // apply ssao default.***
 
-			if (currentShader.color4_loc !== -1){ gl.disableVertexAttribArray(currentShader.color4_loc); }
-			
-			currentShader.bindUniformGenerals();
-			gl.uniform1i(currentShader.textureFlipYAxis_loc, this.sceneState.textureFlipYAxis);
-			
-			//buildingGeoLocation.bindGeoLocationUniforms(gl, currentShader);
-			gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, new Float32Array([1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]));
-			gl.uniform3fv(currentShader.buildingPosHIGH_loc, new Float32Array([0,0,0]));
-			gl.uniform3fv(currentShader.buildingPosLOW_loc, new Float32Array([0,0,0]));
-
-			gl.activeTexture(gl.TEXTURE0);
-			gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffer);  // original.***
-			gl.activeTexture(gl.TEXTURE1);
-			gl.bindTexture(gl.TEXTURE_2D, noiseTexture);
-			gl.activeTexture(gl.TEXTURE2); 
-			gl.bindTexture(gl.TEXTURE_2D, textureAux_1x1);
-			currentShader.last_tex_id = textureAux_1x1;
-		//this.weatherStation.test_renderTemperatureMesh(this, currentShader, renderType);
-		this.weatherStation.test_renderPrecipitationMesh(this, currentShader, renderType);
-		gl.disable(gl.BLEND);
-		
-		currentShader.disableVertexAttribArrayAll();
-		*/
 	}
 	
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
@@ -1693,39 +1652,11 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 
 
 	// Test.***
-	if (!this.objectMarkerTest)
-	{
-		//this.TEST__ObjectMarker_toNeoReference();
-		//this.objectMarkerTest = true;
-	}
-
-
-	/*
-	// Test.***********************************
-	// Test.**********************
-	// do wind test.
-	if (this.windTest === undefined)
-	{
-		if (this.weatherStation === undefined)
-		{ this.weatherStation = new WeatherStation(); }
-	
-		var geometryDataPath = this.readerWriter.geometryDataPath;
-		var windDataFilesNamesArray = ["OBS-QWM_2016062000.grib2_wind_000", "OBS-QWM_2016062001.grib2_wind_000", "OBS-QWM_2016062002.grib2_wind_000", "OBS-QWM_2016062003.grib2_wind_000",
-			"OBS-QWM_2016062004.grib2_wind_000", "OBS-QWM_2016062005.grib2_wind_000", "OBS-QWM_2016062006.grib2_wind_000", "OBS-QWM_2016062007.grib2_wind_000",
-			"OBS-QWM_2016062008.grib2_wind_000", "OBS-QWM_2016062009.grib2_wind_000", "OBS-QWM_2016062010.grib2_wind_000", "OBS-QWM_2016062011.grib2_wind_000",
-			"OBS-QWM_2016062012.grib2_wind_000", "OBS-QWM_2016062013.grib2_wind_000", "OBS-QWM_2016062014.grib2_wind_000", "OBS-QWM_2016062015.grib2_wind_000",
-			"OBS-QWM_2016062016.grib2_wind_000", "OBS-QWM_2016062017.grib2_wind_000", "OBS-QWM_2016062018.grib2_wind_000", "OBS-QWM_2016062019.grib2_wind_000",
-			"OBS-QWM_2016062020.grib2_wind_000", "OBS-QWM_2016062021.grib2_wind_000", "OBS-QWM_2016062022.grib2_wind_000", "OBS-QWM_2016062023.grib2_wind_000"];
-			
-		//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_20191127";
-		var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_Airport";
-		//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_GolfPark_NineBridge1";
-		
-		this.weatherStation.test_loadWindData3d(this, windDataFilesNamesArray, windMapFilesFolderPath);
-		//this.TEST__golfPark();
-		this.windTest = true;
-	}
-	*/
+	//if (!this.objectMarkerTest)
+	//{
+	//this.TEST__ObjectMarker_toNeoReference();
+	//this.objectMarkerTest = true;
+	//}
 };
 
 /**
@@ -4752,6 +4683,8 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 		}
 		this.EXTENSIONS_init = true;
 		use_linearOrLogarithmicDepth = "USE_LOGARITHMIC_DEPTH";
+
+		this.postFxShadersManager.bUseLogarithmicDepth = true;
 	}
 
 	// here creates the necessary shaders for mago3d.***
@@ -6081,10 +6014,35 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedMap, projectId, f4dOb
 	var auxNodesArray = JSON.parse(JSON.stringify(physicalNodesArray));
 	// now, make smartTiles.
 	// there are 2 general smartTiles: AsiaSide & AmericaSide.
-	var targetDepth = 15;
-	this.smartTileManager.makeTreeByDepth(targetDepth, physicalNodesArray, this);
+	// Now, separate physicalNodes by bbox size.
+	var map_depth_physicalNodesArray = [];
+	var nodesCount = physicalNodesArray.length;
+	for (var i=0; i<nodesCount; i++)
+	{
+		var node = physicalNodesArray[i];
+		var bbox = node.data.bbox;
+		var bboxMaxSize = bbox.getMaxLength();
+		var smartTileDepth = SmartTileManager.getDepthByBoundingBoxMaxSize(bboxMaxSize);
 
-	//this.buildingSeedList.buildingSeedArray.length = 0; // init.
+		if (map_depth_physicalNodesArray[smartTileDepth] === undefined)
+		{ map_depth_physicalNodesArray[smartTileDepth] = []; }
+
+		map_depth_physicalNodesArray[smartTileDepth].push(node);
+	}
+
+	for (var i = 0; i<22; i++)
+	{
+		if (map_depth_physicalNodesArray[i] && map_depth_physicalNodesArray[i].length > 0)
+		{
+			var targetDepth = i;
+			this.smartTileManager.makeTreeByDepth(targetDepth, map_depth_physicalNodesArray[i], this);
+		}
+	}
+
+	//var targetDepth = 15;
+	//this.smartTileManager.makeTreeByDepth(targetDepth, physicalNodesArray, this);
+
+	////this.buildingSeedList.buildingSeedArray.length = 0; // init.
 
 	
 	this.emit(MagoManager.EVENT_TYPE.F4DLOADEND, {

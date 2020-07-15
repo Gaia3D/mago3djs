@@ -606,8 +606,11 @@ uniform bool u_flipTexCoordY_windMap;\n\
 uniform bool u_colorScale;\n\
 uniform float u_tailAlpha;\n\
 uniform float u_externAlpha;\n\
+uniform bool bUseLogarithmicDepth;\n\
 \n\
 varying vec2 v_particle_pos;\n\
+varying float flogz;\n\
+varying float Fcoef_half;\n\
 \n\
 vec3 getRainbowColor_byHeight(float height)\n\
 {\n\
@@ -674,6 +677,77 @@ vec3 getRainbowColor_byHeight(float height)\n\
     return resultColor;\n\
 } \n\
 \n\
+vec3 getWhiteToBlueColor_byHeight(float height, float minHeight, float maxHeight)\n\
+{\n\
+    // White to Blue in 32 steps.\n\
+    float gray = (height - minHeight)/(maxHeight - minHeight);\n\
+    gray = 1.0 - gray; // invert gray value (white to blue).\n\
+    // calculate r, g, b values by gray.\n\
+\n\
+    float r, g, b;\n\
+\n\
+    // Red.\n\
+    if(gray >= 0.0 && gray < 0.15625) // [1, 5] from 32 divisions.\n\
+    {\n\
+        float minGray = 0.0;\n\
+        float maxGray = 0.15625;\n\
+        //float maxR = 0.859375; // 220/256.\n\
+        float maxR = 1.0;\n\
+        float minR = 0.3515625; // 90/256.\n\
+        float relativeGray = (gray- minGray)/(maxGray - minGray);\n\
+        r = maxR - relativeGray*(maxR - minR);\n\
+    }\n\
+    else if(gray >= 0.15625 && gray < 0.40625) // [6, 13] from 32 divisions.\n\
+    {\n\
+        float minGray = 0.15625;\n\
+        float maxGray = 0.40625;\n\
+        float maxR = 0.3515625; // 90/256.\n\
+        float minR = 0.0; // 0/256.\n\
+        float relativeGray = (gray- minGray)/(maxGray - minGray);\n\
+        r = maxR - relativeGray*(maxR - minR);\n\
+    }\n\
+    else  // [14, 32] from 32 divisions.\n\
+    {\n\
+        r = 0.0;\n\
+    }\n\
+\n\
+    // Green.\n\
+    if(gray >= 0.0 && gray < 0.15625) // [1, 5] from 32 divisions.\n\
+    {\n\
+        g = 1.0; // 256.\n\
+    }\n\
+    else if(gray >= 0.15625 && gray < 0.5625) // [6, 18] from 32 divisions.\n\
+    {\n\
+        float minGray = 0.15625;\n\
+        float maxGray = 0.5625;\n\
+        float maxG = 1.0; // 256/256.\n\
+        float minG = 0.0; // 0/256.\n\
+        float relativeGray = (gray- minGray)/(maxGray - minGray);\n\
+        g = maxG - relativeGray*(maxG - minG);\n\
+    }\n\
+    else  // [18, 32] from 32 divisions.\n\
+    {\n\
+        g = 0.0;\n\
+    }\n\
+\n\
+    // Blue.\n\
+    if(gray < 0.5625)\n\
+    {\n\
+        b = 1.0;\n\
+    }\n\
+    else // gray >= 0.5625 && gray <= 1.0\n\
+    {\n\
+        float minGray = 0.5625;\n\
+        float maxGray = 1.0;\n\
+        float maxB = 1.0; // 256/256.\n\
+        float minB = 0.0; // 0/256.\n\
+        float relativeGray = (gray- minGray)/(maxGray - minGray);\n\
+        b = maxB - relativeGray*(maxB - minB);\n\
+    }\n\
+\n\
+    return vec3(r, g, b);\n\
+}\n\
+\n\
 void main() {\n\
 	vec2 windMapTexCoord = v_particle_pos;\n\
 	if(u_flipTexCoordY_windMap)\n\
@@ -697,7 +771,8 @@ void main() {\n\
 		else{\n\
 			g = 2.0*speed_t;\n\
 		}\n\
-		vec3 col3 = getRainbowColor_byHeight(speed_t);\n\
+		//vec3 col3 = getRainbowColor_byHeight(speed_t);\n\
+		vec3 col3 = getWhiteToBlueColor_byHeight(speed_t, 0.0, 1.0);\n\
 		float r = speed_t;\n\
 		gl_FragColor = vec4(col3.x, col3.y, col3.z ,u_tailAlpha*u_externAlpha);\n\
 	}\n\
@@ -707,6 +782,13 @@ void main() {\n\
 			intensity = 1.0;\n\
 		gl_FragColor = vec4(intensity,intensity,intensity,u_tailAlpha*u_externAlpha);\n\
 	}\n\
+\n\
+	#ifdef USE_LOGARITHMIC_DEPTH\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
+	}\n\
+	#endif\n\
 }";
 ShaderSource.draw_vert = "precision mediump float;\n\
 \n\
@@ -752,7 +834,12 @@ uniform float pendentPointSize;\n\
 uniform float u_tailAlpha;\n\
 uniform float u_layerAltitude;\n\
 \n\
+uniform bool bUseLogarithmicDepth;\n\
+uniform float uFCoef_logDepth;\n\
+\n\
 varying vec2 v_particle_pos;\n\
+varying float flogz;\n\
+varying float Fcoef_half;\n\
 \n\
 #define M_PI 3.1415926535897932384626433832795\n\
 \n\
@@ -778,6 +865,7 @@ vec2 splitValue(float value)\n\
 	\n\
 vec3 geographicToWorldCoord(float lonRad, float latRad, float alt)\n\
 {\n\
+	// NO USED.\n\
 	// defined in the LINZ standard LINZS25000 (Standard for New Zealand Geodetic Datum 2000)\n\
 	// https://www.linz.govt.nz/data/geodetic-system/coordinate-conversion/geodetic-datum-conversions/equations-used-datum\n\
 	// a = semi-major axis.\n\
@@ -851,6 +939,16 @@ void main() {\n\
 	gl_Position = ModelViewProjectionMatrixRelToEye * posCC;\n\
 	//gl_Position = vec4(2.0 * v_particle_pos.x - 1.0, 1.0 - 2.0 * v_particle_pos.y, 0, 1);\n\
 	//gl_Position = vec4(v_particle_pos.x, v_particle_pos.y, 0, 1);\n\
+\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		// logarithmic zBuffer:\n\
+		// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
+		gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;\n\
+\n\
+		flogz = 1.0 + gl_Position.w;\n\
+		Fcoef_half = 0.5 * uFCoef_logDepth;\n\
+	}\n\
 	\n\
 	// Now calculate the point size.\n\
 	float dist = distance(vec4(u_camPosWC.xyz, 1.0), vec4(posWC.xyz, 1.0));\n\
@@ -3335,6 +3433,121 @@ uniform vec2 uMinMaxAltitudes; // used for altitudes textures as bathymetry.\n\
 \n\
 varying vec2 v_tex_pos;\n\
 \n\
+float getMinValue(float a, float b, float c)\n\
+{\n\
+    float x = min(a, b);\n\
+    return min(x, c);\n\
+}\n\
+\n\
+float getMaxValue(float a, float b, float c)\n\
+{\n\
+    float x = max(a, b);\n\
+    return max(x, c);\n\
+}\n\
+\n\
+bool isNan(float val)\n\
+{\n\
+  return (val <= 0.0 || 0.0 <= val) ? false : true;\n\
+}\n\
+\n\
+vec3 RGBtoHSV(vec3 color)\n\
+{\n\
+    // https://stackoverflow.com/questions/13806483/increase-or-decrease-color-saturation\n\
+    float r,g,b,h,s,v;\n\
+    r= color.r;\n\
+    g= color.g;\n\
+    b= color.b;\n\
+    float minVal = getMinValue( r, g, b );\n\
+    float maxVal = getMaxValue( r, g, b );\n\
+\n\
+    v = maxVal;\n\
+    float delta = maxVal - minVal;\n\
+    if( maxVal != 0.0 )\n\
+        s = delta / maxVal;        // s\n\
+    else {\n\
+        // r = g = b = 0        // s = 0, v is undefined\n\
+        s = 0.0;\n\
+        h = -1.0;\n\
+        return vec3(h, s, 0.0);\n\
+    }\n\
+    if( r == maxVal )\n\
+        h = ( g - b ) / delta;      // between yellow & magenta\n\
+    else if( g == maxVal )\n\
+        h = 2.0 + ( b - r ) / delta;  // between cyan & yellow\n\
+    else\n\
+        h = 4.0 + ( r - g ) / delta;  // between magenta & cyan\n\
+    h *= 60.0;                // degrees\n\
+    if( h < 0.0 )\n\
+        h += 360.0;\n\
+    if ( isNan(h) )\n\
+        h = 0.0;\n\
+    return vec3(h,s,v);\n\
+}\n\
+\n\
+vec3 HSVtoRGB(vec3 color)\n\
+{\n\
+    int i;\n\
+    float h,s,v,r,g,b;\n\
+    h= color.r;\n\
+    s= color.g;\n\
+    v= color.b;\n\
+    if(s == 0.0 ) {\n\
+        // achromatic (grey)\n\
+        r = g = b = v;\n\
+        return vec3(r,g,b);\n\
+    }\n\
+    h /= 60.0;            // sector 0 to 5\n\
+    i = int(floor( h ));\n\
+    float f = h - float(i);          // factorial part of h\n\
+    float p = v * ( 1.0 - s );\n\
+    float q = v * ( 1.0 - s * f );\n\
+    float t = v * ( 1.0 - s * ( 1.0 - f ) );\n\
+    if( i == 0 ) \n\
+    {\n\
+        r = v;\n\
+        g = t;\n\
+        b = p;\n\
+    }\n\
+    else if(i == 1)\n\
+    {\n\
+        r = q;\n\
+        g = v;\n\
+        b = p;\n\
+    }\n\
+    else if(i == 2)\n\
+    {\n\
+        r = p;\n\
+        g = v;\n\
+        b = t;\n\
+    }\n\
+    else if(i == 3)\n\
+    {\n\
+        r = p;\n\
+        g = q;\n\
+        b = v;\n\
+    }\n\
+    else if(i == 4)\n\
+    {\n\
+        r = t;\n\
+        g = p;\n\
+        b = v;\n\
+    }\n\
+    else\n\
+    {       // case 5:\n\
+        r = v;\n\
+        g = p;\n\
+        b = q;\n\
+    }\n\
+    return vec3(r,g,b);\n\
+}\n\
+\n\
+vec3 getSaturatedColor(vec3 color, float saturation)\n\
+{\n\
+    vec3 hsv = RGBtoHSV(color);\n\
+    hsv.y *= saturation;\n\
+    return HSVtoRGB(hsv);\n\
+}\n\
+\n\
 vec3 getRainbowColor_byHeight(float height, float minHeight, float maxHeight)\n\
 {\n\
 	float minHeight_rainbow = minHeight;\n\
@@ -3505,6 +3718,9 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
             }\n\
             \n\
             victory = true;\n\
+\n\
+            // debug.\n\
+            //resultTextureColor = mix(resultTextureColor, vec4(1.0, 1.0, 1.0, 1.0), 0.4);\n\
         }\n\
     }\n\
     else if(activeNumber == 10)\n\
@@ -3542,15 +3758,9 @@ void main()\n\
 {           \n\
     // Debug.\n\
     /*\n\
-    if(v_tex_pos.x < 0.004 || v_tex_pos.x > 0.996)\n\
+    if((v_tex_pos.x < 0.006 || v_tex_pos.x > 0.994) || (v_tex_pos.y < 0.006 || v_tex_pos.y > 0.994))\n\
     {\n\
-        gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);\n\
-        return;\n\
-    }\n\
-\n\
-    if(v_tex_pos.y < 0.004 || v_tex_pos.y > 0.996)\n\
-    {\n\
-        gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);\n\
+        gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);\n\
         return;\n\
     }\n\
     */\n\
@@ -5043,7 +5253,8 @@ void main() {\n\
 	float maxLat = u_geoCoordRadiansMax.y;\n\
 	float latRange = maxLat - minLat;\n\
 	float distortion = cos((minLat + pos.y * latRange ));\n\
-    vec2 offset = vec2(velocity.x / distortion, -velocity.y) * 0.0001 * u_speed_factor * u_interpolation;\n\
+    //vec2 offset = vec2(velocity.x / distortion, -velocity.y) * 0.0001 * u_speed_factor * u_interpolation; // original.\n\
+	vec2 offset = vec2(velocity.x / distortion, -velocity.y) * 0.0002 * u_speed_factor * u_interpolation;\n\
 \n\
     // update particle position, wrapping around the date line\n\
     pos = fract(1.0 + pos + offset);\n\

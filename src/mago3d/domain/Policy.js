@@ -57,11 +57,18 @@ var Policy = function()
 	this.colorChangedObjectId;
 	
 	// LOD1
-	this.lod0DistInMeters = 15;
-	this.lod1DistInMeters = 50;
-	this.lod2DistInMeters = 90;
-	this.lod3DistInMeters = 200;
-	this.lod4DistInMeters = 1000;
+	//this.lod0DistInMeters = 15;
+	//this.lod1DistInMeters = 50;
+	//this.lod2DistInMeters = 90;
+	//this.lod3DistInMeters = 200;
+	//this.lod4DistInMeters = 1000;
+	//this.lod5DistInMeters = 50000;
+
+	this.lod0DistInMeters = 50;
+	this.lod1DistInMeters = 200;
+	this.lod2DistInMeters = 600;
+	this.lod3DistInMeters = 1200;
+	this.lod4DistInMeters = 3000;
 	this.lod5DistInMeters = 50000;
 	
 	// Lighting
