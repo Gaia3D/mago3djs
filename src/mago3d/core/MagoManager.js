@@ -1612,7 +1612,7 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 	if (!this.isCameraMoving && !this.mouseMiddleDown)
 	{
 		this.loadAndPrepareData();
-		//this.managePickingProcess();
+		this.managePickingProcess();
 		this.renderToSelectionBuffer();
 	}
 	
@@ -5554,7 +5554,9 @@ MagoManager.prototype.getObjectIndexFileForData = function(projectId, f4dObject)
 	}
 	
 	var f4dGroupObject = MagoConfig.getData(CODE.PROJECT_ID_PREFIX + projectId);
-	var groupDataFolder = this.hierarchyManager.getNodeByDataKey(projectId, projectId).data.projectFolderName;
+	var node = this.hierarchyManager.getNodeByDataKey(projectId, f4dGroupObject.dataGroupKey);
+
+	var groupDataFolder = node.data.projectFolderName;
 	groupDataFolder = groupDataFolder.replace(/\/+$/, '');
 	var newDataKeys = [];
 	var children = f4dGroupObject.children;
@@ -5577,7 +5579,13 @@ MagoManager.prototype.getObjectIndexFileForData = function(projectId, f4dObject)
 	else 
 	{
 		// TODO :
-		var attributes = f4dObject.attributes || JSON.parse(f4dObject.metainfo);
+		var metaInfo = f4dObject.metainfo;
+		if (metaInfo && typeof metaInfo !== 'object')
+		{
+			metaInfo = JSON.parse(metaInfo);
+		}
+			
+		var attributes = f4dObject.attributes || metaInfo;
 		if (!attributes.isPhysical) 
 		{
 			throw new Error('f4d member must isPhysical true.'); 
@@ -5636,8 +5644,18 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 		if (!jasonObject.data_key) 
 		{
 			jasonObject.childrenCnt = jasonObject.children;
-			jasonObject.attributes = jasonObject.attributes || JSON.parse(jasonObject.metainfo);
+			var metaInfo = jasonObject.metainfo;
+			if (metaInfo && typeof metaInfo !== 'object')
+			{
+				metaInfo = JSON.parse(metaInfo);
+			}
+			jasonObject.attributes = jasonObject.attributes || metaInfo;
 			
+			if (!jasonObject.attributes)
+			{
+				jasonObject.attributes = {isPhysical: false};
+			}
+
 			jasonObject.children = jasonObject.datas;
 			
 			delete jasonObject.datas;
@@ -5715,7 +5733,15 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 			if (attributes.isPhysical)
 			{
 				// find the buildingSeed.
-				buildingSeed = buildingSeedMap.getBuildingSeed(buildingId);
+				if (buildingSeedMap instanceof BuildingSeedMap) 
+				{
+					buildingSeed = buildingSeedMap.getBuildingSeed(buildingId);
+				}
+				else 
+				{
+					buildingSeed = buildingSeedMap[buildingId];
+				}
+				
 				if (buildingSeed)
 				{
 					data.buildingSeed = buildingSeed;

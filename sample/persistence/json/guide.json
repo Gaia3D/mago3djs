@@ -1,20 +1,19 @@
 {
-    "attributes": {
-    "isPhysical": false
-    },
-    "data_key":"guide",
-    "data_name":"guide",
-    "children": [
+    "dataGroupId":1,
+    "dataGroupKey":"guide",
+    "dataGroupName":"가이드 데이터 그룹",
+    "dataGroupPath":"guide",
+    "datas": [
     {
         "attributes": {
             "isPhysical": true,
-            "nodeType": "daejeon",
             "flipYTexCoords": true
         },
-        "children": [],
-        "data_key": "SOCIALROOM",
-        "data_name": "SOCIALROOM",
-        "mapping_type":"origin",
+        "dataId" : 1,
+        "dataGroupId" : 1,
+        "dataKey": "SOCIALROOM",
+        "dataName": "SOCIALROOM",
+        "mappingType":"origin",
         "longitude": 128.917656,
         "latitude": 35.139482,
         "height": 14.177629,
@@ -25,14 +24,15 @@
     {
         "attributes": {
             "isPhysical": true,
-            "nodeType": "daejeon",
             "flipYTexCoords": true
         },
+        "dataId" : 2,
+        "dataGroupId" : 1,
         "children": [],
-        "data_key": "STUDENTROOM",
-        "data_name": "STUDENTROOM",
-        "mapping_type":"origin",
-        "longitude": 128.927656,
+        "dataKey": "STUDENTROOM",
+        "dataName": "STUDENTROOM",
+        "mappingType":"origin",
+        "longitude": 128.919656,
         "latitude": 35.138482,
         "height": 14.177629,
         "heading": 0.000000,
