@@ -53,6 +53,6 @@
   "pendentPointSizeForPc":"60.0",
   "enableMemoryManagement":false,
   "insertDate":"",
-  "terrainType":"elevation",
+  "terrainType":"plain",
   "terrainValue":"/f4d/terrain/"
 }

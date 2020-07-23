@@ -941,6 +941,22 @@ TinTerrain.prototype.prepareTinTerrainPlain = function(magoManager, tinTerrainMa
 			return false;
 		}
 
+		///////////////////////////
+		// Test making textureMaster.
+		// If there are 2 or more layers, then must create textureMaster.
+		// Check if tinTerrain is syncronized with this.tinTerrainManager.
+		if (this.layersStyleId !== this.tinTerrainManager.layersStyleId)
+		{ 
+			this.textureMasterImageryLayersPrepared = undefined; 
+			this.textureMasterPrepared = undefined; 
+		}
+
+		if (!this.textureMasterPrepared && this.isTexturePrepared(this.texture))
+		{
+			this.makeTextureMaster();
+		}
+		////////////////////////////////
+
 		return true;
 	}
 	else
@@ -948,6 +964,8 @@ TinTerrain.prototype.prepareTinTerrainPlain = function(magoManager, tinTerrainMa
 		// Prepare ownerTinTerrain.
 		return this.owner.prepareTinTerrainPlain(magoManager, tinTerrainManager);
 	}
+
+	
 	
 	return true;
 };

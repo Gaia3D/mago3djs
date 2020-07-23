@@ -1107,13 +1107,35 @@ Renderer.prototype.renderSilhouette = function()
 };
 
 /**
- * This function renders the stencil shadows meshes of the scene.
+ * This function renders the ssao by depthBuffer.
  * @param {WebGLRenderingContext} gl WebGL Rendering Context.
- * @param {Number} renderType If renderType = 0 (depth render), renderType = 1 (color render), renderType = 2 (colorCoding render).
- * @param {VisibleObjectsController} visibleObjControlerNodes This object contains visible objects for the camera frustum.
+ */
+Renderer.prototype.renderSsaoFromDepth = function(gl) 
+{
+	// render the ssao to texture, and then apply blur.
+
+	// provisionally, render the ssao into canvas.
+	currentShader = magoManager.postFxShadersManager.getShader("ssaoFromDepth"); 
+	currentShader.useProgram();
+	
+	currentShader.bindUniformGenerals();
+
+	if (this.screenQuad === undefined)
+	{
+		this.screenQuad = new ScreenQuad(magoManager.vboMemoryManager);
+	}
+	
+	this.screenQuad.render(magoManager, currentShader);
+};
+
+/**
+ * This function renders the shadows of the scene on terrain.
+ * @param {WebGLRenderingContext} gl WebGL Rendering Context.
  */
 Renderer.prototype.renderTerrainShadow = function(gl) 
 {
+	// This function renders shadows on terrain in cesium.***
+	// We are using a quadScreen.***
 	var currentShader;
 	var magoManager = this.magoManager;
 	var sceneState = magoManager.sceneState;

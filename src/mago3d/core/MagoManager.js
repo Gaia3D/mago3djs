@@ -5012,7 +5012,13 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	gl.uniform1i(shader.tex_6_loc, 6);
 	gl.uniform1i(shader.tex_7_loc, 7);
 
-
+	/*
+	// ssaoFromDepth shader.***********************************************************************************
+	var shaderName = "ssaoFromDepth";
+	var ssao_vs_source = ShaderSource.ScreenQuadVS;
+	var ssao_fs_source = ShaderSource.ssaoFromDepthFS;
+	var shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
+	*/
 };
 
 /**
