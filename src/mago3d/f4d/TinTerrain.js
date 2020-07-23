@@ -1698,7 +1698,7 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 					gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 					gl.uniform4fv(currentShader.oneColor4_loc, [0.0, 0.9, 0.9, 1.0]);
 					
-					//gl.drawElements(gl.LINES, indicesCount-1, gl.UNSIGNED_SHORT, 0); 
+					gl.drawElements(gl.LINES, indicesCount-1, gl.UNSIGNED_SHORT, 0); 
 					
 					//if (this.tinTerrainManager.getTerrainType() === 0)
 					//{
@@ -1706,11 +1706,11 @@ TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, rende
 					//}
 					//else 
 					//{
-					var trianglesCount = indicesCount;
-					for (var i=0; i<trianglesCount-1; i++)
-					{
-						gl.drawElements(gl.LINE_LOOP, 3, gl.UNSIGNED_SHORT, i*3); 
-					}
+					//var trianglesCount = indicesCount;
+					//for (var i=0; i<trianglesCount-1; i++)
+					//{
+					//	gl.drawElements(gl.LINE_LOOP, 3, gl.UNSIGNED_SHORT, i*3); 
+					//}
 					//}
 					
 					this.drawTerrainName(magoManager);

@@ -1612,8 +1612,8 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 	if (!this.isCameraMoving && !this.mouseMiddleDown)
 	{
 		this.loadAndPrepareData();
-		//this.managePickingProcess();
 		this.renderToSelectionBuffer();
+		this.managePickingProcess();
 	}
 	
 	// Render process.***
