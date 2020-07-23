@@ -20,8 +20,8 @@
 	<li id="homeMenu" class="home">
 		<img src="/images/ko/homepage/home-icon.png" style="width: 35px; height: 35px; padding-right: 2px;" title="Home" />
 	</li>
-	<li onclick="doTest();">
-		test
+	<li onclick="gotopage();">
+		Guide
 	</li>
 </ul>
 <div id="magoContainer" class="mapWrap"></div>
@@ -126,6 +126,13 @@
 		magoManager.on(Mago3D.MagoManager.EVENT_TYPE.F4DLOADEND, function(e){
 			console.info(e.f4d.length + '개의 데이터가 로드되었습니다.');
 		});
+	}
+
+	function gotopage() {
+		window.open(
+			'https://gaia3d.atlassian.net/wiki/spaces/education/pages/79429666/mago3D+JS',
+			'_blank'
+		);
 	}
 </script>
 </body>
