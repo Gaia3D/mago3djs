@@ -4072,13 +4072,13 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
 void main()\n\
 {           \n\
     // Debug.\n\
-    \n\
+    /*\n\
     if((v_tex_pos.x < 0.006 || v_tex_pos.x > 0.994) || (v_tex_pos.y < 0.006 || v_tex_pos.y > 0.994))\n\
     {\n\
         gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);\n\
         return;\n\
     }\n\
-    \n\
+    */\n\
 \n\
     vec2 texCoord = vec2(1.0 - v_tex_pos.x, 1.0 - v_tex_pos.y);\n\
 \n\
