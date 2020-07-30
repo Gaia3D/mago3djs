@@ -66,10 +66,12 @@
 		console.info('Complete construct mago3d instance. Enjoy!');
 		
 		var magoInstance = e;
+		
+		var viewer = magoInstance.getViewer();
+		viewer.scene.globe.depthTestAgainstTerrain = true;
 		var magoManager = magoInstance.getMagoManager();
-		
 		var f4dController = magoInstance.getF4dController();
-		
+
 		var f4dGroup = {
 			"metainfo": {
 				"isPhysical": false
@@ -93,7 +95,7 @@
 			"mappingType":"boundingboxcenter",
 			"longitude": 128.917656,
 			"latitude": 35.139482,
-			"height": 14.177629,
+			"altitude": 14.177629,
 			"heading": 0.000000,
 			"pitch": 0.000000,
 			"roll": 0.000000
@@ -116,7 +118,7 @@
 				"mappingType":"origin",
 				"longitude": 128.919656,
 				"latitude": 35.138482,
-				"height": 14.177629,
+				"altitude": 14.177629,
 				"heading": 0.000000,
 				"pitch": 0.000000,
 				"roll": 0.000000
