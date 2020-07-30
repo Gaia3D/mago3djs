@@ -669,6 +669,19 @@ ManagerUtils.calculatePixelLinearDepth = function(gl, pixelX, pixelY, depthFbo, 
 	var zDepth = depthPixels[0]/(256.0*256.0*256.0) + depthPixels[1]/(256.0*256.0) + depthPixels[2]/256.0 + depthPixels[3]; // 0 to 256 range depth.
 	var linearDepth = zDepth / 256.0; // LinearDepth. Convert to [0.0, 1.0] range depth.
 
+	// Check if we are using logarithmic depth buffer.***
+	if (magoManager.postFxShadersManager.bUseLogarithmicDepth)
+	{
+		var fcoef_half = magoManager.sceneState.fCoef_logDepth[0]/2.0;
+		// gl_FragDepthEXT = linearDepth = log2(flogz) * Fcoef_half;
+		// flogz = 1.0 + gl_Position.z;
+
+		var flogz = Math.pow(2.0, linearDepth/fcoef_half);
+		var z = flogz - 1.0;
+		var frustumFar = magoManager.sceneState.camera.frustum.far;
+		linearDepth = z/(frustumFar);
+	}
+
 	return linearDepth;
 };
 

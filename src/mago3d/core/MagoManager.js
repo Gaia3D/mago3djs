@@ -1419,11 +1419,17 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	
 	
 	if (frustumVolumenObject.depthFbo === undefined) { frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
+	if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
 	if (this.sceneState.drawingBufferWidth[0] !== frustumVolumenObject.depthFbo.width[0] || this.sceneState.drawingBufferHeight[0] !== frustumVolumenObject.depthFbo.height[0])
 	{
 		// move this to onResize.***
 		frustumVolumenObject.depthFbo.deleteObjects(gl);
 		frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
+
+		// move this to onResize.***
+		this.ssaoFromDepthFbo.deleteObjects(gl);
+		this.ssaoFromDepthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
+
 		this.sceneState.camera.frustum.dirty = true;
 
 		// delete selection buffer too.
@@ -1443,6 +1449,8 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	
 
 	this.depthFboNeo = frustumVolumenObject.depthFbo;
+	//this.ssaoFromDepthFbo = frustumVolumenObject.ssaoFromDepthFbo;
+
 	//this.silhouetteDepthFboNeo = frustumVolumenObject.silhouetteDepthFboNeo;
 	//frustumVolumenObject.depthFbo = this.depthFboNeo;
 	this.depthFboNeo.bind(); 
@@ -1458,13 +1466,16 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
 	this.renderer.renderGeometry(gl, renderType, this.visibleObjControlerNodes);
-	// test mago geometries.***********************************************************************************************************
+	// test mago geometries.************************************************************************************************************
 	//this.renderer.renderMagoGeometries(renderType); //TEST
 	this.depthFboNeo.unbind();
 	this.swapRenderingFase();
 
-	// 2) color render.************************************************************************************************************
-	// 2.1) Render terrain shadows.*******************************************************************************************************
+	// 1.1) ssao and other effects from depthBuffer render.*****************************************************************************
+	this.renderer.renderSsaoFromDepth(gl);
+
+	// 2) color render.*****************************************************************************************************************
+	// 2.1) Render terrain shadows.*****************************************************************************************************
 	// Now render the geomatry.
 	if (this.isCesiumGlobe())
 	{
@@ -5012,13 +5023,15 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	gl.uniform1i(shader.tex_6_loc, 6);
 	gl.uniform1i(shader.tex_7_loc, 7);
 
-	/*
+	
 	// ssaoFromDepth shader.***********************************************************************************
 	var shaderName = "ssaoFromDepth";
 	var ssao_vs_source = ShaderSource.ScreenQuadVS;
 	var ssao_fs_source = ShaderSource.ssaoFromDepthFS;
 	var shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
-	*/
+	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
+	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
+	
 };
 
 /**

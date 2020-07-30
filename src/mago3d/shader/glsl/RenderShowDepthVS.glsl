@@ -59,10 +59,12 @@ void main()
 	{
 		// logarithmic zBuffer:
 		// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html
-		//float Fcoef = 2.0 / log2(far + 1.0);
-		gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;
-
-		flogz = 1.0 + gl_Position.w;
+		// float Fcoef = 2.0 / log2(far + 1.0);
+		// gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;
+		// flogz = 1.0 + gl_Position.w;
+		//-----------------------------------------------------------------------------------
+		//float C = 0.0001;
+		flogz = 1.0 + gl_Position.z; // use "z" instead "w" for fast decoding.***
 		Fcoef_half = 0.5 * uFCoef_logDepth;
 	}
 

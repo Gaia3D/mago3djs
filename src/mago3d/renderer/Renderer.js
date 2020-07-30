@@ -1113,19 +1113,63 @@ Renderer.prototype.renderSilhouette = function()
 Renderer.prototype.renderSsaoFromDepth = function(gl) 
 {
 	// render the ssao to texture, and then apply blur.
+	var magoManager = this.magoManager;
+	var sceneState = magoManager.sceneState;
 
-	// provisionally, render the ssao into canvas.
-	currentShader = magoManager.postFxShadersManager.getShader("ssaoFromDepth"); 
+	var ssaoFromDepthFbo = magoManager.ssaoFromDepthFbo;
+
+	// bind ssaoFromDepthBuffer.***
+	ssaoFromDepthFbo.bind(); 
+
+	if (magoManager.isFarestFrustum())
+	{
+		gl.clearColor(0, 0, 0, 0);
+		gl.clearDepth(1);
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	}
+
+	var currentShader = magoManager.postFxShadersManager.getShader("ssaoFromDepth"); 
 	currentShader.useProgram();
-	
 	currentShader.bindUniformGenerals();
+
+	//gl.uniform1f(currentShader.frustumFar_loc, 40000.0); // only in cesium.***
+
+	var bApplySsao = true;
+	gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
+
+	var projectionMatrixInv = sceneState.getProjectionMatrixInv();
+	gl.uniformMatrix4fv(currentShader.projectionMatrixInv_loc, false, projectionMatrixInv._floatArrays);
+
+	gl.uniform1i(currentShader.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
+	//gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
+	//gl.uniform1i(currentShader.bApplyShadow_loc, bApplyShadow);
+	//gl.uniform1i(currentShader.bApplySpecularLighting_loc, true);
+	gl.uniform1f(currentShader.uFCoef_logDepth_loc, sceneState.fCoef_logDepth[0]);
+
+	var noiseTexture = magoManager.texturesStore.getNoiseTexture4x4();
+
+	gl.activeTexture(gl.TEXTURE0);
+	gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);  // original.***
+	gl.activeTexture(gl.TEXTURE1);
+	gl.bindTexture(gl.TEXTURE_2D, noiseTexture);
+	
 
 	if (this.screenQuad === undefined)
 	{
 		this.screenQuad = new ScreenQuad(magoManager.vboMemoryManager);
 	}
+
+	gl.depthMask(false);
+	gl.disable(gl.DEPTH_TEST);
+	//gl.enable(gl.BLEND);
 	
 	this.screenQuad.render(magoManager, currentShader);
+
+	// unbind the ssaoFromDepthBuffer.***
+	ssaoFromDepthFbo.unbind(); 
+
+	gl.depthMask(true);
+	gl.enable(gl.DEPTH_TEST);
 };
 
 /**
@@ -1711,7 +1755,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		var bApplyShadow = false;
 		if (magoManager.currentFrustumIdx < 2)
 		{ bApplySsao = true; }
-	
+		//bApplySsao = false; // testdelete.***
 	
 		if (sceneState.sunSystem !== undefined && sceneState.applySunShadows)
 		{ bApplyShadow = true; }
@@ -1741,6 +1785,9 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			gl.uniform1i(currentShader.bApplyShadow_loc, bApplyShadow);
 			gl.uniform1i(currentShader.bApplySpecularLighting_loc, true);
 			gl.uniform1f(currentShader.uFCoef_logDepth_loc, sceneState.fCoef_logDepth[0]);
+
+			var projectionMatrixInv = sceneState.getProjectionMatrixInv();
+			gl.uniformMatrix4fv(currentShader.projectionMatrixInv_loc, false, projectionMatrixInv._floatArrays);
 
 			var sunSystem = magoManager.sceneState.sunSystem;
 			var sunLight = sunSystem.getLight(0);
@@ -1802,6 +1849,8 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			gl.bindTexture(gl.TEXTURE_2D, noiseTexture);
 			gl.activeTexture(gl.TEXTURE2); 
 			gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
+			gl.activeTexture(gl.TEXTURE5);
+			gl.bindTexture(gl.TEXTURE_2D, magoManager.ssaoFromDepthFbo.colorBuffer);
 			currentShader.last_tex_id = textureAux1x1;
 			
 			gl.activeTexture(gl.TEXTURE3); 
@@ -2023,6 +2072,8 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 
 		}
 		
+		// Test render ssao from depth.****
+		//this.renderSsaoFromDepth(gl);
 	}
 
 	// Test render screenRectangle.

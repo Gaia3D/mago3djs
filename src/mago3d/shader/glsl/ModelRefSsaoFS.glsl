@@ -13,8 +13,10 @@ uniform sampler2D noiseTex;
 uniform sampler2D diffuseTex;
 uniform sampler2D shadowMapTex;
 uniform sampler2D shadowMapTex2;
+uniform sampler2D ssaoFromDepthTex;
 uniform bool textureFlipYAxis;
 uniform mat4 projectionMatrix;
+uniform mat4 projectionMatrixInv;
 uniform mat4 m;
 uniform vec2 noiseScale;
 uniform float near;
@@ -104,10 +106,29 @@ vec3 getViewRay(vec2 tc)
 }         
             
 //linear view space depth
+/*
 float getDepth(vec2 coord)
 {
 	return unpackDepth(texture2D(depthTex, coord.xy));
 }   
+*/
+float getDepth(vec2 coord)
+{
+	if(bUseLogarithmicDepth)
+	{
+		float linearDepth = unpackDepth(texture2D(depthTex, coord.xy));
+		// gl_FragDepthEXT = linearDepth = log2(flogz) * Fcoef_half;
+		// flogz = 1.0 + gl_Position.z;
+
+		float flogzAux = pow(2.0, linearDepth/Fcoef_half);
+		float z = flogzAux - 1.0;
+		linearDepth = z/(far);
+		return linearDepth;
+	}
+	else{
+		return unpackDepth(texture2D(depthTex, coord.xy));
+	}
+}
 
 float getDepthShadowMap(vec2 coord)
 {
@@ -131,6 +152,44 @@ bool clipVertexByPlane(in vec4 plane, in vec3 point)
 	if(dist < 0.0)
 	return true;
 	else return false;
+}
+
+vec3 reconstructPosition(vec2 texCoord, float depth)
+{
+    // https://wickedengine.net/2019/09/22/improved-normal-reconstruction-from-depth/
+    float x = texCoord.x * 2.0 - 1.0;
+    //float y = (1.0 - texCoord.y) * 2.0 - 1.0;
+    float y = (texCoord.y) * 2.0 - 1.0;
+    float z = (1.0 - depth) * 2.0 - 1.0;
+    vec4 pos_NDC = vec4(x, y, z, 1.0);
+    vec4 pos_CC = projectionMatrixInv * pos_NDC;
+    return pos_CC.xyz / pos_CC.w;
+}
+
+vec3 normal_from_depth(float depth, vec2 texCoord) {
+    // http://theorangeduck.com/page/pure-depth-ssao
+    float pixelSizeX = 1.0/screenWidth;
+    float pixelSizeY = 1.0/screenHeight;
+
+    vec2 offset1 = vec2(0.0,pixelSizeY);
+    vec2 offset2 = vec2(pixelSizeX,0.0);
+
+	float depthA = 0.0;
+	float depthB = 0.0;
+	for(float i=0.0; i<1.0; i++)
+	{
+		depthA += getDepth(texCoord + offset1*(1.0+i));
+		depthB += getDepth(texCoord + offset2*(1.0+i));
+	}
+
+	vec3 posA = reconstructPosition(texCoord + offset1*1.0, depthA/1.0);
+	vec3 posB = reconstructPosition(texCoord + offset2*1.0, depthB/1.0);
+
+    vec3 pos0 = reconstructPosition(texCoord, depth);
+    vec3 normal = cross(posA - pos0, posB - pos0);
+    normal.z = -normal.z;
+
+    return normalize(normal);
 }
 
 void main()
@@ -163,17 +222,22 @@ void main()
 	float occlusion = 1.0; // ambient occlusion.***
 	float shadow_occlusion = 1.0;
 	vec3 normal2 = vNormal;	
-		
+	float scalarProd = 1.0;
+	
+	vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
+	float linearDepth = getDepth(screenPos);  
+	vec3 ray = getViewRay(screenPos); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
+	scalarProd = dot(normal2, normalize(-ray));
+	scalarProd *= 0.6;
+	scalarProd += 0.4;
+
+	//vec3 normalFromDepth = normal_from_depth(linearDepth, screenPos); // normal from depthTex.***
+	//normal2 = normalFromDepth;
 	if(bApplySsao)
-	{        
-		////float farForDepth = 30000.0;
-		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
-		float linearDepth = getDepth(screenPos);  
-		vec3 ray = getViewRay(screenPos); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
+	{   
+		    
 		vec3 origin = ray * linearDepth;  
 		float tolerance = radius/far; // original.***
-		////float tolerance = radius/(far-near);// test.***
-		////float tolerance = radius/farForDepth;
 
 		vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;
 		vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));
@@ -209,14 +273,66 @@ void main()
 			}
 		} 
 
-		occlusion = 1.0 - occlusion / float(kernelSize);	
+		//occlusion = 1.0 - occlusion / float(kernelSize);	
+		float smallOccl = occlusion / float(kernelSize);
+		smallOccl *= 0.7;
+		
+		// test.***
+		//ssaoFromDepthTex
+		float pixelSize_x = 1.0/screenWidth;
+		float pixelSize_y = 1.0/screenHeight;
+		float occl_aux = (0.0);
+		for(int i=0; i<4; i++)
+		{
+			for(int j=0; j<4; j++)
+			{
+				vec2 texCoord = vec2(screenPos.x + pixelSize_x*float(i-2), screenPos.y + pixelSize_y*float(j-2));
+				occl_aux += texture2D(ssaoFromDepthTex, texCoord).w;
+			}
+		}
+		occl_aux /= 16.0;
+		occl_aux *= 0.9;
+		//vec4 occlusionFromDepth = texture2D(ssaoFromDepthTex, screenPos);
+		//occlusion = occl_aux + (1.0 - smallOccl);
+		occlusion = 1.0 - occl_aux - smallOccl;
+
+		if(occlusion < 0.1)
+		occlusion = 0.1;
 	}
+
+	vec4 textureColor;
+    if(colorType == 2)
+    {
+        if(textureFlipYAxis)
+        {
+            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));
+        }
+        else{
+            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));
+        }
+		
+        if(textureColor.w == 0.0)
+        {
+            discard;
+        }
+    }
+    else if(colorType == 0)
+	{
+        textureColor = oneColor4;
+    }
+	else if(colorType == 1)
+	{
+        textureColor = vColor4;
+    }
 	
     // Do specular lighting.***
-	float lambertian;
-	float specular;
+	float lambertian = 1.0;
+	float specular = 0.0;
+
+	if((textureColor.r < 0.5 && textureColor.b > 0.5) || textureColor.a < 1.0)
+	//specular = 1.0;
 	
-	if(applySpecLighting> 0.0)
+	//if(applySpecLighting> 0.0)
 	{
 		vec3 L;
 		if(bApplyShadow)
@@ -255,6 +371,9 @@ void main()
 
 	}
 	
+
+	lambertian = 1.0;
+	
 	if(bApplyShadow)
 	{
 		if(currSunIdx > 0.0)
@@ -289,30 +408,7 @@ void main()
 	}
 	
 
-    vec4 textureColor;
-    if(colorType == 2)
-    {
-        if(textureFlipYAxis)
-        {
-            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));
-        }
-        else{
-            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));
-        }
-		
-        if(textureColor.w == 0.0)
-        {
-            discard;
-        }
-    }
-    else if(colorType == 0)
-	{
-        textureColor = oneColor4;
-    }
-	else if(colorType == 1)
-	{
-        textureColor = vColor4;
-    }
+    
 	
 	//textureColor = vec4(0.85, 0.85, 0.85, 1.0);
 	
@@ -324,10 +420,10 @@ void main()
 	{
 		finalColor = vec4((ambientReflectionCoef * ambientColorAux + 
 							diffuseReflectionCoef * lambertian * textureColor.xyz + 
-							specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion * shadow_occlusion, alfa); 
+							specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion * shadow_occlusion * scalarProd, alfa); 
 	}
 	else{
-		finalColor = vec4((textureColor.xyz) * occlusion * shadow_occlusion, alfa);
+		finalColor = vec4((textureColor.xyz) * occlusion * shadow_occlusion * scalarProd, alfa);
 	}
 	
 	//if(testBool)

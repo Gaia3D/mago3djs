@@ -11,7 +11,7 @@ var TinTerrainManager = function(magoManager, options)
 	}
 	this.ready = true;
 	this.maxDepth = 17;
-	this.maxDepth = 15;
+	this.maxDepth = 12;
 	this.currentVisibles_terrName_geoCoords_map = {}; // current visible terrains map[terrainPathName, geographicCoords].
 	this.currentTerrainsMap = {}; // current terrains (that was created) map[terrainPathName, tinTerrain].
 	
@@ -675,6 +675,8 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	
 	currentShader.bindUniformGenerals();
 	gl.uniform1i(currentShader.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
+	var projectionMatrixInv = sceneState.getProjectionMatrixInv();
+	gl.uniformMatrix4fv(currentShader.projectionMatrixInv_loc, false, projectionMatrixInv._floatArrays);
 	
 	magoManager.test__makingTerrainByAltitudesImage = 0;
 	

@@ -70,13 +70,14 @@ void main()
 		if(discardFrag)
 		discard;
 	}
-	
-    gl_FragData[0] = packDepth(-depth);
-	//gl_FragData[0] = PackDepth32(depth);
+	if(!bUseLogarithmicDepth)
+    	gl_FragData[0] = packDepth(-depth);
+
 	#ifdef USE_LOGARITHMIC_DEPTH
 	if(bUseLogarithmicDepth)
 	{
 		gl_FragDepthEXT = log2(flogz) * Fcoef_half;
+		gl_FragData[0] = packDepth(gl_FragDepthEXT);
 	}
 	#endif
 }

@@ -1436,8 +1436,10 @@ uniform sampler2D noiseTex;  \n\
 uniform sampler2D diffuseTex;\n\
 uniform sampler2D shadowMapTex;\n\
 uniform sampler2D shadowMapTex2;\n\
+uniform sampler2D ssaoFromDepthTex;\n\
 uniform bool textureFlipYAxis;\n\
 uniform mat4 projectionMatrix;\n\
+uniform mat4 projectionMatrixInv;\n\
 uniform mat4 m;\n\
 uniform vec2 noiseScale;\n\
 uniform float near;\n\
@@ -1527,10 +1529,29 @@ vec3 getViewRay(vec2 tc)\n\
 }         \n\
             \n\
 //linear view space depth\n\
+/*\n\
 float getDepth(vec2 coord)\n\
 {\n\
 	return unpackDepth(texture2D(depthTex, coord.xy));\n\
 }   \n\
+*/\n\
+float getDepth(vec2 coord)\n\
+{\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		float linearDepth = unpackDepth(texture2D(depthTex, coord.xy));\n\
+		// gl_FragDepthEXT = linearDepth = log2(flogz) * Fcoef_half;\n\
+		// flogz = 1.0 + gl_Position.z;\n\
+\n\
+		float flogzAux = pow(2.0, linearDepth/Fcoef_half);\n\
+		float z = flogzAux - 1.0;\n\
+		linearDepth = z/(far);\n\
+		return linearDepth;\n\
+	}\n\
+	else{\n\
+		return unpackDepth(texture2D(depthTex, coord.xy));\n\
+	}\n\
+}\n\
 \n\
 float getDepthShadowMap(vec2 coord)\n\
 {\n\
@@ -1554,6 +1575,44 @@ bool clipVertexByPlane(in vec4 plane, in vec3 point)\n\
 	if(dist < 0.0)\n\
 	return true;\n\
 	else return false;\n\
+}\n\
+\n\
+vec3 reconstructPosition(vec2 texCoord, float depth)\n\
+{\n\
+    // https://wickedengine.net/2019/09/22/improved-normal-reconstruction-from-depth/\n\
+    float x = texCoord.x * 2.0 - 1.0;\n\
+    //float y = (1.0 - texCoord.y) * 2.0 - 1.0;\n\
+    float y = (texCoord.y) * 2.0 - 1.0;\n\
+    float z = (1.0 - depth) * 2.0 - 1.0;\n\
+    vec4 pos_NDC = vec4(x, y, z, 1.0);\n\
+    vec4 pos_CC = projectionMatrixInv * pos_NDC;\n\
+    return pos_CC.xyz / pos_CC.w;\n\
+}\n\
+\n\
+vec3 normal_from_depth(float depth, vec2 texCoord) {\n\
+    // http://theorangeduck.com/page/pure-depth-ssao\n\
+    float pixelSizeX = 1.0/screenWidth;\n\
+    float pixelSizeY = 1.0/screenHeight;\n\
+\n\
+    vec2 offset1 = vec2(0.0,pixelSizeY);\n\
+    vec2 offset2 = vec2(pixelSizeX,0.0);\n\
+\n\
+	float depthA = 0.0;\n\
+	float depthB = 0.0;\n\
+	for(float i=0.0; i<1.0; i++)\n\
+	{\n\
+		depthA += getDepth(texCoord + offset1*(1.0+i));\n\
+		depthB += getDepth(texCoord + offset2*(1.0+i));\n\
+	}\n\
+\n\
+	vec3 posA = reconstructPosition(texCoord + offset1*1.0, depthA/1.0);\n\
+	vec3 posB = reconstructPosition(texCoord + offset2*1.0, depthB/1.0);\n\
+\n\
+    vec3 pos0 = reconstructPosition(texCoord, depth);\n\
+    vec3 normal = cross(posA - pos0, posB - pos0);\n\
+    normal.z = -normal.z;\n\
+\n\
+    return normalize(normal);\n\
 }\n\
 \n\
 void main()\n\
@@ -1586,17 +1645,22 @@ void main()\n\
 	float occlusion = 1.0; // ambient occlusion.***\n\
 	float shadow_occlusion = 1.0;\n\
 	vec3 normal2 = vNormal;	\n\
-		\n\
+	float scalarProd = 1.0;\n\
+	\n\
+	vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
+	float linearDepth = getDepth(screenPos);  \n\
+	vec3 ray = getViewRay(screenPos); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
+	scalarProd = dot(normal2, normalize(-ray));\n\
+	scalarProd *= 0.6;\n\
+	scalarProd += 0.4;\n\
+\n\
+	//vec3 normalFromDepth = normal_from_depth(linearDepth, screenPos); // normal from depthTex.***\n\
+	//normal2 = normalFromDepth;\n\
 	if(bApplySsao)\n\
-	{        \n\
-		////float farForDepth = 30000.0;\n\
-		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
-		float linearDepth = getDepth(screenPos);  \n\
-		vec3 ray = getViewRay(screenPos); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
+	{   \n\
+		    \n\
 		vec3 origin = ray * linearDepth;  \n\
 		float tolerance = radius/far; // original.***\n\
-		////float tolerance = radius/(far-near);// test.***\n\
-		////float tolerance = radius/farForDepth;\n\
 \n\
 		vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
 		vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
@@ -1632,14 +1696,66 @@ void main()\n\
 			}\n\
 		} \n\
 \n\
-		occlusion = 1.0 - occlusion / float(kernelSize);	\n\
+		//occlusion = 1.0 - occlusion / float(kernelSize);	\n\
+		float smallOccl = occlusion / float(kernelSize);\n\
+		smallOccl *= 0.7;\n\
+		\n\
+		// test.***\n\
+		//ssaoFromDepthTex\n\
+		float pixelSize_x = 1.0/screenWidth;\n\
+		float pixelSize_y = 1.0/screenHeight;\n\
+		float occl_aux = (0.0);\n\
+		for(int i=0; i<4; i++)\n\
+		{\n\
+			for(int j=0; j<4; j++)\n\
+			{\n\
+				vec2 texCoord = vec2(screenPos.x + pixelSize_x*float(i-2), screenPos.y + pixelSize_y*float(j-2));\n\
+				occl_aux += texture2D(ssaoFromDepthTex, texCoord).w;\n\
+			}\n\
+		}\n\
+		occl_aux /= 16.0;\n\
+		occl_aux *= 0.9;\n\
+		//vec4 occlusionFromDepth = texture2D(ssaoFromDepthTex, screenPos);\n\
+		//occlusion = occl_aux + (1.0 - smallOccl);\n\
+		occlusion = 1.0 - occl_aux - smallOccl;\n\
+\n\
+		if(occlusion < 0.1)\n\
+		occlusion = 0.1;\n\
 	}\n\
+\n\
+	vec4 textureColor;\n\
+    if(colorType == 2)\n\
+    {\n\
+        if(textureFlipYAxis)\n\
+        {\n\
+            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));\n\
+        }\n\
+        else{\n\
+            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));\n\
+        }\n\
+		\n\
+        if(textureColor.w == 0.0)\n\
+        {\n\
+            discard;\n\
+        }\n\
+    }\n\
+    else if(colorType == 0)\n\
+	{\n\
+        textureColor = oneColor4;\n\
+    }\n\
+	else if(colorType == 1)\n\
+	{\n\
+        textureColor = vColor4;\n\
+    }\n\
 	\n\
     // Do specular lighting.***\n\
-	float lambertian;\n\
-	float specular;\n\
+	float lambertian = 1.0;\n\
+	float specular = 0.0;\n\
+\n\
+	if((textureColor.r < 0.5 && textureColor.b > 0.5) || textureColor.a < 1.0)\n\
+	//specular = 1.0;\n\
 	\n\
-	if(applySpecLighting> 0.0)\n\
+	//if(applySpecLighting> 0.0)\n\
 	{\n\
 		vec3 L;\n\
 		if(bApplyShadow)\n\
@@ -1678,6 +1794,9 @@ void main()\n\
 \n\
 	}\n\
 	\n\
+\n\
+	lambertian = 1.0;\n\
+	\n\
 	if(bApplyShadow)\n\
 	{\n\
 		if(currSunIdx > 0.0)\n\
@@ -1712,30 +1831,7 @@ void main()\n\
 	}\n\
 	\n\
 \n\
-    vec4 textureColor;\n\
-    if(colorType == 2)\n\
-    {\n\
-        if(textureFlipYAxis)\n\
-        {\n\
-            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));\n\
-        }\n\
-        else{\n\
-            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));\n\
-        }\n\
-		\n\
-        if(textureColor.w == 0.0)\n\
-        {\n\
-            discard;\n\
-        }\n\
-    }\n\
-    else if(colorType == 0)\n\
-	{\n\
-        textureColor = oneColor4;\n\
-    }\n\
-	else if(colorType == 1)\n\
-	{\n\
-        textureColor = vColor4;\n\
-    }\n\
+    \n\
 	\n\
 	//textureColor = vec4(0.85, 0.85, 0.85, 1.0);\n\
 	\n\
@@ -1747,10 +1843,10 @@ void main()\n\
 	{\n\
 		finalColor = vec4((ambientReflectionCoef * ambientColorAux + \n\
 							diffuseReflectionCoef * lambertian * textureColor.xyz + \n\
-							specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion * shadow_occlusion, alfa); \n\
+							specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion * shadow_occlusion * scalarProd, alfa); \n\
 	}\n\
 	else{\n\
-		finalColor = vec4((textureColor.xyz) * occlusion * shadow_occlusion, alfa);\n\
+		finalColor = vec4((textureColor.xyz) * occlusion * shadow_occlusion * scalarProd, alfa);\n\
 	}\n\
 	\n\
 	//if(testBool)\n\
@@ -1955,8 +2051,10 @@ ShaderSource.ModelRefSsaoVS = "\n\
 		{\n\
 			// logarithmic zBuffer:\n\
 			// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
-			//float Fcoef = 2.0 / log2(far + 1.0);\n\
-			gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;\n\
+			// float Fcoef = 2.0 / log2(far + 1.0);\n\
+			// gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;\n\
+			// flogz = 1.0 + gl_Position.w;\n\
+			//---------------------------------------------------------------------------------\n\
 \n\
 			flogz = 1.0 + gl_Position.w;\n\
 			Fcoef_half = 0.5 * uFCoef_logDepth;\n\
@@ -2887,13 +2985,14 @@ void main()\n\
 		if(discardFrag)\n\
 		discard;\n\
 	}\n\
-	\n\
-    gl_FragData[0] = packDepth(-depth);\n\
-	//gl_FragData[0] = PackDepth32(depth);\n\
+	if(!bUseLogarithmicDepth)\n\
+    	gl_FragData[0] = packDepth(-depth);\n\
+\n\
 	#ifdef USE_LOGARITHMIC_DEPTH\n\
 	if(bUseLogarithmicDepth)\n\
 	{\n\
 		gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
+		gl_FragData[0] = packDepth(gl_FragDepthEXT);\n\
 	}\n\
 	#endif\n\
 }";
@@ -2958,10 +3057,12 @@ void main()\n\
 	{\n\
 		// logarithmic zBuffer:\n\
 		// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
-		//float Fcoef = 2.0 / log2(far + 1.0);\n\
-		gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;\n\
-\n\
-		flogz = 1.0 + gl_Position.w;\n\
+		// float Fcoef = 2.0 / log2(far + 1.0);\n\
+		// gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;\n\
+		// flogz = 1.0 + gl_Position.w;\n\
+		//-----------------------------------------------------------------------------------\n\
+		//float C = 0.0001;\n\
+		flogz = 1.0 + gl_Position.z; // use \"z\" instead \"w\" for fast decoding.***\n\
 		Fcoef_half = 0.5 * uFCoef_logDepth;\n\
 	}\n\
 \n\
@@ -3250,75 +3351,32 @@ ShaderSource.ssaoFromDepthFS = "\n\
 #ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\
-/*\n\
-#define %USE_LOGARITHMIC_DEPTH%\n\
-#ifdef USE_LOGARITHMIC_DEPTH\n\
-#extension GL_EXT_frag_depth : enable\n\
-#endif\n\
-*/\n\
 \n\
 uniform sampler2D depthTex;\n\
 uniform sampler2D noiseTex;  \n\
-uniform sampler2D diffuseTex;\n\
-uniform sampler2D shadowMapTex;\n\
-uniform sampler2D shadowMapTex2;\n\
-uniform bool textureFlipYAxis;\n\
+\n\
 uniform mat4 projectionMatrix;\n\
-uniform mat4 m;\n\
-uniform vec2 noiseScale;\n\
+uniform mat4 projectionMatrixInv;\n\
+\n\
 uniform float near;\n\
 uniform float far;            \n\
 uniform float fov;\n\
 uniform float tangentOfHalfFovy;\n\
 uniform float aspectRatio;    \n\
 uniform float screenWidth;    \n\
-uniform float screenHeight;   \n\
-uniform float shadowMapWidth;    \n\
-uniform float shadowMapHeight; \n\
-uniform float shininessValue;\n\
-uniform vec3 kernel[16];   \n\
-uniform vec4 oneColor4;\n\
+uniform float screenHeight; \n\
+uniform vec2 noiseScale;\n\
 \n\
-uniform bool bApplyScpecularLighting;\n\
-uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
-\n\
-uniform vec3 specularColor;\n\
-uniform vec3 ambientColor;\n\
-\n\
-const int kernelSize = 16;  \n\
-uniform float radius;      \n\
-\n\
-uniform float ambientReflectionCoef;\n\
-uniform float diffuseReflectionCoef;  \n\
-uniform float specularReflectionCoef; \n\
 uniform bool bApplySsao;\n\
-uniform bool bApplyShadow;\n\
-uniform float externalAlpha;\n\
-uniform vec4 colorMultiplier;\n\
+uniform float radius; \n\
+uniform vec3 kernel[16]; \n\
+\n\
+const int kernelSize = 16; \n\
+\n\
 uniform bool bUseLogarithmicDepth;\n\
+uniform float uFCoef_logDepth;\n\
 \n\
-//uniform int sunIdx;\n\
 \n\
-// clipping planes.***\n\
-//uniform bool bApplyClippingPlanes;\n\
-//uniform int clippingPlanesCount;\n\
-//uniform vec4 clippingPlanes[6];\n\
-\n\
-varying vec3 vNormal;\n\
-varying vec4 vColor4; // color from attributes\n\
-varying vec2 vTexCoord;   \n\
-varying vec3 vLightWeighting;\n\
-varying vec3 diffuseColor;\n\
-varying vec3 vertexPos;\n\
-varying float applySpecLighting;\n\
-varying vec4 vPosRelToLight; \n\
-varying vec3 vLightDir; \n\
-varying vec3 vNormalWC;\n\
-varying float currSunIdx; \n\
-varying float discardFrag;\n\
-\n\
-varying float flogz;\n\
-varying float Fcoef_half;\n\
 \n\
 float unpackDepth(const in vec4 rgba_depth)\n\
 {\n\
@@ -3353,213 +3411,162 @@ vec3 getViewRay(vec2 tc)\n\
 }         \n\
             \n\
 //linear view space depth\n\
+/*\n\
 float getDepth(vec2 coord)\n\
 {\n\
 	return unpackDepth(texture2D(depthTex, coord.xy));\n\
-}   \n\
-\n\
-float getDepthShadowMap(vec2 coord)\n\
+} \n\
+*/\n\
+float getDepth(vec2 coord)\n\
 {\n\
-	// currSunIdx\n\
-	if(currSunIdx > 0.0 && currSunIdx < 1.0)\n\
+	if(bUseLogarithmicDepth)\n\
 	{\n\
-		return UnpackDepth32(texture2D(shadowMapTex, coord.xy));\n\
+		float linearDepth = unpackDepth(texture2D(depthTex, coord.xy));\n\
+		// gl_FragDepthEXT = linearDepth = log2(flogz) * Fcoef_half;\n\
+		// flogz = 1.0 + gl_Position.z*0.0001;\n\
+        float Fcoef_half = uFCoef_logDepth/2.0;\n\
+		float flogzAux = pow(2.0, linearDepth/Fcoef_half);\n\
+		float z = (flogzAux - 1.0);\n\
+		linearDepth = z/(far);\n\
+		return linearDepth;\n\
 	}\n\
-    else if(currSunIdx > 1.0 && currSunIdx < 2.0)\n\
+	else{\n\
+		return unpackDepth(texture2D(depthTex, coord.xy));\n\
+	}\n\
+}\n\
+\n\
+vec3 reconstructPosition(vec2 texCoord, float depth)\n\
+{\n\
+    // https://wickedengine.net/2019/09/22/improved-normal-reconstruction-from-depth/\n\
+    float x = texCoord.x * 2.0 - 1.0;\n\
+    //float y = (1.0 - texCoord.y) * 2.0 - 1.0;\n\
+    float y = (texCoord.y) * 2.0 - 1.0;\n\
+    float z = (1.0 - depth) * 2.0 - 1.0;\n\
+    vec4 pos_NDC = vec4(x, y, z, 1.0);\n\
+    vec4 pos_CC = projectionMatrixInv * pos_NDC;\n\
+    return pos_CC.xyz / pos_CC.w;\n\
+}\n\
+\n\
+vec3 normal_from_depth(float depth, vec2 texCoord) {\n\
+    // http://theorangeduck.com/page/pure-depth-ssao\n\
+    float pixelSizeX = 1.0/screenWidth;\n\
+    float pixelSizeY = 1.0/screenHeight;\n\
+\n\
+    vec2 offset1 = vec2(0.0,pixelSizeY);\n\
+    vec2 offset2 = vec2(pixelSizeX,0.0);\n\
+\n\
+	float depthA = 0.0;\n\
+	float depthB = 0.0;\n\
+	for(float i=0.0; i<2.0; i++)\n\
 	{\n\
-		return UnpackDepth32(texture2D(shadowMapTex2, coord.xy));\n\
+		depthA += getDepth(texCoord + offset1*(1.0+i));\n\
+		depthB += getDepth(texCoord + offset2*(1.0+i));\n\
 	}\n\
-	else\n\
-		return -1.0;\n\
-}  \n\
+\n\
+	vec3 posA = reconstructPosition(texCoord + offset1*2.0, depthA/2.0);\n\
+	vec3 posB = reconstructPosition(texCoord + offset2*2.0, depthB/2.0);\n\
+\n\
+    vec3 pos0 = reconstructPosition(texCoord, depth);\n\
+    vec3 normal = cross(posA - pos0, posB - pos0);\n\
+    normal.z = -normal.z;\n\
+\n\
+    return normalize(normal);\n\
+}\n\
+\n\
+\n\
 \n\
 void main()\n\
 {\n\
+    float ambientLight = 1.0; // initially all bright.\n\
+    float occlusion = 0.0;\n\
+    float smallOcclusion = 0.0;\n\
+    vec3 normal = vec3(0.0);\n\
+    vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
+    vec3 ray = getViewRay(screenPos); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
+    float linearDepth = getDepth(screenPos);  \n\
 \n\
-	float occlusion = 1.0; // ambient occlusion.***\n\
-	float shadow_occlusion = 1.0;\n\
-	vec3 normal2 = vNormal;	\n\
-		\n\
-	if(bApplySsao)\n\
+    // test.***\n\
+    //float linearDepthTest = unpackDepth(texture2D(depthTex, screenPos));\n\
+    //if(linearDepthTest > 0.99)\n\
+    //discard;\n\
+\n\
+    float bigRadius = 10.0;\n\
+    float factorByDist = 1.0;\n\
+    float realDist = linearDepth * far;\n\
+\n\
+    if(realDist < bigRadius*5.0)\n\
+    {\n\
+        factorByDist = smoothstep(0.0, 1.0, realDist/(bigRadius*5.0));\n\
+    }\n\
+\n\
+    if(factorByDist < 0.05)\n\
+        discard;\n\
+\n\
+    if(bApplySsao)\n\
 	{        \n\
-		////float farForDepth = 30000.0;\n\
-		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
-		float linearDepth = getDepth(screenPos);  \n\
-		vec3 ray = getViewRay(screenPos); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
 		vec3 origin = ray * linearDepth;  \n\
-		float tolerance = radius/far; // original.***\n\
-		////float tolerance = radius/(far-near);// test.***\n\
-		////float tolerance = radius/farForDepth;\n\
-\n\
+        vec3 normal2 = normal_from_depth(linearDepth, screenPos); // normal from depthTex.***\n\
+        normal = normal2;\n\
+        \n\
 		vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
 		vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
 		vec3 bitangent = cross(normal2, tangent);\n\
 		mat3 tbn = mat3(tangent, bitangent, normal2);   \n\
-		float minDepthBuffer;\n\
-		float maxDepthBuffer;\n\
+\n\
 		for(int i = 0; i < kernelSize; ++i)\n\
 		{    	 \n\
-			vec3 sample = origin + (tbn * vec3(kernel[i].x*1.0, kernel[i].y*1.0, kernel[i].z)) * radius*2.0;\n\
-			vec4 offset = projectionMatrix * vec4(sample, 1.0);					\n\
-			offset.xy /= offset.w;\n\
-			offset.xy = offset.xy * 0.5 + 0.5;  				\n\
+			vec3 sample = origin + (tbn * vec3(kernel[i].x*1.0, kernel[i].y*1.0, kernel[i].z)) * bigRadius;\n\
+			vec4 offset = projectionMatrix * vec4(sample, 1.0);	\n\
+            vec3 offsetCoord = vec3(offset.xyz);				\n\
+			offsetCoord.xyz /= offset.w;\n\
+			offsetCoord.xyz = offsetCoord.xyz * 0.5 + 0.5;  				\n\
 			float sampleDepth = -sample.z/far;// original.***\n\
-			////float sampleDepth = -sample.z/(far-near);// test.***\n\
-			////float sampleDepth = -sample.z/farForDepth;\n\
 \n\
-			float depthBufferValue = getDepth(offset.xy);\n\
+			float depthBufferValue = getDepth(offsetCoord.xy);\n\
+            float depthDiff = abs(depthBufferValue - sampleDepth);\n\
+            if(depthDiff < bigRadius/far)\n\
+            {\n\
+                float rangeCheck = smoothstep(0.0, 1.0, bigRadius / (depthDiff*far));\n\
+                if (depthBufferValue < sampleDepth)//-tolerance*1.0)\n\
+                {\n\
+                    occlusion += 1.0 * rangeCheck * factorByDist;\n\
+                }\n\
+            }\n\
 \n\
-			if(depthBufferValue > 0.00391 && depthBufferValue < 0.00393)\n\
+            // do very big radius.***\n\
+            /*\n\
+            offsetCoord = vec2(offset.xy*3.0);				\n\
+			offsetCoord.xy /= offset.w;\n\
+			offsetCoord.xy = offsetCoord.xy * 0.5 + 0.5;  		\n\
+            depthBufferValue = getDepth(offset.xy*3.0);\n\
+\n\
+            if (depthBufferValue - sampleDepth > bigRadius*3.0)\n\
+            {\n\
+                continue;\n\
+            }\n\
+\n\
+			if (depthBufferValue > sampleDepth)//-tolerance*1.0)\n\
 			{\n\
-				if (depthBufferValue < sampleDepth-tolerance*1000.0)\n\
-				{\n\
-					occlusion +=  0.5;\n\
-				}\n\
-				\n\
-				continue;\n\
-			}			\n\
-			\n\
-			if (depthBufferValue < sampleDepth-tolerance)\n\
-			{\n\
-				occlusion +=  1.0;\n\
+				smallOcclusion +=  1.0;\n\
 			}\n\
+            */\n\
 		} \n\
 \n\
-		occlusion = 1.0 - occlusion / float(kernelSize);	\n\
+        \n\
+\n\
+		occlusion = occlusion / float(kernelSize);	\n\
+        if(occlusion < 0.0)\n\
+        occlusion = 0.0;\n\
 	}\n\
-	\n\
-    // Do specular lighting.***\n\
-	float lambertian;\n\
-	float specular;\n\
-	\n\
-	if(applySpecLighting> 0.0)\n\
-	{\n\
-		vec3 L;\n\
-		if(bApplyShadow)\n\
-		{\n\
-			L = vLightDir;// test.***\n\
-			lambertian = max(dot(normal2, L), 0.0); // original.***\n\
-			//lambertian = max(dot(vNormalWC, L), 0.0); // test.\n\
-		}\n\
-		else\n\
-		{\n\
-			vec3 lightPos = vec3(1.0, 1.0, 1.0);\n\
-			L = normalize(lightPos - vertexPos);\n\
-			lambertian = max(dot(normal2, L), 0.0);\n\
-		}\n\
-		\n\
-		specular = 0.0;\n\
-		if(lambertian > 0.0)\n\
-		{\n\
-			vec3 R = reflect(-L, normal2);      // Reflected light vector\n\
-			vec3 V = normalize(-vertexPos); // Vector to viewer\n\
-			\n\
-			// Compute the specular term\n\
-			float specAngle = max(dot(R, V), 0.0);\n\
-			specular = pow(specAngle, shininessValue);\n\
-			\n\
-			if(specular > 1.0)\n\
-			{\n\
-				specular = 1.0;\n\
-			}\n\
-		}\n\
-		\n\
-		if(lambertian < 0.5)\n\
-		{\n\
-			lambertian = 0.5;\n\
-		}\n\
 \n\
-	}\n\
-	\n\
-	if(bApplyShadow)\n\
-	{\n\
-		if(currSunIdx > 0.0)\n\
-		{\n\
-			float ligthAngle = dot(vLightDir, vNormalWC);\n\
-			if(ligthAngle > 0.0)\n\
-			{\n\
-				// The angle between the light direction & face normal is less than 90 degree, so, the face is in shadow.***\n\
-				shadow_occlusion = 0.5;\n\
-			}\n\
-			else\n\
-			{\n\
-				vec3 posRelToLight = vPosRelToLight.xyz / vPosRelToLight.w;\n\
-				float tolerance = 0.9963;\n\
-				posRelToLight = posRelToLight * 0.5 + 0.5; // transform to [0,1] range\n\
-				if(posRelToLight.x >= 0.0 && posRelToLight.x <= 1.0)\n\
-				{\n\
-					if(posRelToLight.y >= 0.0 && posRelToLight.y <= 1.0)\n\
-					{\n\
-						float depthRelToLight = getDepthShadowMap(posRelToLight.xy);\n\
-						if(posRelToLight.z > depthRelToLight*tolerance )\n\
-						{\n\
-							shadow_occlusion = 0.5;\n\
-						}\n\
-					}\n\
-				}\n\
+    // Do lighting.***\n\
+    //float scalarProd = max(0.01, dot(normal, normalize(-ray)));\n\
+   // scalarProd /= 3.0;\n\
+	//scalarProd += 0.666;\n\
+    //gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0 - scalarProd);\n\
 \n\
-				// test. Calculate the zone inside the pixel.************************************\n\
-				//https://docs.microsoft.com/ko-kr/windows/win32/dxtecharts/cascaded-shadow-maps\n\
-			}\n\
-		}\n\
-	}\n\
-	\n\
-\n\
-    vec4 textureColor;\n\
-    if(colorType == 2)\n\
-    {\n\
-        if(textureFlipYAxis)\n\
-        {\n\
-            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));\n\
-        }\n\
-        else{\n\
-            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));\n\
-        }\n\
-		\n\
-        if(textureColor.w == 0.0)\n\
-        {\n\
-            discard;\n\
-        }\n\
-    }\n\
-    else if(colorType == 0)\n\
-	{\n\
-        textureColor = oneColor4;\n\
-    }\n\
-	else if(colorType == 1)\n\
-	{\n\
-        textureColor = vColor4;\n\
-    }\n\
-	\n\
-	//textureColor = vec4(0.85, 0.85, 0.85, 1.0);\n\
-	\n\
-	vec3 ambientColorAux = vec3(textureColor.x*ambientColor.x, textureColor.y*ambientColor.y, textureColor.z*ambientColor.z);\n\
-	float alfa = textureColor.w * externalAlpha;\n\
-\n\
-    vec4 finalColor;\n\
-	if(applySpecLighting> 0.0)\n\
-	{\n\
-		finalColor = vec4((ambientReflectionCoef * ambientColorAux + \n\
-							diffuseReflectionCoef * lambertian * textureColor.xyz + \n\
-							specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion * shadow_occlusion, alfa); \n\
-	}\n\
-	else{\n\
-		finalColor = vec4((textureColor.xyz) * occlusion * shadow_occlusion, alfa);\n\
-	}\n\
-	\n\
-	//if(testBool)\n\
-	//finalColor *= vec4(0.99, 0.33, 0.32, 1.0);\n\
-	\n\
-	finalColor *= colorMultiplier;\n\
-\n\
-\n\
-	//finalColor = vec4(linearDepth, linearDepth, linearDepth, 1.0); // test to render depth color coded.***\n\
-    gl_FragColor = finalColor; \n\
-	//#ifdef USE_LOGARITHMIC_DEPTH\n\
-	//if(bUseLogarithmicDepth)\n\
-	//{\n\
-	//	gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
-	//}\n\
-	//#endif\n\
+	gl_FragColor = vec4(0.0, 0.0, 0.0, occlusion);\n\
+    //gl_FragColor = vec4(normal.xyz, 1.0);\n\
 }";
 ShaderSource.StandardFS = "precision lowp float;\n\
 varying vec3 vColor;\n\
@@ -4721,6 +4728,7 @@ uniform bool bIsMakingDepth;\n\
 uniform bool bExistAltitudes;\n\
 uniform bool bApplyCaustics;\n\
 uniform mat4 projectionMatrix;\n\
+uniform mat4 projectionMatrixInv;\n\
 uniform vec2 noiseScale;\n\
 uniform float near;\n\
 uniform float far;            \n\
@@ -4821,8 +4829,59 @@ vec3 getViewRay(vec2 tc)\n\
 //linear view space depth\n\
 float getDepth(vec2 coord)\n\
 {\n\
-	// in this shader the depthTex is \"diffuseTex\"\n\
-	return unpackDepth(texture2D(diffuseTex, coord.xy));\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		float linearDepth = unpackDepth(texture2D(diffuseTex, coord.xy));\n\
+		// gl_FragDepthEXT = linearDepth = log2(flogz) * Fcoef_half;\n\
+		// flogz = 1.0 + gl_Position.z;\n\
+\n\
+		float flogzAux = pow(2.0, linearDepth/Fcoef_half);\n\
+		float z = flogzAux - 1.0;\n\
+		linearDepth = z/(far);\n\
+		return linearDepth;\n\
+	}\n\
+	else{\n\
+		// in this shader the depthTex is \"diffuseTex\"\n\
+		return unpackDepth(texture2D(diffuseTex, coord.xy));\n\
+	}\n\
+}\n\
+\n\
+vec3 reconstructPosition(vec2 texCoord, float depth)\n\
+{\n\
+    // https://wickedengine.net/2019/09/22/improved-normal-reconstruction-from-depth/\n\
+    float x = texCoord.x * 2.0 - 1.0;\n\
+    //float y = (1.0 - texCoord.y) * 2.0 - 1.0;\n\
+    float y = (texCoord.y) * 2.0 - 1.0;\n\
+    float z = (1.0 - depth) * 2.0 - 1.0;\n\
+    vec4 pos_NDC = vec4(x, y, z, 1.0);\n\
+    vec4 pos_CC = projectionMatrixInv * pos_NDC;\n\
+    return pos_CC.xyz / pos_CC.w;\n\
+}\n\
+\n\
+vec3 normal_from_depth(float depth, vec2 texCoord) {\n\
+    // http://theorangeduck.com/page/pure-depth-ssao\n\
+    float pixelSizeX = 1.0/screenWidth;\n\
+    float pixelSizeY = 1.0/screenHeight;\n\
+\n\
+    vec2 offset1 = vec2(0.0,pixelSizeY);\n\
+    vec2 offset2 = vec2(pixelSizeX,0.0);\n\
+\n\
+	float depthA = 0.0;\n\
+	float depthB = 0.0;\n\
+	for(float i=0.0; i<3.0; i++)\n\
+	{\n\
+		depthA += getDepth(texCoord + offset1*(1.0+i));\n\
+		depthB += getDepth(texCoord + offset2*(1.0+i));\n\
+	}\n\
+\n\
+	vec3 posA = reconstructPosition(texCoord + offset1*2.0, depthA/3.0);\n\
+	vec3 posB = reconstructPosition(texCoord + offset2*2.0, depthB/3.0);\n\
+\n\
+    vec3 pos0 = reconstructPosition(texCoord, depth);\n\
+    vec3 normal = cross(posA - pos0, posB - pos0);\n\
+    normal.z = -normal.z;\n\
+\n\
+    return normalize(normal);\n\
 }\n\
 \n\
 //linear view space depth\n\
@@ -5018,16 +5077,19 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
 \n\
 void main()\n\
 {    \n\
+	float depthAux = -depthValue;\n\
+\n\
 	#ifdef USE_LOGARITHMIC_DEPTH\n\
 	if(bUseLogarithmicDepth)\n\
 	{\n\
 		gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
+		depthAux = gl_FragDepthEXT;\n\
 	}\n\
 	#endif\n\
 \n\
 	if(bIsMakingDepth)\n\
 	{\n\
-		gl_FragColor = packDepth(-depthValue);\n\
+		gl_FragColor = packDepth(depthAux);\n\
 	}\n\
 	else\n\
 	{\n\
@@ -5089,6 +5151,7 @@ void main()\n\
 		float lambertian = 1.0;\n\
 		float specular;\n\
 		vec2 texCoord;\n\
+		/*\n\
 		if(applySpecLighting> 0.0)\n\
 		{\n\
 			vec3 L;\n\
@@ -5103,23 +5166,23 @@ void main()\n\
 				L = normalize(lightPos - v3Pos);\n\
 				lambertian = max(dot(normal2, L), 0.0);\n\
 			}\n\
-			/*\n\
-			specular = 0.0;\n\
-			if(lambertian > 0.0)\n\
-			{\n\
-				vec3 R = reflect(-L, normal2);      // Reflected light vector\n\
-				vec3 V = normalize(-v3Pos); // Vector to viewer\n\
-				\n\
-				// Compute the specular term\n\
-				float specAngle = max(dot(R, V), 0.0);\n\
-				specular = pow(specAngle, shininessValue);\n\
-				\n\
-				if(specular > 1.0)\n\
-				{\n\
-					specular = 1.0;\n\
-				}\n\
-			}\n\
-			*/\n\
+			\n\
+			//specular = 0.0;\n\
+			//if(lambertian > 0.0)\n\
+			//{\n\
+			//	vec3 R = reflect(-L, normal2);      // Reflected light vector\n\
+			//	vec3 V = normalize(-v3Pos); // Vector to viewer\n\
+			//	\n\
+			//	// Compute the specular term\n\
+			//	float specAngle = max(dot(R, V), 0.0);\n\
+			//	specular = pow(specAngle, shininessValue);\n\
+			//	\n\
+			//	if(specular > 1.0)\n\
+			//	{\n\
+			//		specular = 1.0;\n\
+			//	}\n\
+			//}\n\
+			\n\
 			// test.\n\
 			lambertian += 0.3;\n\
 \n\
@@ -5131,7 +5194,10 @@ void main()\n\
 			{\n\
 				lambertian = 1.0;\n\
 			}\n\
+\n\
+			\n\
 		}\n\
+		*/\n\
 		\n\
 		// check if apply ssao.\n\
 		float occlusion = 1.0;\n\
@@ -5200,13 +5266,20 @@ void main()\n\
 			}\n\
 		}\n\
 		// End Dem image.------------------------------------------------------------------------------------------------------------\n\
+		float linearDepthAux = 1.0;\n\
+		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
+		vec3 ray = getViewRay(screenPos); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
+\n\
+		float linearDepth = getDepth(screenPos);  \n\
+		linearDepthAux = linearDepth;\n\
+\n\
 		if(bApplySsao && altitude<0.0)\n\
 		{\n\
 			// must find depthTex & noiseTex.***\n\
 			////float farForDepth = 30000.0;\n\
-			vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
-			float linearDepth = getDepth(screenPos);  \n\
-			vec3 ray = getViewRay(screenPos); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
+			\n\
+			\n\
+			\n\
 			vec3 origin = ray * linearDepth;  \n\
 			float ssaoRadius = radius*20.0;\n\
 			float tolerance = ssaoRadius/far; // original.***\n\
@@ -5250,6 +5323,12 @@ void main()\n\
 			\n\
 			shadow_occlusion *= occlusion;\n\
 		}\n\
+\n\
+		vec3 normalFromDepth = normal_from_depth(linearDepthAux, screenPos); // normal from depthTex.***\n\
+		float scalarProd = dot(normalFromDepth, normalize(-ray));\n\
+		scalarProd /= 3.0;\n\
+		scalarProd += 0.666;\n\
+		\n\
 		\n\
 		if(altitude < 0.0)\n\
 		{\n\
@@ -5312,7 +5391,7 @@ void main()\n\
 			vec3 specularColor = vec3(0.8, 0.8, 0.8);\n\
 			//textureColor = mix(textureColor, fogColor, 0.2); \n\
 			//gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian + specularReflectionCoef * specular * specularColor * shadow_occlusion, 1.0); // with specular.***\n\
-			gl_FragColor = vec4(textureColor.xyz * shadow_occlusion * lambertian, 1.0); // original.***\n\
+			gl_FragColor = vec4(textureColor.xyz * shadow_occlusion * lambertian * scalarProd, 1.0); // original.***\n\
 \n\
 			return;\n\
 		}\n\
@@ -5323,8 +5402,9 @@ void main()\n\
 		}\n\
 		\n\
 		\n\
+		\n\
 		vec4 finalColor = mix(textureColor, fogColor, vFogAmount); \n\
-		gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian, 1.0); // original.***\n\
+		gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian * scalarProd, 1.0); // original.***\n\
 		//gl_FragColor = textureColor; // test.***\n\
 		//gl_FragColor = vec4(vNormal.xyz, 1.0); // test.***\n\
 		\n\
@@ -5465,7 +5545,9 @@ void main()\n\
 \n\
 		// logarithmic zBuffer:\n\
 		// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
-		gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;\n\
+		// gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;\n\
+		// flogz = 1.0 + gl_Position.w;\n\
+		//---------------------------------------------------------------------------------\n\
 \n\
 		flogz = 1.0 + gl_Position.w;\n\
 		Fcoef_half = 0.5 * uFCoef_logDepth;\n\

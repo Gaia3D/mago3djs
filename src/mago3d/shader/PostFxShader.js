@@ -526,6 +526,15 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 		uniformDataPair.uniformLocation = uniformLocation;
 		uniformDataPair.intValue = 4;
 	}
+
+	// 16.3 ssaoFromDepthTex.
+	uniformLocation = gl.getUniformLocation(shader.program, "ssaoFromDepthTex");
+	if (uniformLocation !== null && uniformLocation !== undefined)
+	{
+		uniformDataPair = shader.newUniformDataPair("1i", "ssaoFromDepthTex");
+		uniformDataPair.uniformLocation = uniformLocation;
+		uniformDataPair.intValue = 5;
+	}
 	
 	// 17. specularColor.
 	uniformLocation = gl.getUniformLocation(shader.program, "specularColor");
