@@ -1658,7 +1658,7 @@ void main()\n\
 	//normal2 = normalFromDepth;\n\
 	if(bApplySsao)\n\
 	{   \n\
-		    \n\
+		 \n\
 		vec3 origin = ray * linearDepth;  \n\
 		float tolerance = radius/far; // original.***\n\
 \n\
@@ -1698,26 +1698,37 @@ void main()\n\
 \n\
 		//occlusion = 1.0 - occlusion / float(kernelSize);	\n\
 		float smallOccl = occlusion / float(kernelSize);\n\
-		smallOccl *= 0.7;\n\
+		smallOccl *= 0.4;\n\
 		\n\
 		// test.***\n\
 		//ssaoFromDepthTex\n\
 		float pixelSize_x = 1.0/screenWidth;\n\
 		float pixelSize_y = 1.0/screenHeight;\n\
-		float occl_aux = (0.0);\n\
+		float occl_aux = 0.0;\n\
+		float small_occl_aux = 0.0;\n\
+		float small_occl_A = 0.0;\n\
 		for(int i=0; i<4; i++)\n\
 		{\n\
 			for(int j=0; j<4; j++)\n\
 			{\n\
 				vec2 texCoord = vec2(screenPos.x + pixelSize_x*float(i-2), screenPos.y + pixelSize_y*float(j-2));\n\
-				occl_aux += texture2D(ssaoFromDepthTex, texCoord).w;\n\
+				vec4 color = texture2D(ssaoFromDepthTex, texCoord);\n\
+				occl_aux += color.w;\n\
+				small_occl_aux += color.z;\n\
+				small_occl_A += color.y;\n\
 			}\n\
 		}\n\
 		occl_aux /= 16.0;\n\
-		occl_aux *= 0.9;\n\
+		occl_aux *= 0.5;\n\
+\n\
+		small_occl_aux /= 16.0;\n\
+		small_occl_aux *= 0.5;\n\
+\n\
+		small_occl_A /= 16.0;\n\
+		small_occl_A *= 0.5;\n\
 		//vec4 occlusionFromDepth = texture2D(ssaoFromDepthTex, screenPos);\n\
-		//occlusion = occl_aux + (1.0 - smallOccl);\n\
-		occlusion = 1.0 - occl_aux - smallOccl;\n\
+		occlusion = 1.0 - occl_aux - smallOccl - small_occl_aux - small_occl_A; // original.***\n\
+		//occlusion = 1.0 - occl_aux - small_occl_aux;\n\
 \n\
 		if(occlusion < 0.1)\n\
 		occlusion = 0.1;\n\
@@ -3480,6 +3491,7 @@ void main()\n\
     float ambientLight = 1.0; // initially all bright.\n\
     float occlusion = 0.0;\n\
     float smallOcclusion = 0.0;\n\
+    float occlusion_A = 0.0;\n\
     vec3 normal = vec3(0.0);\n\
     vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
     vec3 ray = getViewRay(screenPos); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
@@ -3490,7 +3502,9 @@ void main()\n\
     //if(linearDepthTest > 0.99)\n\
     //discard;\n\
 \n\
-    float bigRadius = 10.0;\n\
+    float bigRadius = 12.0;\n\
+    float smallRadius = 6.0;\n\
+    float radius_A = 2.0;\n\
     float factorByDist = 1.0;\n\
     float realDist = linearDepth * far;\n\
 \n\
@@ -3499,8 +3513,8 @@ void main()\n\
         factorByDist = smoothstep(0.0, 1.0, realDist/(bigRadius*5.0));\n\
     }\n\
 \n\
-    if(factorByDist < 0.05)\n\
-        discard;\n\
+    //if(factorByDist < 0.05)\n\
+    //    discard;\n\
 \n\
     if(bApplySsao)\n\
 	{        \n\
@@ -3514,8 +3528,9 @@ void main()\n\
 		mat3 tbn = mat3(tangent, bitangent, normal2);   \n\
 \n\
 		for(int i = 0; i < kernelSize; ++i)\n\
-		{    	 \n\
-			vec3 sample = origin + (tbn * vec3(kernel[i].x*1.0, kernel[i].y*1.0, kernel[i].z)) * bigRadius;\n\
+		{    	\n\
+            vec3 rotatedKernel = tbn * vec3(kernel[i].x*1.0, kernel[i].y*1.0, kernel[i].z);\n\
+			vec3 sample = origin + rotatedKernel * bigRadius;\n\
 			vec4 offset = projectionMatrix * vec4(sample, 1.0);	\n\
             vec3 offsetCoord = vec3(offset.xyz);				\n\
 			offsetCoord.xyz /= offset.w;\n\
@@ -3533,23 +3548,43 @@ void main()\n\
                 }\n\
             }\n\
 \n\
-            // do very big radius.***\n\
-            /*\n\
-            offsetCoord = vec2(offset.xy*3.0);				\n\
-			offsetCoord.xy /= offset.w;\n\
-			offsetCoord.xy = offsetCoord.xy * 0.5 + 0.5;  		\n\
-            depthBufferValue = getDepth(offset.xy*3.0);\n\
+            // small occl.***\n\
+            sample = origin + rotatedKernel * smallRadius;\n\
+			offset = projectionMatrix * vec4(sample, 1.0);	\n\
+            offsetCoord = vec3(offset.xyz);				\n\
+			offsetCoord.xyz /= offset.w;\n\
+			offsetCoord.xyz = offsetCoord.xyz * 0.5 + 0.5;  				\n\
+			sampleDepth = -sample.z/far;// original.***\n\
 \n\
-            if (depthBufferValue - sampleDepth > bigRadius*3.0)\n\
+			depthBufferValue = getDepth(offsetCoord.xy);\n\
+            depthDiff = abs(depthBufferValue - sampleDepth);\n\
+            if(depthDiff < smallRadius/far)\n\
             {\n\
-                continue;\n\
+                float rangeCheck = smoothstep(0.0, 1.0, smallRadius / (depthDiff*far));\n\
+                if (depthBufferValue < sampleDepth)//-tolerance*1.0)\n\
+                {\n\
+                    smallOcclusion += 1.0 * rangeCheck * factorByDist;\n\
+                }\n\
             }\n\
+            \n\
+            // radius A.***\n\
+            sample = origin + rotatedKernel * radius_A;\n\
+			offset = projectionMatrix * vec4(sample, 1.0);	\n\
+            offsetCoord = vec3(offset.xyz);				\n\
+			offsetCoord.xyz /= offset.w;\n\
+			offsetCoord.xyz = offsetCoord.xyz * 0.5 + 0.5;  				\n\
+			sampleDepth = -sample.z/far;// original.***\n\
 \n\
-			if (depthBufferValue > sampleDepth)//-tolerance*1.0)\n\
-			{\n\
-				smallOcclusion +=  1.0;\n\
-			}\n\
-            */\n\
+			depthBufferValue = getDepth(offsetCoord.xy);\n\
+            depthDiff = abs(depthBufferValue - sampleDepth);\n\
+            if(depthDiff < radius_A/far)\n\
+            {\n\
+                float rangeCheck = smoothstep(0.0, 1.0, radius_A / (depthDiff*far));\n\
+                if (depthBufferValue < sampleDepth)//-tolerance*1.0)\n\
+                {\n\
+                    occlusion_A += 1.0 * rangeCheck * factorByDist;\n\
+                }\n\
+            }\n\
 		} \n\
 \n\
         \n\
@@ -3557,6 +3592,14 @@ void main()\n\
 		occlusion = occlusion / float(kernelSize);	\n\
         if(occlusion < 0.0)\n\
         occlusion = 0.0;\n\
+\n\
+        smallOcclusion = smallOcclusion / float(kernelSize);	\n\
+        if(smallOcclusion < 0.0)\n\
+        smallOcclusion = 0.0;\n\
+\n\
+        occlusion_A = occlusion_A / float(kernelSize);	\n\
+        if(occlusion_A < 0.0)\n\
+        occlusion_A = 0.0;\n\
 	}\n\
 \n\
     // Do lighting.***\n\
@@ -3565,7 +3608,7 @@ void main()\n\
 	//scalarProd += 0.666;\n\
     //gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0 - scalarProd);\n\
 \n\
-	gl_FragColor = vec4(0.0, 0.0, 0.0, occlusion);\n\
+	gl_FragColor = vec4(0.0, occlusion_A, smallOcclusion, occlusion);\n\
     //gl_FragColor = vec4(normal.xyz, 1.0);\n\
 }";
 ShaderSource.StandardFS = "precision lowp float;\n\

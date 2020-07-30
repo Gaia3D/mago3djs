@@ -1341,4 +1341,9 @@ MagoWorld.prototype.keydown = function(event)
 			magoManager.getObjectIndexFileSmartTileF4d(projectFolderName);
 		}
 	}
+	else if (key === 'z')
+	{
+		var bApplySsao = magoManager.sceneState.getApplySsao();
+		magoManager.sceneState.setApplySsao(!bApplySsao);
+	}
 };

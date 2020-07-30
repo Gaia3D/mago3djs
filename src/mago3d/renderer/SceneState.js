@@ -50,6 +50,7 @@ var SceneState = function()
 	this.sunLight = new LightSource(lightType); // OLD.***
 	this.sunSystem = new SunSystem();
 	this.applySunShadows = false;
+	this.bApplySsao = true;
 	
 	// lighting & ssao.
 	this.ambientReflectionCoef = new Float32Array([0.5]); // 0.7.
@@ -300,6 +301,22 @@ SceneState.prototype.getScreenCenterPositionPixels = function(resultScreenPixelP
 	resultScreenPixelPos.set(Math.floor(screenW/2), Math.floor(screenH/2));
 
 	return resultScreenPixelPos;
+};
+
+/**
+ * Returns the camera.
+ */
+SceneState.prototype.getApplySsao = function() 
+{
+	return this.bApplySsao;
+};
+
+/**
+ * Returns the camera.
+ */
+SceneState.prototype.setApplySsao = function(bApplySsao) 
+{
+	this.bApplySsao = bApplySsao;
 };
 
 /**
