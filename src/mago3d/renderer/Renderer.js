@@ -1135,7 +1135,7 @@ Renderer.prototype.renderSsaoFromDepth = function(gl)
 	//gl.viewport(0, 0, magoManager.sceneState.drawingBufferWidth[0]/2.0, magoManager.sceneState.drawingBufferHeight[0]/2.0);
 	if (magoManager.isCesiumGlobe())
 	{
-		gl.uniform1f(currentShader.frustumFar_loc, 10000.0); // only in cesium.***
+		gl.uniform1f(currentShader.frustumFar_loc, 40000.0); // only in cesium.***
 	}
 
 	var bApplySsao = true;
