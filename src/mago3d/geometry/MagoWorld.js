@@ -205,14 +205,14 @@ MagoWorld.prototype.changeCameraPosition = function(cartesian3, silent)
 MagoWorld.prototype.mousedown = function(event)
 {
 	this.magoManager.sceneState.mouseButton = event.button;
-	MagoWorld.updateMouseStartClick(event.clientX, event.clientY, this.magoManager);
+	MagoWorld.updateMouseStartClick(event.offsetX, event.offsetY, this.magoManager);
 	this.magoManager.isCameraMoving = true;
-	this.magoManager.mouse_x = event.clientX;
-	this.magoManager.mouse_y = event.clientY;
+	this.magoManager.mouse_x = event.offsetX;
+	this.magoManager.mouse_y = event.offsetY;
 	
 	if (this.magoManager.sceneState.mouseButton === 0) 
 	{
-		this.magoManager.mouseActionLeftDown(event.clientX, event.clientY);
+		this.magoManager.mouseActionLeftDown(event.offsetX, event.offsetY);
 	}
 };
 
@@ -253,8 +253,8 @@ MagoWorld.prototype.mouseup = function(event)
 		if (durationTime < 200)
 		{
 			// now, calculate the angle and the rotationAxis.
-			var xMoved = event.clientX - mouseAction.strX;
-			var yMoved = event.clientY - mouseAction.strY;
+			var xMoved = event.offsetX - mouseAction.strX;
+			var yMoved = event.offsetY - mouseAction.strY;
 
 			if (Math.abs(xMoved) < 3 && Math.abs(yMoved) < 3)
 			{
@@ -262,10 +262,10 @@ MagoWorld.prototype.mouseup = function(event)
 				magoManager.bPicking = true;
 				magoManager.managePickingProcess();
 				// Test. process leftClick in magoManager.
-				//this.magoManager.mouseActionLeftClick(event.clientX, event.clientY);				
+				//this.magoManager.mouseActionLeftClick(event.offsetX, event.offsetY);				
 			}
 		}
-		this.magoManager.mouseActionLeftUp(event.clientX, event.clientY);
+		this.magoManager.mouseActionLeftUp(event.offsetX, event.offsetY);
 	}
 	
 	sceneState.mouseButton = -1;
@@ -304,8 +304,8 @@ MagoWorld.prototype.mouseclick = function(event)
 
 	if (event.button === 0)
 	{
-		var mouseX = event.clientX;
-		var mouseY = event.clientY;
+		var mouseX = event.offsetX;
+		var mouseY = event.offsetY;
 		this.magoManager.mouseActionLeftClick(mouseX, mouseY);
 	}
 };
@@ -321,8 +321,8 @@ MagoWorld.prototype.mouseRightClick = function(event)
 	
 	if (event.button === 2)
 	{
-		var mouseX = event.clientX;
-		var mouseY = event.clientY;
+		var mouseX = event.offsetX;
+		var mouseY = event.offsetY;
 		this.magoManager.mouseActionRightClick(mouseX, mouseY);
 		//this.magoManager.managePickingProcess();
 	}
@@ -338,8 +338,8 @@ MagoWorld.prototype.mouseDblClick = function(event)
 	event.stopPropagation();
 	if (event.button === 0)
 	{
-		var mouseX = event.clientX;
-		var mouseY = event.clientY;
+		var mouseX = event.offsetX;
+		var mouseY = event.offsetY;
 		this.magoManager.mouseActionLeftDoubleClick(mouseX, mouseY);
 	}
 };
@@ -378,8 +378,8 @@ MagoWorld.prototype.mousewheel = function(event)
 	var camUp = camera.up;
 	
 	// calculate the direction of the cursor.
-	var nowX = event.clientX;
-	var nowY = event.clientY;
+	var nowX = event.offsetX;
+	var nowY = event.offsetY;
 	var mouseRayWC = ManagerUtils.getRayWorldSpace(undefined, nowX, nowY, undefined, magoManager);
 	var mouseDirWC = mouseRayWC.direction;
 	
@@ -450,8 +450,8 @@ MagoWorld.prototype.moveSelectedObject = function(event)
 MagoWorld.prototype.mousemove = function(event)
 {
 	var magoManager = this.magoManager;
-	var nowX = event.clientX;
-	var nowY = event.clientY;
+	var nowX = event.offsetX;
+	var nowY = event.offsetY;
 	magoManager.mouse_x = nowX;
 	magoManager.mouse_y = nowY;
 	
@@ -665,8 +665,8 @@ MagoWorld.prototype.mousemove = function(event)
 		var xAxis = camera.getCameraRight();
 		
 		// now determine camZRot & camXRot angles.
-		var nowX = event.clientX;
-		var nowY = event.clientY;
+		var nowX = event.offsetX;
+		var nowY = event.offsetY;
 		var increX = nowX - mouseAction.strX;
 		var increY = nowY - mouseAction.strY;
 		
