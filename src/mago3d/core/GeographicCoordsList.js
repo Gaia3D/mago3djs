@@ -24,6 +24,23 @@ var GeographicCoordsList = function(geographicCoordsArray)
 };
 
 /**
+ * cartesian 배열로 부터 GeographicCoordsList객체 생성
+ * @param {Array<object>} cartesians
+ * @return {GeographicCoordsList}
+ * @static
+ */
+GeographicCoordsList.fromCartesians = function(cartesians) 
+{
+	var geographicCoordsArray = [];
+	for (var i=0, len=cartesians.length;i<len;i++) 
+	{
+		geographicCoordsArray.push(GeographicCoord.fromCartesian(cartesians[i]));
+	}
+
+	return new GeographicCoordsList(geographicCoordsArray);
+};
+
+/**
  * push single point
  * @param {GeographicCoord}
  */
@@ -568,44 +585,3 @@ GeographicCoordsList.prototype.getWgs84Points3D = function(resultPoint3DArray)
 	
 	return resultPoint3DArray;
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
