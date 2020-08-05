@@ -69,3 +69,11 @@ AbsPointInteraction.prototype.setActive = function(active)
 		this.emit(this.constructor.EVENT_TYPE.DEACTIVE);
 	}
 };
+
+/**
+ * start interaction
+ */
+AbsPointInteraction.prototype.start = function() 
+{
+	return abstract();
+};
