@@ -127,8 +127,20 @@ SpeechBubble.prototype.getPng = function (imageSize, color, textOption)
 			ctx.fillStyle = fontColor;
 			ctx.strokeStyle = fontBorderColor;
 			ctx.textAlign = "center";
-			ctx.strokeText(textValue, w /2, h /2);
-			ctx.fillText(textValue, w /2, h /2);
+
+			var splitText = textValue.split('\n');
+			var tlen = splitText.length;
+			var denomin = tlen + 1;
+			for (var ti=0;ti<tlen;ti++)
+			{
+				var tVal = splitText[ti];
+				if (tVal.length > 0) 
+				{
+					var ty = (h / denomin) * (ti+1) - (tlen-1) * (h / (denomin * 10));
+					ctx.strokeText(tVal, w /2, ty);
+					ctx.fillText(tVal, w /2, ty);
+				}
+			}
 		}
 
 		ctx.restore();

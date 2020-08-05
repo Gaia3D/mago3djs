@@ -14,7 +14,7 @@ var DrawGeometryInteraction = function(style)
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	Emitter.call(this);
+	Interaction.call(this);
 
 	/**
 	 * geometry style
@@ -31,12 +31,10 @@ var DrawGeometryInteraction = function(style)
 	{
 		this.style = {};
 	}
-	this.manager;
 	this.collection;
-	this.active = false;
 	this.result = [];
 };
-DrawGeometryInteraction.prototype = Object.create(Emitter.prototype);
+DrawGeometryInteraction.prototype = Object.create(Interaction.prototype);
 DrawGeometryInteraction.prototype.constructor = DrawGeometryInteraction;
 
 /**
@@ -88,22 +86,6 @@ DrawGeometryInteraction.prototype.setActive = function(active)
 		this.collection.emit(InteractionCollection.EVENT_TYPE.DEACTIVE);
 		this.emit(this.constructor.EVENT_TYPE.DEACTIVE);
 	}
-};
-/**
- * get active
- * @return {boolean}
- */
-DrawGeometryInteraction.prototype.getActive = function() 
-{
-	return this.active;
-};
-
-/**
- * @private
- */
-DrawGeometryInteraction.prototype.handle = function()
-{
-	return abstract();
 };
 
 /**

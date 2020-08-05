@@ -2260,9 +2260,12 @@ void main()\n\
 	//vec4 projected2 = modelViewMatrixRelToEye * pos4;\n\
 \n\
 	// Now, calculate the pixelSize in the plane of the projected point.\n\
-	float pixelWidthRatio = 2. / (screenWidth * projectionMatrix[0][0]);\n\
+	float pixelWidthRatio = 2. / (screenWidth);// * projectionMatrix[0][0]);\n\
 	// alternative : float pixelWidthRatio = 2. / (screenHeight * projectionMatrix[1][1]);\n\
 	float pixelWidth = projected.w * pixelWidthRatio;\n\
+\n\
+	float pixelHeightRatio = pixelWidthRatio * (screenHeight/screenWidth);\n\
+	float pixelHeight = projected.w * pixelHeightRatio;\n\
 	\n\
 	if(projected.w < 5.0)\n\
 		pixelWidth = 5.0 * pixelWidthRatio;\n\
@@ -2273,11 +2276,11 @@ void main()\n\
 	if(bUseOriginalImageSize)\n\
 	{\n\
 		offsetX = pixelWidth*imageSize.x/2.0;\n\
-		offsetY = pixelWidth*imageSize.y/2.0;\n\
+		offsetY = pixelHeight*imageSize.y/2.0;\n\
 	}\n\
 	else{\n\
 		offsetX = pixelWidth*size2d.x/2.0;\n\
-		offsetY = pixelWidth*size2d.y/2.0;\n\
+		offsetY = pixelHeight*size2d.y/2.0;\n\
 	}\n\
 	\n\
 	// Offset our position along the normal\n\
@@ -2291,11 +2294,11 @@ void main()\n\
 	}\n\
 	else if(orderInt == 2)\n\
 	{\n\
-		offset = vec4(-offsetX*scale2d.x, offsetY*4.0*scale2d.y, 0.0, 1.0);\n\
+		offset = vec4(-offsetX*scale2d.x, offsetY*2.0*scale2d.y, 0.0, 1.0);\n\
 	}\n\
 	else if(orderInt == -2)\n\
 	{\n\
-		offset = vec4(offsetX*scale2d.x, offsetY*4.0*scale2d.y, 0.0, 1.0);\n\
+		offset = vec4(offsetX*scale2d.x, offsetY*2.0*scale2d.y, 0.0, 1.0);\n\
 	}\n\
 \n\
 	gl_Position = projected + offset + vec4(aditionalOffset.x*pixelWidth, aditionalOffset.y*pixelWidth, aditionalOffset.z*pixelWidth, 0.0); \n\
