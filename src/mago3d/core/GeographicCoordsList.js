@@ -145,7 +145,7 @@ GeographicCoordsList.prototype.getCopy = function(resultGeoCoordsListCopy)
  * @param resultPoint3dArray
  * 
  */
-GeographicCoordsList.getPointsRelativeToGeoLocation = function(geoLocIn, geoCoordsArray, resultPoints3dArray) 
+GeographicCoordsList.getPointsRelativeToGeoLocation = function(geoLocIn, geoCoordsArray, resultPoints3dArray, options) 
 {
 	if (resultPoints3dArray === undefined)
 	{ resultPoints3dArray = []; }
@@ -168,6 +168,189 @@ GeographicCoordsList.getPointsRelativeToGeoLocation = function(geoLocIn, geoCoor
 	}
 	
 	return resultPoints3dArray;
+};
+
+/**
+ * Returns renderableObject of the geoCoordsList.
+ */
+GeographicCoordsList.getVBOThickLines = function(magoManager, geoCoordsArray, resultVboKeysContainer, options) 
+{
+	// This function returns thickLines vbo in geoCoords.***
+	if (geoCoordsArray === undefined || geoCoordsArray.length < 2)
+	{ return resultVboKeysContainer; }
+
+	if (resultVboKeysContainer === undefined)
+	{ resultVboKeysContainer = new VBOVertexIdxCacheKeysContainer(); }
+
+	var pointsCount = geoCoordsArray.length;
+
+	// in this case make point4d (x, y, z, w). In "w" save the sign (1 or -1) for the offset in the shader to draw triangles strip.
+	var repeats = 4;
+	var pointDimension = 4;
+	var posByteSize = pointsCount * pointDimension * repeats;
+	var posVboDataArray = new Float32Array(posByteSize);
+	
+	var geoCoord;
+
+	for (var i=0; i<pointsCount; i++)
+	{
+		geoCoord = geoCoordsArray[i];
+		posVboDataArray[i*16] = geoCoord.longitude;
+		posVboDataArray[i*16+1] = geoCoord.latitude;
+		posVboDataArray[i*16+2] = geoCoord.altitude;
+		posVboDataArray[i*16+3] = 1; // order.
+		
+		posVboDataArray[i*16+4] = geoCoord.longitude;
+		posVboDataArray[i*16+5] = geoCoord.latitude;
+		posVboDataArray[i*16+6] = geoCoord.altitude;
+		posVboDataArray[i*16+7] = -1; // order.
+		
+		posVboDataArray[i*16+8] = geoCoord.longitude;
+		posVboDataArray[i*16+9] = geoCoord.latitude;
+		posVboDataArray[i*16+10] = geoCoord.altitude;
+		posVboDataArray[i*16+11] = 2; // order.
+		
+		posVboDataArray[i*16+12] = geoCoord.longitude;
+		posVboDataArray[i*16+13] = geoCoord.latitude;
+		posVboDataArray[i*16+14] = geoCoord.altitude;
+		posVboDataArray[i*16+15] = -2; // order.
+	}
+	
+	// Check if must make color vbo.
+	var strColor4 = new Color(0.6, 0.9, 0.99, 1.0);
+	var endColor4 = new Color(0.6, 0.9, 0.99, 1.0);
+	
+	var colVboDataArray;
+	var makeColorVbo = false;
+	if (options)
+	{
+		if (options.color)
+		{
+			strColor4.setRGBA(options.color.r, options.color.g, options.color.b, options.color.a);
+			endColor4.setRGBA(options.color.r, options.color.g, options.color.b, options.color.a);
+		}
+		
+		if (options.startColor)
+		{
+			strColor4.setRGBA(options.startColor.r, options.startColor.g, options.startColor.b, options.startColor.a);
+			makeColorVbo = true;
+		}
+		
+		if (options.endColor)
+		{
+			endColor4.setRGBA(options.endColor.r, options.endColor.g, options.endColor.b, options.endColor.a);
+			makeColorVbo = true;
+		}
+	}
+	
+	// Make the color vbo if necessary.
+	if (makeColorVbo)
+	{
+		colVboDataArray = new Uint8Array(pointsCount * 4 * repeats);
+		
+		var currColor4 = new Color(0.6, 0.9, 0.99, 1.0);
+		currColor4.copyFrom(strColor4);
+		var w = 1.0; // weight.***
+		var r, g, b, a;
+		for (var i=0; i<pointsCount; i++)
+		{
+			w = 1.0 - (i/(pointsCount-1));
+			currColor4 = Color.mix(strColor4, endColor4, w);
+			
+			colVboDataArray[i*16] = Math.floor(currColor4.r*255);
+			colVboDataArray[i*16+1] = Math.floor(currColor4.g*255);
+			colVboDataArray[i*16+2] = Math.floor(currColor4.b*255);
+			colVboDataArray[i*16+3] = Math.floor(currColor4.a*255);
+			
+			colVboDataArray[i*16+4] = Math.floor(currColor4.r*255);
+			colVboDataArray[i*16+5] = Math.floor(currColor4.g*255);
+			colVboDataArray[i*16+6] = Math.floor(currColor4.b*255);
+			colVboDataArray[i*16+7] = Math.floor(currColor4.a*255);
+			
+			colVboDataArray[i*16+8] = Math.floor(currColor4.r*255);
+			colVboDataArray[i*16+9] = Math.floor(currColor4.g*255);
+			colVboDataArray[i*16+10] = Math.floor(currColor4.b*255);
+			colVboDataArray[i*16+11] = Math.floor(currColor4.a*255);
+			
+			colVboDataArray[i*16+12] = Math.floor(currColor4.r*255);
+			colVboDataArray[i*16+13] = Math.floor(currColor4.g*255);
+			colVboDataArray[i*16+14] = Math.floor(currColor4.b*255);
+			colVboDataArray[i*16+15] = Math.floor(currColor4.a*255);
+		}
+	}
+	var vbo = resultVboKeysContainer.newVBOVertexIdxCacheKey();
+	vbo.setDataArrayPos(posVboDataArray, magoManager.vboMemoryManager, pointDimension);
+	
+	if (colVboDataArray)
+	{
+		vbo.setDataArrayCol(colVboDataArray, magoManager.vboMemoryManager);
+	}
+	
+	return resultVboKeysContainer;
+};
+
+/**
+ * Returns expanded geoCoordsArray of the geoCoordsList.
+ */
+GeographicCoordsList.getRenderableExpandedAndExtrudedObjectOfGeoCoordsArray = function(geoCoordsArray, magoManager, options) 
+{
+	// This function returns a thickLine extruded object, for render in stencil buffer.***
+	if (geoCoordsArray === undefined || geoCoordsArray.length === 0)
+	{ return undefined; }
+	
+	// 1rst, make points3dList relative to the 1rst_geoCoord.
+	var geoCoordsCount = geoCoordsArray.length;
+	var firstGeoCoord = geoCoordsArray[0];
+	var geoLoc = ManagerUtils.calculateGeoLocationData(firstGeoCoord.longitude, firstGeoCoord.latitude, firstGeoCoord.altitude, 0, 0, 0, undefined);
+	
+	// 1rst, make bottom & up geoCoordsArray.***
+	var bottomGeoCoordsArray = [];
+	var topGeoCoordsArray = [];
+	for (var i=0; i<geoCoordsCount; i++)
+	{
+		var originalGeoCoord = geoCoordsArray[i];
+		var bottomGeoCoord = new GeographicCoord(originalGeoCoord.longitude, originalGeoCoord.latitude, 500.0); // altitude -10.0.
+		bottomGeoCoordsArray.push(bottomGeoCoord);
+
+		var topGeoCoord = new GeographicCoord(originalGeoCoord.longitude, originalGeoCoord.latitude, 1000.0); // altitude 1000.0.
+		topGeoCoordsArray.push(topGeoCoord);
+	}
+
+	// Bottom geoCoords.******************************************************************************************
+	var bottomPoints3dLCArray = GeographicCoordsList.getPointsRelativeToGeoLocation(geoLoc, bottomGeoCoordsArray, undefined);
+
+	// Top geoCoords.******************************************************************************************
+	var topPoints3dLCArray = GeographicCoordsList.getPointsRelativeToGeoLocation(geoLoc, topGeoCoordsArray, undefined);
+
+	
+	
+	// Create a vectorMesh.
+	if (options === undefined)
+	{
+		options = {
+			thickness: 2.0
+		};
+	}
+	else
+	{
+		if (options.thickness === undefined)
+		{ options.thickness = 2.0; }
+	}
+
+	var vectorMesh = new VectorExtrudedMesh(options);
+	
+	var optionsThickLine = {
+		colorType: "alphaGradient"
+	};
+	vectorMesh.vboKeysContainer = Point3DList.getVboThickLinesExtruded(magoManager, bottomPoints3dLCArray, topPoints3dLCArray, vectorMesh.vboKeysContainer, options);
+	
+	var renderableObject = new RenderableObject();
+	renderableObject.geoLocDataManager = new GeoLocationDataManager();
+	renderableObject.geoLocDataManager.addGeoLocationData(geoLoc);
+	renderableObject.objectType = MagoRenderable.OBJECT_TYPE.VECTORMESH;
+	renderableObject.objectsArray.push(vectorMesh);
+	
+	return renderableObject;
 };
 
 /**
@@ -340,6 +523,8 @@ GeographicCoordsList.prototype.addAltitude = function(length)
 		geoCoord.altitude += length;
 	}
 };
+
+
 
 /**
  * 

@@ -868,6 +868,8 @@ Renderer.prototype.renderAtmosphere = function(gl, renderType)
 	var magoManager = this.magoManager;
 	if (magoManager.sky === undefined)
 	{ magoManager.sky = new Sky(); }
+	gl.clearColor(0, 0, 0, 1);
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	
 	var currentShader = magoManager.postFxShadersManager.getShader("atmosphere"); 
 	currentShader.useProgram();
@@ -1132,7 +1134,7 @@ Renderer.prototype.renderSsaoFromDepth = function(gl)
 	currentShader.useProgram();
 	currentShader.bindUniformGenerals();
 
-	//gl.viewport(0, 0, magoManager.sceneState.drawingBufferWidth[0]/2.0, magoManager.sceneState.drawingBufferHeight[0]/2.0);
+	//gl.viewport(0, 0, ssaoFromDepthFbo.width, ssaoFromDepthFbo.height);
 	if (magoManager.isCesiumGlobe())
 	{
 		gl.uniform1f(currentShader.frustumFar_loc, 40000.0); // only in cesium.***

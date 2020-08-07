@@ -128,7 +128,6 @@ vec3 normal_from_depth(float depth, vec2 texCoord) {
 
 void main()
 {
-    float ambientLight = 1.0; // initially all bright.
     float occlusion = 0.0;
     float smallOcclusion = 0.0;
     float occlusion_A = 0.0;

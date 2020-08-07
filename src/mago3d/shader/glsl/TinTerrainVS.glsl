@@ -1,19 +1,15 @@
 
 attribute vec3 position;
 attribute vec3 normal;
-attribute vec4 color4;
+//attribute vec4 color4;
 attribute vec2 texCoord;
 attribute float altitude;
 
-uniform mat4 projectionMatrix;  
-uniform mat4 modelViewMatrix;
-uniform mat4 modelViewMatrixInv;
 uniform mat4 modelViewMatrixRelToEye; 
 uniform mat4 ModelViewProjectionMatrixRelToEye;
-uniform mat4 ModelViewProjectionMatrix;
 uniform mat4 normalMatrix4;
 uniform mat4 sunMatrix[2]; 
-uniform mat4 buildingRotMatrix;  
+
 uniform vec3 buildingPosHIGH;
 uniform vec3 buildingPosLOW;
 uniform vec3 sunPosHIGH[2];
@@ -21,12 +17,8 @@ uniform vec3 sunPosLOW[2];
 uniform vec3 sunDirWC;
 uniform vec3 encodedCameraPositionMCHigh;
 uniform vec3 encodedCameraPositionMCLow;
-uniform vec3 aditionalPosition;
-uniform vec4 oneColor4;
-uniform bool bUse1Color;
-uniform bool hasTexture;
+
 uniform bool bIsMakingDepth;
-uniform bool bExistAltitudes;
 uniform float near;
 uniform float far;
 uniform bool bApplyShadow;
@@ -38,9 +30,6 @@ uniform float uFCoef_logDepth;
 varying float applySpecLighting;
 varying vec3 vNormal;
 varying vec2 vTexCoord;   
-varying vec3 uAmbientColor;
-varying vec3 vLightWeighting;
-varying vec4 vcolor4;
 varying vec3 v3Pos;
 varying float depthValue;
 varying float vFogAmount;

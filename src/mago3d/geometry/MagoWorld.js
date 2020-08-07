@@ -1106,6 +1106,36 @@ MagoWorld.prototype.doTest__MagoRectangle = function()
 	this.countAux++;
 };
 
+MagoWorld.prototype.doTest__MagoRectangleGround = function()
+{
+	if (this.countAux === undefined)
+	{ this.countAux = 0; }
+
+	// create a magoRectangle to clamp to terrain.***
+	var position = {
+		minLongitude : 126.31394 + this.countAux*0.06,
+		minLatitude  : 33.22,
+		maxLongitude : 126.34513 + this.countAux*0.06,
+		maxLatitude  : 33.25,
+		altitude     : -200.0
+	};
+
+	var style = {
+		strokeWidth : 2, // no used
+		strokeColor : '#FF0000', // no used
+		fillColor   : '#00FF00',
+		imageUrl    : '/images/materialImages/factoryRoof.jpg', // no used
+		opacity     : 1.0
+	};
+
+	var magoRect = new MagoRectangleGround(position, style);
+
+	var targetDepth = 3;
+	this.magoManager.modeler.addObject(magoRect, targetDepth);
+
+	this.countAux++;
+};
+
 MagoWorld.prototype.doTest__MagoPoint = function()
 {
 	// create a magoRectangle.***
@@ -1132,46 +1162,53 @@ MagoWorld.prototype.doTest__MagoPoint = function()
 MagoWorld.prototype.doTest__MagoPolyline = function()
 {
 	var position = {
-		coordinates: [{
-			longitude : 126.31394,
-			latitude  : 33.18262,
-			altitude  : 200.0
-		},
-		{
-			longitude : 126.34513,
-			latitude  : 33.21500,
-			altitude  : 200.0
-		},
-		{
-			longitude : 126.33,
-			latitude  : 33.18,
-			altitude  : 200.0
-		},
-		{
-			longitude : 126.35,
-			latitude  : 33.18262,
-			altitude  : 200.0
-		},
-		{
-			longitude : 126.38,
-			latitude  : 33.195,
-			altitude  : 200.0
-		}]
+		coordinates: [
+			{
+				longitude : 126.31394,
+				latitude  : 33.16,
+				altitude  : 200.0
+			},
+			{
+				longitude : 126.31394,
+				latitude  : 33.18262,
+				altitude  : 200.0
+			},
+			{
+				longitude : 126.34513,
+				latitude  : 33.21500,
+				altitude  : 200.0
+			},
+			{
+				longitude : 126.33,
+				latitude  : 33.18,
+				altitude  : 200.0
+			},
+			{
+				longitude : 126.35,
+				latitude  : 33.18262,
+				altitude  : 200.0
+			},
+			{
+				longitude : 126.38,
+				latitude  : 33.195,
+				altitude  : 200.0
+			}]
 	};
 
 	var style = {
-		color     : '#ff0000',
-		thickness : 2.0,
-		point     : {
-			size        : 20,
-			strokeColor : '#000000',
-			strokeSize  : 1,
-			color       : '#00FF00',
-			opacity     : 0.7
-		}
+		color     : '#00ffff',
+		thickness : 4.0,
+		//point     : {
+		//	size           : 20,
+		//	strokeColor    : '#000000',
+		//	strokeSize     : 1,
+		//	color          : '#00FF00',
+		//	opacity        : 0.7,
+		//	clampToTerrain : false
+		//}
 	};
 
-	var magoPolyline = new MagoPolyline(position, style);
+	var magoPolyline = new MagoPolylineGround(position, style);
 
 	var targetDepth = 1;
 	this.magoManager.modeler.addObject(magoPolyline, targetDepth);
@@ -1266,8 +1303,9 @@ MagoWorld.prototype.keydown = function(event)
 		//this.doTest__ObjectMarker();
 		//this.doTest__TerrainScanner();
 		//this.doTest__MagoRectangle();
+		this.doTest__MagoRectangleGround();
 		//this.doTest__MagoPoint();
-		this.doTest__MagoPolyline();
+		//this.doTest__MagoPolyline();
 		//this.doTest__GoTo();
 		//this.doTest__CameraOrientation();
 

@@ -318,7 +318,7 @@ MagoRenderable.prototype.renderAsChild = function(magoManager, shader, renderTyp
 	for (var i=0; i<objectsCount; i++)
 	{
 		var object = this.objectsArray[i];
-		if (object instanceof VectorMesh)
+		if (object instanceof VectorMesh || object instanceof VectorExtrudedMesh)
 		{
 			var shaderThickLine;
 			if (renderType === 0)
@@ -329,7 +329,10 @@ MagoRenderable.prototype.renderAsChild = function(magoManager, shader, renderTyp
 			}
 			else if (renderType === 1 || renderType === 2)
 			{
-				shaderThickLine = magoManager.postFxShadersManager.getShader("thickLine");
+				var shaderName = "thickLine";
+				if (object instanceof VectorExtrudedMesh)
+				{ shaderName = "thickLineExtruded"; } // provisional.!!!
+				shaderThickLine = magoManager.postFxShadersManager.getShader(shaderName);
 			}
 			magoManager.postFxShadersManager.useProgram(shaderThickLine);
 			shaderThickLine.bindUniformGenerals();
@@ -358,6 +361,8 @@ MagoRenderable.prototype.renderAsChild = function(magoManager, shader, renderTyp
 			gl.uniform2fv(shaderThickLine.viewport_loc, [drawingBufferWidth[0], drawingBufferHeight[0]]);
 
 			object.renderAsChild(magoManager, shaderThickLine, renderType, glPrimitive, bIsSelected, options, bWireframe);
+
+			gl.enable(gl.CULL_FACE);
 
 			// Return to the currentShader.
 			magoManager.postFxShadersManager.useProgram(shader);

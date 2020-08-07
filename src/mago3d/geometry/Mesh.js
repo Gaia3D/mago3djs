@@ -934,7 +934,7 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive, i
 		if (renderType === 1)
 		{
 			// Normals.
-			if (vboKey.vboBufferNor)
+			if (vboKey.vboBufferNor && shader.normal3_loc >= 0)
 			{
 				if (!vboKey.bindDataNormal(shader, vboMemManager))
 				{ return false; }

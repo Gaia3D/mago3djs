@@ -1419,6 +1419,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	
 	
 	if (frustumVolumenObject.depthFbo === undefined) { frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
+	//if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, new Float32Array([this.sceneState.drawingBufferWidth[0]/2.0]), new Float32Array([this.sceneState.drawingBufferHeight/2.0])); }
 	if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
 	if (this.sceneState.drawingBufferWidth[0] !== frustumVolumenObject.depthFbo.width[0] || this.sceneState.drawingBufferHeight[0] !== frustumVolumenObject.depthFbo.height[0])
 	{
@@ -1428,6 +1429,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 
 		// move this to onResize.***
 		this.ssaoFromDepthFbo.deleteObjects(gl);
+		//this.ssaoFromDepthFbo = new FBO(gl, new Float32Array([this.sceneState.drawingBufferWidth[0]/2.0]), new Float32Array([this.sceneState.drawingBufferHeight/2.0]));
 		this.ssaoFromDepthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
 
 		this.sceneState.camera.frustum.dirty = true;
@@ -4739,6 +4741,10 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
 	shader.bApplyCaustics_loc = gl.getUniformLocation(shader.program, "bApplyCaustics");
 	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
+
+	shader.uTileGeoExtent_loc = gl.getUniformLocation(shader.program, "uTileGeoExtent");
+	shader.uGeoRectangles_loc = gl.getUniformLocation(shader.program, "uGeoRectangles");
+	shader.uGeoRectanglesCount_loc = gl.getUniformLocation(shader.program, "uGeoRectanglesCount");
 	
 	//shader.uSsaoRadius_loc = gl.getUniformLocation(shader.program, "radius");
 	
@@ -4975,6 +4981,28 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.current_loc = 1;
 	shader.next_loc = 2;
 	shader.color4_loc = 3;
+
+	// 13) ThickLine Shader.******************************************************************************
+	var shaderName = "thickLineExtruded";
+	var ssao_vs_source = ShaderSource.thickLineExtrudedVS;
+	var ssao_fs_source = ShaderSource.thickLineFS;
+	ssao_fs_source = ssao_fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
+	shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
+	// ThickLine shader locations.***
+	shader.projectionMatrix_loc = gl.getUniformLocation(shader.program, "projectionMatrix");
+	shader.modelViewMatrix_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
+	shader.viewport_loc = gl.getUniformLocation(shader.program, "viewport");
+	shader.thickness_loc = gl.getUniformLocation(shader.program, "thickness");
+	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
+	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
+	gl.bindAttribLocation(shader.program, 0, "prev");
+	gl.bindAttribLocation(shader.program, 1, "current");
+	gl.bindAttribLocation(shader.program, 2, "next");
+	gl.bindAttribLocation(shader.program, 3, "color4");
+	shader.prev_loc = 0;
+	shader.current_loc = 1;
+	shader.next_loc = 2;
+	shader.color4_loc = 3;
 	
 	// 14) ScreenQuad shader.***********************************************************************************
 	var shaderName = "screenQuad";
@@ -5032,6 +5060,36 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
 	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
 	
+	// 13) ThickLine clampToTerrain shader.******************************************************************************
+	var shaderName = "thickLineClampToTerrain";
+	var ssao_vs_source = ShaderSource.vectorMeshClampToTerrainVS;
+	var ssao_fs_source = ShaderSource.vectorMeshClampToTerrainFS;
+	ssao_fs_source = ssao_fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
+	shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
+	// ThickLine shader locations.***
+	shader.projectionMatrix_loc = gl.getUniformLocation(shader.program, "projectionMatrix");
+	shader.modelViewMatrix_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
+	shader.viewport_loc = gl.getUniformLocation(shader.program, "viewport");
+	shader.thickness_loc = gl.getUniformLocation(shader.program, "thickness");
+	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
+	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
+	gl.bindAttribLocation(shader.program, 0, "prev");
+	gl.bindAttribLocation(shader.program, 1, "current");
+	gl.bindAttribLocation(shader.program, 2, "next");
+	gl.bindAttribLocation(shader.program, 3, "color4");
+	shader.prev_loc = 0;
+	shader.current_loc = 1;
+	shader.next_loc = 2;
+	shader.color4_loc = 3;
+
+	// 1.1) GroundStencilPrimitives.******************************************************************************
+	var shaderName = "groundStencilPrimitives";
+	var showDepth_vs_source = ShaderSource.GroundStencilPrimitivesVS;
+	var showDepth_fs_source = ShaderSource.GroundStencilPrimitivesFS;
+	showDepth_fs_source = showDepth_fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
+	shader = this.postFxShadersManager.createShaderProgram(gl, showDepth_vs_source, showDepth_fs_source, shaderName, this);
+	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
+	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
 };
 
 /**

@@ -39,6 +39,10 @@ uniform int uTileDepth;
 uniform int uSeaOrTerrainType;
 uniform int uRenderType;
 
+uniform vec4 uTileGeoExtent; // (minLon, minLat, maxLon, maxLat).
+uniform vec4 uGeoRectangles[3];
+uniform int uGeoRectanglesCount;
+
 uniform vec4 oneColor4;
 uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.
 
@@ -47,7 +51,7 @@ varying vec3 vLightWeighting;
 
 varying vec3 diffuseColor;
 uniform vec3 specularColor;
-varying float depthValue;
+varying float depthValue; // z buffer depth.
 
 const int kernelSize = 16;  
 uniform float radius;      
@@ -518,6 +522,9 @@ void main()
 			else{
 				texCoord = vec2(vTexCoord.s, vTexCoord.t);
 			}
+
+			// If exist geoRectangles, then, with texCoord can know if this fragment is a renctangle edge.***
+
 			
 			bool firstColorSetted = false;
 			float externalAlpha = 0.0;
@@ -628,6 +635,9 @@ void main()
 		{
 			float minHeight_rainbow = -100.0;
 			float maxHeight_rainbow = 0.0;
+			minHeight_rainbow = uMinMaxAltitudes.x;
+			maxHeight_rainbow = uMinMaxAltitudes.y;
+			
 			float gray = (altitude - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);
 			//float gray = (vAltitude - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);
 			//vec3 rainbowColor = getRainbowColor_byHeight(altitude);

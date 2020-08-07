@@ -1063,6 +1063,169 @@ void main()\n\
     gl_FragColor = finalColor; \n\
 }\n\
 ";
+ShaderSource.GroundStencilPrimitivesFS = "#ifdef GL_ES\n\
+precision highp float;\n\
+#endif\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+uniform vec4 oneColor4;\n\
+\n\
+uniform float near;\n\
+uniform float far;\n\
+\n\
+// clipping planes.***\n\
+uniform bool bApplyClippingPlanes;\n\
+uniform int clippingPlanesCount;\n\
+uniform vec4 clippingPlanes[6];\n\
+uniform bool bUseLogarithmicDepth;\n\
+\n\
+varying float depth;  \n\
+varying vec3 vertexPos;\n\
+varying float flogz;\n\
+varying float Fcoef_half;\n\
+\n\
+vec4 packDepth(const in float depth)\n\
+{\n\
+    const vec4 bit_shift = vec4(16777216.0, 65536.0, 256.0, 1.0); // original.***\n\
+    const vec4 bit_mask  = vec4(0.0, 0.00390625, 0.00390625, 0.00390625);  // original.*** \n\
+	\n\
+    //vec4 res = fract(depth * bit_shift); // Is not precise.\n\
+	vec4 res = mod(depth * bit_shift * vec4(255), vec4(256) ) / vec4(255); // Is better.\n\
+    res -= res.xxyz * bit_mask;\n\
+    return res;  \n\
+}\n\
+\n\
+\n\
+//vec4 PackDepth32( in float depth )\n\
+//{\n\
+//    depth *= (16777216.0 - 1.0) / (16777216.0);\n\
+//    vec4 encode = fract( depth * vec4(1.0, 256.0, 256.0*256.0, 16777216.0) );// 256.0*256.0*256.0 = 16777216.0\n\
+//    return vec4( encode.xyz - encode.yzw / 256.0, encode.w ) + 1.0/512.0;\n\
+//}\n\
+\n\
+bool clipVertexByPlane(in vec4 plane, in vec3 point)\n\
+{\n\
+	float dist = plane.x * point.x + plane.y * point.y + plane.z * point.z + plane.w;\n\
+	\n\
+	if(dist < 0.0)\n\
+	return true;\n\
+	else return false;\n\
+}\n\
+\n\
+void main()\n\
+{     \n\
+	// 1rst, check if there are clipping planes.\n\
+    /*\n\
+	if(bApplyClippingPlanes)\n\
+	{\n\
+		bool discardFrag = true;\n\
+		for(int i=0; i<6; i++)\n\
+		{\n\
+			vec4 plane = clippingPlanes[i];\n\
+			if(!clipVertexByPlane(plane, vertexPos))\n\
+			{\n\
+				discardFrag = false;\n\
+				break;\n\
+			}\n\
+			if(i >= clippingPlanesCount)\n\
+			break;\n\
+		}\n\
+		\n\
+		if(discardFrag)\n\
+		discard;\n\
+	}\n\
+    */\n\
+	//if(!bUseLogarithmicDepth)\n\
+    //	gl_FragData[0] = packDepth(-depth);\n\
+\n\
+gl_FragColor = oneColor4; \n\
+\n\
+	#ifdef USE_LOGARITHMIC_DEPTH\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
+		//gl_FragData[0] = packDepth(gl_FragDepthEXT);\n\
+	}\n\
+	#endif\n\
+\n\
+    \n\
+}";
+ShaderSource.GroundStencilPrimitivesVS = "attribute vec3 position;\n\
+\n\
+uniform mat4 buildingRotMatrix; \n\
+uniform mat4 modelViewMatrix;\n\
+uniform mat4 modelViewMatrixRelToEye; \n\
+uniform mat4 RefTransfMatrix;\n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform vec3 scaleLC;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+uniform float near;\n\
+uniform float far;\n\
+uniform vec3 aditionalPosition;\n\
+uniform vec3 refTranslationVec;\n\
+uniform int refMatrixType; // 0= identity, 1= translate, 2= transform\n\
+uniform bool bUseLogarithmicDepth;\n\
+uniform float uFCoef_logDepth;\n\
+\n\
+varying float flogz;\n\
+varying float Fcoef_half;\n\
+\n\
+varying float depth;\n\
+varying vec3 vertexPos;\n\
+  \n\
+void main()\n\
+{	\n\
+	vec4 scaledPos = vec4(position.x * scaleLC.x, position.y * scaleLC.y, position.z * scaleLC.z, 1.0);\n\
+	vec4 rotatedPos;\n\
+\n\
+	if(refMatrixType == 0)\n\
+	{\n\
+		rotatedPos = buildingRotMatrix * vec4(scaledPos.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
+	}\n\
+	else if(refMatrixType == 1)\n\
+	{\n\
+		rotatedPos = buildingRotMatrix * vec4(scaledPos.xyz + refTranslationVec.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
+	}\n\
+	else if(refMatrixType == 2)\n\
+	{\n\
+		rotatedPos = RefTransfMatrix * vec4(scaledPos.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
+	}\n\
+\n\
+    vec3 objPosHigh = buildingPosHIGH;\n\
+    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
+    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+    \n\
+    //linear depth in camera space (0..far)\n\
+	vec4 orthoPos = modelViewMatrixRelToEye * pos4;\n\
+    depth = orthoPos.z/far; // original.***\n\
+\n\
+\n\
+    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		// logarithmic zBuffer:\n\
+		// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
+		// float Fcoef = 2.0 / log2(far + 1.0);\n\
+		// gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;\n\
+		// flogz = 1.0 + gl_Position.w;\n\
+		//-----------------------------------------------------------------------------------\n\
+		//float C = 0.0001;\n\
+		flogz = 1.0 + gl_Position.w; // use \"z\" instead \"w\" for fast decoding.***\n\
+		Fcoef_half = 0.5 * uFCoef_logDepth;\n\
+	}\n\
+\n\
+	vertexPos = orthoPos.xyz;\n\
+}";
 ShaderSource.ImageViewerRectangleShaderFS = "#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\
@@ -1777,9 +1940,10 @@ void main()\n\
 		}\n\
 		else\n\
 		{\n\
-			vec3 lightPos = vec3(1.0, 1.0, 1.0);\n\
-			L = normalize(lightPos - vertexPos);\n\
-			lambertian = max(dot(normal2, L), 0.0);\n\
+			//vec3 lightPos = vec3(1.0, 1.0, 1.0);\n\
+			//L = normalize(lightPos - vertexPos);\n\
+			//lambertian = max(dot(normal2, L), 0.0);\n\
+			lambertian = 1.0;\n\
 		}\n\
 		\n\
 		specular = 0.0;\n\
@@ -3488,7 +3652,6 @@ vec3 normal_from_depth(float depth, vec2 texCoord) {\n\
 \n\
 void main()\n\
 {\n\
-    float ambientLight = 1.0; // initially all bright.\n\
     float occlusion = 0.0;\n\
     float smallOcclusion = 0.0;\n\
     float occlusion_A = 0.0;\n\
@@ -4125,7 +4288,7 @@ void main()\n\
     /*\n\
     if((v_tex_pos.x < 0.006 || v_tex_pos.x > 0.994) || (v_tex_pos.y < 0.006 || v_tex_pos.y > 0.994))\n\
     {\n\
-        gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);\n\
+        gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n\
         return;\n\
     }\n\
     */\n\
@@ -4306,11 +4469,11 @@ void main()\n\
                 texCoord.y = (texCoordAux.y - minTexCoord.y)/(maxTexCoord.y - minTexCoord.y);\n\
 \n\
                 texCoord.y = 1.0 - texCoord.y;\n\
-                getTextureColor(uActiveTextures[6], texture2D(texture_2, texCoord), texCoord,  victory, externalAlphasArray[6], uExternalTexCoordsArray[6], textureColor);\n\
+                getTextureColor(uActiveTextures[6], texture2D(texture_6, texCoord), texCoord,  victory, externalAlphasArray[6], uExternalTexCoordsArray[6], textureColor);\n\
             }\n\
         }\n\
         else\n\
-            getTextureColor(uActiveTextures[6], texture2D(texture_2, texCoord), texCoord,  victory, externalAlphasArray[6], uExternalTexCoordsArray[6], textureColor);\n\
+            getTextureColor(uActiveTextures[6], texture2D(texture_6, texCoord), texCoord,  victory, externalAlphasArray[6], uExternalTexCoordsArray[6], textureColor);\n\
     }\n\
     if(uActiveTextures[7] > 0)\n\
     {\n\
@@ -4522,6 +4685,646 @@ void main(){\n\
 		vColor = color4; //vec4(color4.r+0.8, color4.g+0.8, color4.b+0.8, color4.a+0.8);\n\
 	else\n\
 		vColor = oneColor4;\n\
+}\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+";
+ShaderSource.thickLineExtrudedVS = "\n\
+attribute vec4 prev;\n\
+attribute vec4 current;\n\
+attribute vec4 next;\n\
+attribute vec4 color4;\n\
+\n\
+uniform float thickness;\n\
+uniform mat4 buildingRotMatrix;\n\
+uniform mat4 projectionMatrix;\n\
+uniform mat4 modelViewMatrix;\n\
+uniform mat4 modelViewMatrixRelToEye; \n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform vec2 viewport;\n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+uniform vec4 oneColor4;\n\
+uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
+uniform float near;\n\
+uniform float far;\n\
+uniform bool bUseLogarithmicDepth;\n\
+uniform float uFCoef_logDepth;\n\
+uniform float uExtrudeHeight;\n\
+\n\
+varying vec4 vColor;\n\
+varying float flogz;\n\
+varying float Fcoef_half;\n\
+\n\
+const float error = 0.001;\n\
+\n\
+// see https://weekly-geekly.github.io/articles/331164/index.html\n\
+// see too https://github.com/ridiculousfish/wavefiz/blob/master/ts/polyline.ts#L306\n\
+\n\
+//                                   Bottom                                      Top\n\
+//       \n\
+//                        (1)                    (2)                  (3)                    (4)\n\
+//                         +-----------------------+                   +-----------------------+ \n\
+//                         |                       |                   |                       |\n\
+//                         |                       |                   |                       |\n\
+//                         *---------------------->*                   *---------------------->*\n\
+//                         |                       |                   |                       |\n\
+//                         |                       |                   |                       |\n\
+//                         +-----------------------+                   +-----------------------+\n\
+//                         (-1)                    (-2)                (-3)                    (-4)\n\
+\n\
+\n\
+vec2 project(vec4 p){\n\
+	return (0.5 * p.xyz / p.w + 0.5).xy * viewport;\n\
+}\n\
+\n\
+bool isEqual(float value, float valueToCompare)\n\
+{\n\
+	if(value + error > valueToCompare && value - error < valueToCompare)\n\
+	return true;\n\
+	\n\
+	return false;\n\
+}\n\
+\n\
+vec4 getPointWC(in vec3 point)\n\
+{\n\
+	vec4 rotatedCurrent = buildingRotMatrix * vec4(point.xyz, 1.0);\n\
+	vec3 objPosHigh = buildingPosHIGH;\n\
+	vec3 objPosLow = buildingPosLOW.xyz + rotatedCurrent.xyz;\n\
+	return vec4(objPosHigh.xyz + objPosLow.xyz, 1.0);\n\
+}\n\
+\n\
+vec4 getPointRelToEye(in vec4 point)\n\
+{\n\
+	vec4 rotatedCurrent = buildingRotMatrix * vec4(point.xyz, 1.0);\n\
+	vec3 objPosHigh = buildingPosHIGH;\n\
+	vec3 objPosLow = buildingPosLOW.xyz + rotatedCurrent.xyz;\n\
+	vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+	vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+	return vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+}\n\
+\n\
+void main()\n\
+{\n\
+	// current, prev & next.***\n\
+	vec4 vCurrent = getPointRelToEye(vec4(current.xyz, 1.0));\n\
+	vec4 vPrev = getPointRelToEye(vec4(prev.xyz, 1.0));\n\
+	vec4 vNext = getPointRelToEye(vec4(next.xyz, 1.0));\n\
+\n\
+    float currW = current.w;\n\
+    float prevW = prev.w;\n\
+    float nextW = next.w;\n\
+\n\
+    vec4 rotatedCurr = buildingRotMatrix * vec4(current.xyz, 1.0);\n\
+    vec4 rotatedPrev = buildingRotMatrix * vec4(prev.xyz, 1.0);\n\
+    vec4 rotatedNext = buildingRotMatrix * vec4(next.xyz, 1.0);\n\
+\n\
+	float sense = 1.0;\n\
+	int orderInt = int(floor(currW + 0.1));\n\
+    int orderIntPrev = int(floor(prevW + 0.1));\n\
+    int orderIntNext = int(floor(nextW + 0.1));\n\
+\n\
+    float absOrderCurr = currW > 0.0? currW : currW*-1.0;\n\
+    float absOrderPrev = prevW > 0.0? prevW : prevW*-1.0;\n\
+    float absOrderNext = nextW > 0.0? nextW : nextW*-1.0;\n\
+\n\
+    float provisionalExtrudeHeght = 500.0; // provisional for debug.\n\
+\n\
+\n\
+\n\
+    // calculate the triangle's normal. To do it, calculate prevDir & currDir.\n\
+    vec3 rotatedUp = normalize(vec3(( rotatedCurr.xyz + buildingPosLOW ) + buildingPosHIGH)); \n\
+    vec3 rotatedPrevDir = normalize(vec3(rotatedCurr.xyz - rotatedPrev.xyz));\n\
+    vec3 rotatedNextDir = normalize(vec3(rotatedNext.xyz - rotatedCurr.xyz));\n\
+\n\
+    // check if any dir is vertical.\n\
+    //float dotPrev = abs(dot(rotatedUp, rotatedPrevDir));\n\
+    //float dotCurr = abs(dot(rotatedUp, rotatedNextDir));\n\
+    vec3 rotatedDir;\n\
+    vec3 rotatedLeft;\n\
+\n\
+    \n\
+    int faceType = 0; // 0= bottom, 1= rear, 2= top, 3= front, 4= left, 5= right.\n\
+    int faceTypeNext = 0;\n\
+\n\
+    if(orderInt == 1)\n\
+    {\n\
+        //rotatedDir\n\
+    }\n\
+    else if(orderInt == -1)\n\
+    {\n\
+\n\
+    }\n\
+    else if(orderInt == 2)\n\
+    {\n\
+        \n\
+    }\n\
+    else if(orderInt == -2)\n\
+    {\n\
+        \n\
+    }\n\
+\n\
+\n\
+\n\
+    vec4 rotatedOffSet;\n\
+\n\
+    \n\
+    //////////////////////////////////////////////////////////////////////////////////////////////////\n\
+	//float aspect = viewport.x / viewport.y;\n\
+	//vec2 aspectVec = vec2(aspect, 1.0);\n\
+	\n\
+	vec4 previousProjected = ModelViewProjectionMatrixRelToEye * vPrev;\n\
+	vec4 currentProjected = ModelViewProjectionMatrixRelToEye * vCurrent;\n\
+	vec4 nextProjected = ModelViewProjectionMatrixRelToEye * vNext;\n\
+	\n\
+	float projectedDepth = currentProjected.w;                \n\
+\n\
+    vec4 rotatedPos = vec4(rotatedCurr.xyz + rotatedOffSet.xyz, 1.0);\n\
+    vec3 objPosHigh = buildingPosHIGH;\n\
+	vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
+	vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+	vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+	vec4 posCC =  vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+    vec4 finalPosProjected = ModelViewProjectionMatrixRelToEye * posCC;\n\
+	gl_Position = finalPosProjected; \n\
+\n\
+\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		// logarithmic zBuffer:\n\
+			// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
+			float Fcoef = 2.0 / log2(far + 1.0);\n\
+			gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;\n\
+\n\
+			flogz = 1.0 + gl_Position.w;\n\
+			Fcoef_half = 0.5 * Fcoef;\n\
+	}\n\
+	\n\
+	if(colorType == 0)\n\
+		vColor = oneColor4;\n\
+	else if(colorType == 1)\n\
+		vColor = color4; //vec4(color4.r+0.8, color4.g+0.8, color4.b+0.8, color4.a+0.8);\n\
+	else\n\
+		vColor = oneColor4;\n\
+\n\
+     // test.***\n\
+    if(orderInt == 1 || orderInt == 11 || orderInt == 21 || orderInt == 31)\n\
+    {\n\
+        vColor = vec4(1.0, 0.0, 0.0, 1.0);\n\
+    }\n\
+    else if(orderInt == -1 || orderInt == -11 || orderInt == -21 || orderInt == -31)\n\
+    {\n\
+        vColor = vec4(0.0, 1.0, 0.0, 1.0);\n\
+    }\n\
+    else if(orderInt == 2 || orderInt == 12 || orderInt == 22 || orderInt == 32)\n\
+    {\n\
+        vColor = vec4(0.0, 1.0, 1.0, 1.0);\n\
+    }\n\
+    else if(orderInt == -2 || orderInt == -12 || orderInt == -22 || orderInt == -32)\n\
+    {\n\
+        vColor = vec4(1.0, 1.0, 0.0, 1.0);\n\
+    }\n\
+\n\
+    //if(isRear )\n\
+    //{\n\
+    //    vColor = vec4(1.0, 0.0, 1.0, 1.0);\n\
+    //}\n\
+}\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+";
+ShaderSource.thickLineExtrudedVS__original = "\n\
+attribute vec4 prev;\n\
+attribute vec4 current;\n\
+attribute vec4 next;\n\
+attribute vec4 color4;\n\
+\n\
+uniform float thickness;\n\
+uniform mat4 buildingRotMatrix;\n\
+uniform mat4 projectionMatrix;\n\
+uniform mat4 modelViewMatrix;\n\
+uniform mat4 modelViewMatrixRelToEye; \n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform vec2 viewport;\n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+uniform vec4 oneColor4;\n\
+uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
+uniform float near;\n\
+uniform float far;\n\
+uniform bool bUseLogarithmicDepth;\n\
+uniform float uFCoef_logDepth;\n\
+uniform float uExtrudeHeight;\n\
+\n\
+varying vec4 vColor;\n\
+varying float flogz;\n\
+varying float Fcoef_half;\n\
+\n\
+const float error = 0.001;\n\
+\n\
+// see https://weekly-geekly.github.io/articles/331164/index.html\n\
+// see too https://github.com/ridiculousfish/wavefiz/blob/master/ts/polyline.ts#L306\n\
+\n\
+//                                   Bottom                                      Top\n\
+//       \n\
+//                        (1)                    (2)                  (3)                    (4)\n\
+//                         +-----------------------+                   +-----------------------+ \n\
+//                         |                       |                   |                       |\n\
+//                         |                       |                   |                       |\n\
+//                         *---------------------->*                   *---------------------->*\n\
+//                         |                       |                   |                       |\n\
+//                         |                       |                   |                       |\n\
+//                         +-----------------------+                   +-----------------------+\n\
+//                         (-1)                    (-2)                (-3)                    (-4)\n\
+\n\
+\n\
+vec2 project(vec4 p){\n\
+	return (0.5 * p.xyz / p.w + 0.5).xy * viewport;\n\
+}\n\
+\n\
+bool isEqual(float value, float valueToCompare)\n\
+{\n\
+	if(value + error > valueToCompare && value - error < valueToCompare)\n\
+	return true;\n\
+	\n\
+	return false;\n\
+}\n\
+\n\
+vec4 getPointWC(in vec3 point)\n\
+{\n\
+	vec4 rotatedCurrent = buildingRotMatrix * vec4(point.xyz, 1.0);\n\
+	vec3 objPosHigh = buildingPosHIGH;\n\
+	vec3 objPosLow = buildingPosLOW.xyz + rotatedCurrent.xyz;\n\
+	return vec4(objPosHigh.xyz + objPosLow.xyz, 1.0);\n\
+}\n\
+\n\
+vec4 getPointRelToEye(in vec4 point)\n\
+{\n\
+	vec4 rotatedCurrent = buildingRotMatrix * vec4(point.xyz, 1.0);\n\
+	vec3 objPosHigh = buildingPosHIGH;\n\
+	vec3 objPosLow = buildingPosLOW.xyz + rotatedCurrent.xyz;\n\
+	vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+	vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+	return vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+}\n\
+\n\
+void main()\n\
+{\n\
+	// current, prev & next.***\n\
+	vec4 vCurrent = getPointRelToEye(vec4(current.xyz, 1.0));\n\
+	vec4 vPrev = getPointRelToEye(vec4(prev.xyz, 1.0));\n\
+	vec4 vNext = getPointRelToEye(vec4(next.xyz, 1.0));\n\
+\n\
+    float currW = current.w;\n\
+    float prevW = prev.w;\n\
+    float nextW = next.w;\n\
+\n\
+    vec4 rotatedCurr = buildingRotMatrix * vec4(current.xyz, 1.0);\n\
+    vec4 rotatedPrev = buildingRotMatrix * vec4(prev.xyz, 1.0);\n\
+    vec4 rotatedNext = buildingRotMatrix * vec4(next.xyz, 1.0);\n\
+\n\
+	float sense = 1.0;\n\
+	int orderInt = int(floor(currW + 0.1));\n\
+    int orderIntPrev = int(floor(prevW + 0.1));\n\
+    int orderIntNext = int(floor(nextW + 0.1));\n\
+\n\
+    float absOrderCurr = currW > 0.0? currW : currW*-1.0;\n\
+    float absOrderPrev = prevW > 0.0? prevW : prevW*-1.0;\n\
+    float absOrderNext = nextW > 0.0? nextW : nextW*-1.0;\n\
+\n\
+    float provisionalExtrudeHeght = 500.0; // provisional for debug.\n\
+\n\
+\n\
+\n\
+    // calculate the triangle's normal. To do it, calculate prevDir & currDir.\n\
+    vec3 rotatedUp = normalize(vec3(( rotatedCurr.xyz + buildingPosLOW ) + buildingPosHIGH)); \n\
+    vec3 rotatedPrevDir = normalize(vec3(rotatedCurr.xyz - rotatedPrev.xyz));\n\
+    vec3 rotatedNextDir = normalize(vec3(rotatedNext.xyz - rotatedCurr.xyz));\n\
+\n\
+    // check if any dir is vertical.\n\
+    //float dotPrev = abs(dot(rotatedUp, rotatedPrevDir));\n\
+    //float dotCurr = abs(dot(rotatedUp, rotatedNextDir));\n\
+    vec3 rotatedDir;\n\
+    vec3 rotatedLeft;\n\
+\n\
+    \n\
+    int faceType = 0; // 0= bottom, 1= rear, 2= top, 3= front, 4= left, 5= right.\n\
+    int faceTypeNext = 0;\n\
+\n\
+    // Check current faceType.************************************************************\n\
+    if(absOrderCurr > 10.0 && absOrderCurr < 20.0)\n\
+    {\n\
+        faceType = 1; // rear.\n\
+\n\
+        // so, add height to nextPoint.\n\
+        rotatedCurr += vec4(rotatedUp * provisionalExtrudeHeght, 0.0);\n\
+    }\n\
+    else if(absOrderCurr > 20.0 && absOrderCurr < 30.0)\n\
+    {\n\
+        faceType = 2; // top.\n\
+\n\
+        // so, add height to nextPoint.\n\
+        rotatedCurr += vec4(rotatedUp * provisionalExtrudeHeght, 0.0);\n\
+    }\n\
+    else if(absOrderCurr > 30.0 && absOrderCurr < 40.0)\n\
+    {\n\
+        faceType = 3; // front.\n\
+\n\
+        // so, add height to nextPoint.\n\
+        //rotatedCurr += vec4(rotatedUp * provisionalExtrudeHeght, 0.0);\n\
+    }\n\
+    else if(absOrderCurr > 40.0 && absOrderCurr < 50.0)\n\
+    {\n\
+        faceType = 4; // left.\n\
+\n\
+        // in this case, must check the orderType to decide add height value into upDirection.\n\
+        if(orderInt == 41)\n\
+        {\n\
+            // is bottom point.\n\
+        }\n\
+        else if(orderInt == -41)\n\
+        {\n\
+            // is top point.\n\
+\n\
+        }\n\
+    }\n\
+\n\
+    // Check next faceType.***************************************************************\n\
+    if(absOrderNext > 10.0 && absOrderNext < 20.0)\n\
+    {\n\
+        faceTypeNext = 1;// rear.\n\
+\n\
+        // so, add height to nextPoint.\n\
+        rotatedNext += vec4(rotatedUp * provisionalExtrudeHeght, 0.0);\n\
+        rotatedNextDir = normalize(vec3(rotatedNext.xyz - rotatedCurr.xyz));\n\
+    }\n\
+    else if(absOrderNext > 20.0 && absOrderNext < 30.0)\n\
+    {\n\
+        faceTypeNext = 2;// top.\n\
+\n\
+        // so, add height to nextPoint.\n\
+        rotatedNext += vec4(rotatedUp * provisionalExtrudeHeght, 0.0);\n\
+        rotatedNextDir = normalize(vec3(rotatedNext.xyz - rotatedCurr.xyz));\n\
+    }\n\
+    else if(absOrderNext > 30.0 && absOrderNext < 40.0)\n\
+    {\n\
+        faceTypeNext = 3;// front.\n\
+\n\
+        // so, add height to nextPoint.\n\
+        //rotatedNext += vec4(rotatedUp * provisionalExtrudeHeght, 0.0);\n\
+        //rotatedNextDir = normalize(vec3(rotatedNext.xyz - rotatedCurr.xyz));\n\
+    }\n\
+    else if(absOrderNext > 40.0 && absOrderNext < 50.0)\n\
+    {\n\
+        faceTypeNext = 4;// left.\n\
+\n\
+        // so, add height to nextPoint.\n\
+        //rotatedNext += vec4(rotatedUp * provisionalExtrudeHeght, 0.0);\n\
+        //rotatedNextDir = normalize(vec3(rotatedNext.xyz - rotatedCurr.xyz));\n\
+    }\n\
+\n\
+    vec4 rotatedOffSet;\n\
+\n\
+    if(faceType == 0)\n\
+    {\n\
+        // bottom.\n\
+        if(orderInt == 1 || orderInt == -1)\n\
+        {\n\
+            rotatedDir = normalize(vec3(rotatedCurr.xyz - rotatedPrev.xyz));\n\
+            rotatedLeft = normalize(cross(rotatedUp, rotatedDir));\n\
+        }\n\
+        else // currOrderInt = 2 || currOrderInt = -2\n\
+        {\n\
+            // check if nextPoint is vertical.\n\
+            if(faceTypeNext == 1)\n\
+            {\n\
+                // next face is rear, so is vertical.\n\
+                //rotatedDir = normalize(vec3(rotatedNext.xyz - rotatedCurr.xyz));\n\
+                rotatedDir = normalize(vec3(rotatedNext.xyz - rotatedPrev.xyz)); // in this case use prevDir.\n\
+                rotatedLeft = normalize(cross(rotatedUp, rotatedDir));\n\
+            }\n\
+            else\n\
+            {\n\
+                rotatedDir = normalize(vec3(rotatedNext.xyz - rotatedCurr.xyz));\n\
+                rotatedLeft = normalize(cross(rotatedUp, rotatedDir));\n\
+            }\n\
+        }\n\
+\n\
+        if(orderInt > 0)\n\
+        {\n\
+            // do left.\n\
+            rotatedOffSet = vec4(-rotatedLeft * thickness * 50.0, 1.0);\n\
+        }\n\
+        else\n\
+        {\n\
+            // do right.\n\
+            rotatedOffSet = vec4(rotatedLeft * thickness * 50.0, 1.0);\n\
+        }\n\
+        \n\
+    }\n\
+    else if(faceType == 1)\n\
+    {\n\
+        // rear.\n\
+        if(orderInt == 11 || orderInt == -11)\n\
+        {\n\
+            rotatedDir = rotatedNextDir;\n\
+            rotatedLeft = normalize(cross(rotatedUp, rotatedDir));\n\
+        }\n\
+        else // orderInt == 12 || -12\n\
+        {\n\
+            rotatedDir = rotatedNextDir;\n\
+            rotatedLeft = normalize(cross(rotatedUp, rotatedDir));\n\
+        }\n\
+\n\
+        if(orderInt > 0)\n\
+        {\n\
+            // do left.\n\
+            rotatedOffSet = vec4(rotatedLeft * thickness * 50.0, 1.0);\n\
+        }\n\
+        else\n\
+        {\n\
+            // do right.\n\
+            rotatedOffSet = vec4(-rotatedLeft * thickness * 50.0, 1.0);\n\
+        }\n\
+    }\n\
+    else if(faceType == 2)\n\
+    {\n\
+        // top.\n\
+        if(orderInt == 21 || orderInt == -21)\n\
+        {\n\
+            rotatedDir = rotatedPrevDir;\n\
+            rotatedLeft = normalize(cross(rotatedUp, rotatedDir));\n\
+        }\n\
+        else // orderInt == 22 || -22\n\
+        {\n\
+            // check if nextPoint is vertical.\n\
+            if(faceTypeNext == 3) // front.\n\
+            {\n\
+                // next face is front, so is vertical.\n\
+                rotatedDir = normalize(vec3(rotatedCurr.xyz - rotatedPrev.xyz)); // in this case use prevDir.\n\
+                rotatedLeft = normalize(cross(rotatedUp, rotatedDir));\n\
+            }\n\
+            else\n\
+            {\n\
+                rotatedDir = normalize(vec3(rotatedNext.xyz - rotatedCurr.xyz));\n\
+                rotatedLeft = normalize(cross(rotatedUp, rotatedDir));\n\
+            }\n\
+            //rotatedDir = rotatedNextDir;\n\
+            //rotatedLeft = normalize(cross(rotatedUp, rotatedDir));\n\
+        }\n\
+\n\
+        if(orderInt > 0)\n\
+        {\n\
+            // do left.\n\
+            rotatedOffSet = vec4(rotatedLeft * thickness * 50.0, 1.0);\n\
+        }\n\
+        else\n\
+        {\n\
+            // do right.\n\
+            rotatedOffSet = vec4(-rotatedLeft * thickness * 50.0, 1.0);\n\
+        }\n\
+    }\n\
+    else if(faceType == 3)\n\
+    {\n\
+        // front.\n\
+        if(orderInt == 31 || orderInt == -31)\n\
+        {\n\
+            rotatedDir = rotatedNextDir;\n\
+            rotatedDir = normalize(vec3(rotatedCurr.xyz - rotatedPrev.xyz));\n\
+            //rotatedLeft = normalize(cross(rotatedUp, rotatedDir));\n\
+            rotatedLeft = normalize(cross(rotatedUp, rotatedNextDir));\n\
+        }\n\
+        else // orderInt == 32 || -32\n\
+        {\n\
+            rotatedDir = rotatedNextDir;\n\
+            rotatedLeft = normalize(cross(rotatedUp, rotatedDir));\n\
+        }\n\
+\n\
+        if(orderInt > 0)\n\
+        {\n\
+            // do left.\n\
+            rotatedOffSet = vec4(rotatedLeft * thickness * 50.0, 1.0);\n\
+        }\n\
+        else\n\
+        {\n\
+            // do right.\n\
+            rotatedOffSet = vec4(-rotatedLeft * thickness * 50.0, 1.0);\n\
+        }\n\
+    }\n\
+    else if(faceType == 4)\n\
+    {\n\
+        // left.\n\
+        if(orderInt == 41 || orderInt == -41)\n\
+        {\n\
+            rotatedDir = rotatedPrevDir;\n\
+            //rotatedDir = rotatedNextDir;\n\
+            rotatedLeft = normalize(cross(rotatedUp, rotatedNextDir));\n\
+            rotatedOffSet = vec4(-rotatedLeft * thickness * 50.0, 1.0);\n\
+        }\n\
+        else \n\
+        {\n\
+            //rotatedDir = rotatedPrevDir;\n\
+            rotatedDir = rotatedNextDir;\n\
+            rotatedLeft = normalize(cross(rotatedUp, rotatedDir));\n\
+            rotatedOffSet = vec4(-rotatedLeft * thickness * 50.0, 1.0);\n\
+        }\n\
+\n\
+        \n\
+\n\
+        if(orderInt < 0)\n\
+        {\n\
+            // add height.\n\
+            rotatedOffSet += vec4(rotatedUp * provisionalExtrudeHeght, 0.0);\n\
+            //rotatedOffSet += vec4(rotatedLeft * thickness * 50.0, 1.0);\n\
+        }\n\
+\n\
+    }\n\
+\n\
+    \n\
+    //////////////////////////////////////////////////////////////////////////////////////////////////\n\
+	//float aspect = viewport.x / viewport.y;\n\
+	//vec2 aspectVec = vec2(aspect, 1.0);\n\
+	\n\
+	vec4 previousProjected = ModelViewProjectionMatrixRelToEye * vPrev;\n\
+	vec4 currentProjected = ModelViewProjectionMatrixRelToEye * vCurrent;\n\
+	vec4 nextProjected = ModelViewProjectionMatrixRelToEye * vNext;\n\
+	\n\
+	float projectedDepth = currentProjected.w;                \n\
+\n\
+    vec4 rotatedPos = vec4(rotatedCurr.xyz + rotatedOffSet.xyz, 1.0);\n\
+    vec3 objPosHigh = buildingPosHIGH;\n\
+	vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
+	vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+	vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+	vec4 posCC =  vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+    vec4 finalPosProjected = ModelViewProjectionMatrixRelToEye * posCC;\n\
+	gl_Position = finalPosProjected; \n\
+\n\
+\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		// logarithmic zBuffer:\n\
+			// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
+			float Fcoef = 2.0 / log2(far + 1.0);\n\
+			gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;\n\
+\n\
+			flogz = 1.0 + gl_Position.w;\n\
+			Fcoef_half = 0.5 * Fcoef;\n\
+	}\n\
+	\n\
+	if(colorType == 0)\n\
+		vColor = oneColor4;\n\
+	else if(colorType == 1)\n\
+		vColor = color4; //vec4(color4.r+0.8, color4.g+0.8, color4.b+0.8, color4.a+0.8);\n\
+	else\n\
+		vColor = oneColor4;\n\
+\n\
+     // test.***\n\
+    if(orderInt == 1 || orderInt == 11 || orderInt == 21 || orderInt == 31)\n\
+    {\n\
+        vColor = vec4(1.0, 0.0, 0.0, 1.0);\n\
+    }\n\
+    else if(orderInt == -1 || orderInt == -11 || orderInt == -21 || orderInt == -31)\n\
+    {\n\
+        vColor = vec4(0.0, 1.0, 0.0, 1.0);\n\
+    }\n\
+    else if(orderInt == 2 || orderInt == 12 || orderInt == 22 || orderInt == 32)\n\
+    {\n\
+        vColor = vec4(0.0, 1.0, 1.0, 1.0);\n\
+    }\n\
+    else if(orderInt == -2 || orderInt == -12 || orderInt == -22 || orderInt == -32)\n\
+    {\n\
+        vColor = vec4(1.0, 1.0, 0.0, 1.0);\n\
+    }\n\
+\n\
+    //if(isRear )\n\
+    //{\n\
+    //    vColor = vec4(1.0, 0.0, 1.0, 1.0);\n\
+    //}\n\
 }\n\
 \n\
 \n\
@@ -4788,6 +5591,10 @@ uniform int uTileDepth;\n\
 uniform int uSeaOrTerrainType;\n\
 uniform int uRenderType;\n\
 \n\
+uniform vec4 uTileGeoExtent; // (minLon, minLat, maxLon, maxLat).\n\
+uniform vec4 uGeoRectangles[3];\n\
+uniform int uGeoRectanglesCount;\n\
+\n\
 uniform vec4 oneColor4;\n\
 uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
 \n\
@@ -4796,7 +5603,7 @@ varying vec3 vLightWeighting;\n\
 \n\
 varying vec3 diffuseColor;\n\
 uniform vec3 specularColor;\n\
-varying float depthValue;\n\
+varying float depthValue; // z buffer depth.\n\
 \n\
 const int kernelSize = 16;  \n\
 uniform float radius;      \n\
@@ -5267,6 +6074,9 @@ void main()\n\
 			else{\n\
 				texCoord = vec2(vTexCoord.s, vTexCoord.t);\n\
 			}\n\
+\n\
+			// If exist geoRectangles, then, with texCoord can know if this fragment is a renctangle edge.***\n\
+\n\
 			\n\
 			bool firstColorSetted = false;\n\
 			float externalAlpha = 0.0;\n\
@@ -5377,6 +6187,9 @@ void main()\n\
 		{\n\
 			float minHeight_rainbow = -100.0;\n\
 			float maxHeight_rainbow = 0.0;\n\
+			minHeight_rainbow = uMinMaxAltitudes.x;\n\
+			maxHeight_rainbow = uMinMaxAltitudes.y;\n\
+			\n\
 			float gray = (altitude - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);\n\
 			//float gray = (vAltitude - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);\n\
 			//vec3 rainbowColor = getRainbowColor_byHeight(altitude);\n\
@@ -5458,19 +6271,15 @@ void main()\n\
 ShaderSource.TinTerrainVS = "\n\
 attribute vec3 position;\n\
 attribute vec3 normal;\n\
-attribute vec4 color4;\n\
+//attribute vec4 color4;\n\
 attribute vec2 texCoord;\n\
 attribute float altitude;\n\
 \n\
-uniform mat4 projectionMatrix;  \n\
-uniform mat4 modelViewMatrix;\n\
-uniform mat4 modelViewMatrixInv;\n\
 uniform mat4 modelViewMatrixRelToEye; \n\
 uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-uniform mat4 ModelViewProjectionMatrix;\n\
 uniform mat4 normalMatrix4;\n\
 uniform mat4 sunMatrix[2]; \n\
-uniform mat4 buildingRotMatrix;  \n\
+\n\
 uniform vec3 buildingPosHIGH;\n\
 uniform vec3 buildingPosLOW;\n\
 uniform vec3 sunPosHIGH[2];\n\
@@ -5478,12 +6287,8 @@ uniform vec3 sunPosLOW[2];\n\
 uniform vec3 sunDirWC;\n\
 uniform vec3 encodedCameraPositionMCHigh;\n\
 uniform vec3 encodedCameraPositionMCLow;\n\
-uniform vec3 aditionalPosition;\n\
-uniform vec4 oneColor4;\n\
-uniform bool bUse1Color;\n\
-uniform bool hasTexture;\n\
+\n\
 uniform bool bIsMakingDepth;\n\
-uniform bool bExistAltitudes;\n\
 uniform float near;\n\
 uniform float far;\n\
 uniform bool bApplyShadow;\n\
@@ -5495,9 +6300,6 @@ uniform float uFCoef_logDepth;\n\
 varying float applySpecLighting;\n\
 varying vec3 vNormal;\n\
 varying vec2 vTexCoord;   \n\
-varying vec3 uAmbientColor;\n\
-varying vec3 vLightWeighting;\n\
-varying vec4 vcolor4;\n\
 varying vec3 v3Pos;\n\
 varying float depthValue;\n\
 varying float vFogAmount;\n\
@@ -5753,6 +6555,162 @@ void main() {\n\
         fract(pos * 255.0),\n\
         floor(pos * 255.0) / 255.0);\n\
 }";
+ShaderSource.vectorMeshClampToTerrainFS = "precision highp float;\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+uniform bool bUseLogarithmicDepth;\n\
+varying vec4 vColor;\n\
+varying float flogz;\n\
+varying float Fcoef_half;\n\
+\n\
+void main() {\n\
+	gl_FragColor = vColor;\n\
+	#ifdef USE_LOGARITHMIC_DEPTH\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
+	}\n\
+	#endif\n\
+}";
+ShaderSource.vectorMeshClampToTerrainVS = "\n\
+attribute vec4 prev;\n\
+attribute vec4 current;\n\
+attribute vec4 next;\n\
+attribute vec4 color4;\n\
+\n\
+uniform float thickness;\n\
+uniform mat4 buildingRotMatrix;\n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform vec2 viewport;\n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+uniform vec4 oneColor4;\n\
+uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
+uniform float far;\n\
+uniform bool bUseLogarithmicDepth;\n\
+uniform float uFCoef_logDepth; // no use.\n\
+\n\
+varying vec4 vColor;\n\
+varying float flogz;\n\
+varying float Fcoef_half;\n\
+\n\
+const float error = 0.001;\n\
+\n\
+// see https://weekly-geekly.github.io/articles/331164/index.html\n\
+// see too https://github.com/ridiculousfish/wavefiz/blob/master/ts/polyline.ts#L306\n\
+\n\
+\n\
+vec4 getPointRelToEye(in vec4 point)\n\
+{\n\
+	vec4 rotatedCurrent = buildingRotMatrix * vec4(point.xyz, 1.0);\n\
+	vec3 objPosHigh = buildingPosHIGH;\n\
+	vec3 objPosLow = buildingPosLOW.xyz + rotatedCurrent.xyz;\n\
+	vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+	vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+	return vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+}\n\
+\n\
+void main(){\n\
+	// current, prev & next.***\n\
+	vec4 vCurrent = getPointRelToEye(vec4(current.xyz, 1.0));\n\
+	vec4 vPrev = getPointRelToEye(vec4(prev.xyz, 1.0));\n\
+	vec4 vNext = getPointRelToEye(vec4(next.xyz, 1.0));\n\
+	\n\
+	float order_w = current.w;\n\
+	//float order_w = float(order);\n\
+	float sense = 1.0;\n\
+	int orderInt = 0;\n\
+	if(order_w > 0.0)\n\
+	{\n\
+		sense = -1.0;\n\
+		if(order_w < 1.5)\n\
+		{\n\
+			orderInt = 1;\n\
+		}\n\
+		else{\n\
+			orderInt = 2;\n\
+		}\n\
+	}\n\
+	else\n\
+	{\n\
+		sense = 1.0;\n\
+		if(order_w > -1.5)\n\
+		{\n\
+			orderInt = -1;\n\
+		}\n\
+		else{\n\
+			orderInt = -2;\n\
+		}\n\
+	}\n\
+	\n\
+	float aspect = viewport.x / viewport.y;\n\
+	vec2 aspectVec = vec2(aspect, 1.0);\n\
+	\n\
+	vec4 previousProjected = ModelViewProjectionMatrixRelToEye * vPrev;\n\
+	vec4 currentProjected = ModelViewProjectionMatrixRelToEye * vCurrent;\n\
+	vec4 nextProjected = ModelViewProjectionMatrixRelToEye * vNext;\n\
+	\n\
+	float projectedDepth = currentProjected.w;                \n\
+	// Get 2D screen space with W divide and aspect correction\n\
+	vec2 currentScreen = currentProjected.xy / currentProjected.w * aspectVec;\n\
+	vec2 previousScreen = previousProjected.xy / previousProjected.w * aspectVec;\n\
+	vec2 nextScreen = nextProjected.xy / nextProjected.w * aspectVec;\n\
+					\n\
+	// This helps us handle 90 degree turns correctly\n\
+	vec2 tangentNext = normalize(nextScreen - currentScreen);\n\
+	vec2 tangentPrev = normalize(currentScreen - previousScreen);\n\
+	vec2 normal; \n\
+	if(orderInt == 1 || orderInt == -1)\n\
+	{\n\
+		normal = vec2(-tangentPrev.y, tangentPrev.x);\n\
+	}\n\
+	else{\n\
+		normal = vec2(-tangentNext.y, tangentNext.x);\n\
+	}\n\
+	normal *= thickness/2.0;\n\
+	normal.x /= aspect;\n\
+	float direction = (thickness*sense*projectedDepth)/1000.0;\n\
+	// Offset our position along the normal\n\
+	vec4 offset = vec4(normal * direction, 0.0, 1.0);\n\
+	gl_Position = currentProjected + offset; \n\
+\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		// logarithmic zBuffer:\n\
+			// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
+			float Fcoef = 2.0 / log2(far + 1.0);\n\
+			//gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;\n\
+\n\
+			flogz = 1.0 + gl_Position.w;\n\
+			Fcoef_half = 0.5 * Fcoef;\n\
+	}\n\
+	\n\
+	if(colorType == 0)\n\
+		vColor = oneColor4;\n\
+	else if(colorType == 1)\n\
+		vColor = color4; //vec4(color4.r+0.8, color4.g+0.8, color4.b+0.8, color4.a+0.8);\n\
+	else\n\
+		vColor = oneColor4;\n\
+}\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+";
 ShaderSource.vol_fs = "#ifdef GL_ES\n\
 precision highp float;\n\
 #endif\n\

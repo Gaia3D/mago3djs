@@ -338,6 +338,298 @@ Point3DList.getVbo = function(magoManager, point3dArray, resultVboKeysContainer)
  * Make the vbo of this point3DList
  * @param magoManager
  */
+Point3DList.getVboThickLinesExtruded = function(magoManager, bottomPoint3dArray, topPoint3dArray, resultVboKeysContainer, options)
+{
+	// this function returns a vbo for draw thickLines using stencil buffer.***
+	if (bottomPoint3dArray === undefined || bottomPoint3dArray.length < 2)
+	{ return resultVboKeysContainer; }
+
+	if (resultVboKeysContainer === undefined)
+	{ resultVboKeysContainer = new VBOVertexIdxCacheKeysContainer(); }
+
+	var bottomPointsCount = bottomPoint3dArray.length;
+	var topPointsCount = topPoint3dArray.length;
+	var lateralRightPointsCount = bottomPointsCount;
+
+	// in this case make point4d (x, y, z, w). In "w" save the sign (1 or -1) for the offset in the shader to draw triangles strip.
+	var repeats = 2;
+	var pointDimension = 4;
+	var posByteSize = (bottomPointsCount + 1 + (bottomPointsCount-1) + 1 + bottomPointsCount) * pointDimension * repeats; // pointsCount x 2, bcos we join bottomPoints & topPoints.***
+	var posVboDataArray = new Float32Array(posByteSize);
+	
+	var point3d;
+	var counter = 0;
+	var height = 500.0;
+
+	// bottomPoints.***
+	for (var i=0; i<bottomPointsCount; i++)
+	{
+		if (i===0)
+		{
+			point3d = bottomPoint3dArray[i];
+			posVboDataArray[counter] = point3d.x;
+			posVboDataArray[counter+1] = point3d.y;
+			posVboDataArray[counter+2] = point3d.z;
+			posVboDataArray[counter+3] = 1; // order.
+			
+			posVboDataArray[counter+4] = point3d.x;
+			posVboDataArray[counter+5] = point3d.y;
+			posVboDataArray[counter+6] = point3d.z;
+			posVboDataArray[counter+7] = -1; // order.
+		}
+		else
+		{
+			point3d = bottomPoint3dArray[i];
+			posVboDataArray[counter] = point3d.x;
+			posVboDataArray[counter+1] = point3d.y;
+			posVboDataArray[counter+2] = point3d.z;
+			posVboDataArray[counter+3] = 2; // order.
+			
+			posVboDataArray[counter+4] = point3d.x;
+			posVboDataArray[counter+5] = point3d.y;
+			posVboDataArray[counter+6] = point3d.z;
+			posVboDataArray[counter+7] = -2; // order.
+		}
+
+		counter += 8;
+	}
+
+
+	// frontPoints.***
+	// Only add the 1rst bottomPoint.***
+	var vbo = resultVboKeysContainer.newVBOVertexIdxCacheKey();
+	vbo.setDataArrayPos(posVboDataArray, magoManager.vboMemoryManager, pointDimension);
+	
+	//if (colVboDataArray)
+	//{
+	//	vbo.setDataArrayCol(colVboDataArray, magoManager.vboMemoryManager);
+	//}
+	
+	return resultVboKeysContainer;
+};
+
+/**
+ * Make the vbo of this point3DList
+ * @param magoManager
+ */
+Point3DList.getVboThickLinesExtruded__original = function(magoManager, bottomPoint3dArray, topPoint3dArray, resultVboKeysContainer, options)
+{
+	// this function returns a vbo for draw thickLines using stencil buffer.***
+	if (bottomPoint3dArray === undefined || bottomPoint3dArray.length < 2)
+	{ return resultVboKeysContainer; }
+
+	if (resultVboKeysContainer === undefined)
+	{ resultVboKeysContainer = new VBOVertexIdxCacheKeysContainer(); }
+
+	var bottomPointsCount = bottomPoint3dArray.length;
+	var topPointsCount = topPoint3dArray.length;
+	var lateralRightPointsCount = bottomPointsCount;
+
+	// in this case make point4d (x, y, z, w). In "w" save the sign (1 or -1) for the offset in the shader to draw triangles strip.
+	var repeats = 4;
+	var pointDimension = 4;
+	var posByteSize = (bottomPointsCount + 1 + (bottomPointsCount-1) + 1 + bottomPointsCount) * pointDimension * repeats; // pointsCount x 2, bcos we join bottomPoints & topPoints.***
+	var posVboDataArray = new Float32Array(posByteSize);
+	
+	var point3d;
+	var counter = 0;
+	var height = 500.0;
+
+	// bottomPoints.***
+	for (var i=0; i<bottomPointsCount; i++)
+	{
+		point3d = bottomPoint3dArray[i];
+		posVboDataArray[counter] = point3d.x;
+		posVboDataArray[counter+1] = point3d.y;
+		posVboDataArray[counter+2] = point3d.z;
+		posVboDataArray[counter+3] = 1; // order.
+		
+		posVboDataArray[counter+4] = point3d.x;
+		posVboDataArray[counter+5] = point3d.y;
+		posVboDataArray[counter+6] = point3d.z;
+		posVboDataArray[counter+7] = -1; // order.
+		
+		posVboDataArray[counter+8] = point3d.x;
+		posVboDataArray[counter+9] = point3d.y;
+		posVboDataArray[counter+10] = point3d.z;
+		posVboDataArray[counter+11] = 2; // order.
+		
+		posVboDataArray[counter+12] = point3d.x;
+		posVboDataArray[counter+13] = point3d.y;
+		posVboDataArray[counter+14] = point3d.z;
+		posVboDataArray[counter+15] = -2; // order.
+		counter += 16;
+	}
+
+	// rearPoints. add 1 face.***
+	point3d = bottomPoint3dArray[bottomPointsCount-1];
+	posVboDataArray[counter] = point3d.x;
+	posVboDataArray[counter+1] = point3d.y;
+	posVboDataArray[counter+2] = point3d.z;
+	posVboDataArray[counter+3] = 11; // order.
+	
+	posVboDataArray[counter+4] = point3d.x;
+	posVboDataArray[counter+5] = point3d.y;
+	posVboDataArray[counter+6] = point3d.z;
+	posVboDataArray[counter+7] = -11; // order.
+	
+	posVboDataArray[counter+8] = point3d.x;
+	posVboDataArray[counter+9] = point3d.y;
+	posVboDataArray[counter+10] = point3d.z;
+	posVboDataArray[counter+11] = 12; // order.
+	
+	posVboDataArray[counter+12] = point3d.x;
+	posVboDataArray[counter+13] = point3d.y;
+	posVboDataArray[counter+14] = point3d.z;
+	posVboDataArray[counter+15] = -12; // order.
+	counter += 16;
+
+	// topPoints, in reverse order.***
+	for (var i=bottomPointsCount-2; i>=0; i--)
+	{
+		point3d = bottomPoint3dArray[i];
+		posVboDataArray[counter] = point3d.x;
+		posVboDataArray[counter+1] = point3d.y;
+		posVboDataArray[counter+2] = point3d.z;
+		posVboDataArray[counter+3] = 21; // order.
+		
+		posVboDataArray[counter+4] = point3d.x;
+		posVboDataArray[counter+5] = point3d.y;
+		posVboDataArray[counter+6] = point3d.z;
+		posVboDataArray[counter+7] = -21; // order.
+		
+		posVboDataArray[counter+8] = point3d.x;
+		posVboDataArray[counter+9] = point3d.y;
+		posVboDataArray[counter+10] = point3d.z;
+		posVboDataArray[counter+11] = 22; // order.
+		
+		posVboDataArray[counter+12] = point3d.x;
+		posVboDataArray[counter+13] = point3d.y;
+		posVboDataArray[counter+14] = point3d.z;
+		posVboDataArray[counter+15] = -22; // order.
+		counter += 16;
+	}
+
+	// frontPoints. add 1 face.***
+	point3d = bottomPoint3dArray[0];
+	posVboDataArray[counter] = point3d.x;
+	posVboDataArray[counter+1] = point3d.y;
+	posVboDataArray[counter+2] = point3d.z;
+	posVboDataArray[counter+3] = 31; // order.
+	
+	posVboDataArray[counter+4] = point3d.x;
+	posVboDataArray[counter+5] = point3d.y;
+	posVboDataArray[counter+6] = point3d.z;
+	posVboDataArray[counter+7] = -31; // order.
+	
+	posVboDataArray[counter+8] = point3d.x;
+	posVboDataArray[counter+9] = point3d.y;
+	posVboDataArray[counter+10] = point3d.z;
+	posVboDataArray[counter+11] = 32; // order.
+	
+	posVboDataArray[counter+12] = point3d.x;
+	posVboDataArray[counter+13] = point3d.y;
+	posVboDataArray[counter+14] = point3d.z;
+	posVboDataArray[counter+15] = -32; // order.
+	counter += 16;
+
+	// lateral LeftPoints.***
+	// Lateral trinagle
+	for (var i=0; i<bottomPointsCount; i++)
+	{
+		point3d = bottomPoint3dArray[i];
+		posVboDataArray[counter] = point3d.x;
+		posVboDataArray[counter+1] = point3d.y;
+		posVboDataArray[counter+2] = point3d.z;
+		posVboDataArray[counter+3] = 41; // order.
+		
+		posVboDataArray[counter+4] = point3d.x;
+		posVboDataArray[counter+5] = point3d.y;
+		posVboDataArray[counter+6] = point3d.z;
+		posVboDataArray[counter+7] = -41; // order.
+		
+		posVboDataArray[counter+8] = point3d.x;
+		posVboDataArray[counter+9] = point3d.y;
+		posVboDataArray[counter+10] = point3d.z;
+		posVboDataArray[counter+11] = 42; // order.
+		
+		posVboDataArray[counter+12] = point3d.x;
+		posVboDataArray[counter+13] = point3d.y;
+		posVboDataArray[counter+14] = point3d.z;
+		posVboDataArray[counter+15] = -42; // order.
+		counter += 16;
+	}
+	
+
+	// front. add a linking strip.***
+	/*
+	var topPoint3d = topPoint3dArray[0];
+	var bottomPoint3d = bottomPoint3dArray[0];
+	posVboDataArray[counter] = topPoint3d.x;
+	posVboDataArray[counter+1] = topPoint3d.y;
+	posVboDataArray[counter+2] = topPoint3d.z;
+	posVboDataArray[counter+3] = 1; // order.
+	
+	posVboDataArray[counter+4] = topPoint3d.x;
+	posVboDataArray[counter+5] = topPoint3d.y;
+	posVboDataArray[counter+6] = topPoint3d.z;
+	posVboDataArray[counter+7] = -1; // order.
+	
+	posVboDataArray[counter+8] = bottomPoint3d.x;
+	posVboDataArray[counter+9] = bottomPoint3d.y;
+	posVboDataArray[counter+10] = bottomPoint3d.z;
+	posVboDataArray[counter+11] = 2; // order.
+	
+	posVboDataArray[counter+12] = bottomPoint3d.x;
+	posVboDataArray[counter+13] = bottomPoint3d.y;
+	posVboDataArray[counter+14] = bottomPoint3d.z;
+	posVboDataArray[counter+15] = -2; // order.
+	counter += 16;
+
+	// lateral right.***
+	for (var i=0; i<bottomPointsCount; i++)
+	{
+		var topPoint3d = topPoint3dArray[i];
+		var bottomPoint3d = bottomPoint3dArray[i];
+		posVboDataArray[counter] = topPoint3d.x;
+		posVboDataArray[counter+1] = topPoint3d.y;
+		posVboDataArray[counter+2] = topPoint3d.z;
+		posVboDataArray[counter+3] = -1; // order.
+		
+		posVboDataArray[counter+4] = bottomPoint3d.x;
+		posVboDataArray[counter+5] = bottomPoint3d.y;
+		posVboDataArray[counter+6] = bottomPoint3d.z;
+		posVboDataArray[counter+7] = -1; // order.
+		
+		posVboDataArray[counter+8] = topPoint3d.x;
+		posVboDataArray[counter+9] = topPoint3d.y;
+		posVboDataArray[counter+10] = topPoint3d.z;
+		posVboDataArray[counter+11] = -1; // order.
+		
+		posVboDataArray[counter+12] = bottomPoint3d.x;
+		posVboDataArray[counter+13] = bottomPoint3d.y;
+		posVboDataArray[counter+14] = bottomPoint3d.z;
+		posVboDataArray[counter+15] = -1; // order.
+		counter += 16;
+	}
+*/
+	// frontPoints.***
+	// Only add the 1rst bottomPoint.***
+	var vbo = resultVboKeysContainer.newVBOVertexIdxCacheKey();
+	vbo.setDataArrayPos(posVboDataArray, magoManager.vboMemoryManager, pointDimension);
+	
+	//if (colVboDataArray)
+	//{
+	//	vbo.setDataArrayCol(colVboDataArray, magoManager.vboMemoryManager);
+	//}
+	
+	return resultVboKeysContainer;
+};
+
+/**
+ * Make the vbo of this point3DList
+ * @param magoManager
+ */
 Point3DList.getVboThickLines = function(magoManager, point3dArray, resultVboKeysContainer, options)
 {
 	if (point3dArray === undefined || point3dArray.length < 2)

@@ -354,9 +354,10 @@ void main()
 		}
 		else
 		{
-			vec3 lightPos = vec3(1.0, 1.0, 1.0);
-			L = normalize(lightPos - vertexPos);
-			lambertian = max(dot(normal2, L), 0.0);
+			//vec3 lightPos = vec3(1.0, 1.0, 1.0);
+			//L = normalize(lightPos - vertexPos);
+			//lambertian = max(dot(normal2, L), 0.0);
+			lambertian = 1.0;
 		}
 		
 		specular = 0.0;

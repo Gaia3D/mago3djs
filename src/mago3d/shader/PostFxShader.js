@@ -41,6 +41,11 @@ var PostFxShader = function(gl)
 	this.shaderManager; 
 };
 
+PostFxShader.prototype.getName = function() 
+{
+	return this.name;
+};
+
 PostFxShader.createShader = function(gl, type, source) 
 {
 	var shader = gl.createShader(type);

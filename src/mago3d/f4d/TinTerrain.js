@@ -231,6 +231,10 @@ TinTerrain.prototype.deleteObjects = function(magoManager)
 
 	delete this.textureMaster;
 	delete this.vertexCount;
+
+	if (this.textureAux)
+	{  gl.deleteTexture(this.textureAux); }
+	delete this.textureAux;
 };
 
 TinTerrain.prototype.getPathName = function()
@@ -737,13 +741,22 @@ TinTerrain.prototype.makeTextureMaster = function()
 				texturesToMergeArray = [];
 			}
 
-			if (objToClamp.texture && objToClamp.texture.fileLoadState === CODE.fileLoadState.BINDING_FINISHED)
-			{ 
-				texturesToMergeArray.push(objToClamp.texture); 
-			}
-			else
+			// Check the class of "objToClamp".***
+			if (objToClamp instanceof MagoRectangle)
 			{
-				objectsToClampToTerrainExistsAndBibded = false;
+				if (objToClamp.texture && objToClamp.texture.fileLoadState === CODE.fileLoadState.BINDING_FINISHED)
+				{ 
+					texturesToMergeArray.push(objToClamp.texture); 
+				}
+				else
+				{
+					objectsToClampToTerrainExistsAndBibded = false;
+				}
+			}
+			else if (objToClamp instanceof MagoPolyline)
+			{
+				// polylines has no texture. must create it.***
+				var hola = 0;
 			}
 		} 
 	}
@@ -773,6 +786,91 @@ TinTerrain.prototype.makeTextureMaster = function()
 		this.objToClampToTerrainStyleId = this.tinTerrainManager.objToClampToTerrainStyleId;
 	}
 
+	FBO.bindFramebuffer(gl, null);
+};
+
+TinTerrain.prototype.getTextureForVectorMeshObject = function(objToClamp, gl, shader)
+{
+	// this function makes a texture 256x256 with the clampToTerrain object (in this case vectorMesh type object).***
+	var magoManager = this.tinTerrainManager.magoManager;
+	var postFxShaderManager = magoManager.postFxShadersManager;
+	var gl = magoManager.getGl();
+
+	if (this.textureAux === undefined)
+	{ 
+		var emptyPixels = new Uint8Array(256* 256 * 4);
+		this.textureAux = Texture.createTexture(gl, gl.LINEAR, emptyPixels, 256, 256); 
+	}
+
+	var texturesMergerFbo = this.tinTerrainManager.texturesMergerFbo;
+	FBO.bindFramebuffer(gl, texturesMergerFbo, this.textureAux);
+	gl.viewport(0, 0, 256, 256);
+
+	// Render the polyline
+	//MagoPolyline.prototype.getVBOThickLinesByGeoCoords = function(magoManager, options)
+	// var vbo = this.vboKeysContainer.getVboKey(0);
+	var shaderThickLine = magoManager.postFxShadersManager.getShader("thickLine");
+
+	magoManager.postFxShadersManager.useProgram(shaderThickLine);
+	shaderThickLine.bindUniformGenerals();
+
+	var gl = magoManager.getGl();
+	gl.uniform1i(shaderThickLine.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
+
+	gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
+	gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+	gl.disable(gl.CULL_FACE);
+
+	gl.enableVertexAttribArray(shaderThickLine.prev_loc);
+	gl.enableVertexAttribArray(shaderThickLine.current_loc);
+	gl.enableVertexAttribArray(shaderThickLine.next_loc);
+
+	//var geoLocData = this.geoLocDataManager.getCurrentGeoLocationData();
+	//geoLocData.bindGeoLocationUniforms(gl, shaderThickLine);
+
+	var sceneState = magoManager.sceneState;
+	gl.uniform2fv(shaderThickLine.viewport_loc, [256, 256]);
+
+	// Now, bind vbo and render.*************************************************************************************
+	var thickness = 2.0;
+	
+	gl.uniform4fv(shader.oneColor4_loc, [0.5, 0.7, 0.9, 1.0]);
+	//gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, this.color4.a]);
+	gl.uniform1f(shader.thickness_loc, thickness);
+
+	var vboPos = vbo.vboBufferPos;
+	var dim = vboPos.dataDimensions; // in this case dimensions = 4.
+	if (!vboPos.isReady(gl, magoManager.vboMemoryManager))
+	{
+		return;
+	}
+	
+	if (vbo.vboBufferCol)
+	{
+		if (!vbo.bindDataColor(shader, magoManager.vboMemoryManager) )
+		{
+			return;
+		}
+		gl.uniform1i(shader.colorType_loc, 1);
+		//gl.enableVertexAttribArray(shader.color4_loc);
+	}
+	else 
+	{
+		gl.uniform1i(shader.colorType_loc, 0);
+		gl.disableVertexAttribArray(shader.color4_loc);
+	}
+
+	gl.bindBuffer(gl.ARRAY_BUFFER, vboPos.key);
+	gl.vertexAttribPointer(shader.prev_loc, dim, gl.FLOAT, false, 16, 0);
+	gl.vertexAttribPointer(shader.current_loc, dim, gl.FLOAT, false, 16, 64-32);
+	gl.vertexAttribPointer(shader.next_loc, dim, gl.FLOAT, false, 16, 128-32);
+
+	gl.drawArrays(gl.TRIANGLE_STRIP, 0, vbo.vertexCount-4);
+
+	gl.enable(gl.CULL_FACE);
+
+
+	// finally unbind the framebuffer.
 	FBO.bindFramebuffer(gl, null);
 };
 

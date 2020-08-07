@@ -284,7 +284,7 @@ CesiumViewerInit.prototype.initMagoManager = function()
 	this.viewer.scene.magoManager = new MagoManager();
 	this.viewer.scene.magoManager.sceneState.textureFlipYAxis = false;
 
-	this.viewer.camera.frustum.fov = Cesium.Math.PI_OVER_THREE*1.8;
+	this.viewer.camera.frustum.fov = Cesium.Math.PI_OVER_THREE;
 	if (serverPolicy.initDefaultFov > 0) 
 	{
 		this.viewer.camera.frustum.fov = Cesium.Math.PI_OVER_THREE * serverPolicy.initDefaultFov;

@@ -3,11 +3,11 @@
 /**
  * vector geometry.
  * This class is analog to "Mesh" class, but vectorMesh is for points, lines, polylines data type.
- * @class VectorMesh
+ * @class VectorExtrudedMesh
  */
-var VectorMesh = function(options) 
+var VectorExtrudedMesh = function(options) 
 {
-	if (!(this instanceof VectorMesh)) 
+	if (!(this instanceof VectorExtrudedMesh)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
@@ -52,7 +52,7 @@ var VectorMesh = function(options)
  * @param glPrimitive
  * @TODO : 누가 이 gl primitive의 type 정체를 안다면 좀 달아주세요ㅠㅠ 세슘 쪽인거 같은데ㅠㅠ
  */
-VectorMesh.prototype.renderAsChild = function (magoManager, shader, renderType, glPrimitive, isSelected, options) 
+VectorExtrudedMesh.prototype.renderAsChild = function (magoManager, shader, renderType, glPrimitive, isSelected, options) 
 {
 	var depthMask = true;
 	var gl = magoManager.getGl();
@@ -81,7 +81,7 @@ VectorMesh.prototype.renderAsChild = function (magoManager, shader, renderType, 
  * @param glPrimitive
  * @TODO : 누가 이 gl primitive의 type 정체를 안다면 좀 달아주세요ㅠㅠ 세슘 쪽인거 같은데ㅠㅠ
  */
-VectorMesh.prototype.render = function(magoManager, shader, renderType, glPrimitive, isSelected)
+VectorExtrudedMesh.prototype.render = function(magoManager, shader, renderType, glPrimitive, isSelected)
 {
 	if (this.vboKeysContainer === undefined)
 	{ return; }
@@ -92,8 +92,7 @@ VectorMesh.prototype.render = function(magoManager, shader, renderType, glPrimit
 	//gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
 	//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 	//gl.disable(gl.CULL_FACE);
-
-
+	gl.enable(gl.CULL_FACE);
 	
 	gl.enableVertexAttribArray(shader.prev_loc);
 	gl.enableVertexAttribArray(shader.current_loc);
@@ -138,21 +137,24 @@ VectorMesh.prototype.render = function(magoManager, shader, renderType, glPrimit
 	}
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, vboPos.key);
-	gl.vertexAttribPointer(shader.prev_loc, dim, gl.FLOAT, false, 16, 0);
-	gl.vertexAttribPointer(shader.current_loc, dim, gl.FLOAT, false, 16, 64-32);
-	gl.vertexAttribPointer(shader.next_loc, dim, gl.FLOAT, false, 16, 128-32);
+	gl.vertexAttribPointer(shader.prev_loc, dim, gl.FLOAT, false, 8, 0);
+	gl.vertexAttribPointer(shader.current_loc, dim, gl.FLOAT, false, 8, 16);
+	gl.vertexAttribPointer(shader.next_loc, dim, gl.FLOAT, false, 8, 48);
 
+	//gl.disable(gl.DEPTH_TEST);
 	gl.drawArrays(gl.TRIANGLE_STRIP, 0, vbo.vertexCount-4);
 	//gl.drawArrays(gl.LINE_STRIP, 0, vbo.vertexCount-4);
 
-
+	//gl.enable(gl.CULL_FACE);
+	//gl.enable(gl.DEPTH_TEST);
+	
 };
 
 /**
  * Clear the data of this feature
  * @param {VBOMemManager} vboMemManager 
  */
-VectorMesh.prototype.deleteObjects = function(vboMemManager)
+VectorExtrudedMesh.prototype.deleteObjects = function(vboMemManager)
 {
 	if (this.vboKeysContainer !== undefined)
 	{

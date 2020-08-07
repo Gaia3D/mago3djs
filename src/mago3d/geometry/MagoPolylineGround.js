@@ -33,10 +33,10 @@
  * 
  * var magoPolyline = new Mago3D.MagoPolyline(position, style);
  */
-var MagoPolyline = function(position, style) 
+var MagoPolylineGround = function(position, style) 
 {
 	
-	if (!(this instanceof MagoPolyline)) 
+	if (!(this instanceof MagoPolylineGround)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
@@ -61,14 +61,14 @@ var MagoPolyline = function(position, style)
 	geoLocData.rotMatrix.Identity();
 };
 
-MagoPolyline.prototype = Object.create(MagoGeometry.prototype);
-MagoPolyline.prototype.constructor = MagoPolyline;
+MagoPolylineGround.prototype = Object.create(MagoGeometry.prototype);
+MagoPolylineGround.prototype.constructor = MagoPolylineGround;
 
 /**
  * set position
  * @param {MagoPolyline~MagoPolylinePosition} position
  */
-MagoPolyline.prototype.setPosition = function(position) 
+MagoPolylineGround.prototype.setPosition = function(position) 
 {
 	var coordsCount = position.coordinates.length;
 	if (coordsCount > 1)
@@ -89,7 +89,7 @@ MagoPolyline.prototype.setPosition = function(position)
  * Makes & returns vbo thickLines by geoCoords.
  * @private
  */
-MagoPolyline.prototype.getVBOThickLinesByGeoCoords = function(magoManager, options)
+MagoPolylineGround.prototype.getVBOThickLinesByGeoCoords = function(magoManager, options)
 {
 	if (this.vboThickLinesByGeoCoords === undefined)
 	{
@@ -103,7 +103,7 @@ MagoPolyline.prototype.getVBOThickLinesByGeoCoords = function(magoManager, optio
  * Makes the geometry mesh.
  * @private
  */
-MagoPolyline.prototype.makeMesh = function(magoManager)
+MagoPolylineGround.prototype.makeMesh = function(magoManager)
 {
 	if (this.knotGeoCoordsArray === undefined)
 	{ return; } // error
@@ -114,7 +114,8 @@ MagoPolyline.prototype.makeMesh = function(magoManager)
 		thickness : this.style.thickness,
 		color     : color
 	};
-	var vectorMesh = GeographicCoordsList.getRenderableObjectOfGeoCoordsArray(this.knotGeoCoordsArray, magoManager, options);
+	var vectorMesh = GeographicCoordsList.getRenderableExpandedAndExtrudedObjectOfGeoCoordsArray(this.knotGeoCoordsArray, magoManager, options);
+	////var vectorMesh = GeographicCoordsList.getRenderableObjectOfGeoCoordsArray(this.knotGeoCoordsArray, magoManager, options);
 
 	// Check style. If exist points, then create points.
 	//var magoPoint = new MagoPoint(position, style);
@@ -149,7 +150,7 @@ MagoPolyline.prototype.makeMesh = function(magoManager)
  * 
  * @return {MagoPoint}
  */
-MagoPolyline.prototype.getPointByIndex = function(index) 
+MagoPolylineGround.prototype.getPointByIndex = function(index) 
 {
 	var points = this.getPoints();
 	if (points.length <= index) 
@@ -168,7 +169,7 @@ MagoPolyline.prototype.getPointByIndex = function(index)
  * get MagoPoint array
  * @return {Array<MagoPoint>}
  */
-MagoPolyline.prototype.getPoints = function() 
+MagoPolylineGround.prototype.getPoints = function() 
 {
 	return this.objectsArray.filter(function(mesh) 
 	{
