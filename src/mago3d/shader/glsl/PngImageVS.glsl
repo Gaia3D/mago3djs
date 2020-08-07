@@ -61,9 +61,12 @@ void main()
 	//vec4 projected2 = modelViewMatrixRelToEye * pos4;
 
 	// Now, calculate the pixelSize in the plane of the projected point.
-	float pixelWidthRatio = 2. / (screenWidth * projectionMatrix[0][0]);
+	float pixelWidthRatio = 2. / (screenWidth);// * projectionMatrix[0][0]);
 	// alternative : float pixelWidthRatio = 2. / (screenHeight * projectionMatrix[1][1]);
 	float pixelWidth = projected.w * pixelWidthRatio;
+
+	float pixelHeightRatio = pixelWidthRatio * (screenHeight/screenWidth);
+	float pixelHeight = projected.w * pixelHeightRatio;
 	
 	if(projected.w < 5.0)
 		pixelWidth = 5.0 * pixelWidthRatio;
@@ -74,11 +77,11 @@ void main()
 	if(bUseOriginalImageSize)
 	{
 		offsetX = pixelWidth*imageSize.x/2.0;
-		offsetY = pixelWidth*imageSize.y/2.0;
+		offsetY = pixelHeight*imageSize.y/2.0;
 	}
 	else{
 		offsetX = pixelWidth*size2d.x/2.0;
-		offsetY = pixelWidth*size2d.y/2.0;
+		offsetY = pixelHeight*size2d.y/2.0;
 	}
 	
 	// Offset our position along the normal
@@ -92,11 +95,11 @@ void main()
 	}
 	else if(orderInt == 2)
 	{
-		offset = vec4(-offsetX*scale2d.x, offsetY*4.0*scale2d.y, 0.0, 1.0);
+		offset = vec4(-offsetX*scale2d.x, offsetY*2.0*scale2d.y, 0.0, 1.0);
 	}
 	else if(orderInt == -2)
 	{
-		offset = vec4(offsetX*scale2d.x, offsetY*4.0*scale2d.y, 0.0, 1.0);
+		offset = vec4(offsetX*scale2d.x, offsetY*2.0*scale2d.y, 0.0, 1.0);
 	}
 
 	gl_Position = projected + offset + vec4(aditionalOffset.x*pixelWidth, aditionalOffset.y*pixelWidth, aditionalOffset.z*pixelWidth, 0.0); 

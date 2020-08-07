@@ -74,6 +74,8 @@ var MagoManager = function(options)
 	 * @private
 	 */
 	this.texturesStore = new TexturesStore(this);
+
+	//this._inputInteraction = new InputInteraction(this);
 	
 	/**
 	 * Manages & controls the tiles.
@@ -457,6 +459,7 @@ MagoManager.prototype.swapRenderingFase = function()
 
 /**
  * 빌딩을 준비(새버전)
+ * staticModel manage
  * @param {gl} gl
  * @private
  */
@@ -5022,6 +5025,8 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.imageSize_loc = gl.getUniformLocation(shader.program, "imageSize");
 	shader.bUseOriginalImageSize_loc = gl.getUniformLocation(shader.program, "bUseOriginalImageSize");
 	shader.aditionalOffset_loc = gl.getUniformLocation(shader.program, "aditionalOffset");
+	shader.screenWidth_loc = gl.getUniformLocation(shader.program, "screenWidth");
+	shader.screenHeight_loc = gl.getUniformLocation(shader.program, "screenHeight");
 
 	// TexturesMerger shader.******************************************************************************************
 	var shaderName = "texturesMerger";

@@ -44,7 +44,7 @@ ObjectMarkerManager.prototype.deleteObject = function(objMarkerId)
 		{
 			this.objectMarkerArray[i].deleteObjects();
 			//this.objectMarkerArray[i] = undefined;
-			delete this.objectMarderMap.objMarkerId;
+			delete this.objectMarkerMap.objMarkerId;
 			this.objectMarkerArray.splice(i, 1);
 			break;
 		}
@@ -332,7 +332,8 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 		gl.uniform3fv(shader.cameraPosHIGH_loc, magoManager.sceneState.encodedCamPosHigh);
 		gl.uniform3fv(shader.cameraPosLOW_loc, magoManager.sceneState.encodedCamPosLow);
 		gl.uniformMatrix4fv(shader.buildingRotMatrix_loc, false, magoManager.sceneState.modelViewRelToEyeMatrixInv._floatArrays);
-		
+		gl.uniform1f(shader.screenWidth_loc, parseFloat(magoManager.sceneState.drawingBufferWidth[0]));
+		gl.uniform1f(shader.screenHeight_loc, parseFloat(magoManager.sceneState.drawingBufferHeight[0]));
 		gl.uniform1i(shader.textureFlipYAxis_loc, magoManager.sceneState.textureFlipYAxis); 
 		// Tell the shader to get the texture from texture unit 0
 		gl.uniform1i(shader.texture_loc, 0);

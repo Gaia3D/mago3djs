@@ -74,6 +74,17 @@ var GeographicCoord = function(lon, lat, alt)
 };
 
 /**
+ * cartesian으로 부터 GeographicCoords 객체 생성
+ * @param {Array<object>} cartesian
+ * @return {GeographicCoord}
+ * @static
+ */
+GeographicCoord.fromCartesian = function(cartesian) 
+{
+	return ManagerUtils.pointToGeographicCoord(cartesian);
+};
+
+/**
  * Clear the value of this instance from the vbo key container and geoLocDataManager 
  * @param {VBOMemoryManager}vboMemManager
  */
@@ -333,8 +344,6 @@ GeographicCoord.prototype.renderPoint = function(magoManager, shader, gl, render
 	{ return false; }
 
 	gl.drawArrays(gl.POINTS, 0, vbo_vicky.vertexCount);
-	
-	
 };
 
 
