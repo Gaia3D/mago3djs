@@ -380,7 +380,7 @@ void main()
 	#ifdef USE_LOGARITHMIC_DEPTH
 	if(bUseLogarithmicDepth)
 	{
-		gl_FragDepthEXT = log2(flogz) * Fcoef_half;
+		gl_FragDepthEXT = log2(flogz) * Fcoef_half; //flogz = 1.0 + gl_Position.z;
 		depthAux = gl_FragDepthEXT;
 	}
 	#endif

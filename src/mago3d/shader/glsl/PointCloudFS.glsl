@@ -1,28 +1,45 @@
-	precision lowp float;
-	uniform vec4 uStrokeColor;
-	varying vec4 vColor;
-	varying float glPointSize;
-	uniform int uPointAppereance; // square, circle, romboide,...
-	uniform int uStrokeSize;
+precision lowp float;
 
-	void main()
-    {
-		vec2 pt = gl_PointCoord - vec2(0.5);
-		float distSquared = pt.x*pt.x+pt.y*pt.y;
-		if(distSquared > 0.25)
-			discard;
+#define %USE_LOGARITHMIC_DEPTH%
+#ifdef USE_LOGARITHMIC_DEPTH
+#extension GL_EXT_frag_depth : enable
+#endif
 
-		vec4 finalColor = vColor;
-		float strokeDist = 0.1;
-		if(glPointSize > 10.0)
-		strokeDist = 0.15;
+uniform vec4 uStrokeColor;
+varying vec4 vColor;
+varying float glPointSize;
+uniform int uPointAppereance; // square, circle, romboide,...
+uniform int uStrokeSize;
+uniform bool bUseLogarithmicDepth;
 
-		if(uStrokeSize > 0)
+varying float flogz;
+varying float Fcoef_half;
+
+void main()
+{
+	vec2 pt = gl_PointCoord - vec2(0.5);
+	float distSquared = pt.x*pt.x+pt.y*pt.y;
+	if(distSquared > 0.25)
+		discard;
+
+	vec4 finalColor = vColor;
+	float strokeDist = 0.1;
+	if(glPointSize > 10.0)
+	strokeDist = 0.15;
+
+	if(uStrokeSize > 0)
+	{
+		if(distSquared >= strokeDist)
 		{
-			if(distSquared >= strokeDist)
-			{
-				finalColor = uStrokeColor;
-			}
+			finalColor = uStrokeColor;
 		}
-		gl_FragColor = finalColor;
 	}
+	gl_FragColor = finalColor;
+
+	#ifdef USE_LOGARITHMIC_DEPTH
+	if(bUseLogarithmicDepth)
+	{
+		gl_FragDepthEXT = log2(flogz) * Fcoef_half;
+	}
+	#endif
+}

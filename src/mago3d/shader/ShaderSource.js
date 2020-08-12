@@ -1867,30 +1867,21 @@ void main()\n\
 		//ssaoFromDepthTex\n\
 		float pixelSize_x = 1.0/screenWidth;\n\
 		float pixelSize_y = 1.0/screenHeight;\n\
-		float occl_aux = 0.0;\n\
-		float small_occl_aux = 0.0;\n\
-		float small_occl_A = 0.0;\n\
+		vec4 occlFromDepth = vec4(0.0);\n\
 		for(int i=0; i<4; i++)\n\
 		{\n\
 			for(int j=0; j<4; j++)\n\
 			{\n\
 				vec2 texCoord = vec2(screenPos.x + pixelSize_x*float(i-2), screenPos.y + pixelSize_y*float(j-2));\n\
 				vec4 color = texture2D(ssaoFromDepthTex, texCoord);\n\
-				occl_aux += color.w;\n\
-				small_occl_aux += color.z;\n\
-				small_occl_A += color.y;\n\
+				occlFromDepth += color;\n\
 			}\n\
 		}\n\
-		occl_aux /= 16.0;\n\
-		occl_aux *= 0.5;\n\
 \n\
-		small_occl_aux /= 16.0;\n\
-		small_occl_aux *= 0.5;\n\
+		occlFromDepth /= 16.0;\n\
+		occlFromDepth *= 0.35;\n\
 \n\
-		small_occl_A /= 16.0;\n\
-		small_occl_A *= 0.5;\n\
-		//vec4 occlusionFromDepth = texture2D(ssaoFromDepthTex, screenPos);\n\
-		occlusion = 1.0 - occl_aux - smallOccl - small_occl_aux - small_occl_A; // original.***\n\
+		occlusion = 1.0 - smallOccl - occlFromDepth.r - occlFromDepth.g - occlFromDepth.b - occlFromDepth.a; // original.***\n\
 		//occlusion = 1.0 - occl_aux - small_occl_aux;\n\
 \n\
 		if(occlusion < 0.1)\n\
@@ -2599,34 +2590,51 @@ void main()\n\
 	depth = (modelViewMatrixRelToEye * pos).z/far; // original.***\n\
 }\n\
 ";
-ShaderSource.PointCloudFS = "	precision lowp float;\n\
-	uniform vec4 uStrokeColor;\n\
-	varying vec4 vColor;\n\
-	varying float glPointSize;\n\
-	uniform int uPointAppereance; // square, circle, romboide,...\n\
-	uniform int uStrokeSize;\n\
+ShaderSource.PointCloudFS = "precision lowp float;\n\
 \n\
-	void main()\n\
-    {\n\
-		vec2 pt = gl_PointCoord - vec2(0.5);\n\
-		float distSquared = pt.x*pt.x+pt.y*pt.y;\n\
-		if(distSquared > 0.25)\n\
-			discard;\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
 \n\
-		vec4 finalColor = vColor;\n\
-		float strokeDist = 0.1;\n\
-		if(glPointSize > 10.0)\n\
-		strokeDist = 0.15;\n\
+uniform vec4 uStrokeColor;\n\
+varying vec4 vColor;\n\
+varying float glPointSize;\n\
+uniform int uPointAppereance; // square, circle, romboide,...\n\
+uniform int uStrokeSize;\n\
+uniform bool bUseLogarithmicDepth;\n\
 \n\
-		if(uStrokeSize > 0)\n\
+varying float flogz;\n\
+varying float Fcoef_half;\n\
+\n\
+void main()\n\
+{\n\
+	vec2 pt = gl_PointCoord - vec2(0.5);\n\
+	float distSquared = pt.x*pt.x+pt.y*pt.y;\n\
+	if(distSquared > 0.25)\n\
+		discard;\n\
+\n\
+	vec4 finalColor = vColor;\n\
+	float strokeDist = 0.1;\n\
+	if(glPointSize > 10.0)\n\
+	strokeDist = 0.15;\n\
+\n\
+	if(uStrokeSize > 0)\n\
+	{\n\
+		if(distSquared >= strokeDist)\n\
 		{\n\
-			if(distSquared >= strokeDist)\n\
-			{\n\
-				finalColor = uStrokeColor;\n\
-			}\n\
+			finalColor = uStrokeColor;\n\
 		}\n\
-		gl_FragColor = finalColor;\n\
-	}";
+	}\n\
+	gl_FragColor = finalColor;\n\
+\n\
+	#ifdef USE_LOGARITHMIC_DEPTH\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
+	}\n\
+	#endif\n\
+}";
 ShaderSource.PointCloudSsaoFS = "#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\
@@ -2956,6 +2964,9 @@ uniform bool bUseLogarithmicDepth;\n\
 varying vec4 vColor;\n\
 varying float glPointSize;\n\
 \n\
+varying float flogz;\n\
+varying float Fcoef_half;\n\
+\n\
 void main()\n\
 {\n\
 	vec3 realPos;\n\
@@ -2989,12 +3000,14 @@ void main()\n\
 	{\n\
 		// logarithmic zBuffer:\n\
 		// https://www.gamasutra.com/blogs/BranoKemen/20090812/85207/Logarithmic_Depth_Buffer.php\n\
-		// z = log(C*z + 1) / log(C*Far + 1) * w\n\
-		float z = gl_Position.z;\n\
-		//float C = 1.0;\n\
-		float w = gl_Position.w;\n\
-		////gl_Position.z = log(C*z + 1.0) / log(C*far + 1.0) * w;\n\
-		gl_Position.z = log(z/near) / log(far/near)*w; // another way.\n\
+\n\
+		// logarithmic zBuffer:\n\
+		// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
+		float Fcoef = 2.0 / log2(far + 1.0);\n\
+		gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;\n\
+\n\
+		flogz = 1.0 + gl_Position.w;\n\
+		Fcoef_half = 0.5 * Fcoef;\n\
 	}\n\
 \n\
 	if(bUseFixPointSize)\n\
@@ -3651,13 +3664,36 @@ vec3 normal_from_depth(float depth, vec2 texCoord) {\n\
     return normalize(normal);\n\
 }\n\
 \n\
+float getOcclusion(vec3 origin, vec3 rotatedKernel, float radius)\n\
+{\n\
+    float result_occlusion = 0.0;\n\
+    vec3 sample = origin + rotatedKernel * radius;\n\
+    vec4 offset = projectionMatrix * vec4(sample, 1.0);	\n\
+    vec3 offsetCoord = vec3(offset.xyz);				\n\
+    offsetCoord.xyz /= offset.w;\n\
+    offsetCoord.xyz = offsetCoord.xyz * 0.5 + 0.5;  				\n\
+    float sampleDepth = -sample.z/far;// original.***\n\
 \n\
+    float depthBufferValue = getDepth(offsetCoord.xy);\n\
+    float depthDiff = abs(depthBufferValue - sampleDepth);\n\
+    if(depthDiff < radius/far)\n\
+    {\n\
+        float rangeCheck = smoothstep(0.0, 1.0, radius / (depthDiff*far));\n\
+        if (depthBufferValue < sampleDepth)//-tolerance*1.0)\n\
+        {\n\
+            result_occlusion = 1.0 * rangeCheck;\n\
+        }\n\
+    }\n\
+\n\
+    return result_occlusion;\n\
+}\n\
 \n\
 void main()\n\
 {\n\
     float occlusion = 0.0;\n\
     float smallOcclusion = 0.0;\n\
     float occlusion_A = 0.0;\n\
+    float occlusion_veryBig = 0.0;\n\
     vec3 normal = vec3(0.0);\n\
     vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
     vec3 ray = getViewRay(screenPos); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
@@ -3668,6 +3704,7 @@ void main()\n\
     //if(linearDepthTest > 0.99)\n\
     //discard;\n\
 \n\
+    float veryBigRadius = 20.0;\n\
     float bigRadius = 12.0;\n\
     float smallRadius = 6.0;\n\
     float radius_A = 2.0;\n\
@@ -3696,61 +3733,18 @@ void main()\n\
 		for(int i = 0; i < kernelSize; ++i)\n\
 		{    	\n\
             vec3 rotatedKernel = tbn * vec3(kernel[i].x*1.0, kernel[i].y*1.0, kernel[i].z);\n\
-			vec3 sample = origin + rotatedKernel * bigRadius;\n\
-			vec4 offset = projectionMatrix * vec4(sample, 1.0);	\n\
-            vec3 offsetCoord = vec3(offset.xyz);				\n\
-			offsetCoord.xyz /= offset.w;\n\
-			offsetCoord.xyz = offsetCoord.xyz * 0.5 + 0.5;  				\n\
-			float sampleDepth = -sample.z/far;// original.***\n\
 \n\
-			float depthBufferValue = getDepth(offsetCoord.xy);\n\
-            float depthDiff = abs(depthBufferValue - sampleDepth);\n\
-            if(depthDiff < bigRadius/far)\n\
-            {\n\
-                float rangeCheck = smoothstep(0.0, 1.0, bigRadius / (depthDiff*far));\n\
-                if (depthBufferValue < sampleDepth)//-tolerance*1.0)\n\
-                {\n\
-                    occlusion += 1.0 * rangeCheck * factorByDist;\n\
-                }\n\
-            }\n\
+            // Big radius.***\n\
+            occlusion += getOcclusion(origin, rotatedKernel, bigRadius) * factorByDist;\n\
 \n\
             // small occl.***\n\
-            sample = origin + rotatedKernel * smallRadius;\n\
-			offset = projectionMatrix * vec4(sample, 1.0);	\n\
-            offsetCoord = vec3(offset.xyz);				\n\
-			offsetCoord.xyz /= offset.w;\n\
-			offsetCoord.xyz = offsetCoord.xyz * 0.5 + 0.5;  				\n\
-			sampleDepth = -sample.z/far;// original.***\n\
+            smallOcclusion += getOcclusion(origin, rotatedKernel, smallRadius) * factorByDist;\n\
 \n\
-			depthBufferValue = getDepth(offsetCoord.xy);\n\
-            depthDiff = abs(depthBufferValue - sampleDepth);\n\
-            if(depthDiff < smallRadius/far)\n\
-            {\n\
-                float rangeCheck = smoothstep(0.0, 1.0, smallRadius / (depthDiff*far));\n\
-                if (depthBufferValue < sampleDepth)//-tolerance*1.0)\n\
-                {\n\
-                    smallOcclusion += 1.0 * rangeCheck * factorByDist;\n\
-                }\n\
-            }\n\
-            \n\
             // radius A.***\n\
-            sample = origin + rotatedKernel * radius_A;\n\
-			offset = projectionMatrix * vec4(sample, 1.0);	\n\
-            offsetCoord = vec3(offset.xyz);				\n\
-			offsetCoord.xyz /= offset.w;\n\
-			offsetCoord.xyz = offsetCoord.xyz * 0.5 + 0.5;  				\n\
-			sampleDepth = -sample.z/far;// original.***\n\
+            occlusion_A += getOcclusion(origin, rotatedKernel, radius_A) * factorByDist;\n\
 \n\
-			depthBufferValue = getDepth(offsetCoord.xy);\n\
-            depthDiff = abs(depthBufferValue - sampleDepth);\n\
-            if(depthDiff < radius_A/far)\n\
-            {\n\
-                float rangeCheck = smoothstep(0.0, 1.0, radius_A / (depthDiff*far));\n\
-                if (depthBufferValue < sampleDepth)//-tolerance*1.0)\n\
-                {\n\
-                    occlusion_A += 1.0 * rangeCheck * factorByDist;\n\
-                }\n\
-            }\n\
+            // veryBigRadius.***\n\
+            occlusion_veryBig += getOcclusion(origin, rotatedKernel, veryBigRadius) * factorByDist;\n\
 		} \n\
 \n\
         \n\
@@ -3766,6 +3760,10 @@ void main()\n\
         occlusion_A = occlusion_A / float(kernelSize);	\n\
         if(occlusion_A < 0.0)\n\
         occlusion_A = 0.0;\n\
+\n\
+        occlusion_veryBig = occlusion_veryBig / float(kernelSize);	\n\
+        if(occlusion_veryBig < 0.0)\n\
+        occlusion_veryBig = 0.0;\n\
 	}\n\
 \n\
     // Do lighting.***\n\
@@ -3774,7 +3772,7 @@ void main()\n\
 	//scalarProd += 0.666;\n\
     //gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0 - scalarProd);\n\
 \n\
-	gl_FragColor = vec4(0.0, occlusion_A, smallOcclusion, occlusion);\n\
+	gl_FragColor = vec4(occlusion_veryBig, occlusion_A, smallOcclusion, occlusion);\n\
     //gl_FragColor = vec4(normal.xyz, 1.0);\n\
 }";
 ShaderSource.StandardFS = "precision lowp float;\n\
@@ -5485,12 +5483,12 @@ void main(){\n\
 	if(bUseLogarithmicDepth)\n\
 	{\n\
 		// logarithmic zBuffer:\n\
-			// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
-			float Fcoef = 2.0 / log2(far + 1.0);\n\
-			gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;\n\
+		// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
+		float Fcoef = 2.0 / log2(far + 1.0);\n\
+		gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;\n\
 \n\
-			flogz = 1.0 + gl_Position.w;\n\
-			Fcoef_half = 0.5 * Fcoef;\n\
+		flogz = 1.0 + gl_Position.w;\n\
+		Fcoef_half = 0.5 * Fcoef;\n\
 	}\n\
 	\n\
 	if(colorType == 0)\n\
@@ -5935,7 +5933,7 @@ void main()\n\
 	#ifdef USE_LOGARITHMIC_DEPTH\n\
 	if(bUseLogarithmicDepth)\n\
 	{\n\
-		gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
+		gl_FragDepthEXT = log2(flogz) * Fcoef_half; //flogz = 1.0 + gl_Position.z;\n\
 		depthAux = gl_FragDepthEXT;\n\
 	}\n\
 	#endif\n\
@@ -6370,11 +6368,13 @@ void main()\n\
 	else{\n\
 		applySpecLighting = -1.0;\n\
 	}\n\
+\n\
+	v3Pos = (modelViewMatrixRelToEye * pos4).xyz;\n\
 	\n\
 	if(bIsMakingDepth)\n\
 	{\n\
 		\n\
-		depthValue = (modelViewMatrixRelToEye * pos4).z/far;\n\
+		depthValue = v3Pos.z/far;\n\
 	}\n\
 	else\n\
 	{\n\
@@ -6382,7 +6382,7 @@ void main()\n\
 		vTexCoord = texCoord;\n\
 	}\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
-	v3Pos = (modelViewMatrixRelToEye * pos4).xyz;\n\
+	\n\
 \n\
 	if(bUseLogarithmicDepth)\n\
 	{\n\
@@ -6397,8 +6397,12 @@ void main()\n\
 		// flogz = 1.0 + gl_Position.w;\n\
 		//---------------------------------------------------------------------------------\n\
 \n\
-		flogz = 1.0 + gl_Position.w;\n\
+		flogz = 1.0 - v3Pos.z;\n\
+		//flogz = 1.0 + gl_Position.w;\n\
 		Fcoef_half = 0.5 * uFCoef_logDepth;\n\
+\n\
+		//vec4 v4Pos = modelViewMatrixRelToEye * pos4;\n\
+		//flogz = 1.0 + v4Pos.w;\n\
 	}\n\
 \n\
 	// calculate fog amount.\n\

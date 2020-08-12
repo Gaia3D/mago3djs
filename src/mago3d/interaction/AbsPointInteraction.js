@@ -14,17 +14,17 @@ var AbsPointInteraction = function(eventObject)
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-    Interaction.call(this);
+	Interaction.call(this);
     
-    this.handleDownEvent = eventObject.handleDownEvent;
+	this.handleDownEvent = eventObject.handleDownEvent;
 
-    this.handleDragEvent  = eventObject.handleDragEvent;
+	this.handleDragEvent  = eventObject.handleDragEvent;
 
-    this.handleMoveEvent = eventObject.handleMoveEvent;
+	this.handleMoveEvent = eventObject.handleMoveEvent;
 
-    this.handleUpEvent = eventObject.handleUpEvent;
+	this.handleUpEvent = eventObject.handleUpEvent;
 
-    this.begin = false;
+	this.begin = false;
 	this.dragging = false;
 	this.startPoint = undefined;
 	this.endPoint = undefined;
@@ -37,11 +37,11 @@ AbsPointInteraction.prototype.constructor = AbsPointInteraction;
  */
 AbsPointInteraction.prototype.init = function() 
 {
-    this.begin = false;
+	this.begin = false;
 	this.dragging = false;
 	this.startPoint = undefined;
 	this.endPoint = undefined;
-}
+};
 /**
  * set active. set true, this interaction active, another interaction deactive.
  * @param {boolean} active

@@ -124,13 +124,36 @@ vec3 normal_from_depth(float depth, vec2 texCoord) {
     return normalize(normal);
 }
 
+float getOcclusion(vec3 origin, vec3 rotatedKernel, float radius)
+{
+    float result_occlusion = 0.0;
+    vec3 sample = origin + rotatedKernel * radius;
+    vec4 offset = projectionMatrix * vec4(sample, 1.0);	
+    vec3 offsetCoord = vec3(offset.xyz);				
+    offsetCoord.xyz /= offset.w;
+    offsetCoord.xyz = offsetCoord.xyz * 0.5 + 0.5;  				
+    float sampleDepth = -sample.z/far;// original.***
 
+    float depthBufferValue = getDepth(offsetCoord.xy);
+    float depthDiff = abs(depthBufferValue - sampleDepth);
+    if(depthDiff < radius/far)
+    {
+        float rangeCheck = smoothstep(0.0, 1.0, radius / (depthDiff*far));
+        if (depthBufferValue < sampleDepth)//-tolerance*1.0)
+        {
+            result_occlusion = 1.0 * rangeCheck;
+        }
+    }
+
+    return result_occlusion;
+}
 
 void main()
 {
     float occlusion = 0.0;
     float smallOcclusion = 0.0;
     float occlusion_A = 0.0;
+    float occlusion_veryBig = 0.0;
     vec3 normal = vec3(0.0);
     vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
     vec3 ray = getViewRay(screenPos); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
@@ -141,6 +164,7 @@ void main()
     //if(linearDepthTest > 0.99)
     //discard;
 
+    float veryBigRadius = 20.0;
     float bigRadius = 12.0;
     float smallRadius = 6.0;
     float radius_A = 2.0;
@@ -169,61 +193,18 @@ void main()
 		for(int i = 0; i < kernelSize; ++i)
 		{    	
             vec3 rotatedKernel = tbn * vec3(kernel[i].x*1.0, kernel[i].y*1.0, kernel[i].z);
-			vec3 sample = origin + rotatedKernel * bigRadius;
-			vec4 offset = projectionMatrix * vec4(sample, 1.0);	
-            vec3 offsetCoord = vec3(offset.xyz);				
-			offsetCoord.xyz /= offset.w;
-			offsetCoord.xyz = offsetCoord.xyz * 0.5 + 0.5;  				
-			float sampleDepth = -sample.z/far;// original.***
 
-			float depthBufferValue = getDepth(offsetCoord.xy);
-            float depthDiff = abs(depthBufferValue - sampleDepth);
-            if(depthDiff < bigRadius/far)
-            {
-                float rangeCheck = smoothstep(0.0, 1.0, bigRadius / (depthDiff*far));
-                if (depthBufferValue < sampleDepth)//-tolerance*1.0)
-                {
-                    occlusion += 1.0 * rangeCheck * factorByDist;
-                }
-            }
+            // Big radius.***
+            occlusion += getOcclusion(origin, rotatedKernel, bigRadius) * factorByDist;
 
             // small occl.***
-            sample = origin + rotatedKernel * smallRadius;
-			offset = projectionMatrix * vec4(sample, 1.0);	
-            offsetCoord = vec3(offset.xyz);				
-			offsetCoord.xyz /= offset.w;
-			offsetCoord.xyz = offsetCoord.xyz * 0.5 + 0.5;  				
-			sampleDepth = -sample.z/far;// original.***
+            smallOcclusion += getOcclusion(origin, rotatedKernel, smallRadius) * factorByDist;
 
-			depthBufferValue = getDepth(offsetCoord.xy);
-            depthDiff = abs(depthBufferValue - sampleDepth);
-            if(depthDiff < smallRadius/far)
-            {
-                float rangeCheck = smoothstep(0.0, 1.0, smallRadius / (depthDiff*far));
-                if (depthBufferValue < sampleDepth)//-tolerance*1.0)
-                {
-                    smallOcclusion += 1.0 * rangeCheck * factorByDist;
-                }
-            }
-            
             // radius A.***
-            sample = origin + rotatedKernel * radius_A;
-			offset = projectionMatrix * vec4(sample, 1.0);	
-            offsetCoord = vec3(offset.xyz);				
-			offsetCoord.xyz /= offset.w;
-			offsetCoord.xyz = offsetCoord.xyz * 0.5 + 0.5;  				
-			sampleDepth = -sample.z/far;// original.***
+            occlusion_A += getOcclusion(origin, rotatedKernel, radius_A) * factorByDist;
 
-			depthBufferValue = getDepth(offsetCoord.xy);
-            depthDiff = abs(depthBufferValue - sampleDepth);
-            if(depthDiff < radius_A/far)
-            {
-                float rangeCheck = smoothstep(0.0, 1.0, radius_A / (depthDiff*far));
-                if (depthBufferValue < sampleDepth)//-tolerance*1.0)
-                {
-                    occlusion_A += 1.0 * rangeCheck * factorByDist;
-                }
-            }
+            // veryBigRadius.***
+            occlusion_veryBig += getOcclusion(origin, rotatedKernel, veryBigRadius) * factorByDist;
 		} 
 
         
@@ -239,6 +220,10 @@ void main()
         occlusion_A = occlusion_A / float(kernelSize);	
         if(occlusion_A < 0.0)
         occlusion_A = 0.0;
+
+        occlusion_veryBig = occlusion_veryBig / float(kernelSize);	
+        if(occlusion_veryBig < 0.0)
+        occlusion_veryBig = 0.0;
 	}
 
     // Do lighting.***
@@ -247,6 +232,6 @@ void main()
 	//scalarProd += 0.666;
     //gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0 - scalarProd);
 
-	gl_FragColor = vec4(0.0, occlusion_A, smallOcclusion, occlusion);
+	gl_FragColor = vec4(occlusion_veryBig, occlusion_A, smallOcclusion, occlusion);
     //gl_FragColor = vec4(normal.xyz, 1.0);
 }

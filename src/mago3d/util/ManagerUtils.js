@@ -638,6 +638,51 @@ ManagerUtils.calculateSplited3fv = function(point3fv, resultSplitPoint3fvHigh, r
 	resultSplitPoint3fvLow[2] = posSplitZ.low;
 };
 
+ManagerUtils.unpackDepth = function(rgba_depth)
+{
+	//var bit_shift = [0.000000059605, 0.000015258789, 0.00390625, 1.0];
+	return rgba_depth[0] * 0.000000059605 + rgba_depth[1] * 0.000015258789 + rgba_depth[2] * 0.00390625 + rgba_depth[3];
+};
+
+ManagerUtils.mod = function(x, y)
+{
+	return x - y * Math.floor(x/y);
+};
+
+ManagerUtils.packDepth = function(depth)
+{
+	//const vec4 bit_shift = vec4(16777216.0, 65536.0, 256.0, 1.0);
+	//const vec4 bit_mask  = vec4(0.0, 0.00390625, 0.00390625, 0.00390625); 
+	////vec4 res = fract(depth * bit_shift); // Is not precise.
+	//vec4 res = mod(depth * bit_shift * vec4(255), vec4(256) ) / vec4(255); // Is better.
+	//res -= res.xxyz * bit_mask;
+	//return res; 
+	
+	var bit_shift = [16777216.0, 65536.0, 256.0, 1.0];
+	var bit_mask = [0.0, 0.00390625, 0.00390625, 0.00390625];
+
+	// calculate value_A = depth * bit_shift * vec4(255).
+	var value_A = [depth * bit_shift[0] * 255.0, depth * bit_shift[1] * 255.0, depth * bit_shift[2] * 255.0, depth * bit_shift[3] * 255.0];
+	var value_B = [256.0, 256.0, 256.0, 256.0];
+
+	var resAux = [( ManagerUtils.mod(value_A[0], value_B[0]) )/255.0, 
+				  ( ManagerUtils.mod(value_A[1], value_B[1]) )/255.0, 
+				  ( ManagerUtils.mod(value_A[2], value_B[2]) )/255.0, 
+				  ( ManagerUtils.mod(value_A[3], value_B[3]) )/255.0];
+
+	var resBitMasked = [resAux[0] * bit_mask[0], 
+		resAux[0] * bit_mask[1], 
+		resAux[1] * bit_mask[2], 
+		resAux[2] * bit_mask[3]];
+
+	var res = [resAux[0] - resBitMasked[0], 
+		resAux[1] - resBitMasked[1], 
+		resAux[2] - resBitMasked[2], 
+		resAux[3] - resBitMasked[3]];
+
+	return res;
+};
+
 /**
  * Calculates the pixel linear depth value.
  * @param {WebGLRenderingContext} gl WebGL Rendering Context.
@@ -666,21 +711,28 @@ ManagerUtils.calculatePixelLinearDepth = function(gl, pixelX, pixelY, depthFbo, 
 	var depthPixels = new Uint8Array(4 * 1 * 1); // 4 x 1x1 pixel.
 	gl.readPixels(pixelX, magoManager.sceneState.drawingBufferHeight - pixelY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, depthPixels);
 	
-	var zDepth = depthPixels[0]/(256.0*256.0*256.0) + depthPixels[1]/(256.0*256.0) + depthPixels[2]/256.0 + depthPixels[3]; // 0 to 256 range depth.
-	var linearDepth = zDepth / 256.0; // LinearDepth. Convert to [0.0, 1.0] range depth.
+	var floatDepthPixels = new Float32Array(([depthPixels[0]/256.0, depthPixels[1]/256.0, depthPixels[2]/256.0, depthPixels[3]/256.0]));
+	var zDepth = ManagerUtils.unpackDepth(floatDepthPixels); // 0 to 256 range depth.
+	var linearDepth = zDepth;// [0.0, 1.0] range depth.
 
 	// Check if we are using logarithmic depth buffer.***
+	
 	if (magoManager.postFxShadersManager.bUseLogarithmicDepth)
 	{
-		var fcoef_half = magoManager.sceneState.fCoef_logDepth[0]/2.0;
+		linearDepth = zDepth * 1.0037;
+		var sceneState = magoManager.sceneState;
+		var far = sceneState.camera.frustum.far[0];
+
+		var fcoef_half = sceneState.fCoef_logDepth[0]/2.0;
 		// gl_FragDepthEXT = linearDepth = log2(flogz) * Fcoef_half;
 		// flogz = 1.0 + gl_Position.z;
+		// sceneState.fCoef_logDepth[0] = 2.0 / Math.log2(frustum0.far[0] + 1.0);
 
 		var flogz = Math.pow(2.0, linearDepth/fcoef_half);
 		var z = flogz - 1.0;
-		var frustumFar = magoManager.sceneState.camera.frustum.far;
-		linearDepth = z/(frustumFar);
+		linearDepth = z/far;
 	}
+	
 
 	return linearDepth;
 };
@@ -730,10 +782,13 @@ ManagerUtils.calculatePixelLinearDepthABGR = function(gl, pixelX, pixelY, depthF
  * @param {Number} pixelY Screen y position of the pixel.
  * @param {Point3D} resultPixelPos The result of the calculation.
  * @param {MagoManager} magoManager Mago3D main manager.
+ * @param {options} options options.
  * @returns {Point3D} resultPixelPos The result of the calculation.
  */
-ManagerUtils.calculatePixelPositionCamCoord = function(gl, pixelX, pixelY, resultPixelPos, depthFbo, frustumNear, frustumFar, magoManager) 
+ManagerUtils.calculatePixelPositionCamCoord = function(gl, pixelX, pixelY, resultPixelPos, depthFbo, frustumNear, frustumFar, magoManager, options) 
 {
+	var sceneState = magoManager.sceneState;
+
 	/*
 	vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
 		float z_window  = unpackDepth(texture2D(depthTex, screenPos.xy)); // z_window  is [0.0, 1.0] range depth.
@@ -757,7 +812,7 @@ ManagerUtils.calculatePixelPositionCamCoord = function(gl, pixelX, pixelY, resul
 		depthFbo.bind(); 
 	}
 	
-	var sceneState = magoManager.sceneState;
+	
 	var screenW = sceneState.drawingBufferWidth;
 	var screenH = sceneState.drawingBufferHeight;
 
@@ -788,16 +843,33 @@ ManagerUtils.calculatePixelPositionCamCoord = function(gl, pixelX, pixelY, resul
 	// Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.***
 	*/
 	if (frustumFar === undefined)
-	{ frustumFar = magoManager.sceneState.camera.frustum.far; }
+	{ frustumFar = sceneState.camera.frustum.far[0]; }
 
 	if (frustumNear === undefined)
 	{ frustumNear = 0.0; }
 	
-	var linearDepth = ManagerUtils.calculatePixelLinearDepth(gl, pixelX, pixelY, depthFbo, magoManager);
+	var linearDepth;
+	if (options)
+	{
+		// Check if exist pre-calculated linearDepth.
+		if (options.linearDepth)
+		{
+			linearDepth = options.linearDepth;
+		}
+	}
+
 	if (!linearDepth) 
 	{
-		return;
+		linearDepth = ManagerUtils.calculatePixelLinearDepth(gl, pixelX, pixelY, depthFbo, magoManager);
+		if (!linearDepth) 
+		{ return; }
 	}
+
+
+	
+	// End new method.----------------------------------------------------------------------------------------------------------------------------------
+	// End new method.----------------------------------------------------------------------------------------------------------------------------------
+
 	//var realZDepth = frustumNear + linearDepth*frustumFar; // Use this code if the zDepth encoder uses frustum near & frustum far, both.
 	// Note: In our RenderShowDepth shaders, we are encoding zDepth no considering the frustum near.
 	var realZDepth = linearDepth*frustumFar; // original.
@@ -809,8 +881,10 @@ ManagerUtils.calculatePixelPositionCamCoord = function(gl, pixelX, pixelY, resul
 	{ resultPixelPos = new Point3D(); }
 	
 	resultPixelPos.set(magoManager.resultRaySC[0] * realZDepth, magoManager.resultRaySC[1] * realZDepth, magoManager.resultRaySC[2] * realZDepth);
+
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 	return resultPixelPos;
+	
 };
 
 /**
@@ -956,8 +1030,9 @@ ManagerUtils.getRayCamSpace = function(pixelX, pixelY, resultRay, magoManager)
 {
 	// in this function "ray" is a vector.
 	var sceneState = magoManager.sceneState;
-	var frustum_far = 1.0; // unitary frustum far.
 	var frustum = sceneState.camera.frustum;
+	var frustum_far = 1.0;//frustum.far[0]; // unitary frustum far.
+
 	var aspectRatio = frustum.aspectRatio;
 	var tangentOfHalfFovy = frustum.tangentOfHalfFovy; 
 	
@@ -970,6 +1045,20 @@ ManagerUtils.getRayCamSpace = function(pixelX, pixelY, resultRay, magoManager)
 	resultRay[0] = wfar*((mouseX/sceneState.drawingBufferWidth) - 0.5);
 	resultRay[1] = hfar*((mouseY/sceneState.drawingBufferHeight) - 0.5);
 	resultRay[2] = - frustum_far;
+
+	/*
+	//var projectMatInv = sceneState.getProjectionMatrixInv();
+	var projectMatInv = sceneState.projectionMatrix;
+	var v4Pos = [resultRay[0], resultRay[1], resultRay[2], 1.0];
+	var rayAux = new Point3D(resultRay[0], resultRay[1], resultRay[2]);
+	//rayAux.unitary();
+	var rayAuxProj = projectMatInv.transformPoint4D(v4Pos, undefined);
+
+	resultRay[0] = rayAuxProj[0]/rayAuxProj[3];
+	resultRay[1] = rayAuxProj[1]/rayAuxProj[3];
+	resultRay[2] = rayAuxProj[2]/rayAuxProj[3];
+	*/
+
 	return resultRay;
 };
 

@@ -281,30 +281,21 @@ void main()
 		//ssaoFromDepthTex
 		float pixelSize_x = 1.0/screenWidth;
 		float pixelSize_y = 1.0/screenHeight;
-		float occl_aux = 0.0;
-		float small_occl_aux = 0.0;
-		float small_occl_A = 0.0;
+		vec4 occlFromDepth = vec4(0.0);
 		for(int i=0; i<4; i++)
 		{
 			for(int j=0; j<4; j++)
 			{
 				vec2 texCoord = vec2(screenPos.x + pixelSize_x*float(i-2), screenPos.y + pixelSize_y*float(j-2));
 				vec4 color = texture2D(ssaoFromDepthTex, texCoord);
-				occl_aux += color.w;
-				small_occl_aux += color.z;
-				small_occl_A += color.y;
+				occlFromDepth += color;
 			}
 		}
-		occl_aux /= 16.0;
-		occl_aux *= 0.5;
 
-		small_occl_aux /= 16.0;
-		small_occl_aux *= 0.5;
+		occlFromDepth /= 16.0;
+		occlFromDepth *= 0.35;
 
-		small_occl_A /= 16.0;
-		small_occl_A *= 0.5;
-		//vec4 occlusionFromDepth = texture2D(ssaoFromDepthTex, screenPos);
-		occlusion = 1.0 - occl_aux - smallOccl - small_occl_aux - small_occl_A; // original.***
+		occlusion = 1.0 - smallOccl - occlFromDepth.r - occlFromDepth.g - occlFromDepth.b - occlFromDepth.a; // original.***
 		//occlusion = 1.0 - occl_aux - small_occl_aux;
 
 		if(occlusion < 0.1)
