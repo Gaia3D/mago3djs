@@ -378,9 +378,9 @@ Matrix4.prototype.transformPoint3D = function(point3d, result)
  * @param {Point3D} result 출력 포인트
  * @returns {Point3D} 출력 포인트
  */
-Matrix4.prototype.transformPoint4D__test = function(cartesian4, result) 
+Matrix4.prototype.transformPoint4D = function(cartesian4, result) 
 {
-	if (result === undefined) { result = new Point3D(); }
+	if (result === undefined) { result = [0, 0, 0, 0]; }
 
 	var x = cartesian4[0];
 	var y = cartesian4[1];

@@ -678,7 +678,6 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 	}
 	else/* if (this.configInformation.basicGlobe === Constant.MAGOWORLD)*/
 	{
-		this.postFxShadersManager.bUseLogarithmicDepth = true;
 		var camera = sceneState.camera;
 		var camPos = camera.position;
 		var frustum0 = camera.getFrustum(0);
@@ -784,7 +783,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		modelViewProjRelToEyeMatrixSky._floatArrays = glMatrix.mat4.multiply(modelViewProjRelToEyeMatrixSky._floatArrays, projectionMatrixSky._floatArrays, modelViewRelToEyeMatrix._floatArrays);
 
 		// Parameters for logarithmic depth buffer.
-		sceneState.fCoef_logDepth[0] = 2.0 / Math.log2(frustum0.far + 1.0);
+		sceneState.fCoef_logDepth[0] = 2.0 / Math.log2(frustum0.far[0] + 1.0);
 	}
 	
 	
@@ -2868,7 +2867,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		var hola = 0;
 	}
 	// Check modeler mode.
-	//this.magoMode = CODE.magoMode.DRAWING;
+	//this.magoMode = CODE.magoMode.DRAWING; // DEBUG. Delete this line.!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	if (this.magoMode === CODE.magoMode.DRAWING)// then process to draw.***
 	{
 		if (this.modeler === undefined)
@@ -4690,6 +4689,7 @@ MagoManager.prototype.setRenderCondition = function(projectId, dataKey, conditio
 MagoManager.prototype.createDefaultShaders = function(gl) 
 {
 	var use_linearOrLogarithmicDepth = "USE_LINEAR_DEPTH";
+	
 	if (!this.isCesiumGlobe())
 	{
 		var supportEXT = gl.getSupportedExtensions().indexOf("EXT_frag_depth");
@@ -4702,6 +4702,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 
 		this.postFxShadersManager.bUseLogarithmicDepth = true;
 	}
+	
 
 	// here creates the necessary shaders for mago3d.***
 	// 1) ModelReferences ssaoShader.******************************************************************************
@@ -4840,6 +4841,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shaderName = "pointsCloud";
 	ssao_vs_source = ShaderSource.PointCloudVS;
 	ssao_fs_source = ShaderSource.PointCloudFS;
+	ssao_fs_source = ssao_fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
 	shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
 	// pointsCloud shader locals.***
 	shader.bPositionCompressed_loc = gl.getUniformLocation(shader.program, "bPositionCompressed");

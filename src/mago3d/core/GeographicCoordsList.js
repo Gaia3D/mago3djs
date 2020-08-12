@@ -686,6 +686,7 @@ GeographicCoordsList.prototype.renderPoints = function(magoManager, shader, rend
 	gl.uniform4fv(shaderLocal.oneColor4_loc, [1.0, 1.0, 0.1, 1.0]); //.
 	gl.uniform1f(shaderLocal.fixPointSize_loc, 5.0);
 	gl.uniform1i(shaderLocal.bUseFixPointSize_loc, 1);
+	gl.uniform1i(shaderLocal.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
 	
 	if (bEnableDepth === undefined)
 	{ bEnableDepth = true; }

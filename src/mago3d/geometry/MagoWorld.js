@@ -747,10 +747,11 @@ MagoWorld.prototype.mousemove = function(event)
  * @param {MagoManager} magoManager
  * @private
  */
-MagoWorld.screenToCamCoord = function(mouseX, mouseY, magoManager, resultPointCamCoord)
+MagoWorld.screenToCamCoord = function(mouseX, mouseY, magoManager, resultPointCamCoord, options)
 {
-	var gl = magoManager.sceneState.gl;
-	var camera = magoManager.sceneState.camera;
+	var sceneState = magoManager.sceneState;
+	var gl = sceneState.gl;
+	var camera = sceneState.camera;
 	
 	if (resultPointCamCoord === undefined)
 	{ resultPointCamCoord = new Point3D(); }
@@ -762,6 +763,16 @@ MagoWorld.screenToCamCoord = function(mouseX, mouseY, magoManager, resultPointCa
 	var currentLinearDepth;
 	var depthDetected = false;
 	var frustumsCount = magoManager.numFrustums;
+
+	//if (options)
+	//{
+	//	// Check if exist pre-calculated linearDepth.
+	//	if (options.linearDepth)
+	//	{
+	//		linearDepth = options.linearDepth;
+	//	}
+	//}
+
 	for (var i = 0; i < frustumsCount; i++)
 	{
 		var frustumVolume = magoManager.frustumVolumeControl.getFrustumVolumeCulling(i); 
@@ -784,7 +795,15 @@ MagoWorld.screenToCamCoord = function(mouseX, mouseY, magoManager, resultPointCa
 	
 	//currentFrustumFar = 30000.0; // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
 	//currentDepthFbo = magoManager.depthFboNeo;
-	resultPointCamCoord = ManagerUtils.calculatePixelPositionCamCoord(gl, mouseX, mouseY, resultPointCamCoord, currentDepthFbo, currentFrustumNear, currentFrustumFar, magoManager);
+	var options = {};
+	options.linearDepth = currentLinearDepth; // optionally, use the pre calculated linearDepth.
+
+	resultPointCamCoord = ManagerUtils.calculatePixelPositionCamCoord(gl, mouseX, mouseY, resultPointCamCoord, currentDepthFbo, currentFrustumNear, currentFrustumFar, magoManager, options);
+
+	// test.***
+	//var projMat = sceneState.getProjectionMatrixInv();
+	//resultPointCamCoord = projMat.transformPoint3D(resultPointCamCoord, undefined);
+
 	return resultPointCamCoord;
 };
 
@@ -1125,7 +1144,7 @@ MagoWorld.prototype.doTest__MagoRectangleGround = function()
 		strokeColor : '#FF0000', // no used
 		fillColor   : '#00FF00',
 		imageUrl    : '/images/materialImages/factoryRoof.jpg', // no used
-		opacity     : 1.0
+		opacity     : 0.5
 	};
 
 	var magoRect = new MagoRectangleGround(position, style);
@@ -1263,6 +1282,112 @@ MagoWorld.prototype.doTest__ObjectMarker = function()
 	}
 };
 
+
+
+MagoWorld.prototype.doTest__logarithmicDepthBuffer_encode_decode = function()
+{
+	var pointLC = new Point3D(125.3569, 165.02054, 542.360145);
+
+	//vec3 objPosHigh = buildingPosHIGH;
+	//vec3 objPosLow = buildingPosLOW.xyz + position.xyz;
+	//vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;
+	//vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;
+	//vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);
+	
+	// vertex shader.***********************************************************************
+	var buildingPosHIGH = new Point3D(-3276800, 3997696, 3604480);
+	var buildingPosLOW = new Point3D(-7867.3564453125, 65481.85546875, 41420.75);
+
+	var encodedCamPosHIGH = new Point3D(-3276800, 4063232, 3604480);
+	var encodedCamPosLOW = new Point3D(-7671.60400390625, 4366.1689453125, 41714.70703125);
+
+	var objectPosHIGH = new Point3D(buildingPosHIGH.x, buildingPosHIGH.y, buildingPosHIGH.z);
+	var objectPosLOW = new Point3D(buildingPosLOW.x + pointLC.x, buildingPosLOW.y + pointLC.y, buildingPosLOW.z + pointLC.z);
+
+	var highDifference = new Point3D(objectPosHIGH.x - encodedCamPosHIGH.x, objectPosHIGH.y - encodedCamPosHIGH.y, objectPosHIGH.z - encodedCamPosHIGH.z);
+	var lowDifference = new Point3D(objectPosLOW.x - encodedCamPosLOW.x, objectPosLOW.y - encodedCamPosLOW.y, objectPosLOW.z - encodedCamPosLOW.z);
+
+	var pos4 = new Point3D(highDifference.x + lowDifference.x, highDifference.y + lowDifference.y, highDifference.z + lowDifference.z);
+
+	var magoManager = this.magoManager;
+	var sceneState = magoManager.sceneState;
+	var mvRelToEyeMat = sceneState.modelViewRelToEyeMatrix;
+
+	var v3Pos = mvRelToEyeMat.transformPoint3D(pos4, undefined);
+
+	var uFCoef_logDepth = sceneState.fCoef_logDepth[0];
+	var flogz = 1.0 - v3Pos.z;
+	var Fcoef_half = 0.5 * uFCoef_logDepth;
+
+	// fragment shader.*********************************************************************
+	var fragDepth = Math.log2(flogz) * Fcoef_half;
+
+	// Now, encode the depthValue.***
+	var packedDepth = ManagerUtils.packDepth(fragDepth);
+	//-------------------------------------------------------------------------------------------------
+
+	// Now, decode packedDepth and try to recover depthValue.***
+	var decodedDepth = ManagerUtils.unpackDepth(packedDepth);
+
+	// Now, check with a uint8Encoded.***
+	var uintPackDepth = new Uint8Array([packedDepth[0]*256, packedDepth[1]*256, packedDepth[2]*256, packedDepth[3]*256]);
+	var uintDecodedDepth = ManagerUtils.unpackDepth(uintPackDepth);
+	var uintDepth = uintDecodedDepth/256.0;
+
+	// Try recover original position.***
+	var linearDepth = decodedDepth / 256.0; // LinearDepth. Convert to [0.0, 1.0] range depth.
+
+	var fcoef_half = sceneState.fCoef_logDepth[0]/2.0;
+	// gl_FragDepthEXT = linearDepth = log2(flogz) * Fcoef_half;
+	// flogz = 1.0 + gl_Position.w;
+	// sceneState.fCoef_logDepth[0] = 2.0 / Math.log2(frustum0.far[0] + 1.0);
+
+	var far = sceneState.camera.frustum.far[0];
+	var near = sceneState.camera.frustum.near[0];
+	var a = far/(far-near);
+	var b = far*near/(near-far);
+	var z = Math.pow(2.0, linearDepth/fcoef_half) - 1.0; // z positive value.***
+
+	var linearZ = a + b/z;
+	/*
+	var u = (pixelX/sceneState.drawingBufferWidth[0])*2-1;
+	var v = (1.0-pixelY/sceneState.drawingBufferHeight[0])*2-1;
+	var projectMatInv = sceneState.getProjectionMatrixInv();
+
+	//vec4(uv_f, linearize_depth(reconstruct_depth()), 1.0) * 2.0 - 1.0
+
+
+
+	//////////////////////////////////////////////////////////////
+	var frustum = sceneState.camera.frustum;
+	var frustum_far = z; // unitary frustum far.
+
+	var aspectRatio = frustum.aspectRatio;
+	var tangentOfHalfFovy = frustum.tangentOfHalfFovy; 
+	
+	var hfar = 2.0 * tangentOfHalfFovy * frustum_far; //var hfar = 2.0 * Math.tan(fovy/2.0) * frustum_far;
+	var wfar = hfar * aspectRatio;
+	var mouseX = pixelX;
+	var mouseY = sceneState.drawingBufferHeight - pixelY;
+
+	var resultRay = new Float32Array(3); 
+	resultRay[0] = wfar*((mouseX/sceneState.drawingBufferWidth) - 0.5);
+	resultRay[1] = hfar*((mouseY/sceneState.drawingBufferHeight) - 0.5);
+	resultRay[2] = - frustum_far;
+	
+	///////////////////////////////////////////////////////////////////////
+
+
+
+
+	var point4 = [u, v, linearZ*2-1, 1.0];
+	var proj4 = [resultRay[0], resultRay[1], -z, 1.0];
+	//var proj4 = projectMatInv.transformPoint4D(point4, undefined);
+	resultPixelPos.set(proj4[0]/proj4[3], proj4[1]/proj4[3], proj4[2]/proj4[3]);
+	*/
+	var hola = 0;
+};
+
 /**
  * @param {*} event
  * @private
@@ -1308,6 +1433,7 @@ MagoWorld.prototype.keydown = function(event)
 		//this.doTest__MagoPolyline();
 		//this.doTest__GoTo();
 		//this.doTest__CameraOrientation();
+		this.doTest__logarithmicDepthBuffer_encode_decode();
 
 		var minHeight = 0.0;
 		var maxHeight = -200;

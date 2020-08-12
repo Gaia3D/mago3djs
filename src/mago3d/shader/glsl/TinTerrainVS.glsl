@@ -97,11 +97,13 @@ void main()
 	else{
 		applySpecLighting = -1.0;
 	}
+
+	v3Pos = (modelViewMatrixRelToEye * pos4).xyz;
 	
 	if(bIsMakingDepth)
 	{
 		
-		depthValue = (modelViewMatrixRelToEye * pos4).z/far;
+		depthValue = v3Pos.z/far;
 	}
 	else
 	{
@@ -109,7 +111,7 @@ void main()
 		vTexCoord = texCoord;
 	}
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;
-	v3Pos = (modelViewMatrixRelToEye * pos4).xyz;
+	
 
 	if(bUseLogarithmicDepth)
 	{
@@ -124,8 +126,12 @@ void main()
 		// flogz = 1.0 + gl_Position.w;
 		//---------------------------------------------------------------------------------
 
-		flogz = 1.0 + gl_Position.w;
+		flogz = 1.0 - v3Pos.z;
+		//flogz = 1.0 + gl_Position.w;
 		Fcoef_half = 0.5 * uFCoef_logDepth;
+
+		//vec4 v4Pos = modelViewMatrixRelToEye * pos4;
+		//flogz = 1.0 + v4Pos.w;
 	}
 
 	// calculate fog amount.
