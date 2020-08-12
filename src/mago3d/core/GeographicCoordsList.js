@@ -546,7 +546,7 @@ GeographicCoordsList.prototype.addAltitude = function(length)
 /**
  * 
  */
-GeographicCoordsList.prototype.getExtrudedMeshRenderableObject = function(height, bLoop, resultRenderableObject, magoManager, extrudeDirWC) 
+GeographicCoordsList.prototype.getExtrudedMeshRenderableObject = function(height, bLoop, resultRenderableObject, magoManager, extrudeDirWC, textureInfo) 
 {
 	if (!this.geographicCoordsArray || this.geographicCoordsArray.length === 0)
 	{ return resultRenderableObject; }
@@ -585,7 +585,42 @@ GeographicCoordsList.prototype.getExtrudedMeshRenderableObject = function(height
 	var solidMesh = vtxProfilesList.getMesh(undefined, bIncludeBottomCap, bIncludeTopCap);
 	var surfIndepMesh = solidMesh.getCopySurfaceIndependentMesh();
 	surfIndepMesh.calculateVerticesNormals();
+
+	if (textureInfo)
+	{
+		var c = document.createElement("canvas");
+		var ctx = c.getContext("2d");
+
+		c.width = 8;
+		c.height = 32;
+		ctx.beginPath();
+		ctx.fillStyle = "#262626";
+		ctx.rect(0, 0, 8, 1);
+		ctx.fill();
+		ctx.closePath();
+			
+		ctx.beginPath();
+		ctx.fillStyle = textureInfo.color;
+		ctx.rect(0, 1, 8, 31);
+		ctx.fill();
+		ctx.closePath();
+
+		ctx.beginPath();
+		ctx.fillStyle = "#0000ff";
+		ctx.rect(2, 8, 4, 8);
+		ctx.fill();
+		ctx.stroke();
+		ctx.closePath();
+
+		console.info(c.toDataURL());
+
+		surfIndepMesh.material = new Material('test');
+		surfIndepMesh.material.setDiffuseTextureUrl(c.toDataURL());
+
+		surfIndepMesh.calculateTexCoordsByHeight(textureInfo.height);
+	}
 	
+
 	resultRenderableObject.objectsArray.push(surfIndepMesh);
 	return resultRenderableObject;
 };
