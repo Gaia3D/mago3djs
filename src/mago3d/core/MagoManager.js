@@ -1525,6 +1525,32 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	//this.renderFilter();
 };
 
+/**
+ * cluster 데이터 설정
+ * @param {Cluster} cluster 
+ */
+MagoManager.prototype.addCluster = function(cluster) {
+	if(!cluster || !cluster instanceof Cluster) {
+		throw new Error('cluster is required.');
+	}
+	
+	this.cluster = cluster;
+}
+
+/**
+ * cluster 데이터 삭제
+ */
+MagoManager.prototype.clearCluster = function() {
+	if(this.objMarkerManager)
+	{
+		this.objMarkerManager.setMarkerByCondition(function(om){
+			return !om.tree;
+		});
+	}
+	
+	this.cluster = undefined;
+}
+
 MagoManager.prototype.renderCluster = function() 
 {
 	if (this.cluster && this.cluster.quatTree) 
@@ -5439,9 +5465,27 @@ MagoManager.prototype.flyTo = function(longitude, latitude, altitude, duration)
 			parseFloat(altitude),
 			parseInt(duration));
 	}
-
 };
+/**
+ * 주어진 3차원 점을 포함하는 영역으로 이동
+ * @param {Point3D} pointsArray 3차원 점
+ */
+MagoManager.prototype.flyToBox = function(pointsArray) {
+	var bbox = new BoundingBox();
+	bbox.init(pointsArray[0]);
+	bbox.addPoint(pointsArray[1]);
 
+	this.boundingSphere_Aux = new Sphere();
+	this.boundingSphere_Aux.radius = bbox.getRadiusAprox();
+	
+	if (this.isCesiumGlobe())
+	{
+		var bboxCenterPoint = bbox.getCenterPoint();
+		this.boundingSphere_Aux.center = Cesium.Cartesian3.clone({x:bboxCenterPoint.x,y:bboxCenterPoint.y,z:bboxCenterPoint.z});
+		var seconds = 3;
+		this.scene.camera.flyToBoundingSphere(this.boundingSphere_Aux, {duration:seconds});
+	}
+}
 /**
  * dataKey 이용해서 data 검색
  * @param apiName api 이름
