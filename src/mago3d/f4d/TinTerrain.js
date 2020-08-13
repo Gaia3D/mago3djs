@@ -539,7 +539,8 @@ TinTerrain.prototype.mergeTexturesToTextureMaster = function(gl, shader, texture
 		{
 			// bathymetry image.
 			var properties = texture.imagery.filter.properties;
-			gl.uniform2fv(shader.uMinMaxAltitudes_loc, [properties.minAltitude, properties.maxAltitude]);
+			gl.uniform2fv(shader.uMinMaxAltitudes_loc, new Float32Array([properties.minAltitude, properties.maxAltitude]));
+			gl.uniform2fv(shader.uMinMaxAltitudesBathymetryToGradient_loc, new Float32Array([properties.minAltitudeToGradient, properties.maxAltitudeToGradient]));
 		}
 	}
 
@@ -917,6 +918,7 @@ TinTerrain.prototype.bindTexture = function(gl, shader)
 
 					var properties = filter.properties;
 					gl.uniform2fv(shader.uMinMaxAltitudes_loc, new Float32Array([properties.minAltitude, properties.maxAltitude]));
+					//gl.uniform2fv(shader.uMinMaxAltitudesBathymetryToGradient_loc, new Float32Array([properties.minAltitudeToGradient, properties.maxAltitudeToGradient]));
 					gl.uniform1i(shader.bApplyCaustics_loc, properties.caustics);
 				}
 			}
@@ -967,6 +969,7 @@ TinTerrain.prototype.bindTexture = function(gl, shader)
 
 				var properties = filter.properties;
 				gl.uniform2fv(shader.uMinMaxAltitudes_loc, new Float32Array([properties.minAltitude, properties.maxAltitude]));
+				//gl.uniform2fv(shader.uMinMaxAltitudesBathymetryToGradient_loc, new Float32Array([properties.minAltitudeToGradient, properties.maxAltitudeToGradient]));
 				gl.uniform1i(shader.bApplyCaustics_loc, properties.caustics);
 			}
 		}
@@ -979,6 +982,10 @@ TinTerrain.prototype.bindTexture = function(gl, shader)
 
 TinTerrain.prototype.prepareTexture = function(texturesMap, imagerys, magoManager, tinTerrainManager)
 {
+	// Check loading status.
+	if (magoManager.fileRequestControler.tinTerrainTexturesRequested > 4)
+	{ return; }
+
 	var gl = magoManager.sceneState.gl;
 
 	var L = this.depth.toString();
@@ -1005,6 +1012,10 @@ TinTerrain.prototype.prepareTexture = function(texturesMap, imagerys, magoManage
 		this.texture[id].imagery = imagery;
 
 		tinTerrainManager.addTextureId(id);
+
+		// Check loading status.
+		if (magoManager.fileRequestControler.tinTerrainTexturesRequested > 4)
+		{ return; }
 	}	
 };
 
@@ -1096,6 +1107,9 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 	// Prepare this tinTerrain.
 	if (this.fileLoadState === CODE.fileLoadState.READY)
 	{
+		if (magoManager.fileRequestControler.tinTerrainFilesRequested > 5)
+		{ return false; }
+		
 		//해당 터레인 xyz를 terrainInfo와 비교하여 유효한 파일이면 통과, 아닐시 plain으로 처리
 		if (!this.checkAvailableTerrain()) 
 		{

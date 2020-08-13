@@ -560,10 +560,12 @@ void main()
 		if(uActiveTextures[5] == 10)
 		{
 			vec4 layersTextureColor = texture2D(diffuseTex_3, texCoord);
-			if(layersTextureColor.w > 0.0)
+			//if(layersTextureColor.w > 0.0)
 			{
 				// decode the grayScale.***
-				altitude = uMinMaxAltitudes.x + layersTextureColor.r * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);
+				float sumAux = layersTextureColor.r;// + layersTextureColor.g + layersTextureColor.b;// + layersTextureColor.w;
+				//sumAux *= 6.6;
+				altitude = uMinMaxAltitudes.x + sumAux * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);
 			}
 		}
 		// End Dem image.------------------------------------------------------------------------------------------------------------
@@ -577,10 +579,6 @@ void main()
 		if(bApplySsao && altitude<0.0)
 		{
 			// must find depthTex & noiseTex.***
-			////float farForDepth = 30000.0;
-			
-			
-			
 			vec3 origin = ray * linearDepth;  
 			float ssaoRadius = radius*20.0;
 			float tolerance = ssaoRadius/far; // original.***

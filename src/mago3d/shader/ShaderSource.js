@@ -3959,6 +3959,7 @@ uniform float externalAlphasArray[8];\n\
 uniform int uActiveTextures[8];\n\
 uniform vec4 uExternalTexCoordsArray[8]; // vec4 (minS, minT, maxS, maxT).\n\
 uniform vec2 uMinMaxAltitudes; // used for altitudes textures as bathymetry.\n\
+uniform vec2 uMinMaxAltitudesBathymetryToGradient; // used for altitudes textures as bathymetry.\n\
 \n\
 varying vec2 v_tex_pos;\n\
 \n\
@@ -4259,8 +4260,11 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
         if(currColor4.w > 0.0)\n\
         {\n\
             // decode the grayScale.***\n\
-            altitude = uMinMaxAltitudes.x + currColor4.r * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);\n\
-        \n\
+            float height;\n\
+            float R = currColor4.r;\n\
+            height = R;\n\
+            altitude = uMinMaxAltitudes.x + height * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);\n\
+\n\
             if(altitude < 0.0)\n\
             {\n\
                 /*\n\
@@ -4274,11 +4278,16 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
                 float blue = gray*2.0 + 2.0;\n\
                 seaColor = vec4(red, green, blue, 1.0);\n\
                 */\n\
-                vec3 seaColorRGB = getWhiteToBlueColor_byHeight(altitude, 0.0, uMinMaxAltitudes.x);\n\
+                // vec3 seaColorRGB = getWhiteToBlueColor_byHeight(altitude, 0.0, uMinMaxAltitudes.x);\n\
+\n\
+                //uMinMaxAltitudesBathymetryToGradient\n\
+                //vec3 seaColorRGB = getWhiteToBlueColor_byHeight(altitude, 0.0, -200.0);\n\
+                vec3 seaColorRGB = getWhiteToBlueColor_byHeight(altitude, uMinMaxAltitudesBathymetryToGradient.y, uMinMaxAltitudesBathymetryToGradient.x);\n\
                 vec4 seaColor = vec4(seaColorRGB, 1.0);\n\
                 \n\
                 resultTextureColor = mix(resultTextureColor, seaColor, 0.99); \n\
             }\n\
+\n\
         }\n\
     }\n\
 }\n\
@@ -6113,10 +6122,12 @@ void main()\n\
 		if(uActiveTextures[5] == 10)\n\
 		{\n\
 			vec4 layersTextureColor = texture2D(diffuseTex_3, texCoord);\n\
-			if(layersTextureColor.w > 0.0)\n\
+			//if(layersTextureColor.w > 0.0)\n\
 			{\n\
 				// decode the grayScale.***\n\
-				altitude = uMinMaxAltitudes.x + layersTextureColor.r * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);\n\
+				float sumAux = layersTextureColor.r;// + layersTextureColor.g + layersTextureColor.b;// + layersTextureColor.w;\n\
+				//sumAux *= 6.6;\n\
+				altitude = uMinMaxAltitudes.x + sumAux * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);\n\
 			}\n\
 		}\n\
 		// End Dem image.------------------------------------------------------------------------------------------------------------\n\
@@ -6130,10 +6141,6 @@ void main()\n\
 		if(bApplySsao && altitude<0.0)\n\
 		{\n\
 			// must find depthTex & noiseTex.***\n\
-			////float farForDepth = 30000.0;\n\
-			\n\
-			\n\
-			\n\
 			vec3 origin = ray * linearDepth;  \n\
 			float ssaoRadius = radius*20.0;\n\
 			float tolerance = ssaoRadius/far; // original.***\n\

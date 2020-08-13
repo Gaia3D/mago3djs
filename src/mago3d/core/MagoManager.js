@@ -1529,27 +1529,31 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
  * cluster 데이터 설정
  * @param {Cluster} cluster 
  */
-MagoManager.prototype.addCluster = function(cluster) {
-	if(!cluster || !cluster instanceof Cluster) {
+MagoManager.prototype.addCluster = function(cluster) 
+{
+	if (!cluster || !cluster instanceof Cluster) 
+	{
 		throw new Error('cluster is required.');
 	}
 	
 	this.cluster = cluster;
-}
+};
 
 /**
  * cluster 데이터 삭제
  */
-MagoManager.prototype.clearCluster = function() {
-	if(this.objMarkerManager)
+MagoManager.prototype.clearCluster = function() 
+{
+	if (this.objMarkerManager)
 	{
-		this.objMarkerManager.setMarkerByCondition(function(om){
+		this.objMarkerManager.setMarkerByCondition(function(om)
+		{
 			return !om.tree;
 		});
 	}
 	
 	this.cluster = undefined;
-}
+};
 
 MagoManager.prototype.renderCluster = function() 
 {
@@ -5066,6 +5070,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.externalAlphasArray_loc = gl.getUniformLocation(shader.program, "externalAlphasArray");
 	shader.uExternalTexCoordsArray_loc = gl.getUniformLocation(shader.program, "uExternalTexCoordsArray");
 	shader.uMinMaxAltitudes_loc = gl.getUniformLocation(shader.program, "uMinMaxAltitudes");
+	shader.uMinMaxAltitudesBathymetryToGradient_loc = gl.getUniformLocation(shader.program, "uMinMaxAltitudesBathymetryToGradient");
 	shader.tex_0_loc = gl.getUniformLocation(shader.program, "texture_0");
 	shader.tex_1_loc = gl.getUniformLocation(shader.program, "texture_1");
 	shader.tex_2_loc = gl.getUniformLocation(shader.program, "texture_2");
@@ -5470,7 +5475,8 @@ MagoManager.prototype.flyTo = function(longitude, latitude, altitude, duration)
  * 주어진 3차원 점을 포함하는 영역으로 이동
  * @param {Point3D} pointsArray 3차원 점
  */
-MagoManager.prototype.flyToBox = function(pointsArray) {
+MagoManager.prototype.flyToBox = function(pointsArray) 
+{
 	var bbox = new BoundingBox();
 	bbox.init(pointsArray[0]);
 	bbox.addPoint(pointsArray[1]);
@@ -5481,11 +5487,11 @@ MagoManager.prototype.flyToBox = function(pointsArray) {
 	if (this.isCesiumGlobe())
 	{
 		var bboxCenterPoint = bbox.getCenterPoint();
-		this.boundingSphere_Aux.center = Cesium.Cartesian3.clone({x:bboxCenterPoint.x,y:bboxCenterPoint.y,z:bboxCenterPoint.z});
+		this.boundingSphere_Aux.center = Cesium.Cartesian3.clone({x: bboxCenterPoint.x, y: bboxCenterPoint.y, z: bboxCenterPoint.z});
 		var seconds = 3;
-		this.scene.camera.flyToBoundingSphere(this.boundingSphere_Aux, {duration:seconds});
+		this.scene.camera.flyToBoundingSphere(this.boundingSphere_Aux, {duration: seconds});
 	}
-}
+};
 /**
  * dataKey 이용해서 data 검색
  * @param apiName api 이름

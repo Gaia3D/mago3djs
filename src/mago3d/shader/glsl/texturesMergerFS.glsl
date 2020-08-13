@@ -15,6 +15,7 @@ uniform float externalAlphasArray[8];
 uniform int uActiveTextures[8];
 uniform vec4 uExternalTexCoordsArray[8]; // vec4 (minS, minT, maxS, maxT).
 uniform vec2 uMinMaxAltitudes; // used for altitudes textures as bathymetry.
+uniform vec2 uMinMaxAltitudesBathymetryToGradient; // used for altitudes textures as bathymetry.
 
 varying vec2 v_tex_pos;
 
@@ -315,8 +316,11 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
         if(currColor4.w > 0.0)
         {
             // decode the grayScale.***
-            altitude = uMinMaxAltitudes.x + currColor4.r * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);
-        
+            float height;
+            float R = currColor4.r;
+            height = R;
+            altitude = uMinMaxAltitudes.x + height * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);
+
             if(altitude < 0.0)
             {
                 /*
@@ -330,11 +334,16 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
                 float blue = gray*2.0 + 2.0;
                 seaColor = vec4(red, green, blue, 1.0);
                 */
-                vec3 seaColorRGB = getWhiteToBlueColor_byHeight(altitude, 0.0, uMinMaxAltitudes.x);
+                // vec3 seaColorRGB = getWhiteToBlueColor_byHeight(altitude, 0.0, uMinMaxAltitudes.x);
+
+                //uMinMaxAltitudesBathymetryToGradient
+                //vec3 seaColorRGB = getWhiteToBlueColor_byHeight(altitude, 0.0, -200.0);
+                vec3 seaColorRGB = getWhiteToBlueColor_byHeight(altitude, uMinMaxAltitudesBathymetryToGradient.y, uMinMaxAltitudesBathymetryToGradient.x);
                 vec4 seaColor = vec4(seaColorRGB, 1.0);
                 
                 resultTextureColor = mix(resultTextureColor, seaColor, 0.99); 
             }
+
         }
     }
 }
