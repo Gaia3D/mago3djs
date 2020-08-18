@@ -5322,7 +5322,9 @@ MagoManager.prototype.doMultiFrustumCullingSmartTiles = function(camera)
 	// TinTerranTiles.*************************************************************************
 	// Provisionally:
 	if (this.tinTerrainManager !== undefined && this.tinTerrainManager.ready)
-	{ this.tinTerrainManager.doFrustumCulling(frustumVolume, camera, this); }
+	{ 
+		this.tinTerrainManager.doFrustumCulling(frustumVolume, camera, this); 
+	}
 };
 
 /**

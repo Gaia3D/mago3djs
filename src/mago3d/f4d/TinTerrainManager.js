@@ -523,14 +523,58 @@ TinTerrainManager.prototype.doFrustumCulling = function(frustum, camera, magoMan
 	if (maxDepth === undefined)
 	{ maxDepth = this.maxDepth; }
 
-	if (magoManager.fileRequestControler.tinTerrainFilesRequested >= 4 || magoManager.fileRequestControler.tinTerrainTexturesRequested >= 2)
-	{ return; }
+	//if (magoManager.fileRequestControler.tinTerrainFilesRequested >= 4 || magoManager.fileRequestControler.tinTerrainTexturesRequested >= 2)
+	//{ return; }
+
 
 	var camPos = camera.position;
 	//var camElevation = camera.getCameraElevation();
 	//var camTarget = camera.getTargetPositionAtDistance(camElevation/2, undefined);
 	//camPos = camTarget;
 	//camPos.camElevation = camElevation;
+	var canDoFrustumCulling = false;
+	if (this.cameraLastPosition === undefined)
+	{ 
+		this.cameraLastPosition = new Point3D(0.0, 0.0, 0.0); 
+	}
+
+	if (this.cameraLastTime === undefined)
+	{ 
+		this.cameraLastTime = magoManager.getCurrentTime(); 
+	}
+
+	if (this.cameraStopped === undefined)
+	{
+		this.cameraStopped = true;
+	}
+
+	var dist = camPos.distToPoint(this.cameraLastPosition);
+	if (dist < 4.0)
+	{
+		var timeDiff = magoManager.getCurrentTime() - this.cameraLastTime;
+		if (!this.cameraStopped && timeDiff > 500)
+		{
+			this.cameraStopped = true;
+		}
+
+		if (this.cameraStopped)
+		{
+			canDoFrustumCulling = true;
+			this.cameraLastTime = magoManager.getCurrentTime();
+		}
+		
+	}
+	else
+	{
+		canDoFrustumCulling = false;
+		this.cameraStopped = false;
+	}
+
+	this.cameraLastPosition.set(camPos.x, camPos.y, camPos.z);
+
+	if (!canDoFrustumCulling)
+	{ return; }
+		
 
 	// Test.
 	//var sceneState = magoManager.sceneState;
@@ -570,6 +614,9 @@ TinTerrainManager.prototype.doFrustumCulling = function(frustum, camera, magoMan
 TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager) 
 {
 	var tinTerrain;
+
+	if (!this.visibleTilesArrayMap)
+	{ return; }
 	
 	// For the visible tinTerrains prepare its.
 	// Preparing rule: First prepare the tinTerrain-owner if the owner is no prepared yet.
@@ -649,6 +696,9 @@ TinTerrainManager.prototype.prepareVisibleTinTerrainsTextures = function(magoMan
 {
 	var tinTerrain;
 
+	if (!this.visibleTilesArrayMap)
+	{ return; }
+
 	// Now, nearToFar, prepare texture if is meshPrepared.
 	for (var depth = this.maxDepth; depth > 0; depth--) 
 	{
@@ -678,7 +728,6 @@ TinTerrainManager.prototype.prepareVisibleTinTerrainsTextures = function(magoMan
 				for (var i=0; i<visiblesTilesCount; i++)
 				{
 					tinTerrain = visibleTilesArray[i];
-					//if (tinTerrain.isMeshPrepared())
 					if (tinTerrain.isVisible())
 					{
 						if (tinTerrain.prepareTexture(tinTerrain.texture, this.imagerys, magoManager, this) > 0)
@@ -961,10 +1010,13 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	gl.depthRange(0, 1);
 
 	// Render-Forward from tilesDepth = 1.***
-	if (this.tinTerrainQuadTreeMercator.childMap.LU) { this.tinTerrainQuadTreeMercator.childMap.LU.renderForward(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
-	if (this.tinTerrainQuadTreeMercator.childMap.LD) { this.tinTerrainQuadTreeMercator.childMap.LD.renderForward(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
-	if (this.tinTerrainQuadTreeMercator.childMap.RU) { this.tinTerrainQuadTreeMercator.childMap.RU.renderForward(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
-	if (this.tinTerrainQuadTreeMercator.childMap.RD) { this.tinTerrainQuadTreeMercator.childMap.RD.renderForward(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
+	if (this.tinTerrainQuadTreeMercator.childMap)
+	{
+		if (this.tinTerrainQuadTreeMercator.childMap.LU) { this.tinTerrainQuadTreeMercator.childMap.LU.renderForward(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
+		if (this.tinTerrainQuadTreeMercator.childMap.LD) { this.tinTerrainQuadTreeMercator.childMap.LD.renderForward(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
+		if (this.tinTerrainQuadTreeMercator.childMap.RU) { this.tinTerrainQuadTreeMercator.childMap.RU.renderForward(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
+		if (this.tinTerrainQuadTreeMercator.childMap.RD) { this.tinTerrainQuadTreeMercator.childMap.RD.renderForward(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
+	}
 	
 	// Render the sea.
 	
