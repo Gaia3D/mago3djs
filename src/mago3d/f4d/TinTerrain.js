@@ -982,121 +982,7 @@ TinTerrain.prototype.getTextureForVectorMeshObject = function(objToClamp, gl, sh
 	FBO.bindFramebuffer(gl, null);
 };
 
-TinTerrain.prototype.bindTexture = function(gl, shader)
-{
-	// Binding textureMaster.
-	var activeTexturesLayers = new Int32Array([1, 1, 0, 0, 1, 0, 0, 0]); // note: the 1rst & 2nd are shadowMap textures.
-	var externalAlphaLayers = new Float32Array([1, 1, 1, 1, 1, 1, 1, 1]); 
-
-	if (this.textureMaster)// && this.textureMasterPrepared === true)
-	{
-		gl.activeTexture(gl.TEXTURE4 + 0); 
-		gl.bindTexture(gl.TEXTURE_2D, this.textureMaster);
-
-		var geoExtentVec4 = this.geographicExtent.getExtentVec4();
-		gl.uniform4fv(shader.uTileGeoExtentOfBindedTextures_loc, geoExtentVec4); //[minLon, minLat, maxLon, maxLat].
-		gl.uniform1i(shader.uTileDepthOfBindedTextures_loc, this.depth);
-
-		// bind filter textures (for example : Bathymetry).
-		var textureKeys = Object.keys(this.texture);
-		var textureLength = textureKeys.length; 
-		for (var i=0;i<textureLength;i++) 
-		{
-			var textureKey = textureKeys[i];
-			var texture = this.texture[textureKey];
-			if (!(texture.texId instanceof WebGLTexture)) 
-			{
-				continue;
-			}
-
-			if (this.tinTerrainManager.textureIdDeleteMap[textureKey]) 
-			{
-				this.tinTerrainManager.eraseTexture(texture, magoManager);
-				delete this.texture[textureKey];
-				continue;
-			}
-			
-			if (!texture.imagery.show) { continue; }
-			
-			var filter = texture.imagery.filter;
-			if (filter) 
-			{
-				if (filter.type === CODE.imageFilter.BATHYMETRY) 
-				{
-					activeTexturesLayers[4+1] = 10;
-					gl.activeTexture(gl.TEXTURE4 + 1);
-					gl.bindTexture(gl.TEXTURE_2D, texture.texId);
-
-					var properties = filter.properties;
-					gl.uniform2fv(shader.uMinMaxAltitudes_loc, new Float32Array([properties.minAltitude, properties.maxAltitude]));
-					gl.uniform1i(shader.bApplyCaustics_loc, properties.caustics);
-				}
-			}
-		}	
-
-		gl.uniform1iv(shader.uActiveTextures_loc, activeTexturesLayers);
-		gl.uniform1fv(shader.externalAlphasArray_loc, externalAlphaLayers);
-		
-		//////////////////////////////////
-
-		return;
-	}
-	else
-	{
-		if (this.owner)
-		{ this.owner.bindTexture(gl, shader); }
-		else
-		{ var hola = 0; }
-	}
-
-	// If no exist textureMaster, then provisionally render textures individually.
-	
-	var textureKeys = Object.keys(this.texture);
-	var textureLength = textureKeys.length; 
-	for (var i=0;i<textureLength;i++) 
-	{
-		var textureKey = textureKeys[i];
-		var texture = this.texture[textureKey];
-		if (!(texture.texId instanceof WebGLTexture)) 
-		{
-			continue;
-		}
-
-		if (this.tinTerrainManager.textureIdDeleteMap[textureKey]) 
-		{
-			this.tinTerrainManager.eraseTexture(texture, magoManager);
-			delete this.texture[textureKey];
-			continue;
-		}
-		
-		if (!texture.imagery.show) { continue; }
-		
-		gl.activeTexture(gl.TEXTURE4 + i); 
-		gl.bindTexture(gl.TEXTURE_2D, texture.texId);
-		
-		activeTexturesLayers[4+i] = 1;
-		externalAlphaLayers[4+i] = texture.imagery.opacity;
-		var filter = texture.imagery.filter;
-		if (filter) 
-		{
-			if (filter.type === CODE.imageFilter.BATHYMETRY) 
-			{
-				activeTexturesLayers[4+i] = 10;
-				gl.bindTexture(gl.TEXTURE_2D, texture.texId);
-
-				var properties = filter.properties;
-				gl.uniform2fv(shader.uMinMaxAltitudes_loc, new Float32Array([properties.minAltitude, properties.maxAltitude]));
-				gl.uniform1i(shader.bApplyCaustics_loc, properties.caustics);
-			}
-		}
-	}	
-
-	gl.uniform1iv(shader.uActiveTextures_loc, activeTexturesLayers);
-	gl.uniform1fv(shader.externalAlphasArray_loc, externalAlphaLayers);
-	
-};
-
-TinTerrain.prototype.bindTexture__test = function(gl, shader, currDepth)
+TinTerrain.prototype.bindTexture = function(gl, shader, currDepth)
 {
 	// Binding textureMaster.
 	var activeTexturesLayers = new Int32Array([1, 1, 0, 0, 1, 0, 0, 0]); // note: the 1rst & 2nd are shadowMap textures.
@@ -1156,62 +1042,13 @@ TinTerrain.prototype.bindTexture__test = function(gl, shader, currDepth)
 		gl.uniform1fv(shader.externalAlphasArray_loc, externalAlphaLayers);
 		
 		//////////////////////////////////
-
 		return;
 	}
 	else
 	{
 		if (this.owner)
-		{ this.owner.bindTexture__test(gl, shader, currDepth); }
-		else
-		{ var hola = 0; }
+		{ this.owner.bindTexture(gl, shader, currDepth); }
 	}
-
-	// If no exist textureMaster, then provisionally render textures individually.
-	/*
-	var textureKeys = Object.keys(this.texture);
-	var textureLength = textureKeys.length; 
-	for (var i=0;i<textureLength;i++) 
-	{
-		var textureKey = textureKeys[i];
-		var texture = this.texture[textureKey];
-		if (!(texture.texId instanceof WebGLTexture)) 
-		{
-			continue;
-		}
-
-		if (this.tinTerrainManager.textureIdDeleteMap[textureKey]) 
-		{
-			this.tinTerrainManager.eraseTexture(texture, magoManager);
-			delete this.texture[textureKey];
-			continue;
-		}
-		
-		if (!texture.imagery.show) { continue; }
-		
-		gl.activeTexture(gl.TEXTURE4 + i); 
-		gl.bindTexture(gl.TEXTURE_2D, texture.texId);
-		
-		activeTexturesLayers[4+i] = 1;
-		externalAlphaLayers[4+i] = texture.imagery.opacity;
-		var filter = texture.imagery.filter;
-		if (filter) 
-		{
-			if (filter.type === CODE.imageFilter.BATHYMETRY) 
-			{
-				activeTexturesLayers[4+i] = 10;
-				gl.bindTexture(gl.TEXTURE_2D, texture.texId);
-
-				var properties = filter.properties;
-				gl.uniform2fv(shader.uMinMaxAltitudes_loc, new Float32Array([properties.minAltitude, properties.maxAltitude]));
-				gl.uniform1i(shader.bApplyCaustics_loc, properties.caustics);
-			}
-		}
-	}	
-	
-	gl.uniform1iv(shader.uActiveTextures_loc, activeTexturesLayers);
-	gl.uniform1fv(shader.externalAlphasArray_loc, externalAlphaLayers);
-	*/
 };
 
 TinTerrain.prototype.prepareTexture = function(texturesMap, imagerys, magoManager, tinTerrainManager)
@@ -1219,8 +1056,6 @@ TinTerrain.prototype.prepareTexture = function(texturesMap, imagerys, magoManage
 	// Check loading status.
 	if (magoManager.fileRequestControler.tinTerrainTexturesRequested >= 6)
 	{ return; }
-
-	
 
 	var gl = magoManager.sceneState.gl;
 
@@ -1834,63 +1669,14 @@ TinTerrain.prototype.deleteTinTerrain = function(magoManager)
 
 TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray)
 {	
-	if (this.depth === 0)
-	{ return true; }
-
-	if (this.depth === 3)
-	{ var hola = 0; }
-
-	if (this.depth === 4)
-	{ var hola = 0; }
-
-	if (this.depth === 5)
-	{ var hola = 0; }
-
-	if (this.depth === 6)
-	{ var hola = 0; }
-
-	if (this.depth === 7)
-	{ var hola = 0; }
-
-	if (this.depth === 8)
-	{ var hola = 0; }
-
-	// Check if children are visible & meshPrepared.
-	// If children are visible & meshPrepared, then render children.
-	var luVisible = false;
-	var ldVisible = false;
-	var ruVisible = false;
-	var rdVisible = false;
-	if (this.childMap)
-	{
-		if (this.childMap.LU){ luVisible = this.childMap.LU.isVisible(); }
-		if (this.childMap.LD){ ldVisible = this.childMap.LD.isVisible(); }
-		if (this.childMap.RU){ ruVisible = this.childMap.RU.isVisible(); }
-		if (this.childMap.RD){ rdVisible = this.childMap.RD.isVisible(); }
-	}
-
 	var isChildrenMeshPrepared = this.isChildrenMeshPrepared();
-	if (isChildrenMeshPrepared && !this.isLeaf)// && (luVisible || ldVisible || ruVisible || rdVisible ))
+	if (isChildrenMeshPrepared && !this.isLeaf)
 	{
 		// Render children.
-		
-
-		//if (luVisible)
-		{
-			this.childMap.LU.renderForward(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray);
-		}
-		//if (ldVisible)
-		{
-			this.childMap.LD.renderForward(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray);
-		}
-		//if (ruVisible)
-		{
-			this.childMap.RU.renderForward(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray);
-		}
-		//if (rdVisible)
-		{
-			this.childMap.RD.renderForward(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray);
-		}
+		this.childMap.LU.renderForward(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray);
+		this.childMap.LD.renderForward(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray);
+		this.childMap.RU.renderForward(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray);
+		this.childMap.RD.renderForward(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray);
 	}
 	else
 	{
@@ -1904,10 +1690,7 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 		if (!this.isMeshPrepared())
 		{ return true; }
 
-		if (this.depth > 3)
-		{ var hola = 0; }
-			
-		
+
 		var gl = magoManager.getGl();
 		if (renderType === 2)
 		{
@@ -1921,6 +1704,29 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 		}
 		else if (renderType === 1)
 		{
+			var sceneState = magoManager.sceneState;
+			if (sceneState.applySunShadows)
+			{
+				var light0 = sceneState.sunSystem.getLight(0);
+				var light0BSphere = light0.bSphere;
+				if (light0BSphere)
+				{
+					var light0Radius = light0BSphere.getRadius();
+					var light0CenterPoint = light0BSphere.getCenterPoint();
+
+					var sphereExtent = this.getSphereExtent(magoManager);
+					var distToLight0 = light0CenterPoint.distToPoint(sphereExtent.centerPoint)+sphereExtent.r;
+					if (distToLight0 < light0Radius*5.0)
+					{
+						gl.uniform1i(currentShader.sunIdx_loc, 0);
+					}
+					else
+					{
+						gl.uniform1i(currentShader.sunIdx_loc, 1);
+					}
+				}
+			}
+			//---------------------------------------------------------------------------------------------------------
 			var mustMakeTextureMaster = false;
 			if (this.objToClampToTerrainStyleId !== this.tinTerrainManager.objToClampToTerrainStyleId)
 			{ mustMakeTextureMaster = true; }
@@ -1982,8 +1788,7 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 			gl.uniform1f(currentShader.uTime_loc, fractionalTime);
 			// End caustics.----------------------------------------
 
-			//this.bindTexture(gl, currentShader);
-			this.bindTexture__test(gl, currentShader, this.depth);
+			this.bindTexture(gl, currentShader, this.depth);
 		}
 			
 		// render this tinTerrain.
@@ -2159,664 +1964,6 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 	
 	
 	
-	
-	return true;
-};
-
-TinTerrain.prototype.render = function(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray)
-{	
-	if (this.depth === 0)
-	{ return true; }
-
-	//if (this.depth === 3 && this.X === 6 && this.Y === 3)
-	//{ var hola = 0; }
-
-	var isPrepared = false;
-	if (this.depth <= this.tinTerrainManager.maxTextureGuranteedDepth)
-	{
-		if ( this.owner === undefined)
-		{
-			isPrepared = this.isPrepared();
-		}
-		else if ( this.owner.isMeshPrepared() && this.owner.isChildrenPrepared()) 
-		{
-			isPrepared = true;
-		}
-	}
-	else
-	{
-		if (this.isMeshPrepared() && this.owner.isChildrenMeshPrepared())
-		{
-			isPrepared = true;
-		}
-	}
-
-	//if (this.isChildrenRenderingPhase(this.tinTerrainManager.renderingFase))
-	//{ return; }
-
-	
-	
-	if (isPrepared)
-	{
-		//if (this.isPrepared())
-		{
-			if (this.fileLoadState === CODE.fileLoadState.LOAD_FAILED) // provisional solution.
-			{ return false; }
-		
-			if (this.depth <= 3 && !this.isTexturePrepared(this.texture))
-			{ 
-				if (this.owner !== undefined)
-				{ this.owner.render(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
-				//return false; 
-			}
-
-			if (this.isRenderingPhase === this.tinTerrainManager.renderingFase)
-			{ 
-				return; 
-			}
-
-			if (this.owner.renderingFase === this.tinTerrainManager.renderingFase)
-			{ 
-				// If my owner rendered, then do no render me.
-				return; 
-			}
-
-			if (this.isChildrenRenderingPhase(this.tinTerrainManager.renderingFase))
-			{ 
-				//this.isChildrenRenderingPhase(this.tinTerrainManager.renderingFase);
-				return; 
-			}
-
-			if (this.depth > 3)
-			{ var hola = 0; }
-			
-		
-			var gl = magoManager.getGl();
-			if (renderType === 2)
-			{
-				var colorAux;
-				colorAux = magoManager.selectionColor.getAvailableColor(colorAux);
-				var idxKey = magoManager.selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
-				magoManager.selectionManager.setCandidateGeneral(idxKey, this);
-				
-				gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
-				gl.uniform4fv(currentShader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
-			}
-			else if (renderType === 1)
-			{
-				var mustMakeTextureMaster = false;
-				if (this.objToClampToTerrainStyleId !== this.tinTerrainManager.objToClampToTerrainStyleId)
-				{ mustMakeTextureMaster = true; }
-
-				if (this.layersStyleId !== this.tinTerrainManager.layersStyleId)
-				{ mustMakeTextureMaster = true; }
-
-				if (mustMakeTextureMaster && this.isTexturePrepared(this.texture))
-				{
-					//this.textureMasterPrepared = undefined;
-					this.makeTextureMaster();
-
-					currentShader.resetLastBuffersBinded();
-					magoManager.postFxShadersManager.useProgram(currentShader);
-					currentShader.enableVertexAttribArray(currentShader.position3_loc);
-					if (bDepth)
-					{ currentShader.disableVertexAttribArray(currentShader.texCoord2_loc); }
-					else
-					{ currentShader.enableVertexAttribArray(currentShader.texCoord2_loc); }
-
-					gl.viewport(0, 0, magoManager.sceneState.drawingBufferWidth[0], magoManager.sceneState.drawingBufferHeight[0]);
-
-					var bApplySsao = true;
-					gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
-					if (bApplySsao)
-					{
-						gl.uniform1f(currentShader.aspectRatio_loc, magoManager.sceneState.camera.frustum.aspectRatio);
-						gl.uniform1f(currentShader.screenWidth_loc, magoManager.sceneState.drawingBufferWidth);	
-
-						// bind depthTex & noiseTex. channels 2 & 3.
-						var noiseTexture = magoManager.texturesStore.getNoiseTexture4x4();
-						gl.uniform2fv(currentShader.noiseScale2_loc, [magoManager.depthFboNeo.width/noiseTexture.width, magoManager.depthFboNeo.height/noiseTexture.height]);
-						gl.uniform3fv(currentShader.kernel16_loc, magoManager.sceneState.ssaoKernel16);
-
-						gl.activeTexture(gl.TEXTURE2);
-						gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);  // original.***
-						gl.activeTexture(gl.TEXTURE3);
-						gl.bindTexture(gl.TEXTURE_2D, noiseTexture);
-					}
-					
-				}
-				
-				gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
-				gl.uniform1f(currentShader.externalAlpha_loc, 1);
-				gl.uniform1i(currentShader.bApplySsao_loc, this.depth > 8); // apply ssao default.***
-				
-
-				// Caustics.***************************************
-				var time = new Date().getTime()/(1000.0);
-				var fractionalTime = (time%1000);
-
-				if (this.timeRandomFactor === undefined)
-				{ this.timeRandomFactor = Math.random()*1000.0; }
-
-				fractionalTime += this.timeRandomFactor;
-				if (fractionalTime > 1000.0)
-				{ fractionalTime -= 1000.0; }
-
-				gl.uniform1f(currentShader.uTime_loc, fractionalTime);
-				// End caustics.----------------------------------------
-
-				//this.bindTexture(gl, currentShader);
-				this.bindTexture__test(gl, currentShader, this.depth);
-			}
-			
-			// render this tinTerrain.
-			var renderWireframe = false;
-			var vboMemManager = magoManager.vboMemoryManager;
-
-			if (this.terrainPositionHIGH === undefined)
-			{
-				var hola = 0;
-				//this.isMeshPrepared();
-				return;
-			}
-			
-			gl.uniform3fv(currentShader.buildingPosHIGH_loc, this.terrainPositionHIGH);
-			gl.uniform3fv(currentShader.buildingPosLOW_loc, this.terrainPositionLOW);
-			
-			gl.uniform1i(currentShader.uTileDepth_loc, this.depth);
-			gl.uniform1i(currentShader.uSeaOrTerrainType_loc, 0); // 0= terrain. 1= ocean.
-			var geoExtentVec4 = this.geographicExtent.getExtentVec4();
-			gl.uniform4fv(currentShader.uTileGeoExtent_loc, geoExtentVec4); //[minLon, minLat, maxLon, maxLat].
-			
-			
-			
-			var vboKey = this.vboKeyContainer.vboCacheKeysArray[0]; // the idx = 0 is the terrain. idx = 1 is the skirt.
-			
-			// Positions.
-			if (!vboKey.bindDataPosition(currentShader, vboMemManager))
-			{ 
-				if (this.owner !== undefined)
-				{ this.owner.render(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
-				return false; 
-			}
-		
-			// TexCoords (No necessary for depth rendering).
-			if (!bDepth)
-			{
-				if (!vboKey.bindDataTexCoord(currentShader, vboMemManager))
-				{
-					if (this.owner !== undefined)
-					{ this.owner.render(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }					
-					return false; 
-				}
-			}
-			
-			// Normals.
-			if (!vboKey.bindDataNormal(currentShader, vboMemManager))
-			{ 
-				if (this.owner !== undefined)
-				{ this.owner.render(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
-				return false; 
-			}
-			
-			// Colors.
-			// todo:
-			
-			
-			/*
-			if (vboKey.bindDataCustom(currentShader, vboMemManager, "altitudes"))
-			{
-				gl.uniform1i(currentShader.bExistAltitudes_loc, true);
-			}
-			else 
-			{
-				gl.uniform1i(currentShader.bExistAltitudes_loc, false);
-			}
-			*/
-			
-			// Indices.
-			if (!vboKey.bindDataIndice(currentShader, vboMemManager))
-			{ 
-				if (this.owner !== undefined)
-				{ this.owner.render(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
-				return false; 
-			}
-			
-			var indicesCount = vboKey.indicesCount;
-			
-			//var currSelObject = magoManager.selectionManager.getSelectedGeneral();
-			//if (currSelObject !== this)
-			{
-				if (renderWireframe)
-				{
-					var trianglesCount = indicesCount;
-					for (var i=0; i<trianglesCount; i++)
-					{
-						gl.drawElements(gl.LINE_LOOP, 3, gl.UNSIGNED_SHORT, i*3); // Fill.
-					}
-				}
-				else
-				{
-					var currSelObject = magoManager.selectionManager.getSelectedGeneral();
-					if (currSelObject !== this)
-					{ gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); } // Fill.
-				}
-			}
-			
-			succesfullyRenderedTilesArray.push(this);
-
-			// Init the intersectionType.
-			this.intersectionType = Constant.INTERSECTION_OUTSIDE;
-			
-			// Test Render wireframe if selected.*************************************************************
-			
-			if (renderType === 1)
-			{
-				gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
-				var currSelObject = magoManager.selectionManager.getSelectedGeneral();
-				if (currSelObject === this)
-				{
-					gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
-					gl.uniform4fv(currentShader.oneColor4_loc, [0.0, 0.9, 0.9, 1.0]);
-					
-					gl.drawElements(gl.LINES, indicesCount-1, gl.UNSIGNED_SHORT, 0); 
-					
-					//if (this.tinTerrainManager.getTerrainType() === 0)
-					//{
-					//	gl.drawElements(gl.LINE_STRIP, indicesCount-1, gl.UNSIGNED_SHORT, 0); 
-					//}
-					//else 
-					//{
-					//var trianglesCount = indicesCount;
-					//for (var i=0; i<trianglesCount-1; i++)
-					//{
-					//	gl.drawElements(gl.LINE_LOOP, 3, gl.UNSIGNED_SHORT, i*3); 
-					//}
-					//}
-					
-					this.drawTerrainName(magoManager);
-				}
-				//this.drawTerrainName(magoManager); // test. delete.
-			}
-			// End test.--------------------------------------------------------------------------------------
-			
-			// Render skirt if exist.
-			
-			var vboKey = this.vboKeyContainer.vboCacheKeysArray[1]; // the idx = 0 is the terrain. idx = 1 is the skirt.
-			if (vboKey === undefined)
-			{ return; }
-			
-			// Positions.
-			if (!vboKey.bindDataPosition(currentShader, vboMemManager))
-			{ 
-				return false; 
-			}
-		
-			// TexCoords (No necessary for depth rendering).
-			if (renderType === 1)
-			{
-				if (!vboKey.bindDataTexCoord(currentShader, vboMemManager))
-				{				
-					return false; 
-				}
-			}
-			
-			//if (vboKey.bindDataCustom(currentShader, vboMemManager, "altitudes"))
-			//{
-			//	gl.uniform1i(currentShader.bExistAltitudes_loc, true);
-			//}
-			//else 
-			//{
-			//	gl.uniform1i(currentShader.bExistAltitudes_loc, false);
-			//}
-			gl.uniform1i(currentShader.bApplySsao_loc, false); // no apply ssao on skirt.***
-
-			var currSelObject = magoManager.selectionManager.getSelectedGeneral();
-			if (currSelObject !== this)// && renderType !== 0)
-			{ 
-				//gl.depthRange(0.5, 1);
-				gl.drawArrays(gl.TRIANGLE_STRIP, 0, vboKey.vertexCount); 
-				//gl.depthRange(0, 1);
-			} 
-			
-			this.renderingFase = this.tinTerrainManager.renderingFase;
-		}
-		//else 
-		//{
-		//	// render the owner tinTerrain.
-		//	if (this.owner !== undefined)
-		//	{ this.owner.render(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
-		//}
-	}
-	else 
-	{
-		// render the owner tinTerrain.
-		if (this.owner !== undefined && this.isVisible())
-		{ this.owner.render(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
-	}
-	
-	return true;
-};
-
-TinTerrain.prototype.render__original = function(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray)
-{	
-	if (this.depth === 0)
-	{ return true; }
-
-	//if (this.isChildrenPrepared())
-	//{ 
-	//	this.subTile_LU.
-	//	return false; 
-	//}
-	
-	if (this.owner === undefined || (this.owner.isPrepared() && this.owner.isChildrenPrepared()))
-	{
-		if (this.isPrepared())
-		{
-			if (this.fileLoadState === CODE.fileLoadState.LOAD_FAILED) // provisional solution.
-			{ return false; }
-		
-			if (!this.isTexturePrepared(this.texture))
-			{ return false; }
-
-			if (this.renderingFase === this.tinTerrainManager.renderingFase)
-			{ 
-				return; 
-			}
-
-			if (this.owner.renderingFase === this.tinTerrainManager.renderingFase)
-			{ 
-				// If my owner rendered, then do no render me.
-				return; 
-			}
-
-			
-		
-			var gl = magoManager.getGl();
-			if (renderType === 2)
-			{
-				var colorAux;
-				colorAux = magoManager.selectionColor.getAvailableColor(colorAux);
-				var idxKey = magoManager.selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
-				magoManager.selectionManager.setCandidateGeneral(idxKey, this);
-				
-				gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
-				gl.uniform4fv(currentShader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
-			}
-			else if (renderType === 1)
-			{
-				var mustMakeTextureMaster = false;
-				if (this.objToClampToTerrainStyleId !== this.tinTerrainManager.objToClampToTerrainStyleId)
-				{ mustMakeTextureMaster = true; }
-
-				if (this.layersStyleId !== this.tinTerrainManager.layersStyleId)
-				{ mustMakeTextureMaster = true; }
-
-				if (mustMakeTextureMaster && this.isTexturePrepared(this.texture))
-				{
-					//this.textureMasterPrepared = undefined;
-					this.makeTextureMaster();
-
-					currentShader.resetLastBuffersBinded();
-					magoManager.postFxShadersManager.useProgram(currentShader);
-					currentShader.enableVertexAttribArray(currentShader.position3_loc);
-					if (bDepth)
-					{ currentShader.disableVertexAttribArray(currentShader.texCoord2_loc); }
-					else
-					{ currentShader.enableVertexAttribArray(currentShader.texCoord2_loc); }
-
-					gl.viewport(0, 0, magoManager.sceneState.drawingBufferWidth[0], magoManager.sceneState.drawingBufferHeight[0]);
-					/*
-					currentShader.bindUniformGenerals();
-					gl.uniform1i(currentShader.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
-
-					var tex = magoManager.texturesStore.getTextureAux1x1(); // provisional.
-					gl.activeTexture(gl.TEXTURE2); 
-					gl.bindTexture(gl.TEXTURE_2D, tex.texId);
-	
-					var textureAux1x1 = magoManager.texturesStore.getTextureAux1x1();
-					var noiseTexture = magoManager.texturesStore.getNoiseTexture4x4();
-		
-					gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture. Initially set as texture color type.***
-					gl.uniform4fv(currentShader.oneColor4_loc, [0.5, 0.5, 0.5, 1.0]);
-					gl.uniform1i(currentShader.refMatrixType_loc, 0); // init referencesMatrix.
-					gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, this.tinTerrainManager.identityMat._floatArrays);
-		
-					gl.uniform1i(currentShader.bApplySpecularLighting_loc, true);
-
-					// shader.altitude_loc
-					gl.uniform1i(currentShader.bExistAltitudes_loc, false);
-		
-					var bApplyShadow = false;
-					if (magoManager.sceneState.sunSystem !== undefined && magoManager.sceneState.applySunShadows)
-					{ bApplyShadow = true; }
-					gl.uniform1i(currentShader.bApplyShadow_loc, bApplyShadow);
-
-
-					for (var i=0; i<8; i++)
-					{
-						gl.activeTexture(gl.TEXTURE0+i); 
-						gl.bindTexture(gl.TEXTURE_2D, null);
-					}
-					*/
-					var bApplySsao = true;
-					gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
-					if (bApplySsao)
-					{
-						gl.uniform1f(currentShader.aspectRatio_loc, magoManager.sceneState.camera.frustum.aspectRatio);
-						gl.uniform1f(currentShader.screenWidth_loc, magoManager.sceneState.drawingBufferWidth);	
-
-						// bind depthTex & noiseTex. channels 2 & 3.
-						var noiseTexture = magoManager.texturesStore.getNoiseTexture4x4();
-						gl.uniform2fv(currentShader.noiseScale2_loc, [magoManager.depthFboNeo.width/noiseTexture.width, magoManager.depthFboNeo.height/noiseTexture.height]);
-						gl.uniform3fv(currentShader.kernel16_loc, magoManager.sceneState.ssaoKernel16);
-
-						gl.activeTexture(gl.TEXTURE2);
-						gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);  // original.***
-						gl.activeTexture(gl.TEXTURE3);
-						gl.bindTexture(gl.TEXTURE_2D, noiseTexture);
-					}
-					
-				}
-				
-				gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
-				gl.uniform1f(currentShader.externalAlpha_loc, 1);
-				gl.uniform1i(currentShader.bApplySsao_loc, this.depth > 8); // apply ssao default.***
-				
-
-				// Caustics.***************************************
-				var time = new Date().getTime()/(1000.0);
-				var fractionalTime = (time%1000);
-
-				if (this.timeRandomFactor === undefined)
-				{ this.timeRandomFactor = Math.random()*1000.0; }
-
-				fractionalTime += this.timeRandomFactor;
-				if (fractionalTime > 1000.0)
-				{ fractionalTime -= 1000.0; }
-
-				gl.uniform1f(currentShader.uTime_loc, fractionalTime);
-				// End caustics.----------------------------------------
-
-				this.bindTexture(gl, currentShader);
-
-			}
-			
-			// render this tinTerrain.
-			var renderWireframe = false;
-			var vboMemManager = magoManager.vboMemoryManager;
-			
-			gl.uniform3fv(currentShader.buildingPosHIGH_loc, this.terrainPositionHIGH);
-			gl.uniform3fv(currentShader.buildingPosLOW_loc, this.terrainPositionLOW);
-			
-			gl.uniform1i(currentShader.uTileDepth_loc, this.depth);
-			gl.uniform1i(currentShader.uSeaOrTerrainType_loc, 0); // terrain.
-			//gl.uniform1i(currentShader.uSeaOrTerrainType_loc, 1); // ocean.
-			
-			var vboKey = this.vboKeyContainer.vboCacheKeysArray[0]; // the idx = 0 is the terrain. idx = 1 is the skirt.
-			
-			// Positions.
-			if (!vboKey.bindDataPosition(currentShader, vboMemManager))
-			{ 
-				if (this.owner !== undefined)
-				{ this.owner.render(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
-				return false; 
-			}
-		
-			// TexCoords (No necessary for depth rendering).
-			if (!bDepth)
-			{
-				if (!vboKey.bindDataTexCoord(currentShader, vboMemManager))
-				{
-					if (this.owner !== undefined)
-					{ this.owner.render(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }					
-					return false; 
-				}
-			}
-			
-			// Normals.
-			if (!vboKey.bindDataNormal(currentShader, vboMemManager))
-			{ 
-				if (this.owner !== undefined)
-				{ this.owner.render(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
-				return false; 
-			}
-			
-			// Colors.
-			// todo:
-			
-			
-			/*
-			if (vboKey.bindDataCustom(currentShader, vboMemManager, "altitudes"))
-			{
-				gl.uniform1i(currentShader.bExistAltitudes_loc, true);
-			}
-			else 
-			{
-				gl.uniform1i(currentShader.bExistAltitudes_loc, false);
-			}
-			*/
-			
-			// Indices.
-			if (!vboKey.bindDataIndice(currentShader, vboMemManager))
-			{ 
-				if (this.owner !== undefined)
-				{ this.owner.render(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
-				return false; 
-			}
-			
-			var indicesCount = vboKey.indicesCount;
-			
-			//var currSelObject = magoManager.selectionManager.getSelectedGeneral();
-			//if (currSelObject !== this)
-			{
-				if (renderWireframe)
-				{
-					var trianglesCount = indicesCount;
-					for (var i=0; i<trianglesCount; i++)
-					{
-						gl.drawElements(gl.LINE_LOOP, 3, gl.UNSIGNED_SHORT, i*3); // Fill.
-					}
-				}
-				else
-				{
-					var currSelObject = magoManager.selectionManager.getSelectedGeneral();
-					if (currSelObject !== this)
-					{ gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); } // Fill.
-				}
-			}
-			
-			succesfullyRenderedTilesArray.push(this);
-
-			// Init the intersectionType.
-			this.intersectionType = Constant.INTERSECTION_OUTSIDE;
-			
-			// Test Render wireframe if selected.*************************************************************
-			
-			if (renderType === 1)
-			{
-				gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
-				var currSelObject = magoManager.selectionManager.getSelectedGeneral();
-				if (currSelObject === this)
-				{
-					gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
-					gl.uniform4fv(currentShader.oneColor4_loc, [0.0, 0.9, 0.9, 1.0]);
-					
-					gl.drawElements(gl.LINES, indicesCount-1, gl.UNSIGNED_SHORT, 0); 
-					
-					//if (this.tinTerrainManager.getTerrainType() === 0)
-					//{
-					//	gl.drawElements(gl.LINE_STRIP, indicesCount-1, gl.UNSIGNED_SHORT, 0); 
-					//}
-					//else 
-					//{
-					//var trianglesCount = indicesCount;
-					//for (var i=0; i<trianglesCount-1; i++)
-					//{
-					//	gl.drawElements(gl.LINE_LOOP, 3, gl.UNSIGNED_SHORT, i*3); 
-					//}
-					//}
-					
-					this.drawTerrainName(magoManager);
-				}
-				//this.drawTerrainName(magoManager); // test. delete.
-			}
-			// End test.--------------------------------------------------------------------------------------
-			
-			// Render skirt if exist.
-			
-			var vboKey = this.vboKeyContainer.vboCacheKeysArray[1]; // the idx = 0 is the terrain. idx = 1 is the skirt.
-			if (vboKey === undefined)
-			{ return; }
-			
-			// Positions.
-			if (!vboKey.bindDataPosition(currentShader, vboMemManager))
-			{ 
-				return false; 
-			}
-		
-			// TexCoords (No necessary for depth rendering).
-			if (renderType === 1)
-			{
-				if (!vboKey.bindDataTexCoord(currentShader, vboMemManager))
-				{				
-					return false; 
-				}
-			}
-			
-			//if (vboKey.bindDataCustom(currentShader, vboMemManager, "altitudes"))
-			//{
-			//	gl.uniform1i(currentShader.bExistAltitudes_loc, true);
-			//}
-			//else 
-			//{
-			//	gl.uniform1i(currentShader.bExistAltitudes_loc, false);
-			//}
-			gl.uniform1i(currentShader.bApplySsao_loc, false); // no apply ssao on skirt.***
-
-			var currSelObject = magoManager.selectionManager.getSelectedGeneral();
-			if (currSelObject !== this)// && renderType !== 0)
-			{ 
-				//gl.depthRange(0.5, 1);
-				gl.drawArrays(gl.TRIANGLE_STRIP, 0, vboKey.vertexCount); 
-				//gl.depthRange(0, 1);
-			} 
-			
-			this.renderingFase = this.tinTerrainManager.renderingFase;
-		}
-		else 
-		{
-			// render the owner tinTerrain.
-			if (this.owner !== undefined)
-			{ this.owner.render(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
-		}
-	}
-	else 
-	{
-		// render the owner tinTerrain.
-		if (this.owner !== undefined)
-		{ this.owner.render(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
-	}
 	
 	return true;
 };
@@ -3153,17 +2300,7 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 		this.isLeaf = true;
 
 		this.putObjectToArraySortedByDist(visibleTilesArrayMap[this.depth], this);
-		//this.owner.childMap.LU.intersectionType = Constant.INTERSECTION_INTERSECT;
-		//this.owner.childMap.LD.intersectionType = Constant.INTERSECTION_INTERSECT;
-		//this.owner.childMap.RU.intersectionType = Constant.INTERSECTION_INTERSECT;
-		//this.owner.childMap.RD.intersectionType = Constant.INTERSECTION_INTERSECT;
 
-		// Must put all sibling tiles.
-		//this.putObjectToArraySortedByDist(visibleTilesArrayMap[this.depth], this.owner.childMap.LU);
-		//this.putObjectToArraySortedByDist(visibleTilesArrayMap[this.depth], this.owner.childMap.LD);
-		//this.putObjectToArraySortedByDist(visibleTilesArrayMap[this.depth], this.owner.childMap.RU);
-		//this.putObjectToArraySortedByDist(visibleTilesArrayMap[this.depth], this.owner.childMap.RD);
-		
 		// Now, extract all lowest-child and put into "noVisibleTilesArray".***
 		if (this.hasChildren())
 		{

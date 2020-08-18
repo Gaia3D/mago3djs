@@ -847,9 +847,6 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 
 	if (renderType === 1)
 	{
-		
-
-
 		var tex = magoManager.texturesStore.getTextureAux1x1(); // provisional.
 		gl.activeTexture(gl.TEXTURE2); 
 		gl.bindTexture(gl.TEXTURE_2D, tex.texId);
@@ -957,69 +954,17 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 		gl.uniform1i(currentShader.uRenderType_loc, 2);
 	}
 	
-	var sceneState = magoManager.sceneState;
-	var bApplyShadow = sceneState.applySunShadows;
-	var renderWireframe = false;
-	var tinTerrain;
-	var visiblesTilesCount = this.visibleTilesArray.length;
-	
-	// check if apply sun shadow.
-	var light0 = sceneState.sunSystem.getLight(0);
-	var light0MaxDistToCam = light0.maxDistToCam;
-	var light0BSphere = light0.bSphere;
-	if (light0BSphere === undefined)
-	{ bApplyShadow = false; } // cant apply shadow anyway.
+
 	
 	var succesfullyRenderedTilesArray = [];
 
 	gl.depthRange(0, 1);
-	//gl.depthFunc(gl.GREATER);
-	
-	if (bApplyShadow)
-	{
-		var light0Radius = light0BSphere.getRadius();
-		var light0CenterPoint = light0BSphere.getCenterPoint();
-		for (var i=0; i<visiblesTilesCount; i++)
-		{
-			tinTerrain = this.visibleTilesArray[i];
-			
-			if (tinTerrain === undefined)
-			{ continue; }
-		
-			var sphereExtent = tinTerrain.getSphereExtent(magoManager);
-			var distToLight0 = light0CenterPoint.distToPoint(sphereExtent.centerPoint)+sphereExtent.r;
-			if (distToLight0 < light0Radius*5.0)
-			{
-				gl.uniform1i(currentShader.sunIdx_loc, 0);
-			}
-			else
-			{
-				gl.uniform1i(currentShader.sunIdx_loc, 1);
-			}
-			tinTerrain.render(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray);
-		}
-	}
-	else
-	{
-		
-		for (var i=0; i<visiblesTilesCount; i++)
-		{
-			tinTerrain = this.visibleTilesArray[i];
-			
-			if (tinTerrain === undefined)
-			{ continue; }
-		
-			//tinTerrain.renderForward(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray);
-			//break;
-		}
-		
 
-		if (this.tinTerrainQuadTreeMercator.childMap.LU) { this.tinTerrainQuadTreeMercator.childMap.LU.renderForward(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
-		if (this.tinTerrainQuadTreeMercator.childMap.LD) { this.tinTerrainQuadTreeMercator.childMap.LD.renderForward(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
-		if (this.tinTerrainQuadTreeMercator.childMap.RU) { this.tinTerrainQuadTreeMercator.childMap.RU.renderForward(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
-		if (this.tinTerrainQuadTreeMercator.childMap.RD) { this.tinTerrainQuadTreeMercator.childMap.RD.renderForward(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
-	}
-	
+	// Render-Forward from tilesDepth = 1.***
+	if (this.tinTerrainQuadTreeMercator.childMap.LU) { this.tinTerrainQuadTreeMercator.childMap.LU.renderForward(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
+	if (this.tinTerrainQuadTreeMercator.childMap.LD) { this.tinTerrainQuadTreeMercator.childMap.LD.renderForward(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
+	if (this.tinTerrainQuadTreeMercator.childMap.RU) { this.tinTerrainQuadTreeMercator.childMap.RU.renderForward(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
+	if (this.tinTerrainQuadTreeMercator.childMap.RD) { this.tinTerrainQuadTreeMercator.childMap.RD.renderForward(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
 	
 	// Render the sea.
 	

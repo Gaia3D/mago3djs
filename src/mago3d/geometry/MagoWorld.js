@@ -1394,9 +1394,9 @@ MagoWorld.prototype.doTest__logarithmicDepthBuffer_encode_decode = function()
  */
 MagoWorld.prototype.keydown = function(event)
 {
-	var bool = false;
-	if (!bool)
-	{ return; }
+	//var bool = false;
+	//if (!bool)
+	//{ return; }
 
 	var key = event.key;
 	var magoManager = this.magoManager;

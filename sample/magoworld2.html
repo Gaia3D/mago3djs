@@ -82,9 +82,9 @@
 				baseMap = new Mago3D.XYZLayer({url: 'https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'});
 				//baseMap = new Mago3D.XYZLayer({url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'});
 
-				//tt = new Mago3D.WMSLayer({url: 'http://localhost:8080/geoserver/mago3d/gwc/service/wms', show: true, filter: bathymetryFilter, param: {layers: 'mago3d:susim_5m', tiled: true}}); // new version.
-				tt = new Mago3D.WMSLayer({url: 'http://localhost:8080/geoserver/mago3d/wms', show: true, filter: bathymetryFilter, param: {layers: 'mago3d:susim_5m', tiled: true}}); // new version.
-				
+				tt = new Mago3D.WMSLayer({url: 'http://localhost:8080/geoserver/mago3d/gwc/service/wms', show: true, filter: bathymetryFilter, param: {layers: 'mago3d:susim_5m', tiled: true}}); // new version.
+				//tt = new Mago3D.WMSLayer({url: 'http://localhost:8080/geoserver/mago3d/wms', show: true, filter: bathymetryFilter, param: {layers: 'mago3d:susim_5m', tiled: true}}); // new version.
+				//ttt = new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: false,   param: {layers: 'ndtp:sk_sdo', tiled: true}});
 				//tt = new Mago3D.WMSLayer({url: 'http://localhost:8080/geoserver/mago3d/gwc/service/wms', show: true, opacity: 0.5, param: {layers: 'mago3d:15m_susim', tiled: true}});
 				//ttt = new Mago3D.WMSLayer({url: 'http://localhost:8080/geoserver/mago3d/wms', show: true, minZoom:10,   param: {layers: 'mago3d:mj1m', tiled: true}});
 
@@ -112,7 +112,7 @@
 				
 				managerFactory = new Mago3D.Mago3d(renderDivId,serverPolicy,undefined,{
 					layers : [
-						baseMap, tt
+						baseMap, tt//, ttt
 						//new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'sk_emd', tiled: true}}),
 					]
 				});
