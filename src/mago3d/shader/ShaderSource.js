@@ -5597,11 +5597,11 @@ uniform vec3 kernel[16];   \n\
 uniform int uActiveTextures[8];\n\
 uniform float externalAlphasArray[8];\n\
 uniform vec2 uMinMaxAltitudes;\n\
-uniform int uTileDepth;\n\
+// int uTileDepth;\n\
 uniform int uSeaOrTerrainType;\n\
 uniform int uRenderType;\n\
 \n\
-uniform vec4 uTileGeoExtent; // (minLon, minLat, maxLon, maxLat).\n\
+\n\
 uniform vec4 uGeoRectangles[3];\n\
 uniform int uGeoRectanglesCount;\n\
 \n\
@@ -5642,6 +5642,18 @@ varying float vAltitude;\n\
 \n\
 varying float flogz;\n\
 varying float Fcoef_half;\n\
+\n\
+// Texture's vars.***\n\
+varying float vTileDepth;\n\
+varying float vTexTileDepth;\n\
+varying float vAConstForDepth;\n\
+varying float vAConstForTexDepth;\n\
+varying float vMinT;\n\
+varying float vMinTTex;\n\
+varying float vRecalculatedTexCoordS;\n\
+\n\
+varying float vTestCurrLatitude;\n\
+varying float vTestCurrLongitude;\n\
 \n\
 const float equatorialRadius = 6378137.0;\n\
 const float polarRadius = 6356752.3142;\n\
@@ -5935,6 +5947,49 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
     }\n\
 }\n\
 \n\
+float roundCustom(float number)\n\
+{\n\
+	float numberResult = sign(number)*floor(abs(number)+0.5);\n\
+	return numberResult;\n\
+}\n\
+\n\
+#define M_PI 3.1415926535897932384626433832795\n\
+\n\
+//varying float vAConstForDepth;\n\
+//varying float vAConstForTexDepth;\n\
+//varying float vMinT;\n\
+//varying float vMinTTex;\n\
+\n\
+float LatitudeRad_fromTexCoordY(float t)\n\
+{\n\
+	float PI_DIV_4 = M_PI/4.0;\n\
+	//float tileDepthFloat = float(tileDepth);\n\
+	//float aConst = (1.0/(2.0*M_PI))*pow(2.0, tileDepthFloat);\n\
+\n\
+	//float minT = roundCustom( vAConstForDepth*(M_PI-log(tan(PI_DIV_4+minLatitudeRad/2.0))) );\n\
+	//minT = 1.0 - minT;\n\
+\n\
+	float tAux = t + vMinT;\n\
+	tAux = 1.0 - tAux;\n\
+	float latRad = 2.0*(atan(exp(M_PI-tAux/vAConstForDepth))-PI_DIV_4);\n\
+	\n\
+	return latRad;\n\
+}\n\
+\n\
+float TexCoordY_fromLatitudeRad(float latitudeRad)\n\
+{\n\
+	float PI_DIV_4 = M_PI/4.0;\n\
+	//float aConstTex = (1.0/(2.0*M_PI))*pow(2.0, float(tileDepth));\n\
+	//float minTTex = roundCustom(vAConstForTexDepth*(M_PI-log(tan(PI_DIV_4+minLatitudeRad/2.0))));\n\
+	//minTTex = 1.0 - minTTex;\n\
+\n\
+	float newT = vAConstForTexDepth*(M_PI-log(tan(PI_DIV_4+latitudeRad/2.0)));\n\
+	newT = 1.0 - newT;\n\
+	newT -= vMinTTex;\n\
+\n\
+	return newT;\n\
+}\n\
+\n\
 void main()\n\
 {    \n\
 	float depthAux = -depthValue;\n\
@@ -6076,16 +6131,25 @@ void main()\n\
 		}\n\
 		else if(colorType == 2) // texture color.\n\
 		{\n\
+			// Check if the texture is from a different depth tile texture.***\n\
+			vec2 finalTexCoord = vTexCoord;\n\
+			//if((vTileDepth - vTexTileDepth)> 0.5)\n\
+			//{\n\
+			//	// Must recalculate texCoords.***\n\
+			//	float currLatRad = LatitudeRad_fromTexCoordY(vTexCoord.t);\n\
+			//	float newT = TexCoordY_fromLatitudeRad(currLatRad); // [0..1] range\n\
+			//	finalTexCoord = vec2(vRecalculatedTexCoordS, newT);\n\
+			//}\n\
 			\n\
 			if(textureFlipYAxis)\n\
 			{\n\
-				texCoord = vec2(vTexCoord.s, 1.0 - vTexCoord.t);\n\
+				texCoord = vec2(finalTexCoord.s, 1.0 - finalTexCoord.t);\n\
 			}\n\
 			else{\n\
-				texCoord = vec2(vTexCoord.s, vTexCoord.t);\n\
+				texCoord = vec2(finalTexCoord.s, finalTexCoord.t);\n\
 			}\n\
 \n\
-			// If exist geoRectangles, then, with texCoord can know if this fragment is a renctangle edge.***\n\
+			\n\
 \n\
 			\n\
 			bool firstColorSetted = false;\n\
@@ -6205,11 +6269,12 @@ void main()\n\
 			// caustics.*********************\n\
 			if(bApplyCaustics)\n\
 			{\n\
-				if(uTime > 0.0 && uTileDepth > 6 && gray > 0.0)//&& altitude > -120.0)\n\
+				int tileDepth = int(floor(vTileDepth + 0.1));\n\
+				if(uTime > 0.0 && tileDepth > 6 && gray > 0.0)//&& altitude > -120.0)\n\
 				{\n\
 					// Active this code if want same size caustic effects for different tileDepths.***\n\
 					// Take tileDepth 14 as the unitary tile depth.\n\
-					//float tileDethDiff = float(16 - uTileDepth);\n\
+					//float tileDethDiff = float(16 - tileDepth);\n\
 					//vec2 cauticsTexCoord = texCoord*pow(2.0, tileDethDiff);\n\
 					//-----------------------------------------------------------------------\n\
 					vec2 cauticsTexCoord = texCoord;\n\
@@ -6227,28 +6292,6 @@ void main()\n\
 			float blue = gray*2.0 + 2.0;\n\
 			fogColor = vec4(red, green, blue, 1.0);\n\
 			\n\
-			// Test drawing grid.***\n\
-			//if(uTileDepth > 7)\n\
-			//{\n\
-			//	float numSegs = 5.0;\n\
-			//	float fX = fract(texCoord.x * numSegs);\n\
-			//\n\
-			//	float gridLineWidth = getGridLineWidth(uTileDepth);\n\
-			//	if( fX < gridLineWidth || fX > 1.0-gridLineWidth)\n\
-			//	{\n\
-			//		vec3 color = vec3(0.99, 0.5, 0.5);\n\
-			//		gl_FragColor = vec4(color.rgb* shadow_occlusion * lambertian, 1.0);\n\
-			//		return;\n\
-			//	}\n\
-			//	\n\
-			//	float fY = fract(texCoord.y * numSegs);\n\
-			//	if( fY < gridLineWidth|| fY > 1.0-gridLineWidth)\n\
-			//	{\n\
-			//		vec3 color = vec3(0.3, 0.5, 0.99);\n\
-			//		gl_FragColor = vec4(color.rgb* shadow_occlusion * lambertian, 1.0);\n\
-			//		return;\n\
-			//	}\n\
-			//}\n\
 			\n\
 			// End test drawing grid.---\n\
 			float specularReflectionCoef = 0.6;\n\
@@ -6271,12 +6314,38 @@ void main()\n\
 		gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian * scalarProd, 1.0); // original.***\n\
 		//gl_FragColor = textureColor; // test.***\n\
 		//gl_FragColor = vec4(vNormal.xyz, 1.0); // test.***\n\
-		\n\
+		/*\n\
+		int texDepthDiff = int(floor(vTileDepth+0.1) - floor(vTexTileDepth+0.1));\n\
+		if(texDepthDiff > 0)\n\
+		{\n\
+			if(texDepthDiff == 1)\n\
+			finalColor = mix(textureColor, vec4(1.0, 0.0, 0.0, 1.0), 0.2); \n\
+\n\
+			if(texDepthDiff == 2)\n\
+			finalColor = mix(textureColor, vec4(0.0, 1.0, 0.0, 1.0), 0.2); \n\
+\n\
+			if(texDepthDiff == 3)\n\
+			finalColor = mix(textureColor, vec4(0.0, 0.0, 1.0, 1.0), 0.2); \n\
+\n\
+			if(texDepthDiff == 4)\n\
+			finalColor = mix(textureColor, vec4(1.0, 1.0, 0.0, 1.0), 0.2); \n\
+\n\
+			if(texDepthDiff > 4)\n\
+			finalColor = mix(textureColor, vec4(1.0, 0.0, 1.0, 1.0), 0.2); \n\
+\n\
+\n\
+			gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian * scalarProd, 1.0); // original.***\n\
+\n\
+			//if(abs(vTestCurrLatitude - 36.0) < 0.01 || abs(vTestCurrLongitude - 127.0) < 0.01)\n\
+			//gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0); // original.***\n\
+		}\n\
+		*/\n\
 		//if(currSunIdx > 0.0 && currSunIdx < 1.0 && shadow_occlusion<0.9)gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n\
 		\n\
 	}\n\
 }";
 ShaderSource.TinTerrainVS = "\n\
+\n\
 attribute vec3 position;\n\
 attribute vec3 normal;\n\
 //attribute vec4 color4;\n\
@@ -6305,6 +6374,12 @@ uniform bool bApplySpecularLighting;\n\
 uniform bool bUseLogarithmicDepth;\n\
 uniform float uFCoef_logDepth;\n\
 \n\
+// geographic.\n\
+uniform int uTileDepth;\n\
+uniform vec4 uTileGeoExtent; // (minLon, minLat, maxLon, maxLat).\n\
+uniform int uTileDepthOfBindedTextures; // The depth of the tileTexture binded. Normally uTileDepth = uTileDepthOfBindedTextures, but if current tile has no texturesPrepared, then bind ownerTexture and change texCoords.\n\
+uniform vec4 uTileGeoExtentOfBindedTextures; // (minLon, minLat, maxLon, maxLat).\n\
+\n\
 varying float applySpecLighting;\n\
 varying vec3 vNormal;\n\
 varying vec2 vTexCoord;   \n\
@@ -6320,6 +6395,56 @@ varying float vAltitude;\n\
 varying float flogz;\n\
 varying float Fcoef_half;\n\
 \n\
+// Texture's vars.***\n\
+varying float vTileDepth;\n\
+varying float vTexTileDepth;\n\
+varying float vAConstForDepth;\n\
+varying float vAConstForTexDepth;\n\
+varying float vMinT;\n\
+varying float vMinTTex;\n\
+varying float vRecalculatedTexCoordS;\n\
+\n\
+varying float vTestCurrLatitude;\n\
+varying float vTestCurrLongitude;\n\
+\n\
+#define M_PI 3.1415926535897932384626433832795\n\
+\n\
+float roundCustom(float number)\n\
+{\n\
+	float numberResult = sign(number)*floor(abs(number)+0.5);\n\
+	return numberResult;\n\
+}\n\
+\n\
+float LatitudeRad_fromTexCoordY(float t, float minLatitudeRad, int tileDepth)\n\
+{\n\
+	float PI_DIV_4 = M_PI/4.0;\n\
+	float tileDepthFloat = float(tileDepth);\n\
+	float aConst = (1.0/(2.0*M_PI))*pow(2.0, tileDepthFloat);\n\
+\n\
+	float minT = roundCustom( aConst*(M_PI-log(tan(PI_DIV_4+minLatitudeRad/2.0))) );\n\
+	minT = 1.0 - minT;\n\
+\n\
+	float tAux = t + minT;\n\
+	tAux = 1.0 - tAux;\n\
+	float latRad = 2.0*(atan(exp(M_PI-tAux/aConst))-PI_DIV_4);\n\
+	\n\
+	return latRad;\n\
+}\n\
+\n\
+float TexCoordY_fromLatitudeRad(float latitudeRad, float minLatitudeRad, int tileDepth)\n\
+{\n\
+	float PI_DIV_4 = M_PI/4.0;\n\
+	float aConstTex = (1.0/(2.0*M_PI))*pow(2.0, float(tileDepth));\n\
+	float minTTex = roundCustom(aConstTex*(M_PI-log(tan(PI_DIV_4+minLatitudeRad/2.0))));\n\
+	minTTex = 1.0 - minTTex;\n\
+\n\
+	float newT = aConstTex*(M_PI-log(tan(PI_DIV_4+latitudeRad/2.0)));\n\
+	newT = 1.0 - newT;\n\
+	newT -= minTTex;\n\
+\n\
+	return newT;\n\
+}\n\
+\n\
 void main()\n\
 {	\n\
     vec3 objPosHigh = buildingPosHIGH;\n\
@@ -6331,6 +6456,9 @@ void main()\n\
 	vNormal = normalize((normalMatrix4 * vec4(normal.x, normal.y, normal.z, 1.0)).xyz); // original.***\n\
 	vLightDir = vec3(normalMatrix4*vec4(sunDirWC.xyz, 1.0)).xyz;\n\
 	vAltitude = altitude;\n\
+\n\
+	vTileDepth = float(uTileDepth);\n\
+	vTexTileDepth = float(uTileDepthOfBindedTextures);\n\
 	\n\
 	currSunIdx = -1.0; // initially no apply shadow.\n\
 	if(bApplyShadow && !bIsMakingDepth)\n\
@@ -6385,8 +6513,71 @@ void main()\n\
 	}\n\
 	else\n\
 	{\n\
-		\n\
 		vTexCoord = texCoord;\n\
+		// ckeck if the texture is for this tile.\n\
+		if(uTileDepth != uTileDepthOfBindedTextures)\n\
+		{\n\
+			float thisMinLon = uTileGeoExtent.x;\n\
+			float thisMinLat = uTileGeoExtent.y;\n\
+			float thisMaxLon = uTileGeoExtent.z;\n\
+			float thisMaxLat = uTileGeoExtent.w;\n\
+			float thisLonRange = (thisMaxLon - thisMinLon);\n\
+			float thisLatRange = (thisMaxLat - thisMinLat);\n\
+\n\
+			float thisMinLatRad = thisMinLat * M_PI/180.0;\n\
+			float thisMinLonRad = thisMinLon * M_PI/180.0;\n\
+\n\
+			float texMinLon = uTileGeoExtentOfBindedTextures.x;\n\
+			float texMinLat = uTileGeoExtentOfBindedTextures.y;\n\
+			float texMaxLon = uTileGeoExtentOfBindedTextures.z;\n\
+			float texMaxLat = uTileGeoExtentOfBindedTextures.w;\n\
+			float texLonRange = (texMaxLon - texMinLon);\n\
+			float texLatRange = (texMaxLat - texMinLat);\n\
+\n\
+			float texMinLatRad = texMinLat * M_PI/180.0;\n\
+			float texMinLonRad = texMinLon * M_PI/180.0;\n\
+			//---------------------------------------------------------------\n\
+			float PI_DIV_4 = M_PI/4.0;\n\
+			/*\n\
+			vAConstForDepth = (1.0/(2.0*M_PI))*pow(2.0, float(uTileDepth));\n\
+			vAConstForTexDepth = (1.0/(2.0*M_PI))*pow(2.0, float(uTileDepthOfBindedTextures));\n\
+			vMinT = roundCustom( vAConstForDepth*(M_PI-log(tan(PI_DIV_4+thisMinLatRad/2.0))) );\n\
+			vMinT = 1.0 - vMinT;\n\
+			vMinTTex = roundCustom( vAConstForTexDepth*(M_PI-log(tan(PI_DIV_4+texMinLatRad/2.0))) );\n\
+			vMinTTex = 1.0- vMinTTex;\n\
+			*/\n\
+			//-------------------------------------------------------------\n\
+			\n\
+			float currLatRad = LatitudeRad_fromTexCoordY(texCoord.y, thisMinLatRad, uTileDepth);\n\
+			//vTestCurrLatitude = currLatRad * 180.0/M_PI; // *** delete ***\n\
+\n\
+			// now, calculate s,t for bindedTexture tile depth.***\n\
+			\n\
+			float newS;\n\
+			float currLon = thisMinLon + texCoord.x * thisLonRange;\n\
+			vTestCurrLongitude = currLon; // *** delete ***\n\
+			newS = (currLon - texMinLon) / texLonRange; // [0..1] range\n\
+			float newT = TexCoordY_fromLatitudeRad(currLatRad, texMinLatRad, uTileDepthOfBindedTextures); // [0..1] range\n\
+			float texCorrection = 0.0/float(uTileDepth - uTileDepthOfBindedTextures);\n\
+			vTexCoord = vec2(newS, newT + texCorrection);\n\
+			\n\
+			vRecalculatedTexCoordS = newS;\n\
+\n\
+			/*\n\
+			// CRS84.**************************************************\n\
+			// need know longitude & latitude of my texCoord.\n\
+			float currLon = thisMinLon + texCoord.x * thisLonRange;\n\
+			float currLat = thisMinLat + texCoord.y * thisLatRange;\n\
+\n\
+			// calculate my minLon relative to texture.***\n\
+			float s = (currLon - texMinLon) / texLonRange; // [0..1] range\n\
+			float t = (currLat - texMinLat) / texLatRange; // [0..1] range\n\
+\n\
+			vTexCoord = vec2(s, t);\n\
+			*/\n\
+		}\n\
+		\n\
+		\n\
 	}\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 	\n\

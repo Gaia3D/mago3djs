@@ -35,11 +35,11 @@ uniform vec3 kernel[16];
 uniform int uActiveTextures[8];
 uniform float externalAlphasArray[8];
 uniform vec2 uMinMaxAltitudes;
-uniform int uTileDepth;
+// int uTileDepth;
 uniform int uSeaOrTerrainType;
 uniform int uRenderType;
 
-uniform vec4 uTileGeoExtent; // (minLon, minLat, maxLon, maxLat).
+
 uniform vec4 uGeoRectangles[3];
 uniform int uGeoRectanglesCount;
 
@@ -80,6 +80,18 @@ varying float vAltitude;
 
 varying float flogz;
 varying float Fcoef_half;
+
+// Texture's vars.***
+varying float vTileDepth;
+varying float vTexTileDepth;
+varying float vAConstForDepth;
+varying float vAConstForTexDepth;
+varying float vMinT;
+varying float vMinTTex;
+varying float vRecalculatedTexCoordS;
+
+varying float vTestCurrLatitude;
+varying float vTestCurrLongitude;
 
 const float equatorialRadius = 6378137.0;
 const float polarRadius = 6356752.3142;
@@ -373,6 +385,49 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
     }
 }
 
+float roundCustom(float number)
+{
+	float numberResult = sign(number)*floor(abs(number)+0.5);
+	return numberResult;
+}
+
+#define M_PI 3.1415926535897932384626433832795
+
+//varying float vAConstForDepth;
+//varying float vAConstForTexDepth;
+//varying float vMinT;
+//varying float vMinTTex;
+
+float LatitudeRad_fromTexCoordY(float t)
+{
+	float PI_DIV_4 = M_PI/4.0;
+	//float tileDepthFloat = float(tileDepth);
+	//float aConst = (1.0/(2.0*M_PI))*pow(2.0, tileDepthFloat);
+
+	//float minT = roundCustom( vAConstForDepth*(M_PI-log(tan(PI_DIV_4+minLatitudeRad/2.0))) );
+	//minT = 1.0 - minT;
+
+	float tAux = t + vMinT;
+	tAux = 1.0 - tAux;
+	float latRad = 2.0*(atan(exp(M_PI-tAux/vAConstForDepth))-PI_DIV_4);
+	
+	return latRad;
+}
+
+float TexCoordY_fromLatitudeRad(float latitudeRad)
+{
+	float PI_DIV_4 = M_PI/4.0;
+	//float aConstTex = (1.0/(2.0*M_PI))*pow(2.0, float(tileDepth));
+	//float minTTex = roundCustom(vAConstForTexDepth*(M_PI-log(tan(PI_DIV_4+minLatitudeRad/2.0))));
+	//minTTex = 1.0 - minTTex;
+
+	float newT = vAConstForTexDepth*(M_PI-log(tan(PI_DIV_4+latitudeRad/2.0)));
+	newT = 1.0 - newT;
+	newT -= vMinTTex;
+
+	return newT;
+}
+
 void main()
 {    
 	float depthAux = -depthValue;
@@ -514,16 +569,25 @@ void main()
 		}
 		else if(colorType == 2) // texture color.
 		{
+			// Check if the texture is from a different depth tile texture.***
+			vec2 finalTexCoord = vTexCoord;
+			//if((vTileDepth - vTexTileDepth)> 0.5)
+			//{
+			//	// Must recalculate texCoords.***
+			//	float currLatRad = LatitudeRad_fromTexCoordY(vTexCoord.t);
+			//	float newT = TexCoordY_fromLatitudeRad(currLatRad); // [0..1] range
+			//	finalTexCoord = vec2(vRecalculatedTexCoordS, newT);
+			//}
 			
 			if(textureFlipYAxis)
 			{
-				texCoord = vec2(vTexCoord.s, 1.0 - vTexCoord.t);
+				texCoord = vec2(finalTexCoord.s, 1.0 - finalTexCoord.t);
 			}
 			else{
-				texCoord = vec2(vTexCoord.s, vTexCoord.t);
+				texCoord = vec2(finalTexCoord.s, finalTexCoord.t);
 			}
 
-			// If exist geoRectangles, then, with texCoord can know if this fragment is a renctangle edge.***
+			
 
 			
 			bool firstColorSetted = false;
@@ -643,11 +707,12 @@ void main()
 			// caustics.*********************
 			if(bApplyCaustics)
 			{
-				if(uTime > 0.0 && uTileDepth > 6 && gray > 0.0)//&& altitude > -120.0)
+				int tileDepth = int(floor(vTileDepth + 0.1));
+				if(uTime > 0.0 && tileDepth > 6 && gray > 0.0)//&& altitude > -120.0)
 				{
 					// Active this code if want same size caustic effects for different tileDepths.***
 					// Take tileDepth 14 as the unitary tile depth.
-					//float tileDethDiff = float(16 - uTileDepth);
+					//float tileDethDiff = float(16 - tileDepth);
 					//vec2 cauticsTexCoord = texCoord*pow(2.0, tileDethDiff);
 					//-----------------------------------------------------------------------
 					vec2 cauticsTexCoord = texCoord;
@@ -665,28 +730,6 @@ void main()
 			float blue = gray*2.0 + 2.0;
 			fogColor = vec4(red, green, blue, 1.0);
 			
-			// Test drawing grid.***
-			//if(uTileDepth > 7)
-			//{
-			//	float numSegs = 5.0;
-			//	float fX = fract(texCoord.x * numSegs);
-			//
-			//	float gridLineWidth = getGridLineWidth(uTileDepth);
-			//	if( fX < gridLineWidth || fX > 1.0-gridLineWidth)
-			//	{
-			//		vec3 color = vec3(0.99, 0.5, 0.5);
-			//		gl_FragColor = vec4(color.rgb* shadow_occlusion * lambertian, 1.0);
-			//		return;
-			//	}
-			//	
-			//	float fY = fract(texCoord.y * numSegs);
-			//	if( fY < gridLineWidth|| fY > 1.0-gridLineWidth)
-			//	{
-			//		vec3 color = vec3(0.3, 0.5, 0.99);
-			//		gl_FragColor = vec4(color.rgb* shadow_occlusion * lambertian, 1.0);
-			//		return;
-			//	}
-			//}
 			
 			// End test drawing grid.---
 			float specularReflectionCoef = 0.6;
@@ -709,7 +752,32 @@ void main()
 		gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian * scalarProd, 1.0); // original.***
 		//gl_FragColor = textureColor; // test.***
 		//gl_FragColor = vec4(vNormal.xyz, 1.0); // test.***
-		
+		/*
+		int texDepthDiff = int(floor(vTileDepth+0.1) - floor(vTexTileDepth+0.1));
+		if(texDepthDiff > 0)
+		{
+			if(texDepthDiff == 1)
+			finalColor = mix(textureColor, vec4(1.0, 0.0, 0.0, 1.0), 0.2); 
+
+			if(texDepthDiff == 2)
+			finalColor = mix(textureColor, vec4(0.0, 1.0, 0.0, 1.0), 0.2); 
+
+			if(texDepthDiff == 3)
+			finalColor = mix(textureColor, vec4(0.0, 0.0, 1.0, 1.0), 0.2); 
+
+			if(texDepthDiff == 4)
+			finalColor = mix(textureColor, vec4(1.0, 1.0, 0.0, 1.0), 0.2); 
+
+			if(texDepthDiff > 4)
+			finalColor = mix(textureColor, vec4(1.0, 0.0, 1.0, 1.0), 0.2); 
+
+
+			gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian * scalarProd, 1.0); // original.***
+
+			//if(abs(vTestCurrLatitude - 36.0) < 0.01 || abs(vTestCurrLongitude - 127.0) < 0.01)
+			//gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0); // original.***
+		}
+		*/
 		//if(currSunIdx > 0.0 && currSunIdx < 1.0 && shadow_occlusion<0.9)gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 		
 	}

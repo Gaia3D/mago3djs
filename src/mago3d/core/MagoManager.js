@@ -1062,8 +1062,88 @@ MagoManager.prototype.loadAndPrepareData = function()
 	// TinTerrain.*******************************************************************************************************************************
 	if (this.isFarestFrustum())
 	{
+		var camera = this.sceneState.camera;
+		if (this.cameraLastPosition === undefined)
+		{ 
+			this.cameraLastPosition = new Point3D(0.0, 0.0, 0.0); 
+		}
+
+		if (this.cameraLastTime === undefined)
+		{ 
+			this.cameraLastTime = this.getCurrentTime(); 
+		}
+
+		if (this.cameraLastTimeForMesh === undefined)
+		{ 
+			this.cameraLastTimeForMesh = this.getCurrentTime(); 
+		}
+
+		if (this.cameraStopped === undefined)
+		{
+			this.cameraStopped = true;
+		}
+
+		if (this.cameraStoppedForMesh === undefined)
+		{
+			this.cameraStoppedForMesh = true;
+		}
+
+
 		if (this.tinTerrainManager !== undefined && this.tinTerrainManager.ready)
-		{ this.tinTerrainManager.prepareVisibleTinTerrains(this); }
+		{ 
+			var dist = camera.position.distToPoint(this.cameraLastPosition);
+			if (dist < 4.0)
+			{
+				var timeDiff = this.getCurrentTime() - this.cameraLastTimeForMesh;
+				if (!this.cameraStoppedForMesh && timeDiff > 500)
+				{
+					this.cameraStoppedForMesh = true;
+				}
+
+				if (this.cameraStoppedForMesh)
+				{
+					this.tinTerrainManager.prepareVisibleTinTerrains(this); 
+					this.cameraLastTimeForMesh = this.getCurrentTime();
+				}
+				
+			}
+			else
+			{
+				this.cameraStoppedForMesh = false;
+			}
+		}
+
+		if (this.fileRequestControler.tinTerrainTexturesRequested < 6)
+		{ 
+			// 1rst, check cameraPosition vs cameraLastPosition.
+			var dist = camera.position.distToPoint(this.cameraLastPosition);
+
+			if (dist < 4.0)
+			{
+				// Now, check the time-difference.
+				var timeDiff = this.getCurrentTime() - this.cameraLastTime;
+				if (!this.cameraStopped && timeDiff > 500)
+				{
+					this.cameraStopped = true;
+				}
+
+				if (this.cameraStopped)
+				{
+					if (this.tinTerrainManager !== undefined && this.tinTerrainManager.ready)
+					{ 
+						this.tinTerrainManager.prepareVisibleTinTerrainsTextures(this); 
+						this.cameraLastTime = this.getCurrentTime();
+					}
+				}
+
+			}
+			else
+			{
+				this.cameraStopped = false;
+			}
+		}
+
+		this.cameraLastPosition.set(camera.position.x, camera.position.y, camera.position.z);
 	}
 	//if(this.isFarestFrustum())
 	this.manageQueue();
@@ -2418,6 +2498,7 @@ MagoManager.prototype.setBPicking = function(mouseX, mouseY)
 		if (this.mouse_x === mouseX && this.mouse_y === mouseY) 
 		{
 			this.bPicking = true;
+			//this.renderToSelectionBuffer(); // debug: delete this.!!!!!!!!!!
 		}
 	}
 };
@@ -4779,6 +4860,10 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.uTileGeoExtent_loc = gl.getUniformLocation(shader.program, "uTileGeoExtent");
 	shader.uGeoRectangles_loc = gl.getUniformLocation(shader.program, "uGeoRectangles");
 	shader.uGeoRectanglesCount_loc = gl.getUniformLocation(shader.program, "uGeoRectanglesCount");
+
+	shader.uTileGeoExtent_loc = gl.getUniformLocation(shader.program, "uTileGeoExtent");
+	shader.uTileDepthOfBindedTextures_loc = gl.getUniformLocation(shader.program, "uTileDepthOfBindedTextures");
+	shader.uTileGeoExtentOfBindedTextures_loc = gl.getUniformLocation(shader.program, "uTileGeoExtentOfBindedTextures");
 	
 	//shader.uSsaoRadius_loc = gl.getUniformLocation(shader.program, "radius");
 	

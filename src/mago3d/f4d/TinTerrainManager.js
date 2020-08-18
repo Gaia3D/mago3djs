@@ -94,6 +94,9 @@ var TinTerrainManager = function(magoManager, options)
 	// Objects to clampToTerrain.
 	this.objectsToClampToTerrainArray;
 
+	// Max textureGuaranteedDepth.
+	this.maxTextureGuranteedDepth = 5;
+
 	this.init();
 	this.makeTinTerrainWithDEMIndex(); // provisional.
 	
@@ -561,11 +564,156 @@ TinTerrainManager.prototype.doFrustumCulling = function(frustum, camera, magoMan
 	}
 };
 
-
 /**
  * Prepare tinTerrains.
  */
 TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager) 
+{
+	var tinTerrain;
+	
+	// For the visible tinTerrains prepare its.
+	// Preparing rule: First prepare the tinTerrain-owner if the owner is no prepared yet.
+	//for (var depth = 0; depth <= this.maxDepth; depth++) 
+	for (var depth = 0; depth <= this.maxDepth; depth++) 
+	{
+		if (magoManager.fileRequestControler.tinTerrainFilesRequested >= 6)// || magoManager.fileRequestControler.tinTerrainTexturesRequested >= 2)
+		{ break; }
+
+		var visibleTilesArray = this.visibleTilesArrayMap[depth];
+		if (visibleTilesArray && visibleTilesArray.length > 0)
+		{
+			//*********************************************************
+			var visiblesTilesCount = visibleTilesArray.length;
+			if (this.terrainType === CODE.magoEarthTerrainType.PLAIN) // PlainTerrain.
+			{
+				for (var i=0; i<visiblesTilesCount; i++)
+				{
+					tinTerrain = visibleTilesArray[i];
+					tinTerrain.prepareTinTerrainPlain(magoManager, this);
+				}
+			}
+			else if (this.terrainType === CODE.magoEarthTerrainType.ELEVATION)// ElevationTerrain.
+			{
+				var maxProcessCounter = 0;
+				for (var i=0; i<visiblesTilesCount; i++)
+				{
+					tinTerrain = visibleTilesArray[i];
+					{
+						if (!tinTerrain.prepareTinTerrain(magoManager, this))
+						{ maxProcessCounter += 1; }
+					}
+				}
+			}
+			else if (this.terrainType === CODE.magoEarthTerrainType.REALTIME)// Real time ElevationTerrain.
+			{
+				var maxProcessCounter = 0;
+				for (var i=0; i<visiblesTilesCount; i++)
+				{
+					tinTerrain = visibleTilesArray[i];
+					if (!tinTerrain.prepareTinTerrainRealTimeElevation(magoManager, this))
+					{ maxProcessCounter += 1; }
+				
+					if (maxProcessCounter > 5)
+					{ break; }
+				}
+			}
+			
+			// 2nd, for all terrains that exist, if there are not in the visiblesMap, then delete its.
+			// Deleting rule: If a tinTerrain has children, then delete first the children.
+			var deletedCount = 0;
+			var noVisiblesTilesCount = this.noVisibleTilesArray.length;
+			for (var i=0; i<visiblesTilesCount; i++)
+			{
+				tinTerrain = this.noVisibleTilesArray[i];
+				if (tinTerrain !== undefined)
+				{
+					if (tinTerrain.depth > 2)
+					{
+						tinTerrain.deleteTinTerrain(magoManager);
+						deletedCount++;
+					}
+				}
+				
+				if (deletedCount > 50)
+				{ break; }
+			}
+			//---------------------------------------------------------
+		}
+	}
+};
+
+/**
+ * Prepare tinTerrains.
+ */
+TinTerrainManager.prototype.prepareVisibleTinTerrainsTextures = function(magoManager) 
+{
+	var tinTerrain;
+
+	// Now, nearToFar, prepare texture if is meshPrepared.
+	for (var depth = this.maxDepth; depth > 0; depth--) 
+	{
+		if (magoManager.fileRequestControler.tinTerrainTexturesRequested >= 5)
+		{ break; }
+
+		var visibleTilesArray = this.visibleTilesArrayMap[depth];
+		if (visibleTilesArray && visibleTilesArray.length > 0)
+		{
+			//*********************************************************
+			var visiblesTilesCount = visibleTilesArray.length;
+			if (this.terrainType === CODE.magoEarthTerrainType.PLAIN) // PlainTerrain.
+			{
+				for (var i=0; i<visiblesTilesCount; i++)
+				{
+					tinTerrain = visibleTilesArray[i];
+					if (tinTerrain.isMeshPrepared())
+					{
+						if (tinTerrain.prepareTexture(tinTerrain.texture, this.imagerys, magoManager, this) > 0)
+						{ break; }
+					}
+				}
+			}
+			else if (this.terrainType === CODE.magoEarthTerrainType.ELEVATION)// ElevationTerrain.
+			{
+				var maxProcessCounter = 0;
+				for (var i=0; i<visiblesTilesCount; i++)
+				{
+					tinTerrain = visibleTilesArray[i];
+					//if (tinTerrain.isMeshPrepared())
+					if (tinTerrain.isVisible())
+					{
+						if (tinTerrain.prepareTexture(tinTerrain.texture, this.imagerys, magoManager, this) > 0)
+						{ break; }
+					}
+
+					if (magoManager.fileRequestControler.tinTerrainTexturesRequested >= 6)
+					{ break; }
+
+				}
+			}
+			else if (this.terrainType === CODE.magoEarthTerrainType.REALTIME)// Real time ElevationTerrain.
+			{
+				var maxProcessCounter = 0;
+				for (var i=0; i<visiblesTilesCount; i++)
+				{
+					tinTerrain = visibleTilesArray[i];
+					if (!tinTerrain.prepareTinTerrainRealTimeElevation(magoManager, this))
+					{ maxProcessCounter += 1; }
+				
+					if (maxProcessCounter > 5)
+					{ break; }
+				}
+			}
+			
+		}
+	}
+
+};
+
+
+/**
+ * Prepare tinTerrains.
+ */
+TinTerrainManager.prototype.prepareVisibleTinTerrains__original = function(magoManager) 
 {
 	var tinTerrain;
 	
@@ -674,9 +822,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	//gl.disableVertexAttribArray(currentShader.color4_loc);
 	
 	currentShader.bindUniformGenerals();
-	gl.uniform1i(currentShader.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
-	var projectionMatrixInv = sceneState.getProjectionMatrixInv();
-	gl.uniformMatrix4fv(currentShader.projectionMatrixInv_loc, false, projectionMatrixInv._floatArrays);
+	
 	
 	magoManager.test__makingTerrainByAltitudesImage = 0;
 	
@@ -689,13 +835,21 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	if (this.identityMat === undefined)
 	{ this.identityMat = new Matrix4(); }
 	
+	gl.uniform1i(currentShader.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
+	var projectionMatrixInv = sceneState.getProjectionMatrixInv();
+	gl.uniformMatrix4fv(currentShader.projectionMatrixInv_loc, false, projectionMatrixInv._floatArrays);
+
 	gl.uniform1i(currentShader.bIsMakingDepth_loc, bDepth); //. old. use uRenderType_loc = 0. ***
 	gl.uniform1i(currentShader.uRenderType_loc, 1);
 	gl.uniform1f(currentShader.uFCoef_logDepth_loc, sceneState.fCoef_logDepth[0]);
+	
 
 
 	if (renderType === 1)
 	{
+		
+
+
 		var tex = magoManager.texturesStore.getTextureAux1x1(); // provisional.
 		gl.activeTexture(gl.TEXTURE2); 
 		gl.bindTexture(gl.TEXTURE_2D, tex.texId);
@@ -847,6 +1001,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	}
 	else
 	{
+		
 		for (var i=0; i<visiblesTilesCount; i++)
 		{
 			tinTerrain = this.visibleTilesArray[i];
@@ -854,8 +1009,15 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 			if (tinTerrain === undefined)
 			{ continue; }
 		
-			tinTerrain.render(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray);
+			//tinTerrain.renderForward(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray);
+			//break;
 		}
+		
+
+		if (this.tinTerrainQuadTreeMercator.childMap.LU) { this.tinTerrainQuadTreeMercator.childMap.LU.renderForward(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
+		if (this.tinTerrainQuadTreeMercator.childMap.LD) { this.tinTerrainQuadTreeMercator.childMap.LD.renderForward(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
+		if (this.tinTerrainQuadTreeMercator.childMap.RU) { this.tinTerrainQuadTreeMercator.childMap.RU.renderForward(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
+		if (this.tinTerrainQuadTreeMercator.childMap.RD) { this.tinTerrainQuadTreeMercator.childMap.RD.renderForward(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
 	}
 	
 	

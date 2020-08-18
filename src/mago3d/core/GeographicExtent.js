@@ -161,6 +161,19 @@ GeographicExtent.prototype.getMidPoint = function(resultGeographicCoord)
 };
 
 /**
+ * Returns the minimum longitude in radians.
+ * @returns {Number}
+ */
+GeographicExtent.prototype.getExtentVec4 = function() 
+{
+	// This function returns an array = [minLon, minLat, maxLon, maxLat].***
+	if (this.minGeographicCoord === undefined || this.maxGeographicCoord === undefined)
+	{ return; }
+
+	return [this.minGeographicCoord.longitude, this.minGeographicCoord.latitude, this.maxGeographicCoord.longitude, this.maxGeographicCoord.latitude];
+};
+
+/**
  * Returns the minimum latitude in radians.
  * @returns {Number}
  */

@@ -99,7 +99,22 @@
 		magoInstance.setBaseUrl(dataInfo.baseUrl);
 
 		var magoManager = magoInstance.getMagoManager();
-		
+		var viewer = magoInstance.getViewer();
+		var provider = new Cesium.WebMapServiceImageryProvider({
+			url : 'http://localhost:8080/geoserver/mago3d/gwc/service/wms',
+			layers : 'mago3d:susim_5m',
+			tilingScheme : new Cesium.WebMercatorTilingScheme(),
+			parameters: {
+				tiled: true,
+				transparent : true,
+				srs : 'EPSG:3857',
+            	format: "image/png"
+			}
+		});
+		var aa = new Cesium.ImageryLayer(provider, {
+			alpha : 0.9
+		});
+viewer.imageryLayers.add(aa);
 		var layer = new Mago3D.MagoLayer({
 			dataGroupId : 1,
 			dataGroupKey : '3ds',
@@ -149,7 +164,7 @@
 		});
 
 		// Test weather wind.*********************************
-		var magomanager = MAGO3D_INSTANCE.getMagoManager();
+		/*var magomanager = MAGO3D_INSTANCE.getMagoManager();
 		if (magomanager.windTest === undefined)
 		{
 			if (magomanager.weatherStation === undefined)
@@ -169,7 +184,7 @@
 			magomanager.weatherStation.test_loadWindData3d(magomanager, windDataFilesNamesArray, windMapFilesFolderPath);
 			magomanager.TEST__golfPark();
 			magomanager.windTest = true;
-		}
+		}*/
 	}
 
 </script>

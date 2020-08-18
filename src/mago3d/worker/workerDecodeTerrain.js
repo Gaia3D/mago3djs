@@ -74,10 +74,15 @@ worker.onmessage = function(e)
 			
 			// make texcoords.
 			t = aConst*(PI-Math.log(Math.tan(PI_DIV_4+currLat/2)));
+
+			//var t1 = t;
 			t = 1.0 - t;
+
+			//var t2 = t;
 				
 			// Substract minT to "t" to make range [0 to 1].***
 			t -= minT; 
+			//var t3 = t;
 			
 			s = aConst*(currLon+PI);
 			s -= floorMinS;
@@ -95,27 +100,22 @@ worker.onmessage = function(e)
 			
 			texCoordsArray[i*2] = s;
 			texCoordsArray[i*2+1] = t;
-			/*
-			if (i === 0)
-			{
-				realmaxS = s;
-				realmaxT = t;
-				realminS = s;
-				realminT = t;
-			}
-			else
-			{
-				if (s < realminS)
-				{ realminS = s; }
-				else if (s > realmaxS)
-				{ realmaxS = s; }
 
-				if (t < realminT)
-				{ realminT = t; }
-				else if (t > realmaxT)
-				{ realmaxT = t; }
-			}
+
+			// Debug to find reverse latitude from t.
+			/*
+			var thisMinLatRad = minLat;
+			var aConstAux = (1.0/(2.0*PI))*Math.pow(2.0, depth);
+
+			var minTAux = Math.round( aConstAux*(PI-Math.log(Math.tan(PI_DIV_4+thisMinLatRad/2.0))) );
+			minTAux = 1.0 - minTAux;
+
+			var tAux = ( t) + minTAux;
+			tAux = 1.0 - tAux;
+			var latRad = 2.0*(Math.atan(Math.exp(PI-tAux/aConstAux))-PI_DIV_4);
+			var hola = 0;
 			*/
+			// End debug.---
 		}
 	}
 	else
