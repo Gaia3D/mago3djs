@@ -289,9 +289,9 @@ Color.prototype.setRGBA = function(red, green, blue, alpha)
  */
 Color.prototype.getHexCode = function() 
 {
-	var r = this.r * 255;
-	var g = this.g * 255;
-	var b = this.b * 255;
+	var r = this.r;
+	var g = this.g;
+	var b = this.b;
 	
 	return Color.getHexCode(r, g, b);
 };
@@ -302,9 +302,9 @@ Color.prototype.getHexCode = function()
  */
 Color.getHexCode = function(red, green, blue) 
 {	
-	var r = red * 255;
-	var g = green * 255;
-	var b = blue * 255;
+	var r = parseInt(red * 255);
+	var g = parseInt(green * 255);
+	var b = parseInt(blue * 255);
 	
 	var hexR = r.toString(16).padStart(2, '0'); //String.padStart i.e no support..TT 
 	var hexG = g.toString(16).padStart(2, '0');

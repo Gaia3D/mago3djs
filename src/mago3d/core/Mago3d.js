@@ -23,7 +23,7 @@
  * @param {Stirng} containerId container div id. required.
  * @param {object} serverPolicy mage3d geopolicy
  * @param {Mago3d~callback} callback loadstart callback, loadend callback.
- * @param {object} options Cesium viewer parameter.
+ * @param {object} options viewer parameter.
  * @param {Cesium.Viewer} legacyViewer 타 시스템과의 연동의 경우 view 객체가 생성되어서 넘어 오는 경우가 있음
  * 
  * @return {Mago3d~returnObj} 
@@ -61,6 +61,7 @@ var Mago3d = function(containerId, serverPolicy, callback, options, legacyViewer
 	//this.emit('loadstart', this);
 
 	serverPolicy = validPolicy(serverPolicy);
+	options = validOption(options, serverPolicy.basicGlobe);
 	var viewerInitializer;
 
 	if (serverPolicy.basicGlobe === Constant.CESIUM) 
@@ -154,6 +155,39 @@ var Mago3d = function(containerId, serverPolicy, callback, options, legacyViewer
 		defaultPolicy.maxHeight_rainbow_loc = 100.0;
 
 		return Object.assign({}, defaultPolicy, policy||{});
+	}
+
+	function validOption(opt, gType)
+	{
+		opt = opt ? opt : {};
+
+		var option = {};
+		if ( gType === Constant.CESIUM)
+		{
+			option.infoBox = false;
+			option.navigationHelpButton = false;
+			option.selectionIndicator = false;
+			option.homeButton = false;
+			option.fullscreenButton = false;
+			option.geocoder = false;
+			option.baseLayerPicker = false;
+			option.sceneModePicker = false;
+		} 
+
+		option.defaultControl = {};
+
+		option.defaultControl.zoom = true;
+		option.defaultControl.initCamera = true;
+		option.defaultControl.fullScreen = true;
+		option.defaultControl.measure = true;
+		option.defaultControl.tools = true;
+		option.defaultControl.attribution = true;
+		option.defaultControl.overviewMap = true;
+		
+		var defControl = Object.assign({}, option.defaultControl, opt.defaultControl||{});
+		opt.defaultControl = defControl;
+		
+		return Object.assign({}, option, opt||{});
 	}
 };
 Mago3d.prototype = Object.create(Emitter.prototype);

@@ -911,6 +911,20 @@ Node.prototype.getNodeGeoLocDataManager = function()
 };
 
 /**
+ * 현재 데이터가 위치한 정보 획득
+ * @return {GeoLocationData}
+ */
+Node.prototype.getCurrentGeoLocationData = function() 
+{
+	if (!this.isReadyToRender() || !this.data || !this.data.geoLocDataManager) 
+	{
+		throw new Error('this node is not ready to use.');
+	}
+	var geoLoDataManager = this.getNodeGeoLocDataManager();
+	return geoLoDataManager.getCurrentGeoLocationData();
+};
+
+/**
  * 어떤 일을 하고 있습니까?
  */
 Node.prototype.finishedAnimation = function(magoManager) 

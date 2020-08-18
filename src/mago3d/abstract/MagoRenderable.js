@@ -201,7 +201,12 @@ MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPr
 	// check options provisionally here.
 	if (this.options)
 	{
-		if (this.options.renderWireframe)
+		var selectionManager = magoManager.selectionManager;
+		var bIsSelected = false;
+		if (selectionManager.isObjectSelected(this))
+		{ bIsSelected = true; }
+
+		if (bIsSelected && this.options.renderWireframe)
 		{
 			var shaderThickLine = magoManager.postFxShadersManager.getShader("thickLine");
 			shaderThickLine.useProgram();
@@ -260,7 +265,7 @@ MagoRenderable.prototype.renderAsChild = function(magoManager, shader, renderTyp
 
 		if (selectionManager.isObjectSelected(this))
 		{ bIsSelected = true; }
-		
+		bIsSelected = false;
 		if (bIsSelected)
 		{
 			var selColor = [0.9, 0.1, 0.1, 1.0];
@@ -277,7 +282,7 @@ MagoRenderable.prototype.renderAsChild = function(magoManager, shader, renderTyp
 				}
 			}
 			
-			gl.uniform4fv(shader.oneColor4_loc, selColor);
+			//gl.uniform4fv(shader.oneColor4_loc, selColor);
 		}
 		else 
 		{

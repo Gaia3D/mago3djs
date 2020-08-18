@@ -16,6 +16,7 @@ var ViewerInit = function(containerId, serverPolicy)
 
 	MagoConfig.setContainerId(this.targetId);
 	this.init();
+	//this.createElement();
 };
 
 ViewerInit.prototype.init = function() 
@@ -50,4 +51,71 @@ ViewerInit.prototype.initPosition = function()
 		if (isNaN(duration)) { duration = 3; }
 		this.magoManager.flyTo(lon, lat, height, duration);
 	}
+};
+
+ViewerInit.prototype.createElement = function()
+{
+	var viewElement = this.magoManager.isCesiumGlobe() ? document.getElementsByClassName('cesium-viewer')[0] : document.getElementById(this.targetId);
+
+	this.magoManager.overlayContainer = document.createElement('div');
+	this.magoManager.overlayContainer.style.position = 'absolute';
+	this.magoManager.overlayContainer.style.zIndex = '0';
+	this.magoManager.overlayContainer.style.width = '100%';
+	this.magoManager.overlayContainer.style.height = '100%';
+	this.magoManager.overlayContainer.style.top = '0px';
+	this.magoManager.overlayContainer.style.pointerEvents = 'none';
+	this.magoManager.overlayContainer.className = 'mago3d-overlayContainer';
+
+	this.magoManager.defaultControlContainer = document.createElement('div');
+	this.magoManager.defaultControlContainer.style.position = 'absolute';
+	this.magoManager.defaultControlContainer.style.right = '0px';
+	this.magoManager.defaultControlContainer.style.width = '220px';
+	this.magoManager.defaultControlContainer.style.height = '100%';
+	this.magoManager.defaultControlContainer.style.float = 'right';
+	this.magoManager.defaultControlContainer.className = 'mago3d-overlayContainer-defaultControl';
+
+	this.magoManager.overlayContainer.appendChild(this.magoManager.defaultControlContainer);
+	viewElement.appendChild(this.magoManager.overlayContainer);
+
+	var defaultControl = this.options.defaultControl;
+
+	if (defaultControl.zoom)
+	{
+		this.magoManager.controls.add(new Zoom());
+	}
+	if (defaultControl.initCamera)
+	{
+		this.magoManager.controls.add(new InitCamera());
+	}
+
+	if (defaultControl.fullScreen)
+	{
+		this.magoManager.controls.add(new FullScreen());
+	}
+
+	if (defaultControl.measure)
+	{
+		this.magoManager.controls.add(new Measure());
+	}
+
+	if (defaultControl.tools)
+	{
+		this.magoManager.controls.add(new Tools());
+	}
+
+	if (defaultControl.attribution)
+	{
+		this.magoManager.controls.add(new Attribution());
+	}
+
+	if (defaultControl.overviewMap)
+	{
+		this.magoManager.controls.add(new OverviewMap());
+	}
+
+	/*if(defaultControl.compass)
+	{
+		this.magoManager.controls.add(new Compass());
+	}
+*/
 };

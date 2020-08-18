@@ -538,6 +538,20 @@ Surface.prototype.calculateTexCoordsBox = function(texCoordsBoundingBox)
 };
 
 /**
+ * Get the texture coordinate by box projection
+ */
+Surface.prototype.calculateTexCoordsByHeight = function(height)
+{
+	var face;
+	var facesCount = this.getFacesCount();
+	for (var i=0; i<facesCount; i++)
+	{
+		face = this.getFace(i);
+		face.calculateTexCoordsByHeight(height);
+	}
+};
+
+/**
  *
  * 전체 Face 에 대해 각 Face 가 가진 버텍스값을 뒤바꾼다
  */

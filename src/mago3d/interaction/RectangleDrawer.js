@@ -121,7 +121,7 @@ RectangleDrawer.prototype.start = function()
 				minLatitude  : minLat,
 				maxLongitude : maxLon,
 				maxLatitude  : maxLat,
-				altitude     : that.height
+				altitude     : -3000
 			};
 
 			if (!that.tempRectangle)
@@ -132,7 +132,7 @@ RectangleDrawer.prototype.start = function()
 						fillColor: '#ff0000'
 					};
 				}
-				that.tempRectangle = new MagoRectangle(position, that.style);
+				that.tempRectangle = new MagoRectangleGround(position, that.style);
 				manager.modeler.magoRectangle = that.tempRectangle;
 			}
 			else 
