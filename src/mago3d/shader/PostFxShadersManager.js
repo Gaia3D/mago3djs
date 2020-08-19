@@ -76,7 +76,12 @@ PostFxShadersManager.prototype.isCurrentShader = function(shader)
  */
 PostFxShadersManager.prototype.useProgram = function(shader) 
 {
-	if (!this.isCurrentShader(shader))
+	if (shader === undefined || shader === null)
+	{
+		this.gl.useProgram(null);
+		this.currentShaderUsing = null;
+	}
+	else if (!this.isCurrentShader(shader))
 	{
 		shader.useProgram();
 		this.currentShaderUsing = shader;

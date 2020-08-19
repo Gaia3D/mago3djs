@@ -1156,8 +1156,245 @@ TinTerrain.prototype.prepareTinTerrainPlain = function(magoManager, tinTerrainMa
 	return true;
 };
 
+TinTerrain.prototype.prepareTinTerrainForward = function(magoManager, tinTerrainManager)
+{	
+	if (this.depth === 0)
+	{ var hola = 0; }
+
+	if (this.depth === 1)
+	{ var hola = 0; }
+
+	if (this.depth === 2)
+	{ var hola = 0; }
+
+	if (this.depth === 3)
+	{ var hola = 0; }
+
+	if (this.depth === 4)
+	{ var hola = 0; }
+
+	if (this.depth === 5)
+	{ var hola = 0; }
+
+	if (this.depth === 6)
+	{ var hola = 0; }
+
+	if (this.depth === 7)
+	{ var hola = 0; }
+
+	if (this.isMeshPrepared())
+	{
+		// prepare children.***
+		if (!this.isLeaf && this.childMap)
+		{
+			this.childMap.LU.prepareTinTerrainForward(magoManager, tinTerrainManager);
+			this.childMap.LD.prepareTinTerrainForward(magoManager, tinTerrainManager);
+			this.childMap.RU.prepareTinTerrainForward(magoManager, tinTerrainManager);
+			this.childMap.RD.prepareTinTerrainForward(magoManager, tinTerrainManager);
+		}
+	}
+	else
+	{
+		// prepare this tile.***
+		magoManager.processQueue.eraseTinTerrainToDelete(this);
+
+		if (this.fileLoadState === CODE.fileLoadState.LOAD_FAILED)
+		{
+			return this.prepareTinTerrainPlain(magoManager, tinTerrainManager);
+		}
+		
+		// Prepare this tinTerrain.
+		if (this.fileLoadState === CODE.fileLoadState.READY)
+		{
+			if (magoManager.fileRequestControler.tinTerrainFilesRequested > 5)
+			{ return false; }
+			
+			//해당 터레인 xyz를 terrainInfo와 비교하여 유효한 파일이면 통과, 아닐시 plain으로 처리
+			if (!this.checkAvailableTerrain()) 
+			{
+				this.fileLoadState = CODE.fileLoadState.LOAD_FAILED;
+				return false;
+			}
+
+			var pathName = this.getPathName();
+			var geometryDataPath = magoManager.readerWriter.geometryDataPath;
+			//var fileName = geometryDataPath + "/Terrain/" + pathName + ".terrain";
+
+			var fileName = this.tinTerrainManager.terrainValue + pathName + ".terrain";
+			magoManager.readerWriter.loadTINTerrain(fileName, this, magoManager);
+				
+			return false;
+		}
+		else if (this.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
+		{
+			// put the terrain into parseQueue.
+			magoManager.parseQueue.putTinTerrainToParse(this, 0);
+			return false;
+		}
+		else if (this.fileLoadState === CODE.fileLoadState.PARSE_STARTED) 
+		{
+			var parsedTerrainMap = tinTerrainManager.textureParsedTerrainMap;
+			var z = this.depth;
+			var x = this.X;
+			var y = this.Y;
+			if (!parsedTerrainMap[z]) { return; }
+			if (!parsedTerrainMap[z][x]) { return; }
+			if (!parsedTerrainMap[z][x][y]) { return; }
+
+			var result = parsedTerrainMap[z][x][y];
+
+			this.centerX = result.centerX;
+			this.centerY = result.centerY;
+			this.centerZ = result.centerZ;
+				
+			this.minHeight = result.minHeight;
+			this.maxHeight = result.maxHeight;
+				
+			// In this moment set the altitudes for the geographicExtension.
+			this.geographicExtent.setExtent(undefined, undefined, this.minHeight[0], undefined, undefined, this.maxHeight[0]);
+				
+			this.boundingSphereCenterX = result.boundingSphereCenterX;
+			this.boundingSphereCenterY = result.boundingSphereCenterY;
+			this.boundingSphereCenterZ = result.boundingSphereCenterZ;
+			this.boundingSphereRadius = result.boundingSphereRadius;
+				
+			this.horizonOcclusionPointX = result.horizonOcclusionPointX;
+			this.horizonOcclusionPointY = result.horizonOcclusionPointY;
+			this.horizonOcclusionPointZ = result.horizonOcclusionPointZ;
+				
+			// 2. vertex data.
+			this.vertexCount = result.vertexCount;
+			this.uValues = result.uValues;
+			this.vValues = result.vValues;
+			this.hValues = result.hValues;
+				
+			// 3. indices.
+			this.trianglesCount = result.trianglesCount;
+			this.indices = result.indices;
+				
+			// 4. edges indices.
+			this.westVertexCount = result.westVertexCount;
+			this.westIndices = result.westIndices;
+				
+			this.southVertexCount = result.southVertexCount;
+			this.southIndices = result.southIndices;
+				
+			this.eastVertexCount = result.eastVertexCount; 
+			this.eastIndices = result.eastIndices;
+				
+			this.northVertexCount = result.northVertexCount;
+			this.northIndices = result.northIndices;
+
+			// 5. extension header.
+			this.extensionId = result.extensionId;
+			this.extensionLength = result.extensionLength;
+				
+			this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
+			delete this.tinTerrainManager.textureParsedTerrainMap[z][x][y];
+
+			return false;
+		}
+		else if (this.fileLoadState === CODE.fileLoadState.PARSE_FINISHED && this.vboKeyContainer === undefined)
+		{
+			if (!this.requestDecodeData) 
+			{ 
+				this.decodeData(tinTerrainManager.imageryType); 
+				return false;
+			}
+				
+			var z = this.depth;
+			var x = this.X;
+			var y = this.Y;
+			var decodedTerrainMap = tinTerrainManager.textureDecodedTerrainMap;
+			if (!decodedTerrainMap[z]) { return false; }
+			if (!decodedTerrainMap[z][x]) { return false; }
+			if (!decodedTerrainMap[z][x][y]) { return false; }
+
+			var result = decodedTerrainMap[z][x][y];
+
+			this.texCoordsArray = result.texCoordsArray;
+			this.cartesiansArray = result.cartesiansArray;
+			this.skirtCartesiansArray = result.skirtCartesiansArray;
+			this.skirtTexCoordsArray = result.skirtTexCoordsArray;
+			this.skirtAltitudesArray = result.skirtAltitudesArray;
+			this.altArray = result.altArray;
+			this.normalsArray = result.normalsArray;
+			this.lonArray = result.longitudesArray;
+			this.latArray = result.latitudesArray;
+
+			delete this.tinTerrainManager.textureDecodedTerrainMap[z][x][y];
+			this.makeVbo(magoManager.vboMemoryManager);
+
+			// Make sea mesh too.
+			this.makeSeaMeshVirtually(undefined);
+			this.makeVboSea(magoManager.vboMemoryManager);
+			return false;
+		}
+		else if (!this.isTexturePrepared(this.texture))
+		{
+			if (this.depth <= tinTerrainManager.maxTextureGuranteedDepth)
+			{
+				this.prepareTexture(this.texture, tinTerrainManager.imagerys, magoManager, tinTerrainManager);
+			}
+			return false;
+		}
+		
+		
+
+		// Test making textureMaster.
+		// If there are 2 or more layers, then must create textureMaster.
+		// Check if tinTerrain is syncronized with this.tinTerrainManager.
+		if (this.layersStyleId !== this.tinTerrainManager.layersStyleId)
+		{ 
+			this.textureMasterImageryLayersPrepared = undefined; 
+			this.textureMasterPrepared = undefined; 
+		}
+
+		//if (this.objToClampToTerrainStyleId !== this.tinTerrainManager.objToClampToTerrainStyleId)
+		//{ 
+		//	this.textureMasterPrepared = undefined; 
+		//}
+
+		if (!this.textureMasterPrepared && this.isTexturePrepared(this.texture))
+		{
+			this.makeTextureMaster();
+		}
+	}
+
+	
+	
+	
+	
+	
+	return true;
+};
+
 TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager)
 {
+	if (this.depth === 0)
+	{ var hola = 0; }
+
+	if (this.depth === 1)
+	{ var hola = 0; }
+
+	if (this.depth === 2)
+	{ var hola = 0; }
+
+	if (this.depth === 3)
+	{ var hola = 0; }
+
+	if (this.depth === 4)
+	{ var hola = 0; }
+
+	if (this.depth === 5)
+	{ var hola = 0; }
+
+	if (this.depth === 6)
+	{ var hola = 0; }
+
+	if (this.depth === 7)
+	{ var hola = 0; }
+
 	// first, read terrainTiles-info.json
 	if (!this.tinTerrainManager.terrainReady) 
 	{
@@ -1171,16 +1408,7 @@ TinTerrain.prototype.prepareTinTerrain = function(magoManager, tinTerrainManager
 		return this.owner.prepareTinTerrain(magoManager, tinTerrainManager);
 	}
 
-	/*
-	if (!this.isVisible())
-	{
-		if (this.owner.isVisible())
-		{
-			return this.owner.prepareTinTerrain(magoManager, tinTerrainManager);
-		}
-	
-		return false;
-	}*/
+
 
 	// This function 1- loads file & 2- parses file & 3- makes vbo.
 	// 1rst, check if the parent is prepared. If parent is not prepared, then prepare the parent.
@@ -1669,6 +1897,30 @@ TinTerrain.prototype.deleteTinTerrain = function(magoManager)
 
 TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray)
 {	
+	if (this.depth === 0)
+	{ var hola = 0; }
+
+	if (this.depth === 1)
+	{ var hola = 0; }
+
+	if (this.depth === 2)
+	{ var hola = 0; }
+
+	if (this.depth === 3)
+	{ var hola = 0; }
+
+	if (this.depth === 4)
+	{ var hola = 0; }
+
+	if (this.depth === 5)
+	{ var hola = 0; }
+
+	if (this.depth === 6)
+	{ var hola = 0; }
+
+	if (this.depth === 7)
+	{ var hola = 0; }
+
 	var isChildrenMeshPrepared = this.isChildrenMeshPrepared();
 	if (isChildrenMeshPrepared && !this.isLeaf)
 	{

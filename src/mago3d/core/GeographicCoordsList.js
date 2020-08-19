@@ -669,7 +669,7 @@ GeographicCoordsList.prototype.renderLines = function(magoManager, shader, rende
 	{ return false; }
 	
 	var shader = magoManager.postFxShadersManager.getShader("pointsCloud");
-	shader.useProgram();
+	magoManager.postFxShadersManager.useProgram(shader);
 	shader.disableVertexAttribArrayAll();
 	shader.resetLastBuffersBinded();
 	shader.enableVertexAttribArray(shader.position3_loc);
@@ -707,7 +707,7 @@ GeographicCoordsList.prototype.renderPoints = function(magoManager, shader, rend
 	//	gl.disableVertexAttribArray(i);
 
 	var shaderLocal = magoManager.postFxShadersManager.getShader("pointsCloud"); // provisional. Use the currentShader of argument.
-	shaderLocal.useProgram();
+	magoManager.postFxShadersManager.useProgram(shaderLocal);
 	
 	shaderLocal.disableVertexAttribArrayAll();
 	shaderLocal.resetLastBuffersBinded();
@@ -783,7 +783,7 @@ GeographicCoordsList.prototype.renderPoints = function(magoManager, shader, rend
 	ctx.restore();
 	
 	// return the current shader.
-	shader.useProgram();
+	magoManager.postFxShadersManager.useProgram(shader);
 };
 
 /**

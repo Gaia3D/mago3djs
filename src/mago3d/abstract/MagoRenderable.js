@@ -204,7 +204,7 @@ MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPr
 		if (this.options.renderWireframe)
 		{
 			var shaderThickLine = magoManager.postFxShadersManager.getShader("thickLine");
-			shaderThickLine.useProgram();
+			magoManager.postFxShadersManager.useProgram(shaderThickLine);
 			shaderThickLine.bindUniformGenerals();
 			var gl = magoManager.getGl();
 			gl.uniform1i(shaderThickLine.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
@@ -232,7 +232,7 @@ MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPr
 			this.renderAsChild(magoManager, shaderThickLine, renderType, glPrimitive, bIsSelected, this.options, bWireframe);
 			
 			// Return to the currentShader.
-			shader.useProgram();
+			magoManager.postFxShadersManager.useProgram(shader);
 		}
 	}
 };

@@ -95,7 +95,7 @@ var TinTerrainManager = function(magoManager, options)
 	this.objectsToClampToTerrainArray;
 
 	// Max textureGuaranteedDepth.
-	this.maxTextureGuranteedDepth = 5;
+	this.maxTextureGuranteedDepth = 2;
 
 	this.init();
 	this.makeTinTerrainWithDEMIndex(); // provisional.
@@ -617,6 +617,15 @@ TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager)
 
 	if (!this.visibleTilesArrayMap)
 	{ return; }
+
+	if (this.tinTerrainQuadTreeMercator.childMap)
+	{
+		if (this.tinTerrainQuadTreeMercator.childMap.LU) { this.tinTerrainQuadTreeMercator.childMap.LU.prepareTinTerrainForward(magoManager, this); }
+		if (this.tinTerrainQuadTreeMercator.childMap.LD) { this.tinTerrainQuadTreeMercator.childMap.LD.prepareTinTerrainForward(magoManager, this); }
+		if (this.tinTerrainQuadTreeMercator.childMap.RU) { this.tinTerrainQuadTreeMercator.childMap.RU.prepareTinTerrainForward(magoManager, this); }
+		if (this.tinTerrainQuadTreeMercator.childMap.RD) { this.tinTerrainQuadTreeMercator.childMap.RD.prepareTinTerrainForward(magoManager, this); }
+	}
+	return;
 	
 	// For the visible tinTerrains prepare its.
 	// Preparing rule: First prepare the tinTerrain-owner if the owner is no prepared yet.
@@ -649,6 +658,9 @@ TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager)
 						if (!tinTerrain.prepareTinTerrain(magoManager, this))
 						{ maxProcessCounter += 1; }
 					}
+
+					if (magoManager.fileRequestControler.tinTerrainFilesRequested >= 6)// || magoManager.fileRequestControler.tinTerrainTexturesRequested >= 2)
+					{ break; }
 				}
 			}
 			else if (this.terrainType === CODE.magoEarthTerrainType.REALTIME)// Real time ElevationTerrain.
@@ -859,6 +871,15 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	{ currentShader = shader; }
 	else
 	{ currentShader = magoManager.postFxShadersManager.getShader("tinTerrain"); }
+
+	if (renderType === 0)
+	{ var hola = 0; }
+
+	if (renderType === 1)
+	{ var hola = 0; }
+
+	if (renderType === 2)
+	{ var hola = 0; }
 	
 	currentShader.resetLastBuffersBinded();
 	magoManager.postFxShadersManager.useProgram(currentShader);
@@ -871,6 +892,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	//gl.disableVertexAttribArray(currentShader.color4_loc);
 	
 	currentShader.bindUniformGenerals();
+
 	
 	
 	magoManager.test__makingTerrainByAltitudesImage = 0;
@@ -1054,7 +1076,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	currentShader.disableVertexAttribArray(currentShader.position3_loc); 
 	currentShader.disableVertexAttribArray(currentShader.normal3_loc); 
 	currentShader.disableVertexAttribArray(currentShader.color4_loc); 
-	gl.useProgram(null);
+	magoManager.postFxShadersManager.useProgram(null);
 
 	this.renderingFase +=1;
 	if (this.renderingFase > 1000000)
