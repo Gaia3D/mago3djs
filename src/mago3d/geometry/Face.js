@@ -307,6 +307,67 @@ Face.prototype.calculateVerticesNormals = function(bForceRecalculatePlaneNormal)
 /**
  * Get the texture coordinate by box projection
  */
+Face.prototype.calculateTexCoordsByHeight = function(height, width)
+{
+	width = 3;
+
+	var planeNormal = this.getPlaneNormal();
+	var zAxix = new Point3D(0, 0, 1);
+	var dotValue = zAxix.scalarProduct(planeNormal);
+	var isCeil = dotValue > 0.9 ? true : false; 
+
+	var horizontalDownEdge;
+	var length = 0;
+	var hel = this.getHalfEdgesLoop();
+	for (var j=0, len=hel.length;j<len;j++)
+	{
+		var halfEdge = hel[j];
+		var startV = halfEdge.getStartVertex();
+		var startTexCoord = startV.getTexCoord();
+		var endV = halfEdge.getEndVertex();
+		var endTexCoord = endV.getTexCoord();
+		
+		var sPos = startV.getPosition();
+		var ePos = endV.getPosition();
+
+		var sz = sPos.z;
+		var ez = ePos.z;
+
+		if (isCeil)
+		{
+			startTexCoord.set(0, 0);
+			endTexCoord.set(0, 0);
+		}
+		else 
+		{
+			if (sz < 0.5 && ez < 0.5) 
+			{
+				horizontalDownEdge = halfEdge;
+				length = sPos.distToPoint(ePos);
+
+				var s = length / width;
+				var t = 0;
+
+				startTexCoord.set(0, t);
+				endTexCoord.set(s, t);
+			}
+			else if (sz > 0.5 && ez > 0.5) 
+			{
+				horizontalDownEdge = halfEdge;
+				length = sPos.distToPoint(ePos);
+
+				var s = length / width;
+				var t = sz / height;
+
+				startTexCoord.set(s, t);
+				endTexCoord.set(0, t);
+			}
+		}
+	}
+};
+/**
+ * Get the texture coordinate by box projection
+ */
 Face.prototype.calculateTexCoordsBox = function(texCoordsBoundingBox)
 {
 	//CODE.boxFace = { "UNKNOWN" : 0, "LEFT" : 1, "RIGHT" : 2, "FRONT" : 3, "REAR"  : 4, "TOP" : 5, "BOTTOM" : 6 };

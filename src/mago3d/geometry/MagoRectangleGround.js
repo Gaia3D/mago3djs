@@ -100,7 +100,18 @@ MagoRectangleGround.prototype.makeMesh = function(magoManager)
 {
 	// check if exist geoCoords extent.
 	if (!this.maxGeographicCoord || !this.minGeographicCoord)
-	{ return; } // error message.
+	{ 
+		return; 
+	} // error message.
+
+	var resultGeographicCoord;
+	resultGeographicCoord = GeographicCoord.getMidPoint(this.minGeographicCoord, this.maxGeographicCoord, resultGeographicCoord);
+    
+	var geoLocDataManager = new GeoLocationDataManager();
+	var geoLocData = geoLocDataManager.newGeoLocationData();
+	geoLocData = ManagerUtils.calculateGeoLocationData(resultGeographicCoord.longitude, resultGeographicCoord.latitude, resultGeographicCoord.altitude, undefined, undefined, undefined, geoLocData);
+	// set the geoLocDataManager of the terrainScanner.
+	this.geoLocDataManager = geoLocDataManager;
 
 	// make a geoCoordsArray.
 	var geoCoordsArray = [];
@@ -129,7 +140,7 @@ MagoRectangleGround.prototype.makeMesh = function(magoManager)
 	geoCoordsArray.push(geoCoord);
 
 	var geoCoordsList = new GeographicCoordsList(geoCoordsArray);
-	var height = 1000.0;
+	var height = 10000.0;
 	var bLoop = true;
 	var extrudeDirWC = undefined;
 	var renderableObj = geoCoordsList.getExtrudedMeshRenderableObject(height, bLoop, undefined, magoManager, extrudeDirWC);
@@ -211,6 +222,35 @@ MagoRectangleGround.prototype.setStyle = function(style, magoManager)
 			}
 		}
 	}
+};
+/**
+ * make clone this instance
+ * @return {MagoRectangle}
+ */
+MagoRectangleGround.prototype.clone = function()
+{
+	var position = {
+		minLongitude : this.minGeographicCoord.longitude,
+		minLatitude  : this.minGeographicCoord.latitude,
+		maxLongitude : this.maxGeographicCoord.longitude,
+		maxLatitude  : this.maxGeographicCoord.latitude,
+		altitude     : -200
+	};
+	var style = JSON.parse(JSON.stringify(this.style));
+
+	return new MagoRectangle(position, style);
+};
+
+/**
+ * return area
+ * @return {number}
+ */
+MagoRectangleGround.prototype.getArea = function() 
+{
+	var edge = new GeographicCoord(this.minGeographicCoord.longitude, this.maxGeographicCoord.latitude, this.maxGeographicCoord.altitude);
+	var height = Globe.getArcDistanceBetweenGeographicCoords(this.minGeographicCoord, edge);
+	var width = Globe.getArcDistanceBetweenGeographicCoords(edge, this.maxGeographicCoord);
+	return Math.abs(width * height);
 };
 
 MagoRectangleGround.prototype.render = function(magoManager, shader, renderType, glPrimitive, bIsSelected) 

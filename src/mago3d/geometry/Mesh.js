@@ -558,6 +558,20 @@ Mesh.prototype.calculateTexCoordsBox = function(texCoordsBoundingBox)
 };
 
 /**
+ * Get the texture coordinate by box projection
+ */
+Mesh.prototype.calculateTexCoordsByHeight = function(height)
+{
+	var surface;
+	var surfacesCount = this.getSurfacesCount();
+	for (var i=0; i<surfacesCount; i++)
+	{
+		surface = this.getSurface(i);
+		surface.calculateTexCoordsByHeight(height);
+	}
+};
+
+/**
  * Get the texture coordinate by spherical projection
  */
 Mesh.prototype.calculateTexCoordsSpherical = function()
@@ -846,7 +860,7 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive, i
 	if (this.vboKeysContainer === undefined)
 	{
 		this.vboKeysContainer = this.getVbo(this.vboKeysContainer, vboMemManager);
-		return;
+		//return;
 	}
 	
 	var gl = magoManager.sceneState.gl;

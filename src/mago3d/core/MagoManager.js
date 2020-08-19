@@ -325,6 +325,12 @@ var MagoManager = function(options)
 	this.interactions = new InteractionCollection(this);
 
 	/**
+     * Control collection.
+     * @type {ControlCollection}
+     */
+    this.controls = new ControlCollection(this);
+
+	/**
 	 * MagoLayer collection
 	 * @type {MagoLayerCollection}
 	 */
