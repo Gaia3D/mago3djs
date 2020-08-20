@@ -5732,7 +5732,7 @@ vec3 normal_from_depth(float depth, vec2 texCoord) {\n\
 \n\
 	float depthA = 0.0;\n\
 	float depthB = 0.0;\n\
-	for(float i=0.0; i<3.0; i++)\n\
+	for(float i=-3.0; i<0.0; i++)\n\
 	{\n\
 		depthA += getDepth(texCoord + offset1*(1.0+i));\n\
 		depthB += getDepth(texCoord + offset2*(1.0+i));\n\
@@ -5947,41 +5947,7 @@ float roundCustom(float number)\n\
 \n\
 #define M_PI 3.1415926535897932384626433832795\n\
 \n\
-//varying float vAConstForDepth;\n\
-//varying float vAConstForTexDepth;\n\
-//varying float vMinT;\n\
-//varying float vMinTTex;\n\
-/*\n\
-float LatitudeRad_fromTexCoordY(float t)\n\
-{\n\
-	float PI_DIV_4 = M_PI/4.0;\n\
-	//float tileDepthFloat = float(tileDepth);\n\
-	//float aConst = (1.0/(2.0*M_PI))*pow(2.0, tileDepthFloat);\n\
 \n\
-	//float minT = roundCustom( vAConstForDepth*(M_PI-log(tan(PI_DIV_4+minLatitudeRad/2.0))) );\n\
-	//minT = 1.0 - minT;\n\
-\n\
-	float tAux = t + vMinT;\n\
-	tAux = 1.0 - tAux;\n\
-	float latRad = 2.0*(atan(exp(M_PI-tAux/vAConstForDepth))-PI_DIV_4);\n\
-	\n\
-	return latRad;\n\
-}\n\
-\n\
-float TexCoordY_fromLatitudeRad(float latitudeRad)\n\
-{\n\
-	float PI_DIV_4 = M_PI/4.0;\n\
-	//float aConstTex = (1.0/(2.0*M_PI))*pow(2.0, float(tileDepth));\n\
-	//float minTTex = roundCustom(vAConstForTexDepth*(M_PI-log(tan(PI_DIV_4+minLatitudeRad/2.0))));\n\
-	//minTTex = 1.0 - minTTex;\n\
-\n\
-	float newT = vAConstForTexDepth*(M_PI-log(tan(PI_DIV_4+latitudeRad/2.0)));\n\
-	newT = 1.0 - newT;\n\
-	newT -= vMinTTex;\n\
-\n\
-	return newT;\n\
-}\n\
-*/\n\
 \n\
 void main()\n\
 {    \n\
@@ -6142,9 +6108,6 @@ void main()\n\
 				texCoord = vec2(finalTexCoord.s, finalTexCoord.t);\n\
 			}\n\
 \n\
-			\n\
-\n\
-			\n\
 			bool firstColorSetted = false;\n\
 			float externalAlpha = 0.0;\n\
 \n\
@@ -6536,7 +6499,7 @@ void main()\n\
 			float scaleT = maxT - minT;\n\
 			float newT = minT + texCoord.y * scaleT;\n\
 \n\
-			vTexCoord = vec2(newS, newT);// * (1.0 + texCorrection));\n\
+			vTexCoord = vec2(newS, newT);\n\
 			\n\
 			\n\
 \n\

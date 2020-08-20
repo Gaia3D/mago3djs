@@ -984,17 +984,6 @@ TinTerrain.prototype.getTextureForVectorMeshObject = function(objToClamp, gl, sh
 
 TinTerrain.prototype.bindTexture = function(gl, shader, currDepth)
 {
-	// Debug: force to bind owners texture.***
-	if (this.tinTerrainManager.debug_useOwnerTexture === undefined)
-	{ this.tinTerrainManager.debug_useOwnerTexture = false; }
-
-	if (currDepth === this.depth && this.owner && this.tinTerrainManager.debug_useOwnerTexture)
-	{
-		this.owner.bindTexture(gl, shader, currDepth);
-		return; 
-	}
-	// End debug.------------------------------------------
-
 	if (this.textureMaster)
 	{
 		// Binding textureMaster.
