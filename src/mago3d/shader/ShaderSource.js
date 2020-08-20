@@ -5646,14 +5646,6 @@ varying float Fcoef_half;\n\
 // Texture's vars.***\n\
 varying float vTileDepth;\n\
 varying float vTexTileDepth;\n\
-varying float vAConstForDepth;\n\
-varying float vAConstForTexDepth;\n\
-varying float vMinT;\n\
-varying float vMinTTex;\n\
-varying float vRecalculatedTexCoordS;\n\
-\n\
-varying float vTestCurrLatitude;\n\
-varying float vTestCurrLongitude;\n\
 \n\
 const float equatorialRadius = 6378137.0;\n\
 const float polarRadius = 6356752.3142;\n\
@@ -5959,7 +5951,7 @@ float roundCustom(float number)\n\
 //varying float vAConstForTexDepth;\n\
 //varying float vMinT;\n\
 //varying float vMinTTex;\n\
-\n\
+/*\n\
 float LatitudeRad_fromTexCoordY(float t)\n\
 {\n\
 	float PI_DIV_4 = M_PI/4.0;\n\
@@ -5989,6 +5981,7 @@ float TexCoordY_fromLatitudeRad(float latitudeRad)\n\
 \n\
 	return newT;\n\
 }\n\
+*/\n\
 \n\
 void main()\n\
 {    \n\
@@ -6314,6 +6307,7 @@ void main()\n\
 		gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian * scalarProd, 1.0); // original.***\n\
 		//gl_FragColor = textureColor; // test.***\n\
 		//gl_FragColor = vec4(vNormal.xyz, 1.0); // test.***\n\
+\n\
 		/*\n\
 		int texDepthDiff = int(floor(vTileDepth+0.1) - floor(vTexTileDepth+0.1));\n\
 		if(texDepthDiff > 0)\n\
@@ -6380,6 +6374,9 @@ uniform vec4 uTileGeoExtent; // (minLon, minLat, maxLon, maxLat).\n\
 uniform int uTileDepthOfBindedTextures; // The depth of the tileTexture binded. Normally uTileDepth = uTileDepthOfBindedTextures, but if current tile has no texturesPrepared, then bind ownerTexture and change texCoords.\n\
 uniform vec4 uTileGeoExtentOfBindedTextures; // (minLon, minLat, maxLon, maxLat).\n\
 \n\
+// Debug uniforms for texCorrection.***\n\
+uniform vec3 uDebug_texCorrectionFactor;\n\
+\n\
 varying float applySpecLighting;\n\
 varying vec3 vNormal;\n\
 varying vec2 vTexCoord;   \n\
@@ -6398,16 +6395,9 @@ varying float Fcoef_half;\n\
 // Texture's vars.***\n\
 varying float vTileDepth;\n\
 varying float vTexTileDepth;\n\
-varying float vAConstForDepth;\n\
-varying float vAConstForTexDepth;\n\
-varying float vMinT;\n\
-varying float vMinTTex;\n\
-varying float vRecalculatedTexCoordS;\n\
-\n\
-varying float vTestCurrLatitude;\n\
-varying float vTestCurrLongitude;\n\
 \n\
 #define M_PI 3.1415926535897932384626433832795\n\
+#define M_E 2.7182818284590452353602875\n\
 \n\
 float roundCustom(float number)\n\
 {\n\
@@ -6417,6 +6407,7 @@ float roundCustom(float number)\n\
 \n\
 float LatitudeRad_fromTexCoordY(float t, float minLatitudeRad, int tileDepth)\n\
 {\n\
+	// No used. Is not precise.\n\
 	float PI_DIV_4 = M_PI/4.0;\n\
 	float tileDepthFloat = float(tileDepth);\n\
 	float aConst = (1.0/(2.0*M_PI))*pow(2.0, tileDepthFloat);\n\
@@ -6431,14 +6422,13 @@ float LatitudeRad_fromTexCoordY(float t, float minLatitudeRad, int tileDepth)\n\
 	return latRad;\n\
 }\n\
 \n\
-float TexCoordY_fromLatitudeRad(float latitudeRad, float minLatitudeRad, int tileDepth)\n\
+float TexCoordY_fromLatitudeRad(float latitudeRad, float minLatitudeRad, int tileDepth, float aConst)\n\
 {\n\
 	float PI_DIV_4 = M_PI/4.0;\n\
-	float aConstTex = (1.0/(2.0*M_PI))*pow(2.0, float(tileDepth));\n\
-	float minTTex = roundCustom(aConstTex*(M_PI-log(tan(PI_DIV_4+minLatitudeRad/2.0))));\n\
+	float minTTex = roundCustom(aConst*(M_PI-log(tan(PI_DIV_4+minLatitudeRad/2.0))));\n\
 	minTTex = 1.0 - minTTex;\n\
 \n\
-	float newT = aConstTex*(M_PI-log(tan(PI_DIV_4+latitudeRad/2.0)));\n\
+	float newT = aConst*(M_PI-log(tan(PI_DIV_4+latitudeRad/2.0)));\n\
 	newT = 1.0 - newT;\n\
 	newT -= minTTex;\n\
 \n\
@@ -6514,6 +6504,8 @@ void main()\n\
 	else\n\
 	{\n\
 		vTexCoord = texCoord;\n\
+\n\
+\n\
 		// ckeck if the texture is for this tile.\n\
 		if(uTileDepth != uTileDepthOfBindedTextures)\n\
 		{\n\
@@ -6522,46 +6514,31 @@ void main()\n\
 			float thisMaxLon = uTileGeoExtent.z;\n\
 			float thisMaxLat = uTileGeoExtent.w;\n\
 			float thisLonRange = (thisMaxLon - thisMinLon);\n\
-			float thisLatRange = (thisMaxLat - thisMinLat);\n\
 \n\
 			float thisMinLatRad = thisMinLat * M_PI/180.0;\n\
-			float thisMinLonRad = thisMinLon * M_PI/180.0;\n\
+			float thisMaxLatRad = thisMaxLat * M_PI/180.0;\n\
 \n\
 			float texMinLon = uTileGeoExtentOfBindedTextures.x;\n\
 			float texMinLat = uTileGeoExtentOfBindedTextures.y;\n\
 			float texMaxLon = uTileGeoExtentOfBindedTextures.z;\n\
-			float texMaxLat = uTileGeoExtentOfBindedTextures.w;\n\
+\n\
 			float texLonRange = (texMaxLon - texMinLon);\n\
-			float texLatRange = (texMaxLat - texMinLat);\n\
-\n\
 			float texMinLatRad = texMinLat * M_PI/180.0;\n\
-			float texMinLonRad = texMinLon * M_PI/180.0;\n\
-			//---------------------------------------------------------------\n\
-			float PI_DIV_4 = M_PI/4.0;\n\
-			/*\n\
-			vAConstForDepth = (1.0/(2.0*M_PI))*pow(2.0, float(uTileDepth));\n\
-			vAConstForTexDepth = (1.0/(2.0*M_PI))*pow(2.0, float(uTileDepthOfBindedTextures));\n\
-			vMinT = roundCustom( vAConstForDepth*(M_PI-log(tan(PI_DIV_4+thisMinLatRad/2.0))) );\n\
-			vMinT = 1.0 - vMinT;\n\
-			vMinTTex = roundCustom( vAConstForTexDepth*(M_PI-log(tan(PI_DIV_4+texMinLatRad/2.0))) );\n\
-			vMinTTex = 1.0- vMinTTex;\n\
-			*/\n\
-			//-------------------------------------------------------------\n\
-			\n\
-			float currLatRad = LatitudeRad_fromTexCoordY(texCoord.y, thisMinLatRad, uTileDepth);\n\
-			//vTestCurrLatitude = currLatRad * 180.0/M_PI; // *** delete ***\n\
 \n\
-			// now, calculate s,t for bindedTexture tile depth.***\n\
-			\n\
-			float newS;\n\
+\n\
 			float currLon = thisMinLon + texCoord.x * thisLonRange;\n\
-			vTestCurrLongitude = currLon; // *** delete ***\n\
-			newS = (currLon - texMinLon) / texLonRange; // [0..1] range\n\
-			float newT = TexCoordY_fromLatitudeRad(currLatRad, texMinLatRad, uTileDepthOfBindedTextures); // [0..1] range\n\
-			float texCorrection = 0.0/float(uTileDepth - uTileDepthOfBindedTextures);\n\
-			vTexCoord = vec2(newS, newT + texCorrection);\n\
+			float newS = (currLon - texMinLon) / texLonRange; // [0..1] range\n\
+\n\
+			float aConstTex = (1.0/(2.0*M_PI))*pow(2.0, float(uTileDepthOfBindedTextures));\n\
+\n\
+			float minT = TexCoordY_fromLatitudeRad(thisMinLatRad, texMinLatRad, uTileDepthOfBindedTextures, aConstTex); // [0..1] range\n\
+			float maxT = TexCoordY_fromLatitudeRad(thisMaxLatRad, texMinLatRad, uTileDepthOfBindedTextures, aConstTex); // [0..1] range\n\
+			float scaleT = maxT - minT;\n\
+			float newT = minT + texCoord.y * scaleT;\n\
+\n\
+			vTexCoord = vec2(newS, newT);// * (1.0 + texCorrection));\n\
 			\n\
-			vRecalculatedTexCoordS = newS;\n\
+			\n\
 \n\
 			/*\n\
 			// CRS84.**************************************************\n\

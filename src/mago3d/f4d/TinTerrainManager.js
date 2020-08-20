@@ -95,7 +95,7 @@ var TinTerrainManager = function(magoManager, options)
 	this.objectsToClampToTerrainArray;
 
 	// Max textureGuaranteedDepth.
-	this.maxTextureGuranteedDepth = 2;
+	this.maxTextureGuranteedDepth = 4;
 
 	this.init();
 	this.makeTinTerrainWithDEMIndex(); // provisional.
@@ -625,79 +625,34 @@ TinTerrainManager.prototype.prepareVisibleTinTerrains = function(magoManager)
 		if (this.tinTerrainQuadTreeMercator.childMap.RU) { this.tinTerrainQuadTreeMercator.childMap.RU.prepareTinTerrainForward(magoManager, this); }
 		if (this.tinTerrainQuadTreeMercator.childMap.RD) { this.tinTerrainQuadTreeMercator.childMap.RD.prepareTinTerrainForward(magoManager, this); }
 	}
-	return;
-	
+	//return;
+
 	// For the visible tinTerrains prepare its.
 	// Preparing rule: First prepare the tinTerrain-owner if the owner is no prepared yet.
 	//for (var depth = 0; depth <= this.maxDepth; depth++) 
 	for (var depth = 0; depth <= this.maxDepth; depth++) 
 	{
-		if (magoManager.fileRequestControler.tinTerrainFilesRequested >= 6)// || magoManager.fileRequestControler.tinTerrainTexturesRequested >= 2)
-		{ break; }
-
-		var visibleTilesArray = this.visibleTilesArrayMap[depth];
-		if (visibleTilesArray && visibleTilesArray.length > 0)
+			
+		// 2nd, for all terrains that exist, if there are not in the visiblesMap, then delete its.
+		// Deleting rule: If a tinTerrain has children, then delete first the children.
+		var deletedCount = 0;
+		var noVisiblesTilesCount = this.noVisibleTilesArray.length;
+		for (var i=0; i<noVisiblesTilesCount; i++)
 		{
-			//*********************************************************
-			var visiblesTilesCount = visibleTilesArray.length;
-			if (this.terrainType === CODE.magoEarthTerrainType.PLAIN) // PlainTerrain.
+			tinTerrain = this.noVisibleTilesArray[i];
+			if (tinTerrain !== undefined)
 			{
-				for (var i=0; i<visiblesTilesCount; i++)
+				if (tinTerrain.depth > 2)
 				{
-					tinTerrain = visibleTilesArray[i];
-					tinTerrain.prepareTinTerrainPlain(magoManager, this);
-				}
-			}
-			else if (this.terrainType === CODE.magoEarthTerrainType.ELEVATION)// ElevationTerrain.
-			{
-				var maxProcessCounter = 0;
-				for (var i=0; i<visiblesTilesCount; i++)
-				{
-					tinTerrain = visibleTilesArray[i];
-					{
-						if (!tinTerrain.prepareTinTerrain(magoManager, this))
-						{ maxProcessCounter += 1; }
-					}
-
-					if (magoManager.fileRequestControler.tinTerrainFilesRequested >= 6)// || magoManager.fileRequestControler.tinTerrainTexturesRequested >= 2)
-					{ break; }
-				}
-			}
-			else if (this.terrainType === CODE.magoEarthTerrainType.REALTIME)// Real time ElevationTerrain.
-			{
-				var maxProcessCounter = 0;
-				for (var i=0; i<visiblesTilesCount; i++)
-				{
-					tinTerrain = visibleTilesArray[i];
-					if (!tinTerrain.prepareTinTerrainRealTimeElevation(magoManager, this))
-					{ maxProcessCounter += 1; }
-				
-					if (maxProcessCounter > 5)
-					{ break; }
+					tinTerrain.deleteTinTerrain(magoManager);
+					deletedCount++;
 				}
 			}
 			
-			// 2nd, for all terrains that exist, if there are not in the visiblesMap, then delete its.
-			// Deleting rule: If a tinTerrain has children, then delete first the children.
-			var deletedCount = 0;
-			var noVisiblesTilesCount = this.noVisibleTilesArray.length;
-			for (var i=0; i<visiblesTilesCount; i++)
-			{
-				tinTerrain = this.noVisibleTilesArray[i];
-				if (tinTerrain !== undefined)
-				{
-					if (tinTerrain.depth > 2)
-					{
-						tinTerrain.deleteTinTerrain(magoManager);
-						deletedCount++;
-					}
-				}
-				
-				if (deletedCount > 50)
-				{ break; }
-			}
-			//---------------------------------------------------------
+			if (deletedCount > 50)
+			{ break; }
 		}
+		
 	}
 };
 
@@ -768,87 +723,6 @@ TinTerrainManager.prototype.prepareVisibleTinTerrainsTextures = function(magoMan
 		}
 	}
 
-};
-
-
-/**
- * Prepare tinTerrains.
- */
-TinTerrainManager.prototype.prepareVisibleTinTerrains__original = function(magoManager) 
-{
-	var tinTerrain;
-	
-	// For the visible tinTerrains prepare its.
-	// Preparing rule: First prepare the tinTerrain-owner if the owner is no prepared yet.
-	for (var depth = 0; depth <= this.maxDepth; depth++) 
-	{
-		if (magoManager.fileRequestControler.tinTerrainFilesRequested >= 4 || magoManager.fileRequestControler.tinTerrainTexturesRequested >= 2)
-		{ break; }
-
-		var visibleTilesArray = this.visibleTilesArrayMap[depth];
-		if (visibleTilesArray && visibleTilesArray.length > 0)
-		{
-			//*********************************************************
-			var visiblesTilesCount = visibleTilesArray.length;
-			if (this.terrainType === CODE.magoEarthTerrainType.PLAIN) // PlainTerrain.
-			{
-				for (var i=0; i<visiblesTilesCount; i++)
-				{
-					tinTerrain = visibleTilesArray[i];
-					tinTerrain.prepareTinTerrainPlain(magoManager, this);
-				}
-			}
-			else if (this.terrainType === CODE.magoEarthTerrainType.ELEVATION)// ElevationTerrain.
-			{
-				var maxProcessCounter = 0;
-				for (var i=0; i<visiblesTilesCount; i++)
-				{
-					tinTerrain = visibleTilesArray[i];
-					if (!tinTerrain.prepareTinTerrain(magoManager, this))
-					{ maxProcessCounter += 1; }
-
-				}
-			}
-			else if (this.terrainType === CODE.magoEarthTerrainType.REALTIME)// Real time ElevationTerrain.
-			{
-				var maxProcessCounter = 0;
-				for (var i=0; i<visiblesTilesCount; i++)
-				{
-					tinTerrain = visibleTilesArray[i];
-					if (!tinTerrain.prepareTinTerrainRealTimeElevation(magoManager, this))
-					{ maxProcessCounter += 1; }
-				
-					if (maxProcessCounter > 5)
-					{ break; }
-				}
-			}
-			
-			// 2nd, for all terrains that exist, if there are not in the visiblesMap, then delete its.
-			// Deleting rule: If a tinTerrain has children, then delete first the children.
-			var deletedCount = 0;
-			var noVisiblesTilesCount = this.noVisibleTilesArray.length;
-			for (var i=0; i<visiblesTilesCount; i++)
-			{
-				tinTerrain = this.noVisibleTilesArray[i];
-				if (tinTerrain !== undefined)
-				{
-					if (tinTerrain.depth > 2)
-					{
-						tinTerrain.deleteTinTerrain(magoManager);
-						deletedCount++;
-					}
-				}
-				
-				if (deletedCount > 50)
-				{ break; }
-			}
-			//---------------------------------------------------------
-		}
-
-		
-	}
-
-	//this.prepareObjectToClampToTerrain();
 };
 
 TinTerrainManager.prototype.getAltitudes = function(geoCoordsArray, resultGeoCoordsArray) 
@@ -1024,7 +898,6 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 		gl.uniform1i(currentShader.bApplySpecularLighting_loc, false);
 		gl.uniform1i(currentShader.uRenderType_loc, 2);
 	}
-	
 
 	
 	var succesfullyRenderedTilesArray = [];

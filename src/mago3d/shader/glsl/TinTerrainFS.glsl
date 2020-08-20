@@ -84,14 +84,6 @@ varying float Fcoef_half;
 // Texture's vars.***
 varying float vTileDepth;
 varying float vTexTileDepth;
-varying float vAConstForDepth;
-varying float vAConstForTexDepth;
-varying float vMinT;
-varying float vMinTTex;
-varying float vRecalculatedTexCoordS;
-
-varying float vTestCurrLatitude;
-varying float vTestCurrLongitude;
 
 const float equatorialRadius = 6378137.0;
 const float polarRadius = 6356752.3142;
@@ -397,7 +389,7 @@ float roundCustom(float number)
 //varying float vAConstForTexDepth;
 //varying float vMinT;
 //varying float vMinTTex;
-
+/*
 float LatitudeRad_fromTexCoordY(float t)
 {
 	float PI_DIV_4 = M_PI/4.0;
@@ -427,6 +419,7 @@ float TexCoordY_fromLatitudeRad(float latitudeRad)
 
 	return newT;
 }
+*/
 
 void main()
 {    
@@ -752,6 +745,7 @@ void main()
 		gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian * scalarProd, 1.0); // original.***
 		//gl_FragColor = textureColor; // test.***
 		//gl_FragColor = vec4(vNormal.xyz, 1.0); // test.***
+
 		/*
 		int texDepthDiff = int(floor(vTileDepth+0.1) - floor(vTexTileDepth+0.1));
 		if(texDepthDiff > 0)

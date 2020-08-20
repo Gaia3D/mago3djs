@@ -114,6 +114,16 @@ worker.onmessage = function(e)
 			tAux = 1.0 - tAux;
 			var latRad = 2.0*(Math.atan(Math.exp(PI-tAux/aConstAux))-PI_DIV_4);
 			var hola = 0;
+
+			// Now, with latRad, recalculate texCoord.***
+			//var aConstTex = (1.0/(2.0*PI))*pow(2.0, float(tileDepth));
+			var minTTex = Math.round(aConstAux*(PI-Math.log(Math.tan(PI_DIV_4+thisMinLatRad/2.0))));
+			minTTex = 1.0 - minTTex;
+
+			var newT = aConstAux*(PI-Math.log(Math.tan(PI_DIV_4+latRad/2.0)));
+			newT = 1.0 - newT;
+			newT -= minTTex;
+			var hola = 0;
 			*/
 			// End debug.---
 		}

@@ -1398,6 +1398,8 @@ MagoWorld.prototype.keydown = function(event)
 	//if (!bool)
 	//{ return; }
 
+	var factorAux = 0.0005;
+
 	var key = event.key;
 	var magoManager = this.magoManager;
 	var modeler = magoManager.modeler;

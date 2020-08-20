@@ -328,7 +328,7 @@ var MagoManager = function(options)
      * Control collection.
      * @type {ControlCollection}
      */
-    this.controls = new ControlCollection(this);
+	this.controls = new ControlCollection(this);
 
 	/**
 	 * MagoLayer collection
@@ -4870,6 +4870,8 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.uTileGeoExtent_loc = gl.getUniformLocation(shader.program, "uTileGeoExtent");
 	shader.uTileDepthOfBindedTextures_loc = gl.getUniformLocation(shader.program, "uTileDepthOfBindedTextures");
 	shader.uTileGeoExtentOfBindedTextures_loc = gl.getUniformLocation(shader.program, "uTileGeoExtentOfBindedTextures");
+
+	shader.uDebug_texCorrectionFactor_loc = gl.getUniformLocation(shader.program, "uDebug_texCorrectionFactor");
 	
 	//shader.uSsaoRadius_loc = gl.getUniformLocation(shader.program, "radius");
 	
