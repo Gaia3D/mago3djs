@@ -168,12 +168,13 @@ vec3 normal_from_depth(float depth, vec2 texCoord) {
     vec2 offset1 = vec2(0.0,pixelSizeY);
     vec2 offset2 = vec2(pixelSizeX,0.0);
 
+	vec2 origin = vec2(texCoord.x - pixelSizeX, texCoord.y - pixelSizeY);
 	float depthA = 0.0;
 	float depthB = 0.0;
-	for(float i=-3.0; i<0.0; i++)
+	for(float i=0.0; i<3.0; i++)
 	{
-		depthA += getDepth(texCoord + offset1*(1.0+i));
-		depthB += getDepth(texCoord + offset2*(1.0+i));
+		depthA += getDepth(origin + offset1*(1.0+i));
+		depthB += getDepth(origin + offset2*(1.0+i));
 	}
 
 	vec3 posA = reconstructPosition(texCoord + offset1*2.0, depthA/3.0);

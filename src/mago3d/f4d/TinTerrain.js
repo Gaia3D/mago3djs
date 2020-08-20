@@ -1175,6 +1175,25 @@ TinTerrain.prototype.prepareTinTerrainForward = function(magoManager, tinTerrain
 			this.childMap.RU.prepareTinTerrainForward(magoManager, tinTerrainManager);
 			this.childMap.RD.prepareTinTerrainForward(magoManager, tinTerrainManager);
 		}
+
+		// Test making textureMaster.
+		// If there are 2 or more layers, then must create textureMaster.
+		// Check if tinTerrain is syncronized with this.tinTerrainManager.
+		if (this.layersStyleId !== this.tinTerrainManager.layersStyleId)
+		{ 
+			this.textureMasterImageryLayersPrepared = undefined; 
+			this.textureMasterPrepared = undefined; 
+		}
+
+		//if (this.objToClampToTerrainStyleId !== this.tinTerrainManager.objToClampToTerrainStyleId)
+		//{ 
+		//	this.textureMasterPrepared = undefined; 
+		//}
+
+		if (!this.textureMasterPrepared && this.isTexturePrepared(this.texture))
+		{
+			this.makeTextureMaster();
+		}
 	}
 	else
 	{
@@ -1327,6 +1346,7 @@ TinTerrain.prototype.prepareTinTerrainForward = function(magoManager, tinTerrain
 		// Test making textureMaster.
 		// If there are 2 or more layers, then must create textureMaster.
 		// Check if tinTerrain is syncronized with this.tinTerrainManager.
+		/*
 		if (this.layersStyleId !== this.tinTerrainManager.layersStyleId)
 		{ 
 			this.textureMasterImageryLayersPrepared = undefined; 
@@ -1342,6 +1362,7 @@ TinTerrain.prototype.prepareTinTerrainForward = function(magoManager, tinTerrain
 		{
 			this.makeTextureMaster();
 		}
+		*/
 	}
 
 	
