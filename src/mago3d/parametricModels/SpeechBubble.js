@@ -62,7 +62,7 @@ SpeechBubble.prototype.makeDefault = function(imageSize)
  * @param {Color} color
  * @param {object} textOption
  */
-SpeechBubble.prototype.getPng = function (imageSize, color, textOption) 
+SpeechBubble.prototype.getPng = function (imageSize, color, textOption)
 {
 	//need validation
 	//var hexColor = color.getHexCode();
@@ -82,7 +82,7 @@ SpeechBubble.prototype.getPng = function (imageSize, color, textOption)
 	this.repository[id] = canvas;
 	return canvas.toDataURL();
 
-	function makeCanvas(size, hex, tOption, p2dArray) 
+	function makeCanvas(size, hex, tOption, p2dArray)
 	{
 		var c = document.createElement("canvas");
 		var w = size[0];
@@ -93,19 +93,19 @@ SpeechBubble.prototype.getPng = function (imageSize, color, textOption)
 		var ctx = c.getContext("2d");
 		ctx.save();
 		ctx.fillStyle = hex;
-		ctx.strokeStyle = '#000000';
+		ctx.strokeStyle = '#364049';
 		ctx.lineWidth = 2;
 		ctx.beginPath();
-		
+
 		var p2dLength = p2dArray.length;
-		for (var i=0;i<p2dLength;i++) 
+		for (var i=0;i<p2dLength;i++)
 		{
 			var p2d = p2dArray[i];
-			if (p2d.point.length === 2) 
+			if (p2d.point.length === 2)
 			{
 				ctx[p2d.command].call(ctx, p2d.point[0], p2d.point[1]);
 			}
-			else 
+			else
 			{
 				ctx[p2d.command].call(ctx, p2d.point[0], p2d.point[1], p2d.point[2], p2d.point[3]);
 			}
@@ -113,20 +113,21 @@ SpeechBubble.prototype.getPng = function (imageSize, color, textOption)
 
 		ctx.closePath();
 		ctx.fill();
-		ctx.stroke();
-		
-		if (tOption) 
+		//ctx.stroke();
+
+		if (tOption)
 		{
 			var textValue = tOption.text; //required.
 			var fontPixel = defaultValue(tOption.pixel, 10);
-			var fontType = defaultValue(tOption.font, 'sans-serif');
+			var fontType = defaultValue(tOption.font, 'Dotum');
 			var fontColor = defaultValue(tOption.color, 'white');
 			var fontBorderColor = defaultValue(tOption.borderColor, 'black');
 
 			ctx.font = 'bold ' + fontPixel + "px " + fontType;
+			//			ctx.font = fontPixel + "px " + fontType;
 			ctx.fillStyle = fontColor;
 			ctx.strokeStyle = fontBorderColor;
-			ctx.textAlign = "center";
+			ctx.textAlign = "start";
 
 			var splitText = textValue.split('\n');
 			var tlen = splitText.length;
@@ -134,11 +135,15 @@ SpeechBubble.prototype.getPng = function (imageSize, color, textOption)
 			for (var ti=0;ti<tlen;ti++)
 			{
 				var tVal = splitText[ti];
-				if (tVal.length > 0) 
+				if (tVal.length > 0)
 				{
-					var ty = (h / denomin) * (ti+1) - (tlen-1) * (h / (denomin * 10));
-					ctx.strokeText(tVal, w /2, ty);
-					ctx.fillText(tVal, w /2, ty);
+					var ty = ((h / denomin) * (ti+1) - (tlen-1) * (h / (denomin * 10))) - (ti * 3);
+					var mt = ctx.measureText(tVal);
+					console.log(mt);
+					//ctx.strokeText(tVal, 20, ty, mt.width * 0.8);
+					ctx.fillText(tVal, 20, ty, mt.width * 0.8);
+					//					ctx.strokeText(tVal, w /2, ty);
+					//					ctx.fillText(tVal, w /2, ty);
 				}
 			}
 		}

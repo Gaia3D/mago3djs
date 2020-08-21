@@ -17,6 +17,8 @@ var PointDrawer = function(style)
 	DrawGeometryInteraction.call(this, style);
 
 	this.startDraw = false;
+	this.startTime = undefined;
+	this.startPoint = undefined;
 	this.result = [];
 };
 PointDrawer.prototype = Object.create(DrawGeometryInteraction.prototype);
@@ -31,6 +33,8 @@ PointDrawer.EVENT_TYPE = {
 PointDrawer.prototype.init = function() 
 {
 	this.startDraw = false;
+	this.startTime = undefined;
+	this.startPoint = undefined;
 };
 /**
  * @private
@@ -66,6 +70,8 @@ PointDrawer.prototype.start = function()
 		if (!that.startDraw) 
 		{
 			that.startDraw = true;
+			that.startTime = e.timestamp;
+			that.startPoint = e.point.screenCoordinate;
 		}
 	});
 	manager.on(MagoManager.EVENT_TYPE.LEFTUP, function(e)
@@ -73,8 +79,27 @@ PointDrawer.prototype.start = function()
 		if (!that.getActive()) { return; }
 		if (that.startDraw) 
 		{
+			var moveless = false;
+			if ((e.timestamp - that.startTime) < 1500)
+			{
+				var startScreenCoordinate = that.startPoint;
+				var endScreenCoordinate = e.point.screenCoordinate;
+
+				var diffX = Math.abs(startScreenCoordinate.x - endScreenCoordinate.x);
+				var diffY = Math.abs(startScreenCoordinate.y - endScreenCoordinate.y);
+
+				if (diffX <= 0 && diffY  <= 0)
+				{
+					moveless = true;
+				}
+			}
+			if (!moveless)
+			{
+				that.init();
+				return;
+			} 
+
 			var position = e.point.geographicCoordinate;
-            
 
 			if (Object.keys(that.style).length < 1) 
 			{
