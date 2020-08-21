@@ -207,6 +207,11 @@ vec3 getWhiteToBlueColor_byHeight(float height, float minHeight, float maxHeight
     //gray = 1.0 - gray; // invert gray value (white to blue).
     // calculate r, g, b values by gray.
 
+    // Test to quadratic gray scale.***
+   // float grayAux = 1.0 - gray;
+    //gray = gray*gray*gray;
+    // End test.-----------------------
+
     float r, g, b;
 
     // Red.
@@ -339,6 +344,7 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
                 //uMinMaxAltitudesBathymetryToGradient
                 //vec3 seaColorRGB = getWhiteToBlueColor_byHeight(altitude, 0.0, -200.0);
                 vec3 seaColorRGB = getWhiteToBlueColor_byHeight(altitude, uMinMaxAltitudesBathymetryToGradient.y, uMinMaxAltitudesBathymetryToGradient.x);
+                //vec3 seaColorRGB = getWhiteToBlueColor_byHeight(altitude, uMinMaxAltitudes.y, uMinMaxAltitudes.x);
                 vec4 seaColor = vec4(seaColorRGB, 1.0);
                 
                 resultTextureColor = mix(resultTextureColor, seaColor, 0.99); 

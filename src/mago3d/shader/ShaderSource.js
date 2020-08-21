@@ -2411,8 +2411,6 @@ void main()\n\
 			orderInt = -2;\n\
 		}\n\
 	}\n\
-\n\
-	//https://stackoverflow.com/questions/10936570/eye-space-pixel-width-in-glsl-vertex-shader\n\
 	\n\
     v_texcoord = texCoord;\n\
 	vec4 projected = ModelViewProjectionMatrixRelToEye * pos4;\n\
@@ -2423,7 +2421,7 @@ void main()\n\
 	// alternative : float pixelWidthRatio = 2. / (screenHeight * projectionMatrix[1][1]);\n\
 	float pixelWidth = projected.w * pixelWidthRatio;\n\
 \n\
-	//float pixelHeightRatio = pixelWidthRatio * (screenHeight/screenWidth);\n\
+	//float pixelHeightRatio = pixelWidthRatio * (screenHeight/screenWidth); // no works correctly.\n\
 	float pixelHeightRatio = 2. / ((screenHeight));\n\
 	float pixelHeight = projected.w * pixelHeightRatio;\n\
 	\n\
@@ -4158,6 +4156,11 @@ vec3 getWhiteToBlueColor_byHeight(float height, float minHeight, float maxHeight
     //gray = 1.0 - gray; // invert gray value (white to blue).\n\
     // calculate r, g, b values by gray.\n\
 \n\
+    // Test to quadratic gray scale.***\n\
+   // float grayAux = 1.0 - gray;\n\
+    //gray = gray*gray*gray;\n\
+    // End test.-----------------------\n\
+\n\
     float r, g, b;\n\
 \n\
     // Red.\n\
@@ -4290,6 +4293,7 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
                 //uMinMaxAltitudesBathymetryToGradient\n\
                 //vec3 seaColorRGB = getWhiteToBlueColor_byHeight(altitude, 0.0, -200.0);\n\
                 vec3 seaColorRGB = getWhiteToBlueColor_byHeight(altitude, uMinMaxAltitudesBathymetryToGradient.y, uMinMaxAltitudesBathymetryToGradient.x);\n\
+                //vec3 seaColorRGB = getWhiteToBlueColor_byHeight(altitude, uMinMaxAltitudes.y, uMinMaxAltitudes.x);\n\
                 vec4 seaColor = vec4(seaColorRGB, 1.0);\n\
                 \n\
                 resultTextureColor = mix(resultTextureColor, seaColor, 0.99); \n\

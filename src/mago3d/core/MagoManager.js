@@ -2984,7 +2984,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		var hola = 0;
 	}
 	// Check modeler mode.
-	this.magoMode = CODE.magoMode.DRAWING; // DEBUG. Delete this line.!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	//this.magoMode = CODE.magoMode.DRAWING; // DEBUG. Delete this line.!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	if (this.magoMode === CODE.magoMode.DRAWING)// then process to draw.***
 	{
 		if (this.modeler === undefined)

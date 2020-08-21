@@ -55,8 +55,6 @@ void main()
 			orderInt = -2;
 		}
 	}
-
-	//https://stackoverflow.com/questions/10936570/eye-space-pixel-width-in-glsl-vertex-shader
 	
     v_texcoord = texCoord;
 	vec4 projected = ModelViewProjectionMatrixRelToEye * pos4;
@@ -67,7 +65,7 @@ void main()
 	// alternative : float pixelWidthRatio = 2. / (screenHeight * projectionMatrix[1][1]);
 	float pixelWidth = projected.w * pixelWidthRatio;
 
-	//float pixelHeightRatio = pixelWidthRatio * (screenHeight/screenWidth);
+	//float pixelHeightRatio = pixelWidthRatio * (screenHeight/screenWidth); // no works correctly.
 	float pixelHeightRatio = 2. / ((screenHeight));
 	float pixelHeight = projected.w * pixelHeightRatio;
 	
