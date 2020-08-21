@@ -3964,7 +3964,7 @@ uniform float externalAlphasArray[8];\n\
 uniform int uActiveTextures[8];\n\
 uniform vec4 uExternalTexCoordsArray[8]; // vec4 (minS, minT, maxS, maxT).\n\
 uniform vec2 uMinMaxAltitudes; // used for altitudes textures as bathymetry.\n\
-uniform vec2 uMinMaxAltitudesBathymetryToGradient; // used for altitudes textures as bathymetry.\n\
+//uniform vec2 uMinMaxAltitudesBathymetryToGradient; // used for altitudes textures as bathymetry.\n\
 \n\
 // gradient white-blue vars.***\n\
 uniform float uGradientSteps[16];\n\
@@ -4153,10 +4153,10 @@ vec3 getRainbowColor_byHeight(float height, float minHeight, float maxHeight)\n\
     return resultColor;\n\
 } \n\
 \n\
-vec3 getWhiteToBlueColor_byHeight(float height, float minHeight, float maxHeight)\n\
+vec3 getWhiteToBlueColor_byHeight(float height)//, float minHeight, float maxHeight)\n\
 {\n\
     // White to Blue in 32 steps.\n\
-    float gray = (height - minHeight)/(maxHeight - minHeight);\n\
+    float gray = 1.0;\n\
     //gray = 1.0 - gray; // invert gray value (white to blue).\n\
     // calculate r, g, b values by gray.\n\
 \n\
@@ -4323,7 +4323,7 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
 \n\
                 //uMinMaxAltitudesBathymetryToGradient\n\
                 //vec3 seaColorRGB = getWhiteToBlueColor_byHeight(altitude, 0.0, -200.0);\n\
-                vec3 seaColorRGB = getWhiteToBlueColor_byHeight(altitude, uMinMaxAltitudesBathymetryToGradient.y, uMinMaxAltitudesBathymetryToGradient.x);\n\
+                vec3 seaColorRGB = getWhiteToBlueColor_byHeight(altitude);//, uMinMaxAltitudesBathymetryToGradient.y, uMinMaxAltitudesBathymetryToGradient.x);\n\
                 //vec3 seaColorRGB = getWhiteToBlueColor_byHeight(altitude, uMinMaxAltitudes.y, uMinMaxAltitudes.x);\n\
                 vec4 seaColor = vec4(seaColorRGB, 1.0);\n\
                 \n\
