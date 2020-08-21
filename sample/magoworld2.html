@@ -68,17 +68,22 @@
 						}
 					}
 				});
+				
 				var bathymetryFilter = {
 					type: Mago3D.CODE.imageFilter.BATHYMETRY,
 					properties : {
 						minAltitude: -2796,
 						maxAltitude: 1840,
+						stepGradient : [0, -40,-80,-120,-160,-200,-1000, -2000, -2796],
 						minAltitudeToGradient : -200,
 						maxAltitudeToGradient : 0,
 						caustics: true
 					}
 				};
+				
 
+
+				
 				baseMap = new Mago3D.XYZLayer({url: 'https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'});
 				//baseMap = new Mago3D.XYZLayer({url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'});
 

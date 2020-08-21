@@ -3966,6 +3966,10 @@ uniform vec4 uExternalTexCoordsArray[8]; // vec4 (minS, minT, maxS, maxT).\n\
 uniform vec2 uMinMaxAltitudes; // used for altitudes textures as bathymetry.\n\
 uniform vec2 uMinMaxAltitudesBathymetryToGradient; // used for altitudes textures as bathymetry.\n\
 \n\
+// gradient white-blue vars.***\n\
+uniform float uGradientSteps[16];\n\
+uniform int uGradientStepsCount;\n\
+\n\
 varying vec2 v_tex_pos;\n\
 \n\
 float getMinValue(float a, float b, float c)\n\
@@ -4157,8 +4161,35 @@ vec3 getWhiteToBlueColor_byHeight(float height, float minHeight, float maxHeight
     // calculate r, g, b values by gray.\n\
 \n\
     // Test to quadratic gray scale.***\n\
-   // float grayAux = 1.0 - gray;\n\
-    //gray = gray*gray*gray;\n\
+    float stepGray = 1.0;\n\
+\n\
+    for(int i=0; i<16-1; i++)\n\
+    {\n\
+        if(i >= uGradientStepsCount-1)\n\
+        break;\n\
+\n\
+        float stepValue = uGradientSteps[i];\n\
+        float stepValue2 = uGradientSteps[i+1];\n\
+\n\
+        // check if is frontier.***\n\
+        if(height >= uGradientSteps[0])\n\
+        {\n\
+            stepGray = 0.0;\n\
+            break;\n\
+        }\n\
+\n\
+        if(height <= stepValue && height > stepValue2)\n\
+        {\n\
+            // calculate decimal.***\n\
+            //float decimal = (height - stepValue)/(stepValue2-stepValue);\n\
+            float decimal = (stepValue - height)/(stepValue-stepValue2);\n\
+            float unit = float (i);\n\
+            float value = unit + decimal;\n\
+            stepGray = value/float(uGradientStepsCount-1);\n\
+            break;\n\
+        }\n\
+    }\n\
+    gray = stepGray;\n\
     // End test.-----------------------\n\
 \n\
     float r, g, b;\n\

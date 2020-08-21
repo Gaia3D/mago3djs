@@ -17,6 +17,10 @@ uniform vec4 uExternalTexCoordsArray[8]; // vec4 (minS, minT, maxS, maxT).
 uniform vec2 uMinMaxAltitudes; // used for altitudes textures as bathymetry.
 uniform vec2 uMinMaxAltitudesBathymetryToGradient; // used for altitudes textures as bathymetry.
 
+// gradient white-blue vars.***
+uniform float uGradientSteps[16];
+uniform int uGradientStepsCount;
+
 varying vec2 v_tex_pos;
 
 float getMinValue(float a, float b, float c)
@@ -208,8 +212,35 @@ vec3 getWhiteToBlueColor_byHeight(float height, float minHeight, float maxHeight
     // calculate r, g, b values by gray.
 
     // Test to quadratic gray scale.***
-   // float grayAux = 1.0 - gray;
-    //gray = gray*gray*gray;
+    float stepGray = 1.0;
+
+    for(int i=0; i<16-1; i++)
+    {
+        if(i >= uGradientStepsCount-1)
+        break;
+
+        float stepValue = uGradientSteps[i];
+        float stepValue2 = uGradientSteps[i+1];
+
+        // check if is frontier.***
+        if(height >= uGradientSteps[0])
+        {
+            stepGray = 0.0;
+            break;
+        }
+
+        if(height <= stepValue && height > stepValue2)
+        {
+            // calculate decimal.***
+            //float decimal = (height - stepValue)/(stepValue2-stepValue);
+            float decimal = (stepValue - height)/(stepValue-stepValue2);
+            float unit = float (i);
+            float value = unit + decimal;
+            stepGray = value/float(uGradientStepsCount-1);
+            break;
+        }
+    }
+    gray = stepGray;
     // End test.-----------------------
 
     float r, g, b;

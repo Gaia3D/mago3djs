@@ -650,7 +650,23 @@ TinTerrain.prototype.mergeTexturesToTextureMaster = function(gl, shader, texture
 			// bathymetry image.
 			var properties = texture.imagery.filter.properties;
 			gl.uniform2fv(shader.uMinMaxAltitudes_loc, new Float32Array([properties.minAltitude, properties.maxAltitude]));
-			gl.uniform2fv(shader.uMinMaxAltitudesBathymetryToGradient_loc, new Float32Array([properties.minAltitudeToGradient, properties.maxAltitudeToGradient]));
+			//gl.uniform2fv(shader.uMinMaxAltitudesBathymetryToGradient_loc, new Float32Array([properties.minAltitudeToGradient, properties.maxAltitudeToGradient]));
+			// set whiteToBlue gradient params.***
+			var stepGradient = properties.stepGradient;
+			if (stepGradient)
+			{
+				var stepsCount = stepGradient.length;
+				gl.uniform1fv(shader.uGradientSteps_loc, new Float32Array(stepGradient));
+				gl.uniform1i(shader.uGradientStepsCount_loc, stepsCount);
+			}
+			else
+			{
+				// gradient default 0m to -200m.***
+				var gradientSteps = new Float32Array([0.0, -200.0]);
+				var stepsCount = gradientSteps.length;
+				gl.uniform1fv(shader.uGradientSteps_loc, gradientSteps);
+				gl.uniform1i(shader.uGradientStepsCount_loc, stepsCount);
+			}
 		}
 	}
 
