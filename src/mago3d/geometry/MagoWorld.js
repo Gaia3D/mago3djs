@@ -1264,7 +1264,7 @@ MagoWorld.prototype.doTest__ObjectMarker = function()
 			};
 
 			//SpeechBubble을 통해서 png 만들어서 가져오기
-			var img = sb.getPng([64, 64], bubbleColor, commentTextOption);
+			var img = sb.getPng([256, 256], bubbleColor, commentTextOption);
 
 			//ObjectMarker 옵션, 위치정보와 이미지 정보
 			var geoCoord = geoCoordsList.getGeoCoord(i);
@@ -1431,7 +1431,7 @@ MagoWorld.prototype.keydown = function(event)
 
 		//this.doTest__BSpline3DCubic();
 		//this.doTest__ExtrudedObject();
-		//this.doTest__ObjectMarker();
+		this.doTest__ObjectMarker();
 		//this.doTest__TerrainScanner();
 		//this.doTest__MagoRectangle();
 		//this.doTest__MagoRectangleGround();

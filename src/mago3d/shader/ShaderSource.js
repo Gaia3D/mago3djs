@@ -2337,10 +2337,12 @@ void main()\n\
 		textureColor = texture2D(u_texture, v_texcoord);\n\
 	}\n\
 	//if(textureColor.w < 0.005)\n\
-	if(textureColor.w == 0.0)\n\
-	{\n\
-		discard;\n\
-	}\n\
+	//if(textureColor.w < 1.0)\n\
+	//{\n\
+	//	discard;\n\
+	//}\n\
+\n\
+\n\
 	if(colorType == 2)\n\
 	{\n\
 		// do nothing.\n\
@@ -2409,21 +2411,26 @@ void main()\n\
 			orderInt = -2;\n\
 		}\n\
 	}\n\
+\n\
+	//https://stackoverflow.com/questions/10936570/eye-space-pixel-width-in-glsl-vertex-shader\n\
 	\n\
     v_texcoord = texCoord;\n\
 	vec4 projected = ModelViewProjectionMatrixRelToEye * pos4;\n\
 	//vec4 projected2 = modelViewMatrixRelToEye * pos4;\n\
 \n\
 	// Now, calculate the pixelSize in the plane of the projected point.\n\
-	float pixelWidthRatio = 2. / (screenWidth);// * projectionMatrix[0][0]);\n\
+	float pixelWidthRatio = 2. / ((screenWidth));// * projectionMatrix[0][0]);\n\
 	// alternative : float pixelWidthRatio = 2. / (screenHeight * projectionMatrix[1][1]);\n\
 	float pixelWidth = projected.w * pixelWidthRatio;\n\
 \n\
-	float pixelHeightRatio = pixelWidthRatio * (screenHeight/screenWidth);\n\
+	//float pixelHeightRatio = pixelWidthRatio * (screenHeight/screenWidth);\n\
+	float pixelHeightRatio = 2. / ((screenHeight));\n\
 	float pixelHeight = projected.w * pixelHeightRatio;\n\
 	\n\
 	if(projected.w < 5.0)\n\
 		pixelWidth = 5.0 * pixelWidthRatio;\n\
+\n\
+	//pixelHeight = pixelWidth;\n\
 	\n\
 	vec4 offset;\n\
 	float offsetX;\n\

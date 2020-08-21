@@ -2984,7 +2984,7 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 		var hola = 0;
 	}
 	// Check modeler mode.
-	//this.magoMode = CODE.magoMode.DRAWING; // DEBUG. Delete this line.!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	this.magoMode = CODE.magoMode.DRAWING; // DEBUG. Delete this line.!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	if (this.magoMode === CODE.magoMode.DRAWING)// then process to draw.***
 	{
 		if (this.modeler === undefined)
@@ -3058,7 +3058,7 @@ MagoManager.prototype.doTest__ObjectMarker = function()
 			};
 
 			//SpeechBubble을 통해서 png 만들어서 가져오기
-			var img = sb.getPng([64, 64], bubbleColor, commentTextOption);
+			var img = sb.getPng([256, 256], bubbleColor, commentTextOption);
 
 			//ObjectMarker 옵션, 위치정보와 이미지 정보
 			var geoCoord = geoCoordsList.getGeoCoord(i);

@@ -22,10 +22,12 @@ void main()
 		textureColor = texture2D(u_texture, v_texcoord);
 	}
 	//if(textureColor.w < 0.005)
-	if(textureColor.w == 0.0)
-	{
-		discard;
-	}
+	//if(textureColor.w < 1.0)
+	//{
+	//	discard;
+	//}
+
+
 	if(colorType == 2)
 	{
 		// do nothing.

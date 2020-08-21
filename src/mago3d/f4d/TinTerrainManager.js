@@ -95,7 +95,7 @@ var TinTerrainManager = function(magoManager, options)
 	this.objectsToClampToTerrainArray;
 
 	// Max textureGuaranteedDepth.
-	this.maxTextureGuranteedDepth = 4;
+	this.maxTextureGuranteedDepth = 1;
 
 	this.init();
 	this.makeTinTerrainWithDEMIndex(); // provisional.

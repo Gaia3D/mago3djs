@@ -365,6 +365,7 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 		var lastTexId = undefined;
 		if (renderType === 1)
 		{
+			gl.enable(gl.BLEND);
 			var executedEffects = false;
 			for (var i=0; i<objectsMarkersCount; i++)
 			{

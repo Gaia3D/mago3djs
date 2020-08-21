@@ -520,8 +520,11 @@ TinTerrain.prototype.isTexturePrepared = function(texturesMap)
 		var texture = texturesMap[textureKeys[i]];
 		if (texture.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED || !texture.texId) 
 		{
+			//if (this.depth > this.tinTerrainManager.maxTextureGuranteedDepth)
+			//{
 			isTexturePrepared = false;
 			break;
+			//}
 		}
 	}
 	return isTexturePrepared;
