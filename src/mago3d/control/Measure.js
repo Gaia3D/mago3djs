@@ -29,7 +29,7 @@ var Measure = function(options)
 	element.style.backgroundColor = 'rgba(255,255,255,0.4)';
 	element.style.borderRadius = '4px';
 	element.style.padding = '2px';
-	element.style.top = '20.0em';
+	element.style.bottom = '9.5em';
 	element.style.right = '.5em';
 
 
@@ -53,14 +53,14 @@ var Measure = function(options)
 
 		var textSpan = document.createElement('span');
 		textSpan.appendChild(document.createTextNode(description));
-		textSpan.style.fontSize = '12px';
+		textSpan.style.fontSize = '10px';
 		textSpan.style.verticalAlign = 'baseline';
 		textSpan.style.lineHeight = '0.6em';
 		button.appendChild(textSpan);
 
 		thisArg.setBtnStyle(button);
 		button.style.backgroundColor = 'rgba(230, 230, 230, 0.8)';
-		
+		button.style.display = 'inline-block';
 		thisArg.buttons[type] = {
 			status  : false,
 			element : button

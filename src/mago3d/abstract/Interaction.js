@@ -67,3 +67,13 @@ Interaction.prototype.clear = function()
 {
 	return abstract();
 };
+
+/**
+ * handle event
+ * @param {BrowserEvent} browserEvent
+ * @abstract
+ */
+Interaction.prototype.handle = function(browserEvent) 
+{
+	return abstract();
+};

@@ -29,6 +29,7 @@ var InteractionCollection = function(magoManager)
 		target.manager = magoManager;
 	});
 
+	/*
 	this.on(InteractionCollection.EVENT_TYPE.ACTIVE, function(target)
 	{
 		for (var i=0, len = that.array.length; i<len; i++)
@@ -46,7 +47,7 @@ var InteractionCollection = function(magoManager)
 			}
 		}
 	});
-
+	*/
 	this.on(InteractionCollection.EVENT_TYPE.DEACTIVE, function()
 	{
 		for (var i=0, len = that.array.length; i<len; i++)

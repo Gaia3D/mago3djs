@@ -16,7 +16,7 @@ var ViewerInit = function(containerId, serverPolicy)
 
 	MagoConfig.setContainerId(this.targetId);
 	this.init();
-	//this.createElement();
+	this.createElement();
 };
 
 ViewerInit.prototype.init = function() 
@@ -69,12 +69,28 @@ ViewerInit.prototype.createElement = function()
 	this.magoManager.defaultControlContainer = document.createElement('div');
 	this.magoManager.defaultControlContainer.style.position = 'absolute';
 	this.magoManager.defaultControlContainer.style.right = '0px';
-	this.magoManager.defaultControlContainer.style.width = '220px';
+	this.magoManager.defaultControlContainer.style.width = '320px';
 	this.magoManager.defaultControlContainer.style.height = '100%';
 	this.magoManager.defaultControlContainer.style.float = 'right';
 	this.magoManager.defaultControlContainer.className = 'mago3d-overlayContainer-defaultControl';
 
+	this.magoManager.defaultContentContainer = document.createElement('div');
+	this.magoManager.defaultContentContainer.style.position = 'absolute';
+	this.magoManager.defaultContentContainer.style.right = '-320px';
+	this.magoManager.defaultContentContainer.style.width = '320px';
+	//advanceToolDiv.style.height = 'calc(100% - 30px)';
+	this.magoManager.defaultContentContainer.style.height = '100%';
+	this.magoManager.defaultContentContainer.style.float = 'right';
+	//advanceToolDiv.style.marginTop = '15px';
+	this.magoManager.defaultContentContainer.style.border = '2px solid rgb(204, 229, 236)';
+	this.magoManager.defaultContentContainer.style.borderRadius = '4px';
+	this.magoManager.defaultContentContainer.style.backgroundColor = '#EAEAEA';
+	this.magoManager.defaultContentContainer.style.pointerEvents = 'auto';
+	this.magoManager.defaultContentContainer.style.display = 'none';
+	this.magoManager.defaultContentContainer.className = 'mago3d-overlayContainer-defaultContent';
+
 	this.magoManager.overlayContainer.appendChild(this.magoManager.defaultControlContainer);
+	this.magoManager.overlayContainer.appendChild(this.magoManager.defaultContentContainer);
 	viewElement.appendChild(this.magoManager.overlayContainer);
 
 	var defaultControl = this.options.defaultControl;

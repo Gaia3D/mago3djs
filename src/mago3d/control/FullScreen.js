@@ -30,7 +30,7 @@ var FullScreen = function(options)
 	element.style.backgroundColor = 'rgba(255,255,255,0.4)';
 	element.style.borderRadius = '4px';
 	element.style.padding = '2px';
-	element.style.top = '8.5em';
+	element.style.top = '4.5em';
 	element.style.right = '.5em';
 
 	var fullButton = document.createElement('button');
@@ -49,13 +49,13 @@ var FullScreen = function(options)
 
 	var textSpan = document.createElement('span');
 	textSpan.appendChild(document.createTextNode('전체화면'));
-	textSpan.style.fontSize = '12px';
+	textSpan.style.fontSize = '10px';
 	textSpan.style.verticalAlign = 'baseline';
 	textSpan.style.lineHeight = '0.6em';
 	fullButton.appendChild(textSpan);
 
 	this.setBtnStyle(fullButton);
-	
+
 	fullButton.addEventListener(
 		'click',
 		that.handleClick.bind(that),
@@ -78,7 +78,7 @@ var FullScreen = function(options)
 
 	var cancleTextSpan = document.createElement('span');
 	cancleTextSpan.appendChild(document.createTextNode('취소'));
-	cancleTextSpan.style.fontSize = '12px';
+	cancleTextSpan.style.fontSize = '10px';
 	cancleTextSpan.style.verticalAlign = 'baseline';
 	cancleTextSpan.style.lineHeight = '0.6em';
 	cancleButton.appendChild(cancleTextSpan);

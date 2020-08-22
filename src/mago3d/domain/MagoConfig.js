@@ -151,8 +151,8 @@ MagoConfig.init = function(serverPolicy, projectIdArray, projectDataArray)
 
 	function getScriptRootPath() 
 	{
-		var magoScriptQueryStrRegex = /((?:.*\/)|^)mago3d\.js\?(?:&?[^=&]*=[^=&]*)*/;
-		var magoScriptRegex = /((?:.*\/)|^)mago3d\.js$/;
+		var magoScriptQueryStrRegex = /((?:.*\/)|^)(mago3d|mago3d.min)\.js\?(?:&?[^=&]*=[^=&]*)*/;
+		var magoScriptRegex = /((?:.*\/)|^)(mago3d|mago3d.min)\.js$/;
 		var magoScriptPath;
 		var scripts = document.getElementsByTagName('script');
 		for ( var j = 0, len = scripts.length; j < len; ++j) 

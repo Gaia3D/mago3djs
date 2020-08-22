@@ -330,54 +330,69 @@ CesiumViewerInit.prototype.setEventHandler = function()
 	
 	magoManager.handler.setInputAction(function(click) 
 	{
+		
+		magoManager.handleBrowserEvent(new BrowserEvent(MagoManager.EVENT_TYPE.LEFTDOWN, click.position, magoManager));
 		magoManager.mouseActionLeftDown(click.position.x, click.position.y);
 	}, Cesium.ScreenSpaceEventType.LEFT_DOWN);
 
 	magoManager.handler.setInputAction(function(click) 
 	{
+		magoManager.handleBrowserEvent(new BrowserEvent(MagoManager.EVENT_TYPE.MIDDLEDOWN, click.position, magoManager));
 		magoManager.mouseActionMiddleDown(click.position.x, click.position.y);
 	}, Cesium.ScreenSpaceEventType.MIDDLE_DOWN);
     
 	magoManager.handler.setInputAction(function(click) 
 	{
+		magoManager.handleBrowserEvent(new BrowserEvent(MagoManager.EVENT_TYPE.RIGHTDOWN, click.position, magoManager));
 		magoManager.mouseActionRightDown(click.position.x, click.position.y);
 	}, Cesium.ScreenSpaceEventType.RIGHT_DOWN);
 
 	magoManager.handler.setInputAction(function(movement) 
 	{
+		magoManager.handleBrowserEvent(new BrowserEvent(MagoManager.EVENT_TYPE.MOUSEMOVE, movement, magoManager));
 		magoManager.mouseActionMove(movement.startPosition, movement.endPosition);
 	}, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 
 	magoManager.handler.setInputAction(function(movement) 
 	{
+		magoManager.handleBrowserEvent(new BrowserEvent(MagoManager.EVENT_TYPE.LEFTUP, movement.position, magoManager));
 		magoManager.mouseActionLeftUp(movement.position.x, movement.position.y);
 	}, Cesium.ScreenSpaceEventType.LEFT_UP);
 
 	magoManager.handler.setInputAction(function(movement) 
 	{
+		magoManager.handleBrowserEvent(new BrowserEvent(MagoManager.EVENT_TYPE.MIDDLEUP, movement.position, magoManager));
 		magoManager.mouseActionMiddleUp(movement.position.x, movement.position.y);
 	}, Cesium.ScreenSpaceEventType.MIDDLE_UP);
     
 	magoManager.handler.setInputAction(function(movement) 
 	{
+		magoManager.handleBrowserEvent(new BrowserEvent(MagoManager.EVENT_TYPE.RIGHTUP, movement.position, magoManager));
 		magoManager.mouseActionRightUp(movement.position.x, movement.position.y);
 	}, Cesium.ScreenSpaceEventType.RIGHT_UP);
     
 	magoManager.handler.setInputAction(function(movement) 
 	{
+		magoManager.handleBrowserEvent(new BrowserEvent(MagoManager.EVENT_TYPE.CLICK, movement.position, magoManager));
 		magoManager.mouseActionLeftClick(movement.position.x, movement.position.y);
 	}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
 	magoManager.handler.setInputAction(function(movement) 
 	{
+		magoManager.handleBrowserEvent(new BrowserEvent(MagoManager.EVENT_TYPE.DBCLICK, movement.position, magoManager));
 		magoManager.mouseActionLeftDoubleClick(movement.position.x, movement.position.y);
 	}, Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
 
 	magoManager.handler.setInputAction(function(movement) 
 	{
+		magoManager.handleBrowserEvent(new BrowserEvent(MagoManager.EVENT_TYPE.RIGHTCLICK, movement.position, magoManager));
 		magoManager.mouseActionRightClick(movement.position.x, movement.position.y);
 	}, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
 
+	magoManager.handler.setInputAction(function(delta) 
+	{
+		magoManager.handleBrowserEvent(new BrowserEvent(MagoManager.EVENT_TYPE.WHEEL, {delta: delta}, magoManager));
+	}, Cesium.ScreenSpaceEventType.WHEEL);
 	 
 	this.viewer.clock.onTick.addEventListener(function(clock) 
 	{

@@ -34,6 +34,7 @@ AbsControl.prototype.setControl = function(magoManager)
 
 	var target = this.target ? this.target : this.magoManager.defaultControlContainer;
 	target.appendChild(this.element);
+	this.target = target;
 };
 
 /**
@@ -50,8 +51,8 @@ AbsControl.prototype.setBtnStyle = function(element)
 	element.style.fontWeight = 'bold';
 	element.style.textDecoration = 'none';
 	element.style.textAlign = 'center';
-	element.style.height = '50px';
-	element.style.width = '50px';
+	element.style.height = '42px';
+	element.style.width = '42px';
 	element.style.lineHeight = '.4em';
 	element.style.border = 'none';
 	element.style.backgroundColor = 'rgba(148,216,246, 0.8)';
@@ -90,7 +91,7 @@ AbsControl.prototype.setTextBtn = function(element)
 	element.style.textDecoration = 'none';
 	element.style.textAlign = 'center';
 	element.style.height = '1.75em';
-	element.style.width = '4.675em';
+	element.style.width = '4.575em';
 	element.style.lineHeight = '.4em';
 	element.style.border = 'none';
 	element.style.backgroundColor = 'rgba(148,216,246, 0.8)';

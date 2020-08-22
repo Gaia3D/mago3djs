@@ -27,7 +27,7 @@ var InitCamera = function(options)
 	element.style.backgroundColor = 'rgba(255,255,255,0.4)';
 	element.style.borderRadius = '4px';
 	element.style.padding = '2px';
-	element.style.top = '5.0em';
+	element.style.top = '1.0em';
 	element.style.right = '.5em';
 
 	var that = this;
@@ -45,7 +45,7 @@ var InitCamera = function(options)
 
 	var textSpan = document.createElement('span');
 	textSpan.appendChild(document.createTextNode('처음으로'));
-	textSpan.style.fontSize = '12px';
+	textSpan.style.fontSize = '10px';
 	textSpan.style.verticalAlign = 'baseline';
 	textSpan.style.lineHeight = '0.6em';
 	homeButton.appendChild(textSpan);

@@ -612,58 +612,58 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 	
 	// Depth for silhouette.***************************************************************************************
 	// Check if there are node selected.***********************************************************
-	if (magoManager.nodeSelected && magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected)
+	//if (magoManager.nodeSelected && magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected)
+	//{
+	var node = magoManager.nodeSelected;
+	if (node !== undefined) // test code.***
 	{
-		var node = magoManager.nodeSelected;
-		if (node !== undefined) // test code.***
+		magoManager.currentProcess = CODE.magoCurrentProcess.SilhouetteDepthRendering;
+		var silhouetteDepthFbo = magoManager.getSilhouetteDepthFbo();
+		silhouetteDepthFbo.bind(); 
+			
+		if (magoManager.isFarestFrustum())
 		{
-			magoManager.currentProcess = CODE.magoCurrentProcess.SilhouetteDepthRendering;
-			var silhouetteDepthFbo = magoManager.getSilhouetteDepthFbo();
-			silhouetteDepthFbo.bind(); 
-			
-			if (magoManager.isFarestFrustum())
-			{
-				gl.clearColor(0, 0, 0, 1);
-				gl.clearDepth(1);
-				gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-			}
-			
-			magoManager.swapRenderingFase();
-			
-			var currentShader;
-			currentShader = magoManager.postFxShadersManager.getShader("modelRefDepth"); 
-			currentShader.resetLastBuffersBinded();
-
-			currentShader.useProgram();
-			currentShader.disableVertexAttribArrayAll();
-			currentShader.enableVertexAttribArray(currentShader.position3_loc);
-
-			currentShader.bindUniformGenerals();
-			gl.uniform3fv(currentShader.scaleLC_loc, [1.0, 1.0, 1.0]); // init referencesMatrix.
-			
-			// check if exist clippingPlanes.
-			if (magoManager.modeler.clippingBox !== undefined)
-			{
-				var planesVec4Array = magoManager.modeler.clippingBox.getPlanesRelToEyevec4Array(magoManager);
-				var planesVec4FloatArray = new Float32Array(planesVec4Array);
-				
-				gl.uniform1i(currentShader.bApplyClippingPlanes_loc, true);
-				gl.uniform1i(currentShader.clippingPlanesCount_loc, 6);
-				gl.uniform4fv(currentShader.clippingPlanes_loc, planesVec4FloatArray);
-			}
-			else 
-			{
-				gl.uniform1i(currentShader.bApplyClippingPlanes_loc, false);
-			}
-			
-			var renderType = 0;
-			var refMatrixIdxKey = 0;
-			node.renderContent(magoManager, currentShader, renderType, refMatrixIdxKey);
-
-			silhouetteDepthFbo.unbind(); 
-			magoManager.swapRenderingFase();
+			gl.clearColor(0, 0, 0, 1);
+			gl.clearDepth(1);
+			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		}
+			
+		magoManager.swapRenderingFase();
+			
+		var currentShader;
+		currentShader = magoManager.postFxShadersManager.getShader("modelRefDepth"); 
+		currentShader.resetLastBuffersBinded();
+
+		currentShader.useProgram();
+		currentShader.disableVertexAttribArrayAll();
+		currentShader.enableVertexAttribArray(currentShader.position3_loc);
+
+		currentShader.bindUniformGenerals();
+		gl.uniform3fv(currentShader.scaleLC_loc, [1.0, 1.0, 1.0]); // init referencesMatrix.
+			
+		// check if exist clippingPlanes.
+		if (magoManager.modeler.clippingBox !== undefined)
+		{
+			var planesVec4Array = magoManager.modeler.clippingBox.getPlanesRelToEyevec4Array(magoManager);
+			var planesVec4FloatArray = new Float32Array(planesVec4Array);
+				
+			gl.uniform1i(currentShader.bApplyClippingPlanes_loc, true);
+			gl.uniform1i(currentShader.clippingPlanesCount_loc, 6);
+			gl.uniform4fv(currentShader.clippingPlanes_loc, planesVec4FloatArray);
+		}
+		else 
+		{
+			gl.uniform1i(currentShader.bApplyClippingPlanes_loc, false);
+		}
+			
+		var renderType = 0;
+		var refMatrixIdxKey = 0;
+		node.renderContent(magoManager, currentShader, renderType, refMatrixIdxKey);
+
+		silhouetteDepthFbo.unbind(); 
+		magoManager.swapRenderingFase();
 	}
+	//}
 	
 	// Check if there are a object selected.**********************************************************************
 	if (magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.OBJECT && magoManager.objectSelected)
@@ -1920,12 +1920,12 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 
 		if (magoManager.nodeSelected) // if there are an object selected then there are a building selected.***
 		{
-			if (magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.OBJECT && magoManager.objectSelected)
+			if (magoManager.objectSelected)
 			{
 				this.renderSilhouette();
 			}
 			
-			if (magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected)
+			if (magoManager.buildingSelected)
 			{
 				node = magoManager.nodeSelected;
 				if (node !== undefined) // test code.***

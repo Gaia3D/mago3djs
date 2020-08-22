@@ -323,6 +323,7 @@ var MagoManager = function(options)
 	 * @type {InteractionCollection}
 	 */
 	this.interactions = new InteractionCollection(this);
+	this.interactions.add(new F4dSelectInteraction());
 
 	/**
      * Control collection.
@@ -346,6 +347,11 @@ MagoManager.EVENT_TYPE = {
 	'MOUSEMOVE'              	: 'mousemove',
 	'LEFTDOWN'              		: 'leftdown',
 	'LEFTUP'                		: 'leftup',
+	'MIDDLEDOWN'            		: 'middledown',
+	'MIDDLEUP'              		: 'middleup',
+	'RIGHTDOWN'             		: 'rightdown',
+	'RIGHTUP'               		: 'rightup',
+	'WHEEL'                 		: 'wheel',
 	'SMARTTILELOADSTART'     	: 'smarttileloadstart',
 	'SMARTTILELOADEND'       	: 'smarttileloadend',
 	'F4DLOADSTART'           	: 'f4dloadstart',
@@ -438,7 +444,6 @@ MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums)
  */
 MagoManager.prototype.updateSize = function() 
 {
-
 	var sceneState = this.sceneState;
 	var canvas = sceneState.canvas;
 	canvas.width = canvas.offsetWidth;
@@ -451,6 +456,42 @@ MagoManager.prototype.updateSize = function()
 MagoManager.prototype.isCesiumGlobe = function() 
 {
 	return this.configInformation.basicGlobe === Constant.CESIUM;
+};
+
+/**
+ * handle browser event
+ * @param {BrowserEvent} browserEvent 
+ */
+MagoManager.prototype.handleBrowserEvent = function(browserEvent) 
+{
+	this.emit(browserEvent.type, browserEvent);
+	var interactionArray = this.interactions.array;
+
+	for (var i=interactionArray.length - 1; i>=0;i--)
+	{
+		var interaction = interactionArray[i];
+		if (!interaction.getActive())
+		{
+			continue;
+		}
+
+		interaction.handle(browserEvent);
+	}
+	
+	/*if (browserEvent.type === 'click')
+	{
+		//
+		var infoPromise = loadWithXhr('./persistence/json/mago3d-building_4326');
+
+		infoPromise.done(function(e)
+		{
+			
+			var pbf = new Pbf(e);
+			console.info(pbf);
+			var c = MBTile.read(pbf);
+			console.info(c);
+		});
+	}*/
 };
 
 /**
@@ -1222,45 +1263,7 @@ MagoManager.prototype.managePickingProcess = function()
 	
 	if (this.selectionFbo === undefined) 
 	{ this.selectionFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
-	/*
-	if (this.isCameraMoved || this.bPicking) // 
-	{
-		this.selectionFbo.bind(); // framebuffer for color selection.***
-		gl.enable(gl.DEPTH_TEST);
-		gl.depthFunc(gl.LEQUAL);
-		gl.depthRange(0, 1);
-		gl.disable(gl.CULL_FACE);
-		if (this.isLastFrustum)
-		{
-			// this is the farest frustum, so init selection process.***
-			gl.clearColor(1, 1, 1, 1); // white background.***
-			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // clear buffer.***
-			this.selectionManager.clearCandidates();
-			gl.clearColor(0, 0, 0, 1); // return to black background.***
-		}
-		
-		this.renderer.renderGeometryColorCoding(this.visibleObjControlerNodes);
-		this.swapRenderingFase();
-		
-		if (this.currentFrustumIdx === 0)
-		{
-			this.isCameraMoved = false;
-
-			//TODO : MOVEEND EVENT TRIGGER
-			//PSEUDO CODE FOR CLUSTER
-			//if (this.modeler && this.modeler.objectsArray) 
-			//{
-			//	for (var i=0, len=this.modeler.objectsArray.length;i<len;i++) 
-			//	{
-			//		var obj = this.modeler.objectsArray[i];
-			//		if (!obj instanceof Cluster) { continue; }
-			//
-			//		if (!obj.dirty && !obj.isMaking) { obj.setDirty(true); }
-			//	}
-			//}
-		}
-	}
-	*/
+	
 	
 	if (this.currentFrustumIdx === 0)
 	{

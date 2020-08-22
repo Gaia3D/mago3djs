@@ -27,8 +27,8 @@ var Zoom = function(options)
 	element.style.backgroundColor = 'rgba(255,255,255,0.4)';
 	element.style.borderRadius = '4px';
 	element.style.padding = '2px';
-	element.style.top = '12.5em';
-	element.style.right = '.5em';
+	element.style.bottom = '0.5em';
+	element.style.right = '9.5em';
 
 	var that = this;
 	var upButton = document.createElement('button');
@@ -41,17 +41,19 @@ var Zoom = function(options)
 	imageSpan.style.lineHeight = '0.6em';
 	upButton.appendChild(imageSpan);
 
-	upButton.appendChild(document.createElement('br'));
+	/*upButton.appendChild(document.createElement('br'));
 
 	var textSpan = document.createElement('span');
 	textSpan.appendChild(document.createTextNode('줌인'));
-	textSpan.style.fontSize = '12px';
+	textSpan.style.fontSize = '10px';
 	textSpan.style.verticalAlign = 'baseline';
 	textSpan.style.lineHeight = '0.6em';
-	upButton.appendChild(textSpan);
+	upButton.appendChild(textSpan);*/
     
 	this.setBtnStyle(upButton);
-
+	upButton.style.width='25px';
+	upButton.style.height='25px';
+	upButton.style.display='inline-block';
 	upButton.addEventListener(
 		'click',
 		that.handleClick.bind(that, 1),
@@ -68,17 +70,19 @@ var Zoom = function(options)
 	downImageSpan.style.lineHeight = '0.6em';
 	downButton.appendChild(downImageSpan);
 
-	downButton.appendChild(document.createElement('br'));
+	/*downButton.appendChild(document.createElement('br'));
 
 	var downTextSpan = document.createElement('span');
 	downTextSpan.appendChild(document.createTextNode('줌아웃'));
-	downTextSpan.style.fontSize = '12px';
+	downTextSpan.style.fontSize = '10px';
 	downTextSpan.style.verticalAlign = 'baseline';
 	downTextSpan.style.lineHeight = '0.6em';
-	downButton.appendChild(downTextSpan);
+	downButton.appendChild(downTextSpan);*/
 
 	this.setBtnStyle(downButton);
-    
+	downButton.style.width='25px';
+	downButton.style.height='25px';
+	downButton.style.display='inline-block';
 	downButton.addEventListener(
 		'click',
 		that.handleClick.bind(that, 0),

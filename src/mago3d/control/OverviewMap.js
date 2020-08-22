@@ -30,8 +30,8 @@ var OverviewMap = function(options)
 	element.style.padding = '2px';
 	element.style.bottom = '.5em';
 	element.style.right = '.5em';
-	element.style.width = '200px';
-	element.style.height = '200px';
+	element.style.width = '135px';
+	element.style.height = '135px';
 	element.style.borderRadius = '4px';
 	element.style.border = '2px solid #CCE5EC';
 };
