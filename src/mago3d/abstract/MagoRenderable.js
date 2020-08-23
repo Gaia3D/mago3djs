@@ -522,3 +522,20 @@ MagoRenderable.prototype.getGeoLocDataManager = function()
 {
 	return this.geoLocDataManager;
 };
+
+/**
+ * set model position
+ * @param {GeographicCoord} geographicCoord 
+ */
+MagoRenderable.prototype.setGeographicPosition = function(geographicCoord) 
+{
+	if (this.geoLocDataManager === undefined)
+	{ this.geoLocDataManager = new GeoLocationDataManager(); }
+
+	var geoLocData = this.geoLocDataManager.getCurrentGeoLocationData();
+	if (geoLocData === undefined)
+	{
+		geoLocData = this.geoLocDataManager.newGeoLocationData("default");
+		geoLocData = ManagerUtils.calculateGeoLocationData(geographicCoord.longitude, geographicCoord.latitude, geographicCoord.altitude, undefined, undefined, undefined, geoLocData);
+	}
+};

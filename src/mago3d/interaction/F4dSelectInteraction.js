@@ -40,7 +40,10 @@ F4dSelectInteraction.prototype.handleDownEvent = function(browserEvent)
  */
 F4dSelectInteraction.prototype.handleUpEvent = function(browserEvent)
 {
-	return abstract();
+	console.info('handle up test');
+	console.info(this.manager);
+	console.info(this.manager.currentFrustumIdx);
+	console.info(browserEvent);
 };
 
 /**
@@ -54,7 +57,7 @@ F4dSelectInteraction.prototype.handleMoveEvent = function(browserEvent)
 		var manager = this.manager;
 		var gl = manager.getGl();
 		if (manager.selectionFbo === undefined) 
-		{ manager.selectionFbo = new FBO(gl, manager.sceneState.drawingBufferWidth, manager.sceneState.drawingBufferHeight); }
+		{ manager.selectionFbo = new FBO(gl, manager.sceneState.drawingBufferWidth, manager.sceneState.drawingBufferHeight, {matchCanvasSize : true}); }
         
 		var position = browserEvent.endEvent.screenCoordinate;
 
@@ -63,7 +66,7 @@ F4dSelectInteraction.prototype.handleMoveEvent = function(browserEvent)
 		var auxBuildingSelected = manager.arrayAuxSC[0];
 		var auxOctreeSelected = manager.arrayAuxSC[1];
 		var auxNodeSelected = manager.arrayAuxSC[3]; 
-
+		console.info(auxNodeSelected);
 		manager.buildingSelected = auxBuildingSelected;
 		manager.octreeSelected = auxOctreeSelected;
 		manager.nodeSelected = auxNodeSelected;

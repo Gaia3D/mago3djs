@@ -15,7 +15,8 @@ var FBO = function(gl, width, height, options)
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+	options = options ? options : {};
+	this.options = options;
 	/**
 	 * WebGL rendering context.
 	 * @type {WebGLRenderingContext}
@@ -42,34 +43,21 @@ var FBO = function(gl, width, height, options)
 	 * @type {WebGLFramebuffer}
 	 * @default WebGLFramebuffer
 	 */
-	this.fbo = gl.createFramebuffer();
-	
+	this.fbo = undefined;
 	
 	/**
 	 * WebGL Renderbuffer.
 	 * @type {WebGLRenderbuffer}
 	 * @default WebGLRenderbuffer
 	 */
-	this.depthBuffer = gl.createRenderbuffer();
+	this.depthBuffer = undefined;
 	
 	/**
 	 * WebGL texture.
 	 * @type {WebGLTexture}
 	 * @default WebGLTexture
 	 */
-	var colorBuffer;
-	if (options)
-	{
-		if (options.colorBuffer !== undefined)
-		{
-			colorBuffer = options.colorBuffer;
-		}
-	}
-
-	if (colorBuffer !== undefined)
-	{ this.colorBuffer = colorBuffer; }
-	else
-	{ this.colorBuffer = gl.createTexture(); }
+	this.colorBuffer = undefined;
 	
 	/**
 	 * Boolean var that indicates that the parameters must be updated.
@@ -81,7 +69,36 @@ var FBO = function(gl, width, height, options)
 	// Init process.
 	this.width[0] = width;
 	this.height[0] = height;
-  
+
+	this.init();
+
+	if(options.matchCanvasSize)
+	{
+		var that = this;
+		window.addEventListener('resize', function()
+		{
+			var canvas = that.gl.canvas;
+
+			that.width[0] = canvas.offsetWidth;
+			that.height[0] = canvas.offsetHeight;
+
+			that.deleteObjects(that.gl);
+			that.init();
+		}, false);
+	}
+};   
+
+FBO.prototype.init = function() 
+{
+	var gl = this.gl;
+	this.fbo = gl.createFramebuffer();
+	this.depthBuffer = gl.createRenderbuffer();
+
+	if (this.options.colorBuffer)
+	{ this.colorBuffer = this.options.colorBuffer; }
+	else
+	{ this.colorBuffer = gl.createTexture(); }
+
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, this.colorBuffer);  
 	
@@ -91,11 +108,11 @@ var FBO = function(gl, width, height, options)
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 	//gl.generateMipmap(gl.TEXTURE_2D)
 
-	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width[0], height[0], 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.width[0], this.height[0], 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
   
 	gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo);
 	gl.bindRenderbuffer(gl.RENDERBUFFER, this.depthBuffer);
-	gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width[0], height[0]);
+	gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, this.width[0], this.height[0]);
 	gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.depthBuffer);
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.colorBuffer, 0);
 	if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) 
@@ -104,7 +121,7 @@ var FBO = function(gl, width, height, options)
 	}
 
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-};   
+}
 
 FBO.prototype.setColorBuffer = function(colorBuffer) 
 {
@@ -168,8 +185,6 @@ FBO.prototype.deleteObjects = function(gl)
 	if (this.fbo)
 	{ gl.deleteFramebuffer(this.fbo); }
 	this.fbo = undefined;
-	
-	
 };
 
 /**

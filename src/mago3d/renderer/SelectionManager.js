@@ -36,6 +36,8 @@ var SelectionManager = function(magoManager)
 
 	// Parameter that indicates that we are rendering selected data structure.
 	this.parentSelected = false;
+
+	this.selectionFbo = new FBO(this.magoManager.getGl(), this.magoManager.sceneState.drawingBufferWidth, this.magoManager.sceneState.drawingBufferHeight, {matchCanvasSize : true});
 };
 
 /**
@@ -263,4 +265,98 @@ SelectionManager.prototype.TEST__CurrGeneralObjSel = function()
 	{ return true; }
 	else
 	{ return false; }
+};
+
+/**
+ * Selects an object of the current visible objects that's under mouse.
+ * @param {GL} gl.
+ * @param {int} mouseX Screen x position of the mouse.
+ * @param {int} mouseY Screen y position of the mouse.
+ * 
+ * @private
+ */
+SelectionManager.prototype.selectObject = function(gl, mouseX, mouseY, resultSelectedArray, bSelectObjects) 
+{
+	if (bSelectObjects === undefined)
+	{ bSelectObjects = false; }
+
+	this.magoManager.selectionFbo.bind(); // framebuffer for color selection.***
+	gl.enable(gl.DEPTH_TEST);
+	gl.depthFunc(gl.LEQUAL);
+	gl.depthRange(0, 1);
+	gl.disable(gl.CULL_FACE);
+	
+	// Read the picked pixel and find the object.*********************************************************
+	var mosaicWidth = 1;
+	var mosaicHeight = 1;
+	var totalPixelsCount = mosaicWidth*mosaicHeight;
+	var pixels = new Uint8Array(4 * mosaicWidth * mosaicHeight); // 4 x 3x3 pixel, total 9 pixels select.***
+	var pixelX = mouseX - Math.floor(mosaicWidth/2);
+	var pixelY = this.sceneState.drawingBufferHeight - mouseY - Math.floor(mosaicHeight/2); // origin is bottom.***
+	
+	if (pixelX < 0){ pixelX = 0; }
+	if (pixelY < 0){ pixelY = 0; }
+	
+	gl.readPixels(pixelX, pixelY, mosaicWidth, mosaicHeight, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+	gl.bindFramebuffer(gl.FRAMEBUFFER, null); // unbind framebuffer.***
+	
+	var selectionManager = this.selectionManager;
+
+	// now, select the object.***
+	// The center pixel of the selection is 12, 13, 14.***
+	var centerPixel = Math.floor(totalPixelsCount/2);
+	var idx = this.selectionColor.decodeColor3(pixels[centerPixel*3], pixels[centerPixel*3+1], pixels[centerPixel*3+2]);
+	
+	// Provisionally.***
+	if (bSelectObjects)
+	{ selectionManager.selectObjects(idx); }
+	else 
+	{
+		selectionManager.currentReferenceSelected = selectionManager.referencesMap[idx];
+		selectionManager.currentOctreeSelected = selectionManager.octreesMap[idx];
+		selectionManager.currentBuildingSelected = selectionManager.buildingsMap[idx];
+		selectionManager.currentNodeSelected = selectionManager.nodesMap[idx];
+	}
+	
+	var selectedObject = selectionManager.currentReferenceSelected;
+
+	resultSelectedArray[0] = selectionManager.currentBuildingSelected;
+	resultSelectedArray[1] = selectionManager.currentOctreeSelected;
+	resultSelectedArray[2] = selectionManager.currentReferenceSelected;
+	resultSelectedArray[3] = selectionManager.currentNodeSelected;
+	
+	// Additionally check if selected an edge of topology.***
+	var selNetworkEdges = selectionManager.getSelectionCandidatesFamily("networkEdges");
+	if (selNetworkEdges)
+	{
+		var currEdgeSelected = selNetworkEdges.currentSelected;
+		var i = 0;
+		while (currEdgeSelected === undefined && i< totalPixelsCount)
+		{
+			var idx = this.selectionColor.decodeColor3(pixels[i*3], pixels[i*3+1], pixels[i*3+2]);
+			currEdgeSelected = selNetworkEdges.selectObject(idx);
+			i++;
+		}
+	}
+	
+	// TEST: Check if selected a cuttingPlane.***
+	var selGeneralObjects = selectionManager.getSelectionCandidatesFamily("general");
+	if (selGeneralObjects)
+	{
+		var currObjectSelected = selGeneralObjects.currentSelected;
+		var i = 0;
+		while (currObjectSelected === undefined && i< totalPixelsCount)
+		{
+			var idx = this.selectionColor.decodeColor3(pixels[i*3], pixels[i*3+1], pixels[i*3+2]);
+			currObjectSelected = selGeneralObjects.selectObject(idx);
+			i++;
+		}
+	}
+	
+	// Check general objects.***
+	if (selectedObject === undefined)
+	{ selectedObject = selectionManager.selCandidatesMap[idx]; }
+	selectionManager.setSelectedGeneral(selectionManager.selCandidatesMap[idx]);
+	
+	return selectedObject;
 };

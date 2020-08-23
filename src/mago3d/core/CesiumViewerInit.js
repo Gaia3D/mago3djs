@@ -393,6 +393,12 @@ CesiumViewerInit.prototype.setEventHandler = function()
 	{
 		magoManager.handleBrowserEvent(new BrowserEvent(MagoManager.EVENT_TYPE.WHEEL, {delta: delta}, magoManager));
 	}, Cesium.ScreenSpaceEventType.WHEEL);
+
+	window.addEventListener('resize', function(event)
+	{
+
+		magoManager.isCameraMoved = true;
+	}, false);
 	 
 	this.viewer.clock.onTick.addEventListener(function(clock) 
 	{

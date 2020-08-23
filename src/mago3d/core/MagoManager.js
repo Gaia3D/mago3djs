@@ -28,7 +28,7 @@ var MagoManager = function(options)
 	 * 
 	 * @private
 	 */
-	this.selectionManager = new SelectionManager(this);
+	this.selectionManager = undefined;
 	
 	/**
 	 * Manages the shaders.
@@ -393,6 +393,8 @@ MagoManager.prototype.init = function(gl)
 	{ this.vboMemoryManager.gl = gl; }
 	if (this.effectsManager.gl === undefined)
 	{ this.effectsManager.gl = gl; }
+
+	this.selectionManager = new SelectionManager(this);
 };
 
 /**
@@ -415,6 +417,10 @@ MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums)
 	var isLastFrustum = false;
 	this.numFrustums = numFrustums;
 	this.currentFrustumIdx = this.numFrustums-frustumIdx-1;
+	if (this.currentFrustumIdx === 0)
+	{
+		this.emit('lastFrustum');
+	}
 	if (this.currentFrustumIdx === numFrustums-1) 
 	{
 		isLastFrustum = true;
@@ -1206,7 +1212,7 @@ MagoManager.prototype.renderToSelectionBuffer = function()
 	var gl = this.getGl();
 	
 	if (this.selectionFbo === undefined) 
-	{ this.selectionFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
+	{ this.selectionFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize : true}); }
 	
 	if (this.isCameraMoved || this.bPicking) // 
 	{
@@ -1262,7 +1268,7 @@ MagoManager.prototype.managePickingProcess = function()
 	var gl = this.getGl();
 	
 	if (this.selectionFbo === undefined) 
-	{ this.selectionFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
+	{ this.selectionFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize : true}); }
 	
 	
 	if (this.currentFrustumIdx === 0)
@@ -1469,14 +1475,7 @@ MagoManager.prototype.getSilhouetteDepthFbo = function()
 	// Provisional function.***
 	var gl = this.getGl();
 	
-	if (this.silhouetteDepthFboNeo === undefined) { this.silhouetteDepthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
-	if (this.sceneState.drawingBufferWidth[0] !== this.silhouetteDepthFboNeo.width[0] || this.sceneState.drawingBufferHeight[0] !== this.silhouetteDepthFboNeo.height[0])
-	{
-		// move this to onResize.***
-		this.silhouetteDepthFboNeo.deleteObjects(gl);
-		this.silhouetteDepthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
-		this.sceneState.camera.frustum.dirty = true;
-	}
+	if (this.silhouetteDepthFboNeo === undefined) { this.silhouetteDepthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize : true}); }
 	
 	return this.silhouetteDepthFboNeo;
 };
@@ -1498,47 +1497,16 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	
 	// Take the depFrameBufferObject of the current frustumVolume.***
 	/*
-	if (this.depthFboNeo === undefined) { this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
-	if (this.sceneState.drawingBufferWidth[0] !== this.depthFboNeo.width[0] || this.sceneState.drawingBufferHeight[0] !== this.depthFboNeo.height[0])
-	{
-		// move this to onResize.***
-		this.depthFboNeo.deleteObjects(gl);
-		this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
-		this.sceneState.camera.frustum.dirty = true;
-	}
+	if (this.depthFboNeo === undefined) { this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize : true}); }
 	*/
 	
 	
-	if (frustumVolumenObject.depthFbo === undefined) { frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
-	//if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, new Float32Array([this.sceneState.drawingBufferWidth[0]/2.0]), new Float32Array([this.sceneState.drawingBufferHeight/2.0])); }
-	if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
-	if (this.sceneState.drawingBufferWidth[0] !== frustumVolumenObject.depthFbo.width[0] || this.sceneState.drawingBufferHeight[0] !== frustumVolumenObject.depthFbo.height[0])
-	{
-		// move this to onResize.***
-		frustumVolumenObject.depthFbo.deleteObjects(gl);
-		frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
+	if (frustumVolumenObject.depthFbo === undefined) { frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize : true}); }
+	//if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, new Float32Array([this.sceneState.drawingBufferWidth[0]/2.0]), new Float32Array([this.sceneState.drawingBufferHeight/2.0]), {matchCanvasSize : true}); }
+	if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize : true}); }
 
-		// move this to onResize.***
-		this.ssaoFromDepthFbo.deleteObjects(gl);
-		//this.ssaoFromDepthFbo = new FBO(gl, new Float32Array([this.sceneState.drawingBufferWidth[0]/2.0]), new Float32Array([this.sceneState.drawingBufferHeight/2.0]));
-		this.ssaoFromDepthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
-
-		this.sceneState.camera.frustum.dirty = true;
-
-		// delete selection buffer too.
-		this.selectionFbo.deleteObjects(gl);
-		this.selectionFbo = undefined;
-	}
-	
 	// test silhouette depthFbo.***
-	//if (frustumVolumenObject.silhouetteDepthFboNeo === undefined) { frustumVolumenObject.silhouetteDepthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); }
-	//if (this.sceneState.drawingBufferWidth[0] !== frustumVolumenObject.silhouetteDepthFboNeo.width[0] || this.sceneState.drawingBufferHeight[0] !== frustumVolumenObject.silhouetteDepthFboNeo.height[0])
-	//{
-	//	// move this to onResize.***
-	//	frustumVolumenObject.silhouetteDepthFboNeo.deleteObjects(gl);
-	//	frustumVolumenObject.silhouetteDepthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
-	//	this.sceneState.camera.frustum.dirty = true;
-	//}
+	//if (frustumVolumenObject.silhouetteDepthFboNeo === undefined) { frustumVolumenObject.silhouetteDepthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize : true}); }
 	
 
 	this.depthFboNeo = frustumVolumenObject.depthFbo;
@@ -1962,7 +1930,7 @@ MagoManager.prototype.cameraMoved = function()
 	{ 
 		if (this.sceneState.gl) 
 		{
-			this.selectionFbo = new FBO(this.sceneState.gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight); 
+			this.selectionFbo = new FBO(this.sceneState.gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize : true}); 
 		}
 	}
 	if (this.selectionFbo)
@@ -3981,14 +3949,9 @@ MagoManager.prototype.test_renderDepth_objectSelected = function(currObjectSelec
 	
 	if (this.depthFboAux === undefined)
 	{
-		this.depthFboAux = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
+		this.depthFboAux = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize : true});
 	}
-	if (this.sceneState.drawingBufferWidth[0] !== this.depthFboAux.width[0] || this.sceneState.drawingBufferHeight[0] !== this.depthFboAux.height[0])
-	{
-		// move this to onResize.***
-		this.depthFboAux.deleteObjects(gl);
-		this.depthFboAux = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight);
-	}
+
 	this.depthFboAux.bind(); 
 	
 	if (this.isFarestFrustum())

@@ -106,7 +106,12 @@ AbsSelectInteraction.prototype.handle = function(browserEvent)
 
 			if (diffX <= this.tolerance && diffY  <= this.tolerance)
 			{
-				this.handleUpEvent.call(this, browserEvent);
+				var that = this;
+				this.manager.once('lastFrustum', function() 
+				{
+					that.handleUpEvent.call(that, browserEvent);
+				});
+				
 			}
 		}
 	}
@@ -121,6 +126,7 @@ AbsSelectInteraction.prototype.handle = function(browserEvent)
 			this.begin = true;
 			this.startPoint = browserEvent.point;
 			this.startTime = browserEvent.timestamp;
+
 			this.handleDownEvent.call(this, browserEvent);
 		}
 	}

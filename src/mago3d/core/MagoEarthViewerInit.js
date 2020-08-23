@@ -114,6 +114,9 @@ MagoEarthViewerInit.prototype.setEventHandler = function()
 		var magomanager = magoWorld.magoManager;
 		var sceneState = magomanager.sceneState;
 		sceneState.setDrawingBufferSize(canvas.offsetWidth, canvas.offsetHeight);
+
+		//when resized, must do render color selection buffer
+		magomanager.isCameraMoved = true;
 	}, false);
 	
 	var handlekeydown = function(event) 
