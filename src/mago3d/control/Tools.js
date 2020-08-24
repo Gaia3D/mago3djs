@@ -100,187 +100,6 @@ var Tools = function(options)
 	this.setBtnStyle(button);
 	button.style.backgroundColor = 'rgba(217, 217, 217, 0.8)';
 	element.appendChild(button);
-
-	//옆으로 나오는 div 주석처리
-	/*
-	var toolsDiv = document.createElement('div');
-	toolsDiv.style.position = 'absolute';
-	toolsDiv.style.pointerEvents = 'auto';
-	//toolsDiv.style.backgroundColor = 'rgba(255,255,255,0.4)';
-	toolsDiv.style.backgroundColor = 'rgba(255,255,255,1)';
-	toolsDiv.style.borderRadius = '4px';
-	toolsDiv.style.padding = '2px';
-	//toolsDiv.style.top = '0';
-	toolsDiv.style.top = '50px';
-	//toolsDiv.style.right = '48px';
-	toolsDiv.style.right = '1px';
-	toolsDiv.style.display = 'none';
-	//toolsDiv.style.width = '195px';
-	toolsDiv.style.width = '319px';
-	toolsDiv.style.lineHeight = '1.0em';
-    
-	this.toolsDiv = toolsDiv;
-	element.appendChild(toolsDiv);
-	*/
-
-	var toggleBbox = document.createElement('button');
-	toggleBbox.setAttribute('type', 'button');
-	toggleBbox.dataset.type= 'bbox';
-	toggleBbox.dataset.status= 'off';
-	toggleBbox.title = 'BoundingBox Toggle';
-	toggleBbox.appendChild(document.createTextNode('BBOX'));
-	this.setTextBtn(toggleBbox, 'bbox');
-	toggleBbox.style.backgroundColor = 'rgba(70, 70, 70, 0.8)';
-    
-	this.tools.bbox = {
-		runType : 'toggle',
-		element : toggleBbox,
-		action  : function(value) 
-		{
-			this.magoManager.magoPolicy.setShowBoundingBox(value);
-		}
-	};
-
-	//toolsDiv.appendChild(toggleBbox);
-
-	var toggleLabel = document.createElement('button');
-	toggleLabel.setAttribute('type', 'button');
-	toggleLabel.dataset.type=  'label';
-	toggleLabel.dataset.status= 'off';
-	toggleLabel.title = 'Label Toggle';
-	toggleLabel.appendChild(document.createTextNode('Label'));
-	this.setTextBtn(toggleLabel, 'label');
-	toggleLabel.style.backgroundColor = 'rgba(70, 70, 70, 0.8)';
-
-	this.tools.label = {
-		runType : 'toggle',
-		element : toggleLabel,
-		action  : function(value) 
-		{
-			this.magoManager.magoPolicy.setShowLabelInfo(value);
-		
-			// clear the text canvas.
-			var canvas = document.getElementById("objectLabel");
-			var ctx = canvas.getContext("2d");
-			ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-		}
-	};
-	//toolsDiv.appendChild(toggleLabel);
-
-	var toggleOrigin = document.createElement('button');
-	toggleOrigin.setAttribute('type', 'button');
-	toggleOrigin.dataset.type=  'origin';
-	toggleOrigin.dataset.status= 'off';
-	toggleOrigin.title = 'Origin Toggle';
-	toggleOrigin.appendChild(document.createTextNode('Origin'));
-	this.setTextBtn(toggleOrigin, 'origin');
-	toggleOrigin.style.backgroundColor = 'rgba(70, 70, 70, 0.8)';
-
-	this.tools.origin = {
-		runType : 'toggle',
-		element : toggleOrigin,
-		action  : function(value) 
-		{
-			this.magoManager.magoPolicy.setShowOrigin(value);
-		}
-	};
-	//toolsDiv.appendChild(toggleOrigin);
-    
-	var toggleShadow = document.createElement('button');
-	toggleShadow.setAttribute('type', 'button');
-	toggleShadow.dataset.type=  'shadow';
-	toggleShadow.dataset.status= 'off';
-	toggleShadow.title = 'Shadow Toggle';
-	toggleShadow.appendChild(document.createTextNode('Shadow'));
-	this.setTextBtn(toggleShadow, 'shadow');
-	toggleShadow.style.backgroundColor = 'rgba(70, 70, 70, 0.8)';
-
-	this.tools.shadow = {
-		runType : 'toggle',
-		element : toggleShadow,
-		action  : function(value) 
-		{
-			this.magoManager.sceneState.setApplySunShadows(value);
-		}
-	};
-	//toolsDiv.appendChild(toggleShadow);
-
-	/*
-	var toggleAdvance = document.createElement('button');
-	toggleAdvance.setAttribute('type', 'button');
-	toggleAdvance.dataset.type=  'advance';
-	toggleAdvance.dataset.status= 'off';
-	toggleAdvance.title = 'Advance Toggle';
-	toggleAdvance.appendChild(document.createTextNode('Advance'));
-	this.setTextBtn(toggleAdvance, 'advance');
-	toggleAdvance.style.backgroundColor = 'rgba(70, 70, 70, 0.8)';
-	toolsDiv.appendChild(toggleAdvance);
-	this.tools.advance = {
-		runType : 'toggle',
-		element : toggleAdvance,
-		action  : function(value) 
-		{
-			//mago3d-overlayContainer-defaultContent
-			var mainContainer = document.getElementById(MagoConfig.getContainerId()).getElementsByClassName('mago3d-overlayContainer-defaultContent').item(0);
-			var thisContainer = mainContainer.getElementsByClassName('mago3d-tools-advance').item(0);
-			if (value === true)
-			{
-				this.target.style.right = '220px';
-				mainContainer.style.display = 'block';
-				mainContainer.style.right = '0px';
-				var toolsDivs = mainContainer.getElementsByClassName('mago3d-tools-div');
-				for (var i =0, len=toolsDivs.length;i<len;i++)
-				{
-					var toolDiv = toolsDivs.item(i);
-					toolDiv.style.display = 'none';
-				}
-				thisContainer.style.display = 'block';
-			}
-			else 
-			{
-				thisContainer.style.display = 'none';
-				this.target.style.right = '0px';
-				mainContainer.style.display = 'none';
-				mainContainer.style.right = '0px';
-			}
-		}
-	};
-
-	var buttons = toolsDiv.getElementsByTagName('button');
-	for (var i=0, len = buttons.length;i<len;i++)
-	{
-		var btn = buttons.item(i);
-		var btnType = btn.dataset.type;
-		var tool = this.tools[btnType];
-
-		btn.addEventListener(
-			'click',
-			this.handleToolClick.bind(this, tool),
-			false
-		);
-        
-		btn.addEventListener(
-			'mouseenter',
-			function(e)
-			{
-				e.target.style.backgroundColor = 'rgba(148,216,246, 0.8)';
-			},
-			false
-		);
-        
-		btn.addEventListener(
-			'mouseleave',
-			function(e)
-			{
-				if (e.target.dataset.status !== 'on')
-				{
-					e.target.style.backgroundColor = 'rgba(70, 70, 70, 0.8)';
-				}
-			},
-			false
-		);
-	}
-	*/
 };
 
 Tools.prototype = Object.create(AbsControl.prototype);
@@ -306,11 +125,14 @@ Tools.prototype.setControl = function(magoManager)
 	this.magoManager.defaultContentContainer.appendChild(advanceToolDiv);
 
 	var basicSettingsDiv = getGroupDiv('기본 설정');
+	advanceToolDiv.appendChild(basicSettingsDiv);
+
 	var basicSettingBtnDiv = document.createElement('div');
 	basicSettingBtnDiv.style.marginTop = '5px';
 	basicSettingsDiv.appendChild(basicSettingBtnDiv);
 
 	var that = this;
+	var basicBtns = [];
 	var bboxBtnObj = getBasicButtonObject('bbox', 'BoundingBox Toggle', 'BBOX', 'toggle', function(value) 
 	{
 		that.magoManager.magoPolicy.setShowBoundingBox(value);
@@ -333,23 +155,263 @@ Tools.prototype.setControl = function(magoManager)
 		that.magoManager.sceneState.setApplySunShadows(value);
 	});
 
-	basicSettingBtnDiv.appendChild(bboxBtnObj.element);
-	basicSettingBtnDiv.appendChild(labelBtnObj.element);
-	basicSettingBtnDiv.appendChild(originBtnObj.element);
-	basicSettingBtnDiv.appendChild(shadowBtnObj.element);
+	basicBtns.push(bboxBtnObj);
+	basicBtns.push(labelBtnObj);
+	basicBtns.push(originBtnObj);
+	basicBtns.push(shadowBtnObj);
 
-	basicSettingsDiv.appendChild(getTitleDiv('SSAO', 'adjust'));
-	var ssaoContentDuv = getContentDiv([
-		{
-			id      : 'ssaoRadius',
-			label   : '그림자 반경',
-			type    : 'text',
-			default : '0.15',
-			unit    : 'M'
-		}
-	]);
-	basicSettingsDiv.appendChild(ssaoContentDuv);
-	advanceToolDiv.appendChild(basicSettingsDiv);
+	for(var i=0,btnLength=basicBtns.length;i<btnLength;i++)
+	{
+		var basicBtn = basicBtns[i];
+		var elem = basicBtn.element;
+		basicSettingBtnDiv.appendChild(elem);
+
+		elem.addEventListener(
+			'click',
+			that.handleToolClick.bind(this, basicBtn),
+			false
+		);
+	}
+
+	var basicSettingInputDiv = document.createElement('div');
+	basicSettingInputDiv.style.padding = '0 5px 0 0';
+	basicSettingInputDiv.style.margin = '5px 5px 0 5px';
+	basicSettingsDiv.appendChild(basicSettingInputDiv);
+
+	var ssaoDiv = document.createElement('div'); 
+	ssaoDiv.style.padding = '4px';
+	ssaoDiv.style.margin = '10px 0px 4px';
+	ssaoDiv.style.outline = '0px 0px 4px';
+	ssaoDiv.style.verticalAlign = 'top';
+	ssaoDiv.style.backgroundColor = 'rgb(243,243,243)';
+	ssaoDiv.style.borderRadius = '12px';
+	ssaoDiv.style.borderStyle = 'none';
+	ssaoDiv.className = 'mago3d-tools-ssao-div';
+	basicSettingInputDiv.appendChild(ssaoDiv);
+
+	var ssaoLabel = document.createElement('label');
+	ssaoLabel.style.width = '25%';
+	ssaoLabel.style.padding = '2px';
+	ssaoLabel.style.verticalAlign = 'middle';
+	ssaoLabel.style.display = 'inline-block';
+	ssaoLabel.style.textAlign = 'justify';
+	ssaoLabel.style.fontSize = '13.33333px';
+	ssaoLabel.setAttribute('for', 'ssaoRadius');
+	ssaoLabel.appendChild(document.createTextNode('SSAO'));
+	ssaoDiv.appendChild(ssaoLabel);
+
+	var ssaoInput = document.createElement('input');
+	ssaoInput.style.width = '45%';
+	ssaoInput.style.marginRight = '5px';
+	ssaoInput.style.padding = '5px';
+	ssaoInput.style.fontSize = 'small';
+	ssaoInput.style.verticalAlign = 'middle';
+	ssaoInput.style.lineHeight = '1.5em';
+	ssaoInput.style.color = '#444';
+	ssaoInput.setAttribute('id', 'ssaoRadius');
+	ssaoInput.setAttribute('name', 'ssaoRadius');
+	ssaoInput.setAttribute('type', 'text');
+	ssaoInput.setAttribute('value', this.magoManager.configInformation.ssaoRadius);
+	ssaoDiv.appendChild(ssaoInput);
+
+	var ssaoBtn = document.createElement('button');
+	ssaoBtn.setAttribute('type', 'button');
+	ssaoBtn.style.display = 'inline-block';
+	ssaoBtn.style.verticalAlign = 'middle';
+	ssaoBtn.style.padding = '2px 10px';
+	ssaoBtn.style.fontSize = '12px';
+	ssaoBtn.style.color = '#FFFFFF';
+	ssaoBtn.style.borderRadius = '12px';
+	ssaoBtn.style.borderStyle = 'none';
+	ssaoBtn.style.backgroundColor = '#636363';
+	ssaoBtn.appendChild(document.createTextNode('적용'));
+	ssaoBtn.addEventListener(
+		'click',
+		function() {
+			var ssao = ssaoInput.value;
+			if(isNaN(ssao)) {
+				alert('숫자만 입력 가능합니다.');
+				return;
+			} 
+			magoManager.magoPolicy.setSsaoRadius(ssao);
+			magoManager.sceneState.ssaoRadius[0] = Number(ssao);
+		},
+		false
+	);
+	ssaoDiv.appendChild(ssaoBtn); 
+	
+	var lodDiv = document.createElement('div'); 
+	lodDiv.style.padding = '4px';
+	lodDiv.style.margin = '10px 0px 4px';
+	lodDiv.style.outline = '0px 0px 4px';
+	lodDiv.style.verticalAlign = 'top';
+	lodDiv.style.backgroundColor = 'rgb(243,243,243)';
+	lodDiv.style.borderRadius = '12px';
+	lodDiv.style.borderStyle = 'none';
+	lodDiv.className = 'mago3d-tools-lod-div';
+	basicSettingInputDiv.appendChild(lodDiv);
+
+	var lodh3 = document.createElement('h3');
+	lodh3.style.fontSize = '15px';
+	lodh3.appendChild(document.createTextNode('Level of Detail'));
+	lodDiv.appendChild(lodh3);
+	
+	for(var i=0;i<6;i++)
+	{
+		var id = 'geoLod' + i;
+		var name = 'lod' + i;
+
+		var lodLabel = document.createElement('label');
+		lodLabel.style.width = '25%';
+		lodLabel.style.padding = '2px';
+		lodLabel.style.verticalAlign = 'middle';
+		lodLabel.style.display = 'inline-block';
+		lodLabel.style.textAlign = 'justify';
+		lodLabel.style.fontSize = '13.33333px';
+		lodLabel.setAttribute('for', id);
+		lodLabel.appendChild(document.createTextNode(name.toUpperCase()));
+		lodDiv.appendChild(lodLabel);
+
+		var lodInput = document.createElement('input');
+		lodInput.style.width = '45%';
+		lodInput.style.marginRight = '5px';
+		lodInput.style.padding = '5px';
+		lodInput.style.fontSize = 'small';
+		lodInput.style.verticalAlign = 'middle';
+		lodInput.style.lineHeight = '1.5em';
+		lodInput.style.color = '#444';
+		lodInput.setAttribute('id', id);
+		lodInput.setAttribute('name', name);
+		lodInput.setAttribute('type', 'text');
+		lodInput.setAttribute('value', this.magoManager.configInformation[name]);
+		lodDiv.appendChild(lodInput);
+	}
+
+	var lodBtn = document.createElement('button');
+	lodBtn.setAttribute('type', 'button');
+	lodBtn.style.display = 'inline-block';
+	lodBtn.style.verticalAlign = 'middle';
+	lodBtn.style.padding = '2px 10px';
+	lodBtn.style.fontSize = '12px';
+	lodBtn.style.color = '#FFFFFF';
+	lodBtn.style.borderRadius = '12px';
+	lodBtn.style.borderStyle = 'none';
+	lodBtn.style.backgroundColor = '#636363';
+	lodBtn.appendChild(document.createTextNode('적용'));
+	lodBtn.addEventListener(
+		'click',
+		function() {
+			var lod0 = document.getElementById('geoLod0').value;
+			var lod1 = document.getElementById('geoLod1').value;
+			var lod2 = document.getElementById('geoLod2').value;
+			var lod3 = document.getElementById('geoLod3').value;
+			var lod4 = document.getElementById('geoLod4').value;
+			var lod5 = document.getElementById('geoLod5').value;
+			if(isNaN(lod0) || isNaN(lod1) || isNaN(lod2)|| isNaN(lod3) || isNaN(lod4) || isNaN(lod5)) {
+				alert('숫자만 입력 가능합니다.');
+				return;
+			}
+
+			if (lod0 !== null && lod0 !== "") { magoManager.magoPolicy.setLod0DistInMeters(lod0); }
+			if (lod1 !== null && lod1 !== "") { magoManager.magoPolicy.setLod1DistInMeters(lod1); }
+			if (lod2 !== null && lod2 !== "") { magoManager.magoPolicy.setLod2DistInMeters(lod2); }
+			if (lod3 !== null && lod3 !== "") { magoManager.magoPolicy.setLod3DistInMeters(lod3); }
+			if (lod4 !== null && lod4 !== "") { magoManager.magoPolicy.setLod4DistInMeters(lod4); }
+			if (lod5 !== null && lod5 !== "") { magoManager.magoPolicy.setLod5DistInMeters(lod5); }
+		},
+		false
+	);
+	lodDiv.appendChild(lodBtn); 
+
+	var dataDiv = getGroupDiv('데이터 선택');
+	advanceToolDiv.appendChild(dataDiv);
+
+	var dataControlDiv = document.createElement('div'); 
+	dataControlDiv.style.padding = '4px';
+	dataControlDiv.style.margin = '10px 0px 4px';
+	dataControlDiv.style.outline = '0px 0px 4px';
+	dataControlDiv.style.verticalAlign = 'top';
+	dataControlDiv.style.backgroundColor = 'rgb(243,243,243)';
+	dataControlDiv.style.borderRadius = '12px';
+	dataControlDiv.style.borderStyle = 'none';
+	dataControlDiv.className = 'mago3d-tools-data-div';
+	dataDiv.appendChild(dataControlDiv);
+
+	var allText = document.createElement('strong');
+	allText.style.width = '25%';
+	allText.style.padding = '2px';
+	allText.style.verticalAlign = 'middle';
+	allText.style.display = 'inline-block';
+	allText.style.textAlign = 'justify';
+	allText.style.fontSize = '13.33333px';
+	allText.appendChild(document.createTextNode('전체'));
+	dataControlDiv.appendChild(allText);
+
+	var allSelectBtn = document.createElement('button');
+	allSelectBtn.setAttribute('type', 'button');
+	allSelectBtn.style.display = 'inline-block';
+	allSelectBtn.style.verticalAlign = 'middle';
+	allSelectBtn.style.padding = '2px 10px';
+	allSelectBtn.style.fontSize = '12px';
+	allSelectBtn.style.color = '#FFFFFF';
+	allSelectBtn.style.borderRadius = '12px';
+	allSelectBtn.style.borderStyle = 'none';
+	allSelectBtn.style.backgroundColor = '#636363';
+	allSelectBtn.appendChild(document.createTextNode('선택'));
+	dataControlDiv.appendChild(allSelectBtn);
+
+	var allMoveBtn = document.createElement('button');
+	allMoveBtn.setAttribute('type', 'button');
+	allMoveBtn.style.display = 'inline-block';
+	allMoveBtn.style.verticalAlign = 'middle';
+	allMoveBtn.style.marginLeft = '5px';
+	allMoveBtn.style.padding = '2px 10px';
+	allMoveBtn.style.fontSize = '12px';
+	allMoveBtn.style.color = '#FFFFFF';
+	allMoveBtn.style.borderRadius = '12px';
+	allMoveBtn.style.borderStyle = 'none';
+	allMoveBtn.style.backgroundColor = '#636363';
+	allMoveBtn.appendChild(document.createTextNode('이동'));
+	dataControlDiv.appendChild(allMoveBtn);
+
+	dataControlDiv.appendChild(document.createElement('br'));
+
+	var partText = document.createElement('strong');
+	partText.style.width = '25%';
+	partText.style.padding = '2px';
+	partText.style.verticalAlign = 'middle';
+	partText.style.display = 'inline-block';
+	partText.style.textAlign = 'justify';
+	partText.style.fontSize = '13.33333px';
+	partText.appendChild(document.createTextNode('부분'));
+	dataControlDiv.appendChild(partText);
+
+	var partSelectBtn = document.createElement('button');
+	partSelectBtn.setAttribute('type', 'button');
+	partSelectBtn.style.display = 'inline-block';
+	partSelectBtn.style.verticalAlign = 'middle';
+	partSelectBtn.style.padding = '2px 10px';
+	partSelectBtn.style.fontSize = '12px';
+	partSelectBtn.style.color = '#FFFFFF';
+	partSelectBtn.style.borderRadius = '12px';
+	partSelectBtn.style.borderStyle = 'none';
+	partSelectBtn.style.backgroundColor = '#636363';
+	partSelectBtn.appendChild(document.createTextNode('선택'));
+	dataControlDiv.appendChild(partSelectBtn);
+
+	var partMoveBtn = document.createElement('button');
+	partMoveBtn.setAttribute('type', 'button');
+	partMoveBtn.style.display = 'inline-block';
+	partMoveBtn.style.verticalAlign = 'middle';
+	partMoveBtn.style.marginLeft = '5px';
+	partMoveBtn.style.padding = '2px 10px';
+	partMoveBtn.style.fontSize = '12px';
+	partMoveBtn.style.color = '#FFFFFF';
+	partMoveBtn.style.borderRadius = '12px';
+	partMoveBtn.style.borderStyle = 'none';
+	partMoveBtn.style.backgroundColor = '#636363';
+	partMoveBtn.appendChild(document.createTextNode('이동'));
+	dataControlDiv.appendChild(partMoveBtn);
 
 	function getBasicButtonObject (type, title, text, runtype, action)
 	{
@@ -372,7 +434,7 @@ Tools.prototype.setControl = function(magoManager)
 		btn.style.borderStyle = 'none';
 		
 		return {
-			rutnType : runtype,
+			runType : runtype,
 			element  : btn,
 			action   : action
 		};
@@ -383,10 +445,9 @@ Tools.prototype.setControl = function(magoManager)
 		var div = document.createElement('div');
 		div.style.padding = '5px 10px';
 		div.style.margin = '0 0 20px 0';
-		div.style.border = '1px solid #ccc';
 		div.style.outline = '0px';
 		div.style.verticalAlign = 'top';
-		div.style.fontSize = '12PX';
+		div.style.fontSize = '16PX';
 		div.style.fontWeight = 'bold';
 		div.style.color = '#888';
 
@@ -396,131 +457,6 @@ Tools.prototype.setControl = function(magoManager)
 		strong.style.borderBottom = '1px solid #e2e2e2';
 		strong.appendChild(document.createTextNode(category));
 		div.appendChild(strong);
-
-		return div;
-	}
-
-	function getTitleDiv(title, funcType)
-	{
-		var div = document.createElement('div');
-		div.style.padding = '0px';
-		div.style.margin = '0px';
-		div.style.outline = '0px';
-		div.style.verticalAlign = 'top';
-		div.style.width = '100%';
-		div.style.height = '100%';
-		div.style.marginBottom = '10px !important';
-		
-		var h3 = document.createElement('h3');
-		h3.style.paddingLeft = '2px';
-		h3.style.fontSize = '12px';
-		h3.style.display = 'inline-block';
-		h3.appendChild(document.createTextNode("\u25AA" + title));
-		div.appendChild(h3);
-
-		if (funcType === 'adjust')
-		{
-			var btn = document.createElement('button');
-			btn.setAttribute('type', 'button');
-			btn.style.float = 'right';
-			btn.style.display = 'inline-block';
-			btn.style.verticalAlign = 'middle';
-			btn.style.padding = '2px 10px';
-			btn.style.fontSize = '10px';
-			btn.style.color = '#FFFFFF';
-			btn.style.borerRadius = '2px';
-			btn.style.borer = '1px solid #727272';
-			btn.style.backgroundColor = '#636363';
-			btn.appendChild(document.createTextNode('적용'));
-			div.appendChild(btn);
-
-			btn.addEventListener(
-				'mouseenter',
-				function()
-				{
-					btn.style.color = '#477cdb';
-					btn.style.border = '1px solid #477cdb';
-					btn.style.backgroundColor = '#fff';
-				},
-				false
-			);
-			
-			btn.addEventListener(
-				'mouseleave',
-				function()
-				{
-					btn.style.color = '#FFFFFF';
-					btn.style.border = '1px solid #727272';
-					btn.style.backgroundColor = '#636363';
-				},
-				false
-			);
-		}
-		return div;
-	}
-
-	/**
-	 * 
-	 * @typedef {ContentOption}
-	 * @property {string} id
-	 * @property {string} label
-	 * @property {string} type
-	 * @property {string} default
-	 * @property {string} unit
-	 */
-	/**
-	 * 
-	 * @param {Array<ContentOption>} options 
-	 */
-	function getContentDiv(options)
-	{
-		var div = document.createElement('div');
-		div.style.padding = '0px';
-		div.style.margin = '0px';
-		div.style.outline = '0px';
-		div.style.verticalAlign = 'top';
-
-		for (var i=0, len=options.length;i<len;i++)
-		{
-			var o = options[i];
-			var oDiv = document.createElement('div');
-			oDiv.style.padding = '4px';
-			oDiv.style.margin = '0 0 4px 0';
-			oDiv.style.outline = '0px';
-			oDiv.style.verticalAlign = 'top';
-			oDiv.style.backgroundColor = '#f3f3f3';
-
-			var oLabel = document.createElement('label');
-			oLabel.style.width = '36%';
-			oLabel.style.padding = '2px';
-			oLabel.style.verticalAlign = 'middle';
-			oLabel.style.display = 'inline-block';
-			oLabel.style.textAlign = 'justify';
-			oLabel.style.fontSize = '11px';
-			oLabel.setAttribute('for', o.id);
-			oLabel.appendChild(document.createTextNode(o.label));
-			oDiv.appendChild(oLabel);
-
-			if (o.type === 'text')
-			{
-				var oInput = document.createElement('input');
-				oInput.style.width = '45%';
-				oInput.style.marginRight = '5px';
-				oInput.style.padding = '5px';
-				oInput.style.fontSize = 'small';
-				oInput.style.verticalAlign = 'middle';
-				oInput.style.lineHeight = '1.5em';
-				oInput.style.color = '#444';
-				oInput.setAttribute('id', o.id);
-				oInput.setAttribute('name', o.id);
-				oInput.setAttribute('type', o.type);
-				oInput.setAttribute('value', o.default);
-				oDiv.appendChild(oInput);
-			}
-
-			oDiv.appendChild(document.createTextNode(o.unit));
-			div.appendChild(oDiv);
-		}
 
 		return div;
 	}
