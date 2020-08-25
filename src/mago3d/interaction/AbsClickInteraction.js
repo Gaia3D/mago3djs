@@ -3,14 +3,14 @@
 /**
  * This is the interaction for draw geometry.
  * @constructor
- * @class AbsSelectInteraction
+ * @class AbsClickInteraction
  * 
  * @abstract
  * @param {object} option layer object.
  */
-var AbsSelectInteraction = function(option) 
+var AbsClickInteraction = function(option) 
 {
-	if (!(this instanceof AbsSelectInteraction)) 
+	if (!(this instanceof AbsClickInteraction)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
@@ -39,13 +39,13 @@ var AbsSelectInteraction = function(option)
 
 	this.tolerance = 0;
 };
-AbsSelectInteraction.prototype = Object.create(Interaction.prototype);
-AbsSelectInteraction.prototype.constructor = AbsSelectInteraction;
+AbsClickInteraction.prototype = Object.create(Interaction.prototype);
+AbsClickInteraction.prototype.constructor = AbsClickInteraction;
 
 /**
  * interaction init
  */
-AbsSelectInteraction.prototype.init = function() 
+AbsClickInteraction.prototype.init = function() 
 {
 	this.begin = false;
 	this.startPoint = undefined;
@@ -54,10 +54,10 @@ AbsSelectInteraction.prototype.init = function()
 /**
  * set active. set true, this interaction active, another interaction deactive.
  * @param {boolean} active
- * @fires AbsSelectInteraction#ACTIVE
- * @fires AbsSelectInteraction#DEACTIVE
+ * @fires AbsClickInteraction#ACTIVE
+ * @fires AbsClickInteraction#DEACTIVE
  */
-AbsSelectInteraction.prototype.setActive = function(active) 
+AbsClickInteraction.prototype.setActive = function(active) 
 {
 	if (!this.manager || !(this.manager instanceof MagoManager)) 
 	{
@@ -83,7 +83,7 @@ AbsSelectInteraction.prototype.setActive = function(active)
  * handle event
  * @param {BrowserEvent} browserEvent
  */
-AbsSelectInteraction.prototype.handle = function(browserEvent) 
+AbsClickInteraction.prototype.handle = function(browserEvent) 
 {
 	var type = browserEvent.type;
 	if (!(type === MagoManager.EVENT_TYPE.MOUSEMOVE || type === MagoManager.EVENT_TYPE.LEFTDOWN || type === MagoManager.EVENT_TYPE.RIGHTDOWN || type === MagoManager.EVENT_TYPE.MIDDLEDOWN || type === MagoManager.EVENT_TYPE.LEFTUP || type === MagoManager.EVENT_TYPE.RIGHTUP || type === MagoManager.EVENT_TYPE.MIDDLEUP))
@@ -135,7 +135,7 @@ AbsSelectInteraction.prototype.handle = function(browserEvent)
  * handle event
  * @param {BrowserEvent} browserEvent
  */
-AbsSelectInteraction.prototype.handleDownEvent = function(browserEvent)
+AbsClickInteraction.prototype.handleDownEvent = function(browserEvent)
 {
 	return abstract();
 };
@@ -143,7 +143,7 @@ AbsSelectInteraction.prototype.handleDownEvent = function(browserEvent)
  * handle event
  * @param {BrowserEvent} browserEvent
  */
-AbsSelectInteraction.prototype.handleUpEvent = function(browserEvent)
+AbsClickInteraction.prototype.handleUpEvent = function(browserEvent)
 {
 	return abstract();
 };
@@ -152,24 +152,7 @@ AbsSelectInteraction.prototype.handleUpEvent = function(browserEvent)
  * handle event
  * @param {BrowserEvent} browserEvent
  */
-AbsSelectInteraction.prototype.handleMoveEvent = function(browserEvent)
+AbsClickInteraction.prototype.handleMoveEvent = function(browserEvent)
 {
 	return abstract();
 };
-
-/**
- * select 
- * @param {Point2D} screenCoordinate
- * @param {boolean} bObject
- */
-AbsSelectInteraction.prototype.select = function(screenCoordinate, bObject)
-{
-	var manager = this.manager;
-	var selectManager = manager.selectionManager;
-
-	if (manager.selectionFbo === undefined) 
-	{ manager.selectionFbo = new FBO(gl, manager.sceneState.drawingBufferWidth, manager.sceneState.drawingBufferHeight, {matchCanvasSize : true}); }
-
-	var gl = manager.getGl();
-	selectManager.selectObjectByPixel(gl, screenCoordinate.x, screenCoordinate.y, bObject);
-}
