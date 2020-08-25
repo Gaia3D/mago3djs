@@ -5,13 +5,23 @@
  * @class MagoManager
  * @constructor
  */
-var MagoManager = function(options) 
+var MagoManager = function(config) 
 {
 	if (!(this instanceof MagoManager)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	Emitter.call(this);
+
+	/**
+	 * mago config.
+	 * @type {MagoConfig}
+	 * @default MagoConfig.
+	 * 
+	 * @private
+	 */
+	this.config = config;
+
 	/**
 	 * Auxiliary renderer.
 	 * @type {Renderer}
@@ -38,7 +48,8 @@ var MagoManager = function(options)
 	 * @private
 	 */
 	this.postFxShadersManager = new PostFxShadersManager();
-	
+
+	this.configInformation = this.config.getPolicy();
 	/**
 	 * Manages the request & loading files.
 	 * @type {ReaderWriter}
@@ -46,7 +57,7 @@ var MagoManager = function(options)
 	 * 
 	 * @private
 	 */
-	this.readerWriter = new ReaderWriter();
+	this.readerWriter = new ReaderWriter(this.configInformation);
 	
 	/**
 	 * Contains the Mago3D policy data.
@@ -55,7 +66,7 @@ var MagoManager = function(options)
 	 * 
 	 * @private
 	 */
-	this.magoPolicy = new Policy();
+	this.magoPolicy = new Policy(this.configInformation);
 	
 	/**
 	 * Manages & controls the movement of the objects in the scene.
@@ -173,14 +184,14 @@ var MagoManager = function(options)
 	this.thereAreStartMovePoint = false;
 	this.startMovPoint = new Point3D();
 	
-	this.configInformation = MagoConfig.getPolicy();
+	
 	this.cameraFPV = new FirstPersonView();
 	this.myCameraSCX;
 	// var to delete.*********************************************
 	this.loadQueue = new LoadQueue(this); // Old. delete.***
 
 	// Vars.****************************************************************
-	this.sceneState = new SceneState(); // this contains all scene mtrices and camera position.***
+	this.sceneState = new SceneState(this.config); // this contains all scene mtrices and camera position.***
 	this.sceneState.setApplySunShadows(false);
 
 	
@@ -188,7 +199,7 @@ var MagoManager = function(options)
 	this.magoPolicy.objectMoveMode = CODE.moveMode.NONE;
 
 	this.selectionColor = new SelectionColor();
-	this.vboMemoryManager = new VBOMemoryManager();
+	this.vboMemoryManager = new VBOMemoryManager(this.configInformation);
 	
 	if (this.configInformation !== undefined)
 	{
@@ -429,7 +440,7 @@ MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums)
 
 	if (this.configInformation === undefined)
 	{
-		this.configInformation = MagoConfig.getPolicy();
+		this.configInformation = this.config.getPolicy();
 	}
 	if (scene)
 	{
@@ -2367,7 +2378,7 @@ MagoManager.prototype.isDragging = function()
  */
 MagoManager.prototype.setCameraMotion = function(state)
 {
-	if (MagoConfig.isTwoDimension()) 
+	if (this.config.isTwoDimension()) 
 	{
 		return;
 	}
@@ -3183,7 +3194,7 @@ MagoManager.prototype.saveHistoryObjectMovement = function(refObject, node)
 	changeHistory.setProjectId(projectId);
 	changeHistory.setDataKey(dataKey);
 	changeHistory.setObjectIndexOrder(objectIndex);
-	MagoConfig.saveMovingHistory(projectId, dataKey, objectIndex, changeHistory);
+	this.config.saveMovingHistory(projectId, dataKey, objectIndex, changeHistory);
 };
 
 
@@ -3815,7 +3826,7 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 		var data_key = this.selectionManager.currentNodeSelected.data.nodeId;
 		var objectIndexOrder = this.objectSelected._id;
 		
-		MagoConfig.deleteMovingHistoryObject(projectId, data_key, objectIndexOrder);
+		this.config.deleteMovingHistoryObject(projectId, data_key, objectIndexOrder);
 		this.objectMoved = true; // this provoques that on leftMouseUp -> saveHistoryObjectMovement
 		
 	}
@@ -4396,7 +4407,7 @@ MagoManager.prototype.checkChangesHistoryMovements = function(nodesArray)
 		dataKey = node.data.nodeId;
 		
 		// objects movement.
-		moveHistoryMap = MagoConfig.getMovingHistoryObjects(projectId, dataKey);
+		moveHistoryMap = this.config.getMovingHistoryObjects(projectId, dataKey);
 		if (moveHistoryMap)
 		{
 			node.data.moveHistoryMap = moveHistoryMap;
@@ -4520,7 +4531,7 @@ MagoManager.prototype.checkChangesHistoryColors = function(nodesArray)
 		projectId = node.data.projectId;
 		dataKey = node.data.nodeId;
 
-		colorChangedHistoryMap = MagoConfig.getColorHistorys(projectId, dataKey);
+		colorChangedHistoryMap = this.config.getColorHistorys(projectId, dataKey);
 		if (colorChangedHistoryMap)
 		{
 			var data = node.data;
@@ -4530,7 +4541,7 @@ MagoManager.prototype.checkChangesHistoryColors = function(nodesArray)
 		}
 	}
 	
-	var allColorHistoryMap = MagoConfig.getAllColorHistory();
+	var allColorHistoryMap = this.config.getAllColorHistory();
 	if (allColorHistoryMap)
 	{
 		for (var key in allColorHistoryMap) 
@@ -4632,7 +4643,7 @@ MagoManager.prototype.getObjectLabel = function()
 		if (this.canvasObjectLabel === undefined)
 		{ return; }
 
-		var magoDiv = document.getElementById(MagoConfig.getContainerId());
+		var magoDiv = document.getElementById(this.config.getContainerId());
 		var offsetLeft = magoDiv.offsetLeft;
 		var offsetTop = magoDiv.offsetTop;
 		var offsetWidth = magoDiv.offsetWidth;
@@ -5566,7 +5577,7 @@ MagoManager.prototype.flyToBuilding = function(apiName, projectId, dataKey)
 	var node = this.hierarchyManager.getNodeByDataName(projectId, "nodeId", dataKey);
 	if (node === undefined)
 	{ 
-		apiResultCallback( MagoConfig.getPolicy().geo_callback_apiresult, apiName, "-1");
+		apiResultCallback( this.config.getPolicy().geo_callback_apiresult, apiName, "-1");
 		return; 
 	}
 	
@@ -5578,7 +5589,7 @@ MagoManager.prototype.flyToBuilding = function(apiName, projectId, dataKey)
 		geoLoc = node.calculateGeoLocData(this);
 		if (geoLoc === undefined)
 		{
-			apiResultCallback( MagoConfig.getPolicy().geo_callback_apiresult, apiName, "-1");
+			apiResultCallback( this.config.getPolicy().geo_callback_apiresult, apiName, "-1");
 			return; 
 		}
 	}
@@ -5640,7 +5651,7 @@ MagoManager.prototype.selectedObjectNotice = function(neoBuilding)
 	var dataKey = node.data.nodeId;
 	var projectId = node.data.projectId;
 
-	if (MagoConfig.getPolicy().geo_callback_enable === "true") 
+	if (this.config.getPolicy().geo_callback_enable === "true") 
 	{
 		//if (this.objMarkerSC === undefined) { return; }
 		var objectId = null;
@@ -5649,7 +5660,7 @@ MagoManager.prototype.selectedObjectNotice = function(neoBuilding)
 		// click object 정보를 표시
 		if (this.magoPolicy.getObjectInfoViewEnable()) 
 		{
-			selectedObjectCallback(		MagoConfig.getPolicy().geo_callback_selectedobject,
+			selectedObjectCallback(		this.config.getPolicy().geo_callback_selectedobject,
 				projectId,
 				dataKey,
 				objectId,
@@ -5666,7 +5677,7 @@ MagoManager.prototype.selectedObjectNotice = function(neoBuilding)
 		{
 			//if (this.objMarkerSC === undefined) { return; }
 			
-			insertIssueCallback(	MagoConfig.getPolicy().geo_callback_insertissue,
+			insertIssueCallback(	this.config.getPolicy().geo_callback_insertissue,
 				projectId,
 				dataKey,
 				objectId,
@@ -5728,7 +5739,7 @@ MagoManager.prototype.getObjectIndexFile = function(projectId, projectDataFolder
 {
 	if (this.configInformation === undefined)
 	{
-		this.configInformation = MagoConfig.getPolicy();
+		this.configInformation = this.config.getPolicy();
 	}
 	
 	//this.buildingSeedList = new BuildingSeedList();
@@ -5747,10 +5758,10 @@ MagoManager.prototype.getObjectIndexFileForData = function(projectId, f4dObject)
 {
 	if (this.configInformation === undefined)
 	{
-		this.configInformation = MagoConfig.getPolicy();
+		this.configInformation = this.config.getPolicy();
 	}
 	
-	var f4dGroupObject = MagoConfig.getData(CODE.PROJECT_ID_PREFIX + projectId);
+	var f4dGroupObject = this.config.getData(CODE.PROJECT_ID_PREFIX + projectId);
 	var node = this.hierarchyManager.getNodeByDataKey(projectId, f4dGroupObject.dataGroupKey);
 
 	var groupDataFolder = node.data.projectFolderName;
@@ -5794,7 +5805,7 @@ MagoManager.prototype.getObjectIndexFileForData = function(projectId, f4dObject)
 	}
 	
 	var geometrySubDataPath = groupDataFolder;
-	var fileName = this.readerWriter.geometryDataPath + "/" + geometrySubDataPath + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + MagoConfig.getPolicy().content_cache_version;
+	var fileName = this.readerWriter.geometryDataPath + "/" + geometrySubDataPath + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + this.config.getPolicy().content_cache_version;
 	this.readerWriter.getObjectIndexFileForData(fileName, this, projectId, newDataKeys, f4dObject);
 };
 
@@ -5807,7 +5818,7 @@ MagoManager.prototype.getObjectIndexFileSmartTileF4d = function(projectDataFolde
 {
 	if (this.configInformation === undefined)
 	{
-		this.configInformation = MagoConfig.getPolicy();
+		this.configInformation = this.config.getPolicy();
 	}
 
 	var geometrySubDataPath = projectDataFolder;
@@ -6197,7 +6208,7 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedMap, projectId, f4dOb
 	}
 	//var realTimeLocBlocksList = MagoConfig.getData().alldata; // original.***
 	// "projectId" = json file name.
-	var realTimeLocBlocksList = f4dObjectJson || MagoConfig.getData(CODE.PROJECT_ID_PREFIX + projectId);
+	var realTimeLocBlocksList = f4dObjectJson || this.config.getData(CODE.PROJECT_ID_PREFIX + projectId);
 	var buildingSeed;
 	var buildingId;
 	var newLocation;
@@ -6219,6 +6230,7 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedMap, projectId, f4dOb
 	}*/
 	
 	var projectFolderName = getProjectFolderName(realTimeLocBlocksList);
+	console.info(realTimeLocBlocksList);
 	if (!Array.isArray(realTimeLocBlocksList)) 
 	{
 		this.makeNode(realTimeLocBlocksList, physicalNodesArray, buildingSeedMap, projectFolderName, projectId);
@@ -6596,10 +6608,10 @@ MagoManager.prototype.callAPI = function(api)
 	else if (apiName === "deleteAllObjectMove") 
 	{
 		// delete "aditionalMove" of the objects.***
-		var moveHistoryMap = MagoConfig.getAllMovingHistory(); // get colorHistoryMap.***
+		var moveHistoryMap = this.config.getAllMovingHistory(); // get colorHistoryMap.***
 		if (moveHistoryMap === undefined)
 		{
-			MagoConfig.clearMovingHistory();
+			this.config.clearMovingHistory();
 			return;
 		}
 		
@@ -6648,16 +6660,16 @@ MagoManager.prototype.callAPI = function(api)
 			}
 		}
 		
-		MagoConfig.clearMovingHistory();
+		this.config.clearMovingHistory();
 	}
 	else if (apiName === "deleteAllChangeColor") 
 	{
 		// 1rst, must delete the aditionalColors of objects.***
-		var colorHistoryMap = MagoConfig.getAllColorHistory(); // get colorHistoryMap.***
+		var colorHistoryMap = this.config.getAllColorHistory(); // get colorHistoryMap.***
 		
 		if (colorHistoryMap === undefined)
 		{
-			MagoConfig.clearColorHistory();
+			this.config.clearColorHistory();
 			return;
 		}
 		
@@ -6714,7 +6726,7 @@ MagoManager.prototype.callAPI = function(api)
 			}
 		}
 		
-		MagoConfig.clearColorHistory();
+		this.config.clearColorHistory();
 	}
 	else if (apiName === "changeInsertIssueMode") 
 	{
@@ -6904,7 +6916,7 @@ MagoManager.prototype.callAPI = function(api)
 		
 		if (node === undefined)
 		{
-			apiResultCallback( MagoConfig.getPolicy().geo_callback_apiresult, apiName, "-1");
+			apiResultCallback( this.config.getPolicy().geo_callback_apiresult, apiName, "-1");
 			return;
 		}
 		
@@ -6913,7 +6925,7 @@ MagoManager.prototype.callAPI = function(api)
 		
 		if (dataName === undefined || geoLocDataManager === undefined)
 		{
-			apiResultCallback( MagoConfig.getPolicy().geo_callback_apiresult, apiName, "-1");
+			apiResultCallback( this.config.getPolicy().geo_callback_apiresult, apiName, "-1");
 			return;
 		}
 		
@@ -6921,7 +6933,7 @@ MagoManager.prototype.callAPI = function(api)
 		
 		if (geoLocdata === undefined || geoLocdata.geographicCoord === undefined)
 		{
-			apiResultCallback( MagoConfig.getPolicy().geo_callback_apiresult, apiName, "-1");
+			apiResultCallback( this.config.getPolicy().geo_callback_apiresult, apiName, "-1");
 			return;
 		}
 		

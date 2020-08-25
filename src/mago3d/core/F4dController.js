@@ -140,8 +140,8 @@ F4dController.prototype.addF4dGroup = function(f4dLayerObject)
 			groupDataFolder = groupDataFolder.replace(/\/+$/, '');
 		}
 
-		MagoConfig.setData(CODE.PROJECT_ID_PREFIX + groupId, f4dLayerObject);
-		MagoConfig.setProjectDataFolder(CODE.PROJECT_DATA_FOLDER_PREFIX + groupDataFolder, groupDataFolder);
+		this.magoManager.config.setData(CODE.PROJECT_ID_PREFIX + groupId, f4dLayerObject);
+		this.magoManager.config.setProjectDataFolder(CODE.PROJECT_DATA_FOLDER_PREFIX + groupDataFolder, groupDataFolder);
         
 		magoManager.getObjectIndexFile(groupId, groupDataFolder);
 	}

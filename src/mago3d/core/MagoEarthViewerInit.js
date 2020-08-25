@@ -11,7 +11,7 @@ MagoEarthViewerInit.prototype.constructor = MagoEarthViewerInit;
 
 MagoEarthViewerInit.prototype.init = function() 
 {
-	this.magoManager = new MagoManager();
+	this.magoManager = new MagoManager(this.config);
 	this.viewer = new MagoWorld(this.magoManager);
 	
 	this.magoManager.magoWorld = this.viewer;

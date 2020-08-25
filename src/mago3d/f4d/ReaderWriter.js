@@ -4,7 +4,7 @@
  * 어떤 일을 하고 있습니까?
  * @class ReaderWriter
  */
-var ReaderWriter = function() 
+var ReaderWriter = function(policy) 
 {
 	if (!(this instanceof ReaderWriter)) 
 	{
@@ -12,7 +12,7 @@ var ReaderWriter = function()
 	}
 
 	//this.geometryDataPath = "/F4D_GeometryData";
-	var serverPolicy = MagoConfig.getPolicy();
+	var serverPolicy = policy;
 	if (serverPolicy !== undefined)
 	{ this.geometryDataPath = serverPolicy.geo_data_path; }
 	
@@ -898,7 +898,7 @@ ReaderWriter.prototype.getObjectIndexFileForSmartTile = function(fileName, magoM
 			var buildingSeedMap = new BuildingSeedMap();
 			buildingSeedMap.dataArrayBuffer = arrayBuffer;
 			buildingSeedMap.parseBuildingSeedArrayBuffer();
-
+			console.info(buildingSeedMap);
 			magoManager.makeSmartTile(buildingSeedMap, projectId);
 			arrayBuffer = null;
 		}

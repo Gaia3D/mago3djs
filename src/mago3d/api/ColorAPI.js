@@ -77,6 +77,6 @@ ColorAPI.changeColor = function(api, magoManager)
 	for (var i=0; i<historiesCount; i++)
 	{
 		changeHistory = changeHistorys[i];
-		MagoConfig.saveColorHistory(projectId, dataKey, changeHistory.getObjectId(), changeHistory);
+		magoManager.config.saveColorHistory(projectId, dataKey, changeHistory.getObjectId(), changeHistory);
 	}
 };

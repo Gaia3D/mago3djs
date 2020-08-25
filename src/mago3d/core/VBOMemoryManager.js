@@ -4,7 +4,7 @@
  * @class VBOMemoryManager
  * @constructor
  */
-var VBOMemoryManager = function() 
+var VBOMemoryManager = function(policy) 
 {
 	if (!(this instanceof VBOMemoryManager)) 
 	{
@@ -13,7 +13,7 @@ var VBOMemoryManager = function()
 	this.gl;
 	
 	// if "enableMemoryManagement" == false -> no management of the gpu memory.
-	this.enableMemoryManagement = defaultValue(MagoConfig.getPolicy().enableMemoryManagement, false);
+	this.enableMemoryManagement = defaultValue(policy.enableMemoryManagement, false);
 	
 	this.buffersKeyWorld = new VBOKeysWorld();
 	this.elementKeyWorld = new VBOKeysWorld();
