@@ -430,7 +430,7 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	
 	// Check if we are under selected data structure.***
 	var selectionManager = magoManager.selectionManager;
-	if (magoManager.nodeSelected === this)
+	if (selectionManager.getSelectedF4dNode() === this)
 	{ selectionManager.parentSelected = true; }
 	else 
 	{ selectionManager.parentSelected = false; }

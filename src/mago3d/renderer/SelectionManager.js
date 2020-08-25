@@ -130,6 +130,72 @@ SelectionManager.prototype.setSelectedGeneral = function(selectedObject)
  * @alias SelectionManager
  * @class SelectionManager
  */
+SelectionManager.prototype.getSelectedF4dBuilding = function()
+{
+	return this.currentBuildingSelected;
+};
+
+/**
+ * SelectionManager
+ * 
+ * @alias SelectionManager
+ * @class SelectionManager
+ */
+SelectionManager.prototype.setSelectedF4dBuilding = function(building)
+{
+	this.currentBuildingSelected = building;
+};
+
+/**
+ * SelectionManager
+ * 
+ * @alias SelectionManager
+ * @class SelectionManager
+ */
+SelectionManager.prototype.getSelectedF4dObject = function()
+{
+	return this.currentReferenceSelected;
+};
+
+/**
+ * SelectionManager
+ * 
+ * @alias SelectionManager
+ * @class SelectionManager
+ */
+SelectionManager.prototype.setSelectedF4dObject = function(object)
+{
+	this.currentReferenceSelected = object;
+};
+
+/**
+ * SelectionManager
+ * 
+ * @alias SelectionManager
+ * @class SelectionManager
+ */
+SelectionManager.prototype.getSelectedF4dNode = function()
+{
+	return this.currentNodeSelected;
+};
+
+/**
+ * SelectionManager
+ * 
+ * @alias SelectionManager
+ * @class SelectionManager
+ */
+SelectionManager.prototype.setSelectedF4dNode = function(node)
+{
+	this.currentNodeSelected = node;
+};
+
+/**
+ * SelectionManager
+ * 
+ * @alias SelectionManager
+ * @class SelectionManager
+ */
 SelectionManager.prototype.setCandidates = function(idxKey, reference, octree, building, node)
 {
 	if (reference)
@@ -275,7 +341,7 @@ SelectionManager.prototype.TEST__CurrGeneralObjSel = function()
  * 
  * @private
  */
-SelectionManager.prototype.selectObject = function(gl, mouseX, mouseY, resultSelectedArray, bSelectObjects) 
+SelectionManager.prototype.selectObjectByPixel = function(gl, mouseX, mouseY, bSelectObjects) 
 {
 	if (bSelectObjects === undefined)
 	{ bSelectObjects = false; }
@@ -292,55 +358,48 @@ SelectionManager.prototype.selectObject = function(gl, mouseX, mouseY, resultSel
 	var totalPixelsCount = mosaicWidth*mosaicHeight;
 	var pixels = new Uint8Array(4 * mosaicWidth * mosaicHeight); // 4 x 3x3 pixel, total 9 pixels select.***
 	var pixelX = mouseX - Math.floor(mosaicWidth/2);
-	var pixelY = this.sceneState.drawingBufferHeight - mouseY - Math.floor(mosaicHeight/2); // origin is bottom.***
+	var pixelY = this.magoManager.sceneState.drawingBufferHeight - mouseY - Math.floor(mosaicHeight/2); // origin is bottom.***
 	
 	if (pixelX < 0){ pixelX = 0; }
 	if (pixelY < 0){ pixelY = 0; }
 	
 	gl.readPixels(pixelX, pixelY, mosaicWidth, mosaicHeight, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null); // unbind framebuffer.***
-	
-	var selectionManager = this.selectionManager;
 
 	// now, select the object.***
 	// The center pixel of the selection is 12, 13, 14.***
 	var centerPixel = Math.floor(totalPixelsCount/2);
-	var idx = this.selectionColor.decodeColor3(pixels[centerPixel*3], pixels[centerPixel*3+1], pixels[centerPixel*3+2]);
+	var idx = this.magoManager.selectionColor.decodeColor3(pixels[centerPixel*3], pixels[centerPixel*3+1], pixels[centerPixel*3+2]);
 	
 	// Provisionally.***
 	if (bSelectObjects)
-	{ selectionManager.selectObjects(idx); }
+	{ this.selectObjects(idx); }
 	else 
 	{
-		selectionManager.currentReferenceSelected = selectionManager.referencesMap[idx];
-		selectionManager.currentOctreeSelected = selectionManager.octreesMap[idx];
-		selectionManager.currentBuildingSelected = selectionManager.buildingsMap[idx];
-		selectionManager.currentNodeSelected = selectionManager.nodesMap[idx];
+		this.currentReferenceSelected = this.referencesMap[idx];
+		this.currentOctreeSelected = this.octreesMap[idx];
+		this.currentBuildingSelected = this.buildingsMap[idx];
+		this.currentNodeSelected = this.nodesMap[idx];
 	}
 	
-	var selectedObject = selectionManager.currentReferenceSelected;
+	var selectedObject = this.currentReferenceSelected;
 
-	resultSelectedArray[0] = selectionManager.currentBuildingSelected;
-	resultSelectedArray[1] = selectionManager.currentOctreeSelected;
-	resultSelectedArray[2] = selectionManager.currentReferenceSelected;
-	resultSelectedArray[3] = selectionManager.currentNodeSelected;
-	
 	// Additionally check if selected an edge of topology.***
-	var selNetworkEdges = selectionManager.getSelectionCandidatesFamily("networkEdges");
+	var selNetworkEdges = this.getSelectionCandidatesFamily("networkEdges");
 	if (selNetworkEdges)
 	{
 		var currEdgeSelected = selNetworkEdges.currentSelected;
 		var i = 0;
 		while (currEdgeSelected === undefined && i< totalPixelsCount)
 		{
-			var idx = this.selectionColor.decodeColor3(pixels[i*3], pixels[i*3+1], pixels[i*3+2]);
+			var idx = this.magoManager.selectionColor.decodeColor3(pixels[i*3], pixels[i*3+1], pixels[i*3+2]);
 			currEdgeSelected = selNetworkEdges.selectObject(idx);
 			i++;
 		}
 	}
 	
 	// TEST: Check if selected a cuttingPlane.***
-	var selGeneralObjects = selectionManager.getSelectionCandidatesFamily("general");
+	var selGeneralObjects = this.getSelectionCandidatesFamily("general");
 	if (selGeneralObjects)
 	{
 		var currObjectSelected = selGeneralObjects.currentSelected;
@@ -355,8 +414,9 @@ SelectionManager.prototype.selectObject = function(gl, mouseX, mouseY, resultSel
 	
 	// Check general objects.***
 	if (selectedObject === undefined)
-	{ selectedObject = selectionManager.selCandidatesMap[idx]; }
-	selectionManager.setSelectedGeneral(selectionManager.selCandidatesMap[idx]);
-	
-	return selectedObject;
+	{ selectedObject = this.selCandidatesMap[idx]; }
+	this.setSelectedGeneral(this.selCandidatesMap[idx]);
+
+	this.magoManager.selectionFbo.unbind();
+	gl.enable(gl.CULL_FACE);
 };

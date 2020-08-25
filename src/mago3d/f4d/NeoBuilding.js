@@ -1786,7 +1786,7 @@ NeoBuilding.prototype.renderSkin = function(magoManager, shader, renderType)
 
 	var gl = magoManager.sceneState.gl;
 
-	magoManager.renderer.currentObjectsRendering.curOctree = this;
+	//magoManager.renderer.currentObjectsRendering.curOctree = this;
 	
 	var currentObjectsRendering = magoManager.renderer.currentObjectsRendering;
 	var selCandidates;
@@ -1876,110 +1876,6 @@ NeoBuilding.prototype.renderSkin = function(magoManager, shader, renderType)
 	
 	gl.uniform1i(shader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.
 	skinLego.render(magoManager, renderType, renderTexture, shader, this);
-};
-
-/**
- * 어떤 일을 하고 있습니까?
- */
-NeoBuilding.prototype.renderSkin__original = function(magoManager, shader, renderType) 
-{
-	var skinLego = this.getCurrentSkin();
-		
-	if (skinLego === undefined)
-	{ return; }
-
-	if (skinLego.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
-	{ return; }
-
-	var gl = magoManager.sceneState.gl;
-	
-	magoManager.renderer.currentObjectsRendering.curOctree = this;
-	
-	var currentObjectsRendering = magoManager.renderer.currentObjectsRendering;
-	var selCandidates;
-	var selectionColor;
-	var currentNode;
-	var currentOctree;
-	
-	if (renderType === 2)
-	{
-		selCandidates = magoManager.selectionManager;
-		selectionColor = magoManager.selectionColor;
-		renderTexture = false; // reassign value for this var.
-		currentNode = currentObjectsRendering.curNode;
-		currentOctree = currentObjectsRendering.curOctree;
-	}
-	
-	var renderTexture = true;
-	
-	// if the building is highlighted, the use highlight oneColor4.
-	if (renderType === 1)
-	{
-		gl.uniform4fv(shader.oneColor4_loc, [0.7, 0.7, 0.7, 1.0]);
-		if (this.isHighLighted)
-		{
-			//gl.uniform1i(shader.bUse1Color_loc, true);
-			gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
-			gl.uniform4fv(shader.oneColor4_loc, this.highLightColor4); //.
-			renderTexture = false;
-		}
-		else if (this.isColorChanged)
-		{
-			//gl.uniform1i(shader.bUse1Color_loc, true);
-			gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
-			gl.uniform4fv(shader.oneColor4_loc, [this.aditionalColor.r, this.aditionalColor.g, this.aditionalColor.b, this.aditionalColor.a]); //.
-			renderTexture = false;
-		}
-		else
-		{
-			//gl.uniform1i(shader.bUse1Color_loc, false);
-		}
-		//----------------------------------------------------------------------------------
-		if (renderTexture)
-		{
-			if (skinLego.texture !== undefined && skinLego.texture.texId)
-			{
-				
-				shader.enableVertexAttribArray(shader.texCoord2_loc);
-				gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
-				if (shader.last_tex_id !== skinLego.texture.texId)
-				{
-					gl.activeTexture(gl.TEXTURE2);
-					gl.bindTexture(gl.TEXTURE_2D, skinLego.texture.texId);
-					shader.last_tex_id = skinLego.texture.texId;
-				}
-			}
-			else 
-			{
-				//return;
-				if (magoManager.textureAux_1x1 !== undefined)
-				{
-					shader.enableVertexAttribArray(shader.texCoord2_loc);
-					gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
-					gl.activeTexture(gl.TEXTURE2);
-					gl.bindTexture(gl.TEXTURE_2D, magoManager.textureAux_1x1);
-				}
-				else 
-				{
-					gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
-				}
-			}
-		}
-	}
-	else if (renderType === 2)
-	{
-		// Color selction mode.
-		var colorAux;
-		colorAux = magoManager.selectionColor.getAvailableColor(colorAux);
-		var idxKey = magoManager.selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
-		magoManager.selectionManager.setCandidates(idxKey, undefined, undefined, this, currentNode);
-		
-		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
-		gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
-	}
-	
-	gl.uniform1i(shader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.
-	skinLego.render(magoManager, renderType, renderTexture, shader);
 };
 
 /**

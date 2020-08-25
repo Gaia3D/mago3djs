@@ -428,10 +428,7 @@ MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums)
 	var isLastFrustum = false;
 	this.numFrustums = numFrustums;
 	this.currentFrustumIdx = this.numFrustums-frustumIdx-1;
-	if (this.currentFrustumIdx === 0)
-	{
-		this.emit('lastFrustum');
-	}
+	
 	if (this.currentFrustumIdx === numFrustums-1) 
 	{
 		isLastFrustum = true;
@@ -1373,99 +1370,6 @@ MagoManager.prototype.managePickingProcess = function()
 					type: MagoManager.EVENT_TYPE.DESELECTEDGENERALOBJECT
 				});
 			}
-	
-			// Test flyTo by topology.******************************************************************************
-			var selCandidatesEdges = selectionManager.getSelectionCandidatesFamily("networkEdges");
-			var selCandidatesNodes = selectionManager.getSelectionCandidatesFamily("networkNodes");
-			var flyed = false;
-			if (selCandidatesEdges)
-			{
-				var edgeSelected = selCandidatesEdges.currentSelected;
-				if (edgeSelected && edgeSelected.vtxSegment)
-				{
-					// calculate the 2 positions of the edge.***
-					var camPos = this.sceneState.camera.position;
-					var vtxSeg = edgeSelected.vtxSegment;
-					var pos1 = new Point3D();
-					var pos2 = new Point3D();
-					pos1.copyFrom(vtxSeg.startVertex.point3d);
-					pos2.copyFrom(vtxSeg.endVertex.point3d);
-					pos1.add(0.0, 0.0, 1.7); // add person height.***
-					pos2.add(0.0, 0.0, 1.7); // add person height.***
-						
-						
-					// calculate pos1 & pos2 to worldCoordinate.***
-					// Need the building tMatrix.***
-					var network = edgeSelected.networkOwner;
-					var node = network.nodeOwner;
-					var geoLocDataManager = node.data.geoLocDataManager;
-					var geoLoc = geoLocDataManager.getCurrentGeoLocationData();
-					var tMat = geoLoc.tMatrix;
-						
-					// To positions must add "pivotPointTraslation" if exist.***
-					// If building moved to bboxCenter, for example, then exist "pivotPointTraslation".***
-					var pivotTranslation = geoLoc.pivotPointTraslationLC;
-					if (pivotTranslation)
-					{
-						pos1.add(pivotTranslation.x, pivotTranslation.y, pivotTranslation.z);
-						pos2.add(pivotTranslation.x, pivotTranslation.y, pivotTranslation.z);
-					}
-
-					var worldPos1 = tMat.transformPoint3D(pos1, undefined);
-					var worldPos2 = tMat.transformPoint3D(pos2, undefined);
-
-					// select the farestPoint to camera.***
-					var dist1 = camPos.squareDistToPoint(worldPos1);
-					var dist2 = camPos.squareDistToPoint(worldPos2);
-					var pointSelected;
-					if (dist1<dist2)
-					{
-						pointSelected = worldPos2;
-					}
-					else
-					{ pointSelected = worldPos1; }
-						
-					// now flyTo pointSelected.***
-					this.flyToTopology(pointSelected, 2);
-					flyed = true;
-				}
-			}
-			if (!flyed && selCandidatesNodes)
-			{
-				var nodeSelected = selCandidatesNodes.currentSelected;
-				if (nodeSelected)
-				{
-					// calculate the 2 positions of the edge.***
-					var camPos = this.sceneState.camera.position;
-					var pos1 = new Point3D(nodeSelected.position.x, nodeSelected.position.y, nodeSelected.position.z);
-					pos1.add(0.0, 0.0, 1.7); // add person height.***
-						
-						
-					// calculate pos1 & pos2 to worldCoordinate.***
-					// Need the building tMatrix.***
-					var network = nodeSelected.networkOwner;
-					var node = network.nodeOwner;
-					var geoLocDataManager = node.data.geoLocDataManager;
-					var geoLoc = geoLocDataManager.getCurrentGeoLocationData();
-					var tMat = geoLoc.tMatrix;
-						
-					// To positions must add "pivotPointTraslation" if exist.***
-					// If building moved to bboxCenter, for example, then exist "pivotPointTraslation".***
-					var pivotTranslation = geoLoc.pivotPointTraslationLC;
-					if (pivotTranslation)
-					{
-						pos1.add(pivotTranslation.x, pivotTranslation.y, pivotTranslation.z);
-					}
-						
-					var worldPos1 = tMat.transformPoint3D(pos1, undefined);
-						
-					// now flyTo pointSelected.***
-					this.flyToTopology(worldPos1, 2);
-					flyed = true;
-				}
-			}
-			// End Test flyTo by topology.******************************************************************************
-			
 		}
 		
 		this.selectionColor.init(); // selection colors manager.***
@@ -1726,7 +1630,13 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 	{
 		this.loadAndPrepareData();
 		this.renderToSelectionBuffer();
-		this.managePickingProcess();
+		//this.managePickingProcess();
+	}
+	
+	if (frustumIdx === 0)
+	{
+		this.selectionColor.init();
+		this.emit('lastFrustum');
 	}
 	
 	// Render process.***
@@ -2222,7 +2132,7 @@ MagoManager.prototype.calculateSelObjMovePlaneAsimetricMode = function(gl, pixel
 	if (this.pointSC2 === undefined)
 	{ this.pointSC2 = new Point3D(); }
 	
-	var geoLocDataManager = this.nodeSelected.getNodeGeoLocDataManager();
+	var geoLocDataManager = this.selectionManager.getSelectedF4dNode().getNodeGeoLocDataManager();
 	
 	ManagerUtils.calculatePixelPositionWorldCoord(gl, pixelX, pixelY, this.pointSC2, undefined, undefined, undefined, this);
 	var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
@@ -2264,8 +2174,8 @@ MagoManager.prototype.isDragging = function()
 
 	if (this.magoPolicy.objectMoveMode === CODE.moveMode.ALL)	// Moving all
 	{
-		var currentBuildingSelected = this.arrayAuxSC[0];
-		var currentNodeSelected = this.arrayAuxSC[3];
+		var currentBuildingSelected = this.selectionManager.getSelectedF4dBuilding();
+		var currentNodeSelected = this.selectionManager.getSelectedF4dNode();
 		var currentRootNodeSelected;
 		if (currentNodeSelected)
 		{
@@ -3365,7 +3275,8 @@ MagoManager.prototype.manageMouseDragging = function(mouseX, mouseY)
 	// distinguish 2 modes.******************************************************
 	if (this.magoPolicy.objectMoveMode === CODE.moveMode.ALL) // blocks move.***
 	{
-		if (this.buildingSelected !== undefined && this.selectionManager.currentNodeSelected) 
+		
+		if (this.selectionManager.getSelectedF4dBuilding() !== undefined && this.selectionManager.getSelectedF4dNode()) 
 		{
 			// 1rst, check if there are objects to move.***
 			if (this.mustCheckIfDragging) 
@@ -3682,10 +3593,10 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 	
 	if (this.magoPolicy.objectMoveMode === CODE.moveMode.ALL) // buildings move.***
 	{
-		if (this.selectionManager.currentNodeSelected === undefined)
+		if (this.selectionManager.getSelectedF4dNode() === undefined)
 		{ return; }
 		
-		var geoLocDataManager = this.selectionManager.currentNodeSelected.getNodeGeoLocDataManager();
+		var geoLocDataManager = this.selectionManager.getSelectedF4dNode().getNodeGeoLocDataManager();
 		var geoLocationData = geoLocDataManager.getCurrentGeoLocationData();
 		
 		var mouseAction = this.sceneState.mouseAction;
@@ -3755,12 +3666,12 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 			if (attributes.movementInAxisZ)
 			{
 				//geoLocationData = ManagerUtils.calculateGeoLocationData(undefined, undefined, newAltitude, undefined, undefined, undefined, geoLocationData, this);
-				this.changeLocationAndRotationNode(this.selectionManager.currentNodeSelected, undefined, undefined, newAltitude, undefined, undefined, undefined);
+				this.changeLocationAndRotationNode(this.selectionManager.getSelectedF4dNode(), undefined, undefined, newAltitude, undefined, undefined, undefined);
 			}
 			else 
 			{
 				//geoLocationData = ManagerUtils.calculateGeoLocationData(newLongitude, newlatitude, undefined, undefined, undefined, undefined, geoLocationData, this);
-				this.changeLocationAndRotationNode(this.selectionManager.currentNodeSelected, newlatitude, newLongitude, undefined, undefined, undefined, undefined);
+				this.changeLocationAndRotationNode(this.selectionManager.getSelectedF4dNode(), newlatitude, newLongitude, undefined, undefined, undefined, undefined);
 			}
 			
 			this.displayLocationAndRotation(this.buildingSelected);
@@ -3780,7 +3691,7 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 			this.selObjMovePlane = this.calculateSelObjMovePlaneAsimetricMode(gl, this.mouse_x, this.mouse_y, this.selObjMovePlane);
 		}
 		
-		var geoLocDataManager = this.selectionManager.currentNodeSelected.getNodeGeoLocDataManager();
+		var geoLocDataManager = this.selectionManager.getSelectedF4dNode().getNodeGeoLocDataManager();
 
 		// world ray = camPos + lambda*camDir.***
 		if (this.lineSC === undefined)
@@ -3822,8 +3733,8 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 			this.objectSelected.moveVector = buildingGeoLocation.tMatrix.rotatePoint3D(this.objectSelected.moveVectorRelToBuilding, this.objectSelected.moveVector); 
 		}
 		
-		var projectId = this.selectionManager.currentNodeSelected.data.projectId;
-		var data_key = this.selectionManager.currentNodeSelected.data.nodeId;
+		var projectId = this.selectionManager.getSelectedF4dNode().data.projectId;
+		var data_key = this.selectionManager.getSelectedF4dNode().data.nodeId;
 		var objectIndexOrder = this.objectSelected._id;
 		
 		this.config.deleteMovingHistoryObject(projectId, data_key, objectIndexOrder);
@@ -7271,12 +7182,12 @@ MagoManager.prototype.callAPI = function(api)
 
 		this.magoPolicy.setObjectMoveMode(CODE.moveMode.ALL);
 
-		this.nodeSelected = node;
-		this.buildingSelected = node.data.neoBuilding;
-		this.rootNodeSelected = this.nodeSelected.getRoot();
+		//this.nodeSelected = node;
+		//this.buildingSelected = node.data.neoBuilding;
+		//this.rootNodeSelected = this.nodeSelected.getRoot();
 
-		this.selectionManager.currentBuildingSelected = this.buildingSelected;
-		this.selectionManager.currentNodeSelected = this.nodeSelected;
+		this.selectionManager.setSelectedF4dNode(node);
+		this.selectionManager.setSelectedF4dBuilding(node.data.neoBuilding);
 
 		this.emit(MagoManager.EVENT_TYPE.SELECTEDF4D, {
 			type      : MagoManager.EVENT_TYPE.SELECTEDF4D, 
@@ -7323,11 +7234,10 @@ MagoManager.prototype.checkCollision = function (position, direction)
 	var posX = this.sceneState.drawingBufferWidth * 0.5;
 	var posY = this.sceneState.drawingBufferHeight * 0.5;
 	
-	var objects = this.getSelectedObjects(gl, posX, posY, this.arrayAuxSC);
-	if (objects === undefined)	{ return; }
+	//var objects = this.getSelectedObjects(gl, posX, posY, this.arrayAuxSC);
 
-	var current_building = this.buildingSelected;
-	this.buildingSelected = this.arrayAuxSC[0];
+	this.selectionManager.selectObjectByPixel(gl, posX, posY);
+	if (objects === undefined)	{ return; }
 
 	var collisionPosition = new Point3D();
 	var bottomPosition = new Point3D();
@@ -7336,7 +7246,8 @@ MagoManager.prototype.checkCollision = function (position, direction)
 	this.swapRenderingFase();
 	ManagerUtils.calculatePixelPositionWorldCoord(gl, posX, this.sceneState.drawingBufferHeight, undefined, undefined, undefined, this);
 
-	this.buildingSelected = current_building;
+	//this.buildingSelected = current_building;
+	//selectedBuilding = this.selectionManager.currentBuildingSelected;
 	var distance = collisionPosition.squareDistTo(position.x, position.y, position.z);
 	this.swapRenderingFase();
 

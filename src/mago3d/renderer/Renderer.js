@@ -614,7 +614,7 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 	// Check if there are node selected.***********************************************************
 	//if (magoManager.nodeSelected && magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected)
 	//{
-	var node = magoManager.nodeSelected;
+	var node = magoManager.selectionManager.getSelectedF4dNode();
 	if (node !== undefined) // test code.***
 	{
 		magoManager.currentProcess = CODE.magoCurrentProcess.SilhouetteDepthRendering;
@@ -666,11 +666,11 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 	//}
 	
 	// Check if there are a object selected.**********************************************************************
-	if (magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.OBJECT && magoManager.objectSelected)
+	if (magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.OBJECT && magoManager.selectionManager.currentReferenceSelected)
 	{
-		var node = magoManager.nodeSelected;
-		var neoBuilding = magoManager.buildingSelected;
-		if (magoManager.objectSelected instanceof NeoReference && node !== undefined && neoBuilding !== undefined) // test code.***
+		var node = magoManager.selectionManager.getSelectedF4dNode();
+		var neoBuilding = magoManager.selectionManager.getSelectedF4dBuilding();
+		if (magoManager.selectionManager.currentReferenceSelected instanceof NeoReference && node !== undefined && neoBuilding !== undefined) // test code.***
 		{
 			magoManager.currentProcess = CODE.magoCurrentProcess.SilhouetteDepthRendering;
 			var geoLocDataManager = node.getNodeGeoLocDataManager();
@@ -1680,9 +1680,9 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		magoManager.renderer.renderGeometryDepth(gl, renderType, visibleObjControlerNodes);
 		
 		// Draw the axis.***
-		if (magoManager.magoPolicy.getShowOrigin() && magoManager.nodeSelected !== undefined)
+		if (magoManager.magoPolicy.getShowOrigin() && magoManager.selectionManager.getSelectedF4dNode() !== undefined)
 		{
-			node = magoManager.nodeSelected;
+			node = magoManager.selectionManager.getSelectedF4dNode();
 			var nodes = [node];
 			
 			this.renderAxisNodes(nodes, renderType);
@@ -1917,17 +1917,17 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			gl.useProgram(null);
 		}
 		
-
-		if (magoManager.nodeSelected) // if there are an object selected then there are a building selected.***
+		
+		if (magoManager.selectionManager.getSelectedF4dNode()) // if there are an object selected then there are a building selected.***
 		{
-			if (magoManager.objectSelected)
+			if (magoManager.selectionManager.getSelectedF4dBuilding())
 			{
 				this.renderSilhouette();
 			}
 			
-			if (magoManager.buildingSelected)
+			if (magoManager.selectionManager.getSelectedF4dBuilding())
 			{
-				node = magoManager.nodeSelected;
+				node = magoManager.selectionManager.getSelectedF4dNode();
 				if (node !== undefined) // test code.***
 				{
 					// New.
@@ -1938,7 +1938,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			// draw the axis.***
 			if (magoManager.magoPolicy.getShowOrigin())
 			{
-				var node = magoManager.nodeSelected;
+				var node = magoManager.selectionManager.getSelectedF4dNode();
 				//var geoLocDataManager = node.getNodeGeoLocDataManager();
 				var nodes = [node];
 				

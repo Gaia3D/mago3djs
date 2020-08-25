@@ -111,7 +111,6 @@ AbsSelectInteraction.prototype.handle = function(browserEvent)
 				{
 					that.handleUpEvent.call(that, browserEvent);
 				});
-				
 			}
 		}
 	}
@@ -136,7 +135,7 @@ AbsSelectInteraction.prototype.handle = function(browserEvent)
  * handle event
  * @param {BrowserEvent} browserEvent
  */
-AbsPointInteraction.prototype.handleDownEvent = function(browserEvent)
+AbsSelectInteraction.prototype.handleDownEvent = function(browserEvent)
 {
 	return abstract();
 };
@@ -144,7 +143,7 @@ AbsPointInteraction.prototype.handleDownEvent = function(browserEvent)
  * handle event
  * @param {BrowserEvent} browserEvent
  */
-AbsPointInteraction.prototype.handleUpEvent = function(browserEvent)
+AbsSelectInteraction.prototype.handleUpEvent = function(browserEvent)
 {
 	return abstract();
 };
@@ -153,7 +152,24 @@ AbsPointInteraction.prototype.handleUpEvent = function(browserEvent)
  * handle event
  * @param {BrowserEvent} browserEvent
  */
-AbsPointInteraction.prototype.handleMoveEvent = function(browserEvent)
+AbsSelectInteraction.prototype.handleMoveEvent = function(browserEvent)
 {
 	return abstract();
 };
+
+/**
+ * select 
+ * @param {Point2D} screenCoordinate
+ * @param {boolean} bObject
+ */
+AbsSelectInteraction.prototype.select = function(screenCoordinate, bObject)
+{
+	var manager = this.manager;
+	var selectManager = manager.selectionManager;
+
+	if (manager.selectionFbo === undefined) 
+	{ manager.selectionFbo = new FBO(gl, manager.sceneState.drawingBufferWidth, manager.sceneState.drawingBufferHeight, {matchCanvasSize : true}); }
+
+	var gl = manager.getGl();
+	selectManager.selectObjectByPixel(gl, screenCoordinate.x, screenCoordinate.y, bObject);
+}

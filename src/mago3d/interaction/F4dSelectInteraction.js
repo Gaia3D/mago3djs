@@ -17,7 +17,7 @@ var F4dSelectInteraction = function(option)
 	option = option ? option : {};
 	AbsSelectInteraction.call(this, option);
     
-	this.targetHighlight = defaultValue(option.targetHighlight, true);
+	this.targetHighlight = defaultValue(option.targetHighlight, false);
 };
 F4dSelectInteraction.prototype = Object.create(AbsSelectInteraction.prototype);
 F4dSelectInteraction.prototype.constructor = F4dSelectInteraction;
@@ -32,7 +32,7 @@ F4dSelectInteraction.EVENT_TYPE = {
  */
 F4dSelectInteraction.prototype.handleDownEvent = function(browserEvent)
 {
-	return abstract();
+	return;
 };
 /**
  * handle event
@@ -40,10 +40,9 @@ F4dSelectInteraction.prototype.handleDownEvent = function(browserEvent)
  */
 F4dSelectInteraction.prototype.handleUpEvent = function(browserEvent)
 {
-	console.info('handle up test');
-	console.info(this.manager);
-	console.info(this.manager.currentFrustumIdx);
-	console.info(browserEvent);
+	this.select(browserEvent.point.screenCoordinate, false);
+	var selectionManager = this.manager.selectionManager;
+
 };
 
 /**
@@ -54,22 +53,6 @@ F4dSelectInteraction.prototype.handleMoveEvent = function(browserEvent)
 {
 	if (this.targetHighlight)
 	{
-		var manager = this.manager;
-		var gl = manager.getGl();
-		if (manager.selectionFbo === undefined) 
-		{ manager.selectionFbo = new FBO(gl, manager.sceneState.drawingBufferWidth, manager.sceneState.drawingBufferHeight, {matchCanvasSize : true}); }
-        
-		var position = browserEvent.endEvent.screenCoordinate;
-
-		manager.objectSelected = manager.getSelectedObjects(gl, position.x, position.y, manager.arrayAuxSC, true);
-
-		var auxBuildingSelected = manager.arrayAuxSC[0];
-		var auxOctreeSelected = manager.arrayAuxSC[1];
-		var auxNodeSelected = manager.arrayAuxSC[3]; 
-		console.info(auxNodeSelected);
-		manager.buildingSelected = auxBuildingSelected;
-		manager.octreeSelected = auxOctreeSelected;
-		manager.nodeSelected = auxNodeSelected;
-		manager.arrayAuxSC.length = 0;
+		this.select(browserEvent.endEvent.screenCoordinate, false);
 	}
 };
