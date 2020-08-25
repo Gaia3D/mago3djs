@@ -48,7 +48,7 @@ var Tools = function(options)
 	element.addEventListener('click',
 		function() 
 		{
-			var mainContainer = document.getElementById(MagoConfig.getContainerId()).getElementsByClassName('mago3d-overlayContainer-defaultContent').item(0);
+			var mainContainer = document.getElementById(that.magoManager.config.getContainerId()).getElementsByClassName('mago3d-overlayContainer-defaultContent').item(0);
 			var thisContainer = mainContainer.getElementsByClassName('mago3d-tools-advance').item(0);
 			var on = element.className.indexOf('on') >= 0;
 			if (!on)

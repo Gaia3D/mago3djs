@@ -4,7 +4,7 @@
  * Policy
  * @class Policy
  */
-var Policy = function() 
+var Policy = function(policy) 
 {
 	if (!(this instanceof Policy)) 
 	{
@@ -82,7 +82,6 @@ var Policy = function()
 
 	this.modelMovable = true;
 	
-	var policy = MagoConfig.getPolicy();
 	// PointsCloud.
 	this.pointsCloudSettings = {};
 	if (defined(policy)) 

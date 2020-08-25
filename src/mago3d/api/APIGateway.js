@@ -378,7 +378,7 @@ function clearAllDataAPI(managerFactoryInstance)
 	if (managerFactoryInstance === null) { return; } 
 	
 	var api = new Mago3D.API("clearAllData");
-	Mago3D.MagoConfig.clearAllData();
+	managerFactoryInstance.getMagoManager().config.clearAllData();
 	managerFactoryInstance.callAPI(api);
 }
 
@@ -421,8 +421,8 @@ function gotoProjectAPI(managerFactoryInstance, projectId, projectData, projectD
 {
 	if (managerFactoryInstance === null) { return; } 
 	
-	Mago3D.MagoConfig.setData(Mago3D.CODE.PROJECT_ID_PREFIX + projectId, projectData);
-	Mago3D.MagoConfig.setProjectDataFolder(Mago3D.CODE.PROJECT_DATA_FOLDER_PREFIX + projectDataFolder, projectDataFolder);
+	managerFactoryInstance.getMagoManager().config.setData(Mago3D.CODE.PROJECT_ID_PREFIX + projectId, projectData);
+	managerFactoryInstance.getMagoManager().config.setProjectDataFolder(Mago3D.CODE.PROJECT_DATA_FOLDER_PREFIX + projectDataFolder, projectDataFolder);
 	
 	var api = new Mago3D.API("gotoProject");
 	api.setProjectId(projectId);
@@ -449,8 +449,8 @@ function gotoIssueAPI(managerFactoryInstance, projectId, projectData, projectDat
 {
 	if (managerFactoryInstance === null) { return; } 
 	
-	Mago3D.MagoConfig.setData(Mago3D.CODE.PROJECT_ID_PREFIX + projectId, projectData);
-	Mago3D.MagoConfig.setProjectDataFolder(Mago3D.CODE.PROJECT_DATA_FOLDER_PREFIX + projectDataFolder, projectDataFolder);
+	managerFactoryInstance.getMagoManager().config.setData(Mago3D.CODE.PROJECT_ID_PREFIX + projectId, projectData);
+	managerFactoryInstance.getMagoManager().config.setProjectDataFolder(Mago3D.CODE.PROJECT_DATA_FOLDER_PREFIX + projectDataFolder, projectDataFolder);
 	
 	var api = new Mago3D.API("gotoIssue");
 	api.setProjectId(projectId);
@@ -510,23 +510,25 @@ function searchDataAPI(managerFactoryInstance, projectId, dataKey)
 
 /**
  * 환경 설정 data Object에 key 값의 존재 유무를 판별
+ * @param {ManagerFactory} managerFactoryInstance
  * @param {string} key 검색 키
  * @param 
  */
-function isDataExistAPI(key) 
+function isDataExistAPI(managerFactoryInstance, key) 
 {
-	if (Mago3D.MagoConfig.isDataExist(key)) { return true; }
+	if (managerFactoryInstance.getMagoManager().config.isDataExist(key)) { return true; }
 	else { return false; }
 }
 
 /**
  * 환경 설정 data map에서 key 값을 취득
+ * @param {ManagerFactory} managerFactoryInstance
  * @param {string} key 검색 키
  * @param 
  */
-function getDataAPI(key) 
+function getDataAPI(managerFactoryInstance, key) 
 {
-	return Mago3D.MagoConfig.getData(key);
+	return managerFactoryInstance.getMagoManager().config.getData(key);
 }
 
 /**
@@ -565,8 +567,8 @@ function drawAppendDataAPI(managerFactoryInstance, projectIdArray, projectDataAr
 	projectIdArray.forEach(function(dataName, index) 
 	{
 			
-		Mago3D.MagoConfig.setData(Mago3D.CODE.PROJECT_ID_PREFIX + dataName, projectDataArray[index]);
-		Mago3D.MagoConfig.setProjectDataFolder(Mago3D.CODE.PROJECT_DATA_FOLDER_PREFIX + projectDataFolderArray[index], projectDataFolderArray[index]);
+		managerFactoryInstance.getMagoManager().config.setData(Mago3D.CODE.PROJECT_ID_PREFIX + dataName, projectDataArray[index]);
+		managerFactoryInstance.getMagoManager().config.setProjectDataFolder(Mago3D.CODE.PROJECT_DATA_FOLDER_PREFIX + projectDataFolderArray[index], projectDataFolderArray[index]);
 		
 		api.setProjectId(dataName);
 		api.setProjectDataFolder(projectDataFolderArray[index]);

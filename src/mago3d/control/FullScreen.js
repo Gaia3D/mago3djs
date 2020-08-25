@@ -103,7 +103,7 @@ FullScreen.prototype.constructor = FullScreen;
 
 FullScreen.prototype.handleClick = function()
 {
-	var target = document.getElementById(MagoConfig.getContainerId());
+	var target = document.getElementById(this.magoManager.config.getContainerId());
 	if (this.full)
 	{
 		if (isFullScreen())

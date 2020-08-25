@@ -7,14 +7,17 @@ var ViewerInit = function(containerId, serverPolicy)
 	{
 		throw new Error('containerId is required.');
 	}
-	MagoConfig.init(serverPolicy, null, null);
+	var magoConfig = new MagoConfig();
+	magoConfig.init(serverPolicy, null, null);
 
+	this.config = magoConfig;
 	this.targetId = containerId;
 	this.magoManager;
 	this.viewer;
-	this.policy = MagoConfig.getPolicy();
+	this.policy = magoConfig.getPolicy();
+	
 
-	MagoConfig.setContainerId(this.targetId);
+	magoConfig.setContainerId(this.targetId);
 	this.init();
 	this.createElement();
 };

@@ -4,7 +4,7 @@
  * This class contains the camera transformation matrices and other parameters that affects the scene.
  * @class SceneState
  */
-var SceneState = function() 
+var SceneState = function(config) 
 {
 	if (!(this instanceof SceneState)) 
 	{
@@ -151,17 +151,17 @@ var SceneState = function()
 	this.fps = 0.0;
 
 	//mago earth 사용 시 초기 scene 세팅
-	if (MagoConfig.getPolicy().basicGlobe !== 'cesium') 
+	if (config.getPolicy().basicGlobe !== 'cesium') 
 	{
-		this.initMagoSceneState();
+		this.initMagoSceneState(config.getContainerId());
 	}
 };
 /**
  * mago earth 사용 시 초기 scene 세팅
  */
-SceneState.prototype.initMagoSceneState = function() 
+SceneState.prototype.initMagoSceneState = function(cId) 
 {
-	var containerDiv = document.getElementById(MagoConfig.getContainerId());
+	var containerDiv = document.getElementById(cId);
 	if (!containerDiv) 
 	{
 		throw new Error('container is empty.');

@@ -124,7 +124,7 @@ CesiumViewerInit.prototype.providerBuild = function()
 CesiumViewerInit.prototype.geoserverImageProviderBuild = function() 
 {
 	var policy = this.policy;
-	var geoserver = MagoConfig.getGeoserver();
+	var geoserver = this.config.getGeoserver();
     
 	if (!policy.geoserverImageproviderEnable) 
 	{
@@ -281,7 +281,7 @@ CesiumViewerInit.prototype.initMagoManager = function()
 	var serverPolicy = this.policy;
 	var viewer = this.viewer;
 	
-	this.viewer.scene.magoManager = new MagoManager();
+	this.viewer.scene.magoManager = new MagoManager(this.config);
 	this.viewer.scene.magoManager.sceneState.textureFlipYAxis = false;
 
 	this.viewer.camera.frustum.fov = Cesium.Math.PI_OVER_THREE;

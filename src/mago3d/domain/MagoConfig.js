@@ -4,39 +4,50 @@
  * mago3D 전체 환경 설정을 관리
  * @class MagoConfig
  */
-var MagoConfig = {};
+var MagoConfig = function(){
+	this.containerId = undefined;
+	this.serverPolicy = undefined;
+	this.geoserver = undefined;
+	this.dataObject = {};
+	this.selectHistoryObject = {};
+	this.movingHistoryObject = {};
+	this.colorHistoryObject = {};
+	this.locationAndRotationHistoryObject = {};
+	this.scriptRootPath = undefined;
+	this.twoDimension = false;
+};
 
-MagoConfig.setContainerId = function(containerId) 
+MagoConfig.prototype.setContainerId = function(containerId) 
 {
 	this.containerId = containerId;
 };
 
-MagoConfig.getContainerId = function() 
+MagoConfig.prototype.getContainerId = function() 
 {
 	return this.containerId;
 };
 
-MagoConfig.getPolicy = function() 
+MagoConfig.prototype.getPolicy = function() 
 {
 	return this.serverPolicy;
 };
 
-MagoConfig.getGeoserver = function() 
+MagoConfig.prototype.getGeoserver = function() 
 {
 	return this.geoserver;
 };
 
-MagoConfig.getData = function(key) 
+MagoConfig.prototype.getData = function(key) 
 {
 	return this.dataObject[key];
 };
 
-MagoConfig.isDataExist = function(key) 
+MagoConfig.prototype.isDataExist = function(key) 
 {
 	return this.dataObject.hasOwnProperty(key);
 };
 
-MagoConfig.deleteData = function(key) 
+MagoConfig.prototype.deleteData = function(key) 
 {
 	return delete this.dataObject[key];
 };
@@ -46,7 +57,7 @@ MagoConfig.deleteData = function(key)
  * @param key map에 저장될 key
  * @param value map에 저장될 value
  */
-MagoConfig.setData = function(key, value) 
+MagoConfig.prototype.setData = function(key, value) 
 {
 	if (!this.isDataExist(key)) 
 	{
@@ -58,7 +69,7 @@ MagoConfig.setData = function(key, value)
  * F4D Converter 실행 결과물이 저장된 project data folder 명을 획득
  * @param projectDataFolder data folder
  */
-MagoConfig.getProjectDataFolder = function(projectDataFolder) 
+MagoConfig.prototype.getProjectDataFolder = function(projectDataFolder) 
 {
 	var key = CODE.PROJECT_DATA_FOLDER_PREFIX + projectDataFolder;
 	return this.dataObject[key];
@@ -68,7 +79,7 @@ MagoConfig.getProjectDataFolder = function(projectDataFolder)
  * project map에 data folder명의 존재 유무를 검사
  * @param projectDataFolder
  */
-MagoConfig.isProjectDataFolderExist = function(projectDataFolder) 
+MagoConfig.prototype.isProjectDataFolderExist = function(projectDataFolder) 
 {
 	var key = CODE.PROJECT_DATA_FOLDER_PREFIX + projectDataFolder;
 	return this.dataObject.hasOwnProperty(key);
@@ -78,7 +89,7 @@ MagoConfig.isProjectDataFolderExist = function(projectDataFolder)
  * project data folder명을 map에서 삭제
  * @param projectDataFolder
  */
-MagoConfig.deleteProjectDataFolder = function(projectDataFolder) 
+MagoConfig.prototype.deleteProjectDataFolder = function(projectDataFolder) 
 {
 	var key = CODE.PROJECT_DATA_FOLDER_PREFIX + projectDataFolder;
 	return delete this.dataObject[key];
@@ -89,7 +100,7 @@ MagoConfig.deleteProjectDataFolder = function(projectDataFolder)
  * @param projectDataFolder Object에 저장될 key
  * @param value Object에 저장될 value
  */
-MagoConfig.setProjectDataFolder = function(projectDataFolder, value) 
+MagoConfig.prototype.setProjectDataFolder = function(projectDataFolder, value) 
 {
 	var key = CODE.PROJECT_DATA_FOLDER_PREFIX + projectDataFolder;
 	if (!this.isProjectDataFolderExist(key))
@@ -104,7 +115,7 @@ MagoConfig.setProjectDataFolder = function(projectDataFolder, value)
  * @param projectIdArray data 정보를 map 저장할 key name
  * @param projectDataArray data 정보(json)
  */
-MagoConfig.init = function(serverPolicy, projectIdArray, projectDataArray) 
+MagoConfig.prototype.init = function(serverPolicy, projectIdArray, projectDataArray) 
 {
 	if (!serverPolicy || !serverPolicy instanceof Object) 
 	{
@@ -174,7 +185,7 @@ MagoConfig.init = function(serverPolicy, projectIdArray, projectDataArray)
 /**
  * 모든 데이터를 삭제함
  */
-MagoConfig.clearAllData = function() 
+MagoConfig.prototype.clearAllData = function() 
 {
 	this.dataObject = {};
 };
@@ -182,7 +193,7 @@ MagoConfig.clearAllData = function()
 /**
  * 모든 선택 히스토리 삭제
  */
-MagoConfig.clearSelectHistory = function() 
+MagoConfig.prototype.clearSelectHistory = function() 
 {
 	this.selectHistoryObject = {};
 };
@@ -190,7 +201,7 @@ MagoConfig.clearSelectHistory = function()
 /**
  * 모든 object 선택 내용 이력을 취득
  */
-MagoConfig.getAllSelectHistory = function()
+MagoConfig.prototype.getAllSelectHistory = function()
 {
 	return this.selectHistoryObject;
 };
@@ -198,7 +209,7 @@ MagoConfig.getAllSelectHistory = function()
 /**
  * project 별 해당 키에 해당하는 모든 object 선택 내용 이력을 취득
  */
-MagoConfig.getSelectHistoryObjects = function(projectId, dataKey)
+MagoConfig.prototype.getSelectHistoryObjects = function(projectId, dataKey)
 {
 	// projectId 별 Object을 검사
 	var projectIdObject = this.selectHistoryObject[projectId];
@@ -211,7 +222,7 @@ MagoConfig.getSelectHistoryObjects = function(projectId, dataKey)
 /**
  * object 선택 내용 이력을 취득
  */
-MagoConfig.getSelectHistoryObject = function(projectId, dataKey, objectIndexOrder)
+MagoConfig.prototype.getSelectHistoryObject = function(projectId, dataKey, objectIndexOrder)
 {
 	// projectId 별 Object을 검사
 	var projectIdObject = this.selectHistoryObject[projectId];
@@ -226,7 +237,7 @@ MagoConfig.getSelectHistoryObject = function(projectId, dataKey, objectIndexOrde
 /**
  * object 선택 내용을 저장
  */
-MagoConfig.saveSelectHistory = function(projectId, dataKey, objectIndexOrder, changeHistory) 
+MagoConfig.prototype.saveSelectHistory = function(projectId, dataKey, objectIndexOrder, changeHistory) 
 {
 	// projectId 별 Object을 검사
 	var projectIdObject = this.selectHistoryObject.get(projectId);
@@ -251,7 +262,7 @@ MagoConfig.saveSelectHistory = function(projectId, dataKey, objectIndexOrder, ch
 /**
  * object 선택 내용을 삭제
  */
-MagoConfig.deleteSelectHistoryObject = function(projectId, dataKey, objectIndexOrder)
+MagoConfig.prototype.deleteSelectHistoryObject = function(projectId, dataKey, objectIndexOrder)
 {
 	// projectId 별 Object을 검사
 	var projectIdObject = this.selectHistoryObject[projectId];
@@ -266,7 +277,7 @@ MagoConfig.deleteSelectHistoryObject = function(projectId, dataKey, objectIndexO
 /**
  * 모든 이동 히스토리 삭제
  */
-MagoConfig.clearMovingHistory = function() 
+MagoConfig.prototype.clearMovingHistory = function() 
 {
 	this.movingHistoryObject = {};
 };
@@ -274,7 +285,7 @@ MagoConfig.clearMovingHistory = function()
 /**
  * 모든 object 선택 내용 이력을 취득
  */
-MagoConfig.getAllMovingHistory = function()
+MagoConfig.prototype.getAllMovingHistory = function()
 {
 	return this.movingHistoryObject;
 };
@@ -282,7 +293,7 @@ MagoConfig.getAllMovingHistory = function()
 /**
  * project별 입력키 값과 일치하는 object 이동 내용 이력을 취득
  */
-MagoConfig.getMovingHistoryObjects = function(projectId, dataKey)
+MagoConfig.prototype.getMovingHistoryObjects = function(projectId, dataKey)
 {
 	// projectId 별 Object을 검사
 	var projectIdObject = this.movingHistoryObject[projectId];
@@ -295,7 +306,7 @@ MagoConfig.getMovingHistoryObjects = function(projectId, dataKey)
 /**
  * object 이동 내용 이력을 취득
  */
-MagoConfig.getMovingHistoryObject = function(projectId, dataKey, objectIndexOrder)
+MagoConfig.prototype.getMovingHistoryObject = function(projectId, dataKey, objectIndexOrder)
 {
 	// projectId 별 Object을 검사
 	var projectIdObject = this.movingHistoryObject[projectId];
@@ -310,7 +321,7 @@ MagoConfig.getMovingHistoryObject = function(projectId, dataKey, objectIndexOrde
 /**
  * object 이동 내용을 저장
  */
-MagoConfig.saveMovingHistory = function(projectId, dataKey, objectIndexOrder, changeHistory) 
+MagoConfig.prototype.saveMovingHistory = function(projectId, dataKey, objectIndexOrder, changeHistory) 
 {
 	// projectId 별 Object을 검사
 	var projectIdObject = this.movingHistoryObject[projectId];
@@ -335,7 +346,7 @@ MagoConfig.saveMovingHistory = function(projectId, dataKey, objectIndexOrder, ch
 /**
  * object 이동 내용을 삭제
  */
-MagoConfig.deleteMovingHistoryObject = function(projectId, dataKey, objectIndexOrder)
+MagoConfig.prototype.deleteMovingHistoryObject = function(projectId, dataKey, objectIndexOrder)
 {
 	// projectId 별 Object을 검사
 	var projectIdObject = this.movingHistoryObject[projectId];
@@ -350,7 +361,7 @@ MagoConfig.deleteMovingHistoryObject = function(projectId, dataKey, objectIndexO
 /**
  * 모든 색깔 변경 이력을 획득
  */
-MagoConfig.getAllColorHistory = function() 
+MagoConfig.prototype.getAllColorHistory = function() 
 {
 	return this.colorHistoryObject;
 };
@@ -358,7 +369,7 @@ MagoConfig.getAllColorHistory = function()
 /**
  * 모든 색깔변경 히스토리 삭제
  */
-MagoConfig.clearColorHistory = function() 
+MagoConfig.prototype.clearColorHistory = function() 
 {
 	this.colorHistoryObject = {};
 };
@@ -366,7 +377,7 @@ MagoConfig.clearColorHistory = function()
 /**
  * project별 키에 해당하는 모든 색깔 변경 이력을 획득
  */
-MagoConfig.getColorHistorys = function(projectId, dataKey)
+MagoConfig.prototype.getColorHistorys = function(projectId, dataKey)
 {
 	// projectId 별 Object을 검사
 	var projectIdObject = this.colorHistoryObject[projectId];
@@ -379,7 +390,7 @@ MagoConfig.getColorHistorys = function(projectId, dataKey)
 /**
  * 색깝 변경 이력을 획득
  */
-MagoConfig.getColorHistory = function(projectId, dataKey, objectId)
+MagoConfig.prototype.getColorHistory = function(projectId, dataKey, objectId)
 {
 	// projectId 별 Object을 검사
 	var projectIdObject = this.colorHistoryObject[projectId];
@@ -394,7 +405,7 @@ MagoConfig.getColorHistory = function(projectId, dataKey, objectId)
 /**
  * 색깝 변경 내용을 저장
  */
-MagoConfig.saveColorHistory = function(projectId, dataKey, objectId, changeHistory) 
+MagoConfig.prototype.saveColorHistory = function(projectId, dataKey, objectId, changeHistory) 
 {
 	// projectId 별 Object을 검사
 	var projectIdObject = this.colorHistoryObject[projectId];
@@ -425,7 +436,7 @@ MagoConfig.saveColorHistory = function(projectId, dataKey, objectId, changeHisto
 /**
  * 색깔 변경 이력을 삭제
  */
-MagoConfig.deleteColorHistory = function(projectId, dataKey, objectId)
+MagoConfig.prototype.deleteColorHistory = function(projectId, dataKey, objectId)
 {
 	// projectId 별 Object을 검사
 	var projectIdObject = this.colorHistoryObject[projectId];
@@ -440,7 +451,7 @@ MagoConfig.deleteColorHistory = function(projectId, dataKey, objectId)
 /**
  * 모든 색깔변경 히스토리 삭제
  */
-MagoConfig.clearColorHistory = function() 
+MagoConfig.prototype.clearColorHistory = function() 
 {
 	this.colorHistoryObject = {};
 };
@@ -448,7 +459,7 @@ MagoConfig.clearColorHistory = function()
 /**
  * 모든 location and rotation 변경 이력을 획득
  */
-MagoConfig.getAllLocationAndRotationHistory = function() 
+MagoConfig.prototype.getAllLocationAndRotationHistory = function() 
 {
 	return this.locationAndRotationHistoryObject;
 };
@@ -456,7 +467,7 @@ MagoConfig.getAllLocationAndRotationHistory = function()
 /**
  * 프로젝트별 해당 키 값을 갖는 모든 location and rotation 이력을 획득
  */
-MagoConfig.getLocationAndRotationHistorys = function(projectId, dataKey)
+MagoConfig.prototype.getLocationAndRotationHistorys = function(projectId, dataKey)
 {
 	// projectId 별 Object을 검사
 	var projectIdObject = this.locationAndRotationHistoryObject[projectId];
@@ -469,7 +480,7 @@ MagoConfig.getLocationAndRotationHistorys = function(projectId, dataKey)
 /**
  * location and rotation 이력을 획득
  */
-MagoConfig.getLocationAndRotationHistory = function(projectId, dataKey)
+MagoConfig.prototype.getLocationAndRotationHistory = function(projectId, dataKey)
 {
 	// projectId 별 Object을 검사
 	var projectIdObject = this.locationAndRotationHistoryObject[projectId];
@@ -483,7 +494,7 @@ MagoConfig.getLocationAndRotationHistory = function(projectId, dataKey)
 /**
  * location and rotation 내용을 저장
  */
-MagoConfig.saveLocationAndRotationHistory = function(projectId, dataKey, changeHistory) 
+MagoConfig.prototype.saveLocationAndRotationHistory = function(projectId, dataKey, changeHistory) 
 {
 	// projectId 별 Object을 검사
 	var projectIdObject = this.locationAndRotationHistoryObject[projectId];
@@ -506,7 +517,7 @@ MagoConfig.saveLocationAndRotationHistory = function(projectId, dataKey, changeH
 /**
  * location and rotation 이력을 삭제
  */
-MagoConfig.deleteLocationAndRotationHistory = function(projectId, dataKey)
+MagoConfig.prototype.deleteLocationAndRotationHistory = function(projectId, dataKey)
 {
 	// projectId 별 Object을 검사
 	var projectIdObject = this.locationAndRotationHistoryObject[projectId];
@@ -518,37 +529,16 @@ MagoConfig.deleteLocationAndRotationHistory = function(projectId, dataKey)
 /**
  * 모든 location and rotation 히스토리 삭제
  */
-MagoConfig.clearLocationAndRotationHistory = function() 
+MagoConfig.prototype.clearLocationAndRotationHistory = function() 
 {
 	this.locationAndRotationHistoryObject = {};
 };
 	
-/**
- * TODO 이건 나중에 활요. 사용하지 않음
- * check 되지 않은 데이터들을 삭제함
- * @param keyObject 비교할 맵
- */
-/*MagoConfig.clearUnSelectedData = function(keyObject)
-{
-	for (var key of this.dataObject.keys())
-	{
-		if (!keyObject.hasxxxxx(key))
-		{
-			// data folder path가 존재하면....
-			if (key.indexOf(CODE.PROJECT_DATA_FOLDER_PREFIX) >= 0) 
-			{
-				// 지우는 처리가 있어야 함
-			}
-			this.dataObject.delete(key);
-		}
-	}
-};*/
-
-MagoConfig.setTwoDimension = function(twoDimension) 
+MagoConfig.prototype.setTwoDimension = function(twoDimension) 
 {
 	this.twoDimension = twoDimension;
 };
-MagoConfig.isTwoDimension = function()
+MagoConfig.prototype.isTwoDimension = function()
 {
 	return this.twoDimension;
 };

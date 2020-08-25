@@ -3337,7 +3337,7 @@ TinTerrain.prototype.decodeData = function(imageryType)
 	var tinTerrainManager = this.tinTerrainManager;
 	if (!this.tinTerrainManager.workerDecodedTerrain) 
 	{ 
-		this.tinTerrainManager.workerDecodedTerrain = new Worker(MagoConfig.scriptRootPath + 'Worker/workerDecodeTerrain.js'); 
+		this.tinTerrainManager.workerDecodedTerrain = new Worker(this.tinTerrainManager.magoManager.config.scriptRootPath + 'Worker/workerDecodeTerrain.js'); 
 		this.tinTerrainManager.workerDecodedTerrain.onmessage = function(e)
 		{
 			var tileInfo = e.data.info;
@@ -3385,7 +3385,7 @@ TinTerrain.prototype.parseData = function(dataArrayBuffer)
 	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 	if (!this.tinTerrainManager.workerParseTerrain) 
 	{ 
-		this.tinTerrainManager.workerParseTerrain = new Worker(MagoConfig.scriptRootPath + 'Worker/workerParseTerrain.js'); 
+		this.tinTerrainManager.workerParseTerrain = new Worker(this.tinTerrainManager.magoManager.config.scriptRootPath + 'Worker/workerParseTerrain.js'); 
 		this.tinTerrainManager.workerParseTerrain.onmessage = function(e)
 		{
 			var tileInfo = e.data.info;
