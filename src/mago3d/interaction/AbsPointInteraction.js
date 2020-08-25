@@ -76,12 +76,12 @@ AbsPointInteraction.prototype.setActive = function(active)
 	this.active = active;
 	if (active) 
 	{
-		//this.manager.interactions.emit(InteractionCollection.EVENT_TYPE.ACTIVE, that);
+		//this.manager.interactionCollection.emit(InteractionCollection.EVENT_TYPE.ACTIVE, that);
 		this.emit(this.constructor.EVENT_TYPE.ACTIVE, this);
 	}
 	else 
 	{
-		//this.manager.interactions.emit(InteractionCollection.EVENT_TYPE.DEACTIVE);
+		//this.manager.interactionCollection.emit(InteractionCollection.EVENT_TYPE.DEACTIVE);
 		this.emit(this.constructor.EVENT_TYPE.DEACTIVE);
 	}
 };

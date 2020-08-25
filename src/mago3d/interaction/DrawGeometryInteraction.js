@@ -72,7 +72,7 @@ DrawGeometryInteraction.prototype.setActive = function(active)
     
 	if (!this.collection) 
 	{
-		this.collection = this.manager.interactions;
+		this.collection = this.manager.interactionCollection;
 	}
 
 	var that = this;

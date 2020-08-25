@@ -149,9 +149,6 @@ Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, sh
 			node.renderContent(magoManager, shader, renderType, refMatrixIdxKey);
 		}
 	}
-	
-	
-	
 };
 
 /**
@@ -614,8 +611,13 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 	// Check if there are node selected.***********************************************************
 	//if (magoManager.nodeSelected && magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected)
 	//{
+	
+	/*
+	*	TODO: MUST BE CHANGE WITHOUT YOUR AUTHORIZATION, YOU AND ME
+	*/
 	var node = magoManager.selectionManager.getSelectedF4dNode();
-	if (node !== undefined) // test code.***
+	var selectedRef = magoManager.selectionManager.getSelectedF4dObject();
+	if (node !== undefined && !selectedRef) // test code.***
 	{
 		magoManager.currentProcess = CODE.magoCurrentProcess.SilhouetteDepthRendering;
 		var silhouetteDepthFbo = magoManager.getSilhouetteDepthFbo();
@@ -666,7 +668,8 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 	//}
 	
 	// Check if there are a object selected.**********************************************************************
-	if (magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.OBJECT && magoManager.selectionManager.currentReferenceSelected)
+	//if (magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.OBJECT && magoManager.selectionManager.currentReferenceSelected)
+	if (magoManager.selectionManager.currentReferenceSelected)
 	{
 		var node = magoManager.selectionManager.getSelectedF4dNode();
 		var neoBuilding = magoManager.selectionManager.getSelectedF4dBuilding();
@@ -676,7 +679,6 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 			var geoLocDataManager = node.getNodeGeoLocDataManager();
 
 			var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
-			var neoReferencesMotherAndIndices = magoManager.octreeSelected.neoReferencesMotherAndIndices;
 			var glPrimitive = gl.POINTS;
 			glPrimitive = gl.TRIANGLES;
 			var maxSizeToRender = 0.0;
@@ -715,7 +717,7 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 			
 			gl.disable(gl.CULL_FACE);
 			
-			magoManager.objectSelected.render(magoManager, neoBuilding, localRenderType, renderTexture, currentShader, refMatrixIdxKey, minSizeToRender);
+			magoManager.selectionManager.getSelectedF4dObject().render(magoManager, neoBuilding, localRenderType, renderTexture, currentShader, refMatrixIdxKey, minSizeToRender);
 			silhouetteDepthFbo.unbind(); 
 			
 			gl.enable(gl.CULL_FACE);
@@ -2382,7 +2384,16 @@ Renderer.prototype.renderFilter = function()
  */
 Renderer.prototype.renderGeometryColorCoding = function(visibleObjControlerNodes) 
 {
+/*
+	'F4D' : 'f4d',
+	'OBJECT' : 'object',
+	'NATIVE' : 'native',
+	'ALL'  : 'all'
+*/
+
 	var magoManager = this.magoManager;
+	var selectType = magoManager.interactionCollection.getSelectType();
+
 	var gl = magoManager.getGl();
 	var renderType = 2; // 0 = depthRender, 1= colorRender, 2 = selectionRender.***
 	
@@ -2390,7 +2401,8 @@ Renderer.prototype.renderGeometryColorCoding = function(visibleObjControlerNodes
 	
 	// Render mago modeler objects.***
 	
-	if (magoManager.modeler !== undefined)
+	//지금 당장은 필요없음. 테스트용 코드들임.
+	/*if (selectType === 'native' && magoManager.modeler !== undefined)
 	{
 		currentShader = magoManager.postFxShadersManager.getShader("modelRefColorCoding"); 
 		currentShader.useProgram();
@@ -2407,7 +2419,7 @@ Renderer.prototype.renderGeometryColorCoding = function(visibleObjControlerNodes
 
 		currentShader.disableVertexAttribArrayAll();
 		gl.useProgram(null);
-	}
+	}*/
 	
 	
 	// Render f4d objects.***
@@ -2427,12 +2439,19 @@ Renderer.prototype.renderGeometryColorCoding = function(visibleObjControlerNodes
 		gl.disable(gl.CULL_FACE);
 		// do the colorCoding render.***
 		var minSizeToRender = 0.0;
-		magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
-		magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
-		magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
+		if(selectType !== 'native')
+		{
+			magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
+			magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
+			magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
+		}
+		
 		// native objects.
-		var glPrimitive = undefined;
-		this.renderNativeObjects(gl, currentShader, renderType, visibleObjControlerNodes);
+		if(selectType === 'native' || selectType === 'all')
+		{
+			this.renderNativeObjects(gl, currentShader, renderType, visibleObjControlerNodes);
+		}
+		
 		/*
 		var nativeObjectsCount = visibleObjControlerNodes.currentVisibleNativeObjects.length;
 		for (var i=0; i<nativeObjectsCount; i++)
@@ -2448,6 +2467,7 @@ Renderer.prototype.renderGeometryColorCoding = function(visibleObjControlerNodes
 		if (magoManager.weatherStation)
 		{ magoManager.weatherStation.test_renderCuttingPlanes(magoManager, renderType); }
 	}
+
 	if (magoManager.magoPolicy.objectMoveMode === CODE.moveMode.GEOGRAPHICPOINTS)
 	{
 		// render geographicCoords of the modeler.***

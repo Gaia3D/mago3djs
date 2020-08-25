@@ -333,8 +333,8 @@ var MagoManager = function(config)
 	 * Interaction collection.
 	 * @type {InteractionCollection}
 	 */
-	this.interactions = new InteractionCollection(this);
-	this.interactions.add(new F4dSelectInteraction());
+	this.interactionCollection = new InteractionCollection(this);
+	this.interactionCollection.add(new PointSelectInteraction());
 
 	/**
      * Control collection.
@@ -479,11 +479,16 @@ MagoManager.prototype.isCesiumGlobe = function()
 MagoManager.prototype.handleBrowserEvent = function(browserEvent) 
 {
 	this.emit(browserEvent.type, browserEvent);
-	var interactionArray = this.interactions.array;
+	var interactionArray = this.interactionCollection.array;
 
 	for (var i=interactionArray.length - 1; i>=0;i--)
 	{
 		var interaction = interactionArray[i];
+
+		/**
+		 * @example 
+		 * interaction can be pointSelectInteraction.
+		 */
 		if (!interaction.getActive())
 		{
 			continue;
@@ -1240,13 +1245,9 @@ MagoManager.prototype.renderToSelectionBuffer = function()
 			gl.clearColor(0, 0, 0, 1); // return to black background.***
 		}
 
-		
-		
-		this.renderer.renderGeometryColorCoding(this.visibleObjControlerNodes); 
+		this.renderer.renderGeometryColorCoding(this.visibleObjControlerNodes, ''); 
 		this.swapRenderingFase();
 
-		
-		
 		if (this.currentFrustumIdx === 0)
 		{
 			this.isCameraMoved = false;
@@ -2148,7 +2149,7 @@ MagoManager.prototype.calculateSelObjMovePlaneAsimetricMode = function(gl, pixel
 
 /**
  * Returns true if is dragging.
- * 
+ * pointer interaction으로 대체 soon
  * @returns {Boolean} 드래그 여부
  * 
  * @private
@@ -2196,7 +2197,7 @@ MagoManager.prototype.isDragging = function()
 	{
 		if (current_objectSelected === undefined)
 		{ bIsDragging = false; }
-		else if (current_objectSelected === this.objectSelected) 
+		else if (current_objectSelected === this.selectionManager.getSelectedF4dObject()) 
 		{
 			bIsDragging = true;
 		}
@@ -2319,7 +2320,7 @@ MagoManager.prototype.mouseActionLeftUp = function(mouseX, mouseY)
 		if (nodeSelected === undefined)
 		{ return; }
 		
-		this.saveHistoryObjectMovement(this.objectSelected, nodeSelected);
+		this.saveHistoryObjectMovement(this.selectionManager.getSelectedF4dObject(), nodeSelected);
 	}
 
 	var eventCoordinate = ManagerUtils.getComplexCoordinateByScreenCoord(this.getGl(), mouseX, mouseY, undefined, undefined, undefined, this);
@@ -3339,7 +3340,7 @@ MagoManager.prototype.manageMouseDragging = function(mouseX, mouseY)
 	}
 	else if (this.magoPolicy.objectMoveMode === CODE.moveMode.OBJECT) // objects move.***
 	{
-		if (this.objectSelected !== undefined && this.selectionManager.currentOctreeSelected) 
+		if (this.selectionManager.getSelectedF4dObject() !== undefined && this.selectionManager.currentOctreeSelected) 
 		{
 			// 1rst, check if there are objects to move.***
 			if (this.mustCheckIfDragging) 
@@ -3679,10 +3680,11 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 	}
 	else if (this.magoPolicy.objectMoveMode === CODE.moveMode.OBJECT) // objects move.***
 	{
-		if (this.objectSelected === undefined)
+		var selectedObjtect= this.selectionManager.getSelectedF4dObject();
+		if (selectedObjtect === undefined)
 		{ return; }
 	
-		if (this.objectSelected.constructor.name !== "NeoReference")
+		if (selectedObjtect.constructor.name !== "NeoReference")
 		{ return; }
 
 		// create a XY_plane in the selected_pixel_position.***
@@ -3713,14 +3715,15 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 		intersectionPoint = this.selObjMovePlane.intersectionLine(line, intersectionPoint);
 
 		//the movement of an object must multiply by buildingRotMatrix.***
-		if (this.objectSelected.moveVectorRelToBuilding === undefined)
-		{ this.objectSelected.moveVectorRelToBuilding = new Point3D(); }
+		
+		if (selectedObjtect.moveVectorRelToBuilding === undefined)
+		{ selectedObjtect.moveVectorRelToBuilding = new Point3D(); }
 	
 		// move vector rel to building.
 		if (!this.thereAreStartMovePoint) 
 		{
 			this.startMovPoint = intersectionPoint;
-			this.startMovPoint.add(-this.objectSelected.moveVectorRelToBuilding.x, -this.objectSelected.moveVectorRelToBuilding.y, -this.objectSelected.moveVectorRelToBuilding.z);
+			this.startMovPoint.add(-selectedObjtect.moveVectorRelToBuilding.x, -selectedObjtect.moveVectorRelToBuilding.y, -this.objectSelected.moveVectorRelToBuilding.z);
 			this.thereAreStartMovePoint = true;
 		}
 		else 
@@ -3729,13 +3732,13 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 			var difY = intersectionPoint.y - this.startMovPoint.y;
 			var difZ = intersectionPoint.z - this.startMovPoint.z;
 
-			this.objectSelected.moveVectorRelToBuilding.set(difX, difY, difZ);
-			this.objectSelected.moveVector = buildingGeoLocation.tMatrix.rotatePoint3D(this.objectSelected.moveVectorRelToBuilding, this.objectSelected.moveVector); 
+			selectedObjtect.moveVectorRelToBuilding.set(difX, difY, difZ);
+			selectedObjtect.moveVector = buildingGeoLocation.tMatrix.rotatePoint3D(selectedObjtect.moveVectorRelToBuilding, this.objectSelected.moveVector); 
 		}
 		
 		var projectId = this.selectionManager.getSelectedF4dNode().data.projectId;
 		var data_key = this.selectionManager.getSelectedF4dNode().data.nodeId;
-		var objectIndexOrder = this.objectSelected._id;
+		var objectIndexOrder = selectedObjtect._id;
 		
 		this.config.deleteMovingHistoryObject(projectId, data_key, objectIndexOrder);
 		this.objectMoved = true; // this provoques that on leftMouseUp -> saveHistoryObjectMovement
@@ -5566,7 +5569,8 @@ MagoManager.prototype.selectedObjectNotice = function(neoBuilding)
 	{
 		//if (this.objMarkerSC === undefined) { return; }
 		var objectId = null;
-		if (this.objectSelected !== undefined) { objectId = this.objectSelected.objectId; }
+		var selectedObjtect = this.selectionManager.getSelectedF4dObject();
+		if (selectedObjtect !== undefined) { objectId = selectedObjtect.objectId; }
 		
 		// click object 정보를 표시
 		if (this.magoPolicy.getObjectInfoViewEnable()) 

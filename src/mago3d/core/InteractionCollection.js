@@ -78,3 +78,19 @@ InteractionCollection.prototype.add = function(interaction)
 	this.array.push(interaction);
 	this.emit(InteractionCollection.EVENT_TYPE.ADD, interaction);
 };
+
+/**
+ * return select type
+ * @param {DrawGeometryInteraction} interaction
+ * @return {string}
+ */
+InteractionCollection.prototype.getSelectType = function() 
+{
+	var selects = this.array.filter(function(i){
+		if(i instanceof Mago3D.PointSelectInteraction) return i;
+	});
+	var pointSelectInteraction = selects[0];
+	return pointSelectInteraction.targetType;
+};
+
+

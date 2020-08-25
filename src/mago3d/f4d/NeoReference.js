@@ -311,7 +311,7 @@ NeoReference.prototype.solveReferenceColorOrTexture = function(magoManager, neoB
 	// Check if we are under a selected data structure.
 	var selectionManager = magoManager.selectionManager;
 	var referenceObjectIsSelected = false;
-	if (selectionManager.parentSelected && magoManager.objectSelected === this)
+	if (selectionManager.parentSelected && magoManager.selectionManager.getSelectedF4dObject() === this)
 	{
 		referenceObjectIsSelected = true;
 	}
@@ -575,7 +575,7 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 	{ 
 		if (!block.isReadyToRender(neoReference, magoManager, minSizeToRender))
 		{
-			if (magoManager.objectSelected !== neoReference)
+			if (magoManager.selectionManager.getSelectedF4dObject() !== neoReference)
 			{ return false; } 
 		}
 	}

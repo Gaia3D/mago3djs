@@ -265,7 +265,7 @@ MagoRenderable.prototype.renderAsChild = function(magoManager, shader, renderTyp
 
 		if (selectionManager.isObjectSelected(this))
 		{ bIsSelected = true; }
-		bIsSelected = false;
+		
 		if (bIsSelected)
 		{
 			var selColor = [0.9, 0.1, 0.1, 1.0];
@@ -282,7 +282,7 @@ MagoRenderable.prototype.renderAsChild = function(magoManager, shader, renderTyp
 				}
 			}
 			
-			//gl.uniform4fv(shader.oneColor4_loc, selColor);
+			gl.uniform4fv(shader.oneColor4_loc, selColor);
 		}
 		else 
 		{

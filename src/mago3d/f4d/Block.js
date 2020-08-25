@@ -104,7 +104,7 @@ Block.prototype.isReadyToRender = function(neoReference, magoManager, maxSizeToR
 	if (maxSizeToRender && (this.radius < maxSizeToRender))
 	{ return false; }
 	
-	if (magoManager.isCameraMoving && this.radius < magoManager.smallObjectSize && magoManager.objectSelected !== neoReference)
+	if (magoManager.isCameraMoving && this.radius < magoManager.smallObjectSize && magoManager.selectionManager.getSelectedF4dObject() !== neoReference)
 	{ return false; }
 
 	return true;

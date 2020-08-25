@@ -3,7 +3,7 @@
 /**
  * browser event instance
  * @param {string} type required. 
- * @param {object} position 
+ * @param {object} position is screen coord, if mousemove has startPosition and endPositon, otherwise one position
  * @param {MagoManager} magoManager 
  */
 var BrowserEvent = function(type, position, magoManager) 
