@@ -86,8 +86,9 @@ InteractionCollection.prototype.add = function(interaction)
  */
 InteractionCollection.prototype.getSelectType = function() 
 {
-	var selects = this.array.filter(function(i){
-		if(i instanceof Mago3D.PointSelectInteraction) return i;
+	var selects = this.array.filter(function(i)
+	{
+		if (i instanceof Mago3D.PointSelectInteraction) { return i; }
 	});
 	var pointSelectInteraction = selects[0];
 	return pointSelectInteraction.targetType;

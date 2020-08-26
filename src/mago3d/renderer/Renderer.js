@@ -589,20 +589,23 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 	if (magoManager.weatherStation)
 	{ magoManager.weatherStation.test_renderCuttingPlanes(magoManager, renderType); }
 	
-	
+	var selectionManager = magoManager.selectionManager;
 	
 	// Test.***
-	var selGeneralObjects = magoManager.selectionManager.getSelectionCandidatesFamily("general");
-	if (selGeneralObjects)
+	if (selectionManager)
 	{
-		var currObjectSelected = selGeneralObjects.currentSelected;
-		if (currObjectSelected)
+		var selGeneralObjects = selectionManager.getSelectionCandidatesFamily("general");
+		if (selGeneralObjects)
 		{
-			// check if is a cuttingPlane.***
-			if (currObjectSelected instanceof CuttingPlane)
+			var currObjectSelected = selGeneralObjects.currentSelected;
+			if (currObjectSelected)
 			{
-				// Test. Render depth only for the selected object.***************************
-				magoManager.test_renderDepth_objectSelected(currObjectSelected);
+				// check if is a cuttingPlane.***
+				if (currObjectSelected instanceof CuttingPlane)
+				{
+					// Test. Render depth only for the selected object.***************************
+					magoManager.test_renderDepth_objectSelected(currObjectSelected);
+				}
 			}
 		}
 	}
@@ -615,78 +618,13 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 	/*
 	*	TODO: MUST BE CHANGE WITHOUT YOUR AUTHORIZATION, YOU AND ME
 	*/
-	var node = magoManager.selectionManager.getSelectedF4dNode();
-	var selectedRef = magoManager.selectionManager.getSelectedF4dObject();
-	if (node !== undefined && !selectedRef) // test code.***
+	if (selectionManager)
 	{
-		magoManager.currentProcess = CODE.magoCurrentProcess.SilhouetteDepthRendering;
-		var silhouetteDepthFbo = magoManager.getSilhouetteDepthFbo();
-		silhouetteDepthFbo.bind(); 
-			
-		if (magoManager.isFarestFrustum())
-		{
-			gl.clearColor(0, 0, 0, 1);
-			gl.clearDepth(1);
-			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-		}
-			
-		magoManager.swapRenderingFase();
-			
-		var currentShader;
-		currentShader = magoManager.postFxShadersManager.getShader("modelRefDepth"); 
-		currentShader.resetLastBuffersBinded();
-
-		currentShader.useProgram();
-		currentShader.disableVertexAttribArrayAll();
-		currentShader.enableVertexAttribArray(currentShader.position3_loc);
-
-		currentShader.bindUniformGenerals();
-		gl.uniform3fv(currentShader.scaleLC_loc, [1.0, 1.0, 1.0]); // init referencesMatrix.
-			
-		// check if exist clippingPlanes.
-		if (magoManager.modeler.clippingBox !== undefined)
-		{
-			var planesVec4Array = magoManager.modeler.clippingBox.getPlanesRelToEyevec4Array(magoManager);
-			var planesVec4FloatArray = new Float32Array(planesVec4Array);
-				
-			gl.uniform1i(currentShader.bApplyClippingPlanes_loc, true);
-			gl.uniform1i(currentShader.clippingPlanesCount_loc, 6);
-			gl.uniform4fv(currentShader.clippingPlanes_loc, planesVec4FloatArray);
-		}
-		else 
-		{
-			gl.uniform1i(currentShader.bApplyClippingPlanes_loc, false);
-		}
-			
-		var renderType = 0;
-		var refMatrixIdxKey = 0;
-		node.renderContent(magoManager, currentShader, renderType, refMatrixIdxKey);
-
-		silhouetteDepthFbo.unbind(); 
-		magoManager.swapRenderingFase();
-	}
-	//}
-	
-	// Check if there are a object selected.**********************************************************************
-	//if (magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.OBJECT && magoManager.selectionManager.currentReferenceSelected)
-	if (magoManager.selectionManager.currentReferenceSelected)
-	{
-		var node = magoManager.selectionManager.getSelectedF4dNode();
-		var neoBuilding = magoManager.selectionManager.getSelectedF4dBuilding();
-		if (magoManager.selectionManager.currentReferenceSelected instanceof NeoReference && node !== undefined && neoBuilding !== undefined) // test code.***
+		var node = selectionManager.getSelectedF4dNode();
+		var selectedRef = selectionManager.getSelectedF4dObject();
+		if (node !== undefined && !selectedRef) // test code.***
 		{
 			magoManager.currentProcess = CODE.magoCurrentProcess.SilhouetteDepthRendering;
-			var geoLocDataManager = node.getNodeGeoLocDataManager();
-
-			var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
-			var glPrimitive = gl.POINTS;
-			glPrimitive = gl.TRIANGLES;
-			var maxSizeToRender = 0.0;
-			var refMatrixIdxKey = 0;
-			
-			magoManager.currentProcess = CODE.magoCurrentProcess.StencilSilhouetteRendering;
-			
-			// do as the "getSelectedObjectPicking".**********************************************************
 			var silhouetteDepthFbo = magoManager.getSilhouetteDepthFbo();
 			silhouetteDepthFbo.bind(); 
 				
@@ -696,6 +634,8 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 				gl.clearDepth(1);
 				gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 			}
+				
+			magoManager.swapRenderingFase();
 				
 			var currentShader;
 			currentShader = magoManager.postFxShadersManager.getShader("modelRefDepth"); 
@@ -707,20 +647,87 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 
 			currentShader.bindUniformGenerals();
 			gl.uniform3fv(currentShader.scaleLC_loc, [1.0, 1.0, 1.0]); // init referencesMatrix.
-			
-			buildingGeoLocation.bindGeoLocationUniforms(gl, currentShader);
+				
+			// check if exist clippingPlanes.
+			if (magoManager.modeler.clippingBox !== undefined)
+			{
+				var planesVec4Array = magoManager.modeler.clippingBox.getPlanesRelToEyevec4Array(magoManager);
+				var planesVec4FloatArray = new Float32Array(planesVec4Array);
+					
+				gl.uniform1i(currentShader.bApplyClippingPlanes_loc, true);
+				gl.uniform1i(currentShader.clippingPlanesCount_loc, 6);
+				gl.uniform4fv(currentShader.clippingPlanes_loc, planesVec4FloatArray);
+			}
+			else 
+			{
+				gl.uniform1i(currentShader.bApplyClippingPlanes_loc, false);
+			}
+				
+			var renderType = 0;
+			var refMatrixIdxKey = 0;
+			node.renderContent(magoManager, currentShader, renderType, refMatrixIdxKey);
 
-			glPrimitive = gl.TRIANGLES;
-			var localRenderType = 0; // only need positions.***
-			var minSizeToRender = 0.0;
-			var offsetSize = 3/1000;
-			
-			gl.disable(gl.CULL_FACE);
-			
-			magoManager.selectionManager.getSelectedF4dObject().render(magoManager, neoBuilding, localRenderType, renderTexture, currentShader, refMatrixIdxKey, minSizeToRender);
 			silhouetteDepthFbo.unbind(); 
-			
-			gl.enable(gl.CULL_FACE);
+			magoManager.swapRenderingFase();
+		}
+
+		//}
+		
+		// Check if there are a object selected.**********************************************************************
+		//if (magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.OBJECT && magoManager.selectionManager.currentReferenceSelected)
+		if (selectionManager.currentReferenceSelected)
+		{
+			var node = selectionManager.getSelectedF4dNode();
+			var neoBuilding = selectionManager.getSelectedF4dBuilding();
+			if (selectionManager.currentReferenceSelected instanceof NeoReference && node !== undefined && neoBuilding !== undefined) // test code.***
+			{
+				magoManager.currentProcess = CODE.magoCurrentProcess.SilhouetteDepthRendering;
+				var geoLocDataManager = node.getNodeGeoLocDataManager();
+
+				var buildingGeoLocation = geoLocDataManager.getCurrentGeoLocationData();
+				var glPrimitive = gl.POINTS;
+				glPrimitive = gl.TRIANGLES;
+				var maxSizeToRender = 0.0;
+				var refMatrixIdxKey = 0;
+				
+				magoManager.currentProcess = CODE.magoCurrentProcess.StencilSilhouetteRendering;
+				
+				// do as the "getSelectedObjectPicking".**********************************************************
+				var silhouetteDepthFbo = magoManager.getSilhouetteDepthFbo();
+				silhouetteDepthFbo.bind(); 
+					
+				if (magoManager.isFarestFrustum())
+				{
+					gl.clearColor(0, 0, 0, 1);
+					gl.clearDepth(1);
+					gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+				}
+					
+				var currentShader;
+				currentShader = magoManager.postFxShadersManager.getShader("modelRefDepth"); 
+				currentShader.resetLastBuffersBinded();
+
+				currentShader.useProgram();
+				currentShader.disableVertexAttribArrayAll();
+				currentShader.enableVertexAttribArray(currentShader.position3_loc);
+
+				currentShader.bindUniformGenerals();
+				gl.uniform3fv(currentShader.scaleLC_loc, [1.0, 1.0, 1.0]); // init referencesMatrix.
+				
+				buildingGeoLocation.bindGeoLocationUniforms(gl, currentShader);
+
+				glPrimitive = gl.TRIANGLES;
+				var localRenderType = 0; // only need positions.***
+				var minSizeToRender = 0.0;
+				var offsetSize = 3/1000;
+				
+				gl.disable(gl.CULL_FACE);
+				
+				selectionManager.getSelectedF4dObject().render(magoManager, neoBuilding, localRenderType, renderTexture, currentShader, refMatrixIdxKey, minSizeToRender);
+				silhouetteDepthFbo.unbind(); 
+				
+				gl.enable(gl.CULL_FACE);
+			}
 		}
 	}
 };
@@ -1675,6 +1682,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 	var renderingSettings = magoManager._settings.getRenderingSettings();
 
 	var renderTexture = false;
+	var selectionManager = magoManager.selectionManager;
 	
 	if (renderType === 0 ) 
 	{
@@ -1682,9 +1690,9 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		magoManager.renderer.renderGeometryDepth(gl, renderType, visibleObjControlerNodes);
 		
 		// Draw the axis.***
-		if (magoManager.magoPolicy.getShowOrigin() && magoManager.selectionManager.getSelectedF4dNode() !== undefined)
+		if (selectionManager && magoManager.magoPolicy.getShowOrigin() && selectionManager.getSelectedF4dNode() !== undefined)
 		{
-			node = magoManager.selectionManager.getSelectedF4dNode();
+			node = selectionManager.getSelectedF4dNode();
 			var nodes = [node];
 			
 			this.renderAxisNodes(nodes, renderType);
@@ -1920,16 +1928,16 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		}
 		
 		
-		if (magoManager.selectionManager.getSelectedF4dNode()) // if there are an object selected then there are a building selected.***
+		if (selectionManager && selectionManager.getSelectedF4dNode()) // if there are an object selected then there are a building selected.***
 		{
-			if (magoManager.selectionManager.getSelectedF4dBuilding())
+			if (selectionManager.getSelectedF4dBuilding())
 			{
 				this.renderSilhouette();
 			}
 			
-			if (magoManager.selectionManager.getSelectedF4dBuilding())
+			if (selectionManager.getSelectedF4dBuilding())
 			{
-				node = magoManager.selectionManager.getSelectedF4dNode();
+				node = selectionManager.getSelectedF4dNode();
 				if (node !== undefined) // test code.***
 				{
 					// New.
@@ -1940,7 +1948,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			// draw the axis.***
 			if (magoManager.magoPolicy.getShowOrigin())
 			{
-				var node = magoManager.selectionManager.getSelectedF4dNode();
+				var node = selectionManager.getSelectedF4dNode();
 				//var geoLocDataManager = node.getNodeGeoLocDataManager();
 				var nodes = [node];
 				
@@ -2439,7 +2447,7 @@ Renderer.prototype.renderGeometryColorCoding = function(visibleObjControlerNodes
 		gl.disable(gl.CULL_FACE);
 		// do the colorCoding render.***
 		var minSizeToRender = 0.0;
-		if(selectType !== 'native')
+		if (selectType !== 'native')
 		{
 			magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 			magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
@@ -2447,7 +2455,7 @@ Renderer.prototype.renderGeometryColorCoding = function(visibleObjControlerNodes
 		}
 		
 		// native objects.
-		if(selectType === 'native' || selectType === 'all')
+		if (selectType === 'native' || selectType === 'all')
 		{
 			this.renderNativeObjects(gl, currentShader, renderType, visibleObjControlerNodes);
 		}

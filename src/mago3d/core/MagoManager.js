@@ -441,11 +441,24 @@ MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums)
 	}
 	if (scene)
 	{
-		var gl = scene.context._gl;
-		gl.getExtension("EXT_frag_depth");
-		
 		if (!this.bInit)
-		{ this.init(gl); }
+		{ 
+			var gl = scene.context._gl;
+			gl.getExtension("EXT_frag_depth");
+			this.init(gl); 
+		}
+	
+		if (gl.isContextLost())
+		{ return; }
+	}
+	else 
+	{
+		if (!this.bInit)
+		{ 
+			var gl = this.sceneState.gl;
+			gl.getExtension("EXT_frag_depth");
+			this.init(gl); 
+		}
 	
 		if (gl.isContextLost())
 		{ return; }
@@ -1225,7 +1238,7 @@ MagoManager.prototype.renderToSelectionBuffer = function()
 	var gl = this.getGl();
 	
 	if (this.selectionFbo === undefined) 
-	{ this.selectionFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize : true}); }
+	{ this.selectionFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
 	
 	if (this.isCameraMoved || this.bPicking) // 
 	{
@@ -1277,7 +1290,7 @@ MagoManager.prototype.managePickingProcess = function()
 	var gl = this.getGl();
 	
 	if (this.selectionFbo === undefined) 
-	{ this.selectionFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize : true}); }
+	{ this.selectionFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
 	
 	
 	if (this.currentFrustumIdx === 0)
@@ -1391,7 +1404,7 @@ MagoManager.prototype.getSilhouetteDepthFbo = function()
 	// Provisional function.***
 	var gl = this.getGl();
 	
-	if (this.silhouetteDepthFboNeo === undefined) { this.silhouetteDepthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize : true}); }
+	if (this.silhouetteDepthFboNeo === undefined) { this.silhouetteDepthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
 	
 	return this.silhouetteDepthFboNeo;
 };
@@ -1417,9 +1430,9 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	*/
 	
 	
-	if (frustumVolumenObject.depthFbo === undefined) { frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize : true}); }
+	if (frustumVolumenObject.depthFbo === undefined) { frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
 	//if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, new Float32Array([this.sceneState.drawingBufferWidth[0]/2.0]), new Float32Array([this.sceneState.drawingBufferHeight/2.0]), {matchCanvasSize : true}); }
-	if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize : true}); }
+	if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
 
 	// test silhouette depthFbo.***
 	//if (frustumVolumenObject.silhouetteDepthFboNeo === undefined) { frustumVolumenObject.silhouetteDepthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize : true}); }
@@ -1852,7 +1865,7 @@ MagoManager.prototype.cameraMoved = function()
 	{ 
 		if (this.sceneState.gl) 
 		{
-			this.selectionFbo = new FBO(this.sceneState.gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize : true}); 
+			this.selectionFbo = new FBO(this.sceneState.gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); 
 		}
 	}
 	if (this.selectionFbo)
@@ -2032,6 +2045,10 @@ MagoManager.prototype.TEST__ObjectMarker_toNeoReference = function()
  */
 MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, resultSelectedArray, bSelectObjects) 
 {
+	var selectionManager = this.selectionManager;
+	if (!selectionManager)
+	{ return resultSelectedArray; }
+
 	if (bSelectObjects === undefined)
 	{ bSelectObjects = false; }
 
@@ -2055,7 +2072,7 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, resultSe
 	gl.readPixels(pixelX, pixelY, mosaicWidth, mosaicHeight, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null); // unbind framebuffer.***
 	
-	var selectionManager = this.selectionManager;
+	
 
 	// now, select the object.***
 	// The center pixel of the selection is 12, 13, 14.***
@@ -2170,8 +2187,13 @@ MagoManager.prototype.isDragging = function()
 		return false;
 	}
 
+	var selectionManager = this.selectionManager;
+	if (!selectionManager)
+	{ return false; }
+
 	this.selectionFbo.bind();
 	var current_objectSelected = this.getSelectedObjects(gl, this.mouse_x, this.mouse_y, this.arrayAuxSC);
+	
 
 	if (this.magoPolicy.objectMoveMode === CODE.moveMode.ALL)	// Moving all
 	{
@@ -3874,7 +3896,7 @@ MagoManager.prototype.test_renderDepth_objectSelected = function(currObjectSelec
 	
 	if (this.depthFboAux === undefined)
 	{
-		this.depthFboAux = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize : true});
+		this.depthFboAux = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true});
 	}
 
 	this.depthFboAux.bind(); 

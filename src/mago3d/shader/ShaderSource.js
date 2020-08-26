@@ -6249,6 +6249,9 @@ void main()\n\
 		}\n\
 \n\
 		vec3 normalFromDepth = normal_from_depth(linearDepthAux, screenPos); // normal from depthTex.***\n\
+		//normalFromDepth += vNormal*0.5;\n\
+		//normalize(normalFromDepth);\n\
+\n\
 		float scalarProd = dot(normalFromDepth, normalize(-ray));\n\
 		scalarProd /= 3.0;\n\
 		scalarProd += 0.666;\n\

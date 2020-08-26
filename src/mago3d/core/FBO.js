@@ -72,7 +72,7 @@ var FBO = function(gl, width, height, options)
 
 	this.init();
 
-	if(options.matchCanvasSize)
+	if (options.matchCanvasSize)
 	{
 		var that = this;
 		window.addEventListener('resize', function()
@@ -121,7 +121,7 @@ FBO.prototype.init = function()
 	}
 
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-}
+};
 
 FBO.prototype.setColorBuffer = function(colorBuffer) 
 {

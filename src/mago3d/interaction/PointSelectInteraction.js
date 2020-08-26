@@ -26,11 +26,11 @@ PointSelectInteraction.prototype = Object.create(AbsClickInteraction.prototype);
 PointSelectInteraction.prototype.constructor = PointSelectInteraction;
 
 PointSelectInteraction.TARGETTYPE = {
-	'F4D' : 'f4d',
+	'F4D'    : 'f4d',
 	'OBJECT' : 'object',
 	'NATIVE' : 'native',
-	'ALL'  : 'all'
-}
+	'ALL'    : 'all'
+};
 
 PointSelectInteraction.EVENT_TYPE = {
 	'ACTIVE'  	: 'active',
@@ -44,7 +44,7 @@ PointSelectInteraction.EVENT_TYPE = {
 PointSelectInteraction.prototype.setTargetType = function(type)
 {
 	this.targetType = type;
-}
+};
 
 /**
  * get TargetType
@@ -53,7 +53,7 @@ PointSelectInteraction.prototype.setTargetType = function(type)
 PointSelectInteraction.prototype.getTargetType = function()
 {
 	return this.targetType;
-}
+};
 
 /**
  * set TargetHighlight
@@ -62,7 +62,7 @@ PointSelectInteraction.prototype.getTargetType = function()
 PointSelectInteraction.prototype.setTargetHighlight = function(highlight)
 {
 	this.targetHighlight = highlight;
-}
+};
 
 /**
  * get TargetHighlight
@@ -71,7 +71,7 @@ PointSelectInteraction.prototype.setTargetHighlight = function(highlight)
 PointSelectInteraction.prototype.getTargetHighlight = function()
 {
 	return this.targetHighlight;
-}
+};
 /**
  * handle event
  * @param {BrowserEvent} browserEvent
@@ -89,22 +89,22 @@ PointSelectInteraction.prototype.handleUpEvent = function(browserEvent)
 	this.select(browserEvent.point.screenCoordinate, true);
 	var selectionManager = this.manager.selectionManager;
 	var oldSelected = this.selected;
-	switch(this.targetType)
+	switch (this.targetType)
 	{
-		case PointSelectInteraction.TARGETTYPE.F4D : {
-			this.selected = selectionManager.getSelectedF4dNode();
-			break;
-		}
-		case PointSelectInteraction.TARGETTYPE.OBJECT : {
-			this.selected = selectionManager.getSelectedF4dObject();
-			break;
-		}
-		case PointSelectInteraction.TARGETTYPE.NATIVE : {
-			this.selected = selectionManager.getSelectedGeneral();
-			break;
-		}
+	case PointSelectInteraction.TARGETTYPE.F4D : {
+		this.selected = selectionManager.getSelectedF4dNode();
+		break;
 	}
-	if(oldSelected)
+	case PointSelectInteraction.TARGETTYPE.OBJECT : {
+		this.selected = selectionManager.getSelectedF4dObject();
+		break;
+	}
+	case PointSelectInteraction.TARGETTYPE.NATIVE : {
+		this.selected = selectionManager.getSelectedGeneral();
+		break;
+	}
+	}
+	if (oldSelected)
 	{
 		this.emitEvent(oldSelected, false);
 	}
@@ -112,37 +112,37 @@ PointSelectInteraction.prototype.handleUpEvent = function(browserEvent)
 };
 PointSelectInteraction.prototype.emitEvent = function(selectedObj, selected)
 {
-	if(selectedObj)
+	if (selectedObj)
 	{
 		var type = PointSelectInteraction.getEventType(this.targetType, selected);
 		var eventObj = {
-			type : type,
+			type      : type,
 			timestamp : new Date()
 		};
-		selected ? eventObj.selected = selectedObj : eventObj.deselected = selectedObj
+		selected ? eventObj.selected = selectedObj : eventObj.deselected = selectedObj;
 		this.manager.emit(type, eventObj);
 	}
-}
+};
 PointSelectInteraction.getEventType = function(target, selected)
 {
 	var eventType;
-	switch(target)
+	switch (target)
 	{
-		case PointSelectInteraction.TARGETTYPE.F4D : {
-			eventType = selected ? MagoManager.EVENT_TYPE.SELECTEDF4D : MagoManager.EVENT_TYPE.DESELECTEDF4D;
-			break;
-		}
-		case PointSelectInteraction.TARGETTYPE.OBJECT : {
-			eventType = selected ? MagoManager.EVENT_TYPE.SELECTEDF4DOBJECT : MagoManager.EVENT_TYPE.DESELECTEDF4DOBJECT;
-			break;
-		}
-		case PointSelectInteraction.TARGETTYPE.NATIVE : {
-			eventType = selected ? MagoManager.EVENT_TYPE.SELECTEDGENERALOBJECT : MagoManager.EVENT_TYPE.DESELECTEDGENERALOBJECT
-			break;
-		}
+	case PointSelectInteraction.TARGETTYPE.F4D : {
+		eventType = selected ? MagoManager.EVENT_TYPE.SELECTEDF4D : MagoManager.EVENT_TYPE.DESELECTEDF4D;
+		break;
+	}
+	case PointSelectInteraction.TARGETTYPE.OBJECT : {
+		eventType = selected ? MagoManager.EVENT_TYPE.SELECTEDF4DOBJECT : MagoManager.EVENT_TYPE.DESELECTEDF4DOBJECT;
+		break;
+	}
+	case PointSelectInteraction.TARGETTYPE.NATIVE : {
+		eventType = selected ? MagoManager.EVENT_TYPE.SELECTEDGENERALOBJECT : MagoManager.EVENT_TYPE.DESELECTEDGENERALOBJECT;
+		break;
+	}
 	}
 	return eventType;
-}
+};
 
 /**
  * handle event
@@ -167,11 +167,11 @@ PointSelectInteraction.prototype.select = function(screenCoordinate, bObject)
 	var selectManager = manager.selectionManager;
 
 	if (manager.selectionFbo === undefined) 
-	{ manager.selectionFbo = new FBO(gl, manager.sceneState.drawingBufferWidth, manager.sceneState.drawingBufferHeight, {matchCanvasSize : true}); }
+	{ manager.selectionFbo = new FBO(gl, manager.sceneState.drawingBufferWidth, manager.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
 
 	var gl = manager.getGl();
 	selectManager.selectObjectByPixel(gl, screenCoordinate.x, screenCoordinate.y, bObject);
-}
+};
 
 /**
  * clear 
@@ -182,4 +182,4 @@ PointSelectInteraction.prototype.clear = function()
 	this.manager.selectionManager.clearCurrents();
 	this.init();
 	this.selected = undefined;
-}
+};

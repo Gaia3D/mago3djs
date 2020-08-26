@@ -4,7 +4,8 @@
  * mago3D 전체 환경 설정을 관리
  * @class MagoConfig
  */
-var MagoConfig = function(){
+var MagoConfig = function()
+{
 	this.containerId = undefined;
 	this.serverPolicy = undefined;
 	this.geoserver = undefined;

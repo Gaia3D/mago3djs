@@ -160,7 +160,7 @@ Tools.prototype.setControl = function(magoManager)
 	basicBtns.push(originBtnObj);
 	basicBtns.push(shadowBtnObj);
 
-	for(var i=0,btnLength=basicBtns.length;i<btnLength;i++)
+	for (var i=0, btnLength=basicBtns.length;i<btnLength;i++)
 	{
 		var basicBtn = basicBtns[i];
 		var elem = basicBtn.element;
@@ -227,9 +227,11 @@ Tools.prototype.setControl = function(magoManager)
 	ssaoBtn.appendChild(document.createTextNode('적용'));
 	ssaoBtn.addEventListener(
 		'click',
-		function() {
+		function() 
+		{
 			var ssao = ssaoInput.value;
-			if(isNaN(ssao)) {
+			if (isNaN(ssao)) 
+			{
 				alert('숫자만 입력 가능합니다.');
 				return;
 			} 
@@ -256,7 +258,7 @@ Tools.prototype.setControl = function(magoManager)
 	lodh3.appendChild(document.createTextNode('Level of Detail'));
 	lodDiv.appendChild(lodh3);
 	
-	for(var i=0;i<6;i++)
+	for (var i=0;i<6;i++)
 	{
 		var id = 'geoLod' + i;
 		var name = 'lod' + i;
@@ -300,14 +302,16 @@ Tools.prototype.setControl = function(magoManager)
 	lodBtn.appendChild(document.createTextNode('적용'));
 	lodBtn.addEventListener(
 		'click',
-		function() {
+		function() 
+		{
 			var lod0 = document.getElementById('geoLod0').value;
 			var lod1 = document.getElementById('geoLod1').value;
 			var lod2 = document.getElementById('geoLod2').value;
 			var lod3 = document.getElementById('geoLod3').value;
 			var lod4 = document.getElementById('geoLod4').value;
 			var lod5 = document.getElementById('geoLod5').value;
-			if(isNaN(lod0) || isNaN(lod1) || isNaN(lod2)|| isNaN(lod3) || isNaN(lod4) || isNaN(lod5)) {
+			if (isNaN(lod0) || isNaN(lod1) || isNaN(lod2)|| isNaN(lod3) || isNaN(lod4) || isNaN(lod5)) 
+			{
 				alert('숫자만 입력 가능합니다.');
 				return;
 			}
@@ -435,8 +439,8 @@ Tools.prototype.setControl = function(magoManager)
 		
 		return {
 			runType : runtype,
-			element  : btn,
-			action   : action
+			element : btn,
+			action  : action
 		};
 	}
 
