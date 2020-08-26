@@ -609,8 +609,13 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 			}
 		}
 	}
+	this.renderSilhouetteDepth();
 	
-	// Depth for silhouette.***************************************************************************************
+};
+
+Renderer.prototype.renderSilhouetteDepth = function()
+{
+// Depth for silhouette.***************************************************************************************
 	// Check if there are node selected.***********************************************************
 	//if (magoManager.nodeSelected && magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected)
 	//{
@@ -618,8 +623,11 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 	/*
 	*	TODO: MUST BE CHANGE WITHOUT YOUR AUTHORIZATION, YOU AND ME
 	*/
+	var magoManager = this.magoManager;
+	var selectionManager = magoManager.selectionManager;
 	if (selectionManager)
 	{
+		var gl = magoManager.getGl();
 		var node = selectionManager.getSelectedF4dNode();
 		var selectedRef = selectionManager.getSelectedF4dObject();
 		if (node !== undefined && !selectedRef) // test code.***
@@ -730,7 +738,7 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 			}
 		}
 	}
-};
+}
 
 /**
  * This function renders the sunPointOfView depth.

@@ -439,27 +439,13 @@ MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums)
 	{
 		this.configInformation = this.config.getPolicy();
 	}
-	if (scene)
-	{
-		if (!this.bInit)
-		{ 
-			var gl = scene.context._gl;
-			gl.getExtension("EXT_frag_depth");
-			this.init(gl); 
-		}
-	
-		if (gl.isContextLost())
-		{ return; }
-	}
-	else 
-	{
-		if (!this.bInit)
-		{ 
-			var gl = this.sceneState.gl;
-			gl.getExtension("EXT_frag_depth");
-			this.init(gl); 
-		}
-	
+
+	if (!this.bInit)
+	{ 
+		var gl = scene ? scene.context._gl : this.sceneState.gl;
+		gl.getExtension("EXT_frag_depth");
+		this.init(gl); 
+
 		if (gl.isContextLost())
 		{ return; }
 	}
