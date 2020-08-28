@@ -25,11 +25,60 @@ var BrowserEvent = function(type, position, magoManager)
 	{
 		if (position.hasOwnProperty('x') && position.hasOwnProperty('y'))
 		{
-			var eventCoordinate = ManagerUtils.getComplexCoordinateByScreenCoord(magoManager.getGl(), position.x, position.y, undefined, undefined, undefined, magoManager);
+			var worldCoordinate;
+			var sceneState = magoManager.sceneState;
+			var gl = magoManager.getGl();
+			var camera = sceneState.camera;
 
-			if (!eventCoordinate)
+			var maxDepth = 0.996;
+			var currentDepthFbo;
+			var currentFrustumFar;
+			var currentFrustumNear;
+			var currentLinearDepth;
+			var depthDetected = false;
+			var frustumsCount = magoManager.numFrustums;
+			for (var i = 0; i < frustumsCount; i++)
 			{
-				eventCoordinate = {screenCoordinate: new Point2D(position.x, position.y)};
+				var frustumVolume = magoManager.frustumVolumeControl.getFrustumVolumeCulling(i); 
+				var depthFbo = frustumVolume.depthFbo;
+
+				currentLinearDepth = ManagerUtils.calculatePixelLinearDepth(gl, position.x, position.y, depthFbo, magoManager);
+				if (currentLinearDepth < maxDepth) // maxDepth/255 = 0.99607...
+				{ 
+					currentDepthFbo = depthFbo;
+					var frustum = camera.getFrustum(i);
+					currentFrustumFar = frustum.far[0];
+					currentFrustumNear = frustum.near[0];
+					depthDetected = true;
+					break;
+				}
+			}
+
+			if (!depthDetected && magoManager.isCesiumGlobe())
+			{
+				var scene = magoManager.scene;
+				var camera = scene.frameState.camera;
+				var ray = camera.getPickRay(new Cesium.Cartesian2(position.x, position.y));
+				worldCoordinate = scene.globe.pick(ray, scene);
+			} else 
+			{
+				var camCoord = MagoWorld.screenToCamCoord(position.x, position.y, magoManager, camCoord);
+				if(!camCoord)
+				{
+					worldCoordinate = undefined;
+				} 
+				else 
+				{
+					worldCoordinate = ManagerUtils.cameraCoordPositionToWorldCoord(camCoord, worldCoordinate, magoManager);
+				}
+			}
+
+			var eventCoordinate = {};
+			eventCoordinate.screenCoordinate = new Point2D(position.x, position.y);
+			if (worldCoordinate)
+			{
+				eventCoordinate.worldCoordinate = worldCoordinate;
+				eventCoordinate.geographicCoordinate = ManagerUtils.pointToGeographicCoord(worldCoordinate);
 			}
             
 			this.point = eventCoordinate;

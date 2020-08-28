@@ -334,7 +334,10 @@ var MagoManager = function(config)
 	 * @type {InteractionCollection}
 	 */
 	this.interactionCollection = new InteractionCollection(this);
-	this.interactionCollection.add(new PointSelectInteraction());
+	this.defaultSelectInteraction = new PointSelectInteraction();
+	this.defaultTranslateInteraction = new TranslateInteraction();
+	this.interactionCollection.add(this.defaultSelectInteraction);
+	this.interactionCollection.add(this.defaultTranslateInteraction);
 
 	/**
      * Control collection.
@@ -3731,7 +3734,7 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 		if (!this.thereAreStartMovePoint) 
 		{
 			this.startMovPoint = intersectionPoint;
-			this.startMovPoint.add(-selectedObjtect.moveVectorRelToBuilding.x, -selectedObjtect.moveVectorRelToBuilding.y, -this.objectSelected.moveVectorRelToBuilding.z);
+			this.startMovPoint.add(-selectedObjtect.moveVectorRelToBuilding.x, -selectedObjtect.moveVectorRelToBuilding.y, -selectedObjtect.moveVectorRelToBuilding.z);
 			this.thereAreStartMovePoint = true;
 		}
 		else 
@@ -3741,7 +3744,7 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl)
 			var difZ = intersectionPoint.z - this.startMovPoint.z;
 
 			selectedObjtect.moveVectorRelToBuilding.set(difX, difY, difZ);
-			selectedObjtect.moveVector = buildingGeoLocation.tMatrix.rotatePoint3D(selectedObjtect.moveVectorRelToBuilding, this.objectSelected.moveVector); 
+			selectedObjtect.moveVector = buildingGeoLocation.tMatrix.rotatePoint3D(selectedObjtect.moveVectorRelToBuilding, selectedObjtect.moveVector); 
 		}
 		
 		var projectId = this.selectionManager.getSelectedF4dNode().data.projectId;
@@ -6153,7 +6156,6 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedMap, projectId, f4dOb
 	}*/
 	
 	var projectFolderName = getProjectFolderName(realTimeLocBlocksList);
-	console.info(realTimeLocBlocksList);
 	if (!Array.isArray(realTimeLocBlocksList)) 
 	{
 		this.makeNode(realTimeLocBlocksList, physicalNodesArray, buildingSeedMap, projectFolderName, projectId);
@@ -7199,7 +7201,6 @@ MagoManager.prototype.callAPI = function(api)
 		//this.rootNodeSelected = this.nodeSelected.getRoot();
 
 		this.selectionManager.setSelectedF4dNode(node);
-		this.selectionManager.setSelectedF4dBuilding(node.data.neoBuilding);
 
 		this.emit(MagoManager.EVENT_TYPE.SELECTEDF4D, {
 			type      : MagoManager.EVENT_TYPE.SELECTEDF4D, 

@@ -3,14 +3,14 @@
 /**
  * This is the interaction for draw geometry.
  * @constructor
- * @class AbsPointInteraction
+ * @class AbsPointerInteraction
  * 
  * @abstract
  * @param {object} option layer object.
  */
-var AbsPointInteraction = function(option) 
+var AbsPointerInteraction = function(option) 
 {
-	if (!(this instanceof AbsPointInteraction)) 
+	if (!(this instanceof AbsPointerInteraction)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
@@ -40,20 +40,21 @@ var AbsPointInteraction = function(option)
 
 	this.begin = false;
 	this.dragging = false;
-	this.dragtype = undefined;
+	this.mouseBtn = undefined;
 	this.startPoint = undefined;
 	this.endPoint = undefined;
 };
-AbsPointInteraction.prototype = Object.create(Interaction.prototype);
-AbsPointInteraction.prototype.constructor = AbsPointInteraction;
+AbsPointerInteraction.prototype = Object.create(Interaction.prototype);
+AbsPointerInteraction.prototype.constructor = AbsPointerInteraction;
 
 /**
  * interaction init
  */
-AbsPointInteraction.prototype.init = function() 
+AbsPointerInteraction.prototype.init = function() 
 {
 	this.begin = false;
 	this.dragging = false;
+	this.mouseBtn = undefined;
 	this.startPoint = undefined;
 	this.endPoint = undefined;
 };
@@ -63,7 +64,7 @@ AbsPointInteraction.prototype.init = function()
  * @fires AbsPointInteraction#ACTIVE
  * @fires AbsPointInteraction#DEACTIVE
  */
-AbsPointInteraction.prototype.setActive = function(active) 
+AbsPointerInteraction.prototype.setActive = function(active) 
 {
 	if (!this.manager || !(this.manager instanceof MagoManager)) 
 	{
@@ -90,7 +91,7 @@ AbsPointInteraction.prototype.setActive = function(active)
  * handle event
  * @param {BrowserEvent} browserEvent
  */
-AbsPointInteraction.prototype.handle = function(browserEvent) 
+AbsPointerInteraction.prototype.handle = function(browserEvent) 
 {
 	var type = browserEvent.type;
 
@@ -99,7 +100,7 @@ AbsPointInteraction.prototype.handle = function(browserEvent)
 		if (type === MagoManager.EVENT_TYPE.LEFTUP || type === MagoManager.EVENT_TYPE.RIGHTUP || type === MagoManager.EVENT_TYPE.MIDDLEUP)
 		{
 			this.dragging = false;
-			this.dragtype = undefined;
+			this.mouseBtn = undefined;
 			this.endPoint = browserEvent.point;
 			this.handleUpEvent.call(this, browserEvent);
 		} 
@@ -113,7 +114,7 @@ AbsPointInteraction.prototype.handle = function(browserEvent)
 		if (type === MagoManager.EVENT_TYPE.LEFTDOWN || type === MagoManager.EVENT_TYPE.RIGHTDOWN || type === MagoManager.EVENT_TYPE.MIDDLEDOWN)
 		{
 			this.dragging = true;
-			this.dragtype = type;
+			this.mouseBtn = type;
 			this.endPoint = undefined;
 			this.startPoint = browserEvent.point;
 			this.handleDownEvent.call(this, browserEvent);
@@ -129,7 +130,7 @@ AbsPointInteraction.prototype.handle = function(browserEvent)
  * handle event
  * @param {BrowserEvent} browserEvent
  */
-AbsPointInteraction.prototype.handleDownEvent = function(browserEvent)
+AbsPointerInteraction.prototype.handleDownEvent = function(browserEvent)
 {
 	return abstract();
 };
@@ -138,7 +139,7 @@ AbsPointInteraction.prototype.handleDownEvent = function(browserEvent)
  * handle event
  * @param {BrowserEvent} browserEvent
  */
-AbsPointInteraction.prototype.handleDragEvent = function(browserEvent)
+AbsPointerInteraction.prototype.handleDragEvent = function(browserEvent)
 {
 	return abstract();
 };
@@ -147,7 +148,7 @@ AbsPointInteraction.prototype.handleDragEvent = function(browserEvent)
  * handle event
  * @param {BrowserEvent} browserEvent
  */
-AbsPointInteraction.prototype.handleMoveEvent = function(browserEvent)
+AbsPointerInteraction.prototype.handleMoveEvent = function(browserEvent)
 {
 	return abstract();
 };
@@ -156,7 +157,7 @@ AbsPointInteraction.prototype.handleMoveEvent = function(browserEvent)
  * handle event
  * @param {BrowserEvent} browserEvent
  */
-AbsPointInteraction.prototype.handleUpEvent = function(browserEvent)
+AbsPointerInteraction.prototype.handleUpEvent = function(browserEvent)
 {
 	return abstract();
 };

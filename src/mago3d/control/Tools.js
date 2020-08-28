@@ -109,7 +109,7 @@ Tools.prototype.setControl = function(magoManager)
 {
 	this.magoManager = magoManager;
 
-	var target = this.target ? this.target : this.magoManager.defaultControlContainer;
+	var target = this.target ? this.target : magoManager.defaultControlContainer;
 	target.appendChild(this.element);
 	this.target = target;
 
@@ -122,7 +122,7 @@ Tools.prototype.setControl = function(magoManager)
 	advanceToolDiv.style.display = 'none';
 	advanceToolDiv.className = 'mago3d-tools-div mago3d-tools-advance';
 
-	this.magoManager.defaultContentContainer.appendChild(advanceToolDiv);
+	magoManager.defaultContentContainer.appendChild(advanceToolDiv);
 
 	var basicSettingsDiv = getGroupDiv('기본 설정');
 	advanceToolDiv.appendChild(basicSettingsDiv);
@@ -211,7 +211,7 @@ Tools.prototype.setControl = function(magoManager)
 	ssaoInput.setAttribute('id', 'ssaoRadius');
 	ssaoInput.setAttribute('name', 'ssaoRadius');
 	ssaoInput.setAttribute('type', 'text');
-	ssaoInput.setAttribute('value', this.magoManager.configInformation.ssaoRadius);
+	ssaoInput.setAttribute('value', magoManager.configInformation.ssaoRadius);
 	ssaoDiv.appendChild(ssaoInput);
 
 	var ssaoBtn = document.createElement('button');
@@ -285,7 +285,7 @@ Tools.prototype.setControl = function(magoManager)
 		lodInput.setAttribute('id', id);
 		lodInput.setAttribute('name', name);
 		lodInput.setAttribute('type', 'text');
-		lodInput.setAttribute('value', this.magoManager.configInformation[name]);
+		lodInput.setAttribute('value', magoManager.configInformation[name]);
 		lodDiv.appendChild(lodInput);
 	}
 
@@ -342,80 +342,235 @@ Tools.prototype.setControl = function(magoManager)
 	dataDiv.appendChild(dataControlDiv);
 
 	var allText = document.createElement('strong');
-	allText.style.width = '25%';
+	allText.style.width = '35%';
 	allText.style.padding = '2px';
 	allText.style.verticalAlign = 'middle';
 	allText.style.display = 'inline-block';
 	allText.style.textAlign = 'justify';
 	allText.style.fontSize = '13.33333px';
-	allText.appendChild(document.createTextNode('전체'));
+	allText.appendChild(document.createTextNode('F4D 모델'));
 	dataControlDiv.appendChild(allText);
 
 	var allSelectBtn = document.createElement('button');
 	allSelectBtn.setAttribute('type', 'button');
+	allSelectBtn.dataset.type = InteractionTargetType.F4D;
+	allSelectBtn.dataset.function = 'select';
+	allSelectBtn.dataset.active = 'off';
+	allSelectBtn.className = 'mago3d-tools-select';
+	allSelectBtn.name = 'btn-' + InteractionTargetType.F4D;
 	allSelectBtn.style.display = 'inline-block';
 	allSelectBtn.style.verticalAlign = 'middle';
 	allSelectBtn.style.padding = '2px 10px';
 	allSelectBtn.style.fontSize = '12px';
-	allSelectBtn.style.color = '#FFFFFF';
+	allSelectBtn.style.color = 'rgb(20, 20, 20)';
 	allSelectBtn.style.borderRadius = '12px';
 	allSelectBtn.style.borderStyle = 'none';
-	allSelectBtn.style.backgroundColor = '#636363';
+	allSelectBtn.style.backgroundColor = 'rgb(255, 255, 255)';
 	allSelectBtn.appendChild(document.createTextNode('선택'));
 	dataControlDiv.appendChild(allSelectBtn);
 
 	var allMoveBtn = document.createElement('button');
 	allMoveBtn.setAttribute('type', 'button');
+	allMoveBtn.dataset.type = InteractionTargetType.F4D;
+	allMoveBtn.dataset.function = 'translate';
+	allMoveBtn.dataset.active = 'off';
+	allMoveBtn.className = 'mago3d-tools-translate';
+	allMoveBtn.name = 'btn-' + InteractionTargetType.F4D;
 	allMoveBtn.style.display = 'inline-block';
 	allMoveBtn.style.verticalAlign = 'middle';
 	allMoveBtn.style.marginLeft = '5px';
 	allMoveBtn.style.padding = '2px 10px';
 	allMoveBtn.style.fontSize = '12px';
-	allMoveBtn.style.color = '#FFFFFF';
+	allMoveBtn.style.color = 'rgb(20, 20, 20)';
 	allMoveBtn.style.borderRadius = '12px';
 	allMoveBtn.style.borderStyle = 'none';
-	allMoveBtn.style.backgroundColor = '#636363';
+	allMoveBtn.style.backgroundColor = 'rgb(255, 255, 255)';
 	allMoveBtn.appendChild(document.createTextNode('이동'));
 	dataControlDiv.appendChild(allMoveBtn);
 
 	dataControlDiv.appendChild(document.createElement('br'));
 
 	var partText = document.createElement('strong');
-	partText.style.width = '25%';
+	partText.style.width = '35%';
 	partText.style.padding = '2px';
 	partText.style.verticalAlign = 'middle';
 	partText.style.display = 'inline-block';
 	partText.style.textAlign = 'justify';
 	partText.style.fontSize = '13.33333px';
-	partText.appendChild(document.createTextNode('부분'));
+	partText.appendChild(document.createTextNode('F4D 모델 부분'));
 	dataControlDiv.appendChild(partText);
 
 	var partSelectBtn = document.createElement('button');
 	partSelectBtn.setAttribute('type', 'button');
+	partSelectBtn.dataset.type = InteractionTargetType.OBJECT;
+	partSelectBtn.dataset.function = 'select';
+	partSelectBtn.dataset.active = 'off';
+	partSelectBtn.className = 'mago3d-tools-select';
+	partSelectBtn.name = 'btn-' + InteractionTargetType.OBJECT;
 	partSelectBtn.style.display = 'inline-block';
 	partSelectBtn.style.verticalAlign = 'middle';
 	partSelectBtn.style.padding = '2px 10px';
 	partSelectBtn.style.fontSize = '12px';
-	partSelectBtn.style.color = '#FFFFFF';
+	partSelectBtn.style.color = 'rgb(20, 20, 20)';
 	partSelectBtn.style.borderRadius = '12px';
 	partSelectBtn.style.borderStyle = 'none';
-	partSelectBtn.style.backgroundColor = '#636363';
+	partSelectBtn.style.backgroundColor = 'rgb(255, 255, 255)';
 	partSelectBtn.appendChild(document.createTextNode('선택'));
 	dataControlDiv.appendChild(partSelectBtn);
 
 	var partMoveBtn = document.createElement('button');
 	partMoveBtn.setAttribute('type', 'button');
+	partMoveBtn.dataset.type = InteractionTargetType.OBJECT;
+	partMoveBtn.dataset.function = 'translate';
+	partMoveBtn.dataset.active = 'off';
+	partMoveBtn.className = 'mago3d-tools-translate';
+	partMoveBtn.name = 'btn-' + InteractionTargetType.OBJECT;
 	partMoveBtn.style.display = 'inline-block';
 	partMoveBtn.style.verticalAlign = 'middle';
 	partMoveBtn.style.marginLeft = '5px';
 	partMoveBtn.style.padding = '2px 10px';
 	partMoveBtn.style.fontSize = '12px';
-	partMoveBtn.style.color = '#FFFFFF';
+	partMoveBtn.style.color = 'rgb(20, 20, 20)';
 	partMoveBtn.style.borderRadius = '12px';
 	partMoveBtn.style.borderStyle = 'none';
-	partMoveBtn.style.backgroundColor = '#636363';
+	partMoveBtn.style.backgroundColor = 'rgb(255, 255, 255)';
 	partMoveBtn.appendChild(document.createTextNode('이동'));
 	dataControlDiv.appendChild(partMoveBtn);
+
+	dataControlDiv.appendChild(document.createElement('br'));
+
+	var nativeText = document.createElement('strong');
+	nativeText.style.width = '35%';
+	nativeText.style.padding = '2px';
+	nativeText.style.verticalAlign = 'middle';
+	nativeText.style.display = 'inline-block';
+	nativeText.style.textAlign = 'justify';
+	nativeText.style.fontSize = '13.33333px';
+	nativeText.appendChild(document.createTextNode('원시 모델 부분'));
+	dataControlDiv.appendChild(nativeText);
+
+	var nativeSelectBtn = document.createElement('button');
+	nativeSelectBtn.setAttribute('type', 'button');
+	nativeSelectBtn.dataset.type = InteractionTargetType.NATIVE;
+	nativeSelectBtn.dataset.function = 'select';
+	nativeSelectBtn.dataset.active = 'off';
+	nativeSelectBtn.className = 'mago3d-tools-select';
+	nativeSelectBtn.name = 'btn-' + InteractionTargetType.NATIVE;
+	nativeSelectBtn.style.display = 'inline-block';
+	nativeSelectBtn.style.verticalAlign = 'middle';
+	nativeSelectBtn.style.padding = '2px 10px';
+	nativeSelectBtn.style.fontSize = '12px';
+	nativeSelectBtn.style.color = 'rgb(20, 20, 20)';
+	nativeSelectBtn.style.borderRadius = '12px';
+	nativeSelectBtn.style.borderStyle = 'none';
+	nativeSelectBtn.style.backgroundColor = 'rgb(255, 255, 255)';
+	nativeSelectBtn.appendChild(document.createTextNode('선택'));
+	dataControlDiv.appendChild(nativeSelectBtn);
+
+	var nativeMoveBtn = document.createElement('button');
+	nativeMoveBtn.setAttribute('type', 'button');
+	nativeMoveBtn.dataset.type = InteractionTargetType.NATIVE;
+	nativeMoveBtn.dataset.function = 'translate';
+	nativeMoveBtn.dataset.active = 'off';
+	nativeMoveBtn.className = 'mago3d-tools-translate';
+	nativeMoveBtn.name = 'btn-' + InteractionTargetType.NATIVE;
+	nativeMoveBtn.style.display = 'inline-block';
+	nativeMoveBtn.style.verticalAlign = 'middle';
+	nativeMoveBtn.style.marginLeft = '5px';
+	nativeMoveBtn.style.padding = '2px 10px';
+	nativeMoveBtn.style.fontSize = '12px';
+	nativeMoveBtn.style.color = 'rgb(20, 20, 20)';
+	nativeMoveBtn.style.borderRadius = '12px';
+	nativeMoveBtn.style.borderStyle = 'none';
+	nativeMoveBtn.style.backgroundColor = 'rgb(255, 255, 255)';
+	nativeMoveBtn.appendChild(document.createTextNode('이동'));
+	dataControlDiv.appendChild(nativeMoveBtn);
+
+	var selectBtns = magoManager.defaultContentContainer.getElementsByClassName('mago3d-tools-select');
+	var selectInteraction = magoManager.defaultSelectInteraction;
+	var translateBtns = magoManager.defaultContentContainer.getElementsByClassName('mago3d-tools-translate');
+	var translateInteraction = magoManager.defaultTranslateInteraction;
+	var names = [InteractionTargetType.NATIVE, InteractionTargetType.OBJECT, InteractionTargetType.F4D];
+	
+
+	for(var i=0,sLength=selectBtns.length;i<sLength;i++)
+	{
+		(function (idx){
+			var sBtn = selectBtns.item(idx);
+			sBtn.addEventListener('click',function(){
+				var type = sBtn.dataset.type;
+				
+				if(!selectInteraction.getActive())
+				{
+					selectInteraction.setTargetType(type);
+					selectInteraction.setActive(true);
+					sBtn.dataset.active = 'on';
+					
+				} else {
+					var nowTargetType = selectInteraction.getTargetType();
+					if(type === nowTargetType)
+					{
+						selectInteraction.setActive(false);
+						sBtn.dataset.active = 'off';
+					}
+					else
+					{
+						var nowBtn = selectBtns.namedItem('btn-'+nowTargetType);
+						nowBtn.dataset.active = 'off';
+						btnActiveStyle(nowBtn);
+						selectInteraction.setTargetType(type);
+						sBtn.dataset.active = 'on';
+					}
+				}
+				btnActiveStyle(sBtn);
+			},false);
+		})(i)
+	}
+
+	for(var i=0,tLength=translateBtns.length;i<tLength;i++)
+	{
+		(function (idx){
+			var tBtn = translateBtns.item(idx);
+			tBtn.addEventListener('click',function(){
+				var type = tBtn.dataset.type;
+
+				if(!translateInteraction.getActive())
+				{
+					translateInteraction.setTargetType(type);
+					translateInteraction.setActive(true);
+					tBtn.dataset.active = 'on';
+				} else {
+					var nowTargetType = translateInteraction.getTargetType();
+					if(type === nowTargetType)
+					{
+						translateInteraction.setActive(false);
+						tBtn.dataset.active = 'off';
+					}
+					else
+					{
+						var nowBtn = translateBtns.namedItem('btn-'+nowTargetType);
+						nowBtn.dataset.active = 'off';
+						btnActiveStyle(nowBtn);
+						translateInteraction.setTargetType(type);
+						tBtn.dataset.active = 'on';
+					}
+				}
+				btnActiveStyle(tBtn);
+			},false);
+		})(i)
+	}
+
+	function btnActiveStyle (b)
+	{
+		if(b.dataset.active === 'on')
+		{
+			b.style.backgroundColor = 'rgb(160, 160, 160)';
+			b.style.color = 'rgb(230, 230, 230)';
+		} else {
+			b.style.backgroundColor = 'rgb(255, 255, 255)';
+			b.style.color = 'rgb(20, 20, 20)';
+		}
+	}
 
 	function getBasicButtonObject (type, title, text, runtype, action)
 	{
