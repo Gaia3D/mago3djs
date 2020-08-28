@@ -1826,7 +1826,10 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 			worldPosition = nodeRoot.getBBoxCenterPositionWorldCoord(geoLoc);
 			screenCoord = ManagerUtils.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord, this);
 			
-			if (screenCoord.x >= 0 && screenCoord.y >= 0)
+			var elemFromPoints = document.elementsFromPoint(screenCoord.x,screenCoord.y);
+			if(elemFromPoints.length === 0) continue;
+
+			if (elemFromPoints[0].nodeName === 'CANVAS' && screenCoord.x >= 0 && screenCoord.y >= 0)
 			{
 				ctx.font = "13px Arial";
 				//ctx.strokeText(nodeRoot.data.nodeId, screenCoord.x, screenCoord.y);
@@ -4564,28 +4567,30 @@ MagoManager.prototype.getObjectLabel = function()
 {
 	if (this.canvasObjectLabel === undefined)
 	{
-		this.canvasObjectLabel = document.getElementById("objectLabel");
-		if (this.canvasObjectLabel === undefined)
-		{ return; }
+		this.canvasObjectLabel = document.createElement('canvas');
 
 		var magoDiv = document.getElementById(this.config.getContainerId());
 		var offsetLeft = magoDiv.offsetLeft;
 		var offsetTop = magoDiv.offsetTop;
+		var canvasStyleLeft = offsetLeft.toString()+"px";
+		var canvasStyleTop = offsetTop.toString()+"px";
 		var offsetWidth = magoDiv.offsetWidth;
 		var offsetHeight = magoDiv.offsetHeight;
 		
-		this.canvasObjectLabel.style.opacity = 1.0;
-		this.canvasObjectLabel.width = this.sceneState.drawingBufferWidth;
-		this.canvasObjectLabel.height = this.sceneState.drawingBufferHeight;
-		var canvasStyleLeft = offsetLeft.toString()+"px";
-		var canvasStyleTop = offsetTop.toString()+"px";
-		this.canvasObjectLabel.style.left = canvasStyleLeft;
-		this.canvasObjectLabel.style.top = canvasStyleTop;
-		this.canvasObjectLabel.style.position = "absolute";
+		this.canvasObjectLabel.className = 'mago3d-object-label';
 		
-		this.canvasObjectLabel.style.opacity = 1.0;
 		this.canvasObjectLabel.width = this.sceneState.drawingBufferWidth;
 		this.canvasObjectLabel.height = this.sceneState.drawingBufferHeight;
+
+		this.canvasObjectLabel.style.left = '0';
+		this.canvasObjectLabel.style.top = '0';
+		this.canvasObjectLabel.style.width = "100%";
+		this.canvasObjectLabel.style.height = '100%';
+		this.canvasObjectLabel.style.position = "absolute";
+		this.canvasObjectLabel.style.opacity = 1.0;
+		this.canvasObjectLabel.style.backgroundColor = 'transparent';
+		this.canvasObjectLabel.style.pointerEvents = 'none';
+
 		var ctx = this.canvasObjectLabel.getContext("2d");
 		//ctx.strokeStyle = 'SlateGrey';
 		//ctx.strokeStyle = 'MidnightBlue';
@@ -4601,6 +4606,9 @@ MagoManager.prototype.getObjectLabel = function()
 		ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
 		var lineHeight = ctx.measureText("M").width * 1.1;
+
+		var parent = this.isCesiumGlobe() ? magoDiv.getElementsByClassName('cesium-viewer')[0] : magoDiv;
+		parent.appendChild(this.canvasObjectLabel);
 	}
 	
 	return this.canvasObjectLabel;
@@ -6482,7 +6490,7 @@ MagoManager.prototype.callAPI = function(api)
 		this.magoPolicy.setShowLabelInfo(api.getShowLabelInfo());
 		
 		// clear the text canvas.
-		var canvas = document.getElementById("objectLabel");
+		var canvas = this.getObjectLabel();
 		var ctx = canvas.getContext("2d");
 		ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 

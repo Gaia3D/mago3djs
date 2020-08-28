@@ -63,7 +63,7 @@ ViewerInit.prototype.createElement = function()
 
 	this.magoManager.overlayContainer = document.createElement('div');
 	this.magoManager.overlayContainer.style.position = 'absolute';
-	this.magoManager.overlayContainer.style.zIndex = '0';
+	this.magoManager.overlayContainer.style.zIndex = '1';
 	this.magoManager.overlayContainer.style.width = '100%';
 	this.magoManager.overlayContainer.style.height = '100%';
 	this.magoManager.overlayContainer.style.top = '0px';
