@@ -612,8 +612,6 @@ GeographicCoordsList.prototype.getExtrudedMeshRenderableObject = function(height
 		ctx.stroke();
 		ctx.closePath();
 
-		console.info(c.toDataURL());
-
 		surfIndepMesh.material = new Material('test');
 		surfIndepMesh.material.setDiffuseTextureUrl(c.toDataURL());
 
