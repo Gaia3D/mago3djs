@@ -58,7 +58,8 @@ ViewerInit.prototype.initPosition = function()
 
 ViewerInit.prototype.createElement = function()
 {
-	var viewElement = this.magoManager.isCesiumGlobe() ? document.getElementsByClassName('cesium-viewer')[0] : document.getElementById(this.targetId);
+	var container = document.getElementById(this.targetId);
+	var viewElement = this.magoManager.isCesiumGlobe() ? container.getElementsByClassName('cesium-viewer')[0] : container;
 
 	this.magoManager.overlayContainer = document.createElement('div');
 	this.magoManager.overlayContainer.style.position = 'absolute';

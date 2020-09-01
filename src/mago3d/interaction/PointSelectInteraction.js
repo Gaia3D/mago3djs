@@ -19,30 +19,46 @@ var PointSelectInteraction = function(option)
 	
 	this.selected = undefined;
 
-	this.targetType = defaultValue(option.targetType, PointSelectInteraction.TARGETTYPE.F4D);
+	this.targetType = defaultValue(option.targetType, InteractionTargetType.F4D);
 	this.targetHighlight = defaultValue(option.targetHighlight, true);
+
+	var that = this;
+	this.on(PointSelectInteraction.EVENT_TYPE.DEACTIVE, function(){
+		that.init();
+		that.selected = undefined;
+		that.manager.selectionManager.clearCurrents();
+	});
 };
 PointSelectInteraction.prototype = Object.create(AbsClickInteraction.prototype);
 PointSelectInteraction.prototype.constructor = PointSelectInteraction;
-
-PointSelectInteraction.TARGETTYPE = {
-	'F4D'    : 'f4d',
-	'OBJECT' : 'object',
-	'NATIVE' : 'native',
-	'ALL'    : 'all'
-};
 
 PointSelectInteraction.EVENT_TYPE = {
 	'ACTIVE'  	: 'active',
 	'DEACTIVE'	: 'deactive'
 };
-
+/**
+ * interaction init
+ */
+PointSelectInteraction.prototype.init = function() 
+{
+	this.begin = false;
+	this.startPoint = undefined;
+	this.endPoint = undefined;
+};
 /**
  * set TargetType
  * @param {boolean} type 
  */
 PointSelectInteraction.prototype.setTargetType = function(type)
 {
+	var oldType = this.targetType;
+	if(oldType !== type)
+	{
+		this.init();
+		this.selected = undefined;
+		this.manager.isCameraMoved = true;
+		this.manager.selectionManager.clearCurrents();
+	}
 	this.targetType = type;
 };
 
@@ -61,7 +77,21 @@ PointSelectInteraction.prototype.getTargetType = function()
  */
 PointSelectInteraction.prototype.setTargetHighlight = function(highlight)
 {
+	if(!highlight)
+	{
+		this.init();
+		this.manager.selectionManager.clearCurrents();
+	}
 	this.targetHighlight = highlight;
+};
+
+/**
+ * get selected object
+ * @return {Object}
+ */
+PointSelectInteraction.prototype.getSelected = function()
+{
+	return this.selected;
 };
 
 /**
@@ -86,20 +116,20 @@ PointSelectInteraction.prototype.handleDownEvent = function(browserEvent)
  */
 PointSelectInteraction.prototype.handleUpEvent = function(browserEvent)
 {
-	this.select(browserEvent.point.screenCoordinate, true);
+	this.select(browserEvent.point.screenCoordinate);
 	var selectionManager = this.manager.selectionManager;
 	var oldSelected = this.selected;
 	switch (this.targetType)
 	{
-	case PointSelectInteraction.TARGETTYPE.F4D : {
+	case InteractionTargetType.F4D : {
 		this.selected = selectionManager.getSelectedF4dNode();
 		break;
 	}
-	case PointSelectInteraction.TARGETTYPE.OBJECT : {
+	case InteractionTargetType.OBJECT : {
 		this.selected = selectionManager.getSelectedF4dObject();
 		break;
 	}
-	case PointSelectInteraction.TARGETTYPE.NATIVE : {
+	case InteractionTargetType.NATIVE : {
 		this.selected = selectionManager.getSelectedGeneral();
 		break;
 	}
@@ -128,15 +158,15 @@ PointSelectInteraction.getEventType = function(target, selected)
 	var eventType;
 	switch (target)
 	{
-	case PointSelectInteraction.TARGETTYPE.F4D : {
+	case InteractionTargetType.F4D : {
 		eventType = selected ? MagoManager.EVENT_TYPE.SELECTEDF4D : MagoManager.EVENT_TYPE.DESELECTEDF4D;
 		break;
 	}
-	case PointSelectInteraction.TARGETTYPE.OBJECT : {
+	case InteractionTargetType.OBJECT : {
 		eventType = selected ? MagoManager.EVENT_TYPE.SELECTEDF4DOBJECT : MagoManager.EVENT_TYPE.DESELECTEDF4DOBJECT;
 		break;
 	}
-	case PointSelectInteraction.TARGETTYPE.NATIVE : {
+	case InteractionTargetType.NATIVE : {
 		eventType = selected ? MagoManager.EVENT_TYPE.SELECTEDGENERALOBJECT : MagoManager.EVENT_TYPE.DESELECTEDGENERALOBJECT;
 		break;
 	}
@@ -152,7 +182,7 @@ PointSelectInteraction.prototype.handleMoveEvent = function(browserEvent)
 {
 	if (this.targetHighlight && !this.selected)
 	{
-		this.select(browserEvent.endEvent.screenCoordinate, true);
+		this.select(browserEvent.endEvent.screenCoordinate);
 	}
 };
 
@@ -161,7 +191,7 @@ PointSelectInteraction.prototype.handleMoveEvent = function(browserEvent)
  * @param {Point2D} screenCoordinate
  * @param {boolean} bObject
  */
-PointSelectInteraction.prototype.select = function(screenCoordinate, bObject)
+PointSelectInteraction.prototype.select = function(screenCoordinate)
 {
 	var manager = this.manager;
 	var selectManager = manager.selectionManager;
@@ -170,7 +200,10 @@ PointSelectInteraction.prototype.select = function(screenCoordinate, bObject)
 	{ manager.selectionFbo = new FBO(gl, manager.sceneState.drawingBufferWidth, manager.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
 
 	var gl = manager.getGl();
-	selectManager.selectObjectByPixel(gl, screenCoordinate.x, screenCoordinate.y, bObject);
+	selectManager.selectProvisionalObjectByPixel(gl, screenCoordinate.x, screenCoordinate.y);
+	selectManager.provisionalToCurrent(this.targetType);
+	
+	//selectManager.selectObjectByPixel(gl, screenCoordinate.x, screenCoordinate.y, bObject);
 };
 
 /**

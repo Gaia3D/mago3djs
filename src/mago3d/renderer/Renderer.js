@@ -468,7 +468,6 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 
 		currentShader.bindUniformGenerals();
 		gl.uniform3fv(currentShader.scaleLC_loc, [1.0, 1.0, 1.0]); // init referencesMatrix.
-		
 		gl.uniform1i(currentShader.bApplySsao_loc, false); // apply ssao.***
 
 		var refTMatrixIdxKey = 0;
@@ -495,6 +494,7 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 
 		currentShader.bindUniformGenerals();
 		gl.uniform3fv(currentShader.scaleLC_loc, [1.0, 1.0, 1.0]); // init referencesMatrix.
+		gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
 		
 		// check if exist clippingPlanes.
 		if (magoManager.modeler.clippingBox !== undefined)
@@ -609,8 +609,13 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 			}
 		}
 	}
+	this.renderSilhouetteDepth();
 	
-	// Depth for silhouette.***************************************************************************************
+};
+
+Renderer.prototype.renderSilhouetteDepth = function()
+{
+// Depth for silhouette.***************************************************************************************
 	// Check if there are node selected.***********************************************************
 	//if (magoManager.nodeSelected && magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected)
 	//{
@@ -618,8 +623,13 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 	/*
 	*	TODO: MUST BE CHANGE WITHOUT YOUR AUTHORIZATION, YOU AND ME
 	*/
+	var magoManager = this.magoManager;
+	var selectionManager = magoManager.selectionManager;
+	var selectType = magoManager.interactionCollection.getSelectType();
+	var renderTexture = false;
 	if (selectionManager)
 	{
+		var gl = magoManager.getGl();
 		var node = selectionManager.getSelectedF4dNode();
 		var selectedRef = selectionManager.getSelectedF4dObject();
 		if (node !== undefined && !selectedRef) // test code.***
@@ -730,7 +740,7 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 			}
 		}
 	}
-};
+}
 
 /**
  * This function renders the sunPointOfView depth.

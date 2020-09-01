@@ -898,7 +898,6 @@ ReaderWriter.prototype.getObjectIndexFileForSmartTile = function(fileName, magoM
 			var buildingSeedMap = new BuildingSeedMap();
 			buildingSeedMap.dataArrayBuffer = arrayBuffer;
 			buildingSeedMap.parseBuildingSeedArrayBuffer();
-			console.info(buildingSeedMap);
 			magoManager.makeSmartTile(buildingSeedMap, projectId);
 			arrayBuffer = null;
 		}
