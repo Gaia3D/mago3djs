@@ -173,8 +173,8 @@ vec3 normal_from_depth(float depth, vec2 texCoord) {
 	float depthB = 0.0;
 	for(float i=0.0; i<3.0; i++)
 	{
-		depthA += getDepth(origin + offset1*(1.0+i));
-		depthB += getDepth(origin + offset2*(1.0+i));
+		depthA += getDepth(origin + offset1*(1.0+i*2.0));
+		depthB += getDepth(origin + offset2*(1.0+i*2.0));
 	}
 
 	vec3 posA = reconstructPosition(texCoord + offset1*2.0, depthA/3.0);
@@ -592,6 +592,7 @@ void main()
 		// End Dem image.------------------------------------------------------------------------------------------------------------
 		float linearDepthAux = 1.0;
 		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
+
 		vec3 ray = getViewRay(screenPos); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
 
 		float linearDepth = getDepth(screenPos);  
@@ -643,14 +644,37 @@ void main()
 			
 			shadow_occlusion *= occlusion;
 		}
+		/*
+		float offsetAux = 6.0;
+		vec2 screenPos_up = vec2((gl_FragCoord.x)/ screenWidth, (gl_FragCoord.y +offsetAux)/ screenHeight);
+		vec2 screenPos_down = vec2((gl_FragCoord.x)/ screenWidth, (gl_FragCoord.y -offsetAux)/ screenHeight);
+		vec2 screenPos_left = vec2((gl_FragCoord.x -offsetAux)/ screenWidth, (gl_FragCoord.y)/ screenHeight);
+		vec2 screenPos_right = vec2((gl_FragCoord.x +offsetAux)/ screenWidth, (gl_FragCoord.y)/ screenHeight);
+
+		vec3 normalFromDepth_up = normal_from_depth(linearDepthAux, screenPos_up); // normal from depthTex.***
+		vec3 normalFromDepth_down = normal_from_depth(linearDepthAux, screenPos_down); // normal from depthTex.***
+		vec3 normalFromDepth_left = normal_from_depth(linearDepthAux, screenPos_left); // normal from depthTex.***
+		vec3 normalFromDepth_right = normal_from_depth(linearDepthAux, screenPos_right); // normal from depthTex.***
+
+		normalFromDepth = (normalFromDepth + normalFromDepth_up + normalFromDepth_down + normalFromDepth_left + normalFromDepth_right)/5.0;
+		*/
 
 		vec3 normalFromDepth = normal_from_depth(linearDepthAux, screenPos); // normal from depthTex.***
+		
 		//normalFromDepth += vNormal*0.5;
 		//normalize(normalFromDepth);
+		//normalFromDepth = normalize(vec3(normalFromDepth.x*8.0, normalFromDepth.y*8.0, normalFromDepth.z));
+		vec2 screenPosAux = vec2(0.5, 0.5);
 
-		float scalarProd = dot(normalFromDepth, normalize(-ray));
-		scalarProd /= 3.0;
-		scalarProd += 0.666;
+		vec3 rayAux = getViewRay(screenPosAux); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
+		float scalarProd = dot(normalFromDepth, normalize(-rayAux));
+
+		//scalarProd = scalarProd * scalarProd;
+		//scalarProd /= 3.0;
+		//scalarProd += 0.666;
+
+		scalarProd /= 2.0;
+		scalarProd += 0.5;
 		
 		
 		if(altitude < 0.0)

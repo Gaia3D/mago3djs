@@ -446,10 +446,10 @@ MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums)
 			var gl = scene.context._gl;
 			gl.getExtension("EXT_frag_depth");
 			this.init(gl); 
+
+			if (gl.isContextLost())
+			{ return; }
 		}
-	
-		if (gl.isContextLost())
-		{ return; }
 	}
 	else 
 	{
@@ -458,10 +458,10 @@ MagoManager.prototype.start = function(scene, pass, frustumIdx, numFrustums)
 			var gl = this.sceneState.gl;
 			gl.getExtension("EXT_frag_depth");
 			this.init(gl); 
+
+			if (gl.isContextLost())
+			{ return; }
 		}
-	
-		if (gl.isContextLost())
-		{ return; }
 	}
 
 	this.startRender(isLastFrustum, this.currentFrustumIdx, numFrustums);

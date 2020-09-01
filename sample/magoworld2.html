@@ -69,13 +69,23 @@
 					}
 				});
 				
+				//var bathymetryFilter = {
+				//	type: Mago3D.CODE.imageFilter.BATHYMETRY,
+				//	properties : {
+				//		minAltitude: -2796,
+				//		maxAltitude: 1840,
+				//		stepGradient : [0, -40,-80,-120,-400,-800, -1000, -2000, -2796],
+				//		caustics: true
+				//	}
+				//};
+
 				var bathymetryFilter = {
 					type: Mago3D.CODE.imageFilter.BATHYMETRY,
 					properties : {
 						minAltitude: -2796,
 						maxAltitude: 1840,
 						stepGradient : [0, -40,-80,-120,-400,-800, -1000, -2000, -2796],
-						caustics: true
+						caustics: false
 					}
 				};
 				
@@ -115,7 +125,7 @@
 				
 				managerFactory = new Mago3D.Mago3d(renderDivId,serverPolicy,undefined,{
 					layers : [
-						baseMap//, tt//, ttt
+						baseMap, tt//, ttt
 						//new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'sk_emd', tiled: true}}),
 					]
 				});

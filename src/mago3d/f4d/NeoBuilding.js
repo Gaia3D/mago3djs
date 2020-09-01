@@ -1678,7 +1678,7 @@ NeoBuilding.prototype.render = function(magoManager, shader, renderType, refMatr
 		return;
 	}
 	*/
-	
+	//this.currentLod = 3; // delete this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	if (this.currentLod <= 2)
 	{
 		// There are buildings that are only skin, so check projectType of the building.

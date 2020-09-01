@@ -387,7 +387,7 @@ Lego.prototype.parseLegoData = function(buffer, magoManager, bytesReaded)
 		byteSize = 1;
 		startBuff = bytesReaded;
 		endBuff = bytesReaded + byteSize * numColors * 4;
-		var colDataArray = new Int8Array(buffer.slice(startBuff, endBuff));
+		var colDataArray = new Uint8Array(buffer.slice(startBuff, endBuff));
 		vboCacheKey.setDataArrayCol(colDataArray, vboMemManager);
 		bytesReaded = bytesReaded + byteSize * numColors * 4; // updating data.
 	}
@@ -556,15 +556,26 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader,
 		// End test.---
 	
 		// 4) Texcoord.
-		if (renderTexture)
+		// Check if hasTexCoords.***
+
+		if (renderTexture && vbo_vicky.vboBufferTCoord)
 		{
 			if (!vbo_vicky.bindDataTexCoord(shader, magoManager.vboMemoryManager))
 			{ return false; }
 		}
 		else 
 		{
-			gl.uniform1i(shader.bUse1Color_loc, false);
 			shader.disableVertexAttribArray(shader.texCoord2_loc);
+
+			if (!vbo_vicky.bindDataColor(shader, magoManager.vboMemoryManager))
+			{ 
+				gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
+				//return false; 
+			}
+			else 
+			{
+				gl.uniform1i(shader.colorType_loc, 1); // 0= oneColor, 1= attribColor, 2= texture.
+			}
 		}
 
 		if (!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
@@ -573,8 +584,7 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader,
 		if (!vbo_vicky.bindDataNormal(shader, magoManager.vboMemoryManager))
 		{ return false; }
 	
-		//if (!vbo_vicky.bindDataColor(shader, magoManager.vboMemoryManager))
-		//{ return false; }
+		
 
 		// TODO:
 		//if (vbo_vicky.meshColorCacheKey !== undefined )
