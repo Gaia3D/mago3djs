@@ -4190,7 +4190,7 @@ vec3 getWhiteToBlueColor_byHeight(float height)//, float minHeight, float maxHei
         }\n\
     }\n\
     gray = stepGray;\n\
-    // End test.-----------------------\n\
+\n\
 \n\
     float r, g, b;\n\
 \n\
@@ -4199,7 +4199,6 @@ vec3 getWhiteToBlueColor_byHeight(float height)//, float minHeight, float maxHei
     {\n\
         float minGray = 0.0;\n\
         float maxGray = 0.15625;\n\
-        //float maxR = 0.859375; // 220/256.\n\
         float maxR = 1.0;\n\
         float minR = 0.3515625; // 90/256.\n\
         float relativeGray = (gray- minGray)/(maxGray - minGray);\n\
@@ -4301,9 +4300,7 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
         if(currColor4.w > 0.0)\n\
         {\n\
             // decode the grayScale.***\n\
-            float height;\n\
-            float R = currColor4.r;\n\
-            height = R;\n\
+            float height = currColor4.g;\n\
             altitude = uMinMaxAltitudes.x + height * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);\n\
 \n\
             if(altitude < 0.0)\n\
@@ -4319,14 +4316,10 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
                 float blue = gray*2.0 + 2.0;\n\
                 seaColor = vec4(red, green, blue, 1.0);\n\
                 */\n\
-                // vec3 seaColorRGB = getWhiteToBlueColor_byHeight(altitude, 0.0, uMinMaxAltitudes.x);\n\
 \n\
-                //uMinMaxAltitudesBathymetryToGradient\n\
-                //vec3 seaColorRGB = getWhiteToBlueColor_byHeight(altitude, 0.0, -200.0);\n\
-                vec3 seaColorRGB = getWhiteToBlueColor_byHeight(altitude);//, uMinMaxAltitudesBathymetryToGradient.y, uMinMaxAltitudesBathymetryToGradient.x);\n\
-                //vec3 seaColorRGB = getWhiteToBlueColor_byHeight(altitude, uMinMaxAltitudes.y, uMinMaxAltitudes.x);\n\
+                vec3 seaColorRGB = getWhiteToBlueColor_byHeight(altitude);\n\
                 vec4 seaColor = vec4(seaColorRGB, 1.0);\n\
-                \n\
+\n\
                 resultTextureColor = mix(resultTextureColor, seaColor, 0.99); \n\
             }\n\
 \n\
@@ -6273,12 +6266,14 @@ void main()\n\
 		vec3 rayAux = getViewRay(screenPosAux); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
 		float scalarProd = dot(normalFromDepth, normalize(-rayAux));\n\
 \n\
-		scalarProd = scalarProd * scalarProd;\n\
-		//scalarProd /= 3.0;\n\
-		//scalarProd += 0.666;\n\
+		//scalarProd = scalarProd * scalarProd;\n\
+		scalarProd /= 3.0;\n\
+		scalarProd += 0.666;\n\
 \n\
-		scalarProd /= 2.0;\n\
-		scalarProd += 0.5;\n\
+		\n\
+\n\
+		//scalarProd /= 2.0;\n\
+		//scalarProd += 0.5;\n\
 		\n\
 		\n\
 		if(altitude < 0.0)\n\
@@ -6304,7 +6299,7 @@ void main()\n\
 					//vec2 cauticsTexCoord = texCoord*pow(2.0, tileDethDiff);\n\
 					//-----------------------------------------------------------------------\n\
 					vec2 cauticsTexCoord = texCoord;\n\
-					vec3 causticColor = causticColor(cauticsTexCoord)*gray*0.4;\n\
+					vec3 causticColor = causticColor(cauticsTexCoord)*gray*0.3;\n\
 					textureColor = vec4(textureColor.r+ causticColor.x, textureColor.g+ causticColor.y, textureColor.b+ causticColor.z, 1.0);\n\
 				}\n\
 			}\n\
@@ -6317,6 +6312,17 @@ void main()\n\
 			float green = gray + 0.6;\n\
 			float blue = gray*2.0 + 2.0;\n\
 			fogColor = vec4(red, green, blue, 1.0);\n\
+\n\
+			// Something like to HillShade .*********************************************************************************\n\
+			vec3 lightDir = normalize(vec3(1.0, 1.0, 0.0));\n\
+			float scalarProd_2d = dot(lightDir, normalFromDepth);\n\
+			\n\
+			scalarProd_2d /= 2.0;\n\
+			scalarProd_2d += 0.8;\n\
+\n\
+			//scalarProd_2d *= scalarProd_2d;\n\
+			textureColor *= vec4(textureColor.r*scalarProd_2d, textureColor.g*scalarProd_2d, textureColor.b, textureColor.a);\n\
+			// End Something like to HillShade.---------------------------------------------------------------------------------\n\
 			\n\
 			\n\
 			// End test drawing grid.---\n\
@@ -6325,6 +6331,12 @@ void main()\n\
 			//textureColor = mix(textureColor, fogColor, 0.2); \n\
 			//gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian + specularReflectionCoef * specular * specularColor * shadow_occlusion, 1.0); // with specular.***\n\
 			gl_FragColor = vec4(textureColor.xyz * shadow_occlusion * lambertian * scalarProd, 1.0); // original.***\n\
+\n\
+			// test contrast.***\n\
+			//float Contrast = 2.0;\n\
+			//vec3 pixelColor = vec3(gl_FragColor.r, gl_FragColor.g, gl_FragColor.b);\n\
+			//pixelColor.rgb = ((pixelColor.rgb - 0.5) * max(Contrast, 0.0)) + 0.5;\n\
+			//gl_FragColor = vec4(pixelColor, 1.0);\n\
 \n\
 			return;\n\
 		}\n\
@@ -6341,33 +6353,7 @@ void main()\n\
 		//gl_FragColor = textureColor; // test.***\n\
 		//gl_FragColor = vec4(vNormal.xyz, 1.0); // test.***\n\
 \n\
-		/*\n\
-		int texDepthDiff = int(floor(vTileDepth+0.1) - floor(vTexTileDepth+0.1));\n\
-		if(texDepthDiff > 0)\n\
-		{\n\
-			if(texDepthDiff == 1)\n\
-			finalColor = mix(textureColor, vec4(1.0, 0.0, 0.0, 1.0), 0.2); \n\
-\n\
-			if(texDepthDiff == 2)\n\
-			finalColor = mix(textureColor, vec4(0.0, 1.0, 0.0, 1.0), 0.2); \n\
-\n\
-			if(texDepthDiff == 3)\n\
-			finalColor = mix(textureColor, vec4(0.0, 0.0, 1.0, 1.0), 0.2); \n\
-\n\
-			if(texDepthDiff == 4)\n\
-			finalColor = mix(textureColor, vec4(1.0, 1.0, 0.0, 1.0), 0.2); \n\
-\n\
-			if(texDepthDiff > 4)\n\
-			finalColor = mix(textureColor, vec4(1.0, 0.0, 1.0, 1.0), 0.2); \n\
-\n\
-\n\
-			gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian * scalarProd, 1.0); // original.***\n\
-\n\
-			//if(abs(vTestCurrLatitude - 36.0) < 0.01 || abs(vTestCurrLongitude - 127.0) < 0.01)\n\
-			//gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0); // original.***\n\
-		}\n\
-		*/\n\
-		//if(currSunIdx > 0.0 && currSunIdx < 1.0 && shadow_occlusion<0.9)gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n\
+		\n\
 		\n\
 	}\n\
 }";

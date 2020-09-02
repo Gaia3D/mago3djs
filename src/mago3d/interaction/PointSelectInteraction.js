@@ -23,7 +23,8 @@ var PointSelectInteraction = function(option)
 	this.targetHighlight = defaultValue(option.targetHighlight, true);
 
 	var that = this;
-	this.on(PointSelectInteraction.EVENT_TYPE.DEACTIVE, function(){
+	this.on(PointSelectInteraction.EVENT_TYPE.DEACTIVE, function()
+	{
 		that.init();
 		that.selected = undefined;
 		that.manager.selectionManager.clearCurrents();
@@ -52,7 +53,7 @@ PointSelectInteraction.prototype.init = function()
 PointSelectInteraction.prototype.setTargetType = function(type)
 {
 	var oldType = this.targetType;
-	if(oldType !== type)
+	if (oldType !== type)
 	{
 		this.init();
 		this.selected = undefined;
@@ -77,7 +78,7 @@ PointSelectInteraction.prototype.getTargetType = function()
  */
 PointSelectInteraction.prototype.setTargetHighlight = function(highlight)
 {
-	if(!highlight)
+	if (!highlight)
 	{
 		this.init();
 		this.manager.selectionManager.clearCurrents();

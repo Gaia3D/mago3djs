@@ -143,7 +143,7 @@ SelectionManager.prototype.setSelectedGeneral = function(selectedObject)
  */
 SelectionManager.prototype.getSelectedF4dBuilding = function()
 {
-	if(this.currentNodeSelected)
+	if (this.currentNodeSelected)
 	{
 		return this.currentNodeSelected.data.neoBuilding;
 	}
@@ -345,11 +345,12 @@ SelectionManager.prototype.clearCurrents = function()
  * @alias SelectionManager
  * @class SelectionManager
  */
-SelectionManager.prototype.clearProvisionals = function(){
+SelectionManager.prototype.clearProvisionals = function()
+{
 	this.provisionalF4dArray = [];
 	this.provisionalF4dObjectArray = [];
 	this.provisionalNativeArray = [];
-}
+};
 
 /**
  * SelectionManager
@@ -486,18 +487,18 @@ SelectionManager.prototype.selectProvisionalObjectByPixel = function(gl, mouseX,
 	var idx = this.magoManager.selectionColor.decodeColor3(pixels[centerPixel*3], pixels[centerPixel*3+1], pixels[centerPixel*3+2]);
 	
 	// Provisionally.**
-	if(this.nodesMap[idx])
+	if (this.nodesMap[idx])
 	{
 		this.provisionalF4dArray.push(this.nodesMap[idx]);
 	}
 
-	if(this.referencesMap[idx] && this.nodesMap[idx])
+	if (this.referencesMap[idx] && this.nodesMap[idx])
 	{
 		this.provisionalF4dArray.push(this.nodesMap[idx]);
 		this.provisionalF4dObjectArray.push(this.referencesMap[idx]);
 	}
 
-	if(this.selCandidatesMap[idx])
+	if (this.selCandidatesMap[idx])
 	{
 		this.provisionalNativeArray.push(this.selCandidatesMap[idx]);
 	}
@@ -530,55 +531,55 @@ SelectionManager.prototype.selectProvisionalObjectByPixel = function(gl, mouseX,
 SelectionManager.prototype.filterProvisional = function(type, filter)
 {
 	var targetProvisional = {};
-	switch(type)
+	switch (type)
 	{
-		case InteractionTargetType.F4D : {
-			targetProvisional[type] = this.provisionalF4dArray;
-			break;
-		}
-		case InteractionTargetType.OBJECT : {
-			targetProvisional[InteractionTargetType.F4D] = this.provisionalF4dArray;
-			targetProvisional[type] = this.provisionalF4dObjectArray;
-			break;
-		}
-		case InteractionTargetType.NATIVE : {
-			targetProvisional[type] = this.provisionalNativeArray;
-			break;
-		}
+	case InteractionTargetType.F4D : {
+		targetProvisional[type] = this.provisionalF4dArray;
+		break;
+	}
+	case InteractionTargetType.OBJECT : {
+		targetProvisional[InteractionTargetType.F4D] = this.provisionalF4dArray;
+		targetProvisional[type] = this.provisionalF4dObjectArray;
+		break;
+	}
+	case InteractionTargetType.NATIVE : {
+		targetProvisional[type] = this.provisionalNativeArray;
+		break;
+	}
 	}
 
 	var provisionalLength = 0;
-	for(var i in targetProvisional)
+	for (var i in targetProvisional)
 	{
-		if(targetProvisional.hasOwnProperty(i))
+		if (targetProvisional.hasOwnProperty(i))
 		{
 			provisionalLength += targetProvisional[i].length;
 		}
 	}
 
-	if(provisionalLength === 0)
+	if (provisionalLength === 0)
 	{
 		return;
 	}
 
-	filter = filter ? filter : function(){return true;};
+	filter = filter ? filter : function(){ return true; };
 	var result = {};
-	for(var i in targetProvisional)
+	for (var i in targetProvisional)
 	{
-		if(targetProvisional.hasOwnProperty(i))
+		if (targetProvisional.hasOwnProperty(i))
 		{
 			var provisional = targetProvisional[i];
 			
-			for(var j=0,len=provisional.length;j<len;j++)
+			for (var j=0, len=provisional.length;j<len;j++)
 			{
 				var realFilter = filter;
-				if(type === InteractionTargetType.OBJECT && i === InteractionTargetType.F4D)
+				if (type === InteractionTargetType.OBJECT && i === InteractionTargetType.F4D)
 				{
-					realFilter = function(){return true;};
+					realFilter = function(){ return true; };
 				}
-				if(realFilter.call(this, provisional[j]))
+				if (realFilter.call(this, provisional[j]))
 				{
-					if(!result[i]) result[i] = [];
+					if (!result[i]) { result[i] = []; }
 					result[i].push(provisional[j]);
 				}
 			}
@@ -586,7 +587,7 @@ SelectionManager.prototype.filterProvisional = function(type, filter)
 	}
 	
 	return result;
-}
+};
 
 /**
  * 
@@ -598,11 +599,11 @@ SelectionManager.prototype.provisionalToCurrent = function(type, filter)
 	var validProvision = this.filterProvisional(type, filter);
 
 	this.clearCurrents();
-	if(isEmpty(validProvision)){ return;}
+	if (isEmpty(validProvision)){ return; }
 
-	for(var i in validProvision)
+	for (var i in validProvision)
 	{
-		if(validProvision.hasOwnProperty(i))
+		if (validProvision.hasOwnProperty(i))
 		{
 			var variableName = getVariableName(i);
 			this[variableName.currentMember] = validProvision[i];
@@ -614,26 +615,26 @@ SelectionManager.prototype.provisionalToCurrent = function(type, filter)
 
 	function getVariableName(t)
 	{
-		switch(t)
+		switch (t)
 		{
-			case InteractionTargetType.F4D : {
-				return {
-					currentMember : 'currentNodeSelectedArray',
-					auxMember : 'currentNodeSelected',
-				}
-			}
-			case InteractionTargetType.OBJECT : {
-				return {
-					currentMember : 'currentReferenceSelectedArray',
-					auxMember : 'currentReferenceSelected',
-				};
-			}
-			case InteractionTargetType.NATIVE : {
-				return {
-					currentMember : 'currentGeneralObjectSelectedArray',
-					auxMember : 'currentGeneralObjectSelected',
-				}
-			}
+		case InteractionTargetType.F4D : {
+			return {
+				currentMember : 'currentNodeSelectedArray',
+				auxMember     : 'currentNodeSelected',
+			};
+		}
+		case InteractionTargetType.OBJECT : {
+			return {
+				currentMember : 'currentReferenceSelectedArray',
+				auxMember     : 'currentReferenceSelected',
+			};
+		}
+		case InteractionTargetType.NATIVE : {
+			return {
+				currentMember : 'currentGeneralObjectSelectedArray',
+				auxMember     : 'currentGeneralObjectSelected',
+			};
+		}
 		}
 	}
-}
+};

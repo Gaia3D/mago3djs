@@ -60,10 +60,11 @@ var BrowserEvent = function(type, position, magoManager)
 				var camera = scene.frameState.camera;
 				var ray = camera.getPickRay(new Cesium.Cartesian2(position.x, position.y));
 				worldCoordinate = scene.globe.pick(ray, scene);
-			} else 
+			}
+			else 
 			{
 				var camCoord = MagoWorld.screenToCamCoord(position.x, position.y, magoManager, camCoord);
-				if(!camCoord)
+				if (!camCoord)
 				{
 					worldCoordinate = undefined;
 				} 

@@ -670,11 +670,13 @@ void main()
 		float scalarProd = dot(normalFromDepth, normalize(-rayAux));
 
 		//scalarProd = scalarProd * scalarProd;
-		//scalarProd /= 3.0;
-		//scalarProd += 0.666;
+		scalarProd /= 3.0;
+		scalarProd += 0.666;
 
-		scalarProd /= 2.0;
-		scalarProd += 0.5;
+		
+
+		//scalarProd /= 2.0;
+		//scalarProd += 0.5;
 		
 		
 		if(altitude < 0.0)
@@ -700,7 +702,7 @@ void main()
 					//vec2 cauticsTexCoord = texCoord*pow(2.0, tileDethDiff);
 					//-----------------------------------------------------------------------
 					vec2 cauticsTexCoord = texCoord;
-					vec3 causticColor = causticColor(cauticsTexCoord)*gray*0.4;
+					vec3 causticColor = causticColor(cauticsTexCoord)*gray*0.3;
 					textureColor = vec4(textureColor.r+ causticColor.x, textureColor.g+ causticColor.y, textureColor.b+ causticColor.z, 1.0);
 				}
 			}
@@ -713,6 +715,17 @@ void main()
 			float green = gray + 0.6;
 			float blue = gray*2.0 + 2.0;
 			fogColor = vec4(red, green, blue, 1.0);
+
+			// Something like to HillShade .*********************************************************************************
+			vec3 lightDir = normalize(vec3(1.0, 1.0, 0.0));
+			float scalarProd_2d = dot(lightDir, normalFromDepth);
+			
+			scalarProd_2d /= 2.0;
+			scalarProd_2d += 0.8;
+
+			//scalarProd_2d *= scalarProd_2d;
+			textureColor *= vec4(textureColor.r*scalarProd_2d, textureColor.g*scalarProd_2d, textureColor.b, textureColor.a);
+			// End Something like to HillShade.---------------------------------------------------------------------------------
 			
 			
 			// End test drawing grid.---
@@ -721,6 +734,12 @@ void main()
 			//textureColor = mix(textureColor, fogColor, 0.2); 
 			//gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian + specularReflectionCoef * specular * specularColor * shadow_occlusion, 1.0); // with specular.***
 			gl_FragColor = vec4(textureColor.xyz * shadow_occlusion * lambertian * scalarProd, 1.0); // original.***
+
+			// test contrast.***
+			//float Contrast = 2.0;
+			//vec3 pixelColor = vec3(gl_FragColor.r, gl_FragColor.g, gl_FragColor.b);
+			//pixelColor.rgb = ((pixelColor.rgb - 0.5) * max(Contrast, 0.0)) + 0.5;
+			//gl_FragColor = vec4(pixelColor, 1.0);
 
 			return;
 		}
@@ -737,33 +756,7 @@ void main()
 		//gl_FragColor = textureColor; // test.***
 		//gl_FragColor = vec4(vNormal.xyz, 1.0); // test.***
 
-		/*
-		int texDepthDiff = int(floor(vTileDepth+0.1) - floor(vTexTileDepth+0.1));
-		if(texDepthDiff > 0)
-		{
-			if(texDepthDiff == 1)
-			finalColor = mix(textureColor, vec4(1.0, 0.0, 0.0, 1.0), 0.2); 
-
-			if(texDepthDiff == 2)
-			finalColor = mix(textureColor, vec4(0.0, 1.0, 0.0, 1.0), 0.2); 
-
-			if(texDepthDiff == 3)
-			finalColor = mix(textureColor, vec4(0.0, 0.0, 1.0, 1.0), 0.2); 
-
-			if(texDepthDiff == 4)
-			finalColor = mix(textureColor, vec4(1.0, 1.0, 0.0, 1.0), 0.2); 
-
-			if(texDepthDiff > 4)
-			finalColor = mix(textureColor, vec4(1.0, 0.0, 1.0, 1.0), 0.2); 
-
-
-			gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian * scalarProd, 1.0); // original.***
-
-			//if(abs(vTestCurrLatitude - 36.0) < 0.01 || abs(vTestCurrLongitude - 127.0) < 0.01)
-			//gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0); // original.***
-		}
-		*/
-		//if(currSunIdx > 0.0 && currSunIdx < 1.0 && shadow_occlusion<0.9)gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+		
 		
 	}
 }

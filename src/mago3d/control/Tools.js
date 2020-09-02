@@ -493,22 +493,26 @@ Tools.prototype.setControl = function(magoManager)
 	var names = [InteractionTargetType.NATIVE, InteractionTargetType.OBJECT, InteractionTargetType.F4D];
 	
 
-	for(var i=0,sLength=selectBtns.length;i<sLength;i++)
+	for (var i=0, sLength=selectBtns.length;i<sLength;i++)
 	{
-		(function (idx){
+		(function (idx)
+		{
 			var sBtn = selectBtns.item(idx);
-			sBtn.addEventListener('click',function(){
+			sBtn.addEventListener('click', function()
+			{
 				var type = sBtn.dataset.type;
 				
-				if(!selectInteraction.getActive())
+				if (!selectInteraction.getActive())
 				{
 					selectInteraction.setTargetType(type);
 					selectInteraction.setActive(true);
 					sBtn.dataset.active = 'on';
 					
-				} else {
+				}
+				else 
+				{
 					var nowTargetType = selectInteraction.getTargetType();
-					if(type === nowTargetType)
+					if (type === nowTargetType)
 					{
 						selectInteraction.setActive(false);
 						sBtn.dataset.active = 'off';
@@ -523,25 +527,29 @@ Tools.prototype.setControl = function(magoManager)
 					}
 				}
 				btnActiveStyle(sBtn);
-			},false);
-		})(i)
+			}, false);
+		})(i);
 	}
 
-	for(var i=0,tLength=translateBtns.length;i<tLength;i++)
+	for (var i=0, tLength=translateBtns.length;i<tLength;i++)
 	{
-		(function (idx){
+		(function (idx)
+		{
 			var tBtn = translateBtns.item(idx);
-			tBtn.addEventListener('click',function(){
+			tBtn.addEventListener('click', function()
+			{
 				var type = tBtn.dataset.type;
 
-				if(!translateInteraction.getActive())
+				if (!translateInteraction.getActive())
 				{
 					translateInteraction.setTargetType(type);
 					translateInteraction.setActive(true);
 					tBtn.dataset.active = 'on';
-				} else {
+				}
+				else 
+				{
 					var nowTargetType = translateInteraction.getTargetType();
-					if(type === nowTargetType)
+					if (type === nowTargetType)
 					{
 						translateInteraction.setActive(false);
 						tBtn.dataset.active = 'off';
@@ -556,17 +564,19 @@ Tools.prototype.setControl = function(magoManager)
 					}
 				}
 				btnActiveStyle(tBtn);
-			},false);
-		})(i)
+			}, false);
+		})(i);
 	}
 
 	function btnActiveStyle (b)
 	{
-		if(b.dataset.active === 'on')
+		if (b.dataset.active === 'on')
 		{
 			b.style.backgroundColor = 'rgb(160, 160, 160)';
 			b.style.color = 'rgb(230, 230, 230)';
-		} else {
+		}
+		else 
+		{
 			b.style.backgroundColor = 'rgb(255, 255, 255)';
 			b.style.color = 'rgb(20, 20, 20)';
 		}

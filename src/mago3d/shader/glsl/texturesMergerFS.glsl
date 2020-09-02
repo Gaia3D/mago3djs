@@ -241,7 +241,7 @@ vec3 getWhiteToBlueColor_byHeight(float height)//, float minHeight, float maxHei
         }
     }
     gray = stepGray;
-    // End test.-----------------------
+
 
     float r, g, b;
 
@@ -250,7 +250,6 @@ vec3 getWhiteToBlueColor_byHeight(float height)//, float minHeight, float maxHei
     {
         float minGray = 0.0;
         float maxGray = 0.15625;
-        //float maxR = 0.859375; // 220/256.
         float maxR = 1.0;
         float minR = 0.3515625; // 90/256.
         float relativeGray = (gray- minGray)/(maxGray - minGray);
@@ -352,9 +351,7 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
         if(currColor4.w > 0.0)
         {
             // decode the grayScale.***
-            float height;
-            float R = currColor4.r;
-            height = R;
+            float height = currColor4.g;
             altitude = uMinMaxAltitudes.x + height * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);
 
             if(altitude < 0.0)
@@ -370,14 +367,10 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
                 float blue = gray*2.0 + 2.0;
                 seaColor = vec4(red, green, blue, 1.0);
                 */
-                // vec3 seaColorRGB = getWhiteToBlueColor_byHeight(altitude, 0.0, uMinMaxAltitudes.x);
 
-                //uMinMaxAltitudesBathymetryToGradient
-                //vec3 seaColorRGB = getWhiteToBlueColor_byHeight(altitude, 0.0, -200.0);
-                vec3 seaColorRGB = getWhiteToBlueColor_byHeight(altitude);//, uMinMaxAltitudesBathymetryToGradient.y, uMinMaxAltitudesBathymetryToGradient.x);
-                //vec3 seaColorRGB = getWhiteToBlueColor_byHeight(altitude, uMinMaxAltitudes.y, uMinMaxAltitudes.x);
+                vec3 seaColorRGB = getWhiteToBlueColor_byHeight(altitude);
                 vec4 seaColor = vec4(seaColorRGB, 1.0);
-                
+
                 resultTextureColor = mix(resultTextureColor, seaColor, 0.99); 
             }
 

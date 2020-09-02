@@ -740,7 +740,7 @@ Renderer.prototype.renderSilhouetteDepth = function()
 			}
 		}
 	}
-}
+};
 
 /**
  * This function renders the sunPointOfView depth.
