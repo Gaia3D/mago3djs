@@ -195,6 +195,101 @@ Color.getWhiteToBlueColor_byHeight = function(height, minHeight, maxHeight, resu
 	return resultColor;
 };
 
+Color.getWhiteToBlueColor_byHeight2 = function(height, step, resultColor)
+{
+	var gray = 1;
+
+	for(var i=0; i<step.length-1; i++)
+    {
+        var stepValue = step[i];
+        var stepValue2 = step[i+1];
+
+        // check if is frontier.***
+        if(height >= step[0])
+        {
+            gray = 0.0;
+            break;
+        }
+
+        if(height <= stepValue && height > stepValue2)
+        {
+            // calculate decimal.***
+            //float decimal = (height - stepValue)/(stepValue2-stepValue);
+            var decimal = (stepValue - height)/(stepValue-stepValue2);
+            var unit = i;
+            var value = unit + decimal;
+            gray = value/(step.length-1);
+            break;
+        }
+    }
+
+	var r, g, b;
+	// Red.
+	if (gray >= 0.0 && gray < 0.15625) // [1, 5] from 32 divisions.
+	{
+		var minGray = 0.0;
+		var maxGray = 0.15625;
+		//var maxR = 0.859375; // 220/256.
+		var maxR = 1.0;
+		var minR = 0.3515625; // 90/256.
+		var relativeGray = (gray- minGray)/(maxGray - minGray);
+		r = maxR - relativeGray*(maxR - minR);
+	}
+	else if (gray >= 0.15625 && gray < 0.40625) // [6, 13] from 32 divisions.
+	{
+		var minGray = 0.15625;
+		var maxGray = 0.40625;
+		var maxR = 0.3515625; // 90/256.
+		var minR = 0.0; // 0/256.
+		var relativeGray = (gray- minGray)/(maxGray - minGray);
+		r = maxR - relativeGray*(maxR - minR);
+	}
+	else  // [14, 32] from 32 divisions.
+	{
+		r = 0.0;
+	}
+
+	// Green.
+	if (gray >= 0.0 && gray < 0.15625) // [1, 5] from 32 divisions.
+	{
+		g = 1.0; // 256.
+	}
+	else if (gray >= 0.15625 && gray < 0.5625) // [6, 18] from 32 divisions.
+	{
+		var minGray = 0.15625;
+		var maxGray = 0.5625;
+		var maxG = 1.0; // 256/256.
+		var minG = 0.0; // 0/256.
+		var relativeGray = (gray- minGray)/(maxGray - minGray);
+		g = maxG - relativeGray*(maxG - minG);
+	}
+	else  // [18, 32] from 32 divisions.
+	{
+		g = 0.0;
+	}
+
+	// Blue.
+	if (gray < 0.5625)
+	{
+		b = 1.0;
+	}
+	else // gray >= 0.5625 && gray <= 1.0
+	{
+		var minGray = 0.5625;
+		var maxGray = 1.0;
+		var maxB = 1.0; // 256/256.
+		var minB = 0.0; // 0/256.
+		var relativeGray = (gray- minGray)/(maxGray - minGray);
+		b = maxB - relativeGray*(maxB - minB);
+	}
+
+	if (resultColor === undefined)
+	{ resultColor = new Color(); }
+
+	resultColor.setRGB(r, g, b);
+	return resultColor;
+};
+
 /**
  * copy of the value of RGB instance
  * @param {Color} color

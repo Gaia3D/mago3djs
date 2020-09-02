@@ -175,6 +175,8 @@ vec3 normal_from_depth(float depth, vec2 texCoord) {
 	{
 		depthA += getDepth(origin + offset1*(1.0+i));
 		depthB += getDepth(origin + offset2*(1.0+i));
+		//depthA += getDepth(origin + offset1*(1.0+i*2.0));
+        //depthB += getDepth(origin + offset2*(1.0+i*2.0));
 	}
 
 	vec3 posA = reconstructPosition(texCoord + offset1*2.0, depthA/3.0);
@@ -645,10 +647,15 @@ void main()
 		}
 
 		vec3 normalFromDepth = normal_from_depth(linearDepthAux, screenPos); // normal from depthTex.***
+
+		//vec3 rayAux = getViewRay(screenPosAux); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
+        //float scalarProd = dot(normalFromDepth, normalize(-rayAux));
 		float scalarProd = dot(normalFromDepth, normalize(-ray));
 		scalarProd /= 3.0;
 		scalarProd += 0.666;
-		
+
+		//scalarProd /= 2.0;
+		//scalarProd += 0.5;
 		
 		if(altitude < 0.0)
 		{
@@ -698,9 +705,9 @@ void main()
 			return;
 		}
 		else{
+			
 			if(uSeaOrTerrainType == 1)
 			discard;
-		
 		}
 		
 		

@@ -19,6 +19,7 @@ var PointDrawer = function(style)
 	this.startDraw = false;
 	this.startTime = undefined;
 	this.startPoint = undefined;
+	this.added = false;
 	this.result = [];
 };
 PointDrawer.prototype = Object.create(DrawGeometryInteraction.prototype);
@@ -64,54 +65,58 @@ PointDrawer.prototype.start = function()
 	var that = this;
 	var manager = that.manager;
 
-	manager.on(MagoManager.EVENT_TYPE.LEFTDOWN, function(e)
+	if(!this.added)
 	{
-		if (!that.getActive()) { return; }
-		if (!that.startDraw) 
+		this.added = true;
+		manager.on(MagoManager.EVENT_TYPE.LEFTDOWN, function(e)
 		{
-			that.startDraw = true;
-			that.startTime = e.timestamp;
-			that.startPoint = e.point.screenCoordinate;
-		}
-	});
-	manager.on(MagoManager.EVENT_TYPE.LEFTUP, function(e)
-	{
-		if (!that.getActive()) { return; }
-		if (that.startDraw) 
-		{
-			var moveless = false;
-			if ((e.timestamp - that.startTime) < 1500)
+			if (!that.getActive()) { return; }
+			if (!that.startDraw) 
 			{
-				var startScreenCoordinate = that.startPoint;
-				var endScreenCoordinate = e.point.screenCoordinate;
-
-				var diffX = Math.abs(startScreenCoordinate.x - endScreenCoordinate.x);
-				var diffY = Math.abs(startScreenCoordinate.y - endScreenCoordinate.y);
-
-				if (diffX <= 0 && diffY  <= 0)
+				that.startDraw = true;
+				that.startTime = e.timestamp;
+				that.startPoint = e.point.screenCoordinate;
+			}
+		});
+		manager.on(MagoManager.EVENT_TYPE.LEFTUP, function(e)
+		{
+			if (!that.getActive()) { return; }
+			if (that.startDraw) 
+			{
+				var moveless = false;
+				if ((e.timestamp - that.startTime) < 1500)
 				{
-					moveless = true;
+					var startScreenCoordinate = that.startPoint;
+					var endScreenCoordinate = e.point.screenCoordinate;
+
+					var diffX = Math.abs(startScreenCoordinate.x - endScreenCoordinate.x);
+					var diffY = Math.abs(startScreenCoordinate.y - endScreenCoordinate.y);
+
+					if (diffX <= 0 && diffY  <= 0)
+					{
+						moveless = true;
+					}
 				}
+				if (!moveless)
+				{
+					that.init();
+					return;
+				} 
+
+				var position = e.point.geographicCoordinate;
+
+				if (Object.keys(that.style).length < 1) 
+				{
+					that.style = {
+						size  : 10,
+						color : '#00FF00'
+					};
+				}
+
+				that.end(new MagoPoint(position, that.style));
 			}
-			if (!moveless)
-			{
-				that.init();
-				return;
-			} 
-
-			var position = e.point.geographicCoordinate;
-
-			if (Object.keys(that.style).length < 1) 
-			{
-				that.style = {
-					size  : 10,
-					color : '#00FF00'
-				};
-			}
-
-			that.end(new MagoPoint(position, that.style));
-		}
-	});
+		});
+	}
 };
 /**
  * @private

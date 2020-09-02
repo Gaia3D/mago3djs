@@ -20,6 +20,7 @@ var RectangleDrawer = function(style)
 	this.startPoint;
 	this.endPoint;
 	this.height = 200;
+	this.added = false;
 
 	this.tempRectangle;
 	this.result = [];
@@ -92,66 +93,70 @@ RectangleDrawer.prototype.start = function()
 	var that = this;
 	var manager = that.manager;
 
-	manager.on(MagoManager.EVENT_TYPE.LEFTDOWN, function(e)
+	if(!this.added)
 	{
-		if (!that.getActive()) { return; }
-		if (!that.startDraw) 
+		this.added = true;
+		manager.on(MagoManager.EVENT_TYPE.LEFTDOWN, function(e)
 		{
-			manager.magoWorld.cameraMovable = false;
-			that.startDraw = true;
-			that.startPoint = e.point.geographicCoordinate;
-		}
-	});
-    
-	manager.on(MagoManager.EVENT_TYPE.MOUSEMOVE, function(e)
-	{
-		if (!that.getActive()) { return; }
-		if (that.startDraw && that.startPoint) 
-		{
-			that.dragging = true;
-            
-			var auxPoint = e.endEvent.geographicCoordinate;
-			var minLon = (that.startPoint.longitude < auxPoint.longitude) ? that.startPoint.longitude : auxPoint.longitude;
-			var minLat = (that.startPoint.latitude < auxPoint.latitude) ? that.startPoint.latitude : auxPoint.latitude;
-			var maxLon = (that.startPoint.longitude < auxPoint.longitude) ? auxPoint.longitude : that.startPoint.longitude;
-			var maxLat = (that.startPoint.latitude < auxPoint.latitude) ? auxPoint.latitude : that.startPoint.latitude;
-
-			var position = {
-				minLongitude : minLon,
-				minLatitude  : minLat,
-				maxLongitude : maxLon,
-				maxLatitude  : maxLat,
-				altitude     : -3000
-			};
-
-			if (!that.tempRectangle)
+			if (!that.getActive()) { return; }
+			if (!that.startDraw) 
 			{
-				if (Object.keys(that.style).length < 1) 
+				manager.magoWorld.cameraMovable = false;
+				that.startDraw = true;
+				that.startPoint = e.point.geographicCoordinate;
+			}
+		});
+		
+		manager.on(MagoManager.EVENT_TYPE.MOUSEMOVE, function(e)
+		{
+			if (!that.getActive()) { return; }
+			if (that.startDraw && that.startPoint) 
+			{
+				that.dragging = true;
+				
+				var auxPoint = e.endEvent.geographicCoordinate;
+				var minLon = (that.startPoint.longitude < auxPoint.longitude) ? that.startPoint.longitude : auxPoint.longitude;
+				var minLat = (that.startPoint.latitude < auxPoint.latitude) ? that.startPoint.latitude : auxPoint.latitude;
+				var maxLon = (that.startPoint.longitude < auxPoint.longitude) ? auxPoint.longitude : that.startPoint.longitude;
+				var maxLat = (that.startPoint.latitude < auxPoint.latitude) ? auxPoint.latitude : that.startPoint.latitude;
+
+				var position = {
+					minLongitude : minLon,
+					minLatitude  : minLat,
+					maxLongitude : maxLon,
+					maxLatitude  : maxLat,
+					altitude     : -3000
+				};
+
+				if (!that.tempRectangle)
 				{
-					that.style = {
-						fillColor: '#ff0000'
-					};
+					if (Object.keys(that.style).length < 1) 
+					{
+						that.style = {
+							fillColor: '#ff0000'
+						};
+					}
+					that.tempRectangle = new MagoRectangleGround(position, that.style);
+					manager.modeler.magoRectangle = that.tempRectangle;
 				}
-				that.tempRectangle = new MagoRectangleGround(position, that.style);
-				manager.modeler.magoRectangle = that.tempRectangle;
+				else 
+				{
+					that.tempRectangle.init(manager);
+					that.tempRectangle.setPosition(position);
+				}
 			}
-			else 
-			{
-				that.tempRectangle.init(manager);
-				that.tempRectangle.setPosition(position);
-			}
-		}
-	});
-    
-	manager.on(MagoManager.EVENT_TYPE.LEFTUP, function(e)
-	{
-		if (!that.getActive()) { return; }
-		if (that.dragging) 
+		});
+		
+		manager.on(MagoManager.EVENT_TYPE.LEFTUP, function(e)
 		{
-			that.endPoint = e.point;
-			that.end();
-		}
-	});
+			if (!that.getActive()) { return; }
+			if (that.dragging) 
+			{
+				that.endPoint = e.point;
+				that.end();
+			}
+		});
+	}
 };
 /**
  * @private
