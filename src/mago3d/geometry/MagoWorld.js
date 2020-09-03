@@ -426,12 +426,12 @@ MagoWorld.prototype.mousewheel = function(event)
 	}
 
 
-	if (Math.abs(delta) < 100.0)
+	if (Math.abs(delta) < 20.0)
 	{
 		if (delta < 0.0)
-		{ delta = -100; }
+		{ delta = -20; }
 		else
-		{ delta = 100; }
+		{ delta = 20; }
 	}
 	
 	var oldCamPos = new Point3D(camPos.x, camPos.y, camPos.z);
