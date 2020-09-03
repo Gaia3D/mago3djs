@@ -173,10 +173,10 @@ vec3 normal_from_depth(float depth, vec2 texCoord) {
 	float depthB = 0.0;
 	for(float i=0.0; i<3.0; i++)
 	{
-		depthA += getDepth(origin + offset1*(1.0+i));
-		depthB += getDepth(origin + offset2*(1.0+i));
-		//depthA += getDepth(origin + offset1*(1.0+i*2.0));
-        //depthB += getDepth(origin + offset2*(1.0+i*2.0));
+		//depthA += getDepth(origin + offset1*(1.0+i));
+		//depthB += getDepth(origin + offset2*(1.0+i));
+		depthA += getDepth(origin + offset1*(1.0+i*2.0));
+        depthB += getDepth(origin + offset2*(1.0+i*2.0));
 	}
 
 	vec3 posA = reconstructPosition(texCoord + offset1*2.0, depthA/3.0);
@@ -648,9 +648,10 @@ void main()
 
 		vec3 normalFromDepth = normal_from_depth(linearDepthAux, screenPos); // normal from depthTex.***
 
-		//vec3 rayAux = getViewRay(screenPosAux); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
-        //float scalarProd = dot(normalFromDepth, normalize(-rayAux));
-		float scalarProd = dot(normalFromDepth, normalize(-ray));
+        vec2 screenPosAux = vec2(0.5, 0.5);
+		vec3 rayAux = getViewRay(screenPosAux); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
+        float scalarProd = dot(normalFromDepth, normalize(-rayAux));
+		//float scalarProd = dot(normalFromDepth, normalize(-ray));
 		scalarProd /= 3.0;
 		scalarProd += 0.666;
 
@@ -680,12 +681,11 @@ void main()
 					//vec2 cauticsTexCoord = texCoord*pow(2.0, tileDethDiff);
 					//-----------------------------------------------------------------------
 					vec2 cauticsTexCoord = texCoord;
-					vec3 causticColor = causticColor(cauticsTexCoord)*gray*0.4;
+					vec3 causticColor = causticColor(cauticsTexCoord)*gray*0.3;
 					textureColor = vec4(textureColor.r+ causticColor.x, textureColor.g+ causticColor.y, textureColor.b+ causticColor.z, 1.0);
 				}
 			}
 			// End caustics.--------------------------
-
 			
 			if(gray < 0.05)
 			gray = 0.05;
@@ -694,6 +694,16 @@ void main()
 			float blue = gray*2.0 + 2.0;
 			fogColor = vec4(red, green, blue, 1.0);
 			
+            // Something like to HillShade .*********************************************************************************
+            vec3 lightDir = normalize(vec3(1.0, 1.0, 0.0));
+            float scalarProd_2d = dot(lightDir, normalFromDepth);
+            
+            scalarProd_2d /= 2.0;
+            scalarProd_2d += 0.8;
+
+            //scalarProd_2d *= scalarProd_2d;
+            textureColor *= vec4(textureColor.r*scalarProd_2d, textureColor.g*scalarProd_2d, textureColor.b, textureColor.a);
+            // End Something like to HillShade.---------------------------------------------------------------------------------
 			
 			// End test drawing grid.---
 			float specularReflectionCoef = 0.6;
@@ -710,40 +720,9 @@ void main()
 			discard;
 		}
 		
-		
-		
 		vec4 finalColor = mix(textureColor, fogColor, vFogAmount); 
 		gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian * scalarProd, 1.0); // original.***
 		//gl_FragColor = textureColor; // test.***
 		//gl_FragColor = vec4(vNormal.xyz, 1.0); // test.***
-
-		/*
-		int texDepthDiff = int(floor(vTileDepth+0.1) - floor(vTexTileDepth+0.1));
-		if(texDepthDiff > 0)
-		{
-			if(texDepthDiff == 1)
-			finalColor = mix(textureColor, vec4(1.0, 0.0, 0.0, 1.0), 0.2); 
-
-			if(texDepthDiff == 2)
-			finalColor = mix(textureColor, vec4(0.0, 1.0, 0.0, 1.0), 0.2); 
-
-			if(texDepthDiff == 3)
-			finalColor = mix(textureColor, vec4(0.0, 0.0, 1.0, 1.0), 0.2); 
-
-			if(texDepthDiff == 4)
-			finalColor = mix(textureColor, vec4(1.0, 1.0, 0.0, 1.0), 0.2); 
-
-			if(texDepthDiff > 4)
-			finalColor = mix(textureColor, vec4(1.0, 0.0, 1.0, 1.0), 0.2); 
-
-
-			gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian * scalarProd, 1.0); // original.***
-
-			//if(abs(vTestCurrLatitude - 36.0) < 0.01 || abs(vTestCurrLongitude - 127.0) < 0.01)
-			//gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0); // original.***
-		}
-		*/
-		//if(currSunIdx > 0.0 && currSunIdx < 1.0 && shadow_occlusion<0.9)gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-		
 	}
 }

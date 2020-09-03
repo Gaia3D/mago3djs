@@ -4301,9 +4301,10 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
         if(currColor4.w > 0.0)\n\
         {\n\
             // decode the grayScale.***\n\
-            float height;\n\
-            float R = currColor4.r;\n\
-            height = R;\n\
+            //float height;\n\
+            //float R = currColor4.r;\n\
+            //height = R;\n\
+            float height = currColor4.g;\n\
             altitude = uMinMaxAltitudes.x + height * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);\n\
 \n\
             if(altitude < 0.0)\n\
@@ -5777,10 +5778,10 @@ vec3 normal_from_depth(float depth, vec2 texCoord) {\n\
 	float depthB = 0.0;\n\
 	for(float i=0.0; i<3.0; i++)\n\
 	{\n\
-		depthA += getDepth(origin + offset1*(1.0+i));\n\
-		depthB += getDepth(origin + offset2*(1.0+i));\n\
-		//depthA += getDepth(origin + offset1*(1.0+i*2.0));\n\
-        //depthB += getDepth(origin + offset2*(1.0+i*2.0));\n\
+		//depthA += getDepth(origin + offset1*(1.0+i));\n\
+		//depthB += getDepth(origin + offset2*(1.0+i));\n\
+		depthA += getDepth(origin + offset1*(1.0+i*2.0));\n\
+        depthB += getDepth(origin + offset2*(1.0+i*2.0));\n\
 	}\n\
 \n\
 	vec3 posA = reconstructPosition(texCoord + offset1*2.0, depthA/3.0);\n\
@@ -6252,9 +6253,10 @@ void main()\n\
 \n\
 		vec3 normalFromDepth = normal_from_depth(linearDepthAux, screenPos); // normal from depthTex.***\n\
 \n\
-		//vec3 rayAux = getViewRay(screenPosAux); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
-        //float scalarProd = dot(normalFromDepth, normalize(-rayAux));\n\
-		float scalarProd = dot(normalFromDepth, normalize(-ray));\n\
+        vec2 screenPosAux = vec2(0.5, 0.5);\n\
+		vec3 rayAux = getViewRay(screenPosAux); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
+        float scalarProd = dot(normalFromDepth, normalize(-rayAux));\n\
+		//float scalarProd = dot(normalFromDepth, normalize(-ray));\n\
 		scalarProd /= 3.0;\n\
 		scalarProd += 0.666;\n\
 \n\
@@ -6284,12 +6286,11 @@ void main()\n\
 					//vec2 cauticsTexCoord = texCoord*pow(2.0, tileDethDiff);\n\
 					//-----------------------------------------------------------------------\n\
 					vec2 cauticsTexCoord = texCoord;\n\
-					vec3 causticColor = causticColor(cauticsTexCoord)*gray*0.4;\n\
+					vec3 causticColor = causticColor(cauticsTexCoord)*gray*0.3;\n\
 					textureColor = vec4(textureColor.r+ causticColor.x, textureColor.g+ causticColor.y, textureColor.b+ causticColor.z, 1.0);\n\
 				}\n\
 			}\n\
 			// End caustics.--------------------------\n\
-\n\
 			\n\
 			if(gray < 0.05)\n\
 			gray = 0.05;\n\
@@ -6298,6 +6299,16 @@ void main()\n\
 			float blue = gray*2.0 + 2.0;\n\
 			fogColor = vec4(red, green, blue, 1.0);\n\
 			\n\
+            // Something like to HillShade .*********************************************************************************\n\
+            vec3 lightDir = normalize(vec3(1.0, 1.0, 0.0));\n\
+            float scalarProd_2d = dot(lightDir, normalFromDepth);\n\
+            \n\
+            scalarProd_2d /= 2.0;\n\
+            scalarProd_2d += 0.8;\n\
+\n\
+            //scalarProd_2d *= scalarProd_2d;\n\
+            textureColor *= vec4(textureColor.r*scalarProd_2d, textureColor.g*scalarProd_2d, textureColor.b, textureColor.a);\n\
+            // End Something like to HillShade.---------------------------------------------------------------------------------\n\
 			\n\
 			// End test drawing grid.---\n\
 			float specularReflectionCoef = 0.6;\n\
@@ -6314,41 +6325,10 @@ void main()\n\
 			discard;\n\
 		}\n\
 		\n\
-		\n\
-		\n\
 		vec4 finalColor = mix(textureColor, fogColor, vFogAmount); \n\
 		gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian * scalarProd, 1.0); // original.***\n\
 		//gl_FragColor = textureColor; // test.***\n\
 		//gl_FragColor = vec4(vNormal.xyz, 1.0); // test.***\n\
-\n\
-		/*\n\
-		int texDepthDiff = int(floor(vTileDepth+0.1) - floor(vTexTileDepth+0.1));\n\
-		if(texDepthDiff > 0)\n\
-		{\n\
-			if(texDepthDiff == 1)\n\
-			finalColor = mix(textureColor, vec4(1.0, 0.0, 0.0, 1.0), 0.2); \n\
-\n\
-			if(texDepthDiff == 2)\n\
-			finalColor = mix(textureColor, vec4(0.0, 1.0, 0.0, 1.0), 0.2); \n\
-\n\
-			if(texDepthDiff == 3)\n\
-			finalColor = mix(textureColor, vec4(0.0, 0.0, 1.0, 1.0), 0.2); \n\
-\n\
-			if(texDepthDiff == 4)\n\
-			finalColor = mix(textureColor, vec4(1.0, 1.0, 0.0, 1.0), 0.2); \n\
-\n\
-			if(texDepthDiff > 4)\n\
-			finalColor = mix(textureColor, vec4(1.0, 0.0, 1.0, 1.0), 0.2); \n\
-\n\
-\n\
-			gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian * scalarProd, 1.0); // original.***\n\
-\n\
-			//if(abs(vTestCurrLatitude - 36.0) < 0.01 || abs(vTestCurrLongitude - 127.0) < 0.01)\n\
-			//gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0); // original.***\n\
-		}\n\
-		*/\n\
-		//if(currSunIdx > 0.0 && currSunIdx < 1.0 && shadow_occlusion<0.9)gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n\
-		\n\
 	}\n\
 }";
 ShaderSource.TinTerrainVS = "\n\

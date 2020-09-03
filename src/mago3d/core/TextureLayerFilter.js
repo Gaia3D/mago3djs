@@ -101,6 +101,8 @@ TextureLayerFilter.prototype.getLegendImage = function(width, height)
 			if(i === legendStep-1)
 			{
 				xOffset = 20;
+			} else {
+				xOffset = 40;
 			}
 			
 			if(legendStep > 11 && stepGradient[i].toString().length > 4 && i !== legendStep-1)

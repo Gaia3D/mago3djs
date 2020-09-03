@@ -352,9 +352,10 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
         if(currColor4.w > 0.0)
         {
             // decode the grayScale.***
-            float height;
-            float R = currColor4.r;
-            height = R;
+            //float height;
+            //float R = currColor4.r;
+            //height = R;
+            float height = currColor4.g;
             altitude = uMinMaxAltitudes.x + height * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);
 
             if(altitude < 0.0)
