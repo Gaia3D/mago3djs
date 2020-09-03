@@ -344,7 +344,7 @@ CesiumViewerInit.prototype.setEventHandler = function()
 	magoManager.handler.setInputAction(function(click) 
 	{
 		magoManager.handleBrowserEvent(new BrowserEvent(MagoManager.EVENT_TYPE.RIGHTDOWN, click.position, magoManager));
-		magoManager.mouseActionRightDown(click.position.x, click.position.y);
+		//magoManager.mouseActionRightDown(click.position.x, click.position.y);
 	}, Cesium.ScreenSpaceEventType.RIGHT_DOWN);
 
 	magoManager.handler.setInputAction(function(movement) 
@@ -368,7 +368,7 @@ CesiumViewerInit.prototype.setEventHandler = function()
 	magoManager.handler.setInputAction(function(movement) 
 	{
 		magoManager.handleBrowserEvent(new BrowserEvent(MagoManager.EVENT_TYPE.RIGHTUP, movement.position, magoManager));
-		magoManager.mouseActionRightUp(movement.position.x, movement.position.y);
+		//magoManager.mouseActionRightUp(movement.position.x, movement.position.y);
 	}, Cesium.ScreenSpaceEventType.RIGHT_UP);
     
 	magoManager.handler.setInputAction(function(movement) 
@@ -380,13 +380,13 @@ CesiumViewerInit.prototype.setEventHandler = function()
 	magoManager.handler.setInputAction(function(movement) 
 	{
 		magoManager.handleBrowserEvent(new BrowserEvent(MagoManager.EVENT_TYPE.DBCLICK, movement.position, magoManager));
-		magoManager.mouseActionLeftDoubleClick(movement.position.x, movement.position.y);
+		//magoManager.mouseActionLeftDoubleClick(movement.position.x, movement.position.y);
 	}, Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
 
 	magoManager.handler.setInputAction(function(movement) 
 	{
 		magoManager.handleBrowserEvent(new BrowserEvent(MagoManager.EVENT_TYPE.RIGHTCLICK, movement.position, magoManager));
-		magoManager.mouseActionRightClick(movement.position.x, movement.position.y);
+		//magoManager.mouseActionRightClick(movement.position.x, movement.position.y);
 	}, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
 
 	magoManager.handler.setInputAction(function(delta) 
