@@ -212,7 +212,7 @@ F4dController.prototype.deleteF4dMember = function(groupId, memberId)
 	{
 		throw new Error('groupId is required.');
 	}
-	if (!memberId) 
+	if (memberId === undefined || memberId === null) 
 	{
 		throw new Error('memberId is required.');
 	}

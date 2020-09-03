@@ -140,9 +140,9 @@ Tools.prototype.setControl = function(magoManager)
 	var labelBtnObj = getBasicButtonObject('label', 'Label Toggle', 'LABEL', 'toggle', function(value) 
 	{
 		that.magoManager.magoPolicy.setShowLabelInfo(value);
-	
+		
 		// clear the text canvas.
-		var canvas = document.getElementById("objectLabel");
+		var canvas = that.magoManager.getObjectLabel();
 		var ctx = canvas.getContext("2d");
 		ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 	});
