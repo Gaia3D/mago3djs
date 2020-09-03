@@ -523,6 +523,22 @@ MagoRenderable.prototype.getGeoLocDataManager = function()
 	return this.geoLocDataManager;
 };
 
+MagoRenderable.prototype.getCurrentGeoLocationData = function()
+{
+	if (!this.geoLocDataManager) 
+	{
+		throw new Error('this data is not ready to use.');
+	}
+	var geoLoDataManager = this.getGeoLocDataManager();
+	return geoLoDataManager.getCurrentGeoLocationData();
+};
+
+MagoRenderable.prototype.changeLocationAndRotation = function(latitude, longitude, elevation, heading, pitch, roll, magoManager)
+{
+	var geoLocationData = this.getCurrentGeoLocationData();
+	Mago3D.ManagerUtils.calculateGeoLocationData(latitude, longitude, elevation, heading, pitch, roll, geoLocationData, magoManager);
+}
+
 /**
  * set model position
  * @param {GeographicCoord} geographicCoord 
