@@ -156,6 +156,25 @@ SelectionManager.prototype.getSelectedF4dBuilding = function()
  * @alias SelectionManager
  * @class SelectionManager
  */
+SelectionManager.prototype.getSelectedF4dBuildingArray = function()
+{
+	var buildingArray = []
+	var nodeArray = this.getSelectedF4dNodeArray();
+
+	for(var i=0,len=nodeArray.length;i<len;i++) {
+		var node = nodeArray[i];
+		buildingArray.push(node.data.neoBuilding);
+	}
+
+	return buildingArray;
+};
+
+/**
+ * SelectionManager
+ * 
+ * @alias SelectionManager
+ * @class SelectionManager
+ */
 SelectionManager.prototype.setSelectedF4dBuilding = function(building)
 {
 	this.currentBuildingSelected = building;
@@ -178,6 +197,17 @@ SelectionManager.prototype.getSelectedF4dObject = function()
  * @alias SelectionManager
  * @class SelectionManager
  */
+SelectionManager.prototype.getSelectedF4dObjectArray = function()
+{
+	return this.currentReferenceSelectedArray;
+};
+
+/**
+ * SelectionManager
+ * 
+ * @alias SelectionManager
+ * @class SelectionManager
+ */
 SelectionManager.prototype.setSelectedF4dObject = function(object)
 {
 	this.currentReferenceSelected = object;
@@ -192,6 +222,17 @@ SelectionManager.prototype.setSelectedF4dObject = function(object)
 SelectionManager.prototype.getSelectedF4dNode = function()
 {
 	return this.currentNodeSelected;
+};
+
+/**
+ * SelectionManager
+ * 
+ * @alias SelectionManager
+ * @class SelectionManager
+ */
+SelectionManager.prototype.getSelectedF4dNodeArray = function()
+{
+	return this.currentNodeSelectedArray;
 };
 
 /**
@@ -304,6 +345,12 @@ SelectionManager.prototype.isObjectSelected = function(object)
 	{ return true; }
 	
 	if (this.currentGeneralObjectSelected === object)
+	{ return true; }
+
+	if (this.currentGeneralObjectSelectedArray.indexOf(object) > -1)
+	{ return true; }
+
+	if (this.currentNodeSelectedArray.indexOf(object) > -1)
 	{ return true; }
 	
 	return false;

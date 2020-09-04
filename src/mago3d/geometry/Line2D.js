@@ -132,7 +132,17 @@ Line2D.prototype.getRelativeSideOfPoint = function(point, error)
 	var vector = new Point2D(point.x - projectPoint.x, point.y - projectPoint.y);
 	vector.unitary();
 
-	if ((Math.abs(vector.x-this.direction.y) < error) && (Math.abs(vector.y+this.direction.x) < error)) 
+	// gET OUR LEFT LINE.***
+	var myLeft = this.getPerpendicularLeft(point);
+	var scalar = myLeft.direction.scalarProduct(vector);
+
+	if(scalar < 0.0) {
+		return CODE.relativePosition2D.RIGHT;
+	} else {
+		return CODE.relativePosition2D.LEFT;
+	}
+
+	/*if ((Math.abs(vector.x-this.direction.y) < error) && (Math.abs(vector.y+this.direction.x) < error)) 
 	{
 		return CODE.relativePosition2D.RIGHT;
 	}
@@ -141,7 +151,7 @@ Line2D.prototype.getRelativeSideOfPoint = function(point, error)
 		return CODE.relativePosition2D.LEFT;
 	}
 
-	return CODE.relativePosition2D.UNKNOWN;
+	return CODE.relativePosition2D.UNKNOWN;*/
 };
 
 /**

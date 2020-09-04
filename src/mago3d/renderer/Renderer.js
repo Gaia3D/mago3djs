@@ -630,9 +630,9 @@ Renderer.prototype.renderSilhouetteDepth = function()
 	if (selectionManager)
 	{
 		var gl = magoManager.getGl();
-		var node = selectionManager.getSelectedF4dNode();
-		var selectedRef = selectionManager.getSelectedF4dObject();
-		if (node !== undefined && !selectedRef) // test code.***
+		var nodes = selectionManager.getSelectedF4dNodeArray();
+		var selectedRefs = selectionManager.getSelectedF4dObjectArray();
+		if (nodes.length > 0 && selectedRefs.length === 0) // test code.***
 		{
 			magoManager.currentProcess = CODE.magoCurrentProcess.SilhouetteDepthRendering;
 			var silhouetteDepthFbo = magoManager.getSilhouetteDepthFbo();
@@ -675,7 +675,10 @@ Renderer.prototype.renderSilhouetteDepth = function()
 				
 			var renderType = 0;
 			var refMatrixIdxKey = 0;
-			node.renderContent(magoManager, currentShader, renderType, refMatrixIdxKey);
+			for(var i=0,len=nodes.length;i<len;i++) {
+				var node = nodes[i];
+				node.renderContent(magoManager, currentShader, renderType, refMatrixIdxKey);
+			}
 
 			silhouetteDepthFbo.unbind(); 
 			magoManager.swapRenderingFase();
@@ -683,6 +686,9 @@ Renderer.prototype.renderSilhouetteDepth = function()
 
 		//}
 		
+		//var nodes = selectionManager.getSelectedF4dNodeArray();
+		//var selectedRefs = selectionManager.getSelectedF4dObjectArray();
+		//if (nodes.length > 0 && selectedRefs.length === 0) // test code.***
 		// Check if there are a object selected.**********************************************************************
 		//if (magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.OBJECT && magoManager.selectionManager.currentReferenceSelected)
 		if (selectionManager.currentReferenceSelected)
@@ -1938,22 +1944,23 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		}
 		
 		
-		if (selectionManager && selectionManager.getSelectedF4dNode()) // if there are an object selected then there are a building selected.***
+		if (selectionManager && selectionManager.getSelectedF4dNodeArray().length > 0) // if there are an object selected then there are a building selected.***
 		{
-			if (selectionManager.getSelectedF4dBuilding())
+			//var selectedNodeArray = selectionManager.getSelectedF4dNodeArray();
+			if (selectionManager.getSelectedF4dBuildingArray().length > 0)
 			{
 				this.renderSilhouette();
 			}
 			
-			if (selectionManager.getSelectedF4dBuilding())
+			/*if (selectionManager.getSelectedF4dBuildingArray())
 			{
-				node = selectionManager.getSelectedF4dNode();
-				if (node !== undefined) // test code.***
+				nodes = selectionManager.getSelectedF4dNodeArray();
+				if (nodes !== undefined) // test code.***
 				{
 					// New.
 					this.renderSilhouette();
 				}
-			}
+			}*/
 			
 			// draw the axis.***
 			if (magoManager.magoPolicy.getShowOrigin())

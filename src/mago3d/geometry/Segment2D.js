@@ -92,14 +92,14 @@ Segment2D.prototype.getDirection = function(result)
 /**
  * 선분의 경계 사각형을 구한다.
  *
- * @param {BoundaryRectangle} result 선분을 포함하는 경계 사각형
- * @returns {BoundaryRectangle} 선분을 포함하는 경계 사각형
+ * @param {BoundingRectangle} result 선분을 포함하는 경계 사각형
+ * @returns {BoundingRectangle} 선분을 포함하는 경계 사각형
  */
-Segment2D.prototype.getBoundaryRectangle = function(result)
+Segment2D.prototype.getBoundingRectangle = function(result)
 {
 	if (result === undefined)
 	{
-		result = new BoundaryRectangle();
+		result = new BoundingRectangle();
 	}
 	
 	result.setInit(this.startPoint2d);
