@@ -461,10 +461,24 @@ Mesh.prototype.getBoundingBox = function()
 	if (this.bbox === undefined)
 	{
 		this.bbox = new BoundingBox();
+		if(!this.vertexList) {
+			this.vertexList = new VertexList();
+			this.vertexList.vertexArray = this.getNoRepeatedVerticesArray(this.vertexList.vertexArray);
+		}
+
 		this.bbox = this.vertexList.getBoundingBox(this.bbox);
 	}
 	
 	return this.bbox;
+};
+
+/**
+ * Returns the bounding sphere.
+ */
+Mesh.prototype.getBoundingSphere = function()
+{
+	var bbox = this.getBoundingBox();
+	return bbox.getBoundingSphere();
 };
 
 /**
@@ -923,8 +937,6 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive, i
 				gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 				gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, this.color4.a]); 
 			}
-
-			
 		}
 	}
 	else if (renderType === 2)

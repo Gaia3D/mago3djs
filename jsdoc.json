@@ -11,13 +11,16 @@
 	"templates": {
 		"cleverLinks": true,
 		"monospaceLinks": true,
+		"systemName" : "Mago3dJS for SeaForest",
 		"default": {
 			"outputSourceFiles": true
 		},
 		"path": "ink-docstrap",
-		"theme": "cerulean",
-		"navType": "inline",
+		"theme": "readable",
+		"navType": "vertical",
 		"linenums": true,
-		"dateFormat": "YYYY, MMMM Do h:mm:ss a"
+		"dateFormat": "YYYY, MMMM Do h:mm:ss a",
+		"outputSourceFiles":true,
+		"outputSourcePath":true
 	}
 }

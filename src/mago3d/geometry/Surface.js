@@ -565,3 +565,31 @@ Surface.prototype.reverseSense = function()
 		face.reverseSense();
 	}
 };
+
+/**
+ * Returns the bbox.
+ */
+Surface.prototype.getBoundingBox = function()
+{
+	if (this.bbox === undefined)
+	{
+		this.bbox = new BoundingBox();
+		if(!this.localVertexList) {
+			this.localVertexList = new VertexList();
+			this.localVertexList.vertexArray = this.getNoRepeatedVerticesArray(this.vertexList.vertexArray);
+		}
+
+		this.bbox = this.localVertexList.getBoundingBox(this.bbox);
+	}
+	
+	return this.bbox;
+};
+
+/**
+ * Returns the bounding sphere.
+ */
+Surface.prototype.getBoundingSphere = function()
+{
+	var bbox = this.getBoundingBox();
+	return bbox.getBoundingSphere();
+};

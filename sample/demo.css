@@ -19,6 +19,8 @@ ul, li {margin:0; padding:0; }
 .mapWrap {
 	height: 100%;
 	background-color: #eee;
+	float: right;
+    width: calc(100% - 60px);
 }
 
 /* NAV */

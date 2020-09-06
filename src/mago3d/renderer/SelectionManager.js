@@ -130,6 +130,17 @@ SelectionManager.prototype.getSelectedGeneral = function()
  * @alias SelectionManager
  * @class SelectionManager
  */
+SelectionManager.prototype.getSelectedGeneralArray = function()
+{
+	return this.currentGeneralObjectSelectedArray;
+};
+
+/**
+ * SelectionManager
+ * 
+ * @alias SelectionManager
+ * @class SelectionManager
+ */
 SelectionManager.prototype.setSelectedGeneral = function(selectedObject)
 {
 	this.currentGeneralObjectSelected = selectedObject;
@@ -686,3 +697,47 @@ SelectionManager.prototype.provisionalToCurrent = function(type, filter)
 		}
 	}
 };
+
+/**
+ * select object by polygon 2d
+ * @param {function} filter option
+ * @return {Array<object>}
+ */
+SelectionManager.prototype.selectionByPolygon2D = function(polygon2D, type) {
+	this.clearCurrents();
+	var frustumVolumeControl = this.magoManager.frustumVolumeControl;
+	
+	var allVisible = frustumVolumeControl.getAllVisiblesObject();
+	
+	var result;
+	if(type === InteractionTargetType.F4D) {
+		var nodeMap =allVisible.nodeMap;
+		var selectedNodes = [];
+		for(var k in nodeMap) {
+			if(nodeMap.hasOwnProperty(k)) {
+				var node = nodeMap[k];
+
+				if(node.intersectionWithPolygon2D(polygon2D)) {
+					selectedNodes.push(node);
+				}
+			}
+		}
+		this.currentNodeSelectedArray = selectedNodes;
+		result = selectedNodes;
+	} else if(type === InteractionTargetType.NATIVE) {
+		var nativeMap =allVisible.nativeMap;		
+		var selectednative = []
+		for(var k in nativeMap) {
+			if(nativeMap.hasOwnProperty(k)) {
+				var native = nativeMap[k];
+				if(native.intersectionWithPolygon2D(polygon2D)) {
+					selectednative.push(native);
+				}
+			}
+		}
+		this.currentGeneralObjectSelectedArray = selectednative;
+		result = selectednative;
+	}
+
+	return result;
+}

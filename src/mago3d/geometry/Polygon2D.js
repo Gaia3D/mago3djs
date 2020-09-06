@@ -727,24 +727,16 @@ Polygon2D.makePolygonByGeographicCoordArray = function(array)
 	return polygon2D;
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/**
+ * @static
+ * @param {Array<Cesium.cartesian3>} array 
+ */
+Polygon2D.makePolygonByCartesian3Array = function(cartesians) {
+	var geographics = [];
+	for(var k in cartesians) {
+		if(cartesians.hasOwnProperty(k)) {
+			geographics.push(ManagerUtils.pointToGeographicCoord(cartesians[k]));
+		}
+	}
+	return Polygon2D.makePolygonByGeographicCoordArray(geographics);
+}

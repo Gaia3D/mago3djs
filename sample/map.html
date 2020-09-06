@@ -25,7 +25,6 @@
 	</li>
 </ul>
 <div id="magoContainer" class="mapWrap"></div>
-<canvas id="objectLabel"></canvas>
 
 <script type="text/javascript" src="../src/engine/cesium/Cesium.js"></script>
 <script type="text/javascript" src="../build/mago3d/mago3d.js"></script>
@@ -83,8 +82,24 @@
 			type: "GET",
 			dataType: "json",
 			success: function(serverPolicy){
+				var cesiumViewerOption = {};
+				cesiumViewerOption.infoBox = false;
+				cesiumViewerOption.navigationHelpButton = false;
+				cesiumViewerOption.selectionIndicator = false;
+				cesiumViewerOption.homeButton = false;
+				cesiumViewerOption.fullscreenButton = false;
+				cesiumViewerOption.geocoder = false;
+				cesiumViewerOption.baseLayerPicker = false;
+				cesiumViewerOption.sceneModePicker = false;
+
 				serverPolicy.basicGlobe = 'cesium';
-				MAGO3D_INSTANCE = new Mago3D.Mago3d(renderDivId, serverPolicy, {loadend : loadend});
+				serverPolicy.cesiumIonToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyNmNjOWZkOC03NjdlLTRiZTktYWQ3NS1hNmQ0YjA1ZjIzYWEiLCJpZCI6Mzk5Miwic2NvcGVzIjpbImFzciIsImdjIl0sImlhdCI6MTU0NDYwNDQ3M30.AwvoVAuMRwjcMMJ9lEG2v4CPUp8gfltJqZARHgxGv_k";
+				serverPolicy.terrainType = 'cesium-default'
+
+				serverPolicy.initLatitude = 37.43601055850527;
+				serverPolicy.initLongitude = 126.8008658032687;
+				serverPolicy.initAltitude = 3000;
+				MAGO3D_INSTANCE = new Mago3D.Mago3d(renderDivId, serverPolicy, {loadend : loadend}, cesiumViewerOption);
 			},
 			error: function(e){
 				alert(e.responseText);
@@ -95,9 +110,21 @@
 		console.info('Complete construct mago3d instance. Enjoy!');
 		
 		var magoInstance = e;
-
+		console.info(magoInstance)
+		magoInstance.getViewer().scene.globe.depthTestAgainstTerrain = true;
 		magoInstance.setBaseUrl(dataInfo.baseUrl);
 
+
+		var osm = new Cesium.OpenStreetMapImageryProvider({
+			url : 'https://{s}.tile.openstreetmap.org/'
+		});
+
+		var positron = new Cesium.UrlTemplateImageryProvider({
+			url : 'http://xdworld.vworld.kr:8080/2d/Base/201802/{z}/{x}/{y}.png'
+		});
+
+		//magoInstance.getViewer().imageryLayers.addImageryProvider(osm,1);
+		
 		var magoManager = magoInstance.getMagoManager();
 		var viewer = magoInstance.getViewer();
 		var provider = new Cesium.WebMapServiceImageryProvider({
@@ -114,7 +141,7 @@
 		var aa = new Cesium.ImageryLayer(provider, {
 			alpha : 0.9
 		});
-viewer.imageryLayers.add(aa);
+//viewer.imageryLayers.add(aa);
 		var layer = new Mago3D.MagoLayer({
 			dataGroupId : 1,
 			dataGroupKey : '3ds',
@@ -123,70 +150,138 @@ viewer.imageryLayers.add(aa);
 		});
 		
 		magoManager.addLayer(layer);
-		
+
 		magoManager.on(Mago3D.MagoManager.EVENT_TYPE.CLICK, function(e){
 			console.info(e);
-			console.info(magoManager.objectSelected)
+		});
+
+		magoManager.on(Mago3D.MagoManager.EVENT_TYPE.SELECTEDF4D, function(e){
+			console.info(e);
+		});
+
+		magoManager.on(Mago3D.MagoManager.EVENT_TYPE.DESELECTEDF4D, function(e){
+			console.info(e);
 		});
 	}
-	/*
+	
 	function doTest(){
 		var f4dController = MAGO3D_INSTANCE.getF4dController();
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
 		$.ajax({
-			url: dataInformationUrl + "guide.json",
+			url: dataInformationUrl + "sh_struc.json",
 			type: "GET",
 			dataType: "json",
 			success: function(f4dObject){
-				console.info(f4dObject);
 				f4dController.addF4dGroup(f4dObject);
-			},
-			error: function(e){
-				alert(e.responseText);
-			}
-		});
-	}
-	*/
 
-	function doTest(){
-		// load 3ds data.**************************************
-		var f4dController = MAGO3D_INSTANCE.getF4dController();
-		$.ajax({
-			url: dataInformationUrl + "3ds.json",
-			type: "GET",
-			dataType: "json",
-			success: function(f4dObject){
-				console.info(f4dObject);
-				f4dController.addF4dGroup(f4dObject);
-			},
-			error: function(e){
-				alert(e.responseText);
-			}
-		});
+				var box = new Mago3D.Box(30,30, 80);
+				if(!box.attributes) box.attributes = {};
+				box.attributes.isMovable = true;
+				box.setGeographicPosition(new Mago3D.GeographicCoord(126.8014658032687, 37.43653055850527, 14.177629));
+				box.setOneColor(0.2, 0.7, 0.8, 0.4);
+				box.attributes.selectedColor4 = new Mago3D.Color(1.0, 1.0, 0.0, 1.0); // selectedColor fully transparent.
 
-		// Test weather wind.*********************************
-		/*var magomanager = MAGO3D_INSTANCE.getMagoManager();
-		if (magomanager.windTest === undefined)
-		{
-			if (magomanager.weatherStation === undefined)
-			{ magomanager.weatherStation = new Mago3D.WeatherStation(); }
-		
-			var geometryDataPath = magomanager.readerWriter.geometryDataPath;
-			var windDataFilesNamesArray = ["OBS-QWM_2016062000.grib2_wind_000", "OBS-QWM_2016062001.grib2_wind_000", "OBS-QWM_2016062002.grib2_wind_000", "OBS-QWM_2016062003.grib2_wind_000",
-				"OBS-QWM_2016062004.grib2_wind_000", "OBS-QWM_2016062005.grib2_wind_000", "OBS-QWM_2016062006.grib2_wind_000", "OBS-QWM_2016062007.grib2_wind_000",
-				"OBS-QWM_2016062008.grib2_wind_000", "OBS-QWM_2016062009.grib2_wind_000", "OBS-QWM_2016062010.grib2_wind_000", "OBS-QWM_2016062011.grib2_wind_000",
-				"OBS-QWM_2016062012.grib2_wind_000", "OBS-QWM_2016062013.grib2_wind_000", "OBS-QWM_2016062014.grib2_wind_000", "OBS-QWM_2016062015.grib2_wind_000",
-				"OBS-QWM_2016062016.grib2_wind_000", "OBS-QWM_2016062017.grib2_wind_000", "OBS-QWM_2016062018.grib2_wind_000", "OBS-QWM_2016062019.grib2_wind_000",
-				"OBS-QWM_2016062020.grib2_wind_000", "OBS-QWM_2016062021.grib2_wind_000", "OBS-QWM_2016062022.grib2_wind_000", "OBS-QWM_2016062023.grib2_wind_000"];
+				MAGO3D_INSTANCE.getMagoManager().modeler.addObject(box, 5);
+
+				var arrow = new Mago3D.Arrow(30,15, 80);
+				if(!arrow.attributes) arrow.attributes = {};
+				arrow.attributes.isMovable = true;
+				arrow.setGeographicPosition(new Mago3D.GeographicCoord(126.8014658032687, 37.43683055850527, 14.177629));
+
+				arrow.setOneColor(0.2, 0.7, 0.8, 0.4);
+				arrow.attributes.selectedColor4 = new Mago3D.Color(1.0, 1.0, 0.0, 1.0); // selectedColor fully transparent.
+
+				MAGO3D_INSTANCE.getMagoManager().modeler.addObject(arrow, 5);
+
+				var cyl = new Mago3D.Cylinder(30,80);
+				if(!cyl.attributes) cyl.attributes = {};
+				cyl.attributes.isMovable = true;
+				cyl.setGeographicPosition(new Mago3D.GeographicCoord(126.8014658032687, 37.43601055850527, 14.177629));
+
+				cyl.setOneColor(0.2, 0.7, 0.8, 0.4);
+				cyl.attributes.selectedColor4 = new Mago3D.Color(1.0, 1.0, 0.0, 1.0); // selectedColor fully transparent.
+
+				MAGO3D_INSTANCE.getMagoManager().modeler.addObject(cyl, 5);
 				
-			var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_Airport";
-			//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_GolfPark_NineBridge1";
-			
-			magomanager.weatherStation.test_loadWindData3d(magomanager, windDataFilesNamesArray, windMapFilesFolderPath);
-			magomanager.TEST__golfPark();
-			magomanager.windTest = true;
-		}*/
-	}
+				MAGO3D_INSTANCE.getMagoManager().addStaticModel({
+					projectId : 'tree',
+					projectFolderName : 'lh-data',
+					buildingFolderName : 'F4D_tree'
+				});
+				MAGO3D_INSTANCE.getMagoManager().addStaticModel({
+					projectId : 'sj173006',
+					projectFolderName : 'lh-data',
+					buildingFolderName : 'F4D_sj173006'
+				});
+				MAGO3D_INSTANCE.getMagoManager().addStaticModel({
+					projectId : 'SJGSLJ1002',
+					projectFolderName : 'lh-data',
+					buildingFolderName : 'F4D_SJGSLJ1002'
+				});
 
+				var treeStart = new Mago3D.GeographicCoord(126.80127456160453,37.43790781930617,5);
+				var treeEnd = new Mago3D.GeographicCoord(126.79868978138177,37.38050571056221,5);
+				var treePositions = Mago3D.GeographicCoordSegment.getArcInterpolatedGeoCoords(treeStart, treeEnd, 8);
+
+				var slStart = new Mago3D.GeographicCoord(126.80449676241084,37.43770221908449,5);
+				var slEnd = new Mago3D.GeographicCoord(126.79868978138177,37.38050571056221,5);
+				var slPositions = Mago3D.GeographicCoordSegment.getArcInterpolatedGeoCoords(slStart, slEnd, 2);
+
+				var spStart = new Mago3D.GeographicCoord(126.80239144274829,37.4348109445351,5);
+				var spEnd = new Mago3D.GeographicCoord(126.8030056869661,37.37929383761813,5);
+				var spPositions = Mago3D.GeographicCoordSegment.getArcInterpolatedGeoCoords(spStart, spEnd, 2);
+				
+				for(var i in treePositions)
+				{
+					var position = treePositions[i];
+					MAGO3D_INSTANCE.getMagoManager().instantiateStaticModel({
+						projectId : 'tree',
+						instanceId : 'tree'+i,
+						longitude : position.longitude,
+						latitude : position.latitude,
+						height : 0
+					});
+				}
+				for(var i in slPositions)
+				{
+					var position = slPositions[i];
+					MAGO3D_INSTANCE.getMagoManager().instantiateStaticModel({
+						projectId : 'sj173006',
+						instanceId : 'sj173006'+i,
+						longitude : position.longitude,
+						latitude : position.latitude,
+						height : position.altitude
+					});
+				}
+				for(var i in spPositions)
+				{
+					var position = spPositions[i];
+					MAGO3D_INSTANCE.getMagoManager().instantiateStaticModel({
+						projectId : 'SJGSLJ1002',
+						instanceId : 'SJGSLJ1002'+i,
+						longitude : position.longitude,
+						latitude : position.latitude,
+						height : position.altitude
+					});
+				}
+			},
+			error: function(e){
+				alert(e.responseText);
+			}
+		});
+
+		$.ajax({
+			url: dataInformationUrl + "sh.json",
+			type: "GET",
+			dataType: "json",
+			success: function(f4dObject){
+				f4dController.addF4dGroup(f4dObject);
+			},
+			error: function(e){
+				alert(e.responseText);
+			}
+		});
+	}
 </script>
 </body>
 </html>

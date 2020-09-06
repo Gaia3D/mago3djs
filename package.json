@@ -7,7 +7,7 @@
     "test": "jasmine",
     "start": "node server.js",
     "build": "gulp",
-    "doc" : "gulp doc",
+    "doc": "gulp doc",
     "test:debug": "karma start --browsers Chrome_with_debugging"
   },
   "author": "Gaia3d",

@@ -866,53 +866,32 @@ Face.prototype.createHalfEdges = function(resultHalfEdgesArray)
 };
 
 
+/**
+ * Returns the bbox.
+ */
+Face.prototype.getBoundingBox = function()
+{
+	if (this.bbox === undefined)
+	{
+		var box = new BoundingBox();
+		
+		for (var i = 0, vertexCount = this.getVerticesCount(); i < vertexCount; i++) 
+		{
+			var vtx = this.getVertex(i);
+			if (i === 0) { box.init(vtx); }
+			else { box.addPoint(vtx); }
+		}
+		this.bbox = box;
+	}
+	
+	return this.bbox;
+};
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/**
+ * Returns the bounding sphere.
+ */
+Face.prototype.getBoundingSphere = function()
+{
+	var bbox = this.getBoundingBox();
+	return bbox.getBoundingSphere();
+};

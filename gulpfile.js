@@ -293,22 +293,43 @@ gulp.task('karma', function (done)
 // eslint
 gulp.task('lint', function() 
 {
-	var list = paths.source_js.slice(0);
-	list = list.concat(paths.test);
-	return gulp.src(list)
-		.pipe(eslint({fix: true}))
-		.pipe(eslint.format())
-		.pipe(gulpIf(isFixed, gulp.dest(function(file)
-		{
-			return file.base;
-		})))
-		.pipe(eslint.failAfterError());
-});
+    var list = paths.source_js.slice(0);
+    list = list.concat(paths.test);
+    return gulp.src(list)
+        .pipe(eslint({fix: true}))
+        .pipe(eslint({fix: true, quiet: isError}))
+        .pipe(eslint.format())
+        .pipe(gulpIf(isFixed, gulp.dest(function(file)
+        {
+            return file.base;
+        })))
+        .pipe(eslint.failAfterError());
 
+    function isError(msg){
+        return msg.severity !== 1;
+    }
+});
 gulp.task('doc', function (cb) 
 {
+	console.info(cb);
 	var config = require('./jsdoc.json');
-	gulp.src(['README.md', './src/mago3d/*.js', './src/mago3d/**/*.js'], {read: false})
+	gulp.src(['seeforest.md', './src/mago3d/core/MagoManager.js','./src/mago3d/core/Mago3d.js'
+	,'./src/mago3d/core/TextureLayer.js'
+,'./src/mago3d/core/WMSLayer.js'
+,'./src/mago3d/core/XYZLayer.js'
+,'./src/mago3d/geometry/MagoWorld.js'
+,'./src/mago3d/geometry/Modeler.js'
+,'./src/mago3d/geometry/MagoGeometry.js'
+,'./src/mago3d/geometry/MagoPoint.js'
+,'./src/mago3d/geometry/MagoPolyline.js'
+,'./src/mago3d/geometry/MagoRectangle.js'
+,'./src/mago3d/core/InteractionCollection.js'
+,'./src/mago3d/parametricModels/interaction/DrawGeometryInteraction.js'
+,'./src/mago3d/parametricModels/interaction/LineDrawer.js'
+,'./src/mago3d/parametricModels/interaction/PointDrawer.js'
+,'./src/mago3d/parametricModels/interaction/RectangleDrawer.js'
+,'ol-magoworld.js'
+], {read: true})
 		.pipe(jsdoc(config, cb));
 });
 
