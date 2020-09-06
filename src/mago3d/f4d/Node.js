@@ -78,13 +78,15 @@ Node.prototype.isReadyToRender = function()
 	return true;
 };
 
-Node.prototype.getId = function() {
-	if(!this.data) {
+Node.prototype.getId = function() 
+{
+	if (!this.data) 
+	{
 		throw new Error('data is not ready.');
 	}
 
 	return this.data.nodeId + '#' + this.data.projectId;
-}
+};
 
 /**
  * Deletes all datas and all datas of children.
@@ -1431,7 +1433,8 @@ Node.prototype.changeLocationAndRotation = function(latitude, longitude, elevati
  * @param {Polygon2D} polygon2D 
  * @return {boolean}
  */
-Node.prototype.intersectionWithPolygon2D = function(polygon2D) {
+Node.prototype.intersectionWithPolygon2D = function(polygon2D) 
+{
 	var bbox = this.data.bbox;
 	var currentGeoLocationData = this.getCurrentGeoLocationData();
 	var tMat = currentGeoLocationData.tMatrix;
@@ -1439,7 +1442,7 @@ Node.prototype.intersectionWithPolygon2D = function(polygon2D) {
 	var bboxPolygon2D = bbox.getGeographicCoordPolygon2D(tMat);
 	
 	return polygon2D.intersectionWithPolygon2D(bboxPolygon2D);
-}
+};
 /**
  * 어떤 일을 하고 있습니까?
  */

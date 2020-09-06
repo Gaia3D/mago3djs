@@ -33,7 +33,8 @@ Polygon2D.prototype.getBoundingRectangle = function(resultBRect)
 	if (this.point2dList === undefined)
 	{ return resultBRect; }
 	
-	if(!this.bRect) {
+	if (!this.bRect) 
+	{
 		this.bRect = this.point2dList.getBoundingRectangle(resultBRect);
 	}
 	return this.bRect;
@@ -170,7 +171,7 @@ Polygon2D.prototype.tessellate = function(concaveVerticesIndices, convexPolygons
 {
 	var concaveVerticesCount = concaveVerticesIndices.length;
 	
-	if(!convexPolygonsArray) convexPolygonsArray = [];
+	if (!convexPolygonsArray) { convexPolygonsArray = []; }
 
 	if (concaveVerticesCount === 0)
 	{
@@ -285,8 +286,8 @@ Polygon2D.prototype.intersectionWithSegment = function(segment, error)
 	var mySegment;
 	var intersectionType;
 
-	if(!error)
-	error = 10E-8;
+	if (!error)
+	{ error = 10E-8; }
 	var pointsCount = this.point2dList.getPointsCount();
 	for (var i=0; i<pointsCount; i++)
 	{
@@ -534,11 +535,13 @@ Polygon2D.getVbo = function(concavePolygon, convexPolygonsArray, resultVbo)
 	return resultVbo;
 };
 
-Polygon2D.prototype.intersectionWithPolygon2D = function(polygon2D) {
+Polygon2D.prototype.intersectionWithPolygon2D = function(polygon2D) 
+{
 	var resultConcavePointsIdxArray = this.calculateNormal(resultConcavePointsIdxArray);
 	
 	
-	if(this.normal === -1) {
+	if (this.normal === -1) 
+	{
 		this.reverseSense();
 		resultConcavePointsIdxArray.length = 0;
 		resultConcavePointsIdxArray = this.calculateNormal(resultConcavePointsIdxArray);
@@ -546,16 +549,18 @@ Polygon2D.prototype.intersectionWithPolygon2D = function(polygon2D) {
 	var tessellated = this.tessellate(resultConcavePointsIdxArray, []);
 
 	var interior = false;
-	for(var i=0,len=tessellated.length; i<len; i++) {
+	for (var i=0, len=tessellated.length; i<len; i++) 
+	{
 		var convex = tessellated[i];
-		if(convex.intersectionWithPolygon2DConvexPolygon(polygon2D)) {
+		if (convex.intersectionWithPolygon2DConvexPolygon(polygon2D)) 
+		{
 			interior = true;
 			break;
 		}
 	}
 
 	return interior;
-}
+};
 
 /**
  * 
@@ -566,7 +571,8 @@ Polygon2D.prototype.intersectionWithPolygon2DConvexPolygon = function(polygon2D)
 	var thisBRectangle = this.getBoundingRectangle();
 	var targetBRectangle = polygon2D.getBoundingRectangle();
 	
-	if(!thisBRectangle.intersectsWithRectangle(targetBRectangle)) {
+	if (!thisBRectangle.intersectsWithRectangle(targetBRectangle)) 
+	{
 		return false;
 	}
 
@@ -574,19 +580,24 @@ Polygon2D.prototype.intersectionWithPolygon2DConvexPolygon = function(polygon2D)
 
 	//
 	var interior = false;
-	for(var i=0,len=targetPoint2DList.getPointsCount();i<len;i++) {
+	for (var i=0, len=targetPoint2DList.getPointsCount();i<len;i++) 
+	{
 		var targetPoint = targetPoint2DList.getPoint(i); 
 		
 		var relativePosition = this.getRelativePostionOfPoint2DConvexPolygon(targetPoint);
-		if(relativePosition === 3) {
+		if (relativePosition === 3) 
+		{
 			interior = true;
 			break;
 		}
 	}
 
-	if(!interior) {
-		for(var i=0,len=targetPoint2DList.getPointsCount();i<len;i++) {
-			if(this.intersectionWithSegment(targetPoint2DList.getSegment(i), 10E-16)) {
+	if (!interior) 
+	{
+		for (var i=0, len=targetPoint2DList.getPointsCount();i<len;i++) 
+		{
+			if (this.intersectionWithSegment(targetPoint2DList.getSegment(i), 10E-16)) 
+			{
 				interior = true;
 				break;
 			}
@@ -594,52 +605,61 @@ Polygon2D.prototype.intersectionWithPolygon2DConvexPolygon = function(polygon2D)
 	}
 
 	return interior;
-}
+};
 
 /**
  * get relative position of point2d
  * @param {Polygon2D} polygon2D 
  * @return {number}  0 : no intersection 1 : pointCoincident, 2 : edgeCoincident. 3 : interior
  */
-Polygon2D.prototype.getRelativePostionOfPoint2DConvexPolygon = function(point2D) { 
+Polygon2D.prototype.getRelativePostionOfPoint2DConvexPolygon = function(point2D) 
+{ 
 	var thisBRectangle = this.getBoundingRectangle();
-	if(!thisBRectangle.intersectsWithPoint2D(point2D)) {
+	if (!thisBRectangle.intersectsWithPoint2D(point2D)) 
+	{
 		return 0;
 	}
 	var errorDist = 10E-16;
-	for(var i=0,len=this.point2dList.getPointsCount();i<len;i++) {
+	for (var i=0, len=this.point2dList.getPointsCount();i<len;i++) 
+	{
 		var polygonVertex = this.point2dList.getPoint(i); 
 		
-		if(polygonVertex.isCoincidentToPoint(point2D, errorDist)) {
+		if (polygonVertex.isCoincidentToPoint(point2D, errorDist)) 
+		{
 			return 1;
 		}
 	}
 	
-	for(var i=0,len=this.point2dList.getPointsCount();i<len;i++) {
+	for (var i=0, len=this.point2dList.getPointsCount();i<len;i++) 
+	{
 		var segment = this.point2dList.getSegment(i); 
 		
-		if(segment.intersectionWithPoint(point2D, errorDist)) {
+		if (segment.intersectionWithPoint(point2D, errorDist)) 
+		{
 			return 2;
 		}
 	}
 
 	var oldSide;
-	for(var i=0,len=this.point2dList.getPointsCount();i<len;i++) {
+	for (var i=0, len=this.point2dList.getPointsCount();i<len;i++) 
+	{
 		var segment = this.point2dList.getSegment(i); 
 		var line2D = segment.getLine();
 
-		var side = line2D.getRelativeSideOfPoint(point2D, errorDist)
-		if(!oldSide) {
+		var side = line2D.getRelativeSideOfPoint(point2D, errorDist);
+		if (!oldSide) 
+		{
 			oldSide = side;
 		}
 		
-		if(oldSide !== side) {
+		if (oldSide !== side) 
+		{
 			return 0;
 		}
 	}
 	
 	return 3;
-}
+};
 
 Polygon2D.prototype.solveDegeneratedPoints = function()
 {
@@ -648,21 +668,24 @@ Polygon2D.prototype.solveDegeneratedPoints = function()
 	{ return; }
 	var distError = 10E-8;
 	var aux = [];
-	for(var i=0;i<pointsCount;i++) {
+	for (var i=0;i<pointsCount;i++) 
+	{
 		var point = this.point2dList.getPoint(i);
-		if(aux.length > 0) {
+		if (aux.length > 0) 
+		{
 			var prev = aux[aux.length-1];
-			if(point.isCoincidentToPoint(prev, distError)) continue;
+			if (point.isCoincidentToPoint(prev, distError)) { continue; }
 		}
 		aux.push(point);
 	}
 
-	if(pointsCount !== aux.length) {
+	if (pointsCount !== aux.length) 
+	{
 		var hola = 0;
 	}
 
 	this.point2dList.pointsArray = aux;
-}
+};
 Polygon2D.prototype.solveUroborus = function()
 {
 	// "Uroborus" is an archaic motif of a snake biting its own tail.
@@ -686,10 +709,12 @@ Polygon2D.prototype.solveUroborus = function()
  * @static
  * @param {Array<GeographicCoord>} array 
  */
-Polygon2D.makePolygonByGeographicCoordArray = function(array) {
+Polygon2D.makePolygonByGeographicCoordArray = function(array) 
+{
 
 	var p2dList = new Point2DList();
-	for(var i=0,len=array.length;i<len;i++) {
+	for (var i=0, len=array.length;i<len;i++) 
+	{
 		var geographic = array[i];
 		p2dList.newPoint(geographic.longitude, geographic.latitude);
 	}
@@ -700,7 +725,7 @@ Polygon2D.makePolygonByGeographicCoordArray = function(array) {
 	polygon2D.solveUroborus();
 	polygon2D.solveDegeneratedPoints();
 	return polygon2D;
-}
+};
 
 
 

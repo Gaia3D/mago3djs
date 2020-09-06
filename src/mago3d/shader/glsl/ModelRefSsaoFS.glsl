@@ -331,10 +331,10 @@ void main()
 	float lambertian = 1.0;
 	float specular = 0.0;
 
-	if((textureColor.r < 0.5 && textureColor.b > 0.5) || textureColor.a < 1.0)
-	//specular = 1.0;
-	
-	//if(applySpecLighting> 0.0)
+	//if((textureColor.r < 0.5 && textureColor.b > 0.5) || textureColor.a < 1.0)
+
+	/*
+	if(applySpecLighting> 0.0)
 	{
 		vec3 L;
 		if(bApplyShadow)
@@ -373,9 +373,10 @@ void main()
 		}
 
 	}
-	
+	*/
 
 	lambertian = 1.0;
+	specular = 0.0;
 	
 	if(bApplyShadow)
 	{

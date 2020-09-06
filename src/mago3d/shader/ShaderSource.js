@@ -1917,10 +1917,10 @@ void main()\n\
 	float lambertian = 1.0;\n\
 	float specular = 0.0;\n\
 \n\
-	if((textureColor.r < 0.5 && textureColor.b > 0.5) || textureColor.a < 1.0)\n\
-	//specular = 1.0;\n\
-	\n\
-	//if(applySpecLighting> 0.0)\n\
+	//if((textureColor.r < 0.5 && textureColor.b > 0.5) || textureColor.a < 1.0)\n\
+\n\
+	/*\n\
+	if(applySpecLighting> 0.0)\n\
 	{\n\
 		vec3 L;\n\
 		if(bApplyShadow)\n\
@@ -1959,9 +1959,10 @@ void main()\n\
 		}\n\
 \n\
 	}\n\
-	\n\
+	*/\n\
 \n\
 	lambertian = 1.0;\n\
+	specular = 0.0;\n\
 	\n\
 	if(bApplyShadow)\n\
 	{\n\
@@ -2007,6 +2008,10 @@ void main()\n\
     vec4 finalColor;\n\
 	if(applySpecLighting> 0.0)\n\
 	{\n\
+		finalColor = vec4((ambientReflectionCoef * ambientColorAux + \n\
+							diffuseReflectionCoef * lambertian * textureColor.xyz + \n\
+							specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion * shadow_occlusion * scalarProd, alfa); \n\
+\n\
 		finalColor = vec4((ambientReflectionCoef * ambientColorAux + \n\
 							diffuseReflectionCoef * lambertian * textureColor.xyz + \n\
 							specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion * shadow_occlusion * scalarProd, alfa); \n\

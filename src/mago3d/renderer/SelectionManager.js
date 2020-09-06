@@ -158,10 +158,11 @@ SelectionManager.prototype.getSelectedF4dBuilding = function()
  */
 SelectionManager.prototype.getSelectedF4dBuildingArray = function()
 {
-	var buildingArray = []
+	var buildingArray = [];
 	var nodeArray = this.getSelectedF4dNodeArray();
 
-	for(var i=0,len=nodeArray.length;i<len;i++) {
+	for (var i=0, len=nodeArray.length;i<len;i++) 
+	{
 		var node = nodeArray[i];
 		buildingArray.push(node.data.neoBuilding);
 	}

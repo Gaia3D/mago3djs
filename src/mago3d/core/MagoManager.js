@@ -1830,8 +1830,8 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 			worldPosition = nodeRoot.getBBoxCenterPositionWorldCoord(geoLoc);
 			screenCoord = ManagerUtils.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord, this);
 			
-			var elemFromPoints = document.elementsFromPoint(screenCoord.x,screenCoord.y);
-			if(elemFromPoints.length === 0) continue;
+			var elemFromPoints = document.elementsFromPoint(screenCoord.x, screenCoord.y);
+			if (elemFromPoints.length === 0) { continue; }
 
 			if (elemFromPoints[0].nodeName === 'CANVAS' && screenCoord.x >= 0 && screenCoord.y >= 0)
 			{

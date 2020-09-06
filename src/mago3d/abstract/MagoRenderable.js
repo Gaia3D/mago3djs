@@ -538,7 +538,7 @@ MagoRenderable.prototype.changeLocationAndRotation = function(latitude, longitud
 {
 	var geoLocationData = this.getCurrentGeoLocationData();
 	Mago3D.ManagerUtils.calculateGeoLocationData(latitude, longitude, elevation, heading, pitch, roll, geoLocationData, magoManager);
-}
+};
 
 /**
  * set model position
@@ -565,11 +565,12 @@ MagoRenderable.prototype.setGeographicPosition = function(geographicCoord)
 MagoRenderable.prototype.intersectionWithPolygon2D = function(polygon2D) 
 {
 	var result = false;
-	if(this.geographicCoordList) {
+	if (this.geographicCoordList) 
+	{
 		var geographicArray = this.geographicCoordList.geographicCoordsArray;
 		var nativePolygon2D = Polygon2D.makePolygonByGeographicCoordArray(geographicArray);
 
-		result = polygon2D.intersectionWithPolygon2D(nativePolygon2D)
+		result = polygon2D.intersectionWithPolygon2D(nativePolygon2D);
 	}
 
 	return result;

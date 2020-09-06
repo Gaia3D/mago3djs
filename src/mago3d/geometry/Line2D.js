@@ -136,9 +136,12 @@ Line2D.prototype.getRelativeSideOfPoint = function(point, error)
 	var myLeft = this.getPerpendicularLeft(point);
 	var scalar = myLeft.direction.scalarProduct(vector);
 
-	if(scalar < 0.0) {
+	if (scalar < 0.0) 
+	{
 		return CODE.relativePosition2D.RIGHT;
-	} else {
+	}
+	else 
+	{
 		return CODE.relativePosition2D.LEFT;
 	}
 

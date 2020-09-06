@@ -142,20 +142,24 @@ VisibleObjectsController.prototype.putNativeObject = function(object)
 	}
 };
 
-VisibleObjectsController.prototype.getAllNatives = function() {
+VisibleObjectsController.prototype.getAllNatives = function() 
+{
 	var result = [];
 	var nativeObjects = this.currentVisibleNativeObjects;
-	for(var i in nativeObjects) {
-		if(nativeObjects.hasOwnProperty(i)) {
+	for (var i in nativeObjects) 
+	{
+		if (nativeObjects.hasOwnProperty(i)) 
+		{
 			var nativeArray = nativeObjects[i];
-			for(var j=0,len=nativeArray.length;j<len;j++) {
+			for (var j=0, len=nativeArray.length;j<len;j++) 
+			{
 				result.push(nativeArray[j]);
 			}
 		}
 	}
 
 	return result;
-}
+};
 
 /**
  * 

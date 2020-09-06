@@ -675,7 +675,8 @@ Renderer.prototype.renderSilhouetteDepth = function()
 				
 			var renderType = 0;
 			var refMatrixIdxKey = 0;
-			for(var i=0,len=nodes.length;i<len;i++) {
+			for (var i=0, len=nodes.length;i<len;i++) 
+			{
 				var node = nodes[i];
 				node.renderContent(magoManager, currentShader, renderType, refMatrixIdxKey);
 			}

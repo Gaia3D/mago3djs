@@ -121,30 +121,34 @@ FrustumVolumeControl.prototype.getAllVisiblesObject = function()
 	var nodeMap = {};
 	var nativeMap = {};
 
-	for(var i in this.frustumVolumensMap) {
-		if(this.frustumVolumensMap.hasOwnProperty(i)) {
+	for (var i in this.frustumVolumensMap) 
+	{
+		if (this.frustumVolumensMap.hasOwnProperty(i)) 
+		{
 			var visibleNodes = this.frustumVolumensMap[i].visibleNodes;
 
 			var natives = visibleNodes.getAllNatives();
-			for(var j=0,len=natives.length;j<len;j++) {
+			for (var j=0, len=natives.length;j<len;j++) 
+			{
 				var native = natives[j];
-				if(nativeMap[native._guid]) continue;
+				if (nativeMap[native._guid]) { continue; }
 
 				nativeMap[native._guid] = native;
 			}
 
 			var nodes = visibleNodes.getAllVisibles();
-			for(var j=0,len=nodes.length;j<len;j++) {
+			for (var j=0, len=nodes.length;j<len;j++) 
+			{
 				var node = nodes[j];
 				var id = node.getId();
-				if(nodeMap[id]) continue;
+				if (nodeMap[id]) { continue; }
 
 				nodeMap[id] = node;
 			}
 		}
 	}
 	return {
-		nodeMap : nodeMap,
+		nodeMap   : nodeMap,
 		nativeMap : nativeMap
-	}
-}
+	};
+};

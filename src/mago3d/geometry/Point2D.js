@@ -200,7 +200,8 @@ Point2D.prototype.isCoincidentToPoint = function(point, errorDist)
 {
 	var squareDist = this.distToPoint(point);
 	var coincident = false;
-	if(!errorDist) {
+	if (!errorDist) 
+	{
 		errorDist = 10E-8;
 	}
 
