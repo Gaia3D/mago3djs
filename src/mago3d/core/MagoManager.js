@@ -350,6 +350,9 @@ var MagoManager = function(config)
 	 * @type {MagoLayerCollection}
 	 */
 	this.magoLayerCollection = new MagoLayerCollection();
+
+
+	this._changeCanvasSizeEvent = new Event('changeCanvasSize');
 };
 MagoManager.prototype = Object.create(Emitter.prototype);
 MagoManager.prototype.constructor = MagoManager;
@@ -741,9 +744,13 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		
 		// Update sceneState camera.***
 		this.upDateCamera(sceneState.camera);
-					
-		sceneState.drawingBufferWidth[0] = scene.drawingBufferWidth;
-		sceneState.drawingBufferHeight[0] = scene.drawingBufferHeight;
+
+		if(sceneState.drawingBufferWidth[0] !== scene.drawingBufferWidth || sceneState.drawingBufferHeight[0] !== scene.drawingBufferHeight)
+		{
+			sceneState.drawingBufferWidth[0] = scene.drawingBufferWidth;
+			sceneState.drawingBufferHeight[0] = scene.drawingBufferHeight;
+			window.dispatchEvent(this._changeCanvasSizeEvent);
+		}
 	}
 	else/* if (this.configInformation.basicGlobe === Constant.MAGOWORLD)*/
 	{

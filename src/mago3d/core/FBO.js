@@ -75,7 +75,7 @@ var FBO = function(gl, width, height, options)
 	if (options.matchCanvasSize)
 	{
 		var that = this;
-		window.addEventListener('resize', function()
+		window.addEventListener('changeCanvasSize', function()
 		{
 			var canvas = that.gl.canvas;
 
