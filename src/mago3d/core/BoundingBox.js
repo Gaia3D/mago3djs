@@ -873,3 +873,23 @@ BoundingBox.prototype.intersectsWithBBox = function(box)
 
 	return intersection;
 };
+
+BoundingBox.prototype.getGeographicCoordPolygon2D = function(tMat) {
+	var lb = new Point3D(this.minX, this.minY, this.minZ);
+	var rb = new Point3D(this.maxX, this.minY, this.minZ);
+	var rt = new Point3D(this.maxX, this.maxY, this.minZ);
+	var lt = new Point3D(this.minX, this.maxY, this.minZ);
+
+	var lbWC = tMat.transformPoint3D(lb);
+	var rbWC = tMat.transformPoint3D(rb);
+	var rtWC = tMat.transformPoint3D(rt);
+	var ltWC = tMat.transformPoint3D(lt);
+
+	var gArray = [];
+	gArray.push(ManagerUtils.pointToGeographicCoord(lbWC));
+	gArray.push(ManagerUtils.pointToGeographicCoord(rbWC));
+	gArray.push(ManagerUtils.pointToGeographicCoord(rtWC));
+	gArray.push(ManagerUtils.pointToGeographicCoord(ltWC));
+
+	return Polygon2D.makePolygonByGeographicCoordArray(gArray);
+}

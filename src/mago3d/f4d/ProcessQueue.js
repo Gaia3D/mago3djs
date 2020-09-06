@@ -360,7 +360,8 @@ ProcessQueue.prototype.deleteNeoBuilding = function(gl, neoBuilding, magoManager
 {
 	// check if the neoBuilding id the selected building.
 	var vboMemoryManager = magoManager.vboMemoryManager;
-	if (neoBuilding === magoManager.selectionManager.getSelectedF4dBuilding())
+	var selectedBuildingArray = magoManager.selectionManager.getSelectedF4dBuilding();
+	if (selectedBuildingArray.indexOf(neoBuilding) > -1)
 	{
 		magoManager.selectionManager.clearCurrents();
 	}

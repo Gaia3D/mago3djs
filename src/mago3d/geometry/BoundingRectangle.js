@@ -103,6 +103,28 @@ BoundingRectangle.prototype.intersectsWithRectangle = function(bRect)
 
 /**
  * Check whether this rectangle is intersected with the given bounding rectangle
+ * @param {Point2D} point2D
+ * @returns {Boolean}
+ */
+BoundingRectangle.prototype.intersectsWithPoint2D = function(point2D)
+{
+	if (point2D === undefined)
+	{ return false; }
+	
+	if (point2D.x > this.maxX)
+	{ return false; }
+	else if (point2D.x < this.minX)
+	{ return false; }
+	else if (point2D.y > this.maxY)
+	{ return false; }
+	else if (point2D.y < this.minY)
+	{ return false; }
+	
+	return true;
+};
+
+/**
+ * Check whether this rectangle is intersected with the given bounding rectangle
  * @param {BoundingRectangle} bRect
  * @returns {Point2D}
  */

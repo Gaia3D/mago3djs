@@ -3,6 +3,7 @@
 var MagoRenderable = function(options) 
 {
 	this.objectsArray = [];
+	this._guid = createGuid();
 
 	this.id;
 	this.name;
@@ -523,6 +524,22 @@ MagoRenderable.prototype.getGeoLocDataManager = function()
 	return this.geoLocDataManager;
 };
 
+MagoRenderable.prototype.getCurrentGeoLocationData = function()
+{
+	if (!this.geoLocDataManager) 
+	{
+		throw new Error('this data is not ready to use.');
+	}
+	var geoLoDataManager = this.getGeoLocDataManager();
+	return geoLoDataManager.getCurrentGeoLocationData();
+};
+
+MagoRenderable.prototype.changeLocationAndRotation = function(latitude, longitude, elevation, heading, pitch, roll, magoManager)
+{
+	var geoLocationData = this.getCurrentGeoLocationData();
+	Mago3D.ManagerUtils.calculateGeoLocationData(latitude, longitude, elevation, heading, pitch, roll, geoLocationData, magoManager);
+}
+
 /**
  * set model position
  * @param {GeographicCoord} geographicCoord 
@@ -538,4 +555,22 @@ MagoRenderable.prototype.setGeographicPosition = function(geographicCoord)
 		geoLocData = this.geoLocDataManager.newGeoLocationData("default");
 		geoLocData = ManagerUtils.calculateGeoLocationData(geographicCoord.longitude, geographicCoord.latitude, geographicCoord.altitude, undefined, undefined, undefined, geoLocData);
 	}
+};
+
+/**
+ * set model position
+ * @param {Polygon2D} polygon2D 
+ * @return {boolean}
+ */
+MagoRenderable.prototype.intersectionWithPolygon2D = function(polygon2D) 
+{
+	var result = false;
+	if(this.geographicCoordList) {
+		var geographicArray = this.geographicCoordList.geographicCoordsArray;
+		var nativePolygon2D = Polygon2D.makePolygonByGeographicCoordArray(geographicArray);
+
+		result = polygon2D.intersectionWithPolygon2D(nativePolygon2D)
+	}
+
+	return result;
 };

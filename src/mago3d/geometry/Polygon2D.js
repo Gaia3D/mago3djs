@@ -33,8 +33,10 @@ Polygon2D.prototype.getBoundingRectangle = function(resultBRect)
 	if (this.point2dList === undefined)
 	{ return resultBRect; }
 	
-	resultBRect = this.point2dList.getBoundingRectangle(resultBRect);
-	return resultBRect;
+	if(!this.bRect) {
+		this.bRect = this.point2dList.getBoundingRectangle(resultBRect);
+	}
+	return this.bRect;
 };
 /**
  * get the direction of the specific line segment of the edge
@@ -168,6 +170,8 @@ Polygon2D.prototype.tessellate = function(concaveVerticesIndices, convexPolygons
 {
 	var concaveVerticesCount = concaveVerticesIndices.length;
 	
+	if(!convexPolygonsArray) convexPolygonsArray = [];
+
 	if (concaveVerticesCount === 0)
 	{
 		convexPolygonsArray.push(this);
@@ -267,12 +271,12 @@ Polygon2D.prototype.tessellate = function(concaveVerticesIndices, convexPolygons
  * Check whether the given segment cut a polygon edges or is coincident with a polygon's vertex 
  * @param {Segment2D} segment the target segement
  * */
-Polygon2D.prototype.intersectionWithSegment = function(segment)
+Polygon2D.prototype.intersectionWithSegment = function(segment, error)
 {
 	if (this.bRect !== undefined)
 	{
 		// if exist boundary rectangle, check bRect intersection.
-		var segmentsBRect = segment.getBoundaryRectangle(segmentsBRect);
+		var segmentsBRect = segment.getBoundingRectangle(segmentsBRect);
 		if (!this.bRect.intersectsWithRectangle(segmentsBRect))
 		{ return false; }
 	}
@@ -280,7 +284,9 @@ Polygon2D.prototype.intersectionWithSegment = function(segment)
 	// 1rst check if the segment is coincident with any polygons vertex.
 	var mySegment;
 	var intersectionType;
-	var error = 10E-8;
+
+	if(!error)
+	error = 10E-8;
 	var pointsCount = this.point2dList.getPointsCount();
 	for (var i=0; i<pointsCount; i++)
 	{
@@ -528,6 +534,173 @@ Polygon2D.getVbo = function(concavePolygon, convexPolygonsArray, resultVbo)
 	return resultVbo;
 };
 
+Polygon2D.prototype.intersectionWithPolygon2D = function(polygon2D) {
+	var resultConcavePointsIdxArray = this.calculateNormal(resultConcavePointsIdxArray);
+	
+	
+	if(this.normal === -1) {
+		this.reverseSense();
+		resultConcavePointsIdxArray.length = 0;
+		resultConcavePointsIdxArray = this.calculateNormal(resultConcavePointsIdxArray);
+	}
+	var tessellated = this.tessellate(resultConcavePointsIdxArray, []);
+
+	var interior = false;
+	for(var i=0,len=tessellated.length; i<len; i++) {
+		var convex = tessellated[i];
+		if(convex.intersectionWithPolygon2DConvexPolygon(polygon2D)) {
+			interior = true;
+			break;
+		}
+	}
+
+	return interior;
+}
+
+/**
+ * 
+ * @param {Polygon2D} polygon2D 
+ */
+Polygon2D.prototype.intersectionWithPolygon2DConvexPolygon = function(polygon2D)
+{
+	var thisBRectangle = this.getBoundingRectangle();
+	var targetBRectangle = polygon2D.getBoundingRectangle();
+	
+	if(!thisBRectangle.intersectsWithRectangle(targetBRectangle)) {
+		return false;
+	}
+
+	var targetPoint2DList = polygon2D.point2dList;
+
+	//
+	var interior = false;
+	for(var i=0,len=targetPoint2DList.getPointsCount();i<len;i++) {
+		var targetPoint = targetPoint2DList.getPoint(i); 
+		
+		var relativePosition = this.getRelativePostionOfPoint2DConvexPolygon(targetPoint);
+		if(relativePosition === 3) {
+			interior = true;
+			break;
+		}
+	}
+
+	if(!interior) {
+		for(var i=0,len=targetPoint2DList.getPointsCount();i<len;i++) {
+			if(this.intersectionWithSegment(targetPoint2DList.getSegment(i), 10E-16)) {
+				interior = true;
+				break;
+			}
+		}
+	}
+
+	return interior;
+}
+
+/**
+ * get relative position of point2d
+ * @param {Polygon2D} polygon2D 
+ * @return {number}  0 : no intersection 1 : pointCoincident, 2 : edgeCoincident. 3 : interior
+ */
+Polygon2D.prototype.getRelativePostionOfPoint2DConvexPolygon = function(point2D) { 
+	var thisBRectangle = this.getBoundingRectangle();
+	if(!thisBRectangle.intersectsWithPoint2D(point2D)) {
+		return 0;
+	}
+	var errorDist = 10E-16;
+	for(var i=0,len=this.point2dList.getPointsCount();i<len;i++) {
+		var polygonVertex = this.point2dList.getPoint(i); 
+		
+		if(polygonVertex.isCoincidentToPoint(point2D, errorDist)) {
+			return 1;
+		}
+	}
+	
+	for(var i=0,len=this.point2dList.getPointsCount();i<len;i++) {
+		var segment = this.point2dList.getSegment(i); 
+		
+		if(segment.intersectionWithPoint(point2D, errorDist)) {
+			return 2;
+		}
+	}
+
+	var oldSide;
+	for(var i=0,len=this.point2dList.getPointsCount();i<len;i++) {
+		var segment = this.point2dList.getSegment(i); 
+		var line2D = segment.getLine();
+
+		var side = line2D.getRelativeSideOfPoint(point2D, errorDist)
+		if(!oldSide) {
+			oldSide = side;
+		}
+		
+		if(oldSide !== side) {
+			return 0;
+		}
+	}
+	
+	return 3;
+}
+
+Polygon2D.prototype.solveDegeneratedPoints = function()
+{
+	var pointsCount = this.point2dList.getPointsCount();
+	if (pointsCount < 3)
+	{ return; }
+	var distError = 10E-8;
+	var aux = [];
+	for(var i=0;i<pointsCount;i++) {
+		var point = this.point2dList.getPoint(i);
+		if(aux.length > 0) {
+			var prev = aux[aux.length-1];
+			if(point.isCoincidentToPoint(prev, distError)) continue;
+		}
+		aux.push(point);
+	}
+
+	if(pointsCount !== aux.length) {
+		var hola = 0;
+	}
+
+	this.point2dList.pointsArray = aux;
+}
+Polygon2D.prototype.solveUroborus = function()
+{
+	// "Uroborus" is an archaic motif of a snake biting its own tail.
+	// This function checks if the 1rst vertex & the last vertex are coincident. If are coincident then remove last one.
+	var pointsCount = this.point2dList.getPointsCount();
+	if (pointsCount < 3)
+	{ return; }
+	
+	var startPoint = this.point2dList.getPoint(0);
+	var endPoint = this.point2dList.getPoint(pointsCount-1);
+	var distError = 10E-8; // 0.1mm of error.
+	
+	if (startPoint.isCoincidentToPoint(endPoint, distError))
+	{
+		// remove the last vertex.
+		this.point2dList.pointsArray.pop();
+	}
+};
+
+/**
+ * @static
+ * @param {Array<GeographicCoord>} array 
+ */
+Polygon2D.makePolygonByGeographicCoordArray = function(array) {
+
+	var p2dList = new Point2DList();
+	for(var i=0,len=array.length;i<len;i++) {
+		var geographic = array[i];
+		p2dList.newPoint(geographic.longitude, geographic.latitude);
+	}
+
+	var polygon2D = new Polygon2D();
+	polygon2D.point2dList = p2dList;
+
+	polygon2D.solveUroborus();
+	polygon2D.solveDegeneratedPoints();
+	return polygon2D;
+}
 
 
 
