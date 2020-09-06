@@ -4301,13 +4301,21 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
         if(currColor4.w > 0.0)\n\
         {\n\
             // decode the grayScale.***\n\
-            //float height;\n\
-            //float R = currColor4.r;\n\
-            //height = R;\n\
-            float height = currColor4.g;\n\
-            altitude = uMinMaxAltitudes.x + height * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);\n\
+            float r = currColor4.r;\n\
+            float g = currColor4.g;\n\
+            float b = currColor4.b;\n\
 \n\
-            if(altitude < 0.0)\n\
+            float height = currColor4.r;\n\
+            float incre = 1.0/16.0;\n\
+\n\
+            //height = 256.0*g*289.75 + b*289.75 - 2796.0;\n\
+            height = (256.0*g + b)/(256.0/2.0);\n\
+            \n\
+            //altitude = uMinMaxAltitudes.x + height * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);\n\
+				altitude = -2796.0 + height * (0.1 +2796.0);\n\
+            //altitude = height;\n\
+\n\
+            if(altitude < 0.1)\n\
             {\n\
                 /*\n\
                 float minHeight_rainbow = uMinMaxAltitudes.x;\n\
@@ -6193,7 +6201,19 @@ void main()\n\
 				// decode the grayScale.***\n\
 				float sumAux = layersTextureColor.r;// + layersTextureColor.g + layersTextureColor.b;// + layersTextureColor.w;\n\
 				//sumAux *= 6.6;\n\
-				altitude = uMinMaxAltitudes.x + sumAux * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);\n\
+\n\
+				float r = layersTextureColor.r;\n\
+				float g = layersTextureColor.g;\n\
+				float b = layersTextureColor.b;\n\
+\n\
+				float height = layersTextureColor.r;\n\
+\n\
+				float incre = 1.0/16.0;\n\
+\n\
+            	height = (256.0*g + b)/(256.0/2.0);\n\
+				//altitude = uMinMaxAltitudes.x + height * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);\n\
+				altitude = -2796.0 + height * (0.1 +2796.0);\n\
+				//altitude = height;\n\
 			}\n\
 		}\n\
 		// End Dem image.------------------------------------------------------------------------------------------------------------\n\
@@ -6204,7 +6224,7 @@ void main()\n\
 		float linearDepth = getDepth(screenPos);  \n\
 		linearDepthAux = linearDepth;\n\
 \n\
-		if(bApplySsao && altitude<0.0)\n\
+		if(bApplySsao && altitude<0.1)\n\
 		{\n\
 			// must find depthTex & noiseTex.***\n\
 			vec3 origin = ray * linearDepth;  \n\

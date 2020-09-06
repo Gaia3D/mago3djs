@@ -352,13 +352,21 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
         if(currColor4.w > 0.0)
         {
             // decode the grayScale.***
-            //float height;
-            //float R = currColor4.r;
-            //height = R;
-            float height = currColor4.g;
-            altitude = uMinMaxAltitudes.x + height * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);
+            float r = currColor4.r;
+            float g = currColor4.g;
+            float b = currColor4.b;
 
-            if(altitude < 0.0)
+            float height = currColor4.r;
+            float incre = 1.0/16.0;
+
+            //height = 256.0*g*289.75 + b*289.75 - 2796.0;
+            height = (256.0*g + b)/(256.0/2.0);
+            
+            //altitude = uMinMaxAltitudes.x + height * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);
+				altitude = -2796.0 + height * (0.1 +2796.0);
+            //altitude = height;
+
+            if(altitude < 0.1)
             {
                 /*
                 float minHeight_rainbow = uMinMaxAltitudes.x;

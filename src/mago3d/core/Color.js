@@ -199,29 +199,29 @@ Color.getWhiteToBlueColor_byHeight2 = function(height, step, resultColor)
 {
 	var gray = 1;
 
-	for(var i=0; i<step.length-1; i++)
-    {
-        var stepValue = step[i];
-        var stepValue2 = step[i+1];
+	for (var i=0; i<step.length-1; i++)
+	{
+		var stepValue = step[i];
+		var stepValue2 = step[i+1];
 
-        // check if is frontier.***
-        if(height >= step[0])
-        {
-            gray = 0.0;
-            break;
-        }
+		// check if is frontier.***
+		if (height >= step[0])
+		{
+			gray = 0.0;
+			break;
+		}
 
-        if(height <= stepValue && height > stepValue2)
-        {
-            // calculate decimal.***
-            //float decimal = (height - stepValue)/(stepValue2-stepValue);
-            var decimal = (stepValue - height)/(stepValue-stepValue2);
-            var unit = i;
-            var value = unit + decimal;
-            gray = value/(step.length-1);
-            break;
-        }
-    }
+		if (height <= stepValue && height > stepValue2)
+		{
+			// calculate decimal.***
+			//float decimal = (height - stepValue)/(stepValue2-stepValue);
+			var decimal = (stepValue - height)/(stepValue-stepValue2);
+			var unit = i;
+			var value = unit + decimal;
+			gray = value/(step.length-1);
+			break;
+		}
+	}
 
 	var r, g, b;
 	// Red.

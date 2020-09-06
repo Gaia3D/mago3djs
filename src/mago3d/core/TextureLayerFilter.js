@@ -98,14 +98,16 @@ TextureLayerFilter.prototype.getLegendImage = function(width, height)
 			ctx.textAlign = "center";
 			var lab = parseInt(stepGradient[i], 10);
 			var xOffset = 0;
-			if(i === legendStep-1)
+			if (i === legendStep-1)
 			{
 				xOffset = 20;
-			} else {
+			}
+			else 
+			{
 				xOffset = 40;
 			}
 			
-			if(legendStep > 11 && stepGradient[i].toString().length > 4 && i !== legendStep-1)
+			if (legendStep > 11 && stepGradient[i].toString().length > 4 && i !== legendStep-1)
 			{
 				continue;
 			}

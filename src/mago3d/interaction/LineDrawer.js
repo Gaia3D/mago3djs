@@ -87,7 +87,7 @@ LineDrawer.prototype.start = function()
 	var that = this;
 	var manager = that.manager;
 	
-	if(!this.added)
+	if (!this.added)
 	{
 		this.added = true;
 		manager.on(MagoManager.EVENT_TYPE.LEFTUP, function(e)
@@ -95,29 +95,32 @@ LineDrawer.prototype.start = function()
 			if (!that.getActive()) { return; }
 			
 
-			if(that.points.length === 0)
+			if (that.points.length === 0)
 			{
 				that.points.push(e.point.geographicCoordinate);
-				if(!that.clickTime) that.clickTime = new Date().getTime();
-				if(!that.clickPoint) that.clickPoint = e.point.screenCoordinate;
-			} else {
+				if (!that.clickTime) { that.clickTime = new Date().getTime(); }
+				if (!that.clickPoint) { that.clickPoint = e.point.screenCoordinate; }
+			}
+			else 
+			{
 				var thisTime = new Date().getTime();
 				var thisPoint = e.point.screenCoordinate; 
 				var dbclick = false;
 
-				if(thisTime - that.clickTime < 500 && Math.abs(thisPoint.x - that.clickPoint.x) < 2 && Math.abs(thisPoint.y - that.clickPoint.y) < 2)
+				if (thisTime - that.clickTime < 500 && Math.abs(thisPoint.x - that.clickPoint.x) < 2 && Math.abs(thisPoint.y - that.clickPoint.y) < 2)
 				{
 					dbclick = true;
 				}
 
-				if(!dbclick)
+				if (!dbclick)
 				{
 					that.points.push(e.point.geographicCoordinate);
 					that.clickTime = new Date().getTime();
 					that.clickPoint = e.point.screenCoordinate;
-				} else 
+				}
+				else 
 				{
-					if(that.tempLine)
+					if (that.tempLine)
 					{
 						var position = {coordinates: that.points};
 						that.tempLine.init(manager);

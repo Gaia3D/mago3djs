@@ -93,7 +93,7 @@ RectangleDrawer.prototype.start = function()
 	var that = this;
 	var manager = that.manager;
 
-	if(!this.added)
+	if (!this.added)
 	{
 		this.added = true;
 		manager.on(MagoManager.EVENT_TYPE.LEFTDOWN, function(e)

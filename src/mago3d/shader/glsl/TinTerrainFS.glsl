@@ -588,7 +588,19 @@ void main()
 				// decode the grayScale.***
 				float sumAux = layersTextureColor.r;// + layersTextureColor.g + layersTextureColor.b;// + layersTextureColor.w;
 				//sumAux *= 6.6;
-				altitude = uMinMaxAltitudes.x + sumAux * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);
+
+				float r = layersTextureColor.r;
+				float g = layersTextureColor.g;
+				float b = layersTextureColor.b;
+
+				float height = layersTextureColor.r;
+
+				float incre = 1.0/16.0;
+
+            	height = (256.0*g + b)/(256.0/2.0);
+				//altitude = uMinMaxAltitudes.x + height * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);
+				altitude = -2796.0 + height * (0.1 +2796.0);
+				//altitude = height;
 			}
 		}
 		// End Dem image.------------------------------------------------------------------------------------------------------------
@@ -599,7 +611,7 @@ void main()
 		float linearDepth = getDepth(screenPos);  
 		linearDepthAux = linearDepth;
 
-		if(bApplySsao && altitude<0.0)
+		if(bApplySsao && altitude<0.1)
 		{
 			// must find depthTex & noiseTex.***
 			vec3 origin = ray * linearDepth;  

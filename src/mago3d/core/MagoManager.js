@@ -4818,6 +4818,14 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 		use_linearOrLogarithmicDepth = "USE_LOGARITHMIC_DEPTH";
 
 		this.postFxShadersManager.bUseLogarithmicDepth = true;
+		/*
+		var supportTexterFloatType = gl.getSupportedExtensions().indexOf("OES_texture_float");
+
+		if (supportTexterFloatType) 
+		{
+			gl.getExtension("OES_texture_float");
+		}
+		*/
 	}
 	
 

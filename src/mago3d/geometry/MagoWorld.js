@@ -370,7 +370,7 @@ MagoWorld.prototype.mousewheel = function(event)
 	}
 
 	var wheelIsForward = true;
-    if (delta < 0.0)
+	if (delta < 0.0)
 	{ wheelIsForward = false; }
 	
 	var magoManager = this.magoManager;
@@ -401,14 +401,14 @@ MagoWorld.prototype.mousewheel = function(event)
 	delta *= (camHeght*camHeght) * 0.00001 + camHeightAbs * 0.001;
     
 
-    if (wheelIsForward)
-    {
-        delta += 1;
-    }
-    else 
-    {
-        delta -= 1;
-    }
+	if (wheelIsForward)
+	{
+		delta += 1;
+	}
+	else 
+	{
+		delta -= 1;
+	}
 	
 	//var maxDelta = 200000;
 	var maxDelta = 0.5*camHeightAbs;
@@ -416,23 +416,23 @@ MagoWorld.prototype.mousewheel = function(event)
 	{ maxDelta = 200000; }
 	
 	if (wheelIsForward)
-    {
-        if (delta > maxDelta)
-        { delta = maxDelta; }
-    }
-    else
-    {
-        if (delta < -maxDelta)
-        { delta = -maxDelta; }
-    }
+	{
+		if (delta > maxDelta)
+		{ delta = maxDelta; }
+	}
+	else
+	{
+		if (delta < -maxDelta)
+		{ delta = -maxDelta; }
+	}
 
-    if (Math.abs(delta) < 100.0)
-    {
-        if (delta < 0.0)
-        { delta = -100; }
-        else
-        { delta = 100; }
-    }
+	if (Math.abs(delta) < 100.0)
+	{
+		if (delta < 0.0)
+		{ delta = -20; }
+		else
+		{ delta = 20; }
+	}
 	
 	var oldCamPos = new Point3D(camPos.x, camPos.y, camPos.z);
 	var camNewPos = new Point3D(camPos.x + mouseDirWC.x * delta, camPos.y + mouseDirWC.y * delta, camPos.z + mouseDirWC.z * delta);

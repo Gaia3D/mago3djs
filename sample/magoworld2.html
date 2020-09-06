@@ -74,8 +74,8 @@
 					properties : {
 						minAltitude: -2796,
 						maxAltitude: 1840,
-						stepGradient : [0, -40,-80,-120,-160,-200,-1000, -2000, -2796],
-						caustics: true
+						stepGradient : [0, -50,-200,-1000, -2796],
+						caustics: false
 					}
 				};
 				
@@ -86,6 +86,7 @@
 				//baseMap = new Mago3D.XYZLayer({url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'});
 
 				tt = new Mago3D.WMSLayer({url: 'http://localhost:8080/geoserver/mago3d/gwc/service/wms', show: true, filter: bathymetryFilter, param: {layers: 'mago3d:susim_5m', tiled: true}}); // new version.
+				//tt = new Mago3D.WMSLayer({url: 'http://localhost:8080/geoserver/mago3d/gwc/service/wms', show: true,  param: {layers: 'mago3d:susim_5m', tiled: true}}); // new version.
 				//tt = new Mago3D.WMSLayer({url: 'http://localhost:8080/geoserver/mago3d/wms', show: true, filter: bathymetryFilter, param: {layers: 'mago3d:susim_5m', tiled: true}}); // new version.
 				//ttt = new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: false,   param: {layers: 'ndtp:sk_sdo', tiled: true}});
 				//tt = new Mago3D.WMSLayer({url: 'http://localhost:8080/geoserver/mago3d/gwc/service/wms', show: true, opacity: 0.5, param: {layers: 'mago3d:15m_susim', tiled: true}});
@@ -115,7 +116,7 @@
 				
 				managerFactory = new Mago3D.Mago3d(renderDivId,serverPolicy,undefined,{
 					layers : [
-						baseMap, tt//, ttt
+						baseMap//, tt//, ttt
 						//new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'sk_emd', tiled: true}}),
 					]
 				});
