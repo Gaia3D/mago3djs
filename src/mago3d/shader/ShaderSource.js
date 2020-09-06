@@ -4301,21 +4301,65 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
         if(currColor4.w > 0.0)\n\
         {\n\
             // decode the grayScale.***\n\
-            float r = currColor4.r;\n\
+            float r = currColor4.r * 256.0;\n\
             float g = currColor4.g;\n\
             float b = currColor4.b;\n\
 \n\
             float height = currColor4.r;\n\
-            float incre = 1.0/16.0;\n\
+            float maxHeight;\n\
+            float minHeight;\n\
+            float numDivs;\n\
+            float increHeight;\n\
+				\n\
+				if(r < 0.0001)\n\
+				{\n\
+					// considering r=0.\n\
+					minHeight = -2796.0;\n\
+					maxHeight = -1000.0;\n\
+					numDivs = 2.0;\n\
+                    increHeight = (maxHeight - minHeight)/(numDivs);\n\
+                    height = (256.0*g + b)/(128.0);\n\
 \n\
-            //height = 256.0*g*289.75 + b*289.75 - 2796.0;\n\
-            height = (256.0*g + b)/(256.0/2.0);\n\
+                    //resultTextureColor.r = 1.0;\n\
+                    //resultTextureColor.g = 0.0;\n\
+                    //resultTextureColor.b = 0.0;\n\
+                    //return;\n\
+				}\n\
+				else if(r > 0.5 && r < 1.5)\n\
+				{\n\
+					// considering r=1.\n\
+					minHeight = -1000.0;\n\
+					maxHeight = -200.0;\n\
+					numDivs = 2.0;\n\
+                    increHeight = (maxHeight - minHeight)/(numDivs);\n\
+                    height = (256.0*g + b)/(128.0);\n\
+\n\
+                    //resultTextureColor.r = 0.0;\n\
+                    //resultTextureColor.g = 1.0;\n\
+                    //resultTextureColor.b = 0.0;\n\
+                    //return;\n\
+				}\n\
+				else if(r > 1.5 && r < 2.5)\n\
+				{\n\
+					// considering r=2.\n\
+					minHeight = -200.0;\n\
+					maxHeight = 1.0;\n\
+					numDivs = 123.0;\n\
+                    increHeight = (maxHeight - minHeight)/(numDivs);\n\
+                    height = (256.0*g + b)/(128.0);\n\
+				}\n\
+\n\
+\n\
+\n\
+				//height = (256.0*g + b)/(128.0);\n\
+                height = (256.0*g + b)/(numDivs);\n\
+               // height = (256.0*g*increHeight + b*increHeight)- minHeight;\n\
             \n\
             //altitude = uMinMaxAltitudes.x + height * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);\n\
-				altitude = -2796.0 + height * (0.1 +2796.0);\n\
+		    altitude = minHeight + height * (maxHeight -minHeight);\n\
             //altitude = height;\n\
 \n\
-            if(altitude < 0.1)\n\
+            if(altitude < 0.0)\n\
             {\n\
                 /*\n\
                 float minHeight_rainbow = uMinMaxAltitudes.x;\n\
@@ -6202,17 +6246,62 @@ void main()\n\
 				float sumAux = layersTextureColor.r;// + layersTextureColor.g + layersTextureColor.b;// + layersTextureColor.w;\n\
 				//sumAux *= 6.6;\n\
 \n\
-				float r = layersTextureColor.r;\n\
+				float r = layersTextureColor.r*256.0;;\n\
 				float g = layersTextureColor.g;\n\
 				float b = layersTextureColor.b;\n\
 \n\
-				float height = layersTextureColor.r;\n\
+				float maxHeight;\n\
+				float minHeight;\n\
+				float numDivs;\n\
+				float increHeight;\n\
+				float height;\n\
+				\n\
+				if(r < 0.0001)\n\
+				{\n\
+					// considering r=0.\n\
+					minHeight = -2796.0;\n\
+					maxHeight = -1000.0;\n\
+					numDivs = 2.0;\n\
+                    increHeight = (maxHeight - minHeight)/(numDivs);\n\
+                    height = (256.0*g + b)/(128.0);\n\
 \n\
-				float incre = 1.0/16.0;\n\
+                    //resultTextureColor.r = 1.0;\n\
+                    //resultTextureColor.g = 0.0;\n\
+                    //resultTextureColor.b = 0.0;\n\
+                    //return;\n\
+				}\n\
+				else if(r > 0.5 && r < 1.5)\n\
+				{\n\
+					// considering r=1.\n\
+					minHeight = -1000.0;\n\
+					maxHeight = -200.0;\n\
+					numDivs = 2.0;\n\
+                    increHeight = (maxHeight - minHeight)/(numDivs);\n\
+                    height = (256.0*g + b)/(128.0);\n\
 \n\
-            	height = (256.0*g + b)/(256.0/2.0);\n\
+                    //resultTextureColor.r = 0.0;\n\
+                    //resultTextureColor.g = 1.0;\n\
+                    //resultTextureColor.b = 0.0;\n\
+                    //return;\n\
+				}\n\
+				else if(r > 1.5 && r < 2.5)\n\
+				{\n\
+					// considering r=2.\n\
+					minHeight = -200.0;\n\
+					maxHeight = 1.0;\n\
+					numDivs = 123.0;\n\
+                    increHeight = (maxHeight - minHeight)/(numDivs);\n\
+                    height = (256.0*g + b)/(128.0);\n\
+				}\n\
+\n\
+\n\
+\n\
+				//height = (256.0*g + b)/(128.0);\n\
+                height = (256.0*g + b)/(numDivs);\n\
+				//height = (256.0*g*increHeight + b*increHeight)- minHeight;\n\
+				\n\
 				//altitude = uMinMaxAltitudes.x + height * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);\n\
-				altitude = -2796.0 + height * (0.1 +2796.0);\n\
+				altitude = minHeight + height * (maxHeight -minHeight);\n\
 				//altitude = height;\n\
 			}\n\
 		}\n\
