@@ -104,6 +104,24 @@ var TinTerrainManager = function(magoManager, options)
 };
 TinTerrainManager.INFO_FILE = 'terrainTiles-info.json';
 
+TinTerrainManager.prototype.deleteAll = function()
+{
+	// delete all terrains.***
+	this.maxTextureGuranteedDepth = 0;
+	if (this.tinTerrainsQuadTreeAsia)
+	{
+		this.tinTerrainsQuadTreeAsia.deleteObjects(this.magoManager);
+	}
+	if (this.tinTerrainsQuadTreeAmerica)
+	{
+		this.tinTerrainsQuadTreeAmerica.deleteObjects(this.magoManager);
+	}
+	if (this.tinTerrainQuadTreeMercator)
+	{
+		this.tinTerrainQuadTreeMercator.deleteObjects(this.magoManager);
+	}
+};
+
 TinTerrainManager.prototype.getImageryLayers = function()
 {
 	return this.imagerys;

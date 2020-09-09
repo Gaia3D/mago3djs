@@ -1050,6 +1050,16 @@ TinTerrain.prototype.bindTexture = function(gl, shader, currDepth)
 					gl.uniform2fv(shader.uMinMaxAltitudes_loc, new Float32Array([properties.minAltitude, properties.maxAltitude]));
 					gl.uniform1i(shader.bApplyCaustics_loc, properties.caustics);
 				}
+				else if (filter.type === CODE.imageFilter.OCEANCOLOR_WATERMARKBYALPHA) 
+				{
+					activeTexturesLayers[4+1] = 20;
+					gl.activeTexture(gl.TEXTURE4 + 1);
+					gl.bindTexture(gl.TEXTURE_2D, texture.texId);
+
+					var properties = filter.properties;
+					gl.uniform2fv(shader.uMinMaxAltitudes_loc, new Float32Array([properties.minAltitude, properties.maxAltitude]));
+					gl.uniform1i(shader.bApplyCaustics_loc, properties.caustics);
+				}
 			}
 		}	
 

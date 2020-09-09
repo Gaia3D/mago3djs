@@ -69,8 +69,18 @@
 					}
 				});
 				
-				var bathymetryFilter = {
-					type: Mago3D.CODE.imageFilter.BATHYMETRY,
+				//var bathymetryFilter = {
+				//	type: Mago3D.CODE.imageFilter.BATHYMETRY,
+				//	properties : {
+				//		minAltitude: -2796,
+				//		maxAltitude: 1840,
+				//		stepGradient : [0, -50,-200,-1000, -2796],
+				//		caustics: true
+				//	}
+				//};
+
+				var waterMarkFilter = {
+					type: Mago3D.CODE.imageFilter.OCEANCOLOR_WATERMARKBYALPHA,
 					properties : {
 						minAltitude: -2796,
 						maxAltitude: 1840,
@@ -78,6 +88,7 @@
 						caustics: true
 					}
 				};
+
 				/*
 				var bathymetryFilter = {
 					type: Mago3D.CODE.imageFilter.BATHYMETRY,
@@ -93,7 +104,9 @@
 				baseMap = new Mago3D.XYZLayer({url: 'https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'});
 				//baseMap = new Mago3D.XYZLayer({url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'});
 
-				tt = new Mago3D.WMSLayer({url: 'http://localhost:8080/geoserver/mago3d/gwc/service/wms', show: true, filter: bathymetryFilter, param: {layers: 'mago3d:susim_5m', tiled: true}}); // new version.
+				tt = new Mago3D.WMSLayer({url: 'http://localhost:8080/geoserver/mago3d/gwc/service/wms', show: true, filter: waterMarkFilter, param: {layers: 'mago3d:susim_5m', tiled: true}}); // new version.
+				//tt = new Mago3D.WMSLayer({url: 'http://localhost:8080/geoserver/mago3d/gwc/service/wms', show: true, filter: waterMarkByAlpha, param: {layers: 'mago3d:susim_5m', tiled: true}}); // new version.
+
 				//tt = new Mago3D.WMSLayer({url: 'http://localhost:8080/geoserver/mago3d/gwc/service/wms', show: true,  param: {layers: 'mago3d:susim_5m', tiled: true}}); // new version.
 				//tt = new Mago3D.WMSLayer({url: 'http://localhost:8080/geoserver/mago3d/wms', show: true, filter: bathymetryFilter, param: {layers: 'mago3d:susim_5m', tiled: true}}); // new version.
 				//ttt = new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: false,   param: {layers: 'ndtp:sk_sdo', tiled: true}});
@@ -102,7 +115,7 @@
 
 
 				
-				/*
+				
 				managerFactory = new Mago3D.Mago3d(renderDivId,serverPolicy,undefined,{
 					layers : [
 						baseMap,
@@ -118,16 +131,16 @@
 						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'dem', tiled: true}})
 					]
 				});
-				*/
 				
 				
 				
-				managerFactory = new Mago3D.Mago3d(renderDivId,serverPolicy,undefined,{
-					layers : [
-						baseMap, tt//, ttt
-						//new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'sk_emd', tiled: true}}),
-					]
-				});
+				
+				//managerFactory = new Mago3D.Mago3d(renderDivId,serverPolicy,undefined,{
+				//	layers : [
+				//		baseMap, tt//, ttt
+				//		//new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'sk_emd', tiled: true}}),
+				//	]
+				//});
 				
 				
 
@@ -143,6 +156,7 @@
 	}
 	
 	function doTest(){
+		/*
 		var f4dController = managerFactory.getF4dController();
 		$.ajax({
 			url: dataInformationUrl + "3ds.json",
@@ -156,32 +170,10 @@
 				alert(e.responseText);
 			}
 		});
-
-		// Test weather wind.*********************************
-		
-		var magomanager = managerFactory.getMagoManager();
-		if (magomanager.windTest === undefined)
-		{
-			if (magomanager.weatherStation === undefined)
-			{ magomanager.weatherStation = new Mago3D.WeatherStation(); }
-		
-			var geometryDataPath = magomanager.readerWriter.geometryDataPath;
-			var windDataFilesNamesArray = ["OBS-QWM_2016062000.grib2_wind_000", "OBS-QWM_2016062001.grib2_wind_000", "OBS-QWM_2016062002.grib2_wind_000", "OBS-QWM_2016062003.grib2_wind_000",
-				"OBS-QWM_2016062004.grib2_wind_000", "OBS-QWM_2016062005.grib2_wind_000", "OBS-QWM_2016062006.grib2_wind_000", "OBS-QWM_2016062007.grib2_wind_000",
-				"OBS-QWM_2016062008.grib2_wind_000", "OBS-QWM_2016062009.grib2_wind_000", "OBS-QWM_2016062010.grib2_wind_000", "OBS-QWM_2016062011.grib2_wind_000",
-				"OBS-QWM_2016062012.grib2_wind_000", "OBS-QWM_2016062013.grib2_wind_000", "OBS-QWM_2016062014.grib2_wind_000", "OBS-QWM_2016062015.grib2_wind_000",
-				"OBS-QWM_2016062016.grib2_wind_000", "OBS-QWM_2016062017.grib2_wind_000", "OBS-QWM_2016062018.grib2_wind_000", "OBS-QWM_2016062019.grib2_wind_000",
-				"OBS-QWM_2016062020.grib2_wind_000", "OBS-QWM_2016062021.grib2_wind_000", "OBS-QWM_2016062022.grib2_wind_000", "OBS-QWM_2016062023.grib2_wind_000"];
-				
-			var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_Airport";
-			//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_GolfPark_NineBridge1";
-			
-			magomanager.weatherStation.test_loadWindData3d(magomanager, windDataFilesNamesArray, windMapFilesFolderPath);
-			magomanager.weatherStation.test_loadDustData3d(magomanager, windDataFilesNamesArray, windMapFilesFolderPath);
-			//magomanager.TEST__golfPark();
-			magomanager.windTest = true;
-		}
-		
+		*/
+		// TEST DELETE MEMORY.***
+		var magoManager = managerFactory.getMagoManager();
+		magoManager.deleteAll();
 	}
 	
 	/*

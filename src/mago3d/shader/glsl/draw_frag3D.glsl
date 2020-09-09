@@ -172,8 +172,8 @@ void main() {
 		else{
 			g = 2.0*speed_t;
 		}
-		//vec3 col3 = getRainbowColor_byHeight(speed_t);
-		vec3 col3 = getWhiteToBlueColor_byHeight(speed_t, 0.0, 1.0);
+		vec3 col3 = getRainbowColor_byHeight(speed_t);
+		//vec3 col3 = getWhiteToBlueColor_byHeight(speed_t, 0.0, 1.0);
 		float r = speed_t;
 		gl_FragColor = vec4(col3.x, col3.y, col3.z ,u_tailAlpha*u_externAlpha);
 	}

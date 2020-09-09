@@ -206,7 +206,7 @@ MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPr
 		if (selectionManager.isObjectSelected(this))
 		{ bIsSelected = true; }
 
-		if (bIsSelected && this.options.renderWireframe)
+		if (bIsSelected || this.options.renderWireframe)
 		{
 			var shaderThickLine = magoManager.postFxShadersManager.getShader("thickLine");
 			magoManager.postFxShadersManager.useProgram(shaderThickLine);

@@ -1562,11 +1562,13 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	this.swapRenderingFase();
 
 	// 1.1) ssao and other effects from depthBuffer render.*****************************************************************************
+	this.postFxShadersManager.useProgram(null); // init current bind shader.***
 	this.renderer.renderSsaoFromDepth(gl);
 
 	// 2) color render.*****************************************************************************************************************
 	// 2.1) Render terrain shadows.*****************************************************************************************************
 	// Now render the geomatry.
+	this.postFxShadersManager.useProgram(null); // init current bind shader.***
 	if (this.isCesiumGlobe())
 	{
 		var scene = this.scene;
@@ -1592,12 +1594,11 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 
 	if (this.weatherStation)
 	{
-		this.weatherStation.renderWindLayerDisplayPlanes(this);
 		//this.weatherStation.renderWindMultiLayers(this);
 		//this.weatherStation.test_renderWindLayer(this);
 		//this.weatherStation.test_renderTemperatureLayer(this);
 		//this.weatherStation.test_renderCuttingPlanes(this, renderType);
-
+		this.weatherStation.renderWeather(this);
 	}
 	
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
@@ -4002,6 +4003,9 @@ MagoManager.prototype.test_renderDepth_objectSelected = function(currObjectSelec
 	
 	// Now, renderDepth the selected object. Fix the frustumFar for adequate precision on depthPacking.***
 	var shader = this.postFxShadersManager.getShader("modelRefDepth"); 
+	if (!shader.uniformsMapGeneral.frustumFar)
+	{ return; }
+
 	shader.useProgram();
 	shader.bindUniformGenerals();
 	shader.enableVertexAttribArray(shader.position3_loc);
@@ -4010,6 +4014,8 @@ MagoManager.prototype.test_renderDepth_objectSelected = function(currObjectSelec
 	var geoLocationData = geoLocDataManager.getCurrentGeoLocationData();
 		
 	// test: in depth, set frustumFar = 1000000000(100M).***
+	
+	
 	var frustumFarLoc = shader.uniformsMapGeneral.frustumFar.uniformLocation;
 	gl.uniform1f(frustumFarLoc, new Float32Array([100000000.0]));
 			
@@ -7341,8 +7347,15 @@ MagoManager.prototype.deleteAll = function ()
 	// reset tiles.
 	this.smartTileManager.resetTiles();
 	
-	// finally delete nodes.
+	// delete nodes.
 	this.hierarchyManager.deleteNodes(this.sceneState.gl, this.vboMemoryManager);
+
+	// if exist terrain, then delete terrain.***
+	if (this.tinTerrainManager)
+	{
+		this.tinTerrainManager.deleteAll();
+		this.tinTerrainManager = undefined;
+	}
 };
 
 MagoManager.prototype.checkCollision = function (position, direction)

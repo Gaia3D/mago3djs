@@ -127,8 +127,9 @@ CODE.relativePosition2D = {
 	"COINCIDENT" : 3
 };
 CODE.imageFilter = {
-	"UNKNOWN"    : 0,
-	"BATHYMETRY" : 1
+	"UNKNOWN"                     : 0,
+	"BATHYMETRY"                  : 1,
+	"OCEANCOLOR_WATERMARKBYALPHA" : 2
 };
 CODE.cesiumTerrainType = {
 	GEOSERVER          : 'geoserver',

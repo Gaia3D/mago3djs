@@ -582,12 +582,12 @@ void main()
 		float altitude = 1000000.0;
 		if(uActiveTextures[5] == 10)
 		{
+			// Bathymetry.***
 			vec4 layersTextureColor = texture2D(diffuseTex_3, texCoord);
 			//if(layersTextureColor.w > 0.0)
 			{
 				// decode the grayScale.***
 				float sumAux = layersTextureColor.r;// + layersTextureColor.g + layersTextureColor.b;// + layersTextureColor.w;
-				//sumAux *= 6.6;
 
 				float r = layersTextureColor.r*256.0;;
 				float g = layersTextureColor.g;
@@ -607,11 +607,6 @@ void main()
 					numDivs = 2.0;
                     increHeight = (maxHeight - minHeight)/(numDivs);
                     height = (256.0*g + b)/(128.0);
-
-                    //resultTextureColor.r = 1.0;
-                    //resultTextureColor.g = 0.0;
-                    //resultTextureColor.b = 0.0;
-                    //return;
 				}
 				else if(r > 0.5 && r < 1.5)
 				{
@@ -621,11 +616,6 @@ void main()
 					numDivs = 2.0;
                     increHeight = (maxHeight - minHeight)/(numDivs);
                     height = (256.0*g + b)/(128.0);
-
-                    //resultTextureColor.r = 0.0;
-                    //resultTextureColor.g = 1.0;
-                    //resultTextureColor.b = 0.0;
-                    //return;
 				}
 				else if(r > 1.5 && r < 2.5)
 				{
@@ -637,17 +627,26 @@ void main()
                     height = (256.0*g + b)/(128.0);
 				}
 
-
-
-				//height = (256.0*g + b)/(128.0);
                 height = (256.0*g + b)/(numDivs);
-				//height = (256.0*g*increHeight + b*increHeight)- minHeight;
-				
-				//altitude = uMinMaxAltitudes.x + height * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);
 				altitude = minHeight + height * (maxHeight -minHeight);
-				//altitude = height;
 			}
 		}
+		else if(uActiveTextures[5] == 20)
+		{
+			// waterMarkByAlpha.***
+			// Check only alpha component.
+			vec4 layersTextureColor = texture2D(diffuseTex_3, texCoord);
+			float alpha = layersTextureColor.a;
+			if(alpha > 0.0)
+			{
+				altitude = -100.0;
+			}
+			else
+			{
+				altitude = 100.0;
+			}
+		}
+
 		// End Dem image.------------------------------------------------------------------------------------------------------------
 		float linearDepthAux = 1.0;
 		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);

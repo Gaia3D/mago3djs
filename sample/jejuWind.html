@@ -89,7 +89,7 @@
 			error: function(e){
 				alert(e.responseText);
 			}
-		});
+        });
 	}
 	function loadend(e) {
 		console.info('Complete construct mago3d instance. Enjoy!');
@@ -99,7 +99,18 @@
 		magoInstance.setBaseUrl(dataInfo.baseUrl);
 
 		var magoManager = magoInstance.getMagoManager();
-		var viewer = magoInstance.getViewer();
+        var viewer = magoInstance.getViewer();
+        
+        if (magoManager.weatherStation === undefined)
+            { magoManager.weatherStation = new Mago3D.WeatherStation(); }
+            
+        //MagoManager.prototype.flyToBox = function(pointsArray) 
+        var pointWC_1 = Mago3D.Globe.geographicToCartesianWgs84(126.1547, 33.33759, 0.0, undefined);
+        var pointWC_2 = Mago3D.Globe.geographicToCartesianWgs84(126.95275, 33.45135, 0.0, undefined);
+        var pWC1 = new Mago3D.Point3D(pointWC_1[0], pointWC_1[1], pointWC_1[2]);
+        var pWC2 = new Mago3D.Point3D(pointWC_2[0], pointWC_2[1], pointWC_2[2]);
+        var pointsArray = [pWC1, pWC2];
+        magoManager.flyToBox(pointsArray);
 		/*
 		var provider = new Cesium.WebMapServiceImageryProvider({
 			url : 'http://localhost:8080/geoserver/mago3d/gwc/service/wms',
@@ -130,7 +141,8 @@
 			console.info(e);
 			console.info(magoManager.objectSelected)
 		});
-		*/
+        */
+        
 	}
 	/*
 	function doTest(){
@@ -166,14 +178,15 @@
 			}
 		});
 
+        /*
 		// Test weather wind.*********************************
-		var magomanager = MAGO3D_INSTANCE.getMagoManager();
-		if (magomanager.windTest === undefined)
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+		if (magoManager.windTest === undefined)
 		{
-			if (magomanager.weatherStation === undefined)
-			{ magomanager.weatherStation = new Mago3D.WeatherStation(); }
+			if (magoManager.weatherStation === undefined)
+			{ magoManager.weatherStation = new Mago3D.WeatherStation(); }
 		
-			var geometryDataPath = magomanager.readerWriter.geometryDataPath;
+			var geometryDataPath = magoManager.readerWriter.geometryDataPath;
 			var windDataFilesNamesArray = ["OBS-QWM_2016062000.grib2_wind_000", "OBS-QWM_2016062001.grib2_wind_000", "OBS-QWM_2016062002.grib2_wind_000", "OBS-QWM_2016062003.grib2_wind_000",
 				"OBS-QWM_2016062004.grib2_wind_000", "OBS-QWM_2016062005.grib2_wind_000", "OBS-QWM_2016062006.grib2_wind_000", "OBS-QWM_2016062007.grib2_wind_000",
 				"OBS-QWM_2016062008.grib2_wind_000", "OBS-QWM_2016062009.grib2_wind_000", "OBS-QWM_2016062010.grib2_wind_000", "OBS-QWM_2016062011.grib2_wind_000",
@@ -185,11 +198,14 @@
 			var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_20200908"; // all jeju island.***
 			//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_GolfPark_NineBridge1";
 			
-			magomanager.weatherStation.test_loadWindData3d(magomanager, windDataFilesNamesArray, windMapFilesFolderPath);
-			//magomanager.weatherStation.test_createTemperaturaLayerExample(magomanager);
-			//magomanager.windTest = true;
-		}
-	}
+			magoManager.weatherStation.test_loadWindData3d(magoManager, windDataFilesNamesArray, windMapFilesFolderPath);
+			//magoManager.weatherStation.test_createTemperaturaLayerExample(magoManager);
+			//magoManager.windTest = true;
+        }
+        */
+    }
+    
+
 
 </script>
 </body>

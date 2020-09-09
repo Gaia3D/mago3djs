@@ -771,8 +771,8 @@ void main() {\n\
 		else{\n\
 			g = 2.0*speed_t;\n\
 		}\n\
-		//vec3 col3 = getRainbowColor_byHeight(speed_t);\n\
-		vec3 col3 = getWhiteToBlueColor_byHeight(speed_t, 0.0, 1.0);\n\
+		vec3 col3 = getRainbowColor_byHeight(speed_t);\n\
+		//vec3 col3 = getWhiteToBlueColor_byHeight(speed_t, 0.0, 1.0);\n\
 		float r = speed_t;\n\
 		gl_FragColor = vec4(col3.x, col3.y, col3.z ,u_tailAlpha*u_externAlpha);\n\
 	}\n\
@@ -1920,7 +1920,7 @@ void main()\n\
 	if((textureColor.r < 0.5 && textureColor.b > 0.5) || textureColor.a < 1.0)\n\
 	//specular = 1.0;\n\
 	\n\
-	//if(applySpecLighting> 0.0)\n\
+	if(applySpecLighting> 0.0)\n\
 	{\n\
 		vec3 L;\n\
 		if(bApplyShadow)\n\
@@ -1962,6 +1962,7 @@ void main()\n\
 	\n\
 \n\
 	lambertian = 1.0;\n\
+\n\
 	\n\
 	if(bApplyShadow)\n\
 	{\n\
@@ -6239,12 +6240,12 @@ void main()\n\
 		float altitude = 1000000.0;\n\
 		if(uActiveTextures[5] == 10)\n\
 		{\n\
+			// Bathymetry.***\n\
 			vec4 layersTextureColor = texture2D(diffuseTex_3, texCoord);\n\
 			//if(layersTextureColor.w > 0.0)\n\
 			{\n\
 				// decode the grayScale.***\n\
 				float sumAux = layersTextureColor.r;// + layersTextureColor.g + layersTextureColor.b;// + layersTextureColor.w;\n\
-				//sumAux *= 6.6;\n\
 \n\
 				float r = layersTextureColor.r*256.0;;\n\
 				float g = layersTextureColor.g;\n\
@@ -6264,11 +6265,6 @@ void main()\n\
 					numDivs = 2.0;\n\
                     increHeight = (maxHeight - minHeight)/(numDivs);\n\
                     height = (256.0*g + b)/(128.0);\n\
-\n\
-                    //resultTextureColor.r = 1.0;\n\
-                    //resultTextureColor.g = 0.0;\n\
-                    //resultTextureColor.b = 0.0;\n\
-                    //return;\n\
 				}\n\
 				else if(r > 0.5 && r < 1.5)\n\
 				{\n\
@@ -6278,11 +6274,6 @@ void main()\n\
 					numDivs = 2.0;\n\
                     increHeight = (maxHeight - minHeight)/(numDivs);\n\
                     height = (256.0*g + b)/(128.0);\n\
-\n\
-                    //resultTextureColor.r = 0.0;\n\
-                    //resultTextureColor.g = 1.0;\n\
-                    //resultTextureColor.b = 0.0;\n\
-                    //return;\n\
 				}\n\
 				else if(r > 1.5 && r < 2.5)\n\
 				{\n\
@@ -6294,17 +6285,26 @@ void main()\n\
                     height = (256.0*g + b)/(128.0);\n\
 				}\n\
 \n\
-\n\
-\n\
-				//height = (256.0*g + b)/(128.0);\n\
                 height = (256.0*g + b)/(numDivs);\n\
-				//height = (256.0*g*increHeight + b*increHeight)- minHeight;\n\
-				\n\
-				//altitude = uMinMaxAltitudes.x + height * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);\n\
 				altitude = minHeight + height * (maxHeight -minHeight);\n\
-				//altitude = height;\n\
 			}\n\
 		}\n\
+		else if(uActiveTextures[5] == 20)\n\
+		{\n\
+			// waterMarkByAlpha.***\n\
+			// Check only alpha component.\n\
+			vec4 layersTextureColor = texture2D(diffuseTex_3, texCoord);\n\
+			float alpha = layersTextureColor.a;\n\
+			if(alpha > 0.0)\n\
+			{\n\
+				altitude = -100.0;\n\
+			}\n\
+			else\n\
+			{\n\
+				altitude = 100.0;\n\
+			}\n\
+		}\n\
+\n\
 		// End Dem image.------------------------------------------------------------------------------------------------------------\n\
 		float linearDepthAux = 1.0;\n\
 		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
