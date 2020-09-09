@@ -7356,6 +7356,8 @@ MagoManager.prototype.deleteAll = function ()
 		this.tinTerrainManager.deleteAll();
 		this.tinTerrainManager = undefined;
 	}
+
+	cancelAnimationFrame(magoManager.reqFrameId);
 };
 
 MagoManager.prototype.checkCollision = function (position, direction)

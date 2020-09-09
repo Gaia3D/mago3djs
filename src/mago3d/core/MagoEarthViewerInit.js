@@ -30,6 +30,7 @@ MagoEarthViewerInit.prototype.init = function()
 	this.magoManager.createDefaultShaders(gl);// A1-Use this.***
 
 	var viewer = this.viewer;
+	var manager = this.magoManager;
 	setRequestAnimFrame();
 	
 	function setRequestAnimFrame() 
@@ -51,7 +52,8 @@ MagoEarthViewerInit.prototype.init = function()
 		function animationLoop()
 		{
 			// feedback loop requests new frame
-			requestAnimFrame( animationLoop );
+			var a = requestAnimFrame( animationLoop );
+			manager.reqFrameId = a;
 			// render function is defined below
 			render(); 
 		}
