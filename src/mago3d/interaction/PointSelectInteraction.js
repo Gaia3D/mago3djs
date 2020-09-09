@@ -117,8 +117,9 @@ PointSelectInteraction.prototype.handleDownEvent = function(browserEvent)
  */
 PointSelectInteraction.prototype.handleUpEvent = function(browserEvent)
 {
-	this.select(browserEvent.point.screenCoordinate);
 	var selectionManager = this.manager.selectionManager;
+	selectionManager.clearCurrents();
+	this.select(browserEvent.point.screenCoordinate);
 	var oldSelected = this.selected;
 	switch (this.targetType)
 	{

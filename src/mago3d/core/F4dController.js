@@ -232,6 +232,41 @@ F4dController.prototype.deleteF4dMember = function(groupId, memberId)
 	delete this.magoManager.hierarchyManager.projectsMap[groupId][memberId];
 };
 
+/**
+ * f4d data를 반환
+ * @param {string} groupId required. target group id
+ * @param {string} memberId f4d data definition object
+ */
+F4dController.prototype.getF4d = function(groupId, memberId) 
+{
+	if (!groupId) 
+	{
+		throw new Error('groupId is required.');
+	}
+	if (memberId === undefined || memberId === null) 
+	{
+		throw new Error('memberId is required.');
+	}
+
+	return this.magoManager.hierarchyManager.getNodeByDataKey(groupId, memberId);
+};
+
+/**
+ * f4d data를 반환
+ * @param {string} groupId required. target group id
+ */
+F4dController.prototype.getF4dGroup = function(groupId) 
+{
+	if (!groupId) 
+	{
+		throw new Error('groupId is required.');
+	}
+
+	return this.magoManager.hierarchyManager.projectsMap[groupId];
+};
+
+
+
 F4dController.f4dObjectValidate = function(f4dObject) 
 {
 	console.info(f4dObject);

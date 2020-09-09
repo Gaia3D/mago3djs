@@ -194,6 +194,35 @@ Modeler.prototype.removeObject = function(target)
 	});
 };
 
+/**
+ * MagoRenderable 객체의 guid를 비교하여 같은 모델을 반환
+ * @param {string} guid
+ * @return {MagoRenderable}
+ */
+Modeler.prototype.getObjectByGuid = function(guid) {
+	var model = this.objectsArray.filter(function(object)
+	{
+		return object._guid === guid;
+	});
+
+	return model[0];
+}
+
+/**
+ * MagoRenderable 객체의 key/value를 비교하여 같은 모델을 반환
+ * @param {string} key
+ * @param {string} value
+ * @return {Array<MagoRenderable>}
+ */
+Modeler.prototype.getObjectByKV = function(key, value) {
+	var model = this.objectsArray.filter(function(object)
+	{
+		return object[key] === value;
+	});
+
+	return model;
+}
+
 Modeler.prototype.newPerson = function(options) 
 {
 	if (this.testObjectsArray === undefined)

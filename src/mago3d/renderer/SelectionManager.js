@@ -553,7 +553,7 @@ SelectionManager.prototype.selectProvisionalObjectByPixel = function(gl, mouseX,
 
 	if (this.referencesMap[idx] && this.nodesMap[idx])
 	{
-		this.provisionalF4dArray.push(this.nodesMap[idx]);
+		//this.provisionalF4dArray.push(this.nodesMap[idx]);
 		this.provisionalF4dObjectArray.push(this.referencesMap[idx]);
 	}
 
