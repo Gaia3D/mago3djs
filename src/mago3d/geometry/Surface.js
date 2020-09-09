@@ -12,6 +12,7 @@ var Surface = function(options)
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	
+	this._guid = createGuid();
 	this.id;
 	this.name;
 

@@ -78,12 +78,12 @@ AbsPointerInteraction.prototype.setActive = function(active)
 	if (active) 
 	{
 		//this.manager.interactionCollection.emit(InteractionCollection.EVENT_TYPE.ACTIVE, that);
-		this.emit(this.constructor.EVENT_TYPE.ACTIVE, this);
+		this.emit(InteractionActiveType.ACTIVE, this);
 	}
 	else 
 	{
 		//this.manager.interactionCollection.emit(InteractionCollection.EVENT_TYPE.DEACTIVE);
-		this.emit(this.constructor.EVENT_TYPE.DEACTIVE);
+		this.emit(InteractionActiveType.DEACTIVE);
 	}
 };
 

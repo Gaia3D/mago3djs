@@ -19,6 +19,7 @@ var Face = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
+	this._guid = createGuid();
 	/**
 	 * 페이스의 버텍스 리스트
 	 * @type {Array.<Vertex>}

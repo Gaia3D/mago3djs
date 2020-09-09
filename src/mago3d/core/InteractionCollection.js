@@ -24,7 +24,7 @@ var InteractionCollection = function(magoManager)
 	this.array = [];
 
 	var that =this;
-	this.on(InteractionCollection.EVENT_TYPE.ADD, function(target)
+	this.on(InteractionActiveType.ADD, function(target)
 	{
 		target.manager = magoManager;
 	});
@@ -48,7 +48,7 @@ var InteractionCollection = function(magoManager)
 		}
 	});
 	*/
-	this.on(InteractionCollection.EVENT_TYPE.DEACTIVE, function()
+	this.on(InteractionActiveType.DEACTIVE, function()
 	{
 		for (var i=0, len = that.array.length; i<len; i++)
 		{
@@ -62,9 +62,7 @@ InteractionCollection.prototype = Object.create(Emitter.prototype);
 InteractionCollection.prototype.constructor = InteractionCollection;
 
 InteractionCollection.EVENT_TYPE = {
-	'ADD'     	: 'add',
-	'ACTIVE'   : 'active',
-	'DEACTIVE' : 'deactive'
+	'ADD'     	: 'add'
 };
 
 /**
@@ -76,7 +74,7 @@ InteractionCollection.EVENT_TYPE = {
 InteractionCollection.prototype.add = function(interaction) 
 {
 	this.array.push(interaction);
-	this.emit(InteractionCollection.EVENT_TYPE.ADD, interaction);
+	this.emit(InteractionActiveType.ADD, interaction);
 };
 
 /**

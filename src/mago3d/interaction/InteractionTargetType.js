@@ -1,5 +1,6 @@
 'use strict';
 /**
+ * @enum
  * Interaction target type enum
  */
 var InteractionTargetType = {

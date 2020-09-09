@@ -110,7 +110,7 @@ OverviewMap.prototype.setControl = function(magoManager)
 			//syncByOl();
 		});
     
-		this.magoManager.on(Mago3D.MagoManager.EVENT_TYPE.CAMERACHANGED, function()
+		this.magoManager.on('isCameraMoved', function()
 		{
 			syncByMago();
 		});

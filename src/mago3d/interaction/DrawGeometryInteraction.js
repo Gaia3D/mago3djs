@@ -78,12 +78,12 @@ DrawGeometryInteraction.prototype.setActive = function(active)
 	var that = this;
 	if (active) 
 	{
-		this.collection.emit(InteractionCollection.EVENT_TYPE.ACTIVE, that);
+		this.collection.emit(InteractionActiveType.ACTIVE, that);
 		this.emit(this.constructor.EVENT_TYPE.ACTIVE, this);
 	}
 	else 
 	{
-		this.collection.emit(InteractionCollection.EVENT_TYPE.DEACTIVE);
+		this.collection.emit(InteractionActiveType.DEACTIVE);
 		this.emit(this.constructor.EVENT_TYPE.DEACTIVE);
 	}
 };

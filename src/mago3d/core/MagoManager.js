@@ -740,6 +740,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		if (sceneState.camera.isCameraMoved(camPosX, camPosY, camPosZ, camDirX, camDirY, camDirZ, camUpX, camUpY, camUpZ ))
 		{
 			this.isCameraMoved = true;
+			this.emit('isCameraMoved');
 		}
 		
 		// Update sceneState camera.***

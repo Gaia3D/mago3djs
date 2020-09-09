@@ -1,5 +1,6 @@
 'use strict';
 /**
+ * @enum
  * Interaction event type enum
  */
 var InteractionEventType = {
