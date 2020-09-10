@@ -567,7 +567,7 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader,
 		{
 			shader.disableVertexAttribArray(shader.texCoord2_loc);
 
-			if (!vbo_vicky.bindDataColor(shader, magoManager.vboMemoryManager))
+			if (owner.isColorChanged || !vbo_vicky.bindDataColor(shader, magoManager.vboMemoryManager))
 			{ 
 				gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 				//return false; 
@@ -576,6 +576,7 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader,
 			{
 				gl.uniform1i(shader.colorType_loc, 1); // 0= oneColor, 1= attribColor, 2= texture.
 			}
+			
 		}
 
 		if (!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))

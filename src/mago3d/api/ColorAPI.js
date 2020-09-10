@@ -26,7 +26,7 @@ ColorAPI.changeColor = function(api, magoManager)
 	
 	var color = api.getColor().split(",");
 	var colorsValueCount = color.length;
-	var alpha = 255.0;
+	var alpha = 1.0;
 	if (colorsValueCount === 4)
 	{
 		alpha = color[3]/255;

@@ -29,7 +29,11 @@ var ExtrusionBuilding = function(geographicCoordList, height, options)
 	MagoRenderable.call(this);
     options = options? options : {};
 
-    this.geographicCoordList = geographicCoordList;
+	this.geographicCoordList = geographicCoordList;
+	this.setGeographicPosition(this.geographicCoordList.getMiddleGeographicCoords());
+
+	this.localCoordList = makeLocalCooldList(this.geographicCoordList, this.geoLocDataManager.getCurrentGeoLocationData());
+
     this.height = height;
     this.color4 = defaultValue(options.color, new Color(1,1,1,1));
     this.selectedColor4 = defaultValue(options.selectedColor, new Color(1,1,0,1));
@@ -41,7 +45,21 @@ var ExtrusionBuilding = function(geographicCoordList, height, options)
 
     this.options.renderWireframe = defaultValue(options.renderWireframe, true);
     this.options.renderShaded = defaultValue(options.renderShaded, true);
-    this.options.depthMask = defaultValue(options.depthMask, true);
+	this.options.depthMask = defaultValue(options.depthMask, true);
+	
+	function makeLocalCooldList ( gcList, geoLocData) {
+		var tMatInv = geoLocData.getTMatrixInv();
+		var lcList = [];
+		for(var i=0,len=gcList.geographicCoordsArray.length;i<len;i++)
+		{
+			var gc = gcList.geographicCoordsArray[i];
+			var wc = ManagerUtils.geographicCoordToWorldPoint(gc.longitude,gc.latitude,gc.altitude);
+			var lc = tMatInv.transformPoint3D(wc);
+			lcList.push(lc);
+		}
+
+		return lcList;
+	}
 };
 ExtrusionBuilding.prototype = Object.create(MagoRenderable.prototype);
 ExtrusionBuilding.prototype.constructor = ExtrusionBuilding;
@@ -57,7 +75,8 @@ ExtrusionBuilding.prototype.makeMesh = function() {
     
     if(!geoLocData) {
         return;
-    }
+	}
+
 	// Make the topGeoCoordsList.
 	var topGeoCoordsList = this.geographicCoordList.getCopy();
 	// Reassign the altitude on the geoCoordsListCopy.
@@ -126,7 +145,6 @@ ExtrusionBuilding.prototype.makeMesh = function() {
 ExtrusionBuilding.makeExtrusionBuildingByCartesian3Array = function(cartesian3Array, height, options) {
     var geographicCoordList = GeographicCoordsList.fromCartesians(cartesian3Array);
     var eb = new ExtrusionBuilding(geographicCoordList, height, options);
-    eb.setGeographicPosition(geographicCoordList.getMiddleGeographicCoords())
 
     return eb;
 }

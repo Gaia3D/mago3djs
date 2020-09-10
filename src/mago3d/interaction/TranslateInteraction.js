@@ -425,6 +425,20 @@ TranslateInteraction.prototype.handleNativeDrag = function(browserEvent)
 	else 
 	{
 		geoLocationData = ManagerUtils.calculateGeoLocationData(difX, difY, undefined, undefined, undefined, undefined, geoLocationData, this);
+
+		if(object.localCoordList && object.geographicCoordList) {
+			var arr = [];
+			var tmat = geoLocationData.tMatrix;
+			for(var i=0,len=object.localCoordList.length; i<len; i++)
+			{
+				var lc = object.localCoordList[i];
+				var wc = tmat.transformPoint3D(lc);
+				var gc = ManagerUtils.pointToGeographicCoord(wc);
+				arr.push(gc);
+			}
+
+			object.geographicCoordList = new GeographicCoordsList(arr);
+		}
 	}
 
 	object.moved();
