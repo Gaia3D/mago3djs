@@ -53,7 +53,7 @@ OverviewMap.prototype.setControl = function(magoManager)
     
 	var tilelayer = new OlMago3d.layer.TileLayer({
 		source: new OlMago3d.source.XYZ({
-			url: 'https://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+			url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png'
 		})
 	});
     

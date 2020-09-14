@@ -214,10 +214,12 @@ NativeUpDownInteraction.prototype.handleDragEvent = function(browserEvent)
 				height = height-this.offset;			
 			}
 
-			var model = currentbuilding.geographicCoordList.getExtrudedMeshRenderableObject(height, undefined, undefined, undefined, undefined, {color: currentbuilding.color4.getHexCode(), height: this.offset});
+			/*var model = currentbuilding.geographicCoordList.getExtrudedMeshRenderableObject(height, undefined, undefined, undefined, undefined, {color: currentbuilding.color4.getHexCode(), height: this.offset});
             
 			currentbuilding.height = height;
-			currentbuilding.objectsArray = model.objectsArray;
+			currentbuilding.objectsArray = model.objectsArray;*/
+
+			currentbuilding.setHeight(height);
             
 			this.startPixel.set(screenCoordinate.x, screenCoordinate.y, screenCoordinate.z);
 		}

@@ -879,8 +879,8 @@ Face.prototype.getBoundingBox = function()
 		for (var i = 0, vertexCount = this.getVerticesCount(); i < vertexCount; i++) 
 		{
 			var vtx = this.getVertex(i);
-			if (i === 0) { box.init(vtx); }
-			else { box.addPoint(vtx); }
+			if (i === 0) { box.init(vtx.point3d); }
+			else { box.addPoint(vtx.point3d); }
 		}
 		this.bbox = box;
 	}
