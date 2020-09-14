@@ -2011,10 +2011,6 @@ void main()\n\
 		finalColor = vec4((ambientReflectionCoef * ambientColorAux + \n\
 							diffuseReflectionCoef * lambertian * textureColor.xyz + \n\
 							specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion * shadow_occlusion * scalarProd, alfa); \n\
-\n\
-		finalColor = vec4((ambientReflectionCoef * ambientColorAux + \n\
-							diffuseReflectionCoef * lambertian * textureColor.xyz + \n\
-							specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion * shadow_occlusion * scalarProd, alfa); \n\
 	}\n\
 	else{\n\
 		finalColor = vec4((textureColor.xyz) * occlusion * shadow_occlusion * scalarProd, alfa);\n\

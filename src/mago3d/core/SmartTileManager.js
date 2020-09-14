@@ -72,9 +72,29 @@ SmartTileManager.getDepthByBoundingBoxMaxSize = function(bboxMaxLength)
 	{
 		smartTileDepth = 12;
 	}
-	else if (bboxMaxLength >= 400.0)
+	else if (bboxMaxLength >= 400.0 && bboxMaxLength < 800.0)
 	{
 		smartTileDepth = 11;
+	}
+	else if (bboxMaxLength >= 800.0 && bboxMaxLength < 1600.0)
+	{
+		smartTileDepth = 10;
+	}
+	else if (bboxMaxLength >= 1600.0 && bboxMaxLength < 3200.0)
+	{
+		smartTileDepth = 9;
+	}
+	else if (bboxMaxLength >= 3200.0 && bboxMaxLength < 6400.0)
+	{
+		smartTileDepth = 8;
+	}
+	else if (bboxMaxLength >= 6400.0 && bboxMaxLength < 12800.0)
+	{
+		smartTileDepth = 7;
+	}
+	else if (bboxMaxLength >= 12800.0)
+	{
+		smartTileDepth = 6;
 	}
 
 	/*

@@ -537,12 +537,6 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 		if (neoReference.texture.texId === undefined)
 		{ return false; }
 	}
-
-	if (renderType === 2 && this.objectId === "C1826")
-	{
-		var currFrustumIdx = magoManager.currentFrustumIdx;
-		var hola = 0;
-	}
 	
 	var currentObjectsRendering = magoManager.renderer.currentObjectsRendering;
 	var selectionManager;
