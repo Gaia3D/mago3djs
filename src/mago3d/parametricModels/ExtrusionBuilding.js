@@ -183,3 +183,36 @@ ExtrusionBuilding.prototype.setHeight = function(height) {
 ExtrusionBuilding.prototype.getHeight = function() {
 	return this.height;
 }
+
+/**
+ * @return {number}
+ */
+ExtrusionBuilding.prototype.getLevel = function() {
+	if(!this.floorHeight) {
+		return 0;
+	}
+	return parseInt(this.height / this.floorHeight, 10);
+}
+/**
+ * 
+ * @param {Point3D} cameraPosition 
+ */
+ExtrusionBuilding.prototype.getDistToCamera = function(cameraPosition) {
+	var mesh = this.objectsArray[0];
+	var bb = mesh.getBoundingBox();
+	var radius = bb.getRadiusAprox();
+
+	var bsAbsoluteCenterPos = this.getBBoxCenterPositionWorldCoord();
+	var auxBs = new BoundingSphere(bsAbsoluteCenterPos.x, bsAbsoluteCenterPos.y, bsAbsoluteCenterPos.z, radius);
+
+	return cameraPosition.distToSphere(auxBs);
+}
+
+ExtrusionBuilding.prototype.getBBoxCenterPositionWorldCoord = function() {
+	var geoLocData = this.getCurrentGeoLocationData();
+	var mesh = this.objectsArray[0];
+	var bs = mesh.getBoundingSphere();
+	var bsLocalCenter = bs.centerPoint;
+	
+	return geoLocData.tMatrix.transformPoint3D(bsLocalCenter);
+}

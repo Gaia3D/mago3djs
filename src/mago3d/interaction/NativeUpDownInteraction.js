@@ -34,7 +34,8 @@ NativeUpDownInteraction.prototype.constructor = NativeUpDownInteraction;
 
 NativeUpDownInteraction.EVENT_TYPE = {
 	'ACTIVE'  	: 'active',
-	'DEACTIVE'	: 'deactive'
+	'DEACTIVE'	: 'deactive',
+	'CHANGEHEIGHT' : 'changeheight'
 };
 /**
  * interaction init
@@ -204,7 +205,7 @@ NativeUpDownInteraction.prototype.handleDragEvent = function(browserEvent)
 		{
 			var currentbuilding = this.target;
 			var height = currentbuilding.height;
-            
+            var prevHeight = height;
 			if (up) 
 			{
 				height = height+this.offset;
@@ -220,6 +221,13 @@ NativeUpDownInteraction.prototype.handleDragEvent = function(browserEvent)
 			currentbuilding.objectsArray = model.objectsArray;*/
 
 			currentbuilding.setHeight(height);
+
+			this.emit(NativeUpDownInteraction.EVENT_TYPE.CHANGEHEIGHT, {
+				type : NativeUpDownInteraction.EVENT_TYPE.CHANGEHEIGHT,
+				timestamp : new Date().getTime(),
+				prevHeight : prevHeight,
+				changedHeight : height
+			});
             
 			this.startPixel.set(screenCoordinate.x, screenCoordinate.y, screenCoordinate.z);
 		}
