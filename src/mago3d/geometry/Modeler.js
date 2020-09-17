@@ -38,7 +38,7 @@ var Modeler = function(magoManager)
 	
 	this.testObjectsArray;
 	
-	this.objectsArray; // put here all objects.***
+	this.objectsArray = []; // put here all objects.***
 	this.vectorsArray; // put here vector objects (lines, polylines, etc.).***
 	this.currentVisibleObjectsArray;
 };

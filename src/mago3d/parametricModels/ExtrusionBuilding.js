@@ -153,7 +153,6 @@ ExtrusionBuilding.prototype.makeMesh = function() {
 	this.setDirty(false);
 }
 
-
 /**
  * @param {Array<Cesium.Cartesian3>} cartesian3Array
  * @param {number} height
@@ -164,4 +163,24 @@ ExtrusionBuilding.makeExtrusionBuildingByCartesian3Array = function(cartesian3Ar
     var eb = new ExtrusionBuilding(geographicCoordList, height, options);
 
     return eb;
+}
+
+/**
+ * @param {number} height
+ */
+ExtrusionBuilding.prototype.setHeight = function(height) {
+	if(height === undefined || height === null) {
+		throw new Error(Messages.REQUIRED_EMPTY_ERROR('height'));
+	}
+	var model = this.geographicCoordList.getExtrudedMeshRenderableObject(height);
+		
+	this.height = height;
+	this.objectsArray = model.objectsArray;
+}
+
+/**
+ * @return {number}
+ */
+ExtrusionBuilding.prototype.getHeight = function() {
+	return this.height;
 }
