@@ -161,10 +161,10 @@ Polygon2D.prototype.calculateNormal = function(resultConcavePointsIdxArray)
 };
 
 /**
- * This function divide the polygon2d in 2 splitted polygons by segment2d.
+ * This function divide the polygon2d in splitted polygons by multiple segments2d.
  * @param {Polygon2D} polygon2d The polygon to be splitted.
  * @param {Array[Segment2D]} splitterSegment2dArray The splitter segments array.
- * @param {Array} resultSplittedPolygons The result splitted 2 polygons container.
+ * @param {Array} resultSplittedPolygons The result splitted polygons container.
  * @param {Number} error The tolerance.
  */
 Polygon2D.splitPolygonByMultipleSegments = function(polygon2d, splitterSegment2dArray, resultSplittedPolygons, error)
@@ -785,11 +785,6 @@ Polygon2D.prototype.solveDegeneratedPoints = function()
 			if (point.isCoincidentToPoint(prev, distError)) { continue; }
 		}
 		aux.push(point);
-	}
-
-	if (pointsCount !== aux.length) 
-	{
-		var hola = 0;
 	}
 
 	this.point2dList.pointsArray = aux;

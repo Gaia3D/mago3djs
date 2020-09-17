@@ -278,11 +278,13 @@ void main()
 	float scalarProd = 1.0;
 	
 	vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
-	float linearDepth = getDepth(screenPos);  
+	float linearDepth = getDepth(screenPos);   
 	vec3 ray = getViewRay(screenPos); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
 	scalarProd = dot(normal2, normalize(-ray));
-	scalarProd *= 0.6;
-	scalarProd += 0.4;
+	scalarProd *= scalarProd;
+	scalarProd *= 0.7;
+	scalarProd += 0.3;
+
 
 	//if(scalarProd > 0.6) // delete this. ***
 	//scalarProd = 0.6; // delete this. ***
@@ -457,6 +459,7 @@ void main()
 	if(applySpecLighting> 0.0)
 	{
 		vec3 L;
+		L = ray;// test.***
 		if(bApplyShadow)
 		{
 			L = vLightDir;// test.***
@@ -469,6 +472,7 @@ void main()
 			//L = normalize(lightPos - vertexPos);
 			//lambertian = max(dot(normal2, L), 0.0);
 			lambertian = 1.0;
+			lambertian = (scalarProd-4.0)/0.6;
 		}
 		
 		specular = 0.0;
@@ -551,11 +555,8 @@ void main()
 		finalColor = vec4((textureColor.xyz) * occlusion * shadow_occlusion * scalarProd, alfa);
 	}
 	
-	//if(testBool)
-	//finalColor *= vec4(0.99, 0.33, 0.32, 1.0);
 	
 	finalColor *= colorMultiplier;
-
 
 	//finalColor = vec4(linearDepth, linearDepth, linearDepth, 1.0); // test to render depth color coded.***
     gl_FragColor = finalColor; 

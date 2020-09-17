@@ -1864,11 +1864,13 @@ void main()\n\
 	float scalarProd = 1.0;\n\
 	\n\
 	vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
-	float linearDepth = getDepth(screenPos);  \n\
+	float linearDepth = getDepth(screenPos);   \n\
 	vec3 ray = getViewRay(screenPos); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
 	scalarProd = dot(normal2, normalize(-ray));\n\
-	scalarProd *= 0.6;\n\
-	scalarProd += 0.4;\n\
+	scalarProd *= scalarProd;\n\
+	scalarProd *= 0.7;\n\
+	scalarProd += 0.3;\n\
+\n\
 \n\
 	//if(scalarProd > 0.6) // delete this. ***\n\
 	//scalarProd = 0.6; // delete this. ***\n\
@@ -2043,6 +2045,7 @@ void main()\n\
 	if(applySpecLighting> 0.0)\n\
 	{\n\
 		vec3 L;\n\
+		L = ray;// test.***\n\
 		if(bApplyShadow)\n\
 		{\n\
 			L = vLightDir;// test.***\n\
@@ -2055,6 +2058,7 @@ void main()\n\
 			//L = normalize(lightPos - vertexPos);\n\
 			//lambertian = max(dot(normal2, L), 0.0);\n\
 			lambertian = 1.0;\n\
+			lambertian = (scalarProd-4.0)/0.6;\n\
 		}\n\
 		\n\
 		specular = 0.0;\n\
@@ -2137,11 +2141,8 @@ void main()\n\
 		finalColor = vec4((textureColor.xyz) * occlusion * shadow_occlusion * scalarProd, alfa);\n\
 	}\n\
 	\n\
-	//if(testBool)\n\
-	//finalColor *= vec4(0.99, 0.33, 0.32, 1.0);\n\
 	\n\
 	finalColor *= colorMultiplier;\n\
-\n\
 \n\
 	//finalColor = vec4(linearDepth, linearDepth, linearDepth, 1.0); // test to render depth color coded.***\n\
     gl_FragColor = finalColor; \n\

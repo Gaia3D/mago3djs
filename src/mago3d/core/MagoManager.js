@@ -1996,6 +1996,7 @@ MagoManager.prototype.TEST__splittedExtrudedBuilding = function()
 
 	options.color = new Color(Math.random(),Math.random(),Math.random(),1);
 	options.renderWireframe = true;
+	options.wireframeColor4 = new Color(1.0, 0.5, 0.0, 1.0);
 	var extrudedBuilding = new ExtrusionBuilding(geoCoordsListsArray, height, options);
 	this.modeler.addObject(extrudedBuilding, 5);
 	

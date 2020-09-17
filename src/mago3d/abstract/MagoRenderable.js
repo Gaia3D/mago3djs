@@ -34,6 +34,11 @@ var MagoRenderable = function(options)
 		{
 			this.color4 = options.color;
 		}
+
+		if (options.wireframeColor4 && options.wireframeColor4 instanceof Color) 
+		{
+			this.wireframeColor4 = options.wireframeColor4;
+		}
 	}
 };
 

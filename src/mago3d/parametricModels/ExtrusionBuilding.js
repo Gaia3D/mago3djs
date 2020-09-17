@@ -36,7 +36,7 @@ var ExtrusionBuilding = function(geographicCoordList, height, options)
         throw new Error('height must higher than 0');
     }
 
-	MagoRenderable.call(this);
+	MagoRenderable.call(this, options);
     options = options? options : {};
 
 	var geoCoordsList = this.geographicCoordListsArray[0]; // take the 1rst geoCoordsList.***
@@ -51,6 +51,7 @@ var ExtrusionBuilding = function(geographicCoordList, height, options)
     this.attributes.isMovable = defaultValue(options.isMovable, true);
     this.attributes.isSelectable = defaultValue(options.isSelectable, true);
 
+	if(!this.options)
     this.options = {};
 
     this.options.renderWireframe = defaultValue(options.renderWireframe, true);
@@ -77,8 +78,6 @@ ExtrusionBuilding.prototype.constructor = ExtrusionBuilding;
 ExtrusionBuilding.prototype.makeMesh = function() {
 	if(!this.dirty) return;
 	
-    //if (!this.geographicCoordList || this.geographicCoordList.geographicCoordsArray.length === 0)
-	//{ return; }
 	if(!this.geoLocDataManager) {
         return;
     }
