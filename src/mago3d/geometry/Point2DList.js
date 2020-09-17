@@ -47,6 +47,25 @@ Point2DList.prototype.addPoint = function(point2d)
 
 /**
  * Create a new feature of Point2D
+ * @param {Point2D} point2d the point to insert into list.
+ * @param {Number} idx the idx in the array to insert.
+ */
+Point2DList.prototype.insertPoint = function(point2d, idx)
+{
+	if (this.pointsArray === undefined)
+	{ this.pointsArray = []; }
+
+	if(idx > this.pointsArray.length-1)
+	{
+		this.pointsArray.push(point2d);
+	}
+	else{
+		this.pointsArray.splice(idx, 0, point2d);
+	}
+};
+
+/**
+ * Create a new feature of Point2D
  * @param {Number} x the x coordi of the point
  * @param {Number} y the y coordi of the point
  * @returns {Point2D} return the created point

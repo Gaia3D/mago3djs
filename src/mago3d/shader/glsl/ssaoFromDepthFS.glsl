@@ -225,6 +225,11 @@ void main()
         if(occlusion_veryBig < 0.0)
         occlusion_veryBig = 0.0;
 	}
+    else
+    {
+        // Apply edges from depth.***
+
+    }
 
     // Do lighting.***
     //float scalarProd = max(0.01, dot(normal, normalize(-ray)));

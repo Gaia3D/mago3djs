@@ -114,7 +114,7 @@ void main(){
 	normal.x /= aspect;
 	float direction = (thickness*sense*projectedDepth)/1000.0;
 	// Offset our position along the normal
-	vec4 offset = vec4(normal * direction, 0.0, 1.0);
+	vec4 offset = vec4(normal * direction, 0.0, 0.0);
 	gl_Position = currentProjected + offset; 
 
 	if(bUseLogarithmicDepth)

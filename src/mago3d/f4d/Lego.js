@@ -472,6 +472,9 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader,
 {
 	var rendered = false;
 	var gl = magoManager.sceneState.gl;
+
+	if (owner === undefined)
+		{ return; }
 	
 	if (this.vbo_vicks_container.vboCacheKeysArray.length === 0) 
 	{
@@ -488,8 +491,7 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader,
 	{
 		var processCounterManager = magoManager.processCounterManager;
 		
-		if (owner === undefined)
-		{ return; }
+		
 		
 		if (this.shadowMeshesArray !== undefined)
 		{

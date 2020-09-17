@@ -97,24 +97,9 @@ SmartTileManager.getDepthByBoundingBoxMaxSize = function(bboxMaxLength)
 		smartTileDepth = 6;
 	}
 
-	/*
-	if (bboxMaxSize < 30.0)
-	{
-		smartTileDepth = 16;
-	}
-	else if (bboxMaxSize >= 30.0 && bboxMaxSize < 50.0)
-	{
-		smartTileDepth = 15;
-	}
-	else if (bboxMaxSize >= 50.0 && bboxMaxSize < 100.0)
-	{
-		smartTileDepth = 14;
-	}
-	else if (bboxMaxSize >=100.0)
-	{
-		smartTileDepth = 13;
-	}
-	*/
+	// Debug test.***
+	if(smartTileDepth >10)
+	smartTileDepth = 10;
 	
 	return smartTileDepth;
 };

@@ -1778,6 +1778,59 @@ vec3 normal_from_depth(float depth, vec2 texCoord) {\n\
     return normalize(normal);\n\
 }\n\
 \n\
+mat3 sx = mat3( \n\
+    1.0, 2.0, 1.0, \n\
+    0.0, 0.0, 0.0, \n\
+    -1.0, -2.0, -1.0 \n\
+);\n\
+mat3 sy = mat3( \n\
+    1.0, 0.0, -1.0, \n\
+    2.0, 0.0, -2.0, \n\
+    1.0, 0.0, -1.0 \n\
+);\n\
+\n\
+bool isEdge()\n\
+{\n\
+	vec3 I[3];\n\
+	vec2 screenPos = vec2((gl_FragCoord.x) / screenWidth, (gl_FragCoord.y) / screenHeight);\n\
+	float linearDepth = getDepth(screenPos);\n\
+	vec3 normal = normal_from_depth(linearDepth, screenPos);\n\
+\n\
+    for (int i=0; i<3; i++) {\n\
+        //vec3 norm1 = texelFetch(normalTexture, ivec2(gl_FragCoord) + ivec2(i-1,-1), 0 ).rgb * 2.0f - 1.0f;\n\
+        //vec3 norm2 =  texelFetch(normalTexture, ivec2(gl_FragCoord) + ivec2(i-1,0), 0 ).rgb * 2.0f - 1.0f;\n\
+        //vec3 norm3 = texelFetch(normalTexture, ivec2(gl_FragCoord) + ivec2(i-1,1), 0 ).rgb * 2.0f - 1.0f;\n\
+		vec2 screenPos1 = vec2((gl_FragCoord.x+float(i-1)) / screenWidth, (gl_FragCoord.y-1.0) / screenHeight);\n\
+		float linearDepth1 = getDepth(screenPos1);  \n\
+\n\
+		vec2 screenPos2 = vec2((gl_FragCoord.x+float(i-1)) / screenWidth, (gl_FragCoord.y-0.0) / screenHeight);\n\
+		float linearDepth2 = getDepth(screenPos2);  \n\
+\n\
+		vec2 screenPos3 = vec2((gl_FragCoord.x+float(i-1)) / screenWidth, (gl_FragCoord.y+1.0) / screenHeight);\n\
+		float linearDepth3 = getDepth(screenPos1);  \n\
+\n\
+		vec3 norm1 = normal_from_depth(linearDepth1, screenPos1);\n\
+        vec3 norm2 =  normal_from_depth(linearDepth2, screenPos2);\n\
+        vec3 norm3 = normal_from_depth(linearDepth3, screenPos3);\n\
+        float sampleValLeft  = dot(normal, norm1);\n\
+        float sampleValMiddle  = dot(normal, norm2);\n\
+        float sampleValRight  = dot(normal, norm3);\n\
+        I[i] = vec3(sampleValLeft, sampleValMiddle, sampleValRight);\n\
+    }\n\
+\n\
+    float gx = dot(sx[0], I[0]) + dot(sx[1], I[1]) + dot(sx[2], I[2]); \n\
+    float gy = dot(sy[0], I[0]) + dot(sy[1], I[1]) + dot(sy[2], I[2]);\n\
+\n\
+    if((gx < 0.0 && gy < 0.0) || (gy < 0.0 && gx < 0.0) ) \n\
+        return false;\n\
+	float g = sqrt(pow(gx, 2.0)+pow(gy, 2.0));\n\
+\n\
+    if(g > 0.2) {\n\
+        return true;\n\
+    } \n\
+	return false;\n\
+}\n\
+\n\
 void main()\n\
 {\n\
 	//gl_FragColor = vColor4; \n\
@@ -1817,13 +1870,18 @@ void main()\n\
 	scalarProd *= 0.6;\n\
 	scalarProd += 0.4;\n\
 \n\
+	//if(scalarProd > 0.6) // delete this. ***\n\
+	//scalarProd = 0.6; // delete this. ***\n\
+\n\
+\n\
 	//vec3 normalFromDepth = normal_from_depth(linearDepth, screenPos); // normal from depthTex.***\n\
 	//normal2 = normalFromDepth;\n\
+	//float edgeOccl = 1.0;\n\
 	if(bApplySsao)\n\
 	{   \n\
 		 \n\
 		vec3 origin = ray * linearDepth;  \n\
-		float tolerance = radius/far; // original.***\n\
+		float tolerance = (radius*2.0)/far; // original.***\n\
 \n\
 		vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
 		vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
@@ -1833,7 +1891,7 @@ void main()\n\
 		float maxDepthBuffer;\n\
 		for(int i = 0; i < kernelSize; ++i)\n\
 		{    	 \n\
-			vec3 sample = origin + (tbn * vec3(kernel[i].x*1.0, kernel[i].y*1.0, kernel[i].z)) * radius;\n\
+			vec3 sample = origin + (tbn * vec3(kernel[i].x*1.0, kernel[i].y*1.0, kernel[i].z)) * radius*2.0;\n\
 			vec4 offset = projectionMatrix * vec4(sample, 1.0);					\n\
 			offset.xy /= offset.w;\n\
 			offset.xy = offset.xy * 0.5 + 0.5;  				\n\
@@ -1842,7 +1900,13 @@ void main()\n\
 			////float sampleDepth = -sample.z/farForDepth;\n\
 \n\
 			float depthBufferValue = getDepth(offset.xy);\n\
+			//float diff = abs(sampleDepth - depthBufferValue);\n\
 \n\
+			//if(depthBufferValue < 0.00393)\n\
+			//continue;\n\
+\n\
+			\n\
+			/*\n\
 			if(depthBufferValue > 0.00391 && depthBufferValue < 0.00393)\n\
 			{\n\
 				if (depthBufferValue < sampleDepth-tolerance*1000.0)\n\
@@ -1852,16 +1916,72 @@ void main()\n\
 				\n\
 				continue;\n\
 			}			\n\
-			\n\
+			*/\n\
 			if (depthBufferValue < sampleDepth-tolerance)\n\
 			{\n\
 				occlusion +=  1.0;\n\
 			}\n\
 		} \n\
 \n\
+		// test detect edge.**********************************************************************************\n\
+		/*\n\
+		vec3 normal3 = vec3(-normal2.x, -normal2.y, normal2.z);\n\
+		tangent = normalize(rvec - normal3 * dot(rvec, normal3));\n\
+		bitangent = cross(normal3, tangent);\n\
+		tbn = mat3(tangent, bitangent, normal3);  \n\
+		float edgeRadius = 0.2;\n\
+		edgeOccl = 0.0;\n\
+		tolerance = edgeRadius/far;\n\
+		for(int i = 0; i < kernelSize; ++i)\n\
+		{    	 \n\
+			vec3 sample = origin + (tbn * vec3(kernel[i].x*1.0, kernel[i].y*1.0, kernel[i].z)) * edgeRadius;\n\
+			vec4 offset = projectionMatrix * vec4(sample, 1.0);					\n\
+			offset.xy /= offset.w;\n\
+			offset.xy = offset.xy * 0.5 + 0.5;  				\n\
+			float sampleDepth = -sample.z/far;// original.***\n\
+			////float sampleDepth = -sample.z/(far-near);// test.***\n\
+			////float sampleDepth = -sample.z/farForDepth;\n\
+\n\
+			sampleDepth = 1.0 - sampleDepth;\n\
+\n\
+			float depthBufferValue = getDepth(offset.xy);\n\
+			depthBufferValue = 1.0 - depthBufferValue;\n\
+			\n\
+			if(depthBufferValue > 0.00391 && depthBufferValue < 0.00393)\n\
+			{\n\
+				if (depthBufferValue < sampleDepth-tolerance*1000.0)\n\
+				{\n\
+					edgeOccl +=  0.5;\n\
+				}\n\
+				\n\
+				continue;\n\
+			}			\n\
+			\n\
+			if (depthBufferValue < sampleDepth-tolerance)\n\
+			{\n\
+				edgeOccl +=  1.0;\n\
+			}\n\
+		} \n\
+\n\
+		if(edgeOccl > 0.5)\n\
+		edgeOccl = float(kernelSize);\n\
+\n\
+		if(edgeOccl > float(kernelSize))\n\
+		edgeOccl = float(kernelSize);\n\
+\n\
+		edgeOccl = 1.0 - edgeOccl;\n\
+		*/\n\
+		// end test.----------------------------------------------------------------------------------------\n\
+\n\
 		//occlusion = 1.0 - occlusion / float(kernelSize);	\n\
 		float smallOccl = occlusion / float(kernelSize);\n\
-		smallOccl *= 0.4;\n\
+\n\
+		//if(isEdge())\n\
+		//smallOccl = 1.0;\n\
+\n\
+		//smallOccl *= 0.4;\n\
+\n\
+		\n\
 		\n\
 		// test.***\n\
 		//ssaoFromDepthTex\n\
@@ -2002,7 +2122,8 @@ void main()\n\
 	\n\
 	//textureColor = vec4(0.85, 0.85, 0.85, 1.0);\n\
 	\n\
-	vec3 ambientColorAux = vec3(textureColor.x*ambientColor.x, textureColor.y*ambientColor.y, textureColor.z*ambientColor.z);\n\
+	//vec3 ambientColorAux = vec3(textureColor.x*ambientColor.x, textureColor.y*ambientColor.y, textureColor.z*ambientColor.z); // original.***\n\
+	vec3 ambientColorAux = vec3(textureColor.xyz);\n\
 	float alfa = textureColor.w * externalAlpha;\n\
 \n\
     vec4 finalColor;\n\
@@ -2154,7 +2275,7 @@ ShaderSource.ModelRefSsaoVS = "\n\
 		vec3 uLightingDirection = vec3(-0.1320580393075943, -0.9903827905654907, 0.041261956095695496); \n\
 		uAmbientColor = vec3(1.0);\n\
 		vNormalWC = rotatedNormal;\n\
-		vNormal = normalize((normalMatrix4 * vec4(rotatedNormal.x, rotatedNormal.y, rotatedNormal.z, 1.0)).xyz); // original.***\n\
+		vNormal = normalize((normalMatrix4 * vec4(rotatedNormal, 1.0)).xyz); // original.***\n\
 		vTexCoord = texCoord;\n\
 		vLightDir = vec3(-0.1320580393075943, -0.9903827905654907, 0.041261956095695496);\n\
 		vec3 directionalLightColor = vec3(0.7, 0.7, 0.7);\n\
@@ -2201,10 +2322,11 @@ ShaderSource.ModelRefSsaoVS = "\n\
 		{\n\
 			uAmbientColor = vec3(0.8);\n\
 			uLightingDirection = normalize(vec3(0.6, 0.6, 0.6));\n\
+			//uLightingDirection = normalize(vec3(0.2, 0.6, 1.0));\n\
 			directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
 		}\n\
 \n\
-		vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;\n\
+		vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting; // original.***\n\
 		\n\
 		if(bApplySpecularLighting)\n\
 			applySpecLighting = 1.0;\n\
@@ -3395,11 +3517,11 @@ void main()\n\
 		tolerance = 0.9963;\n\
 		\n\
 		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight); // centerPos.\n\
-		vec2 screenPos_LD = vec2(screenPos.x - pixelSizeW*1.5, screenPos.y - pixelSizeH*1.5); // left-down corner.\n\
+		vec2 screenPos_LD = vec2(screenPos.x - pixelSizeW*2.5, screenPos.y - pixelSizeH*2.5); // left-down corner.\n\
 		\n\
-		for(int w = 0; w<3; w++)\n\
+		for(int w = 0; w<5; w++)\n\
 		{\n\
-			for(int h=0; h<3; h++)\n\
+			for(int h=0; h<5; h++)\n\
 			{\n\
 				vec2 screenPosAux = vec2(screenPos_LD.x + pixelSizeW*float(w), screenPos_LD.y + pixelSizeH*float(h));\n\
 				float z_window  = unpackDepthMago(texture2D(depthTex, screenPosAux.xy)); // z_window  is [0.0, 1.0] range depth.\n\
@@ -3771,6 +3893,11 @@ void main()\n\
         if(occlusion_veryBig < 0.0)\n\
         occlusion_veryBig = 0.0;\n\
 	}\n\
+    else\n\
+    {\n\
+        // Apply edges from depth.***\n\
+\n\
+    }\n\
 \n\
     // Do lighting.***\n\
     //float scalarProd = max(0.01, dot(normal, normalize(-ray)));\n\
@@ -5522,7 +5649,7 @@ void main(){\n\
 	normal.x /= aspect;\n\
 	float direction = (thickness*sense*projectedDepth)/1000.0;\n\
 	// Offset our position along the normal\n\
-	vec4 offset = vec4(normal * direction, 0.0, 1.0);\n\
+	vec4 offset = vec4(normal * direction, 0.0, 0.0);\n\
 	gl_Position = currentProjected + offset; \n\
 \n\
 	if(bUseLogarithmicDepth)\n\

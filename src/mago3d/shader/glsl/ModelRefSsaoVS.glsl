@@ -121,7 +121,7 @@
 		vec3 uLightingDirection = vec3(-0.1320580393075943, -0.9903827905654907, 0.041261956095695496); 
 		uAmbientColor = vec3(1.0);
 		vNormalWC = rotatedNormal;
-		vNormal = normalize((normalMatrix4 * vec4(rotatedNormal.x, rotatedNormal.y, rotatedNormal.z, 1.0)).xyz); // original.***
+		vNormal = normalize((normalMatrix4 * vec4(rotatedNormal, 1.0)).xyz); // original.***
 		vTexCoord = texCoord;
 		vLightDir = vec3(-0.1320580393075943, -0.9903827905654907, 0.041261956095695496);
 		vec3 directionalLightColor = vec3(0.7, 0.7, 0.7);
@@ -168,10 +168,11 @@
 		{
 			uAmbientColor = vec3(0.8);
 			uLightingDirection = normalize(vec3(0.6, 0.6, 0.6));
+			//uLightingDirection = normalize(vec3(0.2, 0.6, 1.0));
 			directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);
 		}
 
-		vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;
+		vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting; // original.***
 		
 		if(bApplySpecularLighting)
 			applySpecLighting = 1.0;

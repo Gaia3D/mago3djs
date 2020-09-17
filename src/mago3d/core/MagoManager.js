@@ -1431,15 +1431,17 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	*/
 	
 	
-	if (frustumVolumenObject.depthFbo === undefined) { frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
+	//if (frustumVolumenObject.depthFbo === undefined) { frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
 	//if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, new Float32Array([this.sceneState.drawingBufferWidth[0]/2.0]), new Float32Array([this.sceneState.drawingBufferHeight/2.0]), {matchCanvasSize : true}); }
 	if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
+	if (this.edgesFromDepthFbo === undefined) { this.edgesFromDepthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
 
+	if (this.depthFboNeo === undefined) { this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
 	// test silhouette depthFbo.***
 	//if (frustumVolumenObject.silhouetteDepthFboNeo === undefined) { frustumVolumenObject.silhouetteDepthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize : true}); }
 	
 
-	this.depthFboNeo = frustumVolumenObject.depthFbo;
+	//this.depthFboNeo = frustumVolumenObject.depthFbo;
 	//this.ssaoFromDepthFbo = frustumVolumenObject.ssaoFromDepthFbo;
 
 	//this.silhouetteDepthFboNeo = frustumVolumenObject.silhouetteDepthFboNeo;
@@ -1510,6 +1512,12 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	
 	// 4) Render filter.******************************************************************************************************************
 	//this.renderFilter();
+
+	if(!this.splittExtrudeBuilding)
+	{
+		this.TEST__splittedExtrudedBuilding();
+		this.splittExtrudeBuilding = true;
+	}
 };
 
 /**
@@ -1897,6 +1905,101 @@ MagoManager.prototype.TEST__RenderGeoCoords = function()
 
 		geoCoordsList.geographicCoordsArray.length = 0;
 	}
+};
+
+/**
+ * @private
+ */
+MagoManager.prototype.TEST__splittedExtrudedBuilding = function() 
+{
+	var polygon = {
+		"type": "FeatureCollection",
+		"name": "polygon",
+		"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+		"features": [
+		{ "type": "Feature", "properties": { "id": 26 }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [ 127.007156778934217, 37.451560023041928 ], [ 127.007460564737684, 37.451040386226865 ], [ 127.00744861308273, 37.451014222695612 ], [ 127.00741694547871, 37.451002455751151 ], [ 127.006967071123384, 37.450835291596306 ], [ 127.006934253008012, 37.450844820064908 ], [ 127.006828575012591, 37.451025584925794 ], [ 127.006920766653792, 37.451059841707512 ], [ 127.006959916298669, 37.45099287523324 ], [ 127.006998483134424, 37.451007205953346 ], [ 127.007032475979713, 37.45094906015845 ], [ 127.00728902455549, 37.45104438837059 ], [ 127.007263482357018, 37.451088079341183 ], [ 127.007310295354259, 37.451105474010767 ], [ 127.007097217797622, 37.451469950027445 ], [ 127.006802613819659, 37.451360481183009 ], [ 127.006878979501849, 37.451229856553653 ], [ 127.006786787668318, 37.451195599739314 ], [ 127.006672178936796, 37.451391639069755 ], [ 127.00667759315165, 37.451403491647312 ], [ 127.007092593098307, 37.451557697325363 ], [ 127.007124260885604, 37.451569464355593 ], [ 127.007156778934217, 37.451560023041928 ] ] ] ] } }
+		]
+	};
+
+	var segments = {
+		"type": "FeatureCollection",
+		"name": "line",
+		"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+		"features": [
+		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.00680258194113, 37.451361285269734 ], [ 127.006761027785558, 37.451435659267922 ] ] } },
+		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007096637143917, 37.451470331843581 ], [ 127.007056141692942, 37.451548940660174 ] ] } },
+		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007310230797074, 37.451105608108712 ], [ 127.007406308239581, 37.451143721474331 ] ] } },
+		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007289321381194, 37.451044203241878 ], [ 127.007332331255597, 37.450969829243697 ] ] } },
+		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007032453177501, 37.450949184503962 ], [ 127.007075463051905, 37.450873751801183 ] ] } },
+		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007032056163283, 37.450949713856282 ], [ 127.006902364849708, 37.450898896035454 ] ] } },
+		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.006960064250435, 37.450993120744904 ], [ 127.006868486302494, 37.450955536731584 ] ] } }
+		]
+	};
+
+
+	// make geographicsCoordsArray.***
+	var geoCoordsArray = [];
+	var coordsArray = polygon.features[0].geometry.coordinates[0][0];
+	var coordsCount = coordsArray.length;
+	for(var i=0; i<coordsCount; i++)
+	{
+		var coord = coordsArray[i];
+		var geoCoord = new GeographicCoord(coord[0], coord[1], 0.0);
+		geoCoordsArray.push(geoCoord);
+	}
+
+	// make segments array.***
+	var segments2dArray = [];
+	var segmentsArray = segments.features;
+	var segmentsCount = segmentsArray.length;
+	for(var i=0; i<segmentsCount; i++)
+	{
+		var segment = segmentsArray[i].geometry.coordinates;
+		var strPoint2D = new Point2D(segment[0][0], segment[0][1]);
+		var endPoint2D = new Point2D(segment[1][0], segment[1][1]);
+		var segment2d = new Segment2D(strPoint2D, endPoint2D);
+		segments2dArray.push(segment2d);
+	}
+
+	// make the polygon by geoCoordsArray.***
+	var polygon2d = Polygon2D.makePolygonByGeographicCoordArray(geoCoordsArray) ;
+	var resultConcavePointsIdxArray = polygon2d.calculateNormal(undefined);
+	if(polygon2d.normal < 0)
+	{
+		polygon2d.reverseSense();
+	}
+
+	// now, split the polygon2d by the segments.***
+	var error = 1E-5;
+	var resultSplittedPolygons = Polygon2D.splitPolygonByMultipleSegments(polygon2d, segments2dArray, resultSplittedPolygons, error);
+
+	// Finally in "resultSplittedPolygons" there are all splitted polygons.***
+	var splittedPolygonsCount = resultSplittedPolygons.length;
+	var height = 100.0;
+	var options = {};
+	var geoCoordsListsArray = [];
+	for(var i=0; i<splittedPolygonsCount; i++)
+	{
+		var polygon2d = resultSplittedPolygons[i];
+		var geographicCoordsArray = [];
+		var coordsCount = polygon2d.point2dList.getPointsCount();
+		for(var j=0; j<coordsCount; j++)
+		{
+			var point2d = polygon2d.point2dList.getPoint(j);
+			var geoCoord = new GeographicCoord(point2d.x, point2d.y, 0.0);
+			geographicCoordsArray.push(geoCoord);
+		}
+		var geoCoordList = new GeographicCoordsList(geographicCoordsArray);
+		geoCoordsListsArray.push(geoCoordList);
+		
+	}
+
+	options.color = new Color(Math.random(),Math.random(),Math.random(),1);
+	options.renderWireframe = true;
+	var extrudedBuilding = new ExtrusionBuilding(geoCoordsListsArray, height, options);
+	this.modeler.addObject(extrudedBuilding, 5);
+	
+	var hola = 0;
 };
 
 /**

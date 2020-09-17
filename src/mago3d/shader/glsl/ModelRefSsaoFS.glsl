@@ -192,6 +192,59 @@ vec3 normal_from_depth(float depth, vec2 texCoord) {
     return normalize(normal);
 }
 
+mat3 sx = mat3( 
+    1.0, 2.0, 1.0, 
+    0.0, 0.0, 0.0, 
+    -1.0, -2.0, -1.0 
+);
+mat3 sy = mat3( 
+    1.0, 0.0, -1.0, 
+    2.0, 0.0, -2.0, 
+    1.0, 0.0, -1.0 
+);
+
+bool isEdge()
+{
+	vec3 I[3];
+	vec2 screenPos = vec2((gl_FragCoord.x) / screenWidth, (gl_FragCoord.y) / screenHeight);
+	float linearDepth = getDepth(screenPos);
+	vec3 normal = normal_from_depth(linearDepth, screenPos);
+
+    for (int i=0; i<3; i++) {
+        //vec3 norm1 = texelFetch(normalTexture, ivec2(gl_FragCoord) + ivec2(i-1,-1), 0 ).rgb * 2.0f - 1.0f;
+        //vec3 norm2 =  texelFetch(normalTexture, ivec2(gl_FragCoord) + ivec2(i-1,0), 0 ).rgb * 2.0f - 1.0f;
+        //vec3 norm3 = texelFetch(normalTexture, ivec2(gl_FragCoord) + ivec2(i-1,1), 0 ).rgb * 2.0f - 1.0f;
+		vec2 screenPos1 = vec2((gl_FragCoord.x+float(i-1)) / screenWidth, (gl_FragCoord.y-1.0) / screenHeight);
+		float linearDepth1 = getDepth(screenPos1);  
+
+		vec2 screenPos2 = vec2((gl_FragCoord.x+float(i-1)) / screenWidth, (gl_FragCoord.y-0.0) / screenHeight);
+		float linearDepth2 = getDepth(screenPos2);  
+
+		vec2 screenPos3 = vec2((gl_FragCoord.x+float(i-1)) / screenWidth, (gl_FragCoord.y+1.0) / screenHeight);
+		float linearDepth3 = getDepth(screenPos1);  
+
+		vec3 norm1 = normal_from_depth(linearDepth1, screenPos1);
+        vec3 norm2 =  normal_from_depth(linearDepth2, screenPos2);
+        vec3 norm3 = normal_from_depth(linearDepth3, screenPos3);
+        float sampleValLeft  = dot(normal, norm1);
+        float sampleValMiddle  = dot(normal, norm2);
+        float sampleValRight  = dot(normal, norm3);
+        I[i] = vec3(sampleValLeft, sampleValMiddle, sampleValRight);
+    }
+
+    float gx = dot(sx[0], I[0]) + dot(sx[1], I[1]) + dot(sx[2], I[2]); 
+    float gy = dot(sy[0], I[0]) + dot(sy[1], I[1]) + dot(sy[2], I[2]);
+
+    if((gx < 0.0 && gy < 0.0) || (gy < 0.0 && gx < 0.0) ) 
+        return false;
+	float g = sqrt(pow(gx, 2.0)+pow(gy, 2.0));
+
+    if(g > 0.2) {
+        return true;
+    } 
+	return false;
+}
+
 void main()
 {
 	//gl_FragColor = vColor4; 
@@ -231,13 +284,18 @@ void main()
 	scalarProd *= 0.6;
 	scalarProd += 0.4;
 
+	//if(scalarProd > 0.6) // delete this. ***
+	//scalarProd = 0.6; // delete this. ***
+
+
 	//vec3 normalFromDepth = normal_from_depth(linearDepth, screenPos); // normal from depthTex.***
 	//normal2 = normalFromDepth;
+	//float edgeOccl = 1.0;
 	if(bApplySsao)
 	{   
 		 
 		vec3 origin = ray * linearDepth;  
-		float tolerance = radius/far; // original.***
+		float tolerance = (radius*2.0)/far; // original.***
 
 		vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;
 		vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));
@@ -247,7 +305,7 @@ void main()
 		float maxDepthBuffer;
 		for(int i = 0; i < kernelSize; ++i)
 		{    	 
-			vec3 sample = origin + (tbn * vec3(kernel[i].x*1.0, kernel[i].y*1.0, kernel[i].z)) * radius;
+			vec3 sample = origin + (tbn * vec3(kernel[i].x*1.0, kernel[i].y*1.0, kernel[i].z)) * radius*2.0;
 			vec4 offset = projectionMatrix * vec4(sample, 1.0);					
 			offset.xy /= offset.w;
 			offset.xy = offset.xy * 0.5 + 0.5;  				
@@ -256,7 +314,13 @@ void main()
 			////float sampleDepth = -sample.z/farForDepth;
 
 			float depthBufferValue = getDepth(offset.xy);
+			//float diff = abs(sampleDepth - depthBufferValue);
 
+			//if(depthBufferValue < 0.00393)
+			//continue;
+
+			
+			/*
 			if(depthBufferValue > 0.00391 && depthBufferValue < 0.00393)
 			{
 				if (depthBufferValue < sampleDepth-tolerance*1000.0)
@@ -266,16 +330,72 @@ void main()
 				
 				continue;
 			}			
-			
+			*/
 			if (depthBufferValue < sampleDepth-tolerance)
 			{
 				occlusion +=  1.0;
 			}
 		} 
 
+		// test detect edge.**********************************************************************************
+		/*
+		vec3 normal3 = vec3(-normal2.x, -normal2.y, normal2.z);
+		tangent = normalize(rvec - normal3 * dot(rvec, normal3));
+		bitangent = cross(normal3, tangent);
+		tbn = mat3(tangent, bitangent, normal3);  
+		float edgeRadius = 0.2;
+		edgeOccl = 0.0;
+		tolerance = edgeRadius/far;
+		for(int i = 0; i < kernelSize; ++i)
+		{    	 
+			vec3 sample = origin + (tbn * vec3(kernel[i].x*1.0, kernel[i].y*1.0, kernel[i].z)) * edgeRadius;
+			vec4 offset = projectionMatrix * vec4(sample, 1.0);					
+			offset.xy /= offset.w;
+			offset.xy = offset.xy * 0.5 + 0.5;  				
+			float sampleDepth = -sample.z/far;// original.***
+			////float sampleDepth = -sample.z/(far-near);// test.***
+			////float sampleDepth = -sample.z/farForDepth;
+
+			sampleDepth = 1.0 - sampleDepth;
+
+			float depthBufferValue = getDepth(offset.xy);
+			depthBufferValue = 1.0 - depthBufferValue;
+			
+			if(depthBufferValue > 0.00391 && depthBufferValue < 0.00393)
+			{
+				if (depthBufferValue < sampleDepth-tolerance*1000.0)
+				{
+					edgeOccl +=  0.5;
+				}
+				
+				continue;
+			}			
+			
+			if (depthBufferValue < sampleDepth-tolerance)
+			{
+				edgeOccl +=  1.0;
+			}
+		} 
+
+		if(edgeOccl > 0.5)
+		edgeOccl = float(kernelSize);
+
+		if(edgeOccl > float(kernelSize))
+		edgeOccl = float(kernelSize);
+
+		edgeOccl = 1.0 - edgeOccl;
+		*/
+		// end test.----------------------------------------------------------------------------------------
+
 		//occlusion = 1.0 - occlusion / float(kernelSize);	
 		float smallOccl = occlusion / float(kernelSize);
-		smallOccl *= 0.4;
+
+		//if(isEdge())
+		//smallOccl = 1.0;
+
+		//smallOccl *= 0.4;
+
+		
 		
 		// test.***
 		//ssaoFromDepthTex
@@ -416,7 +536,8 @@ void main()
 	
 	//textureColor = vec4(0.85, 0.85, 0.85, 1.0);
 	
-	vec3 ambientColorAux = vec3(textureColor.x*ambientColor.x, textureColor.y*ambientColor.y, textureColor.z*ambientColor.z);
+	//vec3 ambientColorAux = vec3(textureColor.x*ambientColor.x, textureColor.y*ambientColor.y, textureColor.z*ambientColor.z); // original.***
+	vec3 ambientColorAux = vec3(textureColor.xyz);
 	float alfa = textureColor.w * externalAlpha;
 
     vec4 finalColor;

@@ -232,9 +232,10 @@ Segment2D.prototype.intersectionWithPoint = function(point, error)
  *
  * @param {Segment2D} segment 선분
  * @param {Number} error 오차율
+ * @param {Point2D} resultIntersectedPoint2d The intersected point if INTERSECTION_INTERSECT.
  * @returns 교차 판단 결과값
  */
-Segment2D.prototype.intersectionWithSegment = function(segment, error)
+Segment2D.prototype.intersectionWithSegment = function(segment, error, resultIntersectedPoint2d)
 {
 	if (segment === undefined)
 	{
@@ -256,8 +257,8 @@ Segment2D.prototype.intersectionWithSegment = function(segment, error)
 		return undefined;
 	}
 	
-	var intersectionTypeA = this.intersectionWithPointByDistances(intersectionPoint);
-	var intersectionTypeB = segment.intersectionWithPointByDistances(intersectionPoint);
+	var intersectionTypeA = this.intersectionWithPointByDistances(intersectionPoint, error);
+	var intersectionTypeB = segment.intersectionWithPointByDistances(intersectionPoint, error);
 	//TODO : change the logic. The return value of intersectionWithPointByDistance has four enum type
 	//But the value really used is only one or two. 
 	if (intersectionTypeA === Constant.INTERSECTION_OUTSIDE)
@@ -269,6 +270,9 @@ Segment2D.prototype.intersectionWithSegment = function(segment, error)
 		return Constant.INTERSECTION_OUTSIDE;
 	}
 	
+	if(resultIntersectedPoint2d)
+	resultIntersectedPoint2d.set(intersectionPoint.x, intersectionPoint.y);
+
 	return Constant.INTERSECTION_INTERSECT;
 };
 

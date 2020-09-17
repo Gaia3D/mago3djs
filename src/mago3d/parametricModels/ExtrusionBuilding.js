@@ -14,9 +14,19 @@ var ExtrusionBuilding = function(geographicCoordList, height, options)
 		throw new Error(Messages.CONSTRUCT_ERROR);
     }
     
-    if(!geographicCoordList || !(geographicCoordList instanceof GeographicCoordsList)) {
+    if(!geographicCoordList) {
         throw new Error(Messages.REQUIRED_EMPTY_ERROR('geographicCoordList'));
-    }
+	}
+
+	this.geographicCoordListsArray = [];
+	
+	if(geographicCoordList instanceof GeographicCoordsList) {
+		this.geographicCoordListsArray.push(geographicCoordList);
+	}
+	else if(geographicCoordList instanceof Array)
+	{
+		this.geographicCoordListsArray = geographicCoordList;
+	}
 
     if(height === undefined || height === null) {
         throw new Error(Messages.REQUIRED_EMPTY_ERROR('height'));
@@ -29,10 +39,10 @@ var ExtrusionBuilding = function(geographicCoordList, height, options)
 	MagoRenderable.call(this);
     options = options? options : {};
 
-	this.geographicCoordList = geographicCoordList;
-	this.setGeographicPosition(this.geographicCoordList.getMiddleGeographicCoords());
+	var geoCoordsList = this.geographicCoordListsArray[0]; // take the 1rst geoCoordsList.***
+	this.setGeographicPosition(geoCoordsList.getMiddleGeographicCoords());
 
-	this.localCoordList = makeLocalCooldList(this.geographicCoordList, this.geoLocDataManager.getCurrentGeoLocationData());
+	this.localCoordList = makeLocalCooldList(geoCoordsList, this.geoLocDataManager.getCurrentGeoLocationData());
 
     this.height = height;
     this.color4 = defaultValue(options.color, new Color(1,1,1,1));
@@ -65,9 +75,10 @@ ExtrusionBuilding.prototype = Object.create(MagoRenderable.prototype);
 ExtrusionBuilding.prototype.constructor = ExtrusionBuilding;
 
 ExtrusionBuilding.prototype.makeMesh = function() {
-    if(!this.dirty) return;
-    if (!this.geographicCoordList || this.geographicCoordList.geographicCoordsArray.length === 0)
-	{ return; }
+	if(!this.dirty) return;
+	
+    //if (!this.geographicCoordList || this.geographicCoordList.geographicCoordsArray.length === 0)
+	//{ return; }
 	if(!this.geoLocDataManager) {
         return;
     }
@@ -77,62 +88,68 @@ ExtrusionBuilding.prototype.makeMesh = function() {
         return;
 	}
 
-	// Make the topGeoCoordsList.
-	var topGeoCoordsList = this.geographicCoordList.getCopy();
-	// Reassign the altitude on the geoCoordsListCopy.
-	topGeoCoordsList.addAltitude(this.height);
-	
-	var basePoints3dArray = GeographicCoordsList.getPointsRelativeToGeoLocation(geoLocData, this.geographicCoordList.geographicCoordsArray, undefined);
-	var topPoints3dArray = GeographicCoordsList.getPointsRelativeToGeoLocation(geoLocData, topGeoCoordsList.geographicCoordsArray, undefined);
-	
-	// Now, with basePoints3dArray & topPoints3dArray make a mesh.
-	// Create a VtxProfilesList.
-	var vtxProfilesList = new VtxProfilesList();
-	var baseVtxProfile = vtxProfilesList.newVtxProfile();
-	baseVtxProfile.makeByPoints3DArray(basePoints3dArray, undefined); 
-	var topVtxProfile = vtxProfilesList.newVtxProfile();
-	topVtxProfile.makeByPoints3DArray(topPoints3dArray, undefined); 
-	
-	var bIncludeBottomCap = true;
-	var bIncludeTopCap = true;
-	var solidMesh = vtxProfilesList.getMesh(undefined, bIncludeBottomCap, bIncludeTopCap);
-	var surfIndepMesh = solidMesh.getCopySurfaceIndependentMesh();
-	surfIndepMesh.calculateVerticesNormals();
-
-    /*
-	if (textureInfo)
+	var geoCoordsListsCount = this.geographicCoordListsArray.length;
+	for(var i=0; i<geoCoordsListsCount; i++)
 	{
-		var c = document.createElement("canvas");
-		var ctx = c.getContext("2d");
+		var geographicCoordList = this.geographicCoordListsArray[i];
 
-		c.width = 8;
-		c.height = 32;
-		ctx.beginPath();
-		ctx.fillStyle = "#262626";
-		ctx.rect(0, 0, 8, 1);
-		ctx.fill();
-		ctx.closePath();
-			
-		ctx.beginPath();
-		ctx.fillStyle = textureInfo.color;
-		ctx.rect(0, 1, 8, 31);
-		ctx.fill();
-		ctx.closePath();
+		// Make the topGeoCoordsList.
+		var topGeoCoordsList = geographicCoordList.getCopy();
+		// Reassign the altitude on the geoCoordsListCopy.
+		topGeoCoordsList.addAltitude(this.height);
+		
+		var basePoints3dArray = GeographicCoordsList.getPointsRelativeToGeoLocation(geoLocData, geographicCoordList.geographicCoordsArray, undefined);
+		var topPoints3dArray = GeographicCoordsList.getPointsRelativeToGeoLocation(geoLocData, topGeoCoordsList.geographicCoordsArray, undefined);
+		
+		// Now, with basePoints3dArray & topPoints3dArray make a mesh.
+		// Create a VtxProfilesList.
+		var vtxProfilesList = new VtxProfilesList();
+		var baseVtxProfile = vtxProfilesList.newVtxProfile();
+		baseVtxProfile.makeByPoints3DArray(basePoints3dArray, undefined); 
+		var topVtxProfile = vtxProfilesList.newVtxProfile();
+		topVtxProfile.makeByPoints3DArray(topPoints3dArray, undefined); 
+		
+		var bIncludeBottomCap = true;
+		var bIncludeTopCap = true;
+		var solidMesh = vtxProfilesList.getMesh(undefined, bIncludeBottomCap, bIncludeTopCap);
+		var surfIndepMesh = solidMesh.getCopySurfaceIndependentMesh();
+		surfIndepMesh.calculateVerticesNormals();
 
-		ctx.beginPath();
-		ctx.fillStyle = "#0000ff";
-		ctx.rect(2, 8, 4, 8);
-		ctx.fill();
-		ctx.stroke();
-		ctx.closePath();
+		/*
+		if (textureInfo)
+		{
+			var c = document.createElement("canvas");
+			var ctx = c.getContext("2d");
 
-		surfIndepMesh.material = new Material('test');
-		surfIndepMesh.material.setDiffuseTextureUrl(c.toDataURL());
+			c.width = 8;
+			c.height = 32;
+			ctx.beginPath();
+			ctx.fillStyle = "#262626";
+			ctx.rect(0, 0, 8, 1);
+			ctx.fill();
+			ctx.closePath();
+				
+			ctx.beginPath();
+			ctx.fillStyle = textureInfo.color;
+			ctx.rect(0, 1, 8, 31);
+			ctx.fill();
+			ctx.closePath();
 
-		surfIndepMesh.calculateTexCoordsByHeight(textureInfo.height);
+			ctx.beginPath();
+			ctx.fillStyle = "#0000ff";
+			ctx.rect(2, 8, 4, 8);
+			ctx.fill();
+			ctx.stroke();
+			ctx.closePath();
+
+			surfIndepMesh.material = new Material('test');
+			surfIndepMesh.material.setDiffuseTextureUrl(c.toDataURL());
+
+			surfIndepMesh.calculateTexCoordsByHeight(textureInfo.height);
+		}
+		*/
+		this.objectsArray.push(surfIndepMesh);
 	}
-	*/
-	this.objectsArray.push(surfIndepMesh);
 	this.setDirty(false);
 }
 

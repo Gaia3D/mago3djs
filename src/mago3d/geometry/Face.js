@@ -306,6 +306,17 @@ Face.prototype.calculateVerticesNormals = function(bForceRecalculatePlaneNormal)
 };
 
 /**
+ * Calculates the minimum distance between this face and the point3d.
+ * @param {Point3D} point3d Point that this calculates the min distance to this face.
+ * @returns {Number} the minimum distance between this face and the point3d.
+ * 
+ */
+Face.prototype.calculateMinDistToPoint = function(point3d)
+{
+	// 1rst, must know if the projecti
+};
+
+/**
  * Get the texture coordinate by box projection
  */
 Face.prototype.calculateTexCoordsByHeight = function(height, width)
@@ -694,6 +705,7 @@ Face.prototype.getTessellatedTriangles = function(resultTrianglesArray)
 };
 
 /**
+ * Note: to call this function, this-face must be CONVEX face.
  * 버텍스 배열의 첫번째 배열을 기준으로 삼각형 convex(Triangle)을 생성 후 배열에 담아 반환
  * @param {Array.<Triangle>} resultTrianglesArray undefined일 때, 배열로 초기화.
  * @returns {Array.<Triangle>|undefined} 기존 버텍스 배열이 undefined거나 비어있으면 매개변수 resultTrianglesArray 상태 그대로 반환.

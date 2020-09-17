@@ -161,6 +161,114 @@ Polygon2D.prototype.calculateNormal = function(resultConcavePointsIdxArray)
 };
 
 /**
+ * This function divide the polygon2d in 2 splitted polygons by segment2d.
+ * @param {Polygon2D} polygon2d The polygon to be splitted.
+ * @param {Array[Segment2D]} splitterSegment2dArray The splitter segments array.
+ * @param {Array} resultSplittedPolygons The result splitted 2 polygons container.
+ * @param {Number} error The tolerance.
+ */
+Polygon2D.splitPolygonByMultipleSegments = function(polygon2d, splitterSegment2dArray, resultSplittedPolygons, error)
+{
+	// Note: the geographicCoords needs a low error (error = 1E-5).***
+	if(!error)
+	error = 1E-8;
+
+	var resultSplittedPolygons_A = [];
+	var resultSplittedPolygons_B = [];
+	resultSplittedPolygons_A.push(polygon2d);
+	var error = 1E-5; 
+	var segmentsCount = splitterSegment2dArray.length;
+	for(var i=0; i<segmentsCount; i++)
+	{
+		var segment2d = splitterSegment2dArray[i];
+		var polygonsCount = resultSplittedPolygons_A.length;
+		for(var j=0; j<polygonsCount; j++)
+		{
+			var polygon2d = resultSplittedPolygons_A[j];
+			if(!Polygon2D.splitPolygonBySegment(polygon2d, segment2d, resultSplittedPolygons_B, error))
+			{
+				// polygon NO splitted.***
+				resultSplittedPolygons_B.push(polygon2d);
+			}
+		}
+		
+		resultSplittedPolygons_A = resultSplittedPolygons_B;
+		resultSplittedPolygons_B = [];
+	}
+
+	if(!resultSplittedPolygons)
+	resultSplittedPolygons = [];
+
+	Array.prototype.push.apply(resultSplittedPolygons, resultSplittedPolygons_A);
+
+	return resultSplittedPolygons;
+};
+
+/**
+ * This function divide the polygon2d in 2 splitted polygons by segment2d.
+ * @param {Polygon2D} polygon2d The polygon to be splitted.
+ * @param {Segment2D} segment2d The splitter segment.
+ * @param {Array} resultSplittedPolygons The result splitted 2 polygons container.
+ */
+Polygon2D.splitPolygonBySegment = function(polygon2d, segment2d, resultSplittedPolygons, error)
+{
+	if(!error)
+	error = 1E-8;
+
+	// 1rst, check if segment2d intersects with the polygon2d.***
+	if(!polygon2d.intersectionWithSegment(segment2d, error))
+	{
+		return false;
+	}
+
+	// 1rst, must find the edges to split by segment2d.***
+	
+	var resultIntersectedPoint2d = new Point2D();
+	var point2d_A = new Point2D();
+	var point2d_B = new Point2D();
+	var idx_A = -1;
+	var idx_B = -1;
+
+	var pointsCount = polygon2d.point2dList.getPointsCount();
+	for(var i=0; i<pointsCount; i++)
+	{
+		var mySegment2d = polygon2d.point2dList.getSegment(i, undefined);
+		if(mySegment2d.intersectionWithSegment(segment2d, error, resultIntersectedPoint2d) === Constant.INTERSECTION_INTERSECT)
+		{
+			// Save intersected point data.***
+			if(idx_A < 0)
+			{
+				idx_A = i;
+				point2d_A.set(resultIntersectedPoint2d.x, resultIntersectedPoint2d.y);
+			}
+			else
+			{
+				idx_B = i;
+				point2d_B.set(resultIntersectedPoint2d.x, resultIntersectedPoint2d.y);
+			}
+			
+		}
+	}
+
+	// Now, if 2 points intersected, then insert the 2 points and split the polygon2d.***
+	if(idx_A < 0 || idx_B < 0)
+	{
+		return false;
+	}
+
+	//Point2DList.prototype.insertPoint = function(point2d, idx)
+	var realIdx_A = idx_A+1; // +1 bcos idx_A is a segment_idx, so in a pointsArray the idx_point = idx_segment + 1.***
+	var realIdx_B = idx_B+2; // +2 bcos we inserted a point_A before.
+	polygon2d.point2dList.insertPoint(point2d_A, realIdx_A); 
+	polygon2d.point2dList.insertPoint(point2d_B, realIdx_B); 
+
+	// finally split the polygon2d.***
+	resultSplittedPolygons = polygon2d.splitPolygon(realIdx_A, realIdx_B, resultSplittedPolygons);
+
+	return true;
+};
+
+/**
  * Make the tessellate of the triangles which originally make up single Polygon2D feature (like a patchwork with triangle)
  * To call this function, before must call "calculateNormal" that returns "concaveVerticesIndices"
  * In 2D, "normal" is -1=(cw) or 1=(ccw).
@@ -711,7 +819,6 @@ Polygon2D.prototype.solveUroborus = function()
  */
 Polygon2D.makePolygonByGeographicCoordArray = function(array) 
 {
-
 	var p2dList = new Point2DList();
 	for (var i=0, len=array.length;i<len;i++) 
 	{

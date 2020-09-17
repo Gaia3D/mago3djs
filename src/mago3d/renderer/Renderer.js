@@ -1135,6 +1135,78 @@ Renderer.prototype.renderSilhouette = function()
 };
 
 /**
+ * This function renders the edges by depthBuffer.
+ * @param {WebGLRenderingContext} gl WebGL Rendering Context.
+ */
+Renderer.prototype.renderEdgesFromDepth = function(gl) 
+{
+	// render the edges to texture.
+	var magoManager = this.magoManager;
+	var sceneState = magoManager.sceneState;
+
+	var ssaoFromDepthFbo = magoManager.ssaoFromDepthFbo;
+
+	// bind ssaoFromDepthBuffer.***
+	ssaoFromDepthFbo.bind(); 
+
+	if (magoManager.isFarestFrustum())
+	{
+		gl.clearColor(0, 0, 0, 0);
+		gl.clearDepth(1);
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	}
+
+	var currentShader = magoManager.postFxShadersManager.getShader("ssaoFromDepth"); 
+	currentShader.useProgram();
+	currentShader.bindUniformGenerals();
+
+	//gl.viewport(0, 0, ssaoFromDepthFbo.width, ssaoFromDepthFbo.height);
+	if (magoManager.isCesiumGlobe())
+	{
+		gl.uniform1f(currentShader.frustumFar_loc, 40000.0); // only in cesium.***
+	}
+
+	var bApplySsao = true;
+	gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
+
+	var projectionMatrixInv = sceneState.getProjectionMatrixInv();
+	gl.uniformMatrix4fv(currentShader.projectionMatrixInv_loc, false, projectionMatrixInv._floatArrays);
+
+	gl.uniform1i(currentShader.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
+	//gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
+	//gl.uniform1i(currentShader.bApplyShadow_loc, bApplyShadow);
+	//gl.uniform1i(currentShader.bApplySpecularLighting_loc, true);
+	gl.uniform1f(currentShader.uFCoef_logDepth_loc, sceneState.fCoef_logDepth[0]);
+
+	var noiseTexture = magoManager.texturesStore.getNoiseTexture4x4();
+
+	gl.activeTexture(gl.TEXTURE0);
+	gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);  // original.***
+	gl.activeTexture(gl.TEXTURE1);
+	gl.bindTexture(gl.TEXTURE_2D, noiseTexture);
+	
+
+	if (this.screenQuad === undefined)
+	{
+		this.screenQuad = new ScreenQuad(magoManager.vboMemoryManager);
+	}
+
+	gl.depthMask(false);
+	gl.disable(gl.DEPTH_TEST);
+	//gl.enable(gl.BLEND);
+	
+	this.screenQuad.render(magoManager, currentShader);
+
+	// unbind the ssaoFromDepthBuffer.***
+	ssaoFromDepthFbo.unbind(); 
+
+	//gl.viewport(0, 0, magoManager.sceneState.drawingBufferWidth[0], magoManager.sceneState.drawingBufferHeight[0]);
+
+	gl.depthMask(true);
+	gl.enable(gl.DEPTH_TEST);
+};
+
+/**
  * This function renders the ssao by depthBuffer.
  * @param {WebGLRenderingContext} gl WebGL Rendering Context.
  */
