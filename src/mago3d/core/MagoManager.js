@@ -628,6 +628,16 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 			{
 				var bytesReaded = 0;
 				neoBuilding.parseHeader(neoBuilding.headerDataArrayBuffer, bytesReaded);
+
+				//temp hardcoding
+				var data = node.data;
+				var bbox = node.getBBox();
+				var geographicCoord = data.geographicCoord;
+				var halfZlength = (bbox.maxZ - bbox.minZ) / 2;
+				var lon = geographicCoord.longitude;
+				var lat = geographicCoord.latitude;
+				
+				node.changeLocationAndRotation(lat, lon, halfZlength, 0,0,0, this);
 	
 				counter++;
 				if (counter > 60)
@@ -1665,6 +1675,8 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 	// Render process.***
 	this.doRender(frustumVolumenObject);
 
+	this.drawSelectedExtruionBuildingLabel();
+	this.canvasDirty = true;
 	// test. Draw the buildingNames.***
 	if (this.magoPolicy.getShowLabelInfo())
 	{
@@ -1862,6 +1874,48 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 	
 	rootNodesMap = {};
 
+	ctx.restore(); 
+};
+
+/**
+ * Draw building names on scene.
+ * @private
+ */
+MagoManager.prototype.drawSelectedExtruionBuildingLabel = function() 
+{
+	var selected = this.selectionManager.getSelectedGeneralArray();
+	var selectedLength = selected.length;
+	if(selectedLength === 0) return;
+
+	var canvas = this.getObjectLabel();
+	var ctx = canvas.getContext("2d");
+
+	// lod2.
+	var gl = this.getGl();
+	var worldPosition;
+	var screenCoord;
+	var campos = this.sceneState.camera.position;
+
+	for(var i=0;i<selectedLength;i++)
+	{
+		var nativeModel = selected[i];
+
+		if(!(nativeModel instanceof ExtrusionBuilding)) continue;
+
+		worldPosition = nativeModel.getBBoxCenterPositionWorldCoord();
+		screenCoord = ManagerUtils.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord, this);
+
+		var elemFromPoints = document.elementsFromPoint(screenCoord.x, screenCoord.y);
+		if (elemFromPoints.length === 0) { continue; }
+
+		if (elemFromPoints[0].nodeName === 'CANVAS' && screenCoord.x >= 0 && screenCoord.y >= 0)
+		{
+			ctx.font = "13px Arial";
+			var text = nativeModel.getLevel();
+			ctx.strokeText(text, screenCoord.x, screenCoord.y);
+			ctx.fillText(text, screenCoord.x, screenCoord.y);
+		}
+	}
 	ctx.restore(); 
 };
 
@@ -6440,7 +6494,6 @@ MagoManager.prototype.instantiateStaticModel = function(attributes)
 		node.data.geographicCoord = geoCoord;
 		node.data.rotationsDegree = new Point3D(pitch, roll, heading);
 		node.data.geoLocDataManager = geoLocDataManager;
-
 		// Now, insert node into smartTile.***
 		var targetDepth = 12;
 		this.smartTileManager.putNode(targetDepth, node, this);

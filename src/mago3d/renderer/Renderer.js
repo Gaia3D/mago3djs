@@ -1779,12 +1779,10 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		magoManager.renderer.renderGeometryDepth(gl, renderType, visibleObjControlerNodes);
 		
 		// Draw the axis.***
-		if (selectionManager && magoManager.magoPolicy.getShowOrigin() && selectionManager.getSelectedF4dNode() !== undefined)
+		//if (selectionManager && magoManager.magoPolicy.getShowOrigin() && selectionManager.getSelectedF4dNode() !== undefined)
+		if (magoManager.magoPolicy.getShowOrigin() && visibleObjControlerNodes.getAllVisibles().length > 0)
 		{
-			node = selectionManager.getSelectedF4dNode();
-			var nodes = [node];
-			
-			this.renderAxisNodes(nodes, renderType);
+			this.renderAxisNodes(visibleObjControlerNodes.getAllVisibles(), renderType);
 		}
 
 		
@@ -1854,8 +1852,6 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE);
 			var bDepthRender = false; // magoManager is no depth render.***
 			magoManager.tinTerrainManager.render(magoManager, bDepthRender, renderType);
-			
-			
 		}
 
 		var bApplySsao = false;
@@ -2015,6 +2011,12 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			currentShader.disableVertexAttribArrayAll();
 			gl.useProgram(null);
 		}
+
+		// draw the axis.***
+		if (magoManager.magoPolicy.getShowOrigin() && visibleObjControlerNodes.getAllVisibles().length > 0)
+		{
+			this.renderAxisNodes(visibleObjControlerNodes.getAllVisibles(), renderType);
+		}
 		
 		
 		if (selectionManager && selectionManager.getSelectedF4dNodeArray().length > 0) // if there are an object selected then there are a building selected.***
@@ -2036,14 +2038,14 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			}*/
 			
 			// draw the axis.***
-			if (magoManager.magoPolicy.getShowOrigin())
+			/*if (magoManager.magoPolicy.getShowOrigin())
 			{
 				var node = selectionManager.getSelectedF4dNode();
 				//var geoLocDataManager = node.getNodeGeoLocDataManager();
 				var nodes = [node];
 				
 				this.renderAxisNodes(nodes, renderType);
-			}
+			}*/
 		}
 		
 		

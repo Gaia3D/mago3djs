@@ -1408,7 +1408,7 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 				data.data_name = data_name;
 				data.attributes = attributes;
 				data.attributes.fromSmartTile = true;
-				data.mapping_type = "origin";
+				data.mapping_type = "boundingboxcenter";
 			
 				neoBuilding = new NeoBuilding();
 				data.neoBuilding = neoBuilding;

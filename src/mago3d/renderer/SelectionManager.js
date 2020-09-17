@@ -724,6 +724,7 @@ SelectionManager.prototype.selectionByPolygon2D = function(polygon2D, type) {
 			}
 		}
 		this.currentNodeSelectedArray = selectedNodes;
+		this.currentNodeSelected = selectedNodes[0];
 		result = selectedNodes;
 	} else if(type === InteractionTargetType.NATIVE) {
 		var nativeMap =allVisible.nativeMap;		
@@ -737,6 +738,7 @@ SelectionManager.prototype.selectionByPolygon2D = function(polygon2D, type) {
 			}
 		}
 		this.currentGeneralObjectSelectedArray = selectednative;
+		this.currentGeneralObjectSelected = selectednative[0];
 		result = selectednative;
 	}
 
