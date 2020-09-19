@@ -549,7 +549,7 @@ MagoRenderable.prototype.changeLocationAndRotation = function(latitude, longitud
  * set model position
  * @param {GeographicCoord} geographicCoord 
  */
-MagoRenderable.prototype.setGeographicPosition = function(geographicCoord) 
+MagoRenderable.prototype.setGeographicPosition = function(geographicCoord, heading, pitch, roll) 
 {
 	if (this.geoLocDataManager === undefined)
 	{ this.geoLocDataManager = new GeoLocationDataManager(); }
@@ -558,7 +558,7 @@ MagoRenderable.prototype.setGeographicPosition = function(geographicCoord)
 	if (geoLocData === undefined)
 	{
 		geoLocData = this.geoLocDataManager.newGeoLocationData("default");
-		geoLocData = ManagerUtils.calculateGeoLocationData(geographicCoord.longitude, geographicCoord.latitude, geographicCoord.altitude, undefined, undefined, undefined, geoLocData);
+		geoLocData = ManagerUtils.calculateGeoLocationData(geographicCoord.longitude, geographicCoord.latitude, geographicCoord.altitude, heading, pitch, roll, geoLocData);
 	}
 };
 

@@ -72,6 +72,17 @@ VtxProfile.prototype.getInnerVtxRing = function(idx)
 };
 
 /**
+ * This function returns the convex faces indices-datas after tessellation proces.
+ * @param {Array} resultConvexFacesIndicesData
+ */
+VtxProfile.prototype.calculateConvexFacesIndicesData = function(resultConvexFacesIndicesData)
+{
+	var profile2d = this.getProjectedProfile2D(undefined);
+	resultConvexFacesIndicesData = profile2d.getConvexFacesIndicesData(resultConvexFacesIndicesData);
+	return resultConvexFacesIndicesData;
+};
+
+/**
  * set vertex index in list
  * 
  * @see VertexList#setIdxInList

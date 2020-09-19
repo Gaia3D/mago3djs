@@ -1065,8 +1065,9 @@ NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoMan
 		// 2 = single building skin data type (as vWorld or googleEarth data).
 		// 3 = multi building skin data type (as Shibuya & Odaiba data).
 		// 4 = pointsCloud data type.
-		// 5 = pointsCloud data type pyramidOctree test.	
-		if (this.metaData.projectDataType === undefined || this.metaData.projectDataType > 3)
+		// 5 = pointsCloud data type pyramidOctree test.
+		// 10 = tree data type.	
+		if (this.metaData.projectDataType === undefined || this.metaData.projectDataType === 4 || this.metaData.projectDataType === 5)
 		{ return neoReference.texture.fileLoadState; }
 	
 		if (neoReference.texture === undefined || neoReference.texture.fileLoadState === CODE.fileLoadState.READY)
@@ -1166,6 +1167,15 @@ NeoBuilding.prototype.parseTexturesList = function(arrayBuffer, bytesReaded)
 			var texture = new Texture();
 			texture.textureTypeName = textureTypeName;
 			texture.textureImageFileName = textureImageFileName;
+			var fileExtension = textureImageFileName.split('.').pop();
+			if(fileExtension === "PNG" || fileExtension === "png")
+			{
+				texture.textureImageFileExtension = "PNG";
+			}
+			else{
+				texture.textureImageFileExtension = fileExtension;
+			}
+			
 			
 			if (this.texturesLoaded === undefined)
 			{ this.texturesLoaded = []; }
@@ -1656,33 +1666,52 @@ NeoBuilding.prototype.render = function(magoManager, shader, renderType, refMatr
 	
 	if (currentLod !== undefined)
 	{ this.currentLod = currentLod; }
+
+	var projectDataType = this.metaData.getProjectDataType();
 	
 	// Check metaData.projectDataType.
-	if (this.metaData.projectDataType === 5)
+	if (projectDataType === 5)
 	{
 		// Render pointsCloud pyramidMode.
 		return;
 	}
-	/*
-	if (renderType === 3)
+
+	if (projectDataType === 10)
 	{
-		// Render the shadowMesh.
-		var lod = 5;
-		var lodBuildingData = this.getLodBuildingData(lod);
-		if (lodBuildingData && !lodBuildingData.isModelRef)
+		// This is tree data type.***
+		// Tree-data-type has no lods.***
+		//var octreesRenderedCount = this.renderDetailed(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord);
+		var renderTexture = false;	
+		if (renderType === 0)
 		{
-			// This building is skinType data.
-			this.renderSkin(magoManager, shader, renderType);
+			renderTexture = false;
 		}
-		
+		else if (renderType === 1)
+		{
+			if (this.texturesLoaded && this.texturesLoaded.length>0)
+			{
+				renderTexture = true;
+			}
+			else { renderTexture = false; }
+		}
+		var minSize = 0;
+		if(this.octree.neoReferencesMotherAndIndices)
+		{
+			// no occludeCulling mode.
+			this.octree.neoReferencesMotherAndIndices.currentVisibleIndices = this.octree.neoReferencesMotherAndIndices.neoRefsIndices; // no occludeCulling mode.
+			this.octree.renderContent(magoManager, this, renderType, renderTexture, shader, minSize, refMatrixIdxKey, flipYTexCoord);
+		}
 		return;
 	}
-	*/
-	//this.currentLod = 3; // delete this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	
+	// Check "lodBuildingData".***
+	// In models as "trees" is possible that there are no lodMesh. 20200919.***
+	var lodBuildingData = this.getLodBuildingData(this.currentLod);
+
 	if (this.currentLod <= 2)
 	{
 		// There are buildings that are only skin, so check projectType of the building.
-		var lodBuildingData = this.getLodBuildingData(this.currentLod);
+		
 		if (lodBuildingData && !lodBuildingData.isModelRef)
 		{
 			// This building is skinType data.

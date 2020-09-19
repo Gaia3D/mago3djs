@@ -72,6 +72,7 @@ var MetaData = function()
 	 * 3 = multi building skin data type (as Shibuya & Odaiba data).
 	 * 4 = pointsCloud data type.
 	 * 5 = pointsCloud data type pyramidOctree test.
+	 * 10 = tree data type.
 	 * @type {Number} 
 	 */
 	this.projectDataType;
@@ -201,6 +202,14 @@ MetaData.prototype.deleteObjects = function()
 	this.isSmall = undefined;
 	this.fileLoadState = undefined;
 };
+
+/**
+ * Returns the projectDataType.
+ */
+MetaData.prototype.getProjectDataType = function() 
+{
+	return this.projectDataType;
+}
 
 /**
  * HeaderAsimetric.hed 파일을 불러와서 metadata 부분을 파싱.

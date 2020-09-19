@@ -25,6 +25,24 @@ var VertexList = function()
 };
 
 /**
+ * adds a vertex into this.vertexArray.
+ * @param {Vertex} vertex vertex to add.
+ */
+VertexList.prototype.addVertex = function(vertex)
+{
+	this.vertexArray.push(vertex);
+};
+
+/**
+ * adds a vertex array into this.vertexArray.
+ * @param {Array} vertexArray vertexArray to add.
+ */
+VertexList.prototype.addVertexArray = function(vertexArray)
+{
+	this.vertexArray.push.apply(this.vertexArray, vertexArray);
+};
+
+/**
  * get previus index of vertexArray
  * @static
  * @param {Number} idx index must bigger than 0, less than vertexArray length.

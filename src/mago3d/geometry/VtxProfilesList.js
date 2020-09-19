@@ -219,7 +219,7 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 	// 0-------1
 	
 	if (this.vtxProfilesArray === undefined)
-	{ return resultTriangleMatrix; }
+	{ return resultMesh; }
 
 	if (bLoop === undefined)
 	{ bLoop = false; }
@@ -236,7 +236,7 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 	var vtxProfilesCount = this.getVtxProfilesCount();
 	
 	if (vtxProfilesCount < 2)
-	{ return resultTriangleMatrix; }
+	{ return resultMesh; }
 	
 	if (resultMesh === undefined)
 	{ resultMesh = new Mesh(); }
@@ -372,8 +372,7 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 	{ 
 		// Calculate the convexFacesIndicesData.
 		var vtxProfileFirst = this.getVtxProfile(0);
-		var profile2d = vtxProfileFirst.getProjectedProfile2D(profile2d);
-		this.convexFacesIndicesData = profile2d.getConvexFacesIndicesData(this.convexFacesIndicesData);
+		this.convexFacesIndicesData = vtxProfileFirst.calculateConvexFacesIndicesData(this.convexFacesIndicesData);
 	}
 	
 	var resultSurface;
@@ -415,6 +414,18 @@ VtxProfilesList.getTransversalSurface = function(vtxProfile, convexFacesIndicesD
 {
 	if (resultSurface === undefined)
 	{ resultSurface = new Surface(); }
+
+	if (convexFacesIndicesData === undefined)
+	{ 
+		// Calculate the convexFacesIndicesData.
+		var profile2d = vtxProfile.getProjectedProfile2D(undefined);
+		convexFacesIndicesData = profile2d.getConvexFacesIndicesData(convexFacesIndicesData);
+	}
+
+	//************************************************************************************************
+	// TODO: must create halfEdges of faces and add into "hedgesList" = resultMesh.getHalfEdgesList();
+	// this is necessary in the future when develop boolean operations between meshes.***
+	//************************************************************************************************
 	 
 	var currRing;
 	var currVtxRing;
@@ -450,7 +461,11 @@ VtxProfilesList.getTransversalSurface = function(vtxProfile, convexFacesIndicesD
 			
 			vertex = currVtxRing.vertexList.getVertex(vertexIdx);
 			face.vertexArray.push(vertex);
+			var hedgesArray = [];
+			face.createHalfEdges(hedgesArray);
 		}
+
+		// TODO: set twin between faces.***
 	}
 	
 	return resultSurface;

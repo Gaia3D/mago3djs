@@ -465,6 +465,7 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 		currentShader.enableVertexAttribArray(currentShader.position3_loc);
 		gl.uniform1i(currentShader.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
 		gl.uniform1f(currentShader.uFCoef_logDepth_loc, sceneState.fCoef_logDepth[0]);
+		gl.uniform1i(currentShader.bHasTexture_loc , false);
 
 		currentShader.bindUniformGenerals();
 		gl.uniform3fv(currentShader.scaleLC_loc, [1.0, 1.0, 1.0]); // init referencesMatrix.
@@ -491,6 +492,7 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 		currentShader.useProgram();
 		currentShader.disableVertexAttribArrayAll();
 		currentShader.enableVertexAttribArray(currentShader.position3_loc);
+		gl.uniform1i(currentShader.bHasTexture_loc , false);
 
 		currentShader.bindUniformGenerals();
 		gl.uniform3fv(currentShader.scaleLC_loc, [1.0, 1.0, 1.0]); // init referencesMatrix.

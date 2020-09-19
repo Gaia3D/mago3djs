@@ -1180,13 +1180,19 @@ Mesh.prototype.getVboTrianglesConvex = function(resultVboContainer, vboMemManage
 
 Mesh.prototype.getEdgeSegment3ds = function(resultSegment3dsArray)
 {
+	//****************************************************************************************************************************
+	// TODO: must find NO repeated hedges. Develop function : getNoRepeatedEdges().***
+	// Provisionally we use only "lateral surfaces hedges", because this function is used, for now, to render thickLines edges.
+	// In the future, when develop boolean operations between meshes, frontierHalfEdges will be repeated in pairs.***
+	//****************************************************************************************************************************
 	var frontierHedgesArray = [];
 	var surface;
 	var surfacesCount = this.getSurfacesCount();
 	for (var i=0; i<surfacesCount; i++)
 	{
 		surface = this.getSurface(i);
-		if (surface.name === "outerLateral")
+		//if (surface.name === "outerLateral") // this is provisional.***
+		if (surface.name !== "top" && surface.name !== "bottom") // .***
 		{ frontierHedgesArray = surface.getFrontierHalfEdges(frontierHedgesArray); }
 	}
 

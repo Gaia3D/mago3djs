@@ -13,12 +13,29 @@
         "flipYTexCoords": true
     },
     "children": [],
+    "data_key": "CB_fall",
+    "data_name": "CB_fall",
+    "mapping_type":"origin",
+    "longitude": 126.6130,
+    "latitude": 37.57845,
+    "altitude": 50.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+},
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
     "data_key": "masterplan_0",
     "data_name": "masterplan_0",
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -36,7 +53,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -54,7 +71,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -72,7 +89,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -90,7 +107,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -108,7 +125,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -126,7 +143,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -144,7 +161,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -162,7 +179,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -180,7 +197,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -198,7 +215,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -216,7 +233,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -234,7 +251,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -252,7 +269,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -270,7 +287,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -288,7 +305,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -306,7 +323,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -324,7 +341,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -342,7 +359,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -360,7 +377,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -378,7 +395,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -396,7 +413,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -414,7 +431,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -432,7 +449,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -450,7 +467,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -468,7 +485,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -486,7 +503,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -504,7 +521,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -522,7 +539,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -540,7 +557,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -558,7 +575,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -576,7 +593,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -594,7 +611,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -612,7 +629,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -630,7 +647,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -648,7 +665,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -666,7 +683,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -684,7 +701,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -702,7 +719,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -720,7 +737,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -738,7 +755,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -756,7 +773,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -774,7 +791,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -792,7 +809,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -810,7 +827,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -828,7 +845,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -846,7 +863,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -864,7 +881,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -882,7 +899,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -900,7 +917,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -918,7 +935,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -936,7 +953,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -954,7 +971,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -972,7 +989,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -990,7 +1007,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1008,7 +1025,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1026,7 +1043,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1044,7 +1061,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1062,7 +1079,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1080,7 +1097,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1098,7 +1115,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1116,7 +1133,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1134,7 +1151,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1152,7 +1169,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1170,7 +1187,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1188,7 +1205,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1206,7 +1223,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1224,7 +1241,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1242,7 +1259,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1260,7 +1277,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1278,7 +1295,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1296,7 +1313,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1314,7 +1331,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1332,7 +1349,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1350,7 +1367,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1368,7 +1385,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1386,7 +1403,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1404,7 +1421,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1422,7 +1439,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1440,7 +1457,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1458,7 +1475,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1476,7 +1493,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1494,7 +1511,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1512,7 +1529,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1530,7 +1547,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1548,7 +1565,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1566,7 +1583,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1584,7 +1601,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1602,7 +1619,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1620,7 +1637,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1638,7 +1655,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1656,7 +1673,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1674,7 +1691,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1692,7 +1709,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1710,7 +1727,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1728,7 +1745,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1746,7 +1763,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1764,7 +1781,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1782,7 +1799,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1800,7 +1817,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1818,7 +1835,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1836,7 +1853,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1854,7 +1871,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1872,7 +1889,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1890,7 +1907,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1908,7 +1925,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1926,7 +1943,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1944,7 +1961,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1962,7 +1979,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1980,7 +1997,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -1998,7 +2015,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2016,7 +2033,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2034,7 +2051,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2052,7 +2069,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2070,7 +2087,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2088,7 +2105,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2106,7 +2123,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2124,7 +2141,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2142,7 +2159,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2160,7 +2177,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2178,7 +2195,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2196,7 +2213,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2214,7 +2231,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2232,7 +2249,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2250,7 +2267,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2268,7 +2285,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2286,7 +2303,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2304,7 +2321,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2322,7 +2339,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2340,7 +2357,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2358,7 +2375,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2376,7 +2393,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2394,7 +2411,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2412,7 +2429,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2430,7 +2447,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2448,7 +2465,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2466,7 +2483,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2484,7 +2501,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2502,7 +2519,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2520,7 +2537,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2538,7 +2555,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2556,7 +2573,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2574,7 +2591,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2592,7 +2609,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2610,7 +2627,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2628,7 +2645,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2646,7 +2663,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2664,7 +2681,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2682,7 +2699,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2700,7 +2717,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2718,7 +2735,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2736,7 +2753,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2754,7 +2771,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2772,7 +2789,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2790,7 +2807,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2808,7 +2825,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2826,7 +2843,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2844,7 +2861,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2862,7 +2879,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2880,7 +2897,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2898,7 +2915,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2916,7 +2933,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2934,7 +2951,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2952,7 +2969,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2970,7 +2987,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -2988,7 +3005,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3006,7 +3023,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3024,7 +3041,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3042,7 +3059,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3060,7 +3077,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3078,7 +3095,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3096,7 +3113,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3114,7 +3131,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3132,7 +3149,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3150,7 +3167,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3168,7 +3185,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3186,7 +3203,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3204,7 +3221,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3222,7 +3239,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3240,7 +3257,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3258,7 +3275,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3276,7 +3293,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3294,7 +3311,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3312,7 +3329,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3330,7 +3347,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3348,7 +3365,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3366,7 +3383,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3384,7 +3401,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3402,7 +3419,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3420,7 +3437,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3438,7 +3455,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3456,7 +3473,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3474,7 +3491,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3492,7 +3509,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3510,7 +3527,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3528,7 +3545,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3546,7 +3563,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3564,7 +3581,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3582,7 +3599,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3600,7 +3617,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3618,7 +3635,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3636,7 +3653,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3654,7 +3671,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3672,7 +3689,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3690,7 +3707,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3708,7 +3725,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3726,7 +3743,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3744,7 +3761,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3762,7 +3779,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3780,7 +3797,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3798,7 +3815,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3816,7 +3833,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3834,7 +3851,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3852,7 +3869,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3870,7 +3887,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3888,7 +3905,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3906,7 +3923,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3924,7 +3941,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3942,7 +3959,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3960,7 +3977,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3978,7 +3995,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -3996,7 +4013,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -4014,7 +4031,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -4032,7 +4049,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -4050,7 +4067,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -4068,7 +4085,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -4086,7 +4103,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -4104,7 +4121,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -4122,7 +4139,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -4140,7 +4157,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -4158,7 +4175,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -4176,7 +4193,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -4194,7 +4211,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -4212,7 +4229,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -4230,7 +4247,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -4248,7 +4265,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -4266,7 +4283,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -4284,7 +4301,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -4302,7 +4319,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -4320,7 +4337,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -4338,7 +4355,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -4356,7 +4373,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -4374,7 +4391,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -4392,7 +4409,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -4410,7 +4427,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -4428,7 +4445,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -4446,7 +4463,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -4464,7 +4481,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -4482,7 +4499,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
@@ -4500,7 +4517,7 @@
     "mapping_type":"origin",
     "longitude": 126.6082,
     "latitude": 37.5820,
-    "height": 50.000000,
+    "altitude": 2050.000000,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000

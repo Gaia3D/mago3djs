@@ -2053,6 +2053,19 @@ MagoManager.prototype.TEST__splittedExtrudedBuilding = function()
 	options.wireframeColor4 = new Color(1.0, 0.5, 0.0, 1.0);
 	var extrudedBuilding = new ExtrusionBuilding(geoCoordsListsArray, height, options);
 	this.modeler.addObject(extrudedBuilding, 5);
+
+	// Now, create a clippingPlane.***
+	//var options = {};
+	options.position = {
+		longitude : 127.0068,
+		latitude : 37.45136,
+		altitude : 120.0
+	};
+	options.color = new Color(0.3, 0.8, 0.8, 0.5);
+	options.isMovable = true;
+
+	var clippingPlane = new ClippingPlane(options);
+	this.modeler.addObject(clippingPlane, 5);
 	
 	var hola = 0;
 };
@@ -5565,6 +5578,7 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 						// 2 = single building skin data type (as vWorld or googleEarth data).***
 						// 3 = multi building skin data type (as Shibuya & Odaiba data).***
 						// 4, 5 = pointsCloud data type.***
+						// 10 = tree data type.***
 						visibleNodes.putNodeToArraySortedByDist(visibleNodes.currentVisiblesAux, node);
 					}
 					// end provisional test.-----------------------------

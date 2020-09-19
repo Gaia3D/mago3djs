@@ -3242,6 +3242,10 @@ precision highp float;\n\
 #extension GL_EXT_frag_depth : enable\n\
 #endif\n\
 \n\
+uniform sampler2D diffuseTex; // used only if texture is PNG, that has pixels with alpha = 0.0.***\n\
+uniform bool bHasTexture; // indicates if texture is PNG, that has pixels with alpha = 0.0.***\n\
+varying vec2 vTexCoord; // used only if texture is PNG, that has pixels with alpha = 0.0.***\n\
+\n\
 uniform float near;\n\
 uniform float far;\n\
 \n\
@@ -3305,6 +3309,15 @@ void main()\n\
 		if(discardFrag)\n\
 		discard;\n\
 	}\n\
+\n\
+	// check if is a pixel with alpha zero.***\n\
+	if(bHasTexture)\n\
+	{\n\
+		vec4 textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));\n\
+		if(textureColor.a < 0.4)\n\
+		discard;\n\
+	}\n\
+\n\
 	if(!bUseLogarithmicDepth)\n\
     	gl_FragData[0] = packDepth(-depth);\n\
 \n\
@@ -3317,6 +3330,7 @@ void main()\n\
 	#endif\n\
 }";
 ShaderSource.RenderShowDepthVS = "attribute vec3 position;\n\
+attribute vec2 texCoord;\n\
 \n\
 uniform mat4 buildingRotMatrix; \n\
 uniform mat4 modelViewMatrix;\n\
@@ -3336,11 +3350,14 @@ uniform int refMatrixType; // 0= identity, 1= translate, 2= transform\n\
 uniform bool bUseLogarithmicDepth;\n\
 uniform float uFCoef_logDepth;\n\
 \n\
+uniform bool bHasTexture; // indicates if texture is PNG, that has pixels with alpha = 0.0.***\n\
+\n\
 varying float flogz;\n\
 varying float Fcoef_half;\n\
 \n\
 varying float depth;\n\
 varying vec3 vertexPos;\n\
+varying vec2 vTexCoord; // used only if texture is PNG, that has pixels with alpha = 0.0.***\n\
   \n\
 void main()\n\
 {	\n\
@@ -3387,6 +3404,11 @@ void main()\n\
 	}\n\
 \n\
 	vertexPos = orthoPos.xyz;\n\
+\n\
+	if(bHasTexture)\n\
+	{\n\
+		vTexCoord = texCoord;\n\
+	}\n\
 }";
 ShaderSource.ScreenQuadFS = "#ifdef GL_ES\n\
     precision highp float;\n\

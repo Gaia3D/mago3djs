@@ -7,6 +7,10 @@ precision highp float;
 #extension GL_EXT_frag_depth : enable
 #endif
 
+uniform sampler2D diffuseTex; // used only if texture is PNG, that has pixels with alpha = 0.0.***
+uniform bool bHasTexture; // indicates if texture is PNG, that has pixels with alpha = 0.0.***
+varying vec2 vTexCoord; // used only if texture is PNG, that has pixels with alpha = 0.0.***
+
 uniform float near;
 uniform float far;
 
@@ -70,6 +74,15 @@ void main()
 		if(discardFrag)
 		discard;
 	}
+
+	// check if is a pixel with alpha zero.***
+	if(bHasTexture)
+	{
+		vec4 textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));
+		if(textureColor.a < 0.4)
+		discard;
+	}
+
 	if(!bUseLogarithmicDepth)
     	gl_FragData[0] = packDepth(-depth);
 

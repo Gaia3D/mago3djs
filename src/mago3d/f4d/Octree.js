@@ -421,6 +421,19 @@ Octree.prototype.prepareSkinData = function(magoManager)
 	if (this.octree_number_name === undefined)
 	{ return; }
 	
+	var neoBuilding = this.neoBuildingOwner;
+	if (neoBuilding === undefined)
+	{ return; }
+
+	var projectDataType = neoBuilding.metaData.getProjectDataType();
+	if(projectDataType === 10)
+	{
+		// projectDataType = 10 -> treeDataType.***
+		// this dataType has no skinData, so load detailed data.***
+		this.prepareModelReferencesListData(magoManager);
+		return;
+	}
+
 	if (this.lego === undefined) 
 	{
 		this.lego = new Lego();
@@ -428,10 +441,6 @@ Octree.prototype.prepareSkinData = function(magoManager)
 		this.lego.fileLoadState = CODE.fileLoadState.READY;
 		this.lego.legoKey = this.octreeKey + "_lego";
 	}
-
-	var neoBuilding = this.neoBuildingOwner;
-	if (neoBuilding === undefined)
-	{ return; }
 	
 	var gl = magoManager.sceneState.gl;
 	var geometryDataPath = magoManager.readerWriter.geometryDataPath;
@@ -751,6 +760,16 @@ Octree.prototype.renderContent = function(magoManager, neoBuilding, renderType, 
 	// This function renders the "neoReferencesMotherAndIndices" or the lego.
 	var rendered = false;
 	var gl = magoManager.sceneState.gl;
+
+	// Check lodBuildingData.***
+	//var lodBuildingData = neoBuilding.getLodBuildingData(this.lod);
+	var projectDataType = neoBuilding.metaData.getProjectDataType();
+	if(projectDataType === 10)
+	{
+		rendered = this.neoReferencesMotherAndIndices.render(magoManager, neoBuilding, renderType, renderTexture, shader, minSizeToRender, refMatrixIdxKey);
+		return rendered;
+	}
+
 
 	if (this.lod < 2)
 	{

@@ -421,12 +421,30 @@ GeoLocationData.prototype.worldCoordToLocalCoord = function(worldCoord, resultLo
 	var tMatrixInv = this.getTMatrixInv();
 	if (worldCoord === undefined || tMatrixInv === undefined)
 	{ return undefined; }
-	
-	if (resultLocalCoord === undefined)
-	{ resultLocalCoord = new Point3D(); }
-	
-	resultLocalCoord = tMatrixInv.transformPoint3D(worldCoord, resultLocalCoord); 
-	return resultLocalCoord;
+
+	// Now, check if "worldCoord" is instance of Point3D or is an instance of Array.***
+	if(worldCoord instanceof GeographicCoord)
+	{
+		if (resultLocalCoord === undefined)
+		{ resultLocalCoord = new Point3D(); }
+
+		resultLocalCoord = tMatrixInv.transformPoint3D(worldCoord, resultLocalCoord); 
+		return resultLocalCoord;
+	}
+	else if(worldCoord instanceof Array)
+	{
+		if(!resultLocalCoord)
+		resultLocalCoord = [];
+
+		var coordsCount = worldCoord.length;
+		for(var i=0; i<coordsCount; i++)
+		{
+			var coord = worldCoord[i];
+			var coordLC = tMatrixInv.transformPoint3D(coord, undefined); 
+			resultLocalCoord.push(coordLC);
+		}
+		return resultLocalCoord;
+	}
 };
 
 /**

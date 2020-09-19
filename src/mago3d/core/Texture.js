@@ -16,6 +16,7 @@ var Texture = function(options)
 
 	this.textureTypeName = "";
 	this.textureImageFileName = "";
+	this.textureImageFileExtension = "";
 	this.texId; // webGlTexture.
 	this.fileLoadState = CODE.fileLoadState.READY;
 	this.imageBinaryData;

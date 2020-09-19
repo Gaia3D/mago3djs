@@ -302,6 +302,35 @@ NeoReference.prototype.isReadyToRender = function()
 };
 
 /**
+ * Used in depth render. 
+ */
+NeoReference.prototype.solveReferencePngTextureForDepthRender = function(magoManager, neoBuilding, shader, currentObjectsRendering) 
+{
+	var gl = magoManager.getGl();
+
+	if(!this.texture)
+	{
+		// set into shader : bHasTexture = false.***
+		gl.uniform1i(shader.bHasTexture_loc , false);
+		return false;
+	}
+	
+	if(this.texture.textureImageFileExtension === "PNG")
+	{
+		gl.uniform1i(shader.bHasTexture_loc , true);
+		if (shader.last_tex_id !== this.texture.texId) 
+		{
+			gl.activeTexture(gl.TEXTURE2);
+			gl.bindTexture(gl.TEXTURE_2D, this.texture.texId);
+			shader.last_tex_id = this.texture.texId;
+		}
+
+		return true;
+	}
+	return false;
+};
+
+/**
  * Renders the content.
  */
 NeoReference.prototype.solveReferenceColorOrTexture = function(magoManager, neoBuilding, shader, currentObjectsRendering) 
@@ -575,7 +604,14 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 	}
 
 	// Check the color or texture of reference object.
-	if (renderType === 1)
+	var bDepthRenderWithTexture = false;
+	if (renderType === 0)
+	{
+		//neoReference.solveReferenceColorOrTexture(magoManager, neoBuilding, shader, currentObjectsRendering);
+		// this is depth render, but must check if an object has png image.***
+		bDepthRenderWithTexture = neoReference.solveReferencePngTextureForDepthRender(magoManager, neoBuilding, shader, currentObjectsRendering);
+	}
+	else if (renderType === 1)
 	{
 		neoReference.solveReferenceColorOrTexture(magoManager, neoBuilding, shader, currentObjectsRendering);
 	}
@@ -641,7 +677,21 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 		if (!vboKey.bindDataPosition(shader, magoManager.vboMemoryManager))
 		{ return false; }
 
-		if (renderType === 1)
+		if (renderType === 0)
+		{
+			if(bDepthRenderWithTexture)
+			{
+				shader.enableVertexAttribArray(shader.texCoord2_loc); 
+				var refVboData = neoReference.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray[n];
+				if (!refVboData.bindDataTexCoord(shader, magoManager.vboMemoryManager))
+				{ return false; }
+			}
+			else
+			{
+				shader.disableVertexAttribArray(shader.texCoord2_loc); 
+			}
+		}
+		else if (renderType === 1)
 		{
 			// Normals.
 			if (!vboKey.bindDataNormal(shader, magoManager.vboMemoryManager))
@@ -666,6 +716,8 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 				shader.disableVertexAttribArray(shader.texCoord2_loc); 
 			}
 		}
+
+		
 
 		// Indices.
 		var indicesCount;

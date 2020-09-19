@@ -1,4 +1,5 @@
 attribute vec3 position;
+attribute vec2 texCoord;
 
 uniform mat4 buildingRotMatrix; 
 uniform mat4 modelViewMatrix;
@@ -18,11 +19,14 @@ uniform int refMatrixType; // 0= identity, 1= translate, 2= transform
 uniform bool bUseLogarithmicDepth;
 uniform float uFCoef_logDepth;
 
+uniform bool bHasTexture; // indicates if texture is PNG, that has pixels with alpha = 0.0.***
+
 varying float flogz;
 varying float Fcoef_half;
 
 varying float depth;
 varying vec3 vertexPos;
+varying vec2 vTexCoord; // used only if texture is PNG, that has pixels with alpha = 0.0.***
   
 void main()
 {	
@@ -69,4 +73,9 @@ void main()
 	}
 
 	vertexPos = orthoPos.xyz;
+
+	if(bHasTexture)
+	{
+		vTexCoord = texCoord;
+	}
 }

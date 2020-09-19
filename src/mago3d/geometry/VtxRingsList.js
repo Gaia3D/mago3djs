@@ -1,9 +1,9 @@
 'use strict';
 /**
- * vertex ring list.
+ * vertex ring list. Used in VtxProfile as inner-vtxRingsList.
  * @exception {Error} Messages.CONSTRUCT_ERROR
  * 
- * @class VtxRing
+ * @class VtxRingsList
  * @constructor
  */
 var VtxRingsList = function() 
@@ -13,7 +13,7 @@ var VtxRingsList = function()
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	/**
-	 * vertex list.
+	 * vertex rings array.
 	 * @type {Array.<VtxRing>}
 	 */
 	this.vtxRingsArray;
