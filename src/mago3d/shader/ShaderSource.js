@@ -3245,6 +3245,7 @@ precision highp float;\n\
 uniform sampler2D diffuseTex; // used only if texture is PNG, that has pixels with alpha = 0.0.***\n\
 uniform bool bHasTexture; // indicates if texture is PNG, that has pixels with alpha = 0.0.***\n\
 varying vec2 vTexCoord; // used only if texture is PNG, that has pixels with alpha = 0.0.***\n\
+uniform bool textureFlipYAxis;\n\
 \n\
 uniform float near;\n\
 uniform float far;\n\
@@ -3313,7 +3314,14 @@ void main()\n\
 	// check if is a pixel with alpha zero.***\n\
 	if(bHasTexture)\n\
 	{\n\
-		vec4 textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));\n\
+		vec4 textureColor;\n\
+		if(textureFlipYAxis)\n\
+        {\n\
+            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));\n\
+        }\n\
+        else{\n\
+            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));\n\
+        }\n\
 		if(textureColor.a < 0.4)\n\
 		discard;\n\
 	}\n\
