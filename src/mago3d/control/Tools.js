@@ -353,11 +353,11 @@ Tools.prototype.setControl = function(magoManager)
 
 	var allSelectBtn = document.createElement('button');
 	allSelectBtn.setAttribute('type', 'button');
-	allSelectBtn.dataset.type = InteractionTargetType.F4D;
+	allSelectBtn.dataset.type = DataType.F4D;
 	allSelectBtn.dataset.function = 'select';
 	allSelectBtn.dataset.active = 'off';
 	allSelectBtn.className = 'mago3d-tools-select';
-	allSelectBtn.name = 'btn-' + InteractionTargetType.F4D;
+	allSelectBtn.name = 'btn-' + DataType.F4D;
 	allSelectBtn.style.display = 'inline-block';
 	allSelectBtn.style.verticalAlign = 'middle';
 	allSelectBtn.style.padding = '2px 10px';
@@ -371,11 +371,11 @@ Tools.prototype.setControl = function(magoManager)
 
 	var allMoveBtn = document.createElement('button');
 	allMoveBtn.setAttribute('type', 'button');
-	allMoveBtn.dataset.type = InteractionTargetType.F4D;
+	allMoveBtn.dataset.type = DataType.F4D;
 	allMoveBtn.dataset.function = 'translate';
 	allMoveBtn.dataset.active = 'off';
 	allMoveBtn.className = 'mago3d-tools-translate';
-	allMoveBtn.name = 'btn-' + InteractionTargetType.F4D;
+	allMoveBtn.name = 'btn-' + DataType.F4D;
 	allMoveBtn.style.display = 'inline-block';
 	allMoveBtn.style.verticalAlign = 'middle';
 	allMoveBtn.style.marginLeft = '5px';
@@ -402,11 +402,11 @@ Tools.prototype.setControl = function(magoManager)
 
 	var partSelectBtn = document.createElement('button');
 	partSelectBtn.setAttribute('type', 'button');
-	partSelectBtn.dataset.type = InteractionTargetType.OBJECT;
+	partSelectBtn.dataset.type = DataType.OBJECT;
 	partSelectBtn.dataset.function = 'select';
 	partSelectBtn.dataset.active = 'off';
 	partSelectBtn.className = 'mago3d-tools-select';
-	partSelectBtn.name = 'btn-' + InteractionTargetType.OBJECT;
+	partSelectBtn.name = 'btn-' + DataType.OBJECT;
 	partSelectBtn.style.display = 'inline-block';
 	partSelectBtn.style.verticalAlign = 'middle';
 	partSelectBtn.style.padding = '2px 10px';
@@ -420,11 +420,11 @@ Tools.prototype.setControl = function(magoManager)
 
 	var partMoveBtn = document.createElement('button');
 	partMoveBtn.setAttribute('type', 'button');
-	partMoveBtn.dataset.type = InteractionTargetType.OBJECT;
+	partMoveBtn.dataset.type = DataType.OBJECT;
 	partMoveBtn.dataset.function = 'translate';
 	partMoveBtn.dataset.active = 'off';
 	partMoveBtn.className = 'mago3d-tools-translate';
-	partMoveBtn.name = 'btn-' + InteractionTargetType.OBJECT;
+	partMoveBtn.name = 'btn-' + DataType.OBJECT;
 	partMoveBtn.style.display = 'inline-block';
 	partMoveBtn.style.verticalAlign = 'middle';
 	partMoveBtn.style.marginLeft = '5px';
@@ -451,11 +451,11 @@ Tools.prototype.setControl = function(magoManager)
 
 	var nativeSelectBtn = document.createElement('button');
 	nativeSelectBtn.setAttribute('type', 'button');
-	nativeSelectBtn.dataset.type = InteractionTargetType.NATIVE;
+	nativeSelectBtn.dataset.type = DataType.NATIVE;
 	nativeSelectBtn.dataset.function = 'select';
 	nativeSelectBtn.dataset.active = 'off';
 	nativeSelectBtn.className = 'mago3d-tools-select';
-	nativeSelectBtn.name = 'btn-' + InteractionTargetType.NATIVE;
+	nativeSelectBtn.name = 'btn-' + DataType.NATIVE;
 	nativeSelectBtn.style.display = 'inline-block';
 	nativeSelectBtn.style.verticalAlign = 'middle';
 	nativeSelectBtn.style.padding = '2px 10px';
@@ -469,11 +469,11 @@ Tools.prototype.setControl = function(magoManager)
 
 	var nativeMoveBtn = document.createElement('button');
 	nativeMoveBtn.setAttribute('type', 'button');
-	nativeMoveBtn.dataset.type = InteractionTargetType.NATIVE;
+	nativeMoveBtn.dataset.type = DataType.NATIVE;
 	nativeMoveBtn.dataset.function = 'translate';
 	nativeMoveBtn.dataset.active = 'off';
 	nativeMoveBtn.className = 'mago3d-tools-translate';
-	nativeMoveBtn.name = 'btn-' + InteractionTargetType.NATIVE;
+	nativeMoveBtn.name = 'btn-' + DataType.NATIVE;
 	nativeMoveBtn.style.display = 'inline-block';
 	nativeMoveBtn.style.verticalAlign = 'middle';
 	nativeMoveBtn.style.marginLeft = '5px';
@@ -490,7 +490,7 @@ Tools.prototype.setControl = function(magoManager)
 	var selectInteraction = magoManager.defaultSelectInteraction;
 	var translateBtns = magoManager.defaultContentContainer.getElementsByClassName('mago3d-tools-translate');
 	var translateInteraction = magoManager.defaultTranslateInteraction;
-	var names = [InteractionTargetType.NATIVE, InteractionTargetType.OBJECT, InteractionTargetType.F4D];
+	var names = [DataType.NATIVE, DataType.OBJECT, DataType.F4D];
 	
 
 	for (var i=0, sLength=selectBtns.length;i<sLength;i++)

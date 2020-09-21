@@ -25,6 +25,7 @@ var MagoRenderable = function(options)
 	this.selectedColor4;
 	this.objectType = MagoRenderable.OBJECT_TYPE.MESH; // Init as mesh type.
 
+	this.terrainHeight = 0;
 	this.eventObject = {};
 	
 	this.options = options;
@@ -572,11 +573,31 @@ MagoRenderable.prototype.intersectionWithPolygon2D = function(polygon2D)
 	var result = false;
 	if (this.geographicCoordList) 
 	{
-		var geographicArray = this.geographicCoordList.geographicCoordsArray;
-		var nativePolygon2D = Polygon2D.makePolygonByGeographicCoordArray(geographicArray);
-
-		result = polygon2D.intersectionWithPolygon2D(nativePolygon2D);
+		result = intersectionWithPolygon2D(polygon2D, this.geographicCoordList.geographicCoordsArray);
+	} else if (this.geographicCoordListsArray)
+	{
+		for(var i=0,len=this.geographicCoordListsArray.length;i<len;i++)
+		{
+			if(intersectionWithPolygon2D(polygon2D, this.geographicCoordListsArray[i].geographicCoordsArray)) {
+				result = true;
+				break;
+			}
+		}
 	}
 
 	return result;
+
+	function intersectionWithPolygon2D(target, gcList){
+		return target.intersectionWithPolygon2D(Polygon2D.makePolygonByGeographicCoordArray(gcList));
+	}
 };
+
+/**
+ * set terrain height. fire makemesh
+ * @param {number} height terrain height
+ */
+MagoRenderable.prototype.setTerrainHeight = function(height)
+{
+	this.terrainHeight = height;
+	this.setDirty(true);
+}

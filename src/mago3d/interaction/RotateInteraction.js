@@ -17,7 +17,7 @@ var RotateInteraction = function(option)
 	option = option ? option : {};
 	AbsPointerInteraction.call(this, option);
     
-	this.targetType = defaultValue(option.targetType, InteractionTargetType.F4D);
+	this.targetType = defaultValue(option.targetType, DataType.F4D);
 	this.filter = defaultValue(option.filter, 'selected');
 	this.filter_;
     
@@ -115,9 +115,9 @@ RotateInteraction.prototype.handleDownEvent = function(browserEvent)
 	if (!isEmpty(filterProvisional))
 	{
 		this.target = filterProvisional[this.targetType][0];
-		if (this.targetType === InteractionTargetType.OBJECT)
+		if (this.targetType === DataType.OBJECT)
 		{
-			this.parentNode = filterProvisional[InteractionTargetType.F4D][0];
+			this.parentNode = filterProvisional[DataType.F4D][0];
 		}
 		var currentGeoLocData = this.target.getCurrentGeoLocationData();
 		var currentGeoCoord = currentGeoLocData.geographicCoord;

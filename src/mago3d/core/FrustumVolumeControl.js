@@ -152,3 +152,22 @@ FrustumVolumeControl.prototype.getAllVisiblesObject = function()
 		nativeMap : nativeMap
 	};
 };
+
+FrustumVolumeControl.prototype.selectionByPolygon2D = function(polygon2D, type) {
+	var allVisible = this.getAllVisiblesObject();
+	
+	var result = [];
+	var dataMap = (type === DataType.F4D) ? allVisible.nodeMap : allVisible.nativeMap;
+
+	for(var k in dataMap) {
+		if(dataMap.hasOwnProperty(k)) {
+			var data = dataMap[k];
+
+			if(data.intersectionWithPolygon2D(polygon2D)) {
+				result.push(data);
+			}
+		}
+	}
+
+	return result;
+}

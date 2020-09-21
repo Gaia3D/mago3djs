@@ -17,7 +17,7 @@ var NativeUpDownInteraction = function(option)
 	option = option ? option : {};
 	AbsPointerInteraction.call(this, option);
     
-	this.targetType = InteractionTargetType.NATIVE;
+	this.targetType = DataType.NATIVE;
 	this.filter = defaultValue(option.filter, 'selected');
 	this.filter_;
 	this.offset = defaultValue(option.filter, 3.3);

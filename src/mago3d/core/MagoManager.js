@@ -630,7 +630,7 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 				neoBuilding.parseHeader(neoBuilding.headerDataArrayBuffer, bytesReaded);
 
 				//temp hardcoding
-				var data = node.data;
+				/*var data = node.data;
 				var bbox = node.getBBox();
 				var geographicCoord = data.geographicCoord;
 				var halfZlength = (bbox.maxZ - bbox.minZ) / 2;
@@ -638,7 +638,7 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 				var lat = geographicCoord.latitude;
 				
 				node.changeLocationAndRotation(lat, lon, halfZlength, 0,0,0, this);
-	
+				*/
 				counter++;
 				if (counter > 60)
 				{ break; }
@@ -1522,12 +1522,6 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	
 	// 4) Render filter.******************************************************************************************************************
 	//this.renderFilter();
-
-	if(!this.splittExtrudeBuilding)
-	{
-		this.TEST__splittedExtrudedBuilding();
-		this.splittExtrudeBuilding = true;
-	}
 };
 
 /**
@@ -1894,13 +1888,12 @@ MagoManager.prototype.drawSelectedExtruionBuildingLabel = function()
 	var gl = this.getGl();
 	var worldPosition;
 	var screenCoord;
-	var campos = this.sceneState.camera.position;
 
 	for(var i=0;i<selectedLength;i++)
 	{
 		var nativeModel = selected[i];
 
-		if(!(nativeModel instanceof ExtrusionBuilding)) continue;
+		if(!(nativeModel instanceof ExtrusionBuilding) || this.modeler.objectsArray.indexOf(nativeModel) < 0) continue;
 
 		worldPosition = nativeModel.getBBoxCenterPositionWorldCoord();
 		screenCoord = ManagerUtils.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord, this);

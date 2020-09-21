@@ -13,7 +13,7 @@ var Modeler = function(magoManager)
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
-	
+	Emitter.call(this);
 	this.magoManager = magoManager;
 	
 	/*
@@ -42,6 +42,12 @@ var Modeler = function(magoManager)
 	this.vectorsArray; // put here vector objects (lines, polylines, etc.).***
 	this.currentVisibleObjectsArray;
 };
+Modeler.EVENT_TYPE = {
+	'ADD' : 'add'
+}
+
+Modeler.prototype = Object.create(Emitter.prototype);
+Modeler.prototype.constructor = Modeler;
 
 Modeler.prototype.extractObjectsByClassName = function(className, resultObjectsArray) 
 {
@@ -122,6 +128,12 @@ Modeler.prototype.addObject = function(object, depth)
 	// Note: the targetDepth must be calculated by the objects bbox size.
 	var targetDepth = depth ? depth : 5;
 	smartTileManager.putObject(targetDepth, object, this.magoManager);
+
+	this.emit(Modeler.EVENT_TYPE.ADD, {
+		type :Modeler.EVENT_TYPE.ADD,
+		timestamp : new Date().getTime(),
+		add : object
+	});
 };
 
 /**

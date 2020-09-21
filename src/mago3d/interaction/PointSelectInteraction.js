@@ -19,7 +19,7 @@ var PointSelectInteraction = function(option)
 	
 	this.selected = undefined;
 
-	this.targetType = defaultValue(option.targetType, InteractionTargetType.F4D);
+	this.targetType = defaultValue(option.targetType, DataType.F4D);
 	this.targetHighlight = defaultValue(option.targetHighlight, true);
 
 	var that = this;
@@ -123,15 +123,15 @@ PointSelectInteraction.prototype.handleUpEvent = function(browserEvent)
 	var oldSelected = this.selected;
 	switch (this.targetType)
 	{
-	case InteractionTargetType.F4D : {
+	case DataType.F4D : {
 		this.selected = selectionManager.getSelectedF4dNode();
 		break;
 	}
-	case InteractionTargetType.OBJECT : {
+	case DataType.OBJECT : {
 		this.selected = selectionManager.getSelectedF4dObject();
 		break;
 	}
-	case InteractionTargetType.NATIVE : {
+	case DataType.NATIVE : {
 		this.selected = selectionManager.getSelectedGeneral();
 		break;
 	}
@@ -160,15 +160,15 @@ PointSelectInteraction.getEventType = function(target, selected)
 	var eventType;
 	switch (target)
 	{
-	case InteractionTargetType.F4D : {
+	case DataType.F4D : {
 		eventType = selected ? MagoManager.EVENT_TYPE.SELECTEDF4D : MagoManager.EVENT_TYPE.DESELECTEDF4D;
 		break;
 	}
-	case InteractionTargetType.OBJECT : {
+	case DataType.OBJECT : {
 		eventType = selected ? MagoManager.EVENT_TYPE.SELECTEDF4DOBJECT : MagoManager.EVENT_TYPE.DESELECTEDF4DOBJECT;
 		break;
 	}
-	case InteractionTargetType.NATIVE : {
+	case DataType.NATIVE : {
 		eventType = selected ? MagoManager.EVENT_TYPE.SELECTEDGENERALOBJECT : MagoManager.EVENT_TYPE.DESELECTEDGENERALOBJECT;
 		break;
 	}

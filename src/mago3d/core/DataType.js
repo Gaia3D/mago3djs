@@ -1,9 +1,9 @@
 'use strict';
 /**
  * @enum
- * Interaction target type enum
+ * mago3d data type enum
  */
-var InteractionTargetType = {
+var DataType = {
 	'F4D'    : 'f4d',
 	'OBJECT' : 'object',
 	'NATIVE' : 'native',
