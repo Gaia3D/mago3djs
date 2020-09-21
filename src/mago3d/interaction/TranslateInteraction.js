@@ -17,7 +17,7 @@ var TranslateInteraction = function(option)
 	option = option ? option : {};
 	AbsPointerInteraction.call(this, option);
     
-	this.targetType = defaultValue(option.targetType, InteractionTargetType.F4D);
+	this.targetType = defaultValue(option.targetType, DataType.F4D);
 	this.filter = defaultValue(option.filter, 'selected');
 	this.filter_;
     
@@ -121,9 +121,9 @@ TranslateInteraction.prototype.handleDownEvent = function(browserEvent)
 	if (!isEmpty(filterProvisional))
 	{
 		this.target = filterProvisional[this.targetType][0];
-		if (this.targetType === InteractionTargetType.OBJECT)
+		if (this.targetType === DataType.OBJECT)
 		{
-			this.parentNode = filterProvisional[InteractionTargetType.F4D][0];
+			this.parentNode = filterProvisional[DataType.F4D][0];
 		}
 	}
 	else 
@@ -139,15 +139,15 @@ TranslateInteraction.prototype.handleDragEvent = function(browserEvent)
 		this.manager.setCameraMotion(false);
 		switch (this.targetType)
 		{
-		case InteractionTargetType.F4D : {
+		case DataType.F4D : {
 			this.handleF4dDrag(browserEvent);
 			break;
 		}
-		case InteractionTargetType.OBJECT : {
+		case DataType.OBJECT : {
 			this.handleObjectDrag(browserEvent);
 			break;
 		}
-		case InteractionTargetType.NATIVE : {
+		case DataType.NATIVE : {
 			this.handleNativeDrag(browserEvent);
 			break;
 		}
@@ -426,18 +426,22 @@ TranslateInteraction.prototype.handleNativeDrag = function(browserEvent)
 	{
 		geoLocationData = ManagerUtils.calculateGeoLocationData(difX, difY, undefined, undefined, undefined, undefined, geoLocationData, this);
 
-		if(object.localCoordList && object.geographicCoordList) {
-			var arr = [];
+		if(object.localCoordListArray && object.geographicCoordListsArray) {
+			var geographicCoordListsArray = [];
 			var tmat = geoLocationData.tMatrix;
-			for(var i=0,len=object.localCoordList.length; i<len; i++)
+			for(var i=0,len=object.localCoordListArray.length; i<len; i++)
 			{
-				var lc = object.localCoordList[i];
-				var wc = tmat.transformPoint3D(lc);
-				var gc = ManagerUtils.pointToGeographicCoord(wc);
-				arr.push(gc);
+				var localCoordList = object.localCoordListArray[i];
+				var geographicCoordArray = [];
+				for(var j=0,localCoordListLen=localCoordList.length; j<localCoordListLen;j++) {
+					var lc = localCoordList[j];
+					var wc = tmat.transformPoint3D(lc);
+					var gc = ManagerUtils.pointToGeographicCoord(wc);
+					geographicCoordArray.push(gc);
+				}
+				geographicCoordListsArray.push(new GeographicCoordsList(geographicCoordArray));
 			}
-
-			object.geographicCoordList = new GeographicCoordsList(arr);
+			object.geographicCoordListsArray = geographicCoordListsArray;
 		}
 	}
 

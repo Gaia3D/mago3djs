@@ -593,16 +593,16 @@ SelectionManager.prototype.filterProvisional = function(type, filter)
 	var targetProvisional = {};
 	switch (type)
 	{
-	case InteractionTargetType.F4D : {
+	case DataType.F4D : {
 		targetProvisional[type] = this.provisionalF4dArray;
 		break;
 	}
-	case InteractionTargetType.OBJECT : {
-		targetProvisional[InteractionTargetType.F4D] = this.provisionalF4dArray;
+	case DataType.OBJECT : {
+		targetProvisional[DataType.F4D] = this.provisionalF4dArray;
 		targetProvisional[type] = this.provisionalF4dObjectArray;
 		break;
 	}
-	case InteractionTargetType.NATIVE : {
+	case DataType.NATIVE : {
 		targetProvisional[type] = this.provisionalNativeArray;
 		break;
 	}
@@ -633,7 +633,7 @@ SelectionManager.prototype.filterProvisional = function(type, filter)
 			for (var j=0, len=provisional.length;j<len;j++)
 			{
 				var realFilter = filter;
-				if (type === InteractionTargetType.OBJECT && i === InteractionTargetType.F4D)
+				if (type === DataType.OBJECT && i === DataType.F4D)
 				{
 					realFilter = function(){ return true; };
 				}
@@ -677,19 +677,19 @@ SelectionManager.prototype.provisionalToCurrent = function(type, filter)
 	{
 		switch (t)
 		{
-		case InteractionTargetType.F4D : {
+		case DataType.F4D : {
 			return {
 				currentMember : 'currentNodeSelectedArray',
 				auxMember     : 'currentNodeSelected',
 			};
 		}
-		case InteractionTargetType.OBJECT : {
+		case DataType.OBJECT : {
 			return {
 				currentMember : 'currentReferenceSelectedArray',
 				auxMember     : 'currentReferenceSelected',
 			};
 		}
-		case InteractionTargetType.NATIVE : {
+		case DataType.NATIVE : {
 			return {
 				currentMember : 'currentGeneralObjectSelectedArray',
 				auxMember     : 'currentGeneralObjectSelected',
@@ -701,46 +701,37 @@ SelectionManager.prototype.provisionalToCurrent = function(type, filter)
 
 /**
  * select object by polygon 2d
- * @param {function} filter option
+ * @param {Polygon2D} polygon2D polygon2d for find object
+ * @param {string} type find type
  * @return {Array<object>}
  */
 SelectionManager.prototype.selectionByPolygon2D = function(polygon2D, type) {
 	this.clearCurrents();
 	var frustumVolumeControl = this.magoManager.frustumVolumeControl;
 	
-	var allVisible = frustumVolumeControl.getAllVisiblesObject();
-	
-	var result;
-	if(type === InteractionTargetType.F4D) {
-		var nodeMap =allVisible.nodeMap;
-		var selectedNodes = [];
-		for(var k in nodeMap) {
-			if(nodeMap.hasOwnProperty(k)) {
-				var node = nodeMap[k];
+	var selectedArray = frustumVolumeControl.selectionByPolygon2D(polygon2D, type);
 
-				if(node.intersectionWithPolygon2D(polygon2D)) {
-					selectedNodes.push(node);
-				}
-			}
-		}
-		this.currentNodeSelectedArray = selectedNodes;
-		this.currentNodeSelected = selectedNodes[0];
-		result = selectedNodes;
-	} else if(type === InteractionTargetType.NATIVE) {
-		var nativeMap =allVisible.nativeMap;		
-		var selectednative = []
-		for(var k in nativeMap) {
-			if(nativeMap.hasOwnProperty(k)) {
-				var native = nativeMap[k];
-				if(native.intersectionWithPolygon2D(polygon2D)) {
-					selectednative.push(native);
-				}
-			}
-		}
-		this.currentGeneralObjectSelectedArray = selectednative;
-		this.currentGeneralObjectSelected = selectednative[0];
-		result = selectednative;
+	if(type === DataType.F4D) {
+		this.currentNodeSelectedArray = selectedArray;
+		this.currentNodeSelected = selectedArray[0];
+	} else if(type === DataType.NATIVE) {
+		this.currentGeneralObjectSelectedArray = selectedArray;
+		this.currentGeneralObjectSelected = selectedArray[0];
 	}
 
-	return result;
+	return selectedArray;
+}
+
+/**
+ * native 객체 개별 삭제
+ * @param {MagoRenderable} native 
+ */
+SelectionManager.prototype.removeNative = function(native)
+{
+	var arr = this.getSelectedGeneralArray();
+
+	this.currentGeneralObjectSelectedArray = arr.filter(function(model) {
+		return model !== native;
+	});
+	this.currentGeneralObjectSelected = this.currentGeneralObjectSelectedArray[0];
 }

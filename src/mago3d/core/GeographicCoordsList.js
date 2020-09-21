@@ -541,7 +541,19 @@ GeographicCoordsList.prototype.addAltitude = function(length)
 	}
 };
 
-
+/**
+ * 
+ */
+GeographicCoordsList.prototype.setAltitude = function(length) 
+{
+	var geoCoord;
+	var geoCoordsCount = this.geographicCoordsArray.length;
+	for (var i=0; i<geoCoordsCount; i++)
+	{
+		geoCoord = this.geographicCoordsArray[i];
+		geoCoord.altitude = length;
+	}
+};
 
 /**
  * 

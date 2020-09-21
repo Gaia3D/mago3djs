@@ -42,7 +42,7 @@ var ExtrusionBuilding = function(geographicCoordList, height, options)
 	var geoCoordsList = this.geographicCoordListsArray[0]; // take the 1rst geoCoordsList.***
 	this.setGeographicPosition(geoCoordsList.getMiddleGeographicCoords());
 
-	this.localCoordList = makeLocalCooldList(geoCoordsList, this.geoLocDataManager.getCurrentGeoLocationData());
+	this.localCoordListArray = makeLocalCooldList(this.geographicCoordListsArray, this.geoLocDataManager.getCurrentGeoLocationData());
 
     this.height = height;
     this.color4 = defaultValue(options.color, new Color(1,1,1,1));
@@ -58,18 +58,25 @@ var ExtrusionBuilding = function(geographicCoordList, height, options)
     this.options.renderShaded = defaultValue(options.renderShaded, true);
 	this.options.depthMask = defaultValue(options.depthMask, true);
 	
-	function makeLocalCooldList ( gcList, geoLocData) {
+	function makeLocalCooldList ( gcLists, geoLocData) {
 		var tMatInv = geoLocData.getTMatrixInv();
-		var lcList = [];
-		for(var i=0,len=gcList.geographicCoordsArray.length;i<len;i++)
+		
+		var lcListArray = [];
+		for(var j=0,gcLen=gcLists.length; j < gcLen; j++) 
 		{
-			var gc = gcList.geographicCoordsArray[i];
-			var wc = ManagerUtils.geographicCoordToWorldPoint(gc.longitude,gc.latitude,gc.altitude);
-			var lc = tMatInv.transformPoint3D(wc);
-			lcList.push(lc);
+			var gcList = gcLists[j];
+			var lcList = [];
+			for(var i=0,len=gcList.geographicCoordsArray.length;i<len;i++)
+			{
+				var gc = gcList.geographicCoordsArray[i];
+				var wc = ManagerUtils.geographicCoordToWorldPoint(gc.longitude,gc.latitude,gc.altitude);
+				var lc = tMatInv.transformPoint3D(wc);
+				lcList.push(lc);
+			}
+			lcListArray.push(lcList);
 		}
-
-		return lcList;
+		
+		return lcListArray;
 	}
 };
 ExtrusionBuilding.prototype = Object.create(MagoRenderable.prototype);
@@ -86,16 +93,18 @@ ExtrusionBuilding.prototype.makeMesh = function() {
     if(!geoLocData) {
         return;
 	}
-
+	this.objectsArray = [];
 	var geoCoordsListsCount = this.geographicCoordListsArray.length;
 	for(var i=0; i<geoCoordsListsCount; i++)
 	{
 		var geographicCoordList = this.geographicCoordListsArray[i];
-
+		
 		// Make the topGeoCoordsList.
 		var topGeoCoordsList = geographicCoordList.getCopy();
 		// Reassign the altitude on the geoCoordsListCopy.
-		topGeoCoordsList.addAltitude(this.height);
+
+		geographicCoordList.setAltitude(this.terrainHeight);
+		topGeoCoordsList.setAltitude(this.height + this.terrainHeight);
 		
 		var basePoints3dArray = GeographicCoordsList.getPointsRelativeToGeoLocation(geoLocData, geographicCoordList.geographicCoordsArray, undefined);
 		var topPoints3dArray = GeographicCoordsList.getPointsRelativeToGeoLocation(geoLocData, topGeoCoordsList.geographicCoordsArray, undefined);
@@ -171,10 +180,12 @@ ExtrusionBuilding.prototype.setHeight = function(height) {
 	if(height === undefined || height === null) {
 		throw new Error(Messages.REQUIRED_EMPTY_ERROR('height'));
 	}
-	var model = this.geographicCoordList.getExtrudedMeshRenderableObject(height);
-		
 	this.height = height;
-	this.objectsArray = model.objectsArray;
+	this.setDirty(true);
+	//var model = this.geographicCoordList.getExtrudedMeshRenderableObject(height);
+		
+	//this.height = height;
+	//this.objectsArray = model.objectsArray;
 }
 
 /**
