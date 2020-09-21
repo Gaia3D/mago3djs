@@ -346,41 +346,48 @@ VisibleObjectsController.getBoundaryNodes = function(visiblesArray, resultBounda
 	for (var i=0; i<visiblesCount; i++)
 	{
 		var visible = visiblesArray[i];
-		var geoCoord = visible.data.geographicCoord;
-		if (i===0)
+		if(visible instanceof Node)
 		{
-			minLonCandidate = geoCoord.longitude;
-			minLatCandidate = geoCoord.latitude;
-			maxLonCandidate = geoCoord.longitude;
-			maxLatCandidate = geoCoord.latitudes;
-			minLonVisible = visible;
-			maxLonVisible = visible;
-			minLatVisible = visible;
-			maxLatVisible = visible;
-		}
-		else
-		{
-			if (geoCoord.longitude < minLonCandidate)
-			{ 
-				minLonCandidate = geoCoord.longitude; 
+			var geoCoord = visible.data.geographicCoord;
+			if (i===0)
+			{
+				minLonCandidate = geoCoord.longitude;
+				minLatCandidate = geoCoord.latitude;
+				maxLonCandidate = geoCoord.longitude;
+				maxLatCandidate = geoCoord.latitudes;
 				minLonVisible = visible;
-			}
-			else if (geoCoord.longitude > maxLonCandidate)
-			{ 
-				maxLonCandidate = geoCoord.longitude; 
 				maxLonVisible = visible;
-			}
-			
-			if (geoCoord.latitude < minLatCandidate)
-			{ 
-				minLatCandidate = geoCoord.latitude; 
 				minLatVisible = visible;
-			}
-			else if (geoCoord.latitude > maxLatCandidate)
-			{ 
-				maxLatCandidate = geoCoord.latitude; 
 				maxLatVisible = visible;
 			}
+			else
+			{
+				if (geoCoord.longitude < minLonCandidate)
+				{ 
+					minLonCandidate = geoCoord.longitude; 
+					minLonVisible = visible;
+				}
+				else if (geoCoord.longitude > maxLonCandidate)
+				{ 
+					maxLonCandidate = geoCoord.longitude; 
+					maxLonVisible = visible;
+				}
+				
+				if (geoCoord.latitude < minLatCandidate)
+				{ 
+					minLatCandidate = geoCoord.latitude; 
+					minLatVisible = visible;
+				}
+				else if (geoCoord.latitude > maxLatCandidate)
+				{ 
+					maxLatCandidate = geoCoord.latitude; 
+					maxLatVisible = visible;
+				}
+			}
+		}
+		else if(visible instanceof MagoRenderable)
+		{
+			var hola = 0;
 		}
 	}
 	
@@ -393,7 +400,7 @@ VisibleObjectsController.getBoundaryNodes = function(visiblesArray, resultBounda
  */
 VisibleObjectsController.prototype.calculateBoundingFrustum = function(camera) 
 {
-	var visiblesArray = this.currentVisibles0.concat(this.currentVisibles1, this.currentVisibles2, this.currentVisibles3);
+	var visiblesArray = this.currentVisibles0.concat(this.currentVisibles1, this.currentVisibles2, this.currentVisibles3)//, this.currentVisibleNativeObjects);
 	
 	if (visiblesArray.length === 0)
 	{ return; }

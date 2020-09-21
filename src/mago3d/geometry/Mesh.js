@@ -824,6 +824,9 @@ Mesh.prototype.renderAsChild = function (magoManager, shader, renderType, glPrim
 
 	if (bWireframe)
 	{
+		if( renderType !== 1)
+		return;
+
 		if (options)
 		{
 			if (options.renderWireframe !== undefined)
