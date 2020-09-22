@@ -5623,12 +5623,65 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 		}
 		
 		// Check native objects.
-		var nativeObjects = lowestTile.nativeObjects;
 		var currVisibleNativeObjects = visibleNodes.currentVisibleNativeObjects;
-		Array.prototype.push.apply(currVisibleNativeObjects.opaquesArray, nativeObjects.opaquesArray);
-		Array.prototype.push.apply(currVisibleNativeObjects.transparentsArray, nativeObjects.transparentsArray);
-		Array.prototype.push.apply(currVisibleNativeObjects.excavationsArray, nativeObjects.excavationsArray);
-		Array.prototype.push.apply(currVisibleNativeObjects.vectorTypeArray, nativeObjects.vectorTypeArray);
+		var nativeObjects = lowestTile.nativeObjects;
+		var nativeObjectsCount = nativeObjects.opaquesArray.length;
+		for(var j=0; j<nativeObjectsCount; j++)
+		{
+			var native = nativeObjects.opaquesArray[j];
+			this.boundingSphere_Aux = native.getBoundingSphereWC(this.boundingSphere_Aux);
+
+			var frustumCull = frustumVolume.intersectionSphere(this.boundingSphere_Aux); // cesium.***
+			// intersect with Frustum
+			if (frustumCull !== Constant.INTERSECTION_OUTSIDE) 
+			{
+				currVisibleNativeObjects.opaquesArray.push(native);
+			}
+		}
+		nativeObjectsCount = nativeObjects.transparentsArray.length;
+		for(var j=0; j<nativeObjectsCount; j++)
+		{
+			var native = nativeObjects.transparentsArray[j];
+			this.boundingSphere_Aux = native.getBoundingSphereWC(this.boundingSphere_Aux);
+
+			var frustumCull = frustumVolume.intersectionSphere(this.boundingSphere_Aux); // cesium.***
+			// intersect with Frustum
+			if (frustumCull !== Constant.INTERSECTION_OUTSIDE) 
+			{
+				currVisibleNativeObjects.transparentsArray.push(native);
+			}
+		}
+		nativeObjectsCount = nativeObjects.excavationsArray.length;
+		for(var j=0; j<nativeObjectsCount; j++)
+		{
+			var native = nativeObjects.excavationsArray[j];
+			this.boundingSphere_Aux = native.getBoundingSphereWC(this.boundingSphere_Aux);
+
+			var frustumCull = frustumVolume.intersectionSphere(this.boundingSphere_Aux); // cesium.***
+			// intersect with Frustum
+			if (frustumCull !== Constant.INTERSECTION_OUTSIDE) 
+			{
+				currVisibleNativeObjects.excavationsArray.push(native);
+			}
+		}
+		nativeObjectsCount = nativeObjects.vectorTypeArray.length;
+		for(var j=0; j<nativeObjectsCount; j++)
+		{
+			var native = nativeObjects.vectorTypeArray[j];
+			this.boundingSphere_Aux = native.getBoundingSphereWC(this.boundingSphere_Aux);
+
+			var frustumCull = frustumVolume.intersectionSphere(this.boundingSphere_Aux); // cesium.***
+			// intersect with Frustum
+			if (frustumCull !== Constant.INTERSECTION_OUTSIDE) 
+			{
+				currVisibleNativeObjects.vectorTypeArray.push(native);
+			}
+		}
+		
+		//Array.prototype.push.apply(currVisibleNativeObjects.opaquesArray, nativeObjects.opaquesArray);
+		//Array.prototype.push.apply(currVisibleNativeObjects.transparentsArray, nativeObjects.transparentsArray);
+		//Array.prototype.push.apply(currVisibleNativeObjects.excavationsArray, nativeObjects.excavationsArray);
+		//Array.prototype.push.apply(currVisibleNativeObjects.vectorTypeArray, nativeObjects.vectorTypeArray);
 		if (nativeObjects.pointTypeArray)
 		{ Array.prototype.push.apply(currVisibleNativeObjects.pointTypeArray, nativeObjects.pointTypeArray); }
 

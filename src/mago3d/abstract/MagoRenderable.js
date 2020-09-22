@@ -594,6 +594,30 @@ MagoRenderable.prototype.getCurrentGeoLocationData = function()
 	return geoLoDataManager.getCurrentGeoLocationData();
 };
 
+MagoRenderable.prototype.getBoundingSphereWC = function(resultBSphereWC)
+{
+	if(!this.boundingSphereWC)
+	{
+		this.boundingSphereWC = new BoundingSphere();
+
+		// provisionally return an aproximate bsphere.***
+		var geoLocationData = this.getCurrentGeoLocationData();
+		var positionWC = geoLocationData.position;
+
+		var radiusAprox = 200.0;
+		this.boundingSphereWC.setCenterPoint(positionWC.x, positionWC.y, positionWC.z);
+		this.boundingSphereWC.setRadius(radiusAprox);
+	}
+
+	if(!resultBSphereWC)
+		resultBSphereWC = new BoundingSphere();
+
+	var centerPoint = this.boundingSphereWC.centerPoint;
+	resultBSphereWC.setCenterPoint(centerPoint.x, centerPoint.y, centerPoint.z);
+	resultBSphereWC.setRadius(this.boundingSphereWC.r);
+	return resultBSphereWC;
+};
+
 MagoRenderable.prototype.changeLocationAndRotation = function(latitude, longitude, elevation, heading, pitch, roll, magoManager)
 {
 	var geoLocationData = this.getCurrentGeoLocationData();
