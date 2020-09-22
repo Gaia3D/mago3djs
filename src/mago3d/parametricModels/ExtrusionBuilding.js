@@ -230,11 +230,11 @@ ExtrusionBuilding.prototype.makeUniformPoints2dArray = function()
 		for(var j=0; j<pointsCount; j++)
 		{
 			var point2d = convexPolygon2d.point2dList.getPoint(j);
-			//uniformPoints2dArray.push(point2d.x, point2d.y);
 			uniformPoints2dArray[2*currentIdx] = point2d.x;
 			uniformPoints2dArray[2*currentIdx+1] = point2d.y;
 			currentIdx += 1;
 		}
+
 		uniformPolygonPointsIdx[i*2+1] = currentIdx-1;
 	}
 

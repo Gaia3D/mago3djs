@@ -201,7 +201,7 @@ MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPr
 		{
 			gl.uniform1i(shader.clippingType_loc, 2); // 2= clipping locally by polygon2d.***
 			gl.uniform2fv(shader.clippingPolygon2dPoints_loc, this.uniformPoints2dArray);
-			gl.uniform1i(shader.clippingConvexPolygon2dPointsIndices_loc, this.uniformPolygonPointsIdx);
+			gl.uniform1iv(shader.clippingConvexPolygon2dPointsIndices_loc, this.uniformPolygonPointsIdx);
 
 			var dynCol4 = this.options.limitationInfringingDynamicColor4;
 			if(dynCol4)

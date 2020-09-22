@@ -2064,8 +2064,14 @@ MagoManager.prototype.TEST__splittedExtrudedBuilding = function()
 	var limiGeoCoord10 = new GeographicCoord(127.00711848788578, 37.45045648607603, 0.0);
 	var limiGeoCoord11 = new GeographicCoord(127.00838475802502, 37.45048859811164, 0.0);
 	var limiGeoCoord12 = new GeographicCoord(127.00826935498984, 37.45181503770476, 0.0);
-	options.limitationGeographicCoords = [limiGeoCoord9, limiGeoCoord10, limiGeoCoord11, limiGeoCoord12];
-	
+	//options.limitationGeographicCoords = [limiGeoCoord9, limiGeoCoord10,  limiGeoCoord11, limiGeoCoord12];
+	//options.limitationGeographicCoords = [limiGeoCoord11, limiGeoCoord12, limiGeoCoord9, limiGeoCoord10];
+
+	var limiGeoCoord13 = new GeographicCoord(127.00705650749205, 37.451801378084006, 0.0);
+	var limiGeoCoord14 = new GeographicCoord(127.00704836209083, 37.45114871921257, 0.0);
+	var limiGeoCoord15 = new GeographicCoord(127.00791679734688, 37.451123869212154, 0.0);
+	var limiGeoCoord16 = new GeographicCoord(127.00790742409, 37.451849349156944, 0.0);
+	options.limitationGeographicCoords = [limiGeoCoord13, limiGeoCoord14, limiGeoCoord15, limiGeoCoord16];
 
 	// End making limitation polygon2d.------------------------------------
 

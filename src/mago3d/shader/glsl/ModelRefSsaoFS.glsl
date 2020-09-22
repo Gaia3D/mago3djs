@@ -332,12 +332,12 @@ int getRelativePositionOfPointToLine(in vec2 line_pos, in vec2 line_dir, vec2 po
 
 bool isPointInsideLimitationConvexPolygon(in vec2 point2d)
 {
-	bool isInside = false;
+	bool isInside = true;
 
 	// Check polygons.***
 	int startIdx = -1;
 	int endIdx = -1;
-	for(int i=0; i<128; i+=1)
+	for(int i=0; i<128; i++)
 	{
 		startIdx = clippingConvexPolygon2dPointsIndices[2*i];  // 0
 		endIdx = clippingConvexPolygon2dPointsIndices[2*i+1];	 // 3
@@ -345,23 +345,29 @@ bool isPointInsideLimitationConvexPolygon(in vec2 point2d)
 		if(startIdx < 0 || endIdx < 0)
 		break;
 
+		isInside  = true;
+		
 		isInside = true;
 		vec2 pointStart = clippingPolygon2dPoints[0];
 		for(int j=0; j<128; j++)
 		{
-			if(j >= startIdx && j<=endIdx)
+			if(j > endIdx)
+			break;
+
+			if(j == startIdx)
+				pointStart = clippingPolygon2dPoints[j];
+
+			if(j >= startIdx && j<endIdx)
 			{
 				vec2 point0;
 				vec2 point1;
-				if(j == startIdx)
-				pointStart = clippingPolygon2dPoints[j];
-
-				//if(j == endIdx)
-				//{
-				//	point0 = clippingPolygon2dPoints[j];
-				//	point1 = pointStart;
-				//}
-				//else
+				
+				if(j == endIdx)
+				{
+					point0 = clippingPolygon2dPoints[j];
+					point1 = pointStart;
+				}
+				else
 				{
 					point0 = clippingPolygon2dPoints[j];
 					point1 = clippingPolygon2dPoints[j+1];
@@ -379,7 +385,9 @@ bool isPointInsideLimitationConvexPolygon(in vec2 point2d)
 					break;
 				}
 			}
+
 		}
+		
 
 		if(isInside)
 		return true;

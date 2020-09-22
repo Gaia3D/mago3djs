@@ -23,7 +23,7 @@
   "geo_view_library": "cesium",
   "geo_cesium_ion_token": "",
   "geo_data_path": "/f4d",
-  "geo_tile_path": "",
+  "geo_tile_path": "smartTilesBBC",
   "geo_data_default_projects": [
   ],
   "geo_cull_face_enable": "false",

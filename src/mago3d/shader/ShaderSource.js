@@ -1916,14 +1916,63 @@ int getRelativePositionOfPointToLine(in vec2 line_pos, in vec2 line_dir, vec2 po
 	return relPos;\n\
 }\n\
 \n\
+bool isPointInsideLimitationConvexPolygonInIdxRange(in int startIdx, in int endIdx, in vec2 point2d)\n\
+{\n\
+	bool isInside = true;\n\
+	vec2 pointStart;\n\
+\n\
+	for(int j=0; j<128; j++)\n\
+	{\n\
+		//if(j > endIdx)\n\
+		//break;\n\
+\n\
+		//if(j == startIdx)\n\
+		//	pointStart = clippingPolygon2dPoints[j];\n\
+\n\
+		if(j >= startIdx && j<endIdx)\n\
+		{\n\
+			vec2 point0;\n\
+			vec2 point1;\n\
+			\n\
+			//if(j == endIdx)\n\
+			//{\n\
+			//	point0 = clippingPolygon2dPoints[j];\n\
+			//	point1 = pointStart;\n\
+			//}\n\
+			//else\n\
+			{\n\
+				point0 = clippingPolygon2dPoints[j];\n\
+				point1 = clippingPolygon2dPoints[j+1];\n\
+			}\n\
+\n\
+			// create the line of the segment.***\n\
+			vec2 dir = getDirection2d(point0, point1);\n\
+\n\
+			// now, check the relative position of the point with the edge line.***\n\
+			int relPos = getRelativePositionOfPointToLine(point0, dir, point2d);\n\
+			if(relPos == 2)\n\
+			{\n\
+				// the point is in the right side of the edge line, so is out of the polygon.***\n\
+				isInside = false;\n\
+				break;\n\
+			}\n\
+\n\
+			isInside = false;\n\
+		}\n\
+\n\
+	}\n\
+\n\
+	return isInside;\n\
+}\n\
+\n\
 bool isPointInsideLimitationConvexPolygon(in vec2 point2d)\n\
 {\n\
-	bool isInside = false;\n\
+	bool isInside = true;\n\
 \n\
 	// Check polygons.***\n\
 	int startIdx = -1;\n\
 	int endIdx = -1;\n\
-	for(int i=0; i<128; i+=1)\n\
+	for(int i=0; i<128; i++)\n\
 	{\n\
 		startIdx = clippingConvexPolygon2dPointsIndices[2*i];  // 0\n\
 		endIdx = clippingConvexPolygon2dPointsIndices[2*i+1];	 // 3\n\
@@ -1931,23 +1980,34 @@ bool isPointInsideLimitationConvexPolygon(in vec2 point2d)\n\
 		if(startIdx < 0 || endIdx < 0)\n\
 		break;\n\
 \n\
+		isInside  = true;\n\
+\n\
+		//if(!isPointInsideLimitationConvexPolygonInIdxRange(startIdx, endIdx, point2d))\n\
+		//{\n\
+		//	isInside = false;\n\
+		//}\n\
+		\n\
 		isInside = true;\n\
 		vec2 pointStart = clippingPolygon2dPoints[0];\n\
 		for(int j=0; j<128; j++)\n\
 		{\n\
-			if(j >= startIdx && j<=endIdx)\n\
+			if(j > endIdx)\n\
+			break;\n\
+\n\
+			if(j == startIdx)\n\
+				pointStart = clippingPolygon2dPoints[j];\n\
+\n\
+			if(j >= startIdx && j<endIdx)\n\
 			{\n\
 				vec2 point0;\n\
 				vec2 point1;\n\
-				if(j == startIdx)\n\
-				pointStart = clippingPolygon2dPoints[j];\n\
-\n\
-				//if(j == endIdx)\n\
-				//{\n\
-				//	point0 = clippingPolygon2dPoints[j];\n\
-				//	point1 = pointStart;\n\
-				//}\n\
-				//else\n\
+				\n\
+				if(j == endIdx)\n\
+				{\n\
+					point0 = clippingPolygon2dPoints[j];\n\
+					point1 = pointStart;\n\
+				}\n\
+				else\n\
 				{\n\
 					point0 = clippingPolygon2dPoints[j];\n\
 					point1 = clippingPolygon2dPoints[j+1];\n\
@@ -1964,8 +2024,12 @@ bool isPointInsideLimitationConvexPolygon(in vec2 point2d)\n\
 					isInside = false;\n\
 					break;\n\
 				}\n\
+\n\
+				//isInside = false;\n\
 			}\n\
+\n\
 		}\n\
+		\n\
 \n\
 		if(isInside)\n\
 		return true;\n\
