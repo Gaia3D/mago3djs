@@ -733,4 +733,5 @@ PostFxShader.prototype.createUniformLocals = function(gl, shader, sceneState)
 	shader.clippingConvexPolygon2dPointsIndices_loc = gl.getUniformLocation(shader.program, "clippingConvexPolygon2dPointsIndices");
 	shader.clippingType_loc = gl.getUniformLocation(shader.program, "clippingType");
 	shader.limitationInfringedColor4_loc = gl.getUniformLocation(shader.program, "limitationInfringedColor4");
+	shader.limitationHeights_loc = gl.getUniformLocation(shader.program, "limitationHeights");
 };

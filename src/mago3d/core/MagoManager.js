@@ -2074,6 +2074,9 @@ MagoManager.prototype.TEST__splittedExtrudedBuilding = function()
 	options.limitationGeographicCoords = [limiGeoCoord13, limiGeoCoord14, limiGeoCoord15, limiGeoCoord16];
 
 	// End making limitation polygon2d.------------------------------------
+	var minHeight = 0.0;
+	var maxHeight = 60.0;
+	options.limitationHeights = new Float32Array([minHeight, maxHeight]);
 
 	options.color = new Color(Math.random(),Math.random(),Math.random(),1);
 	options.renderWireframe = true;

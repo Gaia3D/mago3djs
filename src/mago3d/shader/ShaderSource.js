@@ -1647,6 +1647,7 @@ uniform vec4 clippingPlanes[6];\n\
 uniform vec2 clippingPolygon2dPoints[512];\n\
 uniform int clippingConvexPolygon2dPointsIndices[256];\n\
 uniform vec4 limitationInfringedColor4;\n\
+uniform vec2 limitationHeights;\n\
 \n\
 varying vec3 vNormal;\n\
 varying vec4 vColor4; // color from attributes\n\
@@ -1916,55 +1917,6 @@ int getRelativePositionOfPointToLine(in vec2 line_pos, in vec2 line_dir, vec2 po
 	return relPos;\n\
 }\n\
 \n\
-bool isPointInsideLimitationConvexPolygonInIdxRange(in int startIdx, in int endIdx, in vec2 point2d)\n\
-{\n\
-	bool isInside = true;\n\
-	vec2 pointStart;\n\
-\n\
-	for(int j=0; j<128; j++)\n\
-	{\n\
-		//if(j > endIdx)\n\
-		//break;\n\
-\n\
-		//if(j == startIdx)\n\
-		//	pointStart = clippingPolygon2dPoints[j];\n\
-\n\
-		if(j >= startIdx && j<endIdx)\n\
-		{\n\
-			vec2 point0;\n\
-			vec2 point1;\n\
-			\n\
-			//if(j == endIdx)\n\
-			//{\n\
-			//	point0 = clippingPolygon2dPoints[j];\n\
-			//	point1 = pointStart;\n\
-			//}\n\
-			//else\n\
-			{\n\
-				point0 = clippingPolygon2dPoints[j];\n\
-				point1 = clippingPolygon2dPoints[j+1];\n\
-			}\n\
-\n\
-			// create the line of the segment.***\n\
-			vec2 dir = getDirection2d(point0, point1);\n\
-\n\
-			// now, check the relative position of the point with the edge line.***\n\
-			int relPos = getRelativePositionOfPointToLine(point0, dir, point2d);\n\
-			if(relPos == 2)\n\
-			{\n\
-				// the point is in the right side of the edge line, so is out of the polygon.***\n\
-				isInside = false;\n\
-				break;\n\
-			}\n\
-\n\
-			isInside = false;\n\
-		}\n\
-\n\
-	}\n\
-\n\
-	return isInside;\n\
-}\n\
-\n\
 bool isPointInsideLimitationConvexPolygon(in vec2 point2d)\n\
 {\n\
 	bool isInside = true;\n\
@@ -1981,11 +1933,6 @@ bool isPointInsideLimitationConvexPolygon(in vec2 point2d)\n\
 		break;\n\
 \n\
 		isInside  = true;\n\
-\n\
-		//if(!isPointInsideLimitationConvexPolygonInIdxRange(startIdx, endIdx, point2d))\n\
-		//{\n\
-		//	isInside = false;\n\
-		//}\n\
 		\n\
 		isInside = true;\n\
 		vec2 pointStart = clippingPolygon2dPoints[0];\n\
@@ -2024,8 +1971,6 @@ bool isPointInsideLimitationConvexPolygon(in vec2 point2d)\n\
 					isInside = false;\n\
 					break;\n\
 				}\n\
-\n\
-				//isInside = false;\n\
 			}\n\
 \n\
 		}\n\
@@ -2162,6 +2107,12 @@ void main()\n\
 \n\
 	if(clippingType == 2)\n\
 	{\n\
+		// check limitation heights.***\n\
+		if(vertexPosLC.z < limitationHeights.x || vertexPosLC.z > limitationHeights.y)\n\
+		{\n\
+			gl_FragColor = limitationInfringedColor4; \n\
+			return;\n\
+		}\n\
 		vec2 pointLC = vec2(vertexPosLC.x, vertexPosLC.y);\n\
 		if(!isPointInsideLimitationConvexPolygon(pointLC))\n\
 		{\n\
