@@ -2057,15 +2057,15 @@ MagoManager.prototype.TEST__splittedExtrudedBuilding = function()
 	var limiGeoCoord6 = new GeographicCoord(127.0068275878695, 37.4507608835301, 0.0);
 	var limiGeoCoord7 = new GeographicCoord(127.00753105267508, 37.45075685056917, 0.0);
 	var limiGeoCoord8 = new GeographicCoord(127.00746746612433, 37.45159376615369, 0.0);
-	options.limitationGeographicCoords = [limiGeoCoord1, limiGeoCoord2, limiGeoCoord3, limiGeoCoord4, limiGeoCoord5, limiGeoCoord6, limiGeoCoord7, limiGeoCoord8];
+	//options.limitationGeographicCoords = [limiGeoCoord1, limiGeoCoord2, limiGeoCoord3, limiGeoCoord4, limiGeoCoord5, limiGeoCoord6, limiGeoCoord7, limiGeoCoord8];
 	
-	/*
-	var limiGeoCoord0 = new GeographicCoord(127.00707561793477, 37.45181817281961, 0.0);
-	var limiGeoCoord1 = new GeographicCoord(127.00711848788578, 37.45045648607603, 0.0);
-	var limiGeoCoord2 = new GeographicCoord(127.00838475802502, 37.45048859811164, 0.0);
-	var limiGeoCoord3 = new GeographicCoord(127.00826935498984, 37.45181503770476, 0.0);
-	options.limitationGeographicCoords = [limiGeoCoord0, limiGeoCoord1, limiGeoCoord2, limiGeoCoord3];
-	*/
+	
+	var limiGeoCoord9 = new GeographicCoord(127.00707561793477, 37.45181817281961, 0.0);
+	var limiGeoCoord10 = new GeographicCoord(127.00711848788578, 37.45045648607603, 0.0);
+	var limiGeoCoord11 = new GeographicCoord(127.00838475802502, 37.45048859811164, 0.0);
+	var limiGeoCoord12 = new GeographicCoord(127.00826935498984, 37.45181503770476, 0.0);
+	options.limitationGeographicCoords = [limiGeoCoord9, limiGeoCoord10, limiGeoCoord11, limiGeoCoord12];
+	
 
 	// End making limitation polygon2d.------------------------------------
 

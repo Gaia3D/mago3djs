@@ -161,10 +161,10 @@ bool clipVertexByPlane(in vec4 plane, in vec3 point)
 
 vec2 getDirection2d(in vec2 startPoint, in vec2 endPoint)
 {
-	vec2 vector = endPoint - startPoint;
-	float length = length( vector);
-	vec2 dir = vec2(vector.x/length, vector.y/length);
-
+	//vec2 vector = endPoint - startPoint;
+	//float length = length( vector);
+	//vec2 dir = vec2(vector.x/length, vector.y/length);
+	vec2 dir = normalize(endPoint - startPoint);
 	return dir;
 }
 
@@ -172,18 +172,25 @@ bool intersectionLineToLine(in vec2 line_1_pos, in vec2 line_1_dir,in vec2 line_
 {
 	bool bIntersection = false;
 
-	float zero = 10E-10;
+	float zero = 10E-8;
 	float intersectX;
 	float intersectY;
 
 	// check if 2 lines are parallel.***
 	float dotProd = abs(dot(line_1_dir, line_2_dir));
-	if(dotProd < zero || dotProd-1.0 < zero)
+	if(abs(dotProd-1.0) < zero)
 	return false;
 
 	if (abs(line_1_dir.x) < zero)
 	{
 		// this is a vertical line.
+		/*
+		var slope = line.direction.y / line.direction.x;
+		var b = line.point.y - slope * line.point.x;
+		
+		intersectX = this.point.x;
+		intersectY = slope * this.point.x + b;*/
+
 		float slope = line_2_dir.y / line_2_dir.x;
 		float b = line_2_pos.y - slope * line_2_pos.x;
 		
@@ -195,11 +202,26 @@ bool intersectionLineToLine(in vec2 line_1_pos, in vec2 line_1_dir,in vec2 line_
 	{
 		// this is a horizontal line.
 		// must check if the "line" is vertical.
+		/*
+		if (Math.abs(line.direction.x) < zero)
+		{
+			// "line" is vertical.
+			intersectX = line.point.x;
+			intersectY = this.point.y;
+		}
+		else 
+		{
+			var slope = line.direction.y / line.direction.x;
+			var b = line.point.y - slope * line.point.x;
+			
+			intersectX = (this.point.y - b)/slope;
+			intersectY = this.point.y;
+		}*/
 		if (abs(line_2_dir.x) < zero)
 		{
 			// "line" is vertical.
-			intersectX = line_1_pos.x;
-			intersectY = line_2_pos.y;
+			intersectX = line_2_pos.x;
+			intersectY = line_1_pos.y;
 			bIntersection = true;
 		}
 		else 
@@ -215,12 +237,32 @@ bool intersectionLineToLine(in vec2 line_1_pos, in vec2 line_1_dir,in vec2 line_
 	else 
 	{
 		// this is oblique.
+		/*
+		if (Math.abs(line.direction.x) < zero)
+		{
+			// "line" is vertical.
+			var mySlope = this.direction.y / this.direction.x;
+			var myB = this.point.y - mySlope * this.point.x;
+			intersectX = line.point.x;
+			intersectY = intersectX * mySlope + myB;
+		}
+		else 
+		{
+			var mySlope = this.direction.y / this.direction.x;
+			var myB = this.point.y - mySlope * this.point.x;
+			
+			var slope = line.direction.y / line.direction.x;
+			var b = line.point.y - slope * line.point.x;
+			
+			intersectX = (myB - b)/ (slope - mySlope);
+			intersectY = slope * intersectX + b;
+		}*/
 		if (abs(line_2_dir.x) < zero)
 		{
 			// "line" is vertical.
 			float mySlope = line_1_dir.y / line_1_dir.x;
 			float myB = line_1_pos.y - mySlope * line_1_pos.x;
-			intersectX = line_2_dir.x;
+			intersectX = line_2_pos.x;
 			intersectY = intersectX * mySlope + myB;
 			bIntersection = true;
 		}
@@ -230,7 +272,7 @@ bool intersectionLineToLine(in vec2 line_1_pos, in vec2 line_1_dir,in vec2 line_
 			float myB = line_1_pos.y - mySlope * line_1_pos.x;
 			
 			float slope = line_2_dir.y / line_2_dir.x;
-			float b = line_2_dir.y - slope * line_2_dir.x;
+			float b = line_2_pos.y - slope * line_2_pos.x;
 			
 			intersectX = (myB - b)/ (slope - mySlope);
 			intersectY = slope * intersectX + b;
@@ -276,7 +318,7 @@ int getRelativePositionOfPointToLine(in vec2 line_pos, in vec2 line_dir, vec2 po
 
 	float dotProd = dot(lineLeft_dir, myVector);
 
-	if(dotProd < 0.0)
+	if(dotProd > 0.0)
 	{
 		relPos = 1; // is in left side of the line.***
 	}
@@ -290,24 +332,21 @@ int getRelativePositionOfPointToLine(in vec2 line_pos, in vec2 line_dir, vec2 po
 
 bool isPointInsideLimitationConvexPolygon(in vec2 point2d)
 {
-	bool isInside = true;
+	bool isInside = false;
 
 	// Check polygons.***
 	int startIdx = -1;
 	int endIdx = -1;
-	for(int i=0; i<128; i+=2)
+	for(int i=0; i<128; i+=1)
 	{
-		startIdx = clippingConvexPolygon2dPointsIndices[i];  // 0
-		endIdx = clippingConvexPolygon2dPointsIndices[i+1];	 // 3
+		startIdx = clippingConvexPolygon2dPointsIndices[2*i];  // 0
+		endIdx = clippingConvexPolygon2dPointsIndices[2*i+1];	 // 3
 
-		if(startIdx < 0)
+		if(startIdx < 0 || endIdx < 0)
 		break;
 
-		startIdx *= 2;
-		endIdx *= 2;
-
 		isInside = true;
-		vec2 pointStart;
+		vec2 pointStart = clippingPolygon2dPoints[0];
 		for(int j=0; j<128; j++)
 		{
 			if(j >= startIdx && j<=endIdx)
@@ -339,7 +378,6 @@ bool isPointInsideLimitationConvexPolygon(in vec2 point2d)
 					isInside = false;
 					break;
 				}
-				
 			}
 		}
 

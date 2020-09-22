@@ -1747,10 +1747,10 @@ bool clipVertexByPlane(in vec4 plane, in vec3 point)\n\
 \n\
 vec2 getDirection2d(in vec2 startPoint, in vec2 endPoint)\n\
 {\n\
-	vec2 vector = endPoint - startPoint;\n\
-	float length = length( vector);\n\
-	vec2 dir = vec2(vector.x/length, vector.y/length);\n\
-\n\
+	//vec2 vector = endPoint - startPoint;\n\
+	//float length = length( vector);\n\
+	//vec2 dir = vec2(vector.x/length, vector.y/length);\n\
+	vec2 dir = normalize(endPoint - startPoint);\n\
 	return dir;\n\
 }\n\
 \n\
@@ -1758,18 +1758,25 @@ bool intersectionLineToLine(in vec2 line_1_pos, in vec2 line_1_dir,in vec2 line_
 {\n\
 	bool bIntersection = false;\n\
 \n\
-	float zero = 10E-10;\n\
+	float zero = 10E-8;\n\
 	float intersectX;\n\
 	float intersectY;\n\
 \n\
 	// check if 2 lines are parallel.***\n\
 	float dotProd = abs(dot(line_1_dir, line_2_dir));\n\
-	if(dotProd < zero || dotProd-1.0 < zero)\n\
+	if(abs(dotProd-1.0) < zero)\n\
 	return false;\n\
 \n\
 	if (abs(line_1_dir.x) < zero)\n\
 	{\n\
 		// this is a vertical line.\n\
+		/*\n\
+		var slope = line.direction.y / line.direction.x;\n\
+		var b = line.point.y - slope * line.point.x;\n\
+		\n\
+		intersectX = this.point.x;\n\
+		intersectY = slope * this.point.x + b;*/\n\
+\n\
 		float slope = line_2_dir.y / line_2_dir.x;\n\
 		float b = line_2_pos.y - slope * line_2_pos.x;\n\
 		\n\
@@ -1781,11 +1788,26 @@ bool intersectionLineToLine(in vec2 line_1_pos, in vec2 line_1_dir,in vec2 line_
 	{\n\
 		// this is a horizontal line.\n\
 		// must check if the \"line\" is vertical.\n\
+		/*\n\
+		if (Math.abs(line.direction.x) < zero)\n\
+		{\n\
+			// \"line\" is vertical.\n\
+			intersectX = line.point.x;\n\
+			intersectY = this.point.y;\n\
+		}\n\
+		else \n\
+		{\n\
+			var slope = line.direction.y / line.direction.x;\n\
+			var b = line.point.y - slope * line.point.x;\n\
+			\n\
+			intersectX = (this.point.y - b)/slope;\n\
+			intersectY = this.point.y;\n\
+		}*/\n\
 		if (abs(line_2_dir.x) < zero)\n\
 		{\n\
 			// \"line\" is vertical.\n\
-			intersectX = line_1_pos.x;\n\
-			intersectY = line_2_pos.y;\n\
+			intersectX = line_2_pos.x;\n\
+			intersectY = line_1_pos.y;\n\
 			bIntersection = true;\n\
 		}\n\
 		else \n\
@@ -1801,12 +1823,32 @@ bool intersectionLineToLine(in vec2 line_1_pos, in vec2 line_1_dir,in vec2 line_
 	else \n\
 	{\n\
 		// this is oblique.\n\
+		/*\n\
+		if (Math.abs(line.direction.x) < zero)\n\
+		{\n\
+			// \"line\" is vertical.\n\
+			var mySlope = this.direction.y / this.direction.x;\n\
+			var myB = this.point.y - mySlope * this.point.x;\n\
+			intersectX = line.point.x;\n\
+			intersectY = intersectX * mySlope + myB;\n\
+		}\n\
+		else \n\
+		{\n\
+			var mySlope = this.direction.y / this.direction.x;\n\
+			var myB = this.point.y - mySlope * this.point.x;\n\
+			\n\
+			var slope = line.direction.y / line.direction.x;\n\
+			var b = line.point.y - slope * line.point.x;\n\
+			\n\
+			intersectX = (myB - b)/ (slope - mySlope);\n\
+			intersectY = slope * intersectX + b;\n\
+		}*/\n\
 		if (abs(line_2_dir.x) < zero)\n\
 		{\n\
 			// \"line\" is vertical.\n\
 			float mySlope = line_1_dir.y / line_1_dir.x;\n\
 			float myB = line_1_pos.y - mySlope * line_1_pos.x;\n\
-			intersectX = line_2_dir.x;\n\
+			intersectX = line_2_pos.x;\n\
 			intersectY = intersectX * mySlope + myB;\n\
 			bIntersection = true;\n\
 		}\n\
@@ -1816,7 +1858,7 @@ bool intersectionLineToLine(in vec2 line_1_pos, in vec2 line_1_dir,in vec2 line_
 			float myB = line_1_pos.y - mySlope * line_1_pos.x;\n\
 			\n\
 			float slope = line_2_dir.y / line_2_dir.x;\n\
-			float b = line_2_dir.y - slope * line_2_dir.x;\n\
+			float b = line_2_pos.y - slope * line_2_pos.x;\n\
 			\n\
 			intersectX = (myB - b)/ (slope - mySlope);\n\
 			intersectY = slope * intersectX + b;\n\
@@ -1862,7 +1904,7 @@ int getRelativePositionOfPointToLine(in vec2 line_pos, in vec2 line_dir, vec2 po
 \n\
 	float dotProd = dot(lineLeft_dir, myVector);\n\
 \n\
-	if(dotProd < 0.0)\n\
+	if(dotProd > 0.0)\n\
 	{\n\
 		relPos = 1; // is in left side of the line.***\n\
 	}\n\
@@ -1876,24 +1918,21 @@ int getRelativePositionOfPointToLine(in vec2 line_pos, in vec2 line_dir, vec2 po
 \n\
 bool isPointInsideLimitationConvexPolygon(in vec2 point2d)\n\
 {\n\
-	bool isInside = true;\n\
+	bool isInside = false;\n\
 \n\
 	// Check polygons.***\n\
 	int startIdx = -1;\n\
 	int endIdx = -1;\n\
-	for(int i=0; i<128; i+=2)\n\
+	for(int i=0; i<128; i+=1)\n\
 	{\n\
-		startIdx = clippingConvexPolygon2dPointsIndices[i];  // 0\n\
-		endIdx = clippingConvexPolygon2dPointsIndices[i+1];	 // 3\n\
+		startIdx = clippingConvexPolygon2dPointsIndices[2*i];  // 0\n\
+		endIdx = clippingConvexPolygon2dPointsIndices[2*i+1];	 // 3\n\
 \n\
-		if(startIdx < 0)\n\
+		if(startIdx < 0 || endIdx < 0)\n\
 		break;\n\
 \n\
-		startIdx *= 2;\n\
-		endIdx *= 2;\n\
-\n\
 		isInside = true;\n\
-		vec2 pointStart;\n\
+		vec2 pointStart = clippingPolygon2dPoints[0];\n\
 		for(int j=0; j<128; j++)\n\
 		{\n\
 			if(j >= startIdx && j<=endIdx)\n\
@@ -1925,7 +1964,6 @@ bool isPointInsideLimitationConvexPolygon(in vec2 point2d)\n\
 					isInside = false;\n\
 					break;\n\
 				}\n\
-				\n\
 			}\n\
 		}\n\
 \n\
