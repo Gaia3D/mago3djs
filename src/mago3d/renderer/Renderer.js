@@ -2011,6 +2011,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			
 			// native objects.
 			this.renderNativeObjects(gl, currentShader, renderType, visibleObjControlerNodes);
+			gl.uniform1i(currentShader.clippingType_loc, 0); // 0= no clipping.***
 			
 			currentShader.disableVertexAttribArrayAll();
 			gl.useProgram(null);

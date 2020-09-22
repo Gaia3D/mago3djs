@@ -214,7 +214,7 @@ MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPr
 			}
 		}
 		else{
-			gl.uniform1i(shader.clippingType_loc, 0);
+			gl.uniform1i(shader.clippingType_loc, 0); // 0= no clipping.***
 		}
 	}
 	
