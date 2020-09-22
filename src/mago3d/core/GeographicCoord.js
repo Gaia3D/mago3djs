@@ -266,6 +266,32 @@ GeographicCoord.getMidPoint = function(geographicCoordA, geographicCoordB, resul
 };
 
 /**
+ * Returns if the geographicCoord is coincident to this.
+ * @param {GeographicCoord} geographicCoord
+ * @param {Number} error
+ * @returns {Boolean}
+ */
+GeographicCoord.prototype.isCoincidentToGeoCoord = function(geographicCoord, error, errorForAltitude) 
+{
+	if(!error)
+	error = 1E-8;
+
+	if(!errorForAltitude)
+	errorForAltitude = 1E-6;
+
+	if(Math.abs(this.longitude - geographicCoord.longitude) > error)
+	return false;
+
+	if(Math.abs(this.latitude - geographicCoord.latitude) > error)
+	return false;
+
+	if(Math.abs(this.altitude - geographicCoord.altitude) > errorForAltitude)
+	return false;
+
+	return true;
+};
+
+/**
  * Returns the module of the vector of geographicCoordA to geographicCoordB, without altitude.
  * @param {GeographicCoord} geographicCoordA
  * @param {GeographicCoord} geographicCoordB

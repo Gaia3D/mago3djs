@@ -558,6 +558,66 @@ GeographicCoordsList.prototype.setAltitude = function(length)
 /**
  * 
  */
+GeographicCoordsList.solveUroborus = function(geographicCoordsArray, error) 
+{
+	if(!geographicCoordsArray)
+	return false;
+
+	if(!error)
+	error = 1E-8;
+
+	var geoCoordsCount = geographicCoordsArray.length;
+
+	if(geoCoordsCount < 3)
+	return false;
+
+	var geoCoordStart = geographicCoordsArray[0];
+	var geoCoordLast = geographicCoordsArray[geoCoordsCount-1];
+	var errorForAltitude = error;
+	if(geoCoordStart.isCoincidentToGeoCoord (geoCoordLast, error, errorForAltitude) )
+	{
+		// delete the last geoCoord.***
+		geographicCoordsArray.pop();
+		return true;
+	}
+
+	return false;
+};
+
+
+/**
+ * 
+ */
+GeographicCoordsList.solveDegeneratedPoints = function(geographicCoordsArray, error) 
+{
+	// This function deletes degenerated points.***
+	if(!geographicCoordsArray)
+	return;
+
+	// 1rst, solve uroborus.***
+	if(!error)
+	error = 1E-8;
+	GeographicCoordsList.solveUroborus(geographicCoordsArray, error);
+
+	// 2nd, solve coincidentPoints.***
+	var geoCoordsCount = geographicCoordsArray.length;
+	for(var i=0; i<geoCoordsCount-1; i++)
+	{
+		var geoCoord1 = geographicCoordsArray[i];
+		var geoCoord2 = geographicCoordsArray[i+1];
+
+		if(geoCoord1.isCoincidentToGeoCoord(geoCoord2, error))
+		{
+			// delete the geoCoord2.***
+			geographicCoordsArray.splice(i+1, 1);
+			i--;
+		}
+	}
+};
+
+/**
+ * 
+ */
 GeographicCoordsList.prototype.getExtrudedMeshRenderableObject = function(height, bLoop, resultRenderableObject, magoManager, extrudeDirWC, textureInfo) 
 {
 	if (!this.geographicCoordsArray || this.geographicCoordsArray.length === 0)

@@ -96,6 +96,17 @@ ExtrusionBuilding.prototype.makeMesh = function() {
     if(!geoLocData) {
         return;
 	}
+
+	// Try to solve degeneratedPoints.***
+	var error = 1E-8;
+	var geographicCoordListsCount = this.geographicCoordListsArray.length;
+	for(var i=0; i<geographicCoordListsCount; i++)
+	{
+		var geoCoordsList = this.geographicCoordListsArray[i];
+		GeographicCoordsList.solveDegeneratedPoints(geoCoordsList.geographicCoordsArray, error);
+	}
+	
+
 	this.objectsArray = [];
 	var geoCoordsListsCount = this.geographicCoordListsArray.length;
 	for(var i=0; i<geoCoordsListsCount; i++)

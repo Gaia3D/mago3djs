@@ -1988,7 +1988,7 @@ MagoManager.prototype.TEST__splittedExtrudedBuilding = function()
 		]
 	};
 
-
+	this.sceneState.sunSystem.setDate(new Date('2020-09-21 03:00'));
 	// make geographicsCoordsArray.***
 	var geoCoordsArray = [];
 	var coordsArray = polygon.features[0].geometry.coordinates[0][0];
@@ -2045,6 +2045,8 @@ MagoManager.prototype.TEST__splittedExtrudedBuilding = function()
 		geoCoordsListsArray.push(geoCoordList);
 		
 	}
+
+	
 
 	// make a limitation polygon2d.****************************************
 	//limitationPolygon2d
