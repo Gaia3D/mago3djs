@@ -202,6 +202,16 @@ MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPr
 			gl.uniform1i(shader.clippingType_loc, 2); // 2= clipping locally by polygon2d.***
 			gl.uniform2fv(shader.clippingPolygon2dPoints_loc, this.uniformPoints2dArray);
 			gl.uniform1i(shader.clippingConvexPolygon2dPointsIndices_loc, this.uniformPolygonPointsIdx);
+
+			var dynCol4 = this.options.limitationInfringingDynamicColor4;
+			if(dynCol4)
+			{
+				dynCol4.updateColorAlarm(magoManager.getCurrentTime());
+				gl.uniform4fv(shader.limitationInfringedColor4_loc, new Float32Array([dynCol4.r, dynCol4.g,dynCol4.b, dynCol4.a]));
+			}
+			else{
+				gl.uniform4fv(shader.limitationInfringedColor4_loc, new Float32Array([1.0, 0.5, 0.2, 1.0]));
+			}
 		}
 		else{
 			gl.uniform1i(shader.clippingType_loc, 0);

@@ -60,6 +60,7 @@ uniform int clippingPlanesCount;
 uniform vec4 clippingPlanes[6];
 uniform vec2 clippingPolygon2dPoints[512];
 uniform int clippingConvexPolygon2dPointsIndices[256];
+uniform vec4 limitationInfringedColor4;
 
 varying vec3 vNormal;
 varying vec4 vColor4; // color from attributes
@@ -476,7 +477,7 @@ void main()
 		vec2 pointLC = vec2(vertexPosLC.x, vertexPosLC.y);
 		if(!isPointInsideLimitationConvexPolygon(pointLC))
 		{
-			gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0); 
+			gl_FragColor = limitationInfringedColor4; 
 			return;
 		}
 	}
