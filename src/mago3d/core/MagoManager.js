@@ -2071,7 +2071,7 @@ MagoManager.prototype.TEST__splittedExtrudedBuilding = function()
 	var limiGeoCoord14 = new GeographicCoord(127.00704836209083, 37.45114871921257, 0.0);
 	var limiGeoCoord15 = new GeographicCoord(127.00791679734688, 37.451123869212154, 0.0);
 	var limiGeoCoord16 = new GeographicCoord(127.00790742409, 37.451849349156944, 0.0);
-	options.limitationGeographicCoords = [limiGeoCoord13, limiGeoCoord14, limiGeoCoord15, limiGeoCoord16];
+	//options.limitationGeographicCoords = [limiGeoCoord13, limiGeoCoord14, limiGeoCoord15, limiGeoCoord16];
 
 	// End making limitation polygon2d.------------------------------------
 	var minHeight = 0.0;

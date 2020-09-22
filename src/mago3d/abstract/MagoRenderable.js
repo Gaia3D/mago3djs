@@ -202,8 +202,12 @@ MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPr
 			if(this.options.limitationHeights)
 			{
 				gl.uniform2fv(shader.limitationHeights_loc, this.options.limitationHeights);
+				gl.uniform1i(shader.clippingType_loc, 4); // 2= clipping locally by polygon2d.***
 			}
-			gl.uniform1i(shader.clippingType_loc, 2); // 2= clipping locally by polygon2d.***
+			else{
+				gl.uniform1i(shader.clippingType_loc, 2); // 2= clipping locally by polygon2d.***
+			}
+			
 			gl.uniform2fv(shader.clippingPolygon2dPoints_loc, this.uniformPoints2dArray);
 			gl.uniform1iv(shader.clippingConvexPolygon2dPointsIndices_loc, this.uniformPolygonPointsIdx);
 
@@ -217,8 +221,25 @@ MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPr
 				gl.uniform4fv(shader.limitationInfringedColor4_loc, new Float32Array([1.0, 0.5, 0.2, 1.0]));
 			}
 		}
-		else{
-			gl.uniform1i(shader.clippingType_loc, 0); // 0= no clipping.***
+		else
+		{
+			if(this.options.limitationHeights)
+			{
+				gl.uniform2fv(shader.limitationHeights_loc, this.options.limitationHeights);
+				gl.uniform1i(shader.clippingType_loc, 3); // 3= clipping locally by heights.***
+				var dynCol4 = this.options.limitationInfringingDynamicColor4;
+				if(dynCol4)
+				{
+					dynCol4.updateColorAlarm(magoManager.getCurrentTime());
+					gl.uniform4fv(shader.limitationInfringedColor4_loc, new Float32Array([dynCol4.r, dynCol4.g,dynCol4.b, dynCol4.a]));
+				}
+				else{
+					gl.uniform4fv(shader.limitationInfringedColor4_loc, new Float32Array([1.0, 0.5, 0.2, 1.0]));
+				}
+			}
+			else{
+				gl.uniform1i(shader.clippingType_loc, 0); // 0= no clipping.***
+			}
 		}
 	}
 	

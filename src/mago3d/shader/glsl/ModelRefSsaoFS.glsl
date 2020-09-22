@@ -55,7 +55,7 @@ uniform mat4 clippingPlanesRotMatrix;
 uniform vec3 clippingPlanesPosHIGH;
 uniform vec3 clippingPlanesPosLOW;
 uniform bool bApplyClippingPlanes; // old. deprecated.***
-uniform int clippingType; // 0= no clipping. 1= clipping by planes. 2= clipping by localCoord polyline.
+uniform int clippingType; // 0= no clipping. 1= clipping by planes. 2= clipping by localCoord polyline. 3= clip by heights, 4= clip by (2, 3)
 uniform int clippingPlanesCount;
 uniform vec4 clippingPlanes[6];
 uniform vec2 clippingPolygon2dPoints[512];
@@ -521,14 +521,33 @@ void main()
 
 	if(clippingType == 2)
 	{
+		// clip by limitationPolygon.***
+		vec2 pointLC = vec2(vertexPosLC.x, vertexPosLC.y);
+		if(!isPointInsideLimitationConvexPolygon(pointLC))
+		{
+			gl_FragColor = limitationInfringedColor4; 
+			return;
+		}
+	}
+	else if(clippingType == 3)
+	{
 		// check limitation heights.***
 		if(vertexPosLC.z < limitationHeights.x || vertexPosLC.z > limitationHeights.y)
 		{
 			gl_FragColor = limitationInfringedColor4; 
 			return;
 		}
+	}
+	else if(clippingType == 4)
+	{
+		// clip by limitationPolygon & heights.***
 		vec2 pointLC = vec2(vertexPosLC.x, vertexPosLC.y);
 		if(!isPointInsideLimitationConvexPolygon(pointLC))
+		{
+			gl_FragColor = limitationInfringedColor4; 
+			return;
+		}
+		if(vertexPosLC.z < limitationHeights.x || vertexPosLC.z > limitationHeights.y)
 		{
 			gl_FragColor = limitationInfringedColor4; 
 			return;
