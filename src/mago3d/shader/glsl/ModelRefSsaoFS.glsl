@@ -50,25 +50,29 @@ uniform float externalAlpha;
 uniform vec4 colorMultiplier;
 uniform bool bUseLogarithmicDepth;
 
-//uniform int sunIdx;
-
 // clipping planes.***
-//uniform bool bApplyClippingPlanes;
-//uniform int clippingPlanesCount;
-//uniform vec4 clippingPlanes[6];
+uniform mat4 clippingPlanesRotMatrix; 
+uniform vec3 clippingPlanesPosHIGH;
+uniform vec3 clippingPlanesPosLOW;
+uniform bool bApplyClippingPlanes; // old. deprecated.***
+uniform int clippingType; // 0= no clipping. 1= clipping by planes. 2= clipping by localCoord polyline.
+uniform int clippingPlanesCount;
+uniform vec4 clippingPlanes[6];
+uniform vec2 clippingPolygon2dPoints[512];
+uniform int clippingConvexPolygon2dPointsIndices[256];
 
 varying vec3 vNormal;
 varying vec4 vColor4; // color from attributes
 varying vec2 vTexCoord;   
 varying vec3 vLightWeighting;
 varying vec3 diffuseColor;
-varying vec3 vertexPos;
+varying vec3 vertexPos; // this is the orthoPos.***
+varying vec3 vertexPosLC;
 varying float applySpecLighting;
 varying vec4 vPosRelToLight; 
 varying vec3 vLightDir; 
 varying vec3 vNormalWC;
 varying float currSunIdx; 
-varying float discardFrag;
 
 varying float flogz;
 varying float Fcoef_half;
@@ -154,6 +158,222 @@ bool clipVertexByPlane(in vec4 plane, in vec3 point)
 	else return false;
 }
 
+vec2 getDirection2d(in vec2 startPoint, in vec2 endPoint)
+{
+	vec2 vector = endPoint - startPoint;
+	float length = length( vector);
+	vec2 dir = vec2(vector.x/length, vector.y/length);
+
+	return dir;
+}
+
+bool intersectionLineToLine(in vec2 line_1_pos, in vec2 line_1_dir,in vec2 line_2_pos, in vec2 line_2_dir, out vec2 intersectionPoint2d)
+{
+	bool bIntersection = false;
+
+	float zero = 10E-10;
+	float intersectX;
+	float intersectY;
+
+	// check if 2 lines are parallel.***
+	float dotProd = abs(dot(line_1_dir, line_2_dir));
+	if(dotProd < zero || dotProd-1.0 < zero)
+	return false;
+
+	if (abs(line_1_dir.x) < zero)
+	{
+		// this is a vertical line.
+		float slope = line_2_dir.y / line_2_dir.x;
+		float b = line_2_pos.y - slope * line_2_pos.x;
+		
+		intersectX = line_1_pos.x;
+		intersectY = slope * line_1_pos.x + b;
+		bIntersection = true;
+	}
+	else if (abs(line_1_dir.y) < zero)
+	{
+		// this is a horizontal line.
+		// must check if the "line" is vertical.
+		if (abs(line_2_dir.x) < zero)
+		{
+			// "line" is vertical.
+			intersectX = line_1_pos.x;
+			intersectY = line_2_pos.y;
+			bIntersection = true;
+		}
+		else 
+		{
+			float slope = line_2_dir.y / line_2_dir.x;
+			float b = line_2_pos.y - slope * line_2_pos.x;
+			
+			intersectX = (line_1_pos.y - b)/slope;
+			intersectY = line_1_pos.y;
+			bIntersection = true;
+		}	
+	}
+	else 
+	{
+		// this is oblique.
+		if (abs(line_2_dir.x) < zero)
+		{
+			// "line" is vertical.
+			float mySlope = line_1_dir.y / line_1_dir.x;
+			float myB = line_1_pos.y - mySlope * line_1_pos.x;
+			intersectX = line_2_dir.x;
+			intersectY = intersectX * mySlope + myB;
+			bIntersection = true;
+		}
+		else 
+		{
+			float mySlope = line_1_dir.y / line_1_dir.x;
+			float myB = line_1_pos.y - mySlope * line_1_pos.x;
+			
+			float slope = line_2_dir.y / line_2_dir.x;
+			float b = line_2_dir.y - slope * line_2_dir.x;
+			
+			intersectX = (myB - b)/ (slope - mySlope);
+			intersectY = slope * intersectX + b;
+			bIntersection = true;
+		}
+	}
+
+	intersectionPoint2d.x = intersectX;
+	intersectionPoint2d.y = intersectY;
+
+	return bIntersection;
+}
+
+vec2 getProjectedPoint2dToLine(in vec2 line_point, in vec2 line_dir, in vec2 point)
+{
+	bool intersection = false;
+
+	// create a perpendicular left line.***
+	vec2 lineLeft_dir = vec2(-line_dir.y, line_dir.x);
+	vec2 lineLeft_point = vec2(point.x, point.y);
+	vec2 projectedPoint = vec2(0);
+	intersection = intersectionLineToLine(line_point, line_dir, lineLeft_point, lineLeft_dir, projectedPoint);
+
+	return projectedPoint;
+}
+
+int getRelativePositionOfPointToLine(in vec2 line_pos, in vec2 line_dir, vec2 point)
+{
+	// 0 = coincident. 1= left side. 2= right side.***
+	int relPos = -1;
+
+	vec2 projectedPoint = getProjectedPoint2dToLine(line_pos, line_dir, point );
+	float dist = length(point - projectedPoint);
+
+	if(dist < 1E-8)
+	{
+		relPos = 0; // the point is coincident to line.***
+		return relPos;
+	}
+
+	vec2 myVector = normalize(point - projectedPoint);
+	vec2 lineLeft_dir = vec2(-line_dir.y, line_dir.x);
+
+	float dotProd = dot(lineLeft_dir, myVector);
+
+	if(dotProd < 0.0)
+	{
+		relPos = 1; // is in left side of the line.***
+	}
+	else
+	{
+		relPos = 2; // is in right side of the line.***
+	}
+
+	return relPos;
+}
+
+bool isPointInsideLimitationConvexPolygon(in vec2 point2d)
+{
+	bool isInside = true;
+
+	// Check polygons.***
+	int startIdx = -1;
+	int endIdx = -1;
+	for(int i=0; i<128; i+=2)
+	{
+		startIdx = clippingConvexPolygon2dPointsIndices[i];  // 0
+		endIdx = clippingConvexPolygon2dPointsIndices[i+1];	 // 3
+
+		if(startIdx < 0)
+		break;
+
+		startIdx *= 2;
+		endIdx *= 2;
+
+		isInside = true;
+		vec2 pointStart;
+		for(int j=0; j<128; j++)
+		{
+			if(j >= startIdx && j<=endIdx)
+			{
+				vec2 point0;
+				vec2 point1;
+				if(j == startIdx)
+				pointStart = clippingPolygon2dPoints[j];
+
+				//if(j == endIdx)
+				//{
+				//	point0 = clippingPolygon2dPoints[j];
+				//	point1 = pointStart;
+				//}
+				//else
+				{
+					point0 = clippingPolygon2dPoints[j];
+					point1 = clippingPolygon2dPoints[j+1];
+				}
+
+				// create the line of the segment.***
+				vec2 dir = getDirection2d(point0, point1);
+
+				// now, check the relative position of the point with the edge line.***
+				int relPos = getRelativePositionOfPointToLine(point0, dir, point2d);
+				if(relPos == 2)
+				{
+					// the point is in the right side of the edge line, so is out of the polygon.***
+					isInside = false;
+					break;
+				}
+				
+			}
+		}
+
+		if(isInside)
+		return true;
+
+	}
+
+	return isInside;
+}
+
+
+
+
+/*
+bool clipVertexBySegment2d(in vec3 segPoint_1, in vec3 segPoint_2, vec3 point)
+{
+	bool bClip = false;
+	// Note: use the points as 2d points using only x,y.***
+	// Calculate the direction.***
+	float difX = segPoint_2.x - segPoint_1.x;
+	float difY = segPoint_2.y - segPoint_1.y;
+	float modul = sqrt(difX*difX + difY*difY);
+	vec2 dir = vec2(difX/modul, difY/modul);
+
+	// Calculate 
+
+	// 1rst, check if the projectionPoint is inside of the segment.***
+
+	// 2nd, check the side of the point relative to segment.***
+
+
+	return bClip;
+}
+*/
 vec3 reconstructPosition(vec2 texCoord, float depth)
 {
     // https://wickedengine.net/2019/09/22/improved-normal-reconstruction-from-depth/
@@ -245,31 +465,44 @@ bool isEdge()
 	return false;
 }
 
+
 void main()
 {
 	//gl_FragColor = vColor4; 
 	//return;
-	// 1rst, check if there are clipping planes.
-	/*
+
+	if(clippingType == 2)
+	{
+		vec2 pointLC = vec2(vertexPosLC.x, vertexPosLC.y);
+		if(!isPointInsideLimitationConvexPolygon(pointLC))
+		{
+			gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0); 
+			return;
+		}
+	}
+
+	// Check if clipping.********************************************
+	
 	if(bApplyClippingPlanes)
 	{
-		bool discardFrag = true;
+		bool discardFrag = false;
 		for(int i=0; i<6; i++)
 		{
 			vec4 plane = clippingPlanes[i];
+			
+			// calculate any point of the plane.
 			if(!clipVertexByPlane(plane, vertexPos))
 			{
-				discardFrag = false;
+				discardFrag = false; // false.
 				break;
 			}
 			if(i >= clippingPlanesCount)
 			break;
 		}
 		
-		if(discardFrag)
-		discard;
 	}
-	*/
+	
+	//----------------------------------------------------------------
 
 	//bool testBool = false;
 	float occlusion = 1.0; // ambient occlusion.***

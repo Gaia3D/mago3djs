@@ -212,10 +212,18 @@ Line2D.prototype.isParallelToLine = function(line)
 	{ return false; }
 	
 	var zero = 10E-10;
+	/*
+	// Method 1.***
 	var angRad = this.direction.angleRadToVector(line.direction);
-	
 	// if angle is zero or 180 degree, then this is parallel to "line".
 	if (angRad < zero || Math.abs(angRad - Math.PI) < zero)
+	{ return true; }
+	*/
+
+	// Method 2.***
+	// Another way is using the dot product.***
+	var dotProd = this.direction.scalarProduct(line.direction);
+	if (Math.abs(dotProd) < zero || Math.abs(dotProd - 1.0) < zero)
 	{ return true; }
 	
 	return false;

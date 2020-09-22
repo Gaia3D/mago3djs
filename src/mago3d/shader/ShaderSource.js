@@ -1636,25 +1636,29 @@ uniform float externalAlpha;\n\
 uniform vec4 colorMultiplier;\n\
 uniform bool bUseLogarithmicDepth;\n\
 \n\
-//uniform int sunIdx;\n\
-\n\
 // clipping planes.***\n\
-//uniform bool bApplyClippingPlanes;\n\
-//uniform int clippingPlanesCount;\n\
-//uniform vec4 clippingPlanes[6];\n\
+uniform mat4 clippingPlanesRotMatrix; \n\
+uniform vec3 clippingPlanesPosHIGH;\n\
+uniform vec3 clippingPlanesPosLOW;\n\
+uniform bool bApplyClippingPlanes; // old. deprecated.***\n\
+uniform int clippingType; // 0= no clipping. 1= clipping by planes. 2= clipping by localCoord polyline.\n\
+uniform int clippingPlanesCount;\n\
+uniform vec4 clippingPlanes[6];\n\
+uniform vec2 clippingPolygon2dPoints[512];\n\
+uniform int clippingConvexPolygon2dPointsIndices[256];\n\
 \n\
 varying vec3 vNormal;\n\
 varying vec4 vColor4; // color from attributes\n\
 varying vec2 vTexCoord;   \n\
 varying vec3 vLightWeighting;\n\
 varying vec3 diffuseColor;\n\
-varying vec3 vertexPos;\n\
+varying vec3 vertexPos; // this is the orthoPos.***\n\
+varying vec3 vertexPosLC;\n\
 varying float applySpecLighting;\n\
 varying vec4 vPosRelToLight; \n\
 varying vec3 vLightDir; \n\
 varying vec3 vNormalWC;\n\
 varying float currSunIdx; \n\
-varying float discardFrag;\n\
 \n\
 varying float flogz;\n\
 varying float Fcoef_half;\n\
@@ -1740,6 +1744,222 @@ bool clipVertexByPlane(in vec4 plane, in vec3 point)\n\
 	else return false;\n\
 }\n\
 \n\
+vec2 getDirection2d(in vec2 startPoint, in vec2 endPoint)\n\
+{\n\
+	vec2 vector = endPoint - startPoint;\n\
+	float length = length( vector);\n\
+	vec2 dir = vec2(vector.x/length, vector.y/length);\n\
+\n\
+	return dir;\n\
+}\n\
+\n\
+bool intersectionLineToLine(in vec2 line_1_pos, in vec2 line_1_dir,in vec2 line_2_pos, in vec2 line_2_dir, out vec2 intersectionPoint2d)\n\
+{\n\
+	bool bIntersection = false;\n\
+\n\
+	float zero = 10E-10;\n\
+	float intersectX;\n\
+	float intersectY;\n\
+\n\
+	// check if 2 lines are parallel.***\n\
+	float dotProd = abs(dot(line_1_dir, line_2_dir));\n\
+	if(dotProd < zero || dotProd-1.0 < zero)\n\
+	return false;\n\
+\n\
+	if (abs(line_1_dir.x) < zero)\n\
+	{\n\
+		// this is a vertical line.\n\
+		float slope = line_2_dir.y / line_2_dir.x;\n\
+		float b = line_2_pos.y - slope * line_2_pos.x;\n\
+		\n\
+		intersectX = line_1_pos.x;\n\
+		intersectY = slope * line_1_pos.x + b;\n\
+		bIntersection = true;\n\
+	}\n\
+	else if (abs(line_1_dir.y) < zero)\n\
+	{\n\
+		// this is a horizontal line.\n\
+		// must check if the \"line\" is vertical.\n\
+		if (abs(line_2_dir.x) < zero)\n\
+		{\n\
+			// \"line\" is vertical.\n\
+			intersectX = line_1_pos.x;\n\
+			intersectY = line_2_pos.y;\n\
+			bIntersection = true;\n\
+		}\n\
+		else \n\
+		{\n\
+			float slope = line_2_dir.y / line_2_dir.x;\n\
+			float b = line_2_pos.y - slope * line_2_pos.x;\n\
+			\n\
+			intersectX = (line_1_pos.y - b)/slope;\n\
+			intersectY = line_1_pos.y;\n\
+			bIntersection = true;\n\
+		}	\n\
+	}\n\
+	else \n\
+	{\n\
+		// this is oblique.\n\
+		if (abs(line_2_dir.x) < zero)\n\
+		{\n\
+			// \"line\" is vertical.\n\
+			float mySlope = line_1_dir.y / line_1_dir.x;\n\
+			float myB = line_1_pos.y - mySlope * line_1_pos.x;\n\
+			intersectX = line_2_dir.x;\n\
+			intersectY = intersectX * mySlope + myB;\n\
+			bIntersection = true;\n\
+		}\n\
+		else \n\
+		{\n\
+			float mySlope = line_1_dir.y / line_1_dir.x;\n\
+			float myB = line_1_pos.y - mySlope * line_1_pos.x;\n\
+			\n\
+			float slope = line_2_dir.y / line_2_dir.x;\n\
+			float b = line_2_dir.y - slope * line_2_dir.x;\n\
+			\n\
+			intersectX = (myB - b)/ (slope - mySlope);\n\
+			intersectY = slope * intersectX + b;\n\
+			bIntersection = true;\n\
+		}\n\
+	}\n\
+\n\
+	intersectionPoint2d.x = intersectX;\n\
+	intersectionPoint2d.y = intersectY;\n\
+\n\
+	return bIntersection;\n\
+}\n\
+\n\
+vec2 getProjectedPoint2dToLine(in vec2 line_point, in vec2 line_dir, in vec2 point)\n\
+{\n\
+	bool intersection = false;\n\
+\n\
+	// create a perpendicular left line.***\n\
+	vec2 lineLeft_dir = vec2(-line_dir.y, line_dir.x);\n\
+	vec2 lineLeft_point = vec2(point.x, point.y);\n\
+	vec2 projectedPoint = vec2(0);\n\
+	intersection = intersectionLineToLine(line_point, line_dir, lineLeft_point, lineLeft_dir, projectedPoint);\n\
+\n\
+	return projectedPoint;\n\
+}\n\
+\n\
+int getRelativePositionOfPointToLine(in vec2 line_pos, in vec2 line_dir, vec2 point)\n\
+{\n\
+	// 0 = coincident. 1= left side. 2= right side.***\n\
+	int relPos = -1;\n\
+\n\
+	vec2 projectedPoint = getProjectedPoint2dToLine(line_pos, line_dir, point );\n\
+	float dist = length(point - projectedPoint);\n\
+\n\
+	if(dist < 1E-8)\n\
+	{\n\
+		relPos = 0; // the point is coincident to line.***\n\
+		return relPos;\n\
+	}\n\
+\n\
+	vec2 myVector = normalize(point - projectedPoint);\n\
+	vec2 lineLeft_dir = vec2(-line_dir.y, line_dir.x);\n\
+\n\
+	float dotProd = dot(lineLeft_dir, myVector);\n\
+\n\
+	if(dotProd < 0.0)\n\
+	{\n\
+		relPos = 1; // is in left side of the line.***\n\
+	}\n\
+	else\n\
+	{\n\
+		relPos = 2; // is in right side of the line.***\n\
+	}\n\
+\n\
+	return relPos;\n\
+}\n\
+\n\
+bool isPointInsideLimitationConvexPolygon(in vec2 point2d)\n\
+{\n\
+	bool isInside = true;\n\
+\n\
+	// Check polygons.***\n\
+	int startIdx = -1;\n\
+	int endIdx = -1;\n\
+	for(int i=0; i<128; i+=2)\n\
+	{\n\
+		startIdx = clippingConvexPolygon2dPointsIndices[i];  // 0\n\
+		endIdx = clippingConvexPolygon2dPointsIndices[i+1];	 // 3\n\
+\n\
+		if(startIdx < 0)\n\
+		break;\n\
+\n\
+		startIdx *= 2;\n\
+		endIdx *= 2;\n\
+\n\
+		isInside = true;\n\
+		vec2 pointStart;\n\
+		for(int j=0; j<128; j++)\n\
+		{\n\
+			if(j >= startIdx && j<=endIdx)\n\
+			{\n\
+				vec2 point0;\n\
+				vec2 point1;\n\
+				if(j == startIdx)\n\
+				pointStart = clippingPolygon2dPoints[j];\n\
+\n\
+				//if(j == endIdx)\n\
+				//{\n\
+				//	point0 = clippingPolygon2dPoints[j];\n\
+				//	point1 = pointStart;\n\
+				//}\n\
+				//else\n\
+				{\n\
+					point0 = clippingPolygon2dPoints[j];\n\
+					point1 = clippingPolygon2dPoints[j+1];\n\
+				}\n\
+\n\
+				// create the line of the segment.***\n\
+				vec2 dir = getDirection2d(point0, point1);\n\
+\n\
+				// now, check the relative position of the point with the edge line.***\n\
+				int relPos = getRelativePositionOfPointToLine(point0, dir, point2d);\n\
+				if(relPos == 2)\n\
+				{\n\
+					// the point is in the right side of the edge line, so is out of the polygon.***\n\
+					isInside = false;\n\
+					break;\n\
+				}\n\
+				\n\
+			}\n\
+		}\n\
+\n\
+		if(isInside)\n\
+		return true;\n\
+\n\
+	}\n\
+\n\
+	return isInside;\n\
+}\n\
+\n\
+\n\
+\n\
+\n\
+/*\n\
+bool clipVertexBySegment2d(in vec3 segPoint_1, in vec3 segPoint_2, vec3 point)\n\
+{\n\
+	bool bClip = false;\n\
+	// Note: use the points as 2d points using only x,y.***\n\
+	// Calculate the direction.***\n\
+	float difX = segPoint_2.x - segPoint_1.x;\n\
+	float difY = segPoint_2.y - segPoint_1.y;\n\
+	float modul = sqrt(difX*difX + difY*difY);\n\
+	vec2 dir = vec2(difX/modul, difY/modul);\n\
+\n\
+	// Calculate \n\
+\n\
+	// 1rst, check if the projectionPoint is inside of the segment.***\n\
+\n\
+	// 2nd, check the side of the point relative to segment.***\n\
+\n\
+\n\
+	return bClip;\n\
+}\n\
+*/\n\
 vec3 reconstructPosition(vec2 texCoord, float depth)\n\
 {\n\
     // https://wickedengine.net/2019/09/22/improved-normal-reconstruction-from-depth/\n\
@@ -1831,31 +2051,44 @@ bool isEdge()\n\
 	return false;\n\
 }\n\
 \n\
+\n\
 void main()\n\
 {\n\
 	//gl_FragColor = vColor4; \n\
 	//return;\n\
-	// 1rst, check if there are clipping planes.\n\
-	/*\n\
+\n\
+	if(clippingType == 2)\n\
+	{\n\
+		vec2 pointLC = vec2(vertexPosLC.x, vertexPosLC.y);\n\
+		if(!isPointInsideLimitationConvexPolygon(pointLC))\n\
+		{\n\
+			gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0); \n\
+			return;\n\
+		}\n\
+	}\n\
+\n\
+	// Check if clipping.********************************************\n\
+	\n\
 	if(bApplyClippingPlanes)\n\
 	{\n\
-		bool discardFrag = true;\n\
+		bool discardFrag = false;\n\
 		for(int i=0; i<6; i++)\n\
 		{\n\
 			vec4 plane = clippingPlanes[i];\n\
+			\n\
+			// calculate any point of the plane.\n\
 			if(!clipVertexByPlane(plane, vertexPos))\n\
 			{\n\
-				discardFrag = false;\n\
+				discardFrag = false; // false.\n\
 				break;\n\
 			}\n\
 			if(i >= clippingPlanesCount)\n\
 			break;\n\
 		}\n\
 		\n\
-		if(discardFrag)\n\
-		discard;\n\
 	}\n\
-	*/\n\
+	\n\
+	//----------------------------------------------------------------\n\
 \n\
 	//bool testBool = false;\n\
 	float occlusion = 1.0; // ambient occlusion.***\n\
@@ -2188,19 +2421,14 @@ ShaderSource.ModelRefSsaoVS = "\n\
 	uniform bool bUseLogarithmicDepth;\n\
 	uniform float uFCoef_logDepth;\n\
 	\n\
-	// clipping planes.***\n\
-	uniform mat4 clippingPlanesRotMatrix; \n\
-	uniform vec3 clippingPlanesPosHIGH;\n\
-	uniform vec3 clippingPlanesPosLOW;\n\
-	uniform bool bApplyClippingPlanes;\n\
-	uniform int clippingPlanesCount;\n\
-	uniform vec4 clippingPlanes[6];\n\
+	\n\
 \n\
 	varying vec3 vNormal;\n\
 	varying vec2 vTexCoord;  \n\
 	varying vec3 uAmbientColor;\n\
 	varying vec3 vLightWeighting;\n\
 	varying vec3 vertexPos;\n\
+	varying vec3 vertexPosLC;\n\
 	varying float applySpecLighting;\n\
 	varying vec4 vColor4; // color from attributes\n\
 	varying vec4 vPosRelToLight; \n\
@@ -2211,17 +2439,11 @@ ShaderSource.ModelRefSsaoVS = "\n\
 	varying float flogz;\n\
 	varying float Fcoef_half;\n\
 	\n\
-	bool clipVertexByPlane(in vec4 plane, in vec3 point)\n\
-	{\n\
-		float dist = plane.x * point.x + plane.y * point.y + plane.z * point.z + plane.w;\n\
-		\n\
-		if(dist < 0.0)\n\
-		return true;\n\
-		else return false;\n\
-	}\n\
+\n\
 	\n\
 	void main()\n\
     {	\n\
+		vertexPosLC = vec3(position.x, position.y, position.z);\n\
 		vec4 scaledPos = vec4(position.x * scaleLC.x, position.y * scaleLC.y, position.z * scaleLC.z, 1.0);\n\
 		vec4 rotatedPos;\n\
 		mat3 currentTMat;\n\
@@ -2248,30 +2470,7 @@ ShaderSource.ModelRefSsaoVS = "\n\
 		vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
 		vec3 rotatedNormal = currentTMat * normal;\n\
 		\n\
-		// Check if clipping.********************************************\n\
-		if(bApplyClippingPlanes)\n\
-		{\n\
-			discardFrag = 1.0; // true.\n\
-			for(int i=0; i<6; i++)\n\
-			{\n\
-				vec4 plane = clippingPlanes[i];\n\
-				\n\
-				// calculate any point of the plane.\n\
-				\n\
-				\n\
-				if(!clipVertexByPlane(plane, vertexPos))\n\
-				{\n\
-					discardFrag = -1.0; // false.\n\
-					break;\n\
-				}\n\
-				if(i >= clippingPlanesCount)\n\
-				break;\n\
-			}\n\
-			\n\
-			//if(discardFrag)\n\
-			//discard;\n\
-		}\n\
-		//----------------------------------------------------------------\n\
+		\n\
 		\n\
 		vec3 uLightingDirection = vec3(-0.1320580393075943, -0.9903827905654907, 0.041261956095695496); \n\
 		uAmbientColor = vec3(1.0);\n\

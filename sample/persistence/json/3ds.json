@@ -144,7 +144,8 @@
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
-},{
+},
+{
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
@@ -156,6 +157,130 @@
     "mapping_type":"origin",
     "longitude": 126.6130,
     "latitude": 37.5782,
+    "altitude": 50.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "GK_Spring",
+    "data_name": "GK_Spring",
+    "mapping_type":"origin",
+    "longitude": 126.6131,
+    "latitude": 37.5782,
+    "altitude": 50.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "GK_Summer",
+    "data_name": "GK_Summer",
+    "mapping_type":"origin",
+    "longitude": 126.6132,
+    "latitude": 37.5782,
+    "altitude": 50.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "GK_Winter",
+    "data_name": "GK_Winter",
+    "mapping_type":"origin",
+    "longitude": 126.6133,
+    "latitude": 37.5782,
+    "altitude": 50.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+},{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "SL_Fall",
+    "data_name": "SL_Fall",
+    "mapping_type":"origin",
+    "longitude": 126.6130,
+    "latitude": 37.5781,
+    "altitude": 50.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "SL_Spring",
+    "data_name": "SL_Spring",
+    "mapping_type":"origin",
+    "longitude": 126.6131,
+    "latitude": 37.5781,
+    "altitude": 50.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "SL_Summer",
+    "data_name": "SL_Summer",
+    "mapping_type":"origin",
+    "longitude": 126.6132,
+    "latitude": 37.5781,
+    "altitude": 50.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "SL_Winter",
+    "data_name": "SL_Winter",
+    "mapping_type":"origin",
+    "longitude": 126.6133,
+    "latitude": 37.5781,
     "altitude": 50.000000,
     "heading": 0.000000,
     "pitch": 0.000000,

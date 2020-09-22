@@ -1889,6 +1889,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			gl.uniform1i(currentShader.bApplyShadow_loc, bApplyShadow);
 			gl.uniform1i(currentShader.bApplySpecularLighting_loc, true);
 			gl.uniform1f(currentShader.uFCoef_logDepth_loc, sceneState.fCoef_logDepth[0]);
+			gl.uniform1i(currentShader.clippingType_loc, 0);
 
 			var projectionMatrixInv = sceneState.getProjectionMatrixInv();
 			gl.uniformMatrix4fv(currentShader.projectionMatrixInv_loc, false, projectionMatrixInv._floatArrays);
@@ -1998,6 +1999,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			// after render native geometries, set current shader with "modelRefSsao" shader.
 			currentShader = magoManager.postFxShadersManager.getShader("modelRefSsao"); 
 			currentShader.useProgram();
+			gl.uniform1i(currentShader.clippingType_loc, 0);
 			
 			this.renderExcavationObjects(gl, currentShader, renderType, visibleObjControlerNodes);
 			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);

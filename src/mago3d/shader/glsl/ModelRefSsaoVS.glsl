@@ -33,19 +33,14 @@
 	uniform bool bUseLogarithmicDepth;
 	uniform float uFCoef_logDepth;
 	
-	// clipping planes.***
-	uniform mat4 clippingPlanesRotMatrix; 
-	uniform vec3 clippingPlanesPosHIGH;
-	uniform vec3 clippingPlanesPosLOW;
-	uniform bool bApplyClippingPlanes;
-	uniform int clippingPlanesCount;
-	uniform vec4 clippingPlanes[6];
+	
 
 	varying vec3 vNormal;
 	varying vec2 vTexCoord;  
 	varying vec3 uAmbientColor;
 	varying vec3 vLightWeighting;
 	varying vec3 vertexPos;
+	varying vec3 vertexPosLC;
 	varying float applySpecLighting;
 	varying vec4 vColor4; // color from attributes
 	varying vec4 vPosRelToLight; 
@@ -56,17 +51,11 @@
 	varying float flogz;
 	varying float Fcoef_half;
 	
-	bool clipVertexByPlane(in vec4 plane, in vec3 point)
-	{
-		float dist = plane.x * point.x + plane.y * point.y + plane.z * point.z + plane.w;
-		
-		if(dist < 0.0)
-		return true;
-		else return false;
-	}
+
 	
 	void main()
     {	
+		vertexPosLC = vec3(position.x, position.y, position.z);
 		vec4 scaledPos = vec4(position.x * scaleLC.x, position.y * scaleLC.y, position.z * scaleLC.z, 1.0);
 		vec4 rotatedPos;
 		mat3 currentTMat;
@@ -93,30 +82,7 @@
 		vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);
 		vec3 rotatedNormal = currentTMat * normal;
 		
-		// Check if clipping.********************************************
-		if(bApplyClippingPlanes)
-		{
-			discardFrag = 1.0; // true.
-			for(int i=0; i<6; i++)
-			{
-				vec4 plane = clippingPlanes[i];
-				
-				// calculate any point of the plane.
-				
-				
-				if(!clipVertexByPlane(plane, vertexPos))
-				{
-					discardFrag = -1.0; // false.
-					break;
-				}
-				if(i >= clippingPlanesCount)
-				break;
-			}
-			
-			//if(discardFrag)
-			//discard;
-		}
-		//----------------------------------------------------------------
+		
 		
 		vec3 uLightingDirection = vec3(-0.1320580393075943, -0.9903827905654907, 0.041261956095695496); 
 		uAmbientColor = vec3(1.0);

@@ -190,6 +190,23 @@ MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPr
 	
 	var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
 	buildingGeoLocation.bindGeoLocationUniforms(gl, shader); // rotMatrix, positionHIGH, positionLOW.
+
+	//shader.clippingPolygon2dPoints_loc = gl.getUniformLocation(shader.program, "clippingPolygon2dPoints");
+	//shader.clippingConvexPolygon2dPointsIndices_loc = gl.getUniformLocation(shader.program, "clippingConvexPolygon2dPointsIndices");
+
+
+	if(renderType === 1)
+	{
+		if(this.options.limitationGeographicCoords)
+		{
+			gl.uniform1i(shader.clippingType_loc, 2); // 2= clipping locally by polygon2d.***
+			gl.uniform2fv(shader.clippingPolygon2dPoints_loc, this.uniformPoints2dArray);
+			gl.uniform1i(shader.clippingConvexPolygon2dPointsIndices_loc, this.uniformPolygonPointsIdx);
+		}
+		else{
+			gl.uniform1i(shader.clippingType_loc, 0);
+		}
+	}
 	
 	var renderShaded = true;
 	if (this.options && this.options.renderShaded === false)
@@ -204,6 +221,8 @@ MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPr
 	gl.uniform1f(shader.externalAlpha_loc, 1.0);
 	// delete specularLighting
 	gl.uniform1i(shader.bApplySpecularLighting_loc, false);
+	// return clippingType to 0 (0= no clipping).***
+	gl.uniform1i(shader.clippingType_loc, 0);
 	
 	// check options provisionally here.
 	if (this.options)

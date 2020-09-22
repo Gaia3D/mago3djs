@@ -1519,6 +1519,11 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	
 	// 3) test mago geometries.***********************************************************************************************************
 	//this.renderer.renderMagoGeometries(renderType); //TEST
+	if(!this.test__splittedMesh)
+	{
+		this.TEST__splittedExtrudedBuilding();
+		this.test__splittedMesh = true;
+	}
 	
 	// 4) Render filter.******************************************************************************************************************
 	//this.renderFilter();
@@ -2041,6 +2046,28 @@ MagoManager.prototype.TEST__splittedExtrudedBuilding = function()
 		
 	}
 
+	// make a limitation polygon2d.****************************************
+	//limitationPolygon2d
+	/*
+	var limiGeoCoord1 = new GeographicCoord(127.00677393677276, 37.4515568669093, 0.0);
+	var limiGeoCoord2 = new GeographicCoord(127.00670285098234, 37.451149160635964, 0.0);
+	var limiGeoCoord3 = new GeographicCoord(127.00701725187915, 37.45116161039015, 0.0);
+	var limiGeoCoord4 = new GeographicCoord(127.00699905445235, 37.4510234587059, 0.0);
+	var limiGeoCoord5 = new GeographicCoord(127.00676113458148, 37.45101249247572, 0.0);
+	var limiGeoCoord6 = new GeographicCoord(127.0068275878695, 37.4507608835301, 0.0);
+	var limiGeoCoord7 = new GeographicCoord(127.00753105267508, 37.45075685056917, 0.0);
+	var limiGeoCoord8 = new GeographicCoord(127.00746746612433, 37.45159376615369, 0.0);
+	options.limitationGeographicCoords = [limiGeoCoord1, limiGeoCoord2, limiGeoCoord3, limiGeoCoord4, limiGeoCoord5, limiGeoCoord6, limiGeoCoord7, limiGeoCoord8];
+	*/
+
+	var limiGeoCoord0 = new GeographicCoord(127.00707561793477, 37.45181817281961, 0.0);
+	var limiGeoCoord1 = new GeographicCoord(127.00711848788578, 37.45045648607603, 0.0);
+	var limiGeoCoord2 = new GeographicCoord(127.00838475802502, 37.45048859811164, 0.0);
+	var limiGeoCoord3 = new GeographicCoord(127.00826935498984, 37.45181503770476, 0.0);
+	options.limitationGeographicCoords = [limiGeoCoord0, limiGeoCoord1, limiGeoCoord2, limiGeoCoord3];
+
+	// End making limitation polygon2d.------------------------------------
+
 	options.color = new Color(Math.random(),Math.random(),Math.random(),1);
 	options.renderWireframe = true;
 	options.wireframeColor4 = new Color(1.0, 0.5, 0.0, 1.0);
@@ -2048,7 +2075,7 @@ MagoManager.prototype.TEST__splittedExtrudedBuilding = function()
 	this.modeler.addObject(extrudedBuilding, 5);
 
 	// Now, create a clippingPlane.***
-	//var options = {};
+	var options = {};
 	options.position = {
 		longitude : 127.0068,
 		latitude : 37.45136,
@@ -2056,6 +2083,7 @@ MagoManager.prototype.TEST__splittedExtrudedBuilding = function()
 	};
 	options.color = new Color(0.3, 0.8, 0.8, 0.5);
 	options.isMovable = true;
+	//options.limitationGeographicCoords = undefined;
 
 	var clippingPlane = new ClippingPlane(options);
 	this.modeler.addObject(clippingPlane, 5);

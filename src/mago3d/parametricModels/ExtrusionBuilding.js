@@ -57,6 +57,9 @@ var ExtrusionBuilding = function(geographicCoordList, height, options)
     this.options.renderWireframe = defaultValue(options.renderWireframe, true);
     this.options.renderShaded = defaultValue(options.renderShaded, true);
 	this.options.depthMask = defaultValue(options.depthMask, true);
+	this.options.limitationGeographicCoords = defaultValue(options.limitationGeographicCoords, undefined);
+	this.limitationConvexPolygon2dArray;
+
 	
 	function makeLocalCooldList ( gcLists, geoLocData) {
 		var tMatInv = geoLocData.getTMatrixInv();
@@ -159,7 +162,85 @@ ExtrusionBuilding.prototype.makeMesh = function() {
 		this.objectsArray.push(surfIndepMesh);
 	}
 	this.setDirty(false);
+
+	// Check if exist limitation polygons.***
+	if(this.options.limitationGeographicCoords)
+	{
+		this.makeUniformPoints2dArray();
+	}
 }
+
+ExtrusionBuilding.prototype.makeUniformPoints2dArray = function() 
+{
+	if(!this.geoLocDataManager) {
+        return;
+    }
+	var geoLocData = this.geoLocDataManager.getCurrentGeoLocationData();
+    
+    if(!geoLocData) {
+        return;
+	}
+
+	if(!this.options.limitationGeographicCoords)
+	{
+		return;
+	}
+
+	this.limitationConvexPolygon2dArray = [];
+
+	// 1rst, convert all geoCoords to pointLC.***
+	var limitGeoCoordsArray = this.options.limitationGeographicCoords;
+	var basePoints3dArray = GeographicCoordsList.getPointsRelativeToGeoLocation(geoLocData, limitGeoCoordsArray, undefined);
+
+	// now, make polygons2d.***
+	var polygon2d = new Polygon2D();
+	polygon2d.point2dList = new Point2DList();
+
+	var points3dCount = basePoints3dArray.length;
+	for(var i=0; i<points3dCount; i++)
+	{
+		var point3d = basePoints3dArray[i];
+		var point2d = polygon2d.point2dList.newPoint(point3d.x, point3d.y);
+	}
+
+	// make the polygon by geoCoordsArray.***
+	var resultConcavePointsIdxArray = polygon2d.calculateNormal(undefined);
+	if(polygon2d.normal < 0)
+	{
+		polygon2d.reverseSense();
+		resultConcavePointsIdxArray = polygon2d.calculateNormal(undefined);
+	}
+	var limitationConvexPolygon2dArray = polygon2d.tessellate(resultConcavePointsIdxArray, undefined);
+	
+	// now, make the uniforms values to send to shader.***
+	var uniformPoints2dArray = new Float32Array(512);
+	var uniformPolygonPointsIdx = new Int32Array(256);
+	// set initially idx = -1.***
+	for(var i=0; i<256; i++)
+	{
+		uniformPolygonPointsIdx[i] = -1;
+	}
+	var currentIdx = 0;
+	var convexPolygon2dCount = limitationConvexPolygon2dArray.length;
+	for(var i=0; i<convexPolygon2dCount; i++)
+	{
+		var convexPolygon2d = limitationConvexPolygon2dArray[i];
+		var pointsCount = convexPolygon2d.point2dList.getPointsCount();
+		uniformPolygonPointsIdx[i*2] = currentIdx;
+		for(var j=0; j<pointsCount; j++)
+		{
+			var point2d = convexPolygon2d.point2dList.getPoint(j);
+			//uniformPoints2dArray.push(point2d.x, point2d.y);
+			uniformPoints2dArray[2*currentIdx] = point2d.x;
+			uniformPoints2dArray[2*currentIdx+1] = point2d.y;
+			currentIdx += 1;
+		}
+		uniformPolygonPointsIdx[i*2+1] = currentIdx-1;
+	}
+
+	this.uniformPoints2dArray = uniformPoints2dArray;
+	this.uniformPolygonPointsIdx = uniformPolygonPointsIdx;
+};
 
 /**
  * @param {Array<Cesium.Cartesian3>} cartesian3Array

@@ -726,4 +726,10 @@ PostFxShader.prototype.createUniformLocals = function(gl, shader, sceneState)
 
 	shader.uRenderType_loc = gl.getUniformLocation(shader.program, "uRenderType");
 	shader.uTime_loc = gl.getUniformLocation(shader.program, "uTime");
+
+	//uniform vec2 clippingPolygon2dPoints[512];
+	//uniform int clippingConvexPolygon2dPointsIndices[256];
+	shader.clippingPolygon2dPoints_loc = gl.getUniformLocation(shader.program, "clippingPolygon2dPoints");
+	shader.clippingConvexPolygon2dPointsIndices_loc = gl.getUniformLocation(shader.program, "clippingConvexPolygon2dPointsIndices");
+	shader.clippingType_loc = gl.getUniformLocation(shader.program, "clippingType");
 };

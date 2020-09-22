@@ -35,7 +35,8 @@ var ClippingPlane = function(options)
     //this.selectedColor4 = defaultValue(options.selectedColor, new Color(1,1,0,1));
 
 	//this.attributes.isVisible = defaultValue(options.isVisible, true);
-    this.attributes.isMovable = defaultValue(options.isMovable, true);
+	this.attributes.isMovable = defaultValue(options.isMovable, true);
+	this.attributes.movementInAxisZ = true;
     //this.attributes.isSelectable = defaultValue(options.isSelectable, true);
 
 	//if(!this.options)
