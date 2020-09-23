@@ -63,12 +63,11 @@ var ExtrusionBuilding = function(geographicCoordList, height, options)
 	
 	function makeLocalCooldList ( gcLists, geoLocData) {
 		var tMatInv = geoLocData.getTMatrixInv();
-		var error = 1E-8;
+		var error = 1E-7;
 		var lcListArray = [];
 		for(var j=0,gcLen=gcLists.length; j < gcLen; j++) 
 		{
 			var gcList = gcLists[j];
-			gcList.setAltitude(0);
 			//GeographicCoordsList.solveDegeneratedPoints(gcList.geographicCoordsArray, error);
 			var lcList = [];
 			for(var i=0,len=gcList.geographicCoordsArray.length;i<len;i++)
