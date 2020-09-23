@@ -568,8 +568,9 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader,
 		else 
 		{
 			shader.disableVertexAttribArray(shader.texCoord2_loc);
-
-			if (owner.isColorChanged || !vbo_vicky.bindDataColor(shader, magoManager.vboMemoryManager))
+			vbo_vicky.bindDataColor(shader, magoManager.vboMemoryManager);
+			
+			if (owner.isColorChanged || !vbo_vicky.vboBufferCol)
 			{ 
 				gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 				//return false; 

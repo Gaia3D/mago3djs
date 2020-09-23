@@ -2096,6 +2096,26 @@ MagoManager.prototype.TEST__splittedExtrudedBuilding = function()
 		]
 	};
 
+	var segments2 = {
+		"type": "FeatureCollection",
+		"name": "26",
+		"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+		"features": [
+		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.006806753742254, 37.451359602856371 ], [ 127.006709447420434, 37.451321237588523 ] ] } },
+		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.006854763909828, 37.451375356192607 ], [ 127.006809325715508, 37.451458302330344 ] ] } },
+		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.00699836575032, 37.451427438651173 ], [ 127.006955021671715, 37.451510921356906 ] ] } },
+		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007095029078798, 37.451464196435744 ], [ 127.00705280585106, 37.451549285884532 ] ] } },
+		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007117560636246, 37.451433386339353 ], [ 127.007208653897578, 37.451474539685165 ] ] } },
+		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007177466180138, 37.451327721104477 ], [ 127.007274718919035, 37.451371712563827 ] ] } },
+		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007236719758637, 37.45122818379366 ], [ 127.00732923315249, 37.451269762847076 ] ] } },
+		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007291812004411, 37.4511356703998 ], [ 127.007384325398277, 37.451176209976886 ] ] } },
+		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007309360183939, 37.451106075950335 ], [ 127.00737738351846, 37.450977905949415 ] ] } },
+		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007228403947948, 37.45102236747924 ], [ 127.00727102247771, 37.450940248848731 ] ] } },
+		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007095029078798, 37.450974449860347 ], [ 127.007136930030427, 37.450891393460971 ] ] } },
+		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007034909203824, 37.450952346965117 ], [ 127.006900724536308, 37.450896406546654 ] ] } }
+		]
+		}
+
 	this.sceneState.sunSystem.setDate(new Date('2020-09-21 03:00'));
 	// make geographicsCoordsArray.***
 	var geoCoordsArray = [];
@@ -2110,7 +2130,7 @@ MagoManager.prototype.TEST__splittedExtrudedBuilding = function()
 
 	// make segments array.***
 	var segments2dArray = [];
-	/*
+	
 	var segmentsArray = segments.features;
 	var segmentsCount = segmentsArray.length;
 	for(var i=0; i<segmentsCount; i++)
@@ -2121,7 +2141,7 @@ MagoManager.prototype.TEST__splittedExtrudedBuilding = function()
 		var segment2d = new Segment2D(strPoint2D, endPoint2D);
 		segments2dArray.push(segment2d);
 	}
-	*/
+	
 
 	// make the polygon by geoCoordsArray.***
 	var polygon2d = Polygon2D.makePolygonByGeographicCoordArray(geoCoordsArray) ;
