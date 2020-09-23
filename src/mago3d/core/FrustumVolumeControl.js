@@ -152,8 +152,13 @@ FrustumVolumeControl.prototype.getAllVisiblesObject = function()
 		nativeMap : nativeMap
 	};
 };
-
-FrustumVolumeControl.prototype.selectionByPolygon2D = function(polygon2D, type) {
+/**
+ * 
+ * @param {*} polygon2D 
+ * @param {*} type 
+ * @param {*} filter 
+ */
+FrustumVolumeControl.prototype.selectionByPolygon2D = function(polygon2D, type, filter) {
 	var allVisible = this.getAllVisiblesObject();
 	
 	var result = [];
@@ -162,6 +167,9 @@ FrustumVolumeControl.prototype.selectionByPolygon2D = function(polygon2D, type) 
 	for(var k in dataMap) {
 		if(dataMap.hasOwnProperty(k)) {
 			var data = dataMap[k];
+			if(filter && typeof filter === 'function') {
+				if(filter.call(this, data)) continue;
+			}
 
 			if(data.intersectionWithPolygon2D(polygon2D)) {
 				result.push(data);

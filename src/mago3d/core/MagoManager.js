@@ -1509,12 +1509,12 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	
 	// 3) test mago geometries.***********************************************************************************************************
 	//this.renderer.renderMagoGeometries(renderType); //TEST
+
 	//if(!this.test__splittedMesh)
 	//{
 	//	this.TEST__splittedExtrudedBuilding();
 	//	this.test__splittedMesh = true;
 	//}
-	
 	// 4) Render filter.******************************************************************************************************************
 	//this.renderFilter();
 };
