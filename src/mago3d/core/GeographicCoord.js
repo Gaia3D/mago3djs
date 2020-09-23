@@ -285,8 +285,11 @@ GeographicCoord.prototype.isCoincidentToGeoCoord = function(geographicCoord, err
 	if(Math.abs(this.latitude - geographicCoord.latitude) > error)
 	return false;
 
-	if(Math.abs(this.altitude - geographicCoord.altitude) > errorForAltitude)
-	return false;
+	if(this.altitude && geographicCoord.altitude)
+	{
+		if(Math.abs(this.altitude - geographicCoord.altitude) > errorForAltitude)
+		return false;
+	}
 
 	return true;
 };

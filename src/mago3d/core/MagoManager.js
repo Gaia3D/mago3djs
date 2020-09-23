@@ -1973,6 +1973,24 @@ MagoManager.prototype.TEST__splittedExtrudedBuilding = function()
 		]
 	};
 
+	var polygon2 = {
+		"type": "FeatureCollection",
+		"name": "polygon",
+		"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+		"features": [
+		{ "type": "Feature", "properties": { "id": 26 }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [[127.00715678,37.45156002],[127.00746056,37.45104039],[127.00744861,37.45101422],[127.00741695,37.45100246],[127.00696707,37.45083529],[127.00693425,37.45084482],[127.00682858,37.45102558],[127.00692077,37.45105984],[127.00695992,37.45099288],[127.00699848,37.45100721],[127.00703248,37.45094906],[127.00728902,37.45104439],[127.00726348,37.45108808],[127.0073103,37.45110547],[127.00709722,37.45146995],[127.00680261,37.45136048],[127.00687898,37.45122986],[127.00678679,37.4511956],[127.00667218,37.45139164],[127.00667759,37.45140349],[127.00709259,37.4515577],[127.00712426,37.45156946],[127.00715678,37.45156002]]] ] } }
+		]
+	};
+
+	var polygon3 = {
+		"type": "FeatureCollection",
+		"name": "polygon",
+		"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+		"features": [
+		{ "type": "Feature", "properties": { "id": 26 }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [[127.00624431,37.45311893],[127.00654177,37.45261149],[127.00652793,37.45258185],[127.00604714,37.45240348],[127.00601203,37.45241478],[127.00590635,37.45259555],[127.00599854,37.4526298],[127.00603769,37.45256284],[127.00607626,37.45257717],[127.00611025,37.45251902],[127.0063668,37.45261435],[127.00634126,37.45265804],[127.00638807,37.45267544],[127.00622799,37.45294118],[127.00599713,37.45283828],[127.00592387,37.45296367],[127.00595887,37.45297503],[127.00597467,37.4529813],[127.0059889,37.45298769],[127.00606894,37.45302214],[127.00608174,37.45302778],[127.00609454,37.45303275],[127.00611732,37.45304678],[127.00611974,37.45304806],[127.00612294,37.45305001],[127.00612875,37.45305315],[127.0061422,37.45306056],[127.00616388,37.4530727],[127.00622159,37.45310691],[127.00624431,37.45311893]]] ] } }
+		]
+	};
+
 	var segments = {
 		"type": "FeatureCollection",
 		"name": "line",
@@ -1991,7 +2009,7 @@ MagoManager.prototype.TEST__splittedExtrudedBuilding = function()
 	this.sceneState.sunSystem.setDate(new Date('2020-09-21 03:00'));
 	// make geographicsCoordsArray.***
 	var geoCoordsArray = [];
-	var coordsArray = polygon.features[0].geometry.coordinates[0][0];
+	var coordsArray = polygon2.features[0].geometry.coordinates[0][0];
 	var coordsCount = coordsArray.length;
 	for(var i=0; i<coordsCount; i++)
 	{
@@ -2002,6 +2020,7 @@ MagoManager.prototype.TEST__splittedExtrudedBuilding = function()
 
 	// make segments array.***
 	var segments2dArray = [];
+	
 	var segmentsArray = segments.features;
 	var segmentsCount = segmentsArray.length;
 	for(var i=0; i<segmentsCount; i++)
@@ -2012,6 +2031,7 @@ MagoManager.prototype.TEST__splittedExtrudedBuilding = function()
 		var segment2d = new Segment2D(strPoint2D, endPoint2D);
 		segments2dArray.push(segment2d);
 	}
+	
 
 	// make the polygon by geoCoordsArray.***
 	var polygon2d = Polygon2D.makePolygonByGeographicCoordArray(geoCoordsArray) ;
@@ -2078,7 +2098,7 @@ MagoManager.prototype.TEST__splittedExtrudedBuilding = function()
 	// End making limitation polygon2d.------------------------------------
 	var minHeight = 0.0;
 	var maxHeight = 60.0;
-	options.limitationHeights = new Float32Array([minHeight, maxHeight]);
+	//options.limitationHeights = new Float32Array([minHeight, maxHeight]);
 
 	options.color = new Color(Math.random(),Math.random(),Math.random(),1);
 	options.renderWireframe = true;
@@ -2088,6 +2108,7 @@ MagoManager.prototype.TEST__splittedExtrudedBuilding = function()
 	this.modeler.addObject(extrudedBuilding, 5);
 
 	// Now, create a clippingPlane.***
+	/*
 	var options = {};
 	options.position = {
 		longitude : 127.0068,
@@ -2100,7 +2121,7 @@ MagoManager.prototype.TEST__splittedExtrudedBuilding = function()
 
 	var clippingPlane = new ClippingPlane(options);
 	this.modeler.addObject(clippingPlane, 5);
-	
+	*/
 	var hola = 0;
 };
 
