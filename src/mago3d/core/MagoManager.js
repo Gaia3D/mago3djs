@@ -629,16 +629,6 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 				var bytesReaded = 0;
 				neoBuilding.parseHeader(neoBuilding.headerDataArrayBuffer, bytesReaded);
 
-				//temp hardcoding
-				/*var data = node.data;
-				var bbox = node.getBBox();
-				var geographicCoord = data.geographicCoord;
-				var halfZlength = (bbox.maxZ - bbox.minZ) / 2;
-				var lon = geographicCoord.longitude;
-				var lat = geographicCoord.latitude;
-				
-				node.changeLocationAndRotation(lat, lon, halfZlength, 0,0,0, this);
-				*/
 				counter++;
 				if (counter > 60)
 				{ break; }
@@ -1519,11 +1509,11 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	
 	// 3) test mago geometries.***********************************************************************************************************
 	//this.renderer.renderMagoGeometries(renderType); //TEST
-	if(!this.test__splittedMesh)
+	/*if(!this.test__splittedMesh)
 	{
 		this.TEST__splittedExtrudedBuilding();
 		this.test__splittedMesh = true;
-	}
+	}*/
 	
 	// 4) Render filter.******************************************************************************************************************
 	//this.renderFilter();
@@ -1673,6 +1663,10 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 	
 	// Render process.***
 	this.doRender(frustumVolumenObject);
+
+	if(this['validTerrainHeight']) {
+		this['validTerrainHeight'].call(this);
+	}
 
 	this.drawSelectedExtruionBuildingLabel();
 	this.canvasDirty = true;
@@ -1900,7 +1894,30 @@ MagoManager.prototype.drawSelectedExtruionBuildingLabel = function()
 
 		if(!(nativeModel instanceof ExtrusionBuilding) || this.modeler.objectsArray.indexOf(nativeModel) < 0) continue;
 
-		worldPosition = nativeModel.getBBoxCenterPositionWorldCoord();
+		var center = nativeModel.getCenter();
+		var centerInBuilding = false;
+		var labelGeoCoord;
+
+		var listLength = nativeModel.geographicCoordListsArray.length;
+		for(var i=0;i<listLength;i++) {
+			var geographicCoordList = nativeModel.geographicCoordListsArray[i];
+			var extent = geographicCoordList.getGeographicExtent();
+			if(extent.intersects2dWithGeoCoord(center)) {
+				centerInBuilding = true;
+				break;
+			}
+		}
+
+		if(centerInBuilding) {
+			labelGeoCoord = center;
+		} else {
+			var geographicCoordList = nativeModel.geographicCoordListsArray[Math.floor(listLength/2)];
+			var extent = geographicCoordList.getGeographicExtent();
+			labelGeoCoord = new GeographicCoord(extent.getCenterLongitude(), extent.getCenterLatitude(), extent.getCenterAltitude()); 
+		}
+
+		labelGeoCoord.altitude = nativeModel.getRealHeight() + 2;
+		var worldPosition = ManagerUtils.geographicCoordToWorldPoint(labelGeoCoord.longitude,labelGeoCoord.latitude,labelGeoCoord.altitude);
 		screenCoord = ManagerUtils.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord, this);
 
 		var elemFromPoints = document.elementsFromPoint(screenCoord.x, screenCoord.y);
@@ -1908,7 +1925,7 @@ MagoManager.prototype.drawSelectedExtruionBuildingLabel = function()
 
 		if (elemFromPoints[0].nodeName === 'CANVAS' && screenCoord.x >= 0 && screenCoord.y >= 0)
 		{
-			ctx.font = "13px Arial";
+			ctx.font = "normal normal bolder 18px Helvetica";
 			var text = nativeModel.getLevel();
 			ctx.strokeText(text, screenCoord.x, screenCoord.y);
 			ctx.fillText(text, screenCoord.x, screenCoord.y);

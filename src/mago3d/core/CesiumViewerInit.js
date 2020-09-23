@@ -212,17 +212,27 @@ CesiumViewerInit.prototype.geoserverTerrainProviderBuild = function()
 
 CesiumViewerInit.prototype.postProcessDataProvider = function() 
 {
+	var viewer =this.viewer; 
 	// TODO : 제거 필수!! 세슘의 카메라 매트릭스를 강제로 변환시키기 위하여 우주크기만한 엔티티를 추가.
-	this.viewer.entities.add({
-		name     : "mago3D",
-		position : Cesium.Cartesian3.fromDegrees(37.521168, 126.924185, 3000.0),
-		box      : {
-			dimensions : new Cesium.Cartesian3(300000.0*1000.0, 300000.0*1000.0, 300000.0*1000.0), // dimensions : new Cesium.Cartesian3(400000.0, 300000.0, 500000.0),
-			fill       : true,
-			material   : Cesium.Color.BLUE,
-			outline    : false
+	addSpaceBox(viewer);
+
+	viewer.entities.collectionChanged.addEventListener(function(c,ar,ra,ca) {
+		if(c.values.length === 0) {
+			addSpaceBox(viewer);
 		}
 	});
+	function addSpaceBox(v) {
+		v.entities.add({
+			name     : "mago3D",
+			position : Cesium.Cartesian3.fromDegrees(37.521168, 126.924185, 3000.0),
+			box      : {
+				dimensions : new Cesium.Cartesian3(300000.0*1000.0, 300000.0*1000.0, 300000.0*1000.0), // dimensions : new Cesium.Cartesian3(400000.0, 300000.0, 500000.0),
+				fill       : true,
+				material   : Cesium.Color.BLUE,
+				outline    : false
+			}
+		});
+	}
 
 	if (!this.options.imageryProvider) 
 	{

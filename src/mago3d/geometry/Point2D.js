@@ -146,6 +146,7 @@ Point2D.prototype.isParallelToPoint = function(point, err)
  */
 Point2D.prototype.squareDistToPoint = function(point) 
 {
+	if(!point) return;
 	var dx = this.x - point.x;
 	var dy = this.y - point.y;
 

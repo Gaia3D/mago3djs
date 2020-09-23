@@ -443,6 +443,10 @@ TranslateInteraction.prototype.handleNativeDrag = function(browserEvent)
 			}
 			object.geographicCoordListsArray = geographicCoordListsArray;
 		}
+		if(object.options.limitationGeographicCoords)
+		{
+			object.makeUniformPoints2dArray();
+		}
 	}
 
 	object.moved();
