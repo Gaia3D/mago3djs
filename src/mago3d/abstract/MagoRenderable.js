@@ -679,3 +679,14 @@ MagoRenderable.prototype.setTerrainHeight = function(height)
 	this.terrainHeight = height;
 	this.setDirty(true);
 }
+
+
+/**
+ * set terrain height. fire makemesh
+ * @param {number} height terrain height
+ */
+MagoRenderable.prototype.validTerrainHeight = function()
+{
+	var geoLocData = this.geoLocDataManager.getCurrentGeoLocationData();
+	geoLocData = ManagerUtils.calculateGeoLocationData(undefined, undefined, this.terrainHeight, undefined, undefined, undefined, geoLocData);
+}

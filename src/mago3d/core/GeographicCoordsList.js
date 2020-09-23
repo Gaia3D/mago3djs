@@ -606,6 +606,8 @@ GeographicCoordsList.solveDegeneratedPoints = function(geographicCoordsArray, er
 		var geoCoord1 = geographicCoordsArray[i];
 		var geoCoord2 = geographicCoordsArray[i+1];
 
+		if(!geoCoord2) geoCoord2 = geographicCoordsArray[0];
+
 		if(geoCoord1.isCoincidentToGeoCoord(geoCoord2, error))
 		{
 			// delete the geoCoord2.***

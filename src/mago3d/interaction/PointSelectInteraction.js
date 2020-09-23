@@ -21,6 +21,7 @@ var PointSelectInteraction = function(option)
 
 	this.targetType = defaultValue(option.targetType, DataType.F4D);
 	this.targetHighlight = defaultValue(option.targetHighlight, true);
+	this.filter = undefined;
 
 	var that = this;
 	this.on(PointSelectInteraction.EVENT_TYPE.DEACTIVE, function()
@@ -59,6 +60,7 @@ PointSelectInteraction.prototype.setTargetType = function(type)
 		this.selected = undefined;
 		this.manager.isCameraMoved = true;
 		this.manager.selectionManager.clearCurrents();
+		this.filter = undefined;
 	}
 	this.targetType = type;
 };
@@ -70,6 +72,26 @@ PointSelectInteraction.prototype.setTargetType = function(type)
 PointSelectInteraction.prototype.getTargetType = function()
 {
 	return this.targetType;
+};
+
+/**
+ * set filter function
+ * @param {function} filterFunction
+ */
+PointSelectInteraction.prototype.setFilter = function(filterFunction)
+{
+	if(filterFunction && typeof filterFunction === 'function') {
+		this.filter = filterFunction;
+	}
+};
+
+/**
+ * set filter function
+ * @param {function} filterFunction
+ */
+PointSelectInteraction.prototype.getFilter = function(filterFunction)
+{
+	return this.filter;
 };
 
 /**
@@ -203,7 +225,7 @@ PointSelectInteraction.prototype.select = function(screenCoordinate)
 
 	var gl = manager.getGl();
 	selectManager.selectProvisionalObjectByPixel(gl, screenCoordinate.x, screenCoordinate.y);
-	selectManager.provisionalToCurrent(this.targetType);
+	selectManager.provisionalToCurrent(this.targetType, this.filter);
 	
 	//selectManager.selectObjectByPixel(gl, screenCoordinate.x, screenCoordinate.y, bObject);
 };
