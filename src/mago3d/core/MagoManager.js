@@ -1508,12 +1508,12 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	this.swapRenderingFase();
 	
 	// 3) test mago geometries.***********************************************************************************************************
-	//this.renderer.renderMagoGeometries(renderType); //TEST
-	//if(!this.test__splittedMesh)
-	//{
-	//	this.TEST__splittedExtrudedBuilding();
-	//	this.test__splittedMesh = true;
-	//}
+	this.renderer.renderMagoGeometries(renderType); //TEST
+	if(!this.test__splittedMesh)
+	{
+		this.TEST__splittedExtrudedBuilding();
+		this.test__splittedMesh = true;
+	}
 	
 	// 4) Render filter.******************************************************************************************************************
 	//this.renderFilter();
@@ -2214,8 +2214,17 @@ MagoManager.prototype.TEST__splittedExtrudedBuilding = function()
 	options.renderWireframe = true;
 	options.wireframeColor4 = new Color(1.0, 0.5, 0.0, 1.0);
 	options.limitationInfringingDynamicColor4 = new DynamicColor(1.0, 0.5, 1.0, 1.0);
-	var extrudedBuilding = new ExtrusionBuilding(geoCoordsListsArray, height, options);
-	this.modeler.addObject(extrudedBuilding, 5);
+	//var extrudedBuilding = new ExtrusionBuilding(geoCoordsListsArray, height, options);
+	//this.modeler.addObject(extrudedBuilding, 5);
+
+	// Wall test.***
+	var extrudeDirWC = undefined;
+	var height = 200.0;
+	var geoCoordList = geoCoordsListsArray[0];
+	var options= {};
+	options.doubleFace = true;
+	var resultRenderableObject = geoCoordList.getExtrudedWallRenderableObject(height, undefined, this, extrudeDirWC, options, undefined);
+	this.modeler.addObject(resultRenderableObject, 5);
 
 	// Now, create a clippingPlane.***
 	/*

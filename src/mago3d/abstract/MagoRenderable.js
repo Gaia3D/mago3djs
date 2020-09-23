@@ -194,10 +194,18 @@ MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPr
 	//shader.clippingPolygon2dPoints_loc = gl.getUniformLocation(shader.program, "clippingPolygon2dPoints");
 	//shader.clippingConvexPolygon2dPointsIndices_loc = gl.getUniformLocation(shader.program, "clippingConvexPolygon2dPointsIndices");
 
+	if(this.attributes.doubleFace)
+	{
+		gl.disable(gl.CULL_FACE);
+	}
+	else{
+		gl.enable(gl.CULL_FACE);
+	}
+
 
 	if(renderType === 1)
 	{
-		if(this.options.limitationGeographicCoords)
+		if(this.options && this.options.limitationGeographicCoords)
 		{
 			if(this.options.limitationHeights)
 			{
@@ -223,7 +231,7 @@ MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPr
 		}
 		else
 		{
-			if(this.options.limitationHeights)
+			if(this.options && this.options.limitationHeights)
 			{
 				gl.uniform2fv(shader.limitationHeights_loc, this.options.limitationHeights);
 				gl.uniform1i(shader.clippingType_loc, 3); // 3= clipping locally by heights.***
