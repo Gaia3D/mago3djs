@@ -29,6 +29,10 @@ vec4 PackDepth32( in float depth )
 
 void main()
 {     
+    vec2 pt = gl_PointCoord - vec2(0.5);
+	float distSquared = pt.x*pt.x+pt.y*pt.y;
+	if(distSquared > 0.25)
+		discard;
     gl_FragData[0] = packDepth(-depth);
 	//gl_FragData[0] = PackDepth32(depth);
 }

@@ -551,8 +551,7 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 	if (!neoReference.isReadyToRender())
 	{ return false; }
 
-	if(neoReference.vBOVertexIdxCacheKeysContainer === undefined)
-	return false;
+	//if(neoReference.vBOVertexIdxCacheKeysContainer === undefined) return false;
 
 	// Check if the texture is loaded.
 	//if (neoReference.texture !== undefined || neoReference.materialId != -1)

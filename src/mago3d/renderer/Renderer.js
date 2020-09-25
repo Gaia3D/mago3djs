@@ -165,31 +165,31 @@ Renderer.prototype.getPointsCountForDistance = function(distToCam, realPointsCou
 	if (distToCam <= 10)
 	{
 		// Render all points.
-		vertices_count =  Math.floor(pCloudSettings.MaxPerUnitPointsRenderDistToCam0m * realPointsCount);
+		vertices_count =  Math.floor(pCloudSettings.maxPerUnitPointsRenderDistToCam0m * realPointsCount);
 	}
 	else if (distToCam < 100)
 	{
-		vertices_count = Math.floor(pCloudSettings.MaxPerUnitPointsRenderDistToCam100m * realPointsCount);
+		vertices_count = Math.floor(pCloudSettings.maxPerUnitPointsRenderDistToCam100m * realPointsCount);
 	}
 	else if (distToCam < 200)
 	{
-		vertices_count = Math.floor(pCloudSettings.MaxPerUnitPointsRenderDistToCam200m * realPointsCount);
+		vertices_count = Math.floor(pCloudSettings.maxPerUnitPointsRenderDistToCam200m * realPointsCount);
 	}
 	else if (distToCam < 400)
 	{
-		vertices_count = Math.floor(pCloudSettings.MaxPerUnitPointsRenderDistToCam400m * realPointsCount);
+		vertices_count = Math.floor(pCloudSettings.maxPerUnitPointsRenderDistToCam400m * realPointsCount);
 	}
 	else if (distToCam < 800)
 	{
-		vertices_count = Math.floor(pCloudSettings.MaxPerUnitPointsRenderDistToCam800m * realPointsCount);
+		vertices_count = Math.floor(pCloudSettings.maxPerUnitPointsRenderDistToCam800m * realPointsCount);
 	}
 	else if (distToCam < 1600)
 	{
-		vertices_count = Math.floor(pCloudSettings.MaxPerUnitPointsRenderDistToCam1600m * realPointsCount);
+		vertices_count = Math.floor(pCloudSettings.maxPerUnitPointsRenderDistToCam1600m * realPointsCount);
 	}
 	else
 	{
-		vertices_count = Math.floor(pCloudSettings.MaxPerUnitPointsRenderDistToCamMoreThan1600m * realPointsCount);
+		vertices_count = Math.floor(pCloudSettings.maxPerUnitPointsRenderDistToCamMoreThan1600m * realPointsCount);
 	}
 	
 	return vertices_count;
