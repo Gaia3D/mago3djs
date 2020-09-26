@@ -1327,6 +1327,23 @@ Node.prototype.nodeMoved = function(node)
 	}
 };
 
+/**
+ * attribute height reference에 따라 높이를 보정
+ * @param {MagoManager} magoManager
+ */
+Node.prototype.isNeedValidHeight = function(magoManager) 
+{
+	if (!magoManager.isCesiumGlobe()
+	||	!this.data 
+	|| !this.data.attributes 
+	|| !this.data.attributes.heightReference 
+	|| this.data.attributes.heightReference === HeightReference.NONE)
+	{
+		return false;
+	}
+
+	return true;
+};
 
 /**
  * 
@@ -1444,31 +1461,52 @@ Node.prototype.intersectionWithPolygon2D = function(polygon2D)
 	return polygon2D.intersectionWithPolygon2D(bboxPolygon2D);
 };
 /**
- * 어떤 일을 하고 있습니까?
+ * 높이 레퍼런스 설정에 따른 데이터 높이 계산 후 반환
+ * @param {number} terrainHeight 
+ * @return {number}
  */
-/*
-Node.prototype.test__octreeModelRefAndIndices_changed = function() 
+Node.prototype.caculateHeightByReference = function(terrainHeight)
 {
-	var data = this.data;
-	
-	if(data === undefined)
-		return false;
-	
-	var neoBuilding = data.neoBuilding;
-	if(neoBuilding === undefined)
-		return false;
-	
-	var octree = neoBuilding.octree;
-	if(octree === undefined)
-		return true;
-	
-	var modelRefMotherAndIndices = octree.neoReferencesMotherAndIndices;
-	if(modelRefMotherAndIndices === undefined)
-		return true;
-	
-	if(modelRefMotherAndIndices.neoRefsIndices.length === 0 || modelRefMotherAndIndices.motherNeoRefsList.length === 0)
-		return true;
-	
-	return false;
+	var cp = this.getCurrentGeoLocationData().geographicCoord;
+	var bx = this.getBBox();
+	var height = 0;
+	if (this.data.mapping_type === 'origin')
+	{
+		height = terrainHeight - bx.minZ;
+	}
+	else if (this.data.mapping_type === 'boundingboxcenter') 
+	{
+		var halfZlength = Math.abs(bx.maxZ - bx.minZ) / 2;
+		height = terrainHeight + halfZlength;
+	}
+
+	if (this.data.attributes.heightReference === HeightReference.RELATIVE_TO_GROUND) 
+	{
+		height += cp.altitude;
+	}
+
+	return height;
 };
-*/
+/**
+ * 높이 레퍼런스 설정
+ * @param {HeightReference} ref 
+ * @param {MagoManager} magoManager
+ * @emits
+ */
+Node.prototype.setHeightReference = function(ref, magoManager)
+{
+	this.data.attributes.heightReference = HeightReference.getNameSpace(ref);
+	if (this.data.attributes.heightReference !== HeightReference.NONE)
+	{
+		if (this.isNeedValidHeight(magoManager)) { magoManager._needValidHeightNodeArray.push(this); }
+	}
+};
+
+/**
+ * 높이 레퍼런스 반환
+ * @return {HeightReference}
+ */
+Node.prototype.getHeightReference = function()
+{
+	return this.data.attributes.heightReference;
+};

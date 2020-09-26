@@ -153,6 +153,7 @@ StaticModelsManager.manageStaticModel = function(node, magoManager)
 			neoBuilding.bbox.copyFrom(buildingSeed.bBox);
 		} else {
 			neoBuilding.bbox = neoBuilding.metaData.bbox;
+			if (node.isNeedValidHeight(magoManager)) { magoManager._needValidHeightNodeArray.push(node); }
 		}
 
 		neoBuilding.name = "test_" + neoBuildingFolderName;
