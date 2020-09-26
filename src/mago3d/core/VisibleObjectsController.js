@@ -73,7 +73,7 @@ VisibleObjectsController.prototype.clear = function()
  */
 VisibleObjectsController.prototype.getAllVisibles = function() 
 {
-	var resultVisiblesArray = [].concat(this.currentVisibles0, this.currentVisibles1, this.currentVisibles2, this.currentVisibles3);
+	var resultVisiblesArray = [].concat(this.currentVisibles0, this.currentVisibles1, this.currentVisibles2, this.currentVisibles3, this.currentVisiblesAux);
 	return resultVisiblesArray;
 };
 

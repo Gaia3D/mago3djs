@@ -147,15 +147,21 @@ StaticModelsManager.manageStaticModel = function(node, magoManager)
 				neoBuilding.metaData.heading = buildingSeed.rotationsDegree.z;
 				neoBuilding.metaData.pitch = buildingSeed.rotationsDegree.x;
 				neoBuilding.metaData.roll = buildingSeed.rotationsDegree.y;
+
+				if (neoBuilding.bbox === undefined)
+				{ neoBuilding.bbox = new BoundingBox(); }
+				neoBuilding.bbox.copyFrom(buildingSeed.bBox);
+			}
+			else 
+			{
+				neoBuilding.bbox = neoBuilding.metaData.bbox;
+				//복사되는 모델에 대해서 높이 보정 대상 확인
+				if (node.isNeedValidHeight(magoManager)) { magoManager._needValidHeightNodeArray.push(node); }
 			}
 
 			neoBuilding.name = "test_" + neoBuildingFolderName;
 			neoBuilding.buildingId = neoBuildingFolderName;
-		
 			neoBuilding.buildingType = "basicBuilding";
-			if (neoBuilding.bbox === undefined)
-			{ neoBuilding.bbox = new BoundingBox(); }
-			neoBuilding.bbox.copyFrom(buildingSeed.bBox);
 			neoBuilding.projectFolderName = node.data.projectFolderName;
 		}
 	}

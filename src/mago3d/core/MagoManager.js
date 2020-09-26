@@ -271,7 +271,7 @@ var MagoManager = function()
 	//"DepthShadowRendering" : 4
 
 	this.currentProcess = CODE.magoCurrentProcess.Unknown;
-
+	this._needValidHeightNodeArray = [];
 };
 MagoManager.prototype = Object.create(Emitter.prototype);
 MagoManager.prototype.constructor = MagoManager;
@@ -422,57 +422,12 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 		if (attributes === undefined)
 		{ continue; }
 	
-		neoBuilding = currentVisibleNodes[i].data.neoBuilding;
-		
-		/*
-		if (attributes.objectType === "basicF4d")
-		{
-			
-		}
-		else if (attributes.objectType === "multiBuildingsTile")
-		{
-			
-		}
-		*/
+		neoBuilding = node.data.neoBuilding;
 		
 		if (attributes.projectId !== undefined && attributes.isReference !== undefined && attributes.isReference === true)
 		{
 			StaticModelsManager.manageStaticModel(node, this);
 		}
-		
-		// Check if this node has topologyData.***
-		/*
-		if(node.data && node.data.attributes && node.data.attributes.hasTopology)
-		{
-			if(neoBuilding.network === undefined)
-			{
-				// load topologyData for this node.***
-				neoBuilding.network = new Network(node);
-				var network = neoBuilding.network;
-				var magoManager = this;
-				
-				var geometryDataPath = this.readerWriter.geometryDataPath;
-				var indoorGml_filePath = geometryDataPath + "/"  + projectFolderName + "/"  + neoBuilding.buildingFileName + "/topology.json";
-				
-				loadWithXhr(indoorGml_filePath).done(function(response) 
-				{
-					var enc = new TextDecoder("utf-8");
-					var stringText = enc.decode(response);
-					var SampleIndoorJson = JSON.parse(stringText);
-					var gmlDataContainer = new GMLDataContainer(SampleIndoorJson, "1.0.3");
-					network.parseTopologyData(magoManager, gmlDataContainer);
-					
-				}).fail(function(status) 
-				{
-					
-				}).always(function() 
-				{
-					
-				});
-			}
-	
-		}
-		*/
 		
 		var fromSmartTile = node.data.attributes.fromSmartTile;
 		if (fromSmartTile === undefined)
@@ -498,7 +453,9 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 			{
 				var bytesReaded = 0;
 				neoBuilding.parseHeader(neoBuilding.headerDataArrayBuffer, bytesReaded);
-	
+				//헤더 파싱 후 높이 보정 대상 확인
+				if (node.isNeedValidHeight(this)) { this._needValidHeightNodeArray.push(node); }
+
 				counter++;
 				if (counter > 60)
 				{ break; }
@@ -1547,6 +1504,9 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 	// Render process.***
 	this.doRender(frustumVolumenObject);
 
+	//valid date height by height reference
+	this.validateHeight(frustumVolumenObject);
+
 	// test. Draw the buildingNames.***
 	if (this.magoPolicy.getShowLabelInfo())
 	{
@@ -1576,6 +1536,89 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 		{ this.stadisticsDisplayed = 0; }
 	
 		this.canvasDirty = true;
+	}
+};
+
+/**
+ * valid date height by height reference
+ * @param {frustumObject} frustumObject 
+ */
+MagoManager.prototype.validateHeight = function(frustumObject)
+{
+	//console.info(frustumObject);
+	var visibleNodes = frustumObject.visibleNodes.getAllVisibles();
+	
+	if (this._needValidHeightNodeArray.length > 0 && visibleNodes.length > 0) 
+	{
+		var terrainProvider = this.scene.globe.terrainProvider;
+		var isBasicTerrainProvider = terrainProvider instanceof Cesium.EllipsoidTerrainProvider;
+		var maxZoom = 20;
+		if (!isBasicTerrainProvider) 
+		{
+			if (!terrainProvider._layers || !terrainProvider._layers[0])
+			{
+				return;
+			}
+			maxZoom = terrainProvider._layers[0].availability._maximumLevel - 1;
+		}
+
+		var process = [];
+		var next = [];
+		for (var i=this._needValidHeightNodeArray.length - 1;i>=0;i--) 
+		{
+			var needValidHeightNode = this._needValidHeightNodeArray[i];
+			
+			if (visibleNodes.indexOf(needValidHeightNode) > -1)
+			{
+				this._needValidHeightNodeArray[i].data.validHeightReference = true;
+				process.push(needValidHeightNode);
+			}
+			else 
+			{
+				next.push(needValidHeightNode);
+			}
+		}
+		if (process.length === 0) { return; }
+		
+		var that = this;
+		new Promise(function(resolve) 
+		{
+			resolve({mm: that, nArray: process});
+		}).then(function(obj)
+		{
+			var cartographics = [];
+			var nArray = obj.nArray;
+			var nArrayLength = nArray.length;
+			for (var j=0;j<nArrayLength;j++ )
+			{
+				var node = nArray[j];
+				var geographic;
+				if (node.data.mapping_type === 'origin') 
+				{
+					geographic = ManagerUtils.pointToGeographicCoord(node.bboxAbsoluteCenterPos);
+				}
+				else 
+				{
+					geographic = node.getCurrentGeoLocationData().geographicCoord;
+				}
+				cartographics.push(Cesium.Cartographic.fromDegrees(geographic.longitude, geographic.latitude));
+			}
+			
+			Cesium.sampleTerrain(terrainProvider, maxZoom, cartographics).then(function(samplePositions)
+			{
+				if (samplePositions.length === nArrayLength) 
+				{
+					for (var k=0, slen=samplePositions.length;k<slen;k++) 
+					{
+						var n = nArray[k];
+						var cp = n.getCurrentGeoLocationData().geographicCoord;
+						n.changeLocationAndRotation(cp.latitude, cp.longitude, n.caculateHeightByReference(samplePositions[k].height), 0, 0, 0, obj.mm);
+					}
+				}
+			});
+		});
+
+		this._needValidHeightNodeArray = next;
 	}
 };
 
@@ -5287,6 +5330,11 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 					data.buildingSeed = buildingSeed;
 					resultPhysicalNodesArray.push(node);
 				}
+
+				if (!attributes.hasOwnProperty('heightReference') || !attributes.heightReference)
+				{
+					attributes.heightReference = HeightReference.NONE;
+				}
 			}
 
 			if (longitude && latitude)
@@ -5658,6 +5706,11 @@ MagoManager.prototype.instantiateStaticModel = function(attributes)
 	if (!attributes.nodeType)
 	{
 		attributes.nodeType = "TEST";
+	}
+
+	if (!attributes.heightReference)
+	{
+		attributes.heightReference = HeightReference.NONE;
 	}
 	
 	attributes.objectType = "basicF4d";

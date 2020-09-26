@@ -311,6 +311,30 @@ CesiumViewerInit.prototype.initMagoManager = function()
 	this.viewer.scene.globe.depthTestAgainstTerrain = false;
 	this.viewer.scene.logarithmicDepthBuffer = false; //do not use logarithmic buffer
 	this.viewer.scene.highDynamicRange = false; //do not use high dynamic range
+
+	scene.globe.terrainProviderChanged.addEventListener(function(e)
+	{
+		var hierarchyManager = magoManager.hierarchyManager;
+		var projects = hierarchyManager.projectsMap;
+		for (var j in projects) 
+		{
+			if (projects.hasOwnProperty(j)) 
+			{
+				var project = projects[j];
+				for (var k in project) 
+				{
+					if (project.hasOwnProperty(k)) 
+					{
+						var node = project[k];
+						if (node instanceof Mago3D.Node && node.data.attributes.isPhysical === true) 
+						{
+							if (node.isNeedValidHeight(magoManager)) { magoManager._needValidHeightNodeArray.push(node); }
+						}
+					}
+				}
+			}
+		}
+	});
 	
 	viewer.camera.changed.addEventListener(function(e)
 	{

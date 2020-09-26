@@ -1295,8 +1295,9 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		
 		// Create a node for each building.
 		var attributes = {
-			"isPhysical" : true,
-			"objectType" : "basicF4d"
+			"isPhysical"      : true,
+			"objectType"      : "basicF4d",
+			"heightReference" : HeightReference.NONE
 		};
 		if (projectFolderName.indexOf('-tree') > 0) 
 		{
