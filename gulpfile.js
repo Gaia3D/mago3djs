@@ -341,3 +341,5 @@ gulp.task('buildShader', function(done)
 	glslToJavaScript(false, path.join(path.normalize(paths.build), 'minifyShaders.state'));
 	done();
 });
+
+exports.build = gulp.task('combine:js');
