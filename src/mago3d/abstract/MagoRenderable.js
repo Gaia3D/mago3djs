@@ -685,9 +685,9 @@ MagoRenderable.prototype.intersectionWithPolygon2D = function(polygon2D)
 MagoRenderable.prototype.setTerrainHeight = function(height)
 {
 	this.terrainHeight = height;
-	this.setDirty(true);
+	//this.setDirty(true);
+	this.validTerrainHeight();
 }
-
 
 /**
  * set terrain height. fire makemesh
@@ -698,3 +698,20 @@ MagoRenderable.prototype.validTerrainHeight = function()
 	var geoLocData = this.geoLocDataManager.getCurrentGeoLocationData();
 	geoLocData = ManagerUtils.calculateGeoLocationData(undefined, undefined, this.terrainHeight, undefined, undefined, undefined, geoLocData);
 }
+
+/**
+ * attribute height reference에 따라 높이를 보정
+ * @param {MagoManager} magoManager
+ */
+MagoRenderable.prototype.isNeedValidHeight = function(magoManager) 
+{
+	if (!magoManager.isCesiumGlobe()
+	|| !this.attributes 
+	|| !this.attributes.heightReference 
+	|| this.attributes.heightReference === HeightReference.NONE)
+	{
+		return false;
+	}
+
+	return true;
+};

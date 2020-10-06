@@ -46,10 +46,12 @@ var ExtrusionBuilding = function(geographicCoordList, height, options)
 
     this.height = height;
     this.color4 = defaultValue(options.color, new Color(1,1,1,1));
-    this.selectedColor4 = defaultValue(options.selectedColor, new Color(1,1,0,1));
 
     this.attributes.isMovable = defaultValue(options.isMovable, true);
-    this.attributes.isSelectable = defaultValue(options.isSelectable, true);
+	this.attributes.isSelectable = defaultValue(options.isSelectable, true);
+	this.attributes.selectedColor4 = defaultValue(options.selectedColor, new Color(1,1,0,1));
+	this.attributes.heightReference = defaultValue(options.heightReference, HeightReference.NONE);
+	
 
 	if(!this.options)
     this.options = {};
@@ -112,8 +114,8 @@ ExtrusionBuilding.prototype.makeMesh = function() {
 		// Make the topGeoCoordsList.
 		var topGeoCoordsList = geographicCoordList.getCopy();
 		// Reassign the altitude on the geoCoordsListCopy.
-		geographicCoordList.setAltitude(this.terrainHeight);
-		topGeoCoordsList.setAltitude(this.getRealHeight());
+		geographicCoordList.setAltitude(0);
+		topGeoCoordsList.setAltitude(this.height);
 		
 		var basePoints3dArray = GeographicCoordsList.getPointsRelativeToGeoLocation(geoLocData, geographicCoordList.geographicCoordsArray, undefined);
 		var topPoints3dArray = GeographicCoordsList.getPointsRelativeToGeoLocation(geoLocData, topGeoCoordsList.geographicCoordsArray, undefined);

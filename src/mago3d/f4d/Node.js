@@ -1482,7 +1482,7 @@ Node.prototype.caculateHeightByReference = function(terrainHeight)
 
 	if (this.data.attributes.heightReference === HeightReference.RELATIVE_TO_GROUND) 
 	{
-		height += cp.altitude;
+		height += this.data.originalHeight;// cp.altitude;
 	}
 
 	return height;

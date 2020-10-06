@@ -1527,6 +1527,7 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 			node.data.rotationsDegree = eulerAngDeg; 
 			node.data.dataId = dataId;
 			node.data.dataGroupId = savedProjectId;
+			node.data.originalHeight = geoCoord.altitude;
 
 			node.data.smartTileOwner = this;
 			for (var j in externInfo) 
@@ -1560,6 +1561,7 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 			intantiatedNode.data.dataId = dataId;
 			intantiatedNode.data.dataGroupId = savedProjectId;
 			intantiatedNode.data.projectFolderName = projectFolderName;
+			intantiatedNode.data.originalHeight = alt;
 			for (var j in externInfo) 
 			{
 				if (externInfo.hasOwnProperty(j)) 

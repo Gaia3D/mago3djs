@@ -337,6 +337,12 @@ CesiumViewerInit.prototype.initMagoManager = function()
 				}
 			}
 		}
+
+		for(var j=0,len=magoManager.modeler.objectsArray.length;j<len;j++)
+		{
+			var object = magoManager.modeler.objectsArray[j];
+			if (object.isNeedValidHeight(magoManager)) { magoManager._needValidHeightNativeArray.push(object); }
+		}
 	});
 	
 	viewer.camera.changed.addEventListener(function(e)

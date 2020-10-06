@@ -129,6 +129,8 @@ Modeler.prototype.addObject = function(object, depth)
 	var targetDepth = depth ? depth : 5;
 	smartTileManager.putObject(targetDepth, object, this.magoManager);
 
+	if (object.isNeedValidHeight(this.magoManager)) { this.magoManager._needValidHeightNativeArray.push(object); }
+
 	this.emit(Modeler.EVENT_TYPE.ADD, {
 		type :Modeler.EVENT_TYPE.ADD,
 		timestamp : new Date().getTime(),

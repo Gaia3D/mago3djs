@@ -353,6 +353,8 @@ var MagoManager = function(config)
 
 	//height 변경 적용필요한 f4d 목록
 	this._needValidHeightNodeArray = [];
+	//height 변경 적용필요한 native 목록
+	this._needValidHeightNativeArray = [];
 	this._changeCanvasSizeEvent = new Event('changeCanvasSize');
 };
 MagoManager.prototype = Object.create(Emitter.prototype);
@@ -1763,6 +1765,53 @@ MagoManager.prototype.validateHeight = function(frustumObject)
 		});
 
 		this._needValidHeightNodeArray = next;
+	}
+
+	if (this._needValidHeightNativeArray.length > 0) 
+	{
+		var terrainProvider = this.scene.globe.terrainProvider;
+		var isBasicTerrainProvider = terrainProvider instanceof Cesium.EllipsoidTerrainProvider;
+		var maxZoom = 20;
+		if (!isBasicTerrainProvider) 
+		{
+			if (!terrainProvider._layers || !terrainProvider._layers[0])
+			{
+				return;
+			}
+			maxZoom = terrainProvider._layers[0].availability._maximumLevel - 1;
+		}
+		
+		var that = this;
+		new Promise(function(resolve) 
+		{
+			resolve({mm: that});
+		}).then(function(obj)
+		{
+			var cartographics = [];
+			var nArray = obj.mm._needValidHeightNativeArray;
+			var nArrayLength = nArray.length;
+			for (var j=0;j<nArrayLength;j++ )
+			{
+				var native = nArray[j];
+				var geographic = native.getCurrentGeoLocationData().geographicCoord;
+	
+				cartographics.push(Cesium.Cartographic.fromDegrees(geographic.longitude, geographic.latitude));
+			}
+			
+			Cesium.sampleTerrain(terrainProvider, maxZoom, cartographics).then(function(samplePositions)
+			{
+				if (samplePositions.length === nArrayLength) 
+				{
+					for (var k=0, slen=samplePositions.length;k<slen;k++) 
+					{
+						var n = nArray[k];
+						n.setTerrainHeight(samplePositions[k].height);
+					}
+
+					that._needValidHeightNativeArray.length = 0;
+				}
+			});
+		});
 	}
 };
 
@@ -6267,7 +6316,6 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 			
 			delete jasonObject.datas;
 			
-			
 			data_group_id = jasonObject.dataGroupId;
 			data_group_name = jasonObject.dataGroupName;
 			data_id = jasonObject.dataId;
@@ -6367,6 +6415,7 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 				if (height === undefined)
 				{ height = 0; }
 				
+				data.originalHeight = height;
 				data.geographicCoord = new GeographicCoord();
 				data.geographicCoord.setLonLatAlt(longitude, latitude, height);
 				
@@ -6792,7 +6841,7 @@ MagoManager.prototype.instantiateStaticModel = function(attributes)
 
 		var geoLocDataManager = geoCoord.getGeoLocationDataManager();
 		var geoLocData = geoLocDataManager.newGeoLocationData("noName");
-		geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude+1, heading, pitch, roll, geoLocData, this);
+		geoLocData = ManagerUtils.calculateGeoLocationData(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude, heading, pitch, roll, geoLocData, this);
 
 		// Now, create the geoLocdataManager of node.***
 		node.data.projectId = projectId;
@@ -6800,6 +6849,8 @@ MagoManager.prototype.instantiateStaticModel = function(attributes)
 		node.data.geographicCoord = geoCoord;
 		node.data.rotationsDegree = new Point3D(pitch, roll, heading);
 		node.data.geoLocDataManager = geoLocDataManager;
+		node.data.originalHeight = altitude;
+		
 		// Now, insert node into smartTile.***
 		var targetDepth = 12;
 		this.smartTileManager.putNode(targetDepth, node, this);
