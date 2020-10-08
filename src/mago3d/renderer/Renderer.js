@@ -524,9 +524,9 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 		// excavation objects.
 		this.renderExcavationObjects(gl, currentShader, renderType, visibleObjControlerNodes);
 
-		magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
-		magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
-		magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
+		this.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
+		this.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
+		this.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
 		// native objects.
 		var bIncludeTransparentObjects = false;
 		this.renderNativeObjects(gl, currentShader, renderType, visibleObjControlerNodes, bIncludeTransparentObjects);
@@ -559,7 +559,7 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 		{ magoManager.visibleObjControlerPCloudOctrees = new VisibleObjectsController(); }
 		magoManager.visibleObjControlerPCloudOctrees.clear();
 
-		magoManager.renderer.renderNeoBuildingsPCloud(gl, magoManager.visibleObjControlerNodes.currentVisiblesAux, magoManager, currentShader, renderTexture, renderType); 
+		this.renderNeoBuildingsPCloud(gl, magoManager.visibleObjControlerNodes.currentVisiblesAux, magoManager, currentShader, renderTexture, renderType); 
 		currentShader.disableVertexAttribArrayAll();
 		
 		gl.useProgram(null);
@@ -799,9 +799,9 @@ Renderer.prototype.renderDepthSunPointOfView = function(gl, visibleObjControlerN
 	var minSize = 0.0;
 	var renderTexture = false;
 
-	magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
-	magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
-	magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
+	this.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
+	this.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
+	this.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
 	
 	// Mago native geometries.
 	this.renderNativeObjects(gl, currentShader, renderType, visibleObjControlerNodes);
@@ -1851,7 +1851,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 	if (renderType === 0 ) 
 	{
 		gl.disable(gl.BLEND);
-		magoManager.renderer.renderGeometryDepth(gl, renderType, visibleObjControlerNodes);
+		this.renderGeometryDepth(gl, renderType, visibleObjControlerNodes);
 		
 		// Draw the axis.***
 		//if (selectionManager && magoManager.magoPolicy.getShowOrigin() && selectionManager.getSelectedF4dNode() !== undefined)
@@ -2255,7 +2255,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			{ magoManager.visibleObjControlerPCloudOctrees = new VisibleObjectsController(); }
 			
 			magoManager.visibleObjControlerPCloudOctrees.clear();
-			magoManager.renderer.renderNeoBuildingsPCloud(gl, magoManager.visibleObjControlerNodes.currentVisiblesAux, magoManager, currentShader, renderTexture, renderType); // lod0.***
+			this.renderNeoBuildingsPCloud(gl, magoManager.visibleObjControlerNodes.currentVisiblesAux, magoManager, currentShader, renderTexture, renderType); // lod0.***
 			currentShader.disableVertexAttribArrayAll();
 			
 			gl.useProgram(null);
@@ -2366,7 +2366,7 @@ Renderer.prototype.renderAxisNodes = function(nodesArray, renderType)
 		buildingGeoLocation.bindGeoLocationUniforms(gl, currentShader);
 		gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
 		
-		magoManager.renderer.renderObject(gl, magoManager.axisXYZ, magoManager, currentShader, renderType);
+		this.renderObject(gl, magoManager.axisXYZ, magoManager, currentShader, renderType);
 	}
 	
 
@@ -2622,9 +2622,9 @@ Renderer.prototype.renderGeometryColorCoding = function(visibleObjControlerNodes
 		var minSizeToRender = 0.0;
 		if (selectType !== 'native')
 		{
-			magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
-			magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
-			magoManager.renderer.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
+			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
+			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
+			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 		}
 		
 		// native objects.
@@ -2835,7 +2835,7 @@ Renderer.prototype.renderMagoGeometries = function(renderType)
 		for (var j=0; j<meshesCount; j++)
 		{
 			pMesh = natProject.getMesh(j);
-			magoManager.renderer.renderObject(gl, pMesh, magoManager, currentShader, renderType, bRenderLines);
+			this.renderObject(gl, pMesh, magoManager, currentShader, renderType, bRenderLines);
 		}
 	}
 	

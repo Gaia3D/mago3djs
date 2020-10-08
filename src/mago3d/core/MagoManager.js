@@ -1111,7 +1111,22 @@ MagoManager.prototype.loadAndPrepareData = function()
 	
 	// Init the pCloudPartitionsMother_requested.***
 	this.readerWriter.pCloudPartitionsMother_requested = 0;
-	
+
+	// project type 10 prepare
+	var pt10Array = this.visibleObjControlerNodes.currentVisiblesPT10;
+	if(pt10Array.length > 0)
+	{
+		var pt10Octrees = [];
+		for(var i=0,len=pt10Array.length;i<len;i++)
+		{
+			var pt10 = pt10Array[i];
+			pt10Octrees.push(pt10.data.neoBuilding.octree);
+		}
+		this.visibleObjControlerOctrees.currentVisibles0 = pt10Octrees;
+		this.prepareVisibleOctreesSortedByDistance(gl, this.visibleObjControlerOctrees); 
+		//this.prepareVisibleOctreesSortedByDistanceLOD2(gl, this.visibleObjControlerOctrees.currentVisibles0); 
+	}
+
 	// TinTerrain.*******************************************************************************************************************************
 	if (this.isFarestFrustum())
 	{
@@ -1800,10 +1815,6 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 	// Render process.***
 	this.doRender(frustumVolumenObject);
 
-	if(this['validTerrainHeight']) {
-		this['validTerrainHeight'].call(this);
-	}
-
 	//valid date height by height reference
 	this.validateHeight(frustumVolumenObject);
 
@@ -2017,8 +2028,23 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 		if (attributes.objectType === "basicF4d")
 		{
 			neoBuilding = node.data.neoBuilding;
-			if (neoBuilding.metaData && neoBuilding.metaData.fileLoadState === CODE.fileLoadState.PARSE_FINISHED)
-			{ neoBuilding.prepareSkin(this); }
+
+			if (!neoBuilding.currentLod)
+			{ neoBuilding.currentLod = neoBuilding.nodeOwner.data.currentLod; }
+
+			var lodBuildingData = neoBuilding.getLodBuildingData(neoBuilding.currentLod);
+			if (lodBuildingData === undefined)
+			{ return false; }
+
+			if (lodBuildingData.isModelRef)
+			{ 
+				if(neoBuilding.octree) {
+					neoBuilding.octree.prepareSkinData(this);
+				}
+			} else {
+				if (neoBuilding.metaData && neoBuilding.metaData.fileLoadState === CODE.fileLoadState.PARSE_FINISHED)
+				{ neoBuilding.prepareSkin(this); }
+			}
 		}
 		else if (attributes.objectType === "multiBuildingsTile")
 		{
@@ -6156,7 +6182,12 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 					// end provisional test.-----------------------------
 					else
 					{
-						visibleNodes.putNodeByLod(node, lodByDist);
+						//when projectsType 10 and near, prepare model and ref data, ignore lod. 
+						if(projectsType === 10 && distToCamera < 1500) {
+							visibleNodes.putNodeByProjectType(node);
+						}
+
+						visibleNodes.putNodeByLod(node, lodByDist);						
 					}
 				}
 			}

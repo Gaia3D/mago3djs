@@ -15,7 +15,10 @@ var VisibleObjectsController = function()
 	this.currentVisibles1 = []; 
 	this.currentVisibles2 = []; 
 	this.currentVisibles3 = []; 
+	//use with point cloud
 	this.currentVisiblesAux = [];
+	//use with projectType 10
+	this.currentVisiblesPT10 = [];
 	this.currentVisibleNativeObjects = {
 		opaquesArray      : [],
 		transparentsArray : [],
@@ -36,6 +39,7 @@ VisibleObjectsController.prototype.initArrays = function()
 	this.currentVisibles2 = [];
 	this.currentVisibles3 = [];
 	this.currentVisiblesAux = [];
+	this.currentVisiblesPT10 = [];
 	this.currentVisibleNativeObjects = {
 		opaquesArray      : [],
 		transparentsArray : [],
@@ -58,6 +62,7 @@ VisibleObjectsController.prototype.clear = function()
 	this.currentVisibles2.length = 0;
 	this.currentVisibles3.length = 0;
 	this.currentVisiblesAux.length = 0;
+	this.currentVisiblesPT10.length = 0;
 	this.currentVisibleNativeObjects.opaquesArray.length = 0;
 	this.currentVisibleNativeObjects.transparentsArray.length = 0;
 	this.currentVisibleNativeObjects.excavationsArray.length = 0;
@@ -76,7 +81,7 @@ VisibleObjectsController.prototype.clear = function()
  */
 VisibleObjectsController.prototype.getAllVisibles = function() 
 {
-	var resultVisiblesArray = [].concat(this.currentVisibles0, this.currentVisibles1, this.currentVisibles2, this.currentVisibles3, this.currentVisiblesAux);
+	var resultVisiblesArray = [].concat(this.currentVisibles0, this.currentVisibles1, this.currentVisibles2, this.currentVisibles3, this.currentVisiblesAux, this.currentVisiblesPT10);
 	return resultVisiblesArray;
 };
 
@@ -94,12 +99,12 @@ VisibleObjectsController.prototype.get01Visibles = function()
  */
 VisibleObjectsController.prototype.hasRenderables = function() 
 {
-
 	if (this.currentVisibles0.length > 0 || 
 		this.currentVisibles1.length > 0 || 
 		this.currentVisibles2.length > 0 || 
 		this.currentVisibles3.length > 0 || 
-		this.currentVisiblesAux.length > 0 || 
+		this.currentVisiblesAux.length > 0 ||
+		this.currentVisiblesPT10.length > 0 ||
 		this.currentVisibleNativeObjects.opaquesArray.length > 0 ||
 		this.currentVisibleNativeObjects.transparentsArray.length > 0 ||
 		this.currentVisibleNativeObjects.excavationsArray.length > 0 ||
@@ -542,6 +547,16 @@ VisibleObjectsController.prototype.putNodeByLod = function(node, lod)
 	{
 		this.putNodeToArraySortedByDist(this.currentVisibles3, node);
 	}
+};
+
+/**
+ * Put the node to given node array
+ * @param nodesArray
+ * @param node
+ */
+VisibleObjectsController.prototype.putNodeByProjectType = function(node) 
+{
+	this.putNodeToArraySortedByDist(this.currentVisiblesPT10, node);
 };
 
 
