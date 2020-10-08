@@ -53,15 +53,6 @@ float UnpackDepth32( in vec4 pack )
 
 vec3 getViewRay(vec2 tc)
 {
-	/*
-	// The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
-	float farForDepth = 30000.0;
-	float hfar = 2.0 * tangentOfHalfFovy * farForDepth;
-    float wfar = hfar * aspectRatio;    
-    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -farForDepth);  
-	*/	
-	
-	
 	float hfar = 2.0 * tangentOfHalfFovy * far;
     float wfar = hfar * aspectRatio;    
     vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    
@@ -122,10 +113,18 @@ vec3 normal_from_depth(float depth, vec2 texCoord) {
 		depthB += getDepth(texCoord + offset2*(1.0+i));
 	}
 
-	vec3 posA = reconstructPosition(texCoord + offset1*2.0, depthA/2.0);
-	vec3 posB = reconstructPosition(texCoord + offset2*2.0, depthB/2.0);
+	//vec3 posA = reconstructPosition(texCoord + offset1*2.0, depthA/2.0);
+	//vec3 posB = reconstructPosition(texCoord + offset2*2.0, depthB/2.0);
+    //vec3 pos0 = reconstructPosition(texCoord, depth);
 
-    vec3 pos0 = reconstructPosition(texCoord, depth);
+    vec3 posA = getViewRay(texCoord + offset1*2.0)* depthA/2.0;
+	vec3 posB = getViewRay(texCoord + offset2*2.0)* depthB/2.0;
+    vec3 pos0 = getViewRay(texCoord)* depth;
+
+    posA.z *= -1.0;
+    posB.z *= -1.0;
+    pos0.z *= -1.0;
+
     vec3 normal = cross(posA - pos0, posB - pos0);
     normal.z = -normal.z;
 
@@ -147,6 +146,12 @@ float getOcclusion(vec3 origin, vec3 rotatedKernel, float radius)
     float sampleDepth = -sample.z/far;// original.***
 
     float depthBufferValue = getDepth(offsetCoord.xy);
+
+    // For multiFrustum ssao problem.***
+    //if(depthBufferValue > 0.1)
+    //return 0.0;
+    //------------------------------------
+
     float depthDiff = abs(depthBufferValue - sampleDepth);
     if(depthDiff < radius/far)
     {
@@ -177,10 +182,7 @@ void main()
     //    isAlmostOutOfFrustum = true;
     //}
 
-    // test.***
-    //float linearDepthTest = unpackDepth(texture2D(depthTex, screenPos));
-    //if(linearDepthTest > 0.99)
-    //discard;
+    
 
     float veryBigRadius = 20.0;
     float bigRadius = 12.0;
@@ -199,7 +201,9 @@ void main()
 
     if(bApplySsao)// && !isAlmostOutOfFrustum)
 	{        
-		vec3 origin = ray * linearDepth;  
+		vec3 origin = ray * linearDepth; 
+        //origin = reconstructPosition(screenPos, linearDepth);
+
         vec3 normal2 = normal_from_depth(linearDepth, screenPos); // normal from depthTex.***
         normal = normal2;
         

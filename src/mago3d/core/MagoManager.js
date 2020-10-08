@@ -905,10 +905,15 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
 		var frustumCommandsList = scene.frustumCommandsList;
 		var frustumIdx = this.currentFrustumIdx;
 		var camera = this.sceneState.camera;
-		var currentFrustumFar = frustumCommandsList[frustumIdx].far;
-		var currentFrustumNear = frustumCommandsList[frustumIdx].near;
+		//var currentFrustumFar = frustumCommandsList[frustumIdx].far;
+		//var currentFrustumNear = frustumCommandsList[frustumIdx].near;
 
 		// find near and far by projectionMatrix.***
+		var projectionMat = this.sceneState.projectionMatrix;
+		var n = Matrix4.getNearFromPerspectiveMatrix(projectionMat);
+		var f = Matrix4.getFarFromPerspectiveMatrix(projectionMat);
+		var currentFrustumFar = f;
+		var currentFrustumNear = n;
 		
 		// take all frustums near-far distances.***
 		// In Cesium: If useLogDepth opaqueFrustumNearOffset = 0.9. Else opaqueFrustumNearOffset = 0.9999;
@@ -1579,6 +1584,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	this.swapRenderingFase();
 
 	// 1.1) ssao and other effects from depthBuffer render.*****************************************************************************
+	//if(this.currentFrustumIdx === 0)
 	this.renderer.renderSsaoFromDepth(gl);
 
 	// 2) color render.*****************************************************************************************************************
@@ -1646,7 +1652,12 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	}
 
 	// Render fast antiAlias,************************************************************************************************************
-
+	// Render screenSpaceObjects.********************************************************************************************************
+	if (this.currentFrustumIdx === 0) 
+	{
+		// Render screenSpaceObjects.***
+		
+	}
 	
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
 		
@@ -1664,10 +1675,10 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	//this.renderFilter();
 
 	// Test.***
-	//if(!this.test_shader)
-	//{
-	//	this.TEST__shader();
-	//}
+	if(!this.test_shader)
+	{
+		this.TEST__shader();
+	}
 };
 
 /**

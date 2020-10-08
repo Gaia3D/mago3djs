@@ -526,11 +526,6 @@ void main()
 	scalarProd *= 0.6;
 	scalarProd += 0.4;
 
-
-	//if(scalarProd > 0.6) // delete this. ***
-	//scalarProd = 0.6; // delete this. ***
-
-
 	//vec3 normalFromDepth = normal_from_depth(linearDepth, screenPos); // normal from depthTex.***
 	//normal2 = normalFromDepth;
 	//float edgeOccl = 1.0;
@@ -544,7 +539,6 @@ void main()
 			
 			//Test.********************************************************************************************
 			// NDC : the center of the screen is 0.0.0.***
-			
 			float depthRange_near = 0.0;
 			float depthRange_far = 1.0;
 			float x_ndc = 2.0 * screenPos.x - 1.0;
@@ -553,9 +547,8 @@ void main()
 			
 			vec4 viewPosH = projectionMatrixInv * vec4(x_ndc, y_ndc, z_ndc, 1.0);
 			vec3 posCC = viewPosH.xyz/viewPosH.w;
-			vec4 posWC = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0) + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 1.0);
+			//vec4 posWC = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0) + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 1.0);
 			vec3 origin = vec3(posCC.xyz);  
-			
 			// EndTest.----------------------------------------------------------------------------------------
 
 			//vec3 origin = ray * linearDepth;  // original.***
@@ -612,7 +605,7 @@ void main()
 		}
 		//occlusion = 1.0 - occlusion / float(kernelSize);	
 		float smallOccl = occlusion / float(kernelSize);
-		//smallOccl = 0.0;
+		smallOccl = 0.0;
 		
 		// test.***
 		//ssaoFromDepthTex
@@ -633,7 +626,7 @@ void main()
 		occlFromDepth *= 0.35;
 
 		occlusion = 1.0 - smallOccl - occlFromDepth.r - occlFromDepth.g - occlFromDepth.b - occlFromDepth.a; // original.***
-		//occlusion = 1.0 - occl_aux - small_occl_aux;
+		//occlusion = 1.0 - smallOccl;
 
 		if(occlusion < 0.1)
 		occlusion = 0.1;

@@ -749,6 +749,10 @@ vec3 getWhiteToBlueColor_byHeight(float height, float minHeight, float maxHeight
 }\n\
 \n\
 void main() {\n\
+	vec2 pt = gl_PointCoord - vec2(0.5);\n\
+	if(pt.x*pt.x+pt.y*pt.y > 0.25)\n\
+		discard;\n\
+\n\
 	vec2 windMapTexCoord = v_particle_pos;\n\
 	if(u_flipTexCoordY_windMap)\n\
 	{\n\
@@ -771,8 +775,8 @@ void main() {\n\
 		else{\n\
 			g = 2.0*speed_t;\n\
 		}\n\
-		//vec3 col3 = getRainbowColor_byHeight(speed_t);\n\
-		vec3 col3 = getWhiteToBlueColor_byHeight(speed_t, 0.0, 1.0);\n\
+		vec3 col3 = getRainbowColor_byHeight(speed_t);\n\
+		//vec3 col3 = getWhiteToBlueColor_byHeight(speed_t, 0.0, 1.0);\n\
 		float r = speed_t;\n\
 		gl_FragColor = vec4(col3.x, col3.y, col3.z ,u_tailAlpha*u_externAlpha);\n\
 	}\n\
@@ -818,7 +822,8 @@ ShaderSource.draw_vert3D = "precision highp float;\n\
 // This shader draws windParticles in 3d directly from positions on u_particles image.***\n\
 attribute float a_index;\n\
 \n\
-uniform sampler2D u_particles;\n\
+uniform sampler2D u_particles; // channel-1.***\n\
+uniform sampler2D u_particles_next; // channel-2.***\n\
 uniform float u_particles_res;\n\
 uniform mat4 buildingRotMatrix;\n\
 uniform mat4 ModelViewProjectionMatrix;\n\
@@ -895,44 +900,50 @@ vec3 geographicToWorldCoord(float lonRad, float latRad, float alt)\n\
 	return resultCartesian;\n\
 }\n\
 \n\
-void main() {\n\
-	\n\
-    vec4 color = texture2D(u_particles, vec2(\n\
-        fract(a_index / u_particles_res),\n\
-        floor(a_index / u_particles_res) / u_particles_res));\n\
-\n\
-    // decode current particle position from the pixel's RGBA value\n\
-    v_particle_pos = vec2(\n\
-        color.r / 255.0 + color.b,\n\
-        color.g / 255.0 + color.a);\n\
-\n\
-	// Now, must calculate geographic coords of the pos2d.***\n\
-	float altitude = u_layerAltitude;\n\
+vec2 getOffset(vec2 particlePos, float radius)\n\
+{\n\
 	float minLonRad = u_geoCoordRadiansMin.x;\n\
 	float maxLonRad = u_geoCoordRadiansMax.x;\n\
 	float minLatRad = u_geoCoordRadiansMin.y;\n\
 	float maxLatRad = u_geoCoordRadiansMax.y;\n\
 	float lonRadRange = maxLonRad - minLonRad;\n\
 	float latRadRange = maxLatRad - minLatRad;\n\
-	float longitudeRad = -minLonRad + v_particle_pos.x * lonRadRange;\n\
-	float latitudeRad = maxLatRad - v_particle_pos.y * latRadRange;\n\
-	\n\
-	// Now, calculate worldPosition of the geographicCoords (lon, lat, alt).***\n\
-	//vec3 posWC = geographicToWorldCoord(longitudeRad, latitudeRad, altitude);\n\
-	//vec4 posCC = vec4((posWC - encodedCameraPositionMCHigh) - encodedCameraPositionMCLow, 1.0);\n\
-	\n\
-	// Alternative.\n\
-	\n\
+\n\
+	float distortion = cos((minLatRad + v_particle_pos.y * latRadRange ));\n\
+	float xOffset = (particlePos.x - 0.5)*distortion * lonRadRange * radius;\n\
+	float yOffset = (0.5 - particlePos.y) * latRadRange * radius;\n\
+\n\
+	return vec2(xOffset, yOffset);\n\
+}\n\
+\n\
+void main() {\n\
+	vec2 texCoord = vec2(fract(a_index / u_particles_res), floor(a_index / u_particles_res) / u_particles_res);\n\
+\n\
+	vec4 color_curr = texture2D(u_particles, texCoord);\n\
+    vec2 particle_pos_curr = vec2(color_curr.r / 255.0 + color_curr.b, color_curr.g / 255.0 + color_curr.a);\n\
+\n\
+	vec4 color_next = texture2D(u_particles_next, texCoord);\n\
+    vec2 particle_pos_next = vec2(color_next.r / 255.0 + color_next.b, color_next.g / 255.0 + color_next.a);\n\
+\n\
+\n\
+    //vec4 color = texture2D(u_particles, texCoord);\n\
+    // decode current particle position from the pixel's RGBA value\n\
+    //v_particle_pos = vec2(color.r / 255.0 + color.b,color.g / 255.0 + color.a); // original.***\n\
+\n\
+\n\
+	v_particle_pos = mix(particle_pos_curr, particle_pos_next, 0.0);\n\
+\n\
+	// calculate the offset at the earth radius.***\n\
 	vec3 buildingPos = buildingPosHIGH + buildingPosLOW;\n\
 	float radius = length(buildingPos);\n\
-	float distortion = cos((minLatRad + v_particle_pos.y * latRadRange ));\n\
-	float xOffset = (v_particle_pos.x - 0.5)*distortion * lonRadRange * radius;\n\
-	float yOffset = (0.5 - v_particle_pos.y) * latRadRange * radius;\n\
+	vec2 offset = getOffset(v_particle_pos, radius);\n\
+\n\
+	float xOffset = offset.x;\n\
+	float yOffset = offset.y;\n\
 	vec4 rotatedPos = buildingRotMatrix * vec4(xOffset, yOffset, 0.0, 1.0);\n\
 	\n\
-	\n\
-	vec4 posWC = vec4((rotatedPos.xyz+buildingPosLOW) +( buildingPosHIGH ), 1.0);\n\
-	vec4 posCC = vec4((rotatedPos.xyz+buildingPosLOW- encodedCameraPositionMCLow) +( buildingPosHIGH- encodedCameraPositionMCHigh), 1.0);\n\
+	//vec4 posWC = vec4((rotatedPos.xyz + buildingPosLOW) + ( buildingPosHIGH ), 1.0);\n\
+	vec4 posCC = vec4((rotatedPos.xyz + buildingPosLOW - encodedCameraPositionMCLow) + ( buildingPosHIGH - encodedCameraPositionMCHigh), 1.0);\n\
 	\n\
 	// Now calculate the position on camCoord.***\n\
 	//gl_Position = ModelViewProjectionMatrix * posWC;\n\
@@ -951,8 +962,10 @@ void main() {\n\
 	}\n\
 	\n\
 	// Now calculate the point size.\n\
-	float dist = distance(vec4(u_camPosWC.xyz, 1.0), vec4(posWC.xyz, 1.0));\n\
+	//float dist = distance(vec4(u_camPosWC.xyz, 1.0), vec4(posWC.xyz, 1.0));\n\
+	float dist = length(posCC.xyz);\n\
 	gl_PointSize = (1.0 + pendentPointSize/(dist))*u_tailAlpha; \n\
+	//gl_PointSize = 3.0*u_tailAlpha; \n\
 	\n\
 	if(gl_PointSize > 10.0)\n\
 	gl_PointSize = 10.0;\n\
@@ -1603,6 +1616,11 @@ uniform sampler2D ssaoFromDepthTex;\n\
 uniform bool textureFlipYAxis;\n\
 uniform mat4 projectionMatrix;\n\
 uniform mat4 projectionMatrixInv;\n\
+uniform mat4 modelViewMatrixRelToEyeInv;\n\
+\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+\n\
 uniform mat4 m;\n\
 uniform vec2 noiseScale;\n\
 uniform float near;\n\
@@ -1672,6 +1690,15 @@ float unpackDepth(const in vec4 rgba_depth)\n\
     return depth;\n\
 }  \n\
 \n\
+/*\n\
+// unpack depth used for shadow on screen.***\n\
+float unpackDepth_A(vec4 packedDepth)\n\
+{\n\
+	// See Aras Pranckevičius' post Encoding Floats to RGBA\n\
+	// http://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/\n\
+	return dot(packedDepth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+}\n\
+*/\n\
 \n\
 float UnpackDepth32( in vec4 pack )\n\
 {\n\
@@ -1681,29 +1708,12 @@ float UnpackDepth32( in vec4 pack )\n\
 \n\
 vec3 getViewRay(vec2 tc)\n\
 {\n\
-	/*\n\
-	// The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
-	float farForDepth = 30000.0;\n\
-	float hfar = 2.0 * tangentOfHalfFovy * farForDepth;\n\
-    float wfar = hfar * aspectRatio;    \n\
-    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -farForDepth);  \n\
-	*/	\n\
-	\n\
-	\n\
 	float hfar = 2.0 * tangentOfHalfFovy * far;\n\
     float wfar = hfar * aspectRatio;    \n\
     vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    \n\
-	\n\
     return ray;                      \n\
 }         \n\
             \n\
-//linear view space depth\n\
-/*\n\
-float getDepth(vec2 coord)\n\
-{\n\
-	return unpackDepth(texture2D(depthTex, coord.xy));\n\
-}   \n\
-*/\n\
 float getDepth(vec2 coord)\n\
 {\n\
 	if(bUseLogarithmicDepth)\n\
@@ -1771,13 +1781,6 @@ bool intersectionLineToLine(in vec2 line_1_pos, in vec2 line_1_dir,in vec2 line_
 	if (abs(line_1_dir.x) < zero)\n\
 	{\n\
 		// this is a vertical line.\n\
-		/*\n\
-		var slope = line.direction.y / line.direction.x;\n\
-		var b = line.point.y - slope * line.point.x;\n\
-		\n\
-		intersectX = this.point.x;\n\
-		intersectY = slope * this.point.x + b;*/\n\
-\n\
 		float slope = line_2_dir.y / line_2_dir.x;\n\
 		float b = line_2_pos.y - slope * line_2_pos.x;\n\
 		\n\
@@ -1789,21 +1792,6 @@ bool intersectionLineToLine(in vec2 line_1_pos, in vec2 line_1_dir,in vec2 line_
 	{\n\
 		// this is a horizontal line.\n\
 		// must check if the \"line\" is vertical.\n\
-		/*\n\
-		if (Math.abs(line.direction.x) < zero)\n\
-		{\n\
-			// \"line\" is vertical.\n\
-			intersectX = line.point.x;\n\
-			intersectY = this.point.y;\n\
-		}\n\
-		else \n\
-		{\n\
-			var slope = line.direction.y / line.direction.x;\n\
-			var b = line.point.y - slope * line.point.x;\n\
-			\n\
-			intersectX = (this.point.y - b)/slope;\n\
-			intersectY = this.point.y;\n\
-		}*/\n\
 		if (abs(line_2_dir.x) < zero)\n\
 		{\n\
 			// \"line\" is vertical.\n\
@@ -1824,26 +1812,6 @@ bool intersectionLineToLine(in vec2 line_1_pos, in vec2 line_1_dir,in vec2 line_
 	else \n\
 	{\n\
 		// this is oblique.\n\
-		/*\n\
-		if (Math.abs(line.direction.x) < zero)\n\
-		{\n\
-			// \"line\" is vertical.\n\
-			var mySlope = this.direction.y / this.direction.x;\n\
-			var myB = this.point.y - mySlope * this.point.x;\n\
-			intersectX = line.point.x;\n\
-			intersectY = intersectX * mySlope + myB;\n\
-		}\n\
-		else \n\
-		{\n\
-			var mySlope = this.direction.y / this.direction.x;\n\
-			var myB = this.point.y - mySlope * this.point.x;\n\
-			\n\
-			var slope = line.direction.y / line.direction.x;\n\
-			var b = line.point.y - slope * line.point.x;\n\
-			\n\
-			intersectX = (myB - b)/ (slope - mySlope);\n\
-			intersectY = slope * intersectX + b;\n\
-		}*/\n\
 		if (abs(line_2_dir.x) < zero)\n\
 		{\n\
 			// \"line\" is vertical.\n\
@@ -1987,27 +1955,7 @@ bool isPointInsideLimitationConvexPolygon(in vec2 point2d)\n\
 \n\
 \n\
 \n\
-/*\n\
-bool clipVertexBySegment2d(in vec3 segPoint_1, in vec3 segPoint_2, vec3 point)\n\
-{\n\
-	bool bClip = false;\n\
-	// Note: use the points as 2d points using only x,y.***\n\
-	// Calculate the direction.***\n\
-	float difX = segPoint_2.x - segPoint_1.x;\n\
-	float difY = segPoint_2.y - segPoint_1.y;\n\
-	float modul = sqrt(difX*difX + difY*difY);\n\
-	vec2 dir = vec2(difX/modul, difY/modul);\n\
 \n\
-	// Calculate \n\
-\n\
-	// 1rst, check if the projectionPoint is inside of the segment.***\n\
-\n\
-	// 2nd, check the side of the point relative to segment.***\n\
-\n\
-\n\
-	return bClip;\n\
-}\n\
-*/\n\
 vec3 reconstructPosition(vec2 texCoord, float depth)\n\
 {\n\
     // https://wickedengine.net/2019/09/22/improved-normal-reconstruction-from-depth/\n\
@@ -2173,123 +2121,90 @@ void main()\n\
 	float linearDepth = getDepth(screenPos);   \n\
 	vec3 ray = getViewRay(screenPos); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
 	scalarProd = dot(normal2, normalize(-ray));\n\
-	scalarProd *= scalarProd;\n\
-	scalarProd *= 0.7;\n\
-	scalarProd += 0.3;\n\
-\n\
-\n\
-	//if(scalarProd > 0.6) // delete this. ***\n\
-	//scalarProd = 0.6; // delete this. ***\n\
-\n\
+	//scalarProd *= scalarProd;\n\
+	scalarProd *= 0.6;\n\
+	scalarProd += 0.4;\n\
 \n\
 	//vec3 normalFromDepth = normal_from_depth(linearDepth, screenPos); // normal from depthTex.***\n\
 	//normal2 = normalFromDepth;\n\
 	//float edgeOccl = 1.0;\n\
 	if(bApplySsao)\n\
 	{   \n\
-		 \n\
-		vec3 origin = ray * linearDepth;  \n\
-		float tolerance = (radius*2.0)/far; // original.***\n\
-\n\
-		vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
-		vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
-		vec3 bitangent = cross(normal2, tangent);\n\
-		mat3 tbn = mat3(tangent, bitangent, normal2);   \n\
-		float minDepthBuffer;\n\
-		float maxDepthBuffer;\n\
-		for(int i = 0; i < kernelSize; ++i)\n\
-		{    	 \n\
-			vec3 sample = origin + (tbn * vec3(kernel[i].x*1.0, kernel[i].y*1.0, kernel[i].z)) * radius*2.0;\n\
-			vec4 offset = projectionMatrix * vec4(sample, 1.0);					\n\
-			offset.xy /= offset.w;\n\
-			offset.xy = offset.xy * 0.5 + 0.5;  				\n\
-			float sampleDepth = -sample.z/far;// original.***\n\
-			////float sampleDepth = -sample.z/(far-near);// test.***\n\
-			////float sampleDepth = -sample.z/farForDepth;\n\
-\n\
-			float depthBufferValue = getDepth(offset.xy);\n\
-			//float diff = abs(sampleDepth - depthBufferValue);\n\
-\n\
-			//if(depthBufferValue < 0.00393)\n\
-			//continue;\n\
-\n\
+		//if(linearDepth<0.996 && linearDepth>0.001005)\n\
+		if(linearDepth<0.995 && linearDepth>0.0011)\n\
+		//if(linearDepth<0.995 && linearDepth>0.0079)\n\
+		{\n\
+				//occlusion = 1.0;\n\
 			\n\
-			/*\n\
-			if(depthBufferValue > 0.00391 && depthBufferValue < 0.00393)\n\
-			{\n\
-				if (depthBufferValue < sampleDepth-tolerance*1000.0)\n\
-				{\n\
-					occlusion +=  0.5;\n\
-				}\n\
+			//Test.********************************************************************************************\n\
+			// NDC : the center of the screen is 0.0.0.***\n\
+			float depthRange_near = 0.0;\n\
+			float depthRange_far = 1.0;\n\
+			float x_ndc = 2.0 * screenPos.x - 1.0;\n\
+			float y_ndc = 2.0 * screenPos.y - 1.0;\n\
+			float z_ndc = (2.0 * linearDepth - depthRange_near - depthRange_far) / (depthRange_far - depthRange_near);\n\
+			\n\
+			vec4 viewPosH = projectionMatrixInv * vec4(x_ndc, y_ndc, z_ndc, 1.0);\n\
+			vec3 posCC = viewPosH.xyz/viewPosH.w;\n\
+			//vec4 posWC = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0) + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 1.0);\n\
+			vec3 origin = vec3(posCC.xyz);  \n\
+			// EndTest.----------------------------------------------------------------------------------------\n\
+\n\
+			//vec3 origin = ray * linearDepth;  // original.***\n\
+			float distToCam = -origin.z*0.01;\n\
+			if(distToCam < 1.0)\n\
+			distToCam = 1.0;\n\
+			float radiusAux = 1.0;\n\
+			float tolerance = (radiusAux)/far; // original.***\n\
+			tolerance = 0.0;\n\
+\n\
+			vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
+			vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
+			vec3 bitangent = cross(normal2, tangent);\n\
+			mat3 tbn = mat3(tangent, bitangent, normal2);   \n\
+			float minDepthBuffer;\n\
+			float maxDepthBuffer;\n\
+			for(int i = 0; i < kernelSize; ++i)\n\
+			{    	 \n\
+				vec3 sample = origin + (tbn * vec3(kernel[i].x*1.0, kernel[i].y*1.0, kernel[i].z)) * radiusAux;\n\
+				vec4 offset = projectionMatrix * vec4(sample, 1.0);					\n\
+				offset.xyz /= offset.w;\n\
+				offset.xyz = offset.xyz * 0.5 + 0.5;  				\n\
+				float sampleDepth = -sample.z/far;// original.***\n\
+\n\
+				//if(linearDepth < 0.1 || linearDepth > 0.9)\n\
+				//continue;\n\
+\n\
+				// check if offset.xy is different of screenPos.***\n\
+				//if(int(offset.x * screenWidth) == int(gl_FragCoord.x) && int(offset.y * screenHeight) == int(gl_FragCoord.y))\n\
+				//if(abs(offset.x * screenWidth - gl_FragCoord.x) < 1.5 && abs(offset.y * screenHeight - gl_FragCoord.y) < 1.5)\n\
+				//continue;\n\
+\n\
+				//if(offset.z < -0.1)// || offset.z > 0.99)\n\
+				//continue;\n\
+\n\
+				float depthBufferValue = getDepth(offset.xy);\n\
 				\n\
-				continue;\n\
-			}			\n\
-			*/\n\
-			if (depthBufferValue < sampleDepth-tolerance)\n\
-			{\n\
-				occlusion +=  1.0;\n\
-			}\n\
-		} \n\
-\n\
-		// test detect edge.**********************************************************************************\n\
-		/*\n\
-		vec3 normal3 = vec3(-normal2.x, -normal2.y, normal2.z);\n\
-		tangent = normalize(rvec - normal3 * dot(rvec, normal3));\n\
-		bitangent = cross(normal3, tangent);\n\
-		tbn = mat3(tangent, bitangent, normal3);  \n\
-		float edgeRadius = 0.2;\n\
-		edgeOccl = 0.0;\n\
-		tolerance = edgeRadius/far;\n\
-		for(int i = 0; i < kernelSize; ++i)\n\
-		{    	 \n\
-			vec3 sample = origin + (tbn * vec3(kernel[i].x*1.0, kernel[i].y*1.0, kernel[i].z)) * edgeRadius;\n\
-			vec4 offset = projectionMatrix * vec4(sample, 1.0);					\n\
-			offset.xy /= offset.w;\n\
-			offset.xy = offset.xy * 0.5 + 0.5;  				\n\
-			float sampleDepth = -sample.z/far;// original.***\n\
-			////float sampleDepth = -sample.z/(far-near);// test.***\n\
-			////float sampleDepth = -sample.z/farForDepth;\n\
-\n\
-			sampleDepth = 1.0 - sampleDepth;\n\
-\n\
-			float depthBufferValue = getDepth(offset.xy);\n\
-			depthBufferValue = 1.0 - depthBufferValue;\n\
-			\n\
-			if(depthBufferValue > 0.00391 && depthBufferValue < 0.00393)\n\
-			{\n\
-				if (depthBufferValue < sampleDepth-tolerance*1000.0)\n\
+				/*\n\
+				if(depthBufferValue > 0.00391 && depthBufferValue < 0.00393)\n\
 				{\n\
-					edgeOccl +=  0.5;\n\
+					if (depthBufferValue < sampleDepth-tolerance*1000.0)\n\
+					{\n\
+						occlusion +=  0.5;\n\
+					}\n\
+					\n\
+					continue;\n\
+				}			\n\
+				*/\n\
+				if (depthBufferValue < sampleDepth-tolerance)\n\
+				{\n\
+					occlusion +=  1.0/distToCam;\n\
 				}\n\
-				\n\
-				continue;\n\
-			}			\n\
-			\n\
-			if (depthBufferValue < sampleDepth-tolerance)\n\
-			{\n\
-				edgeOccl +=  1.0;\n\
-			}\n\
-		} \n\
-\n\
-		if(edgeOccl > 0.5)\n\
-		edgeOccl = float(kernelSize);\n\
-\n\
-		if(edgeOccl > float(kernelSize))\n\
-		edgeOccl = float(kernelSize);\n\
-\n\
-		edgeOccl = 1.0 - edgeOccl;\n\
-		*/\n\
-		// end test.----------------------------------------------------------------------------------------\n\
-\n\
+			} \n\
+		}\n\
 		//occlusion = 1.0 - occlusion / float(kernelSize);	\n\
 		float smallOccl = occlusion / float(kernelSize);\n\
-\n\
-		//if(isEdge())\n\
-		//smallOccl = 1.0;\n\
-\n\
-		//smallOccl *= 0.4;\n\
-\n\
-		\n\
+		smallOccl = 0.0;\n\
 		\n\
 		// test.***\n\
 		//ssaoFromDepthTex\n\
@@ -2310,10 +2225,12 @@ void main()\n\
 		occlFromDepth *= 0.35;\n\
 \n\
 		occlusion = 1.0 - smallOccl - occlFromDepth.r - occlFromDepth.g - occlFromDepth.b - occlFromDepth.a; // original.***\n\
-		//occlusion = 1.0 - occl_aux - small_occl_aux;\n\
+		//occlusion = 1.0 - smallOccl;\n\
 \n\
 		if(occlusion < 0.1)\n\
 		occlusion = 0.1;\n\
+\n\
+		\n\
 	}\n\
 \n\
 	vec4 textureColor;\n\
@@ -2431,6 +2348,16 @@ void main()\n\
     \n\
 	\n\
 	//textureColor = vec4(0.85, 0.85, 0.85, 1.0);\n\
+	/*\n\
+	if(linearDepth>0.95)\n\
+	{\n\
+		textureColor = vec4(1.0, 0.0, 0.0, 1.0); \n\
+	}\n\
+	else if(linearDepth<0.0079)\n\
+	{\n\
+		textureColor = vec4(0.0, 1.0, 0.0, 1.0); \n\
+	}\n\
+	*/\n\
 	\n\
 	//vec3 ambientColorAux = vec3(textureColor.x*ambientColor.x, textureColor.y*ambientColor.y, textureColor.z*ambientColor.z); // original.***\n\
 	vec3 ambientColorAux = vec3(textureColor.xyz);\n\
@@ -2449,8 +2376,10 @@ void main()\n\
 	\n\
 	\n\
 	finalColor *= colorMultiplier;\n\
-\n\
 	//finalColor = vec4(linearDepth, linearDepth, linearDepth, 1.0); // test to render depth color coded.***\n\
+\n\
+	\n\
+\n\
     gl_FragColor = finalColor; \n\
 	#ifdef USE_LOGARITHMIC_DEPTH\n\
 	if(bUseLogarithmicDepth)\n\
@@ -2923,6 +2852,10 @@ vec4 PackDepth32( in float depth )\n\
 \n\
 void main()\n\
 {     \n\
+    vec2 pt = gl_PointCoord - vec2(0.5);\n\
+	float distSquared = pt.x*pt.x+pt.y*pt.y;\n\
+	if(distSquared > 0.25)\n\
+		discard;\n\
     gl_FragData[0] = packDepth(-depth);\n\
 	//gl_FragData[0] = PackDepth32(depth);\n\
 }";
@@ -3543,6 +3476,20 @@ vec4 packDepth(const in float depth)\n\
     res -= res.xxyz * bit_mask;\n\
     return res;  \n\
 }\n\
+/*\n\
+vec4 packDepth_A( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0,1.0/255.0,1.0/255.0,0.0);\n\
+  return enc;\n\
+}\n\
+// unpack depth used for shadow on screen.***\n\
+float unpackDepth_A(vec4 packedDepth)\n\
+{\n\
+	// See Aras Pranckevičius' post Encoding Floats to RGBA\n\
+	// http://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/\n\
+	return dot(packedDepth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+}*/\n\
 \n\
 \n\
 //vec4 PackDepth32( in float depth )\n\
@@ -3666,6 +3613,15 @@ void main()\n\
     //linear depth in camera space (0..far)\n\
 	vec4 orthoPos = modelViewMatrixRelToEye * pos4;\n\
     depth = orthoPos.z/far; // original.***\n\
+	\n\
+\n\
+	/*\n\
+	float z_ndc = (2.0 * z_window - depthRange_near - depthRange_far) / (depthRange_far - depthRange_near);\n\
+		\n\
+		vec4 viewPosH = projectionMatrixInv * vec4(x_ndc, y_ndc, z_ndc, 1.0);\n\
+		vec3 posCC = viewPosH.xyz/viewPosH.w;\n\
+		vec4 posWC = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0) + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 1.0);\n\
+		*/\n\
 \n\
 \n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
@@ -3697,35 +3653,47 @@ ShaderSource.ScreenQuadFS = "#ifdef GL_ES\n\
 uniform sampler2D depthTex;\n\
 uniform sampler2D shadowMapTex;\n\
 uniform sampler2D shadowMapTex2;\n\
-uniform mat4 modelViewMatrix;\n\
-uniform mat4 modelViewMatrixRelToEye; \n\
-uniform mat4 modelViewMatrixInv;\n\
-uniform mat4 modelViewProjectionMatrixInv;\n\
 uniform mat4 modelViewMatrixRelToEyeInv;\n\
-uniform mat4 projectionMatrix;\n\
 uniform mat4 projectionMatrixInv;\n\
 uniform vec3 encodedCameraPositionMCHigh;\n\
 uniform vec3 encodedCameraPositionMCLow;\n\
+\n\
+uniform float near;\n\
+uniform float far; \n\
+uniform float tangentOfHalfFovy;\n\
+uniform float aspectRatio;    \n\
+\n\
 uniform bool bApplyShadow;\n\
 uniform bool bSilhouette;\n\
+uniform bool bFxaa;\n\
+\n\
 uniform mat4 sunMatrix[2]; \n\
 uniform vec3 sunPosHIGH[2];\n\
 uniform vec3 sunPosLOW[2];\n\
 uniform int sunIdx;\n\
 uniform float screenWidth;    \n\
 uniform float screenHeight;   \n\
-uniform float near;\n\
-uniform float far;\n\
-uniform float fov;\n\
-uniform float tangentOfHalfFovy;\n\
-uniform float aspectRatio;\n\
-varying vec4 vColor; \n\
+\n\
 \n\
 float unpackDepth(vec4 packedDepth)\n\
 {\n\
 	// See Aras Pranckevičius' post Encoding Floats to RGBA\n\
 	// http://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/\n\
+	//vec4 packDepth( float v ) // function to packDepth.***\n\
+	//{\n\
+	//	vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+	//	enc = fract(enc);\n\
+	//	enc -= enc.yzww * vec4(1.0/255.0,1.0/255.0,1.0/255.0,0.0);\n\
+	//	return enc;\n\
+	//}\n\
 	return dot(packedDepth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+}\n\
+\n\
+vec4 packDepth( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0,1.0/255.0,1.0/255.0,0.0);\n\
+  return enc;\n\
 }\n\
 \n\
 float unpackDepthMago(const in vec4 rgba_depth)\n\
@@ -3755,6 +3723,24 @@ float getDepthShadowMap(vec2 coord)\n\
 	else\n\
 		return -1.0;\n\
 }\n\
+\n\
+vec3 getViewRay(vec2 tc)\n\
+{\n\
+	/*\n\
+	// The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
+	float farForDepth = 30000.0;\n\
+	float hfar = 2.0 * tangentOfHalfFovy * farForDepth;\n\
+    float wfar = hfar * aspectRatio;    \n\
+    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -farForDepth);  \n\
+	*/	\n\
+	\n\
+	\n\
+	float hfar = 2.0 * tangentOfHalfFovy * far;\n\
+    float wfar = hfar * aspectRatio;    \n\
+    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    \n\
+	\n\
+    return ray;                      \n\
+} \n\
 \n\
 bool isInShadow(vec4 pointWC, int currSunIdx)\n\
 {\n\
@@ -3803,6 +3789,22 @@ bool isInShadow(vec4 pointWC, int currSunIdx)\n\
 	}\n\
 	\n\
 	return inShadow;\n\
+}\n\
+\n\
+void make_kernel(inout vec4 n[9], vec2 coord)\n\
+{\n\
+	float w = 1.0 / screenWidth;\n\
+	float h = 1.0 / screenHeight;\n\
+\n\
+	n[0] = texture2D(depthTex, coord + vec2( -w, -h));\n\
+	n[1] = texture2D(depthTex, coord + vec2(0.0, -h));\n\
+	n[2] = texture2D(depthTex, coord + vec2(  w, -h));\n\
+	n[3] = texture2D(depthTex, coord + vec2( -w, 0.0));\n\
+	n[4] = texture2D(depthTex, coord);\n\
+	n[5] = texture2D(depthTex, coord + vec2(  w, 0.0));\n\
+	n[6] = texture2D(depthTex, coord + vec2( -w, h));\n\
+	n[7] = texture2D(depthTex, coord + vec2(0.0, h));\n\
+	n[8] = texture2D(depthTex, coord + vec2(  w, h));\n\
 }\n\
 \n\
 void main()\n\
@@ -3865,6 +3867,9 @@ void main()\n\
 		float z_window  = unpackDepth(texture2D(depthTex, screenPos.xy)); // z_window  is [0.0, 1.0] range depth.\n\
 		if(z_window < 0.001)\n\
 		discard;\n\
+\n\
+		//vec3 ray = getViewRay(screenPos);\n\
+		//vec4 posWC = vec4(ray * z_window, 1.0);\n\
 		\n\
 		// https://stackoverflow.com/questions/11277501/how-to-recover-view-space-position-given-view-space-depth-value-and-ndc-xy\n\
 		float depthRange_near = 0.0;\n\
@@ -3872,12 +3877,13 @@ void main()\n\
 		float x_ndc = 2.0 * screenPos.x - 1.0;\n\
 		float y_ndc = 2.0 * screenPos.y - 1.0;\n\
 		float z_ndc = (2.0 * z_window - depthRange_near - depthRange_far) / (depthRange_far - depthRange_near);\n\
+		// Note: NDC range = (-1,-1,-1) to (1,1,1).***\n\
 		\n\
 		vec4 viewPosH = projectionMatrixInv * vec4(x_ndc, y_ndc, z_ndc, 1.0);\n\
 		vec3 posCC = viewPosH.xyz/viewPosH.w;\n\
 		vec4 posWC = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0) + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 1.0);\n\
-		//----------------------------------------------------------------\n\
-	\n\
+		//------------------------------------------------------------------------------------------------------------------------------\n\
+		\n\
 		// 2nd, calculate the vertex relative to light.***\n\
 		// 1rst, try with the closest sun. sunIdx = 0.\n\
 		bool pointIsinShadow = isInShadow(posWC, 0);\n\
@@ -3891,9 +3897,32 @@ void main()\n\
 			shadow_occlusion = 0.5;\n\
 			alpha = 0.5;\n\
 		}\n\
+\n\
+		gl_FragColor = vec4(finalColor.rgb*shadow_occlusion, alpha);\n\
 		\n\
 	}\n\
-    gl_FragColor = vec4(finalColor.rgb*shadow_occlusion, alpha);\n\
+\n\
+	// check if is fastAntiAlias.***\n\
+	if(bFxaa)\n\
+	{\n\
+		vec4 color = texture2D(depthTex, vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight));\n\
+\n\
+		if(color.r < 0.0001 && color.g < 0.0001 && color.b < 0.0001)\n\
+		discard;\n\
+		/*/\n\
+		vec4 n[9];\n\
+		make_kernel( n, vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight) );\n\
+\n\
+		vec4 sobel_edge_h = n[2] + (2.0*n[5]) + n[8] - (n[0] + (2.0*n[3]) + n[6]);\n\
+		vec4 sobel_edge_v = n[0] + (2.0*n[1]) + n[2] - (n[6] + (2.0*n[7]) + n[8]);\n\
+		vec4 sobel = sqrt((sobel_edge_h * sobel_edge_h) + (sobel_edge_v * sobel_edge_v));\n\
+\n\
+		gl_FragColor = vec4( 1.0 - sobel.rgb, 1.0 );\n\
+		//gl_FragColor = vec4(sobel.rgb, 1.0 );\n\
+		*/\n\
+		gl_FragColor = color;\n\
+	}\n\
+    \n\
 }";
 ShaderSource.ScreenQuadVS = "precision mediump float;\n\
 \n\
@@ -4007,6 +4036,14 @@ float unpackDepth(const in vec4 rgba_depth)\n\
     return depth;\n\
 }  \n\
 \n\
+/*\n\
+float unpackDepth_A(vec4 packedDepth)\n\
+{\n\
+	// See Aras Pranckevičius' post Encoding Floats to RGBA\n\
+	// http://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/\n\
+	return dot(packedDepth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+}\n\
+*/\n\
 \n\
 float UnpackDepth32( in vec4 pack )\n\
 {\n\
@@ -4016,15 +4053,6 @@ float UnpackDepth32( in vec4 pack )\n\
 \n\
 vec3 getViewRay(vec2 tc)\n\
 {\n\
-	/*\n\
-	// The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
-	float farForDepth = 30000.0;\n\
-	float hfar = 2.0 * tangentOfHalfFovy * farForDepth;\n\
-    float wfar = hfar * aspectRatio;    \n\
-    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -farForDepth);  \n\
-	*/	\n\
-	\n\
-	\n\
 	float hfar = 2.0 * tangentOfHalfFovy * far;\n\
     float wfar = hfar * aspectRatio;    \n\
     vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    \n\
@@ -4085,10 +4113,18 @@ vec3 normal_from_depth(float depth, vec2 texCoord) {\n\
 		depthB += getDepth(texCoord + offset2*(1.0+i));\n\
 	}\n\
 \n\
-	vec3 posA = reconstructPosition(texCoord + offset1*2.0, depthA/2.0);\n\
-	vec3 posB = reconstructPosition(texCoord + offset2*2.0, depthB/2.0);\n\
+	//vec3 posA = reconstructPosition(texCoord + offset1*2.0, depthA/2.0);\n\
+	//vec3 posB = reconstructPosition(texCoord + offset2*2.0, depthB/2.0);\n\
+    //vec3 pos0 = reconstructPosition(texCoord, depth);\n\
 \n\
-    vec3 pos0 = reconstructPosition(texCoord, depth);\n\
+    vec3 posA = getViewRay(texCoord + offset1*2.0)* depthA/2.0;\n\
+	vec3 posB = getViewRay(texCoord + offset2*2.0)* depthB/2.0;\n\
+    vec3 pos0 = getViewRay(texCoord)* depth;\n\
+\n\
+    posA.z *= -1.0;\n\
+    posB.z *= -1.0;\n\
+    pos0.z *= -1.0;\n\
+\n\
     vec3 normal = cross(posA - pos0, posB - pos0);\n\
     normal.z = -normal.z;\n\
 \n\
@@ -4102,10 +4138,20 @@ float getOcclusion(vec3 origin, vec3 rotatedKernel, float radius)\n\
     vec4 offset = projectionMatrix * vec4(sample, 1.0);	\n\
     vec3 offsetCoord = vec3(offset.xyz);				\n\
     offsetCoord.xyz /= offset.w;\n\
-    offsetCoord.xyz = offsetCoord.xyz * 0.5 + 0.5;  				\n\
+    offsetCoord.xyz = offsetCoord.xyz * 0.5 + 0.5;  	\n\
+\n\
+    //if(abs(offsetCoord.x * screenWidth - gl_FragCoord.x) < 1.5 && abs(offsetCoord.y * screenHeight - gl_FragCoord.y) < 1.5)\n\
+	//	return 0.0;\n\
+\n\
     float sampleDepth = -sample.z/far;// original.***\n\
 \n\
     float depthBufferValue = getDepth(offsetCoord.xy);\n\
+\n\
+    // For multiFrustum ssao problem.***\n\
+    //if(depthBufferValue > 0.1)\n\
+    //return 0.0;\n\
+    //------------------------------------\n\
+\n\
     float depthDiff = abs(depthBufferValue - sampleDepth);\n\
     if(depthDiff < radius/far)\n\
     {\n\
@@ -4129,11 +4175,14 @@ void main()\n\
     vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
     vec3 ray = getViewRay(screenPos); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
     float linearDepth = getDepth(screenPos);  \n\
+    bool isAlmostOutOfFrustum = false;\n\
+    //if(linearDepth>0.996 || linearDepth<0.001005)\n\
+    //if(linearDepth>0.996 || linearDepth<0.001005)\n\
+    //{\n\
+    //    isAlmostOutOfFrustum = true;\n\
+    //}\n\
 \n\
-    // test.***\n\
-    //float linearDepthTest = unpackDepth(texture2D(depthTex, screenPos));\n\
-    //if(linearDepthTest > 0.99)\n\
-    //discard;\n\
+    \n\
 \n\
     float veryBigRadius = 20.0;\n\
     float bigRadius = 12.0;\n\
@@ -4150,9 +4199,11 @@ void main()\n\
     //if(factorByDist < 0.05)\n\
     //    discard;\n\
 \n\
-    if(bApplySsao)\n\
+    if(bApplySsao)// && !isAlmostOutOfFrustum)\n\
 	{        \n\
-		vec3 origin = ray * linearDepth;  \n\
+		vec3 origin = ray * linearDepth; \n\
+        //origin = reconstructPosition(screenPos, linearDepth);\n\
+\n\
         vec3 normal2 = normal_from_depth(linearDepth, screenPos); // normal from depthTex.***\n\
         normal = normal2;\n\
         \n\

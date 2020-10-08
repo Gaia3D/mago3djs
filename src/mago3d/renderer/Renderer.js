@@ -1821,6 +1821,24 @@ Renderer.prototype.renderScreenRectangle = function(gl)
 
 };
 
+/**
+ * This function renders screenSpaceObjects.
+ * @param {WebGLRenderingContext} gl WebGL Rendering Context.
+ */
+Renderer.prototype.renderScreenSpaceObjects = function(gl) 
+{
+	var magoManager = this.magoManager;
+	var modeler = magoManager.modeler;
+	var sceenSpaceObjectsCount = modeler.screenSpaceObjectsArray.length;
+
+	for(var i=0; i<sceenSpaceObjectsCount; i++)
+	{
+		var screenSpaceObject = modeler.screenSpaceObjectsArray[i];
+
+		
+	}
+};
+
 
 /**
  * This function renders provisional ParametricMesh objects that has no self render function.

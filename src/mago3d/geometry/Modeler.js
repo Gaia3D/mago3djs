@@ -41,6 +41,10 @@ var Modeler = function(magoManager)
 	this.objectsArray = []; // put here all objects.***
 	this.vectorsArray; // put here vector objects (lines, polylines, etc.).***
 	this.currentVisibleObjectsArray;
+
+	// screenSpaceObjectsArray.***
+	this.screenSpaceObjectsArray = [];
+	
 };
 Modeler.EVENT_TYPE = {
 	'ADD' : 'add'
