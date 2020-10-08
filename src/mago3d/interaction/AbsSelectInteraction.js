@@ -132,7 +132,7 @@ AbsSelectInteraction.prototype.handle = function(browserEvent)
  */
 AbsPointInteraction.prototype.handleDownEvent = function(browserEvent)
 {
-	return abstract();
+	return throwAbstractError();
 };
 /**
  * handle event
@@ -140,7 +140,7 @@ AbsPointInteraction.prototype.handleDownEvent = function(browserEvent)
  */
 AbsPointInteraction.prototype.handleUpEvent = function(browserEvent)
 {
-	return abstract();
+	return throwAbstractError();
 };
 
 /**
@@ -149,5 +149,5 @@ AbsPointInteraction.prototype.handleUpEvent = function(browserEvent)
  */
 AbsPointInteraction.prototype.handleMoveEvent = function(browserEvent)
 {
-	return abstract();
+	return throwAbstractError();
 };

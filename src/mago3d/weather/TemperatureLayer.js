@@ -424,7 +424,7 @@ TemperatureLayer.prototype.init = function(gl, magoManager)
 	var camera = magoManager.myCameraSCX;
 	var frustum = camera.bigFrustum;
 	
-	var fovyRad = magoManager.sceneState.camera.frustum.fovyRad;
+	var fovyRad = magoManager.sceneState.camera.frustum.fovyRad[0];
 	var aspectRatio = frustum.aspectRatio[0];
 	var halfHeight = frustum.tangentOfHalfFovy[0];
 	var halfWidth = halfHeight * aspectRatio;

@@ -347,7 +347,7 @@ CCTV.prototype.getVbo = function(resultVboContainer, resultVboContainerEdges, vb
 	// now rotate in X axis.
 	var rotMatAux = new Matrix4();
 	var frustum = this.camera.bigFrustum;
-	var halfFovyRad = frustum.fovyRad / 2.0;
+	var halfFovyRad = frustum.fovyRad[0] / 2.0;
 	rotMatAux.rotationAxisAngDeg((-halfFovyRad) * 180.0 / Math.PI, 1.0, 0.0, 0.0);
 	
 	var surfIndepMesh = frustumMesh.getSurfaceIndependentMesh(undefined, bIncludeBottomCap, bIncludeTopCap);
@@ -423,9 +423,9 @@ CCTV.prototype.makeFrustumGeometry_2 = function(resultMesh)
 	
 	// camera geometry values.
 	var frustum = this.camera.bigFrustum;
-	var far = frustum.far;
-	var halfFovyRad = frustum.fovyRad / 2.0;
-	var halfFovxRad = frustum.fovRad / 2.0;
+	var far = frustum.far[0];
+	var halfFovyRad = frustum.fovyRad[0] / 2.0;
+	var halfFovxRad = frustum.fovRad[0] / 2.0;
 	
 	var left = -far * Math.tan(halfFovxRad);
 	var right = -left;
@@ -483,9 +483,9 @@ CCTV.prototype.makeFrustumGeometry = function(resultMesh)
 	var focusPosition = new Point3D(0.0, 0.0, 0.0);
 	
 	var frustum = this.camera.bigFrustum;
-	var far = frustum.far;
-	var halfFovyRad = frustum.fovyRad / 2.0;
-	var halfFovxRad = frustum.fovRad / 2.0;
+	var far = frustum.far[0];
+	var halfFovyRad = frustum.fovyRad[0] / 2.0;
+	var halfFovxRad = frustum.fovRad[0] / 2.0;
 	
 	var left = -far * Math.tan(halfFovxRad);
 	var right = -left;

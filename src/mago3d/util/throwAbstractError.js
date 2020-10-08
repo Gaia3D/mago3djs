@@ -1,9 +1,9 @@
 'use strict';
 
-function abstract() 
+var throwAbstractError =function () 
 {
 	return  ((function() 
 	{
 		throw new Error('Unimplemented abstract method.');
 	})());
-}
+};

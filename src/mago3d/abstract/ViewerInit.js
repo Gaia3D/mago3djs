@@ -21,17 +21,17 @@ var ViewerInit = function(containerId, serverPolicy)
 
 ViewerInit.prototype.init = function() 
 {
-	return abstract();
+	return throwAbstractError();
 };
 
 ViewerInit.prototype.initMagoManager = function() 
 {
-	return abstract();
+	return throwAbstractError();
 };
 
 ViewerInit.prototype.setEventHandler = function() 
 {
-	return abstract();
+	return throwAbstractError();
 };
 
 ViewerInit.prototype.initPosition = function()

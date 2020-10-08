@@ -440,7 +440,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		sceneState.drawingBufferHeight[0] = canvas.clientHeight;
 		sceneState.camera.frustum.aspectRatio[0] = canvas.clientWidth/canvas.clientHeight;
 		sceneState.camera.frustum.fovRad[0] = Math.PI/3*1.8;
-		sceneState.camera.frustum.fovyRad[0] = sceneState.camera.frustum.fovRad[0]/sceneState.camera.frustum.aspectRatio;
+		sceneState.camera.frustum.fovyRad[0] = sceneState.camera.frustum.fovRad[0]/sceneState.camera.frustum.aspectRatio[0];
 		sceneState.camera.frustum.tangentOfHalfFovy[0] = Math.tan(sceneState.camera.frustum.fovyRad[0]/2);
 		
 		// initial camera position.***

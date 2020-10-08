@@ -75,5 +75,5 @@ AbsPointInteraction.prototype.setActive = function(active)
  */
 AbsPointInteraction.prototype.start = function() 
 {
-	return abstract();
+	return throwAbstractError();
 };

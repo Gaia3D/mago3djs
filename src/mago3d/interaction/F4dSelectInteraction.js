@@ -32,7 +32,7 @@ F4dSelectInteraction.EVENT_TYPE = {
  */
 F4dSelectInteraction.prototype.handleDownEvent = function(browserEvent)
 {
-	return abstract();
+	return throwAbstractError();
 };
 /**
  * handle event
@@ -40,7 +40,7 @@ F4dSelectInteraction.prototype.handleDownEvent = function(browserEvent)
  */
 F4dSelectInteraction.prototype.handleUpEvent = function(browserEvent)
 {
-	return abstract();
+	return throwAbstractError();
 };
 
 /**

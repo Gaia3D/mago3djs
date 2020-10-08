@@ -1391,7 +1391,7 @@ MagoWorld.prototype.doTest__logarithmicDepthBuffer_encode_decode = function()
 	var frustum_far = z; // unitary frustum far.
 
 	var aspectRatio = frustum.aspectRatio;
-	var tangentOfHalfFovy = frustum.tangentOfHalfFovy; 
+	var tangentOfHalfFovy = frustum.tangentOfHalfFovy[0]; 
 	
 	var hfar = 2.0 * tangentOfHalfFovy * frustum_far; //var hfar = 2.0 * Math.tan(fovy/2.0) * frustum_far;
 	var wfar = hfar * aspectRatio;

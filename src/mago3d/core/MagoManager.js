@@ -913,7 +913,7 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
 		resultCamera.up.set(camUpX, camUpY, camUpZ);
 		
 		var aspectRatio = frustum.aspectRatio[0];
-		var fovy = frustum.fovyRad;	
+		var fovy = frustum.fovyRad[0];	
 		
 		frustum = resultCamera.getFrustum(frustumIdx);
 		resultCamera.frustum.near[0] = currentFrustumNear;
@@ -934,7 +934,7 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
 		var camera = this.sceneState.camera;
 		var frustum = camera.getFrustum(frustumIdx);
 		var aspectRatio = frustum.aspectRatio[0];
-		var fovy = frustum.fovyRad;
+		var fovy = frustum.fovyRad[0];
 
 		var currentFrustumFar = frustum.far[0];
 		var currentFrustumNear = frustum.near[0];
@@ -948,8 +948,8 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
 		var distancesArray = [];
 		for (var i=0; i<numFrustums; i++)
 		{
-			distancesArray[i*2] = frustum.near;
-			distancesArray[i*2+1] = frustum.far;
+			distancesArray[i*2] = frustum.near[0];
+			distancesArray[i*2+1] = frustum.far[0];
 		}
 		
 		resultCamera.position.set(camera.position.x, camera.position.y, camera.position.z);
@@ -1523,8 +1523,11 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		this.sceneState.camera.frustum.dirty = true;
 
 		// delete selection buffer too.
-		this.selectionFbo.deleteObjects(gl);
-		this.selectionFbo = undefined;
+		if (this.selectionFbo) 
+		{
+			this.selectionFbo.deleteObjects(gl);
+			this.selectionFbo = undefined;
+		}
 	}
 	
 	// test silhouette depthFbo.***
@@ -4833,7 +4836,13 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 		}
 		*/
 	}
-	
+	var userAgent = window.navigator.userAgent;
+	var isIE = userAgent.indexOf('Trident') > -1;
+	if (isIE) 
+	{
+		use_linearOrLogarithmicDepth = "USE_LINEAR_DEPTH";
+		this.postFxShadersManager.bUseLogarithmicDepth = false;	
+	}
 
 	// here creates the necessary shaders for mago3d.***
 	// 1) ModelReferences ssaoShader.******************************************************************************

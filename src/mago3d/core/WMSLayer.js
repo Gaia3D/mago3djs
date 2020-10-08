@@ -50,13 +50,29 @@ var WMSLayer = function(options)
 	var filter = defaultValue(options.filter, undefined);
 	this.filter = filter ? new TextureLayerFilter(filter) : undefined;
 	this._requestParam = new URLSearchParams(this.param);
-	if (this._requestParam.get('VERSION') === '1.3.0') 
+	var userAgent = window.navigator.userAgent;
+	var isIE = userAgent.indexOf('Trident') > -1;
+	if (isIE) 
 	{
-		this._requestParam.delete('SRS');
+		if (this._requestParam.searchString.VERSION === '1.3.0') 
+		{
+			delete this._requestParam.searchString.SRS;
+		}
+		else 
+		{
+			delete this._requestParam.searchString.CRS;
+		}
 	}
 	else 
 	{
-		this._requestParam.delete('CRS');
+		if (this._requestParam.get('VERSION') === '1.3.0') 
+		{
+			this._requestParam.delete('SRS');
+		}
+		else 
+		{
+			this._requestParam.delete('CRS');
+		}
 	}
 };
 WMSLayer.prototype = Object.create(TextureLayer.prototype);
@@ -93,7 +109,6 @@ WMSLayer.prototype.getUrl = function(info)
 	var maxMercator = Globe.geographicToMercatorProjection(maxGeographicCoord.longitude, maxGeographicCoord.latitude, undefined);
 	// End test.-----------------------------------------------------------
 
-	var isLatest = this._requestParam.get('VERSION') === '1.3.0';
 	/*
 	var minx = isLatest ? minGeographicCoord.latitude : minGeographicCoord.longitude;
 	var miny = isLatest ? minGeographicCoord.longitude : minGeographicCoord.latitude;
@@ -106,6 +121,30 @@ WMSLayer.prototype.getUrl = function(info)
 	var maxy = maxMercator.y;
 	var bbox = minx + ',' + miny + ',' + maxx + ',' + maxy;
 
-	this._requestParam.set('BBOX', bbox);
-	return this.url + '?' + this._requestParam.toString();
+
+	var userAgent = window.navigator.userAgent;
+	var isIE = userAgent.indexOf('Trident') > -1;
+	var result;
+	if (isIE) 
+	{
+		this._requestParam.searchString.BBOX = bbox;
+		var queryStringArray = [];
+
+		for (var i in this._requestParam.searchString)
+		{
+			if (this._requestParam.searchString.hasOwnProperty(i))
+			{
+				queryStringArray.push(i + '=' + this._requestParam.searchString[i]);
+			}
+		}
+		result = this.url + '?' + queryStringArray.join('&');
+	}
+	else 
+	{
+		this._requestParam.set('BBOX', bbox);
+		result = this.url + '?' + this._requestParam.toString();
+	}
+
+	
+	return result;
 };

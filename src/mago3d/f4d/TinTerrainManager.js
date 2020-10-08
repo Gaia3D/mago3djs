@@ -414,20 +414,31 @@ TinTerrainManager.prototype.loadTerrainMeta = function()
 		var infoPath = that.terrainValue + TinTerrainManager.INFO_FILE;
 		var infoPromise = loadWithXhr(infoPath, undefined, undefined, 'json');
 
-		infoPromise.done(function(e)
+		infoPromise.then(function(e)
 		{
 			/**
 			 * TODO : INFO JSON VALIDATE 추가해야함.
 			 */
 			that.terrainTilesInfo = e;
 			that.terrainReady = true;
-		},
-		function(f)
+		});
+
+		infoPromise.catch(function() 
 		{
 			console.warn('Invalid or not exist ' + TinTerrainManager.INFO_FILE);
 			that.terrainType = CODE.magoEarthTerrainType.PLAIN;
 			that.terrainReady = true;
 		});
+		/*
+		infoPromise.done(function(e)
+		{
+			
+		},
+		function(f)
+		{
+			
+		});
+		*/
 	}
 };
 

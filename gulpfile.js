@@ -5,6 +5,7 @@ var fs = require('fs');
 var ncp = require('ncp');
 var path = require('path');
 var gulp = require('gulp');
+var babel = require('gulp-babel');
 
 var globby = require('globby');
 var rimraf = require('rimraf');
@@ -233,6 +234,10 @@ gulp.task('merge:js', gulp.series( 'clean', 'build', function()
 	list.push('!./src/mago3d/domain/Callback.js');
 	list.push('!./src/mago3d/worker/*');
 	return gulp.src(list)
+		.pipe(babel({
+			presets: ['@babel/preset-env'],
+			plugins: ['@babel/plugin-transform-object-assign']
+		}))
 		.pipe(concat('mago3d.js'))
 		.pipe(gulp.dest(paths.dest_js));
 }));
