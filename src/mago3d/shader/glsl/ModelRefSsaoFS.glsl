@@ -17,6 +17,11 @@ uniform sampler2D ssaoFromDepthTex;
 uniform bool textureFlipYAxis;
 uniform mat4 projectionMatrix;
 uniform mat4 projectionMatrixInv;
+uniform mat4 modelViewMatrixRelToEyeInv;
+
+uniform vec3 encodedCameraPositionMCHigh;
+uniform vec3 encodedCameraPositionMCLow;
+
 uniform mat4 m;
 uniform vec2 noiseScale;
 uniform float near;
@@ -86,6 +91,15 @@ float unpackDepth(const in vec4 rgba_depth)
     return depth;
 }  
 
+/*
+// unpack depth used for shadow on screen.***
+float unpackDepth_A(vec4 packedDepth)
+{
+	// See Aras Pranckevičius' post Encoding Floats to RGBA
+	// http://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/
+	return dot(packedDepth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));
+}
+*/
 
 float UnpackDepth32( in vec4 pack )
 {
@@ -95,29 +109,12 @@ float UnpackDepth32( in vec4 pack )
 
 vec3 getViewRay(vec2 tc)
 {
-	/*
-	// The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
-	float farForDepth = 30000.0;
-	float hfar = 2.0 * tangentOfHalfFovy * farForDepth;
-    float wfar = hfar * aspectRatio;    
-    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -farForDepth);  
-	*/	
-	
-	
 	float hfar = 2.0 * tangentOfHalfFovy * far;
     float wfar = hfar * aspectRatio;    
     vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    
-	
     return ray;                      
 }         
             
-//linear view space depth
-/*
-float getDepth(vec2 coord)
-{
-	return unpackDepth(texture2D(depthTex, coord.xy));
-}   
-*/
 float getDepth(vec2 coord)
 {
 	if(bUseLogarithmicDepth)
@@ -185,13 +182,6 @@ bool intersectionLineToLine(in vec2 line_1_pos, in vec2 line_1_dir,in vec2 line_
 	if (abs(line_1_dir.x) < zero)
 	{
 		// this is a vertical line.
-		/*
-		var slope = line.direction.y / line.direction.x;
-		var b = line.point.y - slope * line.point.x;
-		
-		intersectX = this.point.x;
-		intersectY = slope * this.point.x + b;*/
-
 		float slope = line_2_dir.y / line_2_dir.x;
 		float b = line_2_pos.y - slope * line_2_pos.x;
 		
@@ -203,21 +193,6 @@ bool intersectionLineToLine(in vec2 line_1_pos, in vec2 line_1_dir,in vec2 line_
 	{
 		// this is a horizontal line.
 		// must check if the "line" is vertical.
-		/*
-		if (Math.abs(line.direction.x) < zero)
-		{
-			// "line" is vertical.
-			intersectX = line.point.x;
-			intersectY = this.point.y;
-		}
-		else 
-		{
-			var slope = line.direction.y / line.direction.x;
-			var b = line.point.y - slope * line.point.x;
-			
-			intersectX = (this.point.y - b)/slope;
-			intersectY = this.point.y;
-		}*/
 		if (abs(line_2_dir.x) < zero)
 		{
 			// "line" is vertical.
@@ -238,26 +213,6 @@ bool intersectionLineToLine(in vec2 line_1_pos, in vec2 line_1_dir,in vec2 line_
 	else 
 	{
 		// this is oblique.
-		/*
-		if (Math.abs(line.direction.x) < zero)
-		{
-			// "line" is vertical.
-			var mySlope = this.direction.y / this.direction.x;
-			var myB = this.point.y - mySlope * this.point.x;
-			intersectX = line.point.x;
-			intersectY = intersectX * mySlope + myB;
-		}
-		else 
-		{
-			var mySlope = this.direction.y / this.direction.x;
-			var myB = this.point.y - mySlope * this.point.x;
-			
-			var slope = line.direction.y / line.direction.x;
-			var b = line.point.y - slope * line.point.x;
-			
-			intersectX = (myB - b)/ (slope - mySlope);
-			intersectY = slope * intersectX + b;
-		}*/
 		if (abs(line_2_dir.x) < zero)
 		{
 			// "line" is vertical.
@@ -401,27 +356,7 @@ bool isPointInsideLimitationConvexPolygon(in vec2 point2d)
 
 
 
-/*
-bool clipVertexBySegment2d(in vec3 segPoint_1, in vec3 segPoint_2, vec3 point)
-{
-	bool bClip = false;
-	// Note: use the points as 2d points using only x,y.***
-	// Calculate the direction.***
-	float difX = segPoint_2.x - segPoint_1.x;
-	float difY = segPoint_2.y - segPoint_1.y;
-	float modul = sqrt(difX*difX + difY*difY);
-	vec2 dir = vec2(difX/modul, difY/modul);
 
-	// Calculate 
-
-	// 1rst, check if the projectionPoint is inside of the segment.***
-
-	// 2nd, check the side of the point relative to segment.***
-
-
-	return bClip;
-}
-*/
 vec3 reconstructPosition(vec2 texCoord, float depth)
 {
     // https://wickedengine.net/2019/09/22/improved-normal-reconstruction-from-depth/
@@ -587,9 +522,9 @@ void main()
 	float linearDepth = getDepth(screenPos);   
 	vec3 ray = getViewRay(screenPos); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
 	scalarProd = dot(normal2, normalize(-ray));
-	scalarProd *= scalarProd;
-	scalarProd *= 0.7;
-	scalarProd += 0.3;
+	//scalarProd *= scalarProd;
+	scalarProd *= 0.6;
+	scalarProd += 0.4;
 
 
 	//if(scalarProd > 0.6) // delete this. ***
@@ -601,109 +536,83 @@ void main()
 	//float edgeOccl = 1.0;
 	if(bApplySsao)
 	{   
-		 
-		vec3 origin = ray * linearDepth;  
-		float tolerance = (radius*2.0)/far; // original.***
-
-		vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;
-		vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));
-		vec3 bitangent = cross(normal2, tangent);
-		mat3 tbn = mat3(tangent, bitangent, normal2);   
-		float minDepthBuffer;
-		float maxDepthBuffer;
-		for(int i = 0; i < kernelSize; ++i)
-		{    	 
-			vec3 sample = origin + (tbn * vec3(kernel[i].x*1.0, kernel[i].y*1.0, kernel[i].z)) * radius*2.0;
-			vec4 offset = projectionMatrix * vec4(sample, 1.0);					
-			offset.xy /= offset.w;
-			offset.xy = offset.xy * 0.5 + 0.5;  				
-			float sampleDepth = -sample.z/far;// original.***
-			////float sampleDepth = -sample.z/(far-near);// test.***
-			////float sampleDepth = -sample.z/farForDepth;
-
-			float depthBufferValue = getDepth(offset.xy);
-			//float diff = abs(sampleDepth - depthBufferValue);
-
-			//if(depthBufferValue < 0.00393)
-			//continue;
-
+		//if(linearDepth<0.996 && linearDepth>0.001005)
+		if(linearDepth<0.995 && linearDepth>0.0011)
+		//if(linearDepth<0.995 && linearDepth>0.0079)
+		{
+				//occlusion = 1.0;
 			
-			/*
-			if(depthBufferValue > 0.00391 && depthBufferValue < 0.00393)
-			{
-				if (depthBufferValue < sampleDepth-tolerance*1000.0)
-				{
-					occlusion +=  0.5;
-				}
+			//Test.********************************************************************************************
+			// NDC : the center of the screen is 0.0.0.***
+			
+			float depthRange_near = 0.0;
+			float depthRange_far = 1.0;
+			float x_ndc = 2.0 * screenPos.x - 1.0;
+			float y_ndc = 2.0 * screenPos.y - 1.0;
+			float z_ndc = (2.0 * linearDepth - depthRange_near - depthRange_far) / (depthRange_far - depthRange_near);
+			
+			vec4 viewPosH = projectionMatrixInv * vec4(x_ndc, y_ndc, z_ndc, 1.0);
+			vec3 posCC = viewPosH.xyz/viewPosH.w;
+			vec4 posWC = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0) + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 1.0);
+			vec3 origin = vec3(posCC.xyz);  
+			
+			// EndTest.----------------------------------------------------------------------------------------
+
+			//vec3 origin = ray * linearDepth;  // original.***
+			float distToCam = -origin.z*0.01;
+			if(distToCam < 1.0)
+			distToCam = 1.0;
+			float radiusAux = 1.0;
+			float tolerance = (radiusAux)/far; // original.***
+			tolerance = 0.0;
+
+			vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;
+			vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));
+			vec3 bitangent = cross(normal2, tangent);
+			mat3 tbn = mat3(tangent, bitangent, normal2);   
+			float minDepthBuffer;
+			float maxDepthBuffer;
+			for(int i = 0; i < kernelSize; ++i)
+			{    	 
+				vec3 sample = origin + (tbn * vec3(kernel[i].x*1.0, kernel[i].y*1.0, kernel[i].z)) * radiusAux;
+				vec4 offset = projectionMatrix * vec4(sample, 1.0);					
+				offset.xyz /= offset.w;
+				offset.xyz = offset.xyz * 0.5 + 0.5;  				
+				float sampleDepth = -sample.z/far;// original.***
+
+				//if(linearDepth < 0.1 || linearDepth > 0.9)
+				//continue;
+
+				// check if offset.xy is different of screenPos.***
+				//if(int(offset.x * screenWidth) == int(gl_FragCoord.x) && int(offset.y * screenHeight) == int(gl_FragCoord.y))
+				//if(abs(offset.x * screenWidth - gl_FragCoord.x) < 1.5 && abs(offset.y * screenHeight - gl_FragCoord.y) < 1.5)
+				//continue;
+
+				//if(offset.z < -0.1)// || offset.z > 0.99)
+				//continue;
+
+				float depthBufferValue = getDepth(offset.xy);
 				
-				continue;
-			}			
-			*/
-			if (depthBufferValue < sampleDepth-tolerance)
-			{
-				occlusion +=  1.0;
-			}
-		} 
-
-		// test detect edge.**********************************************************************************
-		/*
-		vec3 normal3 = vec3(-normal2.x, -normal2.y, normal2.z);
-		tangent = normalize(rvec - normal3 * dot(rvec, normal3));
-		bitangent = cross(normal3, tangent);
-		tbn = mat3(tangent, bitangent, normal3);  
-		float edgeRadius = 0.2;
-		edgeOccl = 0.0;
-		tolerance = edgeRadius/far;
-		for(int i = 0; i < kernelSize; ++i)
-		{    	 
-			vec3 sample = origin + (tbn * vec3(kernel[i].x*1.0, kernel[i].y*1.0, kernel[i].z)) * edgeRadius;
-			vec4 offset = projectionMatrix * vec4(sample, 1.0);					
-			offset.xy /= offset.w;
-			offset.xy = offset.xy * 0.5 + 0.5;  				
-			float sampleDepth = -sample.z/far;// original.***
-			////float sampleDepth = -sample.z/(far-near);// test.***
-			////float sampleDepth = -sample.z/farForDepth;
-
-			sampleDepth = 1.0 - sampleDepth;
-
-			float depthBufferValue = getDepth(offset.xy);
-			depthBufferValue = 1.0 - depthBufferValue;
-			
-			if(depthBufferValue > 0.00391 && depthBufferValue < 0.00393)
-			{
-				if (depthBufferValue < sampleDepth-tolerance*1000.0)
+				/*
+				if(depthBufferValue > 0.00391 && depthBufferValue < 0.00393)
 				{
-					edgeOccl +=  0.5;
+					if (depthBufferValue < sampleDepth-tolerance*1000.0)
+					{
+						occlusion +=  0.5;
+					}
+					
+					continue;
+				}			
+				*/
+				if (depthBufferValue < sampleDepth-tolerance)
+				{
+					occlusion +=  1.0/distToCam;
 				}
-				
-				continue;
-			}			
-			
-			if (depthBufferValue < sampleDepth-tolerance)
-			{
-				edgeOccl +=  1.0;
-			}
-		} 
-
-		if(edgeOccl > 0.5)
-		edgeOccl = float(kernelSize);
-
-		if(edgeOccl > float(kernelSize))
-		edgeOccl = float(kernelSize);
-
-		edgeOccl = 1.0 - edgeOccl;
-		*/
-		// end test.----------------------------------------------------------------------------------------
-
+			} 
+		}
 		//occlusion = 1.0 - occlusion / float(kernelSize);	
 		float smallOccl = occlusion / float(kernelSize);
-
-		//if(isEdge())
-		//smallOccl = 1.0;
-
-		//smallOccl *= 0.4;
-
-		
+		//smallOccl = 0.0;
 		
 		// test.***
 		//ssaoFromDepthTex
@@ -728,6 +637,8 @@ void main()
 
 		if(occlusion < 0.1)
 		occlusion = 0.1;
+
+		
 	}
 
 	vec4 textureColor;
@@ -845,6 +756,16 @@ void main()
     
 	
 	//textureColor = vec4(0.85, 0.85, 0.85, 1.0);
+	/*
+	if(linearDepth>0.95)
+	{
+		textureColor = vec4(1.0, 0.0, 0.0, 1.0); 
+	}
+	else if(linearDepth<0.0079)
+	{
+		textureColor = vec4(0.0, 1.0, 0.0, 1.0); 
+	}
+	*/
 	
 	//vec3 ambientColorAux = vec3(textureColor.x*ambientColor.x, textureColor.y*ambientColor.y, textureColor.z*ambientColor.z); // original.***
 	vec3 ambientColorAux = vec3(textureColor.xyz);
@@ -863,8 +784,10 @@ void main()
 	
 	
 	finalColor *= colorMultiplier;
-
 	//finalColor = vec4(linearDepth, linearDepth, linearDepth, 1.0); // test to render depth color coded.***
+
+	
+
     gl_FragColor = finalColor; 
 	#ifdef USE_LOGARITHMIC_DEPTH
 	if(bUseLogarithmicDepth)

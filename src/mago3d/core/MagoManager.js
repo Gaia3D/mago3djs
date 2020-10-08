@@ -907,6 +907,8 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
 		var camera = this.sceneState.camera;
 		var currentFrustumFar = frustumCommandsList[frustumIdx].far;
 		var currentFrustumNear = frustumCommandsList[frustumIdx].near;
+
+		// find near and far by projectionMatrix.***
 		
 		// take all frustums near-far distances.***
 		// In Cesium: If useLogDepth opaqueFrustumNearOffset = 0.9. Else opaqueFrustumNearOffset = 0.9999;
@@ -1385,6 +1387,136 @@ MagoManager.prototype.getSilhouetteDepthFbo = function()
  * Main rendering function.
  * @private
  */
+MagoManager.prototype.doRenderEdgeDetect = function(frustumVolumenObject) 
+{
+	var gl = this.getGl();
+	var cameraPosition = this.sceneState.camera.position;
+	var currentShader = undefined;
+	
+	// 1) The depth render.**********************************************************************************************************************
+	var renderType = 0; // 0= depth. 1= color.***
+	this.renderType = 0;
+	var renderTexture = false;
+	
+	// Take the depFrameBufferObject of the current frustumVolume.***
+	/*
+	if (this.depthFboNeo === undefined) { this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize : true}); }
+	*/
+	
+	
+	if (frustumVolumenObject.depthFbo === undefined) { frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
+	if (frustumVolumenObject.colorFbo === undefined) { frustumVolumenObject.colorFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
+	//if (this.depthFboNeo === undefined) { this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
+	//if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, new Float32Array([this.sceneState.drawingBufferWidth[0]/2.0]), new Float32Array([this.sceneState.drawingBufferHeight/2.0]), {matchCanvasSize : true}); }
+	if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
+	//if (this.colorFbo === undefined) { this.colorFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
+
+
+	this.depthFboNeo = frustumVolumenObject.depthFbo;
+	this.colorFbo = frustumVolumenObject.colorFbo;
+	//this.depthFboNeo.colorBuffer = this.scene._context._us.globeDepthTexture._texture;
+
+	this.depthFboNeo.bind(); 
+	
+	//if (this.isFarestFrustum())
+	{
+		gl.clearColor(0, 0, 0, 1);
+		gl.clearDepth(1);
+		//gl.clearDepth(0);
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		gl.clearStencil(0); // provisionally here.***
+	}
+	
+	
+	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
+	this.renderer.renderGeometry(gl, renderType, this.visibleObjControlerNodes);
+	// test mago geometries.************************************************************************************************************
+	//this.renderer.renderMagoGeometries(renderType); //TEST
+	this.depthFboNeo.unbind();
+	this.swapRenderingFase();
+
+	// 1.1) ssao and other effects from depthBuffer render.*****************************************************************************
+	this.renderer.renderSsaoFromDepth(gl);
+
+	// 2) color render.*****************************************************************************************************************
+	// 2.1) Render terrain shadows.*****************************************************************************************************
+	// Now render the geomatry.
+	/*
+	if (this.isCesiumGlobe())
+	{
+		var scene = this.scene;
+		scene._context._currentFramebuffer._bind();
+		if (this.currentFrustumIdx < 2) 
+		{
+			renderType = 3;
+			this.renderer.renderTerrainShadow(gl, renderType, this.visibleObjControlerNodes);
+		}
+	}
+	*/
+	
+	renderType = 1;
+	this.renderType = 1;
+	this.colorFbo.bind(); 
+	//if (this.isFarestFrustum())
+	{
+		gl.clearColor(0, 0, 0, 1);
+		gl.clearDepth(1);
+		//gl.clearDepth(0);
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		gl.clearStencil(0); // provisionally here.***
+	}
+	this.renderer.renderGeometry(gl, renderType, this.visibleObjControlerNodes);
+	this.colorFbo.unbind(); 
+	
+	if (this.currentFrustumIdx === 0) 
+	{
+		this.renderCluster();
+	}
+
+	if (this.weatherStation)
+	{
+		this.weatherStation.renderWindLayerDisplayPlanes(this);
+		//this.weatherStation.renderWindMultiLayers(this);
+		//this.weatherStation.test_renderWindLayer(this);
+		//this.weatherStation.test_renderTemperatureLayer(this);
+		//this.weatherStation.test_renderCuttingPlanes(this, renderType);
+
+	}
+
+	// Render fast antiAlias,************************************************************************************************************
+	if (this.isCesiumGlobe())
+	{
+		var scene = this.scene;
+		scene._context._currentFramebuffer._bind();
+		if (this.currentFrustumIdx < 2) 
+		{
+			renderType = 3;
+			this.renderer.renderTerrainShadow(gl, renderType, this.visibleObjControlerNodes);
+		}
+	}
+	this.renderer.renderFastAntiAlias(gl);
+	
+	
+	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
+		
+	this.swapRenderingFase();
+	
+	// 3) test mago geometries.***********************************************************************************************************
+	//this.renderer.renderMagoGeometries(renderType); //TEST
+
+	//if(!this.test__splittedMesh)
+	//{
+	//	this.TEST__splittedExtrudedBuilding();
+	//	this.test__splittedMesh = true;
+	//}
+	// 4) Render filter.******************************************************************************************************************
+	//this.renderFilter();
+};
+
+/**
+ * Main rendering function.
+ * @private
+ */
 MagoManager.prototype.doRender = function(frustumVolumenObject) 
 {
 	var gl = this.getGl();
@@ -1403,20 +1535,15 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	
 	
 	if (frustumVolumenObject.depthFbo === undefined) { frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
+	//if (this.depthFboNeo === undefined) { this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
 	//if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, new Float32Array([this.sceneState.drawingBufferWidth[0]/2.0]), new Float32Array([this.sceneState.drawingBufferHeight/2.0]), {matchCanvasSize : true}); }
 	if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
-	if (this.edgesFromDepthFbo === undefined) { this.edgesFromDepthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
+	//if (this.colorFbo === undefined) { this.colorFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
 
-	//if (this.depthFboNeo === undefined) { this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
-	// test silhouette depthFbo.***
-	//if (frustumVolumenObject.silhouetteDepthFboNeo === undefined) { frustumVolumenObject.silhouetteDepthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize : true}); }
-	
 
 	this.depthFboNeo = frustumVolumenObject.depthFbo;
-	//this.ssaoFromDepthFbo = frustumVolumenObject.ssaoFromDepthFbo;
+	//this.depthFboNeo.colorBuffer = this.scene._context._us.globeDepthTexture._texture;
 
-	//this.silhouetteDepthFboNeo = frustumVolumenObject.silhouetteDepthFboNeo;
-	//frustumVolumenObject.depthFbo = this.depthFboNeo;
 	this.depthFboNeo.bind(); 
 	
 	//if (this.isFarestFrustum())
@@ -1427,6 +1554,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		gl.clearStencil(0); // provisionally here.***
 	}
+	
 	
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
 	this.renderer.renderGeometry(gl, renderType, this.visibleObjControlerNodes);
@@ -1441,19 +1569,18 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	// 2) color render.*****************************************************************************************************************
 	// 2.1) Render terrain shadows.*****************************************************************************************************
 	// Now render the geomatry.
+	
 	if (this.isCesiumGlobe())
 	{
 		var scene = this.scene;
 		scene._context._currentFramebuffer._bind();
-
 		if (this.currentFrustumIdx < 2) 
 		{
 			renderType = 3;
 			this.renderer.renderTerrainShadow(gl, renderType, this.visibleObjControlerNodes);
 		}
-
 	}
-
+	
 	
 	renderType = 1;
 	this.renderType = 1;
@@ -1463,7 +1590,36 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	{
 		this.renderCluster();
 	}
+	/*
+	if (this.windTest === undefined)
+	{
+		if (this.weatherStation === undefined)
+		{ this.weatherStation = new WeatherStation(); }
+	
+		var geometryDataPath = this.readerWriter.geometryDataPath;
+		//var windDataFilesNamesArray = ["OBS-QWM_2016062000.grib2_wind_000", "OBS-QWM_2016062001.grib2_wind_000", "OBS-QWM_2016062002.grib2_wind_000", "OBS-QWM_2016062003.grib2_wind_000",
+		//	"OBS-QWM_2016062004.grib2_wind_000", "OBS-QWM_2016062005.grib2_wind_000", "OBS-QWM_2016062006.grib2_wind_000", "OBS-QWM_2016062007.grib2_wind_000",
+		//	"OBS-QWM_2016062008.grib2_wind_000", "OBS-QWM_2016062009.grib2_wind_000", "OBS-QWM_2016062010.grib2_wind_000", "OBS-QWM_2016062011.grib2_wind_000",
+		//	"OBS-QWM_2016062012.grib2_wind_000", "OBS-QWM_2016062013.grib2_wind_000", "OBS-QWM_2016062014.grib2_wind_000", "OBS-QWM_2016062015.grib2_wind_000",
+		//	"OBS-QWM_2016062016.grib2_wind_000", "OBS-QWM_2016062017.grib2_wind_000", "OBS-QWM_2016062018.grib2_wind_000", "OBS-QWM_2016062019.grib2_wind_000",
+		//	"OBS-QWM_2016062020.grib2_wind_000", "OBS-QWM_2016062021.grib2_wind_000", "OBS-QWM_2016062022.grib2_wind_000", "OBS-QWM_2016062023.grib2_wind_000"];
 
+		var windDataFilesNamesArray = ["OBS-QWM_2019090700.grib2_wind_000", "OBS-QWM_2019090701.grib2_wind_000", "OBS-QWM_2019090702.grib2_wind_000", "OBS-QWM_2019090703.grib2_wind_000",
+			"OBS-QWM_2019090704.grib2_wind_000", "OBS-QWM_2019090705.grib2_wind_000", "OBS-QWM_2019090706.grib2_wind_000", "OBS-QWM_2019090707.grib2_wind_000",
+			"OBS-QWM_2019090708.grib2_wind_000", "OBS-QWM_2019090709.grib2_wind_000", "OBS-QWM_2019090710.grib2_wind_000", "OBS-QWM_2019090711.grib2_wind_000",
+			"OBS-QWM_2019090712.grib2_wind_000", "OBS-QWM_2019090713.grib2_wind_000", "OBS-QWM_2019090714.grib2_wind_000", "OBS-QWM_2019090715.grib2_wind_000",
+			"OBS-QWM_2019090716.grib2_wind_000", "OBS-QWM_2019090717.grib2_wind_000", "OBS-QWM_2019090718.grib2_wind_000", "OBS-QWM_2019090719.grib2_wind_000",
+			"OBS-QWM_2019090720.grib2_wind_000", "OBS-QWM_2019090721.grib2_wind_000", "OBS-QWM_2019090722.grib2_wind_000", "OBS-QWM_2019090723.grib2_wind_000"];
+			
+		//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_Airport";
+		//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_GolfPark_NineBridge1";
+		var windMapFilesFolderPath = geometryDataPath +"/SeoulWind/200907";
+		
+		this.weatherStation.test_loadWindData3d(this, windDataFilesNamesArray, windMapFilesFolderPath);
+		//this.TEST__golfPark();
+		this.windTest = true;
+	}
+	*/
 	if (this.weatherStation)
 	{
 		this.weatherStation.renderWindLayerDisplayPlanes(this);
@@ -1473,6 +1629,9 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		//this.weatherStation.test_renderCuttingPlanes(this, renderType);
 
 	}
+
+	// Render fast antiAlias,************************************************************************************************************
+
 	
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
 		
@@ -1488,6 +1647,12 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	//}
 	// 4) Render filter.******************************************************************************************************************
 	//this.renderFilter();
+
+	// Test.***
+	//if(!this.test_shader)
+	//{
+	//	this.TEST__shader();
+	//}
 };
 
 /**
@@ -1677,12 +1842,7 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 	}
 
 
-	// Test.***
-	//if (!this.objectMarkerTest)
-	//{
-	//this.TEST__ObjectMarker_toNeoReference();
-	//this.objectMarkerTest = true;
-	//}
+	
 };
 
 /**
@@ -2077,6 +2237,132 @@ MagoManager.prototype.TEST__RenderGeoCoords = function()
 
 		geoCoordsList.geographicCoordsArray.length = 0;
 	}
+};
+
+/**
+ * @private
+ */
+MagoManager.prototype.TEST__shader = function() 
+{
+	// try to debug shader code here.***
+	var sceenWidth = this.sceneState.drawingBufferWidth[0];
+	var sceenHeight = this.sceneState.drawingBufferHeight[0];
+
+	var screenCoordX = 268/sceenWidth;
+	var screenCoordY = 631/sceenHeight;
+
+	screenCoordX = 0.0;
+	screenCoordY = 0.0;
+
+	screenCoordX = 0.5;
+	screenCoordY = 0.5;
+
+	var linearDepth = 0.0024; // 0.0 = near, 1.0 = far.***
+
+	var pixelX = sceenWidth/2;
+	var pixelY = Math.floor(sceenHeight/2);
+	var currFrustumIdx = this.currentFrustumIdx;
+
+	// try to read depth texture of the terrain of cesium.******************************************************************************
+	//magoManager.czm_globeDepthText
+	var gl = this.getGl();
+	
+
+	if(this.czm_globeDepthText)
+	{
+		if(!this.auxFbo)
+		{
+			this.auxFbo = new FBO(gl, sceenWidth, sceenHeight, {matchCanvasSize: true}); 
+			this.auxFbo.setColorBuffer(this.czm_globeDepthText);
+		}
+	}
+	else
+		return;
+
+
+	if(this.auxFbo.colorBuffer)
+	{
+		this.auxFbo.bind();
+		gl.viewport(0, 0, sceenWidth, sceenHeight);
+
+		var depthPixels = new Uint8Array(4 * 1 * 1); // 4 x 1x1 pixel.
+		gl.readPixels(pixelX, sceenHeight - pixelY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, depthPixels);
+
+		//return dot(packedDepth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));
+		
+		var floatDepthPixels = new Float32Array(([depthPixels[0]/256.0, depthPixels[1]/256.0, depthPixels[2]/256.0, depthPixels[3]/256.0]));
+		var zDepth = floatDepthPixels[0] + floatDepthPixels[1]/255 + floatDepthPixels[2]/65025.0 + floatDepthPixels[3]/16581375.0;
+		linearDepth = zDepth;// [0.0, 1.0] range depth.
+
+		// now, return to main framebuffer.***
+		this.auxFbo.unbind();
+	}
+	
+
+	//---------------------------------------------------------------------------------------------------------------------------------
+
+	
+
+	var depthRange_near = 0.0;
+	var depthRange_far = 1.0;
+	var x_ndc = 2.0 * screenCoordX - 1.0;
+	var y_ndc = 2.0 * screenCoordY - 1.0;
+	var z_ndc = (2.0 * linearDepth - depthRange_near - depthRange_far) / (depthRange_far - depthRange_near);
+	
+	// Calculate near & far from projectionMatrix.*********************
+	var projectionMat = this.sceneState.projectionMatrix;
+	var n = Matrix4.getNearFromPerspectiveMatrix(projectionMat);
+	var f = Matrix4.getFarFromPerspectiveMatrix(projectionMat);
+	// End calculing near & far from projectionMatrix.--------------------
+
+	var projectionMatrixInv = this.sceneState.getProjectionMatrixInv();
+	var viewPosHcartesian = projectionMatrixInv.transformPoint4D([x_ndc, y_ndc, z_ndc, 1.0], undefined)
+	///var viewPosH = projectionMatrixInv * vec4(x_ndc, y_ndc, z_ndc, 1.0);
+	var viewPosH = new Point3D(viewPosHcartesian[0], viewPosHcartesian[1], viewPosHcartesian[2]);
+	var posCC = new Point3D(viewPosHcartesian[0]/viewPosHcartesian[3], viewPosHcartesian[1]/viewPosHcartesian[3], viewPosHcartesian[2]/viewPosHcartesian[3]);
+	///var posCC = viewPosH.xyz/viewPosH.w;
+	//var posWC = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0) + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 1.0);
+	
+	
+	// Another way.***
+	var camera = this.sceneState.camera;
+	var currFrustum = camera.frustumsArray[currFrustumIdx];
+	var tangentOfHalfFovy = camera.frustum.tangentOfHalfFovy[0];
+	var far = currFrustum.far[0];
+	var aspectRatio = camera.frustum.aspectRatio[0];
+	var hfar = 2.0 * tangentOfHalfFovy * far;
+    var wfar = hfar * aspectRatio;    
+	var ray = new Point3D(wfar * (screenCoordX - 0.5), hfar * (screenCoordY - 0.5), -far);  
+	var origin = new Point3D(ray.x, ray.y, ray.z);
+	origin.scale(linearDepth);
+	var zAux = linearDepth*(f-n);
+
+	var ratioX = posCC.x/origin.x;
+	var ratioY = posCC.y/origin.y;
+	var ratioZ = posCC.z/origin.z;
+	var ratioZInv = 1.0/ratioZ;
+
+	
+
+
+
+	if (this.isCesiumGlobe())
+	{
+		// https://cesium.com/docs/cesiumjs-ref-doc/Globe.html
+		
+
+		var cesiumScene = this.scene; 
+		var cesiumGlobe = cesiumScene.globe;
+		var cesiumCamera = cesiumScene.camera;
+		var fovy = cesiumCamera.frustum._fovy;
+		var tangentOfHalfFovy_cesium = Math.tan(fovy/2.0);
+		var windowCoordinates = new Cesium.Cartesian2(pixelX, pixelY);
+		var ray2 = cesiumCamera.getPickRay(windowCoordinates);
+		var intersection = cesiumGlobe.pick(ray2, cesiumScene);
+		return intersection;
+	}
+
+	var hola = 0;
 };
 
 /**
@@ -3239,9 +3525,17 @@ MagoManager.prototype.keyDown = function(key)
 				"OBS-QWM_2016062012.grib2_wind_000", "OBS-QWM_2016062013.grib2_wind_000", "OBS-QWM_2016062014.grib2_wind_000", "OBS-QWM_2016062015.grib2_wind_000",
 				"OBS-QWM_2016062016.grib2_wind_000", "OBS-QWM_2016062017.grib2_wind_000", "OBS-QWM_2016062018.grib2_wind_000", "OBS-QWM_2016062019.grib2_wind_000",
 				"OBS-QWM_2016062020.grib2_wind_000", "OBS-QWM_2016062021.grib2_wind_000", "OBS-QWM_2016062022.grib2_wind_000", "OBS-QWM_2016062023.grib2_wind_000"];
+
+			var windDataFilesNamesArray = ["OBS-QWM_2019090700.grib2_wind_000", "OBS-QWM_2019090701.grib2_wind_000", "OBS-QWM_2019090702.grib2_wind_000", "OBS-QWM_2019090703.grib2_wind_000",
+				"OBS-QWM_2019090704.grib2_wind_000", "OBS-QWM_2019090705.grib2_wind_000", "OBS-QWM_2019090706.grib2_wind_000", "OBS-QWM_2019090707.grib2_wind_000",
+				"OBS-QWM_2019090708.grib2_wind_000", "OBS-QWM_2019090709.grib2_wind_000", "OBS-QWM_2019090710.grib2_wind_000", "OBS-QWM_2019090711.grib2_wind_000",
+				"OBS-QWM_2019090712.grib2_wind_000", "OBS-QWM_2019090713.grib2_wind_000", "OBS-QWM_2019090714.grib2_wind_000", "OBS-QWM_2019090715.grib2_wind_000",
+				"OBS-QWM_2019090716.grib2_wind_000", "OBS-QWM_2019090717.grib2_wind_000", "OBS-QWM_2019090718.grib2_wind_000", "OBS-QWM_2019090719.grib2_wind_000",
+				"OBS-QWM_2019090720.grib2_wind_000", "OBS-QWM_2019090721.grib2_wind_000", "OBS-QWM_2019090722.grib2_wind_000", "OBS-QWM_2019090723.grib2_wind_000"];
 				
 			//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_Airport";
-			var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_GolfPark_NineBridge1";
+			//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_GolfPark_NineBridge1";
+			var windMapFilesFolderPath = geometryDataPath +"/SeoulWind/200907";
 			
 			this.weatherStation.test_loadWindData3d(this, windDataFilesNamesArray, windMapFilesFolderPath);
 			this.TEST__golfPark();
@@ -4461,7 +4755,8 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 		data.myCameraRelative.calculateFrustumsPlanes();
 		
 		// 1rst, check if there are octrees very close.
-		var frustum0 = data.myCameraRelative.bigFrustum;
+		//var frustum0 = data.myCameraRelative.bigFrustum;
+		var frustum0 = data.myCameraRelative.frustum;
 		find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(	frustum0, data.currentVisibleOctreesControler, globalVisibleObjControlerOctrees, this.boundingSphere_Aux,
 			data.myCameraRelative.position, distLod0, distLod1, distLod2*100);
 	}

@@ -1065,7 +1065,7 @@ Renderer.prototype.renderExcavationObjects = function(gl, shader, renderType, vi
 };
 
 /**
- * This function renders the stencil shadows meshes of the scene.
+ * This function renders the silhouette of an object by the depthTexture of the object.***
  * @param {WebGLRenderingContext} gl WebGL Rendering Context.
  * @param {Number} renderType If renderType = 0 (depth render), renderType = 1 (color render), renderType = 2 (colorCoding render).
  * @param {VisibleObjectsController} visibleObjControlerNodes This object contains visible objects for the camera frustum.
@@ -1091,8 +1091,10 @@ Renderer.prototype.renderSilhouette = function()
 	
 	var bApplyShadow = false;
 	var bSilhouette = true;
+	var bFxaa = false;
 	gl.uniform1i(currentShader.bApplyShadow_loc, bApplyShadow);
 	gl.uniform1i(currentShader.bSilhouette_loc, bSilhouette);
+	gl.uniform1i(currentShader.bFxaa_loc, bFxaa);
 	
 	var sunSystem = sceneState.sunSystem;
 	var sunLight = sunSystem.getLight(0);
@@ -1281,6 +1283,75 @@ Renderer.prototype.renderSsaoFromDepth = function(gl)
 };
 
 /**
+ * This function renders a fast antiAlias.***
+ * @param {WebGLRenderingContext} gl WebGL Rendering Context.
+ */
+Renderer.prototype.renderFastAntiAlias = function(gl) 
+{
+	// Render screenQuad with effects.
+	var magoManager = this.magoManager;
+	var gl = magoManager.getGl();
+	
+	// Now render screenQuad with the silhouette effect.***
+	var magoManager = this.magoManager;
+	var sceneState = magoManager.sceneState;
+	
+	var currentShader = magoManager.postFxShadersManager.getShader("screenQuad"); 
+	currentShader.useProgram();
+	
+	currentShader.bindUniformGenerals();
+	var projectionMatrixInv = sceneState.getProjectionMatrixInv();
+	gl.uniformMatrix4fv(currentShader.projectionMatrixInv_loc, false, projectionMatrixInv._floatArrays);
+	var modelViewMatrixRelToEyeInv = sceneState.getModelViewRelToEyeMatrixInv();
+	gl.uniformMatrix4fv(currentShader.modelViewMatrixRelToEyeInv_loc, false, modelViewMatrixRelToEyeInv._floatArrays);
+	
+	var bApplyShadow = false;
+	var bSilhouette = false;
+	var bFxaa = true;
+	gl.uniform1i(currentShader.bApplyShadow_loc, bApplyShadow);
+	gl.uniform1i(currentShader.bSilhouette_loc, bSilhouette);
+	gl.uniform1i(currentShader.bFxaa_loc, bFxaa);
+	
+	var sunSystem = sceneState.sunSystem;
+	var sunLight = sunSystem.getLight(0);
+	var textureAux1x1 = magoManager.texturesStore.getTextureAux1x1();
+	var silhouetteDepthFbo = magoManager.getSilhouetteDepthFbo();
+	
+	gl.activeTexture(gl.TEXTURE0);
+	gl.bindTexture(gl.TEXTURE_2D, magoManager.colorFbo.colorBuffer);  // silhouette depth texture.***
+	gl.activeTexture(gl.TEXTURE3); 
+	gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
+	gl.activeTexture(gl.TEXTURE4); 
+	gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
+
+	currentShader.last_tex_id = textureAux1x1;
+			
+	gl.disable(gl.POLYGON_OFFSET_FILL);
+	//gl.disable(gl.CULL_FACE);
+	gl.colorMask(true, true, true, true);
+	gl.depthMask(false);
+	gl.depthRange(0.0, 0.01);
+
+	gl.disable(gl.DEPTH_TEST);
+	gl.enable(gl.BLEND);
+	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); // Original.***
+	//gl.cullFace(gl.FRONT);
+
+	if (this.screenQuad === undefined)
+	{
+		this.screenQuad = new ScreenQuad(magoManager.vboMemoryManager);
+	}
+	
+	this.screenQuad.render(magoManager, currentShader);
+
+	// Restore settings.***
+	gl.colorMask(true, true, true, true);
+	gl.depthMask(true);
+	gl.disable(gl.BLEND);
+	gl.depthRange(0.0, 1.0);
+};
+
+/**
  * This function renders the shadows of the scene on terrain.
  * @param {WebGLRenderingContext} gl WebGL Rendering Context.
  */
@@ -1312,8 +1383,10 @@ Renderer.prototype.renderTerrainShadow = function(gl)
 	gl.uniformMatrix4fv(currentShader.modelViewMatrixRelToEyeInv_loc, false, modelViewMatrixRelToEyeInv._floatArrays);
 	
 	var bSilhouette = false;
+	var bFxaa = false;
 	gl.uniform1i(currentShader.bApplyShadow_loc, bApplyShadow);
 	gl.uniform1i(currentShader.bSilhouette_loc, bSilhouette);
+	gl.uniform1i(currentShader.bFxaa_loc, bFxaa);
 	var sunSystem = sceneState.sunSystem;
 	var sunLight = sunSystem.getLight(0);
 	var textureAux1x1 = magoManager.texturesStore.getTextureAux1x1();
@@ -1863,6 +1936,7 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 	
 		if (sceneState.sunSystem !== undefined && sceneState.applySunShadows)
 		{ bApplyShadow = true; }
+
 	
 		
 		// check changesHistory.
@@ -1893,6 +1967,8 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 
 			var projectionMatrixInv = sceneState.getProjectionMatrixInv();
 			gl.uniformMatrix4fv(currentShader.projectionMatrixInv_loc, false, projectionMatrixInv._floatArrays);
+			var modelViewMatrixRelToEyeInv = sceneState.getModelViewRelToEyeMatrixInv();
+			gl.uniformMatrix4fv(currentShader.modelViewMatrixRelToEyeInv_loc, false, modelViewMatrixRelToEyeInv._floatArrays);
 
 			var sunSystem = magoManager.sceneState.sunSystem;
 			var sunLight = sunSystem.getLight(0);

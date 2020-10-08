@@ -36,6 +36,14 @@ float unpackDepth(const in vec4 rgba_depth)
     return depth;
 }  
 
+/*
+float unpackDepth_A(vec4 packedDepth)
+{
+	// See Aras Pranckevičius' post Encoding Floats to RGBA
+	// http://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/
+	return dot(packedDepth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));
+}
+*/
 
 float UnpackDepth32( in vec4 pack )
 {
@@ -131,7 +139,11 @@ float getOcclusion(vec3 origin, vec3 rotatedKernel, float radius)
     vec4 offset = projectionMatrix * vec4(sample, 1.0);	
     vec3 offsetCoord = vec3(offset.xyz);				
     offsetCoord.xyz /= offset.w;
-    offsetCoord.xyz = offsetCoord.xyz * 0.5 + 0.5;  				
+    offsetCoord.xyz = offsetCoord.xyz * 0.5 + 0.5;  	
+
+    //if(abs(offsetCoord.x * screenWidth - gl_FragCoord.x) < 1.5 && abs(offsetCoord.y * screenHeight - gl_FragCoord.y) < 1.5)
+	//	return 0.0;
+
     float sampleDepth = -sample.z/far;// original.***
 
     float depthBufferValue = getDepth(offsetCoord.xy);
@@ -158,6 +170,12 @@ void main()
     vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
     vec3 ray = getViewRay(screenPos); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
     float linearDepth = getDepth(screenPos);  
+    bool isAlmostOutOfFrustum = false;
+    //if(linearDepth>0.996 || linearDepth<0.001005)
+    //if(linearDepth>0.996 || linearDepth<0.001005)
+    //{
+    //    isAlmostOutOfFrustum = true;
+    //}
 
     // test.***
     //float linearDepthTest = unpackDepth(texture2D(depthTex, screenPos));
@@ -179,7 +197,7 @@ void main()
     //if(factorByDist < 0.05)
     //    discard;
 
-    if(bApplySsao)
+    if(bApplySsao)// && !isAlmostOutOfFrustum)
 	{        
 		vec3 origin = ray * linearDepth;  
         vec3 normal2 = normal_from_depth(linearDepth, screenPos); // normal from depthTex.***

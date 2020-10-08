@@ -308,14 +308,14 @@ NeoReference.prototype.solveReferencePngTextureForDepthRender = function(magoMan
 {
 	var gl = magoManager.getGl();
 
-	if(!this.texture)
+	if(!this.texture)// || this.texture.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
 	{
 		// set into shader : bHasTexture = false.***
 		gl.uniform1i(shader.bHasTexture_loc , false);
 		return false;
 	}
 	
-	if(this.texture.textureImageFileExtension === "PNG")
+	if(this.texture.textureImageFileExtension === "PNG")// && this.texture.texId)
 	{
 		gl.uniform1i(shader.bHasTexture_loc , true);
 		if (shader.last_tex_id !== this.texture.texId) 
@@ -551,7 +551,9 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 	if (!neoReference.isReadyToRender())
 	{ return false; }
 
+
 	//if(neoReference.vBOVertexIdxCacheKeysContainer === undefined) return false;
+
 
 	// Check if the texture is loaded.
 	//if (neoReference.texture !== undefined || neoReference.materialId != -1)
@@ -681,7 +683,7 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 
 		if (renderType === 0)
 		{
-			if(bDepthRenderWithTexture)
+			if(bDepthRenderWithTexture && neoReference.vBOVertexIdxCacheKeysContainer)
 			{
 				shader.enableVertexAttribArray(shader.texCoord2_loc); 
 
@@ -701,7 +703,7 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 			{ return false; }
 
 			// TexCoords.
-			if (renderTexture && neoReference.hasTexture) 
+			if (renderTexture && neoReference.hasTexture && neoReference.vBOVertexIdxCacheKeysContainer) 
 			{
 				if (block.vertexCount <= neoReference.vertexCount) 
 				{

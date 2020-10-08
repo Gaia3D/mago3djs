@@ -5,35 +5,47 @@
 uniform sampler2D depthTex;
 uniform sampler2D shadowMapTex;
 uniform sampler2D shadowMapTex2;
-uniform mat4 modelViewMatrix;
-uniform mat4 modelViewMatrixRelToEye; 
-uniform mat4 modelViewMatrixInv;
-uniform mat4 modelViewProjectionMatrixInv;
 uniform mat4 modelViewMatrixRelToEyeInv;
-uniform mat4 projectionMatrix;
 uniform mat4 projectionMatrixInv;
 uniform vec3 encodedCameraPositionMCHigh;
 uniform vec3 encodedCameraPositionMCLow;
+
+uniform float near;
+uniform float far; 
+uniform float tangentOfHalfFovy;
+uniform float aspectRatio;    
+
 uniform bool bApplyShadow;
 uniform bool bSilhouette;
+uniform bool bFxaa;
+
 uniform mat4 sunMatrix[2]; 
 uniform vec3 sunPosHIGH[2];
 uniform vec3 sunPosLOW[2];
 uniform int sunIdx;
 uniform float screenWidth;    
 uniform float screenHeight;   
-uniform float near;
-uniform float far;
-uniform float fov;
-uniform float tangentOfHalfFovy;
-uniform float aspectRatio;
-varying vec4 vColor; 
+
 
 float unpackDepth(vec4 packedDepth)
 {
 	// See Aras Pranckevičius' post Encoding Floats to RGBA
 	// http://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/
+	//vec4 packDepth( float v ) // function to packDepth.***
+	//{
+	//	vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;
+	//	enc = fract(enc);
+	//	enc -= enc.yzww * vec4(1.0/255.0,1.0/255.0,1.0/255.0,0.0);
+	//	return enc;
+	//}
 	return dot(packedDepth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));
+}
+
+vec4 packDepth( float v ) {
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;
+  enc = fract(enc);
+  enc -= enc.yzww * vec4(1.0/255.0,1.0/255.0,1.0/255.0,0.0);
+  return enc;
 }
 
 float unpackDepthMago(const in vec4 rgba_depth)
@@ -63,6 +75,24 @@ float getDepthShadowMap(vec2 coord)
 	else
 		return -1.0;
 }
+
+vec3 getViewRay(vec2 tc)
+{
+	/*
+	// The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
+	float farForDepth = 30000.0;
+	float hfar = 2.0 * tangentOfHalfFovy * farForDepth;
+    float wfar = hfar * aspectRatio;    
+    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -farForDepth);  
+	*/	
+	
+	
+	float hfar = 2.0 * tangentOfHalfFovy * far;
+    float wfar = hfar * aspectRatio;    
+    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    
+	
+    return ray;                      
+} 
 
 bool isInShadow(vec4 pointWC, int currSunIdx)
 {
@@ -111,6 +141,22 @@ bool isInShadow(vec4 pointWC, int currSunIdx)
 	}
 	
 	return inShadow;
+}
+
+void make_kernel(inout vec4 n[9], vec2 coord)
+{
+	float w = 1.0 / screenWidth;
+	float h = 1.0 / screenHeight;
+
+	n[0] = texture2D(depthTex, coord + vec2( -w, -h));
+	n[1] = texture2D(depthTex, coord + vec2(0.0, -h));
+	n[2] = texture2D(depthTex, coord + vec2(  w, -h));
+	n[3] = texture2D(depthTex, coord + vec2( -w, 0.0));
+	n[4] = texture2D(depthTex, coord);
+	n[5] = texture2D(depthTex, coord + vec2(  w, 0.0));
+	n[6] = texture2D(depthTex, coord + vec2( -w, h));
+	n[7] = texture2D(depthTex, coord + vec2(0.0, h));
+	n[8] = texture2D(depthTex, coord + vec2(  w, h));
 }
 
 void main()
@@ -173,6 +219,9 @@ void main()
 		float z_window  = unpackDepth(texture2D(depthTex, screenPos.xy)); // z_window  is [0.0, 1.0] range depth.
 		if(z_window < 0.001)
 		discard;
+
+		//vec3 ray = getViewRay(screenPos);
+		//vec4 posWC = vec4(ray * z_window, 1.0);
 		
 		// https://stackoverflow.com/questions/11277501/how-to-recover-view-space-position-given-view-space-depth-value-and-ndc-xy
 		float depthRange_near = 0.0;
@@ -180,12 +229,13 @@ void main()
 		float x_ndc = 2.0 * screenPos.x - 1.0;
 		float y_ndc = 2.0 * screenPos.y - 1.0;
 		float z_ndc = (2.0 * z_window - depthRange_near - depthRange_far) / (depthRange_far - depthRange_near);
+		// Note: NDC range = (-1,-1,-1) to (1,1,1).***
 		
 		vec4 viewPosH = projectionMatrixInv * vec4(x_ndc, y_ndc, z_ndc, 1.0);
 		vec3 posCC = viewPosH.xyz/viewPosH.w;
 		vec4 posWC = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0) + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 1.0);
-		//----------------------------------------------------------------
-	
+		//------------------------------------------------------------------------------------------------------------------------------
+		
 		// 2nd, calculate the vertex relative to light.***
 		// 1rst, try with the closest sun. sunIdx = 0.
 		bool pointIsinShadow = isInShadow(posWC, 0);
@@ -199,7 +249,30 @@ void main()
 			shadow_occlusion = 0.5;
 			alpha = 0.5;
 		}
+
+		gl_FragColor = vec4(finalColor.rgb*shadow_occlusion, alpha);
 		
 	}
-    gl_FragColor = vec4(finalColor.rgb*shadow_occlusion, alpha);
+
+	// check if is fastAntiAlias.***
+	if(bFxaa)
+	{
+		vec4 color = texture2D(depthTex, vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight));
+
+		if(color.r < 0.0001 && color.g < 0.0001 && color.b < 0.0001)
+		discard;
+		/*/
+		vec4 n[9];
+		make_kernel( n, vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight) );
+
+		vec4 sobel_edge_h = n[2] + (2.0*n[5]) + n[8] - (n[0] + (2.0*n[3]) + n[6]);
+		vec4 sobel_edge_v = n[0] + (2.0*n[1]) + n[2] - (n[6] + (2.0*n[7]) + n[8]);
+		vec4 sobel = sqrt((sobel_edge_h * sobel_edge_h) + (sobel_edge_v * sobel_edge_v));
+
+		gl_FragColor = vec4( 1.0 - sobel.rgb, 1.0 );
+		//gl_FragColor = vec4(sobel.rgb, 1.0 );
+		*/
+		gl_FragColor = color;
+	}
+    
 }

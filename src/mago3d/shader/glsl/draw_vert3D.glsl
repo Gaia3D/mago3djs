@@ -3,7 +3,8 @@ precision highp float;
 // This shader draws windParticles in 3d directly from positions on u_particles image.***
 attribute float a_index;
 
-uniform sampler2D u_particles;
+uniform sampler2D u_particles; // channel-1.***
+uniform sampler2D u_particles_next; // channel-2.***
 uniform float u_particles_res;
 uniform mat4 buildingRotMatrix;
 uniform mat4 ModelViewProjectionMatrix;
@@ -80,44 +81,50 @@ vec3 geographicToWorldCoord(float lonRad, float latRad, float alt)
 	return resultCartesian;
 }
 
-void main() {
-	
-    vec4 color = texture2D(u_particles, vec2(
-        fract(a_index / u_particles_res),
-        floor(a_index / u_particles_res) / u_particles_res));
-
-    // decode current particle position from the pixel's RGBA value
-    v_particle_pos = vec2(
-        color.r / 255.0 + color.b,
-        color.g / 255.0 + color.a);
-
-	// Now, must calculate geographic coords of the pos2d.***
-	float altitude = u_layerAltitude;
+vec2 getOffset(vec2 particlePos, float radius)
+{
 	float minLonRad = u_geoCoordRadiansMin.x;
 	float maxLonRad = u_geoCoordRadiansMax.x;
 	float minLatRad = u_geoCoordRadiansMin.y;
 	float maxLatRad = u_geoCoordRadiansMax.y;
 	float lonRadRange = maxLonRad - minLonRad;
 	float latRadRange = maxLatRad - minLatRad;
-	float longitudeRad = -minLonRad + v_particle_pos.x * lonRadRange;
-	float latitudeRad = maxLatRad - v_particle_pos.y * latRadRange;
-	
-	// Now, calculate worldPosition of the geographicCoords (lon, lat, alt).***
-	//vec3 posWC = geographicToWorldCoord(longitudeRad, latitudeRad, altitude);
-	//vec4 posCC = vec4((posWC - encodedCameraPositionMCHigh) - encodedCameraPositionMCLow, 1.0);
-	
-	// Alternative.
-	
+
+	float distortion = cos((minLatRad + v_particle_pos.y * latRadRange ));
+	float xOffset = (particlePos.x - 0.5)*distortion * lonRadRange * radius;
+	float yOffset = (0.5 - particlePos.y) * latRadRange * radius;
+
+	return vec2(xOffset, yOffset);
+}
+
+void main() {
+	vec2 texCoord = vec2(fract(a_index / u_particles_res), floor(a_index / u_particles_res) / u_particles_res);
+
+	vec4 color_curr = texture2D(u_particles, texCoord);
+    vec2 particle_pos_curr = vec2(color_curr.r / 255.0 + color_curr.b, color_curr.g / 255.0 + color_curr.a);
+
+	vec4 color_next = texture2D(u_particles_next, texCoord);
+    vec2 particle_pos_next = vec2(color_next.r / 255.0 + color_next.b, color_next.g / 255.0 + color_next.a);
+
+
+    //vec4 color = texture2D(u_particles, texCoord);
+    // decode current particle position from the pixel's RGBA value
+    //v_particle_pos = vec2(color.r / 255.0 + color.b,color.g / 255.0 + color.a); // original.***
+
+
+	v_particle_pos = mix(particle_pos_curr, particle_pos_next, 0.0);
+
+	// calculate the offset at the earth radius.***
 	vec3 buildingPos = buildingPosHIGH + buildingPosLOW;
 	float radius = length(buildingPos);
-	float distortion = cos((minLatRad + v_particle_pos.y * latRadRange ));
-	float xOffset = (v_particle_pos.x - 0.5)*distortion * lonRadRange * radius;
-	float yOffset = (0.5 - v_particle_pos.y) * latRadRange * radius;
+	vec2 offset = getOffset(v_particle_pos, radius);
+
+	float xOffset = offset.x;
+	float yOffset = offset.y;
 	vec4 rotatedPos = buildingRotMatrix * vec4(xOffset, yOffset, 0.0, 1.0);
 	
-	
-	vec4 posWC = vec4((rotatedPos.xyz+buildingPosLOW) +( buildingPosHIGH ), 1.0);
-	vec4 posCC = vec4((rotatedPos.xyz+buildingPosLOW- encodedCameraPositionMCLow) +( buildingPosHIGH- encodedCameraPositionMCHigh), 1.0);
+	//vec4 posWC = vec4((rotatedPos.xyz + buildingPosLOW) + ( buildingPosHIGH ), 1.0);
+	vec4 posCC = vec4((rotatedPos.xyz + buildingPosLOW - encodedCameraPositionMCLow) + ( buildingPosHIGH - encodedCameraPositionMCHigh), 1.0);
 	
 	// Now calculate the position on camCoord.***
 	//gl_Position = ModelViewProjectionMatrix * posWC;
@@ -136,8 +143,10 @@ void main() {
 	}
 	
 	// Now calculate the point size.
-	float dist = distance(vec4(u_camPosWC.xyz, 1.0), vec4(posWC.xyz, 1.0));
+	//float dist = distance(vec4(u_camPosWC.xyz, 1.0), vec4(posWC.xyz, 1.0));
+	float dist = length(posCC.xyz);
 	gl_PointSize = (1.0 + pendentPointSize/(dist))*u_tailAlpha; 
+	//gl_PointSize = 3.0*u_tailAlpha; 
 	
 	if(gl_PointSize > 10.0)
 	gl_PointSize = 10.0;

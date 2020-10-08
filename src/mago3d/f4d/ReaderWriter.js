@@ -1258,6 +1258,7 @@ ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer,
 				// Test with tga decoder from https://github.com/schmittl/tgajs
 				var tga = new TGA();
 				tga.load(arrayBuffer);
+				texture.texId = gl.createTexture();
 				// End decoding.---------------------------------------------------
 				
 				//var tga = magoManager.readerWriter.decodeTGA(arrayBuffer); // old code.
@@ -1375,7 +1376,7 @@ ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer,
 			// is possible that during loading image the building was deleted. Then return.
 			if (texture.texId === undefined)
 			{
-				return;
+				texture.texId = gl.createTexture();
 			}
 			
 			// if "texture.texId" exist then bind it.

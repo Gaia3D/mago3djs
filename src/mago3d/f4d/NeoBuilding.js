@@ -1004,7 +1004,7 @@ NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoMan
 				if (neoReference.texture.fileLoadState === CODE.fileLoadState.READY) 
 				{
 					var gl = magoManager.sceneState.gl;
-					neoReference.texture.texId = gl.createTexture();
+					//neoReference.texture.texId = gl.createTexture();
 					// Load the texture.
 					var projectFolderName = this.projectFolderName;
 					var geometryDataPath = magoManager.readerWriter.geometryDataPath;
@@ -1043,7 +1043,7 @@ NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoMan
 				if (texture.fileLoadState === CODE.fileLoadState.READY) 
 				{
 					var gl = magoManager.sceneState.gl;
-					texture.texId = gl.createTexture();
+					//texture.texId = gl.createTexture();
 					// Load the texture.
 					var projectFolderName = this.projectFolderName;
 					var geometryDataPath = magoManager.readerWriter.getCurrentDataPath();
@@ -1085,7 +1085,7 @@ NeoBuilding.prototype.manageNeoReferenceTexture = function(neoReference, magoMan
 				if (texture.fileLoadState === CODE.fileLoadState.READY) 
 				{
 					var gl = magoManager.sceneState.gl;
-					texture.texId = gl.createTexture();
+					//texture.texId = gl.createTexture();
 					// Load the texture.
 					var projectFolderName = this.projectFolderName;
 					var geometryDataPath = magoManager.readerWriter.getCurrentDataPath();
