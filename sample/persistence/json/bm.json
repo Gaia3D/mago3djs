@@ -1,0 +1,26 @@
+{
+"dataGroupId":2,
+    "dataGroupKey":"bm",
+    "dataGroupName":"가이드 데이터 그룹",
+    "dataGroupPath":"bm",
+    "datas": [
+        
+        {
+            "attributes": {
+                "isPhysical": true,
+                "flipYTexCoords": true
+            },
+            "dataId" : 1,
+            "dataGroupId" : 2,
+            "dataKey": "12_2_1",
+            "dataName": "12_2_1",
+            "mappingType":"boundingboxcenter",
+            "longitude": 126.8008909146765,
+            "latitude": 37.43676289591651,
+            "altitude": 40,
+            "heading": 0.000000,
+            "pitch": 0.000000,
+            "roll": 0.000000
+        }
+    ]
+}

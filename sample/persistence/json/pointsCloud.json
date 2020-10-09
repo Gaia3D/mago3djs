@@ -162,7 +162,8 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "PointsCloud",
-				"flipYTexCoords": true
+                "flipYTexCoords": true,
+                "heightReference" : "relativeToGround"
 			},
 			"children": [],
 			"data_group_id": 78,
@@ -171,7 +172,7 @@
 			"data_key": "Hwangyounggak_group1_densified_point_cloud",
 			"data_name": "Hwangyounggak_group1_densified_point_cloud",
 			"heading": 0,
-			"height": 175.840500,
+			"height": -45,
 			"latitude": 35.836116,
 			"longitude": 129.290585,
 			"pitch": 0,
@@ -181,7 +182,8 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "PointsCloud",
-				"flipYTexCoords": true
+				"flipYTexCoords": true,
+                "heightReference" : "clampToGround"
 			},
 			"children": [],
 			"data_group_id": 78,

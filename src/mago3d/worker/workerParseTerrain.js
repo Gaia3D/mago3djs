@@ -85,36 +85,36 @@ worker.onmessage = function(e)
    
 	if (vertexCount > 65536 )
 	{
-		westVertexCount = new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4)); bytes_readed += 4;
+		westVertexCount = (new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4)))[0]; bytes_readed += 4;
 		westIndices = new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4 * westVertexCount)); bytes_readed += 4 * westVertexCount;
 		
-		southVertexCount = new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4)); bytes_readed += 4;
+		southVertexCount = (new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4)))[0]; bytes_readed += 4;
 		southIndices = new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4 * southVertexCount)); bytes_readed += 4 * southVertexCount;
 		
-		eastVertexCount = new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4)); bytes_readed += 4;
+		eastVertexCount = (new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4)))[0]; bytes_readed += 4;
 		eastIndices = new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4 * eastVertexCount)); bytes_readed += 4 * eastVertexCount;
 		
-		northVertexCount = new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4)); bytes_readed += 4;
+		northVertexCount = (new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4)))[0]; bytes_readed += 4;
 		northIndices = new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4 * northVertexCount)); bytes_readed += 4 * northVertexCount;
 	}
 	else
 	{
-		westVertexCount = new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4)); bytes_readed += 4;
+		westVertexCount = (new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4)))[0]; bytes_readed += 4;
 		westIndices = new Uint16Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 2 * westVertexCount)); bytes_readed += 2 * westVertexCount;
 		
-		southVertexCount = new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4)); bytes_readed += 4;
+		southVertexCount = (new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4)))[0]; bytes_readed += 4;
 		southIndices = new Uint16Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 2 * southVertexCount)); bytes_readed += 2 * southVertexCount;
 		
-		eastVertexCount = new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4)); bytes_readed += 4;
+		eastVertexCount = (new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4)))[0]; bytes_readed += 4;
 		eastIndices = new Uint16Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 2 * eastVertexCount)); bytes_readed += 2 * eastVertexCount;
 		
-		northVertexCount = new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4)); bytes_readed += 4;
+		northVertexCount = (new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4)))[0]; bytes_readed += 4;
 		northIndices = new Uint16Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 2 * northVertexCount)); bytes_readed += 2 * northVertexCount;
 	}
 	
 	// 5. extension header.
 	var extensionId = new Uint8Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 1)); bytes_readed += 1;
-	var extensionLength = new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4)); bytes_readed += 4;
+	var extensionLength = (new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4)))[0]; bytes_readed += 4;
 
 	worker.postMessage({parsedTerrain: {
 		centerX                : centerX,   
