@@ -709,7 +709,7 @@ ManagerUtils.calculatePixelLinearDepth = function(gl, pixelX, pixelY, depthFbo, 
 
 	// Now, read the pixel and find the pixel position.
 	var depthPixels = new Uint8Array(4 * 1 * 1); // 4 x 1x1 pixel.
-	gl.readPixels(pixelX, magoManager.sceneState.drawingBufferHeight - pixelY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, depthPixels);
+	gl.readPixels(pixelX, magoManager.sceneState.drawingBufferHeight[0] - pixelY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, depthPixels);
 	
 	var floatDepthPixels = new Float32Array(([depthPixels[0]/256.0, depthPixels[1]/256.0, depthPixels[2]/256.0, depthPixels[3]/256.0]));
 	var zDepth = ManagerUtils.unpackDepth(floatDepthPixels); // 0 to 256 range depth.
