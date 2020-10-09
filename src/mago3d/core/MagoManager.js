@@ -4105,7 +4105,8 @@ MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = functi
 		data.myCameraRelative.calculateFrustumsPlanes();
 		
 		// 1rst, check if there are octrees very close.
-		var frustum0 = data.myCameraRelative.bigFrustum;
+		//var frustum0 = data.myCameraRelative.bigFrustum;
+		var frustum0 = data.myCameraRelative.frustum;
 		find = neoBuilding.octree.getFrustumVisibleLowestOctreesByLOD(	frustum0, data.currentVisibleOctreesControler, globalVisibleObjControlerOctrees, this.boundingSphere_Aux,
 			data.myCameraRelative.position, distLod0, distLod1, distLod2*100);
 	}

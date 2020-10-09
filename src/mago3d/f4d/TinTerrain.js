@@ -1794,29 +1794,16 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 			}
 		}
 			
-		//if (vboKey.bindDataCustom(currentShader, vboMemManager, "altitudes"))
-		//{
-		//	gl.uniform1i(currentShader.bExistAltitudes_loc, true);
-		//}
-		//else 
-		//{
-		//	gl.uniform1i(currentShader.bExistAltitudes_loc, false);
-		//}
 		gl.uniform1i(currentShader.bApplySsao_loc, false); // no apply ssao on skirt.***
 
 		var currSelObject = magoManager.selectionManager.getSelectedGeneral();
-		if (currSelObject !== this)// && renderType !== 0)
+		if (currSelObject !== this)
 		{ 
-			//gl.depthRange(0.5, 1);
 			gl.drawArrays(gl.TRIANGLE_STRIP, 0, vboKey.vertexCount); 
-			//gl.depthRange(0, 1);
 		} 
 
 		this.renderingFase = this.tinTerrainManager.renderingFase;
 	}
-	
-	
-	
 	
 	return true;
 };
