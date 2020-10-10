@@ -1793,7 +1793,13 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 				return false; 
 			}
 		}
-			
+		if (renderType === 0)
+		{
+			currentShader.disableVertexAttribArray(currentShader.texCoord2_loc);
+		}
+		//when draw skirt, no use normal array
+		currentShader.disableVertexAttribArray(currentShader.normal3_loc);
+
 		gl.uniform1i(currentShader.bApplySsao_loc, false); // no apply ssao on skirt.***
 
 		var currSelObject = magoManager.selectionManager.getSelectedGeneral();
@@ -1804,7 +1810,6 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 
 		this.renderingFase = this.tinTerrainManager.renderingFase;
 	}
-	
 	return true;
 };
 

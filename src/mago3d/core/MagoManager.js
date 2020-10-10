@@ -2012,7 +2012,7 @@ MagoManager.prototype.TEST__SelectionBuffer = function()
 	var totalPixelsCount = mosaicWidth*mosaicHeight;
 	var pixels = new Uint8Array(4 * mosaicWidth * mosaicHeight); // 4 x 3x3 pixel, total 9 pixels select.***
 	var pixelX = mouseX - Math.floor(mosaicWidth/2);
-	var pixelY = this.sceneState.drawingBufferHeight - mouseY - Math.floor(mosaicHeight/2); // origin is bottom.***
+	var pixelY = this.sceneState.drawingBufferHeight[0] - mouseY - Math.floor(mosaicHeight/2); // origin is bottom.***
 	
 	if (pixelX < 0){ pixelX = 0; }
 	if (pixelY < 0){ pixelY = 0; }
@@ -2158,7 +2158,7 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, resultSe
 	var totalPixelsCount = mosaicWidth*mosaicHeight;
 	var pixels = new Uint8Array(4 * mosaicWidth * mosaicHeight); // 4 x 3x3 pixel, total 9 pixels select.***
 	var pixelX = mouseX - Math.floor(mosaicWidth/2);
-	var pixelY = this.sceneState.drawingBufferHeight - mouseY - Math.floor(mosaicHeight/2); // origin is bottom.***
+	var pixelY = this.sceneState.drawingBufferHeight[0] - mouseY - Math.floor(mosaicHeight/2); // origin is bottom.***
 	
 	if (pixelX < 0){ pixelX = 0; }
 	if (pixelY < 0){ pixelY = 0; }
