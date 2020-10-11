@@ -8,11 +8,11 @@
  * @param {*} b
  * @returns {*} Returns the first parameter if not undefined, otherwise the second parameter. 
  */
-function defaultValue(a, b) 
+var defaultValue = function (a, b) 
 {
 	if (a !== undefined && a !== null) 
 	{
 		return a;
 	}
 	return b;
-}
+};

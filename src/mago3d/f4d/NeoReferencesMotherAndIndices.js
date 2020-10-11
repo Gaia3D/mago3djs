@@ -440,6 +440,10 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 			
 			var has_colors = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 			var has_texCoords = readWriter.readUInt8(arrayBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+
+			// test debug.***
+			if (!has_colors)
+			{ var hola= 0; }
 			
 			if (has_colors || has_texCoords)
 			{
@@ -476,16 +480,24 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
 						endBuff = bytes_readed + daya_bytes * verticesFloatValuesCount; 
 						//vboViCacheKey.colVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff)); // original.
 						// TODO: Float32Array or UintArray depending of dataType.
-						var colVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
-						vboViCacheKey.setDataArrayColor(colVboDataArray, vboMemManager);
+						var colVboDataArray;
+						if (data_type === 5121) // ubyte.***
+						{
+							colVboDataArray = new Uint8Array(arrayBuffer.slice(startBuff, endBuff));
+						}
+						if (data_type === 5126) // float.***
+						{
+							colVboDataArray = new Float32Array(arrayBuffer.slice(startBuff, endBuff));
+						}
+						vboViCacheKey.setDataArrayCol(colVboDataArray, vboMemManager);
 
 						bytes_readed += daya_bytes * verticesFloatValuesCount; // updating data.
 						
 						// send data to gpu.
-						if (!vboViCacheKey.isReadyColors(gl, magoManager.vboMemoryManager))
-						{
-							this.succesfullyGpuDataBinded = false;
-						}
+						//if (!vboViCacheKey.isReadyColors(gl, magoManager.vboMemoryManager))
+						//{
+						//	this.succesfullyGpuDataBinded = false;
+						//}
 					}
 					
 					if (has_texCoords)

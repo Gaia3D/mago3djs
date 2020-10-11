@@ -193,6 +193,12 @@ worker.onmessage = function(e)
 	}
 	*/
 
+	//test debug.***
+	//if (e.data.info.z === 8 && e.data.info.x === 217 && e.data.info.y === 99)
+	//{
+	//	var hola = 0;
+	//}
+
 	var options = {
 		skirtDepth          : 500,
 		texCorrectionFactor : texCorrectionFactor

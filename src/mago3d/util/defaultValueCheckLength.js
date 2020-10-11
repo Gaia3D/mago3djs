@@ -8,11 +8,11 @@
  * @param {*} b
  * @returns {*} Returns the first parameter if not undefined, otherwise the second parameter. 
  */
-function defaultValueCheckLength(a, b) 
+var defaultValueCheckLength = function (a, b) 
 {
 	if (a !== undefined && a !== null && a.toString().trim().length > 0) 
 	{
 		return a;
 	}
 	return b;
-}
+};

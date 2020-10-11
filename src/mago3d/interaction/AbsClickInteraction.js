@@ -137,7 +137,7 @@ AbsClickInteraction.prototype.handle = function(browserEvent)
  */
 AbsClickInteraction.prototype.handleDownEvent = function(browserEvent)
 {
-	return abstract();
+	return throwAbstractError();
 };
 /**
  * handle event
@@ -145,7 +145,7 @@ AbsClickInteraction.prototype.handleDownEvent = function(browserEvent)
  */
 AbsClickInteraction.prototype.handleUpEvent = function(browserEvent)
 {
-	return abstract();
+	return throwAbstractError();
 };
 
 /**
@@ -154,5 +154,5 @@ AbsClickInteraction.prototype.handleUpEvent = function(browserEvent)
  */
 AbsClickInteraction.prototype.handleMoveEvent = function(browserEvent)
 {
-	return abstract();
+	return throwAbstractError();
 };

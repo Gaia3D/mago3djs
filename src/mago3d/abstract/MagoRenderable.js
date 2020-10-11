@@ -490,7 +490,7 @@ MagoRenderable.prototype.renderAsChild = function(magoManager, shader, renderTyp
 
 MagoRenderable.prototype.makeMesh = function(magoManager) 
 {
-	return abstract();
+	return throwAbstractError();
 };
 
 MagoRenderable.prototype.moved = function() 

@@ -1050,6 +1050,16 @@ TinTerrain.prototype.bindTexture = function(gl, shader, currDepth)
 					gl.uniform2fv(shader.uMinMaxAltitudes_loc, new Float32Array([properties.minAltitude, properties.maxAltitude]));
 					gl.uniform1i(shader.bApplyCaustics_loc, properties.caustics);
 				}
+				else if (filter.type === CODE.imageFilter.OCEANCOLOR_WATERMARKBYALPHA) 
+				{
+					activeTexturesLayers[4+1] = 20;
+					gl.activeTexture(gl.TEXTURE4 + 1);
+					gl.bindTexture(gl.TEXTURE_2D, texture.texId);
+
+					var properties = filter.properties;
+					gl.uniform2fv(shader.uMinMaxAltitudes_loc, new Float32Array([properties.minAltitude, properties.maxAltitude]));
+					gl.uniform1i(shader.bApplyCaustics_loc, properties.caustics);
+				}
 			}
 		}	
 
@@ -1596,12 +1606,12 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 				gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
 				if (bApplySsao)
 				{
-					gl.uniform1f(currentShader.aspectRatio_loc, magoManager.sceneState.camera.frustum.aspectRatio);
-					gl.uniform1f(currentShader.screenWidth_loc, magoManager.sceneState.drawingBufferWidth);	
+					gl.uniform1f(currentShader.aspectRatio_loc, magoManager.sceneState.camera.frustum.aspectRatio[0]);
+					gl.uniform1f(currentShader.screenWidth_loc, magoManager.sceneState.drawingBufferWidth[0]);	
 
 					// bind depthTex & noiseTex. channels 2 & 3.
 					var noiseTexture = magoManager.texturesStore.getNoiseTexture4x4();
-					gl.uniform2fv(currentShader.noiseScale2_loc, [magoManager.depthFboNeo.width/noiseTexture.width, magoManager.depthFboNeo.height/noiseTexture.height]);
+					gl.uniform2fv(currentShader.noiseScale2_loc, [magoManager.depthFboNeo.width[0]/noiseTexture.width[0], magoManager.depthFboNeo.height[0]/noiseTexture.height[0]]);
 					gl.uniform3fv(currentShader.kernel16_loc, magoManager.sceneState.ssaoKernel16);
 
 					gl.activeTexture(gl.TEXTURE2);
@@ -1638,10 +1648,10 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 		var renderWireframe = false;
 		var vboMemManager = magoManager.vboMemoryManager;
 
-		if (this.terrainPositionHIGH === undefined)
-		{
-			//return;
-		}
+		//if (this.terrainPositionHIGH === undefined)
+		//{
+		//return;
+		//}
 			
 		gl.uniform3fv(currentShader.buildingPosHIGH_loc, this.terrainPositionHIGH);
 		gl.uniform3fv(currentShader.buildingPosLOW_loc, this.terrainPositionLOW);
@@ -1742,35 +1752,20 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 		
 			if (selectionManager)
 			{
-				var currSelObject = selectionManager.getSelectedGeneral();
-				if (currSelObject === this)
-				{
-					gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
-					gl.uniform4fv(currentShader.oneColor4_loc, [0.0, 0.9, 0.9, 1.0]);
-						
-					gl.drawElements(gl.LINES, indicesCount-1, gl.UNSIGNED_SHORT, 0); 
-						
-					//if (this.tinTerrainManager.getTerrainType() === 0)
-					//{
-					//	gl.drawElements(gl.LINE_STRIP, indicesCount-1, gl.UNSIGNED_SHORT, 0); 
-					//}
-					//else 
-					//{
-					//var trianglesCount = indicesCount;
-					//for (var i=0; i<trianglesCount-1; i++)
-					//{
-					//	gl.drawElements(gl.LINE_LOOP, 3, gl.UNSIGNED_SHORT, i*3); 
-					//}
-					//}
-						
-					this.drawTerrainName(magoManager);
-				}
-				//this.drawTerrainName(magoManager); // test. delete.
+				gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
+				gl.uniform4fv(currentShader.oneColor4_loc, [0.0, 0.9, 0.9, 1.0]);
+					
+				gl.drawElements(gl.LINES, indicesCount-1, gl.UNSIGNED_SHORT, 0); 
+
+				this.drawTerrainName(magoManager);
 			}
 		}
 		// End test.--------------------------------------------------------------------------------------
 			
 		// Render skirt if exist.
+
+		//if (this.depth === 8 && this.X === 217 && this.Y === 99)
+		//{ var hola = 0; }
 			
 		var vboKey = this.vboKeyContainer.vboCacheKeysArray[1]; // the idx = 0 is the terrain. idx = 1 is the skirt.
 		if (vboKey === undefined)
@@ -1790,33 +1785,21 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 				return false; 
 			}
 		}
-			
-		//if (vboKey.bindDataCustom(currentShader, vboMemManager, "altitudes"))
-		//{
-		//	gl.uniform1i(currentShader.bExistAltitudes_loc, true);
-		//}
-		//else 
-		//{
-		//	gl.uniform1i(currentShader.bExistAltitudes_loc, false);
-		//}
-		gl.uniform1i(currentShader.bApplySsao_loc, false); // no apply ssao on skirt.***
-		if (selectionManager)
+		if (renderType === 0)
 		{
-			var currSelObject = selectionManager.getSelectedGeneral();
-			if (currSelObject !== this)// && renderType !== 0)
-			{ 
-				//gl.depthRange(0.5, 1);
-				gl.drawArrays(gl.TRIANGLE_STRIP, 0, vboKey.vertexCount); 
-				//gl.depthRange(0, 1);
-			} 
+			currentShader.disableVertexAttribArray(currentShader.texCoord2_loc);
 		}
+		//when draw skirt, no use normal array
+		currentShader.disableVertexAttribArray(currentShader.normal3_loc);
 
+		gl.uniform1i(currentShader.bApplySsao_loc, false); // no apply ssao on skirt.***
+		var currSelObject = magoManager.selectionManager.getSelectedGeneral();
+		if (currSelObject !== this)
+		{ 
+			gl.drawArrays(gl.TRIANGLE_STRIP, 0, vboKey.vertexCount); 
+		} 
 		this.renderingFase = this.tinTerrainManager.renderingFase;
 	}
-	
-	
-	
-	
 	return true;
 };
 
@@ -2811,6 +2794,8 @@ TinTerrain.prototype.makeVbo = function(vboMemManager)
 		vboKey.setDataArrayCustom(this.altArray, vboMemManager, dimensions, name, attribLoc);
 	}
 	*/
+
+	
 
 	// Make skirt.
 	if (this.skirtCartesiansArray === undefined)

@@ -389,8 +389,7 @@ MagoWorld.prototype.mousewheel = function(event)
 	
 	var camHeght = camera.getCameraElevation();
 	var camHeightAbs = Math.abs(camHeght);
-
-	if (isNaN(camHeght))
+		if (isNaN(camHeght))
 	{ return; }
 
 	// Lineal increment.
@@ -398,8 +397,6 @@ MagoWorld.prototype.mousewheel = function(event)
 	
 	// Squared increment.
 	delta *= (camHeght*camHeght) * 0.00001 + camHeightAbs * 0.001;
-	
-
 	if (wheelIsForward)
 	{
 		delta += 1;
@@ -425,8 +422,7 @@ MagoWorld.prototype.mousewheel = function(event)
 		{ delta = -maxDelta; }
 	}
 
-
-	if (Math.abs(delta) < 20.0)
+	if (Math.abs(delta) < 100.0)
 	{
 		if (delta < 0.0)
 		{ delta = -20; }
@@ -1391,7 +1387,7 @@ MagoWorld.prototype.doTest__logarithmicDepthBuffer_encode_decode = function()
 	var frustum_far = z; // unitary frustum far.
 
 	var aspectRatio = frustum.aspectRatio;
-	var tangentOfHalfFovy = frustum.tangentOfHalfFovy; 
+	var tangentOfHalfFovy = frustum.tangentOfHalfFovy[0]; 
 	
 	var hfar = 2.0 * tangentOfHalfFovy * frustum_far; //var hfar = 2.0 * Math.tan(fovy/2.0) * frustum_far;
 	var wfar = hfar * aspectRatio;

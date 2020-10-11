@@ -720,6 +720,14 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 			{
 				shader.disableVertexAttribArray(shader.texCoord2_loc); 
 			}
+
+			// colors.
+			if (!vboKey.bindDataColor(shader, magoManager.vboMemoryManager))
+			{ shader.disableVertexAttribArray(shader.color4_loc);  }
+			else 
+			{
+				//shader.enableVertexAttribArray(shader.color4_loc);
+			}
 		}
 
 		

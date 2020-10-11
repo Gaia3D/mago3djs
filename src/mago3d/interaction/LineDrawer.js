@@ -20,7 +20,12 @@ var LineDrawer = function(style)
 	this.points = [];
 	this.height = 200;
 
+	this.clickTime;
+	this.clickPoint;
 	this.tempLine;
+
+	//OTL
+	this.added = false;
 	this.result = [];
 };
 LineDrawer.prototype = Object.create(DrawGeometryInteraction.prototype);
@@ -50,6 +55,8 @@ LineDrawer.prototype.init = function()
 {
 	this.points = [];
 	this.tempLine = undefined;
+	this.clickTime = undefined;
+	this.clickPoint = undefined;
 	clearTimeout(this.timeout);
 };
 /**
@@ -79,56 +86,97 @@ LineDrawer.prototype.start = function()
 	
 	var that = this;
 	var manager = that.manager;
-    
-	manager.on(MagoManager.EVENT_TYPE.LEFTUP, function(e)
+	
+	if (!this.added)
 	{
-		if (!that.getActive()) { return; }
+		this.added = true;
+		manager.on(MagoManager.EVENT_TYPE.LEFTUP, function(e)
+		{
+			if (!that.getActive()) { return; }
+			
 
-		that.points.push(e.point.geographicCoordinate);
-	});
-
-	manager.on(MagoManager.EVENT_TYPE.MOUSEMOVE, function(e)
-	{
-		if (!that.getActive()) { return; }
-		if (that.points.length > 0) 
-		{   
-			var clonePoints = that.points.slice();
-			var auxPoint = e.endEvent.geographicCoordinate;
-			clonePoints.push(auxPoint);
-            
-			var position = {coordinates: clonePoints};
-			if (!that.tempLine)
+			if (that.points.length === 0)
 			{
-				if (Object.keys(that.style).length < 1) 
-				{
-					that.style = {
-						color     : '#ff0000',
-						thickness : 2.0
-					};
-				}
-				
-				that.tempLine = new MagoPolyline(position, that.style);
-				manager.modeler.magoRectangle = that.tempLine;
+				that.points.push(e.point.geographicCoordinate);
+				if (!that.clickTime) { that.clickTime = new Date().getTime(); }
+				if (!that.clickPoint) { that.clickPoint = e.point.screenCoordinate; }
 			}
 			else 
 			{
-				that.tempLine.init(manager);
-				that.tempLine.setPosition(position);
-			}
-		}
-	});
-    
-	manager.on(MagoManager.EVENT_TYPE.RIGHTCLICK, function(e)
-	{
-		if (!that.getActive() || !that.tempLine) { return; }
-		that.points.push(e.clickCoordinate.geographicCoordinate);
+				var thisTime = new Date().getTime();
+				var thisPoint = e.point.screenCoordinate; 
+				var dbclick = false;
 
-		var position = {coordinates: that.points};
-		that.tempLine.init(manager);
-		that.tempLine.setPosition(position);
-        
-		that.end();
-	});
+				if (thisTime - that.clickTime < 500 && Math.abs(thisPoint.x - that.clickPoint.x) < 2 && Math.abs(thisPoint.y - that.clickPoint.y) < 2)
+				{
+					dbclick = true;
+				}
+
+				if (!dbclick)
+				{
+					that.points.push(e.point.geographicCoordinate);
+					that.clickTime = new Date().getTime();
+					that.clickPoint = e.point.screenCoordinate;
+				}
+				else 
+				{
+					if (that.tempLine)
+					{
+						var position = {coordinates: that.points};
+						that.tempLine.init(manager);
+						that.tempLine.setPosition(position);
+						
+						that.end();
+					}
+				}
+			}
+		});
+
+		manager.on(MagoManager.EVENT_TYPE.MOUSEMOVE, function(e)
+		{
+			if (!that.getActive()) { return; }
+			if (that.points.length > 0) 
+			{   
+				var clonePoints = that.points.slice();
+				var auxPoint = e.endEvent.geographicCoordinate;
+				clonePoints.push(auxPoint);
+				
+				var position = {coordinates: clonePoints};
+				if (!that.tempLine)
+				{
+					if (Object.keys(that.style).length < 1) 
+					{
+						that.style = {
+							color     : '#ff0000',
+							thickness : 2.0
+						};
+					}
+					
+					that.tempLine = new MagoPolyline(position, that.style);
+					manager.modeler.magoRectangle = that.tempLine;
+				}
+				else 
+				{
+					that.tempLine.init(manager);
+					that.tempLine.setPosition(position);
+				}
+			}
+		});
+		
+		/*
+		manager.on(MagoManager.EVENT_TYPE.RIGHTCLICK, function(e)
+		{
+			if (!that.getActive() || !that.tempLine) { return; }
+			that.points.push(e.clickCoordinate.geographicCoordinate);
+
+			var position = {coordinates: that.points};
+			that.tempLine.init(manager);
+			that.tempLine.setPosition(position);
+			
+			that.end();
+		});
+		*/
+	}
 };
 /**
  * @private

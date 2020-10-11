@@ -965,7 +965,7 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
 		resultCamera.up.set(camUpX, camUpY, camUpZ);
 		
 		var aspectRatio = frustum.aspectRatio[0];
-		var fovy = frustum.fovyRad;	
+		var fovy = frustum.fovyRad[0];	
 		
 		frustum = resultCamera.getFrustum(frustumIdx);
 		resultCamera.frustum.near[0] = currentFrustumNear;
@@ -986,7 +986,7 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
 		var camera = this.sceneState.camera;
 		var frustum = camera.getFrustum(frustumIdx);
 		var aspectRatio = frustum.aspectRatio[0];
-		var fovy = frustum.fovyRad;
+		var fovy = frustum.fovyRad[0];
 
 		var currentFrustumFar = frustum.far[0];
 		var currentFrustumNear = frustum.near[0];
@@ -1000,8 +1000,8 @@ MagoManager.prototype.upDateCamera = function(resultCamera)
 		var distancesArray = [];
 		for (var i=0; i<numFrustums; i++)
 		{
-			distancesArray[i*2] = frustum.near;
-			distancesArray[i*2+1] = frustum.far;
+			distancesArray[i*2] = frustum.near[0];
+			distancesArray[i*2+1] = frustum.far[0];
 		}
 		
 		resultCamera.position.set(camera.position.x, camera.position.y, camera.position.z);
@@ -1584,13 +1584,17 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	this.swapRenderingFase();
 
 	// 1.1) ssao and other effects from depthBuffer render.*****************************************************************************
-	//if(this.currentFrustumIdx === 0)
+
+	this.postFxShadersManager.useProgram(null); // init current bind shader.***
+//>>>>>>> feature/seaforest
 	this.renderer.renderSsaoFromDepth(gl);
 
 	// 2) color render.*****************************************************************************************************************
 	// 2.1) Render terrain shadows.*****************************************************************************************************
 	// Now render the geomatry.
-	
+
+	this.postFxShadersManager.useProgram(null); // init current bind shader.***
+//>>>>>>> feature/seaforest
 	if (this.isCesiumGlobe())
 	{
 		var scene = this.scene;
@@ -1643,12 +1647,11 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	*/
 	if (this.weatherStation)
 	{
-		this.weatherStation.renderWindLayerDisplayPlanes(this);
 		//this.weatherStation.renderWindMultiLayers(this);
 		//this.weatherStation.test_renderWindLayer(this);
 		//this.weatherStation.test_renderTemperatureLayer(this);
 		//this.weatherStation.test_renderCuttingPlanes(this, renderType);
-
+		this.weatherStation.renderWeather(this);
 	}
 
 	// Render fast antiAlias,************************************************************************************************************
@@ -2689,7 +2692,7 @@ MagoManager.prototype.TEST__SelectionBuffer = function()
 	var totalPixelsCount = mosaicWidth*mosaicHeight;
 	var pixels = new Uint8Array(4 * mosaicWidth * mosaicHeight); // 4 x 3x3 pixel, total 9 pixels select.***
 	var pixelX = mouseX - Math.floor(mosaicWidth/2);
-	var pixelY = this.sceneState.drawingBufferHeight - mouseY - Math.floor(mosaicHeight/2); // origin is bottom.***
+	var pixelY = this.sceneState.drawingBufferHeight[0] - mouseY - Math.floor(mosaicHeight/2); // origin is bottom.***
 	
 	if (pixelX < 0){ pixelX = 0; }
 	if (pixelY < 0){ pixelY = 0; }
@@ -2839,7 +2842,7 @@ MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, resultSe
 	var totalPixelsCount = mosaicWidth*mosaicHeight;
 	var pixels = new Uint8Array(4 * mosaicWidth * mosaicHeight); // 4 x 3x3 pixel, total 9 pixels select.***
 	var pixelX = mouseX - Math.floor(mosaicWidth/2);
-	var pixelY = this.sceneState.drawingBufferHeight - mouseY - Math.floor(mosaicHeight/2); // origin is bottom.***
+	var pixelY = this.sceneState.drawingBufferHeight[0] - mouseY - Math.floor(mosaicHeight/2); // origin is bottom.***
 	
 	if (pixelX < 0){ pixelX = 0; }
 	if (pixelY < 0){ pixelY = 0; }
@@ -4698,6 +4701,9 @@ MagoManager.prototype.test_renderDepth_objectSelected = function(currObjectSelec
 	
 	// Now, renderDepth the selected object. Fix the frustumFar for adequate precision on depthPacking.***
 	var shader = this.postFxShadersManager.getShader("modelRefDepth"); 
+	if (!shader.uniformsMapGeneral.frustumFar)
+	{ return; }
+
 	shader.useProgram();
 	shader.bindUniformGenerals();
 	shader.enableVertexAttribArray(shader.position3_loc);
@@ -4706,6 +4712,8 @@ MagoManager.prototype.test_renderDepth_objectSelected = function(currObjectSelec
 	var geoLocationData = geoLocDataManager.getCurrentGeoLocationData();
 		
 	// test: in depth, set frustumFar = 1000000000(100M).***
+	
+	
 	var frustumFarLoc = shader.uniformsMapGeneral.frustumFar.uniformLocation;
 	gl.uniform1f(frustumFarLoc, new Float32Array([100000000.0]));
 			
@@ -5520,8 +5528,22 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 		use_linearOrLogarithmicDepth = "USE_LOGARITHMIC_DEPTH";
 
 		this.postFxShadersManager.bUseLogarithmicDepth = true;
+		/*
+		var supportTexterFloatType = gl.getSupportedExtensions().indexOf("OES_texture_float");
+
+		if (supportTexterFloatType) 
+		{
+			gl.getExtension("OES_texture_float");
+		}
+		*/
 	}
-	
+	var userAgent = window.navigator.userAgent;
+	var isIE = userAgent.indexOf('Trident') > -1;
+	if (isIE) 
+	{
+		use_linearOrLogarithmicDepth = "USE_LINEAR_DEPTH";
+		this.postFxShadersManager.bUseLogarithmicDepth = false;	
+	}
 
 	// here creates the necessary shaders for mago3d.***
 	// 1) ModelReferences ssaoShader.******************************************************************************
@@ -8105,8 +8127,17 @@ MagoManager.prototype.deleteAll = function ()
 	// reset tiles.
 	this.smartTileManager.resetTiles();
 	
-	// finally delete nodes.
+	// delete nodes.
 	this.hierarchyManager.deleteNodes(this.sceneState.gl, this.vboMemoryManager);
+
+	// if exist terrain, then delete terrain.***
+	if (this.tinTerrainManager)
+	{
+		this.tinTerrainManager.deleteAll();
+		this.tinTerrainManager = undefined;
+	}
+
+	cancelAnimationFrame(magoManager.reqFrameId);
 };
 
 MagoManager.prototype.checkCollision = function (position, direction)

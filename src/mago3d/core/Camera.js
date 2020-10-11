@@ -487,8 +487,8 @@ Camera.prototype.calculateFrustumsPlanes = function()
 	
 	// Use the frustum0 to calculate nearWidth, nearHeight, farWidth & farHeight.
 	frustum0 = this.getFrustum(0);
-	var nearHeight = frustum0.tangentOfHalfFovy * frustum0.near * 2;
-	var farHeight = frustum0.tangentOfHalfFovy * frustum0.far * 2;
+	var nearHeight = frustum0.tangentOfHalfFovy[0] * frustum0.near[0] * 2;
+	var farHeight = frustum0.tangentOfHalfFovy[0] * frustum0.far[0] * 2;
 	var nearWidth = nearHeight * frustum0.aspectRatio[0];
 	var farWidht = farHeight * frustum0.aspectRatio[0];
 	
@@ -504,8 +504,8 @@ Camera.prototype.calculateFrustumsPlanes = function()
 	this.right = this.direction.crossProduct(this.up, this.right);
 	
 	// calculate the near and far points.
-	this.nearCenterPoint.set(px + dx * frustum0.near, py + dy * frustum0.near, pz + dz * frustum0.near);
-	this.farCenterPoint.set(px + dx * frustum0.far, py + dy * frustum0.far, pz + dz * frustum0.far);
+	this.nearCenterPoint.set(px + dx * frustum0.near[0], py + dy * frustum0.near[0], pz + dz * frustum0.near[0]);
+	this.farCenterPoint.set(px + dx * frustum0.far[0], py + dy * frustum0.far[0], pz + dz * frustum0.far[0]);
 	
 	// far plane points.
 	this.farLeftBottomPoint.set(this.farCenterPoint.x - this.right.x*farWidht*0.5 - this.up.x*farHeight*0.5, 
@@ -564,8 +564,8 @@ Camera.prototype.calculateFrustumsPlanes = function()
 		frustum = this.getFrustum(i);
 		
 		// calculate the near and far points.
-		this.nearCenterPoint.set(px + dx * frustum.near, py + dy * frustum.near, pz + dz * frustum.near);
-		this.farCenterPoint.set(px + dx * frustum.far, py + dy * frustum.far, pz + dz * frustum.far);
+		this.nearCenterPoint.set(px + dx * frustum.near[0], py + dy * frustum.near[0], pz + dz * frustum.near[0]);
+		this.farCenterPoint.set(px + dx * frustum.far[0], py + dy * frustum.far[0], pz + dz * frustum.far[0]);
 		
 		// near plane.
 		plane = frustum.planesArray[0];
@@ -584,8 +584,8 @@ Camera.prototype.calculateFrustumsPlanes = function()
 	
 	// finally calculate the totalFrustum(BigFrustum).
 	// calculate the near and far points.
-	this.nearCenterPoint.set(px + dx * this.bigFrustum.near, py + dy * this.bigFrustum.near, pz + dz * this.bigFrustum.near);
-	this.farCenterPoint.set(px + dx * this.bigFrustum.far, py + dy * this.bigFrustum.far, pz + dz * this.bigFrustum.far);
+	this.nearCenterPoint.set(px + dx * this.bigFrustum.near[0], py + dy * this.bigFrustum.near[0], pz + dz * this.bigFrustum.near[0]);
+	this.farCenterPoint.set(px + dx * this.bigFrustum.far[0], py + dy * this.bigFrustum.far[0], pz + dz * this.bigFrustum.far[0]);
 	
 	// near plane.
 	plane = this.bigFrustum.planesArray[0];

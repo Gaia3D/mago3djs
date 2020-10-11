@@ -34,7 +34,7 @@ MagoGeometry.prototype.constructor = MagoGeometry;
  */
 MagoGeometry.prototype.setPosition = function(position) 
 {
-	return abstract();
+	return throwAbstractError();
 };
 
 /**

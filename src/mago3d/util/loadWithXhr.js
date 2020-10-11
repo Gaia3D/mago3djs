@@ -15,7 +15,7 @@
  * 	TODO
  * });
  */
-function loadWithXhr(url, xhr, timeOut, responseType, method) 
+var loadWithXhr = function (url, xhr, timeOut, responseType, method) 
 {
 	if (!defined(url))
 	{
@@ -32,6 +32,9 @@ function loadWithXhr(url, xhr, timeOut, responseType, method)
 			xhr.open(method, url, true);
 			xhr.responseType = responseType ? responseType : 'arraybuffer';
 
+			var isJson = responseType === 'json';
+			var userAgent = window.navigator.userAgent;
+			var isIE = userAgent.indexOf('Trident') > -1;
 			 // time in milliseconds
 			if (timeOut !== undefined)
 			{ xhr.timeout = timeOut; }
@@ -45,8 +48,9 @@ function loadWithXhr(url, xhr, timeOut, responseType, method)
 				}
 				else 
 				{
+					var response = (isJson && isIE) ? JSON.parse(xhr.response) : xhr.response;
 					// 3.1) DEFERRED를 해결한다. (모든 done()...을 동작시킬 것이다.)
-					resolve(xhr.response);
+					resolve(response);
 				} 
 			};
 			

@@ -580,15 +580,71 @@ void main()
 		float altitude = 1000000.0;
 		if(uActiveTextures[5] == 10)
 		{
+			// Bathymetry.***
 			vec4 layersTextureColor = texture2D(diffuseTex_3, texCoord);
 			//if(layersTextureColor.w > 0.0)
 			{
 				// decode the grayScale.***
 				float sumAux = layersTextureColor.r;// + layersTextureColor.g + layersTextureColor.b;// + layersTextureColor.w;
-				//sumAux *= 6.6;
-				altitude = uMinMaxAltitudes.x + sumAux * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);
+
+				float r = layersTextureColor.r*256.0;;
+				float g = layersTextureColor.g;
+				float b = layersTextureColor.b;
+
+				float maxHeight;
+				float minHeight;
+				float numDivs;
+				float increHeight;
+				float height;
+				
+				if(r < 0.0001)
+				{
+					// considering r=0.
+					minHeight = -2796.0;
+					maxHeight = -1000.0;
+					numDivs = 2.0;
+                    increHeight = (maxHeight - minHeight)/(numDivs);
+                    height = (256.0*g + b)/(128.0);
+				}
+				else if(r > 0.5 && r < 1.5)
+				{
+					// considering r=1.
+					minHeight = -1000.0;
+					maxHeight = -200.0;
+					numDivs = 2.0;
+                    increHeight = (maxHeight - minHeight)/(numDivs);
+                    height = (256.0*g + b)/(128.0);
+				}
+				else if(r > 1.5 && r < 2.5)
+				{
+					// considering r=2.
+					minHeight = -200.0;
+					maxHeight = 1.0;
+					numDivs = 123.0;
+                    increHeight = (maxHeight - minHeight)/(numDivs);
+                    height = (256.0*g + b)/(128.0);
+				}
+
+                height = (256.0*g + b)/(numDivs);
+				altitude = minHeight + height * (maxHeight -minHeight);
 			}
 		}
+		else if(uActiveTextures[5] == 20)
+		{
+			// waterMarkByAlpha.***
+			// Check only alpha component.
+			vec4 layersTextureColor = texture2D(diffuseTex_3, texCoord);
+			float alpha = layersTextureColor.a;
+			if(alpha > 0.0)
+			{
+				altitude = -100.0;
+			}
+			else
+			{
+				altitude = 100.0;
+			}
+		}
+
 		// End Dem image.------------------------------------------------------------------------------------------------------------
 		float linearDepthAux = 1.0;
 		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
@@ -598,7 +654,7 @@ void main()
 		float linearDepth = getDepth(screenPos);  
 		linearDepthAux = linearDepth;
 
-		if(bApplySsao && altitude<0.0)
+		if(bApplySsao && altitude<0.1)
 		{
 			// must find depthTex & noiseTex.***
 			vec3 origin = ray * linearDepth;  
@@ -660,7 +716,6 @@ void main()
 		*/
 
 		vec3 normalFromDepth = normal_from_depth(linearDepthAux, screenPos); // normal from depthTex.***
-		
 		//normalFromDepth += vNormal*0.5;
 		//normalize(normalFromDepth);
 		//normalFromDepth = normalize(vec3(normalFromDepth.x*8.0, normalFromDepth.y*8.0, normalFromDepth.z));
@@ -673,11 +728,8 @@ void main()
 		scalarProd /= 3.0;
 		scalarProd += 0.666;
 
-		
-
 		//scalarProd /= 2.0;
 		//scalarProd += 0.5;
-		
 		
 		if(altitude < 0.0)
 		{
@@ -707,7 +759,6 @@ void main()
 				}
 			}
 			// End caustics.--------------------------
-
 			
 			if(gray < 0.05)
 			gray = 0.05;
@@ -727,6 +778,16 @@ void main()
 			textureColor *= vec4(textureColor.r*scalarProd_2d, textureColor.g*scalarProd_2d, textureColor.b, textureColor.a);
 			// End Something like to HillShade.---------------------------------------------------------------------------------
 			
+            // Something like to HillShade .*********************************************************************************
+            vec3 lightDir = normalize(vec3(1.0, 1.0, 0.0));
+            float scalarProd_2d = dot(lightDir, normalFromDepth);
+            
+            scalarProd_2d /= 2.0;
+            scalarProd_2d += 0.8;
+
+            //scalarProd_2d *= scalarProd_2d;
+            textureColor *= vec4(textureColor.r*scalarProd_2d, textureColor.g*scalarProd_2d, textureColor.b, textureColor.a);
+            // End Something like to HillShade.---------------------------------------------------------------------------------
 			
 			// End test drawing grid.---
 			float specularReflectionCoef = 0.6;
@@ -744,19 +805,14 @@ void main()
 			return;
 		}
 		else{
+			
 			if(uSeaOrTerrainType == 1)
 			discard;
-		
 		}
-		
-		
 		
 		vec4 finalColor = mix(textureColor, fogColor, vFogAmount); 
 		gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian * scalarProd, 1.0); // original.***
 		//gl_FragColor = textureColor; // test.***
 		//gl_FragColor = vec4(vNormal.xyz, 1.0); // test.***
-
-		
-		
 	}
 }

@@ -1674,42 +1674,46 @@ ReaderWriter.prototype.loadWMSImage = function(gl, filePath_inServer, texture, m
 	texture.fileLoadState = CODE.fileLoadState.LOADING_STARTED;
 	var readWriter = this;
 	magoManager.fileRequestControler.tinTerrainTexturesRequested += 1;
-	loadWithXhr(filePath_inServer, undefined, undefined, 'blob').then(function(response) 
+	loadWithXhr(filePath_inServer).then(function(response) 
 	{
-		var blob = response;
-		if (blob && (blob.type === 'image/png' || blob.type === 'image/jpeg')) 
+		var arrayBuffer = response;
+		if (arrayBuffer) 
 		{
-			var ibmPromise = createImageBitmap(blob);
-			ibmPromise.then(function(source)
-			{
-				source.blob = blob;
+			if (flip_y_texCoords === undefined)
+			{ flip_y_texCoords = false; }
 
+			var blob = new Blob( [ arrayBuffer ], { type: "image/png" } );
+			var urlCreator = window.URL || window.webkitURL;
+			var imagenUrl = urlCreator.createObjectURL(blob);
+			var imageFromArray = new Image();
+
+			imageFromArray.onload = function () 
+			{
 				if (texture.texId === undefined)
 				{ texture.texId = gl.createTexture(); }
 
-				if (flip_y_texCoords === undefined)
-				{ flip_y_texCoords = true; }
-
-				texture.imageWidth = source.width;
-				texture.imageHeight = source.height;
-
 				gl.bindTexture(gl.TEXTURE_2D, texture.texId);
 				gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, flip_y_texCoords); // if need vertical mirror of the image.
-				gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source); // Original.
+				gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imageFromArray); // Original.
 				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 				gl.generateMipmap(gl.TEXTURE_2D);
 				gl.bindTexture(gl.TEXTURE_2D, null);
+
 				texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-			});
+				arrayBuffer = null;
+			};
+
+			imageFromArray.onerror = function() 
+			{
+				return;
+			};
+
+			imageFromArray.src = imagenUrl;
 		}
-		else 
-		{
-			texture.texId = 'failed';
-			texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-		}
+		
 	}, function(status) 
 	{
 		console.log(status);

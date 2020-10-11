@@ -709,7 +709,7 @@ ManagerUtils.calculatePixelLinearDepth = function(gl, pixelX, pixelY, depthFbo, 
 
 	// Now, read the pixel and find the pixel position.
 	var depthPixels = new Uint8Array(4 * 1 * 1); // 4 x 1x1 pixel.
-	gl.readPixels(pixelX, magoManager.sceneState.drawingBufferHeight - pixelY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, depthPixels);
+	gl.readPixels(pixelX, magoManager.sceneState.drawingBufferHeight[0] - pixelY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, depthPixels);
 	
 	var floatDepthPixels = new Float32Array(([depthPixels[0]/256.0, depthPixels[1]/256.0, depthPixels[2]/256.0, depthPixels[3]/256.0]));
 	var zDepth = ManagerUtils.unpackDepth(floatDepthPixels); // 0 to 256 range depth.
@@ -768,7 +768,7 @@ ManagerUtils.calculatePixelLinearDepthABGR = function(gl, pixelX, pixelY, depthF
 	
 	// Now, read the pixel and find the pixel position.
 	var depthPixels = new Uint8Array(4 * 1 * 1); // 4 x 1x1 pixel.
-	gl.readPixels(pixelX, magoManager.sceneState.drawingBufferHeight - pixelY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, depthPixels);
+	gl.readPixels(pixelX, magoManager.sceneState.drawingBufferHeight[0] - pixelY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, depthPixels);
 	
 	var zDepth = depthPixels[3]/(255.0*255.0*255.0) + depthPixels[2]/(255.0*255.0) + depthPixels[1]/255.0 + depthPixels[0]; // 0 to 256 range depth.
 	var linearDepth = zDepth / 255.0; // LinearDepth. Convert to [0.0, 1.0] range depth.
@@ -948,7 +948,7 @@ ManagerUtils.calculatePixelPositionWorldCoord = function(gl, pixelX, pixelY, res
 	var pixelPosCamCoord = new Point3D();
 	
 	if (frustumFar === undefined)
-	{ frustumFar = magoManager.sceneState.camera.frustum.far; }
+	{ frustumFar = magoManager.sceneState.camera.frustum.far[0]; }
 
 	if (frustumNear === undefined)
 	{ frustumNear = 0.0; }
@@ -1003,16 +1003,16 @@ ManagerUtils.calculateWorldPositionToScreenCoord = function(gl, worldCoordX, wor
 	}
 	
 	// now calculate the width and height of the plane in zDist.
-	//var fovyRad = sceneState.camera.frustum.fovyRad;
+	//var fovyRad = sceneState.camera.frustum.fovyRad[0];
 	
-	var planeHeight = sceneState.camera.frustum.tangentOfHalfFovy*zDist*2;
-	var planeWidth = planeHeight * sceneState.camera.frustum.aspectRatio; 
-	var pixelX = -pointSC2.x * sceneState.drawingBufferWidth / planeWidth;
-	var pixelY = -(pointSC2.y) * sceneState.drawingBufferHeight / planeHeight;
+	var planeHeight = sceneState.camera.frustum.tangentOfHalfFovy[0]*zDist*2;
+	var planeWidth = planeHeight * sceneState.camera.frustum.aspectRatio[0]; 
+	var pixelX = -pointSC2.x * sceneState.drawingBufferWidth[0] / planeWidth;
+	var pixelY = -(pointSC2.y) * sceneState.drawingBufferHeight[0] / planeHeight;
 
-	pixelX += sceneState.drawingBufferWidth / 2;
-	pixelY += sceneState.drawingBufferHeight / 2;
-	pixelY = sceneState.drawingBufferHeight - pixelY;
+	pixelX += sceneState.drawingBufferWidth[0] / 2;
+	pixelY += sceneState.drawingBufferHeight[0] / 2;
+	pixelY = sceneState.drawingBufferHeight[0] - pixelY;
 	resultScreenCoord.set(pixelX, pixelY, 0);
 	
 	return resultScreenCoord;
@@ -1033,17 +1033,17 @@ ManagerUtils.getRayCamSpace = function(pixelX, pixelY, resultRay, magoManager)
 	var frustum = sceneState.camera.frustum;
 	var frustum_far = 1.0;//frustum.far[0]; // unitary frustum far.
 
-	var aspectRatio = frustum.aspectRatio;
-	var tangentOfHalfFovy = frustum.tangentOfHalfFovy; 
+	var aspectRatio = frustum.aspectRatio[0];
+	var tangentOfHalfFovy = frustum.tangentOfHalfFovy[0]; 
 	
 	var hfar = 2.0 * tangentOfHalfFovy * frustum_far; //var hfar = 2.0 * Math.tan(fovy/2.0) * frustum_far;
 	var wfar = hfar * aspectRatio;
 	var mouseX = pixelX;
-	var mouseY = sceneState.drawingBufferHeight - pixelY;
+	var mouseY = sceneState.drawingBufferHeight[0] - pixelY;
 	if (resultRay === undefined) 
 	{ resultRay = new Float32Array(3); }
-	resultRay[0] = wfar*((mouseX/sceneState.drawingBufferWidth) - 0.5);
-	resultRay[1] = hfar*((mouseY/sceneState.drawingBufferHeight) - 0.5);
+	resultRay[0] = wfar*((mouseX/sceneState.drawingBufferWidth[0]) - 0.5);
+	resultRay[1] = hfar*((mouseY/sceneState.drawingBufferHeight[0]) - 0.5);
 	resultRay[2] = - frustum_far;
 
 	/*

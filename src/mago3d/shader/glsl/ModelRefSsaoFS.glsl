@@ -711,6 +711,7 @@ void main()
 
 	lambertian = 1.0;
 	specular = 0.0;
+
 	
 	if(bApplyShadow)
 	{

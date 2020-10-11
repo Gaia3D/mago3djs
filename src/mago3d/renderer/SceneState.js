@@ -59,7 +59,8 @@ var SceneState = function(config)
 	this.specularColor = new Float32Array([0.7, 0.7, 0.7]);
 	this.ambientColor = new Float32Array([1.0, 1.0, 1.0]);
 	this.ssaoRadius = new Float32Array([0.15]);
-	this.shininessValue = new Float32Array([40.0]);
+	//this.shininessValue = new Float32Array([40.0]); // original.***
+	this.shininessValue = new Float32Array([10.0]);
 	this.ssaoNoiseScale2 = new Float32Array([1.0, 1.0]); // [this.depthFboNeo.width[0]/this.noiseTexture.width, this.depthFboNeo.height[0]/this.noiseTexture.height]
 	this.ssaoKernel16 = new Float32Array([ 0.33, 0.0, 0.85,
 		0.25, 0.3, 0.5,

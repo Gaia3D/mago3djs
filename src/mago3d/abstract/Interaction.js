@@ -29,7 +29,7 @@ Interaction.prototype.constructor = Interaction;
  */
 Interaction.prototype.setActive = function(active) 
 {
-	return abstract();
+	return throwAbstractError();
 };
 
 /**
@@ -47,7 +47,7 @@ Interaction.prototype.getActive = function()
  */
 Interaction.prototype.start = function() 
 {
-	return abstract();
+	return throwAbstractError();
 };
 
 /**
@@ -56,7 +56,7 @@ Interaction.prototype.start = function()
  */
 Interaction.prototype.init = function() 
 {
-	return abstract();
+	return throwAbstractError();
 };
 
 /**
@@ -65,7 +65,7 @@ Interaction.prototype.init = function()
  */
 Interaction.prototype.clear = function() 
 {
-	return abstract();
+	return throwAbstractError();
 };
 
 /**
@@ -75,5 +75,5 @@ Interaction.prototype.clear = function()
  */
 Interaction.prototype.handle = function(browserEvent) 
 {
-	return abstract();
+	return throwAbstractError();
 };

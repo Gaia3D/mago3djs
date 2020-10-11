@@ -77,7 +77,8 @@ TextureLayerFilter.prototype.getLegendImage = function(width, height)
 		for (var i=0;i<legendStep;i++)
 		{
 			level = i * offset;
-			var color = Color.getWhiteToBlueColor_byHeight(level, minAlt, maxAlt);
+			//var color = Color.getWhiteToBlueColor_byHeight(level, minAlt, maxAlt);
+			var color = Color.getWhiteToBlueColor_byHeight2(level, stepGradient);
 			grd.addColorStop((1 / legendStep) * i, 'rgba(' + color.r * 255 +', ' + color.g * 255 +', ' + color.b * 255 +', 1.0)');
 
 			/*if (color.r === 1 && color.g === 1 && color.b === 1)
@@ -95,8 +96,24 @@ TextureLayerFilter.prototype.getLegendImage = function(width, height)
 			ctx.fillStyle = 'rgba(102, 102, 102, 1.0)';
 			//			ctx.fillStyle = 'rgba(0, 0, 0, 1.0)';
 			ctx.textAlign = "center";
-			ctx.fillText(parseInt(stepGradient[i], 10),
-				((i+1) * canvasWidth * (1/legendStep))-20,
+			var lab = parseInt(stepGradient[i], 10);
+			var xOffset = 0;
+			if (i === legendStep-1)
+			{
+				xOffset = 20;
+			}
+			else 
+			{
+				xOffset = 40;
+			}
+			
+			if (legendStep > 11 && stepGradient[i].toString().length > 4 && i !== legendStep-1)
+			{
+				continue;
+			}
+
+			ctx.fillText(lab,
+				((i+1) * canvasWidth * (1/legendStep))-xOffset,
 				//					(i+1) * canvasWidth * (1/legendStep) - canvasWidth * (1/legendStep)/legendStep,
 				canvasHeight * 0.8 + 4
 				//					40

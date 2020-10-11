@@ -104,6 +104,24 @@ var TinTerrainManager = function(magoManager, options)
 };
 TinTerrainManager.INFO_FILE = 'terrainTiles-info.json';
 
+TinTerrainManager.prototype.deleteAll = function()
+{
+	// delete all terrains.***
+	this.maxTextureGuranteedDepth = 0;
+	if (this.tinTerrainsQuadTreeAsia)
+	{
+		this.tinTerrainsQuadTreeAsia.deleteObjects(this.magoManager);
+	}
+	if (this.tinTerrainsQuadTreeAmerica)
+	{
+		this.tinTerrainsQuadTreeAmerica.deleteObjects(this.magoManager);
+	}
+	if (this.tinTerrainQuadTreeMercator)
+	{
+		this.tinTerrainQuadTreeMercator.deleteObjects(this.magoManager);
+	}
+};
+
 TinTerrainManager.prototype.getImageryLayers = function()
 {
 	return this.imagerys;
@@ -396,20 +414,31 @@ TinTerrainManager.prototype.loadTerrainMeta = function()
 		var infoPath = that.terrainValue + TinTerrainManager.INFO_FILE;
 		var infoPromise = loadWithXhr(infoPath, undefined, undefined, 'json');
 
-		infoPromise.done(function(e)
+		infoPromise.then(function(e)
 		{
 			/**
 			 * TODO : INFO JSON VALIDATE 추가해야함.
 			 */
 			that.terrainTilesInfo = e;
 			that.terrainReady = true;
-		},
-		function(f)
+		});
+
+		infoPromise.catch(function() 
 		{
 			console.warn('Invalid or not exist ' + TinTerrainManager.INFO_FILE);
 			that.terrainType = CODE.magoEarthTerrainType.PLAIN;
 			that.terrainReady = true;
 		});
+		/*
+		infoPromise.done(function(e)
+		{
+			
+		},
+		function(f)
+		{
+			
+		});
+		*/
 	}
 };
 

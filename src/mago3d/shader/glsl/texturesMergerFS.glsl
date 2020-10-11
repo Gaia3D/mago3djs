@@ -351,9 +351,64 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
         if(currColor4.w > 0.0)
         {
             // decode the grayScale.***
-            float height = currColor4.g;
-            altitude = uMinMaxAltitudes.x + height * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);
 
+            float r = currColor4.r * 256.0;
+            float g = currColor4.g;
+            float b = currColor4.b;
+
+            float height = currColor4.r;
+            float maxHeight;
+            float minHeight;
+            float numDivs;
+            float increHeight;
+				
+				if(r < 0.0001)
+				{
+					// considering r=0.
+					minHeight = -2796.0;
+					maxHeight = -1000.0;
+					numDivs = 2.0;
+                    increHeight = (maxHeight - minHeight)/(numDivs);
+                    height = (256.0*g + b)/(128.0);
+
+                    //resultTextureColor.r = 1.0;
+                    //resultTextureColor.g = 0.0;
+                    //resultTextureColor.b = 0.0;
+                    //return;
+				}
+				else if(r > 0.5 && r < 1.5)
+				{
+					// considering r=1.
+					minHeight = -1000.0;
+					maxHeight = -200.0;
+					numDivs = 2.0;
+                    increHeight = (maxHeight - minHeight)/(numDivs);
+                    height = (256.0*g + b)/(128.0);
+
+                    //resultTextureColor.r = 0.0;
+                    //resultTextureColor.g = 1.0;
+                    //resultTextureColor.b = 0.0;
+                    //return;
+				}
+				else if(r > 1.5 && r < 2.5)
+				{
+					// considering r=2.
+					minHeight = -200.0;
+					maxHeight = 1.0;
+					numDivs = 123.0;
+                    increHeight = (maxHeight - minHeight)/(numDivs);
+                    height = (256.0*g + b)/(128.0);
+				}
+
+
+
+				//height = (256.0*g + b)/(128.0);
+                height = (256.0*g + b)/(numDivs);
+               // height = (256.0*g*increHeight + b*increHeight)- minHeight;
+            
+            //altitude = uMinMaxAltitudes.x + height * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);
+		    altitude = minHeight + height * (maxHeight -minHeight);
+            //altitude = height;
             if(altitude < 0.0)
             {
                 /*

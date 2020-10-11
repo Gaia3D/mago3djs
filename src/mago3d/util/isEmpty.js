@@ -5,7 +5,7 @@
  * @param {*} value The object.
  * @returns {Boolean} Returns true if the object is empty, returns false otherwise.
  */
-function isEmpty(value)
+var isEmpty = function (value)
 { 
 	if ( value === "" || value === null || value === undefined || ( value !== null && typeof value === "object" && !Object.keys(value).length ) )
 	{ 

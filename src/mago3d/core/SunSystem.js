@@ -246,7 +246,7 @@ SunSystem.prototype.updateSun = function(magoManager, options)
 	var bFrustumFar = totalBoundingFrustum.bFrustumFar;
 	
 	var frustum = camera.getFrustum(0);
-	var tangentOfHalfFovy = frustum.tangentOfHalfFovy;
+	var tangentOfHalfFovy = frustum.tangentOfHalfFovy[0];
 	
 	var minDist = bFrustumNear;
 	if (minDist < 0.0)

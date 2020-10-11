@@ -104,5 +104,5 @@ Object.defineProperties(TextureLayer.prototype, {
  */
 TextureLayer.prototype.getUrl = function() 
 {
-	return abstract();
+	return throwAbstractError();
 };
