@@ -1504,7 +1504,7 @@ MagoManager.prototype.doRenderEdgeDetect = function(frustumVolumenObject)
 	}
 
 	// Render fast antiAlias,************************************************************************************************************
-	if (this.isCesiumGlobe())
+	/*if (this.isCesiumGlobe())
 	{
 		var scene = this.scene;
 		scene._context._currentFramebuffer._bind();
@@ -1515,7 +1515,7 @@ MagoManager.prototype.doRenderEdgeDetect = function(frustumVolumenObject)
 		}
 	}
 	this.renderer.renderFastAntiAlias(gl);
-	
+	*/
 	
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
 		
@@ -1566,15 +1566,10 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 
 	this.depthFboNeo.bind(); 
 	
-	//if (this.isFarestFrustum())
-	{
-		gl.clearColor(0, 0, 0, 1);
-		gl.clearDepth(1);
-		//gl.clearDepth(0);
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-		gl.clearStencil(0); // provisionally here.***
-	}
-	
+	gl.clearColor(0, 0, 0, 1);
+	gl.clearDepth(1);
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	gl.clearStencil(0); // provisionally here.***
 	
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
 	this.renderer.renderGeometry(gl, renderType, this.visibleObjControlerNodes);
@@ -1584,16 +1579,34 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	this.swapRenderingFase();
 
 	// 1.1) ssao and other effects from depthBuffer render.*****************************************************************************
+	this.postFxShadersManager.useProgram(null); // init current bind shader.***
 	this.renderer.renderSsaoFromDepth(gl);
+
+	// prev 2) ready to color frame buffer
+	this.postFxShadersManager.useProgram(null); // init current bind shader.***
+	if (this.isCesiumGlobe())
+	{
+		var scene = this.scene;
+		if(scene && scene._context && scene._context._currentFramebuffer) {
+			scene._context._currentFramebuffer._bind();
+
+			if (this.currentFrustumIdx < 2) 
+			{
+				renderType = 3;
+				this.renderer.renderTerrainShadow(gl, renderType, this.visibleObjControlerNodes);
+			}
+		}
+	}
 
 	// 2) color render.*****************************************************************************************************************
 	// 2.1) Render terrain shadows.*****************************************************************************************************
 	// Now render the geomatry.
-
 	renderType = 1;
 	this.renderType = 1;
 	this.renderer.renderGeometry(gl, renderType, this.visibleObjControlerNodes);
-	
+
+	// ex) webgl render basic pipeline, tutorial.
+	//this.renderBasicGl_test();
 	if (this.currentFrustumIdx === 0) 
 	{
 		this.renderCluster();
@@ -1661,10 +1674,10 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	//this.renderFilter();
 
 	// Test.***
-	if(!this.test_shader)
-	{
-		this.TEST__shader();
-	}
+	//if(!this.test_shader)
+	//{
+	//	this.TEST__shader();
+	//}
 };
 
 /**
@@ -8175,3 +8188,42 @@ MagoManager.prototype.checkCollision = function (position, direction)
 
 	return true;
 };
+MagoManager.prototype.renderBasicGl_test = function()
+{
+	var gl = this.getGl();
+	if(!this.testShader) 
+	{
+		var fragCode =
+            'void main(void) {' +
+               'gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);' +
+			'}';
+			var vertCode =
+            'attribute vec3 coordinates;' +
+            'void main(void) {' +
+               ' gl_Position = vec4(coordinates, 1.0);' +
+            '}';
+
+	// 5) Test Quad shader.****************************************************************************************
+	
+	var shaderName = "renderBasicGl_test"; // used by temperatura layer.***
+	var shader = this.postFxShadersManager.createShaderProgram(gl, vertCode, fragCode, shaderName, this);
+
+	this.testShader = shader;
+	}
+	
+
+	var positions = new Float32Array([0.0,0.0,0,
+									0.5,0.5,0,
+									1.0,1.0,0]);
+	var vboCacheKey = new VBOVertexIdxCacheKey();
+	vboCacheKey.setDataArrayPos(positions, this.vboMemoryManager,3);
+	vboCacheKey.vboBufferPos.isReady(gl, this.vboMemoryManager);
+	
+	this.testShader.useProgram();
+	//vboCacheKey.bindDataPosition(shader,this.vboMemoryManager);
+	gl.bindBuffer(vboCacheKey.vboBufferPos.dataTarget, vboCacheKey.vboBufferPos.key);
+	gl.vertexAttribPointer(0, vboCacheKey.vboBufferPos.dataDimensions, vboCacheKey.vboBufferPos.dataGlType, vboCacheKey.vboBufferPos.normalized, vboCacheKey.vboBufferPos.dataStride, vboCacheKey.vboBufferPos.dataOffSet);
+	gl.disable(gl.CULL_FACE);
+	gl.drawArrays(gl.LINE_STRIP, 0, vboCacheKey.vertexCount);
+
+}

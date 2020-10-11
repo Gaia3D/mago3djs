@@ -1,3 +1,4 @@
+
 #ifdef GL_ES
     precision highp float;
 #endif
@@ -292,7 +293,7 @@ bool isPointInsideLimitationConvexPolygon(in vec2 point2d)
 	// Check polygons.***
 	int startIdx = -1;
 	int endIdx = -1;
-	for(int i=0; i<64; i++)
+	for(int i=0; i<32; i++)
 	{
 		startIdx = clippingConvexPolygon2dPointsIndices[2*i];  // 0
 		endIdx = clippingConvexPolygon2dPointsIndices[2*i+1];	 // 3
@@ -304,7 +305,7 @@ bool isPointInsideLimitationConvexPolygon(in vec2 point2d)
 		
 		isInside = true;
 		vec2 pointStart = clippingPolygon2dPoints[0];
-		for(int j=0; j<64; j++)
+		for(int j=0; j<32; j++)
 		{
 			if(j > endIdx)
 			break;
@@ -710,7 +711,6 @@ void main()
 
 	lambertian = 1.0;
 	specular = 0.0;
-
 	
 	if(bApplyShadow)
 	{
