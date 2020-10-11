@@ -355,7 +355,7 @@ var MagoManager = function(config)
 	this._needValidHeightNodeArray = [];
 	//height 변경 적용필요한 native 목록
 	this._needValidHeightNativeArray = [];
-	this._changeCanvasSizeEvent = new Event('changeCanvasSize');
+	this._changeCanvasSizeEvent = new CustomEvent('changeCanvasSize');
 };
 MagoManager.prototype = Object.create(Emitter.prototype);
 MagoManager.prototype.constructor = MagoManager;
@@ -1232,7 +1232,7 @@ MagoManager.prototype.renderToSelectionBuffer = function()
 	var gl = this.getGl();
 	
 	if (this.selectionFbo === undefined) 
-	{ this.selectionFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
+	{ this.selectionFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
 	
 	if (this.isCameraMoved || this.bPicking) // 
 	{
@@ -1284,7 +1284,7 @@ MagoManager.prototype.managePickingProcess = function()
 	var gl = this.getGl();
 	
 	if (this.selectionFbo === undefined) 
-	{ this.selectionFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
+	{ this.selectionFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
 	
 	
 	if (this.currentFrustumIdx === 0)
@@ -1398,7 +1398,7 @@ MagoManager.prototype.getSilhouetteDepthFbo = function()
 	// Provisional function.***
 	var gl = this.getGl();
 	
-	if (this.silhouetteDepthFboNeo === undefined) { this.silhouetteDepthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
+	if (this.silhouetteDepthFboNeo === undefined) { this.silhouetteDepthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
 	
 	return this.silhouetteDepthFboNeo;
 };
@@ -1424,11 +1424,11 @@ MagoManager.prototype.doRenderEdgeDetect = function(frustumVolumenObject)
 	*/
 	
 	
-	if (frustumVolumenObject.depthFbo === undefined) { frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
-	if (frustumVolumenObject.colorFbo === undefined) { frustumVolumenObject.colorFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
-	//if (this.depthFboNeo === undefined) { this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
+	if (frustumVolumenObject.depthFbo === undefined) { frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
+	if (frustumVolumenObject.colorFbo === undefined) { frustumVolumenObject.colorFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
+	//if (this.depthFboNeo === undefined) { this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
 	//if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, new Float32Array([this.sceneState.drawingBufferWidth[0]/2.0]), new Float32Array([this.sceneState.drawingBufferHeight/2.0]), {matchCanvasSize : true}); }
-	if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
+	if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
 	//if (this.colorFbo === undefined) { this.colorFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
 
 
@@ -1554,10 +1554,10 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	*/
 	
 	
-	if (frustumVolumenObject.depthFbo === undefined) { frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
+	if (frustumVolumenObject.depthFbo === undefined) { frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
 	//if (this.depthFboNeo === undefined) { this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
 	//if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, new Float32Array([this.sceneState.drawingBufferWidth[0]/2.0]), new Float32Array([this.sceneState.drawingBufferHeight/2.0]), {matchCanvasSize : true}); }
-	if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
+	if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
 	//if (this.colorFbo === undefined) { this.colorFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
 
 
@@ -1584,29 +1584,12 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	this.swapRenderingFase();
 
 	// 1.1) ssao and other effects from depthBuffer render.*****************************************************************************
-
-	this.postFxShadersManager.useProgram(null); // init current bind shader.***
-//>>>>>>> feature/seaforest
 	this.renderer.renderSsaoFromDepth(gl);
 
 	// 2) color render.*****************************************************************************************************************
 	// 2.1) Render terrain shadows.*****************************************************************************************************
 	// Now render the geomatry.
 
-	this.postFxShadersManager.useProgram(null); // init current bind shader.***
-//>>>>>>> feature/seaforest
-	if (this.isCesiumGlobe())
-	{
-		var scene = this.scene;
-		scene._context._currentFramebuffer._bind();
-		if (this.currentFrustumIdx < 2) 
-		{
-			renderType = 3;
-			this.renderer.renderTerrainShadow(gl, renderType, this.visibleObjControlerNodes);
-		}
-	}
-	
-	
 	renderType = 1;
 	this.renderType = 1;
 	this.renderer.renderGeometry(gl, renderType, this.visibleObjControlerNodes);
@@ -2249,7 +2232,7 @@ MagoManager.prototype.cameraMoved = function()
 	{ 
 		if (this.sceneState.gl) 
 		{
-			this.selectionFbo = new FBO(this.sceneState.gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); 
+			this.selectionFbo = new FBO(this.sceneState.gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); 
 		}
 	}
 	if (this.selectionFbo)
@@ -4682,7 +4665,7 @@ MagoManager.prototype.test_renderDepth_objectSelected = function(currObjectSelec
 	
 	if (this.depthFboAux === undefined)
 	{
-		this.depthFboAux = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true});
+		this.depthFboAux = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true});
 	}
 
 	this.depthFboAux.bind(); 

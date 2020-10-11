@@ -291,8 +291,8 @@ CesiumViewerInit.prototype.initMagoManager = function()
 	var serverPolicy = this.policy;
 	var viewer = this.viewer;
 	
-	this.viewer.scene.magoManager = new MagoManager(this.config);
-	this.viewer.scene.magoManager.sceneState.textureFlipYAxis = false;
+	//this.viewer.scene.magoManager = new MagoManager(this.config);
+	//this.viewer.scene.magoManager.sceneState.textureFlipYAxis = false;
 
 	this.viewer.camera.frustum.fov = Cesium.Math.PI_OVER_THREE;
 	if (serverPolicy.initDefaultFov > 0) 
@@ -302,12 +302,20 @@ CesiumViewerInit.prototype.initMagoManager = function()
 
 	var gl = this.viewer.scene.context._gl;
 
-	this.viewer.scene.magoManager.postFxShadersManager.gl = gl;
-	this.viewer.scene.magoManager.postFxShadersManager.createDefaultShaders(gl); // A1-OLD.***
-	this.viewer.scene.magoManager.createDefaultShaders(gl);// A1-Use this.***
-	this.viewer.scene.magoManager.scene = this.viewer.scene;
+	//this.viewer.scene.
+	//this.viewer.scene.
+	//this.viewer.scene.// A1-OLD.***
+	//this.viewer.scene.// A1-Use this.***
 
-	var magoManager = this.viewer.scene.magoManager;
+	var magoManager = new MagoManager(this.config);
+	magoManager.sceneState.textureFlipYAxis = false;
+	magoManager.postFxShadersManager.gl = gl;
+	magoManager.scene = this.viewer.scene;
+	magoManager.postFxShadersManager.createDefaultShaders(gl); 
+	magoManager.createDefaultShaders(gl);
+	
+	this.viewer.scene.magoManager = magoManager;
+
 	this.magoManager = magoManager;
 	scene = this.viewer.scene;
 	

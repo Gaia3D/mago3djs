@@ -48,7 +48,7 @@ var SelectionManager = function(magoManager)
 	// Parameter that indicates that we are rendering selected data structure.
 	this.parentSelected = false;
 
-	this.selectionFbo = new FBO(this.magoManager.getGl(), this.magoManager.sceneState.drawingBufferWidth, this.magoManager.sceneState.drawingBufferHeight, {matchCanvasSize: true});
+	this.selectionFbo = new FBO(this.magoManager.getGl(), this.magoManager.sceneState.drawingBufferWidth[0], this.magoManager.sceneState.drawingBufferHeight[0], {matchCanvasSize: true});
 };
 
 /**

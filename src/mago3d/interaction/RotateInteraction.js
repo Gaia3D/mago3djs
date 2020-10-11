@@ -99,7 +99,7 @@ RotateInteraction.prototype.handleDownEvent = function(browserEvent)
 	var selectManager = manager.selectionManager;
 
 	if (manager.selectionFbo === undefined) 
-	{ manager.selectionFbo = new FBO(gl, manager.sceneState.drawingBufferWidth, manager.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
+	{ manager.selectionFbo = new FBO(gl, manager.sceneState.drawingBufferWidth[0], manager.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
 
 	var gl = manager.getGl();
 	var clickScreenCoord = browserEvent.point.screenCoordinate;

@@ -778,15 +778,6 @@ void main()
 			textureColor *= vec4(textureColor.r*scalarProd_2d, textureColor.g*scalarProd_2d, textureColor.b, textureColor.a);
 			// End Something like to HillShade.---------------------------------------------------------------------------------
 			
-            // Something like to HillShade .*********************************************************************************
-            vec3 lightDir = normalize(vec3(1.0, 1.0, 0.0));
-            float scalarProd_2d = dot(lightDir, normalFromDepth);
-            
-            scalarProd_2d /= 2.0;
-            scalarProd_2d += 0.8;
-
-            //scalarProd_2d *= scalarProd_2d;
-            textureColor *= vec4(textureColor.r*scalarProd_2d, textureColor.g*scalarProd_2d, textureColor.b, textureColor.a);
             // End Something like to HillShade.---------------------------------------------------------------------------------
 			
 			// End test drawing grid.---

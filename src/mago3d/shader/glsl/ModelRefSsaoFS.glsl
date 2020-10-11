@@ -1,4 +1,3 @@
-
 #ifdef GL_ES
     precision highp float;
 #endif
@@ -63,8 +62,8 @@ uniform bool bApplyClippingPlanes; // old. deprecated.***
 uniform int clippingType; // 0= no clipping. 1= clipping by planes. 2= clipping by localCoord polyline. 3= clip by heights, 4= clip by (2, 3)
 uniform int clippingPlanesCount;
 uniform vec4 clippingPlanes[6];
-uniform vec2 clippingPolygon2dPoints[512];
-uniform int clippingConvexPolygon2dPointsIndices[256];
+uniform vec2 clippingPolygon2dPoints[64];
+uniform int clippingConvexPolygon2dPointsIndices[64];
 uniform vec4 limitationInfringedColor4;
 uniform vec2 limitationHeights;
 
@@ -293,7 +292,7 @@ bool isPointInsideLimitationConvexPolygon(in vec2 point2d)
 	// Check polygons.***
 	int startIdx = -1;
 	int endIdx = -1;
-	for(int i=0; i<128; i++)
+	for(int i=0; i<64; i++)
 	{
 		startIdx = clippingConvexPolygon2dPointsIndices[2*i];  // 0
 		endIdx = clippingConvexPolygon2dPointsIndices[2*i+1];	 // 3
@@ -305,7 +304,7 @@ bool isPointInsideLimitationConvexPolygon(in vec2 point2d)
 		
 		isInside = true;
 		vec2 pointStart = clippingPolygon2dPoints[0];
-		for(int j=0; j<128; j++)
+		for(int j=0; j<64; j++)
 		{
 			if(j > endIdx)
 			break;
