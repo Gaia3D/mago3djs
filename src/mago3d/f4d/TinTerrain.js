@@ -1606,12 +1606,12 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 				gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
 				if (bApplySsao)
 				{
-					gl.uniform1f(currentShader.aspectRatio_loc, magoManager.sceneState.camera.frustum.aspectRatio);
-					gl.uniform1f(currentShader.screenWidth_loc, magoManager.sceneState.drawingBufferWidth);	
+					gl.uniform1f(currentShader.aspectRatio_loc, magoManager.sceneState.camera.frustum.aspectRatio[0]);
+					gl.uniform1f(currentShader.screenWidth_loc, magoManager.sceneState.drawingBufferWidth[0]);	
 
 					// bind depthTex & noiseTex. channels 2 & 3.
 					var noiseTexture = magoManager.texturesStore.getNoiseTexture4x4();
-					gl.uniform2fv(currentShader.noiseScale2_loc, [magoManager.depthFboNeo.width/noiseTexture.width, magoManager.depthFboNeo.height/noiseTexture.height]);
+					gl.uniform2fv(currentShader.noiseScale2_loc, [magoManager.depthFboNeo.width[0]/noiseTexture.width[0], magoManager.depthFboNeo.height[0]/noiseTexture.height[0]]);
 					gl.uniform3fv(currentShader.kernel16_loc, magoManager.sceneState.ssaoKernel16);
 
 					gl.activeTexture(gl.TEXTURE2);
@@ -1648,10 +1648,10 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 		var renderWireframe = false;
 		var vboMemManager = magoManager.vboMemoryManager;
 
-		if (this.terrainPositionHIGH === undefined)
-		{
-			//return;
-		}
+		//if (this.terrainPositionHIGH === undefined)
+		//{
+		//return;
+		//}
 			
 		gl.uniform3fv(currentShader.buildingPosHIGH_loc, this.terrainPositionHIGH);
 		gl.uniform3fv(currentShader.buildingPosLOW_loc, this.terrainPositionLOW);
@@ -1753,20 +1753,7 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 				gl.uniform4fv(currentShader.oneColor4_loc, [0.0, 0.9, 0.9, 1.0]);
 					
 				gl.drawElements(gl.LINES, indicesCount-1, gl.UNSIGNED_SHORT, 0); 
-					
-				//if (this.tinTerrainManager.getTerrainType() === 0)
-				//{
-				//	gl.drawElements(gl.LINE_STRIP, indicesCount-1, gl.UNSIGNED_SHORT, 0); 
-				//}
-				//else 
-				//{
-				//var trianglesCount = indicesCount;
-				//for (var i=0; i<trianglesCount-1; i++)
-				//{
-				//	gl.drawElements(gl.LINE_LOOP, 3, gl.UNSIGNED_SHORT, i*3); 
-				//}
-				//}
-					
+
 				this.drawTerrainName(magoManager);
 			}
 			//this.drawTerrainName(magoManager); // test. delete.
@@ -1774,6 +1761,9 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 		// End test.--------------------------------------------------------------------------------------
 			
 		// Render skirt if exist.
+
+		//if (this.depth === 8 && this.X === 217 && this.Y === 99)
+		//{ var hola = 0; }
 			
 		var vboKey = this.vboKeyContainer.vboCacheKeysArray[1]; // the idx = 0 is the terrain. idx = 1 is the skirt.
 		if (vboKey === undefined)
@@ -2804,6 +2794,8 @@ TinTerrain.prototype.makeVbo = function(vboMemManager)
 		vboKey.setDataArrayCustom(this.altArray, vboMemManager, dimensions, name, attribLoc);
 	}
 	*/
+
+	
 
 	// Make skirt.
 	if (this.skirtCartesiansArray === undefined)
