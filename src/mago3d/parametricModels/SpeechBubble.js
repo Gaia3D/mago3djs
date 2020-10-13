@@ -58,6 +58,32 @@ SpeechBubble.prototype.makeDefault = function(imageSize)
 };
 
 /**
+ * 
+ * @param {SpeechBubbleOption} option 
+ * @param {MagoManager} magoManager 
+ */
+SpeechBubble.getImage = function(options, magoManager)
+{
+	if (!magoManager.speechBubble) 
+	{
+		magoManager.speechBubble = new Mago3D.SpeechBubble();
+	}
+
+	var sb = magoManager.speechBubble;
+
+	if (!options)
+	{ return undefined; }
+
+	var sbWidht = options.width;
+	var sbHeight = options.height;
+	var commentTextOption = options.commentTextOption;
+	var bubbleColor = options.bubbleColor;
+	var bubbleHexColor = Color.getHexCode(bubbleColor.r, bubbleColor.g, bubbleColor.b);
+
+	return sb.getPng([sbWidht, sbHeight], bubbleHexColor, commentTextOption);
+}
+
+/**
  * @param {Array<number>} imageSize
  * @param {Color} color
  * @param {object} textOption
@@ -127,7 +153,7 @@ SpeechBubble.prototype.getPng = function (imageSize, color, textOption)
 			//			ctx.font = fontPixel + "px " + fontType;
 			ctx.fillStyle = fontColor;
 			ctx.strokeStyle = fontBorderColor;
-			ctx.textAlign = "start";
+			ctx.textAlign = "center";
 
 			var splitText = textValue.split('\n');
 			var tlen = splitText.length;

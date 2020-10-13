@@ -1938,8 +1938,9 @@ MagoManager.prototype.validateHeight = function(frustumObject)
 					for (var k=0, slen=samplePositions.length;k<slen;k++) 
 					{
 						var n = nArray[k];
-						var cp = n.getCurrentGeoLocationData().geographicCoord;
-						n.changeLocationAndRotation(cp.latitude, cp.longitude, n.caculateHeightByReference(samplePositions[k].height), 0, 0, 0, obj.mm);
+						var currentGeoLocationData = n.getCurrentGeoLocationData();
+						var cp = currentGeoLocationData.geographicCoord;
+						n.changeLocationAndRotation(cp.latitude, cp.longitude, n.caculateHeightByReference(samplePositions[k].height), currentGeoLocationData.heading, currentGeoLocationData.pitch, currentGeoLocationData.roll, obj.mm);
 					}
 				}
 			});
