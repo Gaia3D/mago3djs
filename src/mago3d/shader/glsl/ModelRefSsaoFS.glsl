@@ -529,6 +529,7 @@ void main()
 	//vec3 normalFromDepth = normal_from_depth(linearDepth, screenPos); // normal from depthTex.***
 	//normal2 = normalFromDepth;
 	//float edgeOccl = 1.0;
+	/*
 	if(bApplySsao)
 	{   
 		//if(linearDepth<0.996 && linearDepth>0.001005)
@@ -539,19 +540,18 @@ void main()
 			
 			//Test.********************************************************************************************
 			// NDC : the center of the screen is 0.0.0.***
-			float depthRange_near = 0.0;
-			float depthRange_far = 1.0;
-			float x_ndc = 2.0 * screenPos.x - 1.0;
-			float y_ndc = 2.0 * screenPos.y - 1.0;
-			float z_ndc = (2.0 * linearDepth - depthRange_near - depthRange_far) / (depthRange_far - depthRange_near);
+			////float depthRange_near = 0.0;
+			////float depthRange_far = 1.0;
+			////float x_ndc = 2.0 * screenPos.x - 1.0;
+			////float y_ndc = 2.0 * screenPos.y - 1.0;
+			////float z_ndc = (2.0 * linearDepth - depthRange_near - depthRange_far) / (depthRange_far - depthRange_near);
 			
-			vec4 viewPosH = projectionMatrixInv * vec4(x_ndc, y_ndc, z_ndc, 1.0);
-			vec3 posCC = viewPosH.xyz/viewPosH.w;
-			//vec4 posWC = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0) + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 1.0);
-			vec3 origin = vec3(posCC.xyz);  
+			////vec4 viewPosH = projectionMatrixInv * vec4(x_ndc, y_ndc, z_ndc, 1.0);
+			////vec3 posCC = viewPosH.xyz/viewPosH.w;
+			////vec3 origin = vec3(posCC.xyz);  
 			// EndTest.----------------------------------------------------------------------------------------
 
-			//vec3 origin = ray * linearDepth;  // original.***
+			vec3 origin = ray * linearDepth;  // original.***
 			float distToCam = -origin.z*0.01;
 			if(distToCam < 1.0)
 			distToCam = 1.0;
@@ -586,20 +586,20 @@ void main()
 
 				float depthBufferValue = getDepth(offset.xy);
 				
-				/*
-				if(depthBufferValue > 0.00391 && depthBufferValue < 0.00393)
-				{
-					if (depthBufferValue < sampleDepth-tolerance*1000.0)
-					{
-						occlusion +=  0.5;
-					}
-					
-					continue;
-				}			
-				*/
+				
+				////if(depthBufferValue > 0.00391 && depthBufferValue < 0.00393)
+				////{
+				////	if (depthBufferValue < sampleDepth-tolerance*1000.0)
+				////	{
+				////		occlusion +=  0.5;
+				////	}
+				////	
+				////	continue;
+				////}			
+				
 				if (depthBufferValue < sampleDepth-tolerance)
 				{
-					occlusion +=  1.0/distToCam;
+					occlusion +=  1.0;
 				}
 			} 
 		}
@@ -633,6 +633,9 @@ void main()
 
 		
 	}
+	*/
+
+	occlusion = 1.0;
 
 	vec4 textureColor;
     if(colorType == 2)

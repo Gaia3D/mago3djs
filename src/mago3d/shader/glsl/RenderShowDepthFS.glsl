@@ -7,6 +7,11 @@ precision highp float;
 #extension GL_EXT_frag_depth : enable
 #endif
 
+#define %USE_MULTI_RENDER_TARGET%
+#ifdef USE_MULTI_RENDER_TARGET
+#extension GL_EXT_draw_buffers : require
+#endif
+
 uniform sampler2D diffuseTex; // used only if texture is PNG, that has pixels with alpha = 0.0.***
 uniform bool bHasTexture; // indicates if texture is PNG, that has pixels with alpha = 0.0.***
 varying vec2 vTexCoord; // used only if texture is PNG, that has pixels with alpha = 0.0.***
@@ -20,11 +25,14 @@ uniform bool bApplyClippingPlanes;
 uniform int clippingPlanesCount;
 uniform vec4 clippingPlanes[6];
 uniform bool bUseLogarithmicDepth;
+uniform int uFrustumIdx;
 
 varying float depth;  
 varying vec3 vertexPos;
+varying vec3 vNormal;
 varying float flogz;
 varying float Fcoef_half;
+varying float vFrustumIdx;
 
 vec4 packDepth(const in float depth)
 {
@@ -35,6 +43,16 @@ vec4 packDepth(const in float depth)
 	vec4 res = mod(depth * bit_shift * vec4(255), vec4(256) ) / vec4(255); // Is better.
     res -= res.xxyz * bit_mask;
     return res;  
+}
+
+vec3 encodeNormal(in vec3 normal)
+{
+	return normal*0.5 + 0.5;
+}
+
+vec3 decodeNormal(in vec3 normal)
+{
+	return normal * 2.0 - 1.0;
 }
 /*
 vec4 packDepth_A( float v ) {
@@ -104,9 +122,28 @@ void main()
 		if(textureColor.a < 0.4)
 		discard;
 	}
+	
 
 	if(!bUseLogarithmicDepth)
+	{
     	gl_FragData[0] = packDepth(-depth);
+	}
+
+	float frustumIdx = 0.0;
+	if(uFrustumIdx == 0)
+	frustumIdx = 0.05;
+	else if(uFrustumIdx == 1)
+	frustumIdx = 0.15;
+	else if(uFrustumIdx == 2)
+	frustumIdx = 0.25;
+	else if(uFrustumIdx == 3)
+	frustumIdx = 0.35;
+
+	#ifdef USE_MULTI_RENDER_TARGET
+	vec3 encodedNormal = encodeNormal(vNormal);
+	gl_FragData[1] = vec4(encodedNormal, frustumIdx); // save normal.***
+	#endif
+	
 
 	#ifdef USE_LOGARITHMIC_DEPTH
 	if(bUseLogarithmicDepth)

@@ -12,6 +12,8 @@ var FrustumVolumeControl = function()
 	}
 	
 	this.frustumVolumensMap = {};
+	var mexFrustumsCount = 4;
+	this.nearFarArray = new Float32Array(2*mexFrustumsCount);
 };
 
 /**

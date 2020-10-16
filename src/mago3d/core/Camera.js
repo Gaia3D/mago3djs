@@ -470,7 +470,6 @@ Camera.prototype.bindUniforms = function(gl, shader)
 {
 	// Bind frustum near & far. far.
 	var frustum = this.frustum;
-	//var frustum = this.bigFrustum;
 	gl.uniform1f(shader.frustumNear_loc, frustum.near[0]);
 	gl.uniform1f(shader.frustumFar_loc, frustum.far[0]);
 };

@@ -120,6 +120,7 @@ void main()
 		vec3 currSunPosLOW;
 		vec3 currSunPosHIGH;
 		mat4 currSunMatrix;
+
 		if(sunIdx == 0)
 		{
 			currSunPosLOW = sunPosLOW[0];
@@ -142,7 +143,7 @@ void main()
 		vec4 posRelToLightAux = currSunMatrix * pos4Sun;
 		
 		// now, check if "posRelToLightAux" is inside of the lightVolume (inside of the depthTexture of the light).
-		vec3 posRelToLightNDC = posRelToLightAux.xyz / posRelToLightAux.w;
+		//vec3 posRelToLightNDC = posRelToLightAux.xyz / posRelToLightAux.w;
 		vPosRelToLight = posRelToLightAux;
 	}
 	
@@ -197,7 +198,6 @@ void main()
 			float newT = minT + texCoord.y * scaleT;
 
 			vTexCoord = vec2(newS, newT);
-			
 			
 
 			/*

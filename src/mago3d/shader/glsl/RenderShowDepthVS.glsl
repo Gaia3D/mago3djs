@@ -1,4 +1,5 @@
 attribute vec3 position;
+attribute vec3 normal;
 attribute vec2 texCoord;
 
 uniform mat4 buildingRotMatrix; 
@@ -6,6 +7,7 @@ uniform mat4 modelViewMatrix;
 uniform mat4 modelViewMatrixRelToEye; 
 uniform mat4 RefTransfMatrix;
 uniform mat4 ModelViewProjectionMatrixRelToEye;
+uniform mat4 normalMatrix4;
 uniform vec3 buildingPosHIGH;
 uniform vec3 buildingPosLOW;
 uniform vec3 scaleLC;
@@ -27,23 +29,29 @@ varying float Fcoef_half;
 varying float depth;
 varying vec3 vertexPos;
 varying vec2 vTexCoord; // used only if texture is PNG, that has pixels with alpha = 0.0.***
+varying vec3 vNormal;
   
 void main()
 {	
 	vec4 scaledPos = vec4(position.x * scaleLC.x, position.y * scaleLC.y, position.z * scaleLC.z, 1.0);
 	vec4 rotatedPos;
 
+	mat3 currentTMat;
+
 	if(refMatrixType == 0)
 	{
 		rotatedPos = buildingRotMatrix * vec4(scaledPos.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);
+		currentTMat = mat3(buildingRotMatrix);
 	}
 	else if(refMatrixType == 1)
 	{
 		rotatedPos = buildingRotMatrix * vec4(scaledPos.xyz + refTranslationVec.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);
+		currentTMat = mat3(buildingRotMatrix);
 	}
 	else if(refMatrixType == 2)
 	{
 		rotatedPos = RefTransfMatrix * vec4(scaledPos.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);
+		currentTMat = mat3(RefTransfMatrix);
 	}
 
     vec3 objPosHigh = buildingPosHIGH;
@@ -56,6 +64,10 @@ void main()
 	vec4 orthoPos = modelViewMatrixRelToEye * pos4;
     depth = orthoPos.z/far; // original.***
 	
+	// Calculate normalCC.***
+	vec3 rotatedNormal = currentTMat * normal;
+	vNormal = normalize((normalMatrix4 * vec4(rotatedNormal, 1.0)).xyz); // original.***
+	//vNormal = normalize((ModelViewProjectionMatrixRelToEye * vec4(rotatedNormal, 1.0)).xyz); // test.***
 
 	/*
 	float z_ndc = (2.0 * z_window - depthRange_near - depthRange_far) / (depthRange_far - depthRange_near);

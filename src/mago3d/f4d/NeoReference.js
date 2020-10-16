@@ -327,6 +327,10 @@ NeoReference.prototype.solveReferencePngTextureForDepthRender = function(magoMan
 
 		return true;
 	}
+	else{
+		gl.uniform1i(shader.bHasTexture_loc , false);
+		return false;
+	}
 	return false;
 };
 
@@ -683,6 +687,15 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 
 		if (renderType === 0)
 		{
+			// Normals.
+			if(shader.normal3_loc >= 0) // check if shader has normal attributte.***
+			{
+				// There are depth renders that needs normal or not.
+				// General depth render needs normals if MRT, but sunDepthOfView-shader no has normal attributtes.
+				if (!vboKey.bindDataNormal(shader, magoManager.vboMemoryManager))
+				{ return false; }
+			}
+
 			if(bDepthRenderWithTexture && neoReference.vBOVertexIdxCacheKeysContainer)
 			{
 				shader.enableVertexAttribArray(shader.texCoord2_loc); 

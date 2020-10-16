@@ -5,6 +5,8 @@
 uniform sampler2D depthTex;
 uniform sampler2D shadowMapTex;
 uniform sampler2D shadowMapTex2;
+uniform sampler2D ssaoTex;
+uniform sampler2D normalTex;
 uniform mat4 modelViewMatrixRelToEyeInv;
 uniform mat4 projectionMatrixInv;
 uniform vec3 encodedCameraPositionMCHigh;
@@ -18,13 +20,15 @@ uniform float aspectRatio;
 uniform bool bApplyShadow;
 uniform bool bSilhouette;
 uniform bool bFxaa;
+uniform bool bApplySsao;
 
 uniform mat4 sunMatrix[2]; 
 uniform vec3 sunPosHIGH[2];
 uniform vec3 sunPosLOW[2];
 uniform int sunIdx;
 uniform float screenWidth;    
-uniform float screenHeight;   
+uniform float screenHeight;  
+  
 
 
 float unpackDepth(vec4 packedDepth)
@@ -60,6 +64,17 @@ float UnpackDepth32( in vec4 pack )
 	float depth = dot( pack, vec4(1.0, 0.00390625, 0.000015258789, 0.000000059605) );
     return depth * 1.000000059605;// 1.000000059605 = (16777216.0) / (16777216.0 - 1.0);
 }  
+
+vec4 decodeNormal(in vec4 normal)
+{
+	return vec4(normal.xyz * 2.0 - 1.0, normal.w);
+}
+
+vec4 getNormal(in vec2 texCoord)
+{
+    vec4 encodedNormal = texture2D(normalTex, texCoord);
+    return decodeNormal(encodedNormal);
+}
 
 float getDepthShadowMap(vec2 coord)
 {
@@ -161,6 +176,8 @@ void make_kernel(inout vec4 n[9], vec2 coord)
 
 void main()
 {
+	vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
+
 	// 1rst, check if this is silhouette rendering.
 	if(bSilhouette)
 	{
@@ -173,7 +190,6 @@ void main()
 		float tolerance = 0.9963;
 		tolerance = 0.9963;
 		
-		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight); // centerPos.
 		vec2 screenPos_LD = vec2(screenPos.x - pixelSizeW*2.5, screenPos.y - pixelSizeH*2.5); // left-down corner.
 		
 		for(int w = 0; w<5; w++)
@@ -215,7 +231,6 @@ void main()
 	{
 		// the sun lights count are 2.
 		// 1rst, calculate the pixelPosWC.
-		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
 		float z_window  = unpackDepth(texture2D(depthTex, screenPos.xy)); // z_window  is [0.0, 1.0] range depth.
 		if(z_window < 0.001)
 		discard;
@@ -254,13 +269,90 @@ void main()
 		
 	}
 
+	if(bApplySsao)
+	{
+		//ssaoFromDepthTex
+		float pixelSize_x = 1.0/screenWidth;
+		float pixelSize_y = 1.0/screenHeight;
+		vec4 occlFromDepth = vec4(0.0);
+		for(int i=0; i<4; i++)
+		{
+			for(int j=0; j<4; j++)
+			{
+				vec2 texCoord = vec2(screenPos.x + pixelSize_x*float(i-2), screenPos.y + pixelSize_y*float(j-2));
+				vec4 color = texture2D(ssaoTex, texCoord);
+				occlFromDepth += color;
+			}
+		}
+
+		occlFromDepth /= 16.0;
+		occlFromDepth *= 0.45;
+
+		float occlusion = occlFromDepth.r + occlFromDepth.g + occlFromDepth.b + occlFromDepth.a; // original.***
+
+		if(occlusion < 0.0)
+		occlusion = 0.0;
+
+		gl_FragColor = vec4(0.0, 0.0, 0.0, occlusion);
+		//gl_FragColor = vec4(1.0, 0.0, 0.0, 0.2);
+
+		// Provisionally render edges here.***
+		vec3 normal = getNormal(screenPos).xyz;
+
+		if(length(normal) > 0.1)
+		{
+			vec3 normal_up = getNormal(vec2(screenPos.x, screenPos.y + pixelSize_y)).xyz;
+			vec3 normal_right = getNormal(vec2(screenPos.x + pixelSize_x, screenPos.y)).xyz;
+			vec3 normal_down = getNormal(vec2(screenPos.x, screenPos.y - pixelSize_y)).xyz;
+			vec3 normal_left = getNormal(vec2(screenPos.x - pixelSize_x, screenPos.y)).xyz;
+			float factor = 0.0;
+
+			if(dot(normal, normal_up) < 0.3)
+			{
+				factor += 0.15;
+			}
+
+			if(dot(normal, normal_right) < 0.3)
+			{
+				factor += 0.15;
+			}
+
+			if(dot(normal, normal_down) < 0.3)
+			{
+				factor += 0.15;
+			}
+
+			if(dot(normal, normal_left) < 0.3)
+			{
+				factor += 0.15;
+			}
+			if(factor > 0.1)
+			{
+				gl_FragColor = vec4(0.0, 0.0, 0.0, factor+occlusion);
+				return;
+			}
+
+		}
+	}
+
 	// check if is fastAntiAlias.***
 	if(bFxaa)
 	{
-		vec4 color = texture2D(depthTex, vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight));
+		vec4 color = texture2D(depthTex, screenPos);
 
-		if(color.r < 0.0001 && color.g < 0.0001 && color.b < 0.0001)
-		discard;
+		float pixelSize_x = 1.0/screenWidth;
+		float pixelSize_y = 1.0/screenHeight;
+		vec3 normal = getNormal(screenPos).xyz;
+		vec3 normal_up = getNormal(vec2(screenPos.x, screenPos.y + pixelSize_y)).xyz;
+		vec3 normal_right = getNormal(vec2(screenPos.x + pixelSize_x, screenPos.y)).xyz;
+
+		if(dot(normal, normal_up) < 0.5 || dot(normal, normal_right) < 0.5)
+		{
+			gl_FragColor = vec4(0.0, 0.0, 1.0, 0.5);
+			return;
+		}
+		//if(color.r < 0.0001 && color.g < 0.0001 && color.b < 0.0001)
+		//discard;
 		/*/
 		vec4 n[9];
 		make_kernel( n, vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight) );
@@ -272,7 +364,7 @@ void main()
 		gl_FragColor = vec4( 1.0 - sobel.rgb, 1.0 );
 		//gl_FragColor = vec4(sobel.rgb, 1.0 );
 		*/
-		gl_FragColor = color;
+		//gl_FragColor = color;
 	}
     
 }

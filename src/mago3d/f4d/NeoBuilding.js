@@ -1749,7 +1749,7 @@ NeoBuilding.prototype.render = function(magoManager, shader, renderType, refMatr
 				}
 				else 
 				{
-					if (octreesRenderedCount < (lowestOctreesCount0 + lowestOctreesCount1 + lowestOctreesCount2)*0.4)
+					if (octreesRenderedCount < (lowestOctreesCount0 + lowestOctreesCount1 + lowestOctreesCount2)*0.3)
 					{ this.renderSkin(magoManager, shader, renderType); }
 				}
 			}

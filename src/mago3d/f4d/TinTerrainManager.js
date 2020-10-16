@@ -800,9 +800,10 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	
 	magoManager.test__makingTerrainByAltitudesImage = 0;
 	
-	for (var i=0; i<8; i++)
+	if (renderType === 0)
 	{
-		gl.activeTexture(gl.TEXTURE0+i); 
+		//var tex = magoManager.texturesStore.getTextureAux1x1(); // provisional.
+		gl.activeTexture(gl.TEXTURE0); 
 		gl.bindTexture(gl.TEXTURE_2D, null);
 	}
 
@@ -816,14 +817,13 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 	gl.uniform1i(currentShader.bIsMakingDepth_loc, bDepth); //. old. use uRenderType_loc = 0. ***
 	gl.uniform1i(currentShader.uRenderType_loc, 1);
 	gl.uniform1f(currentShader.uFCoef_logDepth_loc, sceneState.fCoef_logDepth[0]);
-	
-
 
 	if (renderType === 1)
 	{
 		var tex = magoManager.texturesStore.getTextureAux1x1(); // provisional.
+
 		gl.activeTexture(gl.TEXTURE2); 
-		gl.bindTexture(gl.TEXTURE_2D, tex.texId);
+		gl.bindTexture(gl.TEXTURE_2D, null);
 	
 		var textureAux1x1 = magoManager.texturesStore.getTextureAux1x1();
 		var noiseTexture = magoManager.texturesStore.getNoiseTexture4x4();
@@ -868,27 +868,27 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 			}
 			
 			gl.activeTexture(gl.TEXTURE0); 
-			if (bApplyShadow && sunLight.depthFbo)
+			var sunLight = sunSystem.getLight(0);
+			if(sunLight.depthFbo)
 			{
-				var sunLight = sunSystem.getLight(0);
 				gl.bindTexture(gl.TEXTURE_2D, sunLight.depthFbo.colorBuffer);
 			}
 			else 
 			{
 				gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
 			}
-			
+
 			gl.activeTexture(gl.TEXTURE1); 
-			if (bApplyShadow && sunLight.depthFbo)
+			sunLight = sunSystem.getLight(1);
+			if(sunLight.depthFbo)
 			{
-				var sunLight = sunSystem.getLight(1);
 				gl.bindTexture(gl.TEXTURE_2D, sunLight.depthFbo.colorBuffer);
 			}
 			else 
 			{
 				gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
 			}
-			
+
 		}
 
 		gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***

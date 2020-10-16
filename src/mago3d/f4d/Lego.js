@@ -533,11 +533,36 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader,
 		return false;
 	}
 
-	if (renderType === 0 || renderType === 2) // depth or colorSelection.
+	if (renderType === 0 ) // depth or colorSelection.
+	{
+		shader.disableVertexAttribArray(shader.texCoord2_loc);
+		shader.enableVertexAttribArray(shader.normal3_loc);
+		shader.disableVertexAttribArray(shader.color4_loc);
+		gl.uniform1i(shader.bHasTexture_loc , false); // textures like png with alpha component.***
+		
+		// 1) Position.
+		if (!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
+		{ return false; }
+
+		// 2) Normal.
+		if(shader.normal3_loc >= 0) // check if shader has normal attributte.***
+		{
+			// There are depth renders that needs normal or not.
+			// General depth render needs normals if MRT, but sunDepthOfView-shader no has normal attributtes.
+			if (!vbo_vicky.bindDataNormal(shader, magoManager.vboMemoryManager))
+			{ return false; }
+		}
+
+		gl.drawArrays(gl.TRIANGLES, 0, vertices_count);
+		rendered = true;
+		
+	}
+	if (renderType === 2) // depth or colorSelection.
 	{
 		shader.disableVertexAttribArray(shader.texCoord2_loc);
 		shader.disableVertexAttribArray(shader.normal3_loc);
 		shader.disableVertexAttribArray(shader.color4_loc);
+		gl.uniform1i(shader.bHasTexture_loc , false); // textures like png with alpha component.***
 		
 		// 1) Position.
 		if (!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))

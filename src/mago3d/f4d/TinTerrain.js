@@ -624,8 +624,8 @@ TinTerrain.prototype.mergeTexturesToTextureMaster = function(gl, shader, texture
 		externalAlphaLayers[i] = texture.opacity;
 		if (texture.activeTextureType === 2)
 		{
-			if (texture.temp_clampToTerrainTexCoord === undefined)
-			{ var hola = 0; }
+			//if (texture.temp_clampToTerrainTexCoord === undefined)
+			//{ var hola = 0; }
 			// custom image.
 			if (externalTexCoordsArray === undefined)
 			{
@@ -699,7 +699,7 @@ TinTerrain.prototype.makeTextureMasterImageryLayers = function()
 	if (this.textureMasterImageryLayers === undefined)
 	{ 
 		this.textureMasterImageryLayers = new Texture();
-		var emptyPixels = new Uint8Array(256* 256 * 4);
+		var emptyPixels = new Uint8Array( 256 * 256 * 4 );
 		this.textureMasterImageryLayers.texId = Texture.createTexture(gl, gl.LINEAR, emptyPixels, 256, 256); 
 	}
 
@@ -1604,6 +1604,9 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 
 				var bApplySsao = true;
 				gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
+
+				// Note: after make texture-master, there are a fbo.bindFramebuffer and changes activeTexture & bindTexture,
+				// so, must restore the textures activated of initial tinTerrainRendering frameBuffer-textures.***
 				if (bApplySsao)
 				{
 					gl.uniform1f(currentShader.aspectRatio_loc, magoManager.sceneState.camera.frustum.aspectRatio[0]);
@@ -1619,6 +1622,32 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 					gl.activeTexture(gl.TEXTURE3);
 					gl.bindTexture(gl.TEXTURE_2D, noiseTexture);
 				}
+
+				//if (bApplyShadow)
+				{
+					// Set sunMatrix uniform.***
+					var sunSystem = this.tinTerrainManager.magoManager.sceneState.sunSystem;
+					var sunLight = sunSystem.getLight(0);
+					if(sunLight)
+					{
+						var sunLight = sunSystem.getLight(0);
+						if(sunLight.depthFbo)
+						{
+							gl.activeTexture(gl.TEXTURE0); 
+							gl.bindTexture(gl.TEXTURE_2D, sunLight.depthFbo.colorBuffer);
+						}
+
+						sunLight = sunSystem.getLight(1);
+						if(sunLight.depthFbo)
+						{
+							gl.activeTexture(gl.TEXTURE1); 
+							gl.bindTexture(gl.TEXTURE_2D, sunLight.depthFbo.colorBuffer);
+						}
+
+					}
+				}
+				// End restoring active textures of initial renderingTinTerrain framebuffer.***
+				//-------------------------------------------------------------------------------------------------------------------
 					
 			}
 				
@@ -1785,6 +1814,7 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 				return false; 
 			}
 		}
+
 		if (renderType === 0)
 		{
 			currentShader.disableVertexAttribArray(currentShader.texCoord2_loc);

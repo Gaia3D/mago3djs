@@ -6,17 +6,20 @@
 #ifdef USE_LOGARITHMIC_DEPTH
 #extension GL_EXT_frag_depth : enable
 #endif
+
+#define %USE_MULTI_RENDER_TARGET%
+#ifdef USE_MULTI_RENDER_TARGET
+#extension GL_EXT_draw_buffers : require
+#endif
   
 uniform sampler2D shadowMapTex;// 0
 uniform sampler2D shadowMapTex2;// 1
-//uniform sampler2D depthTex;//2
-//uniform sampler2D noiseTex;//3
-uniform sampler2D diffuseTex;  // 4
-uniform sampler2D diffuseTex_1;// 5
-uniform sampler2D diffuseTex_2;// 6
-uniform sampler2D diffuseTex_3;// 7
-uniform sampler2D diffuseTex_4;// 8
-uniform sampler2D diffuseTex_5;// 9
+uniform sampler2D diffuseTex;  // 2
+uniform sampler2D diffuseTex_1;// 3
+uniform sampler2D diffuseTex_2;// 4
+uniform sampler2D diffuseTex_3;// 5
+uniform sampler2D diffuseTex_4;// 6
+uniform sampler2D diffuseTex_5;// 7
 uniform bool textureFlipYAxis;
 uniform bool bIsMakingDepth;
 uniform bool bExistAltitudes;
@@ -38,10 +41,6 @@ uniform vec2 uMinMaxAltitudes;
 // int uTileDepth;
 uniform int uSeaOrTerrainType;
 uniform int uRenderType;
-
-
-uniform vec4 uGeoRectangles[3];
-uniform int uGeoRectanglesCount;
 
 uniform vec4 oneColor4;
 uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.
@@ -67,26 +66,18 @@ uniform float shadowMapWidth;
 uniform float shadowMapHeight;
 uniform bool bUseLogarithmicDepth;
 
-varying vec3 v3Pos;
 varying float vFogAmount;
 
-varying float applySpecLighting;
 varying vec4 vPosRelToLight; 
-varying vec3 vLightDir; 
 varying vec3 vNormal;
-varying vec3 vNormalWC;
 varying float currSunIdx;
-varying float vAltitude;
 
 varying float flogz;
 varying float Fcoef_half;
 
 // Texture's vars.***
 varying float vTileDepth;
-varying float vTexTileDepth;
 
-const float equatorialRadius = 6378137.0;
-const float polarRadius = 6356752.3142;
 
 // water caustics: https://catlikecoding.com/unity/tutorials/flow/texture-distortion/
 
@@ -272,6 +263,7 @@ float getDepthShadowMap(vec2 coord)
 	}
 	else
 		return 1000.0;
+	
 } 
 
 float getGridLineWidth(int depth)
@@ -402,19 +394,20 @@ void main()
 
 	if(bIsMakingDepth)
 	{
-		gl_FragColor = packDepth(depthAux);
+		gl_FragData[0] = packDepth(depthAux);
+		return;
 	}
 	else
 	{
 		if(uRenderType == 2)
 		{
-			gl_FragColor = oneColor4; 
+			gl_FragData[0] = oneColor4; 
 			return;
 		}
 
 		if(uSeaOrTerrainType == 1)
 		{
-			gl_FragColor = vec4(oneColor4.xyz, 0.5); // original.***
+			gl_FragData[0] = vec4(oneColor4.xyz, 0.5); // original.***
 			// Render a dot matrix in the sea surface. TODO.***
 
 			return;
@@ -663,13 +656,12 @@ void main()
 			////float tolerance = radius/(far-near);// test.***
 			////float tolerance = radius/farForDepth;
 
-			// in this shader noiseTex is "diffusse_1".
+			// in this shader noiseTex is "diffusse_1" in channel 3.
 			vec3 rvec = texture2D(diffuseTex_1, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;
 			vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));
 			vec3 bitangent = cross(normal2, tangent);
 			mat3 tbn = mat3(tangent, bitangent, normal2);   
-			//float minDepthBuffer;
-			//float maxDepthBuffer;
+
 			for(int i = 0; i < kernelSize; ++i)
 			{    	 
 				vec3 sample = origin + (tbn * vec3(kernel[i].x*3.0, kernel[i].y*3.0, kernel[i].z)) * ssaoRadius*2.0; // original.***
@@ -679,17 +671,6 @@ void main()
 				float sampleDepth = -sample.z/far;// original.***
 
 				float depthBufferValue = getDepth(offset.xy);
-				/*
-				if(depthBufferValue > 0.00391 && depthBufferValue < 0.00393)
-				{
-					if (depthBufferValue < sampleDepth-tolerance*1000.0)
-					{
-						occlusion +=  0.5;
-					}
-					
-					continue;
-				}			
-				*/
 				if (depthBufferValue < sampleDepth)//-tolerance)
 				{
 					occlusion +=  1.0;
@@ -784,14 +765,14 @@ void main()
 			float specularReflectionCoef = 0.6;
 			vec3 specularColor = vec3(0.8, 0.8, 0.8);
 			//textureColor = mix(textureColor, fogColor, 0.2); 
-			//gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian + specularReflectionCoef * specular * specularColor * shadow_occlusion, 1.0); // with specular.***
-			gl_FragColor = vec4(textureColor.xyz * shadow_occlusion * lambertian * scalarProd, 1.0); // original.***
+			//gl_FragData[0] = vec4(finalColor.xyz * shadow_occlusion * lambertian + specularReflectionCoef * specular * specularColor * shadow_occlusion, 1.0); // with specular.***
+			gl_FragData[0] = vec4(textureColor.xyz * shadow_occlusion * lambertian * scalarProd, 1.0); // original.***
 
 			// test contrast.***
 			//float Contrast = 2.0;
-			//vec3 pixelColor = vec3(gl_FragColor.r, gl_FragColor.g, gl_FragColor.b);
+			//vec3 pixelColor = vec3(gl_FragData[0].r, gl_FragData[0].g, gl_FragData[0].b);
 			//pixelColor.rgb = ((pixelColor.rgb - 0.5) * max(Contrast, 0.0)) + 0.5;
-			//gl_FragColor = vec4(pixelColor, 1.0);
+			//gl_FragData[0] = vec4(pixelColor, 1.0);
 
 			return;
 		}
@@ -802,8 +783,13 @@ void main()
 		}
 		
 		vec4 finalColor = mix(textureColor, fogColor, vFogAmount); 
-		gl_FragColor = vec4(finalColor.xyz * shadow_occlusion * lambertian * scalarProd, 1.0); // original.***
-		//gl_FragColor = textureColor; // test.***
-		//gl_FragColor = vec4(vNormal.xyz, 1.0); // test.***
+
+		gl_FragData[0] = vec4(finalColor.xyz * shadow_occlusion * lambertian * scalarProd, 1.0); // original.***
+		//gl_FragData[0] = textureColor; // test.***
+		//gl_FragData[0] = vec4(vNormal.xyz, 1.0); // test.***
+
+		#ifdef USE_MULTI_RENDER_TARGET
+		gl_FragData[1] = vec4(0); // save normal.***
+		#endif
 	}
 }

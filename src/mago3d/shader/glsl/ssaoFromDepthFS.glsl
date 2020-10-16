@@ -5,21 +5,23 @@
 
 uniform sampler2D depthTex;
 uniform sampler2D noiseTex;  
+uniform sampler2D normalTex;
 
 uniform mat4 projectionMatrix;
 uniform mat4 projectionMatrixInv;
 
 uniform float near;
-uniform float far;            
+uniform float far;         
 uniform float fov;
 uniform float tangentOfHalfFovy;
 uniform float aspectRatio;    
 uniform float screenWidth;    
 uniform float screenHeight; 
 uniform vec2 noiseScale;
+uniform vec2 uNearFarArray[4];
+
 
 uniform bool bApplySsao;
-uniform float radius; 
 uniform vec3 kernel[16]; 
 
 const int kernelSize = 16; 
@@ -36,6 +38,17 @@ float unpackDepth(const in vec4 rgba_depth)
     return depth;
 }  
 
+vec4 decodeNormal(in vec4 normal)
+{
+	return vec4(normal.xyz * 2.0 - 1.0, normal.w);
+}
+
+vec4 getNormal(in vec2 texCoord)
+{
+    vec4 encodedNormal = texture2D(normalTex, texCoord);
+    return decodeNormal(encodedNormal);
+}
+
 /*
 float unpackDepth_A(vec4 packedDepth)
 {
@@ -51,22 +64,15 @@ float UnpackDepth32( in vec4 pack )
     return depth * 1.000000059605;// 1.000000059605 = (16777216.0) / (16777216.0 - 1.0);
 }             
 
-vec3 getViewRay(vec2 tc)
+vec3 getViewRay(vec2 tc, in float relFar)
 {
-	float hfar = 2.0 * tangentOfHalfFovy * far;
+	float hfar = 2.0 * tangentOfHalfFovy * relFar;
     float wfar = hfar * aspectRatio;    
-    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    
+    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -relFar);    
 	
     return ray;                      
 }         
             
-//linear view space depth
-/*
-float getDepth(vec2 coord)
-{
-	return unpackDepth(texture2D(depthTex, coord.xy));
-} 
-*/
 float getDepth(vec2 coord)
 {
 	if(bUseLogarithmicDepth)
@@ -85,6 +91,29 @@ float getDepth(vec2 coord)
 	}
 }
 
+vec2 getNearFar_byFrustumIdx(in int frustumIdx)
+{
+    vec2 nearFar;
+    if(frustumIdx == 0)
+    {
+        nearFar = uNearFarArray[0];
+    }
+    else if(frustumIdx == 1)
+    {
+        nearFar = uNearFarArray[1];
+    }
+    else if(frustumIdx == 2)
+    {
+        nearFar = uNearFarArray[2];
+    }
+    else if(frustumIdx == 3)
+    {
+        nearFar = uNearFarArray[3];
+    }
+
+    return nearFar;
+}
+
 vec3 reconstructPosition(vec2 texCoord, float depth)
 {
     // https://wickedengine.net/2019/09/22/improved-normal-reconstruction-from-depth/
@@ -97,7 +126,7 @@ vec3 reconstructPosition(vec2 texCoord, float depth)
     return pos_CC.xyz / pos_CC.w;
 }
 
-vec3 normal_from_depth(float depth, vec2 texCoord) {
+vec3 normal_from_depth(float depth, vec2 texCoord, inout bool isValid) {
     // http://theorangeduck.com/page/pure-depth-ssao
     float pixelSizeX = 1.0/screenWidth;
     float pixelSizeY = 1.0/screenHeight;
@@ -109,24 +138,38 @@ vec3 normal_from_depth(float depth, vec2 texCoord) {
 	float depthB = 0.0;
 	for(float i=0.0; i<2.0; i++)
 	{
-		depthA += getDepth(texCoord + offset1*(1.0+i));
-		depthB += getDepth(texCoord + offset2*(1.0+i));
-	}
+        float depthAux = getDepth(texCoord + offset1*(1.0+i));
+        if(depthAux > 0.996)
+        {
+            depthAux = depth;
+            isValid = false;
+        }
+		depthA += depthAux;
 
+        depthAux = getDepth(texCoord + offset2*(1.0+i));
+        if(depthAux > 0.996)
+        {
+            depthAux = depth;
+            isValid = false;
+        }
+		depthB += depth;
+	}
+    
 	//vec3 posA = reconstructPosition(texCoord + offset1*2.0, depthA/2.0);
 	//vec3 posB = reconstructPosition(texCoord + offset2*2.0, depthB/2.0);
     //vec3 pos0 = reconstructPosition(texCoord, depth);
-
-    vec3 posA = getViewRay(texCoord + offset1*2.0)* depthA/2.0;
-	vec3 posB = getViewRay(texCoord + offset2*2.0)* depthB/2.0;
-    vec3 pos0 = getViewRay(texCoord)* depth;
+    
+    vec3 posA = getViewRay(texCoord + offset1*2.0, far)* depthA/2.0;
+	vec3 posB = getViewRay(texCoord + offset2*2.0, far)* depthB/2.0;
+    vec3 pos0 = getViewRay(texCoord, far)* depth;
 
     posA.z *= -1.0;
     posB.z *= -1.0;
     pos0.z *= -1.0;
-
+    
     vec3 normal = cross(posA - pos0, posB - pos0);
     normal.z = -normal.z;
+    isValid = true;
 
     return normalize(normal);
 }
@@ -140,22 +183,20 @@ float getOcclusion(vec3 origin, vec3 rotatedKernel, float radius)
     offsetCoord.xyz /= offset.w;
     offsetCoord.xyz = offsetCoord.xyz * 0.5 + 0.5;  	
 
-    //if(abs(offsetCoord.x * screenWidth - gl_FragCoord.x) < 1.5 && abs(offsetCoord.y * screenHeight - gl_FragCoord.y) < 1.5)
-	//	return 0.0;
+    vec4 normalRGBA = getNormal(offsetCoord.xy);
+    int currFrustumIdx = int(floor(10.0*normalRGBA.w));
+    vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);
+    float currNear = nearFar.x;
+    float currFar = nearFar.y;
 
-    float sampleDepth = -sample.z/far;// original.***
-
+    float sampleDepth = -sample.z/currFar;// original.***
     float depthBufferValue = getDepth(offsetCoord.xy);
-
-    // For multiFrustum ssao problem.***
-    //if(depthBufferValue > 0.1)
-    //return 0.0;
     //------------------------------------
 
     float depthDiff = abs(depthBufferValue - sampleDepth);
-    if(depthDiff < radius/far)
+    if(depthDiff < radius/currFar)
     {
-        float rangeCheck = smoothstep(0.0, 1.0, radius / (depthDiff*far));
+        float rangeCheck = smoothstep(0.0, 1.0, radius / (depthDiff*currFar));
         if (depthBufferValue < sampleDepth)//-tolerance*1.0)
         {
             result_occlusion = 1.0 * rangeCheck;
@@ -165,15 +206,42 @@ float getOcclusion(vec3 origin, vec3 rotatedKernel, float radius)
     return result_occlusion;
 }
 
+float getFactorByDist(in float radius, in float realDist)
+{
+    float factorByDist = 1.0;
+    if(realDist < radius*5.0)
+    {
+        factorByDist = smoothstep(0.0, 1.0, realDist/(radius*5.0));
+    }
+    return factorByDist;
+}
+
+
+
 void main()
 {
-    float occlusion = 0.0;
-    float smallOcclusion = 0.0;
+    float occlusion_C = 0.0;
+    float occlusion_B = 0.0;
     float occlusion_A = 0.0;
-    float occlusion_veryBig = 0.0;
+    float occlusion_D = 0.0;
+
+    float occlusion_CC = 0.0;
+    float occlusion_BB = 0.0;
+    float occlusion_AA = 0.0;
+    float occlusion_DD = 0.0;
+
     vec3 normal = vec3(0.0);
     vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
-    vec3 ray = getViewRay(screenPos); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
+    vec4 normalRGBA = getNormal(screenPos);
+    vec3 normal2 = normalRGBA.xyz; // original.***
+    int currFrustumIdx = int(floor(10.0*normalRGBA.w));
+
+    vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);
+    float currNear = nearFar.x;
+    float currFar = nearFar.y;
+
+    vec3 ray = getViewRay(screenPos, currFar); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
+    vec3 rayNear = getViewRay(screenPos, currNear);
     float linearDepth = getDepth(screenPos);  
     bool isAlmostOutOfFrustum = false;
     //if(linearDepth>0.996 || linearDepth<0.001005)
@@ -182,18 +250,39 @@ void main()
     //    isAlmostOutOfFrustum = true;
     //}
 
+    if(linearDepth > 0.996)
+    {
+        //gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
+        //return;
+        discard;
+    }
     
 
-    float veryBigRadius = 20.0;
-    float bigRadius = 12.0;
-    float smallRadius = 6.0;
-    float radius_A = 2.0;
-    float factorByDist = 1.0;
-    float realDist = linearDepth * far;
+    float radius_D = 20.0;
+    float radius_C = 12.0;
+    float radius_B = 5.0;
+    float radius_A = 0.5;
 
-    if(realDist < bigRadius*5.0)
+    float radius_DD = 26.0;
+    float radius_CC = 15.0;
+    float radius_BB = 5.0;
+    float radius_AA = 0.5;
+
+    float factorByDist = 1.0;
+    //vec3 posCC = reconstructPosition(screenPos, linearDepth);
+    vec3 posCC = ray * linearDepth + rayNear; 
+    //float realDist = near + linearDepth * far;
+    float realDist = -posCC.z;
+
+    //if(realDist < bigRadius*5.0)
+    //{
+    //    factorByDist = smoothstep(0.0, 1.0, realDist/(bigRadius*5.0));
+    //}
+
+    float aux = 1.0;
+    if(realDist < aux)
     {
-        factorByDist = smoothstep(0.0, 1.0, realDist/(bigRadius*5.0));
+        factorByDist = smoothstep(0.0, 1.0, realDist/(aux));
     }
 
     //if(factorByDist < 0.05)
@@ -202,9 +291,18 @@ void main()
     if(bApplySsao)// && !isAlmostOutOfFrustum)
 	{        
 		vec3 origin = ray * linearDepth; 
-        //origin = reconstructPosition(screenPos, linearDepth);
-
-        vec3 normal2 = normal_from_depth(linearDepth, screenPos); // normal from depthTex.***
+        //vec3 origin = reconstructPosition(screenPos, linearDepth);
+        bool isValid = true;
+        //vec3 normal2 = normal_from_depth(linearDepth, screenPos, isValid); // normal from depthTex.***
+        
+        if(length(normal2) < 0.1)
+        isValid = false;
+        if(!isValid)
+        {
+            //gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
+            //return;
+            discard;
+        }
         normal = normal2;
         
 		vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;
@@ -217,35 +315,47 @@ void main()
             vec3 rotatedKernel = tbn * vec3(kernel[i].x*1.0, kernel[i].y*1.0, kernel[i].z);
 
             // Big radius.***
-            occlusion += getOcclusion(origin, rotatedKernel, bigRadius) * factorByDist;
+            occlusion_C += getOcclusion(origin, rotatedKernel, radius_C) * factorByDist;
+            //occlusion_C += getOcclusion(origin, rotatedKernel, radius_CC) * factorByDist;
 
             // small occl.***
-            smallOcclusion += getOcclusion(origin, rotatedKernel, smallRadius) * factorByDist;
+            occlusion_B += getOcclusion(origin, rotatedKernel, radius_B) * factorByDist;
+            //occlusion_B += getOcclusion(origin, rotatedKernel, radius_BB) * factorByDist;
 
             // radius A.***
             occlusion_A += getOcclusion(origin, rotatedKernel, radius_A) * factorByDist;
+            //occlusion_A += getOcclusion(origin, rotatedKernel, radius_AA) * factorByDist;
 
             // veryBigRadius.***
-            occlusion_veryBig += getOcclusion(origin, rotatedKernel, veryBigRadius) * factorByDist;
+            occlusion_D += getOcclusion(origin, rotatedKernel, radius_D) * factorByDist;
+            //occlusion_D += getOcclusion(origin, rotatedKernel, radius_DD) * factorByDist;
 		} 
 
-        
+        float fKernelSize = float(kernelSize);
 
-		occlusion = occlusion / float(kernelSize);	
-        if(occlusion < 0.0)
-        occlusion = 0.0;
+		occlusion_C = occlusion_C / fKernelSize;	
+        if(occlusion_C < 0.0)
+        occlusion_C = 0.0;
+        else if(occlusion_C > 1.0)
+        occlusion_C = 1.0;
 
-        smallOcclusion = smallOcclusion / float(kernelSize);	
-        if(smallOcclusion < 0.0)
-        smallOcclusion = 0.0;
+        occlusion_B = occlusion_B / fKernelSize;	
+        if(occlusion_B < 0.0)
+        occlusion_B = 0.0;
+        else if(occlusion_B > 1.0)
+        occlusion_B = 1.0;
 
-        occlusion_A = occlusion_A / float(kernelSize);	
+        occlusion_A = occlusion_A / fKernelSize;	
         if(occlusion_A < 0.0)
         occlusion_A = 0.0;
+        else if(occlusion_A > 1.0)
+        occlusion_A = 1.0;
 
-        occlusion_veryBig = occlusion_veryBig / float(kernelSize);	
-        if(occlusion_veryBig < 0.0)
-        occlusion_veryBig = 0.0;
+        occlusion_D = occlusion_D / fKernelSize;	
+        if(occlusion_D < 0.0)
+        occlusion_D = 0.0;
+        else if(occlusion_D > 1.0)
+        occlusion_D = 1.0;
 	}
     else
     {
@@ -259,6 +369,6 @@ void main()
 	//scalarProd += 0.666;
     //gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0 - scalarProd);
 
-	gl_FragColor = vec4(occlusion_veryBig, occlusion_A, smallOcclusion, occlusion);
+	gl_FragColor = vec4(occlusion_A, occlusion_B, occlusion_C, occlusion_D);
     //gl_FragColor = vec4(normal.xyz, 1.0);
 }
