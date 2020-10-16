@@ -1789,8 +1789,8 @@ uniform bool bApplyClippingPlanes; // old. deprecated.***\n\
 uniform int clippingType; // 0= no clipping. 1= clipping by planes. 2= clipping by localCoord polyline. 3= clip by heights, 4= clip by (2, 3)\n\
 uniform int clippingPlanesCount;\n\
 uniform vec4 clippingPlanes[6];\n\
-uniform vec2 clippingPolygon2dPoints[512];\n\
-uniform int clippingConvexPolygon2dPointsIndices[256];\n\
+uniform vec2 clippingPolygon2dPoints[64];\n\
+uniform int clippingConvexPolygon2dPointsIndices[64];\n\
 uniform vec4 limitationInfringedColor4;\n\
 uniform vec2 limitationHeights;\n\
 \n\
@@ -2019,7 +2019,7 @@ bool isPointInsideLimitationConvexPolygon(in vec2 point2d)\n\
 	// Check polygons.***\n\
 	int startIdx = -1;\n\
 	int endIdx = -1;\n\
-	for(int i=0; i<128; i++)\n\
+	for(int i=0; i<32; i++)\n\
 	{\n\
 		startIdx = clippingConvexPolygon2dPointsIndices[2*i];  // 0\n\
 		endIdx = clippingConvexPolygon2dPointsIndices[2*i+1];	 // 3\n\
@@ -2031,7 +2031,7 @@ bool isPointInsideLimitationConvexPolygon(in vec2 point2d)\n\
 		\n\
 		isInside = true;\n\
 		vec2 pointStart = clippingPolygon2dPoints[0];\n\
-		for(int j=0; j<128; j++)\n\
+		for(int j=0; j<32; j++)\n\
 		{\n\
 			if(j > endIdx)\n\
 			break;\n\
@@ -5163,9 +5163,64 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
         if(currColor4.w > 0.0)\n\
         {\n\
             // decode the grayScale.***\n\
-            float height = currColor4.g;\n\
-            altitude = uMinMaxAltitudes.x + height * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);\n\
 \n\
+            float r = currColor4.r * 256.0;\n\
+            float g = currColor4.g;\n\
+            float b = currColor4.b;\n\
+\n\
+            float height = currColor4.r;\n\
+            float maxHeight;\n\
+            float minHeight;\n\
+            float numDivs;\n\
+            float increHeight;\n\
+				\n\
+				if(r < 0.0001)\n\
+				{\n\
+					// considering r=0.\n\
+					minHeight = -2796.0;\n\
+					maxHeight = -1000.0;\n\
+					numDivs = 2.0;\n\
+                    increHeight = (maxHeight - minHeight)/(numDivs);\n\
+                    height = (256.0*g + b)/(128.0);\n\
+\n\
+                    //resultTextureColor.r = 1.0;\n\
+                    //resultTextureColor.g = 0.0;\n\
+                    //resultTextureColor.b = 0.0;\n\
+                    //return;\n\
+				}\n\
+				else if(r > 0.5 && r < 1.5)\n\
+				{\n\
+					// considering r=1.\n\
+					minHeight = -1000.0;\n\
+					maxHeight = -200.0;\n\
+					numDivs = 2.0;\n\
+                    increHeight = (maxHeight - minHeight)/(numDivs);\n\
+                    height = (256.0*g + b)/(128.0);\n\
+\n\
+                    //resultTextureColor.r = 0.0;\n\
+                    //resultTextureColor.g = 1.0;\n\
+                    //resultTextureColor.b = 0.0;\n\
+                    //return;\n\
+				}\n\
+				else if(r > 1.5 && r < 2.5)\n\
+				{\n\
+					// considering r=2.\n\
+					minHeight = -200.0;\n\
+					maxHeight = 1.0;\n\
+					numDivs = 123.0;\n\
+                    increHeight = (maxHeight - minHeight)/(numDivs);\n\
+                    height = (256.0*g + b)/(128.0);\n\
+				}\n\
+\n\
+\n\
+\n\
+				//height = (256.0*g + b)/(128.0);\n\
+                height = (256.0*g + b)/(numDivs);\n\
+               // height = (256.0*g*increHeight + b*increHeight)- minHeight;\n\
+            \n\
+            //altitude = uMinMaxAltitudes.x + height * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);\n\
+		    altitude = minHeight + height * (maxHeight -minHeight);\n\
+            //altitude = height;\n\
             if(altitude < 0.0)\n\
             {\n\
                 /*\n\
@@ -7033,15 +7088,71 @@ void main()\n\
 		float altitude = 1000000.0;\n\
 		if(uActiveTextures[5] == 10)\n\
 		{\n\
+			// Bathymetry.***\n\
 			vec4 layersTextureColor = texture2D(diffuseTex_3, texCoord);\n\
 			//if(layersTextureColor.w > 0.0)\n\
 			{\n\
 				// decode the grayScale.***\n\
 				float sumAux = layersTextureColor.r;// + layersTextureColor.g + layersTextureColor.b;// + layersTextureColor.w;\n\
-				//sumAux *= 6.6;\n\
-				altitude = uMinMaxAltitudes.x + sumAux * (uMinMaxAltitudes.y - uMinMaxAltitudes.x);\n\
+\n\
+				float r = layersTextureColor.r*256.0;;\n\
+				float g = layersTextureColor.g;\n\
+				float b = layersTextureColor.b;\n\
+\n\
+				float maxHeight;\n\
+				float minHeight;\n\
+				float numDivs;\n\
+				float increHeight;\n\
+				float height;\n\
+				\n\
+				if(r < 0.0001)\n\
+				{\n\
+					// considering r=0.\n\
+					minHeight = -2796.0;\n\
+					maxHeight = -1000.0;\n\
+					numDivs = 2.0;\n\
+                    increHeight = (maxHeight - minHeight)/(numDivs);\n\
+                    height = (256.0*g + b)/(128.0);\n\
+				}\n\
+				else if(r > 0.5 && r < 1.5)\n\
+				{\n\
+					// considering r=1.\n\
+					minHeight = -1000.0;\n\
+					maxHeight = -200.0;\n\
+					numDivs = 2.0;\n\
+                    increHeight = (maxHeight - minHeight)/(numDivs);\n\
+                    height = (256.0*g + b)/(128.0);\n\
+				}\n\
+				else if(r > 1.5 && r < 2.5)\n\
+				{\n\
+					// considering r=2.\n\
+					minHeight = -200.0;\n\
+					maxHeight = 1.0;\n\
+					numDivs = 123.0;\n\
+                    increHeight = (maxHeight - minHeight)/(numDivs);\n\
+                    height = (256.0*g + b)/(128.0);\n\
+				}\n\
+\n\
+                height = (256.0*g + b)/(numDivs);\n\
+				altitude = minHeight + height * (maxHeight -minHeight);\n\
 			}\n\
 		}\n\
+		else if(uActiveTextures[5] == 20)\n\
+		{\n\
+			// waterMarkByAlpha.***\n\
+			// Check only alpha component.\n\
+			vec4 layersTextureColor = texture2D(diffuseTex_3, texCoord);\n\
+			float alpha = layersTextureColor.a;\n\
+			if(alpha > 0.0)\n\
+			{\n\
+				altitude = -100.0;\n\
+			}\n\
+			else\n\
+			{\n\
+				altitude = 100.0;\n\
+			}\n\
+		}\n\
+\n\
 		// End Dem image.------------------------------------------------------------------------------------------------------------\n\
 		float linearDepthAux = 1.0;\n\
 		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
@@ -7051,7 +7162,7 @@ void main()\n\
 		float linearDepth = getDepth(screenPos);  \n\
 		linearDepthAux = linearDepth;\n\
 \n\
-		if(bApplySsao && altitude<0.0)\n\
+		if(bApplySsao && altitude<0.1)\n\
 		{\n\
 			// must find depthTex & noiseTex.***\n\
 			vec3 origin = ray * linearDepth;  \n\
@@ -7101,7 +7212,6 @@ void main()\n\
 		*/\n\
 \n\
 		vec3 normalFromDepth = normal_from_depth(linearDepthAux, screenPos); // normal from depthTex.***\n\
-		\n\
 		//normalFromDepth += vNormal*0.5;\n\
 		//normalize(normalFromDepth);\n\
 		//normalFromDepth = normalize(vec3(normalFromDepth.x*8.0, normalFromDepth.y*8.0, normalFromDepth.z));\n\
@@ -7114,11 +7224,8 @@ void main()\n\
 		scalarProd /= 3.0;\n\
 		scalarProd += 0.666;\n\
 \n\
-		\n\
-\n\
 		//scalarProd /= 2.0;\n\
 		//scalarProd += 0.5;\n\
-		\n\
 		\n\
 		if(altitude < 0.0)\n\
 		{\n\
@@ -7148,7 +7255,6 @@ void main()\n\
 				}\n\
 			}\n\
 			// End caustics.--------------------------\n\
-\n\
 			\n\
 			if(gray < 0.05)\n\
 			gray = 0.05;\n\
@@ -7168,6 +7274,7 @@ void main()\n\
 			textureColor *= vec4(textureColor.r*scalarProd_2d, textureColor.g*scalarProd_2d, textureColor.b, textureColor.a);\n\
 			// End Something like to HillShade.---------------------------------------------------------------------------------\n\
 			\n\
+            // End Something like to HillShade.---------------------------------------------------------------------------------\n\
 			\n\
 			// End test drawing grid.---\n\
 			float specularReflectionCoef = 0.6;\n\
@@ -7185,14 +7292,13 @@ void main()\n\
 			return;\n\
 		}\n\
 		else{\n\
+			\n\
 			if(uSeaOrTerrainType == 1)\n\
 			discard;\n\
-		\n\
 		}\n\
 		\n\
-		\n\
-		\n\
 		vec4 finalColor = mix(textureColor, fogColor, vFogAmount); \n\
+\n\
 		gl_FragData[0] = vec4(finalColor.xyz * shadow_occlusion * lambertian * scalarProd, 1.0); // original.***\n\
 		//gl_FragData[0] = textureColor; // test.***\n\
 		//gl_FragData[0] = vec4(vNormal.xyz, 1.0); // test.***\n\
@@ -7200,7 +7306,6 @@ void main()\n\
 		#ifdef USE_MULTI_RENDER_TARGET\n\
 		gl_FragData[1] = vec4(0); // save normal.***\n\
 		#endif\n\
-		\n\
 	}\n\
 }";
 ShaderSource.TinTerrainVS = "\n\

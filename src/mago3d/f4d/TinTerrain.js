@@ -1774,7 +1774,7 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 		this.intersectionType = Constant.INTERSECTION_OUTSIDE;
 			
 		// Test Render wireframe if selected.*************************************************************
-		
+		/*
 		if (renderType === 1)
 		{
 			gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
@@ -1789,6 +1789,7 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 				this.drawTerrainName(magoManager);
 			}
 		}
+		*/
 		// End test.--------------------------------------------------------------------------------------
 			
 		// Render skirt if exist.
@@ -1823,8 +1824,8 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 		currentShader.disableVertexAttribArray(currentShader.normal3_loc);
 
 		gl.uniform1i(currentShader.bApplySsao_loc, false); // no apply ssao on skirt.***
-		var currSelObject = magoManager.selectionManager.getSelectedGeneral();
-		if (currSelObject !== this)
+		//var currSelObject = magoManager.selectionManager.getSelectedGeneral();
+		//if (currSelObject === this)
 		{ 
 			gl.drawArrays(gl.TRIANGLE_STRIP, 0, vboKey.vertexCount); 
 		} 
