@@ -174,7 +174,7 @@ vec3 normal_from_depth(float depth, vec2 texCoord, inout bool isValid) {
     return normalize(normal);
 }
 
-float getOcclusion(vec3 origin, vec3 rotatedKernel, float radius)
+float getOcclusion(vec3 origin, vec3 rotatedKernel, float radius, vec2 origin_nearFar)
 {
     float result_occlusion = 0.0;
     vec3 sample = origin + rotatedKernel * radius;
@@ -189,10 +189,25 @@ float getOcclusion(vec3 origin, vec3 rotatedKernel, float radius)
     float currNear = nearFar.x;
     float currFar = nearFar.y;
 
+    float originFar = origin_nearFar.y;
+    float originNear = origin_nearFar.x;
     float sampleDepth = -sample.z/currFar;// original.***
     float depthBufferValue = getDepth(offsetCoord.xy);
     //------------------------------------
-
+    /*
+    float sampleZ = -sample.z;
+    float bufferZ = currNear + depthBufferValue * (currFar - currNear);
+    float zDiff = abs(bufferZ - sampleZ);
+    if(zDiff < radius)
+    {
+        float rangeCheck = smoothstep(0.0, 1.0, radius/zDiff);
+        if (bufferZ < sampleZ)//-tolerance*1.0)
+        {
+            result_occlusion = 1.0 * rangeCheck;
+        }
+    }
+    */
+    
     float depthDiff = abs(depthBufferValue - sampleDepth);
     if(depthDiff < radius/currFar)
     {
@@ -202,7 +217,7 @@ float getOcclusion(vec3 origin, vec3 rotatedKernel, float radius)
             result_occlusion = 1.0 * rangeCheck;
         }
     }
-
+    
     return result_occlusion;
 }
 
@@ -240,7 +255,8 @@ void main()
     float currNear = nearFar.x;
     float currFar = nearFar.y;
 
-    vec3 ray = getViewRay(screenPos, currFar); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
+    vec3 ray = getViewRay(screenPos, (currFar)); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
+
     vec3 rayNear = getViewRay(screenPos, currNear);
     float linearDepth = getDepth(screenPos);  
     bool isAlmostOutOfFrustum = false;
@@ -263,10 +279,10 @@ void main()
     float radius_B = 5.0;
     float radius_A = 0.5;
 
-    float radius_DD = 26.0;
-    float radius_CC = 15.0;
-    float radius_BB = 5.0;
-    float radius_AA = 0.5;
+    //float radius_DD = 26.0;
+    //float radius_CC = 15.0;
+    //float radius_BB = 5.0;
+    //float radius_AA = 0.5;
 
     float factorByDist = 1.0;
     //vec3 posCC = reconstructPosition(screenPos, linearDepth);
@@ -279,7 +295,7 @@ void main()
     //    factorByDist = smoothstep(0.0, 1.0, realDist/(bigRadius*5.0));
     //}
 
-    float aux = 1.0;
+    float aux = 10.0;
     if(realDist < aux)
     {
         factorByDist = smoothstep(0.0, 1.0, realDist/(aux));
@@ -290,7 +306,7 @@ void main()
 
     if(bApplySsao)// && !isAlmostOutOfFrustum)
 	{        
-		vec3 origin = ray * linearDepth; 
+		vec3 origin = ray * linearDepth;// + rayNear; 
         //vec3 origin = reconstructPosition(screenPos, linearDepth);
         bool isValid = true;
         //vec3 normal2 = normal_from_depth(linearDepth, screenPos, isValid); // normal from depthTex.***
@@ -315,20 +331,20 @@ void main()
             vec3 rotatedKernel = tbn * vec3(kernel[i].x*1.0, kernel[i].y*1.0, kernel[i].z);
 
             // Big radius.***
-            occlusion_C += getOcclusion(origin, rotatedKernel, radius_C) * factorByDist;
-            //occlusion_C += getOcclusion(origin, rotatedKernel, radius_CC) * factorByDist;
+            occlusion_C += getOcclusion(origin, rotatedKernel, radius_C, nearFar) * factorByDist;
+            //occlusion_C += getOcclusion(origin, rotatedKernel, radius_CC, nearFar) * factorByDist;
 
             // small occl.***
-            occlusion_B += getOcclusion(origin, rotatedKernel, radius_B) * factorByDist;
-            //occlusion_B += getOcclusion(origin, rotatedKernel, radius_BB) * factorByDist;
+            occlusion_B += getOcclusion(origin, rotatedKernel, radius_B, nearFar) * factorByDist;
+            //occlusion_B += getOcclusion(origin, rotatedKernel, radius_BB, nearFar) * factorByDist;
 
             // radius A.***
-            occlusion_A += getOcclusion(origin, rotatedKernel, radius_A) * factorByDist;
-            //occlusion_A += getOcclusion(origin, rotatedKernel, radius_AA) * factorByDist;
+            occlusion_A += getOcclusion(origin, rotatedKernel, radius_A, nearFar) * factorByDist;
+            //occlusion_A += getOcclusion(origin, rotatedKernel, radius_AA, nearFar) * factorByDist;
 
             // veryBigRadius.***
-            occlusion_D += getOcclusion(origin, rotatedKernel, radius_D) * factorByDist;
-            //occlusion_D += getOcclusion(origin, rotatedKernel, radius_DD) * factorByDist;
+            occlusion_D += getOcclusion(origin, rotatedKernel, radius_D, nearFar) * factorByDist;
+            //occlusion_D += getOcclusion(origin, rotatedKernel, radius_DD, nearFar) * factorByDist;
 		} 
 
         float fKernelSize = float(kernelSize);

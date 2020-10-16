@@ -959,6 +959,20 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive, i
 		// Positions.
 		if (!vboKey.bindDataPosition(shader, vboMemManager))
 		{ return false; }
+
+		if (renderType === 0)
+		{
+			// Normals.
+			if (vboKey.vboBufferNor && shader.normal3_loc >= 0)
+			{
+				if (!vboKey.bindDataNormal(shader, vboMemManager))
+				{ return false; }
+			}
+			else 
+			{
+				shader.disableVertexAttribArray(shader.normal3_loc);
+			}
+		}
 	
 		if (renderType === 1)
 		{

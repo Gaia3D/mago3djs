@@ -63,6 +63,7 @@ void main()
     //linear depth in camera space (0..far)
 	vec4 orthoPos = modelViewMatrixRelToEye * pos4;
     depth = orthoPos.z/far; // original.***
+	//depth = (orthoPos.z-near)/(far-near); // test.***
 	
 	// Calculate normalCC.***
 	vec3 rotatedNormal = currentTMat * normal;
@@ -71,11 +72,10 @@ void main()
 
 	/*
 	float z_ndc = (2.0 * z_window - depthRange_near - depthRange_far) / (depthRange_far - depthRange_near);
-		
-		vec4 viewPosH = projectionMatrixInv * vec4(x_ndc, y_ndc, z_ndc, 1.0);
-		vec3 posCC = viewPosH.xyz/viewPosH.w;
-		vec4 posWC = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0) + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 1.0);
-		*/
+	vec4 viewPosH = projectionMatrixInv * vec4(x_ndc, y_ndc, z_ndc, 1.0);
+	vec3 posCC = viewPosH.xyz/viewPosH.w;
+	vec4 posWC = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0) + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 1.0);
+	*/
 
 
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;

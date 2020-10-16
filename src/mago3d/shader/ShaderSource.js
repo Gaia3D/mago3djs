@@ -3788,6 +3788,7 @@ void main()\n\
     //linear depth in camera space (0..far)\n\
 	vec4 orthoPos = modelViewMatrixRelToEye * pos4;\n\
     depth = orthoPos.z/far; // original.***\n\
+	//depth = (orthoPos.z-near)/(far-near); // test.***\n\
 	\n\
 	// Calculate normalCC.***\n\
 	vec3 rotatedNormal = currentTMat * normal;\n\
@@ -3796,11 +3797,10 @@ void main()\n\
 \n\
 	/*\n\
 	float z_ndc = (2.0 * z_window - depthRange_near - depthRange_far) / (depthRange_far - depthRange_near);\n\
-		\n\
-		vec4 viewPosH = projectionMatrixInv * vec4(x_ndc, y_ndc, z_ndc, 1.0);\n\
-		vec3 posCC = viewPosH.xyz/viewPosH.w;\n\
-		vec4 posWC = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0) + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 1.0);\n\
-		*/\n\
+	vec4 viewPosH = projectionMatrixInv * vec4(x_ndc, y_ndc, z_ndc, 1.0);\n\
+	vec3 posCC = viewPosH.xyz/viewPosH.w;\n\
+	vec4 posWC = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0) + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 1.0);\n\
+	*/\n\
 \n\
 \n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
@@ -4132,28 +4132,42 @@ void main()\n\
 			vec3 normal_right = getNormal(vec2(screenPos.x + pixelSize_x, screenPos.y)).xyz;\n\
 			vec3 normal_down = getNormal(vec2(screenPos.x, screenPos.y - pixelSize_y)).xyz;\n\
 			vec3 normal_left = getNormal(vec2(screenPos.x - pixelSize_x, screenPos.y)).xyz;\n\
+\n\
+			//vec3 normal_ur = getNormal(vec2(screenPos.x + pixelSize_x, screenPos.y + pixelSize_y)).xyz;\n\
+			//vec3 normal_rd = getNormal(vec2(screenPos.x + pixelSize_x, screenPos.y - pixelSize_y)).xyz;\n\
+			//vec3 normal_ld = getNormal(vec2(screenPos.x - pixelSize_x, screenPos.y - pixelSize_y)).xyz;\n\
+			//vec3 normal_lu = getNormal(vec2(screenPos.x - pixelSize_x, screenPos.y + pixelSize_y)).xyz;\n\
+\n\
 			float factor = 0.0;\n\
+			float increF = 0.07 * 2.0;\n\
 \n\
 			if(dot(normal, normal_up) < 0.3)\n\
-			{\n\
-				factor += 0.15;\n\
-			}\n\
+			{ factor += increF; }\n\
 \n\
 			if(dot(normal, normal_right) < 0.3)\n\
-			{\n\
-				factor += 0.15;\n\
-			}\n\
+			{ factor += increF; }\n\
 \n\
 			if(dot(normal, normal_down) < 0.3)\n\
-			{\n\
-				factor += 0.15;\n\
-			}\n\
+			{ factor += increF; }\n\
 \n\
 			if(dot(normal, normal_left) < 0.3)\n\
-			{\n\
-				factor += 0.15;\n\
-			}\n\
-			if(factor > 0.1)\n\
+			{ factor += increF; }\n\
+\n\
+			/*\n\
+			if(dot(normal, normal_ur) < 0.3)\n\
+			{ factor += increF; }\n\
+\n\
+			if(dot(normal, normal_rd) < 0.3)\n\
+			{ factor += increF; }\n\
+\n\
+			if(dot(normal, normal_ld) < 0.3)\n\
+			{ factor += increF; }\n\
+\n\
+			if(dot(normal, normal_lu) < 0.3)\n\
+			{ factor += increF; }\n\
+			*/\n\
+\n\
+			if(factor > increF*0.9)\n\
 			{\n\
 				gl_FragColor = vec4(0.0, 0.0, 0.0, factor+occlusion);\n\
 				return;\n\
@@ -4445,7 +4459,7 @@ vec3 normal_from_depth(float depth, vec2 texCoord, inout bool isValid) {\n\
     return normalize(normal);\n\
 }\n\
 \n\
-float getOcclusion(vec3 origin, vec3 rotatedKernel, float radius)\n\
+float getOcclusion(vec3 origin, vec3 rotatedKernel, float radius, vec2 origin_nearFar)\n\
 {\n\
     float result_occlusion = 0.0;\n\
     vec3 sample = origin + rotatedKernel * radius;\n\
@@ -4460,10 +4474,25 @@ float getOcclusion(vec3 origin, vec3 rotatedKernel, float radius)\n\
     float currNear = nearFar.x;\n\
     float currFar = nearFar.y;\n\
 \n\
+    float originFar = origin_nearFar.y;\n\
+    float originNear = origin_nearFar.x;\n\
     float sampleDepth = -sample.z/currFar;// original.***\n\
     float depthBufferValue = getDepth(offsetCoord.xy);\n\
     //------------------------------------\n\
-\n\
+    /*\n\
+    float sampleZ = -sample.z;\n\
+    float bufferZ = currNear + depthBufferValue * (currFar - currNear);\n\
+    float zDiff = abs(bufferZ - sampleZ);\n\
+    if(zDiff < radius)\n\
+    {\n\
+        float rangeCheck = smoothstep(0.0, 1.0, radius/zDiff);\n\
+        if (bufferZ < sampleZ)//-tolerance*1.0)\n\
+        {\n\
+            result_occlusion = 1.0 * rangeCheck;\n\
+        }\n\
+    }\n\
+    */\n\
+    \n\
     float depthDiff = abs(depthBufferValue - sampleDepth);\n\
     if(depthDiff < radius/currFar)\n\
     {\n\
@@ -4473,7 +4502,7 @@ float getOcclusion(vec3 origin, vec3 rotatedKernel, float radius)\n\
             result_occlusion = 1.0 * rangeCheck;\n\
         }\n\
     }\n\
-\n\
+    \n\
     return result_occlusion;\n\
 }\n\
 \n\
@@ -4511,7 +4540,8 @@ void main()\n\
     float currNear = nearFar.x;\n\
     float currFar = nearFar.y;\n\
 \n\
-    vec3 ray = getViewRay(screenPos, currFar); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
+    vec3 ray = getViewRay(screenPos, (currFar)); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
+\n\
     vec3 rayNear = getViewRay(screenPos, currNear);\n\
     float linearDepth = getDepth(screenPos);  \n\
     bool isAlmostOutOfFrustum = false;\n\
@@ -4534,10 +4564,10 @@ void main()\n\
     float radius_B = 5.0;\n\
     float radius_A = 0.5;\n\
 \n\
-    float radius_DD = 26.0;\n\
-    float radius_CC = 15.0;\n\
-    float radius_BB = 5.0;\n\
-    float radius_AA = 0.5;\n\
+    //float radius_DD = 26.0;\n\
+    //float radius_CC = 15.0;\n\
+    //float radius_BB = 5.0;\n\
+    //float radius_AA = 0.5;\n\
 \n\
     float factorByDist = 1.0;\n\
     //vec3 posCC = reconstructPosition(screenPos, linearDepth);\n\
@@ -4550,7 +4580,7 @@ void main()\n\
     //    factorByDist = smoothstep(0.0, 1.0, realDist/(bigRadius*5.0));\n\
     //}\n\
 \n\
-    float aux = 1.0;\n\
+    float aux = 10.0;\n\
     if(realDist < aux)\n\
     {\n\
         factorByDist = smoothstep(0.0, 1.0, realDist/(aux));\n\
@@ -4561,7 +4591,7 @@ void main()\n\
 \n\
     if(bApplySsao)// && !isAlmostOutOfFrustum)\n\
 	{        \n\
-		vec3 origin = ray * linearDepth; \n\
+		vec3 origin = ray * linearDepth;// + rayNear; \n\
         //vec3 origin = reconstructPosition(screenPos, linearDepth);\n\
         bool isValid = true;\n\
         //vec3 normal2 = normal_from_depth(linearDepth, screenPos, isValid); // normal from depthTex.***\n\
@@ -4586,20 +4616,20 @@ void main()\n\
             vec3 rotatedKernel = tbn * vec3(kernel[i].x*1.0, kernel[i].y*1.0, kernel[i].z);\n\
 \n\
             // Big radius.***\n\
-            occlusion_C += getOcclusion(origin, rotatedKernel, radius_C) * factorByDist;\n\
-            //occlusion_C += getOcclusion(origin, rotatedKernel, radius_CC) * factorByDist;\n\
+            occlusion_C += getOcclusion(origin, rotatedKernel, radius_C, nearFar) * factorByDist;\n\
+            //occlusion_C += getOcclusion(origin, rotatedKernel, radius_CC, nearFar) * factorByDist;\n\
 \n\
             // small occl.***\n\
-            occlusion_B += getOcclusion(origin, rotatedKernel, radius_B) * factorByDist;\n\
-            //occlusion_B += getOcclusion(origin, rotatedKernel, radius_BB) * factorByDist;\n\
+            occlusion_B += getOcclusion(origin, rotatedKernel, radius_B, nearFar) * factorByDist;\n\
+            //occlusion_B += getOcclusion(origin, rotatedKernel, radius_BB, nearFar) * factorByDist;\n\
 \n\
             // radius A.***\n\
-            occlusion_A += getOcclusion(origin, rotatedKernel, radius_A) * factorByDist;\n\
-            //occlusion_A += getOcclusion(origin, rotatedKernel, radius_AA) * factorByDist;\n\
+            occlusion_A += getOcclusion(origin, rotatedKernel, radius_A, nearFar) * factorByDist;\n\
+            //occlusion_A += getOcclusion(origin, rotatedKernel, radius_AA, nearFar) * factorByDist;\n\
 \n\
             // veryBigRadius.***\n\
-            occlusion_D += getOcclusion(origin, rotatedKernel, radius_D) * factorByDist;\n\
-            //occlusion_D += getOcclusion(origin, rotatedKernel, radius_DD) * factorByDist;\n\
+            occlusion_D += getOcclusion(origin, rotatedKernel, radius_D, nearFar) * factorByDist;\n\
+            //occlusion_D += getOcclusion(origin, rotatedKernel, radius_DD, nearFar) * factorByDist;\n\
 		} \n\
 \n\
         float fKernelSize = float(kernelSize);\n\

@@ -305,28 +305,42 @@ void main()
 			vec3 normal_right = getNormal(vec2(screenPos.x + pixelSize_x, screenPos.y)).xyz;
 			vec3 normal_down = getNormal(vec2(screenPos.x, screenPos.y - pixelSize_y)).xyz;
 			vec3 normal_left = getNormal(vec2(screenPos.x - pixelSize_x, screenPos.y)).xyz;
+
+			//vec3 normal_ur = getNormal(vec2(screenPos.x + pixelSize_x, screenPos.y + pixelSize_y)).xyz;
+			//vec3 normal_rd = getNormal(vec2(screenPos.x + pixelSize_x, screenPos.y - pixelSize_y)).xyz;
+			//vec3 normal_ld = getNormal(vec2(screenPos.x - pixelSize_x, screenPos.y - pixelSize_y)).xyz;
+			//vec3 normal_lu = getNormal(vec2(screenPos.x - pixelSize_x, screenPos.y + pixelSize_y)).xyz;
+
 			float factor = 0.0;
+			float increF = 0.07 * 2.0;
 
 			if(dot(normal, normal_up) < 0.3)
-			{
-				factor += 0.15;
-			}
+			{ factor += increF; }
 
 			if(dot(normal, normal_right) < 0.3)
-			{
-				factor += 0.15;
-			}
+			{ factor += increF; }
 
 			if(dot(normal, normal_down) < 0.3)
-			{
-				factor += 0.15;
-			}
+			{ factor += increF; }
 
 			if(dot(normal, normal_left) < 0.3)
-			{
-				factor += 0.15;
-			}
-			if(factor > 0.1)
+			{ factor += increF; }
+
+			/*
+			if(dot(normal, normal_ur) < 0.3)
+			{ factor += increF; }
+
+			if(dot(normal, normal_rd) < 0.3)
+			{ factor += increF; }
+
+			if(dot(normal, normal_ld) < 0.3)
+			{ factor += increF; }
+
+			if(dot(normal, normal_lu) < 0.3)
+			{ factor += increF; }
+			*/
+
+			if(factor > increF*0.9)
 			{
 				gl_FragColor = vec4(0.0, 0.0, 0.0, factor+occlusion);
 				return;
