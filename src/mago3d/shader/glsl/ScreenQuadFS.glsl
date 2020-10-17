@@ -271,36 +271,35 @@ void main()
 
 	if(bApplySsao)
 	{
-		//ssaoFromDepthTex
-		float pixelSize_x = 1.0/screenWidth;
-		float pixelSize_y = 1.0/screenHeight;
-		vec4 occlFromDepth = vec4(0.0);
-		for(int i=0; i<4; i++)
-		{
-			for(int j=0; j<4; j++)
-			{
-				vec2 texCoord = vec2(screenPos.x + pixelSize_x*float(i-2), screenPos.y + pixelSize_y*float(j-2));
-				vec4 color = texture2D(ssaoTex, texCoord);
-				occlFromDepth += color;
-			}
-		}
-
-		occlFromDepth /= 16.0;
-		occlFromDepth *= 0.45;
-
-		float occlusion = occlFromDepth.r + occlFromDepth.g + occlFromDepth.b + occlFromDepth.a; // original.***
-
-		if(occlusion < 0.0)
-		occlusion = 0.0;
-
-		gl_FragColor = vec4(0.0, 0.0, 0.0, occlusion);
-		//gl_FragColor = vec4(1.0, 0.0, 0.0, 0.2);
-
-		// Provisionally render edges here.***
 		vec3 normal = getNormal(screenPos).xyz;
-
 		if(length(normal) > 0.1)
 		{
+			//ssaoFromDepthTex
+			float pixelSize_x = 1.0/screenWidth;
+			float pixelSize_y = 1.0/screenHeight;
+			vec4 occlFromDepth = vec4(0.0);
+			for(int i=0; i<4; i++)
+			{
+				for(int j=0; j<4; j++)
+				{
+					vec2 texCoord = vec2(screenPos.x + pixelSize_x*float(i-2), screenPos.y + pixelSize_y*float(j-2));
+					vec4 color = texture2D(ssaoTex, texCoord);
+					occlFromDepth += color;
+				}
+			}
+
+			occlFromDepth /= 16.0;
+			occlFromDepth *= 0.45;
+
+			float occlusion = occlFromDepth.r + occlFromDepth.g + occlFromDepth.b + occlFromDepth.a; // original.***
+
+			if(occlusion < 0.0)
+			occlusion = 0.0;
+
+			gl_FragColor = vec4(0.0, 0.0, 0.0, occlusion);
+			//gl_FragColor = vec4(1.0, 0.0, 0.0, 0.2);
+
+			// Provisionally render edges here.****************************************************************
 			vec3 normal_up = getNormal(vec2(screenPos.x, screenPos.y + pixelSize_y)).xyz;
 			vec3 normal_right = getNormal(vec2(screenPos.x + pixelSize_x, screenPos.y)).xyz;
 			vec3 normal_down = getNormal(vec2(screenPos.x, screenPos.y - pixelSize_y)).xyz;

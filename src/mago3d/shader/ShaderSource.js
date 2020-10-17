@@ -3699,7 +3699,7 @@ void main()\n\
     	gl_FragData[0] = packDepth(-depth);\n\
 	}\n\
 \n\
-	float frustumIdx = 0.0;\n\
+	float frustumIdx = 1.0;\n\
 	if(uFrustumIdx == 0)\n\
 	frustumIdx = 0.05;\n\
 	else if(uFrustumIdx == 1)\n\
@@ -4098,36 +4098,35 @@ void main()\n\
 \n\
 	if(bApplySsao)\n\
 	{\n\
-		//ssaoFromDepthTex\n\
-		float pixelSize_x = 1.0/screenWidth;\n\
-		float pixelSize_y = 1.0/screenHeight;\n\
-		vec4 occlFromDepth = vec4(0.0);\n\
-		for(int i=0; i<4; i++)\n\
-		{\n\
-			for(int j=0; j<4; j++)\n\
-			{\n\
-				vec2 texCoord = vec2(screenPos.x + pixelSize_x*float(i-2), screenPos.y + pixelSize_y*float(j-2));\n\
-				vec4 color = texture2D(ssaoTex, texCoord);\n\
-				occlFromDepth += color;\n\
-			}\n\
-		}\n\
-\n\
-		occlFromDepth /= 16.0;\n\
-		occlFromDepth *= 0.45;\n\
-\n\
-		float occlusion = occlFromDepth.r + occlFromDepth.g + occlFromDepth.b + occlFromDepth.a; // original.***\n\
-\n\
-		if(occlusion < 0.0)\n\
-		occlusion = 0.0;\n\
-\n\
-		gl_FragColor = vec4(0.0, 0.0, 0.0, occlusion);\n\
-		//gl_FragColor = vec4(1.0, 0.0, 0.0, 0.2);\n\
-\n\
-		// Provisionally render edges here.***\n\
 		vec3 normal = getNormal(screenPos).xyz;\n\
-\n\
 		if(length(normal) > 0.1)\n\
 		{\n\
+			//ssaoFromDepthTex\n\
+			float pixelSize_x = 1.0/screenWidth;\n\
+			float pixelSize_y = 1.0/screenHeight;\n\
+			vec4 occlFromDepth = vec4(0.0);\n\
+			for(int i=0; i<4; i++)\n\
+			{\n\
+				for(int j=0; j<4; j++)\n\
+				{\n\
+					vec2 texCoord = vec2(screenPos.x + pixelSize_x*float(i-2), screenPos.y + pixelSize_y*float(j-2));\n\
+					vec4 color = texture2D(ssaoTex, texCoord);\n\
+					occlFromDepth += color;\n\
+				}\n\
+			}\n\
+\n\
+			occlFromDepth /= 16.0;\n\
+			occlFromDepth *= 0.45;\n\
+\n\
+			float occlusion = occlFromDepth.r + occlFromDepth.g + occlFromDepth.b + occlFromDepth.a; // original.***\n\
+\n\
+			if(occlusion < 0.0)\n\
+			occlusion = 0.0;\n\
+\n\
+			gl_FragColor = vec4(0.0, 0.0, 0.0, occlusion);\n\
+			//gl_FragColor = vec4(1.0, 0.0, 0.0, 0.2);\n\
+\n\
+			// Provisionally render edges here.****************************************************************\n\
 			vec3 normal_up = getNormal(vec2(screenPos.x, screenPos.y + pixelSize_y)).xyz;\n\
 			vec3 normal_right = getNormal(vec2(screenPos.x + pixelSize_x, screenPos.y)).xyz;\n\
 			vec3 normal_down = getNormal(vec2(screenPos.x, screenPos.y - pixelSize_y)).xyz;\n\
@@ -4525,10 +4524,10 @@ void main()\n\
     float occlusion_A = 0.0;\n\
     float occlusion_D = 0.0;\n\
 \n\
-    float occlusion_CC = 0.0;\n\
-    float occlusion_BB = 0.0;\n\
-    float occlusion_AA = 0.0;\n\
-    float occlusion_DD = 0.0;\n\
+    //float occlusion_CC = 0.0;\n\
+    //float occlusion_BB = 0.0;\n\
+    //float occlusion_AA = 0.0;\n\
+    //float occlusion_DD = 0.0;\n\
 \n\
     vec3 normal = vec3(0.0);\n\
     vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
@@ -4541,7 +4540,6 @@ void main()\n\
     float currFar = nearFar.y;\n\
 \n\
     vec3 ray = getViewRay(screenPos, (currFar)); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
-\n\
     vec3 rayNear = getViewRay(screenPos, currNear);\n\
     float linearDepth = getDepth(screenPos);  \n\
     bool isAlmostOutOfFrustum = false;\n\
@@ -4551,12 +4549,10 @@ void main()\n\
     //    isAlmostOutOfFrustum = true;\n\
     //}\n\
 \n\
-    if(linearDepth > 0.996)\n\
-    {\n\
-        //gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);\n\
-        //return;\n\
-        discard;\n\
-    }\n\
+    //if(linearDepth > 0.996)\n\
+    //{\n\
+        //discard;\n\
+    //}\n\
     \n\
 \n\
     float radius_D = 20.0;\n\

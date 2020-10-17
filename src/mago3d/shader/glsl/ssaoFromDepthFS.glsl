@@ -240,10 +240,10 @@ void main()
     float occlusion_A = 0.0;
     float occlusion_D = 0.0;
 
-    float occlusion_CC = 0.0;
-    float occlusion_BB = 0.0;
-    float occlusion_AA = 0.0;
-    float occlusion_DD = 0.0;
+    //float occlusion_CC = 0.0;
+    //float occlusion_BB = 0.0;
+    //float occlusion_AA = 0.0;
+    //float occlusion_DD = 0.0;
 
     vec3 normal = vec3(0.0);
     vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
@@ -256,7 +256,6 @@ void main()
     float currFar = nearFar.y;
 
     vec3 ray = getViewRay(screenPos, (currFar)); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
-
     vec3 rayNear = getViewRay(screenPos, currNear);
     float linearDepth = getDepth(screenPos);  
     bool isAlmostOutOfFrustum = false;
@@ -266,12 +265,10 @@ void main()
     //    isAlmostOutOfFrustum = true;
     //}
 
-    if(linearDepth > 0.996)
-    {
-        //gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
-        //return;
-        discard;
-    }
+    //if(linearDepth > 0.996)
+    //{
+        //discard;
+    //}
     
 
     float radius_D = 20.0;

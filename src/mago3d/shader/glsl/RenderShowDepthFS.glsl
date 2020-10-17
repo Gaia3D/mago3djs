@@ -129,7 +129,7 @@ void main()
     	gl_FragData[0] = packDepth(-depth);
 	}
 
-	float frustumIdx = 0.0;
+	float frustumIdx = 1.0;
 	if(uFrustumIdx == 0)
 	frustumIdx = 0.05;
 	else if(uFrustumIdx == 1)

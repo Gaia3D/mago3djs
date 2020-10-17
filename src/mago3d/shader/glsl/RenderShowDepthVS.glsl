@@ -68,7 +68,6 @@ void main()
 	// Calculate normalCC.***
 	vec3 rotatedNormal = currentTMat * normal;
 	vNormal = normalize((normalMatrix4 * vec4(rotatedNormal, 1.0)).xyz); // original.***
-	//vNormal = normalize((ModelViewProjectionMatrixRelToEye * vec4(rotatedNormal, 1.0)).xyz); // test.***
 
 	/*
 	float z_ndc = (2.0 * z_window - depthRange_near - depthRange_far) / (depthRange_far - depthRange_near);
