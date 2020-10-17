@@ -232,11 +232,6 @@ void main()
 		// the sun lights count are 2.
 		// 1rst, calculate the pixelPosWC.
 		float z_window  = unpackDepth(texture2D(depthTex, screenPos.xy)); // z_window  is [0.0, 1.0] range depth.
-		if(z_window < 0.001)
-		discard;
-
-		//vec3 ray = getViewRay(screenPos);
-		//vec4 posWC = vec4(ray * z_window, 1.0);
 		
 		// https://stackoverflow.com/questions/11277501/how-to-recover-view-space-position-given-view-space-depth-value-and-ndc-xy
 		float depthRange_near = 0.0;

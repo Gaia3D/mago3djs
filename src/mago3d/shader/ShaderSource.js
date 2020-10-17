@@ -3793,7 +3793,6 @@ void main()\n\
 	// Calculate normalCC.***\n\
 	vec3 rotatedNormal = currentTMat * normal;\n\
 	vNormal = normalize((normalMatrix4 * vec4(rotatedNormal, 1.0)).xyz); // original.***\n\
-	//vNormal = normalize((ModelViewProjectionMatrixRelToEye * vec4(rotatedNormal, 1.0)).xyz); // test.***\n\
 \n\
 	/*\n\
 	float z_ndc = (2.0 * z_window - depthRange_near - depthRange_far) / (depthRange_far - depthRange_near);\n\
@@ -4059,8 +4058,8 @@ void main()\n\
 		// the sun lights count are 2.\n\
 		// 1rst, calculate the pixelPosWC.\n\
 		float z_window  = unpackDepth(texture2D(depthTex, screenPos.xy)); // z_window  is [0.0, 1.0] range depth.\n\
-		if(z_window < 0.001)\n\
-		discard;\n\
+		//if(z_window < 0.001)\n\
+		//discard;\n\
 \n\
 		//vec3 ray = getViewRay(screenPos);\n\
 		//vec4 posWC = vec4(ray * z_window, 1.0);\n\
