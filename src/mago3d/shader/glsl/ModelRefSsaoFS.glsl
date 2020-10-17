@@ -748,21 +748,6 @@ void main()
 		}
 	}
 	
-
-    
-	
-	//textureColor = vec4(0.85, 0.85, 0.85, 1.0);
-	/*
-	if(linearDepth>0.95)
-	{
-		textureColor = vec4(1.0, 0.0, 0.0, 1.0); 
-	}
-	else if(linearDepth<0.0079)
-	{
-		textureColor = vec4(0.0, 1.0, 0.0, 1.0); 
-	}
-	*/
-	
 	//vec3 ambientColorAux = vec3(textureColor.x*ambientColor.x, textureColor.y*ambientColor.y, textureColor.z*ambientColor.z); // original.***
 	vec3 ambientColorAux = vec3(textureColor.xyz);
 	float alfa = textureColor.w * externalAlpha;

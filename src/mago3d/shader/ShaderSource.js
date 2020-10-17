@@ -2474,21 +2474,6 @@ void main()\n\
 		}\n\
 	}\n\
 	\n\
-\n\
-    \n\
-	\n\
-	//textureColor = vec4(0.85, 0.85, 0.85, 1.0);\n\
-	/*\n\
-	if(linearDepth>0.95)\n\
-	{\n\
-		textureColor = vec4(1.0, 0.0, 0.0, 1.0); \n\
-	}\n\
-	else if(linearDepth<0.0079)\n\
-	{\n\
-		textureColor = vec4(0.0, 1.0, 0.0, 1.0); \n\
-	}\n\
-	*/\n\
-	\n\
 	//vec3 ambientColorAux = vec3(textureColor.x*ambientColor.x, textureColor.y*ambientColor.y, textureColor.z*ambientColor.z); // original.***\n\
 	vec3 ambientColorAux = vec3(textureColor.xyz);\n\
 	float alfa = textureColor.w * externalAlpha;\n\
@@ -4058,11 +4043,6 @@ void main()\n\
 		// the sun lights count are 2.\n\
 		// 1rst, calculate the pixelPosWC.\n\
 		float z_window  = unpackDepth(texture2D(depthTex, screenPos.xy)); // z_window  is [0.0, 1.0] range depth.\n\
-		//if(z_window < 0.001)\n\
-		//discard;\n\
-\n\
-		//vec3 ray = getViewRay(screenPos);\n\
-		//vec4 posWC = vec4(ray * z_window, 1.0);\n\
 		\n\
 		// https://stackoverflow.com/questions/11277501/how-to-recover-view-space-position-given-view-space-depth-value-and-ndc-xy\n\
 		float depthRange_near = 0.0;\n\
@@ -4541,18 +4521,6 @@ void main()\n\
     vec3 ray = getViewRay(screenPos, (currFar)); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
     vec3 rayNear = getViewRay(screenPos, currNear);\n\
     float linearDepth = getDepth(screenPos);  \n\
-    bool isAlmostOutOfFrustum = false;\n\
-    //if(linearDepth>0.996 || linearDepth<0.001005)\n\
-    //if(linearDepth>0.996 || linearDepth<0.001005)\n\
-    //{\n\
-    //    isAlmostOutOfFrustum = true;\n\
-    //}\n\
-\n\
-    //if(linearDepth > 0.996)\n\
-    //{\n\
-        //discard;\n\
-    //}\n\
-    \n\
 \n\
     float radius_D = 20.0;\n\
     float radius_C = 12.0;\n\
@@ -4575,7 +4543,7 @@ void main()\n\
     //    factorByDist = smoothstep(0.0, 1.0, realDist/(bigRadius*5.0));\n\
     //}\n\
 \n\
-    float aux = 10.0;\n\
+    float aux = 30.0;\n\
     if(realDist < aux)\n\
     {\n\
         factorByDist = smoothstep(0.0, 1.0, realDist/(aux));\n\

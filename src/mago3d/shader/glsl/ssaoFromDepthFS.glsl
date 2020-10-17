@@ -258,18 +258,6 @@ void main()
     vec3 ray = getViewRay(screenPos, (currFar)); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
     vec3 rayNear = getViewRay(screenPos, currNear);
     float linearDepth = getDepth(screenPos);  
-    bool isAlmostOutOfFrustum = false;
-    //if(linearDepth>0.996 || linearDepth<0.001005)
-    //if(linearDepth>0.996 || linearDepth<0.001005)
-    //{
-    //    isAlmostOutOfFrustum = true;
-    //}
-
-    //if(linearDepth > 0.996)
-    //{
-        //discard;
-    //}
-    
 
     float radius_D = 20.0;
     float radius_C = 12.0;
@@ -292,7 +280,7 @@ void main()
     //    factorByDist = smoothstep(0.0, 1.0, realDist/(bigRadius*5.0));
     //}
 
-    float aux = 10.0;
+    float aux = 30.0;
     if(realDist < aux)
     {
         factorByDist = smoothstep(0.0, 1.0, realDist/(aux));

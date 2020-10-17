@@ -129,9 +129,10 @@ Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, sh
 				var radiusAprox = bbox.getRadiusAprox();
 				var distToLight0 = light0CenterPoint.distToPoint(bboxAbsoluteCenterPos);//+radiusAprox;
 				
-				if (distToLight0 < light0Radius)
+				if (distToLight0 < light0Radius*0.5)
 				{
-					gl.uniform1i(shader.sunIdx_loc, 0);
+					gl.uniform1i(shader.sunIdx_loc, 0); // original.***
+					//gl.uniform1i(shader.sunIdx_loc, 1);
 				}
 				else
 				{
@@ -1621,6 +1622,10 @@ Renderer.prototype.renderTerrainShadow = function(gl)
  */
 Renderer.prototype.renderScreenQuadShadow = function(gl, depthTex) 
 {
+	// Function no used yet.***
+	// Function no used yet.***
+	// Function no used yet.***
+	//------------------------------------------------
 	var currentShader;
 	var shaderProgram;
 	var neoBuilding;
