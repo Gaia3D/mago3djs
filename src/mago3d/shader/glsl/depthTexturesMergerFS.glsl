@@ -91,7 +91,7 @@ void main()
 
     // Take the base color.
     vec4 textureColor = vec4(0.0, 0.0, 0.0, 0.0);
-    vec4 normalColor = vec4(0.0, 0.0, 0.0, 0.0);
+    vec4 normalColor = vec4(0.0, 0.0, 0.0, 1.0);
     bool isValid = false;
 
     for(int i=0; i<4; i++)
@@ -115,7 +115,11 @@ void main()
     }
 
     if(!isValid)
-    discard;
+    {
+        gl_FragData[1] = vec4(0.0, 0.0, 0.0, 1.0);
+        return;
+    }
+    //discard;
 
     
     gl_FragData[0] = textureColor;

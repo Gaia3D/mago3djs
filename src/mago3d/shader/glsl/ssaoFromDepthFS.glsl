@@ -30,13 +30,31 @@ uniform bool bUseLogarithmicDepth;
 uniform float uFCoef_logDepth;
 
 
-
+/*
 float unpackDepth(const in vec4 rgba_depth)
 {
+    // mago unpackDepth.***
     const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);// original.***
     float depth = dot(rgba_depth, bit_shift);
     return depth;
 }  
+*/
+
+
+float unpackDepth(vec4 packedDepth)
+{
+	// See Aras Pranckevičius' post Encoding Floats to RGBA
+	// http://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/
+	//vec4 packDepth( float v ) // function to packDepth.***
+	//{
+	//	vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;
+	//	enc = fract(enc);
+	//	enc -= enc.yzww * vec4(1.0/255.0,1.0/255.0,1.0/255.0,0.0);
+	//	return enc;
+	//}
+	return dot(packedDepth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));
+}
+
 
 vec4 decodeNormal(in vec4 normal)
 {
@@ -48,21 +66,7 @@ vec4 getNormal(in vec2 texCoord)
     vec4 encodedNormal = texture2D(normalTex, texCoord);
     return decodeNormal(encodedNormal);
 }
-
-/*
-float unpackDepth_A(vec4 packedDepth)
-{
-	// See Aras Pranckevičius' post Encoding Floats to RGBA
-	// http://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/
-	return dot(packedDepth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));
-}
-*/
-
-float UnpackDepth32( in vec4 pack )
-{
-	float depth = dot( pack, vec4(1.0, 0.00390625, 0.000015258789, 0.000000059605) );
-    return depth * 1.000000059605;// 1.000000059605 = (16777216.0) / (16777216.0 - 1.0);
-}             
+            
 
 vec3 getViewRay(vec2 tc, in float relFar)
 {
@@ -184,7 +188,7 @@ float getOcclusion(vec3 origin, vec3 rotatedKernel, float radius, vec2 origin_ne
     offsetCoord.xyz = offsetCoord.xyz * 0.5 + 0.5;  	
 
     vec4 normalRGBA = getNormal(offsetCoord.xy);
-    int currFrustumIdx = int(floor(10.0*normalRGBA.w));
+    int currFrustumIdx = int(floor(100.0*normalRGBA.w));
     vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);
     float currNear = nearFar.x;
     float currFar = nearFar.y;
@@ -249,7 +253,10 @@ void main()
     vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
     vec4 normalRGBA = getNormal(screenPos);
     vec3 normal2 = normalRGBA.xyz; // original.***
-    int currFrustumIdx = int(floor(10.0*normalRGBA.w));
+    int currFrustumIdx = int(floor(100.0*normalRGBA.w));
+
+    if(currFrustumIdx > 3)
+    discard;
 
     vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);
     float currNear = nearFar.x;

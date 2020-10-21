@@ -174,7 +174,7 @@ SceneState.prototype.initMagoSceneState = function(cId)
 	containerDiv.appendChild(canvas);
 	var glAttrs = {antialias          : true, 
 		stencil            : true,
-		premultipliedAlpha : false};
+		premultipliedAlpha : true};
 	var gl = canvas.getContext("webgl", glAttrs);
 	if (!gl)
 	{ gl = canvas.getContext("experimental-webgl", glAttrs); }

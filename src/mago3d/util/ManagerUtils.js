@@ -641,7 +641,11 @@ ManagerUtils.calculateSplited3fv = function(point3fv, resultSplitPoint3fvHigh, r
 ManagerUtils.unpackDepth = function(rgba_depth)
 {
 	//var bit_shift = [0.000000059605, 0.000015258789, 0.00390625, 1.0];
-	return rgba_depth[0] * 0.000000059605 + rgba_depth[1] * 0.000015258789 + rgba_depth[2] * 0.00390625 + rgba_depth[3];
+	//return rgba_depth[0] * 0.000000059605 + rgba_depth[1] * 0.000015258789 + rgba_depth[2] * 0.00390625 + rgba_depth[3];
+
+	// New pack-unpack.***
+	//return dot(packedDepth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));
+	return rgba_depth[0] + rgba_depth[1] * 1.0 / 255.0 + rgba_depth[2] * 1.0 / 65025.0 + rgba_depth[3] * 1.0 / 16581375.0;
 };
 
 ManagerUtils.mod = function(x, y)
@@ -651,6 +655,10 @@ ManagerUtils.mod = function(x, y)
 
 ManagerUtils.packDepth = function(depth)
 {
+	// Note: Function for debug. Function no used in javaScript.***
+	// Note: Function for debug. Function no used in javaScript.***
+	// Note: Function for debug. Function no used in javaScript.***
+	//--------------------------------------------------------------------------------------
 	//const vec4 bit_shift = vec4(16777216.0, 65536.0, 256.0, 1.0);
 	//const vec4 bit_mask  = vec4(0.0, 0.00390625, 0.00390625, 0.00390625); 
 	////vec4 res = fract(depth * bit_shift); // Is not precise.
@@ -658,6 +666,7 @@ ManagerUtils.packDepth = function(depth)
 	//res -= res.xxyz * bit_mask;
 	//return res; 
 	
+	// Note: Function for debug. Function no used in javaScript.***
 	var bit_shift = [16777216.0, 65536.0, 256.0, 1.0];
 	var bit_mask = [0.0, 0.00390625, 0.00390625, 0.00390625];
 
@@ -742,17 +751,71 @@ ManagerUtils.calculatePixelLinearDepth = function(gl, pixelX, pixelY, depthFbo, 
  * @param {WebGLRenderingContext} gl WebGL Rendering Context.
  * @param {Number} pixelX Screen x position of the pixel.
  * @param {Number} pixelY Screen y position of the pixel.
- * @param {FBO} depthFbo Depth frameBuffer object.
+ * @param {webGlTexture} depthTex Depth frameBuffer object.
+ * @param {webGlTexture} normalTex Depth frameBuffer object.
  * @param {MagoManager} magoManager Mago3D main manager.
  * @returns {Number} linearDepth Returns the linear depth [0.0, 1.0] ranged value.
  */
-ManagerUtils.calculatePixelLinearDepthABGR = function(gl, pixelX, pixelY, depthFbo, magoManager) 
+ManagerUtils.calculatePixelLinearDepthV2 = function(gl, pixelX, pixelY, depthTex, normalTex, magoManager) 
 {
-	// Test function.
-	// Test function.
-	// Test function.
-	// Test function.
-	// Called from MagoWorld.updateMouseStartClick(...).***
+	var depthPixels = new Uint8Array(4 * 1 * 1); // 4 x 1x1 pixel.
+
+	// 1rst, read normal & currentFrustum.***
+	var texturesMergerFbo = magoManager.texturesManager.texturesMergerFbo;
+	//FBO.bindFramebuffer(gl, texturesMergerFbo, normalTex);
+	texturesMergerFbo.bind();
+	gl.readPixels(pixelX, magoManager.sceneState.drawingBufferHeight[0] - pixelY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, depthPixels);
+	var floatDepthPixels = new Float32Array(([depthPixels[0]/256.0, depthPixels[1]/256.0, depthPixels[2]/256.0, depthPixels[3]/256.0]));
+	var zDepth = ManagerUtils.unpackDepth(floatDepthPixels); // 0 to 256 range depth.
+	var linearDepth = zDepth;// [0.0, 1.0] range depth.
+
+	// swap normalTex & depthTex of the texturesMergerFbo to read the normal.***
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, texturesMergerFbo.extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, normalTex, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, texturesMergerFbo.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, depthTex, 0);
+	gl.readPixels(pixelX, magoManager.sceneState.drawingBufferHeight[0] - pixelY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, depthPixels);
+	var floatNormalPixels = new Float32Array(([depthPixels[0]/256.0, depthPixels[1]/256.0, depthPixels[2]/256.0, depthPixels[3]/256.0]));
+
+	// calculate the frustumIdx of the readed pixel.***
+	var frustumIdx = Math.floor(floatNormalPixels[3]*100);
+
+	// check frustumIdx. There are 2 type of frustumsIdx :  0, 1, 2, 3 or 10, 11, 12, 13.***
+	if(frustumIdx >= 10)
+	frustumIdx -= 10;
+
+	// return the fbo to initial setting.***
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, texturesMergerFbo.extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, texturesMergerFbo.colorBuffer, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, texturesMergerFbo.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, texturesMergerFbo.colorBuffer1, 0);
+	texturesMergerFbo.unbind();
+
+	var near;
+	var far;
+	if(frustumIdx < magoManager.numFrustums)
+	{
+		near = magoManager.frustumVolumeControl.nearFarArray[frustumIdx*2];
+		far = magoManager.frustumVolumeControl.nearFarArray[frustumIdx*2 + 1];
+	}
+
+	// Check if we are using logarithmic depth buffer.***
+	if (magoManager.postFxShadersManager.bUseLogarithmicDepth)
+	{
+		linearDepth = zDepth * 1.0037;
+		var sceneState = magoManager.sceneState;
+		//var far = sceneState.camera.frustum.far[0]; // old.***
+
+		var fcoef_half = sceneState.fCoef_logDepth[0]/2.0;
+		var flogz = Math.pow(2.0, linearDepth/fcoef_half);
+		var z = flogz - 1.0;
+		linearDepth = z/far;
+	}
+
+	return {linearDepth : linearDepth,
+			normal4 : floatNormalPixels,
+			frustumIdx : frustumIdx,
+			near : near,
+			far : far };
+
+	/*
+
 	if (depthFbo === undefined)
 	{ depthFbo = magoManager.depthFboNeo; }
 
@@ -760,18 +823,38 @@ ManagerUtils.calculatePixelLinearDepthABGR = function(gl, pixelX, pixelY, depthF
 	{
 		return;
 	}
-	
+
 	if (depthFbo) 
 	{
 		depthFbo.bind(); 
 	}
-	
+
 	// Now, read the pixel and find the pixel position.
-	var depthPixels = new Uint8Array(4 * 1 * 1); // 4 x 1x1 pixel.
+	
 	gl.readPixels(pixelX, magoManager.sceneState.drawingBufferHeight[0] - pixelY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, depthPixels);
 	
-	var zDepth = depthPixels[3]/(255.0*255.0*255.0) + depthPixels[2]/(255.0*255.0) + depthPixels[1]/255.0 + depthPixels[0]; // 0 to 256 range depth.
-	var linearDepth = zDepth / 255.0; // LinearDepth. Convert to [0.0, 1.0] range depth.
+	var floatDepthPixels = new Float32Array(([depthPixels[0]/256.0, depthPixels[1]/256.0, depthPixels[2]/256.0, depthPixels[3]/256.0]));
+	var zDepth = ManagerUtils.unpackDepth(floatDepthPixels); // 0 to 256 range depth.
+	var linearDepth = zDepth;// [0.0, 1.0] range depth.
+
+	// Check if we are using logarithmic depth buffer.***
+	if (magoManager.postFxShadersManager.bUseLogarithmicDepth)
+	{
+		linearDepth = zDepth * 1.0037;
+		var sceneState = magoManager.sceneState;
+		var far = sceneState.camera.frustum.far[0];
+
+		var fcoef_half = sceneState.fCoef_logDepth[0]/2.0;
+		// gl_FragDepthEXT = linearDepth = log2(flogz) * Fcoef_half;
+		// flogz = 1.0 + gl_Position.z;
+		// sceneState.fCoef_logDepth[0] = 2.0 / Math.log2(frustum0.far[0] + 1.0);
+
+		var flogz = Math.pow(2.0, linearDepth/fcoef_half);
+		var z = flogz - 1.0;
+		linearDepth = z/far;
+	}
+	
+*/
 	return linearDepth;
 };
 
@@ -789,22 +872,6 @@ ManagerUtils.calculatePixelPositionCamCoord = function(gl, pixelX, pixelY, resul
 {
 	var sceneState = magoManager.sceneState;
 
-	/*
-	vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
-		float z_window  = unpackDepth(texture2D(depthTex, screenPos.xy)); // z_window  is [0.0, 1.0] range depth.
-		if(z_window < 0.001)
-		discard;
-	
-		float depthRange_near = 0.0;
-		float depthRange_far = 1.0;
-		float x_ndc = 2.0 * screenPos.x - 1.0;
-		float y_ndc = 2.0 * screenPos.y - 1.0;
-		float z_ndc = (2.0 * z_window - depthRange_near - depthRange_far) / (depthRange_far - depthRange_near);
-		
-		vec4 viewPosH = projectionMatrixInv * vec4(x_ndc, y_ndc, z_ndc, 1.0);
-		vec3 posCC = viewPosH.xyz/viewPosH.w;
-		vec4 posWC = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0) + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 1.0);
-		*/
 	// New.*** New.*** New.*** New.*** New.*** New.*** New.*** New.*** New.*** New.*** New.*** New.*** New.*** New.*** New.*** New.*** New.*** New.***
 	/*
 	if (depthFbo) 
@@ -860,9 +927,26 @@ ManagerUtils.calculatePixelPositionCamCoord = function(gl, pixelX, pixelY, resul
 
 	if (!linearDepth) 
 	{
-		linearDepth = ManagerUtils.calculatePixelLinearDepth(gl, pixelX, pixelY, depthFbo, magoManager);
-		if (!linearDepth) 
-		{ return; }
+		//linearDepth = ManagerUtils.calculatePixelLinearDepth(gl, pixelX, pixelY, depthFbo, magoManager);
+		//if (!linearDepth) 
+		//{ return; }
+
+		var texturesMergerFbo = magoManager.texturesManager.texturesMergerFbo;
+		var depthTex = texturesMergerFbo.colorBuffer;
+		var normalTex = texturesMergerFbo.colorBuffer1;
+		var resultObject = ManagerUtils.calculatePixelLinearDepthV2(gl, pixelX, pixelY, depthTex, normalTex, magoManager);
+
+		if(resultObject.frustumIdx < magoManager.numFrustums)
+		{
+			linearDepth = resultObject.linearDepth;
+			frustumFar = resultObject.far;
+			frustumNear = resultObject.near;
+		}
+		else
+		{
+			return; // no valid linearDepth.
+		}
+
 	}
 
 

@@ -80,20 +80,31 @@ varying float vTileDepth;
 
 
 // water caustics: https://catlikecoding.com/unity/tutorials/flow/texture-distortion/
-
+/*
 float unpackDepth(const in vec4 rgba_depth)
 {
+	// mago unpack.***
+	// mago unpack.***
+	// mago unpack.***
     const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);
     float depth = dot(rgba_depth, bit_shift);
     return depth;
 } 
+*/
 
-float unpackDepthOcean(const in vec4 rgba_depth)
+float unpackDepth(vec4 packedDepth)
 {
-    const vec4 bit_shift = vec4(1.0, 0.00390625, 0.000015258789, 0.000000059605);
-    float depth = dot(rgba_depth, bit_shift);
-    return depth;
-} 
+	// See Aras Pranckevičius' post Encoding Floats to RGBA
+	// http://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/
+	//vec4 packDepth( float v ) // function to packDepth.***
+	//{
+	//	vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;
+	//	enc = fract(enc);
+	//	enc -= enc.yzww * vec4(1.0/255.0,1.0/255.0,1.0/255.0,0.0);
+	//	return enc;
+	//}
+	return dot(packedDepth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));
+}
 
 float UnpackDepth32( in vec4 pack )
 {
@@ -101,15 +112,37 @@ float UnpackDepth32( in vec4 pack )
     return depth * (16777216.0) / (16777216.0 - 1.0);
 }
 
+/*
 vec4 packDepth(const in float depth)
 {
-    const vec4 bit_shift = vec4(16777216.0, 65536.0, 256.0, 1.0);
-    const vec4 bit_mask  = vec4(0.0, 0.00390625, 0.00390625, 0.00390625); 
+	// mago packDepth.***
+    const vec4 bit_shift = vec4(16777216.0, 65536.0, 256.0, 1.0); // original.***
+    const vec4 bit_mask  = vec4(0.0, 0.00390625, 0.00390625, 0.00390625);  // original.*** 
+	
     //vec4 res = fract(depth * bit_shift); // Is not precise.
 	vec4 res = mod(depth * bit_shift * vec4(255), vec4(256) ) / vec4(255); // Is better.
     res -= res.xxyz * bit_mask;
     return res;  
-}               
+}
+*/
+
+
+vec4 packDepth( float v ) {
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;
+  enc = fract(enc);
+  enc -= enc.yzww * vec4(1.0/255.0,1.0/255.0,1.0/255.0,0.0);
+  return enc;
+}   
+
+vec3 encodeNormal(in vec3 normal)
+{
+	return normal*0.5 + 0.5;
+}
+
+vec3 decodeNormal(in vec3 normal)
+{
+	return normal * 2.0 - 1.0;
+}
 
 vec3 getViewRay(vec2 tc)
 {
@@ -395,6 +428,13 @@ void main()
 	if(bIsMakingDepth)
 	{
 		gl_FragData[0] = packDepth(depthAux);
+
+		vec3 encodedNormal = encodeNormal(vNormal);
+		#ifdef USE_MULTI_RENDER_TARGET
+		// check frustumIdx. There are 2 type of frustumsIdx :  0, 1, 2, 3 or 10, 11, 12, 13.***
+		gl_FragData[1] = vec4(encodedNormal, 0.105); // save normal, frustumIdx = 10.***
+		#endif
+
 		return;
 	}
 	else
@@ -412,8 +452,6 @@ void main()
 
 			return;
 		}
-
-		
 
 		float shadow_occlusion = 1.0;
 		if(bApplyShadow)
@@ -457,59 +495,11 @@ void main()
 		float lambertian = 1.0;
 		float specular;
 		vec2 texCoord;
-		/*
-		if(applySpecLighting> 0.0)
-		{
-			vec3 L;
-			if(bApplyShadow)
-			{
-				L = vLightDir;// test.***
-				lambertian = max(dot(normal2, L), 0.0); // original.***
-			}
-			else
-			{
-				vec3 lightPos = vec3(0.0, 0.0, 0.0);
-				L = normalize(lightPos - v3Pos);
-				lambertian = max(dot(normal2, L), 0.0);
-			}
-			
-			//specular = 0.0;
-			//if(lambertian > 0.0)
-			//{
-			//	vec3 R = reflect(-L, normal2);      // Reflected light vector
-			//	vec3 V = normalize(-v3Pos); // Vector to viewer
-			//	
-			//	// Compute the specular term
-			//	float specAngle = max(dot(R, V), 0.0);
-			//	specular = pow(specAngle, shininessValue);
-			//	
-			//	if(specular > 1.0)
-			//	{
-			//		specular = 1.0;
-			//	}
-			//}
-			
-			// test.
-			lambertian += 0.3;
 
-			if(lambertian < 0.8)
-			{
-				lambertian = 0.8;
-			}
-			else if(lambertian > 1.0)
-			{
-				lambertian = 1.0;
-			}
-
-			
-		}
-		*/
 		
 		// check if apply ssao.
 		float occlusion = 1.0;
-		//vec3 normal2 = vNormal;	
-		
-	
+
 		vec4 textureColor = vec4(0.0);
 		if(colorType == 0) // one color.
 		{
@@ -524,13 +514,6 @@ void main()
 		{
 			// Check if the texture is from a different depth tile texture.***
 			vec2 finalTexCoord = vTexCoord;
-			//if((vTileDepth - vTexTileDepth)> 0.5)
-			//{
-			//	// Must recalculate texCoords.***
-			//	float currLatRad = LatitudeRad_fromTexCoordY(vTexCoord.t);
-			//	float newT = TexCoordY_fromLatitudeRad(currLatRad); // [0..1] range
-			//	finalTexCoord = vec2(vRecalculatedTexCoordS, newT);
-			//}
 			
 			if(textureFlipYAxis)
 			{
@@ -681,31 +664,12 @@ void main()
 			
 			shadow_occlusion *= occlusion;
 		}
-		/*
-		float offsetAux = 6.0;
-		vec2 screenPos_up = vec2((gl_FragCoord.x)/ screenWidth, (gl_FragCoord.y +offsetAux)/ screenHeight);
-		vec2 screenPos_down = vec2((gl_FragCoord.x)/ screenWidth, (gl_FragCoord.y -offsetAux)/ screenHeight);
-		vec2 screenPos_left = vec2((gl_FragCoord.x -offsetAux)/ screenWidth, (gl_FragCoord.y)/ screenHeight);
-		vec2 screenPos_right = vec2((gl_FragCoord.x +offsetAux)/ screenWidth, (gl_FragCoord.y)/ screenHeight);
-
-		vec3 normalFromDepth_up = normal_from_depth(linearDepthAux, screenPos_up); // normal from depthTex.***
-		vec3 normalFromDepth_down = normal_from_depth(linearDepthAux, screenPos_down); // normal from depthTex.***
-		vec3 normalFromDepth_left = normal_from_depth(linearDepthAux, screenPos_left); // normal from depthTex.***
-		vec3 normalFromDepth_right = normal_from_depth(linearDepthAux, screenPos_right); // normal from depthTex.***
-
-		normalFromDepth = (normalFromDepth + normalFromDepth_up + normalFromDepth_down + normalFromDepth_left + normalFromDepth_right)/5.0;
-		*/
 
 		vec3 normalFromDepth = normal_from_depth(linearDepthAux, screenPos); // normal from depthTex.***
-		//normalFromDepth += vNormal*0.5;
-		//normalize(normalFromDepth);
-		//normalFromDepth = normalize(vec3(normalFromDepth.x*8.0, normalFromDepth.y*8.0, normalFromDepth.z));
 		vec2 screenPosAux = vec2(0.5, 0.5);
 
 		vec3 rayAux = getViewRay(screenPosAux); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
 		float scalarProd = dot(normalFromDepth, normalize(-rayAux));
-
-		//scalarProd = scalarProd * scalarProd;
 		scalarProd /= 3.0;
 		scalarProd += 0.666;
 
@@ -759,20 +723,12 @@ void main()
 			textureColor *= vec4(textureColor.r*scalarProd_2d, textureColor.g*scalarProd_2d, textureColor.b, textureColor.a);
 			// End Something like to HillShade.---------------------------------------------------------------------------------
 			
-            // End Something like to HillShade.---------------------------------------------------------------------------------
-			
 			// End test drawing grid.---
-			float specularReflectionCoef = 0.6;
-			vec3 specularColor = vec3(0.8, 0.8, 0.8);
+			//float specularReflectionCoef = 0.6;
+			//vec3 specularColor = vec3(0.8, 0.8, 0.8);
 			//textureColor = mix(textureColor, fogColor, 0.2); 
 			//gl_FragData[0] = vec4(finalColor.xyz * shadow_occlusion * lambertian + specularReflectionCoef * specular * specularColor * shadow_occlusion, 1.0); // with specular.***
 			gl_FragData[0] = vec4(textureColor.xyz * shadow_occlusion * lambertian * scalarProd, 1.0); // original.***
-
-			// test contrast.***
-			//float Contrast = 2.0;
-			//vec3 pixelColor = vec3(gl_FragData[0].r, gl_FragData[0].g, gl_FragData[0].b);
-			//pixelColor.rgb = ((pixelColor.rgb - 0.5) * max(Contrast, 0.0)) + 0.5;
-			//gl_FragData[0] = vec4(pixelColor, 1.0);
 
 			return;
 		}

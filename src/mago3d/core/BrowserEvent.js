@@ -25,33 +25,34 @@ var BrowserEvent = function(type, position, magoManager)
 	{
 		if (position.hasOwnProperty('x') && position.hasOwnProperty('y'))
 		{
+			// Enters here when mouse-drag.***
 			var worldCoordinate;
 			var sceneState = magoManager.sceneState;
 			var gl = magoManager.getGl();
 			var camera = sceneState.camera;
 
-			var maxDepth = 0.996;
-			var currentDepthFbo;
+			// Test the new method: depth + normal + frustumIdx.************************************************************************
+			var texturesMergerFbo = magoManager.texturesManager.texturesMergerFbo;
+			var depthTex = texturesMergerFbo.colorBuffer;
+			var normalTex = texturesMergerFbo.colorBuffer1;
+			var resultObject = ManagerUtils.calculatePixelLinearDepthV2(gl, position.x, position.y, depthTex, normalTex, magoManager);
+			/* resultObject = {linearDepth : linearDepth,
+								normal4    : floatNormalPixels,
+								frustumIdx : frustumIdx,
+								near       : near,
+								far        : far };
+				*/
+			//---------------------------------------------------------------------------------------------------------------------------
+			
 			var currentFrustumFar;
 			var currentFrustumNear;
 			var currentLinearDepth;
 			var depthDetected = false;
-			var frustumsCount = magoManager.numFrustums;
-			for (var i = 0; i < frustumsCount; i++)
+			if(resultObject.frustumIdx < magoManager.numFrustums)
 			{
-				var frustumVolume = magoManager.frustumVolumeControl.getFrustumVolumeCulling(i); 
-				var depthFbo = frustumVolume.depthFbo;
-
-				currentLinearDepth = ManagerUtils.calculatePixelLinearDepth(gl, position.x, position.y, depthFbo, magoManager);
-				if (currentLinearDepth < maxDepth) // maxDepth/255 = 0.99607...
-				{ 
-					currentDepthFbo = depthFbo;
-					var frustum = camera.getFrustum(i);
-					currentFrustumFar = frustum.far[0];
-					currentFrustumNear = frustum.near[0];
-					depthDetected = true;
-					break;
-				}
+				depthDetected = true;
+				currentFrustumFar = resultObject.far;
+				currentLinearDepth = resultObject.linearDepth;
 			}
 
 			if (!depthDetected && magoManager.isCesiumGlobe())
@@ -63,14 +64,14 @@ var BrowserEvent = function(type, position, magoManager)
 			}
 			else 
 			{
-				var camCoord = MagoWorld.screenToCamCoord(position.x, position.y, magoManager, camCoord);
+				var camCoord = MagoWorld.screenToCamCoord(position.x, position.y, magoManager, camCoord, resultObject);
 				if (!camCoord)
 				{
 					worldCoordinate = undefined;
 				} 
 				else 
 				{
-					worldCoordinate = ManagerUtils.cameraCoordPositionToWorldCoord(camCoord, worldCoordinate, magoManager);
+					worldCoordinate = ManagerUtils.cameraCoordPositionToWorldCoord(camCoord, worldCoordinate, magoManager, resultObject);
 				}
 			}
 
@@ -86,6 +87,7 @@ var BrowserEvent = function(type, position, magoManager)
 		} 
 		else if (position.hasOwnProperty('startPosition') && position.hasOwnProperty('endPosition'))
 		{
+			// Enters here when mouse-move.***
 			var startEventCoordinate = ManagerUtils.getComplexCoordinateByScreenCoord(magoManager.getGl(), position.startPosition.x, position.startPosition.y, undefined, undefined, undefined, magoManager);
 			if (!startEventCoordinate)
 			{
@@ -102,6 +104,7 @@ var BrowserEvent = function(type, position, magoManager)
 		}
 		else 
 		{
+			// Enters here when mouse-wheel.***
 			this.position = position;
 		}
 	}

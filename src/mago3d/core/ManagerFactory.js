@@ -423,7 +423,7 @@ var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray,
 		var canvas = document.getElementById(containerId);
 		var glAttrs = {antialias          : true, 
 			stencil            : true,
-			premultipliedAlpha : false};
+			premultipliedAlpha : true};
 		var gl = canvas.getContext("webgl", glAttrs);
 		if (!gl)
 		{ gl = canvas.getContext("experimental-webgl", glAttrs); }

@@ -646,7 +646,7 @@ void main()\n\
 \n\
     // Take the base color.\n\
     vec4 textureColor = vec4(0.0, 0.0, 0.0, 0.0);\n\
-    vec4 normalColor = vec4(0.0, 0.0, 0.0, 0.0);\n\
+    vec4 normalColor = vec4(0.0, 0.0, 0.0, 1.0);\n\
     bool isValid = false;\n\
 \n\
     for(int i=0; i<4; i++)\n\
@@ -670,7 +670,11 @@ void main()\n\
     }\n\
 \n\
     if(!isValid)\n\
-    discard;\n\
+    {\n\
+        gl_FragData[1] = vec4(0.0, 0.0, 0.0, 1.0);\n\
+        return;\n\
+    }\n\
+    //discard;\n\
 \n\
     \n\
     gl_FragData[0] = textureColor;\n\
@@ -3588,9 +3592,10 @@ varying vec3 vNormal;\n\
 varying float flogz;\n\
 varying float Fcoef_half;\n\
 varying float vFrustumIdx;\n\
-\n\
+/*\n\
 vec4 packDepth(const in float depth)\n\
 {\n\
+	// mago packDepth.***\n\
     const vec4 bit_shift = vec4(16777216.0, 65536.0, 256.0, 1.0); // original.***\n\
     const vec4 bit_mask  = vec4(0.0, 0.00390625, 0.00390625, 0.00390625);  // original.*** \n\
 	\n\
@@ -3599,6 +3604,16 @@ vec4 packDepth(const in float depth)\n\
     res -= res.xxyz * bit_mask;\n\
     return res;  \n\
 }\n\
+*/\n\
+\n\
+\n\
+vec4 packDepth( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0,1.0/255.0,1.0/255.0,0.0);\n\
+  return enc;\n\
+}\n\
+\n\
 \n\
 vec3 encodeNormal(in vec3 normal)\n\
 {\n\
@@ -3609,20 +3624,7 @@ vec3 decodeNormal(in vec3 normal)\n\
 {\n\
 	return normal * 2.0 - 1.0;\n\
 }\n\
-/*\n\
-vec4 packDepth_A( float v ) {\n\
-  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
-  enc = fract(enc);\n\
-  enc -= enc.yzww * vec4(1.0/255.0,1.0/255.0,1.0/255.0,0.0);\n\
-  return enc;\n\
-}\n\
-// unpack depth used for shadow on screen.***\n\
-float unpackDepth_A(vec4 packedDepth)\n\
-{\n\
-	// See Aras Pranckevičius' post Encoding Floats to RGBA\n\
-	// http://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/\n\
-	return dot(packedDepth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
-}*/\n\
+\n\
 \n\
 \n\
 //vec4 PackDepth32( in float depth )\n\
@@ -3686,13 +3688,13 @@ void main()\n\
 \n\
 	float frustumIdx = 1.0;\n\
 	if(uFrustumIdx == 0)\n\
-	frustumIdx = 0.05;\n\
+	frustumIdx = 0.005;\n\
 	else if(uFrustumIdx == 1)\n\
-	frustumIdx = 0.15;\n\
+	frustumIdx = 0.015;\n\
 	else if(uFrustumIdx == 2)\n\
-	frustumIdx = 0.25;\n\
+	frustumIdx = 0.025;\n\
 	else if(uFrustumIdx == 3)\n\
-	frustumIdx = 0.35;\n\
+	frustumIdx = 0.035;\n\
 \n\
 	#ifdef USE_MULTI_RENDER_TARGET\n\
 	vec3 encodedNormal = encodeNormal(vNormal);\n\
@@ -3855,20 +3857,14 @@ float unpackDepth(vec4 packedDepth)\n\
 	//}\n\
 	return dot(packedDepth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
 }\n\
-\n\
-vec4 packDepth( float v ) {\n\
-  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
-  enc = fract(enc);\n\
-  enc -= enc.yzww * vec4(1.0/255.0,1.0/255.0,1.0/255.0,0.0);\n\
-  return enc;\n\
-}\n\
-\n\
+/*\n\
 float unpackDepthMago(const in vec4 rgba_depth)\n\
 {\n\
     const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);// original.***\n\
     float depth = dot(rgba_depth, bit_shift);\n\
     return depth;\n\
 } \n\
+*/\n\
 \n\
 float UnpackDepth32( in vec4 pack )\n\
 {\n\
@@ -3885,21 +3881,6 @@ vec4 getNormal(in vec2 texCoord)\n\
 {\n\
     vec4 encodedNormal = texture2D(normalTex, texCoord);\n\
     return decodeNormal(encodedNormal);\n\
-}\n\
-\n\
-float getDepthShadowMap(vec2 coord)\n\
-{\n\
-	// currSunIdx\n\
-	if(sunIdx == 0)\n\
-	{\n\
-		return UnpackDepth32(texture2D(shadowMapTex, coord.xy));\n\
-	}\n\
-    else if(sunIdx ==1)\n\
-	{\n\
-		return UnpackDepth32(texture2D(shadowMapTex2, coord.xy));\n\
-	}\n\
-	else\n\
-		return -1.0;\n\
 }\n\
 \n\
 vec3 getViewRay(vec2 tc)\n\
@@ -4008,7 +3989,7 @@ void main()\n\
 			for(int h=0; h<5; h++)\n\
 			{\n\
 				vec2 screenPosAux = vec2(screenPos_LD.x + pixelSizeW*float(w), screenPos_LD.y + pixelSizeH*float(h));\n\
-				float z_window  = unpackDepthMago(texture2D(depthTex, screenPosAux.xy)); // z_window  is [0.0, 1.0] range depth.\n\
+				float z_window  = unpackDepth(texture2D(depthTex, screenPosAux.xy)); // z_window  is [0.0, 1.0] range depth.\n\
 \n\
 				if(z_window > tolerance)\n\
 				{\n\
@@ -4074,10 +4055,16 @@ void main()\n\
 		gl_FragColor = vec4(finalColor.rgb*shadow_occlusion, alpha);\n\
 		\n\
 	}\n\
-\n\
+	\n\
 	if(bApplySsao)\n\
 	{\n\
-		vec3 normal = getNormal(screenPos).xyz;\n\
+		vec4 normal4 = getNormal(screenPos);\n\
+\n\
+		// check frustumIdx. There are 2 type of frustumsIdx :  0, 1, 2, 3 or 10, 11, 12, 13.***\n\
+		if(int(floor(normal4.w * 100.0)) >= 10)\n\
+		discard;\n\
+\n\
+		vec3 normal = normal4.xyz;\n\
 		if(length(normal) > 0.1)\n\
 		{\n\
 			//ssaoFromDepthTex\n\
@@ -4131,19 +4118,19 @@ void main()\n\
 			if(dot(normal, normal_left) < 0.3)\n\
 			{ factor += increF; }\n\
 \n\
-			/*\n\
-			if(dot(normal, normal_ur) < 0.3)\n\
-			{ factor += increF; }\n\
+			\n\
+			////if(dot(normal, normal_ur) < 0.3)\n\
+			////{ factor += increF; }\n\
 \n\
-			if(dot(normal, normal_rd) < 0.3)\n\
-			{ factor += increF; }\n\
+			////if(dot(normal, normal_rd) < 0.3)\n\
+			////{ factor += increF; }\n\
 \n\
-			if(dot(normal, normal_ld) < 0.3)\n\
-			{ factor += increF; }\n\
+			////if(dot(normal, normal_ld) < 0.3)\n\
+			////{ factor += increF; }\n\
 \n\
-			if(dot(normal, normal_lu) < 0.3)\n\
-			{ factor += increF; }\n\
-			*/\n\
+			////if(dot(normal, normal_lu) < 0.3)\n\
+			////{ factor += increF; }\n\
+			\n\
 \n\
 			if(factor > increF*0.9)\n\
 			{\n\
@@ -4153,6 +4140,7 @@ void main()\n\
 \n\
 		}\n\
 	}\n\
+	\n\
 \n\
 	// check if is fastAntiAlias.***\n\
 	if(bFxaa)\n\
@@ -4293,13 +4281,31 @@ uniform bool bUseLogarithmicDepth;\n\
 uniform float uFCoef_logDepth;\n\
 \n\
 \n\
-\n\
+/*\n\
 float unpackDepth(const in vec4 rgba_depth)\n\
 {\n\
+    // mago unpackDepth.***\n\
     const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);// original.***\n\
     float depth = dot(rgba_depth, bit_shift);\n\
     return depth;\n\
 }  \n\
+*/\n\
+\n\
+\n\
+float unpackDepth(vec4 packedDepth)\n\
+{\n\
+	// See Aras Pranckevičius' post Encoding Floats to RGBA\n\
+	// http://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/\n\
+	//vec4 packDepth( float v ) // function to packDepth.***\n\
+	//{\n\
+	//	vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+	//	enc = fract(enc);\n\
+	//	enc -= enc.yzww * vec4(1.0/255.0,1.0/255.0,1.0/255.0,0.0);\n\
+	//	return enc;\n\
+	//}\n\
+	return dot(packedDepth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+}\n\
+\n\
 \n\
 vec4 decodeNormal(in vec4 normal)\n\
 {\n\
@@ -4311,21 +4317,7 @@ vec4 getNormal(in vec2 texCoord)\n\
     vec4 encodedNormal = texture2D(normalTex, texCoord);\n\
     return decodeNormal(encodedNormal);\n\
 }\n\
-\n\
-/*\n\
-float unpackDepth_A(vec4 packedDepth)\n\
-{\n\
-	// See Aras Pranckevičius' post Encoding Floats to RGBA\n\
-	// http://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/\n\
-	return dot(packedDepth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
-}\n\
-*/\n\
-\n\
-float UnpackDepth32( in vec4 pack )\n\
-{\n\
-	float depth = dot( pack, vec4(1.0, 0.00390625, 0.000015258789, 0.000000059605) );\n\
-    return depth * 1.000000059605;// 1.000000059605 = (16777216.0) / (16777216.0 - 1.0);\n\
-}             \n\
+            \n\
 \n\
 vec3 getViewRay(vec2 tc, in float relFar)\n\
 {\n\
@@ -4447,7 +4439,7 @@ float getOcclusion(vec3 origin, vec3 rotatedKernel, float radius, vec2 origin_ne
     offsetCoord.xyz = offsetCoord.xyz * 0.5 + 0.5;  	\n\
 \n\
     vec4 normalRGBA = getNormal(offsetCoord.xy);\n\
-    int currFrustumIdx = int(floor(10.0*normalRGBA.w));\n\
+    int currFrustumIdx = int(floor(100.0*normalRGBA.w));\n\
     vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);\n\
     float currNear = nearFar.x;\n\
     float currFar = nearFar.y;\n\
@@ -4512,7 +4504,10 @@ void main()\n\
     vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
     vec4 normalRGBA = getNormal(screenPos);\n\
     vec3 normal2 = normalRGBA.xyz; // original.***\n\
-    int currFrustumIdx = int(floor(10.0*normalRGBA.w));\n\
+    int currFrustumIdx = int(floor(100.0*normalRGBA.w));\n\
+\n\
+    if(currFrustumIdx > 3)\n\
+    discard;\n\
 \n\
     vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);\n\
     float currNear = nearFar.x;\n\
@@ -6588,20 +6583,31 @@ varying float vTileDepth;\n\
 \n\
 \n\
 // water caustics: https://catlikecoding.com/unity/tutorials/flow/texture-distortion/\n\
-\n\
+/*\n\
 float unpackDepth(const in vec4 rgba_depth)\n\
 {\n\
+	// mago unpack.***\n\
+	// mago unpack.***\n\
+	// mago unpack.***\n\
     const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);\n\
     float depth = dot(rgba_depth, bit_shift);\n\
     return depth;\n\
 } \n\
+*/\n\
 \n\
-float unpackDepthOcean(const in vec4 rgba_depth)\n\
+float unpackDepth(vec4 packedDepth)\n\
 {\n\
-    const vec4 bit_shift = vec4(1.0, 0.00390625, 0.000015258789, 0.000000059605);\n\
-    float depth = dot(rgba_depth, bit_shift);\n\
-    return depth;\n\
-} \n\
+	// See Aras Pranckevičius' post Encoding Floats to RGBA\n\
+	// http://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/\n\
+	//vec4 packDepth( float v ) // function to packDepth.***\n\
+	//{\n\
+	//	vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+	//	enc = fract(enc);\n\
+	//	enc -= enc.yzww * vec4(1.0/255.0,1.0/255.0,1.0/255.0,0.0);\n\
+	//	return enc;\n\
+	//}\n\
+	return dot(packedDepth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+}\n\
 \n\
 float UnpackDepth32( in vec4 pack )\n\
 {\n\
@@ -6609,15 +6615,37 @@ float UnpackDepth32( in vec4 pack )\n\
     return depth * (16777216.0) / (16777216.0 - 1.0);\n\
 }\n\
 \n\
+/*\n\
 vec4 packDepth(const in float depth)\n\
 {\n\
-    const vec4 bit_shift = vec4(16777216.0, 65536.0, 256.0, 1.0);\n\
-    const vec4 bit_mask  = vec4(0.0, 0.00390625, 0.00390625, 0.00390625); \n\
+	// mago packDepth.***\n\
+    const vec4 bit_shift = vec4(16777216.0, 65536.0, 256.0, 1.0); // original.***\n\
+    const vec4 bit_mask  = vec4(0.0, 0.00390625, 0.00390625, 0.00390625);  // original.*** \n\
+	\n\
     //vec4 res = fract(depth * bit_shift); // Is not precise.\n\
 	vec4 res = mod(depth * bit_shift * vec4(255), vec4(256) ) / vec4(255); // Is better.\n\
     res -= res.xxyz * bit_mask;\n\
     return res;  \n\
-}               \n\
+}\n\
+*/\n\
+\n\
+\n\
+vec4 packDepth( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0,1.0/255.0,1.0/255.0,0.0);\n\
+  return enc;\n\
+}   \n\
+\n\
+vec3 encodeNormal(in vec3 normal)\n\
+{\n\
+	return normal*0.5 + 0.5;\n\
+}\n\
+\n\
+vec3 decodeNormal(in vec3 normal)\n\
+{\n\
+	return normal * 2.0 - 1.0;\n\
+}\n\
 \n\
 vec3 getViewRay(vec2 tc)\n\
 {\n\
@@ -6903,6 +6931,13 @@ void main()\n\
 	if(bIsMakingDepth)\n\
 	{\n\
 		gl_FragData[0] = packDepth(depthAux);\n\
+\n\
+		vec3 encodedNormal = encodeNormal(vNormal);\n\
+		#ifdef USE_MULTI_RENDER_TARGET\n\
+		// check frustumIdx. There are 2 type of frustumsIdx :  0, 1, 2, 3 or 10, 11, 12, 13.***\n\
+		gl_FragData[1] = vec4(encodedNormal, 0.105); // save normal, frustumIdx = 10.***\n\
+		#endif\n\
+\n\
 		return;\n\
 	}\n\
 	else\n\
@@ -6920,8 +6955,6 @@ void main()\n\
 \n\
 			return;\n\
 		}\n\
-\n\
-		\n\
 \n\
 		float shadow_occlusion = 1.0;\n\
 		if(bApplyShadow)\n\
@@ -6965,59 +6998,11 @@ void main()\n\
 		float lambertian = 1.0;\n\
 		float specular;\n\
 		vec2 texCoord;\n\
-		/*\n\
-		if(applySpecLighting> 0.0)\n\
-		{\n\
-			vec3 L;\n\
-			if(bApplyShadow)\n\
-			{\n\
-				L = vLightDir;// test.***\n\
-				lambertian = max(dot(normal2, L), 0.0); // original.***\n\
-			}\n\
-			else\n\
-			{\n\
-				vec3 lightPos = vec3(0.0, 0.0, 0.0);\n\
-				L = normalize(lightPos - v3Pos);\n\
-				lambertian = max(dot(normal2, L), 0.0);\n\
-			}\n\
-			\n\
-			//specular = 0.0;\n\
-			//if(lambertian > 0.0)\n\
-			//{\n\
-			//	vec3 R = reflect(-L, normal2);      // Reflected light vector\n\
-			//	vec3 V = normalize(-v3Pos); // Vector to viewer\n\
-			//	\n\
-			//	// Compute the specular term\n\
-			//	float specAngle = max(dot(R, V), 0.0);\n\
-			//	specular = pow(specAngle, shininessValue);\n\
-			//	\n\
-			//	if(specular > 1.0)\n\
-			//	{\n\
-			//		specular = 1.0;\n\
-			//	}\n\
-			//}\n\
-			\n\
-			// test.\n\
-			lambertian += 0.3;\n\
 \n\
-			if(lambertian < 0.8)\n\
-			{\n\
-				lambertian = 0.8;\n\
-			}\n\
-			else if(lambertian > 1.0)\n\
-			{\n\
-				lambertian = 1.0;\n\
-			}\n\
-\n\
-			\n\
-		}\n\
-		*/\n\
 		\n\
 		// check if apply ssao.\n\
 		float occlusion = 1.0;\n\
-		//vec3 normal2 = vNormal;	\n\
-		\n\
-	\n\
+\n\
 		vec4 textureColor = vec4(0.0);\n\
 		if(colorType == 0) // one color.\n\
 		{\n\
@@ -7032,13 +7017,6 @@ void main()\n\
 		{\n\
 			// Check if the texture is from a different depth tile texture.***\n\
 			vec2 finalTexCoord = vTexCoord;\n\
-			//if((vTileDepth - vTexTileDepth)> 0.5)\n\
-			//{\n\
-			//	// Must recalculate texCoords.***\n\
-			//	float currLatRad = LatitudeRad_fromTexCoordY(vTexCoord.t);\n\
-			//	float newT = TexCoordY_fromLatitudeRad(currLatRad); // [0..1] range\n\
-			//	finalTexCoord = vec2(vRecalculatedTexCoordS, newT);\n\
-			//}\n\
 			\n\
 			if(textureFlipYAxis)\n\
 			{\n\
@@ -7189,31 +7167,12 @@ void main()\n\
 			\n\
 			shadow_occlusion *= occlusion;\n\
 		}\n\
-		/*\n\
-		float offsetAux = 6.0;\n\
-		vec2 screenPos_up = vec2((gl_FragCoord.x)/ screenWidth, (gl_FragCoord.y +offsetAux)/ screenHeight);\n\
-		vec2 screenPos_down = vec2((gl_FragCoord.x)/ screenWidth, (gl_FragCoord.y -offsetAux)/ screenHeight);\n\
-		vec2 screenPos_left = vec2((gl_FragCoord.x -offsetAux)/ screenWidth, (gl_FragCoord.y)/ screenHeight);\n\
-		vec2 screenPos_right = vec2((gl_FragCoord.x +offsetAux)/ screenWidth, (gl_FragCoord.y)/ screenHeight);\n\
-\n\
-		vec3 normalFromDepth_up = normal_from_depth(linearDepthAux, screenPos_up); // normal from depthTex.***\n\
-		vec3 normalFromDepth_down = normal_from_depth(linearDepthAux, screenPos_down); // normal from depthTex.***\n\
-		vec3 normalFromDepth_left = normal_from_depth(linearDepthAux, screenPos_left); // normal from depthTex.***\n\
-		vec3 normalFromDepth_right = normal_from_depth(linearDepthAux, screenPos_right); // normal from depthTex.***\n\
-\n\
-		normalFromDepth = (normalFromDepth + normalFromDepth_up + normalFromDepth_down + normalFromDepth_left + normalFromDepth_right)/5.0;\n\
-		*/\n\
 \n\
 		vec3 normalFromDepth = normal_from_depth(linearDepthAux, screenPos); // normal from depthTex.***\n\
-		//normalFromDepth += vNormal*0.5;\n\
-		//normalize(normalFromDepth);\n\
-		//normalFromDepth = normalize(vec3(normalFromDepth.x*8.0, normalFromDepth.y*8.0, normalFromDepth.z));\n\
 		vec2 screenPosAux = vec2(0.5, 0.5);\n\
 \n\
 		vec3 rayAux = getViewRay(screenPosAux); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
 		float scalarProd = dot(normalFromDepth, normalize(-rayAux));\n\
-\n\
-		//scalarProd = scalarProd * scalarProd;\n\
 		scalarProd /= 3.0;\n\
 		scalarProd += 0.666;\n\
 \n\
@@ -7267,20 +7226,12 @@ void main()\n\
 			textureColor *= vec4(textureColor.r*scalarProd_2d, textureColor.g*scalarProd_2d, textureColor.b, textureColor.a);\n\
 			// End Something like to HillShade.---------------------------------------------------------------------------------\n\
 			\n\
-            // End Something like to HillShade.---------------------------------------------------------------------------------\n\
-			\n\
 			// End test drawing grid.---\n\
-			float specularReflectionCoef = 0.6;\n\
-			vec3 specularColor = vec3(0.8, 0.8, 0.8);\n\
+			//float specularReflectionCoef = 0.6;\n\
+			//vec3 specularColor = vec3(0.8, 0.8, 0.8);\n\
 			//textureColor = mix(textureColor, fogColor, 0.2); \n\
 			//gl_FragData[0] = vec4(finalColor.xyz * shadow_occlusion * lambertian + specularReflectionCoef * specular * specularColor * shadow_occlusion, 1.0); // with specular.***\n\
 			gl_FragData[0] = vec4(textureColor.xyz * shadow_occlusion * lambertian * scalarProd, 1.0); // original.***\n\
-\n\
-			// test contrast.***\n\
-			//float Contrast = 2.0;\n\
-			//vec3 pixelColor = vec3(gl_FragData[0].r, gl_FragData[0].g, gl_FragData[0].b);\n\
-			//pixelColor.rgb = ((pixelColor.rgb - 0.5) * max(Contrast, 0.0)) + 0.5;\n\
-			//gl_FragData[0] = vec4(pixelColor, 1.0);\n\
 \n\
 			return;\n\
 		}\n\

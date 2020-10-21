@@ -788,15 +788,33 @@ MagoWorld.screenToCamCoord = function(mouseX, mouseY, magoManager, resultPointCa
 	var depthDetected = false;
 	var frustumsCount = magoManager.numFrustums;
 
-	//if (options)
-	//{
-	//	// Check if exist pre-calculated linearDepth.
-	//	if (options.linearDepth)
-	//	{
-	//		linearDepth = options.linearDepth;
-	//	}
-	//}
+	if (options)
+	{
+		// Check if exist pre-calculated linearDepth.
+		if (options.linearDepth)
+		{
+			currentLinearDepth = options.linearDepth;
+			currentFrustumFar = options.far;
+			currentFrustumNear = options.near;
+		}
+	}
 
+	if(!currentLinearDepth)
+	{
+		// calculate the linearDepth.***
+		var texturesMergerFbo = magoManager.texturesManager.texturesMergerFbo;
+		var depthTex = texturesMergerFbo.colorBuffer;
+		var normalTex = texturesMergerFbo.colorBuffer1;
+		var resultObject = ManagerUtils.calculatePixelLinearDepthV2(gl, mouseX, mouseY, depthTex, normalTex, magoManager);
+
+		if(resultObject.frustumIdx < magoManager.numFrustums)
+		{
+			currentLinearDepth = resultObject.linearDepth;
+			currentFrustumFar = resultObject.far;
+			currentFrustumNear = resultObject.near;
+		}
+	}
+	/*
 	for (var i = 0; i < frustumsCount; i++)
 	{
 		var frustumVolume = magoManager.frustumVolumeControl.getFrustumVolumeCulling(i); 
@@ -813,13 +831,16 @@ MagoWorld.screenToCamCoord = function(mouseX, mouseY, magoManager, resultPointCa
 			break;
 		}
 	}
+	*/
 	
 	if (!magoManager.isCesiumGlobe())
 	{ currentFrustumNear = 0.0; }
 	
 	//currentFrustumFar = 30000.0; // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
 	//currentDepthFbo = magoManager.depthFboNeo;
-	var options = {};
+	if(!options)
+		options = {};
+		
 	options.linearDepth = currentLinearDepth; // optionally, use the pre calculated linearDepth.
 
 	resultPointCamCoord = ManagerUtils.calculatePixelPositionCamCoord(gl, mouseX, mouseY, resultPointCamCoord, currentDepthFbo, currentFrustumNear, currentFrustumFar, magoManager, options);
@@ -867,6 +888,7 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 	var currentFrustumNear;
 	var currentLinearDepth;
 	var depthDetected = false;
+	/*
 	var frustumsCount = magoManager.numFrustums;
 	for (var i = 0; i < frustumsCount; i++)
 	{
@@ -883,6 +905,20 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 			depthDetected = true;
 			break;
 		}
+	}
+	*/
+
+	var texturesMergerFbo = magoManager.texturesManager.texturesMergerFbo;
+	var depthTex = texturesMergerFbo.colorBuffer;
+	var normalTex = texturesMergerFbo.colorBuffer1;
+	var resultObject = ManagerUtils.calculatePixelLinearDepthV2(gl, mouseX, mouseY, depthTex, normalTex, magoManager);
+
+	if(resultObject.frustumIdx < magoManager.numFrustums)
+	{
+		currentLinearDepth = resultObject.linearDepth;
+		currentFrustumFar = resultObject.far;
+		currentFrustumNear = resultObject.near;
+		depthDetected = true;
 	}
 	
 

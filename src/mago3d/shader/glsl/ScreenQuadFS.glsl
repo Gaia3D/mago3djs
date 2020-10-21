@@ -44,20 +44,14 @@ float unpackDepth(vec4 packedDepth)
 	//}
 	return dot(packedDepth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));
 }
-
-vec4 packDepth( float v ) {
-  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;
-  enc = fract(enc);
-  enc -= enc.yzww * vec4(1.0/255.0,1.0/255.0,1.0/255.0,0.0);
-  return enc;
-}
-
+/*
 float unpackDepthMago(const in vec4 rgba_depth)
 {
     const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);// original.***
     float depth = dot(rgba_depth, bit_shift);
     return depth;
 } 
+*/
 
 float UnpackDepth32( in vec4 pack )
 {
@@ -76,32 +70,8 @@ vec4 getNormal(in vec2 texCoord)
     return decodeNormal(encodedNormal);
 }
 
-float getDepthShadowMap(vec2 coord)
-{
-	// currSunIdx
-	if(sunIdx == 0)
-	{
-		return UnpackDepth32(texture2D(shadowMapTex, coord.xy));
-	}
-    else if(sunIdx ==1)
-	{
-		return UnpackDepth32(texture2D(shadowMapTex2, coord.xy));
-	}
-	else
-		return -1.0;
-}
-
 vec3 getViewRay(vec2 tc)
 {
-	/*
-	// The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
-	float farForDepth = 30000.0;
-	float hfar = 2.0 * tangentOfHalfFovy * farForDepth;
-    float wfar = hfar * aspectRatio;    
-    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -farForDepth);  
-	*/	
-	
-	
 	float hfar = 2.0 * tangentOfHalfFovy * far;
     float wfar = hfar * aspectRatio;    
     vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    
@@ -197,7 +167,7 @@ void main()
 			for(int h=0; h<5; h++)
 			{
 				vec2 screenPosAux = vec2(screenPos_LD.x + pixelSizeW*float(w), screenPos_LD.y + pixelSizeH*float(h));
-				float z_window  = unpackDepthMago(texture2D(depthTex, screenPosAux.xy)); // z_window  is [0.0, 1.0] range depth.
+				float z_window  = unpackDepth(texture2D(depthTex, screenPosAux.xy)); // z_window  is [0.0, 1.0] range depth.
 
 				if(z_window > tolerance)
 				{
@@ -263,10 +233,16 @@ void main()
 		gl_FragColor = vec4(finalColor.rgb*shadow_occlusion, alpha);
 		
 	}
-
+	
 	if(bApplySsao)
 	{
-		vec3 normal = getNormal(screenPos).xyz;
+		vec4 normal4 = getNormal(screenPos);
+
+		// check frustumIdx. There are 2 type of frustumsIdx :  0, 1, 2, 3 or 10, 11, 12, 13.***
+		if(int(floor(normal4.w * 100.0)) >= 10)
+		discard;
+
+		vec3 normal = normal4.xyz;
 		if(length(normal) > 0.1)
 		{
 			//ssaoFromDepthTex
@@ -320,19 +296,19 @@ void main()
 			if(dot(normal, normal_left) < 0.3)
 			{ factor += increF; }
 
-			/*
-			if(dot(normal, normal_ur) < 0.3)
-			{ factor += increF; }
+			
+			////if(dot(normal, normal_ur) < 0.3)
+			////{ factor += increF; }
 
-			if(dot(normal, normal_rd) < 0.3)
-			{ factor += increF; }
+			////if(dot(normal, normal_rd) < 0.3)
+			////{ factor += increF; }
 
-			if(dot(normal, normal_ld) < 0.3)
-			{ factor += increF; }
+			////if(dot(normal, normal_ld) < 0.3)
+			////{ factor += increF; }
 
-			if(dot(normal, normal_lu) < 0.3)
-			{ factor += increF; }
-			*/
+			////if(dot(normal, normal_lu) < 0.3)
+			////{ factor += increF; }
+			
 
 			if(factor > increF*0.9)
 			{
@@ -342,6 +318,7 @@ void main()
 
 		}
 	}
+	
 
 	// check if is fastAntiAlias.***
 	if(bFxaa)

@@ -1609,23 +1609,16 @@ MagoManager.prototype.doRenderEdgeDetect = function(frustumVolumenObject)
 MagoManager.prototype.doRender = function(frustumVolumenObject) 
 {
 	var gl = this.getGl();
-	var cameraPosition = this.sceneState.camera.position;
-	var currentShader = undefined;
 	
 	// 1) The depth render.**********************************************************************************************************************
 	var renderType = 0; // 0= depth. 1= color.***
 	this.renderType = 0;
-	var renderTexture = false;
 	
 	// Take the depFrameBufferObject of the current frustumVolume.***
-
 	var bUseMultiRenderTarget = this.postFxShadersManager.bUseMultiRenderTarget;
 	if (frustumVolumenObject.depthFbo === undefined) { frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true, multiRenderTarget : bUseMultiRenderTarget}); }
 	//if (this.depthFboNeo === undefined) { this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
-	//if (frustumVolumenObject.ssaoFromDepthFbo === undefined) { frustumVolumenObject.ssaoFromDepthFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize : true}); }
 	if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
-
-	//if (this.colorFbo === undefined) { this.colorFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
 
 	this.depthFboNeo = frustumVolumenObject.depthFbo;
 	//this.depthFboNeo.colorBuffer = this.scene._context._us.globeDepthTexture._texture;
@@ -1642,14 +1635,13 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	this.depthFboNeo.unbind();
 	this.swapRenderingFase();
 
-	// If is the frustum zero, then merge depthTexture.***
+	// If is the frustum zero, then merge depthTextures.***
 	if(this.currentFrustumIdx === 0)
 	{
-		// If is the frustum zero, then merge depthTexture.***
+		// If is the frustum zero, then merge depthTextures.***
 		if(!this.texturesManager)
 		{
 			this.texturesManager = new TexturesManager(this);
-
 			var bufferWidth = this.sceneState.drawingBufferWidth[0];
 			var bufferHeight = this.sceneState.drawingBufferHeight[0];
 			var bUseMultiRenderTarget = this.postFxShadersManager.bUseMultiRenderTarget;
