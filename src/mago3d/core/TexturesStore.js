@@ -70,8 +70,9 @@ function isPowerOf2(number)
  * @param {image} image 
  * @param {WebGLTexture} texture 
  * @param {Boolean} flip_y_texCoords //if need vertical mirror of the image
+ * @param {object} options
  */
-function handleTextureLoaded(gl, image, texture, flip_y_texCoords) 
+function handleTextureLoaded(gl, image, texture, flip_y_texCoords, options) 
 {
 	if (flip_y_texCoords === undefined)
 	{ flip_y_texCoords = true; }
@@ -81,13 +82,18 @@ function handleTextureLoaded(gl, image, texture, flip_y_texCoords)
 	
 	if (isPowerOf2(texture.imageWidth) && isPowerOf2(texture.imageHeight))
 	{
+		options = options ? options : {};
+		var magFilter = options.magFilter ? options.magFilter : gl.LINEAR;
+		var minFilter = options.minFilter ? options.minFilter : gl.LINEAR_MIPMAP_NEAREST;
+		var wrapS = options.wrapS ? options.wrapS : gl.REPEAT;
+		var wrapT = options.wrapT ? options.wrapT : gl.REPEAT;
 		gl.bindTexture(gl.TEXTURE_2D, texture);
 		gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, flip_y_texCoords); // if need vertical mirror of the image.
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image); // Original.
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, magFilter);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, minFilter);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrapS);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, wrapT);
 		gl.generateMipmap(gl.TEXTURE_2D);
 		gl.bindTexture(gl.TEXTURE_2D, null);
 	}

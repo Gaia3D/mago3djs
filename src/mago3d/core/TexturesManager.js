@@ -103,7 +103,9 @@ TexturesManager.loadTexture = function(imagePath, texture, magoManager, flip_y_t
 		if (flip_y_texCoord === undefined)
 		{ flip_y_texCoord = false; }
 		
-		handleTextureLoaded(gl, imageToLoad, texture.texId, flip_y_texCoord);
+		handleTextureLoaded(gl, imageToLoad, texture.texId, flip_y_texCoord, {
+			magFilter : gl.NEAREST
+		});
 		texture.fileLoadState = CODE.fileLoadState.BINDING_FINISHED;
 	};
 
@@ -113,6 +115,8 @@ TexturesManager.loadTexture = function(imagePath, texture, magoManager, flip_y_t
 	};
 
 	imageToLoad.src = imagePath;
+
+
 };
 
 TexturesManager.newWebGlTextureByBlob = function(gl, blob, texture)

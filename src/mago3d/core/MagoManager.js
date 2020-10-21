@@ -505,6 +505,7 @@ MagoManager.prototype.handleBrowserEvent = function(browserEvent)
 
 		interaction.handle(browserEvent);
 	}
+	this.setMouseStatus(browserEvent.type);
 	
 	/*if (browserEvent.type === 'click')
 	{
@@ -521,6 +522,55 @@ MagoManager.prototype.handleBrowserEvent = function(browserEvent)
 		});
 	}*/
 };
+
+/**
+ * set mouse status by event type
+ * @param {string} type mouse event type 
+ */
+MagoManager.prototype.setMouseStatus = function(type)
+{
+	if (!this.magoPolicy.getMagoEnable()) { return; }
+	switch(type)
+	{
+		case 'leftdown' :{
+			this.mouseLeftDown = true;
+			this.isCameraMoving = true;
+			break;
+		}
+		case 'leftup' :{
+			this.isCameraMoving = false;
+			this.mouseLeftDown = false;
+			break;
+		}
+		case 'middledown' :{
+			this.mouseMiddleDown = true;
+			this.isCameraMoving = true;
+			break;
+		}
+		case 'middleup' :{
+			this.isCameraMoving = false;
+			this.mouseMiddleDown = false;
+			break;
+		}
+		case 'rightdown' :{
+			this.mouseRightDown = true;
+			this.isCameraMoving = true;
+			break;
+		}
+		case 'rightup' :{
+			this.mouseRightDown = false;
+			this.isCameraMoving = false;
+			break;
+		}
+		case 'mousemove' :{
+			if(this.mouseMiddleDown || this.mouseLeftDown)
+			{
+				this.isCameraMoving = true;
+			}
+			break;
+		}
+	}
+}
 
 /**
  * Swaps the current rendering Phase.
@@ -721,6 +771,10 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		{
 			sceneState.drawingBufferWidth[0] = scene.drawingBufferWidth;
 			sceneState.drawingBufferHeight[0] = scene.drawingBufferHeight;
+
+			var canvas = this.getObjectLabel();
+			canvas.width = scene.drawingBufferWidth;
+			canvas.height = scene.drawingBufferHeight;
 			window.dispatchEvent(this._changeCanvasSizeEvent);
 		}
 
@@ -2171,7 +2225,7 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 		if (node.data === undefined || node.data.neoBuilding === undefined)
 		{ continue; }
 	
-		if (node.data.distToCam > 1500.0)
+		if (node.data.distToCam > 3000.0)
 		{ continue; }
 		
 		var key = node.data.neoBuilding.buildingId;
@@ -2184,31 +2238,126 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 	{
 		if (Object.prototype.hasOwnProperty.call(rootNodesMap, key))
 		{
+			
 			//nodeRoot = rootNodesArray[i];
 			nodeRoot = rootNodesMap[key];
+			if(nodeRoot.data.attributes.isVisible === false || !nodeRoot.data.attributes.label) continue;
 			geoLocDataManager = nodeRoot.data.geoLocDataManager;
 			geoLoc = geoLocDataManager.getCurrentGeoLocationData();
 			//neoBuilding = node.data.neoBuilding;
-			worldPosition = nodeRoot.getBBoxCenterPositionWorldCoord(geoLoc);
-			screenCoord = ManagerUtils.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord, this);
-			
-			var elemFromPoints = document.elementsFromPoint(screenCoord.x, screenCoord.y);
-			if (elemFromPoints.length === 0) { continue; }
-
-			if (elemFromPoints[0].nodeName === 'CANVAS' && screenCoord.x >= 0 && screenCoord.y >= 0)
-			{
-				ctx.font = "13px Arial";
-				//ctx.strokeText(nodeRoot.data.nodeId, screenCoord.x, screenCoord.y);
-				//ctx.fillText(nodeRoot.data.nodeId, screenCoord.x, screenCoord.y);
-				ctx.strokeText(nodeRoot.data.data_name, screenCoord.x, screenCoord.y);
-				ctx.fillText(nodeRoot.data.data_name, screenCoord.x, screenCoord.y);
+			if(nodeRoot.data.nodeId === 'block_0') {
+				var hola = 0;
 			}
+			worldPosition = nodeRoot.getBBoxCenterPositionWorldCoord(geoLoc);
+			if(nodeRoot.data.nodeId === 'block_0') {
+				var hola = 0;
+			}
+			screenCoord = ManagerUtils.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord, this);
+if(nodeRoot.data.nodeId === 'block_0') {
+	var hola = 0;
+}
+			if(isNaN(screenCoord.x) || isNaN(screenCoord.y)) continue;
+
+			var elemFromPoints = document.elementsFromPoint(screenCoord.x, screenCoord.y);
+			//if (elemFromPoints.length === 0) { continue; }
+
+			//if (elemFromPoints[0].nodeName === 'CANVAS' && screenCoord.x >= 0 && screenCoord.y >= 0)
+			//{
+				var label = nodeRoot.data.attributes.label;
+				if(label instanceof Array)
+				{
+					for(var j=0,labelLen=label.length;j<labelLen;j++)
+					{
+						var lb = label[j];
+						ctx.fillStyle = lb.backgroundFillColor ;
+						ctx.strokeStyle = lb.backgroundStrokeColor ;
+						var backgroundOffset = lb.backgroundOffset;
+						var backgroundSize = lb.backgroundSize;
+						roundRect(ctx, screenCoord.x+backgroundOffset[0], screenCoord.y + backgroundOffset[1], backgroundSize[0], backgroundSize[1], 10, true,true);
+						ctx.font = "13px Arial";
+						ctx.fillStyle = "white";
+						ctx.strokeStyle = "white";
+						ctx.textAlign = "center";
+						//ctx.strokeText(nodeRoot.data.nodeId, screenCoord.x, screenCoord.y);
+						//ctx.fillText(nodeRoot.data.nodeId, screenCoord.x, screenCoord.y);
+						//ctx.strokeText('민간분양', screenCoord.x+30, screenCoord.y);
+						var textOffset = lb.textOffset;
+						ctx.fillText(lb.text, screenCoord.x+textOffset[0], screenCoord.y+textOffset[1]);
+					}
+				} else {
+					ctx.fillStyle = label.backgroundFillColor ;
+					ctx.strokeStyle = label.backgroundStrokeColor ;
+					var backgroundOffset = label.backgroundOffset;
+					var backgroundSize = label.backgroundSize;
+					roundRect(ctx, screenCoord.x+backgroundOffset[0], screenCoord.y + backgroundOffset[1], backgroundSize[0], backgroundSize[1], 10, true,true);
+					ctx.font = label.font ? label.font :"13px Arial";
+					ctx.fillStyle = "white";
+					ctx.strokeStyle = "white";
+					ctx.textAlign = "center";
+					//ctx.strokeText(nodeRoot.data.nodeId, screenCoord.x, screenCoord.y);
+					//ctx.fillText(nodeRoot.data.nodeId, screenCoord.x, screenCoord.y);
+					//ctx.strokeText('민간분양', screenCoord.x+30, screenCoord.y);
+					var textOffset = label.textOffset;
+					var text = label.text;
+					if(text.indexOf('\n') > -1) {
+						var splitTexts = text.split('\n');
+						var yoffset = textOffset[1];
+						var halfYoffset = yoffset/2;
+						var ypos = screenCoord.y + yoffset;
+						for(var k=0,textLen=splitTexts.length;k<textLen;k++) {
+							var splitText = splitTexts[k];
+							ypos = ypos + k*-2*yoffset;
+							if(k>0) ypos += 3;
+							ctx.fillText(splitText, screenCoord.x+textOffset[0], ypos);
+						}
+					} else {
+						ctx.fillText(text, screenCoord.x+textOffset[0], screenCoord.y+textOffset[1]);
+					}
+				}
+			//}
 		}
 	}
 	
 	rootNodesMap = {};
 
 	ctx.restore(); 
+
+	function roundRect(context, x, y, width, height, radius, fill, stroke) {
+		if (typeof stroke === 'undefined') {
+		  stroke = true;
+		}
+		if (typeof radius === 'undefined') {
+		  radius = 5;
+		}
+		if (typeof radius === 'number') {
+		  radius = {tl: radius, tr: radius, br: radius, bl: radius};
+		} else {
+		  var defaultRadius = {tl: 0, tr: 0, br: 0, bl: 0};
+		  for (var side in defaultRadius) {
+			if(defaultRadius.hasOwnProperty(side)) {
+				radius[side] = radius[side] || defaultRadius[side];
+			}
+		  }
+		}
+		context.beginPath();
+		context.moveTo(x + radius.tl, y);
+		context.lineTo(x + width - radius.tr, y);
+		context.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
+		context.lineTo(x + width, y + height - radius.br);
+		context.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
+		context.lineTo(x + radius.bl, y + height);
+		context.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
+		context.lineTo(x, y + radius.tl);
+		context.quadraticCurveTo(x, y, x + radius.tl, y);
+		context.closePath();
+		if (fill) {
+			context.fill();
+		}
+		if (stroke) {
+			context.stroke();
+		}
+	  
+	}
 };
 
 /**
@@ -2261,6 +2410,8 @@ MagoManager.prototype.drawSelectedExtruionBuildingLabel = function()
 		var worldPosition = ManagerUtils.geographicCoordToWorldPoint(labelGeoCoord.longitude,labelGeoCoord.latitude,labelGeoCoord.altitude);
 		screenCoord = ManagerUtils.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord, this);
 
+		if(isNaN(screenCoord.x) || isNaN(screenCoord.y)) continue;
+		
 		var elemFromPoints = document.elementsFromPoint(screenCoord.x, screenCoord.y);
 		if (elemFromPoints.length === 0) { continue; }
 
@@ -6724,6 +6875,7 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 	var pitch = undefined;
 	var roll = undefined;
 	var mapping_type = undefined;
+	var label = undefined;
 
 	if (jasonObject !== undefined)
 	{
@@ -6758,6 +6910,7 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 			pitch = jasonObject.pitch;
 			roll = jasonObject.roll;
 			mapping_type = jasonObject.mappingType || 'origin';
+			label = jasonObject.label;
 		}
 		else 
 		{
@@ -6773,6 +6926,7 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 			pitch = jasonObject.pitch;
 			roll = jasonObject.roll;
 			mapping_type = jasonObject.mapping_type;
+			label = jasonObject.label;
 		}
 		attributes = jasonObject.attributes;
 		children = jasonObject.children;
@@ -6836,6 +6990,11 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 				if (!attributes.hasOwnProperty('heightReference') || !attributes.heightReference)
 				{
 					attributes.heightReference = HeightReference.NONE;
+				}
+
+				if(label)
+				{
+					attributes.label = label;
 				}
 			}
 
@@ -8208,7 +8367,7 @@ MagoManager.prototype.deleteAll = function ()
 		this.tinTerrainManager = undefined;
 	}
 
-	cancelAnimationFrame(magoManager.reqFrameId);
+	if(!this.isCesiumGlobe()) cancelAnimationFrame(magoManager.reqFrameId);
 };
 
 MagoManager.prototype.checkCollision = function (position, direction)

@@ -613,6 +613,7 @@ GeographicCoordsList.solveDegeneratedPoints = function(geographicCoordsArray, er
 			// delete the geoCoord2.***
 			geographicCoordsArray.splice(i+1, 1);
 			i--;
+			geoCoordsCount--;
 		}
 	}
 };

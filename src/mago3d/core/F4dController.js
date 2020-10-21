@@ -228,6 +228,14 @@ F4dController.prototype.deleteF4dMember = function(groupId, memberId)
 	{
 		smartTile.eraseNode(node);
 	}
+
+	if(this.magoManager.defaultSelectInteraction.selected === node)
+	{
+		this.magoManager.defaultSelectInteraction.clear();
+	}
+
+	this.magoManager.selectionManager.removeF4d(node);
+	
 	node.deleteObjects(this.magoManager.sceneState.gl, this.magoManager.vboMemoryManager);
 	delete this.magoManager.hierarchyManager.projectsMap[groupId][memberId];
 };

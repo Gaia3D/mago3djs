@@ -250,6 +250,24 @@ Mesh.prototype.getSurface = function(idx)
 };
 
 /**
+ * Get the specific surface of this mesh by name
+ * @param {string} idx 
+ * @returns {Array<Surface>}
+ */
+Mesh.prototype.getSurfaceByName = function(name)
+{
+	if (this.surfacesArray === undefined)
+	{ return undefined; }
+
+	var filteredSurfaceArray = this.surfacesArray.filter(function(surface)
+	{
+		return surface.name === name;
+	});
+	
+	return filteredSurfaceArray;
+};
+
+/**
  * Add a surface at this mesh
  * @param {Surface} surface
  */

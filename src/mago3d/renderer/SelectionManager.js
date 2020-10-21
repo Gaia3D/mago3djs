@@ -735,3 +735,33 @@ SelectionManager.prototype.removeNative = function(native)
 	});
 	this.currentGeneralObjectSelected = this.currentGeneralObjectSelectedArray[0];
 }
+
+/**
+ * f4d 객체 개별 삭제
+ * @param {Node} f4d 
+ */
+SelectionManager.prototype.removeF4d = function(f4d)
+{
+	var arr = this.getSelectedF4dNodeArray();
+
+	this.currentNodeSelectedArray = arr.filter(function(model) {
+		return model !== f4d;
+	});
+	this.currentNodeSelected = this.currentNodeSelectedArray[0];
+}
+
+/**
+ * f4d 객체 개별 선택
+ * @param {Node} f4d 
+ */
+SelectionManager.prototype.selectF4d = function(f4d)
+{
+	var arr = this.getSelectedF4dNodeArray();
+
+	var has = arr.filter(function(model) {
+		return model === f4d;
+	})[0];
+
+	if(!has) this.currentNodeSelectedArray.push(f4d);
+	if(!this.currentNodeSelected) this.currentNodeSelected = f4d;
+}

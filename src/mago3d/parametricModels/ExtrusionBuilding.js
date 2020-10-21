@@ -51,6 +51,7 @@ var ExtrusionBuilding = function(geographicCoordList, height, options)
 	this.attributes.isSelectable = defaultValue(options.isSelectable, true);
 	this.attributes.selectedColor4 = defaultValue(options.selectedColor, new Color(1,1,0,1));
 	this.attributes.heightReference = defaultValue(options.heightReference, HeightReference.NONE);
+	this.divideLevel = defaultValue(options.divideLevel, false);
 	
 
 	if(!this.options)
@@ -70,7 +71,7 @@ var ExtrusionBuilding = function(geographicCoordList, height, options)
 		for(var j=0,gcLen=gcLists.length; j < gcLen; j++) 
 		{
 			var gcList = gcLists[j];
-			//GeographicCoordsList.solveDegeneratedPoints(gcList.geographicCoordsArray, error);
+			GeographicCoordsList.solveDegeneratedPoints(gcList.geographicCoordsArray, error);
 			var lcList = [];
 			for(var i=0,len=gcList.geographicCoordsArray.length;i<len;i++)
 			{
@@ -99,7 +100,10 @@ ExtrusionBuilding.prototype.makeMesh = function() {
     if(!geoLocData) {
         return;
 	}
-
+	if(this.attributes.heightReference !== HeightReference.NONE) {
+		geoLocData = ManagerUtils.calculateGeoLocationData(undefined,undefined, 0, undefined, undefined, undefined, geoLocData);
+	}
+	
 	// Try to solve degeneratedPoints.***
 	var error = 1E-8;
 
@@ -134,8 +138,8 @@ ExtrusionBuilding.prototype.makeMesh = function() {
 		var surfIndepMesh = solidMesh.getCopySurfaceIndependentMesh();
 		surfIndepMesh.calculateVerticesNormals();
 
-		/*
-		if (textureInfo)
+		
+		if (this.divideLevel)
 		{
 			var c = document.createElement("canvas");
 			var ctx = c.getContext("2d");
@@ -147,26 +151,40 @@ ExtrusionBuilding.prototype.makeMesh = function() {
 			ctx.rect(0, 0, 8, 1);
 			ctx.fill();
 			ctx.closePath();
-				
+
 			ctx.beginPath();
-			ctx.fillStyle = textureInfo.color;
+			ctx.fillStyle = this.color4.getHexCode();
 			ctx.rect(0, 1, 8, 31);
 			ctx.fill();
 			ctx.closePath();
 
-			ctx.beginPath();
+			/*ctx.beginPath();
 			ctx.fillStyle = "#0000ff";
 			ctx.rect(2, 8, 4, 8);
 			ctx.fill();
 			ctx.stroke();
-			ctx.closePath();
+			ctx.closePath();*/
 
 			surfIndepMesh.material = new Material('test');
 			surfIndepMesh.material.setDiffuseTextureUrl(c.toDataURL());
 
-			surfIndepMesh.calculateTexCoordsByHeight(textureInfo.height);
+			surfIndepMesh.calculateTexCoordsByHeight(this.floorHeight ? this.floorHeight+0.01 : 3.31);
+			var topSurfaces = surfIndepMesh.getSurfaceByName('top');
+			if(topSurfaces.length > 0)
+			{
+				for(var j=0,surLen=topSurfaces.length;j<surLen;j++) {
+					var ts = topSurfaces[j];
+					var vertexArray = ts.localVertexList.vertexArray;
+					for(var k=0,verLength=vertexArray.length;k<verLength;k++) {
+						var vtx = vertexArray[k];
+						vtx.texCoord.x = 2 / c.width;
+						vtx.texCoord.y = 2 / c.height;
+					}
+				}
+			}
+			
 		}
-		*/
+		
 		this.objectsArray.push(surfIndepMesh);
 	}
 	this.setDirty(false);
@@ -176,7 +194,10 @@ ExtrusionBuilding.prototype.makeMesh = function() {
 	{
 		this.makeUniformPoints2dArray();
 	}
-
+	if(this.attributes.heightReference !== HeightReference.NONE) {
+		if(this.terrainHeight) this.setTerrainHeight(this.terrainHeight);
+	}
+	
 	//this.validTerrainHeight();
 }
 
@@ -273,6 +294,11 @@ ExtrusionBuilding.prototype.setHeight = function(height) {
 	}
 	this.height = height;
 	this.setDirty(true);
+	var that = this;
+	setTimeout(function(){
+		//if(that.terrainHeight) that.setTerrainHeight(that.terrainHeight);
+	},50)
+	
 }
 
 /**
