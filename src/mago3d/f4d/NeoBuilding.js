@@ -1682,8 +1682,6 @@ NeoBuilding.prototype.render = function(magoManager, shader, renderType, refMatr
 
 	if (projectDataType === 10)
 	{
-		if(this.buildingId ==="GK_Fall")
-		var hola = 0;
 
 		// This is tree data type.***
 		// Tree-data-type has no lods.***

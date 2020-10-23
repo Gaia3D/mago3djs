@@ -2239,17 +2239,11 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 			geoLocDataManager = nodeRoot.data.geoLocDataManager;
 			geoLoc = geoLocDataManager.getCurrentGeoLocationData();
 			//neoBuilding = node.data.neoBuilding;
-			if(nodeRoot.data.nodeId === 'block_0') {
-				var hola = 0;
-			}
+
 			worldPosition = nodeRoot.getBBoxCenterPositionWorldCoord(geoLoc);
-			if(nodeRoot.data.nodeId === 'block_0') {
-				var hola = 0;
-			}
+
 			screenCoord = ManagerUtils.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord, this);
-if(nodeRoot.data.nodeId === 'block_0') {
-	var hola = 0;
-}
+
 			if(isNaN(screenCoord.x) || isNaN(screenCoord.y)) continue;
 
 			var elemFromPoints = document.elementsFromPoint(screenCoord.x, screenCoord.y);
@@ -2585,7 +2579,7 @@ MagoManager.prototype.TEST__shader = function()
 		return intersection;
 	}
 
-	var hola = 0;
+
 };
 
 /**
@@ -2853,7 +2847,7 @@ MagoManager.prototype.TEST__splittedExtrudedBuilding = function()
 	var clippingPlane = new ClippingPlane(options);
 	this.modeler.addObject(clippingPlane, 5);
 	*/
-	var hola = 0;
+
 };
 
 /**

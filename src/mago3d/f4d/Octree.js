@@ -422,6 +422,8 @@ Octree.prototype.prepareSkinData = function(magoManager)
 	{ return; }
 	
 	var neoBuilding = this.neoBuildingOwner;
+
+	// Note : Only leafOctrees has "neoBuildingOwner"
 	if (neoBuilding === undefined)
 	{ return; }
 
@@ -760,7 +762,7 @@ Octree.prototype.renderSkin = function(magoManager, neoBuilding, renderType, ren
 		gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
 	}
 	
-	return this.lego.render(magoManager, renderType, renderTexture, shader);
+	return this.lego.render(magoManager, renderType, renderTexture, shader, neoBuilding);
 };
 
 
