@@ -501,7 +501,7 @@ Octree.prototype.prepareSkinData = function(magoManager)
 			{ 
 				magoManager.readerWriter.readLegoSimpleBuildingTexture(gl, texFilePath, neoBuilding.simpleBuilding3x3Texture, magoManager, flip_y_texCoords); 
 			}
-			
+
 			// Check the type of the skinData is for this octree.***
 			var lodBuildingDatasMap = neoBuilding.lodBuildingDatasMap;
 			var lod = 2;

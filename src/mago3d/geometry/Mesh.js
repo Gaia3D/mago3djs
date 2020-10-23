@@ -903,7 +903,11 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive, i
 	
 	if (renderType === 0)
 	{
-		// Depth render.***
+		// Depth render
+		// provisionally disable texture
+		// in the future must call "solveReferencePngTextureForDepthRender" function
+		gl.uniform1i(shader.bHasTexture_loc , false);
+		gl.uniform1i(shader.colorType_loc, 0);
 	}
 	else if (renderType === 1)
 	{
@@ -1044,6 +1048,41 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive, i
 		gl.drawElements(primitive, vboKey.indicesCount, gl.UNSIGNED_SHORT, 0);
 	}
 };
+
+/**
+ * Used in depth render. 
+ */
+/*
+Mesh.prototype.solveReferencePngTextureForDepthRender = function(magoManager, neoBuilding, shader, currentObjectsRendering) 
+{
+	var gl = magoManager.getGl();
+
+	if(!this.texture)// || this.texture.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
+	{
+		// set into shader : bHasTexture = false.***
+		gl.uniform1i(shader.bHasTexture_loc , false);
+		return false;
+	}
+	
+	if(this.texture.textureImageFileExtension === "PNG")// && this.texture.texId)
+	{
+		gl.uniform1i(shader.bHasTexture_loc , true);
+		if (shader.last_tex_id !== this.texture.texId) 
+		{
+			gl.activeTexture(gl.TEXTURE2);
+			gl.bindTexture(gl.TEXTURE_2D, this.texture.texId);
+			shader.last_tex_id = this.texture.texId;
+		}
+
+		return true;
+	}
+	else{
+		gl.uniform1i(shader.bHasTexture_loc , false);
+		return false;
+	}
+	return false;
+};
+*/
 
 /**
  * Render the mesh

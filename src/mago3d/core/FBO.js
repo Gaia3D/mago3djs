@@ -98,9 +98,9 @@ var FBO = function(gl, width, height, options)
 			that.height[0] = canvas.offsetHeight;
 
 			that.deleteObjects(that.gl);
-			if(that.multiRenderTarget === true)
+			if(that.multiRenderTarget)
 			that.initMRT();
-			else if(that.multiRenderTargetNoRenderbuffer === true)
+			else if(that.multiRenderTargetNoRenderbuffer)
 			that.initMRTNoRenderbuffer();
 			else
 			that.init();

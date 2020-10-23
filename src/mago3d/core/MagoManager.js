@@ -387,6 +387,8 @@ MagoManager.EVENT_TYPE = {
 	'CAMERACHANGED'           : 'camerachanged',
 	'CAMERAMOVEEND'           : 'cameramoveend',
 	'CAMERAMOVESTART'         : 'cameramovestart',
+	'ANIMATIONEND'         : 'animationEnd',
+	'ANIMATIONING'         : 'animationing',
 };
 
 /**
