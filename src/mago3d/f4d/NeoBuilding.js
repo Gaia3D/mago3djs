@@ -1535,6 +1535,10 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 		lodBuilding.attributes.hasTexture = true;
 		lodBuilding.textureName = textureFileName;
 	}
+	else
+	{
+		lodBuilding.attributes.hasTexture = false;
+	}
 	
 	// check if exist the lodMesh in lodMeshMap.
 	var lodString = lodBuildingData.geometryFileName;
@@ -1590,7 +1594,7 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 		lowLodMesh.parseArrayBuffer(lowLodMesh.dataArrayBuffer, magoManager);
 	}
 	
-	else if (lowLodMesh.vbo_vicks_container.vboCacheKeysArray[0] && lowLodMesh.vbo_vicks_container.vboCacheKeysArray[0].vboBufferTCoord)
+	else if (lowLodMesh.vbo_vicks_container.vboCacheKeysArray[0] && lowLodMesh.vbo_vicks_container.vboCacheKeysArray[0].vboBufferTCoord && lodBuilding.attributes.hasTexture)
 	{
 		// this is the new version.
 		if (lodBuilding.texture === undefined)
@@ -1836,6 +1840,11 @@ NeoBuilding.prototype.renderSkin = function(magoManager, shader, renderType)
 	}
 	
 	var renderTexture = true;
+
+	if(!skinLego.attributes.hasTexture)
+	{
+		renderTexture = false;
+	}
 	
 	// if the building is highlighted, the use highlight oneColor4.
 	if (renderType === 1)

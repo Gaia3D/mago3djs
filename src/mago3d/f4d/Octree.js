@@ -494,12 +494,15 @@ Octree.prototype.prepareSkinData = function(magoManager)
 			}
 
 			var imageFilaName = neoBuilding.getImageFileNameForLOD(2);
-			var texFilePath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + imageFilaName;
+			if(imageFilaName !== "noTexture")
+			{
+				var texFilePath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + imageFilaName;
 
-			// Direct loading.
-			if (neoBuilding.simpleBuilding3x3Texture !== undefined && neoBuilding.simpleBuilding3x3Texture.fileLoadState === CODE.fileLoadState.READY)
-			{ 
-				magoManager.readerWriter.readLegoSimpleBuildingTexture(gl, texFilePath, neoBuilding.simpleBuilding3x3Texture, magoManager, flip_y_texCoords); 
+				// Direct loading.
+				if (neoBuilding.simpleBuilding3x3Texture !== undefined && neoBuilding.simpleBuilding3x3Texture.fileLoadState === CODE.fileLoadState.READY)
+				{ 
+					magoManager.readerWriter.readLegoSimpleBuildingTexture(gl, texFilePath, neoBuilding.simpleBuilding3x3Texture, magoManager, flip_y_texCoords); 
+				}
 			}
 
 			// Check the type of the skinData is for this octree.***

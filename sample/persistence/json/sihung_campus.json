@@ -7,6 +7,1228 @@
 },
 "children": [
 		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "3DS"
+			},
+			"children": [],
+			"data_key": "Factory 03",
+			"data_name": "Factory 03",
+			"mapping_type": "origin",
+            "heading": 52.0,
+			"height": 50,
+			"latitude": 37.3706,
+			"longitude": 126.7216,
+			"pitch": 0.0,
+			"roll": 0.0
+		},
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_001",
+    "data_name": "BD_001",
+    "mapping_type":"origin",
+    "longitude": 126.721229,
+    "latitude": 37.364494,
+    "height": 30.399998,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_002",
+    "data_name": "BD_002",
+    "mapping_type":"origin",
+    "longitude": 126.723208,
+    "latitude": 37.365881,
+    "height": 36.750000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_003",
+    "data_name": "BD_003",
+    "mapping_type":"origin",
+    "longitude": 126.723597,
+    "latitude": 37.366321,
+    "height": 64.750000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_004",
+    "data_name": "BD_004",
+    "mapping_type":"origin",
+    "longitude": 126.723399,
+    "latitude": 37.366928,
+    "height": 48.750000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_005",
+    "data_name": "BD_005",
+    "mapping_type":"origin",
+    "longitude": 126.715591,
+    "latitude": 37.368093,
+    "height": 79.999992,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_006",
+    "data_name": "BD_006",
+    "mapping_type":"origin",
+    "longitude": 126.714453,
+    "latitude": 37.366883,
+    "height": 31.100000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_007",
+    "data_name": "BD_007",
+    "mapping_type":"origin",
+    "longitude": 126.715464,
+    "latitude": 37.366240,
+    "height": 28.900000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_008",
+    "data_name": "BD_008",
+    "mapping_type":"origin",
+    "longitude": 126.717358,
+    "latitude": 37.365171,
+    "height": 31.099998,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_009",
+    "data_name": "BD_009",
+    "mapping_type":"origin",
+    "longitude": 126.716069,
+    "latitude": 37.365992,
+    "height": 12.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_010",
+    "data_name": "BD_010",
+    "mapping_type":"origin",
+    "longitude": 126.716769,
+    "latitude": 37.365262,
+    "height": 11.999999,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_011",
+    "data_name": "BD_011",
+    "mapping_type":"origin",
+    "longitude": 126.716157,
+    "latitude": 37.364825,
+    "height": 11.841635,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_012",
+    "data_name": "BD_012",
+    "mapping_type":"origin",
+    "longitude": 126.715272,
+    "latitude": 37.365414,
+    "height": 11.228475,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_013",
+    "data_name": "BD_013",
+    "mapping_type":"origin",
+    "longitude": 126.717217,
+    "latitude": 37.367897,
+    "height": 12.275000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_014",
+    "data_name": "BD_014",
+    "mapping_type":"origin",
+    "longitude": 126.720128,
+    "latitude": 37.365573,
+    "height": 9.300000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_015",
+    "data_name": "BD_015",
+    "mapping_type":"origin",
+    "longitude": 126.719631,
+    "latitude": 37.365033,
+    "height": 9.300000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_016",
+    "data_name": "BD_016",
+    "mapping_type":"origin",
+    "longitude": 126.719044,
+    "latitude": 37.365295,
+    "height": 31.750000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_017",
+    "data_name": "BD_017",
+    "mapping_type":"origin",
+    "longitude": 126.718673,
+    "latitude": 37.365829,
+    "height": 9.300000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_018",
+    "data_name": "BD_018",
+    "mapping_type":"origin",
+    "longitude": 126.717389,
+    "latitude": 37.366240,
+    "height": 31.750000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_019",
+    "data_name": "BD_019",
+    "mapping_type":"origin",
+    "longitude": 126.717784,
+    "latitude": 37.366404,
+    "height": 12.275000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_020",
+    "data_name": "BD_020",
+    "mapping_type":"origin",
+    "longitude": 126.716473,
+    "latitude": 37.367013,
+    "height": 31.750000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_021",
+    "data_name": "BD_021",
+    "mapping_type":"origin",
+    "longitude": 126.717331,
+    "latitude": 37.367199,
+    "height": 12.275000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_022",
+    "data_name": "BD_022",
+    "mapping_type":"origin",
+    "longitude": 126.719378,
+    "latitude": 37.366379,
+    "height": 9.800000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_023",
+    "data_name": "BD_023",
+    "mapping_type":"origin",
+    "longitude": 126.718254,
+    "latitude": 37.368841,
+    "height": 17.822886,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_024",
+    "data_name": "BD_024",
+    "mapping_type":"origin",
+    "longitude": 126.717731,
+    "latitude": 37.369793,
+    "height": 30.536749,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_025",
+    "data_name": "BD_025",
+    "mapping_type":"origin",
+    "longitude": 126.719831,
+    "latitude": 37.367955,
+    "height": 17.822886,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_026",
+    "data_name": "BD_026",
+    "mapping_type":"origin",
+    "longitude": 126.720879,
+    "latitude": 37.367349,
+    "height": 17.822886,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_027",
+    "data_name": "BD_027",
+    "mapping_type":"origin",
+    "longitude": 126.720981,
+    "latitude": 37.368643,
+    "height": 19.182302,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_028",
+    "data_name": "BD_028",
+    "mapping_type":"origin",
+    "longitude": 126.721422,
+    "latitude": 37.368281,
+    "height": 19.182302,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_029",
+    "data_name": "BD_029",
+    "mapping_type":"origin",
+    "longitude": 126.720466,
+    "latitude": 37.368234,
+    "height": 6.775000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_030",
+    "data_name": "BD_030",
+    "mapping_type":"origin",
+    "longitude": 126.718945,
+    "latitude": 37.369080,
+    "height": 12.511750,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_031",
+    "data_name": "BD_031",
+    "mapping_type":"origin",
+    "longitude": 126.718457,
+    "latitude": 37.369392,
+    "height": 14.991270,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_032",
+    "data_name": "BD_032",
+    "mapping_type":"origin",
+    "longitude": 126.721957,
+    "latitude": 37.368117,
+    "height": 19.182302,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_033",
+    "data_name": "BD_033",
+    "mapping_type":"origin",
+    "longitude": 126.722238,
+    "latitude": 37.367772,
+    "height": 19.182302,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_034",
+    "data_name": "BD_034",
+    "mapping_type":"origin",
+    "longitude": 126.720547,
+    "latitude": 37.368919,
+    "height": 19.182302,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_035",
+    "data_name": "BD_035",
+    "mapping_type":"origin",
+    "longitude": 126.721731,
+    "latitude": 37.367467,
+    "height": 6.775000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_036",
+    "data_name": "BD_036",
+    "mapping_type":"origin",
+    "longitude": 126.721339,
+    "latitude": 37.367739,
+    "height": 6.775000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_037",
+    "data_name": "BD_037",
+    "mapping_type":"origin",
+    "longitude": 126.720886,
+    "latitude": 37.368016,
+    "height": 6.775000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_038",
+    "data_name": "BD_038",
+    "mapping_type":"origin",
+    "longitude": 126.719311,
+    "latitude": 37.369763,
+    "height": 9.000009,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_039",
+    "data_name": "BD_039",
+    "mapping_type":"origin",
+    "longitude": 126.718747,
+    "latitude": 37.370120,
+    "height": 5.499996,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_040",
+    "data_name": "BD_040",
+    "mapping_type":"origin",
+    "longitude": 126.725124,
+    "latitude": 37.366151,
+    "height": 17.500015,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_041",
+    "data_name": "BD_041",
+    "mapping_type":"origin",
+    "longitude": 126.717334,
+    "latitude": 37.364346,
+    "height": 21.771696,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_042",
+    "data_name": "BD_042",
+    "mapping_type":"origin",
+    "longitude": 126.718034,
+    "latitude": 37.363842,
+    "height": 27.499996,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_043",
+    "data_name": "BD_043",
+    "mapping_type":"origin",
+    "longitude": 126.721810,
+    "latitude": 37.362055,
+    "height": 12.600000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_044",
+    "data_name": "BD_044",
+    "mapping_type":"origin",
+    "longitude": 126.721205,
+    "latitude": 37.361749,
+    "height": 11.200006,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_045",
+    "data_name": "BD_045",
+    "mapping_type":"origin",
+    "longitude": 126.721544,
+    "latitude": 37.362544,
+    "height": 15.400000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_046",
+    "data_name": "BD_046",
+    "mapping_type":"origin",
+    "longitude": 126.720684,
+    "latitude": 37.362043,
+    "height": 18.200005,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_047",
+    "data_name": "BD_047",
+    "mapping_type":"origin",
+    "longitude": 126.720668,
+    "latitude": 37.362962,
+    "height": 15.399998,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_048",
+    "data_name": "BD_048",
+    "mapping_type":"origin",
+    "longitude": 126.719836,
+    "latitude": 37.363466,
+    "height": 15.400000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_049",
+    "data_name": "BD_049",
+    "mapping_type":"origin",
+    "longitude": 126.719313,
+    "latitude": 37.362908,
+    "height": 37.089466,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_050",
+    "data_name": "BD_050",
+    "mapping_type":"origin",
+    "longitude": 126.720107,
+    "latitude": 37.362445,
+    "height": 37.089466,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_051",
+    "data_name": "BD_051",
+    "mapping_type":"origin",
+    "longitude": 126.724306,
+    "latitude": 37.363978,
+    "height": 10.319461,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_052",
+    "data_name": "BD_052",
+    "mapping_type":"origin",
+    "longitude": 126.725154,
+    "latitude": 37.363925,
+    "height": 9.985205,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_053",
+    "data_name": "BD_053",
+    "mapping_type":"origin",
+    "longitude": 126.725658,
+    "latitude": 37.365244,
+    "height": 10.319447,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_054",
+    "data_name": "BD_054",
+    "mapping_type":"origin",
+    "longitude": 126.725375,
+    "latitude": 37.364733,
+    "height": 8.700000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_055",
+    "data_name": "BD_055",
+    "mapping_type":"origin",
+    "longitude": 126.726347,
+    "latitude": 37.364739,
+    "height": 8.700000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_056",
+    "data_name": "BD_056",
+    "mapping_type":"origin",
+    "longitude": 126.722090,
+    "latitude": 37.362305,
+    "height": 15.400000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "BD_057",
+    "data_name": "BD_057",
+    "mapping_type":"origin",
+    "longitude": 126.725831,
+    "latitude": 37.364303,
+    "height": 4.976366,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "ETC_01",
+    "data_name": "ETC_01",
+    "mapping_type":"origin",
+    "longitude": 126.720158,
+    "latitude": 37.367015,
+    "height": 2.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "ETC_02",
+    "data_name": "ETC_02",
+    "mapping_type":"origin",
+    "longitude": 126.721410,
+    "latitude": 37.366473,
+    "height": 13.413245,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "ETC_03",
+    "data_name": "ETC_03",
+    "mapping_type":"origin",
+    "longitude": 126.721307,
+    "latitude": 37.365990,
+    "height": 2.712500,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "ETC_04",
+    "data_name": "ETC_04",
+    "mapping_type":"origin",
+    "longitude": 126.720492,
+    "latitude": 37.363470,
+    "height": 3.100001,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "ETC_05",
+    "data_name": "ETC_05",
+    "mapping_type":"origin",
+    "longitude": 126.719749,
+    "latitude": 37.367260,
+    "height": 2.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "ETC_06",
+    "data_name": "ETC_06",
+    "mapping_type":"origin",
+    "longitude": 126.719335,
+    "latitude": 37.367510,
+    "height": 2.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "ETC_07",
+    "data_name": "ETC_07",
+    "mapping_type":"origin",
+    "longitude": 126.718990,
+    "latitude": 37.367715,
+    "height": 2.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "S-p3",
+    "data_name": "S-p3",
+    "mapping_type":"origin",
+    "longitude": 126.719311,
+    "latitude": 37.366973,
+    "height": 0.021002,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "SITE",
+    "data_name": "SITE",
+    "mapping_type":"origin",
+    "longitude": 126.720727,
+    "latitude": 37.365351,
+    "height": -3.250000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "S_g",
+    "data_name": "S_g",
+    "mapping_type":"origin",
+    "longitude": 126.720331,
+    "latitude": 37.366043,
+    "height": 0.020975,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
     "attributes": {
         "isPhysical": true,
         "nodeType": "daejeon",
@@ -19,6 +1241,204 @@
     "longitude": 126.720359,
     "latitude": 37.366034,
     "height": -0.017742,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "S_indo2",
+    "data_name": "S_indo2",
+    "mapping_type":"origin",
+    "longitude": 126.719199,
+    "latitude": 37.366166,
+    "height": 0.021002,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "S_indo3",
+    "data_name": "S_indo3",
+    "mapping_type":"origin",
+    "longitude": 126.721260,
+    "latitude": 37.365165,
+    "height": 0.021002,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "S_p4",
+    "data_name": "S_p4",
+    "mapping_type":"origin",
+    "longitude": 126.720266,
+    "latitude": 37.366227,
+    "height": 0.050000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "S_p5",
+    "data_name": "S_p5",
+    "mapping_type":"origin",
+    "longitude": 126.719391,
+    "latitude": 37.366915,
+    "height": 0.050000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "S_p6",
+    "data_name": "S_p6",
+    "mapping_type":"origin",
+    "longitude": 126.720261,
+    "latitude": 37.363158,
+    "height": 0.050000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "S_p7",
+    "data_name": "S_p7",
+    "mapping_type":"origin",
+    "longitude": 126.719830,
+    "latitude": 37.362930,
+    "height": 0.050000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "S_road01",
+    "data_name": "S_road01",
+    "mapping_type":"origin",
+    "longitude": 126.720727,
+    "latitude": 37.365351,
+    "height": -3.250000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "S_road02",
+    "data_name": "S_road02",
+    "mapping_type":"origin",
+    "longitude": 126.723310,
+    "latitude": 37.364494,
+    "height": -0.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "S_site5",
+    "data_name": "S_site5",
+    "mapping_type":"origin",
+    "longitude": 126.713751,
+    "latitude": 37.366103,
+    "height": 0.050000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "S_site6",
+    "data_name": "S_site6",
+    "mapping_type":"origin",
+    "longitude": 126.717187,
+    "latitude": 37.364309,
+    "height": 0.050000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+,
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "S_WA",
+    "data_name": "S_WA",
+    "mapping_type":"origin",
+    "longitude": 126.721703,
+    "latitude": 37.364889,
+    "height": 0.021002,
     "heading": 0.000000,
     "pitch": 0.000000,
     "roll": 0.000000
