@@ -556,6 +556,11 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 		gl.uniform1f(currentShader.maxPointSize_loc, pCloudSettings.maxPointSize);
 		gl.uniform1f(currentShader.minPointSize_loc, pCloudSettings.minPointSize);
 		gl.uniform1f(currentShader.pendentPointSize_loc, pCloudSettings.pendentPointSize);
+		gl.uniform1i(currentShader.uFrustumIdx_loc, magoManager.currentFrustumIdx);
+
+		gl.uniform1i(currentShader.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
+		gl.uniform1f(currentShader.uFCoef_logDepth_loc, sceneState.fCoef_logDepth[0]);
+		gl.uniform1i(currentShader.clippingType_loc, 0);
 		
 		// Test to load pCloud.***
 		if (magoManager.visibleObjControlerPCloudOctrees === undefined)
@@ -2421,9 +2426,23 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			gl.uniform1f(currentShader.maxPointSize_loc, pCloudSettings.maxPointSize);
 			gl.uniform1f(currentShader.minPointSize_loc, pCloudSettings.minPointSize);
 			gl.uniform1f(currentShader.pendentPointSize_loc, pCloudSettings.pendentPointSize);
+			gl.uniform1i(currentShader.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
+			gl.uniform1f(currentShader.uFCoef_logDepth_loc, sceneState.fCoef_logDepth[0]);
+			gl.uniform2fv(currentShader.uNearFarArray_loc, magoManager.frustumVolumeControl.nearFarArray);
 			
+			// Bind textures.***
+			var texManager = magoManager.texturesManager;
+			var texturesMergerFbo = texManager.texturesMergerFbo;
+			var noiseTexture = magoManager.texturesStore.getNoiseTexture4x4();
+			var depthTex = texturesMergerFbo.colorBuffer;
+			var normalTex = texturesMergerFbo.colorBuffer1;
+
 			gl.activeTexture(gl.TEXTURE0);
-			gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);
+			//gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);
+			gl.bindTexture(gl.TEXTURE_2D, depthTex);
+			gl.activeTexture(gl.TEXTURE6);
+			//gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);
+			gl.bindTexture(gl.TEXTURE_2D, normalTex);
 			
 			// Test to load pCloud.***
 			if (magoManager.visibleObjControlerPCloudOctrees === undefined)

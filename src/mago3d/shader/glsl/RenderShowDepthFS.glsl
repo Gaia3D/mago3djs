@@ -33,20 +33,6 @@ varying vec3 vNormal;
 varying float flogz;
 varying float Fcoef_half;
 varying float vFrustumIdx;
-/*
-vec4 packDepth(const in float depth)
-{
-	// mago packDepth.***
-    const vec4 bit_shift = vec4(16777216.0, 65536.0, 256.0, 1.0); // original.***
-    const vec4 bit_mask  = vec4(0.0, 0.00390625, 0.00390625, 0.00390625);  // original.*** 
-	
-    //vec4 res = fract(depth * bit_shift); // Is not precise.
-	vec4 res = mod(depth * bit_shift * vec4(255), vec4(256) ) / vec4(255); // Is better.
-    res -= res.xxyz * bit_mask;
-    return res;  
-}
-*/
-
 
 vec4 packDepth( float v ) {
   vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;
@@ -54,7 +40,6 @@ vec4 packDepth( float v ) {
   enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);
   return enc;
 }
-
 
 vec3 encodeNormal(in vec3 normal)
 {
@@ -65,8 +50,6 @@ vec3 decodeNormal(in vec3 normal)
 {
 	return normal * 2.0 - 1.0;
 }
-
-
 
 //vec4 PackDepth32( in float depth )
 //{

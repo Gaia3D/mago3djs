@@ -2493,13 +2493,10 @@ void main()\n\
 		finalColor = vec4((textureColor.xyz) * occlusion * shadow_occlusion * scalarProd, alfa);\n\
 	}\n\
 	\n\
-	\n\
 	finalColor *= colorMultiplier;\n\
 	//finalColor = vec4(linearDepth, linearDepth, linearDepth, 1.0); // test to render depth color coded.***\n\
-\n\
-	\n\
-\n\
     gl_FragColor = finalColor; \n\
+\n\
 	#ifdef USE_LOGARITHMIC_DEPTH\n\
 	if(bUseLogarithmicDepth)\n\
 	{\n\
@@ -2665,7 +2662,6 @@ ShaderSource.ModelRefSsaoVS = "\n\
 			// gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;\n\
 			// flogz = 1.0 + gl_Position.w;\n\
 			//---------------------------------------------------------------------------------\n\
-\n\
 			flogz = 1.0 + gl_Position.w;\n\
 			Fcoef_half = 0.5 * uFCoef_logDepth;\n\
 		}\n\
@@ -2943,8 +2939,26 @@ void main()\n\
 ShaderSource.PointCloudDepthFS = "#ifdef GL_ES\n\
 precision highp float;\n\
 #endif\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+\n\
 uniform float near;\n\
 uniform float far;\n\
+uniform int uFrustumIdx;\n\
+\n\
+uniform bool bUseLogarithmicDepth;\n\
+\n\
+varying float flogz;\n\
+varying float Fcoef_half;\n\
 \n\
 // clipping planes.***\n\
 uniform bool bApplyClippingPlanes;\n\
@@ -2952,15 +2966,26 @@ uniform int clippingPlanesCount;\n\
 uniform vec4 clippingPlanes[6];\n\
 \n\
 varying float depth;  \n\
-\n\
+/*\n\
 vec4 packDepth(const in float depth)\n\
 {\n\
+    // mago packDepth.***\n\
     const vec4 bit_shift = vec4(16777216.0, 65536.0, 256.0, 1.0);\n\
     const vec4 bit_mask  = vec4(0.0, 0.00390625, 0.00390625, 0.00390625); \n\
     vec4 res = fract(depth * bit_shift);\n\
     res -= res.xxyz * bit_mask;\n\
     return res;  \n\
 }\n\
+*/\n\
+\n\
+\n\
+vec4 packDepth( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+  return enc;\n\
+}\n\
+\n\
 \n\
 vec4 PackDepth32( in float depth )\n\
 {\n\
@@ -2969,14 +2994,53 @@ vec4 PackDepth32( in float depth )\n\
     return vec4( encode.xyz - encode.yzw / 256.0, encode.w ) + 1.0/512.0;\n\
 }\n\
 \n\
+vec3 encodeNormal(in vec3 normal)\n\
+{\n\
+	return normal*0.5 + 0.5;\n\
+}\n\
+\n\
+vec3 decodeNormal(in vec3 normal)\n\
+{\n\
+	return normal * 2.0 - 1.0;\n\
+}\n\
+\n\
 void main()\n\
 {     \n\
     vec2 pt = gl_PointCoord - vec2(0.5);\n\
 	float distSquared = pt.x*pt.x+pt.y*pt.y;\n\
 	if(distSquared > 0.25)\n\
 		discard;\n\
-    gl_FragData[0] = packDepth(-depth);\n\
-	//gl_FragData[0] = PackDepth32(depth);\n\
+        \n\
+    if(!bUseLogarithmicDepth)\n\
+	{\n\
+    	gl_FragData[0] = packDepth(-depth);\n\
+	}\n\
+\n\
+    float frustumIdx = 0.1; // realFrustumIdx = 0.1 * 100 = 10. \n\
+	if(uFrustumIdx == 0)\n\
+	frustumIdx = 0.105; // frustumIdx = 10.***\n\
+	else if(uFrustumIdx == 1)\n\
+	frustumIdx = 0.115; // frustumIdx = 11.***\n\
+	else if(uFrustumIdx == 2)\n\
+	frustumIdx = 0.125; // frustumIdx = 12.***\n\
+	else if(uFrustumIdx == 3)\n\
+	frustumIdx = 0.135; // frustumIdx = 13.***\n\
+\n\
+    // use frustumIdx from 10 to 13, instead from 0 to 3.***\n\
+\n\
+\n\
+    #ifdef USE_MULTI_RENDER_TARGET\n\
+	vec3 normal = encodeNormal(vec3(0.0, 0.0, 1.0));\n\
+	gl_FragData[1] = vec4(normal, frustumIdx); // save normal.***\n\
+	#endif\n\
+\n\
+    #ifdef USE_LOGARITHMIC_DEPTH\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
+        gl_FragData[0] = packDepth(gl_FragDepthEXT);\n\
+	}\n\
+	#endif\n\
 }";
 ShaderSource.PointCloudDepthVS = "attribute vec3 position;\n\
 uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
@@ -2999,6 +3063,13 @@ uniform float maxPointSize;\n\
 uniform float minPointSize;\n\
 uniform float pendentPointSize;\n\
 uniform bool bUseFixPointSize;\n\
+\n\
+uniform bool bUseLogarithmicDepth;\n\
+uniform float uFCoef_logDepth;\n\
+\n\
+varying float flogz;\n\
+varying float Fcoef_half;\n\
+\n\
 varying vec4 vColor;\n\
 //varying float glPointSize;\n\
 varying float depth;  \n\
@@ -3041,6 +3112,19 @@ void main()\n\
 		gl_PointSize = 2.0;\n\
 		\n\
 	depth = (modelViewMatrixRelToEye * pos).z/far; // original.***\n\
+\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		// logarithmic zBuffer:\n\
+		// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
+		// float Fcoef = 2.0 / log2(far + 1.0);\n\
+		// gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;\n\
+		// flogz = 1.0 + gl_Position.w;\n\
+		//-----------------------------------------------------------------------------------\n\
+		//float C = 0.0001;\n\
+		flogz = 1.0 + gl_Position.z; // use \"z\" instead \"w\" for fast decoding.***\n\
+		Fcoef_half = 0.5 * uFCoef_logDepth;\n\
+	}\n\
 }\n\
 ";
 ShaderSource.PointCloudFS = "precision lowp float;\n\
@@ -3092,8 +3176,18 @@ ShaderSource.PointCloudSsaoFS = "#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\
 \n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
 uniform sampler2D depthTex;\n\
-uniform mat4 projectionMatrix;\n\
+uniform sampler2D normalTex;\n\
 uniform float near;\n\
 uniform float far;            \n\
 uniform float fov;\n\
@@ -3112,12 +3206,65 @@ uniform float radius;      \n\
 uniform bool bApplySsao;\n\
 uniform float externalAlpha;\n\
 \n\
+uniform bool bUseLogarithmicDepth;\n\
+uniform vec2 uNearFarArray[4];\n\
+\n\
+varying float flogz;\n\
+varying float Fcoef_half;\n\
+/*\n\
 float unpackDepth(const in vec4 rgba_depth)\n\
 {\n\
+	// mago unpckDepth.***\n\
     const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);\n\
     float depth = dot(rgba_depth, bit_shift);\n\
     return depth;\n\
-}                \n\
+} \n\
+*/\n\
+\n\
+\n\
+float unpackDepth(vec4 packedDepth)\n\
+{\n\
+	// See Aras Pranckevičius' post Encoding Floats to RGBA\n\
+	// http://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/\n\
+	//vec4 packDepth( float v ) // function to packDepth.***\n\
+	//{\n\
+	//	vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+	//	enc = fract(enc);\n\
+	//	enc -= enc.yzww * vec4(1.0/255.0,1.0/255.0,1.0/255.0,0.0);\n\
+	//	return enc;\n\
+	//}\n\
+	return dot(packedDepth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+}\n\
+\n\
+float getDepth(vec2 coord)\n\
+{\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		float linearDepth = unpackDepth(texture2D(depthTex, coord.xy));\n\
+		// gl_FragDepthEXT = linearDepth = log2(flogz) * Fcoef_half;\n\
+		// flogz = 1.0 + gl_Position.z;\n\
+\n\
+		float flogzAux = pow(2.0, linearDepth/Fcoef_half);\n\
+		float z = flogzAux - 1.0;\n\
+		linearDepth = z/(far);\n\
+		return linearDepth;\n\
+	}\n\
+	else{\n\
+		return unpackDepth(texture2D(depthTex, coord.xy));\n\
+	}\n\
+}\n\
+\n\
+vec4 decodeNormal(in vec4 normal)\n\
+{\n\
+	return vec4(normal.xyz * 2.0 - 1.0, normal.w);\n\
+}\n\
+\n\
+vec4 getNormal(in vec2 texCoord)\n\
+{\n\
+    vec4 encodedNormal = texture2D(normalTex, texCoord);\n\
+    return decodeNormal(encodedNormal);\n\
+}\n\
+\n\
 \n\
 vec3 getViewRay(vec2 tc)\n\
 {\n\
@@ -3125,13 +3272,38 @@ vec3 getViewRay(vec2 tc)\n\
     float wfar = hfar * aspectRatio;    \n\
     vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    \n\
     return ray;                      \n\
-}         \n\
+}  \n\
+\n\
+vec2 getNearFar_byFrustumIdx(in int frustumIdx)\n\
+{\n\
+    vec2 nearFar;\n\
+    if(frustumIdx == 0)\n\
+    {\n\
+        nearFar = uNearFarArray[0];\n\
+    }\n\
+    else if(frustumIdx == 1)\n\
+    {\n\
+        nearFar = uNearFarArray[1];\n\
+    }\n\
+    else if(frustumIdx == 2)\n\
+    {\n\
+        nearFar = uNearFarArray[2];\n\
+    }\n\
+    else if(frustumIdx == 3)\n\
+    {\n\
+        nearFar = uNearFarArray[3];\n\
+    }\n\
+\n\
+    return nearFar;\n\
+}\n\
             \n\
 //linear view space depth\n\
+/*\n\
 float getDepth(vec2 coord)\n\
 {\n\
     return unpackDepth(texture2D(depthTex, coord.xy));\n\
-}    \n\
+} \n\
+*/   \n\
 \n\
 void main()\n\
 {\n\
@@ -3140,18 +3312,39 @@ void main()\n\
 		discard;\n\
 	\n\
 	float occlusion = 0.0;\n\
+	float lighting = 0.0;\n\
+	bool testBool = false;\n\
+	\n\
 	if(bApplySsao)\n\
 	{          \n\
 		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
 		float linearDepth = getDepth(screenPos);\n\
-		vec3 origin = getViewRay(screenPos) * linearDepth;\n\
+		//vec3 origin = getViewRay(screenPos) * linearDepth;\n\
+\n\
+\n\
+		vec4 normalRGBA = getNormal(screenPos);\n\
+		int currFrustumIdx = int(floor(100.0*normalRGBA.w));\n\
+\n\
+		if(currFrustumIdx >= 10)\n\
+		currFrustumIdx -= 10;\n\
+\n\
+		vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);\n\
+		float currNear = nearFar.x;\n\
+		float currFar = nearFar.y;\n\
+\n\
+		if(currFar < 0.1)\n\
+		{\n\
+			//testBool = true;\n\
+		}\n\
+\n\
+		float myZDist = linearDepth * currFar;\n\
+\n\
 		float radiusAux = glPointSize/1.9;\n\
-		radiusAux = 1.5;\n\
 		vec2 screenPosAdjacent;\n\
 		\n\
 		for(int j = 0; j < 1; ++j)\n\
 		{\n\
-			radiusAux = 1.5 *(float(j)+1.0);\n\
+			//radiusAux = 1.5 *(float(j)+1.0);\n\
 			for(int i = 0; i < 8; ++i)\n\
 			{    	 \n\
 				if(i == 0)\n\
@@ -3170,13 +3363,47 @@ void main()\n\
 					screenPosAdjacent = vec2((gl_FragCoord.x - radiusAux)/ screenWidth, (gl_FragCoord.y + radiusAux) / screenHeight);\n\
 				else if(i == 7)\n\
 					screenPosAdjacent = vec2((gl_FragCoord.x - radiusAux)/ screenWidth, (gl_FragCoord.y) / screenHeight);\n\
+\n\
 				float depthBufferValue = getDepth(screenPosAdjacent);\n\
-				float range_check = abs(linearDepth - depthBufferValue)*far;\n\
-				if (range_check > 1.5 && depthBufferValue > linearDepth)\n\
+				float zDist = depthBufferValue * currFar;\n\
+				float zDistDiff = abs(myZDist - zDist);\n\
+\n\
+				/*\n\
+				if(myZDist < zDist)\n\
 				{\n\
-					if (range_check < 20.0)\n\
-						occlusion +=  1.0;\n\
+					// My pixel is in front\n\
+					if(zDistDiff > 0.0001)\n\
+					occlusion +=  1.0;\n\
 				}\n\
+				else\n\
+				{\n\
+					// My pixel is rear\n\
+					if(zDistDiff > 0.0001)\n\
+					occlusion +=  1.0;\n\
+				}\n\
+				*/\n\
+\n\
+				\n\
+				//float range_check = abs(linearDepth - depthBufferValue)*far;\n\
+				float range_check = abs(linearDepth - depthBufferValue)*currFar;\n\
+				////if (range_check > 1.5 && depthBufferValue > linearDepth) // original\n\
+				if (depthBufferValue > linearDepth)\n\
+				{\n\
+					// My pixel is in front\n\
+					if (range_check > radiusAux)\n\
+					{\n\
+						//if (range_check < 20.0)\n\
+						if (range_check < 30.0)\n\
+							occlusion +=  1.0;\n\
+					}\n\
+				}\n\
+				else\n\
+				{\n\
+					// My pixel is rear\n\
+					// lighting\n\
+\n\
+				}\n\
+				\n\
 			}   \n\
 		}   \n\
 			\n\
@@ -3189,10 +3416,27 @@ void main()\n\
 		occlusion = 1.0;\n\
 	}\n\
 \n\
+	//if(occlusion < 0.9)\n\
+	//occlusion = 0.0;\n\
+\n\
+\n\
     vec4 finalColor;\n\
 	finalColor = vec4((vColor.xyz) * occlusion, externalAlpha);\n\
 	//finalColor = vec4(vec3(0.8, 0.8, 0.8) * occlusion, externalAlpha);\n\
-    gl_FragColor = finalColor; \n\
+    gl_FragData[0] = finalColor; \n\
+\n\
+	//if(testBool)\n\
+	//{\n\
+	//	gl_FragData[0] = vec4(1.0, 0.0, 0.0, 1.0); \n\
+	//}\n\
+\n\
+	#ifdef USE_LOGARITHMIC_DEPTH\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
+	}\n\
+	#endif\n\
+\n\
 }";
 ShaderSource.PointCloudSsaoFS_rainbow = "#ifdef GL_ES\n\
     precision highp float;\n\
@@ -3417,6 +3661,7 @@ uniform bool bUseLogarithmicDepth;\n\
 varying vec4 vColor;\n\
 varying float glPointSize;\n\
 \n\
+uniform float uFCoef_logDepth;\n\
 varying float flogz;\n\
 varying float Fcoef_half;\n\
 \n\
@@ -3442,26 +3687,12 @@ void main()\n\
 	\n\
     if(bUse1Color)\n\
 	{\n\
-		vColor=oneColor4;\n\
+		vColor = oneColor4;\n\
 	}\n\
 	else\n\
-		vColor=color4;\n\
+		vColor = color4;\n\
 	\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
-\n\
-	if(bUseLogarithmicDepth)\n\
-	{\n\
-		// logarithmic zBuffer:\n\
-		// https://www.gamasutra.com/blogs/BranoKemen/20090812/85207/Logarithmic_Depth_Buffer.php\n\
-\n\
-		// logarithmic zBuffer:\n\
-		// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
-		float Fcoef = 2.0 / log2(far + 1.0);\n\
-		gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;\n\
-\n\
-		flogz = 1.0 + gl_Position.w;\n\
-		Fcoef_half = 0.5 * Fcoef;\n\
-	}\n\
 \n\
 	if(bUseFixPointSize)\n\
 	{\n\
@@ -3478,6 +3709,18 @@ void main()\n\
 			gl_PointSize = 2.0;\n\
 	}\n\
 	glPointSize = gl_PointSize;\n\
+\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		// logarithmic zBuffer:\n\
+			// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
+			// float Fcoef = 2.0 / log2(far + 1.0);\n\
+			// gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;\n\
+			// flogz = 1.0 + gl_Position.w;\n\
+			//---------------------------------------------------------------------------------\n\
+			flogz = 1.0 + gl_Position.w;\n\
+			Fcoef_half = 0.5 * uFCoef_logDepth;\n\
+	}\n\
 }";
 ShaderSource.PointCloudVS_rainbow = "attribute vec3 position;\n\
 attribute vec3 normal;\n\
@@ -3592,28 +3835,13 @@ varying vec3 vNormal;\n\
 varying float flogz;\n\
 varying float Fcoef_half;\n\
 varying float vFrustumIdx;\n\
-/*\n\
-vec4 packDepth(const in float depth)\n\
-{\n\
-	// mago packDepth.***\n\
-    const vec4 bit_shift = vec4(16777216.0, 65536.0, 256.0, 1.0); // original.***\n\
-    const vec4 bit_mask  = vec4(0.0, 0.00390625, 0.00390625, 0.00390625);  // original.*** \n\
-	\n\
-    //vec4 res = fract(depth * bit_shift); // Is not precise.\n\
-	vec4 res = mod(depth * bit_shift * vec4(255), vec4(256) ) / vec4(255); // Is better.\n\
-    res -= res.xxyz * bit_mask;\n\
-    return res;  \n\
-}\n\
-*/\n\
-\n\
 \n\
 vec4 packDepth( float v ) {\n\
   vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
   enc = fract(enc);\n\
-  enc -= enc.yzww * vec4(1.0/255.0,1.0/255.0,1.0/255.0,0.0);\n\
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
   return enc;\n\
 }\n\
-\n\
 \n\
 vec3 encodeNormal(in vec3 normal)\n\
 {\n\
@@ -3624,8 +3852,6 @@ vec3 decodeNormal(in vec3 normal)\n\
 {\n\
 	return normal * 2.0 - 1.0;\n\
 }\n\
-\n\
-\n\
 \n\
 //vec4 PackDepth32( in float depth )\n\
 //{\n\
@@ -3885,15 +4111,6 @@ vec4 getNormal(in vec2 texCoord)\n\
 \n\
 vec3 getViewRay(vec2 tc)\n\
 {\n\
-	/*\n\
-	// The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
-	float farForDepth = 30000.0;\n\
-	float hfar = 2.0 * tangentOfHalfFovy * farForDepth;\n\
-    float wfar = hfar * aspectRatio;    \n\
-    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -farForDepth);  \n\
-	*/	\n\
-	\n\
-	\n\
 	float hfar = 2.0 * tangentOfHalfFovy * far;\n\
     float wfar = hfar * aspectRatio;    \n\
     vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    \n\
@@ -4490,15 +4707,10 @@ float getFactorByDist(in float radius, in float realDist)\n\
 \n\
 void main()\n\
 {\n\
-    float occlusion_C = 0.0;\n\
-    float occlusion_B = 0.0;\n\
     float occlusion_A = 0.0;\n\
+    float occlusion_B = 0.0;\n\
+    float occlusion_C = 0.0;\n\
     float occlusion_D = 0.0;\n\
-\n\
-    //float occlusion_CC = 0.0;\n\
-    //float occlusion_BB = 0.0;\n\
-    //float occlusion_AA = 0.0;\n\
-    //float occlusion_DD = 0.0;\n\
 \n\
     vec3 normal = vec3(0.0);\n\
     vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
@@ -4517,15 +4729,10 @@ void main()\n\
     vec3 rayNear = getViewRay(screenPos, currNear);\n\
     float linearDepth = getDepth(screenPos);  \n\
 \n\
-    float radius_D = 20.0;\n\
-    float radius_C = 12.0;\n\
-    float radius_B = 5.0;\n\
     float radius_A = 0.5;\n\
-\n\
-    //float radius_DD = 26.0;\n\
-    //float radius_CC = 15.0;\n\
-    //float radius_BB = 5.0;\n\
-    //float radius_AA = 0.5;\n\
+    float radius_B = 5.0;\n\
+    float radius_C = 12.0;\n\
+    float radius_D = 20.0;\n\
 \n\
     float factorByDist = 1.0;\n\
     //vec3 posCC = reconstructPosition(screenPos, linearDepth);\n\
@@ -4575,19 +4782,15 @@ void main()\n\
 \n\
             // Big radius.***\n\
             occlusion_C += getOcclusion(origin, rotatedKernel, radius_C, nearFar) * factorByDist;\n\
-            //occlusion_C += getOcclusion(origin, rotatedKernel, radius_CC, nearFar) * factorByDist;\n\
 \n\
             // small occl.***\n\
             occlusion_B += getOcclusion(origin, rotatedKernel, radius_B, nearFar) * factorByDist;\n\
-            //occlusion_B += getOcclusion(origin, rotatedKernel, radius_BB, nearFar) * factorByDist;\n\
 \n\
             // radius A.***\n\
             occlusion_A += getOcclusion(origin, rotatedKernel, radius_A, nearFar) * factorByDist;\n\
-            //occlusion_A += getOcclusion(origin, rotatedKernel, radius_AA, nearFar) * factorByDist;\n\
 \n\
             // veryBigRadius.***\n\
             occlusion_D += getOcclusion(origin, rotatedKernel, radius_D, nearFar) * factorByDist;\n\
-            //occlusion_D += getOcclusion(origin, rotatedKernel, radius_DD, nearFar) * factorByDist;\n\
 		} \n\
 \n\
         float fKernelSize = float(kernelSize);\n\

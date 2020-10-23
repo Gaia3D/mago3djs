@@ -1,0 +1,33 @@
+{
+"attributes": {
+		"isPhysical": false,
+		"nodeType": "root",
+		"projectType": "sihung_campus",
+		"specularLighting": true
+},
+"children": [
+		{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "daejeon",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "S_indo1",
+    "data_name": "S_indo1",
+    "mapping_type":"origin",
+    "longitude": 126.720359,
+    "latitude": 37.366034,
+    "height": -0.017742,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+],
+	"parent": 0,
+	"depth": 1,
+	"view_order": 2,
+	"data_key": "sihung_campus",
+	"data_name": "sihung_campus",
+    "mapping_type": "origin"
+}

@@ -239,15 +239,10 @@ float getFactorByDist(in float radius, in float realDist)
 
 void main()
 {
-    float occlusion_C = 0.0;
-    float occlusion_B = 0.0;
     float occlusion_A = 0.0;
+    float occlusion_B = 0.0;
+    float occlusion_C = 0.0;
     float occlusion_D = 0.0;
-
-    //float occlusion_CC = 0.0;
-    //float occlusion_BB = 0.0;
-    //float occlusion_AA = 0.0;
-    //float occlusion_DD = 0.0;
 
     vec3 normal = vec3(0.0);
     vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
@@ -266,15 +261,10 @@ void main()
     vec3 rayNear = getViewRay(screenPos, currNear);
     float linearDepth = getDepth(screenPos);  
 
-    float radius_D = 20.0;
-    float radius_C = 12.0;
-    float radius_B = 5.0;
     float radius_A = 0.5;
-
-    //float radius_DD = 26.0;
-    //float radius_CC = 15.0;
-    //float radius_BB = 5.0;
-    //float radius_AA = 0.5;
+    float radius_B = 5.0;
+    float radius_C = 12.0;
+    float radius_D = 20.0;
 
     float factorByDist = 1.0;
     //vec3 posCC = reconstructPosition(screenPos, linearDepth);
@@ -324,19 +314,15 @@ void main()
 
             // Big radius.***
             occlusion_C += getOcclusion(origin, rotatedKernel, radius_C, nearFar) * factorByDist;
-            //occlusion_C += getOcclusion(origin, rotatedKernel, radius_CC, nearFar) * factorByDist;
 
             // small occl.***
             occlusion_B += getOcclusion(origin, rotatedKernel, radius_B, nearFar) * factorByDist;
-            //occlusion_B += getOcclusion(origin, rotatedKernel, radius_BB, nearFar) * factorByDist;
 
             // radius A.***
             occlusion_A += getOcclusion(origin, rotatedKernel, radius_A, nearFar) * factorByDist;
-            //occlusion_A += getOcclusion(origin, rotatedKernel, radius_AA, nearFar) * factorByDist;
 
             // veryBigRadius.***
             occlusion_D += getOcclusion(origin, rotatedKernel, radius_D, nearFar) * factorByDist;
-            //occlusion_D += getOcclusion(origin, rotatedKernel, radius_DD, nearFar) * factorByDist;
 		} 
 
         float fKernelSize = float(kernelSize);

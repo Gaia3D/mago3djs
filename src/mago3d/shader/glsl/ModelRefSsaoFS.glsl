@@ -763,13 +763,10 @@ void main()
 		finalColor = vec4((textureColor.xyz) * occlusion * shadow_occlusion * scalarProd, alfa);
 	}
 	
-	
 	finalColor *= colorMultiplier;
 	//finalColor = vec4(linearDepth, linearDepth, linearDepth, 1.0); // test to render depth color coded.***
-
-	
-
     gl_FragColor = finalColor; 
+
 	#ifdef USE_LOGARITHMIC_DEPTH
 	if(bUseLogarithmicDepth)
 	{

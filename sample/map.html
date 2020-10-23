@@ -163,13 +163,13 @@
 			console.info(e);
 		});
 	}
-	
+	// 3ds, pointsCloud, sihung_campus
 	function doTest(){
 		var f4dController = MAGO3D_INSTANCE.getF4dController();
 		var magoManager = MAGO3D_INSTANCE.getMagoManager();
 
 		$.ajax({
-			url: dataInformationUrl + "3ds.json",
+			url: dataInformationUrl + "pointsCloud.json",
 			type: "GET",
 			dataType: "json",
 			success: function(f4dObject){

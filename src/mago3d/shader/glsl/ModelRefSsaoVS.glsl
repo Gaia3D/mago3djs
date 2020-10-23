@@ -156,7 +156,6 @@
 			// gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;
 			// flogz = 1.0 + gl_Position.w;
 			//---------------------------------------------------------------------------------
-
 			flogz = 1.0 + gl_Position.w;
 			Fcoef_half = 0.5 * uFCoef_logDepth;
 		}

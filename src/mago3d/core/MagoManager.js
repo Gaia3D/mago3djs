@@ -5883,6 +5883,8 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shaderName = "pointsCloudDepth";
 	ssao_vs_source = ShaderSource.PointCloudDepthVS;
 	ssao_fs_source = ShaderSource.PointCloudDepthFS;
+	ssao_fs_source = ssao_fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
+	ssao_fs_source = ssao_fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
 	shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
 	// pointsCloud shader locals.***
 	shader.bPositionCompressed_loc = gl.getUniformLocation(shader.program, "bPositionCompressed");
@@ -5891,12 +5893,21 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.maxPointSize_loc = gl.getUniformLocation(shader.program, "maxPointSize");
 	shader.minPointSize_loc = gl.getUniformLocation(shader.program, "minPointSize");
 	shader.pendentPointSize_loc = gl.getUniformLocation(shader.program, "pendentPointSize");
+	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
+	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
+	shader.uFrustumIdx_loc = gl.getUniformLocation(shader.program, "uFrustumIdx");
 
 	// 8) PointsCloud shader.****************************************************************************************
 	shaderName = "pointsCloudSsao";
 	ssao_vs_source = ShaderSource.PointCloudVS;
 	ssao_fs_source = ShaderSource.PointCloudSsaoFS;
+	ssao_fs_source = ssao_fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
+	ssao_fs_source = ssao_fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
 	shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
+	shader.normalTex_loc = gl.getUniformLocation(shader.program, "normalTex");
+	this.postFxShadersManager.useProgram(shader);
+	gl.uniform1i(shader.normalTex_loc, 6);
+	shader.uNearFarArray_loc = gl.getUniformLocation(shader.program, "uNearFarArray");
 
 	// pointsCloud shader locals.***
 	shader.bPositionCompressed_loc = gl.getUniformLocation(shader.program, "bPositionCompressed");
@@ -5906,6 +5917,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.minPointSize_loc = gl.getUniformLocation(shader.program, "minPointSize");
 	shader.pendentPointSize_loc = gl.getUniformLocation(shader.program, "pendentPointSize");
 	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
+	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
 
 	// 9) PointsCloud shader RAINBOW.****************************************************************************************
 	shaderName = "pointsCloudSsao_rainbow";
@@ -5983,6 +5995,8 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	var shaderName = "thickLineDepth";
 	var ssao_vs_source = ShaderSource.thickLineDepthVS;
 	var ssao_fs_source = ShaderSource.PointCloudDepthFS;
+	ssao_fs_source = ssao_fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
+	ssao_fs_source = ssao_fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
 	shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
 	// ThickLine shader locations.***
 	shader.projectionMatrix_loc = gl.getUniformLocation(shader.program, "projectionMatrix");

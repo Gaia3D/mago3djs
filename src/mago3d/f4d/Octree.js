@@ -488,8 +488,6 @@ Octree.prototype.prepareSkinData = function(magoManager)
 		else 
 		{
 			var flip_y_texCoords = true;
-
-			// This is the version 001.
 			if (neoBuilding.simpleBuilding3x3Texture === undefined)
 			{
 				neoBuilding.simpleBuilding3x3Texture = new Texture();
@@ -504,7 +502,22 @@ Octree.prototype.prepareSkinData = function(magoManager)
 				magoManager.readerWriter.readLegoSimpleBuildingTexture(gl, texFilePath, neoBuilding.simpleBuilding3x3Texture, magoManager, flip_y_texCoords); 
 			}
 			
-			magoManager.readerWriter.getOctreeLegoArraybuffer(filePathInServer, this, magoManager);
+			// Check the type of the skinData is for this octree.***
+			var lodBuildingDatasMap = neoBuilding.lodBuildingDatasMap;
+			var lod = 2;
+			var lodBuildingData = lodBuildingDatasMap[lod];
+			if(!lodBuildingData.isModelRef)
+			{
+				if(neoBuilding.lodMeshesMap)
+				{
+					var geometryFileName = lodBuildingData.geometryFileName;
+					this.lego = neoBuilding.lodMeshesMap[geometryFileName];
+				}
+			}
+			else
+			{
+				magoManager.readerWriter.getOctreeLegoArraybuffer(filePathInServer, this, magoManager);
+			}
 		}
 	}
 };

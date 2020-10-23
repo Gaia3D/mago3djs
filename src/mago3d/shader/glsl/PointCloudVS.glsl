@@ -25,6 +25,7 @@ uniform bool bUseLogarithmicDepth;
 varying vec4 vColor;
 varying float glPointSize;
 
+uniform float uFCoef_logDepth;
 varying float flogz;
 varying float Fcoef_half;
 
@@ -50,26 +51,12 @@ void main()
 	
     if(bUse1Color)
 	{
-		vColor=oneColor4;
+		vColor = oneColor4;
 	}
 	else
-		vColor=color4;
+		vColor = color4;
 	
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;
-
-	if(bUseLogarithmicDepth)
-	{
-		// logarithmic zBuffer:
-		// https://www.gamasutra.com/blogs/BranoKemen/20090812/85207/Logarithmic_Depth_Buffer.php
-
-		// logarithmic zBuffer:
-		// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html
-		float Fcoef = 2.0 / log2(far + 1.0);
-		gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;
-
-		flogz = 1.0 + gl_Position.w;
-		Fcoef_half = 0.5 * Fcoef;
-	}
 
 	if(bUseFixPointSize)
 	{
@@ -86,4 +73,16 @@ void main()
 			gl_PointSize = 2.0;
 	}
 	glPointSize = gl_PointSize;
+
+	if(bUseLogarithmicDepth)
+	{
+		// logarithmic zBuffer:
+			// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html
+			// float Fcoef = 2.0 / log2(far + 1.0);
+			// gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;
+			// flogz = 1.0 + gl_Position.w;
+			//---------------------------------------------------------------------------------
+			flogz = 1.0 + gl_Position.w;
+			Fcoef_half = 0.5 * uFCoef_logDepth;
+	}
 }
