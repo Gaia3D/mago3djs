@@ -22,6 +22,7 @@ var PostFxShadersManager = function(options)
 	this.currentShaderUsing = undefined; // current active shader.
 
 	this.bUseLogarithmicDepth = false;
+	this.bUseMultiRenderTarget = false;
 
 	if (options)
 	{

@@ -553,9 +553,9 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 		
 		currentShader.bindUniformGenerals();
 		var pCloudSettings = magoManager.magoPolicy.getPointsCloudSettings();
-		gl.uniform1f(currentShader.maxPointSize_loc, pCloudSettings.maxPointSize);
-		gl.uniform1f(currentShader.minPointSize_loc, pCloudSettings.minPointSize);
-		gl.uniform1f(currentShader.pendentPointSize_loc, pCloudSettings.pendentPointSize);
+		gl.uniform1f(currentShader.maxPointSize_loc, parseInt(pCloudSettings.maxPointSize));
+		gl.uniform1f(currentShader.minPointSize_loc, parseInt(pCloudSettings.minPointSize));
+		gl.uniform1f(currentShader.pendentPointSize_loc, parseInt(pCloudSettings.pendentPointSize));
 		gl.uniform1i(currentShader.uFrustumIdx_loc, magoManager.currentFrustumIdx);
 
 		gl.uniform1i(currentShader.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
@@ -2421,11 +2421,11 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			}
 			var pCloudSettings = magoManager.magoPolicy.getPointsCloudSettings();
 			gl.uniform1i(currentShader.bUseColorCodingByHeight_loc, true);
-			gl.uniform1f(currentShader.minHeight_rainbow_loc, pCloudSettings.minHeightRainbow);
-			gl.uniform1f(currentShader.maxHeight_rainbow_loc, pCloudSettings.maxHeightRainbow);
-			gl.uniform1f(currentShader.maxPointSize_loc, pCloudSettings.maxPointSize);
-			gl.uniform1f(currentShader.minPointSize_loc, pCloudSettings.minPointSize);
-			gl.uniform1f(currentShader.pendentPointSize_loc, pCloudSettings.pendentPointSize);
+			gl.uniform1f(currentShader.minHeight_rainbow_loc, parseInt(pCloudSettings.minHeightRainbow));
+			gl.uniform1f(currentShader.maxHeight_rainbow_loc, parseInt(pCloudSettings.maxHeightRainbow));
+			gl.uniform1f(currentShader.maxPointSize_loc, parseInt(pCloudSettings.maxPointSize));
+			gl.uniform1f(currentShader.minPointSize_loc, parseInt(pCloudSettings.minPointSize));
+			gl.uniform1f(currentShader.pendentPointSize_loc, parseInt(pCloudSettings.pendentPointSize));
 			gl.uniform1i(currentShader.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
 			gl.uniform1f(currentShader.uFCoef_logDepth_loc, sceneState.fCoef_logDepth[0]);
 			gl.uniform2fv(currentShader.uNearFarArray_loc, magoManager.frustumVolumeControl.nearFarArray);

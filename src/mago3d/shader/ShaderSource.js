@@ -3188,6 +3188,8 @@ ShaderSource.PointCloudSsaoFS = "#ifdef GL_ES\n\
 \n\
 uniform sampler2D depthTex;\n\
 uniform sampler2D normalTex;\n\
+uniform mat4 projectionMatrix;\n\
+uniform float tangentOfHalfFovy;\n\
 uniform float near;\n\
 uniform float far;            \n\
 uniform float fov;\n\
@@ -3211,15 +3213,6 @@ uniform vec2 uNearFarArray[4];\n\
 \n\
 varying float flogz;\n\
 varying float Fcoef_half;\n\
-/*\n\
-float unpackDepth(const in vec4 rgba_depth)\n\
-{\n\
-	// mago unpckDepth.***\n\
-    const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);\n\
-    float depth = dot(rgba_depth, bit_shift);\n\
-    return depth;\n\
-} \n\
-*/\n\
 \n\
 \n\
 float unpackDepth(vec4 packedDepth)\n\
@@ -3266,13 +3259,14 @@ vec4 getNormal(in vec2 texCoord)\n\
 }\n\
 \n\
 \n\
-vec3 getViewRay(vec2 tc)\n\
+vec3 getViewRay(vec2 tc, in float relFar)\n\
 {\n\
-    float hfar = 2.0 * tan(fov/2.0) * far;\n\
+	float hfar = 2.0 * tangentOfHalfFovy * relFar;\n\
     float wfar = hfar * aspectRatio;    \n\
-    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    \n\
+    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -relFar);    \n\
+	\n\
     return ray;                      \n\
-}  \n\
+} \n\
 \n\
 vec2 getNearFar_byFrustumIdx(in int frustumIdx)\n\
 {\n\
@@ -3311,9 +3305,10 @@ void main()\n\
 	if(pt.x*pt.x+pt.y*pt.y > 0.25)\n\
 		discard;\n\
 	\n\
-	float occlusion = 0.0;\n\
+	float occlusion = 1.0;\n\
 	float lighting = 0.0;\n\
 	bool testBool = false;\n\
+	vec4 colorAux = vec4(1.0, 1.0, 1.0, 1.0);\n\
 	\n\
 	if(bApplySsao)\n\
 	{          \n\
@@ -3332,21 +3327,44 @@ void main()\n\
 		float currNear = nearFar.x;\n\
 		float currFar = nearFar.y;\n\
 \n\
-		if(currFar < 0.1)\n\
-		{\n\
-			//testBool = true;\n\
-		}\n\
 \n\
-		float myZDist = linearDepth * currFar;\n\
+		colorAux = vec4(linearDepth, linearDepth, linearDepth, 1.0);\n\
+		float myZDist = currNear + linearDepth * currFar;\n\
 \n\
-		float radiusAux = glPointSize/1.9;\n\
+		float radiusAux = glPointSize/1.9; // radius in pixels.\n\
+		float radiusFog = glPointSize*3.0; // radius in pixels.\n\
 		vec2 screenPosAdjacent;\n\
+\n\
+		/*\n\
+		vec3 sample = origin + rotatedKernel * radius;\n\
+		vec4 offset = projectionMatrix * vec4(sample, 1.0);	\n\
+		vec3 offsetCoord = vec3(offset.xyz);				\n\
+		offsetCoord.xyz /= offset.w;\n\
+		offsetCoord.xyz = offsetCoord.xyz * 0.5 + 0.5; \n\
+		*/\n\
+\n\
+		// calculate the pixelSize in the screenPos.***\n\
+		float h = 2.0 * tangentOfHalfFovy * currFar * linearDepth; // height in meters of the screen in the current pixelDepth\n\
+    	float w = h * aspectRatio;     							   // width in meters of the screen in the current pixelDepth\n\
+		// vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -relFar);   \n\
+\n\
+		float pixelSize_x = w/screenWidth; // the pixelSize in meters in the x axis.\n\
+		float pixelSize_y = h/screenHeight;  // the pixelSize in meters in the y axis.\n\
+		\n\
+		float radiusInMeters = 0.12;\n\
+		//radiusAux = radiusInMeters / pixelSize_x;\n\
+		float radiusFogInMeters = 1.0;\n\
+		//radiusFog = radiusFogInMeters / pixelSize_x;\n\
+\n\
+		radiusAux = 3.0;\n\
+		float farFactor = sqrt(myZDist*0.5);\n\
 		\n\
 		for(int j = 0; j < 1; ++j)\n\
 		{\n\
 			//radiusAux = 1.5 *(float(j)+1.0);\n\
 			for(int i = 0; i < 8; ++i)\n\
-			{    	 \n\
+			{  \n\
+				// Find occlussion.***  	 \n\
 				if(i == 0)\n\
 					screenPosAdjacent = vec2((gl_FragCoord.x - radiusAux)/ screenWidth, (gl_FragCoord.y - radiusAux) / screenHeight);\n\
 				else if(i == 1)\n\
@@ -3364,66 +3382,108 @@ void main()\n\
 				else if(i == 7)\n\
 					screenPosAdjacent = vec2((gl_FragCoord.x - radiusAux)/ screenWidth, (gl_FragCoord.y) / screenHeight);\n\
 \n\
+				vec4 normalRGBA_adjacent = getNormal(screenPosAdjacent);\n\
+				int adjacentFrustumIdx = int(floor(100.0*normalRGBA_adjacent.w));\n\
+\n\
+				if(adjacentFrustumIdx >= 10)\n\
+				adjacentFrustumIdx -= 10;\n\
+\n\
+				vec2 nearFar_adjacent = getNearFar_byFrustumIdx(adjacentFrustumIdx);\n\
+				float currNear_adjacent = nearFar_adjacent.x;\n\
+				float currFar_adjacent = nearFar_adjacent.y;\n\
+\n\
 				float depthBufferValue = getDepth(screenPosAdjacent);\n\
-				float zDist = depthBufferValue * currFar;\n\
+				float zDist = currNear_adjacent + depthBufferValue * currFar_adjacent;\n\
 				float zDistDiff = abs(myZDist - zDist);\n\
 \n\
-				/*\n\
-				if(myZDist < zDist)\n\
-				{\n\
-					// My pixel is in front\n\
-					if(zDistDiff > 0.0001)\n\
-					occlusion +=  1.0;\n\
-				}\n\
-				else\n\
+				\n\
+				\n\
+				if(myZDist > zDist)\n\
 				{\n\
 					// My pixel is rear\n\
-					if(zDistDiff > 0.0001)\n\
+					if(zDistDiff > farFactor  &&  zDistDiff < 100.0)\n\
 					occlusion +=  1.0;\n\
+				}\n\
+				/*\n\
+				// Find lightingFog.***  	 \n\
+				if(i == 0)\n\
+					screenPosAdjacent = vec2((gl_FragCoord.x - radiusFog)/ screenWidth, (gl_FragCoord.y - radiusFog) / screenHeight);\n\
+				else if(i == 1)\n\
+					screenPosAdjacent = vec2((gl_FragCoord.x)/ screenWidth, (gl_FragCoord.y - radiusFog) / screenHeight);\n\
+				else if(i == 2)\n\
+					screenPosAdjacent = vec2((gl_FragCoord.x + radiusFog)/ screenWidth, (gl_FragCoord.y - radiusFog) / screenHeight);\n\
+				else if(i == 3)\n\
+					screenPosAdjacent = vec2((gl_FragCoord.x + radiusFog)/ screenWidth, (gl_FragCoord.y) / screenHeight);\n\
+				else if(i == 4)\n\
+					screenPosAdjacent = vec2((gl_FragCoord.x + radiusFog)/ screenWidth, (gl_FragCoord.y + radiusFog) / screenHeight);\n\
+				else if(i == 5)\n\
+					screenPosAdjacent = vec2((gl_FragCoord.x)/ screenWidth, (gl_FragCoord.y + radiusFog) / screenHeight);\n\
+				else if(i == 6)\n\
+					screenPosAdjacent = vec2((gl_FragCoord.x - radiusFog)/ screenWidth, (gl_FragCoord.y + radiusFog) / screenHeight);\n\
+				else if(i == 7)\n\
+					screenPosAdjacent = vec2((gl_FragCoord.x - radiusFog)/ screenWidth, (gl_FragCoord.y) / screenHeight);\n\
+\n\
+				normalRGBA_adjacent = getNormal(screenPosAdjacent);\n\
+				adjacentFrustumIdx = int(floor(100.0*normalRGBA_adjacent.w));\n\
+\n\
+				if(adjacentFrustumIdx >= 10)\n\
+				adjacentFrustumIdx -= 10;\n\
+\n\
+				nearFar_adjacent = getNearFar_byFrustumIdx(adjacentFrustumIdx);\n\
+				currNear_adjacent = nearFar_adjacent.x;\n\
+				currFar_adjacent = nearFar_adjacent.y;\n\
+\n\
+				depthBufferValue = getDepth(screenPosAdjacent);\n\
+				zDist = currNear_adjacent + depthBufferValue * currFar_adjacent;\n\
+				zDistDiff = abs(myZDist - zDist);\n\
+				\n\
+				if(myZDist > zDist + 0.2)\n\
+				{\n\
+					// My pixel is rear\n\
+					if(zDistDiff < 1.0)// &&  zDistDiff < 50.0)\n\
+					lighting +=  1.0;\n\
 				}\n\
 				*/\n\
 \n\
-				\n\
-				//float range_check = abs(linearDepth - depthBufferValue)*far;\n\
-				float range_check = abs(linearDepth - depthBufferValue)*currFar;\n\
-				////if (range_check > 1.5 && depthBufferValue > linearDepth) // original\n\
-				if (depthBufferValue > linearDepth)\n\
-				{\n\
-					// My pixel is in front\n\
-					if (range_check > radiusAux)\n\
-					{\n\
-						//if (range_check < 20.0)\n\
-						if (range_check < 30.0)\n\
-							occlusion +=  1.0;\n\
-					}\n\
-				}\n\
-				else\n\
-				{\n\
-					// My pixel is rear\n\
-					// lighting\n\
 \n\
-				}\n\
-				\n\
 			}   \n\
 		}   \n\
 			\n\
-		if(occlusion > 6.0)\n\
-			occlusion = 8.0;\n\
-		//else occlusion = 0.0;\n\
+		//if(occlusion > 6.0)\n\
+		//	occlusion = 8.0;\n\
 		occlusion = 1.0 - occlusion / 8.0;\n\
-	}\n\
-	else{\n\
-		occlusion = 1.0;\n\
+\n\
+		if(occlusion < 0.0)\n\
+		occlusion = 0.0;\n\
+\n\
+		if(lighting > 6.0)\n\
+			lighting = 8.0;\n\
+		lighting = lighting / 8.0;\n\
 	}\n\
 \n\
-	//if(occlusion < 0.9)\n\
+	//if(occlusion < 0.95)\n\
 	//occlusion = 0.0;\n\
 \n\
+	if(occlusion > 0.6)\n\
+	occlusion = 1.0;\n\
+	else{\n\
+		occlusion = 0.0;\n\
+	}\n\
+\n\
+	if(lighting < 0.5)\n\
+	lighting = 0.0;\n\
+\n\
+	//vec3 fogColor = vec3(1.0, 1.0, 1.0);\n\
+	vec3 fogColor = vec3(0.0, 0.0, 0.0);\n\
+	vec3 finalFogColor = mix(vColor.xyz, fogColor, 0.0);\n\
 \n\
     vec4 finalColor;\n\
-	finalColor = vec4((vColor.xyz) * occlusion, externalAlpha);\n\
-	//finalColor = vec4(vec3(0.8, 0.8, 0.8) * occlusion, externalAlpha);\n\
-    gl_FragData[0] = finalColor; \n\
+	//finalColor = vec4((vColor.xyz) * occlusion, externalAlpha); // original.***\n\
+	finalColor = vec4(finalFogColor * occlusion, externalAlpha);\n\
+\n\
+    gl_FragData[0] = finalColor; // original.***\n\
+	//gl_FragData[0] = colorAux;\n\
+	//gl_FragData[0] = vec4(occlusion, occlusion, occlusion, 1.0);\n\
 \n\
 	//if(testBool)\n\
 	//{\n\

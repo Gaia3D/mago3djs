@@ -142,11 +142,11 @@
 			}
 		});
 	}
-	// 3ds, pointsCloud, sihung_campus
+	// 3ds, pointsCloud, sihung_campus, sihung_las
 	function doTest(){
 		var f4dController = managerFactory.getF4dController();
 		$.ajax({
-			url: dataInformationUrl + "sihung_campus.json",
+			url: dataInformationUrl + "sihung_las.json",
 			type: "GET",
 			dataType: "json",
 			success: function(f4dObject){

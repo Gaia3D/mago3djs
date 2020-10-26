@@ -5708,6 +5708,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 		this.postFxShadersManager.bUseLogarithmicDepth = true;
 	}
 
+	this.postFxShadersManager.bUseMultiRenderTarget = false;
 	var supportEXT = gl.getSupportedExtensions().indexOf("WEBGL_draw_buffers");
 	if (supportEXT)
 	{
