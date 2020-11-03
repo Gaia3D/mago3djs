@@ -235,6 +235,63 @@ float getFactorByDist(in float radius, in float realDist)
     return factorByDist;
 }
 
+int getRealFrustumIdx(in int estimatedFrustumIdx, inout int dataType)
+{
+    // Check the type of the data.******************
+    // frustumIdx 0 .. 3 -> general geometry data.
+    // frustumIdx 10 .. 13 -> tinTerrain data.
+    // frustumIdx 20 .. 23 -> points cloud data.
+    //----------------------------------------------
+    int realFrustumIdx = -1;
+    
+     if(estimatedFrustumIdx >= 10)
+    {
+        estimatedFrustumIdx -= 10;
+        if(estimatedFrustumIdx >= 10)
+        {
+            // points cloud data.
+            estimatedFrustumIdx -= 10;
+            dataType = 2;
+        }
+        else
+        {
+            // tinTerrain data.
+            dataType = 1;
+        }
+    }
+    else
+    {
+        // general geomtry.
+        dataType = 0;
+    }
+
+    realFrustumIdx = estimatedFrustumIdx;
+    return realFrustumIdx;
+}
+
+float getOcclusion_pointsCloud(vec2 screenPosAdjacent)
+{
+    float result_occlusion = 0.0;
+
+    vec4 normalRGBA_adjacent = getNormal(screenPosAdjacent);
+    int estimatedFrustumIdx = int(floor(100.0*normalRGBA_adjacent.w));
+
+    // check the data type of the pixel.
+    int dataType = -1;
+    int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);
+
+    vec2 nearFar_adjacent = getNearFar_byFrustumIdx(currFrustumIdx);
+    float currNear_adjacent = nearFar_adjacent.x;
+    float currFar_adjacent = nearFar_adjacent.y;
+
+    float depthBufferValue = getDepth(screenPosAdjacent);
+    //float zDist = currNear_adjacent + depthBufferValue * currFar_adjacent; // correct.
+    float zDist = depthBufferValue * currFar_adjacent;
+
+
+
+    return result_occlusion;
+}
 
 
 void main()
@@ -248,10 +305,22 @@ void main()
     vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
     vec4 normalRGBA = getNormal(screenPos);
     vec3 normal2 = normalRGBA.xyz; // original.***
-    int currFrustumIdx = int(floor(100.0*normalRGBA.w));
+    int estimatedFrustumIdx = int(floor(100.0*normalRGBA.w));
+    int dataType = 0; // 0= general geomtry. 1= tinTerrain. 2= PointsCloud.
 
-    if(currFrustumIdx > 3)
+    // Check the type of the data.******************
+    // dataType = 0 -> general geometry data.
+    // dataType = 1 -> tinTerrain data.
+    // dataType = 2 -> points cloud data.
+    //----------------------------------------------
+    int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);
+
+    // If the data is no generalGeomtry or pointsCloud, then discard.
+    if(dataType != 0 && dataType != 2)
     discard;
+
+    //if(currFrustumIdx > 3)
+    //discard;
 
     vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);
     float currNear = nearFar.x;
@@ -283,15 +352,12 @@ void main()
         factorByDist = smoothstep(0.0, 1.0, realDist/(aux));
     }
 
-    //if(factorByDist < 0.05)
-    //    discard;
-
-    if(bApplySsao)// && !isAlmostOutOfFrustum)
+    // General data type.*************************************************************************************
+    if(dataType == 0 && bApplySsao)
 	{        
 		vec3 origin = ray * linearDepth;// + rayNear; 
-        //vec3 origin = reconstructPosition(screenPos, linearDepth);
+        //vec3 origin = reconstructPosition(screenPos, linearDepth); // used when there are no normal-texture.
         bool isValid = true;
-        //vec3 normal2 = normal_from_depth(linearDepth, screenPos, isValid); // normal from depthTex.***
         
         if(length(normal2) < 0.1)
         isValid = false;
@@ -351,12 +417,125 @@ void main()
         else if(occlusion_D > 1.0)
         occlusion_D = 1.0;
 	}
-    else
-    {
-        // Apply edges from depth.***
 
-    }
+    // Points cloud data type.**************************************************************************************
+    /*
+    if(dataType == 2 && bApplySsao)
+	{        
+		float linearDepth = getDepth(screenPos);
+		//vec3 origin = getViewRay(screenPos) * linearDepth;
 
+
+		vec4 normalRGBA = getNormal(screenPos);
+		int currFrustumIdx = int(floor(100.0*normalRGBA.w));
+
+		if(currFrustumIdx >= 10)
+		currFrustumIdx -= 20;
+
+		vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);
+		float currNear = nearFar.x;
+		float currFar = nearFar.y;
+
+
+		float myZDist = currNear + linearDepth * currFar;
+
+		float radiusAux = glPointSize/1.9; // radius in pixels.
+		float radiusFog = glPointSize*3.0; // radius in pixels.
+		vec2 screenPosAdjacent;
+
+
+
+		// calculate the pixelSize in the screenPos.***
+		float h = 2.0 * tangentOfHalfFovy * currFar * linearDepth; // height in meters of the screen in the current pixelDepth
+    	float w = h * aspectRatio;     							   // width in meters of the screen in the current pixelDepth
+		// vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -relFar);   
+
+		float pixelSize_x = w/screenWidth; // the pixelSize in meters in the x axis.
+		float pixelSize_y = h/screenHeight;  // the pixelSize in meters in the y axis.
+		
+		float radiusInMeters = 0.20;
+		radiusAux = radiusInMeters / pixelSize_x;
+		float radiusFogInMeters = 1.0;
+		radiusFog = radiusFogInMeters / pixelSize_x;
+
+		//radiusAux = 6.0;
+		float farFactor = 0.1*sqrt(myZDist);
+		
+
+        //radiusAux = 1.5 *(float(j)+1.0);
+        for(int i = 0; i < 8; ++i)
+        {  
+            // Find occlussion.***  	 
+            if(i == 0)
+                screenPosAdjacent = vec2((gl_FragCoord.x - radiusAux)/ screenWidth, (gl_FragCoord.y - radiusAux) / screenHeight);
+            else if(i == 1)
+                screenPosAdjacent = vec2((gl_FragCoord.x)/ screenWidth, (gl_FragCoord.y - radiusAux) / screenHeight);
+            else if(i == 2)
+                screenPosAdjacent = vec2((gl_FragCoord.x + radiusAux)/ screenWidth, (gl_FragCoord.y - radiusAux) / screenHeight);
+            else if(i == 3)
+                screenPosAdjacent = vec2((gl_FragCoord.x + radiusAux)/ screenWidth, (gl_FragCoord.y) / screenHeight);
+            else if(i == 4)
+                screenPosAdjacent = vec2((gl_FragCoord.x + radiusAux)/ screenWidth, (gl_FragCoord.y + radiusAux) / screenHeight);
+            else if(i == 5)
+                screenPosAdjacent = vec2((gl_FragCoord.x)/ screenWidth, (gl_FragCoord.y + radiusAux) / screenHeight);
+            else if(i == 6)
+                screenPosAdjacent = vec2((gl_FragCoord.x - radiusAux)/ screenWidth, (gl_FragCoord.y + radiusAux) / screenHeight);
+            else if(i == 7)
+                screenPosAdjacent = vec2((gl_FragCoord.x - radiusAux)/ screenWidth, (gl_FragCoord.y) / screenHeight);
+
+            vec4 normalRGBA_adjacent = getNormal(screenPosAdjacent);
+            int adjacentFrustumIdx = int(floor(100.0*normalRGBA_adjacent.w));
+
+            if(adjacentFrustumIdx >= 10)
+            adjacentFrustumIdx -= 20;
+
+            vec2 nearFar_adjacent = getNearFar_byFrustumIdx(adjacentFrustumIdx);
+            float currNear_adjacent = nearFar_adjacent.x;
+            float currFar_adjacent = nearFar_adjacent.y;
+
+            float depthBufferValue = getDepth(screenPosAdjacent);
+            float zDist = currNear_adjacent + depthBufferValue * currFar_adjacent;
+            float zDistDiff = abs(myZDist - zDist);
+
+            
+            
+            if(myZDist > zDist)
+            {
+                // My pixel is rear
+                if(zDistDiff > farFactor  &&  zDistDiff < 100.0)
+                occlusion +=  1.0;
+            }
+        }
+
+        float fKernelSize = float(kernelSize);
+
+		occlusion_C = occlusion_C / fKernelSize;	
+        if(occlusion_C < 0.0)
+        occlusion_C = 0.0;
+        else if(occlusion_C > 1.0)
+        occlusion_C = 1.0;
+
+        occlusion_B = occlusion_B / fKernelSize;	
+        if(occlusion_B < 0.0)
+        occlusion_B = 0.0;
+        else if(occlusion_B > 1.0)
+        occlusion_B = 1.0;
+
+        occlusion_A = occlusion_A / fKernelSize;	
+        if(occlusion_A < 0.0)
+        occlusion_A = 0.0;
+        else if(occlusion_A > 1.0)
+        occlusion_A = 1.0;
+
+        occlusion_D = occlusion_D / fKernelSize;	
+        if(occlusion_D < 0.0)
+        occlusion_D = 0.0;
+        else if(occlusion_D > 1.0)
+        occlusion_D = 1.0;
+	}
+    */
+
+    
     // Do lighting.***
     //float scalarProd = max(0.01, dot(normal, normalize(-ray)));
    // scalarProd /= 3.0;

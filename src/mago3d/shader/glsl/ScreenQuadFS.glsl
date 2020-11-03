@@ -2,6 +2,8 @@
     precision highp float;
 #endif
 
+#define M_PI 3.1415926535897932384626433832795
+
 uniform sampler2D depthTex;
 uniform sampler2D shadowMapTex;
 uniform sampler2D shadowMapTex2;
@@ -28,6 +30,7 @@ uniform vec3 sunPosLOW[2];
 uniform int sunIdx;
 uniform float screenWidth;    
 uniform float screenHeight;  
+uniform vec2 uNearFarArray[4];
   
 
 
@@ -144,6 +147,63 @@ void make_kernel(inout vec4 n[9], vec2 coord)
 	n[8] = texture2D(depthTex, coord + vec2(  w, h));
 }
 
+int getRealFrustumIdx(in int estimatedFrustumIdx, inout int dataType)
+{
+    // Check the type of the data.******************
+    // frustumIdx 0 .. 3 -> general geometry data.
+    // frustumIdx 10 .. 13 -> tinTerrain data.
+    // frustumIdx 20 .. 23 -> points cloud data.
+    //----------------------------------------------
+    int realFrustumIdx = -1;
+    
+     if(estimatedFrustumIdx >= 10)
+    {
+        estimatedFrustumIdx -= 10;
+        if(estimatedFrustumIdx >= 10)
+        {
+            // points cloud data.
+            estimatedFrustumIdx -= 10;
+            dataType = 2;
+        }
+        else
+        {
+            // tinTerrain data.
+            dataType = 1;
+        }
+    }
+    else
+    {
+        // general geomtry.
+        dataType = 0;
+    }
+
+    realFrustumIdx = estimatedFrustumIdx;
+    return realFrustumIdx;
+}
+
+vec2 getNearFar_byFrustumIdx(in int frustumIdx)
+{
+    vec2 nearFar;
+    if(frustumIdx == 0)
+    {
+        nearFar = uNearFarArray[0];
+    }
+    else if(frustumIdx == 1)
+    {
+        nearFar = uNearFarArray[1];
+    }
+    else if(frustumIdx == 2)
+    {
+        nearFar = uNearFarArray[2];
+    }
+    else if(frustumIdx == 3)
+    {
+        nearFar = uNearFarArray[3];
+    }
+
+    return nearFar;
+}
+
 void main()
 {
 	vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
@@ -238,48 +298,54 @@ void main()
 	{
 		vec4 normal4 = getNormal(screenPos);
 
-		// check frustumIdx. There are 2 type of frustumsIdx :  0, 1, 2, 3 or 10, 11, 12, 13.***
-		if(int(floor(normal4.w * 100.0)) >= 10)
+		vec3 normal = normal4.xyz;
+		if(length(normal) < 0.1)
 		discard;
 
-		vec3 normal = normal4.xyz;
-		if(length(normal) > 0.1)
+		// check frustumIdx. There are 3 type of frustumsIdx :  0, 1, 2, 3 or 10, 11, 12, 13 or 20, 21, 22, 23.***
+		//if(int(floor(normal4.w * 100.0)) >= 10)
+		//discard;
+		int estimatedFrustumIdx = int(floor(normal4.w * 100.0));
+		int dataType = -1;
+		int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);
+		vec2 nearFar_origin = getNearFar_byFrustumIdx(currFrustumIdx);
+		float currNear_origin = nearFar_origin.x;
+		float currFar_origin = nearFar_origin.y;
+
+		if(dataType != 0 && dataType != 2)
+		discard;
+
+		//ssaoFromDepthTex
+		float pixelSize_x = 1.0/screenWidth;
+		float pixelSize_y = 1.0/screenHeight;
+		vec4 occlFromDepth = vec4(0.0);
+		for(int i=0; i<4; i++)
 		{
-			//ssaoFromDepthTex
-			float pixelSize_x = 1.0/screenWidth;
-			float pixelSize_y = 1.0/screenHeight;
-			vec4 occlFromDepth = vec4(0.0);
-			for(int i=0; i<4; i++)
+			for(int j=0; j<4; j++)
 			{
-				for(int j=0; j<4; j++)
-				{
-					vec2 texCoord = vec2(screenPos.x + pixelSize_x*float(i-2), screenPos.y + pixelSize_y*float(j-2));
-					vec4 color = texture2D(ssaoTex, texCoord);
-					occlFromDepth += color;
-				}
+				vec2 texCoord = vec2(screenPos.x + pixelSize_x*float(i-2), screenPos.y + pixelSize_y*float(j-2));
+				vec4 color = texture2D(ssaoTex, texCoord);
+				occlFromDepth += color;
 			}
+		}
 
-			occlFromDepth /= 16.0;
-			occlFromDepth *= 0.45;
+		occlFromDepth /= 16.0;
+		occlFromDepth *= 0.45;
 
-			float occlusion = occlFromDepth.r + occlFromDepth.g + occlFromDepth.b + occlFromDepth.a; // original.***
+		float occlusion = occlFromDepth.r + occlFromDepth.g + occlFromDepth.b + occlFromDepth.a; // original.***
 
-			if(occlusion < 0.0)
-			occlusion = 0.0;
+		if(occlusion < 0.0)
+		occlusion = 0.0;
 
-			gl_FragColor = vec4(0.0, 0.0, 0.0, occlusion);
-			//gl_FragColor = vec4(1.0, 0.0, 0.0, 0.2);
+		gl_FragColor = vec4(0.0, 0.0, 0.0, occlusion);
 
-			// Provisionally render edges here.****************************************************************
+		// Provisionally render edges here.****************************************************************
+		if(dataType == 0)
+		{
 			vec3 normal_up = getNormal(vec2(screenPos.x, screenPos.y + pixelSize_y)).xyz;
 			vec3 normal_right = getNormal(vec2(screenPos.x + pixelSize_x, screenPos.y)).xyz;
 			vec3 normal_down = getNormal(vec2(screenPos.x, screenPos.y - pixelSize_y)).xyz;
 			vec3 normal_left = getNormal(vec2(screenPos.x - pixelSize_x, screenPos.y)).xyz;
-
-			//vec3 normal_ur = getNormal(vec2(screenPos.x + pixelSize_x, screenPos.y + pixelSize_y)).xyz;
-			//vec3 normal_rd = getNormal(vec2(screenPos.x + pixelSize_x, screenPos.y - pixelSize_y)).xyz;
-			//vec3 normal_ld = getNormal(vec2(screenPos.x - pixelSize_x, screenPos.y - pixelSize_y)).xyz;
-			//vec3 normal_lu = getNormal(vec2(screenPos.x - pixelSize_x, screenPos.y + pixelSize_y)).xyz;
 
 			float factor = 0.0;
 			float increF = 0.07 * 2.0;
@@ -296,31 +362,67 @@ void main()
 			if(dot(normal, normal_left) < 0.3)
 			{ factor += increF; }
 
-			
-			////if(dot(normal, normal_ur) < 0.3)
-			////{ factor += increF; }
-
-			////if(dot(normal, normal_rd) < 0.3)
-			////{ factor += increF; }
-
-			////if(dot(normal, normal_ld) < 0.3)
-			////{ factor += increF; }
-
-			////if(dot(normal, normal_lu) < 0.3)
-			////{ factor += increF; }
-			
-
 			if(factor > increF*0.9)
 			{
 				gl_FragColor = vec4(0.0, 0.0, 0.0, factor+occlusion);
 				return;
 			}
-
 		}
+		// render edges for points cloud.
+		/*
+		if(dataType == 2)
+		{
+			// this is point cloud.
+			float linearDepth_origin  = unpackDepth(texture2D(depthTex, screenPos)); // z_window  is [0.0, 1.0] range depth.
+			float myZDist = linearDepth_origin * currFar_origin;
+			float increAngRad = (2.0*M_PI)/16.0;
+			float edgeColor = 0.0;
+			for(int i=0; i<16; i++)
+			{
+				float s = cos(float(i)*increAngRad) * pixelSize_x * 4.0;
+				float t = sin(float(i)*increAngRad) * pixelSize_y * 4.0;
+				vec2 screenPosAdjacent = vec2(screenPos.x+s, screenPos.y+t);
+				vec4 normal4_adjacent = getNormal(screenPosAdjacent);
+				int estimatedFrustumIdx_adjacent = int(floor(normal4_adjacent.w * 100.0));
+				int dataType_adjacent = -1;
+				int currFrustumIdx_adjacent = getRealFrustumIdx(estimatedFrustumIdx_adjacent, dataType_adjacent);
+				vec2 nearFar_adjacent = getNearFar_byFrustumIdx(currFrustumIdx_adjacent);
+				float currNear_adjacent = nearFar_adjacent.x;
+				float currFar_adjacent = nearFar_adjacent.y;
+				float linearDepth_adjacent  = unpackDepth(texture2D(depthTex, screenPosAdjacent)); // z_window  is [0.0, 1.0] range depth.
+				float zDistAdjacent = linearDepth_adjacent * currFar_adjacent;
+
+				float zDepthDiff = abs(myZDist - zDistAdjacent);
+				if(linearDepth_origin < linearDepth_adjacent)
+				{
+					if(zDepthDiff > 2.0)
+					{
+						edgeColor += 1.0;
+					}
+				}
+			}
+			if(edgeColor > 4.0)
+			{
+				edgeColor -= 4.0;
+				edgeColor /= 12.0;
+
+				if(edgeColor > 0.01)
+				edgeColor = 1.0;
+
+				//gl_FragColor = vec4(0.0, 0.0, 0.0, edgeColor);//+occlusion);
+				gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);//+occlusion);
+				return;
+				// Test.***
+				
+			}
+			
+		}
+		*/
 	}
 	
 
 	// check if is fastAntiAlias.***
+	/*
 	if(bFxaa)
 	{
 		vec4 color = texture2D(depthTex, screenPos);
@@ -338,18 +440,16 @@ void main()
 		}
 		//if(color.r < 0.0001 && color.g < 0.0001 && color.b < 0.0001)
 		//discard;
-		/*/
-		vec4 n[9];
-		make_kernel( n, vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight) );
 
-		vec4 sobel_edge_h = n[2] + (2.0*n[5]) + n[8] - (n[0] + (2.0*n[3]) + n[6]);
-		vec4 sobel_edge_v = n[0] + (2.0*n[1]) + n[2] - (n[6] + (2.0*n[7]) + n[8]);
-		vec4 sobel = sqrt((sobel_edge_h * sobel_edge_h) + (sobel_edge_v * sobel_edge_v));
+		////vec4 n[9];
+		////make_kernel( n, vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight) );
 
-		gl_FragColor = vec4( 1.0 - sobel.rgb, 1.0 );
-		//gl_FragColor = vec4(sobel.rgb, 1.0 );
-		*/
-		//gl_FragColor = color;
+		////vec4 sobel_edge_h = n[2] + (2.0*n[5]) + n[8] - (n[0] + (2.0*n[3]) + n[6]);
+		////vec4 sobel_edge_v = n[0] + (2.0*n[1]) + n[2] - (n[6] + (2.0*n[7]) + n[8]);
+		////vec4 sobel = sqrt((sobel_edge_h * sobel_edge_h) + (sobel_edge_v * sobel_edge_v));
+
+		////gl_FragColor = vec4( 1.0 - sobel.rgb, 1.0 );
+
 	}
-    
+    */
 }

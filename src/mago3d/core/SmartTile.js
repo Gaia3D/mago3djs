@@ -1338,6 +1338,9 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 	// parse smartTileF4d.***
 	var bytesReaded = 0;
 	var smartTileType = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+
+	// smartTileType = 2 -> smartTile with "lod" included. Load "smartTiles_lod5", "smartTiles_lod4" or "smartTiles_lod3".
+
 	var buildingsCount = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 	magoManager.emit(MagoManager.EVENT_TYPE.SMARTTILELOADSTART, {tile: this, timestamp: new Date()});
 
@@ -1360,10 +1363,14 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		var savedProjectId = smartTilePathInfo[projectId].projectId;
 		
 		// Create a node for each building.
+		//var attributes = {
+		//	"isPhysical"      : true,
+		//	"objectType"      : "basicF4d",
+		//	"heightReference" : HeightReference.CLAMP_TO_GROUND
+		//};
 		var attributes = {
 			"isPhysical"      : true,
-			"objectType"      : "basicF4d",
-			"heightReference" : HeightReference.NONE
+			"objectType"      : "basicF4d"
 		};
 		if (projectFolderName.indexOf('-tree') > 0) 
 		{
@@ -1460,14 +1467,14 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		var lodNameLength = (new Uint16Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+2)))[0]; bytesReaded += 2;
 		var lodName = enc.decode(new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+ lodNameLength))) ;bytesReaded += lodNameLength;
 		
-		// read lod5 mesh data.
+		// read lod5/4/3 mesh data.
 		var lod5meshSize = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 		var startBuff = bytesReaded;
 		var endBuff = bytesReaded + lod5meshSize;
 		var lowLodMeshDataArray = dataArrayBuffer.slice(startBuff, endBuff);
 		bytesReaded = bytesReaded + lod5meshSize; // updating data.
 
-		// read lod5 image.
+		// read lod5/4/3 image.
 		var lod5ImageSize = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 		var byteSize = 1;
 		var startBuff = bytesReaded;
@@ -1481,20 +1488,73 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		// read euler angles degree.
 		var eulerAngDeg = new Point3D();
 		bytesReaded = eulerAngDeg.readDataFromBuffer(dataArrayBuffer, bytesReaded);
+
+		// Read dataId & dataGroup.
 		var dataId = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 		var dataGroupId = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
-		var endMark = (new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
 
+		// read data_name.
+		var dataName;
+		var endMark = (new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
+		if(endMark > 0)
+		{
+			var dataKeyLength = (new Uint16Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+2)))[0]; bytesReaded += 2;
+			var dataKey = enc.decode(new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+ dataKeyLength))) ;bytesReaded += dataKeyLength;
+			var dataNameLength = (new Uint16Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+2)))[0]; bytesReaded += 2;
+			var dataName = enc.decode(new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+ dataNameLength))) ;bytesReaded += dataNameLength;
+			endMark = (new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
+		}
+
+		// Now, read attributtes.
+		
+		
 		var externInfo = {};
 		while (endMark > 0)
 		{
 			// There are more data.
-			if (endMark === 5) // the next data is string type data.***
+			// 0 = there are not next data.***
+			// 1 = bool
+			// 2 = char
+			// 3 = short
+			// 4 = int
+			// 5 = string
+			// 6 = float
+			// 50 = keyValueDatasList.
+
+			// 1rst, read the stringKey.
+			var dataKeyLength = (new Uint16Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+2)))[0]; bytesReaded += 2;
+			var dataKey = enc.decode(new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+ dataKeyLength))) ;bytesReaded += dataKeyLength;
+
+			if (endMark === 1) // the next data is bool type data.***
 			{
-				// read the stringKey.
-				var dataKeyLength = (new Uint16Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+2)))[0]; bytesReaded += 2;
-				var dataKey = enc.decode(new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+ dataKeyLength))) ;bytesReaded += dataKeyLength;
-				
+				// read the bool value.
+				var boolValue = (new Uint8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
+				// Put the readed data into externInfo.***
+				externInfo[dataKey] = boolValue;
+			}
+			else if (endMark === 2) // the next data is char type data.***
+			{
+				// read the char value.
+				var charValue = (new Uint8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
+				// Put the readed data into externInfo.***
+				externInfo[dataKey] = charValue;
+			}
+			else if (endMark === 3) // the next data is short type data.***
+			{
+				// read the short value.
+				var shortValue = (new Uint16Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+2)))[0]; bytesReaded += 2;
+				// Put the readed data into externInfo.***
+				externInfo[dataKey] = shortValue;
+			}
+			else if (endMark === 4) // the next data is int type data.***
+			{
+				// read the int value.
+				var intValue = (new Uint32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+				// Put the readed data into externInfo.***
+				externInfo[dataKey] = intValue;
+			}
+			else if (endMark === 5) // the next data is string type data.***
+			{
 				// read the string value.
 				var dataValueLength = (new Uint16Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+2)))[0]; bytesReaded += 2;
 				var charArray = new Uint8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+ dataValueLength)); bytesReaded += dataValueLength;
@@ -1504,6 +1564,13 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 				
 				// Put the readed data into externInfo.***
 				externInfo[dataKey] = dataValueUtf8;
+			}
+			else if (endMark === 6) // the next data is float type data.***
+			{
+				// read the float value.
+				var floatValue = (new Float32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+				// Put the readed data into externInfo.***
+				externInfo[dataKey] = floatValue;
 			}
 			
 			endMark = (new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
@@ -1528,13 +1595,14 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 			node.data.dataId = dataId;
 			node.data.dataGroupId = savedProjectId;
 			node.data.originalHeight = geoCoord.altitude;
+			node.data.data_name = dataName;
 
 			node.data.smartTileOwner = this;
 			for (var j in externInfo) 
 			{
 				if (externInfo.hasOwnProperty(j)) 
 				{
-					node.data[j] = externInfo[j];
+					node.data.attributes[j] = externInfo[j];
 				}
 			}
 
@@ -1553,7 +1621,8 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 				height     : alt,
 				heading    : eulerAngDeg.z,
 				pitch      : eulerAngDeg.x,
-				roll       : eulerAngDeg.y
+				roll       : eulerAngDeg.y,
+				heightReference : HeightReference.CLAMP_TO_GROUND
 			});
 
 			var intantiatedNode = hierarchyManager.getNodeByDataKey(savedProjectId, buildingId);
@@ -1566,7 +1635,7 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 			{
 				if (externInfo.hasOwnProperty(j)) 
 				{
-					intantiatedNode.data[j] = externInfo[j];
+					intantiatedNode.attributes.data[j] = externInfo[j];
 				}
 			}
 			this.nodesArray.push(intantiatedNode);

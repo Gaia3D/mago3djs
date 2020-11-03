@@ -67,7 +67,9 @@ void main()
 	if(gl_PointSize < 2.0)
 		gl_PointSize = 2.0;
 		
-	depth = (modelViewMatrixRelToEye * pos).z/far; // original.***
+	vec4 orthoPos = modelViewMatrixRelToEye * pos;
+	depth = orthoPos.z/far; // original.***
+	//depth = (orthoPos.z-near)/(far-near); // correct.***
 
 	if(bUseLogarithmicDepth)
 	{

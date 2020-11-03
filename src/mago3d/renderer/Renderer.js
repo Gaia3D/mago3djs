@@ -1255,6 +1255,7 @@ Renderer.prototype.renderScreenQuadSsao = function(gl)
 	gl.uniform1i(currentShader.bSilhouette_loc, bSilhouette);
 	gl.uniform1i(currentShader.bFxaa_loc, bFxaa);
 	gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao);
+	gl.uniform2fv(currentShader.uNearFarArray_loc, magoManager.frustumVolumeControl.nearFarArray);
 
 	var sunSystem = sceneState.sunSystem;
 	var sunLight = sunSystem.getLight(0);
@@ -1298,9 +1299,13 @@ Renderer.prototype.renderScreenQuadSsao = function(gl)
 
 	var texManager = magoManager.texturesManager;
 	var texturesMergerFbo = texManager.texturesMergerFbo;
+	var depthTex = texturesMergerFbo.colorBuffer;
 	var normalTex = texturesMergerFbo.colorBuffer1;
 	if(bApplySsao)
 	{
+		gl.activeTexture(gl.TEXTURE0);
+		gl.bindTexture(gl.TEXTURE_2D, depthTex);  // original.***
+
 		var ssaoFromDepthFbo = magoManager.ssaoFromDepthFbo;
 		gl.activeTexture(gl.TEXTURE5); // ssaoTex.***
 		gl.bindTexture(gl.TEXTURE_2D, ssaoFromDepthFbo.colorBuffer);
@@ -2438,8 +2443,8 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 			var normalTex = texturesMergerFbo.colorBuffer1;
 
 			gl.activeTexture(gl.TEXTURE0);
-			//gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);
-			gl.bindTexture(gl.TEXTURE_2D, depthTex);
+			gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);
+			//gl.bindTexture(gl.TEXTURE_2D, depthTex);
 			gl.activeTexture(gl.TEXTURE6);
 			//gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);
 			gl.bindTexture(gl.TEXTURE_2D, normalTex);

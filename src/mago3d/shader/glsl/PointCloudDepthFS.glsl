@@ -78,15 +78,16 @@ void main()
     	gl_FragData[0] = packDepth(-depth);
 	}
 
+	// Note: points cloud data has frustumIdx 20 .. 23.********
     float frustumIdx = 0.1; // realFrustumIdx = 0.1 * 100 = 10. 
 	if(uFrustumIdx == 0)
-	frustumIdx = 0.105; // frustumIdx = 10.***
+	frustumIdx = 0.205; // frustumIdx = 20.***
 	else if(uFrustumIdx == 1)
-	frustumIdx = 0.115; // frustumIdx = 11.***
+	frustumIdx = 0.215; // frustumIdx = 21.***
 	else if(uFrustumIdx == 2)
-	frustumIdx = 0.125; // frustumIdx = 12.***
+	frustumIdx = 0.225; // frustumIdx = 22.***
 	else if(uFrustumIdx == 3)
-	frustumIdx = 0.135; // frustumIdx = 13.***
+	frustumIdx = 0.235; // frustumIdx = 23.***
 
     // use frustumIdx from 10 to 13, instead from 0 to 3.***
 

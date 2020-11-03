@@ -3016,15 +3016,16 @@ void main()\n\
     	gl_FragData[0] = packDepth(-depth);\n\
 	}\n\
 \n\
+	// Note: points cloud data has frustumIdx 20 .. 23.********\n\
     float frustumIdx = 0.1; // realFrustumIdx = 0.1 * 100 = 10. \n\
 	if(uFrustumIdx == 0)\n\
-	frustumIdx = 0.105; // frustumIdx = 10.***\n\
+	frustumIdx = 0.205; // frustumIdx = 20.***\n\
 	else if(uFrustumIdx == 1)\n\
-	frustumIdx = 0.115; // frustumIdx = 11.***\n\
+	frustumIdx = 0.215; // frustumIdx = 21.***\n\
 	else if(uFrustumIdx == 2)\n\
-	frustumIdx = 0.125; // frustumIdx = 12.***\n\
+	frustumIdx = 0.225; // frustumIdx = 22.***\n\
 	else if(uFrustumIdx == 3)\n\
-	frustumIdx = 0.135; // frustumIdx = 13.***\n\
+	frustumIdx = 0.235; // frustumIdx = 23.***\n\
 \n\
     // use frustumIdx from 10 to 13, instead from 0 to 3.***\n\
 \n\
@@ -3111,7 +3112,9 @@ void main()\n\
 	if(gl_PointSize < 2.0)\n\
 		gl_PointSize = 2.0;\n\
 		\n\
-	depth = (modelViewMatrixRelToEye * pos).z/far; // original.***\n\
+	vec4 orthoPos = modelViewMatrixRelToEye * pos;\n\
+	depth = orthoPos.z/far; // original.***\n\
+	//depth = (orthoPos.z-near)/(far-near); // correct.***\n\
 \n\
 	if(bUseLogarithmicDepth)\n\
 	{\n\
@@ -3213,6 +3216,7 @@ uniform vec2 uNearFarArray[4];\n\
 \n\
 varying float flogz;\n\
 varying float Fcoef_half;\n\
+varying float depth;\n\
 \n\
 \n\
 float unpackDepth(vec4 packedDepth)\n\
@@ -3309,11 +3313,13 @@ void main()\n\
 	float lighting = 0.0;\n\
 	bool testBool = false;\n\
 	vec4 colorAux = vec4(1.0, 1.0, 1.0, 1.0);\n\
-	\n\
-	if(bApplySsao)\n\
+	bool auxBool = false;\n\
+	//if(bApplySsao)\n\
+	if(auxBool)\n\
 	{          \n\
 		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
-		float linearDepth = getDepth(screenPos);\n\
+		//float linearDepth = getDepth(screenPos);\n\
+		float linearDepth = -depth;\n\
 		//vec3 origin = getViewRay(screenPos) * linearDepth;\n\
 \n\
 \n\
@@ -3321,7 +3327,7 @@ void main()\n\
 		int currFrustumIdx = int(floor(100.0*normalRGBA.w));\n\
 \n\
 		if(currFrustumIdx >= 10)\n\
-		currFrustumIdx -= 10;\n\
+		currFrustumIdx -= 20;\n\
 \n\
 		vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);\n\
 		float currNear = nearFar.x;\n\
@@ -3351,13 +3357,13 @@ void main()\n\
 		float pixelSize_x = w/screenWidth; // the pixelSize in meters in the x axis.\n\
 		float pixelSize_y = h/screenHeight;  // the pixelSize in meters in the y axis.\n\
 		\n\
-		float radiusInMeters = 0.12;\n\
-		//radiusAux = radiusInMeters / pixelSize_x;\n\
+		float radiusInMeters = 0.20;\n\
+		radiusAux = radiusInMeters / pixelSize_x;\n\
 		float radiusFogInMeters = 1.0;\n\
-		//radiusFog = radiusFogInMeters / pixelSize_x;\n\
+		radiusFog = radiusFogInMeters / pixelSize_x;\n\
 \n\
-		radiusAux = 3.0;\n\
-		float farFactor = sqrt(myZDist*0.5);\n\
+		//radiusAux = 6.0;\n\
+		float farFactor = 0.1*sqrt(myZDist);\n\
 		\n\
 		for(int j = 0; j < 1; ++j)\n\
 		{\n\
@@ -3386,7 +3392,7 @@ void main()\n\
 				int adjacentFrustumIdx = int(floor(100.0*normalRGBA_adjacent.w));\n\
 \n\
 				if(adjacentFrustumIdx >= 10)\n\
-				adjacentFrustumIdx -= 10;\n\
+				adjacentFrustumIdx -= 20;\n\
 \n\
 				vec2 nearFar_adjacent = getNearFar_byFrustumIdx(adjacentFrustumIdx);\n\
 				float currNear_adjacent = nearFar_adjacent.x;\n\
@@ -3396,62 +3402,25 @@ void main()\n\
 				float zDist = currNear_adjacent + depthBufferValue * currFar_adjacent;\n\
 				float zDistDiff = abs(myZDist - zDist);\n\
 \n\
-				\n\
-				\n\
 				if(myZDist > zDist)\n\
 				{\n\
 					// My pixel is rear\n\
 					if(zDistDiff > farFactor  &&  zDistDiff < 100.0)\n\
 					occlusion +=  1.0;\n\
 				}\n\
-				/*\n\
-				// Find lightingFog.***  	 \n\
-				if(i == 0)\n\
-					screenPosAdjacent = vec2((gl_FragCoord.x - radiusFog)/ screenWidth, (gl_FragCoord.y - radiusFog) / screenHeight);\n\
-				else if(i == 1)\n\
-					screenPosAdjacent = vec2((gl_FragCoord.x)/ screenWidth, (gl_FragCoord.y - radiusFog) / screenHeight);\n\
-				else if(i == 2)\n\
-					screenPosAdjacent = vec2((gl_FragCoord.x + radiusFog)/ screenWidth, (gl_FragCoord.y - radiusFog) / screenHeight);\n\
-				else if(i == 3)\n\
-					screenPosAdjacent = vec2((gl_FragCoord.x + radiusFog)/ screenWidth, (gl_FragCoord.y) / screenHeight);\n\
-				else if(i == 4)\n\
-					screenPosAdjacent = vec2((gl_FragCoord.x + radiusFog)/ screenWidth, (gl_FragCoord.y + radiusFog) / screenHeight);\n\
-				else if(i == 5)\n\
-					screenPosAdjacent = vec2((gl_FragCoord.x)/ screenWidth, (gl_FragCoord.y + radiusFog) / screenHeight);\n\
-				else if(i == 6)\n\
-					screenPosAdjacent = vec2((gl_FragCoord.x - radiusFog)/ screenWidth, (gl_FragCoord.y + radiusFog) / screenHeight);\n\
-				else if(i == 7)\n\
-					screenPosAdjacent = vec2((gl_FragCoord.x - radiusFog)/ screenWidth, (gl_FragCoord.y) / screenHeight);\n\
-\n\
-				normalRGBA_adjacent = getNormal(screenPosAdjacent);\n\
-				adjacentFrustumIdx = int(floor(100.0*normalRGBA_adjacent.w));\n\
-\n\
-				if(adjacentFrustumIdx >= 10)\n\
-				adjacentFrustumIdx -= 10;\n\
-\n\
-				nearFar_adjacent = getNearFar_byFrustumIdx(adjacentFrustumIdx);\n\
-				currNear_adjacent = nearFar_adjacent.x;\n\
-				currFar_adjacent = nearFar_adjacent.y;\n\
-\n\
-				depthBufferValue = getDepth(screenPosAdjacent);\n\
-				zDist = currNear_adjacent + depthBufferValue * currFar_adjacent;\n\
-				zDistDiff = abs(myZDist - zDist);\n\
-				\n\
-				if(myZDist > zDist + 0.2)\n\
-				{\n\
-					// My pixel is rear\n\
-					if(zDistDiff < 1.0)// &&  zDistDiff < 50.0)\n\
-					lighting +=  1.0;\n\
-				}\n\
-				*/\n\
-\n\
-\n\
 			}   \n\
 		}   \n\
 			\n\
-		//if(occlusion > 6.0)\n\
-		//	occlusion = 8.0;\n\
-		occlusion = 1.0 - occlusion / 8.0;\n\
+		if(occlusion > 4.0)\n\
+		{\n\
+			occlusion -= 4.0;\n\
+			occlusion = 1.0 - occlusion / 4.0;\n\
+		}\n\
+		else\n\
+		{\n\
+			occlusion = 1.0;\n\
+		}\n\
+		\n\
 \n\
 		if(occlusion < 0.0)\n\
 		occlusion = 0.0;\n\
@@ -3460,15 +3429,7 @@ void main()\n\
 			lighting = 8.0;\n\
 		lighting = lighting / 8.0;\n\
 	}\n\
-\n\
-	//if(occlusion < 0.95)\n\
-	//occlusion = 0.0;\n\
-\n\
-	if(occlusion > 0.6)\n\
-	occlusion = 1.0;\n\
-	else{\n\
-		occlusion = 0.0;\n\
-	}\n\
+	\n\
 \n\
 	if(lighting < 0.5)\n\
 	lighting = 0.0;\n\
@@ -3698,6 +3659,7 @@ ShaderSource.PointCloudVS = "attribute vec3 position;\n\
 attribute vec3 normal;\n\
 attribute vec2 texCoord;\n\
 attribute vec4 color4;\n\
+uniform mat4 modelViewMatrixRelToEye;\n\
 uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
 uniform vec3 buildingPosHIGH;\n\
 uniform vec3 buildingPosLOW;\n\
@@ -3720,6 +3682,7 @@ uniform bool bUseColorCodingByHeight;\n\
 uniform bool bUseLogarithmicDepth;\n\
 varying vec4 vColor;\n\
 varying float glPointSize;\n\
+varying float depth;\n\
 \n\
 uniform float uFCoef_logDepth;\n\
 varying float flogz;\n\
@@ -3753,6 +3716,7 @@ void main()\n\
 		vColor = color4;\n\
 	\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
+	depth = (modelViewMatrixRelToEye * pos).z/far; // original.***\n\
 \n\
 	if(bUseFixPointSize)\n\
 	{\n\
@@ -4061,7 +4025,7 @@ void main()\n\
     //linear depth in camera space (0..far)\n\
 	vec4 orthoPos = modelViewMatrixRelToEye * pos4;\n\
     depth = orthoPos.z/far; // original.***\n\
-	//depth = (orthoPos.z-near)/(far-near); // test.***\n\
+	//depth = (orthoPos.z-near)/(far-near); // correct.***\n\
 	\n\
 	// Calculate normalCC.***\n\
 	vec3 rotatedNormal = currentTMat * normal;\n\
@@ -4101,6 +4065,8 @@ ShaderSource.ScreenQuadFS = "#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\
 \n\
+#define M_PI 3.1415926535897932384626433832795\n\
+\n\
 uniform sampler2D depthTex;\n\
 uniform sampler2D shadowMapTex;\n\
 uniform sampler2D shadowMapTex2;\n\
@@ -4127,6 +4093,7 @@ uniform vec3 sunPosLOW[2];\n\
 uniform int sunIdx;\n\
 uniform float screenWidth;    \n\
 uniform float screenHeight;  \n\
+uniform vec2 uNearFarArray[4];\n\
   \n\
 \n\
 \n\
@@ -4243,6 +4210,63 @@ void make_kernel(inout vec4 n[9], vec2 coord)\n\
 	n[8] = texture2D(depthTex, coord + vec2(  w, h));\n\
 }\n\
 \n\
+int getRealFrustumIdx(in int estimatedFrustumIdx, inout int dataType)\n\
+{\n\
+    // Check the type of the data.******************\n\
+    // frustumIdx 0 .. 3 -> general geometry data.\n\
+    // frustumIdx 10 .. 13 -> tinTerrain data.\n\
+    // frustumIdx 20 .. 23 -> points cloud data.\n\
+    //----------------------------------------------\n\
+    int realFrustumIdx = -1;\n\
+    \n\
+     if(estimatedFrustumIdx >= 10)\n\
+    {\n\
+        estimatedFrustumIdx -= 10;\n\
+        if(estimatedFrustumIdx >= 10)\n\
+        {\n\
+            // points cloud data.\n\
+            estimatedFrustumIdx -= 10;\n\
+            dataType = 2;\n\
+        }\n\
+        else\n\
+        {\n\
+            // tinTerrain data.\n\
+            dataType = 1;\n\
+        }\n\
+    }\n\
+    else\n\
+    {\n\
+        // general geomtry.\n\
+        dataType = 0;\n\
+    }\n\
+\n\
+    realFrustumIdx = estimatedFrustumIdx;\n\
+    return realFrustumIdx;\n\
+}\n\
+\n\
+vec2 getNearFar_byFrustumIdx(in int frustumIdx)\n\
+{\n\
+    vec2 nearFar;\n\
+    if(frustumIdx == 0)\n\
+    {\n\
+        nearFar = uNearFarArray[0];\n\
+    }\n\
+    else if(frustumIdx == 1)\n\
+    {\n\
+        nearFar = uNearFarArray[1];\n\
+    }\n\
+    else if(frustumIdx == 2)\n\
+    {\n\
+        nearFar = uNearFarArray[2];\n\
+    }\n\
+    else if(frustumIdx == 3)\n\
+    {\n\
+        nearFar = uNearFarArray[3];\n\
+    }\n\
+\n\
+    return nearFar;\n\
+}\n\
+\n\
 void main()\n\
 {\n\
 	vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
@@ -4337,48 +4361,54 @@ void main()\n\
 	{\n\
 		vec4 normal4 = getNormal(screenPos);\n\
 \n\
-		// check frustumIdx. There are 2 type of frustumsIdx :  0, 1, 2, 3 or 10, 11, 12, 13.***\n\
-		if(int(floor(normal4.w * 100.0)) >= 10)\n\
+		vec3 normal = normal4.xyz;\n\
+		if(length(normal) < 0.1)\n\
 		discard;\n\
 \n\
-		vec3 normal = normal4.xyz;\n\
-		if(length(normal) > 0.1)\n\
+		// check frustumIdx. There are 3 type of frustumsIdx :  0, 1, 2, 3 or 10, 11, 12, 13 or 20, 21, 22, 23.***\n\
+		//if(int(floor(normal4.w * 100.0)) >= 10)\n\
+		//discard;\n\
+		int estimatedFrustumIdx = int(floor(normal4.w * 100.0));\n\
+		int dataType = -1;\n\
+		int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);\n\
+		vec2 nearFar_origin = getNearFar_byFrustumIdx(currFrustumIdx);\n\
+		float currNear_origin = nearFar_origin.x;\n\
+		float currFar_origin = nearFar_origin.y;\n\
+\n\
+		if(dataType != 0 && dataType != 2)\n\
+		discard;\n\
+\n\
+		//ssaoFromDepthTex\n\
+		float pixelSize_x = 1.0/screenWidth;\n\
+		float pixelSize_y = 1.0/screenHeight;\n\
+		vec4 occlFromDepth = vec4(0.0);\n\
+		for(int i=0; i<4; i++)\n\
 		{\n\
-			//ssaoFromDepthTex\n\
-			float pixelSize_x = 1.0/screenWidth;\n\
-			float pixelSize_y = 1.0/screenHeight;\n\
-			vec4 occlFromDepth = vec4(0.0);\n\
-			for(int i=0; i<4; i++)\n\
+			for(int j=0; j<4; j++)\n\
 			{\n\
-				for(int j=0; j<4; j++)\n\
-				{\n\
-					vec2 texCoord = vec2(screenPos.x + pixelSize_x*float(i-2), screenPos.y + pixelSize_y*float(j-2));\n\
-					vec4 color = texture2D(ssaoTex, texCoord);\n\
-					occlFromDepth += color;\n\
-				}\n\
+				vec2 texCoord = vec2(screenPos.x + pixelSize_x*float(i-2), screenPos.y + pixelSize_y*float(j-2));\n\
+				vec4 color = texture2D(ssaoTex, texCoord);\n\
+				occlFromDepth += color;\n\
 			}\n\
+		}\n\
 \n\
-			occlFromDepth /= 16.0;\n\
-			occlFromDepth *= 0.45;\n\
+		occlFromDepth /= 16.0;\n\
+		occlFromDepth *= 0.45;\n\
 \n\
-			float occlusion = occlFromDepth.r + occlFromDepth.g + occlFromDepth.b + occlFromDepth.a; // original.***\n\
+		float occlusion = occlFromDepth.r + occlFromDepth.g + occlFromDepth.b + occlFromDepth.a; // original.***\n\
 \n\
-			if(occlusion < 0.0)\n\
-			occlusion = 0.0;\n\
+		if(occlusion < 0.0)\n\
+		occlusion = 0.0;\n\
 \n\
-			gl_FragColor = vec4(0.0, 0.0, 0.0, occlusion);\n\
-			//gl_FragColor = vec4(1.0, 0.0, 0.0, 0.2);\n\
+		gl_FragColor = vec4(0.0, 0.0, 0.0, occlusion);\n\
 \n\
-			// Provisionally render edges here.****************************************************************\n\
+		// Provisionally render edges here.****************************************************************\n\
+		if(dataType == 0)\n\
+		{\n\
 			vec3 normal_up = getNormal(vec2(screenPos.x, screenPos.y + pixelSize_y)).xyz;\n\
 			vec3 normal_right = getNormal(vec2(screenPos.x + pixelSize_x, screenPos.y)).xyz;\n\
 			vec3 normal_down = getNormal(vec2(screenPos.x, screenPos.y - pixelSize_y)).xyz;\n\
 			vec3 normal_left = getNormal(vec2(screenPos.x - pixelSize_x, screenPos.y)).xyz;\n\
-\n\
-			//vec3 normal_ur = getNormal(vec2(screenPos.x + pixelSize_x, screenPos.y + pixelSize_y)).xyz;\n\
-			//vec3 normal_rd = getNormal(vec2(screenPos.x + pixelSize_x, screenPos.y - pixelSize_y)).xyz;\n\
-			//vec3 normal_ld = getNormal(vec2(screenPos.x - pixelSize_x, screenPos.y - pixelSize_y)).xyz;\n\
-			//vec3 normal_lu = getNormal(vec2(screenPos.x - pixelSize_x, screenPos.y + pixelSize_y)).xyz;\n\
 \n\
 			float factor = 0.0;\n\
 			float increF = 0.07 * 2.0;\n\
@@ -4395,31 +4425,67 @@ void main()\n\
 			if(dot(normal, normal_left) < 0.3)\n\
 			{ factor += increF; }\n\
 \n\
-			\n\
-			////if(dot(normal, normal_ur) < 0.3)\n\
-			////{ factor += increF; }\n\
-\n\
-			////if(dot(normal, normal_rd) < 0.3)\n\
-			////{ factor += increF; }\n\
-\n\
-			////if(dot(normal, normal_ld) < 0.3)\n\
-			////{ factor += increF; }\n\
-\n\
-			////if(dot(normal, normal_lu) < 0.3)\n\
-			////{ factor += increF; }\n\
-			\n\
-\n\
 			if(factor > increF*0.9)\n\
 			{\n\
 				gl_FragColor = vec4(0.0, 0.0, 0.0, factor+occlusion);\n\
 				return;\n\
 			}\n\
-\n\
 		}\n\
+		// render edges for points cloud.\n\
+		/*\n\
+		if(dataType == 2)\n\
+		{\n\
+			// this is point cloud.\n\
+			float linearDepth_origin  = unpackDepth(texture2D(depthTex, screenPos)); // z_window  is [0.0, 1.0] range depth.\n\
+			float myZDist = linearDepth_origin * currFar_origin;\n\
+			float increAngRad = (2.0*M_PI)/16.0;\n\
+			float edgeColor = 0.0;\n\
+			for(int i=0; i<16; i++)\n\
+			{\n\
+				float s = cos(float(i)*increAngRad) * pixelSize_x * 4.0;\n\
+				float t = sin(float(i)*increAngRad) * pixelSize_y * 4.0;\n\
+				vec2 screenPosAdjacent = vec2(screenPos.x+s, screenPos.y+t);\n\
+				vec4 normal4_adjacent = getNormal(screenPosAdjacent);\n\
+				int estimatedFrustumIdx_adjacent = int(floor(normal4_adjacent.w * 100.0));\n\
+				int dataType_adjacent = -1;\n\
+				int currFrustumIdx_adjacent = getRealFrustumIdx(estimatedFrustumIdx_adjacent, dataType_adjacent);\n\
+				vec2 nearFar_adjacent = getNearFar_byFrustumIdx(currFrustumIdx_adjacent);\n\
+				float currNear_adjacent = nearFar_adjacent.x;\n\
+				float currFar_adjacent = nearFar_adjacent.y;\n\
+				float linearDepth_adjacent  = unpackDepth(texture2D(depthTex, screenPosAdjacent)); // z_window  is [0.0, 1.0] range depth.\n\
+				float zDistAdjacent = linearDepth_adjacent * currFar_adjacent;\n\
+\n\
+				float zDepthDiff = abs(myZDist - zDistAdjacent);\n\
+				if(linearDepth_origin < linearDepth_adjacent)\n\
+				{\n\
+					if(zDepthDiff > 2.0)\n\
+					{\n\
+						edgeColor += 1.0;\n\
+					}\n\
+				}\n\
+			}\n\
+			if(edgeColor > 4.0)\n\
+			{\n\
+				edgeColor -= 4.0;\n\
+				edgeColor /= 12.0;\n\
+\n\
+				if(edgeColor > 0.01)\n\
+				edgeColor = 1.0;\n\
+\n\
+				//gl_FragColor = vec4(0.0, 0.0, 0.0, edgeColor);//+occlusion);\n\
+				gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);//+occlusion);\n\
+				return;\n\
+				// Test.***\n\
+				\n\
+			}\n\
+			\n\
+		}\n\
+		*/\n\
 	}\n\
 	\n\
 \n\
 	// check if is fastAntiAlias.***\n\
+	/*\n\
 	if(bFxaa)\n\
 	{\n\
 		vec4 color = texture2D(depthTex, screenPos);\n\
@@ -4437,20 +4503,18 @@ void main()\n\
 		}\n\
 		//if(color.r < 0.0001 && color.g < 0.0001 && color.b < 0.0001)\n\
 		//discard;\n\
-		/*/\n\
-		vec4 n[9];\n\
-		make_kernel( n, vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight) );\n\
 \n\
-		vec4 sobel_edge_h = n[2] + (2.0*n[5]) + n[8] - (n[0] + (2.0*n[3]) + n[6]);\n\
-		vec4 sobel_edge_v = n[0] + (2.0*n[1]) + n[2] - (n[6] + (2.0*n[7]) + n[8]);\n\
-		vec4 sobel = sqrt((sobel_edge_h * sobel_edge_h) + (sobel_edge_v * sobel_edge_v));\n\
+		////vec4 n[9];\n\
+		////make_kernel( n, vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight) );\n\
 \n\
-		gl_FragColor = vec4( 1.0 - sobel.rgb, 1.0 );\n\
-		//gl_FragColor = vec4(sobel.rgb, 1.0 );\n\
-		*/\n\
-		//gl_FragColor = color;\n\
+		////vec4 sobel_edge_h = n[2] + (2.0*n[5]) + n[8] - (n[0] + (2.0*n[3]) + n[6]);\n\
+		////vec4 sobel_edge_v = n[0] + (2.0*n[1]) + n[2] - (n[6] + (2.0*n[7]) + n[8]);\n\
+		////vec4 sobel = sqrt((sobel_edge_h * sobel_edge_h) + (sobel_edge_v * sobel_edge_v));\n\
+\n\
+		////gl_FragColor = vec4( 1.0 - sobel.rgb, 1.0 );\n\
+\n\
 	}\n\
-    \n\
+    */\n\
 }";
 ShaderSource.ScreenQuadVS = "precision mediump float;\n\
 \n\
@@ -4763,6 +4827,63 @@ float getFactorByDist(in float radius, in float realDist)\n\
     return factorByDist;\n\
 }\n\
 \n\
+int getRealFrustumIdx(in int estimatedFrustumIdx, inout int dataType)\n\
+{\n\
+    // Check the type of the data.******************\n\
+    // frustumIdx 0 .. 3 -> general geometry data.\n\
+    // frustumIdx 10 .. 13 -> tinTerrain data.\n\
+    // frustumIdx 20 .. 23 -> points cloud data.\n\
+    //----------------------------------------------\n\
+    int realFrustumIdx = -1;\n\
+    \n\
+     if(estimatedFrustumIdx >= 10)\n\
+    {\n\
+        estimatedFrustumIdx -= 10;\n\
+        if(estimatedFrustumIdx >= 10)\n\
+        {\n\
+            // points cloud data.\n\
+            estimatedFrustumIdx -= 10;\n\
+            dataType = 2;\n\
+        }\n\
+        else\n\
+        {\n\
+            // tinTerrain data.\n\
+            dataType = 1;\n\
+        }\n\
+    }\n\
+    else\n\
+    {\n\
+        // general geomtry.\n\
+        dataType = 0;\n\
+    }\n\
+\n\
+    realFrustumIdx = estimatedFrustumIdx;\n\
+    return realFrustumIdx;\n\
+}\n\
+\n\
+float getOcclusion_pointsCloud(vec2 screenPosAdjacent)\n\
+{\n\
+    float result_occlusion = 0.0;\n\
+\n\
+    vec4 normalRGBA_adjacent = getNormal(screenPosAdjacent);\n\
+    int estimatedFrustumIdx = int(floor(100.0*normalRGBA_adjacent.w));\n\
+\n\
+    // check the data type of the pixel.\n\
+    int dataType = -1;\n\
+    int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);\n\
+\n\
+    vec2 nearFar_adjacent = getNearFar_byFrustumIdx(currFrustumIdx);\n\
+    float currNear_adjacent = nearFar_adjacent.x;\n\
+    float currFar_adjacent = nearFar_adjacent.y;\n\
+\n\
+    float depthBufferValue = getDepth(screenPosAdjacent);\n\
+    //float zDist = currNear_adjacent + depthBufferValue * currFar_adjacent; // correct.\n\
+    float zDist = depthBufferValue * currFar_adjacent;\n\
+\n\
+\n\
+\n\
+    return result_occlusion;\n\
+}\n\
 \n\
 \n\
 void main()\n\
@@ -4776,10 +4897,22 @@ void main()\n\
     vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
     vec4 normalRGBA = getNormal(screenPos);\n\
     vec3 normal2 = normalRGBA.xyz; // original.***\n\
-    int currFrustumIdx = int(floor(100.0*normalRGBA.w));\n\
+    int estimatedFrustumIdx = int(floor(100.0*normalRGBA.w));\n\
+    int dataType = 0; // 0= general geomtry. 1= tinTerrain. 2= PointsCloud.\n\
 \n\
-    if(currFrustumIdx > 3)\n\
+    // Check the type of the data.******************\n\
+    // dataType = 0 -> general geometry data.\n\
+    // dataType = 1 -> tinTerrain data.\n\
+    // dataType = 2 -> points cloud data.\n\
+    //----------------------------------------------\n\
+    int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);\n\
+\n\
+    // If the data is no generalGeomtry or pointsCloud, then discard.\n\
+    if(dataType != 0 && dataType != 2)\n\
     discard;\n\
+\n\
+    //if(currFrustumIdx > 3)\n\
+    //discard;\n\
 \n\
     vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);\n\
     float currNear = nearFar.x;\n\
@@ -4811,15 +4944,12 @@ void main()\n\
         factorByDist = smoothstep(0.0, 1.0, realDist/(aux));\n\
     }\n\
 \n\
-    //if(factorByDist < 0.05)\n\
-    //    discard;\n\
-\n\
-    if(bApplySsao)// && !isAlmostOutOfFrustum)\n\
+    // General data type.*************************************************************************************\n\
+    if(dataType == 0 && bApplySsao)\n\
 	{        \n\
 		vec3 origin = ray * linearDepth;// + rayNear; \n\
-        //vec3 origin = reconstructPosition(screenPos, linearDepth);\n\
+        //vec3 origin = reconstructPosition(screenPos, linearDepth); // used when there are no normal-texture.\n\
         bool isValid = true;\n\
-        //vec3 normal2 = normal_from_depth(linearDepth, screenPos, isValid); // normal from depthTex.***\n\
         \n\
         if(length(normal2) < 0.1)\n\
         isValid = false;\n\
@@ -4879,12 +5009,125 @@ void main()\n\
         else if(occlusion_D > 1.0)\n\
         occlusion_D = 1.0;\n\
 	}\n\
-    else\n\
-    {\n\
-        // Apply edges from depth.***\n\
 \n\
-    }\n\
+    // Points cloud data type.**************************************************************************************\n\
+    /*\n\
+    if(dataType == 2 && bApplySsao)\n\
+	{        \n\
+		float linearDepth = getDepth(screenPos);\n\
+		//vec3 origin = getViewRay(screenPos) * linearDepth;\n\
 \n\
+\n\
+		vec4 normalRGBA = getNormal(screenPos);\n\
+		int currFrustumIdx = int(floor(100.0*normalRGBA.w));\n\
+\n\
+		if(currFrustumIdx >= 10)\n\
+		currFrustumIdx -= 20;\n\
+\n\
+		vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);\n\
+		float currNear = nearFar.x;\n\
+		float currFar = nearFar.y;\n\
+\n\
+\n\
+		float myZDist = currNear + linearDepth * currFar;\n\
+\n\
+		float radiusAux = glPointSize/1.9; // radius in pixels.\n\
+		float radiusFog = glPointSize*3.0; // radius in pixels.\n\
+		vec2 screenPosAdjacent;\n\
+\n\
+\n\
+\n\
+		// calculate the pixelSize in the screenPos.***\n\
+		float h = 2.0 * tangentOfHalfFovy * currFar * linearDepth; // height in meters of the screen in the current pixelDepth\n\
+    	float w = h * aspectRatio;     							   // width in meters of the screen in the current pixelDepth\n\
+		// vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -relFar);   \n\
+\n\
+		float pixelSize_x = w/screenWidth; // the pixelSize in meters in the x axis.\n\
+		float pixelSize_y = h/screenHeight;  // the pixelSize in meters in the y axis.\n\
+		\n\
+		float radiusInMeters = 0.20;\n\
+		radiusAux = radiusInMeters / pixelSize_x;\n\
+		float radiusFogInMeters = 1.0;\n\
+		radiusFog = radiusFogInMeters / pixelSize_x;\n\
+\n\
+		//radiusAux = 6.0;\n\
+		float farFactor = 0.1*sqrt(myZDist);\n\
+		\n\
+\n\
+        //radiusAux = 1.5 *(float(j)+1.0);\n\
+        for(int i = 0; i < 8; ++i)\n\
+        {  \n\
+            // Find occlussion.***  	 \n\
+            if(i == 0)\n\
+                screenPosAdjacent = vec2((gl_FragCoord.x - radiusAux)/ screenWidth, (gl_FragCoord.y - radiusAux) / screenHeight);\n\
+            else if(i == 1)\n\
+                screenPosAdjacent = vec2((gl_FragCoord.x)/ screenWidth, (gl_FragCoord.y - radiusAux) / screenHeight);\n\
+            else if(i == 2)\n\
+                screenPosAdjacent = vec2((gl_FragCoord.x + radiusAux)/ screenWidth, (gl_FragCoord.y - radiusAux) / screenHeight);\n\
+            else if(i == 3)\n\
+                screenPosAdjacent = vec2((gl_FragCoord.x + radiusAux)/ screenWidth, (gl_FragCoord.y) / screenHeight);\n\
+            else if(i == 4)\n\
+                screenPosAdjacent = vec2((gl_FragCoord.x + radiusAux)/ screenWidth, (gl_FragCoord.y + radiusAux) / screenHeight);\n\
+            else if(i == 5)\n\
+                screenPosAdjacent = vec2((gl_FragCoord.x)/ screenWidth, (gl_FragCoord.y + radiusAux) / screenHeight);\n\
+            else if(i == 6)\n\
+                screenPosAdjacent = vec2((gl_FragCoord.x - radiusAux)/ screenWidth, (gl_FragCoord.y + radiusAux) / screenHeight);\n\
+            else if(i == 7)\n\
+                screenPosAdjacent = vec2((gl_FragCoord.x - radiusAux)/ screenWidth, (gl_FragCoord.y) / screenHeight);\n\
+\n\
+            vec4 normalRGBA_adjacent = getNormal(screenPosAdjacent);\n\
+            int adjacentFrustumIdx = int(floor(100.0*normalRGBA_adjacent.w));\n\
+\n\
+            if(adjacentFrustumIdx >= 10)\n\
+            adjacentFrustumIdx -= 20;\n\
+\n\
+            vec2 nearFar_adjacent = getNearFar_byFrustumIdx(adjacentFrustumIdx);\n\
+            float currNear_adjacent = nearFar_adjacent.x;\n\
+            float currFar_adjacent = nearFar_adjacent.y;\n\
+\n\
+            float depthBufferValue = getDepth(screenPosAdjacent);\n\
+            float zDist = currNear_adjacent + depthBufferValue * currFar_adjacent;\n\
+            float zDistDiff = abs(myZDist - zDist);\n\
+\n\
+            \n\
+            \n\
+            if(myZDist > zDist)\n\
+            {\n\
+                // My pixel is rear\n\
+                if(zDistDiff > farFactor  &&  zDistDiff < 100.0)\n\
+                occlusion +=  1.0;\n\
+            }\n\
+        }\n\
+\n\
+        float fKernelSize = float(kernelSize);\n\
+\n\
+		occlusion_C = occlusion_C / fKernelSize;	\n\
+        if(occlusion_C < 0.0)\n\
+        occlusion_C = 0.0;\n\
+        else if(occlusion_C > 1.0)\n\
+        occlusion_C = 1.0;\n\
+\n\
+        occlusion_B = occlusion_B / fKernelSize;	\n\
+        if(occlusion_B < 0.0)\n\
+        occlusion_B = 0.0;\n\
+        else if(occlusion_B > 1.0)\n\
+        occlusion_B = 1.0;\n\
+\n\
+        occlusion_A = occlusion_A / fKernelSize;	\n\
+        if(occlusion_A < 0.0)\n\
+        occlusion_A = 0.0;\n\
+        else if(occlusion_A > 1.0)\n\
+        occlusion_A = 1.0;\n\
+\n\
+        occlusion_D = occlusion_D / fKernelSize;	\n\
+        if(occlusion_D < 0.0)\n\
+        occlusion_D = 0.0;\n\
+        else if(occlusion_D > 1.0)\n\
+        occlusion_D = 1.0;\n\
+	}\n\
+    */\n\
+\n\
+    \n\
     // Do lighting.***\n\
     //float scalarProd = max(0.01, dot(normal, normalize(-ray)));\n\
    // scalarProd /= 3.0;\n\

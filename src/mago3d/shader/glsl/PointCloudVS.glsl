@@ -2,6 +2,7 @@ attribute vec3 position;
 attribute vec3 normal;
 attribute vec2 texCoord;
 attribute vec4 color4;
+uniform mat4 modelViewMatrixRelToEye;
 uniform mat4 ModelViewProjectionMatrixRelToEye;
 uniform vec3 buildingPosHIGH;
 uniform vec3 buildingPosLOW;
@@ -24,6 +25,7 @@ uniform bool bUseColorCodingByHeight;
 uniform bool bUseLogarithmicDepth;
 varying vec4 vColor;
 varying float glPointSize;
+varying float depth;
 
 uniform float uFCoef_logDepth;
 varying float flogz;
@@ -57,6 +59,7 @@ void main()
 		vColor = color4;
 	
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;
+	depth = (modelViewMatrixRelToEye * pos).z/far; // original.***
 
 	if(bUseFixPointSize)
 	{

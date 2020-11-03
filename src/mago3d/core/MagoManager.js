@@ -5694,6 +5694,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 {
 	var use_linearOrLogarithmicDepth = "USE_LINEAR_DEPTH";
 	var use_multi_render_target = "NO_USE_MULTI_RENDER_TARGET";
+	var glVersion = gl.getParameter(gl.VERSION);
 	
 	if (!this.isCesiumGlobe())
 	{
@@ -6043,6 +6044,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	this.postFxShadersManager.useProgram(shader);
 	gl.uniform1i(shader.ssaoTex_loc, 5);
 	gl.uniform1i(shader.normalTex_loc, 6);
+	shader.uNearFarArray_loc = gl.getUniformLocation(shader.program, "uNearFarArray");
 	
 	// 15) Pin shader.******************************************************************************************
 	var shaderName = "pin";
@@ -6904,7 +6906,7 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 			data_group_id = jasonObject.dataGroupId;
 			data_group_name = jasonObject.dataGroupName;
 			data_id = jasonObject.dataId;
-			data_key = jasonObject.dataKey || jasonObject.dataGroupKey;
+			data_key = jasonObject.dataKey || jasonObject.dataGroupKey; // folder name.
 			data_name = jasonObject.dataName || jasonObject.dataGroupName;
 			heading = jasonObject.heading;
 			height = jasonObject.altitude;
@@ -6920,7 +6922,7 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 			data_group_id = jasonObject.data_group_id;
 			data_group_name = jasonObject.data_group_name;
 			data_id = jasonObject.data_id;
-			data_key = jasonObject.data_key;
+			data_key = jasonObject.data_key; // folder name.
 			data_name = jasonObject.data_name;
 			heading = jasonObject.heading;
 			height = jasonObject.height;

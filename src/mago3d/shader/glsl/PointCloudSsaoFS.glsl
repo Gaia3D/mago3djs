@@ -39,6 +39,7 @@ uniform vec2 uNearFarArray[4];
 
 varying float flogz;
 varying float Fcoef_half;
+varying float depth;
 
 
 float unpackDepth(vec4 packedDepth)
@@ -135,11 +136,13 @@ void main()
 	float lighting = 0.0;
 	bool testBool = false;
 	vec4 colorAux = vec4(1.0, 1.0, 1.0, 1.0);
-	
-	if(bApplySsao)
+	bool auxBool = false;
+	//if(bApplySsao)
+	if(auxBool)
 	{          
 		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
-		float linearDepth = getDepth(screenPos);
+		//float linearDepth = getDepth(screenPos);
+		float linearDepth = -depth;
 		//vec3 origin = getViewRay(screenPos) * linearDepth;
 
 
@@ -147,7 +150,7 @@ void main()
 		int currFrustumIdx = int(floor(100.0*normalRGBA.w));
 
 		if(currFrustumIdx >= 10)
-		currFrustumIdx -= 10;
+		currFrustumIdx -= 20;
 
 		vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);
 		float currNear = nearFar.x;
@@ -177,13 +180,13 @@ void main()
 		float pixelSize_x = w/screenWidth; // the pixelSize in meters in the x axis.
 		float pixelSize_y = h/screenHeight;  // the pixelSize in meters in the y axis.
 		
-		float radiusInMeters = 0.12;
-		//radiusAux = radiusInMeters / pixelSize_x;
+		float radiusInMeters = 0.20;
+		radiusAux = radiusInMeters / pixelSize_x;
 		float radiusFogInMeters = 1.0;
-		//radiusFog = radiusFogInMeters / pixelSize_x;
+		radiusFog = radiusFogInMeters / pixelSize_x;
 
-		radiusAux = 3.0;
-		float farFactor = sqrt(myZDist*0.5);
+		//radiusAux = 6.0;
+		float farFactor = 0.1*sqrt(myZDist);
 		
 		for(int j = 0; j < 1; ++j)
 		{
@@ -212,7 +215,7 @@ void main()
 				int adjacentFrustumIdx = int(floor(100.0*normalRGBA_adjacent.w));
 
 				if(adjacentFrustumIdx >= 10)
-				adjacentFrustumIdx -= 10;
+				adjacentFrustumIdx -= 20;
 
 				vec2 nearFar_adjacent = getNearFar_byFrustumIdx(adjacentFrustumIdx);
 				float currNear_adjacent = nearFar_adjacent.x;
@@ -222,62 +225,25 @@ void main()
 				float zDist = currNear_adjacent + depthBufferValue * currFar_adjacent;
 				float zDistDiff = abs(myZDist - zDist);
 
-				
-				
 				if(myZDist > zDist)
 				{
 					// My pixel is rear
 					if(zDistDiff > farFactor  &&  zDistDiff < 100.0)
 					occlusion +=  1.0;
 				}
-				/*
-				// Find lightingFog.***  	 
-				if(i == 0)
-					screenPosAdjacent = vec2((gl_FragCoord.x - radiusFog)/ screenWidth, (gl_FragCoord.y - radiusFog) / screenHeight);
-				else if(i == 1)
-					screenPosAdjacent = vec2((gl_FragCoord.x)/ screenWidth, (gl_FragCoord.y - radiusFog) / screenHeight);
-				else if(i == 2)
-					screenPosAdjacent = vec2((gl_FragCoord.x + radiusFog)/ screenWidth, (gl_FragCoord.y - radiusFog) / screenHeight);
-				else if(i == 3)
-					screenPosAdjacent = vec2((gl_FragCoord.x + radiusFog)/ screenWidth, (gl_FragCoord.y) / screenHeight);
-				else if(i == 4)
-					screenPosAdjacent = vec2((gl_FragCoord.x + radiusFog)/ screenWidth, (gl_FragCoord.y + radiusFog) / screenHeight);
-				else if(i == 5)
-					screenPosAdjacent = vec2((gl_FragCoord.x)/ screenWidth, (gl_FragCoord.y + radiusFog) / screenHeight);
-				else if(i == 6)
-					screenPosAdjacent = vec2((gl_FragCoord.x - radiusFog)/ screenWidth, (gl_FragCoord.y + radiusFog) / screenHeight);
-				else if(i == 7)
-					screenPosAdjacent = vec2((gl_FragCoord.x - radiusFog)/ screenWidth, (gl_FragCoord.y) / screenHeight);
-
-				normalRGBA_adjacent = getNormal(screenPosAdjacent);
-				adjacentFrustumIdx = int(floor(100.0*normalRGBA_adjacent.w));
-
-				if(adjacentFrustumIdx >= 10)
-				adjacentFrustumIdx -= 10;
-
-				nearFar_adjacent = getNearFar_byFrustumIdx(adjacentFrustumIdx);
-				currNear_adjacent = nearFar_adjacent.x;
-				currFar_adjacent = nearFar_adjacent.y;
-
-				depthBufferValue = getDepth(screenPosAdjacent);
-				zDist = currNear_adjacent + depthBufferValue * currFar_adjacent;
-				zDistDiff = abs(myZDist - zDist);
-				
-				if(myZDist > zDist + 0.2)
-				{
-					// My pixel is rear
-					if(zDistDiff < 1.0)// &&  zDistDiff < 50.0)
-					lighting +=  1.0;
-				}
-				*/
-
-
 			}   
 		}   
 			
-		//if(occlusion > 6.0)
-		//	occlusion = 8.0;
-		occlusion = 1.0 - occlusion / 8.0;
+		if(occlusion > 4.0)
+		{
+			occlusion -= 4.0;
+			occlusion = 1.0 - occlusion / 4.0;
+		}
+		else
+		{
+			occlusion = 1.0;
+		}
+		
 
 		if(occlusion < 0.0)
 		occlusion = 0.0;
@@ -286,15 +252,7 @@ void main()
 			lighting = 8.0;
 		lighting = lighting / 8.0;
 	}
-
-	//if(occlusion < 0.95)
-	//occlusion = 0.0;
-
-	if(occlusion > 0.6)
-	occlusion = 1.0;
-	else{
-		occlusion = 0.0;
-	}
+	
 
 	if(lighting < 0.5)
 	lighting = 0.0;
