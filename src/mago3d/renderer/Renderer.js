@@ -1436,8 +1436,6 @@ Renderer.prototype.renderSsaoFromDepth = function(gl)
 	gl.activeTexture(gl.TEXTURE3);
 	gl.bindTexture(gl.TEXTURE_2D, null);
 
-
-
 	gl.depthMask(true);
 	gl.enable(gl.DEPTH_TEST);
 };

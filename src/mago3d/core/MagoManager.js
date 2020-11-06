@@ -1301,6 +1301,10 @@ MagoManager.prototype.loadAndPrepareData = function()
  */
 MagoManager.prototype.renderToSelectionBuffer = function() 
 {
+	var auxBool = false;
+	//if(!auxBool)
+	//return;
+
 	var gl = this.getGl();
 	
 	if (this.selectionFbo === undefined) 
@@ -1324,7 +1328,9 @@ MagoManager.prototype.renderToSelectionBuffer = function()
 			gl.clearColor(0, 0, 0, 1); // return to black background.***
 		}
 
+		this.swapRenderingFase();
 		this.renderer.renderGeometryColorCoding(this.visibleObjControlerNodes, ''); 
+		this.selectionFbo.unbind();
 		this.swapRenderingFase();
 
 		if (this.currentFrustumIdx === 0)
@@ -1903,7 +1909,7 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 	{
 		this.loadAndPrepareData();
 		this.renderToSelectionBuffer();
-		//this.managePickingProcess();
+		////this.managePickingProcess();
 	}
 	
 	if (frustumIdx === 0)
