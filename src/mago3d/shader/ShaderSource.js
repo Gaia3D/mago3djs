@@ -671,7 +671,9 @@ void main()\n\
 \n\
     if(!isValid)\n\
     {\n\
+        #ifdef USE_MULTI_RENDER_TARGET\n\
         gl_FragData[1] = vec4(0.0, 0.0, 0.0, 1.0);\n\
+        #endif\n\
         return;\n\
     }\n\
     //discard;\n\
@@ -3851,6 +3853,7 @@ uniform bool bApplyClippingPlanes;\n\
 uniform int clippingPlanesCount;\n\
 uniform vec4 clippingPlanes[6];\n\
 uniform bool bUseLogarithmicDepth;\n\
+uniform bool bUseMultiRenderTarget;\n\
 uniform int uFrustumIdx;\n\
 \n\
 varying float depth;  \n\
@@ -3947,8 +3950,11 @@ void main()\n\
 	frustumIdx = 0.035;\n\
 \n\
 	#ifdef USE_MULTI_RENDER_TARGET\n\
-	vec3 encodedNormal = encodeNormal(vNormal);\n\
-	gl_FragData[1] = vec4(encodedNormal, frustumIdx); // save normal.***\n\
+	if(bUseMultiRenderTarget)\n\
+	{\n\
+		vec3 encodedNormal = encodeNormal(vNormal);\n\
+		gl_FragData[1] = vec4(encodedNormal, frustumIdx); // save normal.***\n\
+	}\n\
 	#endif\n\
 	\n\
 \n\

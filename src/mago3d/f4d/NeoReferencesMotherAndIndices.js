@@ -1055,7 +1055,7 @@ NeoReferencesMotherAndIndices.prototype.render = function(magoManager, neoBuildi
 			}
 
 			// Swap renderingFase.
-			neoReference.swapRenderingFase(); 
+			neoReference.swapRenderingFase(magoManager.renderingFase); 
 		}
 	}
 	

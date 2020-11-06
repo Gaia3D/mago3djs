@@ -209,9 +209,10 @@ NeoReference.prototype.getCenterPositionWC = function(neoBuilding, resultCenterP
 /**
  * Commutate the renderingFase value: true - false.
  */
-NeoReference.prototype.swapRenderingFase = function() 
+NeoReference.prototype.swapRenderingFase = function(magoManagerRenderingFase) 
 {
-	this.renderingFase = !this.renderingFase;
+	//this.renderingFase = !this.renderingFase;// old.***
+	this.renderingFase = magoManagerRenderingFase;
 };
 
 /**

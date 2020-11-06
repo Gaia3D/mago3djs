@@ -582,7 +582,11 @@ MagoManager.prototype.setMouseStatus = function(type)
  */
 MagoManager.prototype.swapRenderingFase = function() 
 {
-	this.renderingFase = !this.renderingFase;
+	//this.renderingFase = !this.renderingFase; // old.***
+	this.renderingFase += 1;
+
+	if(this.renderingFase > 100)
+	this.renderingFase = 1;
 };
 
 /**
@@ -1328,7 +1332,7 @@ MagoManager.prototype.renderToSelectionBuffer = function()
 			gl.clearColor(0, 0, 0, 1); // return to black background.***
 		}
 
-		this.swapRenderingFase();
+		//this.swapRenderingFase();
 		this.renderer.renderGeometryColorCoding(this.visibleObjControlerNodes, ''); 
 		this.selectionFbo.unbind();
 		this.swapRenderingFase();
