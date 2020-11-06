@@ -1416,6 +1416,8 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 				data.data_name = data_name;
 				data.attributes = attributes;
 				data.attributes.fromSmartTile = true;
+				data.attributes.fromDate = new Date();
+				data.attributes.toDate = new Date();
 				data.mapping_type = "boundingboxcenter";
 			
 				neoBuilding = new NeoBuilding();
@@ -1594,8 +1596,12 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 			node.data.rotationsDegree = eulerAngDeg; 
 			node.data.dataId = dataId;
 			node.data.dataGroupId = savedProjectId;
-			node.data.originalHeight = geoCoord.altitude;
-			node.data.data_name = dataName;
+
+			if(attributes.heightReference === HeightReference.RELATIVE_TO_GROUND) {
+				node.data.relativeHeight = geoCoord.altitude;
+			} else {
+				node.data.relativeHeight = 0;
+			}
 
 			node.data.smartTileOwner = this;
 			for (var j in externInfo) 
@@ -1630,7 +1636,6 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 			intantiatedNode.data.dataId = dataId;
 			intantiatedNode.data.dataGroupId = savedProjectId;
 			intantiatedNode.data.projectFolderName = projectFolderName;
-			intantiatedNode.data.originalHeight = alt;
 			for (var j in externInfo) 
 			{
 				if (externInfo.hasOwnProperty(j)) 

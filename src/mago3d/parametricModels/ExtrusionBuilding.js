@@ -52,7 +52,6 @@ var ExtrusionBuilding = function(geographicCoordList, height, options)
 	this.attributes.selectedColor4 = defaultValue(options.selectedColor, new Color(1,1,0,1));
 	this.attributes.heightReference = defaultValue(options.heightReference, HeightReference.NONE);
 	this.divideLevel = defaultValue(options.divideLevel, false);
-	
 
 	if(!this.options)
     this.options = {};
@@ -201,6 +200,31 @@ ExtrusionBuilding.prototype.makeMesh = function() {
 	//this.validTerrainHeight();
 }
 
+/**
+ * Set the unique one color of the box
+ * @param {Number} r
+ * @param {Number} g
+ * @param {Number} b 
+ * @param {Number} a
+ */
+ExtrusionBuilding.prototype.setOneColor = function(r, g, b, a)
+{
+	// This function sets the unique one color of the mesh.***
+	if (this.color4 === undefined)
+	{ this.color4 = new Color(); }
+	
+	this.color4.setRGBA(r, g, b, a);
+	//TODO : 좀 더 정교한 근사값 구하기로 변경
+	if (a < 1) 
+	{
+		this.setOpaque(false);
+	}
+
+	if(this.divideLevel) {
+		this.setDirty(true);
+	}
+};
+
 ExtrusionBuilding.prototype.makeUniformPoints2dArray = function() 
 {
 	if(!this.geoLocDataManager) {
@@ -294,11 +318,6 @@ ExtrusionBuilding.prototype.setHeight = function(height) {
 	}
 	this.height = height;
 	this.setDirty(true);
-	var that = this;
-	setTimeout(function(){
-		//if(that.terrainHeight) that.setTerrainHeight(that.terrainHeight);
-	},50)
-	
 }
 
 /**

@@ -21,19 +21,24 @@ var MagoRenderable = function(options)
 	
 	this.dirty = true;
 	this.color4;
+	this.orgColor4;
 	this.wireframeColor4;
 	this.selectedColor4;
 	this.objectType = MagoRenderable.OBJECT_TYPE.MESH; // Init as mesh type.
 
 	this.terrainHeight = 0;
 	this.eventObject = {};
+
+	this.fromDate = new Date();
+	this.toDate = new Date();
 	
 	this.options = options;
 	if (options !== undefined)
 	{
 		if (options.color && options.color instanceof Color) 
 		{
-			this.color4 = options.color;
+			this.color4 = defaultValue(options.color, new Color(1,1,1,1));
+			this.orgColor4 = new Color(this.color4.r, this.color4.g, this.color4.b, this.color4.a);
 		}
 
 		if (options.wireframeColor4 && options.wireframeColor4 instanceof Color) 
@@ -553,6 +558,13 @@ MagoRenderable.prototype.setOneColor = function(r, g, b, a)
 	}
 };
 /**
+ * restore color
+ */
+MagoRenderable.prototype.restoreColor = function()
+{
+	this.setOneColor(this.orgColor4.r, this.orgColor4.g, this.orgColor4.b, this.orgColor4.a)
+};
+/**
  * Set the unique one color of the box
  * @param {Number} r
  * @param {Number} g
@@ -629,7 +641,7 @@ MagoRenderable.prototype.getBoundingSphereWC = function(resultBSphereWC)
 MagoRenderable.prototype.changeLocationAndRotation = function(latitude, longitude, elevation, heading, pitch, roll, magoManager)
 {
 	var geoLocationData = this.getCurrentGeoLocationData();
-	Mago3D.ManagerUtils.calculateGeoLocationData(latitude, longitude, elevation, heading, pitch, roll, geoLocationData, magoManager);
+	ManagerUtils.calculateGeoLocationData(longitude, latitude, elevation, heading, pitch, roll, geoLocationData, magoManager);
 };
 
 /**
@@ -644,6 +656,9 @@ MagoRenderable.prototype.setGeographicPosition = function(geographicCoord, headi
 	var geoLocData = this.geoLocDataManager.getCurrentGeoLocationData();
 	if (geoLocData === undefined)
 	{
+		heading = (heading === undefined || heading === null) ? 0 : heading;
+		pitch = (pitch === undefined || pitch === null) ? 0 : pitch;
+		roll = (roll === undefined || roll === null) ? 0 : roll;
 		geoLocData = this.geoLocDataManager.newGeoLocationData("default");
 		geoLocData = ManagerUtils.calculateGeoLocationData(geographicCoord.longitude, geographicCoord.latitude, geographicCoord.altitude, heading, pitch, roll, geoLocData);
 	}
@@ -696,7 +711,11 @@ MagoRenderable.prototype.setTerrainHeight = function(height)
 MagoRenderable.prototype.validTerrainHeight = function()
 {
 	var geoLocData = this.geoLocDataManager.getCurrentGeoLocationData();
-	geoLocData = ManagerUtils.calculateGeoLocationData(undefined, undefined, this.terrainHeight, undefined, undefined, undefined, geoLocData);
+	var validHeight = this.terrainHeight;
+	if(this.relativeHeight && !isNaN(this.relativeHeight)) {
+		validHeight += this.relativeHeight;
+	}
+	geoLocData = ManagerUtils.calculateGeoLocationData(undefined, undefined, validHeight, undefined, undefined, undefined, geoLocData);
 }
 
 /**
@@ -715,3 +734,39 @@ MagoRenderable.prototype.isNeedValidHeight = function(magoManager)
 
 	return true;
 };
+
+/**
+ * set From date
+ * @param {Date} fromDate 
+ */
+MagoRenderable.prototype.setFromDate = function(fromDate) {
+	if(!fromDate || !(fromDate instanceof Date)) {
+		throw new Error('fromDate is required(Date Type).');
+	}
+	this.fromDate = fromDate;
+}
+/**
+ * get From date
+ * @return {Date}
+ */
+MagoRenderable.prototype.getFromDate = function() {
+	return this.fromDate;
+}
+
+/**
+ * set To date
+ * @param {Date} toDate 
+ */
+MagoRenderable.prototype.setToDate = function(toDate) {
+	if(!toDate || !(toDate instanceof Date)) {
+		throw new Error('toDate is required(Date Type).');
+	}
+	this.toDate = toDate;
+}
+/**
+ * get To date
+ * @return {Date}
+ */
+MagoRenderable.prototype.getToDate = function() {
+	return this.toDate;
+}

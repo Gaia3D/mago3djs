@@ -823,3 +823,11 @@ NeoReference.prototype.deleteObjects = function(gl, vboMemManager)
 		this.vBOVertexIdxCacheKeysContainer = undefined;
 	}
 };
+
+/**
+ * 높이 레퍼런스 반환
+ */
+NeoReference.prototype.deleteChangeColor = function()
+{
+	this.aditionalColor = undefined;
+};

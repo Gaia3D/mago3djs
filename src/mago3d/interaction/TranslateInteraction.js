@@ -36,8 +36,15 @@ TranslateInteraction.prototype.constructor = TranslateInteraction;
 
 TranslateInteraction.EVENT_TYPE = {
 	'ACTIVE'  	: 'active',
-	'DEACTIVE'	: 'deactive'
+	'DEACTIVE'	: 'deactive',
+	'MOVING_F4D' : 'movingf4d',
+	'MOVING_NATIVE' : 'movingNative',
+	'MOVING_OBJECT' : 'movingObject',
+	'MOVE_END_F4D' : 'moveEndf4d',
+	'MOVE_END_NATIVE' : 'moveEndNative',
+	'MOVE_END_OBJECT' : 'moveEndObject'
 };
+
 /**
  * interaction init
  * @override
@@ -220,6 +227,12 @@ TranslateInteraction.prototype.handleF4dDrag = function(browserEvent)
 		//geoLocationData = ManagerUtils.calculateGeoLocationData(newLongitude, newlatitude, undefined, undefined, undefined, undefined, geoLocationData, this);
 		manager.changeLocationAndRotationNode(this.target, difY, difX, undefined, undefined, undefined, undefined);
 	}
+
+	this.emit(TranslateInteraction.EVENT_TYPE.MOVING_F4D, {
+		type   : TranslateInteraction.EVENT_TYPE.MOVING_F4D,
+		result : this.target,
+		timestamp: new Date()
+	});
 };
 
 TranslateInteraction.prototype.handleObjectDrag = function(browserEvent)
@@ -449,6 +462,12 @@ TranslateInteraction.prototype.handleNativeDrag = function(browserEvent)
 		}
 	}
 
+	this.emit(TranslateInteraction.EVENT_TYPE.MOVING_NATIVE, {
+		type   : TranslateInteraction.EVENT_TYPE.MOVING_NATIVE,
+		result : this.target,
+		timestamp: new Date()
+	});
+
 	object.moved();
 };
 
@@ -459,6 +478,21 @@ TranslateInteraction.prototype.handleMoveEvent = function()
 
 TranslateInteraction.prototype.handleUpEvent = function()
 {
+	var endEvent;
+	if(this.target instanceof Node) {
+		endEvent = TranslateInteraction.EVENT_TYPE.MOVE_END_F4D;
+	} else if(this.target instanceof MagoRenderable) {
+		endEvent = TranslateInteraction.EVENT_TYPE.MOVE_END_NATIVE;
+	} else {
+		endEvent = TranslateInteraction.EVENT_TYPE.MOVE_END_OBJECT;
+	}
+
+	this.emit(endEvent, {
+		type   : endEvent,
+		result : this.target,
+		timestamp: new Date()
+	});
+	
 	this.init();
 	this.manager.setCameraMotion(true);
 	this.manager.isCameraMoved = true;

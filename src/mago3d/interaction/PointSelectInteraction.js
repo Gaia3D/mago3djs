@@ -141,7 +141,9 @@ PointSelectInteraction.prototype.handleUpEvent = function(browserEvent)
 {
 	var selectionManager = this.manager.selectionManager;
 	selectionManager.clearCurrents();
-	this.select(browserEvent.point.screenCoordinate);
+
+	var screenCoord = browserEvent.point.screenCoordinate;
+	this.select(screenCoord);
 	var oldSelected = this.selected;
 	switch (this.targetType)
 	{
@@ -160,17 +162,18 @@ PointSelectInteraction.prototype.handleUpEvent = function(browserEvent)
 	}
 	if (oldSelected)
 	{
-		this.emitEvent(oldSelected, false);
+		this.emitEvent(oldSelected, false, screenCoord);
 	}
-	this.emitEvent(this.selected, true);
+	this.emitEvent(this.selected, true, screenCoord);
 };
-PointSelectInteraction.prototype.emitEvent = function(selectedObj, selected)
+PointSelectInteraction.prototype.emitEvent = function(selectedObj, selected, screenCoord)
 {
 	if (selectedObj)
 	{
 		var type = PointSelectInteraction.getEventType(this.targetType, selected);
 		var eventObj = {
 			type      : type,
+			pixel : screenCoord,
 			timestamp : new Date()
 		};
 		selected ? eventObj.selected = selectedObj : eventObj.deselected = selectedObj;

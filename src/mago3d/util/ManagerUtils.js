@@ -813,49 +813,6 @@ ManagerUtils.calculatePixelLinearDepthV2 = function(gl, pixelX, pixelY, depthTex
 			frustumIdx : frustumIdx,
 			near : near,
 			far : far };
-
-	/*
-
-	if (depthFbo === undefined)
-	{ depthFbo = magoManager.depthFboNeo; }
-
-	if (!depthFbo) 
-	{
-		return;
-	}
-
-	if (depthFbo) 
-	{
-		depthFbo.bind(); 
-	}
-
-	// Now, read the pixel and find the pixel position.
-	
-	gl.readPixels(pixelX, magoManager.sceneState.drawingBufferHeight[0] - pixelY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, depthPixels);
-	
-	var floatDepthPixels = new Float32Array(([depthPixels[0]/256.0, depthPixels[1]/256.0, depthPixels[2]/256.0, depthPixels[3]/256.0]));
-	var zDepth = ManagerUtils.unpackDepth(floatDepthPixels); // 0 to 256 range depth.
-	var linearDepth = zDepth;// [0.0, 1.0] range depth.
-
-	// Check if we are using logarithmic depth buffer.***
-	if (magoManager.postFxShadersManager.bUseLogarithmicDepth)
-	{
-		linearDepth = zDepth * 1.0037;
-		var sceneState = magoManager.sceneState;
-		var far = sceneState.camera.frustum.far[0];
-
-		var fcoef_half = sceneState.fCoef_logDepth[0]/2.0;
-		// gl_FragDepthEXT = linearDepth = log2(flogz) * Fcoef_half;
-		// flogz = 1.0 + gl_Position.z;
-		// sceneState.fCoef_logDepth[0] = 2.0 / Math.log2(frustum0.far[0] + 1.0);
-
-		var flogz = Math.pow(2.0, linearDepth/fcoef_half);
-		var z = flogz - 1.0;
-		linearDepth = z/far;
-	}
-	
-*/
-	return linearDepth;
 };
 
 /**
@@ -872,43 +829,6 @@ ManagerUtils.calculatePixelPositionCamCoord = function(gl, pixelX, pixelY, resul
 {
 	var sceneState = magoManager.sceneState;
 
-	// New.*** New.*** New.*** New.*** New.*** New.*** New.*** New.*** New.*** New.*** New.*** New.*** New.*** New.*** New.*** New.*** New.*** New.***
-	/*
-	if (depthFbo) 
-	{
-		depthFbo.bind(); 
-	}
-	
-	
-	var screenW = sceneState.drawingBufferWidth;
-	var screenH = sceneState.drawingBufferHeight;
-
-	// Now, read the pixel and find the pixel position.
-	var depthPixels = new Uint8Array(4 * 1 * 1); // 4 x 1x1 pixel.
-	gl.readPixels(pixelX, screenH - pixelY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, depthPixels);
-	
-	// Unpack the depthPixels.
-	//var dot(packedDepth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));
-
-	var zDepth2 = depthPixels[0]/(256.0*256.0*256.0) + depthPixels[1]/(256.0*256.0) + depthPixels[2]/256.0 + depthPixels[3]; 
-	var zDepth = depthPixels[3]/(256.0*256.0*256.0) + depthPixels[2]/(256.0*256.0) + depthPixels[1]/256.0 + depthPixels[0]; 
-	
-	//zDepth /= 256.0;
-	// Calculate NDC coord.
-	var depthRange_near = 0.0;
-	var depthRange_far = 1.0;
-	var screenPos = new Point2D(pixelX/screenW, pixelY/screenH);
-	var xNdc = 2.0 * screenPos.x - 1.0;
-	var yNdc = 2.0 * screenPos.y - 1.0;
-	var zNdc = (2.0 * zDepth - depthRange_near - depthRange_far) / (depthRange_far - depthRange_near);
-	
-	var projectMatInv = sceneState.getProjectionMatrixInv();
-	var viewPosH = projectMatInv.transformPoint4D__test([xNdc, yNdc, zNdc, 1.0], undefined);
-	var viewPosCC = new Point3D(viewPosH[0]/viewPosH[3], viewPosH[1]/viewPosH[3], viewPosH[2]/viewPosH[3]);
-	
-	//********************************************************************************************************************************************
-	// Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.***
-	*/
 	if (frustumFar === undefined)
 	{ frustumFar = sceneState.camera.frustum.far[0]; }
 
@@ -985,6 +905,67 @@ ManagerUtils.cameraCoordPositionToWorldCoord = function(camCoordPos, resultWorld
 	{ var resultWorldPos = new Point3D(); }
 	resultWorldPos = mv_inv.transformPoint3D(camCoordPos, resultWorldPos);
 	return resultWorldPos;
+};
+
+/**
+ * Detect depth in pixel
+ * @param {Number} pixelX Screen x position of the pixel.
+ * @param {Number} pixelY Screen y position of the pixel.
+ * @param {MagoManager} magoManager Mago3D main manager.
+ * @returns {boolean}
+ */
+ManagerUtils.detectedDepth = function(pixelX, pixelY, magoManager) {
+	var gl = magoManager.getGl();
+
+	// Test the new method: depth + normal + frustumIdx.************************************************************************
+	var texturesMergerFbo = magoManager.texturesManager.texturesMergerFbo;
+	var depthTex = texturesMergerFbo.colorBuffer;
+	var normalTex = texturesMergerFbo.colorBuffer1;
+	var resultObject = ManagerUtils.calculatePixelLinearDepthV2(gl, pixelX, pixelY, depthTex, normalTex, magoManager);
+	
+	return (resultObject.frustumIdx < magoManager.numFrustums) ? true : false;
+}
+
+/**
+ * Calculates the world coordinates in pixel position check gl's depth buffer.
+ * @param {Number} pixelX Screen x position of the pixel.
+ * @param {Number} pixelY Screen y position of the pixel.
+ * @param {MagoManager} magoManager Mago3D main manager.
+ * @returns {Point3D}
+ */
+ManagerUtils.screenCoordToWorldCoordUseDepthCheck = function(pixelX, pixelY, magoManager) 
+{
+	var worldCoordinate;
+	var gl = magoManager.getGl();
+
+	// Test the new method: depth + normal + frustumIdx.************************************************************************
+	var texturesMergerFbo = magoManager.texturesManager.texturesMergerFbo;
+	var depthTex = texturesMergerFbo.colorBuffer;
+	var normalTex = texturesMergerFbo.colorBuffer1;
+	var resultObject = ManagerUtils.calculatePixelLinearDepthV2(gl, pixelX, pixelY, depthTex, normalTex, magoManager);
+	
+	var depthDetected = (resultObject.frustumIdx < magoManager.numFrustums) ? true : false;
+	if (!depthDetected && magoManager.isCesiumGlobe())
+	{
+		var scene = magoManager.scene;
+		var camera = scene.frameState.camera;
+		var ray = camera.getPickRay(new Cesium.Cartesian2(pixelX, pixelY));
+		worldCoordinate = scene.globe.pick(ray, scene);
+	}
+	else 
+	{
+		var camCoord = MagoWorld.screenToCamCoord(pixelX, pixelY, magoManager, camCoord, resultObject);
+		if (!camCoord)
+		{
+			worldCoordinate = undefined;
+		} 
+		else 
+		{
+			worldCoordinate = ManagerUtils.cameraCoordPositionToWorldCoord(camCoord, worldCoordinate, magoManager, resultObject);
+		}
+	}
+
+	return worldCoordinate;
 };
 
 /**

@@ -389,6 +389,7 @@ MagoManager.EVENT_TYPE = {
 	'CAMERAMOVESTART'         : 'cameramovestart',
 	'ANIMATIONEND'         : 'animationEnd',
 	'ANIMATIONING'         : 'animationing',
+	'VALIDHEIGHTEND'         : 'validHeightEnd'
 };
 
 /**
@@ -2031,6 +2032,11 @@ MagoManager.prototype.validateHeight = function(frustumObject)
 						var cp = currentGeoLocationData.geographicCoord;
 						n.changeLocationAndRotation(cp.latitude, cp.longitude, n.caculateHeightByReference(samplePositions[k].height), currentGeoLocationData.heading, currentGeoLocationData.pitch, currentGeoLocationData.roll, obj.mm);
 					}
+					obj.mm.emit(MagoManager.EVENT_TYPE.VALIDHEIGHTEND, {
+						type   : MagoManager.EVENT_TYPE.VALIDHEIGHTEND,
+						validDataArray : nArray,
+						timestamp: new Date()
+					});
 				}
 			});
 		});
@@ -2076,9 +2082,14 @@ MagoManager.prototype.validateHeight = function(frustumObject)
 					for (var k=0, slen=samplePositions.length;k<slen;k++) 
 					{
 						var n = nArray[k];
-						n.setTerrainHeight(samplePositions[k].height);
+						var vHeight = samplePositions[k].height;
+						n.setTerrainHeight(vHeight);
 					}
-
+					obj.mm.emit(MagoManager.EVENT_TYPE.VALIDHEIGHTEND, {
+						type   : MagoManager.EVENT_TYPE.VALIDHEIGHTEND,
+						validDataArray : nArray,
+						timestamp: new Date()
+					});
 					that._needValidHeightNativeArray.length = 0;
 				}
 			});
@@ -5699,7 +5710,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	if (!this.isCesiumGlobe())
 	{
 		var supportEXT = gl.getSupportedExtensions().indexOf("EXT_frag_depth");
-		if (supportEXT)
+		if (supportEXT > -1)
 		{
 			gl.getExtension("EXT_frag_depth");
 		}
@@ -5711,7 +5722,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 
 	this.postFxShadersManager.bUseMultiRenderTarget = false;
 	var supportEXT = gl.getSupportedExtensions().indexOf("WEBGL_draw_buffers");
-	if (supportEXT)
+	if (supportEXT > -1)
 	{
 		var extbuffers = gl.getExtension("WEBGL_draw_buffers");
 		this.postFxShadersManager.bUseMultiRenderTarget = true;
@@ -5746,6 +5757,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
 	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
 	shader.uFrustumIdx_loc = gl.getUniformLocation(shader.program, "uFrustumIdx");
+	shader.bUseMultiRenderTarget_loc = gl.getUniformLocation(shader.program, "bUseMultiRenderTarget");
 
 	// 2) ModelReferences colorCoding shader.***********************************************************************
 	var shaderName = "modelRefColorCoding";
@@ -7001,15 +7013,21 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 				{
 					attributes.label = label;
 				}
+				attributes.fromDate = new Date();
+				attributes.toDate = new Date();
 			}
 
 			if (longitude && latitude)
 			{
 				// this is root node.
-				if (height === undefined)
+				if (height === undefined || height === null)
 				{ height = 0; }
+				if(attributes.heightReference === HeightReference.RELATIVE_TO_GROUND) {
+					data.relativeHeight = height;
+				} else {
+					data.relativeHeight = 0;
+				}
 				
-				data.originalHeight = height;
 				data.geographicCoord = new GeographicCoord();
 				data.geographicCoord.setLonLatAlt(longitude, latitude, height);
 				
@@ -7443,7 +7461,15 @@ MagoManager.prototype.instantiateStaticModel = function(attributes)
 		node.data.geographicCoord = geoCoord;
 		node.data.rotationsDegree = new Point3D(pitch, roll, heading);
 		node.data.geoLocDataManager = geoLocDataManager;
-		node.data.originalHeight = altitude;
+
+		if(attributes.heightReference === HeightReference.RELATIVE_TO_GROUND) {
+			node.data.relativeHeight = geoCoord.altitude;
+		} else {
+			node.data.relativeHeight = 0;
+		}
+
+		node.data.attributes.fromDate = new Date();
+		node.data.attributes.toDate = new Date();
 		
 		// Now, insert node into smartTile.***
 		var targetDepth = 12;
@@ -7751,13 +7777,14 @@ MagoManager.prototype.callAPI = function(api)
 								if (node === undefined || node.data === undefined)
 								{ continue; }
 							
-								node.data.isColorChanged = false;
-								node.data.colorChangedHistoryMap = undefined;
+								node.deleteChangeColor(this);
 								
 								var neoBuilding = node.data.neoBuilding;
 								if (neoBuilding === undefined)
 								{ continue; }
-							
+
+								neoBuilding.deleteChangeColor(this, objectId);
+								/*
 								var refObjectArray = neoBuilding.getReferenceObjectsArrayByObjectId(objectId);
 								if (refObjectArray === undefined)
 								{ continue; }
@@ -7768,9 +7795,10 @@ MagoManager.prototype.callAPI = function(api)
 									var refObject = refObjectArray[i];
 									if (refObject)
 									{
-										refObject.aditionalColor = undefined;
+										refObject.deleteChangeColor();
 									}
-								}	
+								}
+								*/
 							}
 						}	
 					}

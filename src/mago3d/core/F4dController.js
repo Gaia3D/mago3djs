@@ -273,7 +273,45 @@ F4dController.prototype.getF4dGroup = function(groupId)
 	return this.magoManager.hierarchyManager.projectsMap[groupId];
 };
 
+/**
+ * return static model project id list
+ * @return {Array<string>}
+ */
+F4dController.prototype.getStaticModelGroupKeys = function() 
+{
+	var groupKeys = [];
+	var staticModelsManager = this.magoManager.hierarchyManager.staticModelsManager;
+	if(staticModelsManager) 
+	{
+		if(staticModelsManager.staticModelsMap){
+			groupKeys = Object.keys(staticModelsManager.staticModelsMap);
+		}
+	}
 
+	return groupKeys;
+}
+
+/**
+ * return static model data (Node) object
+ * obejct key equal group key(project id)
+ * object values equal static model object, have data in group
+ * static model object key equal instance id, and value equal instance (Node)
+ * @return {object}
+ */
+F4dController.prototype.getStaticModelObject = function() 
+{
+	var groupKeys = this.getStaticModelGroupKeys();
+	var obj;
+	for(var i=0,groupKeyLenth=groupKeys.length; i<groupKeyLenth; i++) {
+		var groupKey = groupKeys[i];
+		var group = this.getF4dGroup(groupKey);
+		if(!obj) obj={};
+
+		obj[groupKey] = group;
+	}
+
+	return obj;
+}
 
 F4dController.f4dObjectValidate = function(f4dObject) 
 {

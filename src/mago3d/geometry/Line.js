@@ -59,7 +59,28 @@ Line.prototype.getProjectedPoint = function(point, projectedPoint)
 	
 	return projectedPoint;
 };
+/**
+ * get distance from argument point
+ * @param {Point3D} point 
+ * @return {number}
+ */
+Line.prototype.getDistToPoint = function(point)
+{
+	var projectedPoint = this.getProjectedPoint(point);
+	return projectedPoint.distToPoint(point);
+}
+/**
+ * return whether intersects with shpere
+ * @param {BoundingSphere|Sphere} sphere 
+ * @return {boolean} 
+ */
+Line.prototype.intersectsWithSphere = function(sphere) {
+	var sphereCenter = sphere.centerPoint;
+	var radius = sphere.r;
+	var dist = this.getDistToPoint(sphereCenter);
 
+	return dist < radius;
+}
 /**
  * Check whether the given point is on this line or not
  * @param {Point3D} point the given point

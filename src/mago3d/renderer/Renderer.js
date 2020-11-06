@@ -468,6 +468,7 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 		gl.uniform1f(currentShader.uFCoef_logDepth_loc, sceneState.fCoef_logDepth[0]);
 		gl.uniform1i(currentShader.bHasTexture_loc , false);
 		gl.uniform1i(currentShader.uFrustumIdx_loc, magoManager.currentFrustumIdx);
+		gl.uniform1i(currentShader.bUseMultiRenderTarget_loc, magoManager.postFxShadersManager.bUseMultiRenderTarget);
 
 		currentShader.bindUniformGenerals();
 		gl.uniform3fv(currentShader.scaleLC_loc, [1.0, 1.0, 1.0]); // init referencesMatrix.
@@ -499,8 +500,11 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 		currentShader.bindUniformGenerals();
 		gl.uniform3fv(currentShader.scaleLC_loc, [1.0, 1.0, 1.0]); // init referencesMatrix.
 		gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
+		gl.uniform1i(currentShader.bHasTexture_loc , false);
 		gl.uniform1i(currentShader.uFrustumIdx_loc, magoManager.currentFrustumIdx);
-		
+		gl.uniform1i(currentShader.bUseMultiRenderTarget_loc, magoManager.postFxShadersManager.bUseMultiRenderTarget);
+		gl.uniform1i(currentShader.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
+
 		// check if exist clippingPlanes.
 		if (magoManager.modeler.clippingBox !== undefined)
 		{

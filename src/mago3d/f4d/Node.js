@@ -499,7 +499,7 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	// Check the geoLocationDatasCount & check if is a ghost-trail-render (trail as ghost).
 	// Check if is trail-render.*
 	var isTrailRender = this.data.isTrailRender;
-	if (isTrailRender !== undefined && isTrailRender === true)
+	if (isTrailRender !== undefined && isTrailRender === true && renderType === 1)
 	{
 		magoManager.isTrailRender = true;
 		gl.depthRange(0.1, 1); // reduce depthRange to minimize blending flickling.
@@ -962,6 +962,10 @@ Node.prototype.finishedAnimation = function(magoManager)
 	var animType = animData.animationType;
 	if (animType === CODE.animationType.PATH)
 	{
+		if(animData.stop) {
+			animData.lastTime = currTime;
+			return false; 
+		}
 		// Test.***
 		var nextPosLine = AnimationManager.getNextPosition(animData, currTime, magoManager);
 		
@@ -1480,9 +1484,11 @@ Node.prototype.caculateHeightByReference = function(terrainHeight)
 		height = terrainHeight + halfZlength;
 	}
 
+	this.data.surfaceHeight = height;
+
 	if (this.data.attributes.heightReference === HeightReference.RELATIVE_TO_GROUND) 
 	{
-		height += this.data.originalHeight;// cp.altitude;
+		height += this.data.relativeHeight;// cp.altitude;
 	}
 
 	return height;
@@ -1510,3 +1516,62 @@ Node.prototype.getHeightReference = function()
 {
 	return this.data.attributes.heightReference;
 };
+
+/**
+ * 색상 변경 삭제
+ * @param {MagoManager} magoManager
+ */
+Node.prototype.deleteChangeColor = function(magoManager)
+{
+	if (this.data === undefined)
+	{ return false; }
+
+	this.data.isColorChanged = false;
+	this.data.colorChangedHistoryMap = undefined;
+
+	magoManager.config.deleteF4dColorHistory(this.data.projectId, this.data.nodeId);
+};
+
+/**
+ * set From date
+ * @param {Date} fromDate 
+ */
+Node.prototype.setFromDate = function(fromDate) {
+	if(!fromDate || !(fromDate instanceof Date)) {
+		throw new Error('fromDate is required(Date Type).');
+	}
+	if(!this.isReadyToRender()) {
+		throw new Error('this date is not ready to use.');
+	}
+
+	this.data.attributes.fromDate = fromDate;
+}
+/**
+ * get From date
+ * @return {Date}
+ */
+Node.prototype.getFromDate = function() {
+	return this.data.attributes.fromDate;
+}
+
+/**
+ * set To date
+ * @param {Date} toDate 
+ */
+Node.prototype.setToDate = function(toDate) {
+	if(!toDate || !(toDate instanceof Date)) {
+		throw new Error('toDate is required(Date Type).');
+	}
+	if(!this.isReadyToRender()) {
+		throw new Error('this date is not ready to use.');
+	}
+
+	this.data.attributes.toDate = toDate;
+}
+/**
+ * get To date
+ * @return {Date}
+ */
+Node.prototype.getToDate = function() {
+	return this.data.attributes.toDate;
+}

@@ -450,6 +450,21 @@ MagoConfig.prototype.deleteColorHistory = function(projectId, dataKey, objectId)
 };
 
 /**
+ * 색깔 변경 이력을 삭제
+ */
+MagoConfig.prototype.deleteF4dColorHistory = function(projectId, dataKey)
+{
+	// projectId 별 Object을 검사
+	var projectIdObject = this.colorHistoryObject[projectId];
+	if (projectIdObject === undefined) { return undefined; }
+	// dataKey 별 Object을 검사
+	var dataKeyObject = projectIdObject[dataKey];
+	if (dataKeyObject === undefined) { return undefined; }
+	// objectIndexOrder 를 저장
+	return delete projectIdObject[dataKey];
+};
+
+/**
  * 모든 색깔변경 히스토리 삭제
  */
 MagoConfig.prototype.clearColorHistory = function() 

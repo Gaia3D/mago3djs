@@ -25,6 +25,7 @@ uniform bool bApplyClippingPlanes;
 uniform int clippingPlanesCount;
 uniform vec4 clippingPlanes[6];
 uniform bool bUseLogarithmicDepth;
+uniform bool bUseMultiRenderTarget;
 uniform int uFrustumIdx;
 
 varying float depth;  
@@ -121,8 +122,11 @@ void main()
 	frustumIdx = 0.035;
 
 	#ifdef USE_MULTI_RENDER_TARGET
-	vec3 encodedNormal = encodeNormal(vNormal);
-	gl_FragData[1] = vec4(encodedNormal, frustumIdx); // save normal.***
+	if(bUseMultiRenderTarget)
+	{
+		vec3 encodedNormal = encodeNormal(vNormal);
+		gl_FragData[1] = vec4(encodedNormal, frustumIdx); // save normal.***
+	}
 	#endif
 	
 

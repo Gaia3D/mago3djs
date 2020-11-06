@@ -146,13 +146,19 @@ RotateInteraction.prototype.handleDragEvent = function(browserEvent)
 
 		var currentGeoLocData = this.target.getCurrentGeoLocationData();
 		var currentGeoCoord = currentGeoLocData.geographicCoord;
-		var currentLon = currentGeoCoord.longtitude;
-		var currentLat = currentGeoCoord.longtitude;
+		var currentLon = currentGeoCoord.longitude;
+		var currentLat = currentGeoCoord.latitude;
 		var currentAlt = currentGeoCoord.altitude;
 		var currentRoll = currentGeoLocData.roll;
 		var currentPitch = currentGeoLocData.pitch;
 
-		this.target.changeLocationAndRotation(currentLon, currentLat, currentAlt, -rdeg, currentRoll, currentPitch);
+		this.target.changeLocationAndRotation(currentLat, currentLon, currentAlt, -rdeg, currentRoll, currentPitch);
+		/*if(this.target instanceof Node) {
+			this.target.changeLocationAndRotation(currentLat, currentLon, currentAlt, -rdeg, currentRoll, currentPitch);
+		} else if (this.target instanceof MagoRenderable) {
+			this.target.changeLocationAndRotation(currentLon, currentLat, currentAlt, -rdeg, currentRoll, currentPitch);
+		}*/
+		
 	}
 };
 

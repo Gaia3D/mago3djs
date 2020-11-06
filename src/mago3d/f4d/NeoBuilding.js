@@ -2012,39 +2012,27 @@ NeoBuilding.prototype.renderDetailed = function(magoManager, shader, renderType,
 	return octreesRenderedCount;
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/**
+ * 오브젝트의 색상 변경 이력 삭제
+ * @param {MagoManager} magoManager
+ * @param {String} objectId 삭제할 오브젝트 아이디
+ */
+NeoBuilding.prototype.deleteChangeColor = function(magoManager, objectId) 
+{
+	var refObjectArray = this.getReferenceObjectsArrayByObjectId(objectId);
+	if (refObjectArray === undefined)
+	{ return; }
+	
+	var refObjectsCount = refObjectArray.length;
+	var projectId = this.nodeOwner.data.projectId;
+	var dataKey = this.nodeOwner.data.nodeId;
+	for (var i=0; i<refObjectsCount; i++)
+	{
+		var refObject = refObjectArray[i];
+		if (refObject)
+		{
+			refObject.deleteChangeColor();
+		}
+	}
+	magoManager.config.deleteColorHistory(projectId, dataKey, objectId);
+}

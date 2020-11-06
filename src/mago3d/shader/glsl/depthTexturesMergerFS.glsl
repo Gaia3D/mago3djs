@@ -116,7 +116,9 @@ void main()
 
     if(!isValid)
     {
+        #ifdef USE_MULTI_RENDER_TARGET
         gl_FragData[1] = vec4(0.0, 0.0, 0.0, 1.0);
+        #endif
         return;
     }
     //discard;

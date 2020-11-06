@@ -132,7 +132,7 @@ AbsPointerInteraction.prototype.handle = function(browserEvent)
  */
 AbsPointerInteraction.prototype.handleDownEvent = function(browserEvent)
 {
-	return abstract();
+	return throwAbstractError();
 };
 
 /**
@@ -141,7 +141,7 @@ AbsPointerInteraction.prototype.handleDownEvent = function(browserEvent)
  */
 AbsPointerInteraction.prototype.handleDragEvent = function(browserEvent)
 {
-	return abstract();
+	return throwAbstractError();
 };
 
 /**
@@ -150,7 +150,7 @@ AbsPointerInteraction.prototype.handleDragEvent = function(browserEvent)
  */
 AbsPointerInteraction.prototype.handleMoveEvent = function(browserEvent)
 {
-	return abstract();
+	return throwAbstractError();
 };
 
 /**
@@ -159,5 +159,5 @@ AbsPointerInteraction.prototype.handleMoveEvent = function(browserEvent)
  */
 AbsPointerInteraction.prototype.handleUpEvent = function(browserEvent)
 {
-	return abstract();
+	return throwAbstractError();
 };
