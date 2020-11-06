@@ -162,7 +162,7 @@
 		magoManager.on(Mago3D.MagoManager.EVENT_TYPE.DESELECTEDF4D, function(e){
 			console.info(e);
 		});
-
+		/*
 		var f4dController = e.getF4dController();
 		f4dController.addSmartTileGroup({
             dataGroupId : 10000,
@@ -179,15 +179,16 @@
             dataGroupName : '계양시 건물들',
             dataGroupPath : 'sKorea_Gyeonggi_Gwacheon/',
             smartTileIndexPath: "_TILE"
-        });
+		});
+		*/
 	}
-	// 3ds, pointsCloud, sihung_campus, sihung_las, suseong, IncheonGayang
+	// 3ds, pointsCloud, sihung_campus, sihung_las, suseong, IncheonGayang, IncheonGyeyang_2
 	function doTest(){
 		var f4dController = MAGO3D_INSTANCE.getF4dController();
 		var magoManager = MAGO3D_INSTANCE.getMagoManager();
 
 		$.ajax({
-			url: dataInformationUrl + "IncheonGayang.json",
+			url: dataInformationUrl + "IncheonGyeyang_2.json",
 			type: "GET",
 			dataType: "json",
 			success: function(f4dObject){

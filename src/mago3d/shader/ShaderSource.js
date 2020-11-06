@@ -4944,6 +4944,14 @@ void main()\n\
         factorByDist = smoothstep(0.0, 1.0, realDist/(aux));\n\
     }\n\
 \n\
+    // Now, factorByFarDist. When object are in far, no apply ssao.\n\
+    float factorByFarDist = 1.0;\n\
+    factorByFarDist = 1000.0/realDist;\n\
+    if(factorByFarDist > 1.0)\n\
+    factorByFarDist = 1.0;\n\
+\n\
+    factorByDist *= factorByFarDist;\n\
+\n\
     // General data type.*************************************************************************************\n\
     if(dataType == 0 && bApplySsao)\n\
 	{        \n\
