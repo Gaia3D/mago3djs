@@ -36,6 +36,25 @@ VtxRingsList.prototype.deleteObjects = function()
 	}
 };
 
+/**
+ * set the color for all vertices of the ring
+ * @param {Number} r Red component of the color
+ * @param {Number} g Green component of the color
+ * @param {Number} b Blue component of the color
+ * @param {Number} alpha Alpha component of the color
+ */
+VtxRingsList.prototype.setColorRGBAVertices = function(r, g, b, alpha)
+{
+	if (this.vtxRingsArray !== undefined)
+	{
+		var vtxRingsCount = this.vtxRingsArray.length;
+		for (var i=0; i<vtxRingsCount; i++)
+		{
+			this.vtxRingsArray[i].setColorRGBAVertices(r, g, b, alpha);
+		}
+	}
+};
+
 
 /**
  * get vtxRing count.

@@ -407,6 +407,24 @@ VertexList.prototype.setNormal = function(nx, ny, nz)
 };
 
 /**
+ * set color rgba
+ * @param {Number} r Red component of the color
+ * @param {Number} g Green component of the color
+ * @param {Number} b Blue component of the color
+ * @param {Number} alpha Alpha component of the color
+ */
+VertexList.prototype.setColorRGBA = function(r, g, b, alpha) 
+{
+	var vertex;
+	var vertexCount = this.getVertexCount();
+	for (var i=0; i<vertexCount; i++)
+	{
+		vertex = this.getVertex(i);
+		vertex.setColorRGBA(r, g, b, alpha);
+	}
+};
+
+/**
  * add vertex and return.
  * @returns {Vertex}
  */

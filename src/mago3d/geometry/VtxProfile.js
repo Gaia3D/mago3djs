@@ -233,19 +233,42 @@ VtxProfile.prototype.getProjectedProfile2D = function(resultProfile2d)
  * 
  * @see VtxRing#makeByPoints3DArray
  */
-VtxProfile.prototype.makeByPoints3DArray = function(outerPoints3dArray, innerPoints3dArrayArray)
+VtxProfile.prototype.makeByPoints3DArray = function(outerPoints3dArray, innerPoints3dArrayArray, options)
 {
 	if (outerPoints3dArray === undefined)
 	{ return; }
+
+	var outerRingOptions;
+	if(options)
+	{
+		if(options.outerVtxRingOptions)
+		outerRingOptions = options.outerVtxRingOptions;
+	}
 	
 	// outer.
 	if (this.outerVtxRing === undefined)
 	{ this.outerVtxRing = new VtxRing(); }
 
-	this.outerVtxRing.makeByPoints3DArray(outerPoints3dArray);
+	this.outerVtxRing.makeByPoints3DArray(outerPoints3dArray, outerRingOptions);
 	
 	// inners.
 	// todo:
+};
+
+/**
+ * set the color for all vertices of the ring
+ * @param {Number} r Red component of the color
+ * @param {Number} g Green component of the color
+ * @param {Number} b Blue component of the color
+ * @param {Number} alpha Alpha component of the color
+ */
+VtxProfile.prototype.setColorRGBAVertices = function(r, g, b, alpha)
+{
+	if (this.outerVtxRing !== undefined)
+	{ this.outerVtxRing.setColorRGBAVertices(r, g, b, alpha); }
+	
+	if (this.innerVtxRingsList !== undefined)
+	{ this.innerVtxRingsList.setColorRGBAVertices(r, g, b, alpha); }
 };
 
 /**

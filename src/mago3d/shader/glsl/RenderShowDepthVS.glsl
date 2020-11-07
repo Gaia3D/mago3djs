@@ -69,6 +69,10 @@ void main()
 	vec3 rotatedNormal = currentTMat * normal;
 	vNormal = normalize((normalMatrix4 * vec4(rotatedNormal, 1.0)).xyz); // original.***
 
+	// When render with cull_face disabled, must correct the faces normal.
+	if(vNormal.z < 0.0)
+	vNormal *= -1.0;
+
 	/*
 	float z_ndc = (2.0 * z_window - depthRange_near - depthRange_far) / (depthRange_far - depthRange_near);
 	vec4 viewPosH = projectionMatrixInv * vec4(x_ndc, y_ndc, z_ndc, 1.0);

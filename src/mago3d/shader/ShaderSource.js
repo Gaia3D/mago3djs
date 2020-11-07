@@ -2253,119 +2253,10 @@ void main()\n\
 	vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
 	float linearDepth = getDepth(screenPos);   \n\
 	vec3 ray = getViewRay(screenPos); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
-	scalarProd = dot(normal2, normalize(-ray));\n\
+	scalarProd = abs(dot(normal2, normalize(-ray)));\n\
 	//scalarProd *= scalarProd;\n\
 	scalarProd *= 0.6;\n\
 	scalarProd += 0.4;\n\
-\n\
-	//vec3 normalFromDepth = normal_from_depth(linearDepth, screenPos); // normal from depthTex.***\n\
-	//normal2 = normalFromDepth;\n\
-	//float edgeOccl = 1.0;\n\
-	/*\n\
-	if(bApplySsao)\n\
-	{   \n\
-		//if(linearDepth<0.996 && linearDepth>0.001005)\n\
-		if(linearDepth<0.995 && linearDepth>0.0011)\n\
-		//if(linearDepth<0.995 && linearDepth>0.0079)\n\
-		{\n\
-				//occlusion = 1.0;\n\
-			\n\
-			//Test.********************************************************************************************\n\
-			// NDC : the center of the screen is 0.0.0.***\n\
-			////float depthRange_near = 0.0;\n\
-			////float depthRange_far = 1.0;\n\
-			////float x_ndc = 2.0 * screenPos.x - 1.0;\n\
-			////float y_ndc = 2.0 * screenPos.y - 1.0;\n\
-			////float z_ndc = (2.0 * linearDepth - depthRange_near - depthRange_far) / (depthRange_far - depthRange_near);\n\
-			\n\
-			////vec4 viewPosH = projectionMatrixInv * vec4(x_ndc, y_ndc, z_ndc, 1.0);\n\
-			////vec3 posCC = viewPosH.xyz/viewPosH.w;\n\
-			////vec3 origin = vec3(posCC.xyz);  \n\
-			// EndTest.----------------------------------------------------------------------------------------\n\
-\n\
-			vec3 origin = ray * linearDepth;  // original.***\n\
-			float distToCam = -origin.z*0.01;\n\
-			if(distToCam < 1.0)\n\
-			distToCam = 1.0;\n\
-			float radiusAux = 1.0;\n\
-			float tolerance = (radiusAux)/far; // original.***\n\
-			tolerance = 0.0;\n\
-\n\
-			vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
-			vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
-			vec3 bitangent = cross(normal2, tangent);\n\
-			mat3 tbn = mat3(tangent, bitangent, normal2);   \n\
-			float minDepthBuffer;\n\
-			float maxDepthBuffer;\n\
-			for(int i = 0; i < kernelSize; ++i)\n\
-			{    	 \n\
-				vec3 sample = origin + (tbn * vec3(kernel[i].x*1.0, kernel[i].y*1.0, kernel[i].z)) * radiusAux;\n\
-				vec4 offset = projectionMatrix * vec4(sample, 1.0);					\n\
-				offset.xyz /= offset.w;\n\
-				offset.xyz = offset.xyz * 0.5 + 0.5;  				\n\
-				float sampleDepth = -sample.z/far;// original.***\n\
-\n\
-				//if(linearDepth < 0.1 || linearDepth > 0.9)\n\
-				//continue;\n\
-\n\
-				// check if offset.xy is different of screenPos.***\n\
-				//if(int(offset.x * screenWidth) == int(gl_FragCoord.x) && int(offset.y * screenHeight) == int(gl_FragCoord.y))\n\
-				//if(abs(offset.x * screenWidth - gl_FragCoord.x) < 1.5 && abs(offset.y * screenHeight - gl_FragCoord.y) < 1.5)\n\
-				//continue;\n\
-\n\
-				//if(offset.z < -0.1)// || offset.z > 0.99)\n\
-				//continue;\n\
-\n\
-				float depthBufferValue = getDepth(offset.xy);\n\
-				\n\
-				\n\
-				////if(depthBufferValue > 0.00391 && depthBufferValue < 0.00393)\n\
-				////{\n\
-				////	if (depthBufferValue < sampleDepth-tolerance*1000.0)\n\
-				////	{\n\
-				////		occlusion +=  0.5;\n\
-				////	}\n\
-				////	\n\
-				////	continue;\n\
-				////}			\n\
-				\n\
-				if (depthBufferValue < sampleDepth-tolerance)\n\
-				{\n\
-					occlusion +=  1.0;\n\
-				}\n\
-			} \n\
-		}\n\
-		//occlusion = 1.0 - occlusion / float(kernelSize);	\n\
-		float smallOccl = occlusion / float(kernelSize);\n\
-		smallOccl = 0.0;\n\
-		\n\
-		// test.***\n\
-		//ssaoFromDepthTex\n\
-		float pixelSize_x = 1.0/screenWidth;\n\
-		float pixelSize_y = 1.0/screenHeight;\n\
-		vec4 occlFromDepth = vec4(0.0);\n\
-		for(int i=0; i<4; i++)\n\
-		{\n\
-			for(int j=0; j<4; j++)\n\
-			{\n\
-				vec2 texCoord = vec2(screenPos.x + pixelSize_x*float(i-2), screenPos.y + pixelSize_y*float(j-2));\n\
-				vec4 color = texture2D(ssaoFromDepthTex, texCoord);\n\
-				occlFromDepth += color;\n\
-			}\n\
-		}\n\
-\n\
-		occlFromDepth /= 16.0;\n\
-		occlFromDepth *= 0.35;\n\
-\n\
-		occlusion = 1.0 - smallOccl - occlFromDepth.r - occlFromDepth.g - occlFromDepth.b - occlFromDepth.a; // original.***\n\
-		//occlusion = 1.0 - smallOccl;\n\
-\n\
-		if(occlusion < 0.1)\n\
-		occlusion = 0.1;\n\
-\n\
-		\n\
-	}\n\
-	*/\n\
 \n\
 	occlusion = 1.0;\n\
 \n\
@@ -4036,6 +3927,10 @@ void main()\n\
 	// Calculate normalCC.***\n\
 	vec3 rotatedNormal = currentTMat * normal;\n\
 	vNormal = normalize((normalMatrix4 * vec4(rotatedNormal, 1.0)).xyz); // original.***\n\
+\n\
+	// When render with cull_face disabled, must correct the faces normal.\n\
+	if(vNormal.z < 0.0)\n\
+	vNormal *= -1.0;\n\
 \n\
 	/*\n\
 	float z_ndc = (2.0 * z_window - depthRange_near - depthRange_far) / (depthRange_far - depthRange_near);\n\

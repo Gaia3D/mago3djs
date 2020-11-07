@@ -201,10 +201,16 @@ VtxRing.prototype.getProjectedPolyLineBasedRing2D = function(resultRing2d, norma
  * 
  * @see VertexList#copyFromPoint3DArray
  */
-VtxRing.prototype.makeByPoints3DArray = function(point3dArray)
+VtxRing.prototype.makeByPoints3DArray = function(point3dArray, options)
 {
 	if (point3dArray === undefined)
 	{ return; }
+
+	if(options)
+	{
+		if(options.isOpen)
+		this.setIsOpen(options.isOpen);
+	}
 	
 	if (this.vertexList === undefined)
 	{ this.vertexList = new VertexList(); }
@@ -220,6 +226,18 @@ VtxRing.prototype.makeByPoints3DArray = function(point3dArray)
 		vertex.setVertexType(1);
 	}
 	this.calculateElementsIndicesRange();
+};
+
+/**
+ * set the color for all vertices of the ring
+ * @param {Number} r Red component of the color
+ * @param {Number} g Green component of the color
+ * @param {Number} b Blue component of the color
+ * @param {Number} alpha Alpha component of the color
+ */
+VtxRing.prototype.setColorRGBAVertices = function(r, g, b, alpha)
+{
+	this.vertexList.setColorRGBA(r, g, b, alpha);
 };
 
 /**
@@ -297,6 +315,14 @@ VtxRing.prototype.calculatePlaneNormal = function(resultPlaneNormal)
 /**
  * calculate elements indices range.
  */
+VtxRing.prototype.setIsOpen = function(bIsOpen)
+{
+	this.isOpen = bIsOpen;
+};
+
+/**
+ * calculate elements indices range.
+ */
 VtxRing.prototype.calculateElementsIndicesRange = function()
 {
 	if (this.vertexList === undefined)
@@ -310,6 +336,10 @@ VtxRing.prototype.calculateElementsIndicesRange = function()
 	var idxRange = undefined;
 	var vertexType;
 	var vertexCount = this.vertexList.getVertexCount();
+
+	//if(this.isOpen)
+	//vertexCount -= 1;
+
 	for (var i=0; i<vertexCount; i++)
 	{
 		vertex = this.vertexList.getVertex(i);
@@ -330,8 +360,22 @@ VtxRing.prototype.calculateElementsIndicesRange = function()
 			}
 			if (i !== vertexCount)
 			{
-				idxRange = this.newElementIndexRange();
-				idxRange.strIdx = i;
+				if(i === vertexCount -1)
+				{
+					if(!this.isOpen)
+					{
+						idxRange = this.newElementIndexRange();
+						idxRange.strIdx = i;
+					}
+					else
+					idxRange = undefined;
+				}
+				else
+				{
+					idxRange = this.newElementIndexRange();
+					idxRange.strIdx = i;
+				}
+				
 			}
 		}
 	}

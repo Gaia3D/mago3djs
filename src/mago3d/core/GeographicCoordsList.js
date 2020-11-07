@@ -714,6 +714,9 @@ GeographicCoordsList.prototype.getExtrudedWallRenderableObject = function(height
 	var geoLocData = resultRenderableObject.geoLocDataManager.newGeoLocationData();
 
 	var doubleFace = false;
+	var colorTop = undefined;
+	var colorBottom = undefined;
+	var polyLineLoop = false;
 	if(options)
 	{
 		if(options.doubleFace)
@@ -721,6 +724,15 @@ GeographicCoordsList.prototype.getExtrudedWallRenderableObject = function(height
 			doubleFace = true;
 			resultRenderableObject.attributes.doubleFace = true;
 		}
+
+		if(options.colorTop)
+		colorTop = options.colorTop;
+
+		if(options.colorBottom)
+		colorBottom = options.colorBottom;
+
+		if(options.polyLineLoop)
+		polyLineLoop = options.polyLineLoop;
 	}
 	
 	// The origin of this object is in the middle of this geoCoordsList.
@@ -739,11 +751,25 @@ GeographicCoordsList.prototype.getExtrudedWallRenderableObject = function(height
 	
 	// Now, with basePoints3dArray & topPoints3dArray make a mesh.
 	// Create a VtxProfilesList.
+	var isOpen = !polyLineLoop;
+	var options = {
+		outerVtxRingOptions : {
+			isOpen : isOpen
+		}
+	};
+
 	var vtxProfilesList = new VtxProfilesList();
 	var baseVtxProfile = vtxProfilesList.newVtxProfile();
-	baseVtxProfile.makeByPoints3DArray(basePoints3dArray, undefined); 
+	baseVtxProfile.makeByPoints3DArray(basePoints3dArray, undefined, options); 
+	if(colorBottom && colorTop) // must exist bottom & top colors.
+		baseVtxProfile.setColorRGBAVertices(colorBottom.r, colorBottom.g, colorBottom.b, colorBottom.a);
+
+
 	var topVtxProfile = vtxProfilesList.newVtxProfile();
-	topVtxProfile.makeByPoints3DArray(topPoints3dArray, undefined); 
+	topVtxProfile.makeByPoints3DArray(topPoints3dArray, undefined, options); 
+	if(colorBottom && colorTop) // must exist bottom & top colors.
+		topVtxProfile.setColorRGBAVertices(colorTop.r, colorTop.g, colorTop.b, colorTop.a);
+
 	
 	var bIncludeBottomCap = false;
 	var bIncludeTopCap = false;
