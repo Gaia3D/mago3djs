@@ -701,22 +701,15 @@ GeographicCoordsList.prototype.getExtrudedMeshRenderableObject = function(height
 /**
  * 
  */
-GeographicCoordsList.prototype.getExtrudedWallRenderableObject = function(height, resultRenderableObject, magoManager, extrudeDirWC, options, textureInfo) 
+GeographicCoordsList.prototype._getExtrudedWallRenderableObject_byNumSegments = function(height, resultRenderableObject, magoManager, extrudeDirWC, options, textureInfo) 
 {
-	if (!this.geographicCoordsArray || this.geographicCoordsArray.length === 0)
-	{ return resultRenderableObject; }
-	
-	if (!resultRenderableObject)
-	{
-		resultRenderableObject = new RenderableObject();
-	}
-	resultRenderableObject.geoLocDataManager = new GeoLocationDataManager();
-	var geoLocData = resultRenderableObject.geoLocDataManager.newGeoLocationData();
-
+	// Check options:
 	var doubleFace = false;
 	var colorTop = undefined;
 	var colorBottom = undefined;
 	var polyLineLoop = false;
+	var colorsArray = undefined;
+	var numSegments = undefined;
 	if(options)
 	{
 		if(options.doubleFace)
@@ -733,86 +726,207 @@ GeographicCoordsList.prototype.getExtrudedWallRenderableObject = function(height
 
 		if(options.polyLineLoop)
 		polyLineLoop = options.polyLineLoop;
+
+		if(options.colorsArray)
+		colorsArray = options.colorsArray;
+
+		if(options.numSegments)
+		numSegments = options.numSegments;
 	}
-	
-	// The origin of this object is in the middle of this geoCoordsList.
-	var midGeoCoord = this.getMiddleGeographicCoords();
-	
-	// Make the topGeoCoordsList.
-	var topGeoCoordsList = this.getCopy();
-	
-	// Reassign the altitude on the geoCoordsListCopy.
-	topGeoCoordsList.addAltitude(height);
-	
-	// All points3d is referenced to the middleGeoCoord.
-	ManagerUtils.calculateGeoLocationData(midGeoCoord.longitude, midGeoCoord.latitude, midGeoCoord.altitude, 0, 0, 0, geoLocData);
-	var basePoints3dArray = GeographicCoordsList.getPointsRelativeToGeoLocation(geoLocData, this.geographicCoordsArray, undefined);
-	var topPoints3dArray = GeographicCoordsList.getPointsRelativeToGeoLocation(geoLocData, topGeoCoordsList.geographicCoordsArray, undefined);
-	
-	// Now, with basePoints3dArray & topPoints3dArray make a mesh.
-	// Create a VtxProfilesList.
+
+	var geoLocData = resultRenderableObject.geoLocDataManager.getCurrentGeoLocationData();
+
+	// create options for outer vertexRing.
 	var isOpen = !polyLineLoop;
-	var options = {
+	var profileOptions = {
 		outerVtxRingOptions : {
 			isOpen : isOpen
 		}
 	};
 
+	// create colors for segments if no exist.
+	if(!colorsArray)
+	{
+		colorsArray = [];
+		if(colorBottom && colorTop)
+		{
+			var numColors = numSegments + 1;
+			colorsArray = Color.getInterpolatedColorsArray(colorBottom, colorTop, numColors, colorsArray );
+		}
+	}
+
 	var vtxProfilesList = new VtxProfilesList();
-	var baseVtxProfile = vtxProfilesList.newVtxProfile();
-	baseVtxProfile.makeByPoints3DArray(basePoints3dArray, undefined, options); 
-	if(colorBottom && colorTop) // must exist bottom & top colors.
-		baseVtxProfile.setColorRGBAVertices(colorBottom.r, colorBottom.g, colorBottom.b, colorBottom.a);
+	var increHeight = height/numSegments;
 
+	for(var i=0; i<numSegments+1; i++)
+	{
+		// make a profile for each segments.
+		// Make the topGeoCoordsList.
+		var topGeoCoordsList = this.getCopy();
+		
+		// Reassign the altitude on the geoCoordsListCopy.
+		topGeoCoordsList.addAltitude(increHeight * i);
+		var topPoints3dArray = GeographicCoordsList.getPointsRelativeToGeoLocation(geoLocData, topGeoCoordsList.geographicCoordsArray, undefined);
 
-	var topVtxProfile = vtxProfilesList.newVtxProfile();
-	topVtxProfile.makeByPoints3DArray(topPoints3dArray, undefined, options); 
-	if(colorBottom && colorTop) // must exist bottom & top colors.
-		topVtxProfile.setColorRGBAVertices(colorTop.r, colorTop.g, colorTop.b, colorTop.a);
+		var topVtxProfile = vtxProfilesList.newVtxProfile();
+		topVtxProfile.makeByPoints3DArray(topPoints3dArray, undefined, profileOptions); 
 
-	
+		if(colorsArray) 
+		{
+			var color = colorsArray[i];
+			topVtxProfile.setColorRGBAVertices(color.r, color.g, color.b, color.a);
+		}
+
+	}
+
+	// Now, create the mesh.
 	var bIncludeBottomCap = false;
 	var bIncludeTopCap = false;
 	var bLoop = false;
 	var solidMesh = vtxProfilesList.getMesh(undefined, bIncludeBottomCap, bIncludeTopCap, bLoop);
 	var surfIndepMesh = solidMesh.getCopySurfaceIndependentMesh();
 	surfIndepMesh.calculateVerticesNormals();
-	/*
-	if (textureInfo)
-	{
-		var c = document.createElement("canvas");
-		var ctx = c.getContext("2d");
-
-		c.width = 8;
-		c.height = 32;
-		ctx.beginPath();
-		ctx.fillStyle = "#262626";
-		ctx.rect(0, 0, 8, 1);
-		ctx.fill();
-		ctx.closePath();
-			
-		ctx.beginPath();
-		ctx.fillStyle = textureInfo.color;
-		ctx.rect(0, 1, 8, 31);
-		ctx.fill();
-		ctx.closePath();
-
-		ctx.beginPath();
-		ctx.fillStyle = "#0000ff";
-		ctx.rect(2, 8, 4, 8);
-		ctx.fill();
-		ctx.stroke();
-		ctx.closePath();
-
-		surfIndepMesh.material = new Material('test');
-		surfIndepMesh.material.setDiffuseTextureUrl(c.toDataURL());
-
-		surfIndepMesh.calculateTexCoordsByHeight(textureInfo.height);
-	}
-	*/
 
 	resultRenderableObject.objectsArray.push(surfIndepMesh);
 	return resultRenderableObject;
+};
+
+/**
+ * 
+ */
+GeographicCoordsList.prototype.getExtrudedWallRenderableObject = function(height, resultRenderableObject, magoManager, extrudeDirWC, options, textureInfo) 
+{
+	if (!this.geographicCoordsArray || this.geographicCoordsArray.length === 0)
+	{ return resultRenderableObject; }
+	
+	if (!resultRenderableObject)
+	{
+		resultRenderableObject = new RenderableObject();
+	}
+	resultRenderableObject.geoLocDataManager = new GeoLocationDataManager();
+	var geoLocData = resultRenderableObject.geoLocDataManager.newGeoLocationData();
+
+	// Check options:
+	var doubleFace = false;
+	var colorTop = undefined;
+	var colorBottom = undefined;
+	var polyLineLoop = false;
+	var colorsArray = undefined;
+	var numSegments = undefined;
+	if(options)
+	{
+		if(options.doubleFace)
+		{
+			doubleFace = true;
+			resultRenderableObject.attributes.doubleFace = true;
+		}
+
+		if(options.colorTop)
+		colorTop = options.colorTop;
+
+		if(options.colorBottom)
+		colorBottom = options.colorBottom;
+
+		if(options.polyLineLoop)
+		polyLineLoop = options.polyLineLoop;
+
+		if(options.colorsArray)
+		colorsArray = options.colorsArray;
+
+		if(options.numSegments)
+		numSegments = options.numSegments;
+	}
+	
+	// The origin of this object is in the middle of this geoCoordsList.
+	var midGeoCoord = this.getMiddleGeographicCoords();
+
+	// All points3d is referenced to the middleGeoCoord.
+	ManagerUtils.calculateGeoLocationData(midGeoCoord.longitude, midGeoCoord.latitude, midGeoCoord.altitude, 0, 0, 0, geoLocData);
+	
+	// Make the topGeoCoordsList.
+	var topGeoCoordsList = this.getCopy();
+	
+	// Reassign the altitude on the geoCoordsListCopy.
+	topGeoCoordsList.addAltitude(height);
+
+	// In this point, there are alot of possibilities:
+	if(numSegments || colorsArray)
+	{
+		return this._getExtrudedWallRenderableObject_byNumSegments(height, resultRenderableObject, magoManager, extrudeDirWC, options, textureInfo);
+	}
+	else
+	{
+		
+		var basePoints3dArray = GeographicCoordsList.getPointsRelativeToGeoLocation(geoLocData, this.geographicCoordsArray, undefined);
+		var topPoints3dArray = GeographicCoordsList.getPointsRelativeToGeoLocation(geoLocData, topGeoCoordsList.geographicCoordsArray, undefined);
+		
+		// Now, with basePoints3dArray & topPoints3dArray make a mesh.
+		// Create a VtxProfilesList.
+		var isOpen = !polyLineLoop;
+		var profileOptions = {
+			outerVtxRingOptions : {
+				isOpen : isOpen
+			}
+		};
+
+		var vtxProfilesList = new VtxProfilesList();
+		var baseVtxProfile = vtxProfilesList.newVtxProfile();
+		baseVtxProfile.makeByPoints3DArray(basePoints3dArray, undefined, profileOptions); 
+		if(colorBottom && colorTop) // must exist bottom & top colors.
+			baseVtxProfile.setColorRGBAVertices(colorBottom.r, colorBottom.g, colorBottom.b, colorBottom.a);
+
+
+		var topVtxProfile = vtxProfilesList.newVtxProfile();
+		topVtxProfile.makeByPoints3DArray(topPoints3dArray, undefined, profileOptions); 
+		if(colorBottom && colorTop) // must exist bottom & top colors.
+			topVtxProfile.setColorRGBAVertices(colorTop.r, colorTop.g, colorTop.b, colorTop.a);
+
+		
+		var bIncludeBottomCap = false;
+		var bIncludeTopCap = false;
+		var bLoop = false;
+		var solidMesh = vtxProfilesList.getMesh(undefined, bIncludeBottomCap, bIncludeTopCap, bLoop);
+		var surfIndepMesh = solidMesh.getCopySurfaceIndependentMesh();
+		surfIndepMesh.calculateVerticesNormals();
+		/*
+		if (textureInfo)
+		{
+			var c = document.createElement("canvas");
+			var ctx = c.getContext("2d");
+
+			c.width = 8;
+			c.height = 32;
+			ctx.beginPath();
+			ctx.fillStyle = "#262626";
+			ctx.rect(0, 0, 8, 1);
+			ctx.fill();
+			ctx.closePath();
+				
+			ctx.beginPath();
+			ctx.fillStyle = textureInfo.color;
+			ctx.rect(0, 1, 8, 31);
+			ctx.fill();
+			ctx.closePath();
+
+			ctx.beginPath();
+			ctx.fillStyle = "#0000ff";
+			ctx.rect(2, 8, 4, 8);
+			ctx.fill();
+			ctx.stroke();
+			ctx.closePath();
+
+			surfIndepMesh.material = new Material('test');
+			surfIndepMesh.material.setDiffuseTextureUrl(c.toDataURL());
+
+			surfIndepMesh.calculateTexCoordsByHeight(textureInfo.height);
+		}
+		*/
+
+		resultRenderableObject.objectsArray.push(surfIndepMesh);
+		return resultRenderableObject;
+	}
+	
+	
 };
 
 /**

@@ -33,6 +33,166 @@ var Color = function(red, green, blue, alpha)
 };
 
 
+
+
+
+
+/**
+ * copy of the value of RGB instance
+ * @param {Color} color
+ */
+Color.prototype.copyFrom = function(color) 
+{
+	this.r = color.r;
+	this.g = color.g;
+	this.b = color.b;
+	this.a = color.a;
+};
+
+/**
+ * Clear the RGBA value of this instance
+ */
+Color.prototype.deleteObjects = function() 
+{
+	this.r = undefined;
+	this.g = undefined;
+	this.b = undefined;
+	this.a = undefined;
+};
+
+/**
+ * Linear interpolation between colorA & colorB/
+ * In the resultColorsArray, the 1rst color = colorA & the last color = colorB.
+ */
+Color.getInterpolatedColorsArray = function(colorA, colorB, numColors, resultColorsArray ) 
+{
+	if(!resultColorsArray)
+	resultColorsArray = [];
+	var increWeight = 1/(numColors-1);
+	var weight = 0.0;
+	for(var i=0; i<numColors; i++)
+	{
+		var color = Color.mix(colorA, colorB, weight, undefined );
+		resultColorsArray.push(color);
+		weight += increWeight;
+	}
+
+	return resultColorsArray;
+};
+
+/**
+ * Linear interpolation between colorA & colorB
+ */
+Color.mix = function(colorA, colorB, weight, resultColor ) 
+{
+	if (resultColor === undefined)
+	{ resultColor = new Color(); }
+	
+	var w = weight;
+	var r = colorA.r * w + colorB.r * (1.0 - w);
+	var g = colorA.g * w + colorB.g * (1.0 - w);
+	var b = colorA.b * w + colorB.b * (1.0 - w);
+	var a = colorA.a * w + colorB.a * (1.0 - w);
+	
+	resultColor.setRGBA(r, g, b, a);
+	
+	return resultColor;
+};
+  
+/**
+ * Set the value of RGBA (A means transparancy) as default. 
+ * @param red the value of red
+ * @param green the value of green
+ * @param blue the value of blue
+ * @param alpha the value of transparancy
+ */
+Color.prototype.set = function(red, green, blue, alpha) 
+{
+
+	this.r = red; 
+	this.g = green; 
+	this.b = blue; 
+	this.a = alpha;
+};
+  
+/**
+ * Set the value of RGB
+ * @param red the value of red
+ * @param green the value of green
+ * @param blue the value of blue
+ */
+Color.prototype.setRGB = function(red, green, blue) 
+{
+
+	this.r = red; 
+	this.g = green; 
+	this.b = blue;
+};
+  
+/**
+ * Set the value of RGBA (A means transparancy)
+ * @param red the value of red
+ * @param green the value of green
+ * @param blue the value of blue
+ * @param alpha the value of transparancy
+ */
+Color.prototype.setRGBA = function(red, green, blue, alpha) 
+{
+	//this[0] = red;
+	//this[1] = green;
+	//this[2] = blue;
+	//this[3] = alpha;
+	this.r = red; this.g = green; this.b = blue; this.a = alpha;
+};
+
+/**
+ * return hexCode
+ * @return {string}
+ */
+Color.prototype.getHexCode = function() 
+{
+	var r = this.r;
+	var g = this.g;
+	var b = this.b;
+	
+	return Color.getHexCode(r, g, b);
+};
+
+/**
+ * return hexCode
+ * @return {string}
+ */
+Color.getHexCode = function(red, green, blue) 
+{	
+	var r = parseInt(red * 255);
+	var g = parseInt(green * 255);
+	var b = parseInt(blue * 255);
+	
+	var hexR = r.toString(16).padStart(2, '0'); //String.padStart i.e no support..TT 
+	var hexG = g.toString(16).padStart(2, '0');
+	var hexB = b.toString(16).padStart(2, '0');
+	
+	return '#'+hexR+hexG+hexB;
+};
+
+/**
+ * return hexCode
+ * @return {string}
+ */
+Color.fromHexCode = function(hex, resultColor4) 
+{
+	var r = parseInt(hex.slice(1, 3), 16),
+		g = parseInt(hex.slice(3, 5), 16),
+		b = parseInt(hex.slice(5, 7), 16);
+
+	if (resultColor4 === undefined)
+	{ resultColor4 = new Color(); }
+
+	resultColor4.setRGB(r/256, g/256, b/256);
+	return resultColor4;
+		
+};
+
 /**
  * Match gray scale to RGB scale
  * @param gray the percentage of the gray color. normalize the value from 0.0 to 1.0
@@ -288,140 +448,4 @@ Color.getWhiteToBlueColor_byHeight2 = function(height, step, resultColor)
 
 	resultColor.setRGB(r, g, b);
 	return resultColor;
-};
-
-/**
- * copy of the value of RGB instance
- * @param {Color} color
- */
-Color.prototype.copyFrom = function(color) 
-{
-	this.r = color.r;
-	this.g = color.g;
-	this.b = color.b;
-	this.a = color.a;
-};
-
-/**
- * Clear the RGBA value of this instance
- */
-Color.prototype.deleteObjects = function() 
-{
-	this.r = undefined;
-	this.g = undefined;
-	this.b = undefined;
-	this.a = undefined;
-};
-
-/**
- * Linear interpolation between colorA & colorB
- */
-Color.mix = function(colorA, colorB, weight, resultColor ) 
-{
-	if (resultColor === undefined)
-	{ resultColor = new Color(); }
-	
-	var w = weight;
-	var r = colorA.r * w + colorB.r * (1.0 - w);
-	var g = colorA.g * w + colorB.g * (1.0 - w);
-	var b = colorA.b * w + colorB.b * (1.0 - w);
-	var a = colorA.a * w + colorB.a * (1.0 - w);
-	
-	resultColor.setRGBA(r, g, b, a);
-	
-	return resultColor;
-};
-  
-/**
- * Set the value of RGBA (A means transparancy) as default. 
- * @param red the value of red
- * @param green the value of green
- * @param blue the value of blue
- * @param alpha the value of transparancy
- */
-Color.prototype.set = function(red, green, blue, alpha) 
-{
-
-	this.r = red; 
-	this.g = green; 
-	this.b = blue; 
-	this.a = alpha;
-};
-  
-/**
- * Set the value of RGB
- * @param red the value of red
- * @param green the value of green
- * @param blue the value of blue
- */
-Color.prototype.setRGB = function(red, green, blue) 
-{
-
-	this.r = red; 
-	this.g = green; 
-	this.b = blue;
-};
-  
-/**
- * Set the value of RGBA (A means transparancy)
- * @param red the value of red
- * @param green the value of green
- * @param blue the value of blue
- * @param alpha the value of transparancy
- */
-Color.prototype.setRGBA = function(red, green, blue, alpha) 
-{
-	//this[0] = red;
-	//this[1] = green;
-	//this[2] = blue;
-	//this[3] = alpha;
-	this.r = red; this.g = green; this.b = blue; this.a = alpha;
-};
-
-/**
- * return hexCode
- * @return {string}
- */
-Color.prototype.getHexCode = function() 
-{
-	var r = this.r;
-	var g = this.g;
-	var b = this.b;
-	
-	return Color.getHexCode(r, g, b);
-};
-
-/**
- * return hexCode
- * @return {string}
- */
-Color.getHexCode = function(red, green, blue) 
-{	
-	var r = parseInt(red * 255);
-	var g = parseInt(green * 255);
-	var b = parseInt(blue * 255);
-	
-	var hexR = r.toString(16).padStart(2, '0'); //String.padStart i.e no support..TT 
-	var hexG = g.toString(16).padStart(2, '0');
-	var hexB = b.toString(16).padStart(2, '0');
-	
-	return '#'+hexR+hexG+hexB;
-};
-
-/**
- * return hexCode
- * @return {string}
- */
-Color.fromHexCode = function(hex, resultColor4) 
-{
-	var r = parseInt(hex.slice(1, 3), 16),
-		g = parseInt(hex.slice(3, 5), 16),
-		b = parseInt(hex.slice(5, 7), 16);
-
-	if (resultColor4 === undefined)
-	{ resultColor4 = new Color(); }
-
-	resultColor4.setRGB(r/256, g/256, b/256);
-	return resultColor4;
-		
 };

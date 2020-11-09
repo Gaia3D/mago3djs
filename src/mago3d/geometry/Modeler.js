@@ -192,9 +192,11 @@ Modeler.prototype.__TEST__extrudedLines = function()
 	var colorBottom = new Color(0.0, 1.0, 0.0, 0.8);
 	var options = {
 		doubleFace : true,
-		colorBottom : colorBottom,
-		colorTop : colorTop,
-		polyLineLoop : false
+		//colorBottom : colorBottom,
+		//colorTop : colorTop,
+		polyLineLoop : false,
+		numSegments : 4,
+		colorsArray : [new Color(1.0, 0.0, 0.0, 0.8), new Color(1.0, 1.0, 0.0, 0.8), new Color(0.0, 1.0, 0.0, 0.8), new Color(0.0, 1.0, 1.0, 0.8), new Color(0.0, 0.0, 1.0, 0.8)]
 	};
 	var polylinesCount = lines.length;
 	for(var i=0; i<polylinesCount; i++)
