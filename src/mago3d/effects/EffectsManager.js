@@ -69,10 +69,11 @@ EffectsManager.prototype.addEffect = function(id, effect)
 	effectsObject.effectsArray.push(effect);
 };
 
-EffectsManager.prototype.executeEffects = function(id, currTime)
+EffectsManager.prototype.executeEffects = function(id, magoManager)
 {
 	var effectsObject = this.getEffectsObject(id);
 	var effectExecuted = false;
+	var currTime = magoManager.getCurrentTime();
 	if (effectsObject === undefined)
 	{ return false; }
 	
@@ -82,6 +83,9 @@ EffectsManager.prototype.executeEffects = function(id, currTime)
 		var effect = effectsObject.effectsArray[i];
 		if (effect.execute(currTime/1000))
 		{
+			if(effect.complete && typeof effect.complete === 'function') {
+				effect.complete.call(null, magoManager);
+			}
 			effectsObject.effectsArray.splice(i, 1);
 			effectsCount = effectsObject.effectsArray.length;
 		}

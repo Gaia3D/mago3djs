@@ -1995,7 +1995,7 @@ MagoManager.prototype.validateHeight = function(frustumObject)
 		{
 			var needValidHeightNode = this._needValidHeightNodeArray[i];
 			
-			if (visibleNodes.indexOf(needValidHeightNode) > -1)
+			if (visibleNodes.indexOf(needValidHeightNode) > -1 && process.length < 10)
 			{
 				this._needValidHeightNodeArray[i].data.validHeightReference = true;
 				process.push(needValidHeightNode);
@@ -2054,7 +2054,8 @@ MagoManager.prototype.validateHeight = function(frustumObject)
 		this._needValidHeightNodeArray = next;
 	}
 
-	if (this._needValidHeightNativeArray.length > 0) 
+	var visibleNatives = frustumObject.visibleNodes.getAllNatives();
+	if (this._needValidHeightNativeArray.length > 0 && visibleNatives.length > 0) 
 	{
 		var terrainProvider = this.scene.globe.terrainProvider;
 		var isBasicTerrainProvider = terrainProvider instanceof Cesium.EllipsoidTerrainProvider;
@@ -2067,15 +2068,32 @@ MagoManager.prototype.validateHeight = function(frustumObject)
 			}
 			maxZoom = terrainProvider._layers[0].availability._maximumLevel - 1;
 		}
+
+		var process = [];
+		var next = [];
+		for (var i=this._needValidHeightNativeArray.length - 1;i>=0;i--) 
+		{
+			var needValidNative = this._needValidHeightNativeArray[i];
+			
+			if (visibleNatives.indexOf(needValidNative) > -1 && process.length < 10)
+			{
+				process.push(needValidNative);
+			}
+			else 
+			{
+				next.push(needValidNative);
+			}
+		}
+		if (process.length === 0) { return; }
 		
 		var that = this;
 		new Promise(function(resolve) 
 		{
-			resolve({mm: that});
+			resolve({mm: that, nArray: process});
 		}).then(function(obj)
 		{
 			var cartographics = [];
-			var nArray = obj.mm._needValidHeightNativeArray;
+			var nArray = obj.nArray;
 			var nArrayLength = nArray.length;
 			for (var j=0;j<nArrayLength;j++ )
 			{
@@ -2100,7 +2118,7 @@ MagoManager.prototype.validateHeight = function(frustumObject)
 						validDataArray : nArray,
 						timestamp: new Date()
 					});
-					that._needValidHeightNativeArray.length = 0;
+					that._needValidHeightNativeArray = next;
 				}
 			});
 		});
@@ -6994,6 +7012,7 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 			data.mapping_type = mapping_type;
 			data.dataId = data_id;
 			data.dataGroupId = data_group_id;
+			data._guid = createGuid();
 			var tMatrix;
 			
 			if (attributes.isPhysical)
@@ -7480,6 +7499,7 @@ MagoManager.prototype.instantiateStaticModel = function(attributes)
 
 		node.data.attributes.fromDate = new Date();
 		node.data.attributes.toDate = new Date();
+		node.data._guid = createGuid();
 		
 		// Now, insert node into smartTile.***
 		var targetDepth = 12;

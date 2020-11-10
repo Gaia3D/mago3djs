@@ -15,26 +15,31 @@ var Effect = function(options)
 	this.effectsManager;
 	this.birthData;
 	this.durationSeconds;
+	this.complete;
 	this.effectType = "unknown";
 	
-	if (options)
-	{
-		if (options.effectType)
-		{ this.effectType = options.effectType; }
-		
-		if (options.durationSeconds)
-		{ this.durationSeconds = options.durationSeconds; }
+	options = options ? options : {};
 	
-		if (options.zVelocity)
-		{ this.zVelocity = options.zVelocity; }
+	if (options.effectType)
+	{ this.effectType = options.effectType; }
 	
-		if (options.zMax)
-		{ this.zMax = options.zMax; }
-		
-		if (options.zMin)
-		{ this.zMin = options.zMin; }
+	if (options.durationSeconds)
+	{ this.durationSeconds = options.durationSeconds; }
+
+	if (options.zVelocity)
+	{ this.zVelocity = options.zVelocity; }
+
+	if (options.zMax)
+	{ this.zMax = options.zMax; }
 	
-	}
+	if (options.zMin)
+	{ this.zMin = options.zMin; }
+
+	if(options.blinkDuration)
+	{this.blinkDuration = defaultValue(options.blinkDuration, 0.2);}
+
+	if(options.complete)
+	{this.complete = options.complete;}
 	
 	// available effectType:
 	// 1: zBounceLinear
@@ -109,6 +114,73 @@ Effect.prototype.execute = function(currTimeSec)
 			colorMultiplier = 1/(timeRatio*timeRatio);
 		}
 		gl.uniform4fv(this.effectsManager.currShader.colorMultiplier_loc, [colorMultiplier, colorMultiplier, colorMultiplier, 1.0]);
+		return effectFinished;
+	}
+	else if (this.effectType === "blinker")
+	{
+		var multiplier;
+		var unit = [0.4,0.4,0.4,1];
+		var colorMultiplier = 1.0;
+		if (timeDiffSeconds >= this.durationSeconds)
+		{
+			multiplier = unit;
+			effectFinished = true; // if return true, then this effect is finished, so this effect will be deleted.
+		}
+		else
+		{
+			if(this.blink === undefined) this.blink = true;
+			if(!this.blinkTime) this.blinkTime = currTimeSec;
+			if(!this.blinkDuration) this.blinkDuration = 0.2;
+
+			var blinkDurationDiff = currTimeSec - this.blinkTime;
+			
+			if(blinkDurationDiff > this.blinkDuration) {
+				this.blink = !this.blink;
+				this.blinkTime = currTimeSec;
+			}
+			
+			var timeRatio = timeDiffSeconds/this.durationSeconds;
+			colorMultiplier = 1/(timeRatio*timeRatio);
+
+			if(this.blink) {
+				multiplier = [1000*colorMultiplier,1000*colorMultiplier,1000*colorMultiplier,1];
+			} else {
+				multiplier = unit;
+			}
+		}
+		gl.uniform4fv(this.effectsManager.currShader.colorMultiplier_loc, multiplier);
+		return effectFinished;
+	}
+	else if (this.effectType === "fadeIn")
+	{
+		var opacityMultiplier = 1.0;
+		if (timeDiffSeconds >= this.durationSeconds)
+		{
+			opacityMultiplier = 1.0;
+			effectFinished = true; // if return true, then this effect is finished, so this effect will be deleted.
+		}
+		else
+		{
+			var timeRatio = timeDiffSeconds/this.durationSeconds;
+			opacityMultiplier = timeRatio;
+		}
+		gl.uniform4fv(this.effectsManager.currShader.colorMultiplier_loc, [1.0, 1.0, 1.0, opacityMultiplier]);
+		return effectFinished;
+	}
+	else if (this.effectType === "fadeOut")
+	{
+		var opacityMultiplier = 1.0;
+		if (timeDiffSeconds >= this.durationSeconds)
+		{
+			opacityMultiplier = 0;
+			effectFinished = true; // if return true, then this effect is finished, so this effect will be deleted.
+		}
+		else
+		{
+			var timeRatio = timeDiffSeconds/this.durationSeconds;
+			opacityMultiplier = opacityMultiplier - timeRatio;
+		}
+		gl.uniform4fv(this.effectsManager.currShader.colorMultiplier_loc, [1.0, 1.0, 1.0, opacityMultiplier]);
 		return effectFinished;
 	}
 	else if (this.effectType === "zMovement")

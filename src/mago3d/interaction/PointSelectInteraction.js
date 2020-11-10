@@ -59,7 +59,7 @@ PointSelectInteraction.prototype.setTargetType = function(type)
 		this.init();
 		this.selected = undefined;
 		this.manager.isCameraMoved = true;
-		this.manager.selectionManager.clearCurrents();
+		if(this.manager.selectionManager) this.manager.selectionManager.clearCurrents();
 		this.filter = undefined;
 	}
 	this.targetType = type;
@@ -103,7 +103,7 @@ PointSelectInteraction.prototype.setTargetHighlight = function(highlight)
 	if (!highlight)
 	{
 		this.init();
-		this.manager.selectionManager.clearCurrents();
+		if(this.manager.selectionManager) this.manager.selectionManager.clearCurrents();
 	}
 	this.targetHighlight = highlight;
 };
@@ -239,7 +239,7 @@ PointSelectInteraction.prototype.select = function(screenCoordinate)
 PointSelectInteraction.prototype.clear = function()
 {
 	this.emitEvent(this.selected, false);
-	this.manager.selectionManager.clearCurrents();
+	if(this.manager.selectionManager) this.manager.selectionManager.clearCurrents();
 	this.init();
 	this.selected = undefined;
 };

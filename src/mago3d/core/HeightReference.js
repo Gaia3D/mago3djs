@@ -22,3 +22,18 @@ HeightReference.getNameSpace = function(str)
 	default : return Mago3D.HeightReference.NONE;
 	}
 };
+
+/**
+ * 
+ * @param {number} number 
+ * @static
+ */
+HeightReference.getNameSpaceByOrdinal = function(number) 
+{
+	switch (number) 
+	{
+	case 0 : return Mago3D.HeightReference.NONE;
+	case 1 : return Mago3D.HeightReference.CLAMP_TO_GROUND;
+	case 2 : return Mago3D.HeightReference.RELATIVE_TO_GROUND;
+	}
+};

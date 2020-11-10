@@ -634,8 +634,6 @@ Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive
 	{
 		this.magoRectangle.render(magoManager, shader, renderType, glPrimitive, bIsSelected);
 	}
-	
-	this.__TEST__extrudedLines();
 };
 
 Modeler.prototype.createPlaneGrid = function(width, height, numCols, numRows) 

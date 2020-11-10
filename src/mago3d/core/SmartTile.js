@@ -1538,6 +1538,11 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 			{
 				// read the char value.
 				var charValue = (new Uint8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
+
+				if(dataKey === 'heightReference') {
+					charValue = HeightReference.getNameSpaceByOrdinal(charValue);
+				}
+
 				// Put the readed data into externInfo.***
 				externInfo[dataKey] = charValue;
 			}
@@ -1596,13 +1601,7 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 			node.data.rotationsDegree = eulerAngDeg; 
 			node.data.dataId = dataId;
 			node.data.dataGroupId = savedProjectId;
-
-			if(attributes.heightReference === HeightReference.RELATIVE_TO_GROUND) {
-				node.data.relativeHeight = geoCoord.altitude;
-			} else {
-				node.data.relativeHeight = 0;
-			}
-
+			node.data._guid = createGuid();
 			node.data.smartTileOwner = this;
 			for (var j in externInfo) 
 			{
@@ -1610,6 +1609,12 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 				{
 					node.data.attributes[j] = externInfo[j];
 				}
+			}
+
+			if(attributes.heightReference === HeightReference.RELATIVE_TO_GROUND) {
+				node.data.relativeHeight = geoCoord.altitude;
+			} else {
+				node.data.relativeHeight = 0;
 			}
 
 			this.nodesArray.push(node);

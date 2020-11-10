@@ -403,7 +403,7 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 			
 				// Check if there are effects.
 				if (renderType !== 2 && magoManager.currentProcess !== CODE.magoCurrentProcess.StencilSilhouetteRendering)
-				{ executedEffects = magoManager.effectsManager.executeEffects(objMarker.id, magoManager.getCurrentTime()); }
+				{ executedEffects = magoManager.effectsManager.executeEffects(objMarker.id, magoManager); }
 			
 				gl.uniform2fv(shader.imageSize_loc, [currentTexture.texId.imageWidth, currentTexture.texId.imageHeight]);
 				

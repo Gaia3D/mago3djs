@@ -207,6 +207,9 @@ MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPr
 		gl.enable(gl.CULL_FACE);
 	}
 
+	var executedEffects = false;
+	if (renderType !== 2 && magoManager.currentProcess !== CODE.magoCurrentProcess.StencilSilhouetteRendering)
+	{ executedEffects = magoManager.effectsManager.executeEffects(this._guid, magoManager); }
 
 	if(renderType === 1)
 	{
@@ -272,6 +275,16 @@ MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPr
 	// return clippingType to 0 (0= no clipping).***
 	gl.uniform1i(shader.clippingType_loc, 0);
 	
+	if (executedEffects)
+	{
+		// must return all uniforms changed for effects.
+		gl.uniform3fv(shader.aditionalOffset_loc, [0.0, 0.0, 0.0]); // init referencesMatrix.
+		if (renderType === 1)
+		{
+			gl.uniform4fv(shader.colorMultiplier_loc, [1.0, 1.0, 1.0, 1.0]);
+		}
+	}
+
 	// check options provisionally here.
 	if (this.options)
 	{

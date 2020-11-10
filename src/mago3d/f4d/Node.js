@@ -436,7 +436,7 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 
 	// Check if there are effects.
 	if (renderType !== 2 && magoManager.currentProcess !== CODE.magoCurrentProcess.StencilSilhouetteRendering)
-	{ var executedEffects = magoManager.effectsManager.executeEffects(data.nodeId, magoManager.getCurrentTime()); }
+	{ var executedEffects = magoManager.effectsManager.executeEffects(data._guid, magoManager); }
 	
 	// Check if we are under selected data structure.***
 	var selectionManager = magoManager.selectionManager;

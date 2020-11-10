@@ -200,7 +200,7 @@ SmartTileManager.prototype.parseSmartTilesF4dIndexFile = function(dataBuffer, pr
 		{
 			name += String.fromCharCode(new Int8Array(dataBuffer.slice(bytes_readed, bytes_readed+ 1))[0]);bytes_readed += 1;
 		}
-		
+		var seedName = projectFolderName + '::' + name;
 		var L = readWriter.readUInt8(dataBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
 		var X = readWriter.readInt32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
 		var Y = readWriter.readInt32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
@@ -213,9 +213,9 @@ SmartTileManager.prototype.parseSmartTilesF4dIndexFile = function(dataBuffer, pr
 		var geoExtent = SmartTile.getGeographicExtentOfTileLXY(L, X, Y, undefined, CODE.imageryType.CRS84);
 		var centerGeoCoord = geoExtent.getMidPoint();
 		var f4dTileId = "";
-		var f4dSeedKey = projectFolderName + name;
-		f4dSeedKey = name; // test.
-		this.smartTileF4dSeedMap[f4dSeedKey] = {
+
+		//var smartTileLodsCount = 3;
+		this.smartTileF4dSeedMap[seedName] = {
 			"L"                 : L,
 			"X"                 : X,
 			"Y"                 : Y,
@@ -225,8 +225,8 @@ SmartTileManager.prototype.parseSmartTilesF4dIndexFile = function(dataBuffer, pr
 			"smartTileType"     : smartTileType,
 			"tileName"          : name,
 			"projectFolderName" : projectFolderName,
-			"fileLoadState"     : CODE.fileLoadState.READY};
-
+			"fileLoadState"     : CODE.fileLoadState.READY
+		};
 	}
 	
 	return this.smartTileF4dSeedMap;
