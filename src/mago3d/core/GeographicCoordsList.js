@@ -497,6 +497,7 @@ GeographicCoordsList.prototype.test__makeThickLines = function(magoManager)
  */
 GeographicCoordsList.prototype.getGeographicExtent = function(resultGeographicExtent) 
 {
+	/*
 	if (!resultGeographicExtent)
 	{ resultGeographicExtent = new GeographicExtent(); }
 	
@@ -516,6 +517,32 @@ GeographicCoordsList.prototype.getGeographicExtent = function(resultGeographicEx
 	}
 	
 	return resultGeographicExtent;
+	*/
+
+	return GeographicCoordsList.getGeographicExtent(this.geographicCoordsArray, resultGeographicExtent);
+};
+
+GeographicCoordsList.getGeographicExtent = function(geographicCoordsArray, resultGeographicExtent) 
+{
+	if (!resultGeographicExtent)
+	{ resultGeographicExtent = new GeographicExtent(); }
+	
+	var geoCoord;
+	var geoCoordsCount = geographicCoordsArray.length;
+	for (var i=0; i<geoCoordsCount; i++)
+	{
+		geoCoord = geographicCoordsArray[i];
+		if (i === 0)
+		{
+			resultGeographicExtent.setInitExtent(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude);
+		}
+		else 
+		{
+			resultGeographicExtent.addGeographicCoord(geoCoord);
+		}
+	}
+	
+	return resultGeographicExtent;
 };
 
 /**
@@ -524,6 +551,15 @@ GeographicCoordsList.prototype.getGeographicExtent = function(resultGeographicEx
 GeographicCoordsList.prototype.getMiddleGeographicCoords = function(resultMiddleGeoCoords) 
 {
 	var geoExtent = this.getGeographicExtent();
+	return geoExtent.getMidPoint(resultMiddleGeoCoords);
+};
+
+/**
+ * 
+ */
+GeographicCoordsList.getMiddleGeographicCoords = function(geographicCoordsArray, resultMiddleGeoCoords) 
+{
+	var geoExtent = GeographicCoordsList.getGeographicExtent(geographicCoordsArray, undefined);
 	return geoExtent.getMidPoint(resultMiddleGeoCoords);
 };
 
@@ -1096,6 +1132,7 @@ GeographicCoordsList.prototype.renderPoints = function(magoManager, shader, rend
  */
 GeographicCoordsList.prototype.getWgs84Points3D = function(resultPoint3DArray) 
 {
+	/*
 	if (resultPoint3DArray === undefined)
 	{ resultPoint3DArray = []; }
 	
@@ -1104,6 +1141,29 @@ GeographicCoordsList.prototype.getWgs84Points3D = function(resultPoint3DArray)
 	for (var i=0; i<geoCoordsCount; i++)
 	{
 		geoCoord = this.geographicCoordsArray[i];
+		var wgs84Point3d = geoCoord.getWgs84Point3D(undefined);
+		resultPoint3DArray.push(wgs84Point3d);
+	}
+	
+	return resultPoint3DArray;
+	*/
+	return GeographicCoordsList.getGeoCoordsToWgs84Points3D(this.geographicCoordsArray, resultPoint3DArray);
+};
+
+/**
+ * Change Point3D features from WGS84 Points
+ * @param resultPoint3DArray the target
+ */
+GeographicCoordsList.getGeoCoordsToWgs84Points3D = function(geographicCoordsArray, resultPoint3DArray) 
+{
+	if (resultPoint3DArray === undefined)
+	{ resultPoint3DArray = []; }
+	
+	var geoCoord;
+	var geoCoordsCount = geographicCoordsArray.length;
+	for (var i=0; i<geoCoordsCount; i++)
+	{
+		geoCoord = geographicCoordsArray[i];
 		var wgs84Point3d = geoCoord.getWgs84Point3D(undefined);
 		resultPoint3DArray.push(wgs84Point3d);
 	}

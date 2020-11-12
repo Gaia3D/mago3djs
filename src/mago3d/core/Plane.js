@@ -115,8 +115,8 @@ Plane.prototype.getRotationMatrix = function(resultTMatrix)
 		rotAxis.unitary();
 		var angRad = initialNormal.angleRadToVector(transformedNormal);
 		var axis = glMatrix.vec3.fromValues(rotAxis.x, rotAxis.y, rotAxis.z);
-		var quaternion = quat.create();
-		quaternion = quat.setAxisAngle(quaternion, axis, angRad);
+		var quaternion = glMatrix.quat.create();
+		quaternion = glMatrix.quat.setAxisAngle(quaternion, axis, angRad);
 		
 		// Now, make matrix4 from quaternion.
 		var identityMat = glMatrix.mat4.create();

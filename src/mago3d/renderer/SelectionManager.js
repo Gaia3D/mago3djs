@@ -242,6 +242,27 @@ SelectionManager.prototype.getSelectedF4dNode = function()
  * @alias SelectionManager
  * @class SelectionManager
  */
+SelectionManager.prototype.existSelectedObjects = function()
+{
+	var nativeSelectedArray = this.getSelectedGeneralArray();
+	var nodes = this.getSelectedF4dNodeArray();
+	var selectedRefs = this.getSelectedF4dObjectArray();
+
+	if(nativeSelectedArray.length > 0 || nodes.length > 0 || selectedRefs.length > 0)
+	{
+		return true;
+	}
+	else{
+		return false;
+	}
+};
+
+/**
+ * SelectionManager
+ * 
+ * @alias SelectionManager
+ * @class SelectionManager
+ */
 SelectionManager.prototype.getSelectedF4dNodeArray = function()
 {
 	return this.currentNodeSelectedArray;

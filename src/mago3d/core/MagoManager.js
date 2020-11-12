@@ -1320,19 +1320,23 @@ MagoManager.prototype.renderToSelectionBuffer = function()
 		gl.enable(gl.DEPTH_TEST);
 		gl.depthFunc(gl.LEQUAL);
 		gl.depthRange(0, 1);
-
 		gl.disable(gl.CULL_FACE);
-		gl.clear(gl.DEPTH_BUFFER_BIT); // clear only depth buffer.***
+		
 		if (this.isLastFrustum)
 		{
 			// this is the farest frustum, so init selection process.***
 			gl.clearColor(1, 1, 1, 1); // white background.***
+			gl.clearDepth(1);
 			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // clear buffer.***
 			this.selectionManager.clearCandidates();
 			gl.clearColor(0, 0, 0, 1); // return to black background.***
 		}
+		else
+		{
+			gl.clearDepth(1);
+			gl.clear(gl.DEPTH_BUFFER_BIT); // clear only depth buffer.***
+		}
 
-		//this.swapRenderingFase();
 		this.renderer.renderGeometryColorCoding(this.visibleObjControlerNodes, ''); 
 		this.selectionFbo.unbind();
 		this.swapRenderingFase();
@@ -1629,59 +1633,43 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	
 	// Take the depFrameBufferObject of the current frustumVolume.***
 	var bUseMultiRenderTarget = this.postFxShadersManager.bUseMultiRenderTarget;
-	if (frustumVolumenObject.depthFbo === undefined) { frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true, multiRenderTarget : bUseMultiRenderTarget}); }
-	//if (this.depthFboNeo === undefined) { this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
 	if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
 
-	this.depthFboNeo = frustumVolumenObject.depthFbo;
-	//this.depthFboNeo.colorBuffer = this.scene._context._us.globeDepthTexture._texture;
+	if(!this.texturesManager)
+	{
+		this.texturesManager = new TexturesManager(this);
+		var bufferWidth = this.sceneState.drawingBufferWidth[0];
+		var bufferHeight = this.sceneState.drawingBufferHeight[0];
+		var bUseMultiRenderTarget = this.postFxShadersManager.bUseMultiRenderTarget;
+		this.texturesManager.texturesMergerFbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget : bUseMultiRenderTarget}); 
+	}
 
+	this.depthFboNeo = this.texturesManager.texturesMergerFbo;
 	this.depthFboNeo.bind(); 
 
-	gl.clearColor(0, 0, 0, 1);
-	gl.clearDepth(1);
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	gl.clearStencil(0); // provisionally here.***
+	if(this.isFarestFrustum())
+	{
+		gl.clearColor(0, 0, 0, 1);
+		gl.clearDepth(1);
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		gl.clearStencil(0); // provisionally here.***
+	}
+	else
+	{
+		gl.clearDepth(1);
+		gl.clear(gl.DEPTH_BUFFER_BIT);
+	}
+	
 	
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
 	this.renderer.renderGeometry(gl, renderType, this.visibleObjControlerNodes);
 	this.depthFboNeo.unbind();
 	this.swapRenderingFase();
 
-	// If is the frustum zero, then merge depthTextures.***
 	if(this.currentFrustumIdx === 0)
 	{
-		// If is the frustum zero, then merge depthTextures.***
-		if(!this.texturesManager)
-		{
-			this.texturesManager = new TexturesManager(this);
-			var bufferWidth = this.sceneState.drawingBufferWidth[0];
-			var bufferHeight = this.sceneState.drawingBufferHeight[0];
-			var bUseMultiRenderTarget = this.postFxShadersManager.bUseMultiRenderTarget;
-
-			// Create a FBO without renderbuffer.***
-			this.texturesManager.texturesMergerFbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTargetNoRenderbuffer : bUseMultiRenderTarget}); 
-		}
-
-		// Now, collect depthTextures & normalTextures.***
-		var depthTexturesArray = [];
-		var normalTexturesArray = [];
-
-		var frustumsCount = this.numFrustums;
-		for(var i=0; i<frustumsCount; i++)
-		{
-			var frustumVolumenObject = this.frustumVolumeControl.getFrustumVolumeCulling(i); 
-			var depthTex = frustumVolumenObject.depthFbo.colorBuffer;
-			var normalTex = frustumVolumenObject.depthFbo.colorBuffer1;
-
-			depthTexturesArray.push(depthTex);
-			normalTexturesArray.push(normalTex);
-		}
-
-		this.texturesManager.mergeDepthTextures(this, depthTexturesArray, normalTexturesArray);
 		this.renderer.renderSsaoFromDepth(gl);
 	}
-
 
 	// prev 2) ready to color frame buffer
 	this.postFxShadersManager.useProgram(null); // init current bind shader.***
@@ -1726,29 +1714,35 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		{ this.weatherStation = new WeatherStation(); }
 	
 		var geometryDataPath = this.readerWriter.geometryDataPath;
-		//var windDataFilesNamesArray = ["OBS-QWM_2016062000.grib2_wind_000", "OBS-QWM_2016062001.grib2_wind_000", "OBS-QWM_2016062002.grib2_wind_000", "OBS-QWM_2016062003.grib2_wind_000",
-		//	"OBS-QWM_2016062004.grib2_wind_000", "OBS-QWM_2016062005.grib2_wind_000", "OBS-QWM_2016062006.grib2_wind_000", "OBS-QWM_2016062007.grib2_wind_000",
-		//	"OBS-QWM_2016062008.grib2_wind_000", "OBS-QWM_2016062009.grib2_wind_000", "OBS-QWM_2016062010.grib2_wind_000", "OBS-QWM_2016062011.grib2_wind_000",
-		//	"OBS-QWM_2016062012.grib2_wind_000", "OBS-QWM_2016062013.grib2_wind_000", "OBS-QWM_2016062014.grib2_wind_000", "OBS-QWM_2016062015.grib2_wind_000",
-		//	"OBS-QWM_2016062016.grib2_wind_000", "OBS-QWM_2016062017.grib2_wind_000", "OBS-QWM_2016062018.grib2_wind_000", "OBS-QWM_2016062019.grib2_wind_000",
-		//	"OBS-QWM_2016062020.grib2_wind_000", "OBS-QWM_2016062021.grib2_wind_000", "OBS-QWM_2016062022.grib2_wind_000", "OBS-QWM_2016062023.grib2_wind_000"];
+		// JejuAirport, jejuHanRaSan.
+		var windDataFilesNamesArray = ["OBS-QWM_2016062000.grib2_wind_000", "OBS-QWM_2016062001.grib2_wind_000", "OBS-QWM_2016062002.grib2_wind_000", "OBS-QWM_2016062003.grib2_wind_000",
+			"OBS-QWM_2016062004.grib2_wind_000", "OBS-QWM_2016062005.grib2_wind_000", "OBS-QWM_2016062006.grib2_wind_000", "OBS-QWM_2016062007.grib2_wind_000",
+			"OBS-QWM_2016062008.grib2_wind_000", "OBS-QWM_2016062009.grib2_wind_000", "OBS-QWM_2016062010.grib2_wind_000", "OBS-QWM_2016062011.grib2_wind_000",
+			"OBS-QWM_2016062012.grib2_wind_000", "OBS-QWM_2016062013.grib2_wind_000", "OBS-QWM_2016062014.grib2_wind_000", "OBS-QWM_2016062015.grib2_wind_000",
+			"OBS-QWM_2016062016.grib2_wind_000", "OBS-QWM_2016062017.grib2_wind_000", "OBS-QWM_2016062018.grib2_wind_000", "OBS-QWM_2016062019.grib2_wind_000",
+			"OBS-QWM_2016062020.grib2_wind_000", "OBS-QWM_2016062021.grib2_wind_000", "OBS-QWM_2016062022.grib2_wind_000", "OBS-QWM_2016062023.grib2_wind_000"]; // jeju, hanRaSan
 
+			
+			// Seoul data.
 		var windDataFilesNamesArray = ["OBS-QWM_2019090700.grib2_wind_000", "OBS-QWM_2019090701.grib2_wind_000", "OBS-QWM_2019090702.grib2_wind_000", "OBS-QWM_2019090703.grib2_wind_000",
 			"OBS-QWM_2019090704.grib2_wind_000", "OBS-QWM_2019090705.grib2_wind_000", "OBS-QWM_2019090706.grib2_wind_000", "OBS-QWM_2019090707.grib2_wind_000",
 			"OBS-QWM_2019090708.grib2_wind_000", "OBS-QWM_2019090709.grib2_wind_000", "OBS-QWM_2019090710.grib2_wind_000", "OBS-QWM_2019090711.grib2_wind_000",
 			"OBS-QWM_2019090712.grib2_wind_000", "OBS-QWM_2019090713.grib2_wind_000", "OBS-QWM_2019090714.grib2_wind_000", "OBS-QWM_2019090715.grib2_wind_000",
 			"OBS-QWM_2019090716.grib2_wind_000", "OBS-QWM_2019090717.grib2_wind_000", "OBS-QWM_2019090718.grib2_wind_000", "OBS-QWM_2019090719.grib2_wind_000",
-			"OBS-QWM_2019090720.grib2_wind_000", "OBS-QWM_2019090721.grib2_wind_000", "OBS-QWM_2019090722.grib2_wind_000", "OBS-QWM_2019090723.grib2_wind_000"];
+			"OBS-QWM_2019090720.grib2_wind_000", "OBS-QWM_2019090721.grib2_wind_000", "OBS-QWM_2019090722.grib2_wind_000", "OBS-QWM_2019090723.grib2_wind_000"]; // seoulData.
+			
 			
 		//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_Airport";
 		//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_GolfPark_NineBridge1";
-		var windMapFilesFolderPath = geometryDataPath +"/SeoulWind/200907";
+		//var windMapFilesFolderPath = geometryDataPath +"/SeoulWind/200907";
+		var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_HanRaSan";
 		
 		this.weatherStation.test_loadWindData3d(this, windDataFilesNamesArray, windMapFilesFolderPath);
 		//this.TEST__golfPark();
 		this.windTest = true;
 	}
 	*/
+	
 	if (this.weatherStation)
 	{
 		//this.weatherStation.renderWindMultiLayers(this);

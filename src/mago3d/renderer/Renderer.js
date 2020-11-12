@@ -604,27 +604,61 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 	{ magoManager.weatherStation.test_renderCuttingPlanes(magoManager, renderType); }
 	
 	var selectionManager = magoManager.selectionManager;
-	
-	// Test.***
-	if (selectionManager)
-	{
-		var selGeneralObjects = selectionManager.getSelectionCandidatesFamily("general");
-		if (selGeneralObjects)
-		{
-			var currObjectSelected = selGeneralObjects.currentSelected;
-			if (currObjectSelected)
-			{
-				// check if is a cuttingPlane.***
-				if (currObjectSelected instanceof CuttingPlane)
-				{
-					// Test. Render depth only for the selected object.***************************
-					magoManager.test_renderDepth_objectSelected(currObjectSelected);
-				}
-			}
-		}
-	}
+
+	if(selectionManager.existSelectedObjects())
 	this.renderSilhouetteDepth();
 	
+};
+
+Renderer.prototype.beginRenderSilhouetteDepth = function()
+{
+	var magoManager = this.magoManager;
+	var gl = magoManager.getGl();
+
+	magoManager.currentProcess = CODE.magoCurrentProcess.SilhouetteDepthRendering;
+	var silhouetteDepthFbo = magoManager.getSilhouetteDepthFbo();
+	silhouetteDepthFbo.bind(); 
+		
+	if (magoManager.isFarestFrustum())
+	{
+		gl.clearColor(1, 1, 1, 1);
+		gl.clearDepth(1);
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	}
+		
+	magoManager.swapRenderingFase();
+		
+	var currentShader;
+	currentShader = magoManager.postFxShadersManager.getShader("modelRefDepth"); 
+	currentShader.resetLastBuffersBinded();
+
+	currentShader.useProgram();
+	currentShader.disableVertexAttribArrayAll();
+	currentShader.enableVertexAttribArray(currentShader.position3_loc);
+
+	currentShader.bindUniformGenerals();
+	gl.uniform3fv(currentShader.scaleLC_loc, [1.0, 1.0, 1.0]); // init referencesMatrix.
+		
+	// check if exist clippingPlanes.
+	if (magoManager.modeler.clippingBox !== undefined)
+	{
+		var planesVec4Array = magoManager.modeler.clippingBox.getPlanesRelToEyevec4Array(magoManager);
+		var planesVec4FloatArray = new Float32Array(planesVec4Array);
+			
+		gl.uniform1i(currentShader.bApplyClippingPlanes_loc, true);
+		gl.uniform1i(currentShader.clippingPlanesCount_loc, 6);
+		gl.uniform4fv(currentShader.clippingPlanes_loc, planesVec4FloatArray);
+	}
+	else 
+	{
+		gl.uniform1i(currentShader.bApplyClippingPlanes_loc, false);
+	}
+
+};
+
+Renderer.prototype.endRenderSilhouetteDepth = function(silhouetteDepthFbo)
+{
+	silhouetteDepthFbo.unbind(); 
 };
 
 Renderer.prototype.renderSilhouetteDepth = function()
@@ -643,50 +677,29 @@ Renderer.prototype.renderSilhouetteDepth = function()
 	var renderTexture = false;
 	if (selectionManager)
 	{
+		// 1rst, check if exist objects selected.
+		//var nativeSelectedArray = selectionManager.getSelectedGeneralArray();
+		//var nodes = selectionManager.getSelectedF4dNodeArray();
+		//var selectedRefs = selectionManager.getSelectedF4dObjectArray();
+
+		if(selectionManager.existSelectedObjects())
+		{
+			// Begin render.
+			this.beginRenderSilhouetteDepth();
+		}
+		else{
+			return;
+		}
+
+		var currentShader = magoManager.postFxShadersManager.getShader("modelRefDepth"); 
+		var silhouetteDepthFbo = magoManager.getSilhouetteDepthFbo();
+
 		var gl = magoManager.getGl();
 		var nodes = selectionManager.getSelectedF4dNodeArray();
 		var selectedRefs = selectionManager.getSelectedF4dObjectArray();
 		if (nodes.length > 0 && selectedRefs.length === 0) // test code.***
 		{
-			magoManager.currentProcess = CODE.magoCurrentProcess.SilhouetteDepthRendering;
-			var silhouetteDepthFbo = magoManager.getSilhouetteDepthFbo();
-			silhouetteDepthFbo.bind(); 
-				
-			if (magoManager.isFarestFrustum())
-			{
-				gl.clearColor(1, 1, 1, 1);
-				gl.clearDepth(1);
-				gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-			}
-				
-			magoManager.swapRenderingFase();
-				
-			var currentShader;
-			currentShader = magoManager.postFxShadersManager.getShader("modelRefDepth"); 
-			currentShader.resetLastBuffersBinded();
 
-			currentShader.useProgram();
-			currentShader.disableVertexAttribArrayAll();
-			currentShader.enableVertexAttribArray(currentShader.position3_loc);
-
-			currentShader.bindUniformGenerals();
-			gl.uniform3fv(currentShader.scaleLC_loc, [1.0, 1.0, 1.0]); // init referencesMatrix.
-				
-			// check if exist clippingPlanes.
-			if (magoManager.modeler.clippingBox !== undefined)
-			{
-				var planesVec4Array = magoManager.modeler.clippingBox.getPlanesRelToEyevec4Array(magoManager);
-				var planesVec4FloatArray = new Float32Array(planesVec4Array);
-					
-				gl.uniform1i(currentShader.bApplyClippingPlanes_loc, true);
-				gl.uniform1i(currentShader.clippingPlanesCount_loc, 6);
-				gl.uniform4fv(currentShader.clippingPlanes_loc, planesVec4FloatArray);
-			}
-			else 
-			{
-				gl.uniform1i(currentShader.bApplyClippingPlanes_loc, false);
-			}
-				
 			var renderType = 0;
 			var refMatrixIdxKey = 0;
 			for (var i=0, len=nodes.length;i<len;i++) 
@@ -694,16 +707,10 @@ Renderer.prototype.renderSilhouetteDepth = function()
 				var node = nodes[i];
 				node.renderContent(magoManager, currentShader, renderType, refMatrixIdxKey);
 			}
-
-			silhouetteDepthFbo.unbind(); 
 			magoManager.swapRenderingFase();
 		}
-
-		//}
 		
-		//var nodes = selectionManager.getSelectedF4dNodeArray();
-		//var selectedRefs = selectionManager.getSelectedF4dObjectArray();
-		//if (nodes.length > 0 && selectedRefs.length === 0) // test code.***
+
 		// Check if there are a object selected.**********************************************************************
 		//if (magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.OBJECT && magoManager.selectionManager.currentReferenceSelected)
 		if (selectionManager.currentReferenceSelected)
@@ -721,30 +728,6 @@ Renderer.prototype.renderSilhouetteDepth = function()
 				var maxSizeToRender = 0.0;
 				var refMatrixIdxKey = 0;
 				
-				magoManager.currentProcess = CODE.magoCurrentProcess.StencilSilhouetteRendering;
-				
-				// do as the "getSelectedObjectPicking".**********************************************************
-				var silhouetteDepthFbo = magoManager.getSilhouetteDepthFbo();
-				silhouetteDepthFbo.bind(); 
-					
-				if (magoManager.isFarestFrustum())
-				{
-					gl.clearColor(0, 0, 0, 1);
-					gl.clearDepth(1);
-					gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-				}
-					
-				var currentShader;
-				currentShader = magoManager.postFxShadersManager.getShader("modelRefDepth"); 
-				currentShader.resetLastBuffersBinded();
-
-				currentShader.useProgram();
-				currentShader.disableVertexAttribArrayAll();
-				currentShader.enableVertexAttribArray(currentShader.position3_loc);
-
-				currentShader.bindUniformGenerals();
-				gl.uniform3fv(currentShader.scaleLC_loc, [1.0, 1.0, 1.0]); // init referencesMatrix.
-				
 				buildingGeoLocation.bindGeoLocationUniforms(gl, currentShader);
 
 				glPrimitive = gl.TRIANGLES;
@@ -755,11 +738,23 @@ Renderer.prototype.renderSilhouetteDepth = function()
 				gl.disable(gl.CULL_FACE);
 				
 				selectionManager.getSelectedF4dObject().render(magoManager, neoBuilding, localRenderType, renderTexture, currentShader, refMatrixIdxKey, minSizeToRender);
-				silhouetteDepthFbo.unbind(); 
+				//silhouetteDepthFbo.unbind(); 
 				
 				gl.enable(gl.CULL_FACE);
 			}
 		}
+
+		// Now check native objects.
+		var renderType = 0;
+		var nativeSelectedArray = selectionManager.getSelectedGeneralArray();
+		for(var i=0; i<nativeSelectedArray.length; i++)
+		{
+			var renderableObject = nativeSelectedArray[i];
+			renderableObject.render(magoManager, currentShader, renderType, gl.TRIANGLES);
+		}
+
+		// End render.
+		this.endRenderSilhouetteDepth(silhouetteDepthFbo);
 	}
 };
 
@@ -1104,9 +1099,12 @@ Renderer.prototype.renderSilhouette = function()
 	var bApplyShadow = false;
 	var bSilhouette = true;
 	var bFxaa = false;
+	//var bApplySsao = false;
+
 	gl.uniform1i(currentShader.bApplyShadow_loc, bApplyShadow);
 	gl.uniform1i(currentShader.bSilhouette_loc, bSilhouette);
 	gl.uniform1i(currentShader.bFxaa_loc, bFxaa);
+	//gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao);
 	
 	var sunSystem = sceneState.sunSystem;
 	var sunLight = sunSystem.getLight(0);
@@ -1223,12 +1221,11 @@ Renderer.prototype.renderEdgesFromDepth = function(gl)
 };
 
 /**
- * This function renders the shadows of the scene on terrain.
+ * This function renders ssao
  * @param {WebGLRenderingContext} gl WebGL Rendering Context.
  */
 Renderer.prototype.renderScreenQuadSsao = function(gl) 
 {
-	// This function renders shadows on terrain in cesium.***
 	// We are using a quadScreen.***
 	var currentShader;
 	var magoManager = this.magoManager;
@@ -1313,6 +1310,7 @@ Renderer.prototype.renderScreenQuadSsao = function(gl)
 		var ssaoFromDepthFbo = magoManager.ssaoFromDepthFbo;
 		gl.activeTexture(gl.TEXTURE5); // ssaoTex.***
 		gl.bindTexture(gl.TEXTURE_2D, ssaoFromDepthFbo.colorBuffer);
+		
 
 		gl.activeTexture(gl.TEXTURE6); // normalTex.***
 		gl.bindTexture(gl.TEXTURE_2D, normalTex);
@@ -1938,7 +1936,8 @@ Renderer.prototype.renderScreenRectangle = function(gl)
 {
 	if (this.quadBuffer === undefined)
 	{
-		var data = new Float32Array([0, 0,   1, 0,   0, 1,   0, 1,   1, 0,   1, 1]);
+		//var data = new Float32Array([0, 0,   1, 0,   0, 1,   0, 1,   1, 0,   1, 1]);
+		var data = new Float32Array([0, 0,   0.5, 0,   0, 0.5,   0, 0.5,   0.5, 0,   0.5, 0.5]);
 		this.quadBuffer = FBO.createBuffer(gl, data);
 	}
 
@@ -1966,8 +1965,12 @@ Renderer.prototype.renderScreenRectangle = function(gl)
 	var activeTexturesLayers = new Int32Array([0, 0, 0, 0, 0, 0, 0, 0]); 
 	var externalAlphaLayers = new Float32Array([1, 1, 1, 1, 1, 1, 1, 1]); 
 
-	
-	var texture = magoManager.selectionFbo.colorBuffer; // framebuffer for color selection.***
+	// If you want to see selectionBuffer.
+	//var texture = magoManager.selectionFbo.colorBuffer; // framebuffer for color selection.***
+
+	// If you want to see silhouetteDepthBuffer.
+	var silhouetteDepthFbo = magoManager.getSilhouetteDepthFbo();
+	var texture = silhouetteDepthFbo.colorBuffer;
 
 	if (texture === undefined)
 	{ return; }
@@ -1978,12 +1981,15 @@ Renderer.prototype.renderScreenRectangle = function(gl)
 	activeTexturesLayers[0] = 1;
 	//externalAlphaLayers[0] = texture.opacity;
 
+	gl.depthMask(false);
+
 	gl.uniform1iv(shader.uActiveTextures_loc, activeTexturesLayers);
 	gl.uniform1fv(shader.externalAlphasArray_loc, externalAlphaLayers);
 	gl.drawArrays(gl.TRIANGLES, 0, 6);
 
 
-
+	postFxShadersManager.useProgram(null);
+	gl.depthMask(true);
 
 };
 
