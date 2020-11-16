@@ -145,6 +145,24 @@
 	// 3ds, pointsCloud, sihung_campus, sihung_las, IncheonGyeyang_2
 	function doTest(){
 		var f4dController = managerFactory.getF4dController();
+		
+		f4dController.addSmartTileGroup({
+            dataGroupId : 10000,
+            dataGroupKey : 'IncheonGayang',
+            dataGroupName : '계양시 건물들',
+            dataGroupPath : 'IncheonGayang/',
+            smartTileIndexPath: "SmartTiles_IncheonGayang"
+		});
+		
+		
+		f4dController.addSmartTileGroup({
+            dataGroupId : 10000,
+            dataGroupKey : 'Incheon_Mirae',
+            dataGroupName : '계양시 건물들',
+            dataGroupPath : 'Incheon_Mirae/',
+            smartTileIndexPath: "_TILE_Incheon_Mirae"
+		});
+		/*
 		$.ajax({
 			url: dataInformationUrl + "IncheonGyeyang_2.json",
 			type: "GET",
@@ -157,6 +175,7 @@
 				alert(e.responseText);
 			}
 		});
+		*/
 
 		// Test weather wind.*********************************
 		/*

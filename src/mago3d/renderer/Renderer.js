@@ -625,6 +625,11 @@ Renderer.prototype.beginRenderSilhouetteDepth = function()
 		gl.clearDepth(1);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	}
+	else
+	{
+		gl.clearDepth(1);
+		gl.clear(gl.DEPTH_BUFFER_BIT);
+	}
 		
 	magoManager.swapRenderingFase();
 		
@@ -1099,12 +1104,12 @@ Renderer.prototype.renderSilhouette = function()
 	var bApplyShadow = false;
 	var bSilhouette = true;
 	var bFxaa = false;
-	//var bApplySsao = false;
+	var bApplySsao = false;
 
 	gl.uniform1i(currentShader.bApplyShadow_loc, bApplyShadow);
 	gl.uniform1i(currentShader.bSilhouette_loc, bSilhouette);
 	gl.uniform1i(currentShader.bFxaa_loc, bFxaa);
-	//gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao);
+	gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao);
 	
 	var sunSystem = sceneState.sunSystem;
 	var sunLight = sunSystem.getLight(0);
@@ -2291,37 +2296,6 @@ Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControler
 		{
 			this.renderAxisNodes(visibleObjControlerNodes.getAllVisibles(), renderType);
 		}
-		
-		
-		if (selectionManager && selectionManager.getSelectedF4dNodeArray().length > 0) // if there are an object selected then there are a building selected.***
-		{
-			//var selectedNodeArray = selectionManager.getSelectedF4dNodeArray();
-			if (selectionManager.getSelectedF4dBuildingArray().length > 0)
-			{
-				this.renderSilhouette();
-			}
-			
-			/*if (selectionManager.getSelectedF4dBuildingArray())
-			{
-				nodes = selectionManager.getSelectedF4dNodeArray();
-				if (nodes !== undefined) // test code.***
-				{
-					// New.
-					this.renderSilhouette();
-				}
-			}*/
-			
-			// draw the axis.***
-			/*if (magoManager.magoPolicy.getShowOrigin())
-			{
-				var node = selectionManager.getSelectedF4dNode();
-				//var geoLocDataManager = node.getNodeGeoLocDataManager();
-				var nodes = [node];
-				
-				this.renderAxisNodes(nodes, renderType);
-			}*/
-		}
-		
 		
 		// Render Animated Man.********************************************************************************************************************
 		

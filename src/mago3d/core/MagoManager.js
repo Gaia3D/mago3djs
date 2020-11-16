@@ -1705,7 +1705,28 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 			}
 		this.renderer.renderScreenQuadSsao(gl);
 		this.renderCluster();
+
+		if (this.selectionManager)
+		{
+			if(this.selectionManager.existSelectedObjects())
+			{
+				this.renderer.renderSilhouette();
+			}
+			
+			// draw the axis.***
+			////if (magoManager.magoPolicy.getShowOrigin())
+			////{
+			////	var node = selectionManager.getSelectedF4dNode();
+			////	//var geoLocDataManager = node.getNodeGeoLocDataManager();
+			////	var nodes = [node];
+			////	
+			////	this.renderAxisNodes(nodes, renderType);
+			////}
+		}
+
 	}
+
+	
 
 	/*
 	if (this.windTest === undefined)
