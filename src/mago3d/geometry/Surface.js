@@ -47,6 +47,15 @@ var Surface = function(options)
 	}
 };
 
+Object.defineProperties(Surface.prototype, {
+	guid: {
+		get: function()
+		{
+			return this._guid;
+		}
+	},
+});
+
 /**
  * 생성된 객체가 있다면 삭제하고 초기화 한다.
  */

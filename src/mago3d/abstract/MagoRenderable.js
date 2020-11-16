@@ -60,7 +60,14 @@ MagoRenderable.OBJECT_TYPE = {
 	'VECTORMESH' : 1,
 	'POINTMESH'  : 2
 };
-
+Object.defineProperties(MagoRenderable.prototype, {
+	guid: {
+		get: function()
+		{
+			return this._guid;
+		}
+	},
+});
 /**
  * 이벤트 등록
  * @param {MagoEvent} event 
@@ -209,7 +216,7 @@ MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPr
 
 	var executedEffects = false;
 	if (renderType !== 2 && magoManager.currentProcess !== CODE.magoCurrentProcess.StencilSilhouetteRendering)
-	{ executedEffects = magoManager.effectsManager.executeEffects(this._guid, magoManager); }
+	{ executedEffects = magoManager.effectsManager.executeEffects(this.guid, magoManager); }
 
 	if(renderType === 1)
 	{
@@ -279,6 +286,7 @@ MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPr
 	{
 		// must return all uniforms changed for effects.
 		gl.uniform3fv(shader.aditionalOffset_loc, [0.0, 0.0, 0.0]); // init referencesMatrix.
+		gl.uniform3fv(shader.scaleLC_loc, [1.0,1.0,1.0]);   
 		if (renderType === 1)
 		{
 			gl.uniform4fv(shader.colorMultiplier_loc, [1.0, 1.0, 1.0, 1.0]);

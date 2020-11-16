@@ -100,6 +100,21 @@ Effect.prototype.execute = function(currTimeSec)
 		gl.uniform3fv(this.effectsManager.currShader.scaleLC_loc, [1.0, 1.0, zScale]); // init referencesMatrix.
 		return effectFinished;
 	}
+	else if (this.effectType === "zBounceLinearReverse")
+	{
+		var zScale = 1.0;
+		if (timeDiffSeconds >= this.durationSeconds)
+		{
+			zScale = 0;
+			effectFinished = true; // if return true, then this effect is finished, so this effect will be deleted.
+		}
+		else
+		{
+			zScale = 1 - timeDiffSeconds/this.durationSeconds;
+		}
+		gl.uniform3fv(this.effectsManager.currShader.scaleLC_loc, [1.0, 1.0, zScale]); // init referencesMatrix.
+		return effectFinished;
+	}
 	else if (this.effectType === "borningLight")
 	{
 		var colorMultiplier = 1.0;

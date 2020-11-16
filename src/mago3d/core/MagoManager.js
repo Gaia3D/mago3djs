@@ -7006,7 +7006,6 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 			data.mapping_type = mapping_type;
 			data.dataId = data_id;
 			data.dataGroupId = data_group_id;
-			data._guid = createGuid();
 			var tMatrix;
 			
 			if (attributes.isPhysical)
@@ -7493,7 +7492,6 @@ MagoManager.prototype.instantiateStaticModel = function(attributes)
 
 		node.data.attributes.fromDate = new Date();
 		node.data.attributes.toDate = new Date();
-		node.data._guid = createGuid();
 		
 		// Now, insert node into smartTile.***
 		var targetDepth = 12;

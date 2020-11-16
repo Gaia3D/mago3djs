@@ -13,6 +13,13 @@ var Node = function()
 	}
 
 	/**
+	 * primary key in engine
+	 * @type {String}
+	 * @private
+	 */
+	this._guid = createGuid();
+
+	/**
 	 * Parent (owner) of this node object. If undefined, this node is the root node.
 	 * @type {Node}
 	 * @default undefined
@@ -33,6 +40,15 @@ var Node = function()
 	 */
 	this.data; 
 };
+
+Object.defineProperties(Node.prototype, {
+	guid: {
+		get: function()
+		{
+			return this._guid;
+		}
+	},
+});
 
 /**
  * Returns true if this node is a "reference" type node. "Reference" type nodes uses StaticModels geometry.
@@ -436,7 +452,7 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 
 	// Check if there are effects.
 	if (renderType !== 2 && magoManager.currentProcess !== CODE.magoCurrentProcess.StencilSilhouetteRendering)
-	{ var executedEffects = magoManager.effectsManager.executeEffects(data._guid, magoManager); }
+	{ var executedEffects = magoManager.effectsManager.executeEffects(this.guid, magoManager); }
 	
 	// Check if we are under selected data structure.***
 	var selectionManager = magoManager.selectionManager;

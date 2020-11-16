@@ -43,6 +43,14 @@ var Face = function()
 	 */
 	this.surfaceOwner;
 };
+Object.defineProperties(Face.prototype, {
+	guid: {
+		get: function()
+		{
+			return this._guid;
+		}
+	},
+});
 
 /**
  * delete all member.

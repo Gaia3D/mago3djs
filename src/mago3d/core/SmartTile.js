@@ -1601,7 +1601,7 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 			node.data.rotationsDegree = eulerAngDeg; 
 			node.data.dataId = dataId;
 			node.data.dataGroupId = savedProjectId;
-			node.data._guid = createGuid();
+
 			node.data.smartTileOwner = this;
 			for (var j in externInfo) 
 			{
