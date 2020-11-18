@@ -127,29 +127,6 @@
 		
 		var magoManager = magoInstance.getMagoManager();
 		var viewer = magoInstance.getViewer();
-		var provider = new Cesium.WebMapServiceImageryProvider({
-			url : 'http://localhost:8080/geoserver/mago3d/gwc/service/wms',
-			layers : 'mago3d:susim_5m',
-			tilingScheme : new Cesium.WebMercatorTilingScheme(),
-			parameters: {
-				tiled: true,
-				transparent : true,
-				srs : 'EPSG:3857',
-            	format: "image/png"
-			}
-		});
-		var aa = new Cesium.ImageryLayer(provider, {
-			alpha : 0.9
-		});
-//viewer.imageryLayers.add(aa);
-		var layer = new Mago3D.MagoLayer({
-			dataGroupId : 1,
-			dataGroupKey : '3ds',
-			dataGroupName : '삼디에스',
-			dataGroupPath : '/3ds'
-		});
-		
-		magoManager.addLayer(layer);
 
 		magoManager.on(Mago3D.MagoManager.EVENT_TYPE.CLICK, function(e){
 			console.info(e);
@@ -162,39 +139,6 @@
 		magoManager.on(Mago3D.MagoManager.EVENT_TYPE.DESELECTEDF4D, function(e){
 			console.info(e);
 		});
-		
-		var f4dController = e.getF4dController();
-
-		
-		f4dController.addSmartTileGroup({
-            dataGroupId : 10000,
-            dataGroupKey : 'IncheonGayang',
-            dataGroupName : '계양시 건물들',
-            dataGroupPath : 'IncheonGayang/',
-            smartTileIndexPath: "SmartTiles_IncheonGayang"
-		});
-		
-		
-		f4dController.addSmartTileGroup({
-            dataGroupId : 10000,
-            dataGroupKey : 'Incheon_Mirae',
-            dataGroupName : '계양시 건물들',
-            dataGroupPath : 'Incheon_Mirae/',
-            smartTileIndexPath: "_TILE_Incheon_Mirae"
-		});
-		
-
-		/*
-		// hyemi smartTiles
-		f4dController.addSmartTileGroup({
-            dataGroupId : 10000,
-            dataGroupKey : 'test',
-            dataGroupName : '계양시 건물들',
-            dataGroupPath : 'test/',
-            smartTileIndexPath: "smartTiles_hyemi"
-		});
-		*/
-		
 	}
 	// 3ds, pointsCloud, sihung_campus, sihung_las, suseong, IncheonGayang, IncheonGyeyang_2
 	function doTest(){

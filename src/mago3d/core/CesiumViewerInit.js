@@ -383,14 +383,14 @@ CesiumViewerInit.prototype.setEventHandler = function()
 		//magoManager.mouseActionLeftDown(click.position.x, click.position.y);
 
 		// Do a test. Create a geoCoord and render it.
-		var screenX = click.position.x;
+		/*var screenX = click.position.x;
 		var screenY = click.position.y;
 		var posWC = ManagerUtils.screenCoordToWorldCoordUseDepthCheck(screenX, screenY, magoManager);
 		var geoCoord = ManagerUtils.pointToGeographicCoord(posWC, undefined);
 		geoCoord.makeDefaultGeoLocationData();
 		var geoCoordsList = magoManager.modeler.getGeographicCoordsList();
 		geoCoordsList.addGeoCoord(geoCoord);
-		var hola = 0;
+		var hola = 0;*/
 		// End test.----------------------------------
 
 	}, Cesium.ScreenSpaceEventType.LEFT_DOWN);
