@@ -13,13 +13,13 @@ var HeightReference = {
  * @param {string} str 
  * @static
  */
-HeightReference.getNameSpace = function(str) 
+HeightReference.getKey = function(str) 
 {
 	switch (str) 
 	{
-	case 'clampToGround' : return Mago3D.HeightReference.CLAMP_TO_GROUND;
-	case 'relativeToGround' : return Mago3D.HeightReference.RELATIVE_TO_GROUND;
-	default : return Mago3D.HeightReference.NONE;
+	case 'clampToGround' : return 'CLAMP_TO_GROUND';
+	case 'relativeToGround' : return 'RELATIVE_TO_GROUND';
+	default : return 'NONE';
 	}
 };
 
@@ -28,7 +28,7 @@ HeightReference.getNameSpace = function(str)
  * @param {number} number 
  * @static
  */
-HeightReference.getNameSpaceByOrdinal = function(number) 
+HeightReference.getValueByOrdinal = function(number) 
 {
 	switch (number) 
 	{

@@ -1487,6 +1487,8 @@ Node.prototype.intersectionWithPolygon2D = function(polygon2D)
  */
 Node.prototype.caculateHeightByReference = function(terrainHeight)
 {
+	if(terrainHeight === undefined || terrainHeight === null) terrainHeight = 0;
+	
 	var cp = this.getCurrentGeoLocationData().geographicCoord;
 	var bx = this.getBBox();
 	var height = 0;
@@ -1517,7 +1519,7 @@ Node.prototype.caculateHeightByReference = function(terrainHeight)
  */
 Node.prototype.setHeightReference = function(ref, magoManager)
 {
-	this.data.attributes.heightReference = HeightReference.getNameSpace(ref);
+	this.data.attributes.heightReference = ref;
 	if (this.data.attributes.heightReference !== HeightReference.NONE)
 	{
 		if (this.isNeedValidHeight(magoManager)) { magoManager._needValidHeightNodeArray.push(this); }

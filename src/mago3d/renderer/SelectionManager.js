@@ -627,6 +627,11 @@ SelectionManager.prototype.filterProvisional = function(type, filter)
 		targetProvisional[type] = this.provisionalNativeArray;
 		break;
 	}
+	case DataType.ALL : {
+		targetProvisional[DataType.F4D] = this.provisionalF4dArray;
+		targetProvisional[DataType.NATIVE] = this.provisionalNativeArray;
+		break;
+	}
 	}
 
 	var provisionalLength = 0;
@@ -643,7 +648,7 @@ SelectionManager.prototype.filterProvisional = function(type, filter)
 		return;
 	}
 
-	filter = filter ? filter : function(){ return true; };
+	filter = filter ? filter : TRUE;
 	var result = {};
 	for (var i in targetProvisional)
 	{
@@ -656,7 +661,7 @@ SelectionManager.prototype.filterProvisional = function(type, filter)
 				var realFilter = filter;
 				if (type === DataType.OBJECT && i === DataType.F4D)
 				{
-					realFilter = function(){ return true; };
+					realFilter = TRUE;
 				}
 				if (realFilter.call(this, provisional[j]))
 				{
@@ -675,11 +680,14 @@ SelectionManager.prototype.filterProvisional = function(type, filter)
  * @param {string} type required.
  * @param {function} filter option.
  */
-SelectionManager.prototype.provisionalToCurrent = function(type, filter) 
+SelectionManager.prototype.provisionalToCurrent = function(type, filter, maintain) 
 {
 	var validProvision = this.filterProvisional(type, filter);
 
-	this.clearCurrents();
+	if(!maintain) {
+		this.clearCurrents();
+	}
+	
 	if (isEmpty(validProvision)){ return; }
 
 	for (var i in validProvision)

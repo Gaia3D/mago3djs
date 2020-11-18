@@ -1540,7 +1540,7 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 				var charValue = (new Uint8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
 
 				if(dataKey === 'heightReference') {
-					charValue = HeightReference.getNameSpaceByOrdinal(charValue);
+					charValue = HeightReference.getValueByOrdinal(charValue);
 				}
 
 				// Put the readed data into externInfo.***

@@ -2017,10 +2017,10 @@ MagoManager.prototype.validateHeight = function(frustumObject)
 						validDataArray : nArray,
 						timestamp: new Date()
 					});
-					that._needValidHeightNativeArray = next;
 				}
 			});
 		});
+		this._needValidHeightNativeArray = next;
 	}
 };
 

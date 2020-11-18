@@ -21,7 +21,9 @@ var PointSelectInteraction = function(option)
 
 	this.targetType = defaultValue(option.targetType, DataType.F4D);
 	this.targetHighlight = defaultValue(option.targetHighlight, true);
-	this.filter = undefined;
+
+	this._initFilter();
+	
 
 	var that = this;
 	this.on(PointSelectInteraction.EVENT_TYPE.DEACTIVE, function()
@@ -47,6 +49,22 @@ PointSelectInteraction.prototype.init = function()
 	this.startPoint = undefined;
 	this.endPoint = undefined;
 };
+
+PointSelectInteraction.prototype._initFilter = function() {
+	this.filter = {};
+
+	for(var type in DataType) {
+		if(DataType.hasOwnProperty(type))
+		{
+			var dataType = DataType[type];
+
+			if( dataType !== DataType.ALL 
+				&& typeof dataType !== 'function') {
+				this.filter[dataType] = TRUE;
+			}
+		}
+	}
+}
 /**
  * set TargetType
  * @param {boolean} type 
@@ -60,7 +78,7 @@ PointSelectInteraction.prototype.setTargetType = function(type)
 		this.selected = undefined;
 		this.manager.isCameraMoved = true;
 		if(this.manager.selectionManager) this.manager.selectionManager.clearCurrents();
-		this.filter = undefined;
+		this._initFilter();
 	}
 	this.targetType = type;
 };
@@ -76,22 +94,28 @@ PointSelectInteraction.prototype.getTargetType = function()
 
 /**
  * set filter function
+ * @param {String} dataType DataType. Required
  * @param {function} filterFunction
  */
-PointSelectInteraction.prototype.setFilter = function(filterFunction)
+PointSelectInteraction.prototype.setFilter = function(dataType, filterFunction)
 {
-	if(filterFunction && typeof filterFunction === 'function') {
-		this.filter = filterFunction;
+	if(!dataType || !DataType.hasOwnProperty(DataType.getKey(dataType))) {
+		throw new Error('dataType is required.'); 
 	}
+
+	if(!filterFunction || typeof filterFunction !== 'function') filterFunction = TRUE;
+
+	this.filter[dataType] = filterFunction;
 };
 
 /**
- * set filter function
- * @param {function} filterFunction
+ * get filter function
+ * @param {string} dataType
+ * @return {function}
  */
-PointSelectInteraction.prototype.getFilter = function(filterFunction)
+PointSelectInteraction.prototype.getFilter = function(dataType)
 {
-	return this.filter;
+	return this.filter[dataType];
 };
 
 /**
@@ -157,6 +181,10 @@ PointSelectInteraction.prototype.handleUpEvent = function(browserEvent)
 	}
 	case DataType.NATIVE : {
 		this.selected = selectionManager.getSelectedGeneral();
+		break;
+	}
+	case DataType.ALL : {
+		this.selected = selectionManager.getSelectedF4dNode() || selectionManager.getSelectedGeneral();
 		break;
 	}
 	}
@@ -228,9 +256,13 @@ PointSelectInteraction.prototype.select = function(screenCoordinate)
 
 	var gl = manager.getGl();
 	selectManager.selectProvisionalObjectByPixel(gl, screenCoordinate.x, screenCoordinate.y);
-	selectManager.provisionalToCurrent(this.targetType, this.filter);
-	
-	//selectManager.selectObjectByPixel(gl, screenCoordinate.x, screenCoordinate.y, bObject);
+
+	if(this.targetType === DataType.ALL) {
+		selectManager.provisionalToCurrent(DataType.F4D, this.filter[DataType.F4D]);
+		selectManager.provisionalToCurrent(DataType.NATIVE, this.filter[DataType.NATIVE], true);
+	} else {
+		selectManager.provisionalToCurrent(this.targetType, this.filter[this.targetType]);
+	}
 };
 
 /**

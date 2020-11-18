@@ -720,6 +720,7 @@ MagoRenderable.prototype.intersectionWithPolygon2D = function(polygon2D)
  */
 MagoRenderable.prototype.setTerrainHeight = function(height)
 {
+	if(height === undefined || height === null) height = 0;
 	this.terrainHeight = height;
 	//this.setDirty(true);
 	this.validTerrainHeight();
