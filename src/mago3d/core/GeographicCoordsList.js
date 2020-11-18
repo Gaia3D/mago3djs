@@ -390,15 +390,14 @@ GeographicCoordsList.getRenderableObjectOfGeoCoordsArray = function(geoCoordsArr
 	// Create a vectorMesh.
 	if (options === undefined)
 	{
-		options = {
-			thickness: 2.0
-		};
+		options = {};
 	}
-	else
-	{
-		if (options.thickness === undefined)
-		{ options.thickness = 2.0; }
-	}
+
+	if (options.thickness === undefined)
+	{ options.thickness = 2.0; }
+
+	if (options.color === undefined)
+		{ options.color = new Color(1.0, 0.3, 0.3, 1.0); }
 
 	var vectorMesh = new VectorMesh(options);
 	

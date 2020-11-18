@@ -7,8 +7,9 @@
 uniform sampler2D depthTex;
 uniform sampler2D shadowMapTex;
 uniform sampler2D shadowMapTex2;
-uniform sampler2D ssaoTex;
-uniform sampler2D normalTex;
+uniform sampler2D ssaoTex; // channel 5.
+uniform sampler2D normalTex; // channel 6.
+uniform sampler2D silhouetteDepthTex; // channel 7.
 uniform mat4 modelViewMatrixRelToEyeInv;
 uniform mat4 projectionMatrixInv;
 uniform vec3 encodedCameraPositionMCHigh;
@@ -219,37 +220,52 @@ void main()
 		int backgroundDepthCount = 0;
 		float tolerance = 0.9963;
 		tolerance = 0.9963;
-		
-		vec2 screenPos_LD = vec2(screenPos.x - pixelSizeW*2.5, screenPos.y - pixelSizeH*2.5); // left-down corner.
-		
-		for(int w = 0; w<5; w++)
+
+		float origin_z_window  = unpackDepth(texture2D(depthTex, screenPos.xy)); // z_window  is [0.0, 1.0] range depth.
+		if(origin_z_window > tolerance)
 		{
-			for(int h=0; h<5; h++)
+		
+			vec2 screenPos_LD = vec2(screenPos.x - pixelSizeW*2.5, screenPos.y - pixelSizeH*2.5); // left-down corner.
+			
+			for(int w = -10; w<11; w+= 4)
 			{
-				vec2 screenPosAux = vec2(screenPos_LD.x + pixelSizeW*float(w), screenPos_LD.y + pixelSizeH*float(h));
-				float z_window  = unpackDepth(texture2D(depthTex, screenPosAux.xy)); // z_window  is [0.0, 1.0] range depth.
+				for(int h=-10; h<11; h+= 4)
+				{
+					vec2 screenPosAux = vec2(screenPos_LD.x + pixelSizeW*float(w), screenPos_LD.y + pixelSizeH*float(h));
+					float z_window  = unpackDepth(texture2D(depthTex, screenPosAux.xy)); // z_window  is [0.0, 1.0] range depth.
 
-				if(z_window > tolerance)
-				{
-					// is background.
-					backgroundDepthCount += 1;
-				}
-				else
-				{
-					// is object.
-					objectDepthCount += 1;
-				}
+					if(z_window > tolerance)
+					{
+						// is background.
+						backgroundDepthCount += 1;
+					}
+					else
+					{
+						// is object.
+						objectDepthCount += 1;
+					}
 
-				if(backgroundDepthCount > 0 && objectDepthCount > 0)
-				{
-					// is silhouette.
-					gl_FragColor = vec4(0.2, 1.0, 0.3, 1.0);
-					return;
+					//if(backgroundDepthCount > 0 && objectDepthCount > 0)
+					//{
+						// is silhouette.
+						//gl_FragColor = vec4(0.2, 1.0, 0.3, 1.0);
+						//return;
+					//}
+					
 				}
-				
+			}
+
+			if(backgroundDepthCount > 0 && objectDepthCount > 0)
+			{
+				// is silhouette.
+				float countsDif = abs(float(objectDepthCount)/16.0);
+				gl_FragColor = vec4(0.2, 1.0, 0.3, countsDif);
+				return;
 			}
 		}
-		
+
+		// New:
+		// Try to use a xCross pixels sampling data. TODO:
 		return;
 	}
 	
@@ -334,11 +350,33 @@ void main()
 
 		float occlusion = occlFromDepth.r + occlFromDepth.g + occlFromDepth.b + occlFromDepth.a; // original.***
 
-		if(occlusion < 0.0)
-		occlusion = 0.0;
+		if(occlusion < 0.0)// original.***
+		occlusion = 0.0;// original.***
 
 		gl_FragColor = vec4(0.0, 0.0, 0.0, occlusion);
 
+		
+
+		// Provisionally render Aura by depth.************************************************************
+		/*
+		if(dataType == 0)
+		{
+			// check depth by xCross pixel samples.***
+			// PixelRadius = 7;
+			// South 3 pixels.***
+			float pixelSize_x = 1.0/screenWidth;
+			float pixelSize_y = 1.0/screenHeight;
+			float counter = 1.0;
+			for(int i=0; i<3; i++)
+			{
+				vec2 screePos_south = vec2(screenPos.x, screenPos.y - counter*pixelSize_y);
+
+
+				counter += 1.0;
+			}
+
+		}
+		*/
 		// Provisionally render edges here.****************************************************************
 		if(dataType == 0)
 		{

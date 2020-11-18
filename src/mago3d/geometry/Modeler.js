@@ -308,6 +308,49 @@ Modeler.prototype.__TEST__loftObjects = function()
 	}
 };
 
+Modeler.prototype.__TEST__laser = function()
+{
+	if(!this.testLinesExtrude)
+	{
+		this.testLinesExtrude = true;
+	}
+	else{
+		return;
+	}
+
+	// Create a geoCoordsSegment.
+	var geoCoord_start = new GeographicCoord(126.75739575423393, 37.54300516583088, 19.133160613985577);
+	var geoCoord_end = new GeographicCoord(126.75719736534053, 37.54493737467032, 44.055231264041986);
+	var options = {};
+
+	var renderable = GeographicCoordsList.getRenderableObjectOfGeoCoordsArray([geoCoord_start, geoCoord_end], this.magoManager, options);
+	this.addObject(renderable);
+
+	// Now, detect the intersected point by the laser.
+	var str_WC = ManagerUtils.geographicCoordToWorldPoint(geoCoord_start.longitude, geoCoord_start.latitude, geoCoord_start.altitude, undefined);
+	var end_WC = ManagerUtils.geographicCoordToWorldPoint(geoCoord_end.longitude, geoCoord_end.latitude, geoCoord_end.altitude, undefined);
+
+	// Take the start-point as camera position.
+	var cameraOptions = {
+		name : "laserCamera"
+	};
+	var laserCamera = new Camera(cameraOptions);
+
+
+	// calculate camera direction.
+	var camDir = str_WC.getVectorToPoint(end_WC, undefined);
+	camDir.unitary();
+
+	// calculate camera right.
+	var earthNormal = Globe.normalAtCartesianPointWgs84(str_WC.x, str_WC.y, str_WC.z, undefined);
+	var camRight = camDir.crossProduct(earthNormal, undefined);
+
+	// calculate camera up.
+	var camUp = camRight.crossProduct(camDir, undefined);
+
+	var hola = 0;
+};
+
 Modeler.getLoftMesh = function(profile2d, path, bIncludeBottomCap, bIncludeTopCap, magoManager) 
 {
 	// 1rst, create a VtxProfilesList.
@@ -811,6 +854,7 @@ Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive
 	{
 		this.magoRectangle.render(magoManager, shader, renderType, glPrimitive, bIsSelected);
 	}
+
 };
 
 Modeler.prototype.createPlaneGrid = function(width, height, numCols, numRows) 

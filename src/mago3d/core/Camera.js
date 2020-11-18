@@ -866,6 +866,20 @@ Camera.setOrientation = function (camera, heading, pitch, roll)
 /**
  * Returns the camera's orientation (heading, pitch & roll).
  */
+Camera.prototype.getModelViewMatrix = function() 
+{
+	var modelViewMatrix = new Matrix4();
+
+	modelViewMatrix._floatArrays = Matrix4.lookAt(modelViewMatrix._floatArrays, [camPos.x, camPos.y, camPos.z], 
+		[tergetX, tergetY, tergetZ], 
+		[camUp.x, camUp.y, camUp.z]);
+
+	return modelViewMatrix;
+}
+
+/**
+ * Returns the camera's orientation (heading, pitch & roll).
+ */
 Camera.prototype.getOrientation = function(resultAngles) 
 {
 	// Extract the heading, pitch & roll from this camera.

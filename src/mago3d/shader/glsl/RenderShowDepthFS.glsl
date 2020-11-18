@@ -108,7 +108,7 @@ void main()
 
 	if(!bUseLogarithmicDepth)
 	{
-    	gl_FragData[0] = packDepth(-depth);
+		gl_FragData[0] = packDepth(depth); // correct.
 	}
 
 	float frustumIdx = 1.0;
@@ -124,7 +124,12 @@ void main()
 	#ifdef USE_MULTI_RENDER_TARGET
 	if(bUseMultiRenderTarget)
 	{
-		vec3 encodedNormal = encodeNormal(vNormal);
+		// When render with cull_face disabled, must correct the faces normal.
+		vec3 normal = vNormal;
+		if(normal.z < 0.0)
+		normal *= -1.0;
+
+		vec3 encodedNormal = encodeNormal(normal);
 		gl_FragData[1] = vec4(encodedNormal, frustumIdx); // save normal.***
 	}
 	#endif

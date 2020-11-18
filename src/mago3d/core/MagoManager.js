@@ -1493,136 +1493,6 @@ MagoManager.prototype.getSilhouetteDepthFbo = function()
  * Main rendering function.
  * @private
  */
-MagoManager.prototype.doRenderEdgeDetect = function(frustumVolumenObject) 
-{
-	var gl = this.getGl();
-	var cameraPosition = this.sceneState.camera.position;
-	var currentShader = undefined;
-	
-	// 1) The depth render.**********************************************************************************************************************
-	var renderType = 0; // 0= depth. 1= color.***
-	this.renderType = 0;
-	var renderTexture = false;
-	
-	// Take the depFrameBufferObject of the current frustumVolume.***
-	/*
-	if (this.depthFboNeo === undefined) { this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize : true}); }
-	*/
-	
-	
-	if (frustumVolumenObject.depthFbo === undefined) { frustumVolumenObject.depthFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
-	if (frustumVolumenObject.colorFbo === undefined) { frustumVolumenObject.colorFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
-	//if (this.depthFboNeo === undefined) { this.depthFboNeo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
-	//if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, new Float32Array([this.sceneState.drawingBufferWidth[0]/2.0]), new Float32Array([this.sceneState.drawingBufferHeight/2.0]), {matchCanvasSize : true}); }
-	if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
-	//if (this.colorFbo === undefined) { this.colorFbo = new FBO(gl, this.sceneState.drawingBufferWidth, this.sceneState.drawingBufferHeight, {matchCanvasSize: true}); }
-
-
-	this.depthFboNeo = frustumVolumenObject.depthFbo;
-	this.colorFbo = frustumVolumenObject.colorFbo;
-	//this.depthFboNeo.colorBuffer = this.scene._context._us.globeDepthTexture._texture;
-
-	this.depthFboNeo.bind(); 
-	
-	//if (this.isFarestFrustum())
-	{
-		gl.clearColor(0, 0, 0, 1);
-		gl.clearDepth(1);
-		//gl.clearDepth(0);
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-		gl.clearStencil(0); // provisionally here.***
-	}
-	
-	
-	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
-	this.renderer.renderGeometry(gl, renderType, this.visibleObjControlerNodes);
-	// test mago geometries.************************************************************************************************************
-	//this.renderer.renderMagoGeometries(renderType); //TEST
-	this.depthFboNeo.unbind();
-	this.swapRenderingFase();
-
-	// 1.1) ssao and other effects from depthBuffer render.*****************************************************************************
-	this.renderer.renderSsaoFromDepth(gl);
-
-	// 2) color render.*****************************************************************************************************************
-	// 2.1) Render terrain shadows.*****************************************************************************************************
-	// Now render the geomatry.
-	/*
-	if (this.isCesiumGlobe())
-	{
-		var scene = this.scene;
-		scene._context._currentFramebuffer._bind();
-		if (this.currentFrustumIdx < 2) 
-		{
-			renderType = 3;
-			this.renderer.renderTerrainShadow(gl, renderType, this.visibleObjControlerNodes);
-		}
-	}
-	*/
-	
-	renderType = 1;
-	this.renderType = 1;
-	this.colorFbo.bind(); 
-	//if (this.isFarestFrustum())
-	{
-		gl.clearColor(0, 0, 0, 1);
-		gl.clearDepth(1);
-		//gl.clearDepth(0);
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-		gl.clearStencil(0); // provisionally here.***
-	}
-	this.renderer.renderGeometry(gl, renderType, this.visibleObjControlerNodes);
-	this.colorFbo.unbind(); 
-	
-	if (this.currentFrustumIdx === 0) 
-	{
-		this.renderCluster();
-	}
-
-	if (this.weatherStation)
-	{
-		this.weatherStation.renderWindLayerDisplayPlanes(this);
-		//this.weatherStation.renderWindMultiLayers(this);
-		//this.weatherStation.test_renderWindLayer(this);
-		//this.weatherStation.test_renderTemperatureLayer(this);
-		//this.weatherStation.test_renderCuttingPlanes(this, renderType);
-
-	}
-
-	// Render fast antiAlias,************************************************************************************************************
-	/*if (this.isCesiumGlobe())
-	{
-		var scene = this.scene;
-		scene._context._currentFramebuffer._bind();
-		if (this.currentFrustumIdx < 2) 
-		{
-			renderType = 3;
-			this.renderer.renderTerrainShadow(gl, renderType, this.visibleObjControlerNodes);
-		}
-	}
-	this.renderer.renderFastAntiAlias(gl);
-	*/
-	
-	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
-		
-	this.swapRenderingFase();
-	
-	// 3) test mago geometries.***********************************************************************************************************
-	//this.renderer.renderMagoGeometries(renderType); //TEST
-
-	//if(!this.test__splittedMesh)
-	//{
-	//	this.TEST__splittedExtrudedBuilding();
-	//	this.test__splittedMesh = true;
-	//}
-	// 4) Render filter.******************************************************************************************************************
-	//this.renderFilter();
-};
-
-/**
- * Main rendering function.
- * @private
- */
 MagoManager.prototype.doRender = function(frustumVolumenObject) 
 {
 	var gl = this.getGl();
@@ -6096,9 +5966,11 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	var shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
 	shader.ssaoTex_loc = gl.getUniformLocation(shader.program, "ssaoTex");
 	shader.normalTex_loc = gl.getUniformLocation(shader.program, "normalTex");
+	shader.silhouetteDepthTex_loc = gl.getUniformLocation(shader.program, "silhouetteDepthTex");
 	this.postFxShadersManager.useProgram(shader);
 	gl.uniform1i(shader.ssaoTex_loc, 5);
 	gl.uniform1i(shader.normalTex_loc, 6);
+	gl.uniform1i(shader.silhouetteDepthTex_loc, 7);
 	shader.uNearFarArray_loc = gl.getUniformLocation(shader.program, "uNearFarArray");
 	
 	// 15) Pin shader.******************************************************************************************

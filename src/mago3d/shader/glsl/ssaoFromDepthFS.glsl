@@ -178,7 +178,7 @@ vec3 normal_from_depth(float depth, vec2 texCoord, inout bool isValid) {
     return normalize(normal);
 }
 
-float getOcclusion(vec3 origin, vec3 rotatedKernel, float radius, vec2 origin_nearFar)
+float getOcclusion(vec3 origin, vec3 rotatedKernel, float radius)
 {
     float result_occlusion = 0.0;
     vec3 sample = origin + rotatedKernel * radius;
@@ -192,36 +192,32 @@ float getOcclusion(vec3 origin, vec3 rotatedKernel, float radius, vec2 origin_ne
     vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);
     float currNear = nearFar.x;
     float currFar = nearFar.y;
-
-    float originFar = origin_nearFar.y;
-    float originNear = origin_nearFar.x;
-    float sampleDepth = -sample.z/currFar;// original.***
     float depthBufferValue = getDepth(offsetCoord.xy);
     //------------------------------------
-    /*
+    
     float sampleZ = -sample.z;
     float bufferZ = currNear + depthBufferValue * (currFar - currNear);
     float zDiff = abs(bufferZ - sampleZ);
     if(zDiff < radius)
     {
-        float rangeCheck = smoothstep(0.0, 1.0, radius/zDiff);
+        //float rangeCheck = smoothstep(0.0, 1.0, radius/zDiff);
         if (bufferZ < sampleZ)//-tolerance*1.0)
+        {
+            result_occlusion = 1.0;// * rangeCheck;
+        }
+    }
+    
+    /*
+    float depthDiff = abs(depthBufferValue - sampleDepth);
+    if(depthDiff < radius/currFar)
+    {
+        float rangeCheck = smoothstep(0.0, 1.0, radius / (depthDiff*currFar));
+        if (depthBufferValue < sampleDepth)
         {
             result_occlusion = 1.0 * rangeCheck;
         }
     }
     */
-    
-    float depthDiff = abs(depthBufferValue - sampleDepth);
-    if(depthDiff < radius/currFar)
-    {
-        float rangeCheck = smoothstep(0.0, 1.0, radius / (depthDiff*currFar));
-        if (depthBufferValue < sampleDepth)//-tolerance*1.0)
-        {
-            result_occlusion = 1.0 * rangeCheck;
-        }
-    }
-    
     return result_occlusion;
 }
 
@@ -306,7 +302,7 @@ void main()
     vec4 normalRGBA = getNormal(screenPos);
     vec3 normal2 = normalRGBA.xyz; // original.***
     int estimatedFrustumIdx = int(floor(100.0*normalRGBA.w));
-    int dataType = 0; // 0= general geomtry. 1= tinTerrain. 2= PointsCloud.
+    int dataType = 0; // 0= general geometry. 1= tinTerrain. 2= PointsCloud.
 
     // Check the type of the data.******************
     // dataType = 0 -> general geometry data.
@@ -325,10 +321,11 @@ void main()
     vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);
     float currNear = nearFar.x;
     float currFar = nearFar.y;
+    float linearDepth = getDepth(screenPos);
 
-    vec3 ray = getViewRay(screenPos, (currFar)); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
-    vec3 rayNear = getViewRay(screenPos, currNear);
-    float linearDepth = getDepth(screenPos);  
+    // calculate the real pos of origin.
+    float origin_zDist = linearDepth * (currFar - currNear) + currNear;
+    vec3 origin_real = getViewRay(screenPos, origin_zDist);
 
     float radius_A = 0.5;
     float radius_B = 5.0;
@@ -336,15 +333,7 @@ void main()
     float radius_D = 20.0;
 
     float factorByDist = 1.0;
-    //vec3 posCC = reconstructPosition(screenPos, linearDepth);
-    vec3 posCC = ray * linearDepth + rayNear; 
-    //float realDist = near + linearDepth * far;
-    float realDist = -posCC.z;
-
-    //if(realDist < bigRadius*5.0)
-    //{
-    //    factorByDist = smoothstep(0.0, 1.0, realDist/(bigRadius*5.0));
-    //}
+    float realDist = -origin_real.z;
 
     float aux = 30.0;
     if(realDist < aux)
@@ -360,10 +349,13 @@ void main()
 
     factorByDist *= factorByFarDist;
 
+    if(factorByDist < 0.01)
+    discard;
+
     // General data type.*************************************************************************************
     if(dataType == 0 && bApplySsao)
 	{        
-		vec3 origin = ray * linearDepth;// + rayNear; 
+        vec3 origin = origin_real;
         //vec3 origin = reconstructPosition(screenPos, linearDepth); // used when there are no normal-texture.
         bool isValid = true;
         
@@ -386,17 +378,10 @@ void main()
 		{    	
             vec3 rotatedKernel = tbn * vec3(kernel[i].x*1.0, kernel[i].y*1.0, kernel[i].z);
 
-            // Big radius.***
-            occlusion_C += getOcclusion(origin, rotatedKernel, radius_C, nearFar) * factorByDist;
-
-            // small occl.***
-            occlusion_B += getOcclusion(origin, rotatedKernel, radius_B, nearFar) * factorByDist;
-
-            // radius A.***
-            occlusion_A += getOcclusion(origin, rotatedKernel, radius_A, nearFar) * factorByDist;
-
-            // veryBigRadius.***
-            occlusion_D += getOcclusion(origin, rotatedKernel, radius_D, nearFar) * factorByDist;
+            occlusion_A += getOcclusion(origin, rotatedKernel, radius_A) * factorByDist;
+            occlusion_B += getOcclusion(origin, rotatedKernel, radius_B) * factorByDist;
+            occlusion_C += getOcclusion(origin, rotatedKernel, radius_C) * factorByDist;
+            occlusion_D += getOcclusion(origin, rotatedKernel, radius_D) * factorByDist;
 		} 
 
         float fKernelSize = float(kernelSize);
@@ -424,6 +409,7 @@ void main()
         occlusion_D = 0.0;
         else if(occlusion_D > 1.0)
         occlusion_D = 1.0;
+
 	}
 
     // Points cloud data type.**************************************************************************************

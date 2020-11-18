@@ -183,6 +183,18 @@
             smartTileIndexPath: "_TILE_Incheon_Mirae"
 		});
 		
+
+		/*
+		// hyemi smartTiles
+		f4dController.addSmartTileGroup({
+            dataGroupId : 10000,
+            dataGroupKey : 'test',
+            dataGroupName : '계양시 건물들',
+            dataGroupPath : 'test/',
+            smartTileIndexPath: "smartTiles_hyemi"
+		});
+		*/
+		
 	}
 	// 3ds, pointsCloud, sihung_campus, sihung_las, suseong, IncheonGayang, IncheonGyeyang_2
 	function doTest(){
@@ -190,7 +202,7 @@
 		var magoManager = MAGO3D_INSTANCE.getMagoManager();
 
 		$.ajax({
-			url: dataInformationUrl + "IncheonGyeyang_2.json",
+			url: dataInformationUrl + "3ds.json",
 			type: "GET",
 			dataType: "json",
 			success: function(f4dObject){

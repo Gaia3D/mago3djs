@@ -62,16 +62,16 @@ void main()
     
     //linear depth in camera space (0..far)
 	vec4 orthoPos = modelViewMatrixRelToEye * pos4;
-    depth = orthoPos.z/far; // original.***
-	//depth = (orthoPos.z-near)/(far-near); // correct.***
+    //depth = orthoPos.z/far; // original.***
+	depth = (-orthoPos.z-near)/(far-near); // correct.***
 	
 	// Calculate normalCC.***
 	vec3 rotatedNormal = currentTMat * normal;
 	vNormal = normalize((normalMatrix4 * vec4(rotatedNormal, 1.0)).xyz); // original.***
 
 	// When render with cull_face disabled, must correct the faces normal.
-	if(vNormal.z < 0.0)
-	vNormal *= -1.0;
+	//if(vNormal.z < 0.0) // but, do this in fragment shader.
+	//vNormal *= -1.0; // but, do this in fragment shader.
 
 	/*
 	float z_ndc = (2.0 * z_window - depthRange_near - depthRange_far) / (depthRange_far - depthRange_near);
