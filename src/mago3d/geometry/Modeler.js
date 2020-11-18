@@ -791,8 +791,6 @@ Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive
 			thickLineShader.useProgram();
 			
 			// bind building geoLocationData.
-			
-			
 			var gl = this.magoManager.getGl();
 			gl.uniform1i(thickLineShader.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
 			var sceneState = this.magoManager.sceneState;
@@ -854,7 +852,7 @@ Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive
 	{
 		this.magoRectangle.render(magoManager, shader, renderType, glPrimitive, bIsSelected);
 	}
-
+	//this.__TEST__laser();
 };
 
 Modeler.prototype.createPlaneGrid = function(width, height, numCols, numRows) 

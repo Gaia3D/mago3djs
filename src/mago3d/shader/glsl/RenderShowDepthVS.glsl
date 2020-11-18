@@ -62,8 +62,7 @@ void main()
     
     //linear depth in camera space (0..far)
 	vec4 orthoPos = modelViewMatrixRelToEye * pos4;
-    //depth = orthoPos.z/far; // original.***
-	depth = (-orthoPos.z-near)/(far-near); // correct.***
+	depth = (-orthoPos.z-near)/(far-near); // "depth" is a positive value [0.0, 1.0].***
 	
 	// Calculate normalCC.***
 	vec3 rotatedNormal = currentTMat * normal;

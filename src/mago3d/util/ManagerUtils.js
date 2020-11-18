@@ -869,24 +869,21 @@ ManagerUtils.calculatePixelPositionCamCoord = function(gl, pixelX, pixelY, resul
 
 	}
 
-
-	
-	// End new method.----------------------------------------------------------------------------------------------------------------------------------
-	// End new method.----------------------------------------------------------------------------------------------------------------------------------
-
-	//var realZDepth = frustumNear + linearDepth*frustumFar; // Use this code if the zDepth encoder uses frustum near & frustum far, both.
-	// Note: In our RenderShowDepth shaders, we are encoding zDepth no considering the frustum near.
 	//var realZDepth = linearDepth*frustumFar; // old.
-	var realZDepth = linearDepth*(frustumFar - frustumNear) + frustumNear; // correct.
+	var realZDepth = linearDepth * (frustumFar - frustumNear) + frustumNear; // correct.
 
 	// now, find the 3d position of the pixel in camCoord.*
 	magoManager.resultRaySC = ManagerUtils.getRayCamSpace(pixelX, pixelY, magoManager.resultRaySC, magoManager);
 	if (resultPixelPos === undefined)
 	{ resultPixelPos = new Point3D(); }
 	
-	resultPixelPos.set(magoManager.resultRaySC[0] * realZDepth, magoManager.resultRaySC[1] * realZDepth, magoManager.resultRaySC[2] * realZDepth);
+	resultPixelPos.set(magoManager.resultRaySC[0] * realZDepth, magoManager.resultRaySC[1] * realZDepth, magoManager.resultRaySC[2] * realZDepth);// Original.
 
-	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+	gl.bindFramebuffer(gl.FRAMEBUFFER, null); // delete this code from here. TODO:
+
+	// Another way to calculate the posCC.
+	var z = linearDepth * 2.0 - 1.0;
+
 	return resultPixelPos;
 	
 };
@@ -900,10 +897,19 @@ ManagerUtils.calculatePixelPositionCamCoord = function(gl, pixelX, pixelY, resul
 ManagerUtils.cameraCoordPositionToWorldCoord = function(camCoordPos, resultWorldPos, magoManager) 
 {
 	// now, must transform this pixelCamCoord to world coord.
-	var mv_inv = magoManager.sceneState.getModelViewMatrixInv();
 	if (resultWorldPos === undefined)
 	{ var resultWorldPos = new Point3D(); }
-	resultWorldPos = mv_inv.transformPoint3D(camCoordPos, resultWorldPos);
+
+	var sceneState = magoManager.sceneState;
+	var mvRelToEye_inv = sceneState.getModelViewRelToEyeMatrixInv();
+	resultWorldPos = mvRelToEye_inv.transformPoint3D(camCoordPos, resultWorldPos);
+
+	// now, add to resultPos the camera position.
+	var camPosHIGH = sceneState.encodedCamPosHigh;
+	var camPosLOW = sceneState.encodedCamPosLow;
+	resultWorldPos.add(camPosLOW[0], camPosLOW[1], camPosLOW[2]); // this way is more precise.
+	resultWorldPos.add(camPosHIGH[0], camPosHIGH[1], camPosHIGH[2]); // this way is more precise.
+
 	return resultWorldPos;
 };
 
@@ -1050,14 +1056,21 @@ ManagerUtils.calculateWorldPositionToScreenCoord = function(gl, worldCoordX, wor
 	
 	if (magoManager.pointSC2 === undefined)
 	{ magoManager.pointSC2 = new Point3D(); }
+
+	var sceneState = magoManager.sceneState;
+	var camPosHIGH = sceneState.encodedCamPosHigh;
+	var camPosLOW = sceneState.encodedCamPosLow;
 	
 	magoManager.pointSC.set(worldCoordX, worldCoordY, worldCoordZ);
+	magoManager.pointSC.add(-camPosLOW[0], -camPosLOW[1], -camPosLOW[2]);
+	magoManager.pointSC.add(-camPosHIGH[0], -camPosHIGH[1], -camPosHIGH[2]);
 	
 	// calculate the position in camera coords.
+	var modelViewRelToEye = sceneState.modelViewRelToEyeMatrix;
 	var pointSC2 = magoManager.pointSC2;
-	var sceneState = magoManager.sceneState;
-	pointSC2 = sceneState.modelViewMatrix.transformPoint3D(magoManager.pointSC, pointSC2);
 	
+	pointSC2 = modelViewRelToEye.transformPoint3D(magoManager.pointSC, pointSC2);
+
 	// now calculate the position in screen coords.
 	var zDist = pointSC2.z;
 	if (zDist > 0)
@@ -1091,12 +1104,15 @@ ManagerUtils.calculateWorldPositionToScreenCoord = function(gl, worldCoordX, wor
  * @param {Float32Array(3)} resultRay Result of the calculation.
  * @returns {Float32Array(3)} resultRay Result of the calculation.
  */
-ManagerUtils.getRayCamSpace = function(pixelX, pixelY, resultRay, magoManager) 
+ManagerUtils.getRayCamSpace = function(pixelX, pixelY, resultRay, magoManager, frustumFar) 
 {
 	// in this function "ray" is a vector.
 	var sceneState = magoManager.sceneState;
 	var frustum = sceneState.camera.frustum;
 	var frustum_far = 1.0;//frustum.far[0]; // unitary frustum far.
+
+	if(frustumFar)
+	frustum_far = frustumFar;
 
 	var aspectRatio = frustum.aspectRatio[0];
 	var tangentOfHalfFovy = frustum.tangentOfHalfFovy[0]; 
@@ -1155,7 +1171,6 @@ ManagerUtils.getRayWorldSpace = function(gl, pixelX, pixelY, resultRay, magoMana
 	pointSC.set(rayCamSpace[0], rayCamSpace[1], rayCamSpace[2]);
 
 	// now, must transform this posCamCoord to world coord.
-
 	var mvMatInv = magoManager.sceneState.getModelViewMatrixInv();
 	pointSC2 = mvMatInv.rotatePoint3D(pointSC, pointSC2); // rayWorldSpace.
 	pointSC2.unitary(); // rayWorldSpace.

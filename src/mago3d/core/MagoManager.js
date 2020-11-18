@@ -726,6 +726,20 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		// ProjectionMatrix.***
 		Cesium.Matrix4.toArray(uniformState._projection, sceneState.projectionMatrix._floatArrays); // original.***
 
+		// test keeping projectionMatrix for each frustum.*********************************
+		var currFrustumIdx = this.currentFrustumIdx;
+		if(sceneState.projectionMatrixMap === undefined)
+		sceneState.projectionMatrixMap = [];
+
+		if(!sceneState.projectionMatrixMap[currFrustumIdx])
+		{
+			var projMatAux = new Matrix4();
+			sceneState.projectionMatrixMap[currFrustumIdx] = projMatAux;
+		}
+
+		sceneState.projectionMatrixMap[currFrustumIdx].copyFromMatrix4(sceneState.projectionMatrix);
+		// End test.-----------------------------------------------------------------------
+
 		// Given ModelViewMatrix & ProjectionMatrix, calculate all sceneState matrix.
 		var modelViewMatrixInv = sceneState.getModelViewMatrixInv();
 		modelViewMatrixInv._floatArrays = glMatrix.mat4.invert(modelViewMatrixInv._floatArrays, sceneState.modelViewMatrix._floatArrays);
