@@ -654,7 +654,13 @@ Polygon2D.prototype.intersectionWithPolygon2D = function(polygon2D)
 		resultConcavePointsIdxArray.length = 0;
 		resultConcavePointsIdxArray = this.calculateNormal(resultConcavePointsIdxArray);
 	}
-	var tessellated = this.tessellate(resultConcavePointsIdxArray, []);
+	if(!this.convexPolygonsArray 
+		|| (Array.isArray(this.convexPolygonsArray) && this.convexPolygonsArray.length === 0))
+	{
+		this.convexPolygonsArray = [];
+		this.tessellate(resultConcavePointsIdxArray, this.convexPolygonsArray);
+	}
+	var tessellated = this.convexPolygonsArray;
 
 	var interior = false;
 	for (var i=0, len=tessellated.length; i<len; i++) 
