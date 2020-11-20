@@ -667,6 +667,8 @@ GeographicCoordsList.prototype.getExtrudedMeshRenderableObject = function(height
 	}
 	resultRenderableObject.geoLocDataManager = new GeoLocationDataManager();
 	var geoLocData = resultRenderableObject.geoLocDataManager.newGeoLocationData();
+
+	resultRenderableObject.geographicCoordList = this;
 	
 	// The origin of this object is in the middle of this geoCoordsList.
 	var midGeoCoord = this.getMiddleGeographicCoords();
