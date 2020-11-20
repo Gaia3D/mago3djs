@@ -249,6 +249,7 @@ SceneState.prototype.getProjectionMatrixInv = function()
 		this.projectionMatrixInv = new Matrix4();
 		this.projectionMatrixInv._floatArrays = glMatrix.mat4.invert(this.projectionMatrixInv._floatArrays, this.projectionMatrix._floatArrays);
 	}
+	//this.projectionMatrixInv._floatArrays = glMatrix.mat4.invert(this.projectionMatrixInv._floatArrays, this.projectionMatrix._floatArrays);
 	return this.projectionMatrixInv;
 };
 

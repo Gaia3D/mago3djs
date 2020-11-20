@@ -227,9 +227,9 @@ void main()
 		
 			vec2 screenPos_LD = vec2(screenPos.x - pixelSizeW*2.5, screenPos.y - pixelSizeH*2.5); // left-down corner.
 			
-			for(int w = -10; w<11; w+= 4)
+			for(int w = -10; w<15; w+= 4)
 			{
-				for(int h=-10; h<11; h+= 4)
+				for(int h=-10; h<15; h+= 4)
 				{
 					vec2 screenPosAux = vec2(screenPos_LD.x + pixelSizeW*float(w), screenPos_LD.y + pixelSizeH*float(h));
 					float z_window  = unpackDepth(texture2D(depthTex, screenPosAux.xy)); // z_window  is [0.0, 1.0] range depth.

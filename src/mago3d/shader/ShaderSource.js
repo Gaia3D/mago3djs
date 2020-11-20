@@ -883,8 +883,11 @@ vec3 getWhiteToBlueColor_byHeight(float height, float minHeight, float maxHeight
 \n\
 void main() {\n\
 	vec2 pt = gl_PointCoord - vec2(0.5);\n\
-	if(pt.x*pt.x+pt.y*pt.y > 0.25)\n\
+	float r = pt.x*pt.x+pt.y*pt.y;\n\
+	if(r > 0.25)\n\
 		discard;\n\
+\n\
+	\n\
 \n\
 	vec2 windMapTexCoord = v_particle_pos;\n\
 	if(u_flipTexCoordY_windMap)\n\
@@ -919,6 +922,9 @@ void main() {\n\
 			intensity = 1.0;\n\
 		gl_FragColor = vec4(intensity,intensity,intensity,u_tailAlpha*u_externAlpha);\n\
 	}\n\
+\n\
+	//if(r > 0.16)\n\
+	//gl_FragColor = vec4(1.0, 1.0, 1.0, u_tailAlpha*u_externAlpha);\n\
 \n\
 	#ifdef USE_LOGARITHMIC_DEPTH\n\
 	if(bUseLogarithmicDepth)\n\
@@ -1042,7 +1048,7 @@ vec2 getOffset(vec2 particlePos, float radius)\n\
 	float lonRadRange = maxLonRad - minLonRad;\n\
 	float latRadRange = maxLatRad - minLatRad;\n\
 \n\
-	float distortion = cos((minLatRad + v_particle_pos.y * latRadRange ));\n\
+	float distortion = cos((minLatRad + particlePos.y * latRadRange ));\n\
 	float xOffset = (particlePos.x - 0.5)*distortion * lonRadRange * radius;\n\
 	float yOffset = (0.5 - particlePos.y) * latRadRange * radius;\n\
 \n\
@@ -1053,18 +1059,15 @@ void main() {\n\
 	vec2 texCoord = vec2(fract(a_index / u_particles_res), floor(a_index / u_particles_res) / u_particles_res);\n\
 \n\
 	vec4 color_curr = texture2D(u_particles, texCoord);\n\
-    vec2 particle_pos_curr = vec2(color_curr.r / 255.0 + color_curr.b, color_curr.g / 255.0 + color_curr.a);\n\
+    //vec2 particle_pos_curr = vec2(color_curr.r / 255.0 + color_curr.b, color_curr.g / 255.0 + color_curr.a);\n\
 \n\
-	vec4 color_next = texture2D(u_particles_next, texCoord);\n\
-    vec2 particle_pos_next = vec2(color_next.r / 255.0 + color_next.b, color_next.g / 255.0 + color_next.a);\n\
-\n\
+	//vec4 color_next = texture2D(u_particles_next, texCoord);\n\
+    //vec2 particle_pos_next = vec2(color_next.r / 255.0 + color_next.b, color_next.g / 255.0 + color_next.a);\n\
+	//v_particle_pos = mix(particle_pos_curr, particle_pos_next, 0.0);\n\
 \n\
     //vec4 color = texture2D(u_particles, texCoord);\n\
     // decode current particle position from the pixel's RGBA value\n\
-    //v_particle_pos = vec2(color.r / 255.0 + color.b,color.g / 255.0 + color.a); // original.***\n\
-\n\
-\n\
-	v_particle_pos = mix(particle_pos_curr, particle_pos_next, 0.0);\n\
+    v_particle_pos = vec2(color_curr.r / 255.0 + color_curr.b,color_curr.g / 255.0 + color_curr.a); // original.***\n\
 \n\
 	// calculate the offset at the earth radius.***\n\
 	vec3 buildingPos = buildingPosHIGH + buildingPosLOW;\n\
@@ -1099,9 +1102,12 @@ void main() {\n\
 	float dist = length(posCC.xyz);\n\
 	gl_PointSize = (1.0 + pendentPointSize/(dist))*u_tailAlpha; \n\
 	//gl_PointSize = 3.0*u_tailAlpha; \n\
-	\n\
-	if(gl_PointSize > 10.0)\n\
-	gl_PointSize = 10.0;\n\
+	float maxPointSize = 4.0;\n\
+\n\
+	if(gl_PointSize > maxPointSize)\n\
+	gl_PointSize = maxPointSize;\n\
+	else if(gl_PointSize < 1.5)\n\
+	gl_PointSize = 1.5;\n\
 }\n\
 \n\
 \n\
@@ -4195,9 +4201,9 @@ void main()\n\
 		\n\
 			vec2 screenPos_LD = vec2(screenPos.x - pixelSizeW*2.5, screenPos.y - pixelSizeH*2.5); // left-down corner.\n\
 			\n\
-			for(int w = -10; w<11; w+= 4)\n\
+			for(int w = -10; w<15; w+= 4)\n\
 			{\n\
-				for(int h=-10; h<11; h+= 4)\n\
+				for(int h=-10; h<15; h+= 4)\n\
 				{\n\
 					vec2 screenPosAux = vec2(screenPos_LD.x + pixelSizeW*float(w), screenPos_LD.y + pixelSizeH*float(h));\n\
 					float z_window  = unpackDepth(texture2D(depthTex, screenPosAux.xy)); // z_window  is [0.0, 1.0] range depth.\n\
@@ -7966,6 +7972,14 @@ uniform bool u_flipTexCoordY_windMap;\n\
 uniform vec4 u_visibleTilesRanges[16];\n\
 uniform int u_visibleTilesRangesCount;\n\
 \n\
+// new uniforms test.\n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform mat4 buildingRotMatrix;\n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+\n\
 varying vec2 v_tex_pos;\n\
 \n\
 // pseudo-random generator\n\
@@ -8014,6 +8028,56 @@ bool checkFrustumCulling(vec2 pos)\n\
 		}\n\
 	}\n\
 	return false;\n\
+}\n\
+\n\
+vec2 getOffset(vec2 particlePos, float radius)\n\
+{\n\
+	float minLonRad = u_geoCoordRadiansMin.x;\n\
+	float maxLonRad = u_geoCoordRadiansMax.x;\n\
+	float minLatRad = u_geoCoordRadiansMin.y;\n\
+	float maxLatRad = u_geoCoordRadiansMax.y;\n\
+	float lonRadRange = maxLonRad - minLonRad;\n\
+	float latRadRange = maxLatRad - minLatRad;\n\
+\n\
+	float distortion = cos((minLatRad + particlePos.y * latRadRange ));\n\
+	float xOffset = (particlePos.x - 0.5)*distortion * lonRadRange * radius;\n\
+	float yOffset = (0.5 - particlePos.y) * latRadRange * radius;\n\
+\n\
+	return vec2(xOffset, yOffset);\n\
+}\n\
+\n\
+\n\
+bool isPointInsideOfFrustum(in vec2 pos)\n\
+{\n\
+	bool pointIsInside = true;\n\
+	\n\
+	// calculate the offset at the earth radius.***\n\
+	vec3 buildingPos = buildingPosHIGH + buildingPosLOW;\n\
+	float radius = length(buildingPos);\n\
+	vec2 offset = getOffset(pos, radius);\n\
+\n\
+	float xOffset = offset.x;\n\
+	float yOffset = offset.y;\n\
+	vec4 rotatedPos = buildingRotMatrix * vec4(xOffset, yOffset, 0.0, 1.0);\n\
+	\n\
+	vec4 position = vec4((rotatedPos.xyz + buildingPosLOW - encodedCameraPositionMCLow) + ( buildingPosHIGH - encodedCameraPositionMCHigh), 1.0);\n\
+	\n\
+	// Now calculate the position on camCoord.***\n\
+	vec4 posCC = ModelViewProjectionMatrixRelToEye * position;\n\
+	vec3 ndc_pos = vec3(posCC.xyz/posCC.w);\n\
+	float ndc_x = ndc_pos.x;\n\
+	float ndc_y = ndc_pos.y;\n\
+\n\
+	if(ndc_x < -1.0)\n\
+		return false;\n\
+	else if(ndc_x > 1.0)\n\
+		return false;\n\
+	else if(ndc_y < -1.0)\n\
+		return false;\n\
+	else if(ndc_y > 1.0)\n\
+		return false;\n\
+	\n\
+	return pointIsInside;\n\
 }\n\
 \n\
 void main() {\n\
@@ -8085,6 +8149,32 @@ void main() {\n\
 	if(drop > 0.01)\n\
 	{\n\
 		vec2 random_pos = vec2( rand(pos), rand(v_tex_pos) );\n\
+		\n\
+		// New version:\n\
+		// try to born inside of the camera's frustum.\n\
+\n\
+		vec2 posA = vec2(pos);\n\
+		vec2 posB = vec2(v_tex_pos);\n\
+		bool isInsideOfFrustum = false;\n\
+		for(int i=0; i<30; i++)\n\
+		{\n\
+			if(isPointInsideOfFrustum(random_pos))\n\
+			{\n\
+				isInsideOfFrustum = true;\n\
+				break;\n\
+			}\n\
+			else\n\
+			{\n\
+				posA.x = random_pos.y;\n\
+				posA.y = random_pos.x;\n\
+\n\
+				posB.x = random_pos.x;\n\
+				posB.y = random_pos.y;\n\
+\n\
+				random_pos = vec2( rand(posA), rand(posB) );\n\
+			}\n\
+		}\n\
+\n\
 		pos = random_pos;\n\
 	}\n\
 	\n\

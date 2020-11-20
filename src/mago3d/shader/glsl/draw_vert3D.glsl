@@ -90,7 +90,7 @@ vec2 getOffset(vec2 particlePos, float radius)
 	float lonRadRange = maxLonRad - minLonRad;
 	float latRadRange = maxLatRad - minLatRad;
 
-	float distortion = cos((minLatRad + v_particle_pos.y * latRadRange ));
+	float distortion = cos((minLatRad + particlePos.y * latRadRange ));
 	float xOffset = (particlePos.x - 0.5)*distortion * lonRadRange * radius;
 	float yOffset = (0.5 - particlePos.y) * latRadRange * radius;
 
@@ -101,18 +101,15 @@ void main() {
 	vec2 texCoord = vec2(fract(a_index / u_particles_res), floor(a_index / u_particles_res) / u_particles_res);
 
 	vec4 color_curr = texture2D(u_particles, texCoord);
-    vec2 particle_pos_curr = vec2(color_curr.r / 255.0 + color_curr.b, color_curr.g / 255.0 + color_curr.a);
+    //vec2 particle_pos_curr = vec2(color_curr.r / 255.0 + color_curr.b, color_curr.g / 255.0 + color_curr.a);
 
-	vec4 color_next = texture2D(u_particles_next, texCoord);
-    vec2 particle_pos_next = vec2(color_next.r / 255.0 + color_next.b, color_next.g / 255.0 + color_next.a);
-
+	//vec4 color_next = texture2D(u_particles_next, texCoord);
+    //vec2 particle_pos_next = vec2(color_next.r / 255.0 + color_next.b, color_next.g / 255.0 + color_next.a);
+	//v_particle_pos = mix(particle_pos_curr, particle_pos_next, 0.0);
 
     //vec4 color = texture2D(u_particles, texCoord);
     // decode current particle position from the pixel's RGBA value
-    //v_particle_pos = vec2(color.r / 255.0 + color.b,color.g / 255.0 + color.a); // original.***
-
-
-	v_particle_pos = mix(particle_pos_curr, particle_pos_next, 0.0);
+    v_particle_pos = vec2(color_curr.r / 255.0 + color_curr.b,color_curr.g / 255.0 + color_curr.a); // original.***
 
 	// calculate the offset at the earth radius.***
 	vec3 buildingPos = buildingPosHIGH + buildingPosLOW;
@@ -147,9 +144,12 @@ void main() {
 	float dist = length(posCC.xyz);
 	gl_PointSize = (1.0 + pendentPointSize/(dist))*u_tailAlpha; 
 	//gl_PointSize = 3.0*u_tailAlpha; 
-	
-	if(gl_PointSize > 10.0)
-	gl_PointSize = 10.0;
+	float maxPointSize = 4.0;
+
+	if(gl_PointSize > maxPointSize)
+	gl_PointSize = maxPointSize;
+	else if(gl_PointSize < 1.5)
+	gl_PointSize = 1.5;
 }
 
 

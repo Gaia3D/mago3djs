@@ -93,7 +93,6 @@
 				cesiumViewerOption.sceneModePicker = false;
 
 				serverPolicy.basicGlobe = 'cesium';
-				serverPolicy.cesiumIonToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyNmNjOWZkOC03NjdlLTRiZTktYWQ3NS1hNmQ0YjA1ZjIzYWEiLCJpZCI6Mzk5Miwic2NvcGVzIjpbImFzciIsImdjIl0sImlhdCI6MTU0NDYwNDQ3M30.AwvoVAuMRwjcMMJ9lEG2v4CPUp8gfltJqZARHgxGv_k";
 				serverPolicy.terrainType = 'cesium-default'
 
 				serverPolicy.initLatitude = 37.43601055850527;
@@ -130,6 +129,24 @@
 
 		magoManager.on(Mago3D.MagoManager.EVENT_TYPE.CLICK, function(e){
 			console.info(e);
+			
+			// Do a test. Create a geoCoord and render it.
+
+			//point:
+			//	geographicCoordinate: GeographicCoord {longitude: 126.79789845025299, latitude: 37.43893873157952, altitude: -0.007008081889443001}
+			//	screenCoordinate: Point2D {x: 789, y: 310}
+			//	worldCoordinate: Cartesian3 {x
+			/*
+			var screenX = e.point.screenCoordinate.x;
+			var screenY = e.point.screenCoordinate.y;
+			var posWC = Mago3D.ManagerUtils.screenCoordToWorldCoordUseDepthCheck(screenX, screenY, magoManager);
+			var geoCoord = Mago3D.ManagerUtils.pointToGeographicCoord(posWC, undefined);
+			geoCoord.makeDefaultGeoLocationData();
+			var geoCoordsList = magoManager.modeler.getGeographicCoordsList();
+			geoCoordsList.addGeoCoord(geoCoord);
+			var hola = 0;
+			*/
+			// End test.----------------------------------
 		});
 
 		magoManager.on(Mago3D.MagoManager.EVENT_TYPE.SELECTEDF4D, function(e){
@@ -144,7 +161,7 @@
 	function doTest(){
 		var f4dController = MAGO3D_INSTANCE.getF4dController();
 		var magoManager = MAGO3D_INSTANCE.getMagoManager();
-
+		/*
 		$.ajax({
 			url: dataInformationUrl + "3ds.json",
 			type: "GET",
@@ -156,6 +173,38 @@
 				alert(e.responseText);
 			}
 		});
+		*/
+
+		//---------------------------------------------------------------
+		
+		var arr = [
+            [
+                126.75195,
+                37.54664
+              ],
+              [
+                126.75097,
+                37.54285
+              ],
+              [
+                126.75494,
+                37.54239
+              ],
+              [
+                126.75590,
+                37.54652
+              ]
+        ];
+        var gcarr = [];
+        for(var i in arr) {
+            var geocoord = arr[i];
+           
+            gcarr.push(new Mago3D.GeographicCoord(geocoord[0], geocoord[1], 0));
+        }
+       
+        var polygon2d = Mago3D.Polygon2D.makePolygonByGeographicCoordArray(gcarr);
+		var selected = MAGO3D_INSTANCE.getMagoManager().selectionManager.selectionByPolygon2D(polygon2d, Mago3D.DataType.NATIVE);
+		
 	}
 </script>
 </body>

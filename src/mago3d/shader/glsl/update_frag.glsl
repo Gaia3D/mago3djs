@@ -16,6 +16,14 @@ uniform bool u_flipTexCoordY_windMap;
 uniform vec4 u_visibleTilesRanges[16];
 uniform int u_visibleTilesRangesCount;
 
+// new uniforms test.
+uniform mat4 ModelViewProjectionMatrixRelToEye;
+uniform mat4 buildingRotMatrix;
+uniform vec3 buildingPosHIGH;
+uniform vec3 buildingPosLOW;
+uniform vec3 encodedCameraPositionMCHigh;
+uniform vec3 encodedCameraPositionMCLow;
+
 varying vec2 v_tex_pos;
 
 // pseudo-random generator
@@ -64,6 +72,56 @@ bool checkFrustumCulling(vec2 pos)
 		}
 	}
 	return false;
+}
+
+vec2 getOffset(vec2 particlePos, float radius)
+{
+	float minLonRad = u_geoCoordRadiansMin.x;
+	float maxLonRad = u_geoCoordRadiansMax.x;
+	float minLatRad = u_geoCoordRadiansMin.y;
+	float maxLatRad = u_geoCoordRadiansMax.y;
+	float lonRadRange = maxLonRad - minLonRad;
+	float latRadRange = maxLatRad - minLatRad;
+
+	float distortion = cos((minLatRad + particlePos.y * latRadRange ));
+	float xOffset = (particlePos.x - 0.5)*distortion * lonRadRange * radius;
+	float yOffset = (0.5 - particlePos.y) * latRadRange * radius;
+
+	return vec2(xOffset, yOffset);
+}
+
+
+bool isPointInsideOfFrustum(in vec2 pos)
+{
+	bool pointIsInside = true;
+	
+	// calculate the offset at the earth radius.***
+	vec3 buildingPos = buildingPosHIGH + buildingPosLOW;
+	float radius = length(buildingPos);
+	vec2 offset = getOffset(pos, radius);
+
+	float xOffset = offset.x;
+	float yOffset = offset.y;
+	vec4 rotatedPos = buildingRotMatrix * vec4(xOffset, yOffset, 0.0, 1.0);
+	
+	vec4 position = vec4((rotatedPos.xyz + buildingPosLOW - encodedCameraPositionMCLow) + ( buildingPosHIGH - encodedCameraPositionMCHigh), 1.0);
+	
+	// Now calculate the position on camCoord.***
+	vec4 posCC = ModelViewProjectionMatrixRelToEye * position;
+	vec3 ndc_pos = vec3(posCC.xyz/posCC.w);
+	float ndc_x = ndc_pos.x;
+	float ndc_y = ndc_pos.y;
+
+	if(ndc_x < -1.0)
+		return false;
+	else if(ndc_x > 1.0)
+		return false;
+	else if(ndc_y < -1.0)
+		return false;
+	else if(ndc_y > 1.0)
+		return false;
+	
+	return pointIsInside;
 }
 
 void main() {
@@ -135,6 +193,32 @@ void main() {
 	if(drop > 0.01)
 	{
 		vec2 random_pos = vec2( rand(pos), rand(v_tex_pos) );
+		
+		// New version:
+		// try to born inside of the camera's frustum.
+
+		vec2 posA = vec2(pos);
+		vec2 posB = vec2(v_tex_pos);
+		bool isInsideOfFrustum = false;
+		for(int i=0; i<30; i++)
+		{
+			if(isPointInsideOfFrustum(random_pos))
+			{
+				isInsideOfFrustum = true;
+				break;
+			}
+			else
+			{
+				posA.x = random_pos.y;
+				posA.y = random_pos.x;
+
+				posB.x = random_pos.x;
+				posB.y = random_pos.y;
+
+				random_pos = vec2( rand(posA), rand(posB) );
+			}
+		}
+
 		pos = random_pos;
 	}
 	

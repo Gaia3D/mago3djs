@@ -841,6 +841,8 @@ GeographicCoordsList.prototype.getExtrudedWallRenderableObject = function(height
 	resultRenderableObject.geoLocDataManager = new GeoLocationDataManager();
 	var geoLocData = resultRenderableObject.geoLocDataManager.newGeoLocationData();
 
+	resultRenderableObject.geographicCoordList = this;
+
 	// Check options:
 	var doubleFace = false;
 	var colorTop = undefined;

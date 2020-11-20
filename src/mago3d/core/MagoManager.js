@@ -728,19 +728,20 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 
 		// test keeping projectionMatrix for each frustum.*********************************
 		var currFrustumIdx = this.currentFrustumIdx;
-		if(sceneState.projectionMatrixMap === undefined)
-		sceneState.projectionMatrixMap = [];
+		if(sceneState.projectionMatrixInvMap === undefined)
+		sceneState.projectionMatrixInvMap = [];
 
-		if(!sceneState.projectionMatrixMap[currFrustumIdx])
+		if(!sceneState.projectionMatrixInvMap[currFrustumIdx])
 		{
 			var projMatAux = new Matrix4();
-			sceneState.projectionMatrixMap[currFrustumIdx] = projMatAux;
+			sceneState.projectionMatrixInvMap[currFrustumIdx] = projMatAux;
 		}
 
-		sceneState.projectionMatrixMap[currFrustumIdx].copyFromMatrix4(sceneState.projectionMatrix);
+		sceneState.projectionMatrixInvMap[currFrustumIdx].copyFromMatrix4(sceneState.getProjectionMatrixInv());
 		// End test.-----------------------------------------------------------------------
 
 		// Given ModelViewMatrix & ProjectionMatrix, calculate all sceneState matrix.
+		sceneState.projectionMatrixInv = undefined;
 		var modelViewMatrixInv = sceneState.getModelViewMatrixInv();
 		modelViewMatrixInv._floatArrays = glMatrix.mat4.invert(modelViewMatrixInv._floatArrays, sceneState.modelViewMatrix._floatArrays);
 	
@@ -1620,13 +1621,14 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	
 		var geometryDataPath = this.readerWriter.geometryDataPath;
 		// JejuAirport, jejuHanRaSan.
-		var windDataFilesNamesArray = ["OBS-QWM_2016062000.grib2_wind_000", "OBS-QWM_2016062001.grib2_wind_000", "OBS-QWM_2016062002.grib2_wind_000", "OBS-QWM_2016062003.grib2_wind_000",
-			"OBS-QWM_2016062004.grib2_wind_000", "OBS-QWM_2016062005.grib2_wind_000", "OBS-QWM_2016062006.grib2_wind_000", "OBS-QWM_2016062007.grib2_wind_000",
-			"OBS-QWM_2016062008.grib2_wind_000", "OBS-QWM_2016062009.grib2_wind_000", "OBS-QWM_2016062010.grib2_wind_000", "OBS-QWM_2016062011.grib2_wind_000",
-			"OBS-QWM_2016062012.grib2_wind_000", "OBS-QWM_2016062013.grib2_wind_000", "OBS-QWM_2016062014.grib2_wind_000", "OBS-QWM_2016062015.grib2_wind_000",
-			"OBS-QWM_2016062016.grib2_wind_000", "OBS-QWM_2016062017.grib2_wind_000", "OBS-QWM_2016062018.grib2_wind_000", "OBS-QWM_2016062019.grib2_wind_000",
-			"OBS-QWM_2016062020.grib2_wind_000", "OBS-QWM_2016062021.grib2_wind_000", "OBS-QWM_2016062022.grib2_wind_000", "OBS-QWM_2016062023.grib2_wind_000"]; // jeju, hanRaSan
-
+		
+		//var windDataFilesNamesArray = ["OBS-QWM_2016062000.grib2_wind_000", "OBS-QWM_2016062001.grib2_wind_000", "OBS-QWM_2016062002.grib2_wind_000", "OBS-QWM_2016062003.grib2_wind_000",
+		//	"OBS-QWM_2016062004.grib2_wind_000", "OBS-QWM_2016062005.grib2_wind_000", "OBS-QWM_2016062006.grib2_wind_000", "OBS-QWM_2016062007.grib2_wind_000",
+		//	"OBS-QWM_2016062008.grib2_wind_000", "OBS-QWM_2016062009.grib2_wind_000", "OBS-QWM_2016062010.grib2_wind_000", "OBS-QWM_2016062011.grib2_wind_000",
+		//	"OBS-QWM_2016062012.grib2_wind_000", "OBS-QWM_2016062013.grib2_wind_000", "OBS-QWM_2016062014.grib2_wind_000", "OBS-QWM_2016062015.grib2_wind_000",
+		//	"OBS-QWM_2016062016.grib2_wind_000", "OBS-QWM_2016062017.grib2_wind_000", "OBS-QWM_2016062018.grib2_wind_000", "OBS-QWM_2016062019.grib2_wind_000",
+		//	"OBS-QWM_2016062020.grib2_wind_000", "OBS-QWM_2016062021.grib2_wind_000", "OBS-QWM_2016062022.grib2_wind_000", "OBS-QWM_2016062023.grib2_wind_000"]; // jeju, hanRaSan
+		
 			
 			// Seoul data.
 		var windDataFilesNamesArray = ["OBS-QWM_2019090700.grib2_wind_000", "OBS-QWM_2019090701.grib2_wind_000", "OBS-QWM_2019090702.grib2_wind_000", "OBS-QWM_2019090703.grib2_wind_000",
@@ -1639,14 +1641,15 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 			
 		//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_Airport";
 		//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_GolfPark_NineBridge1";
-		//var windMapFilesFolderPath = geometryDataPath +"/SeoulWind/200907";
-		var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_HanRaSan";
+		var windMapFilesFolderPath = geometryDataPath +"/SeoulWind/200907";
+		//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_HanRaSan";
 		
 		this.weatherStation.test_loadWindData3d(this, windDataFilesNamesArray, windMapFilesFolderPath);
 		//this.TEST__golfPark();
 		this.windTest = true;
 	}
 	*/
+	
 	
 	if (this.weatherStation)
 	{

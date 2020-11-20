@@ -151,8 +151,11 @@ vec3 getWhiteToBlueColor_byHeight(float height, float minHeight, float maxHeight
 
 void main() {
 	vec2 pt = gl_PointCoord - vec2(0.5);
-	if(pt.x*pt.x+pt.y*pt.y > 0.25)
+	float r = pt.x*pt.x+pt.y*pt.y;
+	if(r > 0.25)
 		discard;
+
+	
 
 	vec2 windMapTexCoord = v_particle_pos;
 	if(u_flipTexCoordY_windMap)
@@ -187,6 +190,9 @@ void main() {
 			intensity = 1.0;
 		gl_FragColor = vec4(intensity,intensity,intensity,u_tailAlpha*u_externAlpha);
 	}
+
+	//if(r > 0.16)
+	//gl_FragColor = vec4(1.0, 1.0, 1.0, u_tailAlpha*u_externAlpha);
 
 	#ifdef USE_LOGARITHMIC_DEPTH
 	if(bUseLogarithmicDepth)

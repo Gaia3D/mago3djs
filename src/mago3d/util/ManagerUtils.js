@@ -868,9 +868,9 @@ ManagerUtils.calculatePixelPositionCamCoord = function(gl, pixelX, pixelY, resul
 		}
 
 	}
-
-	//var realZDepth = linearDepth*frustumFar; // old.
+	//linearDepth *= 1.0037; // test.
 	var realZDepth = linearDepth * (frustumFar - frustumNear) + frustumNear; // correct.
+	
 
 	// now, find the 3d position of the pixel in camCoord.*
 	magoManager.resultRaySC = ManagerUtils.getRayCamSpace(pixelX, pixelY, magoManager.resultRaySC, magoManager);
@@ -880,9 +880,20 @@ ManagerUtils.calculatePixelPositionCamCoord = function(gl, pixelX, pixelY, resul
 	resultPixelPos.set(magoManager.resultRaySC[0] * realZDepth, magoManager.resultRaySC[1] * realZDepth, magoManager.resultRaySC[2] * realZDepth);// Original.
 
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null); // delete this code from here. TODO:
-
+	
 	// Another way to calculate the posCC.
-	var z = linearDepth * 2.0 - 1.0;
+	// Note: NDC range = (-1,-1,-1) to (1,1,1).***
+	/*
+	var ndc_z = linearDepth * 2.0 - 1.0;
+	var ndc_x = (pixelX / sceneState.drawingBufferWidth[0]) * 2.0 - 1.0;
+	var ndc_y = (1.0 - pixelY / sceneState.drawingBufferHeight[0]) * 2.0 - 1.0;
+	var ndc_4 = [ndc_x, ndc_y, ndc_z, 1.0];
+
+	var projMatInv = sceneState.projectionMatrixInvMap[options.frustumIdx];
+	var tPos = projMatInv.transformPoint4D(ndc_4, undefined);
+
+	resultPixelPos.set(tPos[0]/tPos[3], tPos[1]/tPos[3], tPos[2]/tPos[3]);
+	*/
 
 	return resultPixelPos;
 	
