@@ -1561,10 +1561,14 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	if (this.isCesiumGlobe())
 	{
 		var scene = this.scene;
+		var bApplyShadow = false;
+		if (this.sceneState.sunSystem !== undefined && this.sceneState.applySunShadows)
+		{ bApplyShadow = true; }
+
 		if(scene && scene._context && scene._context._currentFramebuffer) {
 			scene._context._currentFramebuffer._bind();
 
-			if (this.currentFrustumIdx < 2) 
+			if (bApplyShadow && this.currentFrustumIdx < 2) 
 			{
 				renderType = 3;
 				this.renderer.renderTerrainShadow(gl, renderType, this.visibleObjControlerNodes);
@@ -2318,8 +2322,8 @@ MagoManager.prototype.drawSelectedExtruionBuildingLabel = function()
 		var labelGeoCoord;
 
 		var listLength = nativeModel.geographicCoordListsArray.length;
-		for(var i=0;i<listLength;i++) {
-			var geographicCoordList = nativeModel.geographicCoordListsArray[i];
+		for(var j=0;j<listLength;j++) {
+			var geographicCoordList = nativeModel.geographicCoordListsArray[j];
 			var extent = geographicCoordList.getGeographicExtent();
 			if(extent.intersects2dWithGeoCoord(center)) {
 				centerInBuilding = true;

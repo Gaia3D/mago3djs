@@ -417,7 +417,7 @@ SelectionManager.prototype.clearCurrents = function()
 	this.currentOctreeSelectedArray = [];
 	this.currentBuildingSelectedArray = [];
 	this.currentNodeSelectedArray = [];
-	this.currentGeneralObjectSelectedArray = [];
+	this.currentGeneralObjectSelectedArray = []; 
 	this.magoManager.isCameraMoved = true;
 };
 /**
