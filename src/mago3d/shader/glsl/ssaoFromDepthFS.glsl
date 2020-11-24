@@ -196,7 +196,8 @@ float getOcclusion(vec3 origin, vec3 rotatedKernel, float radius)
     //------------------------------------
     
     float sampleZ = -sample.z;
-    float bufferZ = currNear + depthBufferValue * (currFar - currNear);
+   // float bufferZ = currNear + depthBufferValue * (currFar - currNear);
+    float bufferZ = depthBufferValue * currFar;
     float zDiff = abs(bufferZ - sampleZ);
     if(zDiff < radius)
     {
@@ -324,7 +325,8 @@ void main()
     float linearDepth = getDepth(screenPos);
 
     // calculate the real pos of origin.
-    float origin_zDist = linearDepth * (currFar - currNear) + currNear;
+    //float origin_zDist = linearDepth * (currFar - currNear) + currNear;
+    float origin_zDist = linearDepth * currFar;
     vec3 origin_real = getViewRay(screenPos, origin_zDist);
 
     float radius_A = 0.5;

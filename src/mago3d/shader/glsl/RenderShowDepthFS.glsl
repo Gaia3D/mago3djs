@@ -108,7 +108,7 @@ void main()
 
 	if(!bUseLogarithmicDepth)
 	{
-		gl_FragData[0] = packDepth(depth); // correct.
+		gl_FragData[0] = packDepth(depth); 
 	}
 
 	float frustumIdx = 1.0;

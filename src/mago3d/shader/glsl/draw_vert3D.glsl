@@ -74,8 +74,7 @@ vec3 geographicToWorldCoord(float lonRad, float latRad, float alt)
 	float x = (v+h)*cosLat*cosLon;
 	float y = (v+h)*cosLat*sinLon;
 	float z = (v*(1.0-e2)+h)*sinLat;
-	
-	
+
 	vec3 resultCartesian = vec3(x, y, z);
 	
 	return resultCartesian;

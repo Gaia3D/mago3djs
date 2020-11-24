@@ -23,6 +23,7 @@ uniform vec3 buildingPosHIGH;
 uniform vec3 buildingPosLOW;
 uniform vec3 encodedCameraPositionMCHigh;
 uniform vec3 encodedCameraPositionMCLow;
+uniform mat4 buildingRotMatrixInv;
 
 varying vec2 v_tex_pos;
 
@@ -73,6 +74,13 @@ bool checkFrustumCulling(vec2 pos)
 	}
 	return false;
 }
+/*
+vec3 getCamRayWC()
+{
+	// this function returns the camera direction line in world coords.
+
+}
+*/
 
 vec2 getOffset(vec2 particlePos, float radius)
 {
@@ -89,7 +97,46 @@ vec2 getOffset(vec2 particlePos, float radius)
 
 	return vec2(xOffset, yOffset);
 }
+/*
+vec3 get_NDCCoord(in vec2 pos)
+{
+	// calculate the offset at the earth radius.***
+	vec3 buildingPos = buildingPosHIGH + buildingPosLOW;
+	float radius = length(buildingPos);
+	vec2 offset = getOffset(pos, radius);
 
+	float xOffset = offset.x;
+	float yOffset = offset.y;
+	vec4 rotatedPos = buildingRotMatrix * vec4(xOffset, yOffset, 0.0, 1.0);
+	
+	vec4 position = vec4((rotatedPos.xyz + buildingPosLOW - encodedCameraPositionMCLow) + ( buildingPosHIGH - encodedCameraPositionMCHigh), 1.0);
+	
+	// Now calculate the position on camCoord.***
+	vec4 posCC = ModelViewProjectionMatrixRelToEye * position;
+	vec3 ndc_coord = vec3(posCC.xyz/posCC.w);
+
+	return ndc_coord;
+}
+*/
+
+bool is_NDCCoord_InsideOfFrustum(in vec3 ndc_coord)
+{
+	bool pointIsInside = true;
+
+	float ndc_x = ndc_coord.x;
+	float ndc_y = ndc_coord.y;
+
+	if(ndc_x < -1.0)
+		return false;
+	else if(ndc_x > 1.0)
+		return false;
+	else if(ndc_y < -1.0)
+		return false;
+	else if(ndc_y > 1.0)
+		return false;
+	
+	return pointIsInside;
+}
 
 bool isPointInsideOfFrustum(in vec2 pos)
 {
@@ -109,19 +156,8 @@ bool isPointInsideOfFrustum(in vec2 pos)
 	// Now calculate the position on camCoord.***
 	vec4 posCC = ModelViewProjectionMatrixRelToEye * position;
 	vec3 ndc_pos = vec3(posCC.xyz/posCC.w);
-	float ndc_x = ndc_pos.x;
-	float ndc_y = ndc_pos.y;
 
-	if(ndc_x < -1.0)
-		return false;
-	else if(ndc_x > 1.0)
-		return false;
-	else if(ndc_y < -1.0)
-		return false;
-	else if(ndc_y > 1.0)
-		return false;
-	
-	return pointIsInside;
+	return is_NDCCoord_InsideOfFrustum(ndc_pos);
 }
 
 void main() {
@@ -142,7 +178,7 @@ void main() {
 	float maxLat = u_geoCoordRadiansMax.y;
 	float latRange = maxLat - minLat;
 	float distortion = cos((minLat + pos.y * latRange ));
-    //vec2 offset = vec2(velocity.x / distortion, -velocity.y) * 0.0001 * u_speed_factor * u_interpolation; // original.
+    ////vec2 offset = vec2(velocity.x / distortion, -velocity.y) * 0.0001 * u_speed_factor * u_interpolation; // original.
 	vec2 offset = vec2(velocity.x / distortion, -velocity.y) * 0.0002 * u_speed_factor * u_interpolation;
 
     // update particle position, wrapping around the date line
@@ -152,11 +188,11 @@ void main() {
     // drop rate is a chance a particle will restart at random position, to avoid degeneration
 	float drop = 0.0;
 
-	if(u_interpolation < 0.99) // 0.9
-	{
-		drop = 0.0;
-	}
-	else
+	//if(u_interpolation < 0.99) // 0.9
+	//{
+	//	drop = 0.0;
+	//}
+	//else
 	{
 		// a random seed to use for the particle drop
 		vec2 seed = (pos + v_tex_pos) * u_rand_seed;
@@ -192,6 +228,7 @@ void main() {
 	
 	if(drop > 0.01)
 	{
+		
 		vec2 random_pos = vec2( rand(pos), rand(v_tex_pos) );
 		
 		// New version:
@@ -220,6 +257,66 @@ void main() {
 		}
 
 		pos = random_pos;
+		
+		
+		/*
+		// New way:
+		// 1rst, must know the windCoord of the camera position.
+		vec4 camPosWC = vec4(encodedCameraPositionMCHigh + encodedCameraPositionMCLow, 1.0);
+		vec4 camPosRelToWind = buildingRotMatrixInv * camPosWC;
+
+		// now, must calculate linearPosition rel to windBuilding.
+		float minLonRad = u_geoCoordRadiansMin.x;
+		float maxLonRad = u_geoCoordRadiansMax.x;
+		float minLatRad = u_geoCoordRadiansMin.y;
+		float maxLatRad = u_geoCoordRadiansMax.y;
+		float lonRadRange = maxLonRad - minLonRad;
+		float latRadRange = maxLatRad - minLatRad;
+
+		//float distortion = cos((minLatRad + particlePos.y * latRadRange ));
+		//float xOffset = (particlePos.x - 0.5)*distortion * lonRadRange * radius;
+		//float yOffset = (0.5 - particlePos.y) * latRadRange * radius;
+
+		float xOffset = camPosRelToWind.x;
+		float yOffset = camPosRelToWind.y;
+		vec3 buildingPos = buildingPosHIGH + buildingPosLOW;
+		float radius = length(buildingPos);
+
+		// must calculate linear particlePos_y first.
+		float particlePos_y = 0.5 - yOffset/(latRadRange * radius);
+		float distortion = cos((minLatRad + particlePos_y * latRadRange ));
+		float particlePos_x = xOffset/(distortion * lonRadRange * radius) + 0.5;
+		vec2 linearCamPos = vec2(particlePos_x, particlePos_y);
+
+		// Now, start to calculate new particle position.
+		vec2 random_pos = vec2( rand(pos), rand(v_tex_pos));
+
+		vec2 posA = vec2(pos);
+		vec2 posB = vec2(v_tex_pos);
+		bool isInsideOfFrustum = false;
+		for(int i=0; i<30; i++)
+		{
+			if(isPointInsideOfFrustum(random_pos))
+			{
+				isInsideOfFrustum = true;
+				break;
+			}
+			else
+			{
+				posA.x = random_pos.y;
+				posA.y = random_pos.x;
+
+				posB.x = random_pos.x;
+				posB.y = random_pos.y;
+
+
+				random_pos = vec2( (2.0*rand(posA)-1.0)+particlePos_x, (2.0*rand(posB)-1.0)+(1.0 - particlePos_y) );
+				//random_pos = linearCamPos + (random_pos)*0.1;
+			}
+		}
+
+		pos = random_pos;
+		*/
 	}
 	
 

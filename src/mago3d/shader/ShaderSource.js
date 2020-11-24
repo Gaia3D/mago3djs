@@ -1032,8 +1032,7 @@ vec3 geographicToWorldCoord(float lonRad, float latRad, float alt)\n\
 	float x = (v+h)*cosLat*cosLon;\n\
 	float y = (v+h)*cosLat*sinLon;\n\
 	float z = (v*(1.0-e2)+h)*sinLat;\n\
-	\n\
-	\n\
+\n\
 	vec3 resultCartesian = vec3(x, y, z);\n\
 	\n\
 	return resultCartesian;\n\
@@ -3833,7 +3832,7 @@ void main()\n\
 \n\
 	if(!bUseLogarithmicDepth)\n\
 	{\n\
-		gl_FragData[0] = packDepth(depth); // correct.\n\
+		gl_FragData[0] = packDepth(depth); \n\
 	}\n\
 \n\
 	float frustumIdx = 1.0;\n\
@@ -3932,7 +3931,8 @@ void main()\n\
     \n\
     //linear depth in camera space (0..far)\n\
 	vec4 orthoPos = modelViewMatrixRelToEye * pos4;\n\
-	depth = (-orthoPos.z-near)/(far-near); // \"depth\" is a positive value [0.0, 1.0].***\n\
+	//depth = (-orthoPos.z-near)/(far-near); // \"depth\" is a positive value [0.0, 1.0].***\n\
+	depth = (-orthoPos.z)/(far); // the correct value.\n\
 	\n\
 	// Calculate normalCC.***\n\
 	vec3 rotatedNormal = currentTMat * normal;\n\
@@ -3941,14 +3941,6 @@ void main()\n\
 	// When render with cull_face disabled, must correct the faces normal.\n\
 	//if(vNormal.z < 0.0) // but, do this in fragment shader.\n\
 	//vNormal *= -1.0; // but, do this in fragment shader.\n\
-\n\
-	/*\n\
-	float z_ndc = (2.0 * z_window - depthRange_near - depthRange_far) / (depthRange_far - depthRange_near);\n\
-	vec4 viewPosH = projectionMatrixInv * vec4(x_ndc, y_ndc, z_ndc, 1.0);\n\
-	vec3 posCC = viewPosH.xyz/viewPosH.w;\n\
-	vec4 posWC = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0) + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 1.0);\n\
-	*/\n\
-\n\
 \n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 \n\
@@ -4737,7 +4729,8 @@ float getOcclusion(vec3 origin, vec3 rotatedKernel, float radius)\n\
     //------------------------------------\n\
     \n\
     float sampleZ = -sample.z;\n\
-    float bufferZ = currNear + depthBufferValue * (currFar - currNear);\n\
+   // float bufferZ = currNear + depthBufferValue * (currFar - currNear);\n\
+    float bufferZ = depthBufferValue * currFar;\n\
     float zDiff = abs(bufferZ - sampleZ);\n\
     if(zDiff < radius)\n\
     {\n\
@@ -4865,7 +4858,8 @@ void main()\n\
     float linearDepth = getDepth(screenPos);\n\
 \n\
     // calculate the real pos of origin.\n\
-    float origin_zDist = linearDepth * (currFar - currNear) + currNear;\n\
+    //float origin_zDist = linearDepth * (currFar - currNear) + currNear;\n\
+    float origin_zDist = linearDepth * currFar;\n\
     vec3 origin_real = getViewRay(screenPos, origin_zDist);\n\
 \n\
     float radius_A = 0.5;\n\
@@ -7979,6 +7973,7 @@ uniform vec3 buildingPosHIGH;\n\
 uniform vec3 buildingPosLOW;\n\
 uniform vec3 encodedCameraPositionMCHigh;\n\
 uniform vec3 encodedCameraPositionMCLow;\n\
+uniform mat4 buildingRotMatrixInv;\n\
 \n\
 varying vec2 v_tex_pos;\n\
 \n\
@@ -8029,6 +8024,13 @@ bool checkFrustumCulling(vec2 pos)\n\
 	}\n\
 	return false;\n\
 }\n\
+/*\n\
+vec3 getCamRayWC()\n\
+{\n\
+	// this function returns the camera direction line in world coords.\n\
+\n\
+}\n\
+*/\n\
 \n\
 vec2 getOffset(vec2 particlePos, float radius)\n\
 {\n\
@@ -8045,7 +8047,46 @@ vec2 getOffset(vec2 particlePos, float radius)\n\
 \n\
 	return vec2(xOffset, yOffset);\n\
 }\n\
+/*\n\
+vec3 get_NDCCoord(in vec2 pos)\n\
+{\n\
+	// calculate the offset at the earth radius.***\n\
+	vec3 buildingPos = buildingPosHIGH + buildingPosLOW;\n\
+	float radius = length(buildingPos);\n\
+	vec2 offset = getOffset(pos, radius);\n\
 \n\
+	float xOffset = offset.x;\n\
+	float yOffset = offset.y;\n\
+	vec4 rotatedPos = buildingRotMatrix * vec4(xOffset, yOffset, 0.0, 1.0);\n\
+	\n\
+	vec4 position = vec4((rotatedPos.xyz + buildingPosLOW - encodedCameraPositionMCLow) + ( buildingPosHIGH - encodedCameraPositionMCHigh), 1.0);\n\
+	\n\
+	// Now calculate the position on camCoord.***\n\
+	vec4 posCC = ModelViewProjectionMatrixRelToEye * position;\n\
+	vec3 ndc_coord = vec3(posCC.xyz/posCC.w);\n\
+\n\
+	return ndc_coord;\n\
+}\n\
+*/\n\
+\n\
+bool is_NDCCoord_InsideOfFrustum(in vec3 ndc_coord)\n\
+{\n\
+	bool pointIsInside = true;\n\
+\n\
+	float ndc_x = ndc_coord.x;\n\
+	float ndc_y = ndc_coord.y;\n\
+\n\
+	if(ndc_x < -1.0)\n\
+		return false;\n\
+	else if(ndc_x > 1.0)\n\
+		return false;\n\
+	else if(ndc_y < -1.0)\n\
+		return false;\n\
+	else if(ndc_y > 1.0)\n\
+		return false;\n\
+	\n\
+	return pointIsInside;\n\
+}\n\
 \n\
 bool isPointInsideOfFrustum(in vec2 pos)\n\
 {\n\
@@ -8065,19 +8106,8 @@ bool isPointInsideOfFrustum(in vec2 pos)\n\
 	// Now calculate the position on camCoord.***\n\
 	vec4 posCC = ModelViewProjectionMatrixRelToEye * position;\n\
 	vec3 ndc_pos = vec3(posCC.xyz/posCC.w);\n\
-	float ndc_x = ndc_pos.x;\n\
-	float ndc_y = ndc_pos.y;\n\
 \n\
-	if(ndc_x < -1.0)\n\
-		return false;\n\
-	else if(ndc_x > 1.0)\n\
-		return false;\n\
-	else if(ndc_y < -1.0)\n\
-		return false;\n\
-	else if(ndc_y > 1.0)\n\
-		return false;\n\
-	\n\
-	return pointIsInside;\n\
+	return is_NDCCoord_InsideOfFrustum(ndc_pos);\n\
 }\n\
 \n\
 void main() {\n\
@@ -8098,7 +8128,7 @@ void main() {\n\
 	float maxLat = u_geoCoordRadiansMax.y;\n\
 	float latRange = maxLat - minLat;\n\
 	float distortion = cos((minLat + pos.y * latRange ));\n\
-    //vec2 offset = vec2(velocity.x / distortion, -velocity.y) * 0.0001 * u_speed_factor * u_interpolation; // original.\n\
+    ////vec2 offset = vec2(velocity.x / distortion, -velocity.y) * 0.0001 * u_speed_factor * u_interpolation; // original.\n\
 	vec2 offset = vec2(velocity.x / distortion, -velocity.y) * 0.0002 * u_speed_factor * u_interpolation;\n\
 \n\
     // update particle position, wrapping around the date line\n\
@@ -8108,11 +8138,11 @@ void main() {\n\
     // drop rate is a chance a particle will restart at random position, to avoid degeneration\n\
 	float drop = 0.0;\n\
 \n\
-	if(u_interpolation < 0.99) // 0.9\n\
-	{\n\
-		drop = 0.0;\n\
-	}\n\
-	else\n\
+	//if(u_interpolation < 0.99) // 0.9\n\
+	//{\n\
+	//	drop = 0.0;\n\
+	//}\n\
+	//else\n\
 	{\n\
 		// a random seed to use for the particle drop\n\
 		vec2 seed = (pos + v_tex_pos) * u_rand_seed;\n\
@@ -8148,6 +8178,7 @@ void main() {\n\
 	\n\
 	if(drop > 0.01)\n\
 	{\n\
+		\n\
 		vec2 random_pos = vec2( rand(pos), rand(v_tex_pos) );\n\
 		\n\
 		// New version:\n\
@@ -8176,6 +8207,66 @@ void main() {\n\
 		}\n\
 \n\
 		pos = random_pos;\n\
+		\n\
+		\n\
+		/*\n\
+		// New way:\n\
+		// 1rst, must know the windCoord of the camera position.\n\
+		vec4 camPosWC = vec4(encodedCameraPositionMCHigh + encodedCameraPositionMCLow, 1.0);\n\
+		vec4 camPosRelToWind = buildingRotMatrixInv * camPosWC;\n\
+\n\
+		// now, must calculate linearPosition rel to windBuilding.\n\
+		float minLonRad = u_geoCoordRadiansMin.x;\n\
+		float maxLonRad = u_geoCoordRadiansMax.x;\n\
+		float minLatRad = u_geoCoordRadiansMin.y;\n\
+		float maxLatRad = u_geoCoordRadiansMax.y;\n\
+		float lonRadRange = maxLonRad - minLonRad;\n\
+		float latRadRange = maxLatRad - minLatRad;\n\
+\n\
+		//float distortion = cos((minLatRad + particlePos.y * latRadRange ));\n\
+		//float xOffset = (particlePos.x - 0.5)*distortion * lonRadRange * radius;\n\
+		//float yOffset = (0.5 - particlePos.y) * latRadRange * radius;\n\
+\n\
+		float xOffset = camPosRelToWind.x;\n\
+		float yOffset = camPosRelToWind.y;\n\
+		vec3 buildingPos = buildingPosHIGH + buildingPosLOW;\n\
+		float radius = length(buildingPos);\n\
+\n\
+		// must calculate linear particlePos_y first.\n\
+		float particlePos_y = 0.5 - yOffset/(latRadRange * radius);\n\
+		float distortion = cos((minLatRad + particlePos_y * latRadRange ));\n\
+		float particlePos_x = xOffset/(distortion * lonRadRange * radius) + 0.5;\n\
+		vec2 linearCamPos = vec2(particlePos_x, particlePos_y);\n\
+\n\
+		// Now, start to calculate new particle position.\n\
+		vec2 random_pos = vec2( rand(pos), rand(v_tex_pos));\n\
+\n\
+		vec2 posA = vec2(pos);\n\
+		vec2 posB = vec2(v_tex_pos);\n\
+		bool isInsideOfFrustum = false;\n\
+		for(int i=0; i<30; i++)\n\
+		{\n\
+			if(isPointInsideOfFrustum(random_pos))\n\
+			{\n\
+				isInsideOfFrustum = true;\n\
+				break;\n\
+			}\n\
+			else\n\
+			{\n\
+				posA.x = random_pos.y;\n\
+				posA.y = random_pos.x;\n\
+\n\
+				posB.x = random_pos.x;\n\
+				posB.y = random_pos.y;\n\
+\n\
+\n\
+				random_pos = vec2( (2.0*rand(posA)-1.0)+particlePos_x, (2.0*rand(posB)-1.0)+(1.0 - particlePos_y) );\n\
+				//random_pos = linearCamPos + (random_pos)*0.1;\n\
+			}\n\
+		}\n\
+\n\
+		pos = random_pos;\n\
+		*/\n\
 	}\n\
 	\n\
 \n\

@@ -765,7 +765,8 @@ ManagerUtils.calculatePixelLinearDepthV2 = function(gl, pixelX, pixelY, depthTex
 	//FBO.bindFramebuffer(gl, texturesMergerFbo, normalTex);
 	texturesMergerFbo.bind();
 	gl.readPixels(pixelX, magoManager.sceneState.drawingBufferHeight[0] - pixelY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, depthPixels);
-	var floatDepthPixels = new Float32Array(([depthPixels[0]/256.0, depthPixels[1]/256.0, depthPixels[2]/256.0, depthPixels[3]/256.0]));
+	//var floatDepthPixels = new Float32Array(([depthPixels[0]/256.0, depthPixels[1]/256.0, depthPixels[2]/256.0, depthPixels[3]/256.0]));
+	var floatDepthPixels = new Float32Array(([depthPixels[0]/255.0, depthPixels[1]/255.0, depthPixels[2]/255.0, depthPixels[3]/255.0]));
 	var zDepth = ManagerUtils.unpackDepth(floatDepthPixels); // 0 to 256 range depth.
 	var linearDepth = zDepth;// [0.0, 1.0] range depth.
 
@@ -773,7 +774,7 @@ ManagerUtils.calculatePixelLinearDepthV2 = function(gl, pixelX, pixelY, depthTex
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, texturesMergerFbo.extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, normalTex, 0);
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, texturesMergerFbo.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, depthTex, 0);
 	gl.readPixels(pixelX, magoManager.sceneState.drawingBufferHeight[0] - pixelY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, depthPixels);
-	var floatNormalPixels = new Float32Array(([depthPixels[0]/256.0, depthPixels[1]/256.0, depthPixels[2]/256.0, depthPixels[3]/256.0]));
+	var floatNormalPixels = new Float32Array(([depthPixels[0]/255.0, depthPixels[1]/255.0, depthPixels[2]/255.0, depthPixels[3]/255.0]));
 
 	// calculate the frustumIdx of the readed pixel.***
 	var frustumIdx = Math.floor(floatNormalPixels[3]*100);
@@ -868,8 +869,8 @@ ManagerUtils.calculatePixelPositionCamCoord = function(gl, pixelX, pixelY, resul
 		}
 
 	}
-	//linearDepth *= 1.0037; // test.
-	var realZDepth = linearDepth * (frustumFar - frustumNear) + frustumNear; // correct.
+	//var realZDepth = linearDepth * (frustumFar - frustumNear) + frustumNear; 
+	var realZDepth = linearDepth * frustumFar; 
 	
 
 	// now, find the 3d position of the pixel in camCoord.*
@@ -881,20 +882,6 @@ ManagerUtils.calculatePixelPositionCamCoord = function(gl, pixelX, pixelY, resul
 
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null); // delete this code from here. TODO:
 	
-	// Another way to calculate the posCC.
-	// Note: NDC range = (-1,-1,-1) to (1,1,1).***
-	/*
-	var ndc_z = linearDepth * 2.0 - 1.0;
-	var ndc_x = (pixelX / sceneState.drawingBufferWidth[0]) * 2.0 - 1.0;
-	var ndc_y = (1.0 - pixelY / sceneState.drawingBufferHeight[0]) * 2.0 - 1.0;
-	var ndc_4 = [ndc_x, ndc_y, ndc_z, 1.0];
-
-	var projMatInv = sceneState.projectionMatrixInvMap[options.frustumIdx];
-	var tPos = projMatInv.transformPoint4D(ndc_4, undefined);
-
-	resultPixelPos.set(tPos[0]/tPos[3], tPos[1]/tPos[3], tPos[2]/tPos[3]);
-	*/
-
 	return resultPixelPos;
 	
 };

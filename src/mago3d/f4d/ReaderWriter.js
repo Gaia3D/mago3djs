@@ -1472,11 +1472,12 @@ ReaderWriter.loadImage = function(gl, filePath_inServer, texture)
 				_gl.texImage2D(_gl.TEXTURE_2D, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, data);
 			}
 			_gl.bindTexture(_gl.TEXTURE_2D, null);
-			//gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+			//_gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
 			return textureAux;
 		}
 
-		texture.texId = createTexture(gl, gl.LINEAR, image);
+		//texture.texId = createTexture(gl, gl.LINEAR, image);
+		texture.texId = createTexture(gl, gl.NEAREST, image);
 		texture.fileLoadState = CODE.fileLoadState.BINDING_FINISHED; // file load finished.***
 	};
 
