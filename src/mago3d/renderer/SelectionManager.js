@@ -738,16 +738,28 @@ SelectionManager.prototype.selectionByPolygon2D = function(polygon2D, type) {
 	this.clearCurrents();
 	var frustumVolumeControl = this.magoManager.frustumVolumeControl;
 	
-	var selectedArray = frustumVolumeControl.selectionByPolygon2D(polygon2D, type);
+	var selectedArray;
 
-	if(type === DataType.F4D) {
-		this.currentNodeSelectedArray = selectedArray;
-		this.currentNodeSelected = selectedArray[0];
-	} else if(type === DataType.NATIVE) {
-		this.currentGeneralObjectSelectedArray = selectedArray;
-		this.currentGeneralObjectSelected = selectedArray[0];
+	if(type === DataType.ALL) {
+		var selectedNodeArray = frustumVolumeControl.selectionByPolygon2D(polygon2D, DataType.F4D);
+		this.currentNodeSelectedArray = selectedNodeArray;
+		this.currentNodeSelected = selectedNodeArray[0];
+
+		var selectedNativeArray = frustumVolumeControl.selectionByPolygon2D(polygon2D, DataType.NATIVE);
+		this.currentGeneralObjectSelectedArray = selectedNativeArray;
+		this.currentGeneralObjectSelected = selectedNativeArray[0];
+
+		selectedArray = [].concat(selectedNodeArray, selectedNativeArray);
+	} else {
+		selectedArray = frustumVolumeControl.selectionByPolygon2D(polygon2D, type);
+		if(type === DataType.F4D) {
+			this.currentNodeSelectedArray = selectedArray;
+			this.currentNodeSelected = selectedArray[0];
+		} else if(type === DataType.NATIVE) {
+			this.currentGeneralObjectSelectedArray = selectedArray;
+			this.currentGeneralObjectSelected = selectedArray[0];
+		}
 	}
-
 	return selectedArray;
 }
 

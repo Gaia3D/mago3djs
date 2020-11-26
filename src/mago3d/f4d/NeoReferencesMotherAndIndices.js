@@ -993,7 +993,7 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(ar
 NeoReferencesMotherAndIndices.prototype.render = function(magoManager, neoBuilding, renderType, renderTexture, shader, maxSizeToRender, refMatrixIdxKey) 
 {
 	var allRendered = true;
-	
+	var isStatic = neoBuilding.nodeOwner.data.attributes.isReference;
 	if (!this.isReadyToRender())
 	{ return false; }
 	
@@ -1045,7 +1045,7 @@ NeoReferencesMotherAndIndices.prototype.render = function(magoManager, neoBuildi
 		else 
 		{
 			// Check renderingFase.
-			if (neoReference.renderingFase === magoManager.renderingFase)
+			if (!isStatic && (neoReference.renderingFase === magoManager.renderingFase))
 			{ continue; }
 			
 			// Render the referenceObject.

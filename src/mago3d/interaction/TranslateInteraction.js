@@ -124,8 +124,8 @@ TranslateInteraction.prototype.handleDownEvent = function(browserEvent)
 	}
 
 	var filterProvisional = selectManager.filterProvisional(this.targetType, this.filter_);
-
-	if (!isEmpty(filterProvisional))
+	
+	if (!isEmpty(filterProvisional) && filterProvisional.hasOwnProperty(this.targetType))
 	{
 		this.target = filterProvisional[this.targetType][0];
 		if (this.targetType === DataType.OBJECT)

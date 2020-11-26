@@ -205,6 +205,10 @@ PointSelectInteraction.prototype.emitEvent = function(selectedObj, selected, scr
 			timestamp : new Date()
 		};
 		selected ? eventObj.selected = selectedObj : eventObj.deselected = selectedObj;
+		if(this.targetType === DataType.OBJECT) {
+			eventObj.f4d = this.manager.selectionManager.getSelectedF4dNode();
+		}
+		
 		this.manager.emit(type, eventObj);
 	}
 };

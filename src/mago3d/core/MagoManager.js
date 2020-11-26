@@ -1942,51 +1942,51 @@ MagoManager.prototype.validateHeight = function(frustumObject)
 				next.push(needValidHeightNode);
 			}
 		}
-		if (process.length === 0) { return; }
-		
-		var that = this;
-		new Promise(function(resolve) 
-		{
-			resolve({mm: that, nArray: process});
-		}).then(function(obj)
-		{
-			var cartographics = [];
-			var nArray = obj.nArray;
-			var nArrayLength = nArray.length;
-			for (var j=0;j<nArrayLength;j++ )
+		if (process.length > 0){
+			var that = this;
+			new Promise(function(resolve) 
 			{
-				var node = nArray[j];
-				var geographic;
-				if (node.data.mapping_type === 'origin') 
-				{
-					geographic = ManagerUtils.pointToGeographicCoord(node.bboxAbsoluteCenterPos);
-				}
-				else 
-				{
-					geographic = node.getCurrentGeoLocationData().geographicCoord;
-				}
-				cartographics.push(Cesium.Cartographic.fromDegrees(geographic.longitude, geographic.latitude));
-			}
-			
-			Cesium.sampleTerrain(terrainProvider, maxZoom, cartographics).then(function(samplePositions)
+				resolve({mm: that, nArray: process});
+			}).then(function(obj)
 			{
-				if (samplePositions.length === nArrayLength) 
+				var cartographics = [];
+				var nArray = obj.nArray;
+				var nArrayLength = nArray.length;
+				for (var j=0;j<nArrayLength;j++ )
 				{
-					for (var k=0, slen=samplePositions.length;k<slen;k++) 
+					var node = nArray[j];
+					var geographic;
+					if (node.data.mapping_type === 'origin') 
 					{
-						var n = nArray[k];
-						var currentGeoLocationData = n.getCurrentGeoLocationData();
-						var cp = currentGeoLocationData.geographicCoord;
-						n.changeLocationAndRotation(cp.latitude, cp.longitude, n.caculateHeightByReference(samplePositions[k].height), currentGeoLocationData.heading, currentGeoLocationData.pitch, currentGeoLocationData.roll, obj.mm);
+						geographic = ManagerUtils.pointToGeographicCoord(node.bboxAbsoluteCenterPos);
 					}
-					obj.mm.emit(MagoManager.EVENT_TYPE.VALIDHEIGHTEND, {
-						type   : MagoManager.EVENT_TYPE.VALIDHEIGHTEND,
-						validDataArray : nArray,
-						timestamp: new Date()
-					});
+					else 
+					{
+						geographic = node.getCurrentGeoLocationData().geographicCoord;
+					}
+					cartographics.push(Cesium.Cartographic.fromDegrees(geographic.longitude, geographic.latitude));
 				}
+				
+				Cesium.sampleTerrain(terrainProvider, maxZoom, cartographics).then(function(samplePositions)
+				{
+					if (samplePositions.length === nArrayLength) 
+					{
+						for (var k=0, slen=samplePositions.length;k<slen;k++) 
+						{
+							var n = nArray[k];
+							var currentGeoLocationData = n.getCurrentGeoLocationData();
+							var cp = currentGeoLocationData.geographicCoord;
+							n.changeLocationAndRotation(cp.latitude, cp.longitude, n.caculateHeightByReference(samplePositions[k].height), currentGeoLocationData.heading, currentGeoLocationData.pitch, currentGeoLocationData.roll, obj.mm);
+						}
+						obj.mm.emit(MagoManager.EVENT_TYPE.VALIDHEIGHTEND, {
+							type   : MagoManager.EVENT_TYPE.VALIDHEIGHTEND,
+							validDataArray : nArray,
+							timestamp: new Date()
+						});
+					}
+				});
 			});
-		});
+		}
 
 		this._needValidHeightNodeArray = next;
 	}
@@ -2021,43 +2021,45 @@ MagoManager.prototype.validateHeight = function(frustumObject)
 				next.push(needValidNative);
 			}
 		}
-		if (process.length === 0) { return; }
 		
-		var that = this;
-		new Promise(function(resolve) 
-		{
-			resolve({mm: that, nArray: process});
-		}).then(function(obj)
-		{
-			var cartographics = [];
-			var nArray = obj.nArray;
-			var nArrayLength = nArray.length;
-			for (var j=0;j<nArrayLength;j++ )
+		if (process.length > 0) { 
+			var that = this;
+			new Promise(function(resolve) 
 			{
-				var native = nArray[j];
-				var geographic = native.getCurrentGeoLocationData().geographicCoord;
-	
-				cartographics.push(Cesium.Cartographic.fromDegrees(geographic.longitude, geographic.latitude));
-			}
-			
-			Cesium.sampleTerrain(terrainProvider, maxZoom, cartographics).then(function(samplePositions)
+				resolve({mm: that, nArray: process});
+			}).then(function(obj)
 			{
-				if (samplePositions.length === nArrayLength) 
+				var cartographics = [];
+				var nArray = obj.nArray;
+				var nArrayLength = nArray.length;
+				for (var j=0;j<nArrayLength;j++ )
 				{
-					for (var k=0, slen=samplePositions.length;k<slen;k++) 
-					{
-						var n = nArray[k];
-						var vHeight = samplePositions[k].height;
-						n.setTerrainHeight(vHeight);
-					}
-					obj.mm.emit(MagoManager.EVENT_TYPE.VALIDHEIGHTEND, {
-						type   : MagoManager.EVENT_TYPE.VALIDHEIGHTEND,
-						validDataArray : nArray,
-						timestamp: new Date()
-					});
+					var native = nArray[j];
+					var geographic = native.getCurrentGeoLocationData().geographicCoord;
+		
+					cartographics.push(Cesium.Cartographic.fromDegrees(geographic.longitude, geographic.latitude));
 				}
+				
+				Cesium.sampleTerrain(terrainProvider, maxZoom, cartographics).then(function(samplePositions)
+				{
+					if (samplePositions.length === nArrayLength) 
+					{
+						for (var k=0, slen=samplePositions.length;k<slen;k++) 
+						{
+							var n = nArray[k];
+							var vHeight = samplePositions[k].height;
+							n.setTerrainHeight(vHeight);
+						}
+						obj.mm.emit(MagoManager.EVENT_TYPE.VALIDHEIGHTEND, {
+							type   : MagoManager.EVENT_TYPE.VALIDHEIGHTEND,
+							validDataArray : nArray,
+							timestamp: new Date()
+						});
+					}
+				});
 			});
-		});
+		}
+		
 		this._needValidHeightNativeArray = next;
 	}
 };
