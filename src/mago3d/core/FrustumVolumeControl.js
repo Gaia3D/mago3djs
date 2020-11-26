@@ -117,9 +117,13 @@ FrustumVolumeControl.prototype.calculateBoundingFrustums = function(camera)
 	}
 };
 
-
+/**
+ * Returns the visible nodes & nativeObjects in a maps
+ * Returns in "map", so there are NO repeated nodes or nativeObjects.
+ */
 FrustumVolumeControl.prototype.getAllVisiblesObject = function()
 {
+	// Returns in "map", so there are NO repeated nodes or nativeObjects.
 	var nodeMap = {};
 	var nativeMap = {};
 
@@ -154,6 +158,36 @@ FrustumVolumeControl.prototype.getAllVisiblesObject = function()
 		nativeMap : nativeMap
 	};
 };
+
+/**
+ * Returns the visible nodes & nativeObjects in arrays
+ * Returns in "arrays", so there can be repeated nodes or nativeObjects.
+ */
+FrustumVolumeControl.prototype.getAllVisiblesObjectArrays = function()
+{
+	// Returns in "arrays", so there can be repeated nodes or nativeObjects.
+	var nodeArray = [];
+	var nativeArray = [];
+
+	for (var i in this.frustumVolumensMap) 
+	{
+		if (this.frustumVolumensMap.hasOwnProperty(i)) 
+		{
+			var visibleNodes = this.frustumVolumensMap[i].visibleNodes;
+
+			var natives = visibleNodes.getAllNatives();
+			nativeArray = nativeArray.concat(natives);
+
+			var nodes = visibleNodes.getAllVisibles();
+			nodeArray = nodeArray.concat(nodes);
+		}
+	}
+	return {
+		nodeArray   : nodeArray,
+		nativeArray : nativeArray
+	};
+};
+
 /**
  * 
  * @param {*} polygon2D 

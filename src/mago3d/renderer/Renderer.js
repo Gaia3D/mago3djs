@@ -477,7 +477,7 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 		var refTMatrixIdxKey = 0;
 		var minSizeToRender = 0.0;
 		
-		var refMatrixIdxKey =0; // provisionally set this var here.***
+		var refMatrixIdxKey = 0; // provisionally set this var here.***
 		magoManager.modeler.render(magoManager, currentShader, renderType);
 
 		currentShader.disableVertexAttribArrayAll();
@@ -845,6 +845,7 @@ Renderer.prototype.renderDepthCameraPointOfView = function(camera, visibleObjCon
 	magoManager.currentProcess = CODE.magoCurrentProcess.DepthShadowRendering;
 
 	var gl = magoManager.getGl();
+	var sceneState = magoManager.sceneState;
 
 	// Do the depth render.***
 	var currentShader = magoManager.postFxShadersManager.getShader("modelRefDepth"); 
@@ -856,28 +857,46 @@ Renderer.prototype.renderDepthCameraPointOfView = function(camera, visibleObjCon
 	currentShader.enableVertexAttribArray(currentShader.position3_loc);
 
 	currentShader.bindUniformGenerals();
-	
-	// get camera geoLocationData.
-	//var camGeoLocData = 
 
-	//gl.uniformMatrix4fv(currentShader.modelViewMatrixRelToEye_loc, false, sunTMatrix._floatArrays);
-	gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrixRelToEye_loc, false, sunLight.tMatrix._floatArrays);
-	gl.uniform3fv(currentShader.encodedCameraPositionMCHigh_loc, sunLight.positionHIGH);
-	gl.uniform3fv(currentShader.encodedCameraPositionMCLow_loc, sunLight.positionLOW);
+	//gl.viewport(0, 0, 512, 512);
+	//gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
+	
+	// get camera's encodedPositions high & low.
+	var encodedCamPos = camera.getEncodedCameraPosition();
+	var camMVRelToEyeMat = camera.getModelViewMatrixRelToEye();
+
+	var bigFrustum = camera.getBigFrustum();
+	var projectionMat = Frustum.getProjectionMatrix(bigFrustum, undefined);
+
+	var modelViewProjMatrix = new Matrix4();
+	modelViewProjMatrix._floatArrays = glMatrix.mat4.multiply(modelViewProjMatrix._floatArrays, projectionMat._floatArrays, camMVRelToEyeMat._floatArrays);
+	var mvpMatRelToEye_loc = gl.getUniformLocation(currentShader.program, "ModelViewProjectionMatrixRelToEye");
+
+	gl.uniformMatrix4fv(mvpMatRelToEye_loc, false, modelViewProjMatrix._floatArrays);
+	gl.uniformMatrix4fv(currentShader.modelViewMatrixRelToEye, false, camMVRelToEyeMat._floatArrays);
+	gl.uniform3fv(currentShader.encodedCameraPositionMCHigh, encodedCamPos.high);
+	gl.uniform3fv(currentShader.encodedCameraPositionMCLow, encodedCamPos.low);
 	gl.uniform3fv(currentShader.scaleLC_loc, [1.0, 1.0, 1.0]); // init referencesMatrix.
+	gl.uniform1f(currentShader.frustumFar_loc, bigFrustum.far[0]);
+
+	gl.uniform1i(currentShader.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
+	gl.uniform1f(currentShader.uFCoef_logDepth_loc, sceneState.fCoef_logDepth[0]);
+	gl.uniform1i(currentShader.bHasTexture_loc , false);
+	gl.uniform1i(currentShader.uFrustumIdx_loc, magoManager.currentFrustumIdx);
+	var bUseMultiRenderTarget = false;
+	gl.uniform1i(currentShader.bUseMultiRenderTarget_loc, bUseMultiRenderTarget);
 	
 	gl.uniform1i(currentShader.bApplySsao_loc, false); // apply ssao.***
 	gl.disable(gl.CULL_FACE);
+	gl.enable(gl.DEPTH_TEST);
 	var renderType = 0;
 	
 	// Do render.***
 	var refTMatrixIdxKey = 0;
 	var minSize = 0.0;
 	var renderTexture = false;
-
+	
 	this.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
-	this.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
-	this.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
 	
 	// Mago native geometries.
 	this.renderNativeObjects(gl, currentShader, renderType, visibleObjControlerNodes);
@@ -893,6 +912,8 @@ Renderer.prototype.renderDepthCameraPointOfView = function(camera, visibleObjCon
 	gl.enable(gl.CULL_FACE);
 	currentShader.disableVertexAttribArrayAll();
 	gl.useProgram(null);
+
+	//gl.viewport(0, 0, sceneState.drawingBufferWidth[0], sceneState.drawingBufferHeight[0]);
 };
 
 
@@ -2005,8 +2026,8 @@ Renderer.prototype.renderScreenRectangle = function(gl)
 {
 	if (this.quadBuffer === undefined)
 	{
-		//var data = new Float32Array([0, 0,   1, 0,   0, 1,   0, 1,   1, 0,   1, 1]);
-		var data = new Float32Array([0, 0,   0.5, 0,   0, 0.5,   0, 0.5,   0.5, 0,   0.5, 0.5]);
+		var data = new Float32Array([0, 0,   1, 0,   0, 1,   0, 1,   1, 0,   1,  1]);
+		//var data = new Float32Array([0, 0,   0.5, 0,   0, 0.5,   0, 0.5,   0.5, 0,   0.5,  0.5]);
 		this.quadBuffer = FBO.createBuffer(gl, data);
 	}
 
@@ -2040,6 +2061,13 @@ Renderer.prototype.renderScreenRectangle = function(gl)
 	// If you want to see silhouetteDepthBuffer.
 	var silhouetteDepthFbo = magoManager.getSilhouetteDepthFbo();
 	var texture = silhouetteDepthFbo.colorBuffer;
+
+	if(magoManager.laserCamera)
+	{
+		var options = {};
+		var laserCamDepthFBO = magoManager.laserCamera.getDepthBufferFBO(magoManager, options);
+		texture = laserCamDepthFBO.colorBuffer;
+	}
 
 	if (texture === undefined)
 	{ return; }

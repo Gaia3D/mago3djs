@@ -15,6 +15,8 @@ var Camera = function(options)
 	this.id = "camera";
 	this.name = "noName";
 	this.position = new Point3D(); 
+	this.encodedCamPosHigh; 
+	this.encodedCamPosLow;
 	this.direction = new Point3D(); 
 	this.up = new Point3D();
 	this.right = new Point3D();
@@ -42,6 +44,9 @@ var Camera = function(options)
 	this.rightNormal = new Point3D();
 	this.bottomNormal = new Point3D();
 	this.topNormal = new Point3D();
+
+	// camera's depthBuffer.
+	this.depthBufferFBO;
 	
 	// movement.
 	this.lastMovement; // class Movement.
@@ -367,6 +372,15 @@ Camera.prototype.isCameraMoved = function(newPosX, newPosY, newPosZ, newDirX, ne
 };
 
 /**
+ * returns the big Frustum
+ * @returns {Frustum} 해당하는 배열 인덱스의 frustrum
+ */
+Camera.prototype.getBigFrustum = function()
+{
+	return this.bigFrustum;
+};
+
+/**
  * get the small Frustum in big frustum
  * @param {Number} idx 배열 인덱스
  * @returns {Frustum} 해당하는 배열 인덱스의 frustrum
@@ -683,7 +697,8 @@ Camera.prototype.doTrack = function(magoManager)
 
 				var geoLocMat = geoLocationData.geoLocMatrix._floatArrays;
 				var earthNormal = new Point3D(geoLocMat[8], geoLocMat[9], geoLocMat[10]);
-				Camera.setByPositionAndTarget(camera, rotPointTarget, rotPointCamPos, earthNormal);
+				Camera.setByPositionAndTargetCesiumCamera(camera, rotPointTarget, rotPointCamPos, earthNormal);
+
 			}
 		}
 		else
@@ -762,6 +777,38 @@ Camera.prototype.getPosition = function()
 /**
  * 두 점을 이용하여 디렉션 정보 계산
  */
+Camera.prototype.getEncodedCameraPosition = function()
+{
+	if(!this._lastPosition)
+	{
+		// auxiliar position to campare with the current position.
+		this._lastPosition = new Point3D(0,0,0);
+	}
+
+	if(!this.encodedCamPosHigh || !this.encodedCamPosLow)
+	{
+		this.encodedCamPosHigh = new Float32Array(3);
+		this.encodedCamPosLow = new Float32Array(3);
+	}
+
+	// only calculate if camera moved.
+	if(this.position.x !== this._lastPosition.x || this.position.y !== this._lastPosition.y || this.position.z !== this._lastPosition.z )
+	{
+		ManagerUtils.calculateSplited3fv([this.position.x, this.position.y, this.position.z], this.encodedCamPosHigh, this.encodedCamPosLow);
+		this._lastPosition.set(this.position.x, this.position.y, this.position.z);
+	}
+
+	var camEncodedPositions = {
+		high : this.encodedCamPosHigh,
+		low : this.encodedCamPosLow
+	}
+	
+	return camEncodedPositions;
+};
+
+/**
+ * 두 점을 이용하여 디렉션 정보 계산
+ */
 Camera.prototype.getDirection = function()
 {
 	return this.direction;
@@ -810,19 +857,62 @@ Camera.prototype.getTargetOnTerrain = function (magoManager, resultTargetPos)
  * 
  * @static
  * @param {Cesium.Camera} camera cesium camera object.
- * @param {Point3D} camTarget
+ * @param {Point3D} camTarget 
  * @param {Point3D} camPos
- * @param {Point3D} aproxCamUp
+ * @param {Point3D} aproxCamUp optional param. If undefined, this is calculated in the function
  */
 Camera.setByPositionAndTarget = function (camera, camTarget, camPos, aproxCamUp) 
+{
+	var cameraPosition = camera.getPosition();
+	cameraPosition.set(camPos.x, camPos.y, camPos.z);
+
+	var direction = camera.getDirection();
+	direction.set(camTarget.x - camPos.x, camTarget.y - camPos.y, camTarget.z - camPos.z);
+	direction.unitary();
+
+	// now, check if exist "aproxCamUp".
+	if(!aproxCamUp)
+	{
+		// take the earthNormal at cameraPosition.
+		var earthNormal = Globe.normalAtCartesianPointWgs84(camPos.x, camPos.y, camPos.z, undefined);
+		aproxCamUp = new Point3D(earthNormal[0], earthNormal[1], earthNormal[2]);
+	}
+	var right = camera.getRight();
+	right = direction.crossProduct(aproxCamUp, right);
+
+	var up = camera.getUp();
+	up = right.crossProduct(direction, up);
+	up.unitary();
+};
+
+/**
+ * set position and orientation ( direction, up) of the camera
+ * only cesium
+ * 
+ * @static
+ * @param {Cesium.Camera} camera cesium camera object.
+ * @param {Point3D} camTarget 
+ * @param {Point3D} camPos
+ * @param {Point3D} aproxCamUp optional param. If undefined, this is calculated in the function
+ */
+Camera.setByPositionAndTargetCesiumCamera = function (camera, camTarget, camPos, aproxCamUp, magoManager) 
 {
 	var direction = new Point3D();
 	direction.set(camTarget.x - camPos.x, camTarget.y - camPos.y, camTarget.z - camPos.z);
 	direction.unitary();
 
+	// now, check if exist "aproxCamUp".
+	if(!aproxCamUp)
+	{
+		// take the earthNormal at cameraPosition.
+		var earthNormal = Globe.normalAtCartesianPointWgs84(camPos.x, camPos.y, camPos.z, undefined);
+		aproxCamUp = new Point3D(earthNormal[0], earthNormal[1], earthNormal[2]);
+	}
+
 	var right = direction.crossProduct(aproxCamUp);
 	var up = right.crossProduct(direction);
 	up.unitary();
+
 	camera.setView({
 		destination : camPos,
 		orientation : {
@@ -864,18 +954,65 @@ Camera.setOrientation = function (camera, heading, pitch, roll)
 };
 
 /**
- * Returns the camera's orientation (heading, pitch & roll).
+ * Returns the camera's depth buffer frame buffer object.
+ */
+Camera.prototype.getDepthBufferFBO = function(magoManager, options) 
+{
+	if(!this.depthBufferFBO)
+	{
+		var gl = magoManager.getGl();
+		//var bufferWidth = 512;
+		//var bufferHeight = 512;
+		var bufferWidth = magoManager.sceneState.drawingBufferWidth[0];
+		var bufferHeight = magoManager.sceneState.drawingBufferHeight[0];
+
+		if(options)
+		{
+			if(options.bufferWidth)
+			bufferWidth = options.bufferWidth;
+
+			if(options.bufferHeight)
+			bufferHeight = options.bufferHeight;
+		}
+		
+		var bUseMultiRenderTarget = false;
+		var bMatchCanvasSize = false;
+		this.depthBufferFBO = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: bMatchCanvasSize, multiRenderTarget : bUseMultiRenderTarget}); 
+	}
+
+	return this.depthBufferFBO;
+};
+
+/**
+ * Returns the camera's transformation matrix inverse.
  */
 Camera.prototype.getModelViewMatrix = function() 
 {
 	var modelViewMatrix = new Matrix4();
+	var camPos = this.getPosition();
+	var terget = this.getTargetPositionAtDistance(10000.0);
+	var camUp = this.getUp();
 
 	modelViewMatrix._floatArrays = Matrix4.lookAt(modelViewMatrix._floatArrays, [camPos.x, camPos.y, camPos.z], 
-		[tergetX, tergetY, tergetZ], 
+		[terget.x, terget.y, terget.z], 
 		[camUp.x, camUp.y, camUp.z]);
 
 	return modelViewMatrix;
-}
+};
+
+/**
+ * Returns the camera's transformation matrix inverse relative to eye.
+ */
+Camera.prototype.getModelViewMatrixRelToEye = function() 
+{
+	var modelViewRelToEyeMatrix = this.getModelViewMatrix();
+	modelViewRelToEyeMatrix._floatArrays[12] = 0;
+	modelViewRelToEyeMatrix._floatArrays[13] = 0;
+	modelViewRelToEyeMatrix._floatArrays[14] = 0;
+	modelViewRelToEyeMatrix._floatArrays[15] = 1;
+
+	return modelViewRelToEyeMatrix;
+};
 
 /**
  * Returns the camera's orientation (heading, pitch & roll).
@@ -1113,4 +1250,113 @@ Camera.prototype.finishedAnimation__original = function(magoManager)
 	}
 
 	return finished;
+};
+
+/**
+ * Returns the impact point of the camera as laser in world coord.
+ */
+Camera.intersectPointByLaser = function(startGeoCoord, endGeoCoord, laserCam, resultImpactPointWC, magoManager, options) 
+{
+	if(!laserCam)
+	{
+		laserCam = new Camera();
+	}
+
+	if(!resultImpactPointWC)
+	resultImpactPointWC = new Point3D();
+
+	var startWC = ManagerUtils.geographicCoordToWorldPoint(startGeoCoord.longitude, startGeoCoord.latitude, startGeoCoord.altitude, undefined);
+	var endWC = ManagerUtils.geographicCoordToWorldPoint(endGeoCoord.longitude, endGeoCoord.latitude, endGeoCoord.altitude, undefined);
+	var dist = startWC.distToPoint(endWC)*1.2;
+	var aproxCamUp = undefined;
+	Camera.setByPositionAndTarget(laserCam, endWC, startWC, aproxCamUp);
+
+	var optionsFBO = {
+		bufferWidth : 64,
+		bufferHeight : 64
+	};
+	var camDepthBufferFBO = laserCam.getDepthBufferFBO(magoManager, optionsFBO);
+
+	// now, set the frustum near & far.
+	var bigFrustum = laserCam.getBigFrustum();
+	bigFrustum.setFar(dist);
+	bigFrustum.setAspectRatio(camDepthBufferFBO.getAspectRatio());
+	bigFrustum.setFovyRad(Math.PI/32);
+
+	return Camera.shootLaser(laserCam, resultImpactPointWC, magoManager, options);
+};
+
+/**
+ * Returns the impact point of the camera as laser in world coord.
+ */
+Camera.shootLaser = function(laserCam, resultImpactPointWC, magoManager, options) 
+{
+	var optionsFBO = {
+		bufferWidth : 64,
+		bufferHeight : 64
+	};
+	var camDepthBufferFBO = laserCam.getDepthBufferFBO(magoManager, optionsFBO);
+
+	var nodesArray;
+	var nativesArray;
+	if(options)
+	{
+		if(options.nodesArray)
+		nodesArray = options.nodesArray;
+
+		if(options.nativesArray)
+		nativesArray = options.nativesArray;
+	}
+	else
+	{
+		var allVisibleObjects = magoManager.frustumVolumeControl.getAllVisiblesObjectArrays(); 
+		nodesArray = allVisibleObjects.nodeArray;
+		nativesArray = allVisibleObjects.nativeArray;
+	}
+	var allVisibleObjects = magoManager.frustumVolumeControl.getAllVisiblesObjectArrays(); 
+	var visibleObjectsController = new VisibleObjectsController();
+	visibleObjectsController.currentVisibles0 = nodesArray;
+	visibleObjectsController.currentVisibleNativeObjects.opaquesArray = nativesArray;
+
+	var gl = magoManager.getGl();
+
+	// store the current viewport.
+	var currentViewport = gl.getParameter(gl.VIEWPORT);
+
+	// Now, bind depthBufferFBO.
+	var bufferWidth = camDepthBufferFBO.getWidth();
+	var bufferHeight = camDepthBufferFBO.getHeight();
+
+	camDepthBufferFBO.bind(); 
+	gl.viewport(0, 0, bufferWidth, bufferHeight);
+
+	gl.clearColor(1, 1, 1, 1);
+	gl.clearDepth(1);
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+	var renderer = magoManager.renderer;
+	renderer.renderDepthCameraPointOfView(laserCam, visibleObjectsController);
+
+	// Now, read the centerPixel from the buffer.
+	var depthPixels = new Uint8Array(4 * 1 * 1); // 4 x 1x1 pixel.
+	var screenMidX = Math.floor(bufferWidth/2.0);
+	var screenMidY = Math.floor(bufferHeight/2.0);
+
+	gl.readPixels(screenMidX, screenMidY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, depthPixels);
+	var floatDepthPixels = new Float32Array(([depthPixels[0]/255.0, depthPixels[1]/255.0, depthPixels[2]/255.0, depthPixels[3]/255.0]));
+	var linearDepth = ManagerUtils.unpackDepth(floatDepthPixels); // 0 to 256 range depth.
+
+	var bigFrustum = laserCam.getBigFrustum();
+	var realDist = linearDepth * bigFrustum.far[0];
+
+	// Now, create a point in the intersection pos.
+	if(!resultImpactPointWC)
+	resultImpactPointWC = new Point3D();
+
+	resultImpactPointWC = laserCam.getTargetPositionAtDistance(realDist, resultImpactPointWC);
+
+	camDepthBufferFBO.unbind(); 
+	gl.viewport(currentViewport[0], currentViewport[1], currentViewport[2], currentViewport[3]);
+
+	return resultImpactPointWC;
 };

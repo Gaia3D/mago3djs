@@ -19,6 +19,8 @@ var Frustum = function()
 	this.aspectRatio = new Float32Array([1.3584]);
 	this.planesArray = [];
 	this.dirty = true;
+
+	// note: "tangentOfHalfFovy" & "fovRad" are privates.
 	
 	// plane[0] = near, plane[1] = far.
 	for (var i=0; i<6; i++)
@@ -43,6 +45,21 @@ Frustum.prototype.copyParametersFrom = function(frustum)
 };
 
 /**
+ * returns the projection matrix of the frustum
+ * @param {Frustum} frustum
+ * @param {Matrix4} resultProjectionMatrix
+ */
+Frustum.getProjectionMatrix = function(frustum, resultProjectionMatrix) 
+{
+	if(!resultProjectionMatrix)
+	{
+		resultProjectionMatrix = new Matrix4();
+	}
+	resultProjectionMatrix._floatArrays = glMatrix.mat4.perspective(resultProjectionMatrix._floatArrays, frustum.fovyRad[0], frustum.aspectRatio[0], frustum.near[0], frustum.far[0]);
+	return resultProjectionMatrix;
+};
+
+/**
  * Set the near of frustum by distance
  * @param {Float32} near
  */
@@ -52,12 +69,36 @@ Frustum.prototype.setNear = function(near)
 };
 
 /**
- * Set the fart of frustum by distance
+ * Set the far of frustum by distance
  * @param {Float32} far
  */
 Frustum.prototype.setFar = function(far) 
 {
 	this.far[0] = far;
+};
+
+/**
+ * Set the aspect ratio of frustum
+ * @param {Float32} aspectRatio
+ */
+Frustum.prototype.setAspectRatio = function(aspectRatio) 
+{
+	this.aspectRatio[0] = aspectRatio;
+
+	// update fovx.
+	this.fovRad[0] = aspectRatio * this.fovyRad[0];
+};
+
+/**
+ * Set the field of view in Y direction.
+ * @param {Float32} fovyRad
+ */
+Frustum.prototype.setFovyRad = function(fovyRad) 
+{
+	this.fovyRad[0] = fovyRad;
+
+	// update tangent of half fovy.
+	this.tangentOfHalfFovy = Math.tan(fovyRad/2);
 };
 
 /**

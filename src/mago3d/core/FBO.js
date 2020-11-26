@@ -393,6 +393,21 @@ FBO.bindTexture = function(gl, texture, unit)
 	gl.bindTexture(gl.TEXTURE_2D, texture);
 };
 
+FBO.prototype.getWidth = function()
+{
+	return this.width;
+};
+
+FBO.prototype.getHeight = function()
+{
+	return this.height;
+};
+
+FBO.prototype.getAspectRatio = function()
+{
+	return this.width / this.height;
+};
+
 
 
 

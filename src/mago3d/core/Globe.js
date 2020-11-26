@@ -89,11 +89,13 @@ Globe.radiusAtLatitudeDeg = function(latDeg)
 
 /**
  * Normalize the elements of the 3D feature
+ * @param deprecated.
  * @param {Float32Array} cartesian this can be any feature such as a point or a axis to make unitary
  * 
  */
 Globe.normalizeCartesian = function(cartesian)
 {
+	// this function considere earth as a sphere
 	if (cartesian === undefined)
 	{ return; }
 

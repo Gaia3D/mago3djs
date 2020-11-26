@@ -857,7 +857,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		// projection.***
 		// consider near as zero provisionally.***
 		var projectionMatrix = sceneState.projectionMatrix;
-		projectionMatrix._floatArrays = glMatrix.mat4.perspective(projectionMatrix._floatArrays, frustum0.fovyRad[0], frustum0.aspectRatio[0], frustum0.near[0], frustum0.far[0]);
+		projectionMatrix = Frustum.getProjectionMatrix(frustum0, projectionMatrix);
 
 		// perspective for reverseDepthRange:
 		/*
@@ -1510,6 +1510,25 @@ MagoManager.prototype.getSilhouetteDepthFbo = function()
  * Main rendering function.
  * @private
  */
+MagoManager.prototype.TEST__cameraLaser = function() 
+{
+	// this function tests camera laser.
+	var geoCoord_start = new GeographicCoord(126.75740, 37.54302, 29.133160613985577);
+	var geoCoord_end = new GeographicCoord(126.75719736534053, 37.54493737467032, 44.055231264041986);
+	//var geoCoord_end = new GeographicCoord(126.75767, 37.54526, 44.055231264041986);
+
+	var posWC = Camera.intersectPointByLaser(geoCoord_start, geoCoord_end, undefined, undefined, this, undefined) ;
+
+	var geoCoord = Mago3D.ManagerUtils.pointToGeographicCoord(posWC, undefined);
+	geoCoord.makeDefaultGeoLocationData();
+	var geoCoordsList = this.modeler.getGeographicCoordsList();
+	geoCoordsList.addGeoCoord(geoCoord);
+};
+
+/**
+ * Main rendering function.
+ * @private
+ */
 MagoManager.prototype.doRender = function(frustumVolumenObject) 
 {
 	var gl = this.getGl();
@@ -1694,6 +1713,8 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	//	this.TEST__splittedExtrudedBuilding();
 	//	this.test__splittedMesh = true;
 	//}
+
+	
 };
 
 /**
