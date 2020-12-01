@@ -138,7 +138,7 @@ Arc2D.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 	{ this.numPointsFor360Deg = pointsCountFor360Deg; }
 
 	if (this.numPointsFor360Deg === undefined)
-	{ this.numPointsFor360Deg = 36; }
+	{ this.numPointsFor360Deg = 16; }
 
 	// Check if exist strAng.
 	var strVector, endVector;

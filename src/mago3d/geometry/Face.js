@@ -248,12 +248,6 @@ Face.calculatePlaneNormal = function(vertexArray, resultPlaneNormal)
 		
 		if (startVec.isNAN() || endVec.isNAN())
 		{ 
-			var prevIdx = VertexList.getPrevIdx(i, vertexArray);
-		var startVec = VertexList.getVector(prevIdx, vertexArray, undefined);
-		var endVec = VertexList.getVector(i, vertexArray, undefined);
-		
-		startVec.unitary();
-		endVec.unitary();
 			continue; 
 		}
 		

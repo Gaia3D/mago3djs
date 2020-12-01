@@ -937,7 +937,7 @@ ManagerUtils.detectedDepth = function(pixelX, pixelY, magoManager) {
  * @param {MagoManager} magoManager Mago3D main manager.
  * @returns {Point3D}
  */
-ManagerUtils.screenCoordToWorldCoordUseDepthCheck = function(pixelX, pixelY, magoManager) 
+ManagerUtils.screenCoordToWorldCoordUseDepthCheck = function(pixelX, pixelY, magoManager, options) 
 {
 	var worldCoordinate;
 	var gl = magoManager.getGl();
@@ -969,7 +969,31 @@ ManagerUtils.screenCoordToWorldCoordUseDepthCheck = function(pixelX, pixelY, mag
 		}
 	}
 
-	return worldCoordinate;
+	options = options ? options : {};
+	var needHighPrecision = options.highPrecision;
+
+	if (depthDetected && needHighPrecision)
+	{
+		// Test shooting laser mode:
+		var camera = magoManager.sceneState.getCamera();
+		var camPosWC = camera.getPosition();
+
+		// Now, calculate startGeoCoord & endGeoCoord around the targetGeoCoord.
+		var direction = new Point3D(worldCoordinate.x - camPosWC.x, worldCoordinate.y - camPosWC.y, worldCoordinate.z - camPosWC.z);
+		direction.unitary();
+
+		var dist = 10.0;
+		var startWC = new Point3D(worldCoordinate.x - direction.x * dist, worldCoordinate.y - direction.y * dist, worldCoordinate.z - direction.z * dist);
+		var endWC = new Point3D(worldCoordinate.x + direction.x * dist, worldCoordinate.y + direction.y * dist, worldCoordinate.z + direction.z * dist);
+
+		var startGeoCoord = ManagerUtils.pointToGeographicCoord(startWC, undefined);
+		var endGeoCoord = ManagerUtils.pointToGeographicCoord(endWC, undefined);
+		var highPrecisionPositionWC = Camera.intersectPointByLaser(startGeoCoord, endGeoCoord, undefined, undefined, magoManager, undefined) ;
+
+		worldCoordinate = highPrecisionPositionWC;
+	}
+
+	return worldCoordinate; // original.
 };
 
 /**

@@ -733,6 +733,18 @@ Modeler.getExtrudedMesh = function(profile2d, extrusionDist, extrudeSegmentsCoun
 	return resultMesh;
 };
 
+Modeler.getRevolvedMesh = function(profile2d, revolveAngDeg, revolveSegmentsCount, revolveSegment2d, bIncludeBottomCap, bIncludeTopCap, resultMesh) 
+{
+	if (profile2d === undefined || revolveAngDeg === undefined)
+	{ return undefined; }
+
+	var solidMesh = Modeler.getRevolvedSolidMesh(profile2d, revolveAngDeg, revolveSegmentsCount, revolveSegment2d, bIncludeBottomCap, bIncludeTopCap, resultMesh);
+	resultMesh = solidMesh.getCopySurfaceIndependentMesh(resultMesh);
+	resultMesh.calculateVerticesNormals();
+	
+	return resultMesh;
+};
+
 Modeler.getRevolvedSolidMesh = function(profile2d, revolveAngDeg, revolveSegmentsCount, revolveSegment2d, bIncludeBottomCap, bIncludeTopCap, resultMesh) 
 {
 	// Note: move this function into "VtxProfilesList" class.

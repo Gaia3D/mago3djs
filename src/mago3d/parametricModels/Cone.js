@@ -118,7 +118,7 @@ Cone.prototype.makeMesh = function()
 	revolveSegment2d.setPoints(strPoint2d, endPoint2d);
 	var bIncludeBottomCap = false;
 	var bIncludeTopCap = false;
-	var mesh = Modeler.getRevolvedSolidMesh(profile2dAux, revolveAngDeg, revolveSegmentsCount, revolveSegment2d, bIncludeBottomCap, bIncludeTopCap, undefined);
+	var mesh = Modeler.getRevolvedMesh(profile2dAux, revolveAngDeg, revolveSegmentsCount, revolveSegment2d, bIncludeBottomCap, bIncludeTopCap, undefined);
 	this.mesh = mesh.getCopySurfaceIndependentMesh(mesh);
 	this.objectsArray.push(this.mesh);
 	this.dirty = false;
