@@ -723,3 +723,58 @@ VertexList.getVboDataArrays = function(vertexArray, resultVbo, vboMemManager)
 
 	return resultVbo;
 };
+
+/**
+ * This function returns a vertexArray where there are no adjacent-coincident vertices.
+ * @static
+ * @param {Array} vertexArray 
+ * @param {Array} resultVertexArray. 
+ * @param {Number} error.
+ * @returns {Array} 
+ */
+VertexList.eliminateCoincidentVerticesOfArray = function(vertexArray, resultVertexArray, error) 
+{
+	if(!resultVertexArray)
+	resultVertexArray = [];
+
+	// put the 1rst vertex into resultVertexArray.
+	resultVertexArray.push(vertexArray[0]);
+	var lastVertex = vertexArray[0];
+	var vertexCount = vertexArray.length;
+	for(var i=1; i<vertexCount; i++)
+	{
+		var vertex = vertexArray[i];
+
+		// check if the vertex is coincident with the lastVertex.
+		if(!vertex.getPosition().isCoincidentToPoint(lastVertex.getPosition(), error))
+		{
+			resultVertexArray.push(vertex);
+			lastVertex = vertex;
+		}
+	}
+
+	resultVertexArray = VertexList.solveUroborusOfArray(resultVertexArray, error);
+
+	return resultVertexArray;
+};
+
+/**
+ * This function eliminates the last vertex if is coincident with the 1rst.
+ * @static
+ * @param {Array} vertexArray 
+ * @param {Array} resultVertexArray. 
+ * @param {Number} error.
+ * @returns {Array} 
+ */
+VertexList.solveUroborusOfArray = function(vertexArray, error) 
+{
+	var firstVertex = vertexArray[0];
+	var lastVertex = vertexArray[vertexArray.length-1];
+
+	if(firstVertex.getPosition().isCoincidentToPoint(lastVertex.getPosition(), error))
+	{
+		vertexArray.length = vertexArray.length-1;
+	}
+
+	return vertexArray;
+};

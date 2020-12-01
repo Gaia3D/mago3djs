@@ -643,6 +643,13 @@ Modeler.prototype.newPerson = function(options)
 	return person;
 };
 
+Modeler.prototype.newCone = function(radius, height, options) 
+{
+	var cone = new Cone(radius, height, options);
+
+	return cone;
+};
+
 Modeler.prototype.newBasicFactory = function(factoryWidth, factoryLength, factoryHeight, options) 
 {
 	// set material for the roof of the factory.

@@ -1,7 +1,6 @@
 'use strict';
 
 /**
- * @typedef
  * @property {number} interiorRadius
  * @property {number} exteriorRadius
  * @property {number} width

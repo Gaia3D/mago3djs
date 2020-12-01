@@ -96,6 +96,7 @@ VtxProfilesList.getLateralFaces = function(bottomVtxRing, topVtxRing, resultFace
 	var face, prevFace;
 	var hedgesArray = [];
 	currIdx = elemIndexRange.strIdx;
+	var error = 1E-6;
 	while (currIdx !== elemIndexRange.endIdx)
 	{
 		nextIdx = bottomVtxRing.vertexList.getNextIdx(currIdx);
@@ -108,7 +109,9 @@ VtxProfilesList.getLateralFaces = function(bottomVtxRing, topVtxRing, resultFace
 		vtx1 = bottomVtxRing.vertexList.getVertex(nextIdx);
 		vtx2 = topVtxRing.vertexList.getVertex(nextIdx);
 		vtx3 = topVtxRing.vertexList.getVertex(currIdx);
-		Array.prototype.push.apply(face.vertexArray, [vtx0, vtx1, vtx2, vtx3]);
+
+		// Here, must check if any adjacent vertices are coincidents.
+		face.vertexArray = VertexList.eliminateCoincidentVerticesOfArray([vtx0, vtx1, vtx2, vtx3], face.vertexArray, error);
 		
 		// now create hedges of the face.
 		hedgesArray.length = 0;

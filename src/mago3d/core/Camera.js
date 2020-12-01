@@ -1267,7 +1267,8 @@ Camera.intersectPointByLaser = function(startGeoCoord, endGeoCoord, laserCam, re
 
 	var startWC = ManagerUtils.geographicCoordToWorldPoint(startGeoCoord.longitude, startGeoCoord.latitude, startGeoCoord.altitude, undefined);
 	var endWC = ManagerUtils.geographicCoordToWorldPoint(endGeoCoord.longitude, endGeoCoord.latitude, endGeoCoord.altitude, undefined);
-	var dist = startWC.distToPoint(endWC)*1.2;
+	var dist = startWC.distToPoint(endWC);
+	var frustumFar = dist*1.2;
 	var aproxCamUp = undefined;
 	Camera.setByPositionAndTarget(laserCam, endWC, startWC, aproxCamUp);
 
@@ -1279,11 +1280,18 @@ Camera.intersectPointByLaser = function(startGeoCoord, endGeoCoord, laserCam, re
 
 	// now, set the frustum near & far.
 	var bigFrustum = laserCam.getBigFrustum();
-	bigFrustum.setFar(dist);
+	bigFrustum.setFar(frustumFar);
 	bigFrustum.setAspectRatio(camDepthBufferFBO.getAspectRatio());
 	bigFrustum.setFovyRad(Math.PI/32);
 
-	return Camera.shootLaser(laserCam, resultImpactPointWC, magoManager, options);
+	resultImpactPointWC =  Camera.shootLaser(laserCam, resultImpactPointWC, magoManager, options);
+
+	// Now, check if the impactPoint is inside of the segment startGeoCoord-endGeoCoord;
+	var distImpact = startWC.distToPoint(resultImpactPointWC);
+	if(distImpact > dist*1.001)
+	return undefined;
+
+	return resultImpactPointWC;
 };
 
 /**

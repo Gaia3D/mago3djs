@@ -1513,16 +1513,26 @@ MagoManager.prototype.getSilhouetteDepthFbo = function()
 MagoManager.prototype.TEST__cameraLaser = function() 
 {
 	// this function tests camera laser.
-	var geoCoord_start = new GeographicCoord(126.75740, 37.54302, 29.133160613985577);
-	var geoCoord_end = new GeographicCoord(126.75719736534053, 37.54493737467032, 44.055231264041986);
-	//var geoCoord_end = new GeographicCoord(126.75767, 37.54526, 44.055231264041986);
+	var geoCoordsList = this.modeler.getGeographicCoordsList();
+	var geoCoordsCount = geoCoordsList.getGeoCoordsCount();
+	if(geoCoordsCount < 2)
+	return;
+
+	//var geoCoord_start = new GeographicCoord(126.75740, 37.54302, 29.133160613985577);
+	//var geoCoord_end = new GeographicCoord(126.75719736534053, 37.54493737467032, 44.055231264041986);
+
+	var geoCoord_start = geoCoordsList.getGeoCoord(geoCoordsCount - 2);
+	var geoCoord_end = geoCoordsList.getGeoCoord(geoCoordsCount - 1);
 
 	var posWC = Camera.intersectPointByLaser(geoCoord_start, geoCoord_end, undefined, undefined, this, undefined) ;
 
-	var geoCoord = Mago3D.ManagerUtils.pointToGeographicCoord(posWC, undefined);
-	geoCoord.makeDefaultGeoLocationData();
-	var geoCoordsList = this.modeler.getGeographicCoordsList();
-	geoCoordsList.addGeoCoord(geoCoord);
+	if(posWC)
+	{
+		var geoCoord = Mago3D.ManagerUtils.pointToGeographicCoord(posWC, undefined);
+		geoCoord.makeDefaultGeoLocationData();
+		var geoCoordsList = this.modeler.getGeographicCoordsList();
+		geoCoordsList.addGeoCoord(geoCoord);
+	}
 };
 
 /**
@@ -1555,7 +1565,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 
 	if(this.isFarestFrustum())
 	{
-		gl.clearColor(0, 0, 0, 1);
+		gl.clearColor(1, 1, 1, 1);
 		gl.clearDepth(1);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		gl.clearStencil(0); // provisionally here.***
@@ -1655,27 +1665,27 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		
 			
 		// Seoul data.
-		//var windDataFilesNamesArray = ["OBS-QWM_2019090700.grib2_wind_000", "OBS-QWM_2019090701.grib2_wind_000", "OBS-QWM_2019090702.grib2_wind_000", "OBS-QWM_2019090703.grib2_wind_000",
-		//	"OBS-QWM_2019090704.grib2_wind_000", "OBS-QWM_2019090705.grib2_wind_000", "OBS-QWM_2019090706.grib2_wind_000", "OBS-QWM_2019090707.grib2_wind_000",
-		//	"OBS-QWM_2019090708.grib2_wind_000", "OBS-QWM_2019090709.grib2_wind_000", "OBS-QWM_2019090710.grib2_wind_000", "OBS-QWM_2019090711.grib2_wind_000",
-		//	"OBS-QWM_2019090712.grib2_wind_000", "OBS-QWM_2019090713.grib2_wind_000", "OBS-QWM_2019090714.grib2_wind_000", "OBS-QWM_2019090715.grib2_wind_000",
-		//	"OBS-QWM_2019090716.grib2_wind_000", "OBS-QWM_2019090717.grib2_wind_000", "OBS-QWM_2019090718.grib2_wind_000", "OBS-QWM_2019090719.grib2_wind_000",
-		//	"OBS-QWM_2019090720.grib2_wind_000", "OBS-QWM_2019090721.grib2_wind_000", "OBS-QWM_2019090722.grib2_wind_000", "OBS-QWM_2019090723.grib2_wind_000"]; // seoulData.
-			
-			
-		//Siheung_wind
 		var windDataFilesNamesArray = ["OBS-QWM_2019090700.grib2_wind_000", "OBS-QWM_2019090701.grib2_wind_000", "OBS-QWM_2019090702.grib2_wind_000", "OBS-QWM_2019090703.grib2_wind_000",
 			"OBS-QWM_2019090704.grib2_wind_000", "OBS-QWM_2019090705.grib2_wind_000", "OBS-QWM_2019090706.grib2_wind_000", "OBS-QWM_2019090707.grib2_wind_000",
 			"OBS-QWM_2019090708.grib2_wind_000", "OBS-QWM_2019090709.grib2_wind_000", "OBS-QWM_2019090710.grib2_wind_000", "OBS-QWM_2019090711.grib2_wind_000",
 			"OBS-QWM_2019090712.grib2_wind_000", "OBS-QWM_2019090713.grib2_wind_000", "OBS-QWM_2019090714.grib2_wind_000", "OBS-QWM_2019090715.grib2_wind_000",
 			"OBS-QWM_2019090716.grib2_wind_000", "OBS-QWM_2019090717.grib2_wind_000", "OBS-QWM_2019090718.grib2_wind_000", "OBS-QWM_2019090719.grib2_wind_000",
-			"OBS-QWM_2019090720.grib2_wind_000", "OBS-QWM_2019090721.grib2_wind_000", "OBS-QWM_2019090722.grib2_wind_000", "OBS-QWM_2019090723.grib2_wind_000"];
+			"OBS-QWM_2019090720.grib2_wind_000", "OBS-QWM_2019090721.grib2_wind_000", "OBS-QWM_2019090722.grib2_wind_000", "OBS-QWM_2019090723.grib2_wind_000"]; // seoulData.
+			
+			
+		//Siheung_wind
+		//var windDataFilesNamesArray = ["OBS-QWM_2019090700.grib2_wind_000", "OBS-QWM_2019090701.grib2_wind_000", "OBS-QWM_2019090702.grib2_wind_000", "OBS-QWM_2019090703.grib2_wind_000",
+		//	"OBS-QWM_2019090704.grib2_wind_000", "OBS-QWM_2019090705.grib2_wind_000", "OBS-QWM_2019090706.grib2_wind_000", "OBS-QWM_2019090707.grib2_wind_000",
+		//	"OBS-QWM_2019090708.grib2_wind_000", "OBS-QWM_2019090709.grib2_wind_000", "OBS-QWM_2019090710.grib2_wind_000", "OBS-QWM_2019090711.grib2_wind_000",
+		//	"OBS-QWM_2019090712.grib2_wind_000", "OBS-QWM_2019090713.grib2_wind_000", "OBS-QWM_2019090714.grib2_wind_000", "OBS-QWM_2019090715.grib2_wind_000",
+		//	"OBS-QWM_2019090716.grib2_wind_000", "OBS-QWM_2019090717.grib2_wind_000", "OBS-QWM_2019090718.grib2_wind_000", "OBS-QWM_2019090719.grib2_wind_000",
+		//	"OBS-QWM_2019090720.grib2_wind_000", "OBS-QWM_2019090721.grib2_wind_000", "OBS-QWM_2019090722.grib2_wind_000", "OBS-QWM_2019090723.grib2_wind_000"];
 			
 		//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_Airport";
 		//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_GolfPark_NineBridge1";
-		//var windMapFilesFolderPath = geometryDataPath +"/SeoulWind/200907";
+		var windMapFilesFolderPath = geometryDataPath +"/SeoulWind/200907";
 		//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_HanRaSan";
-		var windMapFilesFolderPath = geometryDataPath +"/Siheung_wind";
+		//var windMapFilesFolderPath = geometryDataPath +"/Siheung_wind";
 		
 		this.weatherStation.test_loadWindData3d(this, windDataFilesNamesArray, windMapFilesFolderPath);
 		//this.TEST__golfPark();

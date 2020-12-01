@@ -23,7 +23,7 @@ var Ring2D = function()
 	 */
 	this.polygon = undefined;
 	
-	this.isOpen; // note: only outer rings can be open.
+	this.isOpen; // note: only outer rings can to be open.
 };
 
 Ring2D.prototype.getElement = function(index)

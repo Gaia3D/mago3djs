@@ -127,6 +127,41 @@ SmartTileManager.maxDistToCameraByDepth = function(depth)
 	}
 	else if (depth === 16)
 	{
+		return 1000;
+	}
+	else if (depth === 17)
+	{
+		return 500;
+	}
+	else if (depth === 18)
+	{
+		return 150;
+	}
+	else if (depth > 18)
+	{
+		return 100;
+	}
+
+	/*
+	// ORIGINAL.
+	if (depth < 13)
+	{
+		return 10000;
+	}
+	else if (depth === 13)
+	{
+		return 9000;
+	}
+	else if (depth === 14)
+	{
+		return 4000;
+	}
+	else if (depth === 15)
+	{
+		return 2000;
+	}
+	else if (depth === 16)
+	{
 		return 1500;
 	}
 	else if (depth === 17)
@@ -141,7 +176,7 @@ SmartTileManager.maxDistToCameraByDepth = function(depth)
 	{
 		return 150;
 	}
-	
+	*/
 	
 	return 10;
 };

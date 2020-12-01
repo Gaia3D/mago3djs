@@ -2447,7 +2447,7 @@ ShaderSource.ModelRefSsaoVS = "\n\
 	varying vec3 vertexPosLC;\n\
 	varying float applySpecLighting;\n\
 	varying vec4 vColor4; // color from attributes\n\
-	varying vec4 vPosRelToLight; \n\
+	varying vec4 vPosRelToLight; // sun lighting.\n\
 	varying vec3 vLightDir; \n\
 	varying vec3 vNormalWC; \n\
 	varying float currSunIdx;  \n\

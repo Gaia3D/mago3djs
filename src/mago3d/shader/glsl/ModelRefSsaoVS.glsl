@@ -43,7 +43,7 @@
 	varying vec3 vertexPosLC;
 	varying float applySpecLighting;
 	varying vec4 vColor4; // color from attributes
-	varying vec4 vPosRelToLight; 
+	varying vec4 vPosRelToLight; // sun lighting.
 	varying vec3 vLightDir; 
 	varying vec3 vNormalWC; 
 	varying float currSunIdx;  

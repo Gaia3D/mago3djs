@@ -1617,6 +1617,8 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 				node.data.relativeHeight = 0;
 			}
 
+			// HeightReference.CLAMP_TO_GROUND;
+
 			this.nodesArray.push(node);
 		}
 		else 
