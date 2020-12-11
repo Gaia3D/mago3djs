@@ -125,13 +125,18 @@ TranslateInteraction.prototype.handleDownEvent = function(browserEvent)
 
 	var filterProvisional = selectManager.filterProvisional(this.targetType, this.filter_);
 	
-	if (!isEmpty(filterProvisional) && filterProvisional.hasOwnProperty(this.targetType))
+	if (!isEmpty(filterProvisional) && (filterProvisional.hasOwnProperty(this.targetType) || this.targetType === DataType.ALL))
 	{
-		this.target = filterProvisional[this.targetType][0];
-		if (this.targetType === DataType.OBJECT)
-		{
-			this.parentNode = filterProvisional[DataType.F4D][0];
+		if(this.targetType !== DataType.ALL) {
+			this.target = filterProvisional[this.targetType][0];
+			if (this.targetType === DataType.OBJECT)
+			{
+				this.parentNode = filterProvisional[DataType.F4D][0];
+			}
+		} else {
+			this.target = filterProvisional[Object.keys(filterProvisional)[0]][0];
 		}
+		
 	}
 	else 
 	{
@@ -156,6 +161,14 @@ TranslateInteraction.prototype.handleDragEvent = function(browserEvent)
 		}
 		case DataType.NATIVE : {
 			this.handleNativeDrag(browserEvent);
+			break;
+		}
+		case DataType.ALL : {
+			if(this.target instanceof Node) {
+				this.handleF4dDrag(browserEvent);
+			} else if(this.target instanceof MagoRenderable) {
+				this.handleNativeDrag(browserEvent);
+			}
 			break;
 		}
 		}

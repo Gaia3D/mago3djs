@@ -198,7 +198,7 @@ PointSelectInteraction.prototype.emitEvent = function(selectedObj, selected, scr
 {
 	if (selectedObj)
 	{
-		var type = PointSelectInteraction.getEventType(this.targetType, selected);
+		var type = PointSelectInteraction.getEventType(this.targetType, selected, selectedObj);
 		var eventObj = {
 			type      : type,
 			pixel : screenCoord,
@@ -212,7 +212,7 @@ PointSelectInteraction.prototype.emitEvent = function(selectedObj, selected, scr
 		this.manager.emit(type, eventObj);
 	}
 };
-PointSelectInteraction.getEventType = function(target, selected)
+PointSelectInteraction.getEventType = function(target, selected, selectedObj)
 {
 	var eventType;
 	switch (target)
@@ -229,7 +229,11 @@ PointSelectInteraction.getEventType = function(target, selected)
 		eventType = selected ? MagoManager.EVENT_TYPE.SELECTEDGENERALOBJECT : MagoManager.EVENT_TYPE.DESELECTEDGENERALOBJECT;
 		break;
 	}
+	case DataType.ALL : {
+		var selectedType = (selectedObj instanceof Node) ? DataType.F4D : DataType.NATIVE;
+		return PointSelectInteraction.getEventType(selectedType, selected);
 	}
+ 	}
 	return eventType;
 };
 
