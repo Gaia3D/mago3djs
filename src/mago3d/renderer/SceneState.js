@@ -34,6 +34,10 @@ var SceneState = function(config)
 	this.projectionMatrixSky = new Matrix4(); // created as identity matrix.
 	this.modelViewProjRelToEyeMatrixSky = new Matrix4(); // created as identity matrix.
 
+	// Matrices for lighting rendering (large far).
+	this.projectionMatrixLighting = new Matrix4(); // created as identity matrix.
+	this.modelViewProjRelToEyeMatrixLighting = new Matrix4(); // created as identity matrix.
+
 	this.encodedCamPosHigh = new Float32Array([0.0, 0.0, 0.0]);
 	this.encodedCamPosLow = new Float32Array([0.0, 0.0, 0.0]);
 	
@@ -51,6 +55,7 @@ var SceneState = function(config)
 	this.sunSystem = new SunSystem();
 	this.applySunShadows = false;
 	this.bApplySsao = true;
+	this.applyLightsShadows = true;
 	
 	// lighting & ssao.
 	this.ambientReflectionCoef = new Float32Array([0.5]); // 0.7.

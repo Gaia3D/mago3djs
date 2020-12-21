@@ -52,13 +52,6 @@ vec3 decodeNormal(in vec3 normal)
 	return normal * 2.0 - 1.0;
 }
 
-//vec4 PackDepth32( in float depth )
-//{
-//    depth *= (16777216.0 - 1.0) / (16777216.0);
-//    vec4 encode = fract( depth * vec4(1.0, 256.0, 256.0*256.0, 16777216.0) );// 256.0*256.0*256.0 = 16777216.0
-//    return vec4( encode.xyz - encode.yzw / 256.0, encode.w ) + 1.0/512.0;
-//}
-
 bool clipVertexByPlane(in vec4 plane, in vec3 point)
 {
 	float dist = plane.x * point.x + plane.y * point.y + plane.z * point.z + plane.w;
@@ -108,7 +101,8 @@ void main()
 
 	if(!bUseLogarithmicDepth)
 	{
-		gl_FragData[0] = packDepth(depth); 
+		//gl_FragData[0] = packDepth(depth); 
+		gl_FragData[0] = vec4(depth, depth, depth, 1.0); 
 	}
 
 	float frustumIdx = 1.0;

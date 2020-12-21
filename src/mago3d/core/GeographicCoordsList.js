@@ -1044,12 +1044,13 @@ GeographicCoordsList.prototype.renderPoints = function(magoManager, shader, rend
 	{ return false; }
 	
 	var gl = magoManager.sceneState.gl;
+	var sceneState = magoManager.sceneState;
 	
 	//var vertexAttribsCount = gl.getParameter(gl.MAX_VERTEX_ATTRIBS);
 	//for(var i = 0; i<vertexAttribsCount; i++)
 	//	gl.disableVertexAttribArray(i);
 
-	var shaderLocal = magoManager.postFxShadersManager.getShader("pointsCloud"); // provisional. Use the currentShader of argument.
+	var shaderLocal = magoManager.postFxShadersManager.getShader("pointsCloudSsao"); // provisional. Use the currentShader of argument.
 	magoManager.postFxShadersManager.useProgram(shaderLocal);
 	
 	shaderLocal.disableVertexAttribArrayAll();
@@ -1061,10 +1062,24 @@ GeographicCoordsList.prototype.renderPoints = function(magoManager, shader, rend
 	
 	gl.uniform1i(shaderLocal.bPositionCompressed_loc, false);
 	gl.uniform1i(shaderLocal.bUse1Color_loc, true);
-	gl.uniform4fv(shaderLocal.oneColor4_loc, [1.0, 1.0, 0.1, 1.0]); //.
+	gl.uniform4fv(shaderLocal.oneColor4_loc, [1.0, 0.1, 0.1, 1.0]); //.
 	gl.uniform1f(shaderLocal.fixPointSize_loc, 5.0);
 	gl.uniform1i(shaderLocal.bUseFixPointSize_loc, 1);
+
+	/////////////////////////////////////////////////////////////
+	var pCloudSettings = magoManager.magoPolicy.getPointsCloudSettings();
+	gl.uniform1i(shaderLocal.bUseColorCodingByHeight_loc, true);
+	gl.uniform1f(shaderLocal.minHeight_rainbow_loc, parseInt(pCloudSettings.minHeightRainbow));
+	gl.uniform1f(shaderLocal.maxHeight_rainbow_loc, parseInt(pCloudSettings.maxHeightRainbow));
+	gl.uniform1f(shaderLocal.maxPointSize_loc, parseInt(pCloudSettings.maxPointSize));
+	gl.uniform1f(shaderLocal.minPointSize_loc, parseInt(pCloudSettings.minPointSize));
+	gl.uniform1f(shaderLocal.pendentPointSize_loc, parseInt(pCloudSettings.pendentPointSize));
 	gl.uniform1i(shaderLocal.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
+	gl.uniform1i(shaderLocal.bUseMultiRenderTarget_loc, magoManager.postFxShadersManager.bUseMultiRenderTarget);
+	gl.uniform1f(shaderLocal.uFCoef_logDepth_loc, sceneState.fCoef_logDepth[0]);
+	gl.uniform2fv(shaderLocal.uNearFarArray_loc, magoManager.frustumVolumeControl.nearFarArray);
+	gl.uniform1i(shaderLocal.uFrustumIdx_loc, magoManager.currentFrustumIdx);
+	///////////////////////////////////////////////////////////////////
 	
 	if (bEnableDepth === undefined)
 	{ bEnableDepth = true; }

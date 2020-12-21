@@ -1214,6 +1214,836 @@ void main()\n\
     gl_FragColor = finalColor; \n\
 }\n\
 ";
+ShaderSource.GBufferFS = "#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+\n\
+//uniform sampler2D depthTex;\n\
+//uniform sampler2D noiseTex;  \n\
+uniform sampler2D diffuseTex;\n\
+uniform sampler2D shadowMapTex;\n\
+uniform sampler2D shadowMapTex2;\n\
+//uniform sampler2D ssaoFromDepthTex;\n\
+uniform bool textureFlipYAxis;\n\
+uniform mat4 projectionMatrix;\n\
+uniform mat4 projectionMatrixInv;\n\
+uniform mat4 modelViewMatrixRelToEyeInv;\n\
+\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+\n\
+uniform mat4 m;\n\
+uniform vec2 noiseScale;\n\
+uniform float near;\n\
+uniform float far;            \n\
+uniform float fov;\n\
+uniform float tangentOfHalfFovy;\n\
+uniform float aspectRatio;    \n\
+uniform float screenWidth;    \n\
+uniform float screenHeight;   \n\
+uniform float shadowMapWidth;    \n\
+uniform float shadowMapHeight; \n\
+uniform float shininessValue;\n\
+uniform vec3 kernel[16];   \n\
+uniform vec4 oneColor4;\n\
+\n\
+uniform bool bApplyScpecularLighting;\n\
+uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
+\n\
+uniform vec3 specularColor;\n\
+uniform vec3 ambientColor;\n\
+\n\
+const int kernelSize = 16;  \n\
+uniform float radius;      \n\
+\n\
+uniform float ambientReflectionCoef;\n\
+uniform float diffuseReflectionCoef;  \n\
+uniform float specularReflectionCoef; \n\
+uniform bool bApplySsao;\n\
+uniform bool bApplyShadow;\n\
+uniform float externalAlpha;\n\
+uniform vec4 colorMultiplier;\n\
+uniform bool bUseLogarithmicDepth;\n\
+uniform bool bUseMultiRenderTarget;\n\
+uniform int uFrustumIdx;\n\
+\n\
+// clipping planes.***\n\
+uniform mat4 clippingPlanesRotMatrix; \n\
+uniform vec3 clippingPlanesPosHIGH;\n\
+uniform vec3 clippingPlanesPosLOW;\n\
+uniform bool bApplyClippingPlanes; // old. deprecated.***\n\
+uniform int clippingType; // 0= no clipping. 1= clipping by planes. 2= clipping by localCoord polyline. 3= clip by heights, 4= clip by (2, 3)\n\
+uniform int clippingPlanesCount;\n\
+uniform vec4 clippingPlanes[6];\n\
+uniform vec2 clippingPolygon2dPoints[64];\n\
+uniform int clippingConvexPolygon2dPointsIndices[64];\n\
+uniform vec4 limitationInfringedColor4;\n\
+uniform vec2 limitationHeights;\n\
+\n\
+varying vec3 vNormal;\n\
+varying vec4 vColor4; // color from attributes\n\
+varying vec2 vTexCoord;   \n\
+varying vec3 vLightWeighting;\n\
+varying vec3 diffuseColor;\n\
+varying vec3 vertexPos; // this is the orthoPos.***\n\
+varying vec3 vertexPosLC;\n\
+varying float applySpecLighting;\n\
+varying vec4 vPosRelToLight; \n\
+varying vec3 vLightDir; \n\
+varying vec3 vNormalWC;\n\
+varying float currSunIdx; \n\
+\n\
+varying float flogz;\n\
+varying float Fcoef_half;\n\
+varying float depth;\n\
+\n\
+vec4 packDepth( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+  return enc;\n\
+}\n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+} \n\
+\n\
+vec3 encodeNormal(in vec3 normal)\n\
+{\n\
+	return normal*0.5 + 0.5;\n\
+}            \n\
+\n\
+vec3 getViewRay(vec2 tc)\n\
+{\n\
+	float hfar = 2.0 * tangentOfHalfFovy * far;\n\
+    float wfar = hfar * aspectRatio;    \n\
+    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    \n\
+    return ray;                      \n\
+}         \n\
+/*          \n\
+float getDepth(vec2 coord)\n\
+{\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		float linearDepth = unpackDepth(texture2D(depthTex, coord.xy));\n\
+		// gl_FragDepthEXT = linearDepth = log2(flogz) * Fcoef_half;\n\
+		// flogz = 1.0 + gl_Position.z;\n\
+\n\
+		float flogzAux = pow(2.0, linearDepth/Fcoef_half);\n\
+		float z = flogzAux - 1.0;\n\
+		linearDepth = z/(far);\n\
+		return linearDepth;\n\
+	}\n\
+	else{\n\
+		return unpackDepth(texture2D(depthTex, coord.xy));\n\
+	}\n\
+}\n\
+*/\n\
+float getDepthShadowMap(vec2 coord)\n\
+{\n\
+	// currSunIdx\n\
+	if(currSunIdx > 0.0 && currSunIdx < 1.0)\n\
+	{\n\
+		return unpackDepth(texture2D(shadowMapTex, coord.xy));\n\
+	}\n\
+    else if(currSunIdx > 1.0 && currSunIdx < 2.0)\n\
+	{\n\
+		return unpackDepth(texture2D(shadowMapTex2, coord.xy));\n\
+	}\n\
+	else\n\
+		return -1.0;\n\
+}  \n\
+\n\
+bool clipVertexByPlane(in vec4 plane, in vec3 point)\n\
+{\n\
+	float dist = plane.x * point.x + plane.y * point.y + plane.z * point.z + plane.w;\n\
+	\n\
+	if(dist < 0.0)\n\
+	return true;\n\
+	else return false;\n\
+}\n\
+\n\
+vec2 getDirection2d(in vec2 startPoint, in vec2 endPoint)\n\
+{\n\
+	//vec2 vector = endPoint - startPoint;\n\
+	//float length = length( vector);\n\
+	//vec2 dir = vec2(vector.x/length, vector.y/length);\n\
+	vec2 dir = normalize(endPoint - startPoint);\n\
+	return dir;\n\
+}\n\
+\n\
+bool intersectionLineToLine(in vec2 line_1_pos, in vec2 line_1_dir,in vec2 line_2_pos, in vec2 line_2_dir, out vec2 intersectionPoint2d)\n\
+{\n\
+	bool bIntersection = false;\n\
+\n\
+	float zero = 10E-8;\n\
+	float intersectX;\n\
+	float intersectY;\n\
+\n\
+	// check if 2 lines are parallel.***\n\
+	float dotProd = abs(dot(line_1_dir, line_2_dir));\n\
+	if(abs(dotProd-1.0) < zero)\n\
+	return false;\n\
+\n\
+	if (abs(line_1_dir.x) < zero)\n\
+	{\n\
+		// this is a vertical line.\n\
+		float slope = line_2_dir.y / line_2_dir.x;\n\
+		float b = line_2_pos.y - slope * line_2_pos.x;\n\
+		\n\
+		intersectX = line_1_pos.x;\n\
+		intersectY = slope * line_1_pos.x + b;\n\
+		bIntersection = true;\n\
+	}\n\
+	else if (abs(line_1_dir.y) < zero)\n\
+	{\n\
+		// this is a horizontal line.\n\
+		// must check if the \"line\" is vertical.\n\
+		if (abs(line_2_dir.x) < zero)\n\
+		{\n\
+			// \"line\" is vertical.\n\
+			intersectX = line_2_pos.x;\n\
+			intersectY = line_1_pos.y;\n\
+			bIntersection = true;\n\
+		}\n\
+		else \n\
+		{\n\
+			float slope = line_2_dir.y / line_2_dir.x;\n\
+			float b = line_2_pos.y - slope * line_2_pos.x;\n\
+			\n\
+			intersectX = (line_1_pos.y - b)/slope;\n\
+			intersectY = line_1_pos.y;\n\
+			bIntersection = true;\n\
+		}	\n\
+	}\n\
+	else \n\
+	{\n\
+		// this is oblique.\n\
+		if (abs(line_2_dir.x) < zero)\n\
+		{\n\
+			// \"line\" is vertical.\n\
+			float mySlope = line_1_dir.y / line_1_dir.x;\n\
+			float myB = line_1_pos.y - mySlope * line_1_pos.x;\n\
+			intersectX = line_2_pos.x;\n\
+			intersectY = intersectX * mySlope + myB;\n\
+			bIntersection = true;\n\
+		}\n\
+		else \n\
+		{\n\
+			float mySlope = line_1_dir.y / line_1_dir.x;\n\
+			float myB = line_1_pos.y - mySlope * line_1_pos.x;\n\
+			\n\
+			float slope = line_2_dir.y / line_2_dir.x;\n\
+			float b = line_2_pos.y - slope * line_2_pos.x;\n\
+			\n\
+			intersectX = (myB - b)/ (slope - mySlope);\n\
+			intersectY = slope * intersectX + b;\n\
+			bIntersection = true;\n\
+		}\n\
+	}\n\
+\n\
+	intersectionPoint2d.x = intersectX;\n\
+	intersectionPoint2d.y = intersectY;\n\
+\n\
+	return bIntersection;\n\
+}\n\
+\n\
+vec2 getProjectedPoint2dToLine(in vec2 line_point, in vec2 line_dir, in vec2 point)\n\
+{\n\
+	bool intersection = false;\n\
+\n\
+	// create a perpendicular left line.***\n\
+	vec2 lineLeft_dir = vec2(-line_dir.y, line_dir.x);\n\
+	vec2 lineLeft_point = vec2(point.x, point.y);\n\
+	vec2 projectedPoint = vec2(0);\n\
+	intersection = intersectionLineToLine(line_point, line_dir, lineLeft_point, lineLeft_dir, projectedPoint);\n\
+\n\
+	return projectedPoint;\n\
+}\n\
+\n\
+int getRelativePositionOfPointToLine(in vec2 line_pos, in vec2 line_dir, vec2 point)\n\
+{\n\
+	// 0 = coincident. 1= left side. 2= right side.***\n\
+	int relPos = -1;\n\
+\n\
+	vec2 projectedPoint = getProjectedPoint2dToLine(line_pos, line_dir, point );\n\
+	float dist = length(point - projectedPoint);\n\
+\n\
+	if(dist < 1E-8)\n\
+	{\n\
+		relPos = 0; // the point is coincident to line.***\n\
+		return relPos;\n\
+	}\n\
+\n\
+	vec2 myVector = normalize(point - projectedPoint);\n\
+	vec2 lineLeft_dir = vec2(-line_dir.y, line_dir.x);\n\
+\n\
+	float dotProd = dot(lineLeft_dir, myVector);\n\
+\n\
+	if(dotProd > 0.0)\n\
+	{\n\
+		relPos = 1; // is in left side of the line.***\n\
+	}\n\
+	else\n\
+	{\n\
+		relPos = 2; // is in right side of the line.***\n\
+	}\n\
+\n\
+	return relPos;\n\
+}\n\
+\n\
+bool isPointInsideLimitationConvexPolygon(in vec2 point2d)\n\
+{\n\
+	bool isInside = true;\n\
+\n\
+	// Check polygons.***\n\
+	int startIdx = -1;\n\
+	int endIdx = -1;\n\
+	for(int i=0; i<32; i++)\n\
+	{\n\
+		startIdx = clippingConvexPolygon2dPointsIndices[2*i];  // 0\n\
+		endIdx = clippingConvexPolygon2dPointsIndices[2*i+1];	 // 3\n\
+\n\
+		if(startIdx < 0 || endIdx < 0)\n\
+		break;\n\
+\n\
+		isInside  = true;\n\
+		\n\
+		isInside = true;\n\
+		vec2 pointStart = clippingPolygon2dPoints[0];\n\
+		for(int j=0; j<32; j++)\n\
+		{\n\
+			if(j > endIdx)\n\
+			break;\n\
+\n\
+			if(j == startIdx)\n\
+				pointStart = clippingPolygon2dPoints[j];\n\
+\n\
+			if(j >= startIdx && j<endIdx)\n\
+			{\n\
+				vec2 point0;\n\
+				vec2 point1;\n\
+				\n\
+				if(j == endIdx)\n\
+				{\n\
+					point0 = clippingPolygon2dPoints[j];\n\
+					point1 = pointStart;\n\
+				}\n\
+				else\n\
+				{\n\
+					point0 = clippingPolygon2dPoints[j];\n\
+					point1 = clippingPolygon2dPoints[j+1];\n\
+				}\n\
+\n\
+				// create the line of the segment.***\n\
+				vec2 dir = getDirection2d(point0, point1);\n\
+\n\
+				// now, check the relative position of the point with the edge line.***\n\
+				int relPos = getRelativePositionOfPointToLine(point0, dir, point2d);\n\
+				if(relPos == 2)\n\
+				{\n\
+					// the point is in the right side of the edge line, so is out of the polygon.***\n\
+					isInside = false;\n\
+					break;\n\
+				}\n\
+			}\n\
+\n\
+		}\n\
+		\n\
+\n\
+		if(isInside)\n\
+		return true;\n\
+\n\
+	}\n\
+\n\
+	return isInside;\n\
+}\n\
+\n\
+\n\
+\n\
+/*\n\
+\n\
+vec3 reconstructPosition(vec2 texCoord, float depth)\n\
+{\n\
+    // https://wickedengine.net/2019/09/22/improved-normal-reconstruction-from-depth/\n\
+    float x = texCoord.x * 2.0 - 1.0;\n\
+    //float y = (1.0 - texCoord.y) * 2.0 - 1.0;\n\
+    float y = (texCoord.y) * 2.0 - 1.0;\n\
+    float z = (1.0 - depth) * 2.0 - 1.0;\n\
+    vec4 pos_NDC = vec4(x, y, z, 1.0);\n\
+    vec4 pos_CC = projectionMatrixInv * pos_NDC;\n\
+    return pos_CC.xyz / pos_CC.w;\n\
+}\n\
+\n\
+vec3 normal_from_depth(float depth, vec2 texCoord) {\n\
+    // http://theorangeduck.com/page/pure-depth-ssao\n\
+    float pixelSizeX = 1.0/screenWidth;\n\
+    float pixelSizeY = 1.0/screenHeight;\n\
+\n\
+    vec2 offset1 = vec2(0.0,pixelSizeY);\n\
+    vec2 offset2 = vec2(pixelSizeX,0.0);\n\
+\n\
+	float depthA = 0.0;\n\
+	float depthB = 0.0;\n\
+	for(float i=0.0; i<1.0; i++)\n\
+	{\n\
+		depthA += getDepth(texCoord + offset1*(1.0+i));\n\
+		depthB += getDepth(texCoord + offset2*(1.0+i));\n\
+	}\n\
+\n\
+	vec3 posA = reconstructPosition(texCoord + offset1*1.0, depthA/1.0);\n\
+	vec3 posB = reconstructPosition(texCoord + offset2*1.0, depthB/1.0);\n\
+\n\
+    vec3 pos0 = reconstructPosition(texCoord, depth);\n\
+    vec3 normal = cross(posA - pos0, posB - pos0);\n\
+    normal.z = -normal.z;\n\
+\n\
+    return normalize(normal);\n\
+}\n\
+\n\
+mat3 sx = mat3( \n\
+    1.0, 2.0, 1.0, \n\
+    0.0, 0.0, 0.0, \n\
+    -1.0, -2.0, -1.0 \n\
+);\n\
+mat3 sy = mat3( \n\
+    1.0, 0.0, -1.0, \n\
+    2.0, 0.0, -2.0, \n\
+    1.0, 0.0, -1.0 \n\
+);\n\
+\n\
+bool isEdge()\n\
+{\n\
+	vec3 I[3];\n\
+	vec2 screenPos = vec2((gl_FragCoord.x) / screenWidth, (gl_FragCoord.y) / screenHeight);\n\
+	float linearDepth = getDepth(screenPos);\n\
+	vec3 normal = normal_from_depth(linearDepth, screenPos);\n\
+\n\
+    for (int i=0; i<3; i++) {\n\
+        //vec3 norm1 = texelFetch(normalTexture, ivec2(gl_FragCoord) + ivec2(i-1,-1), 0 ).rgb * 2.0f - 1.0f;\n\
+        //vec3 norm2 =  texelFetch(normalTexture, ivec2(gl_FragCoord) + ivec2(i-1,0), 0 ).rgb * 2.0f - 1.0f;\n\
+        //vec3 norm3 = texelFetch(normalTexture, ivec2(gl_FragCoord) + ivec2(i-1,1), 0 ).rgb * 2.0f - 1.0f;\n\
+		vec2 screenPos1 = vec2((gl_FragCoord.x+float(i-1)) / screenWidth, (gl_FragCoord.y-1.0) / screenHeight);\n\
+		float linearDepth1 = getDepth(screenPos1);  \n\
+\n\
+		vec2 screenPos2 = vec2((gl_FragCoord.x+float(i-1)) / screenWidth, (gl_FragCoord.y-0.0) / screenHeight);\n\
+		float linearDepth2 = getDepth(screenPos2);  \n\
+\n\
+		vec2 screenPos3 = vec2((gl_FragCoord.x+float(i-1)) / screenWidth, (gl_FragCoord.y+1.0) / screenHeight);\n\
+		float linearDepth3 = getDepth(screenPos1);  \n\
+\n\
+		vec3 norm1 = normal_from_depth(linearDepth1, screenPos1);\n\
+        vec3 norm2 =  normal_from_depth(linearDepth2, screenPos2);\n\
+        vec3 norm3 = normal_from_depth(linearDepth3, screenPos3);\n\
+        float sampleValLeft  = dot(normal, norm1);\n\
+        float sampleValMiddle  = dot(normal, norm2);\n\
+        float sampleValRight  = dot(normal, norm3);\n\
+        I[i] = vec3(sampleValLeft, sampleValMiddle, sampleValRight);\n\
+    }\n\
+\n\
+    float gx = dot(sx[0], I[0]) + dot(sx[1], I[1]) + dot(sx[2], I[2]); \n\
+    float gy = dot(sy[0], I[0]) + dot(sy[1], I[1]) + dot(sy[2], I[2]);\n\
+\n\
+    if((gx < 0.0 && gy < 0.0) || (gy < 0.0 && gx < 0.0) ) \n\
+        return false;\n\
+	float g = sqrt(pow(gx, 2.0)+pow(gy, 2.0));\n\
+\n\
+    if(g > 0.2) {\n\
+        return true;\n\
+    } \n\
+	return false;\n\
+}\n\
+*/\n\
+\n\
+\n\
+void main()\n\
+{\n\
+	//gl_FragData = vColor4; \n\
+	//return;\n\
+\n\
+	if(clippingType == 2)\n\
+	{\n\
+		// clip by limitationPolygon.***\n\
+		vec2 pointLC = vec2(vertexPosLC.x, vertexPosLC.y);\n\
+		if(!isPointInsideLimitationConvexPolygon(pointLC))\n\
+		{\n\
+			gl_FragData[0] = limitationInfringedColor4; \n\
+			return;\n\
+		}\n\
+	}\n\
+	else if(clippingType == 3)\n\
+	{\n\
+		// check limitation heights.***\n\
+		if(vertexPosLC.z < limitationHeights.x || vertexPosLC.z > limitationHeights.y)\n\
+		{\n\
+			gl_FragData[0] = limitationInfringedColor4; \n\
+			return;\n\
+		}\n\
+	}\n\
+	else if(clippingType == 4)\n\
+	{\n\
+		// clip by limitationPolygon & heights.***\n\
+		vec2 pointLC = vec2(vertexPosLC.x, vertexPosLC.y);\n\
+		if(!isPointInsideLimitationConvexPolygon(pointLC))\n\
+		{\n\
+			gl_FragData[0] = limitationInfringedColor4; \n\
+			return;\n\
+		}\n\
+		if(vertexPosLC.z < limitationHeights.x || vertexPosLC.z > limitationHeights.y)\n\
+		{\n\
+			gl_FragData[0] = limitationInfringedColor4; \n\
+			return;\n\
+		}\n\
+	}\n\
+\n\
+	// Check if clipping.********************************************\n\
+	\n\
+	if(bApplyClippingPlanes)\n\
+	{\n\
+		bool discardFrag = false;\n\
+		for(int i=0; i<6; i++)\n\
+		{\n\
+			vec4 plane = clippingPlanes[i];\n\
+			\n\
+			// calculate any point of the plane.\n\
+			if(!clipVertexByPlane(plane, vertexPos))\n\
+			{\n\
+				discardFrag = false; // false.\n\
+				break;\n\
+			}\n\
+			if(i >= clippingPlanesCount)\n\
+			break;\n\
+		}\n\
+		\n\
+	}\n\
+	\n\
+	//----------------------------------------------------------------\n\
+\n\
+	//bool testBool = false;\n\
+	float occlusion = 1.0; // ambient occlusion.***\n\
+	float shadow_occlusion = 1.0;\n\
+	vec3 normal2 = vNormal;	\n\
+	float scalarProd = 1.0;\n\
+	\n\
+	vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
+	//float linearDepth = getDepth(screenPos);   \n\
+	vec3 ray = getViewRay(screenPos); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
+	scalarProd = abs(dot(normal2, normalize(-ray)));\n\
+	//scalarProd *= scalarProd;\n\
+	scalarProd *= 0.6;\n\
+	scalarProd += 0.4;\n\
+\n\
+	occlusion = 1.0;\n\
+\n\
+	vec4 textureColor;\n\
+    if(colorType == 2)\n\
+    {\n\
+        if(textureFlipYAxis)\n\
+        {\n\
+            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));\n\
+        }\n\
+        else{\n\
+            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));\n\
+        }\n\
+		\n\
+        if(textureColor.w == 0.0)\n\
+        {\n\
+            discard;\n\
+        }\n\
+    }\n\
+    else if(colorType == 0)\n\
+	{\n\
+        textureColor = oneColor4;\n\
+    }\n\
+	else if(colorType == 1)\n\
+	{\n\
+        textureColor = vColor4;\n\
+    }\n\
+	\n\
+    // Do specular lighting.***\n\
+	float lambertian = 1.0;\n\
+	float specular = 0.0;\n\
+	\n\
+	if(bApplyShadow)\n\
+	{\n\
+		if(currSunIdx > 0.0)\n\
+		{\n\
+			float ligthAngle = dot(vLightDir, vNormalWC);\n\
+			if(ligthAngle > 0.0)\n\
+			{\n\
+				// The angle between the light direction & face normal is less than 90 degree, so, the face is in shadow.***\n\
+				shadow_occlusion = 0.5;\n\
+			}\n\
+			else\n\
+			{\n\
+				vec3 posRelToLight = vPosRelToLight.xyz / vPosRelToLight.w;\n\
+				float tolerance = 0.9963;\n\
+				posRelToLight = posRelToLight * 0.5 + 0.5; // transform to [0,1] range\n\
+				if(posRelToLight.x >= 0.0 && posRelToLight.x <= 1.0)\n\
+				{\n\
+					if(posRelToLight.y >= 0.0 && posRelToLight.y <= 1.0)\n\
+					{\n\
+						// fragment is inside of the sun-projectionMatrix.\n\
+						float depthRelToLight = getDepthShadowMap(posRelToLight.xy);\n\
+						if(posRelToLight.z > depthRelToLight*tolerance )\n\
+						{\n\
+							shadow_occlusion = 0.5;\n\
+						}\n\
+					}\n\
+				}\n\
+\n\
+				// test. Calculate the zone inside the pixel.************************************\n\
+				//https://docs.microsoft.com/ko-kr/windows/win32/dxtecharts/cascaded-shadow-maps\n\
+			}\n\
+		}\n\
+	}\n\
+	/*\n\
+	//vec3 ambientColorAux = vec3(textureColor.x*ambientColor.x, textureColor.y*ambientColor.y, textureColor.z*ambientColor.z); // original.***\n\
+	vec3 ambientColorAux = vec3(textureColor.xyz);\n\
+	float alfa = textureColor.w * externalAlpha;\n\
+\n\
+    vec4 finalColor;\n\
+	if(applySpecLighting> 0.0)\n\
+	{\n\
+		finalColor = vec4((ambientReflectionCoef * ambientColorAux + \n\
+							diffuseReflectionCoef * textureColor.xyz + \n\
+							specularReflectionCoef * specularColor)*vLightWeighting * shadow_occlusion * scalarProd, alfa); \n\
+	}\n\
+	else{\n\
+		finalColor = vec4((textureColor.xyz) * occlusion * shadow_occlusion * scalarProd, alfa);\n\
+	}\n\
+\n\
+	\n\
+	\n\
+	finalColor *= colorMultiplier;\n\
+	//finalColor = vec4(linearDepth, linearDepth, linearDepth, 1.0); // test to render depth color coded.***\n\
+    //gl_FragData[0] = finalColor; \n\
+	*/\n\
+	vec4 albedo4 = vec4((textureColor.xyz) * shadow_occlusion, 1.0);\n\
+	gl_FragData[0] = albedo4;\n\
+\n\
+	#ifdef USE_MULTI_RENDER_TARGET\n\
+	if(bUseMultiRenderTarget)\n\
+	{\n\
+		// save depth, normal, albedo.\n\
+		gl_FragData[1] = packDepth(depth); \n\
+\n\
+		// When render with cull_face disabled, must correct the faces normal.\n\
+		float frustumIdx = 1.0;\n\
+		if(uFrustumIdx == 0)\n\
+		frustumIdx = 0.005;\n\
+		else if(uFrustumIdx == 1)\n\
+		frustumIdx = 0.015;\n\
+		else if(uFrustumIdx == 2)\n\
+		frustumIdx = 0.025;\n\
+		else if(uFrustumIdx == 3)\n\
+		frustumIdx = 0.035;\n\
+\n\
+		vec3 normal = vNormal;\n\
+		if(normal.z < 0.0)\n\
+		normal *= -1.0;\n\
+\n\
+		vec3 encodedNormal = encodeNormal(normal);\n\
+		gl_FragData[2] = vec4(encodedNormal, frustumIdx); // save normal.***\n\
+\n\
+		// albedo.\n\
+		gl_FragData[3] = albedo4; \n\
+	}\n\
+	#endif\n\
+\n\
+\n\
+	#ifdef USE_LOGARITHMIC_DEPTH\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
+	}\n\
+	#endif\n\
+}";
+ShaderSource.GBufferVS = "\n\
+	attribute vec3 position;\n\
+	attribute vec3 normal;\n\
+	attribute vec2 texCoord;\n\
+	attribute vec4 color4;\n\
+	\n\
+	uniform mat4 buildingRotMatrix; \n\
+	uniform mat4 projectionMatrix;  \n\
+	uniform mat4 modelViewMatrix;\n\
+	uniform mat4 modelViewMatrixRelToEye; \n\
+	uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+	uniform mat4 RefTransfMatrix;\n\
+	uniform mat4 normalMatrix4;\n\
+	uniform mat4 sunMatrix[2]; \n\
+	uniform vec3 buildingPosHIGH;\n\
+	uniform vec3 buildingPosLOW;\n\
+	uniform float near;\n\
+	uniform float far;\n\
+	uniform vec3 scaleLC;\n\
+	uniform vec3 sunPosHIGH[2];\n\
+	uniform vec3 sunPosLOW[2];\n\
+	uniform int sunIdx;\n\
+	uniform vec3 sunDirWC;\n\
+	uniform vec3 encodedCameraPositionMCHigh;\n\
+	uniform vec3 encodedCameraPositionMCLow;\n\
+	uniform vec3 aditionalPosition;\n\
+	uniform vec3 refTranslationVec;\n\
+	uniform int refMatrixType; // 0= identity, 1= translate, 2= transform\n\
+	uniform bool bApplySpecularLighting;\n\
+	uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
+	\n\
+	uniform bool bApplyShadow;\n\
+	uniform bool bUseLogarithmicDepth;\n\
+	uniform float uFCoef_logDepth;\n\
+	\n\
+	\n\
+\n\
+	varying vec3 vNormal;\n\
+	varying vec2 vTexCoord;  \n\
+	varying vec3 uAmbientColor;\n\
+	varying vec3 vLightWeighting;\n\
+	varying vec3 vertexPos;\n\
+	varying vec3 vertexPosLC;\n\
+	varying float applySpecLighting;\n\
+	varying vec4 vColor4; // color from attributes\n\
+	varying vec4 vPosRelToLight; // sun lighting.\n\
+	varying vec3 vLightDir; \n\
+	varying vec3 vNormalWC; \n\
+	varying float currSunIdx;  \n\
+	varying float discardFrag;\n\
+	varying float flogz;\n\
+	varying float Fcoef_half;\n\
+	varying float depth;\n\
+\n\
+	\n\
+	void main()\n\
+    {	\n\
+		vertexPosLC = vec3(position.x, position.y, position.z);\n\
+		vec4 scaledPos = vec4(position.x * scaleLC.x, position.y * scaleLC.y, position.z * scaleLC.z, 1.0);\n\
+		vec4 rotatedPos;\n\
+		mat3 currentTMat;\n\
+		if(refMatrixType == 0)\n\
+		{\n\
+			rotatedPos = buildingRotMatrix * vec4(scaledPos.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
+			currentTMat = mat3(buildingRotMatrix);\n\
+		}\n\
+		else if(refMatrixType == 1)\n\
+		{\n\
+			rotatedPos = buildingRotMatrix * vec4(scaledPos.xyz + refTranslationVec.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
+			currentTMat = mat3(buildingRotMatrix);\n\
+		}\n\
+		else if(refMatrixType == 2)\n\
+		{\n\
+			rotatedPos = RefTransfMatrix * vec4(scaledPos.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
+			currentTMat = mat3(RefTransfMatrix);\n\
+		}\n\
+\n\
+		vec3 objPosHigh = buildingPosHIGH;\n\
+		vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
+		vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+		vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+		vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+		vec3 rotatedNormal = currentTMat * normal;\n\
+		\n\
+		\n\
+		\n\
+		vec3 uLightingDirection = vec3(-0.1320580393075943, -0.9903827905654907, 0.041261956095695496); \n\
+		uAmbientColor = vec3(1.0);\n\
+		vNormalWC = rotatedNormal;\n\
+		vNormal = normalize((normalMatrix4 * vec4(rotatedNormal, 1.0)).xyz); // original.***\n\
+		vTexCoord = texCoord;\n\
+		vLightDir = vec3(-0.1320580393075943, -0.9903827905654907, 0.041261956095695496);\n\
+		vec3 directionalLightColor = vec3(0.7, 0.7, 0.7);\n\
+		float directionalLightWeighting = 1.0;\n\
+		\n\
+		currSunIdx = -1.0; // initially no apply shadow.\n\
+		if(bApplyShadow)\n\
+		{\n\
+			//vLightDir = normalize(vec3(normalMatrix4 * vec4(sunDirWC.xyz, 1.0)).xyz); // test.***\n\
+			vLightDir = sunDirWC;\n\
+			vNormalWC = rotatedNormal;\n\
+						\n\
+			// the sun lights count are 2.\n\
+			\n\
+			vec3 currSunPosLOW;\n\
+			vec3 currSunPosHIGH;\n\
+			mat4 currSunMatrix;\n\
+			if(sunIdx == 0)\n\
+			{\n\
+				currSunPosLOW = sunPosLOW[0];\n\
+				currSunPosHIGH = sunPosHIGH[0];\n\
+				currSunMatrix = sunMatrix[0];\n\
+				currSunIdx = 0.5;\n\
+			}\n\
+			else if(sunIdx == 1)\n\
+			{\n\
+				currSunPosLOW = sunPosLOW[1];\n\
+				currSunPosHIGH = sunPosHIGH[1];\n\
+				currSunMatrix = sunMatrix[1];\n\
+				currSunIdx = 1.5;\n\
+			}\n\
+			\n\
+			// Calculate the vertex relative to light.***\n\
+			vec3 highDifferenceSun = objPosHigh.xyz - currSunPosHIGH.xyz;\n\
+			vec3 lowDifferenceSun = objPosLow.xyz - currSunPosLOW.xyz;\n\
+			vec4 pos4Sun = vec4(highDifferenceSun.xyz + lowDifferenceSun.xyz, 1.0);\n\
+			vPosRelToLight = currSunMatrix * pos4Sun;\n\
+			\n\
+			uLightingDirection = sunDirWC; \n\
+			//directionalLightColor = vec3(0.9, 0.9, 0.9);\n\
+			directionalLightWeighting = max(dot(rotatedNormal, -sunDirWC), 0.0);\n\
+		}\n\
+		else\n\
+		{\n\
+			uAmbientColor = vec3(0.8);\n\
+			uLightingDirection = normalize(vec3(0.6, 0.6, 0.6));\n\
+			//uLightingDirection = normalize(vec3(0.2, 0.6, 1.0));\n\
+			directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
+		}\n\
+\n\
+		vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting; // original.***\n\
+		\n\
+		if(bApplySpecularLighting)\n\
+			applySpecLighting = 1.0;\n\
+		else\n\
+			applySpecLighting = -1.0;\n\
+\n\
+        gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+		vec4 orthoPos = modelViewMatrixRelToEye * pos4;\n\
+		vertexPos = orthoPos.xyz;\n\
+		depth = (-orthoPos.z)/(far); // the correct value.\n\
+\n\
+		if(bUseLogarithmicDepth)\n\
+		{\n\
+			// logarithmic zBuffer:\n\
+			// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
+			// float Fcoef = 2.0 / log2(far + 1.0);\n\
+			// gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;\n\
+			// flogz = 1.0 + gl_Position.w;\n\
+			//---------------------------------------------------------------------------------\n\
+			flogz = 1.0 + gl_Position.w;\n\
+			Fcoef_half = 0.5 * uFCoef_logDepth;\n\
+		}\n\
+		\n\
+		if(colorType == 1)\n\
+			vColor4 = color4;\n\
+\n\
+		//if(orthoPos.z < 0.0)\n\
+		//aColor4 = vec4(1.0, 0.0, 0.0, 1.0);\n\
+		//else\n\
+		//aColor4 = vec4(0.0, 1.0, 0.0, 1.0);\n\
+		gl_PointSize = 5.0;\n\
+	}";
 ShaderSource.GroundStencilPrimitivesFS = "#ifdef GL_ES\n\
 precision highp float;\n\
 #endif\n\
@@ -1735,8 +2565,7 @@ ShaderSource.InvertedBoxVS = "	attribute vec3 position;\n\
         gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 	}\n\
 ";
-ShaderSource.ModelRefSsaoFS = "\n\
-#ifdef GL_ES\n\
+ShaderSource.LBufferFS = "#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\
 \n\
@@ -1744,6 +2573,465 @@ ShaderSource.ModelRefSsaoFS = "\n\
 #ifdef USE_LOGARITHMIC_DEPTH\n\
 #extension GL_EXT_frag_depth : enable\n\
 #endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+\n\
+uniform sampler2D depthTex;\n\
+uniform sampler2D normalTex;\n\
+uniform samplerCube light_depthCubeMap;\n\
+//uniform sampler2D noiseTex;  \n\
+//uniform sampler2D diffuseTex;\n\
+\n\
+uniform bool textureFlipYAxis;\n\
+uniform mat4 projectionMatrix;\n\
+uniform mat4 projectionMatrixInv;\n\
+uniform mat4 modelViewMatrixRelToEyeInv;\n\
+uniform mat4 buildingRotMatrixInv;\n\
+\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+uniform float lightDist;\n\
+uniform float uMaxSpotDot;\n\
+\n\
+uniform vec2 noiseScale;\n\
+uniform float near;\n\
+uniform float far;            \n\
+uniform float fov;\n\
+uniform float tangentOfHalfFovy;\n\
+uniform float aspectRatio;    \n\
+uniform float screenWidth;    \n\
+uniform float screenHeight;     \n\
+uniform vec4 oneColor4;\n\
+\n\
+uniform vec3 uLightColorAndBrightness;\n\
+\n\
+\n\
+uniform bool bApplyScpecularLighting;\n\
+uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
+\n\
+uniform vec3 specularColor;\n\
+uniform vec3 ambientColor;\n\
+  \n\
+\n\
+uniform float ambientReflectionCoef;\n\
+uniform float diffuseReflectionCoef;  \n\
+uniform float specularReflectionCoef; \n\
+uniform float externalAlpha;\n\
+uniform vec4 colorMultiplier;\n\
+uniform bool bUseLogarithmicDepth;\n\
+uniform bool bUseMultiRenderTarget;\n\
+uniform int uFrustumIdx;\n\
+uniform vec2 uNearFarArray[4];\n\
+\n\
+varying vec3 vLightDirCC;\n\
+varying vec3 vLightPosCC; \n\
+varying vec3 vLightPosWC;\n\
+\n\
+varying vec3 vNormal;\n\
+varying vec4 vColor4; // color from attributes\n\
+varying vec2 vTexCoord;   \n\
+varying vec3 vLightWeighting;\n\
+varying vec3 diffuseColor;\n\
+varying vec3 vertexPos; // this is the orthoPos.***\n\
+varying vec3 vertexPosLC;\n\
+varying float applySpecLighting;\n\
+\n\
+\n\
+varying float flogz;\n\
+varying float Fcoef_half;\n\
+\n\
+\n\
+vec4 packDepth( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+  return enc;\n\
+}\n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+}  \n\
+\n\
+vec3 encodeNormal(in vec3 normal)\n\
+{\n\
+	return normal*0.5 + 0.5;\n\
+}\n\
+\n\
+vec4 decodeNormal(in vec4 normal)\n\
+{\n\
+	return vec4(normal.xyz * 2.0 - 1.0, normal.w);\n\
+}\n\
+\n\
+vec4 getNormal(in vec2 texCoord)\n\
+{\n\
+    vec4 encodedNormal = texture2D(normalTex, texCoord);\n\
+    return decodeNormal(encodedNormal);\n\
+}                   \n\
+        \n\
+float getDepth(vec2 coord)\n\
+{\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		float linearDepth = unpackDepth(texture2D(depthTex, coord.xy));\n\
+		// gl_FragDepthEXT = linearDepth = log2(flogz) * Fcoef_half;\n\
+		// flogz = 1.0 + gl_Position.z;\n\
+\n\
+		float flogzAux = pow(2.0, linearDepth/Fcoef_half);\n\
+		float z = flogzAux - 1.0;\n\
+		linearDepth = z/(far);\n\
+		return linearDepth;\n\
+	}\n\
+	else{\n\
+		return unpackDepth(texture2D(depthTex, coord.xy));\n\
+	}\n\
+}\n\
+\n\
+vec2 getNearFar_byFrustumIdx(in int frustumIdx)\n\
+{\n\
+    vec2 nearFar;\n\
+    if(frustumIdx == 0)\n\
+    {\n\
+        nearFar = uNearFarArray[0];\n\
+    }\n\
+    else if(frustumIdx == 1)\n\
+    {\n\
+        nearFar = uNearFarArray[1];\n\
+    }\n\
+    else if(frustumIdx == 2)\n\
+    {\n\
+        nearFar = uNearFarArray[2];\n\
+    }\n\
+    else if(frustumIdx == 3)\n\
+    {\n\
+        nearFar = uNearFarArray[3];\n\
+    }\n\
+\n\
+    return nearFar;\n\
+}\n\
+\n\
+vec3 getViewRay(vec2 tc, in float relFar)\n\
+{\n\
+	float hfar = 2.0 * tangentOfHalfFovy * relFar;\n\
+    float wfar = hfar * aspectRatio;    \n\
+    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -relFar);    \n\
+	\n\
+    return ray;                      \n\
+} \n\
+\n\
+int getRealFrustumIdx(in int estimatedFrustumIdx, inout int dataType)\n\
+{\n\
+    // Check the type of the data.******************\n\
+    // frustumIdx 0 .. 3 -> general geometry data.\n\
+    // frustumIdx 10 .. 13 -> tinTerrain data.\n\
+    // frustumIdx 20 .. 23 -> points cloud data.\n\
+    //----------------------------------------------\n\
+    int realFrustumIdx = -1;\n\
+    \n\
+     if(estimatedFrustumIdx >= 10)\n\
+    {\n\
+        estimatedFrustumIdx -= 10;\n\
+        if(estimatedFrustumIdx >= 10)\n\
+        {\n\
+            // points cloud data.\n\
+            estimatedFrustumIdx -= 10;\n\
+            dataType = 2;\n\
+        }\n\
+        else\n\
+        {\n\
+            // tinTerrain data.\n\
+            dataType = 1;\n\
+        }\n\
+    }\n\
+    else\n\
+    {\n\
+        // general geomtry.\n\
+        dataType = 0;\n\
+    }\n\
+\n\
+    realFrustumIdx = estimatedFrustumIdx;\n\
+    return realFrustumIdx;\n\
+}\n\
+\n\
+vec3 reconstructPosition(vec2 texCoord, float depth)\n\
+{\n\
+    // https://wickedengine.net/2019/09/22/improved-normal-reconstruction-from-depth/\n\
+    float x = texCoord.x * 2.0 - 1.0;\n\
+    //float y = (1.0 - texCoord.y) * 2.0 - 1.0;\n\
+    float y = (texCoord.y) * 2.0 - 1.0;\n\
+    float z = (1.0 - depth) * 2.0 - 1.0;\n\
+    vec4 pos_NDC = vec4(x, y, z, 1.0);\n\
+    vec4 pos_CC = projectionMatrixInv * pos_NDC;\n\
+    return pos_CC.xyz / pos_CC.w;\n\
+}\n\
+\n\
+vec3 getPosCC(in vec2 screenPosition, inout int dataType, inout vec4 normal4)\n\
+{\n\
+	normal4 = getNormal(screenPosition);\n\
+	int estimatedFrustumIdx = int(floor(100.0*normal4.w));\n\
+	dataType = 0; // 0= general geometry. 1= tinTerrain. 2= PointsCloud.\n\
+\n\
+	// Check the type of the data.******************\n\
+	// dataType = 0 -> general geometry data.\n\
+	// dataType = 1 -> tinTerrain data.\n\
+	// dataType = 2 -> points cloud data.\n\
+	//----------------------------------------------\n\
+	int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);\n\
+\n\
+	vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);\n\
+	float currNear = nearFar.x;\n\
+	float currFar = nearFar.y;\n\
+	float linearDepth = getDepth(screenPosition);\n\
+\n\
+	// calculate the real pos of origin.\n\
+	float origin_zDist = linearDepth * currFar; // original.\n\
+	vec3 origin_real = getViewRay(screenPosition, origin_zDist);\n\
+\n\
+	return origin_real;\n\
+}\n\
+\n\
+\n\
+void main()\n\
+{\n\
+	//bool testBool = false;\n\
+	float occlusion = 1.0; // ambient occlusion.***\n\
+	float shadow_occlusion = 1.0;\n\
+	vec3 normal2 = vNormal;	\n\
+	float scalarProd = 1.0;\n\
+	\n\
+	vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
+\n\
+	#ifdef USE_MULTI_RENDER_TARGET\n\
+	if(bUseMultiRenderTarget)\n\
+	{\n\
+		// Diffuse lighting.\n\
+		int dataType = 0;\n\
+		vec4 normal4;\n\
+		vec3 posCC = getPosCC(screenPos, dataType, normal4);\n\
+		vec3 posWC = (modelViewMatrixRelToEyeInv * vec4(posCC, 1.0)).xyz + encodedCameraPositionMCHigh + encodedCameraPositionMCLow;\n\
+		\n\
+		vec3 posLCAux = posWC - vLightPosWC;\n\
+		vec4 posLC = buildingRotMatrixInv * vec4(posLCAux, 1.0);\n\
+\n\
+		// If the data is no generalGeomtry or pointsCloud, then discard.\n\
+		if(dataType != 0 && dataType != 2)\n\
+		{\n\
+			discard;\n\
+		}\n\
+\n\
+		// vector light-point.\n\
+		vec3 vecLightToPointCC = posCC - vLightPosCC;\n\
+		vec3 lightDirToPointCC = normalize(posCC - vLightPosCC);\n\
+		float distToLight = length(vecLightToPointCC);\n\
+		\n\
+		if(distToLight > lightDist)\n\
+		{\n\
+			discard;\n\
+		}\n\
+\n\
+		float diffuseDot = dot(-lightDirToPointCC, vec3(normal4.xyz));\n\
+\n\
+		if(diffuseDot < 0.0)\n\
+		{\n\
+			discard;\n\
+		}\n\
+\n\
+		float spotDot = dot(vLightDirCC, lightDirToPointCC);\n\
+		if(spotDot < uMaxSpotDot)\n\
+		{\n\
+			discard;\n\
+		}\n\
+\n\
+		// now, check light's depthCubeMap.\n\
+		// 1rst, transform \"lightDirToPointCC\" to \"lightDirToPointWC\".\n\
+		// 2nd, transform \"lightDirToPointWC\" to \"lightDirToPointLC\" ( lightCoord );\n\
+		vec4 lightDirToPointWC = modelViewMatrixRelToEyeInv * vec4(lightDirToPointCC, 1.0);\n\
+		vec3 lightDirToPointWCNormalized = normalize(lightDirToPointWC.xyz);\n\
+		vec4 lightDirToPointLC = buildingRotMatrixInv * vec4(lightDirToPointWCNormalized, 1.0);\n\
+		//vec4 lightDirToPointLC = buildingRotMatrixInv * lightDirToPointWC;\n\
+		vec4 depthCube = textureCube(light_depthCubeMap, normalize(lightDirToPointLC.xyz)); // original.\n\
+\n\
+\n\
+		float depthFromLight = unpackDepth(depthCube)*lightDist;\n\
+\n\
+		if(distToLight > depthFromLight + 0.01)\n\
+		{\n\
+			discard;\n\
+		}\n\
+		\n\
+		//distToLight /= lightDist;\n\
+\n\
+		gl_FragData[0] = vec4(diffuseDot * uLightColorAndBrightness.x * spotDot, \n\
+							diffuseDot * uLightColorAndBrightness.y * spotDot, \n\
+							diffuseDot * uLightColorAndBrightness.z * spotDot, 1.0); \n\
+\n\
+		//gl_FragData[0] = vec4(uLightColorAndBrightness.x, \n\
+		//					uLightColorAndBrightness.y, \n\
+		//					uLightColorAndBrightness.z, 1.0); \n\
+\n\
+		// Specular lighting.\n\
+		gl_FragData[1] = vec4(0.0, 0.0, 0.0, 1.0); // save specular.***\n\
+\n\
+	}\n\
+	#endif\n\
+\n\
+\n\
+	#ifdef USE_LOGARITHMIC_DEPTH\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
+	}\n\
+	#endif\n\
+}";
+ShaderSource.LBufferVS = "\n\
+	attribute vec3 position;\n\
+	attribute vec3 normal;\n\
+	attribute vec2 texCoord; // delete this. lights has no texCoords.\n\
+	attribute vec4 color4;\n\
+	\n\
+	uniform mat4 buildingRotMatrix; \n\
+	uniform mat4 projectionMatrix;  \n\
+	uniform mat4 modelViewMatrix;\n\
+	uniform mat4 modelViewMatrixRelToEye; \n\
+	uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+	uniform mat4 RefTransfMatrix;\n\
+	uniform mat4 normalMatrix4;\n\
+	uniform mat4 sunMatrix[2]; \n\
+\n\
+	// Light position & direction.\n\
+	uniform vec3 buildingPosHIGH; // this is the lightPosition high.\n\
+	uniform vec3 buildingPosLOW; // this is the lightPosition low.\n\
+	uniform vec3 lightDirWC; // this is the lightDirection (in case of the spotLight type).\n\
+\n\
+	uniform float near;\n\
+	uniform float far;\n\
+	uniform vec3 scaleLC;\n\
+\n\
+	uniform vec3 encodedCameraPositionMCHigh;\n\
+	uniform vec3 encodedCameraPositionMCLow;\n\
+	uniform vec3 aditionalPosition;\n\
+	uniform vec3 refTranslationVec;\n\
+	uniform int refMatrixType; // 0= identity, 1= translate, 2= transform\n\
+	uniform bool bApplySpecularLighting;\n\
+	uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
+	\n\
+	uniform bool bUseLogarithmicDepth;\n\
+	uniform float uFCoef_logDepth;\n\
+	\n\
+	\n\
+\n\
+	varying vec3 vNormal;\n\
+	varying vec2 vTexCoord;  \n\
+	varying vec3 uAmbientColor;\n\
+	varying vec3 vLightWeighting;\n\
+	varying vec3 vertexPos;\n\
+	varying vec3 vertexPosLC;\n\
+	varying float applySpecLighting;\n\
+	varying vec4 vColor4; // color from attributes\n\
+\n\
+	varying vec3 vLightDirCC; \n\
+	varying vec3 vLightPosCC; \n\
+	varying vec3 vLightPosWC;\n\
+\n\
+  \n\
+	varying float flogz;\n\
+	varying float Fcoef_half;\n\
+	varying float depth;\n\
+\n\
+	\n\
+	void main()\n\
+    {	\n\
+		vertexPosLC = vec3(position.x, position.y, position.z);\n\
+		vec4 scaledPos = vec4(position.x * scaleLC.x, position.y * scaleLC.y, position.z * scaleLC.z, 1.0);\n\
+		vec4 rotatedPos;\n\
+		mat3 currentTMat;\n\
+		if(refMatrixType == 0)\n\
+		{\n\
+			rotatedPos = buildingRotMatrix * vec4(scaledPos.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
+			currentTMat = mat3(buildingRotMatrix);\n\
+		}\n\
+		else if(refMatrixType == 1)\n\
+		{\n\
+			rotatedPos = buildingRotMatrix * vec4(scaledPos.xyz + refTranslationVec.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
+			currentTMat = mat3(buildingRotMatrix);\n\
+		}\n\
+		else if(refMatrixType == 2)\n\
+		{\n\
+			rotatedPos = RefTransfMatrix * vec4(scaledPos.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
+			currentTMat = mat3(RefTransfMatrix);\n\
+		}\n\
+\n\
+		vec3 objPosHigh = buildingPosHIGH;\n\
+		vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
+		vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+		vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+		vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+		vec3 rotatedNormal = currentTMat * normal;\n\
+\n\
+		// calculate the light position CC.*****************************************\n\
+		vLightPosWC = buildingPosHIGH + buildingPosLOW;\n\
+		vec3 lightPosHighDiff = buildingPosHIGH - encodedCameraPositionMCHigh;\n\
+		vec3 lightPosLowDiff = buildingPosLOW - encodedCameraPositionMCLow;\n\
+		vec4 lightPosCC = vec4(lightPosHighDiff + lightPosLowDiff, 1.0);\n\
+		vec4 lightPosCC_aux = modelViewMatrixRelToEye * lightPosCC;\n\
+		vLightPosCC = lightPosCC_aux.xyz;\n\
+		//--------------------------------------------------------------------------\n\
+\n\
+		vec3 uLightingDirection = vec3(-0.1320580393075943, -0.9903827905654907, 0.041261956095695496); \n\
+		uAmbientColor = vec3(1.0);\n\
+\n\
+		vNormal = normalize((normalMatrix4 * vec4(rotatedNormal, 1.0)).xyz); // original.***\n\
+		vTexCoord = texCoord;\n\
+\n\
+		// calculate lightDirection in cameraCoord.\n\
+		vLightDirCC = normalize((normalMatrix4 * vec4(lightDirWC, 1.0)).xyz); // original.***\n\
+		vec3 directionalLightColor = vec3(0.7, 0.7, 0.7);\n\
+		float directionalLightWeighting = 1.0;\n\
+		\n\
+		uAmbientColor = vec3(0.8);\n\
+		uLightingDirection = normalize(vec3(0.6, 0.6, 0.6));\n\
+		directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
+\n\
+		vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting; // original.***\n\
+		\n\
+		if(bApplySpecularLighting)\n\
+			applySpecLighting = 1.0;\n\
+		else\n\
+			applySpecLighting = -1.0;\n\
+\n\
+        gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+		//vec4 orthoPos = modelViewMatrixRelToEye * pos4;\n\
+		//vertexPos = orthoPos.xyz;\n\
+		//depth = (-orthoPos.z)/(far); // the correct value.\n\
+\n\
+		if(bUseLogarithmicDepth)\n\
+		{\n\
+			// logarithmic zBuffer:\n\
+			// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
+			// float Fcoef = 2.0 / log2(far + 1.0);\n\
+			// gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;\n\
+			// flogz = 1.0 + gl_Position.w;\n\
+			//---------------------------------------------------------------------------------\n\
+			flogz = 1.0 + gl_Position.w;\n\
+			Fcoef_half = 0.5 * uFCoef_logDepth;\n\
+		}\n\
+		\n\
+		if(colorType == 1)\n\
+			vColor4 = color4;\n\
+	}";
+ShaderSource.ModelRefSsaoFS = "#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
 \n\
 uniform sampler2D depthTex;\n\
 uniform sampler2D noiseTex;  \n\
@@ -1821,12 +3109,24 @@ varying float currSunIdx; \n\
 varying float flogz;\n\
 varying float Fcoef_half;\n\
 \n\
+vec4 packDepth( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+  return enc;\n\
+}\n\
+\n\
 float unpackDepth(const in vec4 rgba_depth)\n\
 {\n\
     const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);// original.***\n\
-    float depth = dot(rgba_depth, bit_shift);\n\
-    return depth;\n\
+    float depthAux = dot(rgba_depth, bit_shift);\n\
+    return depthAux;\n\
 }  \n\
+\n\
+vec3 encodeNormal(in vec3 normal)\n\
+{\n\
+	return normal*0.5 + 0.5;\n\
+}\n\
 \n\
 /*\n\
 // unpack depth used for shadow on screen.***\n\
@@ -2092,7 +3392,7 @@ bool isPointInsideLimitationConvexPolygon(in vec2 point2d)\n\
 \n\
 \n\
 \n\
-\n\
+/*\n\
 \n\
 vec3 reconstructPosition(vec2 texCoord, float depth)\n\
 {\n\
@@ -2184,11 +3484,12 @@ bool isEdge()\n\
     } \n\
 	return false;\n\
 }\n\
+*/\n\
 \n\
 \n\
 void main()\n\
 {\n\
-	//gl_FragColor = vColor4; \n\
+	//gl_FragData = vColor4; \n\
 	//return;\n\
 \n\
 	if(clippingType == 2)\n\
@@ -2197,7 +3498,7 @@ void main()\n\
 		vec2 pointLC = vec2(vertexPosLC.x, vertexPosLC.y);\n\
 		if(!isPointInsideLimitationConvexPolygon(pointLC))\n\
 		{\n\
-			gl_FragColor = limitationInfringedColor4; \n\
+			gl_FragData[0] = limitationInfringedColor4; \n\
 			return;\n\
 		}\n\
 	}\n\
@@ -2206,7 +3507,7 @@ void main()\n\
 		// check limitation heights.***\n\
 		if(vertexPosLC.z < limitationHeights.x || vertexPosLC.z > limitationHeights.y)\n\
 		{\n\
-			gl_FragColor = limitationInfringedColor4; \n\
+			gl_FragData[0] = limitationInfringedColor4; \n\
 			return;\n\
 		}\n\
 	}\n\
@@ -2216,12 +3517,12 @@ void main()\n\
 		vec2 pointLC = vec2(vertexPosLC.x, vertexPosLC.y);\n\
 		if(!isPointInsideLimitationConvexPolygon(pointLC))\n\
 		{\n\
-			gl_FragColor = limitationInfringedColor4; \n\
+			gl_FragData[0] = limitationInfringedColor4; \n\
 			return;\n\
 		}\n\
 		if(vertexPosLC.z < limitationHeights.x || vertexPosLC.z > limitationHeights.y)\n\
 		{\n\
-			gl_FragColor = limitationInfringedColor4; \n\
+			gl_FragData[0] = limitationInfringedColor4; \n\
 			return;\n\
 		}\n\
 	}\n\
@@ -2256,7 +3557,7 @@ void main()\n\
 	float scalarProd = 1.0;\n\
 	\n\
 	vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
-	float linearDepth = getDepth(screenPos);   \n\
+	//float linearDepth = getDepth(screenPos);   \n\
 	vec3 ray = getViewRay(screenPos); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
 	scalarProd = abs(dot(normal2, normalize(-ray)));\n\
 	//scalarProd *= scalarProd;\n\
@@ -2393,7 +3694,9 @@ void main()\n\
 	\n\
 	finalColor *= colorMultiplier;\n\
 	//finalColor = vec4(linearDepth, linearDepth, linearDepth, 1.0); // test to render depth color coded.***\n\
-    gl_FragColor = finalColor; \n\
+    gl_FragData[0] = finalColor; \n\
+\n\
+\n\
 \n\
 	#ifdef USE_LOGARITHMIC_DEPTH\n\
 	if(bUseLogarithmicDepth)\n\
@@ -2454,7 +3757,6 @@ ShaderSource.ModelRefSsaoVS = "\n\
 	varying float discardFrag;\n\
 	varying float flogz;\n\
 	varying float Fcoef_half;\n\
-	\n\
 \n\
 	\n\
 	void main()\n\
@@ -2552,6 +3854,7 @@ ShaderSource.ModelRefSsaoVS = "\n\
         gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 		vec4 orthoPos = modelViewMatrixRelToEye * pos4;\n\
 		vertexPos = orthoPos.xyz;\n\
+\n\
 		if(bUseLogarithmicDepth)\n\
 		{\n\
 			// logarithmic zBuffer:\n\
@@ -3100,6 +4403,7 @@ uniform float screenHeight;    \n\
 uniform vec3 kernel[16];   \n\
 uniform vec4 oneColor4;\n\
 varying vec4 aColor4; // color from attributes\n\
+\n\
 varying vec4 vColor;\n\
 varying float glPointSize;\n\
 \n\
@@ -3111,12 +4415,14 @@ uniform float externalAlpha;\n\
 \n\
 uniform bool bUseLogarithmicDepth;\n\
 uniform vec2 uNearFarArray[4];\n\
+uniform bool bUseMultiRenderTarget;\n\
+uniform int uFrustumIdx;\n\
 \n\
 varying float flogz;\n\
 varying float Fcoef_half;\n\
 varying float depth;\n\
 \n\
-\n\
+/*\n\
 float unpackDepth(vec4 packedDepth)\n\
 {\n\
 	// See Aras Pranckevičius' post Encoding Floats to RGBA\n\
@@ -3192,6 +4498,7 @@ vec2 getNearFar_byFrustumIdx(in int frustumIdx)\n\
 \n\
     return nearFar;\n\
 }\n\
+*/\n\
             \n\
 //linear view space depth\n\
 /*\n\
@@ -3201,16 +4508,37 @@ float getDepth(vec2 coord)\n\
 } \n\
 */   \n\
 \n\
+vec3 encodeNormal(in vec3 normal)\n\
+{\n\
+	return normal*0.5 + 0.5;\n\
+}\n\
+\n\
+vec3 decodeNormal(in vec3 normal)\n\
+{\n\
+	return normal * 2.0 - 1.0;\n\
+}\n\
+\n\
+vec4 packDepth( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+  return enc;\n\
+}\n\
+\n\
 void main()\n\
 {\n\
 	vec2 pt = gl_PointCoord - vec2(0.5);\n\
 	if(pt.x*pt.x+pt.y*pt.y > 0.25)\n\
+	{\n\
 		discard;\n\
+	}\n\
+		\n\
 	\n\
 	float occlusion = 1.0;\n\
 	float lighting = 0.0;\n\
 	bool testBool = false;\n\
 	vec4 colorAux = vec4(1.0, 1.0, 1.0, 1.0);\n\
+	/*\n\
 	bool auxBool = false;\n\
 	//if(bApplySsao)\n\
 	if(auxBool)\n\
@@ -3239,13 +4567,13 @@ void main()\n\
 		float radiusFog = glPointSize*3.0; // radius in pixels.\n\
 		vec2 screenPosAdjacent;\n\
 \n\
-		/*\n\
-		vec3 sample = origin + rotatedKernel * radius;\n\
-		vec4 offset = projectionMatrix * vec4(sample, 1.0);	\n\
-		vec3 offsetCoord = vec3(offset.xyz);				\n\
-		offsetCoord.xyz /= offset.w;\n\
-		offsetCoord.xyz = offsetCoord.xyz * 0.5 + 0.5; \n\
-		*/\n\
+		\n\
+		////vec3 sample = origin + rotatedKernel * radius;\n\
+		////vec4 offset = projectionMatrix * vec4(sample, 1.0);	\n\
+		////vec3 offsetCoord = vec3(offset.xyz);				\n\
+		////offsetCoord.xyz /= offset.w;\n\
+		////offsetCoord.xyz = offsetCoord.xyz * 0.5 + 0.5; \n\
+		\n\
 \n\
 		// calculate the pixelSize in the screenPos.***\n\
 		float h = 2.0 * tangentOfHalfFovy * currFar * linearDepth; // height in meters of the screen in the current pixelDepth\n\
@@ -3327,7 +4655,7 @@ void main()\n\
 			lighting = 8.0;\n\
 		lighting = lighting / 8.0;\n\
 	}\n\
-	\n\
+	*/\n\
 \n\
 	if(lighting < 0.5)\n\
 	lighting = 0.0;\n\
@@ -3348,6 +4676,43 @@ void main()\n\
 	//{\n\
 	//	gl_FragData[0] = vec4(1.0, 0.0, 0.0, 1.0); \n\
 	//}\n\
+	#ifdef USE_MULTI_RENDER_TARGET\n\
+	if(bUseMultiRenderTarget)\n\
+	{\n\
+		//if(!bUseLogarithmicDepth)\n\
+		//{\n\
+			gl_FragData[1] = packDepth(depth);\n\
+		//}\n\
+\n\
+		// Note: points cloud data has frustumIdx 20 .. 23.********\n\
+		float frustumIdx = 0.1; // realFrustumIdx = 0.1 * 100 = 10. \n\
+		\n\
+		if(uFrustumIdx == 0)\n\
+		frustumIdx = 0.205; // frustumIdx = 20.***\n\
+		else if(uFrustumIdx == 1)\n\
+		frustumIdx = 0.215; // frustumIdx = 21.***\n\
+		else if(uFrustumIdx == 2)\n\
+		frustumIdx = 0.225; // frustumIdx = 22.***\n\
+		else if(uFrustumIdx == 3)\n\
+		frustumIdx = 0.235; // frustumIdx = 23.***\n\
+		/*\n\
+		if(uFrustumIdx == 0)\n\
+		frustumIdx = 0.005;\n\
+		else if(uFrustumIdx == 1)\n\
+		frustumIdx = 0.015;\n\
+		else if(uFrustumIdx == 2)\n\
+		frustumIdx = 0.025;\n\
+		else if(uFrustumIdx == 3)\n\
+		frustumIdx = 0.035;\n\
+		*/\n\
+\n\
+		vec3 normal = encodeNormal(vec3(0.0, 0.0, 1.0));\n\
+		gl_FragData[2] = vec4(normal, frustumIdx); // save normal.***\n\
+\n\
+		// now, albedo.\n\
+		gl_FragData[3] = vColor; \n\
+	}\n\
+	#endif\n\
 \n\
 	#ifdef USE_LOGARITHMIC_DEPTH\n\
 	if(bUseLogarithmicDepth)\n\
@@ -3614,7 +4979,7 @@ void main()\n\
 		vColor = color4;\n\
 	\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
-	depth = (modelViewMatrixRelToEye * pos).z/far; // original.***\n\
+	depth = -(modelViewMatrixRelToEye * pos).z/far; // original.***\n\
 \n\
 	if(bUseFixPointSize)\n\
 	{\n\
@@ -3722,6 +5087,203 @@ void main() {\n\
     gl_Position = vec4(1.0 - 2.0 * a_pos, 0, 1);\n\
 }\n\
 ";
+ShaderSource.rectangleScreenFS = "#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+uniform sampler2D texture_0;  \n\
+uniform samplerCube texture_cube;\n\
+\n\
+uniform int uTextureType;\n\
+\n\
+varying vec2 v_tex_pos;\n\
+\n\
+int faceIndex(in vec2 texCoord)\n\
+{\n\
+    int faceIndex = -1;\n\
+\n\
+    float tx = texCoord.x;\n\
+    float ty = texCoord.y;\n\
+\n\
+    if(tx >= 0.0 && tx < 0.25)\n\
+    {\n\
+        if(ty >= 0.0 && ty < 1.0/3.0)\n\
+        {\n\
+            // is no cubeMap zone.\n\
+        }\n\
+        else if(ty >= 1.0/3.0 && ty < 2.0/3.0)\n\
+        {\n\
+            faceIndex = 1;\n\
+        }\n\
+        else if(ty >= 2.0/3.0)\n\
+        {\n\
+            // is no cubeMap zone.\n\
+        }\n\
+    }\n\
+    else if(tx >= 0.25 && tx < 0.5)\n\
+    {\n\
+        if(ty >= 0.0 && ty < 1.0/3.0)\n\
+        {\n\
+            faceIndex = 3;\n\
+        }\n\
+        else if(ty >= 1.0/3.0 && ty < 2.0/3.0)\n\
+        {\n\
+            faceIndex = 4;\n\
+        }\n\
+        else if(ty >= 2.0/3.0)\n\
+        {\n\
+            faceIndex = 2;\n\
+        }\n\
+    }\n\
+    else if(tx >= 0.5 && tx < 0.75)\n\
+    {\n\
+        if(ty >= 0.0 && ty < 1.0/3.0)\n\
+        {\n\
+            // is no cubeMap zone.\n\
+        }\n\
+        else if(ty >= 1.0/3.0 && ty < 2.0/3.0)\n\
+        {\n\
+            faceIndex = 0;\n\
+        }\n\
+        else if(ty >= 2.0/3.0)\n\
+        {\n\
+            // is no cubeMap zone.\n\
+        }\n\
+    }\n\
+    else if(tx >= 0.75)\n\
+    {\n\
+        if(ty >= 0.0 && ty < 1.0/3.0)\n\
+        {\n\
+            // is no cubeMap zone.\n\
+        }\n\
+        else if(ty >= 1.0/3.0 && ty < 2.0/3.0)\n\
+        {\n\
+            faceIndex = 5;\n\
+        }\n\
+        else if(ty >= 2.0/3.0)\n\
+        {\n\
+            // is no cubeMap zone.\n\
+        }\n\
+    }\n\
+\n\
+    return faceIndex;\n\
+}\n\
+\n\
+bool cubeMapNormal(in vec2 texCoord, inout vec3 normal)\n\
+{\n\
+    int faceIdx = faceIndex(texCoord);\n\
+\n\
+    if(faceIdx == -1)\n\
+    {\n\
+        return false;\n\
+    }\n\
+\n\
+    bool isCubeMapZone = true;\n\
+\n\
+    // convert range 0 to 1 to -1 to 1\n\
+    float uc = 2.0 * texCoord.x - 1.0;\n\
+    float vc = 2.0 * texCoord.y - 1.0;\n\
+    float x, y, z;\n\
+\n\
+    if(faceIdx == 0)\n\
+    { \n\
+        x =  1.0; \n\
+        y =   vc; \n\
+        z =  -uc; // POSITIVE X\n\
+    }\n\
+    else if(faceIdx == 1)\n\
+    {\n\
+        x = -1.0; \n\
+        y =   vc; \n\
+        z =   uc; // NEGATIVE X\n\
+    }\n\
+    else if(faceIdx == 2)\n\
+    {\n\
+        x =   uc; \n\
+        y =  1.0; \n\
+        z =  -vc; // POSITIVE Y\n\
+    }\n\
+    else if(faceIdx == 3)\n\
+    {\n\
+        x =   uc; \n\
+        y = -1.0; \n\
+        z =   vc; // NEGATIVE Y\n\
+    }\n\
+    else if(faceIdx == 4)\n\
+    {\n\
+        x =   uc; \n\
+        y =   vc; \n\
+        z =  1.0; // POSITIVE Z\n\
+    }\n\
+    else if(faceIdx == 5)\n\
+    {\n\
+        x =  -uc; \n\
+        y =   vc; \n\
+        z = -1.0; // NEGATIVE Z\n\
+    }\n\
+    \n\
+    normal = vec3(x, y, z);\n\
+    return isCubeMapZone;\n\
+}\n\
+\n\
+void main()\n\
+{           \n\
+    // Debug.\n\
+    /*\n\
+    if((v_tex_pos.x < 0.006 || v_tex_pos.x > 0.994) || (v_tex_pos.y < 0.006 || v_tex_pos.y > 0.994))\n\
+    {\n\
+        gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n\
+        return;\n\
+    }\n\
+    */\n\
+\n\
+    vec2 texCoord = vec2(1.0 - v_tex_pos.x, 1.0 - v_tex_pos.y); // original.\n\
+    //float u = (v_tex_pos.x - 0.5) * 2.0;\n\
+    //float v = (v_tex_pos.y - 0.5) * 2.0;\n\
+   // vec2 texCoord = vec2(1.0 - u, 1.0 - v);\n\
+    bool is2DTex = true;\n\
+\n\
+    if(uTextureType == 0)\n\
+    {\n\
+        is2DTex = true;\n\
+    }\n\
+    else if(uTextureType == 1)\n\
+    {\n\
+        is2DTex = false;\n\
+    }\n\
+\n\
+    // Take the base color.\n\
+    vec4 textureColor = vec4(1.0,1.0,1.0, 0.0);\n\
+    if(uTextureType == 0)\n\
+    {\n\
+        textureColor = texture2D(texture_0, texCoord);\n\
+    }\n\
+    else if(uTextureType == 1)\n\
+    {\n\
+        vec3 normal3 = vec3(0.0, 1.0, -1.0);\n\
+        if(cubeMapNormal(texCoord, normal3))\n\
+        {\n\
+            textureColor = textureCube(texture_cube, normalize(normal3));\n\
+        }\n\
+        else{\n\
+            textureColor = vec4(1.0, 0.0, 0.0, 1.0);\n\
+        }\n\
+    }\n\
+\n\
+    gl_FragColor = textureColor;\n\
+	\n\
+}";
+ShaderSource.rectangleScreenVS = "precision mediump float;\n\
+\n\
+attribute vec2 a_pos;\n\
+\n\
+varying vec2 v_tex_pos;\n\
+\n\
+void main() {\n\
+    v_tex_pos = a_pos;\n\
+    //vec2 pos = a_pos*0.5;\n\
+    gl_Position = vec4(1.0 - 2.0 * a_pos, 0, 1);\n\
+}";
 ShaderSource.RenderShowDepthFS = "#ifdef GL_ES\n\
 precision highp float;\n\
 #endif\n\
@@ -3776,13 +5338,6 @@ vec3 decodeNormal(in vec3 normal)\n\
 	return normal * 2.0 - 1.0;\n\
 }\n\
 \n\
-//vec4 PackDepth32( in float depth )\n\
-//{\n\
-//    depth *= (16777216.0 - 1.0) / (16777216.0);\n\
-//    vec4 encode = fract( depth * vec4(1.0, 256.0, 256.0*256.0, 16777216.0) );// 256.0*256.0*256.0 = 16777216.0\n\
-//    return vec4( encode.xyz - encode.yzw / 256.0, encode.w ) + 1.0/512.0;\n\
-//}\n\
-\n\
 bool clipVertexByPlane(in vec4 plane, in vec3 point)\n\
 {\n\
 	float dist = plane.x * point.x + plane.y * point.y + plane.z * point.z + plane.w;\n\
@@ -3832,7 +5387,8 @@ void main()\n\
 \n\
 	if(!bUseLogarithmicDepth)\n\
 	{\n\
-		gl_FragData[0] = packDepth(depth); \n\
+		//gl_FragData[0] = packDepth(depth); \n\
+		gl_FragData[0] = vec4(depth, depth, depth, 1.0); \n\
 	}\n\
 \n\
 	float frustumIdx = 1.0;\n\
@@ -3872,7 +5428,7 @@ attribute vec3 normal;\n\
 attribute vec2 texCoord;\n\
 \n\
 uniform mat4 buildingRotMatrix; \n\
-uniform mat4 modelViewMatrix;\n\
+//uniform mat4 modelViewMatrix;\n\
 uniform mat4 modelViewMatrixRelToEye; \n\
 uniform mat4 RefTransfMatrix;\n\
 uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
@@ -3931,7 +5487,6 @@ void main()\n\
     \n\
     //linear depth in camera space (0..far)\n\
 	vec4 orthoPos = modelViewMatrixRelToEye * pos4;\n\
-	//depth = (-orthoPos.z-near)/(far-near); // \"depth\" is a positive value [0.0, 1.0].***\n\
 	depth = (-orthoPos.z)/(far); // the correct value.\n\
 	\n\
 	// Calculate normalCC.***\n\
@@ -3970,12 +5525,16 @@ ShaderSource.ScreenQuadFS = "#ifdef GL_ES\n\
 \n\
 #define M_PI 3.1415926535897932384626433832795\n\
 \n\
-uniform sampler2D depthTex;\n\
-uniform sampler2D shadowMapTex;\n\
-uniform sampler2D shadowMapTex2;\n\
-uniform sampler2D ssaoTex; // channel 5.\n\
-uniform sampler2D normalTex; // channel 6.\n\
-uniform sampler2D silhouetteDepthTex; // channel 7.\n\
+uniform sampler2D depthTex; // 0\n\
+uniform sampler2D normalTex; // 1\n\
+uniform sampler2D albedoTex; // 2\n\
+uniform sampler2D shadowMapTex; // 3\n\
+uniform sampler2D shadowMapTex2; // 4\n\
+uniform sampler2D ssaoTex; // 5\n\
+\n\
+uniform sampler2D diffuseLightTex; // 6\n\
+uniform sampler2D specularLightTex; // 7\n\
+uniform sampler2D silhouetteDepthTex; // channel .\n\
 uniform mat4 modelViewMatrixRelToEyeInv;\n\
 uniform mat4 projectionMatrixInv;\n\
 uniform vec3 encodedCameraPositionMCHigh;\n\
@@ -3986,7 +5545,8 @@ uniform float far; \n\
 uniform float tangentOfHalfFovy;\n\
 uniform float aspectRatio;    \n\
 \n\
-uniform bool bApplyShadow;\n\
+uniform bool bApplyShadow; // sun shadows on cesium terrain.\n\
+uniform bool bApplyMagoShadow;\n\
 uniform bool bSilhouette;\n\
 uniform bool bFxaa;\n\
 uniform bool bApplySsao;\n\
@@ -3994,11 +5554,13 @@ uniform bool bApplySsao;\n\
 uniform mat4 sunMatrix[2]; \n\
 uniform vec3 sunPosHIGH[2];\n\
 uniform vec3 sunPosLOW[2];\n\
+uniform vec3 sunDirWC;\n\
 uniform int sunIdx;\n\
 uniform float screenWidth;    \n\
 uniform float screenHeight;  \n\
 uniform vec2 uNearFarArray[4];\n\
-  \n\
+uniform bool bUseLogarithmicDepth;\n\
+uniform float uFCoef_logDepth;\n\
 \n\
 \n\
 float unpackDepth(vec4 packedDepth)\n\
@@ -4014,20 +5576,6 @@ float unpackDepth(vec4 packedDepth)\n\
 	//}\n\
 	return dot(packedDepth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
 }\n\
-/*\n\
-float unpackDepthMago(const in vec4 rgba_depth)\n\
-{\n\
-    const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);// original.***\n\
-    float depth = dot(rgba_depth, bit_shift);\n\
-    return depth;\n\
-} \n\
-*/\n\
-\n\
-float UnpackDepth32( in vec4 pack )\n\
-{\n\
-	float depth = dot( pack, vec4(1.0, 0.00390625, 0.000015258789, 0.000000059605) );\n\
-    return depth * 1.000000059605;// 1.000000059605 = (16777216.0) / (16777216.0 - 1.0);\n\
-}  \n\
 \n\
 vec4 decodeNormal(in vec4 normal)\n\
 {\n\
@@ -4048,6 +5596,15 @@ vec3 getViewRay(vec2 tc)\n\
 	\n\
     return ray;                      \n\
 } \n\
+\n\
+vec3 getViewRay(vec2 tc, in float relFar)\n\
+{\n\
+	float hfar = 2.0 * tangentOfHalfFovy * relFar;\n\
+    float wfar = hfar * aspectRatio;    \n\
+    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -relFar);    \n\
+	\n\
+    return ray;                      \n\
+}\n\
 \n\
 bool isInShadow(vec4 pointWC, int currSunIdx)\n\
 {\n\
@@ -4078,6 +5635,7 @@ bool isInShadow(vec4 pointWC, int currSunIdx)\n\
 \n\
 	vec3 posRelToLight = vPosRelToLight.xyz / vPosRelToLight.w;\n\
 	float tolerance = 0.9963;\n\
+	tolerance = 0.9967; // test.\n\
 	posRelToLight = posRelToLight * 0.5 + 0.5; // transform to [0,1] range\n\
 	if(posRelToLight.x >= 0.0 && posRelToLight.x <= 1.0)\n\
 	{\n\
@@ -4085,9 +5643,9 @@ bool isInShadow(vec4 pointWC, int currSunIdx)\n\
 		{\n\
 			float depthRelToLight;\n\
 			if(currSunIdx == 0)\n\
-			{depthRelToLight = UnpackDepth32(texture2D(shadowMapTex, posRelToLight.xy));}\n\
+			{depthRelToLight = unpackDepth(texture2D(shadowMapTex, posRelToLight.xy));}\n\
 			else if(currSunIdx == 1)\n\
-			{depthRelToLight = UnpackDepth32(texture2D(shadowMapTex2, posRelToLight.xy));}\n\
+			{depthRelToLight = unpackDepth(texture2D(shadowMapTex2, posRelToLight.xy));}\n\
 			if(posRelToLight.z > depthRelToLight*tolerance )\n\
 			{\n\
 				inShadow = true;\n\
@@ -4097,7 +5655,7 @@ bool isInShadow(vec4 pointWC, int currSunIdx)\n\
 	\n\
 	return inShadow;\n\
 }\n\
-\n\
+/*\n\
 void make_kernel(inout vec4 n[9], vec2 coord)\n\
 {\n\
 	float w = 1.0 / screenWidth;\n\
@@ -4113,6 +5671,7 @@ void make_kernel(inout vec4 n[9], vec2 coord)\n\
 	n[7] = texture2D(depthTex, coord + vec2(0.0, h));\n\
 	n[8] = texture2D(depthTex, coord + vec2(  w, h));\n\
 }\n\
+*/\n\
 \n\
 int getRealFrustumIdx(in int estimatedFrustumIdx, inout int dataType)\n\
 {\n\
@@ -4169,6 +5728,24 @@ vec2 getNearFar_byFrustumIdx(in int frustumIdx)\n\
     }\n\
 \n\
     return nearFar;\n\
+}\n\
+\n\
+float getDepth(vec2 coord)\n\
+{\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		float linearDepth = unpackDepth(texture2D(depthTex, coord.xy));\n\
+		// gl_FragDepthEXT = linearDepth = log2(flogz) * Fcoef_half;\n\
+		// flogz = 1.0 + gl_Position.z*0.0001;\n\
+        float Fcoef_half = uFCoef_logDepth/2.0;\n\
+		float flogzAux = pow(2.0, linearDepth/Fcoef_half);\n\
+		float z = (flogzAux - 1.0);\n\
+		linearDepth = z/(far);\n\
+		return linearDepth;\n\
+	}\n\
+	else{\n\
+		return unpackDepth(texture2D(depthTex, coord.xy));\n\
+	}\n\
 }\n\
 \n\
 void main()\n\
@@ -4241,6 +5818,7 @@ void main()\n\
 	finalColor = vec4(0.2, 0.2, 0.2, 0.8);\n\
 	if(bApplyShadow)\n\
 	{\n\
+		// *** For cesiumTerrain shadows.***\n\
 		// the sun lights count are 2.\n\
 		// 1rst, calculate the pixelPosWC.\n\
 		float z_window  = unpackDepth(texture2D(depthTex, screenPos.xy)); // z_window  is [0.0, 1.0] range depth.\n\
@@ -4273,27 +5851,82 @@ void main()\n\
 		}\n\
 \n\
 		gl_FragColor = vec4(finalColor.rgb*shadow_occlusion, alpha);\n\
-		\n\
+		return;\n\
+	}\n\
+\n\
+	vec4 normal4 = getNormal(screenPos);\n\
+	vec3 normal = normal4.xyz;\n\
+	if(length(normal) < 0.1)\n\
+	discard;\n\
+\n\
+	// check frustumIdx. There are 3 type of frustumsIdx :  0, 1, 2, 3 or 10, 11, 12, 13 or 20, 21, 22, 23.***\n\
+	//if(int(floor(normal4.w * 100.0)) >= 10)\n\
+	//discard;\n\
+	int estimatedFrustumIdx = int(floor(normal4.w * 100.0));\n\
+	int dataType = -1;\n\
+	int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);\n\
+	vec2 nearFar_origin = getNearFar_byFrustumIdx(currFrustumIdx);\n\
+	float currNear_origin = nearFar_origin.x;\n\
+	float currFar_origin = nearFar_origin.y;\n\
+	\n\
+	vec3 ambientColor = vec3(1.0);\n\
+	vec3 directionalLightColor = vec3(0.7, 0.7, 0.7);\n\
+	float directionalLightWeighting = 1.0;\n\
+	if(bApplyMagoShadow)\n\
+	{\n\
+		/*\n\
+		float linearDepth = getDepth(screenPos);\n\
+		// calculate the real pos of origin.\n\
+		float origin_zDist = linearDepth * currFar_origin; // original.\n\
+		vec3 posCC = getViewRay(screenPos, origin_zDist);\n\
+		vec4 posWC = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0) + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 1.0);\n\
+		//------------------------------------------------------------------------------------------------------------------------------\n\
+		// 2nd, calculate the vertex relative to light.***\n\
+		// 1rst, try with the closest sun. sunIdx = 0.\n\
+		bool pointIsinShadow = isInShadow(posWC, 0);\n\
+		if(!pointIsinShadow)\n\
+		{\n\
+			pointIsinShadow = isInShadow(posWC, 1);\n\
+		}\n\
+\n\
+		if(pointIsinShadow)\n\
+		{\n\
+			shadow_occlusion = 0.5;\n\
+			alpha = 0.5;\n\
+		}\n\
+		*/\n\
+\n\
+		// calculate sunDirCC.\n\
+		vec4 sunDirCC = modelViewMatrixRelToEyeInv * vec4(sunDirWC, 1.0);\n\
+		directionalLightWeighting = max(dot(normal, -sunDirCC.xyz), 0.0);\n\
+	}\n\
+	else\n\
+	{\n\
+		ambientColor = vec3(0.8);\n\
+		vec3 lightingDirection = normalize(vec3(0.6, 0.6, 0.6));\n\
+		//vec3 lightingDirection = (modelViewMatrixRelToEyeInv * vec4(0.6, 0.6, 0.6, 1.0)).xyz;\n\
+		directionalLightWeighting = max(dot(normal, lightingDirection), 0.0);\n\
 	}\n\
 	\n\
+	// 1rst, take the albedo.\n\
+	vec4 albedo = texture2D(albedoTex, screenPos);\n\
+	vec4 diffuseLight = texture2D(diffuseLightTex, screenPos);\n\
+\n\
+	vec3 ray = getViewRay(screenPos, 1.0); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
+	float scalarProd = abs(dot(normal, normalize(-ray)));\n\
+\n\
+	\n\
+	vec3 lightWeighting = ambientColor + directionalLightColor * directionalLightWeighting; // original.***\n\
+\n\
+	lightWeighting += diffuseLight.xyz;\n\
+\n\
+	//albedo *= scalarProd;\n\
+	albedo *= vec4(lightWeighting, 1.0);\n\
+\n\
 	if(bApplySsao)\n\
 	{\n\
-		vec4 normal4 = getNormal(screenPos);\n\
-\n\
-		vec3 normal = normal4.xyz;\n\
-		if(length(normal) < 0.1)\n\
-		discard;\n\
-\n\
-		// check frustumIdx. There are 3 type of frustumsIdx :  0, 1, 2, 3 or 10, 11, 12, 13 or 20, 21, 22, 23.***\n\
-		//if(int(floor(normal4.w * 100.0)) >= 10)\n\
-		//discard;\n\
-		int estimatedFrustumIdx = int(floor(normal4.w * 100.0));\n\
-		int dataType = -1;\n\
-		int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);\n\
-		vec2 nearFar_origin = getNearFar_byFrustumIdx(currFrustumIdx);\n\
-		float currNear_origin = nearFar_origin.x;\n\
-		float currFar_origin = nearFar_origin.y;\n\
-\n\
+		// 1rst, calculate the ilumination. todo:\n\
+		// now, apply ssao from ssaoTexture.\n\
 		if(dataType != 0 && dataType != 2)\n\
 		discard;\n\
 \n\
@@ -4319,9 +5952,17 @@ void main()\n\
 		if(occlusion < 0.0)// original.***\n\
 		occlusion = 0.0;// original.***\n\
 \n\
-		gl_FragColor = vec4(0.0, 0.0, 0.0, occlusion);\n\
+		//gl_FragColor = vec4(0.0, 0.0, 0.0, occlusion);\n\
 \n\
-		\n\
+\n\
+		//gl_FragColor = vec4(albedo.r - occlusion, albedo.g - occlusion, albedo.b - occlusion, albedo.a);\n\
+		float occlInv = 1.0 - occlusion;\n\
+		vec4 finalColor = vec4(albedo.r * occlInv, albedo.g * occlInv, albedo.b * occlInv, albedo.a);\n\
+		gl_FragColor = vec4(finalColor);\n\
+\n\
+		//float finalColorLightLevel = finalColor.r + finalColor.g + finalColor.b;\n\
+		//if(finalColorLightLevel < 0.9)\n\
+		//return;\n\
 \n\
 		// Provisionally render Aura by depth.************************************************************\n\
 		/*\n\
@@ -4344,8 +5985,10 @@ void main()\n\
 		}\n\
 		*/\n\
 		// Provisionally render edges here.****************************************************************\n\
+		// EDGES.***\n\
 		if(dataType == 0)\n\
 		{\n\
+			// detect edges by normals.\n\
 			vec3 normal_up = getNormal(vec2(screenPos.x, screenPos.y + pixelSize_y)).xyz;\n\
 			vec3 normal_right = getNormal(vec2(screenPos.x + pixelSize_x, screenPos.y)).xyz;\n\
 			vec3 normal_down = getNormal(vec2(screenPos.x, screenPos.y - pixelSize_y)).xyz;\n\
@@ -4353,25 +5996,144 @@ void main()\n\
 \n\
 			float factor = 0.0;\n\
 			float increF = 0.07 * 2.0;\n\
+			increF = 0.18;\n\
+			float minDot = 0.3;\n\
 \n\
-			if(dot(normal, normal_up) < 0.3)\n\
+			if(dot(normal, normal_up) < minDot)\n\
 			{ factor += increF; }\n\
 \n\
-			if(dot(normal, normal_right) < 0.3)\n\
+			if(dot(normal, normal_right) < minDot)\n\
 			{ factor += increF; }\n\
 \n\
-			if(dot(normal, normal_down) < 0.3)\n\
+			if(dot(normal, normal_down) < minDot)\n\
 			{ factor += increF; }\n\
 \n\
-			if(dot(normal, normal_left) < 0.3)\n\
+			if(dot(normal, normal_left) < minDot)\n\
 			{ factor += increF; }\n\
 \n\
-			if(factor > increF*0.9)\n\
+			float edgeAlpha = factor + occlusion;\n\
+				if(edgeAlpha > 1.0)\n\
+				{\n\
+					edgeAlpha = 1.0;\n\
+				}\n\
+\n\
+			if(factor > increF*0.9*2.0)\n\
 			{\n\
-				gl_FragColor = vec4(0.0, 0.0, 0.0, factor+occlusion);\n\
+				//edgeAlpha = 0.6;\n\
+				vec4 edgeColor = finalColor * 0.2;\n\
+				gl_FragColor = vec4(edgeColor.rgb, edgeAlpha);\n\
+			}\n\
+			else if(factor > increF*0.9)\n\
+			{\n\
+				vec4 albedo_up = texture2D(albedoTex, vec2(screenPos.x, screenPos.y + pixelSize_y));\n\
+				vec4 albedo_right = texture2D(albedoTex, vec2(screenPos.x + pixelSize_x, screenPos.y));\n\
+				vec4 albedo_down = texture2D(albedoTex, vec2(screenPos.x, screenPos.y - pixelSize_y));\n\
+				vec4 albedo_left = texture2D(albedoTex, vec2(screenPos.x - pixelSize_x, screenPos.y));\n\
+\n\
+				vec4 edgeColor_A = mix(albedo_up, albedo_right, 0.5);\n\
+				vec4 edgeColor_B = mix(albedo_down, albedo_left, 0.5);\n\
+				vec4 edgeColor_C = mix(edgeColor_A, edgeColor_B, 0.5);\n\
+				vec4 edgeColor_D = mix(edgeColor_C, albedo, 0.5);\n\
+\n\
+				vec4 edgeColorPrev = vec4(edgeColor_D.r * occlInv, edgeColor_D.g * occlInv, edgeColor_D.b * occlInv, edgeColor_D.a);\n\
+				vec4 edgeColor = edgeColorPrev * 0.4;\n\
+\n\
+				gl_FragColor = vec4(edgeColor.rgb, edgeAlpha);\n\
+\n\
+			}\n\
+			\n\
+		}\n\
+		else if(dataType == 2)\n\
+		{\n\
+			// this is pointCloud data.\n\
+			// Check depth values around the pixel to find a silhouette.\n\
+			float pixelSize_x = 1.0/screenWidth;\n\
+			float pixelSize_y = 1.0/screenHeight;\n\
+			float myLinearDepth = getDepth(screenPos);\n\
+\n\
+			float myDepth = myLinearDepth * currFar_origin;\n\
+\n\
+\n\
+			float radius = 3.0;\n\
+			float occ = 0.0;\n\
+			for(int i=0; i<3; i++)\n\
+			{\n\
+				for(int j=0; j<3; j++)\n\
+				{\n\
+					vec2 texCoord = vec2(screenPos.x + pixelSize_x*float(i-1), screenPos.y + pixelSize_y*float(j-1));\n\
+\n\
+					// calculate current frustum idx.\n\
+					vec4 normal4 = getNormal(texCoord);\n\
+					int estimatedFrustumIdx = int(floor(normal4.w * 100.0));\n\
+					int dataType = -1;\n\
+					int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);\n\
+\n\
+					if(dataType == 1)\n\
+					continue;\n\
+\n\
+					vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);\n\
+					float currNear = nearFar.x;\n\
+					float currFar = nearFar.y;\n\
+					float linearDepth = getDepth(texCoord);\n\
+					float depth = linearDepth * currFar;\n\
+					if(depth > myDepth + radius)\n\
+					{\n\
+						occ += 1.0;\n\
+					}\n\
+				}\n\
+			}\n\
+\n\
+			\n\
+			//for(int i=0; i<4; i++)\n\
+			//{\n\
+			//	for(int j=0; j<4; j++)\n\
+			//	{\n\
+			//		vec2 texCoord = vec2(screenPos.x + pixelSize_x*float(i-2), screenPos.y + pixelSize_y*float(j-2));\n\
+\n\
+			//		// calculate current frustum idx.\n\
+			//		vec4 normal4 = getNormal(texCoord);\n\
+			//		int estimatedFrustumIdx = int(floor(normal4.w * 100.0));\n\
+			//		int dataType = -1;\n\
+			//		int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);\n\
+\n\
+			//		if(dataType == 1)\n\
+			//		continue;\n\
+\n\
+			//		vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);\n\
+			//		float currNear = nearFar.x;\n\
+			//		float currFar = nearFar.y;\n\
+			//		float linearDepth = getDepth(texCoord);\n\
+			//		float depth = linearDepth * currFar;\n\
+			//		if(depth > myDepth + radius)\n\
+			//		{\n\
+			//			occ += 1.0;\n\
+			//		}\n\
+			//	}\n\
+			//}\n\
+\n\
+			if(occ > 0.0)\n\
+			{\n\
+				float alpha = occ/8.0;\n\
+				float distLimit = 150.0;\n\
+				if(myDepth < distLimit)\n\
+				{\n\
+					alpha = smoothstep(1.0, 0.0, myDepth/distLimit);\n\
+				}\n\
+				else{\n\
+					alpha = 0.0;\n\
+				}\n\
+\n\
+				gl_FragColor = vec4(1.0, 1.0, 1.0, alpha);\n\
 				return;\n\
 			}\n\
 		}\n\
+		\n\
+		// TEST DEBUG.***********************************\n\
+		//if(gl_FragColor.r > 0.8 && gl_FragColor.g > 0.8 && gl_FragColor.b > 0.8 )\n\
+		//{\n\
+		//	gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n\
+		//}\n\
+\n\
 		// render edges for points cloud.\n\
 		/*\n\
 		if(dataType == 2)\n\
@@ -4858,7 +6620,6 @@ void main()\n\
     float linearDepth = getDepth(screenPos);\n\
 \n\
     // calculate the real pos of origin.\n\
-    //float origin_zDist = linearDepth * (currFar - currNear) + currNear;\n\
     float origin_zDist = linearDepth * currFar;\n\
     vec3 origin_real = getViewRay(screenPos, origin_zDist);\n\
 \n\
@@ -4888,6 +6649,7 @@ void main()\n\
     discard;\n\
 \n\
     // General data type.*************************************************************************************\n\
+    //if((dataType == 0 || dataType == 2) && bApplySsao) // ssao including pointClouds.\n\
     if(dataType == 0 && bApplySsao)\n\
 	{        \n\
         vec3 origin = origin_real;\n\
@@ -6740,13 +8502,71 @@ ShaderSource.thickLineFS = "precision highp float;\n\
 #extension GL_EXT_frag_depth : enable\n\
 #endif\n\
 \n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
 uniform bool bUseLogarithmicDepth;\n\
+uniform bool bUseMultiRenderTarget;\n\
 varying vec4 vColor;\n\
 varying float flogz;\n\
 varying float Fcoef_half;\n\
 \n\
+vec3 encodeNormal(in vec3 normal)\n\
+{\n\
+	return normal*0.5 + 0.5;\n\
+}\n\
+\n\
+vec3 decodeNormal(in vec3 normal)\n\
+{\n\
+	return normal * 2.0 - 1.0;\n\
+}\n\
+\n\
+vec4 packDepth( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+  return enc;\n\
+}\n\
+\n\
 void main() {\n\
-	gl_FragColor = vColor;\n\
+	gl_FragData[0] = vColor;\n\
+\n\
+	#ifdef USE_MULTI_RENDER_TARGET\n\
+	if(bUseMultiRenderTarget)\n\
+	{\n\
+		gl_FragData[1] = vec4(0.0);\n\
+		gl_FragData[2] = vec4(0.0);\n\
+		gl_FragData[3] = vec4(0.0);\n\
+		/*\n\
+		// TODO:\n\
+		//if(!bUseLogarithmicDepth)\n\
+		//{\n\
+			gl_FragData[1] = packDepth(depth);\n\
+		//}\n\
+\n\
+		// Note: points cloud data has frustumIdx 20 .. 23.********\n\
+		float frustumIdx = 0.1; // realFrustumIdx = 0.1 * 100 = 10. \n\
+		\n\
+		if(uFrustumIdx == 0)\n\
+		frustumIdx = 0.205; // frustumIdx = 20.***\n\
+		else if(uFrustumIdx == 1)\n\
+		frustumIdx = 0.215; // frustumIdx = 21.***\n\
+		else if(uFrustumIdx == 2)\n\
+		frustumIdx = 0.225; // frustumIdx = 22.***\n\
+		else if(uFrustumIdx == 3)\n\
+		frustumIdx = 0.235; // frustumIdx = 23.***\n\
+\n\
+		vec3 normal = encodeNormal(vec3(0.0, 0.0, 1.0));\n\
+		gl_FragData[2] = vec4(normal, frustumIdx); // save normal.***\n\
+\n\
+		// now, albedo.\n\
+		gl_FragData[3] = vColor; \n\
+		*/\n\
+	}\n\
+	#endif\n\
+\n\
 	#ifdef USE_LOGARITHMIC_DEPTH\n\
 	if(bUseLogarithmicDepth)\n\
 	{\n\

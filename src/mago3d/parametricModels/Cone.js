@@ -16,7 +16,7 @@ var Cone = function(radius, height, options)
 	this.radius = 10;
     this.height = 5;
 	this.baseType = 1; // 0= NONE. 1= PLANE. 2= SPHERICAL.
-	this.originPosition;
+	this.originType = 0; // 0= ATBASE, 1= ATVERTEX
 	
 	if (radius !== undefined)
 	{ this.radius = radius; }
@@ -28,21 +28,14 @@ var Cone = function(radius, height, options)
 	this.mesh;
 	this.bbox;
 	
-	/**
-	 * The geographic location of the factory.
-	 * @type {GeoLocationDataManager}
-	 * @default undefined
-	 */
-	this.geoLocDataManager;
-	this.color4;
-	
 	if (options !== undefined)
 	{
 		var color = options.color;
 		if (color)
 		{
-			this.color4 = new Color();
-			this.color4.setRGBA(color.r, color.g, color.b, color.a);
+			this.setOneColor(color.r, color.g, color.b, color.a);
+			//this.color4 = new Color();
+			//this.color4.setRGBA(color.r, color.g, color.b, color.a);
 		}
 		var selectedColor = options.selectedColor;
 		if (selectedColor)
@@ -55,6 +48,12 @@ var Cone = function(radius, height, options)
 		if(baseType)
 		{
 			this.baseType = baseType;
+		}
+
+		var originType = options.originType;
+		if(originType)
+		{
+			this.originType = originType;
 		}
 	}
 };
@@ -120,6 +119,12 @@ Cone.prototype.makeMesh = function()
 	var bIncludeTopCap = false;
 	var mesh = Modeler.getRevolvedMesh(profile2dAux, revolveAngDeg, revolveSegmentsCount, revolveSegment2d, bIncludeBottomCap, bIncludeTopCap, undefined);
 	this.mesh = mesh.getCopySurfaceIndependentMesh(mesh);
+	this.mesh.rotate(90, 1.0, 0.0, 0.0);
+
+	if(this.originType === 1)
+	{
+		this.mesh.translate(0.0, 0.0, -height);
+	}
 	this.objectsArray.push(this.mesh);
 	this.dirty = false;
 };

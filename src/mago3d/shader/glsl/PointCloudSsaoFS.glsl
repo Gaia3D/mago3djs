@@ -25,6 +25,7 @@ uniform float screenHeight;
 uniform vec3 kernel[16];   
 uniform vec4 oneColor4;
 varying vec4 aColor4; // color from attributes
+
 varying vec4 vColor;
 varying float glPointSize;
 
@@ -36,12 +37,14 @@ uniform float externalAlpha;
 
 uniform bool bUseLogarithmicDepth;
 uniform vec2 uNearFarArray[4];
+uniform bool bUseMultiRenderTarget;
+uniform int uFrustumIdx;
 
 varying float flogz;
 varying float Fcoef_half;
 varying float depth;
 
-
+/*
 float unpackDepth(vec4 packedDepth)
 {
 	// See Aras Pranckevičius' post Encoding Floats to RGBA
@@ -117,6 +120,7 @@ vec2 getNearFar_byFrustumIdx(in int frustumIdx)
 
     return nearFar;
 }
+*/
             
 //linear view space depth
 /*
@@ -126,16 +130,37 @@ float getDepth(vec2 coord)
 } 
 */   
 
+vec3 encodeNormal(in vec3 normal)
+{
+	return normal*0.5 + 0.5;
+}
+
+vec3 decodeNormal(in vec3 normal)
+{
+	return normal * 2.0 - 1.0;
+}
+
+vec4 packDepth( float v ) {
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;
+  enc = fract(enc);
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);
+  return enc;
+}
+
 void main()
 {
 	vec2 pt = gl_PointCoord - vec2(0.5);
 	if(pt.x*pt.x+pt.y*pt.y > 0.25)
+	{
 		discard;
+	}
+		
 	
 	float occlusion = 1.0;
 	float lighting = 0.0;
 	bool testBool = false;
 	vec4 colorAux = vec4(1.0, 1.0, 1.0, 1.0);
+	/*
 	bool auxBool = false;
 	//if(bApplySsao)
 	if(auxBool)
@@ -164,13 +189,13 @@ void main()
 		float radiusFog = glPointSize*3.0; // radius in pixels.
 		vec2 screenPosAdjacent;
 
-		/*
-		vec3 sample = origin + rotatedKernel * radius;
-		vec4 offset = projectionMatrix * vec4(sample, 1.0);	
-		vec3 offsetCoord = vec3(offset.xyz);				
-		offsetCoord.xyz /= offset.w;
-		offsetCoord.xyz = offsetCoord.xyz * 0.5 + 0.5; 
-		*/
+		
+		////vec3 sample = origin + rotatedKernel * radius;
+		////vec4 offset = projectionMatrix * vec4(sample, 1.0);	
+		////vec3 offsetCoord = vec3(offset.xyz);				
+		////offsetCoord.xyz /= offset.w;
+		////offsetCoord.xyz = offsetCoord.xyz * 0.5 + 0.5; 
+		
 
 		// calculate the pixelSize in the screenPos.***
 		float h = 2.0 * tangentOfHalfFovy * currFar * linearDepth; // height in meters of the screen in the current pixelDepth
@@ -252,7 +277,7 @@ void main()
 			lighting = 8.0;
 		lighting = lighting / 8.0;
 	}
-	
+	*/
 
 	if(lighting < 0.5)
 	lighting = 0.0;
@@ -273,6 +298,43 @@ void main()
 	//{
 	//	gl_FragData[0] = vec4(1.0, 0.0, 0.0, 1.0); 
 	//}
+	#ifdef USE_MULTI_RENDER_TARGET
+	if(bUseMultiRenderTarget)
+	{
+		//if(!bUseLogarithmicDepth)
+		//{
+			gl_FragData[1] = packDepth(depth);
+		//}
+
+		// Note: points cloud data has frustumIdx 20 .. 23.********
+		float frustumIdx = 0.1; // realFrustumIdx = 0.1 * 100 = 10. 
+		
+		if(uFrustumIdx == 0)
+		frustumIdx = 0.205; // frustumIdx = 20.***
+		else if(uFrustumIdx == 1)
+		frustumIdx = 0.215; // frustumIdx = 21.***
+		else if(uFrustumIdx == 2)
+		frustumIdx = 0.225; // frustumIdx = 22.***
+		else if(uFrustumIdx == 3)
+		frustumIdx = 0.235; // frustumIdx = 23.***
+		/*
+		if(uFrustumIdx == 0)
+		frustumIdx = 0.005;
+		else if(uFrustumIdx == 1)
+		frustumIdx = 0.015;
+		else if(uFrustumIdx == 2)
+		frustumIdx = 0.025;
+		else if(uFrustumIdx == 3)
+		frustumIdx = 0.035;
+		*/
+
+		vec3 normal = encodeNormal(vec3(0.0, 0.0, 1.0));
+		gl_FragData[2] = vec4(normal, frustumIdx); // save normal.***
+
+		// now, albedo.
+		gl_FragData[3] = vColor; 
+	}
+	#endif
 
 	#ifdef USE_LOGARITHMIC_DEPTH
 	if(bUseLogarithmicDepth)

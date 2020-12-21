@@ -4,12 +4,16 @@
 
 #define M_PI 3.1415926535897932384626433832795
 
-uniform sampler2D depthTex;
-uniform sampler2D shadowMapTex;
-uniform sampler2D shadowMapTex2;
-uniform sampler2D ssaoTex; // channel 5.
-uniform sampler2D normalTex; // channel 6.
-uniform sampler2D silhouetteDepthTex; // channel 7.
+uniform sampler2D depthTex; // 0
+uniform sampler2D normalTex; // 1
+uniform sampler2D albedoTex; // 2
+uniform sampler2D shadowMapTex; // 3
+uniform sampler2D shadowMapTex2; // 4
+uniform sampler2D ssaoTex; // 5
+
+uniform sampler2D diffuseLightTex; // 6
+uniform sampler2D specularLightTex; // 7
+uniform sampler2D silhouetteDepthTex; // channel .
 uniform mat4 modelViewMatrixRelToEyeInv;
 uniform mat4 projectionMatrixInv;
 uniform vec3 encodedCameraPositionMCHigh;
@@ -20,7 +24,8 @@ uniform float far;
 uniform float tangentOfHalfFovy;
 uniform float aspectRatio;    
 
-uniform bool bApplyShadow;
+uniform bool bApplyShadow; // sun shadows on cesium terrain.
+uniform bool bApplyMagoShadow;
 uniform bool bSilhouette;
 uniform bool bFxaa;
 uniform bool bApplySsao;
@@ -28,11 +33,13 @@ uniform bool bApplySsao;
 uniform mat4 sunMatrix[2]; 
 uniform vec3 sunPosHIGH[2];
 uniform vec3 sunPosLOW[2];
+uniform vec3 sunDirWC;
 uniform int sunIdx;
 uniform float screenWidth;    
 uniform float screenHeight;  
 uniform vec2 uNearFarArray[4];
-  
+uniform bool bUseLogarithmicDepth;
+uniform float uFCoef_logDepth;
 
 
 float unpackDepth(vec4 packedDepth)
@@ -48,20 +55,6 @@ float unpackDepth(vec4 packedDepth)
 	//}
 	return dot(packedDepth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));
 }
-/*
-float unpackDepthMago(const in vec4 rgba_depth)
-{
-    const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);// original.***
-    float depth = dot(rgba_depth, bit_shift);
-    return depth;
-} 
-*/
-
-float UnpackDepth32( in vec4 pack )
-{
-	float depth = dot( pack, vec4(1.0, 0.00390625, 0.000015258789, 0.000000059605) );
-    return depth * 1.000000059605;// 1.000000059605 = (16777216.0) / (16777216.0 - 1.0);
-}  
 
 vec4 decodeNormal(in vec4 normal)
 {
@@ -82,6 +75,15 @@ vec3 getViewRay(vec2 tc)
 	
     return ray;                      
 } 
+
+vec3 getViewRay(vec2 tc, in float relFar)
+{
+	float hfar = 2.0 * tangentOfHalfFovy * relFar;
+    float wfar = hfar * aspectRatio;    
+    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -relFar);    
+	
+    return ray;                      
+}
 
 bool isInShadow(vec4 pointWC, int currSunIdx)
 {
@@ -112,6 +114,7 @@ bool isInShadow(vec4 pointWC, int currSunIdx)
 
 	vec3 posRelToLight = vPosRelToLight.xyz / vPosRelToLight.w;
 	float tolerance = 0.9963;
+	tolerance = 0.9967; // test.
 	posRelToLight = posRelToLight * 0.5 + 0.5; // transform to [0,1] range
 	if(posRelToLight.x >= 0.0 && posRelToLight.x <= 1.0)
 	{
@@ -119,9 +122,9 @@ bool isInShadow(vec4 pointWC, int currSunIdx)
 		{
 			float depthRelToLight;
 			if(currSunIdx == 0)
-			{depthRelToLight = UnpackDepth32(texture2D(shadowMapTex, posRelToLight.xy));}
+			{depthRelToLight = unpackDepth(texture2D(shadowMapTex, posRelToLight.xy));}
 			else if(currSunIdx == 1)
-			{depthRelToLight = UnpackDepth32(texture2D(shadowMapTex2, posRelToLight.xy));}
+			{depthRelToLight = unpackDepth(texture2D(shadowMapTex2, posRelToLight.xy));}
 			if(posRelToLight.z > depthRelToLight*tolerance )
 			{
 				inShadow = true;
@@ -131,7 +134,7 @@ bool isInShadow(vec4 pointWC, int currSunIdx)
 	
 	return inShadow;
 }
-
+/*
 void make_kernel(inout vec4 n[9], vec2 coord)
 {
 	float w = 1.0 / screenWidth;
@@ -147,6 +150,7 @@ void make_kernel(inout vec4 n[9], vec2 coord)
 	n[7] = texture2D(depthTex, coord + vec2(0.0, h));
 	n[8] = texture2D(depthTex, coord + vec2(  w, h));
 }
+*/
 
 int getRealFrustumIdx(in int estimatedFrustumIdx, inout int dataType)
 {
@@ -203,6 +207,24 @@ vec2 getNearFar_byFrustumIdx(in int frustumIdx)
     }
 
     return nearFar;
+}
+
+float getDepth(vec2 coord)
+{
+	if(bUseLogarithmicDepth)
+	{
+		float linearDepth = unpackDepth(texture2D(depthTex, coord.xy));
+		// gl_FragDepthEXT = linearDepth = log2(flogz) * Fcoef_half;
+		// flogz = 1.0 + gl_Position.z*0.0001;
+        float Fcoef_half = uFCoef_logDepth/2.0;
+		float flogzAux = pow(2.0, linearDepth/Fcoef_half);
+		float z = (flogzAux - 1.0);
+		linearDepth = z/(far);
+		return linearDepth;
+	}
+	else{
+		return unpackDepth(texture2D(depthTex, coord.xy));
+	}
 }
 
 void main()
@@ -275,6 +297,7 @@ void main()
 	finalColor = vec4(0.2, 0.2, 0.2, 0.8);
 	if(bApplyShadow)
 	{
+		// *** For cesiumTerrain shadows.***
 		// the sun lights count are 2.
 		// 1rst, calculate the pixelPosWC.
 		float z_window  = unpackDepth(texture2D(depthTex, screenPos.xy)); // z_window  is [0.0, 1.0] range depth.
@@ -307,27 +330,82 @@ void main()
 		}
 
 		gl_FragColor = vec4(finalColor.rgb*shadow_occlusion, alpha);
-		
+		return;
+	}
+
+	vec4 normal4 = getNormal(screenPos);
+	vec3 normal = normal4.xyz;
+	if(length(normal) < 0.1)
+	discard;
+
+	// check frustumIdx. There are 3 type of frustumsIdx :  0, 1, 2, 3 or 10, 11, 12, 13 or 20, 21, 22, 23.***
+	//if(int(floor(normal4.w * 100.0)) >= 10)
+	//discard;
+	int estimatedFrustumIdx = int(floor(normal4.w * 100.0));
+	int dataType = -1;
+	int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);
+	vec2 nearFar_origin = getNearFar_byFrustumIdx(currFrustumIdx);
+	float currNear_origin = nearFar_origin.x;
+	float currFar_origin = nearFar_origin.y;
+	
+	vec3 ambientColor = vec3(1.0);
+	vec3 directionalLightColor = vec3(0.7, 0.7, 0.7);
+	float directionalLightWeighting = 1.0;
+	if(bApplyMagoShadow)
+	{
+		/*
+		float linearDepth = getDepth(screenPos);
+		// calculate the real pos of origin.
+		float origin_zDist = linearDepth * currFar_origin; // original.
+		vec3 posCC = getViewRay(screenPos, origin_zDist);
+		vec4 posWC = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0) + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 1.0);
+		//------------------------------------------------------------------------------------------------------------------------------
+		// 2nd, calculate the vertex relative to light.***
+		// 1rst, try with the closest sun. sunIdx = 0.
+		bool pointIsinShadow = isInShadow(posWC, 0);
+		if(!pointIsinShadow)
+		{
+			pointIsinShadow = isInShadow(posWC, 1);
+		}
+
+		if(pointIsinShadow)
+		{
+			shadow_occlusion = 0.5;
+			alpha = 0.5;
+		}
+		*/
+
+		// calculate sunDirCC.
+		vec4 sunDirCC = modelViewMatrixRelToEyeInv * vec4(sunDirWC, 1.0);
+		directionalLightWeighting = max(dot(normal, -sunDirCC.xyz), 0.0);
+	}
+	else
+	{
+		ambientColor = vec3(0.8);
+		vec3 lightingDirection = normalize(vec3(0.6, 0.6, 0.6));
+		//vec3 lightingDirection = (modelViewMatrixRelToEyeInv * vec4(0.6, 0.6, 0.6, 1.0)).xyz;
+		directionalLightWeighting = max(dot(normal, lightingDirection), 0.0);
 	}
 	
+	// 1rst, take the albedo.
+	vec4 albedo = texture2D(albedoTex, screenPos);
+	vec4 diffuseLight = texture2D(diffuseLightTex, screenPos);
+
+	vec3 ray = getViewRay(screenPos, 1.0); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
+	float scalarProd = abs(dot(normal, normalize(-ray)));
+
+	
+	vec3 lightWeighting = ambientColor + directionalLightColor * directionalLightWeighting; // original.***
+
+	lightWeighting += diffuseLight.xyz;
+
+	//albedo *= scalarProd;
+	albedo *= vec4(lightWeighting, 1.0);
+
 	if(bApplySsao)
 	{
-		vec4 normal4 = getNormal(screenPos);
-
-		vec3 normal = normal4.xyz;
-		if(length(normal) < 0.1)
-		discard;
-
-		// check frustumIdx. There are 3 type of frustumsIdx :  0, 1, 2, 3 or 10, 11, 12, 13 or 20, 21, 22, 23.***
-		//if(int(floor(normal4.w * 100.0)) >= 10)
-		//discard;
-		int estimatedFrustumIdx = int(floor(normal4.w * 100.0));
-		int dataType = -1;
-		int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);
-		vec2 nearFar_origin = getNearFar_byFrustumIdx(currFrustumIdx);
-		float currNear_origin = nearFar_origin.x;
-		float currFar_origin = nearFar_origin.y;
-
+		// 1rst, calculate the ilumination. todo:
+		// now, apply ssao from ssaoTexture.
 		if(dataType != 0 && dataType != 2)
 		discard;
 
@@ -353,9 +431,17 @@ void main()
 		if(occlusion < 0.0)// original.***
 		occlusion = 0.0;// original.***
 
-		gl_FragColor = vec4(0.0, 0.0, 0.0, occlusion);
+		//gl_FragColor = vec4(0.0, 0.0, 0.0, occlusion);
 
-		
+
+		//gl_FragColor = vec4(albedo.r - occlusion, albedo.g - occlusion, albedo.b - occlusion, albedo.a);
+		float occlInv = 1.0 - occlusion;
+		vec4 finalColor = vec4(albedo.r * occlInv, albedo.g * occlInv, albedo.b * occlInv, albedo.a);
+		gl_FragColor = vec4(finalColor);
+
+		//float finalColorLightLevel = finalColor.r + finalColor.g + finalColor.b;
+		//if(finalColorLightLevel < 0.9)
+		//return;
 
 		// Provisionally render Aura by depth.************************************************************
 		/*
@@ -378,8 +464,10 @@ void main()
 		}
 		*/
 		// Provisionally render edges here.****************************************************************
+		// EDGES.***
 		if(dataType == 0)
 		{
+			// detect edges by normals.
 			vec3 normal_up = getNormal(vec2(screenPos.x, screenPos.y + pixelSize_y)).xyz;
 			vec3 normal_right = getNormal(vec2(screenPos.x + pixelSize_x, screenPos.y)).xyz;
 			vec3 normal_down = getNormal(vec2(screenPos.x, screenPos.y - pixelSize_y)).xyz;
@@ -387,25 +475,144 @@ void main()
 
 			float factor = 0.0;
 			float increF = 0.07 * 2.0;
+			increF = 0.18;
+			float minDot = 0.3;
 
-			if(dot(normal, normal_up) < 0.3)
+			if(dot(normal, normal_up) < minDot)
 			{ factor += increF; }
 
-			if(dot(normal, normal_right) < 0.3)
+			if(dot(normal, normal_right) < minDot)
 			{ factor += increF; }
 
-			if(dot(normal, normal_down) < 0.3)
+			if(dot(normal, normal_down) < minDot)
 			{ factor += increF; }
 
-			if(dot(normal, normal_left) < 0.3)
+			if(dot(normal, normal_left) < minDot)
 			{ factor += increF; }
 
-			if(factor > increF*0.9)
+			float edgeAlpha = factor + occlusion;
+				if(edgeAlpha > 1.0)
+				{
+					edgeAlpha = 1.0;
+				}
+
+			if(factor > increF*0.9*2.0)
 			{
-				gl_FragColor = vec4(0.0, 0.0, 0.0, factor+occlusion);
+				//edgeAlpha = 0.6;
+				vec4 edgeColor = finalColor * 0.2;
+				gl_FragColor = vec4(edgeColor.rgb, edgeAlpha);
+			}
+			else if(factor > increF*0.9)
+			{
+				vec4 albedo_up = texture2D(albedoTex, vec2(screenPos.x, screenPos.y + pixelSize_y));
+				vec4 albedo_right = texture2D(albedoTex, vec2(screenPos.x + pixelSize_x, screenPos.y));
+				vec4 albedo_down = texture2D(albedoTex, vec2(screenPos.x, screenPos.y - pixelSize_y));
+				vec4 albedo_left = texture2D(albedoTex, vec2(screenPos.x - pixelSize_x, screenPos.y));
+
+				vec4 edgeColor_A = mix(albedo_up, albedo_right, 0.5);
+				vec4 edgeColor_B = mix(albedo_down, albedo_left, 0.5);
+				vec4 edgeColor_C = mix(edgeColor_A, edgeColor_B, 0.5);
+				vec4 edgeColor_D = mix(edgeColor_C, albedo, 0.5);
+
+				vec4 edgeColorPrev = vec4(edgeColor_D.r * occlInv, edgeColor_D.g * occlInv, edgeColor_D.b * occlInv, edgeColor_D.a);
+				vec4 edgeColor = edgeColorPrev * 0.4;
+
+				gl_FragColor = vec4(edgeColor.rgb, edgeAlpha);
+
+			}
+			
+		}
+		else if(dataType == 2)
+		{
+			// this is pointCloud data.
+			// Check depth values around the pixel to find a silhouette.
+			float pixelSize_x = 1.0/screenWidth;
+			float pixelSize_y = 1.0/screenHeight;
+			float myLinearDepth = getDepth(screenPos);
+
+			float myDepth = myLinearDepth * currFar_origin;
+
+
+			float radius = 3.0;
+			float occ = 0.0;
+			for(int i=0; i<3; i++)
+			{
+				for(int j=0; j<3; j++)
+				{
+					vec2 texCoord = vec2(screenPos.x + pixelSize_x*float(i-1), screenPos.y + pixelSize_y*float(j-1));
+
+					// calculate current frustum idx.
+					vec4 normal4 = getNormal(texCoord);
+					int estimatedFrustumIdx = int(floor(normal4.w * 100.0));
+					int dataType = -1;
+					int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);
+
+					if(dataType == 1)
+					continue;
+
+					vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);
+					float currNear = nearFar.x;
+					float currFar = nearFar.y;
+					float linearDepth = getDepth(texCoord);
+					float depth = linearDepth * currFar;
+					if(depth > myDepth + radius)
+					{
+						occ += 1.0;
+					}
+				}
+			}
+
+			
+			//for(int i=0; i<4; i++)
+			//{
+			//	for(int j=0; j<4; j++)
+			//	{
+			//		vec2 texCoord = vec2(screenPos.x + pixelSize_x*float(i-2), screenPos.y + pixelSize_y*float(j-2));
+
+			//		// calculate current frustum idx.
+			//		vec4 normal4 = getNormal(texCoord);
+			//		int estimatedFrustumIdx = int(floor(normal4.w * 100.0));
+			//		int dataType = -1;
+			//		int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);
+
+			//		if(dataType == 1)
+			//		continue;
+
+			//		vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);
+			//		float currNear = nearFar.x;
+			//		float currFar = nearFar.y;
+			//		float linearDepth = getDepth(texCoord);
+			//		float depth = linearDepth * currFar;
+			//		if(depth > myDepth + radius)
+			//		{
+			//			occ += 1.0;
+			//		}
+			//	}
+			//}
+
+			if(occ > 0.0)
+			{
+				float alpha = occ/8.0;
+				float distLimit = 150.0;
+				if(myDepth < distLimit)
+				{
+					alpha = smoothstep(1.0, 0.0, myDepth/distLimit);
+				}
+				else{
+					alpha = 0.0;
+				}
+
+				gl_FragColor = vec4(1.0, 1.0, 1.0, alpha);
 				return;
 			}
 		}
+		
+		// TEST DEBUG.***********************************
+		//if(gl_FragColor.r > 0.8 && gl_FragColor.g > 0.8 && gl_FragColor.b > 0.8 )
+		//{
+		//	gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+		//}
+
 		// render edges for points cloud.
 		/*
 		if(dataType == 2)

@@ -126,6 +126,12 @@ Modeler.prototype.addObject = function(object, depth)
 		}
 	}
 
+	// check if the object is a lightSource.
+	if (object instanceof SpotLight)
+	{
+		var hola = 0;
+	}
+
 	this.objectsArray.push(object);
 	
 	var smartTileManager = this.magoManager.smartTileManager;
@@ -965,7 +971,7 @@ Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive
 	{
 		this.magoRectangle.render(magoManager, shader, renderType, glPrimitive, bIsSelected);
 	}
-	//this.__TEST__laser();
+	this.__TEST__laser();
 	//this.__TEST__extrudedLines();
 	//this.__TEST__extrusionBuildings();
 };

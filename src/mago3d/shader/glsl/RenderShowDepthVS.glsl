@@ -3,7 +3,7 @@ attribute vec3 normal;
 attribute vec2 texCoord;
 
 uniform mat4 buildingRotMatrix; 
-uniform mat4 modelViewMatrix;
+//uniform mat4 modelViewMatrix;
 uniform mat4 modelViewMatrixRelToEye; 
 uniform mat4 RefTransfMatrix;
 uniform mat4 ModelViewProjectionMatrixRelToEye;
@@ -62,7 +62,6 @@ void main()
     
     //linear depth in camera space (0..far)
 	vec4 orthoPos = modelViewMatrixRelToEye * pos4;
-	//depth = (-orthoPos.z-near)/(far-near); // "depth" is a positive value [0.0, 1.0].***
 	depth = (-orthoPos.z)/(far); // the correct value.
 	
 	// Calculate normalCC.***

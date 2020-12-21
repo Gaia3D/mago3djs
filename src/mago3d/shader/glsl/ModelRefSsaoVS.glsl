@@ -50,7 +50,6 @@
 	varying float discardFrag;
 	varying float flogz;
 	varying float Fcoef_half;
-	
 
 	
 	void main()
@@ -148,6 +147,7 @@
         gl_Position = ModelViewProjectionMatrixRelToEye * pos4;
 		vec4 orthoPos = modelViewMatrixRelToEye * pos4;
 		vertexPos = orthoPos.xyz;
+
 		if(bUseLogarithmicDepth)
 		{
 			// logarithmic zBuffer:

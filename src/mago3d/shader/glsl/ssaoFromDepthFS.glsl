@@ -325,7 +325,6 @@ void main()
     float linearDepth = getDepth(screenPos);
 
     // calculate the real pos of origin.
-    //float origin_zDist = linearDepth * (currFar - currNear) + currNear;
     float origin_zDist = linearDepth * currFar;
     vec3 origin_real = getViewRay(screenPos, origin_zDist);
 
@@ -355,6 +354,7 @@ void main()
     discard;
 
     // General data type.*************************************************************************************
+    //if((dataType == 0 || dataType == 2) && bApplySsao) // ssao including pointClouds.
     if(dataType == 0 && bApplySsao)
 	{        
         vec3 origin = origin_real;

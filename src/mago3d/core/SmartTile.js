@@ -42,7 +42,8 @@ var SmartTile = function(smartTileName)
 		opaquesArray      : [],
 		transparentsArray : [],
 		excavationsArray  : [],
-		vectorTypeArray   : []
+		vectorTypeArray   : [],
+		lightSourcesArray : []
 	};
 	
 	this.isVisible; // var to manage the frustumCulling and delete buildings if necessary.
@@ -607,6 +608,10 @@ SmartTile.prototype.putObject = function(targetDepth, object, magoManager)
 			{
 				this.nativeObjects.vectorTypeArray.push(object);
 			}
+			else if (object.objectType === MagoRenderable.OBJECT_TYPE.LIGHTSOURCE)
+			{
+				this.nativeObjects.lightSourcesArray.push(object);
+			}
 		}
 		else if (object instanceof GeographicCoord)
 		{
@@ -1071,8 +1076,9 @@ SmartTile.prototype.hasRenderables = function()
 	if (nativeObjects.pointTypeArray && nativeObjects.pointTypeArray.length > 0)
 	{ return true; }
 	
-	//if (this.objectsArray !== undefined && this.objectsArray.length > 0)
-	//{ return true; }
+	// Check lightSources.***
+	if (nativeObjects.lightSourcesArray && nativeObjects.lightSourcesArray.length > 0)
+	{ return true; }
 	
 	return hasObjects;
 };
@@ -1539,9 +1545,9 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 				// read the char value.
 				var charValue = (new Uint8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
 
-				if(dataKey === 'heightReference') {
-					charValue = HeightReference.getValueByOrdinal(charValue);
-				}
+				//if(dataKey === 'heightReference') {
+				//	charValue = HeightReference.getValueByOrdinal(charValue);
+				//}
 
 				// Put the readed data into externInfo.***
 				externInfo[dataKey] = charValue;
@@ -1581,6 +1587,13 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 			}
 			
 			endMark = (new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
+		}
+
+		if(externInfo.heightReference) 
+		{
+			var charValue = externInfo.heightReference;
+			charValue = HeightReference.getValueByOrdinal(charValue);
+			externInfo.heightReference = charValue;
 		}
 
 		if (!attributes.isReference) 

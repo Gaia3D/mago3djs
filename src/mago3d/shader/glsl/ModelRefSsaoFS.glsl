@@ -1,4 +1,3 @@
-
 #ifdef GL_ES
     precision highp float;
 #endif
@@ -7,6 +6,7 @@
 #ifdef USE_LOGARITHMIC_DEPTH
 #extension GL_EXT_frag_depth : enable
 #endif
+
 
 uniform sampler2D depthTex;
 uniform sampler2D noiseTex;  
@@ -84,12 +84,24 @@ varying float currSunIdx;
 varying float flogz;
 varying float Fcoef_half;
 
+vec4 packDepth( float v ) {
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;
+  enc = fract(enc);
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);
+  return enc;
+}
+
 float unpackDepth(const in vec4 rgba_depth)
 {
     const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);// original.***
-    float depth = dot(rgba_depth, bit_shift);
-    return depth;
+    float depthAux = dot(rgba_depth, bit_shift);
+    return depthAux;
 }  
+
+vec3 encodeNormal(in vec3 normal)
+{
+	return normal*0.5 + 0.5;
+}
 
 /*
 // unpack depth used for shadow on screen.***
@@ -355,7 +367,7 @@ bool isPointInsideLimitationConvexPolygon(in vec2 point2d)
 
 
 
-
+/*
 
 vec3 reconstructPosition(vec2 texCoord, float depth)
 {
@@ -447,11 +459,12 @@ bool isEdge()
     } 
 	return false;
 }
+*/
 
 
 void main()
 {
-	//gl_FragColor = vColor4; 
+	//gl_FragData = vColor4; 
 	//return;
 
 	if(clippingType == 2)
@@ -460,7 +473,7 @@ void main()
 		vec2 pointLC = vec2(vertexPosLC.x, vertexPosLC.y);
 		if(!isPointInsideLimitationConvexPolygon(pointLC))
 		{
-			gl_FragColor = limitationInfringedColor4; 
+			gl_FragData[0] = limitationInfringedColor4; 
 			return;
 		}
 	}
@@ -469,7 +482,7 @@ void main()
 		// check limitation heights.***
 		if(vertexPosLC.z < limitationHeights.x || vertexPosLC.z > limitationHeights.y)
 		{
-			gl_FragColor = limitationInfringedColor4; 
+			gl_FragData[0] = limitationInfringedColor4; 
 			return;
 		}
 	}
@@ -479,12 +492,12 @@ void main()
 		vec2 pointLC = vec2(vertexPosLC.x, vertexPosLC.y);
 		if(!isPointInsideLimitationConvexPolygon(pointLC))
 		{
-			gl_FragColor = limitationInfringedColor4; 
+			gl_FragData[0] = limitationInfringedColor4; 
 			return;
 		}
 		if(vertexPosLC.z < limitationHeights.x || vertexPosLC.z > limitationHeights.y)
 		{
-			gl_FragColor = limitationInfringedColor4; 
+			gl_FragData[0] = limitationInfringedColor4; 
 			return;
 		}
 	}
@@ -519,7 +532,7 @@ void main()
 	float scalarProd = 1.0;
 	
 	vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
-	float linearDepth = getDepth(screenPos);   
+	//float linearDepth = getDepth(screenPos);   
 	vec3 ray = getViewRay(screenPos); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
 	scalarProd = abs(dot(normal2, normalize(-ray)));
 	//scalarProd *= scalarProd;
@@ -656,7 +669,9 @@ void main()
 	
 	finalColor *= colorMultiplier;
 	//finalColor = vec4(linearDepth, linearDepth, linearDepth, 1.0); // test to render depth color coded.***
-    gl_FragColor = finalColor; 
+    gl_FragData[0] = finalColor; 
+
+
 
 	#ifdef USE_LOGARITHMIC_DEPTH
 	if(bUseLogarithmicDepth)

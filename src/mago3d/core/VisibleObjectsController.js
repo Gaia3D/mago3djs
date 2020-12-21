@@ -15,6 +15,12 @@ var VisibleObjectsController = function()
 	this.currentVisibles1 = []; 
 	this.currentVisibles2 = []; 
 	this.currentVisibles3 = []; 
+
+	this.currentVisibles0Transparents = []; 
+	this.currentVisibles1Transparents = []; 
+	this.currentVisibles2Transparents = []; 
+	this.currentVisibles3Transparents = []; 
+
 	//use with point cloud
 	this.currentVisiblesAux = [];
 	//use with projectType 10
@@ -24,7 +30,8 @@ var VisibleObjectsController = function()
 		transparentsArray : [],
 		excavationsArray  : [],
 		vectorTypeArray   : [],
-		pointTypeArray    : []
+		pointTypeArray    : [],
+		lightSourcesArray : []
 	};
 	this.currentVisiblesToPrepare = [];
 	
@@ -38,6 +45,12 @@ VisibleObjectsController.prototype.initArrays = function()
 	this.currentVisibles1 = [];
 	this.currentVisibles2 = [];
 	this.currentVisibles3 = [];
+
+	this.currentVisibles0Transparents = []; 
+	this.currentVisibles1Transparents = []; 
+	this.currentVisibles2Transparents = []; 
+	this.currentVisibles3Transparents = []; 
+
 	this.currentVisiblesAux = [];
 	this.currentVisiblesPT10 = [];
 	this.currentVisibleNativeObjects = {
@@ -45,7 +58,8 @@ VisibleObjectsController.prototype.initArrays = function()
 		transparentsArray : [],
 		excavationsArray  : [],
 		vectorTypeArray   : [],
-		pointTypeArray    : []
+		pointTypeArray    : [],
+		lightSourcesArray : []
 	};
 	this.currentVisiblesToPrepare = [];
 	
@@ -61,6 +75,12 @@ VisibleObjectsController.prototype.clear = function()
 	this.currentVisibles1.length = 0;
 	this.currentVisibles2.length = 0;
 	this.currentVisibles3.length = 0;
+
+	this.currentVisibles0Transparents.length = 0; 
+	this.currentVisibles1Transparents.length = 0; 
+	this.currentVisibles2Transparents.length = 0; 
+	this.currentVisibles3Transparents.length = 0; 
+
 	this.currentVisiblesAux.length = 0;
 	this.currentVisiblesPT10.length = 0;
 	this.currentVisibleNativeObjects.opaquesArray.length = 0;
@@ -68,6 +88,7 @@ VisibleObjectsController.prototype.clear = function()
 	this.currentVisibleNativeObjects.excavationsArray.length = 0;
 	this.currentVisibleNativeObjects.vectorTypeArray.length = 0;
 	this.currentVisibleNativeObjects.pointTypeArray.length = 0;
+	this.currentVisibleNativeObjects.lightSourcesArray.length = 0;
 	this.currentVisiblesToPrepare.length = 0;
 	
 	
@@ -103,13 +124,18 @@ VisibleObjectsController.prototype.hasRenderables = function()
 		this.currentVisibles1.length > 0 || 
 		this.currentVisibles2.length > 0 || 
 		this.currentVisibles3.length > 0 || 
+		this.currentVisibles0Transparents.length > 0 || 
+		this.currentVisibles1Transparents.length > 0 || 
+		this.currentVisibles2Transparents.length > 0 || 
+		this.currentVisibles3Transparents.length > 0 || 
 		this.currentVisiblesAux.length > 0 ||
 		this.currentVisiblesPT10.length > 0 ||
 		this.currentVisibleNativeObjects.opaquesArray.length > 0 ||
 		this.currentVisibleNativeObjects.transparentsArray.length > 0 ||
 		this.currentVisibleNativeObjects.excavationsArray.length > 0 ||
 		this.currentVisibleNativeObjects.vectorTypeArray.length > 0||
-		this.currentVisibleNativeObjects.pointTypeArray.length > 0)
+		this.currentVisibleNativeObjects.pointTypeArray.length > 0 ||
+		this.currentVisibleNativeObjects.lightSourcesArray.length > 0)
 	{ return true; }
 	else
 	{ return false; }
@@ -121,6 +147,7 @@ VisibleObjectsController.prototype.hasRenderables = function()
  * @param nodesArray
  * @param node
  */
+/*
 VisibleObjectsController.prototype.putNativeObject = function(object) 
 {
 	// check if the object if opaque or transparent.
@@ -146,6 +173,7 @@ VisibleObjectsController.prototype.putNativeObject = function(object)
 		this.currentVisibleNativeObjects.opaquesArray.push(object);
 	}
 };
+*/
 
 VisibleObjectsController.prototype.getAllNatives = function() 
 {
@@ -158,6 +186,7 @@ VisibleObjectsController.prototype.getAllNatives = function()
 			var nativeArray = nativeObjects[i];
 			for (var j=0, len=nativeArray.length;j<len;j++) 
 			{
+				if (!(nativeArray[j] instanceof SpotLight))
 				result.push(nativeArray[j]);
 			}
 		}

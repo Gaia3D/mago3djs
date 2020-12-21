@@ -59,7 +59,7 @@ void main()
 		vColor = color4;
 	
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;
-	depth = (modelViewMatrixRelToEye * pos).z/far; // original.***
+	depth = -(modelViewMatrixRelToEye * pos).z/far; // original.***
 
 	if(bUseFixPointSize)
 	{

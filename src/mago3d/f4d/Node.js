@@ -818,8 +818,8 @@ Node.prototype.calculateBBoxCenterPositionWorldCoord = function(geoLoc)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @returns {Boolean} applyOcclusionCulling
+ * This function returns the boundingSphere of the node in worldCoord.
+ * @returns {BoundingSphere} resultBoundingSphere
  */
 Node.prototype.getBoundingSphereWC = function(resultBoundingSphere) 
 {
@@ -846,7 +846,7 @@ Node.prototype.getBoundingSphereWC = function(resultBoundingSphere)
 
 /**
  * 어떤 일을 하고 있습니까?
- * @returns {Boolean} applyOcclusionCulling
+ * @returns {Number} dist to camera
  */
 Node.prototype.getDistToCamera = function(cameraPosition, boundingSphere_Aux) 
 {

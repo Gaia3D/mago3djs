@@ -683,6 +683,7 @@ PostFxShader.prototype.createUniformLocals = function(gl, shader, sceneState)
 	shader.bUse1Color_loc = gl.getUniformLocation(shader.program, "bUse1Color");
 	shader.oneColor4_loc = gl.getUniformLocation(shader.program, "oneColor4");
 	shader.bApplySsao_loc = gl.getUniformLocation(shader.program, "bApplySsao");
+	shader.bApplyMagoShadow_loc = gl.getUniformLocation(shader.program, "bApplyMagoShadow");
 	shader.bApplyShadow_loc = gl.getUniformLocation(shader.program, "bApplyShadow");
 	shader.bSilhouette_loc = gl.getUniformLocation(shader.program, "bSilhouette");
 	shader.bFxaa_loc = gl.getUniformLocation(shader.program, "bFxaa");

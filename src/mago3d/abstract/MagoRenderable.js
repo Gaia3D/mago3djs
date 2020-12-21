@@ -58,7 +58,8 @@ MagoRenderable.EVENT_TYPE = {
 MagoRenderable.OBJECT_TYPE = {
 	'MESH'       : 0,
 	'VECTORMESH' : 1,
-	'POINTMESH'  : 2
+	'POINTMESH'  : 2,
+	'LIGHTSOURCE': 3
 };
 Object.defineProperties(MagoRenderable.prototype, {
 	guid: {
@@ -308,6 +309,7 @@ MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPr
 			shaderThickLine.bindUniformGenerals();
 			var gl = magoManager.getGl();
 			gl.uniform1i(shaderThickLine.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
+			gl.uniform1i(shaderThickLine.bUseMultiRenderTarget_loc, magoManager.postFxShadersManager.bUseMultiRenderTarget);
 			gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
 			gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 			gl.disable(gl.CULL_FACE);
@@ -439,6 +441,7 @@ MagoRenderable.prototype.renderAsChild = function(magoManager, shader, renderTyp
 			
 			var gl = magoManager.getGl();
 			gl.uniform1i(shaderThickLine.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
+			gl.uniform1i(shaderThickLine.bUseMultiRenderTarget_loc, magoManager.postFxShadersManager.bUseMultiRenderTarget);
 
 			gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
 			gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
@@ -476,16 +479,14 @@ MagoRenderable.prototype.renderAsChild = function(magoManager, shader, renderTyp
 			}
 			else if (renderType === 1 || renderType === 2)
 			{
-				shaderLocal = magoManager.postFxShadersManager.getShader("pointsCloud"); 
+				shaderLocal = magoManager.postFxShadersManager.getShader("pointsCloudSsao"); 
 			}
 
 			magoManager.postFxShadersManager.useProgram(shaderLocal);
 			
 			shaderLocal.disableVertexAttribArrayAll();
 			shaderLocal.resetLastBuffersBinded();
-
 			shaderLocal.enableVertexAttribArray(shaderLocal.position3_loc);
-			
 			shaderLocal.bindUniformGenerals();
 
 			var geoLocData = this.geoLocDataManager.getCurrentGeoLocationData();
@@ -522,6 +523,8 @@ MagoRenderable.prototype.makeMesh = function(magoManager)
 MagoRenderable.prototype.moved = function() 
 {
 	// do something.
+	// delete boundingSphereWC, etc.
+	var hola = 0;
 };
 
 MagoRenderable.prototype.updateMatrix = function(ownerMatrix) 
@@ -620,6 +623,12 @@ MagoRenderable.prototype.isOpaque = function()
 
 	return this.attributes.opaque;
 };
+
+MagoRenderable.prototype.setObjectType = function(objectType)
+{
+	this.objectType = objectType; 
+};
+
 MagoRenderable.prototype.getGeoLocDataManager = function()
 {
 	return this.geoLocDataManager;
@@ -645,7 +654,7 @@ MagoRenderable.prototype.getBoundingSphereWC = function(resultBSphereWC)
 		var geoLocationData = this.getCurrentGeoLocationData();
 		var positionWC = geoLocationData.position;
 
-		var radiusAprox = 200.0;
+		var radiusAprox = 200.0; // calculate it : TODO.
 		this.boundingSphereWC.setCenterPoint(positionWC.x, positionWC.y, positionWC.z);
 		this.boundingSphereWC.setRadius(radiusAprox);
 	}

@@ -764,6 +764,8 @@ ManagerUtils.calculatePixelLinearDepthV2 = function(gl, pixelX, pixelY, depthTex
 	var texturesMergerFbo = magoManager.texturesManager.texturesMergerFbo;
 	//FBO.bindFramebuffer(gl, texturesMergerFbo, normalTex);
 	texturesMergerFbo.bind();
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, texturesMergerFbo.extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, depthTex, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, texturesMergerFbo.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, normalTex, 0);
 	gl.readPixels(pixelX, magoManager.sceneState.drawingBufferHeight[0] - pixelY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, depthPixels);
 	//var floatDepthPixels = new Float32Array(([depthPixels[0]/256.0, depthPixels[1]/256.0, depthPixels[2]/256.0, depthPixels[3]/256.0]));
 	var floatDepthPixels = new Float32Array(([depthPixels[0]/255.0, depthPixels[1]/255.0, depthPixels[2]/255.0, depthPixels[3]/255.0]));
@@ -779,8 +781,8 @@ ManagerUtils.calculatePixelLinearDepthV2 = function(gl, pixelX, pixelY, depthTex
 	// calculate the frustumIdx of the readed pixel.***
 	var frustumIdx = Math.floor(floatNormalPixels[3]*100);
 
-	// check frustumIdx. There are 2 type of frustumsIdx :  0, 1, 2, 3 or 10, 11, 12, 13.***
-	if(frustumIdx >= 10)
+	// check frustumIdx. There are 2 type of frustumsIdx :  (geometry)0, 1, 2, 3 or (tinTerrain)10, 11, 12, 13 or (pointsCloud)20, 21, 22, 23.***
+	while(frustumIdx >= 10)
 	frustumIdx -= 10;
 
 	// return the fbo to initial setting.***
@@ -946,9 +948,16 @@ ManagerUtils.screenCoordToWorldCoordUseDepthCheck = function(pixelX, pixelY, mag
 	var texturesMergerFbo = magoManager.texturesManager.texturesMergerFbo;
 	var depthTex = texturesMergerFbo.colorBuffer;
 	var normalTex = texturesMergerFbo.colorBuffer1;
+	
 	var resultObject = ManagerUtils.calculatePixelLinearDepthV2(gl, pixelX, pixelY, depthTex, normalTex, magoManager);
 	
-	var depthDetected = (resultObject.frustumIdx < magoManager.numFrustums) ? true : false;
+	//var depthDetected = (resultObject.frustumIdx < magoManager.numFrustums) ? true : false;
+	var depthDetected = true;
+	var normal = new Point3D(resultObject.normal4[0], resultObject.normal4[1], resultObject.normal4[2]);
+	var normalSquaredLength = normal.getSquaredModul();
+	if(normalSquaredLength < 0.5)
+	depthDetected = false;
+
 	if (!depthDetected && magoManager.isCesiumGlobe())
 	{
 		var scene = magoManager.scene;
@@ -990,7 +999,10 @@ ManagerUtils.screenCoordToWorldCoordUseDepthCheck = function(pixelX, pixelY, mag
 		var endGeoCoord = ManagerUtils.pointToGeographicCoord(endWC, undefined);
 		var highPrecisionPositionWC = Camera.intersectPointByLaser(startGeoCoord, endGeoCoord, undefined, undefined, magoManager, undefined) ;
 
-		worldCoordinate = highPrecisionPositionWC;
+		if(highPrecisionPositionWC)
+		{
+			worldCoordinate = highPrecisionPositionWC;
+		}
 	}
 
 	return worldCoordinate; // original.

@@ -802,9 +802,9 @@ MagoWorld.screenToCamCoord = function(mouseX, mouseY, magoManager, resultPointCa
 	if(!currentLinearDepth)
 	{
 		// calculate the linearDepth.***
-		var texturesMergerFbo = magoManager.texturesManager.texturesMergerFbo;
-		var depthTex = texturesMergerFbo.colorBuffer;
-		var normalTex = texturesMergerFbo.colorBuffer1;
+		var texturesMergerFbo = magoManager.texturesManager.texturesMergerFbo; // gBuffer.
+		var depthTex = texturesMergerFbo.colorBuffersArray[0];
+		var normalTex = texturesMergerFbo.colorBuffersArray[1];
 		var resultObject = ManagerUtils.calculatePixelLinearDepthV2(gl, mouseX, mouseY, depthTex, normalTex, magoManager);
 
 		if(resultObject.frustumIdx < magoManager.numFrustums)
@@ -814,30 +814,10 @@ MagoWorld.screenToCamCoord = function(mouseX, mouseY, magoManager, resultPointCa
 			currentFrustumNear = resultObject.near;
 		}
 	}
-	/*
-	for (var i = 0; i < frustumsCount; i++)
-	{
-		var frustumVolume = magoManager.frustumVolumeControl.getFrustumVolumeCulling(i); 
-		var depthFbo = frustumVolume.depthFbo;
-
-		currentLinearDepth = ManagerUtils.calculatePixelLinearDepth(gl, mouseX, mouseY, depthFbo, magoManager);
-		if (currentLinearDepth < 0.996) // maxDepth/255 = 0.99607...
-		{ 
-			currentDepthFbo = depthFbo;
-			var frustum = camera.getFrustum(i);
-			currentFrustumFar = frustum.far[0];
-			currentFrustumNear = frustum.near[0];
-			depthDetected = true;
-			break;
-		}
-	}
-	*/
 	
 	if (!magoManager.isCesiumGlobe())
 	{ currentFrustumNear = 0.0; }
 	
-	//currentFrustumFar = 30000.0; // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
-	//currentDepthFbo = magoManager.depthFboNeo;
 	if(!options)
 		options = {};
 		
