@@ -7327,40 +7327,35 @@ MagoManager.prototype.getObjectIndexFileForData = function(projectId, f4dObject)
 	{
 		for (var i=0, len=f4dObject.length;i<len;i++) 
 		{
-			var attributes = f4dObject[i].attributes || JSON.parse(f4dObject[i].metainfo);
-			if (!attributes.isPhysical) 
-			{
-				throw new Error('f4d member must isPhysical true.'); 
-			}
-			f4dObject[i].groupDataFolder = groupDataFolder;
-			var dataKey = f4dObject[i].data_key || f4dObject[i].dataKey;
-			newDataKeys.push(dataKey);
-			children.push(f4dObject[i]);
+			addChildrend(children, newDataKeys, f4dObject[i]);
 		}
 	}
 	else 
 	{
-		// TODO :
-		var metaInfo = f4dObject.metainfo;
-		if (metaInfo && typeof metaInfo !== 'object')
-		{
-			metaInfo = JSON.parse(metaInfo);
-		}
-			
-		var attributes = f4dObject.attributes || metaInfo;
-		if (!attributes.isPhysical) 
-		{
-			throw new Error('f4d member must isPhysical true.'); 
-		}
-		f4dObject.groupDataFolder = groupDataFolder;
-		var dataKey = f4dObject.data_key || f4dObject.dataKey;
-		newDataKeys.push(dataKey);
-		children.push(f4dObject);
+		addChildrend(children, newDataKeys, f4dObject);
 	}
 	
 	var geometrySubDataPath = groupDataFolder;
 	var fileName = this.readerWriter.geometryDataPath + "/" + geometrySubDataPath + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + this.config.getPolicy().content_cache_version;
 	this.readerWriter.getObjectIndexFileForData(fileName, this, projectId, newDataKeys, f4dObject);
+
+	function addChildrend(childrenArray, dataKeyArray, child) {
+		var metaInfo = child.metainfo;
+		if (metaInfo && typeof metaInfo !== 'object')
+		{
+			metaInfo = JSON.parse(metaInfo);
+		}
+			
+		var attributes = child.attributes || metaInfo;
+		if (!attributes.isPhysical) 
+		{
+			throw new Error('f4d member must isPhysical true.'); 
+		}
+		child.groupDataFolder = groupDataFolder;
+		var dataKey = child.data_key || child.dataKey;
+		dataKeyArray.push(dataKey);
+		childrenArray.push(f4dObject);
+	}
 };
 
 /**
@@ -7408,7 +7403,7 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 		{
 			jasonObject.childrenCnt = jasonObject.children;
 			var metaInfo = jasonObject.metainfo;
-			if (metaInfo && typeof metaInfo !== 'object')
+			if (metaInfo && typeof metaInfo === 'string')
 			{
 				metaInfo = JSON.parse(metaInfo);
 			}
