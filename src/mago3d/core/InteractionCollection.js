@@ -62,7 +62,8 @@ InteractionCollection.prototype = Object.create(Emitter.prototype);
 InteractionCollection.prototype.constructor = InteractionCollection;
 
 InteractionCollection.EVENT_TYPE = {
-	'ADD'     	: 'add'
+	'ADD'     	: 'add',
+	'REMOVE'    : 'remove',
 };
 
 /**
@@ -75,6 +76,25 @@ InteractionCollection.prototype.add = function(interaction)
 {
 	this.array.push(interaction);
 	this.emit(InteractionActiveType.ADD, interaction);
+};
+
+/**
+ * remove interaction.
+ * @param {DrawGeometryInteraction} interaction
+ * 
+ * @fires InteractionCollection#EVENT_TYPE.REMOVE
+ */
+InteractionCollection.prototype.remove = function(interaction) 
+{
+	if(this.manager.defaultSelectInteraction === interaction
+	|| this.manager.defaultTranslateInteraction === interaction) {
+		throw new Error('Not allow delete default interaction.');
+	}
+
+	this.array = this.array.filter(function(i){
+		return i !== interaction;
+	})
+	this.emit(InteractionActiveType.REMOVE, interaction);
 };
 
 /**

@@ -336,8 +336,9 @@ var MagoManager = function(config)
 	this.interactionCollection = new InteractionCollection(this);
 	this.defaultSelectInteraction = new PointSelectInteraction();
 	this.defaultTranslateInteraction = new TranslateInteraction();
-	this.interactionCollection.add(this.defaultSelectInteraction);
 	this.interactionCollection.add(this.defaultTranslateInteraction);
+	this.interactionCollection.add(this.defaultSelectInteraction);
+	
 
 	/**
      * Control collection.

@@ -1265,6 +1265,9 @@ Camera.intersectPointByLaser = function(startGeoCoord, endGeoCoord, laserCam, re
 	if(!resultImpactPointWC)
 	resultImpactPointWC = new Point3D();
 
+	options = options ? options : {};
+
+	var error = defaultValue(options.error, 0.1);
 	var startWC = ManagerUtils.geographicCoordToWorldPoint(startGeoCoord.longitude, startGeoCoord.latitude, startGeoCoord.altitude, undefined);
 	var endWC = ManagerUtils.geographicCoordToWorldPoint(endGeoCoord.longitude, endGeoCoord.latitude, endGeoCoord.altitude, undefined);
 	var dist = startWC.distToPoint(endWC);
@@ -1288,8 +1291,12 @@ Camera.intersectPointByLaser = function(startGeoCoord, endGeoCoord, laserCam, re
 
 	// Now, check if the impactPoint is inside of the segment startGeoCoord-endGeoCoord;
 	var distImpact = startWC.distToPoint(resultImpactPointWC);
-	if(distImpact > dist*1.001)
+	if(distImpact > dist)
 	return undefined;
+
+	if(startWC.distToPoint(resultImpactPointWC) < error || endWC.distToPoint(resultImpactPointWC) < error) {
+		return undefined;
+	}
 
 	return resultImpactPointWC;
 };
@@ -1299,29 +1306,17 @@ Camera.intersectPointByLaser = function(startGeoCoord, endGeoCoord, laserCam, re
  */
 Camera.shootLaser = function(laserCam, resultImpactPointWC, magoManager, options) 
 {
+	options = options ? options : {};
 	var optionsFBO = {
 		bufferWidth : 64,
 		bufferHeight : 64
 	};
 	var camDepthBufferFBO = laserCam.getDepthBufferFBO(magoManager, optionsFBO);
 
-	var nodesArray;
-	var nativesArray;
-	if(options)
-	{
-		if(options.nodesArray)
-		nodesArray = options.nodesArray;
-
-		if(options.nativesArray)
-		nativesArray = options.nativesArray;
-	}
-	else
-	{
-		var allVisibleObjects = magoManager.frustumVolumeControl.getAllVisiblesObjectArrays(); 
-		nodesArray = allVisibleObjects.nodeArray;
-		nativesArray = allVisibleObjects.nativeArray;
-	}
 	var allVisibleObjects = magoManager.frustumVolumeControl.getAllVisiblesObjectArrays(); 
+	var nodesArray = defaultValue(options.nodesArray, allVisibleObjects.nodeArray);
+	var nativesArray = defaultValue(options.nativesArray, allVisibleObjects.nativeArray);
+	
 	var visibleObjectsController = new VisibleObjectsController();
 	visibleObjectsController.currentVisibles0 = nodesArray;
 	visibleObjectsController.currentVisibleNativeObjects.opaquesArray = nativesArray;
