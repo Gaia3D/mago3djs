@@ -1,0 +1,186 @@
+#ifdef GL_ES
+    precision highp float;
+#endif
+
+uniform sampler2D texture_0;  
+uniform samplerCube texture_cube;
+
+uniform int uTextureType;
+
+varying vec2 v_tex_pos;
+
+int faceIndex(in vec2 texCoord)
+{
+    int faceIndex = -1;
+
+    float tx = texCoord.x;
+    float ty = texCoord.y;
+
+    if(tx >= 0.0 && tx < 0.25)
+    {
+        if(ty >= 0.0 && ty < 1.0/3.0)
+        {
+            // is no cubeMap zone.
+        }
+        else if(ty >= 1.0/3.0 && ty < 2.0/3.0)
+        {
+            faceIndex = 1;
+        }
+        else if(ty >= 2.0/3.0)
+        {
+            // is no cubeMap zone.
+        }
+    }
+    else if(tx >= 0.25 && tx < 0.5)
+    {
+        if(ty >= 0.0 && ty < 1.0/3.0)
+        {
+            faceIndex = 3;
+        }
+        else if(ty >= 1.0/3.0 && ty < 2.0/3.0)
+        {
+            faceIndex = 4;
+        }
+        else if(ty >= 2.0/3.0)
+        {
+            faceIndex = 2;
+        }
+    }
+    else if(tx >= 0.5 && tx < 0.75)
+    {
+        if(ty >= 0.0 && ty < 1.0/3.0)
+        {
+            // is no cubeMap zone.
+        }
+        else if(ty >= 1.0/3.0 && ty < 2.0/3.0)
+        {
+            faceIndex = 0;
+        }
+        else if(ty >= 2.0/3.0)
+        {
+            // is no cubeMap zone.
+        }
+    }
+    else if(tx >= 0.75)
+    {
+        if(ty >= 0.0 && ty < 1.0/3.0)
+        {
+            // is no cubeMap zone.
+        }
+        else if(ty >= 1.0/3.0 && ty < 2.0/3.0)
+        {
+            faceIndex = 5;
+        }
+        else if(ty >= 2.0/3.0)
+        {
+            // is no cubeMap zone.
+        }
+    }
+
+    return faceIndex;
+}
+
+bool cubeMapNormal(in vec2 texCoord, inout vec3 normal)
+{
+    int faceIdx = faceIndex(texCoord);
+
+    if(faceIdx == -1)
+    {
+        return false;
+    }
+
+    bool isCubeMapZone = true;
+
+    // convert range 0 to 1 to -1 to 1
+    float uc = 2.0 * texCoord.x - 1.0;
+    float vc = 2.0 * texCoord.y - 1.0;
+    float x, y, z;
+
+    if(faceIdx == 0)
+    { 
+        x =  1.0; 
+        y =   vc; 
+        z =  -uc; // POSITIVE X
+    }
+    else if(faceIdx == 1)
+    {
+        x = -1.0; 
+        y =   vc; 
+        z =   uc; // NEGATIVE X
+    }
+    else if(faceIdx == 2)
+    {
+        x =   uc; 
+        y =  1.0; 
+        z =  -vc; // POSITIVE Y
+    }
+    else if(faceIdx == 3)
+    {
+        x =   uc; 
+        y = -1.0; 
+        z =   vc; // NEGATIVE Y
+    }
+    else if(faceIdx == 4)
+    {
+        x =   uc; 
+        y =   vc; 
+        z =  1.0; // POSITIVE Z
+    }
+    else if(faceIdx == 5)
+    {
+        x =  -uc; 
+        y =   vc; 
+        z = -1.0; // NEGATIVE Z
+    }
+    
+    normal = vec3(x, y, z);
+    return isCubeMapZone;
+}
+
+void main()
+{           
+    // Debug.
+    /*
+    if((v_tex_pos.x < 0.006 || v_tex_pos.x > 0.994) || (v_tex_pos.y < 0.006 || v_tex_pos.y > 0.994))
+    {
+        gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+        return;
+    }
+    */
+
+    vec2 texCoord = vec2(1.0 - v_tex_pos.x, 1.0 - v_tex_pos.y); // original.
+    //float u = (v_tex_pos.x - 0.5) * 2.0;
+    //float v = (v_tex_pos.y - 0.5) * 2.0;
+   // vec2 texCoord = vec2(1.0 - u, 1.0 - v);
+    bool is2DTex = true;
+
+    if(uTextureType == 0)
+    {
+        is2DTex = true;
+    }
+    else if(uTextureType == 1)
+    {
+        is2DTex = false;
+    }
+
+    // Take the base color.
+    vec4 textureColor = vec4(1.0,1.0,1.0, 0.0);
+    if(uTextureType == 0)
+    {
+        textureColor = texture2D(texture_0, texCoord);
+    }
+    else if(uTextureType == 1)
+    {
+        vec3 normal3 = vec3(0.0, 1.0, -1.0);
+        if(cubeMapNormal(texCoord, normal3))
+        {
+            textureColor = textureCube(texture_cube, normalize(normal3));
+        }
+        else{
+            textureColor = vec4(1.0, 0.0, 0.0, 1.0);
+        }
+    }
+
+    gl_FragColor = textureColor;
+	
+}

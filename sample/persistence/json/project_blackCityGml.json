@@ -1,0 +1,33 @@
+{
+"attributes": {
+		"isPhysical": false,
+		"nodeType": "root",
+		"projectType": "3ds",
+		"specularLighting": true
+},
+"children": [
+{
+    "attributes": {
+        "isPhysical": true,
+        "nodeType": "default",
+        "flipYTexCoords": true
+    },
+    "children": [],
+    "data_key": "Modellbahnbruecke-LoD3-V03",
+    "data_name": "Modellbahnbruecke-LoD3-V03",
+    "mapping_type":"origin",
+    "longitude": 126.6130,
+    "latitude": 37.57845,
+    "altitude": 50.000000,
+    "heading": 0.000000,
+    "pitch": 0.000000,
+    "roll": 0.000000
+}
+],
+	"parent": 0,
+	"depth": 1,
+	"view_order": 2,
+	"data_key": "project_blackCityGml",
+	"data_name": "project_blackCityGml",
+    "mapping_type": "origin"
+}
