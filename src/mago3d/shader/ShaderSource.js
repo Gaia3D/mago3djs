@@ -2624,6 +2624,7 @@ uniform float externalAlpha;\n\
 uniform vec4 colorMultiplier;\n\
 uniform bool bUseLogarithmicDepth;\n\
 uniform bool bUseMultiRenderTarget;\n\
+uniform bool bApplyShadows;\n\
 uniform int uFrustumIdx;\n\
 uniform vec2 uNearFarArray[4];\n\
 \n\
@@ -2812,10 +2813,10 @@ void main()\n\
 		int dataType = 0;\n\
 		vec4 normal4;\n\
 		vec3 posCC = getPosCC(screenPos, dataType, normal4);\n\
-		vec3 posWC = (modelViewMatrixRelToEyeInv * vec4(posCC, 1.0)).xyz + encodedCameraPositionMCHigh + encodedCameraPositionMCLow;\n\
+		//vec3 posWC = (modelViewMatrixRelToEyeInv * vec4(posCC, 1.0)).xyz + encodedCameraPositionMCHigh + encodedCameraPositionMCLow;\n\
 		\n\
-		vec3 posLCAux = posWC - vLightPosWC;\n\
-		vec4 posLC = buildingRotMatrixInv * vec4(posLCAux, 1.0);\n\
+		//vec3 posLCAux = posWC - vLightPosWC;\n\
+		//vec4 posLC = buildingRotMatrixInv * vec4(posLCAux, 1.0);\n\
 \n\
 		// If the data is no generalGeomtry or pointsCloud, then discard.\n\
 		if(dataType != 0 && dataType != 2)\n\
@@ -2846,21 +2847,24 @@ void main()\n\
 			discard;\n\
 		}\n\
 \n\
-		// now, check light's depthCubeMap.\n\
-		// 1rst, transform \"lightDirToPointCC\" to \"lightDirToPointWC\".\n\
-		// 2nd, transform \"lightDirToPointWC\" to \"lightDirToPointLC\" ( lightCoord );\n\
-		vec4 lightDirToPointWC = modelViewMatrixRelToEyeInv * vec4(lightDirToPointCC, 1.0);\n\
-		vec3 lightDirToPointWCNormalized = normalize(lightDirToPointWC.xyz);\n\
-		vec4 lightDirToPointLC = buildingRotMatrixInv * vec4(lightDirToPointWCNormalized, 1.0);\n\
-		//vec4 lightDirToPointLC = buildingRotMatrixInv * lightDirToPointWC;\n\
-		vec4 depthCube = textureCube(light_depthCubeMap, normalize(lightDirToPointLC.xyz)); // original.\n\
-\n\
-\n\
-		float depthFromLight = unpackDepth(depthCube)*lightDist;\n\
-\n\
-		if(distToLight > depthFromLight + 0.01)\n\
+		if(bApplyShadows)\n\
 		{\n\
-			discard;\n\
+			// now, check light's depthCubeMap.\n\
+			// 1rst, transform \"lightDirToPointCC\" to \"lightDirToPointWC\".\n\
+			// 2nd, transform \"lightDirToPointWC\" to \"lightDirToPointLC\" ( lightCoord );\n\
+			vec4 lightDirToPointWC = modelViewMatrixRelToEyeInv * vec4(lightDirToPointCC, 1.0);\n\
+			vec3 lightDirToPointWCNormalized = normalize(lightDirToPointWC.xyz);\n\
+			vec4 lightDirToPointLC = buildingRotMatrixInv * vec4(lightDirToPointWCNormalized, 1.0);\n\
+			//vec4 lightDirToPointLC = buildingRotMatrixInv * lightDirToPointWC;\n\
+			vec4 depthCube = textureCube(light_depthCubeMap, normalize(lightDirToPointLC.xyz)); // original.\n\
+\n\
+\n\
+			float depthFromLight = unpackDepth(depthCube)*lightDist;\n\
+\n\
+			if(distToLight > depthFromLight + 0.01)\n\
+			{\n\
+				discard;\n\
+			}\n\
 		}\n\
 		\n\
 		//distToLight /= lightDist;\n\

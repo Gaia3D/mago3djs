@@ -1748,7 +1748,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 			this.specularLightTex = this.lBuffer.colorBuffersArray[1];
 			
 			// Render the lightBuffer.
-			//this.renderer.renderLightDepthCubeMaps(this.lightSourcesArray); // active this code for shadows.
+			this.renderer.renderLightDepthCubeMaps(this.lightSourcesArray); // active this code for shadows.
 			this.renderer.renderLightBuffer(this.lightSourcesArray);
 
 			if (this.isCesiumGlobe())
@@ -6173,6 +6173,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
 	shader.uFrustumIdx_loc = gl.getUniformLocation(shader.program, "uFrustumIdx");
 	shader.bUseMultiRenderTarget_loc = gl.getUniformLocation(shader.program, "bUseMultiRenderTarget");
+	shader.bApplyShadows_loc = gl.getUniformLocation(shader.program, "bApplyShadows");
 	shader.lightDirWC_loc = gl.getUniformLocation(shader.program, "lightDirWC");
 	shader.lightDist_loc = gl.getUniformLocation(shader.program, "lightDist");
 	shader.uNearFarArray_loc = gl.getUniformLocation(shader.program, "uNearFarArray");

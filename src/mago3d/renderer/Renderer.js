@@ -2423,6 +2423,7 @@ Renderer.prototype.renderLightBuffer = function(lightSourcesArray)
 	gl.uniform1i(currentShader.uFrustumIdx_loc, magoManager.currentFrustumIdx);
 	gl.uniform1i(currentShader.bUseMultiRenderTarget_loc, magoManager.postFxShadersManager.bUseMultiRenderTarget);
 	gl.uniform2fv(currentShader.uNearFarArray_loc, magoManager.frustumVolumeControl.nearFarArray);
+	gl.uniform1i(currentShader.bApplyShadows_loc, bApplyShadow);
 
 	//var projectionMatrixInv = sceneState.getProjectionMatrixInv();
 	//gl.uniformMatrix4fv(currentShader.projectionMatrixInv_loc, false, projectionMatrixInv._floatArrays);
