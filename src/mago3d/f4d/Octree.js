@@ -486,64 +486,90 @@ Octree.prototype.prepareSkinData = function(magoManager)
 /**
  * 어떤 일을 하고 있습니까?
  */
-Octree.prototype.prepareModelReferencesListData = function(magoManager) 
+Octree.prototype.prepareModelReferencesListData = function (magoManager) 
 {
-	var neoBuilding = this.neoBuildingOwner;
-		
-	// 1rst check possibles errors.
-	if (neoBuilding === undefined)
-	{ return; }
-	
+	var neoBuilding = this.neoBuildingOwner; // 1rst check possibles errors.
+  
+	if (neoBuilding === undefined) 
+	{
+	  return;
+	}
+  
 	if (this.triPolyhedronsCount === 0) 
-	{ return; }
-	
-	if (this.octree_number_name === undefined)
-	{ return; }
-
-	// Check the version.
+	{
+	  return;
+	}
+  
+	if (this.octree_number_name === undefined) 
+	{
+	  return;
+	} // Check the version.
+  
+  
 	var version = neoBuilding.getHeaderVersion();
+	/*
 	if (version === "0.0.2")
 	{
 		this.prepareModelReferencesListData_v002(magoManager);
 		return;
 	}
-
+	*/
+  
 	var geometryDataPath = magoManager.readerWriter.geometryDataPath;
 	var buildingFolderName = neoBuilding.buildingFileName;
 	var projectFolderName = neoBuilding.projectFolderName;
-	
-	if (this.neoReferencesMotherAndIndices === undefined)
+	var keepDataArrayBuffers = false;
+	var attrib = neoBuilding.attributes;
+  
+	if (attrib !== undefined) 
 	{
-		this.neoReferencesMotherAndIndices = new NeoReferencesMotherAndIndices();
-		this.neoReferencesMotherAndIndices.motherNeoRefsList = neoBuilding.motherNeoReferencesArray;
+	  if (attrib.keepDataArrayBuffers !== undefined && attrib.keepDataArrayBuffers === true) 
+		{
+			keepDataArrayBuffers = true;
+	  }
 	}
-	
-	if (this.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.READY)
+  
+	if (this.neoReferencesMotherAndIndices === undefined) 
 	{
-		if (this.neoReferencesMotherAndIndices.blocksList === undefined)
-		{ this.neoReferencesMotherAndIndices.blocksList = new BlocksList("0.0.1"); }
-
-		var subOctreeNumberName = this.octree_number_name.toString();
-		var references_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/References";
-		var intRef_filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref";
-		magoManager.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, this, magoManager);
+	  this.neoReferencesMotherAndIndices = new NeoReferencesMotherAndIndices();
+	  this.neoReferencesMotherAndIndices.motherNeoRefsList = neoBuilding.motherNeoReferencesArray;
 	}
-	
-	
-	// 4 = parsed.
+  
+	if (this.neoReferencesMotherAndIndices.fileLoadState === CODE.fileLoadState.READY) 
+	{
+	  if (this.neoReferencesMotherAndIndices.blocksList === undefined) 
+		{
+			this.neoReferencesMotherAndIndices.blocksList = new BlocksList("0.0.1");
+	  }
+  
+	  if (keepDataArrayBuffers) 
+		{
+			this.neoReferencesMotherAndIndices.blocksList.keepDataArrayBuffers = keepDataArrayBuffers;
+	  }
+  
+	  var subOctreeNumberName = this.octree_number_name.toString();
+	  var references_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/References";
+	  var intRef_filePath = references_folderPath + "/" + subOctreeNumberName + "_Ref";
+	  magoManager.readerWriter.getNeoReferencesArraybuffer(intRef_filePath, this, magoManager);
+	} // 4 = parsed.
 	// now, check if the blocksList is loaded & parsed.
+  
+  
 	var blocksList = this.neoReferencesMotherAndIndices.blocksList;
-	if (blocksList === undefined)
-	{ return; }
+  
+	if (blocksList === undefined) 
+	{
+	  return;
+	}
+  
 	if (blocksList.fileLoadState === CODE.fileLoadState.READY) 
 	{
-		// must read blocksList.
-		var subOctreeNumberName = this.octree_number_name.toString();
-		var blocks_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/Models";
-		var filePathInServer = blocks_folderPath + "/" + subOctreeNumberName + "_Model";
-		magoManager.readerWriter.getNeoBlocksArraybuffer(filePathInServer, this, magoManager);
+	  // must read blocksList.
+	  var subOctreeNumberName = this.octree_number_name.toString();
+	  var blocks_folderPath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/Models";
+	  var filePathInServer = blocks_folderPath + "/" + subOctreeNumberName + "_Model";
+	  magoManager.readerWriter.getNeoBlocksArraybuffer(filePathInServer, this, magoManager);
 	}
-
 };
 
 /**
@@ -1734,11 +1760,11 @@ Octree.prototype.parseAsimetricVersion = function(arrayBuffer, readerWriter, byt
 	if (this.triPolyhedronsCount > 0)
 	{ this.neoBuildingOwner = neoBuildingOwner; }
 
-	if (version === "0.0.2")
-	{
-		// Read ModelLists partitions count.
-		this.blocksListsPartitionsCount = readerWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
-	}
+	// if (version === "0.0.2")
+	// {
+	// 	// Read ModelLists partitions count.
+	// 	this.blocksListsPartitionsCount = readerWriter.readInt32(arrayBuffer, bytesReaded, bytesReaded+4); bytesReaded += 4;
+	// }
 
 	// 1rst, create the 8 subOctrees.
 	for (var i=0; i<subOctreesCount; i++) 
