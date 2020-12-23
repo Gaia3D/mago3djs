@@ -16,19 +16,13 @@
 uniform sampler2D depthTex;
 uniform sampler2D normalTex;
 uniform samplerCube light_depthCubeMap;
-//uniform sampler2D noiseTex;  
-//uniform sampler2D diffuseTex;
 
-uniform bool textureFlipYAxis;
-uniform mat4 projectionMatrix;
 uniform mat4 projectionMatrixInv;
 uniform mat4 modelViewMatrixRelToEyeInv;
 uniform mat4 buildingRotMatrixInv;
 
-uniform vec3 encodedCameraPositionMCHigh;
-uniform vec3 encodedCameraPositionMCLow;
-uniform float lightDist;
-uniform float uMaxSpotDot;
+// Light parameters.
+uniform float uLightParameters[4]; // 0= lightDist, 1= lightFalloffDist, 2= maxSpotDot, 3= falloffSpotDot.
 
 uniform vec2 noiseScale;
 uniform float near;
@@ -38,23 +32,9 @@ uniform float tangentOfHalfFovy;
 uniform float aspectRatio;    
 uniform float screenWidth;    
 uniform float screenHeight;     
-uniform vec4 oneColor4;
 
 uniform vec3 uLightColorAndBrightness;
 
-
-uniform bool bApplyScpecularLighting;
-uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.
-
-uniform vec3 specularColor;
-uniform vec3 ambientColor;
-  
-
-uniform float ambientReflectionCoef;
-uniform float diffuseReflectionCoef;  
-uniform float specularReflectionCoef; 
-uniform float externalAlpha;
-uniform vec4 colorMultiplier;
 uniform bool bUseLogarithmicDepth;
 uniform bool bUseMultiRenderTarget;
 uniform bool bApplyShadows;
@@ -65,14 +45,7 @@ varying vec3 vLightDirCC;
 varying vec3 vLightPosCC; 
 varying vec3 vLightPosWC;
 
-varying vec3 vNormal;
-varying vec4 vColor4; // color from attributes
-varying vec2 vTexCoord;   
-varying vec3 vLightWeighting;
-varying vec3 diffuseColor;
-varying vec3 vertexPos; // this is the orthoPos.***
-varying vec3 vertexPosLC;
-varying float applySpecLighting;
+varying vec3 vNormal; // delete this.
 
 
 varying float flogz;
@@ -228,6 +201,84 @@ vec3 getPosCC(in vec2 screenPosition, inout int dataType, inout vec4 normal4)
 	return origin_real;
 }
 
+int getFaceIdx(in vec3 normalRelToLight, inout vec2 faceTexCoord, inout vec3 faceDir)
+{
+	int faceIdx = -1;
+
+	// Note: the "faceTexCoord" is 1- to 1 range.
+
+	float x = normalRelToLight.x;
+	float y = normalRelToLight.y;
+	float z = normalRelToLight.z;
+
+	float absX = abs(x);
+	float absY = abs(y);
+	float absZ = abs(normalRelToLight.z);
+
+	bool isXPositive = true;
+	bool isYPositive = true;
+	bool isZPositive = true;
+
+	if(x < 0.0)
+	isXPositive = false;
+
+	if(y < 0.0)
+	isYPositive = false;
+
+	if(z < 0.0)
+	isZPositive = false;
+
+	// xPositive.
+	if(isXPositive && absX >= absY && absX >= absZ)
+	{
+		faceIdx = 0;
+		faceTexCoord = vec2(y, z);
+		faceDir = vec3(1.0, 0.0, 0.0);
+	}
+
+	// xNegative.
+	else if(!isXPositive && absX >= absY && absX >= absZ)
+	{
+		faceIdx = 1;
+		faceTexCoord = vec2(y, z);
+		faceDir = vec3(-1.0, 0.0, 0.0);
+	}
+
+	// yPositive.
+	else if(isYPositive && absY >= absX && absY >= absZ)
+	{
+		faceIdx = 2;
+		faceTexCoord = vec2(x, z);
+		faceDir = vec3(0.0, 1.0, 0.0);
+	}
+
+	// yNegative.
+	else if(!isYPositive && absY >= absX && absY >= absZ)
+	{
+		faceIdx = 3;
+		faceTexCoord = vec2(x, z);
+		faceDir = vec3(0.0, -1.0, 0.0);
+	}
+
+	// zPositive.
+	else if(isZPositive && absZ >= absX && absZ >= absY)
+	{
+		faceIdx = 4;
+		faceTexCoord = vec2(x, y);
+		faceDir = vec3(0.0, 0.0, 1.0);
+	}
+
+	// zNegative.
+	else if(!isZPositive && absZ >= absX && absZ >= absY)
+	{
+		faceIdx = 5;
+		faceTexCoord = vec2(x, y);
+		faceDir = vec3(0.0, 0.0, -1.0);
+	}
+
+	return faceIdx;
+}
+
 
 void main()
 {
@@ -246,23 +297,21 @@ void main()
 		int dataType = 0;
 		vec4 normal4;
 		vec3 posCC = getPosCC(screenPos, dataType, normal4);
-		//vec3 posWC = (modelViewMatrixRelToEyeInv * vec4(posCC, 1.0)).xyz + encodedCameraPositionMCHigh + encodedCameraPositionMCLow;
 		
-		//vec3 posLCAux = posWC - vLightPosWC;
-		//vec4 posLC = buildingRotMatrixInv * vec4(posLCAux, 1.0);
-
 		// If the data is no generalGeomtry or pointsCloud, then discard.
 		if(dataType != 0 && dataType != 2)
 		{
 			discard;
 		}
+		//uLightParameters[4]; // 0= lightDist, 1= lightFalloffDist, 2= maxSpotDot, 3= falloffSpotDot.
 
 		// vector light-point.
 		vec3 vecLightToPointCC = posCC - vLightPosCC;
 		vec3 lightDirToPointCC = normalize(posCC - vLightPosCC);
 		float distToLight = length(vecLightToPointCC);
-		
-		if(distToLight > lightDist)
+
+		float lightFalloffLightDist = uLightParameters[1];
+		if(distToLight > lightFalloffLightDist)
 		{
 			discard;
 		}
@@ -274,8 +323,9 @@ void main()
 			discard;
 		}
 
+		float falloffSpotDot = uLightParameters[3];
 		float spotDot = dot(vLightDirCC, lightDirToPointCC);
-		if(spotDot < uMaxSpotDot)
+		if(spotDot < falloffSpotDot)
 		{
 			discard;
 		}
@@ -288,27 +338,28 @@ void main()
 			vec4 lightDirToPointWC = modelViewMatrixRelToEyeInv * vec4(lightDirToPointCC, 1.0);
 			vec3 lightDirToPointWCNormalized = normalize(lightDirToPointWC.xyz);
 			vec4 lightDirToPointLC = buildingRotMatrixInv * vec4(lightDirToPointWCNormalized, 1.0);
-			//vec4 lightDirToPointLC = buildingRotMatrixInv * lightDirToPointWC;
-			vec4 depthCube = textureCube(light_depthCubeMap, normalize(lightDirToPointLC.xyz)); // original.
+			vec3 lightDirToPointLC_norm = normalize(lightDirToPointLC.xyz);
+			vec4 depthCube = textureCube(light_depthCubeMap, lightDirToPointLC_norm); // original
 
+			float falloffLightDist = uLightParameters[1];
 
-			float depthFromLight = unpackDepth(depthCube)*lightDist;
+			// Now, try to calculate the zone of the our pixel.
+			vec2 faceTexCoord;
+			vec3 faceDir;
+			getFaceIdx(lightDirToPointLC_norm, faceTexCoord, faceDir);
+			float spotDotAux = dot(lightDirToPointLC_norm, faceDir);
+			float depthFromLight = unpackDepth(depthCube)*lightFalloffLightDist/spotDotAux;
 
-			if(distToLight > depthFromLight + 0.01)
+			if(distToLight > depthFromLight+0.01)// + 0.01)
 			{
+				// we are in shadow, so do not lighting.
 				discard;
 			}
 		}
-		
-		//distToLight /= lightDist;
 
 		gl_FragData[0] = vec4(diffuseDot * uLightColorAndBrightness.x * spotDot, 
 							diffuseDot * uLightColorAndBrightness.y * spotDot, 
 							diffuseDot * uLightColorAndBrightness.z * spotDot, 1.0); 
-
-		//gl_FragData[0] = vec4(uLightColorAndBrightness.x, 
-		//					uLightColorAndBrightness.y, 
-		//					uLightColorAndBrightness.z, 1.0); 
 
 		// Specular lighting.
 		gl_FragData[1] = vec4(0.0, 0.0, 0.0, 1.0); // save specular.***

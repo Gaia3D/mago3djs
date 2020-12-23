@@ -23,6 +23,7 @@ var SpotLight = function(options)
 	// omni cubemaps:
 	//https://learnopengl.com/Advanced-Lighting/Shadows/Point-Shadows
 	//https://gamedev.stackexchange.com/questions/75854/omni-directional-light-shadow-mapping-with-cubemaps-in-webgl
+	//https://computergraphics.stackexchange.com/questions/1788/webgl-omnidirectional-shadow-mapping-issue
 
 	// pointLight lighting shaders
 	// http://www.paulallenrenton.com/individual-projects/webgl-deferred-renderer
@@ -30,6 +31,7 @@ var SpotLight = function(options)
 	this.hotspotDeg = 43.0;
 	this.falloffDeg = 45.0;
 	this.distance = 30.0; // 30 meters.
+	this.falloffDistance = 40.0; // 30 meters.
 	if (this.geoLocDataManager === undefined)
 	{ this.geoLocDataManager = new GeoLocationDataManager(); }
 	this.directionLC = new Point3D(0.0, 0.0, -1.0); // this is a constant value.
@@ -49,6 +51,9 @@ var SpotLight = function(options)
 
 		if(options.distance)
 		this.distance = options.distance;
+
+		if(options.falloffDistance)
+		this.falloffDistance = options.falloffDistance;
 	}
 
 	this.setObjectType(MagoRenderable.OBJECT_TYPE.LIGHTSOURCE);
@@ -97,6 +102,26 @@ SpotLight.prototype.getLightDirectionWC = function()
 /**
  * Returns the lightDistance.
  */
+SpotLight.prototype.getLightParameters = function()
+{
+	if(!this.lightParameters)
+	{
+		// "lightParameters" is an array[4].
+		// 0= lightDist, 1= lightFalloffDist, 2= maxSpotDot, 3= falloffSpotDot.
+		this.lightParameters = new Float32Array(4);
+
+		this.lightParameters[0] = this.getLightDistance();
+		this.lightParameters[1] = this.getLightDistance() * 1.3; // provisional.
+		this.lightParameters[2] = this.getMaxSpotDot();
+		this.lightParameters[3] = this.getFalloffSpotDot();
+	}
+
+	return this.lightParameters;
+};
+
+/**
+ * Returns the lightDistance.
+ */
 SpotLight.prototype.getLightDistance = function()
 {
 	return this.distance;
@@ -110,10 +135,24 @@ SpotLight.prototype.getMaxSpotDot = function()
 	if(!this._maxSpotDot)
 	{
 		// calculate the dotProd of lightDir and the max-spotLightDir.
-		this._maxSpotDot = Math.cos(this.falloffDeg * Math.PI/180.0);
+		this._maxSpotDot = Math.cos(this.hotspotDeg * Math.PI/180.0);
 	}
 
 	return this._maxSpotDot;
+};
+
+/**
+ * Returns the lightDistance.
+ */
+SpotLight.prototype.getFalloffSpotDot = function()
+{
+	if(!this._falloffSpotDot)
+	{
+		// calculate the dotProd of lightDir and the max-spotLightDir.
+		this._falloffSpotDot = Math.cos(this.falloffDeg * Math.PI/180.0);
+	}
+
+	return this._falloffSpotDot;
 };
 
 /**
@@ -254,7 +293,6 @@ SpotLight.prototype._createCubeMatrix = function(faceIdx, dirX, dirY, dirZ, upX,
 	camUp.set(upX, upY, upZ);
 	camTarget.set(camPos.x + camDir.x * far, camPos.y + camDir.y * far, camPos.z + camDir.z * far);
 	matAux._floatArrays = Matrix4.lookAt(matAux._floatArrays, [camPos.x, camPos.y, camPos.z], [camTarget.x, camTarget.y, camTarget.z], [camUp.x, camUp.y, camUp.z]);
-	//tMat._floatArrays = glMatrix.mat4.multiply(tMat._floatArrays, matAux._floatArrays, geoLocRotMatrix._floatArrays);
 	tMat._floatArrays = glMatrix.mat4.multiply(tMat._floatArrays, geoLocRotMatrix._floatArrays, matAux._floatArrays);
 	
 	// now, inverse the matrix.
@@ -322,7 +360,7 @@ SpotLight.prototype._createModelViewProjectionMatrixRelToEyes = function()
 
 	if(!this.mvpMatRelToEyeArray)
 	this.mvpMatRelToEyeArray = new Array(6);
-	
+	/*
 	// Positive_X. Face_0.
 	this._createCubeMatrix(0,   1.0, 0.0, 0.0,   0.0, -1.0, 0.0,  projMat, rotMat);
 
@@ -340,220 +378,26 @@ SpotLight.prototype._createModelViewProjectionMatrixRelToEyes = function()
 
 	// Negative_Z. Face_5.
 	this._createCubeMatrix(5,   0.0, 0.0, -1.0,   0.0, -1.0, 0.0,  projMat, rotMat);
+	*/
 	
-	
-	/*
 	// Positive_X. Face_0.
-	this._createCubeMatrix(0,   0.0, 0.0, -1.0,   0.0, -1.0, 0.0,  projMat, rotMat);
+	this._createCubeMatrix(0,   1.0, 0.0, 0.0,   0.0, -1.0, 0.0,  projMat, rotMat);
 
 	// Negative_X. Face_1.
-	this._createCubeMatrix(1,   0.0, 0.0, -1.0,   0.0, -1.0, 0.0,  projMat, rotMat);
+	this._createCubeMatrix(1,   -1.0, 0.0, 0.0,   0.0, -1.0, 0.0,  projMat, rotMat);
 
 	// Positive_Y. Face_2.
-	this._createCubeMatrix(2,   0.0, 0.0, -1.0,   0.0, -1.0, 0.0,  projMat, rotMat);
+	this._createCubeMatrix(3,   0.0, 1.0, 0.0,   0.0, 0.0, 1.0,  projMat, rotMat);
 
 	// Negative_Y. Face_3.
-	this._createCubeMatrix(3,   0.0, 0.0, -1.0,   0.0, -1.0, 0.0,  projMat, rotMat);
+	this._createCubeMatrix(2,   0.0, -1.0, 0.0,   0.0, 0.0, -1.0,  projMat, rotMat);
 
 	// Positive_Z. Face_4.
-	this._createCubeMatrix(4,   0.0, 0.0, -1.0,   0.0, -1.0, 0.0,  projMat, rotMat);
+	this._createCubeMatrix(4,   0.0, 0.0, 1.0,   0.0, -1.0, 0.0,  projMat, rotMat);
 
 	// Negative_Z. Face_5.
 	this._createCubeMatrix(5,   0.0, 0.0, -1.0,   0.0, -1.0, 0.0,  projMat, rotMat);
-	*/
 
-	/*
-	// https://github.com/mrdoob/three.js/blob/r84/src/renderers/webgl/WebGLShadowMap.js#L144-L179
-	// Positive_X. Face_0.
-	this._createCubeMatrix(0,   1.0, 0.0, 0.0,   0.0, 1.0, 0.0,  projMat, rotMat);
-
-	// Negative_X. Face_1.
-	this._createCubeMatrix(1,   -1.0, 0.0, 0.0,   0.0, 1.0, 0.0,  projMat, rotMat);
-
-	// Positive_Y. Face_2.
-	this._createCubeMatrix(2,   0.0, 0.0, 1.0,   0.0, 1.0, 0.0,  projMat, rotMat);
-
-	// Negative_Y. Face_3.
-	this._createCubeMatrix(3,   0.0, 0.0, -1.0,   0.0, 1.0, 0.0,  projMat, rotMat);
-
-	// Positive_Z. Face_4.
-	this._createCubeMatrix(4,   0.0, 1.0, 0.0,   0.0, 0.0, 1.0,  projMat, rotMat);
-
-	// Negative_Z. Face_5.
-	this._createCubeMatrix(5,   0.0, -1.0, 0.0,   0.0, 0.0, -1.0,  projMat, rotMat);
-	*/
-
-	
-	/*
-	// Positive_X. Face_0.
-	this._createCubeMatrix(1,   xAxis.x, xAxis.y, xAxis.z,   xAxis.x, xAxis.y, xAxis.z,  projMat);
-
-	// Negative_X. Face_1.
-	this._createCubeMatrix(0,   -xAxis.x, -xAxis.y, -xAxis.z,   xAxis.x, xAxis.y, xAxis.z,  projMat);
-
-	// Positive_Y. Face_2.
-	this._createCubeMatrix(3,   yAxis.x, yAxis.y, yAxis.z,   zAxis.x, zAxis.y, zAxis.z,  projMat);
-
-	// Negative_Y. Face_3.
-	this._createCubeMatrix(2,   -yAxis.x, -yAxis.y, -yAxis.z,   -zAxis.x, -zAxis.y, -zAxis.z,  projMat);
-
-	// Positive_Z. Face_4.
-	this._createCubeMatrix(5,   -zAxis.x, -zAxis.y, -zAxis.z,   -yAxis.x, -yAxis.y, -yAxis.z,  projMat);
-
-	// Negative_Z. Face_5.
-	this._createCubeMatrix(4,   zAxis.x, zAxis.y, zAxis.z,   -yAxis.x, -yAxis.y, -yAxis.z,  projMat);
-	*/
-	/*
-	// Positive_X. Face_0.
-	this._createCubeMatrix2(0,   rotMat,  projMat);
-
-	// Negative_X. Face_1.
-	this._createCubeMatrix2(1,   rotMat,  projMat);
-
-	// Positive_Y. Face_2.
-	this._createCubeMatrix2(2,   rotMat,  projMat);
-
-	// Negative_Y. Face_3.
-	this._createCubeMatrix2(3,   rotMat,  projMat);
-
-	// Positive_Z. Face_4.
-	this._createCubeMatrix2(4,   rotMat,  projMat);
-
-	// Negative_Z. Face_5.
-	this._createCubeMatrix2(5,   rotMat,  projMat);
-	*/
-};
-
-SpotLight.prototype._createModelViewProjectionMatrixRelToEyes__original = function() 
-{
-	// create the 6 mvpMatrices.
-	var fovyRad = 90 * Math.PI/180;
-	var aspectRatio = 1;
-	var near = 0.1;
-	var far = this.distance;
-	var projMat = new Matrix4();
-	var modelViewMat = new Matrix4();
-	
-	projMat._floatArrays = glMatrix.mat4.perspective(projMat._floatArrays, fovyRad, aspectRatio, near, far);
-	
-	var geoLocDataManager = this.getGeoLocDataManager();
-	var geoLocData = geoLocDataManager.getCurrentGeoLocationData();
-	var geoLocMat = geoLocData.geoLocMatrix;
-
-	// take the lightPosition.
-	var camPos = new Point3D(); // position at the origin (0, 0, 0).
-	var camDir = new Point3D();
-	var camTarget = new Point3D();
-	var camUp = new Point3D();
-
-	// take the axis direction of the geoLocMatrix.
-	var xAxis = geoLocMat.getXAxis();
-	var yAxis = geoLocMat.getYAxis();
-	var zAxis = geoLocMat.getZAxis();
-
-	
-	// gl.TEXTURE_CUBE_MAP_POSITIVE_X = face_0
-	// gl.TEXTURE_CUBE_MAP_NEGATIVE_X = face_1
-	// gl.TEXTURE_CUBE_MAP_POSITIVE_Y = face_2
-	// gl.TEXTURE_CUBE_MAP_NEGATIVE_Y = face_3
-	// gl.TEXTURE_CUBE_MAP_POSITIVE_Z = face_4
-	// gl.TEXTURE_CUBE_MAP_NEGATIVE_Z = face_5
-	//
-	//               +-------------+
-	//               | z  face_2   |
-	//               | ^   (+Y)    |
-	//               | |           |
-	//               | +---> X     |
-	// +-------------+-------------+-------------+-------------+
-	// | y  face_1   | y  face_4   | y  face_0   | y  face_5   |
-	// | ^  (-X)     | ^  (+Z)     | ^   (+X)    | ^  (-Z)     |
-	// | |           | |           | |           | |           |
-	// | +---> -z    | +---> X     | +---> z     | +---> -X    |
-	// +-------------+-------------+-------------+-------------+
-	//               | -z face_3   |
-	//               | ^  (-Y)     |
-	//               | |           |
-	//               | +---> X     |
-	//               +-------------+
-
-
-	// Create modelViewMatrix-relativeToEye of 6 faces.
-	this.mvMatRelToEyeArray = [];
-
-	// Positive_X. Face_0.
-	var mvMat_Positive_X = new Matrix4();
-	camDir.set(xAxis.x, xAxis.y, xAxis.z);
-	camUp.set(yAxis.x, yAxis.y, yAxis.z);
-	camTarget.set(camPos.x + camDir.x * far, camPos.y + camDir.y * far, camPos.z + camDir.z * far);
-	mvMat_Positive_X._floatArrays = Matrix4.lookAt(mvMat_Positive_X._floatArrays, [camPos.x, camPos.y, camPos.z], [camTarget.x, camTarget.y, camTarget.z], [camUp.x, camUp.y, camUp.z]);
-	this.mvMatRelToEyeArray.push(mvMat_Positive_X);
-
-	// Negative_X. Face_1.
-	var mvMat_Negative_X = new Matrix4();
-	camDir.set(-xAxis.x, -xAxis.y, -xAxis.z);
-	camUp.set(yAxis.x, yAxis.y, yAxis.z);
-	camTarget.set(camPos.x + camDir.x * far, camPos.y + camDir.y * far, camPos.z + camDir.z * far);
-	mvMat_Negative_X._floatArrays = Matrix4.lookAt(mvMat_Negative_X._floatArrays, [camPos.x, camPos.y, camPos.z], [camTarget.x, camTarget.y, camTarget.z], [camUp.x, camUp.y, camUp.z]);
-	this.mvMatRelToEyeArray.push(mvMat_Negative_X);
-
-	// Positive_Y. Face_2.
-	var mvMat_Positive_Y = new Matrix4();
-	camDir.set(yAxis.x, yAxis.y, yAxis.z);
-	camUp.set(zAxis.x, zAxis.y, zAxis.z);
-	camTarget.set(camPos.x + camDir.x * far, camPos.y + camDir.y * far, camPos.z + camDir.z * far);
-	mvMat_Positive_Y._floatArrays = Matrix4.lookAt(mvMat_Positive_Y._floatArrays, [camPos.x, camPos.y, camPos.z], [camTarget.x, camTarget.y, camTarget.z], [camUp.x, camUp.y, camUp.z]);
-	this.mvMatRelToEyeArray.push(mvMat_Positive_Y);
-
-	// Negative_Y. Face_3.
-	var mvMat_Negative_Y = new Matrix4();
-	camDir.set(-yAxis.x, -yAxis.y, -yAxis.z);
-	camUp.set(-zAxis.x, -zAxis.y, -zAxis.z);
-	camTarget.set(camPos.x + camDir.x * far, camPos.y + camDir.y * far, camPos.z + camDir.z * far);
-	mvMat_Negative_Y._floatArrays = Matrix4.lookAt(mvMat_Negative_Y._floatArrays, [camPos.x, camPos.y, camPos.z], [camTarget.x, camTarget.y, camTarget.z], [camUp.x, camUp.y, camUp.z]);
-	this.mvMatRelToEyeArray.push(mvMat_Negative_Y);
-
-	// Positive_Z. Face_4. Note: the "Positive_Z" is coincident with "geoLocMat".
-	var mvMat_Positive_Z = new Matrix4();
-	camDir.set(-zAxis.x, -zAxis.y, -zAxis.z);
-	camUp.set(yAxis.x, yAxis.y, yAxis.z);
-	camTarget.set(camPos.x + camDir.x * far, camPos.y + camDir.y * far, camPos.z + camDir.z * far);
-	mvMat_Positive_Z._floatArrays = Matrix4.lookAt(mvMat_Positive_Z._floatArrays, [camPos.x, camPos.y, camPos.z], [camTarget.x, camTarget.y, camTarget.z], [camUp.x, camUp.y, camUp.z]);
-	this.mvMatRelToEyeArray.push(mvMat_Positive_Z);
-
-	// Negative_Z. Face_5.
-	var mvMat_Negative_Z = new Matrix4();
-	camDir.set(zAxis.x, zAxis.y, zAxis.z);
-	camUp.set(yAxis.x, yAxis.y, yAxis.z);
-	camTarget.set(camPos.x + camDir.x * far, camPos.y + camDir.y * far, camPos.z + camDir.z * far);
-	mvMat_Negative_Z._floatArrays = Matrix4.lookAt(mvMat_Negative_Z._floatArrays, [camPos.x, camPos.y, camPos.z], [camTarget.x, camTarget.y, camTarget.z], [camUp.x, camUp.y, camUp.z]);
-	this.mvMatRelToEyeArray.push(mvMat_Negative_Z);
-
-	// Now, multiply the projectionMatrix with the 6 modelViewMatrices.
-	this.mvpMatRelToEyeArray = [];
-
-	var mvpMatRelToEye_positive_X = new Matrix4();
-	mvpMatRelToEye_positive_X._floatArrays = glMatrix.mat4.multiply(mvpMatRelToEye_positive_X._floatArrays, projMat._floatArrays, mvMat_Positive_X._floatArrays);
-	this.mvpMatRelToEyeArray.push(mvpMatRelToEye_positive_X);
-
-	var mvpMatRelToEye_negative_X = new Matrix4();
-	mvpMatRelToEye_negative_X._floatArrays = glMatrix.mat4.multiply(mvpMatRelToEye_negative_X._floatArrays, projMat._floatArrays, mvMat_Negative_X._floatArrays);
-	this.mvpMatRelToEyeArray.push(mvpMatRelToEye_negative_X);
-
-	var mvpMatRelToEye_positive_Y = new Matrix4();
-	mvpMatRelToEye_positive_Y._floatArrays = glMatrix.mat4.multiply(mvpMatRelToEye_positive_Y._floatArrays, projMat._floatArrays, mvMat_Positive_Y._floatArrays);
-	this.mvpMatRelToEyeArray.push(mvpMatRelToEye_positive_Y);
-
-	var mvpMatRelToEye_negative_Y = new Matrix4();
-	mvpMatRelToEye_negative_Y._floatArrays = glMatrix.mat4.multiply(mvpMatRelToEye_negative_Y._floatArrays, projMat._floatArrays, mvMat_Negative_Y._floatArrays);
-	this.mvpMatRelToEyeArray.push(mvpMatRelToEye_negative_Y);
-
-	var mvpMatRelToEye_positive_Z = new Matrix4();
-	mvpMatRelToEye_positive_Z._floatArrays = glMatrix.mat4.multiply(mvpMatRelToEye_positive_Z._floatArrays, projMat._floatArrays, mvMat_Positive_Z._floatArrays);
-	this.mvpMatRelToEyeArray.push(mvpMatRelToEye_positive_Z);
-
-	var mvpMatRelToEye_negative_Z = new Matrix4();
-	mvpMatRelToEye_negative_Z._floatArrays = glMatrix.mat4.multiply(mvpMatRelToEye_negative_Z._floatArrays, projMat._floatArrays, mvMat_Negative_Z._floatArrays);
-	this.mvpMatRelToEyeArray.push(mvpMatRelToEye_negative_Z);
 };
 
 SpotLight.prototype.getModelViewProjectionMatrixRelToEye = function(faceIdx) 
@@ -587,14 +431,28 @@ SpotLight.prototype.bindCubeMapFrameBuffer = function(faceIdx, magoManager)
 	//var mvpMatRelToEye = this.getModelViewProjectionMatrixRelToEye(faceIdx);
 
 	gl.bindFramebuffer(gl.FRAMEBUFFER, cubeMapFbo.framebuffer[faceIdx]);
+
+	gl.bindRenderbuffer(gl.RENDERBUFFER, cubeMapFbo.depthBuffer);
+	gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, cubeMapFbo.width[0], cubeMapFbo.width[0]);
+	gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, cubeMapFbo.depthBuffer);
+	
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_CUBE_MAP_POSITIVE_X + faceIdx, cubeMapFbo.colorBuffer, 0);
 	
 	gl.viewport(0, 0, cubeMapFbo.width[0], cubeMapFbo.width[0]);
 	gl.clearColor(1, 1, 1, 1);
-	//gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	gl.clear(gl.DEPTH_BUFFER_BIT);
+	gl.clearDepth(1.0);
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	//gl.clear(gl.DEPTH_BUFFER_BIT);
 	gl.clearColor(0, 0, 0, 1);
+	
+	// test to calculate the dot product of 45 degree.
+	var point1 = new Point3D(0, 0, -1);
+	point1.unitary();
+	var point2 = new Point3D(-1, -1, -1);
+	point2.unitary();
+	var dotProd = point1.scalarProduct(point2);
 	var hola = 0;
+
 };
 
 SpotLight.prototype.getDepthCubeMapTexture = function(magoManager) 

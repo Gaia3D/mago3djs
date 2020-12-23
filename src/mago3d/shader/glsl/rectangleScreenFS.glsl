@@ -8,6 +8,7 @@ uniform samplerCube texture_cube;
 uniform int uTextureType;
 
 varying vec2 v_tex_pos;
+varying vec3 v_normal; // use for cubeMap.
 
 int faceIndex(in vec2 texCoord)
 {
@@ -137,6 +138,11 @@ bool cubeMapNormal(in vec2 texCoord, inout vec3 normal)
     return isCubeMapZone;
 }
 
+float unpackDepth(const in vec4 rgba_depth)
+{
+	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));
+} 
+
 void main()
 {           
     // Debug.
@@ -149,38 +155,21 @@ void main()
     */
 
     vec2 texCoord = vec2(1.0 - v_tex_pos.x, 1.0 - v_tex_pos.y); // original.
-    //float u = (v_tex_pos.x - 0.5) * 2.0;
-    //float v = (v_tex_pos.y - 0.5) * 2.0;
-   // vec2 texCoord = vec2(1.0 - u, 1.0 - v);
-    bool is2DTex = true;
-
-    if(uTextureType == 0)
-    {
-        is2DTex = true;
-    }
-    else if(uTextureType == 1)
-    {
-        is2DTex = false;
-    }
 
     // Take the base color.
     vec4 textureColor = vec4(1.0,1.0,1.0, 0.0);
     if(uTextureType == 0)
     {
         textureColor = texture2D(texture_0, texCoord);
+        
     }
     else if(uTextureType == 1)
     {
-        vec3 normal3 = vec3(0.0, 1.0, -1.0);
-        if(cubeMapNormal(texCoord, normal3))
-        {
-            textureColor = textureCube(texture_cube, normalize(normal3));
-        }
-        else{
-            textureColor = vec4(1.0, 0.0, 0.0, 1.0);
-        }
+         textureColor = textureCube(texture_cube, v_normal);
+         float linearDepth = unpackDepth(textureColor); // original.
+        textureColor = vec4(linearDepth, linearDepth, linearDepth, 1.0);
     }
-
+    
     gl_FragColor = textureColor;
 	
 }

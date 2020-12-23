@@ -1571,7 +1571,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		this.swapRenderingFase();
 	}
 
-	/*
+	
 	var lightsArray = this.visibleObjControlerNodes.currentVisibleNativeObjects.lightSourcesArray;
 	var lightCount = lightsArray.length;
 	if(lightCount > 0 && sceneState.applyLightsShadows && !this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
@@ -1586,7 +1586,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 			light.doIntersectedObjectsCulling(visiblesArray, nativeVisiblesArray);
 		}
 	}
-	*/
+	
 
 	// 1.2) render selected silhouetteDepth.
 	var selectionManager = this.selectionManager;
@@ -1679,6 +1679,28 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	renderType = 1;
 	this.renderType = 1;
 	this.renderer.renderGeometryBuffer(gl, renderType, this.visibleObjControlerNodes);
+
+	// Render transparents.****************************************************************************************************************
+	if (this.isCesiumGlobe())
+	{
+		scene._context._currentFramebuffer._bind();
+		// unbind mago colorTextures:
+		
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // depthTex.
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // normalTex.
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0); // albedoTex.
+		this.extbuffers.drawBuffersWEBGL([
+			this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
+			this.extbuffers.NONE, // gl_FragData[1]
+			this.extbuffers.NONE, // gl_FragData[2]
+			this.extbuffers.NONE, // gl_FragData[3]
+			]);
+			
+	}
+	renderType = 1;
+	this.renderType = 1;
+	this.renderer.renderGeometryBufferTransparents(gl, renderType, this.visibleObjControlerNodes);
+	// End rendering transparents.----------------------------------------------------------------------------------------------------------
 
 	// check if must render boundingBoxes.
 	if (this.magoPolicy.getShowBoundingBox())
@@ -1781,11 +1803,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		this.renderer.renderScreenQuadSsao(gl);
 		this.renderCluster();
 
-		// Render transparents.
-		renderType = 1;
-		this.renderType = 1;
-		this.renderer.renderGeometryBufferTransparents(gl, renderType, this.visibleObjControlerNodes);
-		// End rendering transparents.
+		
 
 		if (this.selectionManager)
 		{
@@ -1810,13 +1828,15 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		var lightAux;
 		if(lightsArray)
 		{
-			lightAux = lightsArray[0];
+			var lightsCount = lightsArray.length;
+			lightAux = lightsArray[lightsCount - 1];
 		}
 		var options = {
 			lightSource : lightAux
 		};
+		
+		this.renderer.renderScreenRectangle(gl, options); // debug component.
 		*/
-		//this.renderer.renderScreenRectangle(gl, options); // debug component.
 		//-----------------------------------------------------------
 
 	}
@@ -1862,9 +1882,9 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 			
 		//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_Airport";
 		//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_GolfPark_NineBridge1";
-		var windMapFilesFolderPath = geometryDataPath +"/SeoulWind/200907";
+		//var windMapFilesFolderPath = geometryDataPath +"/SeoulWind/200907";
 		//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_HanRaSan";
-		//var windMapFilesFolderPath = geometryDataPath +"/Siheung_wind";
+		var windMapFilesFolderPath = geometryDataPath +"/Siheung_wind";
 		
 		this.weatherStation.test_loadWindData3d(this, windDataFilesNamesArray, windMapFilesFolderPath);
 		//this.TEST__golfPark();
@@ -1875,6 +1895,23 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	
 	if (this.weatherStation)
 	{
+		if (this.isCesiumGlobe())
+			{
+				scene._context._currentFramebuffer._bind();
+				// unbind mago colorTextures:
+				
+				gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // depthTex.
+				gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // normalTex.
+				gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0); // albedoTex.
+				this.extbuffers.drawBuffersWEBGL([
+					this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
+					this.extbuffers.NONE, // gl_FragData[1]
+					this.extbuffers.NONE, // gl_FragData[2]
+					this.extbuffers.NONE, // gl_FragData[3]
+					]);
+					
+			}
+
 		//this.weatherStation.renderWindMultiLayers(this);
 		//this.weatherStation.test_renderWindLayer(this);
 		//this.weatherStation.test_renderTemperatureLayer(this);
@@ -6175,12 +6212,12 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.bUseMultiRenderTarget_loc = gl.getUniformLocation(shader.program, "bUseMultiRenderTarget");
 	shader.bApplyShadows_loc = gl.getUniformLocation(shader.program, "bApplyShadows");
 	shader.lightDirWC_loc = gl.getUniformLocation(shader.program, "lightDirWC");
-	shader.lightDist_loc = gl.getUniformLocation(shader.program, "lightDist");
 	shader.uNearFarArray_loc = gl.getUniformLocation(shader.program, "uNearFarArray");
 	shader.uLightColorAndBrightness_loc = gl.getUniformLocation(shader.program, "uLightColorAndBrightness");
-	shader.uMaxSpotDot_loc = gl.getUniformLocation(shader.program, "uMaxSpotDot");
 	shader.ModelViewProjectionMatrixRelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
 	shader.buildingRotMatrixInv_loc = gl.getUniformLocation(shader.program, "buildingRotMatrixInv");
+
+	shader.uLightParameters_loc = gl.getUniformLocation(shader.program, "uLightParameters");// 0= lightDist, 1= lightFalloffDist, 2= maxSpotDot, 3= falloffSpotDot.
 
 	shader.normalTex_loc = gl.getUniformLocation(shader.program, "normalTex");
 	shader.light_depthCubeMap_loc = gl.getUniformLocation(shader.program, "light_depthCubeMap");
@@ -6587,6 +6624,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	var ssao_fs_source = ShaderSource.rectangleScreenFS;
 	var shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
 	shader.position2_loc = gl.getAttribLocation(shader.program, "a_pos");
+	shader.normal3_loc = gl.getAttribLocation(shader.program, "a_nor");
 	shader.tex_0_loc = gl.getUniformLocation(shader.program, "texture_0");
 	shader.texture_cube_loc = gl.getUniformLocation(shader.program, "texture_cube");
 	shader.uTextureType_loc = gl.getUniformLocation(shader.program, "uTextureType");

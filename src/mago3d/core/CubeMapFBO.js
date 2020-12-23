@@ -130,8 +130,8 @@ CubeMapFBO.prototype.init = function()
 	////gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.width[0], this.width[0], 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
   
 	////gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo);
-	gl.bindRenderbuffer(gl.RENDERBUFFER, this.depthBuffer);
-	////gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, this.width[0], this.height[0]);
+	////gl.bindRenderbuffer(gl.RENDERBUFFER, this.depthBuffer);
+	////gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, this.width[0], this.width[0]);
     ////gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.depthBuffer);
     
     for (var face = 0; face < 6; face++)

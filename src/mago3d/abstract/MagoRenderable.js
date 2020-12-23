@@ -354,7 +354,6 @@ MagoRenderable.prototype.renderAsChild = function(magoManager, shader, renderTyp
 	else if (renderType === 1)
 	{
 		// Color render.***
-		gl.enable(gl.BLEND);
 		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
 		
 		// Check if is selected.***
@@ -408,7 +407,6 @@ MagoRenderable.prototype.renderAsChild = function(magoManager, shader, renderTyp
 		magoManager.selectionManager.setCandidateGeneral(idxKey, this);
 		
 		gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
-		gl.disable(gl.BLEND);
 	}
 
 	if (this.tMat) 
@@ -509,8 +507,6 @@ MagoRenderable.prototype.renderAsChild = function(magoManager, shader, renderTyp
 			object.renderAsChild(magoManager, shader, renderType, glPrimitive, bIsSelected, options, bWireframe);
 		}
 	}
-	
-	gl.disable(gl.BLEND);
 
 	this.dispatchEvent('RENDER_END', magoManager);
 };

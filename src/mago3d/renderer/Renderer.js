@@ -2122,15 +2122,62 @@ Renderer.prototype.renderGeometryStencilShadowMeshes__original = function(gl, re
  */
 Renderer.prototype.renderScreenRectangle = function(gl, options) 
 {
+	var magoManager = this.magoManager;
+	var sceneState = magoManager.sceneState;
+	var screenWidth = sceneState.drawingBufferWidth[0];
+	var screenHeight = sceneState.drawingBufferHeight[0];
+	var aspectRatio = screenWidth / screenHeight;
+
 	if (this.quadBuffer === undefined)
 	{
-		var data = new Float32Array([0, 0,   1, 0,   0, 1,   0, 1,   1, 0,   1,  1]);
-		//var data = new Float32Array([0, 0,   0.5, 0,   0, 0.5,   0, 0.5,   0.5, 0,   0.5,  0.5]);
+
+		//var data = new Float32Array([0, 0,   1, 0,   0, 1,   0, 1,   1, 0,   1,  1]);
+		var data = new Float32Array([0, 0,   0.5, 0,   0, 0.5,   
+									 0, 0.5,   0.5, 0,   0.5, 0.5]);
 		this.quadBuffer = FBO.createBuffer(gl, data);
+
+		// now, create normalBuffer for use with cubeMaps.
+		// zNegative face = 5.
+		var normal_3 = new Point3D(1, -1, -1);
+		normal_3.unitary();
+		var normal_2 = new Point3D(-1, -1, -1);
+		normal_2.unitary();
+		var normal_1 = new Point3D(-1, 1, -1);
+		normal_1.unitary();
+		var normal_0 = new Point3D(1, 1, -1);
+		normal_0.unitary();
+		//--------------------------------------------
+
+		// yPositive face = 2.
+		normal_3 = new Point3D(1, 1, 1);
+		normal_3.unitary();
+		normal_2 = new Point3D(-1, 1, 1);
+		normal_2.unitary();
+		normal_1 = new Point3D(-1, 1, -1);
+		normal_1.unitary();
+		normal_0 = new Point3D(1, 1, -1);
+		normal_0.unitary();
+		//------------------------------------------
+		/*
+		// yNegative face = 3.
+		normal_3 = new Point3D(1, 1, 1);
+		normal_3.unitary();
+		normal_2 = new Point3D(-1, 1, 1);
+		normal_2.unitary();
+		normal_1 = new Point3D(-1, 1, -1);
+		normal_1.unitary();
+		normal_0 = new Point3D(1, 1, -1);
+		normal_0.unitary();
+		*/
+		//------------------------------------------
+
+		var nor = new Float32Array([normal_0.x, normal_0.y, normal_0.z,   normal_1.x, normal_1.y, normal_1.z,   normal_3.x, normal_3.y, normal_3.z,
+									normal_3.x, normal_3.y, normal_3.z,   normal_1.x, normal_1.y, normal_1.z,   normal_2.x, normal_2.y, normal_2.z]);
+		this.normalBuffer = FBO.createBuffer(gl, nor);
 	}
 
 	// use a simple shader.
-	var magoManager = this.magoManager;
+	
 	var postFxShadersManager = magoManager.postFxShadersManager;
 
 	if (postFxShadersManager === undefined)
@@ -2149,6 +2196,9 @@ Renderer.prototype.renderScreenRectangle = function(gl, options)
 
 	gl.enableVertexAttribArray(shader.position2_loc);
 	FBO.bindAttribute(gl, this.quadBuffer, shader.position2_loc, 2);
+
+	gl.enableVertexAttribArray(shader.normal3_loc);
+	FBO.bindAttribute(gl, this.normalBuffer, shader.normal3_loc, 3);
 
 	// If you want to see selectionBuffer.
 	//var texture = magoManager.selectionFbo.colorBuffer; // framebuffer for color selection.***
@@ -2181,7 +2231,7 @@ Renderer.prototype.renderScreenRectangle = function(gl, options)
 
 	if(magoManager.normalTex)
 	{
-		//texture = magoManager.normalTex;
+		texture = magoManager.normalTex;
 	}
 
 	if(magoManager.albedoTex)
@@ -2267,7 +2317,7 @@ Renderer.prototype.renderScreenSpaceObjects = function(gl)
  * This function renders lightBuffer.
  * @param {Array} lightSourcesArray .
  */
-Renderer.prototype.renderLightDepthCubeMaps = function(lightSourcesArray) 
+Renderer.prototype.renderLightDepthCubeMaps = function (lightSourcesArray) 
 {
 	var magoManager = this.magoManager;
 	var lightSourcesCount = lightSourcesArray.length;
@@ -2297,16 +2347,14 @@ Renderer.prototype.renderLightDepthCubeMaps = function(lightSourcesArray)
 	//currentShader.bindUniformGenerals();
 	gl.uniform3fv(currentShader.scaleLC_loc, [1.0, 1.0, 1.0]); // init referencesMatrix.
 	gl.uniform1i(currentShader.bApplySsao_loc, false); // apply ssao.***
+	gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
 
-	// For lighting, must reBind:
-	// modelViewMatrixRelToEye; 
-	// ModelViewProjectionMatrixRelToEye;
-	// normalMatrix4;
-	// encodedCameraPositionMCHigh;
-	// encodedCameraPositionMCLow;
-
-	gl.disable(gl.CULL_FACE);
-	//gl.enable(gl.CULL_FACE);
+	gl.enable(gl.CULL_FACE);
+	gl.enable(gl.DEPTH_TEST);
+	gl.depthRange(0.0, 1.0);
+	//gl.depthFunc(gl.LEQUAL);
+	gl.depthMask(true);
+	gl.disable(gl.BLEND);
 
 	var light;
 	var objects;
@@ -2315,7 +2363,12 @@ Renderer.prototype.renderLightDepthCubeMaps = function(lightSourcesArray)
 	var minSizeToRender = undefined;
 	var refTMatrixIdxKey = 0;
 
-	for(var i=0; i<lightSourcesCount; i++)
+	var options = {
+		bRenderOpaques : true,
+		bRenderTransparents : false
+	};
+
+	for (var i=0; i<lightSourcesCount; i++)
 	{
 		light = lightSourcesArray[i];
 
@@ -2342,6 +2395,7 @@ Renderer.prototype.renderLightDepthCubeMaps = function(lightSourcesArray)
 		// Take the cubeMap of the light.
 		for(var face = 0; face<6; face++)
 		{
+
 			light.bindCubeMapFrameBuffer(face, magoManager);
 			var mvpMatRelToEye = light.getModelViewProjectionMatrixRelToEye(face);
 			var mvMatRelToEye = light.getModelViewMatrixRelToEye(face);
@@ -2351,16 +2405,16 @@ Renderer.prototype.renderLightDepthCubeMaps = function(lightSourcesArray)
 
 			gl.uniformMatrix4fv(currentShader.mvpRelToEyeMatrix_loc, false, mvpMatRelToEye._floatArrays);
 			gl.uniformMatrix4fv(currentShader.mvRelToEyeMatrix_loc, false, mvMatRelToEye._floatArrays);
-			gl.uniform1f(currentShader.frustumFar_loc, light.distance);
+			gl.uniform1f(currentShader.frustumFar_loc, light.falloffDistance);
 			
 			magoManager.swapRenderingFase();
 			this.renderNodes(gl, visibleObjectsControler.currentVisibles0, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 			
 			// native objects.
-			this.renderNativeObjects(gl, currentShader, renderType, visibleObjectsControler);
-
-			light.bCubeMapMade = true;
+			this.renderNativeObjects(gl, currentShader, renderType, visibleObjectsControler, options);
 		}
+
+		light.bCubeMapMade = true;
 	}
 
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -2412,7 +2466,7 @@ Renderer.prototype.renderLightBuffer = function(lightSourcesArray)
 
 	// bind LBuffer shader.
 	var bApplySsao = false;
-	var bApplyShadow = false;
+	var bApplyShadow = sceneState.applyLightsShadows;
 
 	var currentShader = magoManager.postFxShadersManager.getShader("lBuffer"); 
 	magoManager.postFxShadersManager.useProgram(currentShader);
@@ -2481,9 +2535,9 @@ Renderer.prototype.renderLightBuffer = function(lightSourcesArray)
 		
 		// set the light direction WC.
 		gl.uniform3fv(currentShader.lightDirWC_loc, [lightDirWC.x, lightDirWC.y, lightDirWC.z]); //.
-		gl.uniform1f(currentShader.lightDist_loc, lightDist); //.
 		gl.uniform3fv(currentShader.uLightColorAndBrightness_loc, [1.0, 1.0, 1.0]); //.
-		gl.uniform1f(currentShader.uMaxSpotDot_loc, maxSpotDot); //.
+		var lightParams = light.getLightParameters(); //uLightParameters[4]; // 0= lightDist, 1= lightFalloffDist, 2= maxSpotDot, 3= falloffSpotDot.
+		gl.uniform1fv(currentShader.uLightParameters_loc, lightParams);
 
 		gl.activeTexture(gl.TEXTURE2);
 		gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubeMapFbo.colorBuffer);
@@ -2702,7 +2756,7 @@ Renderer.prototype.renderGeometryBuffer = function(gl, renderType, visibleObjCon
 			var refMatrixIdxKey =0; // provisionally set magoManager var here.***
 			
 			// temp test excavation, thickLines, etc.***.
-			magoManager.modeler.render(magoManager, currentShader, renderType);
+			//magoManager.modeler.render(magoManager, currentShader, renderType);
 			// excavation objects.
 			
 			// after render native geometries, set current shader with "modelRefSsao" shader.
@@ -2710,7 +2764,7 @@ Renderer.prototype.renderGeometryBuffer = function(gl, renderType, visibleObjCon
 			currentShader.useProgram();
 			gl.uniform1i(currentShader.clippingType_loc, 0);
 			
-			this.renderExcavationObjects(gl, currentShader, renderType, visibleObjControlerNodes);
+			//this.renderExcavationObjects(gl, currentShader, renderType, visibleObjControlerNodes);
 			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 			
 			gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); 
@@ -2883,17 +2937,9 @@ Renderer.prototype.renderGeometryBufferTransparents = function(gl, renderType, v
 	var renderTexture = false;
 	var selectionManager = magoManager.selectionManager;
 
-	gl.disable(gl.BLEND); // No blend in GBuffer.
+	gl.enable(gl.BLEND); // In this render pass enable blending.
+	gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
 	
-	if (renderType === 0 ) 
-	{
-		// Draw the axis.***
-		if (magoManager.magoPolicy.getShowOrigin() && visibleObjControlerNodes.getAllVisibles().length > 0)
-		{
-			this.renderAxisNodes(visibleObjControlerNodes.getAllVisibles(), renderType);
-		}
-		
-	}
 	if (renderType === 1 )//&& magoManager.currentFrustumIdx === 1) 
 	{
 		var textureAux1x1 = magoManager.texturesStore.getTextureAux1x1();
@@ -2901,24 +2947,6 @@ Renderer.prototype.renderGeometryBufferTransparents = function(gl, renderType, v
 		
 		magoManager.currentProcess = CODE.magoCurrentProcess.ColorRendering;
 		
-		// Set default blending setting.
-		//gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
-		
-		// Test TinTerrain.**************************************************************************
-		// Test TinTerrain.**************************************************************************
-		// render tiles, rendertiles.***
-		
-		if (magoManager.tinTerrainManager !== undefined)
-		{
-			// Atmosphere.*******************************************************************************
-			this.renderAtmosphere(gl, renderType);
-
-			//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-			//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE);
-			var bDepthRender = false; // magoManager is no depth render.***
-			magoManager.tinTerrainManager.render(magoManager, bDepthRender, renderType);
-		}
-
 		var bApplySsao = false;
 		var bApplyShadow = false;
 		if (magoManager.currentFrustumIdx < 2)
@@ -2927,8 +2955,6 @@ Renderer.prototype.renderGeometryBufferTransparents = function(gl, renderType, v
 		if (sceneState.sunSystem !== undefined && sceneState.applySunShadows)
 		{ bApplyShadow = true; }
 
-	
-		
 		// check changesHistory.
 		magoManager.checkChangesHistoryMovements(visibleObjControlerNodes.currentVisibles0);
 		magoManager.checkChangesHistoryColors(visibleObjControlerNodes.currentVisibles0);
@@ -2943,7 +2969,7 @@ Renderer.prototype.renderGeometryBufferTransparents = function(gl, renderType, v
 		var visibleObjectControllerHasRenderables = visibleObjControlerNodes.hasRenderables();
 		if (visibleObjectControllerHasRenderables || magoManager.modeler !== undefined)
 		{
-			currentShader = magoManager.postFxShadersManager.getShader("gBuffer"); 
+			currentShader = magoManager.postFxShadersManager.getShader("modelRefSsao"); 
 			magoManager.postFxShadersManager.useProgram(currentShader);
 			magoManager.effectsManager.setCurrentShader(currentShader);
 			gl.uniform1i(currentShader.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
@@ -3047,12 +3073,7 @@ Renderer.prototype.renderGeometryBufferTransparents = function(gl, renderType, v
 				gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
 			}
 
-			/*
-			if (MagoConfig.getPolicy().geo_cull_face_enable === "true") 
-			{ gl.enable(gl.CULL_FACE); }
-			else 
-			{ gl.disable(gl.CULL_FACE); }
-			*/
+
 			gl.enable(gl.CULL_FACE);
 			var refTMatrixIdxKey = 0;
 			var minSizeToRender = 0.0;
@@ -3064,7 +3085,7 @@ Renderer.prototype.renderGeometryBufferTransparents = function(gl, renderType, v
 			// excavation objects.
 			
 			// after render native geometries, set current shader with "modelRefSsao" shader.
-			currentShader = magoManager.postFxShadersManager.getShader("gBuffer"); 
+			currentShader = magoManager.postFxShadersManager.getShader("modelRefSsao"); 
 			currentShader.useProgram();
 			gl.uniform1i(currentShader.clippingType_loc, 0);
 			
@@ -3216,7 +3237,7 @@ Renderer.prototype.renderGeometryBufferTransparents = function(gl, renderType, v
 
 		}
 	}
-
+	gl.disable(gl.BLEND);
 	gl.depthRange(0.0, 1.0);	
 };
 
@@ -3927,6 +3948,11 @@ Renderer.prototype.renderGeometryColorCoding = function(visibleObjControlerNodes
 		currentShader.disableVertexAttribArray(currentShader.normal3_loc);
 		
 		currentShader.bindUniformGenerals();
+
+		  var options = {
+			bRenderOpaques : true,
+			bRenderTransparents : true
+		  };
 		
 		gl.disable(gl.CULL_FACE);
 		// do the colorCoding render.***
@@ -3941,7 +3967,7 @@ Renderer.prototype.renderGeometryColorCoding = function(visibleObjControlerNodes
 		// native objects.
 		if (selectType === 'native' || selectType === 'all')
 		{
-			this.renderNativeObjects(gl, currentShader, renderType, visibleObjControlerNodes);
+			this.renderNativeObjects(gl, currentShader, renderType, visibleObjControlerNodes, options);
 		}
 		
 		/*

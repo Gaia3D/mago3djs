@@ -518,16 +518,15 @@ void main()
 	//bool testBool = false;
 	float occlusion = 1.0; // ambient occlusion.***
 	float shadow_occlusion = 1.0;
-	vec3 normal2 = vNormal;	
-	float scalarProd = 1.0;
+	//vec3 normal2 = vNormal;	
+	//float scalarProd = 1.0;
 	
-	vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
-	//float linearDepth = getDepth(screenPos);   
-	vec3 ray = getViewRay(screenPos); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
-	scalarProd = abs(dot(normal2, normalize(-ray)));
-	//scalarProd *= scalarProd;
-	scalarProd *= 0.6;
-	scalarProd += 0.4;
+	//vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
+
+	//vec3 ray = getViewRay(screenPos); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
+	//scalarProd = abs(dot(normal2, normalize(-ray)));
+	//scalarProd *= 0.6;
+	//scalarProd += 0.4;
 
 	occlusion = 1.0;
 

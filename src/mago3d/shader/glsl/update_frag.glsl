@@ -25,6 +25,8 @@ uniform vec3 encodedCameraPositionMCHigh;
 uniform vec3 encodedCameraPositionMCLow;
 uniform mat4 buildingRotMatrixInv;
 
+#define M_PI 3.1415926535897932384626433832795
+
 varying vec2 v_tex_pos;
 
 // pseudo-random generator
@@ -173,13 +175,41 @@ void main() {
     vec2 velocity = mix(u_wind_min, u_wind_max, lookup_wind(windMapTexCoord));
     float speed_t = length(velocity) / length(u_wind_max);
 
+	// Calculate pixelSizes.**************************************************************************************************
+	
+	vec3 buildingPos = buildingPosHIGH + buildingPosLOW;
+	float radius = length(buildingPos);
+	float minLonRad = u_geoCoordRadiansMin.x;
+	float maxLonRad = u_geoCoordRadiansMax.x;
+	float minLatRad = u_geoCoordRadiansMin.y;
+	float maxLatRad = u_geoCoordRadiansMax.y;
+	float lonRadRange = maxLonRad - minLonRad;
+	float latRadRange = maxLatRad - minLatRad;
+
+	float distortion = cos((minLatRad + pos.y * latRadRange ));
+
+	float meterToLon = 1.0/(radius * distortion);
+	float meterToLat = 1.0 / radius;
+
+	float xSpeedFactor = meterToLon / lonRadRange;
+	float ySpeedFactor = meterToLat / latRadRange;
+
+	xSpeedFactor *= 3.0;
+	ySpeedFactor *= 3.0;
+
+	vec2 offset = vec2(velocity.x / distortion * xSpeedFactor, -velocity.y * ySpeedFactor);
+
+	// End ******************************************************************************************************************
+/*
     // take EPSG:4236 distortion into account for calculating where the particle moved
 	float minLat = u_geoCoordRadiansMin.y;
 	float maxLat = u_geoCoordRadiansMax.y;
 	float latRange = maxLat - minLat;
 	float distortion = cos((minLat + pos.y * latRange ));
     ////vec2 offset = vec2(velocity.x / distortion, -velocity.y) * 0.0001 * u_speed_factor * u_interpolation; // original.
-	vec2 offset = vec2(velocity.x / distortion, -velocity.y) * 0.0002 * u_speed_factor * u_interpolation;
+	//vec2 offset = vec2(velocity.x / distortion, -velocity.y) * 0.0002 * u_speed_factor * u_interpolation;
+*/
+	
 
     // update particle position, wrapping around the date line
     pos = fract(1.0 + pos + offset);

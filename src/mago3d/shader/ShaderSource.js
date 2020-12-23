@@ -1734,16 +1734,15 @@ void main()\n\
 	//bool testBool = false;\n\
 	float occlusion = 1.0; // ambient occlusion.***\n\
 	float shadow_occlusion = 1.0;\n\
-	vec3 normal2 = vNormal;	\n\
-	float scalarProd = 1.0;\n\
+	//vec3 normal2 = vNormal;	\n\
+	//float scalarProd = 1.0;\n\
 	\n\
-	vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
-	//float linearDepth = getDepth(screenPos);   \n\
-	vec3 ray = getViewRay(screenPos); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
-	scalarProd = abs(dot(normal2, normalize(-ray)));\n\
-	//scalarProd *= scalarProd;\n\
-	scalarProd *= 0.6;\n\
-	scalarProd += 0.4;\n\
+	//vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
+\n\
+	//vec3 ray = getViewRay(screenPos); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
+	//scalarProd = abs(dot(normal2, normalize(-ray)));\n\
+	//scalarProd *= 0.6;\n\
+	//scalarProd += 0.4;\n\
 \n\
 	occlusion = 1.0;\n\
 \n\
@@ -2583,19 +2582,13 @@ ShaderSource.LBufferFS = "#ifdef GL_ES\n\
 uniform sampler2D depthTex;\n\
 uniform sampler2D normalTex;\n\
 uniform samplerCube light_depthCubeMap;\n\
-//uniform sampler2D noiseTex;  \n\
-//uniform sampler2D diffuseTex;\n\
 \n\
-uniform bool textureFlipYAxis;\n\
-uniform mat4 projectionMatrix;\n\
 uniform mat4 projectionMatrixInv;\n\
 uniform mat4 modelViewMatrixRelToEyeInv;\n\
 uniform mat4 buildingRotMatrixInv;\n\
 \n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
-uniform float lightDist;\n\
-uniform float uMaxSpotDot;\n\
+// Light parameters.\n\
+uniform float uLightParameters[4]; // 0= lightDist, 1= lightFalloffDist, 2= maxSpotDot, 3= falloffSpotDot.\n\
 \n\
 uniform vec2 noiseScale;\n\
 uniform float near;\n\
@@ -2605,23 +2598,9 @@ uniform float tangentOfHalfFovy;\n\
 uniform float aspectRatio;    \n\
 uniform float screenWidth;    \n\
 uniform float screenHeight;     \n\
-uniform vec4 oneColor4;\n\
 \n\
 uniform vec3 uLightColorAndBrightness;\n\
 \n\
-\n\
-uniform bool bApplyScpecularLighting;\n\
-uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
-\n\
-uniform vec3 specularColor;\n\
-uniform vec3 ambientColor;\n\
-  \n\
-\n\
-uniform float ambientReflectionCoef;\n\
-uniform float diffuseReflectionCoef;  \n\
-uniform float specularReflectionCoef; \n\
-uniform float externalAlpha;\n\
-uniform vec4 colorMultiplier;\n\
 uniform bool bUseLogarithmicDepth;\n\
 uniform bool bUseMultiRenderTarget;\n\
 uniform bool bApplyShadows;\n\
@@ -2632,14 +2611,7 @@ varying vec3 vLightDirCC;\n\
 varying vec3 vLightPosCC; \n\
 varying vec3 vLightPosWC;\n\
 \n\
-varying vec3 vNormal;\n\
-varying vec4 vColor4; // color from attributes\n\
-varying vec2 vTexCoord;   \n\
-varying vec3 vLightWeighting;\n\
-varying vec3 diffuseColor;\n\
-varying vec3 vertexPos; // this is the orthoPos.***\n\
-varying vec3 vertexPosLC;\n\
-varying float applySpecLighting;\n\
+varying vec3 vNormal; // delete this.\n\
 \n\
 \n\
 varying float flogz;\n\
@@ -2795,6 +2767,84 @@ vec3 getPosCC(in vec2 screenPosition, inout int dataType, inout vec4 normal4)\n\
 	return origin_real;\n\
 }\n\
 \n\
+int getFaceIdx(in vec3 normalRelToLight, inout vec2 faceTexCoord, inout vec3 faceDir)\n\
+{\n\
+	int faceIdx = -1;\n\
+\n\
+	// Note: the \"faceTexCoord\" is 1- to 1 range.\n\
+\n\
+	float x = normalRelToLight.x;\n\
+	float y = normalRelToLight.y;\n\
+	float z = normalRelToLight.z;\n\
+\n\
+	float absX = abs(x);\n\
+	float absY = abs(y);\n\
+	float absZ = abs(normalRelToLight.z);\n\
+\n\
+	bool isXPositive = true;\n\
+	bool isYPositive = true;\n\
+	bool isZPositive = true;\n\
+\n\
+	if(x < 0.0)\n\
+	isXPositive = false;\n\
+\n\
+	if(y < 0.0)\n\
+	isYPositive = false;\n\
+\n\
+	if(z < 0.0)\n\
+	isZPositive = false;\n\
+\n\
+	// xPositive.\n\
+	if(isXPositive && absX >= absY && absX >= absZ)\n\
+	{\n\
+		faceIdx = 0;\n\
+		faceTexCoord = vec2(y, z);\n\
+		faceDir = vec3(1.0, 0.0, 0.0);\n\
+	}\n\
+\n\
+	// xNegative.\n\
+	else if(!isXPositive && absX >= absY && absX >= absZ)\n\
+	{\n\
+		faceIdx = 1;\n\
+		faceTexCoord = vec2(y, z);\n\
+		faceDir = vec3(-1.0, 0.0, 0.0);\n\
+	}\n\
+\n\
+	// yPositive.\n\
+	else if(isYPositive && absY >= absX && absY >= absZ)\n\
+	{\n\
+		faceIdx = 2;\n\
+		faceTexCoord = vec2(x, z);\n\
+		faceDir = vec3(0.0, 1.0, 0.0);\n\
+	}\n\
+\n\
+	// yNegative.\n\
+	else if(!isYPositive && absY >= absX && absY >= absZ)\n\
+	{\n\
+		faceIdx = 3;\n\
+		faceTexCoord = vec2(x, z);\n\
+		faceDir = vec3(0.0, -1.0, 0.0);\n\
+	}\n\
+\n\
+	// zPositive.\n\
+	else if(isZPositive && absZ >= absX && absZ >= absY)\n\
+	{\n\
+		faceIdx = 4;\n\
+		faceTexCoord = vec2(x, y);\n\
+		faceDir = vec3(0.0, 0.0, 1.0);\n\
+	}\n\
+\n\
+	// zNegative.\n\
+	else if(!isZPositive && absZ >= absX && absZ >= absY)\n\
+	{\n\
+		faceIdx = 5;\n\
+		faceTexCoord = vec2(x, y);\n\
+		faceDir = vec3(0.0, 0.0, -1.0);\n\
+	}\n\
+\n\
+	return faceIdx;\n\
+}\n\
+\n\
 \n\
 void main()\n\
 {\n\
@@ -2813,23 +2863,21 @@ void main()\n\
 		int dataType = 0;\n\
 		vec4 normal4;\n\
 		vec3 posCC = getPosCC(screenPos, dataType, normal4);\n\
-		//vec3 posWC = (modelViewMatrixRelToEyeInv * vec4(posCC, 1.0)).xyz + encodedCameraPositionMCHigh + encodedCameraPositionMCLow;\n\
 		\n\
-		//vec3 posLCAux = posWC - vLightPosWC;\n\
-		//vec4 posLC = buildingRotMatrixInv * vec4(posLCAux, 1.0);\n\
-\n\
 		// If the data is no generalGeomtry or pointsCloud, then discard.\n\
 		if(dataType != 0 && dataType != 2)\n\
 		{\n\
 			discard;\n\
 		}\n\
+		//uLightParameters[4]; // 0= lightDist, 1= lightFalloffDist, 2= maxSpotDot, 3= falloffSpotDot.\n\
 \n\
 		// vector light-point.\n\
 		vec3 vecLightToPointCC = posCC - vLightPosCC;\n\
 		vec3 lightDirToPointCC = normalize(posCC - vLightPosCC);\n\
 		float distToLight = length(vecLightToPointCC);\n\
-		\n\
-		if(distToLight > lightDist)\n\
+\n\
+		float lightFalloffLightDist = uLightParameters[1];\n\
+		if(distToLight > lightFalloffLightDist)\n\
 		{\n\
 			discard;\n\
 		}\n\
@@ -2841,8 +2889,9 @@ void main()\n\
 			discard;\n\
 		}\n\
 \n\
+		float falloffSpotDot = uLightParameters[3];\n\
 		float spotDot = dot(vLightDirCC, lightDirToPointCC);\n\
-		if(spotDot < uMaxSpotDot)\n\
+		if(spotDot < falloffSpotDot)\n\
 		{\n\
 			discard;\n\
 		}\n\
@@ -2855,27 +2904,28 @@ void main()\n\
 			vec4 lightDirToPointWC = modelViewMatrixRelToEyeInv * vec4(lightDirToPointCC, 1.0);\n\
 			vec3 lightDirToPointWCNormalized = normalize(lightDirToPointWC.xyz);\n\
 			vec4 lightDirToPointLC = buildingRotMatrixInv * vec4(lightDirToPointWCNormalized, 1.0);\n\
-			//vec4 lightDirToPointLC = buildingRotMatrixInv * lightDirToPointWC;\n\
-			vec4 depthCube = textureCube(light_depthCubeMap, normalize(lightDirToPointLC.xyz)); // original.\n\
+			vec3 lightDirToPointLC_norm = normalize(lightDirToPointLC.xyz);\n\
+			vec4 depthCube = textureCube(light_depthCubeMap, lightDirToPointLC_norm); // original\n\
 \n\
+			float falloffLightDist = uLightParameters[1];\n\
 \n\
-			float depthFromLight = unpackDepth(depthCube)*lightDist;\n\
+			// Now, try to calculate the zone of the our pixel.\n\
+			vec2 faceTexCoord;\n\
+			vec3 faceDir;\n\
+			getFaceIdx(lightDirToPointLC_norm, faceTexCoord, faceDir);\n\
+			float spotDotAux = dot(lightDirToPointLC_norm, faceDir);\n\
+			float depthFromLight = unpackDepth(depthCube)*lightFalloffLightDist/spotDotAux;\n\
 \n\
-			if(distToLight > depthFromLight + 0.01)\n\
+			if(distToLight > depthFromLight+0.01)// + 0.01)\n\
 			{\n\
+				// we are in shadow, so do not lighting.\n\
 				discard;\n\
 			}\n\
 		}\n\
-		\n\
-		//distToLight /= lightDist;\n\
 \n\
 		gl_FragData[0] = vec4(diffuseDot * uLightColorAndBrightness.x * spotDot, \n\
 							diffuseDot * uLightColorAndBrightness.y * spotDot, \n\
 							diffuseDot * uLightColorAndBrightness.z * spotDot, 1.0); \n\
-\n\
-		//gl_FragData[0] = vec4(uLightColorAndBrightness.x, \n\
-		//					uLightColorAndBrightness.y, \n\
-		//					uLightColorAndBrightness.z, 1.0); \n\
 \n\
 		// Specular lighting.\n\
 		gl_FragData[1] = vec4(0.0, 0.0, 0.0, 1.0); // save specular.***\n\
@@ -5101,6 +5151,7 @@ uniform samplerCube texture_cube;\n\
 uniform int uTextureType;\n\
 \n\
 varying vec2 v_tex_pos;\n\
+varying vec3 v_normal; // use for cubeMap.\n\
 \n\
 int faceIndex(in vec2 texCoord)\n\
 {\n\
@@ -5230,6 +5281,11 @@ bool cubeMapNormal(in vec2 texCoord, inout vec3 normal)\n\
     return isCubeMapZone;\n\
 }\n\
 \n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+} \n\
+\n\
 void main()\n\
 {           \n\
     // Debug.\n\
@@ -5242,49 +5298,36 @@ void main()\n\
     */\n\
 \n\
     vec2 texCoord = vec2(1.0 - v_tex_pos.x, 1.0 - v_tex_pos.y); // original.\n\
-    //float u = (v_tex_pos.x - 0.5) * 2.0;\n\
-    //float v = (v_tex_pos.y - 0.5) * 2.0;\n\
-   // vec2 texCoord = vec2(1.0 - u, 1.0 - v);\n\
-    bool is2DTex = true;\n\
-\n\
-    if(uTextureType == 0)\n\
-    {\n\
-        is2DTex = true;\n\
-    }\n\
-    else if(uTextureType == 1)\n\
-    {\n\
-        is2DTex = false;\n\
-    }\n\
 \n\
     // Take the base color.\n\
     vec4 textureColor = vec4(1.0,1.0,1.0, 0.0);\n\
     if(uTextureType == 0)\n\
     {\n\
         textureColor = texture2D(texture_0, texCoord);\n\
+        \n\
     }\n\
     else if(uTextureType == 1)\n\
     {\n\
-        vec3 normal3 = vec3(0.0, 1.0, -1.0);\n\
-        if(cubeMapNormal(texCoord, normal3))\n\
-        {\n\
-            textureColor = textureCube(texture_cube, normalize(normal3));\n\
-        }\n\
-        else{\n\
-            textureColor = vec4(1.0, 0.0, 0.0, 1.0);\n\
-        }\n\
+         textureColor = textureCube(texture_cube, v_normal);\n\
+         float linearDepth = unpackDepth(textureColor); // original.\n\
+        textureColor = vec4(linearDepth, linearDepth, linearDepth, 1.0);\n\
     }\n\
-\n\
+    \n\
     gl_FragColor = textureColor;\n\
 	\n\
 }";
 ShaderSource.rectangleScreenVS = "precision mediump float;\n\
 \n\
 attribute vec2 a_pos;\n\
+attribute vec3 a_nor;\n\
 \n\
 varying vec2 v_tex_pos;\n\
+varying vec3 v_normal;\n\
 \n\
 void main() {\n\
     v_tex_pos = a_pos;\n\
+    v_normal = a_nor;\n\
+    \n\
     //vec2 pos = a_pos*0.5;\n\
     gl_Position = vec4(1.0 - 2.0 * a_pos, 0, 1);\n\
 }";
@@ -5391,8 +5434,7 @@ void main()\n\
 \n\
 	if(!bUseLogarithmicDepth)\n\
 	{\n\
-		//gl_FragData[0] = packDepth(depth); \n\
-		gl_FragData[0] = vec4(depth, depth, depth, 1.0); \n\
+		gl_FragData[0] = packDepth(depth); \n\
 	}\n\
 \n\
 	float frustumIdx = 1.0;\n\
@@ -9799,6 +9841,8 @@ uniform vec3 encodedCameraPositionMCHigh;\n\
 uniform vec3 encodedCameraPositionMCLow;\n\
 uniform mat4 buildingRotMatrixInv;\n\
 \n\
+#define M_PI 3.1415926535897932384626433832795\n\
+\n\
 varying vec2 v_tex_pos;\n\
 \n\
 // pseudo-random generator\n\
@@ -9947,13 +9991,41 @@ void main() {\n\
     vec2 velocity = mix(u_wind_min, u_wind_max, lookup_wind(windMapTexCoord));\n\
     float speed_t = length(velocity) / length(u_wind_max);\n\
 \n\
+	// Calculate pixelSizes.**************************************************************************************************\n\
+	\n\
+	vec3 buildingPos = buildingPosHIGH + buildingPosLOW;\n\
+	float radius = length(buildingPos);\n\
+	float minLonRad = u_geoCoordRadiansMin.x;\n\
+	float maxLonRad = u_geoCoordRadiansMax.x;\n\
+	float minLatRad = u_geoCoordRadiansMin.y;\n\
+	float maxLatRad = u_geoCoordRadiansMax.y;\n\
+	float lonRadRange = maxLonRad - minLonRad;\n\
+	float latRadRange = maxLatRad - minLatRad;\n\
+\n\
+	float distortion = cos((minLatRad + pos.y * latRadRange ));\n\
+\n\
+	float meterToLon = 1.0/(radius * distortion);\n\
+	float meterToLat = 1.0 / radius;\n\
+\n\
+	float xSpeedFactor = meterToLon / lonRadRange;\n\
+	float ySpeedFactor = meterToLat / latRadRange;\n\
+\n\
+	xSpeedFactor *= 3.0;\n\
+	ySpeedFactor *= 3.0;\n\
+\n\
+	vec2 offset = vec2(velocity.x / distortion * xSpeedFactor, -velocity.y * ySpeedFactor);\n\
+\n\
+	// End ******************************************************************************************************************\n\
+/*\n\
     // take EPSG:4236 distortion into account for calculating where the particle moved\n\
 	float minLat = u_geoCoordRadiansMin.y;\n\
 	float maxLat = u_geoCoordRadiansMax.y;\n\
 	float latRange = maxLat - minLat;\n\
 	float distortion = cos((minLat + pos.y * latRange ));\n\
     ////vec2 offset = vec2(velocity.x / distortion, -velocity.y) * 0.0001 * u_speed_factor * u_interpolation; // original.\n\
-	vec2 offset = vec2(velocity.x / distortion, -velocity.y) * 0.0002 * u_speed_factor * u_interpolation;\n\
+	//vec2 offset = vec2(velocity.x / distortion, -velocity.y) * 0.0002 * u_speed_factor * u_interpolation;\n\
+*/\n\
+	\n\
 \n\
     // update particle position, wrapping around the date line\n\
     pos = fract(1.0 + pos + offset);\n\

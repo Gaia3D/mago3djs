@@ -101,8 +101,7 @@ void main()
 
 	if(!bUseLogarithmicDepth)
 	{
-		//gl_FragData[0] = packDepth(depth); 
-		gl_FragData[0] = vec4(depth, depth, depth, 1.0); 
+		gl_FragData[0] = packDepth(depth); 
 	}
 
 	float frustumIdx = 1.0;

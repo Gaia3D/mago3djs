@@ -221,10 +221,11 @@ Modeler.prototype.__TEST__extrusionBuildings = function()
 		var options = {};
 		//var extrudedLine = geoCoordsList.getExtrudedWallRenderableObject(height, undefined, this.magoManager, undefined, options, undefined) ;
 		var eb = new ExtrusionBuilding(geoCoordsList, height, options);
-		eb.setOneColor(1.0, 0.5, 0.3, 1.0);
+		eb.setOneColor(1.0, 0.5, 0.3, 0.5);
 		eb.attributes.isSelectable = true;
 		eb.attributes.isMovable = true;
 		eb.attributes.selectedColor4 = new Color(1.0, 0.0, 0.0, 1.0);
+		//eb.attributes.opaque = true;
 
 		if (eb.options === undefined)
 		{ eb.options = {}; }
@@ -971,7 +972,7 @@ Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive
 	{
 		this.magoRectangle.render(magoManager, shader, renderType, glPrimitive, bIsSelected);
 	}
-	this.__TEST__laser();
+	//this.__TEST__laser();
 	//this.__TEST__extrudedLines();
 	//this.__TEST__extrusionBuildings();
 };
