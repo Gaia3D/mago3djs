@@ -1326,7 +1326,7 @@ MagoManager.prototype.loadAndPrepareData = function()
 
 		this.cameraLastPosition.set(camera.position.x, camera.position.y, camera.position.z);
 	}
-	//if(this.isFarestFrustum())
+
 	this.manageQueue();
 	
 };
@@ -1550,13 +1550,18 @@ MagoManager.prototype.TEST__cameraLaser = function()
 	}
 };
 
-
 /**
  * Main rendering function.
  * @private
  */
 MagoManager.prototype.doRender = function(frustumVolumenObject) 
 {
+	if(!this.isCesiumGlobe())
+	{
+		this.doRenderMagoWorld(frustumVolumenObject);
+		return;
+	}
+
 	var gl = this.getGl();
 	
 	// 1) The depth render.**********************************************************************************************************************
@@ -1651,6 +1656,8 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 
 				gl.bindTexture(gl.TEXTURE_2D, this.albedoTex);  
 				gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
+
+				gl.bindTexture(gl.TEXTURE_2D, null);  
 			}
 
 			// Bind mago colorTextures:
@@ -1668,11 +1675,6 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 			// End mrt.---------------------------------------------------------------------------------------------------------------
 			
 		}
-	}
-	else
-	{
-		// magoEarth : TODO.
-		
 	}
 
 	// 2) gBuffer render.*****************************************************************************************************************
@@ -1695,8 +1697,8 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 			this.extbuffers.NONE, // gl_FragData[2]
 			this.extbuffers.NONE, // gl_FragData[3]
 			]);
-			
 	}
+
 	renderType = 1;
 	this.renderType = 1;
 	this.renderer.renderGeometryBufferTransparents(gl, renderType, this.visibleObjControlerNodes);
@@ -1789,6 +1791,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 					]);
 					
 			}
+
 			// End rendering lightBuffer.--------------------------------------------
 		}
 
@@ -1911,6 +1914,393 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 					]);
 					
 			}
+
+		//this.weatherStation.renderWindMultiLayers(this);
+		//this.weatherStation.test_renderWindLayer(this);
+		//this.weatherStation.test_renderTemperatureLayer(this);
+		//this.weatherStation.test_renderCuttingPlanes(this, renderType);
+		this.weatherStation.renderWeather(this);
+	}
+
+	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
+		
+	this.swapRenderingFase();
+	
+	//if(!this.test__splittedMesh)
+	//{
+	//	this.TEST__splittedExtrudedBuilding();
+	//	this.test__splittedMesh = true;
+	//}
+
+	
+};
+
+/**
+ * Binds the magoWorld frameBuffer.
+ * @private
+ */
+MagoManager.prototype.bindMagoFbo = function() 
+{
+	var gl = this.getGl();
+	var bufferWidth = this.sceneState.drawingBufferWidth[0];
+	var bufferHeight = this.sceneState.drawingBufferHeight[0];
+
+	if(!this.texturesManager)
+	{
+		this.texturesManager = new TexturesManager(this);
+		var bUseMultiRenderTarget = this.postFxShadersManager.bUseMultiRenderTarget;
+		this.texturesManager.texturesMergerFbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 4}); 
+	}
+	
+	this.depthFboNeo = this.texturesManager.texturesMergerFbo;
+
+	this.depthTex = this.depthFboNeo.colorBuffersArray[1];
+	this.normalTex = this.depthFboNeo.colorBuffersArray[2];
+	this.albedoTex = this.depthFboNeo.colorBuffersArray[3];
+	
+	this.texturesManager.texturesMergerFbo.bind();
+	
+	// MRT on mago.**************************************************
+	if(!this.extbuffers)
+	this.extbuffers = gl.getExtension("WEBGL_draw_buffers");
+	
+	if(!this.aqwse)
+	{
+		// Do this if screenSize changes.***
+		gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffersArray[0]);  
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, bufferWidth, bufferHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
+
+		gl.bindTexture(gl.TEXTURE_2D, this.depthTex);  
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, bufferWidth, bufferHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
+
+		gl.bindTexture(gl.TEXTURE_2D, this.normalTex);  
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, bufferWidth, bufferHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
+
+		gl.bindTexture(gl.TEXTURE_2D, this.albedoTex);  
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, bufferWidth, bufferHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
+
+		gl.bindTexture(gl.TEXTURE_2D, null);  
+		this.aqwse = true;
+	}
+
+	// Bind mago colorTextures:
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.depthFboNeo.colorBuffersArray[0], 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.depthTex, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, this.normalTex, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, this.albedoTex, 0);
+
+	this.extbuffers.drawBuffersWEBGL([
+		this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
+		this.extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - depthTex
+		this.extbuffers.COLOR_ATTACHMENT2_WEBGL,//, // gl_FragData[2] - normalTex
+		this.extbuffers.COLOR_ATTACHMENT3_WEBGL // gl_FragData[3] - albedoTex
+		]);
+};
+
+/**
+ * Main rendering function.
+ * @private
+ */
+MagoManager.prototype.doRenderMagoWorld = function(frustumVolumenObject) 
+{
+	var gl = this.getGl();
+	
+	// 1) The depth render.**********************************************************************************************************************
+	var renderType = 0; // 0= depth. 1= color.***
+	this.renderType = 0;
+	var sceneState = this.sceneState;
+
+	// 1.1) render sunDepth.
+	if (sceneState.applySunShadows && !this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
+	{
+		this.renderer.renderDepthSunSystem(this.visibleObjControlerNodes);
+		this.swapRenderingFase();
+	}
+
+	
+	var lightsArray = this.visibleObjControlerNodes.currentVisibleNativeObjects.lightSourcesArray;
+	var lightCount = lightsArray.length;
+	if(lightCount > 0 && sceneState.applyLightsShadows && !this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
+	{
+		// for each visible lightSources, make cubeMap depthTextures if no exist.
+		var visiblesArray = this.visibleObjControlerNodes.getAllVisibles();
+		var nativeVisiblesArray = this.visibleObjControlerNodes.getAllNatives();
+		
+		for(var i=0; i<lightCount; i++)
+		{
+			var light = lightsArray[i];
+			light.doIntersectedObjectsCulling(visiblesArray, nativeVisiblesArray);
+		}
+	}
+	
+
+	// 1.2) render selected silhouetteDepth.
+	var selectionManager = this.selectionManager;
+	if(selectionManager.existSelectedObjects())
+	{
+		//this.renderer.renderSilhouetteDepth(); // note: integrate this in the gBuffer. TODO:
+	}
+	
+	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
+
+	this.bindMagoFbo();
+
+	gl.clearColor(0, 0, 0, 1);
+	gl.clearDepth(1);
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	//gl.clearStencil(0); // provisionally here.***
+	
+	// End mrt.---------------------------------------------------------------------------------------------------------------
+			
+	// 1rst, render atmosphere & the earth.
+	// TinTerrain.**************************************************************************
+	if (this.tinTerrainManager !== undefined)
+	{
+		// Atmosphere.*******************************************************************************
+		//this.renderer.renderAtmosphere(gl, renderType);
+
+		//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+		//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE);
+		var bDepthRender = false; // magoManager is no depth render.***
+		var renderType = 1;
+		this.tinTerrainManager.render (this, bDepthRender, renderType);
+	}
+	
+
+	// 2) gBuffer render.*****************************************************************************************************************
+	renderType = 1;
+	this.renderType = 1;
+	this.renderer.renderGeometryBuffer(gl, renderType, this.visibleObjControlerNodes);
+	
+	/*
+	// Render transparents.****************************************************************************************************************
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // depthTex.
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // normalTex.
+	//gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0); // albedoTex.
+	this.extbuffers.drawBuffersWEBGL([
+		this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
+		this.extbuffers.NONE, // gl_FragData[1]
+		this.extbuffers.NONE, // gl_FragData[2]
+		//this.extbuffers.NONE, // gl_FragData[3]
+		]);
+
+	renderType = 1;
+	this.renderType = 1;
+	this.renderer.renderGeometryBufferTransparents(gl, renderType, this.visibleObjControlerNodes);
+	// End rendering transparents.----------------------------------------------------------------------------------------------------------
+
+	// check if must render boundingBoxes.
+	if (this.magoPolicy.getShowBoundingBox())
+	{
+		var bRenderLines = true;
+		//var currentVisiblesArray = visibleObjControlerNodes.currentVisibles0.concat(visibleObjControlerNodes.currentVisibles2,);
+		this.renderer.renderBoundingBoxesNodes(this.visibleObjControlerNodes.currentVisibles0, undefined, bRenderLines);
+		this.renderer.renderBoundingBoxesNodes(this.visibleObjControlerNodes.currentVisibles2, undefined, bRenderLines);
+		this.renderer.renderBoundingBoxesNodes(this.visibleObjControlerNodes.currentVisibles3, undefined, bRenderLines);
+		this.renderer.renderBoundingBoxesNodes(this.visibleObjControlerNodes.currentVisiblesAux, undefined, bRenderLines);
+	}
+
+	if (sceneState.applyLightsShadows)
+	{
+		// if exist lightSources, the store all lightSources of all frustums.
+		var lightSourcesArray = this.visibleObjControlerNodes.currentVisibleNativeObjects.lightSourcesArray;
+		if(!this.lightSourcesMap)
+		{ this.lightSourcesMap = {}; }
+
+		var lightCount = lightSourcesArray.length;
+		for(var i=0; i<lightCount; i++)
+		{
+			var light = lightSourcesArray[i];
+			var lightGuid = light._guid;
+			this.lightSourcesMap[lightGuid] = light;
+		}
+
+		if (this.currentFrustumIdx === 0) 
+		{
+			// now, make the lightSourcesArray.
+			if(!this.lightSourcesArray)
+			{ this.lightSourcesArray = []; }
+
+			// 1rst, init the array.
+			this.lightSourcesArray.length = 0;
+
+			for(var key in this.lightSourcesMap)
+			{
+				if(this.lightSourcesMap.hasOwnProperty(key))
+				{
+					this.lightSourcesArray.push(this.lightSourcesMap[key]);
+				}
+			}
+
+			// finally init the lightSourcesMap.
+			this.lightSourcesMap = {};
+		}
+	}
+	*/
+	// 1.1) ssao and other effects from depthBuffer render.*****************************************************************************
+	if (this.currentFrustumIdx === 0) 
+	{
+		// Render the lightBuffer.*****************************************
+		if (sceneState.applyLightsShadows)
+		{
+			/*
+			// Create lightBufferFBO if no exist.
+			if(!this.texturesManager.lBuffer)
+			{
+				// create a lBuffer with 2 colorTextures : diffuseLighting & specularLighting.
+				var bufferWidth = this.sceneState.drawingBufferWidth[0];
+				var bufferHeight = this.sceneState.drawingBufferHeight[0];
+				var bUseMultiRenderTarget = this.postFxShadersManager.bUseMultiRenderTarget;
+				this.texturesManager.lBuffer = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 2}); 
+			}
+			this.lBuffer = this.texturesManager.lBuffer;
+			this.diffuseLightTex = this.lBuffer.colorBuffersArray[0];
+			this.specularLightTex = this.lBuffer.colorBuffersArray[1];
+			
+			// Render the lightBuffer.
+			this.renderer.renderLightDepthCubeMaps(this.lightSourcesArray); // active this code for shadows.
+			this.renderer.renderLightBuffer(this.lightSourcesArray);
+			*/
+
+			//if (this.isCesiumGlobe())
+			{
+				//scene._context._currentFramebuffer._bind();
+				// unbind mago colorTextures:
+				
+				//gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // depthTex.
+				//gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // normalTex.
+				//gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0); // albedoTex.
+				//this.extbuffers.drawBuffersWEBGL([
+				//	this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
+				//	this.extbuffers.NONE, // gl_FragData[1]
+				//	this.extbuffers.NONE, // gl_FragData[2]
+				//	this.extbuffers.NONE, // gl_FragData[3]
+				//	]);
+					
+			}
+
+			// End rendering lightBuffer.--------------------------------------------
+		}
+		if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
+		//this.renderer.renderSsaoFromDepth(gl);
+
+		//if (this.isCesiumGlobe())
+		//{
+		//	scene._context._currentFramebuffer._bind();
+		//}
+
+		// Final render output.
+		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+		//gl.clearColor(1, 0.5, 0.5, 1);
+		//gl.clearDepth(1);
+		//gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		//gl.clearStencil(0); // provisionally here.***
+
+		this.renderer.renderScreenQuadSsao(gl);
+		//this.renderCluster();
+
+		
+		/*
+		if (this.selectionManager)
+		{
+			if(this.selectionManager.existSelectedObjects())
+			{
+				this.renderer.renderSilhouette();
+			}
+		}
+		*/
+
+		// Debug component.******************************************
+		
+		var lightAux;
+		if(lightsArray)
+		{
+			var lightsCount = lightsArray.length;
+			lightAux = lightsArray[lightsCount - 1];
+		}
+		var options = {
+			lightSource : lightAux
+		};
+		gl.disable(gl.BLEND);
+		this.renderer.renderScreenRectangle(gl, options); // debug component.
+		
+		//-----------------------------------------------------------
+
+	}
+
+	// DEBUG.Render lights sources.*************************************************************************
+	//this.renderer.renderNativeLightSources(renderType, this.visibleObjControlerNodes) ; // debug component.
+	//------------------------------------------------------------------------------------------------------
+
+	/*
+	if (this.windTest === undefined)
+	{
+		
+
+		if (this.weatherStation === undefined)
+		{ this.weatherStation = new WeatherStation(); }
+	
+		var geometryDataPath = this.readerWriter.geometryDataPath;
+		// JejuAirport, jejuHanRaSan.
+		//var windDataFilesNamesArray = ["OBS-QWM_2016062000.grib2_wind_000", "OBS-QWM_2016062001.grib2_wind_000", "OBS-QWM_2016062002.grib2_wind_000", "OBS-QWM_2016062003.grib2_wind_000",
+		//	"OBS-QWM_2016062004.grib2_wind_000", "OBS-QWM_2016062005.grib2_wind_000", "OBS-QWM_2016062006.grib2_wind_000", "OBS-QWM_2016062007.grib2_wind_000",
+		//	"OBS-QWM_2016062008.grib2_wind_000", "OBS-QWM_2016062009.grib2_wind_000", "OBS-QWM_2016062010.grib2_wind_000", "OBS-QWM_2016062011.grib2_wind_000",
+		//	"OBS-QWM_2016062012.grib2_wind_000", "OBS-QWM_2016062013.grib2_wind_000", "OBS-QWM_2016062014.grib2_wind_000", "OBS-QWM_2016062015.grib2_wind_000",
+		//	"OBS-QWM_2016062016.grib2_wind_000", "OBS-QWM_2016062017.grib2_wind_000", "OBS-QWM_2016062018.grib2_wind_000", "OBS-QWM_2016062019.grib2_wind_000",
+		//	"OBS-QWM_2016062020.grib2_wind_000", "OBS-QWM_2016062021.grib2_wind_000", "OBS-QWM_2016062022.grib2_wind_000", "OBS-QWM_2016062023.grib2_wind_000"]; // jeju, hanRaSan
+		
+			
+		// Seoul data.
+		var windDataFilesNamesArray = ["OBS-QWM_2019090700.grib2_wind_000", "OBS-QWM_2019090701.grib2_wind_000", "OBS-QWM_2019090702.grib2_wind_000", "OBS-QWM_2019090703.grib2_wind_000",
+			"OBS-QWM_2019090704.grib2_wind_000", "OBS-QWM_2019090705.grib2_wind_000", "OBS-QWM_2019090706.grib2_wind_000", "OBS-QWM_2019090707.grib2_wind_000",
+			"OBS-QWM_2019090708.grib2_wind_000", "OBS-QWM_2019090709.grib2_wind_000", "OBS-QWM_2019090710.grib2_wind_000", "OBS-QWM_2019090711.grib2_wind_000",
+			"OBS-QWM_2019090712.grib2_wind_000", "OBS-QWM_2019090713.grib2_wind_000", "OBS-QWM_2019090714.grib2_wind_000", "OBS-QWM_2019090715.grib2_wind_000",
+			"OBS-QWM_2019090716.grib2_wind_000", "OBS-QWM_2019090717.grib2_wind_000", "OBS-QWM_2019090718.grib2_wind_000", "OBS-QWM_2019090719.grib2_wind_000",
+			"OBS-QWM_2019090720.grib2_wind_000", "OBS-QWM_2019090721.grib2_wind_000", "OBS-QWM_2019090722.grib2_wind_000", "OBS-QWM_2019090723.grib2_wind_000"]; // seoulData.
+			
+			
+		//Siheung_wind
+		//var windDataFilesNamesArray = ["OBS-QWM_2019090700.grib2_wind_000", "OBS-QWM_2019090701.grib2_wind_000", "OBS-QWM_2019090702.grib2_wind_000", "OBS-QWM_2019090703.grib2_wind_000",
+		//	"OBS-QWM_2019090704.grib2_wind_000", "OBS-QWM_2019090705.grib2_wind_000", "OBS-QWM_2019090706.grib2_wind_000", "OBS-QWM_2019090707.grib2_wind_000",
+		//	"OBS-QWM_2019090708.grib2_wind_000", "OBS-QWM_2019090709.grib2_wind_000", "OBS-QWM_2019090710.grib2_wind_000", "OBS-QWM_2019090711.grib2_wind_000",
+		//	"OBS-QWM_2019090712.grib2_wind_000", "OBS-QWM_2019090713.grib2_wind_000", "OBS-QWM_2019090714.grib2_wind_000", "OBS-QWM_2019090715.grib2_wind_000",
+		//	"OBS-QWM_2019090716.grib2_wind_000", "OBS-QWM_2019090717.grib2_wind_000", "OBS-QWM_2019090718.grib2_wind_000", "OBS-QWM_2019090719.grib2_wind_000",
+		//	"OBS-QWM_2019090720.grib2_wind_000", "OBS-QWM_2019090721.grib2_wind_000", "OBS-QWM_2019090722.grib2_wind_000", "OBS-QWM_2019090723.grib2_wind_000"];
+			
+		//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_Airport";
+		//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_GolfPark_NineBridge1";
+		//var windMapFilesFolderPath = geometryDataPath +"/SeoulWind/200907";
+		//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_HanRaSan";
+		var windMapFilesFolderPath = geometryDataPath +"/Siheung_wind";
+		
+		this.weatherStation.test_loadWindData3d(this, windDataFilesNamesArray, windMapFilesFolderPath);
+		//this.TEST__golfPark();
+		this.windTest = true;
+	}
+	*/
+
+	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+	
+	
+	if (this.weatherStation)
+	{
+		//if (this.isCesiumGlobe())
+		{
+			//scene._context._currentFramebuffer._bind();
+			// unbind mago colorTextures:
+			
+			gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // depthTex.
+			gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // normalTex.
+			gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0); // albedoTex.
+			this.extbuffers.drawBuffersWEBGL([
+				this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
+				this.extbuffers.NONE, // gl_FragData[1]
+				this.extbuffers.NONE, // gl_FragData[2]
+				this.extbuffers.NONE, // gl_FragData[3]
+				]);
+				
+		}
 
 		//this.weatherStation.renderWindMultiLayers(this);
 		//this.weatherStation.test_renderWindLayer(this);

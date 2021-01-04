@@ -125,6 +125,10 @@ bool isInShadow(vec4 pointWC, int currSunIdx)
 			{depthRelToLight = unpackDepth(texture2D(shadowMapTex, posRelToLight.xy));}
 			else if(currSunIdx == 1)
 			{depthRelToLight = unpackDepth(texture2D(shadowMapTex2, posRelToLight.xy));}
+
+			//if(depthRelToLight < 0.1)
+			//return false;
+
 			if(posRelToLight.z > depthRelToLight*tolerance )
 			{
 				inShadow = true;
@@ -314,19 +318,30 @@ void main()
 		vec3 posCC = viewPosH.xyz/viewPosH.w;
 		vec4 posWC = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0) + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 1.0);
 		//------------------------------------------------------------------------------------------------------------------------------
+
+		// now, check if sun is in the antipodas.
+		bool sunInAntipodas = false;
+		float dotAux = dot(sunDirWC, normalize(posWC.xyz));
+		if(dotAux > 0.0)
+		{
+			sunInAntipodas = true;
+		}
 		
 		// 2nd, calculate the vertex relative to light.***
 		// 1rst, try with the closest sun. sunIdx = 0.
-		bool pointIsinShadow = isInShadow(posWC, 0);
-		if(!pointIsinShadow)
+		if(!sunInAntipodas)
 		{
-			pointIsinShadow = isInShadow(posWC, 1);
-		}
+			bool pointIsinShadow = isInShadow(posWC, 0);
+			if(!pointIsinShadow)
+			{
+				pointIsinShadow = isInShadow(posWC, 1);
+			}
 
-		if(pointIsinShadow)
-		{
-			shadow_occlusion = 0.5;
-			alpha = 0.5;
+			if(pointIsinShadow)
+			{
+				shadow_occlusion = 0.5;
+				alpha = 0.5;
+			}
 		}
 
 		gl_FragColor = vec4(finalColor.rgb*shadow_occlusion, alpha);
@@ -438,6 +453,15 @@ void main()
 		float occlInv = 1.0 - occlusion;
 		vec4 finalColor = vec4(albedo.r * occlInv, albedo.g * occlInv, albedo.b * occlInv, albedo.a);
 		gl_FragColor = vec4(finalColor);
+
+		// fog.*****************************************************************
+		//float myLinearDepth2 = getDepth(screenPos);
+		//float myDepth = (myLinearDepth2 * currFar_origin)/500.0;
+		//if(myDepth > 1.0)
+		//myDepth = 1.0;
+		//vec4 finalColor2 = mix(finalColor, vec4(1.0, 1.0, 1.0, 1.0), myDepth);
+		//gl_FragColor = vec4(finalColor2);
+		// End fog.---------------------------------------------------------------
 
 		//float finalColorLightLevel = finalColor.r + finalColor.g + finalColor.b;
 		//if(finalColorLightLevel < 0.9)

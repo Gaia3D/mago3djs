@@ -73,7 +73,7 @@ void main()
 {  
 	if(bIsMakingDepth)
 	{
-		gl_FragColor = packDepth(-depthValue);
+		gl_FragData[0] = packDepth(-depthValue);
 	}
 	else{
 		vec4 textureColor = oneColor4;
@@ -105,6 +105,8 @@ void main()
 			textureColor = oneColor4;
 		}
 		
-		gl_FragColor = vcolor4; 
+		gl_FragData[0] = vcolor4; 
+		//gl_FragData[1] = vcolor4; 
+		//gl_FragData[2] = vcolor4; 
 	}
 }

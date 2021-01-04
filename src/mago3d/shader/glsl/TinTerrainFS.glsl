@@ -411,8 +411,6 @@ float roundCustom(float number)
 
 #define M_PI 3.1415926535897932384626433832795
 
-
-
 void main()
 {    
 	float depthAux = -depthValue;
@@ -424,7 +422,7 @@ void main()
 		depthAux = gl_FragDepthEXT;
 	}
 	#endif
-
+	/*
 	if(bIsMakingDepth)
 	{
 		gl_FragData[0] = packDepth(depthAux);
@@ -438,7 +436,9 @@ void main()
 		return;
 	}
 	else
+	*/
 	{
+		/*
 		if(uRenderType == 2)
 		{
 			gl_FragData[0] = oneColor4; 
@@ -452,6 +452,7 @@ void main()
 
 			return;
 		}
+		*/
 
 		float shadow_occlusion = 1.0;
 		if(bApplyShadow)
@@ -501,6 +502,7 @@ void main()
 		float occlusion = 1.0;
 
 		vec4 textureColor = vec4(0.0);
+		/*
 		if(colorType == 0) // one color.
 		{
 			textureColor = oneColor4;
@@ -510,7 +512,8 @@ void main()
 				discard;
 			}
 		}
-		else if(colorType == 2) // texture color.
+		*/
+		if(colorType == 2) // texture color.
 		{
 			// Check if the texture is from a different depth tile texture.***
 			vec2 finalTexCoord = vTexCoord;
@@ -542,7 +545,9 @@ void main()
 			if(textureColor.w == 0.0)
 			{
 				discard;
+				//textureColor = vec4(1.0, 0.0, 1.0, 1.0); // test.
 			}
+
 		}
 		else{
 			textureColor = oneColor4;
@@ -665,16 +670,19 @@ void main()
 			shadow_occlusion *= occlusion;
 		}
 
-		vec3 normalFromDepth = normal_from_depth(linearDepthAux, screenPos); // normal from depthTex.***
-		vec2 screenPosAux = vec2(0.5, 0.5);
+		vec3 normalFromDepth = vec3(0.0, 0.0, 1.0);
+		//vec3 normalFromDepth = normal_from_depth(linearDepthAux, screenPos); // normal from depthTex.***
+		//vec2 screenPosAux = vec2(0.5, 0.5);
 
-		vec3 rayAux = getViewRay(screenPosAux); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
-		float scalarProd = dot(normalFromDepth, normalize(-rayAux));
-		scalarProd /= 3.0;
-		scalarProd += 0.666;
+		//vec3 rayAux = getViewRay(screenPosAux); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
+		//float scalarProd = dot(normalFromDepth, normalize(-rayAux));
+		//scalarProd /= 3.0;
+		//scalarProd += 0.666;
 
-		//scalarProd /= 2.0;
-		//scalarProd += 0.5;
+		////scalarProd /= 2.0;
+		////scalarProd += 0.5;
+
+		float scalarProd = 1.0;
 		
 		if(altitude < 0.0)
 		{
@@ -732,20 +740,29 @@ void main()
 
 			return;
 		}
-		else{
+		//else{
 			
-			if(uSeaOrTerrainType == 1)
-			discard;
-		}
+			//if(uSeaOrTerrainType == 1)
+			//discard;
+		//}
 		
-		vec4 finalColor = mix(textureColor, fogColor, vFogAmount); 
+		//vec4 finalColor = mix(textureColor, fogColor, vFogAmount); 
 
-		gl_FragData[0] = vec4(finalColor.xyz * shadow_occlusion * lambertian * scalarProd, 1.0); // original.***
+		//gl_FragData[0] = vec4(finalColor.xyz * shadow_occlusion * lambertian * scalarProd, 1.0); // original.***
 		//gl_FragData[0] = textureColor; // test.***
 		//gl_FragData[0] = vec4(vNormal.xyz, 1.0); // test.***
+		gl_FragData[0] = packDepth(depthAux);  // anything.
 
+		
 		#ifdef USE_MULTI_RENDER_TARGET
-		gl_FragData[1] = vec4(0); // save normal.***
+		gl_FragData[1] = packDepth(depthAux);  // depth.
+		vec3 normal = vNormal;
+		if(normal.z < 0.0)
+		normal *= -1.0;
+		vec3 encodedNormal = encodeNormal(normal);
+		gl_FragData[2] = vec4(encodedNormal, 0.005); // normal.***
+		//gl_FragData[2] = vec4(0.0, 0.0, 1.0, 1.0); // normal.***
+		gl_FragData[3] = vec4(textureColor); // albedo.***
 		#endif
 	}
 }

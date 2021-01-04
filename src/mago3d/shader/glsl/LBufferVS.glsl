@@ -115,7 +115,6 @@
 			applySpecLighting = -1.0;
 
         gl_Position = ModelViewProjectionMatrixRelToEye * pos4;
-		//vec4 orthoPos = modelViewMatrixRelToEye * pos4;
 		//vertexPos = orthoPos.xyz;
 		//depth = (-orthoPos.z)/(far); // the correct value.
 
@@ -127,7 +126,9 @@
 			// gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;
 			// flogz = 1.0 + gl_Position.w;
 			//---------------------------------------------------------------------------------
-			flogz = 1.0 + gl_Position.w;
+			//flogz = 1.0 + gl_Position.w;
+			vec4 orthoPos = modelViewMatrixRelToEye * pos4;
+			flogz = 1.0 - orthoPos.z;
 			Fcoef_half = 0.5 * uFCoef_logDepth;
 		}
 		

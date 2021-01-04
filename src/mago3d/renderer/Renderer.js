@@ -2249,6 +2249,21 @@ Renderer.prototype.renderScreenRectangle = function(gl, options)
 		//texture = magoManager.specularLightTex;
 	}
 
+	var sunSystem = sceneState.sunSystem;
+	if(sunSystem)
+	{
+		var sunLight = sunSystem.getLight(0);
+		if(sunLight && sunLight.depthFbo && sunLight.depthFbo.colorBuffer)
+		{
+			texture = sunLight.depthFbo.colorBuffer;
+		}
+		
+	}
+
+	//if(magoManager.scene._context._us.globeDepthTexture._texture)
+	//{
+	//	texture = magoManager.scene._context._us.globeDepthTexture._texture;
+	//}
 	
 
 	if (texture === undefined)
@@ -2280,7 +2295,7 @@ Renderer.prototype.renderScreenRectangle = function(gl, options)
 
 	gl.depthMask(false);
 	gl.disable(gl.DEPTH_TEST);
-	gl.enable(gl.BLEND);
+	//gl.enable(gl.BLEND);
 
 	gl.drawArrays(gl.TRIANGLES, 0, 6);
 
@@ -2581,15 +2596,15 @@ Renderer.prototype.renderGeometryBuffer = function(gl, renderType, visibleObjCon
 
 	gl.disable(gl.BLEND); // No blend in GBuffer.
 	
-	if (renderType === 0 ) 
-	{
-		// Draw the axis.***
-		if (magoManager.magoPolicy.getShowOrigin() && visibleObjControlerNodes.getAllVisibles().length > 0)
-		{
-			this.renderAxisNodes(visibleObjControlerNodes.getAllVisibles(), renderType);
-		}
-		
-	}
+	//if (renderType === 0 ) 
+	//{
+	//	// Draw the axis.***
+	//	if (magoManager.magoPolicy.getShowOrigin() && visibleObjControlerNodes.getAllVisibles().length > 0)
+	//	{
+	//		this.renderAxisNodes(visibleObjControlerNodes.getAllVisibles(), renderType);
+	//	}
+	//	
+	//}
 	if (renderType === 1 )//&& magoManager.currentFrustumIdx === 1) 
 	{
 		var textureAux1x1 = magoManager.texturesStore.getTextureAux1x1();
@@ -2599,21 +2614,6 @@ Renderer.prototype.renderGeometryBuffer = function(gl, renderType, visibleObjCon
 		
 		// Set default blending setting.
 		//gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
-		
-		// Test TinTerrain.**************************************************************************
-		// Test TinTerrain.**************************************************************************
-		// render tiles, rendertiles.***
-		
-		if (magoManager.tinTerrainManager !== undefined)
-		{
-			// Atmosphere.*******************************************************************************
-			this.renderAtmosphere(gl, renderType);
-
-			//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-			//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE);
-			var bDepthRender = false; // magoManager is no depth render.***
-			magoManager.tinTerrainManager.render(magoManager, bDepthRender, renderType);
-		}
 
 		var bApplySsao = false;
 		var bApplyShadow = false;

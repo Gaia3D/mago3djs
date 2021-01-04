@@ -11,7 +11,7 @@ var TinTerrainManager = function(magoManager, options)
 	}
 	this.ready = true;
 	this.maxDepth = 17;
-	//this.maxDepth = 15;
+	//this.maxDepth = 3; // test.
 	this.currentVisibles_terrName_geoCoords_map = {}; // current visible terrains map[terrainPathName, geographicCoords].
 	this.currentTerrainsMap = {}; // current terrains (that was created) map[terrainPathName, tinTerrain].
 	
@@ -844,7 +844,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 		{ bApplyShadow = true; }
 		gl.uniform1i(currentShader.bApplyShadow_loc, bApplyShadow);
 
-		var bApplySsao = true;
+		
 
 		
 		if (bApplyShadow)
@@ -891,6 +891,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 
 		}
 
+		var bApplySsao = false;
 		gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
 		if (bApplySsao)
 		{
@@ -903,7 +904,7 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 			gl.uniform3fv(currentShader.kernel16_loc, magoManager.sceneState.ssaoKernel16);
 
 			gl.activeTexture(gl.TEXTURE2);
-			gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);  // original.***
+			//gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);  // original.***
 			gl.activeTexture(gl.TEXTURE3);
 			gl.bindTexture(gl.TEXTURE_2D, noiseTexture);
 		}
@@ -941,36 +942,6 @@ TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, s
 		if (this.tinTerrainQuadTreeMercator.childMap.RU) { this.tinTerrainQuadTreeMercator.childMap.RU.renderForward(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
 		if (this.tinTerrainQuadTreeMercator.childMap.RD) { this.tinTerrainQuadTreeMercator.childMap.RD.renderForward(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
 	}
-	
-	// Render the sea.
-	
-	//var currSelObject = magoManager.selectionManager.getSelectedGeneral();
-	//if (currSelObject instanceof(TinTerrain))
-	//{
-	//	currSelObject.renderSea(currentShader, magoManager, bDepth, renderType);
-	//}
-	
-	
-	/*
-	if (renderType === 1)
-	{
-		gl.uniform1i(currentShader.bApplySpecularLighting_loc, true);
-		gl.enable(gl.BLEND);
-		gl.disable(gl.CULL_FACE);
-		var seaTilesCount = succesfullyRenderedTilesArray.length;
-		for (var i=0; i<seaTilesCount; i++)
-		{
-			tinTerrain = succesfullyRenderedTilesArray[i];
-			
-			if (tinTerrain === undefined)
-			{ continue; }
-		
-			tinTerrain.renderSea(currentShader, magoManager, bDepth, renderType);
-		}
-		gl.disable(gl.BLEND);
-		gl.enable(gl.CULL_FACE);
-	}
-	*/
 	
 	gl.depthRange(0, 1);
 	gl.depthFunc(gl.LEQUAL);

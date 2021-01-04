@@ -504,6 +504,10 @@ MagoWorld.prototype.mousemove = function(event)
 	*/
 	// End check if is dragging.---
 	var mouseAction = magoManager.sceneState.mouseAction;
+
+	if(!mouseAction.strCamCoordPoint)
+	return;
+	
 	var camera = this.magoManager.sceneState.camera;
 	
 	var oldX = mouseAction.strX;
@@ -915,7 +919,7 @@ MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
 	// determine world position of the X,Y.
 	mouseAction.strLinealDepth = currentLinearDepth;
 	//mouseAction.strCamCoordPoint = ManagerUtils.calculatePixelPositionCamCoord(gl, mouseAction.strX, mouseAction.strY, mouseAction.strCamCoordPoint, currentDepthFbo, currentFrustumNear, currentFrustumFar, magoManager);
-	mouseAction.strCamCoordPoint = MagoWorld.screenToCamCoord(mouseX, mouseY, magoManager, mouseAction.strCamCoordPoint);
+	mouseAction.strCamCoordPoint = MagoWorld.screenToCamCoord(mouseX, mouseY, magoManager, mouseAction.strCamCoordPoint);//, resultObject);
 	if (!mouseAction.strCamCoordPoint) 
 	{
 		return;

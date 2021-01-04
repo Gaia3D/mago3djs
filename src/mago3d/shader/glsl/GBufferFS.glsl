@@ -614,14 +614,24 @@ void main()
 	//finalColor = vec4(linearDepth, linearDepth, linearDepth, 1.0); // test to render depth color coded.***
     //gl_FragData[0] = finalColor; 
 	*/
+	float depthAux = depth;
+
+	#ifdef USE_LOGARITHMIC_DEPTH
+	if(bUseLogarithmicDepth)
+	{
+		gl_FragDepthEXT = log2(flogz) * Fcoef_half;
+		depthAux = gl_FragDepthEXT; 
+	}
+	#endif
+
 	vec4 albedo4 = vec4((textureColor.xyz) * shadow_occlusion, 1.0);
-	gl_FragData[0] = albedo4;
+	gl_FragData[0] = albedo4; // anything.
 
 	#ifdef USE_MULTI_RENDER_TARGET
 	if(bUseMultiRenderTarget)
 	{
 		// save depth, normal, albedo.
-		gl_FragData[1] = packDepth(depth); 
+		gl_FragData[1] = packDepth(depthAux); 
 
 		// When render with cull_face disabled, must correct the faces normal.
 		float frustumIdx = 1.0;
@@ -647,10 +657,5 @@ void main()
 	#endif
 
 
-	#ifdef USE_LOGARITHMIC_DEPTH
-	if(bUseLogarithmicDepth)
-	{
-		gl_FragDepthEXT = log2(flogz) * Fcoef_half;
-	}
-	#endif
+	
 }

@@ -396,6 +396,7 @@ TinTerrain.prototype.isChildrenRenderingPhase = function(renderingPhase)
 
 TinTerrain.prototype.isChildrenPrepared = function()
 {
+	// function no used.
 	if (this.childMap === undefined)
 	{ return false; }
 	
@@ -836,11 +837,11 @@ TinTerrain.prototype.makeTextureMaster = function()
 	var shader =  postFxShaderManager.getShader("texturesMerger");
 	postFxShaderManager.useProgram(shader);
 
-	for (var i=0; i<8; i++)
-	{
-		gl.activeTexture(gl.TEXTURE0 + i); 
-		gl.bindTexture(gl.TEXTURE_2D, null);
-	}
+	//for (var i=0; i<8; i++)
+	//{
+	//	gl.activeTexture(gl.TEXTURE0 + i); 
+	//	gl.bindTexture(gl.TEXTURE_2D, null);
+	//}
 
 	gl.enableVertexAttribArray(shader.position2_loc);
 	FBO.bindAttribute(gl, this.tinTerrainManager.quadBuffer, shader.position2_loc, 2);
@@ -912,6 +913,8 @@ TinTerrain.prototype.makeTextureMaster = function()
 		this.textureMasterPrepared = true; 
 		this.objToClampToTerrainStyleId = this.tinTerrainManager.objToClampToTerrainStyleId;
 	}
+
+	
 
 	FBO.bindFramebuffer(gl, null);
 };
@@ -1067,12 +1070,14 @@ TinTerrain.prototype.bindTexture = function(gl, shader, currDepth)
 		gl.uniform1fv(shader.externalAlphasArray_loc, externalAlphaLayers);
 		
 		//////////////////////////////////
-		return;
+		return true;
 	}
 	else
 	{
 		if (this.owner)
-		{ this.owner.bindTexture(gl, shader, currDepth); }
+		{ return this.owner.bindTexture(gl, shader, currDepth); }
+		else
+		return false;
 	}
 };
 
@@ -1393,9 +1398,6 @@ TinTerrain.prototype.prepareTinTerrainForward = function(magoManager, tinTerrain
 		}
 		*/
 	}
-
-	
-	
 	
 	
 	
@@ -1531,18 +1533,19 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 		this.childMap.RU.renderForward(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray);
 		this.childMap.RD.renderForward(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray);
 	}
-	else
+	else 
 	{
 		// Render this tile.
 		if (this.fileLoadState === CODE.fileLoadState.LOAD_FAILED) // provisional solution.
 		{ return false; }
 
-		if (this.renderingFase === this.tinTerrainManager.renderingFase)
-		{ return true; }
+		//if (this.renderingFase === this.tinTerrainManager.renderingFase)
+		//{ return true; }
 
 		if (!this.isMeshPrepared())
-		{ return true; }
-
+		{ 
+			return true; 
+		}
 
 		var gl = magoManager.getGl();
 		if (renderType === 2)
@@ -1587,10 +1590,14 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 			if (this.layersStyleId !== this.tinTerrainManager.layersStyleId)
 			{ mustMakeTextureMaster = true; }
 
+
 			if (mustMakeTextureMaster && this.isTexturePrepared(this.texture))
 			{
-				//this.textureMasterPrepared = undefined;
-				this.makeTextureMaster();
+				this.makeTextureMaster();	
+				
+				// After makingTextureMaster, rebing current frameBuffer.
+				var magoManager = this.tinTerrainManager.magoManager;
+				magoManager.bindMagoFbo();
 
 				currentShader.resetLastBuffersBinded();
 				magoManager.postFxShadersManager.useProgram(currentShader);
@@ -1602,7 +1609,7 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 
 				gl.viewport(0, 0, magoManager.sceneState.drawingBufferWidth[0], magoManager.sceneState.drawingBufferHeight[0]);
 
-				var bApplySsao = true;
+				var bApplySsao = false;
 				gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
 
 				// Note: after make texture-master, there are a fbo.bindFramebuffer and changes activeTexture & bindTexture,
@@ -1618,11 +1625,11 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 					gl.uniform3fv(currentShader.kernel16_loc, magoManager.sceneState.ssaoKernel16);
 
 					gl.activeTexture(gl.TEXTURE2);
-					gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);  // original.***
+					//gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);  // original.***
 					gl.activeTexture(gl.TEXTURE3);
 					gl.bindTexture(gl.TEXTURE_2D, noiseTexture);
 				}
-
+				
 				//if (bApplyShadow)
 				{
 					// Set sunMatrix uniform.***
@@ -1648,12 +1655,11 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 				}
 				// End restoring active textures of initial renderingTinTerrain framebuffer.***
 				//-------------------------------------------------------------------------------------------------------------------
-					
 			}
 				
 			gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
 			gl.uniform1f(currentShader.externalAlpha_loc, 1);
-			gl.uniform1i(currentShader.bApplySsao_loc, this.depth > 8); // apply ssao default.***
+			//gl.uniform1i(currentShader.bApplySsao_loc, this.depth > 8); // apply ssao default.***
 				
 
 			// Caustics.***************************************
@@ -1671,16 +1677,20 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 			// End caustics.----------------------------------------
 
 			this.bindTexture(gl, currentShader, this.depth);
+
 		}
+
+
 			
 		// render this tinTerrain.
 		var renderWireframe = false;
 		var vboMemManager = magoManager.vboMemoryManager;
 
-		//if (this.terrainPositionHIGH === undefined)
-		//{
+		if (Math.abs(this.terrainPositionHIGH[0]) < 10.0 || Math.abs(this.terrainPositionHIGH[1]) < 10.0 || Math.abs(this.terrainPositionHIGH[1]) < 10.0 )
+		{
+			var hola = 0;
 		//return;
-		//}
+		}
 			
 		gl.uniform3fv(currentShader.buildingPosHIGH_loc, this.terrainPositionHIGH);
 		gl.uniform3fv(currentShader.buildingPosLOW_loc, this.terrainPositionLOW);
@@ -1697,28 +1707,28 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 		// Positions.
 		if (!vboKey.bindDataPosition(currentShader, vboMemManager))
 		{ 
-			if (this.owner !== undefined)
-			{ this.owner.render(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
-			return false; 
+			//if (this.owner !== undefined)
+			//{ this.owner.render(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); } // render function no exist. change by renderForward.
+			//return false; 
 		}
 		
 		// TexCoords (No necessary for depth rendering).
-		if (!bDepth)
+		//if (!bDepth)
 		{
 			if (!vboKey.bindDataTexCoord(currentShader, vboMemManager))
 			{
-				if (this.owner !== undefined)
-				{ this.owner.render(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }					
-				return false; 
+				//if (this.owner !== undefined)
+				//{ this.owner.render(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); } // render function no exist. change by renderForward.					
+				//return false; 
 			}
 		}
 			
 		// Normals.
 		if (!vboKey.bindDataNormal(currentShader, vboMemManager))
 		{ 
-			if (this.owner !== undefined)
-			{ this.owner.render(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
-			return false; 
+			//if (this.owner !== undefined)
+			//{ this.owner.render(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); } // render function no exist. change by renderForward.
+			//return false; 
 		}
 			
 		// Colors.
@@ -1739,9 +1749,9 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 		// Indices.
 		if (!vboKey.bindDataIndice(currentShader, vboMemManager))
 		{ 
-			if (this.owner !== undefined)
-			{ this.owner.render(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
-			return false; 
+			//if (this.owner !== undefined)
+			//{ this.owner.render(currentShader, magoManager, bDepth, renderType, succesfullyRenderedTilesArray); }
+			//return false; 
 		}
 		var selectionManager = magoManager.selectionManager;
 		var indicesCount = vboKey.indicesCount;
@@ -1759,10 +1769,10 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 			}
 			else
 			{
-				if (selectionManager)
+				//if (selectionManager)
 				{
 					var currSelObject = selectionManager.getSelectedGeneral();
-					if (currSelObject !== this)
+					//if (currSelObject !== this)
 					{ gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); } // Fill.
 				}
 			}
@@ -1793,10 +1803,6 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 		// End test.--------------------------------------------------------------------------------------
 			
 		// Render skirt if exist.
-
-		//if (this.depth === 8 && this.X === 217 && this.Y === 99)
-		//{ var hola = 0; }
-			
 		var vboKey = this.vboKeyContainer.vboCacheKeysArray[1]; // the idx = 0 is the terrain. idx = 1 is the skirt.
 		if (vboKey === undefined)
 		{ return; }
@@ -1829,9 +1835,11 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 		{ 
 			gl.drawArrays(gl.TRIANGLE_STRIP, 0, vboKey.vertexCount); 
 		} 
+
 		this.renderingFase = this.tinTerrainManager.renderingFase;
+		return true;
 	}
-	return true;
+	
 };
 
 /**

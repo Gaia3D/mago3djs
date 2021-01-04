@@ -75,7 +75,7 @@ void main()\n\
 {  \n\
 	if(bIsMakingDepth)\n\
 	{\n\
-		gl_FragColor = packDepth(-depthValue);\n\
+		gl_FragData[0] = packDepth(-depthValue);\n\
 	}\n\
 	else{\n\
 		vec4 textureColor = oneColor4;\n\
@@ -107,7 +107,9 @@ void main()\n\
 			textureColor = oneColor4;\n\
 		}\n\
 		\n\
-		gl_FragColor = vcolor4; \n\
+		gl_FragData[0] = vcolor4; \n\
+		//gl_FragData[1] = vcolor4; \n\
+		//gl_FragData[2] = vcolor4; \n\
 	}\n\
 }";
 ShaderSource.atmosphereVS = "attribute vec3 position;\n\
@@ -1830,14 +1832,24 @@ void main()\n\
 	//finalColor = vec4(linearDepth, linearDepth, linearDepth, 1.0); // test to render depth color coded.***\n\
     //gl_FragData[0] = finalColor; \n\
 	*/\n\
+	float depthAux = depth;\n\
+\n\
+	#ifdef USE_LOGARITHMIC_DEPTH\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
+		depthAux = gl_FragDepthEXT; \n\
+	}\n\
+	#endif\n\
+\n\
 	vec4 albedo4 = vec4((textureColor.xyz) * shadow_occlusion, 1.0);\n\
-	gl_FragData[0] = albedo4;\n\
+	gl_FragData[0] = albedo4; // anything.\n\
 \n\
 	#ifdef USE_MULTI_RENDER_TARGET\n\
 	if(bUseMultiRenderTarget)\n\
 	{\n\
 		// save depth, normal, albedo.\n\
-		gl_FragData[1] = packDepth(depth); \n\
+		gl_FragData[1] = packDepth(depthAux); \n\
 \n\
 		// When render with cull_face disabled, must correct the faces normal.\n\
 		float frustumIdx = 1.0;\n\
@@ -1863,12 +1875,7 @@ void main()\n\
 	#endif\n\
 \n\
 \n\
-	#ifdef USE_LOGARITHMIC_DEPTH\n\
-	if(bUseLogarithmicDepth)\n\
-	{\n\
-		gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
-	}\n\
-	#endif\n\
+	\n\
 }";
 ShaderSource.GBufferVS = "\n\
 	attribute vec3 position;\n\
@@ -2030,7 +2037,8 @@ ShaderSource.GBufferVS = "\n\
 			// gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;\n\
 			// flogz = 1.0 + gl_Position.w;\n\
 			//---------------------------------------------------------------------------------\n\
-			flogz = 1.0 + gl_Position.w;\n\
+			//flogz = 1.0 + gl_Position.w;\n\
+			flogz = 1.0 - orthoPos.z;\n\
 			Fcoef_half = 0.5 * uFCoef_logDepth;\n\
 		}\n\
 		\n\
@@ -3058,7 +3066,6 @@ ShaderSource.LBufferVS = "\n\
 			applySpecLighting = -1.0;\n\
 \n\
         gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
-		//vec4 orthoPos = modelViewMatrixRelToEye * pos4;\n\
 		//vertexPos = orthoPos.xyz;\n\
 		//depth = (-orthoPos.z)/(far); // the correct value.\n\
 \n\
@@ -3070,7 +3077,9 @@ ShaderSource.LBufferVS = "\n\
 			// gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;\n\
 			// flogz = 1.0 + gl_Position.w;\n\
 			//---------------------------------------------------------------------------------\n\
-			flogz = 1.0 + gl_Position.w;\n\
+			//flogz = 1.0 + gl_Position.w;\n\
+			vec4 orthoPos = modelViewMatrixRelToEye * pos4;\n\
+			flogz = 1.0 - orthoPos.z;\n\
 			Fcoef_half = 0.5 * uFCoef_logDepth;\n\
 		}\n\
 		\n\
@@ -5692,6 +5701,10 @@ bool isInShadow(vec4 pointWC, int currSunIdx)\n\
 			{depthRelToLight = unpackDepth(texture2D(shadowMapTex, posRelToLight.xy));}\n\
 			else if(currSunIdx == 1)\n\
 			{depthRelToLight = unpackDepth(texture2D(shadowMapTex2, posRelToLight.xy));}\n\
+\n\
+			//if(depthRelToLight < 0.1)\n\
+			//return false;\n\
+\n\
 			if(posRelToLight.z > depthRelToLight*tolerance )\n\
 			{\n\
 				inShadow = true;\n\
@@ -5881,19 +5894,30 @@ void main()\n\
 		vec3 posCC = viewPosH.xyz/viewPosH.w;\n\
 		vec4 posWC = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0) + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 1.0);\n\
 		//------------------------------------------------------------------------------------------------------------------------------\n\
+\n\
+		// now, check if sunDirection has same direction that posWC.\n\
+		bool sunInAntipodas = false;\n\
+		float dotAux = dot(sunDirWC, normalize(posWC.xyz));\n\
+		if(dotAux > 0.0)\n\
+		{\n\
+			sunInAntipodas = true;\n\
+		}\n\
 		\n\
 		// 2nd, calculate the vertex relative to light.***\n\
 		// 1rst, try with the closest sun. sunIdx = 0.\n\
-		bool pointIsinShadow = isInShadow(posWC, 0);\n\
-		if(!pointIsinShadow)\n\
+		if(!sunInAntipodas)\n\
 		{\n\
-			pointIsinShadow = isInShadow(posWC, 1);\n\
-		}\n\
+			bool pointIsinShadow = isInShadow(posWC, 0);\n\
+			if(!pointIsinShadow)\n\
+			{\n\
+				pointIsinShadow = isInShadow(posWC, 1);\n\
+			}\n\
 \n\
-		if(pointIsinShadow)\n\
-		{\n\
-			shadow_occlusion = 0.5;\n\
-			alpha = 0.5;\n\
+			if(pointIsinShadow)\n\
+			{\n\
+				shadow_occlusion = 0.5;\n\
+				alpha = 0.5;\n\
+			}\n\
 		}\n\
 \n\
 		gl_FragColor = vec4(finalColor.rgb*shadow_occlusion, alpha);\n\
@@ -6005,6 +6029,15 @@ void main()\n\
 		float occlInv = 1.0 - occlusion;\n\
 		vec4 finalColor = vec4(albedo.r * occlInv, albedo.g * occlInv, albedo.b * occlInv, albedo.a);\n\
 		gl_FragColor = vec4(finalColor);\n\
+\n\
+		// fog.*****************************************************************\n\
+		//float myLinearDepth2 = getDepth(screenPos);\n\
+		//float myDepth = (myLinearDepth2 * currFar_origin)/500.0;\n\
+		//if(myDepth > 1.0)\n\
+		//myDepth = 1.0;\n\
+		//vec4 finalColor2 = mix(finalColor, vec4(1.0, 1.0, 1.0, 1.0), myDepth);\n\
+		//gl_FragColor = vec4(finalColor2);\n\
+		// End fog.---------------------------------------------------------------\n\
 \n\
 		//float finalColorLightLevel = finalColor.r + finalColor.g + finalColor.b;\n\
 		//if(finalColorLightLevel < 0.9)\n\
@@ -9223,8 +9256,6 @@ float roundCustom(float number)\n\
 \n\
 #define M_PI 3.1415926535897932384626433832795\n\
 \n\
-\n\
-\n\
 void main()\n\
 {    \n\
 	float depthAux = -depthValue;\n\
@@ -9236,7 +9267,7 @@ void main()\n\
 		depthAux = gl_FragDepthEXT;\n\
 	}\n\
 	#endif\n\
-\n\
+	/*\n\
 	if(bIsMakingDepth)\n\
 	{\n\
 		gl_FragData[0] = packDepth(depthAux);\n\
@@ -9250,7 +9281,9 @@ void main()\n\
 		return;\n\
 	}\n\
 	else\n\
+	*/\n\
 	{\n\
+		/*\n\
 		if(uRenderType == 2)\n\
 		{\n\
 			gl_FragData[0] = oneColor4; \n\
@@ -9264,6 +9297,7 @@ void main()\n\
 \n\
 			return;\n\
 		}\n\
+		*/\n\
 \n\
 		float shadow_occlusion = 1.0;\n\
 		if(bApplyShadow)\n\
@@ -9313,6 +9347,7 @@ void main()\n\
 		float occlusion = 1.0;\n\
 \n\
 		vec4 textureColor = vec4(0.0);\n\
+		/*\n\
 		if(colorType == 0) // one color.\n\
 		{\n\
 			textureColor = oneColor4;\n\
@@ -9322,7 +9357,8 @@ void main()\n\
 				discard;\n\
 			}\n\
 		}\n\
-		else if(colorType == 2) // texture color.\n\
+		*/\n\
+		if(colorType == 2) // texture color.\n\
 		{\n\
 			// Check if the texture is from a different depth tile texture.***\n\
 			vec2 finalTexCoord = vTexCoord;\n\
@@ -9354,7 +9390,9 @@ void main()\n\
 			if(textureColor.w == 0.0)\n\
 			{\n\
 				discard;\n\
+				//textureColor = vec4(1.0, 0.0, 1.0, 1.0); // test.\n\
 			}\n\
+\n\
 		}\n\
 		else{\n\
 			textureColor = oneColor4;\n\
@@ -9477,16 +9515,19 @@ void main()\n\
 			shadow_occlusion *= occlusion;\n\
 		}\n\
 \n\
-		vec3 normalFromDepth = normal_from_depth(linearDepthAux, screenPos); // normal from depthTex.***\n\
-		vec2 screenPosAux = vec2(0.5, 0.5);\n\
+		vec3 normalFromDepth = vec3(0.0, 0.0, 1.0);\n\
+		//vec3 normalFromDepth = normal_from_depth(linearDepthAux, screenPos); // normal from depthTex.***\n\
+		//vec2 screenPosAux = vec2(0.5, 0.5);\n\
 \n\
-		vec3 rayAux = getViewRay(screenPosAux); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
-		float scalarProd = dot(normalFromDepth, normalize(-rayAux));\n\
-		scalarProd /= 3.0;\n\
-		scalarProd += 0.666;\n\
+		//vec3 rayAux = getViewRay(screenPosAux); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
+		//float scalarProd = dot(normalFromDepth, normalize(-rayAux));\n\
+		//scalarProd /= 3.0;\n\
+		//scalarProd += 0.666;\n\
 \n\
-		//scalarProd /= 2.0;\n\
-		//scalarProd += 0.5;\n\
+		////scalarProd /= 2.0;\n\
+		////scalarProd += 0.5;\n\
+\n\
+		float scalarProd = 1.0;\n\
 		\n\
 		if(altitude < 0.0)\n\
 		{\n\
@@ -9544,20 +9585,29 @@ void main()\n\
 \n\
 			return;\n\
 		}\n\
-		else{\n\
+		//else{\n\
 			\n\
-			if(uSeaOrTerrainType == 1)\n\
-			discard;\n\
-		}\n\
+			//if(uSeaOrTerrainType == 1)\n\
+			//discard;\n\
+		//}\n\
 		\n\
-		vec4 finalColor = mix(textureColor, fogColor, vFogAmount); \n\
+		//vec4 finalColor = mix(textureColor, fogColor, vFogAmount); \n\
 \n\
-		gl_FragData[0] = vec4(finalColor.xyz * shadow_occlusion * lambertian * scalarProd, 1.0); // original.***\n\
+		//gl_FragData[0] = vec4(finalColor.xyz * shadow_occlusion * lambertian * scalarProd, 1.0); // original.***\n\
 		//gl_FragData[0] = textureColor; // test.***\n\
 		//gl_FragData[0] = vec4(vNormal.xyz, 1.0); // test.***\n\
+		gl_FragData[0] = packDepth(depthAux);  // anything.\n\
 \n\
+		\n\
 		#ifdef USE_MULTI_RENDER_TARGET\n\
-		gl_FragData[1] = vec4(0); // save normal.***\n\
+		gl_FragData[1] = packDepth(depthAux);  // depth.\n\
+		vec3 normal = vNormal;\n\
+		if(normal.z < 0.0)\n\
+		normal *= -1.0;\n\
+		vec3 encodedNormal = encodeNormal(normal);\n\
+		gl_FragData[2] = vec4(encodedNormal, 0.005); // normal.***\n\
+		//gl_FragData[2] = vec4(0.0, 0.0, 1.0, 1.0); // normal.***\n\
+		gl_FragData[3] = vec4(textureColor); // albedo.***\n\
 		#endif\n\
 	}\n\
 }";
@@ -9719,14 +9769,8 @@ void main()\n\
 	}\n\
 \n\
 	v3Pos = (modelViewMatrixRelToEye * pos4).xyz;\n\
-	\n\
-	if(bIsMakingDepth)\n\
-	{\n\
-		\n\
-		depthValue = v3Pos.z/far;\n\
-	}\n\
-	else\n\
-	{\n\
+	depthValue = v3Pos.z/far;\n\
+\n\
 		vTexCoord = texCoord;\n\
 \n\
 \n\
@@ -9778,7 +9822,7 @@ void main()\n\
 		}\n\
 		\n\
 		\n\
-	}\n\
+	\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 	\n\
 \n\
@@ -9796,11 +9840,7 @@ void main()\n\
 		//---------------------------------------------------------------------------------\n\
 \n\
 		flogz = 1.0 - v3Pos.z;\n\
-		//flogz = 1.0 + gl_Position.w;\n\
 		Fcoef_half = 0.5 * uFCoef_logDepth;\n\
-\n\
-		//vec4 v4Pos = modelViewMatrixRelToEye * pos4;\n\
-		//flogz = 1.0 + v4Pos.w;\n\
 	}\n\
 \n\
 	// calculate fog amount.\n\
