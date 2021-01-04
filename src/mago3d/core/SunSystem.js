@@ -175,7 +175,7 @@ SunSystem.prototype.calculateSunGeographicCoords = function()
 	{
 		this.date = new Date();
 		this.date.setMonth(2);
-		this.date.setHours(2);
+		this.date.setHours(15);
 		this.date.setMinutes(0);
 	}
 	

@@ -310,10 +310,11 @@ Modeler.prototype.__TEST__extrudedLines = function()
 		// now, create the polyLine extruded.***
 		
 		var extrudedLine = geoCoordsList.getExtrudedWallRenderableObject(height, undefined, this.magoManager, undefined, options, undefined) ;
-		extrudedLine.setOneColor(1.0, 0.5, 0.3, 1.0);
+		extrudedLine.setOneColor(1.0, 0.5, 0.3, 0.5);
 		extrudedLine.attributes.isSelectable = true;
 		extrudedLine.attributes.isMovable = true;
 		extrudedLine.attributes.selectedColor4 = new Color(1.0, 0.0, 0.0, 1.0);
+		extrudedLine.attributes.opaque = false;
 
 		if (extrudedLine.options === undefined)
 		{ extrudedLine.options = {}; }
@@ -973,7 +974,7 @@ Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive
 		this.magoRectangle.render(magoManager, shader, renderType, glPrimitive, bIsSelected);
 	}
 	//this.__TEST__laser();
-	//this.__TEST__extrudedLines();
+	this.__TEST__extrudedLines();
 	//this.__TEST__extrusionBuildings();
 };
 

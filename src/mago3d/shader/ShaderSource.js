@@ -5895,7 +5895,7 @@ void main()\n\
 		vec4 posWC = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0) + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 1.0);\n\
 		//------------------------------------------------------------------------------------------------------------------------------\n\
 \n\
-		// now, check if sunDirection has same direction that posWC.\n\
+		// now, check if sun is in the antipodas.\n\
 		bool sunInAntipodas = false;\n\
 		float dotAux = dot(sunDirWC, normalize(posWC.xyz));\n\
 		if(dotAux > 0.0)\n\
