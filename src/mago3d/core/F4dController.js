@@ -47,6 +47,14 @@ F4dController.prototype.addSmartTileGroup = function(f4dObject)
 		var groupId = f4dObject.data_key || f4dObject.dataGroupId;
 		var groupDataFolder;
 		var groupKey;
+		var attributes;
+
+		var metaInfo = f4dObject.metainfo;
+		if (metaInfo && typeof metaInfo === 'string')
+		{
+			metaInfo = JSON.parse(metaInfo);
+		}
+
 		if (f4dObject.data_key) 
 		{
 			groupDataFolder = groupId;
@@ -65,6 +73,7 @@ F4dController.prototype.addSmartTileGroup = function(f4dObject)
 			this.smartTilePathInfo[groupKey] = {};
 		}
 
+		this.smartTilePathInfo[groupKey].attributes = f4dObject.attributes || metaInfo;
 		this.smartTilePathInfo[groupKey].projectId = groupId;
 		this.smartTilePathInfo[groupKey].projectFolderPath = groupDataFolder;
 		//this.smartTilePathInfo[groupKey].smartTileIndexPath = groupDataFolder + '/' + groupKey + '_TILE';

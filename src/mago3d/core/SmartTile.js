@@ -1392,7 +1392,8 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 			}
 		}
 
-		var commonAttr = magoManager.hierarchyManager.getNodeByDataKey(savedProjectId, 'attributes');
+		//var commonAttr = magoManager.hierarchyManager.getNodeByDataKey(savedProjectId, 'attributes');
+		var commonAttr = smartTilePathInfo[projectId].attributes;
 		if (commonAttr) 
 		{
 			attributes.isVisible = commonAttr.isVisible;

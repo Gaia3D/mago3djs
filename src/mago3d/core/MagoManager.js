@@ -3054,7 +3054,6 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 	var nodeRoot;
 	var geoLocDataManager;
 	var geoLoc;
-	var neoBuilding;
 	var worldPosition;
 	var screenCoord;
 	
@@ -3073,7 +3072,6 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 		{ continue; }
 		
 		var key = node.data.neoBuilding.buildingId;
-		///rootNodesMap.set(nodeRoot, nodeRoot);
 		rootNodesMap[key] = nodeRoot;
 	}
 	
@@ -3082,26 +3080,32 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 	{
 		if (Object.prototype.hasOwnProperty.call(rootNodesMap, key))
 		{
-			
-			//nodeRoot = rootNodesArray[i];
 			nodeRoot = rootNodesMap[key];
-			if(nodeRoot.data.attributes.isVisible === false || !nodeRoot.data.attributes.label) continue;
+			var label = nodeRoot.data.attributes.label;
+
+			if(nodeRoot.data.attributes.isVisible === false) continue;
 			geoLocDataManager = nodeRoot.data.geoLocDataManager;
 			geoLoc = geoLocDataManager.getCurrentGeoLocationData();
-			//neoBuilding = node.data.neoBuilding;
 
 			worldPosition = nodeRoot.getBBoxCenterPositionWorldCoord(geoLoc);
-
 			screenCoord = ManagerUtils.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord, this);
 
 			if(isNaN(screenCoord.x) || isNaN(screenCoord.y)) continue;
 
-			var elemFromPoints = document.elementsFromPoint(screenCoord.x, screenCoord.y);
-			//if (elemFromPoints.length === 0) { continue; }
+			if(!label) {
+				var dataName = nodeRoot.data.data_name;
+				if(!dataName || dataName.length === 0) continue;
+				var elemFromPoints = document.elementsFromPoint(screenCoord.x, screenCoord.y);
+				if (elemFromPoints.length > 0 && elemFromPoints[0].nodeName === 'CANVAS' && screenCoord.x >= 0 && screenCoord.y >= 0)
+				{
+					ctx.font = "13px Arial";
+					ctx.strokeStyle = 'MidnightBlue';
+					ctx.fillStyle= "PapayaWhip";
 
-			//if (elemFromPoints[0].nodeName === 'CANVAS' && screenCoord.x >= 0 && screenCoord.y >= 0)
-			//{
-				var label = nodeRoot.data.attributes.label;
+					ctx.fillText(dataName, screenCoord.x, screenCoord.y);
+					ctx.strokeText(dataName, screenCoord.x, screenCoord.y);
+				}
+			} else {
 				if(label instanceof Array)
 				{
 					for(var j=0,labelLen=label.length;j<labelLen;j++)
@@ -3116,9 +3120,6 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 						ctx.fillStyle = "white";
 						ctx.strokeStyle = "white";
 						ctx.textAlign = "center";
-						//ctx.strokeText(nodeRoot.data.nodeId, screenCoord.x, screenCoord.y);
-						//ctx.fillText(nodeRoot.data.nodeId, screenCoord.x, screenCoord.y);
-						//ctx.strokeText('민간분양', screenCoord.x+30, screenCoord.y);
 						var textOffset = lb.textOffset;
 						ctx.fillText(lb.text, screenCoord.x+textOffset[0], screenCoord.y+textOffset[1]);
 					}
@@ -3132,15 +3133,11 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 					ctx.fillStyle = "white";
 					ctx.strokeStyle = "white";
 					ctx.textAlign = "center";
-					//ctx.strokeText(nodeRoot.data.nodeId, screenCoord.x, screenCoord.y);
-					//ctx.fillText(nodeRoot.data.nodeId, screenCoord.x, screenCoord.y);
-					//ctx.strokeText('민간분양', screenCoord.x+30, screenCoord.y);
 					var textOffset = label.textOffset;
 					var text = label.text;
 					if(text.indexOf('\n') > -1) {
 						var splitTexts = text.split('\n');
 						var yoffset = textOffset[1];
-						var halfYoffset = yoffset/2;
 						var ypos = screenCoord.y + yoffset;
 						for(var k=0,textLen=splitTexts.length;k<textLen;k++) {
 							var splitText = splitTexts[k];
@@ -3152,7 +3149,7 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 						ctx.fillText(text, screenCoord.x+textOffset[0], screenCoord.y+textOffset[1]);
 					}
 				}
-			//}
+			}
 		}
 	}
 	
