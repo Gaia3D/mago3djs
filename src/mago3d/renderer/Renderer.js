@@ -1722,8 +1722,7 @@ Renderer.prototype.renderTerrainCopy = function()
 	var sceneState = magoManager.sceneState;
 	var gl = magoManager.getGl();
 	
-	if (magoManager.czm_globeDepthText === undefined)
-	{ magoManager.czm_globeDepthText = magoManager.scene._context._us.globeDepthTexture._texture; }
+	magoManager.czm_globeDepthText = magoManager.scene._context._us.globeDepthTexture._texture; 
 
 	if (!magoManager.czm_globeDepthText)
 	{ return; }
@@ -1838,8 +1837,7 @@ Renderer.prototype.renderTerrainShadow = function(gl)
 	var magoManager = this.magoManager;
 	var sceneState = magoManager.sceneState;
 	
-	if (magoManager.czm_globeDepthText === undefined)
-	{ magoManager.czm_globeDepthText = magoManager.scene._context._us.globeDepthTexture._texture; }
+	magoManager.czm_globeDepthText = magoManager.scene._context._us.globeDepthTexture._texture; 
 
 	if(!magoManager.czm_globeDepthText)
 	return;

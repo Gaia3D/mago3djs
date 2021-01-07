@@ -2896,7 +2896,10 @@ void main()\n\
 			factorByDist = 1.0 - (distToLight - lightHotDistance)/(lightFalloffLightDist - lightHotDistance);\n\
 		}\n\
 \n\
-		float diffuseDot = dot(-lightDirToPointCC, vec3(normal4.xyz));\n\
+		vec3 normal3 = normal4.xyz;\n\
+		if(normal3.z < 0.0)\n\
+		normal3 *= -1.0;\n\
+		float diffuseDot = dot(-lightDirToPointCC, vec3(normal3));\n\
 \n\
 		if(diffuseDot < 0.0)\n\
 		{\n\
