@@ -1863,8 +1863,6 @@ void main()\n\
 		frustumIdx = 0.035;\n\
 \n\
 		vec3 normal = vNormal;\n\
-		if(normal.z < 0.0)\n\
-		normal *= -1.0;\n\
 \n\
 		vec3 encodedNormal = encodeNormal(normal);\n\
 		gl_FragData[2] = vec4(encodedNormal, frustumIdx); // save normal.***\n\
@@ -2897,8 +2895,6 @@ void main()\n\
 		}\n\
 \n\
 		vec3 normal3 = normal4.xyz;\n\
-		if(normal3.z < 0.0)\n\
-		normal3 *= -1.0;\n\
 		float diffuseDot = dot(-lightDirToPointCC, vec3(normal3));\n\
 \n\
 		if(diffuseDot < 0.0)\n\
@@ -5735,8 +5731,8 @@ void main()\n\
 \n\
 		vec4 normal4WC = vec4(normalize(posWC.xyz), 1.0);\n\
 		vec4 normal4 = normalMatrix4 * normal4WC;\n\
-		if(normal4.z < 0.0)\n\
-		normal4 *= -1.0;\n\
+		//if(normal4.z < 0.0)\n\
+		//normal4 *= -1.0;\n\
 		\n\
 		vec3 encodedNormal = encodeNormal(normal4.xyz);\n\
 		gl_FragData[1] = vec4(encodedNormal, frustumIdx); // save normal.***\n\

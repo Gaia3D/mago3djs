@@ -645,8 +645,6 @@ void main()
 		frustumIdx = 0.035;
 
 		vec3 normal = vNormal;
-		if(normal.z < 0.0)
-		normal *= -1.0;
 
 		vec3 encodedNormal = encodeNormal(normal);
 		gl_FragData[2] = vec4(encodedNormal, frustumIdx); // save normal.***
