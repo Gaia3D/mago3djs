@@ -2873,10 +2873,10 @@ void main()\n\
 		vec3 posCC = getPosCC(screenPos, dataType, normal4);\n\
 		\n\
 		// If the data is no generalGeomtry or pointsCloud, then discard.\n\
-		if(dataType != 0 && dataType != 2)\n\
-		{\n\
-			discard;\n\
-		}\n\
+		//if(dataType != 0 && dataType != 2)\n\
+		//{\n\
+		//	discard;\n\
+		//}\n\
 		//uLightParameters[4]; // 0= lightDist, 1= lightFalloffDist, 2= maxSpotDot, 3= falloffSpotDot.\n\
 \n\
 		// vector light-point.\n\
@@ -2884,10 +2884,16 @@ void main()\n\
 		vec3 lightDirToPointCC = normalize(posCC - vLightPosCC);\n\
 		float distToLight = length(vecLightToPointCC);\n\
 \n\
+		float lightHotDistance = uLightParameters[0];\n\
 		float lightFalloffLightDist = uLightParameters[1];\n\
+		float factorByDist = 1.0;\n\
 		if(distToLight > lightFalloffLightDist)\n\
 		{\n\
 			discard;\n\
+		}\n\
+		else if(distToLight > lightHotDistance)\n\
+		{\n\
+			factorByDist = 1.0 - (distToLight - lightHotDistance)/(lightFalloffLightDist - lightHotDistance);\n\
 		}\n\
 \n\
 		float diffuseDot = dot(-lightDirToPointCC, vec3(normal4.xyz));\n\
@@ -2897,11 +2903,18 @@ void main()\n\
 			discard;\n\
 		}\n\
 \n\
+		float hotSpotDot = uLightParameters[2];\n\
 		float falloffSpotDot = uLightParameters[3];\n\
+\n\
 		float spotDot = dot(vLightDirCC, lightDirToPointCC);\n\
+		float factorBySpot = 1.0;\n\
 		if(spotDot < falloffSpotDot)\n\
 		{\n\
 			discard;\n\
+		}\n\
+		else if(spotDot < hotSpotDot)\n\
+		{\n\
+			//factorBySpot = -(spotDot - hotSpotDot)/-(falloffSpotDot - hotSpotDot);\n\
 		}\n\
 \n\
 		if(bApplyShadows)\n\
@@ -2915,8 +2928,6 @@ void main()\n\
 			vec3 lightDirToPointLC_norm = normalize(lightDirToPointLC.xyz);\n\
 			vec4 depthCube = textureCube(light_depthCubeMap, lightDirToPointLC_norm); // original\n\
 \n\
-			float falloffLightDist = uLightParameters[1];\n\
-\n\
 			// Now, try to calculate the zone of the our pixel.\n\
 			vec2 faceTexCoord;\n\
 			vec3 faceDir;\n\
@@ -2924,13 +2935,15 @@ void main()\n\
 			float spotDotAux = dot(lightDirToPointLC_norm, faceDir);\n\
 			float depthFromLight = unpackDepth(depthCube)*lightFalloffLightDist/spotDotAux;\n\
 \n\
-			if(distToLight > depthFromLight+0.01)// + 0.01)\n\
+			float depthTolerance = 0.06;\n\
+			if(distToLight > depthFromLight + depthTolerance)\n\
 			{\n\
 				// we are in shadow, so do not lighting.\n\
 				discard;\n\
 			}\n\
 		}\n\
-\n\
+		diffuseDot *= factorByDist;\n\
+		spotDot *= factorBySpot;\n\
 		gl_FragData[0] = vec4(diffuseDot * uLightColorAndBrightness.x * spotDot, \n\
 							diffuseDot * uLightColorAndBrightness.y * spotDot, \n\
 							diffuseDot * uLightColorAndBrightness.z * spotDot, 1.0); \n\
@@ -5574,6 +5587,163 @@ void main()\n\
 		vTexCoord = texCoord;\n\
 	}\n\
 }";
+ShaderSource.ScreenCopyQuadFS = "#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+#define M_PI 3.1415926535897932384626433832795\n\
+\n\
+#define %USE_GL_EXT_FRAGDEPTH%\n\
+#ifdef USE_GL_EXT_FRAGDEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+uniform sampler2D depthTex; // 0\n\
+uniform sampler2D normalTex; // 1\n\
+uniform sampler2D albedoTex; // 2\n\
+uniform sampler2D shadowMapTex; // 3\n\
+uniform sampler2D shadowMapTex2; // 4\n\
+uniform sampler2D ssaoTex; // 5\n\
+\n\
+uniform sampler2D diffuseLightTex; // 6\n\
+uniform sampler2D specularLightTex; // 7\n\
+uniform sampler2D silhouetteDepthTex; // channel .\n\
+uniform mat4 modelViewMatrixRelToEyeInv;\n\
+uniform mat4 projectionMatrixInv;\n\
+uniform mat4 normalMatrix4;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+\n\
+uniform float near;\n\
+uniform float far; \n\
+uniform float tangentOfHalfFovy;\n\
+uniform float aspectRatio;    \n\
+\n\
+uniform bool bApplyShadow; // sun shadows on cesium terrain.\n\
+uniform bool bApplyMagoShadow;\n\
+uniform bool bSilhouette;\n\
+uniform bool bFxaa;\n\
+uniform bool bApplySsao;\n\
+uniform bool bScreenCopy;\n\
+\n\
+uniform mat4 sunMatrix[2]; \n\
+uniform vec3 sunPosHIGH[2];\n\
+uniform vec3 sunPosLOW[2];\n\
+uniform vec3 sunDirWC;\n\
+uniform int sunIdx;\n\
+uniform float screenWidth;    \n\
+uniform float screenHeight;  \n\
+uniform vec2 uNearFarArray[4];\n\
+uniform bool bUseLogarithmicDepth;\n\
+uniform float uFCoef_logDepth;\n\
+uniform int uFrustumIdx;\n\
+\n\
+vec4 packDepth( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+  return enc;\n\
+}\n\
+\n\
+float unpackDepth(vec4 packedDepth)\n\
+{\n\
+	// See Aras Pranckevičius' post Encoding Floats to RGBA\n\
+	// http://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/\n\
+	//vec4 packDepth( float v ) // function to packDepth.***\n\
+	//{\n\
+	//	vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+	//	enc = fract(enc);\n\
+	//	enc -= enc.yzww * vec4(1.0/255.0,1.0/255.0,1.0/255.0,0.0);\n\
+	//	return enc;\n\
+	//}\n\
+	return dot(packedDepth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+}\n\
+\n\
+vec4 decodeNormal(in vec4 normal)\n\
+{\n\
+	return vec4(normal.xyz * 2.0 - 1.0, normal.w);\n\
+}\n\
+\n\
+vec3 encodeNormal(in vec3 normal)\n\
+{\n\
+	return normal*0.5 + 0.5;\n\
+} \n\
+\n\
+\n\
+\n\
+void main()\n\
+{\n\
+	vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
+\n\
+	// in this case, do not other process.\n\
+	// 1rst, calculate the pixelPosWC.\n\
+	vec4 depthColor4 = texture2D(depthTex, screenPos.xy);\n\
+	float z_window  = unpackDepth(depthColor4); // z_window  is [0.0, 1.0] range depth.\n\
+\n\
+	if(z_window >= 1.0)\n\
+	{\n\
+		discard;\n\
+	}\n\
+\n\
+	if(z_window <= 0.0)\n\
+	{\n\
+		discard;\n\
+	}\n\
+	\n\
+	// https://stackoverflow.com/questions/11277501/how-to-recover-view-space-position-given-view-space-depth-value-and-ndc-xy\n\
+	float depthRange_near = 0.0;\n\
+	float depthRange_far = 1.0;\n\
+	float x_ndc = 2.0 * screenPos.x - 1.0;\n\
+	float y_ndc = 2.0 * screenPos.y - 1.0;\n\
+	float z_ndc = (2.0 * z_window - depthRange_near - depthRange_far) / (depthRange_far - depthRange_near);\n\
+	// Note: NDC range = (-1,-1,-1) to (1,1,1).***\n\
+	\n\
+	vec4 viewPosH = projectionMatrixInv * vec4(x_ndc, y_ndc, z_ndc, 1.0);\n\
+	vec3 posCC = viewPosH.xyz/viewPosH.w;\n\
+	vec4 posWC = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0) + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 1.0);\n\
+	//------------------------------------------------------------------------------------------------------------------------------\n\
+\n\
+	float depth = -posCC.z/far;\n\
+\n\
+	#ifdef USE_GL_EXT_FRAGDEPTH\n\
+		//gl_FragDepthEXT = z_window;\n\
+	#endif\n\
+\n\
+	// Now, save the albedo.\n\
+	#ifdef USE_MULTI_RENDER_TARGET\n\
+\n\
+		//gl_FragData[0] = packDepth(z_window); // depth.\n\
+		gl_FragData[0] = packDepth(depth); // depth.\n\
+\n\
+		float frustumIdx = 1.0;\n\
+		if(uFrustumIdx == 0)\n\
+		frustumIdx = 0.105;\n\
+		else if(uFrustumIdx == 1)\n\
+		frustumIdx = 0.115;\n\
+		else if(uFrustumIdx == 2)\n\
+		frustumIdx = 0.125;\n\
+		else if(uFrustumIdx == 3)\n\
+		frustumIdx = 0.135;\n\
+\n\
+		vec4 normal4WC = vec4(normalize(posWC.xyz), 1.0);\n\
+		vec4 normal4 = normalMatrix4 * normal4WC;\n\
+		if(normal4.z < 0.0)\n\
+		normal4 *= -1.0;\n\
+		\n\
+		vec3 encodedNormal = encodeNormal(normal4.xyz);\n\
+		gl_FragData[1] = vec4(encodedNormal, frustumIdx); // save normal.***\n\
+\n\
+		//gl_FragData[3] = gl_FragData[0]; // albedo.\n\
+	#endif\n\
+\n\
+	return;\n\
+\n\
+}";
 ShaderSource.ScreenQuadFS = "#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\
@@ -5616,6 +5786,7 @@ uniform float screenHeight;  \n\
 uniform vec2 uNearFarArray[4];\n\
 uniform bool bUseLogarithmicDepth;\n\
 uniform float uFCoef_logDepth;\n\
+uniform float uSceneDayNightLightingFactor; // day -> 1.0; night -> 0.0\n\
 \n\
 \n\
 float unpackDepth(vec4 packedDepth)\n\
@@ -5939,48 +6110,63 @@ void main()\n\
 	float currNear_origin = nearFar_origin.x;\n\
 	float currFar_origin = nearFar_origin.y;\n\
 	\n\
-	vec3 ambientColor = vec3(1.0);\n\
+	vec3 ambientColor = vec3(0.0);\n\
 	vec3 directionalLightColor = vec3(0.7, 0.7, 0.7);\n\
 	float directionalLightWeighting = 1.0;\n\
+	/*\n\
 	if(bApplyMagoShadow)\n\
 	{\n\
-		/*\n\
-		float linearDepth = getDepth(screenPos);\n\
+		\n\
+		///float linearDepth = getDepth(screenPos);\n\
 		// calculate the real pos of origin.\n\
-		float origin_zDist = linearDepth * currFar_origin; // original.\n\
-		vec3 posCC = getViewRay(screenPos, origin_zDist);\n\
-		vec4 posWC = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0) + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 1.0);\n\
+		///float origin_zDist = linearDepth * currFar_origin; // original.\n\
+		///vec3 posCC = getViewRay(screenPos, origin_zDist);\n\
+		///vec4 posWC = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0) + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 1.0);\n\
 		//------------------------------------------------------------------------------------------------------------------------------\n\
 		// 2nd, calculate the vertex relative to light.***\n\
 		// 1rst, try with the closest sun. sunIdx = 0.\n\
-		bool pointIsinShadow = isInShadow(posWC, 0);\n\
-		if(!pointIsinShadow)\n\
-		{\n\
-			pointIsinShadow = isInShadow(posWC, 1);\n\
-		}\n\
+		///bool pointIsinShadow = isInShadow(posWC, 0);\n\
+		///if(!pointIsinShadow)\n\
+		///{\n\
+		///	pointIsinShadow = isInShadow(posWC, 1);\n\
+		///}\n\
 \n\
-		if(pointIsinShadow)\n\
-		{\n\
-			shadow_occlusion = 0.5;\n\
-			alpha = 0.5;\n\
-		}\n\
-		*/\n\
+		///if(pointIsinShadow)\n\
+		///{\n\
+		///	shadow_occlusion = 0.5;\n\
+		///	alpha = 0.5;\n\
+		///}\n\
+		\n\
 \n\
 		// calculate sunDirCC.\n\
 		vec4 sunDirCC = modelViewMatrixRelToEyeInv * vec4(sunDirWC, 1.0);\n\
 		directionalLightWeighting = max(dot(normal, -sunDirCC.xyz), 0.0);\n\
 	}\n\
-	else\n\
-	{\n\
-		ambientColor = vec3(0.8);\n\
-		vec3 lightingDirection = normalize(vec3(0.6, 0.6, 0.6));\n\
-		//vec3 lightingDirection = (modelViewMatrixRelToEyeInv * vec4(0.6, 0.6, 0.6, 1.0)).xyz;\n\
-		directionalLightWeighting = max(dot(normal, lightingDirection), 0.0);\n\
-	}\n\
+	*/\n\
+\n\
+	ambientColor = vec3(0.8);\n\
+	vec3 lightingDirection = normalize(vec3(0.6, 0.6, 0.6));\n\
+	directionalLightWeighting = max(dot(normal, lightingDirection), 0.0);\n\
 	\n\
 	// 1rst, take the albedo.\n\
 	vec4 albedo = texture2D(albedoTex, screenPos);\n\
 	vec4 diffuseLight = texture2D(diffuseLightTex, screenPos);\n\
+	float diffuseLightModul = length(diffuseLight.xyz);\n\
+	\n\
+\n\
+	vec4 nightFilter4 = vec4(0.0, 0.0, 0.0, 0.5);\n\
+\n\
+	// In this point check the \"dataType\".\n\
+	if(dataType == 1)\n\
+	{\n\
+		// This is TERRAIN.\n\
+		float darkness = 1.0 - uSceneDayNightLightingFactor;\n\
+		darkness = min(darkness, 1.0 - diffuseLightModul);\n\
+\n\
+		vec4 blendColor4 = vec4(0.0, 0.0, 0.0, darkness);\n\
+		gl_FragColor = blendColor4;\n\
+		return;\n\
+	}\n\
 \n\
 	vec3 ray = getViewRay(screenPos, 1.0); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
 	float scalarProd = abs(dot(normal, normalize(-ray)));\n\
@@ -5988,9 +6174,8 @@ void main()\n\
 	\n\
 	vec3 lightWeighting = ambientColor + directionalLightColor * directionalLightWeighting; // original.***\n\
 \n\
-	lightWeighting += diffuseLight.xyz;\n\
+	//lightWeighting += diffuseLight.xyz;\n\
 \n\
-	//albedo *= scalarProd;\n\
 	albedo *= vec4(lightWeighting, 1.0);\n\
 \n\
 	if(bApplySsao)\n\
@@ -6022,13 +6207,26 @@ void main()\n\
 		if(occlusion < 0.0)// original.***\n\
 		occlusion = 0.0;// original.***\n\
 \n\
-		//gl_FragColor = vec4(0.0, 0.0, 0.0, occlusion);\n\
-\n\
-\n\
-		//gl_FragColor = vec4(albedo.r - occlusion, albedo.g - occlusion, albedo.b - occlusion, albedo.a);\n\
 		float occlInv = 1.0 - occlusion;\n\
+\n\
+		float lightFactorAux = min(uSceneDayNightLightingFactor + diffuseLightModul, 1.3);\n\
+		occlInv *= lightFactorAux;\n\
+\n\
+		// Light factor.***\n\
 		vec4 finalColor = vec4(albedo.r * occlInv, albedo.g * occlInv, albedo.b * occlInv, albedo.a);\n\
-		gl_FragColor = vec4(finalColor);\n\
+		gl_FragColor = finalColor;\n\
+\n\
+		/*\n\
+		vec4 finalColorNight = mix(finalColor, nightFilter4, 0.5); // test.\n\
+		gl_FragColor = mix(finalColorNight, finalColor, diffuseLightModul);// test.\n\
+		\n\
+		if(diffuseLightModul > 0.0)\n\
+			gl_FragColor = finalColor;\n\
+		else\n\
+		{\n\
+			gl_FragColor = mix(finalColor, nightFilter4, 0.5);\n\
+		}\n\
+		*/\n\
 \n\
 		// fog.*****************************************************************\n\
 		//float myLinearDepth2 = getDepth(screenPos);\n\
@@ -6091,16 +6289,22 @@ void main()\n\
 			{ factor += increF; }\n\
 \n\
 			float edgeAlpha = factor + occlusion;\n\
-				if(edgeAlpha > 1.0)\n\
-				{\n\
-					edgeAlpha = 1.0;\n\
-				}\n\
+			//edgeAlpha /= uSceneDayNightLightingFactor;\n\
+\n\
+			if(edgeAlpha > 1.0)\n\
+			{\n\
+				edgeAlpha = 1.0;\n\
+			}\n\
+			else if(edgeAlpha < 0.2)\n\
+			{\n\
+				edgeAlpha = 0.2;\n\
+			}\n\
 \n\
 			if(factor > increF*0.9*2.0)\n\
 			{\n\
 				//edgeAlpha = 0.6;\n\
-				vec4 edgeColor = finalColor * 0.2;\n\
-				gl_FragColor = vec4(edgeColor.rgb, edgeAlpha);\n\
+				vec4 edgeColor = finalColor * 0.6;\n\
+				gl_FragColor = vec4(edgeColor.rgb, 1.0);\n\
 			}\n\
 			else if(factor > increF*0.9)\n\
 			{\n\
@@ -6115,9 +6319,10 @@ void main()\n\
 				vec4 edgeColor_D = mix(edgeColor_C, albedo, 0.5);\n\
 \n\
 				vec4 edgeColorPrev = vec4(edgeColor_D.r * occlInv, edgeColor_D.g * occlInv, edgeColor_D.b * occlInv, edgeColor_D.a);\n\
-				vec4 edgeColor = edgeColorPrev * 0.4;\n\
+				vec4 edgeColor = edgeColorPrev * 0.8;\n\
 \n\
-				gl_FragColor = vec4(edgeColor.rgb, edgeAlpha);\n\
+				//gl_FragColor = vec4(edgeColor.rgb, edgeAlpha);\n\
+				gl_FragColor = vec4(edgeColor.rgb, 1.0);\n\
 \n\
 			}\n\
 			\n\

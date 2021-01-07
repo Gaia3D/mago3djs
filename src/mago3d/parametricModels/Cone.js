@@ -110,7 +110,7 @@ Cone.prototype.makeMesh = function()
 	}
 
 	var revolveAngDeg = 360;
-	var revolveSegmentsCount = 12;
+	var revolveSegmentsCount = 24;
 	var revolveSegment2d = new Segment2D();
 	var strPoint2d = new Point2D(0, 0);
 	var endPoint2d = new Point2D(0, 1);

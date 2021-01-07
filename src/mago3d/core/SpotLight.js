@@ -30,7 +30,7 @@ var SpotLight = function(options)
 
 	this.hotspotDeg = 43.0;
 	this.falloffDeg = 45.0;
-	this.distance = 30.0; // 30 meters.
+	this.hotDistance = 30.0; // 30 meters.
 	this.falloffDistance = 40.0; // 30 meters.
 	if (this.geoLocDataManager === undefined)
 	{ this.geoLocDataManager = new GeoLocationDataManager(); }
@@ -39,6 +39,7 @@ var SpotLight = function(options)
 	this.cubeMapFBO = undefined;
 
 	this._maxSpotDot; // dot(lightDir, spotDir).
+	this.cullingUpdatedTime;
 	
 
 	if(options)
@@ -49,8 +50,8 @@ var SpotLight = function(options)
 		if(options.falloffDeg)
 		this.falloffDeg = options.falloffDeg;
 
-		if(options.distance)
-		this.distance = options.distance;
+		if(options.hotDistance)
+		this.hotDistance = options.hotDistance;
 
 		if(options.falloffDistance)
 		this.falloffDistance = options.falloffDistance;
@@ -70,8 +71,8 @@ SpotLight.prototype.makeMesh = function()
 	// provisionally make a cone.
 	// coneRadius = this.distance * sin(this.falloffDeg * PI/180).
 	var angRad = this.falloffDeg * Math.PI/180;
-	var radius = this.distance * Math.sin(angRad);
-	var height = this.distance * Math.cos(angRad);
+	var radius = this.falloffDistance * Math.sin(angRad) * 1.2;
+	var height = this.falloffDistance * Math.cos(angRad);
 	var color = new Mago3D.Color(0.95, 0.95, 0.95, 0.4);
 	var options = {
 			baseType : 2, // 0= NONE. 1= PLANE. 2= SPHERICAL.
@@ -81,6 +82,14 @@ SpotLight.prototype.makeMesh = function()
 	var cone = new Cone(radius, height, options);
 	this.objectsArray.push(cone);
 	this.setDirty(false);
+};
+
+/**
+ * Returns the lightDirection in world coord.
+ */
+SpotLight.prototype.setCullingUpdatedTime = function(time)
+{
+	this.cullingUpdatedTime = time;
 };
 
 /**
@@ -110,8 +119,8 @@ SpotLight.prototype.getLightParameters = function()
 		// 0= lightDist, 1= lightFalloffDist, 2= maxSpotDot, 3= falloffSpotDot.
 		this.lightParameters = new Float32Array(4);
 
-		this.lightParameters[0] = this.getLightDistance();
-		this.lightParameters[1] = this.getLightDistance() * 1.3; // provisional.
+		this.lightParameters[0] = this.getLightHotDistance();
+		this.lightParameters[1] = this.getLightFallOffDistance(); // provisional.
 		this.lightParameters[2] = this.getMaxSpotDot();
 		this.lightParameters[3] = this.getFalloffSpotDot();
 	}
@@ -122,9 +131,17 @@ SpotLight.prototype.getLightParameters = function()
 /**
  * Returns the lightDistance.
  */
-SpotLight.prototype.getLightDistance = function()
+SpotLight.prototype.getLightHotDistance = function()
 {
-	return this.distance;
+	return this.hotDistance;
+};
+
+/**
+ * Returns the lightDistance.
+ */
+SpotLight.prototype.getLightFallOffDistance = function()
+{
+	return this.falloffDistance;
 };
 
 /**
@@ -158,13 +175,25 @@ SpotLight.prototype.getFalloffSpotDot = function()
 /**
  * Makes a objectsArray influenced by this light.
  */
+SpotLight.prototype.clearIntersectedObjects = function()
+{
+	if(!this.visibleObjectsControler)
+	{
+		return;
+	}
+
+	this.visibleObjectsControler.clear(); // erase all objects from the arrays.
+};
+
+/**
+ * Makes a objectsArray influenced by this light.
+ */
 SpotLight.prototype.doIntersectedObjectsCulling = function(visiblesArray, nativeVisiblesArray)
 {
 	// this function does a frustumCulling-like process.
 	// This function collects all objects inside of "this.distance" of this light position.
-
-	if(this.bIntersectionCulling)
-	return;
+	if(!this.cullingUpdatedTime)
+	this.cullingUpdatedTime = 0;
 
 	var visiblesCount = 0;
 	var nativeVisiblesCount = 0;
@@ -175,26 +204,16 @@ SpotLight.prototype.doIntersectedObjectsCulling = function(visiblesArray, native
 	if(nativeVisiblesArray)
 	nativeVisiblesCount = nativeVisiblesArray.length;
 
-	if(visiblesCount === 0 && nativeVisiblesCount === 0)
-	return;
+	//if(visiblesCount === 0 && nativeVisiblesCount === 0)
+	//return;
 
 	var myBSphereWC = this.getBoundingSphereWC(undefined);
-	//if(!this.intersectedObjectsArray) // old. Delete.***
-	//this.intersectedObjectsArray = []; // old. Delete.***
-
-	//if(!this.intersectedNativeObjectsArray) // old. Delete.***
-	//this.intersectedNativeObjectsArray = []; // old. Delete.***
-
-	//this.intersectedObjectsArray.length = 0; // old. Delete.***
-	//this.intersectedNativeObjectsArray.length = 0; // old. Delete.***
 
 	if(!this.visibleObjectsControler)
 	{
 		// create a visible objects controler.
 		this.visibleObjectsControler = new VisibleObjectsController();
 	}
-
-	this.visibleObjectsControler.clear(); // erase all objects from the arrays.
 
 	// visiblesObjects (nodes).
 	var node;
@@ -206,7 +225,6 @@ SpotLight.prototype.doIntersectedObjectsCulling = function(visiblesArray, native
 
 		if(myBSphereWC.intersectsWithBSphere(bSphereWC) !== Constant.INTERSECTION_OUTSIDE)
 		{
-			//this.intersectedObjectsArray.push(node);
 			this.visibleObjectsControler.currentVisibles0.push(node);
 		}
 	}
@@ -220,12 +238,14 @@ SpotLight.prototype.doIntersectedObjectsCulling = function(visiblesArray, native
 
 		if(myBSphereWC.intersectsWithBSphere(bSphereWC) !== Constant.INTERSECTION_OUTSIDE)
 		{
-			//this.intersectedNativeObjectsArray.push(native);
 			this.visibleObjectsControler.currentVisibleNativeObjects.opaquesArray.push(native);
 		}
 	}
 
 	this.bIntersectionCulling = true;
+	this.bCubeMapMade = false;
+
+	return true;
 };
 
 /**
@@ -240,7 +260,7 @@ SpotLight.prototype.getBoundingSphereWC = function(resultBoundingSphere)
 	var geoLoc = this.geoLocDataManager.getCurrentGeoLocationData();
 	
 	var posWC = geoLoc.tMatrix.transformPoint3D(new Point3D(0,0,0), undefined);
-	var radius = this.distance;
+	var radius = this.hotDistance;
 	
 	resultBoundingSphere.setCenterPoint(posWC.x, posWC.y, posWC.z);
 	resultBoundingSphere.setRadius(radius);
@@ -284,7 +304,7 @@ SpotLight.prototype._createCubeMatrix = function(faceIdx, dirX, dirY, dirZ, upX,
 	var camDir = new Point3D();
 	var camTarget = new Point3D();
 	var camUp = new Point3D();
-	var far = this.distance;
+	var far = this.hotDistance;
 
 	var matAux = new Matrix4();
 	var tMat = new Matrix4();
@@ -313,7 +333,7 @@ SpotLight.prototype._createModelViewProjectionMatrixRelToEyes = function()
 	var fovyRad = 90 * Math.PI/180;
 	var aspectRatio = 1;
 	var near = 0.05;
-	var far = this.distance;
+	var far = this.hotDdistance;
 	var projMat = new Matrix4();
 	
 	projMat._floatArrays = glMatrix.mat4.perspective(projMat._floatArrays, fovyRad, aspectRatio, near, far);
@@ -442,16 +462,7 @@ SpotLight.prototype.bindCubeMapFrameBuffer = function(faceIdx, magoManager)
 	gl.clearColor(1, 1, 1, 1);
 	gl.clearDepth(1.0);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	//gl.clear(gl.DEPTH_BUFFER_BIT);
 	gl.clearColor(0, 0, 0, 1);
-	
-	// test to calculate the dot product of 45 degree.
-	var point1 = new Point3D(0, 0, -1);
-	point1.unitary();
-	var point2 = new Point3D(-1, -1, -1);
-	point2.unitary();
-	var dotProd = point1.scalarProduct(point2);
-	var hola = 0;
 
 };
 

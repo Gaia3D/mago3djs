@@ -56,6 +56,34 @@ SunSystem.prototype.init = function()
 	light.directionalBoxWidth = 400.0;
 	light.geoCoord = new GeographicCoord(126.61255088096084, 37.58071053758259, 50);
 	this.lightSourcesArray.push(light);
+
+	if (this.date === undefined)
+	{
+		this.date = new Date();
+		this.date.setMonth(2);
+		this.date.setHours(15);
+		this.date.setMinutes(0);
+	}
+};
+
+SunSystem.prototype.getDayNightLightingFactorOfPosition = function(posWC) 
+{
+	// given a geoCoord, this function returns a value 0 to 1.
+	// night = 0 & day = 1.
+	var lightFactor = 0.0;
+
+	var pointAuxWC = new Point3D(posWC.x, posWC.y, posWC.z);
+	pointAuxWC.unitary();
+
+	var geoLocData = this.sunGeoLocDataManager.getCurrentGeoLocationData();
+	var sunPosWC = geoLocData.position;
+
+	var sunPosAux = new Point3D(sunPosWC.x, sunPosWC.y, sunPosWC.z);
+	sunPosAux.unitary();
+
+	lightFactor = pointAuxWC.scalarProduct(sunPosAux);
+
+	return lightFactor;
 };
 
 SunSystem.prototype.getSunDirWC = function() 

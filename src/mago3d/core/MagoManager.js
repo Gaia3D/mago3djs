@@ -1579,16 +1579,38 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	
 	var lightsArray = this.visibleObjControlerNodes.currentVisibleNativeObjects.lightSourcesArray;
 	var lightCount = lightsArray.length;
+	var currentTime = this.getCurrentTime();
 	if(lightCount > 0 && sceneState.applyLightsShadows && !this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
 	{
 		// for each visible lightSources, make cubeMap depthTextures if no exist.
 		var visiblesArray = this.visibleObjControlerNodes.getAllVisibles();
 		var nativeVisiblesArray = this.visibleObjControlerNodes.getAllNatives();
-		
+		var lightCullingsCount = 0;
 		for(var i=0; i<lightCount; i++)
 		{
 			var light = lightsArray[i];
-			light.doIntersectedObjectsCulling(visiblesArray, nativeVisiblesArray);
+
+			if(!light.cullingUpdatedTime)
+				light.cullingUpdatedTime = 0;
+			
+			if(currentTime !== light.cullingUpdatedTime) 
+			{
+				var timeDiffSec = (currentTime - light.cullingUpdatedTime)/1000.0;
+				if(timeDiffSec < 3)
+				continue;
+
+				light.clearIntersectedObjects();
+			}
+
+			// In one frame, do only one intersectionCulling for lights.
+			if(light.doIntersectedObjectsCulling(visiblesArray, nativeVisiblesArray))
+			{
+				light.cullingUpdatedTime = currentTime;
+				lightCullingsCount ++;
+			}
+
+			if(lightCullingsCount > 0)
+			break;
 		}
 	}
 	
@@ -1632,7 +1654,40 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	{
 		var scene = this.scene;
 
-		if (scene && scene._context && scene._context._currentFramebuffer) {
+		// Test to copy terrain.******************************************************************************************
+		
+		if(!this.extbuffers)
+			this.extbuffers = gl.getExtension("WEBGL_draw_buffers");
+
+		this.texturesManager.texturesMergerFbo.bind();
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.depthTex, 0);
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0);
+
+		this.extbuffers.drawBuffersWEBGL([
+			this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
+			this.extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - depthTex
+			this.extbuffers.NONE, // gl_FragData[2] - normalTex
+			this.extbuffers.NONE // gl_FragData[3] - albedoTex
+			]);
+
+		if(this.isFarestFrustum())
+		{
+			gl.clearColor(1.0, 1.0, 1.0, 1.0);
+			gl.clearDepth(1.0);
+			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+			gl.clearColor(0, 0, 0, 1);
+
+		}
+		gl.clear(gl.DEPTH_BUFFER_BIT);
+
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.normalTex, 0);
+
+		this.renderer.renderTerrainCopy();
+		
+		// end test.---------------------------------------------------------------------------------------------------
+
+		if (scene && scene._context && scene._context._currentFramebuffer) 
+		{
 			scene._context._currentFramebuffer._bind();
 
 			if (bApplyShadow && this.currentFrustumIdx < 2) 
@@ -1669,13 +1724,14 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 				this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
 				this.extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - depthTex
 				this.extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - normalTex
-				this.extbuffers.COLOR_ATTACHMENT3_WEBGL, // gl_FragData[3] - albedoTex
+				this.extbuffers.COLOR_ATTACHMENT3_WEBGL // gl_FragData[3] - albedoTex
 			  ]);
 			
 			// End mrt.---------------------------------------------------------------------------------------------------------------
 			
 		}
 	}
+
 
 	// 2) gBuffer render.*****************************************************************************************************************
 	renderType = 1;
@@ -6636,6 +6692,35 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.uNearFarArray_loc = gl.getUniformLocation(shader.program, "uNearFarArray");
 	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
 	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
+	shader.uSceneDayNightLightingFactor_loc = gl.getUniformLocation(shader.program, "uSceneDayNightLightingFactor");
+
+	// 0.2) ScreenQuad shader.***********************************************************************************
+	var shaderName = "screenCopyQuad";
+	var ssao_vs_source = ShaderSource.ScreenQuadVS;
+	var ssao_fs_source = ShaderSource.ScreenCopyQuadFS;
+	ssao_fs_source = ssao_fs_source.replace(/%USE_GL_EXT_FRAGDEPTH%/g, "USE_GL_EXT_FRAGDEPTH"); // only in this shader use extension GL_EXT_frag_depth.
+	ssao_fs_source = ssao_fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
+	var shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
+	shader.ssaoTex_loc = gl.getUniformLocation(shader.program, "ssaoTex");
+	shader.normalTex_loc = gl.getUniformLocation(shader.program, "normalTex");
+	shader.albedoTex_loc = gl.getUniformLocation(shader.program, "albedoTex");
+	shader.silhouetteDepthTex_loc = gl.getUniformLocation(shader.program, "silhouetteDepthTex");
+	shader.diffuseLightTex_loc = gl.getUniformLocation(shader.program, "diffuseLightTex");
+	shader.specularLightTex_loc = gl.getUniformLocation(shader.program, "specularLightTex");
+	//diffuseLightTex; 
+	//specularLightTex; 
+	//albedoTex
+	this.postFxShadersManager.useProgram(shader);
+	gl.uniform1i(shader.ssaoTex_loc, 5);
+	gl.uniform1i(shader.normalTex_loc, 1);
+	gl.uniform1i(shader.albedoTex_loc, 2);
+	gl.uniform1i(shader.diffuseLightTex_loc, 6);
+	gl.uniform1i(shader.specularLightTex_loc, 7);
+	gl.uniform1i(shader.silhouetteDepthTex_loc, 8);
+	shader.uNearFarArray_loc = gl.getUniformLocation(shader.program, "uNearFarArray");
+	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
+	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
+	shader.uFrustumIdx_loc = gl.getUniformLocation(shader.program, "uFrustumIdx");
 
 	// 1) ModelReferences ssaoShader.******************************************************************************
 	var shaderName = "modelRefSsao";

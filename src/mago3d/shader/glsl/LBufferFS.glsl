@@ -299,10 +299,10 @@ void main()
 		vec3 posCC = getPosCC(screenPos, dataType, normal4);
 		
 		// If the data is no generalGeomtry or pointsCloud, then discard.
-		if(dataType != 0 && dataType != 2)
-		{
-			discard;
-		}
+		//if(dataType != 0 && dataType != 2)
+		//{
+		//	discard;
+		//}
 		//uLightParameters[4]; // 0= lightDist, 1= lightFalloffDist, 2= maxSpotDot, 3= falloffSpotDot.
 
 		// vector light-point.
@@ -310,10 +310,16 @@ void main()
 		vec3 lightDirToPointCC = normalize(posCC - vLightPosCC);
 		float distToLight = length(vecLightToPointCC);
 
+		float lightHotDistance = uLightParameters[0];
 		float lightFalloffLightDist = uLightParameters[1];
+		float factorByDist = 1.0;
 		if(distToLight > lightFalloffLightDist)
 		{
 			discard;
+		}
+		else if(distToLight > lightHotDistance)
+		{
+			factorByDist = 1.0 - (distToLight - lightHotDistance)/(lightFalloffLightDist - lightHotDistance);
 		}
 
 		float diffuseDot = dot(-lightDirToPointCC, vec3(normal4.xyz));
@@ -323,11 +329,18 @@ void main()
 			discard;
 		}
 
+		float hotSpotDot = uLightParameters[2];
 		float falloffSpotDot = uLightParameters[3];
+
 		float spotDot = dot(vLightDirCC, lightDirToPointCC);
+		float factorBySpot = 1.0;
 		if(spotDot < falloffSpotDot)
 		{
 			discard;
+		}
+		else if(spotDot < hotSpotDot)
+		{
+			//factorBySpot = -(spotDot - hotSpotDot)/-(falloffSpotDot - hotSpotDot);
 		}
 
 		if(bApplyShadows)
@@ -341,8 +354,6 @@ void main()
 			vec3 lightDirToPointLC_norm = normalize(lightDirToPointLC.xyz);
 			vec4 depthCube = textureCube(light_depthCubeMap, lightDirToPointLC_norm); // original
 
-			float falloffLightDist = uLightParameters[1];
-
 			// Now, try to calculate the zone of the our pixel.
 			vec2 faceTexCoord;
 			vec3 faceDir;
@@ -350,13 +361,15 @@ void main()
 			float spotDotAux = dot(lightDirToPointLC_norm, faceDir);
 			float depthFromLight = unpackDepth(depthCube)*lightFalloffLightDist/spotDotAux;
 
-			if(distToLight > depthFromLight+0.01)// + 0.01)
+			float depthTolerance = 0.06;
+			if(distToLight > depthFromLight + depthTolerance)
 			{
 				// we are in shadow, so do not lighting.
 				discard;
 			}
 		}
-
+		diffuseDot *= factorByDist;
+		spotDot *= factorBySpot;
 		gl_FragData[0] = vec4(diffuseDot * uLightColorAndBrightness.x * spotDot, 
 							diffuseDot * uLightColorAndBrightness.y * spotDot, 
 							diffuseDot * uLightColorAndBrightness.z * spotDot, 1.0); 

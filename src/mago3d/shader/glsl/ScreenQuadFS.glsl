@@ -40,6 +40,7 @@ uniform float screenHeight;
 uniform vec2 uNearFarArray[4];
 uniform bool bUseLogarithmicDepth;
 uniform float uFCoef_logDepth;
+uniform float uSceneDayNightLightingFactor; // day -> 1.0; night -> 0.0
 
 
 float unpackDepth(vec4 packedDepth)
@@ -363,48 +364,63 @@ void main()
 	float currNear_origin = nearFar_origin.x;
 	float currFar_origin = nearFar_origin.y;
 	
-	vec3 ambientColor = vec3(1.0);
+	vec3 ambientColor = vec3(0.0);
 	vec3 directionalLightColor = vec3(0.7, 0.7, 0.7);
 	float directionalLightWeighting = 1.0;
+	/*
 	if(bApplyMagoShadow)
 	{
-		/*
-		float linearDepth = getDepth(screenPos);
+		
+		///float linearDepth = getDepth(screenPos);
 		// calculate the real pos of origin.
-		float origin_zDist = linearDepth * currFar_origin; // original.
-		vec3 posCC = getViewRay(screenPos, origin_zDist);
-		vec4 posWC = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0) + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 1.0);
+		///float origin_zDist = linearDepth * currFar_origin; // original.
+		///vec3 posCC = getViewRay(screenPos, origin_zDist);
+		///vec4 posWC = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0) + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 1.0);
 		//------------------------------------------------------------------------------------------------------------------------------
 		// 2nd, calculate the vertex relative to light.***
 		// 1rst, try with the closest sun. sunIdx = 0.
-		bool pointIsinShadow = isInShadow(posWC, 0);
-		if(!pointIsinShadow)
-		{
-			pointIsinShadow = isInShadow(posWC, 1);
-		}
+		///bool pointIsinShadow = isInShadow(posWC, 0);
+		///if(!pointIsinShadow)
+		///{
+		///	pointIsinShadow = isInShadow(posWC, 1);
+		///}
 
-		if(pointIsinShadow)
-		{
-			shadow_occlusion = 0.5;
-			alpha = 0.5;
-		}
-		*/
+		///if(pointIsinShadow)
+		///{
+		///	shadow_occlusion = 0.5;
+		///	alpha = 0.5;
+		///}
+		
 
 		// calculate sunDirCC.
 		vec4 sunDirCC = modelViewMatrixRelToEyeInv * vec4(sunDirWC, 1.0);
 		directionalLightWeighting = max(dot(normal, -sunDirCC.xyz), 0.0);
 	}
-	else
-	{
-		ambientColor = vec3(0.8);
-		vec3 lightingDirection = normalize(vec3(0.6, 0.6, 0.6));
-		//vec3 lightingDirection = (modelViewMatrixRelToEyeInv * vec4(0.6, 0.6, 0.6, 1.0)).xyz;
-		directionalLightWeighting = max(dot(normal, lightingDirection), 0.0);
-	}
+	*/
+
+	ambientColor = vec3(0.8);
+	vec3 lightingDirection = normalize(vec3(0.6, 0.6, 0.6));
+	directionalLightWeighting = max(dot(normal, lightingDirection), 0.0);
 	
 	// 1rst, take the albedo.
 	vec4 albedo = texture2D(albedoTex, screenPos);
 	vec4 diffuseLight = texture2D(diffuseLightTex, screenPos);
+	float diffuseLightModul = length(diffuseLight.xyz);
+	
+
+	vec4 nightFilter4 = vec4(0.0, 0.0, 0.0, 0.5);
+
+	// In this point check the "dataType".
+	if(dataType == 1)
+	{
+		// This is TERRAIN.
+		float darkness = 1.0 - uSceneDayNightLightingFactor;
+		darkness = min(darkness, 1.0 - diffuseLightModul);
+
+		vec4 blendColor4 = vec4(0.0, 0.0, 0.0, darkness);
+		gl_FragColor = blendColor4;
+		return;
+	}
 
 	vec3 ray = getViewRay(screenPos, 1.0); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
 	float scalarProd = abs(dot(normal, normalize(-ray)));
@@ -412,9 +428,8 @@ void main()
 	
 	vec3 lightWeighting = ambientColor + directionalLightColor * directionalLightWeighting; // original.***
 
-	lightWeighting += diffuseLight.xyz;
+	//lightWeighting += diffuseLight.xyz;
 
-	//albedo *= scalarProd;
 	albedo *= vec4(lightWeighting, 1.0);
 
 	if(bApplySsao)
@@ -446,13 +461,26 @@ void main()
 		if(occlusion < 0.0)// original.***
 		occlusion = 0.0;// original.***
 
-		//gl_FragColor = vec4(0.0, 0.0, 0.0, occlusion);
-
-
-		//gl_FragColor = vec4(albedo.r - occlusion, albedo.g - occlusion, albedo.b - occlusion, albedo.a);
 		float occlInv = 1.0 - occlusion;
+
+		float lightFactorAux = min(uSceneDayNightLightingFactor + diffuseLightModul, 1.3);
+		occlInv *= lightFactorAux;
+
+		// Light factor.***
 		vec4 finalColor = vec4(albedo.r * occlInv, albedo.g * occlInv, albedo.b * occlInv, albedo.a);
-		gl_FragColor = vec4(finalColor);
+		gl_FragColor = finalColor;
+
+		/*
+		vec4 finalColorNight = mix(finalColor, nightFilter4, 0.5); // test.
+		gl_FragColor = mix(finalColorNight, finalColor, diffuseLightModul);// test.
+		
+		if(diffuseLightModul > 0.0)
+			gl_FragColor = finalColor;
+		else
+		{
+			gl_FragColor = mix(finalColor, nightFilter4, 0.5);
+		}
+		*/
 
 		// fog.*****************************************************************
 		//float myLinearDepth2 = getDepth(screenPos);
@@ -515,16 +543,22 @@ void main()
 			{ factor += increF; }
 
 			float edgeAlpha = factor + occlusion;
-				if(edgeAlpha > 1.0)
-				{
-					edgeAlpha = 1.0;
-				}
+			//edgeAlpha /= uSceneDayNightLightingFactor;
+
+			if(edgeAlpha > 1.0)
+			{
+				edgeAlpha = 1.0;
+			}
+			else if(edgeAlpha < 0.2)
+			{
+				edgeAlpha = 0.2;
+			}
 
 			if(factor > increF*0.9*2.0)
 			{
 				//edgeAlpha = 0.6;
-				vec4 edgeColor = finalColor * 0.2;
-				gl_FragColor = vec4(edgeColor.rgb, edgeAlpha);
+				vec4 edgeColor = finalColor * 0.6;
+				gl_FragColor = vec4(edgeColor.rgb, 1.0);
 			}
 			else if(factor > increF*0.9)
 			{
@@ -539,9 +573,10 @@ void main()
 				vec4 edgeColor_D = mix(edgeColor_C, albedo, 0.5);
 
 				vec4 edgeColorPrev = vec4(edgeColor_D.r * occlInv, edgeColor_D.g * occlInv, edgeColor_D.b * occlInv, edgeColor_D.a);
-				vec4 edgeColor = edgeColorPrev * 0.4;
+				vec4 edgeColor = edgeColorPrev * 0.8;
 
-				gl_FragColor = vec4(edgeColor.rgb, edgeAlpha);
+				//gl_FragColor = vec4(edgeColor.rgb, edgeAlpha);
+				gl_FragColor = vec4(edgeColor.rgb, 1.0);
 
 			}
 			
