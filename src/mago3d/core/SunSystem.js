@@ -61,8 +61,10 @@ SunSystem.prototype.init = function()
 	{
 		this.date = new Date();
 		this.date.setMonth(2);
-		this.date.setHours(15);
+		this.date.setHours(12);
 		this.date.setMinutes(0);
+
+		this.setDate(this.date);
 	}
 };
 

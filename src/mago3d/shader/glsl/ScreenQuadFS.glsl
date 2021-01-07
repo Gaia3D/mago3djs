@@ -354,6 +354,12 @@ void main()
 	if(length(normal) < 0.1)
 	discard;
 
+	//if(normal.z < 0.0)
+	//{
+	//	gl_FragColor = vec4(1.0, 0.2, 0.2, 1.0);
+	//	return;
+	//}
+
 	// check frustumIdx. There are 3 type of frustumsIdx :  0, 1, 2, 3 or 10, 11, 12, 13 or 20, 21, 22, 23.***
 	//if(int(floor(normal4.w * 100.0)) >= 10)
 	//discard;

@@ -1841,6 +1841,9 @@ Renderer.prototype.renderTerrainShadow = function(gl)
 	if (magoManager.czm_globeDepthText === undefined)
 	{ magoManager.czm_globeDepthText = magoManager.scene._context._us.globeDepthTexture._texture; }
 
+	if(!magoManager.czm_globeDepthText)
+	return;
+
 	var bApplyShadow = false;
 	if (sceneState.sunSystem !== undefined && sceneState.applySunShadows)
 	{ bApplyShadow = true; }
@@ -2365,7 +2368,7 @@ Renderer.prototype.renderScreenRectangle = function(gl, options)
 
 	if(magoManager.normalTex)
 	{
-		//texture = magoManager.normalTex;
+		texture = magoManager.normalTex;
 	}
 
 	if(magoManager.albedoTex)
@@ -2375,7 +2378,7 @@ Renderer.prototype.renderScreenRectangle = function(gl, options)
 
 	if(magoManager.diffuseLightTex)
 	{
-		texture = magoManager.diffuseLightTex;
+		//texture = magoManager.diffuseLightTex;
 	}
 
 	if(magoManager.specularLightTex)
