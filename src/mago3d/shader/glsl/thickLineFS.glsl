@@ -12,9 +12,11 @@ precision highp float;
 
 uniform bool bUseLogarithmicDepth;
 uniform bool bUseMultiRenderTarget;
+uniform int uFrustumIdx;
 varying vec4 vColor;
 varying float flogz;
 varying float Fcoef_half;
+varying float vDepth;
 
 vec3 encodeNormal(in vec3 normal)
 {
@@ -39,34 +41,32 @@ void main() {
 	#ifdef USE_MULTI_RENDER_TARGET
 	if(bUseMultiRenderTarget)
 	{
-		gl_FragData[1] = vec4(0.0);
-		gl_FragData[2] = vec4(0.0);
-		gl_FragData[3] = vec4(0.0);
-		/*
-		// TODO:
-		//if(!bUseLogarithmicDepth)
-		//{
-			gl_FragData[1] = packDepth(depth);
-		//}
+		//gl_FragData[1] = vec4(0.0);
+		//gl_FragData[2] = vec4(0.0);
+		//gl_FragData[3] = vec4(0.0);
+		
+
+		gl_FragData[1] = packDepth(vDepth);
+		
 
 		// Note: points cloud data has frustumIdx 20 .. 23.********
 		float frustumIdx = 0.1; // realFrustumIdx = 0.1 * 100 = 10. 
 		
 		if(uFrustumIdx == 0)
-		frustumIdx = 0.205; // frustumIdx = 20.***
+		frustumIdx = 0.005; // frustumIdx = 20.***
 		else if(uFrustumIdx == 1)
-		frustumIdx = 0.215; // frustumIdx = 21.***
+		frustumIdx = 0.015; // frustumIdx = 21.***
 		else if(uFrustumIdx == 2)
-		frustumIdx = 0.225; // frustumIdx = 22.***
+		frustumIdx = 0.025; // frustumIdx = 22.***
 		else if(uFrustumIdx == 3)
-		frustumIdx = 0.235; // frustumIdx = 23.***
+		frustumIdx = 0.035; // frustumIdx = 23.***
 
 		vec3 normal = encodeNormal(vec3(0.0, 0.0, 1.0));
 		gl_FragData[2] = vec4(normal, frustumIdx); // save normal.***
 
 		// now, albedo.
 		gl_FragData[3] = vColor; 
-		*/
+		
 	}
 	#endif
 

@@ -974,7 +974,7 @@ Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive
 		this.magoRectangle.render(magoManager, shader, renderType, glPrimitive, bIsSelected);
 	}
 	//this.__TEST__laser();
-	this.__TEST__extrudedLines();
+	//this.__TEST__extrudedLines();
 	//this.__TEST__extrusionBuildings();
 };
 

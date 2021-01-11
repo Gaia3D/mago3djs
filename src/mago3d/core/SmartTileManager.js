@@ -32,6 +32,7 @@ var SmartTileManager = function()
 	this.objectSeedsMap;
 	
 	this.maxDepth = 17;
+	this.maxDepth = 15;
 };
 
 /**
@@ -387,7 +388,10 @@ SmartTileManager.prototype.newSmartTile = function(smartTileName)
 	if (this.tilesArray === undefined)
 	{ this.tilesArray = []; }
 	
-	var smartTile = new SmartTile(smartTileName);
+	var options = {
+		smartTileManager : this
+	};
+	var smartTile = new SmartTile(smartTileName, options);
 	this.tilesArray.push(smartTile);
 	return smartTile;
 };

@@ -25,6 +25,7 @@ uniform float uFCoef_logDepth;
 varying vec4 vColor;
 varying float flogz;
 varying float Fcoef_half;
+varying float vDepth;
 
 const float error = 0.001;
 
@@ -92,6 +93,9 @@ void main(){
 	vec4 previousProjected = ModelViewProjectionMatrixRelToEye * vPrev;
 	vec4 currentProjected = ModelViewProjectionMatrixRelToEye * vCurrent;
 	vec4 nextProjected = ModelViewProjectionMatrixRelToEye * vNext;
+
+	vec4 orthoPos = modelViewMatrixRelToEye * vCurrent;
+	vDepth = -orthoPos.z/far;
 	
 	float projectedDepth = currentProjected.w;                
 	// Get 2D screen space with W divide and aspect correction

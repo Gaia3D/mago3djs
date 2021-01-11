@@ -2,6 +2,11 @@ precision highp float;
 
 uniform sampler2D u_particles;
 uniform sampler2D u_wind;
+uniform sampler2D u_windGlobeDepthTex;
+uniform sampler2D u_windGlobeNormalTex;
+
+uniform mat4 modelViewMatrixInv;
+
 uniform vec2 u_wind_res;
 uniform vec2 u_wind_min;
 uniform vec2 u_wind_max;
@@ -16,6 +21,10 @@ uniform bool u_flipTexCoordY_windMap;
 uniform vec4 u_visibleTilesRanges[16];
 uniform int u_visibleTilesRangesCount;
 
+uniform float tangentOfHalfFovy;
+uniform float far;            
+uniform float aspectRatio; 
+
 // new uniforms test.
 uniform mat4 ModelViewProjectionMatrixRelToEye;
 uniform mat4 buildingRotMatrix;
@@ -24,6 +33,7 @@ uniform vec3 buildingPosLOW;
 uniform vec3 encodedCameraPositionMCHigh;
 uniform vec3 encodedCameraPositionMCLow;
 uniform mat4 buildingRotMatrixInv;
+uniform vec2 uNearFarArray[4];
 
 #define M_PI 3.1415926535897932384626433832795
 
@@ -52,40 +62,10 @@ vec2 lookup_wind(const vec2 uv) {
 	
 }
 
-bool checkFrustumCulling(vec2 pos)
-{
-	for(int i=0; i<16; i++)
-	{
-		if(i >= u_visibleTilesRangesCount)
-		return false;
-		
-		vec4 range = u_visibleTilesRanges[i]; // range = minX(x), minY(y), maxX(z), maxY(w)
-
-		float minX = range.x;
-		float minY = range.y;
-		float maxX = range.z;
-		float maxY = range.w;
-		
-		if(pos.x > minX && pos.x < maxX)
-		{
-			if(pos.y > minY && pos.y < maxY)
-			{
-				return true;
-			}
-		}
-	}
-	return false;
-}
-/*
-vec3 getCamRayWC()
-{
-	// this function returns the camera direction line in world coords.
-
-}
-*/
 
 vec2 getOffset(vec2 particlePos, float radius)
 {
+	// "particlePos" is a unitary position.
 	float minLonRad = u_geoCoordRadiansMin.x;
 	float maxLonRad = u_geoCoordRadiansMax.x;
 	float minLatRad = u_geoCoordRadiansMin.y;
@@ -153,7 +133,7 @@ bool isPointInsideOfFrustum(in vec2 pos)
 	float yOffset = offset.y;
 	vec4 rotatedPos = buildingRotMatrix * vec4(xOffset, yOffset, 0.0, 1.0);
 	
-	vec4 position = vec4((rotatedPos.xyz + buildingPosLOW - encodedCameraPositionMCLow) + ( buildingPosHIGH - encodedCameraPositionMCHigh), 1.0);
+	vec4 position = vec4(( rotatedPos.xyz + buildingPosLOW - encodedCameraPositionMCLow ) + ( buildingPosHIGH - encodedCameraPositionMCHigh ), 1.0);
 	
 	// Now calculate the position on camCoord.***
 	vec4 posCC = ModelViewProjectionMatrixRelToEye * position;
@@ -161,6 +141,88 @@ bool isPointInsideOfFrustum(in vec2 pos)
 
 	return is_NDCCoord_InsideOfFrustum(ndc_pos);
 }
+
+
+vec3 getViewRay(vec2 tc, in float relFar)
+{
+	float hfar = 2.0 * tangentOfHalfFovy * relFar;
+    float wfar = hfar * aspectRatio;    
+    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -relFar);    
+    return ray;                      
+} 
+
+vec4 decodeNormal(in vec4 normal)
+{
+	return vec4(normal.xyz * 2.0 - 1.0, normal.w);
+}
+
+vec4 getNormal(in vec2 texCoord)
+{
+    vec4 encodedNormal = texture2D(u_windGlobeNormalTex, texCoord);
+    return decodeNormal(encodedNormal);
+}
+
+int getRealFrustumIdx(in int estimatedFrustumIdx, inout int dataType)
+{
+    // Check the type of the data.******************
+    // frustumIdx 0 .. 3 -> general geometry data.
+    // frustumIdx 10 .. 13 -> tinTerrain data.
+    // frustumIdx 20 .. 23 -> points cloud data.
+    //----------------------------------------------
+    int realFrustumIdx = -1;
+    
+     if(estimatedFrustumIdx >= 10)
+    {
+        estimatedFrustumIdx -= 10;
+        if(estimatedFrustumIdx >= 10)
+        {
+            // points cloud data.
+            estimatedFrustumIdx -= 10;
+            dataType = 2;
+        }
+        else
+        {
+            // tinTerrain data.
+            dataType = 1;
+        }
+    }
+    else
+    {
+        // general geomtry.
+        dataType = 0;
+    }
+
+    realFrustumIdx = estimatedFrustumIdx;
+    return realFrustumIdx;
+}
+
+vec2 getNearFar_byFrustumIdx(in int frustumIdx)
+{
+    vec2 nearFar;
+    if(frustumIdx == 0)
+    {
+        nearFar = uNearFarArray[0];
+    }
+    else if(frustumIdx == 1)
+    {
+        nearFar = uNearFarArray[1];
+    }
+    else if(frustumIdx == 2)
+    {
+        nearFar = uNearFarArray[2];
+    }
+    else if(frustumIdx == 3)
+    {
+        nearFar = uNearFarArray[3];
+    }
+
+    return nearFar;
+}
+
+float unpackDepth(const in vec4 rgba_depth)
+{
+	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));
+} 
 
 void main() {
     vec4 color = texture2D(u_particles, v_tex_pos);
@@ -194,21 +256,13 @@ void main() {
 	float xSpeedFactor = meterToLon / lonRadRange;
 	float ySpeedFactor = meterToLat / latRadRange;
 
-	xSpeedFactor *= 3.0;
-	ySpeedFactor *= 3.0;
+	xSpeedFactor *= 3.0 * u_speed_factor;
+	ySpeedFactor *= 3.0 * u_speed_factor;
 
 	vec2 offset = vec2(velocity.x / distortion * xSpeedFactor, -velocity.y * ySpeedFactor);
 
 	// End ******************************************************************************************************************
-/*
-    // take EPSG:4236 distortion into account for calculating where the particle moved
-	float minLat = u_geoCoordRadiansMin.y;
-	float maxLat = u_geoCoordRadiansMax.y;
-	float latRange = maxLat - minLat;
-	float distortion = cos((minLat + pos.y * latRange ));
-    ////vec2 offset = vec2(velocity.x / distortion, -velocity.y) * 0.0001 * u_speed_factor * u_interpolation; // original.
-	//vec2 offset = vec2(velocity.x / distortion, -velocity.y) * 0.0002 * u_speed_factor * u_interpolation;
-*/
+
 	
 
     // update particle position, wrapping around the date line
@@ -254,11 +308,63 @@ void main() {
 		}
 	}
 	*/
-	
-	
 	if(drop > 0.01)
 	{
-		
+		// Intersection ray with globe mode:
+		vec2 random_screenPos = vec2( rand(pos), rand(v_tex_pos) );
+		vec4 normal4 = getNormal(random_screenPos);
+		vec3 normal = normal4.xyz;
+		if(length(normal) < 0.1)
+		{
+			// do nothing.
+		}
+		else
+		{
+			int estimatedFrustumIdx = int(floor(normal4.w * 100.0));
+			int dataType = -1;
+			int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);
+			vec2 nearFar_origin = getNearFar_byFrustumIdx(currFrustumIdx);
+			float currNear_origin = nearFar_origin.x;
+			float currFar_origin = nearFar_origin.y;
+
+			vec4 depth4 = texture2D(u_windGlobeDepthTex, random_screenPos);
+			float linearDepth = unpackDepth(depth4);
+			float relativeFar = linearDepth * currFar_origin;
+			vec3 posCC = getViewRay(random_screenPos, relativeFar);  
+			vec4 posWC = modelViewMatrixInv * vec4(posCC, 1.0);
+
+			// convert nearP(wc) to local coord.
+			posWC.x -= (buildingPosHIGH.x + buildingPosLOW.x);
+			posWC.y -= (buildingPosHIGH.y + buildingPosLOW.y);
+			posWC.z -= (buildingPosHIGH.z + buildingPosLOW.z);
+
+			vec4 posLC = buildingRotMatrixInv * vec4(posWC.xyz, 1.0);
+
+			// now, convert localPos to unitary-offset position.
+			float minLonRad = u_geoCoordRadiansMin.x;
+			float maxLonRad = u_geoCoordRadiansMax.x;
+			float minLatRad = u_geoCoordRadiansMin.y;
+			float maxLatRad = u_geoCoordRadiansMax.y;
+			float lonRadRange = maxLonRad - minLonRad;
+			float latRadRange = maxLatRad - minLatRad;
+
+			// Calculate the inverse of xOffset & yOffset.****************************************
+			// Remember : float xOffset = (particlePos.x - 0.5)*distortion * lonRadRange * radius;
+			// Remember : float yOffset = (0.5 - particlePos.y) * latRadRange * radius;
+			//------------------------------------------------------------------------------------
+			
+			float unitaryOffset_y = 0.5 - (posLC.y / (latRadRange * radius));
+			float distortion = cos((minLatRad + unitaryOffset_y * latRadRange ));
+			float unitaryOffset_x = (posLC.x /(distortion * lonRadRange * radius)) + 0.5;
+
+			pos = vec2(unitaryOffset_x, unitaryOffset_y);
+		}
+	}
+	
+	/*
+	if(drop > 0.01)
+	{
+		// Methode 2:
 		vec2 random_pos = vec2( rand(pos), rand(v_tex_pos) );
 		
 		// New version:
@@ -287,68 +393,8 @@ void main() {
 		}
 
 		pos = random_pos;
-		
-		
-		/*
-		// New way:
-		// 1rst, must know the windCoord of the camera position.
-		vec4 camPosWC = vec4(encodedCameraPositionMCHigh + encodedCameraPositionMCLow, 1.0);
-		vec4 camPosRelToWind = buildingRotMatrixInv * camPosWC;
-
-		// now, must calculate linearPosition rel to windBuilding.
-		float minLonRad = u_geoCoordRadiansMin.x;
-		float maxLonRad = u_geoCoordRadiansMax.x;
-		float minLatRad = u_geoCoordRadiansMin.y;
-		float maxLatRad = u_geoCoordRadiansMax.y;
-		float lonRadRange = maxLonRad - minLonRad;
-		float latRadRange = maxLatRad - minLatRad;
-
-		//float distortion = cos((minLatRad + particlePos.y * latRadRange ));
-		//float xOffset = (particlePos.x - 0.5)*distortion * lonRadRange * radius;
-		//float yOffset = (0.5 - particlePos.y) * latRadRange * radius;
-
-		float xOffset = camPosRelToWind.x;
-		float yOffset = camPosRelToWind.y;
-		vec3 buildingPos = buildingPosHIGH + buildingPosLOW;
-		float radius = length(buildingPos);
-
-		// must calculate linear particlePos_y first.
-		float particlePos_y = 0.5 - yOffset/(latRadRange * radius);
-		float distortion = cos((minLatRad + particlePos_y * latRadRange ));
-		float particlePos_x = xOffset/(distortion * lonRadRange * radius) + 0.5;
-		vec2 linearCamPos = vec2(particlePos_x, particlePos_y);
-
-		// Now, start to calculate new particle position.
-		vec2 random_pos = vec2( rand(pos), rand(v_tex_pos));
-
-		vec2 posA = vec2(pos);
-		vec2 posB = vec2(v_tex_pos);
-		bool isInsideOfFrustum = false;
-		for(int i=0; i<30; i++)
-		{
-			if(isPointInsideOfFrustum(random_pos))
-			{
-				isInsideOfFrustum = true;
-				break;
-			}
-			else
-			{
-				posA.x = random_pos.y;
-				posA.y = random_pos.x;
-
-				posB.x = random_pos.x;
-				posB.y = random_pos.y;
-
-
-				random_pos = vec2( (2.0*rand(posA)-1.0)+particlePos_x, (2.0*rand(posB)-1.0)+(1.0 - particlePos_y) );
-				//random_pos = linearCamPos + (random_pos)*0.1;
-			}
-		}
-
-		pos = random_pos;
-		*/
 	}
-	
+	*/
 
     // encode the new particle position back into RGBA
     gl_FragColor = vec4(

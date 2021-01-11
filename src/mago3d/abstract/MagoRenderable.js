@@ -310,6 +310,7 @@ MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPr
 			var gl = magoManager.getGl();
 			gl.uniform1i(shaderThickLine.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
 			gl.uniform1i(shaderThickLine.bUseMultiRenderTarget_loc, magoManager.postFxShadersManager.bUseMultiRenderTarget);
+			gl.uniform1i(shaderThickLine.uFrustumIdx_loc, magoManager.currentFrustumIdx);
 			gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
 			gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 			gl.disable(gl.CULL_FACE);
@@ -440,6 +441,7 @@ MagoRenderable.prototype.renderAsChild = function(magoManager, shader, renderTyp
 			var gl = magoManager.getGl();
 			gl.uniform1i(shaderThickLine.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
 			gl.uniform1i(shaderThickLine.bUseMultiRenderTarget_loc, magoManager.postFxShadersManager.bUseMultiRenderTarget);
+			gl.uniform1i(shaderThickLine.uFrustumIdx_loc, magoManager.currentFrustumIdx);
 
 			gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
 			gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);

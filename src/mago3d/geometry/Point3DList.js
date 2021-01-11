@@ -305,6 +305,25 @@ Point3DList.prototype.getBisectionPlane = function(idx, resultBisectionPlane, bL
 };
 
 /**
+ * Returns the bbox of the "point3dArray".
+ * 
+ * @param {Array} point3dArray
+ * @param {BoundingBox} resultBBox
+ * @param magoManager
+ */
+Point3DList.getBoundingBoxOfPoints3DArray = function(point3dArray, resultBBox)
+{
+	if(!point3dArray || point3dArray.length === 0)
+	return resultBBox;
+
+	if(!resultBBox)
+	resultBBox = new BoundingBox();
+
+	resultBBox.addPointsArray(point3dArray);
+	return resultBBox;
+};
+
+/**
  * Make the vbo of this point3DList
  * @param magoManager
  */

@@ -143,9 +143,6 @@ void main()
 
 		vec4 normal4WC = vec4(normalize(posWC.xyz), 1.0);
 		vec4 normal4 = normalMatrix4 * normal4WC;
-		//if(normal4.z < 0.0)
-		//normal4 *= -1.0;
-		
 		vec3 encodedNormal = encodeNormal(normal4.xyz);
 		gl_FragData[1] = vec4(encodedNormal, frustumIdx); // save normal.***
 

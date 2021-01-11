@@ -734,7 +734,18 @@ void main() {\n\
 ";
 ShaderSource.draw_frag3D = "precision highp float;\n\
 \n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
 uniform sampler2D u_wind;\n\
+uniform sampler2D u_depthTex;\n\
 uniform vec2 u_wind_min;\n\
 uniform vec2 u_wind_max;\n\
 uniform bool u_flipTexCoordY_windMap;\n\
@@ -742,6 +753,9 @@ uniform bool u_colorScale;\n\
 uniform float u_tailAlpha;\n\
 uniform float u_externAlpha;\n\
 uniform bool bUseLogarithmicDepth;\n\
+\n\
+uniform int uFrustumIdx;\n\
+varying float vDepth;\n\
 \n\
 varying vec2 v_particle_pos;\n\
 varying float flogz;\n\
@@ -883,6 +897,23 @@ vec3 getWhiteToBlueColor_byHeight(float height, float minHeight, float maxHeight
     return vec3(r, g, b);\n\
 }\n\
 \n\
+vec4 packDepth( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+  return enc;\n\
+}\n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+} \n\
+\n\
+vec3 encodeNormal(in vec3 normal)\n\
+{\n\
+	return normal*0.5 + 0.5;\n\
+}\n\
+\n\
 void main() {\n\
 	vec2 pt = gl_PointCoord - vec2(0.5);\n\
 	float r = pt.x*pt.x+pt.y*pt.y;\n\
@@ -899,7 +930,7 @@ void main() {\n\
     vec2 velocity = mix(u_wind_min, u_wind_max, texture2D(u_wind, windMapTexCoord).rg);\n\
     float speed_t = length(velocity) / length(u_wind_max);\n\
 \n\
-	\n\
+	vec4 albedo4;\n\
 	if(u_colorScale)\n\
 	{\n\
 		speed_t *= 1.5;\n\
@@ -916,17 +947,44 @@ void main() {\n\
 		vec3 col3 = getRainbowColor_byHeight(speed_t);\n\
 		//vec3 col3 = getWhiteToBlueColor_byHeight(speed_t, 0.0, 1.0);\n\
 		float r = speed_t;\n\
-		gl_FragColor = vec4(col3.x, col3.y, col3.z ,u_tailAlpha*u_externAlpha);\n\
+		albedo4 = vec4(col3.x, col3.y, col3.z ,u_tailAlpha*u_externAlpha);\n\
 	}\n\
 	else{\n\
 		float intensity = speed_t*3.0;\n\
 		if(intensity > 1.0)\n\
 			intensity = 1.0;\n\
-		gl_FragColor = vec4(intensity,intensity,intensity,u_tailAlpha*u_externAlpha);\n\
+		albedo4 = vec4(intensity,intensity,intensity,u_tailAlpha*u_externAlpha);\n\
 	}\n\
 \n\
+	gl_FragData[0] = albedo4;\n\
+	\n\
+	#ifdef USE_MULTI_RENDER_TARGET\n\
+		// save depth, normal, albedo.\n\
+		gl_FragData[1] = packDepth(vDepth); \n\
+\n\
+		// When render with cull_face disabled, must correct the faces normal.\n\
+		float frustumIdx = 1.0;\n\
+		if(uFrustumIdx == 0)\n\
+		frustumIdx = 0.005;\n\
+		else if(uFrustumIdx == 1)\n\
+		frustumIdx = 0.015;\n\
+		else if(uFrustumIdx == 2)\n\
+		frustumIdx = 0.025;\n\
+		else if(uFrustumIdx == 3)\n\
+		frustumIdx = 0.035;\n\
+\n\
+		vec3 normal = vec3(0.0, 0.0, 1.0);\n\
+\n\
+		vec3 encodedNormal = encodeNormal(normal);\n\
+		gl_FragData[2] = vec4(encodedNormal, frustumIdx); // save normal.***\n\
+\n\
+		// albedo.\n\
+		gl_FragData[3] = albedo4; \n\
+	#endif\n\
+	\n\
+\n\
 	//if(r > 0.16)\n\
-	//gl_FragColor = vec4(1.0, 1.0, 1.0, u_tailAlpha*u_externAlpha);\n\
+	//gl_FragData[0] = vec4(1.0, 1.0, 1.0, u_tailAlpha*u_externAlpha);\n\
 \n\
 	#ifdef USE_LOGARITHMIC_DEPTH\n\
 	if(bUseLogarithmicDepth)\n\
@@ -966,6 +1024,7 @@ attribute float a_index;\n\
 uniform sampler2D u_particles; // channel-1.***\n\
 uniform sampler2D u_particles_next; // channel-2.***\n\
 uniform float u_particles_res;\n\
+uniform mat4 modelViewMatrixRelToEye;\n\
 uniform mat4 buildingRotMatrix;\n\
 uniform mat4 ModelViewProjectionMatrix;\n\
 uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
@@ -982,10 +1041,12 @@ uniform float u_layerAltitude;\n\
 \n\
 uniform bool bUseLogarithmicDepth;\n\
 uniform float uFCoef_logDepth;\n\
+uniform float far;\n\
 \n\
 varying vec2 v_particle_pos;\n\
 varying float flogz;\n\
 varying float Fcoef_half;\n\
+varying float vDepth;\n\
 \n\
 #define M_PI 3.1415926535897932384626433832795\n\
 \n\
@@ -1085,8 +1146,9 @@ void main() {\n\
 	// Now calculate the position on camCoord.***\n\
 	//gl_Position = ModelViewProjectionMatrix * posWC;\n\
 	gl_Position = ModelViewProjectionMatrixRelToEye * posCC;\n\
-	//gl_Position = vec4(2.0 * v_particle_pos.x - 1.0, 1.0 - 2.0 * v_particle_pos.y, 0, 1);\n\
-	//gl_Position = vec4(v_particle_pos.x, v_particle_pos.y, 0, 1);\n\
+\n\
+	vec4 orthoPos = modelViewMatrixRelToEye * posCC;\n\
+	vDepth = (-orthoPos.z)/(far); // the correct value.\n\
 \n\
 	if(bUseLogarithmicDepth)\n\
 	{\n\
@@ -1107,8 +1169,8 @@ void main() {\n\
 \n\
 	if(gl_PointSize > maxPointSize)\n\
 	gl_PointSize = maxPointSize;\n\
-	else if(gl_PointSize < 1.5)\n\
-	gl_PointSize = 1.5;\n\
+	else if(gl_PointSize < 2.0)\n\
+	gl_PointSize = 2.0;\n\
 }\n\
 \n\
 \n\
@@ -5731,9 +5793,6 @@ void main()\n\
 \n\
 		vec4 normal4WC = vec4(normalize(posWC.xyz), 1.0);\n\
 		vec4 normal4 = normalMatrix4 * normal4WC;\n\
-		//if(normal4.z < 0.0)\n\
-		//normal4 *= -1.0;\n\
-		\n\
 		vec3 encodedNormal = encodeNormal(normal4.xyz);\n\
 		gl_FragData[1] = vec4(encodedNormal, frustumIdx); // save normal.***\n\
 \n\
@@ -8172,6 +8231,7 @@ uniform float uExtrudeHeight;\n\
 varying vec4 vColor;\n\
 varying float flogz;\n\
 varying float Fcoef_half;\n\
+varying float vDepth;\n\
 \n\
 const float error = 0.001;\n\
 \n\
@@ -8304,6 +8364,9 @@ void main()\n\
 	vec4 posCC =  vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
     vec4 finalPosProjected = ModelViewProjectionMatrixRelToEye * posCC;\n\
 	gl_Position = finalPosProjected; \n\
+\n\
+    vec4 orthoPos = modelViewMatrixRelToEye * posCC;\n\
+	vDepth = -orthoPos.z/far;\n\
 \n\
 \n\
 	if(bUseLogarithmicDepth)\n\
@@ -8798,9 +8861,11 @@ ShaderSource.thickLineFS = "precision highp float;\n\
 \n\
 uniform bool bUseLogarithmicDepth;\n\
 uniform bool bUseMultiRenderTarget;\n\
+uniform int uFrustumIdx;\n\
 varying vec4 vColor;\n\
 varying float flogz;\n\
 varying float Fcoef_half;\n\
+varying float vDepth;\n\
 \n\
 vec3 encodeNormal(in vec3 normal)\n\
 {\n\
@@ -8825,34 +8890,32 @@ void main() {\n\
 	#ifdef USE_MULTI_RENDER_TARGET\n\
 	if(bUseMultiRenderTarget)\n\
 	{\n\
-		gl_FragData[1] = vec4(0.0);\n\
-		gl_FragData[2] = vec4(0.0);\n\
-		gl_FragData[3] = vec4(0.0);\n\
-		/*\n\
-		// TODO:\n\
-		//if(!bUseLogarithmicDepth)\n\
-		//{\n\
-			gl_FragData[1] = packDepth(depth);\n\
-		//}\n\
+		//gl_FragData[1] = vec4(0.0);\n\
+		//gl_FragData[2] = vec4(0.0);\n\
+		//gl_FragData[3] = vec4(0.0);\n\
+		\n\
+\n\
+		gl_FragData[1] = packDepth(vDepth);\n\
+		\n\
 \n\
 		// Note: points cloud data has frustumIdx 20 .. 23.********\n\
 		float frustumIdx = 0.1; // realFrustumIdx = 0.1 * 100 = 10. \n\
 		\n\
 		if(uFrustumIdx == 0)\n\
-		frustumIdx = 0.205; // frustumIdx = 20.***\n\
+		frustumIdx = 0.005; // frustumIdx = 20.***\n\
 		else if(uFrustumIdx == 1)\n\
-		frustumIdx = 0.215; // frustumIdx = 21.***\n\
+		frustumIdx = 0.015; // frustumIdx = 21.***\n\
 		else if(uFrustumIdx == 2)\n\
-		frustumIdx = 0.225; // frustumIdx = 22.***\n\
+		frustumIdx = 0.025; // frustumIdx = 22.***\n\
 		else if(uFrustumIdx == 3)\n\
-		frustumIdx = 0.235; // frustumIdx = 23.***\n\
+		frustumIdx = 0.035; // frustumIdx = 23.***\n\
 \n\
 		vec3 normal = encodeNormal(vec3(0.0, 0.0, 1.0));\n\
 		gl_FragData[2] = vec4(normal, frustumIdx); // save normal.***\n\
 \n\
 		// now, albedo.\n\
 		gl_FragData[3] = vColor; \n\
-		*/\n\
+		\n\
 	}\n\
 	#endif\n\
 \n\
@@ -8890,6 +8953,7 @@ uniform float uFCoef_logDepth;\n\
 varying vec4 vColor;\n\
 varying float flogz;\n\
 varying float Fcoef_half;\n\
+varying float vDepth;\n\
 \n\
 const float error = 0.001;\n\
 \n\
@@ -8957,6 +9021,9 @@ void main(){\n\
 	vec4 previousProjected = ModelViewProjectionMatrixRelToEye * vPrev;\n\
 	vec4 currentProjected = ModelViewProjectionMatrixRelToEye * vCurrent;\n\
 	vec4 nextProjected = ModelViewProjectionMatrixRelToEye * vNext;\n\
+\n\
+	vec4 orthoPos = modelViewMatrixRelToEye * vCurrent;\n\
+	vDepth = -orthoPos.z/far;\n\
 	\n\
 	float projectedDepth = currentProjected.w;                \n\
 	// Get 2D screen space with W divide and aspect correction\n\
@@ -10068,6 +10135,11 @@ ShaderSource.update_frag = "precision highp float;\n\
 \n\
 uniform sampler2D u_particles;\n\
 uniform sampler2D u_wind;\n\
+uniform sampler2D u_windGlobeDepthTex;\n\
+uniform sampler2D u_windGlobeNormalTex;\n\
+\n\
+uniform mat4 modelViewMatrixInv;\n\
+\n\
 uniform vec2 u_wind_res;\n\
 uniform vec2 u_wind_min;\n\
 uniform vec2 u_wind_max;\n\
@@ -10082,6 +10154,10 @@ uniform bool u_flipTexCoordY_windMap;\n\
 uniform vec4 u_visibleTilesRanges[16];\n\
 uniform int u_visibleTilesRangesCount;\n\
 \n\
+uniform float tangentOfHalfFovy;\n\
+uniform float far;            \n\
+uniform float aspectRatio; \n\
+\n\
 // new uniforms test.\n\
 uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
 uniform mat4 buildingRotMatrix;\n\
@@ -10090,6 +10166,7 @@ uniform vec3 buildingPosLOW;\n\
 uniform vec3 encodedCameraPositionMCHigh;\n\
 uniform vec3 encodedCameraPositionMCLow;\n\
 uniform mat4 buildingRotMatrixInv;\n\
+uniform vec2 uNearFarArray[4];\n\
 \n\
 #define M_PI 3.1415926535897932384626433832795\n\
 \n\
@@ -10118,40 +10195,10 @@ vec2 lookup_wind(const vec2 uv) {\n\
 	\n\
 }\n\
 \n\
-bool checkFrustumCulling(vec2 pos)\n\
-{\n\
-	for(int i=0; i<16; i++)\n\
-	{\n\
-		if(i >= u_visibleTilesRangesCount)\n\
-		return false;\n\
-		\n\
-		vec4 range = u_visibleTilesRanges[i]; // range = minX(x), minY(y), maxX(z), maxY(w)\n\
-\n\
-		float minX = range.x;\n\
-		float minY = range.y;\n\
-		float maxX = range.z;\n\
-		float maxY = range.w;\n\
-		\n\
-		if(pos.x > minX && pos.x < maxX)\n\
-		{\n\
-			if(pos.y > minY && pos.y < maxY)\n\
-			{\n\
-				return true;\n\
-			}\n\
-		}\n\
-	}\n\
-	return false;\n\
-}\n\
-/*\n\
-vec3 getCamRayWC()\n\
-{\n\
-	// this function returns the camera direction line in world coords.\n\
-\n\
-}\n\
-*/\n\
 \n\
 vec2 getOffset(vec2 particlePos, float radius)\n\
 {\n\
+	// \"particlePos\" is a unitary position.\n\
 	float minLonRad = u_geoCoordRadiansMin.x;\n\
 	float maxLonRad = u_geoCoordRadiansMax.x;\n\
 	float minLatRad = u_geoCoordRadiansMin.y;\n\
@@ -10219,7 +10266,7 @@ bool isPointInsideOfFrustum(in vec2 pos)\n\
 	float yOffset = offset.y;\n\
 	vec4 rotatedPos = buildingRotMatrix * vec4(xOffset, yOffset, 0.0, 1.0);\n\
 	\n\
-	vec4 position = vec4((rotatedPos.xyz + buildingPosLOW - encodedCameraPositionMCLow) + ( buildingPosHIGH - encodedCameraPositionMCHigh), 1.0);\n\
+	vec4 position = vec4(( rotatedPos.xyz + buildingPosLOW - encodedCameraPositionMCLow ) + ( buildingPosHIGH - encodedCameraPositionMCHigh ), 1.0);\n\
 	\n\
 	// Now calculate the position on camCoord.***\n\
 	vec4 posCC = ModelViewProjectionMatrixRelToEye * position;\n\
@@ -10227,6 +10274,88 @@ bool isPointInsideOfFrustum(in vec2 pos)\n\
 \n\
 	return is_NDCCoord_InsideOfFrustum(ndc_pos);\n\
 }\n\
+\n\
+\n\
+vec3 getViewRay(vec2 tc, in float relFar)\n\
+{\n\
+	float hfar = 2.0 * tangentOfHalfFovy * relFar;\n\
+    float wfar = hfar * aspectRatio;    \n\
+    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -relFar);    \n\
+    return ray;                      \n\
+} \n\
+\n\
+vec4 decodeNormal(in vec4 normal)\n\
+{\n\
+	return vec4(normal.xyz * 2.0 - 1.0, normal.w);\n\
+}\n\
+\n\
+vec4 getNormal(in vec2 texCoord)\n\
+{\n\
+    vec4 encodedNormal = texture2D(u_windGlobeNormalTex, texCoord);\n\
+    return decodeNormal(encodedNormal);\n\
+}\n\
+\n\
+int getRealFrustumIdx(in int estimatedFrustumIdx, inout int dataType)\n\
+{\n\
+    // Check the type of the data.******************\n\
+    // frustumIdx 0 .. 3 -> general geometry data.\n\
+    // frustumIdx 10 .. 13 -> tinTerrain data.\n\
+    // frustumIdx 20 .. 23 -> points cloud data.\n\
+    //----------------------------------------------\n\
+    int realFrustumIdx = -1;\n\
+    \n\
+     if(estimatedFrustumIdx >= 10)\n\
+    {\n\
+        estimatedFrustumIdx -= 10;\n\
+        if(estimatedFrustumIdx >= 10)\n\
+        {\n\
+            // points cloud data.\n\
+            estimatedFrustumIdx -= 10;\n\
+            dataType = 2;\n\
+        }\n\
+        else\n\
+        {\n\
+            // tinTerrain data.\n\
+            dataType = 1;\n\
+        }\n\
+    }\n\
+    else\n\
+    {\n\
+        // general geomtry.\n\
+        dataType = 0;\n\
+    }\n\
+\n\
+    realFrustumIdx = estimatedFrustumIdx;\n\
+    return realFrustumIdx;\n\
+}\n\
+\n\
+vec2 getNearFar_byFrustumIdx(in int frustumIdx)\n\
+{\n\
+    vec2 nearFar;\n\
+    if(frustumIdx == 0)\n\
+    {\n\
+        nearFar = uNearFarArray[0];\n\
+    }\n\
+    else if(frustumIdx == 1)\n\
+    {\n\
+        nearFar = uNearFarArray[1];\n\
+    }\n\
+    else if(frustumIdx == 2)\n\
+    {\n\
+        nearFar = uNearFarArray[2];\n\
+    }\n\
+    else if(frustumIdx == 3)\n\
+    {\n\
+        nearFar = uNearFarArray[3];\n\
+    }\n\
+\n\
+    return nearFar;\n\
+}\n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+} \n\
 \n\
 void main() {\n\
     vec4 color = texture2D(u_particles, v_tex_pos);\n\
@@ -10260,21 +10389,13 @@ void main() {\n\
 	float xSpeedFactor = meterToLon / lonRadRange;\n\
 	float ySpeedFactor = meterToLat / latRadRange;\n\
 \n\
-	xSpeedFactor *= 3.0;\n\
-	ySpeedFactor *= 3.0;\n\
+	xSpeedFactor *= 3.0 * u_speed_factor;\n\
+	ySpeedFactor *= 3.0 * u_speed_factor;\n\
 \n\
 	vec2 offset = vec2(velocity.x / distortion * xSpeedFactor, -velocity.y * ySpeedFactor);\n\
 \n\
 	// End ******************************************************************************************************************\n\
-/*\n\
-    // take EPSG:4236 distortion into account for calculating where the particle moved\n\
-	float minLat = u_geoCoordRadiansMin.y;\n\
-	float maxLat = u_geoCoordRadiansMax.y;\n\
-	float latRange = maxLat - minLat;\n\
-	float distortion = cos((minLat + pos.y * latRange ));\n\
-    ////vec2 offset = vec2(velocity.x / distortion, -velocity.y) * 0.0001 * u_speed_factor * u_interpolation; // original.\n\
-	//vec2 offset = vec2(velocity.x / distortion, -velocity.y) * 0.0002 * u_speed_factor * u_interpolation;\n\
-*/\n\
+\n\
 	\n\
 \n\
     // update particle position, wrapping around the date line\n\
@@ -10320,11 +10441,63 @@ void main() {\n\
 		}\n\
 	}\n\
 	*/\n\
-	\n\
-	\n\
 	if(drop > 0.01)\n\
 	{\n\
-		\n\
+		// Intersection ray with globe mode:\n\
+		vec2 random_screenPos = vec2( rand(pos), rand(v_tex_pos) );\n\
+		vec4 normal4 = getNormal(random_screenPos);\n\
+		vec3 normal = normal4.xyz;\n\
+		if(length(normal) < 0.1)\n\
+		{\n\
+			// do nothing.\n\
+		}\n\
+		else\n\
+		{\n\
+			int estimatedFrustumIdx = int(floor(normal4.w * 100.0));\n\
+			int dataType = -1;\n\
+			int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);\n\
+			vec2 nearFar_origin = getNearFar_byFrustumIdx(currFrustumIdx);\n\
+			float currNear_origin = nearFar_origin.x;\n\
+			float currFar_origin = nearFar_origin.y;\n\
+\n\
+			vec4 depth4 = texture2D(u_windGlobeDepthTex, random_screenPos);\n\
+			float linearDepth = unpackDepth(depth4);\n\
+			float relativeFar = linearDepth * currFar_origin;\n\
+			vec3 posCC = getViewRay(random_screenPos, relativeFar);  \n\
+			vec4 posWC = modelViewMatrixInv * vec4(posCC, 1.0);\n\
+\n\
+			// convert nearP(wc) to local coord.\n\
+			posWC.x -= (buildingPosHIGH.x + buildingPosLOW.x);\n\
+			posWC.y -= (buildingPosHIGH.y + buildingPosLOW.y);\n\
+			posWC.z -= (buildingPosHIGH.z + buildingPosLOW.z);\n\
+\n\
+			vec4 posLC = buildingRotMatrixInv * vec4(posWC.xyz, 1.0);\n\
+\n\
+			// now, convert localPos to unitary-offset position.\n\
+			float minLonRad = u_geoCoordRadiansMin.x;\n\
+			float maxLonRad = u_geoCoordRadiansMax.x;\n\
+			float minLatRad = u_geoCoordRadiansMin.y;\n\
+			float maxLatRad = u_geoCoordRadiansMax.y;\n\
+			float lonRadRange = maxLonRad - minLonRad;\n\
+			float latRadRange = maxLatRad - minLatRad;\n\
+\n\
+			// Calculate the inverse of xOffset & yOffset.****************************************\n\
+			// Remember : float xOffset = (particlePos.x - 0.5)*distortion * lonRadRange * radius;\n\
+			// Remember : float yOffset = (0.5 - particlePos.y) * latRadRange * radius;\n\
+			//------------------------------------------------------------------------------------\n\
+			\n\
+			float unitaryOffset_y = 0.5 - (posLC.y / (latRadRange * radius));\n\
+			float distortion = cos((minLatRad + unitaryOffset_y * latRadRange ));\n\
+			float unitaryOffset_x = (posLC.x /(distortion * lonRadRange * radius)) + 0.5;\n\
+\n\
+			pos = vec2(unitaryOffset_x, unitaryOffset_y);\n\
+		}\n\
+	}\n\
+	\n\
+	/*\n\
+	if(drop > 0.01)\n\
+	{\n\
+		// Methode 2:\n\
 		vec2 random_pos = vec2( rand(pos), rand(v_tex_pos) );\n\
 		\n\
 		// New version:\n\
@@ -10353,68 +10526,8 @@ void main() {\n\
 		}\n\
 \n\
 		pos = random_pos;\n\
-		\n\
-		\n\
-		/*\n\
-		// New way:\n\
-		// 1rst, must know the windCoord of the camera position.\n\
-		vec4 camPosWC = vec4(encodedCameraPositionMCHigh + encodedCameraPositionMCLow, 1.0);\n\
-		vec4 camPosRelToWind = buildingRotMatrixInv * camPosWC;\n\
-\n\
-		// now, must calculate linearPosition rel to windBuilding.\n\
-		float minLonRad = u_geoCoordRadiansMin.x;\n\
-		float maxLonRad = u_geoCoordRadiansMax.x;\n\
-		float minLatRad = u_geoCoordRadiansMin.y;\n\
-		float maxLatRad = u_geoCoordRadiansMax.y;\n\
-		float lonRadRange = maxLonRad - minLonRad;\n\
-		float latRadRange = maxLatRad - minLatRad;\n\
-\n\
-		//float distortion = cos((minLatRad + particlePos.y * latRadRange ));\n\
-		//float xOffset = (particlePos.x - 0.5)*distortion * lonRadRange * radius;\n\
-		//float yOffset = (0.5 - particlePos.y) * latRadRange * radius;\n\
-\n\
-		float xOffset = camPosRelToWind.x;\n\
-		float yOffset = camPosRelToWind.y;\n\
-		vec3 buildingPos = buildingPosHIGH + buildingPosLOW;\n\
-		float radius = length(buildingPos);\n\
-\n\
-		// must calculate linear particlePos_y first.\n\
-		float particlePos_y = 0.5 - yOffset/(latRadRange * radius);\n\
-		float distortion = cos((minLatRad + particlePos_y * latRadRange ));\n\
-		float particlePos_x = xOffset/(distortion * lonRadRange * radius) + 0.5;\n\
-		vec2 linearCamPos = vec2(particlePos_x, particlePos_y);\n\
-\n\
-		// Now, start to calculate new particle position.\n\
-		vec2 random_pos = vec2( rand(pos), rand(v_tex_pos));\n\
-\n\
-		vec2 posA = vec2(pos);\n\
-		vec2 posB = vec2(v_tex_pos);\n\
-		bool isInsideOfFrustum = false;\n\
-		for(int i=0; i<30; i++)\n\
-		{\n\
-			if(isPointInsideOfFrustum(random_pos))\n\
-			{\n\
-				isInsideOfFrustum = true;\n\
-				break;\n\
-			}\n\
-			else\n\
-			{\n\
-				posA.x = random_pos.y;\n\
-				posA.y = random_pos.x;\n\
-\n\
-				posB.x = random_pos.x;\n\
-				posB.y = random_pos.y;\n\
-\n\
-\n\
-				random_pos = vec2( (2.0*rand(posA)-1.0)+particlePos_x, (2.0*rand(posB)-1.0)+(1.0 - particlePos_y) );\n\
-				//random_pos = linearCamPos + (random_pos)*0.1;\n\
-			}\n\
-		}\n\
-\n\
-		pos = random_pos;\n\
-		*/\n\
 	}\n\
-	\n\
+	*/\n\
 \n\
     // encode the new particle position back into RGBA\n\
     gl_FragColor = vec4(\n\

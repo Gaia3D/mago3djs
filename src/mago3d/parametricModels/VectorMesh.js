@@ -127,7 +127,7 @@ VectorMesh.prototype.render = function(magoManager, shader, renderType, glPrimit
 			return;
 		}
 		gl.uniform1i(shader.colorType_loc, 1);
-		//gl.enableVertexAttribArray(shader.color4_loc);
+		gl.enableVertexAttribArray(shader.color4_loc);
 	}
 	else 
 	{
@@ -137,10 +137,9 @@ VectorMesh.prototype.render = function(magoManager, shader, renderType, glPrimit
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, vboPos.key);
 	gl.vertexAttribPointer(shader.prev_loc, dim, gl.FLOAT, false, 16, 0);
-	gl.vertexAttribPointer(shader.current_loc, dim, gl.FLOAT, false, 16, 32);//64-32
-	gl.vertexAttribPointer(shader.next_loc, dim, gl.FLOAT, false, 16, 64);//128-32
+	gl.vertexAttribPointer(shader.current_loc, dim, gl.FLOAT, false, 16, 32);
+	gl.vertexAttribPointer(shader.next_loc, dim, gl.FLOAT, false, 16, 64);
 
-	//gl.drawArrays(gl.TRIANGLE_STRIP, 0, vbo.vertexCount-4);
 	gl.drawArrays(gl.TRIANGLE_STRIP, 0, vbo.vertexCount-4);
 };
 

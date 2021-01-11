@@ -773,7 +773,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 			var nearForLighting = 0.1;
 			var fovyRad = sceneState.camera.frustum.fovyRad[0];
 			var aspectRatio = sceneState.camera.frustum.aspectRatio[0];
-			var projectionMatrixLighting = sceneState.projectionMatrixLighting;
+			var projectionMatrixLighting = sceneState.projectionMatrixLighting; // No used.
 			projectionMatrixLighting._floatArrays = glMatrix.mat4.perspective(projectionMatrixLighting._floatArrays, fovyRad, aspectRatio, nearForLighting, farForLighting);
 
 			var modelViewProjRelToEyeMatrixLighting = sceneState.modelViewProjRelToEyeMatrixLighting;
@@ -1738,6 +1738,11 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	this.renderType = 1;
 	this.renderer.renderGeometryBuffer(gl, renderType, this.visibleObjControlerNodes);
 
+	if (this.weatherStation)
+	{
+		this.weatherStation.renderWeather(this);
+	}
+
 	// Render transparents.****************************************************************************************************************
 	if (this.isCesiumGlobe())
 	{
@@ -1759,6 +1764,8 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	this.renderType = 1;
 	this.renderer.renderGeometryBufferTransparents(gl, renderType, this.visibleObjControlerNodes);
 	// End rendering transparents.----------------------------------------------------------------------------------------------------------
+
+	
 
 	// check if must render boundingBoxes.
 	if (this.magoPolicy.getShowBoundingBox())
@@ -1870,16 +1877,6 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 			{
 				this.renderer.renderSilhouette();
 			}
-			
-			// draw the axis.***
-			////if (magoManager.magoPolicy.getShowOrigin())
-			////{
-			////	var node = selectionManager.getSelectedF4dNode();
-			////	//var geoLocDataManager = node.getNodeGeoLocDataManager();
-			////	var nodes = [node];
-			////	
-			////	this.renderAxisNodes(nodes, renderType);
-			////}
 		}
 
 		// Debug component.******************************************
@@ -1898,7 +1895,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		*/
 		//-----------------------------------------------------------
 
-	}
+	} 
 
 	// DEBUG.Render lights sources.*************************************************************************
 	//this.renderer.renderNativeLightSources(renderType, this.visibleObjControlerNodes) ; // debug component.
@@ -1907,8 +1904,6 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	/*
 	if (this.windTest === undefined)
 	{
-		
-
 		if (this.weatherStation === undefined)
 		{ this.weatherStation = new WeatherStation(); }
 	
@@ -1938,45 +1933,51 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		//	"OBS-QWM_2019090712.grib2_wind_000", "OBS-QWM_2019090713.grib2_wind_000", "OBS-QWM_2019090714.grib2_wind_000", "OBS-QWM_2019090715.grib2_wind_000",
 		//	"OBS-QWM_2019090716.grib2_wind_000", "OBS-QWM_2019090717.grib2_wind_000", "OBS-QWM_2019090718.grib2_wind_000", "OBS-QWM_2019090719.grib2_wind_000",
 		//	"OBS-QWM_2019090720.grib2_wind_000", "OBS-QWM_2019090721.grib2_wind_000", "OBS-QWM_2019090722.grib2_wind_000", "OBS-QWM_2019090723.grib2_wind_000"];
+
+		
 			
 		//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_Airport";
 		//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_GolfPark_NineBridge1";
-		//var windMapFilesFolderPath = geometryDataPath +"/SeoulWind/200907";
+		var windMapFilesFolderPath = geometryDataPath +"/SeoulWind/200907";
 		//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_HanRaSan";
-		var windMapFilesFolderPath = geometryDataPath +"/Siheung_wind";
+		//var windMapFilesFolderPath = geometryDataPath +"/Siheung_wind";
+
+		// yeonHwa test data.*********************************************
+		var windDataFilesNamesArray = ["wind_7"];
+		var windMapFilesFolderPath = geometryDataPath +"/wind_yeonHwa";
 		
 		this.weatherStation.test_loadWindData3d(this, windDataFilesNamesArray, windMapFilesFolderPath);
 		//this.TEST__golfPark();
 		this.windTest = true;
 	}
 	*/
-	
-	
 	if (this.weatherStation)
 	{
 		if (this.isCesiumGlobe())
-			{
-				scene._context._currentFramebuffer._bind();
-				// unbind mago colorTextures:
+		{
+			scene._context._currentFramebuffer._bind();
+			// unbind mago colorTextures:
+			
+			gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // depthTex.
+			gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // normalTex.
+			gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0); // albedoTex.
+			this.extbuffers.drawBuffersWEBGL([
+				this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
+				this.extbuffers.NONE, // gl_FragData[1]
+				this.extbuffers.NONE, // gl_FragData[2]
+				this.extbuffers.NONE, // gl_FragData[3]
+				]);
 				
-				gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // depthTex.
-				gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // normalTex.
-				gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0); // albedoTex.
-				this.extbuffers.drawBuffersWEBGL([
-					this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
-					this.extbuffers.NONE, // gl_FragData[1]
-					this.extbuffers.NONE, // gl_FragData[2]
-					this.extbuffers.NONE, // gl_FragData[3]
-					]);
-					
-			}
+		}
 
-		//this.weatherStation.renderWindMultiLayers(this);
-		//this.weatherStation.test_renderWindLayer(this);
-		//this.weatherStation.test_renderTemperatureLayer(this);
-		//this.weatherStation.test_renderCuttingPlanes(this, renderType);
-		this.weatherStation.renderWeather(this);
+		////this.weatherStation.renderWindMultiLayers(this);
+		////this.weatherStation.test_renderWindLayer(this);
+		////this.weatherStation.test_renderTemperatureLayer(this);
+		////this.weatherStation.test_renderCuttingPlanes(this, renderType);
+		//this.weatherStation.renderWeather(this);
 	}
+	
+	
 
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
 		
@@ -6986,6 +6987,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
 	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
 	shader.bUseMultiRenderTarget_loc = gl.getUniformLocation(shader.program, "bUseMultiRenderTarget");
+	shader.uFrustumIdx_loc = gl.getUniformLocation(shader.program, "uFrustumIdx");
 	gl.bindAttribLocation(shader.program, 0, "prev");
 	gl.bindAttribLocation(shader.program, 1, "current");
 	gl.bindAttribLocation(shader.program, 2, "next");

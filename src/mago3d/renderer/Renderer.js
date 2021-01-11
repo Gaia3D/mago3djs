@@ -1186,11 +1186,8 @@ Renderer.prototype.renderNativeObjects = function(gl, shader, renderType, visibl
 		{
 			transparentsArray[i].render(magoManager, shader, renderType, glPrimitive);
 		}
-	}
-	
-	// render vectorType objects as opaques.
-	if (bRenderOpaques && renderType === 1)
-	{
+
+		// ThickLines only in transparentPass.
 		var vectorTypeObjectsArray = visibleObjControlerNodes.currentVisibleNativeObjects.vectorTypeArray;
 		var vectorTypeObjectsCount = vectorTypeObjectsArray.length;
 		if (vectorTypeObjectsCount > 0)
@@ -1213,6 +1210,12 @@ Renderer.prototype.renderNativeObjects = function(gl, shader, renderType, visibl
 			// return to the current shader.
 			shader.useProgram();
 		}
+	}
+	
+	// render vectorType objects as opaques.
+	if (bRenderOpaques && renderType === 1)
+	{
+		
 
 		// Test. Check pointsTypeObjectsArray. Test.***
 		var pointTypeObjectsArray = visibleObjControlerNodes.currentVisibleNativeObjects.pointTypeArray;
@@ -2382,6 +2385,11 @@ Renderer.prototype.renderScreenRectangle = function(gl, options)
 	if(magoManager.specularLightTex)
 	{
 		//texture = magoManager.specularLightTex;
+	}
+
+	if(magoManager.windPlaneDepthTex)
+	{
+		texture = magoManager.windPlaneDepthTex;
 	}
 
 	/*

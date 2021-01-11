@@ -379,7 +379,9 @@ GeographicCoordsList.getRenderableObjectOfGeoCoordsArray = function(geoCoordsArr
 	{ return undefined; }
 	
 	// 1rst, make points3dList relative to the 1rst_geoCoord.
-	var firstGeoCoord = geoCoordsArray[0];
+	// To do this, calculate middleGeoCoord.
+	var geoExtent = GeographicCoordsList.getGeographicExtent(geoCoordsArray, undefined);
+	var firstGeoCoord = geoExtent.getMidPoint(undefined);
 	var geoLoc = ManagerUtils.calculateGeoLocationData(firstGeoCoord.longitude, firstGeoCoord.latitude, firstGeoCoord.altitude, 0, 0, 0, undefined);
 	
 	var points3dLCArray = GeographicCoordsList.getPointsRelativeToGeoLocation(geoLoc, geoCoordsArray, undefined);
@@ -410,6 +412,16 @@ GeographicCoordsList.getRenderableObjectOfGeoCoordsArray = function(geoCoordsArr
 	renderableObject.geoLocDataManager = new GeoLocationDataManager();
 	renderableObject.geoLocDataManager.addGeoLocationData(geoLoc);
 	renderableObject.objectType = MagoRenderable.OBJECT_TYPE.VECTORMESH;
+
+	// calculate vectorMesh "BoundingSphereWC".***********************************************
+	renderableObject.boundingSphereWC = new BoundingSphere();
+	var positionWC = geoLoc.position;
+	var bboxLC = Point3DList.getBoundingBoxOfPoints3DArray(points3dLCArray, undefined);
+	var radiusAprox = bboxLC.getRadiusAprox();
+	renderableObject.boundingSphereWC.setCenterPoint(positionWC.x, positionWC.y, positionWC.z);
+	renderableObject.boundingSphereWC.setRadius(radiusAprox);
+	// End calculating boundingSphereWC.------------------------------------------------------
+
 	renderableObject.objectsArray.push(vectorMesh);
 	
 	return renderableObject;

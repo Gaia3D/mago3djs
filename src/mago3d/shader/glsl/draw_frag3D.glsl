@@ -1,6 +1,17 @@
 precision highp float;
 
+#define %USE_LOGARITHMIC_DEPTH%
+#ifdef USE_LOGARITHMIC_DEPTH
+#extension GL_EXT_frag_depth : enable
+#endif
+
+#define %USE_MULTI_RENDER_TARGET%
+#ifdef USE_MULTI_RENDER_TARGET
+#extension GL_EXT_draw_buffers : require
+#endif
+
 uniform sampler2D u_wind;
+uniform sampler2D u_depthTex;
 uniform vec2 u_wind_min;
 uniform vec2 u_wind_max;
 uniform bool u_flipTexCoordY_windMap;
@@ -8,6 +19,9 @@ uniform bool u_colorScale;
 uniform float u_tailAlpha;
 uniform float u_externAlpha;
 uniform bool bUseLogarithmicDepth;
+
+uniform int uFrustumIdx;
+varying float vDepth;
 
 varying vec2 v_particle_pos;
 varying float flogz;
@@ -149,6 +163,23 @@ vec3 getWhiteToBlueColor_byHeight(float height, float minHeight, float maxHeight
     return vec3(r, g, b);
 }
 
+vec4 packDepth( float v ) {
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;
+  enc = fract(enc);
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);
+  return enc;
+}
+
+float unpackDepth(const in vec4 rgba_depth)
+{
+	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));
+} 
+
+vec3 encodeNormal(in vec3 normal)
+{
+	return normal*0.5 + 0.5;
+}
+
 void main() {
 	vec2 pt = gl_PointCoord - vec2(0.5);
 	float r = pt.x*pt.x+pt.y*pt.y;
@@ -165,7 +196,7 @@ void main() {
     vec2 velocity = mix(u_wind_min, u_wind_max, texture2D(u_wind, windMapTexCoord).rg);
     float speed_t = length(velocity) / length(u_wind_max);
 
-	
+	vec4 albedo4;
 	if(u_colorScale)
 	{
 		speed_t *= 1.5;
@@ -182,17 +213,44 @@ void main() {
 		vec3 col3 = getRainbowColor_byHeight(speed_t);
 		//vec3 col3 = getWhiteToBlueColor_byHeight(speed_t, 0.0, 1.0);
 		float r = speed_t;
-		gl_FragColor = vec4(col3.x, col3.y, col3.z ,u_tailAlpha*u_externAlpha);
+		albedo4 = vec4(col3.x, col3.y, col3.z ,u_tailAlpha*u_externAlpha);
 	}
 	else{
 		float intensity = speed_t*3.0;
 		if(intensity > 1.0)
 			intensity = 1.0;
-		gl_FragColor = vec4(intensity,intensity,intensity,u_tailAlpha*u_externAlpha);
+		albedo4 = vec4(intensity,intensity,intensity,u_tailAlpha*u_externAlpha);
 	}
 
+	gl_FragData[0] = albedo4;
+	
+	#ifdef USE_MULTI_RENDER_TARGET
+		// save depth, normal, albedo.
+		gl_FragData[1] = packDepth(vDepth); 
+
+		// When render with cull_face disabled, must correct the faces normal.
+		float frustumIdx = 1.0;
+		if(uFrustumIdx == 0)
+		frustumIdx = 0.005;
+		else if(uFrustumIdx == 1)
+		frustumIdx = 0.015;
+		else if(uFrustumIdx == 2)
+		frustumIdx = 0.025;
+		else if(uFrustumIdx == 3)
+		frustumIdx = 0.035;
+
+		vec3 normal = vec3(0.0, 0.0, 1.0);
+
+		vec3 encodedNormal = encodeNormal(normal);
+		gl_FragData[2] = vec4(encodedNormal, frustumIdx); // save normal.***
+
+		// albedo.
+		gl_FragData[3] = albedo4; 
+	#endif
+	
+
 	//if(r > 0.16)
-	//gl_FragColor = vec4(1.0, 1.0, 1.0, u_tailAlpha*u_externAlpha);
+	//gl_FragData[0] = vec4(1.0, 1.0, 1.0, u_tailAlpha*u_externAlpha);
 
 	#ifdef USE_LOGARITHMIC_DEPTH
 	if(bUseLogarithmicDepth)

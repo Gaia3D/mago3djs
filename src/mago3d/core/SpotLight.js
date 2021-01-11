@@ -243,10 +243,11 @@ SpotLight.prototype.doIntersectedObjectsCulling = function(visiblesArray, native
 	}
 
 	this.bIntersectionCulling = true;
-	this.bCubeMapMade = false;
+	//this.bCubeMapMade = false;
 
 	return true;
 };
+
 
 /**
  * This function returns the boundingSphere of the spotlight in worldCoord.

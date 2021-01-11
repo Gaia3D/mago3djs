@@ -230,9 +230,10 @@ BoundingBox.prototype.addXYZData = function(x, y, z)
  */
 BoundingBox.prototype.addPointsArray = function(pointsArray) 
 {
-	if (pointsArray === undefined)
+	if (pointsArray === undefined || pointsArray.length === 0)
 	{ return; }
 	
+	this.init(pointsArray[0]);
 	var pointsCount = pointsArray.length;
 	for (var i=0;i<pointsCount;++i)
 	{

@@ -8,7 +8,7 @@
  * @exception {Error} Messages.CONSTRUCT_ERROR
  * @param {String} smartTileName tile name;
  */
-var SmartTile = function(smartTileName) 
+var SmartTile = function(smartTileName, options) 
 {
 	//       +-----+-----+
 	//       |  3  |  2  |
@@ -30,6 +30,7 @@ var SmartTile = function(smartTileName)
 	this.maxGeographicCoord; // longitude, latitude, altitude.
 	this.sphereExtent; // Cartesian position sphere in worldCoord.
 	this.subTiles; // array.
+	this.smartTileManager;
 	
 	this.nodeSeedsArray;
 	this.smartTileF4dSeedArray;
@@ -48,6 +49,12 @@ var SmartTile = function(smartTileName)
 	
 	this.isVisible; // var to manage the frustumCulling and delete buildings if necessary.
 	this.distToCamera;
+
+	if(options)
+	{
+		if(options.smartTileManager)
+		this.smartTileManager = options.smartTileManager;
+	}
 };
 
 /**
@@ -126,6 +133,10 @@ SmartTile.prototype.newSubTile = function(parentTile)
 	var subTile = new SmartTile();
 	subTile.depth = parentTile.depth + 1;
 	subTile.targetDepth = parentTile.targetDepth;
+
+	if(this.smartTileManager)
+	{ subTile.smartTileManager = this.smartTileManager; }
+
 	this.subTiles.push(subTile);
 	return subTile;
 };
@@ -984,7 +995,11 @@ SmartTile.prototype.getFrustumIntersectedTiles = function(camera, frustum, resul
 			{ this.putSmartTileInEyeDistanceSortedArray(resultPartiallyIntersectedTilesArray, this); }
 		} 
 			
-		if (this.subTiles && this.subTiles.length > 0)
+		var maxDepth = 30;
+		if(this.smartTileManager)
+		maxDepth = this.smartTileManager.maxDepth;
+
+		if (this.subTiles && this.subTiles.length > 0 && this.depth < maxDepth) 
 		{
 			for (var i=0; i<this.subTiles.length; i++)
 			{

@@ -26,6 +26,7 @@ uniform float uExtrudeHeight;
 varying vec4 vColor;
 varying float flogz;
 varying float Fcoef_half;
+varying float vDepth;
 
 const float error = 0.001;
 
@@ -158,6 +159,9 @@ void main()
 	vec4 posCC =  vec4(highDifference.xyz + lowDifference.xyz, 1.0);
     vec4 finalPosProjected = ModelViewProjectionMatrixRelToEye * posCC;
 	gl_Position = finalPosProjected; 
+
+    vec4 orthoPos = modelViewMatrixRelToEye * posCC;
+	vDepth = -orthoPos.z/far;
 
 
 	if(bUseLogarithmicDepth)

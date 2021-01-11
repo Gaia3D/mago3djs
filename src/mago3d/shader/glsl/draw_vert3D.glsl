@@ -6,6 +6,7 @@ attribute float a_index;
 uniform sampler2D u_particles; // channel-1.***
 uniform sampler2D u_particles_next; // channel-2.***
 uniform float u_particles_res;
+uniform mat4 modelViewMatrixRelToEye;
 uniform mat4 buildingRotMatrix;
 uniform mat4 ModelViewProjectionMatrix;
 uniform mat4 ModelViewProjectionMatrixRelToEye;
@@ -22,10 +23,12 @@ uniform float u_layerAltitude;
 
 uniform bool bUseLogarithmicDepth;
 uniform float uFCoef_logDepth;
+uniform float far;
 
 varying vec2 v_particle_pos;
 varying float flogz;
 varying float Fcoef_half;
+varying float vDepth;
 
 #define M_PI 3.1415926535897932384626433832795
 
@@ -125,8 +128,9 @@ void main() {
 	// Now calculate the position on camCoord.***
 	//gl_Position = ModelViewProjectionMatrix * posWC;
 	gl_Position = ModelViewProjectionMatrixRelToEye * posCC;
-	//gl_Position = vec4(2.0 * v_particle_pos.x - 1.0, 1.0 - 2.0 * v_particle_pos.y, 0, 1);
-	//gl_Position = vec4(v_particle_pos.x, v_particle_pos.y, 0, 1);
+
+	vec4 orthoPos = modelViewMatrixRelToEye * posCC;
+	vDepth = (-orthoPos.z)/(far); // the correct value.
 
 	if(bUseLogarithmicDepth)
 	{
@@ -147,8 +151,8 @@ void main() {
 
 	if(gl_PointSize > maxPointSize)
 	gl_PointSize = maxPointSize;
-	else if(gl_PointSize < 1.5)
-	gl_PointSize = 1.5;
+	else if(gl_PointSize < 2.0)
+	gl_PointSize = 2.0;
 }
 
 
