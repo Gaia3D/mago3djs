@@ -33,6 +33,7 @@ uniform bool bApplySsao;
 uniform mat4 sunMatrix[2]; 
 uniform vec3 sunPosHIGH[2];
 uniform vec3 sunPosLOW[2];
+uniform vec3 sunDirCC;
 uniform vec3 sunDirWC;
 uniform int sunIdx;
 uniform float screenWidth;    
@@ -86,7 +87,7 @@ vec3 getViewRay(vec2 tc, in float relFar)
     return ray;                      
 }
 
-bool isInShadow(vec4 pointWC, int currSunIdx)
+bool isInShadow(vec4 pointCC, int currSunIdx)
 {
 	bool inShadow = false;
 	vec3 currSunPosLOW;
@@ -106,10 +107,10 @@ bool isInShadow(vec4 pointWC, int currSunIdx)
 	}
 	else
 	return false;
+
 	
-		
-	vec3 highDifferenceSun = pointWC.xyz -currSunPosHIGH.xyz;
-	vec3 lowDifferenceSun = -currSunPosLOW.xyz;
+	vec3 highDifferenceSun = -currSunPosHIGH.xyz + encodedCameraPositionMCHigh;
+	vec3 lowDifferenceSun = pointCC.xyz -currSunPosLOW.xyz + encodedCameraPositionMCLow;
 	vec4 pos4Sun = vec4(highDifferenceSun.xyz + lowDifferenceSun.xyz, 1.0);
 	vec4 vPosRelToLight = currSunMatrix * pos4Sun;
 
@@ -300,6 +301,7 @@ void main()
 	float alpha = 0.0;
 	vec4 finalColor;
 	finalColor = vec4(0.2, 0.2, 0.2, 0.8);
+	/*
 	if(bApplyShadow)
 	{
 		// *** For cesiumTerrain shadows.***
@@ -317,7 +319,8 @@ void main()
 		
 		vec4 viewPosH = projectionMatrixInv * vec4(x_ndc, y_ndc, z_ndc, 1.0);
 		vec3 posCC = viewPosH.xyz/viewPosH.w;
-		vec4 posWC = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0) + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 1.0);
+		vec4 posWCRelToEye = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0);
+		vec4 posWC = posWCRelToEye + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 0.0);
 		//------------------------------------------------------------------------------------------------------------------------------
 
 		// now, check if sun is in the antipodas.
@@ -332,10 +335,10 @@ void main()
 		// 1rst, try with the closest sun. sunIdx = 0.
 		if(!sunInAntipodas)
 		{
-			bool pointIsinShadow = isInShadow(posWC, 0);
+			bool pointIsinShadow = isInShadow(posWCRelToEye, 0);
 			if(!pointIsinShadow)
 			{
-				pointIsinShadow = isInShadow(posWC, 1);
+				pointIsinShadow = isInShadow(posWCRelToEye, 1);
 			}
 
 			if(pointIsinShadow)
@@ -348,7 +351,7 @@ void main()
 		gl_FragColor = vec4(finalColor.rgb*shadow_occlusion, alpha);
 		return;
 	}
-
+	*/
 	vec4 normal4 = getNormal(screenPos);
 	vec3 normal = normal4.xyz;
 	if(length(normal) < 0.1)
@@ -364,45 +367,57 @@ void main()
 	//if(int(floor(normal4.w * 100.0)) >= 10)
 	//discard;
 	int estimatedFrustumIdx = int(floor(normal4.w * 100.0));
-	int dataType = -1;
+	int dataType = -1;// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.
 	int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);
 	vec2 nearFar_origin = getNearFar_byFrustumIdx(currFrustumIdx);
 	float currNear_origin = nearFar_origin.x;
 	float currFar_origin = nearFar_origin.y;
 	
 	vec3 ambientColor = vec3(0.0);
-	vec3 directionalLightColor = vec3(0.7, 0.7, 0.7);
+	vec3 directionalLightColor = vec3(0.9, 0.9, 0.9);
 	float directionalLightWeighting = 1.0;
-	/*
+	
 	if(bApplyMagoShadow)
 	{
-		
-		///float linearDepth = getDepth(screenPos);
-		// calculate the real pos of origin.
-		///float origin_zDist = linearDepth * currFar_origin; // original.
-		///vec3 posCC = getViewRay(screenPos, origin_zDist);
-		///vec4 posWC = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0) + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 1.0);
-		//------------------------------------------------------------------------------------------------------------------------------
-		// 2nd, calculate the vertex relative to light.***
-		// 1rst, try with the closest sun. sunIdx = 0.
-		///bool pointIsinShadow = isInShadow(posWC, 0);
-		///if(!pointIsinShadow)
-		///{
-		///	pointIsinShadow = isInShadow(posWC, 1);
-		///}
+		// 1rst, check normal vs sunDirCC.
+		bool sunInAntipodas = false;
+		float dotAux = dot(sunDirCC, normal);
+		if(dotAux > 0.0)
+		{
+			sunInAntipodas = true;
+			shadow_occlusion = 0.5;
+		}
 
-		///if(pointIsinShadow)
-		///{
-		///	shadow_occlusion = 0.5;
-		///	alpha = 0.5;
-		///}
+		if(!sunInAntipodas)
+		{
+			float linearDepth = getDepth(screenPos);
+			// calculate the real pos of origin.
+			float origin_zDist = linearDepth * currFar_origin; // original.
+			vec3 posCC = getViewRay(screenPos, origin_zDist);
+			vec4 posWCRelToEye = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0);
+			//posWC += vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 0.0);
+			//------------------------------------------------------------------------------------------------------------------------------
+			// 2nd, calculate the vertex relative to light.***
+			// 1rst, try with the closest sun. sunIdx = 0.
+			bool pointIsinShadow = isInShadow(posWCRelToEye, 0);
+			if(!pointIsinShadow)
+			{
+				pointIsinShadow = isInShadow(posWCRelToEye, 1);
+			}
+
+			if(pointIsinShadow)
+			{
+				shadow_occlusion = 0.5;
+				alpha = 0.5;
+			}
+		}
 		
 
 		// calculate sunDirCC.
-		vec4 sunDirCC = modelViewMatrixRelToEyeInv * vec4(sunDirWC, 1.0);
-		directionalLightWeighting = max(dot(normal, -sunDirCC.xyz), 0.0);
+		//vec4 sunDirCC = modelViewMatrixRelToEyeInv * vec4(sunDirWC, 1.0);
+		//directionalLightWeighting = max(dot(normal, -sunDirCC.xyz), 0.0);
 	}
-	*/
+	
 
 	ambientColor = vec3(0.8);
 	vec3 lightingDirection = normalize(vec3(0.6, 0.6, 0.6));
@@ -417,15 +432,40 @@ void main()
 	vec4 nightFilter4 = vec4(0.0, 0.0, 0.0, 0.5);
 
 	// In this point check the "dataType".
+	// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.
 	if(dataType == 1)
 	{
+		// calculate normalWC & compare to sunDirWC.***************************
+		//modelViewMatrixRelToEyeInv
+		/*
+		vec4 normal4WC = modelViewMatrixRelToEyeInv * vec4(normal, 1.0);
+		vec3 normalWC = normalize(normal4WC.xyz);
+		float sunDot = dot(sunDirWC, -normalWC);
+		if(sunDot < 0.0)
+		{
+			gl_FragColor = vec4(0.0, 0.0, 0.0, 0.8);
+		}
+		else
+		{
+			gl_FragColor = vec4(0.0, 0.0, 0.0, 0.1);
+		}
+		return;
+		*/
+		//-----------------------------------------------------------------------
+		
 		// This is TERRAIN.
 		float darkness = 1.0 - uSceneDayNightLightingFactor;
 		darkness = min(darkness, 1.0 - diffuseLightModul);
 
+		if(shadow_occlusion < 1.0)
+		{
+			darkness = 0.5 - diffuseLightModul * 0.3;
+		}
+
 		vec4 blendColor4 = vec4(0.0, 0.0, 0.0, darkness);
 		gl_FragColor = blendColor4;
 		return;
+		
 	}
 
 	vec3 ray = getViewRay(screenPos, 1.0); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
@@ -442,7 +482,7 @@ void main()
 	{
 		// 1rst, calculate the ilumination. todo:
 		// now, apply ssao from ssaoTexture.
-		if(dataType != 0 && dataType != 2)
+		if(dataType != 0 && dataType != 2)// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.
 		discard;
 
 		//ssaoFromDepthTex
@@ -473,6 +513,11 @@ void main()
 		occlInv *= lightFactorAux;
 
 		// Light factor.***
+		shadow_occlusion += diffuseLightModul * 0.3;
+		if(shadow_occlusion > 1.0)
+		shadow_occlusion = 1.0;
+
+		occlInv *= (shadow_occlusion);
 		vec4 finalColor = vec4(albedo.r * occlInv, albedo.g * occlInv, albedo.b * occlInv, albedo.a);
 		gl_FragColor = finalColor;
 
@@ -523,7 +568,7 @@ void main()
 		*/
 		// Provisionally render edges here.****************************************************************
 		// EDGES.***
-		if(dataType == 0)
+		if(dataType == 0)// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.
 		{
 			// detect edges by normals.
 			vec3 normal_up = getNormal(vec2(screenPos.x, screenPos.y + pixelSize_y)).xyz;
@@ -587,7 +632,7 @@ void main()
 			}
 			
 		}
-		else if(dataType == 2)
+		else if(dataType == 2)// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.
 		{
 			// this is pointCloud data.
 			// Check depth values around the pixel to find a silhouette.
@@ -609,7 +654,7 @@ void main()
 					// calculate current frustum idx.
 					vec4 normal4 = getNormal(texCoord);
 					int estimatedFrustumIdx = int(floor(normal4.w * 100.0));
-					int dataType = -1;
+					int dataType = -1;// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.
 					int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);
 
 					if(dataType == 1)

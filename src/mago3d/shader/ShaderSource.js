@@ -1292,50 +1292,14 @@ ShaderSource.GBufferFS = "#ifdef GL_ES\n\
 #extension GL_EXT_draw_buffers : require\n\
 #endif\n\
 \n\
-\n\
-//uniform sampler2D depthTex;\n\
-//uniform sampler2D noiseTex;  \n\
+ \n\
 uniform sampler2D diffuseTex;\n\
-uniform sampler2D shadowMapTex;\n\
-uniform sampler2D shadowMapTex2;\n\
-//uniform sampler2D ssaoFromDepthTex;\n\
-uniform bool textureFlipYAxis;\n\
-uniform mat4 projectionMatrix;\n\
-uniform mat4 projectionMatrixInv;\n\
-uniform mat4 modelViewMatrixRelToEyeInv;\n\
-\n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
-\n\
-uniform mat4 m;\n\
-uniform vec2 noiseScale;\n\
-uniform float near;\n\
-uniform float far;            \n\
-uniform float fov;\n\
-uniform float tangentOfHalfFovy;\n\
-uniform float aspectRatio;    \n\
-uniform float screenWidth;    \n\
-uniform float screenHeight;   \n\
-uniform float shadowMapWidth;    \n\
-uniform float shadowMapHeight; \n\
-uniform float shininessValue;\n\
-uniform vec3 kernel[16];   \n\
+uniform bool textureFlipYAxis;  \n\
 uniform vec4 oneColor4;\n\
 \n\
-uniform bool bApplyScpecularLighting;\n\
+//uniform bool bApplyScpecularLighting;\n\
 uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
 \n\
-uniform vec3 specularColor;\n\
-uniform vec3 ambientColor;\n\
-\n\
-const int kernelSize = 16;  \n\
-uniform float radius;      \n\
-\n\
-uniform float ambientReflectionCoef;\n\
-uniform float diffuseReflectionCoef;  \n\
-uniform float specularReflectionCoef; \n\
-uniform bool bApplySsao;\n\
-uniform bool bApplyShadow;\n\
 uniform float externalAlpha;\n\
 uniform vec4 colorMultiplier;\n\
 uniform bool bUseLogarithmicDepth;\n\
@@ -1358,15 +1322,10 @@ uniform vec2 limitationHeights;\n\
 varying vec3 vNormal;\n\
 varying vec4 vColor4; // color from attributes\n\
 varying vec2 vTexCoord;   \n\
-varying vec3 vLightWeighting;\n\
-varying vec3 diffuseColor;\n\
+\n\
 varying vec3 vertexPos; // this is the orthoPos.***\n\
 varying vec3 vertexPosLC;\n\
-varying float applySpecLighting;\n\
-varying vec4 vPosRelToLight; \n\
-varying vec3 vLightDir; \n\
-varying vec3 vNormalWC;\n\
-varying float currSunIdx; \n\
+\n\
 \n\
 varying float flogz;\n\
 varying float Fcoef_half;\n\
@@ -1389,46 +1348,6 @@ vec3 encodeNormal(in vec3 normal)\n\
 	return normal*0.5 + 0.5;\n\
 }            \n\
 \n\
-vec3 getViewRay(vec2 tc)\n\
-{\n\
-	float hfar = 2.0 * tangentOfHalfFovy * far;\n\
-    float wfar = hfar * aspectRatio;    \n\
-    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    \n\
-    return ray;                      \n\
-}         \n\
-/*          \n\
-float getDepth(vec2 coord)\n\
-{\n\
-	if(bUseLogarithmicDepth)\n\
-	{\n\
-		float linearDepth = unpackDepth(texture2D(depthTex, coord.xy));\n\
-		// gl_FragDepthEXT = linearDepth = log2(flogz) * Fcoef_half;\n\
-		// flogz = 1.0 + gl_Position.z;\n\
-\n\
-		float flogzAux = pow(2.0, linearDepth/Fcoef_half);\n\
-		float z = flogzAux - 1.0;\n\
-		linearDepth = z/(far);\n\
-		return linearDepth;\n\
-	}\n\
-	else{\n\
-		return unpackDepth(texture2D(depthTex, coord.xy));\n\
-	}\n\
-}\n\
-*/\n\
-float getDepthShadowMap(vec2 coord)\n\
-{\n\
-	// currSunIdx\n\
-	if(currSunIdx > 0.0 && currSunIdx < 1.0)\n\
-	{\n\
-		return unpackDepth(texture2D(shadowMapTex, coord.xy));\n\
-	}\n\
-    else if(currSunIdx > 1.0 && currSunIdx < 2.0)\n\
-	{\n\
-		return unpackDepth(texture2D(shadowMapTex2, coord.xy));\n\
-	}\n\
-	else\n\
-		return -1.0;\n\
-}  \n\
 \n\
 bool clipVertexByPlane(in vec4 plane, in vec3 point)\n\
 {\n\
@@ -1636,107 +1555,8 @@ bool isPointInsideLimitationConvexPolygon(in vec2 point2d)\n\
 }\n\
 \n\
 \n\
-\n\
-/*\n\
-\n\
-vec3 reconstructPosition(vec2 texCoord, float depth)\n\
-{\n\
-    // https://wickedengine.net/2019/09/22/improved-normal-reconstruction-from-depth/\n\
-    float x = texCoord.x * 2.0 - 1.0;\n\
-    //float y = (1.0 - texCoord.y) * 2.0 - 1.0;\n\
-    float y = (texCoord.y) * 2.0 - 1.0;\n\
-    float z = (1.0 - depth) * 2.0 - 1.0;\n\
-    vec4 pos_NDC = vec4(x, y, z, 1.0);\n\
-    vec4 pos_CC = projectionMatrixInv * pos_NDC;\n\
-    return pos_CC.xyz / pos_CC.w;\n\
-}\n\
-\n\
-vec3 normal_from_depth(float depth, vec2 texCoord) {\n\
-    // http://theorangeduck.com/page/pure-depth-ssao\n\
-    float pixelSizeX = 1.0/screenWidth;\n\
-    float pixelSizeY = 1.0/screenHeight;\n\
-\n\
-    vec2 offset1 = vec2(0.0,pixelSizeY);\n\
-    vec2 offset2 = vec2(pixelSizeX,0.0);\n\
-\n\
-	float depthA = 0.0;\n\
-	float depthB = 0.0;\n\
-	for(float i=0.0; i<1.0; i++)\n\
-	{\n\
-		depthA += getDepth(texCoord + offset1*(1.0+i));\n\
-		depthB += getDepth(texCoord + offset2*(1.0+i));\n\
-	}\n\
-\n\
-	vec3 posA = reconstructPosition(texCoord + offset1*1.0, depthA/1.0);\n\
-	vec3 posB = reconstructPosition(texCoord + offset2*1.0, depthB/1.0);\n\
-\n\
-    vec3 pos0 = reconstructPosition(texCoord, depth);\n\
-    vec3 normal = cross(posA - pos0, posB - pos0);\n\
-    normal.z = -normal.z;\n\
-\n\
-    return normalize(normal);\n\
-}\n\
-\n\
-mat3 sx = mat3( \n\
-    1.0, 2.0, 1.0, \n\
-    0.0, 0.0, 0.0, \n\
-    -1.0, -2.0, -1.0 \n\
-);\n\
-mat3 sy = mat3( \n\
-    1.0, 0.0, -1.0, \n\
-    2.0, 0.0, -2.0, \n\
-    1.0, 0.0, -1.0 \n\
-);\n\
-\n\
-bool isEdge()\n\
-{\n\
-	vec3 I[3];\n\
-	vec2 screenPos = vec2((gl_FragCoord.x) / screenWidth, (gl_FragCoord.y) / screenHeight);\n\
-	float linearDepth = getDepth(screenPos);\n\
-	vec3 normal = normal_from_depth(linearDepth, screenPos);\n\
-\n\
-    for (int i=0; i<3; i++) {\n\
-        //vec3 norm1 = texelFetch(normalTexture, ivec2(gl_FragCoord) + ivec2(i-1,-1), 0 ).rgb * 2.0f - 1.0f;\n\
-        //vec3 norm2 =  texelFetch(normalTexture, ivec2(gl_FragCoord) + ivec2(i-1,0), 0 ).rgb * 2.0f - 1.0f;\n\
-        //vec3 norm3 = texelFetch(normalTexture, ivec2(gl_FragCoord) + ivec2(i-1,1), 0 ).rgb * 2.0f - 1.0f;\n\
-		vec2 screenPos1 = vec2((gl_FragCoord.x+float(i-1)) / screenWidth, (gl_FragCoord.y-1.0) / screenHeight);\n\
-		float linearDepth1 = getDepth(screenPos1);  \n\
-\n\
-		vec2 screenPos2 = vec2((gl_FragCoord.x+float(i-1)) / screenWidth, (gl_FragCoord.y-0.0) / screenHeight);\n\
-		float linearDepth2 = getDepth(screenPos2);  \n\
-\n\
-		vec2 screenPos3 = vec2((gl_FragCoord.x+float(i-1)) / screenWidth, (gl_FragCoord.y+1.0) / screenHeight);\n\
-		float linearDepth3 = getDepth(screenPos1);  \n\
-\n\
-		vec3 norm1 = normal_from_depth(linearDepth1, screenPos1);\n\
-        vec3 norm2 =  normal_from_depth(linearDepth2, screenPos2);\n\
-        vec3 norm3 = normal_from_depth(linearDepth3, screenPos3);\n\
-        float sampleValLeft  = dot(normal, norm1);\n\
-        float sampleValMiddle  = dot(normal, norm2);\n\
-        float sampleValRight  = dot(normal, norm3);\n\
-        I[i] = vec3(sampleValLeft, sampleValMiddle, sampleValRight);\n\
-    }\n\
-\n\
-    float gx = dot(sx[0], I[0]) + dot(sx[1], I[1]) + dot(sx[2], I[2]); \n\
-    float gy = dot(sy[0], I[0]) + dot(sy[1], I[1]) + dot(sy[2], I[2]);\n\
-\n\
-    if((gx < 0.0 && gy < 0.0) || (gy < 0.0 && gx < 0.0) ) \n\
-        return false;\n\
-	float g = sqrt(pow(gx, 2.0)+pow(gy, 2.0));\n\
-\n\
-    if(g > 0.2) {\n\
-        return true;\n\
-    } \n\
-	return false;\n\
-}\n\
-*/\n\
-\n\
-\n\
 void main()\n\
 {\n\
-	//gl_FragData = vColor4; \n\
-	//return;\n\
-\n\
 	if(clippingType == 2)\n\
 	{\n\
 		// clip by limitationPolygon.***\n\
@@ -1795,21 +1615,6 @@ void main()\n\
 	\n\
 	//----------------------------------------------------------------\n\
 \n\
-	//bool testBool = false;\n\
-	float occlusion = 1.0; // ambient occlusion.***\n\
-	float shadow_occlusion = 1.0;\n\
-	//vec3 normal2 = vNormal;	\n\
-	//float scalarProd = 1.0;\n\
-	\n\
-	//vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
-\n\
-	//vec3 ray = getViewRay(screenPos); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
-	//scalarProd = abs(dot(normal2, normalize(-ray)));\n\
-	//scalarProd *= 0.6;\n\
-	//scalarProd += 0.4;\n\
-\n\
-	occlusion = 1.0;\n\
-\n\
 	vec4 textureColor;\n\
     if(colorType == 2)\n\
     {\n\
@@ -1835,65 +1640,6 @@ void main()\n\
         textureColor = vColor4;\n\
     }\n\
 	\n\
-    // Do specular lighting.***\n\
-	float lambertian = 1.0;\n\
-	float specular = 0.0;\n\
-	\n\
-	if(bApplyShadow)\n\
-	{\n\
-		if(currSunIdx > 0.0)\n\
-		{\n\
-			float ligthAngle = dot(vLightDir, vNormalWC);\n\
-			if(ligthAngle > 0.0)\n\
-			{\n\
-				// The angle between the light direction & face normal is less than 90 degree, so, the face is in shadow.***\n\
-				shadow_occlusion = 0.5;\n\
-			}\n\
-			else\n\
-			{\n\
-				vec3 posRelToLight = vPosRelToLight.xyz / vPosRelToLight.w;\n\
-				float tolerance = 0.9963;\n\
-				posRelToLight = posRelToLight * 0.5 + 0.5; // transform to [0,1] range\n\
-				if(posRelToLight.x >= 0.0 && posRelToLight.x <= 1.0)\n\
-				{\n\
-					if(posRelToLight.y >= 0.0 && posRelToLight.y <= 1.0)\n\
-					{\n\
-						// fragment is inside of the sun-projectionMatrix.\n\
-						float depthRelToLight = getDepthShadowMap(posRelToLight.xy);\n\
-						if(posRelToLight.z > depthRelToLight*tolerance )\n\
-						{\n\
-							shadow_occlusion = 0.5;\n\
-						}\n\
-					}\n\
-				}\n\
-\n\
-				// test. Calculate the zone inside the pixel.************************************\n\
-				//https://docs.microsoft.com/ko-kr/windows/win32/dxtecharts/cascaded-shadow-maps\n\
-			}\n\
-		}\n\
-	}\n\
-	/*\n\
-	//vec3 ambientColorAux = vec3(textureColor.x*ambientColor.x, textureColor.y*ambientColor.y, textureColor.z*ambientColor.z); // original.***\n\
-	vec3 ambientColorAux = vec3(textureColor.xyz);\n\
-	float alfa = textureColor.w * externalAlpha;\n\
-\n\
-    vec4 finalColor;\n\
-	if(applySpecLighting> 0.0)\n\
-	{\n\
-		finalColor = vec4((ambientReflectionCoef * ambientColorAux + \n\
-							diffuseReflectionCoef * textureColor.xyz + \n\
-							specularReflectionCoef * specularColor)*vLightWeighting * shadow_occlusion * scalarProd, alfa); \n\
-	}\n\
-	else{\n\
-		finalColor = vec4((textureColor.xyz) * occlusion * shadow_occlusion * scalarProd, alfa);\n\
-	}\n\
-\n\
-	\n\
-	\n\
-	finalColor *= colorMultiplier;\n\
-	//finalColor = vec4(linearDepth, linearDepth, linearDepth, 1.0); // test to render depth color coded.***\n\
-    //gl_FragData[0] = finalColor; \n\
-	*/\n\
 	float depthAux = depth;\n\
 \n\
 	#ifdef USE_LOGARITHMIC_DEPTH\n\
@@ -1904,7 +1650,7 @@ void main()\n\
 	}\n\
 	#endif\n\
 \n\
-	vec4 albedo4 = vec4((textureColor.xyz) * shadow_occlusion, 1.0);\n\
+	vec4 albedo4 = vec4(textureColor.xyz, 1.0);\n\
 	gl_FragData[0] = albedo4; // anything.\n\
 \n\
 	#ifdef USE_MULTI_RENDER_TARGET\n\
@@ -1944,31 +1690,22 @@ ShaderSource.GBufferVS = "\n\
 	attribute vec4 color4;\n\
 	\n\
 	uniform mat4 buildingRotMatrix; \n\
-	uniform mat4 projectionMatrix;  \n\
-	uniform mat4 modelViewMatrix;\n\
 	uniform mat4 modelViewMatrixRelToEye; \n\
 	uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
 	uniform mat4 RefTransfMatrix;\n\
 	uniform mat4 normalMatrix4;\n\
-	uniform mat4 sunMatrix[2]; \n\
 	uniform vec3 buildingPosHIGH;\n\
 	uniform vec3 buildingPosLOW;\n\
 	uniform float near;\n\
 	uniform float far;\n\
 	uniform vec3 scaleLC;\n\
-	uniform vec3 sunPosHIGH[2];\n\
-	uniform vec3 sunPosLOW[2];\n\
-	uniform int sunIdx;\n\
-	uniform vec3 sunDirWC;\n\
 	uniform vec3 encodedCameraPositionMCHigh;\n\
 	uniform vec3 encodedCameraPositionMCLow;\n\
 	uniform vec3 aditionalPosition;\n\
 	uniform vec3 refTranslationVec;\n\
 	uniform int refMatrixType; // 0= identity, 1= translate, 2= transform\n\
-	uniform bool bApplySpecularLighting;\n\
 	uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
 	\n\
-	uniform bool bApplyShadow;\n\
 	uniform bool bUseLogarithmicDepth;\n\
 	uniform float uFCoef_logDepth;\n\
 	\n\
@@ -1976,16 +1713,9 @@ ShaderSource.GBufferVS = "\n\
 \n\
 	varying vec3 vNormal;\n\
 	varying vec2 vTexCoord;  \n\
-	varying vec3 uAmbientColor;\n\
-	varying vec3 vLightWeighting;\n\
 	varying vec3 vertexPos;\n\
 	varying vec3 vertexPosLC;\n\
-	varying float applySpecLighting;\n\
-	varying vec4 vColor4; // color from attributes\n\
-	varying vec4 vPosRelToLight; // sun lighting.\n\
-	varying vec3 vLightDir; \n\
-	varying vec3 vNormalWC; \n\
-	varying float currSunIdx;  \n\
+	varying vec4 vColor4; // color from attributes \n\
 	varying float discardFrag;\n\
 	varying float flogz;\n\
 	varying float Fcoef_half;\n\
@@ -2021,68 +1751,9 @@ ShaderSource.GBufferVS = "\n\
 		vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
 		vec3 rotatedNormal = currentTMat * normal;\n\
 		\n\
-		\n\
-		\n\
-		vec3 uLightingDirection = vec3(-0.1320580393075943, -0.9903827905654907, 0.041261956095695496); \n\
-		uAmbientColor = vec3(1.0);\n\
-		vNormalWC = rotatedNormal;\n\
+\n\
 		vNormal = normalize((normalMatrix4 * vec4(rotatedNormal, 1.0)).xyz); // original.***\n\
 		vTexCoord = texCoord;\n\
-		vLightDir = vec3(-0.1320580393075943, -0.9903827905654907, 0.041261956095695496);\n\
-		vec3 directionalLightColor = vec3(0.7, 0.7, 0.7);\n\
-		float directionalLightWeighting = 1.0;\n\
-		\n\
-		currSunIdx = -1.0; // initially no apply shadow.\n\
-		if(bApplyShadow)\n\
-		{\n\
-			//vLightDir = normalize(vec3(normalMatrix4 * vec4(sunDirWC.xyz, 1.0)).xyz); // test.***\n\
-			vLightDir = sunDirWC;\n\
-			vNormalWC = rotatedNormal;\n\
-						\n\
-			// the sun lights count are 2.\n\
-			\n\
-			vec3 currSunPosLOW;\n\
-			vec3 currSunPosHIGH;\n\
-			mat4 currSunMatrix;\n\
-			if(sunIdx == 0)\n\
-			{\n\
-				currSunPosLOW = sunPosLOW[0];\n\
-				currSunPosHIGH = sunPosHIGH[0];\n\
-				currSunMatrix = sunMatrix[0];\n\
-				currSunIdx = 0.5;\n\
-			}\n\
-			else if(sunIdx == 1)\n\
-			{\n\
-				currSunPosLOW = sunPosLOW[1];\n\
-				currSunPosHIGH = sunPosHIGH[1];\n\
-				currSunMatrix = sunMatrix[1];\n\
-				currSunIdx = 1.5;\n\
-			}\n\
-			\n\
-			// Calculate the vertex relative to light.***\n\
-			vec3 highDifferenceSun = objPosHigh.xyz - currSunPosHIGH.xyz;\n\
-			vec3 lowDifferenceSun = objPosLow.xyz - currSunPosLOW.xyz;\n\
-			vec4 pos4Sun = vec4(highDifferenceSun.xyz + lowDifferenceSun.xyz, 1.0);\n\
-			vPosRelToLight = currSunMatrix * pos4Sun;\n\
-			\n\
-			uLightingDirection = sunDirWC; \n\
-			//directionalLightColor = vec3(0.9, 0.9, 0.9);\n\
-			directionalLightWeighting = max(dot(rotatedNormal, -sunDirWC), 0.0);\n\
-		}\n\
-		else\n\
-		{\n\
-			uAmbientColor = vec3(0.8);\n\
-			uLightingDirection = normalize(vec3(0.6, 0.6, 0.6));\n\
-			//uLightingDirection = normalize(vec3(0.2, 0.6, 1.0));\n\
-			directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
-		}\n\
-\n\
-		vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting; // original.***\n\
-		\n\
-		if(bApplySpecularLighting)\n\
-			applySpecLighting = 1.0;\n\
-		else\n\
-			applySpecLighting = -1.0;\n\
 \n\
         gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 		vec4 orthoPos = modelViewMatrixRelToEye * pos4;\n\
@@ -5837,6 +5508,7 @@ uniform bool bApplySsao;\n\
 uniform mat4 sunMatrix[2]; \n\
 uniform vec3 sunPosHIGH[2];\n\
 uniform vec3 sunPosLOW[2];\n\
+uniform vec3 sunDirCC;\n\
 uniform vec3 sunDirWC;\n\
 uniform int sunIdx;\n\
 uniform float screenWidth;    \n\
@@ -5890,7 +5562,7 @@ vec3 getViewRay(vec2 tc, in float relFar)\n\
     return ray;                      \n\
 }\n\
 \n\
-bool isInShadow(vec4 pointWC, int currSunIdx)\n\
+bool isInShadow(vec4 pointCC, int currSunIdx)\n\
 {\n\
 	bool inShadow = false;\n\
 	vec3 currSunPosLOW;\n\
@@ -5910,10 +5582,10 @@ bool isInShadow(vec4 pointWC, int currSunIdx)\n\
 	}\n\
 	else\n\
 	return false;\n\
+\n\
 	\n\
-		\n\
-	vec3 highDifferenceSun = pointWC.xyz -currSunPosHIGH.xyz;\n\
-	vec3 lowDifferenceSun = -currSunPosLOW.xyz;\n\
+	vec3 highDifferenceSun = -currSunPosHIGH.xyz + encodedCameraPositionMCHigh;\n\
+	vec3 lowDifferenceSun = pointCC.xyz -currSunPosLOW.xyz + encodedCameraPositionMCLow;\n\
 	vec4 pos4Sun = vec4(highDifferenceSun.xyz + lowDifferenceSun.xyz, 1.0);\n\
 	vec4 vPosRelToLight = currSunMatrix * pos4Sun;\n\
 \n\
@@ -6104,6 +5776,7 @@ void main()\n\
 	float alpha = 0.0;\n\
 	vec4 finalColor;\n\
 	finalColor = vec4(0.2, 0.2, 0.2, 0.8);\n\
+	/*\n\
 	if(bApplyShadow)\n\
 	{\n\
 		// *** For cesiumTerrain shadows.***\n\
@@ -6121,7 +5794,8 @@ void main()\n\
 		\n\
 		vec4 viewPosH = projectionMatrixInv * vec4(x_ndc, y_ndc, z_ndc, 1.0);\n\
 		vec3 posCC = viewPosH.xyz/viewPosH.w;\n\
-		vec4 posWC = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0) + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 1.0);\n\
+		vec4 posWCRelToEye = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0);\n\
+		vec4 posWC = posWCRelToEye + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 0.0);\n\
 		//------------------------------------------------------------------------------------------------------------------------------\n\
 \n\
 		// now, check if sun is in the antipodas.\n\
@@ -6136,10 +5810,10 @@ void main()\n\
 		// 1rst, try with the closest sun. sunIdx = 0.\n\
 		if(!sunInAntipodas)\n\
 		{\n\
-			bool pointIsinShadow = isInShadow(posWC, 0);\n\
+			bool pointIsinShadow = isInShadow(posWCRelToEye, 0);\n\
 			if(!pointIsinShadow)\n\
 			{\n\
-				pointIsinShadow = isInShadow(posWC, 1);\n\
+				pointIsinShadow = isInShadow(posWCRelToEye, 1);\n\
 			}\n\
 \n\
 			if(pointIsinShadow)\n\
@@ -6152,7 +5826,7 @@ void main()\n\
 		gl_FragColor = vec4(finalColor.rgb*shadow_occlusion, alpha);\n\
 		return;\n\
 	}\n\
-\n\
+	*/\n\
 	vec4 normal4 = getNormal(screenPos);\n\
 	vec3 normal = normal4.xyz;\n\
 	if(length(normal) < 0.1)\n\
@@ -6168,45 +5842,57 @@ void main()\n\
 	//if(int(floor(normal4.w * 100.0)) >= 10)\n\
 	//discard;\n\
 	int estimatedFrustumIdx = int(floor(normal4.w * 100.0));\n\
-	int dataType = -1;\n\
+	int dataType = -1;// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.\n\
 	int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);\n\
 	vec2 nearFar_origin = getNearFar_byFrustumIdx(currFrustumIdx);\n\
 	float currNear_origin = nearFar_origin.x;\n\
 	float currFar_origin = nearFar_origin.y;\n\
 	\n\
 	vec3 ambientColor = vec3(0.0);\n\
-	vec3 directionalLightColor = vec3(0.7, 0.7, 0.7);\n\
+	vec3 directionalLightColor = vec3(0.9, 0.9, 0.9);\n\
 	float directionalLightWeighting = 1.0;\n\
-	/*\n\
+	\n\
 	if(bApplyMagoShadow)\n\
 	{\n\
-		\n\
-		///float linearDepth = getDepth(screenPos);\n\
-		// calculate the real pos of origin.\n\
-		///float origin_zDist = linearDepth * currFar_origin; // original.\n\
-		///vec3 posCC = getViewRay(screenPos, origin_zDist);\n\
-		///vec4 posWC = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0) + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 1.0);\n\
-		//------------------------------------------------------------------------------------------------------------------------------\n\
-		// 2nd, calculate the vertex relative to light.***\n\
-		// 1rst, try with the closest sun. sunIdx = 0.\n\
-		///bool pointIsinShadow = isInShadow(posWC, 0);\n\
-		///if(!pointIsinShadow)\n\
-		///{\n\
-		///	pointIsinShadow = isInShadow(posWC, 1);\n\
-		///}\n\
+		// 1rst, check normal vs sunDirCC.\n\
+		bool sunInAntipodas = false;\n\
+		float dotAux = dot(sunDirCC, normal);\n\
+		if(dotAux > 0.0)\n\
+		{\n\
+			sunInAntipodas = true;\n\
+			shadow_occlusion = 0.5;\n\
+		}\n\
 \n\
-		///if(pointIsinShadow)\n\
-		///{\n\
-		///	shadow_occlusion = 0.5;\n\
-		///	alpha = 0.5;\n\
-		///}\n\
+		if(!sunInAntipodas)\n\
+		{\n\
+			float linearDepth = getDepth(screenPos);\n\
+			// calculate the real pos of origin.\n\
+			float origin_zDist = linearDepth * currFar_origin; // original.\n\
+			vec3 posCC = getViewRay(screenPos, origin_zDist);\n\
+			vec4 posWCRelToEye = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0);\n\
+			//posWC += vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 0.0);\n\
+			//------------------------------------------------------------------------------------------------------------------------------\n\
+			// 2nd, calculate the vertex relative to light.***\n\
+			// 1rst, try with the closest sun. sunIdx = 0.\n\
+			bool pointIsinShadow = isInShadow(posWCRelToEye, 0);\n\
+			if(!pointIsinShadow)\n\
+			{\n\
+				pointIsinShadow = isInShadow(posWCRelToEye, 1);\n\
+			}\n\
+\n\
+			if(pointIsinShadow)\n\
+			{\n\
+				shadow_occlusion = 0.5;\n\
+				alpha = 0.5;\n\
+			}\n\
+		}\n\
 		\n\
 \n\
 		// calculate sunDirCC.\n\
-		vec4 sunDirCC = modelViewMatrixRelToEyeInv * vec4(sunDirWC, 1.0);\n\
-		directionalLightWeighting = max(dot(normal, -sunDirCC.xyz), 0.0);\n\
+		//vec4 sunDirCC = modelViewMatrixRelToEyeInv * vec4(sunDirWC, 1.0);\n\
+		//directionalLightWeighting = max(dot(normal, -sunDirCC.xyz), 0.0);\n\
 	}\n\
-	*/\n\
+	\n\
 \n\
 	ambientColor = vec3(0.8);\n\
 	vec3 lightingDirection = normalize(vec3(0.6, 0.6, 0.6));\n\
@@ -6221,15 +5907,40 @@ void main()\n\
 	vec4 nightFilter4 = vec4(0.0, 0.0, 0.0, 0.5);\n\
 \n\
 	// In this point check the \"dataType\".\n\
+	// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.\n\
 	if(dataType == 1)\n\
 	{\n\
+		// calculate normalWC & compare to sunDirWC.***************************\n\
+		//modelViewMatrixRelToEyeInv\n\
+		/*\n\
+		vec4 normal4WC = modelViewMatrixRelToEyeInv * vec4(normal, 1.0);\n\
+		vec3 normalWC = normalize(normal4WC.xyz);\n\
+		float sunDot = dot(sunDirWC, -normalWC);\n\
+		if(sunDot < 0.0)\n\
+		{\n\
+			gl_FragColor = vec4(0.0, 0.0, 0.0, 0.8);\n\
+		}\n\
+		else\n\
+		{\n\
+			gl_FragColor = vec4(0.0, 0.0, 0.0, 0.1);\n\
+		}\n\
+		return;\n\
+		*/\n\
+		//-----------------------------------------------------------------------\n\
+		\n\
 		// This is TERRAIN.\n\
 		float darkness = 1.0 - uSceneDayNightLightingFactor;\n\
 		darkness = min(darkness, 1.0 - diffuseLightModul);\n\
 \n\
+		if(shadow_occlusion < 1.0)\n\
+		{\n\
+			darkness = 0.5 - diffuseLightModul * 0.3;\n\
+		}\n\
+\n\
 		vec4 blendColor4 = vec4(0.0, 0.0, 0.0, darkness);\n\
 		gl_FragColor = blendColor4;\n\
 		return;\n\
+		\n\
 	}\n\
 \n\
 	vec3 ray = getViewRay(screenPos, 1.0); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
@@ -6246,7 +5957,7 @@ void main()\n\
 	{\n\
 		// 1rst, calculate the ilumination. todo:\n\
 		// now, apply ssao from ssaoTexture.\n\
-		if(dataType != 0 && dataType != 2)\n\
+		if(dataType != 0 && dataType != 2)// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.\n\
 		discard;\n\
 \n\
 		//ssaoFromDepthTex\n\
@@ -6277,6 +5988,11 @@ void main()\n\
 		occlInv *= lightFactorAux;\n\
 \n\
 		// Light factor.***\n\
+		shadow_occlusion += diffuseLightModul * 0.3;\n\
+		if(shadow_occlusion > 1.0)\n\
+		shadow_occlusion = 1.0;\n\
+\n\
+		occlInv *= (shadow_occlusion);\n\
 		vec4 finalColor = vec4(albedo.r * occlInv, albedo.g * occlInv, albedo.b * occlInv, albedo.a);\n\
 		gl_FragColor = finalColor;\n\
 \n\
@@ -6327,7 +6043,7 @@ void main()\n\
 		*/\n\
 		// Provisionally render edges here.****************************************************************\n\
 		// EDGES.***\n\
-		if(dataType == 0)\n\
+		if(dataType == 0)// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.\n\
 		{\n\
 			// detect edges by normals.\n\
 			vec3 normal_up = getNormal(vec2(screenPos.x, screenPos.y + pixelSize_y)).xyz;\n\
@@ -6391,7 +6107,7 @@ void main()\n\
 			}\n\
 			\n\
 		}\n\
-		else if(dataType == 2)\n\
+		else if(dataType == 2)// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.\n\
 		{\n\
 			// this is pointCloud data.\n\
 			// Check depth values around the pixel to find a silhouette.\n\
@@ -6413,7 +6129,7 @@ void main()\n\
 					// calculate current frustum idx.\n\
 					vec4 normal4 = getNormal(texCoord);\n\
 					int estimatedFrustumIdx = int(floor(normal4.w * 100.0));\n\
-					int dataType = -1;\n\
+					int dataType = -1;// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.\n\
 					int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);\n\
 \n\
 					if(dataType == 1)\n\
@@ -11432,3 +11148,253 @@ void main()\n\
 	vec4 pos = projectionMatrix * vec4(position.xyz, 1.0);\n\
     gl_Position = pos;\n\
 }";
+ShaderSource.windStreamThickLineFS = "precision highp float;\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+uniform bool bUseLogarithmicDepth;\n\
+uniform bool bUseMultiRenderTarget;\n\
+uniform int uFrustumIdx;\n\
+uniform int uElemIndex;\n\
+uniform int uTotalPointsCount; // total points to draw.\n\
+varying vec4 vColor;\n\
+varying float flogz;\n\
+varying float Fcoef_half;\n\
+varying float vDepth;\n\
+varying float vCurrentIndex;\n\
+\n\
+vec3 encodeNormal(in vec3 normal)\n\
+{\n\
+	return normal*0.5 + 0.5;\n\
+}\n\
+\n\
+vec3 decodeNormal(in vec3 normal)\n\
+{\n\
+	return normal * 2.0 - 1.0;\n\
+}\n\
+\n\
+vec4 packDepth( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+  return enc;\n\
+}\n\
+\n\
+void main() {\n\
+	// calculate the transparency.\n\
+	float alpha = 1.0 - (vCurrentIndex - float(uElemIndex))/float(uTotalPointsCount);\n\
+\n\
+	vec4 finalColor =  vec4(vColor.rgb, alpha);\n\
+\n\
+	//if(alpha > 0.95)\n\
+	//{\n\
+	//	finalColor =  vec4(1.0, 0.0, 0.0, 1.0);\n\
+	//}\n\
+	gl_FragData[0] = finalColor;\n\
+\n\
+\n\
+	#ifdef USE_MULTI_RENDER_TARGET\n\
+	if(bUseMultiRenderTarget)\n\
+	{\n\
+		//gl_FragData[1] = vec4(0.0);\n\
+		//gl_FragData[2] = vec4(0.0);\n\
+		//gl_FragData[3] = vec4(0.0);\n\
+		\n\
+\n\
+		gl_FragData[1] = packDepth(vDepth);\n\
+		\n\
+\n\
+		// Note: points cloud data has frustumIdx 20 .. 23.********\n\
+		float frustumIdx = 0.1; // realFrustumIdx = 0.1 * 100 = 10. \n\
+		\n\
+		if(uFrustumIdx == 0)\n\
+		frustumIdx = 0.005; // frustumIdx = 20.***\n\
+		else if(uFrustumIdx == 1)\n\
+		frustumIdx = 0.015; // frustumIdx = 21.***\n\
+		else if(uFrustumIdx == 2)\n\
+		frustumIdx = 0.025; // frustumIdx = 22.***\n\
+		else if(uFrustumIdx == 3)\n\
+		frustumIdx = 0.035; // frustumIdx = 23.***\n\
+\n\
+		vec3 normal = encodeNormal(vec3(0.0, 0.0, 1.0));\n\
+		gl_FragData[2] = vec4(normal, frustumIdx); // save normal.***\n\
+\n\
+		// now, albedo.\n\
+		gl_FragData[3] = finalColor;\n\
+		\n\
+	}\n\
+	#endif\n\
+\n\
+	#ifdef USE_LOGARITHMIC_DEPTH\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
+	}\n\
+	#endif\n\
+}";
+ShaderSource.windStreamThickLineVS = "\n\
+attribute vec4 prev;\n\
+attribute vec4 current;\n\
+attribute vec4 next;\n\
+attribute vec4 color4;\n\
+attribute float index;\n\
+\n\
+uniform float thickness;\n\
+uniform mat4 buildingRotMatrix;\n\
+uniform mat4 projectionMatrix;\n\
+uniform mat4 modelViewMatrix;\n\
+uniform mat4 modelViewMatrixRelToEye; \n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform vec2 viewport;\n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+uniform vec4 oneColor4;\n\
+uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
+uniform float near;\n\
+uniform float far;\n\
+uniform bool bUseLogarithmicDepth;\n\
+uniform float uFCoef_logDepth;\n\
+\n\
+varying vec4 vColor;\n\
+varying float flogz;\n\
+varying float Fcoef_half;\n\
+varying float vDepth;\n\
+varying float vCurrentIndex;\n\
+\n\
+const float error = 0.001;\n\
+\n\
+// see https://weekly-geekly.github.io/articles/331164/index.html\n\
+// see too https://github.com/ridiculousfish/wavefiz/blob/master/ts/polyline.ts#L306\n\
+\n\
+vec2 project(vec4 p){\n\
+	return (0.5 * p.xyz / p.w + 0.5).xy * viewport;\n\
+}\n\
+\n\
+bool isEqual(float value, float valueToCompare)\n\
+{\n\
+	if(value + error > valueToCompare && value - error < valueToCompare)\n\
+	return true;\n\
+	\n\
+	return false;\n\
+}\n\
+\n\
+vec4 getPointRelToEye(in vec4 point)\n\
+{\n\
+	vec4 rotatedCurrent = buildingRotMatrix * vec4(point.xyz, 1.0);\n\
+	vec3 objPosHigh = buildingPosHIGH;\n\
+	vec3 objPosLow = buildingPosLOW.xyz + rotatedCurrent.xyz;\n\
+	vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+	vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+	return vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+}\n\
+\n\
+void main(){\n\
+	// current, prev & next.***\n\
+	vec4 vCurrent = getPointRelToEye(vec4(current.xyz, 1.0));\n\
+	vec4 vPrev = getPointRelToEye(vec4(prev.xyz, 1.0));\n\
+	vec4 vNext = getPointRelToEye(vec4(next.xyz, 1.0));\n\
+	\n\
+	float order_w = current.w;\n\
+	//float order_w = float(order);\n\
+	float sense = 1.0;\n\
+	int orderInt = 0;\n\
+	if(order_w > 0.0)\n\
+	{\n\
+		sense = -1.0;\n\
+		if(order_w < 1.5)\n\
+		{\n\
+			orderInt = 1;\n\
+		}\n\
+		else{\n\
+			orderInt = 2;\n\
+		}\n\
+	}\n\
+	else\n\
+	{\n\
+		sense = 1.0;\n\
+		if(order_w > -1.5)\n\
+		{\n\
+			orderInt = -1;\n\
+		}\n\
+		else{\n\
+			orderInt = -2;\n\
+		}\n\
+	}\n\
+	\n\
+	float aspect = viewport.x / viewport.y;\n\
+	vec2 aspectVec = vec2(aspect, 1.0);\n\
+	\n\
+	vec4 previousProjected = ModelViewProjectionMatrixRelToEye * vPrev;\n\
+	vec4 currentProjected = ModelViewProjectionMatrixRelToEye * vCurrent;\n\
+	vec4 nextProjected = ModelViewProjectionMatrixRelToEye * vNext;\n\
+\n\
+	vec4 orthoPos = modelViewMatrixRelToEye * vCurrent;\n\
+	vDepth = -orthoPos.z/far;\n\
+	\n\
+	float projectedDepth = currentProjected.w;                \n\
+	// Get 2D screen space with W divide and aspect correction\n\
+	vec2 currentScreen = currentProjected.xy / currentProjected.w * aspectVec;\n\
+	vec2 previousScreen = previousProjected.xy / previousProjected.w * aspectVec;\n\
+	vec2 nextScreen = nextProjected.xy / nextProjected.w * aspectVec;\n\
+					\n\
+	// This helps us handle 90 degree turns correctly\n\
+	vec2 tangentNext = normalize(nextScreen - currentScreen);\n\
+	vec2 tangentPrev = normalize(currentScreen - previousScreen);\n\
+	vec2 normal; \n\
+	if(orderInt == 1 || orderInt == -1)\n\
+	{\n\
+		normal = vec2(-tangentPrev.y, tangentPrev.x);\n\
+	}\n\
+	else{\n\
+		normal = vec2(-tangentNext.y, tangentNext.x);\n\
+	}\n\
+	normal *= thickness/2.0;\n\
+	normal.x /= aspect;\n\
+	float direction = (thickness*sense*projectedDepth)/1000.0;\n\
+	// Offset our position along the normal\n\
+	vec4 offset = vec4(normal * direction, 0.0, 0.0);\n\
+	gl_Position = currentProjected + offset; \n\
+\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		// logarithmic zBuffer:\n\
+		// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
+		float Fcoef = 2.0 / log2(far + 1.0);\n\
+		gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;\n\
+\n\
+		flogz = 1.0 + gl_Position.w;\n\
+		Fcoef_half = 0.5 * Fcoef;\n\
+	}\n\
+	\n\
+	if(colorType == 0)\n\
+		vColor = oneColor4;\n\
+	else if(colorType == 1)\n\
+		vColor = color4; //vec4(color4.r+0.8, color4.g+0.8, color4.b+0.8, color4.a+0.8);\n\
+	else\n\
+		vColor = oneColor4;\n\
+\n\
+	vCurrentIndex = index;\n\
+}\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+\n\
+";

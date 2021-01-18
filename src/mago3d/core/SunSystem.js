@@ -12,6 +12,11 @@ var SunSystem = function(options)
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
+
+	// https://salidaypuestadelsol.com/sun
+	// https://aprenderly.com/doc/889558/calcular-la-hora-de-salida-y-puesta-del-sol
+	// http://www.sc.ehu.es/sbweb/fisica3/celeste/tiempo/tiempo.html
+	// https://en.wikipedia.org/wiki/Sunrise_equation
 	
 	this.sunGeoLocDataManager = new GeoLocationDataManager();
 	this.lightSourcesArray;
@@ -34,6 +39,7 @@ var SunSystem = function(options)
 	
 	var sunRotMat = geoLocData.rotMatrix;
 	this.sunDirWC = new Float32Array([-sunRotMat._floatArrays[8], -sunRotMat._floatArrays[9], -sunRotMat._floatArrays[10]]);
+	this.sunDirCC = new Float32Array([0.0, 0.0, 1.0]);
 	this.init();
 };
 
@@ -60,16 +66,167 @@ SunSystem.prototype.init = function()
 	if (this.date === undefined)
 	{
 		this.date = new Date();
-		this.date.setMonth(2);
-		this.date.setHours(11);
+		this.date.setMonth(12);
+		this.date.setHours(19);
 		this.date.setMinutes(0);
 
 		this.setDate(this.date);
 	}
+
 };
+
+SunSystem.prototype._getSolarDeclinationDegrees = function() 
+{
+	var daysFrom22Dec = this._getDaysCountFrom22December();
+	var declination = -23.45 * Math.cos(((2*Math.PI)/365) * daysFrom22Dec);
+
+	return declination;
+};
+
+SunSystem.prototype._getDaysCountFrom22December = function() 
+{
+	// 1rst, check if the currMonth is December & currDay is after 22.
+	var currDate = this.date;
+	var currMonth = currDate.getMonth();
+	var currDay = currDate.getDay();
+	var currYear = currDate.getFullYear();
+
+	var daysCountFrom22December = 0.0;
+	var lastYear;
+
+	if(currMonth === 12 && currDay >= 22)
+	{
+		lastYear = currYear;
+	}
+	else
+	{
+		lastYear = currYear - 1;
+	}
+
+	var lastDate = new Date();
+	lastDate.setFullYear(lastYear);
+	lastDate.setMonth(12);
+	lastDate.setHours(0);
+	lastDate.setMinutes(0);
+	
+	var lastTime = lastDate.getTime();
+	var currTime = currDate.getTime();
+
+	var diffTime_seconds = (currTime - lastTime)/1000.0;
+	var diffTime_minutes = diffTime_seconds / 60;
+	var diffTime_hours = diffTime_minutes / 60;
+	var diffTime_days = diffTime_hours / 24;
+
+	return diffTime_days;
+};
+
+SunSystem.prototype._getJulianDate = function() 
+{
+	// https://en.wikipedia.org/wiki/Julian_day
+	// The Julian day is the continuous count of days since the beginning of the Julian period
+	var date = this.getDate();
+	var time = date.getTime();
+
+	var time_seconds = time/1000.0;
+	var time_minutes = time_seconds / 60;
+	var time_hours = time_minutes / 60;
+	var time_days = time_hours / 24;
+
+	return time_days;
+};
+/*
+SunSystem.julianIntToDate = function(n) {
+	// convert a Julian number to a Gregorian Date.
+	//    S.Boisseau / BubblingApp.com / 2014
+	var a = n + 32044;
+	var b = Math.floor(((4*a) + 3)/146097);
+	var c = a - Math.floor((146097*b)/4);
+	var d = Math.floor(((4*c) + 3)/1461);
+	var e = c - Math.floor((1461 * d)/4);
+	var f = Math.floor(((5*e) + 2)/153);
+
+	var D = e + 1 - Math.floor(((153*f) + 2)/5);
+	var M = f + 3 - 12 - Math.round(f/10);
+	var Y = (100*b) + d - 4800 + Math.floor(f/10);
+
+	return new Date(Y,M,D);
+};
+*/
 
 SunSystem.prototype.getDayNightLightingFactorOfPosition = function(posWC) 
 {
+	/*
+	var degToRad = Math.PI/180;
+	var radToDeg = 180/Math.PI;
+	var currDate = this.getDate();
+
+	// https://en.wikipedia.org/wiki/Sunrise_equation
+	// Calculate current Julian day.
+	var Jdate = this._getJulianDate();
+	var Date2000 = new Date('January 1, 2000 12:00:00');
+	//Date2000.setFullYear(2000);
+	//Date2000.setMonth(1);
+	//Date2000.setDate(1);
+	//Date2000.setHours(12);
+	var time2000sec = Date2000.getTime()/1000;
+	var currTimeSec = currDate.getTime()/1000;
+	var diffSec = currTimeSec - time2000sec;
+	var diffDays = diffSec / (60*60*24);
+
+
+	var n2 = Jdate * 2451545.0 + 0.0008; // n is the number of days since Jan 1st, 2000 12:00
+	var n = diffDays;
+
+	// Mean solar time.
+	var lonDeg = 127.0; // prov.
+	var solTimeAprox = n - (lonDeg/360);
+
+	// Solar mean anomaly.
+	var M = (357.5291 + 0.98560028 * solTimeAprox) % 360;
+	M *= degToRad;
+
+	// Equation of the center.
+	var C = 1.9148 * Math.sin(M) + 0.0200 * Math.sin(2*M) + 0.0003 * Math.sin(3*M); // 1.9148 is the coefficient of the Equation of the Center for the planet the observer is on (in this case, Earth)
+
+	// Ecliptic longitude.
+	var lambda = (M*radToDeg + C + 180 + 102.9372) % 360; // 102.9372 is a value for the argument of perihelion.
+
+	// Solar transit.
+	var solTransitJulian = 2451545.0 + solTimeAprox + 0.0053 * Math.sin(M) - 0.0069 * Math.sin(2*lambda*degToRad);
+
+	// Declination of the sun.
+	var sin_dec = Math.sin(lambda * degToRad) * Math.sin(23.44 * degToRad);
+	var dec = Math.asin(sin_dec);
+
+	// Hour angle.
+	var latDeg = 37.0;
+	var cos_omega = (Math.sin(-0.83 * degToRad) - Math.sin(latDeg*degToRad) * sin_dec)/(Math.cos(latDeg*degToRad) * Math.cos(dec));
+	var omega = Math.acos(cos_omega);
+
+	var sunRiseJulian = solTransitJulian - omega*radToDeg/360;
+	var sunsetJulian = solTransitJulian + omega*radToDeg/360;
+
+	
+
+	var sunRiseDate = SunSystem.julianIntToDate(sunRiseJulian);
+	var sunSetDate = SunSystem.julianIntToDate(sunsetJulian);
+
+
+
+	// Test.*************************************************************************
+	
+	var declinationDeg = this._getSolarDeclinationDegrees();
+	var sunGeoLocData = this.sunGeoLocDataManager.getCurrentGeoLocationData();
+	var geoCoord = sunGeoLocData.geographicCoord;
+	declinationDeg = geoCoord.latitude; // test.***
+
+	var H = Math.acos(-Math.tan(37.0*degToRad) * Math.tan(declinationDeg*degToRad));
+	H *= radToDeg;
+	
+	var startSunHour = 12 - H/15;
+	var endSunHour = 12 + H/15;
+	// End test.--------------------------------------------------------------------
+	*/
 	// given a geoCoord, this function returns a value 0 to 1.
 	// night = 0 & day = 1.
 	var lightFactor = 0.0;
@@ -77,13 +234,29 @@ SunSystem.prototype.getDayNightLightingFactorOfPosition = function(posWC)
 	var pointAuxWC = new Point3D(posWC.x, posWC.y, posWC.z);
 	pointAuxWC.unitary();
 
-	var geoLocData = this.sunGeoLocDataManager.getCurrentGeoLocationData();
-	var sunPosWC = geoLocData.position;
+	var minVal = -0.2;
+	var maxVal = 0.2;
+	lightFactor = pointAuxWC.scalarProduct(new Point3D(-this.sunDirWC[0], -this.sunDirWC[1], -this.sunDirWC[2]));
+	//if(lightFactor < 0.15)
+	//lightFactor = 0.15;
 
-	var sunPosAux = new Point3D(sunPosWC.x, sunPosWC.y, sunPosWC.z);
-	sunPosAux.unitary();
+	// clamp = min(max(x, minVal), maxVal).
 
-	lightFactor = pointAuxWC.scalarProduct(sunPosAux);
+	var t = (lightFactor - minVal)/(maxVal-minVal);
+	if(t<0.0)
+	t = 0.0;
+	if(t>1.0)
+	t = 1.0;
+	var t2 = t*t*(3.0 - 2*t);
+
+	lightFactor = t2;
+
+	if(lightFactor < 0.15)
+	lightFactor = 0.15;
+
+	//lightFactor *= 1.1;
+
+	
 
 	return lightFactor;
 };
@@ -91,6 +264,11 @@ SunSystem.prototype.getDayNightLightingFactorOfPosition = function(posWC)
 SunSystem.prototype.getSunDirWC = function() 
 {
 	return this.sunDirWC;
+};
+
+SunSystem.prototype.getSunDirCC = function() 
+{
+	return this.sunDirCC;
 };
 
 SunSystem.prototype.getLight = function(idx) 
@@ -190,6 +368,19 @@ SunSystem.prototype.setAnimation = function(options)
 	
 };
 
+SunSystem.prototype.getDate = function() 
+{
+	if (this.date === undefined)
+	{
+		this.date = new Date();
+		this.date.setMonth(2);
+		this.date.setHours(15);
+		this.date.setMinutes(0);
+	}
+
+	return this.date;
+};
+
 SunSystem.prototype.calculateSunGeographicCoords = function() 
 {
 	//https://in-the-sky.org/twilightmap.php // web page. sun in current time.
@@ -201,15 +392,7 @@ SunSystem.prototype.calculateSunGeographicCoords = function()
 	//https://astronomy.stackexchange.com/questions/20560/how-to-calculate-the-position-of-the-sun-in-long-lat
 	// The boilerplate: fiddling with dates
 	var radToDeg = 180/Math.PI;
-	if (this.date === undefined)
-	{
-		this.date = new Date();
-		this.date.setMonth(2);
-		this.date.setHours(15);
-		this.date.setMinutes(0);
-	}
-	
-	var date = this.date;
+	var date = this.getDate();
 	
 	var fullYear = date.getFullYear();
 	var soy = (new Date(date.getFullYear(), 0, 0)).getTime();
@@ -235,12 +418,21 @@ SunSystem.prototype.calculateSunGeographicCoords = function()
 	
 	var sunRotMat = geoLocData.rotMatrix;
 	this.sunDirWC = new Float32Array([-sunRotMat._floatArrays[8], -sunRotMat._floatArrays[9], -sunRotMat._floatArrays[10]]);
+
 };
+
 
 
 SunSystem.prototype.updateSun = function(magoManager, options) 
 {
-	this.calculateSunGeographicCoords(); // test.***
+	var date = this.getDate();
+	if(this.lastUpdateTime !== date.getTime())
+	{
+		this.calculateSunGeographicCoords(); 
+
+		this.lastUpdateTime = date.getTime();
+		//return;
+	}
 	
 	if (this.lightSourcesArray === undefined)
 	{ return; }
@@ -328,6 +520,7 @@ SunSystem.prototype.updateSun = function(magoManager, options)
 	this.updateLight(light);
 		
 	this.updated = true;
+	
 };
 
 /**

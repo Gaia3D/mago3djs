@@ -127,6 +127,22 @@ Point3D.prototype.scalarProduct = function(point)
 };
 
 /**
+ */
+Point3D.mix = function(point_a, point_b, factor, resultPoint) 
+{
+	if(!resultPoint)
+	resultPoint = new Point3D();
+
+	var xVal = point_a.x * (1.0 - factor) + point_b.x * factor;
+	var yVal = point_a.y * (1.0 - factor) + point_b.y * factor;
+	var zVal = point_a.z * (1.0 - factor) + point_b.z * factor;
+
+	resultPoint.set(xVal, yVal, zVal);
+
+	return resultPoint;
+};
+
+/**
  * get the spherical coordinates
  * @param {GeographicCoord}resultGeographicCoords the target that will be canged
  * @returns {GeographicCoord} resultGeographicCoords

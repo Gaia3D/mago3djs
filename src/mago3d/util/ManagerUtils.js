@@ -871,7 +871,6 @@ ManagerUtils.calculatePixelPositionCamCoord = function(gl, pixelX, pixelY, resul
 		}
 
 	}
-	//var realZDepth = linearDepth * (frustumFar - frustumNear) + frustumNear; 
 	var realZDepth = linearDepth * frustumFar; 
 	
 

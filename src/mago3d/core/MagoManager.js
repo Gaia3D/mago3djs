@@ -993,11 +993,20 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 	// update sun if exist.
 	if (!this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
 	{
-		if (this.sceneState.sunSystem && this.sceneState.applySunShadows && this.isFarestFrustum())
+		if (sceneState.sunSystem && sceneState.applySunShadows && this.isFarestFrustum())
 		{
-			this.sceneState.sunSystem.updateSun(this);
+			sceneState.sunSystem.updateSun(this);
 		}
 	}
+
+	// Now, calculate sunDirCC.
+	var normalMatrix4 = sceneState.normalMatrix4;
+	var sunDirWCPoint = new Point3D(sceneState.sunSystem.sunDirWC[0], sceneState.sunSystem.sunDirWC[1], sceneState.sunSystem.sunDirWC[2]);
+	var sunDirCC = normalMatrix4.rotatePoint3D(sunDirWCPoint, undefined);
+
+	sceneState.sunSystem.sunDirCC[0] = sunDirCC.x;
+	sceneState.sunSystem.sunDirCC[1] = sunDirCC.y;
+	sceneState.sunSystem.sunDirCC[2] = sunDirCC.z;
 };
 
 /**
@@ -1655,7 +1664,6 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		var scene = this.scene;
 
 		// Test to copy terrain.******************************************************************************************
-		
 		if(!this.extbuffers)
 			this.extbuffers = gl.getExtension("WEBGL_draw_buffers");
 
@@ -1679,9 +1687,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 
 		}
 		gl.clear(gl.DEPTH_BUFFER_BIT);
-
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.normalTex, 0);
-
 		this.renderer.renderTerrainCopy();
 		
 		// end test.---------------------------------------------------------------------------------------------------
@@ -1689,18 +1695,11 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		if (scene && scene._context && scene._context._currentFramebuffer) 
 		{
 			scene._context._currentFramebuffer._bind();
-
-			if (bApplyShadow && this.currentFrustumIdx < 2) 
-			{
-				renderType = 3;
-				this.renderer.renderTerrainShadow(gl, renderType, this.visibleObjControlerNodes);
-			}
 			
 			// MRT on cesium.**************************************************
 			if(!this.extbuffers)
 			this.extbuffers = gl.getExtension("WEBGL_draw_buffers");
 
-			
 			if(this.isFarestFrustum())
 			{
 				gl.bindTexture(gl.TEXTURE_2D, this.depthTex);  
@@ -1860,6 +1859,8 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 
 		this.renderer.renderSsaoFromDepth(gl);
 
+		
+
 		if (this.isCesiumGlobe())
 		{
 			scene._context._currentFramebuffer._bind();
@@ -1868,8 +1869,6 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		// Final render output.
 		this.renderer.renderScreenQuadSsao(gl);
 		this.renderCluster();
-
-		
 
 		if (this.selectionManager)
 		{
@@ -1897,6 +1896,8 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 
 	} 
 
+	
+
 	// DEBUG.Render lights sources.*************************************************************************
 	//this.renderer.renderNativeLightSources(renderType, this.visibleObjControlerNodes) ; // debug component.
 	//------------------------------------------------------------------------------------------------------
@@ -1918,14 +1919,15 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		
 			
 		// Seoul data.
-		var windDataFilesNamesArray = ["OBS-QWM_2019090700.grib2_wind_000", "OBS-QWM_2019090701.grib2_wind_000", "OBS-QWM_2019090702.grib2_wind_000", "OBS-QWM_2019090703.grib2_wind_000",
+		
+			var windDataFilesNamesArray = ["OBS-QWM_2019090700.grib2_wind_000", "OBS-QWM_2019090701.grib2_wind_000", "OBS-QWM_2019090702.grib2_wind_000", "OBS-QWM_2019090703.grib2_wind_000",
 			"OBS-QWM_2019090704.grib2_wind_000", "OBS-QWM_2019090705.grib2_wind_000", "OBS-QWM_2019090706.grib2_wind_000", "OBS-QWM_2019090707.grib2_wind_000",
 			"OBS-QWM_2019090708.grib2_wind_000", "OBS-QWM_2019090709.grib2_wind_000", "OBS-QWM_2019090710.grib2_wind_000", "OBS-QWM_2019090711.grib2_wind_000",
 			"OBS-QWM_2019090712.grib2_wind_000", "OBS-QWM_2019090713.grib2_wind_000", "OBS-QWM_2019090714.grib2_wind_000", "OBS-QWM_2019090715.grib2_wind_000",
 			"OBS-QWM_2019090716.grib2_wind_000", "OBS-QWM_2019090717.grib2_wind_000", "OBS-QWM_2019090718.grib2_wind_000", "OBS-QWM_2019090719.grib2_wind_000",
 			"OBS-QWM_2019090720.grib2_wind_000", "OBS-QWM_2019090721.grib2_wind_000", "OBS-QWM_2019090722.grib2_wind_000", "OBS-QWM_2019090723.grib2_wind_000"]; // seoulData.
 			
-			
+		
 		//Siheung_wind
 		//var windDataFilesNamesArray = ["OBS-QWM_2019090700.grib2_wind_000", "OBS-QWM_2019090701.grib2_wind_000", "OBS-QWM_2019090702.grib2_wind_000", "OBS-QWM_2019090703.grib2_wind_000",
 		//	"OBS-QWM_2019090704.grib2_wind_000", "OBS-QWM_2019090705.grib2_wind_000", "OBS-QWM_2019090706.grib2_wind_000", "OBS-QWM_2019090707.grib2_wind_000",
@@ -1933,7 +1935,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		//	"OBS-QWM_2019090712.grib2_wind_000", "OBS-QWM_2019090713.grib2_wind_000", "OBS-QWM_2019090714.grib2_wind_000", "OBS-QWM_2019090715.grib2_wind_000",
 		//	"OBS-QWM_2019090716.grib2_wind_000", "OBS-QWM_2019090717.grib2_wind_000", "OBS-QWM_2019090718.grib2_wind_000", "OBS-QWM_2019090719.grib2_wind_000",
 		//	"OBS-QWM_2019090720.grib2_wind_000", "OBS-QWM_2019090721.grib2_wind_000", "OBS-QWM_2019090722.grib2_wind_000", "OBS-QWM_2019090723.grib2_wind_000"];
-
+		
 		
 			
 		//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_Airport";
@@ -1945,49 +1947,20 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		// yeonHwa test data.*********************************************
 		var windDataFilesNamesArray = ["wind_7"];
 		var windMapFilesFolderPath = geometryDataPath +"/wind_yeonHwa";
+
+		// world test data.*********************************************
+		//var windDataFilesNamesArray = ["2016112012"];
+		//var windMapFilesFolderPath = geometryDataPath +"/wind_world";
 		
 		this.weatherStation.test_loadWindData3d(this, windDataFilesNamesArray, windMapFilesFolderPath);
 		//this.TEST__golfPark();
 		this.windTest = true;
 	}
 	*/
-	if (this.weatherStation)
-	{
-		if (this.isCesiumGlobe())
-		{
-			scene._context._currentFramebuffer._bind();
-			// unbind mago colorTextures:
-			
-			gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // depthTex.
-			gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // normalTex.
-			gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0); // albedoTex.
-			this.extbuffers.drawBuffersWEBGL([
-				this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
-				this.extbuffers.NONE, // gl_FragData[1]
-				this.extbuffers.NONE, // gl_FragData[2]
-				this.extbuffers.NONE, // gl_FragData[3]
-				]);
-				
-		}
-
-		////this.weatherStation.renderWindMultiLayers(this);
-		////this.weatherStation.test_renderWindLayer(this);
-		////this.weatherStation.test_renderTemperatureLayer(this);
-		////this.weatherStation.test_renderCuttingPlanes(this, renderType);
-		//this.weatherStation.renderWeather(this);
-	}
-	
-	
 
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
 		
 	this.swapRenderingFase();
-	
-	//if(!this.test__splittedMesh)
-	//{
-	//	this.TEST__splittedExtrudedBuilding();
-	//	this.test__splittedMesh = true;
-	//}
 
 	
 };
@@ -6996,6 +6969,35 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.current_loc = 1;
 	shader.next_loc = 2;
 	shader.color4_loc = 3;
+
+	// 13) ThickLine Shader.******************************************************************************
+	var shaderName = "windStreamThickLine";
+	var ssao_vs_source = ShaderSource.windStreamThickLineVS;
+	var ssao_fs_source = ShaderSource.windStreamThickLineFS;
+	ssao_fs_source = ssao_fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
+	ssao_fs_source = ssao_fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
+	shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
+	// ThickLine shader locations.***
+	shader.projectionMatrix_loc = gl.getUniformLocation(shader.program, "projectionMatrix");
+	shader.modelViewMatrix_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
+	shader.viewport_loc = gl.getUniformLocation(shader.program, "viewport");
+	shader.thickness_loc = gl.getUniformLocation(shader.program, "thickness");
+	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
+	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
+	shader.bUseMultiRenderTarget_loc = gl.getUniformLocation(shader.program, "bUseMultiRenderTarget");
+	shader.uFrustumIdx_loc = gl.getUniformLocation(shader.program, "uFrustumIdx");
+	shader.uElemIndex_loc = gl.getUniformLocation(shader.program, "uElemIndex");
+	shader.uTotalPointsCount_loc = gl.getUniformLocation(shader.program, "uTotalPointsCount");
+	gl.bindAttribLocation(shader.program, 0, "prev");
+	gl.bindAttribLocation(shader.program, 1, "current");
+	gl.bindAttribLocation(shader.program, 2, "next");
+	gl.bindAttribLocation(shader.program, 3, "color4");
+	gl.bindAttribLocation(shader.program, 4, "index");
+	shader.prev_loc = 0;
+	shader.current_loc = 1;
+	shader.next_loc = 2;
+	shader.color4_loc = 3;
+	shader.index_loc = 4;
 
 	// 13) ThickLine Shader.******************************************************************************
 	var shaderName = "thickLineDepth";

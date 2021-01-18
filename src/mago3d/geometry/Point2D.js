@@ -254,6 +254,21 @@ Point2D.prototype.scalarProduct = function(point)
 };
 
 /**
+ */
+Point2D.mix = function(point_a, point_b, factor, resultPoint) 
+{
+	if(!resultPoint)
+	resultPoint = new Point2D();
+
+	var xVal = point_a.x * (1.0 - factor) + point_b.x * factor;
+	var yVal = point_a.y * (1.0 - factor) + point_b.y * factor;
+
+	resultPoint.set(xVal, yVal);
+
+	return resultPoint;
+};
+
+/**
  * Calculate the radian value of the angle of the two vectors
  * @param vector the target vector
  * @returns the angle of two vector

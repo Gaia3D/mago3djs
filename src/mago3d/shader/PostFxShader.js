@@ -671,6 +671,7 @@ PostFxShader.prototype.createUniformLocals = function(gl, shader, sceneState)
 	shader.shadowMapHeight_loc = gl.getUniformLocation(shader.program, "shadowMapHeight");
 	
 	shader.sunDirWC_loc = gl.getUniformLocation(shader.program, "sunDirWC");
+	shader.sunDirCC_loc = gl.getUniformLocation(shader.program, "sunDirCC");
 	shader.sunIdx_loc = gl.getUniformLocation(shader.program, "sunIdx");
 	
 	// Attributtes.*

@@ -1435,18 +1435,22 @@ Renderer.prototype.renderScreenQuadSsao = function(gl)
 	if(dayNightLightingFactor < 0.0)
 	dayNightLightingFactor = 0.0;
 
+	//dayNightLightingFactor = 1.0; // delete.!!!!!!!!!!!!!!!!!!!!!!!!
+
 	gl.uniform1f(currentShader.uSceneDayNightLightingFactor_loc, dayNightLightingFactor);
 
 	var textureAux1x1 = magoManager.texturesStore.getTextureAux1x1();
 
+	var sunDirWC = sunSystem.getSunDirWC();
+	gl.uniform3fv(currentShader.sunDirWC_loc, sunDirWC);
+	var sunDirCC = sunSystem.getSunDirCC();
+	gl.uniform3fv(currentShader.sunDirCC_loc, sunDirCC);
 	if (bApplyMagoShadow)
 	{
 		// Set sunMatrix uniform.***
-		
 		var sunMatFloat32Array = sunSystem.getLightsMatrixFloat32Array();
 		var sunPosLOWFloat32Array = sunSystem.getLightsPosLOWFloat32Array();
 		var sunPosHIGHFloat32Array = sunSystem.getLightsPosHIGHFloat32Array();
-		var sunDirWC = sunSystem.getSunDirWC();
 		
 		if (sunLight.tMatrix!== undefined)
 		{
@@ -1455,7 +1459,6 @@ Renderer.prototype.renderScreenQuadSsao = function(gl)
 			gl.uniform3fv(currentShader.sunPosLow_loc, sunPosLOWFloat32Array);
 			gl.uniform1f(currentShader.shadowMapWidth_loc, sunLight.targetTextureWidth);
 			gl.uniform1f(currentShader.shadowMapHeight_loc, sunLight.targetTextureHeight);
-			gl.uniform3fv(currentShader.sunDirWC_loc, sunDirWC);
 			gl.uniform1i(currentShader.sunIdx_loc, 1);
 		}
 	}
@@ -2369,7 +2372,7 @@ Renderer.prototype.renderScreenRectangle = function(gl, options)
 
 	if(magoManager.normalTex)
 	{
-		texture = magoManager.normalTex;
+		//texture = magoManager.normalTex;
 	}
 
 	if(magoManager.albedoTex)
@@ -2389,7 +2392,17 @@ Renderer.prototype.renderScreenRectangle = function(gl, options)
 
 	if(magoManager.windPlaneDepthTex)
 	{
-		texture = magoManager.windPlaneDepthTex;
+		//texture = magoManager.windPlaneDepthTex;
+	}
+
+	if(magoManager.windPngTex)
+	{
+		texture = magoManager.windPngTex;
+	}
+
+	if(magoManager.windPlaneNormalTex)
+	{
+		//texture = magoManager.windPlaneNormalTex;
 	}
 
 	/*
