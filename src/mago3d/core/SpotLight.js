@@ -32,7 +32,7 @@ var SpotLight = function(options)
 	this.falloffDeg = 45.0;
 	this.hotDistance = 30.0; // 30 meters.
 	this.falloffDistance = 40.0; // 30 meters.
-	this.color3 = new Float32Array([1.0, 1.0, 1.0]);
+	this.color = new Color(1.0, 1.0, 1.0, 1.0);
 	this.intensity = 1.0; // power = intensity * Math.PI.
 	if (this.geoLocDataManager === undefined)
 	{ this.geoLocDataManager = new GeoLocationDataManager(); }
@@ -70,14 +70,12 @@ SpotLight.prototype.constructor = SpotLight;
  */
 SpotLight.prototype.setColorRGB = function(red, green, blue)
 {
-	if(!this.color3)
+	if(!this.color)
 	{
-		this.color3 = new Float32Array([1.0, 1.0, 1.0]);
+		this.color = new Color(1.0, 1.0, 1.0, 1.0);
 	}
 
-	this.color3[0] = red;
-	this.color3[1] = green;
-	this.color3[2] = blue;
+	this.color.setRGB(red, green, blue);
 
 };
 

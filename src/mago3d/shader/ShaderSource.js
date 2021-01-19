@@ -5836,9 +5836,7 @@ void main()\n\
 \n\
 		float occlInv = 1.0 - occlusion;\n\
 \n\
-		//float lightFactorAux = min(uSceneDayNightLightingFactor + diffuseLightModul, 1.3);\n\
 		float lightFactorAux = uSceneDayNightLightingFactor + diffuseLightModul;\n\
-		//occlInv *= lightFactorAux;\n\
 \n\
 		vec3 diffuseLight3 = diffuseLight.xyz + vec3(uSceneDayNightLightingFactor);\n\
 \n\
@@ -5848,7 +5846,9 @@ void main()\n\
 		shadow_occlusion = 1.0;\n\
 \n\
 		occlInv *= (shadow_occlusion);\n\
-		vec4 finalColor = vec4(albedo.r * occlInv * diffuseLight3.x, albedo.g * occlInv * diffuseLight3.y, albedo.b * occlInv * diffuseLight3.z, albedo.a);\n\
+		vec4 finalColor = vec4(albedo.r * occlInv * diffuseLight3.x, \n\
+							albedo.g * occlInv * diffuseLight3.y, \n\
+							albedo.b * occlInv * diffuseLight3.z, albedo.a);\n\
 		gl_FragColor = finalColor;\n\
 \n\
 \n\
@@ -5943,7 +5943,9 @@ void main()\n\
 				vec4 edgeColor_C = mix(edgeColor_A, edgeColor_B, 0.5);\n\
 				vec4 edgeColor_D = mix(edgeColor_C, albedo, 0.5);\n\
 \n\
-				vec4 edgeColorPrev = vec4(edgeColor_D.r * occlInv * diffuseLight3.x, edgeColor_D.g * occlInv * diffuseLight3.y, edgeColor_D.b * occlInv * diffuseLight3.z, edgeColor_D.a);\n\
+				vec4 edgeColorPrev = vec4(edgeColor_D.r * occlInv * diffuseLight3.x, \n\
+										edgeColor_D.g * occlInv * diffuseLight3.y, \n\
+										edgeColor_D.b * occlInv * diffuseLight3.z, edgeColor_D.a);\n\
 				vec4 edgeColor = edgeColorPrev * 0.8;\n\
 \n\
 				//gl_FragColor = vec4(edgeColor.rgb, edgeAlpha);\n\

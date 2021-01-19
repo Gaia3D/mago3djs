@@ -2525,8 +2525,6 @@ Renderer.prototype.renderLightBuffer = function(lightSourcesArray)
 	{
 		light = lightSourcesArray[i];
 		var lightDirWC = light.getLightDirectionWC();
-		//var lightDist = light.getLightHotDistance();
-		//var maxSpotDot = light.getMaxSpotDot();
 		var cubeMapFbo = light._getCubeMapFrameBuffer(gl); // light's depthCubeMap
 		var geoLoc = light.geoLocDataManager.getCurrentGeoLocationData();
 		var buildingRotMatInv = geoLoc.getRotMatrixInv();
@@ -2534,7 +2532,7 @@ Renderer.prototype.renderLightBuffer = function(lightSourcesArray)
 		
 		// set the light direction WC.
 		gl.uniform3fv(currentShader.lightDirWC_loc, [lightDirWC.x, lightDirWC.y, lightDirWC.z]); //.
-		gl.uniform3fv(currentShader.uLightColorAndBrightness_loc, light.color3); //.
+		gl.uniform3fv(currentShader.uLightColorAndBrightness_loc, [light.color.r,light.color.g,light.color.b] ); //.
 		gl.uniform1f(currentShader.uLightIntensity_loc, light.intensity);
 		var lightParams = light.getLightParameters(); //uLightParameters[4]; // 0= lightDist, 1= lightFalloffDist, 2= maxSpotDot, 3= falloffSpotDot.
 		gl.uniform1fv(currentShader.uLightParameters_loc, lightParams);
@@ -2553,7 +2551,6 @@ Renderer.prototype.renderLightBuffer = function(lightSourcesArray)
 	gl.enable(gl.CULL_FACE);
 	gl.frontFace(gl.CCW);	
 	gl.enable(gl.DEPTH_TEST);
-	//gl.depthFunc(gl.LEQUAL);
 
 	lBuffer.unbind();
 };
