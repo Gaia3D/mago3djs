@@ -356,7 +356,7 @@ void main()
 			}
 		}
 		//float fogIntensity = length(vertexPosLC)/lightHotDistance;
-		float atenuation = 0.2; // intern variable to adjust light intensity.
+		float atenuation = 0.3; // intern variable to adjust light intensity.
 		diffuseDot *= factorByDist;
 		spotDot *= factorBySpot;
 		float finalFactor = uLightIntensity * diffuseDot * spotDot * atenuation;
