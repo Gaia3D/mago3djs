@@ -1113,7 +1113,7 @@ Renderer.prototype.renderNativeLightSources = function(renderType, visibleObjCon
 		var gl = magoManager.getGl();
 		var sceneState = magoManager.sceneState;
 
-		var currentShader = magoManager.postFxShadersManager.getShader("gBuffer"); 
+		var currentShader = magoManager.postFxShadersManager.getShader("modelRefSsao"); 
 		currentShader.useProgram();
 
 		var bApplySsao = false;
@@ -1134,11 +1134,14 @@ Renderer.prototype.renderNativeLightSources = function(renderType, visibleObjCon
 		gl.uniformMatrix4fv(currentShader.modelViewMatrixRelToEyeInv_loc, false, modelViewMatrixRelToEyeInv._floatArrays);
 
 		var glPrimitive = undefined;
+		gl.enable(gl.BLEND);
 
 		for (var i=0; i<lightSourcesCount; i++)
 		{
 			lightSourcesArray[i].render(magoManager, currentShader, renderType, glPrimitive);
 		}
+
+		gl.disable(gl.BLEND);
 	}
 };
 
@@ -1409,10 +1412,6 @@ Renderer.prototype.renderScreenQuadSsao = function(gl)
 	postFxShadersManager.useProgram(currentShader);
 	currentShader.bindUniformGenerals();
 
-	//gl.uniform1i(currentShader.ssaoTex_loc, 5);
-	//gl.uniform1i(currentShader.normalTex_loc, 1);
-	//gl.uniform1i(currentShader.albedoTex_loc, 2);
-
 	var projectionMatrixInv = sceneState.getProjectionMatrixInv();
 	gl.uniformMatrix4fv(currentShader.projectionMatrixInv_loc, false, projectionMatrixInv._floatArrays);
 	var modelViewMatrixRelToEyeInv = sceneState.getModelViewRelToEyeMatrixInv();
@@ -1517,7 +1516,6 @@ Renderer.prototype.renderScreenQuadSsao = function(gl)
 		var ssaoFromDepthFbo = magoManager.ssaoFromDepthFbo;
 		gl.activeTexture(gl.TEXTURE5); // ssaoTex.***
 		gl.bindTexture(gl.TEXTURE_2D, ssaoFromDepthFbo.colorBuffer);
-		
 
 		gl.activeTexture(gl.TEXTURE1); // normalTex.***
 		gl.bindTexture(gl.TEXTURE_2D, normalTex);
@@ -1746,70 +1744,13 @@ Renderer.prototype.renderTerrainCopy = function()
 	gl.uniform1i(currentShader.uFrustumIdx_loc, magoManager.currentFrustumIdx);
 	gl.uniform1f(currentShader.far_loc, magoManager.sceneState.camera.frustum.far);
 	
-	var bApplyShadow = false;
-	var sunSystem = sceneState.sunSystem;
-	var sunLight = sunSystem.getLight(0);
-	var textureAux1x1 = magoManager.texturesStore.getTextureAux1x1();
-	/*
-	if (bApplyShadow)
-	{
-		// Set sunMatrix uniform.***
-		
-		var sunMatFloat32Array = sunSystem.getLightsMatrixFloat32Array();
-		var sunPosLOWFloat32Array = sunSystem.getLightsPosLOWFloat32Array();
-		var sunPosHIGHFloat32Array = sunSystem.getLightsPosHIGHFloat32Array();
-		var sunDirWC = sunSystem.getSunDirWC();
-		
-		if (sunLight.tMatrix!== undefined)
-		{
-			gl.uniformMatrix4fv(currentShader.sunMatrix_loc, false, sunMatFloat32Array);
-			gl.uniform3fv(currentShader.sunPosHigh_loc, sunPosHIGHFloat32Array);
-			gl.uniform3fv(currentShader.sunPosLow_loc, sunPosLOWFloat32Array);
-			gl.uniform1f(currentShader.shadowMapWidth_loc, sunLight.targetTextureWidth);
-			gl.uniform1f(currentShader.shadowMapHeight_loc, sunLight.targetTextureHeight);
-			gl.uniform3fv(currentShader.sunDirWC_loc, sunDirWC);
-			gl.uniform1i(currentShader.sunIdx_loc, 1);
-		}
-	}
-	*/
+
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, magoManager.czm_globeDepthText);  // cesium globeDepthTexture.***
-	
-	gl.activeTexture(gl.TEXTURE3); 
-	if (bApplyShadow && sunLight.depthFbo)
-	{
-		var sunSystem = sceneState.sunSystem;
-		var sunLight = sunSystem.getLight(0);
-		gl.bindTexture(gl.TEXTURE_2D, sunLight.depthFbo.colorBuffer);
-	}
-	else 
-	{
-		gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
-	}
-	
-	gl.activeTexture(gl.TEXTURE4); 
-	if (bApplyShadow && sunLight.depthFbo)
-	{
-		var sunSystem = sceneState.sunSystem;
-		var sunLight = sunSystem.getLight(1);
-		gl.bindTexture(gl.TEXTURE_2D, sunLight.depthFbo.colorBuffer);
-	}
-	else 
-	{
-		gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
-	}
-	currentShader.last_tex_id = textureAux1x1;
-			
-	
-	//gl.disable(gl.POLYGON_OFFSET_FILL);
-	//gl.disable(gl.CULL_FACE);
-	//gl.colorMask(true, true, true, true);
-	//gl.depthMask(false);
 
-	//gl.disable(gl.DEPTH_TEST);
-	//gl.enable(gl.BLEND);
-	//gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); // Original.***
-	//gl.cullFace(gl.FRONT);
+	gl.activeTexture(gl.TEXTURE2);
+	gl.bindTexture(gl.TEXTURE_2D, magoManager.cesiumColorBuffer); 
+	
 
 	if (this.screenQuad === undefined)
 	{
@@ -1825,10 +1766,7 @@ Renderer.prototype.renderTerrainCopy = function()
 		gl.bindTexture(gl.TEXTURE_2D, null);
 	}
 	//gl.colorMask(true, true, true, true);
-	//gl.depthMask(true);
-	gl.disable(gl.BLEND);
-	//gl.depthRange(0.0, 1.0);	
-	gl.enable(gl.DEPTH_TEST);
+	//gl.depthMask(true);	
 };
 
 /**
@@ -1953,128 +1891,6 @@ Renderer.prototype.renderTerrainShadow = function(gl)
 	gl.enable(gl.DEPTH_TEST);
 };
 
-/**
- * This function renders the stencil shadows meshes of the scene.
- * @param {WebGLRenderingContext} gl WebGL Rendering Context.
- * @param {Number} renderType If renderType = 0 (depth render), renderType = 1 (color render), renderType = 2 (colorCoding render).
- * @param {VisibleObjectsController} visibleObjControlerNodes This object contains visible objects for the camera frustum.
- */
-Renderer.prototype.renderScreenQuadShadow = function(gl, depthTex) 
-{
-	// Function no used yet.***
-	// Function no used yet.***
-	// Function no used yet.***
-	//------------------------------------------------
-	var currentShader;
-	var shaderProgram;
-	var neoBuilding;
-	var node;
-	var rootNode;
-	var geoLocDataManager;
-	var magoManager = this.magoManager;
-	var sceneState = magoManager.sceneState;
-
-	var bApplyShadow = false;
-	if (sceneState.sunSystem !== undefined && sceneState.applySunShadows)
-	{ bApplyShadow = true; }
-
-	bApplyShadow = true;
-
-	//if (!bApplyShadow)
-	//{ return; }
-
-	currentShader = magoManager.postFxShadersManager.getShader("screenQuad"); 
-	currentShader.useProgram();
-	
-	currentShader.bindUniformGenerals();
-	var projectionMatrixInv = sceneState.getProjectionMatrixInv();
-	
-	if (!projectionMatrixInv._floatArrays)
-	{ return; }
-	
-	gl.uniformMatrix4fv(currentShader.projectionMatrixInv_loc, false, projectionMatrixInv._floatArrays);
-	var modelViewMatrixRelToEyeInv = sceneState.getModelViewRelToEyeMatrixInv();
-	gl.uniformMatrix4fv(currentShader.modelViewMatrixRelToEyeInv_loc, false, modelViewMatrixRelToEyeInv._floatArrays);
-	
-	gl.uniform1i(currentShader.bApplyShadow_loc, bApplyShadow);
-	var sunSystem = sceneState.sunSystem;
-	var sunLight = sunSystem.getLight(0);
-	var textureAux1x1 = magoManager.texturesStore.getTextureAux1x1();
-	
-	if (bApplyShadow)
-	{
-		// Set sunMatrix uniform.***
-		
-		var sunMatFloat32Array = sunSystem.getLightsMatrixFloat32Array();
-		var sunPosLOWFloat32Array = sunSystem.getLightsPosLOWFloat32Array();
-		var sunPosHIGHFloat32Array = sunSystem.getLightsPosHIGHFloat32Array();
-		var sunDirWC = sunSystem.getSunDirWC();
-		
-		if (sunLight.tMatrix!== undefined)
-		{
-			gl.uniformMatrix4fv(currentShader.sunMatrix_loc, false, sunMatFloat32Array);
-			gl.uniform3fv(currentShader.sunPosHigh_loc, sunPosHIGHFloat32Array);
-			gl.uniform3fv(currentShader.sunPosLow_loc, sunPosLOWFloat32Array);
-			gl.uniform1f(currentShader.shadowMapWidth_loc, sunLight.targetTextureWidth);
-			gl.uniform1f(currentShader.shadowMapHeight_loc, sunLight.targetTextureHeight);
-			gl.uniform3fv(currentShader.sunDirWC_loc, sunDirWC);
-			gl.uniform1i(currentShader.sunIdx_loc, 1);
-		}
-	}
-	
-	gl.activeTexture(gl.TEXTURE0);
-	gl.bindTexture(gl.TEXTURE_2D, depthTex);  
-	gl.activeTexture(gl.TEXTURE3); 
-	if (bApplyShadow && sunLight.depthFbo)
-	{
-		var sunSystem = sceneState.sunSystem;
-		var sunLight = sunSystem.getLight(0);
-		gl.bindTexture(gl.TEXTURE_2D, sunLight.depthFbo.colorBuffer);
-	}
-	else 
-	{
-		gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
-	}
-	
-	gl.activeTexture(gl.TEXTURE4); 
-	if (bApplyShadow && sunLight.depthFbo)
-	{
-		var sunSystem = sceneState.sunSystem;
-		var sunLight = sunSystem.getLight(1);
-		gl.bindTexture(gl.TEXTURE_2D, sunLight.depthFbo.colorBuffer);
-	}
-	else 
-	{
-		gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
-	}
-	currentShader.last_tex_id = textureAux1x1;
-			
-	
-	gl.disable(gl.POLYGON_OFFSET_FILL);
-	//gl.disable(gl.CULL_FACE);
-	gl.colorMask(true, true, true, true);
-	gl.depthMask(false);
-
-	gl.disable(gl.DEPTH_TEST);
-	gl.enable(gl.BLEND);
-	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); // Original.***
-	//gl.cullFace(gl.FRONT);
-
-	if (this.screenQuad === undefined)
-	{
-		this.screenQuad = new ScreenQuad(magoManager.vboMemoryManager);
-	}
-	
-	this.screenQuad.render(magoManager, currentShader);
-		
-	
-	
-	// Restore settings.***
-	gl.colorMask(true, true, true, true);
-	gl.depthMask(true);
-	gl.disable(gl.BLEND);
-	gl.depthRange(0.0, 1.0);	
-};
 
 /**
  * This function renders the stencil shadows meshes of the scene.
@@ -2377,7 +2193,7 @@ Renderer.prototype.renderScreenRectangle = function(gl, options)
 
 	if(magoManager.albedoTex)
 	{
-		//texture = magoManager.albedoTex;
+		texture = magoManager.albedoTex;
 	}
 
 	if(magoManager.diffuseLightTex)
@@ -2390,6 +2206,11 @@ Renderer.prototype.renderScreenRectangle = function(gl, options)
 		//texture = magoManager.specularLightTex;
 	}
 
+	if(magoManager.specularLightTex)
+	{
+		//texture = magoManager.LightFogTex;
+	}
+
 	if(magoManager.windPlaneDepthTex)
 	{
 		//texture = magoManager.windPlaneDepthTex;
@@ -2397,7 +2218,7 @@ Renderer.prototype.renderScreenRectangle = function(gl, options)
 
 	if(magoManager.windPngTex)
 	{
-		texture = magoManager.windPngTex;
+		//texture = magoManager.windPngTex;
 	}
 
 	if(magoManager.windPlaneNormalTex)
@@ -2622,14 +2443,18 @@ Renderer.prototype.renderLightBuffer = function(lightSourcesArray)
 	gl.bindTexture(gl.TEXTURE_2D, magoManager.specularLightTex);  
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, sceneState.drawingBufferWidth[0], sceneState.drawingBufferHeight[0], 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
 	
+	gl.bindTexture(gl.TEXTURE_2D, magoManager.LightFogTex);  
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, sceneState.drawingBufferWidth[0], sceneState.drawingBufferHeight[0], 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
 
 	// Bind mago colorTextures:
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, lBuffer.extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, magoManager.diffuseLightTex, 0);
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, lBuffer.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, magoManager.specularLightTex, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, lBuffer.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, magoManager.LightFogTex, 0);
 
 	extbuffers.drawBuffersWEBGL([
 		lBuffer.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - diffuseLighting
 		lBuffer.extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - specularLighting
+		lBuffer.extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[1] - specularLighting
 	]);
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	gl.viewport(0, 0, sceneState.drawingBufferWidth[0], sceneState.drawingBufferHeight[0]);
@@ -2709,7 +2534,8 @@ Renderer.prototype.renderLightBuffer = function(lightSourcesArray)
 		
 		// set the light direction WC.
 		gl.uniform3fv(currentShader.lightDirWC_loc, [lightDirWC.x, lightDirWC.y, lightDirWC.z]); //.
-		gl.uniform3fv(currentShader.uLightColorAndBrightness_loc, [1.0, 1.0, 1.0]); //.
+		gl.uniform3fv(currentShader.uLightColorAndBrightness_loc, light.color3); //.
+		gl.uniform1f(currentShader.uLightIntensity_loc, light.intensity);
 		var lightParams = light.getLightParameters(); //uLightParameters[4]; // 0= lightDist, 1= lightFalloffDist, 2= maxSpotDot, 3= falloffSpotDot.
 		gl.uniform1fv(currentShader.uLightParameters_loc, lightParams);
 

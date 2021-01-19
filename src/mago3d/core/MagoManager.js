@@ -1667,15 +1667,21 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		if(!this.extbuffers)
 			this.extbuffers = gl.getExtension("WEBGL_draw_buffers");
 
+		// Take cesium colorBuffer.**********************
+		scene._context._currentFramebuffer._bind();
+		this.cesiumColorBuffer = gl.getFramebufferAttachmentParameter(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.FRAMEBUFFER_ATTACHMENT_OBJECT_NAME);
+		// End taking cesium colorBuffer.-------------------
+
 		this.texturesManager.texturesMergerFbo.bind();
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.depthTex, 0);
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0);
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0);
 
 		this.extbuffers.drawBuffersWEBGL([
-			this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
-			this.extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - depthTex
-			this.extbuffers.NONE, // gl_FragData[2] - normalTex
-			this.extbuffers.NONE // gl_FragData[3] - albedoTex
+			this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - depth
+			this.extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - normal
+			this.extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - albedo
+			this.extbuffers.NONE //
 			]);
 
 		if(this.isFarestFrustum())
@@ -1688,6 +1694,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		}
 		gl.clear(gl.DEPTH_BUFFER_BIT);
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.normalTex, 0);
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, this.albedoTex, 0);
 		this.renderer.renderTerrainCopy();
 		
 		// end test.---------------------------------------------------------------------------------------------------
@@ -1762,6 +1769,10 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	renderType = 1;
 	this.renderType = 1;
 	this.renderer.renderGeometryBufferTransparents(gl, renderType, this.visibleObjControlerNodes);
+
+	// DEBUG.Render fisically lights sources.*************************************************************************
+	//this.renderer.renderNativeLightSources(renderType, this.visibleObjControlerNodes) ; // debug component.
+	//------------------------------------------------------------------------------------------------------
 	// End rendering transparents.----------------------------------------------------------------------------------------------------------
 
 	
@@ -1827,11 +1838,12 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 				var bufferWidth = this.sceneState.drawingBufferWidth[0];
 				var bufferHeight = this.sceneState.drawingBufferHeight[0];
 				var bUseMultiRenderTarget = this.postFxShadersManager.bUseMultiRenderTarget;
-				this.texturesManager.lBuffer = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 2}); 
+				this.texturesManager.lBuffer = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 3}); 
 			}
 			this.lBuffer = this.texturesManager.lBuffer;
 			this.diffuseLightTex = this.lBuffer.colorBuffersArray[0];
 			this.specularLightTex = this.lBuffer.colorBuffersArray[1];
+			this.LightFogTex = this.lBuffer.colorBuffersArray[2];
 			
 			// Render the lightBuffer.
 			this.renderer.renderLightDepthCubeMaps(this.lightSourcesArray); // active this code for shadows.
@@ -1857,10 +1869,10 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 			// End rendering lightBuffer.--------------------------------------------
 		}
 
+		
 		this.renderer.renderSsaoFromDepth(gl);
 
 		
-
 		if (this.isCesiumGlobe())
 		{
 			scene._context._currentFramebuffer._bind();
@@ -1897,10 +1909,6 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	} 
 
 	
-
-	// DEBUG.Render lights sources.*************************************************************************
-	//this.renderer.renderNativeLightSources(renderType, this.visibleObjControlerNodes) ; // debug component.
-	//------------------------------------------------------------------------------------------------------
 
 	/*
 	if (this.windTest === undefined)
@@ -2332,273 +2340,6 @@ MagoManager.prototype.doRenderMagoWorld = function(frustumVolumenObject)
 				
 		}
 
-		//this.weatherStation.renderWindMultiLayers(this);
-		//this.weatherStation.test_renderWindLayer(this);
-		//this.weatherStation.test_renderTemperatureLayer(this);
-		//this.weatherStation.test_renderCuttingPlanes(this, renderType);
-		this.weatherStation.renderWeather(this);
-	}
-
-	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
-		
-	this.swapRenderingFase();
-	
-	//if(!this.test__splittedMesh)
-	//{
-	//	this.TEST__splittedExtrudedBuilding();
-	//	this.test__splittedMesh = true;
-	//}
-
-	
-};
-
-/**
- * Main rendering function.
- * @private
- */
-MagoManager.prototype.doRender_original = function(frustumVolumenObject) 
-{
-	var gl = this.getGl();
-	
-	// 1) The depth render.**********************************************************************************************************************
-	var renderType = 0; // 0= depth. 1= color.***
-	this.renderType = 0;
-	
-	// Take the depFrameBufferObject of the current frustumVolume.***
-	var bUseMultiRenderTarget = this.postFxShadersManager.bUseMultiRenderTarget;
-	if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
-
-	if(!this.texturesManager)
-	{
-		this.texturesManager = new TexturesManager(this);
-		var bufferWidth = this.sceneState.drawingBufferWidth[0];
-		var bufferHeight = this.sceneState.drawingBufferHeight[0];
-		var bUseMultiRenderTarget = this.postFxShadersManager.bUseMultiRenderTarget;
-		this.texturesManager.texturesMergerFbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget : bUseMultiRenderTarget}); 
-	}
-
-	this.depthFboNeo = this.texturesManager.texturesMergerFbo;
-	this.depthFboNeo.bind(); 
-
-	if(this.isFarestFrustum())
-	{
-		gl.clearColor(1, 1, 1, 1);
-		gl.clearDepth(1);
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-		gl.clearStencil(0); // provisionally here.***
-	}
-	else
-	{
-		gl.clearDepth(1);
-		gl.clear(gl.DEPTH_BUFFER_BIT);
-	}
-	
-	
-	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
-	this.renderer.renderGeometry(gl, renderType, this.visibleObjControlerNodes);
-	this.depthFboNeo.unbind();
-	this.swapRenderingFase();
-
-	//if(this.currentFrustumIdx === 0)
-	//{
-	//	this.renderer.renderSsaoFromDepth(gl);
-	//}
-
-	// prev 2) ready to color frame buffer
-	this.postFxShadersManager.useProgram(null); // init current bind shader.***
-	if (this.isCesiumGlobe())
-	{
-		var scene = this.scene;
-		var bApplyShadow = false;
-		if (this.sceneState.sunSystem !== undefined && this.sceneState.applySunShadows)
-		{ bApplyShadow = true; }
-
-		if (scene && scene._context && scene._context._currentFramebuffer) {
-			scene._context._currentFramebuffer._bind();
-
-			if (bApplyShadow && this.currentFrustumIdx < 2) 
-			{
-				renderType = 3;
-				this.renderer.renderTerrainShadow(gl, renderType, this.visibleObjControlerNodes);
-			}
-			/*
-			// test MRT on cesium.**************************************************
-			if(!this.extbuffers)
-			this.extbuffers = gl.getExtension("WEBGL_draw_buffers");
-
-			var bMustReMakeBuffers = false;
-			var currBufferWidth = this.sceneState.drawingBufferWidth[0];
-			var currBufferHeight = this.sceneState.drawingBufferHeight[0];
-
-			if(!this.depthTex || this.depthTex.width !== currBufferWidth || this.depthTex.height !== currBufferHeight)
-			{
-				bMustReMakeBuffers = true;
-			}
-
-
-			if(bMustReMakeBuffers)
-			{
-				this.depthTex = gl.createTexture();
-				gl.bindTexture(gl.TEXTURE_2D, this.depthTex);  
-				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); //LINEAR_MIPMAP_LINEAR
-				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-				gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
-				this.depthTex.width = this.sceneState.drawingBufferWidth[0];
-				this.depthTex.height = this.sceneState.drawingBufferHeight[0];
-				
-				this.normalTex = gl.createTexture();
-				gl.bindTexture(gl.TEXTURE_2D, this.normalTex);  
-				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); //LINEAR_MIPMAP_LINEAR
-				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-				gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
-				this.normalTex.width = this.sceneState.drawingBufferWidth[0];
-				this.normalTex.height = this.sceneState.drawingBufferHeight[0];
-				
-			}
-
-			if(this.isFarestFrustum())
-			{
-				gl.bindTexture(gl.TEXTURE_2D, this.depthTex);  
-				gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
-				this.depthTex.width = this.sceneState.drawingBufferWidth[0];
-				this.depthTex.height = this.sceneState.drawingBufferHeight[0];
-				gl.bindTexture(gl.TEXTURE_2D, this.normalTex);  
-				gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
-				this.normalTex.width = this.sceneState.drawingBufferWidth[0];
-				this.normalTex.height = this.sceneState.drawingBufferHeight[0];
-			}
-			
-			// Bind mago colorTextures:
-			gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.depthTex, 0);
-			gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, this.normalTex, 0);
-
-			this.extbuffers.drawBuffersWEBGL([
-				this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
-				this.extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - depthTex
-				this.extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - normalTex
-			  ]);
-			
-			// End test.---------------------------------------------------------------------------------------------------------------
-			*/
-		}
-	}
-
-	// 2) color render.*****************************************************************************************************************
-	// 2.1) Render terrain shadows.*****************************************************************************************************
-	// Now render the geomatry.
-	renderType = 1;
-	this.renderType = 1;
-	this.renderer.renderGeometry(gl, renderType, this.visibleObjControlerNodes);
-	/*
-	if (this.isCesiumGlobe())
-	{
-		// unbind mago colorTextures:
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // depthTex.
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // normalTex.
-		this.extbuffers.drawBuffersWEBGL([
-			this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
-			this.extbuffers.NONE, // gl_FragData[1]
-			this.extbuffers.NONE, // gl_FragData[2]
-			]);
-	}
-	*/
-	
-	
-
-	// 1.1) ssao and other effects from depthBuffer render.*****************************************************************************
-	if (this.currentFrustumIdx === 0) 
-	{
-		for (var i=0; i<8; i++)
-		{
-			//gl.activeTexture(gl.TEXTURE0 + i); 
-			//gl.bindTexture(gl.TEXTURE_2D, null);
-		}
-
-		this.renderer.renderSsaoFromDepth(gl);
-
-		if (this.isCesiumGlobe())
-		{
-			scene._context._currentFramebuffer._bind();
-		}
-
-		this.renderer.renderScreenQuadSsao(gl);
-		this.renderCluster();
-
-		if (this.selectionManager)
-		{
-			if(this.selectionManager.existSelectedObjects())
-			{
-				this.renderer.renderSilhouette();
-			}
-			
-			// draw the axis.***
-			////if (magoManager.magoPolicy.getShowOrigin())
-			////{
-			////	var node = selectionManager.getSelectedF4dNode();
-			////	//var geoLocDataManager = node.getNodeGeoLocDataManager();
-			////	var nodes = [node];
-			////	
-			////	this.renderAxisNodes(nodes, renderType);
-			////}
-		}
-
-		//this.renderer.renderScreenRectangle(gl);
-	}
-
-	
-
-	/*
-	if (this.windTest === undefined)
-	{
-		if (this.weatherStation === undefined)
-		{ this.weatherStation = new WeatherStation(); }
-	
-		var geometryDataPath = this.readerWriter.geometryDataPath;
-		// JejuAirport, jejuHanRaSan.
-		//var windDataFilesNamesArray = ["OBS-QWM_2016062000.grib2_wind_000", "OBS-QWM_2016062001.grib2_wind_000", "OBS-QWM_2016062002.grib2_wind_000", "OBS-QWM_2016062003.grib2_wind_000",
-		//	"OBS-QWM_2016062004.grib2_wind_000", "OBS-QWM_2016062005.grib2_wind_000", "OBS-QWM_2016062006.grib2_wind_000", "OBS-QWM_2016062007.grib2_wind_000",
-		//	"OBS-QWM_2016062008.grib2_wind_000", "OBS-QWM_2016062009.grib2_wind_000", "OBS-QWM_2016062010.grib2_wind_000", "OBS-QWM_2016062011.grib2_wind_000",
-		//	"OBS-QWM_2016062012.grib2_wind_000", "OBS-QWM_2016062013.grib2_wind_000", "OBS-QWM_2016062014.grib2_wind_000", "OBS-QWM_2016062015.grib2_wind_000",
-		//	"OBS-QWM_2016062016.grib2_wind_000", "OBS-QWM_2016062017.grib2_wind_000", "OBS-QWM_2016062018.grib2_wind_000", "OBS-QWM_2016062019.grib2_wind_000",
-		//	"OBS-QWM_2016062020.grib2_wind_000", "OBS-QWM_2016062021.grib2_wind_000", "OBS-QWM_2016062022.grib2_wind_000", "OBS-QWM_2016062023.grib2_wind_000"]; // jeju, hanRaSan
-		
-			
-		// Seoul data.
-		var windDataFilesNamesArray = ["OBS-QWM_2019090700.grib2_wind_000", "OBS-QWM_2019090701.grib2_wind_000", "OBS-QWM_2019090702.grib2_wind_000", "OBS-QWM_2019090703.grib2_wind_000",
-			"OBS-QWM_2019090704.grib2_wind_000", "OBS-QWM_2019090705.grib2_wind_000", "OBS-QWM_2019090706.grib2_wind_000", "OBS-QWM_2019090707.grib2_wind_000",
-			"OBS-QWM_2019090708.grib2_wind_000", "OBS-QWM_2019090709.grib2_wind_000", "OBS-QWM_2019090710.grib2_wind_000", "OBS-QWM_2019090711.grib2_wind_000",
-			"OBS-QWM_2019090712.grib2_wind_000", "OBS-QWM_2019090713.grib2_wind_000", "OBS-QWM_2019090714.grib2_wind_000", "OBS-QWM_2019090715.grib2_wind_000",
-			"OBS-QWM_2019090716.grib2_wind_000", "OBS-QWM_2019090717.grib2_wind_000", "OBS-QWM_2019090718.grib2_wind_000", "OBS-QWM_2019090719.grib2_wind_000",
-			"OBS-QWM_2019090720.grib2_wind_000", "OBS-QWM_2019090721.grib2_wind_000", "OBS-QWM_2019090722.grib2_wind_000", "OBS-QWM_2019090723.grib2_wind_000"]; // seoulData.
-			
-			
-		//Siheung_wind
-		//var windDataFilesNamesArray = ["OBS-QWM_2019090700.grib2_wind_000", "OBS-QWM_2019090701.grib2_wind_000", "OBS-QWM_2019090702.grib2_wind_000", "OBS-QWM_2019090703.grib2_wind_000",
-		//	"OBS-QWM_2019090704.grib2_wind_000", "OBS-QWM_2019090705.grib2_wind_000", "OBS-QWM_2019090706.grib2_wind_000", "OBS-QWM_2019090707.grib2_wind_000",
-		//	"OBS-QWM_2019090708.grib2_wind_000", "OBS-QWM_2019090709.grib2_wind_000", "OBS-QWM_2019090710.grib2_wind_000", "OBS-QWM_2019090711.grib2_wind_000",
-		//	"OBS-QWM_2019090712.grib2_wind_000", "OBS-QWM_2019090713.grib2_wind_000", "OBS-QWM_2019090714.grib2_wind_000", "OBS-QWM_2019090715.grib2_wind_000",
-		//	"OBS-QWM_2019090716.grib2_wind_000", "OBS-QWM_2019090717.grib2_wind_000", "OBS-QWM_2019090718.grib2_wind_000", "OBS-QWM_2019090719.grib2_wind_000",
-		//	"OBS-QWM_2019090720.grib2_wind_000", "OBS-QWM_2019090721.grib2_wind_000", "OBS-QWM_2019090722.grib2_wind_000", "OBS-QWM_2019090723.grib2_wind_000"];
-			
-		//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_Airport";
-		//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_GolfPark_NineBridge1";
-		var windMapFilesFolderPath = geometryDataPath +"/SeoulWind/200907";
-		//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_HanRaSan";
-		//var windMapFilesFolderPath = geometryDataPath +"/Siheung_wind";
-		
-		this.weatherStation.test_loadWindData3d(this, windDataFilesNamesArray, windMapFilesFolderPath);
-		//this.TEST__golfPark();
-		this.windTest = true;
-	}
-	*/
-	
-	
-	if (this.weatherStation)
-	{
 		//this.weatherStation.renderWindMultiLayers(this);
 		//this.weatherStation.test_renderWindLayer(this);
 		//this.weatherStation.test_renderTemperatureLayer(this);
@@ -6635,6 +6376,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.buildingRotMatrixInv_loc = gl.getUniformLocation(shader.program, "buildingRotMatrixInv");
 
 	shader.uLightParameters_loc = gl.getUniformLocation(shader.program, "uLightParameters");// 0= lightDist, 1= lightFalloffDist, 2= maxSpotDot, 3= falloffSpotDot.
+	shader.uLightIntensity_loc = gl.getUniformLocation(shader.program, "uLightIntensity");
 
 	shader.normalTex_loc = gl.getUniformLocation(shader.program, "normalTex");
 	shader.light_depthCubeMap_loc = gl.getUniformLocation(shader.program, "light_depthCubeMap");

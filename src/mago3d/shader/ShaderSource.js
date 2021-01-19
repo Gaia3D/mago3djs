@@ -2329,29 +2329,24 @@ uniform mat4 buildingRotMatrixInv;\n\
 // Light parameters.\n\
 uniform float uLightParameters[4]; // 0= lightDist, 1= lightFalloffDist, 2= maxSpotDot, 3= falloffSpotDot.\n\
 \n\
-uniform vec2 noiseScale;\n\
 uniform float near;\n\
 uniform float far;            \n\
-uniform float fov;\n\
 uniform float tangentOfHalfFovy;\n\
 uniform float aspectRatio;    \n\
 uniform float screenWidth;    \n\
 uniform float screenHeight;     \n\
 \n\
 uniform vec3 uLightColorAndBrightness;\n\
+uniform float uLightIntensity;\n\
 \n\
 uniform bool bUseLogarithmicDepth;\n\
 uniform bool bUseMultiRenderTarget;\n\
 uniform bool bApplyShadows;\n\
-uniform int uFrustumIdx;\n\
 uniform vec2 uNearFarArray[4];\n\
 \n\
 varying vec3 vLightDirCC;\n\
 varying vec3 vLightPosCC; \n\
-varying vec3 vLightPosWC;\n\
-\n\
-varying vec3 vNormal; // delete this.\n\
-\n\
+varying vec3 vertexPosLC;\n\
 \n\
 varying float flogz;\n\
 varying float Fcoef_half;\n\
@@ -2587,12 +2582,6 @@ int getFaceIdx(in vec3 normalRelToLight, inout vec2 faceTexCoord, inout vec3 fac
 \n\
 void main()\n\
 {\n\
-	//bool testBool = false;\n\
-	float occlusion = 1.0; // ambient occlusion.***\n\
-	float shadow_occlusion = 1.0;\n\
-	vec3 normal2 = vNormal;	\n\
-	float scalarProd = 1.0;\n\
-	\n\
 	vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
 \n\
 	#ifdef USE_MULTI_RENDER_TARGET\n\
@@ -2602,13 +2591,6 @@ void main()\n\
 		int dataType = 0;\n\
 		vec4 normal4;\n\
 		vec3 posCC = getPosCC(screenPos, dataType, normal4);\n\
-		\n\
-		// If the data is no generalGeomtry or pointsCloud, then discard.\n\
-		//if(dataType != 0 && dataType != 2)\n\
-		//{\n\
-		//	discard;\n\
-		//}\n\
-		//uLightParameters[4]; // 0= lightDist, 1= lightFalloffDist, 2= maxSpotDot, 3= falloffSpotDot.\n\
 \n\
 		// vector light-point.\n\
 		vec3 vecLightToPointCC = posCC - vLightPosCC;\n\
@@ -2620,7 +2602,11 @@ void main()\n\
 		float factorByDist = 1.0;\n\
 		if(distToLight > lightFalloffLightDist)\n\
 		{\n\
-			discard;\n\
+			// Apply only lightFog.***\n\
+			// in final screenQuadPass, use posLC to determine the light-fog.\n\
+			gl_FragData[2] = vec4(vertexPosLC, 1.0); // save fog.***\n\
+			return;\n\
+			//discard;\n\
 		}\n\
 		else if(distToLight > lightHotDistance)\n\
 		{\n\
@@ -2674,14 +2660,20 @@ void main()\n\
 				discard;\n\
 			}\n\
 		}\n\
+		//float fogIntensity = length(vertexPosLC)/lightHotDistance;\n\
+		float atenuation = 0.2; // intern variable to adjust light intensity.\n\
 		diffuseDot *= factorByDist;\n\
 		spotDot *= factorBySpot;\n\
-		gl_FragData[0] = vec4(diffuseDot * uLightColorAndBrightness.x * spotDot, \n\
-							diffuseDot * uLightColorAndBrightness.y * spotDot, \n\
-							diffuseDot * uLightColorAndBrightness.z * spotDot, 1.0); \n\
+		float finalFactor = uLightIntensity * diffuseDot * spotDot * atenuation;\n\
+		gl_FragData[0] = vec4(uLightColorAndBrightness.x * finalFactor , \n\
+							uLightColorAndBrightness.y * finalFactor, \n\
+							uLightColorAndBrightness.z * finalFactor, 1.0); \n\
 \n\
 		// Specular lighting.\n\
 		gl_FragData[1] = vec4(0.0, 0.0, 0.0, 1.0); // save specular.***\n\
+\n\
+		// Light fog.\n\
+		gl_FragData[2] = vec4(1.0, 1.0, 1.0, 1.0); // save fog.***\n\
 \n\
 	}\n\
 	#endif\n\
@@ -2701,21 +2693,16 @@ ShaderSource.LBufferVS = "\n\
 	attribute vec4 color4;\n\
 	\n\
 	uniform mat4 buildingRotMatrix; \n\
-	uniform mat4 projectionMatrix;  \n\
-	uniform mat4 modelViewMatrix;\n\
 	uniform mat4 modelViewMatrixRelToEye; \n\
 	uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
 	uniform mat4 RefTransfMatrix;\n\
 	uniform mat4 normalMatrix4;\n\
-	uniform mat4 sunMatrix[2]; \n\
 \n\
 	// Light position & direction.\n\
 	uniform vec3 buildingPosHIGH; // this is the lightPosition high.\n\
 	uniform vec3 buildingPosLOW; // this is the lightPosition low.\n\
 	uniform vec3 lightDirWC; // this is the lightDirection (in case of the spotLight type).\n\
 \n\
-	uniform float near;\n\
-	uniform float far;\n\
 	uniform vec3 scaleLC;\n\
 \n\
 	uniform vec3 encodedCameraPositionMCHigh;\n\
@@ -2730,24 +2717,18 @@ ShaderSource.LBufferVS = "\n\
 	uniform float uFCoef_logDepth;\n\
 	\n\
 	\n\
-\n\
 	varying vec3 vNormal;\n\
 	varying vec2 vTexCoord;  \n\
-	varying vec3 uAmbientColor;\n\
-	varying vec3 vLightWeighting;\n\
-	varying vec3 vertexPos;\n\
 	varying vec3 vertexPosLC;\n\
 	varying float applySpecLighting;\n\
 	varying vec4 vColor4; // color from attributes\n\
 \n\
 	varying vec3 vLightDirCC; \n\
 	varying vec3 vLightPosCC; \n\
-	varying vec3 vLightPosWC;\n\
 \n\
   \n\
 	varying float flogz;\n\
 	varying float Fcoef_half;\n\
-	varying float depth;\n\
 \n\
 	\n\
 	void main()\n\
@@ -2780,7 +2761,6 @@ ShaderSource.LBufferVS = "\n\
 		vec3 rotatedNormal = currentTMat * normal;\n\
 \n\
 		// calculate the light position CC.*****************************************\n\
-		vLightPosWC = buildingPosHIGH + buildingPosLOW;\n\
 		vec3 lightPosHighDiff = buildingPosHIGH - encodedCameraPositionMCHigh;\n\
 		vec3 lightPosLowDiff = buildingPosLOW - encodedCameraPositionMCLow;\n\
 		vec4 lightPosCC = vec4(lightPosHighDiff + lightPosLowDiff, 1.0);\n\
@@ -2788,22 +2768,12 @@ ShaderSource.LBufferVS = "\n\
 		vLightPosCC = lightPosCC_aux.xyz;\n\
 		//--------------------------------------------------------------------------\n\
 \n\
-		vec3 uLightingDirection = vec3(-0.1320580393075943, -0.9903827905654907, 0.041261956095695496); \n\
-		uAmbientColor = vec3(1.0);\n\
-\n\
 		vNormal = normalize((normalMatrix4 * vec4(rotatedNormal, 1.0)).xyz); // original.***\n\
 		vTexCoord = texCoord;\n\
 \n\
 		// calculate lightDirection in cameraCoord.\n\
 		vLightDirCC = normalize((normalMatrix4 * vec4(lightDirWC, 1.0)).xyz); // original.***\n\
-		vec3 directionalLightColor = vec3(0.7, 0.7, 0.7);\n\
-		float directionalLightWeighting = 1.0;\n\
-		\n\
-		uAmbientColor = vec3(0.8);\n\
-		uLightingDirection = normalize(vec3(0.6, 0.6, 0.6));\n\
-		directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);\n\
 \n\
-		vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting; // original.***\n\
 		\n\
 		if(bApplySpecularLighting)\n\
 			applySpecLighting = 1.0;\n\
@@ -2811,8 +2781,6 @@ ShaderSource.LBufferVS = "\n\
 			applySpecLighting = -1.0;\n\
 \n\
         gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
-		//vertexPos = orthoPos.xyz;\n\
-		//depth = (-orthoPos.z)/(far); // the correct value.\n\
 \n\
 		if(bUseLogarithmicDepth)\n\
 		{\n\
@@ -5338,13 +5306,7 @@ ShaderSource.ScreenCopyQuadFS = "#ifdef GL_ES\n\
 uniform sampler2D depthTex; // 0\n\
 uniform sampler2D normalTex; // 1\n\
 uniform sampler2D albedoTex; // 2\n\
-uniform sampler2D shadowMapTex; // 3\n\
-uniform sampler2D shadowMapTex2; // 4\n\
-uniform sampler2D ssaoTex; // 5\n\
 \n\
-uniform sampler2D diffuseLightTex; // 6\n\
-uniform sampler2D specularLightTex; // 7\n\
-uniform sampler2D silhouetteDepthTex; // channel .\n\
 uniform mat4 modelViewMatrixRelToEyeInv;\n\
 uniform mat4 projectionMatrixInv;\n\
 uniform mat4 normalMatrix4;\n\
@@ -5353,26 +5315,9 @@ uniform vec3 encodedCameraPositionMCLow;\n\
 \n\
 uniform float near;\n\
 uniform float far; \n\
-uniform float tangentOfHalfFovy;\n\
-uniform float aspectRatio;    \n\
 \n\
-uniform bool bApplyShadow; // sun shadows on cesium terrain.\n\
-uniform bool bApplyMagoShadow;\n\
-uniform bool bSilhouette;\n\
-uniform bool bFxaa;\n\
-uniform bool bApplySsao;\n\
-uniform bool bScreenCopy;\n\
-\n\
-uniform mat4 sunMatrix[2]; \n\
-uniform vec3 sunPosHIGH[2];\n\
-uniform vec3 sunPosLOW[2];\n\
-uniform vec3 sunDirWC;\n\
-uniform int sunIdx;\n\
 uniform float screenWidth;    \n\
 uniform float screenHeight;  \n\
-uniform vec2 uNearFarArray[4];\n\
-uniform bool bUseLogarithmicDepth;\n\
-uniform float uFCoef_logDepth;\n\
 uniform int uFrustumIdx;\n\
 \n\
 vec4 packDepth( float v ) {\n\
@@ -5467,7 +5412,7 @@ void main()\n\
 		vec3 encodedNormal = encodeNormal(normal4.xyz);\n\
 		gl_FragData[1] = vec4(encodedNormal, frustumIdx); // save normal.***\n\
 \n\
-		//gl_FragData[3] = gl_FragData[0]; // albedo.\n\
+		gl_FragData[2] = texture2D(albedoTex, screenPos.xy); // copy albedo.\n\
 	#endif\n\
 \n\
 	return;\n\
@@ -5488,7 +5433,7 @@ uniform sampler2D ssaoTex; // 5\n\
 \n\
 uniform sampler2D diffuseLightTex; // 6\n\
 uniform sampler2D specularLightTex; // 7\n\
-uniform sampler2D silhouetteDepthTex; // channel .\n\
+\n\
 uniform mat4 modelViewMatrixRelToEyeInv;\n\
 uniform mat4 projectionMatrixInv;\n\
 uniform vec3 encodedCameraPositionMCHigh;\n\
@@ -5776,71 +5721,13 @@ void main()\n\
 	float alpha = 0.0;\n\
 	vec4 finalColor;\n\
 	finalColor = vec4(0.2, 0.2, 0.2, 0.8);\n\
-	/*\n\
-	if(bApplyShadow)\n\
-	{\n\
-		// *** For cesiumTerrain shadows.***\n\
-		// the sun lights count are 2.\n\
-		// 1rst, calculate the pixelPosWC.\n\
-		float z_window  = unpackDepth(texture2D(depthTex, screenPos.xy)); // z_window  is [0.0, 1.0] range depth.\n\
-		\n\
-		// https://stackoverflow.com/questions/11277501/how-to-recover-view-space-position-given-view-space-depth-value-and-ndc-xy\n\
-		float depthRange_near = 0.0;\n\
-		float depthRange_far = 1.0;\n\
-		float x_ndc = 2.0 * screenPos.x - 1.0;\n\
-		float y_ndc = 2.0 * screenPos.y - 1.0;\n\
-		float z_ndc = (2.0 * z_window - depthRange_near - depthRange_far) / (depthRange_far - depthRange_near);\n\
-		// Note: NDC range = (-1,-1,-1) to (1,1,1).***\n\
-		\n\
-		vec4 viewPosH = projectionMatrixInv * vec4(x_ndc, y_ndc, z_ndc, 1.0);\n\
-		vec3 posCC = viewPosH.xyz/viewPosH.w;\n\
-		vec4 posWCRelToEye = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0);\n\
-		vec4 posWC = posWCRelToEye + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 0.0);\n\
-		//------------------------------------------------------------------------------------------------------------------------------\n\
 \n\
-		// now, check if sun is in the antipodas.\n\
-		bool sunInAntipodas = false;\n\
-		float dotAux = dot(sunDirWC, normalize(posWC.xyz));\n\
-		if(dotAux > 0.0)\n\
-		{\n\
-			sunInAntipodas = true;\n\
-		}\n\
-		\n\
-		// 2nd, calculate the vertex relative to light.***\n\
-		// 1rst, try with the closest sun. sunIdx = 0.\n\
-		if(!sunInAntipodas)\n\
-		{\n\
-			bool pointIsinShadow = isInShadow(posWCRelToEye, 0);\n\
-			if(!pointIsinShadow)\n\
-			{\n\
-				pointIsinShadow = isInShadow(posWCRelToEye, 1);\n\
-			}\n\
-\n\
-			if(pointIsinShadow)\n\
-			{\n\
-				shadow_occlusion = 0.5;\n\
-				alpha = 0.5;\n\
-			}\n\
-		}\n\
-\n\
-		gl_FragColor = vec4(finalColor.rgb*shadow_occlusion, alpha);\n\
-		return;\n\
-	}\n\
-	*/\n\
 	vec4 normal4 = getNormal(screenPos);\n\
 	vec3 normal = normal4.xyz;\n\
 	if(length(normal) < 0.1)\n\
 	discard;\n\
 \n\
-	//if(normal.z < 0.0)\n\
-	//{\n\
-	//	gl_FragColor = vec4(1.0, 0.2, 0.2, 1.0);\n\
-	//	return;\n\
-	//}\n\
 \n\
-	// check frustumIdx. There are 3 type of frustumsIdx :  0, 1, 2, 3 or 10, 11, 12, 13 or 20, 21, 22, 23.***\n\
-	//if(int(floor(normal4.w * 100.0)) >= 10)\n\
-	//discard;\n\
 	int estimatedFrustumIdx = int(floor(normal4.w * 100.0));\n\
 	int dataType = -1;// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.\n\
 	int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);\n\
@@ -5894,7 +5781,7 @@ void main()\n\
 	}\n\
 	\n\
 \n\
-	ambientColor = vec3(0.8);\n\
+	ambientColor = vec3(0.6);\n\
 	vec3 lightingDirection = normalize(vec3(0.6, 0.6, 0.6));\n\
 	directionalLightWeighting = max(dot(normal, lightingDirection), 0.0);\n\
 	\n\
@@ -5902,63 +5789,28 @@ void main()\n\
 	vec4 albedo = texture2D(albedoTex, screenPos);\n\
 	vec4 diffuseLight = texture2D(diffuseLightTex, screenPos);\n\
 	float diffuseLightModul = length(diffuseLight.xyz);\n\
-	\n\
+	float lightFogAprox = diffuseLight.w;\n\
 \n\
-	vec4 nightFilter4 = vec4(0.0, 0.0, 0.0, 0.5);\n\
 \n\
-	// In this point check the \"dataType\".\n\
-	// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.\n\
-	if(dataType == 1)\n\
-	{\n\
-		// calculate normalWC & compare to sunDirWC.***************************\n\
-		//modelViewMatrixRelToEyeInv\n\
-		/*\n\
-		vec4 normal4WC = modelViewMatrixRelToEyeInv * vec4(normal, 1.0);\n\
-		vec3 normalWC = normalize(normal4WC.xyz);\n\
-		float sunDot = dot(sunDirWC, -normalWC);\n\
-		if(sunDot < 0.0)\n\
-		{\n\
-			gl_FragColor = vec4(0.0, 0.0, 0.0, 0.8);\n\
-		}\n\
-		else\n\
-		{\n\
-			gl_FragColor = vec4(0.0, 0.0, 0.0, 0.1);\n\
-		}\n\
-		return;\n\
-		*/\n\
-		//-----------------------------------------------------------------------\n\
-		\n\
-		// This is TERRAIN.\n\
-		float darkness = 1.0 - uSceneDayNightLightingFactor;\n\
-		darkness = min(darkness, 1.0 - diffuseLightModul);\n\
-\n\
-		if(shadow_occlusion < 1.0)\n\
-		{\n\
-			darkness = 0.5 - diffuseLightModul * 0.3;\n\
-		}\n\
-\n\
-		vec4 blendColor4 = vec4(0.0, 0.0, 0.0, darkness);\n\
-		gl_FragColor = blendColor4;\n\
-		return;\n\
-		\n\
-	}\n\
-\n\
-	vec3 ray = getViewRay(screenPos, 1.0); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
-	float scalarProd = abs(dot(normal, normalize(-ray)));\n\
+	//vec3 ray = getViewRay(screenPos, 1.0); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
+	//float scalarProd = abs(dot(normal, normalize(-ray)));\n\
 \n\
 	\n\
 	vec3 lightWeighting = ambientColor + directionalLightColor * directionalLightWeighting; // original.***\n\
 \n\
 	//lightWeighting += diffuseLight.xyz;\n\
-\n\
-	albedo *= vec4(lightWeighting, 1.0);\n\
-\n\
+	if(dataType != 1)\n\
+	{\n\
+		albedo *= vec4(lightWeighting, 1.0) ;\n\
+	}\n\
+	else\n\
+	{\n\
+		albedo *= vec4(lightWeighting, 1.0);\n\
+	}\n\
+	\n\
 	if(bApplySsao)\n\
 	{\n\
-		// 1rst, calculate the ilumination. todo:\n\
-		// now, apply ssao from ssaoTexture.\n\
-		if(dataType != 0 && dataType != 2)// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.\n\
-		discard;\n\
+		// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.\n\
 \n\
 		//ssaoFromDepthTex\n\
 		float pixelSize_x = 1.0/screenWidth;\n\
@@ -5984,8 +5836,11 @@ void main()\n\
 \n\
 		float occlInv = 1.0 - occlusion;\n\
 \n\
-		float lightFactorAux = min(uSceneDayNightLightingFactor + diffuseLightModul, 1.3);\n\
-		occlInv *= lightFactorAux;\n\
+		//float lightFactorAux = min(uSceneDayNightLightingFactor + diffuseLightModul, 1.3);\n\
+		float lightFactorAux = uSceneDayNightLightingFactor + diffuseLightModul;\n\
+		//occlInv *= lightFactorAux;\n\
+\n\
+		vec3 diffuseLight3 = diffuseLight.xyz + vec3(uSceneDayNightLightingFactor);\n\
 \n\
 		// Light factor.***\n\
 		shadow_occlusion += diffuseLightModul * 0.3;\n\
@@ -5993,20 +5848,10 @@ void main()\n\
 		shadow_occlusion = 1.0;\n\
 \n\
 		occlInv *= (shadow_occlusion);\n\
-		vec4 finalColor = vec4(albedo.r * occlInv, albedo.g * occlInv, albedo.b * occlInv, albedo.a);\n\
+		vec4 finalColor = vec4(albedo.r * occlInv * diffuseLight3.x, albedo.g * occlInv * diffuseLight3.y, albedo.b * occlInv * diffuseLight3.z, albedo.a);\n\
 		gl_FragColor = finalColor;\n\
 \n\
-		/*\n\
-		vec4 finalColorNight = mix(finalColor, nightFilter4, 0.5); // test.\n\
-		gl_FragColor = mix(finalColorNight, finalColor, diffuseLightModul);// test.\n\
-		\n\
-		if(diffuseLightModul > 0.0)\n\
-			gl_FragColor = finalColor;\n\
-		else\n\
-		{\n\
-			gl_FragColor = mix(finalColor, nightFilter4, 0.5);\n\
-		}\n\
-		*/\n\
+\n\
 \n\
 		// fog.*****************************************************************\n\
 		//float myLinearDepth2 = getDepth(screenPos);\n\
@@ -6098,7 +5943,7 @@ void main()\n\
 				vec4 edgeColor_C = mix(edgeColor_A, edgeColor_B, 0.5);\n\
 				vec4 edgeColor_D = mix(edgeColor_C, albedo, 0.5);\n\
 \n\
-				vec4 edgeColorPrev = vec4(edgeColor_D.r * occlInv, edgeColor_D.g * occlInv, edgeColor_D.b * occlInv, edgeColor_D.a);\n\
+				vec4 edgeColorPrev = vec4(edgeColor_D.r * occlInv * diffuseLight3.x, edgeColor_D.g * occlInv * diffuseLight3.y, edgeColor_D.b * occlInv * diffuseLight3.z, edgeColor_D.a);\n\
 				vec4 edgeColor = edgeColorPrev * 0.8;\n\
 \n\
 				//gl_FragColor = vec4(edgeColor.rgb, edgeAlpha);\n\

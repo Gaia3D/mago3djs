@@ -74,6 +74,27 @@ Node.prototype.isReferenceNode = function()
  * get node state of rander
  * @return {boolean} return this node is ready to render
  */
+Node.prototype.isOpaque = function()
+{
+	var bOpaque = true;
+	if(this.data)
+	{
+		if(this.data.attributes)
+		{
+			if(this.data.attributes.opaque !== undefined)
+			{
+				bOpaque = this.data.attributes.opaque;
+			}
+		}
+	}
+
+	return bOpaque;
+};
+
+/**
+ * get node state of rander
+ * @return {boolean} return this node is ready to render
+ */
 Node.prototype.isReadyToRender = function()
 {
 	var geoLocDataManager = this.getNodeGeoLocDataManager();

@@ -66,8 +66,8 @@ SunSystem.prototype.init = function()
 	if (this.date === undefined)
 	{
 		this.date = new Date();
-		this.date.setMonth(12);
-		this.date.setHours(19);
+		this.date.setMonth(5);
+		this.date.setHours(12);
 		this.date.setMinutes(0);
 
 		this.setDate(this.date);
@@ -234,29 +234,24 @@ SunSystem.prototype.getDayNightLightingFactorOfPosition = function(posWC)
 	var pointAuxWC = new Point3D(posWC.x, posWC.y, posWC.z);
 	pointAuxWC.unitary();
 
+	lightFactor = pointAuxWC.scalarProduct(new Point3D(-this.sunDirWC[0], -this.sunDirWC[1], -this.sunDirWC[2]));
+
+	// Do smoothStep.***********************************
 	var minVal = -0.2;
 	var maxVal = 0.2;
-	lightFactor = pointAuxWC.scalarProduct(new Point3D(-this.sunDirWC[0], -this.sunDirWC[1], -this.sunDirWC[2]));
-	//if(lightFactor < 0.15)
-	//lightFactor = 0.15;
-
-	// clamp = min(max(x, minVal), maxVal).
-
 	var t = (lightFactor - minVal)/(maxVal-minVal);
+	// clamp = min(max(x, minVal), maxVal).
 	if(t<0.0)
 	t = 0.0;
 	if(t>1.0)
 	t = 1.0;
 	var t2 = t*t*(3.0 - 2*t);
+	// End smoothStep.-----------------------------------
 
 	lightFactor = t2;
 
 	if(lightFactor < 0.15)
 	lightFactor = 0.15;
-
-	//lightFactor *= 1.1;
-
-	
 
 	return lightFactor;
 };

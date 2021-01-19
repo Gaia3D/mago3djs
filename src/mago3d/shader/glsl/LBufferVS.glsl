@@ -5,21 +5,16 @@
 	attribute vec4 color4;
 	
 	uniform mat4 buildingRotMatrix; 
-	uniform mat4 projectionMatrix;  
-	uniform mat4 modelViewMatrix;
 	uniform mat4 modelViewMatrixRelToEye; 
 	uniform mat4 ModelViewProjectionMatrixRelToEye;
 	uniform mat4 RefTransfMatrix;
 	uniform mat4 normalMatrix4;
-	uniform mat4 sunMatrix[2]; 
 
 	// Light position & direction.
 	uniform vec3 buildingPosHIGH; // this is the lightPosition high.
 	uniform vec3 buildingPosLOW; // this is the lightPosition low.
 	uniform vec3 lightDirWC; // this is the lightDirection (in case of the spotLight type).
 
-	uniform float near;
-	uniform float far;
 	uniform vec3 scaleLC;
 
 	uniform vec3 encodedCameraPositionMCHigh;
@@ -34,24 +29,18 @@
 	uniform float uFCoef_logDepth;
 	
 	
-
 	varying vec3 vNormal;
 	varying vec2 vTexCoord;  
-	varying vec3 uAmbientColor;
-	varying vec3 vLightWeighting;
-	varying vec3 vertexPos;
 	varying vec3 vertexPosLC;
 	varying float applySpecLighting;
 	varying vec4 vColor4; // color from attributes
 
 	varying vec3 vLightDirCC; 
 	varying vec3 vLightPosCC; 
-	varying vec3 vLightPosWC;
 
   
 	varying float flogz;
 	varying float Fcoef_half;
-	varying float depth;
 
 	
 	void main()
@@ -84,7 +73,6 @@
 		vec3 rotatedNormal = currentTMat * normal;
 
 		// calculate the light position CC.*****************************************
-		vLightPosWC = buildingPosHIGH + buildingPosLOW;
 		vec3 lightPosHighDiff = buildingPosHIGH - encodedCameraPositionMCHigh;
 		vec3 lightPosLowDiff = buildingPosLOW - encodedCameraPositionMCLow;
 		vec4 lightPosCC = vec4(lightPosHighDiff + lightPosLowDiff, 1.0);
@@ -92,22 +80,12 @@
 		vLightPosCC = lightPosCC_aux.xyz;
 		//--------------------------------------------------------------------------
 
-		vec3 uLightingDirection = vec3(-0.1320580393075943, -0.9903827905654907, 0.041261956095695496); 
-		uAmbientColor = vec3(1.0);
-
 		vNormal = normalize((normalMatrix4 * vec4(rotatedNormal, 1.0)).xyz); // original.***
 		vTexCoord = texCoord;
 
 		// calculate lightDirection in cameraCoord.
 		vLightDirCC = normalize((normalMatrix4 * vec4(lightDirWC, 1.0)).xyz); // original.***
-		vec3 directionalLightColor = vec3(0.7, 0.7, 0.7);
-		float directionalLightWeighting = 1.0;
-		
-		uAmbientColor = vec3(0.8);
-		uLightingDirection = normalize(vec3(0.6, 0.6, 0.6));
-		directionalLightWeighting = max(dot(vNormal, uLightingDirection), 0.0);
 
-		vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting; // original.***
 		
 		if(bApplySpecularLighting)
 			applySpecLighting = 1.0;
@@ -115,8 +93,6 @@
 			applySpecLighting = -1.0;
 
         gl_Position = ModelViewProjectionMatrixRelToEye * pos4;
-		//vertexPos = orthoPos.xyz;
-		//depth = (-orthoPos.z)/(far); // the correct value.
 
 		if(bUseLogarithmicDepth)
 		{

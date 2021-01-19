@@ -564,17 +564,29 @@ VisibleObjectsController.prototype.putNodeToArraySortedByDist = function(nodesAr
  */
 VisibleObjectsController.prototype.putNodeByLod = function(node, lod) 
 {
+	// Check if the node's attributte.
+	var isOpaque = node.isOpaque();
+
 	if (lod === 0 || lod === 1) 
 	{
+		if(isOpaque)
 		this.putNodeToArraySortedByDist(this.currentVisibles0, node);
+		else
+		this.putNodeToArraySortedByDist(this.currentVisibles0Transparents, node);
 	}
 	else if (lod === 2) 
 	{
+		if(isOpaque)
 		this.putNodeToArraySortedByDist(this.currentVisibles2, node);
+		else
+		this.putNodeToArraySortedByDist(this.currentVisibles2Transparents, node);
 	}
 	else if (lod > 2) 
 	{
+		if(isOpaque)
 		this.putNodeToArraySortedByDist(this.currentVisibles3, node);
+		else
+		this.putNodeToArraySortedByDist(this.currentVisibles3Transparents, node);
 	}
 };
 

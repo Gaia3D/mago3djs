@@ -17,13 +17,7 @@
 uniform sampler2D depthTex; // 0
 uniform sampler2D normalTex; // 1
 uniform sampler2D albedoTex; // 2
-uniform sampler2D shadowMapTex; // 3
-uniform sampler2D shadowMapTex2; // 4
-uniform sampler2D ssaoTex; // 5
 
-uniform sampler2D diffuseLightTex; // 6
-uniform sampler2D specularLightTex; // 7
-uniform sampler2D silhouetteDepthTex; // channel .
 uniform mat4 modelViewMatrixRelToEyeInv;
 uniform mat4 projectionMatrixInv;
 uniform mat4 normalMatrix4;
@@ -32,26 +26,9 @@ uniform vec3 encodedCameraPositionMCLow;
 
 uniform float near;
 uniform float far; 
-uniform float tangentOfHalfFovy;
-uniform float aspectRatio;    
 
-uniform bool bApplyShadow; // sun shadows on cesium terrain.
-uniform bool bApplyMagoShadow;
-uniform bool bSilhouette;
-uniform bool bFxaa;
-uniform bool bApplySsao;
-uniform bool bScreenCopy;
-
-uniform mat4 sunMatrix[2]; 
-uniform vec3 sunPosHIGH[2];
-uniform vec3 sunPosLOW[2];
-uniform vec3 sunDirWC;
-uniform int sunIdx;
 uniform float screenWidth;    
 uniform float screenHeight;  
-uniform vec2 uNearFarArray[4];
-uniform bool bUseLogarithmicDepth;
-uniform float uFCoef_logDepth;
 uniform int uFrustumIdx;
 
 vec4 packDepth( float v ) {
@@ -146,7 +123,7 @@ void main()
 		vec3 encodedNormal = encodeNormal(normal4.xyz);
 		gl_FragData[1] = vec4(encodedNormal, frustumIdx); // save normal.***
 
-		//gl_FragData[3] = gl_FragData[0]; // albedo.
+		gl_FragData[2] = texture2D(albedoTex, screenPos.xy); // copy albedo.
 	#endif
 
 	return;

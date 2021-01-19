@@ -13,7 +13,7 @@ uniform sampler2D ssaoTex; // 5
 
 uniform sampler2D diffuseLightTex; // 6
 uniform sampler2D specularLightTex; // 7
-uniform sampler2D silhouetteDepthTex; // channel .
+
 uniform mat4 modelViewMatrixRelToEyeInv;
 uniform mat4 projectionMatrixInv;
 uniform vec3 encodedCameraPositionMCHigh;
@@ -301,71 +301,13 @@ void main()
 	float alpha = 0.0;
 	vec4 finalColor;
 	finalColor = vec4(0.2, 0.2, 0.2, 0.8);
-	/*
-	if(bApplyShadow)
-	{
-		// *** For cesiumTerrain shadows.***
-		// the sun lights count are 2.
-		// 1rst, calculate the pixelPosWC.
-		float z_window  = unpackDepth(texture2D(depthTex, screenPos.xy)); // z_window  is [0.0, 1.0] range depth.
-		
-		// https://stackoverflow.com/questions/11277501/how-to-recover-view-space-position-given-view-space-depth-value-and-ndc-xy
-		float depthRange_near = 0.0;
-		float depthRange_far = 1.0;
-		float x_ndc = 2.0 * screenPos.x - 1.0;
-		float y_ndc = 2.0 * screenPos.y - 1.0;
-		float z_ndc = (2.0 * z_window - depthRange_near - depthRange_far) / (depthRange_far - depthRange_near);
-		// Note: NDC range = (-1,-1,-1) to (1,1,1).***
-		
-		vec4 viewPosH = projectionMatrixInv * vec4(x_ndc, y_ndc, z_ndc, 1.0);
-		vec3 posCC = viewPosH.xyz/viewPosH.w;
-		vec4 posWCRelToEye = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0);
-		vec4 posWC = posWCRelToEye + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 0.0);
-		//------------------------------------------------------------------------------------------------------------------------------
 
-		// now, check if sun is in the antipodas.
-		bool sunInAntipodas = false;
-		float dotAux = dot(sunDirWC, normalize(posWC.xyz));
-		if(dotAux > 0.0)
-		{
-			sunInAntipodas = true;
-		}
-		
-		// 2nd, calculate the vertex relative to light.***
-		// 1rst, try with the closest sun. sunIdx = 0.
-		if(!sunInAntipodas)
-		{
-			bool pointIsinShadow = isInShadow(posWCRelToEye, 0);
-			if(!pointIsinShadow)
-			{
-				pointIsinShadow = isInShadow(posWCRelToEye, 1);
-			}
-
-			if(pointIsinShadow)
-			{
-				shadow_occlusion = 0.5;
-				alpha = 0.5;
-			}
-		}
-
-		gl_FragColor = vec4(finalColor.rgb*shadow_occlusion, alpha);
-		return;
-	}
-	*/
 	vec4 normal4 = getNormal(screenPos);
 	vec3 normal = normal4.xyz;
 	if(length(normal) < 0.1)
 	discard;
 
-	//if(normal.z < 0.0)
-	//{
-	//	gl_FragColor = vec4(1.0, 0.2, 0.2, 1.0);
-	//	return;
-	//}
 
-	// check frustumIdx. There are 3 type of frustumsIdx :  0, 1, 2, 3 or 10, 11, 12, 13 or 20, 21, 22, 23.***
-	//if(int(floor(normal4.w * 100.0)) >= 10)
-	//discard;
 	int estimatedFrustumIdx = int(floor(normal4.w * 100.0));
 	int dataType = -1;// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.
 	int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);
@@ -419,7 +361,7 @@ void main()
 	}
 	
 
-	ambientColor = vec3(0.8);
+	ambientColor = vec3(0.6);
 	vec3 lightingDirection = normalize(vec3(0.6, 0.6, 0.6));
 	directionalLightWeighting = max(dot(normal, lightingDirection), 0.0);
 	
@@ -427,63 +369,28 @@ void main()
 	vec4 albedo = texture2D(albedoTex, screenPos);
 	vec4 diffuseLight = texture2D(diffuseLightTex, screenPos);
 	float diffuseLightModul = length(diffuseLight.xyz);
-	
+	float lightFogAprox = diffuseLight.w;
 
-	vec4 nightFilter4 = vec4(0.0, 0.0, 0.0, 0.5);
 
-	// In this point check the "dataType".
-	// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.
-	if(dataType == 1)
-	{
-		// calculate normalWC & compare to sunDirWC.***************************
-		//modelViewMatrixRelToEyeInv
-		/*
-		vec4 normal4WC = modelViewMatrixRelToEyeInv * vec4(normal, 1.0);
-		vec3 normalWC = normalize(normal4WC.xyz);
-		float sunDot = dot(sunDirWC, -normalWC);
-		if(sunDot < 0.0)
-		{
-			gl_FragColor = vec4(0.0, 0.0, 0.0, 0.8);
-		}
-		else
-		{
-			gl_FragColor = vec4(0.0, 0.0, 0.0, 0.1);
-		}
-		return;
-		*/
-		//-----------------------------------------------------------------------
-		
-		// This is TERRAIN.
-		float darkness = 1.0 - uSceneDayNightLightingFactor;
-		darkness = min(darkness, 1.0 - diffuseLightModul);
-
-		if(shadow_occlusion < 1.0)
-		{
-			darkness = 0.5 - diffuseLightModul * 0.3;
-		}
-
-		vec4 blendColor4 = vec4(0.0, 0.0, 0.0, darkness);
-		gl_FragColor = blendColor4;
-		return;
-		
-	}
-
-	vec3 ray = getViewRay(screenPos, 1.0); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
-	float scalarProd = abs(dot(normal, normalize(-ray)));
+	//vec3 ray = getViewRay(screenPos, 1.0); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
+	//float scalarProd = abs(dot(normal, normalize(-ray)));
 
 	
 	vec3 lightWeighting = ambientColor + directionalLightColor * directionalLightWeighting; // original.***
 
 	//lightWeighting += diffuseLight.xyz;
-
-	albedo *= vec4(lightWeighting, 1.0);
-
+	if(dataType != 1)
+	{
+		albedo *= vec4(lightWeighting, 1.0) ;
+	}
+	else
+	{
+		albedo *= vec4(lightWeighting, 1.0);
+	}
+	
 	if(bApplySsao)
 	{
-		// 1rst, calculate the ilumination. todo:
-		// now, apply ssao from ssaoTexture.
-		if(dataType != 0 && dataType != 2)// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.
-		discard;
+		// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.
 
 		//ssaoFromDepthTex
 		float pixelSize_x = 1.0/screenWidth;
@@ -509,8 +416,11 @@ void main()
 
 		float occlInv = 1.0 - occlusion;
 
-		float lightFactorAux = min(uSceneDayNightLightingFactor + diffuseLightModul, 1.3);
-		occlInv *= lightFactorAux;
+		//float lightFactorAux = min(uSceneDayNightLightingFactor + diffuseLightModul, 1.3);
+		float lightFactorAux = uSceneDayNightLightingFactor + diffuseLightModul;
+		//occlInv *= lightFactorAux;
+
+		vec3 diffuseLight3 = diffuseLight.xyz + vec3(uSceneDayNightLightingFactor);
 
 		// Light factor.***
 		shadow_occlusion += diffuseLightModul * 0.3;
@@ -518,20 +428,10 @@ void main()
 		shadow_occlusion = 1.0;
 
 		occlInv *= (shadow_occlusion);
-		vec4 finalColor = vec4(albedo.r * occlInv, albedo.g * occlInv, albedo.b * occlInv, albedo.a);
+		vec4 finalColor = vec4(albedo.r * occlInv * diffuseLight3.x, albedo.g * occlInv * diffuseLight3.y, albedo.b * occlInv * diffuseLight3.z, albedo.a);
 		gl_FragColor = finalColor;
 
-		/*
-		vec4 finalColorNight = mix(finalColor, nightFilter4, 0.5); // test.
-		gl_FragColor = mix(finalColorNight, finalColor, diffuseLightModul);// test.
-		
-		if(diffuseLightModul > 0.0)
-			gl_FragColor = finalColor;
-		else
-		{
-			gl_FragColor = mix(finalColor, nightFilter4, 0.5);
-		}
-		*/
+
 
 		// fog.*****************************************************************
 		//float myLinearDepth2 = getDepth(screenPos);
@@ -623,7 +523,7 @@ void main()
 				vec4 edgeColor_C = mix(edgeColor_A, edgeColor_B, 0.5);
 				vec4 edgeColor_D = mix(edgeColor_C, albedo, 0.5);
 
-				vec4 edgeColorPrev = vec4(edgeColor_D.r * occlInv, edgeColor_D.g * occlInv, edgeColor_D.b * occlInv, edgeColor_D.a);
+				vec4 edgeColorPrev = vec4(edgeColor_D.r * occlInv * diffuseLight3.x, edgeColor_D.g * occlInv * diffuseLight3.y, edgeColor_D.b * occlInv * diffuseLight3.z, edgeColor_D.a);
 				vec4 edgeColor = edgeColorPrev * 0.8;
 
 				//gl_FragColor = vec4(edgeColor.rgb, edgeAlpha);

@@ -32,6 +32,8 @@ var SpotLight = function(options)
 	this.falloffDeg = 45.0;
 	this.hotDistance = 30.0; // 30 meters.
 	this.falloffDistance = 40.0; // 30 meters.
+	this.color3 = new Float32Array([1.0, 1.0, 1.0]);
+	this.intensity = 1.0; // power = intensity * Math.PI.
 	if (this.geoLocDataManager === undefined)
 	{ this.geoLocDataManager = new GeoLocationDataManager(); }
 	this.directionLC = new Point3D(0.0, 0.0, -1.0); // this is a constant value.
@@ -62,6 +64,30 @@ var SpotLight = function(options)
 
 SpotLight.prototype = Object.create(MagoRenderable.prototype);
 SpotLight.prototype.constructor = SpotLight;
+
+/**
+ * Makes the geometry mesh.
+ */
+SpotLight.prototype.setColorRGB = function(red, green, blue)
+{
+	if(!this.color3)
+	{
+		this.color3 = new Float32Array([1.0, 1.0, 1.0]);
+	}
+
+	this.color3[0] = red;
+	this.color3[1] = green;
+	this.color3[2] = blue;
+
+};
+
+/**
+ * Makes the geometry mesh.
+ */
+SpotLight.prototype.setLightIntensity = function(intensity)
+{
+	this.intensity = intensity;
+};
 
 /**
  * Makes the geometry mesh.

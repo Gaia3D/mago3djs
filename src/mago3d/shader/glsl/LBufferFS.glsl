@@ -24,29 +24,24 @@ uniform mat4 buildingRotMatrixInv;
 // Light parameters.
 uniform float uLightParameters[4]; // 0= lightDist, 1= lightFalloffDist, 2= maxSpotDot, 3= falloffSpotDot.
 
-uniform vec2 noiseScale;
 uniform float near;
 uniform float far;            
-uniform float fov;
 uniform float tangentOfHalfFovy;
 uniform float aspectRatio;    
 uniform float screenWidth;    
 uniform float screenHeight;     
 
 uniform vec3 uLightColorAndBrightness;
+uniform float uLightIntensity;
 
 uniform bool bUseLogarithmicDepth;
 uniform bool bUseMultiRenderTarget;
 uniform bool bApplyShadows;
-uniform int uFrustumIdx;
 uniform vec2 uNearFarArray[4];
 
 varying vec3 vLightDirCC;
 varying vec3 vLightPosCC; 
-varying vec3 vLightPosWC;
-
-varying vec3 vNormal; // delete this.
-
+varying vec3 vertexPosLC;
 
 varying float flogz;
 varying float Fcoef_half;
@@ -282,12 +277,6 @@ int getFaceIdx(in vec3 normalRelToLight, inout vec2 faceTexCoord, inout vec3 fac
 
 void main()
 {
-	//bool testBool = false;
-	float occlusion = 1.0; // ambient occlusion.***
-	float shadow_occlusion = 1.0;
-	vec3 normal2 = vNormal;	
-	float scalarProd = 1.0;
-	
 	vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
 
 	#ifdef USE_MULTI_RENDER_TARGET
@@ -297,13 +286,6 @@ void main()
 		int dataType = 0;
 		vec4 normal4;
 		vec3 posCC = getPosCC(screenPos, dataType, normal4);
-		
-		// If the data is no generalGeomtry or pointsCloud, then discard.
-		//if(dataType != 0 && dataType != 2)
-		//{
-		//	discard;
-		//}
-		//uLightParameters[4]; // 0= lightDist, 1= lightFalloffDist, 2= maxSpotDot, 3= falloffSpotDot.
 
 		// vector light-point.
 		vec3 vecLightToPointCC = posCC - vLightPosCC;
@@ -315,7 +297,11 @@ void main()
 		float factorByDist = 1.0;
 		if(distToLight > lightFalloffLightDist)
 		{
-			discard;
+			// Apply only lightFog.***
+			// in final screenQuadPass, use posLC to determine the light-fog.
+			gl_FragData[2] = vec4(vertexPosLC, 1.0); // save fog.***
+			return;
+			//discard;
 		}
 		else if(distToLight > lightHotDistance)
 		{
@@ -369,14 +355,20 @@ void main()
 				discard;
 			}
 		}
+		//float fogIntensity = length(vertexPosLC)/lightHotDistance;
+		float atenuation = 0.2; // intern variable to adjust light intensity.
 		diffuseDot *= factorByDist;
 		spotDot *= factorBySpot;
-		gl_FragData[0] = vec4(diffuseDot * uLightColorAndBrightness.x * spotDot, 
-							diffuseDot * uLightColorAndBrightness.y * spotDot, 
-							diffuseDot * uLightColorAndBrightness.z * spotDot, 1.0); 
+		float finalFactor = uLightIntensity * diffuseDot * spotDot * atenuation;
+		gl_FragData[0] = vec4(uLightColorAndBrightness.x * finalFactor , 
+							uLightColorAndBrightness.y * finalFactor, 
+							uLightColorAndBrightness.z * finalFactor, 1.0); 
 
 		// Specular lighting.
 		gl_FragData[1] = vec4(0.0, 0.0, 0.0, 1.0); // save specular.***
+
+		// Light fog.
+		gl_FragData[2] = vec4(1.0, 1.0, 1.0, 1.0); // save fog.***
 
 	}
 	#endif
