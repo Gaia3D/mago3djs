@@ -1340,6 +1340,7 @@ SmartTile.prototype.createGeometriesFromSeeds = function(magoManager)
  */
 SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager) 
 {
+	var prefix = 'F4D_';
 	var hierarchyManager = magoManager.hierarchyManager;
 	var readWriter = magoManager.readerWriter;
 	var smartTileManager = magoManager.smartTileManager;
@@ -1377,6 +1378,8 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		var buildingId = "";
 		wordLength = (new Uint16Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+2)))[0]; bytesReaded += 2;
 		buildingId = enc.decode(new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+ wordLength))) ;bytesReaded += wordLength;
+
+		buildingId = buildingId.startsWith(prefix) ? buildingId.substr(4, buildingId.length-4) : buildingId;
 
 		if (!smartTilePathInfo[projectId]) { continue; }
 
@@ -1424,7 +1427,7 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		var neoBuildingHeaderData = dataArrayBuffer.slice(startBuff, endBuff);
 		bytesReaded = bytesReaded + metadataByteSize; // updating data.
 
-		var prefix = 'F4D_';
+		
 		var data_name = buildingId.startsWith(prefix) ? buildingId.replace(prefix, '') : buildingId;
 		if (!node)
 		{ 
@@ -1444,7 +1447,7 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 			
 				neoBuilding = new NeoBuilding();
 				data.neoBuilding = neoBuilding;
-				neoBuilding.buildingFileName = buildingId;
+				neoBuilding.buildingFileName = prefix + buildingId;
 				neoBuilding.buildingId = buildingId;
 				neoBuilding.projectFolderName = projectFolderName;
 				neoBuilding.nodeOwner = node;
@@ -1554,7 +1557,7 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 				// read the bool value.
 				var boolValue = (new Uint8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
 				// Put the readed data into externInfo.***
-				externInfo[dataKey] = boolValue;
+				externInfo[dataKey] = boolValue ? true : false;
 			}
 			else if (endMark === 2) // the next data is char type data.***
 			{

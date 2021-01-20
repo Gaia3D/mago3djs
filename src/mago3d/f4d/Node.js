@@ -1484,6 +1484,18 @@ Node.prototype.changeLocationAndRotation = function(latitude, longitude, elevati
 			var targetDepth = smartTileOwner.depth;
 			magoManager.smartTileManager.putNode(targetDepth, aNode, magoManager);
 		}
+
+		var accessory = aNode.data.accessory;
+		if(accessory 
+		&& accessory instanceof SpotLight
+		&& accessory.localWC) {
+			var spotLightPosition = geoLocationData.tMatrix.transformPoint3D(accessory.localWC);
+			var spotLightGeographic = ManagerUtils.pointToGeographicCoord(spotLightPosition)
+			
+			var spotLightGeoLocationData = accessory.getCurrentGeoLocationData();
+			spotLightGeoLocationData = ManagerUtils.calculateGeoLocationData(spotLightGeographic.longitude, spotLightGeographic.latitude, spotLightGeographic.altitude, geoLocationData.heading, geoLocationData.pitch, geoLocationData.roll, spotLightGeoLocationData);
+			accessory.bCubeMapMade = false
+		}
 	}
 };
 /**

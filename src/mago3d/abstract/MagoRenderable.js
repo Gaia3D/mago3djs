@@ -684,12 +684,14 @@ MagoRenderable.prototype.setGeographicPosition = function(geographicCoord, headi
 	var geoLocData = this.geoLocDataManager.getCurrentGeoLocationData();
 	if (geoLocData === undefined)
 	{
-		heading = (heading === undefined || heading === null) ? 0 : heading;
-		pitch = (pitch === undefined || pitch === null) ? 0 : pitch;
-		roll = (roll === undefined || roll === null) ? 0 : roll;
 		geoLocData = this.geoLocDataManager.newGeoLocationData("default");
-		geoLocData = ManagerUtils.calculateGeoLocationData(geographicCoord.longitude, geographicCoord.latitude, geographicCoord.altitude, heading, pitch, roll, geoLocData);
 	}
+
+	heading = (heading === undefined || heading === null) ? 0 : heading;
+	pitch = (pitch === undefined || pitch === null) ? 0 : pitch;
+	roll = (roll === undefined || roll === null) ? 0 : roll;
+
+	geoLocData = ManagerUtils.calculateGeoLocationData(geographicCoord.longitude, geographicCoord.latitude, geographicCoord.altitude, heading, pitch, roll, geoLocData);
 };
 
 /**

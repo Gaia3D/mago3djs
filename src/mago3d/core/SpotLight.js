@@ -38,27 +38,31 @@ var SpotLight = function(options)
 	{ this.geoLocDataManager = new GeoLocationDataManager(); }
 	this.directionLC = new Point3D(0.0, 0.0, -1.0); // this is a constant value.
 	this.directionWC;
+	this.localWC;
 	this.cubeMapFBO = undefined;
 
 	this._maxSpotDot; // dot(lightDir, spotDir).
 	this.cullingUpdatedTime;
 	
+	this.options = options ? options : {};
 
-	if(options)
-	{
-		if(options.hotspotDeg)
-		this.hotspotDeg = options.hotspotDeg;
-
-		if(options.falloffDeg)
-		this.falloffDeg = options.falloffDeg;
-
-		if(options.hotDistance)
-		this.hotDistance = options.hotDistance;
-
-		if(options.falloffDistance)
-		this.falloffDistance = options.falloffDistance;
+	if(this.options.localWC) {
+		this.localWC = this.options.localWC;
 	}
 
+	if(this.options.hotspotDeg)
+	this.hotspotDeg = this.options.hotspotDeg;
+
+	if(this.options.falloffDeg)
+	this.falloffDeg = this.options.falloffDeg;
+
+	if(this.options.hotDistance)
+	this.hotDistance = this.options.hotDistance;
+
+	if(this.options.falloffDistance)
+	this.falloffDistance = this.options.falloffDistance;
+	
+	//this.attributes.heightReference = HeightReference.CLAMP_TO_GROUND;
 	this.setObjectType(MagoRenderable.OBJECT_TYPE.LIGHTSOURCE);
 };
 
@@ -139,17 +143,25 @@ SpotLight.prototype.getLightParameters = function()
 {
 	if(!this.lightParameters)
 	{
-		// "lightParameters" is an array[4].
-		// 0= lightDist, 1= lightFalloffDist, 2= maxSpotDot, 3= falloffSpotDot.
-		this.lightParameters = new Float32Array(4);
-
-		this.lightParameters[0] = this.getLightHotDistance();
-		this.lightParameters[1] = this.getLightFallOffDistance(); // provisional.
-		this.lightParameters[2] = this.getMaxSpotDot();
-		this.lightParameters[3] = this.getFalloffSpotDot();
+		this.setLightParameters();
 	}
 
 	return this.lightParameters;
+};
+
+/**
+ * set the light parameter.
+ */
+SpotLight.prototype.setLightParameters = function()
+{
+	// "lightParameters" is an array[4].
+	// 0= lightDist, 1= lightFalloffDist, 2= maxSpotDot, 3= falloffSpotDot.
+	this.lightParameters = new Float32Array(4);
+
+	this.lightParameters[0] = this.getLightHotDistance();
+	this.lightParameters[1] = this.getLightFallOffDistance(); // provisional.
+	this.lightParameters[2] = this.getMaxSpotDot();
+	this.lightParameters[3] = this.getFalloffSpotDot();
 };
 
 /**
@@ -176,11 +188,18 @@ SpotLight.prototype.getMaxSpotDot = function()
 	if(!this._maxSpotDot)
 	{
 		// calculate the dotProd of lightDir and the max-spotLightDir.
-		this._maxSpotDot = Math.cos(this.hotspotDeg * Math.PI/180.0);
+		this._setMaxSpotDot();
 	}
 
 	return this._maxSpotDot;
 };
+
+/**
+ * set the maxSpotDot.
+ */
+SpotLight.prototype._setMaxSpotDot = function() {
+	this._maxSpotDot = Math.cos(this.hotspotDeg * Math.PI/180.0);
+}
 
 /**
  * Returns the lightDistance.
@@ -190,11 +209,59 @@ SpotLight.prototype.getFalloffSpotDot = function()
 	if(!this._falloffSpotDot)
 	{
 		// calculate the dotProd of lightDir and the max-spotLightDir.
-		this._falloffSpotDot = Math.cos(this.falloffDeg * Math.PI/180.0);
+		this._setFalloffSpotDot();
 	}
 
 	return this._falloffSpotDot;
 };
+
+/**
+ * set the falloffSpotDot.
+ */
+SpotLight.prototype._setFalloffSpotDot = function() {
+	this._falloffSpotDot = Math.cos(this.falloffDeg * Math.PI/180.0);
+}
+
+
+/**
+ * set the hotDistance.
+ * @param {number}
+ */
+SpotLight.prototype.setHotDistance = function(hotDistance) {
+	this.hotDistance = hotDistance;
+	this.setLightParameters();
+}
+
+/**
+ * set the falloffDistance.
+ * @param {number}
+ */
+SpotLight.prototype.setFalloffDistance = function(falloffDistance) {
+	this.falloffDistance = falloffDistance;
+	this.setDirty(true);
+	this.setLightParameters();
+}
+
+/**
+ * set the hotspotDeg.
+ * @param {number}
+ */
+SpotLight.prototype.setHotspotDeg = function(hotspotDeg) {
+	this.hotspotDeg = hotspotDeg;
+	this._setMaxSpotDot();
+	this.setLightParameters();
+}
+
+/**
+ * set the falloffDeg.
+ * @param {number}
+ */
+SpotLight.prototype.setFalloffDeg = function(falloffDeg) {
+	this.falloffDeg = falloffDeg;
+	this._setFalloffSpotDot();
+	this.setDirty(true);
+	this.setLightParameters();
+}
 
 /**
  * Makes a objectsArray influenced by this light.

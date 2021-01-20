@@ -2535,6 +2535,9 @@ Renderer.prototype.renderLightBuffer = function(lightSourcesArray)
 		gl.uniform3fv(currentShader.uLightColorAndBrightness_loc, [light.color.r,light.color.g,light.color.b] ); //.
 		gl.uniform1f(currentShader.uLightIntensity_loc, light.intensity);
 		var lightParams = light.getLightParameters(); //uLightParameters[4]; // 0= lightDist, 1= lightFalloffDist, 2= maxSpotDot, 3= falloffSpotDot.
+
+		if(!lightParams) continue;
+
 		gl.uniform1fv(currentShader.uLightParameters_loc, lightParams);
 
 		gl.activeTexture(gl.TEXTURE2);
