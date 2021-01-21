@@ -429,6 +429,10 @@ void main()
 		vec4 finalColor = vec4(albedo.r * occlInv * diffuseLight3.x, 
 							albedo.g * occlInv * diffuseLight3.y, 
 							albedo.b * occlInv * diffuseLight3.z, albedo.a);
+
+		// If exist lights, then apply lightFog.***
+		//vec4 lightFog4 = vec4(1.0, 1.0, 1.0, lightFogAprox);
+		//finalColor = mix(finalColor, lightFog4, lightFogAprox);
 		gl_FragColor = finalColor;
 
 

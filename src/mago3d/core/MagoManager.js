@@ -1753,8 +1753,26 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	if (this.isCesiumGlobe())
 	{
 		scene._context._currentFramebuffer._bind();
+		// Deactive depth & normals for transparent pass.
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // depthTex.
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // normalTex.
+		//gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0); // albedoTex.
+		this.extbuffers.drawBuffersWEBGL([
+			this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
+			this.extbuffers.NONE, // gl_FragData[1] - depthTex
+			this.extbuffers.NONE, // gl_FragData[2] - normalTex
+			this.extbuffers.COLOR_ATTACHMENT3_WEBGL, // gl_FragData[3] - albedoTex
+			]);
+	}
+
+	renderType = 1;
+	this.renderType = 1;
+	this.renderer.renderGeometryBufferTransparents(gl, renderType, this.visibleObjControlerNodes);
+
+	if (this.isCesiumGlobe())
+	{
+		scene._context._currentFramebuffer._bind();
 		// unbind mago colorTextures:
-		
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // depthTex.
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // normalTex.
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0); // albedoTex.
@@ -1765,10 +1783,6 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 			this.extbuffers.NONE, // gl_FragData[3]
 			]);
 	}
-
-	renderType = 1;
-	this.renderType = 1;
-	this.renderer.renderGeometryBufferTransparents(gl, renderType, this.visibleObjControlerNodes);
 
 	// DEBUG.Render fisically lights sources.*************************************************************************
 	//this.renderer.renderNativeLightSources(renderType, this.visibleObjControlerNodes) ; // debug component.
@@ -1879,7 +1893,9 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		}
 
 		// Final render output.
-		this.renderer.renderScreenQuadSsao(gl);
+		this.renderer.renderScreenQuad(gl); // 1rst screenQuad.
+		//this.renderer.renderScreenQuad2(gl); // 2nd screenQuad. (developing).
+
 		this.renderCluster();
 
 		if (this.selectionManager)
@@ -2235,7 +2251,7 @@ MagoManager.prototype.doRenderMagoWorld = function(frustumVolumenObject)
 		//gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		//gl.clearStencil(0); // provisionally here.***
 
-		this.renderer.renderScreenQuadSsao(gl);
+		this.renderer.renderScreenQuad(gl);
 		//this.renderCluster();
 
 		
@@ -6438,14 +6454,30 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
 	shader.uFrustumIdx_loc = gl.getUniformLocation(shader.program, "uFrustumIdx");
 
+	// 0.2) ScreenQuad shader.***********************************************************************************
+	var shaderName = "screenQuad2";
+	var ssao_vs_source = ShaderSource.ScreenQuadVS;
+	var ssao_fs_source = ShaderSource.ScreenQuad2FS;
+	var shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
+	shader.lightFogTex_loc = gl.getUniformLocation(shader.program, "lightFogTex");
+	this.postFxShadersManager.useProgram(shader);
+	gl.uniform1i(shader.lightFogTex_loc, 0);
+
+	shader.uNearFarArray_loc = gl.getUniformLocation(shader.program, "uNearFarArray");
+	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
+	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
+	shader.uSceneDayNightLightingFactor_loc = gl.getUniformLocation(shader.program, "uSceneDayNightLightingFactor");
+
 	// 1) ModelReferences ssaoShader.******************************************************************************
 	var shaderName = "modelRefSsao";
 	var ssao_vs_source = ShaderSource.ModelRefSsaoVS;
 	var ssao_fs_source = ShaderSource.ModelRefSsaoFS;
 	ssao_fs_source = ssao_fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
+	ssao_fs_source = ssao_fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
 	var shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
 	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
 	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
+	shader.uFrustumIdx_loc = gl.getUniformLocation(shader.program, "uFrustumIdx");
 
 	// 1.1) ModelReferences depthShader.******************************************************************************
 	var shaderName = "modelRefDepth";

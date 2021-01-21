@@ -7,6 +7,11 @@
 #extension GL_EXT_frag_depth : enable
 #endif
 
+#define %USE_MULTI_RENDER_TARGET%
+#ifdef USE_MULTI_RENDER_TARGET
+#extension GL_EXT_draw_buffers : require
+#endif
+
 
 uniform sampler2D depthTex;
 uniform sampler2D noiseTex;  
@@ -68,6 +73,8 @@ uniform int clippingConvexPolygon2dPointsIndices[64];
 uniform vec4 limitationInfringedColor4;
 uniform vec2 limitationHeights;
 
+uniform int uFrustumIdx;
+
 varying vec3 vNormal;
 varying vec4 vColor4; // color from attributes
 varying vec2 vTexCoord;   
@@ -80,6 +87,7 @@ varying vec4 vPosRelToLight;
 varying vec3 vLightDir; 
 varying vec3 vNormalWC;
 varying float currSunIdx; 
+varying float vDepth;
 
 varying float flogz;
 varying float Fcoef_half;
@@ -669,8 +677,36 @@ void main()
 	
 	finalColor *= colorMultiplier;
 	//finalColor = vec4(linearDepth, linearDepth, linearDepth, 1.0); // test to render depth color coded.***
+	vec4 albedo4 = finalColor;
     gl_FragData[0] = finalColor; 
 
+	#ifdef USE_MULTI_RENDER_TARGET
+	//if(bUseMultiRenderTarget)
+	{
+		// save depth, normal, albedo.
+		float depthAux = vDepth;
+		gl_FragData[1] = packDepth(depthAux); 
+
+		// When render with cull_face disabled, must correct the faces normal.
+		float frustumIdx = 1.0;
+		if(uFrustumIdx == 0)
+		frustumIdx = 0.005;
+		else if(uFrustumIdx == 1)
+		frustumIdx = 0.015;
+		else if(uFrustumIdx == 2)
+		frustumIdx = 0.025;
+		else if(uFrustumIdx == 3)
+		frustumIdx = 0.035;
+
+		vec3 normal = vNormal;
+
+		vec3 encodedNormal = encodeNormal(normal);
+		gl_FragData[2] = vec4(encodedNormal, frustumIdx); // save normal.***
+
+		// albedo.
+		gl_FragData[3] = albedo4; 
+	}
+	#endif
 
 
 	#ifdef USE_LOGARITHMIC_DEPTH

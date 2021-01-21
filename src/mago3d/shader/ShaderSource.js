@@ -2347,6 +2347,9 @@ uniform vec2 uNearFarArray[4];\n\
 varying vec3 vLightDirCC;\n\
 varying vec3 vLightPosCC; \n\
 varying vec3 vertexPosLC;\n\
+varying vec4 vertexPosCC;\n\
+varying float vDotProdLight;\n\
+varying vec3 vCrossProdLight;\n\
 \n\
 varying float flogz;\n\
 varying float Fcoef_half;\n\
@@ -2600,11 +2603,80 @@ void main()\n\
 		float lightHotDistance = uLightParameters[0];\n\
 		float lightFalloffLightDist = uLightParameters[1];\n\
 		float factorByDist = 1.0;\n\
+\n\
+		// Calculate the lightFog intensity (case spotLight).*****************************************\n\
+		// Considere 2 types of distance.\n\
+		float distToLight2d = 0.0;\n\
+		float distToLightDir2d = 0.0;\n\
+		float lightFogIntensity = 0.0;\n\
+\n\
+		//vec3 camDirToLightCC = normalize(vLightPosCC);\n\
+		//float dotCamdiLightDir = dot(camDirToLightCC, vLightDirCC);\n\
+\n\
+		\n\
+		vec3 vectorToVertexCC = vertexPosCC.xyz - vLightPosCC;\n\
+		distToLight2d = length(vectorToVertexCC.xy);\n\
+		float distToLight3d = length(vectorToVertexCC);\n\
+\n\
+		vec3 dirToVertexCC = normalize(vectorToVertexCC);\n\
+		\n\
+		// Do a 2D dotProd.\n\
+		float dotProd2d = dot(dirToVertexCC.xy, vLightDirCC.xy);\n\
+		float lightFogIntensity_3d = 1.0 - length(vectorToVertexCC)/lightFalloffLightDist;\n\
+		float lightFogIntensity_2d = 1.0 - (distToLight2d)/lightFalloffLightDist;\n\
+\n\
+		float diffZ = vLightPosCC.z - vertexPosCC.z;\n\
+\n\
+		\n\
+		lightFogIntensity = lightFogIntensity_2d;\n\
+		lightFogIntensity *= 0.4;\n\
+\n\
+		// Calculate how centered is the pixel relative to lightDir, so calculate the crossProduct of \"vertexPosLC\" to \"vLightDirCC\".\n\
+			vec3 crossProd = cross( dirToVertexCC, vLightDirCC );\n\
+			vec3 lightToVertexCC = normalize(vertexPosCC.xyz);\n\
+			float dotLightDir = dot(normalize(crossProd), lightToVertexCC);\n\
+\n\
+			float intensityFactor = 1.0 - abs(dotLightDir);\n\
+			lightFogIntensity *= intensityFactor;\n\
+			\n\
+		/*\n\
+		if(dotProd2d > 0.0)\n\
+		{\n\
+			// Calculate how centered is the pixel relative to lightDir, so calculate the crossProduct of \"vertexPosLC\" to \"vLightDirCC\".\n\
+			vec3 crossProd = cross( dirToVertexCC, vLightDirCC );\n\
+			vec3 lightToVertexCC = normalize(vertexPosCC.xyz);\n\
+			float dotLightDir = dot(normalize(crossProd), lightToVertexCC);\n\
+\n\
+			float intensityFactor = 1.0 - abs(dotLightDir);\n\
+			lightFogIntensity *= intensityFactor;\n\
+			\n\
+			\n\
+			//vec3 dirToVertexCC2d = vec3(vectorToVertexCC.x, vectorToVertexCC.y, 0.0);\n\
+			//vec3 lightDirCC2d = normalize(vec3(vLightDirCC.x, vLightDirCC.y, 0.0));\n\
+			////vec3 crossProd = cross( dirToVertexCC2d, lightDirCC2d );\n\
+			//float intensityFactor = dot(dirToVertexCC2d, lightDirCC2d);\n\
+			//lightFogIntensity *= intensityFactor;\n\
+		}\n\
+		else\n\
+		{\n\
+			\n\
+			vec3 crossProd = cross( dirToVertexCC, vLightDirCC );\n\
+			vec3 lightToVertexCC = normalize(vertexPosCC.xyz);\n\
+			float dotLightDir = dot(normalize(crossProd), lightToVertexCC);\n\
+\n\
+			float intensityFactor = (1.0 - abs(dotLightDir))*(1.0+dotProd2d);\n\
+			lightFogIntensity *= intensityFactor;\n\
+			\n\
+		}\n\
+		*/\n\
+		//lightFogIntensity = 0.5;\n\
+		// End calculate the lightFog intensity (case spotLight).-------------------------------------\n\
+\n\
 		if(distToLight > lightFalloffLightDist)\n\
 		{\n\
 			// Apply only lightFog.***\n\
 			// in final screenQuadPass, use posLC to determine the light-fog.\n\
-			gl_FragData[2] = vec4(vertexPosLC, 1.0); // save fog.***\n\
+			gl_FragData[2] = vec4(lightFogIntensity, lightFogIntensity, lightFogIntensity, 1.0); // save fog.***\n\
 			return;\n\
 			//discard;\n\
 		}\n\
@@ -2618,7 +2690,8 @@ void main()\n\
 \n\
 		if(diffuseDot < 0.0)\n\
 		{\n\
-			discard;\n\
+			gl_FragData[2] = vec4(lightFogIntensity, lightFogIntensity, lightFogIntensity, 1.0); // save fog.***\n\
+			return;\n\
 		}\n\
 \n\
 		float hotSpotDot = uLightParameters[2];\n\
@@ -2628,7 +2701,8 @@ void main()\n\
 		float factorBySpot = 1.0;\n\
 		if(spotDot < falloffSpotDot)\n\
 		{\n\
-			discard;\n\
+			gl_FragData[2] = vec4(lightFogIntensity, lightFogIntensity, lightFogIntensity, 1.0); // save fog.***\n\
+			return;\n\
 		}\n\
 		else if(spotDot < hotSpotDot)\n\
 		{\n\
@@ -2637,6 +2711,8 @@ void main()\n\
 \n\
 		if(bApplyShadows)\n\
 		{\n\
+			gl_FragData[2] = vec4(lightFogIntensity, lightFogIntensity, lightFogIntensity, 1.0); // save fog.***\n\
+\n\
 			// now, check light's depthCubeMap.\n\
 			// 1rst, transform \"lightDirToPointCC\" to \"lightDirToPointWC\".\n\
 			// 2nd, transform \"lightDirToPointWC\" to \"lightDirToPointLC\" ( lightCoord );\n\
@@ -2657,11 +2733,11 @@ void main()\n\
 			if(distToLight > depthFromLight + depthTolerance)\n\
 			{\n\
 				// we are in shadow, so do not lighting.\n\
-				discard;\n\
+				return;\n\
 			}\n\
 		}\n\
 		//float fogIntensity = length(vertexPosLC)/lightHotDistance;\n\
-		float atenuation = 0.3; // intern variable to adjust light intensity.\n\
+		float atenuation = 0.4; // intern variable to adjust light intensity.\n\
 		diffuseDot *= factorByDist;\n\
 		spotDot *= factorBySpot;\n\
 		float finalFactor = uLightIntensity * diffuseDot * spotDot * atenuation;\n\
@@ -2673,7 +2749,7 @@ void main()\n\
 		gl_FragData[1] = vec4(0.0, 0.0, 0.0, 1.0); // save specular.***\n\
 \n\
 		// Light fog.\n\
-		gl_FragData[2] = vec4(1.0, 1.0, 1.0, 1.0); // save fog.***\n\
+		gl_FragData[2] = vec4(lightFogIntensity, lightFogIntensity, lightFogIntensity, 1.0); // save fog.***\n\
 \n\
 	}\n\
 	#endif\n\
@@ -2692,6 +2768,7 @@ ShaderSource.LBufferVS = "\n\
 	attribute vec2 texCoord; // delete this. lights has no texCoords.\n\
 	attribute vec4 color4;\n\
 	\n\
+	uniform mat4 projectionMatrix;\n\
 	uniform mat4 buildingRotMatrix; \n\
 	uniform mat4 modelViewMatrixRelToEye; \n\
 	uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
@@ -2720,11 +2797,14 @@ ShaderSource.LBufferVS = "\n\
 	varying vec3 vNormal;\n\
 	varying vec2 vTexCoord;  \n\
 	varying vec3 vertexPosLC;\n\
+	varying vec4 vertexPosCC;\n\
 	varying float applySpecLighting;\n\
 	varying vec4 vColor4; // color from attributes\n\
 \n\
 	varying vec3 vLightDirCC; \n\
 	varying vec3 vLightPosCC; \n\
+	varying float vDotProdLight;\n\
+	varying vec3 vCrossProdLight;\n\
 \n\
   \n\
 	varying float flogz;\n\
@@ -2763,8 +2843,8 @@ ShaderSource.LBufferVS = "\n\
 		// calculate the light position CC.*****************************************\n\
 		vec3 lightPosHighDiff = buildingPosHIGH - encodedCameraPositionMCHigh;\n\
 		vec3 lightPosLowDiff = buildingPosLOW - encodedCameraPositionMCLow;\n\
-		vec4 lightPosCC = vec4(lightPosHighDiff + lightPosLowDiff, 1.0);\n\
-		vec4 lightPosCC_aux = modelViewMatrixRelToEye * lightPosCC;\n\
+		vec4 lightPosWC = vec4(lightPosHighDiff + lightPosLowDiff, 1.0);\n\
+		vec4 lightPosCC_aux = modelViewMatrixRelToEye * lightPosWC;\n\
 		vLightPosCC = lightPosCC_aux.xyz;\n\
 		//--------------------------------------------------------------------------\n\
 \n\
@@ -2780,7 +2860,22 @@ ShaderSource.LBufferVS = "\n\
 		else\n\
 			applySpecLighting = -1.0;\n\
 \n\
-        gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+		vec4 posPP = ModelViewProjectionMatrixRelToEye * pos4;\n\
+        gl_Position = posPP; // posProjected.\n\
+		vertexPosCC = modelViewMatrixRelToEye * pos4;\n\
+		\n\
+		// Calculate the lightFog intensity (case spotLight).*****************************************\n\
+		/*\n\
+		vec3 vectorToVertexCC = vertexPosCC.xyz - vLightPosCC;\n\
+		vec3 dirToVertexCCProjected = normalize(vectorToVertexCC);\n\
+		dirToVertexCCProjected.z = 0.0;\n\
+		vec3 lightDirCCProjected = vec3(vLightDirCC.x, vLightDirCC.y, 0.0);\n\
+		vDotProdLight = dot(dirToVertexCCProjected, lightDirCCProjected);\n\
+		// Calculate how centered is the pixel relative to lightDir, so calculate the crossProduct of \"vertexPosLC\" to \"vLightDirCC\".\n\
+		vCrossProdLight = cross( dirToVertexCCProjected, lightDirCCProjected );\n\
+		*/\n\
+\n\
+		// End calculate the lightFog intensity (case spotLight).-------------------------------------\n\
 \n\
 		if(bUseLogarithmicDepth)\n\
 		{\n\
@@ -2806,6 +2901,11 @@ ShaderSource.ModelRefSsaoFS = "#ifdef GL_ES\n\
 #define %USE_LOGARITHMIC_DEPTH%\n\
 #ifdef USE_LOGARITHMIC_DEPTH\n\
 #extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
 #endif\n\
 \n\
 \n\
@@ -2869,6 +2969,8 @@ uniform int clippingConvexPolygon2dPointsIndices[64];\n\
 uniform vec4 limitationInfringedColor4;\n\
 uniform vec2 limitationHeights;\n\
 \n\
+uniform int uFrustumIdx;\n\
+\n\
 varying vec3 vNormal;\n\
 varying vec4 vColor4; // color from attributes\n\
 varying vec2 vTexCoord;   \n\
@@ -2881,6 +2983,7 @@ varying vec4 vPosRelToLight; \n\
 varying vec3 vLightDir; \n\
 varying vec3 vNormalWC;\n\
 varying float currSunIdx; \n\
+varying float vDepth;\n\
 \n\
 varying float flogz;\n\
 varying float Fcoef_half;\n\
@@ -3470,8 +3573,36 @@ void main()\n\
 	\n\
 	finalColor *= colorMultiplier;\n\
 	//finalColor = vec4(linearDepth, linearDepth, linearDepth, 1.0); // test to render depth color coded.***\n\
+	vec4 albedo4 = finalColor;\n\
     gl_FragData[0] = finalColor; \n\
 \n\
+	#ifdef USE_MULTI_RENDER_TARGET\n\
+	//if(bUseMultiRenderTarget)\n\
+	{\n\
+		// save depth, normal, albedo.\n\
+		float depthAux = vDepth;\n\
+		gl_FragData[1] = packDepth(depthAux); \n\
+\n\
+		// When render with cull_face disabled, must correct the faces normal.\n\
+		float frustumIdx = 1.0;\n\
+		if(uFrustumIdx == 0)\n\
+		frustumIdx = 0.005;\n\
+		else if(uFrustumIdx == 1)\n\
+		frustumIdx = 0.015;\n\
+		else if(uFrustumIdx == 2)\n\
+		frustumIdx = 0.025;\n\
+		else if(uFrustumIdx == 3)\n\
+		frustumIdx = 0.035;\n\
+\n\
+		vec3 normal = vNormal;\n\
+\n\
+		vec3 encodedNormal = encodeNormal(normal);\n\
+		gl_FragData[2] = vec4(encodedNormal, frustumIdx); // save normal.***\n\
+\n\
+		// albedo.\n\
+		gl_FragData[3] = albedo4; \n\
+	}\n\
+	#endif\n\
 \n\
 \n\
 	#ifdef USE_LOGARITHMIC_DEPTH\n\
@@ -3533,6 +3664,7 @@ ShaderSource.ModelRefSsaoVS = "\n\
 	varying float discardFrag;\n\
 	varying float flogz;\n\
 	varying float Fcoef_half;\n\
+	varying float vDepth;\n\
 \n\
 	\n\
 	void main()\n\
@@ -3630,6 +3762,7 @@ ShaderSource.ModelRefSsaoVS = "\n\
         gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 		vec4 orthoPos = modelViewMatrixRelToEye * pos4;\n\
 		vertexPos = orthoPos.xyz;\n\
+		vDepth = -orthoPos.z/far;\n\
 \n\
 		if(bUseLogarithmicDepth)\n\
 		{\n\
@@ -5418,6 +5551,138 @@ void main()\n\
 	return;\n\
 \n\
 }";
+ShaderSource.ScreenQuad2FS = "#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+#define M_PI 3.1415926535897932384626433832795\n\
+\n\
+uniform sampler2D lightFogTex;\n\
+\n\
+\n\
+\n\
+uniform float near;\n\
+uniform float far; \n\
+uniform float tangentOfHalfFovy;\n\
+uniform float aspectRatio;    \n\
+\n\
+\n\
+uniform float screenWidth;    \n\
+uniform float screenHeight;  \n\
+uniform vec2 uNearFarArray[4];\n\
+uniform bool bUseLogarithmicDepth;\n\
+uniform float uFCoef_logDepth;\n\
+uniform float uSceneDayNightLightingFactor; // day -> 1.0; night -> 0.0\n\
+\n\
+\n\
+float unpackDepth(vec4 packedDepth)\n\
+{\n\
+	// See Aras Pranckevičius' post Encoding Floats to RGBA\n\
+	// http://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/\n\
+	//vec4 packDepth( float v ) // function to packDepth.***\n\
+	//{\n\
+	//	vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+	//	enc = fract(enc);\n\
+	//	enc -= enc.yzww * vec4(1.0/255.0,1.0/255.0,1.0/255.0,0.0);\n\
+	//	return enc;\n\
+	//}\n\
+	return dot(packedDepth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+}\n\
+\n\
+vec4 decodeNormal(in vec4 normal)\n\
+{\n\
+	return vec4(normal.xyz * 2.0 - 1.0, normal.w);\n\
+}\n\
+\n\
+\n\
+vec3 getViewRay(vec2 tc)\n\
+{\n\
+	float hfar = 2.0 * tangentOfHalfFovy * far;\n\
+    float wfar = hfar * aspectRatio;    \n\
+    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    \n\
+	\n\
+    return ray;                      \n\
+} \n\
+\n\
+vec3 getViewRay(vec2 tc, in float relFar)\n\
+{\n\
+	float hfar = 2.0 * tangentOfHalfFovy * relFar;\n\
+    float wfar = hfar * aspectRatio;    \n\
+    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -relFar);    \n\
+	\n\
+    return ray;                      \n\
+}\n\
+\n\
+\n\
+int getRealFrustumIdx(in int estimatedFrustumIdx, inout int dataType)\n\
+{\n\
+    // Check the type of the data.******************\n\
+    // frustumIdx 0 .. 3 -> general geometry data.\n\
+    // frustumIdx 10 .. 13 -> tinTerrain data.\n\
+    // frustumIdx 20 .. 23 -> points cloud data.\n\
+    //----------------------------------------------\n\
+    int realFrustumIdx = -1;\n\
+    \n\
+     if(estimatedFrustumIdx >= 10)\n\
+    {\n\
+        estimatedFrustumIdx -= 10;\n\
+        if(estimatedFrustumIdx >= 10)\n\
+        {\n\
+            // points cloud data.\n\
+            estimatedFrustumIdx -= 10;\n\
+            dataType = 2;\n\
+        }\n\
+        else\n\
+        {\n\
+            // tinTerrain data.\n\
+            dataType = 1;\n\
+        }\n\
+    }\n\
+    else\n\
+    {\n\
+        // general geomtry.\n\
+        dataType = 0;\n\
+    }\n\
+\n\
+    realFrustumIdx = estimatedFrustumIdx;\n\
+    return realFrustumIdx;\n\
+}\n\
+\n\
+vec2 getNearFar_byFrustumIdx(in int frustumIdx)\n\
+{\n\
+    vec2 nearFar;\n\
+    if(frustumIdx == 0)\n\
+    {\n\
+        nearFar = uNearFarArray[0];\n\
+    }\n\
+    else if(frustumIdx == 1)\n\
+    {\n\
+        nearFar = uNearFarArray[1];\n\
+    }\n\
+    else if(frustumIdx == 2)\n\
+    {\n\
+        nearFar = uNearFarArray[2];\n\
+    }\n\
+    else if(frustumIdx == 3)\n\
+    {\n\
+        nearFar = uNearFarArray[3];\n\
+    }\n\
+\n\
+    return nearFar;\n\
+}\n\
+\n\
+\n\
+\n\
+void main()\n\
+{\n\
+	vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
+	vec4 lightFog4 = texture2D(lightFogTex, screenPos);\n\
+	float fogIntensity = lightFog4.x;\n\
+	if(fogIntensity > 0.9)\n\
+	fogIntensity = 0.9;\n\
+\n\
+	gl_FragColor = vec4(1.0, 1.0, 1.0, fogIntensity*fogIntensity);\n\
+}";
 ShaderSource.ScreenQuadFS = "#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\
@@ -5849,6 +6114,10 @@ void main()\n\
 		vec4 finalColor = vec4(albedo.r * occlInv * diffuseLight3.x, \n\
 							albedo.g * occlInv * diffuseLight3.y, \n\
 							albedo.b * occlInv * diffuseLight3.z, albedo.a);\n\
+\n\
+		// If exist lights, then apply lightFog.***\n\
+		//vec4 lightFog4 = vec4(1.0, 1.0, 1.0, lightFogAprox);\n\
+		//finalColor = mix(finalColor, lightFog4, lightFogAprox);\n\
 		gl_FragColor = finalColor;\n\
 \n\
 \n\

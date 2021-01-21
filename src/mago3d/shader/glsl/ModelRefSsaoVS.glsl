@@ -50,6 +50,7 @@
 	varying float discardFrag;
 	varying float flogz;
 	varying float Fcoef_half;
+	varying float vDepth;
 
 	
 	void main()
@@ -147,6 +148,7 @@
         gl_Position = ModelViewProjectionMatrixRelToEye * pos4;
 		vec4 orthoPos = modelViewMatrixRelToEye * pos4;
 		vertexPos = orthoPos.xyz;
+		vDepth = -orthoPos.z/far;
 
 		if(bUseLogarithmicDepth)
 		{

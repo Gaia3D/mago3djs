@@ -4,6 +4,7 @@
 	attribute vec2 texCoord; // delete this. lights has no texCoords.
 	attribute vec4 color4;
 	
+	uniform mat4 projectionMatrix;
 	uniform mat4 buildingRotMatrix; 
 	uniform mat4 modelViewMatrixRelToEye; 
 	uniform mat4 ModelViewProjectionMatrixRelToEye;
@@ -32,11 +33,14 @@
 	varying vec3 vNormal;
 	varying vec2 vTexCoord;  
 	varying vec3 vertexPosLC;
+	varying vec4 vertexPosCC;
 	varying float applySpecLighting;
 	varying vec4 vColor4; // color from attributes
 
 	varying vec3 vLightDirCC; 
 	varying vec3 vLightPosCC; 
+	varying float vDotProdLight;
+	varying vec3 vCrossProdLight;
 
   
 	varying float flogz;
@@ -75,8 +79,8 @@
 		// calculate the light position CC.*****************************************
 		vec3 lightPosHighDiff = buildingPosHIGH - encodedCameraPositionMCHigh;
 		vec3 lightPosLowDiff = buildingPosLOW - encodedCameraPositionMCLow;
-		vec4 lightPosCC = vec4(lightPosHighDiff + lightPosLowDiff, 1.0);
-		vec4 lightPosCC_aux = modelViewMatrixRelToEye * lightPosCC;
+		vec4 lightPosWC = vec4(lightPosHighDiff + lightPosLowDiff, 1.0);
+		vec4 lightPosCC_aux = modelViewMatrixRelToEye * lightPosWC;
 		vLightPosCC = lightPosCC_aux.xyz;
 		//--------------------------------------------------------------------------
 
@@ -92,7 +96,22 @@
 		else
 			applySpecLighting = -1.0;
 
-        gl_Position = ModelViewProjectionMatrixRelToEye * pos4;
+		vec4 posPP = ModelViewProjectionMatrixRelToEye * pos4;
+        gl_Position = posPP; // posProjected.
+		vertexPosCC = modelViewMatrixRelToEye * pos4;
+		
+		// Calculate the lightFog intensity (case spotLight).*****************************************
+		/*
+		vec3 vectorToVertexCC = vertexPosCC.xyz - vLightPosCC;
+		vec3 dirToVertexCCProjected = normalize(vectorToVertexCC);
+		dirToVertexCCProjected.z = 0.0;
+		vec3 lightDirCCProjected = vec3(vLightDirCC.x, vLightDirCC.y, 0.0);
+		vDotProdLight = dot(dirToVertexCCProjected, lightDirCCProjected);
+		// Calculate how centered is the pixel relative to lightDir, so calculate the crossProduct of "vertexPosLC" to "vLightDirCC".
+		vCrossProdLight = cross( dirToVertexCCProjected, lightDirCCProjected );
+		*/
+
+		// End calculate the lightFog intensity (case spotLight).-------------------------------------
 
 		if(bUseLogarithmicDepth)
 		{
