@@ -56,7 +56,8 @@ uniform float diffuseReflectionCoef;
 uniform float specularReflectionCoef; 
 uniform bool bApplySsao;
 uniform bool bApplyShadow;
-uniform float externalAlpha;
+uniform float externalAlpha; // used by effects.
+uniform float uModelOpacity; // this is model's alpha.
 uniform vec4 colorMultiplier;
 uniform bool bUseLogarithmicDepth;
 
@@ -580,52 +581,7 @@ void main()
 
 	//if((textureColor.r < 0.5 && textureColor.b > 0.5) || textureColor.a < 1.0)
 
-	/*
-	if(applySpecLighting> 0.0)
-	{
-		vec3 L;
-		L = ray;// test.***
-		if(bApplyShadow)
-		{
-			L = vLightDir;// test.***
-			lambertian = max(dot(normal2, L), 0.0); // original.***
-			//lambertian = max(dot(vNormalWC, L), 0.0); // test.
-		}
-		else
-		{
-			//vec3 lightPos = vec3(1.0, 1.0, 1.0);
-			//L = normalize(lightPos - vertexPos);
-			//lambertian = max(dot(normal2, L), 0.0);
-			lambertian = 1.0;
-			lambertian = (scalarProd-4.0)/0.6;
-		}
-		
-		specular = 0.0;
-		if(lambertian > 0.0)
-		{
-			vec3 R = reflect(-L, normal2);      // Reflected light vector
-			vec3 V = normalize(-vertexPos); // Vector to viewer
-			
-			// Compute the specular term
-			float specAngle = max(dot(R, V), 0.0);
-			specular = pow(specAngle, shininessValue);
-			
-			if(specular > 1.0)
-			{
-				specular = 1.0;
-			}
-		}
-		
-		if(lambertian < 0.5)
-		{
-			lambertian = 0.5;
-		}
-
-	}
-	*/
-
 	lambertian = 1.0;
-	specular = 0.0;
 	
 	if(bApplyShadow)
 	{
@@ -659,24 +615,23 @@ void main()
 			}
 		}
 	}
-	
-	//vec3 ambientColorAux = vec3(textureColor.x*ambientColor.x, textureColor.y*ambientColor.y, textureColor.z*ambientColor.z); // original.***
-	vec3 ambientColorAux = vec3(textureColor.xyz);
-	float alfa = textureColor.w * externalAlpha;
 
-    vec4 finalColor;
-	if(applySpecLighting> 0.0)
-	{
-		finalColor = vec4((ambientReflectionCoef * ambientColorAux + 
-							diffuseReflectionCoef * lambertian * textureColor.xyz + 
-							specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion * shadow_occlusion * scalarProd, alfa); 
-	}
-	else{
-		finalColor = vec4((textureColor.xyz) * occlusion * shadow_occlusion * scalarProd, alfa);
-	}
 	
+	// New lighting.***********************************************************************************************
+	vec3 ambientColor = vec3(0.6);
+	vec3 directionalLightColor = vec3(0.9, 0.9, 0.9);
+	vec3 lightingDirection = normalize(vec3(0.6, 0.6, 0.6));
+	float directionalLightWeighting = max(dot(vNormal, lightingDirection), 0.0);
+	vec3 lightWeighting = ambientColor + directionalLightColor * directionalLightWeighting; // original.***
+	// End lighting.-------------------------------------------------------------------------------------------------
+	
+	
+	float alfa = textureColor.w * externalAlpha * uModelOpacity;
+    vec4 finalColor;
+	finalColor = vec4(textureColor.r, textureColor.g, textureColor.b, alfa);
+	finalColor *= vec4(lightWeighting, 1.0) ;
 	finalColor *= colorMultiplier;
-	//finalColor = vec4(linearDepth, linearDepth, linearDepth, 1.0); // test to render depth color coded.***
+
 	vec4 albedo4 = finalColor;
     gl_FragData[0] = finalColor; 
 

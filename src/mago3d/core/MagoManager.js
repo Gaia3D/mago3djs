@@ -613,6 +613,9 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 	var currentVisibleNodes = [].concat(visibleObjControlerNodes.currentVisibles0, 
 		visibleObjControlerNodes.currentVisibles2, 
 		visibleObjControlerNodes.currentVisibles3, 
+		visibleObjControlerNodes.currentVisibles0Transparents, 
+		visibleObjControlerNodes.currentVisibles2Transparents, 
+		visibleObjControlerNodes.currentVisibles3Transparents,
 		visibleObjControlerNodes.currentVisiblesAux,
 		visibleObjControlerNodes.currentVisiblesToPrepare);
 	for (var i=0, length = currentVisibleNodes.length; i<length; i++) 
@@ -1175,9 +1178,15 @@ MagoManager.prototype.loadAndPrepareData = function()
 
 	var node;
 	// lod 0 & lod 1.
-	this.checkPropertyFilters(this.visibleObjControlerNodes.currentVisibles0);
-	this.checkPropertyFilters(this.visibleObjControlerNodes.currentVisibles2);
-	this.checkPropertyFilters(this.visibleObjControlerNodes.currentVisibles3);
+	var visibles0 = this.visibleObjControlerNodes.getOpaquesTransparentsByLod(0);
+	var visibles2 = this.visibleObjControlerNodes.getOpaquesTransparentsByLod(2);
+	var visibles3 = this.visibleObjControlerNodes.getOpaquesTransparentsByLod(3);
+
+	this.checkPropertyFilters(visibles0);
+	this.checkPropertyFilters(visibles2);
+	this.checkPropertyFilters(visibles3);
+
+	// Lod0 opaques.***
 	var nodesCount = this.visibleObjControlerNodes.currentVisibles0.length;
 	for (var i=0; i<nodesCount; i++) 
 	{
@@ -1195,6 +1204,25 @@ MagoManager.prototype.loadAndPrepareData = function()
 			}
 		}
 	}
+
+	// Lod0 transparents.***
+	nodesCount = this.visibleObjControlerNodes.currentVisibles0Transparents.length;
+	for (var i=0; i<nodesCount; i++) 
+	{
+		node = this.visibleObjControlerNodes.currentVisibles0Transparents[i];
+		var attributes = node.data.attributes;
+		if (attributes.objectType === "basicF4d")
+		{
+			// lod0 일시 카메라에 들어오는 옥트리들을 추출
+			if (!this.getRenderablesDetailedNeoBuildingAsimetricVersion(gl, node, this.visibleObjControlerOctrees, 0))
+			{
+				// any octree is visible.
+				this.visibleObjControlerNodes.currentVisibles0Transparents.splice(i, 1);
+				i--;
+				nodesCount = this.visibleObjControlerNodes.currentVisibles0Transparents.length;
+			}
+		}
+	}
 	
 	this.prepareVisibleOctreesSortedByDistance(gl, this.visibleObjControlerOctrees); 
 	this.prepareVisibleOctreesSortedByDistanceLOD2(gl, this.visibleObjControlerOctrees.currentVisibles0); 
@@ -1205,6 +1233,7 @@ MagoManager.prototype.loadAndPrepareData = function()
 	// TODO : maxRequest count to settings
 	if (this.readerWriter.referencesList_requested < 5)
 	{
+		// Opaques.***
 		nodesCount = this.visibleObjControlerNodes.currentVisibles2.length;
 		for (var i=0; i<nodesCount; i++) 
 		{
@@ -1222,14 +1251,33 @@ MagoManager.prototype.loadAndPrepareData = function()
 			}
 		}
 
+		// Transparents.***
+		nodesCount = this.visibleObjControlerNodes.currentVisibles2Transparents.length;
+		for (var i=0; i<nodesCount; i++) 
+		{
+			node = this.visibleObjControlerNodes.currentVisibles2Transparents[i];
+			var attributes = node.data.attributes;
+			if (attributes.objectType === "basicF4d")
+			{
+				if (!this.getRenderablesDetailedNeoBuildingAsimetricVersion(gl, node, this.visibleObjControlerOctrees, 2))
+				{
+					// any octree is visible.
+					this.visibleObjControlerNodes.currentVisibles2Transparents.splice(i, 1);
+					i--;
+					nodesCount = this.visibleObjControlerNodes.currentVisibles2Transparents.length;
+				}
+			}
+		}
+
 		this.prepareVisibleOctreesSortedByDistanceLOD2(gl, this.visibleObjControlerOctrees.currentVisibles2); 
+
 	}
 	
 	// lod3, lod4, lod5.***
 	this.readerWriter.skinLegos_requested = 0;
-	this.prepareVisibleLowLodNodes(this.visibleObjControlerNodes.currentVisibles0);
-	this.prepareVisibleLowLodNodes(this.visibleObjControlerNodes.currentVisibles2);
-	this.prepareVisibleLowLodNodes(this.visibleObjControlerNodes.currentVisibles3);
+	this.prepareVisibleLowLodNodes(visibles0);
+	this.prepareVisibleLowLodNodes(visibles2);
+	this.prepareVisibleLowLodNodes(visibles3);
 	
 	// Init the pCloudPartitionsMother_requested.***
 	this.readerWriter.pCloudPartitionsMother_requested = 0;
@@ -1774,9 +1822,12 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	{
 		var bRenderLines = true;
 		//var currentVisiblesArray = visibleObjControlerNodes.currentVisibles0.concat(visibleObjControlerNodes.currentVisibles2,);
-		this.renderer.renderBoundingBoxesNodes(this.visibleObjControlerNodes.currentVisibles0, undefined, bRenderLines);
-		this.renderer.renderBoundingBoxesNodes(this.visibleObjControlerNodes.currentVisibles2, undefined, bRenderLines);
-		this.renderer.renderBoundingBoxesNodes(this.visibleObjControlerNodes.currentVisibles3, undefined, bRenderLines);
+		var visibles0 = this.visibleObjControlerNodes.getOpaquesTransparentsByLod(0);
+		var visibles2 = this.visibleObjControlerNodes.getOpaquesTransparentsByLod(2);
+		var visibles3 = this.visibleObjControlerNodes.getOpaquesTransparentsByLod(3);
+		this.renderer.renderBoundingBoxesNodes(visibles0, undefined, bRenderLines);
+		this.renderer.renderBoundingBoxesNodes(visibles2, undefined, bRenderLines);
+		this.renderer.renderBoundingBoxesNodes(visibles3, undefined, bRenderLines);
 		this.renderer.renderBoundingBoxesNodes(this.visibleObjControlerNodes.currentVisiblesAux, undefined, bRenderLines);
 	}
 
@@ -5999,6 +6050,9 @@ MagoManager.prototype.checkPropertyFilters = function(nodesArray)
 	{ return; }
 	
 	var nodesCount = nodesArray.length;
+	if(nodesCount === 0)
+	return;
+
 	var node;	
 	var projectId;
 	var propertyKey = this.propertyFilterSC.propertyKey;
@@ -6481,6 +6535,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
 	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
 	shader.uFrustumIdx_loc = gl.getUniformLocation(shader.program, "uFrustumIdx");
+	shader.uModelOpacity_loc = gl.getUniformLocation(shader.program, "uModelOpacity");
 
 	// 1.1) ModelReferences depthShader.******************************************************************************
 	var shaderName = "modelRefDepth";

@@ -100,9 +100,30 @@ VisibleObjectsController.prototype.clear = function()
 /**
  * Make all volumns visible
  */
+VisibleObjectsController.prototype.getOpaquesTransparentsByLod = function(lod) 
+{
+	if(lod === 0)
+	{
+		return [].concat(this.currentVisibles0, this.currentVisibles0Transparents);
+	}
+	else if(lod === 2)
+	{
+		return [].concat(this.currentVisibles2, this.currentVisibles2Transparents);
+	}
+	else if(lod === 3)
+	{
+		return [].concat(this.currentVisibles3, this.currentVisibles3Transparents);
+	}
+};
+
+/**
+ * Make all volumns visible
+ */
 VisibleObjectsController.prototype.getAllVisibles = function() 
 {
-	var resultVisiblesArray = [].concat(this.currentVisibles0, this.currentVisibles1, this.currentVisibles2, this.currentVisibles3, this.currentVisiblesAux, this.currentVisiblesPT10);
+	var resultVisiblesArray = [].concat(this.currentVisibles0, this.currentVisibles1, this.currentVisibles2, this.currentVisibles3,
+										this.currentVisibles0Transparents, this.currentVisibles1Transparents, this.currentVisibles2Transparents, this.currentVisibles3Transparents,
+										this.currentVisiblesAux, this.currentVisiblesPT10);
 	return resultVisiblesArray;
 };
 

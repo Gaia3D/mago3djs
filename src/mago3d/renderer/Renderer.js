@@ -99,6 +99,9 @@ Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, sh
 	// do render.
 	var node;
 	var nodesCount = visibleNodesArray.length;
+
+	if(nodesCount === 0)
+	return;
 	
 	var sceneState = magoManager.sceneState;
 	var bApplyShadow = sceneState.applySunShadows;
@@ -867,6 +870,10 @@ Renderer.prototype._renderDepthSunPointOfView = function(gl, visibleObjControler
 	this.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
 	this.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
 	this.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
+
+	this.renderNodes(gl, visibleObjControlerNodes.currentVisibles0Transparents, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
+	this.renderNodes(gl, visibleObjControlerNodes.currentVisibles2Transparents, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
+	this.renderNodes(gl, visibleObjControlerNodes.currentVisibles3Transparents, magoManager, currentShader, renderTexture, renderType, minSize, 0, refTMatrixIdxKey);
 	
 	// Mago native geometries.
 	var options = {
@@ -3080,7 +3087,10 @@ Renderer.prototype.renderGeometryBufferTransparents = function(gl, renderType, v
 			// after render native geometries, set current shader with "modelRefSsao" shader.
 			currentShader = magoManager.postFxShadersManager.getShader("modelRefSsao"); 
 			currentShader.useProgram();
+
+			// Init uniforms.
 			gl.uniform1i(currentShader.clippingType_loc, 0);
+			gl.uniform1f(currentShader.uModelOpacity_loc, 1.0);
 			
 			this.renderExcavationObjects(gl, currentShader, renderType, visibleObjControlerNodes);
 			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles0Transparents, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
@@ -3925,6 +3935,10 @@ Renderer.prototype.renderGeometryColorCoding = function(visibleObjControlerNodes
 			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles2, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles3, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
+
+			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles0Transparents, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
+			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles2Transparents, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
+			this.renderNodes(gl, visibleObjControlerNodes.currentVisibles3Transparents, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 		}
 		
 		// native objects.

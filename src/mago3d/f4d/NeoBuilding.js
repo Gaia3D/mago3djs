@@ -1666,7 +1666,6 @@ NeoBuilding.prototype.renderCollisionCheckSpheres = function(magoManager, shader
 NeoBuilding.prototype.render = function(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord, currentLod) 
 {
 	var gl = magoManager.sceneState.gl;
-	//gl.uniform1f(shader.externalAlpha_loc, 1.0);
 	
 	if (currentLod !== undefined)
 	{ this.currentLod = currentLod; }

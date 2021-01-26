@@ -2975,7 +2975,8 @@ uniform float diffuseReflectionCoef;  \n\
 uniform float specularReflectionCoef; \n\
 uniform bool bApplySsao;\n\
 uniform bool bApplyShadow;\n\
-uniform float externalAlpha;\n\
+uniform float externalAlpha; // used by effects.\n\
+uniform float uModelOpacity; // this is model's alpha.\n\
 uniform vec4 colorMultiplier;\n\
 uniform bool bUseLogarithmicDepth;\n\
 \n\
@@ -3499,52 +3500,7 @@ void main()\n\
 \n\
 	//if((textureColor.r < 0.5 && textureColor.b > 0.5) || textureColor.a < 1.0)\n\
 \n\
-	/*\n\
-	if(applySpecLighting> 0.0)\n\
-	{\n\
-		vec3 L;\n\
-		L = ray;// test.***\n\
-		if(bApplyShadow)\n\
-		{\n\
-			L = vLightDir;// test.***\n\
-			lambertian = max(dot(normal2, L), 0.0); // original.***\n\
-			//lambertian = max(dot(vNormalWC, L), 0.0); // test.\n\
-		}\n\
-		else\n\
-		{\n\
-			//vec3 lightPos = vec3(1.0, 1.0, 1.0);\n\
-			//L = normalize(lightPos - vertexPos);\n\
-			//lambertian = max(dot(normal2, L), 0.0);\n\
-			lambertian = 1.0;\n\
-			lambertian = (scalarProd-4.0)/0.6;\n\
-		}\n\
-		\n\
-		specular = 0.0;\n\
-		if(lambertian > 0.0)\n\
-		{\n\
-			vec3 R = reflect(-L, normal2);      // Reflected light vector\n\
-			vec3 V = normalize(-vertexPos); // Vector to viewer\n\
-			\n\
-			// Compute the specular term\n\
-			float specAngle = max(dot(R, V), 0.0);\n\
-			specular = pow(specAngle, shininessValue);\n\
-			\n\
-			if(specular > 1.0)\n\
-			{\n\
-				specular = 1.0;\n\
-			}\n\
-		}\n\
-		\n\
-		if(lambertian < 0.5)\n\
-		{\n\
-			lambertian = 0.5;\n\
-		}\n\
-\n\
-	}\n\
-	*/\n\
-\n\
 	lambertian = 1.0;\n\
-	specular = 0.0;\n\
 	\n\
 	if(bApplyShadow)\n\
 	{\n\
@@ -3578,24 +3534,23 @@ void main()\n\
 			}\n\
 		}\n\
 	}\n\
-	\n\
-	//vec3 ambientColorAux = vec3(textureColor.x*ambientColor.x, textureColor.y*ambientColor.y, textureColor.z*ambientColor.z); // original.***\n\
-	vec3 ambientColorAux = vec3(textureColor.xyz);\n\
-	float alfa = textureColor.w * externalAlpha;\n\
 \n\
-    vec4 finalColor;\n\
-	if(applySpecLighting> 0.0)\n\
-	{\n\
-		finalColor = vec4((ambientReflectionCoef * ambientColorAux + \n\
-							diffuseReflectionCoef * lambertian * textureColor.xyz + \n\
-							specularReflectionCoef * specular * specularColor)*vLightWeighting * occlusion * shadow_occlusion * scalarProd, alfa); \n\
-	}\n\
-	else{\n\
-		finalColor = vec4((textureColor.xyz) * occlusion * shadow_occlusion * scalarProd, alfa);\n\
-	}\n\
 	\n\
+	// New lighting.***********************************************************************************************\n\
+	vec3 ambientColor = vec3(0.6);\n\
+	vec3 directionalLightColor = vec3(0.9, 0.9, 0.9);\n\
+	vec3 lightingDirection = normalize(vec3(0.6, 0.6, 0.6));\n\
+	float directionalLightWeighting = max(dot(vNormal, lightingDirection), 0.0);\n\
+	vec3 lightWeighting = ambientColor + directionalLightColor * directionalLightWeighting; // original.***\n\
+	// End lighting.-------------------------------------------------------------------------------------------------\n\
+	\n\
+	\n\
+	float alfa = textureColor.w * externalAlpha * uModelOpacity;\n\
+    vec4 finalColor;\n\
+	finalColor = vec4(textureColor.r, textureColor.g, textureColor.b, alfa);\n\
+	finalColor *= vec4(lightWeighting, 1.0) ;\n\
 	finalColor *= colorMultiplier;\n\
-	//finalColor = vec4(linearDepth, linearDepth, linearDepth, 1.0); // test to render depth color coded.***\n\
+\n\
 	vec4 albedo4 = finalColor;\n\
     gl_FragData[0] = finalColor; \n\
 \n\
@@ -6077,8 +6032,6 @@ void main()\n\
 	vec4 albedo = texture2D(albedoTex, screenPos);\n\
 	vec4 diffuseLight = texture2D(diffuseLightTex, screenPos);\n\
 	float diffuseLightModul = length(diffuseLight.xyz);\n\
-	float lightFogAprox = diffuseLight.w;\n\
-\n\
 \n\
 	//vec3 ray = getViewRay(screenPos, 1.0); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
 	//float scalarProd = abs(dot(normal, normalize(-ray)));\n\
@@ -6134,13 +6087,20 @@ void main()\n\
 		shadow_occlusion = 1.0;\n\
 \n\
 		occlInv *= (shadow_occlusion);\n\
+		bool isTransparentObject = false;\n\
+		if(albedo.a < 1.0)\n\
+		{\n\
+			// This is transparent object (rendered in transparent pass), so atenuate occInv.\n\
+			isTransparentObject = true;\n\
+			occlInv *= 3.0;\n\
+			if(occlInv > 1.0)\n\
+			occlInv = 1.0;\n\
+		}\n\
+\n\
 		vec4 finalColor = vec4(albedo.r * occlInv * diffuseLight3.x, \n\
 							albedo.g * occlInv * diffuseLight3.y, \n\
 							albedo.b * occlInv * diffuseLight3.z, albedo.a);\n\
 \n\
-		// If exist lights, then apply lightFog.***\n\
-		//vec4 lightFog4 = vec4(1.0, 1.0, 1.0, lightFogAprox);\n\
-		//finalColor = mix(finalColor, lightFog4, lightFogAprox);\n\
 		gl_FragColor = finalColor;\n\
 \n\
 \n\
@@ -6217,10 +6177,15 @@ void main()\n\
 				edgeAlpha = 0.2;\n\
 			}\n\
 \n\
+			//vec4 edgeColor;\n\
+\n\
 			if(factor > increF*0.9*2.0)\n\
 			{\n\
 				//edgeAlpha = 0.6;\n\
 				vec4 edgeColor = finalColor * 0.6;\n\
+				if(isTransparentObject)\n\
+				edgeColor *= 1.5;\n\
+\n\
 				gl_FragColor = vec4(edgeColor.rgb, 1.0);\n\
 			}\n\
 			else if(factor > increF*0.9)\n\
@@ -6240,7 +6205,8 @@ void main()\n\
 										edgeColor_D.b * occlInv * diffuseLight3.z, edgeColor_D.a);\n\
 				vec4 edgeColor = edgeColorPrev * 0.8;\n\
 \n\
-				//gl_FragColor = vec4(edgeColor.rgb, edgeAlpha);\n\
+				if(isTransparentObject)\n\
+				edgeColor *= 1.2;\n\
 				gl_FragColor = vec4(edgeColor.rgb, 1.0);\n\
 \n\
 			}\n\

@@ -369,8 +369,6 @@ void main()
 	vec4 albedo = texture2D(albedoTex, screenPos);
 	vec4 diffuseLight = texture2D(diffuseLightTex, screenPos);
 	float diffuseLightModul = length(diffuseLight.xyz);
-	float lightFogAprox = diffuseLight.w;
-
 
 	//vec3 ray = getViewRay(screenPos, 1.0); // The "far" for depthTextures if fixed in "RenderShowDepthVS" shader.
 	//float scalarProd = abs(dot(normal, normalize(-ray)));
@@ -426,13 +424,20 @@ void main()
 		shadow_occlusion = 1.0;
 
 		occlInv *= (shadow_occlusion);
+		bool isTransparentObject = false;
+		if(albedo.a < 1.0)
+		{
+			// This is transparent object (rendered in transparent pass), so atenuate occInv.
+			isTransparentObject = true;
+			occlInv *= 3.0;
+			if(occlInv > 1.0)
+			occlInv = 1.0;
+		}
+
 		vec4 finalColor = vec4(albedo.r * occlInv * diffuseLight3.x, 
 							albedo.g * occlInv * diffuseLight3.y, 
 							albedo.b * occlInv * diffuseLight3.z, albedo.a);
 
-		// If exist lights, then apply lightFog.***
-		//vec4 lightFog4 = vec4(1.0, 1.0, 1.0, lightFogAprox);
-		//finalColor = mix(finalColor, lightFog4, lightFogAprox);
 		gl_FragColor = finalColor;
 
 
@@ -509,10 +514,15 @@ void main()
 				edgeAlpha = 0.2;
 			}
 
+			//vec4 edgeColor;
+
 			if(factor > increF*0.9*2.0)
 			{
 				//edgeAlpha = 0.6;
 				vec4 edgeColor = finalColor * 0.6;
+				if(isTransparentObject)
+				edgeColor *= 1.5;
+
 				gl_FragColor = vec4(edgeColor.rgb, 1.0);
 			}
 			else if(factor > increF*0.9)
@@ -532,7 +542,8 @@ void main()
 										edgeColor_D.b * occlInv * diffuseLight3.z, edgeColor_D.a);
 				vec4 edgeColor = edgeColorPrev * 0.8;
 
-				//gl_FragColor = vec4(edgeColor.rgb, edgeAlpha);
+				if(isTransparentObject)
+				edgeColor *= 1.2;
 				gl_FragColor = vec4(edgeColor.rgb, 1.0);
 
 			}

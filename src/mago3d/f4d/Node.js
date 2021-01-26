@@ -81,9 +81,9 @@ Node.prototype.isOpaque = function()
 	{
 		if(this.data.attributes)
 		{
-			if(this.data.attributes.opaque !== undefined)
+			if(this.data.attributes.opacity !== undefined)
 			{
-				bOpaque = this.data.attributes.opaque;
+				bOpaque = this.data.attributes.opacity === 1;
 			}
 		}
 	}
@@ -574,7 +574,14 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 	// magoManager.tempSettings.renderWithTopology === 2 -> render both.
 
 	// If this node is a referenceNode type, then, must render all references avoiding the renderingFase.
+	var opacity = 1.0;
+	if(attributes.opacity !== undefined)
+	{
+		opacity = attributes.opacity;
+	}
+
 	gl.uniform1f(shader.externalAlpha_loc, 1.0);
+	gl.uniform1f(shader.uModelOpacity_loc, opacity);
 	neoBuilding.currentLod = data.currentLod; // update currentLod.
 	neoBuilding.render(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord, data.currentLod);
 	
@@ -635,6 +642,9 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 			gl.uniform4fv(shader.colorMultiplier_loc, [1.0, 1.0, 1.0, 1.0]);
 		}
 	}
+
+	// restore uniforms.
+	gl.uniform1f(shader.uModelOpacity_loc, 1.0);
 };
 
 /**
