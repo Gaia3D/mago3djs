@@ -324,7 +324,6 @@ void main()
 			float factorByDist = 1.0;
 
 			// Calculate the lightFog intensity (case spotLight).***************************************************************************************************************************
-			
 			float lightFogIntensity = 0.0;
 			
 			// Calculate how centered is the pixel relative to lightDir, so calculate the crossProduct of "vertexPosLC" to "vLightDirCC".
@@ -337,8 +336,18 @@ void main()
 
 			float factorByDist2 = 1.0 - dist_vertexCC_toLight/(lightFalloffLightDist);
 			lightFogIntensity = factorByDist2 * factorByDist2 * abs(dot_dirCamToLight_lightDir * dot_dirCamToLight_lightDir);
+			lightFogIntensity *= 0.8;
+
+			// DepthTest.
+			if(-vertexPosCC.z > -posCC.z)
+			{
+				if(posCC.z < 0.0) // in sky, posCC.z > 0.0
+				lightFogIntensity = 0.0;
+			}
+
 
 			gl_FragData[2] = vec4(uLightColorAndBrightness.x, uLightColorAndBrightness.y, uLightColorAndBrightness.z, lightFogIntensity); // save fog.***
+			// End fog calculating.------------------------------------------------------------------------------------------------------------------------------------------------------------
 			
 			if(distToLight > lightFalloffLightDist)
 			{
@@ -415,11 +424,6 @@ void main()
 			vec4 normal4;
 			vec3 posCC = getPosCC(screenPos, dataType, normal4);
 
-			// vector light-point.
-			//vec3 vecLightToPointCC = posCC - vLightPosCC;
-			//vec3 lightDirToPointCC = normalize(posCC - vLightPosCC);
-			//float distToLight = length(vecLightToPointCC);
-
 			float lightHotDistance = uLightParameters[0];
 			float lightFalloffLightDist = uLightParameters[1];
 
@@ -458,10 +462,10 @@ void main()
 			}
 
 			float intensityFactor = 1.0 - abs(dotLightDir);
-			lightFogIntensity = intensityFactor * factorByDistFog * 0.6;
+			lightFogIntensity = intensityFactor * factorByDistFog * 0.5;
 
 			float camDir_lightDir_factor = dot_dirCamToLight_lightDir * (1.0 - dist_vertexPP_toLight/(lightFalloffLightDist));
-			lightFogIntensity += camDir_lightDir_factor * camDir_lightDir_factor * 0.6; // when look with the same direction that lightDir, add aureola.
+			lightFogIntensity += camDir_lightDir_factor * camDir_lightDir_factor * 0.5; // when look with the same direction that lightDir, add aureola.
 			// End calculate the lightFog intensity (case spotLight).-----------------------------------------------------------------------------------------------------------------------
 
 			// DepthTest.

@@ -1895,8 +1895,8 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		}
 
 		// Final render output.
-		this.renderer.renderScreenQuad(gl); // 1rst screenQuad.
-		this.renderer.renderScreenQuad2(gl); // 2nd screenQuad. (developing).
+		this.renderer.renderScreenQuad(gl); // 1rst screenQuad. (ssao, lighting, shadows)
+		this.renderer.renderScreenQuad2(gl); // 2nd screenQuad. (lightFog)
 
 		this.renderCluster();
 
