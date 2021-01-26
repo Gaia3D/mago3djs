@@ -99,8 +99,8 @@ SpotLight.prototype.makeMesh = function()
 	// provisionally make a cone.
 	// coneRadius = this.distance * sin(this.falloffDeg * PI/180).
 	var angRad = this.falloffDeg * Math.PI/180;
-	var radius = this.falloffDistance * Math.sin(angRad) * 1.2;
-	var height = this.falloffDistance * Math.cos(angRad);
+	var radius = this.falloffDistance * Math.sin(angRad) * 0.98;
+	var height = this.falloffDistance * Math.cos(angRad) * 0.98;
 	var color = new Mago3D.Color(0.95, 0.95, 0.95, 0.4);
 	var options = {
 			baseType : 2, // 0= NONE. 1= PLANE. 2= SPHERICAL.
@@ -425,7 +425,7 @@ SpotLight.prototype._createModelViewProjectionMatrixRelToEyes = function()
 	var fovyRad = 90 * Math.PI/180;
 	var aspectRatio = 1;
 	var near = 0.05;
-	var far = this.hotDdistance;
+	var far = this.getLightFallOffDistance();
 	var projMat = new Matrix4();
 	
 	projMat._floatArrays = glMatrix.mat4.perspective(projMat._floatArrays, fovyRad, aspectRatio, near, far);

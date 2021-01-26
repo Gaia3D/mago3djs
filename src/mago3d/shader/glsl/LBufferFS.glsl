@@ -38,7 +38,9 @@ uniform bool bUseLogarithmicDepth;
 uniform bool bUseMultiRenderTarget;
 uniform bool bApplyShadows;
 uniform vec2 uNearFarArray[4];
+uniform int u_processType; // 1= light pass. 2= lightFog pass.
 
+varying vec3 vNormal;
 varying vec3 vLightDirCC;
 varying vec3 vLightPosCC; 
 varying vec3 vertexPosLC;
@@ -277,6 +279,26 @@ int getFaceIdx(in vec3 normalRelToLight, inout vec2 faceTexCoord, inout vec3 fac
 	return faceIdx;
 }
 
+float getDepthFromLight(in vec3 lightDirCC, inout float spotDotAux)
+{
+	// Note : input must be a direction in cameraCoords.
+	// 1rst, transform "lightDirToPointCC" to "lightDirToPointWC".
+	// 2nd, transform "lightDirToPointWC" to "lightDirToPointLC" ( lightCoord );
+	vec4 lightDirToPointWC = modelViewMatrixRelToEyeInv * vec4(lightDirCC, 1.0);
+	vec3 lightDirToPointWCNormalized = normalize(lightDirToPointWC.xyz);
+	vec4 lightDirToPointLC = buildingRotMatrixInv * vec4(lightDirToPointWCNormalized, 1.0);
+	vec3 lightDirToPointLC_norm = normalize(lightDirToPointLC.xyz);
+	vec4 depthCube = textureCube(light_depthCubeMap, lightDirToPointLC_norm); // original
+
+	// Now, try to calculate the zone of the our pixel.
+	vec2 faceTexCoord;
+	vec3 faceDir;
+	getFaceIdx(lightDirToPointLC_norm, faceTexCoord, faceDir);
+	spotDotAux = dot(lightDirToPointLC_norm, faceDir);
+	float depthFromLight = unpackDepth(depthCube);
+
+	return depthFromLight;
+}
 
 void main()
 {
@@ -285,166 +307,193 @@ void main()
 	#ifdef USE_MULTI_RENDER_TARGET
 	if(bUseMultiRenderTarget)
 	{
-		// Diffuse lighting.
-		int dataType = 0;
-		vec4 normal4;
-		vec3 posCC = getPosCC(screenPos, dataType, normal4);
-
-		// vector light-point.
-		vec3 vecLightToPointCC = posCC - vLightPosCC;
-		vec3 lightDirToPointCC = normalize(posCC - vLightPosCC);
-		float distToLight = length(vecLightToPointCC);
-
-		float lightHotDistance = uLightParameters[0];
-		float lightFalloffLightDist = uLightParameters[1];
-		float factorByDist = 1.0;
-
-		// Calculate the lightFog intensity (case spotLight).*****************************************
-		// Considere 2 types of distance.
-		float distToLight2d = 0.0;
-		float distToLightDir2d = 0.0;
-		float lightFogIntensity = 0.0;
-
-		//vec3 camDirToLightCC = normalize(vLightPosCC);
-		//float dotCamdiLightDir = dot(camDirToLightCC, vLightDirCC);
-
-		
-		vec3 vectorToVertexCC = vertexPosCC.xyz - vLightPosCC;
-		distToLight2d = length(vectorToVertexCC.xy);
-		float distToLight3d = length(vectorToVertexCC);
-
-		vec3 dirToVertexCC = normalize(vectorToVertexCC);
-		
-		// Do a 2D dotProd.
-		float dotProd2d = dot(dirToVertexCC.xy, vLightDirCC.xy);
-		float lightFogIntensity_3d = 1.0 - length(vectorToVertexCC)/lightFalloffLightDist;
-		float lightFogIntensity_2d = 1.0 - (distToLight2d)/lightFalloffLightDist;
-
-		float diffZ = vLightPosCC.z - vertexPosCC.z;
-
-		
-		lightFogIntensity = lightFogIntensity_2d;
-		lightFogIntensity *= 0.4;
-
-		// Calculate how centered is the pixel relative to lightDir, so calculate the crossProduct of "vertexPosLC" to "vLightDirCC".
-			vec3 crossProd = cross( dirToVertexCC, vLightDirCC );
-			vec3 lightToVertexCC = normalize(vertexPosCC.xyz);
-			float dotLightDir = dot(normalize(crossProd), lightToVertexCC);
-
-			float intensityFactor = 1.0 - abs(dotLightDir);
-			lightFogIntensity *= intensityFactor;
-			
-		/*
-		if(dotProd2d > 0.0)
+		if(u_processType == 1) // light pass.
 		{
+			// Diffuse lighting.
+			int dataType = 0;
+			vec4 normal4;
+			vec3 posCC = getPosCC(screenPos, dataType, normal4);
+
+			// vector light-point.
+			vec3 vecLightToPointCC = posCC - vLightPosCC;
+			vec3 lightDirToPointCC = normalize(posCC - vLightPosCC);
+			float distToLight = length(vecLightToPointCC);
+
+			float lightHotDistance = uLightParameters[0];
+			float lightFalloffLightDist = uLightParameters[1];
+			float factorByDist = 1.0;
+
+			// Calculate the lightFog intensity (case spotLight).***************************************************************************************************************************
+			
+			float lightFogIntensity = 0.0;
+			
 			// Calculate how centered is the pixel relative to lightDir, so calculate the crossProduct of "vertexPosLC" to "vLightDirCC".
-			vec3 crossProd = cross( dirToVertexCC, vLightDirCC );
-			vec3 lightToVertexCC = normalize(vertexPosCC.xyz);
-			float dotLightDir = dot(normalize(crossProd), lightToVertexCC);
+			vec3 vectorToVertexCC = vertexPosCC.xyz - vLightPosCC;
+			float dist_vertexCC_toLight = length(vectorToVertexCC);
 
-			float intensityFactor = 1.0 - abs(dotLightDir);
-			lightFogIntensity *= intensityFactor;
+			vec3 dir_camToLight = normalize(vLightPosCC);
+			float dot_dirCamToLight_lightDir = dot(dir_camToLight, vLightDirCC);
+
+
+			float factorByDist2 = 1.0 - dist_vertexCC_toLight/(lightFalloffLightDist);
+			lightFogIntensity = factorByDist2 * factorByDist2 * abs(dot_dirCamToLight_lightDir * dot_dirCamToLight_lightDir);
+
+			gl_FragData[2] = vec4(uLightColorAndBrightness.x, uLightColorAndBrightness.y, uLightColorAndBrightness.z, lightFogIntensity); // save fog.***
 			
-			
-			//vec3 dirToVertexCC2d = vec3(vectorToVertexCC.x, vectorToVertexCC.y, 0.0);
-			//vec3 lightDirCC2d = normalize(vec3(vLightDirCC.x, vLightDirCC.y, 0.0));
-			////vec3 crossProd = cross( dirToVertexCC2d, lightDirCC2d );
-			//float intensityFactor = dot(dirToVertexCC2d, lightDirCC2d);
-			//lightFogIntensity *= intensityFactor;
-		}
-		else
-		{
-			
-			vec3 crossProd = cross( dirToVertexCC, vLightDirCC );
-			vec3 lightToVertexCC = normalize(vertexPosCC.xyz);
-			float dotLightDir = dot(normalize(crossProd), lightToVertexCC);
-
-			float intensityFactor = (1.0 - abs(dotLightDir))*(1.0+dotProd2d);
-			lightFogIntensity *= intensityFactor;
-			
-		}
-		*/
-		//lightFogIntensity = 0.5;
-		// End calculate the lightFog intensity (case spotLight).-------------------------------------
-
-		if(distToLight > lightFalloffLightDist)
-		{
-			// Apply only lightFog.***
-			// in final screenQuadPass, use posLC to determine the light-fog.
-			gl_FragData[2] = vec4(lightFogIntensity, lightFogIntensity, lightFogIntensity, 1.0); // save fog.***
-			return;
-			//discard;
-		}
-		else if(distToLight > lightHotDistance)
-		{
-			factorByDist = 1.0 - (distToLight - lightHotDistance)/(lightFalloffLightDist - lightHotDistance);
-		}
-
-		vec3 normal3 = normal4.xyz;
-		float diffuseDot = dot(-lightDirToPointCC, vec3(normal3));
-
-		if(diffuseDot < 0.0)
-		{
-			gl_FragData[2] = vec4(lightFogIntensity, lightFogIntensity, lightFogIntensity, 1.0); // save fog.***
-			return;
-		}
-
-		float hotSpotDot = uLightParameters[2];
-		float falloffSpotDot = uLightParameters[3];
-
-		float spotDot = dot(vLightDirCC, lightDirToPointCC);
-		float factorBySpot = 1.0;
-		if(spotDot < falloffSpotDot)
-		{
-			gl_FragData[2] = vec4(lightFogIntensity, lightFogIntensity, lightFogIntensity, 1.0); // save fog.***
-			return;
-		}
-		else if(spotDot < hotSpotDot)
-		{
-			//factorBySpot = -(spotDot - hotSpotDot)/-(falloffSpotDot - hotSpotDot);
-		}
-
-		if(bApplyShadows)
-		{
-			gl_FragData[2] = vec4(lightFogIntensity, lightFogIntensity, lightFogIntensity, 1.0); // save fog.***
-
-			// now, check light's depthCubeMap.
-			// 1rst, transform "lightDirToPointCC" to "lightDirToPointWC".
-			// 2nd, transform "lightDirToPointWC" to "lightDirToPointLC" ( lightCoord );
-			vec4 lightDirToPointWC = modelViewMatrixRelToEyeInv * vec4(lightDirToPointCC, 1.0);
-			vec3 lightDirToPointWCNormalized = normalize(lightDirToPointWC.xyz);
-			vec4 lightDirToPointLC = buildingRotMatrixInv * vec4(lightDirToPointWCNormalized, 1.0);
-			vec3 lightDirToPointLC_norm = normalize(lightDirToPointLC.xyz);
-			vec4 depthCube = textureCube(light_depthCubeMap, lightDirToPointLC_norm); // original
-
-			// Now, try to calculate the zone of the our pixel.
-			vec2 faceTexCoord;
-			vec3 faceDir;
-			getFaceIdx(lightDirToPointLC_norm, faceTexCoord, faceDir);
-			float spotDotAux = dot(lightDirToPointLC_norm, faceDir);
-			float depthFromLight = unpackDepth(depthCube)*lightFalloffLightDist/spotDotAux;
-
-			float depthTolerance = 0.06;
-			if(distToLight > depthFromLight + depthTolerance)
+			if(distToLight > lightFalloffLightDist)
 			{
-				// we are in shadow, so do not lighting.
+				// Apply only lightFog.***
+				// in final screenQuadPass, use posLC to determine the light-fog.
+				return;
+				//discard;
+			}
+			else if(distToLight > lightHotDistance)
+			{
+				factorByDist = 1.0 - (distToLight - lightHotDistance)/(lightFalloffLightDist - lightHotDistance);
+			}
+
+			vec3 normal3 = normal4.xyz;
+			float diffuseDot = dot(-lightDirToPointCC, vec3(normal3));
+
+			if(diffuseDot < 0.0)
+			{
 				return;
 			}
+
+			// Check SPOT ANGLES.*****************************************************************************************************************************************
+			float hotSpotDot = uLightParameters[2];
+			float falloffSpotDot = uLightParameters[3];
+
+			float spotDot = dot(vLightDirCC, lightDirToPointCC);
+			float factorBySpot = 1.0;
+			if(spotDot < falloffSpotDot) 
+			{
+				return;
+			}
+			else if(spotDot < hotSpotDot)
+			{
+				factorBySpot = 1.0 - (hotSpotDot - spotDot)/(hotSpotDot - falloffSpotDot);
+			}
+
+			if(bApplyShadows)
+			{
+
+				// Now, try to calculate the zone of the our pixel.
+				float spotDotAux;
+				float depthFromLight = getDepthFromLight(lightDirToPointCC, spotDotAux);
+				depthFromLight *= lightFalloffLightDist/spotDotAux;
+
+				float depthTolerance = 0.06;
+				if(distToLight > depthFromLight + depthTolerance)
+				{
+					// we are in shadow, so do not lighting.
+					gl_FragData[2] = vec4(0.0); // save fog.***
+					return;
+				}
+			}
+			
+
+			//float fogIntensity = length(vertexPosLC)/lightHotDistance;
+			float atenuation = 0.4; // intern variable to adjust light intensity.
+			diffuseDot *= factorByDist;
+			spotDot *= factorBySpot;
+			float finalFactor = uLightIntensity * diffuseDot * spotDot * atenuation;
+			gl_FragData[0] = vec4(uLightColorAndBrightness.x * finalFactor, 
+								uLightColorAndBrightness.y * finalFactor, 
+								uLightColorAndBrightness.z * finalFactor, 1.0); 
+
+			// Specular lighting.
+			gl_FragData[1] = vec4(0.0, 0.0, 0.0, 1.0); // save specular.***
+
+			// Light fog.
+			//gl_FragData[2] = vec4(uLightColorAndBrightness.x, uLightColorAndBrightness.y, uLightColorAndBrightness.z, lightFogIntensity); // save fog.***
 		}
-		//float fogIntensity = length(vertexPosLC)/lightHotDistance;
-		float atenuation = 0.4; // intern variable to adjust light intensity.
-		diffuseDot *= factorByDist;
-		spotDot *= factorBySpot;
-		float finalFactor = uLightIntensity * diffuseDot * spotDot * atenuation;
-		gl_FragData[0] = vec4(uLightColorAndBrightness.x * finalFactor , 
-							uLightColorAndBrightness.y * finalFactor, 
-							uLightColorAndBrightness.z * finalFactor, 1.0); 
+		else if(u_processType == 2) // lightFog pass.
+		{
+			// Diffuse lighting.
+			int dataType = 0;
+			vec4 normal4;
+			vec3 posCC = getPosCC(screenPos, dataType, normal4);
 
-		// Specular lighting.
-		gl_FragData[1] = vec4(0.0, 0.0, 0.0, 1.0); // save specular.***
+			// vector light-point.
+			//vec3 vecLightToPointCC = posCC - vLightPosCC;
+			//vec3 lightDirToPointCC = normalize(posCC - vLightPosCC);
+			//float distToLight = length(vecLightToPointCC);
 
-		// Light fog.
-		gl_FragData[2] = vec4(lightFogIntensity, lightFogIntensity, lightFogIntensity, 1.0); // save fog.***
+			float lightHotDistance = uLightParameters[0];
+			float lightFalloffLightDist = uLightParameters[1];
+
+			// Calculate the lightFog intensity (case spotLight).***************************************************************************************************************************
+			float lightFogIntensity = 0.0;
+			vec3 dir_camToVertex = normalize(vertexPosCC.xyz);
+			vec3 dir_camToLight = normalize(vLightPosCC);
+			float dist_camToLight = length(vLightPosCC);
+			vec3 vertexPP = dir_camToVertex * dist_camToLight;
+			float dist_vertexPP_toLight = length(vertexPP - vLightPosCC);
+
+			// calculate light-to-vertexPP direction.
+			vec3 dir_light_toVertexPP = normalize(vertexPP - vLightPosCC);
+
+			// calculate dotProd of lightDir & dir_light_toVertexPP. If dot is negative, means that the vertex is rear of light.
+			float dot_lightDir_lightToVertexPPDir = dot(vLightDirCC, dir_light_toVertexPP);
+			float dot_dirCamToLight_lightDir = dot(dir_camToLight, vLightDirCC);
+
+			// Calculate how centered is the pixel relative to lightDir, so calculate the crossProduct of "vertexPosLC" to "vLightDirCC".
+			vec3 vectorLightToVertexCC = vertexPosCC.xyz - vLightPosCC;
+			vec3 dirLightToVertexCC = normalize(vectorLightToVertexCC);
+			float dist_vertexCC_toLight = length(vectorLightToVertexCC);
+			vec3 crossProd = cross( dirLightToVertexCC, vLightDirCC );
+			vec3 camToVertexCC = normalize(vertexPosCC.xyz);
+			float dotLightDir = dot(normalize(crossProd), camToVertexCC); // indicates how centered is the point to lightDir.
+
+			// Calculate fog by dist to light & try to eliminate the rear-light fog.
+			float factorByDistFog = 1.0 - dist_vertexPP_toLight / (lightFalloffLightDist * 1.1);
+			factorByDistFog *= abs(dot_lightDir_lightToVertexPPDir);
+
+			if(dot_lightDir_lightToVertexPPDir < 0.1)
+			{
+				// we are rear of the light.
+				float factorByRearLight = 1.0 + dot_lightDir_lightToVertexPPDir; 
+				factorByDistFog *= (factorByRearLight * factorByRearLight);
+			}
+
+			float intensityFactor = 1.0 - abs(dotLightDir);
+			lightFogIntensity = intensityFactor * factorByDistFog * 0.6;
+
+			float camDir_lightDir_factor = dot_dirCamToLight_lightDir * (1.0 - dist_vertexPP_toLight/(lightFalloffLightDist));
+			lightFogIntensity += camDir_lightDir_factor * camDir_lightDir_factor * 0.6; // when look with the same direction that lightDir, add aureola.
+			// End calculate the lightFog intensity (case spotLight).-----------------------------------------------------------------------------------------------------------------------
+
+			// DepthTest.
+			if(-vertexPosCC.z > -posCC.z)
+			{
+				if(posCC.z < 0.0) // in sky, posCC.z > 0.0
+				lightFogIntensity = 0.0;
+				gl_FragData[2] = vec4(uLightColorAndBrightness.x, uLightColorAndBrightness.y, uLightColorAndBrightness.z, lightFogIntensity); // save fog.***
+				return;
+			}
+
+			gl_FragData[2] = vec4(uLightColorAndBrightness.x, uLightColorAndBrightness.y, uLightColorAndBrightness.z, lightFogIntensity); // save fog.***
+
+			if(bApplyShadows)
+			{
+				// Now, try to calculate the zone of the our pixel.
+				float spotDotAux;
+				float depthTolerance = 1.5; // high tolerance.
+				float depthFromLight2 = getDepthFromLight(dirLightToVertexCC, spotDotAux);
+				depthFromLight2 *= lightFalloffLightDist/spotDotAux;
+
+				if(dist_vertexCC_toLight > depthFromLight2 + depthTolerance)
+				{
+					// we are in shadow, so do not lighting.
+					gl_FragData[2] = vec4(0.0);
+					return;
+				}
+			}
+			
+			// Light fog.
+			gl_FragData[2] = vec4(uLightColorAndBrightness.x, uLightColorAndBrightness.y, uLightColorAndBrightness.z, lightFogIntensity); // save fog.***
+		}
 
 	}
 	#endif

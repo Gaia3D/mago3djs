@@ -124,9 +124,9 @@ void main()
 {
 	vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
 	vec4 lightFog4 = texture2D(lightFogTex, screenPos);
-	float fogIntensity = lightFog4.x;
-	if(fogIntensity > 0.9)
-	fogIntensity = 0.9;
+	float alpha = lightFog4.w;
+	if(alpha > 0.6)
+	alpha = 0.6;
 
-	gl_FragColor = vec4(1.0, 1.0, 1.0, fogIntensity*fogIntensity);
+	gl_FragColor = vec4(lightFog4.x, lightFog4.y, lightFog4.z, alpha);
 }

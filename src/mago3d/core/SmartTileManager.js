@@ -32,7 +32,6 @@ var SmartTileManager = function()
 	this.objectSeedsMap;
 	
 	this.maxDepth = 17;
-	this.maxDepth = 15;
 };
 
 /**

@@ -1218,8 +1218,6 @@ Renderer.prototype.renderNativeObjects = function(gl, shader, renderType, visibl
 	// render vectorType objects as opaques.
 	if (bRenderOpaques && renderType === 1)
 	{
-		
-
 		// Test. Check pointsTypeObjectsArray. Test.***
 		var pointTypeObjectsArray = visibleObjControlerNodes.currentVisibleNativeObjects.pointTypeArray;
 		if (pointTypeObjectsArray)
@@ -2325,8 +2323,7 @@ Renderer.prototype.renderLightDepthCubeMaps = function (lightSourcesArray)
 	var gl = magoManager.getGl();
 	var sceneState = magoManager.sceneState;
 	
-	var currentShader = magoManager.postFxShadersManager.getShader("modelRefDepth"); 
-	//var currentShader = magoManager.postFxShadersManager.getShader("modelRefSsao"); 
+	var currentShader = magoManager.postFxShadersManager.getShader("modelRefDepth");  
 	currentShader.resetLastBuffersBinded();
 	//shaderProgram = currentShader.program;
 
@@ -2456,7 +2453,7 @@ Renderer.prototype.renderLightBuffer = function(lightSourcesArray)
 	extbuffers.drawBuffersWEBGL([
 		lBuffer.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - diffuseLighting
 		lBuffer.extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - specularLighting
-		lBuffer.extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[1] - specularLighting
+		lBuffer.extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - lightFog
 	]);
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	gl.viewport(0, 0, sceneState.drawingBufferWidth[0], sceneState.drawingBufferHeight[0]);
@@ -2542,7 +2539,18 @@ Renderer.prototype.renderLightBuffer = function(lightSourcesArray)
 
 		gl.activeTexture(gl.TEXTURE2);
 		gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubeMapFbo.colorBuffer);
-		
+
+
+		// 1rst, do light pass.**************************************************************
+		gl.uniform1i(currentShader.u_processType_loc, 1); // light pass.
+		gl.frontFace(gl.CW); // Must be "CW".	
+		gl.blendFunc(gl.SRC_ALPHA, gl.ONE); 
+		light.render(magoManager, currentShader, renderType, glPrimitive, bIsSelected);
+
+		// Now, do light-fog pass.***********************************************************
+		gl.uniform1i(currentShader.u_processType_loc, 2); // light-fog pass.
+		gl.frontFace(gl.CCW); // Must be "CCW".
+		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);	
 		light.render(magoManager, currentShader, renderType, glPrimitive, bIsSelected);
 	}
 
@@ -3794,29 +3802,17 @@ Renderer.prototype.renderBoundingBoxesNodes = function(nodesArray, color, bRende
 	}
 	
 	var node;
-	var currentShader = magoManager.postFxShadersManager.getTriPolyhedronShader(); // box ssao.***
+	var shaderManager = magoManager.postFxShadersManager;
+	var currentShader = shaderManager.getUnitaryBBoxShader(magoManager); // box ssao.***
 	var shaderProgram = currentShader.program;
-	gl.frontFace(gl.CCW);
-	gl.useProgram(shaderProgram);
+
+	currentShader.useProgram();
 	currentShader.disableVertexAttribArrayAll();
 	currentShader.disableTextureImagesUnitsAll();
 
 	gl.uniformMatrix4fv(currentShader.modelViewProjectionMatrix4RelToEye_loc, false, magoManager.sceneState.modelViewProjRelToEyeMatrix._floatArrays);
-	gl.uniformMatrix4fv(currentShader.modelViewMatrix4RelToEye_loc, false, magoManager.sceneState.modelViewRelToEyeMatrix._floatArrays); // original.***
-	gl.uniformMatrix4fv(currentShader.modelViewMatrix4_loc, false, magoManager.sceneState.modelViewMatrix._floatArrays);
-	gl.uniformMatrix4fv(currentShader.projectionMatrix4_loc, false, magoManager.sceneState.projectionMatrix._floatArrays);
 	gl.uniform3fv(currentShader.cameraPosHIGH_loc, magoManager.sceneState.encodedCamPosHigh);
 	gl.uniform3fv(currentShader.cameraPosLOW_loc, magoManager.sceneState.encodedCamPosLow);
-
-	gl.uniform1f(currentShader.near_loc, magoManager.sceneState.camera.frustum.near);
-	gl.uniform1f(currentShader.far_loc, magoManager.sceneState.camera.frustum.far);
-	
-	gl.uniform1i(currentShader.bApplySsao_loc, false);
-
-	gl.uniformMatrix4fv(currentShader.normalMatrix4_loc, false, magoManager.sceneState.normalMatrix4._floatArrays);
-	//-----------------------------------------------------------------------------------------------------------
-
-	gl.uniform1i(currentShader.hasAditionalMov_loc, true);
 	gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
 	gl.uniform1i(currentShader.bScale_loc, true);
 	var alfa = 1.0;
@@ -3829,25 +3825,8 @@ Renderer.prototype.renderBoundingBoxesNodes = function(nodesArray, color, bRende
 	{
 		gl.uniform4fv(currentShader.oneColor4_loc, [1.0, 0.0, 1.0, alfa]); //.***
 	}
-
-	gl.uniform1i(currentShader.depthTex_loc, 0);
-	gl.uniform1i(currentShader.noiseTex_loc, 1);
-	gl.uniform1i(currentShader.diffuseTex_loc, 2); // no used.***
-	gl.uniform1f(currentShader.fov_loc, magoManager.sceneState.camera.frustum.fovyRad);	// "frustum._fov" is in radians.***
-	gl.uniform1f(currentShader.aspectRatio_loc, magoManager.sceneState.camera.frustum.aspectRatio);
-	gl.uniform1f(currentShader.screenWidth_loc, magoManager.sceneState.drawingBufferWidth);	
-	gl.uniform1f(currentShader.screenHeight_loc, magoManager.sceneState.drawingBufferHeight);
-
-	var noiseTexture = magoManager.texturesStore.getNoiseTexture4x4();
-	gl.uniform2fv(currentShader.noiseScale2_loc, [magoManager.depthFboNeo.width/noiseTexture.width, magoManager.depthFboNeo.height/noiseTexture.height]);
-	gl.uniform3fv(currentShader.kernel16_loc, magoManager.sceneState.ssaoKernel16);
-	//gl.activeTexture(gl.TEXTURE0);
-	//gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);  // original.***
-	gl.activeTexture(gl.TEXTURE1);
-	gl.bindTexture(gl.TEXTURE_2D, noiseTexture);
 	
 	
-
 	var neoBuilding;
 	var bbox;
 	var ssao_idx = 1;
@@ -3867,7 +3846,6 @@ Renderer.prototype.renderBoundingBoxesNodes = function(nodesArray, color, bRende
 
 		magoManager.pointSC = bbox.getCenterPoint(magoManager.pointSC);
 		gl.uniform3fv(currentShader.aditionalMov_loc, [magoManager.pointSC.x, magoManager.pointSC.y, magoManager.pointSC.z]); //.***
-		//gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
 		this.renderObject(gl, magoManager.unitaryBoxSC, magoManager, currentShader, ssao_idx, bRenderLines);
 	}
 

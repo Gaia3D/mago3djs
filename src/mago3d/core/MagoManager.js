@@ -1769,6 +1769,17 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	this.renderType = 1;
 	this.renderer.renderGeometryBufferTransparents(gl, renderType, this.visibleObjControlerNodes);
 
+	// check if must render boundingBoxes.
+	if (this.magoPolicy.getShowBoundingBox())
+	{
+		var bRenderLines = true;
+		//var currentVisiblesArray = visibleObjControlerNodes.currentVisibles0.concat(visibleObjControlerNodes.currentVisibles2,);
+		this.renderer.renderBoundingBoxesNodes(this.visibleObjControlerNodes.currentVisibles0, undefined, bRenderLines);
+		this.renderer.renderBoundingBoxesNodes(this.visibleObjControlerNodes.currentVisibles2, undefined, bRenderLines);
+		this.renderer.renderBoundingBoxesNodes(this.visibleObjControlerNodes.currentVisibles3, undefined, bRenderLines);
+		this.renderer.renderBoundingBoxesNodes(this.visibleObjControlerNodes.currentVisiblesAux, undefined, bRenderLines);
+	}
+
 	if (this.isCesiumGlobe())
 	{
 		scene._context._currentFramebuffer._bind();
@@ -1791,16 +1802,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 
 	
 
-	// check if must render boundingBoxes.
-	if (this.magoPolicy.getShowBoundingBox())
-	{
-		var bRenderLines = true;
-		//var currentVisiblesArray = visibleObjControlerNodes.currentVisibles0.concat(visibleObjControlerNodes.currentVisibles2,);
-		this.renderer.renderBoundingBoxesNodes(this.visibleObjControlerNodes.currentVisibles0, undefined, bRenderLines);
-		this.renderer.renderBoundingBoxesNodes(this.visibleObjControlerNodes.currentVisibles2, undefined, bRenderLines);
-		this.renderer.renderBoundingBoxesNodes(this.visibleObjControlerNodes.currentVisibles3, undefined, bRenderLines);
-		this.renderer.renderBoundingBoxesNodes(this.visibleObjControlerNodes.currentVisiblesAux, undefined, bRenderLines);
-	}
+	
 
 	if (sceneState.applyLightsShadows)
 	{
@@ -1894,7 +1896,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 
 		// Final render output.
 		this.renderer.renderScreenQuad(gl); // 1rst screenQuad.
-		//this.renderer.renderScreenQuad2(gl); // 2nd screenQuad. (developing).
+		this.renderer.renderScreenQuad2(gl); // 2nd screenQuad. (developing).
 
 		this.renderCluster();
 
@@ -6390,6 +6392,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.uLightColorAndBrightness_loc = gl.getUniformLocation(shader.program, "uLightColorAndBrightness");
 	shader.ModelViewProjectionMatrixRelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
 	shader.buildingRotMatrixInv_loc = gl.getUniformLocation(shader.program, "buildingRotMatrixInv");
+	shader.u_processType_loc = gl.getUniformLocation(shader.program, "u_processType");
 
 	shader.uLightParameters_loc = gl.getUniformLocation(shader.program, "uLightParameters");// 0= lightDist, 1= lightFalloffDist, 2= maxSpotDot, 3= falloffSpotDot.
 	shader.uLightIntensity_loc = gl.getUniformLocation(shader.program, "uLightIntensity");

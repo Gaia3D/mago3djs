@@ -172,7 +172,7 @@ PostFxShadersManager.prototype.createShader = function(gl, source, type, typeStr
 PostFxShadersManager.prototype.createDefaultShaders = function(gl, sceneState) 
 {
 	this.modelRefSilhouetteShader = this.createSilhouetteShaderModelRef(gl); // 14.
-	this.triPolyhedronShader = this.createSsaoShaderBox(gl); // 12.
+	//this.triPolyhedronShader = this.createSsaoShaderBox(gl); // 12.
 	
 	//this.invertedBoxShader = this.createInvertedBoxShader(gl); // TEST.
 };
@@ -196,8 +196,12 @@ PostFxShadersManager.prototype.getTriPolyhedronDepthShader = function()
 /**
  * 어떤 일을 하고 있습니까?
  */
-PostFxShadersManager.prototype.getTriPolyhedronShader = function() 
+PostFxShadersManager.prototype.getUnitaryBBoxShader = function(magoManager) 
 {
+	if(!this.triPolyhedronShader)
+	{
+		this.triPolyhedronShader = this.createSsaoShaderBox(magoManager); 
+	}
 	return this.triPolyhedronShader;
 };
 
@@ -261,16 +265,22 @@ PostFxShadersManager.prototype.createSilhouetteShaderModelRef = function(gl)
 // box Shader.
 /**
  * 어떤 일을 하고 있습니까?
- * @param gl 변수
+ * @param magoManager 변수
  */
-PostFxShadersManager.prototype.createSsaoShaderBox = function(gl) 
+PostFxShadersManager.prototype.createSsaoShaderBox = function(magoManager) 
 {
-	// 8.
+	var use_multi_render_target = "NO_USE_MULTI_RENDER_TARGET";
+	magoManager.postFxShadersManager.bUseMultiRenderTarget = true;
+	use_multi_render_target = "USE_MULTI_RENDER_TARGET";
+
+	var gl = magoManager.getGl();
 	var shader = new PostFxShader(this.gl);
+	shader.shaderManager = this;
 	this.pFx_shaders_array.push(shader);
 
 	var ssao_vs_source = ShaderSource.BoxSsaoVS;
 	var ssao_fs_source = ShaderSource.BoxSsaoFS;
+	ssao_fs_source = ssao_fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
 
 	shader.program = gl.createProgram();
 	shader.shader_vertex = this.createShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
@@ -320,32 +330,6 @@ PostFxShadersManager.prototype.createSsaoShaderBox = function(gl)
 	//
 	shader.aditionalMov_loc = gl.getUniformLocation(shader.program, "aditionalPosition");
 
-	// ssao uniforms.*
-	shader.noiseScale2_loc = gl.getUniformLocation(shader.program, "noiseScale");
-	shader.kernel16_loc = gl.getUniformLocation(shader.program, "kernel");
-
-	// uniform values.
-	shader.near_loc = gl.getUniformLocation(shader.program, "near");
-	shader.far_loc = gl.getUniformLocation(shader.program, "far");
-	shader.fov_loc = gl.getUniformLocation(shader.program, "fov");
-	shader.aspectRatio_loc = gl.getUniformLocation(shader.program, "aspectRatio");
-
-	shader.screenWidth_loc = gl.getUniformLocation(shader.program, "screenWidth");
-	shader.screenHeight_loc = gl.getUniformLocation(shader.program, "screenHeight");
-
-	shader.hasTexture_loc = gl.getUniformLocation(shader.program, "hasTexture");
-	shader.color4Aux_loc = gl.getUniformLocation(shader.program, "vColor4Aux");
-
-	// uniform samplers.
-	shader.depthTex_loc = gl.getUniformLocation(shader.program, "depthTex");
-	shader.noiseTex_loc = gl.getUniformLocation(shader.program, "noiseTex");
-	shader.diffuseTex_loc = gl.getUniformLocation(shader.program, "diffuseTex");
-
-	// ModelReference.*
-	shader.useRefTransfMatrix_loc = gl.getUniformLocation(shader.program, "useRefTransfMatrix");
-	shader.useTexture_loc = gl.getUniformLocation(shader.program, "useTexture");
-	shader.invertNormals_loc  = gl.getUniformLocation(shader.program, "invertNormals");
-	
 	return shader;
 };
 
