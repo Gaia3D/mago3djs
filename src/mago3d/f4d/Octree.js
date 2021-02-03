@@ -726,8 +726,6 @@ Octree.prototype.renderSkin = function(magoManager, neoBuilding, renderType, ren
 		
 		if (neoBuilding.simpleBuilding3x3Texture !== undefined && neoBuilding.simpleBuilding3x3Texture.texId && renderTexture)
 		{
-			// Provisionally flip tex coords here.
-			//gl.uniform1i(shader.textureFlipYAxis_loc, false);//.ppp
 			gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
 			if (shader.last_tex_id !== neoBuilding.simpleBuilding3x3Texture.texId)
 			{

@@ -172,9 +172,8 @@ PostFxShadersManager.prototype.createShader = function(gl, source, type, typeStr
 PostFxShadersManager.prototype.createDefaultShaders = function(gl, sceneState) 
 {
 	this.modelRefSilhouetteShader = this.createSilhouetteShaderModelRef(gl); // 14.
-	//this.triPolyhedronShader = this.createSsaoShaderBox(gl); // 12.
-	
-	//this.invertedBoxShader = this.createInvertedBoxShader(gl); // TEST.
+	this.dustParticleShader = this.createDustParticlesShader(gl);
+	this.dustTextureModeShader = this.createDustTextureModeShader(gl);
 };
 
 /**
@@ -259,6 +258,170 @@ PostFxShadersManager.prototype.createSilhouetteShaderModelRef = function(gl)
 	shader.ProjectionMatrix_loc = gl.getUniformLocation(shader.program, "ProjectionMatrix");
 	shader.ModelViewMatrixRelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewMatrixRelToEye");
 	
+	return shader;
+};
+
+// box Shader.
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param magoManager 변수
+ */
+PostFxShadersManager.prototype.createDustParticlesShader = function(gl) 
+{
+	var use_multi_render_target = "NO_USE_MULTI_RENDER_TARGET";
+	this.bUseMultiRenderTarget = true;
+	use_multi_render_target = "USE_MULTI_RENDER_TARGET";
+
+	var use_linearOrLogarithmicDepth = "USE_LINEAR_DEPTH";
+
+	var shader = new PostFxShader(this.gl);
+	shader.shaderManager = this;
+	this.pFx_shaders_array.push(shader);
+
+	var ssao_vs_source = ShaderSource.dustParticleVS;
+	var ssao_fs_source = ShaderSource.dustParticleFS;
+	ssao_fs_source = ssao_fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
+	ssao_fs_source = ssao_fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
+
+	shader.program = gl.createProgram();
+	shader.shader_vertex = this.createShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.createShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+
+	gl.attachShader(shader.program, shader.shader_vertex);
+	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
+	gl.linkProgram(shader.program);
+
+	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
+	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
+	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
+	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
+
+	shader.uNear_loc = gl.getUniformLocation(shader.program, "near");
+	shader.uFar_loc = gl.getUniformLocation(shader.program, "far");
+
+	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
+	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
+	shader.normalMatrix4_loc = gl.getUniformLocation(shader.program, "normalMatrix4");
+	shader.projectionMatrix4_loc = gl.getUniformLocation(shader.program, "projectionMatrix");
+	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
+	//shader.refMatrix_loc = gl.getUniformLocation(shader.program, "RefTransfMatrix");
+	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
+	shader.bUse1Color_loc = gl.getUniformLocation(shader.program, "bUse1Color");
+	shader.oneColor4_loc = gl.getUniformLocation(shader.program, "oneColor4");
+	shader.bUseNormal_loc = gl.getUniformLocation(shader.program, "bUseNormal");
+	shader.bScale_loc = gl.getUniformLocation(shader.program, "bScale");
+	shader.scale_loc = gl.getUniformLocation(shader.program, "scale");
+	shader.uDustConcentration_loc = gl.getUniformLocation(shader.program, "uDustConcentration");
+	shader.uDustConcentMinMax_loc = gl.getUniformLocation(shader.program, "uDustConcentMinMax");
+
+	
+	gl.bindAttribLocation(shader.program, 0, "position");
+	gl.bindAttribLocation(shader.program, 1, "normal");
+	gl.bindAttribLocation(shader.program, 2, "texCoord");
+	gl.bindAttribLocation(shader.program, 3, "color4");
+	
+	
+	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
+	//shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
+	shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
+	shader.color4_loc = gl.getAttribLocation(shader.program, "color4");
+	
+	
+	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
+	shader.attribLocationCacheObj.normal = gl.getAttribLocation(shader.program, "normal");
+	shader.attribLocationCacheObj.color4 = gl.getAttribLocation(shader.program, "color4");
+
+	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
+	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
+	shader.uFrustumIdx_loc = gl.getUniformLocation(shader.program, "uFrustumIdx");
+
+	shader.smokeTex_loc = gl.getUniformLocation(shader.program, "smokeTex");
+	this.useProgram(shader);
+	gl.uniform1i(shader.smokeTex_loc, 0);
+
+	return shader;
+};
+
+// box Shader.
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param magoManager 변수
+ */
+PostFxShadersManager.prototype.createDustTextureModeShader = function(gl) 
+{
+	var use_multi_render_target = "NO_USE_MULTI_RENDER_TARGET";
+	this.bUseMultiRenderTarget = true;
+	use_multi_render_target = "USE_MULTI_RENDER_TARGET";
+
+	var use_linearOrLogarithmicDepth = "USE_LINEAR_DEPTH";
+
+	var shader = new PostFxShader(this.gl);
+	shader.shaderManager = this;
+	this.pFx_shaders_array.push(shader);
+
+	var ssao_vs_source = ShaderSource.dustTextureModeVS;
+	var ssao_fs_source = ShaderSource.dustTextureModeFS;
+	ssao_fs_source = ssao_fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
+	ssao_fs_source = ssao_fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
+
+	shader.program = gl.createProgram();
+	shader.shader_vertex = this.createShader(gl, ssao_vs_source, gl.VERTEX_SHADER, "VERTEX");
+	shader.shader_fragment = this.createShader(gl, ssao_fs_source, gl.FRAGMENT_SHADER, "FRAGMENT");
+
+	gl.attachShader(shader.program, shader.shader_vertex);
+	gl.attachShader(shader.program, shader.shader_fragment);
+	shader.bindAttribLocations(gl, shader); // Do this before linkProgram.
+	gl.linkProgram(shader.program);
+
+	shader.cameraPosHIGH_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCHigh");
+	shader.cameraPosLOW_loc = gl.getUniformLocation(shader.program, "encodedCameraPositionMCLow");
+	shader.buildingPosHIGH_loc = gl.getUniformLocation(shader.program, "buildingPosHIGH");
+	shader.buildingPosLOW_loc = gl.getUniformLocation(shader.program, "buildingPosLOW");
+
+	shader.uNear_loc = gl.getUniformLocation(shader.program, "near");
+	shader.uFar_loc = gl.getUniformLocation(shader.program, "far");
+
+	shader.modelViewMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEye");
+	shader.modelViewProjectionMatrix4RelToEye_loc = gl.getUniformLocation(shader.program, "ModelViewProjectionMatrixRelToEye");
+	shader.normalMatrix4_loc = gl.getUniformLocation(shader.program, "normalMatrix4");
+	shader.projectionMatrix4_loc = gl.getUniformLocation(shader.program, "projectionMatrix");
+	shader.modelViewMatrix4_loc = gl.getUniformLocation(shader.program, "modelViewMatrix");
+	//shader.refMatrix_loc = gl.getUniformLocation(shader.program, "RefTransfMatrix");
+	shader.buildingRotMatrix_loc = gl.getUniformLocation(shader.program, "buildingRotMatrix");
+	shader.bUse1Color_loc = gl.getUniformLocation(shader.program, "bUse1Color");
+	shader.oneColor4_loc = gl.getUniformLocation(shader.program, "oneColor4");
+	shader.bUseNormal_loc = gl.getUniformLocation(shader.program, "bUseNormal");
+	shader.bScale_loc = gl.getUniformLocation(shader.program, "bScale");
+	shader.scale_loc = gl.getUniformLocation(shader.program, "scale");
+	shader.uDustConcentration_loc = gl.getUniformLocation(shader.program, "uDustConcentration");
+	shader.uDustConcentMinMax_loc = gl.getUniformLocation(shader.program, "uDustConcentMinMax");
+
+	
+	gl.bindAttribLocation(shader.program, 0, "position");
+	gl.bindAttribLocation(shader.program, 1, "normal");
+	gl.bindAttribLocation(shader.program, 2, "texCoord");
+	gl.bindAttribLocation(shader.program, 3, "color4");
+	
+	
+	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
+	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
+	shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
+	shader.color4_loc = gl.getAttribLocation(shader.program, "color4");
+	
+	
+	shader.attribLocationCacheObj.position = gl.getAttribLocation(shader.program, "position");
+	shader.attribLocationCacheObj.normal = gl.getAttribLocation(shader.program, "normal");
+	shader.attribLocationCacheObj.color4 = gl.getAttribLocation(shader.program, "color4");
+
+	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
+	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
+	shader.uFrustumIdx_loc = gl.getUniformLocation(shader.program, "uFrustumIdx");
+
+	shader.smokeTex_loc = gl.getUniformLocation(shader.program, "smokeTex");
+	this.useProgram(shader);
+	gl.uniform1i(shader.smokeTex_loc, 0);
+
 	return shader;
 };
 

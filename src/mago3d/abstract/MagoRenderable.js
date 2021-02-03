@@ -522,7 +522,7 @@ MagoRenderable.prototype.moved = function()
 {
 	// do something.
 	// delete boundingSphereWC, etc.
-	var hola = 0;
+	this.boundingSphereWC = undefined;
 };
 
 MagoRenderable.prototype.updateMatrix = function(ownerMatrix) 
@@ -670,6 +670,8 @@ MagoRenderable.prototype.changeLocationAndRotation = function(latitude, longitud
 {
 	var geoLocationData = this.getCurrentGeoLocationData();
 	ManagerUtils.calculateGeoLocationData(longitude, latitude, elevation, heading, pitch, roll, geoLocationData, magoManager);
+
+	this.moved();
 };
 
 /**

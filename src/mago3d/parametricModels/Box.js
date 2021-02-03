@@ -52,6 +52,11 @@ Box.prototype.getMesh = function()
 Box.prototype.moved = function()
 {
 	// do something.
+	// delete boundingSphereWC, etc.
+	//********************************************************************
+	// Note: function override of the "moved" function of MagoRenderable.
+	//********************************************************************
+	this.boundingSphereWC = undefined;
 };
 
 /**

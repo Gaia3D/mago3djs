@@ -480,7 +480,6 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader,
 	{
 		return false;
 	}
-	gl.frontFace(gl.CCW);
 	
 	// renderType = 0 -> depth render.
 	// renderType = 1 -> normal render.
@@ -613,27 +612,8 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader,
 		if (!vbo_vicky.bindDataNormal(shader, magoManager.vboMemoryManager))
 		{ return false; }
 	
-		
-
-		// TODO:
-		//if (vbo_vicky.meshColorCacheKey !== undefined )
-		//{
-		//if(shader.color4_loc != -1)shader.enableVertexAttribArray(shader.color4_loc);
-		//gl.bindBuffer(gl.ARRAY_BUFFER, vbo_vicky.meshColorCacheKey);
-		//gl.vertexAttribPointer(shader.color4_loc, 4, gl.UNSIGNED_BYTE, true, 0, 0);
-		//}
-		
 		if (renderTexture && vbo_vicky.vboBufferTCoord !== undefined)
 		{
-			gl.uniform1i(shader.textureFlipYAxis_loc, false);
-			// Provisionally flip tex coords here.
-			/*if (magoManager.isCesiumGlobe())
-			{ gl.uniform1i(shader.textureFlipYAxis_loc, false); }//.ppp
-			else
-			{ gl.uniform1i(shader.textureFlipYAxis_loc, true); }//.ppp
-			*/
-			//---------------------------------------------------------------------------
-			
 			shader.disableVertexAttribArray(shader.color4_loc); 
 			
 			if (!vbo_vicky.bindDataTexCoord(shader, magoManager.vboMemoryManager))

@@ -243,6 +243,18 @@ GeographicCoord.prototype.getLongitudeRad = function()
 };
 
 /**
+ * Returns the altitude.
+ * @returns {Number}
+ */
+GeographicCoord.prototype.getAltitude = function() 
+{
+	if (this.altitude === undefined)
+	{ return; }
+	
+	return this.altitude;
+};
+
+/**
  * Returns the middle point between two GeopraphicCoord features
  * @param {GeographicCoord} geographicCoordA
  * @param {GeographicCoord} geographicCoordB

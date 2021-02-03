@@ -234,18 +234,25 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 		bIncludeTopCap = false;
 	}
 	
-	
-	// outerLateral.
-	var vtxProfilesCount = this.getVtxProfilesCount();
-	
-	if (vtxProfilesCount < 2)
-	{ return resultMesh; }
-	
 	if (resultMesh === undefined)
 	{ resultMesh = new Mesh(); }
-	
+
 	if (resultMesh.vertexList === undefined)
 	{ resultMesh.vertexList = new VertexList(); }
+	
+	var options = {};
+
+	// outerLateral.
+	var vtxProfilesCount = this.getVtxProfilesCount();
+	if (vtxProfilesCount < 2)
+	{ 
+		// Only exist 1 vtxProfile, so, create a surfaceMesh.
+		options.name = "surface";
+		topVtxProfile = this.getVtxProfile(0);
+		resultSurface = resultMesh.newSurface(options);
+		resultSurface = VtxProfilesList.getTransversalSurface(topVtxProfile, this.convexFacesIndicesData, resultSurface);
+		return resultMesh; // process finished.***
+	}
 	
 	// 1rst, get all vertices and put it into the resultMesh.
 	resultMesh.vertexList.vertexArray = this.getAllVertices(resultMesh.vertexList.vertexArray);
@@ -264,7 +271,7 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 	var facesArray = [];
 	var prevFacesArray;
 	var elemsCount = outerVtxRing.elemsIndexRangesArray.length;
-	var options = {};
+	
 	options.name = "outerLateral";
 	for (var i=0; i<elemsCount; i++)
 	{

@@ -81,21 +81,20 @@ VectorMeshWind.prototype.renderAsChild = function (magoManager, shader, renderTy
  * @param glPrimitive
  * @TODO : 누가 이 gl primitive의 type 정체를 안다면 좀 달아주세요ㅠㅠ 세슘 쪽인거 같은데ㅠㅠ
  */
-VectorMeshWind.prototype.render = function(magoManager, shader)
+VectorMeshWind.prototype.render = function(magoManager, shader, options)
 {
 	if (this.vboKeysContainer === undefined)
 	{ return; }
 	
 	var vbo = this.vboKeysContainer.getVboKey(0);
 	var gl = magoManager.getGl();
+	var animationState = 1; // 0= paused, 1= play.
 
-	//gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
-	//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-	//gl.disable(gl.CULL_FACE);
-
-	//gl.enableVertexAttribArray(shader.prev_loc);
-	//gl.enableVertexAttribArray(shader.current_loc);
-	//gl.enableVertexAttribArray(shader.next_loc);
+	if(options)
+	{
+		if(options.animationState !== undefined)
+		{ animationState = options.animationState; }
+	}
 	
 	gl.disableVertexAttribArray(shader.color4_loc);
 
@@ -154,28 +153,33 @@ VectorMeshWind.prototype.render = function(magoManager, shader)
 
 	//gl.drawArrays(gl.TRIANGLE_STRIP, 0, vbo.vertexCount-4);
 	var maxVertexDrawCount = vbo.vertexCount-4 < 400 ? vbo.vertexCount-4 : 400;
-	if(this.phase < 0)
+
+	if(animationState === 1)
 	{
-		this.currElemIdx = 0;
-		this.vertexToDrawCount = maxVertexDrawCount + this.phase;
-	}
-	else
-	{
-		this.currElemIdx = this.phase;
-		var remanentVertexCount = (vbo.vertexCount-4) - this.currElemIdx;
-		if(remanentVertexCount > maxVertexDrawCount)
+		if(this.phase < 0)
 		{
-			this.vertexToDrawCount = maxVertexDrawCount;
+			this.currElemIdx = 0;
+			this.vertexToDrawCount = maxVertexDrawCount + this.phase;
 		}
 		else
 		{
-			this.vertexToDrawCount = remanentVertexCount;
+			this.currElemIdx = this.phase;
+			var remanentVertexCount = (vbo.vertexCount-4) - this.currElemIdx;
+			if(remanentVertexCount > maxVertexDrawCount)
+			{
+				this.vertexToDrawCount = maxVertexDrawCount;
+			}
+			else
+			{
+				this.vertexToDrawCount = remanentVertexCount;
+			}
 		}
 	}
+
 	if(this.vertexToDrawCount < 4)
 	{
-		this.phase -= 2;
-		if(this.phase <= -maxVertexDrawCount + 2)
+		this.phase -= 1;
+		if(this.phase <= -maxVertexDrawCount + 1)
 		{
 			this.finished = true;
 		}
@@ -185,10 +189,13 @@ VectorMeshWind.prototype.render = function(magoManager, shader)
 	gl.uniform1i(shader.uTotalPointsCount_loc, this.vertexToDrawCount);
 	gl.drawArrays(gl.TRIANGLE_STRIP, this.currElemIdx, this.vertexToDrawCount);
 
-	this.phase -= 2;
-	if(this.phase <= -maxVertexDrawCount + 2)
+	if(animationState === 1)
 	{
-		this.finished = true;
+		this.phase -= 1;
+		if(this.phase <= -maxVertexDrawCount + 1)
+		{
+			this.finished = true;
+		}
 	}
 };
 

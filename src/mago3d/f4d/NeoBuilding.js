@@ -1711,7 +1711,6 @@ NeoBuilding.prototype.render = function(magoManager, shader, renderType, refMatr
 	// Check "lodBuildingData".***
 	// In models as "trees" is possible that there are no lodMesh. 20200919.***
 	var lodBuildingData = this.getLodBuildingData(this.currentLod);
-
 	if (this.currentLod <= 2)
 	{
 		// There are buildings that are only skin, so check projectType of the building.

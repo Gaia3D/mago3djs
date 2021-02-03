@@ -215,7 +215,6 @@ Renderer.prototype.renderPCloud = function(gl, pCloud, magoManager, shader, rend
 	{
 		return;
 	}
-	gl.frontFace(gl.CCW);
 	
 	var vbo_vicky = pCloud.vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.
 	var vertices_count = vbo_vicky.vertexCount;
@@ -488,6 +487,12 @@ Renderer.prototype.renderGeometryDepth = function(gl, renderType, visibleObjCont
 
 	}
 
+	//	// Draw the axis.***
+	//	if (magoManager.magoPolicy.getShowOrigin() && visibleObjControlerNodes.getAllVisibles().length > 0)
+	//	{
+	//		this.renderAxisNodes(visibleObjControlerNodes.getAllVisibles(), renderType);
+	//	}
+	
 	if (visibleObjControlerNodes.hasRenderables())
 	{
 		// Make depth for all visible objects.***
@@ -2200,7 +2205,7 @@ Renderer.prototype.renderScreenRectangle = function(gl, options)
 
 	if(magoManager.albedoTex)
 	{
-		texture = magoManager.albedoTex;
+		//texture = magoManager.albedoTex;
 	}
 
 	if(magoManager.diffuseLightTex)
@@ -2231,6 +2236,16 @@ Renderer.prototype.renderScreenRectangle = function(gl, options)
 	if(magoManager.windPlaneNormalTex)
 	{
 		//texture = magoManager.windPlaneNormalTex;
+	}
+
+	if(magoManager.windVolumeRearDepthTex)
+	{
+		texture = magoManager.windVolumeRearDepthTex;
+	}
+	
+	if(magoManager.windVolumeRearNormalTex)
+	{
+		//texture = magoManager.windVolumeRearNormalTex;
 	}
 
 	/*
@@ -2580,8 +2595,7 @@ Renderer.prototype.renderLightBuffer = function(lightSourcesArray)
  * @param {VisibleObjectsController} visibleObjControlerNodes This object contains visible objects for the camera frustum.
  */
 Renderer.prototype.renderGeometryBuffer = function(gl, renderType, visibleObjControlerNodes) 
-{
-	gl.frontFace(gl.CCW);	
+{	
 	gl.enable(gl.DEPTH_TEST);
 	gl.depthFunc(gl.LEQUAL);
 	gl.enable(gl.CULL_FACE);
@@ -2592,7 +2606,6 @@ Renderer.prototype.renderGeometryBuffer = function(gl, renderType, visibleObjCon
 	var renderingSettings = magoManager._settings.getRenderingSettings();
 
 	var renderTexture = false;
-	var selectionManager = magoManager.selectionManager;
 
 	gl.disable(gl.BLEND); // No blend in GBuffer.
 	
@@ -2611,9 +2624,6 @@ Renderer.prototype.renderGeometryBuffer = function(gl, renderType, visibleObjCon
 		var noiseTexture = magoManager.texturesStore.getNoiseTexture4x4();
 		
 		magoManager.currentProcess = CODE.magoCurrentProcess.ColorRendering;
-		
-		// Set default blending setting.
-		//gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
 
 		var bApplySsao = false;
 		var bApplyShadow = false;
@@ -2643,9 +2653,6 @@ Renderer.prototype.renderGeometryBuffer = function(gl, renderType, visibleObjCon
 			magoManager.postFxShadersManager.useProgram(currentShader);
 			magoManager.effectsManager.setCurrentShader(currentShader);
 			gl.uniform1i(currentShader.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
-			gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
-			gl.uniform1i(currentShader.bApplyShadow_loc, bApplyShadow);
-			gl.uniform1i(currentShader.bApplySpecularLighting_loc, true);
 			gl.uniform1f(currentShader.uFCoef_logDepth_loc, sceneState.fCoef_logDepth[0]);
 			gl.uniform1i(currentShader.clippingType_loc, 0);
 			gl.uniform1i(currentShader.uFrustumIdx_loc, magoManager.currentFrustumIdx);
@@ -2656,28 +2663,6 @@ Renderer.prototype.renderGeometryBuffer = function(gl, renderType, visibleObjCon
 			var modelViewMatrixRelToEyeInv = sceneState.getModelViewRelToEyeMatrixInv();
 			gl.uniformMatrix4fv(currentShader.modelViewMatrixRelToEyeInv_loc, false, modelViewMatrixRelToEyeInv._floatArrays);
 
-			var sunSystem = magoManager.sceneState.sunSystem;
-			var sunLight = sunSystem.getLight(0);
-			if (bApplyShadow)
-			{
-				// Set sunMatrix uniform.***
-				var sunMatFloat32Array = sunSystem.getLightsMatrixFloat32Array();
-				var sunPosLOWFloat32Array = sunSystem.getLightsPosLOWFloat32Array();
-				var sunPosHIGHFloat32Array = sunSystem.getLightsPosHIGHFloat32Array();
-				var sunDirWC = sunSystem.getSunDirWC();
-				
-				if (sunLight.tMatrix!== undefined)
-				{
-					gl.uniformMatrix4fv(currentShader.sunMatrix_loc, false, sunMatFloat32Array);
-					gl.uniform3fv(currentShader.sunPosHigh_loc, sunPosHIGHFloat32Array);
-					gl.uniform3fv(currentShader.sunPosLow_loc, sunPosLOWFloat32Array);
-					gl.uniform1f(currentShader.shadowMapWidth_loc, sunLight.targetTextureWidth);
-					gl.uniform1f(currentShader.shadowMapHeight_loc, sunLight.targetTextureHeight);
-					gl.uniform3fv(currentShader.sunDirWC_loc, sunDirWC);
-					gl.uniform1i(currentShader.sunIdx_loc, 1);
-				}
-			}
-			
 			// check if exist clippingPlanes.
 			if (magoManager.modeler.clippingBox !== undefined)
 			{
@@ -2699,56 +2684,14 @@ Renderer.prototype.renderGeometryBuffer = function(gl, renderType, visibleObjCon
 			if (currentShader.color4_loc !== -1){ gl.disableVertexAttribArray(currentShader.color4_loc); }
 			
 			currentShader.bindUniformGenerals();
-			gl.uniform1f(currentShader.externalAlpha_loc, 1.0);
+			//gl.uniform1f(currentShader.externalAlpha_loc, 1.0);
 			gl.uniform1i(currentShader.textureFlipYAxis_loc, magoManager.sceneState.textureFlipYAxis);
 			gl.uniform1i(currentShader.refMatrixType_loc, 0); // init referencesMatrix.
 			gl.uniform3fv(currentShader.scaleLC_loc, [1.0, 1.0, 1.0]); // init local scale.
 			gl.uniform4fv(currentShader.colorMultiplier_loc, [1.0, 1.0, 1.0, 1.0]);
 			gl.uniform3fv(currentShader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.
 			
-			// Test sphericalKernel for ssao.************************
-			//gl.uniform3fv(currentShader.kernel32_loc, magoManager.sceneState.ssaoSphereKernel32);
-			// End test.---------------------------------------------
 
-			//gl.activeTexture(gl.TEXTURE0);
-			//gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);  // original.***
-			//gl.bindTexture(gl.TEXTURE_2D, magoManager.depthTex);  // original.***
-			gl.activeTexture(gl.TEXTURE1);
-			gl.bindTexture(gl.TEXTURE_2D, noiseTexture);
-			gl.activeTexture(gl.TEXTURE2); 
-			gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
-			//gl.activeTexture(gl.TEXTURE5);
-			//gl.bindTexture(gl.TEXTURE_2D, magoManager.ssaoFromDepthFbo.colorBuffer);
-			currentShader.last_tex_id = textureAux1x1;
-			
-			gl.activeTexture(gl.TEXTURE3); 
-			if (bApplyShadow && sunLight.depthFbo)
-			{
-				var sunLight = sunSystem.getLight(0);
-				gl.bindTexture(gl.TEXTURE_2D, sunLight.depthFbo.colorBuffer);
-			}
-			else 
-			{
-				gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
-			}
-			
-			gl.activeTexture(gl.TEXTURE4); 
-			if (bApplyShadow && sunLight.depthFbo)
-			{
-				var sunLight = sunSystem.getLight(1);
-				gl.bindTexture(gl.TEXTURE_2D, sunLight.depthFbo.colorBuffer);
-			}
-			else 
-			{
-				gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
-			}
-
-			/*
-			if (MagoConfig.getPolicy().geo_cull_face_enable === "true") 
-			{ gl.enable(gl.CULL_FACE); }
-			else 
-			{ gl.disable(gl.CULL_FACE); }
-			*/
 			gl.enable(gl.CULL_FACE);
 			var refTMatrixIdxKey = 0;
 			var minSizeToRender = 0.0;
@@ -2924,7 +2867,6 @@ Renderer.prototype.renderGeometryBuffer = function(gl, renderType, visibleObjCon
  */
 Renderer.prototype.renderGeometryBufferTransparents = function(gl, renderType, visibleObjControlerNodes) 
 {
-	gl.frontFace(gl.CCW);	
 	gl.enable(gl.DEPTH_TEST);
 	gl.depthFunc(gl.LEQUAL);
 	gl.enable(gl.CULL_FACE);
@@ -3253,7 +3195,6 @@ Renderer.prototype.renderGeometryBufferTransparents = function(gl, renderType, v
  */
 Renderer.prototype.renderGeometry = function(gl, renderType, visibleObjControlerNodes) 
 {
-	gl.frontFace(gl.CCW);	
 	gl.enable(gl.DEPTH_TEST);
 	gl.depthFunc(gl.LEQUAL);
 	gl.enable(gl.CULL_FACE);

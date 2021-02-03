@@ -41,6 +41,21 @@ BoundingBox.prototype.init = function(point)
 };
 
 /**
+ * Initiate the value of the bounding box
+ * @param {Point3D} point 3차원 점
+ */
+BoundingBox.prototype.initXYZData = function(x, y, z) 
+{
+	this.minX = x;
+	this.minY = y;
+	this.minZ = z;
+
+	this.maxX = x;
+	this.maxY = y;
+	this.maxZ = z;
+};
+
+/**
  * Reads the boundingBox from an arrayBuffer.
  * @param {typedArray} arrayBuffer
  * @param {Number} bytesReaded current bytesReaded on the arrayBuffer.

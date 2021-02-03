@@ -1611,6 +1611,15 @@ MagoManager.prototype.TEST__cameraLaser = function()
  * Main rendering function.
  * @private
  */
+MagoManager.prototype.bindMainFramebuffer = function() 
+{
+	this.scene._context._currentFramebuffer._bind();
+};
+
+/**
+ * Main rendering function.
+ * @private
+ */
 MagoManager.prototype.doRender = function(frustumVolumenObject) 
 {
 	if(!this.isCesiumGlobe())
@@ -1790,6 +1799,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	// 2) gBuffer render.*****************************************************************************************************************
 	renderType = 1;
 	this.renderType = 1;
+	gl.frontFace(gl.CCW);
 	this.renderer.renderGeometryBuffer(gl, renderType, this.visibleObjControlerNodes);
 
 	if (this.weatherStation)
@@ -1816,6 +1826,11 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	renderType = 1;
 	this.renderType = 1;
 	this.renderer.renderGeometryBufferTransparents(gl, renderType, this.visibleObjControlerNodes);
+
+	if (this.weatherStation)
+	{
+		this.weatherStation.renderWeatherTransparents(this);
+	}
 
 	// check if must render boundingBoxes.
 	if (this.magoPolicy.getShowBoundingBox())
@@ -1977,64 +1992,6 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 
 	} 
 
-	
-
-	/*
-	if (this.windTest === undefined)
-	{
-		if (this.weatherStation === undefined)
-		{ this.weatherStation = new WeatherStation(); }
-	
-		var geometryDataPath = this.readerWriter.geometryDataPath;
-		// JejuAirport, jejuHanRaSan.
-		//var windDataFilesNamesArray = ["OBS-QWM_2016062000.grib2_wind_000", "OBS-QWM_2016062001.grib2_wind_000", "OBS-QWM_2016062002.grib2_wind_000", "OBS-QWM_2016062003.grib2_wind_000",
-		//	"OBS-QWM_2016062004.grib2_wind_000", "OBS-QWM_2016062005.grib2_wind_000", "OBS-QWM_2016062006.grib2_wind_000", "OBS-QWM_2016062007.grib2_wind_000",
-		//	"OBS-QWM_2016062008.grib2_wind_000", "OBS-QWM_2016062009.grib2_wind_000", "OBS-QWM_2016062010.grib2_wind_000", "OBS-QWM_2016062011.grib2_wind_000",
-		//	"OBS-QWM_2016062012.grib2_wind_000", "OBS-QWM_2016062013.grib2_wind_000", "OBS-QWM_2016062014.grib2_wind_000", "OBS-QWM_2016062015.grib2_wind_000",
-		//	"OBS-QWM_2016062016.grib2_wind_000", "OBS-QWM_2016062017.grib2_wind_000", "OBS-QWM_2016062018.grib2_wind_000", "OBS-QWM_2016062019.grib2_wind_000",
-		//	"OBS-QWM_2016062020.grib2_wind_000", "OBS-QWM_2016062021.grib2_wind_000", "OBS-QWM_2016062022.grib2_wind_000", "OBS-QWM_2016062023.grib2_wind_000"]; // jeju, hanRaSan
-		
-			
-		// Seoul data.
-		
-			var windDataFilesNamesArray = ["OBS-QWM_2019090700.grib2_wind_000", "OBS-QWM_2019090701.grib2_wind_000", "OBS-QWM_2019090702.grib2_wind_000", "OBS-QWM_2019090703.grib2_wind_000",
-			"OBS-QWM_2019090704.grib2_wind_000", "OBS-QWM_2019090705.grib2_wind_000", "OBS-QWM_2019090706.grib2_wind_000", "OBS-QWM_2019090707.grib2_wind_000",
-			"OBS-QWM_2019090708.grib2_wind_000", "OBS-QWM_2019090709.grib2_wind_000", "OBS-QWM_2019090710.grib2_wind_000", "OBS-QWM_2019090711.grib2_wind_000",
-			"OBS-QWM_2019090712.grib2_wind_000", "OBS-QWM_2019090713.grib2_wind_000", "OBS-QWM_2019090714.grib2_wind_000", "OBS-QWM_2019090715.grib2_wind_000",
-			"OBS-QWM_2019090716.grib2_wind_000", "OBS-QWM_2019090717.grib2_wind_000", "OBS-QWM_2019090718.grib2_wind_000", "OBS-QWM_2019090719.grib2_wind_000",
-			"OBS-QWM_2019090720.grib2_wind_000", "OBS-QWM_2019090721.grib2_wind_000", "OBS-QWM_2019090722.grib2_wind_000", "OBS-QWM_2019090723.grib2_wind_000"]; // seoulData.
-			
-		
-		//Siheung_wind
-		//var windDataFilesNamesArray = ["OBS-QWM_2019090700.grib2_wind_000", "OBS-QWM_2019090701.grib2_wind_000", "OBS-QWM_2019090702.grib2_wind_000", "OBS-QWM_2019090703.grib2_wind_000",
-		//	"OBS-QWM_2019090704.grib2_wind_000", "OBS-QWM_2019090705.grib2_wind_000", "OBS-QWM_2019090706.grib2_wind_000", "OBS-QWM_2019090707.grib2_wind_000",
-		//	"OBS-QWM_2019090708.grib2_wind_000", "OBS-QWM_2019090709.grib2_wind_000", "OBS-QWM_2019090710.grib2_wind_000", "OBS-QWM_2019090711.grib2_wind_000",
-		//	"OBS-QWM_2019090712.grib2_wind_000", "OBS-QWM_2019090713.grib2_wind_000", "OBS-QWM_2019090714.grib2_wind_000", "OBS-QWM_2019090715.grib2_wind_000",
-		//	"OBS-QWM_2019090716.grib2_wind_000", "OBS-QWM_2019090717.grib2_wind_000", "OBS-QWM_2019090718.grib2_wind_000", "OBS-QWM_2019090719.grib2_wind_000",
-		//	"OBS-QWM_2019090720.grib2_wind_000", "OBS-QWM_2019090721.grib2_wind_000", "OBS-QWM_2019090722.grib2_wind_000", "OBS-QWM_2019090723.grib2_wind_000"];
-		
-		
-			
-		//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_Airport";
-		//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_GolfPark_NineBridge1";
-		var windMapFilesFolderPath = geometryDataPath +"/SeoulWind/200907";
-		//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_HanRaSan";
-		//var windMapFilesFolderPath = geometryDataPath +"/Siheung_wind";
-
-		// yeonHwa test data.*********************************************
-		var windDataFilesNamesArray = ["wind_7"];
-		var windMapFilesFolderPath = geometryDataPath +"/wind_yeonHwa";
-
-		// world test data.*********************************************
-		//var windDataFilesNamesArray = ["2016112012"];
-		//var windMapFilesFolderPath = geometryDataPath +"/wind_world";
-		
-		this.weatherStation.test_loadWindData3d(this, windDataFilesNamesArray, windMapFilesFolderPath);
-		//this.TEST__golfPark();
-		this.windTest = true;
-	}
-	*/
-
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
 		
 	this.swapRenderingFase();
@@ -2177,6 +2134,7 @@ MagoManager.prototype.doRenderMagoWorld = function(frustumVolumenObject)
 	// 2) gBuffer render.*****************************************************************************************************************
 	renderType = 1;
 	this.renderType = 1;
+	gl.frontFace(gl.CCW);
 	this.renderer.renderGeometryBuffer(gl, renderType, this.visibleObjControlerNodes);
 	
 	/*
@@ -2339,53 +2297,6 @@ MagoManager.prototype.doRenderMagoWorld = function(frustumVolumenObject)
 	// DEBUG.Render lights sources.*************************************************************************
 	//this.renderer.renderNativeLightSources(renderType, this.visibleObjControlerNodes) ; // debug component.
 	//------------------------------------------------------------------------------------------------------
-
-	/*
-	if (this.windTest === undefined)
-	{
-		
-
-		if (this.weatherStation === undefined)
-		{ this.weatherStation = new WeatherStation(); }
-	
-		var geometryDataPath = this.readerWriter.geometryDataPath;
-		// JejuAirport, jejuHanRaSan.
-		//var windDataFilesNamesArray = ["OBS-QWM_2016062000.grib2_wind_000", "OBS-QWM_2016062001.grib2_wind_000", "OBS-QWM_2016062002.grib2_wind_000", "OBS-QWM_2016062003.grib2_wind_000",
-		//	"OBS-QWM_2016062004.grib2_wind_000", "OBS-QWM_2016062005.grib2_wind_000", "OBS-QWM_2016062006.grib2_wind_000", "OBS-QWM_2016062007.grib2_wind_000",
-		//	"OBS-QWM_2016062008.grib2_wind_000", "OBS-QWM_2016062009.grib2_wind_000", "OBS-QWM_2016062010.grib2_wind_000", "OBS-QWM_2016062011.grib2_wind_000",
-		//	"OBS-QWM_2016062012.grib2_wind_000", "OBS-QWM_2016062013.grib2_wind_000", "OBS-QWM_2016062014.grib2_wind_000", "OBS-QWM_2016062015.grib2_wind_000",
-		//	"OBS-QWM_2016062016.grib2_wind_000", "OBS-QWM_2016062017.grib2_wind_000", "OBS-QWM_2016062018.grib2_wind_000", "OBS-QWM_2016062019.grib2_wind_000",
-		//	"OBS-QWM_2016062020.grib2_wind_000", "OBS-QWM_2016062021.grib2_wind_000", "OBS-QWM_2016062022.grib2_wind_000", "OBS-QWM_2016062023.grib2_wind_000"]; // jeju, hanRaSan
-		
-			
-		// Seoul data.
-		var windDataFilesNamesArray = ["OBS-QWM_2019090700.grib2_wind_000", "OBS-QWM_2019090701.grib2_wind_000", "OBS-QWM_2019090702.grib2_wind_000", "OBS-QWM_2019090703.grib2_wind_000",
-			"OBS-QWM_2019090704.grib2_wind_000", "OBS-QWM_2019090705.grib2_wind_000", "OBS-QWM_2019090706.grib2_wind_000", "OBS-QWM_2019090707.grib2_wind_000",
-			"OBS-QWM_2019090708.grib2_wind_000", "OBS-QWM_2019090709.grib2_wind_000", "OBS-QWM_2019090710.grib2_wind_000", "OBS-QWM_2019090711.grib2_wind_000",
-			"OBS-QWM_2019090712.grib2_wind_000", "OBS-QWM_2019090713.grib2_wind_000", "OBS-QWM_2019090714.grib2_wind_000", "OBS-QWM_2019090715.grib2_wind_000",
-			"OBS-QWM_2019090716.grib2_wind_000", "OBS-QWM_2019090717.grib2_wind_000", "OBS-QWM_2019090718.grib2_wind_000", "OBS-QWM_2019090719.grib2_wind_000",
-			"OBS-QWM_2019090720.grib2_wind_000", "OBS-QWM_2019090721.grib2_wind_000", "OBS-QWM_2019090722.grib2_wind_000", "OBS-QWM_2019090723.grib2_wind_000"]; // seoulData.
-			
-			
-		//Siheung_wind
-		//var windDataFilesNamesArray = ["OBS-QWM_2019090700.grib2_wind_000", "OBS-QWM_2019090701.grib2_wind_000", "OBS-QWM_2019090702.grib2_wind_000", "OBS-QWM_2019090703.grib2_wind_000",
-		//	"OBS-QWM_2019090704.grib2_wind_000", "OBS-QWM_2019090705.grib2_wind_000", "OBS-QWM_2019090706.grib2_wind_000", "OBS-QWM_2019090707.grib2_wind_000",
-		//	"OBS-QWM_2019090708.grib2_wind_000", "OBS-QWM_2019090709.grib2_wind_000", "OBS-QWM_2019090710.grib2_wind_000", "OBS-QWM_2019090711.grib2_wind_000",
-		//	"OBS-QWM_2019090712.grib2_wind_000", "OBS-QWM_2019090713.grib2_wind_000", "OBS-QWM_2019090714.grib2_wind_000", "OBS-QWM_2019090715.grib2_wind_000",
-		//	"OBS-QWM_2019090716.grib2_wind_000", "OBS-QWM_2019090717.grib2_wind_000", "OBS-QWM_2019090718.grib2_wind_000", "OBS-QWM_2019090719.grib2_wind_000",
-		//	"OBS-QWM_2019090720.grib2_wind_000", "OBS-QWM_2019090721.grib2_wind_000", "OBS-QWM_2019090722.grib2_wind_000", "OBS-QWM_2019090723.grib2_wind_000"];
-			
-		//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_Airport";
-		//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_GolfPark_NineBridge1";
-		//var windMapFilesFolderPath = geometryDataPath +"/SeoulWind/200907";
-		//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_HanRaSan";
-		var windMapFilesFolderPath = geometryDataPath +"/Siheung_wind";
-		
-		this.weatherStation.test_loadWindData3d(this, windDataFilesNamesArray, windMapFilesFolderPath);
-		//this.TEST__golfPark();
-		this.windTest = true;
-	}
-	*/
 
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 	

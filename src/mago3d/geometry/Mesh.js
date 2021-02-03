@@ -580,6 +580,11 @@ Mesh.prototype.calculateVerticesNormals = function(bForceRecalculatePlaneNormal)
  */
 Mesh.prototype.calculateTexCoordsBox = function(texCoordsBoundingBox)
 {
+	if(!texCoordsBoundingBox)
+	{
+		texCoordsBoundingBox = this.getBoundingBox();
+	}
+
 	var surface;
 	var surfacesCount = this.getSurfacesCount();
 	for (var i=0; i<surfacesCount; i++)
