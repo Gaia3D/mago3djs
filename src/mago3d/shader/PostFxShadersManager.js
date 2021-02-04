@@ -417,10 +417,14 @@ PostFxShadersManager.prototype.createDustTextureModeShader = function(gl)
 	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
 	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
 	shader.uFrustumIdx_loc = gl.getUniformLocation(shader.program, "uFrustumIdx");
+	shader.u_tex_res_loc = gl.getUniformLocation(shader.program, "u_tex_res");
+	shader.uZFactor_loc = gl.getUniformLocation(shader.program, "uZFactor");
 
-	shader.smokeTex_loc = gl.getUniformLocation(shader.program, "smokeTex");
+	shader.texUp_loc = gl.getUniformLocation(shader.program, "texUp");
+	shader.texDown_loc = gl.getUniformLocation(shader.program, "texDown");
 	this.useProgram(shader);
-	gl.uniform1i(shader.smokeTex_loc, 0);
+	gl.uniform1i(shader.texDown_loc, 0);
+	gl.uniform1i(shader.texUp_loc, 1);
 
 	return shader;
 };

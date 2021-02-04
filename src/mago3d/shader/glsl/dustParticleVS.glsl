@@ -46,6 +46,23 @@ void main()
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;
 	vDepth = -(modelViewMatrixRelToEye * pos).z/far; // original.***
 
+	float minPointSize = 2.0;
+	float maxPointSize = 60.0;
+	float pendentPointSize = 2000.0 * uDustConcentration;
+	float z_b = gl_Position.z/gl_Position.w;
+	float z_n = 2.0 * z_b - 1.0;
+	float z_e = 2.0 * near * far / (far + near - z_n * (far - near));
+	gl_PointSize = minPointSize + pendentPointSize/z_e; // Original.***
+	//if(gl_PointSize > maxPointSize)
+	//	gl_PointSize = maxPointSize;
+	//if(gl_PointSize < 2.0)
+	//	gl_PointSize = 2.0;
+
+	vDustConcentRel = uDustConcentration/uDustConcentMinMax[1];
+	vDustConcent = uDustConcentration;
+	//gl_PointSize *= uDustConcentration;
+	glPointSize = gl_PointSize;
+
 	if(bUseLogarithmicDepth)
 	{
 		// logarithmic zBuffer:

@@ -10,7 +10,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "CB_fall",
@@ -27,7 +27,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "CB_Spring",
@@ -45,7 +45,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "CB_Summer",
@@ -63,7 +63,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "CB_winter",
@@ -79,7 +79,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "CT_Fall",
@@ -96,7 +96,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "CT_Spring",
@@ -114,7 +114,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "CT_Summer",
@@ -132,7 +132,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "CT_Winter",
@@ -149,7 +149,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "GK_Fall",
@@ -167,7 +167,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "GK_Spring",
@@ -185,7 +185,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "GK_Summer",
@@ -203,7 +203,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "GK_Winter",
@@ -219,7 +219,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "SL_Fall",
@@ -237,7 +237,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "SL_Spring",
@@ -255,7 +255,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "SL_Summer",
@@ -273,7 +273,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "SL_Winter",
@@ -290,7 +290,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_0",
@@ -308,7 +308,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_1",
@@ -326,7 +326,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_10",
@@ -344,7 +344,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_100",
@@ -362,7 +362,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_101",
@@ -380,7 +380,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_102",
@@ -398,7 +398,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_103",
@@ -416,7 +416,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_104",
@@ -434,7 +434,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_105",
@@ -452,7 +452,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_106",
@@ -470,7 +470,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_107",
@@ -488,7 +488,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_108",
@@ -506,7 +506,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_109",
@@ -524,7 +524,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_11",
@@ -542,7 +542,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_110",
@@ -560,7 +560,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_111",
@@ -578,7 +578,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_112",
@@ -596,7 +596,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_113",
@@ -614,7 +614,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_114",
@@ -632,7 +632,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_115",
@@ -650,7 +650,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_116",
@@ -668,7 +668,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_117",
@@ -686,7 +686,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_118",
@@ -704,7 +704,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_119",
@@ -722,7 +722,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_12",
@@ -740,7 +740,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_120",
@@ -758,7 +758,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_121",
@@ -776,7 +776,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_122",
@@ -794,7 +794,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_123",
@@ -812,7 +812,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_124",
@@ -830,7 +830,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_125",
@@ -848,7 +848,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_126",
@@ -866,7 +866,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_127",
@@ -884,7 +884,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_128",
@@ -902,7 +902,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_129",
@@ -920,7 +920,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_13",
@@ -938,7 +938,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_130",
@@ -956,7 +956,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_131",
@@ -974,7 +974,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_132",
@@ -992,7 +992,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_133",
@@ -1010,7 +1010,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_134",
@@ -1028,7 +1028,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_135",
@@ -1046,7 +1046,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_136",
@@ -1064,7 +1064,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_137",
@@ -1082,7 +1082,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_138",
@@ -1100,7 +1100,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_139",
@@ -1118,7 +1118,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_14",
@@ -1136,7 +1136,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_140",
@@ -1154,7 +1154,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_141",
@@ -1172,7 +1172,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_142",
@@ -1190,7 +1190,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_143",
@@ -1208,7 +1208,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_144",
@@ -1226,7 +1226,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_145",
@@ -1244,7 +1244,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_146",
@@ -1262,7 +1262,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_147",
@@ -1280,7 +1280,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_148",
@@ -1298,7 +1298,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_149",
@@ -1316,7 +1316,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_15",
@@ -1334,7 +1334,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_150",
@@ -1352,7 +1352,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_151",
@@ -1370,7 +1370,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_152",
@@ -1388,7 +1388,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_153",
@@ -1406,7 +1406,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_154",
@@ -1424,7 +1424,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_155",
@@ -1442,7 +1442,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_156",
@@ -1460,7 +1460,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_157",
@@ -1478,7 +1478,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_158",
@@ -1496,7 +1496,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_159",
@@ -1514,7 +1514,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_16",
@@ -1532,7 +1532,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_160",
@@ -1550,7 +1550,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_161",
@@ -1568,7 +1568,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_162",
@@ -1586,7 +1586,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_163",
@@ -1604,7 +1604,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_164",
@@ -1622,7 +1622,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_165",
@@ -1640,7 +1640,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_166",
@@ -1658,7 +1658,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_167",
@@ -1676,7 +1676,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_168",
@@ -1694,7 +1694,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_169",
@@ -1712,7 +1712,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_17",
@@ -1730,7 +1730,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_170",
@@ -1748,7 +1748,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_171",
@@ -1766,7 +1766,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_172",
@@ -1784,7 +1784,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_173",
@@ -1802,7 +1802,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_174",
@@ -1820,7 +1820,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_175",
@@ -1838,7 +1838,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_176",
@@ -1856,7 +1856,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_177",
@@ -1874,7 +1874,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_178",
@@ -1892,7 +1892,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_179",
@@ -1910,7 +1910,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_18",
@@ -1928,7 +1928,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_180",
@@ -1946,7 +1946,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_181",
@@ -1964,7 +1964,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_182",
@@ -1982,7 +1982,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_183",
@@ -2000,7 +2000,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_184",
@@ -2018,7 +2018,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_185",
@@ -2036,7 +2036,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_186",
@@ -2054,7 +2054,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_187",
@@ -2072,7 +2072,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_188",
@@ -2090,7 +2090,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_189",
@@ -2108,7 +2108,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_19",
@@ -2126,7 +2126,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_190",
@@ -2144,7 +2144,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_191",
@@ -2162,7 +2162,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_192",
@@ -2180,7 +2180,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_193",
@@ -2198,7 +2198,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_194",
@@ -2216,7 +2216,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_195",
@@ -2234,7 +2234,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_196",
@@ -2252,7 +2252,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_197",
@@ -2270,7 +2270,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_198",
@@ -2288,7 +2288,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_199",
@@ -2306,7 +2306,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_2",
@@ -2324,7 +2324,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_20",
@@ -2342,7 +2342,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_200",
@@ -2360,7 +2360,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_201",
@@ -2378,7 +2378,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_202",
@@ -2396,7 +2396,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_203",
@@ -2414,7 +2414,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_204",
@@ -2432,7 +2432,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_205",
@@ -2450,7 +2450,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_206",
@@ -2468,7 +2468,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_207",
@@ -2486,7 +2486,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_208",
@@ -2504,7 +2504,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_209",
@@ -2522,7 +2522,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_21",
@@ -2540,7 +2540,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_210",
@@ -2558,7 +2558,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_211",
@@ -2576,7 +2576,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_212",
@@ -2594,7 +2594,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_213",
@@ -2612,7 +2612,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_214",
@@ -2630,7 +2630,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_215",
@@ -2648,7 +2648,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_216",
@@ -2666,7 +2666,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_217",
@@ -2684,7 +2684,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_218",
@@ -2702,7 +2702,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_219",
@@ -2720,7 +2720,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_22",
@@ -2738,7 +2738,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_220",
@@ -2756,7 +2756,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_221",
@@ -2774,7 +2774,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_222",
@@ -2792,7 +2792,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_223",
@@ -2810,7 +2810,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_224",
@@ -2828,7 +2828,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_225",
@@ -2846,7 +2846,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_226",
@@ -2864,7 +2864,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_227",
@@ -2882,7 +2882,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_228",
@@ -2900,7 +2900,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_229",
@@ -2918,7 +2918,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_23",
@@ -2936,7 +2936,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_230",
@@ -2954,7 +2954,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_231",
@@ -2972,7 +2972,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_232",
@@ -2990,7 +2990,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_233",
@@ -3008,7 +3008,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_234",
@@ -3026,7 +3026,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_235",
@@ -3044,7 +3044,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_236",
@@ -3062,7 +3062,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_237",
@@ -3080,7 +3080,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_238",
@@ -3098,7 +3098,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_239",
@@ -3116,7 +3116,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_24",
@@ -3134,7 +3134,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_240",
@@ -3152,7 +3152,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_241",
@@ -3170,7 +3170,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_242",
@@ -3188,7 +3188,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_243",
@@ -3206,7 +3206,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_244",
@@ -3224,7 +3224,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_245",
@@ -3242,7 +3242,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_246",
@@ -3260,7 +3260,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_247",
@@ -3278,7 +3278,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_248",
@@ -3296,7 +3296,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_249",
@@ -3314,7 +3314,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_25",
@@ -3332,7 +3332,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_26",
@@ -3350,7 +3350,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_27",
@@ -3368,7 +3368,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_28",
@@ -3386,7 +3386,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_29",
@@ -3404,7 +3404,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_3",
@@ -3422,7 +3422,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_30",
@@ -3440,7 +3440,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_31",
@@ -3458,7 +3458,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_32",
@@ -3476,7 +3476,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_33",
@@ -3494,7 +3494,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_34",
@@ -3512,7 +3512,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_35",
@@ -3530,7 +3530,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_36",
@@ -3548,7 +3548,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_37",
@@ -3566,7 +3566,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_38",
@@ -3584,7 +3584,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_39",
@@ -3602,7 +3602,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_4",
@@ -3620,7 +3620,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_40",
@@ -3638,7 +3638,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_41",
@@ -3656,7 +3656,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_42",
@@ -3674,7 +3674,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_43",
@@ -3692,7 +3692,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_44",
@@ -3710,7 +3710,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_45",
@@ -3728,7 +3728,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_46",
@@ -3746,7 +3746,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_47",
@@ -3764,7 +3764,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_48",
@@ -3782,7 +3782,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_49",
@@ -3800,7 +3800,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_5",
@@ -3818,7 +3818,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_50",
@@ -3836,7 +3836,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_51",
@@ -3854,7 +3854,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_52",
@@ -3872,7 +3872,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_53",
@@ -3890,7 +3890,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_54",
@@ -3908,7 +3908,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_55",
@@ -3926,7 +3926,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_56",
@@ -3944,7 +3944,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_57",
@@ -3962,7 +3962,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_58",
@@ -3980,7 +3980,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_59",
@@ -3998,7 +3998,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_6",
@@ -4016,7 +4016,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_60",
@@ -4034,7 +4034,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_61",
@@ -4052,7 +4052,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_62",
@@ -4070,7 +4070,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_63",
@@ -4088,7 +4088,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_64",
@@ -4106,7 +4106,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_65",
@@ -4124,7 +4124,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_66",
@@ -4142,7 +4142,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_67",
@@ -4160,7 +4160,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_68",
@@ -4178,7 +4178,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_69",
@@ -4196,7 +4196,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_7",
@@ -4214,7 +4214,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_70",
@@ -4232,7 +4232,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_71",
@@ -4250,7 +4250,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_72",
@@ -4268,7 +4268,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_73",
@@ -4286,7 +4286,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_74",
@@ -4304,7 +4304,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_75",
@@ -4322,7 +4322,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_76",
@@ -4340,7 +4340,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_77",
@@ -4358,7 +4358,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_78",
@@ -4376,7 +4376,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_79",
@@ -4394,7 +4394,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_8",
@@ -4412,7 +4412,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_80",
@@ -4430,7 +4430,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_81",
@@ -4448,7 +4448,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_82",
@@ -4466,7 +4466,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_83",
@@ -4484,7 +4484,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_84",
@@ -4502,7 +4502,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_85",
@@ -4520,7 +4520,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_86",
@@ -4538,7 +4538,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_87",
@@ -4556,7 +4556,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_88",
@@ -4574,7 +4574,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_89",
@@ -4592,7 +4592,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_9",
@@ -4610,7 +4610,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_90",
@@ -4628,7 +4628,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_91",
@@ -4646,7 +4646,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_92",
@@ -4664,7 +4664,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_93",
@@ -4682,7 +4682,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_94",
@@ -4700,7 +4700,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_95",
@@ -4718,7 +4718,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_96",
@@ -4736,7 +4736,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_97",
@@ -4754,7 +4754,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_98",
@@ -4772,7 +4772,7 @@
     "attributes": {
         "isPhysical": true,
         "nodeType": "default",
-        "flipYTexCoords": true
+        "flipYTexCoords": false
     },
     "children": [],
     "data_key": "masterplan_99",
@@ -4900,7 +4900,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "mapo_health_center_del",
@@ -4933,7 +4933,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "NorthSeoulArt_del",
@@ -4950,7 +4950,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "Sadang_del",
@@ -4967,7 +4967,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "Sangdo3dong_del",
@@ -4984,7 +4984,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "SD_Youth_del",
@@ -5001,7 +5001,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "Seodaemun_del",
@@ -5018,7 +5018,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "Seobu_del",
@@ -5035,7 +5035,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "Seobingo_del",
@@ -5052,7 +5052,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "Sesomoon1_3_del",
@@ -5069,7 +5069,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "Sesomoon2dong_del",
@@ -5086,7 +5086,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "Sesomoon5dong_del",
@@ -5103,7 +5103,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "seoul_museum_del",
@@ -5120,7 +5120,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "SEOULHISTORICA_del",
@@ -5137,7 +5137,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "Simincheong_del",
@@ -5154,7 +5154,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "Edumuseum_del_150417_02",
@@ -5171,7 +5171,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "SEOULSTATION_del",
@@ -5236,7 +5236,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "GyeomjaeJeongSeon_del",
@@ -5253,7 +5253,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "Gwangjin_center_del",
@@ -5270,7 +5270,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "Gangsu_office_del",
@@ -5303,7 +5303,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "gangil_del",
@@ -5432,7 +5432,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "GasanDigital_del",
@@ -5449,7 +5449,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "SD_COUNCIL_del",
@@ -5466,7 +5466,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "Seongdong_del",
@@ -5483,7 +5483,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "Seongbuk_del",
@@ -5500,7 +5500,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "SeongBuck_del",
@@ -5517,7 +5517,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "Main_del",
@@ -5534,7 +5534,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "Sinnae_del",
@@ -5551,7 +5551,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "Yongsan_del",
@@ -5568,7 +5568,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "imun_del",
@@ -5585,7 +5585,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "Leejina_del",
@@ -5602,7 +5602,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "junggok_del",
@@ -5619,7 +5619,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "GARAK_del",
@@ -5636,7 +5636,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "Jungnanggu-public-library_del",
@@ -5653,7 +5653,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "gangnamgu_office_del",
@@ -5670,7 +5670,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "gangdongguoffice_del_1222_02",
@@ -5687,7 +5687,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "geoRES_testdata_v1.0.0",
@@ -5704,7 +5704,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "3DS",
-				"flipYTexCoords": true,
+				"flipYTexCoords": false,
 				"hasTopology": true
 			},
 			"children": [],
@@ -5754,7 +5754,7 @@
 			"attributes": {
 				"isPhysical": true,
 				"nodeType": "singapore",
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"children": [],
 			"data_key": "JibCrane",

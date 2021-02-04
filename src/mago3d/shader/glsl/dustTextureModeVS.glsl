@@ -12,7 +12,6 @@ uniform vec3 encodedCameraPositionMCLow;
 uniform float near;
 uniform float far;
 uniform float uDustConcentration;
-uniform vec2 uDustConcentMinMax;
 uniform bool bUse1Color;
 uniform vec4 oneColor4;
 uniform bool bUseLogarithmicDepth;
@@ -23,8 +22,6 @@ varying float vDepth;
 uniform float uFCoef_logDepth;
 varying float flogz;
 varying float Fcoef_half;
-varying float vDustConcent;
-varying float vDustConcentRel;
 varying vec2 vTexCoord;
 
 void main()
@@ -63,6 +60,7 @@ void main()
 			gl_PointSize = 2.0;
 	}
 	*/
+	/*
 	float minPointSize = 2.0;
 	float maxPointSize = 60.0;
 	float pendentPointSize = 2000.0 * uDustConcentration;
@@ -75,11 +73,9 @@ void main()
 	//if(gl_PointSize < 2.0)
 	//	gl_PointSize = 2.0;
 
-	vDustConcentRel = uDustConcentration/uDustConcentMinMax[1];
-	vDustConcent = uDustConcentration;
-	//gl_PointSize *= uDustConcentration;
-	glPointSize = gl_PointSize;
-
+	//vDustConcentRel = uDustConcentration/uDustConcentMinMax[1];
+	//glPointSize = gl_PointSize;
+	*/
 	if(bUseLogarithmicDepth)
 	{
 		// logarithmic zBuffer:

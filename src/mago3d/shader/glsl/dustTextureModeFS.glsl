@@ -10,19 +10,19 @@ precision lowp float;
 #extension GL_EXT_draw_buffers : require
 #endif
 
-uniform sampler2D smokeTex;
-uniform vec4 uStrokeColor;
+uniform sampler2D texUp;
+uniform sampler2D texDown;
+uniform vec2 u_tex_res;
+
 varying vec4 vColor;
-varying float glPointSize;
-uniform int uPointAppereance; // square, circle, romboide,...
-uniform int uStrokeSize;
 uniform bool bUseLogarithmicDepth;
 uniform int uFrustumIdx;
+uniform vec2 uDustConcentMinMax;
+uniform float uZFactor;
+
 varying float flogz;
 varying float Fcoef_half;
 varying float vDepth;
-varying float vDustConcent;
-varying float vDustConcentRel;
 varying vec2 vTexCoord;
 
 vec3 encodeNormal(in vec3 normal)
@@ -50,40 +50,87 @@ float rand(const vec2 co) {
     return fract(sin(t) * (rand_constants.z + t));
 }
 
+vec3 getRainbowColor_byHeight(float height)
+{
+	//float gray = (height - uDustConcentMinMax[0])/(uDustConcentMinMax[1] - uDustConcentMinMax[0]);
+	float gray = height;
+	if (gray > 1.0){ gray = 1.0; }
+	else if (gray<0.0){ gray = 0.0; }
+	
+	float r, g, b;
+	
+	if(gray < 0.16666)
+	{
+		b = 0.0;
+		g = gray*6.0;
+		r = 1.0;
+	}
+	else if(gray >= 0.16666 && gray < 0.33333)
+	{
+		b = 0.0;
+		g = 1.0;
+		r = 2.0 - gray*6.0;
+	}
+	else if(gray >= 0.33333 && gray < 0.5)
+	{
+		b = -2.0 + gray*6.0;
+		g = 1.0;
+		r = 0.0;
+	}
+	else if(gray >= 0.5 && gray < 0.66666)
+	{
+		b = 1.0;
+		g = 4.0 - gray*6.0;
+		r = 0.0;
+	}
+	else if(gray >= 0.66666 && gray < 0.83333)
+	{
+		b = 1.0;
+		g = 0.0;
+		r = -4.0 + gray*6.0;
+	}
+	else if(gray >= 0.83333)
+	{
+		b = 6.0 - gray*6.0;
+		g = 0.0;
+		r = 1.0;
+	}
+	
+	float aux = r;
+	r = b;
+	b = aux;
+	
+	//b = -gray + 1.0;
+	//if (gray > 0.5)
+	//{
+	//	g = -gray*2.0 + 2.0; 
+	//}
+	//else 
+	//{
+	//	g = gray*2.0;
+	//}
+	//r = gray;
+	vec3 resultColor = vec3(r, g, b);
+    return resultColor;
+}   
+
 void main()
 {
-	vec2 pt = gl_PointCoord - vec2(0.5);
-	float distSquared = pt.x*pt.x+pt.y*pt.y;
-	//if(distSquared > 0.25)
-	//	discard;
-
-	vec4 textureColor = texture2D(smokeTex, gl_PointCoord);
-	if(textureColor.a < 0.1)
-	discard;
+	vec4 colorUp = texture2D(texUp, vTexCoord);
+	vec4 colorDown = texture2D(texDown, vTexCoord);
+	vec4 textureColor = mix(colorDown, colorUp, uZFactor);
+	//vec4 textureColor = texture2D(texDown, vTexCoord);
 
 	vec4 finalColor = vColor;
-	float alpha = textureColor.a * 2.0;
-	float green = vDustConcentRel;
-	//if(pt.x < 0.0 && pt.y < 0.0)
-	{
-		//float ptLength = length(pt);
-		//green *= (1.0 - ptLength);
-		//if(green < 0.0)
-		//green = 0.0;
-	}
-	finalColor = vec4(green * 0.5, green, vTexCoord.x, alpha);
-	//finalColor = textureColor;
-	//float strokeDist = 0.1;
-	//if(glPointSize > 10.0)
-	//strokeDist = 0.15;
+	float alpha = textureColor.a;
+	float concent = textureColor.g;
+	vec3 rainbowCol = getRainbowColor_byHeight(concent);
 
-	//if(uStrokeSize > 0)
-	//{
-	//	if(distSquared >= strokeDist)
-	//	{
-	//		finalColor = uStrokeColor;
-	//	}
-	//}
+	finalColor = vec4(rainbowCol, alpha);
+	float colValue = 1.0 - concent;//*concent;
+	//colValue *= colValue;
+	finalColor = vec4(1.0, colValue, colValue, concent);
+
 	gl_FragData[0] = finalColor;
 
 	#ifdef USE_MULTI_RENDER_TARGET

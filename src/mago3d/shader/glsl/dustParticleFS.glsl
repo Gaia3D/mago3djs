@@ -51,14 +51,16 @@ float rand(const vec2 co) {
 
 void main()
 {
-
 	vec4 textureColor = texture2D(smokeTex, gl_PointCoord);
+	if(textureColor.a < 0.1)
+	discard;
 
 	vec4 finalColor = vColor;
 	float alpha = textureColor.a * 2.0;
 	float green = 1.0;
 
 	finalColor = vec4(green * 0.5, green, 0.1, alpha);
+	//finalColor = vec4(1.0, 0.0, 0.0, 1.0);
 
 	gl_FragData[0] = finalColor;
 

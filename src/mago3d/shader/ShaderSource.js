@@ -1155,6 +1155,432 @@ void main() {\n\
 \n\
 \n\
 ";
+ShaderSource.dustParticleFS = "precision lowp float;\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+uniform sampler2D smokeTex;\n\
+uniform vec4 uStrokeColor;\n\
+varying vec4 vColor;\n\
+varying float glPointSize;\n\
+uniform int uPointAppereance; // square, circle, romboide,...\n\
+uniform int uStrokeSize;\n\
+uniform bool bUseLogarithmicDepth;\n\
+uniform int uFrustumIdx;\n\
+varying float flogz;\n\
+varying float Fcoef_half;\n\
+varying float vDepth;\n\
+varying float vDustConcent;\n\
+varying float vDustConcentRel;\n\
+\n\
+vec3 encodeNormal(in vec3 normal)\n\
+{\n\
+	return normal*0.5 + 0.5;\n\
+}\n\
+\n\
+vec3 decodeNormal(in vec3 normal)\n\
+{\n\
+	return normal * 2.0 - 1.0;\n\
+}\n\
+\n\
+vec4 packDepth( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+  return enc;\n\
+}\n\
+\n\
+// pseudo-random generator\n\
+const vec3 rand_constants = vec3(12.9898, 78.233, 4375.85453);\n\
+// https://community.khronos.org/t/random-values/75728\n\
+float rand(const vec2 co) {\n\
+    float t = dot(rand_constants.xy, co);\n\
+    return fract(sin(t) * (rand_constants.z + t));\n\
+}\n\
+\n\
+void main()\n\
+{\n\
+	vec4 textureColor = texture2D(smokeTex, gl_PointCoord);\n\
+	if(textureColor.a < 0.1)\n\
+	discard;\n\
+\n\
+	vec4 finalColor = vColor;\n\
+	float alpha = textureColor.a * 2.0;\n\
+	float green = 1.0;\n\
+\n\
+	finalColor = vec4(green * 0.5, green, 0.1, alpha);\n\
+	//finalColor = vec4(1.0, 0.0, 0.0, 1.0);\n\
+\n\
+	gl_FragData[0] = finalColor;\n\
+\n\
+	#ifdef USE_MULTI_RENDER_TARGET\n\
+		gl_FragData[1] = packDepth(vDepth);\n\
+		\n\
+		// Note: points cloud data has frustumIdx 20 .. 23.********\n\
+		float frustumIdx = 0.1; // realFrustumIdx = 0.1 * 100 = 10. \n\
+		\n\
+		if(uFrustumIdx == 0)\n\
+		frustumIdx = 0.005; // frustumIdx = 20.***\n\
+		else if(uFrustumIdx == 1)\n\
+		frustumIdx = 0.015; // frustumIdx = 21.***\n\
+		else if(uFrustumIdx == 2)\n\
+		frustumIdx = 0.025; // frustumIdx = 22.***\n\
+		else if(uFrustumIdx == 3)\n\
+		frustumIdx = 0.035; // frustumIdx = 23.***\n\
+\n\
+		vec3 normal = encodeNormal(vec3(0.0, 0.0, 1.0));\n\
+		gl_FragData[2] = vec4(normal, frustumIdx); // save normal.***\n\
+\n\
+		// now, albedo.\n\
+		gl_FragData[3] = finalColor; \n\
+	#endif\n\
+\n\
+	#ifdef USE_LOGARITHMIC_DEPTH\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
+	}\n\
+	#endif\n\
+}";
+ShaderSource.dustParticleVS = "attribute vec3 position;\n\
+attribute vec3 normal;\n\
+attribute vec2 texCoord;\n\
+attribute vec4 color4;\n\
+uniform mat4 modelViewMatrixRelToEye;\n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform mat4 buildingRotMatrix;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+uniform float near;\n\
+uniform float far;\n\
+uniform float uDustConcentration;\n\
+uniform vec2 uDustConcentMinMax;\n\
+uniform bool bUse1Color;\n\
+uniform vec4 oneColor4;\n\
+uniform bool bUseLogarithmicDepth;\n\
+varying vec4 vColor;\n\
+varying float glPointSize;\n\
+varying float vDepth;\n\
+\n\
+uniform float uFCoef_logDepth;\n\
+varying float flogz;\n\
+varying float Fcoef_half;\n\
+varying float vDustConcent;\n\
+varying float vDustConcentRel;\n\
+\n\
+void main()\n\
+{\n\
+	vec4 rotatedPos;\n\
+	rotatedPos = buildingRotMatrix * vec4(position.xyz, 1.0);\n\
+    vec3 objPosHigh = buildingPosHIGH;\n\
+    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
+    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+	\n\
+    if(bUse1Color)\n\
+	{\n\
+		vColor = oneColor4;\n\
+	}\n\
+	else\n\
+		vColor = color4;\n\
+	\n\
+    gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
+	vDepth = -(modelViewMatrixRelToEye * pos).z/far; // original.***\n\
+\n\
+	float minPointSize = 2.0;\n\
+	float maxPointSize = 60.0;\n\
+	float pendentPointSize = 2000.0 * uDustConcentration;\n\
+	float z_b = gl_Position.z/gl_Position.w;\n\
+	float z_n = 2.0 * z_b - 1.0;\n\
+	float z_e = 2.0 * near * far / (far + near - z_n * (far - near));\n\
+	gl_PointSize = minPointSize + pendentPointSize/z_e; // Original.***\n\
+	//if(gl_PointSize > maxPointSize)\n\
+	//	gl_PointSize = maxPointSize;\n\
+	//if(gl_PointSize < 2.0)\n\
+	//	gl_PointSize = 2.0;\n\
+\n\
+	vDustConcentRel = uDustConcentration/uDustConcentMinMax[1];\n\
+	vDustConcent = uDustConcentration;\n\
+	//gl_PointSize *= uDustConcentration;\n\
+	glPointSize = gl_PointSize;\n\
+\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		// logarithmic zBuffer:\n\
+			// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
+			// float Fcoef = 2.0 / log2(far + 1.0);\n\
+			// gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;\n\
+			// flogz = 1.0 + gl_Position.w;\n\
+			//---------------------------------------------------------------------------------\n\
+			flogz = 1.0 + gl_Position.w;\n\
+			Fcoef_half = 0.5 * uFCoef_logDepth;\n\
+	}\n\
+}";
+ShaderSource.dustTextureModeFS = "precision lowp float;\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+uniform sampler2D texUp;\n\
+uniform sampler2D texDown;\n\
+uniform vec2 u_tex_res;\n\
+\n\
+varying vec4 vColor;\n\
+uniform bool bUseLogarithmicDepth;\n\
+uniform int uFrustumIdx;\n\
+uniform vec2 uDustConcentMinMax;\n\
+uniform float uZFactor;\n\
+\n\
+varying float flogz;\n\
+varying float Fcoef_half;\n\
+varying float vDepth;\n\
+varying vec2 vTexCoord;\n\
+\n\
+vec3 encodeNormal(in vec3 normal)\n\
+{\n\
+	return normal*0.5 + 0.5;\n\
+}\n\
+\n\
+vec3 decodeNormal(in vec3 normal)\n\
+{\n\
+	return normal * 2.0 - 1.0;\n\
+}\n\
+\n\
+vec4 packDepth( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+  return enc;\n\
+}\n\
+\n\
+// pseudo-random generator\n\
+const vec3 rand_constants = vec3(12.9898, 78.233, 4375.85453);\n\
+// https://community.khronos.org/t/random-values/75728\n\
+float rand(const vec2 co) {\n\
+    float t = dot(rand_constants.xy, co);\n\
+    return fract(sin(t) * (rand_constants.z + t));\n\
+}\n\
+\n\
+vec3 getRainbowColor_byHeight(float height)\n\
+{\n\
+	//float gray = (height - uDustConcentMinMax[0])/(uDustConcentMinMax[1] - uDustConcentMinMax[0]);\n\
+	float gray = height;\n\
+	if (gray > 1.0){ gray = 1.0; }\n\
+	else if (gray<0.0){ gray = 0.0; }\n\
+	\n\
+	float r, g, b;\n\
+	\n\
+	if(gray < 0.16666)\n\
+	{\n\
+		b = 0.0;\n\
+		g = gray*6.0;\n\
+		r = 1.0;\n\
+	}\n\
+	else if(gray >= 0.16666 && gray < 0.33333)\n\
+	{\n\
+		b = 0.0;\n\
+		g = 1.0;\n\
+		r = 2.0 - gray*6.0;\n\
+	}\n\
+	else if(gray >= 0.33333 && gray < 0.5)\n\
+	{\n\
+		b = -2.0 + gray*6.0;\n\
+		g = 1.0;\n\
+		r = 0.0;\n\
+	}\n\
+	else if(gray >= 0.5 && gray < 0.66666)\n\
+	{\n\
+		b = 1.0;\n\
+		g = 4.0 - gray*6.0;\n\
+		r = 0.0;\n\
+	}\n\
+	else if(gray >= 0.66666 && gray < 0.83333)\n\
+	{\n\
+		b = 1.0;\n\
+		g = 0.0;\n\
+		r = -4.0 + gray*6.0;\n\
+	}\n\
+	else if(gray >= 0.83333)\n\
+	{\n\
+		b = 6.0 - gray*6.0;\n\
+		g = 0.0;\n\
+		r = 1.0;\n\
+	}\n\
+	\n\
+	float aux = r;\n\
+	r = b;\n\
+	b = aux;\n\
+	\n\
+	//b = -gray + 1.0;\n\
+	//if (gray > 0.5)\n\
+	//{\n\
+	//	g = -gray*2.0 + 2.0; \n\
+	//}\n\
+	//else \n\
+	//{\n\
+	//	g = gray*2.0;\n\
+	//}\n\
+	//r = gray;\n\
+	vec3 resultColor = vec3(r, g, b);\n\
+    return resultColor;\n\
+}   \n\
+\n\
+void main()\n\
+{\n\
+	vec4 colorUp = texture2D(texUp, vTexCoord);\n\
+	vec4 colorDown = texture2D(texDown, vTexCoord);\n\
+	vec4 textureColor = mix(colorDown, colorUp, uZFactor);\n\
+	//vec4 textureColor = texture2D(texDown, vTexCoord);\n\
+\n\
+	vec4 finalColor = vColor;\n\
+	float alpha = textureColor.a;\n\
+	float concent = textureColor.g;\n\
+	vec3 rainbowCol = getRainbowColor_byHeight(concent);\n\
+\n\
+	finalColor = vec4(rainbowCol, alpha);\n\
+	float colValue = 1.0 - concent;//*concent;\n\
+	//colValue *= colValue;\n\
+	finalColor = vec4(1.0, colValue, colValue, concent);\n\
+\n\
+	gl_FragData[0] = finalColor;\n\
+\n\
+	#ifdef USE_MULTI_RENDER_TARGET\n\
+		gl_FragData[1] = packDepth(vDepth);\n\
+		\n\
+		// Note: points cloud data has frustumIdx 20 .. 23.********\n\
+		float frustumIdx = 0.1; // realFrustumIdx = 0.1 * 100 = 10. \n\
+		\n\
+		if(uFrustumIdx == 0)\n\
+		frustumIdx = 0.005; // frustumIdx = 20.***\n\
+		else if(uFrustumIdx == 1)\n\
+		frustumIdx = 0.015; // frustumIdx = 21.***\n\
+		else if(uFrustumIdx == 2)\n\
+		frustumIdx = 0.025; // frustumIdx = 22.***\n\
+		else if(uFrustumIdx == 3)\n\
+		frustumIdx = 0.035; // frustumIdx = 23.***\n\
+\n\
+		vec3 normal = encodeNormal(vec3(0.0, 0.0, 1.0));\n\
+		gl_FragData[2] = vec4(normal, frustumIdx); // save normal.***\n\
+\n\
+		// now, albedo.\n\
+		gl_FragData[3] = finalColor; \n\
+	#endif\n\
+\n\
+	#ifdef USE_LOGARITHMIC_DEPTH\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
+	}\n\
+	#endif\n\
+}";
+ShaderSource.dustTextureModeVS = "attribute vec3 position;\n\
+attribute vec3 normal;\n\
+attribute vec2 texCoord;\n\
+attribute vec4 color4;\n\
+uniform mat4 modelViewMatrixRelToEye;\n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform mat4 buildingRotMatrix;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+uniform float near;\n\
+uniform float far;\n\
+uniform float uDustConcentration;\n\
+uniform bool bUse1Color;\n\
+uniform vec4 oneColor4;\n\
+uniform bool bUseLogarithmicDepth;\n\
+varying vec4 vColor;\n\
+varying float glPointSize;\n\
+varying float vDepth;\n\
+\n\
+uniform float uFCoef_logDepth;\n\
+varying float flogz;\n\
+varying float Fcoef_half;\n\
+varying vec2 vTexCoord;\n\
+\n\
+void main()\n\
+{\n\
+	vec4 rotatedPos;\n\
+	rotatedPos = buildingRotMatrix * vec4(position.xyz, 1.0);\n\
+    vec3 objPosHigh = buildingPosHIGH;\n\
+    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
+    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+	\n\
+    if(bUse1Color)\n\
+	{\n\
+		vColor = oneColor4;\n\
+	}\n\
+	else\n\
+		vColor = color4;\n\
+	\n\
+    gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
+	vDepth = -(modelViewMatrixRelToEye * pos).z/far; // original.***\n\
+	vTexCoord = texCoord;\n\
+/*\n\
+	if(bUseFixPointSize)\n\
+	{\n\
+		gl_PointSize = fixPointSize;\n\
+	}\n\
+	else{\n\
+		float z_b = gl_Position.z/gl_Position.w;\n\
+		float z_n = 2.0 * z_b - 1.0;\n\
+		float z_e = 2.0 * near * far / (far + near - z_n * (far - near));\n\
+		gl_PointSize = minPointSize + pendentPointSize/z_e; // Original.***\n\
+		if(gl_PointSize > maxPointSize)\n\
+			gl_PointSize = maxPointSize;\n\
+		if(gl_PointSize < 2.0)\n\
+			gl_PointSize = 2.0;\n\
+	}\n\
+	*/\n\
+	/*\n\
+	float minPointSize = 2.0;\n\
+	float maxPointSize = 60.0;\n\
+	float pendentPointSize = 2000.0 * uDustConcentration;\n\
+	float z_b = gl_Position.z/gl_Position.w;\n\
+	float z_n = 2.0 * z_b - 1.0;\n\
+	float z_e = 2.0 * near * far / (far + near - z_n * (far - near));\n\
+	gl_PointSize = minPointSize + pendentPointSize/z_e; // Original.***\n\
+	//if(gl_PointSize > maxPointSize)\n\
+	//	gl_PointSize = maxPointSize;\n\
+	//if(gl_PointSize < 2.0)\n\
+	//	gl_PointSize = 2.0;\n\
+\n\
+	//vDustConcentRel = uDustConcentration/uDustConcentMinMax[1];\n\
+	//glPointSize = gl_PointSize;\n\
+	*/\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		// logarithmic zBuffer:\n\
+			// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
+			// float Fcoef = 2.0 / log2(far + 1.0);\n\
+			// gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;\n\
+			// flogz = 1.0 + gl_Position.w;\n\
+			//---------------------------------------------------------------------------------\n\
+			flogz = 1.0 + gl_Position.w;\n\
+			Fcoef_half = 0.5 * uFCoef_logDepth;\n\
+	}\n\
+}";
 ShaderSource.filterSilhouetteFS = "precision mediump float;\n\
 \n\
 uniform sampler2D depthTex;\n\
