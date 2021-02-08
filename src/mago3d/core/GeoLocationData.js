@@ -423,7 +423,7 @@ GeoLocationData.prototype.worldCoordToLocalCoord = function(worldCoord, resultLo
 	{ return undefined; }
 
 	// Now, check if "worldCoord" is instance of Point3D or is an instance of Array.***
-	if(worldCoord instanceof GeographicCoord)
+	if(worldCoord instanceof Point3D)
 	{
 		if (resultLocalCoord === undefined)
 		{ resultLocalCoord = new Point3D(); }

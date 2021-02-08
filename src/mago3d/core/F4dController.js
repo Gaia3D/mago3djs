@@ -214,8 +214,9 @@ F4dController.prototype.deleteF4dGroup = function(groupId)
  * f4d data를 삭제
  * @param {string} groupId required. target group id
  * @param {string} memberId f4d data definition object
+ * @param {boolean} silence 
  */
-F4dController.prototype.deleteF4dMember = function(groupId, memberId) 
+F4dController.prototype.deleteF4dMember = function(groupId, memberId, silence) 
 {
 	if (!groupId) 
 	{
@@ -240,7 +241,7 @@ F4dController.prototype.deleteF4dMember = function(groupId, memberId)
 
 	if(this.magoManager.defaultSelectInteraction.selected === node)
 	{
-		this.magoManager.defaultSelectInteraction.clear();
+		this.magoManager.defaultSelectInteraction.clear(silence);
 	}
 
 	this.magoManager.selectionManager.removeF4d(node);
