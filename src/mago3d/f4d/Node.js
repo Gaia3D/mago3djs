@@ -1636,3 +1636,19 @@ Node.prototype.setToDate = function(toDate) {
 Node.prototype.getToDate = function() {
 	return this.data.attributes.toDate;
 }
+
+/**
+ * set visible
+ * @return {boolean}
+ */
+Node.prototype.setVisible = function(visible) {
+	this.data.attributes.isVisible = visible;
+}
+
+/**
+ * get visible
+ * @return {boolean}
+ */
+Node.prototype.getVisible = function() {
+	return this.data.attributes.isVisible;
+}

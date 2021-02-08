@@ -357,6 +357,11 @@ var MagoManager = function(config)
 	//height 변경 적용필요한 native 목록
 	this._needValidHeightNativeArray = [];
 	this._changeCanvasSizeEvent = new CustomEvent('changeCanvasSize');
+
+	if (Mago3D['WeatherStation'] && this.weatherStation === undefined)
+	{ 
+		this.weatherStation = new Mago3D.WeatherStation(this);
+	}
 };
 MagoManager.prototype = Object.create(Emitter.prototype);
 MagoManager.prototype.constructor = MagoManager;

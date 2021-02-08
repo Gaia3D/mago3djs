@@ -162,6 +162,44 @@ Color.prototype.getHexCode = function()
  * return hexCode
  * @return {string}
  */
+Color.prototype.getRGB = function() 
+{
+	var r = this.r;
+	var g = this.g;
+	var b = this.b;
+
+	var rgb = 'rgb('
+	rgb += r*255 + ', ';
+	rgb += g*255 + ', ';
+	rgb += b*255;
+	rgb += ')';
+	return rgb;
+};
+
+/**
+ * return hexCode
+ * @return {string}
+ */
+Color.prototype.getRGBA = function() 
+{
+	var r = this.r;
+	var g = this.g;
+	var b = this.b;
+	var a = this.a;
+
+	var rgba = 'rgba('
+	rgba += r*255 + ', ';
+	rgba += g*255 + ', ';
+	rgba += b*255 + ', ';
+	rgba += a;
+	rgba += ')';
+	return rgba;
+};
+
+/**
+ * return hexCode
+ * @return {string}
+ */
 Color.getHexCode = function(red, green, blue) 
 {	
 	var r = parseInt(red * 255);

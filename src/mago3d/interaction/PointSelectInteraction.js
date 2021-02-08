@@ -275,10 +275,14 @@ PointSelectInteraction.prototype.select = function(screenCoordinate)
 
 /**
  * clear 
+ * @param {boolean} silence 
  */
-PointSelectInteraction.prototype.clear = function()
+PointSelectInteraction.prototype.clear = function(silence)
 {
-	this.emitEvent(this.selected, false);
+	if(!silence) {
+		this.emitEvent(this.selected, false);
+	}
+	
 	if(this.manager.selectionManager) this.manager.selectionManager.clearCurrents();
 	this.init();
 	this.selected = undefined;

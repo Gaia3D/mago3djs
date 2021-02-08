@@ -152,7 +152,7 @@ ExtrusionBuilding.prototype.makeMesh = function() {
 			ctx.closePath();
 
 			ctx.beginPath();
-			ctx.fillStyle = this.color4.getHexCode();
+			ctx.fillStyle = this.color4.getRGBA();
 			ctx.rect(0, 1, 8, 31);
 			ctx.fill();
 			ctx.closePath();
