@@ -395,7 +395,8 @@ PostFxShadersManager.prototype.createDustTextureModeShader = function(gl)
 	shader.bScale_loc = gl.getUniformLocation(shader.program, "bScale");
 	shader.scale_loc = gl.getUniformLocation(shader.program, "scale");
 	shader.uDustConcentration_loc = gl.getUniformLocation(shader.program, "uDustConcentration");
-	shader.uDustConcentMinMax_loc = gl.getUniformLocation(shader.program, "uDustConcentMinMax");
+	shader.uDustConcentMinMax_up_loc = gl.getUniformLocation(shader.program, "uDustConcentMinMax_up");
+	shader.uDustConcentMinMax_down_loc = gl.getUniformLocation(shader.program, "uDustConcentMinMax_down");
 
 	
 	gl.bindAttribLocation(shader.program, 0, "position");

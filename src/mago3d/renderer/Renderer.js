@@ -2733,8 +2733,7 @@ Renderer.prototype.renderGeometryBuffer = function(gl, renderType, visibleObjCon
 			this.renderAxisNodes(visibleObjControlerNodes.getAllVisibles(), renderType);
 		}
 		
-		// 4) Render ObjectMarkers.********************************************************************************************************
-		magoManager.objMarkerManager.render(magoManager, renderType); 
+		
 
 		// test renders.***
 		// render cctv.***

@@ -293,6 +293,107 @@ ObjectMarkerManager.prototype.newObjectMarkerSpeechBubble = function(options, ma
 	*/
 };
 
+ObjectMarkerManager.prototype.TEST__ObjectMarker_toNeoReference = function() 
+{
+	
+	// buildingId: "SD_COUNCIL_del"
+	// projectId: "3ds.json"
+
+	// objectId: "11011" -> refMatrixType: 0 // sostre verd mig circular
+	// objectId: "2953" -> refMatrixType: 1 // cadira vermella a l'interior.
+	// objectId: "2837" -> refMatrixType: 2 // cadira vermella a l'interior.
+	
+
+	//var objMarkerManager = this.objMarkerManager;
+	var bubbleWidth = 128;
+	var bubbleHeight = 128;
+	var textSize = 36;
+
+	// 1rst object.***************************************************************
+	var target = {
+		projectId  : "3ds",
+		buildingId : "SD_COUNCIL_del",
+		objectId   : "11011"
+	};
+
+	var commentTextOption = {
+		pixel       : textSize,
+		color       : 'blue',
+		borderColor : 'white',
+		text        : '11011'
+	};
+
+	var speechBubbleOptions = {
+		width             : bubbleWidth,
+		height            : bubbleHeight,
+		commentTextOption : commentTextOption,
+		bubbleColor       : {r: 1, g: 1, b: 1}
+	};
+
+	var options = {
+		speechBubbleOptions : speechBubbleOptions,
+		target              : target
+	};
+
+	this.newObjectMarkerSpeechBubble(options, this);
+
+	// 2nd object.***************************************************************
+	var target = {
+		projectId  : "3ds",
+		buildingId : "SD_COUNCIL_del",
+		objectId   : "2953"
+	};
+
+	var commentTextOption = {
+		pixel       : textSize,
+		color       : 'blue',
+		borderColor : 'white',
+		text        : '2953'
+	};
+
+	var speechBubbleOptions = {
+		width             : bubbleWidth,
+		height            : bubbleHeight,
+		commentTextOption : commentTextOption,
+		bubbleColor       : {r: 1, g: 1, b: 1}
+	};
+
+	var options = {
+		speechBubbleOptions : speechBubbleOptions,
+		target              : target
+	};
+
+	this.newObjectMarkerSpeechBubble(options, this);
+
+	// 3rd object.***************************************************************
+	var target = {
+		projectId  : "3ds",
+		buildingId : "SD_COUNCIL_del",
+		objectId   : "2837"
+	};
+
+	var commentTextOption = {
+		pixel       : textSize,
+		color       : 'blue',
+		borderColor : 'white',
+		text        : '2837'
+	};
+
+	var speechBubbleOptions = {
+		width             : bubbleWidth,
+		height            : bubbleHeight,
+		commentTextOption : commentTextOption,
+		bubbleColor       : {r: 1, g: 1, b: 1}
+	};
+
+	var options = {
+		speechBubbleOptions : speechBubbleOptions,
+		target              : target
+	};
+
+	this.newObjectMarkerSpeechBubble(options, this);
+};
+
 /**
  * 어떤 일을 하고 있습니까?
  * @class ObjectMarkerManager
@@ -311,14 +412,7 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 		// Png for pin image 128x128.********************************************************************
 		if (this.pin.positionBuffer === undefined)
 		{ this.pin.createPinCenterBottom(gl); }
-		
-		// check if pin textures is loaded.
-		/*var currentTexture = this.pin.texturesArray[0];
-		if (!currentTexture || !currentTexture.texId)
-		{
-			//magoManager.load_testTextures();
-			return;
-		}*/
+		//-------------------------------------------------------------------------------------------------------------
 		
 		var shader = magoManager.postFxShadersManager.getShader("pin"); 
 		shader.resetLastBuffersBinded();
@@ -359,7 +453,7 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 		gl.uniform1i(shader.bUseOriginalImageSize_loc, true);
 		gl.uniform3fv(shader.aditionalOffset_loc, [0.0, 0.0, 0.0]);
 		
-		gl.depthMask(false);
+		//gl.depthMask(false);
 		gl.disable(gl.BLEND);
 		var selectionManager = magoManager.selectionManager;
 		var lastTexId = undefined;
@@ -420,7 +514,6 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 				
 				gl.uniform3fv(shader.buildingPosHIGH_loc, objMarkerGeoLocation.positionHIGH);
 				gl.uniform3fv(shader.buildingPosLOW_loc, objMarkerGeoLocation.positionLOW);
-
 				gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
 			}
@@ -490,15 +583,14 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 
 				gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 			}
-			gl.enable(gl.BLEND);
 		}
 		
-		gl.enable(gl.BLEND);
+		gl.disable(gl.BLEND);
 		gl.depthRange(0, 1);
 		gl.depthMask(true);
 		gl.useProgram(null);
-		gl.bindTexture(gl.TEXTURE_2D, null);
-		shader.disableVertexAttribArrayAll();
+		//gl.bindTexture(gl.TEXTURE_2D, null);
+		//shader.disableVertexAttribArrayAll();
 		
 	}
 };

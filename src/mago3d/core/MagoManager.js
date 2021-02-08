@@ -1996,7 +1996,12 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		
 	this.swapRenderingFase();
 
-	
+	// Delete after test!!!!!!!!!!!!!!
+	//if(!this.test_speechBubble)
+	//{
+	//	this.TEST__ObjectMarker_toNeoReference();
+	//	this.test_speechBubble = true;
+	//}
 };
 
 /**
@@ -6795,6 +6800,8 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	var shaderName = "pin";
 	var ssao_vs_source = ShaderSource.PngImageVS;
 	var ssao_fs_source = ShaderSource.PngImageFS;
+	ssao_fs_source = ssao_fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
+	ssao_fs_source = ssao_fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
 	var shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
 	shader.position4_loc = gl.getAttribLocation(shader.program, "position");
 	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");

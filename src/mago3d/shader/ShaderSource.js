@@ -1346,7 +1346,8 @@ uniform vec2 u_tex_res;\n\
 varying vec4 vColor;\n\
 uniform bool bUseLogarithmicDepth;\n\
 uniform int uFrustumIdx;\n\
-uniform vec2 uDustConcentMinMax;\n\
+uniform vec2 uDustConcentMinMax_up;\n\
+uniform vec2 uDustConcentMinMax_down;\n\
 uniform float uZFactor;\n\
 \n\
 varying float flogz;\n\
@@ -1443,10 +1444,229 @@ vec3 getRainbowColor_byHeight(float height)\n\
     return resultColor;\n\
 }   \n\
 \n\
+float round(in float value)\n\
+{\n\
+	return floor(value + 0.5);\n\
+}\n\
+\n\
+float calculateIndex(in float rawConcentration)\n\
+{\n\
+	//Index index1 = new Index(0, 50, 1);    // 좋음\n\
+	//Index index2 = new Index(51, 100, 2);  // 보통\n\
+	//Index index3 = new Index(101, 250, 3); // 나쁨\n\
+	//Index index4 = new Index(251, 500, 4); // 매우나쁨\n\
+\n\
+	//pm25.addIndexStep(new IndexStep(index1,  0.0,  15.0));\n\
+	//pm25.addIndexStep(new IndexStep(index2, 16.0,  35.0));\n\
+	//pm25.addIndexStep(new IndexStep(index3, 36.0,  75.0));\n\
+	//pm25.addIndexStep(new IndexStep(index4, 76.0, 500.0));\n\
+\n\
+	// 1rst, calculate index:\n\
+	int indexStep;\n\
+	float valueAux = rawConcentration;\n\
+	if(valueAux >= 0.0 && valueAux <= 15.0)\n\
+	{\n\
+		indexStep = 1;\n\
+	}\n\
+	else if(valueAux > 15.0 && valueAux <= 35.0)\n\
+	{\n\
+		indexStep = 2;\n\
+	}\n\
+	else if(valueAux > 35.0 && valueAux <= 75.0)\n\
+	{\n\
+		indexStep = 3;\n\
+	}\n\
+	else if(valueAux > 75.0 && valueAux <= 500.0)\n\
+	{\n\
+		indexStep = 4;\n\
+	}\n\
+	else\n\
+	{\n\
+		indexStep = -1;\n\
+	}\n\
+\n\
+	float iLow, iHigh;\n\
+	float cLow, cHigh;\n\
+\n\
+	int idx = indexStep;\n\
+\n\
+	if(idx == 1)\n\
+	{\n\
+		iLow = 0.0;\n\
+		iHigh = 50.0;\n\
+		cLow = 0.0;\n\
+		cHigh = 15.0;\n\
+	}\n\
+	else if(idx == 2)\n\
+	{\n\
+		iLow = 51.0;\n\
+		iHigh = 100.0;\n\
+		cLow = 16.0;\n\
+		cHigh = 35.0;\n\
+	}\n\
+	else if(idx == 3)\n\
+	{\n\
+		iLow = 101.0;\n\
+		iHigh = 250.0;\n\
+		cLow = 36.0;\n\
+		cHigh = 75.0;\n\
+	}\n\
+	else if(idx == 4)\n\
+	{\n\
+		iLow = 251.0;\n\
+		iHigh = 500.0;\n\
+		cLow = 76.0;\n\
+		cHigh = 500.0;\n\
+	}\n\
+\n\
+	float rawIndex = (iHigh - iLow) / (cHigh - cLow) * (rawConcentration - cLow) + iLow;\n\
+	//return int(round(rawIndex));\n\
+	return rawIndex;\n\
+}\n\
+\n\
+vec3 getBBCAndYeonHwa_colorCoded(float index)\n\
+{\n\
+	// 0 = rgb(0.16796875, 0.51171875, 0.7265625)\n\
+	// 50 = rgb(0.66796875, 0.86328125, 0.640625)\n\
+	// 100 = rgb(0.99609375, 0.99609375, 0.74609375)\n\
+	// 250 = rgb(0.98828125, 0.6796875, 0.37890625)\n\
+	// 500 = rgb(0.83984375, 0.09765625, 0.109375)\n\
+\n\
+	vec3 result;\n\
+\n\
+	if(index < 0.0)\n\
+	{\n\
+		return vec3(0.0, 0.0, 0.0);\n\
+	}\n\
+\n\
+	if(index >= 0.0 && index < 50.0)\n\
+	{\n\
+		vec3 colorTop = vec3(0.16796875, 0.51171875, 0.7265625);\n\
+		vec3 colorDown = vec3(0.66796875, 0.86328125, 0.640625);\n\
+		float indexFactor = (index - 0.0)/(50.0 - 0.0);\n\
+		result = mix(colorTop, colorDown, indexFactor);\n\
+		//return vec3(1.0, 0.0, 0.0);\n\
+	}\n\
+	else if(index >= 50.0 && index < 100.0)\n\
+	{\n\
+		vec3 colorTop = vec3(0.66796875, 0.86328125, 0.640625);\n\
+		vec3 colorDown = vec3(0.99609375, 0.99609375, 0.74609375);\n\
+		float indexFactor = (index - 50.0)/(100.0 - 50.0);\n\
+		result = mix(colorTop, colorDown, indexFactor);\n\
+		//return vec3(0.0, 1.0, 0.0);\n\
+	}\n\
+	else if(index >= 100.0 && index < 250.0)\n\
+	{\n\
+		vec3 colorTop = vec3(0.99609375, 0.99609375, 0.74609375);\n\
+		vec3 colorDown = vec3(0.98828125, 0.6796875, 0.37890625);\n\
+		float indexFactor = (index - 100.0)/(250.0 - 100.0);\n\
+		result = mix(colorTop, colorDown, indexFactor);\n\
+		//return vec3(0.0, 0.0, 1.0);\n\
+	}\n\
+	else if(index >= 250.0 && index < 500.0)\n\
+	{\n\
+		vec3 colorTop = vec3(0.98828125, 0.6796875, 0.37890625);\n\
+		vec3 colorDown = vec3(0.83984375, 0.09765625, 0.109375);\n\
+		float indexFactor = (index - 250.0)/(500.0 - 250.0);\n\
+		result = mix(colorTop, colorDown, indexFactor);\n\
+		//return vec3(1.0, 1.0, 0.0);\n\
+	}\n\
+	else\n\
+	{\n\
+		return vec3(1.0, 0.0, 1.0);\n\
+	}\n\
+\n\
+	return result;\n\
+}\n\
+\n\
+vec3 getBBCAndYeonHwa_colorCoded_tight(float rawConcent)\n\
+{\n\
+	// 0 = rgb(0.16796875, 0.51171875, 0.7265625)\n\
+	// 50 = rgb(0.66796875, 0.86328125, 0.640625)\n\
+	// 100 = rgb(0.99609375, 0.99609375, 0.74609375)\n\
+	// 250 = rgb(0.98828125, 0.6796875, 0.37890625)\n\
+	// 500 = rgb(0.83984375, 0.09765625, 0.109375)\n\
+\n\
+	// Try to exagere index.***\n\
+	//uDustConcentMinMax[1] - uDustConcentMinMax[0]\n\
+	float maxConcent = uDustConcentMinMax_down[1];\n\
+	float minConcent = uDustConcentMinMax_down[0];\n\
+	float increConcent = maxConcent/4.0;\n\
+\n\
+	vec3 result;\n\
+\n\
+	if(rawConcent < 0.0)\n\
+	{\n\
+		return vec3(0.0, 0.0, 0.0);\n\
+	}\n\
+\n\
+	if(rawConcent >= minConcent && rawConcent < minConcent + increConcent * 1.0)\n\
+	{\n\
+		vec3 colorTop = vec3(0.16796875, 0.51171875, 0.7265625);\n\
+		vec3 colorDown = vec3(0.66796875, 0.86328125, 0.640625);\n\
+		float minValue = minConcent;\n\
+		float maxValue = minConcent + increConcent * 1.0;\n\
+		float indexFactor = (rawConcent - minValue)/(maxValue - minValue);\n\
+		indexFactor = indexFactor - floor(indexFactor); \n\
+		//result = mix(colorDown, colorTop, indexFactor);\n\
+		result = mix(colorTop, colorDown, indexFactor);\n\
+		//return vec3(1.0, 0.0, 0.0);\n\
+	}\n\
+	else if(rawConcent >= minConcent + increConcent * 1.0 && rawConcent < minConcent + increConcent * 2.0)\n\
+	{\n\
+		vec3 colorTop = vec3(0.66796875, 0.86328125, 0.640625);\n\
+		vec3 colorDown = vec3(0.99609375, 0.99609375, 0.74609375);\n\
+		float minValue = minConcent + increConcent * 1.0;\n\
+		float maxValue = minConcent + increConcent * 2.0;\n\
+		float indexFactor = (rawConcent - minValue)/(maxValue - minValue);\n\
+		indexFactor = indexFactor - floor(indexFactor); \n\
+		//result = mix(colorDown, colorTop, indexFactor);\n\
+		result = mix(colorTop, colorDown, indexFactor);\n\
+		//return vec3(0.0, 1.0, 0.0);\n\
+	}\n\
+	else if(rawConcent >= minConcent + increConcent * 2.0 && rawConcent < minConcent + increConcent * 3.0)\n\
+	{\n\
+		vec3 colorTop = vec3(0.99609375, 0.99609375, 0.74609375);\n\
+		vec3 colorDown = vec3(0.98828125, 0.6796875, 0.37890625);\n\
+		float minValue = minConcent + increConcent * 2.0;\n\
+		float maxValue = minConcent + increConcent * 3.0;\n\
+		float indexFactor = (rawConcent - minValue)/(maxValue - minValue);\n\
+		indexFactor = indexFactor - floor(indexFactor); \n\
+		//result = mix(colorDown, colorTop, indexFactor);\n\
+		result = mix(colorTop, colorDown, indexFactor);\n\
+		//return vec3(0.0, 0.0, 1.0);\n\
+	}\n\
+	else if(rawConcent >= minConcent + increConcent * 3.0 && rawConcent < minConcent + increConcent * 4.0)\n\
+	{\n\
+		vec3 colorTop = vec3(0.98828125, 0.6796875, 0.37890625);\n\
+		vec3 colorDown = vec3(0.83984375, 0.09765625, 0.109375);\n\
+		float minValue = minConcent + increConcent * 3.0;\n\
+		float maxValue = minConcent + increConcent * 4.0;\n\
+		float indexFactor = (rawConcent - minValue)/(maxValue - minValue);\n\
+		indexFactor = indexFactor - floor(indexFactor); \n\
+		//result = mix(colorDown, colorTop, indexFactor);\n\
+		result = mix(colorTop, colorDown, indexFactor);\n\
+		//return vec3(1.0, 1.0, 0.0);\n\
+	}\n\
+	else\n\
+	{\n\
+		return vec3(1.0, 0.0, 1.0);\n\
+	}\n\
+\n\
+	return result;\n\
+}\n\
+\n\
 void main()\n\
 {\n\
 	vec4 colorUp = texture2D(texUp, vTexCoord);\n\
 	vec4 colorDown = texture2D(texDown, vTexCoord);\n\
+\n\
+	// now, calculate realConcent_up & realConcent_down.***\n\
+	float realConcent_up = colorUp.r * (uDustConcentMinMax_up[1] - uDustConcentMinMax_up[0]) + uDustConcentMinMax_up[0];\n\
+	float realConcent_down = colorDown.r * (uDustConcentMinMax_down[1] - uDustConcentMinMax_down[0]) + uDustConcentMinMax_down[0];\n\
+	float realConcent = mix(realConcent_down, realConcent_up, uZFactor);\n\
+	float concentMin = mix(uDustConcentMinMax_down[0], uDustConcentMinMax_up[0], uZFactor);\n\
+	float concentMax = mix(uDustConcentMinMax_down[1], uDustConcentMinMax_up[1], uZFactor);\n\
 	vec4 textureColor = mix(colorDown, colorUp, uZFactor);\n\
 	//vec4 textureColor = texture2D(texDown, vTexCoord);\n\
 \n\
@@ -1455,10 +1675,31 @@ void main()\n\
 	float concent = textureColor.g;\n\
 	vec3 rainbowCol = getRainbowColor_byHeight(concent);\n\
 \n\
-	finalColor = vec4(rainbowCol, alpha);\n\
-	float colValue = 1.0 - concent;//*concent;\n\
-	//colValue *= colValue;\n\
-	finalColor = vec4(1.0, colValue, colValue, concent);\n\
+	// BBC & YeonHwa color system.********************************************************************************\n\
+	// BBC & YeonHwa color system.********************************************************************************\n\
+	//float realConcent = concent * (uDustConcentMinMax_down[1] - uDustConcentMinMax_down[0]) + uDustConcentMinMax_down[0];\n\
+	float indexMin = calculateIndex(concentMin);\n\
+	float indexMax = calculateIndex(concentMax);\n\
+	float index = calculateIndex(realConcent);\n\
+\n\
+	float scaledIndex = (index - indexMin)/(indexMax - indexMin);\n\
+	scaledIndex *= 500.0;\n\
+	//vec3 colorAux = getBBCAndYeonHwa_colorCoded(scaledIndex);\n\
+	vec3 colorAux = getBBCAndYeonHwa_colorCoded_tight(realConcent);\n\
+	//-------------------------------------------------------------------------------------------------------------\n\
+	//-------------------------------------------------------------------------------------------------------------\n\
+\n\
+	//finalColor = vec4(rainbowCol, alpha);\n\
+	\n\
+	if(concent < 0.00001)\n\
+	{\n\
+		finalColor = vec4(colorAux, 0.0);\n\
+	}\n\
+	else{\n\
+		finalColor = vec4(colorAux, 0.7);\n\
+	}\n\
+	\n\
+\n\
 \n\
 	gl_FragData[0] = finalColor;\n\
 \n\
@@ -4268,6 +4509,18 @@ void main()\n\
 }\n\
 ";
 ShaderSource.PngImageFS = "precision highp float;\n\
+\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
 varying vec2 v_texcoord;\n\
 uniform bool textureFlipYAxis;\n\
 uniform sampler2D u_texture;\n\
@@ -4276,6 +4529,23 @@ uniform vec4 oneColor4;\n\
 \n\
 \n\
 varying vec2 imageSizeInPixels;\n\
+\n\
+vec3 encodeNormal(in vec3 normal)\n\
+{\n\
+	return normal*0.5 + 0.5;\n\
+}\n\
+\n\
+vec3 decodeNormal(in vec3 normal)\n\
+{\n\
+	return normal * 2.0 - 1.0;\n\
+}\n\
+\n\
+vec4 packDepth( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+  return enc;\n\
+}\n\
 \n\
 void main()\n\
 {\n\
@@ -4306,7 +4576,38 @@ void main()\n\
 		textureColor = oneColor4;\n\
 	}\n\
 \n\
-    gl_FragColor = textureColor;\n\
+    //gl_FragColor = textureColor;\n\
+	gl_FragData[0] = textureColor;\n\
+\n\
+	#ifdef USE_MULTI_RENDER_TARGET\n\
+		//gl_FragData[1] = packDepth(vDepth);\n\
+		gl_FragData[1] = packDepth(0.0);\n\
+		\n\
+		// Note: points cloud data has frustumIdx 20 .. 23.********\n\
+		float frustumIdx = 0.1; // realFrustumIdx = 0.1 * 100 = 10. \n\
+		\n\
+		//if(uFrustumIdx == 0)\n\
+		//frustumIdx = 0.005; // frustumIdx = 20.***\n\
+		//else if(uFrustumIdx == 1)\n\
+		//frustumIdx = 0.015; // frustumIdx = 21.***\n\
+		//else if(uFrustumIdx == 2)\n\
+		//frustumIdx = 0.025; // frustumIdx = 22.***\n\
+		//else if(uFrustumIdx == 3)\n\
+		//frustumIdx = 0.035; // frustumIdx = 23.***\n\
+\n\
+		vec3 normal = encodeNormal(vec3(0.0, 0.0, 1.0));\n\
+		gl_FragData[2] = vec4(normal, frustumIdx); // save normal.***\n\
+\n\
+		// now, albedo.\n\
+		gl_FragData[3] = textureColor; \n\
+	#endif\n\
+\n\
+	#ifdef USE_LOGARITHMIC_DEPTH\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
+	}\n\
+	#endif\n\
 }";
 ShaderSource.PngImageVS = "attribute vec4 position;\n\
 attribute vec2 texCoord;\n\
