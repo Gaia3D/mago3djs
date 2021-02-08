@@ -1,10 +1,13 @@
 #ifdef GL_ES
 precision highp float;
 #endif
-uniform float near;
-uniform float far;
 
-varying float depth;  
+uniform sampler2D diffuseTex;
+uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.
+uniform bool textureFlipYAxis;  
+
+varying float depth;
+varying vec2 vTexCoord;  
 
 vec4 packDepth(const in float depth)
 {
@@ -25,6 +28,22 @@ vec4 PackDepth32( in float depth )
 
 void main()
 {     
+    if(colorType == 2)
+    {
+        vec4 textureColor;
+        if(textureFlipYAxis)
+        {
+            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));
+        }
+        else{
+            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));
+        }
+		
+        if(textureColor.w == 0.0)
+        {
+            discard;
+        }
+    }
     gl_FragData[0] = PackDepth32(depth);
 	//gl_FragData[0] = packDepth(-depth);
 }

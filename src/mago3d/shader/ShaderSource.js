@@ -4433,10 +4433,13 @@ ShaderSource.ModelRefSsaoVS = "\n\
 ShaderSource.OrthogonalDepthShaderFS = "#ifdef GL_ES\n\
 precision highp float;\n\
 #endif\n\
-uniform float near;\n\
-uniform float far;\n\
 \n\
-varying float depth;  \n\
+uniform sampler2D diffuseTex;\n\
+uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
+uniform bool textureFlipYAxis;  \n\
+\n\
+varying float depth;\n\
+varying vec2 vTexCoord;  \n\
 \n\
 vec4 packDepth(const in float depth)\n\
 {\n\
@@ -4457,10 +4460,27 @@ vec4 PackDepth32( in float depth )\n\
 \n\
 void main()\n\
 {     \n\
+    if(colorType == 2)\n\
+    {\n\
+        vec4 textureColor;\n\
+        if(textureFlipYAxis)\n\
+        {\n\
+            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));\n\
+        }\n\
+        else{\n\
+            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));\n\
+        }\n\
+		\n\
+        if(textureColor.w == 0.0)\n\
+        {\n\
+            discard;\n\
+        }\n\
+    }\n\
     gl_FragData[0] = PackDepth32(depth);\n\
 	//gl_FragData[0] = packDepth(-depth);\n\
 }";
 ShaderSource.OrthogonalDepthShaderVS = "attribute vec3 position;\n\
+attribute vec2 texCoord;\n\
 \n\
 uniform mat4 buildingRotMatrix; \n\
 uniform mat4 modelViewMatrixRelToEye; \n\
@@ -4477,6 +4497,7 @@ uniform vec3 refTranslationVec;\n\
 uniform int refMatrixType; // 0= identity, 1= translate, 2= transform\n\
 \n\
 varying float depth;\n\
+varying vec2 vTexCoord;\n\
   \n\
 void main()\n\
 {	\n\
@@ -4506,6 +4527,7 @@ void main()\n\
 \n\
 	gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 	depth = gl_Position.z*0.5+0.5;\n\
+	vTexCoord = texCoord;\n\
 }\n\
 ";
 ShaderSource.PngImageFS = "precision highp float;\n\

@@ -1999,7 +1999,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	// Delete after test!!!!!!!!!!!!!!
 	//if(!this.test_speechBubble)
 	//{
-	//	this.TEST__ObjectMarker_toNeoReference();
+	//	this.objMarkerManager.TEST__ObjectMarker_toNeoReference();
 	//	this.test_speechBubble = true;
 	//}
 };
@@ -3488,107 +3488,6 @@ MagoManager.prototype.TEST__SelectionBuffer = function()
 	var idx = this.selectionColor.decodeColor3(pixels[centerPixel*3], pixels[centerPixel*3+1], pixels[centerPixel*3+2]);
 	//////////////////////////////////////////////////////////////////////////////
 	this.selectionFbo.unbind();
-};
-
-MagoManager.prototype.TEST__ObjectMarker_toNeoReference = function() 
-{
-	
-	// buildingId: "SD_COUNCIL_del"
-	// projectId: "3ds.json"
-
-	// objectId: "11011" -> refMatrixType: 0 // sostre verd mig circular
-	// objectId: "2953" -> refMatrixType: 1 // cadira vermella a l'interior.
-	// objectId: "2837" -> refMatrixType: 2 // cadira vermella a l'interior.
-	
-
-	var objMarkerManager = this.objMarkerManager;
-	var bubbleWidth = 128;
-	var bubbleHeight = 128;
-	var textSize = 36;
-
-	// 1rst object.***************************************************************
-	var target = {
-		projectId  : "3ds",
-		buildingId : "SD_COUNCIL_del",
-		objectId   : "11011"
-	};
-
-	var commentTextOption = {
-		pixel       : textSize,
-		color       : 'blue',
-		borderColor : 'white',
-		text        : '11011'
-	};
-
-	var speechBubbleOptions = {
-		width             : bubbleWidth,
-		height            : bubbleHeight,
-		commentTextOption : commentTextOption,
-		bubbleColor       : {r: 1, g: 1, b: 1}
-	};
-
-	var options = {
-		speechBubbleOptions : speechBubbleOptions,
-		target              : target
-	};
-
-	objMarkerManager.newObjectMarkerSpeechBubble(options, this);
-
-	// 2nd object.***************************************************************
-	var target = {
-		projectId  : "3ds",
-		buildingId : "SD_COUNCIL_del",
-		objectId   : "2953"
-	};
-
-	var commentTextOption = {
-		pixel       : textSize,
-		color       : 'blue',
-		borderColor : 'white',
-		text        : '2953'
-	};
-
-	var speechBubbleOptions = {
-		width             : bubbleWidth,
-		height            : bubbleHeight,
-		commentTextOption : commentTextOption,
-		bubbleColor       : {r: 1, g: 1, b: 1}
-	};
-
-	var options = {
-		speechBubbleOptions : speechBubbleOptions,
-		target              : target
-	};
-
-	objMarkerManager.newObjectMarkerSpeechBubble(options, this);
-
-	// 3rd object.***************************************************************
-	var target = {
-		projectId  : "3ds",
-		buildingId : "SD_COUNCIL_del",
-		objectId   : "2837"
-	};
-
-	var commentTextOption = {
-		pixel       : textSize,
-		color       : 'blue',
-		borderColor : 'white',
-		text        : '2837'
-	};
-
-	var speechBubbleOptions = {
-		width             : bubbleWidth,
-		height            : bubbleHeight,
-		commentTextOption : commentTextOption,
-		bubbleColor       : {r: 1, g: 1, b: 1}
-	};
-
-	var options = {
-		speechBubbleOptions : speechBubbleOptions,
-		target              : target
-	};
-
-	objMarkerManager.newObjectMarkerSpeechBubble(options, this);
 };
 
 /**

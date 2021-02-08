@@ -150,6 +150,11 @@ Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, sh
 		for (var i=0; i<nodesCount; i++)
 		{
 			node = visibleNodesArray[i];
+			if(node.data.nodeId === "CB_fall")
+			{
+				var hola = 0;
+			}
+			
 			node.renderContent(magoManager, shader, renderType, refMatrixIdxKey);
 		}
 	}
@@ -2248,7 +2253,7 @@ Renderer.prototype.renderScreenRectangle = function(gl, options)
 		//texture = magoManager.windVolumeRearNormalTex;
 	}
 
-	/*
+	
 	var sunSystem = sceneState.sunSystem;
 	if(sunSystem)
 	{
@@ -2259,7 +2264,7 @@ Renderer.prototype.renderScreenRectangle = function(gl, options)
 		}
 		
 	}
-	*/
+	
 	if(magoManager.scene._context._us.globeDepthTexture._texture)
 	{
 		//texture = magoManager.scene._context._us.globeDepthTexture._texture;

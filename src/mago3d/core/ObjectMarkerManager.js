@@ -453,7 +453,7 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 		gl.uniform1i(shader.bUseOriginalImageSize_loc, true);
 		gl.uniform3fv(shader.aditionalOffset_loc, [0.0, 0.0, 0.0]);
 		
-		//gl.depthMask(false);
+		gl.depthMask(false);
 		gl.disable(gl.BLEND);
 		var selectionManager = magoManager.selectionManager;
 		var lastTexId = undefined;
