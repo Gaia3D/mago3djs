@@ -154,7 +154,7 @@ Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, sh
 			{
 				var hola = 0;
 			}
-			
+
 			node.renderContent(magoManager, shader, renderType, refMatrixIdxKey);
 		}
 	}
@@ -2106,9 +2106,13 @@ Renderer.prototype.renderScreenRectangle = function(gl, options)
 	{
 
 		//var data = new Float32Array([0, 0,   1, 0,   0, 1,   0, 1,   1, 0,   1,  1]); // total screen.
-		//var data = new Float32Array([0, 0,   0.5, 0,   0, 0.5,       0, 0.5,   0.5, 0,   0.5, 0.5]); // rightUp screen.
-		var data = new Float32Array([0, 0,   0.5, 0,   0, 1,       0, 1,   0.5, 0,   0.5, 1]); // right half screen.
+		var data = new Float32Array([0, 0,   0.5, 0,   0, 0.5,       0, 0.5,   0.5, 0,   0.5, 0.5]); // rightUp screen.
+		//var data = new Float32Array([0, 0,   0.5, 0,   0, 1,       0, 1,   0.5, 0,   0.5, 1]); // right half screen.
 		this.quadBuffer = FBO.createBuffer(gl, data);
+
+		// create texCoords.
+		var texCoords = new Float32Array([0, 0,   1, 0,   0, 1,   0, 1,   1, 0,   1,  1]); // total screen.
+		this.texCoordBuffer = FBO.createBuffer(gl, texCoords);
 
 		// now, create normalBuffer for use with cubeMaps.
 		// zNegative face = 5.
@@ -2171,8 +2175,11 @@ Renderer.prototype.renderScreenRectangle = function(gl, options)
 	gl.enableVertexAttribArray(shader.position2_loc);
 	FBO.bindAttribute(gl, this.quadBuffer, shader.position2_loc, 2);
 
-	gl.enableVertexAttribArray(shader.normal3_loc);
+	gl.enableVertexAttribArray(shader.normal3_loc); // only for cubeMaps.***
 	FBO.bindAttribute(gl, this.normalBuffer, shader.normal3_loc, 3);
+
+	gl.enableVertexAttribArray(shader.texCoord2_loc);
+	FBO.bindAttribute(gl, this.texCoordBuffer, shader.texCoord2_loc, 2);
 
 	// If you want to see selectionBuffer.
 	//var texture = magoManager.selectionFbo.colorBuffer; // framebuffer for color selection.***
@@ -2257,7 +2264,7 @@ Renderer.prototype.renderScreenRectangle = function(gl, options)
 	var sunSystem = sceneState.sunSystem;
 	if(sunSystem)
 	{
-		var sunLight = sunSystem.getLight(0);
+		var sunLight = sunSystem.getLight(1);
 		if(sunLight && sunLight.depthFbo && sunLight.depthFbo.colorBuffer)
 		{
 			texture = sunLight.depthFbo.colorBuffer;

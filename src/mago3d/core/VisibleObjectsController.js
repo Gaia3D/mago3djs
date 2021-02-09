@@ -474,6 +474,7 @@ VisibleObjectsController.prototype.calculateBoundingFrustum = function(camera)
 
 	var filteredVisiblesArray = [];
 	filteredVisiblesArray = VisibleObjectsController.getBoundaryNodes(visiblesArray, filteredVisiblesArray);
+	// note: getBoundaryNodes choose the 4 limit nodes(minLongitude-node, minLatitude-node, maxLongitude-node & maxLatitude-node).
 	
 	var nearSquareDistCandidate = 10E10;
 	var farSquareDistCandidate = 0.0;

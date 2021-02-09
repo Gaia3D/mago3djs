@@ -5870,15 +5870,6 @@ float unpackDepth(const in vec4 rgba_depth)\n\
 \n\
 void main()\n\
 {           \n\
-    // Debug.\n\
-    /*\n\
-    if((v_tex_pos.x < 0.006 || v_tex_pos.x > 0.994) || (v_tex_pos.y < 0.006 || v_tex_pos.y > 0.994))\n\
-    {\n\
-        gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n\
-        return;\n\
-    }\n\
-    */\n\
-\n\
     vec2 texCoord = vec2(1.0 - v_tex_pos.x, 1.0 - v_tex_pos.y); // original.\n\
 \n\
     // Take the base color.\n\
@@ -5902,15 +5893,15 @@ ShaderSource.rectangleScreenVS = "precision mediump float;\n\
 \n\
 attribute vec2 a_pos;\n\
 attribute vec3 a_nor;\n\
+attribute vec2 a_tex;\n\
 \n\
 varying vec2 v_tex_pos;\n\
 varying vec3 v_normal;\n\
 \n\
 void main() {\n\
-    v_tex_pos = a_pos;\n\
+    v_tex_pos = a_tex;\n\
     v_normal = a_nor;\n\
     \n\
-    //vec2 pos = a_pos*0.5;\n\
     gl_Position = vec4(1.0 - 2.0 * a_pos, 0, 1);\n\
 }";
 ShaderSource.RenderShowDepthFS = "#ifdef GL_ES\n\

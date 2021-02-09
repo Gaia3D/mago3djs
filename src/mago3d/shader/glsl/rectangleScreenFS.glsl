@@ -145,15 +145,6 @@ float unpackDepth(const in vec4 rgba_depth)
 
 void main()
 {           
-    // Debug.
-    /*
-    if((v_tex_pos.x < 0.006 || v_tex_pos.x > 0.994) || (v_tex_pos.y < 0.006 || v_tex_pos.y > 0.994))
-    {
-        gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-        return;
-    }
-    */
-
     vec2 texCoord = vec2(1.0 - v_tex_pos.x, 1.0 - v_tex_pos.y); // original.
 
     // Take the base color.

@@ -6755,6 +6755,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	var shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
 	shader.position2_loc = gl.getAttribLocation(shader.program, "a_pos");
 	shader.normal3_loc = gl.getAttribLocation(shader.program, "a_nor");
+	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "a_tex");
 	shader.tex_0_loc = gl.getUniformLocation(shader.program, "texture_0");
 	shader.texture_cube_loc = gl.getUniformLocation(shader.program, "texture_cube");
 	shader.uTextureType_loc = gl.getUniformLocation(shader.program, "uTextureType");

@@ -47,6 +47,9 @@ var Camera = function(options)
 
 	// camera's depthBuffer.
 	this.depthBufferFBO;
+
+	// normalAtCartesianPointwgs84 in the camera position.
+	this._normalAtCartesianPointWgsb4;
 	
 	// movement.
 	this.lastMovement; // class Movement.
