@@ -278,11 +278,16 @@ Node.prototype.correctGeoLocationDataByMappingType = function(geoLoc)
 	}
 
 	// check if use "centerOfBoundingBoxAsOrigin".
-	var buildingSeed = this.data.buildingSeed;
-	if (buildingSeed === undefined)
-	{ return; }
+	var buildingSeedBBox;
 
-	var buildingSeedBBox = buildingSeed.bBox;
+	if(this.data.buildingSeed) {
+		buildingSeedBBox = this.data.buildingSeed.bBox;
+	} else {
+		buildingSeedBBox = this.data.neoBuilding.metaData.bbox;
+	}
+
+	if (buildingSeedBBox === undefined)
+	{ return; }
 		
 	if (this.data.mapping_type.toLowerCase() === "boundingboxcenter")
 	{

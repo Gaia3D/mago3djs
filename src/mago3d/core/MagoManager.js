@@ -7026,12 +7026,7 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 				nodeRoot = node.getRoot();
 				var attributes = node.data.attributes;
 
-				// now, create a geoLocDataManager for node if no exist.
-				if (nodeRoot.data.geoLocDataManager === undefined)
-				{
-					geoLoc = node.calculateGeoLocData(this);
-					continue;
-				}
+				
 				
 				var data = node.data;				
 				neoBuilding = node.data.neoBuilding;
@@ -7041,12 +7036,24 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 					visibleNodes.currentVisiblesToPrepare.push(node);
 					continue;
 				}
-				
+
+				if(neoBuilding.headerDataArrayBuffer && neoBuilding.metaData !== undefined && neoBuilding.metaData.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED) 
+				{
+					neoBuilding.metaData.parseFileHeaderAsimetricVersion(neoBuilding.headerDataArrayBuffer, 0);
+				}
+
 				//check if parsed header.***
 				//neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 				if (neoBuilding.metaData !== undefined && neoBuilding.metaData.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
 				{
 					visibleNodes.currentVisiblesToPrepare.push(node);
+					continue;
+				}
+
+				// now, create a geoLocDataManager for node if no exist.
+				if (nodeRoot.data.geoLocDataManager === undefined)
+				{
+					geoLoc = node.calculateGeoLocData(this);
 					continue;
 				}
 
