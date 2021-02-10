@@ -1739,6 +1739,8 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0);
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0);
 
+		
+
 		this.extbuffers.drawBuffersWEBGL([
 			this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - depth
 			this.extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - normal
@@ -1746,6 +1748,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 			this.extbuffers.NONE //
 			]);
 
+			
 		if(this.isFarestFrustum())
 		{
 			gl.clearColor(1.0, 1.0, 1.0, 1.0);
@@ -2002,11 +2005,11 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	this.swapRenderingFase();
 
 	// Delete after test!!!!!!!!!!!!!!
-	//if(!this.test_speechBubble)
-	//{
-	//	this.objMarkerManager.TEST__ObjectMarker_toNeoReference();
-	//	this.test_speechBubble = true;
-	//}
+	if(!this.test_speechBubble)
+	{
+		this.objMarkerManager.TEST__ObjectMarker_toNeoReference();
+		this.test_speechBubble = true;
+	}
 };
 
 /**

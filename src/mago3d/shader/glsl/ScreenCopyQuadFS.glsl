@@ -67,22 +67,26 @@ vec3 encodeNormal(in vec3 normal)
 void main()
 {
 	vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
-
+	vec4 albedo = texture2D(albedoTex, screenPos.xy);
 	// in this case, do not other process.
 	// 1rst, calculate the pixelPosWC.
 	vec4 depthColor4 = texture2D(depthTex, screenPos.xy);
-	float z_window  = unpackDepth(depthColor4); // z_window  is [0.0, 1.0] range depth.
+	float z_window  = unpackDepth(depthColor4); // z_window  is [-1.0, 1.0] range depth.
+
 
 	if(z_window >= 1.0)
 	{
 		discard;
 	}
 
-	if(z_window <= 0.0)
+	if(z_window <= 0.0 && uFrustumIdx < 2)
 	{
 		discard;
 	}
 	
+	float depth = 0.0;
+	vec4 posWC = vec4(1.0, 1.0, 1.0, 1.0);
+
 	// https://stackoverflow.com/questions/11277501/how-to-recover-view-space-position-given-view-space-depth-value-and-ndc-xy
 	float depthRange_near = 0.0;
 	float depthRange_far = 1.0;
@@ -93,10 +97,12 @@ void main()
 	
 	vec4 viewPosH = projectionMatrixInv * vec4(x_ndc, y_ndc, z_ndc, 1.0);
 	vec3 posCC = viewPosH.xyz/viewPosH.w;
-	vec4 posWC = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0) + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 1.0);
+	posWC = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0) + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 1.0);
 	//------------------------------------------------------------------------------------------------------------------------------
 
-	float depth = -posCC.z/far;
+	depth = -posCC.z/far;
+	gl_FragData[0] = packDepth(depth); // depth.
+	
 
 	#ifdef USE_GL_EXT_FRAGDEPTH
 		//gl_FragDepthEXT = z_window;
@@ -104,9 +110,6 @@ void main()
 
 	// Now, save the albedo.
 	#ifdef USE_MULTI_RENDER_TARGET
-
-		//gl_FragData[0] = packDepth(z_window); // depth.
-		gl_FragData[0] = packDepth(depth); // depth.
 
 		float frustumIdx = 1.0;
 		if(uFrustumIdx == 0)
@@ -118,12 +121,21 @@ void main()
 		else if(uFrustumIdx == 3)
 		frustumIdx = 0.135;
 
-		vec4 normal4WC = vec4(normalize(posWC.xyz), 1.0);
-		vec4 normal4 = normalMatrix4 * normal4WC;
-		vec3 encodedNormal = encodeNormal(normal4.xyz);
-		gl_FragData[1] = vec4(encodedNormal, frustumIdx); // save normal.***
+		if(z_window > 0.0)
+		{
+			vec4 normal4WC = vec4(normalize(posWC.xyz), 1.0);
+			vec4 normal4 = normalMatrix4 * normal4WC;
+			vec3 encodedNormal = encodeNormal(normal4.xyz);
+			gl_FragData[1] = vec4(encodedNormal, frustumIdx); // save normal.***
+		}
+		else
+		{
+			vec3 encodedNormal = encodeNormal(vec3(0.0, 0.0, 1.0));
+			gl_FragData[1] = vec4(encodedNormal, frustumIdx); // save normal.***
+		}
 
-		gl_FragData[2] = texture2D(albedoTex, screenPos.xy); // copy albedo.
+		gl_FragData[2] = albedo; // copy albedo.
+		
 	#endif
 
 	return;

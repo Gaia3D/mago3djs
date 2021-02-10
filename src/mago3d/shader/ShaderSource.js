@@ -6207,22 +6207,26 @@ vec3 encodeNormal(in vec3 normal)\n\
 void main()\n\
 {\n\
 	vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
-\n\
+	vec4 albedo = texture2D(albedoTex, screenPos.xy);\n\
 	// in this case, do not other process.\n\
 	// 1rst, calculate the pixelPosWC.\n\
 	vec4 depthColor4 = texture2D(depthTex, screenPos.xy);\n\
-	float z_window  = unpackDepth(depthColor4); // z_window  is [0.0, 1.0] range depth.\n\
+	float z_window  = unpackDepth(depthColor4); // z_window  is [-1.0, 1.0] range depth.\n\
+\n\
 \n\
 	if(z_window >= 1.0)\n\
 	{\n\
 		discard;\n\
 	}\n\
 \n\
-	if(z_window <= 0.0)\n\
+	if(z_window <= 0.0 && uFrustumIdx < 2)\n\
 	{\n\
 		discard;\n\
 	}\n\
 	\n\
+	float depth = 0.0;\n\
+	vec4 posWC = vec4(1.0, 1.0, 1.0, 1.0);\n\
+\n\
 	// https://stackoverflow.com/questions/11277501/how-to-recover-view-space-position-given-view-space-depth-value-and-ndc-xy\n\
 	float depthRange_near = 0.0;\n\
 	float depthRange_far = 1.0;\n\
@@ -6233,10 +6237,12 @@ void main()\n\
 	\n\
 	vec4 viewPosH = projectionMatrixInv * vec4(x_ndc, y_ndc, z_ndc, 1.0);\n\
 	vec3 posCC = viewPosH.xyz/viewPosH.w;\n\
-	vec4 posWC = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0) + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 1.0);\n\
+	posWC = modelViewMatrixRelToEyeInv * vec4(posCC.xyz, 1.0) + vec4((encodedCameraPositionMCHigh + encodedCameraPositionMCLow).xyz, 1.0);\n\
 	//------------------------------------------------------------------------------------------------------------------------------\n\
 \n\
-	float depth = -posCC.z/far;\n\
+	depth = -posCC.z/far;\n\
+	gl_FragData[0] = packDepth(depth); // depth.\n\
+	\n\
 \n\
 	#ifdef USE_GL_EXT_FRAGDEPTH\n\
 		//gl_FragDepthEXT = z_window;\n\
@@ -6244,9 +6250,6 @@ void main()\n\
 \n\
 	// Now, save the albedo.\n\
 	#ifdef USE_MULTI_RENDER_TARGET\n\
-\n\
-		//gl_FragData[0] = packDepth(z_window); // depth.\n\
-		gl_FragData[0] = packDepth(depth); // depth.\n\
 \n\
 		float frustumIdx = 1.0;\n\
 		if(uFrustumIdx == 0)\n\
@@ -6258,12 +6261,21 @@ void main()\n\
 		else if(uFrustumIdx == 3)\n\
 		frustumIdx = 0.135;\n\
 \n\
-		vec4 normal4WC = vec4(normalize(posWC.xyz), 1.0);\n\
-		vec4 normal4 = normalMatrix4 * normal4WC;\n\
-		vec3 encodedNormal = encodeNormal(normal4.xyz);\n\
-		gl_FragData[1] = vec4(encodedNormal, frustumIdx); // save normal.***\n\
+		if(z_window > 0.0)\n\
+		{\n\
+			vec4 normal4WC = vec4(normalize(posWC.xyz), 1.0);\n\
+			vec4 normal4 = normalMatrix4 * normal4WC;\n\
+			vec3 encodedNormal = encodeNormal(normal4.xyz);\n\
+			gl_FragData[1] = vec4(encodedNormal, frustumIdx); // save normal.***\n\
+		}\n\
+		else\n\
+		{\n\
+			vec3 encodedNormal = encodeNormal(vec3(0.0, 0.0, 1.0));\n\
+			gl_FragData[1] = vec4(encodedNormal, frustumIdx); // save normal.***\n\
+		}\n\
 \n\
-		gl_FragData[2] = texture2D(albedoTex, screenPos.xy); // copy albedo.\n\
+		gl_FragData[2] = albedo; // copy albedo.\n\
+		\n\
 	#endif\n\
 \n\
 	return;\n\

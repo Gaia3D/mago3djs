@@ -2217,7 +2217,7 @@ Renderer.prototype.renderScreenRectangle = function(gl, options)
 
 	if(magoManager.albedoTex)
 	{
-		//texture = magoManager.albedoTex;
+		texture = magoManager.albedoTex;
 	}
 
 	if(magoManager.diffuseLightTex)
@@ -2252,7 +2252,7 @@ Renderer.prototype.renderScreenRectangle = function(gl, options)
 
 	if(magoManager.windVolumeRearDepthTex)
 	{
-		texture = magoManager.windVolumeRearDepthTex;
+		//texture = magoManager.windVolumeRearDepthTex;
 	}
 	
 	if(magoManager.windVolumeRearNormalTex)
@@ -2267,7 +2267,7 @@ Renderer.prototype.renderScreenRectangle = function(gl, options)
 		var sunLight = sunSystem.getLight(1);
 		if(sunLight && sunLight.depthFbo && sunLight.depthFbo.colorBuffer)
 		{
-			texture = sunLight.depthFbo.colorBuffer;
+			//texture = sunLight.depthFbo.colorBuffer;
 		}
 		
 	}
