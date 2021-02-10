@@ -40,8 +40,7 @@ var SmartTile = function(smartTileName, options)
 	this.vectorTypeObjectsArray;
 	
 	this.nativeObjects = {
-		opaquesArray      : [],
-		transparentsArray : [],
+		generalObjectsArray : [], // opaques & transparent objects.
 		excavationsArray  : [],
 		vectorTypeArray   : [],
 		lightSourcesArray : []
@@ -606,14 +605,7 @@ SmartTile.prototype.putObject = function(targetDepth, object, magoManager)
 		{
 			if (object.objectType === MagoRenderable.OBJECT_TYPE.MESH)
 			{
-				if (object.isOpaque())
-				{
-					this.nativeObjects.opaquesArray.push(object);
-				}
-				else 
-				{
-					this.nativeObjects.transparentsArray.push(object);
-				}
+				this.nativeObjects.generalObjectsArray.push(object);
 			}
 			else if (object.objectType === MagoRenderable.OBJECT_TYPE.VECTORMESH)
 			{
@@ -1084,7 +1076,7 @@ SmartTile.prototype.hasRenderables = function()
 
 	// check native objects.
 	var nativeObjects = this.nativeObjects;
-	if (nativeObjects.opaquesArray.length > 0 || nativeObjects.transparentsArray.length > 0 || nativeObjects.excavationsArray.length > 0 || nativeObjects.vectorTypeArray.length > 0)
+	if (nativeObjects.generalObjectsArray.length > 0 || nativeObjects.excavationsArray.length > 0 || nativeObjects.vectorTypeArray.length > 0)
 	{ return true; }
 
 	// Check geographicCoords.***

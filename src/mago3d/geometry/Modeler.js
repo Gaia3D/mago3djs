@@ -975,7 +975,7 @@ Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive
 	}
 	//this.__TEST__laser();
 	//this.__TEST__extrudedLines();
-	//this.__TEST__extrusionBuildings();
+	this.__TEST__extrusionBuildings();
 };
 
 Modeler.prototype.createPlaneGrid = function(width, height, numCols, numRows) 

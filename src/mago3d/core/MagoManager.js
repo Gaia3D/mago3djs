@@ -6969,30 +6969,16 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 	var distToCamera;
 	var magoPolicy = this.magoPolicy;
 	
-	// The max distance to render in mago.
-	var lod5_minDist = magoPolicy.getLod5DistInMeters();
-	
 	var lowestTile;
-	var buildingSeedsCount;
-	var buildingSeed;
 	var neoBuilding;
-	var renderable;
 	var node;
 	var nodeRoot;
-	var nodeBbox;
 	var geoLoc;
-	var geoLocDataManager;
-	var realBuildingPos;
-	var longitude, latitude, altitude, heading, pitch, roll;
 	
 	if (this.boundingSphere_Aux === undefined)
 	{ this.boundingSphere_Aux = new Sphere(); }
 
 	var frustumFar = magoPolicy.getFrustumFarDistance();
-	
-	//if (frustumFar < 30000)
-	//{ frustumFar = 30000; }
-
 	var doFrustumCullingToBuildings = false;
 
 	for (var i=0; i<tilesCount; i++)
@@ -7003,9 +6989,6 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 		{ continue; }
 	
 		distToCamera = cameraPosition.distToSphere(lowestTile.sphereExtent);
-		//if (distToCamera > Number(lod5_minDist))
-		//{ continue; }
-	
 		if (lowestTile.intersectionType === Constant.INTERSECTION_INSIDE)
 		{
 			doFrustumCullingToBuildings = false;
@@ -7025,10 +7008,7 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 				// determine LOD for each building.
 				node = lowestTile.nodesArray[j];
 				nodeRoot = node.getRoot();
-				var attributes = node.data.attributes;
 
-				
-				
 				var data = node.data;				
 				neoBuilding = node.data.neoBuilding;
 				if (neoBuilding === undefined) // attributes.isReference === true
@@ -7044,7 +7024,6 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 				}
 
 				//check if parsed header.***
-				//neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 				if (neoBuilding.metaData !== undefined && neoBuilding.metaData.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
 				{
 					visibleNodes.currentVisiblesToPrepare.push(node);
@@ -7130,33 +7109,23 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLow
 		var currVisibleNativeObjects = visibleNodes.currentVisibleNativeObjects;
 		var nativeObjects = lowestTile.nativeObjects;
 
-		// native opaques.
-		var nativeObjectsCount = nativeObjects.opaquesArray.length;
+		// native opaques & transparents.
+		var nativeObjectsCount = nativeObjects.generalObjectsArray.length;
 		for(var j=0; j<nativeObjectsCount; j++)
 		{
-			var native = nativeObjects.opaquesArray[j];
+			var native = nativeObjects.generalObjectsArray[j];
 			this.boundingSphere_Aux = native.getBoundingSphereWC(this.boundingSphere_Aux);
 
 			var frustumCull = frustumVolume.intersectionSphere(this.boundingSphere_Aux); // cesium.***
 			// intersect with Frustum
 			if (frustumCull !== Constant.INTERSECTION_OUTSIDE) 
 			{
-				currVisibleNativeObjects.opaquesArray.push(native);
-			}
-		}
-
-		// native transparents.
-		nativeObjectsCount = nativeObjects.transparentsArray.length;
-		for(var j=0; j<nativeObjectsCount; j++)
-		{
-			var native = nativeObjects.transparentsArray[j];
-			this.boundingSphere_Aux = native.getBoundingSphereWC(this.boundingSphere_Aux);
-
-			var frustumCull = frustumVolume.intersectionSphere(this.boundingSphere_Aux); // cesium.***
-			// intersect with Frustum
-			if (frustumCull !== Constant.INTERSECTION_OUTSIDE) 
-			{
-				currVisibleNativeObjects.transparentsArray.push(native);
+				if(native.isOpaque())
+				{ currVisibleNativeObjects.opaquesArray.push(native);}
+				else
+				{
+					currVisibleNativeObjects.transparentsArray.push(native);
+				}
 			}
 		}
 
