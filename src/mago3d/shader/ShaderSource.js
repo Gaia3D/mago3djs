@@ -4583,10 +4583,10 @@ void main()\n\
 		textureColor = texture2D(u_texture, v_texcoord);\n\
 	}\n\
 	//if(textureColor.w < 0.005)\n\
-	//if(textureColor.w < 1.0)\n\
-	//{\n\
-	//	discard;\n\
-	//}\n\
+	if(textureColor.w < 0.5)\n\
+	{\n\
+		discard;\n\
+	}\n\
 \n\
 \n\
 	if(colorType == 2)\n\
@@ -6221,6 +6221,7 @@ void main()\n\
 \n\
 	if(z_window <= 0.0 && uFrustumIdx < 2)\n\
 	{\n\
+		// frustum =2 & 3 -> renders sky, so dont discard.\n\
 		discard;\n\
 	}\n\
 	\n\
@@ -6287,8 +6288,8 @@ ShaderSource.ScreenQuad2FS = "#ifdef GL_ES\n\
 \n\
 #define M_PI 3.1415926535897932384626433832795\n\
 \n\
-uniform sampler2D lightFogTex;\n\
-\n\
+uniform sampler2D lightFogTex; // 0\n\
+uniform sampler2D screenSpaceObjectsTex; // 1\n\
 \n\
 \n\
 uniform float near;\n\
@@ -6303,6 +6304,8 @@ uniform vec2 uNearFarArray[4];\n\
 uniform bool bUseLogarithmicDepth;\n\
 uniform float uFCoef_logDepth;\n\
 uniform float uSceneDayNightLightingFactor; // day -> 1.0; night -> 0.0\n\
+\n\
+uniform bool u_activeTex[8];\n\
 \n\
 \n\
 float unpackDepth(vec4 packedDepth)\n\
@@ -6406,12 +6409,30 @@ vec2 getNearFar_byFrustumIdx(in int frustumIdx)\n\
 void main()\n\
 {\n\
 	vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
-	vec4 lightFog4 = texture2D(lightFogTex, screenPos);\n\
-	float alpha = lightFog4.w;\n\
-	if(alpha > 0.6)\n\
-	alpha = 0.6;\n\
 \n\
-	gl_FragColor = vec4(lightFog4.x, lightFog4.y, lightFog4.z, alpha);\n\
+    // check for \"screenSpaceObjectsTex\".\n\
+    vec4 screenSpaceColor4;\n\
+    if(u_activeTex[1])\n\
+    {\n\
+        screenSpaceColor4 = texture2D(screenSpaceObjectsTex, screenPos);\n\
+        gl_FragColor = screenSpaceColor4;\n\
+\n\
+        if(screenSpaceColor4.a > 0.0)\n\
+        return;\n\
+    }\n\
+\n\
+    // Check for light fog.\n\
+    if(u_activeTex[0])\n\
+    {\n\
+        vec4 lightFog4 = texture2D(lightFogTex, screenPos);\n\
+        float alpha = lightFog4.w;\n\
+        if(alpha > 0.6)\n\
+        alpha = 0.6;\n\
+\n\
+        gl_FragColor = vec4(lightFog4.x, lightFog4.y, lightFog4.z, alpha);\n\
+    }\n\
+\n\
+    \n\
 }";
 ShaderSource.ScreenQuadFS = "#ifdef GL_ES\n\
     precision highp float;\n\
@@ -6425,7 +6446,6 @@ uniform sampler2D albedoTex; // 2\n\
 uniform sampler2D shadowMapTex; // 3\n\
 uniform sampler2D shadowMapTex2; // 4\n\
 uniform sampler2D ssaoTex; // 5\n\
-\n\
 uniform sampler2D diffuseLightTex; // 6\n\
 uniform sampler2D specularLightTex; // 7\n\
 \n\

@@ -50,6 +50,12 @@ ObjectMarker.prototype.copyFrom = function(objMarker)
 	this.issue_type = objMarker.issue_type;
 };
 
+ObjectMarker.prototype.render = function(magoManager, currentShader, renderType, glPrimitive) 
+{
+	// This function is created to skip rendering error when Renderer.prototype.renderSilhouetteDepth = function().
+	// do nothing. do nothing. do nothing.
+};
+
 ObjectMarker.prototype.getGeoLocationData = function(magoManager) 
 {
 	var geoLocationData;

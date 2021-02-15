@@ -1736,10 +1736,8 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 
 		this.texturesManager.texturesMergerFbo.bind();
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.depthTex, 0);
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0);
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0);
-
-		
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.normalTex, 0);
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, this.albedoTex, 0);
 
 		this.extbuffers.drawBuffersWEBGL([
 			this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - depth
@@ -1758,20 +1756,18 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 
 		}
 		gl.clear(gl.DEPTH_BUFFER_BIT);
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.normalTex, 0);
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, this.albedoTex, 0);
 		this.renderer.renderTerrainCopy();
 		
 		// end test.---------------------------------------------------------------------------------------------------
 
 		if (scene && scene._context && scene._context._currentFramebuffer) 
 		{
-			scene._context._currentFramebuffer._bind();
+			this.bindMainFramebuffer();
 			
 			// MRT on cesium.**************************************************
 			if(!this.extbuffers)
 			this.extbuffers = gl.getExtension("WEBGL_draw_buffers");
-
+			/*
 			if(this.isFarestFrustum())
 			{
 				gl.bindTexture(gl.TEXTURE_2D, this.depthTex);  
@@ -1785,6 +1781,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 
 				gl.bindTexture(gl.TEXTURE_2D, null);  
 			}
+			*/
 
 			// Bind mago colorTextures:
 			gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.depthTex, 0);
@@ -1818,7 +1815,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	// Render transparents.****************************************************************************************************************
 	if (this.isCesiumGlobe())
 	{
-		scene._context._currentFramebuffer._bind();
+		this.bindMainFramebuffer();
 		// Deactive depth & normals for transparent pass.
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // depthTex.
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // normalTex.
@@ -1854,9 +1851,12 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		this.renderer.renderBoundingBoxesNodes(this.visibleObjControlerNodes.currentVisiblesAux, undefined, bRenderLines);
 	}
 
+	// Finally do screenSpaceObjects render.
+	this.renderer.renderScreenSpaceObjects(gl);
+
 	if (this.isCesiumGlobe())
 	{
-		scene._context._currentFramebuffer._bind();
+		this.bindMainFramebuffer();
 		// unbind mago colorTextures:
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // depthTex.
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // normalTex.
@@ -1873,10 +1873,6 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	//this.renderer.renderNativeLightSources(renderType, this.visibleObjControlerNodes) ; // debug component.
 	//------------------------------------------------------------------------------------------------------
 	// End rendering transparents.----------------------------------------------------------------------------------------------------------
-
-	
-
-	
 
 	if (sceneState.applyLightsShadows)
 	{
@@ -1941,7 +1937,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 
 			if (this.isCesiumGlobe())
 			{
-				scene._context._currentFramebuffer._bind();
+				this.bindMainFramebuffer();
 				// unbind mago colorTextures:
 				
 				gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // depthTex.
@@ -1959,16 +1955,15 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 			// End rendering lightBuffer.--------------------------------------------
 		}
 
-		
+		// Do ssaoFromDepth render.
 		this.renderer.renderSsaoFromDepth(gl);
 
-		
 		if (this.isCesiumGlobe())
 		{
-			scene._context._currentFramebuffer._bind();
+			this.bindMainFramebuffer();
 		}
 
-		// Final render output.
+		// Final render output.**************************************************************
 		this.renderer.renderScreenQuad(gl); // 1rst screenQuad. (ssao, lighting, shadows)
 		this.renderer.renderScreenQuad2(gl); // 2nd screenQuad. (lightFog)
 
@@ -2005,11 +2000,11 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	this.swapRenderingFase();
 
 	// Delete after test!!!!!!!!!!!!!!
-	if(!this.test_speechBubble)
-	{
-		this.objMarkerManager.TEST__ObjectMarker_toNeoReference();
-		this.test_speechBubble = true;
-	}
+	//if(!this.test_speechBubble)
+	//{
+	//	this.objMarkerManager.TEST__ObjectMarker_toNeoReference();
+	//	this.test_speechBubble = true;
+	//}
 };
 
 /**
@@ -6340,13 +6335,16 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	var ssao_fs_source = ShaderSource.ScreenQuad2FS;
 	var shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
 	shader.lightFogTex_loc = gl.getUniformLocation(shader.program, "lightFogTex");
+	shader.screenSpaceObjectsTex_loc = gl.getUniformLocation(shader.program, "screenSpaceObjectsTex");
 	this.postFxShadersManager.useProgram(shader);
 	gl.uniform1i(shader.lightFogTex_loc, 0);
+	gl.uniform1i(shader.screenSpaceObjectsTex_loc, 1);
 
 	shader.uNearFarArray_loc = gl.getUniformLocation(shader.program, "uNearFarArray");
 	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
 	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
 	shader.uSceneDayNightLightingFactor_loc = gl.getUniformLocation(shader.program, "uSceneDayNightLightingFactor");
+	shader.u_activeTex_loc = gl.getUniformLocation(shader.program, "u_activeTex");
 
 	// 1) ModelReferences ssaoShader.******************************************************************************
 	var shaderName = "modelRefSsao";

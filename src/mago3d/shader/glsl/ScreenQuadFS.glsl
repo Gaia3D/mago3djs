@@ -10,7 +10,6 @@ uniform sampler2D albedoTex; // 2
 uniform sampler2D shadowMapTex; // 3
 uniform sampler2D shadowMapTex2; // 4
 uniform sampler2D ssaoTex; // 5
-
 uniform sampler2D diffuseLightTex; // 6
 uniform sampler2D specularLightTex; // 7
 

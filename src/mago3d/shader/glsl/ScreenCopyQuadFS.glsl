@@ -81,6 +81,7 @@ void main()
 
 	if(z_window <= 0.0 && uFrustumIdx < 2)
 	{
+		// frustum =2 & 3 -> renders sky, so dont discard.
 		discard;
 	}
 	

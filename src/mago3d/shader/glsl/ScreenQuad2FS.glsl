@@ -4,8 +4,8 @@
 
 #define M_PI 3.1415926535897932384626433832795
 
-uniform sampler2D lightFogTex;
-
+uniform sampler2D lightFogTex; // 0
+uniform sampler2D screenSpaceObjectsTex; // 1
 
 
 uniform float near;
@@ -20,6 +20,8 @@ uniform vec2 uNearFarArray[4];
 uniform bool bUseLogarithmicDepth;
 uniform float uFCoef_logDepth;
 uniform float uSceneDayNightLightingFactor; // day -> 1.0; night -> 0.0
+
+uniform bool u_activeTex[8];
 
 
 float unpackDepth(vec4 packedDepth)
@@ -123,10 +125,28 @@ vec2 getNearFar_byFrustumIdx(in int frustumIdx)
 void main()
 {
 	vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
-	vec4 lightFog4 = texture2D(lightFogTex, screenPos);
-	float alpha = lightFog4.w;
-	if(alpha > 0.6)
-	alpha = 0.6;
 
-	gl_FragColor = vec4(lightFog4.x, lightFog4.y, lightFog4.z, alpha);
+    // check for "screenSpaceObjectsTex".
+    vec4 screenSpaceColor4;
+    if(u_activeTex[1])
+    {
+        screenSpaceColor4 = texture2D(screenSpaceObjectsTex, screenPos);
+        gl_FragColor = screenSpaceColor4;
+
+        if(screenSpaceColor4.a > 0.0)
+        return;
+    }
+
+    // Check for light fog.
+    if(u_activeTex[0])
+    {
+        vec4 lightFog4 = texture2D(lightFogTex, screenPos);
+        float alpha = lightFog4.w;
+        if(alpha > 0.6)
+        alpha = 0.6;
+
+        gl_FragColor = vec4(lightFog4.x, lightFog4.y, lightFog4.z, alpha);
+    }
+
+    
 }

@@ -435,7 +435,7 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 		gl.enableVertexAttribArray(shader.position4_loc);
 		gl.activeTexture(gl.TEXTURE0);
 		
-		gl.depthRange(0, 0.05);
+		//gl.depthRange(0, 0.05);
 		//var context = document.getElementById('canvas2').getContext("2d");
 		//var canvas = document.getElementById("magoContainer");
 		
@@ -453,8 +453,8 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 		gl.uniform1i(shader.bUseOriginalImageSize_loc, true);
 		gl.uniform3fv(shader.aditionalOffset_loc, [0.0, 0.0, 0.0]);
 		
-		gl.depthMask(false);
-		gl.disable(gl.BLEND);
+		//gl.depthMask(false);
+		//gl.disable(gl.BLEND);
 		var selectionManager = magoManager.selectionManager;
 		var lastTexId = undefined;
 		if (renderType === 1)

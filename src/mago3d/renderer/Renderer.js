@@ -765,7 +765,7 @@ Renderer.prototype.renderSilhouetteDepth = function()
 		// Now check native objects.
 		var renderType = 0;
 		var nativeSelectedArray = selectionManager.getSelectedGeneralArray();
-		for(var i=0; i<nativeSelectedArray.length; i++)
+		for (var i = 0; i < nativeSelectedArray.length; i++)
 		{
 			var renderableObject = nativeSelectedArray[i];
 			renderableObject.render(magoManager, currentShader, renderType, gl.TRIANGLES);
@@ -1613,6 +1613,7 @@ Renderer.prototype.renderScreenQuad2 = function(gl)
 	gl.uniform1i(currentShader.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
 	gl.uniform1f(currentShader.uFCoef_logDepth_loc, sceneState.fCoef_logDepth[0]);
 	
+	
 
 	var sunSystem = sceneState.sunSystem;
 	var sunLight = sunSystem.getLight(0);
@@ -1649,8 +1650,6 @@ Renderer.prototype.renderScreenQuad2 = function(gl)
 		}
 	}
 
-	
-
 	// Bind textures.***
 	/*
 	for(var i=0; i<8; i++)
@@ -1660,14 +1659,24 @@ Renderer.prototype.renderScreenQuad2 = function(gl)
 	}
 	*/
 	
-	//gl.bindTexture(gl.TEXTURE_2D, null);  // cesium globeDepthTexture.***
+	var bLightFogTex = true;
 	gl.activeTexture(gl.TEXTURE0); 
 	gl.bindTexture(gl.TEXTURE_2D, magoManager.LightFogTex);
+
+	var bScreenSpaceObjectsTex = false;
+	var screenSpaceFBO = magoManager.screenSpaceFBO;
+	if(screenSpaceFBO)
+	{
+		bScreenSpaceObjectsTex = true;
+		gl.activeTexture(gl.TEXTURE1); 
+		gl.bindTexture(gl.TEXTURE_2D, screenSpaceFBO.colorBuffersArray[0]);
+	}
+
+	gl.uniform1iv(currentShader.u_activeTex_loc, [bLightFogTex, bScreenSpaceObjectsTex, 0, 0, 0, 0, 0, 0]);
 	
 	gl.depthMask(false);
 	gl.disable(gl.DEPTH_TEST);
 	gl.enable(gl.BLEND);
-	//gl.disable(gl.BLEND);
 	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); // Original.***
 
 	if (this.screenQuad === undefined)
@@ -2276,6 +2285,11 @@ Renderer.prototype.renderScreenRectangle = function(gl, options)
 	{
 		//texture = magoManager.scene._context._us.globeDepthTexture._texture;
 	}
+
+	if(magoManager.screenSpaceFBO)
+	{
+		texture = magoManager.screenSpaceFBO.colorBuffersArray[0];
+	}
 	
 
 	if (texture === undefined)
@@ -2330,16 +2344,52 @@ Renderer.prototype.renderScreenRectangle = function(gl, options)
  */
 Renderer.prototype.renderScreenSpaceObjects = function(gl) 
 {
+	// Render screenSpaceObjects, as speechBubbles.
+	// Create screenSpaceFBO if no exist.
 	var magoManager = this.magoManager;
-	var modeler = magoManager.modeler;
-	var sceenSpaceObjectsCount = modeler.screenSpaceObjectsArray.length;
-
-	for(var i=0; i<sceenSpaceObjectsCount; i++)
+	if(!magoManager.screenSpaceFBO)
 	{
-		var screenSpaceObject = modeler.screenSpaceObjectsArray[i];
+		// create a lBuffer with 2 colorTextures : diffuseLighting & specularLighting.
+		var bufferWidth = magoManager.sceneState.drawingBufferWidth[0];
+		var bufferHeight = magoManager.sceneState.drawingBufferHeight[0];
+		var bUseMultiRenderTarget = magoManager.postFxShadersManager.bUseMultiRenderTarget;
+		magoManager.screenSpaceFBO = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 3}); 
+	}
+
+	var screenSpaceFBO = magoManager.screenSpaceFBO;
+	var extbuffers = magoManager.extbuffers;
+
+	screenSpaceFBO.bind();
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, screenSpaceFBO.colorBuffersArray[0], 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, screenSpaceFBO.colorBuffersArray[1], 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, screenSpaceFBO.colorBuffersArray[2], 0);
+
+	extbuffers.drawBuffersWEBGL([
+		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - depth
+		extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - normal
+		extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - albedo
+		extbuffers.NONE //
+	]);
 
 		
+	if(magoManager.isFarestFrustum())
+	{
+		gl.clearColor(0, 0, 0, 0);
+		gl.clearDepth(1.0);
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		gl.clearColor(0, 0, 0, 1);
+
 	}
+	gl.clear(gl.DEPTH_BUFFER_BIT);
+
+	// 1) Render ObjectMarkers.********************************************************************************************************
+	gl.enable(gl.BLEND);	
+	var renderType = 1;
+	magoManager.objMarkerManager.render(magoManager, renderType); 
+
+	//---------------------------------------------------------------------------------------------------------------------------------
+	gl.disable(gl.BLEND);	
+
 };
 
 /**
@@ -2469,7 +2519,7 @@ Renderer.prototype.renderLightBuffer = function(lightSourcesArray)
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	var extbuffers = lBuffer.extbuffers;
-
+	/*
 	gl.bindTexture(gl.TEXTURE_2D, magoManager.diffuseLightTex);  
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, sceneState.drawingBufferWidth[0], sceneState.drawingBufferHeight[0], 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
 
@@ -2478,7 +2528,7 @@ Renderer.prototype.renderLightBuffer = function(lightSourcesArray)
 	
 	gl.bindTexture(gl.TEXTURE_2D, magoManager.LightFogTex);  
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, sceneState.drawingBufferWidth[0], sceneState.drawingBufferHeight[0], 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
-
+	*/
 	// Bind mago colorTextures:
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, lBuffer.extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, magoManager.diffuseLightTex, 0);
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, lBuffer.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, magoManager.specularLightTex, 0);
@@ -3070,9 +3120,6 @@ Renderer.prototype.renderGeometryBufferTransparents = function(gl, renderType, v
 		{
 			this.renderAxisNodes(visibleObjControlerNodes.getAllVisibles(), renderType);
 		}
-		
-		// 4) Render ObjectMarkers.********************************************************************************************************
-		magoManager.objMarkerManager.render(magoManager, renderType); 
 
 		// test renders.***
 		// render cctv.***
