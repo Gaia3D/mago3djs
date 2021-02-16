@@ -52,8 +52,12 @@ ObjectMarker.prototype.copyFrom = function(objMarker)
 
 ObjectMarker.prototype.render = function(magoManager, currentShader, renderType, glPrimitive) 
 {
+	//****************************************************************************************************************
+	// All native objects must have "render" function, for silhouette.
+	// But objects markers has no silhouette when selected, so create an empty render function.
 	// This function is created to skip rendering error when Renderer.prototype.renderSilhouetteDepth = function().
 	// do nothing. do nothing. do nothing.
+	//****************************************************************************************************************
 };
 
 ObjectMarker.prototype.getGeoLocationData = function(magoManager) 

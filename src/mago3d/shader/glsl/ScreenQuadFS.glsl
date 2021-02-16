@@ -34,7 +34,6 @@ uniform vec3 sunPosHIGH[2];
 uniform vec3 sunPosLOW[2];
 uniform vec3 sunDirCC;
 uniform vec3 sunDirWC;
-uniform int sunIdx;
 uniform float screenWidth;    
 uniform float screenHeight;  
 uniform vec2 uNearFarArray[4];
@@ -86,7 +85,7 @@ vec3 getViewRay(vec2 tc, in float relFar)
     return ray;                      
 }
 
-bool isInShadow(vec4 pointCC, int currSunIdx)
+bool isInShadow(vec4 pointCC, int currSunIdx, inout bool isUnderSun)
 {
 	bool inShadow = false;
 	vec3 currSunPosLOW;
@@ -123,9 +122,13 @@ bool isInShadow(vec4 pointCC, int currSunIdx)
 		{
 			float depthRelToLight;
 			if(currSunIdx == 0)
-			{depthRelToLight = unpackDepth(texture2D(shadowMapTex, posRelToLight.xy));}
+			{
+				depthRelToLight = unpackDepth(texture2D(shadowMapTex, posRelToLight.xy));
+			}
 			else if(currSunIdx == 1)
-			{depthRelToLight = unpackDepth(texture2D(shadowMapTex2, posRelToLight.xy));}
+			{
+				depthRelToLight = unpackDepth(texture2D(shadowMapTex2, posRelToLight.xy));
+			}
 
 			//if(depthRelToLight < 0.1)
 			//return false;
@@ -134,11 +137,14 @@ bool isInShadow(vec4 pointCC, int currSunIdx)
 			{
 				inShadow = true;
 			}
+
+			isUnderSun = true;
 		}
 	}
 	
 	return inShadow;
 }
+
 /*
 void make_kernel(inout vec4 n[9], vec2 coord)
 {
@@ -340,17 +346,23 @@ void main()
 			//------------------------------------------------------------------------------------------------------------------------------
 			// 2nd, calculate the vertex relative to light.***
 			// 1rst, try with the closest sun. sunIdx = 0.
-			bool pointIsinShadow = isInShadow(posWCRelToEye, 0);
-			if(!pointIsinShadow)
+			bool isUnderSun = false;
+			bool pointIsinShadow = isInShadow(posWCRelToEye, 0, isUnderSun);
+			if(!isUnderSun)
 			{
-				pointIsinShadow = isInShadow(posWCRelToEye, 1);
+				pointIsinShadow = isInShadow(posWCRelToEye, 1, isUnderSun);
 			}
 
-			if(pointIsinShadow)
+			if(isUnderSun)
 			{
-				shadow_occlusion = 0.5;
-				alpha = 0.5;
+				if(pointIsinShadow)
+				{
+					shadow_occlusion = 0.5;
+					alpha = 0.5;
+				}
+				
 			}
+
 		}
 		
 

@@ -167,7 +167,7 @@ SpeechBubble.prototype.getPng = function (imageSize, color, textOption)
 					var mt = ctx.measureText(tVal);
 					console.log(mt);
 					//ctx.strokeText(tVal, 20, ty, mt.width * 0.8);
-					ctx.fillText(tVal, 20, ty, mt.width * 0.8);
+					ctx.fillText(tVal, mt.width * 0.5, ty, mt.width * 0.8);
 					//					ctx.strokeText(tVal, w /2, ty);
 					//					ctx.fillText(tVal, w /2, ty);
 				}

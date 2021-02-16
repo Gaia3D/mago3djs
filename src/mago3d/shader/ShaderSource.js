@@ -6468,9 +6468,9 @@ uniform bool bApplySsao;\n\
 uniform mat4 sunMatrix[2]; \n\
 uniform vec3 sunPosHIGH[2];\n\
 uniform vec3 sunPosLOW[2];\n\
+uniform vec4 uSunTexSize; // sun0TexSize(width, height) & sun1TexSize(width, height).\n\
 uniform vec3 sunDirCC;\n\
 uniform vec3 sunDirWC;\n\
-uniform int sunIdx;\n\
 uniform float screenWidth;    \n\
 uniform float screenHeight;  \n\
 uniform vec2 uNearFarArray[4];\n\
@@ -6522,7 +6522,7 @@ vec3 getViewRay(vec2 tc, in float relFar)\n\
     return ray;                      \n\
 }\n\
 \n\
-bool isInShadow(vec4 pointCC, int currSunIdx)\n\
+bool isInShadow(vec4 pointCC, int currSunIdx, inout bool isUnderSun)\n\
 {\n\
 	bool inShadow = false;\n\
 	vec3 currSunPosLOW;\n\
@@ -6559,9 +6559,13 @@ bool isInShadow(vec4 pointCC, int currSunIdx)\n\
 		{\n\
 			float depthRelToLight;\n\
 			if(currSunIdx == 0)\n\
-			{depthRelToLight = unpackDepth(texture2D(shadowMapTex, posRelToLight.xy));}\n\
+			{\n\
+				depthRelToLight = unpackDepth(texture2D(shadowMapTex, posRelToLight.xy));\n\
+			}\n\
 			else if(currSunIdx == 1)\n\
-			{depthRelToLight = unpackDepth(texture2D(shadowMapTex2, posRelToLight.xy));}\n\
+			{\n\
+				depthRelToLight = unpackDepth(texture2D(shadowMapTex2, posRelToLight.xy));\n\
+			}\n\
 \n\
 			//if(depthRelToLight < 0.1)\n\
 			//return false;\n\
@@ -6570,11 +6574,14 @@ bool isInShadow(vec4 pointCC, int currSunIdx)\n\
 			{\n\
 				inShadow = true;\n\
 			}\n\
+\n\
+			isUnderSun = true;\n\
 		}\n\
 	}\n\
 	\n\
 	return inShadow;\n\
 }\n\
+\n\
 /*\n\
 void make_kernel(inout vec4 n[9], vec2 coord)\n\
 {\n\
@@ -6776,17 +6783,23 @@ void main()\n\
 			//------------------------------------------------------------------------------------------------------------------------------\n\
 			// 2nd, calculate the vertex relative to light.***\n\
 			// 1rst, try with the closest sun. sunIdx = 0.\n\
-			bool pointIsinShadow = isInShadow(posWCRelToEye, 0);\n\
-			if(!pointIsinShadow)\n\
+			bool isUnderSun = false;\n\
+			bool pointIsinShadow = isInShadow(posWCRelToEye, 0, isUnderSun);\n\
+			if(!isUnderSun)\n\
 			{\n\
-				pointIsinShadow = isInShadow(posWCRelToEye, 1);\n\
+				pointIsinShadow = isInShadow(posWCRelToEye, 1, isUnderSun);\n\
 			}\n\
 \n\
-			if(pointIsinShadow)\n\
+			if(isUnderSun)\n\
 			{\n\
-				shadow_occlusion = 0.5;\n\
-				alpha = 0.5;\n\
+				if(pointIsinShadow)\n\
+				{\n\
+					shadow_occlusion = 0.5;\n\
+					alpha = 0.5;\n\
+				}\n\
+				\n\
 			}\n\
+\n\
 		}\n\
 		\n\
 \n\

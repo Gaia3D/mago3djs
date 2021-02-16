@@ -1473,7 +1473,6 @@ Renderer.prototype.renderScreenQuad = function(gl)
 			gl.uniform3fv(currentShader.sunPosLow_loc, sunPosLOWFloat32Array);
 			gl.uniform1f(currentShader.shadowMapWidth_loc, sunLight.targetTextureWidth);
 			gl.uniform1f(currentShader.shadowMapHeight_loc, sunLight.targetTextureHeight);
-			gl.uniform1i(currentShader.sunIdx_loc, 1);
 		}
 	}
 
