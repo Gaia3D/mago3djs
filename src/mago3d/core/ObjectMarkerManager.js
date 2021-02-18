@@ -218,6 +218,13 @@ ObjectMarkerManager.prototype.newObjectMarkerSpeechBubble = function(options, ma
 	if (!speechBubbleOptions)
 	{ return undefined; }
 
+	// Try to calculate the textAreaSize.
+	//var text = speechBubbleOptions.commentTextOption.text;
+	////var textOptions = {
+	//	pixel : 24
+	//};
+	//var textAreaSize = SpeechBubble.getTextAreaSize(text, textOptions);
+
 	var sbWidht = speechBubbleOptions.width;
 	var sbHeight = speechBubbleOptions.height;
 	var commentTextOption = speechBubbleOptions.commentTextOption;
@@ -293,6 +300,53 @@ ObjectMarkerManager.prototype.newObjectMarkerSpeechBubble = function(options, ma
 	*/
 };
 
+ObjectMarkerManager.prototype.doTest__ObjectMarker = function(magoManager)
+{
+	//magoManager 가져오기
+	var modeler = magoManager.modeler;
+
+	var geoCoordsList = modeler.getGeographicCoordsList();
+
+	if (geoCoordsList)
+	{
+		var geoCoordsCount = geoCoordsList.getGeoCoordsCount();
+		for (var i=geoCoordsCount-1; i<geoCoordsCount; i++)
+		{
+			//magoManager에 SpeechBubble 객체 없으면 생성하여 등록
+			if (!magoManager.speechBubble) 
+			{
+				magoManager.speechBubble = new Mago3D.SpeechBubble();
+			}
+
+			var sb = magoManager.speechBubble;
+			var bubbleColor = Color.getHexCode(1.0, 1.0, 1.0);
+			//SpeechBubble 옵션
+			var commentTextOption = {
+				pixel       : 12,
+				color       : 'blue',
+				borderColor : 'white',
+				text        : 'blabla'
+			};
+
+			//SpeechBubble을 통해서 png 만들어서 가져오기
+			var img = sb.getPng([256, 256], bubbleColor, commentTextOption);
+
+			//ObjectMarker 옵션, 위치정보와 이미지 정보
+			var geoCoord = geoCoordsList.getGeoCoord(i);
+			var lon = geoCoord.longitude;
+			var lat = geoCoord.latitude;
+			var alt = geoCoord.altitude;
+			var options = {
+				positionWC    : Mago3D.ManagerUtils.geographicCoordToWorldPoint(lon, lat, alt),
+				imageFilePath : img
+			};
+
+			//지도에 ObjectMarker생성하여 표출
+			magoManager.objMarkerManager.newObjectMarker(options, magoManager);
+		}
+	}
+};
+
 ObjectMarkerManager.prototype.TEST__ObjectMarker_toNeoReference = function() 
 {
 	
@@ -305,9 +359,9 @@ ObjectMarkerManager.prototype.TEST__ObjectMarker_toNeoReference = function()
 	
 
 	//var objMarkerManager = this.objMarkerManager;
-	var bubbleWidth = 128;
-	var bubbleHeight = 128;
-	var textSize = 36;
+	var bubbleWidth = 1;
+	var bubbleHeight = 1;
+	var textSize = 26;
 
 	// 1rst object.***************************************************************
 	var target = {
@@ -319,8 +373,8 @@ ObjectMarkerManager.prototype.TEST__ObjectMarker_toNeoReference = function()
 	var commentTextOption = {
 		pixel       : textSize,
 		color       : 'blue',
-		borderColor : 'white',
-		text        : '11011'
+		borderColor : 'blue',
+		text        : '11011 hasta luegor\n babo'
 	};
 
 	var speechBubbleOptions = {
@@ -347,8 +401,8 @@ ObjectMarkerManager.prototype.TEST__ObjectMarker_toNeoReference = function()
 	var commentTextOption = {
 		pixel       : textSize,
 		color       : 'blue',
-		borderColor : 'white',
-		text        : '2953'
+		borderColor : 'blue',
+		text        : '2953\n hola Ricardo Granados'
 	};
 
 	var speechBubbleOptions = {
@@ -375,8 +429,8 @@ ObjectMarkerManager.prototype.TEST__ObjectMarker_toNeoReference = function()
 	var commentTextOption = {
 		pixel       : textSize,
 		color       : 'blue',
-		borderColor : 'white',
-		text        : '2837'
+		borderColor : 'blue',
+		text        : '2837\n tururu piripi\n gaia3d en Korea pa to el mundo del espectaculo \n hello world\n holas Ricardi!\n 삼일차 뉴비인데 다이아 어따써야댐?\n クソじじ・クソババ'
 	};
 
 	var speechBubbleOptions = {

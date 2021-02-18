@@ -67,6 +67,7 @@ ObjectMarker.prototype.getGeoLocationData = function(magoManager)
 
 	if (target)
 	{
+		// Check if target if F4D data.
 		if (target.buildingId !== undefined && target.projectId !== undefined)
 		{
 			var projectId = target.projectId;
@@ -108,6 +109,14 @@ ObjectMarker.prototype.getGeoLocationData = function(magoManager)
 				}
 			}
 		}
+		else if(target.nativeObject)
+		{
+			// The target is a native object.
+			var geoLocDataManager = target.nativeObject.getGeoLocDataManager();
+			geoLocationData = geoLocDataManager.getCurrentGeoLocationData();
+			var hola = 0;
+		}
+		
 	}
 	else 
 	{

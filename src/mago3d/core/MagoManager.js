@@ -1646,7 +1646,6 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		this.renderer.renderDepthSunSystem(this.visibleObjControlerNodes);
 		this.swapRenderingFase();
 	}
-
 	
 	var lightsArray = this.visibleObjControlerNodes.currentVisibleNativeObjects.lightSourcesArray;
 	var lightCount = lightsArray.length;
@@ -1998,13 +1997,14 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
 		
 	this.swapRenderingFase();
-
+	/*
 	// Delete after test!!!!!!!!!!!!!!
-	//if(!this.test_speechBubble)
-	//{
-	//	this.objMarkerManager.TEST__ObjectMarker_toNeoReference();
-	//	this.test_speechBubble = true;
-	//}
+	if(!this.test_speechBubble)
+	{
+		this.objMarkerManager.TEST__ObjectMarker_toNeoReference();
+		this.test_speechBubble = true;
+	}
+	*/
 };
 
 /**
@@ -4404,60 +4404,11 @@ MagoManager.prototype.mouseActionLeftClick = function(mouseX, mouseY)
 			var geoCoordsList = this.modeler.getGeographicCoordsList();
 			geoCoordsList.addGeoCoord(geoCoord);
 		}
-
-		///////////////////////////////////////////////
-		//this.doTest__ObjectMarker();
 	}
 	
 };
 
-MagoManager.prototype.doTest__ObjectMarker = function()
-{
-	//magoManager 가져오기
-	var magoManager = this;
-	var modeler = magoManager.modeler;
 
-	var geoCoordsList = modeler.getGeographicCoordsList();
-
-	if (geoCoordsList)
-	{
-		var geoCoordsCount = geoCoordsList.getGeoCoordsCount();
-		for (var i=geoCoordsCount-1; i<geoCoordsCount; i++)
-		{
-			//magoManager에 SpeechBubble 객체 없으면 생성하여 등록
-			if (!magoManager.speechBubble) 
-			{
-				magoManager.speechBubble = new Mago3D.SpeechBubble();
-			}
-
-			var sb = magoManager.speechBubble;
-			var bubbleColor = Color.getHexCode(1.0, 1.0, 1.0);
-			//SpeechBubble 옵션
-			var commentTextOption = {
-				pixel       : 12,
-				color       : 'blue',
-				borderColor : 'white',
-				text        : 'blabla'
-			};
-
-			//SpeechBubble을 통해서 png 만들어서 가져오기
-			var img = sb.getPng([256, 256], bubbleColor, commentTextOption);
-
-			//ObjectMarker 옵션, 위치정보와 이미지 정보
-			var geoCoord = geoCoordsList.getGeoCoord(i);
-			var lon = geoCoord.longitude;
-			var lat = geoCoord.latitude;
-			var alt = geoCoord.altitude;
-			var options = {
-				positionWC    : Mago3D.ManagerUtils.geographicCoordToWorldPoint(lon, lat, alt),
-				imageFilePath : img
-			};
-
-			//지도에 ObjectMarker생성하여 표출
-			magoManager.objMarkerManager.newObjectMarker(options, magoManager);
-		}
-	}
-};
 
 /**
  * 마우스 더블 클릭 이벤트 처리
@@ -6300,7 +6251,6 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
 	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
 	shader.uSceneDayNightLightingFactor_loc = gl.getUniformLocation(shader.program, "uSceneDayNightLightingFactor");
-	shader.uSunTexSize_loc = gl.getUniformLocation(shader.program, "uSunTexSize");
 
 	// 0.2) ScreenQuad shader.***********************************************************************************
 	var shaderName = "screenCopyQuad";

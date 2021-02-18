@@ -4582,7 +4582,7 @@ void main()\n\
 	{\n\
 		textureColor = texture2D(u_texture, v_texcoord);\n\
 	}\n\
-	//if(textureColor.w < 0.005)\n\
+	\n\
 	if(textureColor.w < 0.5)\n\
 	{\n\
 		discard;\n\
@@ -6468,7 +6468,6 @@ uniform bool bApplySsao;\n\
 uniform mat4 sunMatrix[2]; \n\
 uniform vec3 sunPosHIGH[2];\n\
 uniform vec3 sunPosLOW[2];\n\
-uniform vec4 uSunTexSize; // sun0TexSize(width, height) & sun1TexSize(width, height).\n\
 uniform vec3 sunDirCC;\n\
 uniform vec3 sunDirWC;\n\
 uniform float screenWidth;    \n\
