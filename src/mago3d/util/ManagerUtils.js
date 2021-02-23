@@ -756,7 +756,7 @@ ManagerUtils.calculatePixelLinearDepth = function(gl, pixelX, pixelY, depthFbo, 
  * @param {MagoManager} magoManager Mago3D main manager.
  * @returns {Number} linearDepth Returns the linear depth [0.0, 1.0] ranged value.
  */
-ManagerUtils.calculatePixelLinearDepthV2 = function(gl, pixelX, pixelY, depthTex, normalTex, magoManager) 
+ManagerUtils.calculatePixelLinearDepthV2 = function (gl, pixelX, pixelY, depthTex, normalTex, magoManager) 
 {
 	var depthPixels = new Uint8Array(4 * 1 * 1); // 4 x 1x1 pixel.
 

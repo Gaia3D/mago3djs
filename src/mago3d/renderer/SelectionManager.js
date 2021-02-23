@@ -141,7 +141,7 @@ SelectionManager.prototype.getSelectedGeneralArray = function()
  * @alias SelectionManager
  * @class SelectionManager
  */
-SelectionManager.prototype.setSelectedGeneral = function(selectedObject)
+SelectionManager.prototype.setSelectedGeneral = function (selectedObject)
 {
 	this.currentGeneralObjectSelected = selectedObject;
 };
@@ -343,6 +343,7 @@ SelectionManager.prototype.clearCandidates = function()
  */
 SelectionManager.prototype.selectObjects = function(idxKey)
 {
+	// Function no used.!!!!!!!!!!!!!
 	this.currentReferenceSelected = this.referencesMap[idxKey];
 	this.currentOctreeSelected = this.octreesMap[idxKey];
 	this.currentBuildingSelected = this.buildingsMap[idxKey];

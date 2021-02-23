@@ -35,6 +35,7 @@ CesiumViewerInit.prototype.init = function()
 	this.initMagoManager();
 	//this.setEventHandler();
 };
+
 CesiumViewerInit.prototype.setCanvasEventHandler = function() 
 {
 	var canvas = document.getElementById(this.targetId);

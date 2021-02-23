@@ -34,7 +34,7 @@ void main()
 			finalColor = uStrokeColor;
 		}
 	}
-	gl_FragColor = finalColor;
+	gl_FragData[0] = finalColor;
 
 	#ifdef USE_LOGARITHMIC_DEPTH
 	if(bUseLogarithmicDepth)

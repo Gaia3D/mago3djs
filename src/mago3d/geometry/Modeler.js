@@ -44,6 +44,10 @@ var Modeler = function(magoManager)
 
 	// screenSpaceObjectsArray.***
 	this.screenSpaceObjectsArray = [];
+
+	// style vars.
+	this.bSplineKnotPointsColor = new Color(1.0, 0.6, 0.2, 1.0);
+	this.bSplineControlPointsColor = new Color(0.3, 0.99, 0.99, 1.0);
 	
 };
 Modeler.EVENT_TYPE = {
@@ -976,6 +980,28 @@ Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive
 	//this.__TEST__laser();
 	//this.__TEST__extrudedLines();
 	//this.__TEST__extrusionBuildings();
+	//this.__TEST__bSpline();
+};
+
+Modeler.prototype.__TEST__bSpline = function() 
+{
+	// draw a bSpline.
+	var magoManager = this.magoManager;
+	var modeler = magoManager.modeler;
+
+	if(!modeler.geoCoordsList)
+	{
+		return;
+	}
+
+	var options = {
+		geoCoordsArray : modeler.geoCoordsList.geographicCoordsArray,
+		initialArmsLengthRatio : 0.3
+	};
+
+
+	modeler.bSplineCubic3d = new BSplineCubic3D(options);
+
 };
 
 Modeler.prototype.createPlaneGrid = function(width, height, numCols, numRows) 

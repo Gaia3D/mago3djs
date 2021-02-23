@@ -308,7 +308,7 @@ TranslateInteraction.prototype.handleObjectDrag = function(browserEvent)
 	this.manager.objectMoved = true; // this provoques that on leftMouseUp -> saveHistoryObjectMovement
 };
 
-TranslateInteraction.prototype.handleNativeDrag = function(browserEvent)
+TranslateInteraction.prototype.handleNativeDrag = function (browserEvent)
 {
 	var object = this.target;
 	if (object instanceof ObjectMarker)
@@ -469,7 +469,7 @@ TranslateInteraction.prototype.handleNativeDrag = function(browserEvent)
 			}
 			object.geographicCoordListsArray = geographicCoordListsArray;
 		}
-		if(object.options.limitationGeographicCoords)
+		if(object.options && object.options.limitationGeographicCoords)
 		{
 			object.makeUniformPoints2dArray();
 		}
@@ -482,6 +482,7 @@ TranslateInteraction.prototype.handleNativeDrag = function(browserEvent)
 	});
 
 	object.moved();
+	object.dispatchEvent('MOVE_START', object);
 };
 
 TranslateInteraction.prototype.handleMoveEvent = function()

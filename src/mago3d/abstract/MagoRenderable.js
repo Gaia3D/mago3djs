@@ -1,6 +1,6 @@
 'use strict';
 
-var MagoRenderable = function(options) 
+var MagoRenderable = function (options) 
 {
 	this.objectsArray = [];
 	this._guid = createGuid();
@@ -73,7 +73,7 @@ Object.defineProperties(MagoRenderable.prototype, {
  * 이벤트 등록
  * @param {MagoEvent} event 
  */
-MagoRenderable.prototype.addEventListener = function(event) 
+MagoRenderable.prototype.addEventListener = function (event) 
 {
 	if (!event instanceof MagoEvent) 
 	{
@@ -99,7 +99,7 @@ MagoRenderable.prototype.addEventListener = function(event)
  * 이벤트 실행
  * @param {String} type 
  */
-MagoRenderable.prototype.dispatchEvent = function(type, magoManager) 
+MagoRenderable.prototype.dispatchEvent = function (type, magoManager) 
 {
 	if (!MagoRenderable.EVENT_TYPE[type]) 
 	{
@@ -340,7 +340,7 @@ MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPr
 	}
 };
 
-MagoRenderable.prototype.renderAsChild = function(magoManager, shader, renderType, glPrimitive, bIsSelected, options, bWireframe) 
+MagoRenderable.prototype.renderAsChild = function (magoManager, shader, renderType, glPrimitive, bIsSelected, options, bWireframe) 
 {
 	if (this.dirty)
 	{ this.makeMesh(magoManager); }
@@ -481,23 +481,22 @@ MagoRenderable.prototype.renderAsChild = function(magoManager, shader, renderTyp
 			{
 				shaderLocal = magoManager.postFxShadersManager.getShader("pointsCloudSsao"); 
 			}
-
+			
 			magoManager.postFxShadersManager.useProgram(shaderLocal);
 			
 			shaderLocal.disableVertexAttribArrayAll();
 			shaderLocal.resetLastBuffersBinded();
 			shaderLocal.enableVertexAttribArray(shaderLocal.position3_loc);
 			shaderLocal.bindUniformGenerals();
-
+			
 			var geoLocData = this.geoLocDataManager.getCurrentGeoLocationData();
 			geoLocData.bindSplitedPositionUniforms(gl, shaderLocal);
 			
 			gl.uniform1i(shaderLocal.bPositionCompressed_loc, false);
 			gl.uniform1i(shaderLocal.bUse1Color_loc, true);
-			//gl.uniform4fv(shaderLocal.oneColor4_loc, [1.0, 1.0, 0.1, 1.0]); //.
-			//gl.uniform1f(shaderLocal.fixPointSize_loc, 10.0);
 			gl.uniform1i(shaderLocal.bUseFixPointSize_loc, 1);
 			gl.uniform1i(shaderLocal.uStrokeSize_loc, this.style.strokeSize);
+			gl.uniform1i(shaderLocal.uFrustumIdx_loc, magoManager.currentFrustumIdx);
 			gl.depthRange(0, 0);
 			object.renderAsChild(magoManager, shaderLocal, renderType, glPrimitive, bIsSelected, options, bWireframe);
 			gl.depthRange(0, 1);

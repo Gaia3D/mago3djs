@@ -360,7 +360,7 @@ GeographicCoord.prototype.readDataFromBuffer = function(dataArrayBuffer, bytesRe
 /**
  * Render this feature
  */
-GeographicCoord.prototype.renderPoint = function(magoManager, shader, gl, renderType) 
+GeographicCoord.prototype.renderPoint = function (magoManager, shader, gl, renderType) 
 {
 	if (!this.prepareData(magoManager.vboMemoryManager))
 	{ return false; }

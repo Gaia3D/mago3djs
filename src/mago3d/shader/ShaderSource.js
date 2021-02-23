@@ -5003,7 +5003,7 @@ void main()\n\
 			finalColor = uStrokeColor;\n\
 		}\n\
 	}\n\
-	gl_FragColor = finalColor;\n\
+	gl_FragData[0] = finalColor;\n\
 \n\
 	#ifdef USE_LOGARITHMIC_DEPTH\n\
 	if(bUseLogarithmicDepth)\n\

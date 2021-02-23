@@ -26,11 +26,11 @@
  * 
  * @example
  * var position = {longitude : 0, latitude : 0, altitude : 1};
- * var style = {color:'ff0000',thickness:0.8};
+ * var style = {color:'ff0000',size:3.0, isMovable:true};
  * 
  * var magoPoint = new Mago3D.MagoPoint(position, style);
  */
-var MagoPoint = function(position, style) 
+var MagoPoint = function(position, style, options) 
 {
 	
 	if (!(this instanceof MagoPoint)) 
@@ -43,7 +43,19 @@ var MagoPoint = function(position, style)
 	 * @type {GeographicCoord}
 	 */
 	this.geoCoord;
-	
+	this.description;
+
+	if(options)
+	{
+		this.description = options.description; // if undefined, then is a independet point.
+		// The magoPoint can be part or member of a curve, as a line, a polyLine, or bSpline.
+		// for example, if this is a controlPoint of a spline, then:
+		// this.description = {
+		//    type : curveControlMember (or curveMember),
+		//	  owner : bSpline (or line, polyline, arc, circle,...)
+		// }
+	}
+
 	MagoGeometry.call(this, position, style);
 
 	// Calculate geoLocationData.
@@ -52,6 +64,14 @@ var MagoPoint = function(position, style)
 	geoLocData = ManagerUtils.calculateGeoLocationData(this.geoCoord.longitude, this.geoCoord.latitude, this.geoCoord.altitude, undefined, undefined, undefined, geoLocData);
 	// set the geoLocDataManager of the terrainScanner.
 	this.geoLocDataManager = geoLocDataManager;
+
+	if(style)
+	{
+		if(style.isMovable)
+		{
+			this.attributes.isMovable = style.isMovable;
+		}
+	}
 };
 
 MagoPoint.prototype = Object.create(MagoGeometry.prototype);
@@ -71,6 +91,28 @@ MagoPoint.prototype.setPosition = function(position)
 };
 
 /**
+ */
+MagoPoint.prototype._moveStart = function () 
+{
+	// Function activated when "this" is dragging.
+	// Check if "this" is a member of a curve:
+	if(this.description)
+	{
+		var owner = this.description.owner;
+		if(owner instanceof BSplineCubic3D)
+		{
+			// "this" is member of a bSpline.
+			var memberType = this.description.type;
+			// type can be : curveMember or curveControlMember.
+			if(memberType === "curveMember")
+			{ owner.knotPointMoved(this.description); }
+			else if(memberType === "curveControlMember")
+			{ owner.controlPointMoved(this.description); }
+		}
+	}
+};
+
+/**
  * Makes the geometry mesh.
  * @private
  */
@@ -87,6 +129,7 @@ MagoPoint.prototype.makeMesh = function(magoManager)
 
 	var options = this.style;
 	var pointMesh = new PointMesh(options);
+	pointMesh.owner = this;
 	pointMesh.vboKeysContainer = vboKeyContainer;
     
 	// Finally put the mesh into magoRenderables-objectsArray.

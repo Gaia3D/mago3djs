@@ -1100,7 +1100,11 @@ GeographicCoordsList.prototype.renderLines = function(magoManager, shader, rende
 	{ return false; }
 	
 	if (this.points3dList === undefined)
-	{ return false; }
+	{ 
+		// provisionally make lines.
+		this.makeLines(magoManager);
+		return false; 
+	}
 	
 	var shader = magoManager.postFxShadersManager.getShader("pointsCloud");
 	magoManager.postFxShadersManager.useProgram(shader);

@@ -2225,7 +2225,7 @@ Renderer.prototype.renderScreenRectangle = function(gl, options)
 
 	if(magoManager.albedoTex)
 	{
-		texture = magoManager.albedoTex;
+		//texture = magoManager.albedoTex;
 	}
 
 	if(magoManager.diffuseLightTex)
@@ -2287,7 +2287,7 @@ Renderer.prototype.renderScreenRectangle = function(gl, options)
 
 	if(magoManager.screenSpaceFBO)
 	{
-		texture = magoManager.screenSpaceFBO.colorBuffersArray[0];
+		//texture = magoManager.screenSpaceFBO.colorBuffersArray[0];
 	}
 	
 

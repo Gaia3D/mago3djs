@@ -843,7 +843,7 @@ MagoWorld.screenToCamCoord = function(mouseX, mouseY, magoManager, resultPointCa
  * @param {MagoManager} magoManager
  * @private
  */
-MagoWorld.updateMouseStartClick = function(mouseX, mouseY, magoManager)
+MagoWorld.updateMouseStartClick = function (mouseX, mouseY, magoManager)
 {
 	var sceneState = magoManager.sceneState;
 	var gl = sceneState.gl;

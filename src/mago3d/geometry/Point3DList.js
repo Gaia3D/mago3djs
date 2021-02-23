@@ -18,7 +18,17 @@ var Point3DList = function(points3dArray)
 	
 	this.geoLocDataManager;//This contains the information to change this point to Absolute CRS
 	this.vboKeysContainer;//This saves the key which GPU returns to VBO
+	this.dirty = true;
 };
+
+/**
+ * Clear the properties of this feature
+ */
+Point3DList.prototype.setDirty = function(dirty)
+{
+	this.dirty = dirty;
+};
+
 /**
  * Clear the properties of this feature
  */
@@ -774,8 +784,9 @@ Point3DList.prototype.makeVbo = function(magoManager)
 	{
 		return;
 	}
-	
+	this.deleteVboKeysContainer(magoManager);
 	this.vboKeysContainer = Point3DList.getVbo(magoManager, this.pointsArray, this.vboKeysContainer);
+	this.dirty = false;
 };
 
 /**
@@ -788,7 +799,7 @@ Point3DList.prototype.makeVbo = function(magoManager)
  */
 Point3DList.prototype.render = function(magoManager, shader, renderType, glPrimitive, options)
 {
-	if (this.vboKeysContainer === undefined)
+	if (this.vboKeysContainer === undefined || this.dirty)
 	{ 
 		this.makeVbo(magoManager); 
 		return;
@@ -1088,7 +1099,7 @@ Point3DList.prototype.renderLines = function(magoManager, shader, renderType, bL
 	
 	var gl = magoManager.sceneState.gl;
 	
-	if (this.vboKeysContainer === undefined || this.vboKeysContainer.getVbosCount() === 0)
+	if (this.vboKeysContainer === undefined || this.vboKeysContainer.getVbosCount() === 0 || this.dirty)
 	{
 		this.makeVbo(magoManager);
 		return;
@@ -1126,7 +1137,7 @@ Point3DList.prototype.renderLines = function(magoManager, shader, renderType, bL
 
 	if (glPrimitive === undefined)
 	{ glPrimitive = gl.LINE_STRIP; }
-
+	
 	gl.drawArrays(glPrimitive, 0, vbo_vicky.vertexCount);
 	
 	// Check if exist selectedGeoCoord.
@@ -1153,7 +1164,7 @@ Point3DList.prototype.renderPoints = function(magoManager, shader, renderType, b
 	
 	var gl = magoManager.sceneState.gl;
 	
-	if (this.vboKeysContainer === undefined || this.vboKeysContainer.getVbosCount() === 0)
+	if (this.vboKeysContainer === undefined || this.vboKeysContainer.getVbosCount() === 0 || this.dirty)
 	{
 		this.makeVbo(magoManager);
 		return;
@@ -1215,7 +1226,7 @@ Point3DList.prototype.renderPointsIndividually = function(magoManager, shader, r
 	
 	var gl = magoManager.sceneState.gl;
 	
-	if (this.vboKeysContainer === undefined || this.vboKeysContainer.getVbosCount() === 0)
+	if (this.vboKeysContainer === undefined || this.vboKeysContainer.getVbosCount() === 0 || this.dirty)
 	{
 		this.makeVbo(magoManager);
 		return;

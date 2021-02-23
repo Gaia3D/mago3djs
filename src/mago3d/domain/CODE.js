@@ -158,3 +158,8 @@ CODE.parametricCurveState = {
 	"NORMAL" : 0,
 	"EDITED" : 1
 };
+
+CODE.curveRenderingState = {
+	"NORMAL" : 0,
+	"EDITED" : 1
+}

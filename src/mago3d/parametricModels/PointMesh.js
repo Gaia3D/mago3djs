@@ -2,7 +2,7 @@
 
 /**
  * point geometry.
- * This class is analog to "Mesh" class, but vectorMesh is for points, lines, polylines data type.
+ * This class is analog to "Mesh" class, but pointMesh is for points data type.
  * @class VectorMesh
  */
 var PointMesh = function(options) 
@@ -12,7 +12,7 @@ var PointMesh = function(options)
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	// This class is analog to "Mesh" class, but "PointMesh" is for points.
-
+	this.owner = undefined; // default.
 	this.name;
 	this.id;
 	this.size = 1.0;
@@ -54,7 +54,11 @@ var PointMesh = function(options)
 		}
         
 		if (options.opacity)
-		{ this.opacity = options.opacity; }
+		{ 
+			this.opacity = options.opacity; 
+
+			// Check the opacity value and set magoRenderable.attributes.opaque = value.
+		}
 	}
 };
 
@@ -63,8 +67,26 @@ var PointMesh = function(options)
  * @param {MagoManager}magoManager
  * @param {Shader} shader
  * @param {Number} renderType
- * @param glPrimitive
- * @TODO : 누가 이 gl primitive의 type 정체를 안다면 좀 달아주세요ㅠㅠ 세슘 쪽인거 같은데ㅠㅠ
+ * @param {Number} glPrimitive
+ */
+/*
+PointMesh.prototype.render = function (magoManager, shader, renderType, glPrimitive, options) 
+{
+	var gl = magoManager.getGl();
+	var vbo_vicky = this.vboKeysContainer.vboCacheKeysArray[0]; // there are only one.
+	if (!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
+	{ return false; }
+
+	gl.drawArrays(gl.POINTS, 0, vbo_vicky.vertexCount);
+};
+*/
+
+/**
+ * Render the PointMesh as child. equal render
+ * @param {MagoManager}magoManager
+ * @param {Shader} shader
+ * @param {Number} renderType
+ * @param {Number} glPrimitive
  */
 PointMesh.prototype.renderAsChild = function (magoManager, shader, renderType, glPrimitive, isSelected, options) 
 {
@@ -73,12 +95,15 @@ PointMesh.prototype.renderAsChild = function (magoManager, shader, renderType, g
 	gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, this.color4.a]); //.
 	gl.uniform1f(shader.fixPointSize_loc, this.size);
 
+	if(isSelected)
+	{
+		gl.uniform1f(shader.fixPointSize_loc, this.size*2);
+	}
+
 	var strokeColor = this.strokeColor4;
 	if (strokeColor)
 	{ gl.uniform4fv(shader.uStrokeColor_loc, new Float32Array([strokeColor.r, strokeColor.g, strokeColor.b, strokeColor.a])); }
 
-	
-    
 	if (renderType === 2)
 	{
 		var selectionManager = magoManager.selectionManager;
@@ -86,11 +111,18 @@ PointMesh.prototype.renderAsChild = function (magoManager, shader, renderType, g
 
 		var selColor = selectionColor.getAvailableColor(undefined); 
 		var idxKey = selectionColor.decodeColor3(selColor.r, selColor.g, selColor.b);
-
-		selectionManager.setCandidateGeneral(idxKey, this);
+		var owner = this;
+		if(this.owner)
+		{
+			owner = this.owner;
+		}
+		selectionManager.setCandidateGeneral(idxKey, owner);
+		// Note: in setCandidateGeneral put "this". Later, use getOwner to know the generalObject. TODO:.
 		gl.uniform4fv(shader.oneColor4_loc, [selColor.r/255.0, selColor.g/255.0, selColor.b/255.0, 1.0]);
 	}
-	
+
+	//var glPrimitive = gl.POINTS;
+	//this.render(magoManager, shader, renderType, glPrimitive, undefined);
 	var vbo_vicky = this.vboKeysContainer.vboCacheKeysArray[0]; // there are only one.
 	if (!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
 	{ return false; }

@@ -411,6 +411,21 @@ GeoLocationData.prototype.localCoordToWorldCoord = function(localCoord, resultWo
 };
 
 /**
+ * This function transforms a local position of this geoLocation to geographic position.
+ * @param localCoord  instance of Point3D.
+ * @param resultGeoCoord. instance of GeographicCoord.
+ * @returns resultGeoCoord. instance of GeographicCoord.
+ */
+GeoLocationData.prototype.localCoordToGeographicCoord = function(localCoord, resultGeoCoord) 
+{
+	// 1rst, transform localCoord to worldCoord.
+	var worldCoord = this.localCoordToWorldCoord(localCoord);
+
+	// Now, transform worldCoord to geographicCoord.
+	return ManagerUtils.pointToGeographicCoord(worldCoord, resultGeoCoord);
+};
+
+/**
  * This function transforms an absolute position to local position for this geoLocation.
  * @param worldCoord  instance of Point3D.
  * @param resultLocalCoord. instance of Point3D.
