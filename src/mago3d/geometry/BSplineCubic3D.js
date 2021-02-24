@@ -45,8 +45,9 @@ var BSplineCubic3D = function(options)
 	this.controlPointsDirty = true;
 	this.interpolatedPointsDirty = true;
 
-	// renderables points.
+	// renderables objects.
 	this.renderablePointsMap;
+	this.renderableCurve; // bSpline's thickLine object,
 	this.bRenderablePointsVisible = false;
 
 	// When rendering, if this curve is EDITED state, then renders knotPoints & controlPoints thet are movable.*****
@@ -259,9 +260,6 @@ BSplineCubic3D.prototype.knotPointMoved = function (description)
 				// Move the realControlPoint.
 				var innPosWC = ManagerUtils.geographicCoordToWorldPoint(innLon, innLat, innAlt, undefined);
 				inControlPoint = geoLocData.getTransformedRelativePosition(innPosWC, inControlPoint);
-
-				// Now, must reMake the controlArms to render.***
-				
 			}
 
 			if(outControlPoint)
@@ -277,47 +275,16 @@ BSplineCubic3D.prototype.knotPointMoved = function (description)
 				var outPosWC = ManagerUtils.geographicCoordToWorldPoint(outLon, outLat, outAlt, undefined);
 				outControlPoint = geoLocData.getTransformedRelativePosition(outPosWC, outControlPoint);
 			}
-			
-
-			// Now, must reMake the controlArms to render.***
-			/*
-			var armsLinesPointsArray = [];
-			var controlArmsCount = this.knotPoints3dList.getPointsCount();
-			for (var i=0; i<controlArmsCount; i++)
-			{
-				var controlPointPair = this.controlPoints3dMap[i];
-				var point1 = controlPointPair.inningControlPoint;
-				var point2 = controlPointPair.outingControlPoint;
-				var knotPoint = this.knotPoints3dList.getPoint(i);
-
-				if (point1)
-				{
-					armsLinesPointsArray.push(knotPoint);
-					armsLinesPointsArray.push(point1);
-
-				}
-
-				if (point2)
-				{
-					armsLinesPointsArray.push(knotPoint);
-					armsLinesPointsArray.push(point2);
-				}
-			}
-
-			this.armsLinesPoints3dList.pointsArray = armsLinesPointsArray;
-			this.armsLinesPoints3dList.geoLocDataManager = this.knotPoints3dList.geoLocDataManager;
-			*/
-
 
 		}
 
+		// Now, must reMake the controlArms to render.***
+		this.armsLinesPoints3dList.setDirty(true);
+
+		// Finally recalculate interpolatedPoints for the 2 segments modified.
 		this._reCalculateInterpolatedPointsForSegment(idxPoint-1);
 		this._reCalculateInterpolatedPointsForSegment(idxPoint);
-		
-		var hola = 0;
 	}
-
-	var hola = 0;
 };
 
 /**
@@ -325,7 +292,107 @@ BSplineCubic3D.prototype.knotPointMoved = function (description)
  */
 BSplineCubic3D.prototype.controlPointMoved = function (description) 
 {
-	var hola = 0;
+	//var descriptionControlPoints = {
+	//	type : "curveControlMember",
+	//	inOutControlPoint : "outingControlPoint",
+	//	owner : this,
+	//	idxInCurve : i
+	//};
+	var inOutControlPoint = description.inOutControlPoint;
+	var idxPoint = description.idxInCurve;
+	var object = this.renderablePointsMap[idxPoint];
+	var cPointMapData = this.controlPoints3dMap[idxPoint];
+	var inningCPoint = cPointMapData.inningControlPoint;
+	var outingCPoint = cPointMapData.outingControlPoint;
+	var inningArmLength = cPointMapData.inningArmLength;
+	var outingArmLength = cPointMapData.outingArmLength;
+
+	var renderableKnotPoint, inRenderableControlPoint, outRenderableControlPoint;
+	var dir;
+
+	if (object)
+	{
+		renderableKnotPoint = object.renderableKnotPoint;
+		inRenderableControlPoint = object.renderableInningControlPoint;
+		outRenderableControlPoint = object.renderableOutingControlPoint;
+	}
+
+	var knotPoint = this.knotPoints3dList.getPoint(idxPoint);
+	var geoLocDataManager = this.getGeoLocationDataManager();
+	var geoLocData = geoLocDataManager.getCurrentGeoLocationData();
+
+	if(inOutControlPoint === "outingControlPoint")
+	{
+		// OutingControlPoint moved:
+		// 1rst, take the actual position of the renderableInnCPoint and set the real innCPoint position.
+		var outCPointGeoLocData = outRenderableControlPoint.getGeoLocDataManager().getCurrentGeoLocationData();
+		var outGeoCoord = outCPointGeoLocData.geographicCoord;
+		var outLon = outGeoCoord.longitude;
+		var outLat = outGeoCoord.latitude;
+		var outAlt = outGeoCoord.altitude;
+
+		// Move the realControlPoint.
+		var outPosWC = ManagerUtils.geographicCoordToWorldPoint(outLon, outLat, outAlt, undefined);
+		outingCPoint = geoLocData.getTransformedRelativePosition(outPosWC, outingCPoint);
+
+		// Calculate the new outArmLength.
+		cPointMapData.outingArmLength = knotPoint.distToPoint(outingCPoint);
+
+		// Calculate the cPoint-knotPoint direction.***
+		dir = new Point3D(knotPoint.x - outingCPoint.x, knotPoint.y - outingCPoint.y, knotPoint.z - outingCPoint.z);
+		dir.unitary();
+		
+		// Opposite control Point.*******************************************************************************************
+		// Now, calculate the opposite controlPoint if this knotPoint is tangentType point.
+		if(inRenderableControlPoint)
+		{
+			inningCPoint.set(knotPoint.x + dir.x * inningArmLength, knotPoint.y + dir.y * inningArmLength, knotPoint.z + dir.z * inningArmLength);
+
+			// Now move the renderableOutCPoint.
+			var resultGeoCoord = geoLocData.localCoordToGeographicCoord(inningCPoint, resultGeoCoord);
+			var innCPointGeoLocData = inRenderableControlPoint.getGeoLocDataManager().getCurrentGeoLocationData();
+			innCPointGeoLocData = ManagerUtils.calculateGeoLocationData(resultGeoCoord.longitude, resultGeoCoord.latitude, resultGeoCoord.altitude, 0, 0, 0, innCPointGeoLocData);
+		}
+	}
+	else
+	{
+		// InningControlPoint moved:
+		// 1rst, take the actual position of the renderableInnCPoint and set the real innCPoint position.
+		var innCPointGeoLocData = inRenderableControlPoint.getGeoLocDataManager().getCurrentGeoLocationData();
+		var innGeoCoord = innCPointGeoLocData.geographicCoord;
+		var innLon = innGeoCoord.longitude;
+		var innLat = innGeoCoord.latitude;
+		var innAlt = innGeoCoord.altitude;
+
+		// Move the realControlPoint.
+		var innPosWC = ManagerUtils.geographicCoordToWorldPoint(innLon, innLat, innAlt, undefined);
+		inningCPoint = geoLocData.getTransformedRelativePosition(innPosWC, inningCPoint);
+
+		// Calculate the new innArmLength.
+		cPointMapData.inningArmLength = knotPoint.distToPoint(inningCPoint);
+
+		// Calculate the cPoint-knotPoint direction.***
+		dir = new Point3D(knotPoint.x - inningCPoint.x, knotPoint.y - inningCPoint.y, knotPoint.z - inningCPoint.z);
+		dir.unitary();
+
+		// Opposite control Point.*******************************************************************************************
+		// Now, calculate the opposite controlPoint if this knotPoint is tangentType point.
+		if(outRenderableControlPoint)
+		{
+			outingCPoint.set(knotPoint.x + dir.x * outingArmLength, knotPoint.y + dir.y * outingArmLength, knotPoint.z + dir.z * outingArmLength);
+
+			// Now move the renderableOutCPoint.
+			var resultGeoCoord = geoLocData.localCoordToGeographicCoord(outingCPoint, resultGeoCoord);
+			var outCPointGeoLocData = outRenderableControlPoint.getGeoLocDataManager().getCurrentGeoLocationData();
+			outCPointGeoLocData = ManagerUtils.calculateGeoLocationData(resultGeoCoord.longitude, resultGeoCoord.latitude, resultGeoCoord.altitude, 0, 0, 0, outCPointGeoLocData);
+		}
+	}
+	// Now, must reMake the controlArms to render.***
+	this.armsLinesPoints3dList.setDirty(true);
+
+	// Finally recalculate interpolatedPoints for the 2 segments modified.
+	this._reCalculateInterpolatedPointsForSegment(idxPoint-1);
+	this._reCalculateInterpolatedPointsForSegment(idxPoint);
 };
 
 
@@ -373,6 +440,18 @@ BSplineCubic3D.prototype.render = function (magoManager, shader, renderType)
 	var gl = magoManager.sceneState.gl;
 	
 	// Render interpolated points.***
+	if(!this.renderableCurve)
+	{
+		var options = {
+			color : new Color(1.0, 0.6, 0.3, 1.0)
+		};
+
+		var geoLocDataManager = this.getGeoLocationDataManager();
+		var geoLocData = geoLocDataManager.getCurrentGeoLocationData();
+		this.renderableCurve = Point3DList.getRenderableObjectOfPoints3DArray(this.interpolatedPoints3dList.pointsArray, magoManager, geoLocData, options);
+		magoManager.modeler.addObject(this.renderableCurve);
+	}
+
 	if (this.interpolatedPoints3dList !== undefined)
 	{
 		var shader = magoManager.postFxShadersManager.getShader("modelRefSsao");
@@ -393,6 +472,7 @@ BSplineCubic3D.prototype.render = function (magoManager, shader, renderType)
 		gl.uniform1f(shader.fixPointSize_loc, 5.0);
 		gl.uniform1i(shader.bUseFixPointSize_loc, true);
 		this.interpolatedPoints3dList.renderLines(magoManager, shader, renderType, bLoop, bEnableDepth);
+		
 	}
 
 	// Now, if this renderingState is EDITED, then render knotPoints & controlPoints.***
@@ -401,9 +481,6 @@ BSplineCubic3D.prototype.render = function (magoManager, shader, renderType)
 		// Check if exist knotPoints & controlPoints & are visibles.
 		if(!this.renderablePointsMap)
 		{ this._makeRenderablePoints(magoManager); }
-
-		//this.bRenderablePointsVisible
-
 	}
 };
 
@@ -458,23 +535,24 @@ BSplineCubic3D.prototype._makeRenderablePoints = function(magoManager)
 			var magoPoint = new MagoPoint(position, knotPointsStyle, options);
 			modeler.addObject(magoPoint);
 
-			// The controlPoints:
-			var descriptionControlPoints = {
-				type : "curveControlMember",
-				owner : this,
-				idxInCurve : i
-			};
-
-			var optionsControlPoints = {
-				description : descriptionControlPoints
-			};
-
 			var geoCoord_inning = this.controlPoints3dMap[i].inningGeoCoord;
 			var geoCoord_outing = this.controlPoints3dMap[i].outingGeoCoord;
 			var outingControlPoint = undefined;
 			var inningControlPoint = undefined;
 			if(geoCoord_inning)
 			{
+				// The controlPoints:
+				var descriptionControlPoints = {
+					type : "curveControlMember",
+					inOutControlPoint : "inningControlPoint",
+					owner : this,
+					idxInCurve : i
+				};
+
+				var optionsControlPoints = {
+					description : descriptionControlPoints
+				};
+
 				inningControlPoint = new MagoPoint(geoCoord_inning, controlPointsStyle, optionsControlPoints);
 				modeler.addObject(inningControlPoint);
 
@@ -488,6 +566,17 @@ BSplineCubic3D.prototype._makeRenderablePoints = function(magoManager)
 
 			if(geoCoord_outing)
 			{
+				var descriptionControlPoints = {
+					type : "curveControlMember",
+					inOutControlPoint : "outingControlPoint",
+					owner : this,
+					idxInCurve : i
+				};
+
+				var optionsControlPoints = {
+					description : descriptionControlPoints
+				};
+
 				outingControlPoint = new MagoPoint(geoCoord_outing, controlPointsStyle, optionsControlPoints);
 				modeler.addObject(outingControlPoint);
 
@@ -605,11 +694,14 @@ BSplineCubic3D.prototype._makeControlPoints = function(controlPointArmLength, ma
 				// The outingControlPoint is in the segment, to the 20% of the currentPoint.***
 				var outingControlPoint = new Point3D();
 				outingControlPoint.set(currPoint.x * (1-outingDist) + nextPoint.x * outingDist, currPoint.y * (1-outingDist) + nextPoint.y * outingDist, currPoint.z * (1-outingDist) + nextPoint.z * outingDist); 
+				var outingArmLength = outingControlPoint.distToPoint(currPoint);
 				var outingGeoCoord = geoLocData.localCoordToGeographicCoord(outingControlPoint, undefined);
 				this.controlPoints3dMap[i] = {"inningControlPoint" : undefined, 
 											"outingControlPoint" : outingControlPoint,
 											"inningGeoCoord" : undefined,
-											"outingGeoCoord" : outingGeoCoord};
+											"outingGeoCoord" : outingGeoCoord,
+											"outingArmLength" : outingArmLength,
+											"inningArmLength" : undefined};
 			}
 			else if ( i === pointsCount-1)
 			{
@@ -619,11 +711,14 @@ BSplineCubic3D.prototype._makeControlPoints = function(controlPointArmLength, ma
 				inningDist = controlPointArmLength;
 				var inningControlPoint = new Point3D();
 				inningControlPoint.set(currPoint.x * (1-inningDist) + prevPoint.x * inningDist, currPoint.y * (1-inningDist) + prevPoint.y * inningDist, currPoint.z * (1-inningDist) + prevPoint.z * inningDist); 
+				var inningArmLength = inningControlPoint.distToPoint(currPoint);
 				var inningGeoCoord = geoLocData.localCoordToGeographicCoord(inningControlPoint, undefined);
 				this.controlPoints3dMap[i] = {"inningControlPoint" : inningControlPoint, 
 											"outingControlPoint" : undefined,
 											"inningGeoCoord" : inningGeoCoord,
-											"outingGeoCoord" : undefined};
+											"outingGeoCoord" : undefined,
+											"outingArmLength" : undefined,
+											"inningArmLength" : inningArmLength};
 			}
 			else 
 			{
@@ -648,10 +743,14 @@ BSplineCubic3D.prototype._makeControlPoints = function(controlPointArmLength, ma
 				outingControlPoint.set(currPoint.x + dir.x * outingDist, currPoint.y + dir.y * outingDist, currPoint.z + dir.z * outingDist); 
 				var outingGeoCoord = geoLocData.localCoordToGeographicCoord(outingControlPoint, undefined);
 				
+				var outingArmLength = outingControlPoint.distToPoint(currPoint);
+				var inningArmLength = inningControlPoint.distToPoint(currPoint);
 				this.controlPoints3dMap[i] = {"inningControlPoint" : inningControlPoint, 
 											"outingControlPoint" : outingControlPoint,
 											"inningGeoCoord" : inningGeoCoord,
-											"outingGeoCoord" : outingGeoCoord};
+											"outingGeoCoord" : outingGeoCoord,
+											"outingArmLength" : outingArmLength,
+											"inningArmLength" : inningArmLength};
 			}
 			
 		}

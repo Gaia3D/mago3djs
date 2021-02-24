@@ -406,7 +406,13 @@ GeoLocationData.prototype.localCoordToWorldCoord = function(localCoord, resultWo
 	if (resultWorldCoord === undefined)
 	{ resultWorldCoord = new Point3D(); }
 	
-	resultWorldCoord = this.tMatrix.transformPoint3D(localCoord, resultWorldCoord); 
+	// Do precision calculating.
+	var rotatedPos = this.rotMatrix.rotatePoint3D(localCoord, undefined); 
+
+	resultWorldCoord.set(this.positionHIGH[0] + (rotatedPos.x + this.positionLOW[0]), 
+						this.positionHIGH[1] + (rotatedPos.y + this.positionLOW[1]), 
+						this.positionHIGH[2] + (rotatedPos.z + this.positionLOW[2]));
+	
 	return resultWorldCoord;
 };
 
@@ -635,14 +641,21 @@ GeoLocationData.prototype.getTransformedRelativePositionNoApplyHeadingPitchRoll 
  */
 GeoLocationData.prototype.getTransformedRelativePosition = function(absolutePosition, resultRelativePosition) 
 {
+	// Note : "absolutePosition" is worldCoord position.
 	if (resultRelativePosition === undefined)
 	{ resultRelativePosition = new Point3D(); }
 	
 	var pointAux = new Point3D();
+
+	// Do precision calculating.
+	var positionHIGH = new Float32Array(3); 
+	var positionLOW = new Float32Array(3); 
+	ManagerUtils.calculateSplited3fv([absolutePosition.x, absolutePosition.y, absolutePosition.z], positionHIGH, positionLOW);
+
+	pointAux.set((positionHIGH[0] - this.positionHIGH[0])+(positionLOW[0] - this.positionLOW[0]), 
+				(positionHIGH[1] - this.positionHIGH[1])+(positionLOW[1] - this.positionLOW[1]), 
+				(positionHIGH[2] - this.positionHIGH[2])+(positionLOW[2] - this.positionLOW[2]));
 	
-	pointAux.set(absolutePosition.x - this.position.x, 
-		absolutePosition.y - this.position.y, 
-		absolutePosition.z - this.position.z);
 	var rotMatInv = this.getRotMatrixInv();
 	resultRelativePosition = rotMatInv.transformPoint3D(pointAux, resultRelativePosition);
 	

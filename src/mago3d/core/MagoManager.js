@@ -8965,11 +8965,21 @@ MagoManager.prototype.callAPI = function(api)
 	}
 };
 
+MagoManager.prototype.getSelectionManager = function ()
+{
+	if(!this.selectionManager)
+	{
+		this.selectionManager = new SelectionManager(this);
+	}
+	return this.selectionManager;
+};
+
 MagoManager.prototype.deleteAll = function ()
 {
 	// deselect.
-	this.selectionManager.clearCandidates();
-	this.selectionManager.clearCurrents();
+	var selManager = this.getSelectionManager();
+	selManager.clearCandidates();
+	selManager.clearCurrents();
 	this.objectSelected = undefined;
 	this.octreeSelected = undefined;
 	this.buildingSelected = undefined;

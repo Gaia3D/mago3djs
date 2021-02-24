@@ -656,6 +656,52 @@ Point3DList.getVboThickLinesExtruded__original = function(magoManager, bottomPoi
 };
 
 /**
+ * Returns renderableObject of the points3dArray.
+ */
+Point3DList.getRenderableObjectOfPoints3DArray = function(points3dLCArray, magoManager, geoLoc, options) 
+{
+	if (points3dLCArray === undefined || points3dLCArray.length === 0)
+	{ return undefined; }
+	
+	// Create a vectorMesh.
+	if (options === undefined)
+	{
+		options = {};
+	}
+
+	if (options.thickness === undefined)
+	{ options.thickness = 2.0; }
+
+	if (options.color === undefined)
+		{ options.color = new Color(1.0, 0.3, 0.3, 1.0); }
+
+	var vectorMesh = new VectorMesh(options);
+	
+	var optionsThickLine = {
+		colorType: "alphaGradient"
+	};
+	vectorMesh.vboKeysContainer = Point3DList.getVboThickLines(magoManager, points3dLCArray, vectorMesh.vboKeysContainer, options);
+	
+	var renderableObject = new RenderableObject();
+	renderableObject.geoLocDataManager = new GeoLocationDataManager();
+	renderableObject.geoLocDataManager.addGeoLocationData(geoLoc);
+	renderableObject.objectType = MagoRenderable.OBJECT_TYPE.VECTORMESH;
+
+	// calculate vectorMesh "BoundingSphereWC".***********************************************
+	renderableObject.boundingSphereWC = new BoundingSphere();
+	var positionWC = geoLoc.position;
+	var bboxLC = Point3DList.getBoundingBoxOfPoints3DArray(points3dLCArray, undefined);
+	var radiusAprox = bboxLC.getRadiusAprox();
+	renderableObject.boundingSphereWC.setCenterPoint(positionWC.x, positionWC.y, positionWC.z);
+	renderableObject.boundingSphereWC.setRadius(radiusAprox);
+	// End calculating boundingSphereWC.------------------------------------------------------
+
+	renderableObject.objectsArray.push(vectorMesh);
+	
+	return renderableObject;
+};
+
+/**
  * Make the vbo of this point3DList
  * @param magoManager
  */
@@ -786,6 +832,22 @@ Point3DList.prototype.makeVbo = function(magoManager)
 	}
 	this.deleteVboKeysContainer(magoManager);
 	this.vboKeysContainer = Point3DList.getVbo(magoManager, this.pointsArray, this.vboKeysContainer);
+	this.dirty = false;
+};
+
+/**
+ * Make the vbo of this point3DList
+ * @param magoManager
+ */
+Point3DList.prototype.makeThickLinesVbo = function(magoManager, options)
+{
+	if (!this.pointsArray || this.pointsArray.length === 0) 
+	{
+		return;
+	}
+	this.deleteVboKeysContainer(magoManager);
+	// in "options" there are color information (options.color).
+	this.vboKeysContainer = Point3DList.getVboThickLines(magoManager, this.pointsArray, this.vboKeysContainer, options);
 	this.dirty = false;
 };
 
@@ -1028,7 +1090,10 @@ Point3DList.prototype.renderThickLines__element = function(magoManager, shader, 
 Point3DList.prototype.renderThickLines = function(magoManager, shader, renderType, bEnableDepth, options)
 {
 	if (this.vboKeysContainer === undefined)
-	{ return; }
+	{ 
+		this.makeThickLinesVbo(magoManager, options);
+		return; 
+	}
 
 	if (this.geoLocDataManager === undefined)
 	{ return; }
@@ -1041,8 +1106,8 @@ Point3DList.prototype.renderThickLines = function(magoManager, shader, renderTyp
 	shader.bindUniformGenerals();
 	var gl = magoManager.getGl();
 
-	gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
-	gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+	//gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
+	//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 	gl.disable(gl.CULL_FACE);
 	
 	gl.enableVertexAttribArray(shader.prev_loc);
@@ -1053,8 +1118,8 @@ Point3DList.prototype.renderThickLines = function(magoManager, shader, renderTyp
 	geoLocData.bindGeoLocationUniforms(gl, shader);
 
 	var sceneState = magoManager.sceneState;
-	var projMat = sceneState.projectionMatrix;
-	var viewMat = sceneState.modelViewMatrix;
+	//var projMat = sceneState.projectionMatrix;
+	//var viewMat = sceneState.modelViewMatrix;
 	var drawingBufferWidth = sceneState.drawingBufferWidth;
 	var drawingBufferHeight = sceneState.drawingBufferHeight;
 	
