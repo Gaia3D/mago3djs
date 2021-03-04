@@ -1749,10 +1749,11 @@ NeoBuilding.prototype.render = function(magoManager, shader, renderType, refMatr
 				}
 				else 
 				{
-					if (octreesRenderedCount < (lowestOctreesCount0 + lowestOctreesCount1 + lowestOctreesCount2)*0.2)
+					if (octreesRenderedCount < (lowestOctreesCount0 + lowestOctreesCount1 + lowestOctreesCount2)*0.1)
 					{ this.renderSkin(magoManager, shader, renderType); }
 				}
 			}
+			
 		}
 		
 		// Now, check how many octrees are rendered. If rendered only a few, then render the buildingSkin.
@@ -1892,6 +1893,22 @@ NeoBuilding.prototype.renderSkin = function(magoManager, shader, renderType)
 				}
 			}
 		}
+		
+		// seletionColor4.***
+		if(magoManager.isCameraMoved && !magoManager.isCameraMoving )
+		{
+			selCandidates = magoManager.selectionManager;
+			selectionColor = magoManager.selectionColor;
+			currentNode = currentObjectsRendering.curNode;
+			currentOctree = currentObjectsRendering.curOctree;
+			
+			var colorAux;
+			colorAux = magoManager.selectionColor.getAvailableColor(colorAux);
+			var idxKey = magoManager.selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
+			magoManager.selectionManager.setCandidates(idxKey, undefined, undefined, this, currentNode);
+			gl.uniform4fv(shader.uSelColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
+		}
+		
 	}
 	else if (renderType === 2)
 	{
@@ -1959,10 +1976,12 @@ NeoBuilding.prototype.renderDetailed = function(magoManager, shader, renderType,
 		relCamPosY = this.myCameraRelative.position.y;
 		relCamPosZ = this.myCameraRelative.position.z;
 	}
-
-	// LOD0.
+	var lowestOctreesCount;
 	var minSize = 0.0;
-	var lowestOctreesCount = this.currentVisibleOctreesControler.currentVisibles0.length;
+
+	
+	// LOD0.
+	lowestOctreesCount = this.currentVisibleOctreesControler.currentVisibles0.length;
 	for (var j=0; j<lowestOctreesCount; j++) 
 	{
 		lowestOctree = this.currentVisibleOctreesControler.currentVisibles0[j];

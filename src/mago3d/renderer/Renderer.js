@@ -679,7 +679,7 @@ Renderer.prototype.endRenderSilhouetteDepth = function(silhouetteDepthFbo)
 	silhouetteDepthFbo.unbind(); 
 };
 
-Renderer.prototype.renderSilhouetteDepth = function()
+Renderer.prototype.renderSilhouetteDepth = function ()
 {
 // Depth for silhouette.***************************************************************************************
 	// Check if there are node selected.***********************************************************
@@ -1195,17 +1195,6 @@ Renderer.prototype.renderNativeObjects = function(gl, shader, renderType, visibl
 		{
 			opaquesArray[i].render(magoManager, shader, renderType, glPrimitive);
 		}
-	}
-	
-	// transparents.
-	if (bRenderTransparents)
-	{
-		var transparentsArray = visibleObjControlerNodes.currentVisibleNativeObjects.transparentsArray;
-		nativeObjectsCount = transparentsArray.length;
-		for (var i=0; i<nativeObjectsCount; i++)
-		{
-			transparentsArray[i].render(magoManager, shader, renderType, glPrimitive);
-		}
 
 		// ThickLines only in transparentPass.
 		var vectorTypeObjectsArray = visibleObjControlerNodes.currentVisibleNativeObjects.vectorTypeArray;
@@ -1230,6 +1219,43 @@ Renderer.prototype.renderNativeObjects = function(gl, shader, renderType, visibl
 			// return to the current shader.
 			shader.useProgram();
 		}
+	}
+	
+	// transparents.
+	if (bRenderTransparents)
+	{
+		var transparentsArray = visibleObjControlerNodes.currentVisibleNativeObjects.transparentsArray;
+		nativeObjectsCount = transparentsArray.length;
+		for (var i=0; i<nativeObjectsCount; i++)
+		{
+			transparentsArray[i].render(magoManager, shader, renderType, glPrimitive);
+		}
+
+		// ThickLines only in transparentPass.
+		/*
+		var vectorTypeObjectsArray = visibleObjControlerNodes.currentVisibleNativeObjects.vectorTypeArray;
+		var vectorTypeObjectsCount = vectorTypeObjectsArray.length;
+		if (vectorTypeObjectsCount > 0)
+		{
+			// change shader. use "thickLines" shader.
+			var thickLineShader = magoManager.postFxShadersManager.getShader("thickLine"); 
+			thickLineShader.useProgram();
+			thickLineShader.bindUniformGenerals();
+			
+			gl.uniform4fv(thickLineShader.oneColor4_loc, [0.3, 0.9, 0.5, 1.0]);
+			gl.uniform1i(thickLineShader.colorType_loc, 0);
+			gl.uniform2fv(thickLineShader.viewport_loc, [sceneState.drawingBufferWidth, sceneState.drawingBufferHeight]);
+			gl.uniform1f(thickLineShader.thickness_loc, 5.0);
+				
+			for (var i=0; i<vectorTypeObjectsCount; i++)
+			{
+				vectorTypeObjectsArray[i].render(magoManager, thickLineShader, renderType, glPrimitive);
+			}
+			
+			// return to the current shader.
+			shader.useProgram();
+		}
+		*/
 	}
 	
 	// render vectorType objects as opaques.
@@ -1323,7 +1349,7 @@ Renderer.prototype.renderExcavationObjects = function(gl, shader, renderType, vi
  * @param {Number} renderType If renderType = 0 (depth render), renderType = 1 (color render), renderType = 2 (colorCoding render).
  * @param {VisibleObjectsController} visibleObjControlerNodes This object contains visible objects for the camera frustum.
  */
-Renderer.prototype.renderSilhouette = function() 
+Renderer.prototype.renderSilhouette = function () 
 {
 	// Render screenQuad with effects.
 	var magoManager = this.magoManager;
@@ -2102,7 +2128,7 @@ Renderer.prototype.renderGeometryStencilShadowMeshes__original = function(gl, re
  * This function is debug function
  * @param {WebGLRenderingContext} gl WebGL Rendering Context.
  */
-Renderer.prototype.renderScreenRectangle = function(gl, options) 
+Renderer.prototype.renderScreenRectangle = function (gl, options) 
 {
 	var magoManager = this.magoManager;
 	var sceneState = magoManager.sceneState;
@@ -2266,6 +2292,16 @@ Renderer.prototype.renderScreenRectangle = function(gl, options)
 	if(magoManager.windVolumeRearNormalTex)
 	{
 		//texture = magoManager.windVolumeRearNormalTex;
+	}
+
+	if(magoManager.selectionFbo)
+	{
+		//texture = magoManager.selectionFbo.colorBuffer;
+	}
+
+	if(magoManager.selColorTex)
+	{
+		texture = magoManager.selColorTex;
 	}
 
 	
@@ -2655,7 +2691,7 @@ Renderer.prototype.renderLightBuffer = function(lightSourcesArray)
  * @param {Number} renderType If renderType = 0 (depth render), renderType = 1 (color render), renderType = 2 (colorCoding render).
  * @param {VisibleObjectsController} visibleObjControlerNodes This object contains visible objects for the camera frustum.
  */
-Renderer.prototype.renderGeometryBuffer = function(gl, renderType, visibleObjControlerNodes) 
+Renderer.prototype.renderGeometryBuffer = function (gl, renderType, visibleObjControlerNodes) 
 {	
 	gl.enable(gl.DEPTH_TEST);
 	gl.depthFunc(gl.LEQUAL);
@@ -3866,7 +3902,7 @@ Renderer.prototype.renderBoundingBoxesNodes = function(nodesArray, color, bRende
  * Renders the current frustumVolumen with colorCoding for selection.
  * @param {VisibleObjectsControler} visibleObjControlerBuildings Contains the current visible objects clasified by LOD.
  */
-Renderer.prototype.renderGeometryColorCoding = function(visibleObjControlerNodes) 
+Renderer.prototype.renderGeometryColorCoding = function (visibleObjControlerNodes) 
 {
 /*
 	'F4D' : 'f4d',

@@ -1956,6 +1956,9 @@ uniform int clippingConvexPolygon2dPointsIndices[64];\n\
 uniform vec4 limitationInfringedColor4;\n\
 uniform vec2 limitationHeights;\n\
 \n\
+// Code color for selection:\n\
+uniform vec4 uSelColor4;\n\
+\n\
 varying vec3 vNormal;\n\
 varying vec4 vColor4; // color from attributes\n\
 varying vec2 vTexCoord;   \n\
@@ -2314,6 +2317,9 @@ void main()\n\
 \n\
 		// albedo.\n\
 		gl_FragData[3] = albedo4; \n\
+\n\
+		// selColor4 (if necessary).\n\
+		gl_FragData[4] = uSelColor4; \n\
 	}\n\
 	#endif\n\
 \n\

@@ -254,13 +254,13 @@ PointSelectInteraction.prototype.handleMoveEvent = function(browserEvent)
  * @param {Point2D} screenCoordinate
  * @param {boolean} bObject
  */
-PointSelectInteraction.prototype.select = function(screenCoordinate)
+PointSelectInteraction.prototype.select = function (screenCoordinate)
 {
 	var manager = this.manager;
 	var selectManager = manager.selectionManager;
 
 	if (manager.selectionFbo === undefined) 
-	{ manager.selectionFbo = new FBO(gl, manager.sceneState.drawingBufferWidth[0], manager.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
+	{ manager.getSelectionFBO(); }
 
 	var gl = manager.getGl();
 	selectManager.selectProvisionalObjectByPixel(gl, screenCoordinate.x, screenCoordinate.y);

@@ -231,7 +231,7 @@ SelectionManager.prototype.setSelectedF4dObject = function(object)
  * @alias SelectionManager
  * @class SelectionManager
  */
-SelectionManager.prototype.getSelectedF4dNode = function()
+SelectionManager.prototype.getSelectedF4dNode = function ()
 {
 	return this.currentNodeSelected;
 };
@@ -274,7 +274,7 @@ SelectionManager.prototype.getSelectedF4dNodeArray = function()
  * @alias SelectionManager
  * @class SelectionManager
  */
-SelectionManager.prototype.setSelectedF4dNode = function(node)
+SelectionManager.prototype.setSelectedF4dNode = function (node)
 {
 	this.currentNodeSelected = node;
 };
@@ -285,7 +285,7 @@ SelectionManager.prototype.setSelectedF4dNode = function(node)
  * @alias SelectionManager
  * @class SelectionManager
  */
-SelectionManager.prototype.setCandidates = function(idxKey, reference, octree, building, node)
+SelectionManager.prototype.setCandidates = function (idxKey, reference, octree, building, node)
 {
 	if (reference)
 	{
@@ -341,7 +341,7 @@ SelectionManager.prototype.clearCandidates = function()
  * @alias SelectionManager
  * @class SelectionManager
  */
-SelectionManager.prototype.selectObjects = function(idxKey)
+SelectionManager.prototype.selectObjects = function (idxKey)
 {
 	// Function no used.!!!!!!!!!!!!!
 	this.currentReferenceSelected = this.referencesMap[idxKey];
@@ -540,14 +540,17 @@ SelectionManager.prototype.selectObjectByPixel = function(gl, mouseX, mouseY, bS
  * 
  * @private
  */
-SelectionManager.prototype.selectProvisionalObjectByPixel = function(gl, mouseX, mouseY) 
+SelectionManager.prototype.selectProvisionalObjectByPixel = function (gl, mouseX, mouseY) 
 {
 	this.clearProvisionals();
+	var gl = this.magoManager.getGl();
+
 	this.magoManager.selectionFbo.bind(); // framebuffer for color selection.***
-	gl.enable(gl.DEPTH_TEST);
-	gl.depthFunc(gl.LEQUAL);
-	gl.depthRange(0, 1);
-	gl.disable(gl.CULL_FACE);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.magoManager.selectionFbo.colorBuffer, 0);
+	//gl.enable(gl.DEPTH_TEST);
+	//gl.depthFunc(gl.LEQUAL);
+	//gl.depthRange(0, 1);
+	//gl.disable(gl.CULL_FACE);
 	
 	// Read the picked pixel and find the object.*********************************************************
 	var mosaicWidth = 1;
@@ -681,7 +684,7 @@ SelectionManager.prototype.filterProvisional = function(type, filter)
  * @param {string} type required.
  * @param {function} filter option.
  */
-SelectionManager.prototype.provisionalToCurrent = function(type, filter, maintain) 
+SelectionManager.prototype.provisionalToCurrent = function (type, filter, maintain) 
 {
 	var validProvision = this.filterProvisional(type, filter);
 

@@ -996,7 +996,8 @@ Modeler.prototype.__TEST__bSpline = function()
 
 	var options = {
 		geoCoordsArray : modeler.geoCoordsList.geographicCoordsArray,
-		initialArmsLengthRatio : 0.3
+		initialArmsLengthRatio : 0.3,
+		bLoop : false
 	};
 
 

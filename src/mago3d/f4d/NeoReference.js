@@ -548,7 +548,7 @@ NeoReference.prototype.getTriangles = function(neoBuilding, resultTrianglesArray
  * @param mag{Boolean}
  * @returns {Boolean} returns if the neoReference was rendered.
  */
-NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, renderTexture, shader, refMatrixIdxKey, minSizeToRender) 
+NeoReference.prototype.render = function (magoManager, neoBuilding, renderType, renderTexture, shader, refMatrixIdxKey, minSizeToRender) 
 {
 	var neoReference = this;
 	
@@ -622,6 +622,24 @@ NeoReference.prototype.render = function(magoManager, neoBuilding, renderType, r
 	else if (renderType === 1)
 	{
 		neoReference.solveReferenceColorOrTexture(magoManager, neoBuilding, shader, currentObjectsRendering);
+		// seletionColor4.***
+		
+		if(magoManager.isCameraMoved && !magoManager.isCameraMoving )
+		{
+			//var selCandidates = magoManager.selectionManager;
+			//var selectionColor = magoManager.selectionColor;
+			var currentObjectsRendering = magoManager.renderer.currentObjectsRendering;
+			var currentNode = currentObjectsRendering.curNode;
+			var currentOctree = currentObjectsRendering.curOctree;
+			
+			var colorAux;
+			colorAux = magoManager.selectionColor.getAvailableColor(colorAux);
+			neoReference.selColor4 = colorAux;
+			var idxKey = magoManager.selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
+			magoManager.selectionManager.setCandidates(idxKey, neoReference, currentOctree, neoBuilding, currentNode);
+			gl.uniform4fv(shader.uSelColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
+		}
+		
 	}
 	else if (renderType === 2)
 	{

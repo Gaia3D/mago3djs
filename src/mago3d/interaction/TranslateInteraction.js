@@ -175,7 +175,7 @@ TranslateInteraction.prototype.handleDragEvent = function(browserEvent)
 	}
 };
 
-TranslateInteraction.prototype.handleF4dDrag = function(browserEvent)
+TranslateInteraction.prototype.handleF4dDrag = function (browserEvent)
 {
 	var manager = this.manager;
 	var geoLocDataManager = this.target.getNodeGeoLocDataManager();
@@ -248,7 +248,7 @@ TranslateInteraction.prototype.handleF4dDrag = function(browserEvent)
 	});
 };
 
-TranslateInteraction.prototype.handleObjectDrag = function(browserEvent)
+TranslateInteraction.prototype.handleObjectDrag = function (browserEvent)
 {
 	var selectedObjtect= this.target;
 	var geoLocDataManager = this.parentNode.getNodeGeoLocDataManager();

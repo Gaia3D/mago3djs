@@ -700,6 +700,64 @@ Point3DList.getRenderableObjectOfPoints3DArray = function(points3dLCArray, magoM
 	
 	return renderableObject;
 };
+/**
+ * Make the vboDataArray of point3dArray for thickLines.
+ * @param magoManager
+ */
+Point3DList.getThickLinesPositionDataArray = function(point3dArray, resultPosVboDataArray, options)
+{
+	var pointsCount = point3dArray.length;
+
+	// in this case make point4d (x, y, z, w). In "w" save the sign (1 or -1) for the offset in the shader to draw triangles strip.
+	var repeats = 4;
+	var pointDimension = 4;
+	var posByteSize = pointsCount * pointDimension * repeats;
+
+	if(!resultPosVboDataArray || resultPosVboDataArray.length < posByteSize)
+	{
+		resultPosVboDataArray = new Float32Array(posByteSize);
+	}
+	
+	var point3d;
+	var startIdx = 0;
+	var endIdx = pointsCount;
+
+	if(options)
+	{
+		// startIdx & endIdx exists for updatingData for modified curves.
+		if(options.startIdx)
+		{ startIdx = options.startIdx; }
+
+		if(options.endIdx)
+		{ endIdx = options.endIdx; }
+	}
+
+	for (var i=0; i<pointsCount; i++)
+	{
+		point3d = point3dArray[i];
+		resultPosVboDataArray[i*16] = point3d.x;
+		resultPosVboDataArray[i*16+1] = point3d.y;
+		resultPosVboDataArray[i*16+2] = point3d.z;
+		resultPosVboDataArray[i*16+3] = 1; // order.
+		
+		resultPosVboDataArray[i*16+4] = point3d.x;
+		resultPosVboDataArray[i*16+5] = point3d.y;
+		resultPosVboDataArray[i*16+6] = point3d.z;
+		resultPosVboDataArray[i*16+7] = -1; // order.
+		
+		resultPosVboDataArray[i*16+8] = point3d.x;
+		resultPosVboDataArray[i*16+9] = point3d.y;
+		resultPosVboDataArray[i*16+10] = point3d.z;
+		resultPosVboDataArray[i*16+11] = 2; // order.
+		
+		resultPosVboDataArray[i*16+12] = point3d.x;
+		resultPosVboDataArray[i*16+13] = point3d.y;
+		resultPosVboDataArray[i*16+14] = point3d.z;
+		resultPosVboDataArray[i*16+15] = -2; // order.
+	}
+
+	return resultPosVboDataArray;
+};
 
 /**
  * Make the vbo of this point3DList

@@ -588,9 +588,7 @@ MagoManager.prototype.setMouseStatus = function(type)
  */
 MagoManager.prototype.swapRenderingFase = function() 
 {
-	//this.renderingFase = !this.renderingFase; // old.***
 	this.renderingFase += 1;
-
 	if(this.renderingFase > 100)
 	this.renderingFase = 1;
 };
@@ -1397,7 +1395,24 @@ MagoManager.prototype.loadAndPrepareData = function()
  * Manages the selection process.
  * @private
  */
-MagoManager.prototype.renderToSelectionBuffer = function() 
+MagoManager.prototype.getSelectionFBO = function() 
+{
+	if (this.selectionFbo === undefined) 
+	{ 
+		var texturesManager = this.getTexturesManager();
+		var gl = this.getGl();
+		this.selectionFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); 
+		this.selectionFbo.colorBuffer = texturesManager.texturesMergerFbo.colorBuffersArray[3];
+	}
+
+	return this.selectionFbo;
+};
+
+/**
+ * Manages the selection process.
+ * @private
+ */
+MagoManager.prototype.renderToSelectionBuffer = function () 
 {
 	var auxBool = false;
 	//if(!auxBool)
@@ -1405,12 +1420,11 @@ MagoManager.prototype.renderToSelectionBuffer = function()
 
 	var gl = this.getGl();
 	
-	if (this.selectionFbo === undefined) 
-	{ this.selectionFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
-	
+	var selectionFbo = this.getSelectionFBO();
 	if (this.isCameraMoved || this.bPicking) // 
 	{
-		this.selectionFbo.bind(); // framebuffer for color selection.***
+		
+		selectionFbo.bind(); // framebuffer for color selection.***
 		gl.enable(gl.DEPTH_TEST);
 		gl.depthFunc(gl.LEQUAL);
 		gl.depthRange(0, 1);
@@ -1432,7 +1446,8 @@ MagoManager.prototype.renderToSelectionBuffer = function()
 		}
 
 		this.renderer.renderGeometryColorCoding(this.visibleObjControlerNodes, ''); 
-		this.selectionFbo.unbind();
+		selectionFbo.unbind();
+		
 		this.swapRenderingFase();
 
 		if (this.currentFrustumIdx === 0)
@@ -1625,7 +1640,26 @@ MagoManager.prototype.bindMainFramebuffer = function()
  * Main rendering function.
  * @private
  */
-MagoManager.prototype.doRender = function(frustumVolumenObject) 
+MagoManager.prototype.getTexturesManager = function () 
+{
+	if(!this.texturesManager)
+	{
+		var gl = this.getGl();
+		this.texturesManager = new TexturesManager(this);
+		var bufferWidth = this.sceneState.drawingBufferWidth[0];
+		var bufferHeight = this.sceneState.drawingBufferHeight[0];
+		var bUseMultiRenderTarget = this.postFxShadersManager.bUseMultiRenderTarget;
+		this.texturesManager.texturesMergerFbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 4}); 
+	}
+
+	return this.texturesManager;
+};
+
+/**
+ * Main rendering function.
+ * @private
+ */
+MagoManager.prototype.doRender = function (frustumVolumenObject) 
 {
 	if(!this.isCesiumGlobe())
 	{
@@ -1697,21 +1731,15 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 	
 	if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
 	
-	if(!this.texturesManager)
-	{
-		this.texturesManager = new TexturesManager(this);
-		var bufferWidth = this.sceneState.drawingBufferWidth[0];
-		var bufferHeight = this.sceneState.drawingBufferHeight[0];
-		var bUseMultiRenderTarget = this.postFxShadersManager.bUseMultiRenderTarget;
-		this.texturesManager.texturesMergerFbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 3}); 
-	}
-	
-	this.depthFboNeo = this.texturesManager.texturesMergerFbo;
+	var texturesManager = this.getTexturesManager();
+	this.depthFboNeo = texturesManager.texturesMergerFbo;
 
 	this.depthTex = this.depthFboNeo.colorBuffersArray[0];
 	this.normalTex = this.depthFboNeo.colorBuffersArray[1];
 	this.albedoTex = this.depthFboNeo.colorBuffersArray[2];
+	this.selColorTex = this.depthFboNeo.colorBuffersArray[3];
 
+	var selFBO = this.getSelectionFBO();
 
 	// prev 2) ready to color frame buffer
 	this.postFxShadersManager.useProgram(null); // init current bind shader.***
@@ -1737,15 +1765,35 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.depthTex, 0);
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.normalTex, 0);
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, this.albedoTex, 0);
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, this.selColorTex, 0);
 
-		this.extbuffers.drawBuffersWEBGL([
-			this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - depth
-			this.extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - normal
-			this.extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - albedo
-			this.extbuffers.NONE //
-			]);
+		if (this.isCameraMoved || this.bPicking)
+		{
+			this.extbuffers.drawBuffersWEBGL([
+				this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - depth
+				this.extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - normal
+				this.extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - albedo
+				this.extbuffers.COLOR_ATTACHMENT3_WEBGL  // gl_FragData[4] - selColor4
+				]);
 
-			
+				if(this.isFarestFrustum())
+				{
+					this.selectionManager.clearCandidates();
+				}
+				
+		}
+		else
+		{
+			this.extbuffers.drawBuffersWEBGL([
+				this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - depth
+				this.extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - normal
+				this.extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - albedo
+				this.extbuffers.NONE  // gl_FragData[4] - selColor4
+				]);
+		}
+
+		
+		
 		if(this.isFarestFrustum())
 		{
 			gl.clearColor(1.0, 1.0, 1.0, 1.0);
@@ -1753,8 +1801,20 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 			gl.clearColor(0, 0, 0, 1);
 
+			//this.selectionManager.clearCandidates();
 		}
-		gl.clear(gl.DEPTH_BUFFER_BIT);
+		else
+		{
+			gl.clear(gl.DEPTH_BUFFER_BIT);
+		}
+
+		this.extbuffers.drawBuffersWEBGL([
+			this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - depth
+			this.extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - normal
+			this.extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - albedo
+			this.extbuffers.NONE  // gl_FragData[4] - selColor4
+			]);
+		
 		this.renderer.renderTerrainCopy();
 		
 		// end test.---------------------------------------------------------------------------------------------------
@@ -1766,22 +1826,8 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 			// MRT on cesium.**************************************************
 			if(!this.extbuffers)
 			this.extbuffers = gl.getExtension("WEBGL_draw_buffers");
+
 			/*
-			if(this.isFarestFrustum())
-			{
-				gl.bindTexture(gl.TEXTURE_2D, this.depthTex);  
-				gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
-
-				gl.bindTexture(gl.TEXTURE_2D, this.normalTex);  
-				gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
-
-				gl.bindTexture(gl.TEXTURE_2D, this.albedoTex);  
-				gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
-
-				gl.bindTexture(gl.TEXTURE_2D, null);  
-			}
-			*/
-
 			// Bind mago colorTextures:
 			gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.depthTex, 0);
 			gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, this.normalTex, 0);
@@ -1793,6 +1839,39 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 				this.extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - normalTex
 				this.extbuffers.COLOR_ATTACHMENT3_WEBGL // gl_FragData[3] - albedoTex
 			  ]);
+			  */
+			  
+			if(this.isCameraMoved)
+			{
+				// Attach the selColorBuffer.***
+				gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.depthTex, 0);
+				gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, this.normalTex, 0);
+				gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, this.albedoTex, 0);
+				gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT4_WEBGL, gl.TEXTURE_2D, this.selColorTex, 0);
+
+				this.extbuffers.drawBuffersWEBGL([
+					this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
+					this.extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - depthTex
+					this.extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - normalTex
+					this.extbuffers.COLOR_ATTACHMENT3_WEBGL, // gl_FragData[3] - albedoTex
+					this.extbuffers.COLOR_ATTACHMENT4_WEBGL // gl_FragData[4] - selColor4
+					]);
+			}
+			else
+			{
+				gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.depthTex, 0);
+				gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, this.normalTex, 0);
+				gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, this.albedoTex, 0);
+				gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT4_WEBGL, gl.TEXTURE_2D, null, 0);
+
+				this.extbuffers.drawBuffersWEBGL([
+					this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
+					this.extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - depthTex
+					this.extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - normalTex
+					this.extbuffers.COLOR_ATTACHMENT3_WEBGL, // gl_FragData[3] - albedoTex
+					this.extbuffers.NONE // gl_FragData[3] - albedoTex
+				]);
+			}
 			
 			// End mrt.---------------------------------------------------------------------------------------------------------------
 			
@@ -1824,6 +1903,7 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 			this.extbuffers.NONE, // gl_FragData[1] - depthTex
 			this.extbuffers.NONE, // gl_FragData[2] - normalTex
 			this.extbuffers.COLOR_ATTACHMENT3_WEBGL, // gl_FragData[3] - albedoTex
+			this.extbuffers.COLOR_ATTACHMENT4_WEBGL // gl_FragData[4] - selColor4
 			]);
 	}
 
@@ -1860,11 +1940,13 @@ MagoManager.prototype.doRender = function(frustumVolumenObject)
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // depthTex.
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // normalTex.
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0); // albedoTex.
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT4_WEBGL, gl.TEXTURE_2D, null, 0); // selColor4.
 		this.extbuffers.drawBuffersWEBGL([
 			this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
 			this.extbuffers.NONE, // gl_FragData[1]
 			this.extbuffers.NONE, // gl_FragData[2]
 			this.extbuffers.NONE, // gl_FragData[3]
+			this.extbuffers.NONE, // gl_FragData[4]
 			]);
 	}
 
@@ -2410,7 +2492,7 @@ MagoManager.prototype.initCounters = function()
  * 
  * @private
  */
-MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrustums) 
+MagoManager.prototype.startRender = function (isLastFrustum, frustumIdx, numFrustums) 
 {
 	// Update the current frame's frustums count.
 	this.numFrustums = numFrustums;
@@ -2480,7 +2562,7 @@ MagoManager.prototype.startRender = function(isLastFrustum, frustumIdx, numFrust
 	if (!this.isCameraMoving && !this.mouseMiddleDown)
 	{
 		this.loadAndPrepareData();
-		this.renderToSelectionBuffer();
+		//this.renderToSelectionBuffer();
 		////this.managePickingProcess();
 	}
 	
@@ -3503,7 +3585,7 @@ MagoManager.prototype.TEST__SelectionBuffer = function()
  * 
  * @private
  */
-MagoManager.prototype.getSelectedObjects = function(gl, mouseX, mouseY, resultSelectedArray, bSelectObjects) 
+MagoManager.prototype.getSelectedObjects = function (gl, mouseX, mouseY, resultSelectedArray, bSelectObjects) 
 {
 	var selectionManager = this.selectionManager;
 	if (!selectionManager)
@@ -4522,7 +4604,7 @@ MagoManager.prototype.mouseActionLeftDown = function(mouseX, mouseY)
  * 
  * @private
  */
-MagoManager.prototype.saveHistoryObjectMovement = function(refObject, node) 
+MagoManager.prototype.saveHistoryObjectMovement = function (refObject, node) 
 {
 	var changeHistory = new ChangeHistory();
 	var refMove = changeHistory.getReferenceObjectAditionalMovement();
@@ -5024,7 +5106,7 @@ MagoManager.prototype.moveSelectedObjectGeneral = function(gl, object)
  * 
  * @private
  */
-MagoManager.prototype.moveSelectedObjectAsimetricMode = function(gl) 
+MagoManager.prototype.moveSelectedObjectAsimetricMode = function (gl) 
 {
 	if (!this.magoPolicy.isModelMovable()) { return; }
 
@@ -6197,6 +6279,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
 	shader.uFrustumIdx_loc = gl.getUniformLocation(shader.program, "uFrustumIdx");
 	shader.bUseMultiRenderTarget_loc = gl.getUniformLocation(shader.program, "bUseMultiRenderTarget");
+	shader.uSelColor4_loc = gl.getUniformLocation(shader.program, "uSelColor4");
 
 	// 0.1) lBuffer Shader.********************************************************************************************
 	var shaderName = "lBuffer";
@@ -6911,7 +6994,7 @@ MagoManager.prototype.doMultiFrustumCullingSmartTiles = function(camera)
  * @param dataKey
  * @private
  */
-MagoManager.prototype.tilesMultiFrustumCullingFinished = function(intersectedLowestTilesArray, visibleNodes, cameraPosition, frustumVolume) 
+MagoManager.prototype.tilesMultiFrustumCullingFinished = function (intersectedLowestTilesArray, visibleNodes, cameraPosition, frustumVolume) 
 {
 	var tilesCount = intersectedLowestTilesArray.length;
 	
