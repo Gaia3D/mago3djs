@@ -39,6 +39,8 @@ uniform bool bUseLogarithmicDepth;
 uniform vec2 uNearFarArray[4];
 uniform bool bUseMultiRenderTarget;
 uniform int uFrustumIdx;
+// Code color for selection:
+uniform vec4 uSelColor4;
 
 varying float flogz;
 varying float Fcoef_half;
@@ -333,6 +335,9 @@ void main()
 
 		// now, albedo.
 		gl_FragData[3] = vColor; 
+
+		// selColor4 (if necessary).
+		gl_FragData[4] = uSelColor4; 
 	}
 	#endif
 

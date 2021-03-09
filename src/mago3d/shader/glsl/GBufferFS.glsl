@@ -344,6 +344,7 @@ void main()
         if(textureFlipYAxis)
         {
             textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));
+			 
         }
         else{
             textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));

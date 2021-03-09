@@ -169,7 +169,7 @@ MagoRenderable.prototype.getObject = function(idx)
 	return this.objectsArray[idx];
 };
 
-MagoRenderable.prototype.render = function(magoManager, shader, renderType, glPrimitive, bIsSelected) 
+MagoRenderable.prototype.render = function (magoManager, shader, renderType, glPrimitive, bIsSelected) 
 {
 	if (this.attributes) 
 	{
@@ -398,6 +398,17 @@ MagoRenderable.prototype.renderAsChild = function (magoManager, shader, renderTy
 				}
 			}
 		}
+
+		if(magoManager.isCameraMoved && !magoManager.isCameraMoving )
+		{
+			// Selection render.***
+			var selectionColor = magoManager.selectionColor;
+			var colorAux = selectionColor.getAvailableColor(undefined);
+			var idxKey = selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
+			magoManager.selectionManager.setCandidateGeneral(idxKey, this);
+			gl.uniform4fv(shader.uSelColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
+		}
+
 	}
 	else if (renderType === 2)
 	{

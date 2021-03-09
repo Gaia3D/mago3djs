@@ -1408,73 +1408,12 @@ MagoManager.prototype.getSelectionFBO = function()
 	return this.selectionFbo;
 };
 
-/**
- * Manages the selection process.
- * @private
- */
-MagoManager.prototype.renderToSelectionBuffer = function () 
-{
-	var auxBool = false;
-	//if(!auxBool)
-	//return;
-
-	var gl = this.getGl();
-	
-	var selectionFbo = this.getSelectionFBO();
-	if (this.isCameraMoved || this.bPicking) // 
-	{
-		
-		selectionFbo.bind(); // framebuffer for color selection.***
-		gl.enable(gl.DEPTH_TEST);
-		gl.depthFunc(gl.LEQUAL);
-		gl.depthRange(0, 1);
-		gl.disable(gl.CULL_FACE);
-		
-		if (this.isLastFrustum)
-		{
-			// this is the farest frustum, so init selection process.***
-			gl.clearColor(1, 1, 1, 1); // white background.***
-			gl.clearDepth(1);
-			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // clear buffer.***
-			this.selectionManager.clearCandidates();
-			gl.clearColor(0, 0, 0, 1); // return to black background.***
-		}
-		else
-		{
-			gl.clearDepth(1);
-			gl.clear(gl.DEPTH_BUFFER_BIT); // clear only depth buffer.***
-		}
-
-		this.renderer.renderGeometryColorCoding(this.visibleObjControlerNodes, ''); 
-		selectionFbo.unbind();
-		
-		this.swapRenderingFase();
-
-		if (this.currentFrustumIdx === 0)
-		{
-			this.isCameraMoved = false;
-
-			//TODO : MOVEEND EVENT TRIGGER
-			//PSEUDO CODE FOR CLUSTER
-			//if (this.modeler && this.modeler.objectsArray) 
-			//{
-			//	for (var i=0, len=this.modeler.objectsArray.length;i<len;i++) 
-			//	{
-			//		var obj = this.modeler.objectsArray[i];
-			//		if (!obj instanceof Cluster) { continue; }
-			//
-			//		if (!obj.dirty && !obj.isMaking) { obj.setDirty(true); }
-			//	}
-			//}
-		}
-	}
-};
 
 /**
  * Manages the selection process.
  * @private
  */
-MagoManager.prototype.managePickingProcess = function() 
+MagoManager.prototype.managePickingProcess = function () 
 {
 	var gl = this.getGl();
 	
@@ -1765,10 +1704,12 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.depthTex, 0);
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.normalTex, 0);
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, this.albedoTex, 0);
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, this.selColorTex, 0);
+		
 
 		if (this.isCameraMoved || this.bPicking)
 		{
+			gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, this.selColorTex, 0);
+
 			this.extbuffers.drawBuffersWEBGL([
 				this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - depth
 				this.extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - normal
@@ -1784,6 +1725,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		}
 		else
 		{
+			gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0);
 			this.extbuffers.drawBuffersWEBGL([
 				this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - depth
 				this.extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - normal
@@ -1929,6 +1871,13 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		this.renderer.renderBoundingBoxesNodes(visibles3, undefined, bRenderLines);
 		this.renderer.renderBoundingBoxesNodes(this.visibleObjControlerNodes.currentVisiblesAux, undefined, bRenderLines);
 	}
+
+	// Once all frustums was rendered, then set the camera moved = false.*****************************
+	if (this.currentFrustumIdx === 0)
+	{
+		this.isCameraMoved = false;
+	}
+	//------------------------------------------------------------------------------------------------
 
 	// Finally do screenSpaceObjects render.
 	this.renderer.renderScreenSpaceObjects(gl);
@@ -2562,8 +2511,6 @@ MagoManager.prototype.startRender = function (isLastFrustum, frustumIdx, numFrus
 	if (!this.isCameraMoving && !this.mouseMiddleDown)
 	{
 		this.loadAndPrepareData();
-		//this.renderToSelectionBuffer();
-		////this.managePickingProcess();
 	}
 	
 	if (frustumIdx === 0)
@@ -2579,7 +2526,6 @@ MagoManager.prototype.startRender = function (isLastFrustum, frustumIdx, numFrus
 	this.validateHeight(frustumVolumenObject);
 
 	this.drawSelectedExtruionBuildingLabel();
-	this.canvasDirty = true;
 
 	// test. Draw the buildingNames.***
 	if (this.magoPolicy.getShowLabelInfo())
@@ -6391,6 +6337,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
 	shader.uFrustumIdx_loc = gl.getUniformLocation(shader.program, "uFrustumIdx");
 	shader.uModelOpacity_loc = gl.getUniformLocation(shader.program, "uModelOpacity");
+	shader.uSelColor4_loc = gl.getUniformLocation(shader.program, "uSelColor4");
 
 	// 1.1) ModelReferences depthShader.******************************************************************************
 	var shaderName = "modelRefDepth";
@@ -6581,6 +6528,7 @@ MagoManager.prototype.createDefaultShaders = function(gl)
 	shader.bUseMultiRenderTarget_loc = gl.getUniformLocation(shader.program, "bUseMultiRenderTarget");
 	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
 	shader.uFrustumIdx_loc = gl.getUniformLocation(shader.program, "uFrustumIdx");
+	shader.uSelColor4_loc = gl.getUniformLocation(shader.program, "uSelColor4");
 
 	// 9) PointsCloud shader RAINBOW.****************************************************************************************
 	shaderName = "pointsCloudSsao_rainbow";

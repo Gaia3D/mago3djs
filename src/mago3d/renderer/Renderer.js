@@ -1596,7 +1596,7 @@ Renderer.prototype.renderScreenQuad = function(gl)
  * This function renders ssao
  * @param {WebGLRenderingContext} gl WebGL Rendering Context.
  */
-Renderer.prototype.renderScreenQuad2 = function(gl) 
+Renderer.prototype.renderScreenQuad2 = function (gl) 
 {
 	// We are using a quadScreen.***
 	var currentShader;

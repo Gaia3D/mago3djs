@@ -1806,7 +1806,7 @@ NeoBuilding.prototype.renderShadowMesh = function(magoManager, shader, renderTyp
 /**
  * 어떤 일을 하고 있습니까?
  */
-NeoBuilding.prototype.renderSkin = function(magoManager, shader, renderType) 
+NeoBuilding.prototype.renderSkin = function (magoManager, shader, renderType) 
 {
 	var skinLego = this.getCurrentSkin();
 	// Note: skinLego is "LodBuilding" class object.
@@ -1867,7 +1867,8 @@ NeoBuilding.prototype.renderSkin = function(magoManager, shader, renderType)
 		{
 			if (skinLego.texture !== undefined && skinLego.texture.texId)
 			{
-				
+				var flipYTexCoord = false;
+				gl.uniform1i(shader.textureFlipYAxis_loc, flipYTexCoord);
 				shader.enableVertexAttribArray(shader.texCoord2_loc);
 				gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
 				if (shader.last_tex_id !== skinLego.texture.texId)

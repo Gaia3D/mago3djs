@@ -121,6 +121,21 @@ PointMesh.prototype.renderAsChild = function (magoManager, shader, renderType, g
 		gl.uniform4fv(shader.oneColor4_loc, [selColor.r/255.0, selColor.g/255.0, selColor.b/255.0, 1.0]);
 	}
 
+	// seletionColor4.***
+	if(magoManager.isCameraMoved && !magoManager.isCameraMoving )
+	{
+		var selectionManager = magoManager.selectionManager;
+		var selectionColor = magoManager.selectionColor;
+
+		var selColor = selectionColor.getAvailableColor(undefined); 
+		var idxKey = selectionColor.decodeColor3(selColor.r, selColor.g, selColor.b);
+		var owner = this;
+		if(this.owner)
+		{ owner = this.owner; }
+		selectionManager.setCandidateGeneral(idxKey, owner);
+		gl.uniform4fv(shader.uSelColor4_loc, [selColor.r/255.0, selColor.g/255.0, selColor.b/255.0, 1.0]);
+	}
+
 	//var glPrimitive = gl.POINTS;
 	//this.render(magoManager, shader, renderType, glPrimitive, undefined);
 	var vbo_vicky = this.vboKeysContainer.vboCacheKeysArray[0]; // there are only one.

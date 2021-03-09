@@ -194,7 +194,7 @@ PointSelectInteraction.prototype.handleUpEvent = function(browserEvent)
 	}
 	this.emitEvent(this.selected, true, screenCoord);
 };
-PointSelectInteraction.prototype.emitEvent = function(selectedObj, selected, screenCoord)
+PointSelectInteraction.prototype.emitEvent = function (selectedObj, selected, screenCoord)
 {
 	if (selectedObj)
 	{

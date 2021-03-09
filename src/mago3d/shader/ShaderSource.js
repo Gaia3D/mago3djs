@@ -2261,6 +2261,7 @@ void main()\n\
         if(textureFlipYAxis)\n\
         {\n\
             textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));\n\
+			 \n\
         }\n\
         else{\n\
             textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));\n\
@@ -3667,6 +3668,8 @@ uniform vec4 limitationInfringedColor4;\n\
 uniform vec2 limitationHeights;\n\
 \n\
 uniform int uFrustumIdx;\n\
+// Code color for selection:\n\
+uniform vec4 uSelColor4;\n\
 \n\
 varying vec3 vNormal;\n\
 varying vec4 vColor4; // color from attributes\n\
@@ -4252,6 +4255,9 @@ void main()\n\
 \n\
 		// albedo.\n\
 		gl_FragData[3] = albedo4; \n\
+\n\
+		// selColor4 (if necessary).\n\
+		gl_FragData[4] = uSelColor4; \n\
 	}\n\
 	#endif\n\
 \n\
@@ -5059,6 +5065,8 @@ uniform bool bUseLogarithmicDepth;\n\
 uniform vec2 uNearFarArray[4];\n\
 uniform bool bUseMultiRenderTarget;\n\
 uniform int uFrustumIdx;\n\
+// Code color for selection:\n\
+uniform vec4 uSelColor4;\n\
 \n\
 varying float flogz;\n\
 varying float Fcoef_half;\n\
@@ -5353,6 +5361,9 @@ void main()\n\
 \n\
 		// now, albedo.\n\
 		gl_FragData[3] = vColor; \n\
+\n\
+		// selColor4 (if necessary).\n\
+		gl_FragData[4] = uSelColor4; \n\
 	}\n\
 	#endif\n\
 \n\
