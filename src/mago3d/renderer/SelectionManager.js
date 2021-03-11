@@ -546,7 +546,7 @@ SelectionManager.prototype.selectProvisionalObjectByPixel = function (gl, mouseX
 	var gl = this.magoManager.getGl();
 
 	this.magoManager.selectionFbo.bind(); // framebuffer for color selection.***
-	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.magoManager.selectionFbo.colorBuffer, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.magoManager.selColorTex, 0);
 	//gl.enable(gl.DEPTH_TEST);
 	//gl.depthFunc(gl.LEQUAL);
 	//gl.depthRange(0, 1);

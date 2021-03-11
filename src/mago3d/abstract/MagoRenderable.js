@@ -594,7 +594,7 @@ MagoRenderable.prototype.setOneColor = function(r, g, b, a)
  */
 MagoRenderable.prototype.restoreColor = function()
 {
-	this.setOneColor(this.orgColor4.r, this.orgColor4.g, this.orgColor4.b, this.orgColor4.a)
+	this.setOneColor(this.orgColor4.r, this.orgColor4.g, this.orgColor4.b, this.orgColor4.a);
 };
 /**
  * Set the unique one color of the box

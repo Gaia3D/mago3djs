@@ -8986,7 +8986,7 @@ MagoManager.prototype.callAPI = function(api)
 		//this.buildingSelected = node.data.neoBuilding;
 		//this.rootNodeSelected = this.nodeSelected.getRoot();
 
-		this.selectionManager.setSelectedF4dNode(node);
+		this.selectionManager.selectF4d(node);
 
 		this.emit(MagoManager.EVENT_TYPE.SELECTEDF4D, {
 			type      : MagoManager.EVENT_TYPE.SELECTEDF4D, 

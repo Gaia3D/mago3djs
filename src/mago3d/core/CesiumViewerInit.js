@@ -82,9 +82,11 @@ CesiumViewerInit.prototype.providerBuild = function()
 	}
 	var terrainType = policy.terrainType;
 	var terrainValue = policy.terrainValue;
-	if (terrainType !== CODE.cesiumTerrainType.GEOSERVER && !this.options.terrainProvider) 
+
+	if (!this.options.terrainProvider) 
 	{
-		this.options.terrainProvider = new Cesium.EllipsoidTerrainProvider();
+		this.options.terrainProvider = CesiumViewerInit.makeTerrainProvider(terrainType, terrainValue, policy, policy.geoserverTerrainproviderLayerName, policy.geoserverTerrainproviderStyleName);
+		/*this.options.terrainProvider = new Cesium.EllipsoidTerrainProvider();
 		switch (terrainType) 
 		{
 		case CODE.cesiumTerrainType.CESIUM_ION_DEFAULT :{
@@ -111,7 +113,7 @@ CesiumViewerInit.prototype.providerBuild = function()
 			});
 			break;
 		}
-		}
+		}*/
 	}
 	
 	if (!this.options.imageryProvider) 
@@ -121,6 +123,67 @@ CesiumViewerInit.prototype.providerBuild = function()
 		});
 	}
 };
+
+CesiumViewerInit.makeTerrainProvider = function(type, value, policy, layerName, styleName) {
+	var terrainProvider = new Cesium.EllipsoidTerrainProvider();
+	switch (type) 
+	{
+	case CODE.cesiumTerrainType.CESIUM_ION_DEFAULT :{
+		if (policy.cesiumIonToken && policy.cesiumIonToken.length > 0) 
+		{
+			terrainProvider = new Cesium.CesiumTerrainProvider({
+				url: Cesium.IonResource.fromAssetId(1)
+			});
+		}
+		break;
+	}
+	case CODE.cesiumTerrainType.CESIUM_ION_CDN :{
+		if (policy.cesiumIonToken && policy.cesiumIonToken.length > 0) 
+		{
+			terrainProvider = new Cesium.CesiumTerrainProvider({
+				url: Cesium.IonResource.fromAssetId(parseInt(value))
+			});
+		}
+		break;
+	}
+	case CODE.cesiumTerrainType.CESIUM_CUSTOMER :{
+		terrainProvider = new Cesium.CesiumTerrainProvider({
+			url: value
+		});
+		break;
+	}
+	case CODE.cesiumTerrainType.GEOSERVER : {
+		if (!Cesium.GeoserverTerrainProvider) 
+		{
+			throw new Error('If you want use GeoserverTerrainProvider, GeoserverTerrainProvider plugin required.');
+		}
+
+		var terrainParam = {
+			service: 'WMTS'
+		};
+
+		var terrainUrl = value;
+		
+		if (!terrainUrl) 
+		{
+			throw new Error('If use geoserverTerrainproviderEnable, geoserverTerrainproviderUrl is required.');
+		}
+
+		terrainParam.url = terrainUrl;
+		
+		terrainParam.layerName = layerName;
+		if(styleName) {
+			terrainParam.styleName = styleName;
+		}
+		
+		terrainParam.maxLevel = 13;
+
+		terrainProvider = new Cesium.GeoserverTerrainProvider(terrainParam);
+	}
+ 	}
+
+	return terrainProvider;
+}
 
 CesiumViewerInit.prototype.geoserverImageProviderBuild = function() 
 {
@@ -260,6 +323,10 @@ CesiumViewerInit.prototype.postProcessDataProvider = function()
 			this.viewer.imageryLayers.addImageryProvider(new Cesium.ArcGisMapServerImageryProvider({
 				url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
 			}), 0);
+
+			//this.viewer.imageryLayers.addImageryProvider(new Cesium.UrlTemplateImageryProvider({
+			//	url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/{z}/{y}/{x}'
+			//}), 0);
 		}
 	}
 	//삭제예정. 깔끔하게 삭제하는 법 생각좀하고..

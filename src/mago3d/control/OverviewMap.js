@@ -50,11 +50,41 @@ OverviewMap.prototype.setControl = function(magoManager)
 	var vectorlayer = new OlMago3d.layer.VectorLayer({
 		source: new OlMago3d.source.VectorSource()
 	});
+
+	var imageryLayers = this.magoManager.scene.globe.imageryLayers;
+	var baseLayerIndex = imageryLayers._layers.findIndex(function(l){return l.isBaseLayer()});
+	var baseLayer = imageryLayers.get(baseLayerIndex);
+	var provider = baseLayer.imageryProvider;
+
+	var source;
+	if(provider instanceof Cesium.WebMapServiceImageryProvider) {
+		var resource = provider._resource;
+		//var queryParam = JSON.parse(JSON.stringify(resource.queryParameters));
+		var queryParam = {};
+		queryParam['TILED'] = true;
+		for(var key in resource.queryParameters) {
+			if(key !== 'bbox' && key !== 'height' && key !== 'width') {
+				queryParam[key.toUpperCase()] = resource.queryParameters[key]; 
+			}
+		}
+
+		source = new OlMago3d.source.TileWMS({
+			url : provider.url,
+			serverType : 'geoserver',
+			params : queryParam
+		});
+	} else if(provider instanceof Cesium.ArcGisMapServerImageryProvider) {
+		source = new OlMago3d.source.XYZ({
+			url : 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+		});
+	} else if(provider instanceof Cesium.UrlTemplateImageryProvider) {
+		source = new OlMago3d.source.XYZ({
+			url : provider.url
+		});
+	}
     
 	var tilelayer = new OlMago3d.layer.TileLayer({
-		source: new OlMago3d.source.XYZ({
-			url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png'
-		})
+		source: source
 	});
     
 	this.overviewMap = new OlMago3d.Map({

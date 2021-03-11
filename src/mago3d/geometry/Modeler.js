@@ -599,15 +599,12 @@ Modeler.prototype.removeObject = function(target)
 	var tile = target.smartTileOwner;
 	if (tile)
 	{
-		tile.nativeObjects.opaquesArray = tile.nativeObjects.opaquesArray.filter(function(opaq)
-		{
-			return opaq !== target;
-		});
-		
-		tile.nativeObjects.transparentsArray = tile.nativeObjects.transparentsArray.filter(function(t)
-		{
-			return t !== target;
-		});
+		if(tile.nativeObjects.generalObjectsArray) {
+			tile.nativeObjects.generalObjectsArray = tile.nativeObjects.generalObjectsArray.filter(function(obj)
+			{
+				return obj !== target;
+			});
+		}
 	}
 	
 	this.objectsArray = this.objectsArray.filter(function(object)
