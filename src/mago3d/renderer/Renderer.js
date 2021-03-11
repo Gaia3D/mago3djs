@@ -2140,12 +2140,16 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 	{
 
 		//var data = new Float32Array([0, 0,   1, 0,   0, 1,   0, 1,   1, 0,   1,  1]); // total screen.
+		//-----------------------------------------------------------------------------------------------------------------
 		var data = new Float32Array([0, 0,   0.5, 0,   0, 0.5,       0, 0.5,   0.5, 0,   0.5, 0.5]); // rightUp screen.
+		//-----------------------------------------------------------------------------------------------------------------
 		//var data = new Float32Array([0, 0,   0.5, 0,   0, 1,       0, 1,   0.5, 0,   0.5, 1]); // right half screen.
+		//-----------------------------------------------------------------------------------------------------------------
 		this.quadBuffer = FBO.createBuffer(gl, data);
 
 		// create texCoords.
-		var texCoords = new Float32Array([0, 0,   1, 0,   0, 1,   0, 1,   1, 0,   1,  1]); // total screen.
+		//var texCoords = new Float32Array([0, 0,   1, 0,   0, 1,   0, 1,   1, 0,   1,  1]); // total screen.
+		var texCoords = new Float32Array([0, 0,   0.5, 0,   0, 0.5,       0, 0.5,   0.5, 0,   0.5, 0.5]); // rightUp screen.
 		this.texCoordBuffer = FBO.createBuffer(gl, texCoords);
 
 		// now, create normalBuffer for use with cubeMaps.

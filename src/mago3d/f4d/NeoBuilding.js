@@ -1780,7 +1780,7 @@ NeoBuilding.prototype.render = function(magoManager, shader, renderType, refMatr
 /**
  * 어떤 일을 하고 있습니까?
  */
-NeoBuilding.prototype.renderShadowMesh = function(magoManager, shader, renderType) 
+NeoBuilding.prototype.renderShadowMesh = function (magoManager, shader, renderType) 
 {
 	var skinLego = this.getCurrentSkin();
 	// Note: skinLego is "LodBuilding" class object.
@@ -1896,7 +1896,7 @@ NeoBuilding.prototype.renderSkin = function (magoManager, shader, renderType)
 		}
 		
 		// seletionColor4.***
-		if(magoManager.isCameraMoved && !magoManager.isCameraMoving )
+		if (magoManager.isCameraMoved && !magoManager.isCameraMoving )
 		{
 			selCandidates = magoManager.selectionManager;
 			selectionColor = magoManager.selectionColor;

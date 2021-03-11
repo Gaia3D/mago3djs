@@ -1417,8 +1417,7 @@ MagoManager.prototype.managePickingProcess = function ()
 {
 	var gl = this.getGl();
 	
-	if (this.selectionFbo === undefined) 
-	{ this.selectionFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
+	var selectionFbo = this.getSelectionFBO();
 	
 	
 	if (this.currentFrustumIdx === 0)
@@ -1517,7 +1516,7 @@ MagoManager.prototype.managePickingProcess = function ()
 		this.selectionColor.init(); // selection colors manager.***
 	}
 	
-	this.selectionFbo.unbind();
+	selectionFbo.unbind();
 	gl.enable(gl.CULL_FACE);
 };
 
@@ -3055,17 +3054,11 @@ MagoManager.prototype.drawSelectedExtruionBuildingLabel = function()
 MagoManager.prototype.cameraMoved = function() 
 {
 	this.sceneState.camera.setDirty(true);
+	var selectionFbo = this.getSelectionFBO();
 
-	if (this.selectionFbo === undefined)     
-	{ 
-		if (this.sceneState.gl) 
-		{
-			this.selectionFbo = new FBO(this.sceneState.gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); 
-		}
-	}
-	if (this.selectionFbo)
+	if (selectionFbo)
 	{
-		this.selectionFbo.dirty = true;
+		selectionFbo.dirty = true;
 	}
 };
 

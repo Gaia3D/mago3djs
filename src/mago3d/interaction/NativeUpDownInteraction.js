@@ -82,9 +82,6 @@ NativeUpDownInteraction.prototype.handleDownEvent = function(browserEvent)
 
 	var selectManager = manager.selectionManager;
 
-	if (manager.selectionFbo === undefined) 
-	{ manager.selectionFbo = new FBO(gl, manager.sceneState.drawingBufferWidth[0], manager.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
-
 	var gl = manager.getGl();
 	selectManager.selectProvisionalObjectByPixel(gl, browserEvent.point.screenCoordinate.x, browserEvent.point.screenCoordinate.y);
 

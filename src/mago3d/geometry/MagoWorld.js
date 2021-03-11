@@ -33,6 +33,16 @@ var MagoWorld = function(magoManager)
 	*/
 };
 
+// Water simulation.*****************************
+// words : "3D water with 2D height field techniques"
+// http://physbam.stanford.edu/~fedkiw/
+// HEC-RAS ( inundacion simulador ).*
+// https://kr.civilgeo.com/products/geo-hec-ras/
+// https://medium.com/universe-factory/how-i-generated-artificial-rivers-on-imaginary-continents-747df12c5d4c
+// 
+// pdfs.***
+// https://pub.ist.ac.at/group_wojtan/projects/2020_Skrivan_WaveCurves/wave_curves_2020.pdf
+
 /**
  * 첫 번째 시야를 그릴 준비
  * @private
