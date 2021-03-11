@@ -441,7 +441,7 @@ Node.prototype.checkChangesHistoryColors = function()
 /**
  * 어떤 일을 하고 있습니까?
  */
-Node.prototype.renderContent = function(magoManager, shader, renderType, refMatrixIdxKey) 
+Node.prototype.renderContent = function (magoManager, shader, renderType, refMatrixIdxKey) 
 {
 	// This function renders the renderables that exists in "data".
 	// renderType = 0 -> depth render.
@@ -511,6 +511,8 @@ Node.prototype.renderContent = function(magoManager, shader, renderType, refMatr
 
 	// 1rst, determine the shader.
 	var gl = magoManager.sceneState.gl;
+
+	
 	
 	// check attributes of the project.
 	var project = magoManager.hierarchyManager.getNodesMap(data.projectId);

@@ -69,7 +69,7 @@ PointSelectInteraction.prototype._initFilter = function() {
  * set TargetType
  * @param {boolean} type 
  */
-PointSelectInteraction.prototype.setTargetType = function(type)
+PointSelectInteraction.prototype.setTargetType = function (type)
 {
 	var oldType = this.targetType;
 	if (oldType !== type)

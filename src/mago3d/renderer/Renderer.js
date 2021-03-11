@@ -717,7 +717,7 @@ Renderer.prototype.renderSilhouetteDepth = function ()
 		var selectedRefs = selectionManager.getSelectedF4dObjectArray();
 		if (nodes.length > 0 && selectedRefs.length === 0) // test code.***
 		{
-
+			gl.uniform3fv(currentShader.aditionalMov_loc, [0,0,0]); //.
 			var renderType = 0;
 			var refMatrixIdxKey = 0;
 			for (var i=0, len=nodes.length;i<len;i++) 
@@ -2148,8 +2148,8 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 		this.quadBuffer = FBO.createBuffer(gl, data);
 
 		// create texCoords.
-		//var texCoords = new Float32Array([0, 0,   1, 0,   0, 1,   0, 1,   1, 0,   1,  1]); // total screen.
-		var texCoords = new Float32Array([0, 0,   0.5, 0,   0, 0.5,       0, 0.5,   0.5, 0,   0.5, 0.5]); // rightUp screen.
+		var texCoords = new Float32Array([0, 0,   1, 0,   0, 1,   0, 1,   1, 0,   1,  1]); // total screen.
+		//var texCoords = new Float32Array([0, 0,   0.5, 0,   0, 0.5,       0, 0.5,   0.5, 0,   0.5, 0.5]); // rightUp screen.
 		this.texCoordBuffer = FBO.createBuffer(gl, texCoords);
 
 		// now, create normalBuffer for use with cubeMaps.

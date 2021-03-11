@@ -306,6 +306,7 @@ SelectionManager.prototype.setCandidates = function (idxKey, reference, octree, 
 	{
 		this.nodesMap[idxKey] = node;
 	}
+
 };
 
 /**
@@ -396,7 +397,7 @@ SelectionManager.prototype.isObjectSelected = function(object)
  * @alias SelectionManager
  * @class SelectionManager
  */
-SelectionManager.prototype.clearCurrents = function()
+SelectionManager.prototype.clearCurrents = function ()
 {
 	this.currentReferenceSelected = undefined;
 	this.currentOctreeSelected = undefined;
@@ -547,10 +548,6 @@ SelectionManager.prototype.selectProvisionalObjectByPixel = function (gl, mouseX
 
 	this.magoManager.selectionFbo.bind(); // framebuffer for color selection.***
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.magoManager.selColorTex, 0);
-	//gl.enable(gl.DEPTH_TEST);
-	//gl.depthFunc(gl.LEQUAL);
-	//gl.depthRange(0, 1);
-	//gl.disable(gl.CULL_FACE);
 	
 	// Read the picked pixel and find the object.*********************************************************
 	var mosaicWidth = 1;

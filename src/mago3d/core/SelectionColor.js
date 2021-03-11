@@ -21,7 +21,7 @@ var SelectionColor = function()
 /**
  * Initiate the color value of this feature
  */
-SelectionColor.prototype.init = function() 
+SelectionColor.prototype.init = function () 
 {
 	this.color.r = 0;
 	this.color.g = 0;

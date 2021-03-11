@@ -793,20 +793,24 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		var frustumCommandsList = this.scene._frustumCommandsList;
 		if (frustumCommandsList === undefined)
 		{ frustumCommandsList = this.scene.frustumCommandsList; }
-		
-		var camPosX = this.scene.camera.positionWC.x;
-		var camPosY = this.scene.camera.positionWC.y;
-		var camPosZ = this.scene.camera.positionWC.z;
-		var camDirX = this.scene.camera.direction.x;
-		var camDirY = this.scene.camera.direction.y;
-		var camDirZ = this.scene.camera.direction.z;
-		var camUpX = this.scene.camera.up.x;
-		var camUpY = this.scene.camera.up.y;
-		var camUpZ = this.scene.camera.up.z;
-		if (sceneState.camera.isCameraMoved(camPosX, camPosY, camPosZ, camDirX, camDirY, camDirZ, camUpX, camUpY, camUpZ ))
+
+		if (this.isFarestFrustum())
 		{
-			this.isCameraMoved = true;
-			this.emit('isCameraMoved');
+			var camPosX = this.scene.camera.positionWC.x;
+			var camPosY = this.scene.camera.positionWC.y;
+			var camPosZ = this.scene.camera.positionWC.z;
+			var camDirX = this.scene.camera.direction.x;
+			var camDirY = this.scene.camera.direction.y;
+			var camDirZ = this.scene.camera.direction.z;
+			var camUpX = this.scene.camera.up.x;
+			var camUpY = this.scene.camera.up.y;
+			var camUpZ = this.scene.camera.up.z;
+			if (sceneState.camera.isCameraMoved(camPosX, camPosY, camPosZ, camDirX, camDirY, camDirZ, camUpX, camUpY, camUpZ ))
+			{
+				this.isCameraMoved = true;
+				this.emit('isCameraMoved');
+			}
+			
 		}
 		
 		// Update sceneState camera.***
@@ -2512,14 +2516,14 @@ MagoManager.prototype.startRender = function (isLastFrustum, frustumIdx, numFrus
 		this.loadAndPrepareData();
 	}
 	
+	// Render process.***
+	this.doRender(frustumVolumenObject);
+
 	if (frustumIdx === 0)
 	{
 		this.selectionColor.init();
 		this.emit('lastFrustum');
 	}
-	
-	// Render process.***
-	this.doRender(frustumVolumenObject);
 
 	//valid date height by height reference
 	this.validateHeight(frustumVolumenObject);
