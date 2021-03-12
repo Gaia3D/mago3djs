@@ -775,14 +775,6 @@ TinTerrainManager.prototype.render = function (magoManager, bDepth, renderType, 
 	else
 	{ currentShader = magoManager.postFxShadersManager.getShader("tinTerrain"); }
 
-	if (renderType === 0)
-	{ var hola = 0; }
-
-	if (renderType === 1)
-	{ var hola = 0; }
-
-	if (renderType === 2)
-	{ var hola = 0; }
 	
 	currentShader.resetLastBuffersBinded();
 	magoManager.postFxShadersManager.useProgram(currentShader);
@@ -795,9 +787,6 @@ TinTerrainManager.prototype.render = function (magoManager, bDepth, renderType, 
 	//gl.disableVertexAttribArray(currentShader.color4_loc);
 	
 	currentShader.bindUniformGenerals();
-
-	
-	
 	magoManager.test__makingTerrainByAltitudesImage = 0;
 	
 	if (renderType === 0)
@@ -813,8 +802,6 @@ TinTerrainManager.prototype.render = function (magoManager, bDepth, renderType, 
 	gl.uniform1i(currentShader.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
 	var projectionMatrixInv = sceneState.getProjectionMatrixInv();
 	gl.uniformMatrix4fv(currentShader.projectionMatrixInv_loc, false, projectionMatrixInv._floatArrays);
-
-	gl.uniform1i(currentShader.bIsMakingDepth_loc, bDepth); //. old. use uRenderType_loc = 0. ***
 	gl.uniform1i(currentShader.uRenderType_loc, 1);
 	gl.uniform1f(currentShader.uFCoef_logDepth_loc, sceneState.fCoef_logDepth[0]);
 
@@ -825,90 +812,14 @@ TinTerrainManager.prototype.render = function (magoManager, bDepth, renderType, 
 		gl.activeTexture(gl.TEXTURE2); 
 		gl.bindTexture(gl.TEXTURE_2D, null);
 	
-		var textureAux1x1 = magoManager.texturesStore.getTextureAux1x1();
-		var noiseTexture = magoManager.texturesStore.getNoiseTexture4x4();
-		
 		gl.uniform1i(currentShader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture. Initially set as texture color type.***
 		gl.uniform4fv(currentShader.oneColor4_loc, [0.5, 0.5, 0.5, 1.0]);
 		gl.uniform1i(currentShader.refMatrixType_loc, 0); // init referencesMatrix.
 		gl.uniformMatrix4fv(currentShader.buildingRotMatrix_loc, false, this.identityMat._floatArrays);
-		
-		gl.uniform1i(currentShader.bApplySpecularLighting_loc, true);
 		gl.uniform1i(currentShader.bApplyCaustics_loc, false);
 
 		// shader.altitude_loc
 		gl.uniform1i(currentShader.bExistAltitudes_loc, false);
-		
-		var bApplyShadow = false;
-		if (magoManager.sceneState.sunSystem !== undefined && magoManager.sceneState.applySunShadows)
-		{ bApplyShadow = true; }
-		gl.uniform1i(currentShader.bApplyShadow_loc, bApplyShadow);
-
-		
-
-		
-		if (bApplyShadow)
-		{
-			// Set sunMatrix uniform.***
-			var sunSystem = magoManager.sceneState.sunSystem;
-			var sunMatFloat32Array = sunSystem.getLightsMatrixFloat32Array();
-			var sunPosLOWFloat32Array = sunSystem.getLightsPosLOWFloat32Array();
-			var sunPosHIGHFloat32Array = sunSystem.getLightsPosHIGHFloat32Array();
-			var sunDirWC = sunSystem.getSunDirWC();
-			var sunLight = sunSystem.getLight(0);
-			if (sunLight.tMatrix!== undefined)
-			{
-				gl.uniformMatrix4fv(currentShader.sunMatrix_loc, false, sunMatFloat32Array);
-				gl.uniform3fv(currentShader.sunPosHigh_loc, sunPosHIGHFloat32Array);
-				gl.uniform3fv(currentShader.sunPosLow_loc, sunPosLOWFloat32Array);
-				gl.uniform1f(currentShader.shadowMapWidth_loc, sunLight.targetTextureWidth);
-				gl.uniform1f(currentShader.shadowMapHeight_loc, sunLight.targetTextureHeight);
-				gl.uniform3fv(currentShader.sunDirWC_loc, sunDirWC);
-				gl.uniform1i(currentShader.sunIdx_loc, 1);
-			}
-			
-			gl.activeTexture(gl.TEXTURE0); 
-			var sunLight = sunSystem.getLight(0);
-			if(sunLight.depthFbo)
-			{
-				gl.bindTexture(gl.TEXTURE_2D, sunLight.depthFbo.colorBuffer);
-			}
-			else 
-			{
-				gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
-			}
-
-			gl.activeTexture(gl.TEXTURE1); 
-			sunLight = sunSystem.getLight(1);
-			if(sunLight.depthFbo)
-			{
-				gl.bindTexture(gl.TEXTURE_2D, sunLight.depthFbo.colorBuffer);
-			}
-			else 
-			{
-				gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
-			}
-
-		}
-
-		var bApplySsao = false;
-		gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); // apply ssao default.***
-		if (bApplySsao)
-		{
-			gl.uniform1f(currentShader.aspectRatio_loc, magoManager.sceneState.camera.frustum.aspectRatio);
-			gl.uniform1f(currentShader.screenWidth_loc, magoManager.sceneState.drawingBufferWidth);	
-
-			// bind depthTex & noiseTex. channels 2 & 3.
-			var noiseTexture = magoManager.texturesStore.getNoiseTexture4x4();
-			gl.uniform2fv(currentShader.noiseScale2_loc, [magoManager.depthFboNeo.width/noiseTexture.width, magoManager.depthFboNeo.height/noiseTexture.height]);
-			gl.uniform3fv(currentShader.kernel16_loc, magoManager.sceneState.ssaoKernel16);
-
-			gl.activeTexture(gl.TEXTURE2);
-			//gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);  // original.***
-			gl.activeTexture(gl.TEXTURE3);
-			gl.bindTexture(gl.TEXTURE_2D, noiseTexture);
-		}
-
 		
 		var flipTexCoordY = true;
 
@@ -917,9 +828,6 @@ TinTerrainManager.prototype.render = function (magoManager, bDepth, renderType, 
 
 		gl.uniform1i(currentShader.textureFlipYAxis_loc, flipTexCoordY); // false for cesium, true for magoWorld.
 		gl.uniform1f(currentShader.externalAlpha_loc, 1.0);
-		
-		//gl.enable(gl.POLYGON_OFFSET_FILL);
-		//gl.polygonOffset(1, 3);
 		
 		gl.activeTexture(gl.TEXTURE2); // difusseTex.
 	}

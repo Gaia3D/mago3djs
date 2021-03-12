@@ -2119,9 +2119,6 @@ MagoManager.prototype.bindMagoFbo = function ()
 MagoManager.prototype.doRenderMagoWorld = function (frustumVolumenObject) 
 {
 	var gl = this.getGl();
-	
-	
-
 	var renderType = 0; // 0= depth. 1= color.***
 	this.renderType = 0;
 	var sceneState = this.sceneState;
@@ -2132,7 +2129,6 @@ MagoManager.prototype.doRenderMagoWorld = function (frustumVolumenObject)
 		this.renderer.renderDepthSunSystem(this.visibleObjControlerNodes);
 		this.swapRenderingFase();
 	}
-
 	
 	var lightsArray = this.visibleObjControlerNodes.currentVisibleNativeObjects.lightSourcesArray;
 	var lightCount = lightsArray.length;
@@ -2148,7 +2144,6 @@ MagoManager.prototype.doRenderMagoWorld = function (frustumVolumenObject)
 			light.doIntersectedObjectsCulling(visiblesArray, nativeVisiblesArray);
 		}
 	}
-	
 
 	// 1.2) render selected silhouetteDepth.
 	var selectionManager = this.selectionManager;
@@ -2165,9 +2160,7 @@ MagoManager.prototype.doRenderMagoWorld = function (frustumVolumenObject)
 	gl.clearDepth(1);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	//gl.clearStencil(0); // provisionally here.***
-	
-	
-			
+
 	// 1rst, render atmosphere & the earth.
 	// TinTerrain.**************************************************************************
 	if (this.tinTerrainManager !== undefined)
@@ -2212,7 +2205,7 @@ MagoManager.prototype.doRenderMagoWorld = function (frustumVolumenObject)
 	gl.frontFace(gl.CCW);
 	this.renderer.renderGeometryBuffer(gl, renderType, this.visibleObjControlerNodes);
 	
-	/*
+	
 	// Render transparents.****************************************************************************************************************
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // depthTex.
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // normalTex.
@@ -2221,14 +2214,15 @@ MagoManager.prototype.doRenderMagoWorld = function (frustumVolumenObject)
 		this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
 		this.extbuffers.NONE, // gl_FragData[1]
 		this.extbuffers.NONE, // gl_FragData[2]
-		//this.extbuffers.NONE, // gl_FragData[3]
+		this.extbuffers.COLOR_ATTACHMENT3_WEBGL, // gl_FragData[3] - albedoTex
+		this.extbuffers.COLOR_ATTACHMENT4_WEBGL // gl_FragData[4] - selColor4
 		]);
 
 	renderType = 1;
 	this.renderType = 1;
 	this.renderer.renderGeometryBufferTransparents(gl, renderType, this.visibleObjControlerNodes);
 	// End rendering transparents.----------------------------------------------------------------------------------------------------------
-
+		
 	// check if must render boundingBoxes.
 	if (this.magoPolicy.getShowBoundingBox())
 	{
@@ -2276,14 +2270,14 @@ MagoManager.prototype.doRenderMagoWorld = function (frustumVolumenObject)
 			this.lightSourcesMap = {};
 		}
 	}
-	*/
+	
 	// 1.1) ssao and other effects from depthBuffer render.*****************************************************************************
 	if (this.currentFrustumIdx === 0) 
 	{
 		// Render the lightBuffer.*****************************************
 		if (sceneState.applyLightsShadows)
 		{
-			/*
+			
 			// Create lightBufferFBO if no exist.
 			if(!this.texturesManager.lBuffer)
 			{
@@ -2300,7 +2294,7 @@ MagoManager.prototype.doRenderMagoWorld = function (frustumVolumenObject)
 			// Render the lightBuffer.
 			this.renderer.renderLightDepthCubeMaps(this.lightSourcesArray); // active this code for shadows.
 			this.renderer.renderLightBuffer(this.lightSourcesArray);
-			*/
+			
 
 			//if (this.isCesiumGlobe())
 			{
@@ -2322,12 +2316,7 @@ MagoManager.prototype.doRenderMagoWorld = function (frustumVolumenObject)
 			// End rendering lightBuffer.--------------------------------------------
 		}
 		if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
-		//this.renderer.renderSsaoFromDepth(gl);
-
-		//if (this.isCesiumGlobe())
-		//{
-		//	scene._context._currentFramebuffer._bind();
-		//}
+		this.renderer.renderSsaoFromDepth(gl);
 
 		// Final render output.
 		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -2338,6 +2327,7 @@ MagoManager.prototype.doRenderMagoWorld = function (frustumVolumenObject)
 		//gl.clearStencil(0); // provisionally here.***
 
 		this.renderer.renderScreenQuad(gl);
+		//this.renderer.renderScreenQuad2(gl);
 		//this.renderCluster();
 
 		
@@ -2352,7 +2342,7 @@ MagoManager.prototype.doRenderMagoWorld = function (frustumVolumenObject)
 		*/
 
 		// Debug component.******************************************
-		
+		/*
 		var lightAux;
 		if(lightsArray)
 		{
@@ -2364,7 +2354,7 @@ MagoManager.prototype.doRenderMagoWorld = function (frustumVolumenObject)
 		};
 		gl.disable(gl.BLEND);
 		this.renderer.renderScreenRectangle(gl, options); // debug component.
-		
+		*/
 		//-----------------------------------------------------------
 
 	}
@@ -2405,14 +2395,6 @@ MagoManager.prototype.doRenderMagoWorld = function (frustumVolumenObject)
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
 		
 	this.swapRenderingFase();
-	
-	//if(!this.test__splittedMesh)
-	//{
-	//	this.TEST__splittedExtrudedBuilding();
-	//	this.test__splittedMesh = true;
-	//}
-
-	
 };
 
 /**
@@ -6428,11 +6410,11 @@ MagoManager.prototype.createDefaultShaders = function (gl)
 	var uniformDataPair;
 	
 	// reassign samplers2d locations.
-	uniformDataPair = shader.getUniformDataPair("shadowMapTex");
-	uniformDataPair.intValue = 0; // reassign.***
+	//uniformDataPair = shader.getUniformDataPair("shadowMapTex");
+	//uniformDataPair.intValue = 0; // reassign.***
 	
-	uniformDataPair = shader.getUniformDataPair("shadowMapTex2");
-	uniformDataPair.intValue = 1; // reassign.***
+	//uniformDataPair = shader.getUniformDataPair("shadowMapTex2");
+	//uniformDataPair.intValue = 1; // reassign.***
 	
 	uniformDataPair = shader.getUniformDataPair("diffuseTex");
 	uniformDataPair.intValue = 2; // reassign.***

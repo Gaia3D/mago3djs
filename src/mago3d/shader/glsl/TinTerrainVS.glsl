@@ -9,21 +9,15 @@ attribute float altitude;
 uniform mat4 modelViewMatrixRelToEye; 
 uniform mat4 ModelViewProjectionMatrixRelToEye;
 uniform mat4 normalMatrix4;
-uniform mat4 sunMatrix[2]; 
 
 uniform vec3 buildingPosHIGH;
 uniform vec3 buildingPosLOW;
-uniform vec3 sunPosHIGH[2];
-uniform vec3 sunPosLOW[2];
 uniform vec3 sunDirWC;
 uniform vec3 encodedCameraPositionMCHigh;
 uniform vec3 encodedCameraPositionMCLow;
 
-uniform bool bIsMakingDepth;
 uniform float near;
 uniform float far;
-uniform bool bApplyShadow;
-uniform int sunIdx;
 uniform bool bApplySpecularLighting;
 uniform bool bUseLogarithmicDepth;
 uniform float uFCoef_logDepth;
@@ -34,20 +28,13 @@ uniform vec4 uTileGeoExtent; // (minLon, minLat, maxLon, maxLat).
 uniform int uTileDepthOfBindedTextures; // The depth of the tileTexture binded. Normally uTileDepth = uTileDepthOfBindedTextures, but if current tile has no texturesPrepared, then bind ownerTexture and change texCoords.
 uniform vec4 uTileGeoExtentOfBindedTextures; // (minLon, minLat, maxLon, maxLat).
 
-// Debug uniforms for texCorrection.***
-uniform vec3 uDebug_texCorrectionFactor;
-
-varying float applySpecLighting;
 varying vec3 vNormal;
 varying vec2 vTexCoord;   
 varying vec3 v3Pos;
 varying float depthValue;
 varying float vFogAmount;
 
-varying vec4 vPosRelToLight; 
 varying vec3 vLightDir; 
-varying vec3 vNormalWC;
-varying float currSunIdx;
 varying float vAltitude;
 varying float flogz;
 varying float Fcoef_half;
@@ -109,44 +96,7 @@ void main()
 
 	vTileDepth = float(uTileDepth);
 	vTexTileDepth = float(uTileDepthOfBindedTextures);
-	
-	currSunIdx = -1.0; // initially no apply shadow.
-	if(bApplyShadow && !bIsMakingDepth)
-	{
-		vec3 rotatedNormal = vec3(0.0, 0.0, 1.0); // provisional.***
-		vNormalWC = rotatedNormal;
-					
-		// the sun lights count are 2.
-		vec3 currSunPosLOW;
-		vec3 currSunPosHIGH;
-		mat4 currSunMatrix;
-
-		if(sunIdx == 0)
-		{
-			currSunPosLOW = sunPosLOW[0];
-			currSunPosHIGH = sunPosHIGH[0];
-			currSunMatrix = sunMatrix[0];
-			currSunIdx = 0.5;
-		}
-		else if(sunIdx == 1)
-		{
-			currSunPosLOW = sunPosLOW[1];
-			currSunPosHIGH = sunPosHIGH[1];
-			currSunMatrix = sunMatrix[1];
-			currSunIdx = 1.5;
-		}
-		
-		// Calculate the vertex relative to light.***
-		vec3 highDifferenceSun = objPosHigh.xyz - currSunPosHIGH.xyz;
-		vec3 lowDifferenceSun = objPosLow.xyz - currSunPosLOW.xyz;
-		vec4 pos4Sun = vec4(highDifferenceSun.xyz + lowDifferenceSun.xyz, 1.0);
-		vec4 posRelToLightAux = currSunMatrix * pos4Sun;
-		
-		// now, check if "posRelToLightAux" is inside of the lightVolume (inside of the depthTexture of the light).
-		//vec3 posRelToLightNDC = posRelToLightAux.xyz / posRelToLightAux.w;
-		vPosRelToLight = posRelToLightAux;
-	}
-	
+	/*
 	if(bApplySpecularLighting)
 	{
 		applySpecLighting = 1.0;
@@ -154,7 +104,7 @@ void main()
 	else{
 		applySpecLighting = -1.0;
 	}
-
+	*/
 	v3Pos = (modelViewMatrixRelToEye * pos4).xyz;
 	depthValue = v3Pos.z/far;
 

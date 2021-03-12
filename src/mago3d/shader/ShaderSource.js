@@ -9654,8 +9654,6 @@ ShaderSource.TinTerrainFS = "#ifdef GL_ES\n\
 #extension GL_EXT_draw_buffers : require\n\
 #endif\n\
   \n\
-uniform sampler2D shadowMapTex;// 0\n\
-uniform sampler2D shadowMapTex2;// 1\n\
 uniform sampler2D diffuseTex;  // 2\n\
 uniform sampler2D diffuseTex_1;// 3\n\
 uniform sampler2D diffuseTex_2;// 4\n\
@@ -9674,43 +9672,24 @@ uniform float far;            \n\
 uniform float fov;\n\
 uniform float aspectRatio;    \n\
 uniform float screenWidth;    \n\
-uniform float screenHeight;    \n\
-uniform float shininessValue;\n\
-uniform vec3 kernel[16];   \n\
+uniform float screenHeight;      \n\
 uniform int uActiveTextures[8];\n\
 uniform float externalAlphasArray[8];\n\
 uniform vec2 uMinMaxAltitudes;\n\
-// int uTileDepth;\n\
-uniform int uSeaOrTerrainType;\n\
-uniform int uRenderType;\n\
 \n\
 uniform vec4 oneColor4;\n\
 uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
 \n\
 varying vec2 vTexCoord;   \n\
-varying vec3 vLightWeighting;\n\
 \n\
 varying vec3 diffuseColor;\n\
 uniform vec3 specularColor;\n\
 varying float depthValue; // z buffer depth.\n\
-\n\
-const int kernelSize = 16;  \n\
-uniform float radius;      \n\
+    \n\
 uniform float uTime;  \n\
 \n\
-uniform float ambientReflectionCoef;\n\
-uniform float diffuseReflectionCoef;  \n\
-uniform float specularReflectionCoef; \n\
 uniform float externalAlpha;\n\
-uniform bool bApplyShadow;\n\
-uniform bool bApplySsao;\n\
-uniform float shadowMapWidth;    \n\
-uniform float shadowMapHeight;\n\
 uniform bool bUseLogarithmicDepth;\n\
-\n\
-varying float vFogAmount;\n\
-\n\
-varying vec4 vPosRelToLight; \n\
 varying vec3 vNormal;\n\
 varying float currSunIdx;\n\
 \n\
@@ -9720,19 +9699,6 @@ varying float Fcoef_half;\n\
 // Texture's vars.***\n\
 varying float vTileDepth;\n\
 \n\
-\n\
-// water caustics: https://catlikecoding.com/unity/tutorials/flow/texture-distortion/\n\
-/*\n\
-float unpackDepth(const in vec4 rgba_depth)\n\
-{\n\
-	// mago unpack.***\n\
-	// mago unpack.***\n\
-	// mago unpack.***\n\
-    const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);\n\
-    float depth = dot(rgba_depth, bit_shift);\n\
-    return depth;\n\
-} \n\
-*/\n\
 \n\
 float unpackDepth(vec4 packedDepth)\n\
 {\n\
@@ -9753,21 +9719,6 @@ float UnpackDepth32( in vec4 pack )\n\
     float depth = dot( pack, 1.0 / vec4(1.0, 256.0, 256.0*256.0, 16777216.0) );// 256.0*256.0*256.0 = 16777216.0\n\
     return depth * (16777216.0) / (16777216.0 - 1.0);\n\
 }\n\
-\n\
-/*\n\
-vec4 packDepth(const in float depth)\n\
-{\n\
-	// mago packDepth.***\n\
-    const vec4 bit_shift = vec4(16777216.0, 65536.0, 256.0, 1.0); // original.***\n\
-    const vec4 bit_mask  = vec4(0.0, 0.00390625, 0.00390625, 0.00390625);  // original.*** \n\
-	\n\
-    //vec4 res = fract(depth * bit_shift); // Is not precise.\n\
-	vec4 res = mod(depth * bit_shift * vec4(255), vec4(256) ) / vec4(255); // Is better.\n\
-    res -= res.xxyz * bit_mask;\n\
-    return res;  \n\
-}\n\
-*/\n\
-\n\
 \n\
 vec4 packDepth( float v ) {\n\
   vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
@@ -9853,11 +9804,6 @@ vec3 normal_from_depth(float depth, vec2 texCoord) {\n\
     return normalize(normal);\n\
 }\n\
 \n\
-//linear view space depth\n\
-//float getDepth(vec2 coord)\n\
-//{\n\
-//    return unpackDepth(texture2D(depthTex, coord.xy));\n\
-//}  \n\
 \n\
 vec3 getRainbowColor_byHeight(float height)\n\
 {\n\
@@ -9924,40 +9870,6 @@ vec3 getRainbowColor_byHeight(float height)\n\
 	vec3 resultColor = vec3(r, g, b);\n\
     return resultColor;\n\
 } \n\
-\n\
-float getDepthShadowMap(vec2 coord)\n\
-{\n\
-	// currSunIdx\n\
-	if(currSunIdx > 0.0 && currSunIdx < 1.0)\n\
-	{\n\
-		return UnpackDepth32(texture2D(shadowMapTex, coord.xy));\n\
-	}\n\
-    else if(currSunIdx > 1.0 && currSunIdx < 2.0)\n\
-	{\n\
-		return UnpackDepth32(texture2D(shadowMapTex2, coord.xy));\n\
-	}\n\
-	else\n\
-		return 1000.0;\n\
-	\n\
-} \n\
-\n\
-float getGridLineWidth(int depth)\n\
-{\n\
-	float gridLineWidth = 0.025;\n\
-	\n\
-	if(depth == 17)\n\
-	{\n\
-		gridLineWidth = 0.025;\n\
-	}\n\
-	else{\n\
-		int dif = 18 - depth;\n\
-		if(dif < 1)\n\
-		dif = 1;\n\
-		gridLineWidth = (0.04/17.0) * float(depth/dif);\n\
-	}\n\
-	\n\
-	return gridLineWidth;\n\
-}\n\
 \n\
 //#define SHOW_TILING\n\
 #define TAU 6.28318530718 // https://www.shadertoy.com/view/4sXfDj\n\
@@ -10045,11 +9957,6 @@ void getTextureColor(in int activeNumber, in vec4 currColor4, in vec2 texCoord, 
     }\n\
 }\n\
 \n\
-float roundCustom(float number)\n\
-{\n\
-	float numberResult = sign(number)*floor(abs(number)+0.5);\n\
-	return numberResult;\n\
-}\n\
 \n\
 #define M_PI 3.1415926535897932384626433832795\n\
 \n\
@@ -10096,42 +10003,8 @@ void main()\n\
 		}\n\
 		*/\n\
 \n\
-		float shadow_occlusion = 1.0;\n\
-		if(bApplyShadow)\n\
-		{\n\
-			if(currSunIdx > 0.0)\n\
-			{\n\
-				vec3 fragCoord = gl_FragCoord.xyz;\n\
-				vec3 fragWC;\n\
-				\n\
-				//float ligthAngle = dot(vLightDir, vNormalWC);\n\
-				//if(ligthAngle > 0.0)\n\
-				//{\n\
-				//	// The angle between the light direction & face normal is less than 90 degree, so, the face is in shadow.***\n\
-				//	shadow_occlusion = 0.5;\n\
-				//}\n\
-				//else\n\
-				{\n\
+		\n\
 \n\
-					vec3 posRelToLight = vPosRelToLight.xyz / vPosRelToLight.w;\n\
-					float tolerance = 0.9963;\n\
-					//tolerance = 0.9962;\n\
-					//tolerance = 1.0;\n\
-					posRelToLight = posRelToLight * 0.5 + 0.5; // transform to [0,1] range\n\
-					if(posRelToLight.x >= 0.0 && posRelToLight.x <= 1.0)\n\
-					{\n\
-						if(posRelToLight.y >= 0.0 && posRelToLight.y <= 1.0)\n\
-						{\n\
-							float depthRelToLight = getDepthShadowMap(posRelToLight.xy);\n\
-							if(posRelToLight.z > depthRelToLight*tolerance )\n\
-							{\n\
-								shadow_occlusion = 0.5;\n\
-							}\n\
-						}\n\
-					}\n\
-				}\n\
-			}\n\
-		}\n\
 		\n\
 		// Do specular lighting.***\n\
 		vec3 normal2 = vNormal;	\n\
@@ -10277,41 +10150,6 @@ void main()\n\
 		float linearDepth = getDepth(screenPos);  \n\
 		linearDepthAux = linearDepth;\n\
 \n\
-		if(bApplySsao && altitude<0.1)\n\
-		{\n\
-			// must find depthTex & noiseTex.***\n\
-			vec3 origin = ray * linearDepth;  \n\
-			float ssaoRadius = radius*20.0;\n\
-			float tolerance = ssaoRadius/far; // original.***\n\
-			////float tolerance = radius/(far-near);// test.***\n\
-			////float tolerance = radius/farForDepth;\n\
-\n\
-			// in this shader noiseTex is \"diffusse_1\" in channel 3.\n\
-			vec3 rvec = texture2D(diffuseTex_1, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
-			vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
-			vec3 bitangent = cross(normal2, tangent);\n\
-			mat3 tbn = mat3(tangent, bitangent, normal2);   \n\
-\n\
-			for(int i = 0; i < kernelSize; ++i)\n\
-			{    	 \n\
-				vec3 sample = origin + (tbn * vec3(kernel[i].x*3.0, kernel[i].y*3.0, kernel[i].z)) * ssaoRadius*2.0; // original.***\n\
-				vec4 offset = projectionMatrix * vec4(sample, 1.0);					\n\
-				offset.xy /= offset.w;\n\
-				offset.xy = offset.xy * 0.5 + 0.5;  				\n\
-				float sampleDepth = -sample.z/far;// original.***\n\
-\n\
-				float depthBufferValue = getDepth(offset.xy);\n\
-				if (depthBufferValue < sampleDepth)//-tolerance)\n\
-				{\n\
-					occlusion +=  1.0;\n\
-				}\n\
-			} \n\
-\n\
-			occlusion = 1.0 - occlusion / float(kernelSize);\n\
-			\n\
-			shadow_occlusion *= occlusion;\n\
-		}\n\
-\n\
 		vec3 normalFromDepth = vec3(0.0, 0.0, 1.0);\n\
 		//vec3 normalFromDepth = normal_from_depth(linearDepthAux, screenPos); // normal from depthTex.***\n\
 		//vec2 screenPosAux = vec2(0.5, 0.5);\n\
@@ -10377,8 +10215,8 @@ void main()\n\
 			//float specularReflectionCoef = 0.6;\n\
 			//vec3 specularColor = vec3(0.8, 0.8, 0.8);\n\
 			//textureColor = mix(textureColor, fogColor, 0.2); \n\
-			//gl_FragData[0] = vec4(finalColor.xyz * shadow_occlusion * lambertian + specularReflectionCoef * specular * specularColor * shadow_occlusion, 1.0); // with specular.***\n\
-			gl_FragData[0] = vec4(textureColor.xyz * shadow_occlusion * lambertian * scalarProd, 1.0); // original.***\n\
+			//gl_FragData[0] = vec4(finalColor.xyz * lambertian + specularReflectionCoef * specular * specularColor , 1.0); // with specular.***\n\
+			gl_FragData[0] = vec4(textureColor.xyz *lambertian * scalarProd, 1.0); // original.***\n\
 \n\
 			return;\n\
 		}\n\
@@ -10390,7 +10228,7 @@ void main()\n\
 		\n\
 		//vec4 finalColor = mix(textureColor, fogColor, vFogAmount); \n\
 \n\
-		//gl_FragData[0] = vec4(finalColor.xyz * shadow_occlusion * lambertian * scalarProd, 1.0); // original.***\n\
+		//gl_FragData[0] = vec4(finalColor.xyz * lambertian * scalarProd, 1.0); // original.***\n\
 		//gl_FragData[0] = textureColor; // test.***\n\
 		//gl_FragData[0] = vec4(vNormal.xyz, 1.0); // test.***\n\
 		gl_FragData[0] = packDepth(depthAux);  // anything.\n\
@@ -10419,21 +10257,15 @@ attribute float altitude;\n\
 uniform mat4 modelViewMatrixRelToEye; \n\
 uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
 uniform mat4 normalMatrix4;\n\
-uniform mat4 sunMatrix[2]; \n\
 \n\
 uniform vec3 buildingPosHIGH;\n\
 uniform vec3 buildingPosLOW;\n\
-uniform vec3 sunPosHIGH[2];\n\
-uniform vec3 sunPosLOW[2];\n\
 uniform vec3 sunDirWC;\n\
 uniform vec3 encodedCameraPositionMCHigh;\n\
 uniform vec3 encodedCameraPositionMCLow;\n\
 \n\
-uniform bool bIsMakingDepth;\n\
 uniform float near;\n\
 uniform float far;\n\
-uniform bool bApplyShadow;\n\
-uniform int sunIdx;\n\
 uniform bool bApplySpecularLighting;\n\
 uniform bool bUseLogarithmicDepth;\n\
 uniform float uFCoef_logDepth;\n\
@@ -10444,20 +10276,13 @@ uniform vec4 uTileGeoExtent; // (minLon, minLat, maxLon, maxLat).\n\
 uniform int uTileDepthOfBindedTextures; // The depth of the tileTexture binded. Normally uTileDepth = uTileDepthOfBindedTextures, but if current tile has no texturesPrepared, then bind ownerTexture and change texCoords.\n\
 uniform vec4 uTileGeoExtentOfBindedTextures; // (minLon, minLat, maxLon, maxLat).\n\
 \n\
-// Debug uniforms for texCorrection.***\n\
-uniform vec3 uDebug_texCorrectionFactor;\n\
-\n\
-varying float applySpecLighting;\n\
 varying vec3 vNormal;\n\
 varying vec2 vTexCoord;   \n\
 varying vec3 v3Pos;\n\
 varying float depthValue;\n\
 varying float vFogAmount;\n\
 \n\
-varying vec4 vPosRelToLight; \n\
 varying vec3 vLightDir; \n\
-varying vec3 vNormalWC;\n\
-varying float currSunIdx;\n\
 varying float vAltitude;\n\
 varying float flogz;\n\
 varying float Fcoef_half;\n\
@@ -10519,44 +10344,7 @@ void main()\n\
 \n\
 	vTileDepth = float(uTileDepth);\n\
 	vTexTileDepth = float(uTileDepthOfBindedTextures);\n\
-	\n\
-	currSunIdx = -1.0; // initially no apply shadow.\n\
-	if(bApplyShadow && !bIsMakingDepth)\n\
-	{\n\
-		vec3 rotatedNormal = vec3(0.0, 0.0, 1.0); // provisional.***\n\
-		vNormalWC = rotatedNormal;\n\
-					\n\
-		// the sun lights count are 2.\n\
-		vec3 currSunPosLOW;\n\
-		vec3 currSunPosHIGH;\n\
-		mat4 currSunMatrix;\n\
-\n\
-		if(sunIdx == 0)\n\
-		{\n\
-			currSunPosLOW = sunPosLOW[0];\n\
-			currSunPosHIGH = sunPosHIGH[0];\n\
-			currSunMatrix = sunMatrix[0];\n\
-			currSunIdx = 0.5;\n\
-		}\n\
-		else if(sunIdx == 1)\n\
-		{\n\
-			currSunPosLOW = sunPosLOW[1];\n\
-			currSunPosHIGH = sunPosHIGH[1];\n\
-			currSunMatrix = sunMatrix[1];\n\
-			currSunIdx = 1.5;\n\
-		}\n\
-		\n\
-		// Calculate the vertex relative to light.***\n\
-		vec3 highDifferenceSun = objPosHigh.xyz - currSunPosHIGH.xyz;\n\
-		vec3 lowDifferenceSun = objPosLow.xyz - currSunPosLOW.xyz;\n\
-		vec4 pos4Sun = vec4(highDifferenceSun.xyz + lowDifferenceSun.xyz, 1.0);\n\
-		vec4 posRelToLightAux = currSunMatrix * pos4Sun;\n\
-		\n\
-		// now, check if \"posRelToLightAux\" is inside of the lightVolume (inside of the depthTexture of the light).\n\
-		//vec3 posRelToLightNDC = posRelToLightAux.xyz / posRelToLightAux.w;\n\
-		vPosRelToLight = posRelToLightAux;\n\
-	}\n\
-	\n\
+	/*\n\
 	if(bApplySpecularLighting)\n\
 	{\n\
 		applySpecLighting = 1.0;\n\
@@ -10564,7 +10352,7 @@ void main()\n\
 	else{\n\
 		applySpecLighting = -1.0;\n\
 	}\n\
-\n\
+	*/\n\
 	v3Pos = (modelViewMatrixRelToEye * pos4).xyz;\n\
 	depthValue = v3Pos.z/far;\n\
 \n\
