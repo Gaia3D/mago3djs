@@ -755,14 +755,14 @@ void main()
 
 		
 		#ifdef USE_MULTI_RENDER_TARGET
-		gl_FragData[1] = packDepth(depthAux);  // depth.
-		vec3 normal = vNormal;
-		if(normal.z < 0.0)
-		normal *= -1.0;
-		vec3 encodedNormal = encodeNormal(normal);
-		gl_FragData[2] = vec4(encodedNormal, 0.005); // normal.***
-		//gl_FragData[2] = vec4(0.0, 0.0, 1.0, 1.0); // normal.***
-		gl_FragData[3] = vec4(textureColor); // albedo.***
+			gl_FragData[1] = packDepth(depthAux);  // depth.
+			vec3 normal = vNormal;
+			if(normal.z < 0.0)
+			normal *= -1.0;
+			vec3 encodedNormal = encodeNormal(normal);
+			gl_FragData[2] = vec4(encodedNormal, 0.005); // normal.***
+			//gl_FragData[2] = vec4(0.0, 0.0, 1.0, 1.0); // normal.***
+			gl_FragData[3] = vec4(textureColor); // albedo.***
 		#endif
 	}
 }

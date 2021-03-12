@@ -5,7 +5,7 @@
  * @class MagoManager
  * @constructor
  */
-var MagoManager = function(config) 
+var MagoManager = function (config) 
 {
 	if (!(this instanceof MagoManager)) 
 	{
@@ -1587,11 +1587,16 @@ MagoManager.prototype.getTexturesManager = function ()
 	if(!this.texturesManager)
 	{
 		var gl = this.getGl();
+
+		// 1rst, Create a simpleFramebufferAux.***
+		if (this.framebufferAux === undefined) { this.framebufferAux = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
+
+		// Now, create the texturesMerger.***
 		this.texturesManager = new TexturesManager(this);
 		var bufferWidth = this.sceneState.drawingBufferWidth[0];
 		var bufferHeight = this.sceneState.drawingBufferHeight[0];
 		var bUseMultiRenderTarget = this.postFxShadersManager.bUseMultiRenderTarget;
-		this.texturesManager.texturesMergerFbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 4}); 
+		this.texturesManager.texturesMergerFbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 5}); 
 	}
 
 	return this.texturesManager;
@@ -1669,9 +1674,11 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 	}
 	
 	// Take the depFrameBufferObject of the current frustumVolume.***
-	var bUseMultiRenderTarget = this.postFxShadersManager.bUseMultiRenderTarget;
-	
+	// Create a simpleFramebufferAux.***
+	if (this.framebufferAux === undefined) { this.framebufferAux = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
 	if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
+
+	var bUseMultiRenderTarget = this.postFxShadersManager.bUseMultiRenderTarget;
 	
 	var texturesManager = this.getTexturesManager();
 	this.depthFboNeo = texturesManager.texturesMergerFbo;
@@ -2045,31 +2052,27 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
  * Binds the magoWorld frameBuffer.
  * @private
  */
-MagoManager.prototype.bindMagoFbo = function() 
+MagoManager.prototype.bindMagoFbo = function () 
 {
 	var gl = this.getGl();
-	var bufferWidth = this.sceneState.drawingBufferWidth[0];
-	var bufferHeight = this.sceneState.drawingBufferHeight[0];
 
-	if(!this.texturesManager)
-	{
-		this.texturesManager = new TexturesManager(this);
-		var bUseMultiRenderTarget = this.postFxShadersManager.bUseMultiRenderTarget;
-		this.texturesManager.texturesMergerFbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 4}); 
-	}
-	
-	this.depthFboNeo = this.texturesManager.texturesMergerFbo;
+	var texturesManager = this.getTexturesManager();
+	this.depthFboNeo = texturesManager.texturesMergerFbo;
 
-	this.depthTex = this.depthFboNeo.colorBuffersArray[1];
-	this.normalTex = this.depthFboNeo.colorBuffersArray[2];
-	this.albedoTex = this.depthFboNeo.colorBuffersArray[3];
+	this.depthTex = this.depthFboNeo.colorBuffersArray[0];
+	this.normalTex = this.depthFboNeo.colorBuffersArray[1];
+	this.albedoTex = this.depthFboNeo.colorBuffersArray[2];
+	this.selColorTex = this.depthFboNeo.colorBuffersArray[3];
+
+	var selFBO = this.getSelectionFBO();
+
 	
-	this.texturesManager.texturesMergerFbo.bind();
+	texturesManager.texturesMergerFbo.bind();
 	
 	// MRT on mago.**************************************************
 	if(!this.extbuffers)
 	this.extbuffers = gl.getExtension("WEBGL_draw_buffers");
-	
+	/*
 	if(!this.aqwse)
 	{
 		// Do this if screenSize changes.***
@@ -2085,21 +2088,27 @@ MagoManager.prototype.bindMagoFbo = function()
 		gl.bindTexture(gl.TEXTURE_2D, this.albedoTex);  
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, bufferWidth, bufferHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
 
+		gl.bindTexture(gl.TEXTURE_2D, this.depthFboNeo.colorBuffersArray[4]);  
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, bufferWidth, bufferHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
+
 		gl.bindTexture(gl.TEXTURE_2D, null);  
 		this.aqwse = true;
 	}
+	*/
 
 	// Bind mago colorTextures:
-	gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.depthFboNeo.colorBuffersArray[0], 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.depthFboNeo.colorBuffersArray[4], 0);
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.depthTex, 0);
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, this.normalTex, 0);
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, this.albedoTex, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT4_WEBGL, gl.TEXTURE_2D, this.selColorTex, 0);
 
 	this.extbuffers.drawBuffersWEBGL([
 		this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
 		this.extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - depthTex
-		this.extbuffers.COLOR_ATTACHMENT2_WEBGL,//, // gl_FragData[2] - normalTex
-		this.extbuffers.COLOR_ATTACHMENT3_WEBGL // gl_FragData[3] - albedoTex
+		this.extbuffers.COLOR_ATTACHMENT2_WEBGL,// gl_FragData[2] - normalTex
+		this.extbuffers.COLOR_ATTACHMENT3_WEBGL, // gl_FragData[3] - albedoTex
+		this.extbuffers.COLOR_ATTACHMENT4_WEBGL // gl_FragData[4] - selColorTex
 		]);
 };
 
@@ -2107,11 +2116,12 @@ MagoManager.prototype.bindMagoFbo = function()
  * Main rendering function.
  * @private
  */
-MagoManager.prototype.doRenderMagoWorld = function(frustumVolumenObject) 
+MagoManager.prototype.doRenderMagoWorld = function (frustumVolumenObject) 
 {
 	var gl = this.getGl();
 	
-	// 1) The depth render.**********************************************************************************************************************
+	
+
 	var renderType = 0; // 0= depth. 1= color.***
 	this.renderType = 0;
 	var sceneState = this.sceneState;
@@ -2144,7 +2154,7 @@ MagoManager.prototype.doRenderMagoWorld = function(frustumVolumenObject)
 	var selectionManager = this.selectionManager;
 	if(selectionManager.existSelectedObjects())
 	{
-		//this.renderer.renderSilhouetteDepth(); // note: integrate this in the gBuffer. TODO:
+		//this.renderer.renderSilhouetteDepth(); 
 	}
 	
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
@@ -2156,17 +2166,40 @@ MagoManager.prototype.doRenderMagoWorld = function(frustumVolumenObject)
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	//gl.clearStencil(0); // provisionally here.***
 	
-	// End mrt.---------------------------------------------------------------------------------------------------------------
+	
 			
 	// 1rst, render atmosphere & the earth.
 	// TinTerrain.**************************************************************************
 	if (this.tinTerrainManager !== undefined)
 	{
-		// Atmosphere.*******************************************************************************
-		//this.renderer.renderAtmosphere(gl, renderType);
+		// Atmosphere.**************************************************
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.albedoTex, 0);
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0);
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0);
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0);
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT4_WEBGL, gl.TEXTURE_2D, null, 0);
+		this.extbuffers.drawBuffersWEBGL([
+			this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
+			this.extbuffers.NONE, // gl_FragData[1] - depthTex
+			this.extbuffers.NONE,// gl_FragData[2] - normalTex
+			this.extbuffers.NONE, // gl_FragData[3] - albedoTex
+			this.extbuffers.NONE // gl_FragData[4] - selColorTex
+			]);
+		this.renderer.renderAtmosphere(gl, renderType);
 
-		//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-		//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE);
+		// Terrain.*****************************************************
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.depthFboNeo.colorBuffersArray[4], 0);
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.depthTex, 0);
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, this.normalTex, 0);
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, this.albedoTex, 0);
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT4_WEBGL, gl.TEXTURE_2D, this.selColorTex, 0);
+		this.extbuffers.drawBuffersWEBGL([
+			this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
+			this.extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - depthTex
+			this.extbuffers.COLOR_ATTACHMENT2_WEBGL,// gl_FragData[2] - normalTex
+			this.extbuffers.COLOR_ATTACHMENT3_WEBGL, // gl_FragData[3] - albedoTex
+			this.extbuffers.COLOR_ATTACHMENT4_WEBGL // gl_FragData[4] - selColorTex
+			]);
 		var bDepthRender = false; // magoManager is no depth render.***
 		var renderType = 1;
 		this.tinTerrainManager.render (this, bDepthRender, renderType);
@@ -2342,7 +2375,7 @@ MagoManager.prototype.doRenderMagoWorld = function(frustumVolumenObject)
 
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 	
-	
+	/*
 	if (this.weatherStation)
 	{
 		//if (this.isCesiumGlobe())
@@ -2368,7 +2401,7 @@ MagoManager.prototype.doRenderMagoWorld = function(frustumVolumenObject)
 		//this.weatherStation.test_renderCuttingPlanes(this, renderType);
 		this.weatherStation.renderWeather(this);
 	}
-
+	*/
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
 		
 	this.swapRenderingFase();
@@ -6174,7 +6207,7 @@ MagoManager.prototype.setRenderCondition = function(projectId, dataKey, conditio
  * 
  * @private
  */
-MagoManager.prototype.createDefaultShaders = function(gl) 
+MagoManager.prototype.createDefaultShaders = function (gl) 
 {
 	var use_linearOrLogarithmicDepth = "USE_LINEAR_DEPTH";
 	var use_multi_render_target = "NO_USE_MULTI_RENDER_TARGET";

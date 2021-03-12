@@ -2305,7 +2305,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 	if(magoManager.selColorTex)
 	{
-		texture = magoManager.selColorTex;
+		//texture = magoManager.selColorTex;
 	}
 
 	
@@ -2320,7 +2320,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 		
 	}
 	
-	if(magoManager.scene._context._us.globeDepthTexture._texture)
+	if(magoManager.scene && magoManager.scene._context._us.globeDepthTexture._texture)
 	{
 		//texture = magoManager.scene._context._us.globeDepthTexture._texture;
 	}

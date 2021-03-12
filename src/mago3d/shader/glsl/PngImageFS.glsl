@@ -93,9 +93,9 @@ void main()
 	#endif
 
 	#ifdef USE_LOGARITHMIC_DEPTH
-	if(bUseLogarithmicDepth)
-	{
-		gl_FragDepthEXT = log2(flogz) * Fcoef_half;
-	}
+	//if(bUseLogarithmicDepth)
+	//{
+	//	gl_FragDepthEXT = log2(flogz) * Fcoef_half;
+	//}
 	#endif
 }

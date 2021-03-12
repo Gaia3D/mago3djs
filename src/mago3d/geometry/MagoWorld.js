@@ -212,7 +212,7 @@ MagoWorld.prototype.changeCameraPosition = function(cartesian3, silent)
  * @param {event} event 
  * @private
  */
-MagoWorld.prototype.mousedown = function(event)
+MagoWorld.prototype.mousedown = function (event)
 {
 	this.magoManager.sceneState.mouseButton = event.button;
 	MagoWorld.updateMouseStartClick(event.offsetX, event.offsetY, this.magoManager);
@@ -481,7 +481,7 @@ MagoWorld.prototype.moveSelectedObject = function(event)
  * 어떻게 화면을 변화시키는지를 처리할 수 있다. 마우스 왼쪽 또는 마우스 휠로 회전 가능.
  * @private
  */
-MagoWorld.prototype.mousemove = function(event)
+MagoWorld.prototype.mousemove = function (event)
 {
 	var magoManager = this.magoManager;
 	var nowX = event.offsetX;

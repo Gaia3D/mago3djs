@@ -411,7 +411,7 @@ BSplineCubic3D.prototype.isPrepared = function(magoManager)
 	}
 
 	// 2- check if exist controlPoints.
-	if(!this._makeControlPoints(undefined, magoManager))
+	if(!this.makeControlPoints(undefined, magoManager))
 	{
 		return false;
 	}
@@ -751,7 +751,7 @@ BSplineCubic3D._makeControlPointsOfKnotPoint = function(knotPoints3dList, idxPoi
 /**
  * 어떤 일을 하고 있습니까?
  */
-BSplineCubic3D.prototype._makeControlPoints = function(controlPointArmLength, magoManager) 
+BSplineCubic3D.prototype.makeControlPoints = function(controlPointArmLength, magoManager) 
 {
 	// This function makes the controlPoints automatically for the geographicsPoints.***
 	// There are 2 controlPoints for each point3d : InningControlPoint & OutingControlPoint.***
@@ -944,7 +944,7 @@ BSplineCubic3D.prototype._reCalculateInterpolatedPointsForSegment = function (id
  */
 BSplineCubic3D.prototype._makeInterpolatedPoints = function() 
 {
-	if (!this._makeControlPoints())
+	if (!this.makeControlPoints())
 	{ return false; }
 
 	if(this.interpolatedPoints3dList === undefined || this.interpolatedPointsDirty)
@@ -1041,6 +1041,9 @@ BSplineCubic3D.getLength = function(bSpline, interpolationsCount)
 	var kNotsCount = bSpline.knotPoints3dList.getPointsCount();
 	if (bSpline.segmentLengthArray === undefined)
 	{
+		//if(!bSpline.controlPoints3dMap)
+		//{ return undefined; }
+
 		// Calculate all segments length of the bSpline.***
 		bSpline.segmentLengthArray = [];
 		if (interpolationsCount === undefined)
@@ -1152,7 +1155,7 @@ BSplineCubic3D.getTangent = function(bSpline, linearPosition, resultTangentLine,
 	if (bSpline.knotPoints3dList === undefined)
 	{
 		var controlPointArmLength = 0.3;
-		bSpline._makeControlPoints(controlPointArmLength, magoManager);
+		bSpline.makeControlPoints(controlPointArmLength, magoManager);
 	}
 	
 	// "linearPosition" is a length measurement.***
@@ -1160,6 +1163,9 @@ BSplineCubic3D.getTangent = function(bSpline, linearPosition, resultTangentLine,
 	
 	if (bSpline.segmentLengthArray === undefined)
 	{
+		//if(!bSpline.controlPoints3dMap)
+		//{ return undefined; }
+
 		// Calculate all segments length of the bSpline.***
 		bSpline.segmentLengthArray = [];
 		var interpolationsCount = 20;

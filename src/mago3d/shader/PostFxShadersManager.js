@@ -266,11 +266,19 @@ PostFxShadersManager.prototype.createSilhouetteShaderModelRef = function(gl)
  * 어떤 일을 하고 있습니까?
  * @param magoManager 변수
  */
-PostFxShadersManager.prototype.createDustParticlesShader = function(gl) 
+PostFxShadersManager.prototype.createDustParticlesShader = function (gl) 
 {
 	var use_multi_render_target = "NO_USE_MULTI_RENDER_TARGET";
 	this.bUseMultiRenderTarget = true;
 	use_multi_render_target = "USE_MULTI_RENDER_TARGET";
+
+	var supportEXT = gl.getSupportedExtensions().indexOf("WEBGL_draw_buffers");
+	if (supportEXT > -1)
+	{
+		var extbuffers = gl.getExtension("WEBGL_draw_buffers");
+		this.bUseMultiRenderTarget = true;
+		use_multi_render_target = "USE_MULTI_RENDER_TARGET";
+	}
 
 	var use_linearOrLogarithmicDepth = "USE_LINEAR_DEPTH";
 
@@ -348,11 +356,19 @@ PostFxShadersManager.prototype.createDustParticlesShader = function(gl)
  * 어떤 일을 하고 있습니까?
  * @param magoManager 변수
  */
-PostFxShadersManager.prototype.createDustTextureModeShader = function(gl) 
+PostFxShadersManager.prototype.createDustTextureModeShader = function (gl) 
 {
 	var use_multi_render_target = "NO_USE_MULTI_RENDER_TARGET";
 	this.bUseMultiRenderTarget = true;
 	use_multi_render_target = "USE_MULTI_RENDER_TARGET";
+
+	var supportEXT = gl.getSupportedExtensions().indexOf("WEBGL_draw_buffers");
+	if (supportEXT > -1)
+	{
+		var extbuffers = gl.getExtension("WEBGL_draw_buffers");
+		this.bUseMultiRenderTarget = true;
+		use_multi_render_target = "USE_MULTI_RENDER_TARGET";
+	}
 
 	var use_linearOrLogarithmicDepth = "USE_LINEAR_DEPTH";
 

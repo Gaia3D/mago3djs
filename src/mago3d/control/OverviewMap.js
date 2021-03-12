@@ -43,6 +43,11 @@ OverviewMap.prototype.setControl = function(magoManager)
 {
 	this.magoManager = magoManager;
 
+	if(!this.magoManager.scene)
+	{
+		return;
+	}
+
 	var target = this.target ? this.target : this.magoManager.defaultControlContainer;
 	target.appendChild(this.element);
     

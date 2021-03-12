@@ -4,113 +4,11 @@ ShaderSource.atmosphereFS = "#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\
 \n\
-uniform sampler2D depthTex;\n\
-uniform sampler2D noiseTex;  \n\
-uniform sampler2D diffuseTex;\n\
-uniform bool textureFlipYAxis;\n\
-uniform bool bIsMakingDepth;\n\
-varying vec3 vNormal;\n\
-uniform mat4 projectionMatrix;\n\
-uniform mat4 m;\n\
-uniform vec2 noiseScale;\n\
-uniform float near;\n\
-uniform float far;            \n\
-uniform float fov;\n\
-uniform float aspectRatio;    \n\
-uniform float screenWidth;    \n\
-uniform float screenHeight;    \n\
-uniform float shininessValue;\n\
-uniform vec3 kernel[16];   \n\
-\n\
-uniform vec4 oneColor4;\n\
-uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
-\n\
-varying vec2 vTexCoord;   \n\
-varying vec3 vLightWeighting;\n\
-\n\
-varying vec3 diffuseColor;\n\
-uniform vec3 specularColor;\n\
-varying vec3 vertexPos;\n\
-varying float depthValue;\n\
-varying vec3 v3Pos;\n\
-varying vec3 camPos;\n\
 varying vec4 vcolor4;\n\
-\n\
-const int kernelSize = 16;  \n\
-uniform float radius;      \n\
-\n\
-uniform float ambientReflectionCoef;\n\
-uniform float diffuseReflectionCoef;  \n\
-uniform float specularReflectionCoef; \n\
-uniform float externalAlpha;\n\
-const float equatorialRadius = 6378137.0;\n\
-const float polarRadius = 6356752.3142;\n\
-const float PI = 3.1415926535897932384626433832795;\n\
-const float PI_2 = 1.57079632679489661923; \n\
-const float PI_4 = 0.785398163397448309616;\n\
-\n\
-float unpackDepth(const in vec4 rgba_depth)\n\
-{\n\
-    const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);\n\
-    float depth = dot(rgba_depth, bit_shift);\n\
-    return depth;\n\
-} \n\
-\n\
-vec4 packDepth(const in float depth)\n\
-{\n\
-    const vec4 bit_shift = vec4(16777216.0, 65536.0, 256.0, 1.0);\n\
-    const vec4 bit_mask  = vec4(0.0, 0.00390625, 0.00390625, 0.00390625); \n\
-    vec4 res = fract(depth * bit_shift);\n\
-    res -= res.xxyz * bit_mask;\n\
-    return res;  \n\
-}               \n\
-\n\
-//linear view space depth\n\
-float getDepth(vec2 coord)\n\
-{\n\
-    return unpackDepth(texture2D(depthTex, coord.xy));\n\
-}    \n\
 \n\
 void main()\n\
 {  \n\
-	if(bIsMakingDepth)\n\
-	{\n\
-		gl_FragData[0] = packDepth(-depthValue);\n\
-	}\n\
-	else{\n\
-		vec4 textureColor = oneColor4;\n\
-		if(colorType == 0)\n\
-		{\n\
-			textureColor = oneColor4;\n\
-			\n\
-			if(textureColor.w == 0.0)\n\
-			{\n\
-				discard;\n\
-			}\n\
-		}\n\
-		else if(colorType == 2)\n\
-		{\n\
-			//if(textureFlipYAxis)\n\
-			//{\n\
-			//	textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));\n\
-			//}\n\
-			//else{\n\
-			//	textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));\n\
-			//}\n\
-			\n\
-			if(textureColor.w == 0.0)\n\
-			{\n\
-				discard;\n\
-			}\n\
-		}\n\
-		else{\n\
-			textureColor = oneColor4;\n\
-		}\n\
-		\n\
-		gl_FragData[0] = vcolor4; \n\
-		//gl_FragData[1] = vcolor4; \n\
-		//gl_FragData[2] = vcolor4; \n\
-	}\n\
+	gl_FragData[0] = vcolor4; \n\
 }";
 ShaderSource.atmosphereVS = "attribute vec3 position;\n\
 attribute vec3 normal;\n\
@@ -4637,10 +4535,10 @@ void main()\n\
 	#endif\n\
 \n\
 	#ifdef USE_LOGARITHMIC_DEPTH\n\
-	if(bUseLogarithmicDepth)\n\
-	{\n\
-		gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
-	}\n\
+	//if(bUseLogarithmicDepth)\n\
+	//{\n\
+	//	gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
+	//}\n\
 	#endif\n\
 }";
 ShaderSource.PngImageVS = "attribute vec4 position;\n\
@@ -10499,14 +10397,14 @@ void main()\n\
 \n\
 		\n\
 		#ifdef USE_MULTI_RENDER_TARGET\n\
-		gl_FragData[1] = packDepth(depthAux);  // depth.\n\
-		vec3 normal = vNormal;\n\
-		if(normal.z < 0.0)\n\
-		normal *= -1.0;\n\
-		vec3 encodedNormal = encodeNormal(normal);\n\
-		gl_FragData[2] = vec4(encodedNormal, 0.005); // normal.***\n\
-		//gl_FragData[2] = vec4(0.0, 0.0, 1.0, 1.0); // normal.***\n\
-		gl_FragData[3] = vec4(textureColor); // albedo.***\n\
+			gl_FragData[1] = packDepth(depthAux);  // depth.\n\
+			vec3 normal = vNormal;\n\
+			if(normal.z < 0.0)\n\
+			normal *= -1.0;\n\
+			vec3 encodedNormal = encodeNormal(normal);\n\
+			gl_FragData[2] = vec4(encodedNormal, 0.005); // normal.***\n\
+			//gl_FragData[2] = vec4(0.0, 0.0, 1.0, 1.0); // normal.***\n\
+			gl_FragData[3] = vec4(textureColor); // albedo.***\n\
 		#endif\n\
 	}\n\
 }";

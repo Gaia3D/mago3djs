@@ -765,7 +765,7 @@ TinTerrainManager.prototype.getAltitudes = function(geoCoordsArray, resultGeoCoo
 	}
 };
 
-TinTerrainManager.prototype.render = function(magoManager, bDepth, renderType, shader) 
+TinTerrainManager.prototype.render = function (magoManager, bDepth, renderType, shader) 
 {
 	var sceneState = magoManager.sceneState;
 	var gl = sceneState.gl;
