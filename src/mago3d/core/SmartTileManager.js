@@ -9,7 +9,7 @@
  * @exception {Error} Messages.CONSTRUCT_ERROR
  * @see SmartTile
  */
-var SmartTileManager = function() 
+var SmartTileManager = function(options) 
 {
 	if (!(this instanceof SmartTileManager)) 
 	{
@@ -22,6 +22,8 @@ var SmartTileManager = function()
      * @type {Array.<SmartTile>}
      */
 	this.tilesArray = []; 
+
+	this.magoManager = undefined;
     
 	/**
      * mother 타일 생성
@@ -32,6 +34,15 @@ var SmartTileManager = function()
 	this.objectSeedsMap;
 	
 	this.maxDepth = 17;
+
+	// Vars to control parse-workers.
+	this.parsedSmartTileMap = {};
+
+	if(options)
+	{
+		if(options.magoManager)
+		{ this.magoManager = options.magoManager; }
+	}
 };
 
 /**
@@ -218,7 +229,7 @@ SmartTileManager.prototype.createMainTiles = function()
 
 /**
  */
-SmartTileManager.prototype.parseSmartTilesF4dIndexFile = function(dataBuffer, projectFolderName, magoManager) 
+SmartTileManager.prototype.parseSmartTilesF4dIndexFile = function (dataBuffer, projectFolderName, magoManager) 
 {
 	var bytes_readed = 0;
 	var readWriter = magoManager.readerWriter;

@@ -1186,7 +1186,7 @@ TinTerrain.prototype.prepareTinTerrainPlain = function(magoManager, tinTerrainMa
 	return true;
 };
 
-TinTerrain.prototype.prepareTinTerrainForward = function(magoManager, tinTerrainManager)
+TinTerrain.prototype.prepareTinTerrainForward = function (magoManager, tinTerrainManager)
 {	
 	var isPrepared = false;
 
@@ -3412,7 +3412,7 @@ TinTerrain.prototype.decodeData = function(imageryType)
 	this.requestDecodeData = true;
 };
 
-TinTerrain.prototype.parseData = function(dataArrayBuffer)
+TinTerrain.prototype.parseData = function (dataArrayBuffer)
 {
 	var tinTerrainManager = this.tinTerrainManager;
 	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
@@ -3429,6 +3429,7 @@ TinTerrain.prototype.parseData = function(dataArrayBuffer)
 			if (!parsedTerrainMap[tileInfo.z][tileInfo.x][tileInfo.y]) { parsedTerrainMap[tileInfo.z][tileInfo.x][tileInfo.y] = result; }
 		};
 	}
+
 	this.tinTerrainManager.workerParseTerrain.postMessage({dataArrayBuffer: dataArrayBuffer, info: {x: this.X, y: this.Y, z: this.depth}});
 };
 

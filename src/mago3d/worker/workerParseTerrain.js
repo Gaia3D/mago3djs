@@ -2,7 +2,7 @@
 
 var worker = self;
 
-worker.onmessage = function(e) 
+worker.onmessage = function (e) 
 {
 	var dataArrayBuffer = e.data.dataArrayBuffer;
 	var bytes_readed = 0;

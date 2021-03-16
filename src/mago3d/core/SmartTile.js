@@ -1139,7 +1139,217 @@ SmartTile.prototype.setNodesAttribute = function(nodesArray, attributeName, attr
 
 /**
  */
-SmartTile.prototype.createGeometriesFromSeeds = function(magoManager) 
+SmartTile.prototype.createGeometriesFromSeeds = function (magoManager) 
+{
+	// create the buildings by buildingSeeds.
+	var node;
+	var neoBuilding;
+	var nodeBbox;
+	var buildingSeed;
+	var startIndex = 0;
+	
+	var geometriesCreated = false;
+	
+	// if exist nodesArray (there are buildings) and add a nodeSeed, we must make nodes of the added nodeSeeds.***
+	if (this.nodeSeedsArray !== undefined)
+	{
+		//if (this.nodesArray)
+		//{ startIndex = this.nodesArray.length; }
+
+		if (this.nodesArray === undefined)
+		{ this.nodesArray = []; }
+
+		var nodeSeedsCount = this.nodeSeedsArray.length;
+		var nodesCount = this.nodesArray.length;
+		
+		if (nodeSeedsCount !== nodesCount)
+		{
+			this.setNodesAttribute(this.nodeSeedsArray, "needCreated", 1);
+			this.setNodesAttribute(this.nodesArray, "needCreated", 0);
+			
+			for (var j=0; j<nodeSeedsCount; j++)
+			{
+				node = this.nodeSeedsArray[j];
+				
+				if (node.data.attributes.needCreated === 1)
+				{
+					var attributes = node.data.attributes;
+					if (attributes.objectType === "basicF4d" && !attributes.fromSmartTile)
+					{
+						if (attributes.projectId !== undefined && attributes.isReference !== undefined && attributes.isReference === true)
+						{
+							StaticModelsManager.manageStaticModel(node, magoManager);
+						}
+					
+						if (node.data.neoBuilding !== undefined)
+						{
+							this.nodesArray.push(node);
+							continue;
+						}
+						
+						neoBuilding = new NeoBuilding();
+						
+						// Test.
+						neoBuilding.setAttribute("keepDataArrayBuffers", true);
+						// End test.
+						
+						neoBuilding.nodeOwner = node;
+						node.data.neoBuilding = neoBuilding;
+						if (node.data.bbox === undefined)
+						{ node.data.bbox = new BoundingBox(); }
+						nodeBbox = node.data.bbox;
+						buildingSeed = node.data.buildingSeed;
+						
+						this.nodesArray.push(node);
+						
+						if (neoBuilding.metaData === undefined) 
+						{ neoBuilding.metaData = new MetaData(); }
+
+						if (neoBuilding.metaData.geographicCoord === undefined)
+						{ neoBuilding.metaData.geographicCoord = new GeographicCoord(); }
+
+						if (neoBuilding.metaData.bbox === undefined) 
+						{ neoBuilding.metaData.bbox = new BoundingBox(); }
+
+						// create a building and set the location.***
+						neoBuilding.name = buildingSeed.name;
+						neoBuilding.buildingId = buildingSeed.buildingId;
+					
+						neoBuilding.buildingType = "basicBuilding";
+						neoBuilding.buildingFileName = buildingSeed.buildingFileName;
+						neoBuilding.metaData.geographicCoord.setLonLatAlt(buildingSeed.geographicCoord.longitude, buildingSeed.geographicCoord.latitude, buildingSeed.geographicCoord.altitude);
+						neoBuilding.metaData.bbox.copyFrom(buildingSeed.bBox);
+						nodeBbox.copyFrom(buildingSeed.bBox); // initially copy from building.
+						if (neoBuilding.bbox === undefined)
+						{ neoBuilding.bbox = new BoundingBox(); }
+						neoBuilding.bbox.copyFrom(buildingSeed.bBox);
+						neoBuilding.metaData.heading = buildingSeed.rotationsDegree.z;
+						neoBuilding.metaData.pitch = buildingSeed.rotationsDegree.x;
+						neoBuilding.metaData.roll = buildingSeed.rotationsDegree.y;
+						neoBuilding.projectFolderName = node.data.projectFolderName;
+						
+						geometriesCreated = true;
+
+						magoManager.emit(MagoManager.EVENT_TYPE.F4DRENDERREADY, {
+							type      : MagoManager.EVENT_TYPE.F4DRENDERREADY,
+							f4d       : node,
+							timestamp : new Date()
+						});
+					}
+				}
+				//else if (attributes.objectType === "multiBuildingsTile")
+				//{
+				//	if (node.data.multiBuildings !== undefined)
+				//	{
+				//		this.nodesArray.push(node);
+				//		continue;
+				//	}
+				//	
+				//	var multiBuildings = new MultiBuildings();
+				//	multiBuildings.nodeOwner = node;
+				//	multiBuildings.attributes = attributes;
+				//	node.data.multiBuildings = multiBuildings;
+				//	
+				//	geometriesCreated = true;
+				//}
+			}
+		}
+	}
+	
+	// Now, check if exist smartTileF4dSeeds.******************************************************************************************
+	var distToCam = this.distToCamera; // use distToCam to decide load & parse smartTiles.
+	if (this.smartTileF4dSeedArray !== undefined)
+	{
+		var smartTileF4dSeedsCount = this.smartTileF4dSeedArray.length;
+		for (var i=0; i<smartTileF4dSeedsCount; i++)
+		{
+			var smartTileF4dSeed = this.smartTileF4dSeedArray[i];
+			if (smartTileF4dSeed.fileLoadState === undefined)
+			{ smartTileF4dSeed.fileLoadState = CODE.fileLoadState.READY; }
+			
+			if (i > 0)
+			{
+				// check if the previous level is parsedFinished.
+				if (this.smartTileF4dSeedArray[i-1].fileLoadState !== CODE.fileLoadState.PARSE_FINISHED)
+				{ break; }
+			
+				if (distToCam > magoManager.magoPolicy.getLod4DistInMeters())
+				{ break; }
+			}
+			
+			if (smartTileF4dSeed.fileLoadState === CODE.fileLoadState.READY)
+			{
+				//this.smartTileF4dSeedMap[name] = {
+				//"L"                 : L,
+				//"X"                 : X,
+				//"Y"                 : Y,
+				//"geographicCoord"   : centerGeoCoord,
+				//"objectType"        : "F4dTile",
+				//"id"                : f4dTileId,
+				//"tileName"          : name,
+				//"projectFolderName" : projectFolderName};
+				if (magoManager.readerWriter.smartTileF4d_requested < 3)
+				{
+					var readerWriter = magoManager.readerWriter;
+					var projectFolderName = smartTileF4dSeed.projectFolderName;
+					var L = smartTileF4dSeed.L.toString();
+					var X = smartTileF4dSeed.X.toString();
+					var tilename = smartTileF4dSeed.tileName;
+					var smartTileOwner = this;
+					var geometryDataPath = readerWriter.geometryDataPath; // default geometryDataPath = "/f4d".***
+					var fileName = geometryDataPath + "/" + projectFolderName + "/" + L + "/" + X + "/" + tilename;
+					
+					readerWriter.getSmartTileF4d(fileName, smartTileF4dSeed, smartTileOwner, magoManager);
+				}
+				break;
+			}
+			else if (smartTileF4dSeed.fileLoadState === CODE.fileLoadState.LOADING_FINISHED )
+			{
+				// parse the dataArrayBuffer.***
+				var maxParses = 30;
+				if (i > 0)
+				{ maxParses = 5; }
+				var parseQueue = magoManager.parseQueue;
+				if (parseQueue.smartTileF4dParsesCount < maxParses)
+				{
+					// proceed to parse the dataArrayBuffer.***
+					this._workerParseSmartTile(smartTileF4dSeed, magoManager);
+					parseQueue.smartTileF4dParsesCount++; // increment counter.
+					smartTileF4dSeed.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
+				
+					geometriesCreated = true;
+					break;
+				}
+			}
+			else if (smartTileF4dSeed.fileLoadState === CODE.fileLoadState.PARSE_STARTED )
+			{
+				// check if the worker finished.
+				var parsedSmartTileMap = this.smartTileManager.parsedSmartTileMap;
+				var z = this.depth;
+				var x = this.X;
+				var y = this.Y;
+				if (!parsedSmartTileMap[z]) { return; }
+				if (!parsedSmartTileMap[z][x]) { return; }
+				if (!parsedSmartTileMap[z][x][y]) { return; }
+				if (!parsedSmartTileMap[z][x][y][smartTileF4dSeed.tileName]) { return; }
+
+				var result = parsedSmartTileMap[z][x][y][smartTileF4dSeed.tileName];
+
+				// Now, with the "result", make the nodes.***
+				this._parseSmartTileF4d(result, magoManager);
+				delete parsedSmartTileMap[z][x][y][smartTileF4dSeed.tileName]; // delete from the map.***
+
+				smartTileF4dSeed.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
+			}
+		}
+	}
+
+	return geometriesCreated;
+};
+
+/**
+ */
+SmartTile.prototype.createGeometriesFromSeeds__original = function (magoManager) 
 {
 	// create the buildings by buildingSeeds.
 	var node;
@@ -1330,16 +1540,290 @@ SmartTile.prototype.createGeometriesFromSeeds = function(magoManager)
 
 /**
  */
-SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager) 
+SmartTile.prototype._workerParseSmartTile = function (smartTileF4dSeed, magoManager) 
+{
+	var dataArrayBuffer = smartTileF4dSeed.dataArrayBuffer;
+	var smartTileManager = this.smartTileManager;
+	if (!smartTileManager.workerParseSmartTile) 
+	{ 
+		smartTileManager.workerParseSmartTile = new Worker(this.smartTileManager.magoManager.config.scriptRootPath + 'Worker/workerParseSmartTile.js'); 
+		smartTileManager.workerParseSmartTile.onmessage = function(e)
+		{
+			var tileInfo = e.data.info;
+			var result = e.data.parsedSmartTile;
+			var parsedSmartTileMap = smartTileManager.parsedSmartTileMap;
+			if (!parsedSmartTileMap[tileInfo.z]) { parsedSmartTileMap[tileInfo.z] = {}; }
+			if (!parsedSmartTileMap[tileInfo.z][tileInfo.x]) { parsedSmartTileMap[tileInfo.z][tileInfo.x] = {}; }
+			if (!parsedSmartTileMap[tileInfo.z][tileInfo.x][tileInfo.y]) { parsedSmartTileMap[tileInfo.z][tileInfo.x][tileInfo.y] = {}; }
+			if (!parsedSmartTileMap[tileInfo.z][tileInfo.x][tileInfo.y][tileInfo.tileName]) { parsedSmartTileMap[tileInfo.z][tileInfo.x][tileInfo.y][tileInfo.tileName] = result; }
+		};
+	}
+	
+	smartTileManager.workerParseSmartTile.postMessage({
+		dataArrayBuffer: dataArrayBuffer, 
+		info: {x: this.X, y: this.Y, z: this.depth, tileName : smartTileF4dSeed.tileName} });
+};
+
+SmartTile.prototype._parseSmartTileF4d = function (parsedResult, magoManager) 
 {
 	var prefix = 'F4D_';
 	var hierarchyManager = magoManager.hierarchyManager;
-	var readWriter = magoManager.readerWriter;
-	var smartTileManager = magoManager.smartTileManager;
-	var targetDepth = 17;
+
+	if (this.nodesArray === undefined)
+	{ this.nodesArray = []; }
+
+	if (this.sphereExtent === undefined)
+	{ this.makeSphereExtent(magoManager); }
+
+	var enc = new TextDecoder("utf-8");
 	
-	if (targetDepth > this.depth)
-	{ targetDepth = this.depth; }
+	// parse smartTileF4d.***
+	var smartTileType = parsedResult.smartTileType;
+	var parsedBuildingsArray = parsedResult.buildingsArray;
+	// smartTileType = 2 -> smartTile with "lod" included. Load "smartTiles_lod5", "smartTiles_lod4" or "smartTiles_lod3".
+
+	var buildingsCount = parsedBuildingsArray.length;
+	magoManager.emit(MagoManager.EVENT_TYPE.SMARTTILELOADSTART, {tile: this, timestamp: new Date()});
+
+	var smartTilePathInfo = magoManager.f4dController.smartTilePathInfo;
+	for (var i=0; i<buildingsCount; i++)
+	{
+		var parsedBuildingData = parsedBuildingsArray[i];
+
+		// read projectId.
+		var projectId = parsedBuildingData.projectId;
+		parsedBuildingData.projectId = undefined; // delete from map to save memory.
+		
+		// read buildingId.
+		var buildingId = parsedBuildingData.buildingId;
+		parsedBuildingData.buildingId = undefined; // delete from map to save memory.
+
+		if (!smartTilePathInfo[projectId]) { continue; }
+
+		var projectFolderName = smartTilePathInfo[projectId].projectFolderPath;
+		var savedProjectId = smartTilePathInfo[projectId].projectId;
+		
+		// Create a node for each building.
+		//var attributes = {
+		//	"isPhysical"      : true,
+		//	"objectType"      : "basicF4d",
+		//	"heightReference" : HeightReference.CLAMP_TO_GROUND
+		//};
+		var attributes = {
+			"isPhysical"      : true,
+			"objectType"      : "basicF4d"
+		};
+		if (projectFolderName.indexOf('-tree') > 0) 
+		{
+			attributes.isReference = true;
+			
+			if (!magoManager.isExistStaticModel(savedProjectId)) 
+			{
+				magoManager.addStaticModel({
+					projectId          : savedProjectId,
+					projectFolderName  : projectFolderName,
+					buildingFolderName : buildingId
+				});
+			}
+		}
+
+		var commonAttr = smartTilePathInfo[projectId].attributes;
+		if (commonAttr) 
+		{
+			attributes.isVisible = commonAttr.isVisible;
+		}
+
+		// Now, must check if the node exists.
+		var node = hierarchyManager.getNodeByDataKey(savedProjectId, buildingId);
+		var neoBuilding;
+		var data;
+		var neoBuildingHeaderData = parsedBuildingData.neoBuildingHeaderData;
+		parsedBuildingData.neoBuildingHeaderData = undefined; // delete from map to save memory.
+		var data_name = buildingId.startsWith(prefix) ? buildingId.replace(prefix, '') : buildingId;
+		if (!node)
+		{ 
+			if (!attributes.isReference) 
+			{
+				node = hierarchyManager.newNode(buildingId, savedProjectId, attributes); 
+				// Create a neoBuilding.
+				data = node.data;
+				data.projectFolderName = projectFolderName;
+				data.projectId = savedProjectId;// + ".json";
+				data.data_name = data_name;
+				data.attributes = attributes;
+				data.attributes.fromSmartTile = true;
+				data.attributes.fromDate = new Date();
+				data.attributes.toDate = new Date();
+				data.mapping_type = "boundingboxcenter";
+			
+				neoBuilding = new NeoBuilding();
+				data.neoBuilding = neoBuilding;
+				neoBuilding.buildingFileName = prefix + buildingId;
+				neoBuilding.buildingId = buildingId;
+				neoBuilding.projectFolderName = projectFolderName;
+				neoBuilding.nodeOwner = node;
+				
+				neoBuilding.headerDataArrayBuffer = neoBuildingHeaderData;
+				if (neoBuilding.metaData === undefined) 
+				{ neoBuilding.metaData = new MetaData(); }
+				neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+			}
+		}
+		else 
+		{
+			if (!attributes.isReference) 
+			{
+				data = node.data;
+				neoBuilding = data.neoBuilding;
+				
+				if (neoBuilding === undefined)
+				{
+					neoBuilding = new NeoBuilding();
+					data.neoBuilding = neoBuilding;
+					neoBuilding.buildingFileName =  prefix + buildingId;
+					neoBuilding.buildingId = buildingId;
+					neoBuilding.projectFolderName = projectFolderName;
+					neoBuilding.nodeOwner = node;
+				}
+	
+				var headerDataArrayBuffer = neoBuildingHeaderData; // Step over "dataArrayBuffer".
+				if (neoBuilding.metaData === undefined) 
+				{ 
+					neoBuilding.metaData = new MetaData(); 
+					neoBuilding.headerDataArrayBuffer = headerDataArrayBuffer;
+					neoBuilding.metaData.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+				}
+			}
+		}
+		var lodString = parsedBuildingData.lodString;
+		parsedBuildingData.lodString = undefined; // delete from map to save memory.
+
+		if (lodString !== "lod5")
+		{
+			var hola = 0;
+		}
+		var lodName = parsedBuildingData.lodName;
+		parsedBuildingData.lodName = undefined; // delete from map to save memory.
+		var lowLodMeshDataArray = parsedBuildingData.lowLodMeshDataArray;
+		parsedBuildingData.lowLodMeshDataArray = undefined; // delete from map to save memory.
+		var lodBuildingTextureData = parsedBuildingData.lodBuildingTextureData;
+		parsedBuildingData.lodBuildingTextureData = undefined; // delete from map to save memory.
+
+		// read geographicCoord.
+		var geoCoord = new GeographicCoord(parsedBuildingData.longitude, parsedBuildingData.latitude, parsedBuildingData.altitude);
+		parsedBuildingData.longitude = undefined; // delete from map to save memory.
+		parsedBuildingData.latitude = undefined; // delete from map to save memory.
+		parsedBuildingData.altitude = undefined; // delete from map to save memory.
+
+		// read euler angles degree.
+		var eulerAngDeg = new Point3D(parsedBuildingData.rotX, parsedBuildingData.rotY, parsedBuildingData.rotZ);
+		parsedBuildingData.rotX = undefined; // delete from map to save memory.
+		parsedBuildingData.rotY = undefined; // delete from map to save memory.
+		parsedBuildingData.rotZ = undefined; // delete from map to save memory.
+
+		// Read dataId & dataGroup.
+		var dataId = parsedBuildingData.dataId;
+		parsedBuildingData.dataId = undefined; // delete from map to save memory.
+		var dataGroupId = parsedBuildingData.dataGroupId;
+		parsedBuildingData.dataGroupId = undefined; // delete from map to save memory.
+
+		var externInfo = parsedBuildingData.externInfo;
+		parsedBuildingData.externInfo = undefined; // delete from map to save memory.
+
+		parsedBuildingData = undefined; // delete from map to save memory.
+
+		if(externInfo.heightReference) 
+		{
+			var charValue = externInfo.heightReference;
+			charValue = HeightReference.getValueByOrdinal(charValue);
+			externInfo.heightReference = charValue;
+		}
+
+		if (!attributes.isReference) 
+		{
+			var lodBuilding = neoBuilding.getOrNewLodBuilding(lodString);
+			var lowLodMesh = neoBuilding.getOrNewLodMesh(lodName);
+			
+			lowLodMesh.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+			lowLodMesh.dataArrayBuffer = lowLodMeshDataArray;
+
+			if (lodBuilding.texture === undefined)
+			{ lodBuilding.texture = new Texture(); }
+		
+			lodBuilding.texture.imageBinaryData = lodBuildingTextureData;
+			lodBuilding.texture.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+
+			node.data.geographicCoord = geoCoord;
+			node.data.rotationsDegree = eulerAngDeg; 
+			node.data.dataId = dataId;
+			node.data.dataGroupId = savedProjectId;
+
+			node.data.smartTileOwner = this;
+			for (var j in externInfo) 
+			{
+				if (externInfo.hasOwnProperty(j)) 
+				{
+					node.data.attributes[j] = externInfo[j];
+				}
+			}
+
+			if(attributes.heightReference === HeightReference.RELATIVE_TO_GROUND) {
+				node.data.relativeHeight = geoCoord.altitude;
+			} else {
+				node.data.relativeHeight = 0;
+			}
+
+			// HeightReference.CLAMP_TO_GROUND;
+			this.nodesArray.push(node);
+		}
+		else 
+		{
+			var lon = geoCoord.longitude;
+			var lat = geoCoord.latitude;
+			var alt = geoCoord.altitude;
+			magoManager.instantiateStaticModel({
+				projectId  : savedProjectId,
+				instanceId : buildingId,
+				longitude  : lon,
+				latitude   : lat,
+				height     : alt,
+				heading    : eulerAngDeg.z,
+				pitch      : eulerAngDeg.x,
+				roll       : eulerAngDeg.y,
+				heightReference : HeightReference.CLAMP_TO_GROUND
+			});
+
+			var intantiatedNode = hierarchyManager.getNodeByDataKey(savedProjectId, buildingId);
+
+			intantiatedNode.data.dataId = dataId;
+			intantiatedNode.data.dataGroupId = savedProjectId;
+			intantiatedNode.data.projectFolderName = projectFolderName;
+			for (var j in externInfo) 
+			{
+				if (externInfo.hasOwnProperty(j)) 
+				{
+					intantiatedNode.attributes.data[j] = externInfo[j];
+				}
+			}
+			this.nodesArray.push(intantiatedNode);
+		}
+		parsedResult.buildingsArray = undefined; // delete from map to save memory.
+	}
+	magoManager.emit(MagoManager.EVENT_TYPE.SMARTTILELOADEND, {
+		tile      : this,  
+		timestamp : new Date()
+	});
+};
+
+/**
+ */
+SmartTile.prototype.parseSmartTileF4d = function (dataArrayBuffer, magoManager) 
+{
+	// Old. no used. Now using worker version.
+	// Old. no used. Now using worker version.
+	// Old. no used. Now using worker version.
+	var prefix = 'F4D_';
+	var hierarchyManager = magoManager.hierarchyManager;
 
 	if (this.nodesArray === undefined)
 	{ this.nodesArray = []; }
@@ -1642,7 +2126,6 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 			}
 
 			// HeightReference.CLAMP_TO_GROUND;
-
 			this.nodesArray.push(node);
 		}
 		else 
@@ -1681,7 +2164,6 @@ SmartTile.prototype.parseSmartTileF4d = function(dataArrayBuffer, magoManager)
 		tile      : this,  
 		timestamp : new Date()
 	});
-	//this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 };
 
 /**

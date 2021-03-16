@@ -2454,7 +2454,9 @@ Renderer.prototype.renderLightDepthCubeMaps = function (lightSourcesArray)
 	magoManager.effectsManager.setCurrentShader(currentShader);
 	currentShader.disableVertexAttribArrayAll();
 	currentShader.enableVertexAttribArray(currentShader.position3_loc);
-	gl.uniform1i(currentShader.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
+	// magoManager.postFxShadersManager.bUseLogarithmicDepth
+	var bUseLogarithmicDepth = false; // for lightMap no necessary logDepth precision.***
+	gl.uniform1i(currentShader.bUseLogarithmicDepth_loc, bUseLogarithmicDepth);
 	gl.uniform1f(currentShader.uFCoef_logDepth_loc, sceneState.fCoef_logDepth[0]);
 	gl.uniform1i(currentShader.bHasTexture_loc , false);
 	gl.uniform1i(currentShader.uFrustumIdx_loc, magoManager.currentFrustumIdx);

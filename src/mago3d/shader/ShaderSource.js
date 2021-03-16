@@ -9971,280 +9971,227 @@ void main()\n\
 		depthAux = gl_FragDepthEXT;\n\
 	}\n\
 	#endif\n\
-	/*\n\
-	if(bIsMakingDepth)\n\
-	{\n\
-		gl_FragData[0] = packDepth(depthAux);\n\
 \n\
-		vec3 encodedNormal = encodeNormal(vNormal);\n\
-		#ifdef USE_MULTI_RENDER_TARGET\n\
-		// check frustumIdx. There are 2 type of frustumsIdx :  0, 1, 2, 3 or 10, 11, 12, 13.***\n\
-		gl_FragData[1] = vec4(encodedNormal, 0.105); // save normal, frustumIdx = 10.***\n\
-		#endif\n\
+	vec2 texCoord;\n\
+\n\
+	vec4 textureColor = vec4(0.0);\n\
+\n\
+	if(colorType == 2) // texture color.\n\
+	{\n\
+		// Check if the texture is from a different depth tile texture.***\n\
+		vec2 finalTexCoord = vTexCoord;\n\
+		\n\
+		if(textureFlipYAxis)\n\
+		{\n\
+			texCoord = vec2(finalTexCoord.s, 1.0 - finalTexCoord.t);\n\
+		}\n\
+		else{\n\
+			texCoord = vec2(finalTexCoord.s, finalTexCoord.t);\n\
+		}\n\
+\n\
+		bool firstColorSetted = false;\n\
+\n\
+		if(uActiveTextures[2] > 0 && uActiveTextures[2] != 10)\n\
+			getTextureColor(uActiveTextures[2], texture2D(diffuseTex, texCoord), texCoord,  firstColorSetted, externalAlphasArray[2], textureColor);\n\
+		if(uActiveTextures[3] > 0 && uActiveTextures[3] != 10)\n\
+			getTextureColor(uActiveTextures[3], texture2D(diffuseTex_1, texCoord), texCoord,  firstColorSetted, externalAlphasArray[3], textureColor);\n\
+		if(uActiveTextures[4] > 0 && uActiveTextures[4] != 10)\n\
+			getTextureColor(uActiveTextures[4], texture2D(diffuseTex_2, texCoord), texCoord,  firstColorSetted, externalAlphasArray[4], textureColor);\n\
+		if(uActiveTextures[5] > 0 && uActiveTextures[5] != 10)\n\
+			getTextureColor(uActiveTextures[5], texture2D(diffuseTex_3, texCoord), texCoord,  firstColorSetted, externalAlphasArray[5], textureColor);\n\
+		if(uActiveTextures[6] > 0 && uActiveTextures[6] != 10)\n\
+			getTextureColor(uActiveTextures[6], texture2D(diffuseTex_4, texCoord), texCoord,  firstColorSetted, externalAlphasArray[6], textureColor);\n\
+		if(uActiveTextures[7] > 0 && uActiveTextures[7] != 10)\n\
+			getTextureColor(uActiveTextures[7], texture2D(diffuseTex_5, texCoord), texCoord,  firstColorSetted, externalAlphasArray[7], textureColor);\n\
+\n\
+		if(textureColor.w == 0.0)\n\
+		{\n\
+			discard;\n\
+			//textureColor = vec4(1.0, 0.0, 1.0, 1.0); // test.\n\
+		}\n\
+\n\
+	}\n\
+	else{\n\
+		textureColor = oneColor4;\n\
+	}\n\
+\n\
+	textureColor.w = externalAlpha;\n\
+	vec4 fogColor = vec4(0.9, 0.9, 0.9, 1.0);\n\
+	\n\
+	\n\
+	// Dem image.***************************************************************************************************************\n\
+	float altitude = 1000000.0;\n\
+	if(uActiveTextures[5] == 10)\n\
+	{\n\
+		// Bathymetry.***\n\
+		vec4 layersTextureColor = texture2D(diffuseTex_3, texCoord);\n\
+		//if(layersTextureColor.w > 0.0)\n\
+		{\n\
+			// decode the grayScale.***\n\
+			float sumAux = layersTextureColor.r;// + layersTextureColor.g + layersTextureColor.b;// + layersTextureColor.w;\n\
+\n\
+			float r = layersTextureColor.r*256.0;;\n\
+			float g = layersTextureColor.g;\n\
+			float b = layersTextureColor.b;\n\
+\n\
+			float maxHeight;\n\
+			float minHeight;\n\
+			float numDivs;\n\
+			float increHeight;\n\
+			float height;\n\
+			\n\
+			if(r < 0.0001)\n\
+			{\n\
+				// considering r=0.\n\
+				minHeight = -2796.0;\n\
+				maxHeight = -1000.0;\n\
+				numDivs = 2.0;\n\
+				increHeight = (maxHeight - minHeight)/(numDivs);\n\
+				height = (256.0*g + b)/(128.0);\n\
+			}\n\
+			else if(r > 0.5 && r < 1.5)\n\
+			{\n\
+				// considering r=1.\n\
+				minHeight = -1000.0;\n\
+				maxHeight = -200.0;\n\
+				numDivs = 2.0;\n\
+				increHeight = (maxHeight - minHeight)/(numDivs);\n\
+				height = (256.0*g + b)/(128.0);\n\
+			}\n\
+			else if(r > 1.5 && r < 2.5)\n\
+			{\n\
+				// considering r=2.\n\
+				minHeight = -200.0;\n\
+				maxHeight = 1.0;\n\
+				numDivs = 123.0;\n\
+				increHeight = (maxHeight - minHeight)/(numDivs);\n\
+				height = (256.0*g + b)/(128.0);\n\
+			}\n\
+\n\
+			height = (256.0*g + b)/(numDivs);\n\
+			altitude = minHeight + height * (maxHeight -minHeight);\n\
+		}\n\
+	}\n\
+	else if(uActiveTextures[5] == 20)\n\
+	{\n\
+		// waterMarkByAlpha.***\n\
+		// Check only alpha component.\n\
+		vec4 layersTextureColor = texture2D(diffuseTex_3, texCoord);\n\
+		float alpha = layersTextureColor.a;\n\
+		if(alpha > 0.0)\n\
+		{\n\
+			altitude = -100.0;\n\
+		}\n\
+		else\n\
+		{\n\
+			altitude = 100.0;\n\
+		}\n\
+	}\n\
+\n\
+	// End Dem image.------------------------------------------------------------------------------------------------------------\n\
+	float linearDepthAux = 1.0;\n\
+	vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
+\n\
+	vec3 ray = getViewRay(screenPos); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
+\n\
+	float linearDepth = getDepth(screenPos);  \n\
+	linearDepthAux = linearDepth;\n\
+\n\
+	vec3 normalFromDepth = vec3(0.0, 0.0, 1.0);\n\
+	//vec3 normalFromDepth = normal_from_depth(linearDepthAux, screenPos); // normal from depthTex.***\n\
+	//vec2 screenPosAux = vec2(0.5, 0.5);\n\
+\n\
+	//vec3 rayAux = getViewRay(screenPosAux); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
+	//float scalarProd = dot(normalFromDepth, normalize(-rayAux));\n\
+	//scalarProd /= 3.0;\n\
+	//scalarProd += 0.666;\n\
+\n\
+	////scalarProd /= 2.0;\n\
+	////scalarProd += 0.5;\n\
+\n\
+	float scalarProd = 1.0;\n\
+	\n\
+	if(altitude < 0.0)\n\
+	{\n\
+		float minHeight_rainbow = -100.0;\n\
+		float maxHeight_rainbow = 0.0;\n\
+		minHeight_rainbow = uMinMaxAltitudes.x;\n\
+		maxHeight_rainbow = uMinMaxAltitudes.y;\n\
+		\n\
+		float gray = (altitude - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);\n\
+		//float gray = (vAltitude - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);\n\
+		//vec3 rainbowColor = getRainbowColor_byHeight(altitude);\n\
+\n\
+		// caustics.*********************\n\
+		if(bApplyCaustics)\n\
+		{\n\
+			int tileDepth = int(floor(vTileDepth + 0.1));\n\
+			if(uTime > 0.0 && tileDepth > 6 && gray > 0.0)//&& altitude > -120.0)\n\
+			{\n\
+				// Active this code if want same size caustic effects for different tileDepths.***\n\
+				// Take tileDepth 14 as the unitary tile depth.\n\
+				//float tileDethDiff = float(16 - tileDepth);\n\
+				//vec2 cauticsTexCoord = texCoord*pow(2.0, tileDethDiff);\n\
+				//-----------------------------------------------------------------------\n\
+				vec2 cauticsTexCoord = texCoord;\n\
+				vec3 causticColor = causticColor(cauticsTexCoord)*gray*0.3;\n\
+				textureColor = vec4(textureColor.r+ causticColor.x, textureColor.g+ causticColor.y, textureColor.b+ causticColor.z, 1.0);\n\
+			}\n\
+		}\n\
+		// End caustics.--------------------------\n\
+		\n\
+		if(gray < 0.05)\n\
+		gray = 0.05;\n\
+		float red = gray + 0.2;\n\
+		float green = gray + 0.6;\n\
+		float blue = gray*2.0 + 2.0;\n\
+		fogColor = vec4(red, green, blue, 1.0);\n\
+\n\
+		// Something like to HillShade .*********************************************************************************\n\
+		vec3 lightDir = normalize(vec3(1.0, 1.0, 0.0));\n\
+		float scalarProd_2d = dot(lightDir, normalFromDepth);\n\
+		\n\
+		scalarProd_2d /= 2.0;\n\
+		scalarProd_2d += 0.8;\n\
+\n\
+		//scalarProd_2d *= scalarProd_2d;\n\
+		textureColor *= vec4(textureColor.r*scalarProd_2d, textureColor.g*scalarProd_2d, textureColor.b, textureColor.a);\n\
+		// End Something like to HillShade.---------------------------------------------------------------------------------\n\
+		\n\
+		// End test drawing grid.---\n\
+		//float specularReflectionCoef = 0.6;\n\
+		//vec3 specularColor = vec3(0.8, 0.8, 0.8);\n\
+		//textureColor = mix(textureColor, fogColor, 0.2); \n\
+		//gl_FragData[0] = vec4(finalColor.xyz + specularReflectionCoef * specular * specularColor , 1.0); // with specular.***\n\
+		gl_FragData[0] = vec4(textureColor.xyz * scalarProd, 1.0); // original.***\n\
 \n\
 		return;\n\
 	}\n\
-	else\n\
-	*/\n\
-	{\n\
-		/*\n\
-		if(uRenderType == 2)\n\
-		{\n\
-			gl_FragData[0] = oneColor4; \n\
-			return;\n\
-		}\n\
-\n\
-		if(uSeaOrTerrainType == 1)\n\
-		{\n\
-			gl_FragData[0] = vec4(oneColor4.xyz, 0.5); // original.***\n\
-			// Render a dot matrix in the sea surface. TODO.***\n\
-\n\
-			return;\n\
-		}\n\
-		*/\n\
-\n\
+	//else{\n\
 		\n\
+		//if(uSeaOrTerrainType == 1)\n\
+		//discard;\n\
+	//}\n\
+	\n\
+	//vec4 finalColor = mix(textureColor, fogColor, vFogAmount); \n\
 \n\
-		\n\
-		// Do specular lighting.***\n\
-		vec3 normal2 = vNormal;	\n\
-		float lambertian = 1.0;\n\
-		float specular;\n\
-		vec2 texCoord;\n\
+	//gl_FragData[0] = vec4(finalColor.xyz * scalarProd, 1.0); // original.***\n\
+	//gl_FragData[0] = textureColor; // test.***\n\
+	//gl_FragData[0] = vec4(vNormal.xyz, 1.0); // test.***\n\
+	gl_FragData[0] = packDepth(depthAux);  // anything.\n\
 \n\
-		\n\
-		// check if apply ssao.\n\
-		float occlusion = 1.0;\n\
-\n\
-		vec4 textureColor = vec4(0.0);\n\
-		/*\n\
-		if(colorType == 0) // one color.\n\
-		{\n\
-			textureColor = oneColor4;\n\
-			\n\
-			if(textureColor.w == 0.0)\n\
-			{\n\
-				discard;\n\
-			}\n\
-		}\n\
-		*/\n\
-		if(colorType == 2) // texture color.\n\
-		{\n\
-			// Check if the texture is from a different depth tile texture.***\n\
-			vec2 finalTexCoord = vTexCoord;\n\
-			\n\
-			if(textureFlipYAxis)\n\
-			{\n\
-				texCoord = vec2(finalTexCoord.s, 1.0 - finalTexCoord.t);\n\
-			}\n\
-			else{\n\
-				texCoord = vec2(finalTexCoord.s, finalTexCoord.t);\n\
-			}\n\
-\n\
-			bool firstColorSetted = false;\n\
-			float externalAlpha = 0.0;\n\
-\n\
-			if(uActiveTextures[2] > 0 && uActiveTextures[2] != 10)\n\
-				getTextureColor(uActiveTextures[2], texture2D(diffuseTex, texCoord), texCoord,  firstColorSetted, externalAlphasArray[2], textureColor);\n\
-			if(uActiveTextures[3] > 0 && uActiveTextures[3] != 10)\n\
-				getTextureColor(uActiveTextures[3], texture2D(diffuseTex_1, texCoord), texCoord,  firstColorSetted, externalAlphasArray[3], textureColor);\n\
-			if(uActiveTextures[4] > 0 && uActiveTextures[4] != 10)\n\
-				getTextureColor(uActiveTextures[4], texture2D(diffuseTex_2, texCoord), texCoord,  firstColorSetted, externalAlphasArray[4], textureColor);\n\
-			if(uActiveTextures[5] > 0 && uActiveTextures[5] != 10)\n\
-				getTextureColor(uActiveTextures[5], texture2D(diffuseTex_3, texCoord), texCoord,  firstColorSetted, externalAlphasArray[5], textureColor);\n\
-			if(uActiveTextures[6] > 0 && uActiveTextures[6] != 10)\n\
-				getTextureColor(uActiveTextures[6], texture2D(diffuseTex_4, texCoord), texCoord,  firstColorSetted, externalAlphasArray[6], textureColor);\n\
-			if(uActiveTextures[7] > 0 && uActiveTextures[7] != 10)\n\
-				getTextureColor(uActiveTextures[7], texture2D(diffuseTex_5, texCoord), texCoord,  firstColorSetted, externalAlphasArray[7], textureColor);\n\
-\n\
-			if(textureColor.w == 0.0)\n\
-			{\n\
-				discard;\n\
-				//textureColor = vec4(1.0, 0.0, 1.0, 1.0); // test.\n\
-			}\n\
-\n\
-		}\n\
-		else{\n\
-			textureColor = oneColor4;\n\
-		}\n\
-\n\
-		textureColor.w = externalAlpha;\n\
-		vec4 fogColor = vec4(0.9, 0.9, 0.9, 1.0);\n\
-		\n\
-		\n\
-		// Dem image.***************************************************************************************************************\n\
-		float altitude = 1000000.0;\n\
-		if(uActiveTextures[5] == 10)\n\
-		{\n\
-			// Bathymetry.***\n\
-			vec4 layersTextureColor = texture2D(diffuseTex_3, texCoord);\n\
-			//if(layersTextureColor.w > 0.0)\n\
-			{\n\
-				// decode the grayScale.***\n\
-				float sumAux = layersTextureColor.r;// + layersTextureColor.g + layersTextureColor.b;// + layersTextureColor.w;\n\
-\n\
-				float r = layersTextureColor.r*256.0;;\n\
-				float g = layersTextureColor.g;\n\
-				float b = layersTextureColor.b;\n\
-\n\
-				float maxHeight;\n\
-				float minHeight;\n\
-				float numDivs;\n\
-				float increHeight;\n\
-				float height;\n\
-				\n\
-				if(r < 0.0001)\n\
-				{\n\
-					// considering r=0.\n\
-					minHeight = -2796.0;\n\
-					maxHeight = -1000.0;\n\
-					numDivs = 2.0;\n\
-                    increHeight = (maxHeight - minHeight)/(numDivs);\n\
-                    height = (256.0*g + b)/(128.0);\n\
-				}\n\
-				else if(r > 0.5 && r < 1.5)\n\
-				{\n\
-					// considering r=1.\n\
-					minHeight = -1000.0;\n\
-					maxHeight = -200.0;\n\
-					numDivs = 2.0;\n\
-                    increHeight = (maxHeight - minHeight)/(numDivs);\n\
-                    height = (256.0*g + b)/(128.0);\n\
-				}\n\
-				else if(r > 1.5 && r < 2.5)\n\
-				{\n\
-					// considering r=2.\n\
-					minHeight = -200.0;\n\
-					maxHeight = 1.0;\n\
-					numDivs = 123.0;\n\
-                    increHeight = (maxHeight - minHeight)/(numDivs);\n\
-                    height = (256.0*g + b)/(128.0);\n\
-				}\n\
-\n\
-                height = (256.0*g + b)/(numDivs);\n\
-				altitude = minHeight + height * (maxHeight -minHeight);\n\
-			}\n\
-		}\n\
-		else if(uActiveTextures[5] == 20)\n\
-		{\n\
-			// waterMarkByAlpha.***\n\
-			// Check only alpha component.\n\
-			vec4 layersTextureColor = texture2D(diffuseTex_3, texCoord);\n\
-			float alpha = layersTextureColor.a;\n\
-			if(alpha > 0.0)\n\
-			{\n\
-				altitude = -100.0;\n\
-			}\n\
-			else\n\
-			{\n\
-				altitude = 100.0;\n\
-			}\n\
-		}\n\
-\n\
-		// End Dem image.------------------------------------------------------------------------------------------------------------\n\
-		float linearDepthAux = 1.0;\n\
-		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
-\n\
-		vec3 ray = getViewRay(screenPos); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
-\n\
-		float linearDepth = getDepth(screenPos);  \n\
-		linearDepthAux = linearDepth;\n\
-\n\
-		vec3 normalFromDepth = vec3(0.0, 0.0, 1.0);\n\
-		//vec3 normalFromDepth = normal_from_depth(linearDepthAux, screenPos); // normal from depthTex.***\n\
-		//vec2 screenPosAux = vec2(0.5, 0.5);\n\
-\n\
-		//vec3 rayAux = getViewRay(screenPosAux); // The \"far\" for depthTextures if fixed in \"RenderShowDepthVS\" shader.\n\
-		//float scalarProd = dot(normalFromDepth, normalize(-rayAux));\n\
-		//scalarProd /= 3.0;\n\
-		//scalarProd += 0.666;\n\
-\n\
-		////scalarProd /= 2.0;\n\
-		////scalarProd += 0.5;\n\
-\n\
-		float scalarProd = 1.0;\n\
-		\n\
-		if(altitude < 0.0)\n\
-		{\n\
-			float minHeight_rainbow = -100.0;\n\
-			float maxHeight_rainbow = 0.0;\n\
-			minHeight_rainbow = uMinMaxAltitudes.x;\n\
-			maxHeight_rainbow = uMinMaxAltitudes.y;\n\
-			\n\
-			float gray = (altitude - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);\n\
-			//float gray = (vAltitude - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);\n\
-			//vec3 rainbowColor = getRainbowColor_byHeight(altitude);\n\
-\n\
-			// caustics.*********************\n\
-			if(bApplyCaustics)\n\
-			{\n\
-				int tileDepth = int(floor(vTileDepth + 0.1));\n\
-				if(uTime > 0.0 && tileDepth > 6 && gray > 0.0)//&& altitude > -120.0)\n\
-				{\n\
-					// Active this code if want same size caustic effects for different tileDepths.***\n\
-					// Take tileDepth 14 as the unitary tile depth.\n\
-					//float tileDethDiff = float(16 - tileDepth);\n\
-					//vec2 cauticsTexCoord = texCoord*pow(2.0, tileDethDiff);\n\
-					//-----------------------------------------------------------------------\n\
-					vec2 cauticsTexCoord = texCoord;\n\
-					vec3 causticColor = causticColor(cauticsTexCoord)*gray*0.3;\n\
-					textureColor = vec4(textureColor.r+ causticColor.x, textureColor.g+ causticColor.y, textureColor.b+ causticColor.z, 1.0);\n\
-				}\n\
-			}\n\
-			// End caustics.--------------------------\n\
-			\n\
-			if(gray < 0.05)\n\
-			gray = 0.05;\n\
-			float red = gray + 0.2;\n\
-			float green = gray + 0.6;\n\
-			float blue = gray*2.0 + 2.0;\n\
-			fogColor = vec4(red, green, blue, 1.0);\n\
-\n\
-			// Something like to HillShade .*********************************************************************************\n\
-			vec3 lightDir = normalize(vec3(1.0, 1.0, 0.0));\n\
-			float scalarProd_2d = dot(lightDir, normalFromDepth);\n\
-			\n\
-			scalarProd_2d /= 2.0;\n\
-			scalarProd_2d += 0.8;\n\
-\n\
-			//scalarProd_2d *= scalarProd_2d;\n\
-			textureColor *= vec4(textureColor.r*scalarProd_2d, textureColor.g*scalarProd_2d, textureColor.b, textureColor.a);\n\
-			// End Something like to HillShade.---------------------------------------------------------------------------------\n\
-			\n\
-			// End test drawing grid.---\n\
-			//float specularReflectionCoef = 0.6;\n\
-			//vec3 specularColor = vec3(0.8, 0.8, 0.8);\n\
-			//textureColor = mix(textureColor, fogColor, 0.2); \n\
-			//gl_FragData[0] = vec4(finalColor.xyz * lambertian + specularReflectionCoef * specular * specularColor , 1.0); // with specular.***\n\
-			gl_FragData[0] = vec4(textureColor.xyz *lambertian * scalarProd, 1.0); // original.***\n\
-\n\
-			return;\n\
-		}\n\
-		//else{\n\
-			\n\
-			//if(uSeaOrTerrainType == 1)\n\
-			//discard;\n\
-		//}\n\
-		\n\
-		//vec4 finalColor = mix(textureColor, fogColor, vFogAmount); \n\
-\n\
-		//gl_FragData[0] = vec4(finalColor.xyz * lambertian * scalarProd, 1.0); // original.***\n\
-		//gl_FragData[0] = textureColor; // test.***\n\
-		//gl_FragData[0] = vec4(vNormal.xyz, 1.0); // test.***\n\
-		gl_FragData[0] = packDepth(depthAux);  // anything.\n\
-\n\
-		\n\
-		#ifdef USE_MULTI_RENDER_TARGET\n\
-			gl_FragData[1] = packDepth(depthAux);  // depth.\n\
-			vec3 normal = vNormal;\n\
-			if(normal.z < 0.0)\n\
-			normal *= -1.0;\n\
-			vec3 encodedNormal = encodeNormal(normal);\n\
-			gl_FragData[2] = vec4(encodedNormal, 0.005); // normal.***\n\
-			//gl_FragData[2] = vec4(0.0, 0.0, 1.0, 1.0); // normal.***\n\
-			gl_FragData[3] = vec4(textureColor); // albedo.***\n\
-		#endif\n\
-	}\n\
+	\n\
+	#ifdef USE_MULTI_RENDER_TARGET\n\
+		gl_FragData[1] = packDepth(depthAux);  // depth.\n\
+		vec3 normal = vNormal;\n\
+		if(normal.z < 0.0)\n\
+		normal *= -1.0;\n\
+		vec3 encodedNormal = encodeNormal(normal);\n\
+		gl_FragData[2] = vec4(encodedNormal, 0.005); // normal.***\n\
+		//gl_FragData[2] = vec4(0.0, 0.0, 1.0, 1.0); // normal.***\n\
+		gl_FragData[3] = vec4(textureColor); // albedo.***\n\
+	#endif\n\
+	\n\
 }";
 ShaderSource.TinTerrainVS = "\n\
 \n\

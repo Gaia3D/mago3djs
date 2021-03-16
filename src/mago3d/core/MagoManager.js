@@ -95,7 +95,7 @@ var MagoManager = function (config)
 	 * 
 	 * @private
 	 */
-	this.smartTileManager = new SmartTileManager();
+	this.smartTileManager = new SmartTileManager({magoManager : this});
 	
 	/**
 	 * Manages & controls the deleting objects queue.
