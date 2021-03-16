@@ -329,7 +329,8 @@ gulp.task('doc', function (cb)
 		'./src/mago3d/interaction/TranslateInteraction.js',
 		'./src/mago3d/core/ObjectMarkerManager.js',
 		'./src/mago3d/geometry/Modeler.js',
-		'./src/mago3d/renderer/SelectionManager.js'
+		'./src/mago3d/renderer/SelectionManager.js',
+		'./src/mago3d/f4d/Node.js'
 	], {read: true})
 		.pipe(jsdoc(config, cb));
 });
