@@ -51,12 +51,6 @@ var SelectionManager = function(magoManager)
 	this.selectionFbo = new FBO(this.magoManager.getGl(), this.magoManager.sceneState.drawingBufferWidth[0], this.magoManager.sceneState.drawingBufferHeight[0], {matchCanvasSize: true});
 };
 
-/**
- * SelectionManager
- * 
- * @alias SelectionManager
- * @class SelectionManager
- */
 SelectionManager.prototype.newCandidatesFamily = function(candidatesFamilyTypeName)
 {
 	var selCandidate = new SelectionCandidateFamily();
@@ -65,23 +59,11 @@ SelectionManager.prototype.newCandidatesFamily = function(candidatesFamilyTypeNa
 	return selCandidate;
 };
 
-/**
- * SelectionManager
- * 
- * @alias SelectionManager
- * @class SelectionManager
- */
 SelectionManager.prototype.getSelectionCandidatesFamily = function(familyName)
 {
 	return this.selCandidatesFamilyMap[familyName];
 };
 
-/**
- * SelectionManager
- * 
- * @alias SelectionManager
- * @class SelectionManager
- */
 SelectionManager.prototype.setCandidateCustom = function(idxKey, familyName, object)
 {
 	var selCandidatesFamily = this.getSelectionCandidatesFamily(familyName);
@@ -91,33 +73,19 @@ SelectionManager.prototype.setCandidateCustom = function(idxKey, familyName, obj
 	}
 };
 
-/**
- * SelectionManager. Recomended. Use this for all selection process.
- * 
- * @alias SelectionManager
- * @class SelectionManager
- */
 SelectionManager.prototype.setCandidateGeneral = function(idxKey, candidateObject)
 {
 	this.selCandidatesMap[idxKey] = candidateObject;
 };
 
-/**
- * SelectionManager
- * 
- * @alias SelectionManager
- * @class SelectionManager
- */
 SelectionManager.prototype.getCandidateGeneral = function(idxKey)
 {
 	return this.selCandidatesMap[idxKey];
 };
 
 /**
- * SelectionManager
- * 
- * @alias SelectionManager
- * @class SelectionManager
+ * 선택된 native 모델을 반환. 여러개중 가장 최신에 선택된 모델을 반환.
+ * @return {MagoRenderable}
  */
 SelectionManager.prototype.getSelectedGeneral = function()
 {
@@ -125,33 +93,19 @@ SelectionManager.prototype.getSelectedGeneral = function()
 };
 
 /**
- * SelectionManager
- * 
- * @alias SelectionManager
- * @class SelectionManager
+ * 선택된 native 모델들을 반환.
+ * @return {Array<MagoRenderable>}
  */
 SelectionManager.prototype.getSelectedGeneralArray = function()
 {
 	return this.currentGeneralObjectSelectedArray;
 };
 
-/**
- * SelectionManager
- * 
- * @alias SelectionManager
- * @class SelectionManager
- */
 SelectionManager.prototype.setSelectedGeneral = function (selectedObject)
 {
 	this.currentGeneralObjectSelected = selectedObject;
 };
 
-/**
- * SelectionManager
- * 
- * @alias SelectionManager
- * @class SelectionManager
- */
 SelectionManager.prototype.getSelectedF4dBuilding = function()
 {
 	if (this.currentNodeSelected)
@@ -161,12 +115,6 @@ SelectionManager.prototype.getSelectedF4dBuilding = function()
 	return undefined;
 };
 
-/**
- * SelectionManager
- * 
- * @alias SelectionManager
- * @class SelectionManager
- */
 SelectionManager.prototype.getSelectedF4dBuildingArray = function()
 {
 	var buildingArray = [];
@@ -181,22 +129,14 @@ SelectionManager.prototype.getSelectedF4dBuildingArray = function()
 	return buildingArray;
 };
 
-/**
- * SelectionManager
- * 
- * @alias SelectionManager
- * @class SelectionManager
- */
 SelectionManager.prototype.setSelectedF4dBuilding = function(building)
 {
 	this.currentBuildingSelected = building;
 };
 
 /**
- * SelectionManager
- * 
- * @alias SelectionManager
- * @class SelectionManager
+ * 선택된 f4d object 모델을 반환. 여러개중 가장 최신에 선택된 모델을 반환.
+ * @return {NeoReference}
  */
 SelectionManager.prototype.getSelectedF4dObject = function()
 {
@@ -204,32 +144,22 @@ SelectionManager.prototype.getSelectedF4dObject = function()
 };
 
 /**
- * SelectionManager
- * 
- * @alias SelectionManager
- * @class SelectionManager
+ * 선택된 f4d object 모델들을 반환.
+ * @return {Array<NeoReference>}
  */
 SelectionManager.prototype.getSelectedF4dObjectArray = function()
 {
 	return this.currentReferenceSelectedArray;
 };
 
-/**
- * SelectionManager
- * 
- * @alias SelectionManager
- * @class SelectionManager
- */
 SelectionManager.prototype.setSelectedF4dObject = function(object)
 {
 	this.currentReferenceSelected = object;
 };
 
 /**
- * SelectionManager
- * 
- * @alias SelectionManager
- * @class SelectionManager
+ * 선택된 f4d 모델을 반환. 여러개중 가장 최신에 선택된 모델을 반환.
+ * @return {Node}
  */
 SelectionManager.prototype.getSelectedF4dNode = function ()
 {
@@ -258,33 +188,19 @@ SelectionManager.prototype.existSelectedObjects = function()
 };
 
 /**
- * SelectionManager
- * 
- * @alias SelectionManager
- * @class SelectionManager
+ * 선택된 f4d 모델들을 반환.
+ * @return {Array<Node>}
  */
 SelectionManager.prototype.getSelectedF4dNodeArray = function()
 {
 	return this.currentNodeSelectedArray;
 };
 
-/**
- * SelectionManager
- * 
- * @alias SelectionManager
- * @class SelectionManager
- */
 SelectionManager.prototype.setSelectedF4dNode = function (node)
 {
 	this.currentNodeSelected = node;
 };
 
-/**
- * SelectionManager
- * 
- * @alias SelectionManager
- * @class SelectionManager
- */
 SelectionManager.prototype.setCandidates = function (idxKey, reference, octree, building, node)
 {
 	if (reference)
@@ -309,12 +225,6 @@ SelectionManager.prototype.setCandidates = function (idxKey, reference, octree, 
 
 };
 
-/**
- * SelectionManager
- * 
- * @alias SelectionManager
- * @class SelectionManager
- */
 SelectionManager.prototype.clearCandidates = function()
 {
 	this.referencesMap = {};
@@ -336,12 +246,6 @@ SelectionManager.prototype.clearCandidates = function()
 	this.selCandidatesMap = {};
 };
 
-/**
- * SelectionManager
- * 
- * @alias SelectionManager
- * @class SelectionManager
- */
 SelectionManager.prototype.selectObjects = function (idxKey)
 {
 	// Function no used.!!!!!!!!!!!!!
@@ -392,10 +296,7 @@ SelectionManager.prototype.isObjectSelected = function(object)
 };
 
 /**
- * SelectionManager
- * 
- * @alias SelectionManager
- * @class SelectionManager
+ * 선택된 객체을 선택 해제
  */
 SelectionManager.prototype.clearCurrents = function ()
 {
@@ -422,12 +323,7 @@ SelectionManager.prototype.clearCurrents = function ()
 	this.currentGeneralObjectSelectedArray = []; 
 	this.magoManager.isCameraMoved = true;
 };
-/**
- * SelectionManager
- * 
- * @alias SelectionManager
- * @class SelectionManager
- */
+
 SelectionManager.prototype.clearProvisionals = function()
 {
 	this.provisionalF4dArray = [];
@@ -435,12 +331,6 @@ SelectionManager.prototype.clearProvisionals = function()
 	this.provisionalNativeArray = [];
 };
 
-/**
- * SelectionManager
- * 
- * @alias SelectionManager
- * @class SelectionManager
- */
 SelectionManager.prototype.TEST__CurrGeneralObjSel = function()
 {
 	if (this.currentGeneralObjectSelected)
@@ -606,9 +496,11 @@ SelectionManager.prototype.selectProvisionalObjectByPixel = function (gl, mouseX
 };
 
 /**
- * 
+ * 선택 후보 객체들을 필터 펑션을 통해 걸러냄
  * @param {string} type required.
  * @param {function} filter option.
+ * 
+ * @private
  */
 SelectionManager.prototype.filterProvisional = function(type, filter)
 {
@@ -677,9 +569,11 @@ SelectionManager.prototype.filterProvisional = function(type, filter)
 };
 
 /**
- * 
+ * 후보 객체를 선택된 객체로 변경
  * @param {string} type required.
  * @param {function} filter option.
+ * 
+ * @private
  */
 SelectionManager.prototype.provisionalToCurrent = function (type, filter, maintain) 
 {

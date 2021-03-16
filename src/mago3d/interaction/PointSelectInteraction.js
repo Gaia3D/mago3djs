@@ -1,10 +1,10 @@
 'use strict';
 
 /**
- * This is the interaction for draw geometry.
+ * This is the interaction for select data.
  * @constructor
- * @class GeometrySelectInteraction
- * 
+ * @class PointSelectInteraction
+ * @extends {AbsClickInteraction}
  * 
  * @param {object} option layer object.
  */
@@ -17,9 +17,25 @@ var PointSelectInteraction = function(option)
 	option = option ? option : {};
 	AbsClickInteraction.call(this, option);
 	
+	/**
+	 * selected object
+	 * @type {Node | MagoRenderable}
+	 * @default undefined
+	 */
 	this.selected = undefined;
 
+	/**
+	 * select target type. f4d, native, object
+	 * @type {string}
+	 * @default DataType.F4D
+	 */
 	this.targetType = defaultValue(option.targetType, DataType.F4D);
+
+	/**
+	 * when mouse over target, target highlighting
+	 * @type {string}
+	 * @default true
+	 */
 	this.targetHighlight = defaultValue(option.targetHighlight, true);
 
 	this._initFilter();
@@ -42,6 +58,7 @@ PointSelectInteraction.EVENT_TYPE = {
 };
 /**
  * interaction init
+ * @private
  */
 PointSelectInteraction.prototype.init = function() 
 {
@@ -152,6 +169,7 @@ PointSelectInteraction.prototype.getTargetHighlight = function()
 /**
  * handle event
  * @param {BrowserEvent} browserEvent
+ * @private
  */
 PointSelectInteraction.prototype.handleDownEvent = function(browserEvent)
 {
@@ -160,6 +178,9 @@ PointSelectInteraction.prototype.handleDownEvent = function(browserEvent)
 /**
  * handle event
  * @param {BrowserEvent} browserEvent
+ * 
+ * @fires MagoManager#EVENT_TYPE.SELECTEDF4D
+ * @fires MagoManager#EVENT_TYPE.DESELECTEDF4D
  */
 PointSelectInteraction.prototype.handleUpEvent = function(browserEvent)
 {
@@ -253,6 +274,7 @@ PointSelectInteraction.prototype.handleMoveEvent = function(browserEvent)
  * select 
  * @param {Point2D} screenCoordinate
  * @param {boolean} bObject
+ * @private
  */
 PointSelectInteraction.prototype.select = function (screenCoordinate)
 {
@@ -276,6 +298,7 @@ PointSelectInteraction.prototype.select = function (screenCoordinate)
 /**
  * clear 
  * @param {boolean} silence 
+ * @fires MagoManager#EVENT_TYPE.DESELECTEDF4D
  */
 PointSelectInteraction.prototype.clear = function(silence)
 {

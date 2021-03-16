@@ -4,13 +4,13 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width">
 	<title>Cesium</title>
-	<link rel="stylesheet" href="./demo.css" />
-	<link rel="stylesheet" href="../src/engine/cesium/Widgets/widgets.css" />
-	<link rel="stylesheet" href="../externlib/jquery-ui/jquery-ui.css" />
-	<script type="text/javascript" src="../externlib/jquery/jquery.js"></script>
-	<script type="text/javascript" src="../externlib/jquery-i18next/jquery-i18next.min.js"></script>
-	<script type="text/javascript" src="../externlib/polyfill/decodeTextAlternative/encoding-indexes.js"></script>
-	<script type="text/javascript" src="../externlib/polyfill/decodeTextAlternative/encoding.js"></script>
+	<link rel="stylesheet" href="/sample/demo.css" />
+	<link rel="stylesheet" href="/src/engine/cesium/Widgets/widgets.css" />
+	<link rel="stylesheet" href="/externlib/jquery-ui/jquery-ui.css" />
+	<script type="text/javascript" src="/externlib/jquery/jquery.js"></script>
+	<script type="text/javascript" src="/externlib/jquery-i18next/jquery-i18next.min.js"></script>
+	<script type="text/javascript" src="/externlib/polyfill/decodeTextAlternative/encoding-indexes.js"></script>
+	<script type="text/javascript" src="/externlib/polyfill/decodeTextAlternative/encoding.js"></script>
 </head>
 
 <body>
@@ -26,53 +26,15 @@
 </ul>
 <div id="magoContainer" class="mapWrap"></div>
 
-<script type="text/javascript" src="../src/engine/cesium/Cesium.js"></script>
-<script type="text/javascript" src="../build/mago3d/mago3d.js"></script>
+<script type="text/javascript" src="/src/engine/cesium/Cesium.js"></script>
+<script type="text/javascript" src="/build/mago3d/mago3d.js"></script>
 <script>
-	var message = new Mago3D.Message(i18next);
-	
-	//f4d path, default data array, 
-	var dataInfo = {
-		baseUrl : '/f4d',
-		dataArrat : []
-	}
-
-	function changeLang(lang) 
-	{
-		if(i18next === undefined)
-		{
-			return;
-		}
-		
-		var language = lang || i18next.language;
-		var namespace = i18next.options.ns[0];
-
-		$.ajax({
-			url: "/locales/"+namespace+"/"+language+".json",
-			type: "GET",
-			dataType: "json",
-			success: function(data){
-				i18next.addResourceBundle(language, namespace, data, true, true);
-				i18next.changeLanguage(language);
-			},
-			error: function(e){
-				alert(e.responseText);
-			}
-		});
-	}
-	
-	message.init(function (){
-		i18next = message.getHandle();
-		i18next.on('languageChanged', function (lang) {
-			$('.i18n').localize();
-		});
-		jqueryI18next.init(i18next, $);
-		changeLang();
-	});
+	var SAMPLE_PATH = "/sample/";
+	var DATA_INFORMATION_PATH = SAMPLE_PATH + "/persistence/json/";
+	var F4D_PATH = SAMPLE_PATH + "/sample/f4d/";
 
 	var MAGO3D_INSTANCE;
-	var imagePath = "/images/ko";
-	var dataInformationUrl = "/sample/persistence/json/";
+	//mago3d 시작
 	magoStart(null, "magoContainer", imagePath);
 
     // mago3d 시작, 정책 데이터 파일을 로딩
@@ -109,46 +71,26 @@
 		console.info('Complete construct mago3d instance. Enjoy!');
 		
 		var magoInstance = e;
+		var f4dController = magoInstance.getF4dController();
 		console.info(magoInstance)
 		magoInstance.getViewer().scene.globe.depthTestAgainstTerrain = true;
 		magoInstance.setBaseUrl(dataInfo.baseUrl);
 
-
-		var osm = new Cesium.OpenStreetMapImageryProvider({
-			url : 'https://{s}.tile.openstreetmap.org/'
-		});
-
-		var positron = new Cesium.UrlTemplateImageryProvider({
-			url : 'http://xdworld.vworld.kr:8080/2d/Base/201802/{z}/{x}/{y}.png'
-		});
-
-		//magoInstance.getViewer().imageryLayers.addImageryProvider(osm,1);
-		
-		var magoManager = magoInstance.getMagoManager();
-		var viewer = magoInstance.getViewer();
-		var provider = new Cesium.WebMapServiceImageryProvider({
-			url : 'http://localhost:8080/geoserver/mago3d/gwc/service/wms',
-			layers : 'mago3d:susim_5m',
-			tilingScheme : new Cesium.WebMercatorTilingScheme(),
-			parameters: {
-				tiled: true,
-				transparent : true,
-				srs : 'EPSG:3857',
-            	format: "image/png"
+		$.ajax({
+			url: dataInformationUrl + "totalJson.json",
+			type: "GET",
+			dataType: "json",
+			success: function(json){
+				console.info(json);
+				f4dController.addF4dGroup(json);
+			},
+			error: function(e){
+				alert(e.responseText);
 			}
 		});
-		var aa = new Cesium.ImageryLayer(provider, {
-			alpha : 0.9
-		});
-//viewer.imageryLayers.add(aa);
-		var layer = new Mago3D.MagoLayer({
-			dataGroupId : 1,
-			dataGroupKey : '3ds',
-			dataGroupName : '삼디에스',
-			dataGroupPath : '/3ds'
-		});
-		
-		magoManager.addLayer(layer);
+
+		var magoManager = magoInstance.getMagoManager();
+		var viewer = magoInstance.getViewer();
 
 		magoManager.on(Mago3D.MagoManager.EVENT_TYPE.CLICK, function(e){
 			console.info(e);
@@ -172,89 +114,41 @@
 		magoManager.on(Mago3D.MagoManager.EVENT_TYPE.DESELECTEDF4D, function(e){
 			console.info(e);
 		});
-		
-		var f4dController = e.getF4dController();
-
-		
-		f4dController.addSmartTileGroup({
-            dataGroupId : 10000,
-            dataGroupKey : 'IncheonGayang',
-            dataGroupName : '계양시 건물들',
-            dataGroupPath : 'IncheonGayang/',
-            smartTileIndexPath: "SmartTiles_IncheonGayang"
-		});
-		
-		
-		f4dController.addSmartTileGroup({
-            dataGroupId : 10000,
-            dataGroupKey : 'Incheon_Mirae',
-            dataGroupName : '계양시 건물들',
-            dataGroupPath : 'Incheon_Mirae/',
-            smartTileIndexPath: "_TILE_Incheon_Mirae"
-		});
-		
-
-		/*
-		// hyemi smartTiles
-		f4dController.addSmartTileGroup({
-            dataGroupId : 10000,
-            dataGroupKey : 'test',
-            dataGroupName : '계양시 건물들',
-            dataGroupPath : 'test/',
-            smartTileIndexPath: "smartTiles_hyemi"
-		});
-		*/
-		
 	}
-	// 3ds, pointsCloud, sihung_campus, sihung_las, suseong, IncheonGayang, IncheonGyeyang_2
-	function doTest(){
-		var f4dController = MAGO3D_INSTANCE.getF4dController();
-		var magoManager = MAGO3D_INSTANCE.getMagoManager();
-		/*
+	
+	var message = new Mago3D.Message(i18next);
+	function changeLang(lang) 
+	{
+		if(i18next === undefined)
+		{
+			return;
+		}
+		
+		var language = lang || i18next.language;
+		var namespace = i18next.options.ns[0];
+
 		$.ajax({
-			url: dataInformationUrl + "3ds.json",
+			url: "/locales/"+namespace+"/"+language+".json",
 			type: "GET",
 			dataType: "json",
-			success: function(f4dObject){
-				f4dController.addF4dGroup(f4dObject);
+			success: function(data){
+				i18next.addResourceBundle(language, namespace, data, true, true);
+				i18next.changeLanguage(language);
 			},
 			error: function(e){
 				alert(e.responseText);
 			}
 		});
-		*/
-
-		//---------------------------------------------------------------
-		
-		var arr = [
-            [
-                126.75195,
-                37.54664
-              ],
-              [
-                126.75097,
-                37.54285
-              ],
-              [
-                126.75494,
-                37.54239
-              ],
-              [
-                126.75590,
-                37.54652
-              ]
-        ];
-        var gcarr = [];
-        for(var i in arr) {
-            var geocoord = arr[i];
-           
-            gcarr.push(new Mago3D.GeographicCoord(geocoord[0], geocoord[1], 0));
-        }
-       
-        var polygon2d = Mago3D.Polygon2D.makePolygonByGeographicCoordArray(gcarr);
-		var selected = MAGO3D_INSTANCE.getMagoManager().selectionManager.selectionByPolygon2D(polygon2d, Mago3D.DataType.NATIVE);
-		
 	}
+	
+	message.init(function (){
+		i18next = message.getHandle();
+		i18next.on('languageChanged', function (lang) {
+			$('.i18n').localize();
+		});
+		jqueryI18next.init(i18next, $);
+		changeLang();
+	});
 </script>
 </body>
 </html>

@@ -86,7 +86,7 @@ F4dController.prototype.addSmartTileGroup = function(f4dObject)
 };
 /**
  * Object literal with config options for f4d layer.
- * @typedef {Object} f4dLayerObject
+ * @typedef {Object} F4dController~f4dLayerObject
  * @property {string} dataGroupId Required. f4d 레이어의 고유 아이디.
  * @property {string} dataGroupKey Required. 레이어 폴더 매칭 키
  * @property {string} dataGroupName Required. 레이어 명
@@ -101,7 +101,7 @@ F4dController.prototype.addSmartTileGroup = function(f4dObject)
 
 /**
  * Object literal with config options for f4d data.
- * @typedef {Object} f4dObject
+ * @typedef {Object} F4dController~f4dObject
  * @property {string} dataId Required. 데이터  고유 아이디
  * @property {string} dataGroupId Required. 데이터의 레이어 아이디
  * @property {string} dataKey Required. 데이터 폴더명
@@ -119,7 +119,7 @@ F4dController.prototype.addSmartTileGroup = function(f4dObject)
 
 /**
  * f4d data group 등록
- * @param {Array<f4dLayerObject> | f4dLayerObject} f4dLayerObject f4d data definition object
+ * @param {Array<F4dController~f4dLayerObject> | F4dController~f4dLayerObject} f4dLayerObject f4d data definition object
  */
 F4dController.prototype.addF4dGroup = function(f4dLayerObject) 
 {
@@ -159,7 +159,7 @@ F4dController.prototype.addF4dGroup = function(f4dLayerObject)
 /**
  * f4d data를 등록
  * @param {string} groupId required. target group id
- * @param {Array<f4dObject> | f4dObject} f4dObject f4d data definition object
+ * @param {Array<F4dController~f4dObject> | F4dController~f4dObject} f4dObject f4d data definition object
  */
 F4dController.prototype.addF4dMember = function(groupId, f4dObject) 
 {
@@ -286,6 +286,7 @@ F4dController.prototype.getF4dGroup = function(groupId)
 /**
  * return static model project id list
  * @return {Array<string>}
+ * @private
  */
 F4dController.prototype.getStaticModelGroupKeys = function() 
 {
@@ -307,6 +308,7 @@ F4dController.prototype.getStaticModelGroupKeys = function()
  * object values equal static model object, have data in group
  * static model object key equal instance id, and value equal instance (Node)
  * @return {object}
+ * @private
  */
 F4dController.prototype.getStaticModelObject = function() 
 {

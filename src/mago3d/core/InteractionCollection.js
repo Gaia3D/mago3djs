@@ -6,6 +6,7 @@
  * @class InteractionCollection
  * 
  * @param {MagoManager} magoManager magoManager.
+ * @memberof Interaction
  */
 var InteractionCollection = function(magoManager)
 {
@@ -101,6 +102,8 @@ InteractionCollection.prototype.remove = function(interaction)
  * return select type
  * @param {DrawGeometryInteraction} interaction
  * @return {string}
+ * 
+ * @private
  */
 InteractionCollection.prototype.getSelectType = function() 
 {

@@ -82,6 +82,10 @@
     var knownTilesetFormats = [/\.b3dm/, /\.pnts/, /\.i3dm/, /\.cmpt/, /\.glb/, /\.geom/, /\.vctr/, /tileset.*\.json$/];
     app.get(knownTilesetFormats, checkGzipAndNext);
 
+    app.get('', function(req, res) {
+        res.sendFile(__dirname + '/sample/map.html');
+    })
+
     app.use(express.static(__dirname));
 
     function getRemoteUrlFromParam(req) {

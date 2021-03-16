@@ -1,12 +1,36 @@
 'use strict';
 /**
- * Mago3D return object
- * @typedef {object} Mago3d~returnObj
- * @property {function()} callAPI function. 
- * @property {function()} getViewer function. get this map viewr. Cesium.Viewer or Mago3d.MagoWorld
- * @property {function()} getMagoManagerState function. get magoManager starte
- * @property {function()} getMagoManager function. get magoManager
- * @property {function(string)} setBaseUrl function. set F4d Date base url.
+ * Mago3D serverPolicy
+ * @typedef {object} Mago3d~serverPolicy
+ * @property {string} basicGlobe 필수. javscript 3d Globe. 기본적으로 ‘cesium’을 사용하며 ‘magoworld’ 옵션을 사용 가능. 
+ * @property {string} cesiumIonToke optional. Cesium Ion Token 보유 시 사용. 토큰 등록 시에만 Ion 서비스 이용가능.
+ * @property {string} terrainType terrain 사용 형태.  cesium-default(기본값) : 실제 지형표현이 없는 구 형태의 globecesium-ion-default : Cesium Ion 기본 terrain. Cesium Ion Token 사용 시에만 사용가능cesium-ion-cdn : Cesium Ion에 등록한 terrain 을 호출하여 사용. terrainValue에 해당 assetId를 설정. Cesium Ion Token 사용 시에만 사용가능cesium-customer : 사용자가 직접 생성한 cesium terrain을 사용 시 설정(예를 들면 ctb를 이용하여 생성한 terrain을 cts를 통해 서비스할 경우). terrainValue에 terrain 서비스 url을 등록.geoserver : geoserverTerrainProvider를 이용하여 터레인을 서비스 할 경우 사용. (비추)
+ * @property {string} terrainValue function. get magoManager
+ * @property {boolean} online 시스템 사용 환경의 온오프라인 유무. 기본값은 true
+ * @property {boolean} geoserverEnable GeoServer 서비스 사용 유무. 기본값은 false
+ * @property {boolean} geoserverImageproviderEnable GeoServer 배경 이미지 wms 서비스 사용 유무.
+ * @property {string} geoserverImageproviderUrl GeoServer WMS url
+ * @property {stringn} geoserverImageproviderLayerName 서비스할 레이어명
+ * @property {string} geoserverImageproviderStyleName 적용할 스타일명
+ * @property {number} geoserverImageproviderParametersWidth image width
+ * @property {number} geoserverImageproviderParametersHeight image height
+ * @property {string} geoserverImageproviderParametersFormat image format
+ * @property {string} geoserverTerrainproviderLayerName terrainType 이 geoserver일 시, GeoserverTerrainProvider를 통해 terrain으로 서비스할 레이어명
+ * @property {string} geoserverTerrainproviderStyleName terrainType 이 geoserver일 시, terrain에 적용할 스타일 명
+ * @property {number} geoserverTerrainproviderParametersWidth image width
+ * @property {number} geoserverTerrainproviderParametersHeight image height
+ * @property {number} geoserverTerrainproviderParametersFormat image format
+ * @property {boolean} initCameraEnable globe 시작 시, 시작 위치로 이동 기능 사용 유무. 기본값은 true
+ * @property {number} initLatitude 시작 위도
+ * @property {number} initLongitude 시작 경도
+ * @property {number} initAltitude 시작 고도
+ * @property {number} initDuration 시작 위치로 이동하는 시간, 0으로 지정 시 애니메이션 효과 없음.
+ * @property {number} lod0 lod0 레벨 표출 거리
+ * @property {number} lod1 lod1 레벨 표출 거리
+ * @property {number} lod2 lod2 레벨 표출 거리
+ * @property {number} lod3 lod3 레벨 표출 거리
+ * @property {number} lod4 lod4 레벨 표출 거리
+ * @property {number} lod5 lod5 레벨 표출 거리
  */
 
 /**
@@ -17,11 +41,21 @@
  */
 
 /**
+ * Mago3D return object
+ * @typedef {object} Mago3d~returnObj
+ * @property {function()} callAPI function. 
+ * @property {function()} getViewer function. get this map viewr. Cesium.Viewer or Mago3d.MagoWorld
+ * @property {function()} getMagoManagerState function. get magoManager starte
+ * @property {function()} getMagoManager function. get magoManager
+ * @property {function(string)} setBaseUrl function. set F4d Date base url.
+ */
+
+/**
  * This is mago3d entrypoint.
  * @class Mago3d
  * 
  * @param {Stirng} containerId container div id. required.
- * @param {object} serverPolicy mage3d geopolicy
+ * @param {Mago3d~serverPolicy} serverPolicy mage3d geopolicy
  * @param {Mago3d~callback} callback loadstart callback, loadend callback.
  * @param {object} options viewer parameter.
  * @param {Cesium.Viewer} legacyViewer 타 시스템과의 연동의 경우 view 객체가 생성되어서 넘어 오는 경우가 있음

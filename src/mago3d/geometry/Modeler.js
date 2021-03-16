@@ -57,6 +57,13 @@ Modeler.EVENT_TYPE = {
 Modeler.prototype = Object.create(Emitter.prototype);
 Modeler.prototype.constructor = Modeler;
 
+/**
+ * 입력한 클래스명으로 등록된 모델을 추출
+ * @param {string} className 검색할 class 명
+ * @param {Array|undefined} resultObjectsArray 결과를 담을 배열
+ * 
+ * @return {Array<MagoRenderable>}
+ */
 Modeler.prototype.extractObjectsByClassName = function(className, resultObjectsArray) 
 {
 	if (this.objectsArray === undefined)
@@ -110,7 +117,7 @@ Modeler.prototype.newTube = function(options)
 
 /**
  * 모델러에 그려야할 객체 추가
- * @param {MagoRenderable} object
+ * @param {MagoRenderable} object 등록할 객체. MagoRenderable를 상속받은 객체를 이용
  * @param {number} depth Optional. 설정 시 해당 depth로 targetDepth 설정, targetDepth부터 화면에 나타남.
  */
 Modeler.prototype.addObject = function(object, depth) 

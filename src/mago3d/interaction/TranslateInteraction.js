@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * This is the interaction for draw geometry.
+ * This is the interaction for translate data.
  * @constructor
  * @class TranslateInteraction
  * 
@@ -48,6 +48,7 @@ TranslateInteraction.EVENT_TYPE = {
 /**
  * interaction init
  * @override
+ * @private
  */
 TranslateInteraction.prototype.init = function() 
 {
@@ -105,6 +106,10 @@ TranslateInteraction.prototype.getFilter = function()
 	return this.filter;
 };
 
+/**
+ * handle down event
+ * @param {BrowserEvent} browserEvent
+ */
 TranslateInteraction.prototype.handleDownEvent = function(browserEvent)
 {
 	var manager = this.manager;
@@ -141,6 +146,10 @@ TranslateInteraction.prototype.handleDownEvent = function(browserEvent)
 	}
 };
 
+/**
+ * handle drag event
+ * @param {BrowserEvent} browserEvent
+ */
 TranslateInteraction.prototype.handleDragEvent = function(browserEvent)
 {
 	if (this.target && this.dragging)
@@ -172,6 +181,11 @@ TranslateInteraction.prototype.handleDragEvent = function(browserEvent)
 	}
 };
 
+/**
+ * handle dragged f4d
+ * @param {BrowserEvent} browserEvent
+ * @fires TranslateInteraction#EVENT_TYPE.MOVING_F4D
+ */
 TranslateInteraction.prototype.handleF4dDrag = function (browserEvent)
 {
 	var manager = this.manager;
@@ -245,6 +259,10 @@ TranslateInteraction.prototype.handleF4dDrag = function (browserEvent)
 	});
 };
 
+/**
+ * handle dragged object
+ * @param {BrowserEvent} browserEvent
+ */
 TranslateInteraction.prototype.handleObjectDrag = function (browserEvent)
 {
 	var selectedObjtect= this.target;
@@ -305,6 +323,11 @@ TranslateInteraction.prototype.handleObjectDrag = function (browserEvent)
 	this.manager.objectMoved = true; // this provoques that on leftMouseUp -> saveHistoryObjectMovement
 };
 
+/**
+ * handle dragged native object
+ * @param {BrowserEvent} browserEvent
+ * @fires TranslateInteraction#EVENT_TYPE.MOVING_NATIVE
+ */
 TranslateInteraction.prototype.handleNativeDrag = function (browserEvent)
 {
 	var object = this.target;
@@ -487,6 +510,13 @@ TranslateInteraction.prototype.handleMoveEvent = function()
 	return;
 };
 
+/**
+ * handle mouse up event, action finished
+ * @param {BrowserEvent} browserEvent
+ * @fires TranslateInteraction#EVENT_TYPE.MOVE_END_F4D
+ * @fires TranslateInteraction#EVENT_TYPE.MOVE_END_OBJECT
+ * @fires TranslateInteraction#EVENT_TYPE.MOVE_END_NATIVE
+ */
 TranslateInteraction.prototype.handleUpEvent = function()
 {
 	var endEvent;

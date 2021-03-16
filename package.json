@@ -61,5 +61,7 @@
     "watchify": "^3.11.1",
     "yargs": "^13.3.2"
   },
-  "dependencies": {}
+  "dependencies": {
+    "clean-jsdoc-theme": "^3.0.8"
+  }
 }

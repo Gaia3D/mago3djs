@@ -265,39 +265,6 @@ ObjectMarkerManager.prototype.newObjectMarkerSpeechBubble = function(options, ma
 		//지도에 ObjectMarker생성하여 표출
 		this.newObjectMarker(optionsObjectMarker, magoManager);
 	}
-
-	/*
-	if (!magoManager.speechBubble) 
-	{
-		magoManager.speechBubble = new Mago3D.SpeechBubble();
-	}
-
-	var sb = magoManager.speechBubble;
-	var bubbleColor = Color.getHexCode(1.0, 1.0, 1.0);
-	//SpeechBubble 옵션
-	var commentTextOption = {
-		pixel       : 12,
-		color       : 'blue',
-		borderColor : 'white',
-		text        : 'blabla'
-	};
-
-	//SpeechBubble을 통해서 png 만들어서 가져오기
-	var img = sb.getPng([64, 64], bubbleColor, commentTextOption);
-
-	//ObjectMarker 옵션, 위치정보와 이미지 정보
-	var geoCoord = geoCoordsList.getGeoCoord(i);
-	var lon = geoCoord.longitude;
-	var lat = geoCoord.latitude;
-	var alt = geoCoord.altitude;
-	var options = {
-		positionWC    : Mago3D.ManagerUtils.geographicCoordToWorldPoint(lon, lat, alt),
-		imageFilePath : img
-	};
-
-	//지도에 ObjectMarker생성하여 표출
-	this.newObjectMarker(options, magoManager);
-	*/
 };
 
 ObjectMarkerManager.prototype.doTest__ObjectMarker = function(magoManager)

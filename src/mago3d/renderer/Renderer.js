@@ -3883,9 +3883,11 @@ Renderer.prototype.renderBoundingBoxesNodes = function(nodesArray, color, bRende
 	var nodesCount = nodesArray.length;
 	for (var b=0; b<nodesCount; b++)
 	{
+		node = nodesArray[b];
+		if(node.data.attributes && !node.data.attributes.isVisible) continue;
+
 		currentShader.resetLastBuffersBinded();
 		
-		node = nodesArray[b];
 		neoBuilding = node.data.neoBuilding;
 		bbox = node.getBBox();
 

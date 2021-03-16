@@ -3,7 +3,11 @@
 		"allowUnknownTags": true
 	},
 	"opts": {
-		"destination": "./build/documention"
+		"destination": "./doc/",
+		"template": "./node_modules/clean-jsdoc-theme",
+		"theme_opts":{
+			"theme": "light"
+		}
 	},
 	"plugins": [
 		"plugins/markdown"
@@ -11,12 +15,10 @@
 	"templates": {
 		"cleverLinks": true,
 		"monospaceLinks": true,
-		"systemName" : "Mago3dJS for SeaForest",
+		"systemName" : "Mago3dJS",
 		"default": {
 			"outputSourceFiles": true
 		},
-		"path": "ink-docstrap",
-		"theme": "readable",
 		"navType": "vertical",
 		"linenums": true,
 		"dateFormat": "YYYY, MMMM Do h:mm:ss a",

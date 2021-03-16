@@ -36,7 +36,7 @@ var MagoManager = function (config)
 	 * @type {SelectionManager}
 	 * @default SelectionManager.
 	 * 
-	 * @private
+	 * @api
 	 */
 	this.selectionManager = undefined;
 	
@@ -288,6 +288,12 @@ var MagoManager = function (config)
 
 	this.demoBlocksLoaded = false;
 
+	/**
+	 * marker manager
+	 * @type {ObjectMarkerManager}
+	 * 
+	 * @api
+	 */
 	this.objMarkerManager = new ObjectMarkerManager(this);
 	
 	// renderWithTopology === 0 -> render only CityGML.***
@@ -316,7 +322,10 @@ var MagoManager = function (config)
 	this.idManager = new IdentifierManager();
 	this.processCounterManager = new ProcessCounterManager();
 
-	
+	/**
+	 * F4dController
+	 * @type {F4dController}
+	 */
 	this.f4dController = new F4dController(this);
 	this.effectsManager = new EffectsManager();
 	
@@ -334,7 +343,17 @@ var MagoManager = function (config)
 	 * @type {InteractionCollection}
 	 */
 	this.interactionCollection = new InteractionCollection(this);
+
+	/**
+	 * Default Select Interaction.
+	 * @type {PointSelectInteraction}
+	 */
 	this.defaultSelectInteraction = new PointSelectInteraction();
+
+	/**
+	 * Default translate Interaction.
+	 * @type {TranslateInteraction}
+	 */
 	this.defaultTranslateInteraction = new TranslateInteraction();
 	this.interactionCollection.add(this.defaultTranslateInteraction);
 	this.interactionCollection.add(this.defaultSelectInteraction);
@@ -343,12 +362,15 @@ var MagoManager = function (config)
 	/**
      * Control collection.
      * @type {ControlCollection}
+	 * @private
      */
 	this.controls = new ControlCollection(this);
 
 	/**
 	 * MagoLayer collection
 	 * @type {MagoLayerCollection}
+	 * 
+	 * @private
 	 */
 	this.magoLayerCollection = new MagoLayerCollection();
 
@@ -493,6 +515,7 @@ MagoManager.prototype.isCesiumGlobe = function()
 /**
  * handle browser event
  * @param {BrowserEvent} browserEvent 
+ * @private
  */
 MagoManager.prototype.handleBrowserEvent = function(browserEvent) 
 {
@@ -534,7 +557,8 @@ MagoManager.prototype.handleBrowserEvent = function(browserEvent)
 
 /**
  * set mouse status by event type
- * @param {string} type mouse event type 
+ * @param {string} type mouse event type
+ * @private
  */
 MagoManager.prototype.setMouseStatus = function(type)
 {
@@ -2400,6 +2424,7 @@ MagoManager.prototype.doRenderMagoWorld = function (frustumVolumenObject)
 /**
  * cluster 데이터 설정
  * @param {Cluster} cluster 
+ * @private
  */
 MagoManager.prototype.addCluster = function(cluster) 
 {
@@ -2413,6 +2438,7 @@ MagoManager.prototype.addCluster = function(cluster)
 
 /**
  * cluster 데이터 삭제
+ * @private
  */
 MagoManager.prototype.clearCluster = function() 
 {
@@ -2583,6 +2609,7 @@ MagoManager.prototype.startRender = function (isLastFrustum, frustumIdx, numFrus
 /**
  * valid date height by height reference
  * @param {frustumObject} frustumObject 
+ * @private
  */
 MagoManager.prototype.validateHeight = function(frustumObject)
 {
@@ -2743,6 +2770,7 @@ MagoManager.prototype.validateHeight = function(frustumObject)
 
 /**
  * Prepare current visibles low LOD nodes.***
+ * @private
  */
 MagoManager.prototype.clearCanvas2D = function() 
 {
@@ -7214,10 +7242,11 @@ MagoManager.prototype.flyToTopology = function(worldPoint3d, duration)
 };
 
 /**
- * dataKey 이용해서 data 검색
- * @param apiName api 이름
- * @param projectId project id
- * @param dataKey
+ * 경위도와 이동시간을 통해 카메라 이동
+ * @param {number} longitude 
+ * @param {number} latitude 
+ * @param {number} altitude
+ * @param {number} altitude
  */
 MagoManager.prototype.flyTo = function(longitude, latitude, altitude, duration) 
 {
@@ -7241,6 +7270,7 @@ MagoManager.prototype.flyTo = function(longitude, latitude, altitude, duration)
 /**
  * 주어진 3차원 점을 포함하는 영역으로 이동
  * @param {Point3D} pointsArray 3차원 점
+ * @private
  */
 MagoManager.prototype.flyToBox = function(pointsArray) 
 {
@@ -7264,6 +7294,8 @@ MagoManager.prototype.flyToBox = function(pointsArray)
  * @param apiName api 이름
  * @param projectId project id
  * @param dataKey
+ * 
+ * @private
  */
 MagoManager.prototype.flyToBuilding = function(apiName, projectId, dataKey) 
 {
@@ -7428,6 +7460,8 @@ MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, l
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
  * @param {string} projectId policy 사용 시 geo_data_default_projects 배열에 있는 값.
  * @param {string} projectDataFolder 해당 프로젝트의 data_key를 의미.
+ * 
+ * @private
  */
 MagoManager.prototype.getObjectIndexFile = function(projectId, projectDataFolder) 
 {
@@ -7447,6 +7481,8 @@ MagoManager.prototype.getObjectIndexFile = function(projectId, projectDataFolder
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
  * @param {string} projectId policy 사용 시 geo_data_default_projects 배열에 있는 값.
  * @param {Array<object> | object} f4dObject f4d data definition object
+ * 
+ * @private
  */
 MagoManager.prototype.getObjectIndexFileForData = function(projectId, f4dObject) 
 {
@@ -7502,6 +7538,8 @@ MagoManager.prototype.getObjectIndexFileForData = function(projectId, f4dObject)
  * smartTile 의 object index 파일을 읽음
  * @param {string} projectId 프로젝트 고유번호
  * @param {string} projectDataFolder smartTile 의 위치
+ * 
+ * @private
  */
 MagoManager.prototype.getObjectIndexFileSmartTileF4d = function(projectDataFolder) 
 {
@@ -8126,6 +8164,7 @@ MagoManager.prototype.instantiateStaticModel = function(attributes)
 /**
  * add static model
  * @param {staticModelOption} attributes
+ * @private
  */
 MagoManager.prototype.addStaticModel = function(attribute)
 {
@@ -8158,6 +8197,8 @@ MagoManager.prototype.addStaticModel = function(attribute)
  * check static model is exist
  * @param {string} projectId
  * @returns {Boolean} isExist
+ * 
+ * @private
  */
 MagoManager.prototype.isExistStaticModel = function(projectId)
 {
@@ -8177,6 +8218,8 @@ MagoManager.prototype.isExistStaticModel = function(projectId)
 /**
  * add image layer
  * @param {WMSLayer|XYZLayer} layer. now support type : wms, xyz
+ * 
+ * @private
  */
 MagoManager.prototype.addLayer = function(layer) 
 {
@@ -8209,6 +8252,7 @@ MagoManager.prototype.addLayer = function(layer)
 /**
  * get image layer by id
  * @param {string} id
+ * @private
  */
 MagoManager.prototype.getLayerById = function(id) 
 {
@@ -8218,6 +8262,7 @@ MagoManager.prototype.getLayerById = function(id)
 /**
  * remove image layer by id
  * @param {string} id
+ * @private
  */
 MagoManager.prototype.removeLayerById = function(id) 
 {
@@ -8231,6 +8276,7 @@ MagoManager.prototype.removeLayerById = function(id)
 /**
  * add image layer by layer object
  * @param {WMSLayer | XYZLayer} layer
+ * @private
  */
 MagoManager.prototype.removeLayer = function(removeLayer) 
 {
@@ -9017,6 +9063,9 @@ MagoManager.prototype.getSelectionManager = function ()
 	return this.selectionManager;
 };
 
+/**
+ * delete all object and webgl resource held by object
+ */
 MagoManager.prototype.deleteAll = function ()
 {
 	// deselect.

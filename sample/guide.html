@@ -34,6 +34,7 @@
 	var MAGO3D_INSTANCE;
 	var imagePath = "/images/ko";
 	var dataInformationUrl = "/sample/persistence/json/";
+	var ld;
 	magoStart(null, "magoContainer", imagePath);
 
     // mago3d 시작, 정책 데이터 파일을 로딩
@@ -77,30 +78,50 @@
 				"isPhysical": false
 			},
 			"dataGroupId":1,
-			"dataGroupKey":"guide",
+			"dataGroupKey":"GANGSEO",
 			"dataGroupName":"가이드 데이터 그룹",
-			"dataGroupPath":"guide",
+			"dataGroupPath":"GANGSEO",
 			"datas": []
 		};
 
 		var socialRoomObject = {
 			"metainfo": {
 				"isPhysical": true,
-				"flipYTexCoords": true
+				"flipYTexCoords": false
 			},
 			"dataId" : 1,
 			"dataGroupId" : 1,
-			"dataKey": "SOCIALROOM",
-			"dataName": "SOCIALROOM",
-			"mappingType":"boundingboxcenter",
-			"longitude": 128.917656,
-			"latitude": 35.139482,
-			"altitude": 14.177629,
+			"dataKey": "01_edc_bd01002",
+			"dataName": "01_edc_bd01002",
+			"mappingType":"origin",
+			"longitude": 128.917832,
+    		"latitude": 35.137623,
+			"altitude": 5,
 			"heading": 0.000000,
 			"pitch": 0.000000,
 			"roll": 0.000000
 		};
+		var studentRoomObject= {
+			"metainfo": {
+				"isPhysical": true,
+				"flipYTexCoords": false
+			},
+			"dataId" : 2,
+			"dataGroupId" : 1,
+			"children": [],
+			"dataKey": "01_edc_bd01003",
+    		"dataName": "01_edc_bd01003",
+			"mappingType":"origin",
+			"longitude": 128.917077,
+    		"latitude": 35.138060,
+			"altitude": 5,
+			"heading": 0.000000,
+			"pitch": 0.000000,
+			"roll": 0.000000
+		}
+		
 		f4dGroup.datas.push(socialRoomObject);
+		f4dGroup.datas.push(studentRoomObject);
 		f4dController.addF4dGroup(f4dGroup);
 
 		magoManager.once(Mago3D.MagoManager.EVENT_TYPE.SELECTEDF4D, function(e) {
@@ -123,11 +144,98 @@
 				"pitch": 0.000000,
 				"roll": 0.000000
 			}
-			f4dController.addF4dMember(1, studentRoomObject);		
+			//f4dController.addF4dMember(1, studentRoomObject);		
 		});
 		magoManager.on(Mago3D.MagoManager.EVENT_TYPE.F4DLOADEND, function(e){
 			console.info(e.f4d.length + '개의 데이터가 로드되었습니다.');
 		});
+
+		var spBottomId = 'spBottom'; 
+		var spBottom = {
+			projectId : spBottomId,
+			projectFolderName : 'soundproof',
+			buildingFolderName : 'F4D_SP_A001'
+		}
+		magoManager.addStaticModel(spBottom);
+
+		var spTopId = 'spTop'; 
+		var spTop = {
+			projectId : spTopId,
+			projectFolderName : 'soundproof',
+			buildingFolderName : 'F4D_SP_A002'
+		}
+		magoManager.addStaticModel(spTop);
+
+
+		magoManager.on(Mago3D.MagoManager.EVENT_TYPE.CLICK, function(e){
+			console.info(e);
+			
+		});
+
+		ld = new LineDrawer(viewer, function(lp) {
+			const SP_LENGTH = 2;
+			const SP_HEIGHT = 0.6;
+			const SP_VERTICAL_COUNT = 10;
+			var p1 = new Mago3D.Point3D(lp[0].x, lp[0].y, lp[0].z);
+			var p2 = new Mago3D.Point3D(lp[1].x, lp[1].y, lp[1].z);
+
+			var lineVector = p1.getVectorToPoint(p2);
+			lineVector.unitary();
+
+			var g1 = Mago3D.ManagerUtils.pointToGeographicCoord(p1);
+			var g2 = Mago3D.ManagerUtils.pointToGeographicCoord(p2);
+			var geoSegment = new Mago3D.GeographicCoordSegment(g1,g2);
+			var angle = Mago3D.GeographicCoordSegment.calculateHeadingAngRadToNorthOfSegment(geoSegment, magoManager);
+			angle = angle * 180 / Math.PI;
+
+			var segmentArcLength = Mago3D.Globe.getArcDistanceBetweenGeographicCoords(g1, g2);
+			var intanceCnt = Math.ceil(segmentArcLength / SP_LENGTH);
+			var teamId = parseInt(Math.random() * 100000);
+
+			for(var i=0;i<intanceCnt;i++) {
+				var startPoint = new Mago3D.Point3D();
+				startPoint.copyFrom(p1);
+
+				var vectorPoint = new Mago3D.Point3D(); 
+				vectorPoint.copyFrom(lineVector);
+				vectorPoint.scale(i*SP_LENGTH);
+
+				startPoint.add(vectorPoint.x, vectorPoint.y, vectorPoint.z);
+
+				//var geocoord = Mago3D.ManagerUtils.pointToGeographicCoord(startPoint);
+				var geocoord = Mago3D.ManagerUtils.pointToGeographicCoord(startPoint);
+
+				for(var j=0;j<SP_VERTICAL_COUNT;j++) {
+					var height = j * SP_HEIGHT;
+					var projectId = spBottomId;
+					var heightReference = Mago3D.HeightReference.CLAMP_TO_GROUND;
+					var instanceId = parseInt(Math.random() * 100000);
+					if(j !== 0) {
+						height = j * SP_HEIGHT;
+						heightReference = Mago3D.HeightReference.RELATIVE_TO_GROUND;
+						if(j === (SP_VERTICAL_COUNT -1)) {
+							projectId = spTopId;
+						}
+					}
+
+					magoManager.instantiateStaticModel({
+						projectId: projectId,
+						instanceId: instanceId,
+						longitude: geocoord.longitude,
+						latitude: geocoord.latitude,
+						height: height,
+						heading : angle+90,
+						heightReference: heightReference
+					});
+
+					let node = magoManager.hierarchyManager.getNodeByDataKey(projectId, instanceId);
+					node.data.attributes.assemble = true;
+					node.data.attributes.teamId = teamId;
+				}
+				
+			}
+		});
+		ld.setActive(true)
 	}
 
 	function gotopage() {
@@ -136,6 +244,336 @@
 			'_blank'
 		);
 	}
+
+	/**
+ * @param {Cesium.Viewer} viewer 생성한 세슘 Viewer 객체
+ * @param {function} handleEventEnd 라인그리기 동작을 완료한 후 처리할 기능
+ * @param {object} options 라인 스타일 옵션, 'positions'항목은 무시됨.
+ */
+var LineDrawer = function(viewer, handleEventEnd ,options) {
+	options = options ? options : {};
+	this.viewer = viewer;
+	this.handler = new Cesium.ScreenSpaceEventHandler(this.viewer.canvas);
+	this.active = false;
+	
+	this.changeWc;
+	this.startPointEntity;
+	this.startClickTime;
+	this.startPosition;
+	this.lineEntity;
+	this.points = [];
+	
+	var that = this;
+	this.positionCallback = new Cesium.CallbackProperty(function(){
+		if(that.changeWc) {
+			var pointsCopy = [...that.points];
+			pointsCopy.push(that.changeWc);
+			return pointsCopy;
+		}
+	}, false);
+	
+	this.handleEventEnd = handleEventEnd;
+	
+	
+	//ASSGIN으로 변경하는게...
+	//this.pointStyle = options.pointStyle ? options.pointStyle : {heightReference : Cesium.HeightReference.CLAMP_TO_GROUND};
+	this.lineStyle = options.lineStyle ? options.lineStyle : {width : 3, clampToGround : true};
+	this.lineStyle.positions = this.positionCallback;
+}
+
+LineDrawer.prototype.setActive = function(active) {
+	this.active = active;
+	if(!active) {
+		this.clear();
+	} else {
+		this.handler.setInputAction(this.click.bind(this), Cesium.ScreenSpaceEventType.LEFT_CLICK);
+		this.handler.setInputAction(this.move.bind(this), Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+	}
+}
+
+LineDrawer.prototype.click = function(e){
+	if(!this.startPointEntity)
+	{
+		this.startPosition = e.position.clone();
+		this.startClickTime = new Date().getTime();
+		var wc = this.screenToWorldCoord(e.position);
+		this.startPointEntity = this.viewer.entities.add(new Cesium.Entity({
+			point : new Cesium.PointGraphics(),
+			position : wc
+		}));
+		
+		this.points.push(wc);
+	} else {
+		
+		var curTime = new Date().getTime();
+		var dbclick = false;
+		if((curTime - this.startClickTime < 600) && Math.abs(this.startPosition.x - e.position.x) < 1 &&  Math.abs(this.startPosition.y - e.position.y) < 1) {
+			dbclick = true;
+		}
+		
+		if(dbclick) {
+			var linePosition = this.lineEntity.polyline.positions.getValue();
+			linePosition.pop();
+			
+			if(this.handleEventEnd && typeof this.handleEventEnd === 'function') this.handleEventEnd.call(this, linePosition);
+			
+			this.initVariable();
+		} else {
+			this.points.push(this.screenToWorldCoord(e.position));
+			this.startClickTime = curTime;
+			this.startPosition = e.position.clone();
+		}
+	}
+}
+LineDrawer.prototype.move = function(e) {
+	if(this.startPointEntity) {
+		this.changeWc = this.screenToWorldCoord(e.endPosition);
+		if(!this.lineEntity)
+		{
+			var style = this.lineStyle
+			this.lineEntity = this.viewer.entities.add(new Cesium.Entity({
+				polyline : new Cesium.PolylineGraphics(this.lineStyle)
+			}));
+		}
+	}
+}
+
+LineDrawer.prototype.clear = function (){
+	this.handler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
+	this.handler.removeInputAction(Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+	this.initVariable();
+}
+LineDrawer.prototype.initVariable = function (){
+	if(this.lineEntity) this.viewer.entities.removeById(this.lineEntity.id);
+	if(this.startPointEntity) this.viewer.entities.removeById(this.startPointEntity.id);
+	this.lineEntity = undefined 
+	this.startPointEntity = undefined;
+	this.changeWc = undefined;
+	this.startClickTime = undefined;
+	this.startPosition = undefined;
+	this.points = [];
+}
+
+LineDrawer.prototype.screenToWorldCoord = function(pixel) {
+	var cesiumScene = this.viewer.scene; 
+	var cesiumGlobe = cesiumScene.globe;
+	var cesiumCamera = cesiumScene.camera;
+	var windowCoordinates = new Cesium.Cartesian2(pixel.x, pixel.y);
+	var ray = cesiumCamera.getPickRay(windowCoordinates);
+	var intersection = cesiumGlobe.pick(ray, cesiumScene);
+	
+	return intersection;
+}
+
+Mago3D.TranslateInteraction.prototype.handleDownEvent = function(browserEvent)
+{
+	var manager = this.manager;
+	if (browserEvent.type !== "leftdown") { return; }
+
+	var selectManager = manager.selectionManager;
+
+	if (manager.selectionFbo === undefined) 
+	{ manager.selectionFbo = new Mago3D.FBO(gl, manager.sceneState.drawingBufferWidth[0], manager.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
+
+	var gl = manager.getGl();
+	selectManager.selectProvisionalObjectByPixel(gl, browserEvent.point.screenCoordinate.x, browserEvent.point.screenCoordinate.y);
+
+	if (!this.filter_)
+	{
+		this.setFilterFunction();
+	}
+
+	var filterProvisional = selectManager.filterProvisional(this.targetType, this.filter_);
+	
+	if (!Mago3D.isEmpty(filterProvisional) && (filterProvisional.hasOwnProperty(this.targetType) || this.targetType === Mago3D.DataType.ALL))
+	{
+		if(this.targetType !== Mago3D.DataType.ALL) {
+			this.target = filterProvisional[this.targetType][0];
+			if (this.targetType === Mago3D.DataType.OBJECT)
+			{
+				this.parentNode = filterProvisional[Mago3D.DataType.F4D][0];
+			}
+		} else {
+			this.target = filterProvisional[Object.keys(filterProvisional)[0]][0];
+		}
+		
+		if(this.target instanceof Mago3D.Node && this.target.data.attributes.assemble) {
+			this.targetArray = [];
+			var refTeamId = this.target.data.attributes.teamId;
+			var hierarchyManager = manager.hierarchyManager;
+			var staticModelKeys = Object.keys(hierarchyManager?.staticModelsManager?.staticModelsMap);
+
+			for(var i in staticModelKeys) {
+				var nodes = hierarchyManager.getRootNodes(staticModelKeys[i]);
+				for(var j in nodes) {
+					var node = nodes[j];
+					if(!node.data.attributes.assemble) break;
+					if(node.data.attributes.teamId !== refTeamId) continue;
+
+					this.targetArray.push(node);
+				}
+			}
+		}
+	}
+	else 
+	{
+		this.init();
+	}
+};
+
+Mago3D.TranslateInteraction.prototype.handleF4dDrag = function(browserEvent)
+{
+	var manager = this.manager;
+	var target = this.target;
+
+	var diffPosition = this._calculateIntersectionPoint(browserEvent, target)
+	if(this.targetArray) {
+		this.moveMultiF4d(diffPosition);
+	} else {
+		this.moveSingleF4d(diffPosition, target);
+	}
+};
+
+Mago3D.TranslateInteraction.prototype._calculateIntersectionPoint = function(browserEvent, node) {
+	var manager = this.manager;
+	var geoLocDataManager = node.getNodeGeoLocDataManager();
+	var geoLocationData = geoLocDataManager.getCurrentGeoLocationData();
+	var attributes = node.data.attributes;
+	if (!this.selObjMovePlaneCC)
+	{
+		this.selObjMovePlaneCC = new Mago3D.Plane();
+
+		var geoLocMatrix = geoLocationData.geoLocMatrix;
+		var mvMat = manager.sceneState.modelViewMatrix;
+		var mvMatRelToEye = manager.sceneState.modelViewRelToEyeMatrix;
+
+		var sc = this.startPoint.screenCoordinate;
+		var magoWC = Mago3D.ManagerUtils.calculatePixelPositionWorldCoord(manager.getGl(), sc.x, sc.y, magoWC, undefined, undefined, undefined, manager);
+		var pixelPosCC = mvMat.transformPoint3D(this.startPoint.worldCoordinate, pixelPosCC);
+        
+		if (attributes.movementInAxisZ)
+		{
+			// movement in plane XZ.
+			var globeYaxisWC = new Mago3D.Point3D(geoLocMatrix._floatArrays[4], geoLocMatrix._floatArrays[5], geoLocMatrix._floatArrays[6]);
+			var globeYaxisCC = mvMatRelToEye.transformPoint3D(globeYaxisWC, undefined);
+			this.selObjMovePlaneCC.setPointAndNormal(pixelPosCC.x, pixelPosCC.y, pixelPosCC.z,    globeYaxisCC.x, globeYaxisCC.y, globeYaxisCC.z); 
+		}
+		else 
+		{
+			// movement in plane XY.
+			var globeZaxisWC = new Mago3D.Point3D(geoLocMatrix._floatArrays[8], geoLocMatrix._floatArrays[9], geoLocMatrix._floatArrays[10]);
+			var globeZaxisCC = mvMatRelToEye.transformPoint3D(globeZaxisWC, undefined);
+			this.selObjMovePlaneCC.setPointAndNormal(pixelPosCC.x, pixelPosCC.y, pixelPosCC.z,    globeZaxisCC.x, globeZaxisCC.y, globeZaxisCC.z); 
+		}
+	}
+
+	var screenCoordinate = browserEvent.endEvent.screenCoordinate;
+	var camRay = Mago3D.ManagerUtils.getRayCamSpace(screenCoordinate.x, screenCoordinate.y, camRay, manager);
+	this.lineCC.setPointAndDir(0, 0, 0,  camRay[0], camRay[1], camRay[2]);
+    
+	var intersectionPointCC = new Mago3D.Point3D();
+	intersectionPointCC = this.selObjMovePlaneCC.intersectionLine(this.lineCC, intersectionPointCC);
+    
+	var mvMat = manager.sceneState.getModelViewMatrixInv();
+	var intersectionPointWC = mvMat.transformPoint3D(intersectionPointCC, intersectionPointWC);
+    var cartographic = Mago3D.ManagerUtils.pointToGeographicCoord(intersectionPointWC, cartographic, this);
+	return cartographic;
+}
+
+Mago3D.TranslateInteraction.prototype.moveMultiF4d = function(position) {
+	var manager = this.manager;
+
+	for(var i=0,len=this.targetArray.length;i<len;i++) {
+		var node = this.targetArray[i];
+
+		var geoLocDataManager = node.getNodeGeoLocDataManager();
+		var geoLocationData = geoLocDataManager.getCurrentGeoLocationData();
+
+		if(!node.data.startGeoCoordDif) {
+			var buildingGeoCoord = geoLocationData.geographicCoord;
+			node.data.startGeoCoordDif = new Mago3D.GeographicCoord(position.longitude-buildingGeoCoord.longitude, position.latitude-buildingGeoCoord.latitude, position.altitude-buildingGeoCoord.altitude);
+		}
+		
+		var difX = position.longitude - node.data.startGeoCoordDif.longitude;
+		var difY = position.latitude - node.data.startGeoCoordDif.latitude;
+		var difZ = position.altitude - node.data.startGeoCoordDif.altitude;
+
+		var attributes = node.data.attributes;
+		if (attributes.movementInAxisZ)
+		{
+			//geoLocationData = ManagerUtils.calculateGeoLocationData(undefined, undefined, newAltitude, undefined, undefined, undefined, geoLocationData, this);
+			manager.changeLocationAndRotationNode(node, undefined, undefined, difZ, undefined, undefined, undefined);
+		}
+		else 
+		{
+			//geoLocationData = ManagerUtils.calculateGeoLocationData(newLongitude, newlatitude, undefined, undefined, undefined, undefined, geoLocationData, this);
+			manager.changeLocationAndRotationNode(node, difY, difX, undefined, undefined, undefined, undefined);
+		}
+
+		this.emit(Mago3D.TranslateInteraction.EVENT_TYPE.MOVING_F4D, {
+			type   : Mago3D.TranslateInteraction.EVENT_TYPE.MOVING_F4D,
+			result : node,
+			timestamp: new Date()
+		});
+	}
+}
+
+Mago3D.TranslateInteraction.prototype.moveSingleF4d = function(position, node) {
+	var manager = this.manager;
+
+	var geoLocDataManager = node.getNodeGeoLocDataManager();
+	var geoLocationData = geoLocDataManager.getCurrentGeoLocationData();
+
+	if (!this.startGeoCoordDif)
+	{
+		var buildingGeoCoord = geoLocationData.geographicCoord;
+		this.startGeoCoordDif = new GeographicCoord(cartographic.longitude-buildingGeoCoord.longitude, cartographic.latitude-buildingGeoCoord.latitude, cartographic.altitude-buildingGeoCoord.altitude);
+	}
+
+	var difX = position.longitude - this.startGeoCoordDif.longitude;
+	var difY = position.latitude - this.startGeoCoordDif.latitude;
+	var difZ = position.altitude - this.startGeoCoordDif.altitude;
+
+	var attributes = node.data.attributes;
+	if (attributes.movementInAxisZ)
+	{
+		//geoLocationData = ManagerUtils.calculateGeoLocationData(undefined, undefined, newAltitude, undefined, undefined, undefined, geoLocationData, this);
+		manager.changeLocationAndRotationNode(node, undefined, undefined, difZ, undefined, undefined, undefined);
+	}
+	else 
+	{
+		//geoLocationData = ManagerUtils.calculateGeoLocationData(newLongitude, newlatitude, undefined, undefined, undefined, undefined, geoLocationData, this);
+		manager.changeLocationAndRotationNode(node, difY, difX, undefined, undefined, undefined, undefined);
+	}
+
+	this.emit(Mago3D.TranslateInteraction.EVENT_TYPE.MOVING_F4D, {
+		type   : Mago3D.TranslateInteraction.EVENT_TYPE.MOVING_F4D,
+		result : node,
+		timestamp: new Date()
+	});
+}
+
+Mago3D.TranslateInteraction.prototype.init = function() 
+{
+	this.begin = false;
+	this.dragging = false;
+	this.mouseBtn = undefined;
+	this.startPoint = undefined;
+	this.endPoint = undefined;
+	this.selObjMovePlaneCC = undefined;
+	this.selObjMovePlane = undefined;
+	this.startGeoCoordDif = undefined;
+	this.startMovPoint = undefined;
+	this.target = undefined;
+	this.parentNode = undefined;
+
+	if(this.targetArray) {
+		for(var i=0,len=this.targetArray.length;i<len;i++) {	
+			delete this.targetArray[i].data.startGeoCoordDif
+		}
+		delete this.targetArray;
+	}
+};
 </script>
 </body>
 </html>

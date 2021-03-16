@@ -42,16 +42,6 @@
 			type: "GET",
 			dataType: "json",
 			success: function(serverPolicy){
-
-				var osmStreetLayer = new Mago3D.XYZLayer({
-					urlFunction : function(coordinate) {
-						var url = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
-						return url.replace('{z}',coordinate.z)
-						.replace('{y}',coordinate.y)
-						.replace('{x}',coordinate.x);
-					}
-				});
-
 				var osmCycleLayer = new Mago3D.XYZLayer({
 					urlFunction : function(coordinate) {
 						var url = 'https://{a-c}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png';
@@ -68,160 +58,22 @@
 						}
 					}
 				});
-				
-				//var bathymetryFilter = {
-				//	type: Mago3D.CODE.imageFilter.BATHYMETRY,
-				//	properties : {
-				//		minAltitude: -2796,
-				//		maxAltitude: 1840,
-				//		stepGradient : [0, -40,-80,-120,-400,-800, -1000, -2000, -2796],[0, -100, -300, -1000, -2000, -2796]
-				//		caustics: true
-				//	}
-				//};
 
-				var bathymetryFilter = {
-					type: Mago3D.CODE.imageFilter.BATHYMETRY,
-					properties : {
-						minAltitude: -2796,
-						maxAltitude: 1840,
-						stepGradient : [0, -40,-80,-120,-400,-800, -1000, -2000, -2796],
-						caustics: true
-					}
-				};
-				
-
-
-				
-				baseMap = new Mago3D.XYZLayer({url: 'https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'});
-				//baseMap = new Mago3D.XYZLayer({url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'});
-
-				tt = new Mago3D.WMSLayer({url: 'http://localhost:8080/geoserver/mago3d/gwc/service/wms', show: true, filter: bathymetryFilter, param: {layers: 'mago3d:susim_5m', tiled: true}}); // new version.
-				//tt = new Mago3D.WMSLayer({url: 'http://localhost:8080/geoserver/mago3d/wms', show: true, filter: bathymetryFilter, param: {layers: 'mago3d:susim_5m', tiled: true}}); // new version.
-				//ttt = new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: false,   param: {layers: 'ndtp:sk_sdo', tiled: true}});
-				//tt = new Mago3D.WMSLayer({url: 'http://localhost:8080/geoserver/mago3d/gwc/service/wms', show: true, opacity: 0.5, param: {layers: 'mago3d:15m_susim', tiled: true}});
-				//ttt = new Mago3D.WMSLayer({url: 'http://localhost:8080/geoserver/mago3d/wms', show: true, minZoom:10,   param: {layers: 'mago3d:mj1m', tiled: true}});
-
-
-				
-				/*
 				managerFactory = new Mago3D.Mago3d(renderDivId,serverPolicy,undefined,{
 					layers : [
-						baseMap,
-						tt,
-						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'sk_emd', tiled: true}}),
-						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'basemap', tiled: true}}),
-						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'echodelta_25m', tiled: true}}),
-						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'gangseogu_4326', tiled: true}}),
-						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'land_block', tiled: true}}),
-						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'sk_sdo', tiled: true}}),
-						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'sk_sgg', tiled: true}}),
-						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'utmk_lsmd_cont_ldreg', tiled: true}}),
-						new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'dem', tiled: true}})
+						osmCycleLayer
 					]
 				});
-				*/
-				
-				
-				
-				managerFactory = new Mago3D.Mago3d(renderDivId,serverPolicy,undefined,{
-					layers : [
-						baseMap//, tt//, ttt
-						//new Mago3D.WMSLayer({url: 'http://192.168.10.9:8080/geoserver/ndtp/wms', show: true,  param: {layers: 'sk_emd', tiled: true}}),
-					]
-				});
-				
-				
-
-				var magoManager = managerFactory.getMagoManager();
-				var f4dController = managerFactory.getF4dController();
-
-				//magoManager.addLayer(tt);
 			},
 			error: function(e){
 				alert(e.responseText);
 			}
 		});
 	}
-	// 3ds, pointsCloud, sihung_campus, sihung_las, IncheonGyeyang_2
+
 	function doTest(){
-		var f4dController = managerFactory.getF4dController();
-		
-		f4dController.addSmartTileGroup({
-            dataGroupId : 10000,
-            dataGroupKey : 'IncheonGayang',
-            dataGroupName : '계양시 건물들',
-            dataGroupPath : 'IncheonGayang/',
-            smartTileIndexPath: "SmartTiles_IncheonGayang"
-		});
-		
-		
-		f4dController.addSmartTileGroup({
-            dataGroupId : 10000,
-            dataGroupKey : 'Incheon_Mirae',
-            dataGroupName : '계양시 건물들',
-            dataGroupPath : 'Incheon_Mirae/',
-            smartTileIndexPath: "_TILE_Incheon_Mirae"
-		});
-		/*
-		$.ajax({
-			url: dataInformationUrl + "IncheonGyeyang_2.json",
-			type: "GET",
-			dataType: "json",
-			success: function(f4dObject){
-				console.info(f4dObject);
-				f4dController.addF4dGroup(f4dObject);
-			},
-			error: function(e){
-				alert(e.responseText);
-			}
-		});
-		*/
 
-		// Test weather wind.*********************************
-		/*
-		var magomanager = managerFactory.getMagoManager();
-		if (magomanager.windTest === undefined)
-		{
-			if (magomanager.weatherStation === undefined)
-			{ magomanager.weatherStation = new Mago3D.WeatherStation(); }
-		
-			var geometryDataPath = magomanager.readerWriter.geometryDataPath;
-			var windDataFilesNamesArray = ["OBS-QWM_2016062000.grib2_wind_000", "OBS-QWM_2016062001.grib2_wind_000", "OBS-QWM_2016062002.grib2_wind_000", "OBS-QWM_2016062003.grib2_wind_000",
-				"OBS-QWM_2016062004.grib2_wind_000", "OBS-QWM_2016062005.grib2_wind_000", "OBS-QWM_2016062006.grib2_wind_000", "OBS-QWM_2016062007.grib2_wind_000",
-				"OBS-QWM_2016062008.grib2_wind_000", "OBS-QWM_2016062009.grib2_wind_000", "OBS-QWM_2016062010.grib2_wind_000", "OBS-QWM_2016062011.grib2_wind_000",
-				"OBS-QWM_2016062012.grib2_wind_000", "OBS-QWM_2016062013.grib2_wind_000", "OBS-QWM_2016062014.grib2_wind_000", "OBS-QWM_2016062015.grib2_wind_000",
-				"OBS-QWM_2016062016.grib2_wind_000", "OBS-QWM_2016062017.grib2_wind_000", "OBS-QWM_2016062018.grib2_wind_000", "OBS-QWM_2016062019.grib2_wind_000",
-				"OBS-QWM_2016062020.grib2_wind_000", "OBS-QWM_2016062021.grib2_wind_000", "OBS-QWM_2016062022.grib2_wind_000", "OBS-QWM_2016062023.grib2_wind_000"];
-				
-			var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_Airport";
-			//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_GolfPark_NineBridge1";
-			
-			magomanager.weatherStation.test_loadWindData3d(magomanager, windDataFilesNamesArray, windMapFilesFolderPath);
-			magomanager.weatherStation.test_loadDustData3d(magomanager, windDataFilesNamesArray, windMapFilesFolderPath);
-			//magomanager.TEST__golfPark();
-			magomanager.windTest = true;
-		}
-		*/
 	}
-	
-	/*
-	function doTest(){
-		var f4dController = managerFactory.getF4dController();
-		$.ajax({
-			url: dataInformationUrl + "workshop-data.json",
-			type: "GET",
-			dataType: "json",
-			success: function(f4dObject){
-				console.info(f4dObject);
-				f4dController.addF4dGroup(f4dObject);
-			},
-			error: function(e){
-				alert(e.responseText);
-			}
-		});
-	}
-	*/
-
 </script>
 </body>
 </html>
