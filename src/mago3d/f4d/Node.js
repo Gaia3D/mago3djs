@@ -53,6 +53,7 @@ Object.defineProperties(Node.prototype, {
 /**
  * Returns true if this node is a "reference" type node. "Reference" type nodes uses StaticModels geometry.
  * @returns {Boolean} true if this node is a "reference" type node.
+ * @private
  */
 Node.prototype.isReferenceNode = function() 
 {
@@ -186,6 +187,7 @@ Node.prototype.deleteObjects = function(gl, vboMemoryManager)
  * Calculates the geographicLocationData of the node.
  * @param {MagoManager} magoManager Main class object of Mago3D.
  * @returns {GeoLocationData} geoLoc The calculated geoLocationData of this node.
+ * @private
  */
 Node.prototype.calculateGeoLocData = function(magoManager) 
 {
@@ -268,6 +270,7 @@ Node.prototype.calculateGeoLocData = function(magoManager)
  * Calculates the geographicLocationData of the node.
  * @param {MagoManager} magoManager Main class object of Mago3D.
  * @returns {GeoLocationData} geoLoc The calculated geoLocationData of this node.
+ * @private
  */
 Node.prototype.correctGeoLocationDataByMappingType = function(geoLoc) 
 {
@@ -356,6 +359,7 @@ Node.prototype.checkChangesHistoryMovements = function()
 
 /**
  * Checks if there are some objects that was changed the color.
+ * @private
  */
 Node.prototype.checkChangesHistoryColors = function() 
 {
@@ -439,7 +443,7 @@ Node.prototype.checkChangesHistoryColors = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * @private
  */
 Node.prototype.renderContent = function (magoManager, shader, renderType, refMatrixIdxKey) 
 {
@@ -655,7 +659,7 @@ Node.prototype.renderContent = function (magoManager, shader, renderType, refMat
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * @private
  */
 Node.prototype.addChildren = function(children) 
 {
@@ -664,7 +668,7 @@ Node.prototype.addChildren = function(children)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * @private
  */
 Node.prototype.setParent = function(parent) 
 {
@@ -672,7 +676,7 @@ Node.prototype.setParent = function(parent)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * @private
  */
 Node.prototype.getRoot = function() 
 {
@@ -685,7 +689,9 @@ Node.prototype.getRoot = function()
 };
 
 /**
+ * set render condition function
  * @param {function} renderCondition
+ * @private
  */
 Node.prototype.setRenderCondition = function(renderCondition) 
 {
@@ -696,6 +702,7 @@ Node.prototype.setRenderCondition = function(renderCondition)
 	this.renderCondition = renderCondition;
 };
 /**
+ * get render condition function
  * @return {function}
  */
 Node.prototype.getRenderCondition = function() 
@@ -704,7 +711,7 @@ Node.prototype.getRenderCondition = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * @private
  */
 Node.prototype.getClosestParentWithData = function(dataName) 
 {
@@ -721,7 +728,7 @@ Node.prototype.getClosestParentWithData = function(dataName)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * @private
  */
 Node.prototype.extractNodesByDataName = function(nodesArray, dataname) 
 {
@@ -739,7 +746,7 @@ Node.prototype.extractNodesByDataName = function(nodesArray, dataname)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * @private
  */
 Node.prototype.extractNodes = function(nodesArray) 
 {
@@ -757,6 +764,8 @@ Node.prototype.extractNodes = function(nodesArray)
  * 어떤 일을 하고 있습니까?
  * @param texture 변수
  * @returns texId
+ * 
+ * @private
  */
 Node.prototype.getBBox = function() 
 {
@@ -791,6 +800,8 @@ Node.prototype.getBBox = function()
  * 어떤 일을 하고 있습니까?
  * @param texture 변수
  * @returns texId
+ * 
+ * @private
  */
 Node.prototype.getBBoxCenterPositionWorldCoord = function(geoLoc) 
 {
@@ -811,6 +822,8 @@ Node.prototype.getBBoxCenterPositionWorldCoord = function(geoLoc)
  * 어떤 일을 하고 있습니까?
  * @param texture 변수
  * @returns texId
+ * 
+ * @private
  */
 Node.prototype.calculateBBoxCenterPositionWorldCoord = function(geoLoc) 
 {
@@ -858,6 +871,8 @@ Node.prototype.calculateBBoxCenterPositionWorldCoord = function(geoLoc)
 /**
  * This function returns the boundingSphere of the node in worldCoord.
  * @returns {BoundingSphere} resultBoundingSphere
+ * 
+ * @private
  */
 Node.prototype.getBoundingSphereWC = function(resultBoundingSphere) 
 {
@@ -885,6 +900,8 @@ Node.prototype.getBoundingSphereWC = function(resultBoundingSphere)
 /**
  * 어떤 일을 하고 있습니까?
  * @returns {Number} dist to camera
+ * 
+ * @private
  */
 Node.prototype.getDistToCamera = function(cameraPosition, boundingSphere_Aux) 
 {
@@ -959,6 +976,7 @@ Node.prototype.getDistToCamera = function(cameraPosition, boundingSphere_Aux)
 };
 
 /**
+ * @private
  */
 Node.prototype.getNodeGeoLocDataManager = function() 
 {
@@ -989,7 +1007,7 @@ Node.prototype.getCurrentGeoLocationData = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * @private
  */
 Node.prototype.finishedAnimation = function(magoManager) 
 {
@@ -1157,9 +1175,18 @@ Node.prototype.finishedAnimation = function(magoManager)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 입력받은 위치나 회전정보로 애니메이션 정보와 함께 객체 이동 및 회전
+ * @param {number} latitude
+ * @param {number} longitude
+ * @param {number} elevation
+ * @param {number} heading
+ * @param {number} pitch
+ * @param {number} roll
+ * @param {MagoManager} magoManager
+ * @param {Node~animationOption} animationOption
+ * 
+ * @private
  */
- 
 Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude, elevation, heading, pitch, roll, magoManager, animationOption) 
 {
 	// Provisionally set a geoLocationData target.
@@ -1365,7 +1392,7 @@ Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude,
 };
 
 /**
- * 어떤 일을 하고 있습니까?
+ * @private
  */
 Node.prototype.nodeMoved = function(node) 
 {
@@ -1388,6 +1415,7 @@ Node.prototype.nodeMoved = function(node)
 /**
  * attribute height reference에 따라 높이를 보정
  * @param {MagoManager} magoManager
+ * @private
  */
 Node.prototype.isNeedValidHeight = function(magoManager) 
 {
@@ -1404,9 +1432,14 @@ Node.prototype.isNeedValidHeight = function(magoManager)
 };
 
 /**
- * 
- * TODO : ARGS CHANGE OBJECT
- * 어떤 일을 하고 있습니까?
+ * 입력받은 위치나 회전정보로 객체 이동 및 회전
+ * @param {number} latitude
+ * @param {number} longitude
+ * @param {number} elevation
+ * @param {number} heading
+ * @param {number} pitch
+ * @param {number} roll
+ * @param {MagoManager} magoManager
  * 
  */
 Node.prototype.changeLocationAndRotation = function(latitude, longitude, elevation, heading, pitch, roll, magoManager) 
@@ -1530,10 +1563,13 @@ Node.prototype.intersectionWithPolygon2D = function(polygon2D)
 	
 	return polygon2D.intersectionWithPolygon2D(bboxPolygon2D);
 };
+
 /**
  * 높이 레퍼런스 설정에 따른 데이터 높이 계산 후 반환
  * @param {number} terrainHeight 
  * @return {number}
+ * 
+ * @private
  */
 Node.prototype.caculateHeightByReference = function(terrainHeight)
 {
@@ -1565,7 +1601,6 @@ Node.prototype.caculateHeightByReference = function(terrainHeight)
  * 높이 레퍼런스 설정
  * @param {HeightReference} ref 
  * @param {MagoManager} magoManager
- * @emits
  */
 Node.prototype.setHeightReference = function(ref, magoManager)
 {
@@ -1603,6 +1638,7 @@ Node.prototype.deleteChangeColor = function(magoManager)
 /**
  * set From date
  * @param {Date} fromDate 
+ * @private
  */
 Node.prototype.setFromDate = function(fromDate) {
 	if(!fromDate || !(fromDate instanceof Date)) {
@@ -1617,6 +1653,7 @@ Node.prototype.setFromDate = function(fromDate) {
 /**
  * get From date
  * @return {Date}
+ * @private
  */
 Node.prototype.getFromDate = function() {
 	return this.data.attributes.fromDate;
@@ -1625,6 +1662,7 @@ Node.prototype.getFromDate = function() {
 /**
  * set To date
  * @param {Date} toDate 
+ * @private
  */
 Node.prototype.setToDate = function(toDate) {
 	if(!toDate || !(toDate instanceof Date)) {
@@ -1639,6 +1677,7 @@ Node.prototype.setToDate = function(toDate) {
 /**
  * get To date
  * @return {Date}
+ * @private
  */
 Node.prototype.getToDate = function() {
 	return this.data.attributes.toDate;
@@ -1659,3 +1698,10 @@ Node.prototype.setVisible = function(visible) {
 Node.prototype.getVisible = function() {
 	return this.data.attributes.isVisible;
 }
+
+/**
+ * Object literal with change Location And Rotation animation option.
+ * @typedef {Object} Node~animationOption
+ * @property {string} dutaion optional. 
+ * @property {Boolean} autoChangeRotation optional. If this option is true, your heading, pitch will be ignore, Heading and pitch changes according to the direction.
+ */

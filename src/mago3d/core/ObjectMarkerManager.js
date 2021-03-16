@@ -1,10 +1,56 @@
 'use strict';
 
+/**
+ * 마커를 특정 객체 위치에 생성 시 옵션
+ * @typedef {object} ObjectMarkerManager~target
+ * @property {string} buildingId Required. dataKey를 의미함
+ * @property {string} projectId Required. dataGroupId를 의미함
+ */
 
 /**
- * 어떤 일을 하고 있습니까?
+ * 말풍선 텍스트 옵션
+ * @typedef {object} ObjectMarkerManager~commentTextOption
+ * @property {string} pixel 글자 크기
+ * @property {string} color 글자 색
+ * @property {string} borderColor 글자 테두리 색
+ * @property {string} text 텍스트. \n 으로 줄바꿈 지원
+ */
+
+/**
+ * 말풍선 옵션
+ * @typedef {object} ObjectMarkerManager~speechBubbleOptions
+ * @property {number} width 가로 사이즈
+ * @property {number} height 세로 사이즈
+ * @property {Color} bubbleColor hex type. ex: #aabbcc
+ * @property {ObjectMarkerManager~commentTextOption} commentTextOption
+ */
+
+/**
+ * 말풍선 생성 시 옵션
+ * @typedef {object} ObjectMarkerManager~createSpeechBubbleOption
+ * @property {ObjectMarkerManager~speechBubbleOptions} speechBubbleOptions Optional. when mago3d load start trigger. return magostate.
+ * @property {ObjectMarkerManager~target} target Optional. 특정 객체에 의존한 위치에 표현 시
+ * @property {string} id Optional. when empty, set guid
+ * @property {Position3D} positionWC Required. 마커 표시할 위치
+ */
+
+/**
+ * 마커 생성 시 옵션
+ * @typedef {object} ObjectMarkerManager~createMarkerOption
+ * @property {string} id Optional. when empty, set guid
+ * @property {Position3D} positionWC Required. 마커 표시할 위치
+ * @property {string} imageFilePath Required. 기본 이미지 경로
+ * @property {string} imageFilePathSelected Optional. 마커 선택 시 표시할 이미지 경로
+ * @property {number} sizeX Optional. 이미지 가로 사이즈
+ * @property {number} sizey Optional. 이미지 세로 사이즈
+ * @property {ObjectMarkerManager~target} target Optional. 특정 객체에 의존한 위치에 표현 시
+ */
+
+/**
+ * 지도상의 표시할 마커를 생산, 관리하는 클래스
  * @class ObjectMarkerManager
  *
+ * @see {@link http://localhost/sample/marker.html}
  */
 var ObjectMarkerManager = function(magoManager) 
 {
@@ -19,9 +65,7 @@ var ObjectMarkerManager = function(magoManager)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @class ObjectMarkerManager
- *
+ * 전체 마커 삭제
  */
 ObjectMarkerManager.prototype.deleteObjects = function()
 {
@@ -35,6 +79,10 @@ ObjectMarkerManager.prototype.deleteObjects = function()
 	this.objectMarkerMap = {};
 };
 
+/**
+ * 같은 아이디를 가진 마커 삭제
+ * @param {string} objMarkerId
+ */
 ObjectMarkerManager.prototype.deleteObject = function(objMarkerId)
 {
 	var objectsMarkersCount = this.objectMarkerArray.length;
@@ -61,12 +109,7 @@ ObjectMarkerManager.prototype.setMarkerByCondition = function(condition)
 	});
 	that.objectMarkerArray = arr;
 };
-/**
- * start rendering.
- * @param scene 변수
- * @param isLastFrustum 변수
- */
- 
+
 ObjectMarkerManager.prototype.loadDefaultImages = function(magoManager) 
 {
 	if (this.pin.defaultImagesLoaded === false)
@@ -96,9 +139,10 @@ ObjectMarkerManager.prototype.loadDefaultImages = function(magoManager)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @class ObjectMarkerManager
- *
+ * 마커 등록
+ * @param {ObjectMarkerManager~createMarkerOption} options
+ * @param {MagoManager}
+ * @return {ObjectMarker}
  */
 ObjectMarkerManager.prototype.newObjectMarker = function(options, magoManager)
 {
@@ -111,8 +155,12 @@ ObjectMarkerManager.prototype.newObjectMarker = function(options, magoManager)
 		if (options.id !== undefined)
 		{
 			objMarker.id = options.id;
-			this.objectMarkerMap[objMarker.id] = objMarker;
+			
+		} else {
+			objMarker.id = createGuid();
 		}
+
+		this.objectMarkerMap[objMarker.id] = objMarker;
 
 		if (options.positionWC)
 		{
@@ -137,9 +185,6 @@ ObjectMarkerManager.prototype.newObjectMarker = function(options, magoManager)
 			if (objMarker.size2d === undefined)
 			{ objMarker.size2d = new Float32Array([25.0, 25.0]); }
 			objMarker.size2d[0] = options.sizeX;
-			
-			if (objMarker.size2d === undefined)
-			{ objMarker.size2d = new Float32Array([25.0, 25.0]); }
 			objMarker.size2d[1] = options.sizeY;
 			
 			objMarker.bUseOriginalImageSize = false;
@@ -150,16 +195,19 @@ ObjectMarkerManager.prototype.newObjectMarker = function(options, magoManager)
 		}
 
 		if (options.target)
-		{ objMarker.target = options.target; }
+		{ 
+			objMarker.target = options.target; 
+			objMarker.getGeoLocationData(magoManager);
+		}
 	}
 	
 	return objMarker;
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @class ObjectMarkerManager
- *
+ * 마커 반환
+ * @param {string} id
+ * @return {ObjectMarker}
  */
 ObjectMarkerManager.prototype.getObjectMarkerById = function(id)
 {
@@ -184,9 +232,10 @@ ObjectMarkerManager.prototype.getObjectMarkerById = function(id)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @class ObjectMarkerManager
- *
+ * 말풍선 생산
+ * @param {ObjectMarkerManager~createSpeechBubbleOption} options
+ * @param {MagoManager} magoManager
+ * @return {ObjectMarker}
  */
 ObjectMarkerManager.prototype.newObjectMarkerSpeechBubble = function(options, magoManager)
 {
@@ -257,7 +306,7 @@ ObjectMarkerManager.prototype.newObjectMarkerSpeechBubble = function(options, ma
 		var lat = options.latitude;
 		var alt = options.altitude;
 		var optionsObjectMarker = {
-			positionWC    : Mago3D.ManagerUtils.geographicCoordToWorldPoint(lon, lat, alt),
+			positionWC    : options.positionWC,
 			imageFilePath : img,
 			id            : options.id
 		};
@@ -416,9 +465,7 @@ ObjectMarkerManager.prototype.TEST__ObjectMarker_toNeoReference = function()
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @class ObjectMarkerManager
- *
+ * @private
  */
 ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 {

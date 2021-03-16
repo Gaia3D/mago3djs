@@ -23,6 +23,12 @@
 	<li onclick="gotoDoc();">
 		doc
 	</li>
+    <li onclick="select();">
+		선택
+	</li>
+    <li onclick="window.translate();">
+		이동
+	</li>
 </ul>
 <div id="magoContainer" class="mapWrap"></div>
 
@@ -57,7 +63,7 @@
 		}
 	});
 
-	//Mago3d 객체가 생성된 후 실행되는 소스
+    //Mago3d 객체가 생성된 후 실행되는 소스
 	function loadend(e) {
 		console.info('Complete construct mago3d instance. Enjoy!');
 		
@@ -68,7 +74,51 @@
 
 		viewer.scene.globe.depthTestAgainstTerrain = true;
 		magoInstance.setBaseUrl(F4D_PATH);
+
+		$.ajax({
+			url: DATA_INFORMATION_PATH + "guide-data.json",
+			type: "GET",
+			dataType: "json",
+			success: function(json){
+				f4dController.addF4dGroup(json);
+			},
+			error: function(e){
+				alert(e.responseText);
+			}
+		});
+
+        magoManager.on(Mago3D.MagoManager.EVENT_TYPE.SELECTEDF4D, function(e){
+            //var f4dController = magoInstance.getF4dController();
+            //var selected = e.selected;
+            //f4dController.deleteF4dMember(selected.data.projectId, selected.data.nodeId);
+		});
+
+        magoManager.on(Mago3D.MagoManager.EVENT_TYPE.DESELECTEDF4D, function(e){
+			console.info(e);
+		});
 	}
+
+    var activeSelection = false;
+    function select(force) {
+        var magoManager = MAGO3D_INSTANCE.getMagoManager();
+        var defaultSelectInteraction = magoManager.defaultSelectInteraction;
+
+        activeSelection = force ? force : !activeSelection;
+        defaultSelectInteraction.setActive(activeSelection);
+    }
+
+    var activeTranslate = false;
+    function translate() {
+        var magoManager = MAGO3D_INSTANCE.getMagoManager();
+        var defaultTranslateInteraction = magoManager.defaultTranslateInteraction;
+
+        activeTranslate = !activeTranslate;
+        defaultTranslateInteraction.setActive(activeTranslate);
+
+        if(activeTranslate && !activeSelection){
+            select(true);
+        }
+    }
 
 	function gotoDoc() {
 		window.open('/doc/index.html');

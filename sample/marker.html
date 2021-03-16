@@ -23,6 +23,15 @@
 	<li onclick="gotoDoc();">
 		doc
 	</li>
+    <li onclick="window.changeMode('marker');">
+		기본마커
+	</li>
+    <li onclick="window.targetMarker();">
+		기본마커(타겟)
+	</li>
+    <li onclick="window.changeMode('speechBubble');">
+		말풍선
+	</li>
 </ul>
 <div id="magoContainer" class="mapWrap"></div>
 
@@ -34,6 +43,10 @@
 	var F4D_PATH = SAMPLE_PATH + "f4d";
 
 	var MAGO3D_INSTANCE;
+    var mode;
+    function changeMode(m) {
+        mode = m;
+    }
     // mago3d 시작, 정책 데이터 파일을 로딩
 	$.ajax({
 		url: DATA_INFORMATION_PATH + "geopolicy.json",
@@ -57,7 +70,7 @@
 		}
 	});
 
-	//Mago3d 객체가 생성된 후 실행되는 소스
+    //Mago3d 객체가 생성된 후 실행되는 소스
 	function loadend(e) {
 		console.info('Complete construct mago3d instance. Enjoy!');
 		
@@ -68,7 +81,89 @@
 
 		viewer.scene.globe.depthTestAgainstTerrain = true;
 		magoInstance.setBaseUrl(F4D_PATH);
+
+		$.ajax({
+			url: DATA_INFORMATION_PATH + "guide-data.json",
+			type: "GET",
+			dataType: "json",
+			success: function(json){
+				f4dController.addF4dGroup(json);
+			},
+			error: function(e){
+				alert(e.responseText);
+			}
+		});
+
+        magoManager.on(Mago3D.MagoManager.EVENT_TYPE.CLICK, function(e){
+            console.info(e);
+            var point = e.point.worldCoordinate;
+
+            switch(mode) {
+                case 'marker' : {
+                    marker(point);
+                    break;
+                }
+                case 'speechBubble' : {
+                    speech(point);
+                    break;
+                }
+            }
+		});
 	}
+
+    function marker(position) {
+        var magoManager = MAGO3D_INSTANCE.getMagoManager();
+        var objMarkerManager = magoManager.objMarkerManager;
+
+        var createMarkerOption = {
+            positionWC : position,
+            imageFilePath : '/images/ko/defaultBlue.png',
+            sizeX : 32,
+            sizeY : 32
+        }
+        
+        objMarkerManager.newObjectMarker(createMarkerOption, magoManager);
+    }
+
+    function targetMarker() {
+
+        var magoManager = MAGO3D_INSTANCE.getMagoManager();
+        var objMarkerManager = magoManager.objMarkerManager;
+
+        var createMarkerOption = {
+            target : {
+                buildingId : 'SOCIALROOM',
+                projectId : 1 
+            },
+            imageFilePath : '/images/ko/defaultBlue.png',
+            sizeX : 128,
+            sizeY : 128
+        }
+        
+        objMarkerManager.newObjectMarker(createMarkerOption, magoManager);
+    }
+
+    function speech(position) {
+        var magoManager = MAGO3D_INSTANCE.getMagoManager();
+        var objMarkerManager = magoManager.objMarkerManager;
+
+        var createMarkerOption = {
+            positionWC : position,
+            speechBubbleOptions : {
+                width : 32,
+                height : 32,
+                bubbleColor : new Mago3D.Color(0.4,0.4,0.7),
+                commentTextOption : {
+                    pixel : '10',
+                    color : '#fff',
+                    borderColor : '#000',
+                    text : '교육'
+                }
+            }
+        }
+        
+        objMarkerManager.newObjectMarkerSpeechBubble(createMarkerOption, magoManager);
+    }
 
 	function gotoDoc() {
 		window.open('/doc/index.html');

@@ -3884,7 +3884,7 @@ Renderer.prototype.renderBoundingBoxesNodes = function(nodesArray, color, bRende
 	for (var b=0; b<nodesCount; b++)
 	{
 		node = nodesArray[b];
-		if(node.data.attributes && !node.data.attributes.isVisible) continue;
+		if(node.data.attributes && node.data.attributes.isVisible === false) continue;
 
 		currentShader.resetLastBuffersBinded();
 		

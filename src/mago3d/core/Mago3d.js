@@ -60,6 +60,8 @@
  * @param {object} options viewer parameter.
  * @param {Cesium.Viewer} legacyViewer 타 시스템과의 연동의 경우 view 객체가 생성되어서 넘어 오는 경우가 있음
  * 
+ * @see {@link http://localhost/sample/map.html}
+ * 
  * @return {Mago3d~returnObj} 
  */
 var Mago3d = function(containerId, serverPolicy, callback, options, legacyViewer) 

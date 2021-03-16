@@ -5,6 +5,8 @@
  * @class F4dController
  * 
  * @param {MagoManager} magoManager
+ * 
+ * @see {@link http://localhost/sample/f4d.html}
  */
 var F4dController = function(magoManager) 
 {

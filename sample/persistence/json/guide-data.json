@@ -1,0 +1,43 @@
+{
+    "dataGroupId":1,
+    "dataGroupKey":"guide",
+    "dataGroupName":"가이드 데이터 그룹",
+    "dataGroupPath":"guide",
+    "datas": [
+    {
+        "attributes": {
+            "isPhysical": true,
+            "flipYTexCoords": true
+        },
+        "dataId" : 1,
+        "dataGroupId" : 1,
+        "dataKey": "SOCIALROOM",
+        "dataName": "SOCIALROOM",
+        "mappingType":"origin",
+        "longitude": 126.89186548462749,
+        "latitude": 37.52677715369988,
+        "height": 14.177629,
+        "heading": 0.000000,
+        "pitch": 0.000000,
+        "roll": 0.000000
+    },
+    {
+        "attributes": {
+            "isPhysical": true,
+            "flipYTexCoords": true
+        },
+        "dataId" : 2,
+        "dataGroupId" : 1,
+        "children": [],
+        "dataKey": "STUDENTROOM",
+        "dataName": "STUDENTROOM",
+        "mappingType":"origin",
+        "longitude": 126.89186548462749,
+        "latitude": 37.52682715369988,
+        "height": 14.177629,
+        "heading": 0.000000,
+        "pitch": 0.000000,
+        "roll": 0.000000
+    }
+    ]
+    }

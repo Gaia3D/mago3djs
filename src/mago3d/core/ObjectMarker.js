@@ -114,9 +114,7 @@ ObjectMarker.prototype.getGeoLocationData = function(magoManager)
 			// The target is a native object.
 			var geoLocDataManager = target.nativeObject.getGeoLocDataManager();
 			geoLocationData = geoLocDataManager.getCurrentGeoLocationData();
-			var hola = 0;
 		}
-		
 	}
 	else 
 	{

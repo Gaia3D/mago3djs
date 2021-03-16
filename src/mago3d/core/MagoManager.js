@@ -2892,7 +2892,7 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 	
 	// 1rst, collect rootNodes.
 	var rootNodesMap = {};
-	var currentVisiblesArray = visibleObjControlerNodes.currentVisibles1.concat(visibleObjControlerNodes.currentVisibles2, visibleObjControlerNodes.currentVisibles3);
+	var currentVisiblesArray = visibleObjControlerNodes.currentVisibles1.concat(visibleObjControlerNodes.currentVisibles0, visibleObjControlerNodes.currentVisibles2, visibleObjControlerNodes.currentVisibles3);
 	var nodesCount = currentVisiblesArray.length;
 	for (var i=0; i<nodesCount; i++)
 	{
@@ -2901,7 +2901,7 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 		if (node.data === undefined || node.data.neoBuilding === undefined)
 		{ continue; }
 	
-		if (node.data.distToCam > 3000.0)
+		if (node.data.distToCam > 1500.0)
 		{ continue; }
 		
 		var key = node.data.neoBuilding.buildingId;

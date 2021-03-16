@@ -33,42 +33,7 @@
 	var DATA_INFORMATION_PATH = SAMPLE_PATH + "persistence/json/";
 	var F4D_PATH = SAMPLE_PATH + "f4d";
 
-	var MAGO3D_INSTANCE;
-    // mago3d 시작, 정책 데이터 파일을 로딩
-	$.ajax({
-		url: DATA_INFORMATION_PATH + "geopolicy.json",
-		type: "GET",
-		dataType: "json",
-		success: function(serverPolicy){
-			var cesiumViewerOption = {};
-			cesiumViewerOption.infoBox = false;
-			cesiumViewerOption.navigationHelpButton = false;
-			cesiumViewerOption.selectionIndicator = false;
-			cesiumViewerOption.homeButton = false;
-			cesiumViewerOption.fullscreenButton = false;
-			cesiumViewerOption.geocoder = false;
-			cesiumViewerOption.baseLayerPicker = false;
-			cesiumViewerOption.sceneModePicker = false;
-
-			MAGO3D_INSTANCE = new Mago3D.Mago3d("magoContainer", serverPolicy, {loadend : loadend}, cesiumViewerOption);
-		},
-		error: function(e){
-			alert(e.responseText);
-		}
-	});
-
-	//Mago3d 객체가 생성된 후 실행되는 소스
-	function loadend(e) {
-		console.info('Complete construct mago3d instance. Enjoy!');
-		
-		var magoInstance = e;
-		var f4dController = magoInstance.getF4dController();
-		var viewer = magoInstance.getViewer();
-		var magoManager = magoInstance.getMagoManager();
-
-		viewer.scene.globe.depthTestAgainstTerrain = true;
-		magoInstance.setBaseUrl(F4D_PATH);
-	}
+	var MAGO3D_INSTANCE = new Mago3D.Mago3d("magoContainer");
 
 	function gotoDoc() {
 		window.open('/doc/index.html');

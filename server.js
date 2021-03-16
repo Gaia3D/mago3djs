@@ -83,7 +83,7 @@
     app.get(knownTilesetFormats, checkGzipAndNext);
 
     app.get('', function(req, res) {
-        res.sendFile(__dirname + '/sample/map.html');
+        res.sendFile(__dirname + '/sample/index.html');
     })
 
     app.use(express.static(__dirname));

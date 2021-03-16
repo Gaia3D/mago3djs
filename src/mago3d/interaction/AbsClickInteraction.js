@@ -7,6 +7,8 @@
  * 
  * @abstract
  * @param {object} option layer object.
+ * 
+ * @see {@link http://localhost/sample/interaction.html}
  */
 var AbsClickInteraction = function(option) 
 {

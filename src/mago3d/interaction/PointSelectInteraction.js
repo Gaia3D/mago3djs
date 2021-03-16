@@ -7,6 +7,8 @@
  * @extends {AbsClickInteraction}
  * 
  * @param {object} option layer object.
+ * 
+ * @see {@link http://localhost/sample/interaction.html}
  */
 var PointSelectInteraction = function(option) 
 {
