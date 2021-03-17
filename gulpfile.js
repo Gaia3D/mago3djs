@@ -344,4 +344,4 @@ gulp.task('buildShader', function(done)
 	done();
 });
 
-exports.build = gulp.task('combine:js');
+exports.build = gulp.task('default');
