@@ -42,7 +42,7 @@ if (/\.0$/.test(version))
 
 function glslToJavaScript(minify, minifyStateFilePath) 
 {
-	fs.writeFileSync(minifyStateFilePath, minify);
+	fs.writeFileSync(minifyStateFilePath, JSON.stringify(minify));
 	var minifyStateFileLastModified = fs.existsSync(minifyStateFilePath) ? fs.statSync(minifyStateFilePath).mtime.getTime() : 0;
 
 	// collect all currently existing JS files into a set, later we will remove the ones
@@ -115,7 +115,7 @@ define(function() {\n\
 
 function jsonToJavaScript(minify, minifyStateFilePath) 
 {
-	fs.writeFileSync(minifyStateFilePath, minify);
+	fs.writeFileSync(minifyStateFilePath, JSON.stringify(minify));
 	var minifyStateFileLastModified = fs.existsSync(minifyStateFilePath) ? fs.statSync(minifyStateFilePath).mtime.getTime() : 0;
 
 	// collect all currently existing JS files into a set, later we will remove the ones
@@ -172,7 +172,7 @@ function filePathToModuleId(moduleId)
 
 function createMago3D(minify, minifyStateFilePath) 
 {
-	fs.writeFileSync(minifyStateFilePath, minify);
+	fs.writeFileSync(minifyStateFilePath, JSON.stringify(minify));
 	var minifyStateFileLastModified = fs.existsSync(minifyStateFilePath) ? fs.statSync(minifyStateFilePath).mtime.getTime() : 0;
 
 	var assignments = [];
