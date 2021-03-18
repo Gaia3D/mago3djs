@@ -117,9 +117,9 @@ worker.onmessage = function (e)
 	var extensionId = new Uint8Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 1)); bytes_readed += 1;
 	var extensionLength = (new Uint32Array(dataArrayBuffer.slice(bytes_readed, bytes_readed + 4)))[0]; bytes_readed += 4;
 
-	// Test decoding in this worker.*****************************************************************************************************************************
-	// Test decoding in this worker.*****************************************************************************************************************************
-	// Test decoding in this worker.*****************************************************************************************************************************
+	// Decoding in this worker.*****************************************************************************************************************************
+	// Decoding in this worker.*****************************************************************************************************************************
+	// Decoding in this worker.*****************************************************************************************************************************
 	var PI = Math.PI;
 	var degToRadFactor = PI/180.0;
 	
@@ -154,8 +154,6 @@ worker.onmessage = function (e)
 	{
 		// web_mercator.
 		// https://en.wikipedia.org/wiki/Web_Mercator_projection
-		
-		
 		var aConst = (1.0/(2.0*PI))*Math.pow(2.0, depth);
 		var PI_DIV_4 = PI/4;
 		var minT = Math.round(aConst*(PI-Math.log(Math.tan(PI_DIV_4+minLat/2))));
@@ -318,7 +316,9 @@ worker.onmessage = function (e)
 		westIndices            : westIndices,
 		southIndices           : southIndices,
 		eastIndices            : eastIndices,
-		northIndices           : northIndices
+		northIndices           : northIndices,
+		extensionId            : extensionId,
+		extensionLength        : extensionLength
 	}, info: e.data.info});
 
 	/*

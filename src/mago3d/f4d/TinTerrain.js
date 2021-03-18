@@ -1126,7 +1126,7 @@ TinTerrain.prototype.prepareTexture = function(texturesMap, imagerys, magoManage
 	return texturesRequestedCount;
 };
 
-TinTerrain.prototype.prepareTinTerrainPlain = function(magoManager, tinTerrainManager)
+TinTerrain.prototype.prepareTinTerrainPlain_FUNCTION_NO_USED = function(magoManager, tinTerrainManager)
 {
 	// first, read terrainTiles-info.json
 	if (!this.tinTerrainManager.terrainReady) 
@@ -1219,11 +1219,6 @@ TinTerrain.prototype.prepareTinTerrainForward = function (magoManager, tinTerrai
 			this.textureMasterPrepared = undefined; 
 		}
 
-		//if (this.objToClampToTerrainStyleId !== this.tinTerrainManager.objToClampToTerrainStyleId)
-		//{ 
-		//	this.textureMasterPrepared = undefined; 
-		//}
-
 		if (!this.textureMasterPrepared && this.isTexturePrepared(this.texture))
 		{
 			this.makeTextureMaster();
@@ -1236,7 +1231,9 @@ TinTerrain.prototype.prepareTinTerrainForward = function (magoManager, tinTerrai
 
 		if (this.fileLoadState === CODE.fileLoadState.LOAD_FAILED)
 		{
-			return this.prepareTinTerrainPlain(magoManager, tinTerrainManager);
+			// In this case, set as "LOADING_FINISHED", then, make the terrain virtually in a worker. See "parseData".
+			this.fileLoadState = CODE.fileLoadState.LOADING_FINISHED; 
+			return false;
 		}
 		
 		// Prepare this tinTerrain.
@@ -1248,7 +1245,8 @@ TinTerrain.prototype.prepareTinTerrainForward = function (magoManager, tinTerrai
 			//해당 터레인 xyz를 terrainInfo와 비교하여 유효한 파일이면 통과, 아닐시 plain으로 처리
 			if (!this.checkAvailableTerrain()) 
 			{
-				this.fileLoadState = CODE.fileLoadState.LOAD_FAILED;
+				// In this case, set as "LOADING_FINISHED", then, make the terrain virtually in a worker. See "parseData".
+				this.fileLoadState = CODE.fileLoadState.LOADING_FINISHED; 
 				return false;
 			}
 
@@ -1278,8 +1276,6 @@ TinTerrain.prototype.prepareTinTerrainForward = function (magoManager, tinTerrai
 			if (!parsedTerrainMap[z][x][y]) { return; }
 
 			var result = parsedTerrainMap[z][x][y];
-
-
 			this.centerX = result.centerX;
 			this.centerY = result.centerY;
 			this.centerZ = result.centerZ;
@@ -1314,10 +1310,7 @@ TinTerrain.prototype.prepareTinTerrainForward = function (magoManager, tinTerrai
 			// 5. extension header.
 			this.extensionId = result.extensionId;
 			this.extensionLength = result.extensionLength;
-				
-			this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 
-			//******************************************************************************************************
 			this.texCoordsArray = result.texCoordsArray;
 			this.cartesiansArray = result.cartesiansArray;
 			this.skirtCartesiansArray = result.skirtCartesiansArray;
@@ -1329,6 +1322,7 @@ TinTerrain.prototype.prepareTinTerrainForward = function (magoManager, tinTerrai
 			this.latArray = result.latitudesArray;
 			//--------------------------------------------------------------------------------------------------------
 
+			this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 			delete this.tinTerrainManager.textureParsedTerrainMap[z][x][y];
 
 			this.makeVbo(magoManager.vboMemoryManager);
@@ -1409,11 +1403,6 @@ TinTerrain.prototype.prepareTinTerrainForward_original = function (magoManager, 
 			this.textureMasterPrepared = undefined; 
 		}
 
-		//if (this.objToClampToTerrainStyleId !== this.tinTerrainManager.objToClampToTerrainStyleId)
-		//{ 
-		//	this.textureMasterPrepared = undefined; 
-		//}
-
 		if (!this.textureMasterPrepared && this.isTexturePrepared(this.texture))
 		{
 			this.makeTextureMaster();
@@ -1426,6 +1415,7 @@ TinTerrain.prototype.prepareTinTerrainForward_original = function (magoManager, 
 
 		if (this.fileLoadState === CODE.fileLoadState.LOAD_FAILED)
 		{
+			
 			return this.prepareTinTerrainPlain(magoManager, tinTerrainManager);
 		}
 		
@@ -1468,7 +1458,6 @@ TinTerrain.prototype.prepareTinTerrainForward_original = function (magoManager, 
 			if (!parsedTerrainMap[z][x][y]) { return; }
 
 			var result = parsedTerrainMap[z][x][y];
-
 			this.centerX = result.centerX;
 			this.centerY = result.centerY;
 			this.centerZ = result.centerZ;
@@ -1490,53 +1479,19 @@ TinTerrain.prototype.prepareTinTerrainForward_original = function (magoManager, 
 				
 			// 2. vertex data.
 			this.vertexCount = result.vertexCount;
-			this.uValues = result.uValues;
-			this.vValues = result.vValues;
-			this.hValues = result.hValues;
 				
 			// 3. indices.
-			this.trianglesCount = result.trianglesCount;
 			this.indices = result.indices;
 				
 			// 4. edges indices.
-			this.westVertexCount = result.westVertexCount;
 			this.westIndices = result.westIndices;
-				
-			this.southVertexCount = result.southVertexCount;
 			this.southIndices = result.southIndices;
-				
-			this.eastVertexCount = result.eastVertexCount; 
 			this.eastIndices = result.eastIndices;
-				
-			this.northVertexCount = result.northVertexCount;
 			this.northIndices = result.northIndices;
 
 			// 5. extension header.
 			this.extensionId = result.extensionId;
 			this.extensionLength = result.extensionLength;
-				
-			this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
-			delete this.tinTerrainManager.textureParsedTerrainMap[z][x][y];
-
-			return false;
-		}
-		else if (this.fileLoadState === CODE.fileLoadState.PARSE_FINISHED && this.vboKeyContainer === undefined)
-		{
-			if (!this.requestDecodeData) 
-			{ 
-				this.decodeData(tinTerrainManager.imageryType); 
-				return false;
-			}
-				
-			var z = this.depth;
-			var x = this.X;
-			var y = this.Y;
-			var decodedTerrainMap = tinTerrainManager.textureDecodedTerrainMap;
-			if (!decodedTerrainMap[z]) { return false; }
-			if (!decodedTerrainMap[z][x]) { return false; }
-			if (!decodedTerrainMap[z][x][y]) { return false; }
-
-			var result = decodedTerrainMap[z][x][y];
 
 			this.texCoordsArray = result.texCoordsArray;
 			this.cartesiansArray = result.cartesiansArray;
@@ -1547,8 +1502,11 @@ TinTerrain.prototype.prepareTinTerrainForward_original = function (magoManager, 
 			this.normalsArray = result.normalsArray;
 			this.lonArray = result.longitudesArray;
 			this.latArray = result.latitudesArray;
+			//--------------------------------------------------------------------------------------------------------
 
-			delete this.tinTerrainManager.textureDecodedTerrainMap[z][x][y];
+			this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
+			delete this.tinTerrainManager.textureParsedTerrainMap[z][x][y];
+
 			this.makeVbo(magoManager.vboMemoryManager);
 
 			// Make sea mesh too.
@@ -2323,7 +2281,7 @@ TinTerrain.prototype.getSphereExtent = function(magoManager)
 	return this.sphereExtent;
 };
 
-TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum, maxDepth, camPos, magoManager, visibleTilesArrayMap, noVisibleTilesArray)
+TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function (frustum, maxDepth, camPos, magoManager, visibleTilesArrayMap, noVisibleTilesArray)
 {
 	// Note: this is NO frustum intersection. Select tiles by distance to camera. Function name must to be change.
 	if (this.geographicExtent === undefined || this.geographicExtent.minGeographicCoord === undefined || this.geographicExtent.maxGeographicCoord === undefined)
@@ -2488,22 +2446,25 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function(frustum
 
 		// If this is no prepared then stop process.
 		
-		if (!this.isPrepared())
+		if (!this.depth === 0)
 		{
-			this.visible = true;
-			if (visibleTilesArrayMap[this.depth] === undefined)
-			{ visibleTilesArrayMap[this.depth] = []; }
-			this.putObjectToArraySortedByDist(visibleTilesArrayMap[this.depth], this);
+			if (!this.isPrepared())
+			{
+				this.visible = true;
+				if (visibleTilesArrayMap[this.depth] === undefined)
+				{ visibleTilesArrayMap[this.depth] = []; }
+				this.putObjectToArraySortedByDist(visibleTilesArrayMap[this.depth], this);
 
-			var childrenDepth = this.depth+1;
-			if (visibleTilesArrayMap[childrenDepth] === undefined)
-			{ visibleTilesArrayMap[childrenDepth] = []; }
-			this.putObjectToArraySortedByDist(visibleTilesArrayMap[childrenDepth], this.childMap.LU);
-			this.putObjectToArraySortedByDist(visibleTilesArrayMap[childrenDepth], this.childMap.LD);
-			this.putObjectToArraySortedByDist(visibleTilesArrayMap[childrenDepth], this.childMap.RU);
-			this.putObjectToArraySortedByDist(visibleTilesArrayMap[childrenDepth], this.childMap.RD);
+				var childrenDepth = this.depth+1;
+				if (visibleTilesArrayMap[childrenDepth] === undefined)
+				{ visibleTilesArrayMap[childrenDepth] = []; }
+				this.putObjectToArraySortedByDist(visibleTilesArrayMap[childrenDepth], this.childMap.LU);
+				this.putObjectToArraySortedByDist(visibleTilesArrayMap[childrenDepth], this.childMap.LD);
+				this.putObjectToArraySortedByDist(visibleTilesArrayMap[childrenDepth], this.childMap.RU);
+				this.putObjectToArraySortedByDist(visibleTilesArrayMap[childrenDepth], this.childMap.RD);
 
-			return;
+				return;
+			}
 		}
 		
 
@@ -2553,10 +2514,7 @@ TinTerrain.prototype.calculateCenterPosition = function()
 		this.centerX = new Float64Array([resultCartesian[0]]);
 		this.centerY = new Float64Array([resultCartesian[1]]);
 		this.centerZ = new Float64Array([resultCartesian[2]]);
-		
-		
 	}
-	
 };
 
 TinTerrain.prototype.getMidLatitudeRadWebMercator = function()
@@ -2636,7 +2594,7 @@ TinTerrain.prototype.makeAltitudesSliceByTexture = function(lonSegments, latSegm
 	return altArray;
 };
 
-TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, altitude, options)
+TinTerrain.prototype.makeMeshVirtually_FUNCTION_NO_USED = function (lonSegments, latSegments, altitude, options)
 {
 	// WEB_MERCATOR.
 	// This function makes an ellipsoidal mesh for tiles that has no elevation data.
@@ -2874,7 +2832,7 @@ TinTerrain.prototype.makeSeaMeshVirtually = function(options)
 	this.skirtTexCoordsArraySea = skirtResultObject.skirtTexCoordsArray;
 };
 
-TinTerrain.prototype.makeMeshVirtuallyCRS84 = function(lonSegments, latSegments, altitude, altitudesSlice)
+TinTerrain.prototype.makeMeshVirtuallyCRS84_FUNCTION_NO_USED = function(lonSegments, latSegments, altitude, altitudesSlice)
 {
 	// This function makes an ellipsoidal mesh for tiles that has no elevation data.
 	// note: "altitude" & "altitudesSlice" are optionals.
@@ -2992,14 +2950,6 @@ TinTerrain.prototype.makeVbo = function(vboMemManager)
 	{ return; }
 
 	// rest the CenterPosition to the this.cartesiansArray.
-	var coordsCount = this.cartesiansArray.length/3;
-	//for (var i=0; i<coordsCount; i++)
-	//{
-	//	this.cartesiansArray[i*3] -= this.centerX[0];
-	//	this.cartesiansArray[i*3+1] -= this.centerY[0];
-	//	this.cartesiansArray[i*3+2] -= this.centerZ[0];
-	//}
-	
 	if (this.terrainPositionHIGH === undefined)
 	{ this.terrainPositionHIGH = new Float32Array(3); }
 
@@ -3048,15 +2998,6 @@ TinTerrain.prototype.makeVbo = function(vboMemManager)
 	// Make skirt.
 	if (this.skirtCartesiansArray === undefined)
 	{ return; }
-
-	var skirtCartasiansCount = this.skirtCartesiansArray.length;
-	//for (var i=0; i<skirtCartasiansCount; i++)
-	//{
-	//	this.skirtCartesiansArray[i*3] -= this.centerX[0];
-	//	this.skirtCartesiansArray[i*3+1] -= this.centerY[0];
-	//	this.skirtCartesiansArray[i*3+2] -= this.centerZ[0];
-	//}
-
 	
 	var vboKeySkirt = this.vboKeyContainer.newVBOVertexIdxCacheKey();
 
@@ -3068,17 +3009,6 @@ TinTerrain.prototype.makeVbo = function(vboMemManager)
 	{
 		vboKeySkirt.setDataArrayTexCoord(this.skirtTexCoordsArray, vboMemManager);
 	}
-	
-	// Altitudes for skirtData.
-	/*
-	if (this.skirtAltitudesValuesArray)
-	{
-		var dimensions = 1;
-		var name = "altitudes";
-		var attribLoc = 3;
-		vboKeySkirt.setDataArrayCustom(this.skirtAltitudesValuesArray, vboMemManager, dimensions, name, attribLoc);
-	}
-	*/
 	
 	// Check if exist sea.
 	if (this.seaCartesiansArray !== undefined)
@@ -3625,37 +3555,78 @@ TinTerrain.prototype.parseData = function (dataArrayBuffer)
 {
 	var tinTerrainManager = this.tinTerrainManager;
 	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
-	if (!this.tinTerrainManager.workerParseTerrain) 
-	{ 
-		this.tinTerrainManager.workerParseTerrain = new Worker(this.tinTerrainManager.magoManager.config.scriptRootPath + 'Worker/workerParseTerrain.js'); 
-		this.tinTerrainManager.workerParseTerrain.onmessage = function(e)
-		{
-			var tileInfo = e.data.info;
-			var result = e.data.parsedTerrain;
-			var parsedTerrainMap = tinTerrainManager.textureParsedTerrainMap;
-			if (!parsedTerrainMap[tileInfo.z]) { parsedTerrainMap[tileInfo.z] = {}; }
-			if (!parsedTerrainMap[tileInfo.z][tileInfo.x]) { parsedTerrainMap[tileInfo.z][tileInfo.x] = {}; }
-			if (!parsedTerrainMap[tileInfo.z][tileInfo.x][tileInfo.y]) { parsedTerrainMap[tileInfo.z][tileInfo.x][tileInfo.y] = result; }
-		};
-	}
-
 	var bMakeNormals = true;
 	var imageryType = tinTerrainManager.imageryType;
-	var data = {
-		dataArrayBuffer: dataArrayBuffer,
-		info: {
-			x: this.X, 
-			y: this.Y, 
-			z: this.depth,
-			minGeographicLongitude : this.geographicExtent.minGeographicCoord.longitude,
-			minGeographicLatitude  : this.geographicExtent.minGeographicCoord.latitude,
-			maxGeographicLongitude : this.geographicExtent.maxGeographicCoord.longitude,
-			maxGeographicLatitude  : this.geographicExtent.maxGeographicCoord.latitude,
-			imageryType            : imageryType,
-			bMakeNormals           : bMakeNormals
+
+	if(dataArrayBuffer)
+	{
+		if (!this.tinTerrainManager.workerParseTerrain) 
+		{ 
+			this.tinTerrainManager.workerParseTerrain = new Worker(this.tinTerrainManager.magoManager.config.scriptRootPath + 'Worker/workerParseTerrain.js'); 
+			this.tinTerrainManager.workerParseTerrain.onmessage = function(e)
+			{
+				var tileInfo = e.data.info;
+				var result = e.data.parsedTerrain;
+				var parsedTerrainMap = tinTerrainManager.textureParsedTerrainMap;
+				if (!parsedTerrainMap[tileInfo.z]) { parsedTerrainMap[tileInfo.z] = {}; }
+				if (!parsedTerrainMap[tileInfo.z][tileInfo.x]) { parsedTerrainMap[tileInfo.z][tileInfo.x] = {}; }
+				if (!parsedTerrainMap[tileInfo.z][tileInfo.x][tileInfo.y]) { parsedTerrainMap[tileInfo.z][tileInfo.x][tileInfo.y] = result; }
+			};
 		}
-	};
-	this.tinTerrainManager.workerParseTerrain.postMessage(data, [data.dataArrayBuffer]);// send to worker by reference (transfer).
+
+		var data = {
+			dataArrayBuffer: dataArrayBuffer,
+			info: {
+				x: this.X, 
+				y: this.Y, 
+				z: this.depth,
+				minGeographicLongitude : this.geographicExtent.minGeographicCoord.longitude,
+				minGeographicLatitude  : this.geographicExtent.minGeographicCoord.latitude,
+				maxGeographicLongitude : this.geographicExtent.maxGeographicCoord.longitude,
+				maxGeographicLatitude  : this.geographicExtent.maxGeographicCoord.latitude,
+				imageryType            : imageryType,
+				bMakeNormals           : bMakeNormals
+			}
+		};
+		this.tinTerrainManager.workerParseTerrain.postMessage(data, [data.dataArrayBuffer]);// send to worker by reference (transfer).
+	}
+	else
+	{
+		// make mesh virtually.***
+		if (!this.tinTerrainManager.workerMakePlaneTerrain) 
+		{ 
+			this.tinTerrainManager.workerMakePlaneTerrain = new Worker(this.tinTerrainManager.magoManager.config.scriptRootPath + 'Worker/workerMakePlaneTerrain.js'); 
+			this.tinTerrainManager.workerMakePlaneTerrain.onmessage = function(e)
+			{
+				var tileInfo = e.data.info;
+				var result = e.data.parsedTerrain;
+				var parsedTerrainMap = tinTerrainManager.textureParsedTerrainMap;
+				if (!parsedTerrainMap[tileInfo.z]) { parsedTerrainMap[tileInfo.z] = {}; }
+				if (!parsedTerrainMap[tileInfo.z][tileInfo.x]) { parsedTerrainMap[tileInfo.z][tileInfo.x] = {}; }
+				if (!parsedTerrainMap[tileInfo.z][tileInfo.x][tileInfo.y]) { parsedTerrainMap[tileInfo.z][tileInfo.x][tileInfo.y] = result; }
+			};
+		}
+
+		var texCorrectionFactor = this.tinTerrainManager.getTexCorrection(this.depth);
+		var data = {
+			info: {
+				x: this.X, 
+				y: this.Y, 
+				z: this.depth,
+				minGeographicLongitude : this.geographicExtent.minGeographicCoord.longitude,
+				minGeographicLatitude  : this.geographicExtent.minGeographicCoord.latitude,
+				maxGeographicLongitude : this.geographicExtent.maxGeographicCoord.longitude,
+				maxGeographicLatitude  : this.geographicExtent.maxGeographicCoord.latitude,
+				lonSegments : 20,
+				latSegments : 20, 
+				altitude : 0,
+				imageryType            : imageryType,
+				bMakeNormals           : bMakeNormals,
+				texCorrectionFactor : texCorrectionFactor
+			}
+		};
+		this.tinTerrainManager.workerMakePlaneTerrain.postMessage(data);// send to worker by copy.
+	}
 };
 
 

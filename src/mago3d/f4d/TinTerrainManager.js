@@ -547,7 +547,7 @@ TinTerrainManager.prototype.getTexCorrection = function(depth)
 };
 
 
-TinTerrainManager.prototype.doFrustumCulling = function(frustum, camera, magoManager, maxDepth)
+TinTerrainManager.prototype.doFrustumCulling = function (frustum, camera, magoManager, maxDepth)
 {
 	if (maxDepth === undefined)
 	{ maxDepth = this.maxDepth; }
