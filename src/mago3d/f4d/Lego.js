@@ -306,7 +306,7 @@ Lego.prototype.parsePointsCloudData = function(buffer, gl, magoManager)
  * @param {WebGLRenderingContext} gl not use
  * @param {MagoManager} magoManager 
  */
-Lego.prototype.parseLegoData = function(buffer, magoManager, bytesReaded)
+Lego.prototype.parseLegoData = function (buffer, magoManager, bytesReaded)
 {
 	if (this.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED && this.fileLoadState !== CODE.fileLoadState.IN_PARSE_QUEUE)	{ return; }
 	
@@ -489,9 +489,6 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader,
 	if (renderType === 3)
 	{
 		var processCounterManager = magoManager.processCounterManager;
-		
-		
-		
 		if (this.shadowMeshesArray !== undefined)
 		{
 			// render the shadowMeshes.

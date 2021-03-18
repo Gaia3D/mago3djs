@@ -810,7 +810,8 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 				this.isCameraMoved = true;
 				this.emit('isCameraMoved');
 			}
-			
+
+			sceneState.camera.calculateSpeed(camPosX, camPosY, camPosZ, this.getCurrentTime());
 		}
 		
 		// Update sceneState camera.***
@@ -2122,6 +2123,7 @@ MagoManager.prototype.doRenderMagoWorld = function (frustumVolumenObject)
 	var renderType = 0; // 0= depth. 1= color.***
 	this.renderType = 0;
 	var sceneState = this.sceneState;
+	
 
 	// 1.1) render sunDepth.
 	if (sceneState.applySunShadows && !this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
@@ -2149,12 +2151,13 @@ MagoManager.prototype.doRenderMagoWorld = function (frustumVolumenObject)
 	var selectionManager = this.selectionManager;
 	if(selectionManager.existSelectedObjects())
 	{
-		//this.renderer.renderSilhouetteDepth(); 
+		this.renderer.renderSilhouetteDepth(); 
 	}
 	
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
 
 	this.bindMagoFbo();
+	var extbuffers = this.extbuffers;
 
 	gl.clearColor(0, 0, 0, 1);
 	gl.clearDepth(1);
@@ -2166,32 +2169,32 @@ MagoManager.prototype.doRenderMagoWorld = function (frustumVolumenObject)
 	if (this.tinTerrainManager !== undefined)
 	{
 		// Atmosphere.**************************************************
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.albedoTex, 0);
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0);
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0);
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0);
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT4_WEBGL, gl.TEXTURE_2D, null, 0);
-		this.extbuffers.drawBuffersWEBGL([
-			this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
-			this.extbuffers.NONE, // gl_FragData[1] - depthTex
-			this.extbuffers.NONE,// gl_FragData[2] - normalTex
-			this.extbuffers.NONE, // gl_FragData[3] - albedoTex
-			this.extbuffers.NONE // gl_FragData[4] - selColorTex
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.albedoTex, 0);
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0);
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0);
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0);
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT4_WEBGL, gl.TEXTURE_2D, null, 0);
+		extbuffers.drawBuffersWEBGL([
+			extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
+			extbuffers.NONE, // gl_FragData[1] - depthTex
+			extbuffers.NONE,// gl_FragData[2] - normalTex
+			extbuffers.NONE, // gl_FragData[3] - albedoTex
+			extbuffers.NONE // gl_FragData[4] - selColorTex
 			]);
 		this.renderer.renderAtmosphere(gl, renderType);
 
 		// Terrain.*****************************************************
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.depthFboNeo.colorBuffersArray[4], 0);
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.depthTex, 0);
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, this.normalTex, 0);
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, this.albedoTex, 0);
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT4_WEBGL, gl.TEXTURE_2D, this.selColorTex, 0);
-		this.extbuffers.drawBuffersWEBGL([
-			this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
-			this.extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - depthTex
-			this.extbuffers.COLOR_ATTACHMENT2_WEBGL,// gl_FragData[2] - normalTex
-			this.extbuffers.COLOR_ATTACHMENT3_WEBGL, // gl_FragData[3] - albedoTex
-			this.extbuffers.COLOR_ATTACHMENT4_WEBGL // gl_FragData[4] - selColorTex
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.depthFboNeo.colorBuffersArray[4], 0);
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.depthTex, 0);
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, this.normalTex, 0);
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, this.albedoTex, 0);
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT4_WEBGL, gl.TEXTURE_2D, this.selColorTex, 0);
+		extbuffers.drawBuffersWEBGL([
+			extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
+			extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - depthTex
+			extbuffers.COLOR_ATTACHMENT2_WEBGL,// gl_FragData[2] - normalTex
+			extbuffers.COLOR_ATTACHMENT3_WEBGL, // gl_FragData[3] - albedoTex
+			extbuffers.COLOR_ATTACHMENT4_WEBGL // gl_FragData[4] - selColorTex
 			]);
 		var bDepthRender = false; // magoManager is no depth render.***
 		var renderType = 1;
@@ -2207,15 +2210,15 @@ MagoManager.prototype.doRenderMagoWorld = function (frustumVolumenObject)
 	
 	
 	// Render transparents.****************************************************************************************************************
-	gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // depthTex.
-	gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // normalTex.
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // depthTex.
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // normalTex.
 	//gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0); // albedoTex.
-	this.extbuffers.drawBuffersWEBGL([
-		this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
-		this.extbuffers.NONE, // gl_FragData[1]
-		this.extbuffers.NONE, // gl_FragData[2]
-		this.extbuffers.COLOR_ATTACHMENT3_WEBGL, // gl_FragData[3] - albedoTex
-		this.extbuffers.COLOR_ATTACHMENT4_WEBGL // gl_FragData[4] - selColor4
+	extbuffers.drawBuffersWEBGL([
+		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
+		extbuffers.NONE, // gl_FragData[1]
+		extbuffers.NONE, // gl_FragData[2]
+		extbuffers.COLOR_ATTACHMENT3_WEBGL, // gl_FragData[3] - albedoTex
+		extbuffers.COLOR_ATTACHMENT4_WEBGL // gl_FragData[4] - selColor4
 		]);
 
 	renderType = 1;
@@ -2464,6 +2467,7 @@ MagoManager.prototype.startRender = function (isLastFrustum, frustumIdx, numFrus
 	// Update the current frame's frustums count.
 	this.numFrustums = numFrustums;
 	this.isLastFrustum = isLastFrustum;
+	var camera = this.sceneState.camera;
 	
 	var gl = this.getGl();
 	this.upDateSceneStateMatrices(this.sceneState);
@@ -2494,7 +2498,7 @@ MagoManager.prototype.startRender = function (isLastFrustum, frustumIdx, numFrus
 		gl.clear(gl.STENCIL_BUFFER_BIT);
 
 		// If mago camera has track node, camera look track node.
-		this.sceneState.camera.doTrack(this);
+		camera.doTrack(this);
 		
 		// reset stadistics data.
 		this.sceneState.resetStadistics();
@@ -2503,12 +2507,12 @@ MagoManager.prototype.startRender = function (isLastFrustum, frustumIdx, numFrus
 		this.clearCanvas2D();
 	}
 	
-	var cameraPosition = this.sceneState.camera.position;
+	var cameraPosition = camera.position;
 	
 	// Take the current frustumVolumenObject.***
 	var frustumVolumenObject = this.frustumVolumeControl.getFrustumVolumeCulling(frustumIdx); 
 	this.myCameraSCX.setCurrentFrustum(frustumIdx);
-	this.sceneState.camera.setCurrentFrustum(frustumIdx);
+	camera.setCurrentFrustum(frustumIdx);
 	var visibleNodes = frustumVolumenObject.visibleNodes; // class: VisibleObjectsController.
 
 	if (!this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
@@ -2525,11 +2529,12 @@ MagoManager.prototype.startRender = function (isLastFrustum, frustumIdx, numFrus
 	this.visibleObjControlerNodes = visibleNodes; // set the current visible nodes.***
 
 	// prepare data if camera is no moving.***
-	//if (!this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
-	if (!this.isCameraMoving && !this.mouseMiddleDown)
+	//var camMoveType = camera.lastMovement.movementType;// = CODE.movementType.NO_MOVEMENT
+	if (!this.isCameraMoving && !this.mouseMiddleDown)// && camMoveType === CODE.movementType.NO_MOVEMENT)
 	{
 		this.loadAndPrepareData();
 	}
+
 	
 	// Render process.***
 	this.doRender(frustumVolumenObject);
@@ -2763,9 +2768,18 @@ MagoManager.prototype.clearCanvas2D = function()
  * Prepare current visibles low LOD nodes
  * @private
  */
-MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray) 
+MagoManager.prototype.prepareVisibleLowLodNodes = function (lowLodNodesArray) 
 {
-	var maxParsesCount = 300; // 5
+	var maxParsesCount = 300; 
+
+	var camMoveType = this.sceneState.camera.lastMovement.movementType;// = CODE.movementType.NO_MOVEMENT
+	var camIsMoving = false;
+	if (camMoveType !== CODE.movementType.NO_MOVEMENT)
+	{
+		camIsMoving = true;
+		maxParsesCount = 20; 
+	}
+
 	if (this.readerWriter.skinLegos_requested > maxParsesCount)
 	{ return; }
 	
@@ -2811,6 +2825,9 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function(lowLodNodesArray)
 		}
 		
 		if (this.readerWriter.skinLegos_requested > maxParsesCount)
+		{ return; }
+
+		if(camIsMoving && i > maxParsesCount)
 		{ return; }
 	}
 };

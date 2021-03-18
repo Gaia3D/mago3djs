@@ -100,32 +100,6 @@ worker.onmessage = function(e)
 			
 			texCoordsArray[i*2] = s;
 			texCoordsArray[i*2+1] = t;
-
-
-			// Debug to find reverse latitude from t.
-			/*
-			var thisMinLatRad = minLat;
-			var aConstAux = (1.0/(2.0*PI))*Math.pow(2.0, depth);
-
-			var minTAux = Math.round( aConstAux*(PI-Math.log(Math.tan(PI_DIV_4+thisMinLatRad/2.0))) );
-			minTAux = 1.0 - minTAux;
-
-			var tAux = ( t) + minTAux;
-			tAux = 1.0 - tAux;
-			var latRad = 2.0*(Math.atan(Math.exp(PI-tAux/aConstAux))-PI_DIV_4);
-			var hola = 0;
-
-			// Now, with latRad, recalculate texCoord.***
-			//var aConstTex = (1.0/(2.0*PI))*pow(2.0, float(tileDepth));
-			var minTTex = Math.round(aConstAux*(PI-Math.log(Math.tan(PI_DIV_4+thisMinLatRad/2.0))));
-			minTTex = 1.0 - minTTex;
-
-			var newT = aConstAux*(PI-Math.log(Math.tan(PI_DIV_4+latRad/2.0)));
-			newT = 1.0 - newT;
-			newT -= minTTex;
-			var hola = 0;
-			*/
-			// End debug.---
 		}
 	}
 	else
@@ -192,12 +166,6 @@ worker.onmessage = function(e)
 		altArray[idx] -= 3.0;
 	}
 	*/
-
-	//test debug.***
-	//if (e.data.info.z === 8 && e.data.info.x === 217 && e.data.info.y === 99)
-	//{
-	//	var hola = 0;
-	//}
 
 	var options = {
 		skirtDepth          : 500,

@@ -1279,6 +1279,196 @@ TinTerrain.prototype.prepareTinTerrainForward = function (magoManager, tinTerrai
 
 			var result = parsedTerrainMap[z][x][y];
 
+
+			this.centerX = result.centerX;
+			this.centerY = result.centerY;
+			this.centerZ = result.centerZ;
+				
+			this.minHeight = result.minHeight;
+			this.maxHeight = result.maxHeight;
+				
+			// In this moment set the altitudes for the geographicExtension.
+			this.geographicExtent.setExtent(undefined, undefined, this.minHeight[0], undefined, undefined, this.maxHeight[0]);
+				
+			this.boundingSphereCenterX = result.boundingSphereCenterX;
+			this.boundingSphereCenterY = result.boundingSphereCenterY;
+			this.boundingSphereCenterZ = result.boundingSphereCenterZ;
+			this.boundingSphereRadius = result.boundingSphereRadius;
+				
+			this.horizonOcclusionPointX = result.horizonOcclusionPointX;
+			this.horizonOcclusionPointY = result.horizonOcclusionPointY;
+			this.horizonOcclusionPointZ = result.horizonOcclusionPointZ;
+				
+			// 2. vertex data.
+			this.vertexCount = result.vertexCount;
+				
+			// 3. indices.
+			this.indices = result.indices;
+				
+			// 4. edges indices.
+			this.westIndices = result.westIndices;
+			this.southIndices = result.southIndices;
+			this.eastIndices = result.eastIndices;
+			this.northIndices = result.northIndices;
+
+			// 5. extension header.
+			this.extensionId = result.extensionId;
+			this.extensionLength = result.extensionLength;
+				
+			this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
+
+			//******************************************************************************************************
+			this.texCoordsArray = result.texCoordsArray;
+			this.cartesiansArray = result.cartesiansArray;
+			this.skirtCartesiansArray = result.skirtCartesiansArray;
+			this.skirtTexCoordsArray = result.skirtTexCoordsArray;
+			this.skirtAltitudesArray = result.skirtAltitudesArray;
+			this.altArray = result.altArray;
+			this.normalsArray = result.normalsArray;
+			this.lonArray = result.longitudesArray;
+			this.latArray = result.latitudesArray;
+			//--------------------------------------------------------------------------------------------------------
+
+			delete this.tinTerrainManager.textureParsedTerrainMap[z][x][y];
+
+			this.makeVbo(magoManager.vboMemoryManager);
+
+			// Make sea mesh too.
+			this.makeSeaMeshVirtually(undefined);
+			this.makeVboSea(magoManager.vboMemoryManager);
+			return false;
+		}
+		else if (!this.isTexturePrepared(this.texture))
+		{
+			if (this.depth <= tinTerrainManager.maxTextureGuranteedDepth)
+			{
+				this.prepareTexture(this.texture, tinTerrainManager.imagerys, magoManager, tinTerrainManager);
+			}
+			return false;
+		}
+		
+		
+
+		// Test making textureMaster.
+		// If there are 2 or more layers, then must create textureMaster.
+		// Check if tinTerrain is syncronized with this.tinTerrainManager.
+		/*
+		if (this.layersStyleId !== this.tinTerrainManager.layersStyleId)
+		{ 
+			this.textureMasterImageryLayersPrepared = undefined; 
+			this.textureMasterPrepared = undefined; 
+		}
+
+		//if (this.objToClampToTerrainStyleId !== this.tinTerrainManager.objToClampToTerrainStyleId)
+		//{ 
+		//	this.textureMasterPrepared = undefined; 
+		//}
+
+		if (!this.textureMasterPrepared && this.isTexturePrepared(this.texture))
+		{
+			this.makeTextureMaster();
+		}
+		*/
+	}
+	
+	
+	
+	return true;
+};
+
+TinTerrain.prototype.prepareTinTerrainForward_original = function (magoManager, tinTerrainManager)
+{	
+	var isPrepared = false;
+
+	if (this.depth <= this.tinTerrainManager.maxTextureGuranteedDepth)
+	{
+		isPrepared = this.isPrepared();
+	}
+	else
+	{
+		isPrepared = this.isMeshPrepared();
+	}
+
+	if (isPrepared)
+	{
+		// prepare children.***
+		if (!this.isLeaf && this.childMap)
+		{
+			this.childMap.LU.prepareTinTerrainForward(magoManager, tinTerrainManager);
+			this.childMap.LD.prepareTinTerrainForward(magoManager, tinTerrainManager);
+			this.childMap.RU.prepareTinTerrainForward(magoManager, tinTerrainManager);
+			this.childMap.RD.prepareTinTerrainForward(magoManager, tinTerrainManager);
+		}
+
+		// Test making textureMaster.
+		// If there are 2 or more layers, then must create textureMaster.
+		// Check if tinTerrain is syncronized with this.tinTerrainManager.
+		if (this.layersStyleId !== this.tinTerrainManager.layersStyleId)
+		{ 
+			this.textureMasterImageryLayersPrepared = undefined; 
+			this.textureMasterPrepared = undefined; 
+		}
+
+		//if (this.objToClampToTerrainStyleId !== this.tinTerrainManager.objToClampToTerrainStyleId)
+		//{ 
+		//	this.textureMasterPrepared = undefined; 
+		//}
+
+		if (!this.textureMasterPrepared && this.isTexturePrepared(this.texture))
+		{
+			this.makeTextureMaster();
+		}
+	}
+	else
+	{
+		// prepare this tile.***
+		magoManager.processQueue.eraseTinTerrainToDelete(this);
+
+		if (this.fileLoadState === CODE.fileLoadState.LOAD_FAILED)
+		{
+			return this.prepareTinTerrainPlain(magoManager, tinTerrainManager);
+		}
+		
+		// Prepare this tinTerrain.
+		if (this.fileLoadState === CODE.fileLoadState.READY)
+		{
+			if (magoManager.fileRequestControler.tinTerrainFilesRequested > 5)
+			{ return false; }
+			
+			//해당 터레인 xyz를 terrainInfo와 비교하여 유효한 파일이면 통과, 아닐시 plain으로 처리
+			if (!this.checkAvailableTerrain()) 
+			{
+				this.fileLoadState = CODE.fileLoadState.LOAD_FAILED;
+				return false;
+			}
+
+			var pathName = this.getPathName();
+			var geometryDataPath = magoManager.readerWriter.geometryDataPath;
+			//var fileName = geometryDataPath + "/Terrain/" + pathName + ".terrain";
+
+			var fileName = this.tinTerrainManager.terrainValue + pathName + ".terrain";
+			magoManager.readerWriter.loadTINTerrain(fileName, this, magoManager);
+				
+			return false;
+		}
+		else if (this.fileLoadState === CODE.fileLoadState.LOADING_FINISHED)
+		{
+			// put the terrain into parseQueue.
+			magoManager.parseQueue.putTinTerrainToParse(this, 0);
+			return false;
+		}
+		else if (this.fileLoadState === CODE.fileLoadState.PARSE_STARTED) 
+		{
+			var parsedTerrainMap = tinTerrainManager.textureParsedTerrainMap;
+			var z = this.depth;
+			var x = this.X;
+			var y = this.Y;
+			if (!parsedTerrainMap[z]) { return; }
+			if (!parsedTerrainMap[z][x]) { return; }
+			if (!parsedTerrainMap[z][x][y]) { return; }
+
+			var result = parsedTerrainMap[z][x][y];
+
 			this.centerX = result.centerX;
 			this.centerY = result.centerY;
 			this.centerZ = result.centerZ;
@@ -1755,6 +1945,11 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 		}
 		var selectionManager = magoManager.selectionManager;
 		var indicesCount = vboKey.indicesCount;
+
+		if(indicesCount !== 2400)
+		{
+			var hola = 0;
+		}
 			
 		//var currSelObject = magoManager.selectionManager.getSelectedGeneral();
 		//if (currSelObject !== this)
@@ -2581,10 +2776,7 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 	
 	this.cartesiansArray = Globe.geographicRadianArrayToFloat32ArrayWgs84(lonArray, latArray, altArray, undefined);
 	
-	
 	// Make normals using the cartesians.***
-	
-	
 	this.normalsArray = new Int8Array(vertexCount*3);
 	var point = new Point3D();
 	for (var i=0; i<vertexCount; i++)
@@ -2595,6 +2787,15 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 		this.normalsArray[i*3] = point.x*126;
 		this.normalsArray[i*3+1] = point.y*126;
 		this.normalsArray[i*3+2] = point.z*126;
+	}
+
+	// After calculate normals, convert cartesian rel to center.***
+	var cartesiansCount = this.cartesiansArray.length/3;
+	for(var i=0; i<cartesiansCount; i++)
+	{
+		this.cartesiansArray[i*3] -= this.centerX;
+		this.cartesiansArray[i*3+1] -= this.centerY;
+		this.cartesiansArray[i*3+2] -= this.centerZ;
 	}
 	
 	
@@ -2629,6 +2830,14 @@ TinTerrain.prototype.makeMeshVirtually = function(lonSegments, latSegments, alti
 	var skirtResultObject = TinTerrain.getSkirtTrianglesStrip(lonArray, latArray, altArray, this.texCoordsArray, this.southIndices, this.eastIndices, this.northIndices, this.westIndices, options);
 	this.skirtCartesiansArray = skirtResultObject.skirtCartesiansArray;
 	this.skirtTexCoordsArray = skirtResultObject.skirtTexCoordsArray;
+
+	var cartesiansCount = this.skirtCartesiansArray.length/3;
+	for(var i=0; i<cartesiansCount; i++)
+	{
+		this.skirtCartesiansArray[i*3] -= this.centerX;
+		this.skirtCartesiansArray[i*3+1] -= this.centerY;
+		this.skirtCartesiansArray[i*3+2] -= this.centerZ;
+	}
 	
 	this.calculateCenterPosition();
 };
@@ -2784,12 +2993,12 @@ TinTerrain.prototype.makeVbo = function(vboMemManager)
 
 	// rest the CenterPosition to the this.cartesiansArray.
 	var coordsCount = this.cartesiansArray.length/3;
-	for (var i=0; i<coordsCount; i++)
-	{
-		this.cartesiansArray[i*3] -= this.centerX[0];
-		this.cartesiansArray[i*3+1] -= this.centerY[0];
-		this.cartesiansArray[i*3+2] -= this.centerZ[0];
-	}
+	//for (var i=0; i<coordsCount; i++)
+	//{
+	//	this.cartesiansArray[i*3] -= this.centerX[0];
+	//	this.cartesiansArray[i*3+1] -= this.centerY[0];
+	//	this.cartesiansArray[i*3+2] -= this.centerZ[0];
+	//}
 	
 	if (this.terrainPositionHIGH === undefined)
 	{ this.terrainPositionHIGH = new Float32Array(3); }
@@ -2841,12 +3050,12 @@ TinTerrain.prototype.makeVbo = function(vboMemManager)
 	{ return; }
 
 	var skirtCartasiansCount = this.skirtCartesiansArray.length;
-	for (var i=0; i<skirtCartasiansCount; i++)
-	{
-		this.skirtCartesiansArray[i*3] -= this.centerX[0];
-		this.skirtCartesiansArray[i*3+1] -= this.centerY[0];
-		this.skirtCartesiansArray[i*3+2] -= this.centerZ[0];
-	}
+	//for (var i=0; i<skirtCartasiansCount; i++)
+	//{
+	//	this.skirtCartesiansArray[i*3] -= this.centerX[0];
+	//	this.skirtCartesiansArray[i*3+1] -= this.centerY[0];
+	//	this.skirtCartesiansArray[i*3+2] -= this.centerZ[0];
+	//}
 
 	
 	var vboKeySkirt = this.vboKeyContainer.newVBOVertexIdxCacheKey();
@@ -3359,7 +3568,7 @@ TinTerrain.prototype.makeAltitudesOwnMap = function(magoManager)
 	this.altitudesFbo.unbind();
 };
 
-TinTerrain.prototype.decodeData = function(imageryType)
+TinTerrain.prototype.decodeData_FUNCTION_NO_USED = function(imageryType)
 {
 	if (this.geographicExtent === undefined)
 	{ return; }
@@ -3430,7 +3639,23 @@ TinTerrain.prototype.parseData = function (dataArrayBuffer)
 		};
 	}
 
-	this.tinTerrainManager.workerParseTerrain.postMessage({dataArrayBuffer: dataArrayBuffer, info: {x: this.X, y: this.Y, z: this.depth}});
+	var bMakeNormals = true;
+	var imageryType = tinTerrainManager.imageryType;
+	var data = {
+		dataArrayBuffer: dataArrayBuffer,
+		info: {
+			x: this.X, 
+			y: this.Y, 
+			z: this.depth,
+			minGeographicLongitude : this.geographicExtent.minGeographicCoord.longitude,
+			minGeographicLatitude  : this.geographicExtent.minGeographicCoord.latitude,
+			maxGeographicLongitude : this.geographicExtent.maxGeographicCoord.longitude,
+			maxGeographicLatitude  : this.geographicExtent.maxGeographicCoord.latitude,
+			imageryType            : imageryType,
+			bMakeNormals           : bMakeNormals
+		}
+	};
+	this.tinTerrainManager.workerParseTerrain.postMessage(data, [data.dataArrayBuffer]);// send to worker by reference (transfer).
 };
 
 

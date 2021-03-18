@@ -20,6 +20,11 @@ var Camera = function(options)
 	this.direction = new Point3D(); 
 	this.up = new Point3D();
 	this.right = new Point3D();
+
+	// Vars for speed.
+	this.speed3d = new Point3D();
+	this.updatedTime;
+
 	// current frustum.
 	this.frustum = new Frustum(); 
 	// sum of all frustums.
@@ -52,7 +57,11 @@ var Camera = function(options)
 	this._normalAtCartesianPointWgsb4;
 	
 	// movement.
-	this.lastMovement; // class Movement.
+	this.lastMovement = {
+		currLinearVelocity : 0,
+		currAngularVelocity : 0,
+		movementType : CODE.movementType.NO_MOVEMENT
+	}; // class Movement.
 
 	/**
 	 *  track target node;
@@ -113,7 +122,7 @@ Camera.prototype.copyPosDirUpFrom = function(camera)
  * Translate this camera with translation vector
  * @param {Point3D} translationVec
  */
-Camera.prototype.translate = function(translationVec)
+Camera.prototype.translate = function (translationVec)
 {
 	this.position.add(translationVec.x, translationVec.y, translationVec.z);
 };
@@ -373,6 +382,35 @@ Camera.prototype.isCameraMoved = function(newPosX, newPosY, newPosZ, newDirX, ne
 	return false;
 	
 };
+
+Camera.prototype.calculateSpeed = function (newPosX, newPosY, newPosZ, currTime )
+{
+	// Function called when globe is Cesium. MagoWorld calculates the velocity in mouseMove.
+	var difTime = (currTime - this.updatedTime)/1000;
+	if(difTime < 1E-12)
+	{
+		// speed unknown.
+		return;
+	}
+	var pos = this.position;
+	this.speed3d.set((newPosX - pos.x)/difTime, (newPosY - pos.y)/difTime, (newPosZ - pos.z)/difTime);
+	this.updatedTime = currTime;
+
+	if(!this.lastMovement)
+	{ this.lastMovement = {}; }
+	this.lastMovement.currLinearVelocity = this.speed3d.getModul();
+
+	if(this.lastMovement.currLinearVelocity < 1E-4)
+	{
+		this.lastMovement.movementType = CODE.movementType.NO_MOVEMENT;
+	}
+	else
+	{
+		this.lastMovement.movementType = CODE.movementType.TRANSLATION;
+	}
+};
+
+
 
 /**
  * returns the big Frustum

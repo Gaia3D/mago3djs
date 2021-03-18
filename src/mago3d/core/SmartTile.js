@@ -1559,9 +1559,11 @@ SmartTile.prototype._workerParseSmartTile = function (smartTileF4dSeed, magoMana
 		};
 	}
 	
-	smartTileManager.workerParseSmartTile.postMessage({
-		dataArrayBuffer: dataArrayBuffer, 
-		info: {x: this.X, y: this.Y, z: this.depth, tileName : smartTileF4dSeed.tileName} });
+	var data = { 
+		info: {x: this.X, y: this.Y, z: this.depth, tileName : smartTileF4dSeed.tileName},
+		dataArrayBuffer: dataArrayBuffer};
+	smartTileManager.workerParseSmartTile.postMessage(data, [data.dataArrayBuffer]); // send to worker by reference (transfer).
+	//smartTileManager.workerParseSmartTile.postMessage(data); // send to worker by copy. this is slower.
 };
 
 SmartTile.prototype._parseSmartTileF4d = function (parsedResult, magoManager) 
@@ -1574,8 +1576,6 @@ SmartTile.prototype._parseSmartTileF4d = function (parsedResult, magoManager)
 
 	if (this.sphereExtent === undefined)
 	{ this.makeSphereExtent(magoManager); }
-
-	var enc = new TextDecoder("utf-8");
 	
 	// parse smartTileF4d.***
 	var smartTileType = parsedResult.smartTileType;
@@ -1697,11 +1697,6 @@ SmartTile.prototype._parseSmartTileF4d = function (parsedResult, magoManager)
 		}
 		var lodString = parsedBuildingData.lodString;
 		parsedBuildingData.lodString = undefined; // delete from map to save memory.
-
-		if (lodString !== "lod5")
-		{
-			var hola = 0;
-		}
 		var lodName = parsedBuildingData.lodName;
 		parsedBuildingData.lodName = undefined; // delete from map to save memory.
 		var lowLodMeshDataArray = parsedBuildingData.lowLodMeshDataArray;

@@ -597,7 +597,8 @@ MagoWorld.prototype.mousemove = function (event)
 			{ return; }
 			
 			camera.copyPosDirUpFrom(strCamera);
-			camera.position.add(-moveVectorWC.x, -moveVectorWC.y, -moveVectorWC.z);
+			var translateVectorWC = new Point3D(-moveVectorWC.x, -moveVectorWC.y, -moveVectorWC.z);
+			camera.translate(translateVectorWC);
 			
 			this.updateModelViewMatrixByCamera(camera);
 			

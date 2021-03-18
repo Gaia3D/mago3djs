@@ -1450,7 +1450,7 @@ NeoBuilding.prototype.parseHeader = function(arrayBuffer, bytesReaded)
 /**
  * 어떤 일을 하고 있습니까?
  */
-NeoBuilding.prototype.parseLodBuildingData = function(arrayBuffer, bytesReaded) 
+NeoBuilding.prototype.parseLodBuildingData = function (arrayBuffer, bytesReaded) 
 {
 	var lod;
 	var nameLength;
@@ -1497,7 +1497,7 @@ NeoBuilding.prototype.parseLodBuildingData = function(arrayBuffer, bytesReaded)
 /**
  * 어떤 일을 하고 있습니까?
  */
-NeoBuilding.prototype.prepareSkin = function(magoManager) 
+NeoBuilding.prototype.prepareSkin = function (magoManager) 
 {
 	var headerVersion = this.getHeaderVersion();
 	if (headerVersion === undefined)
@@ -1508,6 +1508,16 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 
 	if (!this.currentLod)
 	{ this.currentLod = this.nodeOwner.data.currentLod; }
+
+	// 1rst check if the needed lodMesh is prepared. If the needed lodMesh is ready, then do nothing.
+	//var neededLodBuildingName = "lod"+this.currentLod.toString();
+	//if (this.lodBuildingMap[neededLodBuildingName])
+	//{
+	//	if (this.lodBuildingMap[neededLodBuildingName].isPrepared)
+	//	{
+	//		return true;
+	//	}
+	//}
 
 	// Must respect the lodLoading order: must load the lowerLod if is not loaded.
 	var lodToLoad;
@@ -1637,7 +1647,6 @@ NeoBuilding.prototype.prepareSkin = function(magoManager)
 			
 		}
 	}
-	
 	
 	return true;
 };

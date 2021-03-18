@@ -795,10 +795,8 @@ ManagerUtils.calculatePixelLinearDepth = function(gl, pixelX, pixelY, depthFbo, 
 	// Check if we are using logarithmic depth buffer.***
 	if (magoManager.postFxShadersManager.bUseLogarithmicDepth)
 	{
-		linearDepth = zDepth * 1.0037;
+		linearDepth = zDepth;// * 1.0037;
 		var sceneState = magoManager.sceneState;
-		//var far = sceneState.camera.frustum.far[0]; // old.***
- 
 		var fcoef_half = sceneState.fCoef_logDepth[0]/2.0;
 		var flogz = Math.pow(2.0, linearDepth/fcoef_half);
 		var z = flogz - 1.0;
