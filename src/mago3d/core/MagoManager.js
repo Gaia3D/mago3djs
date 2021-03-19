@@ -2777,7 +2777,7 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function (lowLodNodesArray)
 	if (camMoveType !== CODE.movementType.NO_MOVEMENT)
 	{
 		camIsMoving = true;
-		maxParsesCount = 20; 
+		maxParsesCount = 200; 
 	}
 
 	if (this.readerWriter.skinLegos_requested > maxParsesCount)
