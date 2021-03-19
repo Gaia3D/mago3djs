@@ -342,11 +342,11 @@ ParseQueue.prototype.parseArrayOctreesPCloudPartition = function(gl, octreesArra
 	}
 };
 
-ParseQueue.prototype.parseArrayOctreesLod2Legos = function(gl, octreesArray, magoManager)
+ParseQueue.prototype.parseArrayOctreesLod2Legos = function (octreesArray, magoManager)
 {
 	if (Object.keys(this.octreesLod2LegosToParseMap).length > 0)
 	{
-		var maxParsesCount = this.maxNumParses;
+		//var maxParsesCount = this.maxNumParses;
 		var octreesParsedCount = 0;
 		var lowestOctree;
 	
@@ -359,13 +359,14 @@ ParseQueue.prototype.parseArrayOctreesLod2Legos = function(gl, octreesArray, mag
 				if (lowestOctree.lego === undefined)
 				{ continue; }
 				
-				lowestOctree.lego.parseArrayBuffer(lowestOctree.lego.dataArrayBuffer, magoManager);
-				lowestOctree.lego.dataArrayBuffer = undefined;
+				// parse by worker:
+				var neoBuilding = lowestOctree.neoBuildingOwner;
+				neoBuilding._parseLegoByWorker(lowestOctree.lego.dataArrayBuffer, lowestOctree.lego, magoManager);
 				
 				octreesParsedCount++;
 			}
-			if (octreesParsedCount > maxParsesCount)
-			{ break; }
+			//if (octreesParsedCount > maxParsesCount)
+			//{ break; }
 		}
 		/*
 		if (octreesParsedCount === 0)
@@ -634,7 +635,7 @@ ParseQueue.prototype.eraseOctreeLod0ModelsToParse = function(octree)
 	return false;
 };
 
-ParseQueue.prototype.putOctreeLod2LegosToParse = function(octree, aValue)
+ParseQueue.prototype.putOctreeLod2LegosToParse = function (octree, aValue)
 {
 	// provisionally "aValue" can be anything.
 	if (aValue === undefined)

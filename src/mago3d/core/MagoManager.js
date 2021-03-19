@@ -5549,7 +5549,7 @@ MagoManager.prototype.manageQueue = function()
 	
 	
 	// parse octrees lod2 (lego).***
-	this.parseQueue.parseArrayOctreesLod2Legos(gl, this.visibleObjControlerOctrees.currentVisibles2, this);
+	this.parseQueue.parseArrayOctreesLod2Legos(this.visibleObjControlerOctrees.currentVisibles2, this);
 
 	// parse PCloud octree.***
 	this.parseQueue.parseArrayOctreesPCloud(gl, this.visibleObjControlerOctrees.currentVisiblesAux, this);

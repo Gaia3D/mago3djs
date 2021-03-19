@@ -32,7 +32,7 @@ worker.onmessage = function (e)
 		buildingData.buildingId = "";
 		wordLength = (new Uint16Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+2)))[0]; bytesReaded += 2;
 		buildingData.buildingId = enc.decode(new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+ wordLength))) ;bytesReaded += wordLength;
-		buildingData.buildingId = buildingData.buildingId.startsWith(prefix) ? buildingId.substr(4, buildingId.length-4) : buildingData.buildingId;
+		buildingData.buildingId = buildingData.buildingId.startsWith(prefix) ? buildingData.buildingId.substr(4, buildingData.buildingId.length-4) : buildingData.buildingId;
 
         // read metaData (header).****************************************************************************************************
         var metadataByteSize = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;

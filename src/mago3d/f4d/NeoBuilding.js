@@ -1413,21 +1413,23 @@ NeoBuilding.prototype.parseHeader = function(arrayBuffer, bytesReaded)
 	
 	// Now, make the neoBuilding's octree.***
 	if (this.octree === undefined) { this.octree = new Octree(undefined); }
-	this.octree.neoBuildingOwnerId = this.buildingId;
-	this.octree.octreeKey = this.buildingId + "_" + this.octree.octree_number_name;
+	var octree = this.octree;
+	octree.neoBuildingOwnerId = this.buildingId;
+	octree.octreeKey = this.buildingId + "_" + octree.octree_number_name;
 	
 	// now, parse octreeAsimetric or octreePyramid (check metadata.projectDataType).***
 	if (metaData.projectDataType === 5)
-	{ bytesReaded = this.octree.parsePyramidVersion(arrayBuffer, bytesReaded, this); }
+	{ bytesReaded = octree.parsePyramidVersion(arrayBuffer, bytesReaded, this); }
 	else
-	{ bytesReaded = this.octree.parseAsimetricVersion(arrayBuffer, bytesReaded, this); }
+	{ bytesReaded = octree.parseAsimetricVersion(arrayBuffer, bytesReaded, this); }
 
-	metaData.oct_min_x = this.octree.centerPos.x - this.octree.half_dx;
-	metaData.oct_max_x = this.octree.centerPos.x + this.octree.half_dx;
-	metaData.oct_min_y = this.octree.centerPos.y - this.octree.half_dy;
-	metaData.oct_max_y = this.octree.centerPos.y + this.octree.half_dy;
-	metaData.oct_min_z = this.octree.centerPos.z - this.octree.half_dz;
-	metaData.oct_max_z = this.octree.centerPos.z + this.octree.half_dz;
+	var centerPos = octree.centerPos;
+	metaData.oct_min_x = centerPos.x - octree.half_dx;
+	metaData.oct_max_x = centerPos.x + octree.half_dx;
+	metaData.oct_min_y = centerPos.y - octree.half_dy;
+	metaData.oct_max_y = centerPos.y + octree.half_dy;
+	metaData.oct_min_z = centerPos.z - octree.half_dz;
+	metaData.oct_max_z = centerPos.z + octree.half_dz;
 
 	
 	if (metaData.version === "0.0.1" || metaData.version === "0.0.2")
@@ -1667,6 +1669,9 @@ NeoBuilding.prototype.prepareSkin = function (magoManager)
 
 		var result = legoParsedMap[smartTileDepth][smartTileX][smartTileY][buildingId][legoKey];
 		lowLodMesh._parseLegoDataResultFromWorker(result, magoManager);
+
+		// Now, delete the parsedObject in the map.
+		delete legoParsedMap[smartTileDepth][smartTileX][smartTileY][buildingId][legoKey]; // delete from the map.***
 	}
 	else if (lowLodMesh.vbo_vicks_container.vboCacheKeysArray[0] && lowLodMesh.vbo_vicks_container.vboCacheKeysArray[0].vboBufferTCoord && lodBuilding.attributes.hasTexture)
 	{

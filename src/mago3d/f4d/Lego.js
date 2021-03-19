@@ -400,8 +400,6 @@ Lego.prototype.parseLegoData = function (buffer, magoManager, bytesReaded)
 	var bbox = this.bbox;
 	var vboCacheKey = this.vbo_vicks_container.newVBOVertexIdxCacheKey();
 	
-	
-
 	// BoundingBox.
 	bytesReaded = bbox.readData(buffer, bytesReaded);
 
@@ -419,11 +417,6 @@ Lego.prototype.parseLegoData = function (buffer, magoManager, bytesReaded)
 		vboCacheKey.vboBufferPos.bKeepDataArray = true;
 	}
 		
-	//var numPositions = stream.readUint32();
-	//var posDataArray = stream.readFloat32Array(numPositions * 3);
-	//vboCacheKey.setDataArrayPos(posDataArray, vboMemManager);
-
-
 	// VBO(Normal Buffer) - i,j,k
 	var hasNormals = (new Uint8Array(buffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
 	if (hasNormals)
@@ -436,13 +429,6 @@ Lego.prototype.parseLegoData = function (buffer, magoManager, bytesReaded)
 		vboCacheKey.setDataArrayNor(norDataArray, vboMemManager);
 		bytesReaded = bytesReaded + byteSize * numNormals * 3; // updating data.
 	}
-	//var hasNormals = stream.readUint8();
-	//if (hasNormals) 
-	//{
-	//	var numNormals = stream.readUint32();
-	//	var norDataArray = stream.readInt8Array(numNormals * 3);
-	//	vboCacheKey.setDataArrayNor(norDataArray, vboMemManager);
-	//}
 
 	// VBO(Color Buffer) - r,g,b,a
 	var hasColors = (new Uint8Array(buffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
@@ -456,13 +442,6 @@ Lego.prototype.parseLegoData = function (buffer, magoManager, bytesReaded)
 		vboCacheKey.setDataArrayCol(colDataArray, vboMemManager);
 		bytesReaded = bytesReaded + byteSize * numColors * 4; // updating data.
 	}
-	//var hasColors = stream.readUint8();
-	//if (hasColors)
-	//{
-	//	var numColors = stream.readUint32();
-	//	var colDataArray = stream.readUint8Array(numColors * 4);
-	//	vboCacheKey.setDataArrayCol(colDataArray, vboMemManager);
-	//}
 
 	// VBO(TextureCoord Buffer) - u,v
 	this.hasTexCoords = (new Uint8Array(buffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
@@ -477,14 +456,6 @@ Lego.prototype.parseLegoData = function (buffer, magoManager, bytesReaded)
 		vboCacheKey.setDataArrayTexCoord(texCoordDataArray, vboMemManager);
 		bytesReaded = bytesReaded + byteSize * numCoords * 2; // updating data.
 	}
-	//this.hasTexCoords = stream.readUint8();
-	//if (this.hasTexCoords)
-	//{
-	//	var dataType = stream.readUint16();
-	//	var numCoords = stream.readUint32();
-	//	var texCoordDataArray = stream.readFloat32Array(numCoords * 2);
-	//	vboCacheKey.setDataArrayTexCoord(texCoordDataArray, vboMemManager);
-	//}
 
 	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
 	

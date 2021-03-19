@@ -525,6 +525,32 @@ Octree.prototype.prepareSkinData = function(magoManager)
 			}
 		}
 	}
+	else if (this.lego.fileLoadState === CODE.fileLoadState.PARSE_STARTED)
+	{
+		// check if parseWorker finished.***
+		var neoBuilding = this.neoBuildingOwner;
+		var nodeOwner = neoBuilding.nodeOwner;
+		var smartTileOwner = nodeOwner.data.smartTileOwner;
+		var smartTileX = smartTileOwner.X;
+		var smartTileY = smartTileOwner.Y;
+		var smartTileDepth = smartTileOwner.depth;
+		var buildingId = neoBuilding.buildingId;
+		var legoKey = this.lego.legoKey;
+
+		var legoParsedMap = magoManager.legoParsedMap;
+		if(!legoParsedMap){ return; }
+		if (!legoParsedMap[smartTileDepth]) { return; }
+		if (!legoParsedMap[smartTileDepth][smartTileX]) { return; }
+		if (!legoParsedMap[smartTileDepth][smartTileX][smartTileY]) { return; }
+		if (!legoParsedMap[smartTileDepth][smartTileX][smartTileY][buildingId]) { return; }
+		if (!legoParsedMap[smartTileDepth][smartTileX][smartTileY][buildingId][legoKey]) { return; }
+
+		var result = legoParsedMap[smartTileDepth][smartTileX][smartTileY][buildingId][legoKey];
+		this.lego._parseLegoDataResultFromWorker(result, magoManager);
+
+		// Now, delete the parsedObject in the map.
+		delete legoParsedMap[smartTileDepth][smartTileX][smartTileY][buildingId][legoKey]; // delete from the map.***
+	}
 };
 
 /**
