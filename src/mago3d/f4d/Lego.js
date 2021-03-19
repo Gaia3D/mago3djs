@@ -298,6 +298,67 @@ Lego.prototype.parsePointsCloudData = function(buffer, gl, magoManager)
 };
 
 /**
+ * Parse F4D lego data from worker result.
+ * vertex index cache key를 생성하여 담는다.
+ * LOADING_FINISHED 상태일때 실행.
+ * 
+ * @param {object} resultFromWorker 
+ * @param {MagoManager} magoManager 
+ */
+Lego.prototype._parseLegoDataResultFromWorker = function (resultFromWorker, magoManager)
+{
+	var vboMemManager = magoManager.vboMemoryManager;
+	var settings = magoManager._settings;
+	var keepVboPositionDataArrayBuffers = settings.keepVboPositionDataArrayBuffers;
+
+	if (this.vbo_vicks_container === undefined)
+	{ 
+		this.vbo_vicks_container = new VBOVertexIdxCacheKeysContainer(); 
+	}
+
+	this.bbox = new BoundingBox();
+	var bbox = this.bbox;
+	var vboCacheKey = this.vbo_vicks_container.newVBOVertexIdxCacheKey();
+	
+	// BoundingBox.
+	var boxSize = resultFromWorker.bboxSize;
+	bbox.set(boxSize[0], boxSize[1], boxSize[2], boxSize[3], boxSize[4], boxSize[5]);
+
+	// VBO(Position Buffer) - x,y,z
+	vboCacheKey.setDataArrayPos(resultFromWorker.posDataArray, vboMemManager);
+	
+	if (keepVboPositionDataArrayBuffers)
+	{
+		vboCacheKey.vboBufferPos.bKeepDataArray = true;
+	}
+		
+	// VBO(Normal Buffer) - i,j,k
+	var hasNormals = resultFromWorker.norDataArray;
+	if (hasNormals)
+	{
+		vboCacheKey.setDataArrayNor(resultFromWorker.norDataArray, vboMemManager);
+	}
+
+	// VBO(Color Buffer) - r,g,b,a
+	var hasColors = resultFromWorker.colDataArray;
+	if (hasColors)
+	{
+		vboCacheKey.setDataArrayCol(resultFromWorker.colDataArray, vboMemManager);
+	}
+
+	// VBO(TextureCoord Buffer) - u,v
+	this.hasTexCoords = (resultFromWorker.texCoordsArray !== undefined);
+	if (this.hasTexCoords)
+	{
+		vboCacheKey.setDataArrayTexCoord(resultFromWorker.texCoordsArray, vboMemManager);
+	}
+	this.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
+
+	// Test debug:
+	this.parsedFromWorker = true;
+};
+
+/**
  * F4D Lego 자료를 읽어서 가져온 ArrayBuffer를 파싱.
  * vertex index cache key를 생성하여 담는다.
  * LOADING_FINISHED 상태일때 실행.
@@ -308,6 +369,10 @@ Lego.prototype.parsePointsCloudData = function(buffer, gl, magoManager)
  */
 Lego.prototype.parseLegoData = function (buffer, magoManager, bytesReaded)
 {
+	// Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.***
+	// Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.***
+	// Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.***
+	// Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.*** Old.***
 	if (this.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED && this.fileLoadState !== CODE.fileLoadState.IN_PARSE_QUEUE)	{ return; }
 	
 	if (buffer === undefined)

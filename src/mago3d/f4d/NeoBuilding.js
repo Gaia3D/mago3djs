@@ -554,7 +554,7 @@ NeoBuilding.prototype.getLodBuildingData = function(lod)
  * 어떤 일을 하고 있습니까?
  * @param lod 변수
  */
-NeoBuilding.prototype.getOrNewLodMesh = function(lodString) 
+NeoBuilding.prototype.getOrNewLodMesh = function (lodString) 
 {
 	if (this.lodMeshesMap === undefined)
 	{ this.lodMeshesMap = {}; }
@@ -1494,6 +1494,48 @@ NeoBuilding.prototype.parseLodBuildingData = function (arrayBuffer, bytesReaded)
 	return bytesReaded;
 };
 
+NeoBuilding.prototype._parseLegoByWorker = function (dataArrayBuffer, legoMesh, magoManager) 
+{
+	if(dataArrayBuffer)
+	{
+		if (!magoManager.workerParseLego) 
+		{ 
+			magoManager.workerParseLego = new Worker(magoManager.config.scriptRootPath + 'Worker/workerParseLego.js'); 
+			magoManager.workerParseLego.onmessage = function(e)
+			{
+				var info = e.data.info;
+				var result = e.data;
+
+				if(!magoManager.legoParsedMap){ magoManager.legoParsedMap = {}; };
+				var legoParsedMap = magoManager.legoParsedMap;
+				if (!legoParsedMap[info.smartTileDepth]) { legoParsedMap[info.smartTileDepth] = {}; }
+				if (!legoParsedMap[info.smartTileDepth][info.smartTileX]) { legoParsedMap[info.smartTileDepth][info.smartTileX] = {}; }
+				if (!legoParsedMap[info.smartTileDepth][info.smartTileX][info.smartTileY]) { legoParsedMap[info.smartTileDepth][info.smartTileX][info.smartTileY] = {}; }
+				if (!legoParsedMap[info.smartTileDepth][info.smartTileX][info.smartTileY][info.buildingId]) { legoParsedMap[info.smartTileDepth][info.smartTileX][info.smartTileY][info.buildingId] = {}; }
+				if (!legoParsedMap[info.smartTileDepth][info.smartTileX][info.smartTileY][info.buildingId][info.legoKey]) { legoParsedMap[info.smartTileDepth][info.smartTileX][info.smartTileY][info.buildingId][info.legoKey] = result; }
+			};
+		}
+		var nodeOwner = this.nodeOwner;
+		var smartTileOwner = nodeOwner.data.smartTileOwner;
+		var smartTileX = smartTileOwner.X;
+		var smartTileY = smartTileOwner.Y;
+		var smartTileDepth = smartTileOwner.depth;
+		var legoKey = legoMesh.legoKey;
+		var data = {
+			dataArrayBuffer: dataArrayBuffer,
+			info: {
+				smartTileX : smartTileX,
+				smartTileY : smartTileY,
+				smartTileDepth : smartTileDepth,
+				buildingId : this.buildingId,
+				legoKey : legoKey
+			}
+		};
+		magoManager.workerParseLego.postMessage(data, [data.dataArrayBuffer]);// send to worker by reference (transfer).
+		legoMesh.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
+	}
+};
+
 /**
  * 어떤 일을 하고 있습니까?
  */
@@ -1598,12 +1640,34 @@ NeoBuilding.prototype.prepareSkin = function (magoManager)
 	}
 	else if (lowLodMesh.fileLoadState === CODE.fileLoadState.LOADING_FINISHED) 
 	{
-		////magoManager.parseQueue.putSkinLegosToParse(lowLodMesh);
-		////magoManager.readerWriter.skinLegos_requested ++;
-		
-		lowLodMesh.parseArrayBuffer(lowLodMesh.dataArrayBuffer, magoManager);
+		// use worker.
+		this._parseLegoByWorker(lowLodMesh.dataArrayBuffer, lowLodMesh, magoManager);
 	}
-	
+	else if (lowLodMesh.fileLoadState === CODE.fileLoadState.PARSE_STARTED) 
+	{
+		//if (this.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED && this.fileLoadState !== CODE.fileLoadState.IN_PARSE_QUEUE)
+		//{
+		//	return;
+		//}
+		var nodeOwner = this.nodeOwner;
+		var smartTileOwner = nodeOwner.data.smartTileOwner;
+		var smartTileX = smartTileOwner.X;
+		var smartTileY = smartTileOwner.Y;
+		var smartTileDepth = smartTileOwner.depth;
+		var buildingId = this.buildingId;
+		var legoKey = lowLodMesh.legoKey;
+
+		var legoParsedMap = magoManager.legoParsedMap;
+		if(!legoParsedMap){ return; }
+		if (!legoParsedMap[smartTileDepth]) { return; }
+		if (!legoParsedMap[smartTileDepth][smartTileX]) { return; }
+		if (!legoParsedMap[smartTileDepth][smartTileX][smartTileY]) { return; }
+		if (!legoParsedMap[smartTileDepth][smartTileX][smartTileY][buildingId]) { return; }
+		if (!legoParsedMap[smartTileDepth][smartTileX][smartTileY][buildingId][legoKey]) { return; }
+
+		var result = legoParsedMap[smartTileDepth][smartTileX][smartTileY][buildingId][legoKey];
+		lowLodMesh._parseLegoDataResultFromWorker(result, magoManager);
+	}
 	else if (lowLodMesh.vbo_vicks_container.vboCacheKeysArray[0] && lowLodMesh.vbo_vicks_container.vboCacheKeysArray[0].vboBufferTCoord && lodBuilding.attributes.hasTexture)
 	{
 		// this is the new version.

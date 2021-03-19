@@ -2446,7 +2446,7 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function (frustu
 
 		// If this is no prepared then stop process.
 		
-		if (!this.depth === 0)
+		if (!this.depth === 0) // provisionally, magoEarth no uses depth = 0.
 		{
 			if (!this.isPrepared())
 			{
@@ -2487,7 +2487,7 @@ TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function (frustu
 	
 };
 
-TinTerrain.prototype.calculateCenterPosition = function()
+TinTerrain.prototype.calculateCenterPosition_FUNCTION_NO_USED = function ()
 {
 	// Note: The centerPosition is Float64Array type.
 	// The centerPosition of tiles are calculate with "altitude" = 0;.

@@ -320,39 +320,6 @@ worker.onmessage = function (e)
 		extensionId            : extensionId,
 		extensionLength        : extensionLength
 	}, info: e.data.info});
-
-	/*
-	worker.postMessage({parsedTerrain: {
-		centerX                : centerX,   
-		centerY                : centerY,
-		centerZ                : centerZ,
-		minHeight              : minHeight, 
-		maxHeight              : maxHeight,
-		boundingSphereCenterX  : boundingSphereCenterX,
-		boundingSphereCenterY  : boundingSphereCenterY,
-		boundingSphereCenterZ  : boundingSphereCenterZ,
-		boundingSphereRadius   : boundingSphereRadius,
-		horizonOcclusionPointX : horizonOcclusionPointX,
-		horizonOcclusionPointY : horizonOcclusionPointY,
-		horizonOcclusionPointZ : horizonOcclusionPointZ,
-		vertexCount            : readVertexCount,
-		uValues                : uValues,
-		vValues                : vValues,
-		hValues                : hValues,
-		trianglesCount         : readTrianglesCount,
-		indices                : indices,
-		westVertexCount        : westVertexCount,
-		westIndices            : westIndices,
-		southVertexCount       : southVertexCount,
-		southIndices           : southIndices,
-		eastVertexCount        : eastVertexCount,
-		eastIndices            : eastIndices,
-		northVertexCount       : northVertexCount,
-		northIndices           : northIndices,
-		extensionId            : extensionId,
-		extensionLength        : extensionLength
-	}, info: e.data.info});
-	*/
 };
 
 function zigZagDecode(value)

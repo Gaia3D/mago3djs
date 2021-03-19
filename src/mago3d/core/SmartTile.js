@@ -1279,6 +1279,10 @@ SmartTile.prototype.createGeometriesFromSeeds = function (magoManager)
 			
 			if (smartTileF4dSeed.fileLoadState === CODE.fileLoadState.READY)
 			{
+				if (smartTileF4dSeed.smartTile_parsedFromWorker)
+					{
+						var hola = 0;
+					}
 				//this.smartTileF4dSeedMap[name] = {
 				//"L"                 : L,
 				//"X"                 : X,
@@ -1313,6 +1317,11 @@ SmartTile.prototype.createGeometriesFromSeeds = function (magoManager)
 				if (parseQueue.smartTileF4dParsesCount < maxParses)
 				{
 					// proceed to parse the dataArrayBuffer.***
+					if (smartTileF4dSeed.smartTile_parsedFromWorker)
+					{
+						var hola = 0;
+					}
+
 					this._workerParseSmartTile(smartTileF4dSeed, magoManager);
 					parseQueue.smartTileF4dParsesCount++; // increment counter.
 					smartTileF4dSeed.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
@@ -1323,6 +1332,11 @@ SmartTile.prototype.createGeometriesFromSeeds = function (magoManager)
 			}
 			else if (smartTileF4dSeed.fileLoadState === CODE.fileLoadState.PARSE_STARTED )
 			{
+				if (smartTileF4dSeed.smartTile_parsedFromWorker)
+				{
+					var hola = 0;
+				}
+
 				// check if the worker finished.
 				var parsedSmartTileMap = this.smartTileManager.parsedSmartTileMap;
 				var z = this.depth;
@@ -1340,6 +1354,7 @@ SmartTile.prototype.createGeometriesFromSeeds = function (magoManager)
 				delete parsedSmartTileMap[z][x][y][smartTileF4dSeed.tileName]; // delete from the map.***
 
 				smartTileF4dSeed.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;
+				smartTileF4dSeed.smartTile_parsedFromWorker = true;
 			}
 		}
 	}
@@ -1685,7 +1700,7 @@ SmartTile.prototype._parseSmartTileF4d = function (parsedResult, magoManager)
 					neoBuilding.projectFolderName = projectFolderName;
 					neoBuilding.nodeOwner = node;
 				}
-	
+
 				var headerDataArrayBuffer = neoBuildingHeaderData; // Step over "dataArrayBuffer".
 				if (neoBuilding.metaData === undefined) 
 				{ 
@@ -1739,8 +1754,16 @@ SmartTile.prototype._parseSmartTileF4d = function (parsedResult, magoManager)
 			var lodBuilding = neoBuilding.getOrNewLodBuilding(lodString);
 			var lowLodMesh = neoBuilding.getOrNewLodMesh(lodName);
 			
-			lowLodMesh.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-			lowLodMesh.dataArrayBuffer = lowLodMeshDataArray;
+			// Note : "lowLodMeshes" can be shared in a building, so, lodMesh_5 can be used for lod 4 or lod 3. So if the lodMesh exist, then dont touch it.**********
+			if(lowLodMesh.fileLoadState === CODE.fileLoadState.READY)
+			{
+				// Only set "LOADING_FINISHED" when fileLoadState = "READY".
+				lowLodMesh.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+
+				// Now, asign "lowLodMeshDataArray", then it will be parsed into a worker.***
+				lowLodMesh.dataArrayBuffer = lowLodMeshDataArray;
+			}
+			//--------------------------------------------------------------------------------------------------------------------------------------------------------
 
 			if (lodBuilding.texture === undefined)
 			{ lodBuilding.texture = new Texture(); }
@@ -1808,6 +1831,9 @@ SmartTile.prototype._parseSmartTileF4d = function (parsedResult, magoManager)
 		tile      : this,  
 		timestamp : new Date()
 	});
+
+	// test debug:
+	this.smartTile_parsedFromWorker = true;//smartTile_parsedFromWorker
 };
 
 /**
