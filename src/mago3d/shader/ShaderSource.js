@@ -6392,6 +6392,8 @@ uniform bool bUseLogarithmicDepth;\n\
 uniform float uFCoef_logDepth;\n\
 uniform float uSceneDayNightLightingFactor; // day -> 1.0; night -> 0.0\n\
 \n\
+uniform vec3 uAmbientLight;\n\
+\n\
 \n\
 float unpackDepth(vec4 packedDepth)\n\
 {\n\
@@ -6722,8 +6724,8 @@ void main()\n\
 		//directionalLightWeighting = max(dot(normal, -sunDirCC.xyz), 0.0);\n\
 	}\n\
 	\n\
-\n\
-	ambientColor = vec3(0.6);\n\
+	ambientColor = uAmbientLight;\n\
+	// uAmbientLight\n\
 	vec3 lightingDirection = normalize(vec3(0.6, 0.6, 0.6));\n\
 	directionalLightWeighting = max(dot(normal, lightingDirection), 0.0);\n\
 	\n\

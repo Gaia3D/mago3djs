@@ -6309,6 +6309,7 @@ MagoManager.prototype.createDefaultShaders = function (gl)
 	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
 	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
 	shader.uSceneDayNightLightingFactor_loc = gl.getUniformLocation(shader.program, "uSceneDayNightLightingFactor");
+	shader.uAmbientLight_loc = gl.getUniformLocation(shader.program, "uAmbientLight");
 
 	// 0.2) ScreenQuad shader.***********************************************************************************
 	var shaderName = "screenCopyQuad";

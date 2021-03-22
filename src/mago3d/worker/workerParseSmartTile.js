@@ -16,7 +16,7 @@ worker.onmessage = function (e)
 
 	var buildingsCount = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 	//magoManager.emit(MagoManager.EVENT_TYPE.SMARTTILELOADSTART, {tile: this, timestamp: new Date()});
-    var buildingsArray = [];
+    var buildingsArray = new Array(buildingsCount);
 
 	//var smartTilePathInfo = magoManager.f4dController.smartTilePathInfo;
 	for (var i=0; i<buildingsCount; i++)
@@ -164,7 +164,7 @@ worker.onmessage = function (e)
 			endMark = (new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
 		}
         buildingData.externInfo = externInfo;
-        buildingsArray.push(buildingData);
+        buildingsArray[i] = buildingData;
     }
 
     worker.postMessage({parsedSmartTile : 
@@ -173,5 +173,5 @@ worker.onmessage = function (e)
             smartTileType : smartTileType
         },
         info: e.data.info});
-
+		
 }

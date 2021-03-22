@@ -1275,6 +1275,7 @@ Renderer.prototype.renderScreenQuad = function(gl)
 	gl.uniform2fv(currentShader.uNearFarArray_loc, magoManager.frustumVolumeControl.nearFarArray);
 	gl.uniform1i(currentShader.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
 	gl.uniform1f(currentShader.uFCoef_logDepth_loc, sceneState.fCoef_logDepth[0]);
+	gl.uniform3fv(currentShader.uAmbientLight_loc, sceneState.ambientColor);
 	
 
 	var sunSystem = sceneState.sunSystem;

@@ -101,5 +101,4 @@ worker.onmessage = function (e)
 	}
 
     worker.postMessage(parsedLego, transferBuffers);
-	var hola = 0;
 };
