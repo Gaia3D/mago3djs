@@ -236,7 +236,8 @@ CesiumViewerInit.prototype.geoserverImageProviderBuild = function()
 		parameters         : param,
 		tileWidth          : tileWidth, 
 		tileHeight         : tileHeight,
-		enablePickFeatures : false
+		enablePickFeatures : false,
+		minimumLevel : 1
 	});
 
 	this.options.imageryProvider = imageryProvider;
