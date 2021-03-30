@@ -62,6 +62,7 @@ OverviewMap.prototype.setControl = function(magoManager)
 	var provider = baseLayer.imageryProvider;
 
 	var source;
+	var minZoom = 0;
 	if(provider instanceof Cesium.WebMapServiceImageryProvider) {
 		var resource = provider._resource;
 		//var queryParam = JSON.parse(JSON.stringify(resource.queryParameters));
@@ -78,6 +79,7 @@ OverviewMap.prototype.setControl = function(magoManager)
 			serverType : 'geoserver',
 			params : queryParam
 		});
+		minZoom = 1;
 	} else if(provider instanceof Cesium.ArcGisMapServerImageryProvider) {
 		source = new OlMago3d.source.XYZ({
 			url : 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
@@ -89,7 +91,8 @@ OverviewMap.prototype.setControl = function(magoManager)
 	}
     
 	var tilelayer = new OlMago3d.layer.TileLayer({
-		source: source
+		source: source,
+		minZoom : minZoom
 	});
     
 	this.overviewMap = new OlMago3d.Map({
