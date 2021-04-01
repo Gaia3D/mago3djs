@@ -92,6 +92,15 @@ float getDepth(vec2 coord)
 		float z = flogzAux - 1.0;
 		linearDepth = z/(far);
 		return linearDepth;
+		/*
+		float linearDepth = unpackDepth(texture2D(depthTex, coord.xy));
+		// gl_FragDepthEXT = linearDepth = log2(flogz) * Fcoef_half;
+		// flogz = 1.0 + gl_Position.z*0.0001;
+        float Fcoef_half = uFCoef_logDepth/2.0;
+		float flogzAux = pow(2.0, linearDepth/Fcoef_half);
+		float z = (flogzAux - 1.0);
+		linearDepth = z/(far);
+		*/
 	}
 	else{
 		return unpackDepth(texture2D(depthTex, coord.xy));
@@ -302,6 +311,12 @@ float getDepthFromLight(in vec3 lightDirCC, inout float spotDotAux)
 
 void main()
 {
+	//#ifdef USE_LOGARITHMIC_DEPTH
+	//if(bUseLogarithmicDepth)
+	//{
+	//	gl_FragDepthEXT = log2(flogz) * Fcoef_half;
+	//}
+	//#endif
 	vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
 
 	#ifdef USE_MULTI_RENDER_TARGET
@@ -345,7 +360,6 @@ void main()
 				lightFogIntensity = 0.0;
 			}
 
-
 			gl_FragData[2] = vec4(uLightColorAndBrightness.x, uLightColorAndBrightness.y, uLightColorAndBrightness.z, lightFogIntensity); // save fog.***
 			// End fog calculating.------------------------------------------------------------------------------------------------------------------------------------------------------------
 			
@@ -354,7 +368,6 @@ void main()
 				// Apply only lightFog.***
 				// in final screenQuadPass, use posLC to determine the light-fog.
 				return;
-				//discard;
 			}
 			else if(distToLight > lightHotDistance)
 			{
@@ -414,8 +427,9 @@ void main()
 			// Specular lighting.
 			gl_FragData[1] = vec4(0.0, 0.0, 0.0, 1.0); // save specular.***
 
-			// Light fog.
-			//gl_FragData[2] = vec4(uLightColorAndBrightness.x, uLightColorAndBrightness.y, uLightColorAndBrightness.z, lightFogIntensity); // save fog.***
+			//// Light fog.
+			////gl_FragData[2] = vec4(uLightColorAndBrightness.x, uLightColorAndBrightness.y, uLightColorAndBrightness.z, lightFogIntensity); // save fog.***
+
 		}
 		else if(u_processType == 2) // lightFog pass.
 		{
@@ -503,10 +517,5 @@ void main()
 	#endif
 
 
-	#ifdef USE_LOGARITHMIC_DEPTH
-	if(bUseLogarithmicDepth)
-	{
-		gl_FragDepthEXT = log2(flogz) * Fcoef_half;
-	}
-	#endif
+	
 }

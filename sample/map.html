@@ -23,6 +23,33 @@
 	<li onclick="doTest();">
 		test
 	</li>
+	<li onclick="doTest2();">
+		dark
+	</li>
+	<li onclick="doTest3();">
+		light
+	</li>
+	<li onclick="doTest4();">
+		test4
+	</li>
+	<li onclick="testWeather();">
+		test weather
+	</li>
+	<li onclick="playPause();">
+		Play-Pause
+	</li>
+	<li onclick="particlesGeneratorSwitch();">
+		particlesGenSwitch
+	</li>
+	<li onclick="deleteDustVolume();">
+		deleteDustVolume
+	</li>
+	<li onclick="bSplineTest();">
+		bSplineTest
+	</li>
+	<li onclick="WaterTest();">
+		WaterTest
+	</li>
 </ul>
 <div id="magoContainer" class="mapWrap"></div>
 
@@ -95,8 +122,8 @@
 				serverPolicy.basicGlobe = 'cesium';
 				serverPolicy.terrainType = 'cesium-default'
 
-				serverPolicy.initLatitude = 37.43601055850527;
-				serverPolicy.initLongitude = 126.8008658032687;
+				serverPolicy.initLatitude = 37.36734;
+				serverPolicy.initLongitude = 126.72517;
 				serverPolicy.initAltitude = 3000;
 				MAGO3D_INSTANCE = new Mago3D.Mago3d(renderDivId, serverPolicy, {loadend : loadend}, cesiumViewerOption);
 			},
@@ -156,13 +183,74 @@
 			// Do a test. Create a geoCoord and render it.
 			var screenX = e.point.screenCoordinate.x;
 			var screenY = e.point.screenCoordinate.y;
-			var posWC = Mago3D.ManagerUtils.screenCoordToWorldCoordUseDepthCheck(screenX, screenY, magoManager);
+			var options = {
+				highPrecision : false
+			};
+			
+			var posWC = Mago3D.ManagerUtils.screenCoordToWorldCoordUseDepthCheck(screenX, screenY, magoManager, options);
 			var geoCoord = Mago3D.ManagerUtils.pointToGeographicCoord(posWC, undefined);
+
+			geoCoord.altitude += 4.0; //
+
 			geoCoord.makeDefaultGeoLocationData();
 			var geoCoordsList = magoManager.modeler.getGeographicCoordsList();
 			geoCoordsList.addGeoCoord(geoCoord);
 			var hola = 0;
+			
+			
 			// End test.----------------------------------
+			/*
+			// Do a code creating test.
+			var falloffDeg = 90;
+			var falloffDistance = 40;
+			var angRad = falloffDeg * Math.PI/180;
+			var radius = falloffDistance * Math.sin(angRad);
+			var height = falloffDistance * Math.cos(angRad);
+			var color = new Mago3D.Color(0.95, 0.95, 0.95, 0.4);
+			var options = {
+					baseType : 2, // 0= NONE. 1= PLANE. 2= SPHERICAL.
+					color : color,
+					originType : 1 // 0= ATBASE, 1= ATVERTEX
+			};
+			var cone = new Mago3D.Cone(radius, height, options);
+			cone.setGeographicPosition(geoCoord, undefined, undefined, undefined);
+			magoManager.modeler.addObject(cone);
+			*/
+			// End cone test.------------------------------
+
+			// Do a spotLightTest.****************************
+			
+			// Small opening.***
+			var options = {
+				hotspotDeg : 35.0,
+				falloffDeg : 50.0,
+				hotDistance : 50.0,
+				falloffDistance : 60.0
+			};
+
+			// Medium opening.***
+			var options = {
+				hotspotDeg : 55.0,
+				falloffDeg : 75.0,
+				hotDistance : 50.0,
+				falloffDistance : 60.0
+			};
+			/*
+			// Big opening.***
+			var options = {
+				hotspotDeg : 75.0,
+				falloffDeg : 90.0,
+				hotDistance : 50.0,
+				falloffDistance : 60.0
+			};
+			*/
+
+			var spotLight = new Mago3D.SpotLight(options);
+			spotLight.setGeographicPosition(geoCoord, undefined, undefined, undefined);
+			magoManager.modeler.addObject(spotLight);
+			
+			// End spotlightTest.-----------------------------
+			
 		});
 
 		magoManager.on(Mago3D.MagoManager.EVENT_TYPE.SELECTEDF4D, function(e){
@@ -174,8 +262,18 @@
 		});
 		
 		var f4dController = e.getF4dController();
-
+		/*
+		f4dController.addSmartTileGroup({
+            dataGroupId : 10000,
+            dataGroupKey : '3ds',
+            dataGroupName : '테스트 건물들',
+            dataGroupPath : '3ds/',
+            smartTileIndexPath: "smartTiles_3ds"
+		});
+		*/
 		
+
+		/*
 		f4dController.addSmartTileGroup({
             dataGroupId : 10000,
             dataGroupKey : 'IncheonGayang',
@@ -192,27 +290,58 @@
             dataGroupPath : 'Incheon_Mirae/',
             smartTileIndexPath: "_TILE_Incheon_Mirae"
 		});
-		
+		*/
 
 		/*
 		// hyemi smartTiles
 		f4dController.addSmartTileGroup({
             dataGroupId : 10000,
-            dataGroupKey : 'test',
-            dataGroupName : '계양시 건물들',
-            dataGroupPath : 'test/',
-            smartTileIndexPath: "smartTiles_hyemi"
+            dataGroupKey : 'GA',
+            dataGroupName : 'sihung_campus',
+            dataGroupPath : 'smartTile_Gwanak_f4ds/GA/'
+        });
+		f4dController.addSmartTileGroup({
+            dataGroupId : 10001,
+            dataGroupKey : 'EP',
+            dataGroupName : 'sihung_campus',
+            dataGroupPath : 'smartTile_Gwanak_f4ds/EP/',
+            smartTileIndexPath: "smstOutput3_Gwanak"
+		});
+		*/
+		
+		/*
+		// data with NO normals.
+		f4dController.addSmartTileGroup({
+            dataGroupId : 10001,
+            dataGroupKey : 'sKorea_Gyeonggi_Gwacheon_lhdt',
+            dataGroupName : 'sihung_campus',
+            dataGroupPath : 'sKorea_Gyeonggi_Gwacheon_lhdt/',
+            smartTileIndexPath: "_TILE2"
 		});
 		*/
 		
 	}
-	// 3ds, pointsCloud, sihung_campus, sihung_las, suseong, IncheonGayang, IncheonGyeyang_2
+	// 3ds, pointsCloud, sihung_campus, sihung_las, suseong, IncheonGayang, IncheonGyeyang_2, project_blackCityGml, blackBuildings
+	// sejong-bldg-apartment, testF4dKwon, sejong-5-2
+	// testDebug : gy_sketch, gs_F4Ds, realisticTest, HanamGyoSan_f4d_son, namYangJu_wangJu_f4d
 	function doTest(){
 		var f4dController = MAGO3D_INSTANCE.getF4dController();
 		var magoManager = MAGO3D_INSTANCE.getMagoManager();
 		/*
+		f4dController.addSmartTileGroup({
+            dataGroupId : 10000,
+            dataGroupKey : 'gs_F4Ds',
+            dataGroupName : '테스트 건물들',
+            dataGroupPath : 'gs_F4Ds/',
+            smartTileIndexPath: "smartTiles_gs"
+		});
+		*/
+
+		//magoManager.modeler.__TEST__extrusionBuildings();
+		
+		/*
 		$.ajax({
-			url: dataInformationUrl + "3ds.json",
+			url: dataInformationUrl + "gs_F4Ds.json",
 			type: "GET",
 			dataType: "json",
 			success: function(f4dObject){
@@ -223,38 +352,158 @@
 			}
 		});
 		*/
-
-		//---------------------------------------------------------------
 		
-		var arr = [
-            [
-                126.75195,
-                37.54664
-              ],
-              [
-                126.75097,
-                37.54285
-              ],
-              [
-                126.75494,
-                37.54239
-              ],
-              [
-                126.75590,
-                37.54652
-              ]
-        ];
-        var gcarr = [];
-        for(var i in arr) {
-            var geocoord = arr[i];
-           
-            gcarr.push(new Mago3D.GeographicCoord(geocoord[0], geocoord[1], 0));
-        }
-       
-        var polygon2d = Mago3D.Polygon2D.makePolygonByGeographicCoordArray(gcarr);
-		var selected = MAGO3D_INSTANCE.getMagoManager().selectionManager.selectionByPolygon2D(polygon2d, Mago3D.DataType.NATIVE);
+		$.ajax({
+			url: dataInformationUrl + "HanamGyoSan3d_f4d.json",
+			type: "GET",
+			dataType: "json",
+			success: function(f4dObject){
+				f4dController.addF4dGroup(f4dObject);
+			},
+			error: function(e){
+				alert(e.responseText);
+			}
+		});
+		
+		
 		
 	}
+
+	function doTest2(){
+		var f4dController = MAGO3D_INSTANCE.getF4dController();
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+		
+		// test camera laser.
+		//magoManager.TEST__cameraLaser();
+		var sunSystem = magoManager.sceneState.sunSystem;
+		var currHours = sunSystem.date.getHours();
+		var date = new Date();
+		date.setMonth(5);
+		date.setHours(currHours+1);
+		date.setMinutes(0);
+
+		sunSystem.setDate(date);
+		
+	}
+
+	function doTest3(){
+		var f4dController = MAGO3D_INSTANCE.getF4dController();
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+		
+		// test camera laser.
+		//magoManager.TEST__cameraLaser();
+		var sunSystem = magoManager.sceneState.sunSystem;
+		var currHours = sunSystem.date.getHours();
+		var date = new Date();
+		date.setMonth(5);
+		date.setHours(currHours-1);
+		date.setMinutes(0);
+
+		sunSystem.setDate(date);
+		
+	}
+
+	function doTest4(){
+		var f4dController = MAGO3D_INSTANCE.getF4dController();
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+		var selectionManager = magoManager.selectionManager;
+		var nodeSelected = selectionManager.getSelectedF4dNode();
+
+		// test f4d transparent.
+		if(nodeSelected)
+		{
+			nodeSelected.data.attributes.opacity = 0.6;
+			var hola = 0;
+		}
+		
+	}
+
+	function testWeather(){
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+		
+		if (magoManager.weatherStation === undefined)
+		{ magoManager.weatherStation = new Mago3D.WeatherStation(magoManager); }
+
+		//magoManager.weatherStation.TEST_SIHEUNG(magoManager);
+
+		// Paralelament, fem un altre test.
+		var windGeoJsonFilePath = "\\f4d\\wind_yeonHwa\\windAndDust_sample\\GC_after_e\\wind\\wind.json";
+		//var windGeoJsonFilePath = "\\f4d\\wind_yeonHwa\\windAndDust_sample\\GC_before_e\\wind\\wind.json";
+		magoManager.weatherStation.loadWindGeoJson(windGeoJsonFilePath);
+
+		// Load dust geoJson.***
+		//var dustGeoJsonFilePath = "\\f4d\\wind_yeonHwa\\windAndDust_sample\\GC_after_e\\pm2.5\\pm2.5.json";
+		//var dustGeoJsonFilePath = "\\f4d\\wind_yeonHwa\\windAndDust_sample\\GC_before_e\\pm2.5\\pm2.5.json";
+		//var dustGeoJsonFilePath = "\\f4d\\wind_yeonHwa\\pm2.5_aaa\\after_sw\\pm2.5.json";
+		var dustGeoJsonFilePath = "\\f4d\\wind_yeonHwa\\request_sample_data\\GC_after_e\\pm2.5\\pm2.5.json"; // new dust data 20210208_1440
+		magoManager.weatherStation.loadDustGeoJson(dustGeoJsonFilePath);
+	}
+
+	function playPause(){
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+		
+		if (magoManager.weatherStation === undefined)
+		{ magoManager.weatherStation = new Mago3D.WeatherStation(magoManager); }
+
+		if(magoManager.weatherStation.windVolumesArray && magoManager.weatherStation.windVolumesArray.length > 0)
+		{
+			var windVolume = magoManager.weatherStation.windVolumesArray[0];
+			windVolume.switchAnimationState();
+		}
+	}
+
+	function particlesGeneratorSwitch(){
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+		
+		if (magoManager.weatherStation === undefined)
+		{ magoManager.weatherStation = new Mago3D.WeatherStation(magoManager); }
+
+		if(magoManager.weatherStation.windVolumesArray && magoManager.weatherStation.windVolumesArray.length > 0)
+		{
+			var windVolume = magoManager.weatherStation.windVolumesArray[0];
+			if(windVolume._particesGenerationType === 1)
+			windVolume._particesGenerationType = 2;
+			else if(windVolume._particesGenerationType === 2)
+			windVolume._particesGenerationType = 3;
+			else if(windVolume._particesGenerationType === 3)
+			windVolume._particesGenerationType = 1;
+		}
+	}
+
+	function deleteDustVolume(){
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+		
+		if (magoManager.weatherStation)
+		{ 
+			magoManager.weatherStation.deleteDustVolumes();
+			magoManager.weatherStation.deleteWindVolumes();
+		}
+	}
+
+	function bSplineTest(){
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+		
+		if (magoManager.modeler)
+		{ 
+			magoManager.modeler.__TEST__bSpline();
+		}
+	}
+
+	function WaterTest(){
+		var magoManager = MAGO3D_INSTANCE.getMagoManager();
+		
+		// Test creating a waterManager.***
+		if(!magoManager.waterManager)
+		{
+			magoManager.waterManager = new Mago3D.WaterManager(magoManager);
+		}
+
+		if(!magoManager.waterManager.testStarted)
+		{
+			magoManager.waterManager._test_water();
+		}
+	}
+
 </script>
 </body>
 </html>

@@ -1435,7 +1435,7 @@ ReaderWriter.loadBinaryData = function(fileName, dataContainer, weatherLayer)
  * @param neoBuilding 변수
  * @param magoManager 변수
  */
-ReaderWriter.loadImage = function(gl, filePath_inServer, texture) 
+ReaderWriter.loadImage = function (gl, filePath_inServer, texture) 
 {
 	// Must know the fileExtension.***
 	//var extension = filePath_inServer.split('.').pop();
@@ -1470,6 +1470,7 @@ ReaderWriter.loadImage = function(gl, filePath_inServer, texture)
 			else 
 			{
 				_gl.texImage2D(_gl.TEXTURE_2D, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, data);
+				//_gl.texImage2D(_gl.TEXTURE_2D, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_SHORT_4_4_4_4, data);
 			}
 			_gl.bindTexture(_gl.TEXTURE_2D, null);
 			//_gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);

@@ -154,7 +154,7 @@ CubeMapFBO.prototype.init = function()
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 };
 
-CubeMapFBO.prototype.initMRT = function() 
+CubeMapFBO.prototype.initMRT = function () 
 {
 	var gl = this.gl;
 	this.fbo = gl.createFramebuffer();

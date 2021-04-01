@@ -940,6 +940,20 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		// modelViewProjectionRelToEye.***
 		var modelViewProjRelToEyeMatrix = sceneState.modelViewProjRelToEyeMatrix;
 		modelViewProjRelToEyeMatrix._floatArrays = glMatrix.mat4.multiply(modelViewProjRelToEyeMatrix._floatArrays, projectionMatrix._floatArrays, modelViewRelToEyeMatrix._floatArrays);
+
+		// Large far projection for lighting.
+		if(sceneState.applyLightsShadows)
+		{
+			var farForLighting = 20000.0; // 20km
+			var nearForLighting = 0.1;
+			var fovyRad = sceneState.camera.frustum.fovyRad[0];
+			var aspectRatio = sceneState.camera.frustum.aspectRatio[0];
+			var projectionMatrixLighting = sceneState.projectionMatrixLighting; // No used.
+			projectionMatrixLighting._floatArrays = glMatrix.mat4.perspective(projectionMatrixLighting._floatArrays, fovyRad, aspectRatio, nearForLighting, farForLighting);
+
+			var modelViewProjRelToEyeMatrixLighting = sceneState.modelViewProjRelToEyeMatrixLighting;
+			modelViewProjRelToEyeMatrixLighting._floatArrays = glMatrix.mat4.multiply(modelViewProjRelToEyeMatrixLighting._floatArrays, projectionMatrixLighting._floatArrays, sceneState.modelViewRelToEyeMatrix._floatArrays);
+		}
 		
 		// Large far modelViewProjectionRelToEyeSky.***
 		var modelViewProjRelToEyeMatrixSky = sceneState.modelViewProjRelToEyeMatrixSky;
@@ -1669,7 +1683,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 
 	// 1.2) render selected silhouetteDepth.
 	var selectionManager = this.selectionManager;
-	if(selectionManager.existSelectedObjects())
+	if (selectionManager.existSelectedObjects())
 	{
 		this.renderer.renderSilhouetteDepth(); // note: integrate this in the gBuffer. TODO:
 	}
@@ -1843,6 +1857,11 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		this.weatherStation.renderWeather(this);
 	}
 
+	//if(this.waterManager)
+	//{
+	//	this.waterManager.render();
+	//}
+
 	// Render transparents.****************************************************************************************************************
 	if (this.isCesiumGlobe())
 	{
@@ -1867,6 +1886,11 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 	if (this.weatherStation)
 	{
 		this.weatherStation.renderWeatherTransparents(this);
+	}
+
+	if(this.waterManager)
+	{
+		this.waterManager.render();
 	}
 
 	// check if must render boundingBoxes.
@@ -2280,7 +2304,6 @@ MagoManager.prototype.doRenderMagoWorld = function (frustumVolumenObject)
 		// Render the lightBuffer.*****************************************
 		if (sceneState.applyLightsShadows)
 		{
-			
 			// Create lightBufferFBO if no exist.
 			if(!this.texturesManager.lBuffer)
 			{
@@ -2288,16 +2311,26 @@ MagoManager.prototype.doRenderMagoWorld = function (frustumVolumenObject)
 				var bufferWidth = this.sceneState.drawingBufferWidth[0];
 				var bufferHeight = this.sceneState.drawingBufferHeight[0];
 				var bUseMultiRenderTarget = this.postFxShadersManager.bUseMultiRenderTarget;
-				this.texturesManager.lBuffer = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 2}); 
+				this.texturesManager.lBuffer = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 3}); 
 			}
 			this.lBuffer = this.texturesManager.lBuffer;
 			this.diffuseLightTex = this.lBuffer.colorBuffersArray[0];
 			this.specularLightTex = this.lBuffer.colorBuffersArray[1];
+			this.LightFogTex = this.lBuffer.colorBuffersArray[2];
 			
 			// Render the lightBuffer.
 			this.renderer.renderLightDepthCubeMaps(this.lightSourcesArray); // active this code for shadows.
 			this.renderer.renderLightBuffer(this.lightSourcesArray);
-			
+
+			//gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, null, 0);
+			//gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0);
+			//gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0);
+
+			//extbuffers.drawBuffersWEBGL([
+			//	this.extbuffers.NONE, // gl_FragData[0] - diffuseLighting
+			//	this.extbuffers.NONE, // gl_FragData[1] - specularLighting
+			//	this.extbuffers.NONE, // gl_FragData[2] - lightFog
+			//]);
 
 			//if (this.isCesiumGlobe())
 			{
@@ -2324,10 +2357,6 @@ MagoManager.prototype.doRenderMagoWorld = function (frustumVolumenObject)
 		// Final render output.
 		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
-		//gl.clearColor(1, 0.5, 0.5, 1);
-		//gl.clearDepth(1);
-		//gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-		//gl.clearStencil(0); // provisionally here.***
 
 		this.renderer.renderScreenQuad(gl);
 		//this.renderer.renderScreenQuad2(gl);

@@ -110,9 +110,6 @@ GeometryUtils.getIndicesTrianglesRegularNet = function(numCols, numRows, resultI
 	// given a regular net this function returns triangles vertices indices of the net.
 	var verticesCount = numCols * numRows;
 	var trianglesCount = (numCols-1) * (numRows-1) * 2;
-	if (resultIndicesArray === undefined)
-	{ resultIndicesArray = new Uint16Array(trianglesCount * 3); }
-	
 	var idx_1, idx_2, idx_3;
 	var idxCounter = 0;
 	
@@ -121,6 +118,7 @@ GeometryUtils.getIndicesTrianglesRegularNet = function(numCols, numRows, resultI
 	// bLoopColumns : if want object like a cilinder or sphere where the 1rstCol touch with the last col.
 	var bLoopColumns = false; // Default.***
 	var bTrianglesSenseCCW = true;
+	var indicesByteSize = 2; // Uint16, default.
 	if (options !== undefined)
 	{
 		if (options.bLoopColumns !== undefined)
@@ -128,6 +126,17 @@ GeometryUtils.getIndicesTrianglesRegularNet = function(numCols, numRows, resultI
 	
 		if (options.bTrianglesSenseCCW !== undefined)
 		{ bTrianglesSenseCCW = options.bTrianglesSenseCCW; }
+
+		if(options.indicesByteSize)
+		{ indicesByteSize = options.indicesByteSize; }
+	}
+
+	if (resultIndicesArray === undefined)
+	{ 
+		if(indicesByteSize === 2)
+		{ resultIndicesArray = new Uint16Array(trianglesCount * 3); }
+		else if(indicesByteSize === 4)
+		{ resultIndicesArray = new Uint32Array(trianglesCount * 3); }
 	}
 	
 	for (var row = 0; row<numRows-1; row++)
@@ -185,7 +194,13 @@ GeometryUtils.getIndicesTrianglesRegularNet = function(numCols, numRows, resultI
 	{
 		// South.
 		if (!resultSouthIndices)
-		{ resultSouthIndices = new Uint16Array(numCols); }
+		{ 
+			//resultSouthIndices = new Uint16Array(numCols); // original.***
+			if(indicesByteSize === 2)
+			{ resultSouthIndices = new Uint16Array(numCols); }
+			else if(indicesByteSize === 4)
+			{ resultSouthIndices = new Uint32Array(numCols); }
+		}
 		
 		for (var col=0; col<numCols; col++)
 		{
@@ -197,7 +212,13 @@ GeometryUtils.getIndicesTrianglesRegularNet = function(numCols, numRows, resultI
 		
 		// East.
 		if (!resultEastIndices)
-		{ resultEastIndices = new Uint16Array(numRows); }
+		{ 
+			//resultEastIndices = new Uint16Array(numRows); 
+			if(indicesByteSize === 2)
+			{ resultEastIndices = new Uint16Array(numRows); }
+			else if(indicesByteSize === 4)
+			{ resultEastIndices = new Uint32Array(numRows); }
+		}
 		
 		for (var row = 0; row<numRows; row++)
 		{
@@ -209,7 +230,13 @@ GeometryUtils.getIndicesTrianglesRegularNet = function(numCols, numRows, resultI
 		
 		// North.
 		if (!resultNorthIndices)
-		{ resultNorthIndices = new Uint16Array(numCols); }
+		{ 
+			//resultNorthIndices = new Uint16Array(numCols);
+			if(indicesByteSize === 2)
+			{ resultNorthIndices = new Uint16Array(numCols); }
+			else if(indicesByteSize === 4)
+			{ resultNorthIndices = new Uint32Array(numCols); } 
+		}
 		
 		var counter = 0;
 		for (var col=numCols-1; col>=0; col--)
@@ -223,7 +250,13 @@ GeometryUtils.getIndicesTrianglesRegularNet = function(numCols, numRows, resultI
 		
 		// West.
 		if (!resultWestIndices)
-		{ resultWestIndices = new Uint16Array(numRows); }
+		{ 
+			//resultWestIndices = new Uint16Array(numRows);
+			if(indicesByteSize === 2)
+			{ resultWestIndices = new Uint16Array(numRows); }
+			else if(indicesByteSize === 4)
+			{ resultWestIndices = new Uint32Array(numRows); }  
+		}
 		
 		counter = 0;
 		for (var row = numRows-1; row>=0; row--)
