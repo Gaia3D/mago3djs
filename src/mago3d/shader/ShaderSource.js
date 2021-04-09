@@ -2939,6 +2939,15 @@ float getDepth(vec2 coord)\n\
 		float z = flogzAux - 1.0;\n\
 		linearDepth = z/(far);\n\
 		return linearDepth;\n\
+		/*\n\
+		float linearDepth = unpackDepth(texture2D(depthTex, coord.xy));\n\
+		// gl_FragDepthEXT = linearDepth = log2(flogz) * Fcoef_half;\n\
+		// flogz = 1.0 + gl_Position.z*0.0001;\n\
+        float Fcoef_half = uFCoef_logDepth/2.0;\n\
+		float flogzAux = pow(2.0, linearDepth/Fcoef_half);\n\
+		float z = (flogzAux - 1.0);\n\
+		linearDepth = z/(far);\n\
+		*/\n\
 	}\n\
 	else{\n\
 		return unpackDepth(texture2D(depthTex, coord.xy));\n\
@@ -3149,6 +3158,12 @@ float getDepthFromLight(in vec3 lightDirCC, inout float spotDotAux)\n\
 \n\
 void main()\n\
 {\n\
+	//#ifdef USE_LOGARITHMIC_DEPTH\n\
+	//if(bUseLogarithmicDepth)\n\
+	//{\n\
+	//	gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
+	//}\n\
+	//#endif\n\
 	vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
 \n\
 	#ifdef USE_MULTI_RENDER_TARGET\n\
@@ -3192,7 +3207,6 @@ void main()\n\
 				lightFogIntensity = 0.0;\n\
 			}\n\
 \n\
-\n\
 			gl_FragData[2] = vec4(uLightColorAndBrightness.x, uLightColorAndBrightness.y, uLightColorAndBrightness.z, lightFogIntensity); // save fog.***\n\
 			// End fog calculating.------------------------------------------------------------------------------------------------------------------------------------------------------------\n\
 			\n\
@@ -3201,7 +3215,6 @@ void main()\n\
 				// Apply only lightFog.***\n\
 				// in final screenQuadPass, use posLC to determine the light-fog.\n\
 				return;\n\
-				//discard;\n\
 			}\n\
 			else if(distToLight > lightHotDistance)\n\
 			{\n\
@@ -3261,8 +3274,9 @@ void main()\n\
 			// Specular lighting.\n\
 			gl_FragData[1] = vec4(0.0, 0.0, 0.0, 1.0); // save specular.***\n\
 \n\
-			// Light fog.\n\
-			//gl_FragData[2] = vec4(uLightColorAndBrightness.x, uLightColorAndBrightness.y, uLightColorAndBrightness.z, lightFogIntensity); // save fog.***\n\
+			//// Light fog.\n\
+			////gl_FragData[2] = vec4(uLightColorAndBrightness.x, uLightColorAndBrightness.y, uLightColorAndBrightness.z, lightFogIntensity); // save fog.***\n\
+\n\
 		}\n\
 		else if(u_processType == 2) // lightFog pass.\n\
 		{\n\
@@ -3350,12 +3364,7 @@ void main()\n\
 	#endif\n\
 \n\
 \n\
-	#ifdef USE_LOGARITHMIC_DEPTH\n\
-	if(bUseLogarithmicDepth)\n\
-	{\n\
-		gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
-	}\n\
-	#endif\n\
+	\n\
 }";
 ShaderSource.LBufferVS = "\n\
 	attribute vec3 position;\n\
@@ -11183,6 +11192,953 @@ void main()\n\
 	\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 }";
+ShaderSource.waterCalculateFluxFS = "//#version 300 es\n\
+\n\
+#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+uniform sampler2D waterHeightTex;\n\
+uniform sampler2D terrainHeightTex;\n\
+uniform sampler2D currWaterFluxTex;\n\
+\n\
+varying vec2 v_tex_pos;\n\
+\n\
+uniform float u_SimRes;\n\
+uniform float u_PipeLen;\n\
+uniform float u_timestep;\n\
+uniform float u_PipeArea;\n\
+\n\
+uniform vec2 u_heightMap_MinMax;\n\
+\n\
+void main()\n\
+{\n\
+    //vec2 curuv = vec2(v_tex_pos.x, 1.0 - v_tex_pos.y);\n\
+    vec2 curuv = vec2(v_tex_pos.x, v_tex_pos.y);\n\
+    float div = 1.0/u_SimRes;\n\
+    float g = 0.80;\n\
+    float pipelen = u_PipeLen;\n\
+\n\
+    // read terrain heights.\n\
+    vec4 topT = texture2D(terrainHeightTex, curuv+vec2(0.0,div));\n\
+    vec4 rightT = texture2D(terrainHeightTex, curuv+vec2(div,0.0));\n\
+    vec4 bottomT = texture2D(terrainHeightTex, curuv+vec2(0.0,-div));\n\
+    vec4 leftT = texture2D(terrainHeightTex, curuv+vec2(-div,0.0));\n\
+    vec4 curT = texture2D(terrainHeightTex, curuv);\n\
+\n\
+    float heightScale = 30.0; \n\
+    topT *= heightScale;\n\
+    rightT *= heightScale;\n\
+    bottomT *= heightScale;\n\
+    leftT *= heightScale;\n\
+    curT *= heightScale;\n\
+\n\
+    //topT = u_heightMap_MinMax.x + topT * u_heightMap_MinMax.y;\n\
+    //rightT = u_heightMap_MinMax.x + rightT * u_heightMap_MinMax.y;\n\
+    //bottomT = u_heightMap_MinMax.x + bottomT * u_heightMap_MinMax.y;\n\
+    //leftT = u_heightMap_MinMax.x + leftT * u_heightMap_MinMax.y;\n\
+    //curT = u_heightMap_MinMax.x + curT * u_heightMap_MinMax.y;\n\
+\n\
+    // read water heights.\n\
+    float waterScale = 2.0;\n\
+    vec4 topW = texture2D(waterHeightTex, curuv+vec2(0.0,div)) * waterScale;\n\
+    vec4 rightW = texture2D(waterHeightTex, curuv+vec2(div,0.0)) * waterScale;\n\
+    vec4 bottomW = texture2D(waterHeightTex, curuv+vec2(0.0,-div)) * waterScale;\n\
+    vec4 leftW = texture2D(waterHeightTex, curuv+vec2(-div,0.0)) * waterScale;\n\
+    vec4 curW = texture2D(waterHeightTex, curuv) * waterScale;\n\
+\n\
+    // read flux.\n\
+    vec4 curFlux = texture2D(currWaterFluxTex, curuv);\n\
+\n\
+    // calculate outputs.\n\
+    float curTotalH = curT.r + curW.r;\n\
+\n\
+    float HTopOut = curTotalH - (topT.r + topW.r);\n\
+    float HRightOut = curTotalH - (rightT.r + rightW.r);\n\
+    float HBottomOut = curTotalH - (bottomT.r + bottomW.r);\n\
+    float HLeftOut = curTotalH - (leftT.r + leftW.r);\n\
+\n\
+    // outFlux.\n\
+    float ftopout = max(0.0, curFlux.x + (u_timestep * g * u_PipeArea * HTopOut) / pipelen);\n\
+    float frightout = max(0.0, curFlux.y + (u_timestep * g * u_PipeArea * HRightOut) / pipelen);\n\
+    float fbottomout = max(0.0, curFlux.z + (u_timestep * g * u_PipeArea * HBottomOut) / pipelen);\n\
+    float fleftout = max(0.0, curFlux.w + (u_timestep * g * u_PipeArea * HLeftOut) / pipelen);\n\
+\n\
+    //float testA = (u_timestep * g * u_PipeArea * HTopOut) / pipelen;\n\
+    //float testB = (u_timestep * g * u_PipeArea * HRightOut) / pipelen;\n\
+    //float testC = (u_timestep * g * u_PipeArea * HBottomOut) / pipelen;\n\
+    //float testD = (u_timestep * g * u_PipeArea * HLeftOut) / pipelen;\n\
+\n\
+    float damping = 0.9999;\n\
+    //damping = 1.0;\n\
+    //float k = min(1.0,((curTerrain.y )*u_PipeLen*u_PipeLen)/(u_timestep*(ftopout+frightout+fbottomout+fleftout))) * damping;\n\
+    float k = min(1.0,((curW.r ) * u_PipeLen * u_PipeLen) / (u_timestep * (ftopout + frightout + fbottomout + fleftout))) * damping;\n\
+    //k = 1.0;\n\
+    //rescale outflow readFlux so that outflow don't exceed current water volume\n\
+    ftopout *= k;\n\
+    frightout *= k;\n\
+    fbottomout *= k;\n\
+    fleftout *= k;\n\
+\n\
+    //boundary conditions\n\
+    if(curuv.x<=div) fleftout = 0.0;\n\
+    if(curuv.x>=1.0 - 2.0 * div) frightout = 0.0;\n\
+    if(curuv.y<=div) ftopout = 0.0;\n\
+    if(curuv.y>=1.0 - 2.0 * div) fbottomout = 0.0;\n\
+\n\
+\n\
+    if(curuv.x<=div || (curuv.x>=1.0 - 2.0 * div) || (curuv.y<=div) || (curuv.y>=1.0 - 2.0 * div) ){\n\
+        ftopout = 0.0;\n\
+        frightout = 0.0;\n\
+        fbottomout = 0.0;\n\
+        fleftout = 0.0;\n\
+    }\n\
+    \n\
+\n\
+\n\
+    vec4 writeFlux = vec4(ftopout,frightout,fbottomout,fleftout);\n\
+\n\
+    gl_FragData[0] = writeFlux;  // water flux.\n\
+    //gl_FragData[0] = vec4(HTopOut, HRightOut, HBottomOut, HLeftOut); // test debug:\n\
+   //gl_FragData[0] = vec4(testA*50.0, testB*50.0, testC*50.0, testD*50.0); // test debug:\n\
+\n\
+    #ifdef USE_MULTI_RENDER_TARGET\n\
+        gl_FragData[1] = vec4(0.0); // depth\n\
+        gl_FragData[2] = vec4(0.0); // normal\n\
+        gl_FragData[3] = vec4(0.0); // albedo\n\
+        gl_FragData[4] = vec4(0.0); // selection color\n\
+    #endif\n\
+\n\
+}";
+ShaderSource.waterCalculateHeightFS = "//#version 300 es\n\
+\n\
+#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+\n\
+uniform sampler2D waterSourceTex;\n\
+uniform sampler2D rainTex; // if exist.\n\
+uniform sampler2D currWaterHeightTex;\n\
+\n\
+varying vec2 v_tex_pos;\n\
+\n\
+\n\
+void main()\n\
+{\n\
+    // 1rst, take the water source.\n\
+    vec2 texCoord = vec2(v_tex_pos.x, 1.0 - v_tex_pos.y);\n\
+    texCoord = v_tex_pos;\n\
+    vec4 currWaterHeight = texture2D(currWaterHeightTex, texCoord);\n\
+    vec4 waterSource = texture2D(waterSourceTex, texCoord);\n\
+\n\
+    if(waterSource.r < currWaterHeight.r)\n\
+    {\n\
+        waterSource = currWaterHeight;\n\
+    }\n\
+    // provisionally assign the waterSource as waterHeight...\n\
+    gl_FragData[0] = waterSource;  // waterHeight.\n\
+\n\
+    #ifdef USE_MULTI_RENDER_TARGET\n\
+        gl_FragData[1] = vec4(1.0, 0.0, 0.5, 1.0); // depth\n\
+        gl_FragData[2] = vec4(1.0, 0.0, 0.5, 1.0); // normal\n\
+        gl_FragData[3] = vec4(1.0, 0.0, 0.5, 1.0); // albedo\n\
+        gl_FragData[4] = vec4(1.0, 0.0, 0.5, 1.0); // selection color\n\
+    #endif\n\
+}";
+ShaderSource.waterCalculateVelocityFS = "#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+uniform sampler2D waterHeightTex;\n\
+uniform sampler2D terrainHeightTex;\n\
+uniform sampler2D currWaterFluxTex;\n\
+\n\
+varying vec2 v_tex_pos; // texCoords.\n\
+#define PI 3.1415926\n\
+\n\
+uniform float u_SimRes;\n\
+uniform float u_PipeLen;\n\
+uniform float u_timestep;\n\
+uniform float u_PipeArea;\n\
+uniform vec2 u_heightMap_MinMax;\n\
+\n\
+void main()\n\
+{\n\
+    vec2 curuv = vec2(v_tex_pos.x, 1.0 - v_tex_pos.y);\n\
+    curuv = v_tex_pos;\n\
+    float div = 1.0/u_SimRes;\n\
+\n\
+    vec4 topflux = texture2D(currWaterFluxTex, curuv + vec2(0.0, div));\n\
+    vec4 rightflux = texture2D(currWaterFluxTex, curuv + vec2(div, 0.0));\n\
+    vec4 bottomflux = texture2D(currWaterFluxTex, curuv + vec2(0.0, -div));\n\
+    vec4 leftflux = texture2D(currWaterFluxTex, curuv + vec2(-div, 0.0));\n\
+\n\
+    vec4 curflux = texture2D(currWaterFluxTex, curuv);\n\
+    vec4 curT = texture2D(terrainHeightTex, curuv);\n\
+    vec4 curW = texture2D(waterHeightTex, curuv);\n\
+\n\
+    \n\
+    //out flow flux\n\
+    float ftopout = curflux.x;\n\
+    float frightout = curflux.y;\n\
+    float fbottomout = curflux.z;\n\
+    float fleftout = curflux.w;\n\
+\n\
+    vec4 outputflux = curflux;\n\
+    vec4 inputflux = vec4(topflux.z, rightflux.w, bottomflux.x, leftflux.y);\n\
+\n\
+    float fout = ftopout + frightout + fbottomout + fleftout;\n\
+    float fin = topflux.z + rightflux.w + bottomflux.x + leftflux.y;\n\
+    fin = inputflux.x + inputflux.y + inputflux.z + inputflux.w;\n\
+\n\
+    float deltavol = u_timestep * (fin - fout) / (u_PipeLen * u_PipeLen);\n\
+    //---------------------------------------------------------------------------------\n\
+\n\
+    //float d1 = cur.y + curs.x; // original.\n\
+    float d1 = curW.r;\n\
+\n\
+    float d2 = d1 + deltavol;\n\
+    float da = (d1 + d2)/2.0;\n\
+\n\
+    vec2 veloci = vec2(inputflux.w - outputflux.w + outputflux.y - inputflux.y, inputflux.z - outputflux.z + outputflux.x - inputflux.x) / 2.0;\n\
+\n\
+    //veloci *= 100000.0;\n\
+        if(da <= 1e-5) {\n\
+        veloci = vec2(0.0);\n\
+        }else{\n\
+        veloci = veloci/(da * u_PipeLen);\n\
+        }\n\
+\n\
+    if(curuv.x <= div) {deltavol = 0.0; veloci = vec2(0.0);}\n\
+    if(curuv.x >= 1.0 - 2.0 *div) {deltavol = 0.0; veloci = vec2(0.0);}\n\
+    if(curuv.y <= div) {deltavol = 0.0; veloci = vec2(0.0);}\n\
+    if(curuv.y >= 1.0 - 2.0 * div) {deltavol = 0.0; veloci = vec2(0.0);}\n\
+\n\
+    //  float absx = abs(veloci.x);\n\
+    //  float absy = abs(veloci.y);\n\
+    //  float maxxy = max(absx, absy);\n\
+    //  float minxy = min(absx, absy);\n\
+    //  float tantheta = minxy / maxxy;\n\
+    //  float scale = cos(45.0 * PI / 180.0 - atan(tantheta));\n\
+    //  float divtheta = (1.0/sqrt(2.0)) / scale;\n\
+    //  float divs = min(abs(veloci.x), abs(veloci.y))/max(abs(veloci.x), abs(veloci.y));\n\
+    //  if((divs) > 20.0){\n\
+    //    veloci /= 20.0;\n\
+    //  }\n\
+\n\
+\n\
+    vec4 writeVel = vec4(veloci, 0.0, 1.0);\n\
+    //vec4 writeWaterHeight = vec4(cur.x,max(cur.y+deltavol, 0.0),cur.z,cur.w); // original.***\n\
+\n\
+    float waterHeight = max(curW.r + deltavol, 0.0);\n\
+    vec4 writeWaterHeight = vec4(waterHeight, waterHeight, waterHeight, waterHeight);\n\
+\n\
+\n\
+    gl_FragData[0] = writeWaterHeight;  // water flux.\n\
+\n\
+\n\
+    #ifdef USE_MULTI_RENDER_TARGET\n\
+        gl_FragData[1] = writeVel; // velocity\n\
+        gl_FragData[2] = vec4(0.0); // \n\
+        gl_FragData[3] = vec4(0.0); // \n\
+        gl_FragData[4] = vec4(0.0); // \n\
+    #endif\n\
+\n\
+}";
+ShaderSource.waterDepthRenderFS = "//#version 300 es\n\
+\n\
+#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+uniform vec2 u_PlanePos; // Our location in the virtual world displayed by the plane\n\
+\n\
+//in vec3 fs_Pos;\n\
+//in vec4 fs_Nor;\n\
+//in vec4 fs_Col;\n\
+\n\
+uniform sampler2D hightmap;\n\
+uniform sampler2D normap;\n\
+uniform sampler2D sceneDepth;\n\
+uniform sampler2D colorReflection;\n\
+uniform sampler2D sedimap;\n\
+\n\
+//in float fs_Sine;\n\
+//in vec2 fs_Uv;\n\
+//layout (location = 0) out vec4 out_Col; // This is the final output color that you will see on your\n\
+//layout (location = 1) out vec4 col_reflect;\n\
+                  // screen for the pixel that is currently being processed.\n\
+uniform vec3 u_Eye, u_Ref, u_Up;\n\
+\n\
+\n\
+uniform int u_TerrainType;\n\
+uniform float u_WaterTransparency;\n\
+uniform float u_SimRes;\n\
+uniform vec2 u_Dimensions;\n\
+uniform vec3 unif_LightPos;\n\
+uniform float u_far;\n\
+uniform float u_near;\n\
+\n\
+varying vec4 vColorAuxTest;\n\
+varying float vWaterHeight;\n\
+/*\n\
+vec3 calnor(vec2 uv){\n\
+    float eps = 1.0/u_SimRes;\n\
+    vec4 cur = texture(hightmap,uv);\n\
+    vec4 r = texture(hightmap,uv+vec2(eps,0.f));\n\
+    vec4 t = texture(hightmap,uv+vec2(0.f,eps));\n\
+\n\
+    vec3 n1 = normalize(vec3(-1.0, cur.y + cur.x - r.y - r.x, 0.f));\n\
+    vec3 n2 = normalize(vec3(-1.0, t.x + t.y - r.y - r.x, 1.0));\n\
+\n\
+    vec3 nor = -cross(n1,n2);\n\
+    nor = normalize(nor);\n\
+    return nor;\n\
+}\n\
+\n\
+vec3 sky(in vec3 rd){\n\
+    return mix(vec3(0.6,0.6,0.6),vec3(0.3,0.5,0.9),clamp(rd.y,0.f,1.f));\n\
+}\n\
+\n\
+float linearDepth(float depthSample)\n\
+{\n\
+    depthSample = 2.0 * depthSample - 1.0;\n\
+    float zLinear = 2.0 * u_near * u_far / (u_far + u_near - depthSample * (u_far - u_near));\n\
+    return zLinear;\n\
+}\n\
+*/\n\
+void main()\n\
+{\n\
+    if(vWaterHeight < 0.0001)\n\
+    {\n\
+        discard;\n\
+    }\n\
+\n\
+    vec4 finalCol4 = vec4(vColorAuxTest);\n\
+    //if(vColorAuxTest.r == vColorAuxTest.g && vColorAuxTest.r == vColorAuxTest.b )\n\
+    //{\n\
+    //    finalCol4 = vec4(1.0, 0.0, 0.0, 1.0);\n\
+    //}\n\
+    gl_FragData[0] = finalCol4;  // anything.\n\
+\n\
+    #ifdef USE_MULTI_RENDER_TARGET\n\
+        gl_FragData[1] = vec4(1.0); // depth\n\
+        gl_FragData[2] = vec4(1.0); // normal\n\
+        gl_FragData[3] = finalCol4; // albedo\n\
+        gl_FragData[4] = vec4(1.0); // selection color\n\
+    #endif\n\
+    /*\n\
+    vec2 uv = vec2(gl_FragCoord.xy/u_Dimensions);\n\
+    float terrainDepth = texture(sceneDepth,uv).x;\n\
+    float sediment = texture(sedimap,fs_Uv).x;\n\
+    float waterDepth = gl_FragCoord.z;\n\
+\n\
+    terrainDepth = linearDepth(terrainDepth);\n\
+    waterDepth = linearDepth(waterDepth);\n\
+\n\
+    float dpVal = 180.0 * max(0.0,terrainDepth - waterDepth);\n\
+    dpVal = clamp(dpVal, 0.0,4.0);\n\
+    //dpVal = pow(dpVal, 0.1);\n\
+\n\
+\n\
+    float fbias = 0.2;\n\
+    float fscale = 0.2;\n\
+    float fpow = 22.0;\n\
+    vec3 sundir = unif_LightPos;\n\
+\n\
+    sundir = normalize(sundir);\n\
+\n\
+    vec3 nor = -calnor(fs_Uv);\n\
+    vec3 viewdir = normalize(u_Eye - fs_Pos);\n\
+    vec3 lightdir = normalize(sundir);\n\
+    vec3 halfway = normalize(lightdir + viewdir);\n\
+    vec3 reflectedSky = sky(halfway);\n\
+    float spec = pow(max(dot(nor, halfway), 0.0), 333.0);\n\
+\n\
+\n\
+    float R = max(0.0, min(1.0, fbias + fscale * pow(1.0 + dot(viewdir, -nor), fpow)));\n\
+\n\
+    //lamb =1.f;\n\
+\n\
+    float yval = texture(hightmap,fs_Uv).x * 4.0;\n\
+    float wval = texture(hightmap,fs_Uv).y;\n\
+    wval /= 1.0;\n\
+\n\
+\n\
+\n\
+    vec3 watercolor = mix(vec3(0.8,0.0,0.0), vec3(0.0,0.0,0.8), sediment * 2.0);\n\
+    vec3 watercolorspec = vec3(1.0);\n\
+    watercolorspec *= spec;\n\
+\n\
+\n\
+\n\
+    out_Col = vec4(vec3(0.0,0.2,0.5) + R * reflectedSky + watercolorspec  , (.5 + spec) * u_WaterTransparency * dpVal);\n\
+    col_reflect = vec4(1.0);\n\
+    */\n\
+}";
+ShaderSource.waterDepthRenderVS = "\n\
+//#version 300 es\n\
+\n\
+	attribute vec3 position;\n\
+	attribute vec3 normal;\n\
+	attribute vec2 texCoord;\n\
+	attribute vec4 color4;\n\
+	\n\
+	uniform mat4 buildingRotMatrix; \n\
+	uniform mat4 modelViewMatrixRelToEye; \n\
+	uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+	uniform mat4 normalMatrix4;\n\
+	uniform vec3 buildingPosHIGH;\n\
+	uniform vec3 buildingPosLOW;\n\
+	uniform float near;\n\
+	uniform float far;\n\
+	uniform vec3 scaleLC;\n\
+	uniform vec3 encodedCameraPositionMCHigh;\n\
+	uniform vec3 encodedCameraPositionMCLow;\n\
+	uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
+	\n\
+	uniform bool bUseLogarithmicDepth;\n\
+	uniform float uFCoef_logDepth;\n\
+    \n\
+uniform mat4 u_Model;\n\
+uniform mat4 u_ModelInvTr;\n\
+uniform mat4 u_ViewProj;\n\
+uniform vec2 u_PlanePos; // Our location in the virtual world displayed by the plane\n\
+\n\
+uniform sampler2D hightmap;\n\
+uniform sampler2D terrainmap;\n\
+uniform float u_SimRes;\n\
+\n\
+uniform vec2 u_heightMap_MinMax;\n\
+uniform vec2 u_waterHeightMap_MinMax;\n\
+\n\
+\n\
+varying vec4 vColorAuxTest;\n\
+varying float vWaterHeight;\n\
+\n\
+void main()\n\
+{\n\
+	// read the altitude from hightmap.\n\
+	vec4 heightVec4 = texture2D(hightmap, vec2(texCoord.x, 1.0 - texCoord.y));\n\
+	vec4 terrainHeight4 = texture2D(terrainmap, vec2(texCoord.x, 1.0 - texCoord.y));\n\
+	float r = heightVec4.r;\n\
+	float g = heightVec4.g;\n\
+\n\
+	float decodedHeight = r;\n\
+	float terrainH = terrainHeight4.r;\n\
+\n\
+	//float height = u_heightMap_MinMax.x + decodedHeight * u_heightMap_MinMax.y;\n\
+	float waterHeight = decodedHeight * 10.0;\n\
+	float terrainHeight = u_heightMap_MinMax.x + terrainH * u_heightMap_MinMax.y;\n\
+	float height = terrainHeight + waterHeight;\n\
+\n\
+	vWaterHeight = waterHeight;\n\
+\n\
+	//vColorAuxTest = heightVec4;\n\
+	//vColorAuxTest = vec4(heightVec4.rgb, 0.5);\n\
+	vColorAuxTest = vec4(0.1, 0.5, 1.0, min(r*1.1, 1.0));\n\
+\n\
+	vec3 objPosHigh = buildingPosHIGH;\n\
+    vec3 objPosLow = buildingPosLOW.xyz + position.xyz;\n\
+    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+	\n\
+	// calculate the up direction:\n\
+	vec4 posWC = vec4(objPosLow + objPosHigh, 1.0);\n\
+	vec3 upDir = normalize(posWC.xyz);\n\
+\n\
+	vec4 finalPos4 =  vec4(pos4.x + upDir.x * height, pos4.y + upDir.y * height, pos4.z + upDir.z * height, 1.0);\n\
+\n\
+	gl_Position = ModelViewProjectionMatrixRelToEye * finalPos4;\n\
+\n\
+}\n\
+";
+ShaderSource.waterQuadVertVS = "//precision mediump float;\n\
+\n\
+attribute vec2 a_pos;\n\
+\n\
+varying vec2 v_tex_pos;\n\
+\n\
+void main() {\n\
+    v_tex_pos = a_pos;\n\
+    gl_Position = vec4(-1.0 + 2.0 * a_pos, 0, 1);\n\
+}";
+ShaderSource.waterRenderFS = "//#version 300 es\n\
+\n\
+#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+uniform vec2 u_PlanePos; // Our location in the virtual world displayed by the plane\n\
+\n\
+//in vec3 fs_Pos;\n\
+//in vec4 fs_Nor;\n\
+//in vec4 fs_Col;\n\
+\n\
+uniform sampler2D hightmap;\n\
+uniform sampler2D normap;\n\
+uniform sampler2D sceneDepth;\n\
+uniform sampler2D colorReflection;\n\
+uniform sampler2D sedimap;\n\
+\n\
+//in float fs_Sine;\n\
+//in vec2 fs_Uv;\n\
+//layout (location = 0) out vec4 out_Col; // This is the final output color that you will see on your\n\
+//layout (location = 1) out vec4 col_reflect;\n\
+                  // screen for the pixel that is currently being processed.\n\
+uniform vec3 u_Eye, u_Ref, u_Up;\n\
+\n\
+\n\
+uniform int u_TerrainType;\n\
+uniform float u_WaterTransparency;\n\
+uniform float u_SimRes;\n\
+uniform vec2 u_Dimensions;\n\
+uniform vec3 unif_LightPos;\n\
+uniform float u_far;\n\
+uniform float u_near;\n\
+\n\
+varying vec4 vColorAuxTest;\n\
+varying float vWaterHeight;\n\
+/*\n\
+vec3 calnor(vec2 uv){\n\
+    float eps = 1.0/u_SimRes;\n\
+    vec4 cur = texture(hightmap,uv);\n\
+    vec4 r = texture(hightmap,uv+vec2(eps,0.f));\n\
+    vec4 t = texture(hightmap,uv+vec2(0.f,eps));\n\
+\n\
+    vec3 n1 = normalize(vec3(-1.0, cur.y + cur.x - r.y - r.x, 0.f));\n\
+    vec3 n2 = normalize(vec3(-1.0, t.x + t.y - r.y - r.x, 1.0));\n\
+\n\
+    vec3 nor = -cross(n1,n2);\n\
+    nor = normalize(nor);\n\
+    return nor;\n\
+}\n\
+\n\
+vec3 sky(in vec3 rd){\n\
+    return mix(vec3(0.6,0.6,0.6),vec3(0.3,0.5,0.9),clamp(rd.y,0.f,1.f));\n\
+}\n\
+\n\
+float linearDepth(float depthSample)\n\
+{\n\
+    depthSample = 2.0 * depthSample - 1.0;\n\
+    float zLinear = 2.0 * u_near * u_far / (u_far + u_near - depthSample * (u_far - u_near));\n\
+    return zLinear;\n\
+}\n\
+*/\n\
+void main()\n\
+{\n\
+    if(vWaterHeight < 0.0001)\n\
+    {\n\
+        discard;\n\
+    }\n\
+\n\
+    vec4 finalCol4 = vec4(vColorAuxTest);\n\
+    //if(vColorAuxTest.r == vColorAuxTest.g && vColorAuxTest.r == vColorAuxTest.b )\n\
+    //{\n\
+    //    finalCol4 = vec4(1.0, 0.0, 0.0, 1.0);\n\
+    //}\n\
+    gl_FragData[0] = finalCol4;  // anything.\n\
+\n\
+    #ifdef USE_MULTI_RENDER_TARGET\n\
+        gl_FragData[1] = vec4(1.0); // depth\n\
+        gl_FragData[2] = vec4(1.0); // normal\n\
+        gl_FragData[3] = finalCol4; // albedo\n\
+        gl_FragData[4] = vec4(1.0); // selection color\n\
+    #endif\n\
+    /*\n\
+    vec2 uv = vec2(gl_FragCoord.xy/u_Dimensions);\n\
+    float terrainDepth = texture(sceneDepth,uv).x;\n\
+    float sediment = texture(sedimap,fs_Uv).x;\n\
+    float waterDepth = gl_FragCoord.z;\n\
+\n\
+    terrainDepth = linearDepth(terrainDepth);\n\
+    waterDepth = linearDepth(waterDepth);\n\
+\n\
+    float dpVal = 180.0 * max(0.0,terrainDepth - waterDepth);\n\
+    dpVal = clamp(dpVal, 0.0,4.0);\n\
+    //dpVal = pow(dpVal, 0.1);\n\
+\n\
+\n\
+    float fbias = 0.2;\n\
+    float fscale = 0.2;\n\
+    float fpow = 22.0;\n\
+    vec3 sundir = unif_LightPos;\n\
+\n\
+    sundir = normalize(sundir);\n\
+\n\
+    vec3 nor = -calnor(fs_Uv);\n\
+    vec3 viewdir = normalize(u_Eye - fs_Pos);\n\
+    vec3 lightdir = normalize(sundir);\n\
+    vec3 halfway = normalize(lightdir + viewdir);\n\
+    vec3 reflectedSky = sky(halfway);\n\
+    float spec = pow(max(dot(nor, halfway), 0.0), 333.0);\n\
+\n\
+\n\
+    float R = max(0.0, min(1.0, fbias + fscale * pow(1.0 + dot(viewdir, -nor), fpow)));\n\
+\n\
+    //lamb =1.f;\n\
+\n\
+    float yval = texture(hightmap,fs_Uv).x * 4.0;\n\
+    float wval = texture(hightmap,fs_Uv).y;\n\
+    wval /= 1.0;\n\
+\n\
+\n\
+\n\
+    vec3 watercolor = mix(vec3(0.8,0.0,0.0), vec3(0.0,0.0,0.8), sediment * 2.0);\n\
+    vec3 watercolorspec = vec3(1.0);\n\
+    watercolorspec *= spec;\n\
+\n\
+\n\
+\n\
+    out_Col = vec4(vec3(0.0,0.2,0.5) + R * reflectedSky + watercolorspec  , (.5 + spec) * u_WaterTransparency * dpVal);\n\
+    col_reflect = vec4(1.0);\n\
+    */\n\
+}";
+ShaderSource.waterRenderVS = "\n\
+//#version 300 es\n\
+\n\
+	attribute vec3 position;\n\
+	attribute vec3 normal;\n\
+	attribute vec2 texCoord;\n\
+	attribute vec4 color4;\n\
+	\n\
+	uniform mat4 buildingRotMatrix; \n\
+	uniform mat4 modelViewMatrixRelToEye; \n\
+	uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+	uniform mat4 normalMatrix4;\n\
+	uniform vec3 buildingPosHIGH;\n\
+	uniform vec3 buildingPosLOW;\n\
+	uniform float near;\n\
+	uniform float far;\n\
+	uniform vec3 scaleLC;\n\
+	uniform vec3 encodedCameraPositionMCHigh;\n\
+	uniform vec3 encodedCameraPositionMCLow;\n\
+	uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
+	\n\
+	uniform bool bUseLogarithmicDepth;\n\
+	uniform float uFCoef_logDepth;\n\
+    \n\
+uniform mat4 u_Model;\n\
+uniform mat4 u_ModelInvTr;\n\
+uniform mat4 u_ViewProj;\n\
+uniform vec2 u_PlanePos; // Our location in the virtual world displayed by the plane\n\
+\n\
+uniform sampler2D hightmap;\n\
+uniform sampler2D terrainmap;\n\
+uniform float u_SimRes;\n\
+\n\
+uniform vec2 u_heightMap_MinMax;\n\
+\n\
+\n\
+\n\
+varying vec4 vColorAuxTest;\n\
+varying float vWaterHeight;\n\
+\n\
+void main()\n\
+{\n\
+	// read the altitude from hightmap.\n\
+	vec4 heightVec4 = texture2D(hightmap, vec2(texCoord.x, 1.0 - texCoord.y));\n\
+	vec4 terrainHeight4 = texture2D(terrainmap, vec2(texCoord.x, 1.0 - texCoord.y));\n\
+	float r = heightVec4.r;\n\
+	float g = heightVec4.g;\n\
+\n\
+	float decodedHeight = r;\n\
+	float terrainH = terrainHeight4.r;\n\
+\n\
+	//float height = u_heightMap_MinMax.x + decodedHeight * u_heightMap_MinMax.y;\n\
+	float waterHeight = decodedHeight * 10.0;\n\
+	float terrainHeight = u_heightMap_MinMax.x + terrainH * u_heightMap_MinMax.y;\n\
+	float height = terrainHeight + waterHeight;\n\
+\n\
+	vWaterHeight = waterHeight;\n\
+\n\
+	//vColorAuxTest = heightVec4;\n\
+	//vColorAuxTest = vec4(heightVec4.rgb, 0.5);\n\
+	vColorAuxTest = vec4(0.1, 0.5, 1.0, min(r*1.1, 1.0));\n\
+\n\
+	vec3 objPosHigh = buildingPosHIGH;\n\
+    vec3 objPosLow = buildingPosLOW.xyz + position.xyz;\n\
+    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+	\n\
+	// calculate the up direction:\n\
+	vec4 posWC = vec4(objPosLow + objPosHigh, 1.0);\n\
+	vec3 upDir = normalize(posWC.xyz);\n\
+\n\
+	vec4 finalPos4 =  vec4(pos4.x + upDir.x * height, pos4.y + upDir.y * height, pos4.z + upDir.z * height, 1.0);\n\
+\n\
+	gl_Position = ModelViewProjectionMatrixRelToEye * finalPos4;\n\
+\n\
+}\n\
+";
+ShaderSource.waterSimTerrainRenderFS = "//#version 300 es\n\
+\n\
+#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+uniform vec2 u_PlanePos; // Our location in the virtual world displayed by the plane\n\
+\n\
+//in vec3 fs_Pos;\n\
+//in vec4 fs_Nor;\n\
+//in vec4 fs_Col;\n\
+\n\
+uniform sampler2D hightmap;\n\
+uniform sampler2D terrainmap;\n\
+uniform sampler2D normap;\n\
+uniform sampler2D sceneDepth;\n\
+uniform sampler2D colorReflection;\n\
+uniform sampler2D sedimap;\n\
+\n\
+//in float fs_Sine;\n\
+//in vec2 fs_Uv;\n\
+\n\
+uniform vec3 u_Eye, u_Ref, u_Up;\n\
+\n\
+\n\
+uniform int u_TerrainType;\n\
+uniform float u_WaterTransparency;\n\
+uniform float u_SimRes;\n\
+uniform vec2 u_Dimensions;\n\
+uniform vec3 unif_LightPos;\n\
+uniform float u_far;\n\
+uniform float u_near;\n\
+\n\
+uniform vec2 u_screenSize;\n\
+\n\
+varying vec4 vColorAuxTest;\n\
+varying vec2 vTexCoord;\n\
+\n\
+vec3 calculateNormal(vec2 uv){\n\
+    float eps = 1.0/u_SimRes;\n\
+    vec4 cur = texture2D(terrainmap, uv)*50.0;\n\
+    vec4 r = texture2D(terrainmap, uv + vec2(eps, 0.0))*50.0;\n\
+    vec4 t = texture2D(terrainmap, uv + vec2(0.0, eps))*50.0;\n\
+\n\
+    vec3 n1 = normalize(vec3(-1.0, cur.x - r.x, 0.0));\n\
+    vec3 n2 = normalize(vec3(-1.0, t.x - r.x, 1.0));\n\
+\n\
+    vec3 nor = -cross(n1,n2);\n\
+    nor = normalize(nor);\n\
+    return nor;\n\
+}\n\
+/*\n\
+vec3 sky(in vec3 rd){\n\
+    return mix(vec3(0.6,0.6,0.6),vec3(0.3,0.5,0.9),clamp(rd.y,0.f,1.f));\n\
+}\n\
+\n\
+float linearDepth(float depthSample)\n\
+{\n\
+    depthSample = 2.0 * depthSample - 1.0;\n\
+    float zLinear = 2.0 * u_near * u_far / (u_far + u_near - depthSample * (u_far - u_near));\n\
+    return zLinear;\n\
+}\n\
+*/\n\
+void main()\n\
+{\n\
+    vec3 camDir = normalize(vec3(-gl_FragCoord.x / u_screenSize.x, -gl_FragCoord.y / u_screenSize.y, 1.0));\n\
+    vec3 camDir2 = -1.0 + 2.0 * camDir;\n\
+    vec3 normal = calculateNormal(vec2(vTexCoord.x, 1.0 - vTexCoord.y));\n\
+    float dotProd = dot(camDir2, normal);\n\
+    vec4 finalCol4 = vec4(vColorAuxTest * dotProd);\n\
+    finalCol4 = vec4(normal, 1.0);\n\
+    //if(vColorAuxTest.r == vColorAuxTest.g && vColorAuxTest.r == vColorAuxTest.b )\n\
+    //{\n\
+    //    finalCol4 = vec4(1.0, 0.0, 0.0, 1.0);\n\
+    //}\n\
+    gl_FragData[0] = finalCol4;  // anything.\n\
+\n\
+    #ifdef USE_MULTI_RENDER_TARGET\n\
+        gl_FragData[1] = vec4(1.0); // depth\n\
+        gl_FragData[2] = vec4(1.0); // normal\n\
+        gl_FragData[3] = finalCol4; // albedo\n\
+        gl_FragData[4] = vec4(1.0); // selection color\n\
+    #endif\n\
+    /*\n\
+    vec2 uv = vec2(gl_FragCoord.xy/u_Dimensions);\n\
+    float terrainDepth = texture(sceneDepth,uv).x;\n\
+    float sediment = texture(sedimap,fs_Uv).x;\n\
+    float waterDepth = gl_FragCoord.z;\n\
+\n\
+    terrainDepth = linearDepth(terrainDepth);\n\
+    waterDepth = linearDepth(waterDepth);\n\
+\n\
+    float dpVal = 180.0 * max(0.0,terrainDepth - waterDepth);\n\
+    dpVal = clamp(dpVal, 0.0,4.0);\n\
+    //dpVal = pow(dpVal, 0.1);\n\
+\n\
+\n\
+    float fbias = 0.2;\n\
+    float fscale = 0.2;\n\
+    float fpow = 22.0;\n\
+    vec3 sundir = unif_LightPos;\n\
+\n\
+    sundir = normalize(sundir);\n\
+\n\
+    vec3 nor = -calnor(fs_Uv);\n\
+    vec3 viewdir = normalize(u_Eye - fs_Pos);\n\
+    vec3 lightdir = normalize(sundir);\n\
+    vec3 halfway = normalize(lightdir + viewdir);\n\
+    vec3 reflectedSky = sky(halfway);\n\
+    float spec = pow(max(dot(nor, halfway), 0.0), 333.0);\n\
+\n\
+\n\
+    float R = max(0.0, min(1.0, fbias + fscale * pow(1.0 + dot(viewdir, -nor), fpow)));\n\
+\n\
+    //lamb =1.f;\n\
+\n\
+    float yval = texture(hightmap,fs_Uv).x * 4.0;\n\
+    float wval = texture(hightmap,fs_Uv).y;\n\
+    wval /= 1.0;\n\
+\n\
+\n\
+\n\
+    vec3 watercolor = mix(vec3(0.8,0.0,0.0), vec3(0.0,0.0,0.8), sediment * 2.0);\n\
+    vec3 watercolorspec = vec3(1.0);\n\
+    watercolorspec *= spec;\n\
+\n\
+\n\
+\n\
+    out_Col = vec4(vec3(0.0,0.2,0.5) + R * reflectedSky + watercolorspec  , (.5 + spec) * u_WaterTransparency * dpVal);\n\
+    col_reflect = vec4(1.0);\n\
+    */\n\
+}";
+ShaderSource.waterSimTerrainRenderVS = "\n\
+//#version 300 es\n\
+\n\
+	attribute vec3 position;\n\
+	attribute vec3 normal;\n\
+	attribute vec2 texCoord;\n\
+	attribute vec4 color4;\n\
+	\n\
+	uniform mat4 buildingRotMatrix; \n\
+	uniform mat4 modelViewMatrixRelToEye; \n\
+	uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+	uniform mat4 normalMatrix4;\n\
+	uniform vec3 buildingPosHIGH;\n\
+	uniform vec3 buildingPosLOW;\n\
+	uniform float near;\n\
+	uniform float far;\n\
+	uniform vec3 scaleLC;\n\
+	uniform vec3 encodedCameraPositionMCHigh;\n\
+	uniform vec3 encodedCameraPositionMCLow;\n\
+	uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
+	\n\
+	uniform bool bUseLogarithmicDepth;\n\
+	uniform float uFCoef_logDepth;\n\
+    \n\
+uniform mat4 u_Model;\n\
+uniform mat4 u_ModelInvTr;\n\
+uniform mat4 u_ViewProj;\n\
+uniform vec2 u_PlanePos; // Our location in the virtual world displayed by the plane\n\
+\n\
+uniform sampler2D hightmap;\n\
+uniform sampler2D terrainmap;\n\
+uniform float u_SimRes;\n\
+\n\
+uniform vec2 u_heightMap_MinMax;\n\
+\n\
+\n\
+\n\
+varying vec4 vColorAuxTest;\n\
+varying vec2 vTexCoord;\n\
+\n\
+void main()\n\
+{\n\
+	// read the altitude from hightmap.\n\
+	//vec4 heightVec4 = texture2D(hightmap, vec2(texCoord.x, 1.0 - texCoord.y));\n\
+	vec4 terrainHeight4 = texture2D(terrainmap, vec2(texCoord.x, 1.0 - texCoord.y));\n\
+	vTexCoord = texCoord;\n\
+	//float r = heightVec4.r;\n\
+	//float g = heightVec4.g;\n\
+\n\
+	//float decodedHeight = r;\n\
+	float terrainH = terrainHeight4.r;\n\
+\n\
+	//float waterHeight = decodedHeight * 50.0;\n\
+	float terrainHeight = u_heightMap_MinMax.x + terrainH * u_heightMap_MinMax.y;\n\
+	float height = terrainHeight;\n\
+\n\
+	vColorAuxTest = terrainHeight4;\n\
+\n\
+	vec3 objPosHigh = buildingPosHIGH;\n\
+    vec3 objPosLow = buildingPosLOW.xyz + position.xyz;\n\
+    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+	\n\
+	// calculate the up direction:\n\
+	vec4 posWC = vec4(objPosLow + objPosHigh, 1.0);\n\
+	vec3 upDir = normalize(posWC.xyz);\n\
+\n\
+	vec4 finalPos4 =  vec4(pos4.x + upDir.x * height, pos4.y + upDir.y * height, pos4.z + upDir.z * height, 1.0);\n\
+\n\
+	gl_Position = ModelViewProjectionMatrixRelToEye * finalPos4;\n\
+}\n\
+";
 ShaderSource.wgs84_volumFS = "precision mediump float;\n\
 \n\
 #define M_PI 3.1415926535897932384626433832795\n\

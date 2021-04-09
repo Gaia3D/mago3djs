@@ -1435,7 +1435,7 @@ ReaderWriter.loadBinaryData = function(fileName, dataContainer, weatherLayer)
  * @param neoBuilding 변수
  * @param magoManager 변수
  */
-ReaderWriter.loadImage = function(gl, filePath_inServer, texture) 
+ReaderWriter.loadImage = function (gl, filePath_inServer, texture) 
 {
 	// Must know the fileExtension.***
 	//var extension = filePath_inServer.split('.').pop();

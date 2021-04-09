@@ -62,7 +62,7 @@ var SceneState = function(config)
 	this.diffuseReflectionCoef = new Float32Array([1.0]); // 0.4
 	this.specularReflectionCoef = new Float32Array([0.6]); // 0.6
 	this.specularColor = new Float32Array([0.7, 0.7, 0.7]);
-	this.ambientColor = new Float32Array([0.5, 0.5, 0.5]);
+	this.ambientColor = new Float32Array([0.6, 0.6, 0.6]);
 	this.ssaoRadius = new Float32Array([0.15]);
 	//this.shininessValue = new Float32Array([40.0]); // original.***
 	this.shininessValue = new Float32Array([10.0]);
@@ -179,8 +179,9 @@ SceneState.prototype.initMagoSceneState = function(cId)
 	containerDiv.appendChild(canvas);
 	var glAttrs = {antialias          : true, 
 		stencil            : true,
-		premultipliedAlpha : true};
-	var gl = canvas.getContext("webgl", glAttrs);
+		premultipliedAlpha : false};//,
+		//preserveDrawingBuffer: true};
+	var gl = canvas.getContext("webgl", {glAttrs});
 	if (!gl)
 	{ gl = canvas.getContext("experimental-webgl", glAttrs); }
     

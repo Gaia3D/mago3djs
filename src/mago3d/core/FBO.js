@@ -234,7 +234,12 @@ FBO.prototype.setColorBuffer = function(colorBuffer)
  */
 FBO.prototype.bind = function() 
 {
-	this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.fbo);
+	var gl = this.gl;
+	gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.fbo);
+
+	//gl.bindRenderbuffer(gl.RENDERBUFFER, this.depthBuffer);
+	//gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, this.width[0], this.height[0]);
+	//gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.depthBuffer);
 };
 
 /**

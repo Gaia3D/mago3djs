@@ -1559,7 +1559,7 @@ Renderer.prototype.renderSsaoFromDepth = function(gl)
 
 	//if (magoManager.isFarestFrustum())
 	{
-		gl.clearColor(0, 0, 0, 0);
+		gl.clearColor(0, 0, 0, 0);// original.***
 		gl.clearDepth(1);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		gl.clearColor(0, 0, 0, 1);
@@ -2118,6 +2118,47 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 		//texture = magoManager.selColorTex;
 	}
 
+	if(magoManager.ssaoFromDepthFbo)
+	{
+		//texture = magoManager.ssaoFromDepthFbo.colorBuffer;
+	}
+
+	if(magoManager.waterManager)
+	{
+		if(magoManager.waterManager.waterLayersArray.length > 0)
+		{
+			var waterLayer = magoManager.waterManager.waterLayersArray[0];
+			if(waterLayer.waterHeightTexA && waterLayer.waterHeightTexA.texId)
+			{
+				texture = waterLayer.waterHeightTexA.texId;
+			}
+
+			if(waterLayer.waterHeightTexB && waterLayer.waterHeightTexB.texId)
+			{
+				//texture = waterLayer.waterHeightTexB.texId;
+			}
+
+			if(waterLayer.waterSourceTex && waterLayer.waterSourceTex.texId)
+			{
+				//texture = waterLayer.waterSourceTex.texId;
+			}
+
+			if(waterLayer.waterFluxTexA && waterLayer.waterFluxTexA.texId)
+			{
+				//texture = waterLayer.waterFluxTexA.texId;
+			}
+
+			if(waterLayer.waterVelocityTexA && waterLayer.waterVelocityTexA.texId)
+			{
+				//texture = waterLayer.waterVelocityTexA.texId;
+			}
+
+			if(magoManager.waterManager.dem_texture && magoManager.waterManager.dem_texture.texId)
+			{
+				//texture = magoManager.waterManager.dem_texture.texId;
+			}
+		}
+	}
 	
 	var sunSystem = sceneState.sunSystem;
 	if(sunSystem)
@@ -2169,7 +2210,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 	*/
 	///////////////////////////////////////////////////////////////////////////
 
-
+	gl.frontFace(gl.CCW);
 	gl.depthMask(false);
 	gl.disable(gl.DEPTH_TEST);
 	//gl.enable(gl.BLEND);
@@ -2354,7 +2395,7 @@ Renderer.prototype.renderLightDepthCubeMaps = function (lightSourcesArray)
  * This function renders lightBuffer.
  * @param {Array} lightSourcesArray .
  */
-Renderer.prototype.renderLightBuffer = function(lightSourcesArray) 
+Renderer.prototype.renderLightBuffer = function (lightSourcesArray) 
 {
 	var magoManager = this.magoManager;
 	var lightSourcesCount = lightSourcesArray.length;
@@ -2370,16 +2411,7 @@ Renderer.prototype.renderLightBuffer = function(lightSourcesArray)
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	var extbuffers = lBuffer.extbuffers;
-	/*
-	gl.bindTexture(gl.TEXTURE_2D, magoManager.diffuseLightTex);  
-	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, sceneState.drawingBufferWidth[0], sceneState.drawingBufferHeight[0], 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
-
-	gl.bindTexture(gl.TEXTURE_2D, magoManager.specularLightTex);  
-	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, sceneState.drawingBufferWidth[0], sceneState.drawingBufferHeight[0], 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
 	
-	gl.bindTexture(gl.TEXTURE_2D, magoManager.LightFogTex);  
-	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, sceneState.drawingBufferWidth[0], sceneState.drawingBufferHeight[0], 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
-	*/
 	// Bind mago colorTextures:
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, lBuffer.extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, magoManager.diffuseLightTex, 0);
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, lBuffer.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, magoManager.specularLightTex, 0);
@@ -2404,7 +2436,7 @@ Renderer.prototype.renderLightBuffer = function(lightSourcesArray)
 	var currentShader = magoManager.postFxShadersManager.getShader("lBuffer"); 
 	magoManager.postFxShadersManager.useProgram(currentShader);
 	magoManager.effectsManager.setCurrentShader(currentShader);
-	gl.uniform1i(currentShader.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
+	gl.uniform1i(currentShader.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth); // lBufferRender NO uses logDepth, but the depthBuffer can be in logDepth.
 	gl.uniform1i(currentShader.bApplySpecularLighting_loc, true);
 	gl.uniform1f(currentShader.uFCoef_logDepth_loc, sceneState.fCoef_logDepth[0]);
 	gl.uniform1i(currentShader.bUseMultiRenderTarget_loc, magoManager.postFxShadersManager.bUseMultiRenderTarget);
@@ -2449,6 +2481,7 @@ Renderer.prototype.renderLightBuffer = function(lightSourcesArray)
 	gl.depthMask(false);
 	gl.disable(gl.DEPTH_TEST);
 
+	
 	var light;
 	var renderType = 1;
 	var glPrimitive = undefined;
@@ -2488,6 +2521,7 @@ Renderer.prototype.renderLightBuffer = function(lightSourcesArray)
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);	
 		light.render(magoManager, currentShader, renderType, glPrimitive, bIsSelected);
 	}
+	
 
 	magoManager.postFxShadersManager.useProgram(null);
 
