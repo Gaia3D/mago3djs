@@ -12087,9 +12087,6 @@ float atanHP(in float x) // atan High Precision.\n\
 \n\
 float atan2(in float y, in float x) \n\
 {\n\
-	//return atan(y, x);\n\
-	//return atanHP(y/x);\n\
-\n\
 	if (x > 0.0)\n\
 	{\n\
 		return atanHP(y/x);\n\

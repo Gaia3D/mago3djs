@@ -834,30 +834,6 @@ Water.prototype._makeSurface = function ()
 	}
 	
 	this.cartesiansArray = Globe.geographicRadianArrayToFloat32ArrayWgs84(lonArray, latArray, altArray, this.cartesiansArray);
-
-	// do a test debug::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-	var testAlt = 0.0;
-	var testResult = [];
-	testResult = Globe.geographicRadianArrayToFloat32ArrayWgs84([minLon], [minLat], [testAlt], testResult);
-
-	// now convert cartesian to geoCoords.
-	var testLon = minLon * 180 / Math.PI;
-	var testLat = minLat * 180 / Math.PI;
-	var testGeoCoord = Globe.CartesianToGeographicWgs84(testResult[0], testResult[1], testResult[2], undefined, false);
-
-	var Zdiv_sqrtDDpZZ_plusD = new Float32Array([0.3210387166838446]);  // over 1e-16 ok (no finished).
-	var atanFinal = 0.31064489236831216;
-	var atanFinal_calculed = Math.atan(Zdiv_sqrtDDpZZ_plusD[0]);
-
-	/*
-	testLat: 35.59728252
-	testLon: 127.196678737
-	testResult: Array(3)
-	x: -3138921.028762174
-	y: 4135873.541104075
-	z: 3691949.857424516
-	*/
-	// End test debug.================================================================================================================================
 	
 	// Make normals using the cartesians.***
 	this.normalsArray = new Int8Array(vertexCount*3);

@@ -2063,7 +2063,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		}
 
 		// Debug component.******************************************
-		
+		/*
 		var lightAux;
 		if(lightsArray)
 		{
@@ -2075,7 +2075,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		};
 		
 		this.renderer.renderScreenRectangle(gl, options); // debug component.
-		
+		*/
 		//-----------------------------------------------------------
 
 	} 

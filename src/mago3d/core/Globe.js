@@ -577,17 +577,6 @@ Globe.CartesianToGeographicWgs84 = function (x, y, z, result, bStoreAbsolutePosi
 		D = k * sqrtXXpYY / (k + e2);
 		sqrtDDpZZ = Math.sqrt(D * D + Z * Z);
 
-		// test debug::::::::::::::::
-		//var DD = D*D;
-		//var D_float = new Float32Array([D]);
-		//var DD_float = new Float32Array([D_float[0] * D_float[0]]);
-		//var a5000 = Math.sqrt(5000);
-		//var a5000_2 = 10 * Math.sqrt(5000/100);
-		var sqrtDDpZZ_plusD = sqrtDDpZZ + D;
-		var Zdiv_sqrtDDpZZ_plusD = Z / sqrtDDpZZ_plusD;
-		var atanFinal = Math.atan(Zdiv_sqrtDDpZZ_plusD);
-		// end test.-----------------
-
 		h = (k + e2 - 1) * sqrtDDpZZ / k;
 		//phi = 2 * Math.atan2(Z, sqrtDDpZZ + D);
 		phi = 2 * Globe.atan2Test(Z, sqrtDDpZZ + D);
