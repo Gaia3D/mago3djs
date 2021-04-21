@@ -14,11 +14,8 @@
 #extension GL_EXT_draw_buffers : require
 #endif
 
-uniform vec2 u_PlanePos; // Our location in the virtual world displayed by the plane
-
-//in vec3 fs_Pos;
-//in vec4 fs_Nor;
-//in vec4 fs_Col;
+uniform sampler2D diffuseTex;
+uniform sampler2D depthTex; 
 
 uniform sampler2D hightmap;
 uniform sampler2D terrainmap;
@@ -27,10 +24,12 @@ uniform sampler2D sceneDepth;
 uniform sampler2D colorReflection;
 uniform sampler2D sedimap;
 
-//in float fs_Sine;
-//in vec2 fs_Uv;
-
-uniform vec3 u_Eye, u_Ref, u_Up;
+uniform float near;
+uniform float far;
+uniform mat4 projectionMatrixInv;
+uniform bool bUseLogarithmicDepth;
+varying float flogz;
+varying float Fcoef_half;
 
 
 uniform int u_TerrainType;
@@ -71,6 +70,69 @@ float linearDepth(float depthSample)
     return zLinear;
 }
 */
+
+float unpackDepth(const in vec4 rgba_depth)
+{
+	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));
+}
+
+float getDepth(vec2 coord)
+{
+	if(bUseLogarithmicDepth)
+	{
+		float linearDepth = unpackDepth(texture2D(depthTex, coord.xy));
+		// gl_FragDepthEXT = linearDepth = log2(flogz) * Fcoef_half;
+		// flogz = 1.0 + gl_Position.z;
+
+		float flogzAux = pow(2.0, linearDepth/Fcoef_half);
+		float z = flogzAux - 1.0;
+		linearDepth = z/(far);
+		return linearDepth;
+	}
+	else{
+		return unpackDepth(texture2D(depthTex, coord.xy));
+	}
+}
+
+/*
+vec3 reconstructPosition(vec2 texCoord, float depth)
+{
+    // https://wickedengine.net/2019/09/22/improved-normal-reconstruction-from-depth/
+    float x = texCoord.x * 2.0 - 1.0;
+    //float y = (1.0 - texCoord.y) * 2.0 - 1.0;
+    float y = (texCoord.y) * 2.0 - 1.0;
+    float z = (1.0 - depth) * 2.0 - 1.0;
+    vec4 pos_NDC = vec4(x, y, z, 1.0);
+    vec4 pos_CC = projectionMatrixInv * pos_NDC;
+    return pos_CC.xyz / pos_CC.w;
+}
+
+vec3 normal_from_depth(float depth, vec2 texCoord) {
+    // http://theorangeduck.com/page/pure-depth-ssao
+    float pixelSizeX = 1.0/u_screenSize.x;
+    float pixelSizeY = 1.0/u_screenSize.y;
+
+    vec2 offset1 = vec2(0.0,pixelSizeY);
+    vec2 offset2 = vec2(pixelSizeX,0.0);
+
+	float depthA = 0.0;
+	float depthB = 0.0;
+	for(float i=0.0; i<1.0; i++)
+	{
+		depthA += getDepth(texCoord + offset1*(1.0+i));
+		depthB += getDepth(texCoord + offset2*(1.0+i));
+	}
+
+	vec3 posA = reconstructPosition(texCoord + offset1*1.0, depthA/1.0);
+	vec3 posB = reconstructPosition(texCoord + offset2*1.0, depthB/1.0);
+
+    vec3 pos0 = reconstructPosition(texCoord, depth);
+    vec3 normal = cross(posA - pos0, posB - pos0);
+    normal.z = -normal.z;
+
+    return normalize(normal);
+}
+*/
 void main()
 {
     vec3 camDir = normalize(vec3(-gl_FragCoord.x / u_screenSize.x, -gl_FragCoord.y / u_screenSize.y, 1.0));
@@ -83,12 +145,15 @@ void main()
     //{
     //    finalCol4 = vec4(1.0, 0.0, 0.0, 1.0);
     //}
-    gl_FragData[0] = finalCol4;  // anything.
+
+    // read difusseTex.
+    vec4 difusseColor = texture2D(diffuseTex, vec2(vTexCoord.x, 1.0 - vTexCoord.y));
+    gl_FragData[0] = difusseColor;  // anything.
 
     #ifdef USE_MULTI_RENDER_TARGET
         gl_FragData[1] = vec4(1.0); // depth
         gl_FragData[2] = vec4(1.0); // normal
-        gl_FragData[3] = finalCol4; // albedo
+        gl_FragData[3] = difusseColor; // albedo
         gl_FragData[4] = vec4(1.0); // selection color
     #endif
     /*

@@ -1890,6 +1890,26 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 
 	if(this.waterManager)
 	{
+		/*
+		var lightsArray = this.visibleObjControlerNodes.currentVisibleNativeObjects.lightSourcesArray;
+		var lightCount = lightsArray.length;
+		if(lightCount > 0 && sceneState.applyLightsShadows && !this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
+		{
+			// for each visible lightSources, make cubeMap depthTextures if no exist.
+			var visiblesArray = this.visibleObjControlerNodes.getAllVisibles();
+			var nativeVisiblesArray = this.visibleObjControlerNodes.getAllNatives();
+			
+			for(var i=0; i<lightCount; i++)
+			{
+				var light = lightsArray[i];
+				light.doIntersectedObjectsCulling(visiblesArray, nativeVisiblesArray);
+			}
+		}
+		*/
+		// 1rst, do objects intersection culling.
+		var visiblesArray = this.visibleObjControlerNodes.getAllVisibles();
+		var nativeVisiblesArray = this.visibleObjControlerNodes.getAllNatives();
+		this.waterManager.doIntersectedObjectsCulling(visiblesArray, nativeVisiblesArray);
 		this.waterManager.render();
 	}
 

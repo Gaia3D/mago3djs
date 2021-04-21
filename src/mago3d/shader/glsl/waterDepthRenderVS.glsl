@@ -37,6 +37,7 @@ uniform vec2 u_waterHeightMap_MinMax;
 
 varying vec4 vColorAuxTest;
 varying float vWaterHeight;
+varying float depth;
 
 void main()
 {
@@ -50,7 +51,7 @@ void main()
 	float terrainH = terrainHeight4.r;
 
 	//float height = u_heightMap_MinMax.x + decodedHeight * u_heightMap_MinMax.y;
-	float waterHeight = decodedHeight * 10.0;
+	float waterHeight = decodedHeight * 40.0;
 	float terrainHeight = u_heightMap_MinMax.x + terrainH * u_heightMap_MinMax.y;
 	float height = terrainHeight + waterHeight;
 
@@ -58,7 +59,8 @@ void main()
 
 	//vColorAuxTest = heightVec4;
 	//vColorAuxTest = vec4(heightVec4.rgb, 0.5);
-	vColorAuxTest = vec4(0.1, 0.5, 1.0, min(r*1.1, 1.0));
+	//vColorAuxTest = vec4(0.1, 0.5, 1.0, min(r*1.1, 1.0));
+	vColorAuxTest = vec4(0.1, 0.5, 1.0, 1.0);
 
 	vec3 objPosHigh = buildingPosHIGH;
     vec3 objPosLow = buildingPosLOW.xyz + position.xyz;
@@ -73,5 +75,11 @@ void main()
 	vec4 finalPos4 =  vec4(pos4.x + upDir.x * height, pos4.y + upDir.y * height, pos4.z + upDir.z * height, 1.0);
 
 	gl_Position = ModelViewProjectionMatrixRelToEye * finalPos4;
+
+	vec4 orthoPos = modelViewMatrixRelToEye * finalPos4;
+	//vertexPos = orthoPos.xyz;
+	depth = (-orthoPos.z)/(far); // the correct value.
+
+	
 
 }

@@ -243,6 +243,78 @@ Modeler.prototype.__TEST__extrusionBuildings = function()
 	var hola = 0;
 };
 
+Modeler.prototype.__TEST__extrusionBuildings_son = function ()
+{
+	if(!this.testLinesExtrude)
+	{
+		this.testLinesExtrude = true;
+	}
+	else{
+		return;
+	}
+	var increLon = 5.0;
+	var increLat = 25.0;
+
+	increLon = 0.0;
+	increLat = 0.0;
+
+	var widthIncreLon = 0.0005;
+	var minLon = 127.20762;
+	var minLat = 35.60993;
+
+	//var lines = [[[ 127.20762, 35.61518 ], [ 127.20762, 35.60993 ], [ 127.20762 + widthIncreLon, 35.60993 ], [ 127.20762 + widthIncreLon, 35.61518 ]]]; // original.
+	var lines = [[[ 127.20762 + increLon, 35.61518 + increLat], [ 127.20762 + increLon, 35.60993  + increLat], [ 127.20762 + widthIncreLon + increLon, 35.60993  + increLat], [ 127.20762 + widthIncreLon + increLon, 35.61518  + increLat]]];
+
+	// Now, create geoCoords.***
+	var altAux = 100.0;
+	var height = 280.0;
+	var colorTop = new Color(1.0, 0.0, 0.0, 0.8);
+	var colorBottom = new Color(0.0, 1.0, 0.0, 0.8);
+	var alpha = 1.0;
+	var options = {
+		doubleFace : true,
+		//colorBottom : colorBottom,
+		//colorTop : colorTop,
+		polyLineLoop : false,
+		numSegments : 4,
+		colorsArray : [new Color(1.0, 0.0, 0.0, alpha), new Color(1.0, 1.0, 0.0, alpha), new Color(0.0, 1.0, 0.0, alpha), new Color(0.0, 1.0, 1.0, alpha), new Color(0.0, 0.0, 1.0, alpha)]
+	};
+	var polylinesCount = lines.length;
+	for(var i=0; i<polylinesCount; i++)
+	{
+		var polyLine = lines[i];
+		var geoCoordsList = new GeographicCoordsList();
+		var pointsCount = polyLine.length;
+		for(var j=0; j<pointsCount; j++)
+		{
+			var point = polyLine[j];
+			var geoCoord = geoCoordsList.newGeoCoord(point[0], point[1], altAux);
+		}
+
+		// now, create the polyLine extruded.***
+		var options = {};
+		//var extrudedLine = geoCoordsList.getExtrudedWallRenderableObject(height, undefined, this.magoManager, undefined, options, undefined) ;
+		var eb = new ExtrusionBuilding(geoCoordsList, height, options);
+		eb.setOneColor(1.0, 0.5, 0.3, 1.0);
+		eb.attributes.isSelectable = true;
+		eb.attributes.isMovable = true;
+		eb.attributes.selectedColor4 = new Color(1.0, 0.0, 0.0, 1.0);
+		eb.attributes.heightReference = "none";
+		eb.attributes.doubleFace = true;
+		//eb.attributes.opaque = true;
+
+		if (eb.options === undefined)
+		{ eb.options = {}; }
+		
+		//eb.options.renderWireframe = true;
+		eb.options.renderShaded = true; // bcos must be selectable.
+		eb.options.renderWireframe = false;
+
+		this.addObject(eb);
+	}
+	var hola = 0;
+};
+
 Modeler.prototype.__TEST__extrudedLines = function()
 {
 	if(!this.testLinesExtrude)

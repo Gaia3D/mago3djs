@@ -44,6 +44,20 @@ uniform float u_near;
 
 varying vec4 vColorAuxTest;
 varying float vWaterHeight;
+varying float depth;
+
+vec4 packDepth( float v ) {
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;
+  enc = fract(enc);
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);
+  return enc;
+}
+
+float unpackDepth(const in vec4 rgba_depth)
+{
+	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));
+}
+
 /*
 vec3 calnor(vec2 uv){
     float eps = 1.0/u_SimRes;
@@ -77,12 +91,22 @@ void main()
         discard;
     }
 
+    float depthAux = depth;
+
+    #ifdef USE_LOGARITHMIC_DEPTH
+	//if(bUseLogarithmicDepth)
+	{
+		gl_FragDepthEXT = log2(flogz) * Fcoef_half;
+		depthAux = gl_FragDepthEXT; 
+	}
+	#endif
+
     vec4 finalCol4 = vec4(vColorAuxTest);
-    //if(vColorAuxTest.r == vColorAuxTest.g && vColorAuxTest.r == vColorAuxTest.b )
-    //{
-    //    finalCol4 = vec4(1.0, 0.0, 0.0, 1.0);
-    //}
-    gl_FragData[0] = finalCol4;  // anything.
+    
+    // save depth, normal, albedo.
+	gl_FragData[0] = packDepth(depthAux); 
+
+    //gl_FragData[0] = finalCol4;  // anything.
 
     #ifdef USE_MULTI_RENDER_TARGET
         gl_FragData[1] = vec4(1.0); // depth

@@ -41,7 +41,7 @@ WaterManager.prototype.init = function ()
 	*/
 
 	// create frame buffer object.
-	if(!this.fbo)
+	if(!this.fbo) // simulation fbo (512 x 512).
 	{
 		var gl = this.magoManager.getGl();
 		var bufferWidth = 512;
@@ -49,6 +49,18 @@ WaterManager.prototype.init = function ()
 		var bUseMultiRenderTarget = this.magoManager.postFxShadersManager.bUseMultiRenderTarget;
 
 		this.fbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 3}); 
+	}
+
+	if(!this.depthFbo) // screen size fbo.
+	{
+		var magoManager = this.magoManager;
+		var sceneState = magoManager.sceneState;
+		var gl = magoManager.getGl();
+		var bufferWidth = sceneState.drawingBufferWidth[0];
+		var bufferHeight = sceneState.drawingBufferHeight[0];
+		var bUseMultiRenderTarget = magoManager.postFxShadersManager.bUseMultiRenderTarget;
+
+		this.depthFbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 3}); 
 	}
 };
 
@@ -106,11 +118,18 @@ WaterManager.prototype.createDefaultShaders = function ()
 	shader.u_SimRes_loc = gl.getUniformLocation(shader.program, "u_SimRes");
 	shader.hightmap_loc = gl.getUniformLocation(shader.program, "hightmap");
 	shader.terrainmap_loc = gl.getUniformLocation(shader.program, "terrainmap");
+	shader.waterTex_loc = gl.getUniformLocation(shader.program, "waterTex");
 	shader.u_heightMap_MinMax_loc = gl.getUniformLocation(shader.program, "u_heightMap_MinMax");
+	shader.u_screenSize_loc = gl.getUniformLocation(shader.program, "u_screenSize");
+	shader.projectionMatrixInv_loc = gl.getUniformLocation(shader.program, "projectionMatrixInv");//
+	shader.uWaterType_loc = gl.getUniformLocation(shader.program, "uWaterType");//
 
 	magoManager.postFxShadersManager.useProgram(shader);
-	gl.uniform1i(shader.hightmap_loc, 0);
-	gl.uniform1i(shader.terrainmap_loc, 1);
+	//gl.uniform1i(shader.depthTex_loc, 0);
+	gl.uniform1i(shader.hightmap_loc, 1);
+	gl.uniform1i(shader.terrainmap_loc, 2);
+	gl.uniform1i(shader.waterTex_loc, 3);
+	
 
 	// 1) waterRender Shader.********************************************************************************************
 	var shaderName = "waterDepthRender";
@@ -140,10 +159,12 @@ WaterManager.prototype.createDefaultShaders = function ()
 	shader.hightmap_loc = gl.getUniformLocation(shader.program, "hightmap");
 	shader.terrainmap_loc = gl.getUniformLocation(shader.program, "terrainmap");
 	shader.u_heightMap_MinMax_loc = gl.getUniformLocation(shader.program, "u_heightMap_MinMax");
+	shader.difusseTex_loc = gl.getUniformLocation(shader.program, "diffuseTex");
 
 	magoManager.postFxShadersManager.useProgram(shader);
 	gl.uniform1i(shader.hightmap_loc, 0);
 	gl.uniform1i(shader.terrainmap_loc, 1);
+	gl.uniform1i(shader.difusseTex_loc, 2);
 
 	// 2) calculate waterHeight by water source and rain.*******************************************************************
 	shaderName = "waterCalculateHeight";
@@ -181,6 +202,7 @@ WaterManager.prototype.createDefaultShaders = function ()
 	gl.uniform1i(shader.waterHeightTex_loc, 0);
 	gl.uniform1i(shader.terrainHeightTex_loc, 1);
 	gl.uniform1i(shader.currWaterFluxTex_loc, 2);
+	
 
 	// 4) calculateVelocity Shader.*********************************************************************************************
 	shaderName = "waterCalculateVelocity";
@@ -202,6 +224,30 @@ WaterManager.prototype.createDefaultShaders = function ()
 	gl.uniform1i(shader.waterHeightTex_loc, 0);
 	gl.uniform1i(shader.terrainHeightTex_loc, 1);
 	gl.uniform1i(shader.currWaterFluxTex_loc, 2);
+
+	// 5) calculateVelocity Shader.*********************************************************************************************
+	shaderName = "waterOrthogonalDepthRender";
+	vs_source = ShaderSource.WaterOrthogonalDepthShaderVS;
+	fs_source = ShaderSource.WaterOrthogonalDepthShaderFS;
+	fs_source = fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
+	fs_source = fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
+	shader = magoManager.postFxShadersManager.createShaderProgram(gl, vs_source, fs_source, shaderName, this.magoManager);
+	shader.u_modelViewProjectionMatrix_loc = gl.getUniformLocation(shader.program, "modelViewProjectionMatrix");
+	shader.u_screenSize_loc = gl.getUniformLocation(shader.program, "u_screenSize");
+	shader.currDEMTex_loc = gl.getUniformLocation(shader.program, "currDEMTex");
+	magoManager.postFxShadersManager.useProgram(shader);
+	gl.uniform1i(shader.currDEMTex_loc, 0);
+
+	// 6) simple texture copy Shader.*********************************************************************************************
+	shaderName = "waterCopyTexture";
+	vs_source = ShaderSource.waterQuadVertVS;
+	fs_source = ShaderSource.waterCopyFS;
+	fs_source = fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
+	fs_source = fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
+	shader = magoManager.postFxShadersManager.createShaderProgram(gl, vs_source, fs_source, shaderName, this.magoManager);
+	shader.texToCopy_loc = gl.getUniformLocation(shader.program, "texToCopy");
+	magoManager.postFxShadersManager.useProgram(shader);
+	gl.uniform1i(shader.texToCopy_loc, 0);
 };
 
 WaterManager.prototype.getQuadBuffer = function ()
@@ -220,29 +266,126 @@ WaterManager.prototype.getQuadBuffer = function ()
 	return this.screenQuad;
 };
 
+WaterManager.prototype._newTexture = function (gl, texWidth, texHeight)
+{
+	var imageData = new Uint8Array(texWidth * texHeight * 4);
+	var tex = gl.createTexture();
+	gl.bindTexture(gl.TEXTURE_2D, tex);  // depthTex.
+	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); //LINEAR_MIPMAP_LINEAR
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, texWidth, texHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+
+	gl.bindTexture(gl.TEXTURE_2D, null);
+
+	var magoTexture = new Texture();
+	magoTexture.texId = tex;
+	magoTexture.fileLoadState = CODE.fileLoadState.BINDING_FINISHED;
+
+	return magoTexture;
+};
+
+WaterManager.prototype.doIntersectedObjectsCulling = function (visiblesArray, nativeVisiblesArray)
+{
+	var isFarestFrustum = this.magoManager.isFarestFrustum();
+	//if(!this.bObjectsCulling)
+	//{
+		var waterLayersCount = this.waterLayersArray.length;
+		var waterLayer;
+
+		if(isFarestFrustum)
+		{
+			for(var i=0; i<waterLayersCount; i++)
+			{
+				waterLayer = this.waterLayersArray[i];
+				if(waterLayer.visibleObjectsControler)
+				{ waterLayer.visibleObjectsControler.clear(); }
+			}
+		}
+
+		for(var i=0; i<waterLayersCount; i++)
+		{
+			waterLayer = this.waterLayersArray[i];
+			waterLayer.doIntersectedObjectsCulling(visiblesArray, nativeVisiblesArray);
+		}
+
+		this.bObjectsCulling = true;
+	//}
+};
+
+WaterManager.prototype.overWriteDEMWithObjects = function ()
+{
+	var waterLayersCount = this.waterLayersArray.length;
+	var waterLayer;
+	var shader;
+	var magoManager = this.magoManager;
+
+	for(var i=0; i<waterLayersCount; i++)
+	{
+		waterLayer = this.waterLayersArray[i];
+		waterLayer.overWriteDEMWithObjects(shader, magoManager);
+	}
+};
+
 WaterManager.prototype.render = function ()
 {
 	var magoManager = this.magoManager;
 	var sceneState = magoManager.sceneState;
 	var gl = magoManager.getGl();
 
-	this.doSimulation();
+	this.overWriteDEMWithObjects();
+
+	if(this.magoManager.isFarestFrustum())
+	{ 
+		this.doSimulation(); 
+	}
 
 	var waterLayersCount = this.waterLayersArray.length;
 	var waterLayer;
 
 	// Now, render the water depth.************************************************************************
 	// Note: the water depth must be rendered in the depth framebuffer:
-	var fbo = this.fbo;
+	if(!this.depthTex || !this.depthTex.texId)
+	{
+		var texWidth = sceneState.drawingBufferWidth[0];
+		var texHeight = sceneState.drawingBufferHeight[0];
+		this.depthTex = this._newTexture(gl, texWidth, texHeight);
+	}
+	
+	var fbo = this.depthFbo;
+	var extbuffers = fbo.extbuffers;
+	fbo.bind();
+	gl.viewport(0, 0, fbo.width[0], fbo.height[0]);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.depthTex.texId, 0); // depthTex.
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // normalTex.
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // albedoTex.
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0); // .
+	extbuffers.drawBuffersWEBGL([
+		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
+		extbuffers.NONE, // gl_FragData[1]
+		extbuffers.NONE, // gl_FragData[2]
+		extbuffers.NONE, // gl_FragData[3]
+		]);
+
 	var shader = magoManager.postFxShadersManager.getShader("waterDepthRender");
 	magoManager.postFxShadersManager.useProgram(shader);
 	shader.bindUniformGenerals();
+
+	gl.disable(gl.BLEND);
+	gl.clearColor(0.0, 0.0, 0.0, 0.0);
+	gl.clearDepth(1.0);
+	if(this.magoManager.isFarestFrustum())
+	{ gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); }
+
+	
 	for(var i=0; i<waterLayersCount; i++)
 	{
 		waterLayer = this.waterLayersArray[i];
-		//waterLayer.renderWaterDepth(shader, magoManager);
+		waterLayer.renderWaterDepth(shader, magoManager);
 	}
-
+	
 	// Once finished simulation, bind the current framebuffer.
 	magoManager.bindMainFramebuffer();
 	gl.viewport(0, 0, sceneState.drawingBufferWidth[0], sceneState.drawingBufferHeight[0]);
@@ -297,12 +440,18 @@ WaterManager.prototype.doSimulation = function ()
  */
 WaterManager.prototype._test_water = function()
 {
-    // 127.1966787369999992,35.5972825200000003 : 127.2283140579999952,35.6277023940000035
-    var minLon = 127.1966787369999992;
-    var minLat = 35.5972825200000003;
+    // 127.1966787369999992,35.5972825200000003 : 127.2283140579999952,35.6277023940000035 // original from BBC.
+	var increLon = 5.0;
+	var increLat = 25.0;
+
+	increLon = 0.0;
+	increLat = 0.0;
+
+    var minLon = 127.1966787369999992 + increLon;
+    var minLat = 35.5972825200000003 + increLat;
     var minAlt = 0;
-    var maxLon = 127.2283140579999952;
-    var maxLat = 35.6277023940000035;
+    var maxLon = 127.2283140579999952 + increLon;
+    var maxLat = 35.6277023940000035 + increLat;
     var maxAlt = 0;
     var geographicExtent = new GeographicExtent(minLon, minLat, minAlt, maxLon, maxLat, maxAlt);
     var options = {

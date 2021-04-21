@@ -2130,12 +2130,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 			var waterLayer = magoManager.waterManager.waterLayersArray[0];
 			if(waterLayer.waterHeightTexA && waterLayer.waterHeightTexA.texId)
 			{
-				texture = waterLayer.waterHeightTexA.texId;
-			}
-
-			if(waterLayer.waterHeightTexB && waterLayer.waterHeightTexB.texId)
-			{
-				//texture = waterLayer.waterHeightTexB.texId;
+				//texture = waterLayer.waterHeightTexA.texId;
 			}
 
 			if(waterLayer.waterSourceTex && waterLayer.waterSourceTex.texId)
@@ -2153,10 +2148,17 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 				//texture = waterLayer.waterVelocityTexA.texId;
 			}
 
-			if(magoManager.waterManager.dem_texture && magoManager.waterManager.dem_texture.texId)
+			if(waterLayer.demWithBuildingsTex && waterLayer.demWithBuildingsTex.texId)
 			{
-				//texture = magoManager.waterManager.dem_texture.texId;
+				texture = waterLayer.demWithBuildingsTex.texId;
 			}
+
+			if(waterLayer.dem_texture && waterLayer.dem_texture.texId)
+			{
+				//texture = waterLayer.dem_texture.texId;
+			}
+
+
 		}
 	}
 	

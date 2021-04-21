@@ -33,7 +33,8 @@ uniform float u_SimRes;
 
 uniform vec2 u_heightMap_MinMax;
 
-
+varying float flogz;
+varying float Fcoef_half;
 
 varying vec4 vColorAuxTest;
 varying vec2 vTexCoord;
@@ -69,4 +70,16 @@ void main()
 	vec4 finalPos4 =  vec4(pos4.x + upDir.x * height, pos4.y + upDir.y * height, pos4.z + upDir.z * height, 1.0);
 
 	gl_Position = ModelViewProjectionMatrixRelToEye * finalPos4;
+
+	if(bUseLogarithmicDepth)
+	{
+		// logarithmic zBuffer:
+		// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html
+		// float Fcoef = 2.0 / log2(far + 1.0);
+		// gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;
+		// flogz = 1.0 + gl_Position.w;
+		//---------------------------------------------------------------------------------
+		flogz = 1.0 + gl_Position.w;
+		Fcoef_half = 0.5 * uFCoef_logDepth;
+	}
 }

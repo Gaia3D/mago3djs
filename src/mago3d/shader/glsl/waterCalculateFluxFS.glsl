@@ -56,11 +56,11 @@ void main()
     //curT = u_heightMap_MinMax.x + curT * u_heightMap_MinMax.y;
 
     // read water heights.
-    float waterScale = 2.0;
-    vec4 topW = texture2D(waterHeightTex, curuv+vec2(0.0,div)) * waterScale;
-    vec4 rightW = texture2D(waterHeightTex, curuv+vec2(div,0.0)) * waterScale;
-    vec4 bottomW = texture2D(waterHeightTex, curuv+vec2(0.0,-div)) * waterScale;
-    vec4 leftW = texture2D(waterHeightTex, curuv+vec2(-div,0.0)) * waterScale;
+    float waterScale = 5.0;
+    vec4 topW = texture2D(waterHeightTex, curuv + vec2(0.0, div)) * waterScale;
+    vec4 rightW = texture2D(waterHeightTex, curuv + vec2(div, 0.0)) * waterScale;
+    vec4 bottomW = texture2D(waterHeightTex, curuv + vec2(0.0, -div)) * waterScale;
+    vec4 leftW = texture2D(waterHeightTex, curuv + vec2(-div, 0.0)) * waterScale;
     vec4 curW = texture2D(waterHeightTex, curuv) * waterScale;
 
     // read flux.
@@ -80,14 +80,9 @@ void main()
     float fbottomout = max(0.0, curFlux.z + (u_timestep * g * u_PipeArea * HBottomOut) / pipelen);
     float fleftout = max(0.0, curFlux.w + (u_timestep * g * u_PipeArea * HLeftOut) / pipelen);
 
-    //float testA = (u_timestep * g * u_PipeArea * HTopOut) / pipelen;
-    //float testB = (u_timestep * g * u_PipeArea * HRightOut) / pipelen;
-    //float testC = (u_timestep * g * u_PipeArea * HBottomOut) / pipelen;
-    //float testD = (u_timestep * g * u_PipeArea * HLeftOut) / pipelen;
 
     float damping = 0.9999;
     //damping = 1.0;
-    //float k = min(1.0,((curTerrain.y )*u_PipeLen*u_PipeLen)/(u_timestep*(ftopout+frightout+fbottomout+fleftout))) * damping;
     float k = min(1.0,((curW.r ) * u_PipeLen * u_PipeLen) / (u_timestep * (ftopout + frightout + fbottomout + fleftout))) * damping;
     //k = 1.0;
     //rescale outflow readFlux so that outflow don't exceed current water volume
@@ -97,13 +92,13 @@ void main()
     fleftout *= k;
 
     //boundary conditions
-    if(curuv.x<=div) fleftout = 0.0;
-    if(curuv.x>=1.0 - 2.0 * div) frightout = 0.0;
-    if(curuv.y<=div) ftopout = 0.0;
-    if(curuv.y>=1.0 - 2.0 * div) fbottomout = 0.0;
+    if(curuv.x <= div) fleftout = 0.0;
+    if(curuv.x >= 1.0 - 2.0 * div) frightout = 0.0;
+    if(curuv.y <= div) ftopout = 0.0;
+    if(curuv.y >= 1.0 - 2.0 * div) fbottomout = 0.0;
 
 
-    if(curuv.x<=div || (curuv.x>=1.0 - 2.0 * div) || (curuv.y<=div) || (curuv.y>=1.0 - 2.0 * div) ){
+    if(curuv.x <= div || (curuv.x >= 1.0 - 2.0 * div) || (curuv.y <= div) || (curuv.y >= 1.0 - 2.0 * div) ){
         ftopout = 0.0;
         frightout = 0.0;
         fbottomout = 0.0;
@@ -112,7 +107,7 @@ void main()
     
 
 
-    vec4 writeFlux = vec4(ftopout,frightout,fbottomout,fleftout);
+    vec4 writeFlux = vec4(ftopout, frightout, fbottomout, fleftout);
 
     gl_FragData[0] = writeFlux;  // water flux.
     //gl_FragData[0] = vec4(HTopOut, HRightOut, HBottomOut, HLeftOut); // test debug:

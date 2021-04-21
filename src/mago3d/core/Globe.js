@@ -577,6 +577,17 @@ Globe.CartesianToGeographicWgs84 = function (x, y, z, result, bStoreAbsolutePosi
 		D = k * sqrtXXpYY / (k + e2);
 		sqrtDDpZZ = Math.sqrt(D * D + Z * Z);
 
+		// test debug::::::::::::::::
+		//var DD = D*D;
+		//var D_float = new Float32Array([D]);
+		//var DD_float = new Float32Array([D_float[0] * D_float[0]]);
+		//var a5000 = Math.sqrt(5000);
+		//var a5000_2 = 10 * Math.sqrt(5000/100);
+		var sqrtDDpZZ_plusD = sqrtDDpZZ + D;
+		var Zdiv_sqrtDDpZZ_plusD = Z / sqrtDDpZZ_plusD;
+		var atanFinal = Math.atan(Zdiv_sqrtDDpZZ_plusD);
+		// end test.-----------------
+
 		h = (k + e2 - 1) * sqrtDDpZZ / k;
 		//phi = 2 * Math.atan2(Z, sqrtDDpZZ + D);
 		phi = 2 * Globe.atan2Test(Z, sqrtDDpZZ + D);
@@ -732,7 +743,7 @@ Globe.geographicToCartesianWgs84 = function(longitude, latitude, altitude, resul
  * @returns {Float32Array} resultCartesian
  */
 
-Globe.geographicRadianArrayToFloat32ArrayWgs84 = function(lonArray, latArray, altArray, resultCartesianArray)
+Globe.geographicRadianArrayToFloat32ArrayWgs84 = function (lonArray, latArray, altArray, resultCartesianArray)
 {
 	// defined in the LINZ standard LINZS25000 (Standard for New Zealand Geodetic Datum 2000)
 	// https://www.linz.govt.nz/data/geodetic-system/coordinate-conversion/geodetic-datum-conversions/equations-used-datum
@@ -773,6 +784,10 @@ Globe.geographicRadianArrayToFloat32ArrayWgs84 = function(lonArray, latArray, al
 		v = a/Math.sqrt(1.0 - e2 * sinLat * sinLat);
 		h = altArray[i];
 		
+		//var xAux = (v+h)*cosLat*cosLon;
+		//var yAux = (v+h)*cosLat*sinLon;
+		//var zAux = (v*e2a+h)*sinLat;
+
 		resultCartesianArray[i*3] = (v+h)*cosLat*cosLon;
 		resultCartesianArray[i*3+1] = (v+h)*cosLat*sinLon;
 		resultCartesianArray[i*3+2] = (v*e2a+h)*sinLat;

@@ -228,7 +228,7 @@ PostFxShader.prototype.useProgram = function()
  * @param shaderName 변수
  * @returns shader
  */
-PostFxShader.prototype.bindUniformGenerals = function()
+PostFxShader.prototype.bindUniformGenerals = function ()
 {
 	if (this.uniformsArrayGeneral === undefined)
 	{ return; }

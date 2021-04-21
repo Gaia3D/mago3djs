@@ -11250,11 +11250,11 @@ void main()\n\
     //curT = u_heightMap_MinMax.x + curT * u_heightMap_MinMax.y;\n\
 \n\
     // read water heights.\n\
-    float waterScale = 2.0;\n\
-    vec4 topW = texture2D(waterHeightTex, curuv+vec2(0.0,div)) * waterScale;\n\
-    vec4 rightW = texture2D(waterHeightTex, curuv+vec2(div,0.0)) * waterScale;\n\
-    vec4 bottomW = texture2D(waterHeightTex, curuv+vec2(0.0,-div)) * waterScale;\n\
-    vec4 leftW = texture2D(waterHeightTex, curuv+vec2(-div,0.0)) * waterScale;\n\
+    float waterScale = 5.0;\n\
+    vec4 topW = texture2D(waterHeightTex, curuv + vec2(0.0, div)) * waterScale;\n\
+    vec4 rightW = texture2D(waterHeightTex, curuv + vec2(div, 0.0)) * waterScale;\n\
+    vec4 bottomW = texture2D(waterHeightTex, curuv + vec2(0.0, -div)) * waterScale;\n\
+    vec4 leftW = texture2D(waterHeightTex, curuv + vec2(-div, 0.0)) * waterScale;\n\
     vec4 curW = texture2D(waterHeightTex, curuv) * waterScale;\n\
 \n\
     // read flux.\n\
@@ -11274,14 +11274,9 @@ void main()\n\
     float fbottomout = max(0.0, curFlux.z + (u_timestep * g * u_PipeArea * HBottomOut) / pipelen);\n\
     float fleftout = max(0.0, curFlux.w + (u_timestep * g * u_PipeArea * HLeftOut) / pipelen);\n\
 \n\
-    //float testA = (u_timestep * g * u_PipeArea * HTopOut) / pipelen;\n\
-    //float testB = (u_timestep * g * u_PipeArea * HRightOut) / pipelen;\n\
-    //float testC = (u_timestep * g * u_PipeArea * HBottomOut) / pipelen;\n\
-    //float testD = (u_timestep * g * u_PipeArea * HLeftOut) / pipelen;\n\
 \n\
     float damping = 0.9999;\n\
     //damping = 1.0;\n\
-    //float k = min(1.0,((curTerrain.y )*u_PipeLen*u_PipeLen)/(u_timestep*(ftopout+frightout+fbottomout+fleftout))) * damping;\n\
     float k = min(1.0,((curW.r ) * u_PipeLen * u_PipeLen) / (u_timestep * (ftopout + frightout + fbottomout + fleftout))) * damping;\n\
     //k = 1.0;\n\
     //rescale outflow readFlux so that outflow don't exceed current water volume\n\
@@ -11291,13 +11286,13 @@ void main()\n\
     fleftout *= k;\n\
 \n\
     //boundary conditions\n\
-    if(curuv.x<=div) fleftout = 0.0;\n\
-    if(curuv.x>=1.0 - 2.0 * div) frightout = 0.0;\n\
-    if(curuv.y<=div) ftopout = 0.0;\n\
-    if(curuv.y>=1.0 - 2.0 * div) fbottomout = 0.0;\n\
+    if(curuv.x <= div) fleftout = 0.0;\n\
+    if(curuv.x >= 1.0 - 2.0 * div) frightout = 0.0;\n\
+    if(curuv.y <= div) ftopout = 0.0;\n\
+    if(curuv.y >= 1.0 - 2.0 * div) fbottomout = 0.0;\n\
 \n\
 \n\
-    if(curuv.x<=div || (curuv.x>=1.0 - 2.0 * div) || (curuv.y<=div) || (curuv.y>=1.0 - 2.0 * div) ){\n\
+    if(curuv.x <= div || (curuv.x >= 1.0 - 2.0 * div) || (curuv.y <= div) || (curuv.y >= 1.0 - 2.0 * div) ){\n\
         ftopout = 0.0;\n\
         frightout = 0.0;\n\
         fbottomout = 0.0;\n\
@@ -11306,7 +11301,7 @@ void main()\n\
     \n\
 \n\
 \n\
-    vec4 writeFlux = vec4(ftopout,frightout,fbottomout,fleftout);\n\
+    vec4 writeFlux = vec4(ftopout, frightout, fbottomout, fleftout);\n\
 \n\
     gl_FragData[0] = writeFlux;  // water flux.\n\
     //gl_FragData[0] = vec4(HTopOut, HRightOut, HBottomOut, HLeftOut); // test debug:\n\
@@ -11476,6 +11471,38 @@ void main()\n\
     #endif\n\
 \n\
 }";
+ShaderSource.waterCopyFS = "//#version 300 es\n\
+\n\
+#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+uniform sampler2D texToCopy;\n\
+varying vec2 v_tex_pos;\n\
+\n\
+void main()\n\
+{\n\
+    vec4 finalCol4 = texture2D(texToCopy, vec2(v_tex_pos.x, v_tex_pos.y));\n\
+    gl_FragData[0] = finalCol4;  // anything.\n\
+\n\
+    #ifdef USE_MULTI_RENDER_TARGET\n\
+        gl_FragData[1] = vec4(1.0); // depth\n\
+        gl_FragData[2] = vec4(1.0); // normal\n\
+        gl_FragData[3] = finalCol4; // albedo\n\
+        gl_FragData[4] = vec4(1.0); // selection color\n\
+    #endif\n\
+\n\
+}";
 ShaderSource.waterDepthRenderFS = "//#version 300 es\n\
 \n\
 #ifdef GL_ES\n\
@@ -11522,6 +11549,20 @@ uniform float u_near;\n\
 \n\
 varying vec4 vColorAuxTest;\n\
 varying float vWaterHeight;\n\
+varying float depth;\n\
+\n\
+vec4 packDepth( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+  return enc;\n\
+}\n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+}\n\
+\n\
 /*\n\
 vec3 calnor(vec2 uv){\n\
     float eps = 1.0/u_SimRes;\n\
@@ -11555,12 +11596,22 @@ void main()\n\
         discard;\n\
     }\n\
 \n\
+    float depthAux = depth;\n\
+\n\
+    #ifdef USE_LOGARITHMIC_DEPTH\n\
+	//if(bUseLogarithmicDepth)\n\
+	{\n\
+		gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
+		depthAux = gl_FragDepthEXT; \n\
+	}\n\
+	#endif\n\
+\n\
     vec4 finalCol4 = vec4(vColorAuxTest);\n\
-    //if(vColorAuxTest.r == vColorAuxTest.g && vColorAuxTest.r == vColorAuxTest.b )\n\
-    //{\n\
-    //    finalCol4 = vec4(1.0, 0.0, 0.0, 1.0);\n\
-    //}\n\
-    gl_FragData[0] = finalCol4;  // anything.\n\
+    \n\
+    // save depth, normal, albedo.\n\
+	gl_FragData[0] = packDepth(depthAux); \n\
+\n\
+    //gl_FragData[0] = finalCol4;  // anything.\n\
 \n\
     #ifdef USE_MULTI_RENDER_TARGET\n\
         gl_FragData[1] = vec4(1.0); // depth\n\
@@ -11656,6 +11707,7 @@ uniform vec2 u_waterHeightMap_MinMax;\n\
 \n\
 varying vec4 vColorAuxTest;\n\
 varying float vWaterHeight;\n\
+varying float depth;\n\
 \n\
 void main()\n\
 {\n\
@@ -11669,7 +11721,7 @@ void main()\n\
 	float terrainH = terrainHeight4.r;\n\
 \n\
 	//float height = u_heightMap_MinMax.x + decodedHeight * u_heightMap_MinMax.y;\n\
-	float waterHeight = decodedHeight * 10.0;\n\
+	float waterHeight = decodedHeight * 40.0;\n\
 	float terrainHeight = u_heightMap_MinMax.x + terrainH * u_heightMap_MinMax.y;\n\
 	float height = terrainHeight + waterHeight;\n\
 \n\
@@ -11677,7 +11729,8 @@ void main()\n\
 \n\
 	//vColorAuxTest = heightVec4;\n\
 	//vColorAuxTest = vec4(heightVec4.rgb, 0.5);\n\
-	vColorAuxTest = vec4(0.1, 0.5, 1.0, min(r*1.1, 1.0));\n\
+	//vColorAuxTest = vec4(0.1, 0.5, 1.0, min(r*1.1, 1.0));\n\
+	vColorAuxTest = vec4(0.1, 0.5, 1.0, 1.0);\n\
 \n\
 	vec3 objPosHigh = buildingPosHIGH;\n\
     vec3 objPosLow = buildingPosLOW.xyz + position.xyz;\n\
@@ -11693,6 +11746,569 @@ void main()\n\
 \n\
 	gl_Position = ModelViewProjectionMatrixRelToEye * finalPos4;\n\
 \n\
+	vec4 orthoPos = modelViewMatrixRelToEye * finalPos4;\n\
+	//vertexPos = orthoPos.xyz;\n\
+	depth = (-orthoPos.z)/(far); // the correct value.\n\
+\n\
+	\n\
+\n\
+}\n\
+";
+ShaderSource.WaterOrthogonalDepthShaderFS = "#ifdef GL_ES\n\
+precision highp float;\n\
+#endif\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+uniform sampler2D currDEMTex;\n\
+uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
+\n\
+uniform vec2 u_screenSize;\n\
+\n\
+varying float vDepth;\n\
+varying vec2 vTexCoord;  \n\
+varying vec4 vColor4;\n\
+\n\
+vec4 packDepth( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+  return enc;\n\
+}\n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+}\n\
+\n\
+void main()\n\
+{     \n\
+    vec2 screenPos = vec2(gl_FragCoord.x / u_screenSize.x, gl_FragCoord.y / u_screenSize.y);\n\
+\n\
+    // read the currentDEM depth.\n\
+    //vec4 depthCol4 = texture2D(currDEMTex, vec2(screenPos.x, 1.0 - screenPos.y));\n\
+   // float currDepth = unpackDepth(depthCol4);\n\
+\n\
+    //if(vDepth > currDepth)\n\
+    //{\n\
+        //discard;\n\
+    //}\n\
+\n\
+    //gl_FragData[0] = packDepth(vDepth);\n\
+    //gl_FragData[0] = vec4(1.0, 0.0, 0.0, 1.0);\n\
+    gl_FragData[0] = vColor4;\n\
+\n\
+    #ifdef USE_MULTI_RENDER_TARGET\n\
+        gl_FragData[1] = vec4(1.0); // depth\n\
+        gl_FragData[2] = vec4(1.0); // normal\n\
+        gl_FragData[3] = vec4(1.0); // albedo\n\
+        gl_FragData[4] = vec4(1.0); // selection color\n\
+    #endif\n\
+}";
+ShaderSource.WaterOrthogonalDepthShaderVS = "precision highp float;\n\
+\n\
+attribute vec3 position;\n\
+attribute vec2 texCoord;\n\
+\n\
+uniform mat4 buildingRotMatrix; \n\
+uniform mat4 modelViewMatrixRelToEye; \n\
+uniform mat4 RefTransfMatrix;\n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform mat4 modelViewProjectionMatrix;\n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+uniform float near;\n\
+uniform float far;\n\
+uniform vec3 aditionalPosition;\n\
+uniform vec3 refTranslationVec;\n\
+uniform int refMatrixType; // 0= identity, 1= translate, 2= transform\n\
+\n\
+varying float vDepth;\n\
+varying vec2 vTexCoord;\n\
+varying vec4 vColor4;\n\
+#define M_PI 3.1415926535897932384626433832795\n\
+//#define M_PI 3.1415926535\n\
+\n\
+float cbrt(in float val)\n\
+{\n\
+	if (val < 0.0) {\n\
+ \n\
+        return -pow(-val, 1.0 / 3.0);\n\
+    }\n\
+ \n\
+    else {\n\
+ \n\
+        return pow(val, 1.0 / 3.0);\n\
+    }\n\
+}\n\
+\n\
+float atanHP_getConstant(in int j) \n\
+{\n\
+	float constant = 0.0;\n\
+\n\
+	// https://studylib.net/doc/18241330/high-precision-calculation-of-arcsin-x--arceos-x--and-arctan\n\
+	// The constants tan(j*PI/24), (j = 1, 2, • • • , 11) and PI/2 are:\n\
+	// j = 1 -> tan(PI/24) =     0.13165 24975 87395 85347 2\n\
+	// j = 2 -> tan(PI/12) =     0.26794 91924 31122 70647 3\n\
+	// j = 3 -> tan(PI/8) =      0.41421 35623 73095 04880 2\n\
+	// j = 4 -> tan(PI/6) =      0.57735 02691 89625 76450 9\n\
+	// j = 5 -> tan(5*PI/24) =   0.76732 69879 78960 34292 3\n\
+	// j = 6 -> tan(PI/4) =      1.00000 00000 00000 00000 0\n\
+	// j = 7 -> tan(7*PI/24) =   1.30322 53728 41205 75586 8\n\
+	// j = 8 -> tan(PI/3) =      1.73205 08075 68877 29352 7\n\
+	// j = 9 -> tan(3*PI/8) =    2.41421 35623 73095 04880 2\n\
+	// j = 10 -> tan(5*PI/12) =  3.73205 08075 68877 29352 7\n\
+	// j = 11 -> tan(11*PI/24) = 7.59575 41127 25150 44052 6\n\
+	// PI/2 =                    1.57079 63267 94896 61923 1\n\
+\n\
+	if(j == 1)\n\
+	{\n\
+		constant = 0.131652497587395853472;\n\
+	}\n\
+	else if(j == 2)\n\
+	{\n\
+		constant = 0.267949192431122706473;\n\
+	}\n\
+	else if(j == 3)\n\
+	{\n\
+		constant = 0.414213562373095048802;\n\
+	}\n\
+	else if(j == 4)\n\
+	{\n\
+		constant = 0.577350269189625764509;\n\
+	}\n\
+	else if(j == 5)\n\
+	{\n\
+		constant = 0.767326987978960342923;\n\
+	}\n\
+	else if(j == 6)\n\
+	{\n\
+		constant = 1.000000000000000000000;\n\
+	}\n\
+	else if(j == 7)\n\
+	{\n\
+		constant = 1.303225372841205755868;\n\
+	}\n\
+	else if(j == 8)\n\
+	{\n\
+		constant = 1.732050807568877293527;\n\
+	}\n\
+	else if(j == 9)\n\
+	{\n\
+		constant = 2.414213562373095048802;\n\
+	}\n\
+	else if(j == 10)\n\
+	{\n\
+		constant = 3.732050807568877293527;\n\
+	}\n\
+	else if(j == 11)\n\
+	{\n\
+		constant = 7.595754112725150440526;\n\
+	}\n\
+	else if(j == 12)\n\
+	{\n\
+		constant = 1.570796326794896619231;\n\
+	}\n\
+\n\
+	return constant;\n\
+}\n\
+\n\
+int atanHP_getInterval(in float x) \n\
+{\n\
+	// Subdivide the interval (0, infinite ) into seven intervals as follows:\n\
+	// 0 <= u < tan(PI/24)\n\
+	// tan[(2j - 3)*PI/24] <= u < tan[(2j - 1)*PI/24] for j = 2, 3, 4, 5, 6\n\
+	// tan(11PI/24) <= u < infinite.\n\
+	//------------------------------------------------------------------------\n\
+	float u = abs(x);\n\
+	int interval = -1;\n\
+\n\
+	// check if is interval = 0.******************************************************************\n\
+	// 0 <= u < tan(PI/24)\n\
+	float tan_PIdiv24 = atanHP_getConstant(1);\n\
+	if(u < tan_PIdiv24)\n\
+	{\n\
+		return 0;\n\
+	}\n\
+\n\
+	// check if is interval = 1: (j = interval + 1), so j = 2.***********************************\n\
+	// tan[(2j - 3)*PI/24] <= u < tan[(2j - 1)*PI/24] for j = 2, 3, 4, 5, 6\n\
+	// tan(PI/24) <= u < tan(PI/8)\n\
+	float min = atanHP_getConstant(1);\n\
+	float max = atanHP_getConstant(3);\n\
+	if(u >= min && u < max)\n\
+	{\n\
+		return 1;\n\
+	}\n\
+	\n\
+	// check if is interval = 2: (j = interval + 1), so j = 3.***********************************\n\
+	// tan[(2j - 3)*PI/24] <= u < tan[(2j - 1)*PI/24] for j = 2, 3, 4, 5, 6\n\
+	// tan(PI/8) <= u < tan(5*PI/24)\n\
+	min = atanHP_getConstant(3);\n\
+	max = atanHP_getConstant(5);\n\
+	if(u >= min && u < max)\n\
+	{\n\
+		return 2;\n\
+	}\n\
+\n\
+	// check if is interval = 3: (j = interval + 1), so j = 4.***********************************\n\
+	// tan[(2j - 3)*PI/24] <= u < tan[(2j - 1)*PI/24] for j = 2, 3, 4, 5, 6\n\
+	// tan(5*PI/24) <= u < tan(7*PI/24)\n\
+	min = atanHP_getConstant(5);\n\
+	max = atanHP_getConstant(7);\n\
+	if(u >= min && u < max)\n\
+	{\n\
+		return 3;\n\
+	}\n\
+\n\
+	// check if is interval = 4: (j = interval + 1), so j = 5.***********************************\n\
+	// tan[(2j - 3)*PI/24] <= u < tan[(2j - 1)*PI/24] for j = 2, 3, 4, 5, 6\n\
+	// tan(7*PI/24) <= u < tan(3*PI/8)\n\
+	min = atanHP_getConstant(7);\n\
+	max = atanHP_getConstant(9);\n\
+	if(u >= min && u < max)\n\
+	{\n\
+		return 4;\n\
+	}\n\
+\n\
+	// check if is interval = 5: (j = interval + 1), so j = 6.***********************************\n\
+	// tan[(2j - 3)*PI/24] <= u < tan[(2j - 1)*PI/24] for j = 2, 3, 4, 5, 6\n\
+	// tan(3*PI/8) <= u < tan(11*PI/24)\n\
+	min = atanHP_getConstant(9);\n\
+	max = atanHP_getConstant(11);\n\
+	if(u >= min && u < max)\n\
+	{\n\
+		return 5;\n\
+	}\n\
+\n\
+	// check if is interval = 6: (j = interval + 1), so j = 6.***********************************\n\
+	// tan(11PI/24) <= u < infinite.\n\
+	min = atanHP_getConstant(11);\n\
+	if(u >= min)\n\
+	{\n\
+		return 6;\n\
+	}\n\
+\n\
+\n\
+	return interval;\n\
+}\n\
+\n\
+float atanHP_polynomialApproximation(in float x) \n\
+{\n\
+	// P(x) = a1*x + a3*pow(x, 3) + ... + a17*pow(x, 17)\n\
+	float result_atan = -1.0;\n\
+\n\
+	float a1 = 1.0;\n\
+	float a3 = -0.333333333333333331607;\n\
+	float a5 = 0.199999999999998244448;\n\
+	float a7 = -0.142857142856331306529;\n\
+	float a9 = 0.111111110907793967393;\n\
+	float a11 = -0.0909090609633677637073;\n\
+	float a13 = 0.0769204073249154081320;\n\
+	float a15 = -0.0665248229413108277905;\n\
+	float a17 = 0.0546721009395938806941;\n\
+\n\
+	result_atan = a1*x + a3*pow(x, 3.0) + a5*pow(x, 5.0) +  a7*pow(x, 7.0) +  a9*pow(x, 9.0) +  a11*pow(x, 11.0) +  a13*pow(x, 13.0) +  a15*pow(x, 15.0) +  a17*pow(x, 17.0);\n\
+\n\
+	return result_atan;\n\
+}\n\
+\n\
+float atanHP(in float x) // atan High Precision.\n\
+{\n\
+	// https://studylib.net/doc/18241330/high-precision-calculation-of-arcsin-x--arceos-x--and-arctan\n\
+	//-----------------------------------------------------------------------------------------------\n\
+\n\
+	// Obtain the interval.\n\
+	int interval = atanHP_getInterval(x);\n\
+\n\
+	if(interval == 0)\n\
+	{\n\
+		// use polynomial approximation.\n\
+		return atanHP_polynomialApproximation(x);\n\
+	}\n\
+	else if(interval >= 1 && interval <6)\n\
+	{\n\
+		// use Arctan|x| = (j*PI/12) + Arctan(tj),\n\
+		// where tj = A / B, where\n\
+		// A = |x| - tan(j*PI/12)\n\
+		// B = 1 + |x| * tan(j*PI/12).\n\
+		float tan_jPIdiv12;\n\
+		float j = float(interval);\n\
+		if(interval == 1)\n\
+		{\n\
+			tan_jPIdiv12 = atanHP_getConstant(2);\n\
+		}\n\
+		else if(interval == 2)\n\
+		{\n\
+			tan_jPIdiv12 = atanHP_getConstant(4);\n\
+		}\n\
+		else if(interval == 3)\n\
+		{\n\
+			tan_jPIdiv12 = atanHP_getConstant(6);\n\
+		}\n\
+		else if(interval == 4)\n\
+		{\n\
+			tan_jPIdiv12 = atanHP_getConstant(8);\n\
+		}\n\
+		else if(interval == 5)\n\
+		{\n\
+			tan_jPIdiv12 = atanHP_getConstant(10);\n\
+		}\n\
+\n\
+		float A = abs(x) - tan_jPIdiv12;\n\
+		float B = 1.0 + abs(x) * tan_jPIdiv12;\n\
+		float tj = A/B;\n\
+		float arctan_tj = atanHP_polynomialApproximation(tj);\n\
+		float arctan = (j*M_PI/12.0) + arctan_tj;\n\
+		return arctan;\n\
+	}\n\
+	else\n\
+	{\n\
+		// the interval = 6 (the last interval).\n\
+		// In this case,\n\
+		// Arctan|x| = PI/2 - Arctan(1/|x|).\n\
+		float pi_div2 = atanHP_getConstant(12);\n\
+		float arctan = pi_div2 - atan(1.0/abs(x));\n\
+		return arctan;\n\
+	}\n\
+\n\
+	return -1.0;\n\
+}\n\
+\n\
+float atan2(in float y, in float x) \n\
+{\n\
+	//return atan(y, x);\n\
+	//return atanHP(y/x);\n\
+\n\
+	if (x > 0.0)\n\
+	{\n\
+		return atanHP(y/x);\n\
+	}\n\
+	else if (x < 0.0)\n\
+	{\n\
+		if (y >= 0.0)\n\
+		{\n\
+			return atanHP(y/x) + M_PI;\n\
+		}\n\
+		else \n\
+		{\n\
+			return atanHP(y/x) - M_PI;\n\
+		}\n\
+	}\n\
+	else if (x == 0.0)\n\
+	{\n\
+		if (y>0.0)\n\
+		{\n\
+			return M_PI/2.0;\n\
+		}\n\
+		else if (y<0.0)\n\
+		{\n\
+			return -M_PI/2.0;\n\
+		}\n\
+		else \n\
+		{\n\
+			return 0.0; // return undefined.\n\
+		}\n\
+	}\n\
+}\n\
+\n\
+vec3 CartesianToGeographicWgs84(vec3 posWC, inout float inoutAux)\n\
+{\n\
+	vec3 geoCoord;\n\
+\n\
+	// From WebWorldWind.\n\
+	// According to H. Vermeille, \"An analytical method to transform geocentric into geodetic coordinates\"\n\
+	// http://www.springerlink.com/content/3t6837t27t351227/fulltext.pdf\n\
+	// Journal of Geodesy, accepted 10/2010, not yet published\n\
+	\n\
+	\n\
+	//// equatorialRadius = 6378137.0; // meters.\n\
+	//// polarRadius = 6356752.3142; // meters.\n\
+	//// firstEccentricitySquared = 6.69437999014E-3;\n\
+	//// secondEccentricitySquared = 6.73949674228E-3;\n\
+	//// degToRadFactor = Math.PI/180.0;\n\
+	\n\
+	float firstEccentricitySquared = 6.69437999014E-3;\n\
+	float equatorialRadius = 6378137.0;\n\
+\n\
+	float X = posWC.x;\n\
+	float Y = posWC.y;\n\
+	float Z = posWC.z;\n\
+\n\
+	float XXpYY = X * X + Y * Y;\n\
+	float sqrtXXpYY = sqrt(XXpYY);\n\
+	float a = equatorialRadius;\n\
+	float ra2 = 1.0 / (a * a);\n\
+	float e2 = firstEccentricitySquared;\n\
+	float e4 = e2 * e2;\n\
+	float p = XXpYY * ra2;\n\
+	float q = Z * Z * (1.0 - e2) * ra2;\n\
+	float r = (p + q - e4) / 6.0;\n\
+	float h;\n\
+	float phi;\n\
+	float u;\n\
+	float evoluteBorderTest = 8.0 * r * r * r + e4 * p * q;\n\
+	float rad1;\n\
+	float rad2;\n\
+	float rad3;\n\
+	float atan_son;\n\
+	float v;\n\
+	float w;\n\
+	float k;\n\
+	float D;\n\
+	float sqrtDDpZZ;\n\
+	float e;\n\
+	float lambda;\n\
+	float s2;\n\
+\n\
+	\n\
+\n\
+	if (evoluteBorderTest > 0.0 || q != 0.0) \n\
+	{\n\
+		if (evoluteBorderTest > 0.0) \n\
+		{\n\
+			// Step 2: general case\n\
+			rad1 = sqrt(evoluteBorderTest);\n\
+			rad2 = sqrt(e4 * p * q);\n\
+\n\
+			// 10*e2 is my arbitrary decision of what Vermeille means by \"near... the cusps of the evolute\".\n\
+			if (evoluteBorderTest > 10.0 * e2) \n\
+			{\n\
+				rad3 = cbrt((rad1 + rad2) * (rad1 + rad2));\n\
+				u = r + 0.5 * rad3 + 2.0 * r * r / rad3;\n\
+			}\n\
+			else \n\
+			{\n\
+				u = r + 0.5 * cbrt((rad1 + rad2) * (rad1 + rad2))\n\
+					+ 0.5 * cbrt((rad1 - rad2) * (rad1 - rad2));\n\
+			}\n\
+		}\n\
+		else \n\
+		{\n\
+			// Step 3: near evolute\n\
+			rad1 = sqrt(-evoluteBorderTest);\n\
+			rad2 = sqrt(-8.0 * r * r * r);\n\
+			rad3 = sqrt(e4 * p * q);\n\
+			atan_son = 2.0 * atan2(rad3, rad1 + rad2) / 3.0;\n\
+\n\
+			u = -4.0 * r * sin(atan_son) * cos(M_PI / 6.0 + atan_son);\n\
+		}\n\
+\n\
+		v = sqrt(u * u + e4 * q);\n\
+		w = e2 * (u + v - q) / (2.0 * v);\n\
+		k = (u + v) / (sqrt(w * w + u + v) + w);\n\
+		D = k * sqrtXXpYY / (k + e2);\n\
+		float D_scaled = D/10000.0;\n\
+		float Z_scaled = Z/10000.0;\n\
+		sqrtDDpZZ = sqrt(D_scaled * D_scaled + Z_scaled * Z_scaled) * 10000.0; // more precision.\n\
+		//sqrtDDpZZ = sqrt(D * D + Z * Z);\n\
+\n\
+		h = (k + e2 - 1.0) * sqrtDDpZZ / k;\n\
+		phi = 2.0 * atan2(Z, (sqrtDDpZZ + D));\n\
+		\n\
+	}\n\
+	else \n\
+	{\n\
+		// Step 4: singular disk\n\
+		rad1 = sqrt(1.0 - e2);\n\
+		rad2 = sqrt(e2 - p);\n\
+		e = sqrt(e2);\n\
+\n\
+		h = -a * rad1 * rad2 / e;\n\
+		phi = rad2 / (e * rad2 + rad1 * sqrt(p));\n\
+	}\n\
+\n\
+\n\
+	// Compute lambda\n\
+	s2 = sqrt(2.0);\n\
+	if ((s2 - 1.0) * Y < sqrtXXpYY + X) \n\
+	{\n\
+		// case 1 - -135deg < lambda < 135deg\n\
+		lambda = 2.0 * atan2(Y, sqrtXXpYY + X);\n\
+	}\n\
+	else if (sqrtXXpYY + Y < (s2 + 1.0) * X) \n\
+	{\n\
+		// case 2 - -225deg < lambda < 45deg\n\
+		lambda = -M_PI * 0.5 + 2.0 * atan2(X, sqrtXXpYY - Y);\n\
+	}\n\
+	else \n\
+	{\n\
+		// if (sqrtXXpYY-Y<(s2=1)*X) {  // is the test, if needed, but it's not\n\
+		// case 3: - -45deg < lambda < 225deg\n\
+		lambda = M_PI * 0.5 - 2.0 * atan2(X, sqrtXXpYY + Y);\n\
+	}\n\
+\n\
+	float factor = 180.0 / M_PI;\n\
+	geoCoord = vec3(factor * lambda, factor * phi, h);\n\
+\n\
+	return geoCoord;\n\
+}\n\
+\n\
+float rand(vec2 co){\n\
+    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);\n\
+}\n\
+\n\
+bool aproxEqual(float valA, float valB, float error)\n\
+{\n\
+	bool areEquals = false;\n\
+\n\
+	if(abs(valA - valB) < error)\n\
+	{\n\
+		areEquals = true;\n\
+	}\n\
+	else{\n\
+		areEquals = false;\n\
+	}\n\
+\n\
+	return areEquals;\n\
+}\n\
+  \n\
+void main()\n\
+{	\n\
+	// Function for overWrite waterSystem DEM texture.\n\
+	vec4 rotatedPos;\n\
+\n\
+	if(refMatrixType == 0)\n\
+	{\n\
+		rotatedPos = buildingRotMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
+	}\n\
+	else if(refMatrixType == 1)\n\
+	{\n\
+		rotatedPos = buildingRotMatrix * vec4(position.xyz + refTranslationVec.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
+	}\n\
+	else if(refMatrixType == 2)\n\
+	{\n\
+		rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
+	}\n\
+\n\
+    vec3 objPosHigh = buildingPosHIGH;\n\
+    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
+    vec3 highDifference = objPosHigh.xyz; // - encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = objPosLow.xyz; // - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0); // world position.\n\
+\n\
+	float inoutAux = 0.0;\n\
+	vec3 geoCoord = CartesianToGeographicWgs84(pos4.xyz, inoutAux);\n\
+\n\
+	//gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+	gl_Position = modelViewProjectionMatrix * vec4(geoCoord, 1.0);\n\
+	gl_Position.y *= -1.0;\n\
+	vDepth = gl_Position.z * 0.5 + 0.5;\n\
+	vTexCoord = texCoord;\n\
+	vColor4 = vec4(1.0, 0.0, 0.0, 1.0);\n\
+\n\
+	// test debug:\n\
+	gl_PointSize = 10.0;\n\
 }\n\
 ";
 ShaderSource.waterQuadVertVS = "//precision mediump float;\n\
@@ -11721,11 +12337,8 @@ ShaderSource.waterRenderFS = "//#version 300 es\n\
 #extension GL_EXT_draw_buffers : require\n\
 #endif\n\
 \n\
-uniform vec2 u_PlanePos; // Our location in the virtual world displayed by the plane\n\
-\n\
-//in vec3 fs_Pos;\n\
-//in vec4 fs_Nor;\n\
-//in vec4 fs_Col;\n\
+uniform sampler2D depthTex;\n\
+uniform sampler2D waterTex;\n\
 \n\
 uniform sampler2D hightmap;\n\
 uniform sampler2D normap;\n\
@@ -11733,12 +12346,17 @@ uniform sampler2D sceneDepth;\n\
 uniform sampler2D colorReflection;\n\
 uniform sampler2D sedimap;\n\
 \n\
-//in float fs_Sine;\n\
-//in vec2 fs_Uv;\n\
-//layout (location = 0) out vec4 out_Col; // This is the final output color that you will see on your\n\
-//layout (location = 1) out vec4 col_reflect;\n\
-                  // screen for the pixel that is currently being processed.\n\
-uniform vec3 u_Eye, u_Ref, u_Up;\n\
+uniform vec2 u_screenSize;\n\
+uniform float near;\n\
+uniform float far;\n\
+uniform float tangentOfHalfFovy;\n\
+uniform float aspectRatio;\n\
+uniform mat4 projectionMatrixInv;\n\
+uniform bool bUseLogarithmicDepth;\n\
+uniform int uWaterType;\n\
+varying float flogz;\n\
+varying float Fcoef_half;\n\
+\n\
 \n\
 \n\
 uniform int u_TerrainType;\n\
@@ -11751,6 +12369,10 @@ uniform float u_near;\n\
 \n\
 varying vec4 vColorAuxTest;\n\
 varying float vWaterHeight;\n\
+varying vec3 vNormal;\n\
+varying vec3 vViewRay;\n\
+varying vec3 vOrthoPos;\n\
+varying vec2 vTexCoord;\n\
 /*\n\
 vec3 calnor(vec2 uv){\n\
     float eps = 1.0/u_SimRes;\n\
@@ -11777,6 +12399,84 @@ float linearDepth(float depthSample)\n\
     return zLinear;\n\
 }\n\
 */\n\
+vec4 packDepth( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+  return enc;\n\
+}\n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+}\n\
+\n\
+float getDepth(vec2 coord)\n\
+{\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		float linearDepth = unpackDepth(texture2D(depthTex, coord.xy));\n\
+		// gl_FragDepthEXT = linearDepth = log2(flogz) * Fcoef_half;\n\
+		// flogz = 1.0 + gl_Position.z;\n\
+\n\
+		float flogzAux = pow(2.0, linearDepth/Fcoef_half);\n\
+		float z = flogzAux - 1.0;\n\
+		linearDepth = z/(far);\n\
+		return linearDepth;\n\
+	}\n\
+	else{\n\
+		return unpackDepth(texture2D(depthTex, coord.xy));\n\
+	}\n\
+}\n\
+\n\
+\n\
+vec3 reconstructPosition(vec2 texCoord, float depth)\n\
+{\n\
+    // https://wickedengine.net/2019/09/22/improved-normal-reconstruction-from-depth/\n\
+    float x = texCoord.x * 2.0 - 1.0;\n\
+    //float y = (1.0 - texCoord.y) * 2.0 - 1.0;\n\
+    float y = (texCoord.y) * 2.0 - 1.0;\n\
+    float z = (1.0 - depth) * 2.0 - 1.0;\n\
+    vec4 pos_NDC = vec4(x, y, z, 1.0);\n\
+    vec4 pos_CC = projectionMatrixInv * pos_NDC;\n\
+    return pos_CC.xyz / pos_CC.w;\n\
+}\n\
+\n\
+vec3 normal_from_depth(float depth, vec2 texCoord) {\n\
+    // http://theorangeduck.com/page/pure-depth-ssao\n\
+    float pixelSizeX = 1.0/u_screenSize.x;\n\
+    float pixelSizeY = 1.0/u_screenSize.y;\n\
+\n\
+    vec2 offset1 = vec2(0.0,pixelSizeY);\n\
+    vec2 offset2 = vec2(pixelSizeX,0.0);\n\
+\n\
+	float depthA = 0.0;\n\
+	float depthB = 0.0;\n\
+	for(float i=0.0; i<1.0; i++)\n\
+	{\n\
+		depthA += getDepth(texCoord + offset1*(1.0+i));\n\
+		depthB += getDepth(texCoord + offset2*(1.0+i));\n\
+	}\n\
+\n\
+	vec3 posA = reconstructPosition(texCoord + offset1*1.0, depthA/1.0);\n\
+	vec3 posB = reconstructPosition(texCoord + offset2*1.0, depthB/1.0);\n\
+\n\
+    vec3 pos0 = reconstructPosition(texCoord, depth);\n\
+    vec3 normal = cross(posA - pos0, posB - pos0);\n\
+    normal.z = -normal.z;\n\
+\n\
+    return normalize(normal);\n\
+}\n\
+\n\
+vec3 getViewRay(vec2 tc, in float relFar)\n\
+{\n\
+	float hfar = 2.0 * tangentOfHalfFovy * relFar;\n\
+    float wfar = hfar * aspectRatio;    \n\
+    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -relFar);    \n\
+	\n\
+    return ray;                      \n\
+}\n\
+\n\
 void main()\n\
 {\n\
     if(vWaterHeight < 0.0001)\n\
@@ -11784,11 +12484,85 @@ void main()\n\
         discard;\n\
     }\n\
 \n\
+    float alpha = vColorAuxTest.a;\n\
     vec4 finalCol4 = vec4(vColorAuxTest);\n\
-    //if(vColorAuxTest.r == vColorAuxTest.g && vColorAuxTest.r == vColorAuxTest.b )\n\
-    //{\n\
-    //    finalCol4 = vec4(1.0, 0.0, 0.0, 1.0);\n\
-    //}\n\
+    if(vWaterHeight < 0.01)\n\
+    {\n\
+        /*\n\
+        vec4 finalCol4 = vec4(0.9, 0.9, 0.9, 0.9);\n\
+        gl_FragData[0] = finalCol4;  // anything.\n\
+\n\
+        #ifdef USE_MULTI_RENDER_TARGET\n\
+            gl_FragData[1] = vec4(1.0); // depth\n\
+            gl_FragData[2] = vec4(1.0); // normal\n\
+            gl_FragData[3] = finalCol4; // albedo\n\
+            gl_FragData[4] = vec4(1.0); // selection color\n\
+        #endif\n\
+\n\
+        return;\n\
+        */\n\
+\n\
+        alpha = 0.9;\n\
+        finalCol4 = vec4(vColorAuxTest * 0.5);\n\
+    }\n\
+\n\
+    //vec2 screenPos = vec2(gl_FragCoord.x / u_screenSize.x, gl_FragCoord.y / u_screenSize.y);\n\
+\n\
+    \n\
+    float dotProd = max(dot(vViewRay, vNormal), 0.6);\n\
+    finalCol4 = vec4(finalCol4.xyz * dotProd, alpha);\n\
+\n\
+    if(uWaterType == 1)\n\
+    {\n\
+        //vec4 velocity4 = texture2D(waterTex, vec2(vTexCoord.x, 1.0 - vTexCoord.y));\n\
+        //float velocity = length(velocity4.xy);\n\
+        //finalCol4.r = velocity;\n\
+        //finalCol4.b = 1.0 - velocity;\n\
+        //finalCol4 = vec4(velocity4.r, velocity4.g, 0.0, alpha);\n\
+        //finalCol4 = vec4(velocity, velocity, velocity, alpha);\n\
+    }\n\
+\n\
+    //*************************************************************************************************************\n\
+    // Do specular lighting.***\n\
+	float lambertian = 1.0;\n\
+	float specular = 0.0;\n\
+    float shininessValue = 20.0;\n\
+	//if(applySpecLighting> 0.0)\n\
+	{\n\
+		vec3 L;\n\
+        vec3 lightPos = vec3(0.0, 1.0, -1.0)*length(vOrthoPos);\n\
+        L = normalize(lightPos - vOrthoPos);\n\
+        lambertian = max(dot(vNormal, L), 0.0);\n\
+		\n\
+		specular = 0.0;\n\
+		if(lambertian > 0.0)\n\
+		{\n\
+			vec3 R = reflect(-L, vNormal);      // Reflected light vector\n\
+			vec3 V = normalize(-vOrthoPos); // Vector to viewer\n\
+			\n\
+			// Compute the specular term\n\
+			float specAngle = max(dot(R, V), 0.0);\n\
+			specular = pow(specAngle, shininessValue);\n\
+			\n\
+			if(specular > 1.0)\n\
+			{\n\
+				//specular = 1.0;\n\
+			}\n\
+		}\n\
+\n\
+		\n\
+		if(lambertian < 0.9)\n\
+		{\n\
+			lambertian = 0.9;\n\
+		}\n\
+\n\
+	}\n\
+    vec3 specCol = finalCol4.xyz * 3.0;\n\
+    finalCol4 = vec4((finalCol4.xyz * lambertian + specCol * specular), alpha);\n\
+    //finalCol4 = vec4(finalCol4.xyz * (lambertian + specular), alpha);\n\
+    //*************************************************************************************************************\n\
+\n\
+\n\
     gl_FragData[0] = finalCol4;  // anything.\n\
 \n\
     #ifdef USE_MULTI_RENDER_TARGET\n\
@@ -11834,13 +12608,9 @@ void main()\n\
     float wval = texture(hightmap,fs_Uv).y;\n\
     wval /= 1.0;\n\
 \n\
-\n\
-\n\
     vec3 watercolor = mix(vec3(0.8,0.0,0.0), vec3(0.0,0.0,0.8), sediment * 2.0);\n\
     vec3 watercolorspec = vec3(1.0);\n\
     watercolorspec *= spec;\n\
-\n\
-\n\
 \n\
     out_Col = vec4(vec3(0.0,0.2,0.5) + R * reflectedSky + watercolorspec  , (.5 + spec) * u_WaterTransparency * dpVal);\n\
     col_reflect = vec4(1.0);\n\
@@ -11870,10 +12640,11 @@ ShaderSource.waterRenderVS = "\n\
 	uniform bool bUseLogarithmicDepth;\n\
 	uniform float uFCoef_logDepth;\n\
     \n\
-uniform mat4 u_Model;\n\
-uniform mat4 u_ModelInvTr;\n\
-uniform mat4 u_ViewProj;\n\
-uniform vec2 u_PlanePos; // Our location in the virtual world displayed by the plane\n\
+uniform vec2 u_screenSize;\n\
+uniform float tangentOfHalfFovy;\n\
+uniform float aspectRatio;\n\
+uniform mat4 projectionMatrixInv;\n\
+\n\
 \n\
 uniform sampler2D hightmap;\n\
 uniform sampler2D terrainmap;\n\
@@ -11881,14 +12652,100 @@ uniform float u_SimRes;\n\
 \n\
 uniform vec2 u_heightMap_MinMax;\n\
 \n\
+uniform sampler2D depthTex;\n\
 \n\
+varying float flogz;\n\
+varying float Fcoef_half;\n\
 \n\
 varying vec4 vColorAuxTest;\n\
 varying float vWaterHeight;\n\
+varying vec3 vNormal;\n\
+varying vec3 vViewRay;\n\
+varying vec3 vOrthoPos;\n\
+varying vec2 vTexCoord;\n\
+\n\
+vec4 packDepth( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+  return enc;\n\
+}\n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+}\n\
+\n\
+float getDepth(vec2 coord)\n\
+{\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		float linearDepth = unpackDepth(texture2D(depthTex, coord.xy));\n\
+		// gl_FragDepthEXT = linearDepth = log2(flogz) * Fcoef_half;\n\
+		// flogz = 1.0 + gl_Position.z;\n\
+\n\
+		float flogzAux = pow(2.0, linearDepth/Fcoef_half);\n\
+		float z = flogzAux - 1.0;\n\
+		linearDepth = z/(far);\n\
+		return linearDepth;\n\
+	}\n\
+	else{\n\
+		return unpackDepth(texture2D(depthTex, coord.xy));\n\
+	}\n\
+}\n\
+\n\
+\n\
+vec3 reconstructPosition(vec2 texCoord, float depth)\n\
+{\n\
+    // https://wickedengine.net/2019/09/22/improved-normal-reconstruction-from-depth/\n\
+    float x = texCoord.x * 2.0 - 1.0;\n\
+    //float y = (1.0 - texCoord.y) * 2.0 - 1.0;\n\
+    float y = (texCoord.y) * 2.0 - 1.0;\n\
+    float z = (1.0 - depth) * 2.0 - 1.0;\n\
+    vec4 pos_NDC = vec4(x, y, z, 1.0);\n\
+    vec4 pos_CC = projectionMatrixInv * pos_NDC;\n\
+    return pos_CC.xyz / pos_CC.w;\n\
+}\n\
+\n\
+vec3 normal_from_depth(float depth, vec2 texCoord) {\n\
+    // http://theorangeduck.com/page/pure-depth-ssao\n\
+    float pixelSizeX = 1.0/u_screenSize.x;\n\
+    float pixelSizeY = 1.0/u_screenSize.y;\n\
+\n\
+    vec2 offset1 = vec2(0.0,pixelSizeY);\n\
+    vec2 offset2 = vec2(pixelSizeX,0.0);\n\
+\n\
+	float depthA = 0.0;\n\
+	float depthB = 0.0;\n\
+	for(float i=0.0; i<1.0; i++)\n\
+	{\n\
+		depthA += getDepth(texCoord + offset1*(1.0+i));\n\
+		depthB += getDepth(texCoord + offset2*(1.0+i));\n\
+	}\n\
+\n\
+	vec3 posA = reconstructPosition(texCoord + offset1*1.0, depthA/1.0);\n\
+	vec3 posB = reconstructPosition(texCoord + offset2*1.0, depthB/1.0);\n\
+\n\
+    vec3 pos0 = reconstructPosition(texCoord, depth);\n\
+    vec3 normal = cross(posA - pos0, posB - pos0);\n\
+    normal.z = -normal.z;\n\
+\n\
+    return normalize(normal);\n\
+}\n\
+\n\
+vec3 getViewRay(vec2 tc, in float relFar)\n\
+{\n\
+	float hfar = 2.0 * tangentOfHalfFovy * relFar;\n\
+    float wfar = hfar * aspectRatio;    \n\
+    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -relFar);    \n\
+	\n\
+    return ray;                      \n\
+}\n\
 \n\
 void main()\n\
 {\n\
 	// read the altitude from hightmap.\n\
+	vTexCoord = texCoord;\n\
 	vec4 heightVec4 = texture2D(hightmap, vec2(texCoord.x, 1.0 - texCoord.y));\n\
 	vec4 terrainHeight4 = texture2D(terrainmap, vec2(texCoord.x, 1.0 - texCoord.y));\n\
 	float r = heightVec4.r;\n\
@@ -11898,7 +12755,7 @@ void main()\n\
 	float terrainH = terrainHeight4.r;\n\
 \n\
 	//float height = u_heightMap_MinMax.x + decodedHeight * u_heightMap_MinMax.y;\n\
-	float waterHeight = decodedHeight * 10.0;\n\
+	float waterHeight = decodedHeight * 40.0;\n\
 	float terrainHeight = u_heightMap_MinMax.x + terrainH * u_heightMap_MinMax.y;\n\
 	float height = terrainHeight + waterHeight;\n\
 \n\
@@ -11906,7 +12763,8 @@ void main()\n\
 \n\
 	//vColorAuxTest = heightVec4;\n\
 	//vColorAuxTest = vec4(heightVec4.rgb, 0.5);\n\
-	vColorAuxTest = vec4(0.1, 0.5, 1.0, min(r*1.1, 1.0));\n\
+	float alpha = max(r*1.5, 0.4);\n\
+	vColorAuxTest = vec4(0.1, 0.3, 1.0, alpha);\n\
 \n\
 	vec3 objPosHigh = buildingPosHIGH;\n\
     vec3 objPosLow = buildingPosLOW.xyz + position.xyz;\n\
@@ -11922,6 +12780,32 @@ void main()\n\
 \n\
 	gl_Position = ModelViewProjectionMatrixRelToEye * finalPos4;\n\
 \n\
+	vOrthoPos = (modelViewMatrixRelToEye * finalPos4).xyz;\n\
+\n\
+	// try to calculate normal here.\n\
+	vec3 ndc = gl_Position.xyz / gl_Position.w; //perspective divide/normalize\n\
+	\n\
+	vec2 screenPos = ndc.xy * 0.5 + 0.5; //ndc is -1 to 1 in GL. scale for 0 to 1\n\
+    float depth = getDepth(screenPos);\n\
+    vNormal = normal_from_depth(depth, screenPos);\n\
+	if(vNormal.z < 0.0)\n\
+	{\n\
+		vNormal *= -1.0;\n\
+	}\n\
+	//vNormal = normalize(vNormal * vec3(1.0, 1.0, 2.0));\n\
+	vViewRay = normalize(-getViewRay(screenPos, depth));\n\
+\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		// logarithmic zBuffer:\n\
+		// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
+		// float Fcoef = 2.0 / log2(far + 1.0);\n\
+		// gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;\n\
+		// flogz = 1.0 + gl_Position.w;\n\
+		//---------------------------------------------------------------------------------\n\
+		flogz = 1.0 + gl_Position.w;\n\
+		Fcoef_half = 0.5 * uFCoef_logDepth;\n\
+	}\n\
 }\n\
 ";
 ShaderSource.waterSimTerrainRenderFS = "//#version 300 es\n\
@@ -11940,11 +12824,8 @@ ShaderSource.waterSimTerrainRenderFS = "//#version 300 es\n\
 #extension GL_EXT_draw_buffers : require\n\
 #endif\n\
 \n\
-uniform vec2 u_PlanePos; // Our location in the virtual world displayed by the plane\n\
-\n\
-//in vec3 fs_Pos;\n\
-//in vec4 fs_Nor;\n\
-//in vec4 fs_Col;\n\
+uniform sampler2D diffuseTex;\n\
+uniform sampler2D depthTex; \n\
 \n\
 uniform sampler2D hightmap;\n\
 uniform sampler2D terrainmap;\n\
@@ -11953,10 +12834,12 @@ uniform sampler2D sceneDepth;\n\
 uniform sampler2D colorReflection;\n\
 uniform sampler2D sedimap;\n\
 \n\
-//in float fs_Sine;\n\
-//in vec2 fs_Uv;\n\
-\n\
-uniform vec3 u_Eye, u_Ref, u_Up;\n\
+uniform float near;\n\
+uniform float far;\n\
+uniform mat4 projectionMatrixInv;\n\
+uniform bool bUseLogarithmicDepth;\n\
+varying float flogz;\n\
+varying float Fcoef_half;\n\
 \n\
 \n\
 uniform int u_TerrainType;\n\
@@ -11997,6 +12880,69 @@ float linearDepth(float depthSample)\n\
     return zLinear;\n\
 }\n\
 */\n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+}\n\
+\n\
+float getDepth(vec2 coord)\n\
+{\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		float linearDepth = unpackDepth(texture2D(depthTex, coord.xy));\n\
+		// gl_FragDepthEXT = linearDepth = log2(flogz) * Fcoef_half;\n\
+		// flogz = 1.0 + gl_Position.z;\n\
+\n\
+		float flogzAux = pow(2.0, linearDepth/Fcoef_half);\n\
+		float z = flogzAux - 1.0;\n\
+		linearDepth = z/(far);\n\
+		return linearDepth;\n\
+	}\n\
+	else{\n\
+		return unpackDepth(texture2D(depthTex, coord.xy));\n\
+	}\n\
+}\n\
+\n\
+/*\n\
+vec3 reconstructPosition(vec2 texCoord, float depth)\n\
+{\n\
+    // https://wickedengine.net/2019/09/22/improved-normal-reconstruction-from-depth/\n\
+    float x = texCoord.x * 2.0 - 1.0;\n\
+    //float y = (1.0 - texCoord.y) * 2.0 - 1.0;\n\
+    float y = (texCoord.y) * 2.0 - 1.0;\n\
+    float z = (1.0 - depth) * 2.0 - 1.0;\n\
+    vec4 pos_NDC = vec4(x, y, z, 1.0);\n\
+    vec4 pos_CC = projectionMatrixInv * pos_NDC;\n\
+    return pos_CC.xyz / pos_CC.w;\n\
+}\n\
+\n\
+vec3 normal_from_depth(float depth, vec2 texCoord) {\n\
+    // http://theorangeduck.com/page/pure-depth-ssao\n\
+    float pixelSizeX = 1.0/u_screenSize.x;\n\
+    float pixelSizeY = 1.0/u_screenSize.y;\n\
+\n\
+    vec2 offset1 = vec2(0.0,pixelSizeY);\n\
+    vec2 offset2 = vec2(pixelSizeX,0.0);\n\
+\n\
+	float depthA = 0.0;\n\
+	float depthB = 0.0;\n\
+	for(float i=0.0; i<1.0; i++)\n\
+	{\n\
+		depthA += getDepth(texCoord + offset1*(1.0+i));\n\
+		depthB += getDepth(texCoord + offset2*(1.0+i));\n\
+	}\n\
+\n\
+	vec3 posA = reconstructPosition(texCoord + offset1*1.0, depthA/1.0);\n\
+	vec3 posB = reconstructPosition(texCoord + offset2*1.0, depthB/1.0);\n\
+\n\
+    vec3 pos0 = reconstructPosition(texCoord, depth);\n\
+    vec3 normal = cross(posA - pos0, posB - pos0);\n\
+    normal.z = -normal.z;\n\
+\n\
+    return normalize(normal);\n\
+}\n\
+*/\n\
 void main()\n\
 {\n\
     vec3 camDir = normalize(vec3(-gl_FragCoord.x / u_screenSize.x, -gl_FragCoord.y / u_screenSize.y, 1.0));\n\
@@ -12009,12 +12955,15 @@ void main()\n\
     //{\n\
     //    finalCol4 = vec4(1.0, 0.0, 0.0, 1.0);\n\
     //}\n\
-    gl_FragData[0] = finalCol4;  // anything.\n\
+\n\
+    // read difusseTex.\n\
+    vec4 difusseColor = texture2D(diffuseTex, vec2(vTexCoord.x, 1.0 - vTexCoord.y));\n\
+    gl_FragData[0] = difusseColor;  // anything.\n\
 \n\
     #ifdef USE_MULTI_RENDER_TARGET\n\
         gl_FragData[1] = vec4(1.0); // depth\n\
         gl_FragData[2] = vec4(1.0); // normal\n\
-        gl_FragData[3] = finalCol4; // albedo\n\
+        gl_FragData[3] = difusseColor; // albedo\n\
         gl_FragData[4] = vec4(1.0); // selection color\n\
     #endif\n\
     /*\n\
@@ -12101,7 +13050,8 @@ uniform float u_SimRes;\n\
 \n\
 uniform vec2 u_heightMap_MinMax;\n\
 \n\
-\n\
+varying float flogz;\n\
+varying float Fcoef_half;\n\
 \n\
 varying vec4 vColorAuxTest;\n\
 varying vec2 vTexCoord;\n\
@@ -12137,6 +13087,18 @@ void main()\n\
 	vec4 finalPos4 =  vec4(pos4.x + upDir.x * height, pos4.y + upDir.y * height, pos4.z + upDir.z * height, 1.0);\n\
 \n\
 	gl_Position = ModelViewProjectionMatrixRelToEye * finalPos4;\n\
+\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		// logarithmic zBuffer:\n\
+		// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
+		// float Fcoef = 2.0 / log2(far + 1.0);\n\
+		// gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;\n\
+		// flogz = 1.0 + gl_Position.w;\n\
+		//---------------------------------------------------------------------------------\n\
+		flogz = 1.0 + gl_Position.w;\n\
+		Fcoef_half = 0.5 * uFCoef_logDepth;\n\
+	}\n\
 }\n\
 ";
 ShaderSource.wgs84_volumFS = "precision mediump float;\n\
