@@ -33,7 +33,13 @@ var Water = function(waterManager, options)
 	this.waterVelocityTexA;
 	this.waterVelocityTexB;
 
+	// simulation parameters.******************************************
 	this.terrainMinMaxHeights = new Float32Array([10.0, 200.0]);
+	this.waterMaxHeight = 20.0; // 2meters.
+	this.waterMaxFlux = 10.0; // volume/cell
+	//this.waterMaxFlux = 30.0;
+	this.simulationTimeStep = 0.053; // 
+	//this.simulationTimeStep = 0.1; // 
 
 	// The water renderable surface.
 	this.surface; // tile size surface, with 512 x 512 points (as DEM texture size).
@@ -112,7 +118,9 @@ Water.prototype.prepareTextures = function ()
 	{
 		var magoManager = this.waterManager.magoManager;
 		var gl = magoManager.getGl();
-		var texturePath = '/images/en/waterSourceTexTest2.png';
+		var texturePath = '/images/en/waterSourceTexTestlow.png';
+		//var texturePath = '/images/en/waterSourceTexTest2.png';
+		//var texturePath = '/images/en/waterSourceTexTest_rain.png';
 
 		ReaderWriter.loadImage(gl, texturePath, this.waterSourceTex);
 		return false;
@@ -249,6 +257,7 @@ Water.prototype.doSimulationSteps = function (magoManager)
 	
 	Water._swapTextures(this.waterHeightTexA, this.waterHeightTexB);
 		
+	
 	//----------------------------------------------------------------------------------------------------------------------------------
 	// 2- Calculate the fluxMap by terrain dem & current waterHeight.*******************************************************************
 	fbo.bind();
@@ -267,8 +276,11 @@ Water.prototype.doSimulationSteps = function (magoManager)
 
 	gl.uniform1f(shader.u_SimRes_loc, 512);
 	gl.uniform1f(shader.u_PipeLen_loc, 1.0);
-	gl.uniform1f(shader.u_timestep_loc, 0.1);
+	gl.uniform1f(shader.u_timestep_loc, this.simulationTimeStep);
 	gl.uniform1f(shader.u_PipeArea_loc, 0.8);
+	gl.uniform2fv(shader.u_heightMap_MinMax_loc, this.terrainMinMaxHeights);
+	gl.uniform1f(shader.u_waterMaxHeigh_loc, this.waterMaxHeight);
+	gl.uniform1f(shader.u_waterMaxFlux_loc, this.waterMaxFlux);
 	
 	gl.activeTexture(gl.TEXTURE0); // water height tex.
     gl.bindTexture(gl.TEXTURE_2D, this.waterHeightTexB.texId);
@@ -311,8 +323,10 @@ Water.prototype.doSimulationSteps = function (magoManager)
 
 	gl.uniform1f(shader.u_SimRes_loc, 512);
 	gl.uniform1f(shader.u_PipeLen_loc, 1.0);
-	gl.uniform1f(shader.u_timestep_loc, 0.1);
+	gl.uniform1f(shader.u_timestep_loc, this.simulationTimeStep);
 	gl.uniform1f(shader.u_PipeArea_loc, 0.8);
+	gl.uniform1f(shader.u_waterMaxHeigh_loc, this.waterMaxHeight);
+	gl.uniform1f(shader.u_waterMaxFlux_loc, this.waterMaxFlux);
 	
 	gl.activeTexture(gl.TEXTURE0); // water height tex.
 	gl.bindTexture(gl.TEXTURE_2D, this.waterHeightTexB.texId);
@@ -332,8 +346,12 @@ Water.prototype.doSimulationSteps = function (magoManager)
 	// now, swap waterHeightTextures:
 	Water._swapTextures(this.waterHeightTexA, this.waterHeightTexB);
 	Water._swapTextures(this.waterVelocityTexA, this.waterVelocityTexB);
+
+	//-----------------------------------------------------------------------------------------------------------------------------------------------------
+	// 4) calculate sediment, waterHeight & velocity by terrain & water heights map & velocity.************************************************************
+	shader = magoManager.postFxShadersManager.getShader("waterCalculateSediment");
 		
-	//--------------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------------------------------------------------------------------------------
 	// Must return to current frameBuffer. TODO:
 	var hola = 0;
 
@@ -442,6 +460,7 @@ Water.prototype.renderWaterDepth = function (shader, magoManager)
 	gl.uniform3fv(shader.buildingPosHIGH_loc, this.terrainPositionHIGH);
 	gl.uniform3fv(shader.buildingPosLOW_loc, this.terrainPositionLOW);
 	gl.uniform2fv(shader.u_heightMap_MinMax_loc, this.terrainMinMaxHeights);
+	gl.uniform1f(shader.u_waterMaxHeigh_loc, this.waterMaxHeight);
 
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, this.waterHeightTexA.texId);
@@ -632,6 +651,8 @@ Water.prototype.overWriteDEMWithObjects = function (shader, magoManager)
 		magoManager.postFxShadersManager.useProgram(shader);
 		shader.bindUniformGenerals();
 
+		gl.uniform1i(shader.u_textureFlipYAxis_loc, true);
+
 		gl.activeTexture(gl.TEXTURE0);
 		gl.bindTexture(gl.TEXTURE_2D, this.dem_texture.texId);  // original.***
 
@@ -716,7 +737,8 @@ Water.prototype.renderWater = function (shader, magoManager)
 	gl.uniform3fv(shader.buildingPosLOW_loc, this.terrainPositionLOW);
 	gl.uniform2fv(shader.u_heightMap_MinMax_loc, this.terrainMinMaxHeights);
 	gl.uniform2fv(shader.u_screenSize_loc, [sceneState.drawingBufferWidth[0], sceneState.drawingBufferHeight[0]]);
-	gl.uniform1i(shader.uWaterType_loc, 1); // 0 = waterColor., 1 = velocity.
+	gl.uniform1i(shader.uWaterType_loc, 0); // 0 = waterColor., 1 = water-flux, 2 = water-velocity
+	gl.uniform1f(shader.u_waterMaxHeigh_loc, this.waterMaxHeight);
 
 	var projectionMatrixInv = sceneState.getProjectionMatrixInv();
   	gl.uniformMatrix4fv(shader.projectionMatrixInv_loc, false, projectionMatrixInv._floatArrays);
@@ -731,7 +753,7 @@ Water.prototype.renderWater = function (shader, magoManager)
 	gl.bindTexture(gl.TEXTURE_2D, this.dem_texture.texId);
 
 	gl.activeTexture(gl.TEXTURE3);
-	gl.bindTexture(gl.TEXTURE_2D, this.waterVelocityTexA.texId);
+	gl.bindTexture(gl.TEXTURE_2D, this.waterFluxTexA.texId);// waterFluxTexA, waterVelocityTexA
 
 	var vbo_vicky = this.vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.
 	var vertices_count = vbo_vicky.vertexCount;

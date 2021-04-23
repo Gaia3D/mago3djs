@@ -154,6 +154,11 @@ vec3 getViewRay(vec2 tc, in float relFar)
     return ray;                      
 }
 
+vec2 decodeVelocity(in vec2 encodedVel)
+{
+	return vec2(encodedVel.xy * 2.0 - 1.0);
+}
+
 void main()
 {
     if(vWaterHeight < 0.0001)
@@ -191,12 +196,27 @@ void main()
 
     if(uWaterType == 1)
     {
-        //vec4 velocity4 = texture2D(waterTex, vec2(vTexCoord.x, 1.0 - vTexCoord.y));
-        //float velocity = length(velocity4.xy);
-        //finalCol4.r = velocity;
-        //finalCol4.b = 1.0 - velocity;
-        //finalCol4 = vec4(velocity4.r, velocity4.g, 0.0, alpha);
-        //finalCol4 = vec4(velocity, velocity, velocity, alpha);
+        alpha = 1.0;
+
+
+        // flux case:
+        vec4 flux = texture2D(waterTex, vec2(vTexCoord.x, vTexCoord.y));
+        float fluxLength = length(flux)/sqrt(4.0);
+        float value = fluxLength;
+        finalCol4 = vec4(value, value, value, alpha);
+        
+    }
+    else if(uWaterType == 2)
+    {
+        alpha = 1.0;
+
+        // velocity case: now, decode velocity:
+        vec4 velocity4 = texture2D(waterTex, vec2(vTexCoord.x, vTexCoord.y));
+        vec2 decodedVelocity = decodeVelocity(velocity4.xy);
+        float velocity = length(decodedVelocity.xy)/sqrt(2.0);
+        float value = velocity;
+        finalCol4 = vec4(value, value, value, alpha);
+
     }
 
     //*************************************************************************************************************

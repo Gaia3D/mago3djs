@@ -484,7 +484,7 @@ void main()
 
 	//gl_Position = ModelViewProjectionMatrixRelToEye * pos4;
 	gl_Position = modelViewProjectionMatrix * vec4(geoCoord, 1.0);
-	gl_Position.y *= -1.0;
+
 	vDepth = gl_Position.z * 0.5 + 0.5;
 	vTexCoord = texCoord;
 	vColor4 = vec4(1.0, 0.0, 0.0, 1.0);

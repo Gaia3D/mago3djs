@@ -25,10 +25,10 @@ varying vec2 v_tex_pos;
 void main()
 {
     // 1rst, take the water source.
-    vec2 texCoord = vec2(v_tex_pos.x, 1.0 - v_tex_pos.y);
-    texCoord = v_tex_pos;
-    vec4 currWaterHeight = texture2D(currWaterHeightTex, texCoord);
-    vec4 waterSource = texture2D(waterSourceTex, texCoord);
+    //vec2 texCoord = vec2(v_tex_pos.x, 1.0 - v_tex_pos.y);
+    //texCoord = v_tex_pos;
+    vec4 currWaterHeight = texture2D(currWaterHeightTex, vec2(v_tex_pos.x, v_tex_pos.y));
+    vec4 waterSource = texture2D(waterSourceTex, vec2(v_tex_pos.x, 1.0 - v_tex_pos.y));
 
     if(waterSource.r < currWaterHeight.r)
     {

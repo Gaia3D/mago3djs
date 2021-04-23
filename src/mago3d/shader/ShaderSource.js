@@ -11218,39 +11218,34 @@ uniform float u_SimRes;\n\
 uniform float u_PipeLen;\n\
 uniform float u_timestep;\n\
 uniform float u_PipeArea;\n\
+uniform float u_waterMaxHeigh;\n\
+uniform float u_waterMaxFlux;\n\
 \n\
 uniform vec2 u_heightMap_MinMax;\n\
 \n\
 void main()\n\
 {\n\
-    //vec2 curuv = vec2(v_tex_pos.x, 1.0 - v_tex_pos.y);\n\
     vec2 curuv = vec2(v_tex_pos.x, v_tex_pos.y);\n\
+    vec2 curuvTerrain = vec2(v_tex_pos.x, v_tex_pos.y);\n\
     float div = 1.0/u_SimRes;\n\
     float g = 0.80;\n\
     float pipelen = u_PipeLen;\n\
 \n\
     // read terrain heights.\n\
-    vec4 topT = texture2D(terrainHeightTex, curuv+vec2(0.0,div));\n\
-    vec4 rightT = texture2D(terrainHeightTex, curuv+vec2(div,0.0));\n\
-    vec4 bottomT = texture2D(terrainHeightTex, curuv+vec2(0.0,-div));\n\
-    vec4 leftT = texture2D(terrainHeightTex, curuv+vec2(-div,0.0));\n\
-    vec4 curT = texture2D(terrainHeightTex, curuv);\n\
+    vec4 topT = texture2D(terrainHeightTex, curuvTerrain + vec2(0.0,div));\n\
+    vec4 rightT = texture2D(terrainHeightTex, curuvTerrain + vec2(div,0.0));\n\
+    vec4 bottomT = texture2D(terrainHeightTex, curuvTerrain + vec2(0.0,-div));\n\
+    vec4 leftT = texture2D(terrainHeightTex, curuvTerrain + vec2(-div,0.0));\n\
+    vec4 curT = texture2D(terrainHeightTex, curuvTerrain);\n\
 \n\
-    float heightScale = 30.0; \n\
-    topT *= heightScale;\n\
-    rightT *= heightScale;\n\
-    bottomT *= heightScale;\n\
-    leftT *= heightScale;\n\
-    curT *= heightScale;\n\
-\n\
-    //topT = u_heightMap_MinMax.x + topT * u_heightMap_MinMax.y;\n\
-    //rightT = u_heightMap_MinMax.x + rightT * u_heightMap_MinMax.y;\n\
-    //bottomT = u_heightMap_MinMax.x + bottomT * u_heightMap_MinMax.y;\n\
-    //leftT = u_heightMap_MinMax.x + leftT * u_heightMap_MinMax.y;\n\
-    //curT = u_heightMap_MinMax.x + curT * u_heightMap_MinMax.y;\n\
+    topT = u_heightMap_MinMax.x + topT * u_heightMap_MinMax.y;\n\
+    rightT = u_heightMap_MinMax.x + rightT * u_heightMap_MinMax.y;\n\
+    bottomT = u_heightMap_MinMax.x + bottomT * u_heightMap_MinMax.y;\n\
+    leftT = u_heightMap_MinMax.x + leftT * u_heightMap_MinMax.y;\n\
+    curT = u_heightMap_MinMax.x + curT * u_heightMap_MinMax.y;\n\
 \n\
     // read water heights.\n\
-    float waterScale = 5.0;\n\
+    float waterScale = u_waterMaxHeigh; \n\
     vec4 topW = texture2D(waterHeightTex, curuv + vec2(0.0, div)) * waterScale;\n\
     vec4 rightW = texture2D(waterHeightTex, curuv + vec2(div, 0.0)) * waterScale;\n\
     vec4 bottomW = texture2D(waterHeightTex, curuv + vec2(0.0, -div)) * waterScale;\n\
@@ -11258,7 +11253,7 @@ void main()\n\
     vec4 curW = texture2D(waterHeightTex, curuv) * waterScale;\n\
 \n\
     // read flux.\n\
-    vec4 curFlux = texture2D(currWaterFluxTex, curuv);\n\
+    vec4 curFlux = texture2D(currWaterFluxTex, curuv) * u_waterMaxFlux;\n\
 \n\
     // calculate outputs.\n\
     float curTotalH = curT.r + curW.r;\n\
@@ -11268,15 +11263,19 @@ void main()\n\
     float HBottomOut = curTotalH - (bottomT.r + bottomW.r);\n\
     float HLeftOut = curTotalH - (leftT.r + leftW.r);\n\
 \n\
+    // calculate the new flux.\n\
+    float fK = u_timestep * g * u_PipeArea / pipelen;\n\
+    vec4 newFlux = vec4(HTopOut, HRightOut, HBottomOut, HLeftOut) * fK;\n\
+\n\
     // outFlux.\n\
-    float ftopout = max(0.0, curFlux.x + (u_timestep * g * u_PipeArea * HTopOut) / pipelen);\n\
-    float frightout = max(0.0, curFlux.y + (u_timestep * g * u_PipeArea * HRightOut) / pipelen);\n\
-    float fbottomout = max(0.0, curFlux.z + (u_timestep * g * u_PipeArea * HBottomOut) / pipelen);\n\
-    float fleftout = max(0.0, curFlux.w + (u_timestep * g * u_PipeArea * HLeftOut) / pipelen);\n\
+    float ftopout = max(0.0, curFlux.x + newFlux.x);\n\
+    float frightout = max(0.0, curFlux.y + newFlux.y);\n\
+    float fbottomout = max(0.0, curFlux.z + newFlux.z);\n\
+    float fleftout = max(0.0, curFlux.w + newFlux.w);\n\
 \n\
 \n\
     float damping = 0.9999;\n\
-    //damping = 1.0;\n\
+    damping = 1.0;\n\
     float k = min(1.0,((curW.r ) * u_PipeLen * u_PipeLen) / (u_timestep * (ftopout + frightout + fbottomout + fleftout))) * damping;\n\
     //k = 1.0;\n\
     //rescale outflow readFlux so that outflow don't exceed current water volume\n\
@@ -11291,17 +11290,14 @@ void main()\n\
     if(curuv.y <= div) ftopout = 0.0;\n\
     if(curuv.y >= 1.0 - 2.0 * div) fbottomout = 0.0;\n\
 \n\
-\n\
     if(curuv.x <= div || (curuv.x >= 1.0 - 2.0 * div) || (curuv.y <= div) || (curuv.y >= 1.0 - 2.0 * div) ){\n\
         ftopout = 0.0;\n\
         frightout = 0.0;\n\
         fbottomout = 0.0;\n\
         fleftout = 0.0;\n\
     }\n\
-    \n\
 \n\
-\n\
-    vec4 writeFlux = vec4(ftopout, frightout, fbottomout, fleftout);\n\
+    vec4 writeFlux = vec4(ftopout, frightout, fbottomout, fleftout) / u_waterMaxFlux;\n\
 \n\
     gl_FragData[0] = writeFlux;  // water flux.\n\
     //gl_FragData[0] = vec4(HTopOut, HRightOut, HBottomOut, HLeftOut); // test debug:\n\
@@ -11342,10 +11338,10 @@ varying vec2 v_tex_pos;\n\
 void main()\n\
 {\n\
     // 1rst, take the water source.\n\
-    vec2 texCoord = vec2(v_tex_pos.x, 1.0 - v_tex_pos.y);\n\
-    texCoord = v_tex_pos;\n\
-    vec4 currWaterHeight = texture2D(currWaterHeightTex, texCoord);\n\
-    vec4 waterSource = texture2D(waterSourceTex, texCoord);\n\
+    //vec2 texCoord = vec2(v_tex_pos.x, 1.0 - v_tex_pos.y);\n\
+    //texCoord = v_tex_pos;\n\
+    vec4 currWaterHeight = texture2D(currWaterHeightTex, vec2(v_tex_pos.x, v_tex_pos.y));\n\
+    vec4 waterSource = texture2D(waterSourceTex, vec2(v_tex_pos.x, 1.0 - v_tex_pos.y));\n\
 \n\
     if(waterSource.r < currWaterHeight.r)\n\
     {\n\
@@ -11360,6 +11356,72 @@ void main()\n\
         gl_FragData[3] = vec4(1.0, 0.0, 0.5, 1.0); // albedo\n\
         gl_FragData[4] = vec4(1.0, 0.0, 0.5, 1.0); // selection color\n\
     #endif\n\
+}";
+ShaderSource.waterCalculateSedimentFS = "#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+uniform sampler2D waterHeightTex;\n\
+uniform sampler2D terrainHeightTex;\n\
+uniform sampler2D currWaterFluxTex;\n\
+uniform sampler2D sedimentHeightTex;\n\
+\n\
+varying vec2 v_tex_pos; // texCoords.\n\
+#define PI 3.1415926\n\
+\n\
+uniform float u_SimRes;\n\
+uniform float u_PipeLen;\n\
+uniform float u_Ks;\n\
+uniform float u_Kc;\n\
+uniform float u_Kd;\n\
+uniform float u_timestep;\n\
+\n\
+uniform float u_PipeArea;\n\
+uniform vec2 u_heightMap_MinMax;\n\
+uniform float u_waterMaxHeigh;\n\
+\n\
+/*\n\
+vec3 calnor(vec2 uv){\n\
+  float eps = 1.f/u_SimRes;\n\
+  vec4 cur = texture(readTerrain,uv);\n\
+  vec4 r = texture(readTerrain,uv+vec2(eps,0.f));\n\
+  vec4 t = texture(readTerrain,uv+vec2(0.f,eps));\n\
+  vec4 b = texture(readTerrain,uv+vec2(0.f,-eps));\n\
+  vec4 l = texture(readTerrain,uv+vec2(-eps,0.f));\n\
+\n\
+  vec3 nor = vec3(l.x - r.x, 2.0, t.x - b.x);\n\
+  nor = normalize(nor);\n\
+  return nor;\n\
+}\n\
+*/\n\
+\n\
+void main()\n\
+{\n\
+    vec2 curuv = vec2(v_tex_pos.x, v_tex_pos.y);\n\
+    curuv = v_tex_pos;\n\
+\n\
+\n\
+\n\
+    gl_FragData[0] = vec4(0.0);  // water flux.\n\
+\n\
+\n\
+    #ifdef USE_MULTI_RENDER_TARGET\n\
+        gl_FragData[1] = vec4(0.0); // velocity\n\
+        gl_FragData[2] = vec4(0.0); // \n\
+        gl_FragData[3] = vec4(0.0); // \n\
+        gl_FragData[4] = vec4(0.0); // \n\
+    #endif\n\
+\n\
 }";
 ShaderSource.waterCalculateVelocityFS = "#ifdef GL_ES\n\
     precision highp float;\n\
@@ -11387,21 +11449,33 @@ uniform float u_PipeLen;\n\
 uniform float u_timestep;\n\
 uniform float u_PipeArea;\n\
 uniform vec2 u_heightMap_MinMax;\n\
+uniform float u_waterMaxHeigh;\n\
+uniform float u_waterMaxFlux;\n\
+\n\
+vec2 encodeVelocity(in vec2 vel)\n\
+{\n\
+	return vel*0.5 + 0.5;\n\
+}\n\
+\n\
+vec2 decodeVelocity(in vec2 encodedVel)\n\
+{\n\
+	return vec2(encodedVel.xy * 2.0 - 1.0);\n\
+}\n\
 \n\
 void main()\n\
 {\n\
-    vec2 curuv = vec2(v_tex_pos.x, 1.0 - v_tex_pos.y);\n\
+    vec2 curuv = vec2(v_tex_pos.x, v_tex_pos.y);\n\
     curuv = v_tex_pos;\n\
     float div = 1.0/u_SimRes;\n\
 \n\
-    vec4 topflux = texture2D(currWaterFluxTex, curuv + vec2(0.0, div));\n\
-    vec4 rightflux = texture2D(currWaterFluxTex, curuv + vec2(div, 0.0));\n\
-    vec4 bottomflux = texture2D(currWaterFluxTex, curuv + vec2(0.0, -div));\n\
-    vec4 leftflux = texture2D(currWaterFluxTex, curuv + vec2(-div, 0.0));\n\
+    vec4 topflux = texture2D(currWaterFluxTex, curuv + vec2(0.0, div)) * u_waterMaxFlux;\n\
+    vec4 rightflux = texture2D(currWaterFluxTex, curuv + vec2(div, 0.0)) * u_waterMaxFlux;\n\
+    vec4 bottomflux = texture2D(currWaterFluxTex, curuv + vec2(0.0, -div)) * u_waterMaxFlux;\n\
+    vec4 leftflux = texture2D(currWaterFluxTex, curuv + vec2(-div, 0.0)) * u_waterMaxFlux;\n\
 \n\
-    vec4 curflux = texture2D(currWaterFluxTex, curuv);\n\
-    vec4 curT = texture2D(terrainHeightTex, curuv);\n\
-    vec4 curW = texture2D(waterHeightTex, curuv);\n\
+    vec4 curflux = texture2D(currWaterFluxTex, curuv) * u_waterMaxFlux;\n\
+    //vec4 curT = texture2D(terrainHeightTex, vec2(v_tex_pos.x, v_tex_pos.y));\n\
+    vec4 curW = texture2D(waterHeightTex, vec2(v_tex_pos.x, v_tex_pos.y)) * u_waterMaxHeigh;\n\
 \n\
     \n\
     //out flow flux\n\
@@ -11421,7 +11495,8 @@ void main()\n\
     //---------------------------------------------------------------------------------\n\
 \n\
     //float d1 = cur.y + curs.x; // original.\n\
-    float d1 = curW.r;\n\
+    float currWaterHeight = curW.r;\n\
+    float d1 = currWaterHeight;\n\
 \n\
     float d2 = d1 + deltavol;\n\
     float da = (d1 + d2)/2.0;\n\
@@ -11435,10 +11510,10 @@ void main()\n\
         veloci = veloci/(da * u_PipeLen);\n\
         }\n\
 \n\
-    if(curuv.x <= div) {deltavol = 0.0; veloci = vec2(0.0);}\n\
-    if(curuv.x >= 1.0 - 2.0 *div) {deltavol = 0.0; veloci = vec2(0.0);}\n\
-    if(curuv.y <= div) {deltavol = 0.0; veloci = vec2(0.0);}\n\
-    if(curuv.y >= 1.0 - 2.0 * div) {deltavol = 0.0; veloci = vec2(0.0);}\n\
+    if(curuv.x <= div) { deltavol = 0.0; veloci = vec2(0.0); }\n\
+    if(curuv.x >= 1.0 - 2.0 * div) { deltavol = 0.0; veloci = vec2(0.0); }\n\
+    if(curuv.y <= div) { deltavol = 0.0; veloci = vec2(0.0); }\n\
+    if(curuv.y >= 1.0 - 2.0 * div) { deltavol = 0.0; veloci = vec2(0.0); }\n\
 \n\
     //  float absx = abs(veloci.x);\n\
     //  float absy = abs(veloci.y);\n\
@@ -11452,12 +11527,14 @@ void main()\n\
     //    veloci /= 20.0;\n\
     //  }\n\
 \n\
-\n\
-    vec4 writeVel = vec4(veloci, 0.0, 1.0);\n\
+    vec2 encodedVelocity = encodeVelocity(veloci);\n\
+    vec4 writeVel = vec4(encodedVelocity, 0.0, 1.0);\n\
     //vec4 writeWaterHeight = vec4(cur.x,max(cur.y+deltavol, 0.0),cur.z,cur.w); // original.***\n\
 \n\
-    float waterHeight = max(curW.r + deltavol, 0.0);\n\
-    vec4 writeWaterHeight = vec4(waterHeight, waterHeight, waterHeight, waterHeight);\n\
+    float waterHeight = max(curW.r / u_waterMaxHeigh+ deltavol, 0.0); // original.***\n\
+    //float waterHeight = max(currWaterHeight + deltavol, 0.0); // test.***\n\
+    //waterHeight /= u_waterMaxHeigh; // test.***\n\
+    vec4 writeWaterHeight = vec4(waterHeight);\n\
 \n\
 \n\
     gl_FragData[0] = writeWaterHeight;  // water flux.\n\
@@ -11488,11 +11565,21 @@ ShaderSource.waterCopyFS = "//#version 300 es\n\
 #endif\n\
 \n\
 uniform sampler2D texToCopy;\n\
+uniform bool u_textureFlipYAxis;\n\
 varying vec2 v_tex_pos;\n\
 \n\
 void main()\n\
 {\n\
-    vec4 finalCol4 = texture2D(texToCopy, vec2(v_tex_pos.x, v_tex_pos.y));\n\
+    vec4 finalCol4;\n\
+    if(u_textureFlipYAxis)\n\
+    {\n\
+        finalCol4 = texture2D(texToCopy, vec2(v_tex_pos.x, 1.0 - v_tex_pos.y));\n\
+    }\n\
+    else\n\
+    {\n\
+        finalCol4 = texture2D(texToCopy, vec2(v_tex_pos.x, v_tex_pos.y));\n\
+    }\n\
+    \n\
     gl_FragData[0] = finalCol4;  // anything.\n\
 \n\
     #ifdef USE_MULTI_RENDER_TARGET\n\
@@ -11702,7 +11789,7 @@ uniform sampler2D terrainmap;\n\
 uniform float u_SimRes;\n\
 \n\
 uniform vec2 u_heightMap_MinMax;\n\
-uniform vec2 u_waterHeightMap_MinMax;\n\
+uniform float u_waterMaxHeigh;\n\
 \n\
 \n\
 varying vec4 vColorAuxTest;\n\
@@ -11712,7 +11799,7 @@ varying float depth;\n\
 void main()\n\
 {\n\
 	// read the altitude from hightmap.\n\
-	vec4 heightVec4 = texture2D(hightmap, vec2(texCoord.x, 1.0 - texCoord.y));\n\
+	vec4 heightVec4 = texture2D(hightmap, vec2(texCoord.x, texCoord.y));\n\
 	vec4 terrainHeight4 = texture2D(terrainmap, vec2(texCoord.x, 1.0 - texCoord.y));\n\
 	float r = heightVec4.r;\n\
 	float g = heightVec4.g;\n\
@@ -11721,7 +11808,7 @@ void main()\n\
 	float terrainH = terrainHeight4.r;\n\
 \n\
 	//float height = u_heightMap_MinMax.x + decodedHeight * u_heightMap_MinMax.y;\n\
-	float waterHeight = decodedHeight * 40.0;\n\
+	float waterHeight = decodedHeight * u_waterMaxHeigh;\n\
 	float terrainHeight = u_heightMap_MinMax.x + terrainH * u_heightMap_MinMax.y;\n\
 	float height = terrainHeight + waterHeight;\n\
 \n\
@@ -12299,7 +12386,7 @@ void main()\n\
 \n\
 	//gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 	gl_Position = modelViewProjectionMatrix * vec4(geoCoord, 1.0);\n\
-	gl_Position.y *= -1.0;\n\
+\n\
 	vDepth = gl_Position.z * 0.5 + 0.5;\n\
 	vTexCoord = texCoord;\n\
 	vColor4 = vec4(1.0, 0.0, 0.0, 1.0);\n\
@@ -12474,6 +12561,11 @@ vec3 getViewRay(vec2 tc, in float relFar)\n\
     return ray;                      \n\
 }\n\
 \n\
+vec2 decodeVelocity(in vec2 encodedVel)\n\
+{\n\
+	return vec2(encodedVel.xy * 2.0 - 1.0);\n\
+}\n\
+\n\
 void main()\n\
 {\n\
     if(vWaterHeight < 0.0001)\n\
@@ -12511,12 +12603,27 @@ void main()\n\
 \n\
     if(uWaterType == 1)\n\
     {\n\
-        //vec4 velocity4 = texture2D(waterTex, vec2(vTexCoord.x, 1.0 - vTexCoord.y));\n\
-        //float velocity = length(velocity4.xy);\n\
-        //finalCol4.r = velocity;\n\
-        //finalCol4.b = 1.0 - velocity;\n\
-        //finalCol4 = vec4(velocity4.r, velocity4.g, 0.0, alpha);\n\
-        //finalCol4 = vec4(velocity, velocity, velocity, alpha);\n\
+        alpha = 1.0;\n\
+\n\
+\n\
+        // flux case:\n\
+        vec4 flux = texture2D(waterTex, vec2(vTexCoord.x, vTexCoord.y));\n\
+        float fluxLength = length(flux)/sqrt(4.0);\n\
+        float value = fluxLength;\n\
+        finalCol4 = vec4(value, value, value, alpha);\n\
+        \n\
+    }\n\
+    else if(uWaterType == 2)\n\
+    {\n\
+        alpha = 1.0;\n\
+\n\
+        // velocity case: now, decode velocity:\n\
+        vec4 velocity4 = texture2D(waterTex, vec2(vTexCoord.x, vTexCoord.y));\n\
+        vec2 decodedVelocity = decodeVelocity(velocity4.xy);\n\
+        float velocity = length(decodedVelocity.xy)/sqrt(2.0);\n\
+        float value = velocity;\n\
+        finalCol4 = vec4(value, value, value, alpha);\n\
+\n\
     }\n\
 \n\
     //*************************************************************************************************************\n\
@@ -12647,7 +12754,8 @@ uniform sampler2D hightmap;\n\
 uniform sampler2D terrainmap;\n\
 uniform float u_SimRes;\n\
 \n\
-uniform vec2 u_heightMap_MinMax;\n\
+uniform vec2 u_heightMap_MinMax; // terrain.\n\
+uniform float u_waterMaxHeigh;\n\
 \n\
 uniform sampler2D depthTex;\n\
 \n\
@@ -12743,7 +12851,7 @@ void main()\n\
 {\n\
 	// read the altitude from hightmap.\n\
 	vTexCoord = texCoord;\n\
-	vec4 heightVec4 = texture2D(hightmap, vec2(texCoord.x, 1.0 - texCoord.y));\n\
+	vec4 heightVec4 = texture2D(hightmap, vec2(texCoord.x, texCoord.y));\n\
 	vec4 terrainHeight4 = texture2D(terrainmap, vec2(texCoord.x, 1.0 - texCoord.y));\n\
 	float r = heightVec4.r;\n\
 	float g = heightVec4.g;\n\
@@ -12752,7 +12860,7 @@ void main()\n\
 	float terrainH = terrainHeight4.r;\n\
 \n\
 	//float height = u_heightMap_MinMax.x + decodedHeight * u_heightMap_MinMax.y;\n\
-	float waterHeight = decodedHeight * 40.0;\n\
+	float waterHeight = decodedHeight * u_waterMaxHeigh;\n\
 	float terrainHeight = u_heightMap_MinMax.x + terrainH * u_heightMap_MinMax.y;\n\
 	float height = terrainHeight + waterHeight;\n\
 \n\

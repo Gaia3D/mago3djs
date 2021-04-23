@@ -24,21 +24,33 @@ uniform float u_PipeLen;
 uniform float u_timestep;
 uniform float u_PipeArea;
 uniform vec2 u_heightMap_MinMax;
+uniform float u_waterMaxHeigh;
+uniform float u_waterMaxFlux;
+
+vec2 encodeVelocity(in vec2 vel)
+{
+	return vel*0.5 + 0.5;
+}
+
+vec2 decodeVelocity(in vec2 encodedVel)
+{
+	return vec2(encodedVel.xy * 2.0 - 1.0);
+}
 
 void main()
 {
-    vec2 curuv = vec2(v_tex_pos.x, 1.0 - v_tex_pos.y);
+    vec2 curuv = vec2(v_tex_pos.x, v_tex_pos.y);
     curuv = v_tex_pos;
     float div = 1.0/u_SimRes;
 
-    vec4 topflux = texture2D(currWaterFluxTex, curuv + vec2(0.0, div));
-    vec4 rightflux = texture2D(currWaterFluxTex, curuv + vec2(div, 0.0));
-    vec4 bottomflux = texture2D(currWaterFluxTex, curuv + vec2(0.0, -div));
-    vec4 leftflux = texture2D(currWaterFluxTex, curuv + vec2(-div, 0.0));
+    vec4 topflux = texture2D(currWaterFluxTex, curuv + vec2(0.0, div)) * u_waterMaxFlux;
+    vec4 rightflux = texture2D(currWaterFluxTex, curuv + vec2(div, 0.0)) * u_waterMaxFlux;
+    vec4 bottomflux = texture2D(currWaterFluxTex, curuv + vec2(0.0, -div)) * u_waterMaxFlux;
+    vec4 leftflux = texture2D(currWaterFluxTex, curuv + vec2(-div, 0.0)) * u_waterMaxFlux;
 
-    vec4 curflux = texture2D(currWaterFluxTex, curuv);
-    vec4 curT = texture2D(terrainHeightTex, curuv);
-    vec4 curW = texture2D(waterHeightTex, curuv);
+    vec4 curflux = texture2D(currWaterFluxTex, curuv) * u_waterMaxFlux;
+    //vec4 curT = texture2D(terrainHeightTex, vec2(v_tex_pos.x, v_tex_pos.y));
+    vec4 curW = texture2D(waterHeightTex, vec2(v_tex_pos.x, v_tex_pos.y)) * u_waterMaxHeigh;
 
     
     //out flow flux
@@ -58,7 +70,8 @@ void main()
     //---------------------------------------------------------------------------------
 
     //float d1 = cur.y + curs.x; // original.
-    float d1 = curW.r;
+    float currWaterHeight = curW.r;
+    float d1 = currWaterHeight;
 
     float d2 = d1 + deltavol;
     float da = (d1 + d2)/2.0;
@@ -72,10 +85,10 @@ void main()
         veloci = veloci/(da * u_PipeLen);
         }
 
-    if(curuv.x <= div) {deltavol = 0.0; veloci = vec2(0.0);}
-    if(curuv.x >= 1.0 - 2.0 *div) {deltavol = 0.0; veloci = vec2(0.0);}
-    if(curuv.y <= div) {deltavol = 0.0; veloci = vec2(0.0);}
-    if(curuv.y >= 1.0 - 2.0 * div) {deltavol = 0.0; veloci = vec2(0.0);}
+    if(curuv.x <= div) { deltavol = 0.0; veloci = vec2(0.0); }
+    if(curuv.x >= 1.0 - 2.0 * div) { deltavol = 0.0; veloci = vec2(0.0); }
+    if(curuv.y <= div) { deltavol = 0.0; veloci = vec2(0.0); }
+    if(curuv.y >= 1.0 - 2.0 * div) { deltavol = 0.0; veloci = vec2(0.0); }
 
     //  float absx = abs(veloci.x);
     //  float absy = abs(veloci.y);
@@ -89,12 +102,14 @@ void main()
     //    veloci /= 20.0;
     //  }
 
-
-    vec4 writeVel = vec4(veloci, 0.0, 1.0);
+    vec2 encodedVelocity = encodeVelocity(veloci);
+    vec4 writeVel = vec4(encodedVelocity, 0.0, 1.0);
     //vec4 writeWaterHeight = vec4(cur.x,max(cur.y+deltavol, 0.0),cur.z,cur.w); // original.***
 
-    float waterHeight = max(curW.r + deltavol, 0.0);
-    vec4 writeWaterHeight = vec4(waterHeight, waterHeight, waterHeight, waterHeight);
+    float waterHeight = max(curW.r / u_waterMaxHeigh+ deltavol, 0.0); // original.***
+    //float waterHeight = max(currWaterHeight + deltavol, 0.0); // test.***
+    //waterHeight /= u_waterMaxHeigh; // test.***
+    vec4 writeWaterHeight = vec4(waterHeight);
 
 
     gl_FragData[0] = writeWaterHeight;  // water flux.

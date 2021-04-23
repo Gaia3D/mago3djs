@@ -2140,7 +2140,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 			if(waterLayer.waterFluxTexA && waterLayer.waterFluxTexA.texId)
 			{
-				//texture = waterLayer.waterFluxTexA.texId;
+				texture = waterLayer.waterFluxTexA.texId;
 			}
 
 			if(waterLayer.waterVelocityTexA && waterLayer.waterVelocityTexA.texId)
@@ -2150,7 +2150,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 			if(waterLayer.demWithBuildingsTex && waterLayer.demWithBuildingsTex.texId)
 			{
-				texture = waterLayer.demWithBuildingsTex.texId;
+				//texture = waterLayer.demWithBuildingsTex.texId;
 			}
 
 			if(waterLayer.dem_texture && waterLayer.dem_texture.texId)

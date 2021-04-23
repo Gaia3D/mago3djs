@@ -32,7 +32,8 @@ uniform sampler2D hightmap;
 uniform sampler2D terrainmap;
 uniform float u_SimRes;
 
-uniform vec2 u_heightMap_MinMax;
+uniform vec2 u_heightMap_MinMax; // terrain.
+uniform float u_waterMaxHeigh;
 
 uniform sampler2D depthTex;
 
@@ -128,7 +129,7 @@ void main()
 {
 	// read the altitude from hightmap.
 	vTexCoord = texCoord;
-	vec4 heightVec4 = texture2D(hightmap, vec2(texCoord.x, 1.0 - texCoord.y));
+	vec4 heightVec4 = texture2D(hightmap, vec2(texCoord.x, texCoord.y));
 	vec4 terrainHeight4 = texture2D(terrainmap, vec2(texCoord.x, 1.0 - texCoord.y));
 	float r = heightVec4.r;
 	float g = heightVec4.g;
@@ -137,7 +138,7 @@ void main()
 	float terrainH = terrainHeight4.r;
 
 	//float height = u_heightMap_MinMax.x + decodedHeight * u_heightMap_MinMax.y;
-	float waterHeight = decodedHeight * 40.0;
+	float waterHeight = decodedHeight * u_waterMaxHeigh;
 	float terrainHeight = u_heightMap_MinMax.x + terrainH * u_heightMap_MinMax.y;
 	float height = terrainHeight + waterHeight;
 
