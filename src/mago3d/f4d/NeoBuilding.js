@@ -1741,7 +1741,7 @@ NeoBuilding.prototype.renderCollisionCheckSpheres = function(magoManager, shader
 /**
  * 어떤 일을 하고 있습니까?
  */
-NeoBuilding.prototype.render = function(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord, currentLod) 
+NeoBuilding.prototype.render = function (magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord, currentLod) 
 {
 	var gl = magoManager.sceneState.gl;
 	

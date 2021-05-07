@@ -2138,9 +2138,14 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 				//texture = waterLayer.waterSourceTex.texId;
 			}
 
-			if(waterLayer.waterFluxTexA && waterLayer.waterFluxTexA.texId)
+			if(waterLayer.waterFluxTexA_HIGH && waterLayer.waterFluxTexA_HIGH.texId)
 			{
-				texture = waterLayer.waterFluxTexA.texId;
+				texture = waterLayer.waterFluxTexA_HIGH.texId;
+			}
+
+			if(waterLayer.waterFluxTexA_LOW && waterLayer.waterFluxTexA_LOW.texId)
+			{
+				//texture = waterLayer.waterFluxTexA_LOW.texId;
 			}
 
 			if(waterLayer.waterVelocityTexA && waterLayer.waterVelocityTexA.texId)

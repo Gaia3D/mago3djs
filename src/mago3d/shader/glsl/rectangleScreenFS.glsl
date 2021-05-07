@@ -152,7 +152,12 @@ void main()
     if(uTextureType == 0)
     {
         textureColor = texture2D(texture_0, texCoord);
-        
+
+        // Test debug:
+        //if(textureColor.r > 0.0 || textureColor.g > 0.0)
+        //{
+        //    textureColor = vec4(1.0, 1.0, 0.5, 1.0);
+        //}
     }
     else if(uTextureType == 1)
     {

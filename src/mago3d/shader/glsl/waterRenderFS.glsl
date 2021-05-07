@@ -17,7 +17,7 @@
 uniform sampler2D depthTex;
 uniform sampler2D waterTex;
 
-uniform sampler2D hightmap;
+uniform sampler2D waterHeightTex;
 uniform sampler2D normap;
 uniform sampler2D sceneDepth;
 uniform sampler2D colorReflection;
@@ -53,9 +53,9 @@ varying vec2 vTexCoord;
 /*
 vec3 calnor(vec2 uv){
     float eps = 1.0/u_SimRes;
-    vec4 cur = texture(hightmap,uv);
-    vec4 r = texture(hightmap,uv+vec2(eps,0.f));
-    vec4 t = texture(hightmap,uv+vec2(0.f,eps));
+    vec4 cur = texture(waterHeightTex,uv);
+    vec4 r = texture(waterHeightTex,uv+vec2(eps,0.f));
+    vec4 t = texture(waterHeightTex,uv+vec2(0.f,eps));
 
     vec3 n1 = normalize(vec3(-1.0, cur.y + cur.x - r.y - r.x, 0.f));
     vec3 n2 = normalize(vec3(-1.0, t.x + t.y - r.y - r.x, 1.0));
@@ -161,14 +161,16 @@ vec2 decodeVelocity(in vec2 encodedVel)
 
 void main()
 {
-    if(vWaterHeight < 0.0001)
+    float minWaterHeightToRender = 0.05;
+    minWaterHeightToRender = 0.00000001; // test. delete.
+    if(vWaterHeight < minWaterHeightToRender)// original = 0.0001
     {
         discard;
     }
 
     float alpha = vColorAuxTest.a;
     vec4 finalCol4 = vec4(vColorAuxTest);
-    if(vWaterHeight < 0.01)
+    if(vWaterHeight < minWaterHeightToRender)// + 0.01)
     {
         /*
         vec4 finalCol4 = vec4(0.9, 0.9, 0.9, 0.9);
@@ -197,7 +199,6 @@ void main()
     if(uWaterType == 1)
     {
         alpha = 1.0;
-
 
         // flux case:
         vec4 flux = texture2D(waterTex, vec2(vTexCoord.x, vTexCoord.y));
@@ -301,8 +302,8 @@ void main()
 
     //lamb =1.f;
 
-    float yval = texture(hightmap,fs_Uv).x * 4.0;
-    float wval = texture(hightmap,fs_Uv).y;
+    float yval = texture(waterHeightTex,fs_Uv).x * 4.0;
+    float wval = texture(waterHeightTex,fs_Uv).y;
     wval /= 1.0;
 
     vec3 watercolor = mix(vec3(0.8,0.0,0.0), vec3(0.0,0.0,0.8), sediment * 2.0);

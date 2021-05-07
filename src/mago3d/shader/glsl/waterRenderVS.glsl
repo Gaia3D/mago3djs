@@ -28,7 +28,7 @@ uniform float aspectRatio;
 uniform mat4 projectionMatrixInv;
 
 
-uniform sampler2D hightmap;
+uniform sampler2D waterHeightTex;
 uniform sampler2D terrainmap;
 uniform float u_SimRes;
 
@@ -125,28 +125,45 @@ vec3 getViewRay(vec2 tc, in float relFar)
     return ray;                      
 }
 
+float decodeRG(in vec2 waterColorRG)
+{
+    // https://titanwolf.org/Network/Articles/Article?AID=666e7443-0511-4210-b39c-db0bb6738246#gsc.tab=0
+    return dot(waterColorRG, vec2(1.0, 1.0 / 255.0));
+}
+
+vec2 encodeRG(in float wh)
+{
+    // https://titanwolf.org/Network/Articles/Article?AID=666e7443-0511-4210-b39c-db0bb6738246#gsc.tab=0
+    float encodedBit = 1.0/255.0;
+    vec2 enc = vec2(1.0, 255.0) * wh;
+    enc = fract(enc);
+    enc.x -= enc.y * encodedBit;
+    return enc; // R = HIGH, G = LOW.***
+}
+
+float getWaterHeight(in vec2 texCoord)
+{
+    vec4 color4 = texture2D(waterHeightTex, texCoord);
+    float decoded = decodeRG(color4.rg);
+    float waterHeight = decoded * u_waterMaxHeigh;
+
+    return waterHeight;
+}
+
 void main()
 {
-	// read the altitude from hightmap.
+	// read the altitude from waterHeightTex.
 	vTexCoord = texCoord;
-	vec4 heightVec4 = texture2D(hightmap, vec2(texCoord.x, texCoord.y));
 	vec4 terrainHeight4 = texture2D(terrainmap, vec2(texCoord.x, 1.0 - texCoord.y));
-	float r = heightVec4.r;
-	float g = heightVec4.g;
+	float waterHeight = getWaterHeight(vec2(texCoord.x, texCoord.y));
 
-	float decodedHeight = r;
 	float terrainH = terrainHeight4.r;
-
-	//float height = u_heightMap_MinMax.x + decodedHeight * u_heightMap_MinMax.y;
-	float waterHeight = decodedHeight * u_waterMaxHeigh;
 	float terrainHeight = u_heightMap_MinMax.x + terrainH * u_heightMap_MinMax.y;
 	float height = terrainHeight + waterHeight;
 
 	vWaterHeight = waterHeight;
 
-	//vColorAuxTest = heightVec4;
-	//vColorAuxTest = vec4(heightVec4.rgb, 0.5);
-	float alpha = max(r*1.5, 0.4);
+	float alpha = max(waterHeight/u_waterMaxHeigh*1.5, 0.4);
 	vColorAuxTest = vec4(0.1, 0.3, 1.0, alpha);
 
 	vec3 objPosHigh = buildingPosHIGH;
