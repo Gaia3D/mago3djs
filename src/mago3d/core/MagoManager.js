@@ -3129,7 +3129,8 @@ MagoManager.prototype.drawSelectedExtruionBuildingLabel = function()
 			ctx.fillText(text, screenCoord.x, screenCoord.y);
 		}
 	}
-	ctx.restore(); 
+	ctx.restore();
+	this.canvasDirty = true;
 };
 
 /**
