@@ -161,8 +161,8 @@ vec2 decodeVelocity(in vec2 encodedVel)
 
 void main()
 {
-    float minWaterHeightToRender = 0.05;
-    minWaterHeightToRender = 0.00000001; // test. delete.
+    float minWaterHeightToRender = 0.001; // 1mm.
+    //minWaterHeightToRender = 0.00000001; // test. delete.
     if(vWaterHeight < minWaterHeightToRender)// original = 0.0001
     {
         discard;
@@ -172,20 +172,6 @@ void main()
     vec4 finalCol4 = vec4(vColorAuxTest);
     if(vWaterHeight < minWaterHeightToRender)// + 0.01)
     {
-        /*
-        vec4 finalCol4 = vec4(0.9, 0.9, 0.9, 0.9);
-        gl_FragData[0] = finalCol4;  // anything.
-
-        #ifdef USE_MULTI_RENDER_TARGET
-            gl_FragData[1] = vec4(1.0); // depth
-            gl_FragData[2] = vec4(1.0); // normal
-            gl_FragData[3] = finalCol4; // albedo
-            gl_FragData[4] = vec4(1.0); // selection color
-        #endif
-
-        return;
-        */
-
         alpha = 0.9;
         finalCol4 = vec4(vColorAuxTest * 0.5);
     }

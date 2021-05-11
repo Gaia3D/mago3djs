@@ -28,30 +28,32 @@ var Water = function(waterManager, options)
 	this.waterSourceTex;
 	this.rainTex;
 
-	this.waterFluxTexA; // water fluxing in 4 directions.
-	this.waterFluxTexB; // water fluxing in 4 directions.
+	//this.waterFluxTexA; // water fluxing in 4 directions. Old. delete!!!
+	//this.waterFluxTexB; // water fluxing in 4 directions. Old. delete!!!
 
 	this.waterFluxTexA_HIGH; // water fluxing in 4 directions. splitted values in high & low.
 	this.waterFluxTexB_HIGH; // water fluxing in 4 directions. splitted values in high & low.
 	this.waterFluxTexA_LOW; // water fluxing in 4 directions. splitted values in high & low.
 	this.waterFluxTexB_LOW; // water fluxing in 4 directions. splitted values in high & low.
 
-
 	this.waterVelocityTexA;
 	this.waterVelocityTexB;
 
+	this.shaderLogTexA; // auxiliar tex to debug shaders.***
+	this.shaderLogTexB; // auxiliar tex to debug shaders.***
+
+	this.shaderLogTex_Flux_A; // auxiliar tex to debug shaders.***
+	this.shaderLogTex_Flux_B; // auxiliar tex to debug shaders.***
+
 	// simulation parameters.******************************************
 	this.terrainMinMaxHeights = new Float32Array([10.0, 200.0]);
-	this.waterMaxHeight = 20.0; // 2meters.
-	this.waterMaxHeight = 100.0;
-	//this.waterMaxHeight = 10.0;
+	this.waterMaxHeight = 100.0; // ok.
+	//this.waterMaxHeight = 20.0;
 
-	this.waterMaxFlux = 10.0; // volume/cell
-	this.waterMaxFlux = 1000.0;
+	this.waterMaxFlux = 2000.0; // ok. (1000 is no enought).
 
-	this.simulationTimeStep = 0.053; 
-	this.simulationTimeStep = 0.3; // ok.
-	//this.simulationTimeStep = 1.0; // 
+	this.simulationTimeStep = 0.25; // ok.
+	//this.simulationTimeStep = 0.3; // 
 
 	// The water renderable surface.
 	this.surface; // tile size surface, with 512 x 512 points (as DEM texture size).
@@ -117,6 +119,12 @@ Water.prototype._makeTextures = function ()
 	this.waterVelocityTexB = this.waterManager._newTexture(gl, texWidth, texHeight);
 
 	this.demWithBuildingsTex = this.waterManager._newTexture(gl, texWidth, texHeight);
+
+	this.shaderLogTexA = this.waterManager._newTexture(gl, texWidth, texHeight); // auxiliar tex to debug shaders. delete after use.
+	this.shaderLogTexB = this.waterManager._newTexture(gl, texWidth, texHeight); // auxiliar tex to debug shaders. delete after use.
+
+	this.shaderLogTex_Flux_A = this.waterManager._newTexture(gl, texWidth, texHeight); // auxiliar tex to debug shaders. delete after use.
+	this.shaderLogTex_Flux_B = this.waterManager._newTexture(gl, texWidth, texHeight); // auxiliar tex to debug shaders. delete after use.
 
 	gl.bindTexture(gl.TEXTURE_2D, null);
 };
@@ -294,10 +302,11 @@ Water._swapTextures = function (texA, texB)
 	fbo.bind();
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.waterFluxTexA_HIGH.texId, 0); // depthTex.
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.waterFluxTexA_LOW.texId, 0); // depthTex.
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, this.shaderLogTex_Flux_A.texId, 0); // depthTex.
 	extbuffers.drawBuffersWEBGL([
 		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
 		extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1]
-		extbuffers.NONE, // gl_FragData[2]
+		extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2]
 		extbuffers.NONE, // gl_FragData[3]
 		]);
 
@@ -336,19 +345,20 @@ Water._swapTextures = function (texA, texB)
 	// now, swap waterHeightTextures:
 	Water._swapTextures(this.waterFluxTexA_HIGH, this.waterFluxTexB_HIGH);
 	Water._swapTextures(this.waterFluxTexA_LOW, this.waterFluxTexB_LOW);
+	Water._swapTextures(this.shaderLogTex_Flux_A, this.shaderLogTex_Flux_B);
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------
 	// 3- calculate velocityMap & new height by height & flux maps.*********************************************************************************
 	fbo.bind();
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.waterHeightTexA.texId, 0); // waterHeight
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.waterVelocityTexA.texId, 0); // waterVelocity.
-	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // 
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, this.shaderLogTexA.texId, 0);  // debug. delete after use.
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0); // 
 	
 	extbuffers.drawBuffersWEBGL([
 		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
 		extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1]
-		extbuffers.NONE, // gl_FragData[2]
+		extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2]
 		extbuffers.NONE, // gl_FragData[3]
 		]);
 
@@ -387,6 +397,7 @@ Water._swapTextures = function (texA, texB)
 	// now, swap waterHeightTextures:
 	Water._swapTextures(this.waterHeightTexA, this.waterHeightTexB);
 	Water._swapTextures(this.waterVelocityTexA, this.waterVelocityTexB);
+	Water._swapTextures(this.shaderLogTexA, this.shaderLogTexB); // debug. delete after use.
 
 	//-----------------------------------------------------------------------------------------------------------------------------------------------------
 	// 4) calculate sediment, waterHeight & velocity by terrain & water heights map & velocity.************************************************************

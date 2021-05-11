@@ -21,6 +21,27 @@ uniform sampler2D currWaterHeightTex;
 
 varying vec2 v_tex_pos;
 
+vec4 packDepth( float v ) {
+    vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;
+    enc = fract(enc);
+    enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);
+    return enc;
+}
+
+float unpackDepth(const in vec4 rgba_depth)
+{
+	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));
+}
+/*
+float getWaterHeight(in vec2 texCoord)
+{
+    vec4 color4 = texture2D(currWaterHeightTex, texCoord);
+    //float decoded = decodeRG(color4.rg); // old.
+    float decoded = unpackDepth(color4);
+    float waterHeight = decoded * u_waterMaxHeigh;
+    return waterHeight;
+}
+*/
 
 void main()
 {
@@ -30,10 +51,34 @@ void main()
     vec4 currWaterHeight = texture2D(currWaterHeightTex, vec2(v_tex_pos.x, v_tex_pos.y));
     vec4 waterSource = texture2D(waterSourceTex, vec2(v_tex_pos.x, 1.0 - v_tex_pos.y));
 
-    if(waterSource.r < currWaterHeight.r)
+    float decodedCurrWaterHeight = unpackDepth(currWaterHeight);
+    float decodedSourceWaterHeight = unpackDepth(waterSource);
+
+    if(decodedSourceWaterHeight < decodedCurrWaterHeight)
     {
         waterSource = currWaterHeight;
     }
+/*
+    if(waterSource.r < currWaterHeight.r)
+    {
+        waterSource.r = currWaterHeight.r;
+    }
+
+    if(waterSource.g < currWaterHeight.g)
+    {
+        waterSource.g = currWaterHeight.g;
+    }
+
+    if(waterSource.b < currWaterHeight.b)
+    {
+        waterSource.b = currWaterHeight.b;
+    }
+
+    if(waterSource.a < currWaterHeight.a)
+    {
+        waterSource.a = currWaterHeight.a;
+    }
+    */
     // provisionally assign the waterSource as waterHeight...
     gl_FragData[0] = waterSource;  // waterHeight.
 

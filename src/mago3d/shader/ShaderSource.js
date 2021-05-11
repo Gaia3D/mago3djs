@@ -11247,10 +11247,23 @@ vec2 encodeRG(in float wh)\n\
     return enc; // R = HIGH, G = LOW.***\n\
 }\n\
 \n\
+vec4 packDepth( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+  return enc;\n\
+}\n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+}\n\
+\n\
 float getWaterHeight(in vec2 texCoord)\n\
 {\n\
     vec4 color4 = texture2D(waterHeightTex, texCoord);\n\
-    float decoded = decodeRG(color4.rg);\n\
+    //float decoded = decodeRG(color4.rg); // 16bit.\n\
+    float decoded = unpackDepth(color4); // 32bit.\n\
     float waterHeight = decoded * u_waterMaxHeigh;\n\
 \n\
     return waterHeight;\n\
@@ -11281,19 +11294,9 @@ void encodeWaterFlux(vec4 flux, inout vec4 flux_high, inout vec4 flux_low)\n\
     flux_low = vec4(encoded_top_flux.g, encoded_right_flux.g, encoded_bottom_flux.g, encoded_left_flux.g);\n\
 }\n\
 \n\
-/*\n\
-vec4 packDepth( float v ) {\n\
-  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
-  enc = fract(enc);\n\
-  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
-  return enc;\n\
-}\n\
 \n\
-float unpackDepth(const in vec4 rgba_depth)\n\
-{\n\
-	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
-}\n\
-*/\n\
+\n\
+\n\
 \n\
 void main()\n\
 {\n\
@@ -11320,11 +11323,6 @@ void main()\n\
     curT = u_heightMap_MinMax.x + curT * u_heightMap_MinMax.y;\n\
 \n\
     // read water heights.\n\
-    //float topWH = getWaterHeight(curuv + vec2(div, 0.0));\n\
-    //float rightWH = getWaterHeight(curuv + vec2(div, 0.0));\n\
-    //float bottomWH = getWaterHeight(curuv + vec2(0.0, -div));\n\
-    //float leftWH = getWaterHeight(curuv + vec2(-div, 0.0));\n\
-\n\
     float topWH = getWaterHeight(curuv + vec2(0.0, div));\n\
     float rightWH = getWaterHeight(curuv + vec2(div, 0.0));\n\
     float bottomWH = getWaterHeight(curuv + vec2(0.0, -div));\n\
@@ -11341,9 +11339,7 @@ void main()\n\
     float HBottomOut = curTotalH - (bottomT.r + bottomWH);\n\
     float HLeftOut = curTotalH - (leftT.r + leftWH);\n\
     float gravity = 9.8;\n\
-    //gravity = 1.0;\n\
     float waterDensity = 997.0; // 997kg/m3.\n\
-    //waterDensity = 1.0;\n\
     vec4 deltaP = vec4(waterDensity * gravity * HTopOut, \n\
                         waterDensity * gravity * HRightOut, \n\
                         waterDensity * gravity * HBottomOut, \n\
@@ -11356,7 +11352,6 @@ void main()\n\
                             deltaP.w/(waterDensity * cellSize_y));\n\
 \n\
     // read flux.\n\
-    //vec4 curFlux = texture2D(currWaterFluxTex, curuv) * u_waterMaxFlux;\n\
     vec4 curFlux = getWaterFlux(curuv);\n\
 \n\
     // calculate the new flux.\n\
@@ -11364,36 +11359,66 @@ void main()\n\
     vec4 newFlux = u_timestep * pipeArea * waterAccel;\n\
 \n\
     // total outFlux.\n\
-    float factorAux = 1.0;\n\
-    float ftopout = max(0.0, curFlux.x + newFlux.x) * factorAux;\n\
-    float frightout = max(0.0, curFlux.y + newFlux.y) * factorAux;\n\
-    float fbottomout = max(0.0, curFlux.z + newFlux.z) * factorAux;\n\
-    float fleftout = max(0.0, curFlux.w + newFlux.w) * factorAux;\n\
+    float cushionFactor = 0.9999; // esmorteiment.\n\
+    float ftopout = max(0.0, curFlux.x + newFlux.x) * cushionFactor;\n\
+    float frightout = max(0.0, curFlux.y + newFlux.y) * cushionFactor;\n\
+    float fbottomout = max(0.0, curFlux.z + newFlux.z) * cushionFactor;\n\
+    float fleftout = max(0.0, curFlux.w + newFlux.w) * cushionFactor;\n\
+\n\
+    vec4 shaderLogFluxColor4 = vec4(0.0); // test var. delete after use.\n\
 \n\
     // calculate vOut & currVolum.\n\
     float vOut = u_timestep * (ftopout + frightout + fbottomout + fleftout); \n\
 \n\
     float currWaterVol = curWH * pipeArea;\n\
-    float minWaterHeight = 0.01;\n\
+    float minWaterHeight = 0.005;\n\
+    //minWaterHeight = 0.15;\n\
+    float minWaterVol = minWaterHeight * pipeArea;\n\
+    float nextWH = (currWaterVol - vOut) / pipeArea;\n\
+    /*\n\
     if(curWH <= minWaterHeight)\n\
     {\n\
         ftopout = 0.0;\n\
         frightout = 0.0;\n\
         fbottomout = 0.0;\n\
         fleftout = 0.0;\n\
+        shaderLogFluxColor4 = vec4(1.0, 0.0, 0.0, 1.0);\n\
     }\n\
+    */\n\
 \n\
-    if(vOut > currWaterVol - minWaterHeight)\n\
+    if(vOut > currWaterVol)// - minWaterVol)\n\
     {\n\
         //rescale outflow readFlux so that outflow don't exceed current water volume\n\
-        float factor = ((currWaterVol - minWaterHeight) / vOut)*0.9999;\n\
+        float factor = ((currWaterVol) / vOut);\n\
         ftopout *= factor;\n\
         frightout *= factor;\n\
         fbottomout *= factor;\n\
         fleftout *= factor;\n\
+        //shaderLogFluxColor4 = vec4(0.0, 1.0, 0.0, 1.0);\n\
     }\n\
+    /*\n\
+    if(currWaterVol <= minWaterVol)\n\
+    {\n\
+        ftopout = 0.0;\n\
+        frightout = 0.0;\n\
+        fbottomout = 0.0;\n\
+        fleftout = 0.0;\n\
+        shaderLogFluxColor4 = vec4(0.0, 1.0, 0.0, 1.0);\n\
+    }\n\
+    */\n\
+    /*\n\
+    if(curWH > minWaterHeight && nextWH < minWaterHeight)\n\
+    {\n\
+        float factor = (currWaterVol - minWaterVol)/vOut;\n\
+        ftopout *= factor;\n\
+        frightout *= factor;\n\
+        fbottomout *= factor;\n\
+        fleftout *= factor;\n\
+        shaderLogFluxColor4 = vec4(0.2, 0.5, 1.0, 1.0);\n\
+    }\n\
+    */\n\
     \n\
-    \n\
+    /*\n\
     //boundary conditions\n\
     if(curuv.x <= div) fleftout = 0.0;\n\
     if(curuv.x >= 1.0 - 2.0 * div) frightout = 0.0;\n\
@@ -11406,20 +11431,18 @@ void main()\n\
         fbottomout = 0.0;\n\
         fleftout = 0.0;\n\
     }\n\
-    \n\
+    */\n\
 \n\
-    vec4 writeFlux = vec4(ftopout, frightout, fbottomout, fleftout) / u_waterMaxFlux;\n\
+    vec4 outFlux = vec4(ftopout, frightout, fbottomout, fleftout) / u_waterMaxFlux;\n\
     vec4 flux_high;\n\
     vec4 flux_low;\n\
-    encodeWaterFlux(vec4(ftopout, frightout, fbottomout, fleftout) / u_waterMaxFlux, flux_high, flux_low);\n\
+    encodeWaterFlux(outFlux, flux_high, flux_low);\n\
 \n\
-    //gl_FragData[0] = writeFlux;  // water flux.\n\
     gl_FragData[0] = flux_high;  // water flux high.\n\
-\n\
 \n\
     #ifdef USE_MULTI_RENDER_TARGET\n\
         gl_FragData[1] = flux_low; // water flux low.\n\
-        gl_FragData[2] = vec4(0.0); // normal\n\
+        gl_FragData[2] = shaderLogFluxColor4; // shader log. delete after use.\n\
         gl_FragData[3] = vec4(0.0); // albedo\n\
         gl_FragData[4] = vec4(0.0); // selection color\n\
     #endif\n\
@@ -11448,6 +11471,27 @@ uniform sampler2D currWaterHeightTex;\n\
 \n\
 varying vec2 v_tex_pos;\n\
 \n\
+vec4 packDepth( float v ) {\n\
+    vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+    enc = fract(enc);\n\
+    enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+    return enc;\n\
+}\n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+}\n\
+/*\n\
+float getWaterHeight(in vec2 texCoord)\n\
+{\n\
+    vec4 color4 = texture2D(currWaterHeightTex, texCoord);\n\
+    //float decoded = decodeRG(color4.rg); // old.\n\
+    float decoded = unpackDepth(color4);\n\
+    float waterHeight = decoded * u_waterMaxHeigh;\n\
+    return waterHeight;\n\
+}\n\
+*/\n\
 \n\
 void main()\n\
 {\n\
@@ -11457,10 +11501,34 @@ void main()\n\
     vec4 currWaterHeight = texture2D(currWaterHeightTex, vec2(v_tex_pos.x, v_tex_pos.y));\n\
     vec4 waterSource = texture2D(waterSourceTex, vec2(v_tex_pos.x, 1.0 - v_tex_pos.y));\n\
 \n\
-    if(waterSource.r < currWaterHeight.r)\n\
+    float decodedCurrWaterHeight = unpackDepth(currWaterHeight);\n\
+    float decodedSourceWaterHeight = unpackDepth(waterSource);\n\
+\n\
+    if(decodedSourceWaterHeight < decodedCurrWaterHeight)\n\
     {\n\
         waterSource = currWaterHeight;\n\
     }\n\
+/*\n\
+    if(waterSource.r < currWaterHeight.r)\n\
+    {\n\
+        waterSource.r = currWaterHeight.r;\n\
+    }\n\
+\n\
+    if(waterSource.g < currWaterHeight.g)\n\
+    {\n\
+        waterSource.g = currWaterHeight.g;\n\
+    }\n\
+\n\
+    if(waterSource.b < currWaterHeight.b)\n\
+    {\n\
+        waterSource.b = currWaterHeight.b;\n\
+    }\n\
+\n\
+    if(waterSource.a < currWaterHeight.a)\n\
+    {\n\
+        waterSource.a = currWaterHeight.a;\n\
+    }\n\
+    */\n\
     // provisionally assign the waterSource as waterHeight...\n\
     gl_FragData[0] = waterSource;  // waterHeight.\n\
 \n\
@@ -11588,7 +11656,6 @@ float decodeRG(in vec2 waterColorRG)\n\
 \n\
 vec2 encodeRG(in float wh)\n\
 {\n\
-    // https://titanwolf.org/Network/Articles/Article?AID=666e7443-0511-4210-b39c-db0bb6738246#gsc.tab=0\n\
     float encodedBit = 1.0/255.0;\n\
     vec2 enc = vec2(1.0, 255.0) * wh;\n\
     enc = fract(enc);\n\
@@ -11596,10 +11663,23 @@ vec2 encodeRG(in float wh)\n\
     return enc; // R = HIGH, G = LOW.***\n\
 }\n\
 \n\
+vec4 packDepth( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+  return enc;\n\
+}\n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+}\n\
+\n\
 float getWaterHeight(in vec2 texCoord)\n\
 {\n\
     vec4 color4 = texture2D(waterHeightTex, texCoord);\n\
-    float decoded = decodeRG(color4.rg);\n\
+    //float decoded = decodeRG(color4.rg); // old.\n\
+    float decoded = unpackDepth(color4);\n\
     float waterHeight = decoded * u_waterMaxHeigh;\n\
     return waterHeight;\n\
 }\n\
@@ -11635,12 +11715,6 @@ void main()\n\
     curuv = v_tex_pos;\n\
     float div = 1.0/u_SimRes;\n\
 \n\
-    //vec4 topflux = texture2D(currWaterFluxTex, curuv + vec2(0.0, div)) * u_waterMaxFlux;\n\
-    //vec4 rightflux = texture2D(currWaterFluxTex, curuv + vec2(div, 0.0)) * u_waterMaxFlux;\n\
-    //vec4 bottomflux = texture2D(currWaterFluxTex, curuv + vec2(0.0, -div)) * u_waterMaxFlux;\n\
-    //vec4 leftflux = texture2D(currWaterFluxTex, curuv + vec2(-div, 0.0)) * u_waterMaxFlux;\n\
-    //vec4 curflux = texture2D(currWaterFluxTex, curuv) * u_waterMaxFlux;\n\
-\n\
     vec4 topflux = getWaterFlux(curuv + vec2(0.0, div));\n\
     vec4 rightflux = getWaterFlux(curuv + vec2(div, 0.0));\n\
     vec4 bottomflux = getWaterFlux(curuv + vec2(0.0, -div));\n\
@@ -11662,16 +11736,15 @@ void main()\n\
     float fout = ftopout + frightout + fbottomout + fleftout;\n\
     float fin = inputflux.x + inputflux.y + inputflux.z + inputflux.w;\n\
 \n\
-\n\
     float cellSize_x = u_tileSize.x / u_SimRes;\n\
     float cellSize_y = u_tileSize.y / u_SimRes;\n\
 \n\
-    float deltavol = u_timestep * (fin - fout) / (cellSize_x * cellSize_y); // pipeLen = cellSizeX = cellSizeY.\n\
+    float deltaH = u_timestep * (fin - fout) / (cellSize_x * cellSize_y); \n\
     //---------------------------------------------------------------------------------\n\
 \n\
     //float d1 = cur.y + curs.x; // original. (waterH + sedimentH).\n\
     float d1 = currWaterHeight;\n\
-    float d2 = d1 + deltavol;\n\
+    float d2 = d1 + deltaH;\n\
     float da = (d1 + d2)/2.0;\n\
 \n\
     vec2 veloci = vec2(inputflux.w - outputflux.w + outputflux.y - inputflux.y, inputflux.z - outputflux.z + outputflux.x - inputflux.x) / 2.0;\n\
@@ -11686,10 +11759,10 @@ void main()\n\
         veloci = veloci/(da * cellSize_x);\n\
     }\n\
 \n\
-    if(curuv.x <= div) { deltavol = 0.0; veloci = vec2(0.0); }\n\
-    if(curuv.x >= 1.0 - 2.0 * div) { deltavol = 0.0; veloci = vec2(0.0); }\n\
-    if(curuv.y <= div) { deltavol = 0.0; veloci = vec2(0.0); }\n\
-    if(curuv.y >= 1.0 - 2.0 * div) { deltavol = 0.0; veloci = vec2(0.0); }\n\
+    if(curuv.x <= div) { deltaH = 0.0; veloci = vec2(0.0); }\n\
+    if(curuv.x >= 1.0 - 2.0 * div) { deltaH = 0.0; veloci = vec2(0.0); }\n\
+    if(curuv.y <= div) { deltaH = 0.0; veloci = vec2(0.0); }\n\
+    if(curuv.y >= 1.0 - 2.0 * div) { deltaH = 0.0; veloci = vec2(0.0); }\n\
 \n\
     //  float absx = abs(veloci.x);\n\
     //  float absy = abs(veloci.y);\n\
@@ -11707,18 +11780,27 @@ void main()\n\
     vec4 writeVel = vec4(encodedVelocity, 0.0, 1.0);\n\
     //vec4 writeWaterHeight = vec4(cur.x,max(cur.y+deltavol, 0.0),cur.z,cur.w); // original.***\n\
 \n\
-    float waterHeight = max(currWaterHeight + deltavol, 0.0); // original.***\n\
+    float waterHeight = max(currWaterHeight + deltaH, 0.0); // original.***\n\
     waterHeight /= u_waterMaxHeigh; // original.***\n\
-    vec2 encodedWH = encodeRG(waterHeight);\n\
-    vec4 writeWaterHeight = vec4(encodedWH.rg, 1.0, 1.0);\n\
 \n\
+    vec4 encodedWH = packDepth(waterHeight);\n\
 \n\
-    gl_FragData[0] = writeWaterHeight;  // water flux.\n\
+    //vec2 encodedWH = encodeRG(waterHeight);\n\
+    //vec4 writeWaterHeight = vec4(encodedWH.rg, 1.0, 1.0);\n\
+    //gl_FragData[0] = writeWaterHeight;  // water height.\n\
 \n\
+    gl_FragData[0] = encodedWH;  // water height.\n\
+\n\
+    float minWaterHeight = 0.005;\n\
+    vec4 shaderLogColor4 = vec4(0.0);\n\
+    if((currWaterHeight) > minWaterHeight && waterHeight < minWaterHeight)\n\
+    {\n\
+        shaderLogColor4 = vec4(1.0, 0.0, 0.0, 1.0);\n\
+    }\n\
 \n\
     #ifdef USE_MULTI_RENDER_TARGET\n\
         gl_FragData[1] = writeVel; // velocity\n\
-        gl_FragData[2] = vec4(0.0); // \n\
+        gl_FragData[2] = shaderLogColor4; // \n\
         gl_FragData[3] = vec4(0.0); // \n\
         gl_FragData[4] = vec4(0.0); // \n\
     #endif\n\
@@ -11988,10 +12070,23 @@ vec2 encodeRG(in float wh)\n\
     return enc; // R = HIGH, G = LOW.***\n\
 }\n\
 \n\
+vec4 packDepth( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+  return enc;\n\
+}\n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+}\n\
+\n\
 float getWaterHeight(in vec2 texCoord)\n\
 {\n\
     vec4 color4 = texture2D(waterHeightTex, texCoord);\n\
-    float decoded = decodeRG(color4.rg);\n\
+    //float decoded = decodeRG(color4.rg); // old.\n\
+    float decoded = unpackDepth(color4);\n\
     float waterHeight = decoded * u_waterMaxHeigh;\n\
 \n\
     return waterHeight;\n\
@@ -12760,8 +12855,8 @@ vec2 decodeVelocity(in vec2 encodedVel)\n\
 \n\
 void main()\n\
 {\n\
-    float minWaterHeightToRender = 0.05;\n\
-    minWaterHeightToRender = 0.00000001; // test. delete.\n\
+    float minWaterHeightToRender = 0.001; // 1mm.\n\
+    //minWaterHeightToRender = 0.00000001; // test. delete.\n\
     if(vWaterHeight < minWaterHeightToRender)// original = 0.0001\n\
     {\n\
         discard;\n\
@@ -12771,20 +12866,6 @@ void main()\n\
     vec4 finalCol4 = vec4(vColorAuxTest);\n\
     if(vWaterHeight < minWaterHeightToRender)// + 0.01)\n\
     {\n\
-        /*\n\
-        vec4 finalCol4 = vec4(0.9, 0.9, 0.9, 0.9);\n\
-        gl_FragData[0] = finalCol4;  // anything.\n\
-\n\
-        #ifdef USE_MULTI_RENDER_TARGET\n\
-            gl_FragData[1] = vec4(1.0); // depth\n\
-            gl_FragData[2] = vec4(1.0); // normal\n\
-            gl_FragData[3] = finalCol4; // albedo\n\
-            gl_FragData[4] = vec4(1.0); // selection color\n\
-        #endif\n\
-\n\
-        return;\n\
-        */\n\
-\n\
         alpha = 0.9;\n\
         finalCol4 = vec4(vColorAuxTest * 0.5);\n\
     }\n\
@@ -13059,7 +13140,8 @@ vec2 encodeRG(in float wh)\n\
 float getWaterHeight(in vec2 texCoord)\n\
 {\n\
     vec4 color4 = texture2D(waterHeightTex, texCoord);\n\
-    float decoded = decodeRG(color4.rg);\n\
+    //float decoded = decodeRG(color4.rg); // old.\n\
+    float decoded = unpackDepth(color4);\n\
     float waterHeight = decoded * u_waterMaxHeigh;\n\
 \n\
     return waterHeight;\n\

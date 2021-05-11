@@ -55,10 +55,23 @@ vec2 encodeRG(in float wh)
     return enc; // R = HIGH, G = LOW.***
 }
 
+vec4 packDepth( float v ) {
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;
+  enc = fract(enc);
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);
+  return enc;
+}
+
+float unpackDepth(const in vec4 rgba_depth)
+{
+	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));
+}
+
 float getWaterHeight(in vec2 texCoord)
 {
     vec4 color4 = texture2D(waterHeightTex, texCoord);
-    float decoded = decodeRG(color4.rg);
+    //float decoded = decodeRG(color4.rg); // old.
+    float decoded = unpackDepth(color4);
     float waterHeight = decoded * u_waterMaxHeigh;
 
     return waterHeight;

@@ -144,7 +144,8 @@ vec2 encodeRG(in float wh)
 float getWaterHeight(in vec2 texCoord)
 {
     vec4 color4 = texture2D(waterHeightTex, texCoord);
-    float decoded = decodeRG(color4.rg);
+    //float decoded = decodeRG(color4.rg); // old.
+    float decoded = unpackDepth(color4);
     float waterHeight = decoded * u_waterMaxHeigh;
 
     return waterHeight;

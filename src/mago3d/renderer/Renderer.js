@@ -2130,7 +2130,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 			var waterLayer = magoManager.waterManager.waterLayersArray[0];
 			if(waterLayer.waterHeightTexA && waterLayer.waterHeightTexA.texId)
 			{
-				//texture = waterLayer.waterHeightTexA.texId;
+				texture = waterLayer.waterHeightTexA.texId;
 			}
 
 			if(waterLayer.waterSourceTex && waterLayer.waterSourceTex.texId)
@@ -2140,7 +2140,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 			if(waterLayer.waterFluxTexA_HIGH && waterLayer.waterFluxTexA_HIGH.texId)
 			{
-				texture = waterLayer.waterFluxTexA_HIGH.texId;
+				//texture = waterLayer.waterFluxTexA_HIGH.texId;
 			}
 
 			if(waterLayer.waterFluxTexA_LOW && waterLayer.waterFluxTexA_LOW.texId)
@@ -2163,7 +2163,15 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 				//texture = waterLayer.dem_texture.texId;
 			}
 
+			if(waterLayer.shaderLogTexA && waterLayer.shaderLogTexA.texId)
+			{
+				//texture = waterLayer.shaderLogTexA.texId;
+			}
 
+			if(waterLayer.shaderLogTex_Flux_A && waterLayer.shaderLogTex_Flux_A.texId)
+			{
+				texture = waterLayer.shaderLogTex_Flux_A.texId;
+			}
 		}
 	}
 	
