@@ -18,6 +18,13 @@ var WaterManager = function(magoManager)
 
 	this.fbo;
 
+	// Water wind.*************************************************************************************
+	this.windParticlesPosFbo;
+	this.windRes = 64;
+	this.dropRate = 0.003; // how often the particles move to a random place
+	this.dropRateBump = 0.001; // drop rate increase relative to individual particle speed
+	//-------------------------------------------------------------------------------------------------
+
     this.createDefaultShaders();
 	this.init();
 };
@@ -28,6 +35,7 @@ var WaterManager = function(magoManager)
 WaterManager.prototype.newWater = function (options)
 {
 	var water = new Water(this, options);
+	water.windRes = this.windRes;
 	this.waterLayersArray.push(water);
 	return water;
 };
@@ -40,28 +48,55 @@ WaterManager.prototype.init = function ()
 	var bUseMultiRenderTarget = this.postFxShadersManager.bUseMultiRenderTarget;
 	this.texturesManager.lBuffer = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 3}); 
 	*/
-
+	var gl = this.magoManager.getGl();
 	// create frame buffer object.
 	if(!this.fbo) // simulation fbo (512 x 512).
 	{
-		var gl = this.magoManager.getGl();
 		var bufferWidth = 512;
 		var bufferHeight = 512;
 		var bUseMultiRenderTarget = this.magoManager.postFxShadersManager.bUseMultiRenderTarget;
 
-		this.fbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 3}); 
+		this.fbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: false, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 3}); 
 	}
 
 	if(!this.depthFbo) // screen size fbo.
 	{
 		var magoManager = this.magoManager;
 		var sceneState = magoManager.sceneState;
-		var gl = magoManager.getGl();
 		var bufferWidth = sceneState.drawingBufferWidth[0];
 		var bufferHeight = sceneState.drawingBufferHeight[0];
 		var bUseMultiRenderTarget = magoManager.postFxShadersManager.bUseMultiRenderTarget;
 
 		this.depthFbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 3}); 
+	}
+
+	// Water particles.**************************************************************************************************************************************************
+	// Create indices for the particles.
+	this.numParticles = this.windRes * this.windRes;
+	var particleIndices = new Float32Array(this.numParticles);
+	for (var i = 0; i < this.numParticles; i++) 
+	{ particleIndices[i] = i; }
+	this.particleIndexBuffer = FBO.createBuffer(gl, particleIndices);
+
+	this.particlesRenderTexWidth = 2048;
+	this.particlesRenderTexHeight = 2048;
+
+	if(!this.windParticlesPosFbo) // simulation fbo (windRes x windRes).
+	{
+		var bufferWidth = this.windRes;
+		var bufferHeight = this.windRes;
+		var bUseMultiRenderTarget = this.magoManager.postFxShadersManager.bUseMultiRenderTarget;
+
+		this.windParticlesPosFbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: false, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 1}); 
+	}
+
+	if(!this.windParticlesRenderingFbo) // simulation fbo (windRes x windRes).
+	{
+		var bufferWidth = this.particlesRenderTexWidth;
+		var bufferHeight = this.particlesRenderTexHeight;
+		var bUseMultiRenderTarget = this.magoManager.postFxShadersManager.bUseMultiRenderTarget;
+
+		this.windParticlesRenderingFbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: false, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 3}); 
 	}
 };
 
@@ -125,6 +160,7 @@ WaterManager.prototype.createDefaultShaders = function ()
 	shader.projectionMatrixInv_loc = gl.getUniformLocation(shader.program, "projectionMatrixInv");//
 	shader.uWaterType_loc = gl.getUniformLocation(shader.program, "uWaterType");//
 	shader.u_waterMaxHeigh_loc = gl.getUniformLocation(shader.program, "u_waterMaxHeigh");
+	shader.u_RenderParticles_loc = gl.getUniformLocation(shader.program, "u_RenderParticles");
 
 	magoManager.postFxShadersManager.useProgram(shader);
 	//gl.uniform1i(shader.depthTex_loc, 0);
@@ -176,6 +212,7 @@ WaterManager.prototype.createDefaultShaders = function ()
 	fs_source = fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
 	fs_source = fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
 	shader = magoManager.postFxShadersManager.createShaderProgram(gl, vs_source, fs_source, shaderName, this.magoManager);
+	shader.u_existRain_loc = gl.getUniformLocation(shader.program, "u_existRain");
 
 	shader.waterSourceTex_loc = gl.getUniformLocation(shader.program, "waterSourceTex");
 	shader.rainTex_loc = gl.getUniformLocation(shader.program, "rainTex");
@@ -227,6 +264,7 @@ WaterManager.prototype.createDefaultShaders = function ()
 	shader.u_waterMaxHeigh_loc = gl.getUniformLocation(shader.program, "u_waterMaxHeigh");
 	shader.u_waterMaxFlux_loc = gl.getUniformLocation(shader.program, "u_waterMaxFlux");
 	shader.u_tileSize_loc = gl.getUniformLocation(shader.program, "u_tileSize");
+	shader.u_waterMaxVelocity_loc = gl.getUniformLocation(shader.program, "u_waterMaxVelocity");
 
 	shader.waterHeightTex_loc = gl.getUniformLocation(shader.program, "waterHeightTex");
 	shader.terrainHeightTex_loc = gl.getUniformLocation(shader.program, "terrainHeightTex");
@@ -279,6 +317,64 @@ WaterManager.prototype.createDefaultShaders = function ()
 	shader.u_textureFlipYAxis_loc = gl.getUniformLocation(shader.program, "u_textureFlipYAxis");
 	magoManager.postFxShadersManager.useProgram(shader);
 	gl.uniform1i(shader.texToCopy_loc, 0);
+
+	// 7) water particles update shader.*********************************************************************************************
+	shaderName = "waterParticlesUpdate";
+	vs_source = ShaderSource.waterQuadVertVS;
+	fs_source = ShaderSource.waterUpdateParticlesFS;
+	fs_source = fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
+	fs_source = fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
+	shader = magoManager.postFxShadersManager.createShaderProgram(gl, vs_source, fs_source, shaderName, this.magoManager);
+	shader.u_particles_loc = gl.getUniformLocation(shader.program, "u_particles"); // smple2d.
+	shader.u_wind_loc = gl.getUniformLocation(shader.program, "u_wind"); // smple2d.
+
+	shader.u_flipTexCoordY_windMap_loc = gl.getUniformLocation(shader.program, "u_flipTexCoordY_windMap");
+	shader.u_wind_res_loc = gl.getUniformLocation(shader.program, "u_wind_res");
+	shader.u_wind_min_loc = gl.getUniformLocation(shader.program, "u_wind_min");
+	shader.u_wind_max_loc = gl.getUniformLocation(shader.program, "u_wind_max");
+	shader.u_geoCoordRadiansMax_loc = gl.getUniformLocation(shader.program, "u_geoCoordRadiansMax");
+	shader.u_geoCoordRadiansMin_loc = gl.getUniformLocation(shader.program, "u_geoCoordRadiansMin");
+	shader.u_speed_factor_loc = gl.getUniformLocation(shader.program, "u_speed_factor");
+	shader.u_drop_rate_loc = gl.getUniformLocation(shader.program, "u_drop_rate");
+	shader.u_drop_rate_bump_loc = gl.getUniformLocation(shader.program, "u_drop_rate_bump");
+	shader.u_rand_seed_loc = gl.getUniformLocation(shader.program, "u_rand_seed");
+	magoManager.postFxShadersManager.useProgram(shader);
+	gl.uniform1i(shader.u_particles_loc, 0);
+	gl.uniform1i(shader.u_wind_loc, 1);
+
+	// 7) water particles render shader.*********************************************************************************************
+	shaderName = "waterParticlesRender";
+	vs_source = ShaderSource.waterParticlesRenderVS;
+	fs_source = ShaderSource.waterParticlesRenderFS;
+	fs_source = fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
+	fs_source = fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
+	shader = magoManager.postFxShadersManager.createShaderProgram(gl, vs_source, fs_source, shaderName, this.magoManager);
+	shader.u_particles_loc = gl.getUniformLocation(shader.program, "u_particles"); // smple2d.
+	shader.u_wind_loc = gl.getUniformLocation(shader.program, "u_wind"); // smple2d.
+
+	shader.u_particles_res_loc = gl.getUniformLocation(shader.program, "u_particles_res");
+	shader.u_flipTexCoordY_windMap_loc = gl.getUniformLocation(shader.program, "u_flipTexCoordY_windMap");
+	shader.u_wind_min_loc = gl.getUniformLocation(shader.program, "u_wind_min");
+	shader.u_wind_max_loc = gl.getUniformLocation(shader.program, "u_wind_max");
+	shader.u_colorScale_loc = gl.getUniformLocation(shader.program, "u_colorScale");
+
+	magoManager.postFxShadersManager.useProgram(shader);
+	gl.uniform1i(shader.u_particles_loc, 0);
+	gl.uniform1i(shader.u_wind_loc, 1);
+
+	// 7) water particles render shader.*********************************************************************************************
+	shaderName = "waterParticlesRenderFade";
+	vs_source = ShaderSource.waterQuadVertVS;
+	fs_source = ShaderSource.waterParticlesRenderingFadeFS;
+	//fs_source = fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
+	//fs_source = fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
+	shader = magoManager.postFxShadersManager.createShaderProgram(gl, vs_source, fs_source, shaderName, this.magoManager);
+	shader.u_screen_loc = gl.getUniformLocation(shader.program, "u_screen"); // smple2d.
+	shader.u_opacity_loc = gl.getUniformLocation(shader.program, "u_opacity");
+	magoManager.postFxShadersManager.useProgram(shader);
+	gl.uniform1i(shader.u_screen_loc, 0);
+	
+	
 };
 
 WaterManager.prototype.getQuadBuffer = function ()
@@ -442,6 +538,7 @@ WaterManager.prototype.render = function ()
 	shader.enableVertexAttribArray(shader.position3_loc);
 	shader.enableVertexAttribArray(shader.texCoord2_loc);
 	gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
+	gl.uniform1i(shader.u_RenderParticles_loc, 1); // render particles.
 
 	gl.enable(gl.DEPTH_TEST);
 

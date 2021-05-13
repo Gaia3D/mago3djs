@@ -39,6 +39,13 @@ var Water = function(waterManager, options)
 	this.waterVelocityTexA;
 	this.waterVelocityTexB;
 
+	// water particles.************************************************
+	this.particlesTex_A;
+	this.particlesTex_B;
+	this.particlesPosTex_A;
+	this.particlesPosTex_B;
+	this.windRes;
+
 	this.shaderLogTexA; // auxiliar tex to debug shaders.***
 	this.shaderLogTexB; // auxiliar tex to debug shaders.***
 
@@ -51,6 +58,9 @@ var Water = function(waterManager, options)
 	//this.waterMaxHeight = 20.0;
 
 	this.waterMaxFlux = 2000.0; // ok. (1000 is no enought).
+	this.waterMaxFlux = 3000.0;
+
+	this.waterMaxVelocity = 40.0;
 
 	this.simulationTimeStep = 0.25; // ok.
 	//this.simulationTimeStep = 0.3; // 
@@ -119,12 +129,30 @@ Water.prototype._makeTextures = function ()
 	this.waterVelocityTexB = this.waterManager._newTexture(gl, texWidth, texHeight);
 
 	this.demWithBuildingsTex = this.waterManager._newTexture(gl, texWidth, texHeight);
-
+	
+	// Shade Log textures.**********************************************************************************************************************
 	this.shaderLogTexA = this.waterManager._newTexture(gl, texWidth, texHeight); // auxiliar tex to debug shaders. delete after use.
 	this.shaderLogTexB = this.waterManager._newTexture(gl, texWidth, texHeight); // auxiliar tex to debug shaders. delete after use.
 
 	this.shaderLogTex_Flux_A = this.waterManager._newTexture(gl, texWidth, texHeight); // auxiliar tex to debug shaders. delete after use.
 	this.shaderLogTex_Flux_B = this.waterManager._newTexture(gl, texWidth, texHeight); // auxiliar tex to debug shaders. delete after use.
+
+	// Particles.********************************************************************************************************************************
+	// Now, inicialitze particles random position.
+	var particlesTexWidth = this.waterManager.particlesRenderTexWidth;
+	var particlesTexHeight = this.waterManager.particlesRenderTexHeight;
+	this.particlesTex_A = this.waterManager._newTexture(gl, particlesTexWidth, particlesTexHeight);
+	this.particlesTex_B = this.waterManager._newTexture(gl, particlesTexWidth, particlesTexHeight);
+	var numParticles = this.windRes * this.windRes;
+	var particleState = new Uint8Array(numParticles * 4);
+	for (var i = 0; i < particleState.length; i++) 
+	{
+		particleState[i] = Math.floor(Math.random() * 256); // randomize the initial particle positions
+	}
+	this.particlesPosTex_A = new Texture();
+	this.particlesPosTex_B = new Texture();
+	this.particlesPosTex_A.texId = Texture.createTexture(gl, gl.NEAREST, particleState, this.windRes, this.windRes);
+	this.particlesPosTex_B.texId = Texture.createTexture(gl, gl.NEAREST, particleState, this.windRes, this.windRes);
 
 	gl.bindTexture(gl.TEXTURE_2D, null);
 };
@@ -159,14 +187,38 @@ Water.prototype.prepareTextures = function ()
 		var gl = magoManager.getGl();
 		var texturePath = '/images/en/waterSourceTexTestlow.png';
 		//var texturePath = '/images/en/waterSourceTexTest2.png';
-		//var texturePath = '/images/en/waterSourceTexTest_rain.png';
 
 		ReaderWriter.loadImage(gl, texturePath, this.waterSourceTex);
 		return false;
 	}
 	else if (this.waterSourceTex.fileLoadState === CODE.fileLoadState.BINDING_FINISHED)
 	{
-		var hola = 0;
+		var hola = 0; // debug to check. Delete this "if".
+	}
+
+	// Rain if exist.
+	if(!this.rainTex)
+	{
+		var magoManager = this.waterManager.magoManager;
+		var gl = magoManager.getGl();
+
+		// load test texture dem.
+		this.rainTex = new Texture();
+		this.rainTex.texId = gl.createTexture();
+	}
+
+	if (this.rainTex.fileLoadState === CODE.fileLoadState.READY)
+	{
+		var magoManager = this.waterManager.magoManager;
+		var gl = magoManager.getGl();
+		var texturePath = '/images/en/waterSourceTexTest_rain.png';
+
+		ReaderWriter.loadImage(gl, texturePath, this.rainTex);
+		return false;
+	}
+	else if (this.rainTex.fileLoadState === CODE.fileLoadState.BINDING_FINISHED)
+	{
+		var hola = 0; // debug to check. Delete this "if".
 	}
 
 	// DEM texture.
@@ -274,12 +326,13 @@ Water._swapTextures = function (texA, texB)
 	var screenQuad = this.waterManager.getQuadBuffer();
 	shader = magoManager.postFxShadersManager.getShader("waterCalculateHeight");
 	magoManager.postFxShadersManager.useProgram(shader);
+	gl.uniform1i(shader.u_existRain_loc, false);
 
 	gl.activeTexture(gl.TEXTURE0);
-	gl.bindTexture(gl.TEXTURE_2D, this.waterSourceTex.texId);
+	gl.bindTexture(gl.TEXTURE_2D, this.waterSourceTex.texId); // water source.
 
 	gl.activeTexture(gl.TEXTURE1);
-	gl.bindTexture(gl.TEXTURE_2D, null);
+	gl.bindTexture(gl.TEXTURE_2D, this.rainTex.texId); // rain.
 
 	gl.activeTexture(gl.TEXTURE2);
 	gl.bindTexture(gl.TEXTURE_2D, this.waterHeightTexB.texId);
@@ -375,6 +428,7 @@ Water._swapTextures = function (texA, texB)
 	gl.uniform1f(shader.u_waterMaxHeigh_loc, this.waterMaxHeight);
 	gl.uniform1f(shader.u_waterMaxFlux_loc, this.waterMaxFlux);
 	gl.uniform2fv(shader.u_tileSize_loc, [this.tileSizeMeters_x, this.tileSizeMeters_y]);
+	gl.uniform1f(shader.u_waterMaxVelocity_loc, this.waterMaxVelocity);
 	
 	gl.activeTexture(gl.TEXTURE0); // water height tex.
 	gl.bindTexture(gl.TEXTURE_2D, this.waterHeightTexB.texId);
@@ -402,7 +456,11 @@ Water._swapTextures = function (texA, texB)
 	//-----------------------------------------------------------------------------------------------------------------------------------------------------
 	// 4) calculate sediment, waterHeight & velocity by terrain & water heights map & velocity.************************************************************
 	shader = magoManager.postFxShadersManager.getShader("waterCalculateSediment");
-		
+
+	// Once finished simulation, then calculate particles if necessary:
+	this.doSimulationSteps_particles(magoManager);
+	
+
 	//-----------------------------------------------------------------------------------------------------------------------------------------------------
 	// Must return to current frameBuffer. TODO:
 	var hola = 0;
@@ -423,6 +481,153 @@ Water._swapTextures = function (texA, texB)
 		extbuffers.NONE, // gl_FragData[3]
 		]);
 
+};
+
+/**
+ * simulation
+ */
+Water.prototype.doSimulationSteps_particles = function (magoManager)
+{
+	// Use the velocity map of the water to render particles movement.
+	var gl = magoManager.getGl();
+	var fbo = this.waterManager.windParticlesPosFbo;
+	var extbuffers = fbo.extbuffers;
+	var screenQuad = this.waterManager.getQuadBuffer();
+	var shader;
+	fbo.bind();
+	gl.viewport(0, 0, fbo.width[0], fbo.height[0]);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.particlesPosTex_A.texId, 0); // waterHeight
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // waterVelocity.
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0);  // debug. delete after use.
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0); // 
+	
+	extbuffers.drawBuffersWEBGL([
+		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
+		extbuffers.NONE, // gl_FragData[1]
+		extbuffers.NONE, // gl_FragData[2]
+		extbuffers.NONE, // gl_FragData[3]
+		]);
+
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+	//-----------------------------------------------------------------------------------------------------------------------------------------------------
+	// 1) Calculate particles position.********************************************************************************************************************
+	shader = magoManager.postFxShadersManager.getShader("waterParticlesUpdate");
+	magoManager.postFxShadersManager.useProgram(shader);
+
+	var minGeoCoord = this.geographicExtent.minGeographicCoord;
+	var maxGeoCoord = this.geographicExtent.maxGeographicCoord;
+
+	gl.uniform1i(shader.u_flipTexCoordY_windMap_loc, true);
+	gl.uniform2fv(shader.u_wind_res_loc, [this.windRes, this.windRes]);
+	gl.uniform2fv(shader.u_wind_min_loc, [0.0, 0.0]); // provisional value.
+	gl.uniform2fv(shader.u_wind_max_loc, [40.0, 40.0]); // provisional value.
+	gl.uniform3fv(shader.u_geoCoordRadiansMax_loc, [maxGeoCoord.getLongitudeRad(), maxGeoCoord.getLatitudeRad(), 0.0]); 
+	gl.uniform3fv(shader.u_geoCoordRadiansMin_loc, [minGeoCoord.getLongitudeRad(), minGeoCoord.getLatitudeRad(), 0.0]); 
+	//gl.uniform1f(shader.u_speed_factor_loc, 0.2); // original.***
+	gl.uniform1f(shader.u_speed_factor_loc, 0.1); 
+	gl.uniform1f(shader.u_drop_rate_loc, this.waterManager.dropRate);
+	gl.uniform1f(shader.u_drop_rate_bump_loc, this.waterManager.dropRateBump);
+	var randomSeed = Math.random();
+	gl.uniform1f(shader.u_rand_seed_loc, randomSeed);
+
+	//this.particlesTex; // 
+	//this.particlesPosTex_A;
+	//this.particlesPosTex_B;
+
+	gl.activeTexture(gl.TEXTURE0); // "u_particles"
+	gl.bindTexture(gl.TEXTURE_2D, this.particlesPosTex_B.texId);
+
+	gl.activeTexture(gl.TEXTURE1); // "u_wind"
+	gl.bindTexture(gl.TEXTURE_2D,  this.waterVelocityTexB.texId);
+
+	// bind screenQuad positions.
+	gl.enableVertexAttribArray(shader.a_pos);
+	FBO.bindAttribute(gl, screenQuad.posBuffer, shader.a_pos, 2);
+
+	// Draw screenQuad:
+	gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+	Water._swapTextures(this.particlesPosTex_A, this.particlesPosTex_B);
+
+	//-----------------------------------------------------------------------------------------------------------------------------------------------------
+	// 2) Fade particles render.***************************************************************************************************************************
+	
+	fbo = this.waterManager.windParticlesRenderingFbo;
+	fbo.bind();
+	gl.viewport(0, 0, fbo.width[0], fbo.height[0]);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.particlesTex_A.texId, 0); // waterHeight
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // waterVelocity.
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0);  // debug. delete after use.
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0); // 
+	
+	extbuffers.drawBuffersWEBGL([
+		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
+		extbuffers.NONE, // gl_FragData[1]
+		extbuffers.NONE, // gl_FragData[2]
+		extbuffers.NONE, // gl_FragData[3]
+		]);
+
+	// NO clear : gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	shader = magoManager.postFxShadersManager.getShader("waterParticlesRenderFade");
+	magoManager.postFxShadersManager.useProgram(shader);
+
+	gl.uniform1f(shader.u_opacity_loc, 0.99);
+
+	gl.activeTexture(gl.TEXTURE0); // "u_particles"
+	gl.bindTexture(gl.TEXTURE_2D, this.particlesTex_B.texId);
+
+	// bind screenQuad positions.
+	gl.enableVertexAttribArray(shader.a_pos);
+	FBO.bindAttribute(gl, screenQuad.posBuffer, shader.a_pos, 2);
+
+	// Draw screenQuad:
+	gl.drawArrays(gl.TRIANGLES, 0, 6);
+		
+	//-----------------------------------------------------------------------------------------------------------------------------------------------------
+	// 3) Render particles.********************************************************************************************************************************
+	
+	fbo = this.waterManager.windParticlesRenderingFbo;
+	extbuffers = fbo.extbuffers;
+	fbo.bind();
+	
+	gl.viewport(0, 0, fbo.width[0], fbo.height[0]);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.particlesTex_A.texId, 0); // waterHeight
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // waterVelocity.
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0);  // debug. delete after use.
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0); // 
+	
+	extbuffers.drawBuffersWEBGL([
+		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
+		extbuffers.NONE, // gl_FragData[1]
+		extbuffers.NONE, // gl_FragData[2]
+		extbuffers.NONE, // gl_FragData[3]
+		]);
+
+	shader = magoManager.postFxShadersManager.getShader("waterParticlesRender");
+	magoManager.postFxShadersManager.useProgram(shader);
+
+	// NO clear : gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+	gl.activeTexture(gl.TEXTURE0); // "u_particles"
+	gl.bindTexture(gl.TEXTURE_2D, this.particlesPosTex_B.texId);
+
+	gl.activeTexture(gl.TEXTURE1); // "u_wind"
+	gl.bindTexture(gl.TEXTURE_2D,  this.waterVelocityTexB.texId);
+
+	// bind screenQuad positions.
+	gl.enableVertexAttribArray(shader.a_index);
+	FBO.bindAttribute(gl, this.waterManager.particleIndexBuffer, shader.a_index, 1);
+	gl.uniform1i(shader.u_colorScale, false);
+	
+	gl.uniform1f(shader.u_particles_res, this.waterManager.windRes);
+	gl.uniform2fv(shader.u_wind_min_loc, [0.0, 0.0]); // provisional value.
+	gl.uniform2fv(shader.u_wind_max_loc, [40.0, 40.0]); // provisional value.
+	gl.uniform1i(shader.u_flipTexCoordY_windMap, this.flipTexCoordsY_windMap);
+
+	gl.drawArrays(gl.POINTS, 0, this.waterManager.numParticles);
+		
+	Water._swapTextures(this.particlesTex_A, this.particlesTex_B);
 };
 
 /**
@@ -975,7 +1180,7 @@ Water.prototype.renderWater = function (shader, magoManager)
 	gl.uniform3fv(shader.buildingPosLOW_loc, this.terrainPositionLOW);
 	gl.uniform2fv(shader.u_heightMap_MinMax_loc, this.terrainMinMaxHeights);
 	gl.uniform2fv(shader.u_screenSize_loc, [sceneState.drawingBufferWidth[0], sceneState.drawingBufferHeight[0]]);
-	gl.uniform1i(shader.uWaterType_loc, 0); // 0 = waterColor., 1 = water-flux, 2 = water-velocity
+	gl.uniform1i(shader.uWaterType_loc, 3); // 0 = waterColor., 1 = water-flux, 2 = water-velocity, 3= particles.
 	gl.uniform1f(shader.u_waterMaxHeigh_loc, this.waterMaxHeight);
 
 	var projectionMatrixInv = sceneState.getProjectionMatrixInv();
@@ -991,7 +1196,7 @@ Water.prototype.renderWater = function (shader, magoManager)
 	gl.bindTexture(gl.TEXTURE_2D, this.dem_texture.texId);
 
 	gl.activeTexture(gl.TEXTURE3);
-	gl.bindTexture(gl.TEXTURE_2D, this.waterFluxTexA.texId);// waterFluxTexA, waterVelocityTexA
+	gl.bindTexture(gl.TEXTURE_2D, this.particlesTex_A.texId);// waterFluxTexA, waterVelocityTexA, particlesTex_A
 
 	var vbo_vicky = this.vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.
 	var vertices_count = vbo_vicky.vertexCount;

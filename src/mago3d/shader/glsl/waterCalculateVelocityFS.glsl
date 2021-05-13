@@ -30,6 +30,7 @@ uniform vec2 u_tileSize; // tile size in meters.
 uniform vec2 u_heightMap_MinMax;
 uniform float u_waterMaxHeigh;
 uniform float u_waterMaxFlux;
+uniform float u_waterMaxVelocity;
 
 vec2 encodeVelocity(in vec2 vel)
 {
@@ -142,6 +143,8 @@ void main()
 
     vec2 veloci = vec2(inputflux.w - outputflux.w + outputflux.y - inputflux.y, inputflux.z - outputflux.z + outputflux.x - inputflux.x) / 2.0;
 
+    vec4 shaderLogColor4 = vec4(0.0);
+
     if(da <= 1e-8) 
     {
         veloci = vec2(0.0);
@@ -149,7 +152,7 @@ void main()
     else
     {
         //veloci = veloci/(da * u_PipeLen);
-        veloci = veloci/(da * cellSize_x);
+        veloci = veloci/(da * vec2(cellSize_y, cellSize_x));
     }
 
     if(curuv.x <= div) { deltaH = 0.0; veloci = vec2(0.0); }
@@ -169,27 +172,23 @@ void main()
     //    veloci /= 20.0;
     //  }
 
-    vec2 encodedVelocity = encodeVelocity(veloci);
+    
+
+    vec2 encodedVelocity = encodeVelocity(veloci/u_waterMaxVelocity);
     vec4 writeVel = vec4(encodedVelocity, 0.0, 1.0);
     //vec4 writeWaterHeight = vec4(cur.x,max(cur.y+deltavol, 0.0),cur.z,cur.w); // original.***
+
+    // test debug:
+    //if(abs(veloci.x) > 40.0 || abs(veloci.y) > 40.0)
+    {
+        shaderLogColor4 = vec4(encodedVelocity, 0.0, 1.0);
+    }
 
     float waterHeight = max(currWaterHeight + deltaH, 0.0); // original.***
     waterHeight /= u_waterMaxHeigh; // original.***
 
     vec4 encodedWH = packDepth(waterHeight);
-
-    //vec2 encodedWH = encodeRG(waterHeight);
-    //vec4 writeWaterHeight = vec4(encodedWH.rg, 1.0, 1.0);
-    //gl_FragData[0] = writeWaterHeight;  // water height.
-
     gl_FragData[0] = encodedWH;  // water height.
-
-    float minWaterHeight = 0.005;
-    vec4 shaderLogColor4 = vec4(0.0);
-    if((currWaterHeight) > minWaterHeight && waterHeight < minWaterHeight)
-    {
-        shaderLogColor4 = vec4(1.0, 0.0, 0.0, 1.0);
-    }
 
     #ifdef USE_MULTI_RENDER_TARGET
         gl_FragData[1] = writeVel; // velocity

@@ -2170,7 +2170,17 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 			if(waterLayer.shaderLogTex_Flux_A && waterLayer.shaderLogTex_Flux_A.texId)
 			{
-				texture = waterLayer.shaderLogTex_Flux_A.texId;
+				//texture = waterLayer.shaderLogTex_Flux_A.texId;
+			}
+
+			if(waterLayer.particlesPosTex_A && waterLayer.particlesPosTex_A.texId)
+			{
+				//texture = waterLayer.particlesPosTex_A.texId;
+			}
+
+			if(waterLayer.particlesTex_A && waterLayer.particlesTex_A.texId)
+			{
+				texture = waterLayer.particlesTex_A.texId;
 			}
 		}
 	}

@@ -19,6 +19,9 @@ uniform sampler2D waterSourceTex;
 uniform sampler2D rainTex; // if exist.
 uniform sampler2D currWaterHeightTex;
 
+uniform bool u_existRain;
+uniform float u_waterMaxHeigh;
+
 varying vec2 v_tex_pos;
 
 vec4 packDepth( float v ) {
@@ -58,27 +61,14 @@ void main()
     {
         waterSource = currWaterHeight;
     }
-/*
-    if(waterSource.r < currWaterHeight.r)
+
+    // add rain.
+    if(u_existRain)
     {
-        waterSource.r = currWaterHeight.r;
+        vec4 rain = texture2D(rainTex, vec2(v_tex_pos.x, 1.0 - v_tex_pos.y));
+        waterSource += rain;
     }
 
-    if(waterSource.g < currWaterHeight.g)
-    {
-        waterSource.g = currWaterHeight.g;
-    }
-
-    if(waterSource.b < currWaterHeight.b)
-    {
-        waterSource.b = currWaterHeight.b;
-    }
-
-    if(waterSource.a < currWaterHeight.a)
-    {
-        waterSource.a = currWaterHeight.a;
-    }
-    */
     // provisionally assign the waterSource as waterHeight...
     gl_FragData[0] = waterSource;  // waterHeight.
 

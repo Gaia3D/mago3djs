@@ -16,12 +16,7 @@
 
 uniform sampler2D depthTex;
 uniform sampler2D waterTex;
-
-uniform sampler2D waterHeightTex;
-uniform sampler2D normap;
-uniform sampler2D sceneDepth;
-uniform sampler2D colorReflection;
-uniform sampler2D sedimap;
+uniform sampler2D particlesTex;
 
 uniform vec2 u_screenSize;
 uniform float near;
@@ -30,11 +25,10 @@ uniform float tangentOfHalfFovy;
 uniform float aspectRatio;
 uniform mat4 projectionMatrixInv;
 uniform bool bUseLogarithmicDepth;
-uniform int uWaterType;
+uniform int uWaterType; // 0= nothing, 1= flux, 2= velocity
+uniform int u_RenderParticles; 
 varying float flogz;
 varying float Fcoef_half;
-
-
 
 uniform int u_TerrainType;
 uniform float u_WaterTransparency;
@@ -162,7 +156,7 @@ vec2 decodeVelocity(in vec2 encodedVel)
 void main()
 {
     float minWaterHeightToRender = 0.001; // 1mm.
-    //minWaterHeightToRender = 0.00000001; // test. delete.
+    minWaterHeightToRender = 0.01; // test. delete.
     if(vWaterHeight < minWaterHeightToRender)// original = 0.0001
     {
         discard;
@@ -203,6 +197,26 @@ void main()
         float velocity = length(decodedVelocity.xy)/sqrt(2.0);
         float value = velocity;
         finalCol4 = vec4(value, value, value, alpha);
+
+    }
+    else if(uWaterType == 3)
+    {
+        //alpha = 1.0;
+
+        // particles case: now, decode velocity:
+        vec4 velocity4 = texture2D(waterTex, vec2(vTexCoord.x, vTexCoord.y));
+        finalCol4 = mix(vColorAuxTest, velocity4, velocity4.a);
+        if(alpha < velocity4.a)
+        {
+            alpha = velocity4.a;
+        }
+    }
+
+    // Check if render particles.***
+    if(u_RenderParticles == 1)
+    {
+        // add particles color to "finalCol4".
+        vec4 particlesColor4 = texture2D(particlesTex, vec2(vTexCoord.x, vTexCoord.y));
 
     }
 

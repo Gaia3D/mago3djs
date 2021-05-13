@@ -173,10 +173,10 @@ void main()
 
     float currWaterVol = curWH * pipeArea;
 
-    if(vOut > currWaterVol)// - minWaterVol)
+    if(vOut > currWaterVol)
     {
         //rescale outflow readFlux so that outflow don't exceed current water volume
-        float factor = ((currWaterVol) / vOut);
+        float factor = (currWaterVol / vOut);
         ftopout *= factor;
         frightout *= factor;
         fbottomout *= factor;

@@ -11371,52 +11371,17 @@ void main()\n\
     float vOut = u_timestep * (ftopout + frightout + fbottomout + fleftout); \n\
 \n\
     float currWaterVol = curWH * pipeArea;\n\
-    float minWaterHeight = 0.005;\n\
-    //minWaterHeight = 0.15;\n\
-    float minWaterVol = minWaterHeight * pipeArea;\n\
-    float nextWH = (currWaterVol - vOut) / pipeArea;\n\
-    /*\n\
-    if(curWH <= minWaterHeight)\n\
-    {\n\
-        ftopout = 0.0;\n\
-        frightout = 0.0;\n\
-        fbottomout = 0.0;\n\
-        fleftout = 0.0;\n\
-        shaderLogFluxColor4 = vec4(1.0, 0.0, 0.0, 1.0);\n\
-    }\n\
-    */\n\
 \n\
-    if(vOut > currWaterVol)// - minWaterVol)\n\
+    if(vOut > currWaterVol)\n\
     {\n\
         //rescale outflow readFlux so that outflow don't exceed current water volume\n\
-        float factor = ((currWaterVol) / vOut);\n\
+        float factor = (currWaterVol / vOut);\n\
         ftopout *= factor;\n\
         frightout *= factor;\n\
         fbottomout *= factor;\n\
         fleftout *= factor;\n\
-        //shaderLogFluxColor4 = vec4(0.0, 1.0, 0.0, 1.0);\n\
     }\n\
-    /*\n\
-    if(currWaterVol <= minWaterVol)\n\
-    {\n\
-        ftopout = 0.0;\n\
-        frightout = 0.0;\n\
-        fbottomout = 0.0;\n\
-        fleftout = 0.0;\n\
-        shaderLogFluxColor4 = vec4(0.0, 1.0, 0.0, 1.0);\n\
-    }\n\
-    */\n\
-    /*\n\
-    if(curWH > minWaterHeight && nextWH < minWaterHeight)\n\
-    {\n\
-        float factor = (currWaterVol - minWaterVol)/vOut;\n\
-        ftopout *= factor;\n\
-        frightout *= factor;\n\
-        fbottomout *= factor;\n\
-        fleftout *= factor;\n\
-        shaderLogFluxColor4 = vec4(0.2, 0.5, 1.0, 1.0);\n\
-    }\n\
-    */\n\
+\n\
     \n\
     /*\n\
     //boundary conditions\n\
@@ -11469,6 +11434,9 @@ uniform sampler2D waterSourceTex;\n\
 uniform sampler2D rainTex; // if exist.\n\
 uniform sampler2D currWaterHeightTex;\n\
 \n\
+uniform bool u_existRain;\n\
+uniform float u_waterMaxHeigh;\n\
+\n\
 varying vec2 v_tex_pos;\n\
 \n\
 vec4 packDepth( float v ) {\n\
@@ -11508,27 +11476,14 @@ void main()\n\
     {\n\
         waterSource = currWaterHeight;\n\
     }\n\
-/*\n\
-    if(waterSource.r < currWaterHeight.r)\n\
+\n\
+    // add rain.\n\
+    if(u_existRain)\n\
     {\n\
-        waterSource.r = currWaterHeight.r;\n\
+        vec4 rain = texture2D(rainTex, vec2(v_tex_pos.x, 1.0 - v_tex_pos.y));\n\
+        waterSource += rain;\n\
     }\n\
 \n\
-    if(waterSource.g < currWaterHeight.g)\n\
-    {\n\
-        waterSource.g = currWaterHeight.g;\n\
-    }\n\
-\n\
-    if(waterSource.b < currWaterHeight.b)\n\
-    {\n\
-        waterSource.b = currWaterHeight.b;\n\
-    }\n\
-\n\
-    if(waterSource.a < currWaterHeight.a)\n\
-    {\n\
-        waterSource.a = currWaterHeight.a;\n\
-    }\n\
-    */\n\
     // provisionally assign the waterSource as waterHeight...\n\
     gl_FragData[0] = waterSource;  // waterHeight.\n\
 \n\
@@ -11637,6 +11592,7 @@ uniform vec2 u_tileSize; // tile size in meters.\n\
 uniform vec2 u_heightMap_MinMax;\n\
 uniform float u_waterMaxHeigh;\n\
 uniform float u_waterMaxFlux;\n\
+uniform float u_waterMaxVelocity;\n\
 \n\
 vec2 encodeVelocity(in vec2 vel)\n\
 {\n\
@@ -11749,6 +11705,8 @@ void main()\n\
 \n\
     vec2 veloci = vec2(inputflux.w - outputflux.w + outputflux.y - inputflux.y, inputflux.z - outputflux.z + outputflux.x - inputflux.x) / 2.0;\n\
 \n\
+    vec4 shaderLogColor4 = vec4(0.0);\n\
+\n\
     if(da <= 1e-8) \n\
     {\n\
         veloci = vec2(0.0);\n\
@@ -11756,7 +11714,7 @@ void main()\n\
     else\n\
     {\n\
         //veloci = veloci/(da * u_PipeLen);\n\
-        veloci = veloci/(da * cellSize_x);\n\
+        veloci = veloci/(da * vec2(cellSize_y, cellSize_x));\n\
     }\n\
 \n\
     if(curuv.x <= div) { deltaH = 0.0; veloci = vec2(0.0); }\n\
@@ -11776,27 +11734,23 @@ void main()\n\
     //    veloci /= 20.0;\n\
     //  }\n\
 \n\
-    vec2 encodedVelocity = encodeVelocity(veloci);\n\
+    \n\
+\n\
+    vec2 encodedVelocity = encodeVelocity(veloci/u_waterMaxVelocity);\n\
     vec4 writeVel = vec4(encodedVelocity, 0.0, 1.0);\n\
     //vec4 writeWaterHeight = vec4(cur.x,max(cur.y+deltavol, 0.0),cur.z,cur.w); // original.***\n\
+\n\
+    // test debug:\n\
+    //if(abs(veloci.x) > 40.0 || abs(veloci.y) > 40.0)\n\
+    {\n\
+        shaderLogColor4 = vec4(encodedVelocity, 0.0, 1.0);\n\
+    }\n\
 \n\
     float waterHeight = max(currWaterHeight + deltaH, 0.0); // original.***\n\
     waterHeight /= u_waterMaxHeigh; // original.***\n\
 \n\
     vec4 encodedWH = packDepth(waterHeight);\n\
-\n\
-    //vec2 encodedWH = encodeRG(waterHeight);\n\
-    //vec4 writeWaterHeight = vec4(encodedWH.rg, 1.0, 1.0);\n\
-    //gl_FragData[0] = writeWaterHeight;  // water height.\n\
-\n\
     gl_FragData[0] = encodedWH;  // water height.\n\
-\n\
-    float minWaterHeight = 0.005;\n\
-    vec4 shaderLogColor4 = vec4(0.0);\n\
-    if((currWaterHeight) > minWaterHeight && waterHeight < minWaterHeight)\n\
-    {\n\
-        shaderLogColor4 = vec4(1.0, 0.0, 0.0, 1.0);\n\
-    }\n\
 \n\
     #ifdef USE_MULTI_RENDER_TARGET\n\
         gl_FragData[1] = writeVel; // velocity\n\
@@ -12682,6 +12636,101 @@ void main()\n\
 	gl_PointSize = 10.0;\n\
 }\n\
 ";
+ShaderSource.waterParticlesRenderFS = "precision mediump float;\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+uniform sampler2D u_wind;\n\
+uniform vec2 u_wind_min;\n\
+uniform vec2 u_wind_max;\n\
+uniform bool u_flipTexCoordY_windMap;\n\
+uniform bool u_colorScale;\n\
+\n\
+varying vec2 v_particle_pos;\n\
+\n\
+void main() {\n\
+	vec2 pt = gl_PointCoord - vec2(0.5);\n\
+	if(pt.x*pt.x+pt.y*pt.y > 0.25)\n\
+	{\n\
+		discard;\n\
+	}\n\
+	\n\
+	vec2 windMapTexCoord = v_particle_pos;\n\
+	if(u_flipTexCoordY_windMap)\n\
+	{\n\
+		windMapTexCoord.y = 1.0 - windMapTexCoord.y;\n\
+	}\n\
+    vec2 velocity = mix(u_wind_min, u_wind_max, texture2D(u_wind, windMapTexCoord).rg);\n\
+    float speed_t = length(velocity) / length(u_wind_max);\n\
+\n\
+	if(u_colorScale)\n\
+	{\n\
+		speed_t *= 1.5;\n\
+		if(speed_t > 1.0)speed_t = 1.0;\n\
+		float b = 1.0 - speed_t;\n\
+		float g;\n\
+		if(speed_t > 0.5)\n\
+		{\n\
+			g = 2.0-2.0*speed_t;\n\
+		}\n\
+		else{\n\
+			g = 2.0*speed_t;\n\
+		}\n\
+		float r = speed_t;\n\
+		gl_FragColor = vec4(r,g,b,1.0);\n\
+	}\n\
+	else\n\
+	{\n\
+		float intensity = speed_t*3.0;\n\
+		if(intensity > 1.0)\n\
+			intensity = 1.0;\n\
+		gl_FragColor = vec4(intensity,intensity,intensity,1.0);\n\
+	}\n\
+}\n\
+";
+ShaderSource.waterParticlesRenderingFadeFS = "precision mediump float;\n\
+\n\
+uniform sampler2D u_screen;\n\
+uniform float u_opacity;\n\
+\n\
+varying vec2 v_tex_pos;\n\
+\n\
+void main() {\n\
+    vec4 color = texture2D(u_screen, vec2(v_tex_pos.x, v_tex_pos.y));\n\
+    // a hack to guarantee opacity fade out even with a value close to 1.0\n\
+    gl_FragColor = vec4(floor(255.0 * color * u_opacity) / 255.0);\n\
+}";
+ShaderSource.waterParticlesRenderVS = "precision mediump float;\n\
+\n\
+attribute float a_index;\n\
+\n\
+uniform sampler2D u_particles;\n\
+uniform float u_particles_res;\n\
+\n\
+varying vec2 v_particle_pos;\n\
+\n\
+void main() {\n\
+    vec4 color = texture2D(u_particles, vec2(\n\
+        fract(a_index / u_particles_res),\n\
+        floor(a_index / u_particles_res) / u_particles_res));\n\
+\n\
+    // decode current particle position from the pixel's RGBA value\n\
+    v_particle_pos = vec2(\n\
+        color.r / 255.0 + color.b,\n\
+        color.g / 255.0 + color.a);\n\
+\n\
+    gl_PointSize = 1.5;\n\
+    gl_Position = vec4(2.0 * v_particle_pos.x - 1.0, 1.0 - 2.0 * v_particle_pos.y, 0, 1);\n\
+}\n\
+";
 ShaderSource.waterQuadVertVS = "//precision mediump float;\n\
 \n\
 attribute vec2 a_pos;\n\
@@ -12690,7 +12739,7 @@ varying vec2 v_tex_pos;\n\
 \n\
 void main() {\n\
     v_tex_pos = a_pos;\n\
-    gl_Position = vec4(-1.0 + 2.0 * a_pos, 0, 1);\n\
+    gl_Position = vec4(-1.0 + 2.0 * a_pos, 0.0, 1.0);\n\
 }";
 ShaderSource.waterRenderFS = "//#version 300 es\n\
 \n\
@@ -12710,12 +12759,7 @@ ShaderSource.waterRenderFS = "//#version 300 es\n\
 \n\
 uniform sampler2D depthTex;\n\
 uniform sampler2D waterTex;\n\
-\n\
-uniform sampler2D waterHeightTex;\n\
-uniform sampler2D normap;\n\
-uniform sampler2D sceneDepth;\n\
-uniform sampler2D colorReflection;\n\
-uniform sampler2D sedimap;\n\
+uniform sampler2D particlesTex;\n\
 \n\
 uniform vec2 u_screenSize;\n\
 uniform float near;\n\
@@ -12724,11 +12768,10 @@ uniform float tangentOfHalfFovy;\n\
 uniform float aspectRatio;\n\
 uniform mat4 projectionMatrixInv;\n\
 uniform bool bUseLogarithmicDepth;\n\
-uniform int uWaterType;\n\
+uniform int uWaterType; // 0= nothing, 1= flux, 2= velocity\n\
+uniform int u_RenderParticles; \n\
 varying float flogz;\n\
 varying float Fcoef_half;\n\
-\n\
-\n\
 \n\
 uniform int u_TerrainType;\n\
 uniform float u_WaterTransparency;\n\
@@ -12856,7 +12899,7 @@ vec2 decodeVelocity(in vec2 encodedVel)\n\
 void main()\n\
 {\n\
     float minWaterHeightToRender = 0.001; // 1mm.\n\
-    //minWaterHeightToRender = 0.00000001; // test. delete.\n\
+    minWaterHeightToRender = 0.01; // test. delete.\n\
     if(vWaterHeight < minWaterHeightToRender)// original = 0.0001\n\
     {\n\
         discard;\n\
@@ -12897,6 +12940,26 @@ void main()\n\
         float velocity = length(decodedVelocity.xy)/sqrt(2.0);\n\
         float value = velocity;\n\
         finalCol4 = vec4(value, value, value, alpha);\n\
+\n\
+    }\n\
+    else if(uWaterType == 3)\n\
+    {\n\
+        //alpha = 1.0;\n\
+\n\
+        // particles case: now, decode velocity:\n\
+        vec4 velocity4 = texture2D(waterTex, vec2(vTexCoord.x, vTexCoord.y));\n\
+        finalCol4 = mix(vColorAuxTest, velocity4, velocity4.a);\n\
+        if(alpha < velocity4.a)\n\
+        {\n\
+            alpha = velocity4.a;\n\
+        }\n\
+    }\n\
+\n\
+    // Check if render particles.***\n\
+    if(u_RenderParticles == 1)\n\
+    {\n\
+        // add particles color to \"finalCol4\".\n\
+        vec4 particlesColor4 = texture2D(particlesTex, vec2(vTexCoord.x, vTexCoord.y));\n\
 \n\
     }\n\
 \n\
@@ -13498,6 +13561,188 @@ void main()\n\
 	}\n\
 }\n\
 ";
+ShaderSource.waterUpdateParticlesFS = "precision highp float;\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+uniform sampler2D u_particles;\n\
+uniform sampler2D u_wind;\n\
+uniform sampler2D u_windGlobeDepthTex;\n\
+uniform sampler2D u_windGlobeNormalTex;\n\
+\n\
+uniform mat4 modelViewMatrixInv;\n\
+\n\
+uniform vec2 u_wind_res;\n\
+uniform vec2 u_wind_min;\n\
+uniform vec2 u_wind_max;\n\
+uniform vec3 u_geoCoordRadiansMax;\n\
+uniform vec3 u_geoCoordRadiansMin;\n\
+uniform float u_rand_seed;\n\
+uniform float u_speed_factor;\n\
+uniform float u_interpolation;\n\
+uniform float u_drop_rate;\n\
+uniform float u_drop_rate_bump;\n\
+uniform bool u_flipTexCoordY_windMap;\n\
+uniform vec4 u_visibleTilesRanges[16];\n\
+uniform int u_visibleTilesRangesCount;\n\
+\n\
+uniform float tangentOfHalfFovy;\n\
+uniform float far;            \n\
+uniform float aspectRatio; \n\
+\n\
+// new uniforms test.\n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform mat4 buildingRotMatrix;\n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+uniform mat4 buildingRotMatrixInv;\n\
+uniform vec2 uNearFarArray[4];\n\
+\n\
+#define M_PI 3.1415926535897932384626433832795\n\
+\n\
+varying vec2 v_tex_pos;\n\
+\n\
+// pseudo-random generator\n\
+const vec3 rand_constants = vec3(12.9898, 78.233, 4375.85453);\n\
+// https://community.khronos.org/t/random-values/75728\n\
+float rand(const vec2 co) {\n\
+    float t = dot(rand_constants.xy, co);\n\
+    return fract(sin(t) * (rand_constants.z + t));\n\
+}\n\
+\n\
+vec2 encodeVelocity(in vec2 vel)\n\
+{\n\
+	return vel*0.5 + 0.5;\n\
+}\n\
+\n\
+vec2 decodeVelocity(in vec2 encodedVel)\n\
+{\n\
+	return vec2(encodedVel.xy * 2.0 - 1.0);\n\
+}\n\
+\n\
+// wind speed lookup; use manual bilinear filtering based on 4 adjacent pixels for smooth interpolation\n\
+vec2 lookup_wind(const vec2 uv) {\n\
+    //return texture2D(u_wind, uv).rg; // lower-res hardware filtering\n\
+	\n\
+    vec2 px = 1.0 / u_wind_res;\n\
+    vec2 vc = (floor(uv * u_wind_res)) * px;\n\
+    vec2 f = fract(uv * u_wind_res);\n\
+    vec2 tl = texture2D(u_wind, vc).rg;\n\
+    vec2 tr = texture2D(u_wind, vc + vec2(px.x, 0)).rg;\n\
+    vec2 bl = texture2D(u_wind, vc + vec2(0, px.y)).rg;\n\
+    vec2 br = texture2D(u_wind, vc + px).rg;\n\
+\n\
+    //tl = decodeVelocity(tl);\n\
+    //tr = decodeVelocity(tr);\n\
+    //bl = decodeVelocity(bl);\n\
+    //br = decodeVelocity(br);\n\
+\n\
+    return mix(mix(tl, tr, f.x), mix(bl, br, f.x), f.y);\n\
+	\n\
+}\n\
+\n\
+float radiusAtLatitudeRad(in float latRad)\n\
+{\n\
+	// a = equatorialRadius, b = polarRadius.\n\
+	// r = a*b / sqrt(a2*sin2(lat) + b2*cos2(lat)).\n\
+	//------------------------------------------------------\n\
+	float a = 6378137.0; // Globe.equatorialRadius();\n\
+	float b = 6356752.3142; // Globe.polarRadius();\n\
+	float a2 = 40680631590769.0; // Globe.equatorialRadiusSquared();\n\
+	float b2 = 40408299984087.05552164; // Globe.polarRadiusSquared();\n\
+	\n\
+	float sin = sin(latRad);\n\
+	float cos = cos(latRad);\n\
+	float sin2 = sin*sin;\n\
+	float cos2 = cos*cos;\n\
+	\n\
+	float radius = (a*b)/(sqrt(a2*sin2 + b2*cos2));\n\
+	return radius;\n\
+}\n\
+\n\
+void main() \n\
+{\n\
+    vec4 color = texture2D(u_particles, v_tex_pos);\n\
+    vec2 pos = vec2(\n\
+        color.r / 255.0 + color.b,\n\
+        color.g / 255.0 + color.a); // decode particle position from pixel RGBA\n\
+	vec2 windMapTexCoord = pos;\n\
+	if(u_flipTexCoordY_windMap)\n\
+	{\n\
+		windMapTexCoord.y = 1.0 - windMapTexCoord.y;\n\
+	}\n\
+\n\
+    vec2 velocity = mix(u_wind_min, u_wind_max, decodeVelocity(lookup_wind(windMapTexCoord)));\n\
+    float speed_t = length(velocity) / length(u_wind_max);\n\
+\n\
+    // Calculate pixelSizes.**************************************************************************************************\n\
+	//vec3 buildingPos = buildingPosHIGH + buildingPosLOW;\n\
+	//float radius = length(buildingPos);\n\
+	float minLonRad = u_geoCoordRadiansMin.x;\n\
+	float maxLonRad = u_geoCoordRadiansMax.x;\n\
+	float minLatRad = u_geoCoordRadiansMin.y;\n\
+	float maxLatRad = u_geoCoordRadiansMax.y;\n\
+	float lonRadRange = maxLonRad - minLonRad;\n\
+	float latRadRange = maxLatRad - minLatRad;\n\
+\n\
+    float midLatRad = (maxLatRad + minLatRad) / 2.0;\n\
+    float radius = radiusAtLatitudeRad(midLatRad);\n\
+\n\
+	float distortion = cos((minLatRad + pos.y * latRadRange ));\n\
+\n\
+	float meterToLon = 1.0/(radius * distortion);\n\
+	float meterToLat = 1.0 / radius;\n\
+\n\
+	float xSpeedFactor = meterToLon / lonRadRange;\n\
+	float ySpeedFactor = meterToLat / latRadRange;\n\
+\n\
+	xSpeedFactor *= 1.0 * u_speed_factor;\n\
+	ySpeedFactor *= 1.0 * u_speed_factor;\n\
+\n\
+	vec2 offset = vec2(velocity.x / distortion * xSpeedFactor, -velocity.y * ySpeedFactor);\n\
+\n\
+    // update particle position, wrapping around the date line\n\
+    vec2 auxVec2 = vec2(pos.x, pos.y);\n\
+    pos = fract(1.0 + pos + offset);\n\
+	// End ******************************************************************************************************************\n\
+\n\
+    float drop = 0.0;\n\
+\n\
+    // a random seed to use for the particle drop\n\
+    vec2 seed = (pos + v_tex_pos) * u_rand_seed;\n\
+    float drop_rate = u_drop_rate + speed_t * u_drop_rate_bump;\n\
+    drop = step(1.0 - drop_rate, rand(seed));\n\
+\n\
+    vec4 vel = texture2D(u_wind, v_tex_pos);\n\
+\n\
+    if(drop > 0.1 || speed_t < 0.01) // 0.01\n\
+	{\n\
+		vec2 random_pos = vec2( rand(pos), rand(v_tex_pos) );\n\
+		pos = random_pos;\n\
+	}\n\
+    \n\
+    // encode the new particle position back into RGBA\n\
+    gl_FragData[0] = vec4(\n\
+        fract(pos * 255.0),\n\
+        floor(pos * 255.0) / 255.0);\n\
+\n\
+    #ifdef USE_MULTI_RENDER_TARGET\n\
+        gl_FragData[1] = vec4(0.0); //\n\
+        gl_FragData[2] = vec4(0.0); // \n\
+        gl_FragData[3] = vec4(0.0); // \n\
+        gl_FragData[4] = vec4(0.0); // \n\
+    #endif\n\
+}";
 ShaderSource.wgs84_volumFS = "precision mediump float;\n\
 \n\
 #define M_PI 3.1415926535897932384626433832795\n\
