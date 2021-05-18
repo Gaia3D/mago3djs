@@ -11197,6 +11197,258 @@ void main()\n\
 	\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 }";
+ShaderSource.waterCalculateContaminationFS = "#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+uniform sampler2D waterHeightTex;\n\
+uniform sampler2D terrainHeightTex;\n\
+uniform sampler2D currWaterFluxTex_HIGH;\n\
+uniform sampler2D currWaterFluxTex_LOW;\n\
+uniform sampler2D contaminantHeightTex;\n\
+\n\
+varying vec2 v_tex_pos; // texCoords.\n\
+#define PI 3.1415926\n\
+\n\
+uniform float u_SimRes;\n\
+uniform float u_PipeLen; // pipeLen = cellSizeX = cellSizeY.\n\
+uniform float u_timestep;\n\
+uniform float u_PipeArea;\n\
+\n\
+uniform vec2 u_tileSize; // tile size in meters.\n\
+uniform vec2 u_heightMap_MinMax;\n\
+uniform float u_waterMaxHeigh;\n\
+uniform float u_waterMaxFlux;\n\
+uniform float u_waterMaxVelocity;\n\
+uniform float u_contaminantMaxHeigh;\n\
+\n\
+uniform vec2 u_simulationTextureSize;\n\
+uniform vec2 u_terrainTextureSize;\n\
+\n\
+vec2 encodeVelocity(in vec2 vel)\n\
+{\n\
+	return vel*0.5 + 0.5;\n\
+}\n\
+\n\
+vec2 decodeVelocity(in vec2 encodedVel)\n\
+{\n\
+	return vec2(encodedVel.xy * 2.0 - 1.0);\n\
+}\n\
+\n\
+float decodeRG(in vec2 waterColorRG)\n\
+{\n\
+    // https://titanwolf.org/Network/Articles/Article?AID=666e7443-0511-4210-b39c-db0bb6738246#gsc.tab=0\n\
+    return dot(waterColorRG, vec2(1.0, 1.0 / 255.0));\n\
+}\n\
+\n\
+vec2 encodeRG(in float wh)\n\
+{\n\
+    float encodedBit = 1.0/255.0;\n\
+    vec2 enc = vec2(1.0, 255.0) * wh;\n\
+    enc = fract(enc);\n\
+    enc.x -= enc.y * encodedBit;\n\
+    return enc; // R = HIGH, G = LOW.***\n\
+}\n\
+\n\
+vec4 packDepth( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+  return enc;\n\
+}\n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+}\n\
+\n\
+float getWaterHeight(in vec2 texCoord)\n\
+{\n\
+    vec4 color4 = texture2D(waterHeightTex, texCoord);\n\
+    //float decoded = decodeRG(color4.rg); // old.\n\
+    float decoded = unpackDepth(color4);\n\
+    float waterHeight = decoded * u_waterMaxHeigh;\n\
+    return waterHeight;\n\
+}\n\
+\n\
+float getContaminantHeight(in vec2 texCoord)\n\
+{\n\
+    vec4 color4 = texture2D(contaminantHeightTex, texCoord);\n\
+    float decoded = unpackDepth(color4);\n\
+    float contaminHeight = decoded * u_contaminantMaxHeigh;\n\
+    return contaminHeight;\n\
+}\n\
+\n\
+vec4 getWaterFlux(in vec2 texCoord)\n\
+{\n\
+    vec4 color4_HIGH = texture2D(currWaterFluxTex_HIGH, texCoord);\n\
+    vec4 color4_LOW = texture2D(currWaterFluxTex_LOW, texCoord);\n\
+\n\
+    float flux_top = decodeRG(vec2(color4_HIGH.r, color4_LOW.r));\n\
+    float flux_right = decodeRG(vec2(color4_HIGH.g, color4_LOW.g));\n\
+    float flux_bottom = decodeRG(vec2(color4_HIGH.b, color4_LOW.b));\n\
+    float flux_left = decodeRG(vec2(color4_HIGH.a, color4_LOW.a));\n\
+\n\
+    vec4 flux = vec4(flux_top, flux_right, flux_bottom, flux_left) * u_waterMaxFlux;\n\
+    return flux; \n\
+}\n\
+\n\
+void encodeWaterFlux(vec4 flux, inout vec4 flux_high, inout vec4 flux_low)\n\
+{\n\
+    vec2 encoded_top_flux = encodeRG(flux.r);\n\
+    vec2 encoded_right_flux = encodeRG(flux.g);\n\
+    vec2 encoded_bottom_flux = encodeRG(flux.b);\n\
+    vec2 encoded_left_flux = encodeRG(flux.a);\n\
+\n\
+    flux_high = vec4(encoded_top_flux.r, encoded_right_flux.r, encoded_bottom_flux.r, encoded_left_flux.r);\n\
+    flux_low = vec4(encoded_top_flux.g, encoded_right_flux.g, encoded_bottom_flux.g, encoded_left_flux.g);\n\
+}\n\
+\n\
+void main()\n\
+{\n\
+    vec2 curuv = vec2(v_tex_pos.x, v_tex_pos.y);\n\
+    curuv = v_tex_pos;\n\
+\n\
+    float divX = 1.0/u_simulationTextureSize.x;\n\
+    float divY = 1.0/u_simulationTextureSize.y;\n\
+\n\
+    float cellSize_x = u_tileSize.x / u_simulationTextureSize.x;\n\
+    float cellSize_y = u_tileSize.y / u_simulationTextureSize.y;\n\
+    float cellArea = cellSize_x * cellSize_y;\n\
+\n\
+    vec4 topflux = getWaterFlux(curuv + vec2(0.0, divY));\n\
+    vec4 rightflux = getWaterFlux(curuv + vec2(divX, 0.0));\n\
+    vec4 bottomflux = getWaterFlux(curuv + vec2(0.0, -divY));\n\
+    vec4 leftflux = getWaterFlux(curuv + vec2(-divX, 0.0));\n\
+    vec4 curflux = getWaterFlux(curuv);\n\
+    //vec4 curT = texture2D(terrainHeightTex, vec2(v_tex_pos.x, v_tex_pos.y));\n\
+    //curT = u_heightMap_MinMax.x + curT * u_heightMap_MinMax.y;\n\
+    float topWH = getWaterHeight(curuv + vec2(0.0, divY));\n\
+    float rightWH = getWaterHeight(curuv + vec2(divX, 0.0));\n\
+    float bottomWH = getWaterHeight(curuv + vec2(0.0, -divY));\n\
+    float leftWH = getWaterHeight(curuv + vec2(-divX, 0.0));\n\
+    float currWH = getWaterHeight(curuv);\n\
+    \n\
+    float topContaminHeight = getContaminantHeight(curuv + vec2(0.0, divY));\n\
+    float rightContaminHeight = getContaminantHeight(curuv + vec2(divX, 0.0));\n\
+    float bottomContaminHeight = getContaminantHeight(curuv + vec2(0.0, -divY));\n\
+    float leftContaminHeight = getContaminantHeight(curuv + vec2(-divX, 0.0));\n\
+    float currContaminHeight = getContaminantHeight(curuv);\n\
+\n\
+    \n\
+    \n\
+    //out flow flux\n\
+    float ftopout = curflux.x;\n\
+    float frightout = curflux.y;\n\
+    float fbottomout = curflux.z;\n\
+    float fleftout = curflux.w;\n\
+\n\
+    vec4 outputflux = curflux;\n\
+    vec4 inputflux = vec4(topflux.z, rightflux.w, bottomflux.x, leftflux.y);\n\
+\n\
+    float fout = ftopout + frightout + fbottomout + fleftout;\n\
+    float fin = inputflux.x + inputflux.y + inputflux.z + inputflux.w;\n\
+\n\
+    \n\
+\n\
+    float deltaH = u_timestep * (fin - fout) / cellArea; \n\
+    //---------------------------------------------------------------------------------\n\
+    // do contaminant flux interchange.\n\
+    // Top.***\n\
+    float topOutContaminH = (curflux.x * u_timestep / cellArea) * (currContaminHeight / currWH);\n\
+    float topInContaminH = (topflux.z * u_timestep / cellArea) * (topContaminHeight / topWH);\n\
+    float topContaminDelta = topInContaminH - topOutContaminH;\n\
+\n\
+    // Right.***\n\
+    float rightOutContaminH = (curflux.y * u_timestep / cellArea) * (currContaminHeight / currWH);\n\
+    float rightInContaminH = (rightflux.w * u_timestep / cellArea) * (rightContaminHeight / rightWH);\n\
+    float rightContaminDelta = rightInContaminH - rightOutContaminH;\n\
+\n\
+    // Bottom.***\n\
+    float bottomOutContaminH = (curflux.z * u_timestep / cellArea) * (currContaminHeight / currWH);\n\
+    float bottomInContaminH = (bottomflux.x * u_timestep / cellArea) * (bottomContaminHeight / bottomWH);\n\
+    float bottomContaminDelta = bottomInContaminH - bottomOutContaminH;\n\
+\n\
+    // Left.***\n\
+    float leftOutContaminH = (curflux.w * u_timestep / cellArea) * (currContaminHeight / currWH);\n\
+    float leftInContaminH = (leftflux.y * u_timestep / cellArea) * (leftContaminHeight / leftWH);\n\
+    float leftContaminDelta = leftInContaminH - leftOutContaminH;\n\
+\n\
+    float newContaminantHeight = max(0.0, topContaminDelta + rightContaminDelta + bottomContaminDelta + leftContaminDelta);\n\
+    //----------------------------------------------------------------------------------\n\
+\n\
+    //float d1 = cur.y + curs.x; // original. (waterH + sedimentH).\n\
+    float d1 = currWH;\n\
+    float d2 = d1 + deltaH;\n\
+    float da = (d1 + d2)/2.0;\n\
+\n\
+    vec2 veloci = vec2(inputflux.w - outputflux.w + outputflux.y - inputflux.y, inputflux.z - outputflux.z + outputflux.x - inputflux.x) / 2.0;\n\
+\n\
+    vec4 shaderLogColor4 = vec4(0.0);\n\
+\n\
+    if(da <= 1e-8) \n\
+    {\n\
+        veloci = vec2(0.0);\n\
+    }\n\
+    else\n\
+    {\n\
+        //veloci = veloci/(da * u_PipeLen);\n\
+        veloci = veloci/(da * vec2(cellSize_y, cellSize_x));\n\
+    }\n\
+\n\
+    if(curuv.x <= divX) { deltaH = 0.0; veloci = vec2(0.0); }\n\
+    if(curuv.x >= 1.0 - 2.0 * divX) { deltaH = 0.0; veloci = vec2(0.0); }\n\
+    if(curuv.y <= divY) { deltaH = 0.0; veloci = vec2(0.0); }\n\
+    if(curuv.y >= 1.0 - 2.0 * divY) { deltaH = 0.0; veloci = vec2(0.0); }\n\
+\n\
+    //  float absx = abs(veloci.x);\n\
+    //  float absy = abs(veloci.y);\n\
+    //  float maxxy = max(absx, absy);\n\
+    //  float minxy = min(absx, absy);\n\
+    //  float tantheta = minxy / maxxy;\n\
+    //  float scale = cos(45.0 * PI / 180.0 - atan(tantheta));\n\
+    //  float divtheta = (1.0/sqrt(2.0)) / scale;\n\
+    //  float divs = min(abs(veloci.x), abs(veloci.y))/max(abs(veloci.x), abs(veloci.y));\n\
+    //  if((divs) > 20.0){\n\
+    //    veloci /= 20.0;\n\
+    //  }\n\
+\n\
+    \n\
+\n\
+    vec2 encodedVelocity = encodeVelocity(veloci/u_waterMaxVelocity);\n\
+    vec4 writeVel = vec4(encodedVelocity, 0.0, 1.0);\n\
+    //vec4 writeWaterHeight = vec4(cur.x,max(cur.y+deltavol, 0.0),cur.z,cur.w); // original.***\n\
+\n\
+    // test debug:\n\
+    //if(abs(veloci.x) > 40.0 || abs(veloci.y) > 40.0)\n\
+    {\n\
+        shaderLogColor4 = vec4(encodedVelocity, 0.0, 1.0);\n\
+    }\n\
+\n\
+    float waterHeight = max(currWH + deltaH, 0.0); // original.***\n\
+    waterHeight /= u_waterMaxHeigh; // original.***\n\
+\n\
+    vec4 encodedWH = packDepth(waterHeight);\n\
+    gl_FragData[0] = encodedWH;  // water height.\n\
+\n\
+    #ifdef USE_MULTI_RENDER_TARGET\n\
+        gl_FragData[1] = writeVel; // velocity\n\
+        gl_FragData[2] = shaderLogColor4; // \n\
+        gl_FragData[3] = vec4(0.0); // \n\
+        gl_FragData[4] = vec4(0.0); // \n\
+    #endif\n\
+\n\
+}";
 ShaderSource.waterCalculateFluxFS = "//#version 300 es\n\
 \n\
 #ifdef GL_ES\n\
@@ -11215,21 +11467,23 @@ ShaderSource.waterCalculateFluxFS = "//#version 300 es\n\
 \n\
 uniform sampler2D waterHeightTex;\n\
 uniform sampler2D terrainHeightTex;\n\
-uniform sampler2D currWaterFluxTex;\n\
+uniform sampler2D contaminantHeightTex;\n\
 uniform sampler2D currWaterFluxTex_HIGH;\n\
 uniform sampler2D currWaterFluxTex_LOW;\n\
 \n\
 varying vec2 v_tex_pos;\n\
 \n\
 uniform float u_SimRes;\n\
-uniform float u_PipeLen; // pipeLen = cellSizeX = cellSizeY.\n\
 uniform float u_timestep;\n\
-uniform float u_PipeArea;\n\
 \n\
 uniform vec2 u_tileSize; // tile size in meters.\n\
 uniform float u_waterMaxHeigh;\n\
 uniform float u_waterMaxFlux;\n\
 uniform vec2 u_heightMap_MinMax;\n\
+uniform float u_contaminantMaxHeigh; // if \"u_contaminantMaxHeigh\" < 0.0 -> no exist contaminant.\n\
+\n\
+uniform vec2 u_simulationTextureSize;\n\
+uniform vec2 u_terrainTextureSize;\n\
 \n\
 float decodeRG(in vec2 waterColorRG)\n\
 {\n\
@@ -11269,6 +11523,16 @@ float getWaterHeight(in vec2 texCoord)\n\
     return waterHeight;\n\
 }\n\
 \n\
+float getContaminantHeight(in vec2 texCoord)\n\
+{\n\
+    vec4 color4 = texture2D(contaminantHeightTex, texCoord);\n\
+    //float decoded = decodeRG(color4.rg); // 16bit.\n\
+    float decoded = unpackDepth(color4); // 32bit.\n\
+    float waterHeight = decoded * u_contaminantMaxHeigh;\n\
+\n\
+    return waterHeight;\n\
+}\n\
+\n\
 vec4 getWaterFlux(in vec2 texCoord)\n\
 {\n\
     vec4 color4_HIGH = texture2D(currWaterFluxTex_HIGH, texCoord);\n\
@@ -11294,50 +11558,79 @@ void encodeWaterFlux(vec4 flux, inout vec4 flux_high, inout vec4 flux_low)\n\
     flux_low = vec4(encoded_top_flux.g, encoded_right_flux.g, encoded_bottom_flux.g, encoded_left_flux.g);\n\
 }\n\
 \n\
+vec4 getTerrainHeightInterpolation(const vec2 uv) {\n\
+    //return texture2D(u_wind, uv).rg; // lower-res hardware filtering\n\
+	\n\
+    vec2 px = 1.0 / u_terrainTextureSize;\n\
+    vec2 vc = (floor(uv * u_terrainTextureSize)) * px;\n\
+    vec2 f = fract(uv * u_terrainTextureSize);\n\
+    vec4 tl = texture2D(terrainHeightTex, vc);\n\
+    vec4 tr = texture2D(terrainHeightTex, vc + vec2(px.x, 0));\n\
+    vec4 bl = texture2D(terrainHeightTex, vc + vec2(0, px.y));\n\
+    vec4 br = texture2D(terrainHeightTex, vc + px);\n\
 \n\
+    return mix(mix(tl, tr, f.x), mix(bl, br, f.x), f.y);\n\
+}\n\
 \n\
-\n\
+float getTerrainHeight(in vec2 texCoord)\n\
+{\n\
+    float terainHeight = texture2D(terrainHeightTex, texCoord).r;\n\
+    terainHeight = u_heightMap_MinMax.x + terainHeight * u_heightMap_MinMax.y;\n\
+    return terainHeight;\n\
+}\n\
 \n\
 void main()\n\
 {\n\
     vec2 curuv = vec2(v_tex_pos.x, v_tex_pos.y);\n\
     vec2 curuvTerrain = vec2(v_tex_pos.x, v_tex_pos.y);\n\
-    float div = 1.0/u_SimRes;\n\
-    //float g = 0.80;\n\
+    float divX = 1.0/u_simulationTextureSize.x;\n\
+    float divY = 1.0/u_simulationTextureSize.y;\n\
 \n\
-    float cellSize_x = u_tileSize.x / u_SimRes;\n\
-    float cellSize_y = u_tileSize.y / u_SimRes;\n\
+    float cellSize_x = u_tileSize.x / u_simulationTextureSize.x;\n\
+    float cellSize_y = u_tileSize.y / u_simulationTextureSize.y;\n\
 \n\
     // Terrain & water heights.**************************************************************************************************\n\
     // read terrain heights.\n\
-    vec4 topT = texture2D(terrainHeightTex, curuvTerrain + vec2(0.0, div));\n\
-    vec4 rightT = texture2D(terrainHeightTex, curuvTerrain + vec2(div, 0.0));\n\
-    vec4 bottomT = texture2D(terrainHeightTex, curuvTerrain + vec2(0.0, -div));\n\
-    vec4 leftT = texture2D(terrainHeightTex, curuvTerrain + vec2(-div, 0.0));\n\
-    vec4 curT = texture2D(terrainHeightTex, curuvTerrain);\n\
-\n\
-    topT = u_heightMap_MinMax.x + topT * u_heightMap_MinMax.y;\n\
-    rightT = u_heightMap_MinMax.x + rightT * u_heightMap_MinMax.y;\n\
-    bottomT = u_heightMap_MinMax.x + bottomT * u_heightMap_MinMax.y;\n\
-    leftT = u_heightMap_MinMax.x + leftT * u_heightMap_MinMax.y;\n\
-    curT = u_heightMap_MinMax.x + curT * u_heightMap_MinMax.y;\n\
+    float topTH = getTerrainHeight(curuvTerrain + vec2(0.0, divY));\n\
+    float rightTH = getTerrainHeight(curuvTerrain + vec2(divX, 0.0));\n\
+    float bottomTH = getTerrainHeight(curuvTerrain + vec2(0.0, -divY));\n\
+    float leftTH = getTerrainHeight(curuvTerrain + vec2(-divX, 0.0));\n\
+    float curTH = getTerrainHeight(curuvTerrain);\n\
 \n\
     // read water heights.\n\
-    float topWH = getWaterHeight(curuv + vec2(0.0, div));\n\
-    float rightWH = getWaterHeight(curuv + vec2(div, 0.0));\n\
-    float bottomWH = getWaterHeight(curuv + vec2(0.0, -div));\n\
-    float leftWH = getWaterHeight(curuv + vec2(-div, 0.0));\n\
-\n\
+    float topWH = getWaterHeight(curuv + vec2(0.0, divY));\n\
+    float rightWH = getWaterHeight(curuv + vec2(divX, 0.0));\n\
+    float bottomWH = getWaterHeight(curuv + vec2(0.0, -divY));\n\
+    float leftWH = getWaterHeight(curuv + vec2(-divX, 0.0));\n\
     float curWH = getWaterHeight(curuv);\n\
+\n\
+    float topCH = 0.0;\n\
+    float rightCH = 0.0;\n\
+    float bottomCH = 0.0;\n\
+    float leftCH = 0.0;\n\
+    float curCH = 0.0;\n\
+\n\
+    // Check if exist contaminant.\n\
+    if(u_contaminantMaxHeigh > 0.0)\n\
+    {\n\
+        // exist contaminant.\n\
+        topCH = getContaminantHeight(curuv + vec2(0.0, divY));\n\
+        rightCH = getContaminantHeight(curuv + vec2(divX, 0.0));\n\
+        bottomCH = getContaminantHeight(curuv + vec2(0.0, -divY));\n\
+        leftCH = getContaminantHeight(curuv + vec2(-divX, 0.0));\n\
+        curCH = getContaminantHeight(curuv);\n\
+    }\n\
+\n\
     // End terrain & water heights.-----------------------------------------------------------------------------------------------\n\
 \n\
     // Calculate deltaPresure: deltaP_ij(x,y) = ro*g* deltaH_ij(x,y).*************************************************************\n\
     // calculate deltaH.***\n\
-    float curTotalH = curT.r + curWH;\n\
-    float HTopOut = curTotalH - (topT.r + topWH);\n\
-    float HRightOut = curTotalH - (rightT.r + rightWH);\n\
-    float HBottomOut = curTotalH - (bottomT.r + bottomWH);\n\
-    float HLeftOut = curTotalH - (leftT.r + leftWH);\n\
+    // Provisionally considere contaminant density equal to water density.\n\
+    float curTotalH = curTH + curWH + curCH;\n\
+    float HTopOut = curTotalH - (topTH + topWH + topCH);\n\
+    float HRightOut = curTotalH - (rightTH + rightWH + rightCH);\n\
+    float HBottomOut = curTotalH - (bottomTH + bottomWH + bottomCH);\n\
+    float HLeftOut = curTotalH - (leftTH + leftWH + leftCH);\n\
     float gravity = 9.8;\n\
     float waterDensity = 997.0; // 997kg/m3.\n\
     vec4 deltaP = vec4(waterDensity * gravity * HTopOut, \n\
@@ -11370,7 +11663,7 @@ void main()\n\
     // calculate vOut & currVolum.\n\
     float vOut = u_timestep * (ftopout + frightout + fbottomout + fleftout); \n\
 \n\
-    float currWaterVol = curWH * pipeArea;\n\
+    float currWaterVol = (curWH + curCH) * pipeArea;\n\
 \n\
     if(vOut > currWaterVol)\n\
     {\n\
@@ -11408,8 +11701,8 @@ void main()\n\
     #ifdef USE_MULTI_RENDER_TARGET\n\
         gl_FragData[1] = flux_low; // water flux low.\n\
         gl_FragData[2] = shaderLogFluxColor4; // shader log. delete after use.\n\
-        gl_FragData[3] = vec4(0.0); // albedo\n\
-        gl_FragData[4] = vec4(0.0); // selection color\n\
+        gl_FragData[3] = shaderLogFluxColor4; // albedo\n\
+        gl_FragData[4] = shaderLogFluxColor4; // selection color\n\
     #endif\n\
 \n\
 }";
@@ -11433,9 +11726,12 @@ ShaderSource.waterCalculateHeightFS = "//#version 300 es\n\
 uniform sampler2D waterSourceTex;\n\
 uniform sampler2D rainTex; // if exist.\n\
 uniform sampler2D currWaterHeightTex;\n\
+uniform sampler2D currContaminationHeightTex;\n\
+uniform sampler2D contaminantSourceTex;\n\
 \n\
 uniform bool u_existRain;\n\
 uniform float u_waterMaxHeigh;\n\
+uniform float u_contaminantMaxHeigh;\n\
 \n\
 varying vec2 v_tex_pos;\n\
 \n\
@@ -11464,9 +11760,7 @@ float getWaterHeight(in vec2 texCoord)\n\
 void main()\n\
 {\n\
     // 1rst, take the water source.\n\
-    //vec2 texCoord = vec2(v_tex_pos.x, 1.0 - v_tex_pos.y);\n\
-    //texCoord = v_tex_pos;\n\
-    vec4 currWaterHeight = texture2D(currWaterHeightTex, vec2(v_tex_pos.x, v_tex_pos.y));\n\
+    vec4 currWaterHeight = texture2D(currWaterHeightTex, v_tex_pos);\n\
     vec4 waterSource = texture2D(waterSourceTex, vec2(v_tex_pos.x, 1.0 - v_tex_pos.y));\n\
 \n\
     float decodedCurrWaterHeight = unpackDepth(currWaterHeight);\n\
@@ -11484,11 +11778,26 @@ void main()\n\
         waterSource += rain;\n\
     }\n\
 \n\
+    vec4 contaminSourceHeight = vec4(0.0);\n\
+    if(u_contaminantMaxHeigh > 0.0)\n\
+    {\n\
+        // check if exist contaminant.\n\
+        contaminSourceHeight = texture2D(contaminantSourceTex, vec2(v_tex_pos.x, 1.0 - v_tex_pos.y));\n\
+        vec4 currContaminHeight = texture2D(currContaminationHeightTex, v_tex_pos);\n\
+\n\
+        float decodedSourceContaminHeight = unpackDepth(contaminSourceHeight);\n\
+        float decodedCurrContaminHeight = unpackDepth(currContaminHeight);\n\
+        if(decodedSourceContaminHeight < decodedCurrContaminHeight)\n\
+        {\n\
+            contaminSourceHeight = currContaminHeight;\n\
+        }\n\
+    }\n\
+\n\
     // provisionally assign the waterSource as waterHeight...\n\
     gl_FragData[0] = waterSource;  // waterHeight.\n\
 \n\
     #ifdef USE_MULTI_RENDER_TARGET\n\
-        gl_FragData[1] = vec4(1.0, 0.0, 0.5, 1.0); // depth\n\
+        gl_FragData[1] = contaminSourceHeight; // contamination\n\
         gl_FragData[2] = vec4(1.0, 0.0, 0.5, 1.0); // normal\n\
         gl_FragData[3] = vec4(1.0, 0.0, 0.5, 1.0); // albedo\n\
         gl_FragData[4] = vec4(1.0, 0.0, 0.5, 1.0); // selection color\n\
@@ -11576,9 +11885,9 @@ ShaderSource.waterCalculateVelocityFS = "#ifdef GL_ES\n\
 \n\
 uniform sampler2D waterHeightTex;\n\
 uniform sampler2D terrainHeightTex;\n\
-uniform sampler2D currWaterFluxTex;\n\
 uniform sampler2D currWaterFluxTex_HIGH;\n\
 uniform sampler2D currWaterFluxTex_LOW;\n\
+uniform sampler2D contaminantHeightTex;\n\
 \n\
 varying vec2 v_tex_pos; // texCoords.\n\
 #define PI 3.1415926\n\
@@ -11593,6 +11902,10 @@ uniform vec2 u_heightMap_MinMax;\n\
 uniform float u_waterMaxHeigh;\n\
 uniform float u_waterMaxFlux;\n\
 uniform float u_waterMaxVelocity;\n\
+uniform float u_contaminantMaxHeigh;\n\
+\n\
+uniform vec2 u_simulationTextureSize;\n\
+uniform vec2 u_terrainTextureSize;\n\
 \n\
 vec2 encodeVelocity(in vec2 vel)\n\
 {\n\
@@ -11640,6 +11953,16 @@ float getWaterHeight(in vec2 texCoord)\n\
     return waterHeight;\n\
 }\n\
 \n\
+float getContaminantHeight(in vec2 texCoord)\n\
+{\n\
+    vec4 color4 = texture2D(contaminantHeightTex, texCoord);\n\
+    //float decoded = decodeRG(color4.rg); // 16bit.\n\
+    float decoded = unpackDepth(color4); // 32bit.\n\
+    float waterHeight = decoded * u_contaminantMaxHeigh;\n\
+\n\
+    return waterHeight;\n\
+}\n\
+\n\
 vec4 getWaterFlux(in vec2 texCoord)\n\
 {\n\
     vec4 color4_HIGH = texture2D(currWaterFluxTex_HIGH, texCoord);\n\
@@ -11669,17 +11992,21 @@ void main()\n\
 {\n\
     vec2 curuv = vec2(v_tex_pos.x, v_tex_pos.y);\n\
     curuv = v_tex_pos;\n\
-    float div = 1.0/u_SimRes;\n\
 \n\
-    vec4 topflux = getWaterFlux(curuv + vec2(0.0, div));\n\
-    vec4 rightflux = getWaterFlux(curuv + vec2(div, 0.0));\n\
-    vec4 bottomflux = getWaterFlux(curuv + vec2(0.0, -div));\n\
-    vec4 leftflux = getWaterFlux(curuv + vec2(-div, 0.0));\n\
+    float divX = 1.0/u_simulationTextureSize.x;\n\
+    float divY = 1.0/u_simulationTextureSize.y;\n\
+\n\
+    float cellSize_x = u_tileSize.x / u_simulationTextureSize.x;\n\
+    float cellSize_y = u_tileSize.y / u_simulationTextureSize.y;\n\
+    float cellArea = cellSize_x * cellSize_y;\n\
+    float timeStep_divCellArea = u_timestep / cellArea;;\n\
+\n\
+    vec4 topflux = getWaterFlux(curuv + vec2(0.0, divY));\n\
+    vec4 rightflux = getWaterFlux(curuv + vec2(divX, 0.0));\n\
+    vec4 bottomflux = getWaterFlux(curuv + vec2(0.0, -divY));\n\
+    vec4 leftflux = getWaterFlux(curuv + vec2(-divX, 0.0));\n\
     vec4 curflux = getWaterFlux(curuv);\n\
-    //vec4 curT = texture2D(terrainHeightTex, vec2(v_tex_pos.x, v_tex_pos.y));\n\
-    //curT = u_heightMap_MinMax.x + curT * u_heightMap_MinMax.y;\n\
-    float currWaterHeight = getWaterHeight(vec2(v_tex_pos.x, v_tex_pos.y));\n\
-    \n\
+\n\
     //out flow flux\n\
     float ftopout = curflux.x;\n\
     float frightout = curflux.y;\n\
@@ -11689,17 +12016,78 @@ void main()\n\
     vec4 outputflux = curflux;\n\
     vec4 inputflux = vec4(topflux.z, rightflux.w, bottomflux.x, leftflux.y);\n\
 \n\
+    // Now, calculate the contamination trasference.**************************************************\n\
+    // read water heights.\n\
+    float topWH = getWaterHeight(curuv + vec2(0.0, divY));\n\
+    float rightWH = getWaterHeight(curuv + vec2(divX, 0.0));\n\
+    float bottomWH = getWaterHeight(curuv + vec2(0.0, -divY));\n\
+    float leftWH = getWaterHeight(curuv + vec2(-divX, 0.0));\n\
+    float curWH = getWaterHeight(curuv);\n\
+\n\
+    float topCH = 0.0;\n\
+    float rightCH = 0.0;\n\
+    float bottomCH = 0.0;\n\
+    float leftCH = 0.0;\n\
+    float curCH = 0.0;\n\
+\n\
+    // Check if exist contaminant.\n\
+    if(u_contaminantMaxHeigh > 0.0)\n\
+    {\n\
+        // exist contaminant.\n\
+        topCH = getContaminantHeight(curuv + vec2(0.0, divY));\n\
+        rightCH = getContaminantHeight(curuv + vec2(divX, 0.0));\n\
+        bottomCH = getContaminantHeight(curuv + vec2(0.0, -divY));\n\
+        leftCH = getContaminantHeight(curuv + vec2(-divX, 0.0));\n\
+        curCH = getContaminantHeight(curuv);\n\
+    }\n\
+\n\
+    // calculate contaminat ratio.\n\
+    float topContaminPerUnit = topCH / (topCH + topWH);\n\
+    float rightContaminPerUnit = rightCH / (rightCH + rightWH);\n\
+    float bottomContaminPerUnit = bottomCH / (bottomCH + bottomWH);\n\
+    float leftContaminPerUnit = leftCH / (leftCH + leftWH);\n\
+\n\
+    // calculate input waterHeight & contaminHeight.\n\
+    float inputTopTotalH = inputflux.x * timeStep_divCellArea;\n\
+    float inputRightTotalH = inputflux.y * timeStep_divCellArea;\n\
+    float inputBottomTotalH = inputflux.z * timeStep_divCellArea;\n\
+    float inputLeftTotalH = inputflux.w * timeStep_divCellArea;\n\
+\n\
+    float inputTopCH = inputTopTotalH * topContaminPerUnit;\n\
+    float inputRightCH = inputRightTotalH * rightContaminPerUnit;\n\
+    float inputBottomCH = inputBottomTotalH * bottomContaminPerUnit;\n\
+    float inputLeftCH = inputLeftTotalH * leftContaminPerUnit;\n\
+\n\
+    float inputTopWH = inputTopTotalH - inputTopCH;\n\
+    float inputRightWH = inputRightTotalH - inputRightCH;\n\
+    float inputBottomWH = inputBottomTotalH - inputBottomCH;\n\
+    float inputLeftWH = inputLeftTotalH - inputLeftCH;\n\
+\n\
+    // Now, calculate outputs.\n\
+    float currContaminPerUnit = curCH / (curCH + curWH);\n\
+    float outputTotalH = (ftopout + frightout + fbottomout + fleftout) * timeStep_divCellArea;\n\
+    float outputCH = outputTotalH * currContaminPerUnit;\n\
+    float outputWH = outputTotalH - outputCH;\n\
+\n\
+    // Now, calculate delt-water-H & delta-contaminant-H.\n\
+    float deltaWH = inputTopWH + inputRightWH + inputBottomWH + inputLeftWH - outputWH;\n\
+    float deltaCH = inputTopCH + inputRightCH + inputBottomCH + inputLeftCH - outputCH;\n\
+    float deltaH = deltaWH + deltaCH;\n\
+    //------------------------------------------------------------------------------------------------\n\
+\n\
+    //vec4 curT = texture2D(terrainHeightTex, vec2(v_tex_pos.x, v_tex_pos.y));\n\
+    //curT = u_heightMap_MinMax.x + curT * u_heightMap_MinMax.y;\n\
+\n\
     float fout = ftopout + frightout + fbottomout + fleftout;\n\
     float fin = inputflux.x + inputflux.y + inputflux.z + inputflux.w;\n\
 \n\
-    float cellSize_x = u_tileSize.x / u_SimRes;\n\
-    float cellSize_y = u_tileSize.y / u_SimRes;\n\
-\n\
-    float deltaH = u_timestep * (fin - fout) / (cellSize_x * cellSize_y); \n\
+    //float deltaH = u_timestep * (fin - fout) / cellArea; \n\
     //---------------------------------------------------------------------------------\n\
 \n\
+    \n\
+\n\
     //float d1 = cur.y + curs.x; // original. (waterH + sedimentH).\n\
-    float d1 = currWaterHeight;\n\
+    float d1 = curWH + curCH;\n\
     float d2 = d1 + deltaH;\n\
     float da = (d1 + d2)/2.0;\n\
 \n\
@@ -11717,10 +12105,30 @@ void main()\n\
         veloci = veloci/(da * vec2(cellSize_y, cellSize_x));\n\
     }\n\
 \n\
-    if(curuv.x <= div) { deltaH = 0.0; veloci = vec2(0.0); }\n\
-    if(curuv.x >= 1.0 - 2.0 * div) { deltaH = 0.0; veloci = vec2(0.0); }\n\
-    if(curuv.y <= div) { deltaH = 0.0; veloci = vec2(0.0); }\n\
-    if(curuv.y >= 1.0 - 2.0 * div) { deltaH = 0.0; veloci = vec2(0.0); }\n\
+    if(curuv.x <= divX) \n\
+    { \n\
+        deltaWH = 0.0; \n\
+        deltaCH = 0.0; \n\
+        veloci = vec2(0.0); \n\
+    }\n\
+    if(curuv.x >= 1.0 - 2.0 * divX) \n\
+    { \n\
+        deltaWH = 0.0; \n\
+        deltaCH = 0.0; \n\
+        veloci = vec2(0.0); \n\
+    }\n\
+    if(curuv.y <= divY) \n\
+    { \n\
+        deltaWH = 0.0; \n\
+        deltaCH = 0.0; \n\
+        veloci = vec2(0.0); \n\
+    }\n\
+    if(curuv.y >= 1.0 - 2.0 * divY) \n\
+    { \n\
+        deltaWH = 0.0; \n\
+        deltaCH = 0.0; \n\
+        veloci = vec2(0.0); \n\
+    }\n\
 \n\
     //  float absx = abs(veloci.x);\n\
     //  float absy = abs(veloci.y);\n\
@@ -11746,15 +12154,21 @@ void main()\n\
         shaderLogColor4 = vec4(encodedVelocity, 0.0, 1.0);\n\
     }\n\
 \n\
-    float waterHeight = max(currWaterHeight + deltaH, 0.0); // original.***\n\
-    waterHeight /= u_waterMaxHeigh; // original.***\n\
-\n\
-    vec4 encodedWH = packDepth(waterHeight);\n\
+    float waterHeight = max(curWH + deltaWH, 0.0); // original.***\n\
+    vec4 encodedWH = packDepth(waterHeight / u_waterMaxHeigh);\n\
     gl_FragData[0] = encodedWH;  // water height.\n\
+\n\
+    vec4 encodedCH = vec4(0.0);\n\
+    if(u_contaminantMaxHeigh > 0.0)\n\
+    {\n\
+        float contaminantHeight = max(curCH + deltaCH, 0.0);\n\
+        encodedCH = packDepth(contaminantHeight / u_contaminantMaxHeigh);\n\
+    }\n\
+\n\
 \n\
     #ifdef USE_MULTI_RENDER_TARGET\n\
         gl_FragData[1] = writeVel; // velocity\n\
-        gl_FragData[2] = shaderLogColor4; // \n\
+        gl_FragData[2] = encodedCH; // contaminatHeight if exist.\n\
         gl_FragData[3] = vec4(0.0); // \n\
         gl_FragData[4] = vec4(0.0); // \n\
     #endif\n\
@@ -11998,10 +12412,11 @@ uniform vec2 u_PlanePos; // Our location in the virtual world displayed by the p
 \n\
 uniform sampler2D waterHeightTex;\n\
 uniform sampler2D terrainmap;\n\
-uniform float u_SimRes;\n\
+uniform sampler2D contaminantHeightTex;\n\
 \n\
 uniform vec2 u_heightMap_MinMax;\n\
 uniform float u_waterMaxHeigh;\n\
+uniform float u_contaminantMaxHeigh;\n\
 \n\
 \n\
 varying vec4 vColorAuxTest;\n\
@@ -12046,15 +12461,32 @@ float getWaterHeight(in vec2 texCoord)\n\
     return waterHeight;\n\
 }\n\
 \n\
+float getContaminantHeight(in vec2 texCoord)\n\
+{\n\
+    vec4 color4 = texture2D(contaminantHeightTex, texCoord);\n\
+    //float decoded = decodeRG(color4.rg); // 16bit.\n\
+    float decoded = unpackDepth(color4); // 32bit.\n\
+    float waterHeight = decoded * u_contaminantMaxHeigh;\n\
+    return waterHeight;\n\
+}\n\
+\n\
 void main()\n\
 {\n\
 	// read the altitude from hightmap.\n\
 	vec4 terrainHeight4 = texture2D(terrainmap, vec2(texCoord.x, 1.0 - texCoord.y));\n\
 	float waterHeight = getWaterHeight(vec2(texCoord.x, texCoord.y));\n\
 \n\
+	float contaminantHeight = 0.0;\n\
+	// check if exist contaminat.\n\
+	if(u_contaminantMaxHeigh > 0.0)\n\
+	{\n\
+		// exist contaminant.\n\
+		contaminantHeight = getContaminantHeight(texCoord);\n\
+	}\n\
+\n\
 	float terrainH = terrainHeight4.r;\n\
 	float terrainHeight = u_heightMap_MinMax.x + terrainH * u_heightMap_MinMax.y;\n\
-	float height = terrainHeight + waterHeight;\n\
+	float height = terrainHeight + waterHeight + contaminantHeight;\n\
 \n\
 	vWaterHeight = waterHeight;\n\
 \n\
@@ -12783,6 +13215,8 @@ uniform float u_near;\n\
 \n\
 varying vec4 vColorAuxTest;\n\
 varying float vWaterHeight;\n\
+varying float vContaminantHeight;\n\
+varying float vExistContaminant;\n\
 varying vec3 vNormal;\n\
 varying vec3 vViewRay;\n\
 varying vec3 vOrthoPos;\n\
@@ -12900,18 +13334,21 @@ void main()\n\
 {\n\
     float minWaterHeightToRender = 0.001; // 1mm.\n\
     minWaterHeightToRender = 0.01; // test. delete.\n\
-    if(vWaterHeight < minWaterHeightToRender)// original = 0.0001\n\
+    if(vWaterHeight + vContaminantHeight < minWaterHeightToRender)// original = 0.0001\n\
     {\n\
         discard;\n\
     }\n\
 \n\
     float alpha = vColorAuxTest.a;\n\
     vec4 finalCol4 = vec4(vColorAuxTest);\n\
-    if(vWaterHeight < minWaterHeightToRender)// + 0.01)\n\
+    if(vWaterHeight + vContaminantHeight < minWaterHeightToRender)// + 0.01)\n\
     {\n\
         alpha = 0.9;\n\
-        finalCol4 = vec4(vColorAuxTest * 0.5);\n\
+        finalCol4 = vec4(vColorAuxTest * 0.4);\n\
     }\n\
+\n\
+    // calculate contaminationConcentration;\n\
+    float contaminConcentration = vContaminantHeight / (vWaterHeight + vContaminantHeight);\n\
 \n\
     //vec2 screenPos = vec2(gl_FragCoord.x / u_screenSize.x, gl_FragCoord.y / u_screenSize.y);\n\
 \n\
@@ -12955,13 +13392,37 @@ void main()\n\
         }\n\
     }\n\
 \n\
-    // Check if render particles.***\n\
-    if(u_RenderParticles == 1)\n\
+    if(vExistContaminant > 0.0 && vContaminantHeight > 0.001)\n\
     {\n\
-        // add particles color to \"finalCol4\".\n\
-        vec4 particlesColor4 = texture2D(particlesTex, vec2(vTexCoord.x, vTexCoord.y));\n\
+        float factor = min(contaminConcentration + 0.5, 1.0);\n\
+        vec4 contaminCol4 = finalCol4;\n\
 \n\
+        if(contaminConcentration > 0.3)\n\
+        {\n\
+            //factor = 1.0;\n\
+            contaminCol4 = vec4(1.0, 0.0, 0.0, 1.0);\n\
+        }\n\
+        else if(contaminConcentration < 0.3 && contaminConcentration > 0.1)\n\
+        {\n\
+            //factor = 0.5;\n\
+            contaminCol4 = vec4(1.0, 1.0, 0.0, 1.0);\n\
+        }\n\
+        else if(contaminConcentration < 0.1 && contaminConcentration > 0.05)\n\
+        {\n\
+            //factor = 0.25;\n\
+            contaminCol4 = vec4(0.0, 1.0, 0.0, 1.0);\n\
+        }\n\
+        \n\
+        finalCol4 = mix(finalCol4, contaminCol4, factor);\n\
+        //finalCol4 = contaminCol4;\n\
     }\n\
+\n\
+    // Check if render particles.***\n\
+    //if(u_RenderParticles == 1)\n\
+    //{\n\
+    //    // add particles color to \"finalCol4\".\n\
+    //    vec4 particlesColor4 = texture2D(particlesTex, vec2(vTexCoord.x, vTexCoord.y));\n\
+    //}\n\
 \n\
     //*************************************************************************************************************\n\
     // Do specular lighting.***\n\
@@ -13086,13 +13547,14 @@ uniform float tangentOfHalfFovy;\n\
 uniform float aspectRatio;\n\
 uniform mat4 projectionMatrixInv;\n\
 \n\
-\n\
+// Textures.********************************\n\
 uniform sampler2D waterHeightTex;\n\
 uniform sampler2D terrainmap;\n\
-uniform float u_SimRes;\n\
+uniform sampler2D contaminantHeightTex;\n\
 \n\
 uniform vec2 u_heightMap_MinMax; // terrain.\n\
 uniform float u_waterMaxHeigh;\n\
+uniform float u_contaminantMaxHeigh;\n\
 \n\
 uniform sampler2D depthTex;\n\
 \n\
@@ -13101,6 +13563,8 @@ varying float Fcoef_half;\n\
 \n\
 varying vec4 vColorAuxTest;\n\
 varying float vWaterHeight;\n\
+varying float vContaminantHeight;\n\
+varying float vExistContaminant;\n\
 varying vec3 vNormal;\n\
 varying vec3 vViewRay;\n\
 varying vec3 vOrthoPos;\n\
@@ -13206,7 +13670,15 @@ float getWaterHeight(in vec2 texCoord)\n\
     //float decoded = decodeRG(color4.rg); // old.\n\
     float decoded = unpackDepth(color4);\n\
     float waterHeight = decoded * u_waterMaxHeigh;\n\
+    return waterHeight;\n\
+}\n\
 \n\
+float getContaminantHeight(in vec2 texCoord)\n\
+{\n\
+    vec4 color4 = texture2D(contaminantHeightTex, texCoord);\n\
+    //float decoded = decodeRG(color4.rg); // 16bit.\n\
+    float decoded = unpackDepth(color4); // 32bit.\n\
+    float waterHeight = decoded * u_contaminantMaxHeigh;\n\
     return waterHeight;\n\
 }\n\
 \n\
@@ -13215,11 +13687,20 @@ void main()\n\
 	// read the altitude from waterHeightTex.\n\
 	vTexCoord = texCoord;\n\
 	vec4 terrainHeight4 = texture2D(terrainmap, vec2(texCoord.x, 1.0 - texCoord.y));\n\
-	float waterHeight = getWaterHeight(vec2(texCoord.x, texCoord.y));\n\
+	float waterHeight = getWaterHeight(texCoord);\n\
+	vContaminantHeight = 0.0;\n\
+	vExistContaminant = -1.0;\n\
+	// check if exist contaminat.\n\
+	if(u_contaminantMaxHeigh > 0.0)\n\
+	{\n\
+		// exist contaminant.\n\
+		vContaminantHeight = getContaminantHeight(texCoord);\n\
+		vExistContaminant = 1.0;\n\
+	}\n\
 \n\
 	float terrainH = terrainHeight4.r;\n\
 	float terrainHeight = u_heightMap_MinMax.x + terrainH * u_heightMap_MinMax.y;\n\
-	float height = terrainHeight + waterHeight;\n\
+	float height = terrainHeight + waterHeight + vContaminantHeight;\n\
 \n\
 	vWaterHeight = waterHeight;\n\
 \n\
@@ -13642,13 +14123,7 @@ vec2 lookup_wind(const vec2 uv) {\n\
     vec2 bl = texture2D(u_wind, vc + vec2(0, px.y)).rg;\n\
     vec2 br = texture2D(u_wind, vc + px).rg;\n\
 \n\
-    //tl = decodeVelocity(tl);\n\
-    //tr = decodeVelocity(tr);\n\
-    //bl = decodeVelocity(bl);\n\
-    //br = decodeVelocity(br);\n\
-\n\
     return mix(mix(tl, tr, f.x), mix(bl, br, f.x), f.y);\n\
-	\n\
 }\n\
 \n\
 float radiusAtLatitudeRad(in float latRad)\n\

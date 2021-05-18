@@ -263,7 +263,8 @@ Modeler.prototype.__TEST__extrusionBuildings_son = function ()
 	var minLat = 35.60993;
 
 	//var lines = [[[ 127.20762, 35.61518 ], [ 127.20762, 35.60993 ], [ 127.20762 + widthIncreLon, 35.60993 ], [ 127.20762 + widthIncreLon, 35.61518 ]]]; // original.
-	var lines = [[[ 127.20762 + increLon, 35.61518 + increLat], [ 127.20762 + increLon, 35.60993  + increLat], [ 127.20762 + widthIncreLon + increLon, 35.60993  + increLat], [ 127.20762 + widthIncreLon + increLon, 35.61518  + increLat]]];
+	var lines = [[[ 127.20762 + increLon, 35.61518 + increLat], [ 127.20762 + increLon, 35.60993  + increLat], [ 127.20762 + widthIncreLon + increLon, 35.60993  + increLat], [ 127.20762 + widthIncreLon + increLon, 35.61518  + increLat]],
+					[[ 127.20762 + increLon, 35.61518 + increLat], [ 127.20762 + increLon, 35.60993  + increLat], [ 127.20762 + widthIncreLon + increLon, 35.60993  + increLat], [ 127.20762 + widthIncreLon + increLon, 35.61518  + increLat]]];
 
 	// Now, create geoCoords.***
 	var altAux = 100.0;

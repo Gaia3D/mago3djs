@@ -29,10 +29,11 @@ uniform vec2 u_PlanePos; // Our location in the virtual world displayed by the p
 
 uniform sampler2D waterHeightTex;
 uniform sampler2D terrainmap;
-uniform float u_SimRes;
+uniform sampler2D contaminantHeightTex;
 
 uniform vec2 u_heightMap_MinMax;
 uniform float u_waterMaxHeigh;
+uniform float u_contaminantMaxHeigh;
 
 
 varying vec4 vColorAuxTest;
@@ -77,15 +78,32 @@ float getWaterHeight(in vec2 texCoord)
     return waterHeight;
 }
 
+float getContaminantHeight(in vec2 texCoord)
+{
+    vec4 color4 = texture2D(contaminantHeightTex, texCoord);
+    //float decoded = decodeRG(color4.rg); // 16bit.
+    float decoded = unpackDepth(color4); // 32bit.
+    float waterHeight = decoded * u_contaminantMaxHeigh;
+    return waterHeight;
+}
+
 void main()
 {
 	// read the altitude from hightmap.
 	vec4 terrainHeight4 = texture2D(terrainmap, vec2(texCoord.x, 1.0 - texCoord.y));
 	float waterHeight = getWaterHeight(vec2(texCoord.x, texCoord.y));
 
+	float contaminantHeight = 0.0;
+	// check if exist contaminat.
+	if(u_contaminantMaxHeigh > 0.0)
+	{
+		// exist contaminant.
+		contaminantHeight = getContaminantHeight(texCoord);
+	}
+
 	float terrainH = terrainHeight4.r;
 	float terrainHeight = u_heightMap_MinMax.x + terrainH * u_heightMap_MinMax.y;
-	float height = terrainHeight + waterHeight;
+	float height = terrainHeight + waterHeight + contaminantHeight;
 
 	vWaterHeight = waterHeight;
 

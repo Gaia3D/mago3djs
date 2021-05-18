@@ -13,9 +13,12 @@ var Water = function(waterManager, options)
     this.waterManager = waterManager;
 
 	this.geographicExtent;
-	this.simulationResolution = 512;
-	this.textureWidth = new Int32Array([this.simulationResolution]);
-	this.textureHeight = new Int32Array([this.simulationResolution]);
+	this.simulationResolution = waterManager.simulationTextureWidth;
+	this.textureWidth = new Int32Array([waterManager.simulationTextureWidth]);
+	this.textureHeight = new Int32Array([waterManager.simulationTextureHeight]);
+
+	this.demTextureWidth = 512;
+	this.demTextureHeight = 512;
 
 	// simulation textures.
 	this.terrainHeightTexA; // terrain DEM texture.
@@ -24,12 +27,10 @@ var Water = function(waterManager, options)
 	this.waterHeightTexA; // water height over terrain.
 	this.waterHeightTexB; // water height over terrain.
 
-	// water source & rain.
+	// water source, contaminant source  & rain.*********************************************
 	this.waterSourceTex;
 	this.rainTex;
-
-	//this.waterFluxTexA; // water fluxing in 4 directions. Old. delete!!!
-	//this.waterFluxTexB; // water fluxing in 4 directions. Old. delete!!!
+	this.contaminantSourceTex;
 
 	this.waterFluxTexA_HIGH; // water fluxing in 4 directions. splitted values in high & low.
 	this.waterFluxTexB_HIGH; // water fluxing in 4 directions. splitted values in high & low.
@@ -46,6 +47,11 @@ var Water = function(waterManager, options)
 	this.particlesPosTex_B;
 	this.windRes;
 
+	// contamination texture.******************************************
+	this.contaminationTex_A;
+	this.contaminationTex_B;
+
+	// Shader log textures.********************************************
 	this.shaderLogTexA; // auxiliar tex to debug shaders.***
 	this.shaderLogTexB; // auxiliar tex to debug shaders.***
 
@@ -55,12 +61,10 @@ var Water = function(waterManager, options)
 	// simulation parameters.******************************************
 	this.terrainMinMaxHeights = new Float32Array([10.0, 200.0]);
 	this.waterMaxHeight = 100.0; // ok.
-	//this.waterMaxHeight = 20.0;
-
-	this.waterMaxFlux = 2000.0; // ok. (1000 is no enought).
-	this.waterMaxFlux = 3000.0;
-
+	this.waterMaxFlux = 4000.0; // ok. (3000 is no enought).
 	this.waterMaxVelocity = 40.0;
+	this.contaminantMaxheight = -1.0;
+	this.contaminantMaxheight = 50.0;
 
 	this.simulationTimeStep = 0.25; // ok.
 	//this.simulationTimeStep = 0.3; // 
@@ -107,6 +111,7 @@ Water.prototype._makeTextures = function ()
 	var magoManager = this.waterManager.magoManager;
 	var gl = magoManager.getGl();
 
+	// water simulation texture size: it depends of waterManager.
 	var texWidth = this.textureWidth[0];
 	var texHeight = this.textureHeight[0];
 	
@@ -116,9 +121,6 @@ Water.prototype._makeTextures = function ()
 
 	this.waterHeightTexA.name = "A";
 	this.waterHeightTexB.name = "B";
-
-	this.waterFluxTexA = this.waterManager._newTexture(gl, texWidth, texHeight); // old.***
-	this.waterFluxTexB = this.waterManager._newTexture(gl, texWidth, texHeight); // old.***
 
 	this.waterFluxTexA_HIGH = this.waterManager._newTexture(gl, texWidth, texHeight);; // water fluxing in 4 directions. splitted values in high & low.
 	this.waterFluxTexB_HIGH = this.waterManager._newTexture(gl, texWidth, texHeight);; // water fluxing in 4 directions. splitted values in high & low.
@@ -154,6 +156,10 @@ Water.prototype._makeTextures = function ()
 	this.particlesPosTex_A.texId = Texture.createTexture(gl, gl.NEAREST, particleState, this.windRes, this.windRes);
 	this.particlesPosTex_B.texId = Texture.createTexture(gl, gl.NEAREST, particleState, this.windRes, this.windRes);
 
+	// Contamination texture.*********************************************************************************************************************
+	this.contaminationTex_A = this.waterManager._newTexture(gl, texWidth, texHeight);
+	this.contaminationTex_B = this.waterManager._newTexture(gl, texWidth, texHeight);
+
 	gl.bindTexture(gl.TEXTURE_2D, null);
 };
 
@@ -187,6 +193,8 @@ Water.prototype.prepareTextures = function ()
 		var gl = magoManager.getGl();
 		var texturePath = '/images/en/waterSourceTexTestlow.png';
 		//var texturePath = '/images/en/waterSourceTexTest2.png';
+		//var texturePath = '/images/en/black.png';
+		//var texturePath = '/images/en/contaminantHigh.png';
 
 		ReaderWriter.loadImage(gl, texturePath, this.waterSourceTex);
 		return false;
@@ -262,11 +270,39 @@ Water.prototype.prepareTextures = function ()
 		var magoManager = this.waterManager.magoManager;
 		var gl = magoManager.getGl();
 		var dem_texturePath = '/images/en/waterTerrainDifusse.png';
+		//var dem_texturePath = '/images/en/waterTerrainDifusse_bw.png';
 
 		ReaderWriter.loadImage(gl, dem_texturePath, this.terrainDiffTex);
 		return false;
 	}
 	else if (this.terrainDiffTex.fileLoadState === CODE.fileLoadState.BINDING_FINISHED)
+	{
+		var hola = 0;
+	}// 
+
+	// contaminant texture.
+	if(!this.contaminantSourceTex)
+	{
+		var magoManager = this.waterManager.magoManager;
+		var gl = magoManager.getGl();
+
+		// load test texture dem.
+		this.contaminantSourceTex = new Texture();
+		this.contaminantSourceTex.texId = gl.createTexture();
+	}
+
+	if (this.contaminantSourceTex.fileLoadState === CODE.fileLoadState.READY)
+	{
+		var magoManager = this.waterManager.magoManager;
+		var gl = magoManager.getGl();
+		var contaminant_texturePath = '/images/en/contaminant.png';
+		//var contaminant_texturePath = '/images/en/contaminantHigh.png';
+		//var contaminant_texturePath = '/images/en/black.png';
+
+		ReaderWriter.loadImage(gl, contaminant_texturePath, this.contaminantSourceTex);
+		return false;
+	}
+	else if (this.contaminantSourceTex.fileLoadState === CODE.fileLoadState.BINDING_FINISHED)
 	{
 		var hola = 0;
 	}// 
@@ -284,8 +320,8 @@ Water._swapTextures = function (texA, texB)
 /**
  * simulation
  */
- Water.prototype.doSimulationSteps = function (magoManager)
- {
+Water.prototype.doSimulationSteps = function (magoManager)
+{
 	if(!this.waterHeightTexA)
 	{
 		return false;
@@ -295,6 +331,7 @@ Water._swapTextures = function (texA, texB)
 	{ return false; }
 
 	var sceneState = magoManager.sceneState;
+	var waterManager = this.waterManager;
 
 	// bind frameBuffer.
 	var gl = magoManager.getGl();
@@ -302,7 +339,7 @@ Water._swapTextures = function (texA, texB)
 	var fbo = this.waterManager.fbo;
 	var extbuffers = fbo.extbuffers;
 	var shader;
-	
+
 	gl.disable(gl.BLEND);
 	gl.clearColor(0.0, 0.0, 0.0, 0.0);
 	gl.clearDepth(1.0);
@@ -311,12 +348,12 @@ Water._swapTextures = function (texA, texB)
 	fbo.bind();
 	gl.viewport(0, 0, fbo.width[0], fbo.height[0]);
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.waterHeightTexA.texId, 0); // depthTex.
-	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // normalTex.
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.contaminationTex_A.texId, 0); // normalTex.
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // albedoTex.
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0); // .
 	extbuffers.drawBuffersWEBGL([
 		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
-		extbuffers.NONE, // gl_FragData[1]
+		extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1]
 		extbuffers.NONE, // gl_FragData[2]
 		extbuffers.NONE, // gl_FragData[3]
 		]);
@@ -327,6 +364,7 @@ Water._swapTextures = function (texA, texB)
 	shader = magoManager.postFxShadersManager.getShader("waterCalculateHeight");
 	magoManager.postFxShadersManager.useProgram(shader);
 	gl.uniform1i(shader.u_existRain_loc, false);
+	gl.uniform1f(shader.u_contaminantMaxHeigh_loc, this.contaminantMaxheight); // negative value -> no exist contaminat.
 
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, this.waterSourceTex.texId); // water source.
@@ -337,6 +375,15 @@ Water._swapTextures = function (texA, texB)
 	gl.activeTexture(gl.TEXTURE2);
 	gl.bindTexture(gl.TEXTURE_2D, this.waterHeightTexB.texId);
 
+	if(this.contaminantMaxheight > 0.0)
+	{
+		gl.activeTexture(gl.TEXTURE3); // contaminant tex if exist.
+		gl.bindTexture(gl.TEXTURE_2D, this.contaminantSourceTex.texId);
+
+		gl.activeTexture(gl.TEXTURE4); // contaminant tex if exist.
+		gl.bindTexture(gl.TEXTURE_2D, this.contaminationTex_B.texId);
+	}
+
 	// bind screenQuad positions.
 	FBO.bindAttribute(gl, screenQuad.posBuffer, shader.a_pos, 2);
 	//FBO.bindAttribute(gl, this.texCoordBuffer, shader.texCoord2_loc, 2);
@@ -346,10 +393,10 @@ Water._swapTextures = function (texA, texB)
 
 	// now, swap waterHeightTextures:
 	//gl.bindFramebuffer(gl.FRAMEBUFFER,null);
-	
+
 	Water._swapTextures(this.waterHeightTexA, this.waterHeightTexB);
+	Water._swapTextures(this.contaminationTex_A, this.contaminationTex_B);
 		
-	
 	//----------------------------------------------------------------------------------------------------------------------------------
 	// 2- Calculate the fluxMap by terrain dem & current waterHeight.*******************************************************************
 	fbo.bind();
@@ -369,14 +416,16 @@ Water._swapTextures = function (texA, texB)
 	magoManager.postFxShadersManager.useProgram(shader);
 
 	gl.uniform1f(shader.u_SimRes_loc, this.simulationResolution);
-	gl.uniform1f(shader.u_PipeLen_loc, 1.0); // pipeLen = cellSizeX = cellSizeY.
+	gl.uniform2fv(shader.u_simulationTextureSize_loc, [waterManager.simulationTextureWidth, waterManager.simulationTextureHeight]);
+	gl.uniform2fv(shader.u_terrainTextureSize_loc, [this.demTextureWidth, this.demTextureHeight]);
+
 	gl.uniform1f(shader.u_timestep_loc, this.simulationTimeStep);
-	gl.uniform1f(shader.u_PipeArea_loc, 0.8);
 	gl.uniform2fv(shader.u_heightMap_MinMax_loc, this.terrainMinMaxHeights);
 	gl.uniform1f(shader.u_waterMaxHeigh_loc, this.waterMaxHeight);
 	gl.uniform1f(shader.u_waterMaxFlux_loc, this.waterMaxFlux);
 	gl.uniform2fv(shader.u_tileSize_loc, [this.tileSizeMeters_x, this.tileSizeMeters_y]);
-	
+	gl.uniform1f(shader.u_contaminantMaxHeigh_loc, this.contaminantMaxheight); // negative value -> no exist contaminat.
+
 	gl.activeTexture(gl.TEXTURE0); // water height tex.
 	gl.bindTexture(gl.TEXTURE_2D, this.waterHeightTexB.texId);
 
@@ -388,6 +437,12 @@ Water._swapTextures = function (texA, texB)
 
 	gl.activeTexture(gl.TEXTURE3); // flux tex low.
 	gl.bindTexture(gl.TEXTURE_2D, this.waterFluxTexB_LOW.texId);
+
+	if(this.contaminantMaxheight > 0.0)
+	{
+		gl.activeTexture(gl.TEXTURE4); // contaminant tex if exist.
+		gl.bindTexture(gl.TEXTURE_2D, this.contaminationTex_B.texId);
+	}
 
 	// bind screenQuad positions.
 	FBO.bindAttribute(gl, screenQuad.posBuffer, shader.a_pos, 2);
@@ -405,9 +460,9 @@ Water._swapTextures = function (texA, texB)
 	fbo.bind();
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.waterHeightTexA.texId, 0); // waterHeight
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.waterVelocityTexA.texId, 0); // waterVelocity.
-	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, this.shaderLogTexA.texId, 0);  // debug. delete after use.
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, this.contaminationTex_A.texId, 0);  // debug. delete after use.
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0); // 
-	
+
 	extbuffers.drawBuffersWEBGL([
 		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
 		extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1]
@@ -421,6 +476,9 @@ Water._swapTextures = function (texA, texB)
 	magoManager.postFxShadersManager.useProgram(shader);
 
 	gl.uniform1f(shader.u_SimRes_loc, this.simulationResolution);
+	gl.uniform2fv(shader.u_simulationTextureSize_loc, [waterManager.simulationTextureWidth, waterManager.simulationTextureHeight]);
+	gl.uniform2fv(shader.u_terrainTextureSize_loc, [this.demTextureWidth, this.demTextureHeight]);
+
 	gl.uniform1f(shader.u_PipeLen_loc, 1.0); // pipeLen = cellSizeX = cellSizeY.
 	gl.uniform1f(shader.u_timestep_loc, this.simulationTimeStep);
 	gl.uniform1f(shader.u_PipeArea_loc, 0.8);
@@ -429,7 +487,8 @@ Water._swapTextures = function (texA, texB)
 	gl.uniform1f(shader.u_waterMaxFlux_loc, this.waterMaxFlux);
 	gl.uniform2fv(shader.u_tileSize_loc, [this.tileSizeMeters_x, this.tileSizeMeters_y]);
 	gl.uniform1f(shader.u_waterMaxVelocity_loc, this.waterMaxVelocity);
-	
+	gl.uniform1f(shader.u_contaminantMaxHeigh_loc, this.contaminantMaxheight);
+
 	gl.activeTexture(gl.TEXTURE0); // water height tex.
 	gl.bindTexture(gl.TEXTURE_2D, this.waterHeightTexB.texId);
 
@@ -442,6 +501,12 @@ Water._swapTextures = function (texA, texB)
 	gl.activeTexture(gl.TEXTURE3); // flux tex low.
 	gl.bindTexture(gl.TEXTURE_2D, this.waterFluxTexB_LOW.texId);
 
+	if(this.contaminantMaxheight > 0.0)
+	{
+		gl.activeTexture(gl.TEXTURE4); // contaminant tex if exist.
+		gl.bindTexture(gl.TEXTURE_2D, this.contaminationTex_B.texId);
+	}
+
 	// bind screenQuad positions.
 	FBO.bindAttribute(gl, screenQuad.posBuffer, shader.a_pos, 2);
 
@@ -451,15 +516,20 @@ Water._swapTextures = function (texA, texB)
 	// now, swap waterHeightTextures:
 	Water._swapTextures(this.waterHeightTexA, this.waterHeightTexB);
 	Water._swapTextures(this.waterVelocityTexA, this.waterVelocityTexB);
-	Water._swapTextures(this.shaderLogTexA, this.shaderLogTexB); // debug. delete after use.
+	Water._swapTextures(this.contaminationTex_A, this.contaminationTex_B); // debug. delete after use.
 
 	//-----------------------------------------------------------------------------------------------------------------------------------------------------
 	// 4) calculate sediment, waterHeight & velocity by terrain & water heights map & velocity.************************************************************
 	shader = magoManager.postFxShadersManager.getShader("waterCalculateSediment");
 
+	//-----------------------------------------------------------------------------------------------------------------------------------------------------
+	// 5) calculate contamination by terrain & water heights map & velocity.*******************************************************************
+	shader = magoManager.postFxShadersManager.getShader("waterCalculateContamination");
+
+
+	//-----------------------------------------------------------------------------------------------------------------------------------------------------
 	// Once finished simulation, then calculate particles if necessary:
 	this.doSimulationSteps_particles(magoManager);
-	
 
 	//-----------------------------------------------------------------------------------------------------------------------------------------------------
 	// Must return to current frameBuffer. TODO:
@@ -525,15 +595,11 @@ Water.prototype.doSimulationSteps_particles = function (magoManager)
 	gl.uniform3fv(shader.u_geoCoordRadiansMax_loc, [maxGeoCoord.getLongitudeRad(), maxGeoCoord.getLatitudeRad(), 0.0]); 
 	gl.uniform3fv(shader.u_geoCoordRadiansMin_loc, [minGeoCoord.getLongitudeRad(), minGeoCoord.getLatitudeRad(), 0.0]); 
 	//gl.uniform1f(shader.u_speed_factor_loc, 0.2); // original.***
-	gl.uniform1f(shader.u_speed_factor_loc, 0.1); 
+	gl.uniform1f(shader.u_speed_factor_loc, 0.1); // ok.
 	gl.uniform1f(shader.u_drop_rate_loc, this.waterManager.dropRate);
 	gl.uniform1f(shader.u_drop_rate_bump_loc, this.waterManager.dropRateBump);
 	var randomSeed = Math.random();
 	gl.uniform1f(shader.u_rand_seed_loc, randomSeed);
-
-	//this.particlesTex; // 
-	//this.particlesPosTex_A;
-	//this.particlesPosTex_B;
 
 	gl.activeTexture(gl.TEXTURE0); // "u_particles"
 	gl.bindTexture(gl.TEXTURE_2D, this.particlesPosTex_B.texId);
@@ -904,12 +970,25 @@ Water.prototype.renderWaterDepth = function (shader, magoManager)
 	gl.uniform3fv(shader.buildingPosLOW_loc, this.terrainPositionLOW);
 	gl.uniform2fv(shader.u_heightMap_MinMax_loc, this.terrainMinMaxHeights);
 	gl.uniform1f(shader.u_waterMaxHeigh_loc, this.waterMaxHeight);
+	gl.uniform1f(shader.u_contaminantMaxHeigh_loc, this.contaminantMaxheight);
 
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, this.waterHeightTexA.texId);
 
 	gl.activeTexture(gl.TEXTURE1);
 	gl.bindTexture(gl.TEXTURE_2D, this.dem_texture.texId);
+
+	if(this.contaminantMaxheight > 0.0)
+	{
+		gl.activeTexture(gl.TEXTURE2); // contaminant tex if exist.
+		gl.bindTexture(gl.TEXTURE_2D, this.contaminationTex_B.texId);
+	}
+
+	if(this.contaminantMaxheight > 0.0)
+	{
+		gl.activeTexture(gl.TEXTURE2); // contaminant tex if exist.
+		gl.bindTexture(gl.TEXTURE_2D, this.contaminationTex_B.texId);
+	}
 
 	var vbo_vicky = this.vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.
 	var vertices_count = vbo_vicky.vertexCount;
@@ -1138,7 +1217,7 @@ Water.prototype.overWriteDEMWithObjects = function (shader, magoManager)
 	{
 		var native = this.visibleObjectsControler.currentVisibleNativeObjects.opaquesArray[i];
 		native.render(magoManager, shader, renderType, glPrimitive);
-		break;
+		//break;
 	}
 
 	visibleNativesCount = this.visibleObjectsControler.currentVisibleNativeObjects.transparentsArray.length;
@@ -1182,6 +1261,7 @@ Water.prototype.renderWater = function (shader, magoManager)
 	gl.uniform2fv(shader.u_screenSize_loc, [sceneState.drawingBufferWidth[0], sceneState.drawingBufferHeight[0]]);
 	gl.uniform1i(shader.uWaterType_loc, 3); // 0 = waterColor., 1 = water-flux, 2 = water-velocity, 3= particles.
 	gl.uniform1f(shader.u_waterMaxHeigh_loc, this.waterMaxHeight);
+	gl.uniform1f(shader.u_contaminantMaxHeigh_loc, this.contaminantMaxheight);
 
 	var projectionMatrixInv = sceneState.getProjectionMatrixInv();
   	gl.uniformMatrix4fv(shader.projectionMatrixInv_loc, false, projectionMatrixInv._floatArrays);
@@ -1197,6 +1277,13 @@ Water.prototype.renderWater = function (shader, magoManager)
 
 	gl.activeTexture(gl.TEXTURE3);
 	gl.bindTexture(gl.TEXTURE_2D, this.particlesTex_A.texId);// waterFluxTexA, waterVelocityTexA, particlesTex_A
+
+	if(this.contaminantMaxheight > 0.0)
+	{
+		gl.activeTexture(gl.TEXTURE4); // contaminant tex if exist.
+		gl.bindTexture(gl.TEXTURE_2D, this.contaminationTex_B.texId);
+	}
+
 
 	var vbo_vicky = this.vbo_vicks_container.vboCacheKeysArray[0]; // there are only one.
 	var vertices_count = vbo_vicky.vertexCount;
@@ -1217,8 +1304,12 @@ Water.prototype.renderWater = function (shader, magoManager)
 Water.prototype._makeSurface = function ()
 {
 	// CRS84.***
-	var lonSegments = this.simulationResolution;
-	var latSegments = this.simulationResolution;
+	//var lonSegments = this.simulationResolution;
+	//var latSegments = this.simulationResolution;
+
+	var lonSegments = this.waterManager.simulationTextureWidth;
+	var latSegments = this.waterManager.simulationTextureHeight;
+
 	var altitude = 0;
 
 	// This function makes an ellipsoidal mesh for tiles that has no elevation data.

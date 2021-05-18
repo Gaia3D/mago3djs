@@ -27,13 +27,14 @@ uniform float tangentOfHalfFovy;
 uniform float aspectRatio;
 uniform mat4 projectionMatrixInv;
 
-
+// Textures.********************************
 uniform sampler2D waterHeightTex;
 uniform sampler2D terrainmap;
-uniform float u_SimRes;
+uniform sampler2D contaminantHeightTex;
 
 uniform vec2 u_heightMap_MinMax; // terrain.
 uniform float u_waterMaxHeigh;
+uniform float u_contaminantMaxHeigh;
 
 uniform sampler2D depthTex;
 
@@ -42,6 +43,8 @@ varying float Fcoef_half;
 
 varying vec4 vColorAuxTest;
 varying float vWaterHeight;
+varying float vContaminantHeight;
+varying float vExistContaminant;
 varying vec3 vNormal;
 varying vec3 vViewRay;
 varying vec3 vOrthoPos;
@@ -147,7 +150,15 @@ float getWaterHeight(in vec2 texCoord)
     //float decoded = decodeRG(color4.rg); // old.
     float decoded = unpackDepth(color4);
     float waterHeight = decoded * u_waterMaxHeigh;
+    return waterHeight;
+}
 
+float getContaminantHeight(in vec2 texCoord)
+{
+    vec4 color4 = texture2D(contaminantHeightTex, texCoord);
+    //float decoded = decodeRG(color4.rg); // 16bit.
+    float decoded = unpackDepth(color4); // 32bit.
+    float waterHeight = decoded * u_contaminantMaxHeigh;
     return waterHeight;
 }
 
@@ -156,11 +167,20 @@ void main()
 	// read the altitude from waterHeightTex.
 	vTexCoord = texCoord;
 	vec4 terrainHeight4 = texture2D(terrainmap, vec2(texCoord.x, 1.0 - texCoord.y));
-	float waterHeight = getWaterHeight(vec2(texCoord.x, texCoord.y));
+	float waterHeight = getWaterHeight(texCoord);
+	vContaminantHeight = 0.0;
+	vExistContaminant = -1.0;
+	// check if exist contaminat.
+	if(u_contaminantMaxHeigh > 0.0)
+	{
+		// exist contaminant.
+		vContaminantHeight = getContaminantHeight(texCoord);
+		vExistContaminant = 1.0;
+	}
 
 	float terrainH = terrainHeight4.r;
 	float terrainHeight = u_heightMap_MinMax.x + terrainH * u_heightMap_MinMax.y;
-	float height = terrainHeight + waterHeight;
+	float height = terrainHeight + waterHeight + vContaminantHeight;
 
 	vWaterHeight = waterHeight;
 

@@ -79,13 +79,7 @@ vec2 lookup_wind(const vec2 uv) {
     vec2 bl = texture2D(u_wind, vc + vec2(0, px.y)).rg;
     vec2 br = texture2D(u_wind, vc + px).rg;
 
-    //tl = decodeVelocity(tl);
-    //tr = decodeVelocity(tr);
-    //bl = decodeVelocity(bl);
-    //br = decodeVelocity(br);
-
     return mix(mix(tl, tr, f.x), mix(bl, br, f.x), f.y);
-	
 }
 
 float radiusAtLatitudeRad(in float latRad)

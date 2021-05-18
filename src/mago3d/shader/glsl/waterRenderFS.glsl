@@ -40,6 +40,8 @@ uniform float u_near;
 
 varying vec4 vColorAuxTest;
 varying float vWaterHeight;
+varying float vContaminantHeight;
+varying float vExistContaminant;
 varying vec3 vNormal;
 varying vec3 vViewRay;
 varying vec3 vOrthoPos;
@@ -157,18 +159,21 @@ void main()
 {
     float minWaterHeightToRender = 0.001; // 1mm.
     minWaterHeightToRender = 0.01; // test. delete.
-    if(vWaterHeight < minWaterHeightToRender)// original = 0.0001
+    if(vWaterHeight + vContaminantHeight < minWaterHeightToRender)// original = 0.0001
     {
         discard;
     }
 
     float alpha = vColorAuxTest.a;
     vec4 finalCol4 = vec4(vColorAuxTest);
-    if(vWaterHeight < minWaterHeightToRender)// + 0.01)
+    if(vWaterHeight + vContaminantHeight < minWaterHeightToRender)// + 0.01)
     {
         alpha = 0.9;
-        finalCol4 = vec4(vColorAuxTest * 0.5);
+        finalCol4 = vec4(vColorAuxTest * 0.4);
     }
+
+    // calculate contaminationConcentration;
+    float contaminConcentration = vContaminantHeight / (vWaterHeight + vContaminantHeight);
 
     //vec2 screenPos = vec2(gl_FragCoord.x / u_screenSize.x, gl_FragCoord.y / u_screenSize.y);
 
@@ -212,13 +217,37 @@ void main()
         }
     }
 
-    // Check if render particles.***
-    if(u_RenderParticles == 1)
+    if(vExistContaminant > 0.0 && vContaminantHeight > 0.001)
     {
-        // add particles color to "finalCol4".
-        vec4 particlesColor4 = texture2D(particlesTex, vec2(vTexCoord.x, vTexCoord.y));
+        float factor = min(contaminConcentration + 0.5, 1.0);
+        vec4 contaminCol4 = finalCol4;
 
+        if(contaminConcentration > 0.3)
+        {
+            //factor = 1.0;
+            contaminCol4 = vec4(1.0, 0.0, 0.0, 1.0);
+        }
+        else if(contaminConcentration < 0.3 && contaminConcentration > 0.1)
+        {
+            //factor = 0.5;
+            contaminCol4 = vec4(1.0, 1.0, 0.0, 1.0);
+        }
+        else if(contaminConcentration < 0.1 && contaminConcentration > 0.05)
+        {
+            //factor = 0.25;
+            contaminCol4 = vec4(0.0, 1.0, 0.0, 1.0);
+        }
+        
+        finalCol4 = mix(finalCol4, contaminCol4, factor);
+        //finalCol4 = contaminCol4;
     }
+
+    // Check if render particles.***
+    //if(u_RenderParticles == 1)
+    //{
+    //    // add particles color to "finalCol4".
+    //    vec4 particlesColor4 = texture2D(particlesTex, vec2(vTexCoord.x, vTexCoord.y));
+    //}
 
     //*************************************************************************************************************
     // Do specular lighting.***

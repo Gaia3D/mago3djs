@@ -18,6 +18,13 @@ var WaterManager = function(magoManager)
 
 	this.fbo;
 
+	// Simulation parameters.**************************************************************************
+	//this.simulationTextureWidth = 1024;
+	//this.simulationTextureHeight = 1024;
+
+	this.simulationTextureWidth = 512; // limited by DEM texture size
+	this.simulationTextureHeight = 512;
+
 	// Water wind.*************************************************************************************
 	this.windParticlesPosFbo;
 	this.windRes = 64;
@@ -50,10 +57,11 @@ WaterManager.prototype.init = function ()
 	*/
 	var gl = this.magoManager.getGl();
 	// create frame buffer object.
+	
 	if(!this.fbo) // simulation fbo (512 x 512).
 	{
-		var bufferWidth = 512;
-		var bufferHeight = 512;
+		var bufferWidth = this.simulationTextureWidth;
+		var bufferHeight = this.simulationTextureHeight;
 		var bUseMultiRenderTarget = this.magoManager.postFxShadersManager.bUseMultiRenderTarget;
 
 		this.fbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: false, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 3}); 
@@ -155,18 +163,21 @@ WaterManager.prototype.createDefaultShaders = function ()
 	shader.hightmap_loc = gl.getUniformLocation(shader.program, "waterHeightTex");
 	shader.terrainmap_loc = gl.getUniformLocation(shader.program, "terrainmap");
 	shader.waterTex_loc = gl.getUniformLocation(shader.program, "waterTex");
+	shader.contaminantHeightTex_loc = gl.getUniformLocation(shader.program, "contaminantHeightTex");
 	shader.u_heightMap_MinMax_loc = gl.getUniformLocation(shader.program, "u_heightMap_MinMax");
 	shader.u_screenSize_loc = gl.getUniformLocation(shader.program, "u_screenSize");
 	shader.projectionMatrixInv_loc = gl.getUniformLocation(shader.program, "projectionMatrixInv");//
 	shader.uWaterType_loc = gl.getUniformLocation(shader.program, "uWaterType");//
 	shader.u_waterMaxHeigh_loc = gl.getUniformLocation(shader.program, "u_waterMaxHeigh");
 	shader.u_RenderParticles_loc = gl.getUniformLocation(shader.program, "u_RenderParticles");
+	shader.u_contaminantMaxHeigh_loc = gl.getUniformLocation(shader.program, "u_contaminantMaxHeigh");
 
 	magoManager.postFxShadersManager.useProgram(shader);
 	//gl.uniform1i(shader.depthTex_loc, 0);
-	gl.uniform1i(shader.hightmap_loc, 1);
-	gl.uniform1i(shader.terrainmap_loc, 2);
-	gl.uniform1i(shader.waterTex_loc, 3);
+	gl.uniform1i(shader.hightmap_loc, 1); // this is water height tex.
+	gl.uniform1i(shader.terrainmap_loc, 2); // this is terrain height tex.
+	gl.uniform1i(shader.waterTex_loc, 3); // this is water color tex.
+	gl.uniform1i(shader.contaminantHeightTex_loc, 4); // this is contaminant height tex.
 	
 
 	// 1) waterRender Shader.********************************************************************************************
@@ -179,12 +190,15 @@ WaterManager.prototype.createDefaultShaders = function ()
 	shader.u_SimRes_loc = gl.getUniformLocation(shader.program, "u_SimRes");
 	shader.hightmap_loc = gl.getUniformLocation(shader.program, "waterHeightTex");
 	shader.terrainmap_loc = gl.getUniformLocation(shader.program, "terrainmap");
+	shader.contaminantHeightTex_loc = gl.getUniformLocation(shader.program, "contaminantHeightTex");
 	shader.u_heightMap_MinMax_loc = gl.getUniformLocation(shader.program, "u_heightMap_MinMax");
 	shader.u_waterMaxHeigh_loc = gl.getUniformLocation(shader.program, "u_waterMaxHeigh");
+	shader.u_contaminantMaxHeigh_loc = gl.getUniformLocation(shader.program, "u_contaminantMaxHeigh");
 
 	magoManager.postFxShadersManager.useProgram(shader);
 	gl.uniform1i(shader.hightmap_loc, 0);
 	gl.uniform1i(shader.terrainmap_loc, 1);
+	gl.uniform1i(shader.contaminantHeightTex_loc, 2); // this is contaminant height tex.
 
 	// 1.1) terrainRender Shader.********************************************************************************************
 	var shaderName = "terrainRender";
@@ -212,15 +226,21 @@ WaterManager.prototype.createDefaultShaders = function ()
 	fs_source = fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
 	fs_source = fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
 	shader = magoManager.postFxShadersManager.createShaderProgram(gl, vs_source, fs_source, shaderName, this.magoManager);
-	shader.u_existRain_loc = gl.getUniformLocation(shader.program, "u_existRain");
+	shader.u_existRain_loc = gl.getUniformLocation(shader.program, "u_existRain"); // change this by rainMaxHeight
+	shader.u_waterMaxHeigh_loc = gl.getUniformLocation(shader.program, "u_waterMaxHeigh");
+	shader.u_contaminantMaxHeigh_loc = gl.getUniformLocation(shader.program, "u_contaminantMaxHeigh");
 
 	shader.waterSourceTex_loc = gl.getUniformLocation(shader.program, "waterSourceTex");
+	shader.contaminantSourceTex_loc = gl.getUniformLocation(shader.program, "contaminantSourceTex");
 	shader.rainTex_loc = gl.getUniformLocation(shader.program, "rainTex");
 	shader.currWaterHeightTex_loc = gl.getUniformLocation(shader.program, "currWaterHeightTex");
+	shader.currContaminationHeightTex_loc = gl.getUniformLocation(shader.program, "currContaminationHeightTex");
 	magoManager.postFxShadersManager.useProgram(shader);
 	gl.uniform1i(shader.waterSourceTex_loc, 0);
 	gl.uniform1i(shader.rainTex_loc, 1);
 	gl.uniform1i(shader.currWaterHeightTex_loc, 2);
+	gl.uniform1i(shader.contaminantSourceTex_loc, 3);
+	gl.uniform1i(shader.currContaminationHeightTex_loc, 4);
 
 	// 3) calculateFlux Shader.*********************************************************************************************
 	shaderName = "waterCalculateFlux";
@@ -238,15 +258,21 @@ WaterManager.prototype.createDefaultShaders = function ()
 	shader.u_waterMaxFlux_loc = gl.getUniformLocation(shader.program, "u_waterMaxFlux");
 	shader.u_tileSize_loc = gl.getUniformLocation(shader.program, "u_tileSize");
 
+	shader.u_simulationTextureSize_loc = gl.getUniformLocation(shader.program, "u_simulationTextureSize");
+	shader.u_terrainTextureSize_loc = gl.getUniformLocation(shader.program, "u_terrainTextureSize");
+	shader.u_contaminantMaxHeigh_loc = gl.getUniformLocation(shader.program, "u_contaminantMaxHeigh");
+
 	shader.waterHeightTex_loc = gl.getUniformLocation(shader.program, "waterHeightTex");
 	shader.terrainHeightTex_loc = gl.getUniformLocation(shader.program, "terrainHeightTex");
 	shader.currWaterFluxTex_HIGH_loc = gl.getUniformLocation(shader.program, "currWaterFluxTex_HIGH");
 	shader.currWaterFluxTex_LOW_loc = gl.getUniformLocation(shader.program, "currWaterFluxTex_LOW");
+	shader.contaminantHeightTex_loc = gl.getUniformLocation(shader.program, "contaminantHeightTex");
 	magoManager.postFxShadersManager.useProgram(shader);
 	gl.uniform1i(shader.waterHeightTex_loc, 0);
 	gl.uniform1i(shader.terrainHeightTex_loc, 1);
 	gl.uniform1i(shader.currWaterFluxTex_HIGH_loc, 2);
 	gl.uniform1i(shader.currWaterFluxTex_LOW_loc, 3);
+	gl.uniform1i(shader.contaminantHeightTex_loc, 4);
 	
 
 	// 4) calculateVelocity Shader.*********************************************************************************************
@@ -266,16 +292,22 @@ WaterManager.prototype.createDefaultShaders = function ()
 	shader.u_tileSize_loc = gl.getUniformLocation(shader.program, "u_tileSize");
 	shader.u_waterMaxVelocity_loc = gl.getUniformLocation(shader.program, "u_waterMaxVelocity");
 
+	shader.u_simulationTextureSize_loc = gl.getUniformLocation(shader.program, "u_simulationTextureSize");
+	shader.u_terrainTextureSize_loc = gl.getUniformLocation(shader.program, "u_terrainTextureSize");
+	shader.u_contaminantMaxHeigh_loc = gl.getUniformLocation(shader.program, "u_contaminantMaxHeigh");
+
 	shader.waterHeightTex_loc = gl.getUniformLocation(shader.program, "waterHeightTex");
 	shader.terrainHeightTex_loc = gl.getUniformLocation(shader.program, "terrainHeightTex");
 	shader.currWaterFluxTex_loc = gl.getUniformLocation(shader.program, "currWaterFluxTex");
 	shader.currWaterFluxTex_HIGH_loc = gl.getUniformLocation(shader.program, "currWaterFluxTex_HIGH");
 	shader.currWaterFluxTex_LOW_loc = gl.getUniformLocation(shader.program, "currWaterFluxTex_LOW");
+	shader.contaminantHeightTex_loc = gl.getUniformLocation(shader.program, "contaminantHeightTex");
 	magoManager.postFxShadersManager.useProgram(shader);
 	gl.uniform1i(shader.waterHeightTex_loc, 0);
 	gl.uniform1i(shader.terrainHeightTex_loc, 1);
 	gl.uniform1i(shader.currWaterFluxTex_HIGH_loc, 2);
 	gl.uniform1i(shader.currWaterFluxTex_LOW_loc, 3);
+	gl.uniform1i(shader.contaminantHeightTex_loc, 4);
 
 	// 4.1) Calculate sediment shader.******************************************************************************************
 	shaderName = "waterCalculateSediment";
@@ -284,6 +316,28 @@ WaterManager.prototype.createDefaultShaders = function ()
 	fs_source = fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
 	fs_source = fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
 	shader = magoManager.postFxShadersManager.createShaderProgram(gl, vs_source, fs_source, shaderName, this.magoManager);
+
+	shader.waterHeightTex_loc = gl.getUniformLocation(shader.program, "waterHeightTex");
+	shader.terrainHeightTex_loc = gl.getUniformLocation(shader.program, "terrainHeightTex");
+	shader.currWaterFluxTex_loc = gl.getUniformLocation(shader.program, "currWaterFluxTex");
+	magoManager.postFxShadersManager.useProgram(shader);
+	gl.uniform1i(shader.waterHeightTex_loc, 0);
+	gl.uniform1i(shader.terrainHeightTex_loc, 1);
+	gl.uniform1i(shader.currWaterFluxTex_loc, 2);
+
+	// 4.1) Calculate contaminant shader.******************************************************************************************
+	shaderName = "waterCalculateContamination";
+	vs_source = ShaderSource.waterQuadVertVS;
+	fs_source = ShaderSource.waterCalculateContaminationFS;
+	fs_source = fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
+	fs_source = fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
+	shader = magoManager.postFxShadersManager.createShaderProgram(gl, vs_source, fs_source, shaderName, this.magoManager);
+	shader.u_heightMap_MinMax_loc = gl.getUniformLocation(shader.program, "u_heightMap_MinMax");
+	shader.u_waterMaxHeigh_loc = gl.getUniformLocation(shader.program, "u_waterMaxHeigh");
+	shader.u_waterMaxFlux_loc = gl.getUniformLocation(shader.program, "u_waterMaxFlux");
+	shader.u_tileSize_loc = gl.getUniformLocation(shader.program, "u_tileSize");
+	shader.u_waterMaxVelocity_loc = gl.getUniformLocation(shader.program, "u_waterMaxVelocity");
+	shader.u_contaminantMaxHeigh_loc = gl.getUniformLocation(shader.program, "u_contaminantMaxHeigh");
 
 	shader.waterHeightTex_loc = gl.getUniformLocation(shader.program, "waterHeightTex");
 	shader.terrainHeightTex_loc = gl.getUniformLocation(shader.program, "terrainHeightTex");
