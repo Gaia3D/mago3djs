@@ -104,14 +104,15 @@ void main()
     vec4 finalCol4 = vec4(vColorAuxTest);
     
     // save depth, normal, albedo.
-	gl_FragData[0] = packDepth(depthAux); 
+    vec4 encodedDepth = packDepth(depthAux); 
+	gl_FragData[0] = encodedDepth; 
 
     //gl_FragData[0] = finalCol4;  // anything.
 
     #ifdef USE_MULTI_RENDER_TARGET
-        gl_FragData[1] = vec4(1.0); // depth
+        gl_FragData[1] = encodedDepth; // depth
         gl_FragData[2] = vec4(1.0); // normal
-        gl_FragData[3] = finalCol4; // albedo
+        gl_FragData[3] = vec4(1.0); // albedo
         gl_FragData[4] = vec4(1.0); // selection color
     #endif
     /*

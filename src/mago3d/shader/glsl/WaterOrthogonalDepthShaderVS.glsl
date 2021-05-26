@@ -3,26 +3,23 @@ precision highp float;
 attribute vec3 position;
 attribute vec2 texCoord;
 
-uniform mat4 buildingRotMatrix; 
-uniform mat4 modelViewMatrixRelToEye; 
+uniform mat4 buildingRotMatrix;  
 uniform mat4 RefTransfMatrix;
-uniform mat4 ModelViewProjectionMatrixRelToEye;
 uniform mat4 modelViewProjectionMatrix;
 uniform vec3 buildingPosHIGH;
 uniform vec3 buildingPosLOW;
-uniform vec3 encodedCameraPositionMCHigh;
-uniform vec3 encodedCameraPositionMCLow;
 uniform float near;
 uniform float far;
 uniform vec3 aditionalPosition;
 uniform vec3 refTranslationVec;
 uniform int refMatrixType; // 0= identity, 1= translate, 2= transform
 
+uniform vec4 u_color4;
 varying float vDepth;
-varying vec2 vTexCoord;
+varying float vAltitude;
 varying vec4 vColor4;
+
 #define M_PI 3.1415926535897932384626433832795
-//#define M_PI 3.1415926535
 
 float cbrt(in float val)
 {
@@ -482,13 +479,12 @@ void main()
 	float inoutAux = 0.0;
 	vec3 geoCoord = CartesianToGeographicWgs84(pos4.xyz, inoutAux);
 
-	//gl_Position = ModelViewProjectionMatrixRelToEye * pos4;
+	////gl_Position = ModelViewProjectionMatrixRelToEye * pos4;
 	gl_Position = modelViewProjectionMatrix * vec4(geoCoord, 1.0);
 
 	vDepth = gl_Position.z * 0.5 + 0.5;
-	vTexCoord = texCoord;
-	vColor4 = vec4(1.0, 0.0, 0.0, 1.0);
+	vAltitude = geoCoord.z;
+	//vTexCoord = texCoord; // no used.
+	vColor4 = u_color4; // used for "waterCalculateHeightContaminationFS".***
 
-	// test debug:
-	gl_PointSize = 10.0;
 }

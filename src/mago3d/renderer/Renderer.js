@@ -2140,7 +2140,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 			if(waterLayer.waterFluxTexA_HIGH && waterLayer.waterFluxTexA_HIGH.texId)
 			{
-				texture = waterLayer.waterFluxTexA_HIGH.texId;
+				//texture = waterLayer.waterFluxTexA_HIGH.texId;
 			}
 
 			if(waterLayer.waterFluxTexA_LOW && waterLayer.waterFluxTexA_LOW.texId)
@@ -2155,7 +2155,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 			if(waterLayer.demWithBuildingsTex && waterLayer.demWithBuildingsTex.texId)
 			{
-				//texture = waterLayer.demWithBuildingsTex.texId;
+				texture = waterLayer.demWithBuildingsTex.texId;
 			}
 
 			if(waterLayer.dem_texture && waterLayer.dem_texture.texId)
@@ -2185,7 +2185,12 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 			if(waterLayer.contaminationTex_A && waterLayer.contaminationTex_A.texId)
 			{
-				texture = waterLayer.contaminationTex_A.texId;
+				//texture = waterLayer.contaminationTex_A.texId;
+			}
+
+			if(waterLayer.contaminantSourceTex && waterLayer.contaminantSourceTex.texId)
+			{
+				//texture = waterLayer.contaminantSourceTex.texId;
 			}
 		}
 	}

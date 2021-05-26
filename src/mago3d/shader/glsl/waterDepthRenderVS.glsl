@@ -87,10 +87,16 @@ float getContaminantHeight(in vec2 texCoord)
     return waterHeight;
 }
 
+float getTerrainHeight(in vec2 texCoord)
+{
+    float terainHeight = texture2D(terrainmap, texCoord).r;
+    terainHeight = u_heightMap_MinMax.x + terainHeight * u_heightMap_MinMax.y;
+    return terainHeight;
+}
+
 void main()
 {
 	// read the altitude from hightmap.
-	vec4 terrainHeight4 = texture2D(terrainmap, vec2(texCoord.x, 1.0 - texCoord.y));
 	float waterHeight = getWaterHeight(vec2(texCoord.x, texCoord.y));
 
 	float contaminantHeight = 0.0;
@@ -101,13 +107,10 @@ void main()
 		contaminantHeight = getContaminantHeight(texCoord);
 	}
 
-	float terrainH = terrainHeight4.r;
-	float terrainHeight = u_heightMap_MinMax.x + terrainH * u_heightMap_MinMax.y;
+	float terrainHeight = getTerrainHeight(texCoord);
 	float height = terrainHeight + waterHeight + contaminantHeight;
 
-	vWaterHeight = waterHeight;
-
-	vColorAuxTest = vec4(0.1, 0.5, 1.0, 1.0);
+	vWaterHeight = waterHeight + contaminantHeight; // needed to discard if waterHeight is small.
 
 	vec3 objPosHigh = buildingPosHIGH;
     vec3 objPosLow = buildingPosLOW.xyz + position.xyz;
@@ -124,9 +127,6 @@ void main()
 	gl_Position = ModelViewProjectionMatrixRelToEye * finalPos4;
 
 	vec4 orthoPos = modelViewMatrixRelToEye * finalPos4;
-	//vertexPos = orthoPos.xyz;
 	depth = (-orthoPos.z)/(far); // the correct value.
-
 	
-
 }

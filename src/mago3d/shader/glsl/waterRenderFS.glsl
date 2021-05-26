@@ -18,6 +18,13 @@ uniform sampler2D depthTex;
 uniform sampler2D waterTex;
 uniform sampler2D particlesTex;
 
+// Textures.********************************
+uniform sampler2D waterHeightTex;
+uniform sampler2D terrainmap;
+uniform sampler2D contaminantHeightTex;
+
+
+
 uniform vec2 u_screenSize;
 uniform float near;
 uniform float far;
@@ -38,6 +45,8 @@ uniform vec3 unif_LightPos;
 uniform float u_far;
 uniform float u_near;
 
+uniform float u_contaminantMaxHeigh;
+
 varying vec4 vColorAuxTest;
 varying float vWaterHeight;
 varying float vContaminantHeight;
@@ -46,32 +55,7 @@ varying vec3 vNormal;
 varying vec3 vViewRay;
 varying vec3 vOrthoPos;
 varying vec2 vTexCoord;
-/*
-vec3 calnor(vec2 uv){
-    float eps = 1.0/u_SimRes;
-    vec4 cur = texture(waterHeightTex,uv);
-    vec4 r = texture(waterHeightTex,uv+vec2(eps,0.f));
-    vec4 t = texture(waterHeightTex,uv+vec2(0.f,eps));
 
-    vec3 n1 = normalize(vec3(-1.0, cur.y + cur.x - r.y - r.x, 0.f));
-    vec3 n2 = normalize(vec3(-1.0, t.x + t.y - r.y - r.x, 1.0));
-
-    vec3 nor = -cross(n1,n2);
-    nor = normalize(nor);
-    return nor;
-}
-
-vec3 sky(in vec3 rd){
-    return mix(vec3(0.6,0.6,0.6),vec3(0.3,0.5,0.9),clamp(rd.y,0.f,1.f));
-}
-
-float linearDepth(float depthSample)
-{
-    depthSample = 2.0 * depthSample - 1.0;
-    float zLinear = 2.0 * u_near * u_far / (u_far + u_near - depthSample * (u_far - u_near));
-    return zLinear;
-}
-*/
 vec4 packDepth( float v ) {
   vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;
   enc = fract(enc);
@@ -155,6 +139,24 @@ vec2 decodeVelocity(in vec2 encodedVel)
 	return vec2(encodedVel.xy * 2.0 - 1.0);
 }
 
+vec3 getRainbowColor_byHeight(float height, in float maxi, in float mini)
+{
+	float gray = (height - mini)/(maxi - mini);
+	if (gray > 1.0){ gray = 1.0; }
+	else if (gray<0.0){ gray = 0.0; }
+	
+	float r, g, b;
+
+    b= 0.0;
+    r = min(gray * 2.0, 1.0);
+    g = min(2.0 - gray * 2.0, 1.0);
+
+	vec3 resultColor = vec3(r, g, b);
+    return resultColor;
+} 
+
+
+
 void main()
 {
     float minWaterHeightToRender = 0.001; // 1mm.
@@ -178,8 +180,9 @@ void main()
     //vec2 screenPos = vec2(gl_FragCoord.x / u_screenSize.x, gl_FragCoord.y / u_screenSize.y);
 
     
-    float dotProd = max(dot(vViewRay, vNormal), 0.6);
-    finalCol4 = vec4(finalCol4.xyz * dotProd, alpha);
+    float dotProd = dot(vViewRay, vNormal);
+    //finalCol4 = vec4(finalCol4.xyz * dotProd, alpha);
+    bool isParticle = false;
 
     if(uWaterType == 1)
     {
@@ -206,63 +209,48 @@ void main()
     }
     else if(uWaterType == 3)
     {
-        //alpha = 1.0;
-
         // particles case: now, decode velocity:
         vec4 velocity4 = texture2D(waterTex, vec2(vTexCoord.x, vTexCoord.y));
         finalCol4 = mix(vColorAuxTest, velocity4, velocity4.a);
         if(alpha < velocity4.a)
         {
             alpha = velocity4.a;
+            isParticle = true;
         }
     }
 
     if(vExistContaminant > 0.0 && vContaminantHeight > 0.001)
     {
-        float factor = min(contaminConcentration + 0.5, 1.0);
+        float factor = min(contaminConcentration + 0.6, 1.0);
+        
         vec4 contaminCol4 = finalCol4;
 
-        if(contaminConcentration > 0.3)
+        if(!isParticle)
         {
-            //factor = 1.0;
-            contaminCol4 = vec4(1.0, 0.0, 0.0, 1.0);
+            float maxConc = 0.001;
+            float minConc = 0.0;
+            contaminCol4 = vec4(getRainbowColor_byHeight(contaminConcentration, maxConc, minConc), 1.0);
+            factor = (contaminConcentration - minConc)/(maxConc - minConc);
         }
-        else if(contaminConcentration < 0.3 && contaminConcentration > 0.1)
-        {
-            //factor = 0.5;
-            contaminCol4 = vec4(1.0, 1.0, 0.0, 1.0);
-        }
-        else if(contaminConcentration < 0.1 && contaminConcentration > 0.05)
-        {
-            //factor = 0.25;
-            contaminCol4 = vec4(0.0, 1.0, 0.0, 1.0);
-        }
-        
         finalCol4 = mix(finalCol4, contaminCol4, factor);
-        //finalCol4 = contaminCol4;
     }
 
-    // Check if render particles.***
-    //if(u_RenderParticles == 1)
-    //{
-    //    // add particles color to "finalCol4".
-    //    vec4 particlesColor4 = texture2D(particlesTex, vec2(vTexCoord.x, vTexCoord.y));
-    //}
+    finalCol4 = vec4(finalCol4.xyz * dotProd, alpha);
 
     //*************************************************************************************************************
     // Do specular lighting.***
 	float lambertian = 1.0;
 	float specular = 0.0;
-    float shininessValue = 20.0;
+    float shininessValue = 200.0;
 	//if(applySpecLighting> 0.0)
-	{
+	//{
 		vec3 L;
         vec3 lightPos = vec3(0.0, 1.0, -1.0)*length(vOrthoPos);
         L = normalize(lightPos - vOrthoPos);
         lambertian = max(dot(vNormal, L), 0.0);
 		
 		specular = 0.0;
-		if(lambertian > 0.0)
+		//if(lambertian > 0.0)
 		{
 			vec3 R = reflect(-L, vNormal);      // Reflected light vector
 			vec3 V = normalize(-vOrthoPos); // Vector to viewer
@@ -276,20 +264,23 @@ void main()
 				//specular = 1.0;
 			}
 		}
-
 		
 		if(lambertian < 0.9)
 		{
 			lambertian = 0.9;
 		}
 
-	}
-    vec3 specCol = finalCol4.xyz * 3.0;
+	//}
+    vec3 specCol = finalCol4.xyz;
+    //specCol = vec3(1.0);
     finalCol4 = vec4((finalCol4.xyz * lambertian + specCol * specular), alpha);
-    //finalCol4 = vec4(finalCol4.xyz * (lambertian + specular), alpha);
     //*************************************************************************************************************
+    //vec3 lightdir = normalize(lightPos - vOrthoPos);
+    //vec3 halfway = normalize(lightdir + vViewRay);
+    //float spec = pow(max(dot(vNormal, halfway), 0.0), 333.0);
+    //finalCol4 = vec4((finalCol4.xyz * lambertian + specCol * spec), alpha);
 
-
+    //-------------------------------------------------------------------------------------------------------------
     gl_FragData[0] = finalCol4;  // anything.
 
     #ifdef USE_MULTI_RENDER_TARGET

@@ -1857,10 +1857,12 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		this.weatherStation.renderWeather(this);
 	}
 
-	//if(this.waterManager)
-	//{
-	//	this.waterManager.render();
-	//}
+	if(this.waterManager) // OpaquesPass.***
+	{
+		// Render terrain.***
+		this.waterManager.renderTerrain();
+	}
+
 
 	// Render transparents.****************************************************************************************************************
 	if (this.isCesiumGlobe())
@@ -1888,24 +1890,8 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		this.weatherStation.renderWeatherTransparents(this);
 	}
 
-	if(this.waterManager)
+	if(this.waterManager) // TransparentPass.***
 	{
-		/*
-		var lightsArray = this.visibleObjControlerNodes.currentVisibleNativeObjects.lightSourcesArray;
-		var lightCount = lightsArray.length;
-		if(lightCount > 0 && sceneState.applyLightsShadows && !this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
-		{
-			// for each visible lightSources, make cubeMap depthTextures if no exist.
-			var visiblesArray = this.visibleObjControlerNodes.getAllVisibles();
-			var nativeVisiblesArray = this.visibleObjControlerNodes.getAllNatives();
-			
-			for(var i=0; i<lightCount; i++)
-			{
-				var light = lightsArray[i];
-				light.doIntersectedObjectsCulling(visiblesArray, nativeVisiblesArray);
-			}
-		}
-		*/
 		// 1rst, do objects intersection culling.
 		var visiblesArray = this.visibleObjControlerNodes.getAllVisibles();
 		var nativeVisiblesArray = this.visibleObjControlerNodes.getAllNatives();

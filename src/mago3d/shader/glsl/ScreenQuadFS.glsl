@@ -362,12 +362,9 @@ void main()
 					shadow_occlusion = 0.5;
 					alpha = 0.5;
 				}
-				
 			}
-
 		}
 		
-
 		// calculate sunDirCC.
 		//vec4 sunDirCC = modelViewMatrixRelToEyeInv * vec4(sunDirWC, 1.0);
 		//directionalLightWeighting = max(dot(normal, -sunDirCC.xyz), 0.0);
@@ -426,9 +423,7 @@ void main()
 		occlusion = 0.0;// original.***
 
 		float occlInv = 1.0 - occlusion;
-
 		float lightFactorAux = uSceneDayNightLightingFactor + diffuseLightModul;
-
 		vec3 diffuseLight3 = diffuseLight.xyz + vec3(uSceneDayNightLightingFactor);
 
 		// Light factor.***
@@ -452,8 +447,6 @@ void main()
 							albedo.b * occlInv * diffuseLight3.z, albedo.a);
 
 		gl_FragColor = finalColor;
-
-
 
 		// fog.*****************************************************************
 		//float myLinearDepth2 = getDepth(screenPos);

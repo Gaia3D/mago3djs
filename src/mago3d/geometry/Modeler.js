@@ -259,16 +259,20 @@ Modeler.prototype.__TEST__extrusionBuildings_son = function ()
 	increLat = 0.0;
 
 	var widthIncreLon = 0.0005;
+	var widthIncreLat = 0.0005;
 	var minLon = 127.20762;
 	var minLat = 35.60993;
 
 	//var lines = [[[ 127.20762, 35.61518 ], [ 127.20762, 35.60993 ], [ 127.20762 + widthIncreLon, 35.60993 ], [ 127.20762 + widthIncreLon, 35.61518 ]]]; // original.
-	var lines = [[[ 127.20762 + increLon, 35.61518 + increLat], [ 127.20762 + increLon, 35.60993  + increLat], [ 127.20762 + widthIncreLon + increLon, 35.60993  + increLat], [ 127.20762 + widthIncreLon + increLon, 35.61518  + increLat]],
-					[[ 127.20762 + increLon, 35.61518 + increLat], [ 127.20762 + increLon, 35.60993  + increLat], [ 127.20762 + widthIncreLon + increLon, 35.60993  + increLat], [ 127.20762 + widthIncreLon + increLon, 35.61518  + increLat]]];
+	////var lines = [[[ 127.20762 + increLon, 35.61518 + increLat], [ 127.20762 + increLon, 35.60993  + increLat], [ 127.20762 + widthIncreLon + increLon, 35.60993  + increLat], [ 127.20762 + widthIncreLon + increLon, 35.61518  + increLat]],
+	////				[[ 127.20762 + increLon, 35.61518 + increLat], [ 127.20762 + increLon, 35.60993  + increLat], [ 127.20762 + widthIncreLon + increLon, 35.60993  + increLat], [ 127.20762 + widthIncreLon + increLon, 35.61518  + increLat]]];
+	var lines = [[[ 127.20762 + increLon, 35.61518 + increLat], [ 127.20762 + increLon, 35.60993  + increLat], [ 127.20762 + widthIncreLon + increLon, 35.60993  + increLat], [ 127.20762 + widthIncreLon + increLon, 35.61518  + increLat]]];
+	lines.push([[ minLon, minLat ], [ minLon + widthIncreLon, minLat ], [ minLon + widthIncreLon, minLat + widthIncreLat], [ minLon, minLat + widthIncreLat ]]); // original.
+
 
 	// Now, create geoCoords.***
 	var altAux = 100.0;
-	var height = 280.0;
+	var height = 230.0;
 	var colorTop = new Color(1.0, 0.0, 0.0, 0.8);
 	var colorBottom = new Color(0.0, 1.0, 0.0, 0.8);
 	var alpha = 1.0;

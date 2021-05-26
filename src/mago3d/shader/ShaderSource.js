@@ -6727,12 +6727,9 @@ void main()\n\
 					shadow_occlusion = 0.5;\n\
 					alpha = 0.5;\n\
 				}\n\
-				\n\
 			}\n\
-\n\
 		}\n\
 		\n\
-\n\
 		// calculate sunDirCC.\n\
 		//vec4 sunDirCC = modelViewMatrixRelToEyeInv * vec4(sunDirWC, 1.0);\n\
 		//directionalLightWeighting = max(dot(normal, -sunDirCC.xyz), 0.0);\n\
@@ -6791,9 +6788,7 @@ void main()\n\
 		occlusion = 0.0;// original.***\n\
 \n\
 		float occlInv = 1.0 - occlusion;\n\
-\n\
 		float lightFactorAux = uSceneDayNightLightingFactor + diffuseLightModul;\n\
-\n\
 		vec3 diffuseLight3 = diffuseLight.xyz + vec3(uSceneDayNightLightingFactor);\n\
 \n\
 		// Light factor.***\n\
@@ -6817,8 +6812,6 @@ void main()\n\
 							albedo.b * occlInv * diffuseLight3.z, albedo.a);\n\
 \n\
 		gl_FragColor = finalColor;\n\
-\n\
-\n\
 \n\
 		// fog.*****************************************************************\n\
 		//float myLinearDepth2 = getDepth(screenPos);\n\
@@ -11557,7 +11550,7 @@ void encodeWaterFlux(vec4 flux, inout vec4 flux_high, inout vec4 flux_low)\n\
     flux_high = vec4(encoded_top_flux.r, encoded_right_flux.r, encoded_bottom_flux.r, encoded_left_flux.r);\n\
     flux_low = vec4(encoded_top_flux.g, encoded_right_flux.g, encoded_bottom_flux.g, encoded_left_flux.g);\n\
 }\n\
-\n\
+/*\n\
 vec4 getTerrainHeightInterpolation(const vec2 uv) {\n\
     //return texture2D(u_wind, uv).rg; // lower-res hardware filtering\n\
 	\n\
@@ -11571,6 +11564,7 @@ vec4 getTerrainHeightInterpolation(const vec2 uv) {\n\
 \n\
     return mix(mix(tl, tr, f.x), mix(bl, br, f.x), f.y);\n\
 }\n\
+*/\n\
 \n\
 float getTerrainHeight(in vec2 texCoord)\n\
 {\n\
@@ -11706,6 +11700,70 @@ void main()\n\
     #endif\n\
 \n\
 }";
+ShaderSource.waterCalculateHeightContaminationFS = "//#version 300 es\n\
+\n\
+#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+\n\
+uniform sampler2D waterSourceTex;\n\
+uniform sampler2D rainTex; // if exist.\n\
+uniform sampler2D currWaterHeightTex;\n\
+uniform sampler2D currContaminationHeightTex;\n\
+uniform sampler2D contaminantSourceTex;\n\
+\n\
+uniform bool u_existRain;\n\
+uniform float u_waterMaxHeigh;\n\
+uniform float u_contaminantMaxHeigh;\n\
+\n\
+varying vec2 v_tex_pos;\n\
+varying vec4 vColor4;\n\
+\n\
+vec4 packDepth( float v ) {\n\
+    vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+    enc = fract(enc);\n\
+    enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+    return enc;\n\
+}\n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+}\n\
+/*\n\
+float getWaterHeight(in vec2 texCoord)\n\
+{\n\
+    vec4 color4 = texture2D(currWaterHeightTex, texCoord);\n\
+    //float decoded = decodeRG(color4.rg); // old.\n\
+    float decoded = unpackDepth(color4);\n\
+    float waterHeight = decoded * u_waterMaxHeigh;\n\
+    return waterHeight;\n\
+}\n\
+*/\n\
+\n\
+void main()\n\
+{\n\
+    // 1rst, take the water source.\n\
+    gl_FragData[0] = vColor4;\n\
+\n\
+    #ifdef USE_MULTI_RENDER_TARGET\n\
+        gl_FragData[1] = vec4(1.0, 0.0, 0.5, 1.0); // contamination\n\
+        gl_FragData[2] = vec4(1.0, 0.0, 0.5, 1.0); // normal\n\
+        gl_FragData[3] = vec4(1.0, 0.0, 0.5, 1.0); // albedo\n\
+        gl_FragData[4] = vec4(1.0, 0.0, 0.5, 1.0); // selection color\n\
+    #endif\n\
+}";
 ShaderSource.waterCalculateHeightFS = "//#version 300 es\n\
 \n\
 #ifdef GL_ES\n\
@@ -11782,7 +11840,7 @@ void main()\n\
     if(u_contaminantMaxHeigh > 0.0)\n\
     {\n\
         // check if exist contaminant.\n\
-        contaminSourceHeight = texture2D(contaminantSourceTex, vec2(v_tex_pos.x, 1.0 - v_tex_pos.y));\n\
+        contaminSourceHeight = texture2D(contaminantSourceTex, v_tex_pos);\n\
         vec4 currContaminHeight = texture2D(currContaminationHeightTex, v_tex_pos);\n\
 \n\
         float decodedSourceContaminHeight = unpackDepth(contaminSourceHeight);\n\
@@ -11892,19 +11950,16 @@ uniform sampler2D contaminantHeightTex;\n\
 varying vec2 v_tex_pos; // texCoords.\n\
 #define PI 3.1415926\n\
 \n\
-uniform float u_SimRes;\n\
-uniform float u_PipeLen; // pipeLen = cellSizeX = cellSizeY.\n\
 uniform float u_timestep;\n\
-uniform float u_PipeArea;\n\
 \n\
 uniform vec2 u_tileSize; // tile size in meters.\n\
-uniform vec2 u_heightMap_MinMax;\n\
+uniform vec2 u_heightMap_MinMax; // terrain min max heights. no used.\n\
 uniform float u_waterMaxHeigh;\n\
 uniform float u_waterMaxFlux;\n\
 uniform float u_waterMaxVelocity;\n\
 uniform float u_contaminantMaxHeigh;\n\
 \n\
-uniform vec2 u_simulationTextureSize;\n\
+uniform vec2 u_simulationTextureSize; // for example 512 x 512.\n\
 uniform vec2 u_terrainTextureSize;\n\
 \n\
 vec2 encodeVelocity(in vec2 vel)\n\
@@ -12322,14 +12377,15 @@ void main()\n\
     vec4 finalCol4 = vec4(vColorAuxTest);\n\
     \n\
     // save depth, normal, albedo.\n\
-	gl_FragData[0] = packDepth(depthAux); \n\
+    vec4 encodedDepth = packDepth(depthAux); \n\
+	gl_FragData[0] = encodedDepth; \n\
 \n\
     //gl_FragData[0] = finalCol4;  // anything.\n\
 \n\
     #ifdef USE_MULTI_RENDER_TARGET\n\
-        gl_FragData[1] = vec4(1.0); // depth\n\
+        gl_FragData[1] = encodedDepth; // depth\n\
         gl_FragData[2] = vec4(1.0); // normal\n\
-        gl_FragData[3] = finalCol4; // albedo\n\
+        gl_FragData[3] = vec4(1.0); // albedo\n\
         gl_FragData[4] = vec4(1.0); // selection color\n\
     #endif\n\
     /*\n\
@@ -12470,10 +12526,16 @@ float getContaminantHeight(in vec2 texCoord)\n\
     return waterHeight;\n\
 }\n\
 \n\
+float getTerrainHeight(in vec2 texCoord)\n\
+{\n\
+    float terainHeight = texture2D(terrainmap, texCoord).r;\n\
+    terainHeight = u_heightMap_MinMax.x + terainHeight * u_heightMap_MinMax.y;\n\
+    return terainHeight;\n\
+}\n\
+\n\
 void main()\n\
 {\n\
 	// read the altitude from hightmap.\n\
-	vec4 terrainHeight4 = texture2D(terrainmap, vec2(texCoord.x, 1.0 - texCoord.y));\n\
 	float waterHeight = getWaterHeight(vec2(texCoord.x, texCoord.y));\n\
 \n\
 	float contaminantHeight = 0.0;\n\
@@ -12484,13 +12546,10 @@ void main()\n\
 		contaminantHeight = getContaminantHeight(texCoord);\n\
 	}\n\
 \n\
-	float terrainH = terrainHeight4.r;\n\
-	float terrainHeight = u_heightMap_MinMax.x + terrainH * u_heightMap_MinMax.y;\n\
+	float terrainHeight = getTerrainHeight(texCoord);\n\
 	float height = terrainHeight + waterHeight + contaminantHeight;\n\
 \n\
-	vWaterHeight = waterHeight;\n\
-\n\
-	vColorAuxTest = vec4(0.1, 0.5, 1.0, 1.0);\n\
+	vWaterHeight = waterHeight + contaminantHeight; // needed to discard if waterHeight is small.\n\
 \n\
 	vec3 objPosHigh = buildingPosHIGH;\n\
     vec3 objPosLow = buildingPosLOW.xyz + position.xyz;\n\
@@ -12507,11 +12566,8 @@ void main()\n\
 	gl_Position = ModelViewProjectionMatrixRelToEye * finalPos4;\n\
 \n\
 	vec4 orthoPos = modelViewMatrixRelToEye * finalPos4;\n\
-	//vertexPos = orthoPos.xyz;\n\
 	depth = (-orthoPos.z)/(far); // the correct value.\n\
-\n\
 	\n\
-\n\
 }\n\
 ";
 ShaderSource.WaterOrthogonalDepthShaderFS = "#ifdef GL_ES\n\
@@ -12529,13 +12585,12 @@ precision highp float;\n\
 #endif\n\
 \n\
 uniform sampler2D currDEMTex;\n\
-uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
 \n\
-uniform vec2 u_screenSize;\n\
+uniform vec2 u_heightMap_MinMax; // terrain min max heights. \n\
+uniform vec2 u_simulationTextureSize; // for example 512 x 512.\n\
 \n\
 varying float vDepth;\n\
-varying vec2 vTexCoord;  \n\
-varying vec4 vColor4;\n\
+varying float vAltitude;\n\
 \n\
 vec4 packDepth( float v ) {\n\
   vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
@@ -12549,25 +12604,33 @@ float unpackDepth(const in vec4 rgba_depth)\n\
 	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
 }\n\
 \n\
+float getTerrainHeight(in vec2 texCoord)\n\
+{\n\
+    float terainHeight = texture2D(currDEMTex, texCoord).r;\n\
+    terainHeight = u_heightMap_MinMax.x + terainHeight * u_heightMap_MinMax.y;\n\
+    return terainHeight;\n\
+}\n\
+\n\
 void main()\n\
 {     \n\
-    vec2 screenPos = vec2(gl_FragCoord.x / u_screenSize.x, gl_FragCoord.y / u_screenSize.y);\n\
+    vec2 screenPos = vec2(gl_FragCoord.x / u_simulationTextureSize.x, 1.0 - gl_FragCoord.y / u_simulationTextureSize.y);\n\
 \n\
     // read the currentDEM depth.\n\
-    //vec4 depthCol4 = texture2D(currDEMTex, vec2(screenPos.x, 1.0 - screenPos.y));\n\
-   // float currDepth = unpackDepth(depthCol4);\n\
+    float curTerrainHeght = texture2D(currDEMTex, screenPos).r;\n\
 \n\
-    //if(vDepth > currDepth)\n\
-    //{\n\
-        //discard;\n\
-    //}\n\
+    float newTerrainHeght = ((vAltitude - u_heightMap_MinMax.x)/u_heightMap_MinMax.y);\n\
+    //float newTerrainHeght = ((vAltitude - u_heightMap_MinMax.x)/u_heightMap_MinMax.y);\n\
 \n\
-    //gl_FragData[0] = packDepth(vDepth);\n\
-    //gl_FragData[0] = vec4(1.0, 0.0, 0.0, 1.0);\n\
-    gl_FragData[0] = vColor4;\n\
+    if(newTerrainHeght < curTerrainHeght)\n\
+    {\n\
+        discard;\n\
+    }\n\
+    \n\
+    vec4 depthColor4 = vec4(newTerrainHeght, newTerrainHeght, newTerrainHeght, 1.0);\n\
+    gl_FragData[0] = depthColor4;\n\
 \n\
     #ifdef USE_MULTI_RENDER_TARGET\n\
-        gl_FragData[1] = vec4(1.0); // depth\n\
+        gl_FragData[1] = depthColor4; // depth\n\
         gl_FragData[2] = vec4(1.0); // normal\n\
         gl_FragData[3] = vec4(1.0); // albedo\n\
         gl_FragData[4] = vec4(1.0); // selection color\n\
@@ -12578,26 +12641,23 @@ ShaderSource.WaterOrthogonalDepthShaderVS = "precision highp float;\n\
 attribute vec3 position;\n\
 attribute vec2 texCoord;\n\
 \n\
-uniform mat4 buildingRotMatrix; \n\
-uniform mat4 modelViewMatrixRelToEye; \n\
+uniform mat4 buildingRotMatrix;  \n\
 uniform mat4 RefTransfMatrix;\n\
-uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
 uniform mat4 modelViewProjectionMatrix;\n\
 uniform vec3 buildingPosHIGH;\n\
 uniform vec3 buildingPosLOW;\n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
 uniform float near;\n\
 uniform float far;\n\
 uniform vec3 aditionalPosition;\n\
 uniform vec3 refTranslationVec;\n\
 uniform int refMatrixType; // 0= identity, 1= translate, 2= transform\n\
 \n\
+uniform vec4 u_color4;\n\
 varying float vDepth;\n\
-varying vec2 vTexCoord;\n\
+varying float vAltitude;\n\
 varying vec4 vColor4;\n\
+\n\
 #define M_PI 3.1415926535897932384626433832795\n\
-//#define M_PI 3.1415926535\n\
 \n\
 float cbrt(in float val)\n\
 {\n\
@@ -13057,15 +13117,14 @@ void main()\n\
 	float inoutAux = 0.0;\n\
 	vec3 geoCoord = CartesianToGeographicWgs84(pos4.xyz, inoutAux);\n\
 \n\
-	//gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+	////gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 	gl_Position = modelViewProjectionMatrix * vec4(geoCoord, 1.0);\n\
 \n\
 	vDepth = gl_Position.z * 0.5 + 0.5;\n\
-	vTexCoord = texCoord;\n\
-	vColor4 = vec4(1.0, 0.0, 0.0, 1.0);\n\
+	vAltitude = geoCoord.z;\n\
+	//vTexCoord = texCoord; // no used.\n\
+	vColor4 = u_color4; // used for \"waterCalculateHeightContaminationFS\".***\n\
 \n\
-	// test debug:\n\
-	gl_PointSize = 10.0;\n\
 }\n\
 ";
 ShaderSource.waterParticlesRenderFS = "precision mediump float;\n\
@@ -13193,6 +13252,13 @@ uniform sampler2D depthTex;\n\
 uniform sampler2D waterTex;\n\
 uniform sampler2D particlesTex;\n\
 \n\
+// Textures.********************************\n\
+uniform sampler2D waterHeightTex;\n\
+uniform sampler2D terrainmap;\n\
+uniform sampler2D contaminantHeightTex;\n\
+\n\
+\n\
+\n\
 uniform vec2 u_screenSize;\n\
 uniform float near;\n\
 uniform float far;\n\
@@ -13213,6 +13279,8 @@ uniform vec3 unif_LightPos;\n\
 uniform float u_far;\n\
 uniform float u_near;\n\
 \n\
+uniform float u_contaminantMaxHeigh;\n\
+\n\
 varying vec4 vColorAuxTest;\n\
 varying float vWaterHeight;\n\
 varying float vContaminantHeight;\n\
@@ -13221,32 +13289,7 @@ varying vec3 vNormal;\n\
 varying vec3 vViewRay;\n\
 varying vec3 vOrthoPos;\n\
 varying vec2 vTexCoord;\n\
-/*\n\
-vec3 calnor(vec2 uv){\n\
-    float eps = 1.0/u_SimRes;\n\
-    vec4 cur = texture(waterHeightTex,uv);\n\
-    vec4 r = texture(waterHeightTex,uv+vec2(eps,0.f));\n\
-    vec4 t = texture(waterHeightTex,uv+vec2(0.f,eps));\n\
 \n\
-    vec3 n1 = normalize(vec3(-1.0, cur.y + cur.x - r.y - r.x, 0.f));\n\
-    vec3 n2 = normalize(vec3(-1.0, t.x + t.y - r.y - r.x, 1.0));\n\
-\n\
-    vec3 nor = -cross(n1,n2);\n\
-    nor = normalize(nor);\n\
-    return nor;\n\
-}\n\
-\n\
-vec3 sky(in vec3 rd){\n\
-    return mix(vec3(0.6,0.6,0.6),vec3(0.3,0.5,0.9),clamp(rd.y,0.f,1.f));\n\
-}\n\
-\n\
-float linearDepth(float depthSample)\n\
-{\n\
-    depthSample = 2.0 * depthSample - 1.0;\n\
-    float zLinear = 2.0 * u_near * u_far / (u_far + u_near - depthSample * (u_far - u_near));\n\
-    return zLinear;\n\
-}\n\
-*/\n\
 vec4 packDepth( float v ) {\n\
   vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
   enc = fract(enc);\n\
@@ -13330,6 +13373,24 @@ vec2 decodeVelocity(in vec2 encodedVel)\n\
 	return vec2(encodedVel.xy * 2.0 - 1.0);\n\
 }\n\
 \n\
+vec3 getRainbowColor_byHeight(float height, in float maxi, in float mini)\n\
+{\n\
+	float gray = (height - mini)/(maxi - mini);\n\
+	if (gray > 1.0){ gray = 1.0; }\n\
+	else if (gray<0.0){ gray = 0.0; }\n\
+	\n\
+	float r, g, b;\n\
+\n\
+    b= 0.0;\n\
+    r = min(gray * 2.0, 1.0);\n\
+    g = min(2.0 - gray * 2.0, 1.0);\n\
+\n\
+	vec3 resultColor = vec3(r, g, b);\n\
+    return resultColor;\n\
+} \n\
+\n\
+\n\
+\n\
 void main()\n\
 {\n\
     float minWaterHeightToRender = 0.001; // 1mm.\n\
@@ -13353,8 +13414,9 @@ void main()\n\
     //vec2 screenPos = vec2(gl_FragCoord.x / u_screenSize.x, gl_FragCoord.y / u_screenSize.y);\n\
 \n\
     \n\
-    float dotProd = max(dot(vViewRay, vNormal), 0.6);\n\
-    finalCol4 = vec4(finalCol4.xyz * dotProd, alpha);\n\
+    float dotProd = dot(vViewRay, vNormal);\n\
+    //finalCol4 = vec4(finalCol4.xyz * dotProd, alpha);\n\
+    bool isParticle = false;\n\
 \n\
     if(uWaterType == 1)\n\
     {\n\
@@ -13381,63 +13443,48 @@ void main()\n\
     }\n\
     else if(uWaterType == 3)\n\
     {\n\
-        //alpha = 1.0;\n\
-\n\
         // particles case: now, decode velocity:\n\
         vec4 velocity4 = texture2D(waterTex, vec2(vTexCoord.x, vTexCoord.y));\n\
         finalCol4 = mix(vColorAuxTest, velocity4, velocity4.a);\n\
         if(alpha < velocity4.a)\n\
         {\n\
             alpha = velocity4.a;\n\
+            isParticle = true;\n\
         }\n\
     }\n\
 \n\
     if(vExistContaminant > 0.0 && vContaminantHeight > 0.001)\n\
     {\n\
-        float factor = min(contaminConcentration + 0.5, 1.0);\n\
+        float factor = min(contaminConcentration + 0.6, 1.0);\n\
+        \n\
         vec4 contaminCol4 = finalCol4;\n\
 \n\
-        if(contaminConcentration > 0.3)\n\
+        if(!isParticle)\n\
         {\n\
-            //factor = 1.0;\n\
-            contaminCol4 = vec4(1.0, 0.0, 0.0, 1.0);\n\
+            float maxConc = 0.001;\n\
+            float minConc = 0.0;\n\
+            contaminCol4 = vec4(getRainbowColor_byHeight(contaminConcentration, maxConc, minConc), 1.0);\n\
+            factor = (contaminConcentration - minConc)/(maxConc - minConc);\n\
         }\n\
-        else if(contaminConcentration < 0.3 && contaminConcentration > 0.1)\n\
-        {\n\
-            //factor = 0.5;\n\
-            contaminCol4 = vec4(1.0, 1.0, 0.0, 1.0);\n\
-        }\n\
-        else if(contaminConcentration < 0.1 && contaminConcentration > 0.05)\n\
-        {\n\
-            //factor = 0.25;\n\
-            contaminCol4 = vec4(0.0, 1.0, 0.0, 1.0);\n\
-        }\n\
-        \n\
         finalCol4 = mix(finalCol4, contaminCol4, factor);\n\
-        //finalCol4 = contaminCol4;\n\
     }\n\
 \n\
-    // Check if render particles.***\n\
-    //if(u_RenderParticles == 1)\n\
-    //{\n\
-    //    // add particles color to \"finalCol4\".\n\
-    //    vec4 particlesColor4 = texture2D(particlesTex, vec2(vTexCoord.x, vTexCoord.y));\n\
-    //}\n\
+    finalCol4 = vec4(finalCol4.xyz * dotProd, alpha);\n\
 \n\
     //*************************************************************************************************************\n\
     // Do specular lighting.***\n\
 	float lambertian = 1.0;\n\
 	float specular = 0.0;\n\
-    float shininessValue = 20.0;\n\
+    float shininessValue = 200.0;\n\
 	//if(applySpecLighting> 0.0)\n\
-	{\n\
+	//{\n\
 		vec3 L;\n\
         vec3 lightPos = vec3(0.0, 1.0, -1.0)*length(vOrthoPos);\n\
         L = normalize(lightPos - vOrthoPos);\n\
         lambertian = max(dot(vNormal, L), 0.0);\n\
 		\n\
 		specular = 0.0;\n\
-		if(lambertian > 0.0)\n\
+		//if(lambertian > 0.0)\n\
 		{\n\
 			vec3 R = reflect(-L, vNormal);      // Reflected light vector\n\
 			vec3 V = normalize(-vOrthoPos); // Vector to viewer\n\
@@ -13451,20 +13498,23 @@ void main()\n\
 				//specular = 1.0;\n\
 			}\n\
 		}\n\
-\n\
 		\n\
 		if(lambertian < 0.9)\n\
 		{\n\
 			lambertian = 0.9;\n\
 		}\n\
 \n\
-	}\n\
-    vec3 specCol = finalCol4.xyz * 3.0;\n\
+	//}\n\
+    vec3 specCol = finalCol4.xyz;\n\
+    //specCol = vec3(1.0);\n\
     finalCol4 = vec4((finalCol4.xyz * lambertian + specCol * specular), alpha);\n\
-    //finalCol4 = vec4(finalCol4.xyz * (lambertian + specular), alpha);\n\
     //*************************************************************************************************************\n\
+    //vec3 lightdir = normalize(lightPos - vOrthoPos);\n\
+    //vec3 halfway = normalize(lightdir + vViewRay);\n\
+    //float spec = pow(max(dot(vNormal, halfway), 0.0), 333.0);\n\
+    //finalCol4 = vec4((finalCol4.xyz * lambertian + specCol * spec), alpha);\n\
 \n\
-\n\
+    //-------------------------------------------------------------------------------------------------------------\n\
     gl_FragData[0] = finalCol4;  // anything.\n\
 \n\
     #ifdef USE_MULTI_RENDER_TARGET\n\
@@ -13526,7 +13576,7 @@ ShaderSource.waterRenderVS = "\n\
 	attribute vec2 texCoord;\n\
 	attribute vec4 color4;\n\
 	\n\
-	uniform mat4 buildingRotMatrix; \n\
+	uniform mat4 buildingRotMatrix; // use this matrix to calculate normals from highMaps.***\n\
 	uniform mat4 modelViewMatrixRelToEye; \n\
 	uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
 	uniform mat4 normalMatrix4;\n\
@@ -13555,6 +13605,8 @@ uniform sampler2D contaminantHeightTex;\n\
 uniform vec2 u_heightMap_MinMax; // terrain.\n\
 uniform float u_waterMaxHeigh;\n\
 uniform float u_contaminantMaxHeigh;\n\
+uniform vec2 u_tileSize; // tile size in meters.\n\
+uniform vec2 u_simulationTextureSize; // for example 512 x 512.\n\
 \n\
 uniform sampler2D depthTex;\n\
 \n\
@@ -13682,11 +13734,84 @@ float getContaminantHeight(in vec2 texCoord)\n\
     return waterHeight;\n\
 }\n\
 \n\
+float getTerrainHeight(in vec2 texCoord)\n\
+{\n\
+    float terainHeight = texture2D(terrainmap, texCoord).r;\n\
+    terainHeight = u_heightMap_MinMax.x + terainHeight * u_heightMap_MinMax.y;\n\
+    return terainHeight;\n\
+}\n\
+\n\
+/*\n\
+vec3 calnor(vec2 uv){\n\
+    float eps = 1.0/u_SimRes;\n\
+    vec4 cur = texture(waterHeightTex,uv);\n\
+    vec4 r = texture(waterHeightTex,uv+vec2(eps,0.f));\n\
+    vec4 t = texture(waterHeightTex,uv+vec2(0.f,eps));\n\
+\n\
+    vec3 n1 = normalize(vec3(-1.0, cur.y + cur.x - r.y - r.x, 0.f));\n\
+    vec3 n2 = normalize(vec3(-1.0, t.x + t.y - r.y - r.x, 1.0));\n\
+\n\
+    vec3 nor = -cross(n1,n2);\n\
+    nor = normalize(nor);\n\
+    return nor;\n\
+}\n\
+\n\
+vec3 sky(in vec3 rd){\n\
+    return mix(vec3(0.6,0.6,0.6),vec3(0.3,0.5,0.9),clamp(rd.y,0.f,1.f));\n\
+}\n\
+\n\
+float linearDepth(float depthSample)\n\
+{\n\
+    depthSample = 2.0 * depthSample - 1.0;\n\
+    float zLinear = 2.0 * u_near * u_far / (u_far + u_near - depthSample * (u_far - u_near));\n\
+    return zLinear;\n\
+}\n\
+*/\n\
+\n\
+float getTotalHeight(in vec2 texCoord)\n\
+{\n\
+	float waterHeight = getWaterHeight(texCoord);\n\
+	float terrainHeight = getTerrainHeight(texCoord);\n\
+	float contaminHeight = 0.0;\n\
+	if(u_contaminantMaxHeigh > 0.0)\n\
+	{\n\
+		// exist contaminant.\n\
+		contaminHeight = getContaminantHeight(texCoord);\n\
+	}\n\
+\n\
+	float totalHeight = waterHeight + terrainHeight + contaminHeight;\n\
+	return totalHeight;\n\
+}\n\
+\n\
+vec3 calculateNormalFromHeights(in vec2 texCoord)\n\
+{\n\
+	vec3 normal;\n\
+	float cellSize_x = u_tileSize.x / u_simulationTextureSize.x;\n\
+    float cellSize_y = u_tileSize.y / u_simulationTextureSize.y;\n\
+\n\
+	float divX = 1.0/u_simulationTextureSize.x;\n\
+    float divY = 1.0/u_simulationTextureSize.y;\n\
+\n\
+	// curPos = (0, 0, curH).\n\
+	// upPos = (0, dy, upH).\n\
+	// rightPos = (dz, 0, rightH).\n\
+\n\
+	vec3 curPos = vec3(0.0, 0.0, getTotalHeight(texCoord));\n\
+	vec3 upPos = vec3(0.0, cellSize_y, getTotalHeight(texCoord + vec2(0.0, divY)));\n\
+	vec3 rightPos = vec3(cellSize_x, 0.0, getTotalHeight(texCoord + vec2(divX, 0.0)));\n\
+\n\
+	vec3 rightDir = normalize(rightPos - curPos);\n\
+	vec3 upDir = normalize(upPos - curPos);\n\
+\n\
+	normal = normalize(cross(rightDir, upDir));\n\
+\n\
+	return normal;\n\
+}\n\
+\n\
 void main()\n\
 {\n\
 	// read the altitude from waterHeightTex.\n\
 	vTexCoord = texCoord;\n\
-	vec4 terrainHeight4 = texture2D(terrainmap, vec2(texCoord.x, 1.0 - texCoord.y));\n\
 	float waterHeight = getWaterHeight(texCoord);\n\
 	vContaminantHeight = 0.0;\n\
 	vExistContaminant = -1.0;\n\
@@ -13698,13 +13823,13 @@ void main()\n\
 		vExistContaminant = 1.0;\n\
 	}\n\
 \n\
-	float terrainH = terrainHeight4.r;\n\
-	float terrainHeight = u_heightMap_MinMax.x + terrainH * u_heightMap_MinMax.y;\n\
+	float terrainHeight = getTerrainHeight(texCoord);\n\
 	float height = terrainHeight + waterHeight + vContaminantHeight;\n\
 \n\
 	vWaterHeight = waterHeight;\n\
 \n\
-	float alpha = max(waterHeight/u_waterMaxHeigh*1.5, 0.4);\n\
+	//float alpha = max(waterHeight/u_waterMaxHeigh*1.5, 0.4); // original.***\n\
+	float alpha = max(waterHeight/u_waterMaxHeigh*1.5, 0.7);\n\
 	vColorAuxTest = vec4(0.1, 0.3, 1.0, alpha);\n\
 \n\
 	vec3 objPosHigh = buildingPosHIGH;\n\
@@ -13725,15 +13850,22 @@ void main()\n\
 \n\
 	// try to calculate normal here.\n\
 	vec3 ndc = gl_Position.xyz / gl_Position.w; //perspective divide/normalize\n\
-	\n\
 	vec2 screenPos = ndc.xy * 0.5 + 0.5; //ndc is -1 to 1 in GL. scale for 0 to 1\n\
     float depth = getDepth(screenPos);\n\
+\n\
+	// Calculate normal.\n\
+	vec3 normalLC = calculateNormalFromHeights(texCoord);\n\
+	vec4 normalWC = buildingRotMatrix * vec4(normalLC, 1.0);\n\
+	vec4 normalCC = normalMatrix4 * normalWC;\n\
+\n\
+	/*\n\
     vNormal = normal_from_depth(depth, screenPos);\n\
 	if(vNormal.z < 0.0)\n\
 	{\n\
 		vNormal *= -1.0;\n\
 	}\n\
-	//vNormal = normalize(vNormal * vec3(1.0, 1.0, 2.0));\n\
+	*/\n\
+	vNormal = normalCC.xyz;\n\
 	vViewRay = normalize(-getViewRay(screenPos, depth));\n\
 \n\
 	if(bUseLogarithmicDepth)\n\
@@ -13782,7 +13914,7 @@ uniform bool bUseLogarithmicDepth;\n\
 varying float flogz;\n\
 varying float Fcoef_half;\n\
 \n\
-\n\
+uniform int uFrustumIdx;\n\
 uniform int u_TerrainType;\n\
 uniform float u_WaterTransparency;\n\
 uniform float u_SimRes;\n\
@@ -13795,6 +13927,9 @@ uniform vec2 u_screenSize;\n\
 \n\
 varying vec4 vColorAuxTest;\n\
 varying vec2 vTexCoord;\n\
+varying float depth;\n\
+varying vec3 vNormal;\n\
+varying vec3 vViewRay;\n\
 \n\
 vec3 calculateNormal(vec2 uv){\n\
     float eps = 1.0/u_SimRes;\n\
@@ -13822,10 +13957,17 @@ float linearDepth(float depthSample)\n\
 }\n\
 */\n\
 \n\
+vec4 packDepth( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+  return enc;\n\
+}\n\
+\n\
 float unpackDepth(const in vec4 rgba_depth)\n\
 {\n\
 	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
-}\n\
+} \n\
 \n\
 float getDepth(vec2 coord)\n\
 {\n\
@@ -13884,26 +14026,61 @@ vec3 normal_from_depth(float depth, vec2 texCoord) {\n\
     return normalize(normal);\n\
 }\n\
 */\n\
+\n\
+vec3 encodeNormal(in vec3 normal)\n\
+{\n\
+	return normal*0.5 + 0.5;\n\
+}\n\
+\n\
+\n\
 void main()\n\
 {\n\
-    vec3 camDir = normalize(vec3(-gl_FragCoord.x / u_screenSize.x, -gl_FragCoord.y / u_screenSize.y, 1.0));\n\
-    vec3 camDir2 = -1.0 + 2.0 * camDir;\n\
-    vec3 normal = calculateNormal(vec2(vTexCoord.x, 1.0 - vTexCoord.y));\n\
-    float dotProd = dot(camDir2, normal);\n\
-    vec4 finalCol4 = vec4(vColorAuxTest * dotProd);\n\
-    finalCol4 = vec4(normal, 1.0);\n\
+    //vec3 camDir = normalize(vec3(-gl_FragCoord.x / u_screenSize.x, -gl_FragCoord.y / u_screenSize.y, 1.0));\n\
+    //vec3 camDir2 = -1.0 + 2.0 * camDir;\n\
+    //vec3 normal = calculateNormal(vec2(vTexCoord.x, 1.0 - vTexCoord.y));\n\
+    //float dotProd = dot(camDir2, normal);\n\
+    //vec4 finalCol4 = vec4(vColorAuxTest * dotProd);\n\
+    //finalCol4 = vec4(normal, 1.0);\n\
     //if(vColorAuxTest.r == vColorAuxTest.g && vColorAuxTest.r == vColorAuxTest.b )\n\
     //{\n\
     //    finalCol4 = vec4(1.0, 0.0, 0.0, 1.0);\n\
     //}\n\
 \n\
+    \n\
+\n\
+    float depthAux = depth;\n\
+\n\
+	#ifdef USE_LOGARITHMIC_DEPTH\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
+		depthAux = gl_FragDepthEXT; \n\
+	}\n\
+	#endif\n\
+\n\
     // read difusseTex.\n\
     vec4 difusseColor = texture2D(diffuseTex, vec2(vTexCoord.x, 1.0 - vTexCoord.y));\n\
+    //float dotProd = dot(vViewRay, vNormal);\n\
+    //difusseColor = vec4(difusseColor.xyz * dotProd, 1.0);\n\
+    //gl_FragData[2] = vec4(vNormal, 1.0); // normal\n\
+    float frustumIdx = 1.0;\n\
+    if(uFrustumIdx == 0)\n\
+    frustumIdx = 0.005;\n\
+    else if(uFrustumIdx == 1)\n\
+    frustumIdx = 0.015;\n\
+    else if(uFrustumIdx == 2)\n\
+    frustumIdx = 0.025;\n\
+    else if(uFrustumIdx == 3)\n\
+    frustumIdx = 0.035;\n\
+\n\
+    vec3 encodedNormal = encodeNormal(vNormal);\n\
+\n\
+\n\
     gl_FragData[0] = difusseColor;  // anything.\n\
 \n\
     #ifdef USE_MULTI_RENDER_TARGET\n\
-        gl_FragData[1] = vec4(1.0); // depth\n\
-        gl_FragData[2] = vec4(1.0); // normal\n\
+        gl_FragData[1] = packDepth(depthAux);  // depth\n\
+        gl_FragData[2] = vec4(encodedNormal, frustumIdx); // normal\n\
         gl_FragData[3] = difusseColor; // albedo\n\
         gl_FragData[4] = vec4(1.0); // selection color\n\
     #endif\n\
@@ -13964,7 +14141,7 @@ ShaderSource.waterSimTerrainRenderVS = "\n\
 	attribute vec2 texCoord;\n\
 	attribute vec4 color4;\n\
 	\n\
-	uniform mat4 buildingRotMatrix; \n\
+	uniform mat4 buildingRotMatrix; // use this to calculate normal from hightMap textures.\n\
 	uniform mat4 modelViewMatrixRelToEye; \n\
 	uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
 	uniform mat4 normalMatrix4;\n\
@@ -13980,6 +14157,7 @@ ShaderSource.waterSimTerrainRenderVS = "\n\
 	uniform bool bUseLogarithmicDepth;\n\
 	uniform float uFCoef_logDepth;\n\
     \n\
+\n\
 uniform mat4 u_Model;\n\
 uniform mat4 u_ModelInvTr;\n\
 uniform mat4 u_ViewProj;\n\
@@ -13989,31 +14167,74 @@ uniform sampler2D hightmap;\n\
 uniform sampler2D terrainmap;\n\
 uniform float u_SimRes;\n\
 \n\
+uniform vec2 u_screenSize;\n\
+uniform float tangentOfHalfFovy;\n\
+uniform float aspectRatio;\n\
+uniform mat4 projectionMatrixInv;\n\
+\n\
 uniform vec2 u_heightMap_MinMax;\n\
+uniform vec2 u_tileSize; // tile size in meters.\n\
+uniform vec2 u_simulationTextureSize; // for example 512 x 512.\n\
 \n\
 varying float flogz;\n\
 varying float Fcoef_half;\n\
 \n\
 varying vec4 vColorAuxTest;\n\
 varying vec2 vTexCoord;\n\
+varying float depth;\n\
+varying vec3 vNormal;\n\
+varying vec3 vViewRay;\n\
+\n\
+vec3 getViewRay(vec2 tc, in float relFar)\n\
+{\n\
+	float hfar = 2.0 * tangentOfHalfFovy * relFar;\n\
+    float wfar = hfar * aspectRatio;    \n\
+    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -relFar);    \n\
+	\n\
+    return ray;                      \n\
+}\n\
+\n\
+float getTerrainHeight(in vec2 texCoord)\n\
+{\n\
+    float terainHeight = texture2D(terrainmap, texCoord).r;\n\
+    terainHeight = u_heightMap_MinMax.x + terainHeight * u_heightMap_MinMax.y;\n\
+    return terainHeight;\n\
+}\n\
+\n\
+vec3 calculateNormalFromHeights(in vec2 texCoord)\n\
+{\n\
+	vec3 normal;\n\
+	float cellSize_x = u_tileSize.x / u_simulationTextureSize.x;\n\
+    float cellSize_y = u_tileSize.y / u_simulationTextureSize.y;\n\
+\n\
+	float divX = 1.0/u_simulationTextureSize.x;\n\
+    float divY = 1.0/u_simulationTextureSize.y;\n\
+\n\
+	// curPos = (0, 0, curH).\n\
+	// upPos = (0, dy, upH).\n\
+	// rightPos = (dz, 0, rightH).\n\
+	vec3 curPos = vec3(0.0, 0.0, getTerrainHeight(texCoord));\n\
+	vec3 upPos = vec3(0.0, cellSize_y, getTerrainHeight(texCoord + vec2(0.0, divY)));\n\
+	vec3 rightPos = vec3(cellSize_x, 0.0, getTerrainHeight(texCoord + vec2(divX, 0.0)));\n\
+\n\
+	vec3 rightDir = normalize(rightPos - curPos);\n\
+	vec3 upDir = normalize(upPos - curPos);\n\
+\n\
+	normal = normalize(cross(rightDir, upDir));\n\
+\n\
+	return normal;\n\
+}\n\
 \n\
 void main()\n\
 {\n\
 	// read the altitude from hightmap.\n\
-	//vec4 heightVec4 = texture2D(hightmap, vec2(texCoord.x, 1.0 - texCoord.y));\n\
-	vec4 terrainHeight4 = texture2D(terrainmap, vec2(texCoord.x, 1.0 - texCoord.y));\n\
+	vec4 terrainHeight4 = texture2D(terrainmap, vec2(texCoord.x, 1.0 - texCoord.y)); // delete this.\n\
 	vTexCoord = texCoord;\n\
-	//float r = heightVec4.r;\n\
-	//float g = heightVec4.g;\n\
 \n\
-	//float decodedHeight = r;\n\
-	float terrainH = terrainHeight4.r;\n\
-\n\
-	//float waterHeight = decodedHeight * 50.0;\n\
-	float terrainHeight = u_heightMap_MinMax.x + terrainH * u_heightMap_MinMax.y;\n\
+	float terrainHeight = getTerrainHeight(vec2(texCoord.x, 1.0 - texCoord.y));\n\
 	float height = terrainHeight;\n\
 \n\
-	vColorAuxTest = terrainHeight4;\n\
+	vColorAuxTest = terrainHeight4; // delete this.\n\
 \n\
 	vec3 objPosHigh = buildingPosHIGH;\n\
     vec3 objPosLow = buildingPosLOW.xyz + position.xyz;\n\
@@ -14028,6 +14249,22 @@ void main()\n\
 	vec4 finalPos4 =  vec4(pos4.x + upDir.x * height, pos4.y + upDir.y * height, pos4.z + upDir.z * height, 1.0);\n\
 \n\
 	gl_Position = ModelViewProjectionMatrixRelToEye * finalPos4;\n\
+\n\
+	vec4 orthoPos = modelViewMatrixRelToEye * finalPos4;\n\
+	//vertexPos = orthoPos.xyz;\n\
+	depth = (-orthoPos.z)/(far); // the correct value.\n\
+\n\
+	// Calculate normal.\n\
+	// try to calculate normal here.\n\
+	////vec3 ndc = gl_Position.xyz / gl_Position.w; //perspective divide/normalize\n\
+	////vec2 screenPos = ndc.xy * 0.5 + 0.5; //ndc is -1 to 1 in GL. scale for 0 to 1\n\
+	////vViewRay = normalize(-getViewRay(screenPos, depth));\n\
+\n\
+	vec3 normalLC = calculateNormalFromHeights(vec2(texCoord.x, 1.0 - texCoord.y));\n\
+	vec4 normalWC = buildingRotMatrix * vec4(normalLC, 1.0);\n\
+	vec4 normalCC = normalMatrix4 * normalWC;\n\
+	vNormal = normalCC.xyz;\n\
+	\n\
 \n\
 	if(bUseLogarithmicDepth)\n\
 	{\n\

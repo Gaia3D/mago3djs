@@ -6,7 +6,7 @@
 	attribute vec2 texCoord;
 	attribute vec4 color4;
 	
-	uniform mat4 buildingRotMatrix; 
+	uniform mat4 buildingRotMatrix; // use this matrix to calculate normals from highMaps.***
 	uniform mat4 modelViewMatrixRelToEye; 
 	uniform mat4 ModelViewProjectionMatrixRelToEye;
 	uniform mat4 normalMatrix4;
@@ -35,6 +35,8 @@ uniform sampler2D contaminantHeightTex;
 uniform vec2 u_heightMap_MinMax; // terrain.
 uniform float u_waterMaxHeigh;
 uniform float u_contaminantMaxHeigh;
+uniform vec2 u_tileSize; // tile size in meters.
+uniform vec2 u_simulationTextureSize; // for example 512 x 512.
 
 uniform sampler2D depthTex;
 
@@ -162,11 +164,84 @@ float getContaminantHeight(in vec2 texCoord)
     return waterHeight;
 }
 
+float getTerrainHeight(in vec2 texCoord)
+{
+    float terainHeight = texture2D(terrainmap, texCoord).r;
+    terainHeight = u_heightMap_MinMax.x + terainHeight * u_heightMap_MinMax.y;
+    return terainHeight;
+}
+
+/*
+vec3 calnor(vec2 uv){
+    float eps = 1.0/u_SimRes;
+    vec4 cur = texture(waterHeightTex,uv);
+    vec4 r = texture(waterHeightTex,uv+vec2(eps,0.f));
+    vec4 t = texture(waterHeightTex,uv+vec2(0.f,eps));
+
+    vec3 n1 = normalize(vec3(-1.0, cur.y + cur.x - r.y - r.x, 0.f));
+    vec3 n2 = normalize(vec3(-1.0, t.x + t.y - r.y - r.x, 1.0));
+
+    vec3 nor = -cross(n1,n2);
+    nor = normalize(nor);
+    return nor;
+}
+
+vec3 sky(in vec3 rd){
+    return mix(vec3(0.6,0.6,0.6),vec3(0.3,0.5,0.9),clamp(rd.y,0.f,1.f));
+}
+
+float linearDepth(float depthSample)
+{
+    depthSample = 2.0 * depthSample - 1.0;
+    float zLinear = 2.0 * u_near * u_far / (u_far + u_near - depthSample * (u_far - u_near));
+    return zLinear;
+}
+*/
+
+float getTotalHeight(in vec2 texCoord)
+{
+	float waterHeight = getWaterHeight(texCoord);
+	float terrainHeight = getTerrainHeight(texCoord);
+	float contaminHeight = 0.0;
+	if(u_contaminantMaxHeigh > 0.0)
+	{
+		// exist contaminant.
+		contaminHeight = getContaminantHeight(texCoord);
+	}
+
+	float totalHeight = waterHeight + terrainHeight + contaminHeight;
+	return totalHeight;
+}
+
+vec3 calculateNormalFromHeights(in vec2 texCoord)
+{
+	vec3 normal;
+	float cellSize_x = u_tileSize.x / u_simulationTextureSize.x;
+    float cellSize_y = u_tileSize.y / u_simulationTextureSize.y;
+
+	float divX = 1.0/u_simulationTextureSize.x;
+    float divY = 1.0/u_simulationTextureSize.y;
+
+	// curPos = (0, 0, curH).
+	// upPos = (0, dy, upH).
+	// rightPos = (dz, 0, rightH).
+
+	vec3 curPos = vec3(0.0, 0.0, getTotalHeight(texCoord));
+	vec3 upPos = vec3(0.0, cellSize_y, getTotalHeight(texCoord + vec2(0.0, divY)));
+	vec3 rightPos = vec3(cellSize_x, 0.0, getTotalHeight(texCoord + vec2(divX, 0.0)));
+
+	vec3 rightDir = normalize(rightPos - curPos);
+	vec3 upDir = normalize(upPos - curPos);
+
+	normal = normalize(cross(rightDir, upDir));
+
+	return normal;
+}
+
 void main()
 {
 	// read the altitude from waterHeightTex.
 	vTexCoord = texCoord;
-	vec4 terrainHeight4 = texture2D(terrainmap, vec2(texCoord.x, 1.0 - texCoord.y));
 	float waterHeight = getWaterHeight(texCoord);
 	vContaminantHeight = 0.0;
 	vExistContaminant = -1.0;
@@ -178,13 +253,13 @@ void main()
 		vExistContaminant = 1.0;
 	}
 
-	float terrainH = terrainHeight4.r;
-	float terrainHeight = u_heightMap_MinMax.x + terrainH * u_heightMap_MinMax.y;
+	float terrainHeight = getTerrainHeight(texCoord);
 	float height = terrainHeight + waterHeight + vContaminantHeight;
 
 	vWaterHeight = waterHeight;
 
-	float alpha = max(waterHeight/u_waterMaxHeigh*1.5, 0.4);
+	//float alpha = max(waterHeight/u_waterMaxHeigh*1.5, 0.4); // original.***
+	float alpha = max(waterHeight/u_waterMaxHeigh*1.5, 0.7);
 	vColorAuxTest = vec4(0.1, 0.3, 1.0, alpha);
 
 	vec3 objPosHigh = buildingPosHIGH;
@@ -205,15 +280,22 @@ void main()
 
 	// try to calculate normal here.
 	vec3 ndc = gl_Position.xyz / gl_Position.w; //perspective divide/normalize
-	
 	vec2 screenPos = ndc.xy * 0.5 + 0.5; //ndc is -1 to 1 in GL. scale for 0 to 1
     float depth = getDepth(screenPos);
+
+	// Calculate normal.
+	vec3 normalLC = calculateNormalFromHeights(texCoord);
+	vec4 normalWC = buildingRotMatrix * vec4(normalLC, 1.0);
+	vec4 normalCC = normalMatrix4 * normalWC;
+
+	/*
     vNormal = normal_from_depth(depth, screenPos);
 	if(vNormal.z < 0.0)
 	{
 		vNormal *= -1.0;
 	}
-	//vNormal = normalize(vNormal * vec3(1.0, 1.0, 2.0));
+	*/
+	vNormal = normalCC.xyz;
 	vViewRay = normalize(-getViewRay(screenPos, depth));
 
 	if(bUseLogarithmicDepth)

@@ -13,13 +13,12 @@ precision highp float;
 #endif
 
 uniform sampler2D currDEMTex;
-uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.
 
-uniform vec2 u_screenSize;
+uniform vec2 u_heightMap_MinMax; // terrain min max heights. 
+uniform vec2 u_simulationTextureSize; // for example 512 x 512.
 
 varying float vDepth;
-varying vec2 vTexCoord;  
-varying vec4 vColor4;
+varying float vAltitude;
 
 vec4 packDepth( float v ) {
   vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;
@@ -33,25 +32,33 @@ float unpackDepth(const in vec4 rgba_depth)
 	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));
 }
 
+float getTerrainHeight(in vec2 texCoord)
+{
+    float terainHeight = texture2D(currDEMTex, texCoord).r;
+    terainHeight = u_heightMap_MinMax.x + terainHeight * u_heightMap_MinMax.y;
+    return terainHeight;
+}
+
 void main()
 {     
-    vec2 screenPos = vec2(gl_FragCoord.x / u_screenSize.x, gl_FragCoord.y / u_screenSize.y);
+    vec2 screenPos = vec2(gl_FragCoord.x / u_simulationTextureSize.x, 1.0 - gl_FragCoord.y / u_simulationTextureSize.y);
 
     // read the currentDEM depth.
-    //vec4 depthCol4 = texture2D(currDEMTex, vec2(screenPos.x, 1.0 - screenPos.y));
-   // float currDepth = unpackDepth(depthCol4);
+    float curTerrainHeght = texture2D(currDEMTex, screenPos).r;
 
-    //if(vDepth > currDepth)
-    //{
-        //discard;
-    //}
+    float newTerrainHeght = ((vAltitude - u_heightMap_MinMax.x)/u_heightMap_MinMax.y);
+    //float newTerrainHeght = ((vAltitude - u_heightMap_MinMax.x)/u_heightMap_MinMax.y);
 
-    //gl_FragData[0] = packDepth(vDepth);
-    //gl_FragData[0] = vec4(1.0, 0.0, 0.0, 1.0);
-    gl_FragData[0] = vColor4;
+    if(newTerrainHeght < curTerrainHeght)
+    {
+        discard;
+    }
+    
+    vec4 depthColor4 = vec4(newTerrainHeght, newTerrainHeght, newTerrainHeght, 1.0);
+    gl_FragData[0] = depthColor4;
 
     #ifdef USE_MULTI_RENDER_TARGET
-        gl_FragData[1] = vec4(1.0); // depth
+        gl_FragData[1] = depthColor4; // depth
         gl_FragData[2] = vec4(1.0); // normal
         gl_FragData[3] = vec4(1.0); // albedo
         gl_FragData[4] = vec4(1.0); // selection color

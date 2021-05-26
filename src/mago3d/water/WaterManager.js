@@ -55,6 +55,7 @@ WaterManager.prototype.init = function ()
 	var bUseMultiRenderTarget = this.postFxShadersManager.bUseMultiRenderTarget;
 	this.texturesManager.lBuffer = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 3}); 
 	*/
+	var magoManager = this.magoManager;
 	var gl = this.magoManager.getGl();
 	// create frame buffer object.
 	
@@ -106,6 +107,9 @@ WaterManager.prototype.init = function ()
 
 		this.windParticlesRenderingFbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: false, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 3}); 
 	}
+
+	// 
+	this.test__createContaminationBox(magoManager);
 };
 
  /**
@@ -171,6 +175,8 @@ WaterManager.prototype.createDefaultShaders = function ()
 	shader.u_waterMaxHeigh_loc = gl.getUniformLocation(shader.program, "u_waterMaxHeigh");
 	shader.u_RenderParticles_loc = gl.getUniformLocation(shader.program, "u_RenderParticles");
 	shader.u_contaminantMaxHeigh_loc = gl.getUniformLocation(shader.program, "u_contaminantMaxHeigh");
+	shader.u_tileSize_loc = gl.getUniformLocation(shader.program, "u_tileSize");
+	shader.u_simulationTextureSize_loc = gl.getUniformLocation(shader.program, "u_simulationTextureSize");
 
 	magoManager.postFxShadersManager.useProgram(shader);
 	//gl.uniform1i(shader.depthTex_loc, 0);
@@ -213,6 +219,9 @@ WaterManager.prototype.createDefaultShaders = function ()
 	shader.terrainmap_loc = gl.getUniformLocation(shader.program, "terrainmap");
 	shader.u_heightMap_MinMax_loc = gl.getUniformLocation(shader.program, "u_heightMap_MinMax");
 	shader.difusseTex_loc = gl.getUniformLocation(shader.program, "diffuseTex");
+	shader.u_tileSize_loc = gl.getUniformLocation(shader.program, "u_tileSize");
+	shader.u_simulationTextureSize_loc = gl.getUniformLocation(shader.program, "u_simulationTextureSize");
+	shader.uFrustumIdx_loc = gl.getUniformLocation(shader.program, "uFrustumIdx");
 
 	magoManager.postFxShadersManager.useProgram(shader);
 	gl.uniform1i(shader.hightmap_loc, 0);
@@ -310,7 +319,7 @@ WaterManager.prototype.createDefaultShaders = function ()
 	gl.uniform1i(shader.contaminantHeightTex_loc, 4);
 
 	// 4.1) Calculate sediment shader.******************************************************************************************
-	shaderName = "waterCalculateSediment";
+	shaderName = "waterCalculateSediment"; // NO USED .***
 	vs_source = ShaderSource.waterQuadVertVS;
 	fs_source = ShaderSource.waterCalculateSedimentFS;
 	fs_source = fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
@@ -326,7 +335,7 @@ WaterManager.prototype.createDefaultShaders = function ()
 	gl.uniform1i(shader.currWaterFluxTex_loc, 2);
 
 	// 4.1) Calculate contaminant shader.******************************************************************************************
-	shaderName = "waterCalculateContamination";
+	shaderName = "waterCalculateContamination"; // NO USED .***
 	vs_source = ShaderSource.waterQuadVertVS;
 	fs_source = ShaderSource.waterCalculateContaminationFS;
 	fs_source = fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
@@ -356,6 +365,23 @@ WaterManager.prototype.createDefaultShaders = function ()
 	shader = magoManager.postFxShadersManager.createShaderProgram(gl, vs_source, fs_source, shaderName, this.magoManager);
 	shader.u_modelViewProjectionMatrix_loc = gl.getUniformLocation(shader.program, "modelViewProjectionMatrix");
 	shader.u_screenSize_loc = gl.getUniformLocation(shader.program, "u_screenSize");
+	shader.u_color4_loc = gl.getUniformLocation(shader.program, "u_color4");
+	shader.u_heightMap_MinMax_loc = gl.getUniformLocation(shader.program, "u_heightMap_MinMax");
+	shader.u_simulationTextureSize_loc = gl.getUniformLocation(shader.program, "u_simulationTextureSize");
+	shader.currDEMTex_loc = gl.getUniformLocation(shader.program, "currDEMTex");
+	magoManager.postFxShadersManager.useProgram(shader);
+	gl.uniform1i(shader.currDEMTex_loc, 0);
+
+	// 5.1) calculateHeight contamination Shader.**********************************************************************************
+	shaderName = "waterOrthogonalContamination";
+	vs_source = ShaderSource.WaterOrthogonalDepthShaderVS;
+	fs_source = ShaderSource.waterCalculateHeightContaminationFS;
+	fs_source = fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
+	fs_source = fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
+	shader = magoManager.postFxShadersManager.createShaderProgram(gl, vs_source, fs_source, shaderName, this.magoManager);
+	shader.u_modelViewProjectionMatrix_loc = gl.getUniformLocation(shader.program, "modelViewProjectionMatrix");
+	shader.u_screenSize_loc = gl.getUniformLocation(shader.program, "u_screenSize");
+	shader.u_color4_loc = gl.getUniformLocation(shader.program, "u_color4");
 	shader.currDEMTex_loc = gl.getUniformLocation(shader.program, "currDEMTex");
 	magoManager.postFxShadersManager.useProgram(shader);
 	gl.uniform1i(shader.currDEMTex_loc, 0);
@@ -496,6 +522,19 @@ WaterManager.prototype.doIntersectedObjectsCulling = function (visiblesArray, na
 	//}
 };
 
+WaterManager.prototype.makeContaminationSourceTex = function ()
+{
+	var waterLayersCount = this.waterLayersArray.length;
+	var waterLayer;
+	var magoManager = this.magoManager;
+
+	for(var i=0; i<waterLayersCount; i++)
+	{
+		waterLayer = this.waterLayersArray[i];
+		waterLayer.makeContaminationSourceTex(magoManager);
+	}
+};
+
 WaterManager.prototype.overWriteDEMWithObjects = function ()
 {
 	var waterLayersCount = this.waterLayersArray.length;
@@ -510,16 +549,41 @@ WaterManager.prototype.overWriteDEMWithObjects = function ()
 	}
 };
 
+WaterManager.prototype.renderTerrain = function ()
+{
+	// Note: terrain must be rendered in opaques-pass.***
+	var magoManager = this.magoManager;
+	//magoManager.bindMainFramebuffer();
+	//var gl = magoManager.getGl();
+	//gl.viewport(0, 0, sceneState.drawingBufferWidth[0], sceneState.drawingBufferHeight[0]);
+
+	// Render terrain.********************************************************************************
+	var waterLayersCount = this.waterLayersArray.length;
+	var waterLayer;
+	var shader = magoManager.postFxShadersManager.getShader("terrainRender");
+	magoManager.postFxShadersManager.useProgram(shader);
+	shader.bindUniformGenerals();
+	for(var i=0; i<waterLayersCount; i++)
+	{
+		waterLayer = this.waterLayersArray[i];
+		waterLayer.renderTerrain(shader, magoManager);
+	}
+};
+
 WaterManager.prototype.render = function ()
 {
+	// Note: water must be rendered in transparent-pass.***
 	var magoManager = this.magoManager;
 	var sceneState = magoManager.sceneState;
 	var gl = magoManager.getGl();
 
 	this.overWriteDEMWithObjects();
+	this.makeContaminationSourceTex();
 
-	if(this.magoManager.isFarestFrustum())
+	if(this.magoManager.currentFrustumIdx === 0)
 	{ 
+		// do simulation in "currentFrustumIdx" == 0 (nearestFrustum).
+		// in nearestFrustum we have overWriteDEM data ready & updated.
 		this.doSimulation(); 
 	}
 
@@ -567,10 +631,12 @@ WaterManager.prototype.render = function ()
 		waterLayer.renderWaterDepth(shader, magoManager);
 	}
 	
-	// Once finished simulation, bind the current framebuffer.
+	// ************.MAIN-FRAMEBUFFER.************************************.MAIN-FRAMEBUFFER.************************
+	// Once finished simulation, bind the current framebuffer. 
 	magoManager.bindMainFramebuffer();
 	gl.viewport(0, 0, sceneState.drawingBufferWidth[0], sceneState.drawingBufferHeight[0]);
 
+	/*
 	// 1rst render terrain.********************************************************************************
 	var shader = magoManager.postFxShadersManager.getShader("terrainRender");
 	magoManager.postFxShadersManager.useProgram(shader);
@@ -580,6 +646,7 @@ WaterManager.prototype.render = function ()
 		waterLayer = this.waterLayersArray[i];
 		waterLayer.renderTerrain(shader, magoManager);
 	}
+	*/
 
 	// 2nd, render water.**********************************************************************************
 	shader = magoManager.postFxShadersManager.getShader("waterRender");
@@ -601,6 +668,39 @@ WaterManager.prototype.render = function ()
 		waterLayer = this.waterLayersArray[i];
 		waterLayer.renderWater(shader, magoManager);
 	}
+};
+
+WaterManager.prototype.getContaminationObjectsArray = function ()
+{
+	if(!this._contaminationBoxesArray)
+	this._contaminationBoxesArray = [];
+	
+	return this._contaminationBoxesArray;
+};
+
+WaterManager.prototype.test__createContaminationBox = function (magoManager)
+{
+	// Create the particlesGenerator in the middle of windVolume.
+	var lon = 127.21537;
+	var lat = 35.61202;
+
+	// Test with box.***
+	var width = 10.0;
+	var length = 10.0;
+	var height = 200.0;
+	var name = "contaminationGenerator";
+	var initialGeoCoord = new GeographicCoord(lon, lat, 160.0);
+	var box = new Box(width, length, height, name);
+	box.setGeographicPosition(initialGeoCoord, 0, 0, 0);
+	box.attributes.isMovable = true;
+	box.options = {};
+	var depth = 6;
+	magoManager.modeler.addObject(box, depth);
+
+	var contaminationBoxesArray = this.getContaminationObjectsArray();
+	contaminationBoxesArray.push(box);
+	
+	return true;
 };
 
 /**

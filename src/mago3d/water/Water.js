@@ -59,9 +59,10 @@ var Water = function(waterManager, options)
 	this.shaderLogTex_Flux_B; // auxiliar tex to debug shaders.***
 
 	// simulation parameters.******************************************
-	this.terrainMinMaxHeights = new Float32Array([10.0, 200.0]);
+	//this.terrainMinMaxHeights = new Float32Array([180.0, 540.0]);
+	this.terrainMinMaxHeights = new Float32Array([180.0, 540.0]);
 	this.waterMaxHeight = 100.0; // ok.
-	this.waterMaxFlux = 4000.0; // ok. (3000 is no enought).
+	this.waterMaxFlux = 5000.0; // ok. (4000 is no enought).
 	this.waterMaxVelocity = 40.0;
 	this.contaminantMaxheight = -1.0;
 	this.contaminantMaxheight = 50.0;
@@ -160,6 +161,8 @@ Water.prototype._makeTextures = function ()
 	this.contaminationTex_A = this.waterManager._newTexture(gl, texWidth, texHeight);
 	this.contaminationTex_B = this.waterManager._newTexture(gl, texWidth, texHeight);
 
+	this.contaminantSourceTex = this.waterManager._newTexture(gl, texWidth, texHeight);
+
 	gl.bindTexture(gl.TEXTURE_2D, null);
 };
 
@@ -192,7 +195,7 @@ Water.prototype.prepareTextures = function ()
 		var magoManager = this.waterManager.magoManager;
 		var gl = magoManager.getGl();
 		var texturePath = '/images/en/waterSourceTexTestlow.png';
-		//var texturePath = '/images/en/waterSourceTexTest2.png';
+		//var texturePath = '/images/en/waterSourceTexTest_rain.png';
 		//var texturePath = '/images/en/black.png';
 		//var texturePath = '/images/en/contaminantHigh.png';
 
@@ -281,6 +284,7 @@ Water.prototype.prepareTextures = function ()
 	}// 
 
 	// contaminant texture.
+	/*
 	if(!this.contaminantSourceTex)
 	{
 		var magoManager = this.waterManager.magoManager;
@@ -306,6 +310,7 @@ Water.prototype.prepareTextures = function ()
 	{
 		var hola = 0;
 	}// 
+	*/
 
 	return true;
 };
@@ -342,7 +347,8 @@ Water.prototype.doSimulationSteps = function (magoManager)
 
 	gl.disable(gl.BLEND);
 	gl.clearColor(0.0, 0.0, 0.0, 0.0);
-	gl.clearDepth(1.0);
+	gl.clearDepth(1.0); 
+
 	//---------------------------------------------------------------------------------------------------------------------------------
 	// 1- Calculate water height by water source.**************************************************************************************
 	fbo.bind();
@@ -894,6 +900,7 @@ Water.prototype.renderTerrain = function (shader, magoManager)
 	if(!this.prepareTextures())
 	{ return false; }
 
+	var waterManager = this.waterManager;
 	var sceneState = magoManager.sceneState;
 	var currShader = magoManager.postFxShadersManager.getShader("terrainRender");
 	magoManager.postFxShadersManager.useProgram(currShader);
@@ -912,7 +919,11 @@ Water.prototype.renderTerrain = function (shader, magoManager)
 
 	gl.uniform3fv(currShader.buildingPosHIGH_loc, this.terrainPositionHIGH);
 	gl.uniform3fv(currShader.buildingPosLOW_loc, this.terrainPositionLOW);
+	gl.uniformMatrix4fv(shader.buildingRotMatrix_loc, false, this.buildingGeoLocMat._floatArrays);
 	gl.uniform2fv(currShader.u_heightMap_MinMax_loc, this.terrainMinMaxHeights);
+	gl.uniform2fv(shader.u_tileSize_loc, [this.tileSizeMeters_x, this.tileSizeMeters_y]);
+	gl.uniform2fv(shader.u_simulationTextureSize_loc, [waterManager.simulationTextureWidth, waterManager.simulationTextureHeight]);
+	gl.uniform1i(shader.uFrustumIdx_loc, magoManager.currentFrustumIdx);
 
 	gl.uniform1f(currShader.u_SimRes_loc, 512);
 	gl.uniform2fv(currShader.u_screenSize_loc, [sceneState.drawingBufferWidth[0], sceneState.drawingBufferHeight[0]]);
@@ -976,7 +987,7 @@ Water.prototype.renderWaterDepth = function (shader, magoManager)
 	gl.bindTexture(gl.TEXTURE_2D, this.waterHeightTexA.texId);
 
 	gl.activeTexture(gl.TEXTURE1);
-	gl.bindTexture(gl.TEXTURE_2D, this.dem_texture.texId);
+	gl.bindTexture(gl.TEXTURE_2D, this.demWithBuildingsTex.texId);//dem_texture//demWithBuildingsTex
 
 	if(this.contaminantMaxheight > 0.0)
 	{
@@ -1072,28 +1083,9 @@ Water.prototype.doIntersectedObjectsCulling = function (visiblesArray, nativeVis
 	return true;
 };
 
-Water.prototype.overWriteDEMWithObjects = function (shader, magoManager)
+Water.prototype.getTileOrthographic_mvpMat = function ()
 {
-	// render extrudeObjects depth over the DEM depth texture.
-	if (!this.visibleObjectsControler)
-	{
-		return;
-	}
-
-	if(!this.isPrepared())
-	{
-		this.init();
-		return;
-	}
-
-	if(!this.prepareTextures())
-	{ return false; }
-
-	var visibleNodesCount = this.visibleObjectsControler.currentVisibles0.length;
-	var visibleNativesCount = this.visibleObjectsControler.currentVisibleNativeObjects.opaquesArray.length;
-
-
-	if (!this.modelViewProjMatrix)
+	if (!this.tileOrthoModelViewProjMatrix)
 	{
 		// Calculate the mvp matrix.***********************************************************************************************
 		//var depthFactor = 10.0;
@@ -1112,7 +1104,6 @@ Water.prototype.overWriteDEMWithObjects = function (shader, magoManager)
 		var lonRange = maxLon - minLon;
 		var latRange = maxLat - minLat;
 		var altRange = maxAlt - minAlt;
-
 		
 		var left = -lonRange / 2.0;
 		var right = lonRange / 2.0;
@@ -1123,7 +1114,7 @@ Water.prototype.overWriteDEMWithObjects = function (shader, magoManager)
 		//var nRange = light.directionalBoxWidth/2;
 		//var left = -nRange, right = nRange, bottom = -nRange, top = nRange, near = -depthFactor*nRange, far = depthFactor*nRange;
 		var ortho = new Matrix4();
-		ortho._floatArrays = glMatrix.mat4.ortho(ortho._floatArrays, left, right, bottom, top, near*10.0, far*10.0);
+		ortho._floatArrays = glMatrix.mat4.ortho(ortho._floatArrays, left, right, bottom, top, near*1.0, far*1.0);
 
 		// The modelView matrix is a NO rotation matrix, centered in the midle of the tile.
 		var tMat = new Matrix4();
@@ -1134,12 +1125,110 @@ Water.prototype.overWriteDEMWithObjects = function (shader, magoManager)
 
 		// Now, calculate modelViewProjectionMatrix.
 		// modelViewProjection.***
-		this.modelViewProjMatrix = new Matrix4();
-		//this.modelViewProjMatrix._floatArrays = glMatrix.mat4.multiply(this.modelViewProjMatrix._floatArrays, ortho._floatArrays, modelView._floatArrays);
-		this.modelViewProjMatrix = modelView.getMultipliedByMatrix(ortho, this.modelViewProjMatrix);
+		this.tileOrthoModelViewProjMatrix = new Matrix4();
+		this.tileOrthoModelViewProjMatrix = modelView.getMultipliedByMatrix(ortho, this.tileOrthoModelViewProjMatrix);
 	}
-	//--------------------------------------------------------------------------------------------------------------------------------
 
+	return this.tileOrthoModelViewProjMatrix;
+};
+
+
+
+Water.prototype.makeContaminationSourceTex = function (magoManager)
+{
+	// render extrudeObjects depth over the DEM depth texture.
+	if(!this.isPrepared())
+	{
+		this.init();
+		return;
+	}
+
+	if(!this.prepareTextures())
+	{ return false; }
+
+	var modelViewProjMatrix = this.getTileOrthographic_mvpMat();
+
+	var screenQuad = this.waterManager.getQuadBuffer();
+	var gl = magoManager.getGl();
+	var fbo = this.waterManager.fbo; // simulation fbo. (512 x 512).
+	var extbuffers = fbo.extbuffers;
+	var shader;
+
+	gl.disable(gl.BLEND);
+	gl.clearColor(0.0, 0.0, 0.0, 0.0);
+	gl.clearDepth(1.0);
+	
+
+	// *********************************************************************************************************************************************
+	fbo.bind();
+	gl.viewport(0, 0, fbo.width[0], fbo.height[0]);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.contaminantSourceTex.texId, 0); // depthTex.
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // normalTex.
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // albedoTex.
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0); // .
+	extbuffers.drawBuffersWEBGL([
+		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
+		extbuffers.NONE, // gl_FragData[1]
+		extbuffers.NONE, // gl_FragData[2]
+		extbuffers.NONE, // gl_FragData[3]
+		]);
+
+	if (magoManager.isFarestFrustum())
+	{
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);  
+	}
+		
+	// 1rst, create a local coords system:
+	// the center of the water tile is origin.
+	shader = magoManager.postFxShadersManager.getShader("waterOrthogonalContamination");
+	magoManager.postFxShadersManager.useProgram(shader);
+	shader.bindUniformGenerals();
+
+	gl.uniformMatrix4fv(shader.u_modelViewProjectionMatrix_loc, false, modelViewProjMatrix._floatArrays);
+	gl.uniform3fv(shader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
+	gl.uniform4fv(shader.u_color4_loc, [0.0, 0.5, 0.6, 1.0]); //.***
+	gl.disable(gl.CULL_FACE);
+	if (magoManager.isFarestFrustum())
+	{ gl.clear(gl.DEPTH_BUFFER_BIT); }
+
+	var renderType = 0;
+	var refMatrixIdxKey = 0;
+	var glPrimitive = undefined;
+
+	var contaminationBoxesArray = this.waterManager.getContaminationObjectsArray(); 
+	var contaminantObjectsCount = contaminationBoxesArray.length;
+
+	for(var i=0; i<contaminantObjectsCount; i++)
+	{
+		var native = contaminationBoxesArray[i];
+		native.render(magoManager, shader, renderType, glPrimitive);
+	}
+
+	gl.enable(gl.CULL_FACE);
+};
+
+Water.prototype.overWriteDEMWithObjects = function (shader, magoManager)
+{
+	// render extrudeObjects depth over the DEM depth texture.
+	if (!this.visibleObjectsControler)
+	{
+		return;
+	}
+
+	if(!this.isPrepared())
+	{
+		this.init();
+		return;
+	}
+
+	if(!this.prepareTextures())
+	{ return false; }
+
+	var visibleNodesCount = this.visibleObjectsControler.currentVisibles0.length;
+
+	var modelViewProjMatrix = this.getTileOrthographic_mvpMat();
+
+	var waterManager = this.waterManager;
 	var screenQuad = this.waterManager.getQuadBuffer();
 	var gl = magoManager.getGl();
 	var fbo = this.waterManager.fbo; // simulation fbo. (512 x 512).
@@ -1155,15 +1244,18 @@ Water.prototype.overWriteDEMWithObjects = function (shader, magoManager)
 	fbo.bind();
 	gl.viewport(0, 0, fbo.width[0], fbo.height[0]);
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.demWithBuildingsTex.texId, 0); // depthTex.
-	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // normalTex.
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.shaderLogTexA.texId, 0); // normalTex.
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // albedoTex.
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0); // .
 	extbuffers.drawBuffersWEBGL([
 		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
-		extbuffers.NONE, // gl_FragData[1]
+		extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1]
 		extbuffers.NONE, // gl_FragData[2]
 		extbuffers.NONE, // gl_FragData[3]
 		]);
+
+	gl.activeTexture(gl.TEXTURE0);
+	gl.bindTexture(gl.TEXTURE_2D, this.dem_texture.texId);  // original.***
 		
 	if (magoManager.isFarestFrustum())
 	{ 
@@ -1175,9 +1267,6 @@ Water.prototype.overWriteDEMWithObjects = function (shader, magoManager)
 
 		gl.uniform1i(shader.u_textureFlipYAxis_loc, true);
 
-		gl.activeTexture(gl.TEXTURE0);
-		gl.bindTexture(gl.TEXTURE_2D, this.dem_texture.texId);  // original.***
-
 		// bind screenQuad positions.
 		FBO.bindAttribute(gl, screenQuad.posBuffer, shader.a_pos, 2);
 
@@ -1185,22 +1274,22 @@ Water.prototype.overWriteDEMWithObjects = function (shader, magoManager)
 		gl.drawArrays(gl.TRIANGLES, 0, 6);
 	}
 
-	gl.activeTexture(gl.TEXTURE0);
-	gl.bindTexture(gl.TEXTURE_2D, null);  
-
 	// 2n, make building depth over terrain depth.******************************************************************************************************
-		
+
 	// 1rst, create a local coords system:
 	// the center of the water tile is origin.
 	shader = magoManager.postFxShadersManager.getShader("waterOrthogonalDepthRender");
 	magoManager.postFxShadersManager.useProgram(shader);
 	shader.bindUniformGenerals();
 
-	gl.uniformMatrix4fv(shader.u_modelViewProjectionMatrix_loc, false, this.modelViewProjMatrix._floatArrays);
+	gl.uniformMatrix4fv(shader.u_modelViewProjectionMatrix_loc, false, modelViewProjMatrix._floatArrays);
 	gl.uniform3fv(shader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
+	gl.uniform4fv(shader.u_color4_loc, [1.0, 0.0, 0.0, 1.0]); //.***
+	gl.uniform2fv(shader.u_heightMap_MinMax_loc, this.terrainMinMaxHeights);
+	gl.uniform2fv(shader.u_simulationTextureSize_loc, [waterManager.simulationTextureWidth, waterManager.simulationTextureHeight]);
+	
 	gl.disable(gl.CULL_FACE);
-	if (magoManager.isFarestFrustum())
-	{ gl.clear(gl.DEPTH_BUFFER_BIT); }
+	gl.clear(gl.DEPTH_BUFFER_BIT);
 
 	var renderType = 0;
 	var refMatrixIdxKey = 0;
@@ -1212,22 +1301,28 @@ Water.prototype.overWriteDEMWithObjects = function (shader, magoManager)
 		node.renderContent(magoManager, shader, renderType, refMatrixIdxKey);
 	}
 
-	var visibleNativesCount = this.visibleObjectsControler.currentVisibleNativeObjects.opaquesArray.length;
-	for(var i=0; i<visibleNativesCount; i++)
+	var visibleNativesOpaquesCount = this.visibleObjectsControler.currentVisibleNativeObjects.opaquesArray.length;
+	for(var i=0; i<visibleNativesOpaquesCount; i++)
 	{
 		var native = this.visibleObjectsControler.currentVisibleNativeObjects.opaquesArray[i];
-		native.render(magoManager, shader, renderType, glPrimitive);
+		if (native.name !== "contaminationGenerator")
+		{ native.render(magoManager, shader, renderType, glPrimitive); }
+
+		//if(i > 2)
 		//break;
 	}
 
-	visibleNativesCount = this.visibleObjectsControler.currentVisibleNativeObjects.transparentsArray.length;
-	for(var i=0; i<visibleNativesCount; i++)
+	var visibleNativesTransparentsCount = this.visibleObjectsControler.currentVisibleNativeObjects.transparentsArray.length;
+	for(var i=0; i<visibleNativesTransparentsCount; i++)
 	{
 		var native = this.visibleObjectsControler.currentVisibleNativeObjects.transparentsArray[i];
-		native.render(magoManager, shader, renderType, glPrimitive);
+		if (native.name !== "contaminationGenerator")
+		{ native.render(magoManager, shader, renderType, glPrimitive); }
 	}
 	
 	gl.enable(gl.CULL_FACE);
+	gl.activeTexture(gl.TEXTURE0);
+	gl.bindTexture(gl.TEXTURE_2D, null); 
 };
 
 /**
@@ -1244,6 +1339,8 @@ Water.prototype.renderWater = function (shader, magoManager)
 	if(!this.prepareTextures())
 	{ return false; }
 
+	var waterManager = this.waterManager;
+
 	// make the vboKey:*****************************************************************************
 	if (this.vbo_vicks_container === undefined)
 	{ 
@@ -1255,13 +1352,17 @@ Water.prototype.renderWater = function (shader, magoManager)
 
 	var gl = magoManager.getGl();
 	var sceneState = this.waterManager.magoManager.sceneState;
+	// note: shader uniformGenerals binded at waterManager.
 	gl.uniform3fv(shader.buildingPosHIGH_loc, this.terrainPositionHIGH);
 	gl.uniform3fv(shader.buildingPosLOW_loc, this.terrainPositionLOW);
+	gl.uniformMatrix4fv(shader.buildingRotMatrix_loc, false, this.buildingGeoLocMat._floatArrays);
 	gl.uniform2fv(shader.u_heightMap_MinMax_loc, this.terrainMinMaxHeights);
 	gl.uniform2fv(shader.u_screenSize_loc, [sceneState.drawingBufferWidth[0], sceneState.drawingBufferHeight[0]]);
 	gl.uniform1i(shader.uWaterType_loc, 3); // 0 = waterColor., 1 = water-flux, 2 = water-velocity, 3= particles.
 	gl.uniform1f(shader.u_waterMaxHeigh_loc, this.waterMaxHeight);
 	gl.uniform1f(shader.u_contaminantMaxHeigh_loc, this.contaminantMaxheight);
+	gl.uniform2fv(shader.u_tileSize_loc, [this.tileSizeMeters_x, this.tileSizeMeters_y]);
+	gl.uniform2fv(shader.u_simulationTextureSize_loc, [waterManager.simulationTextureWidth, waterManager.simulationTextureHeight]);
 
 	var projectionMatrixInv = sceneState.getProjectionMatrixInv();
   	gl.uniformMatrix4fv(shader.projectionMatrixInv_loc, false, projectionMatrixInv._floatArrays);
@@ -1273,7 +1374,7 @@ Water.prototype.renderWater = function (shader, magoManager)
 	gl.bindTexture(gl.TEXTURE_2D, this.waterHeightTexA.texId);
 
 	gl.activeTexture(gl.TEXTURE2);
-	gl.bindTexture(gl.TEXTURE_2D, this.dem_texture.texId);
+	gl.bindTexture(gl.TEXTURE_2D, this.demWithBuildingsTex.texId);//dem_texture//demWithBuildingsTex
 
 	gl.activeTexture(gl.TEXTURE3);
 	gl.bindTexture(gl.TEXTURE_2D, this.particlesTex_A.texId);// waterFluxTexA, waterVelocityTexA, particlesTex_A
@@ -1304,9 +1405,6 @@ Water.prototype.renderWater = function (shader, magoManager)
 Water.prototype._makeSurface = function ()
 {
 	// CRS84.***
-	//var lonSegments = this.simulationResolution;
-	//var latSegments = this.simulationResolution;
-
 	var lonSegments = this.waterManager.simulationTextureWidth;
 	var latSegments = this.waterManager.simulationTextureHeight;
 
@@ -1467,4 +1565,11 @@ Water.prototype._makeSurface = function ()
 	{ this.terrainPositionLOW = new Float32Array(3); }
 	ManagerUtils.calculateSplited3fv([this.centerX[0], this.centerY[0], this.centerZ[0]], this.terrainPositionHIGH, this.terrainPositionLOW);
 
+	// Now, calculate the buildingRotMatrix. This matrix is the tMat at cartesian point. This matrix will be used to
+	// calculate the normal from highMaps. So, calculate the tMat at the middle of the tile.
+	this.buildingGeoLocMat = new Matrix4(); // Only rotations.
+	this.buildingGeoLocMat._floatArrays = Globe.transformMatrixAtCartesianPointWgs84(this.centerX[0], this.centerY[0], this.centerZ[0], this.buildingGeoLocMat._floatArrays);
+	this.buildingGeoLocMat._floatArrays[12] = 0.0; // Only rotations.
+	this.buildingGeoLocMat._floatArrays[13] = 0.0; // Only rotations.
+	this.buildingGeoLocMat._floatArrays[14] = 0.0; // Only rotations.
 };

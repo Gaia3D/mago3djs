@@ -31,7 +31,7 @@ uniform bool bUseLogarithmicDepth;
 varying float flogz;
 varying float Fcoef_half;
 
-
+uniform int uFrustumIdx;
 uniform int u_TerrainType;
 uniform float u_WaterTransparency;
 uniform float u_SimRes;
@@ -44,6 +44,9 @@ uniform vec2 u_screenSize;
 
 varying vec4 vColorAuxTest;
 varying vec2 vTexCoord;
+varying float depth;
+varying vec3 vNormal;
+varying vec3 vViewRay;
 
 vec3 calculateNormal(vec2 uv){
     float eps = 1.0/u_SimRes;
@@ -71,10 +74,17 @@ float linearDepth(float depthSample)
 }
 */
 
+vec4 packDepth( float v ) {
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;
+  enc = fract(enc);
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);
+  return enc;
+}
+
 float unpackDepth(const in vec4 rgba_depth)
 {
 	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));
-}
+} 
 
 float getDepth(vec2 coord)
 {
@@ -133,26 +143,61 @@ vec3 normal_from_depth(float depth, vec2 texCoord) {
     return normalize(normal);
 }
 */
+
+vec3 encodeNormal(in vec3 normal)
+{
+	return normal*0.5 + 0.5;
+}
+
+
 void main()
 {
-    vec3 camDir = normalize(vec3(-gl_FragCoord.x / u_screenSize.x, -gl_FragCoord.y / u_screenSize.y, 1.0));
-    vec3 camDir2 = -1.0 + 2.0 * camDir;
-    vec3 normal = calculateNormal(vec2(vTexCoord.x, 1.0 - vTexCoord.y));
-    float dotProd = dot(camDir2, normal);
-    vec4 finalCol4 = vec4(vColorAuxTest * dotProd);
-    finalCol4 = vec4(normal, 1.0);
+    //vec3 camDir = normalize(vec3(-gl_FragCoord.x / u_screenSize.x, -gl_FragCoord.y / u_screenSize.y, 1.0));
+    //vec3 camDir2 = -1.0 + 2.0 * camDir;
+    //vec3 normal = calculateNormal(vec2(vTexCoord.x, 1.0 - vTexCoord.y));
+    //float dotProd = dot(camDir2, normal);
+    //vec4 finalCol4 = vec4(vColorAuxTest * dotProd);
+    //finalCol4 = vec4(normal, 1.0);
     //if(vColorAuxTest.r == vColorAuxTest.g && vColorAuxTest.r == vColorAuxTest.b )
     //{
     //    finalCol4 = vec4(1.0, 0.0, 0.0, 1.0);
     //}
 
+    
+
+    float depthAux = depth;
+
+	#ifdef USE_LOGARITHMIC_DEPTH
+	if(bUseLogarithmicDepth)
+	{
+		gl_FragDepthEXT = log2(flogz) * Fcoef_half;
+		depthAux = gl_FragDepthEXT; 
+	}
+	#endif
+
     // read difusseTex.
     vec4 difusseColor = texture2D(diffuseTex, vec2(vTexCoord.x, 1.0 - vTexCoord.y));
+    //float dotProd = dot(vViewRay, vNormal);
+    //difusseColor = vec4(difusseColor.xyz * dotProd, 1.0);
+    //gl_FragData[2] = vec4(vNormal, 1.0); // normal
+    float frustumIdx = 1.0;
+    if(uFrustumIdx == 0)
+    frustumIdx = 0.005;
+    else if(uFrustumIdx == 1)
+    frustumIdx = 0.015;
+    else if(uFrustumIdx == 2)
+    frustumIdx = 0.025;
+    else if(uFrustumIdx == 3)
+    frustumIdx = 0.035;
+
+    vec3 encodedNormal = encodeNormal(vNormal);
+
+
     gl_FragData[0] = difusseColor;  // anything.
 
     #ifdef USE_MULTI_RENDER_TARGET
-        gl_FragData[1] = vec4(1.0); // depth
-        gl_FragData[2] = vec4(1.0); // normal
+        gl_FragData[1] = packDepth(depthAux);  // depth
+        gl_FragData[2] = vec4(encodedNormal, frustumIdx); // normal
         gl_FragData[3] = difusseColor; // albedo
         gl_FragData[4] = vec4(1.0); // selection color
     #endif

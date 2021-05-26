@@ -21,19 +21,16 @@ uniform sampler2D contaminantHeightTex;
 varying vec2 v_tex_pos; // texCoords.
 #define PI 3.1415926
 
-uniform float u_SimRes;
-uniform float u_PipeLen; // pipeLen = cellSizeX = cellSizeY.
 uniform float u_timestep;
-uniform float u_PipeArea;
 
 uniform vec2 u_tileSize; // tile size in meters.
-uniform vec2 u_heightMap_MinMax;
+uniform vec2 u_heightMap_MinMax; // terrain min max heights. no used.
 uniform float u_waterMaxHeigh;
 uniform float u_waterMaxFlux;
 uniform float u_waterMaxVelocity;
 uniform float u_contaminantMaxHeigh;
 
-uniform vec2 u_simulationTextureSize;
+uniform vec2 u_simulationTextureSize; // for example 512 x 512.
 uniform vec2 u_terrainTextureSize;
 
 vec2 encodeVelocity(in vec2 vel)

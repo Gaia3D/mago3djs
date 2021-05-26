@@ -106,7 +106,7 @@ void encodeWaterFlux(vec4 flux, inout vec4 flux_high, inout vec4 flux_low)
     flux_high = vec4(encoded_top_flux.r, encoded_right_flux.r, encoded_bottom_flux.r, encoded_left_flux.r);
     flux_low = vec4(encoded_top_flux.g, encoded_right_flux.g, encoded_bottom_flux.g, encoded_left_flux.g);
 }
-
+/*
 vec4 getTerrainHeightInterpolation(const vec2 uv) {
     //return texture2D(u_wind, uv).rg; // lower-res hardware filtering
 	
@@ -120,6 +120,7 @@ vec4 getTerrainHeightInterpolation(const vec2 uv) {
 
     return mix(mix(tl, tr, f.x), mix(bl, br, f.x), f.y);
 }
+*/
 
 float getTerrainHeight(in vec2 texCoord)
 {

@@ -74,7 +74,7 @@ void main()
     if(u_contaminantMaxHeigh > 0.0)
     {
         // check if exist contaminant.
-        contaminSourceHeight = texture2D(contaminantSourceTex, vec2(v_tex_pos.x, 1.0 - v_tex_pos.y));
+        contaminSourceHeight = texture2D(contaminantSourceTex, v_tex_pos);
         vec4 currContaminHeight = texture2D(currContaminationHeightTex, v_tex_pos);
 
         float decodedSourceContaminHeight = unpackDepth(contaminSourceHeight);
