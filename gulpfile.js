@@ -316,24 +316,19 @@ gulp.task('lint', function()
 });
 gulp.task('doc', function (cb) 
 {
-	console.info(cb);
 	var config = require('./jsdoc.json');
-	gulp.src(['seeforest.md', './src/mago3d/core/MagoManager.js','./src/mago3d/core/Mago3d.js'
-	,'./src/mago3d/core/TextureLayer.js'
-,'./src/mago3d/core/WMSLayer.js'
-,'./src/mago3d/core/XYZLayer.js'
-,'./src/mago3d/geometry/MagoWorld.js'
-,'./src/mago3d/geometry/Modeler.js'
-,'./src/mago3d/geometry/MagoGeometry.js'
-,'./src/mago3d/geometry/MagoPoint.js'
-,'./src/mago3d/geometry/MagoPolyline.js'
-,'./src/mago3d/geometry/MagoRectangle.js'
-,'./src/mago3d/core/InteractionCollection.js'
-,'./src/mago3d/parametricModels/interaction/DrawGeometryInteraction.js'
-,'./src/mago3d/parametricModels/interaction/LineDrawer.js'
-,'./src/mago3d/parametricModels/interaction/PointDrawer.js'
-,'./src/mago3d/parametricModels/interaction/RectangleDrawer.js'
-,'ol-magoworld.js'
+	gulp.src(['README.md', 
+	'./src/mago3d/core/MagoManager.js',
+	'./src/mago3d/core/Mago3d.js',
+	'./src/mago3d/core/F4dController.js',
+	'./src/mago3d/core/InteractionCollection.js',
+	'./src/mago3d/interaction/AbsClickInteraction.js',
+	'./src/mago3d/interaction/PointSelectInteraction.js',
+	'./src/mago3d/interaction/TranslateInteraction.js',
+	'./src/mago3d/core/ObjectMarkerManager.js',
+	'./src/mago3d/geometry/Modeler.js',
+	'./src/mago3d/renderer/SelectionManager.js',
+	'./src/mago3d/f4d/Node.js'
 ], {read: true})
 		.pipe(jsdoc(config, cb));
 });

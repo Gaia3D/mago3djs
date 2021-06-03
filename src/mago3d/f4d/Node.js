@@ -1565,7 +1565,6 @@ Node.prototype.caculateHeightByReference = function(terrainHeight)
  * 높이 레퍼런스 설정
  * @param {HeightReference} ref 
  * @param {MagoManager} magoManager
- * @emits
  */
 Node.prototype.setHeightReference = function(ref, magoManager)
 {

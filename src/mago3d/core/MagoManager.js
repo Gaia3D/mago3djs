@@ -2615,9 +2615,6 @@ MagoManager.prototype.startRender = function (isLastFrustum, frustumIdx, numFrus
 	
 		this.canvasDirty = true;
 	}
-
-
-	
 };
 
 /**
@@ -3104,16 +3101,11 @@ MagoManager.prototype.drawSelectedExtruionBuildingLabel = function()
 
 		if(isNaN(screenCoord.x) || isNaN(screenCoord.y)) continue;
 		
-		var elemFromPoints = document.elementsFromPoint(screenCoord.x, screenCoord.y);
-		if (elemFromPoints.length === 0) { continue; }
+		ctx.font = "normal normal bolder 18px Helvetica";
+		var text = nativeModel.getLevel();
+		ctx.strokeText(text, screenCoord.x, screenCoord.y);
+		ctx.fillText(text, screenCoord.x, screenCoord.y);
 
-		if (elemFromPoints[0].nodeName === 'CANVAS' && screenCoord.x >= 0 && screenCoord.y >= 0)
-		{
-			ctx.font = "normal normal bolder 18px Helvetica";
-			var text = nativeModel.getLevel();
-			ctx.strokeText(text, screenCoord.x, screenCoord.y);
-			ctx.fillText(text, screenCoord.x, screenCoord.y);
-		}
 	}
 	ctx.restore();
 	this.canvasDirty = true;
