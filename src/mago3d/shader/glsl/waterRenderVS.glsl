@@ -37,6 +37,7 @@ uniform float u_waterMaxHeigh;
 uniform float u_contaminantMaxHeigh;
 uniform vec2 u_tileSize; // tile size in meters.
 uniform vec2 u_simulationTextureSize; // for example 512 x 512.
+uniform vec2 u_terrainTextureSize; // for example 512 x 512.
 
 uniform sampler2D depthTex;
 
@@ -82,44 +83,6 @@ float getDepth(vec2 coord)
 	}
 }
 
-
-vec3 reconstructPosition(vec2 texCoord, float depth)
-{
-    // https://wickedengine.net/2019/09/22/improved-normal-reconstruction-from-depth/
-    float x = texCoord.x * 2.0 - 1.0;
-    //float y = (1.0 - texCoord.y) * 2.0 - 1.0;
-    float y = (texCoord.y) * 2.0 - 1.0;
-    float z = (1.0 - depth) * 2.0 - 1.0;
-    vec4 pos_NDC = vec4(x, y, z, 1.0);
-    vec4 pos_CC = projectionMatrixInv * pos_NDC;
-    return pos_CC.xyz / pos_CC.w;
-}
-
-vec3 normal_from_depth(float depth, vec2 texCoord) {
-    // http://theorangeduck.com/page/pure-depth-ssao
-    float pixelSizeX = 1.0/u_screenSize.x;
-    float pixelSizeY = 1.0/u_screenSize.y;
-
-    vec2 offset1 = vec2(0.0,pixelSizeY);
-    vec2 offset2 = vec2(pixelSizeX,0.0);
-
-	float depthA = 0.0;
-	float depthB = 0.0;
-	for(float i=0.0; i<1.0; i++)
-	{
-		depthA += getDepth(texCoord + offset1*(1.0+i));
-		depthB += getDepth(texCoord + offset2*(1.0+i));
-	}
-
-	vec3 posA = reconstructPosition(texCoord + offset1*1.0, depthA/1.0);
-	vec3 posB = reconstructPosition(texCoord + offset2*1.0, depthB/1.0);
-
-    vec3 pos0 = reconstructPosition(texCoord, depth);
-    vec3 normal = cross(posA - pos0, posB - pos0);
-    normal.z = -normal.z;
-
-    return normalize(normal);
-}
 
 vec3 getViewRay(vec2 tc, in float relFar)
 {
@@ -167,7 +130,7 @@ float getContaminantHeight(in vec2 texCoord)
 float getTerrainHeight(in vec2 texCoord)
 {
     float terainHeight = texture2D(terrainmap, texCoord).r;
-    terainHeight = u_heightMap_MinMax.x + terainHeight * u_heightMap_MinMax.y;
+    terainHeight = u_heightMap_MinMax.x + terainHeight * (u_heightMap_MinMax.y - u_heightMap_MinMax.x);
     return terainHeight;
 }
 
@@ -213,6 +176,20 @@ float getTotalHeight(in vec2 texCoord)
 	return totalHeight;
 }
 
+float getLiquidHeight(in vec2 texCoord)
+{
+	float waterHeight = getWaterHeight(texCoord);
+	float contaminHeight = 0.0;
+	if(u_contaminantMaxHeigh > 0.0)
+	{
+		// exist contaminant.
+		contaminHeight = getContaminantHeight(texCoord);
+	}
+
+	float totalHeight = waterHeight + contaminHeight;
+	return totalHeight;
+}
+
 vec3 calculateNormalFromHeights(in vec2 texCoord)
 {
 	vec3 normal;
@@ -230,19 +207,21 @@ vec3 calculateNormalFromHeights(in vec2 texCoord)
 	vec3 upPos = vec3(0.0, cellSize_y, getTotalHeight(texCoord + vec2(0.0, divY)));
 	vec3 rightPos = vec3(cellSize_x, 0.0, getTotalHeight(texCoord + vec2(divX, 0.0)));
 
-	vec3 rightDir = normalize(rightPos - curPos);
-	vec3 upDir = normalize(upPos - curPos);
+	vec3 rightDir = (rightPos - curPos);
+	vec3 upDir = (upPos - curPos);
 
 	normal = normalize(cross(rightDir, upDir));
 
 	return normal;
 }
 
+
 void main()
 {
 	// read the altitude from waterHeightTex.
 	vTexCoord = texCoord;
-	float waterHeight = getWaterHeight(texCoord);
+	vWaterHeight = getWaterHeight(texCoord);
+
 	vContaminantHeight = 0.0;
 	vExistContaminant = -1.0;
 	// check if exist contaminat.
@@ -253,13 +232,33 @@ void main()
 		vExistContaminant = 1.0;
 	}
 
+	// Test check neighbor(adjacent) waterHeights.**************************
+	// If some adjacent waterHeight is zero, then this waterHeight is zero.
+	/*
+	float extrudeHeight = 0.0;
+	float minLiquidHeight = 0.0001;
+	bool thisIsBorderWater = false;
+	if(vWaterHeight + vContaminantHeight < minLiquidHeight)
+	{
+		thisIsBorderWater = true;
+		extrudeHeight = 0.0;
+	}
+	*/
+	// End test.------------------------------------------------------------
+
 	float terrainHeight = getTerrainHeight(texCoord);
-	float height = terrainHeight + waterHeight + vContaminantHeight;
+	//float terrainHeight = getTerrainHeight_interpolated(texCoord);
+	float height = terrainHeight + vWaterHeight + vContaminantHeight;
 
-	vWaterHeight = waterHeight;
+	//if(thisIsBorderWater)
+	//{
+	//	height = extrudeHeight;
+	//}
 
-	//float alpha = max(waterHeight/u_waterMaxHeigh*1.5, 0.4); // original.***
-	float alpha = max(waterHeight/u_waterMaxHeigh*1.5, 0.7);
+	//float alpha = max(vWaterHeight/u_waterMaxHeigh*1.5, 0.4); // original.***
+	float alpha = max(vWaterHeight/u_waterMaxHeigh*1.5, 0.7);
+
+	
 	vColorAuxTest = vec4(0.1, 0.3, 1.0, alpha);
 
 	vec3 objPosHigh = buildingPosHIGH;
@@ -277,26 +276,19 @@ void main()
 	gl_Position = ModelViewProjectionMatrixRelToEye * finalPos4;
 
 	vOrthoPos = (modelViewMatrixRelToEye * finalPos4).xyz;
+	float depth = (-vOrthoPos.z)/(far); // the correct value.
 
 	// try to calculate normal here.
 	vec3 ndc = gl_Position.xyz / gl_Position.w; //perspective divide/normalize
 	vec2 screenPos = ndc.xy * 0.5 + 0.5; //ndc is -1 to 1 in GL. scale for 0 to 1
-    float depth = getDepth(screenPos);
 
 	// Calculate normal.
 	vec3 normalLC = calculateNormalFromHeights(texCoord);
 	vec4 normalWC = buildingRotMatrix * vec4(normalLC, 1.0);
 	vec4 normalCC = normalMatrix4 * normalWC;
 
-	/*
-    vNormal = normal_from_depth(depth, screenPos);
-	if(vNormal.z < 0.0)
-	{
-		vNormal *= -1.0;
-	}
-	*/
 	vNormal = normalCC.xyz;
-	vViewRay = normalize(-getViewRay(screenPos, depth));
+	vViewRay = normalize(-getViewRay(screenPos, depth)); // original.***
 
 	if(bUseLogarithmicDepth)
 	{

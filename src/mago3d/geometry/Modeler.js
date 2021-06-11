@@ -113,7 +113,7 @@ Modeler.prototype.newTube = function(options)
  * @param {MagoRenderable} object
  * @param {number} depth Optional. 설정 시 해당 depth로 targetDepth 설정, targetDepth부터 화면에 나타남.
  */
-Modeler.prototype.addObject = function(object, depth) 
+Modeler.prototype.addObject = function (object, depth) 
 {
 	if (this.objectsArray === undefined)
 	{ this.objectsArray = []; }

@@ -1629,6 +1629,58 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		return;
 	}
 
+		// Test.***
+	if(!this.qMeshPromise)
+	{
+		this.qMeshPromise = this.scene.globe.terrainProvider.requestTileGeometry(27965, 4870, 14);
+		this.qMeshPromise.then((value) =>
+		{
+			this.qMesh = value;
+		});
+	}
+	
+	if(this.qMesh)
+	{
+		var heightsCount  = this.qMesh._heightValues.length;
+		this.qMesh._minimumHeight = 0.0;
+		var minH = this.qMesh._minimumHeight;
+		var maxH = this.qMesh._maximumHeight;
+		var shortSize = 0;
+		//var imposedH = 500.0;
+		//for(var i=0; i<heightsCount; i++)
+		//{
+			//this.qMesh._heightValues[i] = shortSize;
+		//}
+
+		// FindHirarcy:
+		this.qMeshParents = [];
+		var X = 27965;
+		var Y = 4870;
+		var L = 14;
+		var count = L;
+		for(var i=0; i<count; i++)
+		{
+			var resultParent = SmartTile.getParentTileOfTileLXY(L, X, Y, undefined, CODE.imageryType.CRS84);
+			this.qMeshParents.push(resultParent);
+			X = resultParent.X;
+			Y = resultParent.Y;
+			L = resultParent.L;
+		}
+		
+	}
+
+	if(this.qMesh && !this.soundDEMTexTest)
+	{
+		// make demTex with the qMeshData.***
+		if(this.soundManager && this.soundManager.soundLayersArray.length > 0)
+		{
+			var soundLayer = this.soundManager.soundLayersArray[0];
+			soundLayer.qMesh = this.qMesh;
+			//soundLayer.makeDEMTextureByQuantizedMesh(this.qMesh);
+			this.soundDEMTexTest = true;
+		}
+	}
+	
 	var gl = this.getGl();
 	
 	// 1) The depth render.**********************************************************************************************************************
@@ -1898,6 +1950,12 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		this.waterManager.doIntersectedObjectsCulling(visiblesArray, nativeVisiblesArray);
 		this.waterManager.render();
 	}
+
+	if(this.soundManager) // TransparentPass.***
+	{
+		// do sound simulation.
+		this.soundManager.render();
+	};
 
 	// check if must render boundingBoxes.
 	if (this.magoPolicy.getShowBoundingBox())
@@ -7155,6 +7213,12 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function (intersectedLo
 		for(var j=0; j<nativeObjectsCount; j++)
 		{
 			var native = nativeObjects.generalObjectsArray[j];
+			if(native.attributes._deleted)
+			{
+				lowestTile.deleteNativeObjectByGuid(native._guid, this);
+				continue;
+			}
+
 			this.boundingSphere_Aux = native.getBoundingSphereWC(this.boundingSphere_Aux);
 
 			var frustumCull = frustumVolume.intersectionSphere(this.boundingSphere_Aux); // cesium.***

@@ -38,6 +38,9 @@ var SmartTileManager = function(options)
 	// Vars to control parse-workers.
 	this.parsedSmartTileMap = {};
 
+	// Optional vars.
+	
+
 	if(options)
 	{
 		if(options.magoManager)

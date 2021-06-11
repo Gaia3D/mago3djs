@@ -17,12 +17,8 @@
 uniform sampler2D diffuseTex;
 uniform sampler2D depthTex; 
 
-uniform sampler2D hightmap;
 uniform sampler2D terrainmap;
-uniform sampler2D normap;
-uniform sampler2D sceneDepth;
-uniform sampler2D colorReflection;
-uniform sampler2D sedimap;
+uniform sampler2D terrainMapToCompare;
 
 uniform float near;
 uniform float far;
@@ -47,6 +43,7 @@ varying vec2 vTexCoord;
 varying float depth;
 varying vec3 vNormal;
 varying vec3 vViewRay;
+varying float vTerrainSlided;
 
 vec3 calculateNormal(vec2 uv){
     float eps = 1.0/u_SimRes;
@@ -177,6 +174,12 @@ void main()
 
     // read difusseTex.
     vec4 difusseColor = texture2D(diffuseTex, vec2(vTexCoord.x, 1.0 - vTexCoord.y));
+    if(vTerrainSlided > 0.0)
+    {
+        difusseColor.r *= 0.5;
+        difusseColor.g *= 0.5;
+        difusseColor.b *= 0.5;
+    }
     //float dotProd = dot(vViewRay, vNormal);
     //difusseColor = vec4(difusseColor.xyz * dotProd, 1.0);
     //gl_FragData[2] = vec4(vNormal, 1.0); // normal

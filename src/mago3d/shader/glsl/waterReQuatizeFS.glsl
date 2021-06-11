@@ -15,6 +15,10 @@
 #endif
 
 uniform sampler2D texToCopy;
+
+uniform vec2 u_original_MinMax;
+uniform vec2 u_desired_MinMax;
+
 uniform bool u_textureFlipYAxis;
 varying vec2 v_tex_pos;
 
@@ -33,10 +37,10 @@ void main()
     gl_FragData[0] = finalCol4;  // anything.
 
     #ifdef USE_MULTI_RENDER_TARGET
-        gl_FragData[1] = finalCol4; // depth
-        gl_FragData[2] = finalCol4; // normal
+        gl_FragData[1] = vec4(1.0); // depth
+        gl_FragData[2] = vec4(1.0); // normal
         gl_FragData[3] = finalCol4; // albedo
-        gl_FragData[4] = finalCol4; // selection color
+        gl_FragData[4] = vec4(1.0); // selection color
     #endif
 
 }

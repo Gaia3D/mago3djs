@@ -558,8 +558,52 @@ SmartTile.prototype.putNode = function(targetDepth, node, magoManager)
 };
 
 /**
- * 어떤 일을 하고 있습니까?
- * @param geoLocData 변수
+ * This function deletes native object by nativeObject's guid.
+ */
+SmartTile._deleteObjectFromArrayByGuid = function(objectGuid, objectsArray, magoManager) 
+{
+	var object;
+	var objectsCount = objectsArray.length;
+	for(var i=0; i<objectsCount; i++)
+	{
+		object = objectsArray[i];
+		if(object._guid === objectGuid)
+		{
+			// Delete the object.
+			object.deleteObjects(magoManager.vboMemoryManager);
+			delete objectsArray[i];
+			objectsArray.splice(i, 1);
+			return true;
+		}
+	}
+
+	return false;
+};
+
+/**
+ * This function deletes native object by nativeObject's guid.
+ */
+SmartTile.prototype.deleteNativeObjectByGuid = function(objectGuid, magoManager) 
+{
+	var natives = this.nativeObjects;
+	var bDeleted = false;
+	if(SmartTile._deleteObjectFromArrayByGuid(objectGuid, natives.generalObjectsArray, magoManager))
+	{ bDeleted = true; }
+	if(SmartTile._deleteObjectFromArrayByGuid(objectGuid, natives.excavationsArray, magoManager))
+	{ bDeleted = true; }
+	if(SmartTile._deleteObjectFromArrayByGuid(objectGuid, natives.vectorTypeArray, magoManager))
+	{ bDeleted = true; }
+	if(SmartTile._deleteObjectFromArrayByGuid(objectGuid, natives.lightSourcesArray, magoManager))
+	{ bDeleted = true; }
+
+	return false;
+};
+
+/**
+ * This function puts a native object in this smartTile.
+ * @param {Number} targetDepth the tileDepth target
+ * @param {MagoRenderable} object objects to put
+ * @param {MagoManager} magoManager magoManager
  */
 SmartTile.prototype.putObject = function(targetDepth, object, magoManager) 
 {
@@ -864,9 +908,6 @@ SmartTile.prototype.intersectPoint = function(longitude, latitude)
  */
 SmartTile.prototype.eraseNode = function(node) 
 {
-	//this.nodeSeedsArray;
-	//this.nodesArray;
-	
 	// Erase from this.nodeSeedsArray & this.nodesArray.
 	if (this.nodeSeedsArray !== undefined)
 	{
@@ -1060,7 +1101,7 @@ SmartTile.prototype.putSmartTileInEyeDistanceSortedArray = function(result_smart
 /**
  * This function returns true if this smartTile has renderables objects.
  */
-SmartTile.prototype.hasRenderables = function() 
+SmartTile.prototype.hasRenderables = function () 
 {
 	var hasObjects = false;
 	
@@ -2258,6 +2299,29 @@ SmartTile.selectTileName = function(depth, longitude, latitude, resultTileName)
 	var yIndex = Math.floor((yMin - latitude)/angRange);
 	resultTileName = depth.toString() + "\\" + xIndex.toString() + "\\" + yIndex.toString();
 	return resultTileName;
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @param frustum 변수
+ */
+SmartTile.getParentTileOfTileLXY = function(L, X, Y, resultParent, imageryType) 
+{
+	if(!resultParent)
+	{
+		resultParent = {L : 0, 
+			X : 0, 
+			Y : 0};
+	}
+
+	if (imageryType === CODE.imageryType.CRS84)
+	{
+		resultParent.L = L - 1;
+		resultParent.X = Math.floor(X/2);
+		resultParent.Y = Math.floor(Y/2);
+	}
+
+	return resultParent;
 };
 
 /**

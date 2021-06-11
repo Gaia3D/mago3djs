@@ -271,14 +271,16 @@ void main()
 		}
 
 	//}
-    vec3 specCol = finalCol4.xyz;
-    //specCol = vec3(1.0);
-    finalCol4 = vec4((finalCol4.xyz * lambertian + specCol * specular), alpha);
+    vec3 specCol = finalCol4.xyz * 3.0;
+    specCol = vec3(0.5, 1.0, 1.0);
+    //finalCol4 = vec4((finalCol4.xyz * lambertian + specCol * specular), alpha);
     //*************************************************************************************************************
-    //vec3 lightdir = normalize(lightPos - vOrthoPos);
-    //vec3 halfway = normalize(lightdir + vViewRay);
-    //float spec = pow(max(dot(vNormal, halfway), 0.0), 333.0);
-    //finalCol4 = vec4((finalCol4.xyz * lambertian + specCol * spec), alpha);
+    vec3 lightdir = normalize(lightPos - vOrthoPos);
+    vec3 halfway = normalize(lightdir + vViewRay);
+    float spec = pow(max(dot(vNormal, halfway), 0.0), 333.0);
+    finalCol4 = vec4((finalCol4.xyz * lambertian + specCol * spec), alpha);
+
+    //finalCol4 = vec4(0.0, 0.0, 0.0, 1.0); // test debug.
 
     //-------------------------------------------------------------------------------------------------------------
     gl_FragData[0] = finalCol4;  // anything.

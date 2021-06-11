@@ -4,6 +4,7 @@ var worker = self;
 
 worker.onmessage = function (e) 
 {
+	// This worker parses & decodes the tinTerrain.***
 	var dataArrayBuffer = e.data.dataArrayBuffer;
 	var bytes_readed = 0;
 	var data = e.data;
@@ -195,14 +196,14 @@ worker.onmessage = function (e)
 			s = aConst*(currLon+PI);
 			s -= floorMinS;
 			
-			if (s<0.0)
+			if ( s < 0.0 )
 			{ s = 0.0; }
-			else if (s>1.0)
+			else if ( s > 1.0 )
 			{ s = 1.0; }
 
-			if (t<0.0)
+			if ( t < 0.0 )
 			{ t = 0.0; }
-			else if (t>1.0)
+			else if ( t > 1.0 )
 			{ t = 1.0; }
 			
 			

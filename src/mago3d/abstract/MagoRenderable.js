@@ -564,6 +564,14 @@ MagoRenderable.prototype.updateMatrix = function(ownerMatrix)
 		}
 	}
 };
+
+MagoRenderable.prototype.setDeleted = function(bDeleted) 
+{
+	// If a object.atributtes._deleted === true, then this object must be deleted.
+	// objects marked sa "deleted" will be deleted in "magoManager.tilesMultiFrustumCullingFinished()" function.
+	this.attributes._deleted = bDeleted;
+};
+
 MagoRenderable.prototype.setDirty = function(dirty) 
 {
 	this.dirty = dirty;

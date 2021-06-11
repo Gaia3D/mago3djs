@@ -2155,7 +2155,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 			if(waterLayer.demWithBuildingsTex && waterLayer.demWithBuildingsTex.texId)
 			{
-				texture = waterLayer.demWithBuildingsTex.texId;
+				//texture = waterLayer.demWithBuildingsTex.texId;
 			}
 
 			if(waterLayer.dem_texture && waterLayer.dem_texture.texId)
@@ -2170,7 +2170,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 			if(waterLayer.shaderLogTex_Flux_A && waterLayer.shaderLogTex_Flux_A.texId)
 			{
-				//texture = waterLayer.shaderLogTex_Flux_A.texId;
+				//texture = waterLayer.shaderLogTex_Flux_A.texId; // LOG.*** LOG.*** LOG.*** LOG.*** LOG.*** LOG.*** LOG.*** LOG.*** LOG.***
 			}
 
 			if(waterLayer.particlesPosTex_A && waterLayer.particlesPosTex_A.texId)
@@ -2191,6 +2191,38 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 			if(waterLayer.contaminantSourceTex && waterLayer.contaminantSourceTex.texId)
 			{
 				//texture = waterLayer.contaminantSourceTex.texId;
+			}
+
+			if(waterLayer.terrainMaxSlippageTex && waterLayer.terrainMaxSlippageTex.texId)
+			{
+				//texture = waterLayer.terrainMaxSlippageTex.texId;
+			}
+
+			if(waterLayer.terrainFluxTexA_HIGH && waterLayer.terrainFluxTexA_HIGH.texId)
+			{
+				//texture = waterLayer.terrainFluxTexA_HIGH.texId;
+			}
+
+			if(waterLayer.terrainFluxTexA_LOW && waterLayer.terrainFluxTexA_LOW.texId)
+			{
+				//texture = waterLayer.terrainFluxTexA_LOW.texId;
+			}
+
+			if(waterLayer.waterAditionTex && waterLayer.waterAditionTex.texId)
+			{
+				//texture = waterLayer.waterAditionTex.texId;
+			}
+		}
+	}
+
+	if(magoManager.soundManager)
+	{
+		if(magoManager.soundManager.soundLayersArray.length > 0)
+		{
+			var soundLayer = magoManager.soundManager.soundLayersArray[0];
+			if(soundLayer.demTex && soundLayer.demTex.texId)
+			{
+				texture = soundLayer.demTex.texId;
 			}
 		}
 	}

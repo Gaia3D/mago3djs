@@ -20,6 +20,7 @@ uniform sampler2D rainTex; // if exist.
 uniform sampler2D currWaterHeightTex;
 uniform sampler2D currContaminationHeightTex;
 uniform sampler2D contaminantSourceTex;
+uniform sampler2D waterAditionTex;
 
 uniform bool u_existRain;
 uniform float u_waterMaxHeigh;
@@ -69,6 +70,9 @@ void main()
         vec4 rain = texture2D(rainTex, vec2(v_tex_pos.x, 1.0 - v_tex_pos.y));
         waterSource += rain;
     }
+
+    vec4 waterAdition = texture2D(waterAditionTex, vec2(v_tex_pos.x, v_tex_pos.y));
+    waterSource += waterAdition;
 
     vec4 contaminSourceHeight = vec4(0.0);
     if(u_contaminantMaxHeigh > 0.0)

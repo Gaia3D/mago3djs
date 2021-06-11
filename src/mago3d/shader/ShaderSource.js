@@ -11550,33 +11550,18 @@ void encodeWaterFlux(vec4 flux, inout vec4 flux_high, inout vec4 flux_low)\n\
     flux_high = vec4(encoded_top_flux.r, encoded_right_flux.r, encoded_bottom_flux.r, encoded_left_flux.r);\n\
     flux_low = vec4(encoded_top_flux.g, encoded_right_flux.g, encoded_bottom_flux.g, encoded_left_flux.g);\n\
 }\n\
-/*\n\
-vec4 getTerrainHeightInterpolation(const vec2 uv) {\n\
-    //return texture2D(u_wind, uv).rg; // lower-res hardware filtering\n\
-	\n\
-    vec2 px = 1.0 / u_terrainTextureSize;\n\
-    vec2 vc = (floor(uv * u_terrainTextureSize)) * px;\n\
-    vec2 f = fract(uv * u_terrainTextureSize);\n\
-    vec4 tl = texture2D(terrainHeightTex, vc);\n\
-    vec4 tr = texture2D(terrainHeightTex, vc + vec2(px.x, 0));\n\
-    vec4 bl = texture2D(terrainHeightTex, vc + vec2(0, px.y));\n\
-    vec4 br = texture2D(terrainHeightTex, vc + px);\n\
 \n\
-    return mix(mix(tl, tr, f.x), mix(bl, br, f.x), f.y);\n\
-}\n\
-*/\n\
 \n\
 float getTerrainHeight(in vec2 texCoord)\n\
 {\n\
     float terainHeight = texture2D(terrainHeightTex, texCoord).r;\n\
-    terainHeight = u_heightMap_MinMax.x + terainHeight * u_heightMap_MinMax.y;\n\
+    terainHeight = u_heightMap_MinMax.x + terainHeight * (u_heightMap_MinMax.y - u_heightMap_MinMax.x);\n\
     return terainHeight;\n\
 }\n\
 \n\
 void main()\n\
 {\n\
-    vec2 curuv = vec2(v_tex_pos.x, v_tex_pos.y);\n\
-    vec2 curuvTerrain = vec2(v_tex_pos.x, v_tex_pos.y);\n\
+    vec2 curuv = v_tex_pos;\n\
     float divX = 1.0/u_simulationTextureSize.x;\n\
     float divY = 1.0/u_simulationTextureSize.y;\n\
 \n\
@@ -11585,11 +11570,11 @@ void main()\n\
 \n\
     // Terrain & water heights.**************************************************************************************************\n\
     // read terrain heights.\n\
-    float topTH = getTerrainHeight(curuvTerrain + vec2(0.0, divY));\n\
-    float rightTH = getTerrainHeight(curuvTerrain + vec2(divX, 0.0));\n\
-    float bottomTH = getTerrainHeight(curuvTerrain + vec2(0.0, -divY));\n\
-    float leftTH = getTerrainHeight(curuvTerrain + vec2(-divX, 0.0));\n\
-    float curTH = getTerrainHeight(curuvTerrain);\n\
+    float topTH = getTerrainHeight(curuv + vec2(0.0, divY));\n\
+    float rightTH = getTerrainHeight(curuv + vec2(divX, 0.0));\n\
+    float bottomTH = getTerrainHeight(curuv + vec2(0.0, -divY));\n\
+    float leftTH = getTerrainHeight(curuv + vec2(-divX, 0.0));\n\
+    float curTH = getTerrainHeight(curuv);\n\
 \n\
     // read water heights.\n\
     float topWH = getWaterHeight(curuv + vec2(0.0, divY));\n\
@@ -11726,6 +11711,8 @@ uniform sampler2D contaminantSourceTex;\n\
 uniform bool u_existRain;\n\
 uniform float u_waterMaxHeigh;\n\
 uniform float u_contaminantMaxHeigh;\n\
+uniform float u_fluidMaxHeigh;\n\
+uniform float u_fluidHeigh;\n\
 \n\
 varying vec2 v_tex_pos;\n\
 varying vec4 vColor4;\n\
@@ -11754,11 +11741,12 @@ float getWaterHeight(in vec2 texCoord)\n\
 \n\
 void main()\n\
 {\n\
-    // 1rst, take the water source.\n\
-    gl_FragData[0] = vColor4;\n\
+    float unitaryHeight = u_fluidHeigh / u_fluidMaxHeigh;\n\
+    vec4 encodedHeight = packDepth(unitaryHeight);\n\
+    gl_FragData[0] = encodedHeight;\n\
 \n\
     #ifdef USE_MULTI_RENDER_TARGET\n\
-        gl_FragData[1] = vec4(1.0, 0.0, 0.5, 1.0); // contamination\n\
+        gl_FragData[1] = vec4(1.0, 0.0, 0.5, 1.0); // water source\n\
         gl_FragData[2] = vec4(1.0, 0.0, 0.5, 1.0); // normal\n\
         gl_FragData[3] = vec4(1.0, 0.0, 0.5, 1.0); // albedo\n\
         gl_FragData[4] = vec4(1.0, 0.0, 0.5, 1.0); // selection color\n\
@@ -11786,6 +11774,7 @@ uniform sampler2D rainTex; // if exist.\n\
 uniform sampler2D currWaterHeightTex;\n\
 uniform sampler2D currContaminationHeightTex;\n\
 uniform sampler2D contaminantSourceTex;\n\
+uniform sampler2D waterAditionTex;\n\
 \n\
 uniform bool u_existRain;\n\
 uniform float u_waterMaxHeigh;\n\
@@ -11835,6 +11824,9 @@ void main()\n\
         vec4 rain = texture2D(rainTex, vec2(v_tex_pos.x, 1.0 - v_tex_pos.y));\n\
         waterSource += rain;\n\
     }\n\
+\n\
+    vec4 waterAdition = texture2D(waterAditionTex, vec2(v_tex_pos.x, v_tex_pos.y));\n\
+    waterSource += waterAdition;\n\
 \n\
     vec4 contaminSourceHeight = vec4(0.0);\n\
     if(u_contaminantMaxHeigh > 0.0)\n\
@@ -11924,6 +11916,435 @@ void main()\n\
         gl_FragData[2] = vec4(0.0); // \n\
         gl_FragData[3] = vec4(0.0); // \n\
         gl_FragData[4] = vec4(0.0); // \n\
+    #endif\n\
+\n\
+}";
+ShaderSource.waterCalculateTerrainFluxFS = "//#version 300 es\n\
+\n\
+#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+uniform sampler2D terrainHeightTex;\n\
+uniform sampler2D terrainMaxSlippageTex;\n\
+\n\
+varying vec2 v_tex_pos;\n\
+uniform float u_timestep;\n\
+\n\
+uniform vec2 u_tileSize; // tile size in meters.\n\
+uniform float u_terrainMaxFlux;\n\
+uniform vec2 u_heightMap_MinMax; // terrain min-max heights.\n\
+uniform float u_contaminantMaxHeigh; // if \"u_contaminantMaxHeigh\" < 0.0 -> no exist contaminant.\n\
+\n\
+uniform vec2 u_simulationTextureSize;\n\
+uniform vec2 u_terrainTextureSize;\n\
+\n\
+float decodeRG(in vec2 waterColorRG)\n\
+{\n\
+    // https://titanwolf.org/Network/Articles/Article?AID=666e7443-0511-4210-b39c-db0bb6738246#gsc.tab=0\n\
+    return dot(waterColorRG, vec2(1.0, 1.0 / 255.0));\n\
+}\n\
+\n\
+vec2 encodeRG(in float wh)\n\
+{\n\
+    // https://titanwolf.org/Network/Articles/Article?AID=666e7443-0511-4210-b39c-db0bb6738246#gsc.tab=0\n\
+    float encodedBit = 1.0/255.0;\n\
+    vec2 enc = vec2(1.0, 255.0) * wh;\n\
+    enc = fract(enc);\n\
+    enc.x -= enc.y * encodedBit;\n\
+    return enc; // R = HIGH, G = LOW.***\n\
+}\n\
+\n\
+vec4 packDepth( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+  return enc;\n\
+}\n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+}\n\
+\n\
+\n\
+\n\
+float getTerrainHeight(in vec2 texCoord)\n\
+{\n\
+    float terainHeight = texture2D(terrainHeightTex, texCoord).r;\n\
+    terainHeight = u_heightMap_MinMax.x + terainHeight * (u_heightMap_MinMax.y - u_heightMap_MinMax.x);\n\
+    return terainHeight;\n\
+}\n\
+\n\
+float getMaxSlippage(in vec2 texCoord)\n\
+{\n\
+    // Note : for maxSlippage use \"u_heightMap_MinMax.y\" as quantizer.\n\
+    vec4 encoded = texture2D(terrainMaxSlippageTex, texCoord);\n\
+    float decoded = unpackDepth(encoded);\n\
+    decoded = decoded * u_heightMap_MinMax.y;\n\
+    return decoded;\n\
+}\n\
+\n\
+void encodeFlux(vec4 flux, inout vec4 flux_high, inout vec4 flux_low)\n\
+{\n\
+    vec2 encoded_top_flux = encodeRG(flux.r);\n\
+    vec2 encoded_right_flux = encodeRG(flux.g);\n\
+    vec2 encoded_bottom_flux = encodeRG(flux.b);\n\
+    vec2 encoded_left_flux = encodeRG(flux.a);\n\
+\n\
+    flux_high = vec4(encoded_top_flux.r, encoded_right_flux.r, encoded_bottom_flux.r, encoded_left_flux.r);\n\
+    flux_low = vec4(encoded_top_flux.g, encoded_right_flux.g, encoded_bottom_flux.g, encoded_left_flux.g);\n\
+}\n\
+\n\
+void main()\n\
+{\n\
+    vec2 curuv = v_tex_pos;\n\
+    float divX = 1.0/u_simulationTextureSize.x;\n\
+    float divY = 1.0/u_simulationTextureSize.y;\n\
+\n\
+    float cellSize_x = u_tileSize.x / u_simulationTextureSize.x;\n\
+    float cellSize_y = u_tileSize.y / u_simulationTextureSize.y;\n\
+\n\
+    vec4 shaderLogFluxColor4 = vec4(0.0); // test var. delete after use.\n\
+\n\
+    // Terrain heights.**************************************************************************************************\n\
+    float topTH = getTerrainHeight(curuv + vec2(0.0, divY));\n\
+    float rightTH = getTerrainHeight(curuv + vec2(divX, 0.0));\n\
+    float bottomTH = getTerrainHeight(curuv + vec2(0.0, -divY));\n\
+    float leftTH = getTerrainHeight(curuv + vec2(-divX, 0.0));\n\
+    float curTH = getTerrainHeight(curuv);\n\
+    // End terrain heights.-----------------------------------------------------------------------------------------------\n\
+\n\
+    // MaxSlippges.******************************************************************************************************\n\
+    float topSlip = getMaxSlippage(curuv + vec2(0.0, divY));\n\
+    float rightSlip = getMaxSlippage(curuv + vec2(divX, 0.0));\n\
+    float bottomSlip = getMaxSlippage(curuv + vec2(0.0, -divY));\n\
+    float leftSlip = getMaxSlippage(curuv + vec2(-divX, 0.0));\n\
+    float curSlip = getMaxSlippage(curuv);\n\
+    // End max slippages.-------------------------------------------------------------------------------------------------\n\
+\n\
+\n\
+    vec4 diff;\n\
+    diff.x = curTH - topTH - (curSlip + topSlip) * 0.5;\n\
+    diff.y = curTH - rightTH - (curSlip + rightSlip) * 0.5;\n\
+    diff.z = curTH - bottomTH - (curSlip + bottomSlip) * 0.5;\n\
+    diff.w = curTH - leftTH - (curSlip + leftSlip) * 0.5;\n\
+\n\
+    diff = max(vec4(0.0), diff);\n\
+\n\
+    //vec4 newFlow = diff * 0.2;\n\
+    vec4 newFlow = diff;\n\
+\n\
+    float outfactor = (newFlow.x + newFlow.y + newFlow.z + newFlow.w)*u_timestep;\n\
+\n\
+    if(outfactor > 1e-5){\n\
+        outfactor = curTH / outfactor;\n\
+        if(outfactor > 1.0) outfactor = 1.0;\n\
+        newFlow = newFlow * outfactor;\n\
+    \n\
+        shaderLogFluxColor4 = vec4(1.0, 0.5, 0.25, 1.0);\n\
+    }\n\
+\n\
+    /*\n\
+    if(outfactor > curTH){\n\
+        float factor = (curTH / outfactor);\n\
+        newFlow *= factor;\n\
+        shaderLogFluxColor4 = vec4(1.0, 0.5, 0.25, 1.0);\n\
+    }\n\
+    */\n\
+    \n\
+\n\
+    /*\n\
+    if(vOut > currWaterVol)\n\
+    {\n\
+        //rescale outflow readFlux so that outflow don't exceed current water volume\n\
+        float factor = (currWaterVol / vOut);\n\
+        ftopout *= factor;\n\
+        frightout *= factor;\n\
+        fbottomout *= factor;\n\
+        fleftout *= factor;\n\
+    }\n\
+\n\
+    \n\
+    /*\n\
+    //boundary conditions\n\
+    if(curuv.x <= div) fleftout = 0.0;\n\
+    if(curuv.x >= 1.0 - 2.0 * div) frightout = 0.0;\n\
+    if(curuv.y <= div) ftopout = 0.0;\n\
+    if(curuv.y >= 1.0 - 2.0 * div) fbottomout = 0.0;\n\
+\n\
+    if(curuv.x <= div || (curuv.x >= 1.0 - 2.0 * div) || (curuv.y <= div) || (curuv.y >= 1.0 - 2.0 * div) ){\n\
+        ftopout = 0.0;\n\
+        frightout = 0.0;\n\
+        fbottomout = 0.0;\n\
+        fleftout = 0.0;\n\
+    }\n\
+    */\n\
+\n\
+    vec4 outFlux = newFlow / u_terrainMaxFlux;\n\
+    vec4 flux_high;\n\
+    vec4 flux_low;\n\
+    encodeFlux(outFlux, flux_high, flux_low);\n\
+\n\
+    shaderLogFluxColor4 = outFlux;\n\
+\n\
+    gl_FragData[0] = flux_high;  // water flux high.\n\
+\n\
+    #ifdef USE_MULTI_RENDER_TARGET\n\
+        gl_FragData[1] = flux_low; // water flux low.\n\
+        gl_FragData[2] = shaderLogFluxColor4; // shader log. delete after use.\n\
+        gl_FragData[3] = shaderLogFluxColor4; // albedo\n\
+        gl_FragData[4] = shaderLogFluxColor4; // selection color\n\
+    #endif\n\
+\n\
+}";
+ShaderSource.waterCalculateTerrainHeightByFluxFS = "//#version 300 es\n\
+\n\
+#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+uniform sampler2D terrainHeightTex;\n\
+uniform sampler2D terrainFluxTex_HIGH;\n\
+uniform sampler2D terrainFluxTex_LOW;\n\
+\n\
+varying vec2 v_tex_pos;\n\
+uniform float u_timestep;\n\
+\n\
+uniform vec2 u_tileSize; // tile size in meters.\n\
+uniform vec2 u_heightMap_MinMax; // terrain min-max heights.\n\
+uniform float u_terrainMaxFlux;\n\
+\n\
+uniform vec2 u_simulationTextureSize;\n\
+uniform vec2 u_terrainTextureSize;\n\
+\n\
+float decodeRG(in vec2 waterColorRG)\n\
+{\n\
+    // https://titanwolf.org/Network/Articles/Article?AID=666e7443-0511-4210-b39c-db0bb6738246#gsc.tab=0\n\
+    return dot(waterColorRG, vec2(1.0, 1.0 / 255.0));\n\
+}\n\
+\n\
+vec2 encodeRG(in float wh)\n\
+{\n\
+    // https://titanwolf.org/Network/Articles/Article?AID=666e7443-0511-4210-b39c-db0bb6738246#gsc.tab=0\n\
+    float encodedBit = 1.0/255.0;\n\
+    vec2 enc = vec2(1.0, 255.0) * wh;\n\
+    enc = fract(enc);\n\
+    enc.x -= enc.y * encodedBit;\n\
+    return enc; // R = HIGH, G = LOW.***\n\
+}\n\
+\n\
+vec4 packDepth( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+  return enc;\n\
+}\n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+}\n\
+\n\
+\n\
+\n\
+float getTerrainHeight(in vec2 texCoord)\n\
+{\n\
+    float terainHeight = texture2D(terrainHeightTex, texCoord).r;\n\
+    terainHeight = u_heightMap_MinMax.x + terainHeight * (u_heightMap_MinMax.y - u_heightMap_MinMax.x);\n\
+    return terainHeight;\n\
+}\n\
+\n\
+vec4 getTerrainFlux(in vec2 texCoord)\n\
+{\n\
+    vec4 color4_HIGH = texture2D(terrainFluxTex_HIGH, texCoord);\n\
+    vec4 color4_LOW = texture2D(terrainFluxTex_LOW, texCoord);\n\
+\n\
+    float flux_top = decodeRG(vec2(color4_HIGH.r, color4_LOW.r));\n\
+    float flux_right = decodeRG(vec2(color4_HIGH.g, color4_LOW.g));\n\
+    float flux_bottom = decodeRG(vec2(color4_HIGH.b, color4_LOW.b));\n\
+    float flux_left = decodeRG(vec2(color4_HIGH.a, color4_LOW.a));\n\
+\n\
+    vec4 flux = vec4(flux_top, flux_right, flux_bottom, flux_left) * u_terrainMaxFlux;\n\
+    return flux; \n\
+}\n\
+\n\
+void main()\n\
+{\n\
+    vec2 curuv = v_tex_pos;\n\
+    float divX = 1.0/u_simulationTextureSize.x;\n\
+    float divY = 1.0/u_simulationTextureSize.y;\n\
+\n\
+    float cellSize_x = u_tileSize.x / u_simulationTextureSize.x;\n\
+    float cellSize_y = u_tileSize.y / u_simulationTextureSize.y;\n\
+\n\
+    vec4 shaderLogFluxColor4 = vec4(0.0); // test var. delete after use.\n\
+\n\
+    // Terrain height.\n\
+    float curTH = getTerrainHeight(curuv);\n\
+\n\
+    // Terrain fluxes.\n\
+    vec4 topFlux = getTerrainFlux(curuv + vec2(0.0, divY));\n\
+    vec4 rightFlux = getTerrainFlux(curuv + vec2(divX, 0.0));\n\
+    vec4 bottomFlux = getTerrainFlux(curuv + vec2(0.0, -divY));\n\
+    vec4 leftFlux = getTerrainFlux(curuv + vec2(-divX, 0.0));\n\
+\n\
+    vec4 outFlux = getTerrainFlux(curuv);\n\
+    vec4 inputFlux = vec4(topFlux.z, rightFlux.w, bottomFlux.x, leftFlux.y);\n\
+\n\
+    float vol = inputFlux.x + inputFlux.y + inputFlux.z + inputFlux.w - outFlux.x - outFlux.y - outFlux.z - outFlux.w;\n\
+\n\
+    float thermalErosionScale = 2.6;\n\
+    thermalErosionScale = 1.0;\n\
+    //float tdelta = min(10.0, u_timestep * thermalErosionScale) * vol; // original.\n\
+    float tdelta = (u_timestep * thermalErosionScale) * vol;\n\
+    float newTerrainHeight = curTH + tdelta;\n\
+    newTerrainHeight = (newTerrainHeight - u_heightMap_MinMax.x) / (u_heightMap_MinMax.y - u_heightMap_MinMax.x);\n\
+    vec4 newTH4 = vec4(newTerrainHeight, newTerrainHeight, newTerrainHeight, 1.0);\n\
+\n\
+    shaderLogFluxColor4 = outFlux;\n\
+\n\
+    gl_FragData[0] = newTH4;  // water flux high.\n\
+\n\
+    #ifdef USE_MULTI_RENDER_TARGET\n\
+        gl_FragData[1] = shaderLogFluxColor4; // water flux low.\n\
+        gl_FragData[2] = shaderLogFluxColor4; // shader log. delete after use.\n\
+        gl_FragData[3] = shaderLogFluxColor4; // albedo\n\
+        gl_FragData[4] = shaderLogFluxColor4; // selection color\n\
+    #endif\n\
+\n\
+}";
+ShaderSource.waterCalculateTerrainMaxSlippageFS = "//#version 300 es\n\
+\n\
+#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+uniform sampler2D terrainHeightTex;\n\
+\n\
+varying vec2 v_tex_pos;\n\
+uniform float u_timestep;\n\
+\n\
+uniform vec2 u_tileSize; // tile size in meters.\n\
+uniform vec2 u_heightMap_MinMax; // terrain min-max heights.\n\
+\n\
+uniform vec2 u_simulationTextureSize;\n\
+uniform vec2 u_terrainTextureSize;\n\
+\n\
+float decodeRG(in vec2 waterColorRG)\n\
+{\n\
+    // https://titanwolf.org/Network/Articles/Article?AID=666e7443-0511-4210-b39c-db0bb6738246#gsc.tab=0\n\
+    return dot(waterColorRG, vec2(1.0, 1.0 / 255.0));\n\
+}\n\
+\n\
+vec2 encodeRG(in float wh)\n\
+{\n\
+    // https://titanwolf.org/Network/Articles/Article?AID=666e7443-0511-4210-b39c-db0bb6738246#gsc.tab=0\n\
+    float encodedBit = 1.0/255.0;\n\
+    vec2 enc = vec2(1.0, 255.0) * wh;\n\
+    enc = fract(enc);\n\
+    enc.x -= enc.y * encodedBit;\n\
+    return enc; // R = HIGH, G = LOW.***\n\
+}\n\
+\n\
+vec4 packDepth( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+  return enc;\n\
+}\n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+}\n\
+\n\
+\n\
+\n\
+float getTerrainHeight(in vec2 texCoord)\n\
+{\n\
+    float terainHeight = texture2D(terrainHeightTex, texCoord).r;\n\
+    terainHeight = u_heightMap_MinMax.x + terainHeight * (u_heightMap_MinMax.y - u_heightMap_MinMax.x);\n\
+    return terainHeight;\n\
+}\n\
+\n\
+void main()\n\
+{\n\
+    vec2 curuv = v_tex_pos;\n\
+    float divX = 1.0/u_simulationTextureSize.x;\n\
+    float divY = 1.0/u_simulationTextureSize.y;\n\
+\n\
+    //float cellSize_x = u_tileSize.x / u_simulationTextureSize.x;\n\
+    //float cellSize_y = u_tileSize.y / u_simulationTextureSize.y;\n\
+\n\
+    vec4 shaderLogFluxColor4 = vec4(0.0); // test var. delete after use.\n\
+\n\
+    // Terrain heights.**************************************************************************************************\n\
+    float topTH = getTerrainHeight(curuv + vec2(0.0, divY));\n\
+    float rightTH = getTerrainHeight(curuv + vec2(divX, 0.0));\n\
+    float bottomTH = getTerrainHeight(curuv + vec2(0.0, -divY));\n\
+    float leftTH = getTerrainHeight(curuv + vec2(-divX, 0.0));\n\
+    float curTH = getTerrainHeight(curuv);\n\
+    // End terrain heights.-----------------------------------------------------------------------------------------------\n\
+\n\
+    // Calculate maxSlippge.***\n\
+    float _maxHeightDiff = 3.0;\n\
+    //float maxLocalDiff = _maxHeightDiff * 0.01; // original.**\n\
+    float maxLocalDiff = _maxHeightDiff * 0.01;\n\
+    float avgDiff = (topTH + rightTH + bottomTH + leftTH) * 0.25 - curTH;\n\
+    //avgDiff = 10.0 * max(abs(avgDiff) - maxLocalDiff, 0.0); // original.\n\
+    avgDiff = 1.0 * max(abs(avgDiff) - maxLocalDiff, 0.0);\n\
+\n\
+    float maxSlippage = max(_maxHeightDiff - avgDiff, 0.0);\n\
+\n\
+    // now, encode the maxSlippage value.\n\
+    // Note : for maxSlippage use \"u_heightMap_MinMax.y\" as quantizer.\n\
+    maxSlippage = maxSlippage / u_heightMap_MinMax.y;\n\
+    //maxSlippage *= 100.0; // test.\n\
+    //maxSlippage *= 10.0; // test.\n\
+    shaderLogFluxColor4 = vec4(maxSlippage, 0.0, 0.0, 1.0);\n\
+\n\
+\n\
+    vec4 maxslippage4 = packDepth(maxSlippage);\n\
+    //vec4 maxslippage4 = vec4(maxSlippage, 0.0, 0.0, 1.0); // test.***\n\
+\n\
+    gl_FragData[0] = maxslippage4;  // water flux high.\n\
+\n\
+    #ifdef USE_MULTI_RENDER_TARGET\n\
+        gl_FragData[1] = shaderLogFluxColor4; // water flux low.\n\
+        gl_FragData[2] = shaderLogFluxColor4; // shader log. delete after use.\n\
+        gl_FragData[3] = shaderLogFluxColor4; // albedo\n\
+        gl_FragData[4] = shaderLogFluxColor4; // selection color\n\
     #endif\n\
 \n\
 }";
@@ -12264,6 +12685,55 @@ void main()\n\
     gl_FragData[0] = finalCol4;  // anything.\n\
 \n\
     #ifdef USE_MULTI_RENDER_TARGET\n\
+        gl_FragData[1] = finalCol4; // depth\n\
+        gl_FragData[2] = finalCol4; // normal\n\
+        gl_FragData[3] = finalCol4; // albedo\n\
+        gl_FragData[4] = finalCol4; // selection color\n\
+    #endif\n\
+\n\
+}";
+ShaderSource.waterDEMTexFromQuantizedMeshFS = "//#version 300 es\n\
+\n\
+#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+uniform vec2 u_minMaxHeights;\n\
+\n\
+varying vec3 vPos;\n\
+\n\
+vec4 packDepth( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+  return enc;\n\
+}\n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+}\n\
+\n\
+\n\
+\n\
+void main()\n\
+{\n\
+    vec4 finalCol4 = vec4(vPos.z, vPos.z, vPos.z, 1.0);\n\
+\n\
+    //-------------------------------------------------------------------------------------------------------------\n\
+    gl_FragData[0] = finalCol4;  // anything.\n\
+\n\
+    #ifdef USE_MULTI_RENDER_TARGET\n\
         gl_FragData[1] = vec4(1.0); // depth\n\
         gl_FragData[2] = vec4(1.0); // normal\n\
         gl_FragData[3] = finalCol4; // albedo\n\
@@ -12588,6 +13058,14 @@ uniform sampler2D currDEMTex;\n\
 \n\
 uniform vec2 u_heightMap_MinMax; // terrain min max heights. \n\
 uniform vec2 u_simulationTextureSize; // for example 512 x 512.\n\
+uniform vec2 u_quantizedVolume_MinMax;\n\
+\n\
+//******************************************\n\
+// u_processType = 0 -> overWriteDEM.\n\
+// u_processType = 1 -> excavation.\n\
+uniform int u_processType;\n\
+//------------------------------------------\n\
+\n\
 \n\
 varying float vDepth;\n\
 varying float vAltitude;\n\
@@ -12607,31 +13085,53 @@ float unpackDepth(const in vec4 rgba_depth)\n\
 float getTerrainHeight(in vec2 texCoord)\n\
 {\n\
     float terainHeight = texture2D(currDEMTex, texCoord).r;\n\
-    terainHeight = u_heightMap_MinMax.x + terainHeight * u_heightMap_MinMax.y;\n\
+    terainHeight = u_heightMap_MinMax.x + terainHeight * (u_heightMap_MinMax.y - u_heightMap_MinMax.x);\n\
     return terainHeight;\n\
 }\n\
 \n\
 void main()\n\
 {     \n\
-    vec2 screenPos = vec2(gl_FragCoord.x / u_simulationTextureSize.x, 1.0 - gl_FragCoord.y / u_simulationTextureSize.y);\n\
+    vec2 screenPos = vec2(gl_FragCoord.x / u_simulationTextureSize.x, gl_FragCoord.y / u_simulationTextureSize.y);\n\
 \n\
     // read the currentDEM depth.\n\
     float curTerrainHeght = texture2D(currDEMTex, screenPos).r;\n\
+    float newTerrainHeght = ((vAltitude - u_heightMap_MinMax.x)/(u_heightMap_MinMax.y - u_heightMap_MinMax.x));\n\
 \n\
-    float newTerrainHeght = ((vAltitude - u_heightMap_MinMax.x)/u_heightMap_MinMax.y);\n\
-    //float newTerrainHeght = ((vAltitude - u_heightMap_MinMax.x)/u_heightMap_MinMax.y);\n\
+    //******************************************\n\
+    // u_processType = 0 -> overWriteDEM.\n\
+    // u_processType = 1 -> excavation.\n\
+    //------------------------------------------\n\
 \n\
-    if(newTerrainHeght < curTerrainHeght)\n\
+    if(u_processType == 0)\n\
     {\n\
-        discard;\n\
+        // if u_processType = 0 -> overWriteDEM.\n\
+        if(newTerrainHeght < curTerrainHeght)\n\
+        {\n\
+            discard;\n\
+        }\n\
+    }\n\
+    else if(u_processType == 1)\n\
+    {\n\
+        // if u_processType = 1 -> excavation.\n\
+        // in this process, the meshses must be rendered in frontFace = CW.***\n\
+        if(newTerrainHeght > curTerrainHeght)\n\
+        {\n\
+            discard;\n\
+        }\n\
     }\n\
     \n\
     vec4 depthColor4 = vec4(newTerrainHeght, newTerrainHeght, newTerrainHeght, 1.0);\n\
     gl_FragData[0] = depthColor4;\n\
 \n\
+    vec4 shaderLogColor4 = vec4(0.0);\n\
+    if(vAltitude < u_heightMap_MinMax.x)\n\
+    {\n\
+        shaderLogColor4 = vec4(0.0, 1.0, 0.0, 1.0);\n\
+    }\n\
+\n\
     #ifdef USE_MULTI_RENDER_TARGET\n\
-        gl_FragData[1] = depthColor4; // depth\n\
-        gl_FragData[2] = vec4(1.0); // normal\n\
+        gl_FragData[1] = shaderLogColor4; // depth\n\
+        gl_FragData[2] = shaderLogColor4; // normal\n\
         gl_FragData[3] = vec4(1.0); // albedo\n\
         gl_FragData[4] = vec4(1.0); // selection color\n\
     #endif\n\
@@ -13122,7 +13622,6 @@ void main()\n\
 \n\
 	vDepth = gl_Position.z * 0.5 + 0.5;\n\
 	vAltitude = geoCoord.z;\n\
-	//vTexCoord = texCoord; // no used.\n\
 	vColor4 = u_color4; // used for \"waterCalculateHeightContaminationFS\".***\n\
 \n\
 }\n\
@@ -13231,6 +13730,21 @@ varying vec2 v_tex_pos;\n\
 void main() {\n\
     v_tex_pos = a_pos;\n\
     gl_Position = vec4(-1.0 + 2.0 * a_pos, 0.0, 1.0);\n\
+}";
+ShaderSource.waterQuantizedMeshVS = "//precision mediump float;\n\
+\n\
+attribute vec3 a_pos;\n\
+\n\
+varying vec2 v_tex_pos;\n\
+varying vec3 vPos;\n\
+\n\
+void main() {\n\
+    // Note: the position attributte is initially (in javascript) unsignedInt16 (0 to 32,767) (quantizedMesh).\n\
+    // So, when normalize the data it transforms to (0.0 to 0.5), so must multiply by 2.0.\n\
+    vec3 pos = a_pos * 2.0;\n\
+    vPos = pos;\n\
+    v_tex_pos = pos.xy;\n\
+    gl_Position = vec4(-1.0 + 2.0 * pos, 1.0);\n\
 }";
 ShaderSource.waterRenderFS = "//#version 300 es\n\
 \n\
@@ -13505,14 +14019,16 @@ void main()\n\
 		}\n\
 \n\
 	//}\n\
-    vec3 specCol = finalCol4.xyz;\n\
-    //specCol = vec3(1.0);\n\
-    finalCol4 = vec4((finalCol4.xyz * lambertian + specCol * specular), alpha);\n\
+    vec3 specCol = finalCol4.xyz * 3.0;\n\
+    specCol = vec3(0.5, 1.0, 1.0);\n\
+    //finalCol4 = vec4((finalCol4.xyz * lambertian + specCol * specular), alpha);\n\
     //*************************************************************************************************************\n\
-    //vec3 lightdir = normalize(lightPos - vOrthoPos);\n\
-    //vec3 halfway = normalize(lightdir + vViewRay);\n\
-    //float spec = pow(max(dot(vNormal, halfway), 0.0), 333.0);\n\
-    //finalCol4 = vec4((finalCol4.xyz * lambertian + specCol * spec), alpha);\n\
+    vec3 lightdir = normalize(lightPos - vOrthoPos);\n\
+    vec3 halfway = normalize(lightdir + vViewRay);\n\
+    float spec = pow(max(dot(vNormal, halfway), 0.0), 333.0);\n\
+    finalCol4 = vec4((finalCol4.xyz * lambertian + specCol * spec), alpha);\n\
+\n\
+    //finalCol4 = vec4(0.0, 0.0, 0.0, 1.0); // test debug.\n\
 \n\
     //-------------------------------------------------------------------------------------------------------------\n\
     gl_FragData[0] = finalCol4;  // anything.\n\
@@ -13607,6 +14123,7 @@ uniform float u_waterMaxHeigh;\n\
 uniform float u_contaminantMaxHeigh;\n\
 uniform vec2 u_tileSize; // tile size in meters.\n\
 uniform vec2 u_simulationTextureSize; // for example 512 x 512.\n\
+uniform vec2 u_terrainTextureSize; // for example 512 x 512.\n\
 \n\
 uniform sampler2D depthTex;\n\
 \n\
@@ -13652,44 +14169,6 @@ float getDepth(vec2 coord)\n\
 	}\n\
 }\n\
 \n\
-\n\
-vec3 reconstructPosition(vec2 texCoord, float depth)\n\
-{\n\
-    // https://wickedengine.net/2019/09/22/improved-normal-reconstruction-from-depth/\n\
-    float x = texCoord.x * 2.0 - 1.0;\n\
-    //float y = (1.0 - texCoord.y) * 2.0 - 1.0;\n\
-    float y = (texCoord.y) * 2.0 - 1.0;\n\
-    float z = (1.0 - depth) * 2.0 - 1.0;\n\
-    vec4 pos_NDC = vec4(x, y, z, 1.0);\n\
-    vec4 pos_CC = projectionMatrixInv * pos_NDC;\n\
-    return pos_CC.xyz / pos_CC.w;\n\
-}\n\
-\n\
-vec3 normal_from_depth(float depth, vec2 texCoord) {\n\
-    // http://theorangeduck.com/page/pure-depth-ssao\n\
-    float pixelSizeX = 1.0/u_screenSize.x;\n\
-    float pixelSizeY = 1.0/u_screenSize.y;\n\
-\n\
-    vec2 offset1 = vec2(0.0,pixelSizeY);\n\
-    vec2 offset2 = vec2(pixelSizeX,0.0);\n\
-\n\
-	float depthA = 0.0;\n\
-	float depthB = 0.0;\n\
-	for(float i=0.0; i<1.0; i++)\n\
-	{\n\
-		depthA += getDepth(texCoord + offset1*(1.0+i));\n\
-		depthB += getDepth(texCoord + offset2*(1.0+i));\n\
-	}\n\
-\n\
-	vec3 posA = reconstructPosition(texCoord + offset1*1.0, depthA/1.0);\n\
-	vec3 posB = reconstructPosition(texCoord + offset2*1.0, depthB/1.0);\n\
-\n\
-    vec3 pos0 = reconstructPosition(texCoord, depth);\n\
-    vec3 normal = cross(posA - pos0, posB - pos0);\n\
-    normal.z = -normal.z;\n\
-\n\
-    return normalize(normal);\n\
-}\n\
 \n\
 vec3 getViewRay(vec2 tc, in float relFar)\n\
 {\n\
@@ -13737,7 +14216,7 @@ float getContaminantHeight(in vec2 texCoord)\n\
 float getTerrainHeight(in vec2 texCoord)\n\
 {\n\
     float terainHeight = texture2D(terrainmap, texCoord).r;\n\
-    terainHeight = u_heightMap_MinMax.x + terainHeight * u_heightMap_MinMax.y;\n\
+    terainHeight = u_heightMap_MinMax.x + terainHeight * (u_heightMap_MinMax.y - u_heightMap_MinMax.x);\n\
     return terainHeight;\n\
 }\n\
 \n\
@@ -13783,6 +14262,20 @@ float getTotalHeight(in vec2 texCoord)\n\
 	return totalHeight;\n\
 }\n\
 \n\
+float getLiquidHeight(in vec2 texCoord)\n\
+{\n\
+	float waterHeight = getWaterHeight(texCoord);\n\
+	float contaminHeight = 0.0;\n\
+	if(u_contaminantMaxHeigh > 0.0)\n\
+	{\n\
+		// exist contaminant.\n\
+		contaminHeight = getContaminantHeight(texCoord);\n\
+	}\n\
+\n\
+	float totalHeight = waterHeight + contaminHeight;\n\
+	return totalHeight;\n\
+}\n\
+\n\
 vec3 calculateNormalFromHeights(in vec2 texCoord)\n\
 {\n\
 	vec3 normal;\n\
@@ -13800,19 +14293,21 @@ vec3 calculateNormalFromHeights(in vec2 texCoord)\n\
 	vec3 upPos = vec3(0.0, cellSize_y, getTotalHeight(texCoord + vec2(0.0, divY)));\n\
 	vec3 rightPos = vec3(cellSize_x, 0.0, getTotalHeight(texCoord + vec2(divX, 0.0)));\n\
 \n\
-	vec3 rightDir = normalize(rightPos - curPos);\n\
-	vec3 upDir = normalize(upPos - curPos);\n\
+	vec3 rightDir = (rightPos - curPos);\n\
+	vec3 upDir = (upPos - curPos);\n\
 \n\
 	normal = normalize(cross(rightDir, upDir));\n\
 \n\
 	return normal;\n\
 }\n\
 \n\
+\n\
 void main()\n\
 {\n\
 	// read the altitude from waterHeightTex.\n\
 	vTexCoord = texCoord;\n\
-	float waterHeight = getWaterHeight(texCoord);\n\
+	vWaterHeight = getWaterHeight(texCoord);\n\
+\n\
 	vContaminantHeight = 0.0;\n\
 	vExistContaminant = -1.0;\n\
 	// check if exist contaminat.\n\
@@ -13823,13 +14318,33 @@ void main()\n\
 		vExistContaminant = 1.0;\n\
 	}\n\
 \n\
+	// Test check neighbor(adjacent) waterHeights.**************************\n\
+	// If some adjacent waterHeight is zero, then this waterHeight is zero.\n\
+	/*\n\
+	float extrudeHeight = 0.0;\n\
+	float minLiquidHeight = 0.0001;\n\
+	bool thisIsBorderWater = false;\n\
+	if(vWaterHeight + vContaminantHeight < minLiquidHeight)\n\
+	{\n\
+		thisIsBorderWater = true;\n\
+		extrudeHeight = 0.0;\n\
+	}\n\
+	*/\n\
+	// End test.------------------------------------------------------------\n\
+\n\
 	float terrainHeight = getTerrainHeight(texCoord);\n\
-	float height = terrainHeight + waterHeight + vContaminantHeight;\n\
+	//float terrainHeight = getTerrainHeight_interpolated(texCoord);\n\
+	float height = terrainHeight + vWaterHeight + vContaminantHeight;\n\
 \n\
-	vWaterHeight = waterHeight;\n\
+	//if(thisIsBorderWater)\n\
+	//{\n\
+	//	height = extrudeHeight;\n\
+	//}\n\
 \n\
-	//float alpha = max(waterHeight/u_waterMaxHeigh*1.5, 0.4); // original.***\n\
-	float alpha = max(waterHeight/u_waterMaxHeigh*1.5, 0.7);\n\
+	//float alpha = max(vWaterHeight/u_waterMaxHeigh*1.5, 0.4); // original.***\n\
+	float alpha = max(vWaterHeight/u_waterMaxHeigh*1.5, 0.7);\n\
+\n\
+	\n\
 	vColorAuxTest = vec4(0.1, 0.3, 1.0, alpha);\n\
 \n\
 	vec3 objPosHigh = buildingPosHIGH;\n\
@@ -13847,26 +14362,19 @@ void main()\n\
 	gl_Position = ModelViewProjectionMatrixRelToEye * finalPos4;\n\
 \n\
 	vOrthoPos = (modelViewMatrixRelToEye * finalPos4).xyz;\n\
+	float depth = (-vOrthoPos.z)/(far); // the correct value.\n\
 \n\
 	// try to calculate normal here.\n\
 	vec3 ndc = gl_Position.xyz / gl_Position.w; //perspective divide/normalize\n\
 	vec2 screenPos = ndc.xy * 0.5 + 0.5; //ndc is -1 to 1 in GL. scale for 0 to 1\n\
-    float depth = getDepth(screenPos);\n\
 \n\
 	// Calculate normal.\n\
 	vec3 normalLC = calculateNormalFromHeights(texCoord);\n\
 	vec4 normalWC = buildingRotMatrix * vec4(normalLC, 1.0);\n\
 	vec4 normalCC = normalMatrix4 * normalWC;\n\
 \n\
-	/*\n\
-    vNormal = normal_from_depth(depth, screenPos);\n\
-	if(vNormal.z < 0.0)\n\
-	{\n\
-		vNormal *= -1.0;\n\
-	}\n\
-	*/\n\
 	vNormal = normalCC.xyz;\n\
-	vViewRay = normalize(-getViewRay(screenPos, depth));\n\
+	vViewRay = normalize(-getViewRay(screenPos, depth)); // original.***\n\
 \n\
 	if(bUseLogarithmicDepth)\n\
 	{\n\
@@ -13881,6 +14389,52 @@ void main()\n\
 	}\n\
 }\n\
 ";
+ShaderSource.waterReQuatizeFS = "//#version 300 es\n\
+\n\
+#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+uniform sampler2D texToCopy;\n\
+\n\
+uniform vec2 u_original_MinMax;\n\
+uniform vec2 u_desired_MinMax;\n\
+\n\
+uniform bool u_textureFlipYAxis;\n\
+varying vec2 v_tex_pos;\n\
+\n\
+void main()\n\
+{\n\
+    vec4 finalCol4;\n\
+    if(u_textureFlipYAxis)\n\
+    {\n\
+        finalCol4 = texture2D(texToCopy, vec2(v_tex_pos.x, 1.0 - v_tex_pos.y));\n\
+    }\n\
+    else\n\
+    {\n\
+        finalCol4 = texture2D(texToCopy, vec2(v_tex_pos.x, v_tex_pos.y));\n\
+    }\n\
+    \n\
+    gl_FragData[0] = finalCol4;  // anything.\n\
+\n\
+    #ifdef USE_MULTI_RENDER_TARGET\n\
+        gl_FragData[1] = vec4(1.0); // depth\n\
+        gl_FragData[2] = vec4(1.0); // normal\n\
+        gl_FragData[3] = finalCol4; // albedo\n\
+        gl_FragData[4] = vec4(1.0); // selection color\n\
+    #endif\n\
+\n\
+}";
 ShaderSource.waterSimTerrainRenderFS = "//#version 300 es\n\
 \n\
 #ifdef GL_ES\n\
@@ -13900,12 +14454,8 @@ ShaderSource.waterSimTerrainRenderFS = "//#version 300 es\n\
 uniform sampler2D diffuseTex;\n\
 uniform sampler2D depthTex; \n\
 \n\
-uniform sampler2D hightmap;\n\
 uniform sampler2D terrainmap;\n\
-uniform sampler2D normap;\n\
-uniform sampler2D sceneDepth;\n\
-uniform sampler2D colorReflection;\n\
-uniform sampler2D sedimap;\n\
+uniform sampler2D terrainMapToCompare;\n\
 \n\
 uniform float near;\n\
 uniform float far;\n\
@@ -13930,6 +14480,7 @@ varying vec2 vTexCoord;\n\
 varying float depth;\n\
 varying vec3 vNormal;\n\
 varying vec3 vViewRay;\n\
+varying float vTerrainSlided;\n\
 \n\
 vec3 calculateNormal(vec2 uv){\n\
     float eps = 1.0/u_SimRes;\n\
@@ -14060,6 +14611,12 @@ void main()\n\
 \n\
     // read difusseTex.\n\
     vec4 difusseColor = texture2D(diffuseTex, vec2(vTexCoord.x, 1.0 - vTexCoord.y));\n\
+    if(vTerrainSlided > 0.0)\n\
+    {\n\
+        difusseColor.r *= 0.5;\n\
+        difusseColor.g *= 0.5;\n\
+        difusseColor.b *= 0.5;\n\
+    }\n\
     //float dotProd = dot(vViewRay, vNormal);\n\
     //difusseColor = vec4(difusseColor.xyz * dotProd, 1.0);\n\
     //gl_FragData[2] = vec4(vNormal, 1.0); // normal\n\
@@ -14134,47 +14691,38 @@ void main()\n\
     */\n\
 }";
 ShaderSource.waterSimTerrainRenderVS = "\n\
-//#version 300 es\n\
+attribute vec3 position;\n\
+attribute vec3 normal;\n\
+attribute vec2 texCoord;\n\
+attribute vec4 color4;\n\
 \n\
-	attribute vec3 position;\n\
-	attribute vec3 normal;\n\
-	attribute vec2 texCoord;\n\
-	attribute vec4 color4;\n\
-	\n\
-	uniform mat4 buildingRotMatrix; // use this to calculate normal from hightMap textures.\n\
-	uniform mat4 modelViewMatrixRelToEye; \n\
-	uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-	uniform mat4 normalMatrix4;\n\
-	uniform vec3 buildingPosHIGH;\n\
-	uniform vec3 buildingPosLOW;\n\
-	uniform float near;\n\
-	uniform float far;\n\
-	uniform vec3 scaleLC;\n\
-	uniform vec3 encodedCameraPositionMCHigh;\n\
-	uniform vec3 encodedCameraPositionMCLow;\n\
-	uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
-	\n\
-	uniform bool bUseLogarithmicDepth;\n\
-	uniform float uFCoef_logDepth;\n\
-    \n\
+uniform mat4 buildingRotMatrix; // use this to calculate normal from hightMap textures.\n\
+uniform mat4 modelViewMatrixRelToEye; \n\
+uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+uniform mat4 normalMatrix4;\n\
+uniform vec3 buildingPosHIGH;\n\
+uniform vec3 buildingPosLOW;\n\
+uniform float near;\n\
+uniform float far;\n\
+uniform vec3 scaleLC;\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
 \n\
-uniform mat4 u_Model;\n\
-uniform mat4 u_ModelInvTr;\n\
-uniform mat4 u_ViewProj;\n\
-uniform vec2 u_PlanePos; // Our location in the virtual world displayed by the plane\n\
+uniform bool bUseLogarithmicDepth;\n\
+uniform float uFCoef_logDepth;\n\
 \n\
-uniform sampler2D hightmap;\n\
 uniform sampler2D terrainmap;\n\
-uniform float u_SimRes;\n\
+uniform sampler2D terrainMapToCompare;\n\
 \n\
 uniform vec2 u_screenSize;\n\
 uniform float tangentOfHalfFovy;\n\
 uniform float aspectRatio;\n\
-uniform mat4 projectionMatrixInv;\n\
 \n\
 uniform vec2 u_heightMap_MinMax;\n\
 uniform vec2 u_tileSize; // tile size in meters.\n\
 uniform vec2 u_simulationTextureSize; // for example 512 x 512.\n\
+uniform vec2 u_terrainTextureSize; // for example 512 x 512.\n\
 \n\
 varying float flogz;\n\
 varying float Fcoef_half;\n\
@@ -14184,6 +14732,7 @@ varying vec2 vTexCoord;\n\
 varying float depth;\n\
 varying vec3 vNormal;\n\
 varying vec3 vViewRay;\n\
+varying float vTerrainSlided;\n\
 \n\
 vec3 getViewRay(vec2 tc, in float relFar)\n\
 {\n\
@@ -14197,11 +14746,33 @@ vec3 getViewRay(vec2 tc, in float relFar)\n\
 float getTerrainHeight(in vec2 texCoord)\n\
 {\n\
     float terainHeight = texture2D(terrainmap, texCoord).r;\n\
-    terainHeight = u_heightMap_MinMax.x + terainHeight * u_heightMap_MinMax.y;\n\
+    terainHeight = u_heightMap_MinMax.x + terainHeight * (u_heightMap_MinMax.y - u_heightMap_MinMax.x);\n\
     return terainHeight;\n\
 }\n\
 \n\
-vec3 calculateNormalFromHeights(in vec2 texCoord)\n\
+float getTerrainToCompareHeight(in vec2 texCoord)\n\
+{\n\
+    float terainHeight = texture2D(terrainMapToCompare, texCoord).r;\n\
+    terainHeight = u_heightMap_MinMax.x + terainHeight * (u_heightMap_MinMax.y - u_heightMap_MinMax.x);\n\
+    return terainHeight;\n\
+}\n\
+\n\
+float getTerrainHeight_interpolated(const vec2 uv) \n\
+{\n\
+    vec2 px = 1.0 / u_terrainTextureSize;\n\
+    vec2 vc = (floor(uv * u_terrainTextureSize)) * px;\n\
+    vec2 f = fract(uv * u_terrainTextureSize);\n\
+    float tl = texture2D(terrainmap, vc).r;\n\
+    float tr = texture2D(terrainmap, vc + vec2(px.x, 0)).r;\n\
+    float bl = texture2D(terrainmap, vc + vec2(0, px.y)).r;\n\
+    float br = texture2D(terrainmap, vc + px).r;\n\
+\n\
+    float h =  mix(mix(tl, tr, f.x), mix(bl, br, f.x), f.y);\n\
+	h = u_heightMap_MinMax.x + h * (u_heightMap_MinMax.y - u_heightMap_MinMax.x);\n\
+	return h;\n\
+}\n\
+\n\
+vec3 calculateNormalFromHeights(in vec2 texCoord, in float curHeight)\n\
 {\n\
 	vec3 normal;\n\
 	float cellSize_x = u_tileSize.x / u_simulationTextureSize.x;\n\
@@ -14210,31 +14781,32 @@ vec3 calculateNormalFromHeights(in vec2 texCoord)\n\
 	float divX = 1.0/u_simulationTextureSize.x;\n\
     float divY = 1.0/u_simulationTextureSize.y;\n\
 \n\
-	// curPos = (0, 0, curH).\n\
-	// upPos = (0, dy, upH).\n\
-	// rightPos = (dz, 0, rightH).\n\
-	vec3 curPos = vec3(0.0, 0.0, getTerrainHeight(texCoord));\n\
-	vec3 upPos = vec3(0.0, cellSize_y, getTerrainHeight(texCoord + vec2(0.0, divY)));\n\
-	vec3 rightPos = vec3(cellSize_x, 0.0, getTerrainHeight(texCoord + vec2(divX, 0.0)));\n\
+	vec3 curPos = vec3(0.0, 0.0, curHeight);\n\
+	vec3 upPos = vec3(0.0, cellSize_y, getTerrainHeight_interpolated(texCoord + vec2(0.0, divY)));\n\
+	vec3 rightPos = vec3(cellSize_x, 0.0, getTerrainHeight_interpolated(texCoord + vec2(divX, 0.0)));\n\
 \n\
-	vec3 rightDir = normalize(rightPos - curPos);\n\
-	vec3 upDir = normalize(upPos - curPos);\n\
+	vec3 rightDir = (rightPos - curPos);\n\
+	vec3 upDir = (upPos - curPos);\n\
 \n\
 	normal = normalize(cross(rightDir, upDir));\n\
-\n\
 	return normal;\n\
 }\n\
 \n\
 void main()\n\
 {\n\
 	// read the altitude from hightmap.\n\
-	vec4 terrainHeight4 = texture2D(terrainmap, vec2(texCoord.x, 1.0 - texCoord.y)); // delete this.\n\
-	vTexCoord = texCoord;\n\
+	vTexCoord = texCoord; // used for difusseTex.\n\
 \n\
-	float terrainHeight = getTerrainHeight(vec2(texCoord.x, 1.0 - texCoord.y));\n\
+	//float terrainHeight = getTerrainHeight_interpolated(texCoord);\n\
+	float terrainHeight = getTerrainHeight(texCoord);\n\
 	float height = terrainHeight;\n\
+	float terrainToCompareHeight = getTerrainToCompareHeight(texCoord);\n\
 \n\
-	vColorAuxTest = terrainHeight4; // delete this.\n\
+	vTerrainSlided = -1.0;\n\
+	if(abs(terrainToCompareHeight - terrainHeight) > 0.8)\n\
+	{\n\
+		vTerrainSlided = 1.0;\n\
+	}\n\
 \n\
 	vec3 objPosHigh = buildingPosHIGH;\n\
     vec3 objPosLow = buildingPosLOW.xyz + position.xyz;\n\
@@ -14260,7 +14832,7 @@ void main()\n\
 	////vec2 screenPos = ndc.xy * 0.5 + 0.5; //ndc is -1 to 1 in GL. scale for 0 to 1\n\
 	////vViewRay = normalize(-getViewRay(screenPos, depth));\n\
 \n\
-	vec3 normalLC = calculateNormalFromHeights(vec2(texCoord.x, 1.0 - texCoord.y));\n\
+	vec3 normalLC = calculateNormalFromHeights(texCoord, terrainHeight);\n\
 	vec4 normalWC = buildingRotMatrix * vec4(normalLC, 1.0);\n\
 	vec4 normalCC = normalMatrix4 * normalWC;\n\
 	vNormal = normalCC.xyz;\n\

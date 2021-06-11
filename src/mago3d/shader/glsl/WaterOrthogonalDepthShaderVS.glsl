@@ -484,7 +484,6 @@ void main()
 
 	vDepth = gl_Position.z * 0.5 + 0.5;
 	vAltitude = geoCoord.z;
-	//vTexCoord = texCoord; // no used.
 	vColor4 = u_color4; // used for "waterCalculateHeightContaminationFS".***
 
 }

@@ -106,33 +106,18 @@ void encodeWaterFlux(vec4 flux, inout vec4 flux_high, inout vec4 flux_low)
     flux_high = vec4(encoded_top_flux.r, encoded_right_flux.r, encoded_bottom_flux.r, encoded_left_flux.r);
     flux_low = vec4(encoded_top_flux.g, encoded_right_flux.g, encoded_bottom_flux.g, encoded_left_flux.g);
 }
-/*
-vec4 getTerrainHeightInterpolation(const vec2 uv) {
-    //return texture2D(u_wind, uv).rg; // lower-res hardware filtering
-	
-    vec2 px = 1.0 / u_terrainTextureSize;
-    vec2 vc = (floor(uv * u_terrainTextureSize)) * px;
-    vec2 f = fract(uv * u_terrainTextureSize);
-    vec4 tl = texture2D(terrainHeightTex, vc);
-    vec4 tr = texture2D(terrainHeightTex, vc + vec2(px.x, 0));
-    vec4 bl = texture2D(terrainHeightTex, vc + vec2(0, px.y));
-    vec4 br = texture2D(terrainHeightTex, vc + px);
 
-    return mix(mix(tl, tr, f.x), mix(bl, br, f.x), f.y);
-}
-*/
 
 float getTerrainHeight(in vec2 texCoord)
 {
     float terainHeight = texture2D(terrainHeightTex, texCoord).r;
-    terainHeight = u_heightMap_MinMax.x + terainHeight * u_heightMap_MinMax.y;
+    terainHeight = u_heightMap_MinMax.x + terainHeight * (u_heightMap_MinMax.y - u_heightMap_MinMax.x);
     return terainHeight;
 }
 
 void main()
 {
-    vec2 curuv = vec2(v_tex_pos.x, v_tex_pos.y);
-    vec2 curuvTerrain = vec2(v_tex_pos.x, v_tex_pos.y);
+    vec2 curuv = v_tex_pos;
     float divX = 1.0/u_simulationTextureSize.x;
     float divY = 1.0/u_simulationTextureSize.y;
 
@@ -141,11 +126,11 @@ void main()
 
     // Terrain & water heights.**************************************************************************************************
     // read terrain heights.
-    float topTH = getTerrainHeight(curuvTerrain + vec2(0.0, divY));
-    float rightTH = getTerrainHeight(curuvTerrain + vec2(divX, 0.0));
-    float bottomTH = getTerrainHeight(curuvTerrain + vec2(0.0, -divY));
-    float leftTH = getTerrainHeight(curuvTerrain + vec2(-divX, 0.0));
-    float curTH = getTerrainHeight(curuvTerrain);
+    float topTH = getTerrainHeight(curuv + vec2(0.0, divY));
+    float rightTH = getTerrainHeight(curuv + vec2(divX, 0.0));
+    float bottomTH = getTerrainHeight(curuv + vec2(0.0, -divY));
+    float leftTH = getTerrainHeight(curuv + vec2(-divX, 0.0));
+    float curTH = getTerrainHeight(curuv);
 
     // read water heights.
     float topWH = getWaterHeight(curuv + vec2(0.0, divY));
