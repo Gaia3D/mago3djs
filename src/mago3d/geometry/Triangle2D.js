@@ -73,6 +73,138 @@ Triangle2D.prototype.isPoint2dInside = function(point2d)
 	return isInside;
 };
 
+Triangle2D.prototype.getBoundingRectangle = function(resultBoundingRect) 
+{
+	if (resultBoundingRect === undefined)
+	{
+		resultBoundingRect = new BoundingRectangle();
+	}
+	
+	resultBoundingRect.setInit(this.point2d0);
+	resultBoundingRect.addPoint(this.point2d1);
+	resultBoundingRect.addPoint(this.point2d2);
+	
+	return resultBoundingRect;
+};
+
+Triangle2D.prototype.getSegment2D = function(idx) 
+{
+	var seg2d = new Segment2D();
+
+	if(idx === 0)
+	{
+		seg2d.setPoints(this.point2d0, this.point2d1);
+	}
+	else if(idx === 1)
+	{
+		seg2d.setPoints(this.point2d1, this.point2d2);
+	}
+	else if(idx === 2)
+	{
+		seg2d.setPoints(this.point2d2, this.point2d0);
+	}
+
+	return seg2d;
+};
+
+
+
+Triangle2D.prototype.getRelativePositionOfPoint2DReport = function(point2d, resultReport, error) 
+{
+	// a point can be:
+	// 1) outside of the triangle.
+	// 2) inside of the triangle.
+	// 3) coincident with any points of the triangle.
+	// 4) coincident with any segment of the triangle.
+	//-------------------------------------------------------------
+
+	// 1rst, check if the point is coincident with any point of the triangle.
+	if(error === undefined)
+	{ error = 1e-8; }
+
+	/*
+	CODE.relativePositionPoint2DWithTriangle2D = {
+		"UNKNOWN" : 0,
+		"OUTSIDE" : 1,
+		"INSIDE" : 2,
+		"COINCIDENT_WITH_TRIANGLE_POINT" : 3,
+		"COINCIDENT_WITH_TRIANGLE_EDGE" : 4
+	}
+	*/
+
+	if(resultReport === undefined)
+	{
+		resultReport = {};
+	}
+	resultReport.relPos = CODE.relativePositionPoint2DWithTriangle2D.UNKNOWN;
+
+	if(this.point2d0.isCoincidentToPoint(point2d, error))
+	{
+		resultReport.relPos = CODE.relativePositionPoint2DWithTriangle2D.COINCIDENT_WITH_TRIANGLE_POINT;
+		resultReport.pointIdx = 0;
+		return resultReport;
+	}
+
+	if(this.point2d1.isCoincidentToPoint(point2d, error))
+	{
+		resultReport.relPos = CODE.relativePositionPoint2DWithTriangle2D.COINCIDENT_WITH_TRIANGLE_POINT;
+		resultReport.pointIdx = 1;
+		return resultReport;
+	}
+
+	if(this.point2d2.isCoincidentToPoint(point2d, error))
+	{
+		resultReport.relPos = CODE.relativePositionPoint2DWithTriangle2D.COINCIDENT_WITH_TRIANGLE_POINT;
+		resultReport.pointIdx = 2;
+		return resultReport;
+	}
+
+	// Check if is coincident with any triangle edge.
+	//Constant.INTERSECTION_POINT_A;
+	//Constant.INTERSECTION_POINT_B;
+	//Constant.INTERSECTION_OUTSIDE;
+	//Constant.INTERSECTION_INSIDE;
+
+	var segmentIdx = 0;
+	var seg2d = this.getSegment2D(segmentIdx);
+	if(seg2d.intersectionWithPointByDistances(point2d, error) === Constant.INTERSECTION_INSIDE)
+	{
+		resultReport.relPos = CODE.relativePositionPoint2DWithTriangle2D.COINCIDENT_WITH_TRIANGLE_EDGE;
+		resultReport.segmentIdx = segmentIdx;
+		return resultReport;
+	}
+
+	segmentIdx = 1;
+	seg2d = this.getSegment2D(segmentIdx);
+	if(seg2d.intersectionWithPointByDistances(point2d, error) === Constant.INTERSECTION_INSIDE)
+	{
+		resultReport.relPos = CODE.relativePositionPoint2DWithTriangle2D.COINCIDENT_WITH_TRIANGLE_EDGE;
+		resultReport.segmentIdx = segmentIdx;
+		return resultReport;
+	}
+
+	segmentIdx = 2;
+	seg2d = this.getSegment2D(segmentIdx);
+	if(seg2d.intersectionWithPointByDistances(point2d, error) === Constant.INTERSECTION_INSIDE)
+	{
+		resultReport.relPos = CODE.relativePositionPoint2DWithTriangle2D.COINCIDENT_WITH_TRIANGLE_EDGE;
+		resultReport.segmentIdx = segmentIdx;
+		return resultReport;
+	}
+	
+	// Now, check if the point2d is inside or outside of the triangle.
+	if(this.isPoint2dInside(point2d))
+	{
+		resultReport.relPos = CODE.relativePositionPoint2DWithTriangle2D.INSIDE;
+		return resultReport;
+	}
+	else
+	{
+		resultReport.relPos = CODE.relativePositionPoint2DWithTriangle2D.OUTSIDE;
+		return resultReport;
+	}
+};
+
 
 
 

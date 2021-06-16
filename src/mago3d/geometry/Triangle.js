@@ -68,6 +68,9 @@ var Triangle= function(vertex0, vertex1, vertex2)
 	{ this.vertex2 = vertex2; }
 	
 	this.hEdge;
+
+	// auxiliar vars:
+	this.bRectXY; // bounding rectangle of the triangle projected in the plane XY.
 };
 
 /**
@@ -310,6 +313,8 @@ Triangle.prototype.getSegment = function(idx, resultSegment)
 	
 	return resultSegment;
 };
+
+
 
 
 

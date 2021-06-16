@@ -73,6 +73,24 @@ GeographicExtent.prototype.setExtent = function(minLon, minLat, minAlt, maxLon, 
 
 /**
  * set the value of this instance
+ * @param minAlt the value of alt of the lower bound
+ * @param maxAlt the value of alt of the lower bound
+ */
+GeographicExtent.prototype.setExtentAltitudes = function(minAlt, maxAlt) 
+{
+	if (this.minGeographicCoord === undefined)
+	{ this.minGeographicCoord = new GeographicCoord(); }
+	
+	this.minGeographicCoord.setAltitude(minAlt);
+	
+	if (this.maxGeographicCoord === undefined)
+	{ this.maxGeographicCoord = new GeographicCoord(); }
+	
+	this.maxGeographicCoord.setAltitude(maxAlt);
+};
+
+/**
+ * set the value of this instance
  * @param lon
  * @param lat
  * @param alt
@@ -276,6 +294,39 @@ GeographicExtent.prototype.intersects2dWithGeoExtent = function(geoExtent)
 	{ return false; }
 
 	return true;
+};
+
+GeographicExtent.prototype.getQuantizedPoint = function(geoCoord, resultQPoint) 
+{
+	// This function returns the quantizedPoint3d.
+	// Quantized points domain is positive short size (0 to 32767).***
+	if(!resultQPoint)
+	{
+		resultQPoint = new Point3D();
+	}
+
+	var minGeoCoord = this.minGeographicCoord;
+	var maxGeoCoord = this.maxGeographicCoord;
+
+	var minLon = minGeoCoord.longitude;
+	var maxLon = maxGeoCoord.longitude;
+
+	var minLat = minGeoCoord.latitude;
+	var maxLat = maxGeoCoord.latitude;
+
+	var minAlt = minGeoCoord.altitude;
+	var maxAlt = maxGeoCoord.altitude;
+
+	var unitary_u, unitary_v, unitary_h;
+
+	unitary_u = (geoCoord.longitude - minLon) / (maxLon - minLon);
+	unitary_v = (geoCoord.latitude - minLat) / (maxLat - minLat);
+	unitary_h = (geoCoord.altitude - minAlt) / (maxAlt - minAlt);
+
+	var shortMax = 32767;
+	resultQPoint.set(unitary_u * shortMax, unitary_v * shortMax, unitary_h * shortMax);
+
+	return resultQPoint;
 };
 
 

@@ -58,6 +58,11 @@ TrianglesList.prototype.deleteObjects = function()
 	this.trianglesArray = [];
 };
 
+TrianglesList.prototype.deleteTriangleByIdx = function(triangleIdx) 
+{
+	this.trianglesArray.splice(triangleIdx, 1);
+};
+
 /**
  * Triangle 배열의 개수를 구한다.
  * 

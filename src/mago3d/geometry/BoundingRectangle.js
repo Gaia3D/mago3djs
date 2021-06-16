@@ -16,6 +16,14 @@ var BoundingRectangle = function(x, y)
 	this.maxY = Number.MIN_VALUE;
 };
 
+BoundingRectangle.prototype.setInitXY = function(x, y)
+{
+	this.minX = x;
+	this.minY = y;
+	this.maxX = x;
+	this.maxY = y;
+}
+
 BoundingRectangle.prototype.setInit = function(point)
 {
 	if (point === undefined)
@@ -39,6 +47,19 @@ BoundingRectangle.prototype.setInitByRectangle = function(bRect)
 	this.minY = bRect.minY;
 	this.maxX = bRect.maxX;
 	this.maxY = bRect.maxY;
+};
+
+BoundingRectangle.prototype.addPointXY = function(x, y)
+{
+	if (x < this.minX)
+	{ this.minX = x; }
+	else if (x > this.maxX)
+	{ this.maxX = x; }
+	
+	if (y < this.minY)
+	{ this.minY = y; }
+	else if (y > this.maxY)
+	{ this.maxY = y; }
 };
 
 /**
@@ -118,6 +139,20 @@ BoundingRectangle.prototype.intersectsWithPoint2D = function(point2D)
 	else if (point2D.y > this.maxY)
 	{ return false; }
 	else if (point2D.y < this.minY)
+	{ return false; }
+	
+	return true;
+};
+
+BoundingRectangle.prototype.intersectsWithPointXY = function(x, y)
+{
+	if (x > this.maxX)
+	{ return false; }
+	else if (x < this.minX)
+	{ return false; }
+	else if (y > this.maxY)
+	{ return false; }
+	else if (y < this.minY)
 	{ return false; }
 	
 	return true;

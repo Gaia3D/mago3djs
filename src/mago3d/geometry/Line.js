@@ -42,6 +42,15 @@ Line.prototype.setPointAndDir = function(px, py, pz, dx, dy, dz)
 	this.direction.unitary();
 };
 
+Line.prototype.set2Points = function(px, py, pz, px2, py2, pz2) 
+{
+	// Calculate the direction.
+	var dir = new Point3D(px2 - px, py2 - py, pz2 - pz);
+	dir.unitary();
+
+	this.setPointAndDir(px, py, pz, dir.x, dir.y, dir.z);
+};
+
 /**
  * get the point which is projected as 2d plane(the plane which is represented by using x,y axis)
  * @param point the target point 

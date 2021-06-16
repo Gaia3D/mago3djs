@@ -432,7 +432,7 @@ Renderer.prototype.renderObject = function(gl, renderable, magoManager, shader, 
 	}
 };
 
-Renderer.prototype.beginRenderSilhouetteDepth = function()
+Renderer.prototype.beginRenderSilhouetteDepth = function ()
 {
 	var magoManager = this.magoManager;
 	var gl = magoManager.getGl();

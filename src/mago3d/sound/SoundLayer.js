@@ -262,7 +262,28 @@ SoundLayer.prototype.doSimulationSteps = function (magoManager)
 
 	}
 
-	
+	// Do another test:
+	if(!this.quantizedSurfaceTest)
+	{
+		// 1rst, calculate the geoExtent of the tile:
+		var imageryType = CODE.imageryType.CRS84;
+		var geoExtent = SmartTile.getGeographicExtentOfTileLXY(this.qMesh.L, this.qMesh.X, this.qMesh.Y, undefined, imageryType);
+
+		this.quantizedSurface = new QuantizedSurface(this.qMesh);
+		// The testing tile extent:
+		// {longitude: 127.24364884800002, latitude: 36.49658264, altitude: 155.60084533691406}
+		// {longitude: 127.23266252000002, latitude: 36.485596312, altitude: 0}
+		var excavationGeoCoords = [new GeographicCoord(127.238, 36.492, 0.0), 
+									new GeographicCoord(127.238, 36.489, 0.0), 
+									new GeographicCoord(127.240, 36.489, 0.0), 
+									new GeographicCoord(127.240, 36.490, 0.0), 
+									new GeographicCoord(127.239, 36.490, 0.0), 
+									new GeographicCoord(127.239, 36.492, 0.0)];
+
+		var excavationDepth = 20.0;
+		this.quantizedSurface.excavation(excavationGeoCoords, excavationDepth);
+		this.quantizedSurfaceTest = true;
+	}
 	
 
 };

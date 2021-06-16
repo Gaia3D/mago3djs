@@ -150,6 +150,87 @@ Segment2D.prototype.getLength = function()
 	return Math.sqrt(this.getSquaredLength());
 };
 
+Segment2D.prototype.getRelativePositionOfPoint2DReport = function(point2d, resultReport)
+{
+	// a point2d can be:
+	// 1) outside.
+	// 2) inside.
+	// 3) coincident with startPoint.
+	// 4) coincident with endPoint.
+	//----------------------------------------
+
+	/*
+	CODE.relativePositionPoint2DWithSegment2D = {
+		"UNKNOWN" : 0,
+		"OUTSIDE" : 1,
+		"INSIDE" : 2,
+		"COINCIDENT_WITH_START_POINT" : 3,
+		"COINCIDENT_WITH_END_POINT" : 4
+	}
+	*/
+	if(resultReport === undefined)
+	{
+		resultReport = {};
+	}
+	resultReport.relPos = CODE.relativePositionPoint2DWithSegment2D.UNKNOWN;
+
+	var error = 1e-8;
+
+	// check if point2d is coincident with startPoint.
+	if(point2d.isCoincidentToPoint(this.startPoint2d, error))
+	{
+		resultReport.relPos = CODE.relativePositionPoint2DWithSegment2D.COINCIDENT_WITH_START_POINT;
+		return resultReport;
+	}
+
+	if(point2d.isCoincidentToPoint(this.endPoint2d, error))
+	{
+		resultReport.relPos = CODE.relativePositionPoint2DWithSegment2D.COINCIDENT_WITH_END_POINT;
+		return resultReport;
+	}
+
+	// Check if the point2d is coincident with the segment's line.
+	var line = this.getLine();
+	if (!line.isCoincidentPoint(point2d, error))
+	{
+		resultReport.relPos = CODE.relativePositionPoint2DWithSegment2D.OUTSIDE;
+		return resultReport;
+	}
+	else
+	{
+		// The point2d is coincident with the line.
+		if(this.intersectionWithPointByDistances(this.startPoint2d, error))
+		{
+			resultReport.relPos = CODE.relativePositionPoint2DWithSegment2D.INSIDE;
+			return resultReport;
+		}
+	}
+
+	return resultReport;
+
+};
+
+
+Segment2D.prototype.getRelativePositionOfSegment2DReport = function(seg2d, resultReport)
+{
+	var lineA = this.getLine();
+	var lineB = seg2d.getLine();
+
+	var segA_sp = this.startPoint2d;
+	var segA_ep = this.endPoint2d;
+
+	var segB_sp = seg2d.startPoint2d;
+	var segB_ep = seg2d.endPoint2d;
+
+	var intersectedPoint = lineA.intersectionWithLine(lineB);
+
+	if(!intersectedPoint)
+	{
+		// Lines are parallel.***
+		// Now, must know if there are colineal.
+
+	}
+};
 
 /**
  * 오차율에 따라 주어진 포인트와 선분의 교차를 판단한다.

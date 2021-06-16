@@ -163,3 +163,20 @@ CODE.curveRenderingState = {
 	"NORMAL" : 0,
 	"EDITED" : 1
 }
+
+
+CODE.relativePositionPoint2DWithTriangle2D = {
+	"UNKNOWN" : 0,
+	"OUTSIDE" : 1,
+	"INSIDE" : 2,
+	"COINCIDENT_WITH_TRIANGLE_POINT" : 3,
+	"COINCIDENT_WITH_TRIANGLE_EDGE" : 4
+}
+
+CODE.relativePositionPoint2DWithSegment2D = {
+	"UNKNOWN" : 0,
+	"OUTSIDE" : 1,
+	"INSIDE" : 2,
+	"COINCIDENT_WITH_START_POINT" : 3,
+	"COINCIDENT_WITH_END_POINT" : 4
+}
