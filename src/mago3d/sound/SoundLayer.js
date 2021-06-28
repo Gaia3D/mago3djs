@@ -114,8 +114,6 @@ SoundLayer.prototype._makeTextures = function ()
 
 	this.demTex = this.soundManager._newTexture(gl, texWidth, texHeight);
 	
-
-
 };
 
 SoundLayer.prototype.makeQuantizedMeshVbo = function (qMesh)
@@ -243,7 +241,6 @@ SoundLayer.prototype.makeDEMTextureByQuantizedMesh = function (qMesh)
 	gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.
 
 	fbo.unbind();
-
 };
 
 SoundLayer.prototype.doSimulationSteps = function (magoManager)

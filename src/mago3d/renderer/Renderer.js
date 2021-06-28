@@ -2133,7 +2133,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 				//texture = waterLayer.waterHeightTexA.texId;
 			}
 
-			if(waterLayer.waterSourceTex && waterLayer.waterSourceTex.texId)
+			if (waterLayer.waterSourceTex && waterLayer.waterSourceTex.texId)
 			{
 				//texture = waterLayer.waterSourceTex.texId;
 			}
@@ -2212,6 +2212,11 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 			{
 				//texture = waterLayer.waterAditionTex.texId;
 			}
+
+			if(waterLayer.original_dem_texture && waterLayer.original_dem_texture.texId)
+			{
+				texture = waterLayer.original_dem_texture.texId;
+			}
 		}
 	}
 
@@ -2222,7 +2227,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 			var soundLayer = magoManager.soundManager.soundLayersArray[0];
 			if(soundLayer.demTex && soundLayer.demTex.texId)
 			{
-				texture = soundLayer.demTex.texId;
+				//texture = soundLayer.demTex.texId;
 			}
 		}
 	}

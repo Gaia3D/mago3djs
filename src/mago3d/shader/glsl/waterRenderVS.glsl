@@ -250,6 +250,9 @@ void main()
 	//float terrainHeight = getTerrainHeight_interpolated(texCoord);
 	float height = terrainHeight + vWaterHeight + vContaminantHeight;
 
+	// Test debug:
+	//height += 5.0;
+
 	//if(thisIsBorderWater)
 	//{
 	//	height = extrudeHeight;

@@ -11,19 +11,22 @@ var Water = function(waterManager, options)
 	}
 
     this.waterManager = waterManager;
-
 	this.geographicExtent;
-	this.simulationResolution = waterManager.simulationTextureWidth;
-	this.textureWidth = new Int32Array([waterManager.simulationTextureWidth]);
-	this.textureHeight = new Int32Array([waterManager.simulationTextureHeight]);
+
+	// Now, childTilesTargetDepth.
+	this._targetDepth; // the depth of tiles used to make the DEM texture from quantizedMeshes.***
+
+
+	//this.simulationResolution = waterManager.simulationTextureWidth;
+	//this.textureWidth = new Int32Array([waterManager.simulationTextureWidth]);
+	//this.textureHeight = new Int32Array([waterManager.simulationTextureHeight]);
 
 	//***************************************************************************************************************
 	// original_dem_texture -> (excavate)-> dem_texture -> (overWriteBuildings) -> demWithBuildingsTex.**************
 	// The "original_dem_texture" can NOT be modified.
 	// The "dem_texture" only can be modified by excavations & landSlides.
 	// The "demWithBuildingsTex" can be modified by buildings.
-	this.demTextureWidth = 512;
-	this.demTextureHeight = 512;
+
 	this.original_dem_texture; // this is the original DEM texture. Do NOT modify.
 	this.dem_withExcavation;
 	this.dem_texture_A;
@@ -81,7 +84,7 @@ var Water = function(waterManager, options)
 	this.waterMaxHeight = 100.0; // ok.
 	this.waterMaxFlux = 5000.0; // ok. (4000 is no enought).
 	this.waterMaxVelocity = 40.0;
-	this.contaminantMaxheight = -1.0;
+	this.contaminantMaxheight = -1.0; // value when there are no exist contaminant.
 	this.contaminantMaxheight = 50.0;
 
 	this.simulationTimeStep = 0.25; // ok.
@@ -100,6 +103,16 @@ var Water = function(waterManager, options)
 		if(options.geographicExtent)
 		{
 			this.geographicExtent = options.geographicExtent;
+		}
+
+		if(options.tileIndices)
+		{
+			this.tileIndices = options.tileIndices;
+		}
+
+		if(options.targetDepth)
+		{
+			this._targetDepth = options.targetDepth;
 		}
 	}
 };
@@ -130,45 +143,48 @@ Water.prototype.init = function ()
 
 Water.prototype._makeTextures = function ()
 {
-	var magoManager = this.waterManager.magoManager;
+	var waterManager = this.waterManager;
+	var magoManager = waterManager.magoManager;
 	var gl = magoManager.getGl();
 
 	// water simulation texture size: it depends of waterManager.
-	var texWidth = this.textureWidth[0];
-	var texHeight = this.textureHeight[0];
+	//var texWidth = this.textureWidth[0];
+	//var texHeight = this.textureHeight[0];
+	var texWidth = waterManager.simulationTextureSize[0];
+	var texHeight = waterManager.simulationTextureSize[1];
 
-	this.waterAditionTex = this.waterManager._newTexture(gl, texWidth, texHeight);
+	this.waterAditionTex = waterManager._newTexture(gl, texWidth, texHeight);
 	
 	// make a heightMap and a fluxMap.
-	this.waterHeightTexA = this.waterManager._newTexture(gl, texWidth, texHeight);
-	this.waterHeightTexB = this.waterManager._newTexture(gl, texWidth, texHeight);
+	this.waterHeightTexA = waterManager._newTexture(gl, texWidth, texHeight);
+	this.waterHeightTexB = waterManager._newTexture(gl, texWidth, texHeight);
 
 	this.waterHeightTexA.name = "A";
 	this.waterHeightTexB.name = "B";
 
-	this.waterFluxTexA_HIGH = this.waterManager._newTexture(gl, texWidth, texHeight);; // water fluxing in 4 directions. splitted values in high & low.
-	this.waterFluxTexB_HIGH = this.waterManager._newTexture(gl, texWidth, texHeight);; // water fluxing in 4 directions. splitted values in high & low.
-	this.waterFluxTexA_LOW = this.waterManager._newTexture(gl, texWidth, texHeight);; // water fluxing in 4 directions. splitted values in high & low.
-	this.waterFluxTexB_LOW = this.waterManager._newTexture(gl, texWidth, texHeight);; // water fluxing in 4 directions. splitted values in high & low.
+	this.waterFluxTexA_HIGH = waterManager._newTexture(gl, texWidth, texHeight);; // water fluxing in 4 directions. splitted values in high & low.
+	this.waterFluxTexB_HIGH = waterManager._newTexture(gl, texWidth, texHeight);; // water fluxing in 4 directions. splitted values in high & low.
+	this.waterFluxTexA_LOW = waterManager._newTexture(gl, texWidth, texHeight);; // water fluxing in 4 directions. splitted values in high & low.
+	this.waterFluxTexB_LOW = waterManager._newTexture(gl, texWidth, texHeight);; // water fluxing in 4 directions. splitted values in high & low.
 	
-	this.waterVelocityTexA = this.waterManager._newTexture(gl, texWidth, texHeight);
-	this.waterVelocityTexB = this.waterManager._newTexture(gl, texWidth, texHeight);
+	this.waterVelocityTexA = waterManager._newTexture(gl, texWidth, texHeight);
+	this.waterVelocityTexB = waterManager._newTexture(gl, texWidth, texHeight);
 
-	this.demWithBuildingsTex = this.waterManager._newTexture(gl, texWidth, texHeight);
+	this.demWithBuildingsTex = waterManager._newTexture(gl, texWidth, texHeight);
 	
 	// Shade Log textures.**********************************************************************************************************************
-	this.shaderLogTexA = this.waterManager._newTexture(gl, texWidth, texHeight); // auxiliar tex to debug shaders. delete after use.
-	this.shaderLogTexB = this.waterManager._newTexture(gl, texWidth, texHeight); // auxiliar tex to debug shaders. delete after use.
+	this.shaderLogTexA = waterManager._newTexture(gl, texWidth, texHeight); // auxiliar tex to debug shaders. delete after use.
+	this.shaderLogTexB = waterManager._newTexture(gl, texWidth, texHeight); // auxiliar tex to debug shaders. delete after use.
 
-	this.shaderLogTex_Flux_A = this.waterManager._newTexture(gl, texWidth, texHeight); // auxiliar tex to debug shaders. delete after use.
-	this.shaderLogTex_Flux_B = this.waterManager._newTexture(gl, texWidth, texHeight); // auxiliar tex to debug shaders. delete after use.
+	this.shaderLogTex_Flux_A = waterManager._newTexture(gl, texWidth, texHeight); // auxiliar tex to debug shaders. delete after use.
+	this.shaderLogTex_Flux_B = waterManager._newTexture(gl, texWidth, texHeight); // auxiliar tex to debug shaders. delete after use.
 
 	// Particles.********************************************************************************************************************************
 	// Now, inicialitze particles random position.
-	var particlesTexWidth = this.waterManager.particlesRenderTexWidth;
-	var particlesTexHeight = this.waterManager.particlesRenderTexHeight;
-	this.particlesTex_A = this.waterManager._newTexture(gl, particlesTexWidth, particlesTexHeight);
-	this.particlesTex_B = this.waterManager._newTexture(gl, particlesTexWidth, particlesTexHeight);
+	var particlesTexWidth = waterManager.particlesRenderTexWidth;
+	var particlesTexHeight = waterManager.particlesRenderTexHeight;
+	this.particlesTex_A = waterManager._newTexture(gl, particlesTexWidth, particlesTexHeight);
+	this.particlesTex_B = waterManager._newTexture(gl, particlesTexWidth, particlesTexHeight);
 	var numParticles = this.windRes * this.windRes;
 	var particleState = new Uint8Array(numParticles * 4);
 	for (var i = 0; i < particleState.length; i++) 
@@ -181,22 +197,351 @@ Water.prototype._makeTextures = function ()
 	this.particlesPosTex_B.texId = Texture.createTexture(gl, gl.NEAREST, particleState, this.windRes, this.windRes);
 
 	// Contamination texture.*********************************************************************************************************************
-	this.contaminationTex_A = this.waterManager._newTexture(gl, texWidth, texHeight);
-	this.contaminationTex_B = this.waterManager._newTexture(gl, texWidth, texHeight);
+	this.contaminationTex_A = waterManager._newTexture(gl, texWidth, texHeight);
+	this.contaminationTex_B = waterManager._newTexture(gl, texWidth, texHeight);
 
-	this.contaminantSourceTex = this.waterManager._newTexture(gl, texWidth, texHeight);
+	this.contaminantSourceTex = waterManager._newTexture(gl, texWidth, texHeight);
 
 	// DEM texture.*******************************************************************************************************************************
 	this.dem_withExcavation; // do NOT create here.
 	this.dem_texture_A; // do NOT create here.
 	this.dem_texture_B; // do NOT create here.
-	this.terrainFluxTexA_HIGH = this.waterManager._newTexture(gl, texWidth, texHeight); // terrain fluxing in 4 directions. splitted values in high & low.
-	this.terrainFluxTexB_HIGH = this.waterManager._newTexture(gl, texWidth, texHeight); // terrain fluxing in 4 directions. splitted values in high & low.
-	this.terrainFluxTexA_LOW = this.waterManager._newTexture(gl, texWidth, texHeight); // terrain fluxing in 4 directions. splitted values in high & low.
-	this.terrainFluxTexB_LOW = this.waterManager._newTexture(gl, texWidth, texHeight); 
-	this.terrainMaxSlippageTex = this.waterManager._newTexture(gl, texWidth, texHeight); 
+	this.terrainFluxTexA_HIGH = waterManager._newTexture(gl, texWidth, texHeight); // terrain fluxing in 4 directions. splitted values in high & low.
+	this.terrainFluxTexB_HIGH = waterManager._newTexture(gl, texWidth, texHeight); // terrain fluxing in 4 directions. splitted values in high & low.
+	this.terrainFluxTexA_LOW = waterManager._newTexture(gl, texWidth, texHeight); // terrain fluxing in 4 directions. splitted values in high & low.
+	this.terrainFluxTexB_LOW = waterManager._newTexture(gl, texWidth, texHeight); 
+	this.terrainMaxSlippageTex = waterManager._newTexture(gl, texWidth, texHeight); 
 
 	gl.bindTexture(gl.TEXTURE_2D, null);
+};
+
+Water.prototype.makeDEMTextureByQuantizedMeshes = function ()
+{
+	if(!this.isPrepared())
+	{ return; }
+
+	// Must calculate the minHeight & maxHeight of the water simulation area.***
+	// So, to do this, reset the altitudes of the geographicExtension.
+	this.geographicExtent.setExtentAltitudes(10000.0, -10000.0);
+	var tilesCount = this.tilesArray.length;
+	for(var i=0; i<tilesCount; i++)
+	{
+		var tile = this.tilesArray[i];
+		var minHeight = tile.qMesh._minimumHeight;
+		var maxHeight = tile.qMesh._maximumHeight;
+
+		// In this point, calculate the minimumHeight and the maximumHeight of the simulation area.***
+		if(this.geographicExtent.minGeographicCoord.altitude > minHeight)
+		{
+			this.geographicExtent.minGeographicCoord.altitude = minHeight;
+		}
+		else if(this.geographicExtent.maxGeographicCoord.altitude < maxHeight)
+		{
+			this.geographicExtent.maxGeographicCoord.altitude = maxHeight;
+		}
+	}
+
+	this.terrainMinMaxHeights[0] = this.geographicExtent.minGeographicCoord.altitude;
+	this.terrainMinMaxHeights[1] = this.geographicExtent.maxGeographicCoord.altitude;
+
+	// Now, make the vbo of the each tile.***
+	var tilesCount = this.tilesArray.length;
+	for(var i=0; i<tilesCount; i++)
+	{
+		var tile = this.tilesArray[i];
+		if(!tile.qMeshVboKeyContainer)
+		{
+			this._makeQuantizedMeshVbo(tile);
+		}
+	}
+	
+	var waterManager = this.waterManager;
+	var magoManager = waterManager.magoManager;
+	var vboMemManager = magoManager.vboMemoryManager;
+	var gl = magoManager.getGl();
+	var fbo = waterManager.terrainTexFbo; // simulation fbo. (512 x 512).
+	//var fbo = waterManager.fbo; // simulation fbo. (1024 x 1024).
+	var extbuffers = fbo.extbuffers;
+	var shader;
+
+
+	gl.disable(gl.BLEND);
+	gl.disable(gl.CULL_FACE);
+	gl.clearColor(1.0, 0.0, 0.0, 0.0);
+	gl.clearDepth(1.0);
+
+	if(!this.original_dem_texture)
+	{
+		//var texWidth = waterManager.simulationTextureSize[0];
+		//var texHeight = waterManager.simulationTextureSize[1];
+		var texWidth = waterManager.terrainTextureSize[0];
+		var texHeight = waterManager.terrainTextureSize[1];
+
+		this.original_dem_texture = waterManager._newTexture(gl, texWidth, texHeight);
+	}
+
+	// 2n, make building depth over terrain depth.******************************************************************************************************
+	fbo.bind();
+	gl.viewport(0, 0, fbo.width[0], fbo.height[0]);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.original_dem_texture.texId, 0); // depthTex.
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // normalTex.
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // albedoTex.
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0); // .
+	extbuffers.drawBuffersWEBGL([
+		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
+		extbuffers.NONE, // gl_FragData[1]
+		extbuffers.NONE, // gl_FragData[2]
+		extbuffers.NONE, // gl_FragData[3]
+		]);
+
+	shader = magoManager.postFxShadersManager.getShader("depthTexFromQuantizedMesh");
+	magoManager.postFxShadersManager.useProgram(shader);
+	shader.bindUniformGenerals();
+
+	//gl.uniform2fv(shader.u_minMaxHeights_loc, [this.qMesh._minimumHeight, this.qMesh._maximumHeight]);
+
+	//gl.disable(gl.CULL_FACE);
+	gl.clear(gl.DEPTH_BUFFER_BIT);
+
+	// Now, set the waterSimGeoExtent & the qMeshGeoExtent.
+	var geoExtent = this.geographicExtent;
+	gl.uniform3fv(shader.u_totalMinGeoCoord_loc, [geoExtent.minGeographicCoord.longitude, geoExtent.minGeographicCoord.latitude, geoExtent.minGeographicCoord.altitude]);
+	gl.uniform3fv(shader.u_totalMaxGeoCoord_loc, [geoExtent.maxGeographicCoord.longitude, geoExtent.maxGeographicCoord.latitude, geoExtent.maxGeographicCoord.altitude]);
+
+	for(var i=0; i<tilesCount; i++)
+	{
+		var tile = this.tilesArray[i];
+		var tileGeoExtent = tile.geoExtent;
+		gl.uniform3fv(shader.u_currentMinGeoCoord_loc, [tileGeoExtent.minGeographicCoord.longitude, tileGeoExtent.minGeographicCoord.latitude, tile.qMesh._minimumHeight]);
+		gl.uniform3fv(shader.u_currentMaxGeoCoord_loc, [tileGeoExtent.maxGeographicCoord.longitude, tileGeoExtent.maxGeographicCoord.latitude, tile.qMesh._maximumHeight]);
+
+
+		var vbo_vicky = tile.qMeshVboKeyContainer.vboCacheKeysArray[0]; // there are only one.
+		var vertices_count = vbo_vicky.vertexCount;
+
+		// Bind positions.
+		vbo_vicky.vboBufferPos.bindData(shader, shader.a_pos, vboMemManager);
+		
+		//if (!vbo_vicky.bindDataNormal(shader, magoManager.vboMemoryManager))
+		//{ return false; }
+
+		//if (!vbo_vicky.bindDataTexCoord(shader, magoManager.vboMemoryManager))
+		//{ return false; }
+
+		var indicesCount = vbo_vicky.indicesCount;
+		if (!vbo_vicky.bindDataIndice(shader, magoManager.vboMemoryManager))
+		{ return false; }
+
+		gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.
+		
+	}
+
+	
+
+	fbo.unbind();
+	gl.enable(gl.CULL_FACE);
+
+	this.original_dem_texture.fileLoadState = CODE.fileLoadState.BINDING_FINISHED;
+};
+
+Water.prototype.makeDEMTextureByQuantizedMesh__original = function (qMesh)
+{
+	if(!this.isPrepared())
+	{ return; }
+
+	if(!this.qMeshVboKeyContainer)
+	{
+		this.makeQuantizedMeshVbo(qMesh);
+	}
+	
+	var waterManager = this.waterManager;
+	var magoManager = waterManager.magoManager;
+	var vboMemManager = magoManager.vboMemoryManager;
+	var gl = magoManager.getGl();
+	var fbo = waterManager.terrainTexFbo; // simulation fbo. (512 x 512).
+	//var fbo = waterManager.fbo; // simulation fbo. (1024 x 1024).
+	var extbuffers = fbo.extbuffers;
+	var shader;
+
+
+	gl.disable(gl.BLEND);
+	gl.disable(gl.CULL_FACE);
+	gl.clearColor(1.0, 0.0, 0.0, 0.0);
+	gl.clearDepth(1.0);
+
+	if(!this.original_dem_texture)
+	{
+		//var texWidth = waterManager.simulationTextureSize[0];
+		//var texHeight = waterManager.simulationTextureSize[1];
+		var texWidth = waterManager.terrainTextureSize[0];
+		var texHeight = waterManager.terrainTextureSize[1];
+
+		this.original_dem_texture = waterManager._newTexture(gl, texWidth, texHeight);
+	}
+
+	// 2n, make building depth over terrain depth.******************************************************************************************************
+	fbo.bind();
+	gl.viewport(0, 0, fbo.width[0], fbo.height[0]);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.original_dem_texture.texId, 0); // depthTex.
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // normalTex.
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // albedoTex.
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0); // .
+	extbuffers.drawBuffersWEBGL([
+		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
+		extbuffers.NONE, // gl_FragData[1]
+		extbuffers.NONE, // gl_FragData[2]
+		extbuffers.NONE, // gl_FragData[3]
+		]);
+
+	shader = magoManager.postFxShadersManager.getShader("depthTexFromQuantizedMesh");
+	magoManager.postFxShadersManager.useProgram(shader);
+	shader.bindUniformGenerals();
+
+	gl.uniform2fv(shader.u_minMaxHeights_loc, [this.qMesh._minimumHeight, this.qMesh._maximumHeight]);
+
+	//gl.disable(gl.CULL_FACE);
+	gl.clear(gl.DEPTH_BUFFER_BIT);
+
+	var vbo_vicky = this.qMeshVboKeyContainer.vboCacheKeysArray[0]; // there are only one.
+	var vertices_count = vbo_vicky.vertexCount;
+
+	// Bind positions.
+	vbo_vicky.vboBufferPos.bindData(shader, shader.a_pos, vboMemManager);
+	
+	//if (!vbo_vicky.bindDataNormal(shader, magoManager.vboMemoryManager))
+	//{ return false; }
+
+	//if (!vbo_vicky.bindDataTexCoord(shader, magoManager.vboMemoryManager))
+	//{ return false; }
+
+	var indicesCount = vbo_vicky.indicesCount;
+	if (!vbo_vicky.bindDataIndice(shader, magoManager.vboMemoryManager))
+	{ return false; }
+
+	gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.
+
+	fbo.unbind();
+	gl.enable(gl.CULL_FACE);
+
+	this.original_dem_texture.fileLoadState = CODE.fileLoadState.BINDING_FINISHED;
+};
+
+Water.prototype._makeQuantizedMeshVbo = function (tile)
+{
+	var qMesh = tile.qMesh;
+	var minHeight = qMesh._minimumHeight;
+	var maxHeight = qMesh._maximumHeight;
+	var uValues = qMesh._uValues;
+	var vValues = qMesh._vValues;
+	var hValues = qMesh._heightValues;
+	this.indices = qMesh._indices;
+
+	// Now, make vbo.***
+	var pointsCount = uValues.length;
+	this.cartesiansArray = new Uint16Array(pointsCount * 3);
+
+	var shortMax = 32767;
+	var x, y, z;
+	for(var i=0; i<pointsCount; i++)
+	{
+		x = uValues[i];
+		y = vValues[i];
+		z = hValues[i];
+
+		this.cartesiansArray[i * 3] = x;
+		this.cartesiansArray[i * 3 + 1] = y;
+		this.cartesiansArray[i * 3 + 2] = z;
+	}
+
+	var magoManager = this.waterManager.magoManager;
+	var vboMemManager = magoManager.vboMemoryManager;
+
+	if (tile.qMeshVboKeyContainer === undefined)
+	{ tile.qMeshVboKeyContainer = new VBOVertexIdxCacheKeysContainer(); }
+	
+	var vboKey = tile.qMeshVboKeyContainer.newVBOVertexIdxCacheKey();
+	
+	// Positions.
+	vboKey.setDataArrayPos(this.cartesiansArray, vboMemManager);
+
+	// Normals.
+	if (this.normalsArray)
+	{
+		vboKey.setDataArrayNor(this.normalsArray, vboMemManager);
+	}
+	
+	// TexCoords.
+	if (this.texCoordsArray)
+	{
+		vboKey.setDataArrayTexCoord(this.texCoordsArray, vboMemManager);
+	}
+		
+	// Indices.
+	vboKey.setDataArrayIdx(this.indices, vboMemManager);
+
+	var hola = 0;
+};
+
+Water.prototype.makeQuantizedMeshVbo__original = function (qMesh)
+{
+	if(this.qMeshVboKeyContainer)
+	{
+		return true;
+	}
+
+	var minHeight = qMesh._minimumHeight;
+	var maxHeight = qMesh._maximumHeight;
+	var uValues = qMesh._uValues;
+	var vValues = qMesh._vValues;
+	var hValues = qMesh._heightValues;
+	this.indices = qMesh._indices;
+
+	// Now, make vbo.***
+	var pointsCount = uValues.length;
+	this.cartesiansArray = new Uint16Array(pointsCount * 3);
+	
+	// Now, scale the mesh into the this.geoExtension.***
+
+	var shortMax = 32767;
+	var x, y, z;
+	for(var i=0; i<pointsCount; i++)
+	{
+		x = uValues[i];
+		y = vValues[i];
+		z = hValues[i];
+
+		this.cartesiansArray[i * 3] = x;
+		this.cartesiansArray[i * 3 + 1] = y;
+		this.cartesiansArray[i * 3 + 2] = z;
+	}
+
+	var magoManager = this.waterManager.magoManager;
+	var vboMemManager = magoManager.vboMemoryManager;
+
+	if (this.qMeshVboKeyContainer === undefined)
+	{ this.qMeshVboKeyContainer = new VBOVertexIdxCacheKeysContainer(); }
+	
+	var vboKey = this.qMeshVboKeyContainer.newVBOVertexIdxCacheKey();
+	
+	// Positions.
+	vboKey.setDataArrayPos(this.cartesiansArray, vboMemManager);
+
+	// Normals.
+	if (this.normalsArray)
+	{
+		vboKey.setDataArrayNor(this.normalsArray, vboMemManager);
+	}
+	
+	// TexCoords.
+	if (this.texCoordsArray)
+	{
+		vboKey.setDataArrayTexCoord(this.texCoordsArray, vboMemManager);
+	}
+		
+	// Indices.
+	vboKey.setDataArrayIdx(this.indices, vboMemManager);
+
+	var hola = 0;
 };
 
 /**
@@ -212,6 +557,15 @@ Water.prototype.isPrepared = function()
 	return true;
 };
 
+Water.prototype._loadQuantizedMesh = function (L, X, Y, tile)
+{
+	tile.qMeshPromise = this.waterManager.terrainProvider.requestTileGeometry(X, Y, L);
+	tile.qMeshPromise.then((value) =>
+	{
+		tile.qMesh = value;
+		tile.geoExtent = SmartTile.getGeographicExtentOfTileLXY(L, X, Y, undefined, CODE.imageryType.CRS84);
+	});
+};
 
 Water.prototype.prepareTextures = function ()
 {
@@ -269,28 +623,125 @@ Water.prototype.prepareTextures = function ()
 	}
 
 	// Original DEM texture.**************************************************************************************************
-	if(!this.original_dem_texture)
+	// Note : the original dem texture can provide from HeightMapTexture or quantizedMesh.
+	if(this.waterManager.terrainDemSourceType === "HIGHMAP")
 	{
-		var magoManager = this.waterManager.magoManager;
-		var gl = magoManager.getGl();
+		if(!this.original_dem_texture)
+		{
+			var magoManager = this.waterManager.magoManager;
+			var gl = magoManager.getGl();
 
-		// load test texture dem.
-		this.original_dem_texture = new Texture();
-		this.original_dem_texture.texId = gl.createTexture();
-		return false;
-	}
-	else if (this.original_dem_texture.fileLoadState === CODE.fileLoadState.READY)
-	{
-		var magoManager = this.waterManager.magoManager;
-		var gl = magoManager.getGl();
-		var dem_texturePath = '/images/en/demSampleTest.png';
+			// load test texture dem.
+			this.original_dem_texture = new Texture();
+			this.original_dem_texture.texId = gl.createTexture();
+			return false;
+		}
+		else if (this.original_dem_texture.fileLoadState === CODE.fileLoadState.READY)
+		{
+			var magoManager = this.waterManager.magoManager;
+			var gl = magoManager.getGl();
+			var dem_texturePath = '/images/en/demSampleTest.png'; // provisional.***
 
-		ReaderWriter.loadImage(gl, dem_texturePath, this.original_dem_texture);
-		return false;
+			ReaderWriter.loadImage(gl, dem_texturePath, this.original_dem_texture);
+			return false;
+		}
+		else if (this.original_dem_texture.fileLoadState !== CODE.fileLoadState.BINDING_FINISHED)
+		{
+			return false;
+		}
 	}
-	else if (this.original_dem_texture.fileLoadState !== CODE.fileLoadState.BINDING_FINISHED)
+	else if (this.waterManager.terrainDemSourceType === "QUANTIZEDMESH")
 	{
-		return false;
+		// check the needed tiles.***
+
+		if(!this.tilesArray)
+		{
+			// 1rst, must find the tile depth with similar size of my geoExtent.***
+			var geoExtent = this.geographicExtent;
+			// From my geoExtent, determine the minimum size of the rectangle.
+			var lonRangeDegree = geoExtent.maxGeographicCoord.longitude - geoExtent.minGeographicCoord.longitude;
+			var latRangeDegree = geoExtent.maxGeographicCoord.latitude - geoExtent.minGeographicCoord.latitude;
+			var targetDepth = -1;
+			if(lonRangeDegree < latRangeDegree)
+			{
+				// use lonRange to determine the closes tile depth.
+				var angDepthRange;
+				for(var i=1; i<30; i++)
+				{
+					angDepthRange = SmartTile.selectTileAngleRangeByDepth(i);
+					if(angDepthRange < lonRangeDegree)
+					{
+						targetDepth = i;
+						break;
+					}
+				}
+			}
+			else
+			{
+				// use latRange to determine the closes tile depth.
+				var angDepthRange;
+				for(var i=1; i<30; i++)
+				{
+					angDepthRange = SmartTile.selectTileAngleRangeByDepth(i);
+					if(angDepthRange < latRangeDegree)
+					{
+						targetDepth = i;
+						break;
+					}
+				}
+			}
+
+			var waterManager = this.waterManager;
+			waterManager.simulationTileDepth = targetDepth;
+			var simulationTileDepth = waterManager.simulationTileDepth;
+			this._targetDepth = simulationTileDepth + 4;
+			var depth = this._targetDepth;
+			
+			var minLon = geoExtent.minGeographicCoord.longitude;
+			var minLat = geoExtent.minGeographicCoord.latitude;
+			var maxLon = geoExtent.maxGeographicCoord.longitude;
+			var maxLat = geoExtent.maxGeographicCoord.latitude;
+
+			this.tilesArray = SmartTile.selectTileIndicesArray(depth, minLon, minLat, maxLon, maxLat, undefined);
+		}
+
+		// Now, check if tile's qMesh is loaded.***
+		if(!this.allQuantizedMeshesLoaded)
+		{
+			var allQuantizedMeshesLoaded = true;
+			var tilesCount = this.tilesArray.length;
+			for(var i=0; i<tilesCount; i++)
+			{
+				var tile = this.tilesArray[i];
+				if(!tile.qMesh)
+				{
+					if(!tile.qMeshPromise)
+					{
+						var X = tile.X;
+						var Y = tile.Y;
+						var L = tile.L;
+						this._loadQuantizedMesh(L, X, Y, tile);
+					}
+
+					allQuantizedMeshesLoaded = false;
+				}
+			}
+
+			if(allQuantizedMeshesLoaded)
+			{
+				this.allQuantizedMeshesLoaded = true;
+			}
+		}
+
+		if(this.allQuantizedMeshesLoaded)
+		{
+			// Make dem texture from qMeshes.***
+			if(!this.original_dem_texture)
+			{
+				this.makeDEMTextureByQuantizedMeshes();
+			}
+			var hola = 0;
+		}
 	}
 
 	// Terrain difusse texture.**************************************************************************************************
@@ -350,13 +801,252 @@ Water.prototype.prepareTextures = function ()
 	// Copy demTexture to preserve the originalDEMTexture.***********************************************************************
 	if (!this.dem_texture_A)
 	{
-		if (this.original_dem_texture.fileLoadState === CODE.fileLoadState.BINDING_FINISHED)
+		if (this.original_dem_texture && this.original_dem_texture.fileLoadState === CODE.fileLoadState.BINDING_FINISHED)
 		{
 			var magoManager = this.waterManager.magoManager;
 			var gl = magoManager.getGl();
 
-			var texWidth = this.textureWidth[0];
-			var texHeight = this.textureHeight[0];
+			// Note : dem_texture_A & dem_texture_B is used for landSlide simulation.***
+			// dem_texture_A & dem_texture_B must to be simulation texture size.***
+
+			var texWidth = this.waterManager.simulationTextureSize[0];
+			var texHeight = this.waterManager.simulationTextureSize[1];
+			this.dem_texture_A = this.waterManager._newTexture(gl, texWidth, texHeight);
+			var bFlipTexcoordY = true;
+			this.copyTexture(this.original_dem_texture, [this.dem_texture_A], bFlipTexcoordY);
+
+			// create the dem_texture_B too.
+			this.dem_texture_B = this.waterManager._newTexture(gl, texWidth, texHeight);
+			this.copyTexture(this.original_dem_texture, [this.dem_texture_B], bFlipTexcoordY);
+			this.dem_withExcavation = this.waterManager._newTexture(gl, texWidth, texHeight);
+			this.copyTexture(this.original_dem_texture, [this.dem_withExcavation], bFlipTexcoordY);
+		}
+		return false;
+	}
+
+	return true;
+};
+
+Water.prototype.prepareTextures__original = function ()
+{
+	// Water source texture.**************************************************************************************************
+	if(!this.waterSourceTex)
+	{
+		var magoManager = this.waterManager.magoManager;
+		var gl = magoManager.getGl();
+
+		// load test texture dem.
+		this.waterSourceTex = new Texture();
+		this.waterSourceTex.texId = gl.createTexture();
+		return false;
+	}
+	else if (this.waterSourceTex.fileLoadState === CODE.fileLoadState.READY)
+	{
+		var magoManager = this.waterManager.magoManager;
+		var gl = magoManager.getGl();
+		//var texturePath = '/images/en/waterSourceTexTestlow.png';
+		//var texturePath = '/images/en/waterSourceTexTest_rain.png';
+		var texturePath = '/images/en/black.png';
+		//var texturePath = '/images/en/contaminantHigh.png';
+
+		ReaderWriter.loadImage(gl, texturePath, this.waterSourceTex);
+		return false;
+	}
+	else if (this.waterSourceTex.fileLoadState !== CODE.fileLoadState.BINDING_FINISHED)
+	{
+		return false;
+	}
+
+	// Rain if exist.**************************************************************************************************
+	if(!this.rainTex)
+	{
+		var magoManager = this.waterManager.magoManager;
+		var gl = magoManager.getGl();
+
+		// load test texture dem.
+		this.rainTex = new Texture();
+		this.rainTex.texId = gl.createTexture();
+		return false;
+	}
+	else if (this.rainTex.fileLoadState === CODE.fileLoadState.READY)
+	{
+		var magoManager = this.waterManager.magoManager;
+		var gl = magoManager.getGl();
+		var texturePath = '/images/en/waterSourceTexTest_rain.png';
+
+		ReaderWriter.loadImage(gl, texturePath, this.rainTex);
+		return false;
+	}
+	else if (this.rainTex.fileLoadState !== CODE.fileLoadState.BINDING_FINISHED)
+	{
+		return false;
+	}
+
+	// Original DEM texture.**************************************************************************************************
+	// Note : the original dem texture can provide from HeightMapTexture or quantizedMesh.
+	if(this.waterManager.terrainDemSourceType === "HIGHMAP")
+	{
+		if(!this.original_dem_texture)
+		{
+			var magoManager = this.waterManager.magoManager;
+			var gl = magoManager.getGl();
+
+			// load test texture dem.
+			this.original_dem_texture = new Texture();
+			this.original_dem_texture.texId = gl.createTexture();
+			return false;
+		}
+		else if (this.original_dem_texture.fileLoadState === CODE.fileLoadState.READY)
+		{
+			var magoManager = this.waterManager.magoManager;
+			var gl = magoManager.getGl();
+			var dem_texturePath = '/images/en/demSampleTest.png'; // provisional.***
+
+			ReaderWriter.loadImage(gl, dem_texturePath, this.original_dem_texture);
+			return false;
+		}
+		else if (this.original_dem_texture.fileLoadState !== CODE.fileLoadState.BINDING_FINISHED)
+		{
+			return false;
+		}
+	}
+	else if (this.waterManager.terrainDemSourceType === "QUANTIZEDMESH")
+	{
+		// 1rst, make a needed tilesMap:
+		if(!this.targetTilesMap)
+		{
+			this.targetTilesMap = {};
+
+			// Need find all children tiles of targetDepth under the current tile.
+
+			var L = this.tileIndices.L;
+			var X = this.tileIndices.X;
+			var Y = this.tileIndices.Y;
+
+			this._targetDepth = L + 2; // test debug.***
+			var targetL = this._targetDepth;
+			var difDepth = targetL - L;
+
+			var expNumber = Math.pow(2, difDepth);
+			var minX = X * expNumber;
+			var numCols = expNumber;
+			var maxX = minX + numCols - 1;
+
+			var minY = Y * expNumber;
+			var numRows = expNumber;
+			var maxY = minY + numRows - 1;
+
+			this.targetTilesMap[targetL] = {};
+			for(var i=minX; i <= maxX; i++)
+			{
+				this.targetTilesMap[targetL][i] = {};
+				for(var j=minY; j<=maxY; j++)
+				{
+					this.targetTilesMap[targetL][i][j] = {};
+				}
+			}
+		}
+
+		
+		// In this case load the quantizedMesh from terainProvider.
+		// Once qMesh loaded, then make the original_dem_texture from qMesh.
+		if(!this.qMesh)
+		{
+			if(!this.qMeshPromise)
+			{
+				var X = this.tileIndices.X;
+				var Y = this.tileIndices.Y;
+				var L = this.tileIndices.L;
+				this.qMeshPromise = this.waterManager.terrainProvider.requestTileGeometry(X, Y, L);
+				this.qMeshPromise.then((value) =>
+				{
+					this.qMesh = value;
+					this.qMesh.tileIndices = {
+						L : L, X : X, Y : Y
+					}; // no necessary.
+
+					this.terrainMinMaxHeights = new Float32Array([this.qMesh._minimumHeight, this.qMesh._maximumHeight]);
+					
+				});
+
+			}
+			return false;
+		}
+		else if(!this.original_dem_texture)
+		{
+			this.makeDEMTextureByQuantizedMesh(this.qMesh);
+			return false;
+		}
+		
+	}
+
+	// Terrain difusse texture.**************************************************************************************************
+	if(!this.terrainDiffTex)
+	{
+		var magoManager = this.waterManager.magoManager;
+		var gl = magoManager.getGl();
+
+		// load test texture dem.
+		this.terrainDiffTex = new Texture();
+		this.terrainDiffTex.texId = gl.createTexture();
+		return false;
+	}
+	else if (this.terrainDiffTex.fileLoadState === CODE.fileLoadState.READY)
+	{
+		var magoManager = this.waterManager.magoManager;
+		var gl = magoManager.getGl();
+		var dem_texturePath = '/images/en/waterTerrainDifusse.png';
+		//var dem_texturePath = '/images/en/demSampleTest.png';
+		//var dem_texturePath = '/images/en/terrainColor.png';
+
+		ReaderWriter.loadImage(gl, dem_texturePath, this.terrainDiffTex);
+		return false;
+	}
+	else if (this.terrainDiffTex.fileLoadState !== CODE.fileLoadState.BINDING_FINISHED)
+	{
+		return false;
+	}
+
+	// Terrain difusse texture.**************************************************************************************************
+	if(!this.terrainDiffTex2)
+	{
+		var magoManager = this.waterManager.magoManager;
+		var gl = magoManager.getGl();
+
+		// load test texture dem.
+		this.terrainDiffTex2 = new Texture();
+		this.terrainDiffTex2.texId = gl.createTexture();
+		return false;
+	}
+	else if (this.terrainDiffTex2.fileLoadState === CODE.fileLoadState.READY)
+	{
+		var magoManager = this.waterManager.magoManager;
+		var gl = magoManager.getGl();
+		//var dem_texturePath = '/images/en/waterTerrainDifusse.png';
+		//var dem_texturePath = '/images/en/demSampleTest.png';
+		var dem_texturePath = '/images/en/terrainColor.png';
+
+		ReaderWriter.loadImage(gl, dem_texturePath, this.terrainDiffTex2);
+		return false;
+	}
+	else if (this.terrainDiffTex2.fileLoadState !== CODE.fileLoadState.BINDING_FINISHED)
+	{
+		return false;
+	}
+
+	// Copy demTexture to preserve the originalDEMTexture.***********************************************************************
+	if (!this.dem_texture_A)
+	{
+		if (this.original_dem_texture && this.original_dem_texture.fileLoadState === CODE.fileLoadState.BINDING_FINISHED)
+		{
+			var magoManager = this.waterManager.magoManager;
+			var gl = magoManager.getGl();
+
+			// Note : dem_texture_A & dem_texture_B is used for landSlide simulation.***
+			// dem_texture_A & dem_texture_B must to be simulation texture size.***
+
+			var texWidth = this.waterManager.simulationTextureSize[0];
+			var texHeight = this.waterManager.simulationTextureSize[1];
 			this.dem_texture_A = this.waterManager._newTexture(gl, texWidth, texHeight);
 			var bFlipTexcoordY = true;
 			this.copyTexture(this.original_dem_texture, [this.dem_texture_A], bFlipTexcoordY);
@@ -401,7 +1091,10 @@ Water.prototype.doSimulationSteps = function (magoManager)
 	var extbuffers = fbo.extbuffers;
 	var shader;
 
-	//-----------------------------------------------------------------------------------------------------------------------------------------------------
+	// 1rst, check if dem texture is ready.
+
+
+	//---------------------------------------------------------------------------------------------------------------------------------
 	// Check if simulate landSlides.
 	if(this.waterManager.bDoLandSlideSimulation)
 	{
@@ -490,8 +1183,8 @@ Water.prototype.doSimulationSteps = function (magoManager)
 	magoManager.postFxShadersManager.useProgram(shader);
 
 	gl.uniform1f(shader.u_SimRes_loc, this.simulationResolution);
-	gl.uniform2fv(shader.u_simulationTextureSize_loc, [waterManager.simulationTextureWidth, waterManager.simulationTextureHeight]);
-	gl.uniform2fv(shader.u_terrainTextureSize_loc, [this.demTextureWidth, this.demTextureHeight]);
+	gl.uniform2fv(shader.u_simulationTextureSize_loc, waterManager.simulationTextureSize);
+	gl.uniform2fv(shader.u_terrainTextureSize_loc, waterManager.terrainTextureSize);
 
 	gl.uniform1f(shader.u_timestep_loc, this.simulationTimeStep);
 	gl.uniform2fv(shader.u_heightMap_MinMax_loc, this.terrainMinMaxHeights);
@@ -549,8 +1242,9 @@ Water.prototype.doSimulationSteps = function (magoManager)
 	magoManager.postFxShadersManager.useProgram(shader);
 
 	gl.uniform1f(shader.u_SimRes_loc, this.simulationResolution);
-	gl.uniform2fv(shader.u_simulationTextureSize_loc, [waterManager.simulationTextureWidth, waterManager.simulationTextureHeight]);
-	gl.uniform2fv(shader.u_terrainTextureSize_loc, [this.demTextureWidth, this.demTextureHeight]);
+	gl.uniform2fv(shader.u_simulationTextureSize_loc, waterManager.simulationTextureSize);
+	gl.uniform2fv(shader.u_terrainTextureSize_loc, waterManager.terrainTextureSize);
+
 
 	gl.uniform1f(shader.u_PipeLen_loc, 1.0); // pipeLen = cellSizeX = cellSizeY.
 	gl.uniform1f(shader.u_timestep_loc, this.simulationTimeStep);
@@ -660,8 +1354,9 @@ Water.prototype.doSimulationSteps_landSlide = function (magoManager)
 	shader = magoManager.postFxShadersManager.getShader("waterCalculateTerrainMaxSlippage");
 	magoManager.postFxShadersManager.useProgram(shader);
 
-	gl.uniform2fv(shader.u_simulationTextureSize_loc, [waterManager.simulationTextureWidth, waterManager.simulationTextureHeight]);
-	gl.uniform2fv(shader.u_terrainTextureSize_loc, [this.demTextureWidth, this.demTextureHeight]);
+	gl.uniform2fv(shader.u_simulationTextureSize_loc, waterManager.simulationTextureSize);
+	gl.uniform2fv(shader.u_terrainTextureSize_loc, waterManager.terrainTextureSize);
+
 
 	gl.uniform1f(shader.u_timestep_loc, this.simulationTimeStep);
 	gl.uniform2fv(shader.u_heightMap_MinMax_loc, this.terrainMinMaxHeights);
@@ -703,8 +1398,9 @@ Water.prototype.doSimulationSteps_landSlide = function (magoManager)
 	shader = magoManager.postFxShadersManager.getShader("waterCalculateTerrainFlux");
 	magoManager.postFxShadersManager.useProgram(shader);
 
-	gl.uniform2fv(shader.u_simulationTextureSize_loc, [waterManager.simulationTextureWidth, waterManager.simulationTextureHeight]);
-	gl.uniform2fv(shader.u_terrainTextureSize_loc, [this.demTextureWidth, this.demTextureHeight]);
+	gl.uniform2fv(shader.u_simulationTextureSize_loc, waterManager.simulationTextureSize);
+	gl.uniform2fv(shader.u_terrainTextureSize_loc, waterManager.terrainTextureSize);
+
 
 	gl.uniform1f(shader.u_timestep_loc, this.simulationTimeStep);
 	gl.uniform2fv(shader.u_heightMap_MinMax_loc, this.terrainMinMaxHeights);
@@ -747,8 +1443,9 @@ Water.prototype.doSimulationSteps_landSlide = function (magoManager)
 	shader = magoManager.postFxShadersManager.getShader("waterCalculateTerrainHeightByFlux");
 	magoManager.postFxShadersManager.useProgram(shader);
 
-	gl.uniform2fv(shader.u_simulationTextureSize_loc, [waterManager.simulationTextureWidth, waterManager.simulationTextureHeight]);
-	gl.uniform2fv(shader.u_terrainTextureSize_loc, [this.demTextureWidth, this.demTextureHeight]);
+	gl.uniform2fv(shader.u_simulationTextureSize_loc, waterManager.simulationTextureSize);
+	gl.uniform2fv(shader.u_terrainTextureSize_loc, waterManager.terrainTextureSize);
+
 
 	gl.uniform1f(shader.u_timestep_loc, this.simulationTimeStep);
 	gl.uniform2fv(shader.u_heightMap_MinMax_loc, this.terrainMinMaxHeights);
@@ -950,9 +1647,9 @@ Water.prototype.renderTerrain = function (shader, magoManager)
 	gl.uniformMatrix4fv(shader.buildingRotMatrix_loc, false, this.buildingGeoLocMat._floatArrays);
 	gl.uniform2fv(shader.u_heightMap_MinMax_loc, this.terrainMinMaxHeights);
 	gl.uniform2fv(shader.u_tileSize_loc, [this.tileSizeMeters_x, this.tileSizeMeters_y]);
-	gl.uniform2fv(shader.u_simulationTextureSize_loc, [waterManager.simulationTextureWidth, waterManager.simulationTextureHeight]);
+	gl.uniform2fv(shader.u_simulationTextureSize_loc, waterManager.simulationTextureSize);
+	gl.uniform2fv(shader.u_terrainTextureSize_loc, waterManager.terrainTextureSize);
 	gl.uniform1i(shader.uFrustumIdx_loc, magoManager.currentFrustumIdx);
-	gl.uniform2fv(shader.u_terrainTextureSize_loc, [this.demTextureWidth, this.demTextureHeight]);
 	gl.uniform2fv(shader.u_quantizedVolume_MinMax_loc, this.quantizedVolumeMinMaxHeights);
 	gl.uniform2fv(shader.u_screenSize_loc, [sceneState.drawingBufferWidth[0], sceneState.drawingBufferHeight[0]]);
 
@@ -963,7 +1660,8 @@ Water.prototype.renderTerrain = function (shader, magoManager)
 	gl.bindTexture(gl.TEXTURE_2D, this.dem_texture_A.texId); // correct.
 
 	gl.activeTexture(gl.TEXTURE2);
-	gl.bindTexture(gl.TEXTURE_2D, this.terrainDiffTex.texId);
+	//gl.bindTexture(gl.TEXTURE_2D, this.terrainDiffTex.texId);
+	gl.bindTexture(gl.TEXTURE_2D, this.original_dem_texture.texId);
 
 	gl.activeTexture(gl.TEXTURE3);
 	gl.bindTexture(gl.TEXTURE_2D, this.dem_withExcavation.texId); // 
@@ -1144,7 +1842,8 @@ Water.prototype.getTileOrthographic_mvpMat = function ()
 		//var nRange = light.directionalBoxWidth/2;
 		//var left = -nRange, right = nRange, bottom = -nRange, top = nRange, near = -depthFactor*nRange, far = depthFactor*nRange;
 		var ortho = new Matrix4();
-		ortho._floatArrays = glMatrix.mat4.ortho(ortho._floatArrays, left, right, bottom, top, near*2.0, far*2.0);
+		var nearFarScale = 5.0; // original 2.0.
+		ortho._floatArrays = glMatrix.mat4.ortho(ortho._floatArrays, left, right, bottom, top, near * nearFarScale, far * nearFarScale);
 
 		// The modelView matrix is a NO rotation matrix, centered in the midle of the tile.
 		var tMat = new Matrix4();
@@ -1177,7 +1876,7 @@ Water.prototype.makeWaterAndContaminationSourceTex = function (magoManager)
 
 	var screenQuad = this.waterManager.getQuadBuffer();
 	var gl = magoManager.getGl();
-	var fbo = this.waterManager.fbo; // simulation fbo. (512 x 512).
+	var fbo = this.waterManager.fbo; // simulation fbo. (1024 x 1024).
 	var extbuffers = fbo.extbuffers;
 	var shader;
 
@@ -1283,7 +1982,7 @@ Water.prototype.makeWaterAndContaminationSourceTex = function (magoManager)
 	
 };
 
-Water.prototype.copyTexture = function (originalTexture, dstTexturesArray, bFlipTexcoordY)
+Water.prototype.copyTexture = function (originalTexture, dstTexturesArray, bFlipTexcoordY, fbo)
 {
 	// There are the original tile DEM texture named : "dem_texture".
 	// In this function we copy the originalDEM into "demWithBuildingsTex".
@@ -1291,7 +1990,10 @@ Water.prototype.copyTexture = function (originalTexture, dstTexturesArray, bFlip
 	var magoManager = waterManager.magoManager;
 	var screenQuad = this.waterManager.getQuadBuffer();
 	var gl = magoManager.getGl();
-	var fbo = this.waterManager.fbo; // simulation fbo. (512 x 512).
+	if(!fbo)
+	{
+		fbo = this.waterManager.fbo; // simulation fbo. (512 x 512).
+	}
 	var extbuffers = fbo.extbuffers;
 	var shader;
 
@@ -1368,9 +2070,9 @@ Water.prototype.excavationDEM = function (shader, magoManager)
 	// 1rst, copy the terrain depth into "this.demWithBuildingsTex".************************************************************************************
 	if (magoManager.isFarestFrustum())
 	{ 
-		// We must copy "dem_texture" into "demWithBuildingsTex" to preserve the "dem_texture".
-		// There are the original tile DEM texture named : "dem_texture".
-		// In this function we copy the "dem_texture" into "demWithBuildingsTex".
+		// We must copy "original_dem_texture" into "demWithBuildingsTex" to preserve the "original_dem_texture".
+		// There are the original tile DEM texture named : "original_dem_texture".
+		// In this function we copy the "original_dem_texture" into "demWithBuildingsTex".
 		// Note : "dem_texture" can have excavations.
 		var bFlipTexcoordY = true;
 		this.copyTexture(this.original_dem_texture, [this.dem_texture_A], bFlipTexcoordY);
@@ -1407,7 +2109,9 @@ Water.prototype.excavationDEM = function (shader, magoManager)
 	gl.uniform3fv(shader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
 	gl.uniform4fv(shader.u_color4_loc, [1.0, 0.0, 0.0, 1.0]); //.***
 	gl.uniform2fv(shader.u_heightMap_MinMax_loc, this.terrainMinMaxHeights);
-	gl.uniform2fv(shader.u_simulationTextureSize_loc, [waterManager.simulationTextureWidth, waterManager.simulationTextureHeight]);
+	gl.uniform2fv(shader.u_simulationTextureSize_loc, waterManager.simulationTextureSize);
+	//gl.uniform2fv(shader.u_terrainTextureSize_loc, waterManager.terrainTextureSize);
+
 	gl.uniform1i(shader.u_processType_loc, 1); // 0 = overWriteDEM, 1 = excavation.
 	
 	gl.disable(gl.CULL_FACE);
@@ -1528,7 +2232,9 @@ Water.prototype.overWriteDEMWithObjects = function (shader, magoManager)
 	gl.uniform3fv(shader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
 	gl.uniform4fv(shader.u_color4_loc, [1.0, 0.0, 0.0, 1.0]); //.***
 	gl.uniform2fv(shader.u_heightMap_MinMax_loc, this.terrainMinMaxHeights);
-	gl.uniform2fv(shader.u_simulationTextureSize_loc, [waterManager.simulationTextureWidth, waterManager.simulationTextureHeight]);
+	gl.uniform2fv(shader.u_simulationTextureSize_loc, waterManager.simulationTextureSize);
+	//gl.uniform2fv(shader.u_terrainTextureSize_loc, waterManager.terrainTextureSize);
+
 	gl.uniform1i(shader.u_processType_loc, 0); // 0 = overWriteDEM, 1 = excavation.
 	
 	gl.disable(gl.CULL_FACE);
@@ -1600,8 +2306,9 @@ Water.prototype.renderWater = function (shader, magoManager)
 	gl.uniform1f(shader.u_waterMaxHeigh_loc, this.waterMaxHeight);
 	gl.uniform1f(shader.u_contaminantMaxHeigh_loc, this.contaminantMaxheight);
 	gl.uniform2fv(shader.u_tileSize_loc, [this.tileSizeMeters_x, this.tileSizeMeters_y]);
-	gl.uniform2fv(shader.u_simulationTextureSize_loc, [waterManager.simulationTextureWidth, waterManager.simulationTextureHeight]);
-	gl.uniform2fv(shader.u_terrainTextureSize_loc, [waterManager.terrainTextureWidth, waterManager.terrainTextureHeight]);
+	gl.uniform2fv(shader.u_simulationTextureSize_loc, waterManager.simulationTextureSize);
+	gl.uniform2fv(shader.u_terrainTextureSize_loc, waterManager.terrainTextureSize);
+
 
 	var projectionMatrixInv = sceneState.getProjectionMatrixInv();
   	gl.uniformMatrix4fv(shader.projectionMatrixInv_loc, false, projectionMatrixInv._floatArrays);
@@ -1652,8 +2359,8 @@ Water.prototype.renderWater = function (shader, magoManager)
 Water.prototype._makeSurface = function ()
 {
 	// CRS84.***
-	var lonSegments = this.waterManager.simulationTextureWidth;
-	var latSegments = this.waterManager.simulationTextureHeight;
+	var lonSegments = this.waterManager.simulationTextureSize[0];
+	var latSegments = this.waterManager.simulationTextureSize[1];
 
 	var altitude = 0;
 

@@ -213,6 +213,7 @@ Segment2D.prototype.getRelativePositionOfPoint2DReport = function(point2d, resul
 
 Segment2D.prototype.getRelativePositionOfSegment2DReport = function(seg2d, resultReport)
 {
+	// TODO: TODO: TODO: TODO: TODO: TODO: TODO: TODO:
 	var lineA = this.getLine();
 	var lineB = seg2d.getLine();
 
@@ -223,13 +224,33 @@ Segment2D.prototype.getRelativePositionOfSegment2DReport = function(seg2d, resul
 	var segB_ep = seg2d.endPoint2d;
 
 	var intersectedPoint = lineA.intersectionWithLine(lineB);
+	var error = 1e-8;
+	if(resultReport === undefined)
+	{
+		resultReport = {};
+	}
+	resultReport.relPos = CODE.relativePositionPoint2DWithSegment2D.UNKNOWN;
+
+	/*
+	CODE.relativePositionSegment2DWithSegment2D = {
+	"UNKNOWN" : 0,
+	"NO_INTERSECTION" : 1,
+	"INTERSECTION" : 2
+	}
+	*/
 
 	if(!intersectedPoint)
 	{
 		// Lines are parallel.***
-		// Now, must know if there are colineal.
+		// Now, must know if they are colineal.
+		if(lineA.isCoincidentPoint(segB_sp, error))
+		{
+			// they are colineal.
 
+		}
 	}
+
+	// TODO: TODO: TODO: TODO: TODO: TODO: TODO: TODO:
 };
 
 /**

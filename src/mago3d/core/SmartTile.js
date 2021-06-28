@@ -2301,6 +2301,61 @@ SmartTile.selectTileName = function(depth, longitude, latitude, resultTileName)
 	return resultTileName;
 };
 
+SmartTile.selectTileIndices = function(depth, longitude, latitude, resultTileIndices) 
+{
+	var xMin = -180.0;
+	var yMin = 90.0;
+	var angRange = SmartTile.selectTileAngleRangeByDepth(depth);
+	
+	var xIndex = Math.floor((longitude - xMin)/angRange);
+	var yIndex = Math.floor((yMin - latitude)/angRange);
+
+	if(resultTileIndices === undefined)
+	{
+		resultTileIndices = {};
+	}
+
+	resultTileIndices.L = depth;
+	resultTileIndices.X = xIndex;
+	resultTileIndices.Y = yIndex;
+
+	return resultTileIndices;
+};
+
+SmartTile.selectTileIndicesArray = function(depth, minLon, minLat, maxLon, maxLat, resultTileIndicesArray) 
+{
+	// Given a geographic rectangle (minLon, minLat, maxLon, maxLat) & a depth, this function returns all
+	// tilesIndices intersected by the rectangle for the specific depth.**
+	var leftDownTileName = SmartTile.selectTileIndices(depth, minLon, minLat, undefined);
+	var rightDownTileName = SmartTile.selectTileIndices(depth, maxLon, minLat, undefined);
+	var rightUpTileName = SmartTile.selectTileIndices(depth, maxLon, maxLat, undefined);
+	//var leftUpTileName = SmartTile.selectTileIndices(depth, minLon, maxLat, undefined);
+
+	var minX = leftDownTileName.X;
+	var maxX = rightDownTileName.X;
+	var maxY = leftDownTileName.Y; // origin is left-up.
+	var minY = rightUpTileName.Y;
+
+	if(!resultTileIndicesArray)
+	{
+		resultTileIndicesArray = [];
+	}
+
+	for(var x = minX; x <= maxX; x++)
+	{
+		for(var y = minY; y <= maxY; y++)
+		{
+			var tileIndices = {
+				L : depth, X : x, Y : y
+			};
+
+			resultTileIndicesArray.push(tileIndices);
+		}
+	}
+
+	return resultTileIndicesArray;
+};
+
 /**
  * 어떤 일을 하고 있습니까?
  * @param frustum 변수

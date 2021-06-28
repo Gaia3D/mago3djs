@@ -3,7 +3,7 @@
 /**
  * @class WaterManager
  */
-var WaterManager = function(magoManager) 
+var WaterManager = function (magoManager, options) 
 {
 	if (!(this instanceof WaterManager)) 
 	{
@@ -16,17 +16,23 @@ var WaterManager = function(magoManager)
     this.waterLayersArray = [];
     this.magoManager = magoManager;
 
+	// Simulation extension.***************************************************************************
+	this.simulationGeoExtent;
+	this.simulationTileDepth; // The water simulation runs over terrain of the some tile depth.
+
+	// The DEM can be from highMapTextures files, or from quantizedMesh.*******************************
+	this.terrainDemSourceType = "HIGHMAP"; // from HighMap or from QuantizedMesh.
+	// if this.terrainDemSourceType === "HIGHMAP", then load from files.
+	// if this.terrainDemSourceType === "QUANTIZEDMESH", then load the quantizedMesh & make the highMap.
+	this.terrainProvider; // if this.terrainDemSourceType === "QUANTIZEDMESH", then use terrain provider to load quantizedMeshes.
+
 	this.fbo;
 
 	// Simulation parameters.**************************************************************************
-	this.simulationTextureWidth = 1024;
-	this.simulationTextureHeight = 1024;
-	//this.simulationTextureWidth = 512; // limited by DEM texture size
-	//this.simulationTextureHeight = 512;
+	this.simulationTextureSize = new Float32Array([1024, 1024]);
 	this.bSsimulateWater = false;
-
-	this.terrainTextureWidth = 512;
-	this.terrainTextureHeight = 512;
+	//this.terrainTextureSize = new Float32Array([512, 512]);
+	this.terrainTextureSize = new Float32Array([1024, 1024]);
 
 	// Water wind.*************************************************************************************
 	this.windParticlesPosFbo;
@@ -43,6 +49,30 @@ var WaterManager = function(magoManager)
 	this.bExistPendentExcavation = false; // If this var is "true", then do excavation process only one time.
 	this.bDoLandSlideSimulation = false; // false by default.
 	//-------------------------------------------------------------------------------------------------
+
+	// Check options.***
+	if(options)
+	{
+		if(options.simulationGeographicExtent)
+		{
+			this.simulationGeoExtent = options.simulationGeographicExtent;
+		}
+
+		if(options.terrainDemSourceType)
+		{
+			this.terrainDemSourceType = options.terrainDemSourceType;
+		}
+
+		if(options.terrainProvider)
+		{
+			this.terrainProvider = options.terrainProvider;
+		}
+
+		if(options.simulationTileDepth)
+		{
+			this.simulationTileDepth = options.simulationTileDepth;
+		}
+	}
 
 
     this.createDefaultShaders();
@@ -79,11 +109,20 @@ WaterManager.prototype.init = function ()
 	
 	if(!this.fbo) // simulation fbo (512 x 512).
 	{
-		var bufferWidth = this.simulationTextureWidth;
-		var bufferHeight = this.simulationTextureHeight;
+		var bufferWidth = this.simulationTextureSize[0];
+		var bufferHeight = this.simulationTextureSize[1];
 		var bUseMultiRenderTarget = this.magoManager.postFxShadersManager.bUseMultiRenderTarget;
 
 		this.fbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: false, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 3}); 
+	}
+
+	if(!this.terrainTexFbo) // simulation fbo (512 x 512).
+	{
+		var bufferWidth = this.terrainTextureSize[0];
+		var bufferHeight = this.terrainTextureSize[1];
+		var bUseMultiRenderTarget = this.magoManager.postFxShadersManager.bUseMultiRenderTarget;
+
+		this.terrainTexFbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: false, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 3}); 
 	}
 
 	if(!this.depthFbo) // screen size fbo.
@@ -125,10 +164,15 @@ WaterManager.prototype.init = function ()
 
 		this.windParticlesRenderingFbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: false, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 3}); 
 	}
+	//------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-	// 
-	this.test__createContaminationBox(magoManager);
-	this.test__createExcavationBox(magoManager);
+	// create only one water layer.******************************************************************************************************************************************
+	var geoExtent = this.simulationGeoExtent;
+	var options = {
+		geographicExtent : geoExtent
+	};
+
+	var waterLayer = this.newWater(options);
 };
 
  /**
@@ -547,7 +591,24 @@ WaterManager.prototype.createDefaultShaders = function ()
 	magoManager.postFxShadersManager.useProgram(shader);
 	gl.uniform1i(shader.u_screen_loc, 0);
 	
-	
+	// 8) depthTexFromQuantizedMesh Shader.********************************************************************************************
+	var shaderName = "depthTexFromQuantizedMesh";
+	var vs_source = ShaderSource.waterQuantizedMeshVS;
+	var fs_source = ShaderSource.waterDEMTexFromQuantizedMeshFS;
+	fs_source = fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
+	fs_source = fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
+	var shader = magoManager.postFxShadersManager.createShaderProgram(gl, vs_source, fs_source, shaderName, this.magoManager);
+	shader.position3_loc = gl.getAttribLocation(shader.program, "a_pos");
+	shader.u_minMaxHeights_loc = gl.getUniformLocation(shader.program, "u_minMaxHeights"); // change this by rainMaxHeight
+
+	shader.u_totalMinGeoCoord_loc = gl.getUniformLocation(shader.program, "u_totalMinGeoCoord");
+	shader.u_totalMaxGeoCoord_loc = gl.getUniformLocation(shader.program, "u_totalMaxGeoCoord");
+	shader.u_currentMinGeoCoord_loc = gl.getUniformLocation(shader.program, "u_currentMinGeoCoord");
+	shader.u_currentMaxGeoCoord_loc = gl.getUniformLocation(shader.program, "u_currentMaxGeoCoord");
+
+
+	magoManager.postFxShadersManager.useProgram(shader);
+
 };
 
 WaterManager.prototype.getQuadBuffer = function ()
@@ -582,6 +643,8 @@ WaterManager.prototype._newTexture = function (gl, texWidth, texHeight)
 
 	var magoTexture = new Texture();
 	magoTexture.texId = tex;
+	magoTexture.imageWidth = texWidth;
+	magoTexture.imageHeight = texHeight;
 	magoTexture.fileLoadState = CODE.fileLoadState.BINDING_FINISHED;
 
 	return magoTexture;
@@ -831,6 +894,69 @@ WaterManager.prototype.getExcavationObjectsArray = function ()
 	return this._excavationObjectsArray;
 };
 
+WaterManager.prototype._loadQuantizedMesh = function (L, X, Y, waterLayer)
+{
+	if(!this.qMeshesPromisesMap)
+	{
+		this.qMeshesPromisesMap = {};
+	}
+
+	if(this.qMeshesPromisesMap[L])
+	{
+		if(this.qMeshesPromisesMap[L][X])
+		{
+			if(this.qMeshesPromisesMap[L][X][Y])
+			{
+				// Exist the qMeshPromise, so wait.
+				return false;
+			}
+		}
+	}
+
+	// if no exist qMeshPromise, then request.
+	if(!this.qMeshesPromisesMap[L]){this.qMeshesPromisesMap[L] = {}};
+	if(!this.qMeshesPromisesMap[L][X]){this.qMeshesPromisesMap[L][X] = {}};
+	if(!this.qMeshesPromisesMap[L][X][Y]){this.qMeshesPromisesMap[L][X][Y] = {}};
+
+	this.qMeshesPromisesMap[L][X][Y] = this.terrainProvider.requestTileGeometry(X, Y, L);
+	this.qMeshesPromisesMap[L][X][Y].then((value) =>
+	{
+		if(!this.qMeshesMap[L]){this.qMeshesMap[L] = {}};
+		if(!this.qMeshesMap[L][X]){this.qMeshesMap[L][X] = {}};
+		if(!this.qMeshesMap[L][X][Y]){this.qMeshesMap[L][X][Y] = {}};
+
+		this.qMeshesMap[L][X][Y] = value;
+		this.qMeshesMap[L][X][Y].tileIndices = {
+			L : L, X : X, Y : Y
+		}; // no necessary.
+	});
+};
+
+WaterManager.prototype.getQuantizedMesh = function (L, X, Y, waterLayer)
+{
+	if(!this.qMeshesMap)
+	{
+		this.qMeshesMap = {};
+	}
+
+	var existQMeshVbo = false;
+
+	if(this.qMeshesMap[L])
+	{
+		if(this.qMeshesMap[L][X])
+		{
+			if(this.qMeshesMap[L][X][Y])
+			{
+				// return the qMeshVbo.
+				return this.qMeshesMap[L][X][Y];
+			}
+		}
+	}
+	
+	// If no exist the qMesh, then load it.
+	this._loadQuantizedMesh(L, X, Y, waterLayer);
+};
+
 WaterManager.prototype.test__createExcavationBox = function (magoManager)
 {
 	var lon = 127.21537;
@@ -861,6 +987,8 @@ WaterManager.prototype.test__createContaminationBox = function (magoManager)
 	var lon = 127.21537;
 	var lat = 35.61202;
 
+	
+
 	// Test with box.***
 	var width = 10.0;
 	var length = 10.0;
@@ -882,6 +1010,7 @@ WaterManager.prototype.test__createContaminationBox = function (magoManager)
 	// this.getWaterSourceObjectsArray();
 	lon = 127.21049;
 	lat = 35.60385;
+
 	width = 20.0;
 	length = 20.0;
 	height = 200.0;
@@ -919,6 +1048,101 @@ WaterManager.prototype.test__createContaminationBox = function (magoManager)
 	// another water source.
 	lon = 127.21673;
 	lat = 35.60460;
+
+	name = "waterGenerator";
+	initialGeoCoord = new GeographicCoord(lon, lat, alt);
+	box = new Box(width, length, height, name);
+	box.setGeographicPosition(initialGeoCoord, 0, 0, 0);
+	box.attributes.isMovable = true;
+	box.setOneColor(0.2, 0.5, 1.0, 1.0);
+	box.options = {};
+	depth = 6;
+	magoManager.modeler.addObject(box, depth);
+
+	var waterSourceObjectsArray = this.getWaterSourceObjectsArray();
+	waterSourceObjectsArray.push(box);
+
+	
+	return true;
+};
+
+WaterManager.prototype.test__createContaminationBox_sejong = function (magoManager)
+{
+	var lon = 127.23257;
+	var lat = 36.51568;
+
+	
+
+	// Test with box.***
+	var width = 50.0;
+	var length = 50.0;
+	var height = 200.0;
+	var name = "contaminationGenerator";
+	var initialGeoCoord = new GeographicCoord(lon, lat, 200.0);
+	var box = new Box(width, length, height, name);
+	box.setGeographicPosition(initialGeoCoord, 0, 0, 0);
+	box.attributes.isMovable = true;
+	box.setOneColor(1.0, 0.5, 0.2, 1.0);
+	box.options = {};
+	var depth = 6;
+	magoManager.modeler.addObject(box, depth);
+
+	var contaminationBoxesArray = this.getContaminationObjectsArray();
+	contaminationBoxesArray.push(box);
+
+	// create 3 waterSourceObjects.***
+	// this.getWaterSourceObjectsArray();
+	lon = 127.21049;
+	lat = 35.60385;
+
+	var lon = 127.28055;
+	var lat = 36.51814;
+
+	width = 20.0;
+	length = 20.0;
+	width = 50.0;
+	length = 50.0;
+	height = 400.0;
+	var alt = 50;
+	name = "waterGenerator";
+	initialGeoCoord = new GeographicCoord(lon, lat, alt);
+	box = new Box(width, length, height, name);
+	box.setGeographicPosition(initialGeoCoord, 0, 0, 0);
+	box.attributes.isMovable = true;
+	box.setOneColor(0.2, 0.5, 1.0, 1.0);
+	box.options = {};
+	depth = 6;
+	magoManager.modeler.addObject(box, depth);
+
+	var waterSourceObjectsArray = this.getWaterSourceObjectsArray();
+	waterSourceObjectsArray.push(box);
+
+	// another water source.
+	lon = 127.21592;
+	lat = 35.61843;
+
+	var lon = 127.25264;
+	var lat = 36.53745;
+
+	name = "waterGenerator";
+	initialGeoCoord = new GeographicCoord(lon, lat, alt);
+	box = new Box(width, length, height, name);
+	box.setGeographicPosition(initialGeoCoord, 0, 0, 0);
+	box.attributes.isMovable = true;
+	box.setOneColor(0.2, 0.5, 1.0, 1.0);
+	box.options = {};
+	depth = 6;
+	magoManager.modeler.addObject(box, depth);
+
+	var waterSourceObjectsArray = this.getWaterSourceObjectsArray();
+	waterSourceObjectsArray.push(box);
+
+	// another water source.
+	lon = 127.21673;
+	lat = 35.60460;
+
+	var lon = 127.31799;
+	var lat = 36.49179;
 
 	name = "waterGenerator";
 	initialGeoCoord = new GeographicCoord(lon, lat, alt);

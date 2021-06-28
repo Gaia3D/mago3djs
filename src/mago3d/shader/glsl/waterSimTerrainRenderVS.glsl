@@ -53,14 +53,14 @@ vec3 getViewRay(vec2 tc, in float relFar)
 
 float getTerrainHeight(in vec2 texCoord)
 {
-    float terainHeight = texture2D(terrainmap, texCoord).r;
+    float terainHeight = texture2D(terrainmap, texCoord).b;
     terainHeight = u_heightMap_MinMax.x + terainHeight * (u_heightMap_MinMax.y - u_heightMap_MinMax.x);
     return terainHeight;
 }
 
 float getTerrainToCompareHeight(in vec2 texCoord)
 {
-    float terainHeight = texture2D(terrainMapToCompare, texCoord).r;
+    float terainHeight = texture2D(terrainMapToCompare, texCoord).b;
     terainHeight = u_heightMap_MinMax.x + terainHeight * (u_heightMap_MinMax.y - u_heightMap_MinMax.x);
     return terainHeight;
 }
@@ -107,7 +107,7 @@ void main()
 
 	//float terrainHeight = getTerrainHeight_interpolated(texCoord);
 	float terrainHeight = getTerrainHeight(texCoord);
-	float height = terrainHeight;
+	float height = terrainHeight; 
 	float terrainToCompareHeight = getTerrainToCompareHeight(texCoord);
 
 	vTerrainSlided = -1.0;

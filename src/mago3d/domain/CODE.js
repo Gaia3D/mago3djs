@@ -180,3 +180,18 @@ CODE.relativePositionPoint2DWithSegment2D = {
 	"COINCIDENT_WITH_START_POINT" : 3,
 	"COINCIDENT_WITH_END_POINT" : 4
 }
+
+CODE.relativePositionSegment2DWithSegment2D = {
+	"UNKNOWN" : 0,
+	"NO_INTERSECTION" : 1,
+	"INTERSECTION" : 2
+}
+
+CODE.relativePositionSegment3DWithPlane2D = {
+	"UNKNOWN" : 0,
+	"NO_INTERSECTION" : 1,
+	"INTERSECTION" : 2,
+	"START_POINT_COINCIDENT" : 3,
+	"END_POINT_COINCIDENT" : 4,
+	"TWO_POINTS_COINCIDENT" : 5
+}

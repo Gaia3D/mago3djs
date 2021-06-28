@@ -107,7 +107,12 @@ Triangle2D.prototype.getSegment2D = function(idx)
 	return seg2d;
 };
 
-
+Triangle2D.prototype.getIntersectedPointsByLine2D = function(line2d, resultIntersectedPointsArray) 
+{
+	// Tangent lines are not considered intersection.
+	// A line can touch one or two points. In these cases the line is tangent.
+	
+};
 
 Triangle2D.prototype.getRelativePositionOfPoint2DReport = function(point2d, resultReport, error) 
 {

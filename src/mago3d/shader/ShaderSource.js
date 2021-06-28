@@ -13735,15 +13735,35 @@ ShaderSource.waterQuantizedMeshVS = "//precision mediump float;\n\
 \n\
 attribute vec3 a_pos;\n\
 \n\
+uniform vec3 u_totalMinGeoCoord; // (lon, lat, alt).\n\
+uniform vec3 u_totalMaxGeoCoord;\n\
+uniform vec3 u_currentMinGeoCoord;\n\
+uniform vec3 u_currentMaxGeoCoord;\n\
+\n\
 varying vec2 v_tex_pos;\n\
 varying vec3 vPos;\n\
 \n\
 void main() {\n\
     // Note: the position attributte is initially (in javascript) unsignedInt16 (0 to 32,767) (quantizedMesh).\n\
     // So, when normalize the data it transforms to (0.0 to 0.5), so must multiply by 2.0.\n\
-    vec3 pos = a_pos * 2.0;\n\
+    vec3 pos = a_pos * 2.0; // quantizedMeshes uses the positive parts of the signed short, so must multiply by 2.\n\
+    \n\
+    // Now, use totalGeoExtent & currentGeoExtent to scale the mesh.\n\
+    // Calculate longitude & latitude.\n\
+    float lon = u_currentMinGeoCoord.x + pos.x * (u_currentMaxGeoCoord.x - u_currentMinGeoCoord.x);\n\
+    float lat = u_currentMinGeoCoord.y + pos.y * (u_currentMaxGeoCoord.y - u_currentMinGeoCoord.y);\n\
+    float alt = u_currentMinGeoCoord.z + pos.z * (u_currentMaxGeoCoord.z - u_currentMinGeoCoord.z);\n\
+\n\
+    // Now, calculate the coord on total geoExtent.\n\
+    float s = (lon - u_totalMinGeoCoord.x) / (u_totalMaxGeoCoord.x - u_totalMinGeoCoord.x);\n\
+    float t = (lat - u_totalMinGeoCoord.y) / (u_totalMaxGeoCoord.y - u_totalMinGeoCoord.y);\n\
+    float u = (alt - u_totalMinGeoCoord.z) / (u_totalMaxGeoCoord.z - u_totalMinGeoCoord.z);\n\
+\n\
+    //pos = vec3(pos.x, 1.0 - pos.y, pos.z); // flip y coords. // original.***\n\
+    pos = vec3(s, 1.0 - t, u); // flip y coords.\n\
     vPos = pos;\n\
     v_tex_pos = pos.xy;\n\
+\n\
     gl_Position = vec4(-1.0 + 2.0 * pos, 1.0);\n\
 }";
 ShaderSource.waterRenderFS = "//#version 300 es\n\
@@ -14336,6 +14356,9 @@ void main()\n\
 	//float terrainHeight = getTerrainHeight_interpolated(texCoord);\n\
 	float height = terrainHeight + vWaterHeight + vContaminantHeight;\n\
 \n\
+	// Test debug:\n\
+	//height += 5.0;\n\
+\n\
 	//if(thisIsBorderWater)\n\
 	//{\n\
 	//	height = extrudeHeight;\n\
@@ -14745,14 +14768,14 @@ vec3 getViewRay(vec2 tc, in float relFar)\n\
 \n\
 float getTerrainHeight(in vec2 texCoord)\n\
 {\n\
-    float terainHeight = texture2D(terrainmap, texCoord).r;\n\
+    float terainHeight = texture2D(terrainmap, texCoord).b;\n\
     terainHeight = u_heightMap_MinMax.x + terainHeight * (u_heightMap_MinMax.y - u_heightMap_MinMax.x);\n\
     return terainHeight;\n\
 }\n\
 \n\
 float getTerrainToCompareHeight(in vec2 texCoord)\n\
 {\n\
-    float terainHeight = texture2D(terrainMapToCompare, texCoord).r;\n\
+    float terainHeight = texture2D(terrainMapToCompare, texCoord).b;\n\
     terainHeight = u_heightMap_MinMax.x + terainHeight * (u_heightMap_MinMax.y - u_heightMap_MinMax.x);\n\
     return terainHeight;\n\
 }\n\
@@ -14799,7 +14822,7 @@ void main()\n\
 \n\
 	//float terrainHeight = getTerrainHeight_interpolated(texCoord);\n\
 	float terrainHeight = getTerrainHeight(texCoord);\n\
-	float height = terrainHeight;\n\
+	float height = terrainHeight; \n\
 	float terrainToCompareHeight = getTerrainToCompareHeight(texCoord);\n\
 \n\
 	vTerrainSlided = -1.0;\n\

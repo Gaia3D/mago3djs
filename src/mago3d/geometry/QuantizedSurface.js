@@ -91,62 +91,29 @@ QuantizedSurface.prototype.getTrianglesList = function ()
     return this.trianglesList;
 };
 
-QuantizedSurface._segment2DIntersectsTriangle2D = function(triangle2d, seg2d, resultTrianglesArray) 
+QuantizedSurface._segment2DIntersectsTriangle2D = function(triangle2d, seg2d) 
 {
     // This function calculates if the segment2d intersects with the triangle2d.
     // Remember : In quatizedMesh process, a segment always cuts a triangle by a triangle's vertex.
     //-----------------------------------------------------------------------------------------------------
     // Check if the segment cuts any edge of the triangle.
+    var error = 1e-8;
+    var intersectPoint = new Point2D();
     var triangleSegment = triangle2d.getSegment2D(0);
 
-    
-};
-
-QuantizedSurface.cutTriangleWithVerticalPlaneByVtxSegment = function(triangle, seg2d, resultTrianglesArray) 
-{
-    //***********************************************
-	// This function works in 2D in the plane XY.
-    //-----------------------------------------------
-
-    //*********************************************************************************************************************************************
-    // The qMesh was prepared inserting vertices & refining the mesh, so all segments points are coincidents with triangles vertices.***
-    //*********************************************************************************************************************************************
-
-    // segment can be:
-    // 1) Only touch the triangle for a vertex (do nothing)
-    // 2) Cut the triangle by one of the triangle vertex (cut the triangle in 2 triangles)
-    // 3) Tangent to triangle. (do nothing)
-    //-----------------------------------------------------------------------------------------
-
-
-
-	// 1rst, check if the segment intersects the triangle.
-    //var point1 = vtxSeg.startVertex.getPosition();
-    //var point2 = vtxSeg.endVertex.getPosition();
-	//var seg2d = new Segment2D(point1, point2);
-    var segBRect = seg2d.getBoundingRectangle();
-
-    //var triPoint1 = triangle.vertex0.getPosition();
-    //var triPoint2 = triangle.vertex1.getPosition();
-    //var triPoint3 = triangle.vertex2.getPosition();
-    var tri2d = QuantizedSurface.getProjectedTriangle2D_planeXY(triangle, undefined);
-    var triBRect = tri2d.getBoundingRectangle();
-
-    if(!segBRect.intersectsWithRectangle(triBRect))
+    if(triangleSegment.intersectionWithSegment(seg2d, error, intersectPoint))
     {
-        return false;
+        // check if the intersectPoint is inside of the triangleSegment.
+        var report = triangleSegment.getRelativePositionOfPoint2DReport(intersectPoint, undefined);
+        if(report.relPos === CODE.relativePositionPoint2DWithSegment2D.INSIDE)
+        {
+
+            var hola = 0;
+        }
     }
-
-    // Now, must know the relative position between the segment and the triangle.
-    var relPos_point1;
-    var relPos_point2;
-
-    // Now, check if some point of the segment is inside of the triangle2d.***
-    var error = 1e-8;
-    var report1 = tri2d.getRelativePositionOfPoint2DReport(point1, undefined, error);
-
-    var hola = 0;
 };
+
+
 
 QuantizedSurface.getQuantizedPointsArrayFromGeoCoords = function (geoCoordsArray, geoExtent, resultqPointsArray)
 {
@@ -258,10 +225,6 @@ QuantizedSurface.insertQPointIntoTriangle = function (qPoint, triangle, triangle
 
 };
 
-QuantizedSurface.splitTrianglesByQPointInSegment = function (qPoint, segment, triList, vertexList)
-{
-    // TODO:
-};
 
 QuantizedSurface.insertQPointIntoTrianglesList = function (qPoint, triList, vertexList)
 {
@@ -310,6 +273,7 @@ QuantizedSurface.insertQPointIntoTrianglesList = function (qPoint, triList, vert
 
                 if(report.relPos === CODE.relativePositionPoint2DWithTriangle2D.COINCIDENT_WITH_TRIANGLE_POINT)
                 {
+                    // Do nothing.***
                     var hola = 0;
                 }
 
@@ -343,6 +307,92 @@ QuantizedSurface.insertQPointsArrayIntoTrianglesList = function (qPointsArray, t
     }
 };
 
+QuantizedSurface.cutTrianglesWithPlane = function (triList, plane, segment2d, resultTrianglesArray) 
+{
+    // This is a special function in the "QuantizedSurface".
+    //*********************************************************************************************************************************************
+    // The qMesh was prepared inserting vertices & refining the mesh, so all segments points are coincidents with triangles vertices.***
+    //*********************************************************************************************************************************************
+    var triCount = triList.getTrianglesCount();
+    var tri;
+    var report;
+    var error = 1e-8;
+    for(var i=0; i<triCount; i++)
+    {
+        tri = triList.getTriangle(i);
+        report = tri.getIntersectionByPlaneReport(plane, undefined, error);
+
+        // Note : if the report.length === 1, then the triangle is tangent to plane by one vertex.***
+
+        if(report && report.length > 1)
+        {
+            // Now, split the triangle if the intersected points is inside of the range of the segment2d.***
+            // The triangle can be splitted in 2 or 3 triangles.
+            // If the plane intersects any triangle's vertex, then the triangle is splitted in 2 triangles.
+            // If the plane intersects the triangle in the triangles edges, then the triangle is splitted in 3 triangles.
+            var intersect_1 = report[0];
+            var intersect_2 = report[1];
+
+            // 1rst, check if the intersected points are inside of the range.
+            var intersectPoint_1 = intersect_1.intesectPoint;
+            var intersectPoint_2 = intersect_2.intesectPoint;
+
+            // check if intersectPoint_1 && intersectPoint_2 intersects in 2d with segment2d.
+            // There are 2 cases:
+            // 1) the 2 points intersects the segment2d.
+            // 2) Only 1 point intersects the segment2d.
+            // If only 1 point intersects and the intersection is in a edge, then, split the triangle by triangles-edge to triangles-oppositeVertex.
+            var intersectPoint2d_1 = new Point2D(intersectPoint_1.x, intersectPoint_1.y);
+            var intersectPoint2d_2 = new Point2D(intersectPoint_2.x, intersectPoint_2.y);
+
+            /*
+            CODE.relativePositionPoint2DWithSegment2D = {
+                "UNKNOWN" : 0,
+                "OUTSIDE" : 1,
+                "INSIDE" : 2,
+                "COINCIDENT_WITH_START_POINT" : 3,
+                "COINCIDENT_WITH_END_POINT" : 4
+            }
+            */
+            var relPosPoint2d_1 = segment2d.getRelativePositionOfPoint2DReport(intersectPoint2d_1, undefined);
+            var relPosPoint2d_2 = segment2d.getRelativePositionOfPoint2DReport(intersectPoint2d_2, undefined);
+
+            // Here must check if one of the points2d is inside & the another point is outside.***
+            if(relPosPoint2d_1 === CODE.relativePositionPoint2DWithSegment2D.OUTSIDE || relPosPoint2d_2 === CODE.relativePositionPoint2DWithSegment2D.OUTSIDE )
+            {
+                var hola = 0;
+            }
+
+            if(intersect_1.intersectionType === "segmentIntersection")
+            {
+                if(intersect_2.intersectionType === "segmentIntersection")
+                {
+                    // The triangle must be splitted in 3 triangles.
+
+                }
+                else if(intersect_2.intersectionType === "startPointIntersection")
+                {
+                    // The triangle must be splitted in 2 triangles.
+                }
+            }
+            else if(intersect_1.intersectionType === "startPointIntersection")
+            {
+                if(intersect_2.intersectionType === "segmentIntersection")
+                {
+                    // The triangle must be splitted in 2 triangles.
+                }
+                else if(intersect_2.intersectionType === "startPointIntersection")
+                {
+                    // This is a tangent case. Do not splitt the triangle.
+                    var hola = 0;
+                }
+            }
+        }
+        var hola = 0;
+    }
+    
+};
+
 QuantizedSurface.prototype.excavation = function (excavationGeoCoords, excavationDepth)
 {
     // In this function, cut the qmesh with the excavationPolygon and create a negative extrude.
@@ -374,7 +424,9 @@ QuantizedSurface.prototype.excavation = function (excavationGeoCoords, excavatio
     var vertexSegment;
     var segment2d = new Segment2D();
     var u, v, h;
-    var qPoint1, qPoint2; // Point3D class.
+    var qPoint1, qPoint2, qPointHight; // Point3D class.
+    qPointHight = new Point3D();
+    var plane = new Plane();
     for(var i=0; i<geoCoordsCount; i++)
     {
         nextIdx = GeometryUtils.getNextIdx(i, geoCoordsCount);
@@ -383,9 +435,13 @@ QuantizedSurface.prototype.excavation = function (excavationGeoCoords, excavatio
 
         qPoint1 = geoExtent.getQuantizedPoint(startGeoCoord, undefined);
         qPoint2 = geoExtent.getQuantizedPoint(endGeoCoord, undefined);
+        qPointHight.set(qPoint1.x, qPoint1.y, qPoint1.z + 10000.0);
         segment2d.setPoints(qPoint1, qPoint2);
 
+        // Now, make a vertical plane with qPoint1, qPoint2 and qPointHight.
+        plane.set3Points(qPoint1.x, qPoint1.y, qPoint1.z,   qPoint2.x, qPoint2.y, qPoint2.z,   qPointHight.x, qPointHight.y, qPointHight.z);
 
+        var trianglesArray = QuantizedSurface.cutTrianglesWithPlane(triList, plane, segment2d, undefined);
         var hola = 0;
     }
     

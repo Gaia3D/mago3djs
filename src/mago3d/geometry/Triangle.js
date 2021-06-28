@@ -209,6 +209,119 @@ Triangle.prototype.getPlaneNormal = function()
 	return this.normal;
 };
 
+
+/**
+ * Return points intersected by the plane.
+ * 
+ * @param {Plane} plane 
+ * @param {Array} resultIntersectedPoints 
+ */
+Triangle.prototype.getIntersectionByPlaneReport = function(plane, resultIntersectionReportsArray, error) 
+{
+	// 1rst, check if boundingSphere intersects with the plane.
+	var bbox = this.getBoundingBox();
+	var bSphere = bbox.getBoundingSphere();
+
+	if(plane.intersectionSphere(bSphere) !== Constant.INTERSECTION_INTERSECT)
+	{
+		return resultIntersectionReportsArray;
+	}
+
+	if(error === undefined)
+	{ error = 1e-8; }
+
+	// Now, for each edge, intersect with plane.
+	/*
+	CODE.relativePositionSegment3DWithPlane2D = {
+		"UNKNOWN" : 0,
+		"NO_INTERSECTION" : 1,
+		"INTERSECTION" : 2,
+		"START_POINT_COINCIDENT" : 3,
+		"END_POINT_COINCIDENT" : 4,
+		"TWO_POINTS_COINCIDENT" : 5
+	}*/
+	var intersectedPointsArray = [];
+
+	// Segment 0.*********************************************************************
+	var seg0 = this.getSegment(0);
+	var relPosSeg0ToPlane = plane.getRelativePositionOfTheSegment(seg0, error);
+
+	if(relPosSeg0ToPlane === CODE.relativePositionSegment3DWithPlane2D.INTERSECTION)
+	{
+		// calculate the intersection point.
+		var line = seg0.getLine();
+		var intersectPoint = plane.intersectionLine(line, undefined);
+		intersectedPointsArray.push({
+			intersectionType : "segmentIntersection",
+			idx : 0,
+			intesectPoint : intersectPoint});
+	}
+	else if(relPosSeg0ToPlane === CODE.relativePositionSegment3DWithPlane2D.START_POINT_COINCIDENT)
+	{
+		var startPoint = seg0.startPoint3d;
+		intersectedPointsArray.push({
+			intersectionType : "startPointIntersection",
+			idx : 0,
+			intesectPoint : startPoint});
+	}
+
+	// Segment 1.*********************************************************************
+	var seg1 = this.getSegment(1);
+	var relPosSeg1ToPlane = plane.getRelativePositionOfTheSegment(seg1, error);
+
+	if(relPosSeg1ToPlane === CODE.relativePositionSegment3DWithPlane2D.INTERSECTION)
+	{
+		// calculate the intersection point.
+		var line = seg1.getLine();
+		var intersectPoint = plane.intersectionLine(line, undefined);
+		intersectedPointsArray.push({
+			intersectionType : "segmentIntersection",
+			idx : 1,
+			intesectPoint : intersectPoint});
+	}
+	else if(relPosSeg1ToPlane === CODE.relativePositionSegment3DWithPlane2D.START_POINT_COINCIDENT)
+	{
+		var startPoint = seg1.startPoint3d;
+		intersectedPointsArray.push({
+			intersectionType : "startPointIntersection",
+			idx : 1,
+			intesectPoint : startPoint});
+	}
+
+	if(intersectedPointsArray.length < 2)
+	{
+		// Segment 2.*********************************************************************
+		var seg2 = this.getSegment(2);
+		var relPosSeg2ToPlane = plane.getRelativePositionOfTheSegment(seg2, error);
+
+		if(relPosSeg2ToPlane === CODE.relativePositionSegment3DWithPlane2D.INTERSECTION)
+		{
+			// calculate the intersection point.
+			var line = seg2.getLine();
+			var intersectPoint = plane.intersectionLine(line, undefined);
+			intersectedPointsArray.push({
+				intersectionType : "segmentIntersection",
+				idx : 2,
+				intesectPoint : intersectPoint});
+		}
+		else if(relPosSeg2ToPlane === CODE.relativePositionSegment3DWithPlane2D.START_POINT_COINCIDENT)
+		{
+			var startPoint = seg2.startPoint3d;
+			intersectedPointsArray.push({
+				intersectionType : "startPointIntersection",
+				idx : 2,
+				intesectPoint : startPoint});
+		}
+	}
+	
+	if(!resultIntersectionReportsArray)
+	{
+		resultIntersectionReportsArray = [];
+	}
+	Array.prototype.push.apply(resultIntersectionReportsArray, intersectedPointsArray);
+	return resultIntersectionReportsArray;
+};
+
 /**
  * CrossProduct(벡터의 외적)를 계산한다.
  * 

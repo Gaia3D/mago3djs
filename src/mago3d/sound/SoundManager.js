@@ -144,7 +144,7 @@ SoundManager.prototype.createDefaultShaders = function ()
 	}
 
 	// here creates the necessary shaders for waterManager.***
-	// 1) waterRender Shader.********************************************************************************************
+	// 1) depthTexFromQuantizedMesh Shader.********************************************************************************************
 	var shaderName = "depthTexFromQuantizedMesh";
 	var vs_source = ShaderSource.waterQuantizedMeshVS;
 	var fs_source = ShaderSource.waterDEMTexFromQuantizedMeshFS;
