@@ -2656,7 +2656,7 @@ MagoManager.prototype.startRender = function (isLastFrustum, frustumIdx, numFrus
  * @param {Cesium.TerrainProvider} terrainProvider
  * @return {number}
  */
-MagoManager.getTerrainMaximumLevel = function(terrainProvider)
+MagoManager.getMaximumLevelOfTerrainProvider = function(terrainProvider)
 {
 	var maxLevel = 20;
 	var isBasicTerrainProvider = terrainProvider instanceof Cesium.EllipsoidTerrainProvider;
@@ -2685,7 +2685,7 @@ MagoManager.prototype.validateHeight = function(frustumObject)
 	{
 		var terrainProvider = this.scene.globe.terrainProvider;
 		
-		var maxZoom = MagoManager.getTerrainMaximumLevel(terrainProvider);
+		var maxZoom = MagoManager.getMaximumLevelOfTerrainProvider(terrainProvider);
 		var process = [];
 		var next = [];
 		for (var i=this._needValidHeightNodeArray.length - 1;i>=0;i--) 
@@ -2755,7 +2755,7 @@ MagoManager.prototype.validateHeight = function(frustumObject)
 	if (this._needValidHeightNativeArray.length > 0 && visibleNatives.length > 0) 
 	{
 		var terrainProvider = this.scene.globe.terrainProvider;
-		var maxZoom = MagoManager.getTerrainMaximumLevel(terrainProvider);
+		var maxZoom = MagoManager.getMaximumLevelOfTerrainProvider(terrainProvider);
 
 		var process = [];
 		var next = [];
