@@ -11466,7 +11466,6 @@ uniform sampler2D currWaterFluxTex_LOW;\n\
 \n\
 varying vec2 v_tex_pos;\n\
 \n\
-uniform float u_SimRes;\n\
 uniform float u_timestep;\n\
 \n\
 uniform vec2 u_tileSize; // tile size in meters.\n\
@@ -11713,6 +11712,7 @@ uniform float u_waterMaxHeigh;\n\
 uniform float u_contaminantMaxHeigh;\n\
 uniform float u_fluidMaxHeigh;\n\
 uniform float u_fluidHeigh;\n\
+uniform float u_timestep;\n\
 \n\
 varying vec2 v_tex_pos;\n\
 varying vec4 vColor4;\n\
@@ -14357,7 +14357,7 @@ void main()\n\
 	float height = terrainHeight + vWaterHeight + vContaminantHeight;\n\
 \n\
 	// Test debug:\n\
-	//height += 5.0;\n\
+	height += 0.5;\n\
 \n\
 	//if(thisIsBorderWater)\n\
 	//{\n\

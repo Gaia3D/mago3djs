@@ -81,6 +81,9 @@ var Renderer = function(manoManager)
 	 * @default ManoManager
 	 */
 	this.magoManager = manoManager;
+
+	// test debugging vars:
+	this._screenRectangleRenderType = 0; // test var.***
 };
 
 /**
@@ -2140,7 +2143,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 			if(waterLayer.waterFluxTexA_HIGH && waterLayer.waterFluxTexA_HIGH.texId)
 			{
-				//texture = waterLayer.waterFluxTexA_HIGH.texId;
+				texture = waterLayer.waterFluxTexA_HIGH.texId;
 			}
 
 			if(waterLayer.waterFluxTexA_LOW && waterLayer.waterFluxTexA_LOW.texId)
@@ -2215,7 +2218,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 			if(waterLayer.original_dem_texture && waterLayer.original_dem_texture.texId)
 			{
-				texture = waterLayer.original_dem_texture.texId;
+				//texture = waterLayer.original_dem_texture.texId;
 			}
 		}
 	}

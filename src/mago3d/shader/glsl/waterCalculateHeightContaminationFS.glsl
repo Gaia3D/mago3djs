@@ -26,6 +26,7 @@ uniform float u_waterMaxHeigh;
 uniform float u_contaminantMaxHeigh;
 uniform float u_fluidMaxHeigh;
 uniform float u_fluidHeigh;
+uniform float u_timestep;
 
 varying vec2 v_tex_pos;
 varying vec4 vColor4;

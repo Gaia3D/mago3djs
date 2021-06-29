@@ -251,7 +251,7 @@ void main()
 	float height = terrainHeight + vWaterHeight + vContaminantHeight;
 
 	// Test debug:
-	//height += 5.0;
+	height += 0.5;
 
 	//if(thisIsBorderWater)
 	//{

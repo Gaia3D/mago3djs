@@ -29,17 +29,21 @@ var WaterManager = function (magoManager, options)
 	this.fbo;
 
 	// Simulation parameters.**************************************************************************
-	this.simulationTextureSize = new Float32Array([1024, 1024]);
+	var simRes = 1024; // todo : try to set texture size that the simulation cell is aproximately square.
+	this.simulationTextureSize = new Float32Array([simRes, simRes]);
 	this.bSsimulateWater = false;
-	//this.terrainTextureSize = new Float32Array([512, 512]);
-	this.terrainTextureSize = new Float32Array([1024, 1024]);
+	this.terrainTextureSize = new Float32Array([simRes, simRes]);
 
 	// Water wind.*************************************************************************************
+	this.bRenderParticles = true;
 	this.windParticlesPosFbo;
 	this.windRes = 64;
 	this.dropRate = 0.003; // how often the particles move to a random place
 	this.dropRateBump = 0.001; // drop rate increase relative to individual particle speed
 	//-------------------------------------------------------------------------------------------------
+
+	// Rain.*******************************************************************************************
+	this.bExistRain = false;
 
 	// Terrain slippage.*******************************************************************************
 	this.bSimulateTerrainSlippage = false;
@@ -68,9 +72,14 @@ var WaterManager = function (magoManager, options)
 			this.terrainProvider = options.terrainProvider;
 		}
 
-		if(options.simulationTileDepth)
+		if(options.renderParticles !== undefined)
 		{
-			this.simulationTileDepth = options.simulationTileDepth;
+			this.bRenderParticles = options.renderParticles;
+		}
+
+		if(options.existRain !== undefined)
+		{
+			this.bExistRain = options.existRain;
 		}
 	}
 
@@ -97,12 +106,9 @@ WaterManager.prototype.newWater = function (options)
 
 WaterManager.prototype.init = function ()
 {
-	/*
-	var bufferWidth = this.sceneState.drawingBufferWidth[0];
-	var bufferHeight = this.sceneState.drawingBufferHeight[0];
-	var bUseMultiRenderTarget = this.postFxShadersManager.bUseMultiRenderTarget;
-	this.texturesManager.lBuffer = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 3}); 
-	*/
+	// 1rst, try to set simulation resolution to be square cells.***
+
+
 	var magoManager = this.magoManager;
 	var gl = this.magoManager.getGl();
 	// create frame buffer object.
@@ -780,6 +786,8 @@ WaterManager.prototype.render = function ()
 	// 2nd, check if simulate water.************************************************************************
 	if(this.bSsimulateWater)
 	{
+		//if(!this.magoManager.isCameraMoving)
+
 		this.overWriteDEMWithObjects();
 		this.makeWaterAndContaminationSourceTex();
 
@@ -789,6 +797,7 @@ WaterManager.prototype.render = function ()
 			// in nearestFrustum we have overWriteDEM data ready & updated.
 			this.doSimulation(); 
 		}
+		
 	}
 	//-------------------------------------------------------------------------------------------------------
 	

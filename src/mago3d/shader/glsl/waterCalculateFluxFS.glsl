@@ -22,7 +22,6 @@ uniform sampler2D currWaterFluxTex_LOW;
 
 varying vec2 v_tex_pos;
 
-uniform float u_SimRes;
 uniform float u_timestep;
 
 uniform vec2 u_tileSize; // tile size in meters.
