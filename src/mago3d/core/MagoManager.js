@@ -358,7 +358,7 @@ var MagoManager = function (config)
 	this._needValidHeightNativeArray = [];
 	this._changeCanvasSizeEvent = new CustomEvent('changeCanvasSize');
 
-	if (Mago3D['WeatherStation'] && this.weatherStation === undefined)
+	if (window.Mago3D && Mago3D['WeatherStation'] && this.weatherStation === undefined)
 	{ 
 		this.weatherStation = new Mago3D.WeatherStation(this);
 	}
@@ -2652,6 +2652,27 @@ MagoManager.prototype.startRender = function (isLastFrustum, frustumIdx, numFrus
 };
 
 /**
+ * Get terrain's maximum level
+ * @param {Cesium.TerrainProvider} terrainProvider
+ * @return {number}
+ */
+MagoManager.getTerrainMaximumLevel = function(terrainProvider)
+{
+	var maxLevel = 20;
+	var isBasicTerrainProvider = terrainProvider instanceof Cesium.EllipsoidTerrainProvider;
+	if (!isBasicTerrainProvider) 
+	{
+		if (!terrainProvider._layers || !terrainProvider._layers[0])
+		{
+			return;
+		}
+		maxLevel = terrainProvider._layers[0].availability._maximumLevel - 1;
+	}
+
+	return maxLevel;
+}
+
+/**
  * valid date height by height reference
  * @param {frustumObject} frustumObject 
  */
@@ -2663,17 +2684,8 @@ MagoManager.prototype.validateHeight = function(frustumObject)
 	if (this._needValidHeightNodeArray.length > 0 && visibleNodes.length > 0) 
 	{
 		var terrainProvider = this.scene.globe.terrainProvider;
-		var isBasicTerrainProvider = terrainProvider instanceof Cesium.EllipsoidTerrainProvider;
-		var maxZoom = 20;
-		if (!isBasicTerrainProvider) 
-		{
-			if (!terrainProvider._layers || !terrainProvider._layers[0])
-			{
-				return;
-			}
-			maxZoom = terrainProvider._layers[0].availability._maximumLevel - 1;
-		}
-
+		
+		var maxZoom = MagoManager.getTerrainMaximumLevel(terrainProvider);
 		var process = [];
 		var next = [];
 		for (var i=this._needValidHeightNodeArray.length - 1;i>=0;i--) 
@@ -2743,16 +2755,7 @@ MagoManager.prototype.validateHeight = function(frustumObject)
 	if (this._needValidHeightNativeArray.length > 0 && visibleNatives.length > 0) 
 	{
 		var terrainProvider = this.scene.globe.terrainProvider;
-		var isBasicTerrainProvider = terrainProvider instanceof Cesium.EllipsoidTerrainProvider;
-		var maxZoom = 20;
-		if (!isBasicTerrainProvider) 
-		{
-			if (!terrainProvider._layers || !terrainProvider._layers[0])
-			{
-				return;
-			}
-			maxZoom = terrainProvider._layers[0].availability._maximumLevel - 1;
-		}
+		var maxZoom = MagoManager.getTerrainMaximumLevel(terrainProvider);
 
 		var process = [];
 		var next = [];
