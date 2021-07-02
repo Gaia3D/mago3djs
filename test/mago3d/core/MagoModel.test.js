@@ -39,6 +39,7 @@ describe("MagoModel", function ()
 				expect(function()
 				{
 					mockModel.dataId = 'abc';
+					mockModel.dataKey = 'abc';
 					model = new MagoModel(mockModel);
 				}).toThrowError(Messages.REQUIRED_EMPTY_ERROR('dataGroupId'));
 			});
@@ -47,23 +48,17 @@ describe("MagoModel", function ()
 				expect(function()
 				{
 					mockModel.dataGroupId = 'abc';
+					mockModel.dataKey = 'abc';
 					model = new MagoModel(mockModel);
 				}).toThrowError(Messages.REQUIRED_EMPTY_ERROR('longitude', 'latitude'));
-			});
-
-			it('empty seed', function () 
-			{
-				expect(function()
-				{
-					mockModel.longitude = 1;
-					mockModel.latitude = 2;
-					model = new MagoModel(mockModel);
-				}).toThrowError(Messages.REQUIRED_EMPTY_ERROR('BuildingSeed'));
 			});
 		});
 
 		it('객체 생성시 제대로 값을 넣었을 때 값 확인', function () 
 		{
+			mockModel.longitude = 1;
+			mockModel.latitude = 2;
+			mockModel.altitude = 0;
 			model = new MagoModel(mockModel, mockSeed);
 			expect(model.id).toEqual('abc');
 			expect(model.layerId).toEqual('abc');

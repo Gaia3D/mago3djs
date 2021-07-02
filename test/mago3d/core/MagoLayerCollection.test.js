@@ -60,7 +60,7 @@ describe("MagoLayerCollection", function ()
 				expect(addedLayer.id).toEqual(1);
 				expect(addedLayer.key).toEqual('edc');
 				expect(addedLayer.name).toEqual('이디시');
-				expect(addedLayer.path).toEqual('abc/edc/');
+				expect(addedLayer.path).toEqual('abc/edc');
 
 				
 			});

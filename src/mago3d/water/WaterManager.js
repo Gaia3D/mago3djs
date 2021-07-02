@@ -897,6 +897,54 @@ WaterManager.prototype.getWaterSourceObjectsArray = function ()
 	return this._waterSourceObjectsArray;
 };
 
+/**
+ * @param {MagoRenderable} object
+ * @param {depth} number
+ */
+WaterManager.prototype.addObject = function (object, depth) 
+{
+	if(!(object instanceof MagoRenderable)) {
+		return false;
+	}
+	
+	var permitNames = ['waterGenerator', 'contaminationGenerator'];
+	var nameType = permitNames.indexOf(object.name);
+	if(!object.name || nameType < 0) {
+		return false;
+	}
+	var objectArray = (nameType === 0) ? this.getWaterSourceObjectsArray() : this.getContaminationObjectsArray();
+	objectArray.push(object);
+	depth = depth ? depth : 5;
+	this.magoManager.modeler.addObject(object, depth);
+}
+
+/**
+ * @param {MagoRenderable} object
+ */
+ WaterManager.prototype.removeObject = function (object) 
+ {
+	 var _remove = function(item){
+		return item !== object;
+	}
+	 if(!(object instanceof MagoRenderable)) {
+		 return false;
+	 }
+	 
+	 var permitNames = ['waterGenerator', 'contaminationGenerator'];
+	 var nameType = permitNames.indexOf(object.name);
+	 if(!object.name || nameType < 0) {
+		 return false;
+	 }
+
+	 if(nameType === 0) {
+		this._waterSourceObjectsArray = this._waterSourceObjectsArray.filter(_remove);
+	 } else {
+		this._contaminationBoxesArray = this._contaminationBoxesArray.filter(_remove);
+	 }
+	 
+	 this.magoManager.modeler.removeObject(object);
+ }
+
 WaterManager.prototype.getExcavationObjectsArray = function ()
 {
 	if(!this._excavationObjectsArray)

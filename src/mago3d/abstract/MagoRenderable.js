@@ -20,8 +20,8 @@ var MagoRenderable = function (options)
 	this.geoLocDataManager;
 	
 	this.dirty = true;
-	this.color4;
-	this.orgColor4;
+	this.color4 =  new Color(1,1,1,1);
+	this.orgColor4 =  new Color(1,1,1,1);
 	this.wireframeColor4;
 	this.selectedColor4;
 	this.objectType = MagoRenderable.OBJECT_TYPE.MESH; // Init as mesh type.
