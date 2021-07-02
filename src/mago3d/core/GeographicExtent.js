@@ -227,6 +227,39 @@ GeographicExtent.prototype.getMaxAltitude = function()
 	return this.maxGeographicCoord.altitude;
 };
 
+GeographicExtent.prototype.getLongitudeRange = function() 
+{
+	return this.maxGeographicCoord.longitude - this.minGeographicCoord.longitude;
+};
+
+GeographicExtent.prototype.getLatitudeRange = function() 
+{
+	return this.maxGeographicCoord.latitude - this.minGeographicCoord.latitude;
+};
+
+GeographicExtent.prototype.getAltitudeRange = function() 
+{
+	return this.maxGeographicCoord.altitude - this.minGeographicCoord.altitude;
+};
+
+GeographicExtent.prototype.getLongitudeArcDistance = function() 
+{
+	// This function returns the arcDistance in longitude of the midLatitude.***
+	var midGeoCoord = this.getMidPoint();
+	var minGeoCoord = new GeographicCoord(this.minGeographicCoord.longitude, midGeoCoord.latitude, midGeoCoord.altitude);
+	var maxGeoCoord = new GeographicCoord(this.maxGeographicCoord.longitude, midGeoCoord.latitude, midGeoCoord.altitude);
+	return Globe.getArcDistanceBetweenGeographicCoords(minGeoCoord, maxGeoCoord);
+};
+
+GeographicExtent.prototype.getLatitudeArcDistance = function() 
+{
+	// This function returns the arcDistance in latitude of the midLongitude.***
+	var midGeoCoord = this.getMidPoint();
+	var minGeoCoord = new GeographicCoord(midGeoCoord.longitude, this.minGeographicCoord.latitude, midGeoCoord.altitude);
+	var maxGeoCoord = new GeographicCoord(midGeoCoord.longitude, this.maxGeographicCoord.latitude, midGeoCoord.altitude);
+	return Globe.getArcDistanceBetweenGeographicCoords(minGeoCoord, maxGeoCoord);
+};
+
 /**
  * Returns the minimum longitude in radians.
  * @returns {Number}

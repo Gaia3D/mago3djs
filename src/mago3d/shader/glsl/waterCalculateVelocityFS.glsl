@@ -124,6 +124,8 @@ void main()
 
     float cellSize_x = u_tileSize.x / u_simulationTextureSize.x;
     float cellSize_y = u_tileSize.y / u_simulationTextureSize.y;
+
+
     float cellArea = cellSize_x * cellSize_y;
     float timeStep_divCellArea = u_timestep / cellArea;;
 

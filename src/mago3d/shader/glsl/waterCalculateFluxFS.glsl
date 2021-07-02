@@ -123,6 +123,7 @@ void main()
     float cellSize_x = u_tileSize.x / u_simulationTextureSize.x;
     float cellSize_y = u_tileSize.y / u_simulationTextureSize.y;
 
+
     // Terrain & water heights.**************************************************************************************************
     // read terrain heights.
     float topTH = getTerrainHeight(curuv + vec2(0.0, divY));

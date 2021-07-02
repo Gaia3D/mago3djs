@@ -11567,6 +11567,7 @@ void main()\n\
     float cellSize_x = u_tileSize.x / u_simulationTextureSize.x;\n\
     float cellSize_y = u_tileSize.y / u_simulationTextureSize.y;\n\
 \n\
+\n\
     // Terrain & water heights.**************************************************************************************************\n\
     // read terrain heights.\n\
     float topTH = getTerrainHeight(curuv + vec2(0.0, divY));\n\
@@ -12499,6 +12500,8 @@ void main()\n\
 \n\
     float cellSize_x = u_tileSize.x / u_simulationTextureSize.x;\n\
     float cellSize_y = u_tileSize.y / u_simulationTextureSize.y;\n\
+\n\
+\n\
     float cellArea = cellSize_x * cellSize_y;\n\
     float timeStep_divCellArea = u_timestep / cellArea;;\n\
 \n\

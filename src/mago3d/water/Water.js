@@ -168,8 +168,6 @@ Water.prototype._makeTextures = function ()
 	var gl = magoManager.getGl();
 
 	// water simulation texture size: it depends of waterManager.
-	//var texWidth = this.textureWidth[0];
-	//var texHeight = this.textureHeight[0];
 	var texWidth = waterManager.simulationTextureSize[0];
 	var texHeight = waterManager.simulationTextureSize[1];
 
@@ -182,10 +180,10 @@ Water.prototype._makeTextures = function ()
 	this.waterHeightTexA.name = "A";
 	this.waterHeightTexB.name = "B";
 
-	this.waterFluxTexA_HIGH = waterManager._newTexture(gl, texWidth, texHeight);; // water fluxing in 4 directions. splitted values in high & low.
-	this.waterFluxTexB_HIGH = waterManager._newTexture(gl, texWidth, texHeight);; // water fluxing in 4 directions. splitted values in high & low.
-	this.waterFluxTexA_LOW = waterManager._newTexture(gl, texWidth, texHeight);; // water fluxing in 4 directions. splitted values in high & low.
-	this.waterFluxTexB_LOW = waterManager._newTexture(gl, texWidth, texHeight);; // water fluxing in 4 directions. splitted values in high & low.
+	this.waterFluxTexA_HIGH = waterManager._newTexture(gl, texWidth, texHeight); // water fluxing in 4 directions. splitted values in high & low.
+	this.waterFluxTexB_HIGH = waterManager._newTexture(gl, texWidth, texHeight); // water fluxing in 4 directions. splitted values in high & low.
+	this.waterFluxTexA_LOW = waterManager._newTexture(gl, texWidth, texHeight); // water fluxing in 4 directions. splitted values in high & low.
+	this.waterFluxTexB_LOW = waterManager._newTexture(gl, texWidth, texHeight); // water fluxing in 4 directions. splitted values in high & low.
 	
 	this.waterVelocityTexA = waterManager._newTexture(gl, texWidth, texHeight);
 	this.waterVelocityTexB = waterManager._newTexture(gl, texWidth, texHeight);

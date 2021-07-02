@@ -111,8 +111,32 @@ WaterManager.prototype.newWater = function (options)
 
 WaterManager.prototype.init = function ()
 {
-	// 1rst, try to set simulation resolution to be square cells.***
+	// 1rst, determine the simulation texture size by this.simulationGeoExtent.
+	var simulationGeoExtent = this.simulationGeoExtent;
 
+	//var lonRange = simulationGeoExtent.getLongitudeRange();
+	//var latRange = simulationGeoExtent.getLatitudeRange();
+
+
+	var lonArcDist = simulationGeoExtent.getLongitudeArcDistance();
+	var latArcDist = simulationGeoExtent.getLatitudeArcDistance();
+
+
+
+	if(lonArcDist > latArcDist)
+	{
+		// longitude texture size is 1024.
+		this.simulationTextureSize[0] = 1024;
+		this.simulationTextureSize[1] = Math.floor(1024 * (latArcDist / lonArcDist));
+	}
+	else
+	{
+		this.simulationTextureSize[0] = Math.floor(1024 * (lonArcDist / latArcDist));
+		this.simulationTextureSize[1] = 1024;
+	}
+
+	this.terrainTextureSize[0] = this.simulationTextureSize[0];
+	this.terrainTextureSize[1] = this.simulationTextureSize[1];
 
 	var magoManager = this.magoManager;
 	var gl = this.magoManager.getGl();
