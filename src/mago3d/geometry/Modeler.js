@@ -337,6 +337,8 @@ Modeler.prototype.__TEST__extrusionBuildings_sejongForWaterSimulation = function
 
 	var widthIncreLon = 0.0005;
 	var widthIncreLat = 0.0005;
+	var bigIncreLat = 0.005;
+	var bigIncreLon = 0.02;
 	var minLon = 127.20762;
 	var minLat = 35.60993;
 	var maxLat = 35.61518;
@@ -349,8 +351,9 @@ Modeler.prototype.__TEST__extrusionBuildings_sejongForWaterSimulation = function
 
 
 
-	var lines = [[[ minLon + increLon, maxLat + increLat], [ minLon + increLon, minLat  + increLat], [ minLon + widthIncreLon + increLon, minLat  + increLat], [ minLon + widthIncreLon + increLon, maxLat  + increLat]]];
-	lines.push([[ minLon, minLat ], [ minLon + widthIncreLon, minLat ], [ minLon + widthIncreLon, minLat + widthIncreLat], [ minLon, minLat + widthIncreLat ]]); // original.
+	var lines = [[[ minLon + increLon, maxLat + increLat], [ minLon + increLon, minLat  + increLat], [ minLon + widthIncreLon + increLon, minLat  + increLat], [ minLon + widthIncreLon + increLon, maxLat  + increLat]]]; // vertical wall. (south to north)
+	//lines.push([[ minLon, minLat ], [ minLon + widthIncreLon, minLat ], [ minLon + widthIncreLon, minLat + widthIncreLat], [ minLon, minLat + widthIncreLat ]]); // a small column.
+	lines.push([[ minLon, minLat ], [ minLon + bigIncreLon, minLat ], [ minLon + bigIncreLon, minLat + widthIncreLat], [ minLon, minLat + widthIncreLat ]]); // horizontal wall (west to east).
 
 
 	// Now, create geoCoords.***

@@ -55,25 +55,50 @@ void main()
     // 1rst, take the water source.
     vec4 currWaterHeight = texture2D(currWaterHeightTex, v_tex_pos);
     vec4 waterSource = texture2D(waterSourceTex, vec2(v_tex_pos.x, 1.0 - v_tex_pos.y));
+    //vec4 waterSource = vec4(0.0, 0.0, 0.0, 0.01);
 
-    float decodedCurrWaterHeight = unpackDepth(currWaterHeight);
-    float decodedSourceWaterHeight = unpackDepth(waterSource);
+    float decodedCurrWaterHeight = unpackDepth(currWaterHeight) * u_waterMaxHeigh;
+    float decodedSourceWaterHeight = unpackDepth(waterSource) * u_waterMaxHeigh;
 
-    if(decodedSourceWaterHeight < decodedCurrWaterHeight)
+    float finalWaterHeight = decodedSourceWaterHeight; // init value.***
+    //finalWaterHeight = 0.0;
+
+    vec4 shaderLogColor4 = vec4(0.0, 0.0, 0.0, 1.0);
+
+    if(finalWaterHeight < 0.0)
     {
-        waterSource = currWaterHeight;
+        shaderLogColor4 = vec4(1.0, 0.0, 1.0, 1.0);
     }
 
+    if(finalWaterHeight < decodedCurrWaterHeight)
+    {
+        finalWaterHeight = decodedCurrWaterHeight;
+        shaderLogColor4 = vec4(1.0, 0.0, 0.0, 1.0);
+    }
+
+
     // add rain.
+    
     if(u_existRain)
     {
         vec4 rain = texture2D(rainTex, vec2(v_tex_pos.x, 1.0 - v_tex_pos.y));
-        waterSource += rain;
+        float rainHeight = unpackDepth(rain) * u_waterMaxHeigh;
+        finalWaterHeight += rainHeight;
     }
 
     vec4 waterAdition = texture2D(waterAditionTex, vec2(v_tex_pos.x, v_tex_pos.y));
-    waterSource += waterAdition;
+    float waterAditionHeight = unpackDepth(waterAdition) * u_waterMaxHeigh;
+    finalWaterHeight += waterAditionHeight;
 
+    if(finalWaterHeight > u_waterMaxHeigh)
+    {
+        shaderLogColor4 = vec4(0.0, 1.0, 0.5, 1.0);
+    }
+    
+
+    vec4 finalWaterHeight4 = packDepth(finalWaterHeight / u_waterMaxHeigh);
+
+    // Contamination Height.********************************************************************************
     vec4 contaminSourceHeight = vec4(0.0);
     if(u_contaminantMaxHeigh > 0.0)
     {
@@ -89,12 +114,12 @@ void main()
         }
     }
 
-    // provisionally assign the waterSource as waterHeight...
-    gl_FragData[0] = waterSource;  // waterHeight.
+    
+    gl_FragData[0] = finalWaterHeight4;  // waterHeight.
 
     #ifdef USE_MULTI_RENDER_TARGET
         gl_FragData[1] = contaminSourceHeight; // contamination
-        gl_FragData[2] = vec4(1.0, 0.0, 0.5, 1.0); // normal
+        gl_FragData[2] = shaderLogColor4; // normal
         gl_FragData[3] = vec4(1.0, 0.0, 0.5, 1.0); // albedo
         gl_FragData[4] = vec4(1.0, 0.0, 0.5, 1.0); // selection color
     #endif

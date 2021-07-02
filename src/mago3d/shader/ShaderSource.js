@@ -11809,25 +11809,50 @@ void main()\n\
     // 1rst, take the water source.\n\
     vec4 currWaterHeight = texture2D(currWaterHeightTex, v_tex_pos);\n\
     vec4 waterSource = texture2D(waterSourceTex, vec2(v_tex_pos.x, 1.0 - v_tex_pos.y));\n\
+    //vec4 waterSource = vec4(0.0, 0.0, 0.0, 0.01);\n\
 \n\
-    float decodedCurrWaterHeight = unpackDepth(currWaterHeight);\n\
-    float decodedSourceWaterHeight = unpackDepth(waterSource);\n\
+    float decodedCurrWaterHeight = unpackDepth(currWaterHeight) * u_waterMaxHeigh;\n\
+    float decodedSourceWaterHeight = unpackDepth(waterSource) * u_waterMaxHeigh;\n\
 \n\
-    if(decodedSourceWaterHeight < decodedCurrWaterHeight)\n\
+    float finalWaterHeight = decodedSourceWaterHeight; // init value.***\n\
+    //finalWaterHeight = 0.0;\n\
+\n\
+    vec4 shaderLogColor4 = vec4(0.0, 0.0, 0.0, 1.0);\n\
+\n\
+    if(finalWaterHeight < 0.0)\n\
     {\n\
-        waterSource = currWaterHeight;\n\
+        shaderLogColor4 = vec4(1.0, 0.0, 1.0, 1.0);\n\
     }\n\
 \n\
+    if(finalWaterHeight < decodedCurrWaterHeight)\n\
+    {\n\
+        finalWaterHeight = decodedCurrWaterHeight;\n\
+        shaderLogColor4 = vec4(1.0, 0.0, 0.0, 1.0);\n\
+    }\n\
+\n\
+\n\
     // add rain.\n\
+    \n\
     if(u_existRain)\n\
     {\n\
         vec4 rain = texture2D(rainTex, vec2(v_tex_pos.x, 1.0 - v_tex_pos.y));\n\
-        waterSource += rain;\n\
+        float rainHeight = unpackDepth(rain) * u_waterMaxHeigh;\n\
+        finalWaterHeight += rainHeight;\n\
     }\n\
 \n\
     vec4 waterAdition = texture2D(waterAditionTex, vec2(v_tex_pos.x, v_tex_pos.y));\n\
-    waterSource += waterAdition;\n\
+    float waterAditionHeight = unpackDepth(waterAdition) * u_waterMaxHeigh;\n\
+    finalWaterHeight += waterAditionHeight;\n\
 \n\
+    if(finalWaterHeight > u_waterMaxHeigh)\n\
+    {\n\
+        shaderLogColor4 = vec4(0.0, 1.0, 0.5, 1.0);\n\
+    }\n\
+    \n\
+\n\
+    vec4 finalWaterHeight4 = packDepth(finalWaterHeight / u_waterMaxHeigh);\n\
+\n\
+    // Contamination Height.********************************************************************************\n\
     vec4 contaminSourceHeight = vec4(0.0);\n\
     if(u_contaminantMaxHeigh > 0.0)\n\
     {\n\
@@ -11843,12 +11868,12 @@ void main()\n\
         }\n\
     }\n\
 \n\
-    // provisionally assign the waterSource as waterHeight...\n\
-    gl_FragData[0] = waterSource;  // waterHeight.\n\
+    \n\
+    gl_FragData[0] = finalWaterHeight4;  // waterHeight.\n\
 \n\
     #ifdef USE_MULTI_RENDER_TARGET\n\
         gl_FragData[1] = contaminSourceHeight; // contamination\n\
-        gl_FragData[2] = vec4(1.0, 0.0, 0.5, 1.0); // normal\n\
+        gl_FragData[2] = shaderLogColor4; // normal\n\
         gl_FragData[3] = vec4(1.0, 0.0, 0.5, 1.0); // albedo\n\
         gl_FragData[4] = vec4(1.0, 0.0, 0.5, 1.0); // selection color\n\
     #endif\n\

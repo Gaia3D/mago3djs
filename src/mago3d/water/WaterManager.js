@@ -81,6 +81,11 @@ var WaterManager = function (magoManager, options)
 		{
 			this.bExistRain = options.existRain;
 		}
+
+		if(options.waterSourceUrl !== undefined)
+		{
+			this.waterSourceUrl = options.waterSourceUrl;
+		}
 	}
 
 
@@ -177,6 +182,11 @@ WaterManager.prototype.init = function ()
 	var options = {
 		geographicExtent : geoExtent
 	};
+
+	if(this.waterSourceUrl)
+	{
+		options.waterSourceUrl = this.waterSourceUrl;
+	}
 
 	var waterLayer = this.newWater(options);
 };
@@ -635,17 +645,9 @@ WaterManager.prototype.getQuadBuffer = function ()
 
 WaterManager.prototype._newTexture = function (gl, texWidth, texHeight)
 {
-	var imageData = new Uint8Array(texWidth * texHeight * 4);
-	var tex = gl.createTexture();
-	gl.bindTexture(gl.TEXTURE_2D, tex);  // depthTex.
-	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); //LINEAR_MIPMAP_LINEAR
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, texWidth, texHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-
-	gl.bindTexture(gl.TEXTURE_2D, null);
+	var filter = gl.LINEAR;
+	var data = new Uint8Array(texWidth * texHeight * 4);
+	var tex = Texture.createTexture(gl, filter, data, texWidth, texHeight);
 
 	var magoTexture = new Texture();
 	magoTexture.texId = tex;
@@ -1083,8 +1085,8 @@ WaterManager.prototype.test__createContaminationBox_sejong = function (magoManag
 	
 
 	// Test with box.***
-	var width = 50.0;
-	var length = 50.0;
+	var width = 20.0;
+	var length = 20.0;
 	var height = 200.0;
 	var name = "contaminationGenerator";
 	var initialGeoCoord = new GeographicCoord(lon, lat, 200.0);

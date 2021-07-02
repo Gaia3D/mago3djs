@@ -33,6 +33,11 @@ var Texture = function(options)
 		{
 			this.opacity = options.opacity;
 		}
+
+		if (options.url !== undefined)
+		{
+			this.url = options.url;
+		}
 	}
 };
 
@@ -83,24 +88,41 @@ Texture.prototype.deleteObjects = function(gl)
  * @param width the width of the texture image
  * @param height the height of the texture image
  */
-Texture.createTexture = function(gl, filter, data, width, height) 
+Texture.createTexture = function(gl, filter, data, width, height, texWrap) 
 {
 	// static function.
 	// example of filter: gl.NEAREST
+	if(!texWrap)
+	{
+		texWrap = gl.CLAMP_TO_EDGE;
+	}
+
+	if(!filter)
+	{
+		filter = gl.NEAREST;
+	}
+
+	if(data === undefined)
+	{
+		data = null;
+	}
+
 	var texture = gl.createTexture();
 	gl.bindTexture(gl.TEXTURE_2D, texture);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, texWrap);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, texWrap);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filter);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filter);
-	if (data instanceof Uint8Array) 
+	if (data instanceof Uint8Array || data === null) 
 	{
 		//Reference : https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texImage2D
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, data);
 	}
 	else 
 	{
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, data);
+		// here, "data" must to be "image" type object.
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, data); 
 	}
 	gl.bindTexture(gl.TEXTURE_2D, null);
 	return texture;
