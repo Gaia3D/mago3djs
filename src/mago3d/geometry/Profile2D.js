@@ -17,6 +17,26 @@ var Profile2D = function()
 };
 
 /**
+ * @param {Array<Point2D>} point2dArray
+ */
+Profile2D.fromPoint2DArray = function(point2dArray) {
+	if(!point2dArray || !Array.isArray(point2dArray)) {
+		throw new Error(Messages.REQUIRED_EMPTY_ERROR('Point2D Array'))
+	}
+
+	var profile2d = new Profile2D();
+	var outerRing = profile2d.newOuterRing();
+	var polyline = outerRing.newElement("POLYLINE");
+
+	var pointCount = point2dArray.length;
+	for(var i=0;i<pointCount;i++) {
+		polyline.addPoint2d(point2dArray[i]);
+	}
+
+	return profile2d;
+}
+
+/**
  * Set new outer border of this polygon as outerRing
  * @returns {Ring2D} outerRing
  */
@@ -172,7 +192,6 @@ Profile2D.prototype.getConvexFacesIndicesData = function(resultGeneralIndicesDat
  * 어떤 일을 하고 있습니까?
  * @returns vertexList
  */
- 
 Profile2D.prototype.getGeneralPolygon = function(generalPolygon) 
 {
 	// this returns a holesTessellatedPolygon, and inside it has convexPolygons.

@@ -16,6 +16,24 @@ var PolyLine2D = function()
 };
 
 /**
+ * add Point2D.
+ * @param {Point2D} point2d
+ * @returns point2d
+ */
+ PolyLine2D.prototype.addPoint2d = function(point2d)
+ {
+	 if (this.point2dArray === undefined)
+	 { this.point2dArray = []; }
+	 
+	 if(!point2d || !(point2d instanceof Point2D)) {
+		 throw new Error(Messages.REQUIRED_EMPTY_ERROR('Point2D'))
+	 }
+
+	 this.point2dArray.push(point2d);
+	 return point2d;
+ };
+
+/**
  * Creates a new Point2D.
  * @param {Number} x
  * @param {Number} y
@@ -27,7 +45,7 @@ PolyLine2D.prototype.newPoint2d = function(x, y)
 	{ this.point2dArray = []; }
 	
 	var point2d = new Point2D(x, y);
-	this.point2dArray.push(point2d);
+	this.addPoint2d(point2d);
 	return point2d;
 };
 

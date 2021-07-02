@@ -85,9 +85,9 @@ var Water = function(waterManager, options)
 
 	// simulation parameters.******************************************
 	this.terrainMinMaxHeights = new Float32Array([180.0, 540.0]);
-	this.waterMaxHeight = 100.0; // ok.
+	this.waterMaxHeight = 500.0; // ok.
 	//this.waterMaxHeight = 1000.0; // ok.
-	this.waterMaxFlux = 50000.0; // ok. (4000 is no enought).
+	this.waterMaxFlux = 100000.0; // ok. (4000 is no enought).
 	this.waterMaxVelocity = 40.0;
 	this.waterMaxVelocity = 400.0;
 	this.contaminantMaxheight = -1.0; // value when there are no exist contaminant.
