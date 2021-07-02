@@ -1629,33 +1629,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		return;
 	}
 
-		// Test.***
-		if(!this.qMeshPromise)
-		{
-			var X = 27965;
-			var Y = 4870;
-			var L = 14;
-			this.qMeshPromise = this.scene.globe.terrainProvider.requestTileGeometry(X, Y, L);
-			this.qMeshPromise.then((value) =>
-			{
-				this.qMesh = value;
-				this.qMesh.tileIndices = {
-					L : L, X : X, Y : Y
-				};
-			});
-		}
-	
-		if(this.qMesh && !this.soundDEMTexTest)
-		{
-			// make demTex with the qMeshData.***
-			if(this.soundManager && this.soundManager.soundLayersArray.length > 0)
-			{
-				var soundLayer = this.soundManager.soundLayersArray[0];
-				soundLayer.qMesh = this.qMesh;
-				soundLayer.makeDEMTextureByQuantizedMesh(this.qMesh);
-				this.soundDEMTexTest = true;
-			}
-		}
+
 	
 	var gl = this.getGl();
 	

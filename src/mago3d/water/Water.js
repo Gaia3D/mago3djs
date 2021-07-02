@@ -660,7 +660,7 @@ Water.prototype.prepareTextures = function ()
 		var gl = magoManager.getGl();
 		//var texturePath = '/images/en/waterSourceTexTestlow.png';
 		//var texturePath = '/images/en/waterSourceTexTest_rain.png';
-		var texturePath = '/images/en/black1024.png';
+		var texturePath = '/images/en/black.png';
 		//var texturePath = '/images/en/contaminantHigh.png';
 
 		ReaderWriter.loadImage(gl, texturePath, this.waterSourceTex);
