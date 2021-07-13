@@ -1628,9 +1628,42 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		this.doRenderMagoWorld(frustumVolumenObject);
 		return;
 	}
+		/*
+		// Test.***
+		if(!this.qMeshPromise)
+		{
+			// Sejong tile.***
+			var X = 27965;
+			var Y = 4870;
+			var L = 14;
+			//----------------
+			// For sihung: lon = 126.89287, lat = 37.35476 (L: 14, X: 27934, Y: 4791)
+			//var tile = SmartTile.selectTileIndices(14, 126.89287, 37.35476, undefined);
+			var X = 27934;
+			var Y = 4791;
+			var L = 14;
 
-
+			this.qMeshPromise = this.scene.globe.terrainProvider.requestTileGeometry(X, Y, L);
+			this.qMeshPromise.then((value) =>
+			{
+				this.qMesh = value;
+				this.qMesh.tileIndices = {
+					L : L, X : X, Y : Y
+				};
+			});
+		}
 	
+		if(this.qMesh && !this.DEMTexTest)
+		{
+			// make demTex with the qMeshData.***
+			if(this.waterManager && this.waterManager.waterLayersArray.length > 0)
+			{
+				var waterLayer = this.waterManager.waterLayersArray[0];
+				waterLayer.testQMesh = this.qMesh;
+				this.DEMTexTest = true;
+			}
+		}
+	*/
 	var gl = this.getGl();
 	
 	// 1) The depth render.**********************************************************************************************************************
@@ -1863,6 +1896,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 	{
 		// Render terrain.***
 		//this.waterManager.renderTerrain();
+		this.waterManager._TEST_renderQMesh();
 	}
 
 
@@ -4330,35 +4364,7 @@ MagoManager.prototype.keyDown = function(key)
 	}
 	else if (key === 87) // 87 = 'w'.***
 	{
-		// do wind test.
-		if (this.windTest === undefined)
-		{
-			if (this.weatherStation === undefined)
-			{ this.weatherStation = new WeatherStation(); }
-		
-			var geometryDataPath = this.readerWriter.geometryDataPath;
-			var windDataFilesNamesArray = ["OBS-QWM_2016062000.grib2_wind_000", "OBS-QWM_2016062001.grib2_wind_000", "OBS-QWM_2016062002.grib2_wind_000", "OBS-QWM_2016062003.grib2_wind_000",
-				"OBS-QWM_2016062004.grib2_wind_000", "OBS-QWM_2016062005.grib2_wind_000", "OBS-QWM_2016062006.grib2_wind_000", "OBS-QWM_2016062007.grib2_wind_000",
-				"OBS-QWM_2016062008.grib2_wind_000", "OBS-QWM_2016062009.grib2_wind_000", "OBS-QWM_2016062010.grib2_wind_000", "OBS-QWM_2016062011.grib2_wind_000",
-				"OBS-QWM_2016062012.grib2_wind_000", "OBS-QWM_2016062013.grib2_wind_000", "OBS-QWM_2016062014.grib2_wind_000", "OBS-QWM_2016062015.grib2_wind_000",
-				"OBS-QWM_2016062016.grib2_wind_000", "OBS-QWM_2016062017.grib2_wind_000", "OBS-QWM_2016062018.grib2_wind_000", "OBS-QWM_2016062019.grib2_wind_000",
-				"OBS-QWM_2016062020.grib2_wind_000", "OBS-QWM_2016062021.grib2_wind_000", "OBS-QWM_2016062022.grib2_wind_000", "OBS-QWM_2016062023.grib2_wind_000"];
-
-			var windDataFilesNamesArray = ["OBS-QWM_2019090700.grib2_wind_000", "OBS-QWM_2019090701.grib2_wind_000", "OBS-QWM_2019090702.grib2_wind_000", "OBS-QWM_2019090703.grib2_wind_000",
-				"OBS-QWM_2019090704.grib2_wind_000", "OBS-QWM_2019090705.grib2_wind_000", "OBS-QWM_2019090706.grib2_wind_000", "OBS-QWM_2019090707.grib2_wind_000",
-				"OBS-QWM_2019090708.grib2_wind_000", "OBS-QWM_2019090709.grib2_wind_000", "OBS-QWM_2019090710.grib2_wind_000", "OBS-QWM_2019090711.grib2_wind_000",
-				"OBS-QWM_2019090712.grib2_wind_000", "OBS-QWM_2019090713.grib2_wind_000", "OBS-QWM_2019090714.grib2_wind_000", "OBS-QWM_2019090715.grib2_wind_000",
-				"OBS-QWM_2019090716.grib2_wind_000", "OBS-QWM_2019090717.grib2_wind_000", "OBS-QWM_2019090718.grib2_wind_000", "OBS-QWM_2019090719.grib2_wind_000",
-				"OBS-QWM_2019090720.grib2_wind_000", "OBS-QWM_2019090721.grib2_wind_000", "OBS-QWM_2019090722.grib2_wind_000", "OBS-QWM_2019090723.grib2_wind_000"];
-				
-			//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_Airport";
-			//var windMapFilesFolderPath = geometryDataPath +"/JeJu_wind_GolfPark_NineBridge1";
-			var windMapFilesFolderPath = geometryDataPath +"/SeoulWind/200907";
-			
-			this.weatherStation.test_loadWindData3d(this, windDataFilesNamesArray, windMapFilesFolderPath);
-			this.TEST__golfPark();
-			this.windTest = true;
-		}
+		//
 	}
 	else if (key === 89) // 89 = 'y'.***
 	{

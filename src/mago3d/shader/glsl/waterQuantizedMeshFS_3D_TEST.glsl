@@ -45,6 +45,8 @@ void main()
         finalCol4 = u_oneColor4;
     }
 
+    finalCol4 = u_oneColor4; // original.***
+
     //-------------------------------------------------------------------------------------------------------------
     gl_FragData[0] = finalCol4;  // anything.
 

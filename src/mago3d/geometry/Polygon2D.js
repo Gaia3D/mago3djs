@@ -4,7 +4,7 @@
  * 어떤 일을 하고 있습니까?
  * @class Polygon2D
  */
-var Polygon2D = function() 
+var Polygon2D = function(options) 
 {
 	if (!(this instanceof Polygon2D)) 
 	{
@@ -15,6 +15,14 @@ var Polygon2D = function()
 	this.normal; // Polygon2D sense. (normal = 1) -> CCW. (normal = -1) -> CW.
 	this.convexPolygonsArray; // tessellation result.
 	this.bRect; // boundary rectangle.
+
+	if(options)
+	{
+		if(options.point2dList)
+		{
+			this.point2dList = options.point2dList;
+		}
+	}
 };
 
 Polygon2D.prototype.deleteObjects = function()

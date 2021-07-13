@@ -195,3 +195,10 @@ CODE.relativePositionSegment3DWithPlane2D = {
 	"END_POINT_COINCIDENT" : 4,
 	"TWO_POINTS_COINCIDENT" : 5
 }
+
+CODE.status = {
+	"UNKNOWN" : 0,
+	"NORMAL" : 1,
+	"DELETED" : 2,
+	"HIGHLIGHTED" : 3
+}

@@ -69,6 +69,10 @@ var Triangle= function(vertex0, vertex1, vertex2)
 	
 	this.hEdge;
 
+	this.status = CODE.status.NORMAL; // this var indicates the status of the triangle.
+	// If no exist status, then the status is "NORMAL".***
+	// Status can be "DELETED", "NORMAL", etc.***
+
 	// auxiliar vars:
 	this.bRectXY; // bounding rectangle of the triangle projected in the plane XY.
 };
@@ -116,6 +120,16 @@ Triangle.prototype.setVertices = function(vertex0, vertex1, vertex2)
 	this.vertex2 = vertex2;
 };
 
+Triangle.prototype.setStatus = function(status) 
+{
+	this.status = status;
+};
+
+Triangle.prototype.getStatus = function() 
+{
+	return this.status;
+};
+
 /**
  * Vertex의 vertexList index를 가지고 와서 Vertex index 설정
  */
@@ -148,6 +162,17 @@ Triangle.prototype.getIndicesArray = function(indicesArray)
 	}
 	
 	return indicesArray;
+};
+
+Triangle.prototype.hasVertex = function(vertex) 
+{
+	// this function returns true if "vertex" is the same vertex of the triangle.
+	if(this.vertex0 === vertex || this.vertex1 === vertex || this.vertex2 === vertex)
+	{
+		return true;
+	}
+
+	return false;
 };
 
 /**
@@ -209,7 +234,6 @@ Triangle.prototype.getPlaneNormal = function()
 	return this.normal;
 };
 
-
 /**
  * Return points intersected by the plane.
  * 
@@ -251,10 +275,14 @@ Triangle.prototype.getIntersectionByPlaneReport = function(plane, resultIntersec
 		// calculate the intersection point.
 		var line = seg0.getLine();
 		var intersectPoint = plane.intersectionLine(line, undefined);
-		intersectedPointsArray.push({
-			intersectionType : "segmentIntersection",
-			idx : 0,
-			intesectPoint : intersectPoint});
+		// Now, must check if the "intersectPoint" is inside of the segment.
+		if(seg0.intersectionWithPoint(intersectPoint, error))
+		{
+			intersectedPointsArray.push({
+				intersectionType : "segmentIntersection",
+				idx : 0,
+				intesectPoint : intersectPoint});
+		}
 	}
 	else if(relPosSeg0ToPlane === CODE.relativePositionSegment3DWithPlane2D.START_POINT_COINCIDENT)
 	{
@@ -274,10 +302,13 @@ Triangle.prototype.getIntersectionByPlaneReport = function(plane, resultIntersec
 		// calculate the intersection point.
 		var line = seg1.getLine();
 		var intersectPoint = plane.intersectionLine(line, undefined);
-		intersectedPointsArray.push({
-			intersectionType : "segmentIntersection",
-			idx : 1,
-			intesectPoint : intersectPoint});
+		if(seg1.intersectionWithPoint(intersectPoint, error))
+		{
+			intersectedPointsArray.push({
+				intersectionType : "segmentIntersection",
+				idx : 1,
+				intesectPoint : intersectPoint});
+		}
 	}
 	else if(relPosSeg1ToPlane === CODE.relativePositionSegment3DWithPlane2D.START_POINT_COINCIDENT)
 	{
@@ -299,10 +330,13 @@ Triangle.prototype.getIntersectionByPlaneReport = function(plane, resultIntersec
 			// calculate the intersection point.
 			var line = seg2.getLine();
 			var intersectPoint = plane.intersectionLine(line, undefined);
-			intersectedPointsArray.push({
-				intersectionType : "segmentIntersection",
-				idx : 2,
-				intesectPoint : intersectPoint});
+			if(seg2.intersectionWithPoint(intersectPoint, error))
+			{
+				intersectedPointsArray.push({
+					intersectionType : "segmentIntersection",
+					idx : 2,
+					intesectPoint : intersectPoint});
+			}
 		}
 		else if(relPosSeg2ToPlane === CODE.relativePositionSegment3DWithPlane2D.START_POINT_COINCIDENT)
 		{
@@ -400,6 +434,22 @@ Triangle.prototype.getPlane = function(resultPlane)
 	return resultPlane;
 };
 
+Triangle.prototype.getCenterPoint = function(resultCenterPoint) 
+{
+	if(!resultCenterPoint)
+	{
+		resultCenterPoint = new Point3D();
+	}
+
+	var p0 = this.vertex0.getPosition();
+	var p1 = this.vertex1.getPosition();
+	var p2 = this.vertex2.getPosition();
+
+	resultCenterPoint.set((p0.x + p1.x + p2.x)/3.0, (p0.y + p1.y + p2.y)/3.0, (p0.z + p1.z + p2.z)/3.0);
+
+	return resultCenterPoint;
+};
+
 /**
  * 
  */
@@ -426,6 +476,7 @@ Triangle.prototype.getSegment = function(idx, resultSegment)
 	
 	return resultSegment;
 };
+
 
 
 

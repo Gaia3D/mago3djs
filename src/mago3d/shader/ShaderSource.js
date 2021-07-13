@@ -12737,8 +12737,11 @@ ShaderSource.waterDEMTexFromQuantizedMeshFS = "//#version 300 es\n\
 #endif\n\
 \n\
 uniform vec2 u_minMaxHeights;\n\
+uniform int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
+uniform vec4 u_oneColor4;\n\
 \n\
 varying vec3 vPos;\n\
+varying vec4 vColor4;\n\
 \n\
 vec4 packDepth( float v ) {\n\
   vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
@@ -12756,7 +12759,13 @@ float unpackDepth(const in vec4 rgba_depth)\n\
 \n\
 void main()\n\
 {\n\
-    vec4 finalCol4 = vec4(vPos.z, vPos.z, vPos.z, 1.0);\n\
+    vec4 finalCol4 = vec4(vPos.z, vPos.z, vPos.z, 1.0); // original.***\n\
+\n\
+    if(colorType == 1)\n\
+    {\n\
+        //finalCol4 = vColor4;\n\
+        finalCol4 = u_oneColor4;\n\
+    }\n\
 \n\
     //-------------------------------------------------------------------------------------------------------------\n\
     gl_FragData[0] = finalCol4;  // anything.\n\
@@ -13759,9 +13768,70 @@ void main() {\n\
     v_tex_pos = a_pos;\n\
     gl_Position = vec4(-1.0 + 2.0 * a_pos, 0.0, 1.0);\n\
 }";
+ShaderSource.waterQuantizedMeshFS_3D_TEST = "//#version 300 es\n\
+\n\
+#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+uniform vec2 u_minMaxHeights;\n\
+uniform int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
+uniform vec4 u_oneColor4;\n\
+\n\
+varying vec3 vPos;\n\
+varying vec4 vColor4;\n\
+\n\
+vec4 packDepth( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+  return enc;\n\
+}\n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+}\n\
+\n\
+\n\
+\n\
+void main()\n\
+{\n\
+    vec4 finalCol4 = vec4(vPos.z, vPos.z, vPos.z, 1.0); // original.***\n\
+\n\
+    if(colorType == 1)\n\
+    {\n\
+        //finalCol4 = vColor4;\n\
+        finalCol4 = u_oneColor4;\n\
+    }\n\
+\n\
+    finalCol4 = u_oneColor4; // original.***\n\
+\n\
+    //-------------------------------------------------------------------------------------------------------------\n\
+    gl_FragData[0] = finalCol4;  // anything.\n\
+\n\
+    #ifdef USE_MULTI_RENDER_TARGET\n\
+        gl_FragData[1] = vec4(1.0); // depth\n\
+        gl_FragData[2] = vec4(1.0); // normal\n\
+        gl_FragData[3] = finalCol4; // albedo\n\
+        gl_FragData[4] = vec4(1.0); // selection color\n\
+    #endif\n\
+\n\
+}";
 ShaderSource.waterQuantizedMeshVS = "//precision mediump float;\n\
 \n\
 attribute vec3 a_pos;\n\
+attribute vec4 color4;\n\
 \n\
 uniform vec3 u_totalMinGeoCoord; // (lon, lat, alt).\n\
 uniform vec3 u_totalMaxGeoCoord;\n\
@@ -13770,6 +13840,7 @@ uniform vec3 u_currentMaxGeoCoord;\n\
 \n\
 varying vec2 v_tex_pos;\n\
 varying vec3 vPos;\n\
+varying vec4 vColor4;\n\
 \n\
 void main() {\n\
     // Note: the position attributte is initially (in javascript) unsignedInt16 (0 to 32,767) (quantizedMesh).\n\
@@ -13793,6 +13864,98 @@ void main() {\n\
     v_tex_pos = pos.xy;\n\
 \n\
     gl_Position = vec4(-1.0 + 2.0 * pos, 1.0);\n\
+\n\
+    vColor4 = color4;\n\
+}";
+ShaderSource.waterQuantizedMeshVS_3D_TEST = "//precision mediump float;\n\
+\n\
+attribute vec3 a_pos;\n\
+attribute vec4 color4;\n\
+\n\
+uniform mat4 buildingRotMatrix; \n\
+	uniform mat4 modelViewMatrixRelToEye; \n\
+	uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
+	uniform mat4 RefTransfMatrix;\n\
+	uniform mat4 normalMatrix4;\n\
+	uniform vec3 buildingPosHIGH;\n\
+	uniform vec3 buildingPosLOW;\n\
+	uniform float near;\n\
+	uniform float far;\n\
+	uniform vec3 scaleLC;\n\
+	uniform vec3 encodedCameraPositionMCHigh;\n\
+	uniform vec3 encodedCameraPositionMCLow;\n\
+	uniform vec3 aditionalPosition;\n\
+	uniform vec3 refTranslationVec;\n\
+	uniform int refMatrixType; // 0= identity, 1= translate, 2= transform\n\
+	uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
+\n\
+uniform vec3 u_minGeoCoord;\n\
+uniform vec3 u_maxGeoCoord;\n\
+\n\
+uniform vec3 u_totalMinGeoCoord; // (lon, lat, alt).\n\
+uniform vec3 u_totalMaxGeoCoord;\n\
+uniform vec3 u_currentMinGeoCoord;\n\
+uniform vec3 u_currentMaxGeoCoord;\n\
+\n\
+varying vec2 v_tex_pos;\n\
+varying vec3 vPos;\n\
+varying vec4 vColor4;\n\
+\n\
+/*\n\
+vec3 geographicToCartesianWgs84 = function(longitude, latitude, altitude)\n\
+{\n\
+	// a = semi-major axis.\n\
+	// e2 = firstEccentricitySquared.\n\
+	// v = a / sqrt(1 - e2 * sin2(lat)).\n\
+	// x = (v+h)*cos(lat)*cos(lon).\n\
+	// y = (v+h)*cos(lat)*sin(lon).\n\
+	// z = [v*(1-e2)+h]*sin(lat).\n\
+	var degToRadFactor = Math.PI/180.0;\n\
+	var equatorialRadius = 6378137.0;\n\
+	var firstEccentricitySquared = 6.69437999014E-3;\n\
+	var lonRad = longitude * degToRadFactor;\n\
+	var latRad = latitude * degToRadFactor;\n\
+	var cosLon = Math.cos(lonRad);\n\
+	var cosLat = Math.cos(latRad);\n\
+	var sinLon = Math.sin(lonRad);\n\
+	var sinLat = Math.sin(latRad);\n\
+	var a = equatorialRadius;\n\
+	var e2 = firstEccentricitySquared;\n\
+	var v = a/Math.sqrt(1.0 - e2 * sinLat * sinLat);\n\
+	var h = altitude;\n\
+	\n\
+	if (resultCartesian === undefined)\n\
+	{ resultCartesian = []; }\n\
+	\n\
+	resultCartesian[0]=(v+h)*cosLat*cosLon;\n\
+	resultCartesian[1]=(v+h)*cosLat*sinLon;\n\
+	resultCartesian[2]=(v*(1.0-e2)+h)*sinLat;\n\
+	\n\
+	return resultCartesian;\n\
+};\n\
+*/\n\
+\n\
+void main() {\n\
+    // Note: the position attributte is initially (in javascript) unsignedInt16 (0 to 32,767) (quantizedMesh).\n\
+    // So, when normalize the data it transforms to (0.0 to 0.5), so must multiply by 2.0.\n\
+    vec3 pos = a_pos * 2.0; // quantizedMeshes uses the positive parts of the signed short, so must multiply by 2.\n\
+    \n\
+	pos = vec3(pos.xy * 2000.0, pos.z * 500.0 + 500.0);\n\
+    //----------------------------------------------------------------------------------------------------\n\
+	vec4 rotatedPos = buildingRotMatrix * vec4(pos.xyz, 1.0);\n\
+    vec3 objPosHigh = buildingPosHIGH;\n\
+    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
+    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
+    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
+    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
+    //vec3 rotatedNormal = currentTMat * normal;\n\
+\n\
+    //vNormal = normalize((normalMatrix4 * vec4(rotatedNormal, 1.0)).xyz); // original.***\n\
+    //vTexCoord = texCoord;\n\
+\n\
+    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
+\n\
+    vColor4 = color4;\n\
 }";
 ShaderSource.waterRenderFS = "//#version 300 es\n\
 \n\

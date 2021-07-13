@@ -317,6 +317,7 @@ Water.prototype.makeDEMTextureByQuantizedMeshes = function ()
 	shader.bindUniformGenerals();
 
 	//gl.uniform2fv(shader.u_minMaxHeights_loc, [this.qMesh._minimumHeight, this.qMesh._maximumHeight]);
+	gl.uniform1i(shader.colorType_loc_loc, 0);
 
 	//gl.disable(gl.CULL_FACE);
 	gl.clear(gl.DEPTH_BUFFER_BIT);
@@ -346,6 +347,9 @@ Water.prototype.makeDEMTextureByQuantizedMeshes = function ()
 		//if (!vbo_vicky.bindDataTexCoord(shader, magoManager.vboMemoryManager))
 		//{ return false; }
 
+		//if (!vbo_vicky.bindDataColor(shader, magoManager.vboMemoryManager))
+		//{ return false; }
+
 		var indicesCount = vbo_vicky.indicesCount;
 		if (!vbo_vicky.bindDataIndice(shader, magoManager.vboMemoryManager))
 		{ return false; }
@@ -362,14 +366,17 @@ Water.prototype.makeDEMTextureByQuantizedMeshes = function ()
 	this.original_dem_texture.fileLoadState = CODE.fileLoadState.BINDING_FINISHED;
 };
 
-Water.prototype.makeDEMTextureByQuantizedMesh__original = function (qMesh)
+Water.prototype.makeDEMTextureByQuantizedMesh__testQSurfaceMesh = function (qMesh)
 {
+	// Test function to render qSurface in excavation.***
+	// Test function to render qSurface in excavation.***
+	// Test function to render qSurface in excavation.***
 	if(!this.isPrepared())
 	{ return; }
 
 	if(!this.qMeshVboKeyContainer)
 	{
-		this.makeQuantizedMeshVbo(qMesh);
+		this._makeQuantizedMeshVbo__testQSurfaceMesh(qMesh);
 	}
 	
 	var waterManager = this.waterManager;
@@ -384,23 +391,37 @@ Water.prototype.makeDEMTextureByQuantizedMesh__original = function (qMesh)
 
 	gl.disable(gl.BLEND);
 	gl.disable(gl.CULL_FACE);
-	gl.clearColor(1.0, 0.0, 0.0, 0.0);
+	gl.clearColor(1.0, 1.0, 1.0, 1.0);
 	gl.clearDepth(1.0);
 
-	if(!this.original_dem_texture)
+	if(!this.qSurfaceMesh_dem_texture)
 	{
 		//var texWidth = waterManager.simulationTextureSize[0];
 		//var texHeight = waterManager.simulationTextureSize[1];
 		var texWidth = waterManager.terrainTextureSize[0];
 		var texHeight = waterManager.terrainTextureSize[1];
 
-		this.original_dem_texture = waterManager._newTexture(gl, texWidth, texHeight);
+		this.qSurfaceMesh_dem_texture = waterManager._newTexture(gl, texWidth, texHeight);
 	}
+
+	if(!qMesh.geoExtent)
+    {
+        // Make the geographicExtent by tile indices L, X, Y.
+        var imageryType = CODE.imageryType.CRS84;
+        var tileIndices = qMesh.tileIndices;
+        qMesh.geoExtent = SmartTile.getGeographicExtentOfTileLXY(tileIndices.L, tileIndices.X, tileIndices.Y, undefined, imageryType);
+
+        // set minAltitude & maxAltitude to the geoExtent.
+        var maxHeight = qMesh._maximumHeight;
+        var minHeight = qMesh._minimumHeight;
+        
+        qMesh.geoExtent.setExtentAltitudes(minHeight, maxHeight);
+    }
 
 	// 2n, make building depth over terrain depth.******************************************************************************************************
 	fbo.bind();
 	gl.viewport(0, 0, fbo.width[0], fbo.height[0]);
-	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.original_dem_texture.texId, 0); // depthTex.
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.qSurfaceMesh_dem_texture.texId, 0); // depthTex.
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // normalTex.
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // albedoTex.
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0); // .
@@ -415,10 +436,22 @@ Water.prototype.makeDEMTextureByQuantizedMesh__original = function (qMesh)
 	magoManager.postFxShadersManager.useProgram(shader);
 	shader.bindUniformGenerals();
 
-	gl.uniform2fv(shader.u_minMaxHeights_loc, [this.qMesh._minimumHeight, this.qMesh._maximumHeight]);
+	gl.uniform4fv(shader.u_oneColor4_loc, [1.0, 0.5, 0.25, 1.0]);
+	
+
+	// Now, set the waterSimGeoExtent & the qMeshGeoExtent.
+	
+	var geoExtent = qMesh.geoExtent;
+	gl.uniform3fv(shader.u_totalMinGeoCoord_loc, [geoExtent.minGeographicCoord.longitude, geoExtent.minGeographicCoord.latitude, geoExtent.minGeographicCoord.altitude]);
+	gl.uniform3fv(shader.u_totalMaxGeoCoord_loc, [geoExtent.maxGeographicCoord.longitude, geoExtent.maxGeographicCoord.latitude, geoExtent.maxGeographicCoord.altitude]);
+
+	//var tileGeoExtent = qMesh.geoExtent;
+	gl.uniform3fv(shader.u_currentMinGeoCoord_loc, [geoExtent.minGeographicCoord.longitude, geoExtent.minGeographicCoord.latitude, geoExtent.minGeographicCoord.altitude]);
+	gl.uniform3fv(shader.u_currentMaxGeoCoord_loc, [geoExtent.maxGeographicCoord.longitude, geoExtent.maxGeographicCoord.latitude, geoExtent.maxGeographicCoord.altitude]);
+	
 
 	//gl.disable(gl.CULL_FACE);
-	gl.clear(gl.DEPTH_BUFFER_BIT);
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 	var vbo_vicky = this.qMeshVboKeyContainer.vboCacheKeysArray[0]; // there are only one.
 	var vertices_count = vbo_vicky.vertexCount;
@@ -432,16 +465,41 @@ Water.prototype.makeDEMTextureByQuantizedMesh__original = function (qMesh)
 	//if (!vbo_vicky.bindDataTexCoord(shader, magoManager.vboMemoryManager))
 	//{ return false; }
 
+	if(vbo_vicky.vboBufferCol)
+	{
+		vbo_vicky.vboBufferCol.bindData(shader, shader.color4_loc, vboMemManager);
+	}
+
 	var indicesCount = vbo_vicky.indicesCount;
 	if (!vbo_vicky.bindDataIndice(shader, magoManager.vboMemoryManager))
 	{ return false; }
 
-	gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.
+	// Render in traditional mode.***
+	/*
+	gl.uniform1i(shader.colorType_loc, 1);
+	gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); 
+
+	gl.uniform1i(shader.colorType_loc, 0);
+	gl.disable(gl.DEPTH_TEST);
+	gl.drawElements(gl.LINES, indicesCount, gl.UNSIGNED_SHORT, 0); 
+	*/
+
+	// Render triangle one by one.**********************************************************
+	var triCount = indicesCount/3.0;
+	var byteOffset;
+	gl.uniform1i(shader.colorType_loc, 1);
+	for(var i=0; i<triCount; i++)
+	{
+		byteOffset = i*3*2;
+		gl.uniform4fv(shader.u_oneColor4_loc, [Math.random()*0.5, Math.random()*0.5, Math.random()*0.5, 1.0]);
+		gl.drawElements(gl.TRIANGLES, 3, gl.UNSIGNED_SHORT, byteOffset); 
+	}
 
 	fbo.unbind();
 	gl.enable(gl.CULL_FACE);
+	gl.enable(gl.DEPTH_TEST);
 
-	this.original_dem_texture.fileLoadState = CODE.fileLoadState.BINDING_FINISHED;
+	this.qSurfaceMesh_dem_texture.fileLoadState = CODE.fileLoadState.BINDING_FINISHED;
 };
 
 Water.prototype._makeQuantizedMeshVbo = function (tile)
@@ -500,7 +558,7 @@ Water.prototype._makeQuantizedMeshVbo = function (tile)
 	var hola = 0;
 };
 
-Water.prototype.makeQuantizedMeshVbo__original = function (qMesh)
+Water.prototype._makeQuantizedMeshVbo__testQSurfaceMesh = function (qMesh)
 {
 	if(this.qMeshVboKeyContainer)
 	{
@@ -513,10 +571,18 @@ Water.prototype.makeQuantizedMeshVbo__original = function (qMesh)
 	var vValues = qMesh._vValues;
 	var hValues = qMesh._heightValues;
 	this.indices = qMesh._indices;
+	var colors;
+
+	// check if has colors.
+	if(qMesh._colors)
+	{
+		// has colors.
+		colors = qMesh._colors;
+	}
 
 	// Now, make vbo.***
 	var pointsCount = uValues.length;
-	this.cartesiansArray = new Uint16Array(pointsCount * 3);
+	var cartesiansArray = new Uint16Array(pointsCount * 3);
 	
 	// Now, scale the mesh into the this.geoExtension.***
 
@@ -528,9 +594,9 @@ Water.prototype.makeQuantizedMeshVbo__original = function (qMesh)
 		y = vValues[i];
 		z = hValues[i];
 
-		this.cartesiansArray[i * 3] = x;
-		this.cartesiansArray[i * 3 + 1] = y;
-		this.cartesiansArray[i * 3 + 2] = z;
+		cartesiansArray[i * 3] = x;
+		cartesiansArray[i * 3 + 1] = y;
+		cartesiansArray[i * 3 + 2] = z;
 	}
 
 	var magoManager = this.waterManager.magoManager;
@@ -542,18 +608,23 @@ Water.prototype.makeQuantizedMeshVbo__original = function (qMesh)
 	var vboKey = this.qMeshVboKeyContainer.newVBOVertexIdxCacheKey();
 	
 	// Positions.
-	vboKey.setDataArrayPos(this.cartesiansArray, vboMemManager);
+	vboKey.setDataArrayPos(cartesiansArray, vboMemManager);
 
 	// Normals.
-	if (this.normalsArray)
-	{
-		vboKey.setDataArrayNor(this.normalsArray, vboMemManager);
-	}
+	//if (this.normalsArray)
+	//{
+	//	vboKey.setDataArrayNor(this.normalsArray, vboMemManager);
+	//}
 	
 	// TexCoords.
-	if (this.texCoordsArray)
+	//if (this.texCoordsArray)
+	//{
+	//	vboKey.setDataArrayTexCoord(this.texCoordsArray, vboMemManager);
+	//}
+
+	if(colors)
 	{
-		vboKey.setDataArrayTexCoord(this.texCoordsArray, vboMemManager);
+		vboKey.setDataArrayCol(colors, vboMemManager);
 	}
 		
 	// Indices.
@@ -939,6 +1010,12 @@ Water._swapTextures = function (texA, texB)
 	texB.texId = texAux;
 };
 
+Water.prototype.test__doQuantizedSurfaceExcavation = function ()
+{
+	// Test debug to do excavation on cesium terrain.***
+
+};
+
 /**
  * simulation
  */
@@ -960,7 +1037,94 @@ Water.prototype.doSimulationSteps = function (magoManager)
 	var extbuffers = fbo.extbuffers;
 	var shader;
 
+	// Test.*** delete this.*** Test.*** delete this.*** Test.*** delete this.*** Test.*** delete this.*** Test.*** delete this.*** Test.*** 
 	// 1rst, check if dem texture is ready.
+	if(!this.quantizedSurfaceTest && this.testQMesh)
+	{
+		// 1rst, calculate the geoExtent of the tile:
+		var imageryType = CODE.imageryType.CRS84;
+		var tileIndices = this.testQMesh.tileIndices;
+		var geoExtent = SmartTile.getGeographicExtentOfTileLXY(tileIndices.L, tileIndices.X, tileIndices.Y, undefined, imageryType);
+		var minGeoCoord = geoExtent.minGeographicCoord;
+		var maxGeoCoord = geoExtent.maxGeographicCoord;
+
+		this.quantizedSurface = new QuantizedSurface(this.testQMesh);
+		// The testing tile extent:
+		var minLon = minGeoCoord.longitude;
+		var minLat = minGeoCoord.latitude;
+		var maxLon = maxGeoCoord.longitude;
+		var maxLat = maxGeoCoord.latitude;
+
+		var midLon = (maxLon + minLon) / 2.0;
+		var midLat = (maxLat + minLat) / 2.0;
+		var lonRange = maxLon - minLon;
+		var latRange = maxLat - minLat;
+
+		var deltaLon = 0.0;
+		var deltaLat = 0.0;
+
+		var excavationGeoCoords = [];
+		
+		// make a rectangle.************************************************************************************************
+		// origin is left-down.***
+		/*
+		excavationGeoCoords.push(new GeographicCoord((minLon + 0.2 * lonRange), (minLat + 0.15 * latRange), 0.0));
+		excavationGeoCoords.push(new GeographicCoord((minLon + 0.78 * lonRange), (minLat + 0.15 * latRange), 0.0));
+		excavationGeoCoords.push(new GeographicCoord((minLon + 0.78 * lonRange), (minLat + 0.8 * latRange), 0.0));
+		excavationGeoCoords.push(new GeographicCoord((minLon + 0.2 * lonRange), (minLat + 0.8 * latRange), 0.0));
+		*/
+
+		// make a irregular "L" shape.**************************************************************************************
+		
+		excavationGeoCoords.push(new GeographicCoord((minLon + 0.1 * lonRange), (minLat + 0.1 * latRange), 0.0));
+		excavationGeoCoords.push(new GeographicCoord((minLon + 0.8 * lonRange), (minLat + 0.15 * latRange), 0.0));
+		excavationGeoCoords.push(new GeographicCoord((minLon + 0.75 * lonRange), (minLat + 0.4 * latRange), 0.0));
+		excavationGeoCoords.push(new GeographicCoord((minLon + 0.4 * lonRange), (minLat + 0.32 * latRange), 0.0));
+		excavationGeoCoords.push(new GeographicCoord((minLon + 0.5 * lonRange), (minLat + 0.9 * latRange), 0.0));
+		excavationGeoCoords.push(new GeographicCoord((minLon + 0.3 * lonRange), (minLat + 0.7 * latRange), 0.0));
+		
+
+		// small rectangle.*************************************************************************************************
+		/*
+		excavationGeoCoords.push(new GeographicCoord((minLon + 0.2 * lonRange), (minLat + 0.15 * latRange), 0.0));
+		excavationGeoCoords.push(new GeographicCoord((minLon + 0.3 * lonRange), (minLat + 0.15 * latRange), 0.0));
+		excavationGeoCoords.push(new GeographicCoord((minLon + 0.3 * lonRange), (minLat + 0.21 * latRange), 0.0));
+		excavationGeoCoords.push(new GeographicCoord((minLon + 0.2 * lonRange), (minLat + 0.21 * latRange), 0.0));
+			*/
+		// make a circle.***************************************************************************************************
+		/*
+		var angRad = 0.0;
+		var interpolation = 128;
+		var increAngRad = Math.PI / (interpolation / 2);
+		var lonRadius = (lonRange/2) * 0.77;
+		var latRadius = (latRange/2) * 0.77;
+		var lonOffset = 0.0001;
+		var latOffset = 0.0001;
+		lonOffset = 0.004;
+		latOffset = 0.005;
+		for(var i=0; i<interpolation; i++)
+		{
+			angRad = increAngRad * i;
+			var x = Math.cos(angRad);
+			var y = Math.sin(angRad);
+
+			var currLon = midLon + lonOffset + lonRadius * x;
+			var currLat = midLat + latOffset + latRadius * y;
+
+			excavationGeoCoords.push(new GeographicCoord(currLon + deltaLon, currLat + deltaLat, 0.0));
+		}
+		*/
+		
+		var excavationDepth = 20.0;
+		this.quantizedSurface.excavation(excavationGeoCoords, excavationDepth);
+		this.quantizedSurfaceTest = true;
+	}
+
+	if(!this.qSurfaceMesh_dem_texture)
+	{
+		this.makeDEMTextureByQuantizedMesh__testQSurfaceMesh(this.testQMesh);
+	}
+	// End test.--- delete this.--- End test.--- delete this.--- End test.--- delete this.--- End test.--- delete this.--- End test.--- delete this.---
 
 
 	//---------------------------------------------------------------------------------------------------------------------------------
@@ -2142,6 +2306,106 @@ Water.prototype.overWriteDEMWithObjects = function (shader, magoManager)
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, null); 
 	gl.frontFace(gl.CCW);
+};
+
+Water.prototype._renderQMesh = function (magoManager)
+{
+	// This function is a test function, to render the qmesh.***
+	// Test function to render qSurface in excavation.***
+	// Test function to render qSurface in excavation.***
+	// Test function to render qSurface in excavation.***
+	if(!this.isPrepared())
+	{ return; }
+
+	if(!this.qMeshVboKeyContainer)
+	{
+		return;
+	}
+	
+	var waterManager = this.waterManager;
+	var magoManager = waterManager.magoManager;
+	var vboMemManager = magoManager.vboMemoryManager;
+	var gl = magoManager.getGl();
+	var shader;
+
+
+	//gl.disable(gl.BLEND);
+	//gl.disable(gl.CULL_FACE);
+
+
+	var shader = magoManager.postFxShadersManager.getShader("qMeshRenderTEST");
+	magoManager.postFxShadersManager.useProgram(shader);
+	shader.bindUniformGenerals();
+
+	gl.uniform4fv(shader.u_oneColor4_loc, [1.0, 0.5, 0.25, 1.0]);
+	gl.uniform3fv(shader.buildingPosHIGH_loc, this.terrainPositionHIGH);
+	gl.uniform3fv(shader.buildingPosLOW_loc, this.terrainPositionLOW);
+	gl.uniformMatrix4fv(shader.buildingRotMatrix_loc, false, this.buildingGeoLocMat._floatArrays);
+
+	// Now, set the waterSimGeoExtent & the qMeshGeoExtent.
+	
+	//var geoExtent = qMesh.geoExtent;
+	//gl.uniform3fv(shader.u_totalMinGeoCoord_loc, [geoExtent.minGeographicCoord.longitude, geoExtent.minGeographicCoord.latitude, geoExtent.minGeographicCoord.altitude]);
+	//gl.uniform3fv(shader.u_totalMaxGeoCoord_loc, [geoExtent.maxGeographicCoord.longitude, geoExtent.maxGeographicCoord.latitude, geoExtent.maxGeographicCoord.altitude]);
+
+	//var tileGeoExtent = qMesh.geoExtent;
+	//gl.uniform3fv(shader.u_currentMinGeoCoord_loc, [geoExtent.minGeographicCoord.longitude, geoExtent.minGeographicCoord.latitude, geoExtent.minGeographicCoord.altitude]);
+	//gl.uniform3fv(shader.u_currentMaxGeoCoord_loc, [geoExtent.maxGeographicCoord.longitude, geoExtent.maxGeographicCoord.latitude, geoExtent.maxGeographicCoord.altitude]);
+	
+
+
+	var vbo_vicky = this.qMeshVboKeyContainer.vboCacheKeysArray[0]; // there are only one.
+	var vertices_count = vbo_vicky.vertexCount;
+
+	// Bind positions.
+	vbo_vicky.vboBufferPos.bindData(shader, shader.a_pos, vboMemManager);
+	
+	//if (!vbo_vicky.bindDataNormal(shader, magoManager.vboMemoryManager))
+	//{ return false; }
+
+	//if (!vbo_vicky.bindDataTexCoord(shader, magoManager.vboMemoryManager))
+	//{ return false; }
+
+	if(vbo_vicky.vboBufferCol)
+	{
+		vbo_vicky.vboBufferCol.bindData(shader, shader.color4_loc, vboMemManager);
+	}
+
+	var indicesCount = vbo_vicky.indicesCount;
+	if (!vbo_vicky.bindDataIndice(shader, magoManager.vboMemoryManager))
+	{ return false; }
+
+	// Render in traditional mode.***
+	/*
+	gl.uniform1i(shader.colorType_loc, 1);
+	gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); 
+
+	gl.uniform1i(shader.colorType_loc, 0);
+	gl.disable(gl.DEPTH_TEST);
+	gl.drawElements(gl.LINES, indicesCount, gl.UNSIGNED_SHORT, 0); 
+	*/
+
+	// Render triangle one by one.**********************************************************
+	var triCount = indicesCount/3.0;
+	if(!this.randomColorsArray)
+	{
+		this.randomColorsArray = [];
+		for(var i=0; i<triCount; i++)
+		{
+			this.randomColorsArray.push([Math.random()*0.5, Math.random()*0.5, Math.random()*0.5, 1.0]);
+		}
+	}
+	
+	var byteOffset;
+	gl.uniform1i(shader.colorType_loc, 1);
+	for(var i=0; i<triCount; i++)
+	{
+		byteOffset = i*3*2;
+		gl.uniform4fv(shader.u_oneColor4_loc, this.randomColorsArray[i]);
+		gl.drawElements(gl.TRIANGLES, 3, gl.UNSIGNED_SHORT, byteOffset); 
+	}
+
+
 };
 
 /**

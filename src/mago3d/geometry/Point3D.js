@@ -262,9 +262,9 @@ Point3D.prototype.squareDistToPoint = function(point)
  */
 Point3D.prototype.isCoincidentToPoint = function(point, errorDist) 
 {
-	var squareDist = this.distToPoint(point);
+	var dist = this.distToPoint(point);
 	var coincident = false;
-	if (squareDist < errorDist*errorDist)
+	if (dist < errorDist)
 	{
 		coincident = true;
 	}

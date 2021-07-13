@@ -150,7 +150,7 @@ Segment2D.prototype.getLength = function()
 	return Math.sqrt(this.getSquaredLength());
 };
 
-Segment2D.prototype.getRelativePositionOfPoint2DReport = function(point2d, resultReport)
+Segment2D.prototype.getRelativePositionOfPoint2DReport = function(point2d, resultReport, error)
 {
 	// a point2d can be:
 	// 1) outside.
@@ -174,7 +174,16 @@ Segment2D.prototype.getRelativePositionOfPoint2DReport = function(point2d, resul
 	}
 	resultReport.relPos = CODE.relativePositionPoint2DWithSegment2D.UNKNOWN;
 
-	var error = 1e-8;
+	// check by boundingRectangle.***
+	var boundingRect = this.getBoundingRectangle();
+	if(!boundingRect.intersectsWithPoint2D(point2d))
+	{
+		resultReport.relPos = CODE.relativePositionPoint2DWithSegment2D.OUTSIDE;
+		return resultReport;
+	}
+
+	if(error === undefined)
+	{ error = 1e-8; }
 
 	// check if point2d is coincident with startPoint.
 	if(point2d.isCoincidentToPoint(this.startPoint2d, error))
@@ -199,7 +208,29 @@ Segment2D.prototype.getRelativePositionOfPoint2DReport = function(point2d, resul
 	else
 	{
 		// The point2d is coincident with the line.
-		if(this.intersectionWithPointByDistances(this.startPoint2d, error))
+		/*
+		return Constant.INTERSECTION_POINT_A;
+		return Constant.INTERSECTION_POINT_B;
+		return Constant.INTERSECTION_OUTSIDE;
+		return Constant.INTERSECTION_INSIDE;
+		*/
+		var intersectionType = this.intersectionWithPointByDistances(point2d, error);
+		if(intersectionType === Constant.INTERSECTION_POINT_A)
+		{
+			resultReport.relPos = CODE.relativePositionPoint2DWithSegment2D.COINCIDENT_WITH_START_POINT;
+			return resultReport;
+		}
+		else if(intersectionType === Constant.INTERSECTION_POINT_B)
+		{
+			resultReport.relPos = CODE.relativePositionPoint2DWithSegment2D.COINCIDENT_WITH_END_POINT;
+			return resultReport;
+		}
+		else if(intersectionType === Constant.INTERSECTION_OUTSIDE)
+		{
+			resultReport.relPos = CODE.relativePositionPoint2DWithSegment2D.OUTSIDE;
+			return resultReport;
+		}
+		else if(intersectionType === Constant.INTERSECTION_INSIDE)
 		{
 			resultReport.relPos = CODE.relativePositionPoint2DWithSegment2D.INSIDE;
 			return resultReport;

@@ -1,6 +1,7 @@
 //precision mediump float;
 
 attribute vec3 a_pos;
+attribute vec4 color4;
 
 uniform vec3 u_totalMinGeoCoord; // (lon, lat, alt).
 uniform vec3 u_totalMaxGeoCoord;
@@ -9,6 +10,7 @@ uniform vec3 u_currentMaxGeoCoord;
 
 varying vec2 v_tex_pos;
 varying vec3 vPos;
+varying vec4 vColor4;
 
 void main() {
     // Note: the position attributte is initially (in javascript) unsignedInt16 (0 to 32,767) (quantizedMesh).
@@ -32,4 +34,6 @@ void main() {
     v_tex_pos = pos.xy;
 
     gl_Position = vec4(-1.0 + 2.0 * pos, 1.0);
+
+    vColor4 = color4;
 }

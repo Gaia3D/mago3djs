@@ -638,16 +638,31 @@ WaterManager.prototype.createDefaultShaders = function ()
 	fs_source = fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
 	fs_source = fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
 	var shader = magoManager.postFxShadersManager.createShaderProgram(gl, vs_source, fs_source, shaderName, this.magoManager);
-	shader.position3_loc = gl.getAttribLocation(shader.program, "a_pos");
-	shader.u_minMaxHeights_loc = gl.getUniformLocation(shader.program, "u_minMaxHeights"); // change this by rainMaxHeight
+	shader.position3_loc = gl.getAttribLocation(shader.program, "a_pos");//
+	shader.color4_loc = gl.getAttribLocation(shader.program, "color4");//
+	shader.u_minMaxHeights_loc = gl.getUniformLocation(shader.program, "u_minMaxHeights"); // change this by rainMaxHeight//
+	shader.colorType_loc = gl.getUniformLocation(shader.program, "colorType");//
+	shader.u_oneColor4_loc = gl.getUniformLocation(shader.program, "u_oneColor4");
 
 	shader.u_totalMinGeoCoord_loc = gl.getUniformLocation(shader.program, "u_totalMinGeoCoord");
 	shader.u_totalMaxGeoCoord_loc = gl.getUniformLocation(shader.program, "u_totalMaxGeoCoord");
 	shader.u_currentMinGeoCoord_loc = gl.getUniformLocation(shader.program, "u_currentMinGeoCoord");
 	shader.u_currentMaxGeoCoord_loc = gl.getUniformLocation(shader.program, "u_currentMaxGeoCoord");
-
-
 	magoManager.postFxShadersManager.useProgram(shader);
+
+	// 7) TEST qMesh render shader.*********************************************************************************************
+	shaderName = "qMeshRenderTEST";
+	vs_source = ShaderSource.waterQuantizedMeshVS_3D_TEST;
+	fs_source = ShaderSource.waterQuantizedMeshFS_3D_TEST;
+	fs_source = fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
+	fs_source = fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
+	shader = magoManager.postFxShadersManager.createShaderProgram(gl, vs_source, fs_source, shaderName, this.magoManager);
+	shader.u_screen_loc = gl.getUniformLocation(shader.program, "u_screen"); // smple2d.
+	shader.u_opacity_loc = gl.getUniformLocation(shader.program, "u_opacity");
+	shader.colorType_loc = gl.getUniformLocation(shader.program, "colorType");//
+	shader.u_oneColor4_loc = gl.getUniformLocation(shader.program, "u_oneColor4");
+	magoManager.postFxShadersManager.useProgram(shader);
+	gl.uniform1i(shader.u_screen_loc, 0);
 
 };
 
@@ -769,6 +784,27 @@ WaterManager.prototype.renderTerrain = function ()
 	{
 		waterLayer = this.waterLayersArray[i];
 		waterLayer.renderTerrain(shader, magoManager);
+	}
+};
+
+WaterManager.prototype._TEST_renderQMesh = function ()
+{
+	// Note: terrain must be rendered in opaques-pass.***
+	var magoManager = this.magoManager;
+	//magoManager.bindMainFramebuffer();
+	//var gl = magoManager.getGl();
+	//gl.viewport(0, 0, sceneState.drawingBufferWidth[0], sceneState.drawingBufferHeight[0]);
+
+	// Render terrain.********************************************************************************
+	var waterLayersCount = this.waterLayersArray.length;
+	var waterLayer;
+	//var shader = magoManager.postFxShadersManager.getShader("terrainRender");
+	//magoManager.postFxShadersManager.useProgram(shader);
+	//shader.bindUniformGenerals();
+	for(var i=0; i<waterLayersCount; i++)
+	{
+		waterLayer = this.waterLayersArray[i];
+		waterLayer._renderQMesh(magoManager);
 	}
 };
 
@@ -1175,11 +1211,11 @@ WaterManager.prototype.test__createContaminationBox_sejong = function (magoManag
 
 	// create 3 waterSourceObjects.***
 	// this.getWaterSourceObjectsArray();
-	lon = 127.21049;
-	lat = 35.60385;
+	lon = 126.90190;
+	lat = 37.35583;
 
-	var lon = 127.28055;
-	var lat = 36.51814;
+	var lon = 126.87882;
+	var lat = 37.32386;
 
 	width = 20.0;
 	length = 20.0;
@@ -1204,8 +1240,8 @@ WaterManager.prototype.test__createContaminationBox_sejong = function (magoManag
 	lon = 127.21592;
 	lat = 35.61843;
 
-	var lon = 127.25264;
-	var lat = 36.53745;
+	var lon = 126.88789;
+	var lat = 37.34314;
 
 	name = "waterGenerator";
 	initialGeoCoord = new GeographicCoord(lon, lat, alt);
@@ -1224,8 +1260,8 @@ WaterManager.prototype.test__createContaminationBox_sejong = function (magoManag
 	lon = 127.21673;
 	lat = 35.60460;
 
-	var lon = 127.31799;
-	var lat = 36.49179;
+	var lon = 126.89650;
+	var lat = 37.35525;
 
 	name = "waterGenerator";
 	initialGeoCoord = new GeographicCoord(lon, lat, alt);
