@@ -202,3 +202,11 @@ CODE.status = {
 	"DELETED" : 2,
 	"HIGHLIGHTED" : 3
 }
+
+CODE.cardinal = {
+	"UNKNOWN" : 0,
+	"SOUTH" : 1,
+	"EAST" : 2,
+	"NORTH" : 3,
+	"WEST" : 4
+}

@@ -1499,9 +1499,6 @@ WindVolume.prototype._getWindStreamLine = function (startGeoCoord, magoManager, 
 				minSpeed = speed;
 			}
 		}
-
-		console.info("minSpeed" + minSpeed);
-		console.info("maxSpeed" + maxSpeed);
 	}
 
 

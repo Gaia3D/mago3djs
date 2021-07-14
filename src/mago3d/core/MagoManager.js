@@ -1663,7 +1663,8 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 				this.DEMTexTest = true;
 			}
 		}
-	*/
+		*/
+	
 	var gl = this.getGl();
 	
 	// 1) The depth render.**********************************************************************************************************************

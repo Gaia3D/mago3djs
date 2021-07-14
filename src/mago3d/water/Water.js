@@ -630,6 +630,89 @@ Water.prototype._makeQuantizedMeshVbo__testQSurfaceMesh = function (qMesh)
 	// Indices.
 	vboKey.setDataArrayIdx(this.indices, vboMemManager);
 
+	// Now, make skirt vbo.*****************************************************
+	// South skrit.***
+	var indicesArray = qMesh._southIndices;
+	var indicesCount = indicesArray.length;
+	var idx;
+	// 1rst, make skirt cartesians array (use by TRIANGLES_STRIP).***
+	var cartesian;
+	var skirtCartesians = [];
+	var zAux = 0.0;
+	for(var i=0; i<indicesCount; i++)
+	{
+		idx = indicesArray[i];
+		x = uValues[idx];
+		y = vValues[idx];
+		z = hValues[idx];
+
+		// Top value.***
+		skirtCartesians.push(x, y, z);
+
+		// bottom value.***
+		skirtCartesians.push(x, y, zAux);
+	}
+
+	// east skirt.***
+	var indicesArray = qMesh._eastIndices;
+	var indicesCount = indicesArray.length;
+	// 1rst, make skirt cartesians array (use by TRIANGLES_STRIP).***
+	for(var i=0; i<indicesCount; i++)
+	{
+		idx = indicesArray[i];
+		x = uValues[idx];
+		y = vValues[idx];
+		z = hValues[idx];
+
+		// Top value.***
+		skirtCartesians.push(x, y, z);
+
+		// bottom value.***
+		skirtCartesians.push(x, y, zAux);
+	}
+	
+	// north skirt.***
+	var indicesArray = qMesh._northIndices;
+	var indicesCount = indicesArray.length;
+	// 1rst, make skirt cartesians array (use by TRIANGLES_STRIP).***
+	for(var i=indicesCount-1; i>=0; i--)
+	{
+		idx = indicesArray[i];
+		x = uValues[idx];
+		y = vValues[idx];
+		z = hValues[idx];
+
+		// Top value.***
+		skirtCartesians.push(x, y, z);
+
+		// bottom value.***
+		skirtCartesians.push(x, y, zAux);
+	}
+
+	// west skirt.***
+	var indicesArray = qMesh._westIndices;
+	var indicesCount = indicesArray.length;
+	// 1rst, make skirt cartesians array (use by TRIANGLES_STRIP).***
+	for(var i=indicesCount-1; i>=0; i--)
+	{
+		idx = indicesArray[i];
+		x = uValues[idx];
+		y = vValues[idx];
+		z = hValues[idx];
+
+		// Top value.***
+		skirtCartesians.push(x, y, z);
+
+		// bottom value.***
+		skirtCartesians.push(x, y, zAux);
+	}
+	
+
+	var vboKey = this.qMeshVboKeyContainer.newVBOVertexIdxCacheKey();
+	
+	// Positions.
+	vboKey.setDataArrayPos(new Uint16Array(skirtCartesians), vboMemManager);
+
 	var hola = 0;
 };
 
@@ -1036,8 +1119,97 @@ Water.prototype.doSimulationSteps = function (magoManager)
 	var fbo = waterManager.fbo;
 	var extbuffers = fbo.extbuffers;
 	var shader;
-
 	
+	/*
+	// Test.*** delete this.*** Test.*** delete this.*** Test.*** delete this.*** Test.*** delete this.*** Test.*** delete this.*** Test.*** 
+	// 1rst, check if dem texture is ready.
+	if(!this.quantizedSurfaceTest && this.testQMesh)
+	{
+		// 1rst, calculate the geoExtent of the tile:
+		var imageryType = CODE.imageryType.CRS84;
+		var tileIndices = this.testQMesh.tileIndices;
+		var geoExtent = SmartTile.getGeographicExtentOfTileLXY(tileIndices.L, tileIndices.X, tileIndices.Y, undefined, imageryType);
+		var minGeoCoord = geoExtent.minGeographicCoord;
+		var maxGeoCoord = geoExtent.maxGeographicCoord;
+
+		this.quantizedSurface = new QuantizedSurface(this.testQMesh);
+		// The testing tile extent:
+		var minLon = minGeoCoord.longitude;
+		var minLat = minGeoCoord.latitude;
+		var maxLon = maxGeoCoord.longitude;
+		var maxLat = maxGeoCoord.latitude;
+
+		var midLon = (maxLon + minLon) / 2.0;
+		var midLat = (maxLat + minLat) / 2.0;
+		var lonRange = maxLon - minLon;
+		var latRange = maxLat - minLat;
+
+		var deltaLon = 0.0;
+		var deltaLat = 0.0;
+
+		var excavationGeoCoords = [];
+		
+		// make a rectangle.************************************************************************************************
+		// origin is left-down.***
+		/*
+		excavationGeoCoords.push(new GeographicCoord((minLon + 0.2 * lonRange), (minLat + 0.15 * latRange), 0.0));
+		excavationGeoCoords.push(new GeographicCoord((minLon + 0.78 * lonRange), (minLat + 0.15 * latRange), 0.0));
+		excavationGeoCoords.push(new GeographicCoord((minLon + 0.78 * lonRange), (minLat + 0.8 * latRange), 0.0));
+		excavationGeoCoords.push(new GeographicCoord((minLon + 0.2 * lonRange), (minLat + 0.8 * latRange), 0.0));
+		*/
+
+		// make a irregular "L" shape.**************************************************************************************
+		/*
+		excavationGeoCoords.push(new GeographicCoord((minLon + 0.1 * lonRange), (minLat + 0.1 * latRange), 0.0));
+		excavationGeoCoords.push(new GeographicCoord((minLon + 0.8 * lonRange), (minLat + 0.15 * latRange), 0.0));
+		excavationGeoCoords.push(new GeographicCoord((minLon + 0.75 * lonRange), (minLat + 0.4 * latRange), 0.0));
+		excavationGeoCoords.push(new GeographicCoord((minLon + 0.4 * lonRange), (minLat + 0.32 * latRange), 0.0));
+		excavationGeoCoords.push(new GeographicCoord((minLon + 0.5 * lonRange), (minLat + 0.9 * latRange), 0.0));
+		excavationGeoCoords.push(new GeographicCoord((minLon + 0.3 * lonRange), (minLat + 0.7 * latRange), 0.0));
+		*/
+
+		// small rectangle.*************************************************************************************************
+		/*
+		excavationGeoCoords.push(new GeographicCoord((minLon + 0.2 * lonRange), (minLat + 0.15 * latRange), 0.0));
+		excavationGeoCoords.push(new GeographicCoord((minLon + 0.3 * lonRange), (minLat + 0.15 * latRange), 0.0));
+		excavationGeoCoords.push(new GeographicCoord((minLon + 0.3 * lonRange), (minLat + 0.21 * latRange), 0.0));
+		excavationGeoCoords.push(new GeographicCoord((minLon + 0.2 * lonRange), (minLat + 0.21 * latRange), 0.0));
+			*/
+		// make a circle.***************************************************************************************************
+		/*
+		var angRad = 0.0;
+		var interpolation = 128;
+		var increAngRad = Math.PI / (interpolation / 2);
+		var lonRadius = (lonRange/2) * 0.77;
+		var latRadius = (latRange/2) * 0.77;
+		var lonOffset = 0.0001;
+		var latOffset = 0.0001;
+		lonOffset = 0.004;
+		latOffset = 0.005;
+		for(var i=0; i<interpolation; i++)
+		{
+			angRad = increAngRad * i;
+			var x = Math.cos(angRad);
+			var y = Math.sin(angRad);
+
+			var currLon = midLon + lonOffset + lonRadius * x;
+			var currLat = midLat + latOffset + latRadius * y;
+
+			excavationGeoCoords.push(new GeographicCoord(currLon + deltaLon, currLat + deltaLat, 0.0));
+		}
+		
+		
+		var excavationDepth = 20.0;
+		this.quantizedSurface.excavation(excavationGeoCoords, excavationDepth);
+		this.quantizedSurfaceTest = true;
+	}
+
+	if(!this.qSurfaceMesh_dem_texture)
+	{
+		this.makeDEMTextureByQuantizedMesh__testQSurfaceMesh(this.testQMesh);
+	}
+	// End test.-------------
+	*/
 
 	//---------------------------------------------------------------------------------------------------------------------------------
 	// Check if simulate landSlides.
@@ -2317,7 +2489,14 @@ Water.prototype._renderQMesh = function (magoManager)
 		gl.drawElements(gl.TRIANGLES, 3, gl.UNSIGNED_SHORT, byteOffset); 
 	}
 
+	// Now, render the skirt.***
+	var vbo_vicky = this.qMeshVboKeyContainer.vboCacheKeysArray[1]; // there are only one.
+	var vertices_count = vbo_vicky.vertexCount;
 
+	// Bind positions.
+	vbo_vicky.vboBufferPos.bindData(shader, shader.a_pos, vboMemManager);
+
+	gl.drawArrays(gl.TRIANGLE_STRIP, 0, vertices_count);
 };
 
 /**

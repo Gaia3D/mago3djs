@@ -41,7 +41,6 @@ QuantizedSurface.prototype._makeQuantizedMeshFromTrianglesList = function (trian
     var GH = 50;
     var BH = 255;
     var AH = 255;
-
 	
     var vertex;
     var pos;
@@ -55,33 +54,6 @@ QuantizedSurface.prototype._makeQuantizedMeshFromTrianglesList = function (trian
 
         // set idx in list of the vertex.
         vertex.idxInList = i;
-
-        /*
-        // Test debug:
-        // check if any triangle of the vertex is highlighted***
-        if(!vertex.trianglesArray)
-        {vertex.trianglesArray = [];}
-        
-        var trianglesOfVertexCount = vertex.trianglesArray.length;
-        var triIsHighLighted = false;
-        for(var j=0; j<trianglesOfVertexCount; j++)
-        {
-            if(vertex.trianglesArray[j].getStatus() === CODE.status.HIGHLIGHTED)
-            {
-                triIsHighLighted = true;
-                break;
-            }
-        }
-
-        if(triIsHighLighted)
-        {
-            color4Array.push(RH, GH, BH, AH);
-        }
-        else
-        {
-            color4Array.push(R, G, B, A);
-        }
-        */
     }
 
     // Now, collect all triangles that status is NO DELETED.
@@ -112,7 +84,6 @@ QuantizedSurface.prototype._makeQuantizedMeshFromTrianglesList = function (trian
         indices[i * 3] = vtx_1.idxInList;
         indices[i * 3 + 1] = vtx_2.idxInList;
         indices[i * 3 + 2] = vtx_3.idxInList;
-
     }
 
     if(!resultQMesh)
@@ -147,21 +118,64 @@ QuantizedSurface.prototype._makeTrianglesListFromQuantizedMesh = function (resul
     }
 
 	var pointsCount = uValues.length;
-	
-	var x, y, z;
-    var point3d;
     var vtx;
 	for(var i=0; i<pointsCount; i++)
 	{
-		x = uValues[i];
-		y = vValues[i];
-		z = hValues[i];
-
-		point3d = new Point3D(x, y, z);
-        vtx = this.vertexList.newVertex(point3d);
+        vtx = this.vertexList.newVertex(new Point3D(uValues[i], vValues[i], hValues[i]));
 	}
 
-    // Now, make triangles.***
+    // For each vertex, set flag : south, east, north or west.***
+    // The corner vertex must 2 flags.
+    // south.***
+    var indicesArray = qMesh._southIndices;
+	var indicesCount = indicesArray.length;
+	var idx;
+	// 1rst, make skirt cartesians array (use by TRIANGLES_STRIP).***
+	for(var i=0; i<indicesCount; i++)
+	{
+		idx = indicesArray[i];
+        vtx = this.vertexList.getVertex(idx);
+        vtx.bSouth = true;
+	}
+
+    // east.***
+    var indicesArray = qMesh._eastIndices;
+	var indicesCount = indicesArray.length;
+	var idx;
+	// 1rst, make skirt cartesians array (use by TRIANGLES_STRIP).***
+	for(var i=0; i<indicesCount; i++)
+	{
+		idx = indicesArray[i];
+        vtx = this.vertexList.getVertex(idx);
+        vtx.bEast = true;
+	}
+
+    // north.***
+    var indicesArray = qMesh._northIndices;
+	var indicesCount = indicesArray.length;
+	var idx;
+	// 1rst, make skirt cartesians array (use by TRIANGLES_STRIP).***
+	for(var i=0; i<indicesCount; i++)
+	{
+		idx = indicesArray[i];
+        vtx = this.vertexList.getVertex(idx);
+        vtx.bNorth = true;
+	}
+
+    // west.***
+    var indicesArray = qMesh._westIndices;
+	var indicesCount = indicesArray.length;
+	var idx;
+	// 1rst, make skirt cartesians array (use by TRIANGLES_STRIP).***
+	for(var i=0; i<indicesCount; i++)
+	{
+		idx = indicesArray[i];
+        vtx = this.vertexList.getVertex(idx);
+        vtx.bWest = true;
+	}
+
+    //************************************************************************************************************************
+    // Now, make triangles.***************************************************************************************************
     if(!resultTrianglesList)
     {
         resultTrianglesList = new TrianglesList();
@@ -420,6 +434,104 @@ QuantizedSurface.insertQPointIntoTriangle = function (qPoint, triangle, triList,
     triangle.setStatus(CODE.status.DELETED);
 };
 
+QuantizedSurface._setCardinalToVertex = function (vertex, cardinal)
+{
+    if(cardinal !== CODE.cardinal.UNKNOWN)
+    {
+        if(cardinal === CODE.cardinal.SOUTH)
+        {
+            vertex.bSouth = true;
+        }
+        else if(cardinal === CODE.cardinal.EAST)
+        {
+            vertex.bEast = true;
+        }
+        else if(cardinal === CODE.cardinal.NORTH)
+        {
+            vertex.bNorth = true;
+        }
+        else if(cardinal === CODE.cardinal.WEST)
+        {
+            vertex.bWest = true;
+        }
+    }
+};
+
+QuantizedSurface._getCardinalsOfTriangle = function (triangle, resultCardinalsArray)
+{
+    var v0 = triangle.vertex0;
+    var v1 = triangle.vertex1;
+    var v2 = triangle.vertex2;
+
+    var cardinal_0 = QuantizedSurface._getCardinalOfEdge(v0, v1);
+    var cardinal_1 = QuantizedSurface._getCardinalOfEdge(v1, v2);
+    var cardinal_2 = QuantizedSurface._getCardinalOfEdge(v2, v0);
+
+    if(!resultCardinalsArray)
+    { resultCardinalsArray = []; }
+
+    if(cardinal_0 !== CODE.cardinal.UNKNOWN)
+    {
+        resultCardinalsArray.push(cardinal_0);
+    }
+
+    if(cardinal_1 !== CODE.cardinal.UNKNOWN)
+    {
+        resultCardinalsArray.push(cardinal_1);
+    }
+
+    if(cardinal_2 !== CODE.cardinal.UNKNOWN)
+    {
+        resultCardinalsArray.push(cardinal_2);
+    }
+
+    return resultCardinalsArray;
+};
+
+QuantizedSurface._getCardinalOfEdge = function (vertex_A, vertex_B)
+{
+    // this function returns the cardinal direction of vertices if the 2 vertices are the same cardinal direction.
+    /*
+    CODE.cardinal = {
+	"UNKNOWN" : 0,
+	"SOUTH" : 1,
+	"EAST" : 2,
+	"NORTH" : 3,
+	"WEST" : 4
+    }
+    */
+    if(vertex_A.bSouth)
+    {
+        if(vertex_B.bSouth)
+        {
+            return CODE.cardinal.SOUTH;
+        }
+    }
+    else if(vertex_A.bEast)
+    {
+        if(vertex_B.bEast)
+        {
+            return CODE.cardinal.EAST;
+        }
+    }
+    else if(vertex_A.bNorth)
+    {
+        if(vertex_B.bNorth)
+        {
+            return CODE.cardinal.NORTH;
+        }
+    }
+    else if(vertex_A.bWest)
+    {
+        if(vertex_B.bWest)
+        {
+            return CODE.cardinal.WEST;
+        }
+    }
+
+    return CODE.cardinal.UNKNOWN;
+};
+
 QuantizedSurface.insertQPointIntoTriangleEdge = function (qPoint, triangle, triList, vertexList, edgeIdx, newVertexArray)
 {
     // Here, insert the qPoint into triangle's edge.
@@ -438,29 +550,38 @@ QuantizedSurface.insertQPointIntoTriangleEdge = function (qPoint, triangle, triL
 
     // Now, create 2 new triangles depending the edgeIdx.***
     //var segIdx = triangle.getSegmentIdxOfVertices(vertex_A, vertex_B);
-
+    var cardinal = CODE.cardinal.UNKNOWN;
     if(edgeIdx === 0)
     {
         tri1 = triList.newTriangle(qVertex, v1, v2);
         tri2 = triList.newTriangle(qVertex, v2, v0);
+
+        // check vertex_0 & vertex_1.
+        cardinal = QuantizedSurface._getCardinalOfEdge(v0, v1);
+        
     }
     else if(edgeIdx === 1)
     {
         tri1 = triList.newTriangle(qVertex, v2, v0);
         tri2 = triList.newTriangle(qVertex, v0, v1);
+
+        // check vertex_1 & vertex_2.
+        cardinal = QuantizedSurface._getCardinalOfEdge(v1, v2);
     }
     else if(edgeIdx === 2)
     {
         tri1 = triList.newTriangle(qVertex, v0, v1);
         tri2 = triList.newTriangle(qVertex, v1, v2);
+
+        // check vertex_2 & vertex_0.
+        cardinal = QuantizedSurface._getCardinalOfEdge(v2, v0);
     }
+
+    QuantizedSurface._setCardinalToVertex(qVertex, cardinal);
 
     // store triangles into vertices, to use as vertex-triangle-map.
     QuantizedSurface._storeTriangleInVertices(tri1);
     QuantizedSurface._storeTriangleInVertices(tri2);
-
-    tri1.setStatus(CODE.status.HIGHLIGHTED); // delete this.***
-    tri2.setStatus(CODE.status.HIGHLIGHTED); // delete this.***
 
     // finally mark twinTriangle as "deleted".
     triangle.setStatus(CODE.status.DELETED);
@@ -485,6 +606,8 @@ QuantizedSurface.insert2QPointIntoTriangleEdges = function (qPoint_A, qPoint_B, 
     v1 = triangle.vertex1;
     v2 = triangle.vertex2;
 
+    var cardinal_A, cardinal_B;
+
     if(edgeIdx_A === 0)
     {
         if(edgeIdx_B === 1)
@@ -500,6 +623,9 @@ QuantizedSurface.insert2QPointIntoTriangleEdges = function (qPoint_A, qPoint_B, 
             tri1 = triList.newTriangle(v0, qVertex_A, v2);
             tri2 = triList.newTriangle(qVertex_A, qVertex_B, v2);
             tri3 = triList.newTriangle(qVertex_A, v1, qVertex_B);
+
+            cardinal_A = QuantizedSurface._getCardinalOfEdge(v0, v1);
+            cardinal_B = QuantizedSurface._getCardinalOfEdge(v1, v2);
         }
         else if(edgeIdx_B === 2)
         {
@@ -514,6 +640,9 @@ QuantizedSurface.insert2QPointIntoTriangleEdges = function (qPoint_A, qPoint_B, 
             tri1 = triList.newTriangle(v0, qVertex_A, qVertex_B);
             tri2 = triList.newTriangle(qVertex_A, v2, qVertex_B);
             tri3 = triList.newTriangle(qVertex_A, v1, v2);
+
+            cardinal_A = QuantizedSurface._getCardinalOfEdge(v0, v1);
+            cardinal_B = QuantizedSurface._getCardinalOfEdge(v2, v0);
         }
     }
     else if(edgeIdx_A === 1)
@@ -531,6 +660,9 @@ QuantizedSurface.insert2QPointIntoTriangleEdges = function (qPoint_A, qPoint_B, 
             tri1 = triList.newTriangle(v0, qVertex_B, v2);
             tri2 = triList.newTriangle(qVertex_B, qVertex_A, v2);
             tri3 = triList.newTriangle(qVertex_B, v1, qVertex_A);
+
+            cardinal_A = QuantizedSurface._getCardinalOfEdge(v1, v2);
+            cardinal_B = QuantizedSurface._getCardinalOfEdge(v0, v1);
         }
         else if(edgeIdx_B === 2)
         {
@@ -545,6 +677,9 @@ QuantizedSurface.insert2QPointIntoTriangleEdges = function (qPoint_A, qPoint_B, 
             tri1 = triList.newTriangle(v0, v1, qVertex_A);
             tri2 = triList.newTriangle(v0, qVertex_A, qVertex_B);
             tri3 = triList.newTriangle(qVertex_B, qVertex_A, v2);
+
+            cardinal_A = QuantizedSurface._getCardinalOfEdge(v1, v2);
+            cardinal_B = QuantizedSurface._getCardinalOfEdge(v2, v0);
         }
     }
     else if(edgeIdx_A === 2)
@@ -562,6 +697,9 @@ QuantizedSurface.insert2QPointIntoTriangleEdges = function (qPoint_A, qPoint_B, 
             tri1 = triList.newTriangle(v0, qVertex_B, qVertex_A);
             tri2 = triList.newTriangle(qVertex_B, v2, qVertex_A);
             tri3 = triList.newTriangle(qVertex_B, v1, v2);
+
+            cardinal_A = QuantizedSurface._getCardinalOfEdge(v2, v0);
+            cardinal_B = QuantizedSurface._getCardinalOfEdge(v0, v1);
         }
         else if(edgeIdx_B === 1)
         {
@@ -576,8 +714,14 @@ QuantizedSurface.insert2QPointIntoTriangleEdges = function (qPoint_A, qPoint_B, 
             tri1 = triList.newTriangle(v0, v1, qVertex_B);
             tri2 = triList.newTriangle(v0, qVertex_B, qVertex_A);
             tri3 = triList.newTriangle(qVertex_A, qVertex_B, v2);
+
+            cardinal_A = QuantizedSurface._getCardinalOfEdge(v2, v0);
+            cardinal_B = QuantizedSurface._getCardinalOfEdge(v1, v2);
         }
     }
+
+    QuantizedSurface._setCardinalToVertex(qVertex_A, cardinal_A);
+    QuantizedSurface._setCardinalToVertex(qVertex_B, cardinal_B);
 
     QuantizedSurface._storeTriangleInVertices(tri1);
     QuantizedSurface._storeTriangleInVertices(tri2);
@@ -1080,9 +1224,58 @@ QuantizedSurface._createLateralTrianglesOfTriangle = function (tri, triList)
     return false;
 };
 
-QuantizedSurface.recalculateSkirtIndices = function (triList, vertexList, excavationDepth)
+QuantizedSurface.recalculateSkirtIndices = function (triList, vertexList)
 {
-    //
+    // All indices right to left or down to up.***
+    // south & north skirt (right to left), west & east (down to up).***
+    // south skirt.***
+    // 1rst, must find all south triangles.***
+
+    // QuantizedSurface._getCardinalsOfTriangle = function (triangle, resultCardinalsArray)
+
+    var southTrianglesArray = [];
+    var eastTrianglesArray = [];
+    var northTrianglesArray = [];
+    var westTrianglesArray = [];
+
+    var triCount = triList.getTrianglesCount();
+    var tri;
+    for(var i=0; i<triCount; i++)
+    {
+        tri = triList.getTriangle(i);
+        if(tri.getStatus() === CODE.status.DELETED)
+        { continue; }
+        
+        var cardinals = QuantizedSurface._getCardinalsOfTriangle(tri, undefined);
+        var cardinalsCount = cardinals.length;
+        for(var j=0; j<cardinalsCount; j++)
+        {
+            if(cardinals[j] === CODE.cardinal.SOUTH)
+            {
+                southTrianglesArray.push(tri);
+            }
+            else if(cardinals[j] === CODE.cardinal.EAST)
+            {
+                eastTrianglesArray.push(tri);
+            }
+            else if(cardinals[j] === CODE.cardinal.NORTH)
+            {
+                northTrianglesArray.push(tri);
+            }
+            else if(cardinals[j] === CODE.cardinal.WEST)
+            {
+                westTrianglesArray.push(tri);
+            }
+        }
+    }
+
+    var vertexCount = vertexList.getVertexCount();
+    var vertex;
+    for(var i=0; i<vertexCount; i++)
+    {
+        vertex = vertexList.getVertex(i);
+
+    }
 };
 
 QuantizedSurface.createLateralTrianglesOfExcavation = function (triList, vertexList, excavationDepth)
@@ -1129,6 +1322,16 @@ QuantizedSurface.createLateralTrianglesOfExcavation = function (triList, vertexL
 
             // store in newVertex the originalVertex as twinVertex.
             newVertex.twinVertex = vertex;
+
+            // copy the cardinal of vertex.
+            if(vertex.bSouth)
+            { newVertex.bSouth = true; }
+            if(vertex.bEast)
+            { newVertex.bEast = true; }
+            if(vertex.bNorth)
+            { newVertex.bNorth = true; }
+            if(vertex.bWest)
+            { newVertex.bWest = true; }
 
             for(var j=0; j<normalTriCount; j++)
             {
@@ -1247,7 +1450,7 @@ QuantizedSurface.prototype.excavation = function (excavationGeoCoords, excavatio
     QuantizedSurface.createLateralTrianglesOfExcavation(triList, this.vertexList, excavationDepth);
 
     // Now, must recalculate the skirt indices.***
-
+    QuantizedSurface.recalculateSkirtIndices(triList, this.vertexList);
 
     // Now, remake the quantized mesh.***
     this._makeQuantizedMeshFromTrianglesList(triList, this.vertexList, this.qMesh);
