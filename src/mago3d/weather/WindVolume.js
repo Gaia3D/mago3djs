@@ -41,8 +41,7 @@ var WindVolume = function (options)
 	{
 		if(options.geoJsonFile)
 		{
-			this._geoJsonFile = options.geoJsonFile;
-			this._geoJsonFileLoadState = CODE.fileLoadState.LOADING_FINISHED;;
+			this.setWindGeoJson(options.geoJsonFile);
 		}
 
 		if(options.geoJsonFilePath)
@@ -379,6 +378,23 @@ WindVolume.prototype._createdElemsForDisplayBox = function(magoManager)
 	}
 };
 
+WindVolume.prototype.setWindGeoJson = function (windGeoJson)
+{
+	if(!windGeoJson)
+	{
+		return;
+	}
+
+	this._geoJsonFile = windGeoJson;
+	this._geoJsonFileLoadState = CODE.fileLoadState.LOADING_FINISHED;
+
+	if(this._geoJsonFile.style && this._geoJsonFile.style.colorRamp)
+	{
+		// make a colorRamp.
+		this.colorRamp = new ColorRamp(this._geoJsonFile.style.colorRamp);
+	}
+};
+
 WindVolume.prototype.loadWindGeoJson = function ()
 {
 	// This is the geoJson version. 2021.
@@ -388,17 +404,7 @@ WindVolume.prototype.loadWindGeoJson = function ()
 		var that = this;
 		loadWithXhr(this._geoJsonFilePath, undefined, undefined, 'json', 'GET').done(function(res) 
 		{
-			that._geoJsonFileLoadState = CODE.fileLoadState.LOADING_FINISHED;
-			that._geoJsonFile = res;
-
-			if(that._geoJsonFile)
-			{
-				if(that._geoJsonFile.style && that._geoJsonFile.style.colorRamp)
-				{
-					// make a colorRamp.
-					that.colorRamp = new ColorRamp(that._geoJsonFile.style.colorRamp);
-				}
-			}
+			that.setWindGeoJson(res);
 		});
 	}
 };
