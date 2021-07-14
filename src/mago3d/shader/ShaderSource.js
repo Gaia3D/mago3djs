@@ -15764,11 +15764,15 @@ uniform bool bUseMultiRenderTarget;\n\
 uniform int uFrustumIdx;\n\
 uniform int uElemIndex;\n\
 uniform int uTotalPointsCount; // total points to draw.\n\
+uniform vec2 viewport;\n\
+uniform float thickness;\n\
 varying vec4 vColor;\n\
 varying float flogz;\n\
 varying float Fcoef_half;\n\
 varying float vDepth;\n\
 varying float vCurrentIndex;\n\
+\n\
+varying float vSense;\n\
 \n\
 vec3 encodeNormal(in vec3 normal)\n\
 {\n\
@@ -15791,23 +15795,17 @@ void main() {\n\
 	// calculate the transparency.\n\
 	float alpha = 1.0 - (vCurrentIndex - float(uElemIndex))/float(uTotalPointsCount);\n\
 \n\
+	// use vSense to calculate aditional transparency in the borders of the thick line.***\n\
+	float beta = sin(acos(vSense));\n\
+	alpha *= beta;\n\
+\n\
 	vec4 finalColor =  vec4(vColor.rgb, alpha);\n\
 \n\
-	//if(alpha > 0.95)\n\
-	//{\n\
-	//	finalColor =  vec4(1.0, 0.0, 0.0, 1.0);\n\
-	//}\n\
 	gl_FragData[0] = finalColor;\n\
-\n\
 \n\
 	#ifdef USE_MULTI_RENDER_TARGET\n\
 	if(bUseMultiRenderTarget)\n\
 	{\n\
-		//gl_FragData[1] = vec4(0.0);\n\
-		//gl_FragData[2] = vec4(0.0);\n\
-		//gl_FragData[3] = vec4(0.0);\n\
-		\n\
-\n\
 		gl_FragData[1] = packDepth(vDepth);\n\
 		\n\
 \n\
@@ -15869,6 +15867,8 @@ varying float flogz;\n\
 varying float Fcoef_half;\n\
 varying float vDepth;\n\
 varying float vCurrentIndex;\n\
+\n\
+varying float vSense;\n\
 \n\
 const float error = 0.001;\n\
 \n\
@@ -15959,10 +15959,11 @@ void main(){\n\
 	}\n\
 	normal *= thickness/2.0;\n\
 	normal.x /= aspect;\n\
-	float direction = (thickness*sense*projectedDepth)/1000.0;\n\
+	float realThickness = (thickness*sense*projectedDepth)/1000.0;\n\
 	// Offset our position along the normal\n\
-	vec4 offset = vec4(normal * direction, 0.0, 0.0);\n\
+	vec4 offset = vec4(normal * realThickness, 0.0, 0.0);\n\
 	gl_Position = currentProjected + offset; \n\
+	vSense = sense;\n\
 \n\
 	if(bUseLogarithmicDepth)\n\
 	{\n\

@@ -15,11 +15,15 @@ uniform bool bUseMultiRenderTarget;
 uniform int uFrustumIdx;
 uniform int uElemIndex;
 uniform int uTotalPointsCount; // total points to draw.
+uniform vec2 viewport;
+uniform float thickness;
 varying vec4 vColor;
 varying float flogz;
 varying float Fcoef_half;
 varying float vDepth;
 varying float vCurrentIndex;
+
+varying float vSense;
 
 vec3 encodeNormal(in vec3 normal)
 {
@@ -42,23 +46,17 @@ void main() {
 	// calculate the transparency.
 	float alpha = 1.0 - (vCurrentIndex - float(uElemIndex))/float(uTotalPointsCount);
 
+	// use vSense to calculate aditional transparency in the borders of the thick line.***
+	float beta = sin(acos(vSense));
+	alpha *= beta;
+
 	vec4 finalColor =  vec4(vColor.rgb, alpha);
 
-	//if(alpha > 0.95)
-	//{
-	//	finalColor =  vec4(1.0, 0.0, 0.0, 1.0);
-	//}
 	gl_FragData[0] = finalColor;
-
 
 	#ifdef USE_MULTI_RENDER_TARGET
 	if(bUseMultiRenderTarget)
 	{
-		//gl_FragData[1] = vec4(0.0);
-		//gl_FragData[2] = vec4(0.0);
-		//gl_FragData[3] = vec4(0.0);
-		
-
 		gl_FragData[1] = packDepth(vDepth);
 		
 
