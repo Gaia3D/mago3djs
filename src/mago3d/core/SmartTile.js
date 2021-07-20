@@ -43,7 +43,8 @@ var SmartTile = function(smartTileName, options)
 		generalObjectsArray : [], // opaques & transparent objects.
 		excavationsArray  : [],
 		vectorTypeArray   : [],
-		lightSourcesArray : []
+		lightSourcesArray : [],
+		nativeSeedArray : []
 	};
 	
 	this.isVisible; // var to manage the frustumCulling and delete buildings if necessary.
@@ -154,70 +155,6 @@ SmartTile.prototype.clearNodesArray = function()
 	}
 	this.nodesArray = undefined;
 };
-
-
-/**
- * 어떤 일을 하고 있습니까?
- */
-/*
-SmartTile.prototype.getNodeByBuildingId = function(buildingType, buildingId) 
-{
-	var resultNode;
-	var neoBuilding;
-	var node;
-	var hasSubTiles = true;
-	if (this.subTiles === undefined)
-	{ hasSubTiles = false; }
-	
-	if (this.subTiles && this.subTiles.length === 0)
-	{ hasSubTiles = false; }
-		
-	if (!hasSubTiles)
-	{
-		if (this.nodesArray)
-		{
-			var nodesCount = this.nodesArray.length;
-			var find = false;
-			var i=0;
-			while (!find && i<nodesCount) 
-			{
-				node = this.nodesArray[i];
-				neoBuilding = node.data.neoBuilding;
-				if (buildingType)
-				{
-					if (neoBuilding.buildingId === buildingId && neoBuilding.buildingType === buildingType) 
-					{
-						find = true;
-						resultNode = node;
-						return resultNode;
-					}
-				}
-				else 
-				{
-					if (neoBuilding.buildingId === buildingId) 
-					{
-						find = true;
-						resultNode = node;
-						return resultNode;
-					}
-				}
-				i++;
-			}
-		}	
-	}
-	else 
-	{
-		for (var i=0; i<this.subTiles.length; i++)
-		{
-			resultNode = this.subTiles[i].getNodeByBuildingId(buildingType, buildingId);
-			if (resultNode)
-			{ return resultNode; }
-		}
-	}
-	
-	return resultNode;
-};
-*/
 
 /**
  * 어떤 일을 하고 있습니까?
@@ -595,7 +532,6 @@ SmartTile.prototype.deleteNativeObjectByGuid = function(objectGuid, magoManager)
 	{ bDeleted = true; }
 	if(SmartTile._deleteObjectFromArrayByGuid(objectGuid, natives.lightSourcesArray, magoManager))
 	{ bDeleted = true; }
-
 	return false;
 };
 
@@ -624,8 +560,13 @@ SmartTile.prototype.putObject = function(targetDepth, object, magoManager)
 		this.setSizesToSubTiles();
 
 		// intercept buildingSeeds for each subTiles.
-		var geoLocData = object.geoLocDataManager.getCurrentGeoLocationData();
-		var geoCoord = geoLocData.getGeographicCoords();
+		var geoCoord;
+		if(object.geoLocDataManager) {
+			var geoLocData = object.geoLocDataManager.getCurrentGeoLocationData();
+			geoCoord = geoLocData.getGeographicCoords();
+		} else if(object.geographicCoord) {
+			geoCoord = object.geographicCoord;
+		}
 		
 		var subSmartTile;
 		var finish = false;
@@ -671,11 +612,14 @@ SmartTile.prototype.putObject = function(targetDepth, object, magoManager)
 		{
 			this.nativeObjects.excavationsArray.push(object);
 		}
+		else if (object instanceof KoreaBuildingSeed)
+		{
+			this.nativeObjects.nativeSeedArray.push(object);
+		}
 		// todo: Must recalculate the smartTile sphereExtent.
 		return true;
 	}
 };
-
 
 /**
  * 목표레벨까지 각 타일의 SUB타일 생성 및 노드의 위치와 교점이 있는지 파악 후 노드를 보관.
@@ -722,44 +666,6 @@ SmartTile.prototype.makeTreeByDepth = function(targetDepth, magoManager)
 		
 	}
 };
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param geoLocData 변수
- */
-/*
-SmartTile.prototype.getLowestTileWithNodeInside = function(node) 
-{
-	// this function returns the lowestTile with "node" if exist.
-	if (this.subTiles === undefined)
-	{
-		var nodesCount = this.nodesArray.length;
-		var i=0;
-		while (i<nodesCount)
-		{
-			if (node == this.nodesArray[i])
-			{
-				return this;
-			}
-			i++;
-		}
-		return undefined;
-	}
-	else 
-	{	
-		var subTilesCount = this.subTiles.length;
-		var lowestTile;
-		for (var i=0; i<subTilesCount; i++)
-		{
-			lowestTile = this.subTiles[i].getLowestTileWithNodeInside(node);
-			if (lowestTile)
-			{ return lowestTile; }
-		}
-		
-		return undefined;
-	}
-};
-*/
 
 /**
  * 타일과 노드의 포함유무 체크
@@ -851,38 +757,6 @@ SmartTile.prototype.takeIntersectedBuildingSeeds = function(nodeSeedsArray)
 		}
 	}
 };
-
-/**
- * 어떤 일을 하고 있습니까?
- * @param geoLocData 변수
- */
-/*
-SmartTile.prototype.calculateAltitudeLimits = function() 
-{
-	// this function calculates the minAltitude and maxAltitude of the tile.
-	// init the altitudes.
-	this.minGeographicCoord.altitude = 0;
-	this.maxGeographicCoord.altitude = 0;
-	
-	var buildingSeed;
-	var buildingSeedsCount = this.buildingSeedsArray.length;
-	for (var i=0; i<buildingSeedsCount; i++)
-	{
-		buildingSeed = this.buildingSeedsArray[i];
-
-		var altitude = buildingSeed.geographicCoordOfBBox.altitude;
-		var bboxRadius = buildingSeed.bBox.getRadiusAprox();
-		if (altitude-bboxRadius < this.minGeographicCoord.altitude)
-		{
-			this.minGeographicCoord.altitude = altitude-bboxRadius;
-		}
-		if (altitude+bboxRadius > this.maxGeographicCoord.altitude)
-		{
-			this.maxGeographicCoord.altitude = altitude+bboxRadius;
-		}
-	}
-};
-*/
 
 /**
  * 위경도를 받아서 현재 타일인스턴스와의 포함유무 반환.
@@ -1126,6 +1000,10 @@ SmartTile.prototype.hasRenderables = function ()
 	
 	// Check lightSources.***
 	if (nativeObjects.lightSourcesArray && nativeObjects.lightSourcesArray.length > 0)
+	{ return true; }
+
+	// Check nativeSeedArray.***
+	if (nativeObjects.nativeSeedArray && nativeObjects.nativeSeedArray.length > 0)
 	{ return true; }
 	
 	return hasObjects;

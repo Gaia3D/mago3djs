@@ -1152,10 +1152,11 @@ BSplineCubic3D.getUnitaryPositionForSegmentAtLinearPosition = function(strPoint,
  */
 BSplineCubic3D.getTangent = function(bSpline, linearPosition, resultTangentLine, magoManager) 
 {
-	if (bSpline.knotPoints3dList === undefined)
+	if (bSpline.knotPoints3dList === undefined || bSpline.knotPoints3dList.dirty)
 	{
 		var controlPointArmLength = 0.3;
 		bSpline.makeControlPoints(controlPointArmLength, magoManager);
+		bSpline.knotPoints3dList.dirty = false;
 	}
 	
 	// "linearPosition" is a length measurement.***

@@ -172,15 +172,7 @@ GeographicCoordsList.getPointsRelativeToGeoLocation = function(geoLocIn, geoCoor
 	for (var i=0; i<geoPointsCount; i++)
 	{
 		var geoCoord = geoCoordsArray[i];
-		var geoLocDataManager = geoCoord.getGeoLocationDataManager();
-		var geoLoc = geoLocDataManager.getCurrentGeoLocationData();
-		if (geoLoc === undefined)
-		{
-			geoCoord.makeDefaultGeoLocationData();
-			geoLoc = geoLocDataManager.getCurrentGeoLocationData();
-		}
-		
-		var posAbs = geoLoc.position;
+		var posAbs = ManagerUtils.geographicCoordToWorldPoint(geoCoord.longitude,geoCoord.latitude,geoCoord.altitude);
 		resultPoints3dArray[i] = geoLocIn.getTransformedRelativePosition(posAbs, resultPoints3dArray[i]);
 	}
 	

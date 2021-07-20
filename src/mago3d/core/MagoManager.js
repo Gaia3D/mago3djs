@@ -358,6 +358,9 @@ var MagoManager = function (config)
 	this._needValidHeightNativeArray = [];
 	this._changeCanvasSizeEvent = new CustomEvent('changeCanvasSize');
 
+	//한국 건축물 마스터
+	this.koreaBuildingMaster = {};
+
 	if (window.Mago3D && Mago3D['WeatherStation'] && this.weatherStation === undefined)
 	{ 
 		this.weatherStation = new Mago3D.WeatherStation(this);
@@ -7248,6 +7251,27 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function (intersectedLo
 		if (nativeObjects.pointTypeArray)
 		{ Array.prototype.push.apply(currVisibleNativeObjects.pointTypeArray, nativeObjects.pointTypeArray); }
 
+		// native lightSources.
+		nativeObjectsCount = nativeObjects.nativeSeedArray.length;
+		for(var j=0; j<nativeObjectsCount; j++)
+		{
+			var seed = nativeObjects.nativeSeedArray[j];
+			var master = this.koreaBuildingMaster[seed.masterId];
+
+			if(master.show && seed.status === KoreaBuildingSeed.STATUS.UNLOAD) 
+			{
+				seed.load();
+				continue;
+			}
+
+			if(seed.status === KoreaBuildingSeed.STATUS.LOADEND) 
+			{
+				//remove
+				continue;
+			}
+		}
+		
+
 		if (lowestTile.isNeededToCreateGeometriesFromSeeds())
 		{
 			lowestTile.createGeometriesFromSeeds(this);
@@ -9218,4 +9242,18 @@ MagoManager.prototype.renderBasicGl_test = function()
 	gl.disable(gl.CULL_FACE);
 	gl.drawArrays(gl.LINE_STRIP, 0, vboCacheKey.vertexCount);
 
+}
+
+/**
+ * 건축통합정보 마스터 가시화 추가
+ * @param {string} url 
+ * @param {string} format 
+ * 
+ * @return {KoreaBuildingMaster}
+ */
+MagoManager.prototype.addKoreaBuildingMaster = function(url, format, option) {
+	var master = new KoreaBuildingMaster(url, format, option, this);
+	this.koreaBuildingMaster[master.guid] = master;
+
+	return master;
 }

@@ -39,6 +39,7 @@ var Modeler = function(magoManager)
 	this.testObjectsArray;
 	
 	this.objectsArray = []; // put here all objects.***
+	this.mergedObjectsArray = [];
 	this.vectorsArray; // put here vector objects (lines, polylines, etc.).***
 	this.currentVisibleObjectsArray;
 
@@ -151,6 +152,30 @@ Modeler.prototype.addObject = function (object, depth)
 		add : object
 	});
 };
+
+/**
+ * 모델러에 그려야할 병합 객체 추가
+ * @param {MagoRenderable} object
+ * @param {number} depth Optional. 설정 시 해당 depth로 targetDepth 설정, targetDepth부터 화면에 나타남.
+ */
+ Modeler.prototype.addMergedObject = function (object, depth) 
+ {
+	 if (this.mergedObjectsArray === undefined)
+	 { this.mergedObjectsArray = []; }
+ 
+	 this.mergedObjectsArray.push(object);
+	 
+	 var smartTileManager = this.magoManager.smartTileManager;
+	 // Note: the targetDepth must be calculated by the objects bbox size.
+	 var targetDepth = depth ? depth : 15;
+	 smartTileManager.putObject(targetDepth, object, this.magoManager);
+ 
+	 this.emit(Modeler.EVENT_TYPE.ADD, {
+		 type :Modeler.EVENT_TYPE.ADD,
+		 timestamp : new Date().getTime(),
+		 add : object
+	 });
+ };
 
 Modeler.prototype.__TEST__extrusionBuildings = function()
 {
@@ -567,7 +592,7 @@ Modeler.prototype.__TEST__loftObjects = function()
 		////extrudedLine.setOneColor(1.0, 0.5, 0.3, 1.0);
 		////this.addObject(extrudedLine);
 		//var path3d = new Path3D(geoCoordsList.geographicCoordsArray);
-		var loftMesh = Modeler.getLoftMesh(profile2d, geoCoordsList.geographicCoordsArray, bIncludeBottomCap, bIncludeTopCap, this.magoManager);
+		var loftMesh = Modeler._getLoftMesh(profile2d, geoCoordsList.geographicCoordsArray, bIncludeBottomCap, bIncludeTopCap, this.magoManager);
 
 		this.addObject(loftMesh);
 	}
@@ -620,7 +645,7 @@ Modeler.prototype.__TEST__laser = function()
 	*/
 };
 
-Modeler.getLoftMesh = function(profile2d, path, bIncludeBottomCap, bIncludeTopCap, magoManager) 
+Modeler._getLoftMesh = function(profile2d, path, bIncludeBottomCap, bIncludeTopCap, magoManager) 
 {
 	// 1rst, create a VtxProfilesList.
 	var vtxProfilesList = new VtxProfilesList();
@@ -904,6 +929,96 @@ Modeler.getExtrudedMesh = function(profile2d, extrusionDist, extrudeSegmentsCoun
 	
 	return resultMesh;
 };
+
+/**
+ * 
+ * @param {GeographicCoordsList} geographicCoordsList 
+ * @param {Array<Point2D>} point2dArray 
+ */
+Modeler.getLoftMesh = function(geographicCoordsList, point2dArray) {
+	if (!geographicCoordsList || !(geographicCoordsList instanceof GeographicCoordsList))
+	{ return undefined; }
+	
+	if(!point2dArray) {
+		point2dArray = [];
+
+		var halfWidth = 20;
+		var halLength = 100;
+
+		point2dArray.push(new Point2D(-halfWidth, -halLength));
+		point2dArray.push(new Point2D(halfWidth, -halLength));
+		point2dArray.push(new Point2D(halfWidth, halLength));
+		point2dArray.push(new Point2D(-halfWidth, halLength));
+	}
+
+	var profile2d = Profile2D.fromPoint2DArray(point2dArray);
+
+	var extent = geographicCoordsList.getGeographicExtent();
+	var centerGeoCoord = extent.getMidPoint(undefined);
+	var geoLoc = ManagerUtils.calculateGeoLocationData(centerGeoCoord.longitude, centerGeoCoord.latitude, centerGeoCoord.altitude, 0, 0, 0);
+	
+	var vertexProfileList = new VtxProfilesList();
+	var points3dLCArray = GeographicCoordsList.getPointsRelativeToGeoLocation(geoLoc, geographicCoordsList.geographicCoordsArray, undefined);
+	var point3dList = new Point3DList(points3dLCArray);
+	var pointCount = point3dList.getPointsCount();
+	for(var index=0;index<pointCount-1;index++) {
+		//now, we calculate tmatrix for profile2d
+		//we know z direction
+		var nextIndex = point3dList.getNextIdx(index);
+
+		var firstPoint3d = point3dList.getPoint(index);
+		var nextPoint3d = point3dList.getPoint(nextIndex);
+		var zDir = firstPoint3d.getVectorToPoint(nextPoint3d);
+		zDir.unitary();
+
+		var firstGeoCoord = geographicCoordsList.getGeoCoord(index);
+		var firstWorldCoord = ManagerUtils.geographicCoordToWorldPoint(firstGeoCoord.longitude, firstGeoCoord.latitude, firstGeoCoord.altitude)
+
+		var earthNormalFloat32Array = Globe.normalAtCartesianPointWgs84(firstWorldCoord.x, firstWorldCoord.y, firstWorldCoord.z);
+		var earthNormal = new Point3D(earthNormalFloat32Array[0], earthNormalFloat32Array[1], earthNormalFloat32Array[2]);
+
+		var rotMatInv = geoLoc.getRotMatrixInv();
+		var earthNormalLC = rotMatInv.transformPoint3D(earthNormal);
+
+		var xDir = earthNormalLC.crossProduct(zDir);
+		var yDir = zDir.crossProduct(xDir);
+
+		var transformMatrix = new Matrix4();
+		transformMatrix.setByFloat32Array(new Float32Array([
+			xDir.x, xDir.y, xDir.z, 0,
+			yDir.x, yDir.y, yDir.z, 0,
+			zDir.x, zDir.y, zDir.z, 0,
+			firstPoint3d.x, firstPoint3d.y, firstPoint3d.z, 1.0]));
+
+		var vertexProfile = new VtxProfile();
+		vertexProfile.makeByProfile2D(profile2d);
+		
+		vertexProfile.transformPointsByMatrix4(transformMatrix);
+		if(index===0) vertexProfileList.addVtxProfile(vertexProfile);
+
+		var plane = point3dList.getBisectionPlane(nextIndex);
+		var nextVertexProfile =VtxProfile.getProjectedOntoPlane(vertexProfile, plane, zDir);
+		vertexProfileList.addVtxProfile(nextVertexProfile);
+	}
+	
+	var renderableObject = new RenderableObject();
+	renderableObject.geoLocDataManager = new GeoLocationDataManager();
+	renderableObject.geoLocDataManager.addGeoLocationData(geoLoc);
+
+	renderableObject.boundingSphereWC = new BoundingSphere();
+	var positionWC = geoLoc.position;
+	var bboxLC = Point3DList.getBoundingBoxOfPoints3DArray(points3dLCArray, undefined);
+	var radiusAprox = bboxLC.getRadiusAprox();
+	renderableObject.boundingSphereWC.setCenterPoint(positionWC.x, positionWC.y, positionWC.z);
+	renderableObject.boundingSphereWC.setRadius(radiusAprox);
+
+	var solidMesh = vertexProfileList.getMesh();
+	var surfIndepMesh = solidMesh.getCopySurfaceIndependentMesh();
+    surfIndepMesh.calculateVerticesNormals();
+	renderableObject.objectsArray.push(surfIndepMesh);
+
+	return renderableObject;
+}
 
 Modeler.getRevolvedMesh = function(profile2d, revolveAngDeg, revolveSegmentsCount, revolveSegment2d, bIncludeBottomCap, bIncludeTopCap, resultMesh) 
 {

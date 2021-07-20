@@ -1336,7 +1336,8 @@ Camera.intersectPointByLaser = function(startGeoCoord, endGeoCoord, laserCam, re
 	return undefined;
 
 	if(startWC.distToPoint(resultImpactPointWC) < error || endWC.distToPoint(resultImpactPointWC) < error) {
-		return undefined;
+		//return undefined;
+		var a;
 	}
 
 	return resultImpactPointWC;
