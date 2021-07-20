@@ -362,6 +362,8 @@ var MagoManager = function (config)
 	{ 
 		this.weatherStation = new Mago3D.WeatherStation(this);
 	}
+
+	this.quantizedMeshManager;
 };
 MagoManager.prototype = Object.create(Emitter.prototype);
 MagoManager.prototype.constructor = MagoManager;

@@ -402,7 +402,7 @@ Polygon2D.prototype.intersectionWithSegment = function(segment, error)
 	var mySegment;
 	var intersectionType;
 
-	if (!error)
+	if (error === undefined)
 	{ error = 10E-8; }
 	var pointsCount = this.point2dList.getPointsCount();
 	for (var i=0; i<pointsCount; i++)
@@ -736,6 +736,7 @@ Polygon2D.prototype.intersectionWithPolygon2DConvexPolygon = function(polygon2D)
  */
 Polygon2D.prototype.getRelativePostionOfPoint2DConvexPolygon = function(point2D) 
 { 
+	// 0 : no intersection 1 : pointCoincident, 2 : edgeCoincident. 3 : interior
 	var thisBRectangle = this.getBoundingRectangle();
 	if (!thisBRectangle.intersectsWithPoint2D(point2D)) 
 	{
@@ -780,6 +781,7 @@ Polygon2D.prototype.getRelativePostionOfPoint2DConvexPolygon = function(point2D)
 		}
 	}
 	
+	// 0 : no intersection 1 : pointCoincident, 2 : edgeCoincident. 3 : interior
 	return 3;
 };
 

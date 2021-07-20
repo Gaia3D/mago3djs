@@ -29,18 +29,6 @@ QuantizedSurface.prototype._makeQuantizedMeshFromTrianglesList = function (trian
     var uValues = new Uint16Array(vertexCount);
 	var vValues = new Uint16Array(vertexCount);
 	var hValues = new Uint16Array(vertexCount);
-
-    // provisionally make color4.***
-    var color4Array = [];
-    var R = 255;
-    var G = 50;
-    var B = 50;
-    var A = 255;
-
-    var RH = 50;
-    var GH = 50;
-    var BH = 255;
-    var AH = 255;
 	
     var vertex;
     var pos;
@@ -95,7 +83,6 @@ QuantizedSurface.prototype._makeQuantizedMeshFromTrianglesList = function (trian
     resultQMesh._vValues = vValues;
     resultQMesh._heightValues = hValues;
     resultQMesh._indices = indices;
-    //resultQMesh._colors = new Uint8Array(color4Array);
 
     return resultQMesh;
 };
@@ -257,13 +244,8 @@ QuantizedSurface.getQuantizedPointsArrayFromGeoCoords = function (geoCoordsArray
         resultqPointsArray = [];
     }
 
-    var geoCoordsCount = geoCoordsArray.length;
-    var qPoint;
-    for(var i=0; i<geoCoordsCount; i++)
-    {
-        qPoint = geoExtent.getQuantizedPoint(geoCoordsArray[i], undefined);
-        resultqPointsArray.push(qPoint);
-    }
+    resultqPointsArray = geoExtent.getQuantizedPoints(geoCoordsArray, resultqPointsArray);
+
 
     return resultqPointsArray;
 };
@@ -326,7 +308,6 @@ QuantizedSurface._storeTriangleInVertices = function (triangle)
     v0.trianglesArray.push(triangle);
     v1.trianglesArray.push(triangle);
     v2.trianglesArray.push(triangle);
-
 };
 
 QuantizedSurface._recalculateTrianglesStoredInVertices = function (triList, vertexList)
@@ -1217,6 +1198,8 @@ QuantizedSurface._createLateralTrianglesOfTriangle = function (tri, triList)
         var tri1, tri2;
         tri1 = triList.newTriangle(twinVertexA, twinVertexB, vertexB);
         tri2 = triList.newTriangle(twinVertexA, vertexB, vertexA);
+        QuantizedSurface._storeTriangleInVertices(tri1);
+        QuantizedSurface._storeTriangleInVertices(tri2);
         return true;
     }
     
@@ -1224,58 +1207,256 @@ QuantizedSurface._createLateralTrianglesOfTriangle = function (tri, triList)
     return false;
 };
 
-QuantizedSurface.recalculateSkirtIndices = function (triList, vertexList)
+QuantizedSurface._getNextSkirtVertexReport = function (vertex, triangleMaster, cardinal)
+{
+    var trianglesArray = vertex.trianglesArray;
+    if(!trianglesArray)
+    { return undefined; }
+
+    var report = {};
+
+    var triCount = trianglesArray.length;
+    var tri;
+
+    if(cardinal === CODE.cardinal.SOUTH)
+    {
+        for(var i=0; i<triCount; i++)
+        {
+            tri = trianglesArray[i];
+            if(tri !== triangleMaster && tri.getStatus() !== CODE.status.DELETED)
+            {
+                // now, check if this triangle has another south-vertex.***
+                if(tri.vertex0 !== vertex && tri.vertex0.bSouth)
+                {
+                    report.vertex = tri.vertex0;
+                    report.triangle = tri;
+                    return report;
+                }
+                else if(tri.vertex1 !== vertex && tri.vertex1.bSouth)
+                {
+                    report.vertex = tri.vertex1;
+                    report.triangle = tri;
+                    return report;
+                }
+                else if(tri.vertex2 !== vertex && tri.vertex2.bSouth)
+                {
+                    report.vertex = tri.vertex2;
+                    report.triangle = tri;
+                    return report;
+                }
+            }
+        }
+    }
+    else if(cardinal === CODE.cardinal.EAST)
+    {
+        for(var i=0; i<triCount; i++)
+        {
+            tri = trianglesArray[i];
+            if(tri !== triangleMaster && tri.getStatus() !== CODE.status.DELETED)
+            {
+                // now, check if this triangle has another south-vertex.***
+                if(tri.vertex0 !== vertex && tri.vertex0.bEast)
+                {
+                    report.vertex = tri.vertex0;
+                    report.triangle = tri;
+                    return report;
+                }
+                else if(tri.vertex1 !== vertex && tri.vertex1.bEast)
+                {
+                    report.vertex = tri.vertex1;
+                    report.triangle = tri;
+                    return report;
+                }
+                else if(tri.vertex2 !== vertex && tri.vertex2.bEast)
+                {
+                    report.vertex = tri.vertex2;
+                    report.triangle = tri;
+                    return report;
+                }
+            }
+        }
+    }
+    else if(cardinal === CODE.cardinal.NORTH)
+    {
+        for(var i=0; i<triCount; i++)
+        {
+            tri = trianglesArray[i];
+            if(tri !== triangleMaster && tri.getStatus() !== CODE.status.DELETED)
+            {
+                // now, check if this triangle has another south-vertex.***
+                if(tri.vertex0 !== vertex && tri.vertex0.bNorth)
+                {
+                    report.vertex = tri.vertex0;
+                    report.triangle = tri;
+                    return report;
+                }
+                else if(tri.vertex1 !== vertex && tri.vertex1.bNorth)
+                {
+                    report.vertex = tri.vertex1;
+                    report.triangle = tri;
+                    return report;
+                }
+                else if(tri.vertex2 !== vertex && tri.vertex2.bNorth)
+                {
+                    report.vertex = tri.vertex2;
+                    report.triangle = tri;
+                    return report;
+                }
+            }
+        }
+    }
+    else if(cardinal === CODE.cardinal.WEST)
+    {
+        for(var i=0; i<triCount; i++)
+        {
+            tri = trianglesArray[i];
+            if(tri !== triangleMaster && tri.getStatus() !== CODE.status.DELETED)
+            {
+                // now, check if this triangle has another south-vertex.***
+                if(tri.vertex0 !== vertex && tri.vertex0.bWest)
+                {
+                    report.vertex = tri.vertex0;
+                    report.triangle = tri;
+                    return report;
+                }
+                else if(tri.vertex1 !== vertex && tri.vertex1.bWest)
+                {
+                    report.vertex = tri.vertex1;
+                    report.triangle = tri;
+                    return report;
+                }
+                else if(tri.vertex2 !== vertex && tri.vertex2.bWest)
+                {
+                    report.vertex = tri.vertex2;
+                    report.triangle = tri;
+                    return report;
+                }
+            }
+        }
+    }
+
+    return undefined;
+};
+
+QuantizedSurface._getSkirtVertices = function (cardinal, startVertex, resultVertexArray, maxIterations)
+{
+    if(!resultVertexArray)
+    { resultVertexArray = []; }
+
+    resultVertexArray.push(startVertex); // put the 1rst vertex of the south skirt.***
+    var currVertex = startVertex;
+    var currTriangle = undefined; // initially undefined.***
+    var finished = false;
+    if(maxIterations === undefined)
+    {
+        maxIterations = 35000;
+    }
+    var i = 0;
+    while(!finished && i<maxIterations)
+    {
+        var report = QuantizedSurface._getNextSkirtVertexReport(currVertex, currTriangle, cardinal);
+
+        if(report)
+        {
+            var nextVertex = report.vertex;
+            resultVertexArray.push(nextVertex);
+            currVertex = nextVertex;
+            currTriangle = report.triangle;
+        }
+        else
+        {
+            finished = true;
+        }
+        i++;
+    }
+
+    return resultVertexArray;
+};
+
+QuantizedSurface.recalculateSkirtIndices = function (triList, vertexList, qMesh)
 {
     // All indices right to left or down to up.***
     // south & north skirt (right to left), west & east (down to up).***
     // south skirt.***
     // 1rst, must find all south triangles.***
 
-    // QuantizedSurface._getCardinalsOfTriangle = function (triangle, resultCardinalsArray)
-
-    var southTrianglesArray = [];
-    var eastTrianglesArray = [];
-    var northTrianglesArray = [];
-    var westTrianglesArray = [];
-
-    var triCount = triList.getTrianglesCount();
-    var tri;
-    for(var i=0; i<triCount; i++)
-    {
-        tri = triList.getTriangle(i);
-        if(tri.getStatus() === CODE.status.DELETED)
-        { continue; }
-        
-        var cardinals = QuantizedSurface._getCardinalsOfTriangle(tri, undefined);
-        var cardinalsCount = cardinals.length;
-        for(var j=0; j<cardinalsCount; j++)
-        {
-            if(cardinals[j] === CODE.cardinal.SOUTH)
-            {
-                southTrianglesArray.push(tri);
-            }
-            else if(cardinals[j] === CODE.cardinal.EAST)
-            {
-                eastTrianglesArray.push(tri);
-            }
-            else if(cardinals[j] === CODE.cardinal.NORTH)
-            {
-                northTrianglesArray.push(tri);
-            }
-            else if(cardinals[j] === CODE.cardinal.WEST)
-            {
-                westTrianglesArray.push(tri);
-            }
-        }
-    }
-
+    // find the left_down vertex (west_south).***
     var vertexCount = vertexList.getVertexCount();
     var vertex;
+    var vertexSouthWest, vertexSouthEast, vertexNorthEast, vertexNorthWest;
     for(var i=0; i<vertexCount; i++)
     {
         vertex = vertexList.getVertex(i);
-
+        if(vertex.bSouth && vertex.bWest)
+        {
+            vertexSouthWest = vertex;
+        }
+        else if(vertex.bSouth && vertex.bEast)
+        {
+            vertexSouthEast = vertex;
+        }
+        else if(vertex.bNorth && vertex.bEast)
+        {
+            vertexNorthEast = vertex;
+        }
+        else if(vertex.bNorth && vertex.bWest)
+        {
+            vertexNorthWest = vertex;
+        }
     }
+
+    // with vertexSouthWest, find southVertexArray.***
+    var cardinal = CODE.cardinal.SOUTH;
+    var southVertexArray = QuantizedSurface._getSkirtVertices(cardinal, vertexSouthWest, undefined, vertexCount);
+
+    // East vertex array.***
+    cardinal = CODE.cardinal.EAST;
+    var eastVertexArray = QuantizedSurface._getSkirtVertices(cardinal, vertexSouthEast, undefined, vertexCount);
+
+    // North vertex array.***
+    cardinal = CODE.cardinal.NORTH;
+    var northVertexArray = QuantizedSurface._getSkirtVertices(cardinal, vertexNorthWest, undefined, vertexCount);
+
+    // West vertex array.***
+    cardinal = CODE.cardinal.WEST;
+    var westVertexArray = QuantizedSurface._getSkirtVertices(cardinal, vertexSouthWest, undefined, vertexCount);
+
+    vertexList.setIdxInList();
+
+    var southSkirtIndices = [];
+    var skirtVertexCount = southVertexArray.length;
+    for(var i=0; i<skirtVertexCount; i++)
+    {
+        southSkirtIndices.push(southVertexArray[i].idxInList);
+    }
+
+    var eastSkirtIndices = [];
+    skirtVertexCount = eastVertexArray.length;
+    for(var i=0; i<skirtVertexCount; i++)
+    {
+        eastSkirtIndices.push(eastVertexArray[i].idxInList);
+    }
+
+    var northSkirtIndices = [];
+    skirtVertexCount = northVertexArray.length;
+    for(var i=0; i<skirtVertexCount; i++)
+    {
+        northSkirtIndices.push(northVertexArray[i].idxInList);
+    }
+
+    var westSkirtIndices = [];
+    skirtVertexCount = westVertexArray.length;
+    for(var i=0; i<skirtVertexCount; i++)
+    {
+        westSkirtIndices.push(westVertexArray[i].idxInList);
+    }
+
+    qMesh._southIndices = new Uint16Array(southSkirtIndices);
+    qMesh._eastIndices = new Uint16Array(eastSkirtIndices);
+    qMesh._northIndices = new Uint16Array(northSkirtIndices);
+    qMesh._westIndices = new Uint16Array(westSkirtIndices);
+
+    var hola = 0;
 };
 
 QuantizedSurface.createLateralTrianglesOfExcavation = function (triList, vertexList, excavationDepth)
@@ -1367,7 +1548,7 @@ QuantizedSurface.createLateralTrianglesOfExcavation = function (triList, vertexL
     var tri;
     var status;
     var pos;
-
+    var altAux = 3500;
     for(var i=0; i<triCount; i++)
     {
         tri = triList.getTriangle(i);
@@ -1376,11 +1557,11 @@ QuantizedSurface.createLateralTrianglesOfExcavation = function (triList, vertexL
         {
             // set excavation altitude.***
             pos = tri.vertex0.getPosition();
-            pos.z = 0.0;
+            pos.z = altAux;
             pos = tri.vertex1.getPosition();
-            pos.z = 0.0;
+            pos.z = altAux;
             pos = tri.vertex2.getPosition();
-            pos.z = 0.0;
+            pos.z = altAux;
         }
     }
 
@@ -1388,10 +1569,22 @@ QuantizedSurface.createLateralTrianglesOfExcavation = function (triList, vertexL
     var hola = 0;
 };
 
-QuantizedSurface.prototype.excavation = function (excavationGeoCoords, excavationDepth)
+QuantizedSurface.prototype.excavation = function (excavationGeoCoordsArray, excavationDepth)
 {
     // In this function, cut the qmesh with the excavationPolygon and create a negative extrude.
     var triList = this.getTrianglesList();
+
+    // the "excavationGeoCoordsArray" is a lon, lat array, so must convert to geoCoordsArray.
+    var excavationGeoCoords = [];
+    var coordsCount = excavationGeoCoordsArray.length / 2.0;
+    for(var i=0; i<coordsCount; i++)
+    {
+        var lon = excavationGeoCoordsArray[i * 2];
+        var lat = excavationGeoCoordsArray[i * 2 + 1];
+        var geoCoord = new GeographicCoord(lon, lat, 0.0);
+        excavationGeoCoords.push(geoCoord);
+    }
+
 
     // make vertexSegment in positive short range by geographicCoords.
     if(!this.qMesh.geoExtent)
@@ -1450,7 +1643,7 @@ QuantizedSurface.prototype.excavation = function (excavationGeoCoords, excavatio
     QuantizedSurface.createLateralTrianglesOfExcavation(triList, this.vertexList, excavationDepth);
 
     // Now, must recalculate the skirt indices.***
-    QuantizedSurface.recalculateSkirtIndices(triList, this.vertexList);
+    QuantizedSurface.recalculateSkirtIndices(triList, this.vertexList, this.qMesh);
 
     // Now, remake the quantized mesh.***
     this._makeQuantizedMeshFromTrianglesList(triList, this.vertexList, this.qMesh);

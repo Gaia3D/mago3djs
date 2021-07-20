@@ -1120,10 +1120,11 @@ Water.prototype.doSimulationSteps = function (magoManager)
 	var extbuffers = fbo.extbuffers;
 	var shader;
 	
-	/*
+	
 	// Test.*** delete this.*** Test.*** delete this.*** Test.*** delete this.*** Test.*** delete this.*** Test.*** delete this.*** Test.*** 
 	// 1rst, check if dem texture is ready.
-	if(!this.quantizedSurfaceTest && this.testQMesh)
+	/*
+	if (!this.quantizedSurfaceTest && this.testQMesh)
 	{
 		// 1rst, calculate the geoExtent of the tile:
 		var imageryType = CODE.imageryType.CRS84;
@@ -1132,7 +1133,7 @@ Water.prototype.doSimulationSteps = function (magoManager)
 		var minGeoCoord = geoExtent.minGeographicCoord;
 		var maxGeoCoord = geoExtent.maxGeographicCoord;
 
-		this.quantizedSurface = new QuantizedSurface(this.testQMesh);
+		//this.quantizedSurface = new QuantizedSurface(this.testQMesh);
 		// The testing tile extent:
 		var minLon = minGeoCoord.longitude;
 		var minLat = minGeoCoord.latitude;
@@ -1148,32 +1149,37 @@ Water.prototype.doSimulationSteps = function (magoManager)
 		var deltaLat = 0.0;
 
 		var excavationGeoCoords = [];
+
+		var lonOffset = 0.0001;
+		var latOffset = 0.0001;
+		lonOffset = 0.004;
+		//latOffset = 0.005;
 		
 		// make a rectangle.************************************************************************************************
 		// origin is left-down.***
 		/*
-		excavationGeoCoords.push(new GeographicCoord((minLon + 0.2 * lonRange), (minLat + 0.15 * latRange), 0.0));
-		excavationGeoCoords.push(new GeographicCoord((minLon + 0.78 * lonRange), (minLat + 0.15 * latRange), 0.0));
-		excavationGeoCoords.push(new GeographicCoord((minLon + 0.78 * lonRange), (minLat + 0.8 * latRange), 0.0));
-		excavationGeoCoords.push(new GeographicCoord((minLon + 0.2 * lonRange), (minLat + 0.8 * latRange), 0.0));
+		excavationGeoCoords.push((minLon + 0.2 * lonRange), (minLat + 0.15 * latRange));
+		excavationGeoCoords.push((minLon + 0.78 * lonRange), (minLat + 0.15 * latRange));
+		excavationGeoCoords.push((minLon + 0.78 * lonRange), (minLat + 0.8 * latRange));
+		excavationGeoCoords.push((minLon + 0.2 * lonRange), (minLat + 0.8 * latRange));
 		*/
 
 		// make a irregular "L" shape.**************************************************************************************
 		/*
-		excavationGeoCoords.push(new GeographicCoord((minLon + 0.1 * lonRange), (minLat + 0.1 * latRange), 0.0));
-		excavationGeoCoords.push(new GeographicCoord((minLon + 0.8 * lonRange), (minLat + 0.15 * latRange), 0.0));
-		excavationGeoCoords.push(new GeographicCoord((minLon + 0.75 * lonRange), (minLat + 0.4 * latRange), 0.0));
-		excavationGeoCoords.push(new GeographicCoord((minLon + 0.4 * lonRange), (minLat + 0.32 * latRange), 0.0));
-		excavationGeoCoords.push(new GeographicCoord((minLon + 0.5 * lonRange), (minLat + 0.9 * latRange), 0.0));
-		excavationGeoCoords.push(new GeographicCoord((minLon + 0.3 * lonRange), (minLat + 0.7 * latRange), 0.0));
-		*/
+		excavationGeoCoords.push((minLon + 0.1 * lonRange + lonOffset), (minLat + 0.1 * latRange + latOffset));
+		excavationGeoCoords.push((minLon + 0.8 * lonRange + lonOffset), (minLat + 0.15 * latRange + latOffset));
+		excavationGeoCoords.push((minLon + 0.75 * lonRange + lonOffset), (minLat + 0.4 * latRange + latOffset));
+		excavationGeoCoords.push((minLon + 0.4 * lonRange + lonOffset), (minLat + 0.32 * latRange + latOffset));
+		excavationGeoCoords.push((minLon + 0.5 * lonRange + lonOffset), (minLat + 0.9 * latRange + latOffset));
+		excavationGeoCoords.push((minLon + 0.3 * lonRange + lonOffset), (minLat + 0.7 * latRange + latOffset));
+		
 
 		// small rectangle.*************************************************************************************************
 		/*
-		excavationGeoCoords.push(new GeographicCoord((minLon + 0.2 * lonRange), (minLat + 0.15 * latRange), 0.0));
-		excavationGeoCoords.push(new GeographicCoord((minLon + 0.3 * lonRange), (minLat + 0.15 * latRange), 0.0));
-		excavationGeoCoords.push(new GeographicCoord((minLon + 0.3 * lonRange), (minLat + 0.21 * latRange), 0.0));
-		excavationGeoCoords.push(new GeographicCoord((minLon + 0.2 * lonRange), (minLat + 0.21 * latRange), 0.0));
+		excavationGeoCoords.push((minLon + 0.2 * lonRange), (minLat + 0.15 * latRange));
+		excavationGeoCoords.push((minLon + 0.3 * lonRange), (minLat + 0.15 * latRange));
+		excavationGeoCoords.push((minLon + 0.3 * lonRange), (minLat + 0.21 * latRange));
+		excavationGeoCoords.push((minLon + 0.2 * lonRange), (minLat + 0.21 * latRange));
 			*/
 		// make a circle.***************************************************************************************************
 		/*
@@ -1182,10 +1188,7 @@ Water.prototype.doSimulationSteps = function (magoManager)
 		var increAngRad = Math.PI / (interpolation / 2);
 		var lonRadius = (lonRange/2) * 0.77;
 		var latRadius = (latRange/2) * 0.77;
-		var lonOffset = 0.0001;
-		var latOffset = 0.0001;
-		lonOffset = 0.004;
-		latOffset = 0.005;
+		
 		for(var i=0; i<interpolation; i++)
 		{
 			angRad = increAngRad * i;
@@ -1195,16 +1198,82 @@ Water.prototype.doSimulationSteps = function (magoManager)
 			var currLon = midLon + lonOffset + lonRadius * x;
 			var currLat = midLat + latOffset + latRadius * y;
 
-			excavationGeoCoords.push(new GeographicCoord(currLon + deltaLon, currLat + deltaLat, 0.0));
+			excavationGeoCoords.push(currLon + deltaLon, currLat + deltaLat);
+		}
+		*/
+/*
+		// Do a worker test.***
+		var qMeshManager = magoManager.quantizedMeshManager;
+		if(qMeshManager)
+		{
+			var excavationAltitude = 180.0;
+			qMeshManager.doExcavation(this.testQMesh, excavationGeoCoords, excavationAltitude);
 		}
 		
-		
-		var excavationDepth = 20.0;
-		this.quantizedSurface.excavation(excavationGeoCoords, excavationDepth);
+		//var excavationDepth = 120.0;
+		//this.quantizedSurface.excavation(excavationGeoCoords, excavationDepth);
 		this.quantizedSurfaceTest = true;
+
 	}
 
-	if(!this.qSurfaceMesh_dem_texture)
+	// Check if the qMesh worker finished.***
+	var qMeshManager = magoManager.quantizedMeshManager;
+	if(qMeshManager && !this.testQMesh_received)
+	{
+		var tileIndices = this.testQMesh.tileIndices;
+		var excavatedQMesh = qMeshManager.getExcavatedQuantizedMesh(tileIndices.X, tileIndices.Y, tileIndices.L);
+
+		if(excavatedQMesh)
+		{
+			/*
+			geoExtent: GeographicExtent {minGeographicCoord: GeographicCoord, maxGeographicCoord: GeographicCoord}
+			tileIndices: {L: 14, X: 27934, Y: 4791}
+			_boundingSphere: BoundingSphere {center: Cartesian3, radius: 791.149544024402}
+			_childTileMask: 15
+			_createdByUpsampling: false
+			_credits: undefined
+			_eastIndices: 
+			_eastSkirtHeight: 23.519085626208074
+			_encodedNormals: undefined
+			_heightValues: 
+			_horizonOcclusionPoint: Cartesian3 {x: -0.4778397353669971, y: 0.6364787134478864, z: 0.6055654428958949}
+			_indices: 
+			_maximumHeight: 459.2222900390625
+			_mesh: undefined
+			_minimumHeight: 172.89456176757812
+			_northIndices: 
+			_northSkirtHeight: 23.519085626208074
+			_orientedBoundingBox: OrientedBoundingBox {center: Cartesian3, halfAxes: Matrix3}
+			_quantizedVertices: 
+			_southIndices: 
+			_southSkirtHeight: 23.519085626208074
+			_uValues: 
+			_vValues: 
+			_westIndices: 
+			_westSkirtHeight: 23.519085626208074
+			*/
+/*
+			if(!this.testQMesh_received)
+			{
+				this.testQMesh._uValues = excavatedQMesh.uValues;
+				this.testQMesh._vValues = excavatedQMesh.vValues;
+				this.testQMesh._heightValues = excavatedQMesh.hValues;
+				this.testQMesh._indices = excavatedQMesh.indices;
+
+				this.testQMesh._southIndices = excavatedQMesh.southIndices;
+				this.testQMesh._eastIndices = excavatedQMesh.eastIndices;
+				this.testQMesh._northIndices = excavatedQMesh.northIndices;
+				this.testQMesh._westIndices = excavatedQMesh.westIndices;
+
+				this.testQMesh._minimumHeight = excavatedQMesh.minHeight;
+				this.testQMesh._maximumHeight = excavatedQMesh.maxHeight;
+
+				this.testQMesh_received = true;
+			}
+		}
+	}
+
+	if(!this.qSurfaceMesh_dem_texture && this.testQMesh_received)
 	{
 		this.makeDEMTextureByQuantizedMesh__testQSurfaceMesh(this.testQMesh);
 	}

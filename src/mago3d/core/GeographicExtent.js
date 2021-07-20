@@ -329,13 +329,13 @@ GeographicExtent.prototype.intersects2dWithGeoExtent = function(geoExtent)
 	return true;
 };
 
-GeographicExtent.prototype.getQuantizedPoint = function(geoCoord, resultQPoint) 
+GeographicExtent.prototype.getQuantizedPoints = function(geoCoordsArray, resultQPointsArray) 
 {
 	// This function returns the quantizedPoint3d.
 	// Quantized points domain is positive short size (0 to 32767).***
-	if(!resultQPoint)
+	if(!resultQPointsArray)
 	{
-		resultQPoint = new Point3D();
+		resultQPointsArray = [];
 	}
 
 	var minGeoCoord = this.minGeographicCoord;
@@ -350,16 +350,26 @@ GeographicExtent.prototype.getQuantizedPoint = function(geoCoord, resultQPoint)
 	var minAlt = minGeoCoord.altitude;
 	var maxAlt = maxGeoCoord.altitude;
 
+	var lonRange = maxLon - minLon;
+	var latRange = maxLat - minLat;
+	var altRange = maxAlt - minAlt;
+
 	var unitary_u, unitary_v, unitary_h;
+	var corrdsCount = geoCoordsArray.length;
+	for(var i=0; i<corrdsCount; i++)
+	{
+		var geoCoord = geoCoordsArray[i];
+		unitary_u = (geoCoord.longitude - minLon) / lonRange;
+		unitary_v = (geoCoord.latitude - minLat) / latRange;
+		unitary_h = (geoCoord.altitude - minAlt) / altRange;
 
-	unitary_u = (geoCoord.longitude - minLon) / (maxLon - minLon);
-	unitary_v = (geoCoord.latitude - minLat) / (maxLat - minLat);
-	unitary_h = (geoCoord.altitude - minAlt) / (maxAlt - minAlt);
+		var shortMax = 32767;
+		//resultQPoint.set(unitary_u * shortMax, unitary_v * shortMax, unitary_h * shortMax);
+		var qPoint = new Point3D(unitary_u * shortMax, unitary_v * shortMax, unitary_h * shortMax);
+		resultQPointsArray.push(qPoint);
+	}
 
-	var shortMax = 32767;
-	resultQPoint.set(unitary_u * shortMax, unitary_v * shortMax, unitary_h * shortMax);
-
-	return resultQPoint;
+	return resultQPointsArray;
 };
 
 
