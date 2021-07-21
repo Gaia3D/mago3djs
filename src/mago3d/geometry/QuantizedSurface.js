@@ -87,6 +87,23 @@ QuantizedSurface.prototype._makeQuantizedMeshFromTrianglesList = function (trian
     return resultQMesh;
 };
 
+QuantizedSurface.prototype.recalculateQuantizedAltitudes = function (newMinHeight, newMaxHeight, currMinHeight, currMaxHeight, vertexList)
+{
+	var newHeightRange = newMaxHeight - newMinHeight;
+	var currHeightRange = currMaxHeight - currMinHeight;
+
+	var vertexCount = vertexList.getVertexCount();
+	for(var i=0; i<vertexCount; i++)
+	{
+		var vertex = vertexList.getVertex(i);
+		var pos = vertex.getPosition();
+		var realHeight = currMinHeight + (pos.z / 32767) * currHeightRange;
+		var newHeight = (realHeight - newMinHeight) / newHeightRange;
+
+		pos.z = newHeight * 32767;
+	}
+};
+
 QuantizedSurface.prototype._makeTrianglesListFromQuantizedMesh = function (resultTrianglesList)
 {
     // In this function make a operable triangle-based mesh.
@@ -1548,7 +1565,7 @@ QuantizedSurface.createLateralTrianglesOfExcavation = function (triList, vertexL
     var tri;
     var status;
     var pos;
-    var altAux = 3500;
+    var altAux = excavationDepth;
     for(var i=0; i<triCount; i++)
     {
         tri = triList.getTriangle(i);
@@ -1639,8 +1656,34 @@ QuantizedSurface.prototype.excavation = function (excavationGeoCoordsArray, exca
     // Now, for each triangle, check if it is inside of the polygon2d.
     QuantizedSurface._classifyTrianglesAsInteriorOrExteriorOfPolygon(triList, convexPolygonsArray);
 
+    //**********************************************************************************************************************************
     // Now, for interior triangles set z -= excavationHeight, and create excavation lateral triabgles.***
-    QuantizedSurface.createLateralTrianglesOfExcavation(triList, this.vertexList, excavationDepth);
+	var excavationAltitude = qMesh.excavationAltitude;
+	// Note : if excavationAltitude is lower than qMesh._minimumHeight or higher than qMesh._maximumHeight, the must recalculate quantized altitudes.
+	var minHeight = qMesh.minHeight;
+	var maxHeight = qMesh.maxHeight;
+	if(excavationAltitude < minHeight)
+	{
+		var newMinHeight = excavationAltitude;
+		var newMaxHeight = qMesh.maxHeight;
+		QuantizedSurface.recalculateQuantizedAltitudes(newMinHeight, newMaxHeight, minHeight, maxHeight, vertexList);
+
+		qMesh.minHeight = newMinHeight;
+		qMesh.maxHeight = newMaxHeight;
+	}
+	else if(excavationAltitude > maxHeight)
+	{
+		var newMinHeight = qMesh.minHeight;
+		var newMaxHeight = excavationAltitude;
+		QuantizedSurface.recalculateQuantizedAltitudes(newMinHeight, newMaxHeight, minHeight, maxHeight, vertexList);
+
+		qMesh.minHeight = newMinHeight;
+		qMesh.maxHeight = newMaxHeight;
+	}
+	var quantizedAltitude = (excavationAltitude - qMesh.minHeight) / (qMesh.maxHeight - qMesh.minHeight) * 32767;
+
+    // Now, for interior triangles set z -= excavationHeight, and create excavation lateral triabgles.***
+    QuantizedSurface.createLateralTrianglesOfExcavation(triList, this.vertexList, quantizedAltitude);
 
     // Now, must recalculate the skirt indices.***
     QuantizedSurface.recalculateSkirtIndices(triList, this.vertexList, this.qMesh);

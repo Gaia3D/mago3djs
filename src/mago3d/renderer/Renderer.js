@@ -2218,12 +2218,12 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 			if(waterLayer.original_dem_texture && waterLayer.original_dem_texture.texId)
 			{
-				//texture = waterLayer.original_dem_texture.texId;
+				texture = waterLayer.original_dem_texture.texId;
 			}//
 
 			if(waterLayer.qSurfaceMesh_dem_texture && waterLayer.qSurfaceMesh_dem_texture.texId)
 			{
-				texture = waterLayer.qSurfaceMesh_dem_texture.texId;
+				//texture = waterLayer.qSurfaceMesh_dem_texture.texId;
 			}
 		}
 	}

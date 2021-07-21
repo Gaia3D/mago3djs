@@ -1280,6 +1280,32 @@ WaterManager.prototype.test__createContaminationBox_sejong = function (magoManag
 	return true;
 };
 
+WaterManager.prototype.deleteObjects = function ()
+{
+	var waterLayersCount = this.waterLayersArray.length;
+	var waterLayer;
+	for(var i=0; i<waterLayersCount; i++)
+	{
+		waterLayer = this.waterLayersArray[i];
+		waterLayer.deleteObjects();
+
+		this.waterLayersArray[i] = undefined;
+	}
+
+	this.waterLayersArray.length = 0;
+};
+
+WaterManager.prototype.resetSimulation = function ()
+{
+	var waterLayersCount = this.waterLayersArray.length;
+	var waterLayer;
+	for(var i=0; i<waterLayersCount; i++)
+	{
+		waterLayer = this.waterLayersArray[i];
+		waterLayer.resetSimulation();
+	}
+};
+
 /**
  * render
  */

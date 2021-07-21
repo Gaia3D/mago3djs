@@ -1633,42 +1633,6 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		this.doRenderMagoWorld(frustumVolumenObject);
 		return;
 	}
-		/*
-		// Test.***
-		if(!this.qMeshPromise)
-		{
-			// Sejong tile.***
-			var X = 27965;
-			var Y = 4870;
-			var L = 14;
-			//----------------
-			// For sihung: lon = 126.89287, lat = 37.35476 (L: 14, X: 27934, Y: 4791)
-			//var tile = SmartTile.selectTileIndices(14, 126.89287, 37.35476, undefined);
-			var X = 27934;
-			var Y = 4791;
-			var L = 14;
-
-			this.qMeshPromise = this.scene.globe.terrainProvider.requestTileGeometry(X, Y, L);
-			this.qMeshPromise.then((value) =>
-			{
-				this.qMesh = value;
-				this.qMesh.tileIndices = {
-					L : L, X : X, Y : Y
-				};
-			});
-		}
-	
-		if(this.qMesh && !this.DEMTexTest)
-		{
-			// make demTex with the qMeshData.***
-			if(this.waterManager && this.waterManager.waterLayersArray.length > 0)
-			{
-				var waterLayer = this.waterManager.waterLayersArray[0];
-				waterLayer.testQMesh = this.qMesh;
-				this.DEMTexTest = true;
-			}
-		}
-		*/
 	
 	var gl = this.getGl();
 	

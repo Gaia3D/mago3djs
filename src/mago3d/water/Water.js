@@ -130,6 +130,248 @@ var Water = function(waterManager, options)
 	}
 };
 
+Water.prototype.deleteObjects = function ()
+{
+	var waterManager = this.waterManager;
+	var magoManager = waterManager.magoManager;
+	var gl = magoManager.getGl();
+
+	// 1rst, delete glObjects.***
+	// Textures.***
+	if(this.waterHeightTexA)
+	{
+		this.waterHeightTexA.deleteObjects(gl);
+		this.waterHeightTexA = undefined;
+	}
+	
+	if(this.waterHeightTexB)
+	{
+		this.waterHeightTexB.deleteObjects(gl);
+		this.waterHeightTexB = undefined;
+	}
+	
+	if(this.contaminationTex_A)
+	{
+		this.contaminationTex_A.deleteObjects(gl);
+		this.contaminationTex_A = undefined;
+	}
+	
+	if(this.contaminationTex_B)
+	{
+		this.contaminationTex_B.deleteObjects(gl);
+		this.contaminationTex_B = undefined;
+	}
+	
+	if(this.waterFluxTexA_HIGH)
+	{
+		this.waterFluxTexA_HIGH.deleteObjects(gl);
+		this.waterFluxTexA_HIGH = undefined;
+	}
+	
+	if(this.waterFluxTexA_LOW)
+	{
+		this.waterFluxTexA_LOW.deleteObjects(gl);
+		this.waterFluxTexA_LOW = undefined;
+	}
+	
+	if(this.waterFluxTexB_HIGH)
+	{
+		this.waterFluxTexB_HIGH.deleteObjects(gl);
+		this.waterFluxTexB_HIGH = undefined;
+	}
+	
+	if(this.waterFluxTexB_LOW)
+	{
+		this.waterFluxTexB_LOW.deleteObjects(gl);
+		this.waterFluxTexB_LOW = undefined;
+	}
+
+	if(this.shaderLogTexA)
+	{
+		this.shaderLogTexA.deleteObjects(gl);
+		this.shaderLogTexA = undefined;
+	}
+
+	if(this.shaderLogTexB)
+	{
+		this.shaderLogTexB.deleteObjects(gl);
+		this.shaderLogTexB = undefined;
+	}
+
+	if(this.waterSourceTex)
+	{
+		this.waterSourceTex.deleteObjects(gl);
+		this.waterSourceTex = undefined;
+	}
+	
+	if(this.rainTex)
+	{
+		this.rainTex.deleteObjects(gl);
+		this.rainTex = undefined;
+	}
+
+	if(this.waterAditionTex)
+	{
+		this.waterAditionTex.deleteObjects(gl);
+		this.waterAditionTex = undefined;
+	}
+
+	if(this.waterVelocityTexA)
+	{
+		this.waterVelocityTexA.deleteObjects(gl);
+		this.waterVelocityTexA = undefined;
+	}
+
+	if(this.waterVelocityTexB)
+	{
+		this.waterVelocityTexB.deleteObjects(gl);
+		this.waterVelocityTexB = undefined;
+	}
+
+	if(this.demWithBuildingsTex)
+	{
+		this.demWithBuildingsTex.deleteObjects(gl);
+		this.demWithBuildingsTex = undefined;
+	}
+
+	if(this.shaderLogTex_Flux_A)
+	{
+		this.shaderLogTex_Flux_A.deleteObjects(gl);
+		this.shaderLogTex_Flux_A = undefined;
+	}
+	
+	if(this.shaderLogTex_Flux_B)
+	{
+		this.shaderLogTex_Flux_B.deleteObjects(gl);
+		this.shaderLogTex_Flux_B = undefined;
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	if(this.particlesTex_A)
+	{
+		this.particlesTex_A.deleteObjects(gl);
+		this.particlesTex_A = undefined;
+	}
+
+	if(this.particlesTex_B)
+	{
+		this.particlesTex_B.deleteObjects(gl);
+		this.particlesTex_B = undefined;
+	}
+
+	if(this.particlesPosTex_A)
+	{
+		this.particlesPosTex_A.deleteObjects(gl);
+		this.particlesPosTex_A = undefined;
+	}
+
+	if(this.particlesPosTex_B)
+	{
+		this.particlesPosTex_B.deleteObjects(gl);
+		this.particlesPosTex_B = undefined;
+	}
+
+	if(this.contaminationTex_A)
+	{
+		this.contaminationTex_A.deleteObjects(gl);
+		this.contaminationTex_A = undefined;
+	}
+
+	if(this.contaminationTex_B)
+	{
+		this.contaminationTex_B.deleteObjects(gl);
+		this.contaminationTex_B = undefined;
+	}
+
+	if(this.contaminantSourceTex)
+	{
+		this.contaminantSourceTex.deleteObjects(gl);
+		this.contaminantSourceTex = undefined;
+	}
+
+	if(this.dem_withExcavation)
+	{
+		this.dem_withExcavation.deleteObjects(gl);
+		this.dem_withExcavation = undefined;
+	}
+
+	if(this.dem_texture_A)
+	{
+		this.dem_texture_A.deleteObjects(gl);
+		this.dem_texture_A = undefined;
+	}
+
+	if(this.dem_texture_B)
+	{
+		this.dem_texture_B.deleteObjects(gl);
+		this.dem_texture_B = undefined;
+	}
+
+	if(this.terrainFluxTexA_HIGH)
+	{
+		this.terrainFluxTexA_HIGH.deleteObjects(gl);
+		this.terrainFluxTexA_HIGH = undefined;
+	}
+
+	if(this.terrainFluxTexB_HIGH)
+	{
+		this.terrainFluxTexB_HIGH.deleteObjects(gl);
+		this.terrainFluxTexB_HIGH = undefined;
+	}
+
+	if(this.terrainFluxTexA_LOW)
+	{
+		this.terrainFluxTexA_LOW.deleteObjects(gl);
+		this.terrainFluxTexA_LOW = undefined;
+	}
+
+	if(this.terrainFluxTexB_LOW)
+	{
+		this.terrainFluxTexB_LOW.deleteObjects(gl);
+		this.terrainFluxTexB_LOW = undefined;
+	}
+
+	if(this.terrainMaxSlippageTex)
+	{
+		this.terrainMaxSlippageTex.deleteObjects(gl);
+		this.terrainMaxSlippageTex = undefined;
+	}
+
+	// Now, delete vbo objects.***
+	if(this.vbo_vicks_container)
+	{
+		this.vbo_vicks_container.deleteGlObjects(gl, magoManager.vboMemoryManager);
+		this.vbo_vicks_container = undefined;
+	}
+};
+
+Water.prototype.resetSimulation = function ()
+{
+	// clean water textures.***
+	var waterManager = this.waterManager;
+	var magoManager = waterManager.magoManager;
+	var gl = magoManager.getGl();
+
+	var texWidth = waterManager.simulationTextureSize[0];
+	var texHeight = waterManager.simulationTextureSize[1];
+
+	var filter = gl.LINEAR;
+	var texWrap = gl.CLAMP_TO_EDGE;;
+
+	// water height textures.***
+	Texture.resetTexture(this.waterHeightTexA, gl, filter, texWrap, texWidth, texHeight);
+	Texture.resetTexture(this.waterHeightTexB, gl, filter, texWrap, texWidth, texHeight);
+	
+	Texture.resetTexture(this.contaminationTex_A, gl, filter, texWrap, texWidth, texHeight);
+	Texture.resetTexture(this.contaminationTex_B, gl, filter, texWrap, texWidth, texHeight);
+
+	Texture.resetTexture(this.waterFluxTexA_HIGH, gl, filter, texWrap, texWidth, texHeight);
+	Texture.resetTexture(this.waterFluxTexA_LOW, gl, filter, texWrap, texWidth, texHeight);
+
+	Texture.resetTexture(this.waterFluxTexB_HIGH, gl, filter, texWrap, texWidth, texHeight);
+	Texture.resetTexture(this.waterFluxTexB_LOW, gl, filter, texWrap, texWidth, texHeight);
+};
+
 Water.prototype.init = function ()
 {
 	this._makeSurface();
@@ -235,28 +477,38 @@ Water.prototype._makeTextures = function ()
 
 Water.prototype.makeDEMTextureByQuantizedMeshes = function ()
 {
-	if(!this.isPrepared())
-	{ return; }
+	if(this.makeDemTextureByQMeshses_processFinished) {
+		return;
+	}
+
+	if(!this.isPrepared()) { 
+		return; 
+	}
 
 	// Must calculate the minHeight & maxHeight of the water simulation area.***
 	// So, to do this, reset the altitudes of the geographicExtension.
-	this.geographicExtent.setExtentAltitudes(10000.0, -10000.0);
-	var tilesCount = this.tilesArray.length;
-	for(var i=0; i<tilesCount; i++)
+	if(!this.recalculatedGeoExtentAltitudes)
 	{
-		var tile = this.tilesArray[i];
-		var minHeight = tile.qMesh._minimumHeight;
-		var maxHeight = tile.qMesh._maximumHeight;
+		this.geographicExtent.setExtentAltitudes(10000.0, -10000.0);
+		var tilesCount = this.tilesArray.length;
+		for(var i=0; i<tilesCount; i++)
+		{
+			var tile = this.tilesArray[i];
+			var minHeight = tile.qMesh._minimumHeight;
+			var maxHeight = tile.qMesh._maximumHeight;
 
-		// In this point, calculate the minimumHeight and the maximumHeight of the simulation area.***
-		if(this.geographicExtent.minGeographicCoord.altitude > minHeight)
-		{
-			this.geographicExtent.minGeographicCoord.altitude = minHeight;
+			// In this point, calculate the minimumHeight and the maximumHeight of the simulation area.***
+			if(this.geographicExtent.minGeographicCoord.altitude > minHeight)
+			{
+				this.geographicExtent.minGeographicCoord.altitude = minHeight;
+			}
+			else if(this.geographicExtent.maxGeographicCoord.altitude < maxHeight)
+			{
+				this.geographicExtent.maxGeographicCoord.altitude = maxHeight;
+			}
 		}
-		else if(this.geographicExtent.maxGeographicCoord.altitude < maxHeight)
-		{
-			this.geographicExtent.maxGeographicCoord.altitude = maxHeight;
-		}
+
+		this.recalculatedGeoExtentAltitudes = true;
 	}
 
 	this.terrainMinMaxHeights[0] = this.geographicExtent.minGeographicCoord.altitude;
@@ -264,13 +516,19 @@ Water.prototype.makeDEMTextureByQuantizedMeshes = function ()
 
 	// Now, make the vbo of the each tile.***
 	var tilesCount = this.tilesArray.length;
-	for(var i=0; i<tilesCount; i++)
+
+	if(!this.tilesQuantizedMeshVboMade)
 	{
-		var tile = this.tilesArray[i];
-		if(!tile.qMeshVboKeyContainer)
+		for(var i=0; i<tilesCount; i++)
 		{
-			this._makeQuantizedMeshVbo(tile);
+			var tile = this.tilesArray[i];
+			if(!tile.qMeshVboKeyContainer)
+			{
+				this._makeQuantizedMeshVbo(tile);
+			}
 		}
+
+		this.tilesQuantizedMeshVboMade = true;
 	}
 	
 	var waterManager = this.waterManager;
@@ -290,8 +548,6 @@ Water.prototype.makeDEMTextureByQuantizedMeshes = function ()
 
 	if(!this.original_dem_texture)
 	{
-		//var texWidth = waterManager.simulationTextureSize[0];
-		//var texHeight = waterManager.simulationTextureSize[1];
 		var texWidth = waterManager.terrainTextureSize[0];
 		var texHeight = waterManager.terrainTextureSize[1];
 
@@ -327,13 +583,26 @@ Water.prototype.makeDEMTextureByQuantizedMeshes = function ()
 	gl.uniform3fv(shader.u_totalMinGeoCoord_loc, [geoExtent.minGeographicCoord.longitude, geoExtent.minGeographicCoord.latitude, geoExtent.minGeographicCoord.altitude]);
 	gl.uniform3fv(shader.u_totalMaxGeoCoord_loc, [geoExtent.maxGeographicCoord.longitude, geoExtent.maxGeographicCoord.latitude, geoExtent.maxGeographicCoord.altitude]);
 
-	for(var i=0; i<tilesCount; i++)
+	if(this.demTextureByQMesh_lastTileIdx === undefined)
 	{
-		var tile = this.tilesArray[i];
+		this.demTextureByQMesh_lastTileIdx = 0;
+	}
+
+	var maxTilesRender = 50;
+	for(var i = 0; i<maxTilesRender; i++)
+	{
+		var idx = i + this.demTextureByQMesh_lastTileIdx;
+
+		if(idx >= tilesCount)
+		{
+			this.original_dem_texture.fileLoadState = CODE.fileLoadState.BINDING_FINISHED;
+			this.makeDemTextureByQMeshses_processFinished = true;
+			break;
+		}
+		var tile = this.tilesArray[idx];
 		var tileGeoExtent = tile.geoExtent;
 		gl.uniform3fv(shader.u_currentMinGeoCoord_loc, [tileGeoExtent.minGeographicCoord.longitude, tileGeoExtent.minGeographicCoord.latitude, tile.qMesh._minimumHeight]);
 		gl.uniform3fv(shader.u_currentMaxGeoCoord_loc, [tileGeoExtent.maxGeographicCoord.longitude, tileGeoExtent.maxGeographicCoord.latitude, tile.qMesh._maximumHeight]);
-
 
 		var vbo_vicky = tile.qMeshVboKeyContainer.vboCacheKeysArray[0]; // there are only one.
 		var vertices_count = vbo_vicky.vertexCount;
@@ -355,15 +624,14 @@ Water.prototype.makeDEMTextureByQuantizedMeshes = function ()
 		{ return false; }
 
 		gl.drawElements(gl.TRIANGLES, indicesCount, gl.UNSIGNED_SHORT, 0); // Fill.
-		
 	}
 
-	
+	this.demTextureByQMesh_lastTileIdx += maxTilesRender;
 
 	fbo.unbind();
 	gl.enable(gl.CULL_FACE);
 
-	this.original_dem_texture.fileLoadState = CODE.fileLoadState.BINDING_FINISHED;
+	
 };
 
 Water.prototype.makeDEMTextureByQuantizedMesh__testQSurfaceMesh = function (qMesh)
@@ -965,16 +1233,16 @@ Water.prototype.prepareTextures = function ()
 		}
 
 		// Now, check if tile's qMesh is loaded.***
-		if(!this.allQuantizedMeshesLoaded)
+		if (!this.allQuantizedMeshesLoaded)
 		{
 			var allQuantizedMeshesLoaded = true;
 			var tilesCount = this.tilesArray.length;
-			for(var i=0; i<tilesCount; i++)
+			for (var i=0; i<tilesCount; i++)
 			{
 				var tile = this.tilesArray[i];
-				if(!tile.qMesh)
+				if (!tile.qMesh)
 				{
-					if(!tile.qMeshPromise)
+					if (!tile.qMeshPromise)
 					{
 						var X = tile.X;
 						var Y = tile.Y;
@@ -986,18 +1254,20 @@ Water.prototype.prepareTextures = function ()
 				}
 			}
 
-			if(allQuantizedMeshesLoaded)
+			if (allQuantizedMeshesLoaded)
 			{
 				this.allQuantizedMeshesLoaded = true;
 			}
 		}
 
-		if(this.allQuantizedMeshesLoaded)
+		if (this.allQuantizedMeshesLoaded)
 		{
 			// Make dem texture from qMeshes.***
-			if(!this.original_dem_texture)
+			//if (!this.original_dem_texture)
+			if (!this.makeDemTextureByQMeshses_processFinished)
 			{
 				this.makeDEMTextureByQuantizedMeshes();
+				return false;
 			}
 			var hola = 0;
 		}
@@ -1093,37 +1363,34 @@ Water._swapTextures = function (texA, texB)
 	texB.texId = texAux;
 };
 
-Water.prototype.test__doQuantizedSurfaceExcavation = function ()
+Water.prototype.test__doQuantizedSurfaceExcavation = function (magoManager)
 {
-	// Test debug to do excavation on cesium terrain.***
+	if(this.qMeshTestFinished)
+	{
+		return;
+	}
 
-};
-
-/**
- * simulation
- */
-Water.prototype.doSimulationSteps = function (magoManager)
-{
-	if(!this.isPrepared())
-	{ return; }
-
-	if(!this.prepareTextures()) // textures that must be loaded.
-	{ return false; }
-
-	var sceneState = magoManager.sceneState;
-	var waterManager = this.waterManager;
-
-	// bind frameBuffer.
-	var gl = magoManager.getGl();
-	//var extbuffers = magoManager.extbuffers;
-	var fbo = waterManager.fbo;
-	var extbuffers = fbo.extbuffers;
-	var shader;
 	
-	
+
 	// Test.*** delete this.*** Test.*** delete this.*** Test.*** delete this.*** Test.*** delete this.*** Test.*** delete this.*** Test.*** 
+	if(!this.testQMesh)
+	{
+		var X = 27934;
+		var Y = 4791;
+		var L = 14;
+
+		this.qMeshPromise = magoManager.scene.globe.terrainProvider.requestTileGeometry(X, Y, L);
+		this.qMeshPromise.then((value) =>
+		{
+			this.testQMesh = value;
+			this.testQMesh.tileIndices = {
+				L : L, X : X, Y : Y
+			};
+		});
+	}
+
+	// Test debug to do excavation on cesium terrain.***
 	// 1rst, check if dem texture is ready.
-	/*
 	if (!this.quantizedSurfaceTest && this.testQMesh)
 	{
 		// 1rst, calculate the geoExtent of the tile:
@@ -1165,7 +1432,7 @@ Water.prototype.doSimulationSteps = function (magoManager)
 		*/
 
 		// make a irregular "L" shape.**************************************************************************************
-		/*
+		
 		excavationGeoCoords.push((minLon + 0.1 * lonRange + lonOffset), (minLat + 0.1 * latRange + latOffset));
 		excavationGeoCoords.push((minLon + 0.8 * lonRange + lonOffset), (minLat + 0.15 * latRange + latOffset));
 		excavationGeoCoords.push((minLon + 0.75 * lonRange + lonOffset), (minLat + 0.4 * latRange + latOffset));
@@ -1201,13 +1468,18 @@ Water.prototype.doSimulationSteps = function (magoManager)
 			excavationGeoCoords.push(currLon + deltaLon, currLat + deltaLat);
 		}
 		*/
-/*
+
 		// Do a worker test.***
 		var qMeshManager = magoManager.quantizedMeshManager;
 		if(qMeshManager)
 		{
 			var excavationAltitude = 180.0;
 			qMeshManager.doExcavation(this.testQMesh, excavationGeoCoords, excavationAltitude);
+
+			// another test.****
+			var excavationSet = qMeshManager.newExcavationSet(excavationGeoCoords, excavationAltitude);
+			var tiles = excavationSet.getIntersectedTiles();
+			var hola = 0;
 		}
 		
 		//var excavationDepth = 120.0;
@@ -1218,7 +1490,7 @@ Water.prototype.doSimulationSteps = function (magoManager)
 
 	// Check if the qMesh worker finished.***
 	var qMeshManager = magoManager.quantizedMeshManager;
-	if(qMeshManager && !this.testQMesh_received)
+	if(qMeshManager && this.testQMesh && !this.testQMesh_received)
 	{
 		var tileIndices = this.testQMesh.tileIndices;
 		var excavatedQMesh = qMeshManager.getExcavatedQuantizedMesh(tileIndices.X, tileIndices.Y, tileIndices.L);
@@ -1252,7 +1524,7 @@ Water.prototype.doSimulationSteps = function (magoManager)
 			_westIndices: 
 			_westSkirtHeight: 23.519085626208074
 			*/
-/*
+
 			if(!this.testQMesh_received)
 			{
 				this.testQMesh._uValues = excavatedQMesh.uValues;
@@ -1276,9 +1548,35 @@ Water.prototype.doSimulationSteps = function (magoManager)
 	if(!this.qSurfaceMesh_dem_texture && this.testQMesh_received)
 	{
 		this.makeDEMTextureByQuantizedMesh__testQSurfaceMesh(this.testQMesh);
+		this.qMeshTestFinished = true;
 	}
 	// End test.-------------
-	*/
+};
+
+/**
+ * simulation
+ */
+Water.prototype.doSimulationSteps = function (magoManager)
+{
+	if(!this.isPrepared())
+	{ return; }
+
+	if(!this.prepareTextures()) // textures that must be loaded.
+	{ return false; }
+
+	var sceneState = magoManager.sceneState;
+	var waterManager = this.waterManager;
+
+	// bind frameBuffer.
+	var gl = magoManager.getGl();
+	//var extbuffers = magoManager.extbuffers;
+	var fbo = waterManager.fbo;
+	var extbuffers = fbo.extbuffers;
+	var shader;
+	
+	
+	// test qmesh excavation.***
+	//this.test__doQuantizedSurfaceExcavation(magoManager);
 
 	//---------------------------------------------------------------------------------------------------------------------------------
 	// Check if simulate landSlides.
@@ -1338,7 +1636,6 @@ Water.prototype.doSimulationSteps = function (magoManager)
 	gl.activeTexture(gl.TEXTURE5);
 	gl.bindTexture(gl.TEXTURE_2D, this.waterAditionTex.texId);
 
-
 	// bind screenQuad positions.
 	FBO.bindAttribute(gl, screenQuad.posBuffer, shader.a_pos, 2);
 	//FBO.bindAttribute(gl, this.texCoordBuffer, shader.texCoord2_loc, 2);
@@ -1347,8 +1644,6 @@ Water.prototype.doSimulationSteps = function (magoManager)
 	gl.drawArrays(gl.TRIANGLES, 0, 6);
 
 	// now, swap waterHeightTextures:
-	//gl.bindFramebuffer(gl.FRAMEBUFFER,null);
-
 	Water._swapTextures(this.waterHeightTexA, this.waterHeightTexB);
 	Water._swapTextures(this.contaminationTex_A, this.contaminationTex_B);
 		

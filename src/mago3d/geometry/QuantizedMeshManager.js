@@ -14,7 +14,47 @@ var QuantizedMeshManager = function(magoManager)
 
     this.magoManager = magoManager;
     this.excavatedQuantizedMeshMap = {};
-    
+    this.excavationSetsArray = [];
+};
+
+function isNumber(n) { return !isNaN(parseFloat(n)) && !isNaN(n - 0) }
+
+QuantizedMeshManager.prototype.newExcavationSet = function (excavationGeoCoords, excavationAltitude)
+{
+    // Check the type of the geoCoords.***
+    // take one geoCoord.***
+    var geoCoord = excavationGeoCoords[0];
+    if(isNumber(geoCoord))
+    {
+        // convert number array to geographicCoords array.***
+        var geoCoordsAux = excavationGeoCoords;
+        excavationGeoCoords = [];
+        var coordsCount = geoCoordsAux.length/2;
+        for(var i=0; i<coordsCount; i++)
+        {
+            var lon = geoCoordsAux[i*2];
+            var lat = geoCoordsAux[i*2+1];
+            var geoCoord = new GeographicCoord(lon, lat, 0.0);
+            excavationGeoCoords.push(geoCoord);
+        }
+    }
+    else if(Array.isArray(geoCoord))
+    {
+        var geoCoordsAux = excavationGeoCoords;
+        excavationGeoCoords = [];
+        var coordsCount = geoCoordsAux.length;
+        for(var i=0; i<coordsCount; i++)
+        {
+            var lon = geoCoordsAux[i][0];
+            var lat = geoCoordsAux[i][1];
+            var geoCoord = new GeographicCoord(lon, lat, 0.0);
+            excavationGeoCoords.push(geoCoord);
+        }
+    }
+
+    var excavationSet = new QuantizedMeshExcavationSet(this, excavationGeoCoords, excavationAltitude);
+    this.excavationSetsArray.push(excavationSet);
+    return excavationSet;
 };
 
 QuantizedMeshManager.prototype.doExcavation = function (qMesh, excavationGeoCoords, excavationAltitude)
