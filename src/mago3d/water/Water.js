@@ -1214,7 +1214,7 @@ Water.prototype.prepareTextures = function ()
 			var waterManager = this.waterManager;
 			waterManager.simulationTileDepth = targetDepth;
 			var simulationTileDepth = waterManager.simulationTileDepth;
-			this._targetDepth = simulationTileDepth + 4;
+			this._targetDepth = simulationTileDepth + 3;
 
 			var maxDepthAvailable = MagoManager.getMaximumLevelOfTerrainProvider(this.waterManager.terrainProvider);
 			if(this._targetDepth > maxDepthAvailable)

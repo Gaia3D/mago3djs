@@ -39,20 +39,45 @@ MergedObject.prototype.constructor = MergedObject;
  */
 MergedObject.prototype.initialize = function(magoRenderables) {
     var terrainProvider = this.magoManager.scene.globe.terrainProvider;
+    var tilingScheme = terrainProvider.tilingScheme;
     var maxZoom = MagoManager.getMaximumLevelOfTerrainProvider(terrainProvider);
 
-    var centerGeographicCoordsArray = magoRenderables.map(function(mr) {
-        return Cesium.Cartographic.fromDegrees(mr.centerGeographicCoords.longitude,mr.centerGeographicCoords.latitude);
-    });
+    var cache = {};
+
+    var magoRenderablesCount = magoRenderables.length
+    var models = [];
+    var availableRequestTileModels = [];
+    var centerGeographicCoordsArray = [];
+    var centroid = {longitude:0, latitude:0, altitude:0};
+    for(var i=0;i<magoRenderablesCount;i++) {
+        var mrender = magoRenderables[i];
+        var carto = Cesium.Cartographic.fromDegrees(mrender.centerGeographicCoords.longitude,mrender.centerGeographicCoords.latitude);
+        var xy = tilingScheme.positionToTileXY(carto, maxZoom);
+        var strXy = xy.toString();
+
+        if(!cache.hasOwnProperty(strXy)) {
+            cache[strXy] = terrainProvider.getTileDataAvailable(xy.x, xy.y, maxZoom);
+        }
+
+        if(cache[strXy]) {
+            availableRequestTileModels.push(mrender);
+            centerGeographicCoordsArray.push(carto);
+        } else {
+            models.push(mrender);
+            centroid.longitude = centroid.longitude + mrender.centerGeographicCoords.longitude;
+            centroid.latitude = centroid.latitude + mrender.centerGeographicCoords.latitude;
+        }
+    }
+
     var self = this;
     var _init = function(positions) {
         var count = positions.length;
-        var centroid = {longitude:0, latitude:0, altitude:0};
+        
         for(var j=0;j<count;j++) {
             var position = positions[j];
             var height = position.height === undefined ? 0 : position.height;
 
-            var magoRenderable = magoRenderables[j];
+            var magoRenderable = availableRequestTileModels[j];
             var magoRenderableGeographicCoordListsArrayCnt = magoRenderable.geographicCoordListsArray.length;
             for(var k=0;k<magoRenderableGeographicCoordListsArrayCnt;k++) {
                 var magoRenderableGeographicCoordsList = magoRenderable.geographicCoordListsArray[k];
@@ -62,10 +87,12 @@ MergedObject.prototype.initialize = function(magoRenderables) {
             centroid.longitude = centroid.longitude + position.longitude * 180 / Math.PI;
             centroid.latitude = centroid.latitude + position.latitude * 180 / Math.PI;
             centroid.altitude = centroid.altitude + height;
+
+            models.push(magoRenderable);
         }
 
-        self.setGeographicPosition(new GeographicCoord(centroid.longitude/count, centroid.latitude/count, centroid.altitude/count));
-        self.addMagoRenderables(magoRenderables);
+        self.setGeographicPosition(new GeographicCoord(centroid.longitude/magoRenderablesCount, centroid.latitude/magoRenderablesCount, centroid.altitude/magoRenderablesCount));
+        self.addMagoRenderables(models);
     }
 
     return Cesium.sampleTerrain(terrainProvider, maxZoom, centerGeographicCoordsArray).then(_init);
