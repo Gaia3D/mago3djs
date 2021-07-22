@@ -6758,7 +6758,7 @@ void main()\n\
 	}\n\
 	else\n\
 	{\n\
-		albedo *= vec4(lightWeighting, 1.0);\n\
+		//albedo *= vec4(lightWeighting, 1.0);\n\
 	}\n\
 	\n\
 	if(bApplySsao)\n\

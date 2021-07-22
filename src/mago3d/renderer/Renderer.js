@@ -1232,7 +1232,7 @@ Renderer.prototype.renderSilhouette = function ()
  * This function renders ssao
  * @param {WebGLRenderingContext} gl WebGL Rendering Context.
  */
-Renderer.prototype.renderScreenQuad = function(gl) 
+Renderer.prototype.renderScreenQuad = function (gl) 
 {
 	// We are using a quadScreen.***
 	var currentShader;

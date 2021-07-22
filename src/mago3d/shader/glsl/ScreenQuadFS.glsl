@@ -393,7 +393,8 @@ void main()
 	}
 	else
 	{
-		albedo *= vec4(lightWeighting, 1.0);
+		// This is terrain. provisionally do nothing.
+		//albedo *= vec4(lightWeighting, 1.0);
 	}
 	
 	if(bApplySsao)
