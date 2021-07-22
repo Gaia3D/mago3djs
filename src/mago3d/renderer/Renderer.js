@@ -153,11 +153,6 @@ Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, sh
 		for (var i=0; i<nodesCount; i++)
 		{
 			node = visibleNodesArray[i];
-			if(node.data.nodeId === "CB_fall")
-			{
-				var hola = 0;
-			}
-
 			node.renderContent(magoManager, shader, renderType, refMatrixIdxKey);
 		}
 	}
@@ -2158,7 +2153,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 			if(waterLayer.demWithBuildingsTex && waterLayer.demWithBuildingsTex.texId)
 			{
-				//texture = waterLayer.demWithBuildingsTex.texId;
+				texture = waterLayer.demWithBuildingsTex.texId;
 			}
 
 			if(waterLayer.dem_texture && waterLayer.dem_texture.texId)
@@ -2218,7 +2213,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 			if(waterLayer.original_dem_texture && waterLayer.original_dem_texture.texId)
 			{
-				texture = waterLayer.original_dem_texture.texId;
+				//texture = waterLayer.original_dem_texture.texId;
 			}//
 
 			if(waterLayer.qSurfaceMesh_dem_texture && waterLayer.qSurfaceMesh_dem_texture.texId)

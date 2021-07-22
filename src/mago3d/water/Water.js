@@ -597,6 +597,8 @@ Water.prototype.makeDEMTextureByQuantizedMeshes = function ()
 		{
 			this.original_dem_texture.fileLoadState = CODE.fileLoadState.BINDING_FINISHED;
 			this.makeDemTextureByQMeshses_processFinished = true;
+
+			
 			break;
 		}
 		var tile = this.tilesArray[idx];
@@ -1349,6 +1351,8 @@ Water.prototype.prepareTextures = function ()
 			this.copyTexture(this.original_dem_texture, [this.dem_texture_B], bFlipTexcoordY);
 			this.dem_withExcavation = this.waterManager._newTexture(gl, texWidth, texHeight);
 			this.copyTexture(this.original_dem_texture, [this.dem_withExcavation], bFlipTexcoordY);
+
+			this.copyTexture(this.original_dem_texture, [this.demWithBuildingsTex], bFlipTexcoordY);
 		}
 		return false;
 	}
@@ -2230,6 +2234,32 @@ Water.prototype.renderWaterDepth = function (shader, magoManager)
 
 };
 
+Water.prototype.resetObjectIdDemOverWrited = function ()
+{
+	this.buildingsId_OverWritedOnDemMap = {};
+};
+
+Water.prototype._isObjectIdDemOverWrited = function (objectId)
+{
+	if(!this.buildingsId_OverWritedOnDemMap)
+	{
+		return false;
+	}
+
+	return this.buildingsId_OverWritedOnDemMap.hasOwnProperty(objectId);
+};
+
+Water.prototype.getBoundingSphereWC = function ()
+{
+	if(!this._BSphereWC)
+	{
+		var magoManager = this.waterManager.magoManager;
+		this._BSphereWC = SmartTile.computeSphereExtent(magoManager, this.geographicExtent.minGeographicCoord, this.geographicExtent.maxGeographicCoord, undefined);
+	}
+
+	return this._BSphereWC;
+};
+
 Water.prototype.doIntersectedObjectsCulling = function (visiblesArray, nativeVisiblesArray)
 {
 	// this function does a frustumCulling-like process.
@@ -2248,11 +2278,8 @@ Water.prototype.doIntersectedObjectsCulling = function (visiblesArray, nativeVis
 
 	//if(visiblesCount === 0 && nativeVisiblesCount === 0)
 	//return;
-	if(!this._BSphereWC)
-	{
-		var magoManager = this.waterManager.magoManager;
-		this._BSphereWC = SmartTile.computeSphereExtent(magoManager, this.geographicExtent.minGeographicCoord, this.geographicExtent.maxGeographicCoord, undefined);
-	}
+
+	var myBSphereWC = this.getBoundingSphereWC();
 
 	if(!this.visibleObjectsControler)
 	{
@@ -2260,17 +2287,18 @@ Water.prototype.doIntersectedObjectsCulling = function (visiblesArray, nativeVis
 		this.visibleObjectsControler = new VisibleObjectsController();
 	}
 
-	
-
 	// visiblesObjects (nodes).
 	var node;
 	var bSphereWC;
 	for(var i=0; i<visiblesCount; i++)
 	{
 		node = visiblesArray[i];
+		if(this._isObjectIdDemOverWrited(node._guid)) {
+			continue;
+		}
 		bSphereWC = node.getBoundingSphereWC(bSphereWC);
 
-		if(this._BSphereWC.intersectionSphere(bSphereWC) !== Constant.INTERSECTION_OUTSIDE)
+		if(myBSphereWC.intersectionSphere(bSphereWC) !== Constant.INTERSECTION_OUTSIDE)
 		{
 			this.visibleObjectsControler.currentVisibles0.push(node);
 		}
@@ -2281,16 +2309,18 @@ Water.prototype.doIntersectedObjectsCulling = function (visiblesArray, nativeVis
 	for(var i=0; i<nativeVisiblesCount; i++)
 	{
 		native = nativeVisiblesArray[i];
+		if(this._isObjectIdDemOverWrited(native._guid)) {
+			continue;
+		}
 		bSphereWC = native.getBoundingSphereWC(bSphereWC);
 
-		if(this._BSphereWC.intersectionSphere(bSphereWC) !== Constant.INTERSECTION_OUTSIDE)
+		if(myBSphereWC.intersectionSphere(bSphereWC) !== Constant.INTERSECTION_OUTSIDE)
 		{
 			this.visibleObjectsControler.currentVisibleNativeObjects.opaquesArray.push(native);
 		}
 	}
 
 	this.bIntersectionCulling = true;
-	//this.bCubeMapMade = false;
 
 	return true;
 };
@@ -2664,6 +2694,14 @@ Water.prototype.overWriteDEMWithObjects = function (shader, magoManager)
 	{ return false; }
 
 	var visibleNodesCount = this.visibleObjectsControler.currentVisibles0.length;
+	var visibleNativesOpaquesCount = this.visibleObjectsControler.currentVisibleNativeObjects.opaquesArray.length;
+	var visibleNativesTransparentsCount = this.visibleObjectsControler.currentVisibleNativeObjects.transparentsArray.length;
+
+	if(visibleNodesCount + visibleNativesOpaquesCount + visibleNativesTransparentsCount === 0)
+	{
+		return;
+	}
+
 	var modelViewProjMatrix = this.getTileOrthographic_mvpMat();
 
 	var waterManager = this.waterManager;
@@ -2682,6 +2720,8 @@ Water.prototype.overWriteDEMWithObjects = function (shader, magoManager)
 		var bFlipTexcoordY = false;
 		this.copyTexture(this.dem_texture_A, [this.demWithBuildingsTex], bFlipTexcoordY);
 	}
+
+	
 
 	gl.disable(gl.BLEND);
 	gl.clearColor(1.0, 0.0, 0.0, 0.0);
@@ -2727,11 +2767,17 @@ Water.prototype.overWriteDEMWithObjects = function (shader, magoManager)
 	var renderType = 0;
 	var refMatrixIdxKey = 0;
 	var glPrimitive = undefined;
+
+	if(!this.buildingsId_OverWritedOnDemMap)
+	{
+		this.buildingsId_OverWritedOnDemMap = {};
+	}
 	
 	for(var i=0; i<visibleNodesCount; i++)
 	{
 		var node = this.visibleObjectsControler.currentVisibles0[i];
 		node.renderContent(magoManager, shader, renderType, refMatrixIdxKey);
+		this.buildingsId_OverWritedOnDemMap[node._guid] = node;
 	}
 
 	var visibleNativesOpaquesCount = this.visibleObjectsControler.currentVisibleNativeObjects.opaquesArray.length;
@@ -2739,7 +2785,10 @@ Water.prototype.overWriteDEMWithObjects = function (shader, magoManager)
 	{
 		var native = this.visibleObjectsControler.currentVisibleNativeObjects.opaquesArray[i];
 		if (native.name !== "contaminationGenerator" && native.name !== "excavationObject" && native.name !== "waterGenerator")
-		{ native.render(magoManager, shader, renderType, glPrimitive); }
+		{ 
+			native.render(magoManager, shader, renderType, glPrimitive); 
+			this.buildingsId_OverWritedOnDemMap[native._guid] = native;
+		}
 	}
 
 	var visibleNativesTransparentsCount = this.visibleObjectsControler.currentVisibleNativeObjects.transparentsArray.length;
@@ -2747,7 +2796,10 @@ Water.prototype.overWriteDEMWithObjects = function (shader, magoManager)
 	{
 		var native = this.visibleObjectsControler.currentVisibleNativeObjects.transparentsArray[i];
 		if (native.name !== "contaminationGenerator" && native.name !== "excavationObject" && native.name !== "waterGenerator")
-		{ native.render(magoManager, shader, renderType, glPrimitive); }
+		{ 
+			native.render(magoManager, shader, renderType, glPrimitive); 
+			this.buildingsId_OverWritedOnDemMap[native._guid] = native;
+		}
 	}
 	
 	gl.enable(gl.CULL_FACE);

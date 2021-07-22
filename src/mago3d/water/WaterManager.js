@@ -1306,6 +1306,26 @@ WaterManager.prototype.resetSimulation = function ()
 	}
 };
 
+WaterManager.prototype.objectMoved = function (object)
+{
+	// An object of the scene was moved, so must reMake demWihtBuildings of water simulation.****
+	var waterLayersCount = this.waterLayersArray.length;
+	var waterLayer;
+	for(var i=0; i<waterLayersCount; i++)
+	{
+		waterLayer = this.waterLayersArray[i];
+
+		// check if the object is inside of the water simulation area.
+		var waterBSphereWC = waterLayer.getBoundingSphereWC();
+		var objectBSphereWC = object.getBoundingSphereWC(undefined);
+
+		if(waterBSphereWC.intersectionSphere(objectBSphereWC) !== Constant.INTERSECTION_OUTSIDE)
+		{
+			waterLayer.resetObjectIdDemOverWrited();
+		}
+	}
+};
+
 /**
  * render
  */
