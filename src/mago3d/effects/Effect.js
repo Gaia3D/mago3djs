@@ -51,7 +51,7 @@ var Effect = function(options)
 /**
  *
  */
-Effect.prototype.execute = function(currTimeSec)
+Effect.prototype.execute = function(currTimeSec, magoManager)
 {
 	var effectFinished = false;
 	if (this.birthData === undefined)
@@ -59,10 +59,20 @@ Effect.prototype.execute = function(currTimeSec)
 		this.birthData = currTimeSec;
 		return effectFinished;
 	}
+
+	var gl = this.effectsManager.gl;
+	var currentShader = magoManager.postFxShadersManager.currentShaderUsing;
+	var currentShaderName = currentShader.getName();
+	var effectShader = this.effectsManager.currShader;
+
+	var changeShader = false;
+	if(currentShader !== effectShader) {
+		changeShader = true;
+		effectShader.useProgram();
+	} 
 	
 	var timeDiffSeconds = (currTimeSec - this.birthData);
-	var gl = this.effectsManager.gl;
-	
+
 	if (this.effectType === "zBounceSpring")
 	{
 		var zScale = 1.0;
@@ -82,8 +92,8 @@ Effect.prototype.execute = function(currTimeSec)
 			zScale = amp*Math.pow(Math.E, -lambda*t)*(Math.cos(w*t+fita) + Math.sin(w*t+fita));
 			zScale = (1.0-zScale)*Math.log(t/this.durationSeconds+1.1);
 		}
-		gl.uniform3fv(this.effectsManager.currShader.scaleLC_loc, [1.0, 1.0, zScale]); // init referencesMatrix.
-		return effectFinished;
+		gl.uniform3fv(effectShader.scaleLC_loc, [1.0, 1.0, zScale]); // init referencesMatrix.
+		
 	}
 	else if (this.effectType === "zBounceLinear")
 	{
@@ -97,8 +107,8 @@ Effect.prototype.execute = function(currTimeSec)
 		{
 			zScale = timeDiffSeconds/this.durationSeconds;
 		}
-		gl.uniform3fv(this.effectsManager.currShader.scaleLC_loc, [1.0, 1.0, zScale]); // init referencesMatrix.
-		return effectFinished;
+		gl.uniform3fv(effectShader.scaleLC_loc, [1.0, 1.0, zScale]); // init referencesMatrix.
+		
 	}
 	else if (this.effectType === "zBounceLinearReverse")
 	{
@@ -112,8 +122,8 @@ Effect.prototype.execute = function(currTimeSec)
 		{
 			zScale = 1 - timeDiffSeconds/this.durationSeconds;
 		}
-		gl.uniform3fv(this.effectsManager.currShader.scaleLC_loc, [1.0, 1.0, zScale]); // init referencesMatrix.
-		return effectFinished;
+		gl.uniform3fv(effectShader.scaleLC_loc, [1.0, 1.0, zScale]); // init referencesMatrix.
+		
 	}
 	else if (this.effectType === "borningLight")
 	{
@@ -128,8 +138,8 @@ Effect.prototype.execute = function(currTimeSec)
 			var timeRatio = timeDiffSeconds/this.durationSeconds;
 			colorMultiplier = 1/(timeRatio*timeRatio);
 		}
-		gl.uniform4fv(this.effectsManager.currShader.colorMultiplier_loc, [colorMultiplier, colorMultiplier, colorMultiplier, 1.0]);
-		return effectFinished;
+		gl.uniform4fv(effectShader.colorMultiplier_loc, [colorMultiplier, colorMultiplier, colorMultiplier, 1.0]);
+		
 	}
 	else if (this.effectType === "blinker")
 	{
@@ -163,8 +173,8 @@ Effect.prototype.execute = function(currTimeSec)
 				multiplier = unit;
 			}
 		}
-		gl.uniform4fv(this.effectsManager.currShader.colorMultiplier_loc, multiplier);
-		return effectFinished;
+		gl.uniform4fv(effectShader.colorMultiplier_loc, multiplier);
+		
 	}
 	else if (this.effectType === "fadeIn")
 	{
@@ -179,8 +189,8 @@ Effect.prototype.execute = function(currTimeSec)
 			var timeRatio = timeDiffSeconds/this.durationSeconds;
 			opacityMultiplier = timeRatio;
 		}
-		gl.uniform4fv(this.effectsManager.currShader.colorMultiplier_loc, [1.0, 1.0, 1.0, opacityMultiplier]);
-		return effectFinished;
+		gl.uniform4fv(effectShader.colorMultiplier_loc, [1.0, 1.0, 1.0, opacityMultiplier]);
+		
 	}
 	else if (this.effectType === "fadeOut")
 	{
@@ -195,8 +205,8 @@ Effect.prototype.execute = function(currTimeSec)
 			var timeRatio = timeDiffSeconds/this.durationSeconds;
 			opacityMultiplier = opacityMultiplier - timeRatio;
 		}
-		gl.uniform4fv(this.effectsManager.currShader.colorMultiplier_loc, [1.0, 1.0, 1.0, opacityMultiplier]);
-		return effectFinished;
+		gl.uniform4fv(effectShader.colorMultiplier_loc, [1.0, 1.0, 1.0, opacityMultiplier]);
+		
 	}
 	else if (this.effectType === "zMovement")
 	{
@@ -245,8 +255,14 @@ Effect.prototype.execute = function(currTimeSec)
 				}
 			}
 		}
-		gl.uniform3fv(this.effectsManager.currShader.aditionalOffset_loc, [0.0, this.zOffset, 0.0 ]); // init referencesMatrix.
+		gl.uniform3fv(effectShader.aditionalOffset_loc, [0.0, this.zOffset, 0.0 ]); // init referencesMatrix.
 		this.lastTime = currTimeSec;
-		return effectFinished;
+		
 	}
+
+	if(changeShader) {
+		var shader = magoManager.postFxShadersManager.getShader(currentShaderName); 
+		shader.useProgram();
+	}
+	return effectFinished;
 };

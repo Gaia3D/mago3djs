@@ -81,7 +81,7 @@ EffectsManager.prototype.executeEffects = function(id, magoManager)
 	for (var i=0; i<effectsCount; i++)
 	{
 		var effect = effectsObject.effectsArray[i];
-		if (effect.execute(currTime/1000))
+		if (effect.execute((currTime/1000), magoManager))
 		{
 			if(effect.complete && typeof effect.complete === 'function') {
 				effect.complete.call(null, magoManager);
