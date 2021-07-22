@@ -97,7 +97,7 @@ var Renderer = function(manoManager)
  * @param {Number} maxSizeToRender This parameter limites the minimum size in the rendering process.
  * @param {Number} refMatrixIdxKey Indicates the references transformation matrix index.
  */
-Renderer.prototype.renderNodes = function(gl, visibleNodesArray, magoManager, shader, renderTexture, renderType, maxSizeToRender, refMatrixIdxKey) 
+Renderer.prototype.renderNodes = function (gl, visibleNodesArray, magoManager, shader, renderTexture, renderType, maxSizeToRender, refMatrixIdxKey) 
 {
 	// do render.
 	var node;
