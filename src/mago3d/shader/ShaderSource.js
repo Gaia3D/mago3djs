@@ -6758,6 +6758,7 @@ void main()\n\
 	}\n\
 	else\n\
 	{\n\
+		// This is terrain. provisionally do nothing.\n\
 		//albedo *= vec4(lightWeighting, 1.0);\n\
 	}\n\
 	\n\

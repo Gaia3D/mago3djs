@@ -2697,10 +2697,7 @@ Water.prototype.overWriteDEMWithObjects = function (shader, magoManager)
 	var visibleNativesOpaquesCount = this.visibleObjectsControler.currentVisibleNativeObjects.opaquesArray.length;
 	var visibleNativesTransparentsCount = this.visibleObjectsControler.currentVisibleNativeObjects.transparentsArray.length;
 
-	if(visibleNodesCount + visibleNativesOpaquesCount + visibleNativesTransparentsCount === 0)
-	{
-		return;
-	}
+	
 
 	var modelViewProjMatrix = this.getTileOrthographic_mvpMat();
 
@@ -2721,7 +2718,10 @@ Water.prototype.overWriteDEMWithObjects = function (shader, magoManager)
 		this.copyTexture(this.dem_texture_A, [this.demWithBuildingsTex], bFlipTexcoordY);
 	}
 
-	
+	if(visibleNodesCount + visibleNativesOpaquesCount + visibleNativesTransparentsCount === 0)
+	{
+		return;
+	}
 
 	gl.disable(gl.BLEND);
 	gl.clearColor(1.0, 0.0, 0.0, 0.0);

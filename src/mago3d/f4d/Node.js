@@ -991,7 +991,7 @@ Node.prototype.getCurrentGeoLocationData = function()
 /**
  * 어떤 일을 하고 있습니까?
  */
-Node.prototype.finishedAnimation = function(magoManager) 
+Node.prototype.finishedAnimation = function (magoManager) 
 {
 	var finished = false;
 	var animData = this.data.animationData;
@@ -1160,7 +1160,7 @@ Node.prototype.finishedAnimation = function(magoManager)
  * 어떤 일을 하고 있습니까?
  */
  
-Node.prototype.changeLocationAndRotationAnimated = function(latitude, longitude, elevation, heading, pitch, roll, magoManager, animationOption) 
+Node.prototype.changeLocationAndRotationAnimated = function (latitude, longitude, elevation, heading, pitch, roll, magoManager, animationOption) 
 {
 	// Provisionally set a geoLocationData target.
 	if (this.data.animationData === undefined)
