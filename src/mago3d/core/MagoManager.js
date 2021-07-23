@@ -1180,6 +1180,14 @@ MagoManager.prototype.getCurrentTime = function()
 	return this.currTime;
 };
 
+MagoManager.prototype.getSecondsPerFrame = function() 
+{
+	var currTime = this.getCurrentTime();
+	var prevTime = this.prevTime;
+
+	return (currTime - prevTime)/1000.0;
+};
+
 /**
  * Returns WebGL Rendering Context.
  * @private
