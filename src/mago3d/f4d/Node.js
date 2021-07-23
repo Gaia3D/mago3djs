@@ -1483,6 +1483,14 @@ Node.prototype.changeLocationAndRotation = function(latitude, longitude, elevati
 		
 		aNode.bboxAbsoluteCenterPos = undefined; // provisional.
 		aNode.bboxAbsoluteCenterPos = aNode.calculateBBoxCenterPositionWorldCoord(geoLocationData); // provisional.
+
+		// check if the neoBuilding is static.***
+		var projectDataType = neoBuilding.metaData.getProjectDataType();
+		if(projectDataType === 10) {
+			// the neoBuilding is static data type.
+			neoBuilding.mustRecalculateRefKeyMatrix = true; // the refKeyMatrices will be calculate in renderTime.
+		}
+
 		
 		// Now, calculate the geoCoords of the bbox.
 		if (nodeRoot.data.bbox.geographicCoord === undefined)

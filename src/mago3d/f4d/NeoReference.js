@@ -671,10 +671,12 @@ NeoReference.prototype.render = function (magoManager, neoBuilding, renderType, 
 
 	gl.uniform1i(shader.refMatrixType_loc, neoReference.refMatrixType);
 
-	if (neoReference.refMatrixType === 1)
-	{ gl.uniform3fv(shader.refTranslationVec_loc, neoReference.refTranslationVec); }
-	else if (neoReference.refMatrixType === 2)
-	{ gl.uniformMatrix4fv(shader.refMatrix_loc, false, neoReference.tMatrixAuxArray[refMatrixIdxKey]._floatArrays); }
+	if (neoReference.refMatrixType === 1) { 
+		gl.uniform3fv(shader.refTranslationVec_loc, neoReference.refTranslationVec); 
+	}
+	else if (neoReference.refMatrixType === 2) { 
+		gl.uniformMatrix4fv(shader.refMatrix_loc, false, neoReference.tMatrixAuxArray[refMatrixIdxKey]._floatArrays); 
+	}
 	
 
 	if (neoReference.moveVector !== undefined) 

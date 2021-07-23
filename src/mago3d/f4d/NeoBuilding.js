@@ -1779,6 +1779,14 @@ NeoBuilding.prototype.render = function (magoManager, shader, renderType, refMat
 		var minSize = 0;
 		if(this.octree.neoReferencesMotherAndIndices)
 		{
+			// Here must do -> neoBuilding.octree.multiplyKeyTransformMatrix(0, geoLocationData.rotMatrix), bcos
+			// for example, if there are multiple vehicles, as buses, that are moving and rotating, the references with "refMatrixType = 2" is going to multiply by different geoLocations, and
+			// so, the references that has "refMatrixType = 2" has a wrong tMatrix. This only occurs in static f4ds with multiple copies.***
+			if(this.mustRecalculateRefKeyMatrix) {
+				var geoLocData = this.nodeOwner.getCurrentGeoLocationData();
+				this.octree.multiplyKeyTransformMatrix(0, geoLocData.rotMatrix);
+				this.mustRecalculateRefKeyMatrix = false;
+			}
 			// no occludeCulling mode.
 			this.octree.neoReferencesMotherAndIndices.currentVisibleIndices = this.octree.neoReferencesMotherAndIndices.neoRefsIndices; // no occludeCulling mode.
 			this.octree.renderContent(magoManager, this, renderType, renderTexture, shader, minSize, refMatrixIdxKey, flipYTexCoord);

@@ -29,10 +29,10 @@ var WaterManager = function (magoManager, options)
 	this.fbo;
 
 	// Simulation parameters.**************************************************************************
-	var simRes = 1024; // todo : try to set texture size that the simulation cell is aproximately square.
-	this.simulationTextureSize = new Float32Array([simRes, simRes]);
+	this.maxSimulationSize = 1024;
+	this.simulationTextureSize = new Float32Array([this.maxSimulationSize, this.maxSimulationSize]);
 	this.bSsimulateWater = false;
-	this.terrainTextureSize = new Float32Array([simRes, simRes]);
+	this.terrainTextureSize = new Float32Array([this.maxSimulationSize, this.maxSimulationSize]);
 
 	// Water wind.*************************************************************************************
 	this.bRenderParticles = true;
@@ -86,6 +86,11 @@ var WaterManager = function (magoManager, options)
 		{
 			this.waterSourceUrl = options.waterSourceUrl;
 		}
+
+		if(options.maxSimulationTextureSize !== undefined)
+		{
+			this.maxSimulationSize = options.maxSimulationTextureSize;
+		}
 	}
 
 
@@ -122,17 +127,17 @@ WaterManager.prototype.init = function ()
 	var latArcDist = simulationGeoExtent.getLatitudeArcDistance();
 
 
-
+	var maxTexSize = this.maxSimulationSize;
 	if(lonArcDist > latArcDist)
 	{
 		// longitude texture size is 1024.
-		this.simulationTextureSize[0] = 1024;
-		this.simulationTextureSize[1] = Math.floor(1024 * (latArcDist / lonArcDist));
+		this.simulationTextureSize[0] = maxTexSize;
+		this.simulationTextureSize[1] = Math.floor(maxTexSize * (latArcDist / lonArcDist));
 	}
 	else
 	{
-		this.simulationTextureSize[0] = Math.floor(1024 * (lonArcDist / latArcDist));
-		this.simulationTextureSize[1] = 1024;
+		this.simulationTextureSize[0] = Math.floor(maxTexSize * (lonArcDist / latArcDist));
+		this.simulationTextureSize[1] = maxTexSize;
 	}
 
 	this.terrainTextureSize[0] = this.simulationTextureSize[0];
@@ -266,14 +271,11 @@ WaterManager.prototype.createDefaultShaders = function ()
 	fs_source = fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
 	fs_source = fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
 	var shader = magoManager.postFxShadersManager.createShaderProgram(gl, vs_source, fs_source, shaderName, this.magoManager);
-	shader.u_SimRes_loc = gl.getUniformLocation(shader.program, "u_SimRes");
 	shader.hightmap_loc = gl.getUniformLocation(shader.program, "waterHeightTex");
 	shader.terrainmap_loc = gl.getUniformLocation(shader.program, "terrainmap");
 	shader.waterTex_loc = gl.getUniformLocation(shader.program, "waterTex");
 	shader.contaminantHeightTex_loc = gl.getUniformLocation(shader.program, "contaminantHeightTex");
 	shader.u_heightMap_MinMax_loc = gl.getUniformLocation(shader.program, "u_heightMap_MinMax");
-	shader.u_screenSize_loc = gl.getUniformLocation(shader.program, "u_screenSize");
-	shader.projectionMatrixInv_loc = gl.getUniformLocation(shader.program, "projectionMatrixInv");//
 	shader.uWaterType_loc = gl.getUniformLocation(shader.program, "uWaterType");//
 	shader.u_waterMaxHeigh_loc = gl.getUniformLocation(shader.program, "u_waterMaxHeigh");
 	shader.u_RenderParticles_loc = gl.getUniformLocation(shader.program, "u_RenderParticles");
@@ -283,7 +285,6 @@ WaterManager.prototype.createDefaultShaders = function ()
 	shader.u_terrainTextureSize_loc = gl.getUniformLocation(shader.program, "u_terrainTextureSize");
 
 	magoManager.postFxShadersManager.useProgram(shader);
-	//gl.uniform1i(shader.depthTex_loc, 0);
 	gl.uniform1i(shader.hightmap_loc, 1); // this is water height tex.
 	gl.uniform1i(shader.terrainmap_loc, 2); // this is terrain height tex.
 	gl.uniform1i(shader.waterTex_loc, 3); // this is water color tex.
@@ -297,7 +298,6 @@ WaterManager.prototype.createDefaultShaders = function ()
 	fs_source = fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
 	fs_source = fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
 	var shader = magoManager.postFxShadersManager.createShaderProgram(gl, vs_source, fs_source, shaderName, this.magoManager);
-	shader.u_SimRes_loc = gl.getUniformLocation(shader.program, "u_SimRes");
 	shader.hightmap_loc = gl.getUniformLocation(shader.program, "waterHeightTex");
 	shader.terrainmap_loc = gl.getUniformLocation(shader.program, "terrainmap");
 	shader.contaminantHeightTex_loc = gl.getUniformLocation(shader.program, "contaminantHeightTex");
@@ -317,7 +317,6 @@ WaterManager.prototype.createDefaultShaders = function ()
 	fs_source = fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
 	fs_source = fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
 	var shader = magoManager.postFxShadersManager.createShaderProgram(gl, vs_source, fs_source, shaderName, this.magoManager);
-	shader.u_SimRes_loc = gl.getUniformLocation(shader.program, "u_SimRes");
 	shader.u_screenSize_loc = gl.getUniformLocation(shader.program, "u_screenSize");
 	shader.u_heightMap_MinMax_loc = gl.getUniformLocation(shader.program, "u_heightMap_MinMax");
 	shader.u_tileSize_loc = gl.getUniformLocation(shader.program, "u_tileSize");
@@ -368,8 +367,6 @@ WaterManager.prototype.createDefaultShaders = function ()
 	fs_source = fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
 	fs_source = fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
 	shader = magoManager.postFxShadersManager.createShaderProgram(gl, vs_source, fs_source, shaderName, this.magoManager);
-	shader.u_SimRes_loc = gl.getUniformLocation(shader.program, "u_SimRes");
-	shader.u_PipeLen_loc = gl.getUniformLocation(shader.program, "u_PipeLen");
 	shader.u_timestep_loc = gl.getUniformLocation(shader.program, "u_timestep");
 	shader.u_PipeArea_loc = gl.getUniformLocation(shader.program, "u_PipeArea");
 	shader.u_heightMap_MinMax_loc = gl.getUniformLocation(shader.program, "u_heightMap_MinMax");
@@ -401,8 +398,6 @@ WaterManager.prototype.createDefaultShaders = function ()
 	fs_source = fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
 	fs_source = fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
 	shader = magoManager.postFxShadersManager.createShaderProgram(gl, vs_source, fs_source, shaderName, this.magoManager);
-	shader.u_SimRes_loc = gl.getUniformLocation(shader.program, "u_SimRes");
-	shader.u_PipeLen_loc = gl.getUniformLocation(shader.program, "u_PipeLen");
 	shader.u_timestep_loc = gl.getUniformLocation(shader.program, "u_timestep");
 	shader.u_PipeArea_loc = gl.getUniformLocation(shader.program, "u_PipeArea");
 	shader.u_heightMap_MinMax_loc = gl.getUniformLocation(shader.program, "u_heightMap_MinMax");

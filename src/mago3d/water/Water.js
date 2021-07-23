@@ -1730,8 +1730,6 @@ Water.prototype.doSimulationSteps = function (magoManager)
 	gl.uniform2fv(shader.u_simulationTextureSize_loc, waterManager.simulationTextureSize);
 	gl.uniform2fv(shader.u_terrainTextureSize_loc, waterManager.terrainTextureSize);
 
-
-	gl.uniform1f(shader.u_PipeLen_loc, 1.0); // pipeLen = cellSizeX = cellSizeY.
 	gl.uniform1f(shader.u_timestep_loc, this.simulationTimeStep);
 	gl.uniform1f(shader.u_PipeArea_loc, 0.8);
 	gl.uniform2fv(shader.u_heightMap_MinMax_loc, this.terrainMinMaxHeights);

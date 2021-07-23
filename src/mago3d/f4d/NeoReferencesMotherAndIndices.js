@@ -36,11 +36,13 @@ NeoReferencesMotherAndIndices.prototype.multiplyKeyTransformMatrix = function(id
 {
 	var refIndicesCount = this.neoRefsIndices.length;
 	var reference;
-	for (var i=0; i<refIndicesCount; i++)
-	{
+	for (var i=0; i<refIndicesCount; i++) {
 		reference = this.motherNeoRefsList[this.neoRefsIndices[i]];
-		if (reference)
-		{ reference.multiplyKeyTransformMatrix(idxKey, matrix); }
+		if (reference){// && reference.refMatrixType === 2) { 
+			// only multiply references that are "refMatrixType = 2". 
+			// if "refMatrixType" = 0 or = 1, then the reference no uses the matrix.
+			reference.multiplyKeyTransformMatrix(idxKey, matrix); 
+		}
 	}
 };
 
