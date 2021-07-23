@@ -369,8 +369,12 @@ Modeler.prototype.__TEST__extrusionBuildings_sejongForWaterSimulation = function
 	var maxLat = 35.61518;
 
 	// coords for sejong.***
-	var minLon = 127.23257;
-	var minLat = 36.51568;
+
+
+	// coords for sihung.***
+	var minLon = 126.88027;
+	var minLat = 37.33282;
+
 	var maxLat = minLat + 0.015;
 
 

@@ -2237,6 +2237,13 @@ Water.prototype.renderWaterDepth = function (shader, magoManager)
 Water.prototype.resetObjectIdDemOverWrited = function ()
 {
 	this.buildingsId_OverWritedOnDemMap = {};
+
+	// We must copy "dem_texture" into "demWithBuildingsTex" to preserve the "dem_texture".
+	// There are the original tile DEM texture named : "dem_texture".
+	// In this function we copy the "dem_texture" into "demWithBuildingsTex".
+	// Note : "dem_texture" can have excavations.
+	var bFlipTexcoordY = false;
+	this.copyTexture(this.dem_texture_A, [this.demWithBuildingsTex], bFlipTexcoordY);
 };
 
 Water.prototype._isObjectIdDemOverWrited = function (objectId)
@@ -2304,17 +2311,32 @@ Water.prototype.doIntersectedObjectsCulling = function (visiblesArray, nativeVis
 		}
 	}
 
+	// test.******
+	if(!this.buildingsId_OverWritedOnDemMap)
+	{
+		this.buildingsId_OverWritedOnDemMap = {};
+	}
+	if(Object.keys(this.buildingsId_OverWritedOnDemMap).length === 0)
+	{
+		var hola = 0;
+	}
+
 	// nativeVisiblesObjects.
 	var native;
 	for(var i=0; i<nativeVisiblesCount; i++)
 	{
 		native = nativeVisiblesArray[i];
-		if(this._isObjectIdDemOverWrited(native._guid)) {
+		if (native.name === "contaminationGenerator" || native.name === "excavationObject" || native.name === "waterGenerator") {
 			continue;
 		}
+
+		if (this._isObjectIdDemOverWrited(native._guid)) {
+			continue;
+		}
+
 		bSphereWC = native.getBoundingSphereWC(bSphereWC);
 
-		if(myBSphereWC.intersectionSphere(bSphereWC) !== Constant.INTERSECTION_OUTSIDE)
+		if (myBSphereWC.intersectionSphere(bSphereWC) !== Constant.INTERSECTION_OUTSIDE)
 		{
 			this.visibleObjectsControler.currentVisibleNativeObjects.opaquesArray.push(native);
 		}
@@ -2697,7 +2719,10 @@ Water.prototype.overWriteDEMWithObjects = function (shader, magoManager)
 	var visibleNativesOpaquesCount = this.visibleObjectsControler.currentVisibleNativeObjects.opaquesArray.length;
 	var visibleNativesTransparentsCount = this.visibleObjectsControler.currentVisibleNativeObjects.transparentsArray.length;
 
-	
+	if(visibleNodesCount + visibleNativesOpaquesCount + visibleNativesTransparentsCount === 0)
+	{
+		return;
+	}
 
 	var modelViewProjMatrix = this.getTileOrthographic_mvpMat();
 
@@ -2708,20 +2733,17 @@ Water.prototype.overWriteDEMWithObjects = function (shader, magoManager)
 	var shader;
 
 	// 1rst, copy the terrain depth into "this.demWithBuildingsTex".************************************************************************************
-	if (magoManager.isFarestFrustum())
-	{ 
+	//if (magoManager.isFarestFrustum())
+	//{ 
 		// We must copy "dem_texture" into "demWithBuildingsTex" to preserve the "dem_texture".
 		// There are the original tile DEM texture named : "dem_texture".
 		// In this function we copy the "dem_texture" into "demWithBuildingsTex".
 		// Note : "dem_texture" can have excavations.
-		var bFlipTexcoordY = false;
-		this.copyTexture(this.dem_texture_A, [this.demWithBuildingsTex], bFlipTexcoordY);
-	}
+		//var bFlipTexcoordY = false;
+		//this.copyTexture(this.dem_texture_A, [this.demWithBuildingsTex], bFlipTexcoordY);
+	//}
 
-	if(visibleNodesCount + visibleNativesOpaquesCount + visibleNativesTransparentsCount === 0)
-	{
-		return;
-	}
+	
 
 	gl.disable(gl.BLEND);
 	gl.clearColor(1.0, 0.0, 0.0, 0.0);
