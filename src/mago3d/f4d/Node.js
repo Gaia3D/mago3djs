@@ -605,7 +605,6 @@ Node.prototype.renderContent = function (magoManager, shader, renderType, refMat
 				this.mustRecalculateRefKeyMatrix = false;
 			}
 		}
-		return;
 	}
 	// End checking staticType model.------------------------------------------------------------------------------------------
 
