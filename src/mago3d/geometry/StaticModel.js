@@ -81,17 +81,16 @@ StaticModelsManager.prototype.getStaticModel = function(guid)
 	return staticModel;
 };
 
-StaticModelsManager.manageStaticModel = function(node, magoManager)
-{
+StaticModelsManager.manageStaticModel = function(node, magoManager) {
 	// Check if the node is a referenceNode.***
 	var attributes = node.data.attributes;
-	if (attributes === undefined)
-	{ return; }
+	if (attributes === undefined) { 
+		return; 
+	}
 
 	var neoBuilding = node.data.neoBuilding;
 		
-	if (attributes.projectId !== undefined && attributes.isReference !== undefined && attributes.isReference === true)
-	{
+	if (attributes.projectId !== undefined && attributes.isReference !== undefined && attributes.isReference === true) {
 		var projectFolderName;
 		var neoBuildingFolderName;
 	
@@ -127,7 +126,7 @@ StaticModelsManager.manageStaticModel = function(node, magoManager)
 		
 		// Now, set neoBuildings parameters.***
 		neoBuilding.buildingFileName = neoBuildingFolderName;
-		neoBuilding.nodeOwner = node;
+		neoBuilding.nodeOwner = node; // Attention! : static model has no NODE owner.!!!
 		node.data.neoBuilding = neoBuilding;
 		node.data.buildingSeed = buildingSeed;
 		node.data.projectFolderName = projectFolderName;

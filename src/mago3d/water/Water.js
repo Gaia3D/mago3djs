@@ -1560,13 +1560,14 @@ Water.prototype.test__doQuantizedSurfaceExcavation = function (magoManager)
 /**
  * simulation
  */
-Water.prototype.doSimulationSteps = function (magoManager)
-{
-	if(!this.isPrepared())
-	{ return; }
+Water.prototype.doSimulationSteps = function (magoManager) {
+	if(!this.isPrepared()) { 
+		return; 
+	}
 
-	if(!this.prepareTextures()) // textures that must be loaded.
-	{ return false; }
+	if(!this.prepareTextures()) { 
+		return false; 
+	}
 
 	var sceneState = magoManager.sceneState;
 	var waterManager = this.waterManager;
@@ -1580,12 +1581,11 @@ Water.prototype.doSimulationSteps = function (magoManager)
 	
 	
 	// test qmesh excavation.***
-	//this.test__doQuantizedSurfaceExcavation(magoManager);
+	this.test__doQuantizedSurfaceExcavation(magoManager);
 
 	//---------------------------------------------------------------------------------------------------------------------------------
 	// Check if simulate landSlides.
-	if(waterManager.bDoLandSlideSimulation)
-	{
+	if(waterManager.bDoLandSlideSimulation) {
 		this.doSimulationSteps_landSlide(magoManager);
 	}
 
@@ -1627,8 +1627,7 @@ Water.prototype.doSimulationSteps = function (magoManager)
 	gl.activeTexture(gl.TEXTURE2);
 	gl.bindTexture(gl.TEXTURE_2D, this.waterHeightTexB.texId);
 
-	if(this.contaminantMaxheight > 0.0)
-	{
+	if(this.contaminantMaxheight > 0.0) {
 		gl.activeTexture(gl.TEXTURE3); // contaminant tex if exist.
 		gl.bindTexture(gl.TEXTURE_2D, this.contaminantSourceTex.texId);
 
@@ -1691,8 +1690,7 @@ Water.prototype.doSimulationSteps = function (magoManager)
 	gl.activeTexture(gl.TEXTURE3); // flux tex low.
 	gl.bindTexture(gl.TEXTURE_2D, this.waterFluxTexB_LOW.texId);
 
-	if(this.contaminantMaxheight > 0.0)
-	{
+	if(this.contaminantMaxheight > 0.0) {
 		gl.activeTexture(gl.TEXTURE4); // contaminant tex if exist.
 		gl.bindTexture(gl.TEXTURE_2D, this.contaminationTex_B.texId);
 	}
@@ -1751,8 +1749,7 @@ Water.prototype.doSimulationSteps = function (magoManager)
 	gl.activeTexture(gl.TEXTURE3); // flux tex low.
 	gl.bindTexture(gl.TEXTURE_2D, this.waterFluxTexB_LOW.texId);
 
-	if(this.contaminantMaxheight > 0.0)
-	{
+	if(this.contaminantMaxheight > 0.0) {
 		gl.activeTexture(gl.TEXTURE4); // contaminant tex if exist.
 		gl.bindTexture(gl.TEXTURE_2D, this.contaminationTex_B.texId);
 	}
@@ -1774,8 +1771,7 @@ Water.prototype.doSimulationSteps = function (magoManager)
 
 	//-----------------------------------------------------------------------------------------------------------------------------------------------------
 	// Once finished simulation, then calculate particles if necessary:
-	if(waterManager.bRenderParticles)
-	{
+	if(waterManager.bRenderParticles) {
 		this.doSimulationSteps_particles(magoManager);
 	}
 
@@ -1783,8 +1779,7 @@ Water.prototype.doSimulationSteps = function (magoManager)
 	// Must return to current frameBuffer. TODO:
 	var hola = 0;
 
-	for(var i=0; i<8; i++)
-	{
+	for(var i=0; i<8; i++) {
 		gl.activeTexture(gl.TEXTURE0+i); 
 		gl.bindTexture(gl.TEXTURE_2D, null);
 	}

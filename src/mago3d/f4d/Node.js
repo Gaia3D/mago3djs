@@ -441,8 +441,7 @@ Node.prototype.checkChangesHistoryColors = function()
 /**
  * 어떤 일을 하고 있습니까?
  */
-Node.prototype.renderContent = function (magoManager, shader, renderType, refMatrixIdxKey) 
-{
+Node.prototype.renderContent = function (magoManager, shader, renderType, refMatrixIdxKey) {
 	// This function renders the renderables that exists in "data".
 	// renderType = 0 -> depth render.
 	// renderType = 1 -> normal render.
@@ -450,46 +449,46 @@ Node.prototype.renderContent = function (magoManager, shader, renderType, refMat
 	// renderType = 3 -> shadowMesh render.
 	//--------------------------------------------
 	var data = this.data;
-	if (data === undefined)
-	{ return; }
+	if (data === undefined) { 
+		return; 
+	}
 
-	if (this.renderCondition && typeof this.renderCondition === 'function') 
-	{
+	if (this.renderCondition && typeof this.renderCondition === 'function') {
 		this.renderCondition.call(this, data);
 	}
 	
 	var attributes = data.attributes;
 	
-	if (attributes)
-	{
-		if (attributes.isVisible !== undefined && attributes.isVisible === false) 
-		{
+	if (attributes) {
+		if (attributes.isVisible !== undefined && attributes.isVisible === false)  {
 			return;
 		}
 		
-		if (magoManager.currentProcess === CODE.magoCurrentProcess.DepthShadowRendering)
-		{
-			if (attributes.castShadow !== undefined && attributes.castShadow === false) 
-			{
+		if (magoManager.currentProcess === CODE.magoCurrentProcess.DepthShadowRendering) {
+			if (attributes.castShadow !== undefined && attributes.castShadow === false) {
 				return;
 			}
 		}
 	}
 
 	// Check if there are effects.
-	if (renderType !== 2 && magoManager.currentProcess !== CODE.magoCurrentProcess.StencilSilhouetteRendering)
-	{ var executedEffects = magoManager.effectsManager.executeEffects(this.guid, magoManager); }
+	if (renderType !== 2 && magoManager.currentProcess !== CODE.magoCurrentProcess.StencilSilhouetteRendering) { 
+		var executedEffects = magoManager.effectsManager.executeEffects(this.guid, magoManager); 
+	}
 	
 	// Check if we are under selected data structure.***
 	var selectionManager = magoManager.selectionManager;
-	if (selectionManager.isObjectSelected(this))
-	{ selectionManager.parentSelected = true; }
-	else 
-	{ selectionManager.parentSelected = false; }
+	if (selectionManager.isObjectSelected(this)) { 
+		selectionManager.parentSelected = true; 
+	}
+	else { 
+		selectionManager.parentSelected = false; 
+	}
 	
 	var neoBuilding = data.neoBuilding;
-	if (neoBuilding === undefined)
-	{ return; }
+	if (neoBuilding === undefined) { 
+		return; 
+	}
 
 	// Update visibleOctreesControler of the neoBuilding & the relativeCurrentCamera.
 	// Note: currentVisibleOctreesControler & myCameraRelative are calculated on MagoManager.getRenderablesDetailedNeoBuildingAsimetricVersion(...).
@@ -512,17 +511,16 @@ Node.prototype.renderContent = function (magoManager, shader, renderType, refMat
 	// 1rst, determine the shader.
 	var gl = magoManager.sceneState.gl;
 
-	
-	
 	// check attributes of the project.
 	var project = magoManager.hierarchyManager.getNodesMap(data.projectId);
-	if (project.attributes !== undefined && project.attributes.specularLighting !== undefined && shader.bApplySpecularLighting_loc !== undefined)
-	{
+	if (project.attributes !== undefined && project.attributes.specularLighting !== undefined && shader.bApplySpecularLighting_loc !== undefined) {
 		var applySpecLighting = project.attributes.specularLighting;
-		if (applySpecLighting)
-		{ gl.uniform1i(shader.bApplySpecularLighting_loc, true); }
-		else
-		{ gl.uniform1i(shader.bApplySpecularLighting_loc, false); }
+		if (applySpecLighting) { 
+			gl.uniform1i(shader.bApplySpecularLighting_loc, true); 
+		}
+		else { 
+			gl.uniform1i(shader.bApplySpecularLighting_loc, false); 
+		}
 	}
 	// end check attributes of the project.----------------------------------------
 	
@@ -537,8 +535,9 @@ Node.prototype.renderContent = function (magoManager, shader, renderType, refMat
 	gl.uniform1i(shader.textureFlipYAxis_loc, flipYTexCoord);
 	
 	var currRenderingFase = magoManager.renderingFase;
-	if (this.isReferenceNode())
-	{ magoManager.renderingFase = -10; } // set a strange value to skip avoiding rendering fase of references objects.
+	if (this.isReferenceNode()) { 
+		magoManager.renderingFase = -10; 
+	} // set a strange value to skip avoiding rendering fase of references objects.
 
 	// Check the geoLocationDatasCount & check if is a ghost-trail-render (trail as ghost).
 	// Check if is trail-render.*
@@ -586,6 +585,29 @@ Node.prototype.renderContent = function (magoManager, shader, renderType, refMat
 	{
 		opacity = attributes.opacity;
 	}
+
+	// In this moment, check if the node is StaticType.***
+	var projectDataType = neoBuilding.metaData.getProjectDataType();
+	
+	// Check metaData.projectDataType.
+	if (projectDataType === 10)
+	{
+		// This is tree data type, used in static type buildings.***
+		// Tree-data-type has no lods.***
+		//var octreesRenderedCount = this.renderDetailed(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord);
+		var octree = neoBuilding.octree;
+		if (octree.neoReferencesMotherAndIndices) {
+			// Here must do -> neoBuilding.octree.multiplyKeyTransformMatrix(0, geoLocationData.rotMatrix), bcos
+			// for example, if there are multiple vehicles, as buses, that are moving and rotating, the references with "refMatrixType = 2" is going to multiply by different geoLocations, and
+			// so, the references that has "refMatrixType = 2" has a wrong tMatrix. This only occurs in static f4ds with multiple copies.***
+			if(this.mustRecalculateRefKeyMatrix) {
+				octree.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
+				this.mustRecalculateRefKeyMatrix = false;
+			}
+		}
+		return;
+	}
+	// End checking staticType model.------------------------------------------------------------------------------------------
 
 	gl.uniform1f(shader.externalAlpha_loc, 1.0);
 	gl.uniform1f(shader.uModelOpacity_loc, opacity);
@@ -1439,44 +1461,46 @@ Node.prototype.changeLocationAndRotation = function(latitude, longitude, elevati
 	{
 		aNode = nodesArray[i];
 		var geoLocDatamanager = aNode.getNodeGeoLocDataManager();
-		if (geoLocDatamanager === undefined)
-		{ continue; }
+		if (geoLocDatamanager === undefined) { 
+			continue; 
+		}
+
 		var geoLocationData;
-		if (this.data.animationData !== undefined)
-		{
+		if (this.data.animationData !== undefined) {
 			geoLocationData = geoLocDatamanager.newGeoLocationData();
 		}
-		else 
-		{
+		else {
 			geoLocationData = geoLocDatamanager.getCurrentGeoLocationData(); // original.
 		}
-		if (geoLocationData === undefined)
-		{ continue; }
+
+		if (geoLocationData === undefined) { 
+			continue; 
+		}
 	
 		geoLocationData = ManagerUtils.calculateGeoLocationData(longitude, latitude, elevation, heading, pitch, roll, geoLocationData, magoManager);
 		this.correctGeoLocationDataByMappingType(geoLocationData);
 		
-		if (geoLocationData === undefined)
-		{ continue; }
+		if (geoLocationData === undefined) { 
+			continue; 
+		}
 	
-		if (geoLocationData.geographicCoord === undefined)
-		{ continue; } 
+		if (geoLocationData.geographicCoord === undefined) { 
+			continue; 
+		} 
 	
 		// Change the geoCoords of the buildingSeed.
 		var buildingSeed = aNode.data.buildingSeed;
-		if (buildingSeed)
-		{
+		if (buildingSeed) {
 			buildingSeed.geographicCoordOfBBox.longitude = longitude;
 			buildingSeed.geographicCoordOfBBox.latitude = latitude;
 		}
-
 		
 		// now, must change the keyMatrix of the references of the octrees of all buildings of this node.
 		var neoBuilding = aNode.data.neoBuilding;
-		if (neoBuilding.octree)
-		{
+		if (neoBuilding.octree) {
 			neoBuilding.octree.multiplyKeyTransformMatrix(0, geoLocationData.rotMatrix);
 		}
+
 		neoBuilding.calculateBBoxCenterPositionWorldCoord(geoLocationData);
 		nodeRoot.bboxAbsoluteCenterPos = undefined; // provisional.
 		nodeRoot.bboxAbsoluteCenterPos = nodeRoot.calculateBBoxCenterPositionWorldCoord(geoLocationData); // provisional.
@@ -1486,15 +1510,16 @@ Node.prototype.changeLocationAndRotation = function(latitude, longitude, elevati
 
 		// check if the neoBuilding is static.***
 		var projectDataType = neoBuilding.metaData.getProjectDataType();
-		if(projectDataType === 10) {
+		if (projectDataType === 10) {
 			// the neoBuilding is static data type.
-			neoBuilding.mustRecalculateRefKeyMatrix = true; // the refKeyMatrices will be calculate in renderTime.
+			this.mustRecalculateRefKeyMatrix = true; // the refKeyMatrices will be calculate in renderTime.
 		}
 
 		
 		// Now, calculate the geoCoords of the bbox.
-		if (nodeRoot.data.bbox.geographicCoord === undefined)
-		{ nodeRoot.data.bbox.geographicCoord = new GeographicCoord(); }
+		if (nodeRoot.data.bbox.geographicCoord === undefined) { 
+			nodeRoot.data.bbox.geographicCoord = new GeographicCoord(); 
+		}
 		
 		nodeRoot.data.bbox.geographicCoord.setLonLatAlt(longitude, latitude, elevation); // provisional. Must calculate the ... TODO:
 		

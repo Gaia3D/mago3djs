@@ -62,10 +62,10 @@ HierarchyManager.prototype.deleteNodes = function(gl, vboMemoryManager)
  * StaticModelsManager 반환
  * @returns {StaticModelsManager} 선언된 StaticModelsManager가 없을 시 인스턴스 생성하여 등록 후 반환.
  */
-HierarchyManager.prototype.getStaticModelsManager = function() 
-{
-	if (this.staticModelsManager === undefined)
-	{ this.staticModelsManager = new StaticModelsManager(); }
+HierarchyManager.prototype.getStaticModelsManager = function() {
+	if (this.staticModelsManager === undefined) { 
+		this.staticModelsManager = new StaticModelsManager(); 
+	}
 	
 	return this.staticModelsManager;
 };
