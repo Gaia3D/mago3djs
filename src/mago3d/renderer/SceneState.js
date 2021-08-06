@@ -64,6 +64,8 @@ var SceneState = function(config)
 	this.specularColor = new Float32Array([0.7, 0.7, 0.7]);
 	this.ambientColor = new Float32Array([0.6, 0.6, 0.6]);
 	this.ssaoRadius = new Float32Array([0.15]);
+	this.brightnessContrast = new Float32Array([0.01, 1.15]);
+	this.brightnessContrastType = 0; // 0= apply Brightness & contrast only for f4d. 1= f4d & terrain.
 	//this.shininessValue = new Float32Array([40.0]); // original.***
 	this.shininessValue = new Float32Array([10.0]);
 	this.ssaoNoiseScale2 = new Float32Array([1.0, 1.0]); // [this.depthFboNeo.width[0]/this.noiseTexture.width, this.depthFboNeo.height[0]/this.noiseTexture.height]

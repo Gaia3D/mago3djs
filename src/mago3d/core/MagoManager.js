@@ -6311,6 +6311,8 @@ MagoManager.prototype.createDefaultShaders = function (gl)
 	shader.silhouetteDepthTex_loc = gl.getUniformLocation(shader.program, "silhouetteDepthTex");
 	shader.diffuseLightTex_loc = gl.getUniformLocation(shader.program, "diffuseLightTex");
 	shader.specularLightTex_loc = gl.getUniformLocation(shader.program, "specularLightTex");
+	shader.uBrightnessContrast_loc = gl.getUniformLocation(shader.program, "uBrightnessContrast");
+	shader.uBrightnessContrastType_loc = gl.getUniformLocation(shader.program, "uBrightnessContrastType");
 	//diffuseLightTex; 
 	//specularLightTex; 
 	//albedoTex

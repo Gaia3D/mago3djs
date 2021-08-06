@@ -1288,6 +1288,8 @@ Renderer.prototype.renderScreenQuad = function (gl)
 	gl.uniform1i(currentShader.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
 	gl.uniform1f(currentShader.uFCoef_logDepth_loc, sceneState.fCoef_logDepth[0]);
 	gl.uniform3fv(currentShader.uAmbientLight_loc, sceneState.ambientColor);
+	gl.uniform2fv(currentShader.uBrightnessContrast_loc, sceneState.brightnessContrast);
+	gl.uniform1i(currentShader.uBrightnessContrastType_loc, sceneState.brightnessContrastType);
 	
 
 	var sunSystem = sceneState.sunSystem;

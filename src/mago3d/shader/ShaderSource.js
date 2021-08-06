@@ -6568,14 +6568,6 @@ void main()\n\
 		bIsEdge = true;\n\
 	}\n\
 \n\
-	// Edge detection.\n\
-	// https://www.geeks3d.com/20110405/fxaa-fast-approximate-anti-aliasing-demo-glsl-opengl-test-radeon-geforce/3/\n\
-    vec4 normal = getNormal(screenPos);\n\
-    float edgeRatio;\n\
-    //bIsEdge = isEdge_3x3(screenPos, normal.xyz, pixelSize_x, pixelSize_y, edgeRatio);\n\
-    \n\
-\n\
-\n\
 	if(bIsEdge)\n\
 	{\n\
 		// fxaa.*********************************************************************************************************\n\
@@ -6588,7 +6580,6 @@ void main()\n\
 		shadedColor = colorFxaa;\n\
 		//---------------------------------------------------------------------------------------------------------------\n\
 	}\n\
-\n\
 \n\
     // Check for light fog.\n\
     if(u_activeTex[0])\n\
@@ -6648,6 +6639,8 @@ uniform vec2 uNearFarArray[4];\n\
 uniform bool bUseLogarithmicDepth;\n\
 uniform float uFCoef_logDepth;\n\
 uniform float uSceneDayNightLightingFactor; // day -> 1.0; night -> 0.0\n\
+uniform vec2 uBrightnessContrast;\n\
+uniform int uBrightnessContrastType; // 0= only f4d, 1= f4d & terrain.\n\
 \n\
 uniform vec3 uAmbientLight;\n\
 \n\
@@ -6917,6 +6910,69 @@ vec4 getShadedAlbedo(vec2 screenPos, vec3 lightingDirection, vec3 ambientColor, 
 \n\
 	return shadedAlbedo;\n\
 }\n\
+/*\n\
+vec3 rgb2hsv(vec3 c)\n\
+{\n\
+    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);\n\
+    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));\n\
+    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));\n\
+\n\
+    float d = q.x - min(q.w, q.y);\n\
+    float e = 1.0e-10;\n\
+    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);\n\
+}\n\
+\n\
+vec3 hsv2rgb(vec3 c)\n\
+{\n\
+    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);\n\
+    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);\n\
+    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);\n\
+}\n\
+*/\n\
+\n\
+vec4 HueSatBright_color(vec4 color4, float hueAdjust)\n\
+{\n\
+	const vec4  kRGBToYPrime = vec4 (0.299, 0.587, 0.114, 0.0);\n\
+    const vec4  kRGBToI     = vec4 (0.596, -0.275, -0.321, 0.0);\n\
+    const vec4  kRGBToQ     = vec4 (0.212, -0.523, 0.311, 0.0);\n\
+\n\
+    const vec4  kYIQToR   = vec4 (1.0, 0.956, 0.621, 0.0);\n\
+    const vec4  kYIQToG   = vec4 (1.0, -0.272, -0.647, 0.0);\n\
+    const vec4  kYIQToB   = vec4 (1.0, -1.107, 1.704, 0.0);\n\
+\n\
+    // Sample the input pixel\n\
+    vec4    color   = color4;\n\
+\n\
+    // Convert to YIQ\n\
+    float   YPrime  = dot (color, kRGBToYPrime);\n\
+    float   I      = dot (color, kRGBToI);\n\
+    float   Q      = dot (color, kRGBToQ);\n\
+\n\
+    // Calculate the hue and chroma\n\
+    float   hue     = atan (Q, I);\n\
+    float   chroma  = sqrt (I * I + Q * Q);\n\
+\n\
+    // Make the user's adjustments\n\
+    hue += hueAdjust;\n\
+\n\
+    // Convert back to YIQ\n\
+    Q = chroma * sin (hue);\n\
+    I = chroma * cos (hue);\n\
+\n\
+    // Convert back to RGB\n\
+    vec4    yIQ   = vec4 (YPrime, I, Q, 0.0);\n\
+    color.r = dot (yIQ, kYIQToR);\n\
+    color.g = dot (yIQ, kYIQToG);\n\
+    color.b = dot (yIQ, kYIQToB);\n\
+\n\
+    // Save the result\n\
+    return color;\n\
+}\n\
+\n\
+vec3 brightnessContrast(vec3 value, float brightness, float contrast)\n\
+{\n\
+    return (value - 0.5) * contrast + 0.5 + brightness;\n\
+}\n\
 \n\
 void main()\n\
 {\n\
@@ -7055,6 +7111,26 @@ void main()\n\
 	\n\
 	// 1rst, take the albedo.\n\
 	vec4 albedo = texture2D(albedoTex, screenPos);\n\
+\n\
+	// Color correction.******************************************\n\
+	if(uBrightnessContrastType == 0) // apply brightness & contrast for f4d objects.\n\
+	{\n\
+		if(dataType == 0)\n\
+		{\n\
+			float brightness = uBrightnessContrast.x;\n\
+			float contrast = uBrightnessContrast.y;\n\
+			vec3 newColo3 = brightnessContrast(albedo.rgb, brightness, contrast);\n\
+			albedo.rgb = newColo3;\n\
+		}\n\
+	}\n\
+	else if(uBrightnessContrastType == 1) // apply brightness & contrast for f4d objects and terrain\n\
+	{\n\
+		float brightness = uBrightnessContrast.x;\n\
+		float contrast = uBrightnessContrast.y;\n\
+		vec3 newColo3 = brightnessContrast(albedo.rgb, brightness, contrast);\n\
+		albedo.rgb = newColo3;\n\
+	}\n\
+\n\
 	vec4 diffuseLight = texture2D(diffuseLightTex, screenPos);\n\
 	float diffuseLightModul = length(diffuseLight.xyz);\n\
 \n\
