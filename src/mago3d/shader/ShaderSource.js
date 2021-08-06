@@ -6639,10 +6639,12 @@ uniform vec2 uNearFarArray[4];\n\
 uniform bool bUseLogarithmicDepth;\n\
 uniform float uFCoef_logDepth;\n\
 uniform float uSceneDayNightLightingFactor; // day -> 1.0; night -> 0.0\n\
-uniform vec2 uBrightnessContrast;\n\
+uniform vec3 uBrightnessContrastSaturation;\n\
 uniform int uBrightnessContrastType; // 0= only f4d, 1= f4d & terrain.\n\
 \n\
 uniform vec3 uAmbientLight;\n\
+\n\
+const float Epsilon = 1e-10;\n\
 \n\
 \n\
 float unpackDepth(vec4 packedDepth)\n\
@@ -6910,60 +6912,41 @@ vec4 getShadedAlbedo(vec2 screenPos, vec3 lightingDirection, vec3 ambientColor, 
 \n\
 	return shadedAlbedo;\n\
 }\n\
-/*\n\
-vec3 rgb2hsv(vec3 c)\n\
-{\n\
-    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);\n\
-    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));\n\
-    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));\n\
 \n\
-    float d = q.x - min(q.w, q.y);\n\
-    float e = 1.0e-10;\n\
-    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);\n\
+vec3 RGBtoHSV(in vec3 RGB)\n\
+{\n\
+    vec4  P   = (RGB.g < RGB.b) ? vec4(RGB.bg, -1.0, 2.0/3.0) : vec4(RGB.gb, 0.0, -1.0/3.0);\n\
+    vec4  Q   = (RGB.r < P.x) ? vec4(P.xyw, RGB.r) : vec4(RGB.r, P.yzx);\n\
+    float C   = Q.x - min(Q.w, Q.y);\n\
+    float H   = abs((Q.w - Q.y) / (6.0 * C + Epsilon) + Q.z);\n\
+    vec3  HCV = vec3(H, C, Q.x);\n\
+    float S   = HCV.y / (HCV.z + Epsilon);\n\
+    return vec3(HCV.x, S, HCV.z);\n\
 }\n\
 \n\
-vec3 hsv2rgb(vec3 c)\n\
+vec3 HSVtoRGB(in vec3 HSV)\n\
 {\n\
-    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);\n\
-    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);\n\
-    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);\n\
+    float H   = HSV.x;\n\
+    float R   = abs(H * 6.0 - 3.0) - 1.0;\n\
+    float G   = 2.0 - abs(H * 6.0 - 2.0);\n\
+    float B   = 2.0 - abs(H * 6.0 - 4.0);\n\
+    vec3  RGB = clamp( vec3(R,G,B), 0.0, 1.0 );\n\
+    return ((RGB - 1.0) * HSV.y + 1.0) * HSV.z;\n\
 }\n\
-*/\n\
 \n\
-vec4 HueSatBright_color(vec4 color4, float hueAdjust)\n\
+\n\
+vec4 HueSatBright_color(vec4 color4, float saturation)\n\
 {\n\
-	const vec4  kRGBToYPrime = vec4 (0.299, 0.587, 0.114, 0.0);\n\
-    const vec4  kRGBToI     = vec4 (0.596, -0.275, -0.321, 0.0);\n\
-    const vec4  kRGBToQ     = vec4 (0.212, -0.523, 0.311, 0.0);\n\
+	vec4 color = color4;\n\
+	vec3 hsv = RGBtoHSV(color.rgb);\n\
 \n\
-    const vec4  kYIQToR   = vec4 (1.0, 0.956, 0.621, 0.0);\n\
-    const vec4  kYIQToG   = vec4 (1.0, -0.272, -0.647, 0.0);\n\
-    const vec4  kYIQToB   = vec4 (1.0, -1.107, 1.704, 0.0);\n\
+	/*\n\
+	saturation is a value in the range [0.0, 1.0]. 0.5 means that the image is kept as it is. \n\
+	It saturation is greater 0.5 the image is saturated and if it is less than 0.5 the image is bleached\n\
+	*/\n\
+	hsv.y *= (saturation * 2.0);\n\
 \n\
-    // Sample the input pixel\n\
-    vec4    color   = color4;\n\
-\n\
-    // Convert to YIQ\n\
-    float   YPrime  = dot (color, kRGBToYPrime);\n\
-    float   I      = dot (color, kRGBToI);\n\
-    float   Q      = dot (color, kRGBToQ);\n\
-\n\
-    // Calculate the hue and chroma\n\
-    float   hue     = atan (Q, I);\n\
-    float   chroma  = sqrt (I * I + Q * Q);\n\
-\n\
-    // Make the user's adjustments\n\
-    hue += hueAdjust;\n\
-\n\
-    // Convert back to YIQ\n\
-    Q = chroma * sin (hue);\n\
-    I = chroma * cos (hue);\n\
-\n\
-    // Convert back to RGB\n\
-    vec4    yIQ   = vec4 (YPrime, I, Q, 0.0);\n\
-    color.r = dot (yIQ, kYIQToR);\n\
-    color.g = dot (yIQ, kYIQToG);\n\
-    color.b = dot (yIQ, kYIQToB);\n\
+	color.rgb = HSVtoRGB(hsv);\n\
 \n\
     // Save the result\n\
     return color;\n\
@@ -6972,6 +6955,11 @@ vec4 HueSatBright_color(vec4 color4, float hueAdjust)\n\
 vec3 brightnessContrast(vec3 value, float brightness, float contrast)\n\
 {\n\
     return (value - 0.5) * contrast + 0.5 + brightness;\n\
+}\n\
+\n\
+vec3 Gamma(vec3 value, float param)\n\
+{\n\
+    return vec3(pow(abs(value.r), param),pow(abs(value.g), param),pow(abs(value.b), param));\n\
 }\n\
 \n\
 void main()\n\
@@ -7112,24 +7100,35 @@ void main()\n\
 	// 1rst, take the albedo.\n\
 	vec4 albedo = texture2D(albedoTex, screenPos);\n\
 \n\
-	// Color correction.******************************************\n\
+	// Color correction.**********************************************************************************\n\
 	if(uBrightnessContrastType == 0) // apply brightness & contrast for f4d objects.\n\
 	{\n\
 		if(dataType == 0)\n\
 		{\n\
-			float brightness = uBrightnessContrast.x;\n\
-			float contrast = uBrightnessContrast.y;\n\
-			vec3 newColo3 = brightnessContrast(albedo.rgb, brightness, contrast);\n\
-			albedo.rgb = newColo3;\n\
+			float brightness = uBrightnessContrastSaturation.x;\n\
+			float contrast = uBrightnessContrastSaturation.y;\n\
+			float saturation = uBrightnessContrastSaturation.z;\n\
+			albedo.rgb = brightnessContrast(albedo.rgb, brightness, contrast);\n\
+			albedo = HueSatBright_color(albedo, saturation);\n\
+\n\
+			//albedo.rgb = Gamma(albedo.rgb, 1.1);\n\
 		}\n\
 	}\n\
 	else if(uBrightnessContrastType == 1) // apply brightness & contrast for f4d objects and terrain\n\
 	{\n\
-		float brightness = uBrightnessContrast.x;\n\
-		float contrast = uBrightnessContrast.y;\n\
-		vec3 newColo3 = brightnessContrast(albedo.rgb, brightness, contrast);\n\
-		albedo.rgb = newColo3;\n\
+		float brightness = uBrightnessContrastSaturation.x;\n\
+		float contrast = uBrightnessContrastSaturation.y;\n\
+		float saturation = uBrightnessContrastSaturation.z;\n\
+		albedo.rgb = brightnessContrast(albedo.rgb, brightness, contrast);\n\
+		albedo = HueSatBright_color(albedo, saturation);\n\
+\n\
+		//albedo.rgb = Gamma(albedo.rgb, 1.1);\n\
 	}\n\
+\n\
+	\n\
+\n\
+	// End color correction.---------------------------------------------------------------------------\n\
+	\n\
 \n\
 	vec4 diffuseLight = texture2D(diffuseLightTex, screenPos);\n\
 	float diffuseLightModul = length(diffuseLight.xyz);\n\
