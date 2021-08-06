@@ -1251,9 +1251,23 @@ Renderer.prototype.renderScreenQuad = function (gl)
 	if (sceneState.sunSystem !== undefined && sceneState.applySunShadows)
 	{ bApplyMagoShadow = true; }
 
-
 	if (!bApplySsao)
 	{ return; }
+
+	// Render in the shadedColorFbo.*************************************************
+	var shadedColorFbo = magoManager.shadedColorFbo;
+
+	// bind ssaoFromDepthBuffer.***
+	shadedColorFbo.bind(); 
+
+	//if (magoManager.isFarestFrustum())
+	{
+		gl.clearColor(0, 0, 0, 1);// original.***
+		gl.clearDepth(1);
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		gl.clearColor(0, 0, 0, 1);
+	}
+	// ------------------------------------------------------------------------------
 
 	var postFxShadersManager = magoManager.postFxShadersManager;
 	currentShader = postFxShadersManager.getShader("screenQuad"); 
@@ -1391,6 +1405,8 @@ Renderer.prototype.renderScreenQuad = function (gl)
 	gl.disable(gl.BLEND);
 	gl.enable(gl.DEPTH_TEST);
 	//gl.enable(gl.POLYGON_OFFSET_FILL);
+
+	shadedColorFbo.unbind(); 
 	
 	for(var i=0; i<8; i++)
 	{
@@ -1445,7 +1461,7 @@ Renderer.prototype.renderScreenQuad2 = function (gl)
 	gl.uniform2fv(currentShader.uNearFarArray_loc, magoManager.frustumVolumeControl.nearFarArray);
 	gl.uniform1i(currentShader.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
 	gl.uniform1f(currentShader.uFCoef_logDepth_loc, sceneState.fCoef_logDepth[0]);
-	
+	gl.uniform3fv(currentShader.uAmbientLight_loc, sceneState.ambientColor);
 	
 
 	var sunSystem = sceneState.sunSystem;
@@ -1491,9 +1507,19 @@ Renderer.prototype.renderScreenQuad2 = function (gl)
 		gl.bindTexture(gl.TEXTURE_2D, null);
 	}
 	*/
+
+	var depthTex = magoManager.depthTex;
+	var normalTex = magoManager.normalTex;
+
+	// DepthTex & NormalTex for edge detection.***
+	gl.activeTexture(gl.TEXTURE0);
+	gl.bindTexture(gl.TEXTURE_2D, depthTex);  
+
+	gl.activeTexture(gl.TEXTURE1); 
+	gl.bindTexture(gl.TEXTURE_2D, normalTex);
 	
 	var bLightFogTex = true;
-	gl.activeTexture(gl.TEXTURE0); 
+	gl.activeTexture(gl.TEXTURE2); 
 	gl.bindTexture(gl.TEXTURE_2D, magoManager.LightFogTex);
 
 	var bScreenSpaceObjectsTex = false;
@@ -1501,9 +1527,13 @@ Renderer.prototype.renderScreenQuad2 = function (gl)
 	if(screenSpaceFBO)
 	{
 		bScreenSpaceObjectsTex = true;
-		gl.activeTexture(gl.TEXTURE1); 
+		gl.activeTexture(gl.TEXTURE3); 
 		gl.bindTexture(gl.TEXTURE_2D, screenSpaceFBO.colorBuffersArray[0]);
 	}
+
+	var shadedColorFbo = magoManager.shadedColorFbo;
+	gl.activeTexture(gl.TEXTURE4); // ssaoTex.***
+	gl.bindTexture(gl.TEXTURE_2D, shadedColorFbo.colorBuffer);
 
 	gl.uniform1iv(currentShader.u_activeTex_loc, [bLightFogTex, bScreenSpaceObjectsTex, 0, 0, 0, 0, 0, 0]);
 	
@@ -1512,8 +1542,7 @@ Renderer.prototype.renderScreenQuad2 = function (gl)
 	gl.enable(gl.BLEND);
 	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); // Original.***
 
-	if (this.screenQuad === undefined)
-	{
+	if (this.screenQuad === undefined) {
 		this.screenQuad = new ScreenQuad(magoManager.vboMemoryManager);
 	}
 	
@@ -2055,6 +2084,10 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 		//texture = depthFboNeo.colorBuffer;
 	}
 	
+	if (magoManager.shadedColorFbo.colorBuffer)
+	{
+		texture = magoManager.shadedColorFbo.colorBuffer;
+	}
 
 	if(magoManager.normalTex)
 	{
@@ -2153,7 +2186,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 			if(waterLayer.demWithBuildingsTex && waterLayer.demWithBuildingsTex.texId)
 			{
-				texture = waterLayer.demWithBuildingsTex.texId;
+				//texture = waterLayer.demWithBuildingsTex.texId;
 			}
 
 			if(waterLayer.dem_texture && waterLayer.dem_texture.texId)

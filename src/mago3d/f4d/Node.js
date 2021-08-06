@@ -581,11 +581,11 @@ Node.prototype.renderContent = function (magoManager, shader, renderType, refMat
 
 	// If this node is a referenceNode type, then, must render all references avoiding the renderingFase.
 	var opacity = 1.0;
-	if(attributes.opacity !== undefined)
-	{
+	if(attributes.opacity !== undefined) {
 		opacity = attributes.opacity;
 	}
 
+	// ******************************************************************************************************************************************************************
 	// In this moment, check if the node is StaticType.***
 	var projectDataType = neoBuilding.metaData.getProjectDataType();
 	
@@ -606,7 +606,7 @@ Node.prototype.renderContent = function (magoManager, shader, renderType, refMat
 			}
 		}
 	}
-	// End checking staticType model.------------------------------------------------------------------------------------------
+	// End checking staticType model.---------------------------------------------------------------------------------------------------------------------------------------
 
 	gl.uniform1f(shader.externalAlpha_loc, 1.0);
 	gl.uniform1f(shader.uModelOpacity_loc, opacity);

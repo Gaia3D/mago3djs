@@ -147,7 +147,7 @@ bool isInShadow(vec4 pointCC, int currSunIdx, inout bool isUnderSun)
 	return inShadow;
 }
 
-/*
+
 void make_kernel(inout vec4 n[9], vec2 coord)
 {
 	float w = 1.0 / screenWidth;
@@ -163,7 +163,7 @@ void make_kernel(inout vec4 n[9], vec2 coord)
 	n[7] = texture2D(depthTex, coord + vec2(0.0, h));
 	n[8] = texture2D(depthTex, coord + vec2(  w, h));
 }
-*/
+
 
 int getRealFrustumIdx(in int estimatedFrustumIdx, inout int dataType)
 {
@@ -238,6 +238,76 @@ float getDepth(vec2 coord)
 	else{
 		return unpackDepth(texture2D(depthTex, coord.xy));
 	}
+}
+
+bool isEdge(vec2 screenPos, vec3 normal, float pixelSize_x, float pixelSize_y)
+{
+	bool bIsEdge = false;
+
+	// 1rst, check by normals.***
+	vec3 normal_up = getNormal(vec2(screenPos.x, screenPos.y + pixelSize_y*1.0)).xyz;
+	vec3 normal_right = getNormal(vec2(screenPos.x + pixelSize_x*1.0, screenPos.y)).xyz;
+	vec3 normal_down = getNormal(vec2(screenPos.x, screenPos.y - pixelSize_y)).xyz;
+	vec3 normal_left = getNormal(vec2(screenPos.x - pixelSize_x, screenPos.y)).xyz;
+
+	float minDot = 0.3;
+
+	if(dot(normal, normal_up) < minDot)
+	{ return true; }
+
+	if(dot(normal, normal_right) < minDot)
+	{ return true; }
+
+	if(dot(normal, normal_down) < minDot)
+	{ return true; }
+
+	if(dot(normal, normal_left) < minDot)
+	{ return true; }
+
+	// Now, check by depth.***
+
+
+	return bIsEdge;
+}
+
+bool isEdge_original(vec2 screenPos, vec3 normal, float pixelSize_x, float pixelSize_y)
+{
+	bool bIsEdge = false;
+
+	// 1rst, check by normals.***
+	vec3 normal_up = getNormal(vec2(screenPos.x, screenPos.y + pixelSize_y*1.0)).xyz;
+	vec3 normal_right = getNormal(vec2(screenPos.x + pixelSize_x*1.0, screenPos.y)).xyz;
+	vec3 normal_upRight = getNormal(vec2(screenPos.x + pixelSize_x, screenPos.y + pixelSize_y)).xyz;
+
+	float minDot = 0.3;
+
+	if(dot(normal, normal_up) < minDot)
+	{ return true; }
+
+	if(dot(normal, normal_right) < minDot)
+	{ return true; }
+
+	if(dot(normal, normal_upRight) < minDot)
+	{ return true; }
+
+	// Now, check by depth.***
+
+
+	return bIsEdge;
+}
+
+vec4 getShadedAlbedo(vec2 screenPos, vec3 lightingDirection, vec3 ambientColor, vec3 directionalLightColor)
+{
+	vec4 albedo = texture2D(albedoTex, screenPos);
+	//vec4 diffuseLight = texture2D(diffuseLightTex, screenPos) + vec4(uSceneDayNightLightingFactor);
+	vec4 normal = getNormal(screenPos);
+
+	float directionalLightWeighting = max(dot(normal.xyz, lightingDirection), 0.0);
+	
+	vec3 lightWeighting = ambientColor + directionalLightColor * directionalLightWeighting; // original.***
+	vec4 shadedAlbedo = albedo * vec4(lightWeighting, 1.0);
+
+	return shadedAlbedo;
 }
 
 void main()
@@ -424,7 +494,7 @@ void main()
 		occlusion = 0.0;// original.***
 
 		float occlInv = 1.0 - occlusion;
-		float lightFactorAux = uSceneDayNightLightingFactor + diffuseLightModul;
+		//float lightFactorAux = uSceneDayNightLightingFactor + diffuseLightModul;
 		vec3 diffuseLight3 = diffuseLight.xyz + vec3(uSceneDayNightLightingFactor);
 
 		// Light factor.***
@@ -484,75 +554,19 @@ void main()
 		*/
 		// Provisionally render edges here.****************************************************************
 		// EDGES.***
-		if(dataType == 0)// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.
+		if(dataType == 0 || dataType == 1)// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.
 		{
-			// detect edges by normals.
-			vec3 normal_up = getNormal(vec2(screenPos.x, screenPos.y + pixelSize_y)).xyz;
-			vec3 normal_right = getNormal(vec2(screenPos.x + pixelSize_x, screenPos.y)).xyz;
-			vec3 normal_down = getNormal(vec2(screenPos.x, screenPos.y - pixelSize_y)).xyz;
-			vec3 normal_left = getNormal(vec2(screenPos.x - pixelSize_x, screenPos.y)).xyz;
-
-			float factor = 0.0;
-			float increF = 0.07 * 2.0;
-			increF = 0.18;
-			float minDot = 0.3;
-
-			if(dot(normal, normal_up) < minDot)
-			{ factor += increF; }
-
-			if(dot(normal, normal_right) < minDot)
-			{ factor += increF; }
-
-			if(dot(normal, normal_down) < minDot)
-			{ factor += increF; }
-
-			if(dot(normal, normal_left) < minDot)
-			{ factor += increF; }
-
-			float edgeAlpha = factor + occlusion;
-			//edgeAlpha /= uSceneDayNightLightingFactor;
-
-			if(edgeAlpha > 1.0)
-			{
-				edgeAlpha = 1.0;
-			}
-			else if(edgeAlpha < 0.2)
-			{
-				edgeAlpha = 0.2;
-			}
-
-			//vec4 edgeColor;
-
-			if(factor > increF*0.9*2.0)
-			{
-				//edgeAlpha = 0.6;
-				vec4 edgeColor = finalColor * 0.6;
+			
+			bool bIsEdge = isEdge_original(screenPos, normal, pixelSize_x, pixelSize_y);
+			
+			if(bIsEdge)
+			{				
+				vec4 edgeColor = finalColor * 0.7;
 				if(isTransparentObject)
-				edgeColor *= 1.5;
+					edgeColor *= 1.5;
 
 				gl_FragColor = vec4(edgeColor.rgb, 1.0);
-			}
-			else if(factor > increF*0.9)
-			{
-				vec4 albedo_up = texture2D(albedoTex, vec2(screenPos.x, screenPos.y + pixelSize_y));
-				vec4 albedo_right = texture2D(albedoTex, vec2(screenPos.x + pixelSize_x, screenPos.y));
-				vec4 albedo_down = texture2D(albedoTex, vec2(screenPos.x, screenPos.y - pixelSize_y));
-				vec4 albedo_left = texture2D(albedoTex, vec2(screenPos.x - pixelSize_x, screenPos.y));
-
-				vec4 edgeColor_A = mix(albedo_up, albedo_right, 0.5);
-				vec4 edgeColor_B = mix(albedo_down, albedo_left, 0.5);
-				vec4 edgeColor_C = mix(edgeColor_A, edgeColor_B, 0.5);
-				vec4 edgeColor_D = mix(edgeColor_C, albedo, 0.5);
-
-				vec4 edgeColorPrev = vec4(edgeColor_D.r * occlInv * diffuseLight3.x, 
-										edgeColor_D.g * occlInv * diffuseLight3.y, 
-										edgeColor_D.b * occlInv * diffuseLight3.z, edgeColor_D.a);
-				vec4 edgeColor = edgeColorPrev * 0.8;
-
-				if(isTransparentObject)
-				edgeColor *= 1.2;
-				gl_FragColor = vec4(edgeColor.rgb, 1.0);
-
+				
 			}
 			
 		}
@@ -596,34 +610,6 @@ void main()
 				}
 			}
 
-			
-			//for(int i=0; i<4; i++)
-			//{
-			//	for(int j=0; j<4; j++)
-			//	{
-			//		vec2 texCoord = vec2(screenPos.x + pixelSize_x*float(i-2), screenPos.y + pixelSize_y*float(j-2));
-
-			//		// calculate current frustum idx.
-			//		vec4 normal4 = getNormal(texCoord);
-			//		int estimatedFrustumIdx = int(floor(normal4.w * 100.0));
-			//		int dataType = -1;
-			//		int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);
-
-			//		if(dataType == 1)
-			//		continue;
-
-			//		vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);
-			//		float currNear = nearFar.x;
-			//		float currFar = nearFar.y;
-			//		float linearDepth = getDepth(texCoord);
-			//		float depth = linearDepth * currFar;
-			//		if(depth > myDepth + radius)
-			//		{
-			//			occ += 1.0;
-			//		}
-			//	}
-			//}
-
 			if(occ > 0.0)
 			{
 				float alpha = occ/8.0;
@@ -641,11 +627,7 @@ void main()
 			}
 		}
 		
-		// TEST DEBUG.***********************************
-		//if(gl_FragColor.r > 0.8 && gl_FragColor.g > 0.8 && gl_FragColor.b > 0.8 )
-		//{
-		//	gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-		//}
+
 
 		// render edges for points cloud.
 		/*
@@ -698,37 +680,4 @@ void main()
 		}
 		*/
 	}
-	
-
-	// check if is fastAntiAlias.***
-	/*
-	if(bFxaa)
-	{
-		vec4 color = texture2D(depthTex, screenPos);
-
-		float pixelSize_x = 1.0/screenWidth;
-		float pixelSize_y = 1.0/screenHeight;
-		vec3 normal = getNormal(screenPos).xyz;
-		vec3 normal_up = getNormal(vec2(screenPos.x, screenPos.y + pixelSize_y)).xyz;
-		vec3 normal_right = getNormal(vec2(screenPos.x + pixelSize_x, screenPos.y)).xyz;
-
-		if(dot(normal, normal_up) < 0.5 || dot(normal, normal_right) < 0.5)
-		{
-			gl_FragColor = vec4(0.0, 0.0, 1.0, 0.5);
-			return;
-		}
-		//if(color.r < 0.0001 && color.g < 0.0001 && color.b < 0.0001)
-		//discard;
-
-		////vec4 n[9];
-		////make_kernel( n, vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight) );
-
-		////vec4 sobel_edge_h = n[2] + (2.0*n[5]) + n[8] - (n[0] + (2.0*n[3]) + n[6]);
-		////vec4 sobel_edge_v = n[0] + (2.0*n[1]) + n[2] - (n[6] + (2.0*n[7]) + n[8]);
-		////vec4 sobel = sqrt((sobel_edge_h * sobel_edge_h) + (sobel_edge_v * sobel_edge_v));
-
-		////gl_FragColor = vec4( 1.0 - sobel.rgb, 1.0 );
-
-	}
-    */
 }

@@ -422,11 +422,11 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
  */
 VtxProfilesList.getTransversalSurface = function(vtxProfile, convexFacesIndicesData, resultSurface)
 {
-	if (resultSurface === undefined)
-	{ resultSurface = new Surface(); }
+	if (resultSurface === undefined) { 
+		resultSurface = new Surface(); 
+	}
 
-	if (convexFacesIndicesData === undefined)
-	{ 
+	if (convexFacesIndicesData === undefined) { 
 		// Calculate the convexFacesIndicesData.
 		var profile2d = vtxProfile.getProjectedProfile2D(undefined);
 		convexFacesIndicesData = profile2d.getConvexFacesIndicesData(convexFacesIndicesData);

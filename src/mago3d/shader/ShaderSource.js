@@ -6217,15 +6217,16 @@ ShaderSource.ScreenQuad2FS = "#ifdef GL_ES\n\
 \n\
 #define M_PI 3.1415926535897932384626433832795\n\
 \n\
-uniform sampler2D lightFogTex; // 0\n\
-uniform sampler2D screenSpaceObjectsTex; // 1\n\
-\n\
+uniform sampler2D depthTex; // 0\n\
+uniform sampler2D normalTex; // 1\n\
+uniform sampler2D lightFogTex; // 2\n\
+uniform sampler2D screenSpaceObjectsTex; // 3\n\
+uniform sampler2D shadedColorTex; // 4\n\
 \n\
 uniform float near;\n\
 uniform float far; \n\
 uniform float tangentOfHalfFovy;\n\
 uniform float aspectRatio;    \n\
-\n\
 \n\
 uniform float screenWidth;    \n\
 uniform float screenHeight;  \n\
@@ -6234,7 +6235,19 @@ uniform bool bUseLogarithmicDepth;\n\
 uniform float uFCoef_logDepth;\n\
 uniform float uSceneDayNightLightingFactor; // day -> 1.0; night -> 0.0\n\
 \n\
+uniform vec3 uAmbientLight;\n\
+\n\
 uniform bool u_activeTex[8];\n\
+\n\
+#ifndef FXAA_REDUCE_MIN\n\
+    #define FXAA_REDUCE_MIN   (1.0/ 128.0)\n\
+#endif\n\
+#ifndef FXAA_REDUCE_MUL\n\
+    #define FXAA_REDUCE_MUL   (1.0 / 8.0)\n\
+#endif\n\
+#ifndef FXAA_SPAN_MAX\n\
+    #define FXAA_SPAN_MAX     8.0\n\
+#endif\n\
 \n\
 \n\
 float unpackDepth(vec4 packedDepth)\n\
@@ -6249,11 +6262,6 @@ float unpackDepth(vec4 packedDepth)\n\
 	//	return enc;\n\
 	//}\n\
 	return dot(packedDepth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
-}\n\
-\n\
-vec4 decodeNormal(in vec4 normal)\n\
-{\n\
-	return vec4(normal.xyz * 2.0 - 1.0, normal.w);\n\
 }\n\
 \n\
 \n\
@@ -6333,11 +6341,206 @@ vec2 getNearFar_byFrustumIdx(in int frustumIdx)\n\
     return nearFar;\n\
 }\n\
 \n\
+vec4 decodeNormal(in vec4 normal)\n\
+{\n\
+	return vec4(normal.xyz * 2.0 - 1.0, normal.w);\n\
+}\n\
 \n\
+vec4 getNormal(in vec2 texCoord)\n\
+{\n\
+    vec4 encodedNormal = texture2D(normalTex, texCoord);\n\
+    return decodeNormal(encodedNormal);\n\
+}\n\
+\n\
+bool isEdge(vec2 screenPos, vec3 normal, float pixelSize_x, float pixelSize_y, inout float edgeRatio)\n\
+{\n\
+	bool bIsEdge = false;\n\
+\n\
+	// 1rst, check by normals.***\n\
+	vec3 normal_up = getNormal(vec2(screenPos.x, screenPos.y + pixelSize_y)).xyz;\n\
+	vec3 normal_right = getNormal(vec2(screenPos.x + pixelSize_x, screenPos.y)).xyz;\n\
+	vec3 normal_down = getNormal(vec2(screenPos.x, screenPos.y - pixelSize_y)).xyz;\n\
+	vec3 normal_left = getNormal(vec2(screenPos.x - pixelSize_x, screenPos.y)).xyz;\n\
+\n\
+	float minDot = 0.3;\n\
+    edgeRatio = 0.0;\n\
+\n\
+	if(dot(normal, normal_up) < minDot)\n\
+	{ edgeRatio += 1.0; }\n\
+\n\
+	if(dot(normal, normal_right) < minDot)\n\
+	{ edgeRatio += 1.0; }\n\
+\n\
+	if(dot(normal, normal_down) < minDot)\n\
+	{ edgeRatio += 1.0; }\n\
+\n\
+	if(dot(normal, normal_left) < minDot)\n\
+	{ edgeRatio += 1.0; }\n\
+\n\
+	// Now, check by depth.***\n\
+    if(edgeRatio > 0.0)\n\
+    bIsEdge = true;\n\
+\n\
+    edgeRatio /= 4.0;\n\
+\n\
+	return bIsEdge;\n\
+}\n\
+\n\
+bool isEdge_3x3(vec2 screenPos, vec3 normal, float pixelSize_x, float pixelSize_y, inout float edgeRatio)\n\
+{\n\
+	bool bIsEdge = false;\n\
+\n\
+	// 1rst, check by normals.***\n\
+	vec3 normal_up = getNormal(vec2(screenPos.x, screenPos.y + pixelSize_y)).xyz;\n\
+	vec3 normal_right = getNormal(vec2(screenPos.x + pixelSize_x, screenPos.y)).xyz;\n\
+	vec3 normal_down = getNormal(vec2(screenPos.x, screenPos.y - pixelSize_y)).xyz;\n\
+	vec3 normal_left = getNormal(vec2(screenPos.x - pixelSize_x, screenPos.y)).xyz;\n\
+\n\
+    vec3 normal_upRight = getNormal(vec2(screenPos.x + pixelSize_x, screenPos.y + pixelSize_y)).xyz;\n\
+	vec3 normal_upLeft = getNormal(vec2(screenPos.x - pixelSize_x, screenPos.y + pixelSize_y)).xyz;\n\
+	vec3 normal_downRight = getNormal(vec2(screenPos.x + pixelSize_x, screenPos.y - pixelSize_y)).xyz;\n\
+	vec3 normal_downLeft = getNormal(vec2(screenPos.x - pixelSize_x, screenPos.y - pixelSize_y)).xyz;\n\
+\n\
+	float minDot = 0.3;\n\
+    edgeRatio = 0.0;\n\
+\n\
+	if(dot(normal, normal_up) < minDot)\n\
+	{ edgeRatio += 1.0; }\n\
+\n\
+	if(dot(normal, normal_right) < minDot)\n\
+	{ edgeRatio += 1.0; }\n\
+\n\
+	if(dot(normal, normal_down) < minDot)\n\
+	{ edgeRatio += 1.0; }\n\
+\n\
+	if(dot(normal, normal_left) < minDot)\n\
+	{ edgeRatio += 1.0; }\n\
+\n\
+    if(dot(normal, normal_upRight) < minDot)\n\
+	{ edgeRatio += 1.0; }\n\
+\n\
+	if(dot(normal, normal_upLeft) < minDot)\n\
+	{ edgeRatio += 1.0; }\n\
+\n\
+	if(dot(normal, normal_downRight) < minDot)\n\
+	{ edgeRatio += 1.0; }\n\
+\n\
+	if(dot(normal, normal_downLeft) < minDot)\n\
+	{ edgeRatio += 1.0; }\n\
+\n\
+	// Now, check by depth.***\n\
+    if(edgeRatio > 0.0)\n\
+    bIsEdge = true;\n\
+\n\
+    edgeRatio /= 8.0;\n\
+\n\
+	return bIsEdge;\n\
+}\n\
+\n\
+bool isEdge_original(vec2 screenPos, vec3 normal, float pixelSize_x, float pixelSize_y, inout float edgeRatio)\n\
+{\n\
+	bool bIsEdge = false;\n\
+\n\
+	// 1rst, check by normals.***\n\
+	vec3 normal_up = getNormal(vec2(screenPos.x, screenPos.y + pixelSize_y*1.0)).xyz;\n\
+	vec3 normal_right = getNormal(vec2(screenPos.x + pixelSize_x*1.0, screenPos.y)).xyz;\n\
+	vec3 normal_upRight = getNormal(vec2(screenPos.x + pixelSize_x, screenPos.y + pixelSize_y)).xyz;\n\
+\n\
+	float minDot = 0.3;\n\
+    edgeRatio = 0.0;\n\
+\n\
+	if(dot(normal, normal_up) < minDot)\n\
+	{ edgeRatio += 1.0; }\n\
+\n\
+	if(dot(normal, normal_right) < minDot)\n\
+	{ edgeRatio += 1.0; }\n\
+\n\
+	if(dot(normal, normal_upRight) < minDot)\n\
+	{ edgeRatio += 1.0; }\n\
+\n\
+	// Now, check by depth.***\n\
+    if(edgeRatio > 0.0)\n\
+    bIsEdge = true;\n\
+\n\
+    edgeRatio /= 3.0;\n\
+\n\
+	return bIsEdge;\n\
+}\n\
+\n\
+vec4 getShadedAlbedo(vec2 screenPos)\n\
+{\n\
+	return texture2D(shadedColorTex, screenPos);\n\
+}\n\
+\n\
+void make_kernel(inout vec4 n[9], vec2 coord)\n\
+{\n\
+	float w = 1.0 / screenWidth;\n\
+	float h = 1.0 / screenHeight;\n\
+\n\
+	n[0] = texture2D(normalTex, coord + vec2( -w, -h));\n\
+	n[1] = texture2D(normalTex, coord + vec2(0.0, -h));\n\
+	n[2] = texture2D(normalTex, coord + vec2(  w, -h));\n\
+	n[3] = texture2D(normalTex, coord + vec2( -w, 0.0));\n\
+	n[4] = texture2D(normalTex, coord);\n\
+	n[5] = texture2D(normalTex, coord + vec2(  w, 0.0));\n\
+	n[6] = texture2D(normalTex, coord + vec2( -w, h));\n\
+	n[7] = texture2D(normalTex, coord + vec2(0.0, h));\n\
+	n[8] = texture2D(normalTex, coord + vec2(  w, h));\n\
+}\n\
+\n\
+vec4 fxaa(vec2 fragCoord, vec2 resolution,\n\
+            vec2 v_rgbNW, vec2 v_rgbNE, \n\
+            vec2 v_rgbSW, vec2 v_rgbSE, \n\
+            vec2 v_rgbM) {\n\
+    vec4 color;\n\
+    mediump vec2 inverseVP = vec2(1.0 / resolution.x, 1.0 / resolution.y);\n\
+    vec3 rgbNW = texture2D(shadedColorTex, v_rgbNW).xyz;\n\
+    vec3 rgbNE = texture2D(shadedColorTex, v_rgbNE).xyz;\n\
+    vec3 rgbSW = texture2D(shadedColorTex, v_rgbSW).xyz;\n\
+    vec3 rgbSE = texture2D(shadedColorTex, v_rgbSE).xyz;\n\
+    vec4 texColor = texture2D(shadedColorTex, v_rgbM);\n\
+    vec3 rgbM  = texColor.xyz;\n\
+    vec3 luma = vec3(0.299, 0.587, 0.114);\n\
+    float lumaNW = dot(rgbNW, luma);\n\
+    float lumaNE = dot(rgbNE, luma);\n\
+    float lumaSW = dot(rgbSW, luma);\n\
+    float lumaSE = dot(rgbSE, luma);\n\
+    float lumaM  = dot(rgbM,  luma);\n\
+    float lumaMin = min(lumaM, min(min(lumaNW, lumaNE), min(lumaSW, lumaSE)));\n\
+    float lumaMax = max(lumaM, max(max(lumaNW, lumaNE), max(lumaSW, lumaSE)));\n\
+    \n\
+    mediump vec2 dir;\n\
+    dir.x = -((lumaNW + lumaNE) - (lumaSW + lumaSE));\n\
+    dir.y =  ((lumaNW + lumaSW) - (lumaNE + lumaSE));\n\
+    \n\
+    float dirReduce = max((lumaNW + lumaNE + lumaSW + lumaSE) *\n\
+                          (0.25 * FXAA_REDUCE_MUL), FXAA_REDUCE_MIN);\n\
+    \n\
+    float rcpDirMin = 1.0 / (min(abs(dir.x), abs(dir.y)) + dirReduce);\n\
+    dir = min(vec2(FXAA_SPAN_MAX, FXAA_SPAN_MAX),\n\
+              max(vec2(-FXAA_SPAN_MAX, -FXAA_SPAN_MAX),\n\
+              dir * rcpDirMin)) * inverseVP;\n\
+    \n\
+    vec3 rgbA = 0.5 * (\n\
+        texture2D(shadedColorTex, fragCoord * inverseVP + dir * (1.0 / 3.0 - 0.5)).xyz +\n\
+        texture2D(shadedColorTex, fragCoord * inverseVP + dir * (2.0 / 3.0 - 0.5)).xyz);\n\
+    vec3 rgbB = rgbA * 0.5 + 0.25 * (\n\
+        texture2D(shadedColorTex, fragCoord * inverseVP + dir * -0.5).xyz +\n\
+        texture2D(shadedColorTex, fragCoord * inverseVP + dir * 0.5).xyz);\n\
+\n\
+    float lumaB = dot(rgbB, luma);\n\
+    if ((lumaB < lumaMin) || (lumaB > lumaMax))\n\
+        color = vec4(rgbA, texColor.a);\n\
+    else\n\
+        color = vec4(rgbB, texColor.a);\n\
+    return color;\n\
+}\n\
 \n\
 void main()\n\
 {\n\
 	vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
+    float pixelSize_x = 1.0/screenWidth;\n\
+	float pixelSize_y = 1.0/screenHeight;\n\
 \n\
     // check for \"screenSpaceObjectsTex\".\n\
     vec4 screenSpaceColor4;\n\
@@ -6346,9 +6549,46 @@ void main()\n\
         screenSpaceColor4 = texture2D(screenSpaceObjectsTex, screenPos);\n\
         gl_FragColor = screenSpaceColor4;\n\
 \n\
-        if(screenSpaceColor4.a > 0.0)\n\
-        return;\n\
+        //if(screenSpaceColor4.a > 0.0)\n\
+        //return;\n\
     }\n\
+\n\
+	vec4 shadedColor = texture2D(shadedColorTex, screenPos);\n\
+	bool bIsEdge = false;\n\
+\n\
+	vec4 n[9];\n\
+    make_kernel(n, screenPos);\n\
+    vec4 sobel_edge_h = n[2] + (2.0*n[5]) + n[8] - (n[0] + (2.0*n[3]) + n[6]);\n\
+	vec4 sobel_edge_v = n[0] + (2.0*n[1]) + n[2] - (n[6] + (2.0*n[7]) + n[8]);\n\
+	vec4 sobel = sqrt((sobel_edge_h * sobel_edge_h) + (sobel_edge_v * sobel_edge_v));\n\
+	float sobelModul = length(sobel.rgb);\n\
+	\n\
+	if(sobelModul > 0.001)\n\
+	{\n\
+		bIsEdge = true;\n\
+	}\n\
+\n\
+	// Edge detection.\n\
+	// https://www.geeks3d.com/20110405/fxaa-fast-approximate-anti-aliasing-demo-glsl-opengl-test-radeon-geforce/3/\n\
+    vec4 normal = getNormal(screenPos);\n\
+    float edgeRatio;\n\
+    //bIsEdge = isEdge_3x3(screenPos, normal.xyz, pixelSize_x, pixelSize_y, edgeRatio);\n\
+    \n\
+\n\
+\n\
+	if(bIsEdge)\n\
+	{\n\
+		// fxaa.*********************************************************************************************************\n\
+		// https://www.programmersought.com/article/75321121466/\n\
+		vec2 uv_nw = vec2(screenPos.x - pixelSize_x, screenPos.y + pixelSize_y);\n\
+		vec2 uv_ne = vec2(screenPos.x + pixelSize_x, screenPos.y + pixelSize_y);\n\
+		vec2 uv_sw = vec2(screenPos.x - pixelSize_x, screenPos.y - pixelSize_y);\n\
+		vec2 uv_se = vec2(screenPos.x + pixelSize_x, screenPos.y - pixelSize_y);\n\
+		vec4 colorFxaa = fxaa(gl_FragCoord.xy, vec2(screenWidth, screenHeight), uv_nw, uv_ne, uv_sw, uv_se, screenPos);\n\
+		shadedColor = colorFxaa;\n\
+		//---------------------------------------------------------------------------------------------------------------\n\
+	}\n\
+\n\
 \n\
     // Check for light fog.\n\
     if(u_activeTex[0])\n\
@@ -6357,10 +6597,13 @@ void main()\n\
         float alpha = lightFog4.w;\n\
         if(alpha > 0.6)\n\
         alpha = 0.6;\n\
+        \n\
+        vec4 finalColor = mix(shadedColor, lightFog4, alpha);\n\
+        //gl_FragColor = vec4(lightFog4.x, lightFog4.y, lightFog4.z, alpha);\n\
 \n\
-        gl_FragColor = vec4(lightFog4.x, lightFog4.y, lightFog4.z, alpha);\n\
+        gl_FragColor = finalColor;\n\
     }\n\
-\n\
+    \n\
     \n\
 }";
 ShaderSource.ScreenQuadFS = "#ifdef GL_ES\n\
@@ -6512,7 +6755,7 @@ bool isInShadow(vec4 pointCC, int currSunIdx, inout bool isUnderSun)\n\
 	return inShadow;\n\
 }\n\
 \n\
-/*\n\
+\n\
 void make_kernel(inout vec4 n[9], vec2 coord)\n\
 {\n\
 	float w = 1.0 / screenWidth;\n\
@@ -6528,7 +6771,7 @@ void make_kernel(inout vec4 n[9], vec2 coord)\n\
 	n[7] = texture2D(depthTex, coord + vec2(0.0, h));\n\
 	n[8] = texture2D(depthTex, coord + vec2(  w, h));\n\
 }\n\
-*/\n\
+\n\
 \n\
 int getRealFrustumIdx(in int estimatedFrustumIdx, inout int dataType)\n\
 {\n\
@@ -6603,6 +6846,76 @@ float getDepth(vec2 coord)\n\
 	else{\n\
 		return unpackDepth(texture2D(depthTex, coord.xy));\n\
 	}\n\
+}\n\
+\n\
+bool isEdge(vec2 screenPos, vec3 normal, float pixelSize_x, float pixelSize_y)\n\
+{\n\
+	bool bIsEdge = false;\n\
+\n\
+	// 1rst, check by normals.***\n\
+	vec3 normal_up = getNormal(vec2(screenPos.x, screenPos.y + pixelSize_y*1.0)).xyz;\n\
+	vec3 normal_right = getNormal(vec2(screenPos.x + pixelSize_x*1.0, screenPos.y)).xyz;\n\
+	vec3 normal_down = getNormal(vec2(screenPos.x, screenPos.y - pixelSize_y)).xyz;\n\
+	vec3 normal_left = getNormal(vec2(screenPos.x - pixelSize_x, screenPos.y)).xyz;\n\
+\n\
+	float minDot = 0.3;\n\
+\n\
+	if(dot(normal, normal_up) < minDot)\n\
+	{ return true; }\n\
+\n\
+	if(dot(normal, normal_right) < minDot)\n\
+	{ return true; }\n\
+\n\
+	if(dot(normal, normal_down) < minDot)\n\
+	{ return true; }\n\
+\n\
+	if(dot(normal, normal_left) < minDot)\n\
+	{ return true; }\n\
+\n\
+	// Now, check by depth.***\n\
+\n\
+\n\
+	return bIsEdge;\n\
+}\n\
+\n\
+bool isEdge_original(vec2 screenPos, vec3 normal, float pixelSize_x, float pixelSize_y)\n\
+{\n\
+	bool bIsEdge = false;\n\
+\n\
+	// 1rst, check by normals.***\n\
+	vec3 normal_up = getNormal(vec2(screenPos.x, screenPos.y + pixelSize_y*1.0)).xyz;\n\
+	vec3 normal_right = getNormal(vec2(screenPos.x + pixelSize_x*1.0, screenPos.y)).xyz;\n\
+	vec3 normal_upRight = getNormal(vec2(screenPos.x + pixelSize_x, screenPos.y + pixelSize_y)).xyz;\n\
+\n\
+	float minDot = 0.3;\n\
+\n\
+	if(dot(normal, normal_up) < minDot)\n\
+	{ return true; }\n\
+\n\
+	if(dot(normal, normal_right) < minDot)\n\
+	{ return true; }\n\
+\n\
+	if(dot(normal, normal_upRight) < minDot)\n\
+	{ return true; }\n\
+\n\
+	// Now, check by depth.***\n\
+\n\
+\n\
+	return bIsEdge;\n\
+}\n\
+\n\
+vec4 getShadedAlbedo(vec2 screenPos, vec3 lightingDirection, vec3 ambientColor, vec3 directionalLightColor)\n\
+{\n\
+	vec4 albedo = texture2D(albedoTex, screenPos);\n\
+	//vec4 diffuseLight = texture2D(diffuseLightTex, screenPos) + vec4(uSceneDayNightLightingFactor);\n\
+	vec4 normal = getNormal(screenPos);\n\
+\n\
+	float directionalLightWeighting = max(dot(normal.xyz, lightingDirection), 0.0);\n\
+	\n\
+	vec3 lightWeighting = ambientColor + directionalLightColor * directionalLightWeighting; // original.***\n\
+	vec4 shadedAlbedo = albedo * vec4(lightWeighting, 1.0);\n\
+\n\
+	return shadedAlbedo;\n\
 }\n\
 \n\
 void main()\n\
@@ -6789,7 +7102,7 @@ void main()\n\
 		occlusion = 0.0;// original.***\n\
 \n\
 		float occlInv = 1.0 - occlusion;\n\
-		float lightFactorAux = uSceneDayNightLightingFactor + diffuseLightModul;\n\
+		//float lightFactorAux = uSceneDayNightLightingFactor + diffuseLightModul;\n\
 		vec3 diffuseLight3 = diffuseLight.xyz + vec3(uSceneDayNightLightingFactor);\n\
 \n\
 		// Light factor.***\n\
@@ -6849,75 +7162,19 @@ void main()\n\
 		*/\n\
 		// Provisionally render edges here.****************************************************************\n\
 		// EDGES.***\n\
-		if(dataType == 0)// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.\n\
+		if(dataType == 0 || dataType == 1)// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.\n\
 		{\n\
-			// detect edges by normals.\n\
-			vec3 normal_up = getNormal(vec2(screenPos.x, screenPos.y + pixelSize_y)).xyz;\n\
-			vec3 normal_right = getNormal(vec2(screenPos.x + pixelSize_x, screenPos.y)).xyz;\n\
-			vec3 normal_down = getNormal(vec2(screenPos.x, screenPos.y - pixelSize_y)).xyz;\n\
-			vec3 normal_left = getNormal(vec2(screenPos.x - pixelSize_x, screenPos.y)).xyz;\n\
-\n\
-			float factor = 0.0;\n\
-			float increF = 0.07 * 2.0;\n\
-			increF = 0.18;\n\
-			float minDot = 0.3;\n\
-\n\
-			if(dot(normal, normal_up) < minDot)\n\
-			{ factor += increF; }\n\
-\n\
-			if(dot(normal, normal_right) < minDot)\n\
-			{ factor += increF; }\n\
-\n\
-			if(dot(normal, normal_down) < minDot)\n\
-			{ factor += increF; }\n\
-\n\
-			if(dot(normal, normal_left) < minDot)\n\
-			{ factor += increF; }\n\
-\n\
-			float edgeAlpha = factor + occlusion;\n\
-			//edgeAlpha /= uSceneDayNightLightingFactor;\n\
-\n\
-			if(edgeAlpha > 1.0)\n\
-			{\n\
-				edgeAlpha = 1.0;\n\
-			}\n\
-			else if(edgeAlpha < 0.2)\n\
-			{\n\
-				edgeAlpha = 0.2;\n\
-			}\n\
-\n\
-			//vec4 edgeColor;\n\
-\n\
-			if(factor > increF*0.9*2.0)\n\
-			{\n\
-				//edgeAlpha = 0.6;\n\
-				vec4 edgeColor = finalColor * 0.6;\n\
+			\n\
+			bool bIsEdge = isEdge_original(screenPos, normal, pixelSize_x, pixelSize_y);\n\
+			\n\
+			if(bIsEdge)\n\
+			{				\n\
+				vec4 edgeColor = finalColor * 0.7;\n\
 				if(isTransparentObject)\n\
-				edgeColor *= 1.5;\n\
+					edgeColor *= 1.5;\n\
 \n\
 				gl_FragColor = vec4(edgeColor.rgb, 1.0);\n\
-			}\n\
-			else if(factor > increF*0.9)\n\
-			{\n\
-				vec4 albedo_up = texture2D(albedoTex, vec2(screenPos.x, screenPos.y + pixelSize_y));\n\
-				vec4 albedo_right = texture2D(albedoTex, vec2(screenPos.x + pixelSize_x, screenPos.y));\n\
-				vec4 albedo_down = texture2D(albedoTex, vec2(screenPos.x, screenPos.y - pixelSize_y));\n\
-				vec4 albedo_left = texture2D(albedoTex, vec2(screenPos.x - pixelSize_x, screenPos.y));\n\
-\n\
-				vec4 edgeColor_A = mix(albedo_up, albedo_right, 0.5);\n\
-				vec4 edgeColor_B = mix(albedo_down, albedo_left, 0.5);\n\
-				vec4 edgeColor_C = mix(edgeColor_A, edgeColor_B, 0.5);\n\
-				vec4 edgeColor_D = mix(edgeColor_C, albedo, 0.5);\n\
-\n\
-				vec4 edgeColorPrev = vec4(edgeColor_D.r * occlInv * diffuseLight3.x, \n\
-										edgeColor_D.g * occlInv * diffuseLight3.y, \n\
-										edgeColor_D.b * occlInv * diffuseLight3.z, edgeColor_D.a);\n\
-				vec4 edgeColor = edgeColorPrev * 0.8;\n\
-\n\
-				if(isTransparentObject)\n\
-				edgeColor *= 1.2;\n\
-				gl_FragColor = vec4(edgeColor.rgb, 1.0);\n\
-\n\
+				\n\
 			}\n\
 			\n\
 		}\n\
@@ -6961,34 +7218,6 @@ void main()\n\
 				}\n\
 			}\n\
 \n\
-			\n\
-			//for(int i=0; i<4; i++)\n\
-			//{\n\
-			//	for(int j=0; j<4; j++)\n\
-			//	{\n\
-			//		vec2 texCoord = vec2(screenPos.x + pixelSize_x*float(i-2), screenPos.y + pixelSize_y*float(j-2));\n\
-\n\
-			//		// calculate current frustum idx.\n\
-			//		vec4 normal4 = getNormal(texCoord);\n\
-			//		int estimatedFrustumIdx = int(floor(normal4.w * 100.0));\n\
-			//		int dataType = -1;\n\
-			//		int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);\n\
-\n\
-			//		if(dataType == 1)\n\
-			//		continue;\n\
-\n\
-			//		vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);\n\
-			//		float currNear = nearFar.x;\n\
-			//		float currFar = nearFar.y;\n\
-			//		float linearDepth = getDepth(texCoord);\n\
-			//		float depth = linearDepth * currFar;\n\
-			//		if(depth > myDepth + radius)\n\
-			//		{\n\
-			//			occ += 1.0;\n\
-			//		}\n\
-			//	}\n\
-			//}\n\
-\n\
 			if(occ > 0.0)\n\
 			{\n\
 				float alpha = occ/8.0;\n\
@@ -7006,11 +7235,7 @@ void main()\n\
 			}\n\
 		}\n\
 		\n\
-		// TEST DEBUG.***********************************\n\
-		//if(gl_FragColor.r > 0.8 && gl_FragColor.g > 0.8 && gl_FragColor.b > 0.8 )\n\
-		//{\n\
-		//	gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n\
-		//}\n\
+\n\
 \n\
 		// render edges for points cloud.\n\
 		/*\n\
@@ -7063,39 +7288,6 @@ void main()\n\
 		}\n\
 		*/\n\
 	}\n\
-	\n\
-\n\
-	// check if is fastAntiAlias.***\n\
-	/*\n\
-	if(bFxaa)\n\
-	{\n\
-		vec4 color = texture2D(depthTex, screenPos);\n\
-\n\
-		float pixelSize_x = 1.0/screenWidth;\n\
-		float pixelSize_y = 1.0/screenHeight;\n\
-		vec3 normal = getNormal(screenPos).xyz;\n\
-		vec3 normal_up = getNormal(vec2(screenPos.x, screenPos.y + pixelSize_y)).xyz;\n\
-		vec3 normal_right = getNormal(vec2(screenPos.x + pixelSize_x, screenPos.y)).xyz;\n\
-\n\
-		if(dot(normal, normal_up) < 0.5 || dot(normal, normal_right) < 0.5)\n\
-		{\n\
-			gl_FragColor = vec4(0.0, 0.0, 1.0, 0.5);\n\
-			return;\n\
-		}\n\
-		//if(color.r < 0.0001 && color.g < 0.0001 && color.b < 0.0001)\n\
-		//discard;\n\
-\n\
-		////vec4 n[9];\n\
-		////make_kernel( n, vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight) );\n\
-\n\
-		////vec4 sobel_edge_h = n[2] + (2.0*n[5]) + n[8] - (n[0] + (2.0*n[3]) + n[6]);\n\
-		////vec4 sobel_edge_v = n[0] + (2.0*n[1]) + n[2] - (n[6] + (2.0*n[7]) + n[8]);\n\
-		////vec4 sobel = sqrt((sobel_edge_h * sobel_edge_h) + (sobel_edge_v * sobel_edge_v));\n\
-\n\
-		////gl_FragColor = vec4( 1.0 - sobel.rgb, 1.0 );\n\
-\n\
-	}\n\
-    */\n\
 }";
 ShaderSource.ScreenQuadVS = "precision mediump float;\n\
 \n\

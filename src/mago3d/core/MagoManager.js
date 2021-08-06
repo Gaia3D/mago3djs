@@ -643,8 +643,9 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 		}
 		
 		var fromSmartTile = node.data.attributes.fromSmartTile;
-		if (fromSmartTile === undefined)
-		{ fromSmartTile = false; }
+		if (fromSmartTile === undefined) { 
+			fromSmartTile = false; 
+		}
 
 		// check if this building is ready to render.***
 		if (neoBuilding)
@@ -656,9 +657,11 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 				if (!fromSmartTile) // load only if this no is NO from a smartTile.***
 				{
 					projectFolderName = neoBuilding.projectFolderName;
-					if (this.fileRequestControler.isFullHeaders())	{ return; }
+					if (this.fileRequestControler.isFullHeaders()) { 
+						return; 
+					}
+
 					var neoBuildingHeaderPath = geometryDataPath + "/" + projectFolderName + "/" + neoBuilding.buildingFileName + "/HeaderAsimetric.hed";
-					
 					this.readerWriter.getNeoHeaderAsimetricVersion(gl, neoBuildingHeaderPath, neoBuilding, this.readerWriter, this); // Here makes the tree of octree.***
 				}
 			}
@@ -667,11 +670,14 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 				var bytesReaded = 0;
 				neoBuilding.parseHeader(neoBuilding.headerDataArrayBuffer, bytesReaded);
 				//헤더 파싱 후 높이 보정 대상 확인
-				if (node.isNeedValidHeight(this)) { this._needValidHeightNodeArray.push(node); }
+				if (node.isNeedValidHeight(this)) { 
+					this._needValidHeightNodeArray.push(node); 
+				}
 
 				counter++;
-				if (counter > 60)
-				{ break; }
+				if (counter > 60) { 
+					break; 
+				}
 			}
 		}
 		
@@ -1705,6 +1711,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 	// Create a simpleFramebufferAux.***
 	if (this.framebufferAux === undefined) { this.framebufferAux = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
 	if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
+	if (this.shadedColorFbo === undefined) { this.shadedColorFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
 
 	var bUseMultiRenderTarget = this.postFxShadersManager.bUseMultiRenderTarget;
 	
@@ -1755,8 +1762,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 				this.extbuffers.COLOR_ATTACHMENT3_WEBGL  // gl_FragData[4] - selColor4
 				]);
 
-				if(this.isFarestFrustum())
-				{
+				if(this.isFarestFrustum()) {
 					this.selectionManager.clearCandidates();
 				}
 				
@@ -1772,7 +1778,6 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 				]);
 		}
 
-		
 		
 		if(this.isFarestFrustum())
 		{
@@ -1796,7 +1801,6 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 			]);
 		
 		this.renderer.renderTerrainCopy();
-		
 		// end test.---------------------------------------------------------------------------------------------------
 
 		if (scene && scene._context && scene._context._currentFramebuffer) 
@@ -1807,20 +1811,6 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 			if(!this.extbuffers)
 			this.extbuffers = gl.getExtension("WEBGL_draw_buffers");
 
-			/*
-			// Bind mago colorTextures:
-			gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.depthTex, 0);
-			gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, this.normalTex, 0);
-			gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, this.albedoTex, 0);
-
-			this.extbuffers.drawBuffersWEBGL([
-				this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
-				this.extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - depthTex
-				this.extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - normalTex
-				this.extbuffers.COLOR_ATTACHMENT3_WEBGL // gl_FragData[3] - albedoTex
-			  ]);
-			  */
-			  
 			if(this.isCameraMoved)
 			{
 				// Attach the selColorBuffer.***
@@ -2046,16 +2036,19 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 			// End rendering lightBuffer.--------------------------------------------
 		}
 
-		// Do ssaoFromDepth render.
+		// Do ssaoFromDepth render. Renders in ssaoFrameBuffer.***
 		this.renderer.renderSsaoFromDepth(gl);
 
-		if (this.isCesiumGlobe())
-		{
-			this.bindMainFramebuffer();
-		}
+		//if (this.isCesiumGlobe()) {
+		//	this.bindMainFramebuffer();
+		//}
 
 		// Final render output.**************************************************************
-		this.renderer.renderScreenQuad(gl); // 1rst screenQuad. (ssao, lighting, shadows)
+		this.renderer.renderScreenQuad(gl); // 1rst screenQuad. (ssao, lighting, shadows) // this must be rendered in a framebuffer.***
+
+		if (this.isCesiumGlobe()) {
+			this.bindMainFramebuffer();
+		}
 		this.renderer.renderScreenQuad2(gl); // 2nd screenQuad. (lightFog)
 
 		this.renderCluster();
@@ -6367,11 +6360,18 @@ MagoManager.prototype.createDefaultShaders = function (gl)
 	var ssao_vs_source = ShaderSource.ScreenQuadVS;
 	var ssao_fs_source = ShaderSource.ScreenQuad2FS;
 	var shader = this.postFxShadersManager.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this);
-	shader.lightFogTex_loc = gl.getUniformLocation(shader.program, "lightFogTex");
+	shader.depthTex_loc = gl.getUniformLocation(shader.program, "depthTex");
+	shader.normalTex_loc = gl.getUniformLocation(shader.program, "normalTex");
+	shader.lightFogTex_loc = gl.getUniformLocation(shader.program, "lightFogTex");//
+	shader.shadedColorTex_loc = gl.getUniformLocation(shader.program, "shadedColorTex");//
 	shader.screenSpaceObjectsTex_loc = gl.getUniformLocation(shader.program, "screenSpaceObjectsTex");
+	shader.uAmbientLight_loc = gl.getUniformLocation(shader.program, "uAmbientLight");
 	this.postFxShadersManager.useProgram(shader);
-	gl.uniform1i(shader.lightFogTex_loc, 0);
-	gl.uniform1i(shader.screenSpaceObjectsTex_loc, 1);
+	gl.uniform1i(shader.depthTex_loc, 0);
+	gl.uniform1i(shader.normalTex_loc, 1);
+	gl.uniform1i(shader.lightFogTex_loc, 2);
+	gl.uniform1i(shader.screenSpaceObjectsTex_loc, 3);
+	gl.uniform1i(shader.shadedColorTex_loc, 4);
 
 	shader.uNearFarArray_loc = gl.getUniformLocation(shader.program, "uNearFarArray");
 	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
