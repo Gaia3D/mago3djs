@@ -6590,11 +6590,8 @@ void main()\n\
         alpha = 0.6;\n\
         \n\
         vec4 finalColor = mix(shadedColor, lightFog4, alpha);\n\
-        //gl_FragColor = vec4(lightFog4.x, lightFog4.y, lightFog4.z, alpha);\n\
-\n\
         gl_FragColor = finalColor;\n\
     }\n\
-    \n\
     \n\
 }";
 ShaderSource.ScreenQuadFS = "#ifdef GL_ES\n\
@@ -6937,14 +6934,17 @@ vec3 HSVtoRGB(in vec3 HSV)\n\
 \n\
 vec4 HueSatBright_color(vec4 color4, float saturation)\n\
 {\n\
+	// https://stackoverflow.com/questions/53879537/increase-the-intensity-of-texture-in-shader-code-opengl\n\
 	vec4 color = color4;\n\
 	vec3 hsv = RGBtoHSV(color.rgb);\n\
 \n\
+	// saturation range : -1.0 to 1.0\n\
 	/*\n\
 	saturation is a value in the range [0.0, 1.0]. 0.5 means that the image is kept as it is. \n\
 	It saturation is greater 0.5 the image is saturated and if it is less than 0.5 the image is bleached\n\
 	*/\n\
-	hsv.y *= (saturation * 2.0);\n\
+	float sat = saturation + 0.5;\n\
+	hsv.y *= (sat * 2.0);\n\
 \n\
 	color.rgb = HSVtoRGB(hsv);\n\
 \n\
@@ -6954,7 +6954,10 @@ vec4 HueSatBright_color(vec4 color4, float saturation)\n\
 \n\
 vec3 brightnessContrast(vec3 value, float brightness, float contrast)\n\
 {\n\
-    return (value - 0.5) * contrast + 0.5 + brightness;\n\
+	// contrast range : -1.0 to 1.0\n\
+	// brightness range : -1.0 to 1.0\n\
+	float internContrast = contrast + 1.0;\n\
+    return (value - 0.5) * internContrast + 0.5 + brightness;\n\
 }\n\
 \n\
 vec3 Gamma(vec3 value, float param)\n\
@@ -7105,9 +7108,9 @@ void main()\n\
 	{\n\
 		if(dataType == 0)\n\
 		{\n\
-			float brightness = uBrightnessContrastSaturation.x;\n\
-			float contrast = uBrightnessContrastSaturation.y;\n\
-			float saturation = uBrightnessContrastSaturation.z;\n\
+			float brightness = uBrightnessContrastSaturation.x; // range [0.0, 1.0].\n\
+			float contrast = uBrightnessContrastSaturation.y; // range [0.0, 1.0].\n\
+			float saturation = uBrightnessContrastSaturation.z; // range [0.0, 1.0].\n\
 			albedo.rgb = brightnessContrast(albedo.rgb, brightness, contrast);\n\
 			albedo = HueSatBright_color(albedo, saturation);\n\
 \n\
@@ -7116,19 +7119,15 @@ void main()\n\
 	}\n\
 	else if(uBrightnessContrastType == 1) // apply brightness & contrast for f4d objects and terrain\n\
 	{\n\
-		float brightness = uBrightnessContrastSaturation.x;\n\
-		float contrast = uBrightnessContrastSaturation.y;\n\
-		float saturation = uBrightnessContrastSaturation.z;\n\
+		float brightness = uBrightnessContrastSaturation.x; // range [0.0, 1.0].\n\
+		float contrast = uBrightnessContrastSaturation.y; // range [0.0, 1.0].\n\
+		float saturation = uBrightnessContrastSaturation.z; // range [0.0, 1.0].\n\
 		albedo.rgb = brightnessContrast(albedo.rgb, brightness, contrast);\n\
 		albedo = HueSatBright_color(albedo, saturation);\n\
 \n\
 		//albedo.rgb = Gamma(albedo.rgb, 1.1);\n\
 	}\n\
-\n\
-	\n\
-\n\
 	// End color correction.---------------------------------------------------------------------------\n\
-	\n\
 \n\
 	vec4 diffuseLight = texture2D(diffuseLightTex, screenPos);\n\
 	float diffuseLightModul = length(diffuseLight.xyz);\n\
