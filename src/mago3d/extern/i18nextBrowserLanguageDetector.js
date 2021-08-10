@@ -2,7 +2,7 @@
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
   (global.i18nextBrowserLanguageDetector = factory());
-}(this, function () { 'use strict';
+}(this ? this : self, function () { 'use strict';
 
   var arr = [];
   var each = arr.forEach;

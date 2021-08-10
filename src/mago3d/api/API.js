@@ -5,13 +5,14 @@
  * 
  * @class APIGateway
  */
+var API = function(){};
 
 /**
  * mago3d 활성화/비활성화
  * @param {ManagerFactory} managerFactoryInstance 
  * @param {Boolean} isShow true = show, false = hide
  */
-function changeMagoStateAPI(managerFactoryInstance, isShow) 
+API.changeMagoStateAPI = function(managerFactoryInstance, isShow) 
 {
 	if (managerFactoryInstance === null) { return; } 
 	
@@ -25,7 +26,7 @@ function changeMagoStateAPI(managerFactoryInstance, isShow)
  * @param {ManagerFactory} managerFactoryInstance 
  * @param {Boolean} isShow true = show, false = hide
  */
-function changeLabelAPI(managerFactoryInstance, isShow) 
+API.changeLabelAPI = function(managerFactoryInstance, isShow) 
 {
 	if (managerFactoryInstance === null) { return; } 
 	
@@ -39,7 +40,7 @@ function changeLabelAPI(managerFactoryInstance, isShow)
  * @param {ManagerFactory} managerFactoryInstance
  * @param {Boolean} isShow true = show, false = hide
  */
-function changeOriginAPI(managerFactoryInstance, isShow)
+API.changeOriginAPI = function(managerFactoryInstance, isShow)
 {
 	if (managerFactoryInstance === null) { return; }
 
@@ -53,7 +54,7 @@ function changeOriginAPI(managerFactoryInstance, isShow)
  * @param {ManagerFactory} managerFactoryInstance
  * @param {Boolean} isShow true = show, false = hide
  */
-function changeBoundingBoxAPI(managerFactoryInstance, isShow) 
+API.changeBoundingBoxAPI = function(managerFactoryInstance, isShow) 
 {
 	if (managerFactoryInstance === null) { return; } 
 	
@@ -68,7 +69,7 @@ function changeBoundingBoxAPI(managerFactoryInstance, isShow)
  * @param {ManagerFactory} managerFactoryInstance
  * @param {Boolean} isShow true = 표시, false = 비표시
  */
-function changePropertyRenderingAPI(managerFactoryInstance, isShow, projectId, property) 
+API.changePropertyRenderingAPI = function(managerFactoryInstance, isShow, projectId, property) 
 {
 	if (managerFactoryInstance === null) { return; } 
 		
@@ -84,7 +85,7 @@ function changePropertyRenderingAPI(managerFactoryInstance, isShow, projectId, p
  * @param {ManagerFactory} managerFactoryInstance
  * @param {Boolean} isShow true = 활성화, false = 비활성화
  */
-function changeShadowAPI(managerFactoryInstance, isShow) 
+API.changeShadowAPI = function(managerFactoryInstance, isShow) 
 {
 	if (managerFactoryInstance === null) { return; } 
 	
@@ -102,7 +103,7 @@ function changeShadowAPI(managerFactoryInstance, isShow)
  * @param {string} property 속성값 예)isPhysical=true
  * @param {string} color R, G, B, Alpha 색깔을 ',' 로 연결한 string 값을 받음.
  */
-function changeColorAPI(managerFactoryInstance, projectId, dataKey, objectIds, property, color) 
+API.changeColorAPI = function(managerFactoryInstance, projectId, dataKey, objectIds, property, color) 
 {
 	if (managerFactoryInstance === null) { return; } 
 	
@@ -135,7 +136,7 @@ function changeColorAPI(managerFactoryInstance, projectId, dataKey, objectIds, p
  * @param {string} roll 좌, 우 기울기
  * @param {animationOption} animationOption animation option
  */
-function changeLocationAndRotationAPI(managerFactoryInstance, projectId, dataKey, latitude, longitude, height, heading, pitch, roll, animationOption) 
+API.changeLocationAndRotationAPI = function(managerFactoryInstance, projectId, dataKey, latitude, longitude, height, heading, pitch, roll, animationOption) 
 {
 	if (managerFactoryInstance === null) { return; } 
 	
@@ -157,7 +158,7 @@ function changeLocationAndRotationAPI(managerFactoryInstance, projectId, dataKey
  * @param {ManagerFactory} managerFactoryInstance
  * @param {string} objectMoveMode 0 = All, 1 = object, 2 = None
  */
-function changeObjectMoveAPI(managerFactoryInstance, objectMoveMode) 
+API.changeObjectMoveAPI = function(managerFactoryInstance, objectMoveMode) 
 {
 	if (managerFactoryInstance === null) { return; } 
 	
@@ -171,7 +172,7 @@ function changeObjectMoveAPI(managerFactoryInstance, objectMoveMode)
  * @param {ManagerFactory} managerFactoryInstance
  * @param {string} objectMoveMode 0 = All, 1 = object, 2 = None
  */
-function saveObjectMoveAPI(managerFactoryInstance, objectMoveMode) 
+API.saveObjectMoveAPI = function(managerFactoryInstance, objectMoveMode) 
 {
 	if (managerFactoryInstance === null) { return; } 
 	
@@ -185,7 +186,7 @@ function saveObjectMoveAPI(managerFactoryInstance, objectMoveMode)
  * @param {ManagerFactory} managerFactoryInstance
  * @param {string} objectMoveMode 0 = All, 1 = object, 2 = None
  */
-function deleteAllObjectMoveAPI(managerFactoryInstance, objectMoveMode) 
+API.deleteAllObjectMoveAPI = function(managerFactoryInstance, objectMoveMode) 
 {
 	if (managerFactoryInstance === null) { return; } 
 	
@@ -198,7 +199,7 @@ function deleteAllObjectMoveAPI(managerFactoryInstance, objectMoveMode)
  * 브라우저내 모든 색깔 변경 이력을 삭제
  * @param {ManagerFactory} managerFactoryInstance
  */
-function deleteAllChangeColorAPI(managerFactoryInstance) 
+API.deleteAllChangeColorAPI = function(managerFactoryInstance) 
 {
 	if (managerFactoryInstance === null) { return; } 
 	
@@ -211,7 +212,7 @@ function deleteAllChangeColorAPI(managerFactoryInstance)
  * @param {ManagerFactory} managerFactoryInstance
  * @param {Boolean} flag true = 활성화, false = 비활성화
  */
-function changeInsertIssueModeAPI(managerFactoryInstance, flag) 
+API.changeInsertIssueModeAPI = function(managerFactoryInstance, flag) 
 {
 	if (managerFactoryInstance === null) { return; } 
 	
@@ -225,7 +226,7 @@ function changeInsertIssueModeAPI(managerFactoryInstance, flag)
  * @param {ManagerFactory} managerFactoryInstance
  * @param {Boolean} flag true = 활성화, false = 비활성화
  */
-function changeObjectInfoViewModeAPI(managerFactoryInstance, flag) 
+API.changeObjectInfoViewModeAPI = function(managerFactoryInstance, flag) 
 {
 	if (managerFactoryInstance === null) { return; } 
 	
@@ -240,7 +241,7 @@ function changeObjectInfoViewModeAPI(managerFactoryInstance, flag)
  * @param {Boolean} flag true = 활성화, false = 비활성화
  * @param {string} dataKey
  */
-function changeOcclusionCullingAPI(managerFactoryInstance, flag, dataKey) 
+API.changeOcclusionCullingAPI = function(managerFactoryInstance, flag, dataKey) 
 {
 	if (managerFactoryInstance === null) { return; } 
 	
@@ -255,7 +256,7 @@ function changeOcclusionCullingAPI(managerFactoryInstance, flag, dataKey)
  * @param {ManagerFactory} managerFactoryInstance
  * @param {Boolean} flag true = 활성화, false = 비활성화
  */
-function changeFPVModeAPI(managerFactoryInstance, flag)
+API.changeFPVModeAPI = function(managerFactoryInstance, flag)
 {
 	if (managerFactoryInstance === null) { return; } 
 	
@@ -269,7 +270,7 @@ function changeFPVModeAPI(managerFactoryInstance, flag)
  * @param {ManagerFactory} managerFactoryInstance
  * @param {Boolean} flag true = 활성화, false = 비활성화
  */
-function changeMagoModeAPI(managerFactoryInstance, flag)
+API.changeMagoModeAPI = function(managerFactoryInstance, flag)
 {
 	if (managerFactoryInstance === null) { return; } 
 	
@@ -284,7 +285,7 @@ function changeMagoModeAPI(managerFactoryInstance, flag)
  * @param {ManagerFactory} managerFactoryInstance
  * @param {Boolean} flag true = 활성화, false = 비활성화
  */
-function changeNearGeoIssueListViewModeAPI(managerFactoryInstance, flag) 
+API.changeNearGeoIssueListViewModeAPI = function(managerFactoryInstance, flag) 
 {
 	if (managerFactoryInstance === null) { return; } 
 	
@@ -300,7 +301,7 @@ function changeNearGeoIssueListViewModeAPI(managerFactoryInstance, flag)
  * @param {ManagerFactory} managerFactoryInstance
  * @param {string} insertIssueState 이슈 등록 좌표 상태
  */
-function changeInsertIssueStateAPI(managerFactoryInstance, insertIssueState) 
+API.changeInsertIssueStateAPI = function(managerFactoryInstance, insertIssueState) 
 {
 	if (managerFactoryInstance === null) { return; } 
 	
@@ -319,7 +320,7 @@ function changeInsertIssueStateAPI(managerFactoryInstance, insertIssueState)
  * @param {string} lod4DistInMeters
  * @param {string} lod5DistInMeters
  */
-function changeLodAPI(managerFactoryInstance, lod0DistInMeters, lod1DistInMeters, lod2DistInMeters, lod3DistInMeters, lod4DistInMeters, lod5DistInMeters)
+API.changeLodAPI = function(managerFactoryInstance, lod0DistInMeters, lod1DistInMeters, lod2DistInMeters, lod3DistInMeters, lod4DistInMeters, lod5DistInMeters)
 {
 	if (managerFactoryInstance === null) { return; } 
 	
@@ -342,7 +343,7 @@ function changeLodAPI(managerFactoryInstance, lod0DistInMeters, lod1DistInMeters
  * @param {string} ambientColor
  * @param {string} specularColor
  */
-function changeLightingAPI(managerFactoryInstance, ambientReflectionCoef, diffuseReflectionCoef, specularReflectionCoef, ambientColor, specularColor)
+API.changeLightingAPI = function(managerFactoryInstance, ambientReflectionCoef, diffuseReflectionCoef, specularReflectionCoef, ambientColor, specularColor)
 {
 	if (managerFactoryInstance === null) { return; } 
 	
@@ -360,7 +361,7 @@ function changeLightingAPI(managerFactoryInstance, ambientReflectionCoef, diffus
  * @param {ManagerFactory} managerFactoryInstance
  * @param {string} ssaoRadius
  */
-function changeSsaoRadiusAPI(managerFactoryInstance, ssaoRadius)
+API.changeSsaoRadiusAPI = function(managerFactoryInstance, ssaoRadius)
 {
 	if (managerFactoryInstance === null) { return; } 
 	
@@ -373,7 +374,7 @@ function changeSsaoRadiusAPI(managerFactoryInstance, ssaoRadius)
  * 모든 f4d 데이터를 삭제, 비표시
  * @param {ManagerFactory} managerFactoryInstance
  */
-function clearAllDataAPI(managerFactoryInstance)
+API.clearAllDataAPI = function(managerFactoryInstance)
 {	
 	if (managerFactoryInstance === null) { return; } 
 	
@@ -393,7 +394,7 @@ function clearAllDataAPI(managerFactoryInstance)
  * @param {string} longitude 데이터 고유키
  * @param {string} height 데이터 고유키
  */
-function drawInsertIssueImageAPI(managerFactoryInstance, drawType, issue_id, issue_type, data_key, latitude, longitude, height) 
+API.drawInsertIssueImageAPI = function(managerFactoryInstance, drawType, issue_id, issue_type, data_key, latitude, longitude, height) 
 {
 	if (managerFactoryInstance === null) { return; } 
 	
@@ -417,7 +418,7 @@ function drawInsertIssueImageAPI(managerFactoryInstance, drawType, issue_id, iss
  * @param {string} height 데이터 고유키
  * @param {string} duration 이동하는 시간
  */
-function gotoProjectAPI(managerFactoryInstance, projectId, projectData, projectDataFolder, longitude, latitude, height, duration) 
+API.gotoProjectAPI = function(managerFactoryInstance, projectId, projectData, projectDataFolder, longitude, latitude, height, duration) 
 {
 	if (managerFactoryInstance === null) { return; } 
 	
@@ -445,7 +446,7 @@ function gotoProjectAPI(managerFactoryInstance, projectId, projectData, projectD
  * @param {string} height 데이터 고유키
  * @param {string} duration 이동하는 시간
  */
-function gotoIssueAPI(managerFactoryInstance, projectId, projectData, projectDataFolder, issueId, issueType, longitude, latitude, height, duration)
+API.gotoIssueAPI = function(managerFactoryInstance, projectId, projectData, projectDataFolder, issueId, issueType, longitude, latitude, height, duration)
 {
 	if (managerFactoryInstance === null) { return; } 
 	
@@ -467,7 +468,7 @@ function gotoIssueAPI(managerFactoryInstance, projectId, projectData, projectDat
 /**
  * 고려 소프트웨어: 바로가기
  */
-function gotoFlyAPI(managerFactoryInstance, longitude, latitude, height, duration)
+API.gotoFlyAPI = function(managerFactoryInstance, longitude, latitude, height, duration)
 {
 	if (managerFactoryInstance === null) { return; } 
 	
@@ -485,7 +486,7 @@ function gotoFlyAPI(managerFactoryInstance, longitude, latitude, height, duratio
  * @param {ManagerFactory} managerFactoryInstance
  * @param {string} eventType 어떤 마우스 동작을 원하는지를 구분
  */
-function mouseMoveAPI(managerFactoryInstance, eventType) 
+API.mouseMoveAPI = function(managerFactoryInstance, eventType) 
 {
 	if (managerFactoryInstance === null) { return; } 
 	
@@ -498,7 +499,7 @@ function mouseMoveAPI(managerFactoryInstance, eventType)
  * @param {string} projectId 데이터 고유키
  * @param {string} dataKey 데이터 고유키
  */
-function searchDataAPI(managerFactoryInstance, projectId, dataKey) 
+API.searchDataAPI = function(managerFactoryInstance, projectId, dataKey) 
 {
 	if (managerFactoryInstance === null) { return; } 
 	
@@ -514,7 +515,7 @@ function searchDataAPI(managerFactoryInstance, projectId, dataKey)
  * @param {string} key 검색 키
  * @param 
  */
-function isDataExistAPI(managerFactoryInstance, key) 
+API.isDataExistAPI = function(managerFactoryInstance, key) 
 {
 	if (managerFactoryInstance.getMagoManager().config.isDataExist(key)) { return true; }
 	else { return false; }
@@ -526,7 +527,7 @@ function isDataExistAPI(managerFactoryInstance, key)
  * @param {string} key 검색 키
  * @param 
  */
-function getDataAPI(managerFactoryInstance, key) 
+API.getDataAPI = function(managerFactoryInstance, key) 
 {
 	return managerFactoryInstance.getMagoManager().config.getData(key);
 }
@@ -538,7 +539,7 @@ function getDataAPI(managerFactoryInstance, key)
  * @param {String} dataKey Data 고유키
  * @param
  */
-function getDataInfoByDataKeyAPI(managerFactoryInstance, projectId, dataKey)
+API.getDataInfoByDataKeyAPI = function(managerFactoryInstance, projectId, dataKey)
 {
 	if (managerFactoryInstance === null) { return; }
 
@@ -557,7 +558,7 @@ function getDataInfoByDataKeyAPI(managerFactoryInstance, projectId, dataKey)
  * @param {Object[]} projectDataFolderArray 프로젝트 f4d 파일 경로
  * @param 
  */
-function drawAppendDataAPI(managerFactoryInstance, projectIdArray, projectDataArray, projectDataFolderArray) 
+API.drawAppendDataAPI = function(managerFactoryInstance, projectIdArray, projectDataArray, projectDataFolderArray) 
 {
 	if (managerFactoryInstance === null) { return; } 
 	
@@ -584,7 +585,7 @@ function drawAppendDataAPI(managerFactoryInstance, projectIdArray, projectDataAr
  * @param {string} inputPoint input x, y, z
  * @param {string} resultPoint return point
  */
-function getCoordinateRelativeToBuildingAPI(managerFactoryInstance, projectId, dataKey, inputPoint, resultPoint)
+API.getCoordinateRelativeToBuildingAPI = function(managerFactoryInstance, projectId, dataKey, inputPoint, resultPoint)
 {
 	if (managerFactoryInstance === null) { return; }
 
@@ -606,7 +607,7 @@ function getCoordinateRelativeToBuildingAPI(managerFactoryInstance, projectId, d
  * @param {string} inputPoint input x, y, z
  * @param {string} resultPoint return point
  */
-function getAbsoluteCoodinateOfBuildingPointAPI(managerFactoryInstance, projectId, dataKey, inputPoint, resultPoint)
+API.getAbsoluteCoodinateOfBuildingPointAPI = function(managerFactoryInstance, projectId, dataKey, inputPoint, resultPoint)
 {
 	if (managerFactoryInstance === null) { return; }
 
@@ -626,7 +627,7 @@ function getAbsoluteCoodinateOfBuildingPointAPI(managerFactoryInstance, projectI
  * @param {Number} unit position unit. if not define, default value is Mago3D.CODE.units.DEGREE. 0 : Mago3D.CODE.units.METRE, 1 : Mago3D.CODE.units.DEGREE, 2 : Mago3D.CODE.units.RADIAN
  * @returns {Object|Cartesian3|Cartographic}
  */
-function getCameraCurrentPositionAPI(managerFactoryInstance, unit)
+API.getCameraCurrentPositionAPI = function(managerFactoryInstance, unit)
 {
 	var api = new Mago3D.API("getCameraCurrentPosition");
 	
@@ -641,7 +642,7 @@ function getCameraCurrentPositionAPI(managerFactoryInstance, unit)
  * @param {ManagerFactory} managerFactoryInstance
  * @returns {Object}
  */
-function getCameraCurrentOrientaionAPI(managerFactoryInstance)
+API.getCameraCurrentOrientaionAPI = function(managerFactoryInstance)
 {
 	var api = new Mago3D.API("getCameraCurrentOrientaion");
 	
@@ -657,7 +658,7 @@ function getCameraCurrentOrientaionAPI(managerFactoryInstance)
  * @param {string|undefined|null} roll 좌, 우 기울기. needs degree. default value is current camera's roll value.
  * @param {string|undefined|null} duration 이동하는 시간. default value is 0.
  */
-function changeCameraOrientationAPI(managerFactoryInstance, heading, pitch, roll, duration)
+API.changeCameraOrientationAPI = function(managerFactoryInstance, heading, pitch, roll, duration)
 {
 	var api = new Mago3D.API("changeCameraOrientation");
 
@@ -688,7 +689,7 @@ function changeCameraOrientationAPI(managerFactoryInstance, heading, pitch, roll
  * @param {ManagerFactory} managerFactoryInstance
  * @param {instantiateOption} attributes
  */
-function instantiateStaticModelAPI(managerFactoryInstance, attributes)
+API.instantiateStaticModelAPI = function(managerFactoryInstance, attributes)
 {
 	var api = new Mago3D.API("instantiateStaticModel");
 	
@@ -709,7 +710,7 @@ function instantiateStaticModelAPI(managerFactoryInstance, attributes)
  * @param {ManagerFactory} managerFactoryInstance
  * @param {staticModelOption} attributes
  */
-function addStaticModelAPI(managerFactoryInstance, attributes)
+API.addStaticModelAPI = function(managerFactoryInstance, attributes)
 {
 	var api = new Mago3D.API("addStaticModel");
 	
@@ -739,7 +740,7 @@ function addStaticModelAPI(managerFactoryInstance, attributes)
  * @param {string} dataKey data key
  * @param {trackOption} option Optional. 비어있을 시 TRACKING 모드로 설정
  */
-function setTrackNodeAPI(managerFactoryInstance, projectId, dataKey, option)
+API.setTrackNodeAPI = function(managerFactoryInstance, projectId, dataKey, option)
 {
 	var api = new Mago3D.API("setTrackNode");
 	
@@ -753,7 +754,7 @@ function setTrackNodeAPI(managerFactoryInstance, projectId, dataKey, option)
  * set track target node.
  * @param {ManagerFactory} managerFactoryInstance
  */
-function stopTrackAPI(managerFactoryInstance)
+API.stopTrackAPI = function(managerFactoryInstance)
 {
 	var api = new Mago3D.API("stopTrack");
 	
@@ -766,7 +767,7 @@ function stopTrackAPI(managerFactoryInstance)
  * @param {string} projectId
  * @returns {Boolean} isExist
  */
-function isExistStaticModelAPI(managerFactoryInstance, projectId)
+API.isExistStaticModelAPI = function(managerFactoryInstance, projectId)
 {
 	var api = new Mago3D.API("isExistStaticModel");
 	api.setReturnable(true);
@@ -781,7 +782,7 @@ function isExistStaticModelAPI(managerFactoryInstance, projectId)
  * @param {string} dataKey data key
  * @returns {Boolean} isExist
  */
-function isExistDataAPI(managerFactoryInstance, projectId, dataKey)
+API.isExistDataAPI = function(managerFactoryInstance, projectId, dataKey)
 {
 	var api = new Mago3D.API("isExistData");
 	api.setReturnable(true);
@@ -797,7 +798,7 @@ function isExistDataAPI(managerFactoryInstance, projectId, dataKey)
  * @param {string} dataKey data key
  * @return {Boolean} is ready to render 
  */
-function isDataReadyToRenderAPI(managerFactoryInstance, projectId, dataKey)
+API.isDataReadyToRenderAPI = function(managerFactoryInstance, projectId, dataKey)
 {
 	var api = new Mago3D.API("isDataReadyToRender");
 	api.setReturnable(true);
@@ -813,7 +814,7 @@ function isDataReadyToRenderAPI(managerFactoryInstance, projectId, dataKey)
  * @param {string} dataKey data key
  * @param {nodeAttribute} option data key
  */
-function setNodeAttributeAPI(managerFactoryInstance, projectId, dataKey, option)
+API.setNodeAttributeAPI = function(managerFactoryInstance, projectId, dataKey, option)
 {
 	var api = new Mago3D.API("setNodeAttribute");
 	api.setProjectId(projectId);
@@ -826,7 +827,7 @@ function setNodeAttributeAPI(managerFactoryInstance, projectId, dataKey, option)
  * toggle point cloud color mode.
  * @param {ManagerFactory} managerFactoryInstance
  */
-function togglePointCloudColorAPI(managerFactoryInstance)
+API.togglePointCloudColorAPI = function(managerFactoryInstance)
 {
 	var api = new Mago3D.API("togglePointCloudColor");
 	managerFactoryInstance.callAPI(api);
@@ -836,7 +837,7 @@ function togglePointCloudColorAPI(managerFactoryInstance)
  * select f4d
  * @param {ManagerFactory} managerFactoryInstance
  */
-function selectF4dAPI(managerFactoryInstance, projectId, dataKey) 
+API.selectF4dAPI = function(managerFactoryInstance, projectId, dataKey) 
 {
 	var api = new Mago3D.API("selectF4d");
 	api.setProjectId(projectId);

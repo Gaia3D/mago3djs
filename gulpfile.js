@@ -26,13 +26,14 @@ var Server = require('karma').Server;
 
 var paths = {
 	data      : './data',
-	source_js : [ './src/mago3d/*.js', './src/mago3d/**/*.js', '!./src/engine/cesium', '!./src/mago3d/Demo*.js', '!./src/mago3d/extern/*.js' ],
+	source_js : [ './src/mago3d/*.js', './src/mago3d/**/*.js', '!./src/engine/cesium', '!./src/mago3d/Demo*.js' ],
 	dest_js   : './build/mago3d',
 	worker_js : './build/mago3d/Worker',
 	test      : ['./test/*.js', './test/mago3d/*.js', './test/mago3d/**/*.js'],
 	build     : './build'
 };
 
+var mode = 'browser'; //browser, esm
 var packageJson = require('./package.json');
 var version = packageJson.version;
 if (/\.0$/.test(version))
@@ -177,9 +178,9 @@ function createMago3D(minify, minifyStateFilePath)
 
 	var assignments = [];
 	var list = paths.source_js.slice(0);
-	list.push('!./src/mago3d/api/APIGateway.js');
-	list.push('!./src/mago3d/domain/Callback.js');
+	list.push('!./src/mago3d/extern/*.js');
 	list.push('!./src/mago3d/worker/*');
+	list.push('!./src/mago3d/worker/src/*');
 	globby.sync(list).forEach(function(file)
 	{
 		file = path.relative('src/mago3d', file);
@@ -208,6 +209,10 @@ var Mago3D = (function() \n\
 	'+ assignments.join('\n	') +'\n\
 	return _mago3d;\n\
 })();\n';
+	if (mode === 'esm') 
+	{
+		contents += 'export default Mago3D;';
+	}
 	fs.writeFileSync(jsFile, contents);
 }
 
@@ -216,6 +221,18 @@ var Mago3D = (function() \n\
 gulp.task('clean', function() 
 {
 	return del([ paths.build ]);
+});
+
+gulp.task('mode:browser', function(done)
+{
+	mode = 'browser';
+	done();
+});
+
+gulp.task('mode:esm', function(done)
+{
+	mode = 'esm';
+	done();
 });
 
 gulp.task('build', function(done) 
@@ -230,13 +247,14 @@ gulp.task('build', function(done)
 gulp.task('merge:js', gulp.series( 'clean', 'build', function() 
 {
 	var list = paths.source_js.slice(0);
-	list.push('!./src/mago3d/api/APIGateway.js');
-	list.push('!./src/mago3d/domain/Callback.js');
 	list.push('!./src/mago3d/worker/*');
+	list.push('!./src/mago3d/worker/src/*');
+	
 	return gulp.src(list)
 		.pipe(babel({
-			presets: ['@babel/preset-env'],
-			plugins: ['@babel/plugin-transform-object-assign']
+			presets : ['@babel/preset-env'],
+			plugins : ['@babel/plugin-transform-object-assign'],
+			exclude : ['!./src/mago3d/extern/*.js']
 		}))
 		.pipe(concat('mago3d.js'))
 		.pipe(gulp.dest(paths.dest_js));
@@ -247,9 +265,6 @@ gulp.task('combine:js', gulp.series( 'merge:js', function()
 	createMago3D(false, path.join(path.normalize(paths.build), 'minifyShaders.state'));
 
 	var list = [];
-	list.push('./src/mago3d/api/APIGateway.js');
-	list.push('./src/mago3d/domain/Callback.js');
-	list.push('./src/mago3d/extern/*.js');
 	list.push(path.join(path.normalize(paths.dest_js), 'mago3d.js'));
 
 	return gulp.src(list)
@@ -333,7 +348,9 @@ gulp.task('doc', function (cb)
 		.pipe(jsdoc(config, cb));
 });
 
-gulp.task('default', gulp.series('clean', 'lint', 'uglify:js'));
+gulp.task('default', gulp.series('clean', 'lint', 'mode:browser', 'uglify:js'));
+
+gulp.task('build:esm', gulp.series('clean', 'lint', 'mode:esm', 'uglify:js'));
 
 gulp.task('buildShader', function(done) 
 {
