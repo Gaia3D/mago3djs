@@ -65,7 +65,7 @@ var SceneState = function(config)
 	this.ambientColor = new Float32Array([0.6, 0.6, 0.6]);
 	this.ssaoRadius = new Float32Array([0.15]);
 	this.brightnessContrastSaturation = new Float32Array([0.01, 0.15, 0.05]); // 0.0 = neutral.
-	this.brightnessContrastType = 0; // 0= apply Brightness & contrast only for f4d. 1= f4d & terrain.
+	this.brightnessContrastType = 0; // 0= apply Brightness & contrast & Saturation only for f4d. 1= f4d & terrain. -1 = no apply.
 	//this.shininessValue = new Float32Array([40.0]); // original.***
 	this.shininessValue = new Float32Array([10.0]);
 	this.ssaoNoiseScale2 = new Float32Array([1.0, 1.0]); // [this.depthFboNeo.width[0]/this.noiseTexture.width, this.depthFboNeo.height[0]/this.noiseTexture.height]

@@ -1369,19 +1369,22 @@ Water._swapTextures = function (texA, texB)
 
 Water.prototype.test__doQuantizedSurfaceExcavation = function (magoManager)
 {
-	if(this.qMeshTestFinished)
-	{
+	if(this.qMeshTestFinished) {
 		return;
 	}
 
 	
 
 	// Test.*** delete this.*** Test.*** delete this.*** Test.*** delete this.*** Test.*** delete this.*** Test.*** delete this.*** Test.*** 
-	if(!this.testQMesh)
-	{
+	if(!this.testQMesh) {
 		var X = 27934;
 		var Y = 4791;
 		var L = 14;
+
+		// 126.77975, 37.36228
+		var tileIndices = SmartTile.selectTileIndices(L, 126.77975, 37.36228, undefined);
+		X = tileIndices.X;
+		Y = tileIndices.Y;
 
 		this.qMeshPromise = magoManager.scene.globe.terrainProvider.requestTileGeometry(X, Y, L);
 		this.qMeshPromise.then((value) =>
@@ -1395,8 +1398,7 @@ Water.prototype.test__doQuantizedSurfaceExcavation = function (magoManager)
 
 	// Test debug to do excavation on cesium terrain.***
 	// 1rst, check if dem texture is ready.
-	if (!this.quantizedSurfaceTest && this.testQMesh)
-	{
+	if (!this.quantizedSurfaceTest && this.testQMesh) {
 		// 1rst, calculate the geoExtent of the tile:
 		var imageryType = CODE.imageryType.CRS84;
 		var tileIndices = this.testQMesh.tileIndices;
@@ -1423,6 +1425,10 @@ Water.prototype.test__doQuantizedSurfaceExcavation = function (magoManager)
 
 		var lonOffset = 0.0001;
 		var latOffset = 0.0001;
+
+		var lonOffset = -0.001;
+		var latOffset = 0.0001;
+
 		lonOffset = 0.004;
 		//latOffset = 0.005;
 		
