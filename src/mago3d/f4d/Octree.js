@@ -428,7 +428,7 @@ Octree.prototype.prepareSkinData = function(magoManager)
 	{ return; }
 
 	var projectDataType = neoBuilding.metaData.getProjectDataType();
-	if(projectDataType === 10)
+	if (projectDataType === 10)
 	{
 		// projectDataType = 10 -> treeDataType.***
 		// this dataType has no skinData, so load detailed data.***
@@ -496,7 +496,7 @@ Octree.prototype.prepareSkinData = function(magoManager)
 			}
 
 			var imageFilaName = neoBuilding.getImageFileNameForLOD(2);
-			if(imageFilaName !== "noTexture")
+			if (imageFilaName !== "noTexture")
 			{
 				var texFilePath = geometryDataPath + "/" + projectFolderName + "/" + buildingFolderName + "/" + imageFilaName;
 
@@ -511,9 +511,9 @@ Octree.prototype.prepareSkinData = function(magoManager)
 			var lodBuildingDatasMap = neoBuilding.lodBuildingDatasMap;
 			var lod = 2;
 			var lodBuildingData = lodBuildingDatasMap[lod];
-			if(!lodBuildingData.isModelRef)
+			if (!lodBuildingData.isModelRef)
 			{
-				if(neoBuilding.lodMeshesMap)
+				if (neoBuilding.lodMeshesMap)
 				{
 					var geometryFileName = lodBuildingData.geometryFileName;
 					this.lego = neoBuilding.lodMeshesMap[geometryFileName];
@@ -538,7 +538,7 @@ Octree.prototype.prepareSkinData = function(magoManager)
 		var legoKey = this.lego.legoKey;
 
 		var legoParsedMap = magoManager.legoParsedMap;
-		if(!legoParsedMap){ return; }
+		if (!legoParsedMap){ return; }
 		if (!legoParsedMap[smartTileDepth]) { return; }
 		if (!legoParsedMap[smartTileDepth][smartTileX]) { return; }
 		if (!legoParsedMap[smartTileDepth][smartTileX][smartTileY]) { return; }
@@ -774,7 +774,7 @@ Octree.prototype.renderSkin = function(magoManager, neoBuilding, renderType, ren
 
 		// seletionColor4.***
 		
-		if(magoManager.isCameraMoved && !magoManager.isCameraMoving )
+		if (magoManager.isCameraMoved && !magoManager.isCameraMoving )
 		{
 			//var selCandidates = magoManager.selectionManager;
 			//var selectionColor = magoManager.selectionColor;
@@ -824,7 +824,7 @@ Octree.prototype.renderContent = function (magoManager, neoBuilding, renderType,
 	// Check lodBuildingData.***
 	//var lodBuildingData = neoBuilding.getLodBuildingData(this.lod);
 	var projectDataType = neoBuilding.metaData.getProjectDataType();
-	if(projectDataType === 10)
+	if (projectDataType === 10)
 	{
 		// projectDataType = 10, as trees that has no lod data, etc.
 		rendered = this.neoReferencesMotherAndIndices.render(magoManager, neoBuilding, renderType, renderTexture, shader, minSizeToRender, refMatrixIdxKey);

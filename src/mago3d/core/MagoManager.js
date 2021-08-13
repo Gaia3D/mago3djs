@@ -95,7 +95,7 @@ var MagoManager = function (config)
 	 * 
 	 * @private
 	 */
-	this.smartTileManager = new SmartTileManager({magoManager : this});
+	this.smartTileManager = new SmartTileManager({magoManager: this});
 	
 	/**
 	 * Manages & controls the deleting objects queue.
@@ -361,12 +361,13 @@ var MagoManager = function (config)
 	//한국 건축물 마스터
 	this.koreaBuildingMaster = {};
 
-	if (window.Mago3D && Mago3D['WeatherStation'] && this.weatherStation === undefined)
+	if (window.Mago3D && Mago3D.WeatherStation && this.weatherStation === undefined)
 	{ 
 		this.weatherStation = new Mago3D.WeatherStation(this);
 	}
 
 	this.quantizedMeshManager;
+	this.workersManager = new WorkersManager(this);
 };
 MagoManager.prototype = Object.create(Emitter.prototype);
 MagoManager.prototype.constructor = MagoManager;
@@ -398,9 +399,9 @@ MagoManager.EVENT_TYPE = {
 	'CAMERACHANGED'           : 'camerachanged',
 	'CAMERAMOVEEND'           : 'cameramoveend',
 	'CAMERAMOVESTART'         : 'cameramovestart',
-	'ANIMATIONEND'         : 'animationEnd',
-	'ANIMATIONING'         : 'animationing',
-	'VALIDHEIGHTEND'         : 'validHeightEnd'
+	'ANIMATIONEND'            : 'animationEnd',
+	'ANIMATIONING'            : 'animationing',
+	'VALIDHEIGHTEND'          : 'validHeightEnd'
 };
 
 /**
@@ -544,47 +545,47 @@ MagoManager.prototype.handleBrowserEvent = function(browserEvent)
 MagoManager.prototype.setMouseStatus = function(type)
 {
 	if (!this.magoPolicy.getMagoEnable()) { return; }
-	switch(type)
+	switch (type)
 	{
-		case 'leftdown' :{
-			this.mouseLeftDown = true;
-			this.isCameraMoving = true;
-			break;
-		}
-		case 'leftup' :{
-			this.isCameraMoving = false;
-			this.mouseLeftDown = false;
-			break;
-		}
-		case 'middledown' :{
-			this.mouseMiddleDown = true;
-			this.isCameraMoving = true;
-			break;
-		}
-		case 'middleup' :{
-			this.isCameraMoving = false;
-			this.mouseMiddleDown = false;
-			break;
-		}
-		case 'rightdown' :{
-			this.mouseRightDown = true;
-			this.isCameraMoving = true;
-			break;
-		}
-		case 'rightup' :{
-			this.mouseRightDown = false;
-			this.isCameraMoving = false;
-			break;
-		}
-		case 'mousemove' :{
-			if(this.mouseMiddleDown || this.mouseLeftDown)
-			{
-				this.isCameraMoving = true;
-			}
-			break;
-		}
+	case 'leftdown' :{
+		this.mouseLeftDown = true;
+		this.isCameraMoving = true;
+		break;
 	}
-}
+	case 'leftup' :{
+		this.isCameraMoving = false;
+		this.mouseLeftDown = false;
+		break;
+	}
+	case 'middledown' :{
+		this.mouseMiddleDown = true;
+		this.isCameraMoving = true;
+		break;
+	}
+	case 'middleup' :{
+		this.isCameraMoving = false;
+		this.mouseMiddleDown = false;
+		break;
+	}
+	case 'rightdown' :{
+		this.mouseRightDown = true;
+		this.isCameraMoving = true;
+		break;
+	}
+	case 'rightup' :{
+		this.mouseRightDown = false;
+		this.isCameraMoving = false;
+		break;
+	}
+	case 'mousemove' :{
+		if (this.mouseMiddleDown || this.mouseLeftDown)
+		{
+			this.isCameraMoving = true;
+		}
+		break;
+	}
+	}
+};
 
 /**
  * Swaps the current rendering Phase.
@@ -594,8 +595,8 @@ MagoManager.prototype.setMouseStatus = function(type)
 MagoManager.prototype.swapRenderingFase = function() 
 {
 	this.renderingFase += 1;
-	if(this.renderingFase > 100)
-	this.renderingFase = 1;
+	if (this.renderingFase > 100)
+	{ this.renderingFase = 1; }
 };
 
 /**
@@ -643,7 +644,8 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 		}
 		
 		var fromSmartTile = node.data.attributes.fromSmartTile;
-		if (fromSmartTile === undefined) { 
+		if (fromSmartTile === undefined) 
+		{ 
 			fromSmartTile = false; 
 		}
 
@@ -657,7 +659,8 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 				if (!fromSmartTile) // load only if this no is NO from a smartTile.***
 				{
 					projectFolderName = neoBuilding.projectFolderName;
-					if (this.fileRequestControler.isFullHeaders()) { 
+					if (this.fileRequestControler.isFullHeaders()) 
+					{ 
 						return; 
 					}
 
@@ -670,12 +673,14 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
 				var bytesReaded = 0;
 				neoBuilding.parseHeader(neoBuilding.headerDataArrayBuffer, bytesReaded);
 				//헤더 파싱 후 높이 보정 대상 확인
-				if (node.isNeedValidHeight(this)) { 
+				if (node.isNeedValidHeight(this)) 
+				{ 
 					this._needValidHeightNodeArray.push(node); 
 				}
 
 				counter++;
-				if (counter > 60) { 
+				if (counter > 60) 
+				{ 
 					break; 
 				}
 			}
@@ -784,7 +789,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		sceneState.modelViewProjRelToEyeMatrix._floatArrays = glMatrix.mat4.multiply(sceneState.modelViewProjRelToEyeMatrix._floatArrays, sceneState.projectionMatrix._floatArrays, sceneState.modelViewRelToEyeMatrix._floatArrays);
 
 		// Large far projection for lighting.
-		if(sceneState.applyLightsShadows)
+		if (sceneState.applyLightsShadows)
 		{
 			var farForLighting = 20000.0; // 20km
 			var nearForLighting = 0.1;
@@ -828,7 +833,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		// Update sceneState camera.***
 		this.upDateCamera(sceneState.camera);
 
-		if(sceneState.drawingBufferWidth[0] !== scene.drawingBufferWidth || sceneState.drawingBufferHeight[0] !== scene.drawingBufferHeight)
+		if (sceneState.drawingBufferWidth[0] !== scene.drawingBufferWidth || sceneState.drawingBufferHeight[0] !== scene.drawingBufferHeight)
 		{
 			sceneState.drawingBufferWidth[0] = scene.drawingBufferWidth;
 			sceneState.drawingBufferHeight[0] = scene.drawingBufferHeight;
@@ -953,7 +958,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function(sceneState)
 		modelViewProjRelToEyeMatrix._floatArrays = glMatrix.mat4.multiply(modelViewProjRelToEyeMatrix._floatArrays, projectionMatrix._floatArrays, modelViewRelToEyeMatrix._floatArrays);
 
 		// Large far projection for lighting.
-		if(sceneState.applyLightsShadows)
+		if (sceneState.applyLightsShadows)
 		{
 			var farForLighting = 20000.0; // 20km
 			var nearForLighting = 0.1;
@@ -1325,10 +1330,10 @@ MagoManager.prototype.loadAndPrepareData = function()
 
 	// project type 10 prepare
 	var pt10Array = this.visibleObjControlerNodes.currentVisiblesPT10;
-	if(pt10Array.length > 0)
+	if (pt10Array.length > 0)
 	{
 		var pt10Octrees = [];
-		for(var i=0,len=pt10Array.length;i<len;i++)
+		for (var i=0, len=pt10Array.length;i<len;i++)
 		{
 			var pt10 = pt10Array[i];
 			pt10Octrees.push(pt10.data.neoBuilding.octree);
@@ -1583,8 +1588,8 @@ MagoManager.prototype.TEST__cameraLaser = function()
 	// this function tests camera laser.
 	var geoCoordsList = this.modeler.getGeographicCoordsList();
 	var geoCoordsCount = geoCoordsList.getGeoCoordsCount();
-	if(geoCoordsCount < 2)
-	return;
+	if (geoCoordsCount < 2)
+	{ return; }
 
 	//var geoCoord_start = new GeographicCoord(126.75740, 37.54302, 29.133160613985577);
 	//var geoCoord_end = new GeographicCoord(126.75719736534053, 37.54493737467032, 44.055231264041986);
@@ -1594,7 +1599,7 @@ MagoManager.prototype.TEST__cameraLaser = function()
 
 	var posWC = Camera.intersectPointByLaser(geoCoord_start, geoCoord_end, undefined, undefined, this, undefined) ;
 
-	if(posWC)
+	if (posWC)
 	{
 		var geoCoord = Mago3D.ManagerUtils.pointToGeographicCoord(posWC, undefined);
 		geoCoord.makeDefaultGeoLocationData();
@@ -1618,7 +1623,7 @@ MagoManager.prototype.bindMainFramebuffer = function()
  */
 MagoManager.prototype.getTexturesManager = function () 
 {
-	if(!this.texturesManager)
+	if (!this.texturesManager)
 	{
 		var gl = this.getGl();
 
@@ -1630,7 +1635,7 @@ MagoManager.prototype.getTexturesManager = function ()
 		var bufferWidth = this.sceneState.drawingBufferWidth[0];
 		var bufferHeight = this.sceneState.drawingBufferHeight[0];
 		var bUseMultiRenderTarget = this.postFxShadersManager.bUseMultiRenderTarget;
-		this.texturesManager.texturesMergerFbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 5}); 
+		this.texturesManager.texturesMergerFbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget: bUseMultiRenderTarget, numColorBuffers: 5}); 
 	}
 
 	return this.texturesManager;
@@ -1642,7 +1647,7 @@ MagoManager.prototype.getTexturesManager = function ()
  */
 MagoManager.prototype.doRender = function (frustumVolumenObject) 
 {
-	if(!this.isCesiumGlobe())
+	if (!this.isCesiumGlobe())
 	{
 		this.doRenderMagoWorld(frustumVolumenObject);
 		return;
@@ -1665,37 +1670,37 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 	var lightsArray = this.visibleObjControlerNodes.currentVisibleNativeObjects.lightSourcesArray;
 	var lightCount = lightsArray.length;
 	var currentTime = this.getCurrentTime();
-	if(lightCount > 0 && sceneState.applyLightsShadows && !this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
+	if (lightCount > 0 && sceneState.applyLightsShadows && !this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
 	{
 		// for each visible lightSources, make cubeMap depthTextures if no exist.
 		var visiblesArray = this.visibleObjControlerNodes.getAllVisibles();
 		var nativeVisiblesArray = this.visibleObjControlerNodes.getAllNatives();
 		var lightCullingsCount = 0;
-		for(var i=0; i<lightCount; i++)
+		for (var i=0; i<lightCount; i++)
 		{
 			var light = lightsArray[i];
 
-			if(!light.cullingUpdatedTime)
-				light.cullingUpdatedTime = 0;
+			if (!light.cullingUpdatedTime)
+			{ light.cullingUpdatedTime = 0; }
 			
-			if(currentTime !== light.cullingUpdatedTime) 
+			if (currentTime !== light.cullingUpdatedTime) 
 			{
 				var timeDiffSec = (currentTime - light.cullingUpdatedTime)/1000.0;
-				if(timeDiffSec < 3)
-				continue;
+				if (timeDiffSec < 3)
+				{ continue; }
 
 				light.clearIntersectedObjects();
 			}
 
 			// In one frame, do only one intersectionCulling for lights.
-			if(light.doIntersectedObjectsCulling(visiblesArray, nativeVisiblesArray))
+			if (light.doIntersectedObjectsCulling(visiblesArray, nativeVisiblesArray))
 			{
 				light.cullingUpdatedTime = currentTime;
 				lightCullingsCount ++;
 			}
 
-			if(lightCullingsCount > 0)
-			break;
+			if (lightCullingsCount > 0)
+			{ break; }
 		}
 	}
 	
@@ -1737,8 +1742,8 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		var scene = this.scene;
 
 		// Test to copy terrain.******************************************************************************************
-		if(!this.extbuffers)
-			this.extbuffers = gl.getExtension("WEBGL_draw_buffers");
+		if (!this.extbuffers)
+		{ this.extbuffers = gl.getExtension("WEBGL_draw_buffers"); }
 
 		// Take cesium colorBuffer.**********************
 		scene._context._currentFramebuffer._bind();
@@ -1760,11 +1765,12 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 				this.extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - normal
 				this.extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - albedo
 				this.extbuffers.COLOR_ATTACHMENT3_WEBGL  // gl_FragData[4] - selColor4
-				]);
+			]);
 
-				if(this.isFarestFrustum()) {
-					this.selectionManager.clearCandidates();
-				}
+			if (this.isFarestFrustum()) 
+			{
+				this.selectionManager.clearCandidates();
+			}
 				
 		}
 		else
@@ -1775,11 +1781,11 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 				this.extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - normal
 				this.extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - albedo
 				this.extbuffers.NONE  // gl_FragData[4] - selColor4
-				]);
+			]);
 		}
 
 		
-		if(this.isFarestFrustum())
+		if (this.isFarestFrustum())
 		{
 			gl.clearColor(1.0, 1.0, 1.0, 1.0);
 			gl.clearDepth(1.0);
@@ -1798,7 +1804,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 			this.extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - normal
 			this.extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - albedo
 			this.extbuffers.NONE  // gl_FragData[4] - selColor4
-			]);
+		]);
 		
 		this.renderer.renderTerrainCopy();
 		// end test.---------------------------------------------------------------------------------------------------
@@ -1808,10 +1814,10 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 			this.bindMainFramebuffer();
 			
 			// MRT on cesium.**************************************************
-			if(!this.extbuffers)
-			this.extbuffers = gl.getExtension("WEBGL_draw_buffers");
+			if (!this.extbuffers)
+			{ this.extbuffers = gl.getExtension("WEBGL_draw_buffers"); }
 
-			if(this.isCameraMoved)
+			if (this.isCameraMoved)
 			{
 				// Attach the selColorBuffer.***
 				gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.depthTex, 0);
@@ -1825,7 +1831,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 					this.extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - normalTex
 					this.extbuffers.COLOR_ATTACHMENT3_WEBGL, // gl_FragData[3] - albedoTex
 					this.extbuffers.COLOR_ATTACHMENT4_WEBGL // gl_FragData[4] - selColor4
-					]);
+				]);
 			}
 			else
 			{
@@ -1882,7 +1888,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 			this.extbuffers.NONE, // gl_FragData[2] - normalTex
 			this.extbuffers.COLOR_ATTACHMENT3_WEBGL, // gl_FragData[3] - albedoTex
 			this.extbuffers.COLOR_ATTACHMENT4_WEBGL // gl_FragData[4] - selColor4
-			]);
+		]);
 	}
 
 	renderType = 1;
@@ -1894,7 +1900,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		this.weatherStation.renderWeatherTransparents(this);
 	}
 
-	if(this.waterManager) // TransparentPass.***
+	if (this.waterManager) // TransparentPass.***
 	{
 		// 1rst, do objects intersection culling.
 		var visiblesArray = this.visibleObjControlerNodes.getAllVisibles();
@@ -1903,7 +1909,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		this.waterManager.render();
 	}
 
-	if(this.soundManager) // TransparentPass.***
+	if (this.soundManager) // TransparentPass.***
 	{
 		// do sound simulation.
 		this.soundManager.render();
@@ -1947,7 +1953,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 			this.extbuffers.NONE, // gl_FragData[2]
 			this.extbuffers.NONE, // gl_FragData[3]
 			this.extbuffers.NONE, // gl_FragData[4]
-			]);
+		]);
 	}
 
 	// DEBUG.Render fisically lights sources.*************************************************************************
@@ -1959,11 +1965,11 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 	{
 		// if exist lightSources, the store all lightSources of all frustums.
 		var lightSourcesArray = this.visibleObjControlerNodes.currentVisibleNativeObjects.lightSourcesArray;
-		if(!this.lightSourcesMap)
+		if (!this.lightSourcesMap)
 		{ this.lightSourcesMap = {}; }
 
 		var lightCount = lightSourcesArray.length;
-		for(var i=0; i<lightCount; i++)
+		for (var i=0; i<lightCount; i++)
 		{
 			var light = lightSourcesArray[i];
 			var lightGuid = light._guid;
@@ -1973,15 +1979,15 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		if (this.currentFrustumIdx === 0) 
 		{
 			// now, make the lightSourcesArray.
-			if(!this.lightSourcesArray)
+			if (!this.lightSourcesArray)
 			{ this.lightSourcesArray = []; }
 
 			// 1rst, init the array.
 			this.lightSourcesArray.length = 0;
 
-			for(var key in this.lightSourcesMap)
+			for (var key in this.lightSourcesMap)
 			{
-				if(this.lightSourcesMap.hasOwnProperty(key))
+				if (this.lightSourcesMap.hasOwnProperty(key))
 				{
 					this.lightSourcesArray.push(this.lightSourcesMap[key]);
 				}
@@ -1999,13 +2005,13 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		if (sceneState.applyLightsShadows)
 		{
 			// Create lightBufferFBO if no exist.
-			if(!this.texturesManager.lBuffer)
+			if (!this.texturesManager.lBuffer)
 			{
 				// create a lBuffer with 2 colorTextures : diffuseLighting & specularLighting.
 				var bufferWidth = this.sceneState.drawingBufferWidth[0];
 				var bufferHeight = this.sceneState.drawingBufferHeight[0];
 				var bUseMultiRenderTarget = this.postFxShadersManager.bUseMultiRenderTarget;
-				this.texturesManager.lBuffer = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 3}); 
+				this.texturesManager.lBuffer = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget: bUseMultiRenderTarget, numColorBuffers: 3}); 
 			}
 			this.lBuffer = this.texturesManager.lBuffer;
 			this.diffuseLightTex = this.lBuffer.colorBuffersArray[0];
@@ -2029,7 +2035,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 					this.extbuffers.NONE, // gl_FragData[1]
 					this.extbuffers.NONE, // gl_FragData[2]
 					this.extbuffers.NONE, // gl_FragData[3]
-					]);
+				]);
 					
 			}
 
@@ -2046,7 +2052,8 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		// Final render output.**************************************************************
 		this.renderer.renderScreenQuad(gl); // 1rst screenQuad. (ssao, lighting, shadows) // this must be rendered in a framebuffer.***
 
-		if (this.isCesiumGlobe()) {
+		if (this.isCesiumGlobe()) 
+		{
 			this.bindMainFramebuffer();
 		}
 		this.renderer.renderScreenQuad2(gl); // 2nd screenQuad. (lightFog)
@@ -2055,7 +2062,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 
 		if (this.selectionManager)
 		{
-			if(this.selectionManager.existSelectedObjects())
+			if (this.selectionManager.existSelectedObjects())
 			{
 				this.renderer.renderSilhouette();
 			}
@@ -2114,8 +2121,8 @@ MagoManager.prototype.bindMagoFbo = function ()
 	texturesManager.texturesMergerFbo.bind();
 	
 	// MRT on mago.**************************************************
-	if(!this.extbuffers)
-	this.extbuffers = gl.getExtension("WEBGL_draw_buffers");
+	if (!this.extbuffers)
+	{ this.extbuffers = gl.getExtension("WEBGL_draw_buffers"); }
 	/*
 	if(!this.aqwse)
 	{
@@ -2150,10 +2157,10 @@ MagoManager.prototype.bindMagoFbo = function ()
 	this.extbuffers.drawBuffersWEBGL([
 		this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
 		this.extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - depthTex
-		this.extbuffers.COLOR_ATTACHMENT2_WEBGL,// gl_FragData[2] - normalTex
+		this.extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - normalTex
 		this.extbuffers.COLOR_ATTACHMENT3_WEBGL, // gl_FragData[3] - albedoTex
 		this.extbuffers.COLOR_ATTACHMENT4_WEBGL // gl_FragData[4] - selColorTex
-		]);
+	]);
 };
 
 /**
@@ -2177,13 +2184,13 @@ MagoManager.prototype.doRenderMagoWorld = function (frustumVolumenObject)
 	
 	var lightsArray = this.visibleObjControlerNodes.currentVisibleNativeObjects.lightSourcesArray;
 	var lightCount = lightsArray.length;
-	if(lightCount > 0 && sceneState.applyLightsShadows && !this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
+	if (lightCount > 0 && sceneState.applyLightsShadows && !this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
 	{
 		// for each visible lightSources, make cubeMap depthTextures if no exist.
 		var visiblesArray = this.visibleObjControlerNodes.getAllVisibles();
 		var nativeVisiblesArray = this.visibleObjControlerNodes.getAllNatives();
 		
-		for(var i=0; i<lightCount; i++)
+		for (var i=0; i<lightCount; i++)
 		{
 			var light = lightsArray[i];
 			light.doIntersectedObjectsCulling(visiblesArray, nativeVisiblesArray);
@@ -2192,7 +2199,7 @@ MagoManager.prototype.doRenderMagoWorld = function (frustumVolumenObject)
 
 	// 1.2) render selected silhouetteDepth.
 	var selectionManager = this.selectionManager;
-	if(selectionManager.existSelectedObjects())
+	if (selectionManager.existSelectedObjects())
 	{
 		this.renderer.renderSilhouetteDepth(); 
 	}
@@ -2220,10 +2227,10 @@ MagoManager.prototype.doRenderMagoWorld = function (frustumVolumenObject)
 		extbuffers.drawBuffersWEBGL([
 			extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
 			extbuffers.NONE, // gl_FragData[1] - depthTex
-			extbuffers.NONE,// gl_FragData[2] - normalTex
+			extbuffers.NONE, // gl_FragData[2] - normalTex
 			extbuffers.NONE, // gl_FragData[3] - albedoTex
 			extbuffers.NONE // gl_FragData[4] - selColorTex
-			]);
+		]);
 		this.renderer.renderAtmosphere(gl, renderType);
 
 		// Terrain.*****************************************************
@@ -2235,13 +2242,13 @@ MagoManager.prototype.doRenderMagoWorld = function (frustumVolumenObject)
 		extbuffers.drawBuffersWEBGL([
 			extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
 			extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - depthTex
-			extbuffers.COLOR_ATTACHMENT2_WEBGL,// gl_FragData[2] - normalTex
+			extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - normalTex
 			extbuffers.COLOR_ATTACHMENT3_WEBGL, // gl_FragData[3] - albedoTex
 			extbuffers.COLOR_ATTACHMENT4_WEBGL // gl_FragData[4] - selColorTex
-			]);
+		]);
 		var bDepthRender = false; // magoManager is no depth render.***
 		var renderType = 1;
-		this.tinTerrainManager.render (this, bDepthRender, renderType);
+		this.tinTerrainManager.render(this, bDepthRender, renderType);
 	}
 	
 
@@ -2262,7 +2269,7 @@ MagoManager.prototype.doRenderMagoWorld = function (frustumVolumenObject)
 		extbuffers.NONE, // gl_FragData[2]
 		extbuffers.COLOR_ATTACHMENT3_WEBGL, // gl_FragData[3] - albedoTex
 		extbuffers.COLOR_ATTACHMENT4_WEBGL // gl_FragData[4] - selColor4
-		]);
+	]);
 
 	renderType = 1;
 	this.renderType = 1;
@@ -2284,11 +2291,11 @@ MagoManager.prototype.doRenderMagoWorld = function (frustumVolumenObject)
 	{
 		// if exist lightSources, the store all lightSources of all frustums.
 		var lightSourcesArray = this.visibleObjControlerNodes.currentVisibleNativeObjects.lightSourcesArray;
-		if(!this.lightSourcesMap)
+		if (!this.lightSourcesMap)
 		{ this.lightSourcesMap = {}; }
 
 		var lightCount = lightSourcesArray.length;
-		for(var i=0; i<lightCount; i++)
+		for (var i=0; i<lightCount; i++)
 		{
 			var light = lightSourcesArray[i];
 			var lightGuid = light._guid;
@@ -2298,15 +2305,15 @@ MagoManager.prototype.doRenderMagoWorld = function (frustumVolumenObject)
 		if (this.currentFrustumIdx === 0) 
 		{
 			// now, make the lightSourcesArray.
-			if(!this.lightSourcesArray)
+			if (!this.lightSourcesArray)
 			{ this.lightSourcesArray = []; }
 
 			// 1rst, init the array.
 			this.lightSourcesArray.length = 0;
 
-			for(var key in this.lightSourcesMap)
+			for (var key in this.lightSourcesMap)
 			{
-				if(this.lightSourcesMap.hasOwnProperty(key))
+				if (this.lightSourcesMap.hasOwnProperty(key))
 				{
 					this.lightSourcesArray.push(this.lightSourcesMap[key]);
 				}
@@ -2324,13 +2331,13 @@ MagoManager.prototype.doRenderMagoWorld = function (frustumVolumenObject)
 		if (sceneState.applyLightsShadows)
 		{
 			// Create lightBufferFBO if no exist.
-			if(!this.texturesManager.lBuffer)
+			if (!this.texturesManager.lBuffer)
 			{
 				// create a lBuffer with 2 colorTextures : diffuseLighting & specularLighting.
 				var bufferWidth = this.sceneState.drawingBufferWidth[0];
 				var bufferHeight = this.sceneState.drawingBufferHeight[0];
 				var bUseMultiRenderTarget = this.postFxShadersManager.bUseMultiRenderTarget;
-				this.texturesManager.lBuffer = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 3}); 
+				this.texturesManager.lBuffer = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget: bUseMultiRenderTarget, numColorBuffers: 3}); 
 			}
 			this.lBuffer = this.texturesManager.lBuffer;
 			this.diffuseLightTex = this.lBuffer.colorBuffersArray[0];
@@ -2649,7 +2656,7 @@ MagoManager.getMaximumLevelOfTerrainProvider = function(terrainProvider)
 	}
 
 	return maxLevel;
-}
+};
 
 /**
  * valid date height by height reference
@@ -2681,7 +2688,8 @@ MagoManager.prototype.validateHeight = function(frustumObject)
 				next.push(needValidHeightNode);
 			}
 		}
-		if (process.length > 0){
+		if (process.length > 0)
+		{
 			var that = this;
 			new Promise(function(resolve) 
 			{
@@ -2718,9 +2726,9 @@ MagoManager.prototype.validateHeight = function(frustumObject)
 							n.changeLocationAndRotation(cp.latitude, cp.longitude, n.caculateHeightByReference(samplePositions[k].height), currentGeoLocationData.heading, currentGeoLocationData.pitch, currentGeoLocationData.roll, obj.mm);
 						}
 						obj.mm.emit(MagoManager.EVENT_TYPE.VALIDHEIGHTEND, {
-							type   : MagoManager.EVENT_TYPE.VALIDHEIGHTEND,
+							type           : MagoManager.EVENT_TYPE.VALIDHEIGHTEND,
 							validDataArray : nArray,
-							timestamp: new Date()
+							timestamp      : new Date()
 						});
 					}
 				});
@@ -2752,7 +2760,8 @@ MagoManager.prototype.validateHeight = function(frustumObject)
 			}
 		}
 		
-		if (process.length > 0) { 
+		if (process.length > 0) 
+		{ 
 			var that = this;
 			new Promise(function(resolve) 
 			{
@@ -2781,9 +2790,9 @@ MagoManager.prototype.validateHeight = function(frustumObject)
 							n.setTerrainHeight(vHeight);
 						}
 						obj.mm.emit(MagoManager.EVENT_TYPE.VALIDHEIGHTEND, {
-							type   : MagoManager.EVENT_TYPE.VALIDHEIGHTEND,
+							type           : MagoManager.EVENT_TYPE.VALIDHEIGHTEND,
 							validDataArray : nArray,
-							timestamp: new Date()
+							timestamp      : new Date()
 						});
 					}
 				});
@@ -2855,10 +2864,13 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function (lowLodNodesArray)
 
 			if (lodBuildingData.isModelRef)
 			{ 
-				if(neoBuilding.octree) {
+				if (neoBuilding.octree) 
+				{
 					neoBuilding.octree.prepareSkinData(this);
 				}
-			} else {
+			}
+			else 
+			{
 				if (neoBuilding.metaData && neoBuilding.metaData.fileLoadState === CODE.fileLoadState.PARSE_FINISHED)
 				{ neoBuilding.prepareSkin(this); }
 			}
@@ -2875,7 +2887,7 @@ MagoManager.prototype.prepareVisibleLowLodNodes = function (lowLodNodesArray)
 		if (this.readerWriter.skinLegos_requested > maxParsesCount)
 		{ return; }
 
-		if(camIsMoving && i > maxParsesCount)
+		if (camIsMoving && i > maxParsesCount)
 		{ return; }
 	}
 };
@@ -2953,18 +2965,19 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 			nodeRoot = rootNodesMap[key];
 			var label = nodeRoot.data.attributes.label;
 
-			if(nodeRoot.data.attributes.isVisible === false) continue;
+			if (nodeRoot.data.attributes.isVisible === false) { continue; }
 			geoLocDataManager = nodeRoot.data.geoLocDataManager;
 			geoLoc = geoLocDataManager.getCurrentGeoLocationData();
 
 			worldPosition = nodeRoot.getBBoxCenterPositionWorldCoord(geoLoc);
 			screenCoord = ManagerUtils.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord, this);
 
-			if(isNaN(screenCoord.x) || isNaN(screenCoord.y)) continue;
+			if (isNaN(screenCoord.x) || isNaN(screenCoord.y)) { continue; }
 
-			if(!label) {
+			if (!label) 
+			{
 				var dataName = nodeRoot.data.data_name;
-				if(!dataName || dataName.length === 0) continue;
+				if (!dataName || dataName.length === 0) { continue; }
 				var elemFromPoints = document.elementsFromPoint(screenCoord.x, screenCoord.y);
 				if (elemFromPoints.length > 0 && elemFromPoints[0].nodeName === 'CANVAS' && screenCoord.x >= 0 && screenCoord.y >= 0)
 				{
@@ -2975,17 +2988,19 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 					ctx.fillText(dataName, screenCoord.x, screenCoord.y);
 					ctx.strokeText(dataName, screenCoord.x, screenCoord.y);
 				}
-			} else {
-				if(label instanceof Array)
+			}
+			else 
+			{
+				if (label instanceof Array)
 				{
-					for(var j=0,labelLen=label.length;j<labelLen;j++)
+					for (var j=0, labelLen=label.length;j<labelLen;j++)
 					{
 						var lb = label[j];
 						ctx.fillStyle = lb.backgroundFillColor ;
 						ctx.strokeStyle = lb.backgroundStrokeColor ;
 						var backgroundOffset = lb.backgroundOffset;
 						var backgroundSize = lb.backgroundSize;
-						roundRect(ctx, screenCoord.x+backgroundOffset[0], screenCoord.y + backgroundOffset[1], backgroundSize[0], backgroundSize[1], 10, true,true);
+						roundRect(ctx, screenCoord.x+backgroundOffset[0], screenCoord.y + backgroundOffset[1], backgroundSize[0], backgroundSize[1], 10, true, true);
 						ctx.font = "13px Arial";
 						ctx.fillStyle = "white";
 						ctx.strokeStyle = "white";
@@ -2993,29 +3008,35 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 						var textOffset = lb.textOffset;
 						ctx.fillText(lb.text, screenCoord.x+textOffset[0], screenCoord.y+textOffset[1]);
 					}
-				} else {
+				}
+				else 
+				{
 					ctx.fillStyle = label.backgroundFillColor ;
 					ctx.strokeStyle = label.backgroundStrokeColor ;
 					var backgroundOffset = label.backgroundOffset;
 					var backgroundSize = label.backgroundSize;
-					roundRect(ctx, screenCoord.x+backgroundOffset[0], screenCoord.y + backgroundOffset[1], backgroundSize[0], backgroundSize[1], 10, true,true);
+					roundRect(ctx, screenCoord.x+backgroundOffset[0], screenCoord.y + backgroundOffset[1], backgroundSize[0], backgroundSize[1], 10, true, true);
 					ctx.font = label.font ? label.font :"13px Arial";
 					ctx.fillStyle = "white";
 					ctx.strokeStyle = "white";
 					ctx.textAlign = "center";
 					var textOffset = label.textOffset;
 					var text = label.text;
-					if(text.indexOf('\n') > -1) {
+					if (text.indexOf('\n') > -1) 
+					{
 						var splitTexts = text.split('\n');
 						var yoffset = textOffset[1];
 						var ypos = screenCoord.y + yoffset;
-						for(var k=0,textLen=splitTexts.length;k<textLen;k++) {
+						for (var k=0, textLen=splitTexts.length;k<textLen;k++) 
+						{
 							var splitText = splitTexts[k];
 							ypos = ypos + k*-2*yoffset;
-							if(k>0) ypos += 3;
+							if (k>0) { ypos += 3; }
 							ctx.fillText(splitText, screenCoord.x+textOffset[0], ypos);
 						}
-					} else {
+					}
+					else 
+					{
 						ctx.fillText(text, screenCoord.x+textOffset[0], screenCoord.y+textOffset[1]);
 					}
 				}
@@ -3027,21 +3048,29 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 
 	ctx.restore(); 
 
-	function roundRect(context, x, y, width, height, radius, fill, stroke) {
-		if (typeof stroke === 'undefined') {
+	function roundRect(context, x, y, width, height, radius, fill, stroke) 
+	{
+		if (typeof stroke === 'undefined') 
+		{
 		  stroke = true;
 		}
-		if (typeof radius === 'undefined') {
+		if (typeof radius === 'undefined') 
+		{
 		  radius = 5;
 		}
-		if (typeof radius === 'number') {
+		if (typeof radius === 'number') 
+		{
 		  radius = {tl: radius, tr: radius, br: radius, bl: radius};
-		} else {
+		}
+		else 
+		{
 		  var defaultRadius = {tl: 0, tr: 0, br: 0, bl: 0};
-		  for (var side in defaultRadius) {
-			if(defaultRadius.hasOwnProperty(side)) {
-				radius[side] = radius[side] || defaultRadius[side];
-			}
+		  for (var side in defaultRadius) 
+			{
+				if (defaultRadius.hasOwnProperty(side)) 
+				{
+					radius[side] = radius[side] || defaultRadius[side];
+				}
 		  }
 		}
 		context.beginPath();
@@ -3055,10 +3084,12 @@ MagoManager.prototype.drawBuildingNames = function(visibleObjControlerNodes)
 		context.lineTo(x, y + radius.tl);
 		context.quadraticCurveTo(x, y, x + radius.tl, y);
 		context.closePath();
-		if (fill) {
+		if (fill) 
+		{
 			context.fill();
 		}
-		if (stroke) {
+		if (stroke) 
+		{
 			context.stroke();
 		}
 	  
@@ -3073,7 +3104,7 @@ MagoManager.prototype.drawSelectedExtruionBuildingLabel = function()
 {
 	var selected = this.selectionManager.getSelectedGeneralArray();
 	var selectedLength = selected.length;
-	if(selectedLength === 0) return;
+	if (selectedLength === 0) { return; }
 
 	var canvas = this.getObjectLabel();
 	var ctx = canvas.getContext("2d");
@@ -3083,39 +3114,44 @@ MagoManager.prototype.drawSelectedExtruionBuildingLabel = function()
 	var worldPosition;
 	var screenCoord;
 
-	for(var i=0;i<selectedLength;i++)
+	for (var i=0;i<selectedLength;i++)
 	{
 		var nativeModel = selected[i];
 
-		if(!(nativeModel instanceof ExtrusionBuilding) || this.modeler.objectsArray.indexOf(nativeModel) < 0) continue;
+		if (!(nativeModel instanceof ExtrusionBuilding) || this.modeler.objectsArray.indexOf(nativeModel) < 0) { continue; }
 
 		var center = nativeModel.getCenter();
 		var centerInBuilding = false;
 		var labelGeoCoord;
 
 		var listLength = nativeModel.geographicCoordListsArray.length;
-		for(var j=0;j<listLength;j++) {
+		for (var j=0;j<listLength;j++) 
+		{
 			var geographicCoordList = nativeModel.geographicCoordListsArray[j];
 			var extent = geographicCoordList.getGeographicExtent();
-			if(extent.intersects2dWithGeoCoord(center)) {
+			if (extent.intersects2dWithGeoCoord(center)) 
+			{
 				centerInBuilding = true;
 				break;
 			}
 		}
 
-		if(centerInBuilding) {
+		if (centerInBuilding) 
+		{
 			labelGeoCoord = center;
-		} else {
+		}
+		else 
+		{
 			var geographicCoordList = nativeModel.geographicCoordListsArray[Math.floor(listLength/2)];
 			var extent = geographicCoordList.getGeographicExtent();
 			labelGeoCoord = new GeographicCoord(extent.getCenterLongitude(), extent.getCenterLatitude(), extent.getCenterAltitude()); 
 		}
 
 		labelGeoCoord.altitude = nativeModel.getRealHeight() + 2;
-		var worldPosition = ManagerUtils.geographicCoordToWorldPoint(labelGeoCoord.longitude,labelGeoCoord.latitude,labelGeoCoord.altitude);
+		var worldPosition = ManagerUtils.geographicCoordToWorldPoint(labelGeoCoord.longitude, labelGeoCoord.latitude, labelGeoCoord.altitude);
 		screenCoord = ManagerUtils.calculateWorldPositionToScreenCoord(gl, worldPosition.x, worldPosition.y, worldPosition.z, screenCoord, this);
 
-		if(isNaN(screenCoord.x) || isNaN(screenCoord.y)) continue;
+		if (isNaN(screenCoord.x) || isNaN(screenCoord.y)) { continue; }
 		
 		ctx.font = "normal normal bolder 18px Helvetica";
 		var text = nativeModel.getLevel();
@@ -3192,19 +3228,19 @@ MagoManager.prototype.TEST__shader = function()
 	var gl = this.getGl();
 	
 
-	if(this.czm_globeDepthText)
+	if (this.czm_globeDepthText)
 	{
-		if(!this.auxFbo)
+		if (!this.auxFbo)
 		{
 			this.auxFbo = new FBO(gl, sceenWidth, sceenHeight, {matchCanvasSize: true}); 
 			this.auxFbo.setColorBuffer(this.czm_globeDepthText);
 		}
 	}
 	else
-		return;
+	{ return; }
 
 
-	if(this.auxFbo.colorBuffer)
+	if (this.auxFbo.colorBuffer)
 	{
 		this.auxFbo.bind();
 		gl.viewport(0, 0, sceenWidth, sceenHeight);
@@ -3240,7 +3276,7 @@ MagoManager.prototype.TEST__shader = function()
 	// End calculing near & far from projectionMatrix.--------------------
 
 	var projectionMatrixInv = this.sceneState.getProjectionMatrixInv();
-	var viewPosHcartesian = projectionMatrixInv.transformPoint4D([x_ndc, y_ndc, z_ndc, 1.0], undefined)
+	var viewPosHcartesian = projectionMatrixInv.transformPoint4D([x_ndc, y_ndc, z_ndc, 1.0], undefined);
 	///var viewPosH = projectionMatrixInv * vec4(x_ndc, y_ndc, z_ndc, 1.0);
 	var viewPosH = new Point3D(viewPosHcartesian[0], viewPosHcartesian[1], viewPosHcartesian[2]);
 	var posCC = new Point3D(viewPosHcartesian[0]/viewPosHcartesian[3], viewPosHcartesian[1]/viewPosHcartesian[3], viewPosHcartesian[2]/viewPosHcartesian[3]);
@@ -3255,7 +3291,7 @@ MagoManager.prototype.TEST__shader = function()
 	var far = currFrustum.far[0];
 	var aspectRatio = camera.frustum.aspectRatio[0];
 	var hfar = 2.0 * tangentOfHalfFovy * far;
-    var wfar = hfar * aspectRatio;    
+	var wfar = hfar * aspectRatio;    
 	var ray = new Point3D(wfar * (screenCoordX - 0.5), hfar * (screenCoordY - 0.5), -far);  
 	var origin = new Point3D(ray.x, ray.y, ray.z);
 	origin.scale(linearDepth);
@@ -3295,146 +3331,146 @@ MagoManager.prototype.TEST__shader = function()
 MagoManager.prototype.TEST__splittedExtrudedBuilding = function() 
 {
 	var polygon = {
-		"type": "FeatureCollection",
-		"name": "polygon",
-		"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
-		"features": [
-		{ "type": "Feature", "properties": { "id": 26 }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [ 127.007156778934217, 37.451560023041928 ], [ 127.007460564737684, 37.451040386226865 ], [ 127.00744861308273, 37.451014222695612 ], [ 127.00741694547871, 37.451002455751151 ], [ 127.006967071123384, 37.450835291596306 ], [ 127.006934253008012, 37.450844820064908 ], [ 127.006828575012591, 37.451025584925794 ], [ 127.006920766653792, 37.451059841707512 ], [ 127.006959916298669, 37.45099287523324 ], [ 127.006998483134424, 37.451007205953346 ], [ 127.007032475979713, 37.45094906015845 ], [ 127.00728902455549, 37.45104438837059 ], [ 127.007263482357018, 37.451088079341183 ], [ 127.007310295354259, 37.451105474010767 ], [ 127.007097217797622, 37.451469950027445 ], [ 127.006802613819659, 37.451360481183009 ], [ 127.006878979501849, 37.451229856553653 ], [ 127.006786787668318, 37.451195599739314 ], [ 127.006672178936796, 37.451391639069755 ], [ 127.00667759315165, 37.451403491647312 ], [ 127.007092593098307, 37.451557697325363 ], [ 127.007124260885604, 37.451569464355593 ], [ 127.007156778934217, 37.451560023041928 ] ] ] ] } }
+		"type"     : "FeatureCollection",
+		"name"     : "polygon",
+		"crs"      : { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+		"features" : [
+			{ "type": "Feature", "properties": { "id": 26 }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [ 127.007156778934217, 37.451560023041928 ], [ 127.007460564737684, 37.451040386226865 ], [ 127.00744861308273, 37.451014222695612 ], [ 127.00741694547871, 37.451002455751151 ], [ 127.006967071123384, 37.450835291596306 ], [ 127.006934253008012, 37.450844820064908 ], [ 127.006828575012591, 37.451025584925794 ], [ 127.006920766653792, 37.451059841707512 ], [ 127.006959916298669, 37.45099287523324 ], [ 127.006998483134424, 37.451007205953346 ], [ 127.007032475979713, 37.45094906015845 ], [ 127.00728902455549, 37.45104438837059 ], [ 127.007263482357018, 37.451088079341183 ], [ 127.007310295354259, 37.451105474010767 ], [ 127.007097217797622, 37.451469950027445 ], [ 127.006802613819659, 37.451360481183009 ], [ 127.006878979501849, 37.451229856553653 ], [ 127.006786787668318, 37.451195599739314 ], [ 127.006672178936796, 37.451391639069755 ], [ 127.00667759315165, 37.451403491647312 ], [ 127.007092593098307, 37.451557697325363 ], [ 127.007124260885604, 37.451569464355593 ], [ 127.007156778934217, 37.451560023041928 ] ] ] ] } }
 		]
 	};
 
 	var polygon2 = {
-		"type": "FeatureCollection",
-		"name": "polygon",
-		"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
-		"features": [
-		{ "type": "Feature", "properties": { "id": 26 }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [[127.00715678,37.45156002],[127.00746056,37.45104039],[127.00744861,37.45101422],[127.00741695,37.45100246],[127.00696707,37.45083529],[127.00693425,37.45084482],[127.00682858,37.45102558],[127.00692077,37.45105984],[127.00695992,37.45099288],[127.00699848,37.45100721],[127.00703248,37.45094906],[127.00728902,37.45104439],[127.00726348,37.45108808],[127.0073103,37.45110547],[127.00709722,37.45146995],[127.00680261,37.45136048],[127.00687898,37.45122986],[127.00678679,37.4511956],[127.00667218,37.45139164],[127.00667759,37.45140349],[127.00709259,37.4515577],[127.00712426,37.45156946],[127.00715678,37.45156002]]] ] } }
+		"type"     : "FeatureCollection",
+		"name"     : "polygon",
+		"crs"      : { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+		"features" : [
+			{ "type": "Feature", "properties": { "id": 26 }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [[127.00715678, 37.45156002], [127.00746056, 37.45104039], [127.00744861, 37.45101422], [127.00741695, 37.45100246], [127.00696707, 37.45083529], [127.00693425, 37.45084482], [127.00682858, 37.45102558], [127.00692077, 37.45105984], [127.00695992, 37.45099288], [127.00699848, 37.45100721], [127.00703248, 37.45094906], [127.00728902, 37.45104439], [127.00726348, 37.45108808], [127.0073103, 37.45110547], [127.00709722, 37.45146995], [127.00680261, 37.45136048], [127.00687898, 37.45122986], [127.00678679, 37.4511956], [127.00667218, 37.45139164], [127.00667759, 37.45140349], [127.00709259, 37.4515577], [127.00712426, 37.45156946], [127.00715678, 37.45156002]]] ] } }
 		]
 	};
 
 	var polygon3 = {
-		"type": "FeatureCollection",
-		"name": "polygon",
-		"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
-		"features": [
-		{ "type": "Feature", "properties": { "id": 26 }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [[127.00624431,37.45311893],
-		[127.00654177,37.45261149],
-		[127.00652793,37.45258185],
-		[127.00604714,37.45240348],
-		[127.00601203,37.45241478],
-		[127.00590635,37.45259555],
-		[127.00599854,37.4526298],
-		[127.00603769,37.45256284],
-		[127.00607626,37.45257717],
-		[127.00611025,37.45251902],
-		[127.0063668,37.45261435],
-		[127.00634126,37.45265804],[127.00638807,37.45267544],[127.00622799,37.45294118],[127.00599713,37.45283828],[127.00592387,37.45296367],[127.00595887,37.45297503],[127.00597467,37.4529813],[127.0059889,37.45298769],[127.00606894,37.45302214],[127.00608174,37.45302778],[127.00609454,37.45303275],[127.00611732,37.45304678],[127.00611974,37.45304806],[127.00612294,37.45305001],[127.00612875,37.45305315],[127.0061422,37.45306056],[127.00616388,37.4530727],[127.00622159,37.45310691],[127.00624431,37.45311893]]] ] } }
+		"type"     : "FeatureCollection",
+		"name"     : "polygon",
+		"crs"      : { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+		"features" : [
+			{ "type"       : "Feature", "properties" : { "id": 26 }, "geometry"   : { "type"        : "MultiPolygon", "coordinates" : [ [ [[127.00624431, 37.45311893],
+				[127.00654177, 37.45261149],
+				[127.00652793, 37.45258185],
+				[127.00604714, 37.45240348],
+				[127.00601203, 37.45241478],
+				[127.00590635, 37.45259555],
+				[127.00599854, 37.4526298],
+				[127.00603769, 37.45256284],
+				[127.00607626, 37.45257717],
+				[127.00611025, 37.45251902],
+				[127.0063668, 37.45261435],
+				[127.00634126, 37.45265804], [127.00638807, 37.45267544], [127.00622799, 37.45294118], [127.00599713, 37.45283828], [127.00592387, 37.45296367], [127.00595887, 37.45297503], [127.00597467, 37.4529813], [127.0059889, 37.45298769], [127.00606894, 37.45302214], [127.00608174, 37.45302778], [127.00609454, 37.45303275], [127.00611732, 37.45304678], [127.00611974, 37.45304806], [127.00612294, 37.45305001], [127.00612875, 37.45305315], [127.0061422, 37.45306056], [127.00616388, 37.4530727], [127.00622159, 37.45310691], [127.00624431, 37.45311893]]] ] } }
 		]
 	};
 
 	var polygon4 = {
-		"type": "FeatureCollection",
-		"name": "polygon",
-		"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
-		"features": [
-		{ "type": "Feature", "properties": { "id": 26 }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [[127.00712426088562, 37.45156946435559, 30.834664859310234],
-		[127.00709259309828, 37.45155769732531, 30.834664859310234],
-		[127.00667759315165, 37.451403491647234, 30.834664859310234],
-		[127.0066721789368, 37.45139163906972, 30.834664859310234],
-		[127.00678678766829, 37.451195599739265, 30.834664859310234],
-		[127.00687897950189, 37.451229856553624, 30.834664859310234],
-		[127.00680261381964, 37.45136048118296, 30.834664859310234],
-		[127.00709721779768, 37.45146995002743, 30.834664859310234],
-		[127.00731029535426, 37.451105474010745, 30.834664859310234],
-		[127.007263482357, 37.451088079341126, 30.834664859310234],
-		[127.00728902455552, 37.451044388370505, 30.834664859310234],
-		[127.00703247597968, 37.45094906015843, 30.834664859310234],
-		[127.0069984831344, 37.45100720595332, 30.834664859310234],
-		[127.00695991629873, 37.45099287523322, 30.834664859310234],
-		[127.00692076665378, 37.4510598417075, 30.834664859310234],
-		[127.00682857501259, 37.45102558492573, 30.834664859310234],
-		[127.00693425300804, 37.45084482006482, 30.834664859310234],
-		[127.00696707112338, 37.450835291596256, 30.834664859310234],
-		[127.00741694547875, 37.45100245575113, 30.834664859310234],
-		[127.00744861308276, 37.4510142226956, 30.834664859310234],
-		[127.00746056473766, 37.45104038622685, 30.834664859310234],
-		[127.00715677893419, 37.45156002304188, 30.834664859310234]]] ] } }
+		"type"     : "FeatureCollection",
+		"name"     : "polygon",
+		"crs"      : { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+		"features" : [
+			{ "type"       : "Feature", "properties" : { "id": 26 }, "geometry"   : { "type"        : "MultiPolygon", "coordinates" : [ [ [[127.00712426088562, 37.45156946435559, 30.834664859310234],
+				[127.00709259309828, 37.45155769732531, 30.834664859310234],
+				[127.00667759315165, 37.451403491647234, 30.834664859310234],
+				[127.0066721789368, 37.45139163906972, 30.834664859310234],
+				[127.00678678766829, 37.451195599739265, 30.834664859310234],
+				[127.00687897950189, 37.451229856553624, 30.834664859310234],
+				[127.00680261381964, 37.45136048118296, 30.834664859310234],
+				[127.00709721779768, 37.45146995002743, 30.834664859310234],
+				[127.00731029535426, 37.451105474010745, 30.834664859310234],
+				[127.007263482357, 37.451088079341126, 30.834664859310234],
+				[127.00728902455552, 37.451044388370505, 30.834664859310234],
+				[127.00703247597968, 37.45094906015843, 30.834664859310234],
+				[127.0069984831344, 37.45100720595332, 30.834664859310234],
+				[127.00695991629873, 37.45099287523322, 30.834664859310234],
+				[127.00692076665378, 37.4510598417075, 30.834664859310234],
+				[127.00682857501259, 37.45102558492573, 30.834664859310234],
+				[127.00693425300804, 37.45084482006482, 30.834664859310234],
+				[127.00696707112338, 37.450835291596256, 30.834664859310234],
+				[127.00741694547875, 37.45100245575113, 30.834664859310234],
+				[127.00744861308276, 37.4510142226956, 30.834664859310234],
+				[127.00746056473766, 37.45104038622685, 30.834664859310234],
+				[127.00715677893419, 37.45156002304188, 30.834664859310234]]] ] } }
 		]
 	};
 
 	var polygon5 = {
-		"type": "FeatureCollection",
-		"name": "polygon",
-		"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
-		"features": [
-		{ "type": "Feature", "properties": { "id": 26 }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [[127.00712426088562, 37.45156946435559],
-		[127.00709259309828, 37.45155769732531],
-		[127.00667759315165, 37.451403491647234],
-		[127.0066721789368, 37.45139163906972],
-		[127.00678678766829, 37.451195599739265],
-		[127.00687897950189, 37.451229856553624],
-		[127.00680261381964, 37.45136048118296],
-		[127.00709721779768, 37.45146995002743],
-		[127.00731029535426, 37.451105474010745],
-		[127.007263482357, 37.451088079341126],
-		[127.00728902455552, 37.451044388370505],
-		[127.00703247597968, 37.45094906015843],
-		[127.0069984831344, 37.45100720595332],
-		[127.00695991629873, 37.45099287523322],
-		[127.00692076665378, 37.4510598417075],
-		[127.00682857501259, 37.45102558492573],
-		[127.00693425300804, 37.45084482006482],
-		[127.00696707112338, 37.450835291596256],
-		[127.00741694547875, 37.45100245575113],
-		[127.00744861308276, 37.4510142226956],
-		[127.00746056473766, 37.45104038622685],
-		[127.00715677893419, 37.45156002304188]]] ] } }
+		"type"     : "FeatureCollection",
+		"name"     : "polygon",
+		"crs"      : { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+		"features" : [
+			{ "type"       : "Feature", "properties" : { "id": 26 }, "geometry"   : { "type"        : "MultiPolygon", "coordinates" : [ [ [[127.00712426088562, 37.45156946435559],
+				[127.00709259309828, 37.45155769732531],
+				[127.00667759315165, 37.451403491647234],
+				[127.0066721789368, 37.45139163906972],
+				[127.00678678766829, 37.451195599739265],
+				[127.00687897950189, 37.451229856553624],
+				[127.00680261381964, 37.45136048118296],
+				[127.00709721779768, 37.45146995002743],
+				[127.00731029535426, 37.451105474010745],
+				[127.007263482357, 37.451088079341126],
+				[127.00728902455552, 37.451044388370505],
+				[127.00703247597968, 37.45094906015843],
+				[127.0069984831344, 37.45100720595332],
+				[127.00695991629873, 37.45099287523322],
+				[127.00692076665378, 37.4510598417075],
+				[127.00682857501259, 37.45102558492573],
+				[127.00693425300804, 37.45084482006482],
+				[127.00696707112338, 37.450835291596256],
+				[127.00741694547875, 37.45100245575113],
+				[127.00744861308276, 37.4510142226956],
+				[127.00746056473766, 37.45104038622685],
+				[127.00715677893419, 37.45156002304188]]] ] } }
 		]
 	};
 
 	
 
 	var segments = {
-		"type": "FeatureCollection",
-		"name": "line",
-		"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
-		"features": [
-		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.00680258194113, 37.451361285269734 ], [ 127.006761027785558, 37.451435659267922 ] ] } },
-		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007096637143917, 37.451470331843581 ], [ 127.007056141692942, 37.451548940660174 ] ] } },
-		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007310230797074, 37.451105608108712 ], [ 127.007406308239581, 37.451143721474331 ] ] } },
-		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007289321381194, 37.451044203241878 ], [ 127.007332331255597, 37.450969829243697 ] ] } },
-		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007032453177501, 37.450949184503962 ], [ 127.007075463051905, 37.450873751801183 ] ] } },
-		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007032056163283, 37.450949713856282 ], [ 127.006902364849708, 37.450898896035454 ] ] } },
-		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.006960064250435, 37.450993120744904 ], [ 127.006868486302494, 37.450955536731584 ] ] } }
+		"type"     : "FeatureCollection",
+		"name"     : "line",
+		"crs"      : { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+		"features" : [
+			{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.00680258194113, 37.451361285269734 ], [ 127.006761027785558, 37.451435659267922 ] ] } },
+			{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007096637143917, 37.451470331843581 ], [ 127.007056141692942, 37.451548940660174 ] ] } },
+			{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007310230797074, 37.451105608108712 ], [ 127.007406308239581, 37.451143721474331 ] ] } },
+			{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007289321381194, 37.451044203241878 ], [ 127.007332331255597, 37.450969829243697 ] ] } },
+			{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007032453177501, 37.450949184503962 ], [ 127.007075463051905, 37.450873751801183 ] ] } },
+			{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007032056163283, 37.450949713856282 ], [ 127.006902364849708, 37.450898896035454 ] ] } },
+			{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.006960064250435, 37.450993120744904 ], [ 127.006868486302494, 37.450955536731584 ] ] } }
 		]
 	};
 
 	var segments2 = {
-		"type": "FeatureCollection",
-		"name": "26",
-		"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
-		"features": [
-		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.006806753742254, 37.451359602856371 ], [ 127.006709447420434, 37.451321237588523 ] ] } },
-		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.006854763909828, 37.451375356192607 ], [ 127.006809325715508, 37.451458302330344 ] ] } },
-		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.00699836575032, 37.451427438651173 ], [ 127.006955021671715, 37.451510921356906 ] ] } },
-		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007095029078798, 37.451464196435744 ], [ 127.00705280585106, 37.451549285884532 ] ] } },
-		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007117560636246, 37.451433386339353 ], [ 127.007208653897578, 37.451474539685165 ] ] } },
-		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007177466180138, 37.451327721104477 ], [ 127.007274718919035, 37.451371712563827 ] ] } },
-		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007236719758637, 37.45122818379366 ], [ 127.00732923315249, 37.451269762847076 ] ] } },
-		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007291812004411, 37.4511356703998 ], [ 127.007384325398277, 37.451176209976886 ] ] } },
-		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007309360183939, 37.451106075950335 ], [ 127.00737738351846, 37.450977905949415 ] ] } },
-		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007228403947948, 37.45102236747924 ], [ 127.00727102247771, 37.450940248848731 ] ] } },
-		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007095029078798, 37.450974449860347 ], [ 127.007136930030427, 37.450891393460971 ] ] } },
-		{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007034909203824, 37.450952346965117 ], [ 127.006900724536308, 37.450896406546654 ] ] } }
+		"type"     : "FeatureCollection",
+		"name"     : "26",
+		"crs"      : { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+		"features" : [
+			{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.006806753742254, 37.451359602856371 ], [ 127.006709447420434, 37.451321237588523 ] ] } },
+			{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.006854763909828, 37.451375356192607 ], [ 127.006809325715508, 37.451458302330344 ] ] } },
+			{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.00699836575032, 37.451427438651173 ], [ 127.006955021671715, 37.451510921356906 ] ] } },
+			{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007095029078798, 37.451464196435744 ], [ 127.00705280585106, 37.451549285884532 ] ] } },
+			{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007117560636246, 37.451433386339353 ], [ 127.007208653897578, 37.451474539685165 ] ] } },
+			{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007177466180138, 37.451327721104477 ], [ 127.007274718919035, 37.451371712563827 ] ] } },
+			{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007236719758637, 37.45122818379366 ], [ 127.00732923315249, 37.451269762847076 ] ] } },
+			{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007291812004411, 37.4511356703998 ], [ 127.007384325398277, 37.451176209976886 ] ] } },
+			{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007309360183939, 37.451106075950335 ], [ 127.00737738351846, 37.450977905949415 ] ] } },
+			{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007228403947948, 37.45102236747924 ], [ 127.00727102247771, 37.450940248848731 ] ] } },
+			{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007095029078798, 37.450974449860347 ], [ 127.007136930030427, 37.450891393460971 ] ] } },
+			{ "type": "Feature", "properties": { }, "geometry": { "type": "LineString", "coordinates": [ [ 127.007034909203824, 37.450952346965117 ], [ 127.006900724536308, 37.450896406546654 ] ] } }
 		]
-		}
+	};
 
 	this.sceneState.sunSystem.setDate(new Date('2020-09-21 03:00'));
 	// make geographicsCoordsArray.***
 	var geoCoordsArray = [];
 	var coordsArray = polygon4.features[0].geometry.coordinates[0][0];
 	var coordsCount = coordsArray.length;
-	for(var i=0; i<coordsCount; i++)
+	for (var i=0; i<coordsCount; i++)
 	{
 		var coord = coordsArray[i];
 		var geoCoord = new GeographicCoord(coord[0], coord[1], 0.0);
@@ -3446,7 +3482,7 @@ MagoManager.prototype.TEST__splittedExtrudedBuilding = function()
 	
 	var segmentsArray = segments.features;
 	var segmentsCount = segmentsArray.length;
-	for(var i=0; i<segmentsCount; i++)
+	for (var i=0; i<segmentsCount; i++)
 	{
 		var segment = segmentsArray[i].geometry.coordinates;
 		var strPoint2D = new Point2D(segment[0][0], segment[0][1]);
@@ -3459,7 +3495,7 @@ MagoManager.prototype.TEST__splittedExtrudedBuilding = function()
 	// make the polygon by geoCoordsArray.***
 	var polygon2d = Polygon2D.makePolygonByGeographicCoordArray(geoCoordsArray) ;
 	var resultConcavePointsIdxArray = polygon2d.calculateNormal(undefined);
-	if(polygon2d.normal < 0)
+	if (polygon2d.normal < 0)
 	{
 		polygon2d.reverseSense();
 	}
@@ -3473,12 +3509,12 @@ MagoManager.prototype.TEST__splittedExtrudedBuilding = function()
 	var height = 100.0;
 	var options = {};
 	var geoCoordsListsArray = [];
-	for(var i=0; i<splittedPolygonsCount; i++)
+	for (var i=0; i<splittedPolygonsCount; i++)
 	{
 		var polygon2d = resultSplittedPolygons[i];
 		var geographicCoordsArray = [];
 		var coordsCount = polygon2d.point2dList.getPointsCount();
-		for(var j=0; j<coordsCount; j++)
+		for (var j=0; j<coordsCount; j++)
 		{
 			var point2d = polygon2d.point2dList.getPoint(j);
 			var geoCoord = new GeographicCoord(point2d.x, point2d.y, 0.0);
@@ -3523,7 +3559,7 @@ MagoManager.prototype.TEST__splittedExtrudedBuilding = function()
 	var maxHeight = 60.0;
 	//options.limitationHeights = new Float32Array([minHeight, maxHeight]);
 
-	options.color = new Color(Math.random(),Math.random(),Math.random(),1);
+	options.color = new Color(Math.random(), Math.random(), Math.random(), 1);
 	options.renderWireframe = true;
 	options.wireframeColor4 = new Color(1.0, 0.5, 0.0, 1.0);
 	options.limitationInfringingDynamicColor4 = new DynamicColor(1.0, 0.5, 1.0, 1.0);
@@ -5892,8 +5928,8 @@ MagoManager.prototype.checkPropertyFilters = function(nodesArray)
 	{ return; }
 	
 	var nodesCount = nodesArray.length;
-	if(nodesCount === 0)
-	return;
+	if (nodesCount === 0)
+	{ return; }
 
 	var node;	
 	var projectId;
@@ -7056,7 +7092,7 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function (intersectedLo
 					continue;
 				}
 
-				if(neoBuilding.headerDataArrayBuffer && neoBuilding.metaData !== undefined && neoBuilding.metaData.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED) 
+				if (neoBuilding.headerDataArrayBuffer && neoBuilding.metaData !== undefined && neoBuilding.metaData.fileLoadState !== CODE.fileLoadState.PARSE_FINISHED) 
 				{
 					neoBuilding.metaData.parseFileHeaderAsimetricVersion(neoBuilding.headerDataArrayBuffer, 0);
 				}
@@ -7133,7 +7169,8 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function (intersectedLo
 					else
 					{
 						//when projectsType 10 and near, prepare model and ref data, ignore lod. 
-						if(projectsType === 10 && distToCamera < 1500) {
+						if (projectsType === 10 && distToCamera < 1500) 
+						{
 							visibleNodes.putNodeByProjectType(node);
 						}
 
@@ -7149,10 +7186,10 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function (intersectedLo
 
 		// native opaques & transparents.
 		var nativeObjectsCount = nativeObjects.generalObjectsArray.length;
-		for(var j=0; j<nativeObjectsCount; j++)
+		for (var j=0; j<nativeObjectsCount; j++)
 		{
 			var native = nativeObjects.generalObjectsArray[j];
-			if(native.attributes._deleted)
+			if (native.attributes._deleted)
 			{
 				lowestTile.deleteNativeObjectByGuid(native._guid, this);
 				continue;
@@ -7164,8 +7201,8 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function (intersectedLo
 			// intersect with Frustum
 			if (frustumCull !== Constant.INTERSECTION_OUTSIDE) 
 			{
-				if(native.isOpaque())
-				{ currVisibleNativeObjects.opaquesArray.push(native);}
+				if (native.isOpaque())
+				{ currVisibleNativeObjects.opaquesArray.push(native); }
 				else
 				{
 					currVisibleNativeObjects.transparentsArray.push(native);
@@ -7175,7 +7212,7 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function (intersectedLo
 
 		// native excavations.
 		nativeObjectsCount = nativeObjects.excavationsArray.length;
-		for(var j=0; j<nativeObjectsCount; j++)
+		for (var j=0; j<nativeObjectsCount; j++)
 		{
 			var native = nativeObjects.excavationsArray[j];
 			this.boundingSphere_Aux = native.getBoundingSphereWC(this.boundingSphere_Aux);
@@ -7190,7 +7227,7 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function (intersectedLo
 
 		// native vectorType objects.
 		nativeObjectsCount = nativeObjects.vectorTypeArray.length;
-		for(var j=0; j<nativeObjectsCount; j++)
+		for (var j=0; j<nativeObjectsCount; j++)
 		{
 			var native = nativeObjects.vectorTypeArray[j];
 			this.boundingSphere_Aux = native.getBoundingSphereWC(this.boundingSphere_Aux);
@@ -7205,7 +7242,7 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function (intersectedLo
 
 		// native lightSources.
 		nativeObjectsCount = nativeObjects.lightSourcesArray.length;
-		for(var j=0; j<nativeObjectsCount; j++)
+		for (var j=0; j<nativeObjectsCount; j++)
 		{
 			var native = nativeObjects.lightSourcesArray[j];
 			this.boundingSphere_Aux = native.getBoundingSphereWC(this.boundingSphere_Aux);
@@ -7227,18 +7264,18 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function (intersectedLo
 
 		// native lightSources.
 		nativeObjectsCount = nativeObjects.nativeSeedArray.length;
-		for(var j=0; j<nativeObjectsCount; j++)
+		for (var j=0; j<nativeObjectsCount; j++)
 		{
 			var seed = nativeObjects.nativeSeedArray[j];
 			var master = this.koreaBuildingMaster[seed.masterId];
 
-			if(master.show && seed.status === KoreaBuildingSeed.STATUS.UNLOAD) 
+			if (master.show && seed.status === KoreaBuildingSeed.STATUS.UNLOAD) 
 			{
 				seed.load();
 				continue;
 			}
 
-			if(seed.status === KoreaBuildingSeed.STATUS.LOADEND) 
+			if (seed.status === KoreaBuildingSeed.STATUS.LOADEND) 
 			{
 				//remove
 				continue;
@@ -7550,7 +7587,8 @@ MagoManager.prototype.getObjectIndexFileForData = function(projectId, f4dObject)
 	var fileName = this.readerWriter.geometryDataPath + "/" + geometrySubDataPath + Constant.OBJECT_INDEX_FILE + Constant.CACHE_VERSION + this.config.getPolicy().content_cache_version;
 	this.readerWriter.getObjectIndexFileForData(fileName, this, projectId, newDataKeys, f4dObject);
 
-	function addChildrend(childrenArray, dataKeyArray, child) {
+	function addChildrend(childrenArray, dataKeyArray, child) 
+	{
 		var metaInfo = child.metainfo;
 		if (metaInfo && typeof metaInfo !== 'object')
 		{
@@ -7723,7 +7761,7 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 					attributes.heightReference = HeightReference.NONE;
 				}
 
-				if(label)
+				if (label)
 				{
 					attributes.label = label;
 				}
@@ -7736,9 +7774,12 @@ MagoManager.prototype.makeNode = function(jasonObject, resultPhysicalNodesArray,
 				// this is root node.
 				if (height === undefined || height === null)
 				{ height = 0; }
-				if(attributes.heightReference === HeightReference.RELATIVE_TO_GROUND) {
+				if (attributes.heightReference === HeightReference.RELATIVE_TO_GROUND) 
+				{
 					data.relativeHeight = height;
-				} else {
+				}
+				else 
+				{
 					data.relativeHeight = 0;
 				}
 				
@@ -8176,9 +8217,12 @@ MagoManager.prototype.instantiateStaticModel = function(attributes)
 		node.data.rotationsDegree = new Point3D(pitch, roll, heading);
 		node.data.geoLocDataManager = geoLocDataManager;
 
-		if(attributes.heightReference === HeightReference.RELATIVE_TO_GROUND) {
+		if (attributes.heightReference === HeightReference.RELATIVE_TO_GROUND) 
+		{
 			node.data.relativeHeight = geoCoord.altitude;
-		} else {
+		}
+		else 
+		{
 			node.data.relativeHeight = 0;
 		}
 
@@ -9081,7 +9125,7 @@ MagoManager.prototype.callAPI = function(api)
 
 MagoManager.prototype.getSelectionManager = function ()
 {
-	if(!this.selectionManager)
+	if (!this.selectionManager)
 	{
 		this.selectionManager = new SelectionManager(this);
 	}
@@ -9124,7 +9168,7 @@ MagoManager.prototype.deleteAll = function ()
 		this.tinTerrainManager = undefined;
 	}
 
-	if(!this.isCesiumGlobe()) cancelAnimationFrame(magoManager.reqFrameId);
+	if (!this.isCesiumGlobe()) { cancelAnimationFrame(magoManager.reqFrameId); }
 };
 
 MagoManager.prototype.checkCollision = function (position, direction)
@@ -9182,32 +9226,32 @@ MagoManager.prototype.checkCollision = function (position, direction)
 MagoManager.prototype.renderBasicGl_test = function()
 {
 	var gl = this.getGl();
-	if(!this.testShader) 
+	if (!this.testShader) 
 	{
 		var fragCode =
             'void main(void) {' +
                'gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);' +
 			'}';
-			var vertCode =
+		var vertCode =
             'attribute vec3 coordinates;' +
             'void main(void) {' +
                ' gl_Position = vec4(coordinates, 1.0);' +
             '}';
 
-	// 5) Test Quad shader.****************************************************************************************
+		// 5) Test Quad shader.****************************************************************************************
 	
-	var shaderName = "renderBasicGl_test"; // used by temperatura layer.***
-	var shader = this.postFxShadersManager.createShaderProgram(gl, vertCode, fragCode, shaderName, this);
+		var shaderName = "renderBasicGl_test"; // used by temperatura layer.***
+		var shader = this.postFxShadersManager.createShaderProgram(gl, vertCode, fragCode, shaderName, this);
 
-	this.testShader = shader;
+		this.testShader = shader;
 	}
 	
 
-	var positions = new Float32Array([0.0,0.0,0,
-									0.5,0.5,0,
-									1.0,1.0,0]);
+	var positions = new Float32Array([0.0, 0.0, 0,
+		0.5, 0.5, 0,
+		1.0, 1.0, 0]);
 	var vboCacheKey = new VBOVertexIdxCacheKey();
-	vboCacheKey.setDataArrayPos(positions, this.vboMemoryManager,3);
+	vboCacheKey.setDataArrayPos(positions, this.vboMemoryManager, 3);
 	vboCacheKey.vboBufferPos.isReady(gl, this.vboMemoryManager);
 	
 	this.testShader.useProgram();
@@ -9217,7 +9261,7 @@ MagoManager.prototype.renderBasicGl_test = function()
 	gl.disable(gl.CULL_FACE);
 	gl.drawArrays(gl.LINE_STRIP, 0, vboCacheKey.vertexCount);
 
-}
+};
 
 
 /**
@@ -9227,9 +9271,10 @@ MagoManager.prototype.renderBasicGl_test = function()
  * 
  * @return {KoreaBuildingMaster}
  */
- MagoManager.prototype.addKoreaBuildingMaster = function(url, format, option) {
-    var master = new KoreaBuildingMaster(url, format, option, this);
-    this.koreaBuildingMaster[master.guid] = master;
+MagoManager.prototype.addKoreaBuildingMaster = function(url, format, option) 
+{
+	var master = new KoreaBuildingMaster(url, format, option, this);
+	this.koreaBuildingMaster[master.guid] = master;
 
-    return master;
-}
+	return master;
+};

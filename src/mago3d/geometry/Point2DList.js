@@ -55,11 +55,12 @@ Point2DList.prototype.insertPoint = function(point2d, idx)
 	if (this.pointsArray === undefined)
 	{ this.pointsArray = []; }
 
-	if(idx > this.pointsArray.length-1)
+	if (idx > this.pointsArray.length-1)
 	{
 		this.pointsArray.push(point2d);
 	}
-	else{
+	else 
+	{
 		this.pointsArray.splice(idx, 0, point2d);
 	}
 };

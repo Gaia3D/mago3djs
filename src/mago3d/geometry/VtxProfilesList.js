@@ -149,8 +149,10 @@ VtxProfilesList.prototype.addVtxProfile = function(vtxProfile)
  */
 VtxProfilesList.prototype.newVtxProfile = function()
 {
-	if (this.vtxProfilesArray === undefined)
-	{ this.vtxProfilesArray = []; }
+	if (this.vtxProfilesArray === undefined) 
+	{ 
+		this.vtxProfilesArray = []; 
+	}
 	
 	var vtxProfile = new VtxProfile();
 	this.vtxProfilesArray.push(vtxProfile);
@@ -422,11 +424,13 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
  */
 VtxProfilesList.getTransversalSurface = function(vtxProfile, convexFacesIndicesData, resultSurface)
 {
-	if (resultSurface === undefined) { 
+	if (resultSurface === undefined) 
+	{ 
 		resultSurface = new Surface(); 
 	}
 
-	if (convexFacesIndicesData === undefined) { 
+	if (convexFacesIndicesData === undefined) 
+	{ 
 		// Calculate the convexFacesIndicesData.
 		var profile2d = vtxProfile.getProjectedProfile2D(undefined);
 		convexFacesIndicesData = profile2d.getConvexFacesIndicesData(convexFacesIndicesData);

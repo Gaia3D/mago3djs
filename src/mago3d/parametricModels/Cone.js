@@ -14,7 +14,7 @@ var Cone = function(radius, height, options)
 	}
 	
 	this.radius = 10;
-    this.height = 5;
+	this.height = 5;
 	this.baseType = 1; // 0= NONE. 1= PLANE. 2= SPHERICAL.
 	this.originType = 0; // 0= ATBASE, 1= ATVERTEX
 	
@@ -45,13 +45,13 @@ var Cone = function(radius, height, options)
 		}
 
 		var baseType = options.baseType;
-		if(baseType)
+		if (baseType)
 		{
 			this.baseType = baseType;
 		}
 
 		var originType = options.originType;
-		if(originType)
+		if (originType)
 		{
 			this.originType = originType;
 		}
@@ -90,12 +90,12 @@ Cone.prototype.makeMesh = function()
 	polyline.newPoint2d(0.0, height);            
 	polyline.newPoint2d(-radius, 0.0); 
 	
-	if(this.baseType === 1)
+	if (this.baseType === 1)
 	{
 		// Base plane.
 		polyline.newPoint2d(0.0, 0.0); 
 	}
-	else if(this.baseType === 2)
+	else if (this.baseType === 2)
 	{
 		// Base spherical.
 		var sphericalRadius = Math.sqrt(height*height + radius*radius);
@@ -121,7 +121,7 @@ Cone.prototype.makeMesh = function()
 	this.mesh = mesh.getCopySurfaceIndependentMesh(mesh);
 	this.mesh.rotate(90, 1.0, 0.0, 0.0);
 
-	if(this.originType === 1)
+	if (this.originType === 1)
 	{
 		this.mesh.translate(0.0, 0.0, -height);
 	}

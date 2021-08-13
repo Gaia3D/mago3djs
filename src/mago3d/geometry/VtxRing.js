@@ -206,10 +206,10 @@ VtxRing.prototype.makeByPoints3DArray = function(point3dArray, options)
 	if (point3dArray === undefined)
 	{ return; }
 
-	if(options)
+	if (options)
 	{
-		if(options.isOpen)
-		this.setIsOpen(options.isOpen);
+		if (options.isOpen)
+		{ this.setIsOpen(options.isOpen); }
 	}
 	
 	if (this.vertexList === undefined)
@@ -360,15 +360,15 @@ VtxRing.prototype.calculateElementsIndicesRange = function()
 			}
 			if (i !== vertexCount)
 			{
-				if(i === vertexCount -1)
+				if (i === vertexCount -1)
 				{
-					if(!this.isOpen)
+					if (!this.isOpen)
 					{
 						idxRange = this.newElementIndexRange();
 						idxRange.strIdx = i;
 					}
 					else
-					idxRange = undefined;
+					{ idxRange = undefined; }
 				}
 				else
 				{

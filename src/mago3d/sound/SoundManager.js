@@ -13,8 +13,8 @@ var SoundManager = function(magoManager)
 	// Terrain editing on the fly : how to get quantizedMesh:
 	// https://community.cesium.com/t/terrain-editing-on-the-fly/9695/6
 
-    this.soundLayersArray = [];
-    this.magoManager = magoManager;
+	this.soundLayersArray = [];
+	this.magoManager = magoManager;
 
 	// Simulation parameters.**************************************************************************
 	this.simulationTextureWidth = 1024;
@@ -28,7 +28,7 @@ var SoundManager = function(magoManager)
 
 	this.fbo;
 
-    //this.createDefaultShaders();
+	//this.createDefaultShaders();
 	this.init();
 	
 };
@@ -40,13 +40,13 @@ SoundManager.prototype.init = function ()
 	var gl = this.magoManager.getGl();
 	// create frame buffer object.
 	
-	if(!this.fbo) // simulation fbo (512 x 512).
+	if (!this.fbo) // simulation fbo (512 x 512).
 	{
 		var bufferWidth = this.simulationTextureWidth;
 		var bufferHeight = this.simulationTextureHeight;
 		var bUseMultiRenderTarget = this.magoManager.postFxShadersManager.bUseMultiRenderTarget;
 
-		this.fbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: false, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 3}); 
+		this.fbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: false, multiRenderTarget: bUseMultiRenderTarget, numColorBuffers: 3}); 
 	}
 
 	// Create default shaders.
@@ -58,10 +58,10 @@ SoundManager.prototype.render = function ()
 	var magoManager = this.magoManager;
 	var soundLayersCount = this.soundLayersArray.length;
 	var layer;
-	if(this.magoManager.currentFrustumIdx === 0)
+	if (this.magoManager.currentFrustumIdx === 0)
 	{
 		// Simulate in the last frustum only.
-		for(var i=0; i<soundLayersCount; i++)
+		for (var i=0; i<soundLayersCount; i++)
 		{
 			layer = this.soundLayersArray[i];
 			layer.doSimulationSteps(magoManager);
@@ -105,11 +105,11 @@ SoundManager.prototype._newTexture = function (gl, texWidth, texHeight)
 
 SoundManager.prototype.createDefaultShaders = function ()
 {
-    // the water render shader.
-    var magoManager = this.magoManager;
-    var gl = magoManager.getGl();
+	// the water render shader.
+	var magoManager = this.magoManager;
+	var gl = magoManager.getGl();
 
-    var use_linearOrLogarithmicDepth = "USE_LINEAR_DEPTH";
+	var use_linearOrLogarithmicDepth = "USE_LINEAR_DEPTH";
 	var use_multi_render_target = "NO_USE_MULTI_RENDER_TARGET";
 	var glVersion = gl.getParameter(gl.VERSION);
 	
@@ -177,18 +177,18 @@ SoundManager.prototype._test_sound = function ()
 	increLon = 0.0;
 	increLat = 0.0;
 
-    var minLon = 127.1966787369999992 + increLon;
-    var minLat = 35.5972825200000003 + increLat;
-    var minAlt = 0;
-    var maxLon = 127.2283140579999952 + increLon;
-    var maxLat = 35.6277023940000035 + increLat;
-    var maxAlt = 0;
-    var geographicExtent = new GeographicExtent(minLon, minLat, minAlt, maxLon, maxLat, maxAlt);
-    var options = {
-        geographicExtent : geographicExtent
-    };
-    var soundLayer = this.newSoundLayer(options);
+	var minLon = 127.1966787369999992 + increLon;
+	var minLat = 35.5972825200000003 + increLat;
+	var minAlt = 0;
+	var maxLon = 127.2283140579999952 + increLon;
+	var maxLat = 35.6277023940000035 + increLat;
+	var maxAlt = 0;
+	var geographicExtent = new GeographicExtent(minLon, minLat, minAlt, maxLon, maxLat, maxAlt);
+	var options = {
+		geographicExtent: geographicExtent
+	};
+	var soundLayer = this.newSoundLayer(options);
 
 	//----------------------------------------------
-    this.testStarted = true;
+	this.testStarted = true;
 };

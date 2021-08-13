@@ -76,7 +76,7 @@ var BSplineCubic3D = function(options)
 		if (options.bLoop !== undefined)
 		{ this.bLoop = options.bLoop; }
 
-		if(options.initialArmsLengthRatio)
+		if (options.initialArmsLengthRatio)
 		{
 			// Arms length in initial position.
 			this.controlPointArmLengthRatio = options.initialArmsLengthRatio;
@@ -116,7 +116,7 @@ BSplineCubic3D.prototype.getGeoLocationDataManager = function(magoManager)
 {
 	if (this.geoLocDataManager === undefined)
 	{
-		if(this.knotPoints3dList.geoLocDataManager)
+		if (this.knotPoints3dList.geoLocDataManager)
 		{
 			this.geoLocDataManager = this.knotPoints3dList.geoLocDataManager;
 		}
@@ -250,7 +250,7 @@ BSplineCubic3D.prototype.knotPointMoved = function (description)
 			var outControlPoint = this.controlPoints3dMap[idxPoint].outingControlPoint;
 
 			// 1rst, move the renderableControlPoints.
-			if(inControlPoint)
+			if (inControlPoint)
 			{
 				var innCPointGeoLocData = inRenderableControlPoint.getGeoLocDataManager().getCurrentGeoLocationData();
 				var innGeoCoord = innCPointGeoLocData.geographicCoord;
@@ -264,7 +264,7 @@ BSplineCubic3D.prototype.knotPointMoved = function (description)
 				inControlPoint = geoLocData.getTransformedRelativePosition(innPosWC, inControlPoint);
 			}
 
-			if(outControlPoint)
+			if (outControlPoint)
 			{
 				var outCPointGeoLocData = outRenderableControlPoint.getGeoLocDataManager().getCurrentGeoLocationData();
 				var outGeoCoord = outCPointGeoLocData.geographicCoord;
@@ -324,7 +324,7 @@ BSplineCubic3D.prototype.controlPointMoved = function (description)
 	var geoLocDataManager = this.getGeoLocationDataManager();
 	var geoLocData = geoLocDataManager.getCurrentGeoLocationData();
 
-	if(inOutControlPointType === "outingControlPoint")
+	if (inOutControlPointType === "outingControlPoint")
 	{
 		// OutingControlPoint moved:
 		// 1rst, take the actual position of the renderableInnCPoint and set the real innCPoint position.
@@ -347,7 +347,7 @@ BSplineCubic3D.prototype.controlPointMoved = function (description)
 		
 		// Opposite control Point.*******************************************************************************************
 		// Now, calculate the opposite controlPoint if this knotPoint is tangentType point.
-		if(inRenderableControlPoint)
+		if (inRenderableControlPoint)
 		{
 			inningCPoint.set(knotPoint.x + dir.x * inningArmLength, knotPoint.y + dir.y * inningArmLength, knotPoint.z + dir.z * inningArmLength);
 
@@ -380,7 +380,7 @@ BSplineCubic3D.prototype.controlPointMoved = function (description)
 
 		// Opposite control Point.*******************************************************************************************
 		// Now, calculate the opposite controlPoint if this knotPoint is tangentType point.
-		if(outRenderableControlPoint)
+		if (outRenderableControlPoint)
 		{
 			outingCPoint.set(knotPoint.x + dir.x * outingArmLength, knotPoint.y + dir.y * outingArmLength, knotPoint.z + dir.z * outingArmLength);
 
@@ -411,7 +411,7 @@ BSplineCubic3D.prototype.isPrepared = function(magoManager)
 	}
 
 	// 2- check if exist controlPoints.
-	if(!this.makeControlPoints(undefined, magoManager))
+	if (!this.makeControlPoints(undefined, magoManager))
 	{
 		return false;
 	}
@@ -430,7 +430,7 @@ BSplineCubic3D.prototype.isPrepared = function(magoManager)
  */
 BSplineCubic3D.prototype.render = function (magoManager, shader, renderType) 
 {
-	if(!this.isPrepared(magoManager))
+	if (!this.isPrepared(magoManager))
 	{
 		return false;
 	}
@@ -444,13 +444,13 @@ BSplineCubic3D.prototype.render = function (magoManager, shader, renderType)
 	var gl = magoManager.sceneState.gl;
 	
 	// Render interpolated points.***
-	if(!this.renderableCurve)
+	if (!this.renderableCurve)
 	{
 		this._makeRenderableCurve(magoManager);
 		magoManager.modeler.addObject(this.renderableCurve);
 	}
 
-	if(this._renderableCurveDirty)
+	if (this._renderableCurveDirty)
 	{
 		this._reMakeRenderableCurve(magoManager);
 	}
@@ -481,10 +481,10 @@ BSplineCubic3D.prototype.render = function (magoManager, shader, renderType)
 	*/
 
 	// Now, if this renderingState is EDITED, then render knotPoints & controlPoints.***
-	if(this.renderingState === CODE.curveRenderingState.EDITED)
+	if (this.renderingState === CODE.curveRenderingState.EDITED)
 	{
 		// Check if exist knotPoints & controlPoints & are visibles.
-		if(!this.renderablePointsMap)
+		if (!this.renderablePointsMap)
 		{ this._makeRenderablePoints(magoManager); }
 	}
 };
@@ -497,43 +497,43 @@ BSplineCubic3D.prototype._makeRenderablePoints = function(magoManager)
 	// check if exists. If no exists, then create it.
 	var modeler = magoManager.modeler;
 	var knotPointsCount = this.geoCoordsList.getGeoCoordsCount();
-	if(!this.renderablePointsMap || this.renderablePointsMap.length !== knotPointsCount)
+	if (!this.renderablePointsMap || this.renderablePointsMap.length !== knotPointsCount)
 	{ 
-		if(!this.renderablePointsMap)
+		if (!this.renderablePointsMap)
 		{ this.renderablePointsMap = []; }
 
 		var knotPointsStyle = {
-			opacity : 1.0,
-			color : modeler.bSplineKnotPointsColor,
-			size : 8,
+			opacity   : 1.0,
+			color     : modeler.bSplineKnotPointsColor,
+			size      : 8,
 			isMovable : true
 		};
 
 		var controlPointsStyle = {
-			opacity : 1.0,
-			color : modeler.bSplineControlPointsColor,
-			size : 8,
+			opacity   : 1.0,
+			color     : modeler.bSplineControlPointsColor,
+			size      : 8,
 			isMovable : true
 		};
 		
-		for(var i=0; i<knotPointsCount; i++)
+		for (var i=0; i<knotPointsCount; i++)
 		{
 			var coord = this.geoCoordsList.getGeoCoord(i);
 			var position = {
-				longitude: coord.longitude,
-				latitude: coord.latitude,
-				altitude: coord.altitude
+				longitude : coord.longitude,
+				latitude  : coord.latitude,
+				altitude  : coord.altitude
 			};
 
 			// Do a description of the magoPoint:
 			var description = {
-				type : "curveMember",
-				owner : this,
+				type       : "curveMember",
+				owner      : this,
 				idxInCurve : i
 			};
 
 			var options = {
-				description : description
+				description: description
 			};
 
 			// The knotPoint:
@@ -544,18 +544,18 @@ BSplineCubic3D.prototype._makeRenderablePoints = function(magoManager)
 			var geoCoord_outing = this.controlPoints3dMap[i].outingGeoCoord;
 			var outingControlPoint = undefined;
 			var inningControlPoint = undefined;
-			if(geoCoord_inning)
+			if (geoCoord_inning)
 			{
 				// The controlPoints:
 				var descriptionControlPoints = {
-					type : "curveControlMember",
+					type                  : "curveControlMember",
 					inOutControlPointType : "inningControlPoint",
-					owner : this,
-					idxInCurve : i
+					owner                 : this,
+					idxInCurve            : i
 				};
 
 				var optionsControlPoints = {
-					description : descriptionControlPoints
+					description: descriptionControlPoints
 				};
 
 				inningControlPoint = new MagoPoint(geoCoord_inning, controlPointsStyle, optionsControlPoints);
@@ -569,17 +569,17 @@ BSplineCubic3D.prototype._makeRenderablePoints = function(magoManager)
 				inningControlPoint.addEventListener(event);
 			}
 
-			if(geoCoord_outing)
+			if (geoCoord_outing)
 			{
 				var descriptionControlPoints = {
-					type : "curveControlMember",
+					type                  : "curveControlMember",
 					inOutControlPointType : "outingControlPoint",
-					owner : this,
-					idxInCurve : i
+					owner                 : this,
+					idxInCurve            : i
 				};
 
 				var optionsControlPoints = {
-					description : descriptionControlPoints
+					description: descriptionControlPoints
 				};
 
 				outingControlPoint = new MagoPoint(geoCoord_outing, controlPointsStyle, optionsControlPoints);
@@ -595,7 +595,7 @@ BSplineCubic3D.prototype._makeRenderablePoints = function(magoManager)
 
 			// store the renderablesPoints.
 			this.renderablePointsMap[i] = {
-				renderableKnotPoint : magoPoint,
+				renderableKnotPoint          : magoPoint,
 				renderableInningControlPoint : inningControlPoint,
 				renderableOutingControlPoint : outingControlPoint
 			};
@@ -637,7 +637,7 @@ BSplineCubic3D.prototype._reMakeRenderableCurve = function(magoManager)
 BSplineCubic3D.prototype._makeRenderableCurve = function(magoManager) 
 {
 	// Make a renderableObject thickLine type.
-	if(!this.renderableCurve)
+	if (!this.renderableCurve)
 	{
 		// 1rst, create the thickLinesPosDataArray.
 		var optionsPosDataArray = {};
@@ -649,10 +649,10 @@ BSplineCubic3D.prototype._makeRenderableCurve = function(magoManager)
 
 		var options = {};
 		if (options.thickness === undefined)
-		options.thickness = 2.0; 
+		{ options.thickness = 2.0; } 
 
 		if (options.color === undefined)
-			{ options.color = new Color(1.0, 0.3, 0.3, 1.0); }
+		{ options.color = new Color(1.0, 0.3, 0.3, 1.0); }
 
 		// Create a vectorMesh.********************************************************************
 		var vectorMesh = new VectorMesh(options);
@@ -739,11 +739,11 @@ BSplineCubic3D._makeControlPointsOfKnotPoint = function(knotPoints3dList, idxPoi
 	var outingArmLength = outingControlPoint.distToPoint(currPoint);
 	var inningArmLength = inningControlPoint.distToPoint(currPoint);
 	var controlPoints3dMap = {"inningControlPoint" : inningControlPoint, 
-								"outingControlPoint" : outingControlPoint,
-								"inningGeoCoord" : inningGeoCoord,
-								"outingGeoCoord" : outingGeoCoord,
-								"outingArmLength" : outingArmLength,
-								"inningArmLength" : inningArmLength};
+		"outingControlPoint" : outingControlPoint,
+		"inningGeoCoord"     : inningGeoCoord,
+		"outingGeoCoord"     : outingGeoCoord,
+		"outingArmLength"    : outingArmLength,
+		"inningArmLength"    : inningArmLength};
 	
 	return controlPoints3dMap;
 };
@@ -765,7 +765,7 @@ BSplineCubic3D.prototype.makeControlPoints = function(controlPointArmLength, mag
 	if (this.knotPoints3dList.pointsArray === undefined)
 	{ return false; }
 
-	if(!this.controlPoints3dMap || this.controlPointsDirty)
+	if (!this.controlPoints3dMap || this.controlPointsDirty)
 	{
 		this.controlPoints3dMap = {};
 		var bLoop = this.bLoop;
@@ -789,7 +789,7 @@ BSplineCubic3D.prototype.makeControlPoints = function(controlPointArmLength, mag
 			
 			if (i === 0)
 			{
-				if(!this.bLoop)
+				if (!this.bLoop)
 				{
 					// In this case there are no inningControlPoint.***
 					nextPoint = this.knotPoints3dList.getPoint(i+1);
@@ -801,11 +801,11 @@ BSplineCubic3D.prototype.makeControlPoints = function(controlPointArmLength, mag
 					var outingArmLength = outingControlPoint.distToPoint(currPoint);
 					var outingGeoCoord = geoLocData.localCoordToGeographicCoord(outingControlPoint, undefined);
 					this.controlPoints3dMap[i] = {"inningControlPoint" : undefined, 
-												"outingControlPoint" : outingControlPoint,
-												"inningGeoCoord" : undefined,
-												"outingGeoCoord" : outingGeoCoord,
-												"outingArmLength" : outingArmLength,
-												"inningArmLength" : undefined};
+						"outingControlPoint" : outingControlPoint,
+						"inningGeoCoord"     : undefined,
+						"outingGeoCoord"     : outingGeoCoord,
+						"outingArmLength"    : outingArmLength,
+						"inningArmLength"    : undefined};
 				}
 				else
 				{
@@ -814,7 +814,7 @@ BSplineCubic3D.prototype.makeControlPoints = function(controlPointArmLength, mag
 			}
 			else if ( i === pointsCount-1)
 			{
-				if(!this.bLoop)
+				if (!this.bLoop)
 				{
 					// In this case there are no outingControlPoint.***
 					prevPoint = this.knotPoints3dList.getPoint(i-1);
@@ -824,11 +824,11 @@ BSplineCubic3D.prototype.makeControlPoints = function(controlPointArmLength, mag
 					var inningArmLength = inningControlPoint.distToPoint(currPoint);
 					var inningGeoCoord = geoLocData.localCoordToGeographicCoord(inningControlPoint, undefined);
 					this.controlPoints3dMap[i] = {"inningControlPoint" : inningControlPoint, 
-												"outingControlPoint" : undefined,
-												"inningGeoCoord" : inningGeoCoord,
-												"outingGeoCoord" : undefined,
-												"outingArmLength" : undefined,
-												"inningArmLength" : inningArmLength};
+						"outingControlPoint" : undefined,
+						"inningGeoCoord"     : inningGeoCoord,
+						"outingGeoCoord"     : undefined,
+						"outingArmLength"    : undefined,
+						"inningArmLength"    : inningArmLength};
 				}
 				else
 				{
@@ -857,16 +857,16 @@ BSplineCubic3D.prototype._reCalculateInterpolatedPointsForSegment = function (id
 	// Call this function after moving a knotPoint or a controlPoint.
 	// To call this function, must exist previously the this.interpolatedPoints3dList.
 	var segmentsCount = this.knotPoints3dList.getPointsCount();
-	if(!this.bLoop)
+	if (!this.bLoop)
 	{
-		if(idxSegment >= segmentsCount-1 || idxSegment < 0)
+		if (idxSegment >= segmentsCount-1 || idxSegment < 0)
 		{ return; }
 	}
 	else
 	{
-		if(idxSegment >= segmentsCount)
+		if (idxSegment >= segmentsCount)
 		{ idxSegment -= segmentsCount; }
-		else if(idxSegment < 0)
+		else if (idxSegment < 0)
 		{ idxSegment += segmentsCount; }
 	}
 
@@ -928,12 +928,12 @@ BSplineCubic3D.prototype._reCalculateInterpolatedPointsForSegment = function (id
 	this.interpolatedPoints3dList.setDirty(true);
 
 	// Now, if exist thickLineObject, then recalculate modified points.******************
-	if(this.renderableCurve)
+	if (this.renderableCurve)
 	{
 		// Recalculate partially.
 		var optionsPosDataArray = {
 			startIdx : startIdx,
-			endIdx : endIdx
+			endIdx   : endIdx
 		};
 		this._renderableCurveThickLinePosDataArray = Point3DList.getThickLinesPositionDataArray(this.interpolatedPoints3dList.pointsArray, this._renderableCurveThickLinePosDataArray, optionsPosDataArray);
 	}
@@ -947,7 +947,7 @@ BSplineCubic3D.prototype._makeInterpolatedPoints = function()
 	if (!this.makeControlPoints())
 	{ return false; }
 
-	if(this.interpolatedPoints3dList === undefined || this.interpolatedPointsDirty)
+	if (this.interpolatedPoints3dList === undefined || this.interpolatedPointsDirty)
 	{
 		if (this.interpolatedPoints3dList === undefined)
 		{
@@ -961,7 +961,7 @@ BSplineCubic3D.prototype._makeInterpolatedPoints = function()
 		// For each segment, make the bezier curve interpolated points.***
 		var pointsCount = this.knotPoints3dList.getPointsCount();
 		var segmentsCount;
-		if(this.bLoop)
+		if (this.bLoop)
 		{
 			segmentsCount = pointsCount;
 		}
@@ -982,7 +982,7 @@ BSplineCubic3D.prototype._makeInterpolatedPoints = function()
 			
 			BSplineCubic3D.makeForSegment(strPoint, strControlPoint, endControlPoint, endPoint, interpolationsCount, interpolatedPointsArray);
 
-			if(i < segmentsCount-1)
+			if (i < segmentsCount-1)
 			{
 				// If this is NO lastSegment, erase the last point in the array.
 				interpolatedPointsArray.pop();

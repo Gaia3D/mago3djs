@@ -734,19 +734,19 @@ VertexList.getVboDataArrays = function(vertexArray, resultVbo, vboMemManager)
  */
 VertexList.eliminateCoincidentVerticesOfArray = function(vertexArray, resultVertexArray, error) 
 {
-	if(!resultVertexArray)
-	resultVertexArray = [];
+	if (!resultVertexArray)
+	{ resultVertexArray = []; }
 
 	// put the 1rst vertex into resultVertexArray.
 	resultVertexArray.push(vertexArray[0]);
 	var lastVertex = vertexArray[0];
 	var vertexCount = vertexArray.length;
-	for(var i=1; i<vertexCount; i++)
+	for (var i=1; i<vertexCount; i++)
 	{
 		var vertex = vertexArray[i];
 
 		// check if the vertex is coincident with the lastVertex.
-		if(!vertex.getPosition().isCoincidentToPoint(lastVertex.getPosition(), error))
+		if (!vertex.getPosition().isCoincidentToPoint(lastVertex.getPosition(), error))
 		{
 			resultVertexArray.push(vertex);
 			lastVertex = vertex;
@@ -771,7 +771,7 @@ VertexList.solveUroborusOfArray = function(vertexArray, error)
 	var firstVertex = vertexArray[0];
 	var lastVertex = vertexArray[vertexArray.length-1];
 
-	if(firstVertex.getPosition().isCoincidentToPoint(lastVertex.getPosition(), error))
+	if (firstVertex.getPosition().isCoincidentToPoint(lastVertex.getPosition(), error))
 	{
 		vertexArray.length = vertexArray.length-1;
 	}

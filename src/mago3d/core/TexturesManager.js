@@ -104,7 +104,7 @@ TexturesManager.loadTexture = function(imagePath, texture, magoManager, flip_y_t
 		{ flip_y_texCoord = false; }
 		
 		handleTextureLoaded(gl, imageToLoad, texture.texId, flip_y_texCoord, {
-			magFilter : gl.NEAREST
+			magFilter: gl.NEAREST
 		});
 		texture.fileLoadState = CODE.fileLoadState.BINDING_FINISHED;
 	};

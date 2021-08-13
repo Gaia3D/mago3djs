@@ -30,13 +30,13 @@ var DustLayer = function(options)
 	if (options !== undefined)
 	{
 		// take all options.
-		if(options.geoJsonFile)
+		if (options.geoJsonFile)
 		{
 			this.dustMapJson = options.geoJsonFile;
 			this.dustMapJsonFileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 		}
 
-		if(options.geoJsonFileFolderPath)
+		if (options.geoJsonFileFolderPath)
 		{
 			this.dustMapFolderPath = options.geoJsonFileFolderPath;
 		}
@@ -57,8 +57,8 @@ var DustLayer = function(options)
 
 DustLayer.prototype.getAltitude = function()
 {
-	if(!this.dustMapJson)
-	return undefined;
+	if (!this.dustMapJson)
+	{ return undefined; }
 
 	return this.dustMapJson.bbox[2];
 };
@@ -77,7 +77,7 @@ DustLayer.prototype.deleteObjects = function(magoManager)
 	//this.geoLocDataManager; // the geoLocdata of the center of the tile.
 
 	// Delete dustMapTexture.
-	if(this.dustMapTexture)
+	if (this.dustMapTexture)
 	{
 		var gl = magoManager.getGl();
 		this.dustMapTexture.deleteObjects(gl);
@@ -91,13 +91,13 @@ DustLayer.prototype.deleteObjects = function(magoManager)
 	this.dustData = undefined;
 	this.dustVolume = undefined;
 
-	if(this.geoExtent)
+	if (this.geoExtent)
 	{
 		this.geoExtent.deleteObjects();
 	}
 	this.geoExtent = undefined;
 
-	if(this.geoLocDataManager)
+	if (this.geoLocDataManager)
 	{
 		this.geoLocDataManager.deleteObjects();
 	}
@@ -107,7 +107,7 @@ DustLayer.prototype.deleteObjects = function(magoManager)
 DustLayer.prototype.prepareDustLayer = function()
 {
 	// Check if the winsMapTexture is loaded.
-	if(this.gl === undefined)
+	if (this.gl === undefined)
 	{
 		this.gl = this.dustVolume.weatherStation.magoManager.getGl();
 	}
@@ -120,16 +120,17 @@ DustLayer.prototype.prepareDustLayer = function()
 	
 	if (this.dustMapTexture.fileLoadState === CODE.fileLoadState.READY)
 	{
-		if(!this.dustMapFileName)
+		if (!this.dustMapFileName)
 		{
 			// Find the png file name inside of the geoJson.***
-			if(!this.dustMapJson)
+			if (!this.dustMapJson)
 			{ return false; }
 
 			this.dustMapFileName = this.dustMapJson.properties.image.uri;
 		}
 
-		if(!this.dustMapFolderPath || this.dustMapFolderPath.length === 0) {
+		if (!this.dustMapFolderPath || this.dustMapFolderPath.length === 0) 
+		{
 			this.dustMapFolderPath = this.dustMapJson.properties.image.serviceUri.split(this.dustMapFileName)[0];
 		}
 		
@@ -195,8 +196,8 @@ DustLayer.prototype.getConcentration_biLinearInterpolation = function(s, t, mago
 
 DustLayer.prototype.getMinMaxConcentration = function()
 {
-	if(!this.dustMapJson)
-	{ return;}
+	if (!this.dustMapJson)
+	{ return; }
 
 	var value = this.dustMapJson.properties.value;
 	return [value.r.min, value.r.max];
@@ -205,7 +206,7 @@ DustLayer.prototype.getMinMaxConcentration = function()
 DustLayer.prototype.getConcentration = function(pixelX, pixelY, magoManager)
 {
 	// Note: to call this function MUST BE BINDED the windTexture.
-	if(this.dustMapTexture.fileLoadState !== CODE.fileLoadState.BINDING_FINISHED)
+	if (this.dustMapTexture.fileLoadState !== CODE.fileLoadState.BINDING_FINISHED)
 	{
 		return 0;
 	}
@@ -217,7 +218,7 @@ DustLayer.prototype.getConcentration = function(pixelX, pixelY, magoManager)
 	if (pixelX < 0){ pixelX = 0; }
 	if (pixelY < 0){ pixelY = 0; }
 
-	if(!this.dustConcentrationMap)
+	if (!this.dustConcentrationMap)
 	{
 		var gl = magoManager.getGl();
 
@@ -229,7 +230,7 @@ DustLayer.prototype.getConcentration = function(pixelX, pixelY, magoManager)
 		// attach the WINDMAP texture to the framebuffer.
 		gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.dustMapTexture.texId, 0);
 		var canRead = (gl.checkFramebufferStatus(gl.FRAMEBUFFER) === gl.FRAMEBUFFER_COMPLETE);
-		if(canRead)
+		if (canRead)
 		{
 			var totalPixelsCount = texWidth*texHeight;
 			this.dustConcentrationMap = new Uint8Array(4 * totalPixelsCount); // 1 pixels select.***

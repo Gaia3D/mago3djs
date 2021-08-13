@@ -45,7 +45,7 @@ var MagoPoint = function(position, style, options)
 	this.geoCoord;
 	this.description;
 
-	if(options)
+	if (options)
 	{
 		this.description = options.description; // if undefined, then is a independet point.
 		// The magoPoint can be part or member of a curve, as a line, a polyLine, or bSpline.
@@ -65,9 +65,9 @@ var MagoPoint = function(position, style, options)
 	// set the geoLocDataManager of the terrainScanner.
 	this.geoLocDataManager = geoLocDataManager;
 
-	if(style)
+	if (style)
 	{
-		if(style.isMovable)
+		if (style.isMovable)
 		{
 			this.attributes.isMovable = style.isMovable;
 		}
@@ -96,17 +96,17 @@ MagoPoint.prototype._moveStart = function ()
 {
 	// Function activated when "this" is dragging.
 	// Check if "this" is a member of a curve:
-	if(this.description)
+	if (this.description)
 	{
 		var owner = this.description.owner;
-		if(owner instanceof BSplineCubic3D)
+		if (owner instanceof BSplineCubic3D)
 		{
 			// "this" is member of a bSpline.
 			var memberType = this.description.type;
 			// type can be : curveMember or curveControlMember.
-			if(memberType === "curveMember")
+			if (memberType === "curveMember")
 			{ owner.knotPointMoved(this.description); }
-			else if(memberType === "curveControlMember")
+			else if (memberType === "curveControlMember")
 			{ owner.controlPointMoved(this.description); }
 		}
 	}

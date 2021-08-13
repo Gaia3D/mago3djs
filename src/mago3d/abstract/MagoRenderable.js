@@ -20,8 +20,8 @@ var MagoRenderable = function (options)
 	this.geoLocDataManager;
 	
 	this.dirty = true;
-	this.color4 =  new Color(1,1,1,1);
-	this.orgColor4 =  new Color(1,1,1,1);
+	this.color4 =  new Color(1, 1, 1, 1);
+	this.orgColor4 =  new Color(1, 1, 1, 1);
 	this.wireframeColor4;
 	this.selectedColor4;
 	this.objectType = MagoRenderable.OBJECT_TYPE.MESH; // Init as mesh type.
@@ -37,7 +37,7 @@ var MagoRenderable = function (options)
 	{
 		if (options.color && options.color instanceof Color) 
 		{
-			this.color4 = defaultValue(options.color, new Color(1,1,1,1));
+			this.color4 = defaultValue(options.color, new Color(1, 1, 1, 1));
 			this.orgColor4 = new Color(this.color4.r, this.color4.g, this.color4.b, this.color4.a);
 		}
 
@@ -56,10 +56,10 @@ MagoRenderable.EVENT_TYPE = {
 };
 
 MagoRenderable.OBJECT_TYPE = {
-	'MESH'       : 0,
-	'VECTORMESH' : 1,
-	'POINTMESH'  : 2,
-	'LIGHTSOURCE': 3
+	'MESH'        : 0,
+	'VECTORMESH'  : 1,
+	'POINTMESH'   : 2,
+	'LIGHTSOURCE' : 3
 };
 Object.defineProperties(MagoRenderable.prototype, {
 	guid: {
@@ -207,11 +207,12 @@ MagoRenderable.prototype.render = function (magoManager, shader, renderType, glP
 	//shader.clippingPolygon2dPoints_loc = gl.getUniformLocation(shader.program, "clippingPolygon2dPoints");
 	//shader.clippingConvexPolygon2dPointsIndices_loc = gl.getUniformLocation(shader.program, "clippingConvexPolygon2dPointsIndices");
 
-	if(this.attributes.doubleFace)
+	if (this.attributes.doubleFace)
 	{
 		gl.disable(gl.CULL_FACE);
 	}
-	else{
+	else 
+	{
 		gl.enable(gl.CULL_FACE);
 	}
 
@@ -219,16 +220,17 @@ MagoRenderable.prototype.render = function (magoManager, shader, renderType, glP
 	if (renderType !== 2 && magoManager.currentProcess !== CODE.magoCurrentProcess.StencilSilhouetteRendering)
 	{ executedEffects = magoManager.effectsManager.executeEffects(this.guid, magoManager); }
 
-	if(renderType === 1)
+	if (renderType === 1)
 	{
-		if(this.options && this.options.limitationGeographicCoords)
+		if (this.options && this.options.limitationGeographicCoords)
 		{
-			if(this.options.limitationHeights)
+			if (this.options.limitationHeights)
 			{
 				gl.uniform2fv(shader.limitationHeights_loc, this.options.limitationHeights);
 				gl.uniform1i(shader.clippingType_loc, 4); // 2= clipping locally by polygon2d.***
 			}
-			else{
+			else
+			{
 				gl.uniform1i(shader.clippingType_loc, 2); // 2= clipping locally by polygon2d.***
 			}
 			
@@ -236,32 +238,35 @@ MagoRenderable.prototype.render = function (magoManager, shader, renderType, glP
 			gl.uniform1iv(shader.clippingConvexPolygon2dPointsIndices_loc, this.uniformPolygonPointsIdx);
 
 			var dynCol4 = this.options.limitationInfringingDynamicColor4;
-			if(dynCol4)
+			if (dynCol4)
 			{
 				dynCol4.updateColorAlarm(magoManager.getCurrentTime());
-				gl.uniform4fv(shader.limitationInfringedColor4_loc, new Float32Array([dynCol4.r, dynCol4.g,dynCol4.b, dynCol4.a]));
+				gl.uniform4fv(shader.limitationInfringedColor4_loc, new Float32Array([dynCol4.r, dynCol4.g, dynCol4.b, dynCol4.a]));
 			}
-			else{
+			else
+			{
 				gl.uniform4fv(shader.limitationInfringedColor4_loc, new Float32Array([1.0, 0.5, 0.2, 1.0]));
 			}
 		}
 		else
 		{
-			if(this.options && this.options.limitationHeights)
+			if (this.options && this.options.limitationHeights)
 			{
 				gl.uniform2fv(shader.limitationHeights_loc, this.options.limitationHeights);
 				gl.uniform1i(shader.clippingType_loc, 3); // 3= clipping locally by heights.***
 				var dynCol4 = this.options.limitationInfringingDynamicColor4;
-				if(dynCol4)
+				if (dynCol4)
 				{
 					dynCol4.updateColorAlarm(magoManager.getCurrentTime());
-					gl.uniform4fv(shader.limitationInfringedColor4_loc, new Float32Array([dynCol4.r, dynCol4.g,dynCol4.b, dynCol4.a]));
+					gl.uniform4fv(shader.limitationInfringedColor4_loc, new Float32Array([dynCol4.r, dynCol4.g, dynCol4.b, dynCol4.a]));
 				}
-				else{
+				else 
+				{
 					gl.uniform4fv(shader.limitationInfringedColor4_loc, new Float32Array([1.0, 0.5, 0.2, 1.0]));
 				}
 			}
-			else{
+			else 
+			{
 				gl.uniform1i(shader.clippingType_loc, 0); // 0= no clipping.***
 			}
 		}
@@ -287,7 +292,7 @@ MagoRenderable.prototype.render = function (magoManager, shader, renderType, glP
 	{
 		// must return all uniforms changed for effects.
 		gl.uniform3fv(shader.aditionalOffset_loc, [0.0, 0.0, 0.0]); // init referencesMatrix.
-		gl.uniform3fv(shader.scaleLC_loc, [1.0,1.0,1.0]);   
+		gl.uniform3fv(shader.scaleLC_loc, [1.0, 1.0, 1.0]);   
 		if (renderType === 1)
 		{
 			gl.uniform4fv(shader.colorMultiplier_loc, [1.0, 1.0, 1.0, 1.0]);
@@ -342,8 +347,11 @@ MagoRenderable.prototype.render = function (magoManager, shader, renderType, glP
 
 MagoRenderable.prototype.renderAsChild = function (magoManager, shader, renderType, glPrimitive, bIsSelected, options, bWireframe) 
 {
-	if (this.dirty)
-	{ this.makeMesh(magoManager); }
+	if (this.dirty) 
+	{ 
+		this.makeMesh(magoManager); 
+		return;
+	}
 
 	// Set geoLocation uniforms.***
 	var gl = magoManager.getGl();
@@ -399,7 +407,7 @@ MagoRenderable.prototype.renderAsChild = function (magoManager, shader, renderTy
 			}
 		}
 
-		if(magoManager.isCameraMoved && !magoManager.isCameraMoving )
+		if (magoManager.isCameraMoved && !magoManager.isCameraMoving )
 		{
 			// Selection render.***
 			var selectionColor = magoManager.selectionColor;
@@ -662,7 +670,7 @@ MagoRenderable.prototype.getCurrentGeoLocationData = function()
 
 MagoRenderable.prototype.getBoundingSphereWC = function(resultBSphereWC)
 {
-	if(!this.boundingSphereWC)
+	if (!this.boundingSphereWC)
 	{
 		this.boundingSphereWC = new BoundingSphere();
 
@@ -675,8 +683,8 @@ MagoRenderable.prototype.getBoundingSphereWC = function(resultBSphereWC)
 		this.boundingSphereWC.setRadius(radiusAprox);
 	}
 
-	if(!resultBSphereWC)
-		resultBSphereWC = new BoundingSphere();
+	if (!resultBSphereWC)
+	{ resultBSphereWC = new BoundingSphere(); }
 
 	var centerPoint = this.boundingSphereWC.centerPoint;
 	resultBSphereWC.setCenterPoint(centerPoint.x, centerPoint.y, centerPoint.z);
@@ -725,11 +733,13 @@ MagoRenderable.prototype.intersectionWithPolygon2D = function(polygon2D)
 	if (this.geographicCoordList) 
 	{
 		result = intersectionWithPolygon2D(polygon2D, this.geographicCoordList.geographicCoordsArray);
-	} else if (this.geographicCoordListsArray)
+	}
+	else if (this.geographicCoordListsArray)
 	{
-		for(var i=0,len=this.geographicCoordListsArray.length;i<len;i++)
+		for (var i=0, len=this.geographicCoordListsArray.length;i<len;i++)
 		{
-			if(intersectionWithPolygon2D(polygon2D, this.geographicCoordListsArray[i].geographicCoordsArray)) {
+			if (intersectionWithPolygon2D(polygon2D, this.geographicCoordListsArray[i].geographicCoordsArray)) 
+			{
 				result = true;
 				break;
 			}
@@ -738,7 +748,8 @@ MagoRenderable.prototype.intersectionWithPolygon2D = function(polygon2D)
 
 	return result;
 
-	function intersectionWithPolygon2D(target, gcList){
+	function intersectionWithPolygon2D(target, gcList)
+	{
 		return target.intersectionWithPolygon2D(Polygon2D.makePolygonByGeographicCoordArray(gcList));
 	}
 };
@@ -749,11 +760,11 @@ MagoRenderable.prototype.intersectionWithPolygon2D = function(polygon2D)
  */
 MagoRenderable.prototype.setTerrainHeight = function(height)
 {
-	if(height === undefined || height === null) height = 0;
+	if (height === undefined || height === null) { height = 0; }
 	this.terrainHeight = height;
 	//this.setDirty(true);
 	this.validTerrainHeight();
-}
+};
 
 /**
  * set terrain height. fire makemesh
@@ -763,11 +774,12 @@ MagoRenderable.prototype.validTerrainHeight = function()
 {
 	var geoLocData = this.geoLocDataManager.getCurrentGeoLocationData();
 	var validHeight = this.terrainHeight;
-	if(this.relativeHeight && !isNaN(this.relativeHeight)) {
+	if (this.relativeHeight && !isNaN(this.relativeHeight)) 
+	{
 		validHeight += this.relativeHeight;
 	}
 	geoLocData = ManagerUtils.calculateGeoLocationData(undefined, undefined, validHeight, undefined, undefined, undefined, geoLocData);
-}
+};
 
 /**
  * attribute height reference에 따라 높이를 보정
@@ -790,34 +802,40 @@ MagoRenderable.prototype.isNeedValidHeight = function(magoManager)
  * set From date
  * @param {Date} fromDate 
  */
-MagoRenderable.prototype.setFromDate = function(fromDate) {
-	if(!fromDate || !(fromDate instanceof Date)) {
+MagoRenderable.prototype.setFromDate = function(fromDate) 
+{
+	if (!fromDate || !(fromDate instanceof Date)) 
+	{
 		throw new Error('fromDate is required(Date Type).');
 	}
 	this.fromDate = fromDate;
-}
+};
 /**
  * get From date
  * @return {Date}
  */
-MagoRenderable.prototype.getFromDate = function() {
+MagoRenderable.prototype.getFromDate = function() 
+{
 	return this.fromDate;
-}
+};
 
 /**
  * set To date
  * @param {Date} toDate 
  */
-MagoRenderable.prototype.setToDate = function(toDate) {
-	if(!toDate || !(toDate instanceof Date)) {
+MagoRenderable.prototype.setToDate = function(toDate) 
+{
+	if (!toDate || !(toDate instanceof Date)) 
+	{
 		throw new Error('toDate is required(Date Type).');
 	}
 	this.toDate = toDate;
-}
+};
 /**
  * get To date
  * @return {Date}
  */
-MagoRenderable.prototype.getToDate = function() {
+MagoRenderable.prototype.getToDate = function() 
+{
 	return this.toDate;
-}
+};

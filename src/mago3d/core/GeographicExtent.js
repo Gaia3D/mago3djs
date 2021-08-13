@@ -333,7 +333,7 @@ GeographicExtent.prototype.getQuantizedPoints = function(geoCoordsArray, resultQ
 {
 	// This function returns the quantizedPoint3d.
 	// Quantized points domain is positive short size (0 to 32767).***
-	if(!resultQPointsArray)
+	if (!resultQPointsArray)
 	{
 		resultQPointsArray = [];
 	}
@@ -356,7 +356,7 @@ GeographicExtent.prototype.getQuantizedPoints = function(geoCoordsArray, resultQ
 
 	var unitary_u, unitary_v, unitary_h;
 	var corrdsCount = geoCoordsArray.length;
-	for(var i=0; i<corrdsCount; i++)
+	for (var i=0; i<corrdsCount; i++)
 	{
 		var geoCoord = geoCoordsArray[i];
 		unitary_u = (geoCoord.longitude - minLon) / lonRange;

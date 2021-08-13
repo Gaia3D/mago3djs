@@ -197,7 +197,7 @@ PostFxShadersManager.prototype.getTriPolyhedronDepthShader = function()
  */
 PostFxShadersManager.prototype.getUnitaryBBoxShader = function(magoManager) 
 {
-	if(!this.triPolyhedronShader)
+	if (!this.triPolyhedronShader)
 	{
 		this.triPolyhedronShader = this.createSsaoShaderBox(magoManager); 
 	}

@@ -35,11 +35,11 @@ var Effect = function(options)
 	if (options.zMin)
 	{ this.zMin = options.zMin; }
 
-	if(options.blinkDuration)
-	{this.blinkDuration = defaultValue(options.blinkDuration, 0.2);}
+	if (options.blinkDuration)
+	{ this.blinkDuration = defaultValue(options.blinkDuration, 0.2); }
 
-	if(options.complete)
-	{this.complete = options.complete;}
+	if (options.complete)
+	{ this.complete = options.complete; }
 	
 	// available effectType:
 	// 1: zBounceLinear
@@ -66,7 +66,8 @@ Effect.prototype.execute = function(currTimeSec, magoManager)
 	var effectShader = this.effectsManager.currShader;
 
 	var changeShader = false;
-	if(currentShader !== effectShader) {
+	if (currentShader !== effectShader) 
+	{
 		changeShader = true;
 		effectShader.useProgram();
 	} 
@@ -144,7 +145,7 @@ Effect.prototype.execute = function(currTimeSec, magoManager)
 	else if (this.effectType === "blinker")
 	{
 		var multiplier;
-		var unit = [0.4,0.4,0.4,1];
+		var unit = [0.4, 0.4, 0.4, 1];
 		var colorMultiplier = 1.0;
 		if (timeDiffSeconds >= this.durationSeconds)
 		{
@@ -153,13 +154,14 @@ Effect.prototype.execute = function(currTimeSec, magoManager)
 		}
 		else
 		{
-			if(this.blink === undefined) this.blink = true;
-			if(!this.blinkTime) this.blinkTime = currTimeSec;
-			if(!this.blinkDuration) this.blinkDuration = 0.2;
+			if (this.blink === undefined) { this.blink = true; }
+			if (!this.blinkTime) { this.blinkTime = currTimeSec; }
+			if (!this.blinkDuration) { this.blinkDuration = 0.2; }
 
 			var blinkDurationDiff = currTimeSec - this.blinkTime;
 			
-			if(blinkDurationDiff > this.blinkDuration) {
+			if (blinkDurationDiff > this.blinkDuration) 
+			{
 				this.blink = !this.blink;
 				this.blinkTime = currTimeSec;
 			}
@@ -167,9 +169,12 @@ Effect.prototype.execute = function(currTimeSec, magoManager)
 			var timeRatio = timeDiffSeconds/this.durationSeconds;
 			colorMultiplier = 1/(timeRatio*timeRatio);
 
-			if(this.blink) {
-				multiplier = [1000*colorMultiplier,1000*colorMultiplier,1000*colorMultiplier,1];
-			} else {
+			if (this.blink) 
+			{
+				multiplier = [1000*colorMultiplier, 1000*colorMultiplier, 1000*colorMultiplier, 1];
+			}
+			else 
+			{
 				multiplier = unit;
 			}
 		}
@@ -260,7 +265,8 @@ Effect.prototype.execute = function(currTimeSec, magoManager)
 		
 	}
 
-	if(changeShader) {
+	if (changeShader) 
+	{
 		var shader = magoManager.postFxShadersManager.getShader(currentShaderName); 
 		shader.useProgram();
 	}

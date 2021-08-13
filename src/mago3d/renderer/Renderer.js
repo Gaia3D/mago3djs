@@ -103,8 +103,8 @@ Renderer.prototype.renderNodes = function (gl, visibleNodesArray, magoManager, s
 	var node;
 	var nodesCount = visibleNodesArray.length;
 
-	if(nodesCount === 0)
-	return;
+	if (nodesCount === 0)
+	{ return; }
 	
 	var sceneState = magoManager.sceneState;
 	var bApplyShadow = sceneState.applySunShadows;
@@ -507,12 +507,13 @@ Renderer.prototype.renderSilhouetteDepth = function ()
 		//var nodes = selectionManager.getSelectedF4dNodeArray();
 		//var selectedRefs = selectionManager.getSelectedF4dObjectArray();
 
-		if(selectionManager.existSelectedObjects())
+		if (selectionManager.existSelectedObjects())
 		{
 			// Begin render.
 			this.beginRenderSilhouetteDepth();
 		}
-		else{
+		else 
+		{
 			return;
 		}
 
@@ -524,7 +525,7 @@ Renderer.prototype.renderSilhouetteDepth = function ()
 		var selectedRefs = selectionManager.getSelectedF4dObjectArray();
 		if (nodes.length > 0 && selectedRefs.length === 0) // test code.***
 		{
-			gl.uniform3fv(currentShader.aditionalMov_loc, [0,0,0]); //.
+			gl.uniform3fv(currentShader.aditionalMov_loc, [0, 0, 0]); //.
 			var renderType = 0;
 			var refMatrixIdxKey = 0;
 			for (var i=0, len=nodes.length;i<len;i++) 
@@ -694,7 +695,7 @@ Renderer.prototype._renderDepthSunPointOfView = function(gl, visibleObjControler
 	
 	// Mago native geometries.
 	var options = {
-		bRenderOpaques : true,
+		bRenderOpaques      : true,
 		bRenderTransparents : true
 	};
 	this.renderNativeObjects(gl, currentShader, renderType, visibleObjControlerNodes, options);
@@ -762,7 +763,7 @@ Renderer.prototype.renderDepthCameraPointOfView = function(camera, visibleObjCon
 
 	gl.uniform1i(currentShader.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
 	gl.uniform1f(currentShader.uFCoef_logDepth_loc, sceneState.fCoef_logDepth[0]);
-	gl.uniform1i(currentShader.bHasTexture_loc , false);
+	gl.uniform1i(currentShader.bHasTexture_loc, false);
 	gl.uniform1i(currentShader.uFrustumIdx_loc, magoManager.currentFrustumIdx);
 	var bUseMultiRenderTarget = false;
 	gl.uniform1i(currentShader.bUseMultiRenderTarget_loc, bUseMultiRenderTarget);
@@ -781,7 +782,7 @@ Renderer.prototype.renderDepthCameraPointOfView = function(camera, visibleObjCon
 	
 	// Mago native geometries.
 	var options = {
-		bRenderOpaques : true,
+		bRenderOpaques      : true,
 		bRenderTransparents : true
 	};
 	this.renderNativeObjects(gl, currentShader, renderType, visibleObjControlerNodes, options);
@@ -984,13 +985,13 @@ Renderer.prototype.renderNativeObjects = function(gl, shader, renderType, visibl
 	var bRenderOpaques = false;
 	var bRenderTransparents = false;
 
-	if(options)
+	if (options)
 	{
-		if(options.bRenderOpaques)
-		bRenderOpaques = options.bRenderOpaques;
+		if (options.bRenderOpaques)
+		{ bRenderOpaques = options.bRenderOpaques; }
 
-		if(options.bRenderTransparents)
-		bRenderTransparents = options.bRenderTransparents;
+		if (options.bRenderTransparents)
+		{ bRenderTransparents = options.bRenderTransparents; }
 	}
 
 	// 1rst, opaques.
@@ -1296,8 +1297,8 @@ Renderer.prototype.renderScreenQuad = function (gl)
 	var sunLight = sunSystem.getLight(0);
 
 	var dayNightLightingFactor = sunSystem.getDayNightLightingFactorOfPosition(camera.position);
-	if(dayNightLightingFactor < 0.0)
-	dayNightLightingFactor = 0.0;
+	if (dayNightLightingFactor < 0.0)
+	{ dayNightLightingFactor = 0.0; }
 
 	//dayNightLightingFactor = 1.0; // delete.!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -1372,7 +1373,7 @@ Renderer.prototype.renderScreenQuad = function (gl)
 	gl.activeTexture(gl.TEXTURE2);
 	gl.bindTexture(gl.TEXTURE_2D, albedoTex);  // original.***
 
-	if(bApplySsao)
+	if (bApplySsao)
 	{
 		gl.activeTexture(gl.TEXTURE0);
 		gl.bindTexture(gl.TEXTURE_2D, depthTex);  // original.***
@@ -1410,7 +1411,7 @@ Renderer.prototype.renderScreenQuad = function (gl)
 
 	shadedColorFbo.unbind(); 
 	
-	for(var i=0; i<8; i++)
+	for (var i=0; i<8; i++)
 	{
 		gl.activeTexture(gl.TEXTURE0+i); // ssaoTex.***
 		gl.bindTexture(gl.TEXTURE_2D, null);
@@ -1470,8 +1471,8 @@ Renderer.prototype.renderScreenQuad2 = function (gl)
 	var sunLight = sunSystem.getLight(0);
 
 	var dayNightLightingFactor = sunSystem.getDayNightLightingFactorOfPosition(camera.position);
-	if(dayNightLightingFactor < 0.0)
-	dayNightLightingFactor = 0.0;
+	if (dayNightLightingFactor < 0.0)
+	{ dayNightLightingFactor = 0.0; }
 
 	//dayNightLightingFactor = 1.0; // delete.!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -1526,7 +1527,7 @@ Renderer.prototype.renderScreenQuad2 = function (gl)
 
 	var bScreenSpaceObjectsTex = false;
 	var screenSpaceFBO = magoManager.screenSpaceFBO;
-	if(screenSpaceFBO)
+	if (screenSpaceFBO)
 	{
 		bScreenSpaceObjectsTex = true;
 		gl.activeTexture(gl.TEXTURE3); 
@@ -1544,7 +1545,8 @@ Renderer.prototype.renderScreenQuad2 = function (gl)
 	gl.enable(gl.BLEND);
 	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); // Original.***
 
-	if (this.screenQuad === undefined) {
+	if (this.screenQuad === undefined) 
+	{
 		this.screenQuad = new ScreenQuad(magoManager.vboMemoryManager);
 	}
 	
@@ -1556,7 +1558,7 @@ Renderer.prototype.renderScreenQuad2 = function (gl)
 	gl.enable(gl.DEPTH_TEST);
 	//gl.enable(gl.POLYGON_OFFSET_FILL);
 	
-	for(var i=0; i<8; i++)
+	for (var i=0; i<8; i++)
 	{
 		gl.activeTexture(gl.TEXTURE0+i); // ssaoTex.***
 		gl.bindTexture(gl.TEXTURE_2D, null);
@@ -1574,8 +1576,8 @@ Renderer.prototype.renderSsaoFromDepth = function(gl)
 	var magoManager = this.magoManager;
 	var texManager = magoManager.texturesManager;
 
-	if(!texManager)
-	return;
+	if (!texManager)
+	{ return; }
 
 	var sceneState = magoManager.sceneState;
 	var bufferWidth = sceneState.drawingBufferWidth[0];
@@ -1772,7 +1774,7 @@ Renderer.prototype.renderTerrainCopy = function()
 	this.screenQuad.render(magoManager, currentShader);
 
 	// Restore settings.***
-	for(var i=0; i<8; i++)
+	for (var i=0; i<8; i++)
 	{
 		gl.activeTexture(gl.TEXTURE0 + i);
 		gl.bindTexture(gl.TEXTURE_2D, null);
@@ -2027,7 +2029,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 		//------------------------------------------
 
 		var nor = new Float32Array([normal_0.x, normal_0.y, normal_0.z,   normal_1.x, normal_1.y, normal_1.z,   normal_3.x, normal_3.y, normal_3.z,
-									normal_3.x, normal_3.y, normal_3.z,   normal_1.x, normal_1.y, normal_1.z,   normal_2.x, normal_2.y, normal_2.z]);
+			normal_3.x, normal_3.y, normal_3.z,   normal_1.x, normal_1.y, normal_1.z,   normal_2.x, normal_2.y, normal_2.z]);
 		this.normalBuffer = FBO.createBuffer(gl, nor);
 	}
 
@@ -2074,14 +2076,14 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 	
 
-	if(magoManager.depthTex)
+	if (magoManager.depthTex)
 	{
 		texture = magoManager.depthTex;
 	}
 
 	
 	var depthFboNeo = magoManager.depthFboNeo;
-	if(depthFboNeo.colorBuffer)
+	if (depthFboNeo.colorBuffer)
 	{
 		//texture = depthFboNeo.colorBuffer;
 	}
@@ -2091,77 +2093,77 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 		texture = magoManager.shadedColorFbo.colorBuffer;
 	}
 
-	if(magoManager.normalTex)
+	if (magoManager.normalTex)
 	{
 		//texture = magoManager.normalTex;
 	}
 
-	if(magoManager.albedoTex)
+	if (magoManager.albedoTex)
 	{
 		//texture = magoManager.albedoTex;
 	}
 
-	if(magoManager.diffuseLightTex)
+	if (magoManager.diffuseLightTex)
 	{
 		//texture = magoManager.diffuseLightTex;
 	}
 
-	if(magoManager.specularLightTex)
+	if (magoManager.specularLightTex)
 	{
 		//texture = magoManager.specularLightTex;
 	}
 
-	if(magoManager.specularLightTex)
+	if (magoManager.specularLightTex)
 	{
 		//texture = magoManager.LightFogTex;
 	}
 
-	if(magoManager.windPlaneDepthTex)
+	if (magoManager.windPlaneDepthTex)
 	{
 		//texture = magoManager.windPlaneDepthTex;
 	}
 
-	if(magoManager.windPngTex)
+	if (magoManager.windPngTex)
 	{
 		//texture = magoManager.windPngTex;
 	}
 
-	if(magoManager.windPlaneNormalTex)
+	if (magoManager.windPlaneNormalTex)
 	{
 		//texture = magoManager.windPlaneNormalTex;
 	}
 
-	if(magoManager.windVolumeRearDepthTex)
+	if (magoManager.windVolumeRearDepthTex)
 	{
 		//texture = magoManager.windVolumeRearDepthTex;
 	}
 	
-	if(magoManager.windVolumeRearNormalTex)
+	if (magoManager.windVolumeRearNormalTex)
 	{
 		//texture = magoManager.windVolumeRearNormalTex;
 	}
 
-	if(magoManager.selectionFbo)
+	if (magoManager.selectionFbo)
 	{
 		//texture = magoManager.selectionFbo.colorBuffer;
 	}
 
-	if(magoManager.selColorTex)
+	if (magoManager.selColorTex)
 	{
 		//texture = magoManager.selColorTex;
 	}
 
-	if(magoManager.ssaoFromDepthFbo)
+	if (magoManager.ssaoFromDepthFbo)
 	{
 		//texture = magoManager.ssaoFromDepthFbo.colorBuffer;
 	}
 
-	if(magoManager.waterManager)
+	if (magoManager.waterManager)
 	{
-		if(magoManager.waterManager.waterLayersArray.length > 0)
+		if (magoManager.waterManager.waterLayersArray.length > 0)
 		{
 			var waterLayer = magoManager.waterManager.waterLayersArray[0];
-			if(waterLayer.waterHeightTexA && waterLayer.waterHeightTexA.texId)
+			if (waterLayer.waterHeightTexA && waterLayer.waterHeightTexA.texId)
 			{
 				//texture = waterLayer.waterHeightTexA.texId;
 			}
@@ -2171,99 +2173,99 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 				//texture = waterLayer.waterSourceTex.texId;
 			}
 
-			if(waterLayer.waterFluxTexA_HIGH && waterLayer.waterFluxTexA_HIGH.texId)
+			if (waterLayer.waterFluxTexA_HIGH && waterLayer.waterFluxTexA_HIGH.texId)
 			{
 				//texture = waterLayer.waterFluxTexA_HIGH.texId;
 			}
 
-			if(waterLayer.waterFluxTexA_LOW && waterLayer.waterFluxTexA_LOW.texId)
+			if (waterLayer.waterFluxTexA_LOW && waterLayer.waterFluxTexA_LOW.texId)
 			{
 				//texture = waterLayer.waterFluxTexA_LOW.texId;
 			}
 
-			if(waterLayer.waterVelocityTexA && waterLayer.waterVelocityTexA.texId)
+			if (waterLayer.waterVelocityTexA && waterLayer.waterVelocityTexA.texId)
 			{
 				//texture = waterLayer.waterVelocityTexA.texId;
 			}
 
-			if(waterLayer.demWithBuildingsTex && waterLayer.demWithBuildingsTex.texId)
+			if (waterLayer.demWithBuildingsTex && waterLayer.demWithBuildingsTex.texId)
 			{
 				//texture = waterLayer.demWithBuildingsTex.texId;
 			}
 
-			if(waterLayer.dem_texture && waterLayer.dem_texture.texId)
+			if (waterLayer.dem_texture && waterLayer.dem_texture.texId)
 			{
 				//texture = waterLayer.dem_texture.texId;
 			}
 
-			if(waterLayer.shaderLogTexA && waterLayer.shaderLogTexA.texId)
+			if (waterLayer.shaderLogTexA && waterLayer.shaderLogTexA.texId)
 			{
 				//texture = waterLayer.shaderLogTexA.texId;
 			}
 
-			if(waterLayer.shaderLogTex_Flux_A && waterLayer.shaderLogTex_Flux_A.texId)
+			if (waterLayer.shaderLogTex_Flux_A && waterLayer.shaderLogTex_Flux_A.texId)
 			{
 				//texture = waterLayer.shaderLogTex_Flux_A.texId; // LOG.*** LOG.*** LOG.*** LOG.*** LOG.*** LOG.*** LOG.*** LOG.*** LOG.***
 			}
 
-			if(waterLayer.particlesPosTex_A && waterLayer.particlesPosTex_A.texId)
+			if (waterLayer.particlesPosTex_A && waterLayer.particlesPosTex_A.texId)
 			{
 				//texture = waterLayer.particlesPosTex_A.texId;
 			}
 
-			if(waterLayer.particlesTex_A && waterLayer.particlesTex_A.texId)
+			if (waterLayer.particlesTex_A && waterLayer.particlesTex_A.texId)
 			{
 				//texture = waterLayer.particlesTex_A.texId;
 			}
 
-			if(waterLayer.contaminationTex_A && waterLayer.contaminationTex_A.texId)
+			if (waterLayer.contaminationTex_A && waterLayer.contaminationTex_A.texId)
 			{
 				//texture = waterLayer.contaminationTex_A.texId;
 			}
 
-			if(waterLayer.contaminantSourceTex && waterLayer.contaminantSourceTex.texId)
+			if (waterLayer.contaminantSourceTex && waterLayer.contaminantSourceTex.texId)
 			{
 				//texture = waterLayer.contaminantSourceTex.texId;
 			}
 
-			if(waterLayer.terrainMaxSlippageTex && waterLayer.terrainMaxSlippageTex.texId)
+			if (waterLayer.terrainMaxSlippageTex && waterLayer.terrainMaxSlippageTex.texId)
 			{
 				//texture = waterLayer.terrainMaxSlippageTex.texId;
 			}
 
-			if(waterLayer.terrainFluxTexA_HIGH && waterLayer.terrainFluxTexA_HIGH.texId)
+			if (waterLayer.terrainFluxTexA_HIGH && waterLayer.terrainFluxTexA_HIGH.texId)
 			{
 				//texture = waterLayer.terrainFluxTexA_HIGH.texId;
 			}
 
-			if(waterLayer.terrainFluxTexA_LOW && waterLayer.terrainFluxTexA_LOW.texId)
+			if (waterLayer.terrainFluxTexA_LOW && waterLayer.terrainFluxTexA_LOW.texId)
 			{
 				//texture = waterLayer.terrainFluxTexA_LOW.texId;
 			}
 
-			if(waterLayer.waterAditionTex && waterLayer.waterAditionTex.texId)
+			if (waterLayer.waterAditionTex && waterLayer.waterAditionTex.texId)
 			{
 				//texture = waterLayer.waterAditionTex.texId;
 			}
 
-			if(waterLayer.original_dem_texture && waterLayer.original_dem_texture.texId)
+			if (waterLayer.original_dem_texture && waterLayer.original_dem_texture.texId)
 			{
 				//texture = waterLayer.original_dem_texture.texId;
 			}//
 
-			if(waterLayer.qSurfaceMesh_dem_texture && waterLayer.qSurfaceMesh_dem_texture.texId)
+			if (waterLayer.qSurfaceMesh_dem_texture && waterLayer.qSurfaceMesh_dem_texture.texId)
 			{
 				//texture = waterLayer.qSurfaceMesh_dem_texture.texId;
 			}
 		}
 	}
 
-	if(magoManager.soundManager)
+	if (magoManager.soundManager)
 	{
-		if(magoManager.soundManager.soundLayersArray.length > 0)
+		if (magoManager.soundManager.soundLayersArray.length > 0)
 		{
 			var soundLayer = magoManager.soundManager.soundLayersArray[0];
-			if(soundLayer.demTex && soundLayer.demTex.texId)
+			if (soundLayer.demTex && soundLayer.demTex.texId)
 			{
 				//texture = soundLayer.demTex.texId;
 			}
@@ -2271,22 +2273,22 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 	}
 	
 	var sunSystem = sceneState.sunSystem;
-	if(sunSystem)
+	if (sunSystem)
 	{
 		var sunLight = sunSystem.getLight(1);
-		if(sunLight && sunLight.depthFbo && sunLight.depthFbo.colorBuffer)
+		if (sunLight && sunLight.depthFbo && sunLight.depthFbo.colorBuffer)
 		{
 			//texture = sunLight.depthFbo.colorBuffer;
 		}
 		
 	}
 	
-	if(magoManager.scene && magoManager.scene._context._us.globeDepthTexture._texture)
+	if (magoManager.scene && magoManager.scene._context._us.globeDepthTexture._texture)
 	{
 		//texture = magoManager.scene._context._us.globeDepthTexture._texture;
 	}
 
-	if(magoManager.screenSpaceFBO)
+	if (magoManager.screenSpaceFBO)
 	{
 		//texture = magoManager.screenSpaceFBO.colorBuffersArray[0];
 	}
@@ -2347,13 +2349,13 @@ Renderer.prototype.renderScreenSpaceObjects = function(gl)
 	// Render screenSpaceObjects, as speechBubbles.
 	// Create screenSpaceFBO if no exist.
 	var magoManager = this.magoManager;
-	if(!magoManager.screenSpaceFBO)
+	if (!magoManager.screenSpaceFBO)
 	{
 		// create a lBuffer with 2 colorTextures : diffuseLighting & specularLighting.
 		var bufferWidth = magoManager.sceneState.drawingBufferWidth[0];
 		var bufferHeight = magoManager.sceneState.drawingBufferHeight[0];
 		var bUseMultiRenderTarget = magoManager.postFxShadersManager.bUseMultiRenderTarget;
-		magoManager.screenSpaceFBO = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 3}); 
+		magoManager.screenSpaceFBO = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget: bUseMultiRenderTarget, numColorBuffers: 3}); 
 	}
 
 	var screenSpaceFBO = magoManager.screenSpaceFBO;
@@ -2372,7 +2374,7 @@ Renderer.prototype.renderScreenSpaceObjects = function(gl)
 	]);
 
 		
-	if(magoManager.isFarestFrustum())
+	if (magoManager.isFarestFrustum())
 	{
 		gl.clearColor(0, 0, 0, 0);
 		gl.clearDepth(1.0);
@@ -2401,8 +2403,8 @@ Renderer.prototype.renderLightDepthCubeMaps = function (lightSourcesArray)
 	var magoManager = this.magoManager;
 	var lightSourcesCount = lightSourcesArray.length;
 
-	if(lightSourcesCount === 0)
-	return;
+	if (lightSourcesCount === 0)
+	{ return; }
 
 	var gl = magoManager.getGl();
 	var sceneState = magoManager.sceneState;
@@ -2419,7 +2421,7 @@ Renderer.prototype.renderLightDepthCubeMaps = function (lightSourcesArray)
 	var bUseLogarithmicDepth = false; // for lightMap no necessary logDepth precision.***
 	gl.uniform1i(currentShader.bUseLogarithmicDepth_loc, bUseLogarithmicDepth);
 	gl.uniform1f(currentShader.uFCoef_logDepth_loc, sceneState.fCoef_logDepth[0]);
-	gl.uniform1i(currentShader.bHasTexture_loc , false);
+	gl.uniform1i(currentShader.bHasTexture_loc, false);
 	gl.uniform1i(currentShader.uFrustumIdx_loc, magoManager.currentFrustumIdx);
 	//gl.uniform1i(currentShader.bUseMultiRenderTarget_loc, magoManager.postFxShadersManager.bUseMultiRenderTarget);
 	gl.uniform1i(currentShader.bUseMultiRenderTarget_loc, false);
@@ -2444,7 +2446,7 @@ Renderer.prototype.renderLightDepthCubeMaps = function (lightSourcesArray)
 	var refTMatrixIdxKey = 0;
 
 	var options = {
-		bRenderOpaques : true,
+		bRenderOpaques      : true,
 		bRenderTransparents : false
 	};
 
@@ -2452,13 +2454,13 @@ Renderer.prototype.renderLightDepthCubeMaps = function (lightSourcesArray)
 	{
 		light = lightSourcesArray[i];
 
-		if(light.bCubeMapMade)
-		continue;
+		if (light.bCubeMapMade)
+		{ continue; }
 
 		var visibleObjectsControler = light.visibleObjectsControler;
 
-		if(!visibleObjectsControler)
-		continue;
+		if (!visibleObjectsControler)
+		{ continue; }
 
 		var visibleNodesCount = visibleObjectsControler.currentVisibles0.length;
 		var visibleNativesCount = visibleObjectsControler.currentVisibleNativeObjects.opaquesArray.length;
@@ -2473,7 +2475,7 @@ Renderer.prototype.renderLightDepthCubeMaps = function (lightSourcesArray)
 		gl.uniform3fv(currentShader.encodedCameraPositionMCLow_loc, geoLocData.positionLOW);
 
 		// Take the cubeMap of the light.
-		for(var face = 0; face<6; face++)
+		for (var face = 0; face<6; face++)
 		{
 
 			light.bindCubeMapFrameBuffer(face, magoManager);
@@ -2510,8 +2512,8 @@ Renderer.prototype.renderLightBuffer = function (lightSourcesArray)
 	var magoManager = this.magoManager;
 	var lightSourcesCount = lightSourcesArray.length;
 
-	if(lightSourcesCount === 0)
-	return;
+	if (lightSourcesCount === 0)
+	{ return; }
 
 	var gl = magoManager.getGl();
 	var sceneState = magoManager.sceneState;
@@ -2596,7 +2598,7 @@ Renderer.prototype.renderLightBuffer = function (lightSourcesArray)
 	var renderType = 1;
 	var glPrimitive = undefined;
 	var bIsSelected = undefined;
-	for(var i=0; i<lightSourcesCount; i++)
+	for (var i=0; i<lightSourcesCount; i++)
 	{
 		light = lightSourcesArray[i];
 		var lightDirWC = light.getLightDirectionWC();
@@ -2607,11 +2609,11 @@ Renderer.prototype.renderLightBuffer = function (lightSourcesArray)
 		
 		// set the light direction WC.
 		gl.uniform3fv(currentShader.lightDirWC_loc, [lightDirWC.x, lightDirWC.y, lightDirWC.z]); //.
-		gl.uniform3fv(currentShader.uLightColorAndBrightness_loc, [light.color.r,light.color.g,light.color.b] ); //.
+		gl.uniform3fv(currentShader.uLightColorAndBrightness_loc, [light.color.r, light.color.g, light.color.b] ); //.
 		gl.uniform1f(currentShader.uLightIntensity_loc, light.intensity);
 		var lightParams = light.getLightParameters(); //uLightParameters[4]; // 0= lightDist, 1= lightFalloffDist, 2= maxSpotDot, 3= falloffSpotDot.
 
-		if(!lightParams) continue;
+		if (!lightParams) { continue; }
 
 		gl.uniform1fv(currentShader.uLightParameters_loc, lightParams);
 
@@ -2774,7 +2776,7 @@ Renderer.prototype.renderGeometryBuffer = function (gl, renderType, visibleObjCo
 			
 			// native objects.
 			var options = {
-				bRenderOpaques : true,
+				bRenderOpaques      : true,
 	 			bRenderTransparents : false
 			};
 			this.renderNativeObjects(gl, currentShader, renderType, visibleObjControlerNodes, options);
@@ -2897,15 +2899,17 @@ Renderer.prototype.renderGeometryBuffer = function (gl, renderType, visibleObjCo
 			{
 			  for (var i = 0; i < octreesCount; i++) 
 			  {
-				var octree = visiblesSortedOctreesArray[i];
+					var octree = visiblesSortedOctreesArray[i];
 		
-				if (octree.preparePCloudData(magoManager)) {
+					if (octree.preparePCloudData(magoManager)) 
+					{
 				  loadCount++;
-				}
+					}
 		
-				if (loadCount > 1) {
+					if (loadCount > 1) 
+					{
 				  break;
-				}
+					}
 			  }
 			}
 
@@ -3100,7 +3104,7 @@ Renderer.prototype.renderGeometryBufferTransparents = function(gl, renderType, v
 			
 			// native objects.
 			var options = {
-				bRenderOpaques : false,
+				bRenderOpaques      : false,
 	 			bRenderTransparents : true
 			};
 			this.renderNativeObjects(gl, currentShader, renderType, visibleObjControlerNodes, options);
@@ -3221,15 +3225,17 @@ Renderer.prototype.renderGeometryBufferTransparents = function(gl, renderType, v
 			{
 			  for (var i = 0; i < octreesCount; i++) 
 			  {
-				var octree = visiblesSortedOctreesArray[i];
+					var octree = visiblesSortedOctreesArray[i];
 		
-				if (octree.preparePCloudData(magoManager)) {
+					if (octree.preparePCloudData(magoManager)) 
+					{
 				  loadCount++;
-				}
+					}
 		
-				if (loadCount > 1) {
+					if (loadCount > 1) 
+					{
 				  break;
-				}
+					}
 			  }
 			}
 
@@ -3917,7 +3923,7 @@ Renderer.prototype.renderGeometryColorCoding = function (visibleObjControlerNode
 		currentShader.bindUniformGenerals();
 
 		  var options = {
-			bRenderOpaques : true,
+			bRenderOpaques      : true,
 			bRenderTransparents : true
 		  };
 		

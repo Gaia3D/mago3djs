@@ -10,7 +10,7 @@ var SoundLayer = function(soundManager, options)
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-    this.soundManager = soundManager;
+	this.soundManager = soundManager;
 
 	this.geographicExtent;
 	this.textureWidth = new Int32Array([soundManager.simulationTextureWidth]);
@@ -45,9 +45,9 @@ var SoundLayer = function(soundManager, options)
 	// The buildings & objects intersected by this waterTile.
 	this.visibleObjectsControler;
 
-	if(options)
+	if (options)
 	{
-		if(options.geographicExtent)
+		if (options.geographicExtent)
 		{
 			this.geographicExtent = options.geographicExtent;
 		}
@@ -56,7 +56,7 @@ var SoundLayer = function(soundManager, options)
 
 SoundLayer.prototype.isPrepared = function()
 {
-	if(!this._bIsPrepared)
+	if (!this._bIsPrepared)
 	{
 		this.init();
 		return false;
@@ -75,7 +75,7 @@ SoundLayer.prototype.init = function ()
 SoundLayer.prototype.prepareTextures = function ()
 {
 	// Original DEM texture.**************************************************************************************************
-	if(!this.original_dem_texture)
+	if (!this.original_dem_texture)
 	{
 		var magoManager = this.waterManager.magoManager;
 		var gl = magoManager.getGl();
@@ -118,7 +118,7 @@ SoundLayer.prototype._makeTextures = function ()
 
 SoundLayer.prototype.makeQuantizedMeshVbo = function (qMesh)
 {
-	if(this.qMeshVboKeyContainer)
+	if (this.qMeshVboKeyContainer)
 	{
 		return true;
 	}
@@ -135,7 +135,7 @@ SoundLayer.prototype.makeQuantizedMeshVbo = function (qMesh)
 	this.cartesiansArray = new Uint16Array(pointsCount * 3);
 	
 	var x, y, z;
-	for(var i=0; i<pointsCount; i++)
+	for (var i=0; i<pointsCount; i++)
 	{
 		x = uValues[i];
 		y = vValues[i];
@@ -177,10 +177,10 @@ SoundLayer.prototype.makeQuantizedMeshVbo = function (qMesh)
 
 SoundLayer.prototype.makeDEMTextureByQuantizedMesh = function (qMesh)
 {
-	if(!this.isPrepared())
+	if (!this.isPrepared())
 	{ return; }
 
-	if(!this.qMeshVboKeyContainer)
+	if (!this.qMeshVboKeyContainer)
 	{
 		this.makeQuantizedMeshVbo(qMesh);
 	}
@@ -211,7 +211,7 @@ SoundLayer.prototype.makeDEMTextureByQuantizedMesh = function (qMesh)
 		extbuffers.NONE, // gl_FragData[1]
 		extbuffers.NONE, // gl_FragData[2]
 		extbuffers.NONE, // gl_FragData[3]
-		]);
+	]);
 
 	shader = magoManager.postFxShadersManager.getShader("depthTexFromQuantizedMesh");
 	magoManager.postFxShadersManager.useProgram(shader);
@@ -245,13 +245,13 @@ SoundLayer.prototype.makeDEMTextureByQuantizedMesh = function (qMesh)
 
 SoundLayer.prototype.doSimulationSteps = function (magoManager)
 {
-	if(!this.isPrepared())
+	if (!this.isPrepared())
 	{
 		return false;
 	}
 
 	// Check if made demTexture by quantizedMesh.***
-	if(!this.bDemTexFromQuantizedMesh && this.qMesh)
+	if (!this.bDemTexFromQuantizedMesh && this.qMesh)
 	{
 		// make dem texture by quantized mesh.
 		this.makeDEMTextureByQuantizedMesh(this.qMesh);
@@ -260,7 +260,7 @@ SoundLayer.prototype.doSimulationSteps = function (magoManager)
 	}
 
 	// Do another test:
-	if(!this.quantizedSurfaceTest)
+	if (!this.quantizedSurfaceTest)
 	{
 		// 1rst, calculate the geoExtent of the tile:
 		var imageryType = CODE.imageryType.CRS84;
@@ -271,11 +271,11 @@ SoundLayer.prototype.doSimulationSteps = function (magoManager)
 		// {longitude: 127.24364884800002, latitude: 36.49658264, altitude: 155.60084533691406}
 		// {longitude: 127.23266252000002, latitude: 36.485596312, altitude: 0}
 		var excavationGeoCoords = [new GeographicCoord(127.238, 36.492, 0.0), 
-									new GeographicCoord(127.238, 36.489, 0.0), 
-									new GeographicCoord(127.240, 36.489, 0.0), 
-									new GeographicCoord(127.240, 36.490, 0.0), 
-									new GeographicCoord(127.239, 36.490, 0.0), 
-									new GeographicCoord(127.239, 36.492, 0.0)];
+			new GeographicCoord(127.238, 36.489, 0.0), 
+			new GeographicCoord(127.240, 36.489, 0.0), 
+			new GeographicCoord(127.240, 36.490, 0.0), 
+			new GeographicCoord(127.239, 36.490, 0.0), 
+			new GeographicCoord(127.239, 36.492, 0.0)];
 
 		var excavationDepth = 20.0;
 		this.quantizedSurface.excavation(excavationGeoCoords, excavationDepth);
@@ -361,7 +361,7 @@ SoundLayer.prototype._makeSurface = function ()
 		}
 	}
 
-	if(!this.cartesiansArray)
+	if (!this.cartesiansArray)
 	{
 		var coordsCount = lonArray.length;
 		this.cartesiansArray = new Array(coordsCount);
@@ -386,8 +386,8 @@ SoundLayer.prototype._makeSurface = function ()
 	var numCols = lonSegments + 1;
 	var numRows = latSegments + 1;
 	var options = {
-		bCalculateBorderIndices: true,
-		indicesByteSize : 4 // In this case (waterTiles) must calculate indices in Uint32, because here vertexCount is greater than max_shortSize..
+		bCalculateBorderIndices : true,
+		indicesByteSize         : 4 // In this case (waterTiles) must calculate indices in Uint32, because here vertexCount is greater than max_shortSize..
 	};
 	var resultObject = GeometryUtils.getIndicesTrianglesRegularNet(numCols, numRows, undefined, undefined, undefined, undefined, undefined, options);
 	this.indices = resultObject.indicesArray;
@@ -422,7 +422,7 @@ SoundLayer.prototype._makeSurface = function ()
 	var posBuffer = new Float32Array(indicesCount * 3);
 	var texCoordBuffer = new Float32Array(indicesCount * 2);
 	var idx;
-	for(var i=0; i<indicesCount; i++)
+	for (var i=0; i<indicesCount; i++)
 	{
 		idx = this.indices[i];
 		posBuffer[i*3] = this.cartesiansArray[idx*3] - this.centerX[0];

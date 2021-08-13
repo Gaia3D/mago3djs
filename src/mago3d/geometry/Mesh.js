@@ -479,7 +479,8 @@ Mesh.prototype.getBoundingBox = function()
 	if (this.bbox === undefined)
 	{
 		this.bbox = new BoundingBox();
-		if(!this.vertexList) {
+		if (!this.vertexList) 
+		{
 			this.vertexList = new VertexList();
 			this.vertexList.vertexArray = this.getNoRepeatedVerticesArray(this.vertexList.vertexArray);
 		}
@@ -580,7 +581,7 @@ Mesh.prototype.calculateVerticesNormals = function(bForceRecalculatePlaneNormal)
  */
 Mesh.prototype.calculateTexCoordsBox = function(texCoordsBoundingBox)
 {
-	if(!texCoordsBoundingBox)
+	if (!texCoordsBoundingBox)
 	{
 		texCoordsBoundingBox = this.getBoundingBox();
 	}
@@ -847,8 +848,8 @@ Mesh.prototype.renderAsChild = function (magoManager, shader, renderType, glPrim
 
 	if (bWireframe)
 	{
-		if( renderType !== 1)
-		return;
+		if ( renderType !== 1)
+		{ return; }
 
 		if (options)
 		{
@@ -911,7 +912,7 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive, i
 		// Depth render
 		// provisionally disable texture
 		// in the future must call "solveReferencePngTextureForDepthRender" function
-		gl.uniform1i(shader.bHasTexture_loc , false);
+		gl.uniform1i(shader.bHasTexture_loc, false);
 		gl.uniform1i(shader.colorType_loc, 0);
 	}
 	else if (renderType === 1)

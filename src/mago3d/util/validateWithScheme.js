@@ -8,7 +8,8 @@
  */
 var validateWithScheme = function (object, scheme) 
 {
-    return !!Object.keys(scheme).filter(function (key) {
-        return scheme[key](object[key]);
-    }).length;
+	return !!Object.keys(scheme).filter(function (key) 
+	{
+		return scheme[key](object[key]);
+	}).length;
 };

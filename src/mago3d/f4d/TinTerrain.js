@@ -1077,7 +1077,7 @@ TinTerrain.prototype.bindTexture = function(gl, shader, currDepth)
 		if (this.owner)
 		{ return this.owner.bindTexture(gl, shader, currDepth); }
 		else
-		return false;
+		{ return false; }
 	}
 };
 
@@ -1783,17 +1783,17 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 					// Set sunMatrix uniform.***
 					var sunSystem = this.tinTerrainManager.magoManager.sceneState.sunSystem;
 					var sunLight = sunSystem.getLight(0);
-					if(sunLight)
+					if (sunLight)
 					{
 						var sunLight = sunSystem.getLight(0);
-						if(sunLight.depthFbo)
+						if (sunLight.depthFbo)
 						{
 							gl.activeTexture(gl.TEXTURE0); 
 							gl.bindTexture(gl.TEXTURE_2D, sunLight.depthFbo.colorBuffer);
 						}
 
 						sunLight = sunSystem.getLight(1);
-						if(sunLight.depthFbo)
+						if (sunLight.depthFbo)
 						{
 							gl.activeTexture(gl.TEXTURE1); 
 							gl.bindTexture(gl.TEXTURE_2D, sunLight.depthFbo.colorBuffer);
@@ -1904,7 +1904,7 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 		var selectionManager = magoManager.selectionManager;
 		var indicesCount = vboKey.indicesCount;
 
-		if(indicesCount !== 2400)
+		if (indicesCount !== 2400)
 		{
 			var hola = 0;
 		}
@@ -2749,7 +2749,7 @@ TinTerrain.prototype.makeMeshVirtually_FUNCTION_NO_USED = function (lonSegments,
 
 	// After calculate normals, convert cartesian rel to center.***
 	var cartesiansCount = this.cartesiansArray.length/3;
-	for(var i=0; i<cartesiansCount; i++)
+	for (var i=0; i<cartesiansCount; i++)
 	{
 		this.cartesiansArray[i*3] -= this.centerX;
 		this.cartesiansArray[i*3+1] -= this.centerY;
@@ -2790,7 +2790,7 @@ TinTerrain.prototype.makeMeshVirtually_FUNCTION_NO_USED = function (lonSegments,
 	this.skirtTexCoordsArray = skirtResultObject.skirtTexCoordsArray;
 
 	var cartesiansCount = this.skirtCartesiansArray.length/3;
-	for(var i=0; i<cartesiansCount; i++)
+	for (var i=0; i<cartesiansCount; i++)
 	{
 		this.skirtCartesiansArray[i*3] -= this.centerX;
 		this.skirtCartesiansArray[i*3+1] -= this.centerY;
@@ -3558,7 +3558,7 @@ TinTerrain.prototype.parseData = function (dataArrayBuffer)
 	var bMakeNormals = true;
 	var imageryType = tinTerrainManager.imageryType;
 
-	if(dataArrayBuffer)
+	if (dataArrayBuffer)
 	{
 		if (!this.tinTerrainManager.workerParseTerrain) 
 		{ 
@@ -3575,11 +3575,11 @@ TinTerrain.prototype.parseData = function (dataArrayBuffer)
 		}
 
 		var data = {
-			dataArrayBuffer: dataArrayBuffer,
-			info: {
-				x: this.X, 
-				y: this.Y, 
-				z: this.depth,
+			dataArrayBuffer : dataArrayBuffer,
+			info            : {
+				x                      : this.X, 
+				y                      : this.Y, 
+				z                      : this.depth,
 				minGeographicLongitude : this.geographicExtent.minGeographicCoord.longitude,
 				minGeographicLatitude  : this.geographicExtent.minGeographicCoord.latitude,
 				maxGeographicLongitude : this.geographicExtent.maxGeographicCoord.longitude,
@@ -3610,19 +3610,19 @@ TinTerrain.prototype.parseData = function (dataArrayBuffer)
 		var texCorrectionFactor = this.tinTerrainManager.getTexCorrection(this.depth);
 		var data = {
 			info: {
-				x: this.X, 
-				y: this.Y, 
-				z: this.depth,
+				x                      : this.X, 
+				y                      : this.Y, 
+				z                      : this.depth,
 				minGeographicLongitude : this.geographicExtent.minGeographicCoord.longitude,
 				minGeographicLatitude  : this.geographicExtent.minGeographicCoord.latitude,
 				maxGeographicLongitude : this.geographicExtent.maxGeographicCoord.longitude,
 				maxGeographicLatitude  : this.geographicExtent.maxGeographicCoord.latitude,
-				lonSegments : 20,
-				latSegments : 20, 
-				altitude : 0,
+				lonSegments            : 20,
+				latSegments            : 20, 
+				altitude               : 0,
 				imageryType            : imageryType,
 				bMakeNormals           : bMakeNormals,
-				texCorrectionFactor : texCorrectionFactor
+				texCorrectionFactor    : texCorrectionFactor
 			}
 		};
 		this.tinTerrainManager.workerMakePlaneTerrain.postMessage(data);// send to worker by copy.

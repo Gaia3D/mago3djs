@@ -239,7 +239,7 @@ F4dController.prototype.deleteF4dMember = function(groupId, memberId, silence)
 		smartTile.eraseNode(node);
 	}
 
-	if(this.magoManager.defaultSelectInteraction.selected === node)
+	if (this.magoManager.defaultSelectInteraction.selected === node)
 	{
 		this.magoManager.defaultSelectInteraction.clear(silence);
 	}
@@ -291,15 +291,16 @@ F4dController.prototype.getStaticModelGroupKeys = function()
 {
 	var groupKeys = [];
 	var staticModelsManager = this.magoManager.hierarchyManager.staticModelsManager;
-	if(staticModelsManager) 
+	if (staticModelsManager) 
 	{
-		if(staticModelsManager.staticModelsMap){
+		if (staticModelsManager.staticModelsMap)
+		{
 			groupKeys = Object.keys(staticModelsManager.staticModelsMap);
 		}
 	}
 
 	return groupKeys;
-}
+};
 
 /**
  * return static model data (Node) object
@@ -312,16 +313,17 @@ F4dController.prototype.getStaticModelObject = function()
 {
 	var groupKeys = this.getStaticModelGroupKeys();
 	var obj;
-	for(var i=0,groupKeyLenth=groupKeys.length; i<groupKeyLenth; i++) {
+	for (var i=0, groupKeyLenth=groupKeys.length; i<groupKeyLenth; i++) 
+	{
 		var groupKey = groupKeys[i];
 		var group = this.getF4dGroup(groupKey);
-		if(!obj) obj={};
+		if (!obj) { obj={}; }
 
 		obj[groupKey] = group;
 	}
 
 	return obj;
-}
+};
 
 F4dController.f4dObjectValidate = function(f4dObject) 
 {

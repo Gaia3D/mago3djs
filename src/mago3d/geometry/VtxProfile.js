@@ -239,10 +239,10 @@ VtxProfile.prototype.makeByPoints3DArray = function(outerPoints3dArray, innerPoi
 	{ return; }
 
 	var outerRingOptions;
-	if(options)
+	if (options)
 	{
-		if(options.outerVtxRingOptions)
-		outerRingOptions = options.outerVtxRingOptions;
+		if (options.outerVtxRingOptions)
+		{ outerRingOptions = options.outerVtxRingOptions; }
 	}
 	
 	// outer.

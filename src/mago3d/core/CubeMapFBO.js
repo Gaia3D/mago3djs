@@ -14,10 +14,10 @@ var CubeMapFBO = function(gl, width, options)
 	if (!(this instanceof CubeMapFBO)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
-    }
+	}
     
-    // https://en.wikipedia.org/wiki/Cube_mapping
-    // http://marcinignac.com/blog/pragmatic-pbr-hdr/
+	// https://en.wikipedia.org/wiki/Cube_mapping
+	// http://marcinignac.com/blog/pragmatic-pbr-hdr/
 
 	options = options ? options : {};
 	this.options = options;
@@ -69,12 +69,12 @@ var CubeMapFBO = function(gl, width, options)
 	// Init process.
 	this.width[0] = width;
 
-	if(options.multiRenderTarget)
+	if (options.multiRenderTarget)
 	{
 		this.multiRenderTarget = true;
 	}
 
-	if(options.numColorBuffers)
+	if (options.numColorBuffers)
 	{
 		this.numColorBuffers = options.numColorBuffers;
 	}
@@ -90,18 +90,19 @@ var CubeMapFBO = function(gl, width, options)
 			that.height[0] = canvas.offsetHeight;
 
 			that.deleteObjects(that.gl);
-			if(that.multiRenderTarget)
-			that.initMRT();
+			if (that.multiRenderTarget)
+			{ that.initMRT(); }
 			else
-			that.init();
+			{ that.init(); }
 		}, false);
 	}
 
-	if(this.multiRenderTarget)
+	if (this.multiRenderTarget)
 	{
 		this.initMRT();
 	}
-	else{
+	else
+	{
 		this.init();
 	}
 }; 
@@ -115,12 +116,12 @@ CubeMapFBO.prototype.init = function()
 	if (this.options.colorBuffer)
 	{ this.colorBuffer = this.options.colorBuffer; }
 	else
-    { this.colorBuffer = gl.createTexture(); }
+	{ this.colorBuffer = gl.createTexture(); }
     
-    if(!this.colorBuffer)
-    {
-        var hola = 0;
-    }
+	if (!this.colorBuffer)
+	{
+		var hola = 0;
+	}
 
 	gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.colorBuffer);    
 	gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
@@ -132,24 +133,24 @@ CubeMapFBO.prototype.init = function()
 	////gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo);
 	////gl.bindRenderbuffer(gl.RENDERBUFFER, this.depthBuffer);
 	////gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, this.width[0], this.width[0]);
-    ////gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.depthBuffer);
+	////gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.depthBuffer);
     
-    for (var face = 0; face < 6; face++)
-    {
-        gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X + face, 0, gl.RGBA, this.width[0], this.width[0], 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-    }
+	for (var face = 0; face < 6; face++)
+	{
+		gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X + face, 0, gl.RGBA, this.width[0], this.width[0], 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+	}
 
 	this.framebuffer = [];
-    for (var face = 0; face < 6; face++) 
-    {
-        this.framebuffer[face] = gl.createFramebuffer();
-        gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebuffer[face]);
-        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_CUBE_MAP_POSITIVE_X + face, this.colorBuffer, 0);
-        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.depthbuffer);
+	for (var face = 0; face < 6; face++) 
+	{
+		this.framebuffer[face] = gl.createFramebuffer();
+		gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebuffer[face]);
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_CUBE_MAP_POSITIVE_X + face, this.colorBuffer, 0);
+		gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.depthbuffer);
 
-        var e = gl.checkFramebufferStatus(gl.FRAMEBUFFER); // Check for errors
-        if (e !== gl.FRAMEBUFFER_COMPLETE) throw "Cubemap framebuffer object is incomplete: " + e.toString();
-    }
+		var e = gl.checkFramebufferStatus(gl.FRAMEBUFFER); // Check for errors
+		if (e !== gl.FRAMEBUFFER_COMPLETE) { throw "Cubemap framebuffer object is incomplete: " + e.toString(); }
+	}
 
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 };
@@ -163,7 +164,7 @@ CubeMapFBO.prototype.initMRT = function ()
 	this.extbuffers = gl.getExtension("WEBGL_draw_buffers");
 
 	this.colorBuffersArray.length = 0; // init.
-	for(var i=0; i<this.numColorBuffers; i++)
+	for (var i=0; i<this.numColorBuffers; i++)
 	{
 		var colorBuffer = gl.createTexture();
 		gl.bindTexture(gl.TEXTURE_2D, colorBuffer);  // depthTex.
@@ -185,7 +186,7 @@ CubeMapFBO.prototype.initMRT = function ()
 	gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, this.width[0], this.height[0]);
 	gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.depthBuffer);
 
-	for(var i=0; i<this.numColorBuffers; i++)
+	for (var i=0; i<this.numColorBuffers; i++)
 	{
 		var colorBuffer = this.colorBuffersArray[i];
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT0_WEBGL + i, gl.TEXTURE_2D, colorBuffer, 0);
@@ -207,16 +208,16 @@ CubeMapFBO.prototype.initMRT = function ()
 
 CubeMapFBO.prototype.getModelViewProjectionMatrix = function(cubeFace, options) 
 {
-    if(!this.mvpMatrixArray)
-    {
-        // create the 6 mvpMatrices.
-        var fovyRad = 90 * Math.PI/180;
-        var aspectRatio = 1;
-        var near = 0.01;
-        var far = 1000.0;
+	if (!this.mvpMatrixArray)
+	{
+		// create the 6 mvpMatrices.
+		var fovyRad = 90 * Math.PI/180;
+		var aspectRatio = 1;
+		var near = 0.01;
+		var far = 1000.0;
 
-        //resultProjectionMatrix._floatArrays = glMatrix.mat4.perspective(resultProjectionMatrix._floatArrays, frustum.fovyRad[0], frustum.aspectRatio[0], frustum.near[0], frustum.far[0]);
-    }
+		//resultProjectionMatrix._floatArrays = glMatrix.mat4.perspective(resultProjectionMatrix._floatArrays, frustum.fovyRad[0], frustum.aspectRatio[0], frustum.near[0], frustum.far[0]);
+	}
 
-    return this.mvpMatrixArray[cubeFace];
+	return this.mvpMatrixArray[cubeFace];
 };

@@ -80,12 +80,12 @@ var FBO = function(gl, width, height, options)
 	this.width[0] = width;
 	this.height[0] = height;
 
-	if(options.multiRenderTarget)
+	if (options.multiRenderTarget)
 	{
 		this.multiRenderTarget = true;
 	}
 
-	if(options.numColorBuffers)
+	if (options.numColorBuffers)
 	{
 		this.numColorBuffers = options.numColorBuffers;
 	}
@@ -101,18 +101,19 @@ var FBO = function(gl, width, height, options)
 			that.height[0] = canvas.offsetHeight;
 
 			that.deleteObjects(that.gl);
-			if(that.multiRenderTarget)
-			that.initMRT();
+			if (that.multiRenderTarget)
+			{ that.initMRT(); }
 			else
-			that.init();
+			{ that.init(); }
 		}, false);
 	}
 
-	if(this.multiRenderTarget)
+	if (this.multiRenderTarget)
 	{
 		this.initMRT();
 	}
-	else{
+	else 
+	{
 		this.init();
 	}
 };   
@@ -160,7 +161,7 @@ FBO.prototype.initMRT = function()
 	this.extbuffers = gl.getExtension("WEBGL_draw_buffers");
 
 	this.colorBuffersArray.length = 0; // init.
-	for(var i=0; i<this.numColorBuffers; i++)
+	for (var i=0; i<this.numColorBuffers; i++)
 	{
 		var colorBuffer = gl.createTexture();
 		gl.bindTexture(gl.TEXTURE_2D, colorBuffer);  // depthTex.
@@ -182,7 +183,7 @@ FBO.prototype.initMRT = function()
 	gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, this.width[0], this.height[0]);
 	gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.depthBuffer);
 
-	for(var i=0; i<this.numColorBuffers; i++)
+	for (var i=0; i<this.numColorBuffers; i++)
 	{
 		var colorBuffer = this.colorBuffersArray[i];
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT0_WEBGL + i, gl.TEXTURE_2D, colorBuffer, 0);

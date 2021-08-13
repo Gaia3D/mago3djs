@@ -16,9 +16,9 @@ var Polygon2D = function(options)
 	this.convexPolygonsArray; // tessellation result.
 	this.bRect; // boundary rectangle.
 
-	if(options)
+	if (options)
 	{
-		if(options.point2dList)
+		if (options.point2dList)
 		{
 			this.point2dList = options.point2dList;
 		}
@@ -178,22 +178,22 @@ Polygon2D.prototype.calculateNormal = function(resultConcavePointsIdxArray)
 Polygon2D.splitPolygonByMultipleSegments = function(polygon2d, splitterSegment2dArray, resultSplittedPolygons, error)
 {
 	// Note: the geographicCoords needs a low error (error = 1E-5).***
-	if(!error)
-	error = 1E-8;
+	if (!error)
+	{ error = 1E-8; }
 
 	var resultSplittedPolygons_A = [];
 	var resultSplittedPolygons_B = [];
 	resultSplittedPolygons_A.push(polygon2d);
 	var error = 1E-5; 
 	var segmentsCount = splitterSegment2dArray.length;
-	for(var i=0; i<segmentsCount; i++)
+	for (var i=0; i<segmentsCount; i++)
 	{
 		var segment2d = splitterSegment2dArray[i];
 		var polygonsCount = resultSplittedPolygons_A.length;
-		for(var j=0; j<polygonsCount; j++)
+		for (var j=0; j<polygonsCount; j++)
 		{
 			var polygon2d = resultSplittedPolygons_A[j];
-			if(!Polygon2D.splitPolygonBySegment(polygon2d, segment2d, resultSplittedPolygons_B, error))
+			if (!Polygon2D.splitPolygonBySegment(polygon2d, segment2d, resultSplittedPolygons_B, error))
 			{
 				// polygon NO splitted.***
 				resultSplittedPolygons_B.push(polygon2d);
@@ -204,8 +204,8 @@ Polygon2D.splitPolygonByMultipleSegments = function(polygon2d, splitterSegment2d
 		resultSplittedPolygons_B = [];
 	}
 
-	if(!resultSplittedPolygons)
-	resultSplittedPolygons = [];
+	if (!resultSplittedPolygons)
+	{ resultSplittedPolygons = []; }
 
 	Array.prototype.push.apply(resultSplittedPolygons, resultSplittedPolygons_A);
 
@@ -220,11 +220,11 @@ Polygon2D.splitPolygonByMultipleSegments = function(polygon2d, splitterSegment2d
  */
 Polygon2D.splitPolygonBySegment = function(polygon2d, segment2d, resultSplittedPolygons, error)
 {
-	if(!error)
-	error = 1E-8;
+	if (!error)
+	{ error = 1E-8; }
 
 	// 1rst, check if segment2d intersects with the polygon2d.***
-	if(!polygon2d.intersectionWithSegment(segment2d, error))
+	if (!polygon2d.intersectionWithSegment(segment2d, error))
 	{
 		return false;
 	}
@@ -238,13 +238,13 @@ Polygon2D.splitPolygonBySegment = function(polygon2d, segment2d, resultSplittedP
 	var idx_B = -1;
 
 	var pointsCount = polygon2d.point2dList.getPointsCount();
-	for(var i=0; i<pointsCount; i++)
+	for (var i=0; i<pointsCount; i++)
 	{
 		var mySegment2d = polygon2d.point2dList.getSegment(i, undefined);
-		if(mySegment2d.intersectionWithSegment(segment2d, error, resultIntersectedPoint2d) === Constant.INTERSECTION_INTERSECT)
+		if (mySegment2d.intersectionWithSegment(segment2d, error, resultIntersectedPoint2d) === Constant.INTERSECTION_INTERSECT)
 		{
 			// Save intersected point data.***
-			if(idx_A < 0)
+			if (idx_A < 0)
 			{
 				idx_A = i;
 				point2d_A.set(resultIntersectedPoint2d.x, resultIntersectedPoint2d.y);
@@ -259,7 +259,7 @@ Polygon2D.splitPolygonBySegment = function(polygon2d, segment2d, resultSplittedP
 	}
 
 	// Now, if 2 points intersected, then insert the 2 points and split the polygon2d.***
-	if(idx_A < 0 || idx_B < 0)
+	if (idx_A < 0 || idx_B < 0)
 	{
 		return false;
 	}
@@ -662,7 +662,7 @@ Polygon2D.prototype.intersectionWithPolygon2D = function(polygon2D)
 		resultConcavePointsIdxArray.length = 0;
 		resultConcavePointsIdxArray = this.calculateNormal(resultConcavePointsIdxArray);
 	}
-	if(!this.convexPolygonsArray 
+	if (!this.convexPolygonsArray 
 		|| (Array.isArray(this.convexPolygonsArray) && this.convexPolygonsArray.length === 0))
 	{
 		this.convexPolygonsArray = [];
@@ -849,12 +849,15 @@ Polygon2D.makePolygonByGeographicCoordArray = function(array)
  * @static
  * @param {Array<Cesium.cartesian3>} array 
  */
-Polygon2D.makePolygonByCartesian3Array = function(cartesians) {
+Polygon2D.makePolygonByCartesian3Array = function(cartesians) 
+{
 	var geographics = [];
-	for(var k in cartesians) {
-		if(cartesians.hasOwnProperty(k)) {
+	for (var k in cartesians) 
+	{
+		if (cartesians.hasOwnProperty(k)) 
+		{
 			geographics.push(ManagerUtils.pointToGeographicCoord(cartesians[k]));
 		}
 	}
 	return Polygon2D.makePolygonByGeographicCoordArray(geographics);
-}
+};

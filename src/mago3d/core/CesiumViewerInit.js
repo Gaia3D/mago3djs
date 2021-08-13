@@ -124,7 +124,8 @@ CesiumViewerInit.prototype.providerBuild = function()
 	}
 };
 
-CesiumViewerInit.makeTerrainProvider = function(type, value, policy, layerName, styleName) {
+CesiumViewerInit.makeTerrainProvider = function(type, value, policy, layerName, styleName) 
+{
 	var terrainProvider = new Cesium.EllipsoidTerrainProvider();
 	switch (type) 
 	{
@@ -172,7 +173,8 @@ CesiumViewerInit.makeTerrainProvider = function(type, value, policy, layerName, 
 		terrainParam.url = terrainUrl;
 		
 		terrainParam.layerName = layerName;
-		if(styleName) {
+		if (styleName) 
+		{
 			terrainParam.styleName = styleName;
 		}
 		
@@ -183,7 +185,7 @@ CesiumViewerInit.makeTerrainProvider = function(type, value, policy, layerName, 
  	}
 
 	return terrainProvider;
-}
+};
 
 CesiumViewerInit.prototype.geoserverImageProviderBuild = function() 
 {
@@ -237,7 +239,7 @@ CesiumViewerInit.prototype.geoserverImageProviderBuild = function()
 		tileWidth          : tileWidth, 
 		tileHeight         : tileHeight,
 		enablePickFeatures : false,
-		minimumLevel : 1
+		minimumLevel       : 1
 	});
 
 	this.options.imageryProvider = imageryProvider;
@@ -281,12 +283,15 @@ CesiumViewerInit.prototype.postProcessDataProvider = function()
 	// TODO : 제거 필수!! 세슘의 카메라 매트릭스를 강제로 변환시키기 위하여 우주크기만한 엔티티를 추가.
 	addSpaceBox(viewer);
 
-	viewer.entities.collectionChanged.addEventListener(function(c,ar,ra,ca) {
-		if(c.values.length === 0) {
+	viewer.entities.collectionChanged.addEventListener(function(c, ar, ra, ca) 
+	{
+		if (c.values.length === 0) 
+		{
 			addSpaceBox(viewer);
 		}
 	});
-	function addSpaceBox(v) {
+	function addSpaceBox(v) 
+	{
 		v.entities.add({
 			name     : "mago3D",
 			position : Cesium.Cartesian3.fromDegrees(37.521168, 126.924185, 3000.0),
@@ -415,7 +420,7 @@ CesiumViewerInit.prototype.initMagoManager = function()
 			}
 		}
 
-		for(var j=0,len=magoManager.modeler.objectsArray.length;j<len;j++)
+		for (var j=0, len=magoManager.modeler.objectsArray.length;j<len;j++)
 		{
 			var object = magoManager.modeler.objectsArray[j];
 			if (object.isNeedValidHeight(magoManager)) { magoManager._needValidHeightNativeArray.push(object); }

@@ -64,7 +64,7 @@ AnimationManager.prototype.checkAnimation = function(magoManager)
 					
 					magoManager.emit(MagoManager.EVENT_TYPE.ANIMATIONEND, {
 						type      : MagoManager.EVENT_TYPE.ANIMATIONEND,
-						f4d     : node,
+						f4d       : node,
 						timestamp : new Date()
 					});
 				}
@@ -72,7 +72,7 @@ AnimationManager.prototype.checkAnimation = function(magoManager)
 				{
 					magoManager.emit(MagoManager.EVENT_TYPE.ANIMATIONING, {
 						type      : MagoManager.EVENT_TYPE.ANIMATIONING,
-						f4d     : node,
+						f4d       : node,
 						timestamp : new Date()
 					});
 				}

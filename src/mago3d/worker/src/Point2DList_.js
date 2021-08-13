@@ -16,6 +16,20 @@ Point2DList_.prototype.addPoint = function(point2d)
 	this.pointsArray.push(point2d);
 };
 
+Point2DList_.prototype.deleteObjects = function()
+{
+	if (this.pointsArray === undefined)
+	{ return; }
+	
+	var pointsCount = this.pointsArray.length;
+	for (var i=0; i<pointsCount; i++)
+	{
+		this.pointsArray[i].deleteObjects();
+		this.pointsArray[i] = undefined;
+	}
+	this.pointsArray = undefined;
+};
+
 Point2DList_.prototype.getPoint = function(idx)
 {
 	return this.pointsArray[idx];

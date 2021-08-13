@@ -20,18 +20,19 @@ var PolyLine2D = function()
  * @param {Point2D} point2d
  * @returns point2d
  */
- PolyLine2D.prototype.addPoint2d = function(point2d)
- {
+PolyLine2D.prototype.addPoint2d = function(point2d)
+{
 	 if (this.point2dArray === undefined)
 	 { this.point2dArray = []; }
 	 
-	 if(!point2d || !(point2d instanceof Point2D)) {
-		 throw new Error(Messages.REQUIRED_EMPTY_ERROR('Point2D'))
+	 if (!point2d || !(point2d instanceof Point2D)) 
+	{
+		 throw new Error(Messages.REQUIRED_EMPTY_ERROR('Point2D'));
 	 }
 
 	 this.point2dArray.push(point2d);
 	 return point2d;
- };
+};
 
 /**
  * Creates a new Point2D.

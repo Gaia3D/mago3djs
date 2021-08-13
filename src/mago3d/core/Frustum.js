@@ -51,7 +51,7 @@ Frustum.prototype.copyParametersFrom = function(frustum)
  */
 Frustum.getProjectionMatrix = function(frustum, resultProjectionMatrix) 
 {
-	if(!resultProjectionMatrix)
+	if (!resultProjectionMatrix)
 	{
 		resultProjectionMatrix = new Matrix4();
 	}

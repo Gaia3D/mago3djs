@@ -162,51 +162,51 @@ CODE.parametricCurveState = {
 CODE.curveRenderingState = {
 	"NORMAL" : 0,
 	"EDITED" : 1
-}
+};
 
 
 CODE.relativePositionPoint2DWithTriangle2D = {
-	"UNKNOWN" : 0,
-	"OUTSIDE" : 1,
-	"INSIDE" : 2,
+	"UNKNOWN"                        : 0,
+	"OUTSIDE"                        : 1,
+	"INSIDE"                         : 2,
 	"COINCIDENT_WITH_TRIANGLE_POINT" : 3,
-	"COINCIDENT_WITH_TRIANGLE_EDGE" : 4
-}
+	"COINCIDENT_WITH_TRIANGLE_EDGE"  : 4
+};
 
 CODE.relativePositionPoint2DWithSegment2D = {
-	"UNKNOWN" : 0,
-	"OUTSIDE" : 1,
-	"INSIDE" : 2,
+	"UNKNOWN"                     : 0,
+	"OUTSIDE"                     : 1,
+	"INSIDE"                      : 2,
 	"COINCIDENT_WITH_START_POINT" : 3,
-	"COINCIDENT_WITH_END_POINT" : 4
-}
+	"COINCIDENT_WITH_END_POINT"   : 4
+};
 
 CODE.relativePositionSegment2DWithSegment2D = {
-	"UNKNOWN" : 0,
+	"UNKNOWN"         : 0,
 	"NO_INTERSECTION" : 1,
-	"INTERSECTION" : 2
-}
+	"INTERSECTION"    : 2
+};
 
 CODE.relativePositionSegment3DWithPlane2D = {
-	"UNKNOWN" : 0,
-	"NO_INTERSECTION" : 1,
-	"INTERSECTION" : 2,
+	"UNKNOWN"                : 0,
+	"NO_INTERSECTION"        : 1,
+	"INTERSECTION"           : 2,
 	"START_POINT_COINCIDENT" : 3,
-	"END_POINT_COINCIDENT" : 4,
-	"TWO_POINTS_COINCIDENT" : 5
-}
+	"END_POINT_COINCIDENT"   : 4,
+	"TWO_POINTS_COINCIDENT"  : 5
+};
 
 CODE.status = {
-	"UNKNOWN" : 0,
-	"NORMAL" : 1,
-	"DELETED" : 2,
+	"UNKNOWN"     : 0,
+	"NORMAL"      : 1,
+	"DELETED"     : 2,
 	"HIGHLIGHTED" : 3
-}
+};
 
 CODE.cardinal = {
 	"UNKNOWN" : 0,
-	"SOUTH" : 1,
-	"EAST" : 2,
-	"NORTH" : 3,
-	"WEST" : 4
-}
+	"SOUTH"   : 1,
+	"EAST"    : 2,
+	"NORTH"   : 3,
+	"WEST"    : 4
+};

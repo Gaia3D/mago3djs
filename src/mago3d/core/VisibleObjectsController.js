@@ -102,15 +102,15 @@ VisibleObjectsController.prototype.clear = function()
  */
 VisibleObjectsController.prototype.getOpaquesTransparentsByLod = function(lod) 
 {
-	if(lod === 0)
+	if (lod === 0)
 	{
 		return [].concat(this.currentVisibles0, this.currentVisibles0Transparents);
 	}
-	else if(lod === 2)
+	else if (lod === 2)
 	{
 		return [].concat(this.currentVisibles2, this.currentVisibles2Transparents);
 	}
-	else if(lod === 3)
+	else if (lod === 3)
 	{
 		return [].concat(this.currentVisibles3, this.currentVisibles3Transparents);
 	}
@@ -122,8 +122,8 @@ VisibleObjectsController.prototype.getOpaquesTransparentsByLod = function(lod)
 VisibleObjectsController.prototype.getAllVisibles = function() 
 {
 	var resultVisiblesArray = [].concat(this.currentVisibles0, this.currentVisibles1, this.currentVisibles2, this.currentVisibles3,
-										this.currentVisibles0Transparents, this.currentVisibles1Transparents, this.currentVisibles2Transparents, this.currentVisibles3Transparents,
-										this.currentVisiblesAux, this.currentVisiblesPT10);
+		this.currentVisibles0Transparents, this.currentVisibles1Transparents, this.currentVisibles2Transparents, this.currentVisibles3Transparents,
+		this.currentVisiblesAux, this.currentVisiblesPT10);
 	return resultVisiblesArray;
 };
 
@@ -208,7 +208,7 @@ VisibleObjectsController.prototype.getAllNatives = function()
 			for (var j=0, len=nativeArray.length;j<len;j++) 
 			{
 				if (!(nativeArray[j] instanceof SpotLight))
-				result.push(nativeArray[j]);
+				{ result.push(nativeArray[j]); }
 			}
 		}
 	}
@@ -402,11 +402,11 @@ VisibleObjectsController.getBoundaryNodes = function(visiblesArray, resultBounda
 	{
 		var visible = visiblesArray[i];
 		var geoCoord;
-		if(visible instanceof Node)
+		if (visible instanceof Node)
 		{
 			geoCoord = visible.data.geographicCoord;
 		}
-		else if(visible instanceof MagoRenderable)
+		else if (visible instanceof MagoRenderable)
 		{
 			var geoLocationData = visible.getCurrentGeoLocationData();
 			geoCoord = geoLocationData.geographicCoord;
@@ -591,24 +591,24 @@ VisibleObjectsController.prototype.putNodeByLod = function(node, lod)
 
 	if (lod === 0 || lod === 1) 
 	{
-		if(isOpaque)
-		this.putNodeToArraySortedByDist(this.currentVisibles0, node);
+		if (isOpaque)
+		{ this.putNodeToArraySortedByDist(this.currentVisibles0, node); }
 		else
-		this.putNodeToArraySortedByDist(this.currentVisibles0Transparents, node);
+		{ this.putNodeToArraySortedByDist(this.currentVisibles0Transparents, node); }
 	}
 	else if (lod === 2) 
 	{
-		if(isOpaque)
-		this.putNodeToArraySortedByDist(this.currentVisibles2, node);
+		if (isOpaque)
+		{ this.putNodeToArraySortedByDist(this.currentVisibles2, node); }
 		else
-		this.putNodeToArraySortedByDist(this.currentVisibles2Transparents, node);
+		{ this.putNodeToArraySortedByDist(this.currentVisibles2Transparents, node); }
 	}
 	else if (lod > 2) 
 	{
-		if(isOpaque)
-		this.putNodeToArraySortedByDist(this.currentVisibles3, node);
+		if (isOpaque)
+		{ this.putNodeToArraySortedByDist(this.currentVisibles3, node); }
 		else
-		this.putNodeToArraySortedByDist(this.currentVisibles3Transparents, node);
+		{ this.putNodeToArraySortedByDist(this.currentVisibles3Transparents, node); }
 	}
 };
 

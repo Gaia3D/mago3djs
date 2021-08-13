@@ -410,8 +410,8 @@ GeoLocationData.prototype.localCoordToWorldCoord = function(localCoord, resultWo
 	var rotatedPos = this.rotMatrix.rotatePoint3D(localCoord, undefined); 
 
 	resultWorldCoord.set(this.positionHIGH[0] + (rotatedPos.x + this.positionLOW[0]), 
-						this.positionHIGH[1] + (rotatedPos.y + this.positionLOW[1]), 
-						this.positionHIGH[2] + (rotatedPos.z + this.positionLOW[2]));
+		this.positionHIGH[1] + (rotatedPos.y + this.positionLOW[1]), 
+		this.positionHIGH[2] + (rotatedPos.z + this.positionLOW[2]));
 	
 	return resultWorldCoord;
 };
@@ -444,7 +444,7 @@ GeoLocationData.prototype.worldCoordToLocalCoord = function(worldCoord, resultLo
 	{ return undefined; }
 
 	// Now, check if "worldCoord" is instance of Point3D or is an instance of Array.***
-	if(worldCoord instanceof Point3D)
+	if (worldCoord instanceof Point3D)
 	{
 		if (resultLocalCoord === undefined)
 		{ resultLocalCoord = new Point3D(); }
@@ -452,13 +452,13 @@ GeoLocationData.prototype.worldCoordToLocalCoord = function(worldCoord, resultLo
 		resultLocalCoord = tMatrixInv.transformPoint3D(worldCoord, resultLocalCoord); 
 		return resultLocalCoord;
 	}
-	else if(worldCoord instanceof Array)
+	else if (worldCoord instanceof Array)
 	{
-		if(!resultLocalCoord)
-		resultLocalCoord = [];
+		if (!resultLocalCoord)
+		{ resultLocalCoord = []; }
 
 		var coordsCount = worldCoord.length;
-		for(var i=0; i<coordsCount; i++)
+		for (var i=0; i<coordsCount; i++)
 		{
 			var coord = worldCoord[i];
 			var coordLC = tMatrixInv.transformPoint3D(coord, undefined); 
@@ -492,7 +492,7 @@ GeoLocationData.prototype.getLocMatrixInv = function()
  */
 GeoLocationData.prototype.getRotMatrixInv = function() 
 {
-	if (this.rotMatrixInv === undefined)
+	if (this.rotMatrixInv === undefined) 
 	{
 		var rotMatrixInv = glMatrix.mat4.create();
 		rotMatrixInv = glMatrix.mat4.invert(rotMatrixInv, this.rotMatrix._floatArrays );
@@ -653,8 +653,8 @@ GeoLocationData.prototype.getTransformedRelativePosition = function(absolutePosi
 	ManagerUtils.calculateSplited3fv([absolutePosition.x, absolutePosition.y, absolutePosition.z], positionHIGH, positionLOW);
 
 	pointAux.set((positionHIGH[0] - this.positionHIGH[0])+(positionLOW[0] - this.positionLOW[0]), 
-				(positionHIGH[1] - this.positionHIGH[1])+(positionLOW[1] - this.positionLOW[1]), 
-				(positionHIGH[2] - this.positionHIGH[2])+(positionLOW[2] - this.positionLOW[2]));
+		(positionHIGH[1] - this.positionHIGH[1])+(positionLOW[1] - this.positionLOW[1]), 
+		(positionHIGH[2] - this.positionHIGH[2])+(positionLOW[2] - this.positionLOW[2]));
 	
 	var rotMatInv = this.getRotMatrixInv();
 	resultRelativePosition = rotMatInv.transformPoint3D(pointAux, resultRelativePosition);

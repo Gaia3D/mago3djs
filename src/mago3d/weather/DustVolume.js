@@ -37,20 +37,20 @@ var DustVolume = function(options)
 	// Particles generator.
 	this._particlesGeneratorBoxesArray;
 
-	if(options)
+	if (options)
 	{
-		if(options.geoJsonFile)
+		if (options.geoJsonFile)
 		{
 			this._geoJsonFile = options.geoJsonFile;
 			this._geoJsonFileLoadState = CODE.fileLoadState.LOADING_FINISHED;;
 		}
 		
-		if(options.geoJsonFilePath)
+		if (options.geoJsonFilePath)
 		{
 			this._geoJsonFilePath = options.geoJsonFilePath;
 		}
 
-		if(options.geoJsonFileFolderPath)
+		if (options.geoJsonFileFolderPath)
 		{
 			this._geoJsonFileFolderPath = options.geoJsonFileFolderPath;
 		}
@@ -60,7 +60,7 @@ var DustVolume = function(options)
 DustVolume.prototype.loadDustGeoJson = function()
 {
 	// This is the geoJson version. 2021.
-	if(this._geoJsonFileLoadState === CODE.fileLoadState.READY)
+	if (this._geoJsonFileLoadState === CODE.fileLoadState.READY)
 	{
 		this._geoJsonFileLoadState = CODE.fileLoadState.LOADING_STARTED;
 		var that = this;
@@ -74,12 +74,12 @@ DustVolume.prototype.loadDustGeoJson = function()
 
 DustVolume.prototype._prepareDustGeoJson = function()
 {
-	if(this._geoJsonFileLoadState === CODE.fileLoadState.READY)
+	if (this._geoJsonFileLoadState === CODE.fileLoadState.READY)
 	{
 		this.loadDustGeoJson();
 		return false;
 	}
-	else if(this._geoJsonFileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
+	else if (this._geoJsonFileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
 	{
 		return false;
 	}
@@ -90,10 +90,10 @@ DustVolume.prototype._prepareDustGeoJson = function()
 DustVolume.prototype.deleteObjects = function(magoManager)
 {
 	// This function deletes all dustLayers.
-	if(this.dustLayersArray)
+	if (this.dustLayersArray)
 	{
 		var dustlayersCount = this.dustLayersArray.length;
-		for(var i=0; i<dustlayersCount; i++)
+		for (var i=0; i<dustlayersCount; i++)
 		{
 			this.dustLayersArray[i].deleteObjects(magoManager);
 			this.dustLayersArray[i] = undefined;
@@ -109,7 +109,7 @@ DustVolume.prototype.deleteObjects = function(magoManager)
 	
 	// Box & plane.
 	var vboMemManager = magoManager.vboMemoryManager;
-	if(this.dustDisplayBox)
+	if (this.dustDisplayBox)
 	{
 		this.dustDisplayBox.deleteObjects(vboMemManager);
 
@@ -119,10 +119,10 @@ DustVolume.prototype.deleteObjects = function(magoManager)
 	this.dustDisplayBox = undefined;
 
 	this.dustDisplayPlane = undefined;
-	if(this.dustDisplayPlanesArray)
+	if (this.dustDisplayPlanesArray)
 	{
 		var displayPlanesCount = this.dustDisplayPlanesArray.length;
-		for(var i=0; i<displayPlanesCount; i++)
+		for (var i=0; i<displayPlanesCount; i++)
 		{
 			this.dustDisplayPlanesArray[i].deleteObjects(vboMemManager);
 
@@ -165,7 +165,7 @@ DustVolume.prototype.newDustLayer = function(options)
 
 DustVolume.prototype._prepareDustLayers = function()
 {
-	if(!this._geoJsonFile)
+	if (!this._geoJsonFile)
 	{
 		return false;
 	}
@@ -177,18 +177,18 @@ DustVolume.prototype._prepareDustLayers = function()
 		var geoJsonFileFolderPath = this._geoJsonFileFolderPath;
 		var features = this._geoJsonFile.features;
 		var layersCount = features.length;
-		if(layersCount > 0)
+		if (layersCount > 0)
 		{
 			this._dustLayersAltitudesArray = new Array(layersCount);
 			var layer;
 			layer = features[0]; // take the frist layer, to set the bbox.
 			var bbox = new BoundingBox();
 			bbox.initXYZData(layer.bbox[0], layer.bbox[1], layer.bbox[2]);
-			for(var i=0; i<layersCount; i++)
+			for (var i=0; i<layersCount; i++)
 			{
 				layer = features[i];
 				var options = {
-					geoJsonFile : layer,
+					geoJsonFile           : layer,
 					geoJsonFileFolderPath : geoJsonFileFolderPath
 				};
 				var dustLayer = this.newDustLayer(options);
@@ -203,7 +203,7 @@ DustVolume.prototype._prepareDustLayers = function()
 			}
 
 			// calculate the geoExtent of the windVolume.
-			if(!this.geoExtent)
+			if (!this.geoExtent)
 			{
 				// use geoJson to calculate the geoExtent.
 				this.geoExtent = new GeographicExtent(bbox.minX, bbox.minY, bbox.minZ,  bbox.maxX, bbox.maxY, bbox.maxZ);
@@ -217,21 +217,21 @@ DustVolume.prototype._prepareDustLayers = function()
 		return false;
 	}
 
-	if(!this._allDustLayersPrepared)
+	if (!this._allDustLayersPrepared)
 	{
 		var allLayersPrepared = true;
 		var layersCount = this.dustLayersArray.length;
-		for(var i=0; i<layersCount; i++)
+		for (var i=0; i<layersCount; i++)
 		{
 			var dustLayer = this.dustLayersArray[i];
 
-			if(!dustLayer.prepareDustLayer())
+			if (!dustLayer.prepareDustLayer())
 			{
 				allLayersPrepared = false;
 			}
 		}
 		
-		if(allLayersPrepared)
+		if (allLayersPrepared)
 		{
 			this._allDustLayersPrepared = true;
 		}
@@ -244,18 +244,18 @@ DustVolume.prototype._prepareDustLayers = function()
 
 DustVolume.prototype.getGeographicExtent = function()
 {
-	if(!this.geoExtent)
+	if (!this.geoExtent)
 	{
 		// use geoJson to calculate the geoExtent.
 		var features = this._geoJsonFile.features;
 		var layersCount = features.length;
-		if(layersCount > 0)
+		if (layersCount > 0)
 		{
 			var layer;
 			layer = features[0]; // take the first layer, to set the bbox.
 			var bbox = new BoundingBox();
 			bbox.initXYZData(layer.bbox[0], layer.bbox[1], layer.bbox[2]);
-			for(var i=0; i<layersCount; i++)
+			for (var i=0; i<layersCount; i++)
 			{
 				layer = features[i];
 
@@ -382,7 +382,7 @@ DustVolume.prototype.createDustDisplayPlane = function(magoManager)
 		this.dustDisplayPlanesArray.push(dustDisplayPlane);
 
 		// Make texCoords for "this.dustDisplayPlaneForTexture".
-		if(this.dustDisplayPlaneForTexture)
+		if (this.dustDisplayPlaneForTexture)
 		{
 			var mesh = this.dustDisplayPlaneForTexture.getObject(0); // there are only 1 object.
 			mesh.calculateTexCoordsBox(undefined);
@@ -427,7 +427,7 @@ DustVolume.prototype.createDustDisplayPlane = function(magoManager)
 DustVolume.prototype.getMaxAltitude = function()
 {
 	var geoExtent = this.getGeographicExtent();
-	if(geoExtent)
+	if (geoExtent)
 	{
 		return geoExtent.maxGeographicCoord.altitude;
 	} 
@@ -438,7 +438,7 @@ DustVolume.prototype.getMaxAltitude = function()
 DustVolume.prototype.getMinAltitude = function()
 {
 	var geoExtent = this.getGeographicExtent();
-	if(geoExtent)
+	if (geoExtent)
 	{
 		return geoExtent.minGeographicCoord.altitude;
 	} 
@@ -465,13 +465,13 @@ DustVolume.prototype.prepareVolume = function(magoManager)
 	// 2- wind-layers.
 	//-------------------------------------------
 	// 1rst, check if the geoJson is loaded.***
-	if(!this._prepareDustGeoJson())
+	if (!this._prepareDustGeoJson())
 	{
 		return false;
 	}
 
 	// Now, check if windLayers are prepared.***
-	if(!this._prepareDustLayers())
+	if (!this._prepareDustLayers())
 	{
 		return false;
 	}
@@ -488,14 +488,14 @@ DustVolume.prototype.prepareVolume = function(magoManager)
 
 DustVolume.prototype._getVolumeFrontFBO = function(magoManager)
 {
-	if(!this.volumeFrontFBO)
+	if (!this.volumeFrontFBO)
 	{
 		var gl = magoManager.getGl();
 		var sceneState = magoManager.sceneState;
 		var bufferWidth = sceneState.drawingBufferWidth[0];
 		var bufferHeight = sceneState.drawingBufferHeight[0];
 		var bUseMultiRenderTarget = magoManager.postFxShadersManager.bUseMultiRenderTarget;
-		this.volumeFrontFBO = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 4}); 
+		this.volumeFrontFBO = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget: bUseMultiRenderTarget, numColorBuffers: 4}); 
 	}
 
 	return this.volumeFrontFBO;
@@ -503,14 +503,14 @@ DustVolume.prototype._getVolumeFrontFBO = function(magoManager)
 
 DustVolume.prototype._getVolumeRearFBO = function(magoManager)
 {
-	if(!this.volumeRearFBO)
+	if (!this.volumeRearFBO)
 	{
 		var gl = magoManager.getGl();
 		var sceneState = magoManager.sceneState;
 		var bufferWidth = sceneState.drawingBufferWidth[0];
 		var bufferHeight = sceneState.drawingBufferHeight[0];
 		var bUseMultiRenderTarget = magoManager.postFxShadersManager.bUseMultiRenderTarget;
-		this.volumeRearFBO = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 4}); 
+		this.volumeRearFBO = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget: bUseMultiRenderTarget, numColorBuffers: 4}); 
 	}
 
 	return this.volumeRearFBO;
@@ -531,16 +531,16 @@ DustVolume.prototype.renderDepthDustVolume = function(magoManager)
 	var extbuffers = magoManager.extbuffers;
 
 	// Now, render the windPlane.
-	if(!this.visibleObjControler)
+	if (!this.visibleObjControler)
 	{
 		this.visibleObjControler = new VisibleObjectsController();
 	}
 
-	if(this.dustDisplayBox)
+	if (this.dustDisplayBox)
 	{ this.visibleObjControler.currentVisibleNativeObjects.opaquesArray[0] = this.dustDisplayBox; }
 
 	// When render rear, add the lowestWindLayer.***
-	if(this.dustDisplayPlanesArray && this.dustDisplayPlanesArray.length > 0)
+	if (this.dustDisplayPlanesArray && this.dustDisplayPlanesArray.length > 0)
 	{
 		var dustDisplayPlane = this.dustDisplayPlanesArray[0];
 		this.visibleObjControler.currentVisibleNativeObjects.opaquesArray[1] = dustDisplayPlane;
@@ -627,7 +627,7 @@ DustVolume.prototype.renderDepthDustVolume = function(magoManager)
 		extbuffers.NONE, // gl_FragData[1]
 		extbuffers.NONE, // gl_FragData[2]
 		extbuffers.NONE, // gl_FragData[3]
-		]);
+	]);
 		
 };
 
@@ -645,7 +645,7 @@ DustVolume.prototype._getRayIntersectionWithVolume = function(screenX, screenY, 
 	var depthTex = windVolumeRearFBO.colorBuffersArray[1];
 	var normalTex = windVolumeRearFBO.colorBuffersArray[2];
 	var resultObject = ManagerUtils.calculatePixelLinearDepthV2(gl, screenX, screenY, depthTex, normalTex, magoManager);
-	if(resultObject.frustumIdx < magoManager.numFrustums)
+	if (resultObject.frustumIdx < magoManager.numFrustums)
 	{
 		linearDepth = resultObject.linearDepth;
 		frustumFar = resultObject.far;
@@ -654,7 +654,7 @@ DustVolume.prototype._getRayIntersectionWithVolume = function(screenX, screenY, 
 	}
 
 	// check if the ray intersects the volume:
-	if(normal4[0] + normal4[1] + normal4[2] < 0.1)
+	if (normal4[0] + normal4[1] + normal4[2] < 0.1)
 	{
 		// if there are no intersection with the rear face, then ther are no intersection.
 		return undefined;
@@ -670,7 +670,7 @@ DustVolume.prototype._getRayIntersectionWithVolume = function(screenX, screenY, 
 	depthTex = windVolumeFrontFBO.colorBuffersArray[1];
 	normalTex = windVolumeFrontFBO.colorBuffersArray[2];
 	resultObject = ManagerUtils.calculatePixelLinearDepthV2(gl, screenX, screenY, depthTex, normalTex, magoManager);
-	if(resultObject.frustumIdx < magoManager.numFrustums)
+	if (resultObject.frustumIdx < magoManager.numFrustums)
 	{
 		linearDepth = resultObject.linearDepth;
 		frustumFar = resultObject.far;
@@ -679,11 +679,11 @@ DustVolume.prototype._getRayIntersectionWithVolume = function(screenX, screenY, 
 	}
 
 	var posCC_front;
-	if(normal4[0] + normal4[1] + normal4[2] < 0.1)
+	if (normal4[0] + normal4[1] + normal4[2] < 0.1)
 	{
 		// The camera is inside of the volume, so there are no intersection with front face.
 		// Considere posCC_front = (0, 0, 0) = cameraPosCC.
-		posCC_front = new Point3D(0,0,0); 
+		posCC_front = new Point3D(0, 0, 0); 
 	}
 	else
 	{
@@ -700,8 +700,8 @@ DustVolume.prototype._getRayIntersectionWithVolume = function(screenX, screenY, 
 DustVolume.prototype.getDustDensityInGeographicCoord = function(geoCoord)
 {
 	// 1rst, find the 2 dustlayers to interpolate.
-	if(!geoCoord)
-	return undefined;
+	if (!geoCoord)
+	{ return undefined; }
 
 	var altitude = geoCoord.altitude;
 };
@@ -710,9 +710,9 @@ DustVolume.prototype._get2LayersInfoByAltitude = function(altitude)
 {
 	var idxUp = WeatherStation.binarySearch_layersByAltitude(this._dustLayersAltitudesArray, altitude, undefined, undefined);
 	var dustLayersCount = this.dustLayersArray.length;
-	if(idxUp >= dustLayersCount)
+	if (idxUp >= dustLayersCount)
 	{ idxUp = dustLayersCount - 1; }
-	else if(idxUp < 0)
+	else if (idxUp < 0)
 	{ idxUp = 0; }
 	var idxDown = (idxUp - 1) < 0 ? 0 : idxUp - 1;
 
@@ -735,7 +735,7 @@ DustVolume.prototype._get2LayersInfoByAltitude = function(altitude)
 	}
 
 	var resultObj = {
-		idxUp : idxUp,
+		idxUp   : idxUp,
 		idxDown : idxDown,
 		zFactor : zFactor
 	};
@@ -777,7 +777,7 @@ DustVolume.prototype._getDustConcentration = function(geoCoord, magoManager)
 	var s = (currLon - minLonRad)/lonRadRange;
 	var t = (currLat - minLatRad)/latRadRange;
 
-	if(s > 1.0 || t > 1.0 || s < 0.0 || t < 0.0)
+	if (s > 1.0 || t > 1.0 || s < 0.0 || t < 0.0)
 	{
 		return undefined;
 	}
@@ -827,12 +827,12 @@ DustVolume.prototype.newDustParticle = function(magoManager)
 			// now, check the dustConcentration in the "geoCoord".
 			var dustConcentration = this._getDustConcentration(geoCoord, magoManager);
 			
-			if(dustConcentration > 0.0)
+			if (dustConcentration > 0.0)
 			{
 				// Create a dust-particle.
 				dustParticle = {
-					posWC : posWC,
-					geoCoord : geoCoord,
+					posWC             : posWC,
+					geoCoord          : geoCoord,
 					dustConcentration : dustConcentration
 				}; // provisionally is an object.
 			}
@@ -871,10 +871,10 @@ DustVolume.prototype.renderModeTexture = function(magoManager)
 	if (!this.prepareVolume(magoManager))
 	{ return; }
 
-	if(!this.dustDisplayPlaneForTexture)
+	if (!this.dustDisplayPlaneForTexture)
 	{ return; }
 
-	if(!this.dustDisplayPlanesArray)
+	if (!this.dustDisplayPlanesArray)
 	{ return; }
 
 	var gl = magoManager.getGl();
@@ -894,7 +894,7 @@ DustVolume.prototype.renderModeTexture = function(magoManager)
 		extbuffers.NONE, // gl_FragData[1] - depthTex
 		extbuffers.NONE, // gl_FragData[2] - normalTex
 		extbuffers.COLOR_ATTACHMENT3_WEBGL // gl_FragData[3] - albedoTex
-		]);
+	]);
 	//-------------------------------------------------------------------------------------------------------------
 
 	var sceneState = magoManager.sceneState;
@@ -961,7 +961,7 @@ DustVolume.prototype.renderModeTexture = function(magoManager)
 	// now, check the altitude of the displayPlane.
 	var altitude = 0.0;
 
-	if(this.dustDisplayPlanesArray.length > 0)
+	if (this.dustDisplayPlanesArray.length > 0)
 	{
 		var dustDisplayPlane = this.dustDisplayPlanesArray[0];
 		var geoLocData = dustDisplayPlane.geoLocDataManager.getCurrentGeoLocationData();
@@ -988,10 +988,10 @@ DustVolume.prototype.renderMode3D = function(magoManager)
 
 	// test.&****************
 	var smokeTex = this.weatherStation.getSmokeTexture();
-	if(!smokeTex)
+	if (!smokeTex)
 	{ return; }
 
-	if(!this.particlesArray)
+	if (!this.particlesArray)
 	{ this.particlesArray = []; }
 
 	
@@ -1000,10 +1000,10 @@ DustVolume.prototype.renderMode3D = function(magoManager)
 	
 	if (this.particlesArray.length < 3000 && magoManager.currentFrustumIdx === 0)// && this.counterAux > 5)
 	{
-		for(var i=0; i<3; i++)
+		for (var i=0; i<3; i++)
 		{
 			var dustParticle = this.newDustParticle(magoManager);
-			if(dustParticle)
+			if (dustParticle)
 			{
 				this.particlesArray.push(dustParticle);	
 			}
@@ -1026,7 +1026,7 @@ DustVolume.prototype.renderMode3D = function(magoManager)
 		extbuffers.NONE, // gl_FragData[1] - depthTex
 		extbuffers.NONE, // gl_FragData[2] - normalTex
 		extbuffers.COLOR_ATTACHMENT3_WEBGL // gl_FragData[3] - albedoTex
-		]);
+	]);
 	//-------------------------------------------------------------------------------------------------------------
 			
 	var gl = magoManager.getGl();
@@ -1076,7 +1076,7 @@ DustVolume.prototype.renderMode3D = function(magoManager)
 	
 
 	var options = {
-		animationState : this._animationState
+		animationState: this._animationState
 	};
 
 	var vboMemManager = magoManager.vboMemoryManager;
@@ -1086,7 +1086,7 @@ DustVolume.prototype.renderMode3D = function(magoManager)
 		var vboKeysContainer = dustParticle.vboKeysContainer;
 		var geoCoord = dustParticle.geoCoord;
 		// check if exist vbo.
-		if(!vboKeysContainer)
+		if (!vboKeysContainer)
 		{
 			// create vbo.
 			// provisionally the posLC = (0, 0, 0).
@@ -1099,7 +1099,7 @@ DustVolume.prototype.renderMode3D = function(magoManager)
 			continue;
 		}
 
-		if(!geoCoord.geoLocDataManager)
+		if (!geoCoord.geoLocDataManager)
 		{
 			geoCoord.makeDefaultGeoLocationData();
 			continue;

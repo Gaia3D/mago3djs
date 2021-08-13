@@ -78,10 +78,10 @@ WeatherStation.prototype.newWindVolume = function(options)
 WeatherStation.prototype.deleteDustVolumes = function()
 {
 	// This function deletes all dust volumes.
-	if(this.dustVolumesArray)
+	if (this.dustVolumesArray)
 	{
 		var dustVolumesCount = this.dustVolumesArray.length;
-		for(var i=0; i<dustVolumesCount; i++)
+		for (var i=0; i<dustVolumesCount; i++)
 		{
 			this.dustVolumesArray[i].deleteObjects(this.magoManager);
 			this.dustVolumesArray[i] = undefined;
@@ -94,10 +94,10 @@ WeatherStation.prototype.deleteDustVolumes = function()
 WeatherStation.prototype.deleteWindVolumes = function()
 {
 	// This function deletes all dust volumes.
-	if(this.windVolumesArray)
+	if (this.windVolumesArray)
 	{
 		var windVolumesCount = this.windVolumesArray.length;
-		for(var i=0; i<windVolumesCount; i++)
+		for (var i=0; i<windVolumesCount; i++)
 		{
 			this.windVolumesArray[i].deleteObjects(this.magoManager);
 			this.windVolumesArray[i] = undefined;
@@ -111,7 +111,7 @@ WeatherStation.prototype.deleteAllVolumes = function()
 {
 	this.deleteWindVolumes();
 	this.deleteDustVolumes();
-}
+};
 
 WeatherStation.prototype.newDustVolume = function(options)
 {
@@ -127,7 +127,7 @@ WeatherStation.prototype.newDustVolume = function(options)
 WeatherStation.prototype.getSmokeTexture = function()
 {
 	// smokeTexture for dust-rendering.
-	if(this.smokeTexture === undefined)
+	if (this.smokeTexture === undefined)
 	{
 		var gl = this.magoManager.getGl();
 		this.smokeTexture = new Texture();
@@ -185,10 +185,10 @@ WeatherStation.binarySearch_layersByAltitude = function(altitudesArray, altitude
 {
 	// this do a dicotomic search of idx in a ordered table.
 	// 1rst, check the range.
-	if(startIdx === undefined)
-	startIdx = 0;
-	if(endIdx === undefined)
-	endIdx = altitudesArray.length-1;
+	if (startIdx === undefined)
+	{ startIdx = 0; }
+	if (endIdx === undefined)
+	{ endIdx = altitudesArray.length-1; }
 
 	var range = endIdx - startIdx;
 	if (range < 6)
@@ -479,8 +479,8 @@ WeatherStation.prototype.renderWeatherTransparents = function(magoManager)
 WeatherStation.prototype.renderDust3D = function(magoManager)
 {
 	// StreamLines wind version.***
-	if(magoManager.currentFrustumIdx > 2)
-	return;
+	if (magoManager.currentFrustumIdx > 2)
+	{ return; }
 	
 	// DisplayVolumeBox.***
 	if (this.dustVolumesArray === undefined || this.dustVolumesArray.length === 0)
@@ -506,8 +506,8 @@ WeatherStation.prototype.renderDust3D = function(magoManager)
 WeatherStation.prototype.renderWind3D = function(magoManager)
 {
 	// StreamLines wind version.***
-	if(magoManager.currentFrustumIdx > 2)
-	return;
+	if (magoManager.currentFrustumIdx > 2)
+	{ return; }
 	
 	// DisplayVolumeBox.***
 	if (this.windVolumesArray === undefined || this.windVolumesArray.length === 0)
@@ -531,8 +531,8 @@ WeatherStation.prototype.renderWind3D = function(magoManager)
 
 WeatherStation.prototype.renderWindLayerDisplayPlanes = function(magoManager)
 {
-	if(magoManager.currentFrustumIdx > 2)
-	return;
+	if (magoManager.currentFrustumIdx > 2)
+	{ return; }
 	
 	// DisplayVolumeBox + 3 displayPlanes.***
 	if (this.windVolumesArray === undefined || this.windVolumesArray.length === 0)
@@ -558,60 +558,8 @@ WeatherStation.prototype.loadWindGeoJson = function (geoJsonFilePath)
 {
 	// This is the geoJson version. 2021.
 	// Create a windVolume & load the wind-geoJson.
-	if(!geoJsonFilePath)
-	return false;
-
-	// calculate the geoJsonFileFolderPath.***
-	var geoJsonFileFolderPath = "";
-	var splitted = geoJsonFilePath.split('\\');
-	var spilttedsCount = splitted.length;
-	for(var i=0; i<spilttedsCount-1; i++)
-	{
-		var word = splitted[i];
-		if(word.length > 0)
-		{
-			geoJsonFileFolderPath += "\\";
-			geoJsonFileFolderPath += word;
-
-		}
-	}
-
-	var options = {
-		geoJsonFilePath : geoJsonFilePath,
-		geoJsonFileFolderPath : geoJsonFileFolderPath
-	};
-	var windVolume = this.newWindVolume(options);
-};
-
-/**
- * add wind 
- * @param {object} geoJson geojson type object
- */
-WeatherStation.prototype.addWind = function(geoJson)
-{
-	// This is the geoJson version. 2021.
-	// Create a windVolume
-	if(!geoJson)
-	return false;
-
-	/**
-	 * TODO : validation geojson
-	 */
-
-	 //validationGeosjon();
-
-	var options = {
-		geoJsonFile : geoJson
-	};
-	var windVolume = this.newWindVolume(options);
-};
-
-WeatherStation.prototype.loadDustGeoJson = function(geoJsonFilePath)
-{
-	// This is the geoJson version. 2021.
-	// Create a windVolume & load the wind-geoJson.
 	if (!geoJsonFilePath)
-	return false;
+	{ return false; }
 
 	// calculate the geoJsonFileFolderPath.***
 	var geoJsonFileFolderPath = "";
@@ -629,7 +577,59 @@ WeatherStation.prototype.loadDustGeoJson = function(geoJsonFilePath)
 	}
 
 	var options = {
-		geoJsonFilePath : geoJsonFilePath,
+		geoJsonFilePath       : geoJsonFilePath,
+		geoJsonFileFolderPath : geoJsonFileFolderPath
+	};
+	var windVolume = this.newWindVolume(options);
+};
+
+/**
+ * add wind 
+ * @param {object} geoJson geojson type object
+ */
+WeatherStation.prototype.addWind = function(geoJson)
+{
+	// This is the geoJson version. 2021.
+	// Create a windVolume
+	if (!geoJson)
+	{ return false; }
+
+	/**
+	 * TODO : validation geojson
+	 */
+
+	 //validationGeosjon();
+
+	var options = {
+		geoJsonFile: geoJson
+	};
+	var windVolume = this.newWindVolume(options);
+};
+
+WeatherStation.prototype.loadDustGeoJson = function(geoJsonFilePath)
+{
+	// This is the geoJson version. 2021.
+	// Create a windVolume & load the wind-geoJson.
+	if (!geoJsonFilePath)
+	{ return false; }
+
+	// calculate the geoJsonFileFolderPath.***
+	var geoJsonFileFolderPath = "";
+	var splitted = geoJsonFilePath.split('\\');
+	var spilttedsCount = splitted.length;
+	for (var i=0; i<spilttedsCount-1; i++)
+	{
+		var word = splitted[i];
+		if (word.length > 0)
+		{
+			geoJsonFileFolderPath += "\\";
+			geoJsonFileFolderPath += word;
+
+		}
+	}
+
+	var options = {
+		geoJsonFilePath       : geoJsonFilePath,
 		geoJsonFileFolderPath : geoJsonFileFolderPath
 	};
 	var dustVolume = this.newDustVolume(options);
@@ -643,8 +643,8 @@ WeatherStation.prototype.addDust = function(geoJson)
 {
 	// This is the geoJson version. 2021.
 	// Create a windVolume
-	if(!geoJson)
-	return false;
+	if (!geoJson)
+	{ return false; }
 
 	/**
 	 * TODO : validation geojson
@@ -653,7 +653,7 @@ WeatherStation.prototype.addDust = function(geoJson)
 	 //validationGeosjon();
 
 	var options = {
-		geoJsonFile : geoJson
+		geoJsonFile: geoJson
 	};
 	var windVolume = this.newDustVolume(options);
 };

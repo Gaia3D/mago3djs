@@ -15,9 +15,9 @@ var ScreenQuad = function(vboMemManager, options)
 
 	var createTexCoordsBuffer = false;
 
-	if(options)
+	if (options)
 	{
-		if(options.createTexCoordsBuffer)
+		if (options.createTexCoordsBuffer)
 		{
 			createTexCoordsBuffer = options.createTexCoordsBuffer;
 		}
@@ -35,7 +35,7 @@ ScreenQuad.prototype.init = function (vboMemManager, createTexCoordsBuffer)
 	var dimensions = 2;
 	this.vboCacheKey.setDataArrayPos(posDataArray, vboMemManager, dimensions);
 
-	if(createTexCoordsBuffer)
+	if (createTexCoordsBuffer)
 	{
 		var texCoordsArray = new Float32Array([0, 0,   1, 0,   0, 1,   0, 1,   1, 0,   1, 1]);
 		var dimensions = 2;
@@ -52,7 +52,7 @@ ScreenQuad.prototype.render = function (magoManager, shader)
 	if (!this.vboCacheKey.bindDataPosition(shader, magoManager.vboMemoryManager))
 	{ return; }
 
-	if(this.vboCacheKey.vboBufferTCoord)
+	if (this.vboCacheKey.vboBufferTCoord)
 	{
 		if (!this.vboCacheKey.bindDataTexCoord(shader, magoManager.vboMemoryManager))
 		{ return; }

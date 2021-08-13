@@ -81,8 +81,10 @@ GeographicCoordsList.prototype.addGeoCoordsArray = function(geographicPointsArra
  */
 GeographicCoordsList.prototype.getGeoCoord = function(idx) 
 {
-	if (this.geographicCoordsArray === undefined)
-	{ return undefined; }
+	if (this.geographicCoordsArray === undefined) 
+	{ 
+		return undefined; 
+	}
 	
 	return this.geographicCoordsArray[idx];
 };
@@ -93,8 +95,10 @@ GeographicCoordsList.prototype.getGeoCoord = function(idx)
  */
 GeographicCoordsList.prototype.getGeoCoordsCount = function() 
 {
-	if (this.geographicCoordsArray === undefined)
-	{ return 0; }
+	if (this.geographicCoordsArray === undefined) 
+	{ 
+		return 0; 
+	}
 	
 	return this.geographicCoordsArray.length;
 };
@@ -142,11 +146,13 @@ GeographicCoordsList.prototype.getGeoCoordSegment = function(idx, resultGeoCoord
  */
 GeographicCoordsList.prototype.getCopy = function(resultGeoCoordsListCopy) 
 {
-	if (resultGeoCoordsListCopy === undefined)
-	{ resultGeoCoordsListCopy = new GeographicCoordsList(); }
+	if (resultGeoCoordsListCopy === undefined) 
+	{ 
+		resultGeoCoordsListCopy = new GeographicCoordsList(); 
+	}
 	
 	var geoPointsCount = this.getGeoCoordsCount();
-	for (var i=0; i<geoPointsCount; i++)
+	for (var i=0; i<geoPointsCount; i++) 
 	{
 		var geoCoord = this.getGeoCoord(i);
 		var geoCoordCopy = new GeographicCoord(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude);
@@ -172,7 +178,7 @@ GeographicCoordsList.getPointsRelativeToGeoLocation = function(geoLocIn, geoCoor
 	for (var i=0; i<geoPointsCount; i++)
 	{
 		var geoCoord = geoCoordsArray[i];
-		var posAbs = ManagerUtils.geographicCoordToWorldPoint(geoCoord.longitude,geoCoord.latitude,geoCoord.altitude);
+		var posAbs = ManagerUtils.geographicCoordToWorldPoint(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude);
 		resultPoints3dArray[i] = geoLocIn.getTransformedRelativePosition(posAbs, resultPoints3dArray[i]);
 	}
 	
@@ -391,7 +397,7 @@ GeographicCoordsList.getRenderableObjectOfGeoCoordsArray = function(geoCoordsArr
 	{ options.thickness = 2.0; }
 
 	if (options.color === undefined)
-		{ options.color = new Color(1.0, 0.3, 0.3, 1.0); }
+	{ options.color = new Color(1.0, 0.3, 0.3, 1.0); }
 
 	var vectorMesh = new VectorMesh(options);
 	
@@ -500,29 +506,29 @@ GeographicCoordsList.prototype.test__makeThickLines = function(magoManager)
  */
 GeographicCoordsList.prototype.getGeographicExtent = function(resultGeographicExtent) 
 {
-	/*
-	if (!resultGeographicExtent)
-	{ resultGeographicExtent = new GeographicExtent(); }
-	
-	var geoCoord;
-	var geoCoordsCount = this.geographicCoordsArray.length;
-	for (var i=0; i<geoCoordsCount; i++)
-	{
-		geoCoord = this.geographicCoordsArray[i];
-		if (i === 0)
-		{
-			resultGeographicExtent.setInitExtent(geoCoord.longitude, geoCoord.latitude, geoCoord.altitude);
-		}
-		else 
-		{
-			resultGeographicExtent.addGeographicCoord(geoCoord);
-		}
-	}
-	
-	return resultGeographicExtent;
-	*/
-
 	return GeographicCoordsList.getGeographicExtent(this.geographicCoordsArray, resultGeographicExtent);
+};
+
+GeographicCoordsList.getNumbersArrayOfGeoCoordsArray = function(geographicCoordsArray) 
+{
+	// this function returns [lon, lat, alt, lon, lat, alt, ...].
+	var geoCoordsCount = geographicCoordsArray.length;
+	var numbersArray = new Array(geoCoordsCount * 3);
+	for (var i=0; i<geoCoordsCount; i++) 
+	{
+		var geoCoord = geographicCoordsArray[i];
+		numbersArray[i*3] = geoCoord.longitude;
+		numbersArray[i*3+1] = geoCoord.latitude;
+		numbersArray[i*3+2] = geoCoord.altitude;
+	}
+
+	return numbersArray;
+};
+
+GeographicCoordsList.getNumbersArrayOfGeoCoordsList = function(geographicCoordsList) 
+{
+	// this function returns [lon, lat, alt, lon, lat, alt, ...].
+	return GeographicCoordsList.getNumbersArrayOfGeoCoordsArray(geographicCoordsList.geographicCoordsArray);
 };
 
 GeographicCoordsList.getGeographicExtent = function(geographicCoordsArray, resultGeographicExtent) 
@@ -599,21 +605,21 @@ GeographicCoordsList.prototype.setAltitude = function(length)
  */
 GeographicCoordsList.solveUroborus = function(geographicCoordsArray, error) 
 {
-	if(!geographicCoordsArray)
-	return false;
+	if (!geographicCoordsArray)
+	{ return false; }
 
-	if(!error)
-	error = 1E-8;
+	if (!error)
+	{ error = 1E-8; }
 
 	var geoCoordsCount = geographicCoordsArray.length;
 
-	if(geoCoordsCount < 3)
-	return false;
+	if (geoCoordsCount < 3)
+	{ return false; }
 
 	var geoCoordStart = geographicCoordsArray[0];
 	var geoCoordLast = geographicCoordsArray[geoCoordsCount-1];
 	var errorForAltitude = error;
-	if(geoCoordStart.isCoincidentToGeoCoord (geoCoordLast, error, errorForAltitude) )
+	if (geoCoordStart.isCoincidentToGeoCoord(geoCoordLast, error, errorForAltitude) )
 	{
 		// delete the last geoCoord.***
 		geographicCoordsArray.pop();
@@ -630,24 +636,24 @@ GeographicCoordsList.solveUroborus = function(geographicCoordsArray, error)
 GeographicCoordsList.solveDegeneratedPoints = function(geographicCoordsArray, error) 
 {
 	// This function deletes degenerated points.***
-	if(!geographicCoordsArray)
-	return;
+	if (!geographicCoordsArray)
+	{ return; }
 
 	// 1rst, solve uroborus.***
-	if(!error)
-	error = 1E-8;
+	if (!error)
+	{ error = 1E-8; }
 	GeographicCoordsList.solveUroborus(geographicCoordsArray, error);
 
 	// 2nd, solve coincidentPoints.***
 	var geoCoordsCount = geographicCoordsArray.length;
-	for(var i=0; i<geoCoordsCount-1; i++)
+	for (var i=0; i<geoCoordsCount-1; i++)
 	{
 		var geoCoord1 = geographicCoordsArray[i];
 		var geoCoord2 = geographicCoordsArray[i+1];
 
-		if(!geoCoord2) geoCoord2 = geographicCoordsArray[0];
+		if (!geoCoord2) { geoCoord2 = geographicCoordsArray[0]; }
 
-		if(geoCoord1.isCoincidentToGeoCoord(geoCoord2, error))
+		if (geoCoord1.isCoincidentToGeoCoord(geoCoord2, error))
 		{
 			// delete the geoCoord2.***
 			geographicCoordsArray.splice(i+1, 1);
@@ -776,10 +782,10 @@ GeographicCoordsList.prototype.getRenderableObjectPolygon = function(options, re
 	surfIndepMesh.calculateVerticesNormals();
 
 	var textureInfo;
-	if(options)
+	if (options)
 	{
-		if(options.textureInfo)
-		textureInfo = options.textureInfo;
+		if (options.textureInfo)
+		{ textureInfo = options.textureInfo; }
 	}
 	if (textureInfo)
 	{
@@ -830,28 +836,28 @@ GeographicCoordsList.prototype._getExtrudedWallRenderableObject_byNumSegments = 
 	var polyLineLoop = false;
 	var colorsArray = undefined;
 	var numSegments = undefined;
-	if(options)
+	if (options)
 	{
-		if(options.doubleFace)
+		if (options.doubleFace)
 		{
 			doubleFace = true;
 			resultRenderableObject.attributes.doubleFace = true;
 		}
 
-		if(options.colorTop)
-		colorTop = options.colorTop;
+		if (options.colorTop)
+		{ colorTop = options.colorTop; }
 
-		if(options.colorBottom)
-		colorBottom = options.colorBottom;
+		if (options.colorBottom)
+		{ colorBottom = options.colorBottom; }
 
-		if(options.polyLineLoop)
-		polyLineLoop = options.polyLineLoop;
+		if (options.polyLineLoop)
+		{ polyLineLoop = options.polyLineLoop; }
 
-		if(options.colorsArray)
-		colorsArray = options.colorsArray;
+		if (options.colorsArray)
+		{ colorsArray = options.colorsArray; }
 
-		if(options.numSegments)
-		numSegments = options.numSegments;
+		if (options.numSegments)
+		{ numSegments = options.numSegments; }
 	}
 
 	var geoLocData = resultRenderableObject.geoLocDataManager.getCurrentGeoLocationData();
@@ -859,16 +865,16 @@ GeographicCoordsList.prototype._getExtrudedWallRenderableObject_byNumSegments = 
 	// create options for outer vertexRing.
 	var isOpen = !polyLineLoop;
 	var profileOptions = {
-		outerVtxRingOptions : {
-			isOpen : isOpen
+		outerVtxRingOptions: {
+			isOpen: isOpen
 		}
 	};
 
 	// create colors for segments if no exist.
-	if(!colorsArray)
+	if (!colorsArray)
 	{
 		colorsArray = [];
-		if(colorBottom && colorTop)
+		if (colorBottom && colorTop)
 		{
 			var numColors = numSegments + 1;
 			colorsArray = Color.getInterpolatedColorsArray(colorBottom, colorTop, numColors, colorsArray );
@@ -878,7 +884,7 @@ GeographicCoordsList.prototype._getExtrudedWallRenderableObject_byNumSegments = 
 	var vtxProfilesList = new VtxProfilesList();
 	var increHeight = height/numSegments;
 
-	for(var i=0; i<numSegments+1; i++)
+	for (var i=0; i<numSegments+1; i++)
 	{
 		// make a profile for each segments.
 		// Make the topGeoCoordsList.
@@ -891,7 +897,7 @@ GeographicCoordsList.prototype._getExtrudedWallRenderableObject_byNumSegments = 
 		var topVtxProfile = vtxProfilesList.newVtxProfile();
 		topVtxProfile.makeByPoints3DArray(topPoints3dArray, undefined, profileOptions); 
 
-		if(colorsArray) 
+		if (colorsArray) 
 		{
 			var color = colorsArray[i];
 			topVtxProfile.setColorRGBAVertices(color.r, color.g, color.b, color.a);
@@ -935,28 +941,28 @@ GeographicCoordsList.prototype.getExtrudedWallRenderableObject = function(height
 	var polyLineLoop = false;
 	var colorsArray = undefined;
 	var numSegments = undefined;
-	if(options)
+	if (options)
 	{
-		if(options.doubleFace)
+		if (options.doubleFace)
 		{
 			doubleFace = true;
 			resultRenderableObject.attributes.doubleFace = true;
 		}
 
-		if(options.colorTop)
-		colorTop = options.colorTop;
+		if (options.colorTop)
+		{ colorTop = options.colorTop; }
 
-		if(options.colorBottom)
-		colorBottom = options.colorBottom;
+		if (options.colorBottom)
+		{ colorBottom = options.colorBottom; }
 
-		if(options.polyLineLoop)
-		polyLineLoop = options.polyLineLoop;
+		if (options.polyLineLoop)
+		{ polyLineLoop = options.polyLineLoop; }
 
-		if(options.colorsArray)
-		colorsArray = options.colorsArray;
+		if (options.colorsArray)
+		{ colorsArray = options.colorsArray; }
 
-		if(options.numSegments)
-		numSegments = options.numSegments;
+		if (options.numSegments)
+		{ numSegments = options.numSegments; }
 	}
 	
 	// The origin of this object is in the middle of this geoCoordsList.
@@ -972,7 +978,7 @@ GeographicCoordsList.prototype.getExtrudedWallRenderableObject = function(height
 	topGeoCoordsList.addAltitude(height);
 
 	// In this point, there are alot of possibilities:
-	if(numSegments || colorsArray)
+	if (numSegments || colorsArray)
 	{
 		return this._getExtrudedWallRenderableObject_byNumSegments(height, resultRenderableObject, magoManager, extrudeDirWC, options, textureInfo);
 	}
@@ -986,22 +992,22 @@ GeographicCoordsList.prototype.getExtrudedWallRenderableObject = function(height
 		// Create a VtxProfilesList.
 		var isOpen = !polyLineLoop;
 		var profileOptions = {
-			outerVtxRingOptions : {
-				isOpen : isOpen
+			outerVtxRingOptions: {
+				isOpen: isOpen
 			}
 		};
 
 		var vtxProfilesList = new VtxProfilesList();
 		var baseVtxProfile = vtxProfilesList.newVtxProfile();
 		baseVtxProfile.makeByPoints3DArray(basePoints3dArray, undefined, profileOptions); 
-		if(colorBottom && colorTop) // must exist bottom & top colors.
-			baseVtxProfile.setColorRGBAVertices(colorBottom.r, colorBottom.g, colorBottom.b, colorBottom.a);
+		if (colorBottom && colorTop) // must exist bottom & top colors.
+		{ baseVtxProfile.setColorRGBAVertices(colorBottom.r, colorBottom.g, colorBottom.b, colorBottom.a); }
 
 
 		var topVtxProfile = vtxProfilesList.newVtxProfile();
 		topVtxProfile.makeByPoints3DArray(topPoints3dArray, undefined, profileOptions); 
-		if(colorBottom && colorTop) // must exist bottom & top colors.
-			topVtxProfile.setColorRGBAVertices(colorTop.r, colorTop.g, colorTop.b, colorTop.a);
+		if (colorBottom && colorTop) // must exist bottom & top colors.
+		{ topVtxProfile.setColorRGBAVertices(colorTop.r, colorTop.g, colorTop.b, colorTop.a); }
 
 		
 		var bIncludeBottomCap = false;

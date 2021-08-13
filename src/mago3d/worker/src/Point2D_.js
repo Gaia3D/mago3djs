@@ -19,6 +19,18 @@ Point2D_.prototype.set = function(x, y)
 	this.y = y;
 };
 
+Point2D_.prototype.deleteObjects = function() 
+{
+	this.x = undefined;
+	this.y = undefined;
+};
+
+Point2D_.prototype.copyFrom = function(point2d) 
+{
+	this.x = point2d.x;
+	this.y = point2d.y;
+};
+
 Point2D_.prototype.getVectorToPoint = function(targetPoint, resultVector) 
 {
 	if (targetPoint === undefined)

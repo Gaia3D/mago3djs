@@ -77,11 +77,11 @@ Node.prototype.isReferenceNode = function()
 Node.prototype.isOpaque = function()
 {
 	var bOpaque = true;
-	if(this.data)
+	if (this.data)
 	{
-		if(this.data.attributes)
+		if (this.data.attributes)
 		{
-			if(this.data.attributes.opacity !== undefined)
+			if (this.data.attributes.opacity !== undefined)
 			{
 				bOpaque = this.data.attributes.opacity === 1;
 			}
@@ -280,9 +280,12 @@ Node.prototype.correctGeoLocationDataByMappingType = function(geoLoc)
 	// check if use "centerOfBoundingBoxAsOrigin".
 	var buildingSeedBBox;
 
-	if(this.data.buildingSeed) {
+	if (this.data.buildingSeed) 
+	{
 		buildingSeedBBox = this.data.buildingSeed.bBox;
-	} else {
+	}
+	else 
+	{
 		buildingSeedBBox = this.data.neoBuilding.metaData.bbox;
 	}
 
@@ -441,7 +444,8 @@ Node.prototype.checkChangesHistoryColors = function()
 /**
  * 어떤 일을 하고 있습니까?
  */
-Node.prototype.renderContent = function (magoManager, shader, renderType, refMatrixIdxKey) {
+Node.prototype.renderContent = function (magoManager, shader, renderType, refMatrixIdxKey) 
+{
 	// This function renders the renderables that exists in "data".
 	// renderType = 0 -> depth render.
 	// renderType = 1 -> normal render.
@@ -449,44 +453,54 @@ Node.prototype.renderContent = function (magoManager, shader, renderType, refMat
 	// renderType = 3 -> shadowMesh render.
 	//--------------------------------------------
 	var data = this.data;
-	if (data === undefined) { 
+	if (data === undefined) 
+	{ 
 		return; 
 	}
 
-	if (this.renderCondition && typeof this.renderCondition === 'function') {
+	if (this.renderCondition && typeof this.renderCondition === 'function') 
+	{
 		this.renderCondition.call(this, data);
 	}
 	
 	var attributes = data.attributes;
 	
-	if (attributes) {
-		if (attributes.isVisible !== undefined && attributes.isVisible === false)  {
+	if (attributes) 
+	{
+		if (attributes.isVisible !== undefined && attributes.isVisible === false)  
+		{
 			return;
 		}
 		
-		if (magoManager.currentProcess === CODE.magoCurrentProcess.DepthShadowRendering) {
-			if (attributes.castShadow !== undefined && attributes.castShadow === false) {
+		if (magoManager.currentProcess === CODE.magoCurrentProcess.DepthShadowRendering) 
+		{
+			if (attributes.castShadow !== undefined && attributes.castShadow === false) 
+			{
 				return;
 			}
 		}
 	}
 
 	// Check if there are effects.
-	if (renderType !== 2 && magoManager.currentProcess !== CODE.magoCurrentProcess.StencilSilhouetteRendering) { 
+	if (renderType !== 2 && magoManager.currentProcess !== CODE.magoCurrentProcess.StencilSilhouetteRendering) 
+	{ 
 		var executedEffects = magoManager.effectsManager.executeEffects(this.guid, magoManager); 
 	}
 	
 	// Check if we are under selected data structure.***
 	var selectionManager = magoManager.selectionManager;
-	if (selectionManager.isObjectSelected(this)) { 
+	if (selectionManager.isObjectSelected(this)) 
+	{ 
 		selectionManager.parentSelected = true; 
 	}
-	else { 
+	else 
+	{ 
 		selectionManager.parentSelected = false; 
 	}
 	
 	var neoBuilding = data.neoBuilding;
-	if (neoBuilding === undefined) { 
+	if (neoBuilding === undefined) 
+	{ 
 		return; 
 	}
 
@@ -513,12 +527,15 @@ Node.prototype.renderContent = function (magoManager, shader, renderType, refMat
 
 	// check attributes of the project.
 	var project = magoManager.hierarchyManager.getNodesMap(data.projectId);
-	if (project.attributes !== undefined && project.attributes.specularLighting !== undefined && shader.bApplySpecularLighting_loc !== undefined) {
+	if (project.attributes !== undefined && project.attributes.specularLighting !== undefined && shader.bApplySpecularLighting_loc !== undefined) 
+	{
 		var applySpecLighting = project.attributes.specularLighting;
-		if (applySpecLighting) { 
+		if (applySpecLighting) 
+		{ 
 			gl.uniform1i(shader.bApplySpecularLighting_loc, true); 
 		}
-		else { 
+		else 
+		{ 
 			gl.uniform1i(shader.bApplySpecularLighting_loc, false); 
 		}
 	}
@@ -535,7 +552,8 @@ Node.prototype.renderContent = function (magoManager, shader, renderType, refMat
 	gl.uniform1i(shader.textureFlipYAxis_loc, flipYTexCoord);
 	
 	var currRenderingFase = magoManager.renderingFase;
-	if (this.isReferenceNode()) { 
+	if (this.isReferenceNode()) 
+	{ 
 		magoManager.renderingFase = -10; 
 	} // set a strange value to skip avoiding rendering fase of references objects.
 
@@ -581,7 +599,8 @@ Node.prototype.renderContent = function (magoManager, shader, renderType, refMat
 
 	// If this node is a referenceNode type, then, must render all references avoiding the renderingFase.
 	var opacity = 1.0;
-	if(attributes.opacity !== undefined) {
+	if (attributes.opacity !== undefined) 
+	{
 		opacity = attributes.opacity;
 	}
 
@@ -596,11 +615,13 @@ Node.prototype.renderContent = function (magoManager, shader, renderType, refMat
 		// Tree-data-type has no lods.***
 		//var octreesRenderedCount = this.renderDetailed(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord);
 		var octree = neoBuilding.octree;
-		if (octree.neoReferencesMotherAndIndices) {
+		if (octree.neoReferencesMotherAndIndices) 
+		{
 			// Here must do -> neoBuilding.octree.multiplyKeyTransformMatrix(0, geoLocationData.rotMatrix), bcos
 			// for example, if there are multiple vehicles, as buses, that are moving and rotating, the references with "refMatrixType = 2" is going to multiply by different geoLocations, and
 			// so, the references that has "refMatrixType = 2" has a wrong tMatrix. This only occurs in static f4ds with multiple copies.***
-			if(this.mustRecalculateRefKeyMatrix) {
+			if (this.mustRecalculateRefKeyMatrix) 
+			{
 				octree.multiplyKeyTransformMatrix(0, buildingGeoLocation.rotMatrix);
 				this.mustRecalculateRefKeyMatrix = false;
 			}
@@ -1037,7 +1058,8 @@ Node.prototype.finishedAnimation = function (magoManager)
 	var animType = animData.animationType;
 	if (animType === CODE.animationType.PATH)
 	{
-		if(animData.stop) {
+		if (animData.stop) 
+		{
 			animData.lastTime = currTime;
 			return false; 
 		}
@@ -1460,43 +1482,51 @@ Node.prototype.changeLocationAndRotation = function(latitude, longitude, elevati
 	{
 		aNode = nodesArray[i];
 		var geoLocDatamanager = aNode.getNodeGeoLocDataManager();
-		if (geoLocDatamanager === undefined) { 
+		if (geoLocDatamanager === undefined) 
+		{ 
 			continue; 
 		}
 
 		var geoLocationData;
-		if (this.data.animationData !== undefined) {
+		if (this.data.animationData !== undefined) 
+		{
 			geoLocationData = geoLocDatamanager.newGeoLocationData();
 		}
-		else {
+		else 
+		{
 			geoLocationData = geoLocDatamanager.getCurrentGeoLocationData(); // original.
 		}
 
-		if (geoLocationData === undefined) { 
+		if (geoLocationData === undefined) 
+		{ 
 			continue; 
 		}
 	
 		geoLocationData = ManagerUtils.calculateGeoLocationData(longitude, latitude, elevation, heading, pitch, roll, geoLocationData, magoManager);
 		this.correctGeoLocationDataByMappingType(geoLocationData);
 		
-		if (geoLocationData === undefined) { 
+		if (geoLocationData === undefined) 
+		{ 
 			continue; 
 		}
 	
-		if (geoLocationData.geographicCoord === undefined) { 
+		if (geoLocationData.geographicCoord === undefined) 
+		{ 
 			continue; 
 		} 
 	
 		// Change the geoCoords of the buildingSeed.
 		var buildingSeed = aNode.data.buildingSeed;
-		if (buildingSeed) {
+		if (buildingSeed) 
+		{
 			buildingSeed.geographicCoordOfBBox.longitude = longitude;
 			buildingSeed.geographicCoordOfBBox.latitude = latitude;
 		}
 		
 		// now, must change the keyMatrix of the references of the octrees of all buildings of this node.
 		var neoBuilding = aNode.data.neoBuilding;
-		if (neoBuilding.octree) {
+		if (neoBuilding.octree) 
+		{
 			neoBuilding.octree.multiplyKeyTransformMatrix(0, geoLocationData.rotMatrix);
 		}
 
@@ -1509,14 +1539,16 @@ Node.prototype.changeLocationAndRotation = function(latitude, longitude, elevati
 
 		// check if the neoBuilding is static.***
 		var projectDataType = neoBuilding.metaData.getProjectDataType();
-		if (projectDataType === 10) {
+		if (projectDataType === 10) 
+		{
 			// the neoBuilding is static data type.
 			this.mustRecalculateRefKeyMatrix = true; // the refKeyMatrices will be calculate in renderTime.
 		}
 
 		
 		// Now, calculate the geoCoords of the bbox.
-		if (nodeRoot.data.bbox.geographicCoord === undefined) { 
+		if (nodeRoot.data.bbox.geographicCoord === undefined) 
+		{ 
 			nodeRoot.data.bbox.geographicCoord = new GeographicCoord(); 
 		}
 		
@@ -1535,15 +1567,16 @@ Node.prototype.changeLocationAndRotation = function(latitude, longitude, elevati
 		}
 
 		var accessory = aNode.data.accessory;
-		if(accessory 
+		if (accessory 
 		&& accessory instanceof SpotLight
-		&& accessory.localWC) {
+		&& accessory.localWC) 
+		{
 			var spotLightPosition = geoLocationData.tMatrix.transformPoint3D(accessory.localWC);
-			var spotLightGeographic = ManagerUtils.pointToGeographicCoord(spotLightPosition)
+			var spotLightGeographic = ManagerUtils.pointToGeographicCoord(spotLightPosition);
 			
 			var spotLightGeoLocationData = accessory.getCurrentGeoLocationData();
 			spotLightGeoLocationData = ManagerUtils.calculateGeoLocationData(spotLightGeographic.longitude, spotLightGeographic.latitude, spotLightGeographic.altitude, geoLocationData.heading, geoLocationData.pitch, geoLocationData.roll, spotLightGeoLocationData);
-			accessory.bCubeMapMade = false
+			accessory.bCubeMapMade = false;
 		}
 	}
 };
@@ -1569,7 +1602,7 @@ Node.prototype.intersectionWithPolygon2D = function(polygon2D)
  */
 Node.prototype.caculateHeightByReference = function(terrainHeight)
 {
-	if(terrainHeight === undefined || terrainHeight === null) terrainHeight = 0;
+	if (terrainHeight === undefined || terrainHeight === null) { terrainHeight = 0; }
 	
 	var cp = this.getCurrentGeoLocationData().geographicCoord;
 	var bx = this.getBBox();
@@ -1635,58 +1668,68 @@ Node.prototype.deleteChangeColor = function(magoManager)
  * set From date
  * @param {Date} fromDate 
  */
-Node.prototype.setFromDate = function(fromDate) {
-	if(!fromDate || !(fromDate instanceof Date)) {
+Node.prototype.setFromDate = function(fromDate) 
+{
+	if (!fromDate || !(fromDate instanceof Date)) 
+	{
 		throw new Error('fromDate is required(Date Type).');
 	}
-	if(!this.isReadyToRender()) {
+	if (!this.isReadyToRender()) 
+	{
 		throw new Error('this date is not ready to use.');
 	}
 
 	this.data.attributes.fromDate = fromDate;
-}
+};
 /**
  * get From date
  * @return {Date}
  */
-Node.prototype.getFromDate = function() {
+Node.prototype.getFromDate = function() 
+{
 	return this.data.attributes.fromDate;
-}
+};
 
 /**
  * set To date
  * @param {Date} toDate 
  */
-Node.prototype.setToDate = function(toDate) {
-	if(!toDate || !(toDate instanceof Date)) {
+Node.prototype.setToDate = function(toDate) 
+{
+	if (!toDate || !(toDate instanceof Date)) 
+	{
 		throw new Error('toDate is required(Date Type).');
 	}
-	if(!this.isReadyToRender()) {
+	if (!this.isReadyToRender()) 
+	{
 		throw new Error('this date is not ready to use.');
 	}
 
 	this.data.attributes.toDate = toDate;
-}
+};
 /**
  * get To date
  * @return {Date}
  */
-Node.prototype.getToDate = function() {
+Node.prototype.getToDate = function() 
+{
 	return this.data.attributes.toDate;
-}
+};
 
 /**
  * set visible
  * @return {boolean}
  */
-Node.prototype.setVisible = function(visible) {
+Node.prototype.setVisible = function(visible) 
+{
 	this.data.attributes.isVisible = visible;
-}
+};
 
 /**
  * get visible
  * @return {boolean}
  */
-Node.prototype.getVisible = function() {
+Node.prototype.getVisible = function() 
+{
 	return this.data.attributes.isVisible;
-}
+};

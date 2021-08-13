@@ -14,15 +14,15 @@ var ClippingPlane = function(options)
 
 	this.plane; // the plane equation.***
 
-	if(!options)
-	options = {};
+	if (!options)
+	{ options = {}; }
 
-	this.color4 = defaultValue(options.color, new Color(1,1,1,1));
+	this.color4 = defaultValue(options.color, new Color(1, 1, 1, 1));
 
 	options.renderWireframe = true;
 	MagoRenderable.call(this, options);
 
-	if(options.position)
+	if (options.position)
 	{
 		var position = options.position;
 		var heading = 0.0;
@@ -32,18 +32,18 @@ var ClippingPlane = function(options)
 	}
 
 	//this.color4 = defaultValue(options.color, new Color(1,1,1,1));
-    //this.selectedColor4 = defaultValue(options.selectedColor, new Color(1,1,0,1));
+	//this.selectedColor4 = defaultValue(options.selectedColor, new Color(1,1,0,1));
 
 	//this.attributes.isVisible = defaultValue(options.isVisible, true);
 	this.attributes.isMovable = defaultValue(options.isMovable, true);
 	this.attributes.movementInAxisZ = true;
-    //this.attributes.isSelectable = defaultValue(options.isSelectable, true);
+	//this.attributes.isSelectable = defaultValue(options.isSelectable, true);
 
 	//if(!this.options)
-    //this.options = {};
+	//this.options = {};
 
-    //this.options.renderWireframe = defaultValue(options.renderWireframe, true);
-    //this.options.renderShaded = defaultValue(options.renderShaded, true);
+	//this.options.renderWireframe = defaultValue(options.renderWireframe, true);
+	//this.options.renderShaded = defaultValue(options.renderShaded, true);
 	//this.options.depthMask = defaultValue(options.depthMask, true);
 
 	// vars to render the plane as a rectangle.
@@ -57,7 +57,7 @@ ClippingPlane.prototype.constructor = ClippingPlane;
 
 ClippingPlane.prototype.makeMesh = function()
 {
-	if(!this.dirty) return;
+	if (!this.dirty) { return; }
 
 	// make a simple rectangle3d. Create 4 vertices.***
 	var geoLocData = this.geoLocDataManager.getCurrentGeoLocationData();

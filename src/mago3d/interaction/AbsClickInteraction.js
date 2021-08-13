@@ -120,7 +120,7 @@ AbsClickInteraction.prototype.handle = function(browserEvent)
 		{
 			this.handleMoveEvent.call(this, browserEvent);
 		}
-		else if(type === MagoManager.EVENT_TYPE.LEFTDOWN)
+		else if (type === MagoManager.EVENT_TYPE.LEFTDOWN)
 		{
 			this.begin = true;
 			this.startPoint = browserEvent.point;

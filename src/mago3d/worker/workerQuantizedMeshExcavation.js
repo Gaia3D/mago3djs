@@ -28,12 +28,12 @@ var worker = self;
 
 worker.onmessage = function (e) 
 {
-    var value_A = 3.0;
-    var value_B = 5.0;
-    var value_C = 0.0;
+	var value_A = 3.0;
+	var value_B = 5.0;
+	var value_C = 0.0;
 
-    var qMesh = e.data;
-    /*
+	var qMesh = e.data;
+	/*
     var data = {
         info : {X: X, Y: Y, L: L},
         uValues : qMesh._uValues,
@@ -57,38 +57,38 @@ worker.onmessage = function (e)
     };
     */
 
-    var workerPolygon2DTessellate;
+	var workerPolygon2DTessellate;
 
-    if(!workerPolygon2DTessellate)
-    {
-        var qMeshExcavationWorker = this;
-        qMeshExcavationWorker.polygon2DTessellated;
-        workerPolygon2DTessellate = new Worker('workerPolygon2DTessellate.js');
+	if (!workerPolygon2DTessellate)
+	{
+		var qMeshExcavationWorker = this;
+		qMeshExcavationWorker.polygon2DTessellated;
+		workerPolygon2DTessellate = new Worker('workerPolygon2DTessellate.js');
         
-        workerPolygon2DTessellate.onmessage = function(a)
+		workerPolygon2DTessellate.onmessage = function(a)
 		{
 			var result = a.data.result;
 
 			qMeshExcavationWorker.polygon2DTessellated = result;
-            continueProcess(e, qMeshExcavationWorker, qMesh);
+			continueProcess(e, qMeshExcavationWorker, qMesh);
 		};
         
-    }
+	}
 
-    var data = {
-        positions : qMesh.excavationGeoCoords
-    };
+	var data = {
+		positions: qMesh.excavationGeoCoords
+	};
 
-    workerPolygon2DTessellate.postMessage(data); // send to worker by copy.
-}
+	workerPolygon2DTessellate.postMessage(data); // send to worker by copy.
+};
 
 
 function continueProcess(e, qMeshExcavationWorker, qMesh)
 {
-    var convexPolygon2dObject = qMeshExcavationWorker.polygon2DTessellated;
+	var convexPolygon2dObject = qMeshExcavationWorker.polygon2DTessellated;
 
-    // Now, do excavation.***
-    // Make trianglesArray.***
+	// Now, do excavation.***
+	// Make trianglesArray.***
 	var vertexList = QuantizedSurface_.getVertexList(qMesh, undefined);
 	qMesh.vertexList = vertexList; // store vertexList into qMesh.***
 
@@ -108,7 +108,7 @@ function continueProcess(e, qMeshExcavationWorker, qMesh)
 	var excavationGeoCoordsFloats = qMesh.excavationGeoCoords;
 	var excavationGeoCoords = [];
 	var geoCoordsCount = excavationGeoCoordsFloats.length/2.0;
-	for(var i=0; i<geoCoordsCount; i++)
+	for (var i=0; i<geoCoordsCount; i++)
 	{
 		excavationGeoCoords.push(new GeographicCoord_(excavationGeoCoordsFloats[i*2], excavationGeoCoordsFloats[i*2+1], 0.0));
 	}
@@ -120,58 +120,58 @@ function continueProcess(e, qMeshExcavationWorker, qMesh)
 	QuantizedSurface_.insertQPointsArrayIntoTrianglesList(excavationQPoints, trianglesList, vertexList, newVertexArray);
 
 	// Now, make segments2d of the cutting polygon.************************************************************************************
-    var geoCoordsCount = excavationQPoints.length;
-    var nextIdx;
-    var segment2d = new Segment2D_();
-    var qPoint1, qPoint2, qPointHight; // Point3D class.
-    qPointHight = new Point3D_();
-    var plane = new Plane_();
-    for(var i=0; i<geoCoordsCount; i++)
-    {
-        nextIdx = getNextIdx(i, geoCoordsCount);
-        qPoint1 = excavationQPoints[i];
-        qPoint2 = excavationQPoints[nextIdx];
+	var geoCoordsCount = excavationQPoints.length;
+	var nextIdx;
+	var segment2d = new Segment2D_();
+	var qPoint1, qPoint2, qPointHight; // Point3D class.
+	qPointHight = new Point3D_();
+	var plane = new Plane_();
+	for (var i=0; i<geoCoordsCount; i++)
+	{
+		nextIdx = getNextIdx(i, geoCoordsCount);
+		qPoint1 = excavationQPoints[i];
+		qPoint2 = excavationQPoints[nextIdx];
 
-        qPointHight.set(qPoint1.x, qPoint1.y, qPoint1.z + 10000.0);
-        segment2d.setPoints(new Point2D_(qPoint1.x, qPoint1.y), new Point2D_(qPoint2.x, qPoint2.y));
+		qPointHight.set(qPoint1.x, qPoint1.y, qPoint1.z + 10000.0);
+		segment2d.setPoints(new Point2D_(qPoint1.x, qPoint1.y), new Point2D_(qPoint2.x, qPoint2.y));
 
-        // Now, make a vertical plane with qPoint1, qPoint2 and qPointHight.
-        plane.set3Points(qPoint1.x, qPoint1.y, qPoint1.z,   qPoint2.x, qPoint2.y, qPoint2.z,   qPointHight.x, qPointHight.y, qPointHight.z);
+		// Now, make a vertical plane with qPoint1, qPoint2 and qPointHight.
+		plane.set3Points(qPoint1.x, qPoint1.y, qPoint1.z,   qPoint2.x, qPoint2.y, qPoint2.z,   qPointHight.x, qPointHight.y, qPointHight.z);
 
-        QuantizedSurface_._cutTrianglesWithPlane(trianglesList, plane, segment2d, vertexList, undefined, newVertexArray);
-    } 
+		QuantizedSurface_._cutTrianglesWithPlane(trianglesList, plane, segment2d, vertexList, undefined, newVertexArray);
+	} 
 
 	// Now, must classify the triangles that are inside of the excavationGeoCoords.***
-    // Extract convex polygons2d.
+	// Extract convex polygons2d.
 	var convexPolygons2dArray = [];
 	var convexPolygon2dIndicesArray = convexPolygon2dObject.convexPolygonIndicesArray;
 	var tessellatedPolygons2dCount = convexPolygon2dIndicesArray.length; // convexPolygon2dIndicesArray.***
-	for(var i=0; i<tessellatedPolygons2dCount; i++)
+	for (var i=0; i<tessellatedPolygons2dCount; i++)
 	{
 		var point2dList = new Point2DList_();
 		var convexPolygonIndices = convexPolygon2dIndicesArray[i];
 		var indicesCount = convexPolygonIndices.length;
-		for(var j=0; j<indicesCount; j++)
+		for (var j=0; j<indicesCount; j++)
 		{
 			var idx = convexPolygonIndices[j];
 			var excavQPoint = excavationQPoints[idx];
 			var point2d = new Point2D_(excavQPoint.x, excavQPoint.y);
 			point2dList.addPoint(point2d);
 		}
-		var polygon2d = new Polygon2D_({point2dList : point2dList});
+		var polygon2d = new Polygon2D_({point2dList: point2dList});
 		convexPolygons2dArray.push(polygon2d);
 	}
     
     
-    // Now, for each triangle, check if it is inside of the polygon2d.
-    QuantizedSurface_._classifyTrianglesAsInteriorOrExteriorOfPolygon(trianglesList, convexPolygons2dArray);
+	// Now, for each triangle, check if it is inside of the polygon2d.
+	QuantizedSurface_._classifyTrianglesAsInteriorOrExteriorOfPolygon(trianglesList, convexPolygons2dArray);
 
-    // Now, for interior triangles set z -= excavationHeight, and create excavation lateral triabgles.***
+	// Now, for interior triangles set z -= excavationHeight, and create excavation lateral triabgles.***
 	var excavationAltitude = qMesh.excavationAltitude;
 	// Note : if excavationAltitude is lower than qMesh._minimumHeight or higher than qMesh._maximumHeight, the must recalculate quantized altitudes.
 	var minHeight = qMesh.minHeight;
 	var maxHeight = qMesh.maxHeight;
-	if(excavationAltitude < minHeight)
+	if (excavationAltitude < minHeight)
 	{
 		var newMinHeight = excavationAltitude;
 		var newMaxHeight = qMesh.maxHeight;
@@ -180,7 +180,7 @@ function continueProcess(e, qMeshExcavationWorker, qMesh)
 		qMesh.minHeight = newMinHeight;
 		qMesh.maxHeight = newMaxHeight;
 	}
-	else if(excavationAltitude > maxHeight)
+	else if (excavationAltitude > maxHeight)
 	{
 		var newMinHeight = qMesh.minHeight;
 		var newMaxHeight = excavationAltitude;
@@ -190,13 +190,13 @@ function continueProcess(e, qMeshExcavationWorker, qMesh)
 		qMesh.maxHeight = newMaxHeight;
 	}
 	var quantizedAltitude = (excavationAltitude - qMesh.minHeight) / (qMesh.maxHeight - qMesh.minHeight) * 32767;
-    QuantizedSurface_.createLateralTrianglesOfExcavation(trianglesList, vertexList, quantizedAltitude);
+	QuantizedSurface_.createLateralTrianglesOfExcavation(trianglesList, vertexList, quantizedAltitude);
 
-    // Now, must recalculate the skirt indices.***
-    QuantizedSurface_.recalculateSkirtIndices(trianglesList, vertexList, qMesh);
+	// Now, must recalculate the skirt indices.***
+	QuantizedSurface_.recalculateSkirtIndices(trianglesList, vertexList, qMesh);
 
-    // Now, remake the quantized mesh.***
-    QuantizedSurface_._makeQuantizedMeshFromTrianglesList(trianglesList, vertexList, qMesh);
+	// Now, remake the quantized mesh.***
+	QuantizedSurface_._makeQuantizedMeshFromTrianglesList(trianglesList, vertexList, qMesh);
 
 	/*
     var data = {
@@ -222,20 +222,20 @@ function continueProcess(e, qMeshExcavationWorker, qMesh)
     };
     */
 
-    qMeshExcavationWorker.postMessage({result : 
+	qMeshExcavationWorker.postMessage({result: 
         {
-            uValues : qMesh.uValues, 
-            vValues : qMesh.vValues,
-			hValues : qMesh.hValues,
-			indices : qMesh.indices,
-			minHeight : qMesh.minHeight,
-			maxHeight : qMesh.maxHeight,
-			southIndices : qMesh.southIndices,
-			eastIndices : qMesh.eastIndices,
-			northIndices : qMesh.northIndices,
-			westIndices : qMesh.westIndices,
+        	uValues      : qMesh.uValues, 
+        	vValues      : qMesh.vValues,
+        	hValues      : qMesh.hValues,
+        	indices      : qMesh.indices,
+        	minHeight    : qMesh.minHeight,
+        	maxHeight    : qMesh.maxHeight,
+        	southIndices : qMesh.southIndices,
+        	eastIndices  : qMesh.eastIndices,
+        	northIndices : qMesh.northIndices,
+        	westIndices  : qMesh.westIndices,
         },
-        info: e.data.info});
+	info: e.data.info});
 };
 
 

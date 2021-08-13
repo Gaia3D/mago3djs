@@ -4,10 +4,10 @@ var worker = self;
 
 worker.onmessage = function (e) 
 {
-    var dataArrayBuffer = e.data.dataArrayBuffer;
+	var dataArrayBuffer = e.data.dataArrayBuffer;
 	var bytesReaded = 0;
-    var prefix = 'F4D_';
-    var enc = new TextDecoder("utf-8");
+	var prefix = 'F4D_';
+	var enc = new TextDecoder("utf-8");
 	
 	// parse smartTileF4d.***
 	var bytesReaded = 0;
@@ -16,14 +16,14 @@ worker.onmessage = function (e)
 
 	var buildingsCount = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 	//magoManager.emit(MagoManager.EVENT_TYPE.SMARTTILELOADSTART, {tile: this, timestamp: new Date()});
-    var buildingsArray = new Array(buildingsCount);
+	var buildingsArray = new Array(buildingsCount);
 
 	//var smartTilePathInfo = magoManager.f4dController.smartTilePathInfo;
 	for (var i=0; i<buildingsCount; i++)
 	{
-        var buildingData = {};
+		var buildingData = {};
 
-        // read projectId.************************************************************************************************************
+		// read projectId.************************************************************************************************************
 		buildingData.projectId = "";
 		var wordLength = (new Uint16Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+2)))[0]; bytesReaded += 2;
 		buildingData.projectId = enc.decode(new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+ wordLength))) ;bytesReaded += wordLength;
@@ -34,22 +34,22 @@ worker.onmessage = function (e)
 		buildingData.buildingId = enc.decode(new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+ wordLength))) ;bytesReaded += wordLength;
 		buildingData.buildingId = buildingData.buildingId.startsWith(prefix) ? buildingData.buildingId.substr(4, buildingData.buildingId.length-4) : buildingData.buildingId;
 
-        // read metaData (header).****************************************************************************************************
-        var metadataByteSize = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+		// read metaData (header).****************************************************************************************************
+		var metadataByteSize = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 		var startBuff = bytesReaded;
 		var endBuff = bytesReaded + metadataByteSize;
 		buildingData.neoBuildingHeaderData = dataArrayBuffer.slice(startBuff, endBuff);
 		bytesReaded = bytesReaded + metadataByteSize; // updating data.
 
-        // Read lodMeshes.************************************************************************************************************
-        var lodString = "lod5"; // default.
+		// Read lodMeshes.************************************************************************************************************
+		var lodString = "lod5"; // default.
 		if (smartTileType === 2)
 		{
 			// NEW. Read "LOD".*** NEW. Read "LOD".*** NEW. Read "LOD".*** NEW. Read "LOD".*** NEW. Read "LOD".***
 			var lod = (new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
 			lodString = "lod" + lod.toString();
 		}
-        buildingData.lodString = lodString;
+		buildingData.lodString = lodString;
 
 		var lodNameLength = (new Uint16Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+2)))[0]; bytesReaded += 2;
 		buildingData.lodName = enc.decode(new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+ lodNameLength))) ;bytesReaded += lodNameLength;
@@ -70,24 +70,24 @@ worker.onmessage = function (e)
 		bytesReaded = bytesReaded + byteSize * lod5ImageSize; // updating data.
 
 		// read geographicCoord.
-        buildingData.longitude = (new Float64Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+8)))[0]; bytesReaded += 8;
+		buildingData.longitude = (new Float64Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+8)))[0]; bytesReaded += 8;
 	    buildingData.latitude = (new Float64Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+8)))[0]; bytesReaded += 8;
 	    buildingData.altitude = (new Float32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 
 		// read euler angles degree.
-        buildingData.rotX = (new Float32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
-        buildingData.rotY = (new Float32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
-        buildingData.rotZ = (new Float32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+		buildingData.rotX = (new Float32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+		buildingData.rotY = (new Float32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+		buildingData.rotZ = (new Float32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 
 		// Read dataId & dataGroup.
 		buildingData.dataId = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 		buildingData.dataGroupId = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 
 		// read data_name.
-        var externInfo = {};
+		var externInfo = {};
 		var dataName;
 		var endMark = (new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
-		if(endMark > 0)
+		if (endMark > 0)
 		{
 			var dataKeyLength = (new Uint16Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+2)))[0]; bytesReaded += 2;
 			var dataKey = enc.decode(new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+ dataKeyLength))) ;bytesReaded += dataKeyLength;
@@ -163,15 +163,15 @@ worker.onmessage = function (e)
 			
 			endMark = (new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
 		}
-        buildingData.externInfo = externInfo;
-        buildingsArray[i] = buildingData;
-    }
+		buildingData.externInfo = externInfo;
+		buildingsArray[i] = buildingData;
+	}
 
-    worker.postMessage({parsedSmartTile : 
+	worker.postMessage({parsedSmartTile: 
         {
-            buildingsArray : buildingsArray, 
-            smartTileType : smartTileType
+        	buildingsArray : buildingsArray, 
+        	smartTileType  : smartTileType
         },
-        info: e.data.info});
+	info: e.data.info});
 		
-}
+};

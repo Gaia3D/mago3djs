@@ -87,13 +87,13 @@ var WindLayer = function(options)
 	if (options !== undefined)
 	{
 		// take all options.
-		if(options.geoJsonFile)
+		if (options.geoJsonFile)
 		{
 			this.windMapJson = options.geoJsonFile;
 			this.windMapJsonFileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 		}
 
-		if(options.geoJsonFileFolderPath)
+		if (options.geoJsonFileFolderPath)
 		{
 			this.windMapFolderPath = options.geoJsonFileFolderPath;
 		}
@@ -204,7 +204,7 @@ WindLayer.prototype.init = function(gl, magoManager)
 		use_linearOrLogarithmicDepth = "USE_LOGARITHMIC_DEPTH";
 	}
 	fsSource = fsSource.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
-	if(magoManager.postFxShadersManager.bUseMultiRenderTarget)
+	if (magoManager.postFxShadersManager.bUseMultiRenderTarget)
 	{
 		var use_multi_render_target = "USE_MULTI_RENDER_TARGET";
 	}
@@ -251,7 +251,7 @@ WindLayer.prototype.init = function(gl, magoManager)
 WindLayer.prototype.parseWindDataGeoJson = function(jsonData)
 {
 	// 1rst, check if json is old version (iSuSok ver).
-	if(jsonData.lat)
+	if (jsonData.lat)
 	{
 		// this is old version.
 		this.windMapJson = jsonData;
@@ -307,7 +307,7 @@ WindLayer.prototype.parseWindDataGeoJson = function(jsonData)
 	}
 
 	// Check if the json is geoJson.
-	if(jsonData.type)
+	if (jsonData.type)
 	{
 		// This is the new version geoJson.
 		this.windMapJson = jsonData;
@@ -349,7 +349,7 @@ WindLayer.prototype.parseWindDataGeoJson = function(jsonData)
 WindLayer.prototype.prepareWindLayer = function ()
 {
 	// Check if the winsMapTexture is loaded.
-	if(this.gl === undefined)
+	if (this.gl === undefined)
 	{
 		this.gl = this.windVolume.weatherStation.magoManager.getGl();
 	}
@@ -362,10 +362,10 @@ WindLayer.prototype.prepareWindLayer = function ()
 	
 	if (this.windMapTexture.fileLoadState === CODE.fileLoadState.READY)
 	{
-		if(!this.windMapFileName)
+		if (!this.windMapFileName)
 		{
 			// Find the png file name inside of the geoJson.***
-			if(!this.windMapJson)
+			if (!this.windMapJson)
 			{ return false; }
 
 			this.windMapFileName = this.windMapJson.properties.image.uri;
@@ -374,8 +374,9 @@ WindLayer.prototype.prepareWindLayer = function ()
 			//this.windMapFileName = splitted[0];
 		}
 
-		if(!this.windMapFolderPath || this.windMapFolderPath.length === 0) {
-			this.windMapFolderPath = this.windMapJson.properties.image.serviceUri.split(this.windMapFileName)[0]
+		if (!this.windMapFolderPath || this.windMapFolderPath.length === 0) 
+		{
+			this.windMapFolderPath = this.windMapJson.properties.image.serviceUri.split(this.windMapFileName)[0];
 		}
 		
 		var windMapTexturePath = this.windMapFolderPath + "/" + this.windMapFileName;// + ".png";
@@ -402,7 +403,7 @@ WindLayer.prototype.prepareWindLayer = function ()
 
 WindLayer.prototype.getGeographicExtent = function()
 {
-	if(!this.geoExtent)
+	if (!this.geoExtent)
 	{
 		// make it.
 		var minLon; 
@@ -511,7 +512,7 @@ WindLayer.prototype.getVelocityVector2d = function(pixelX, pixelY, resultPoint2d
 	if (pixelX < 0){ pixelX = 0; }
 	if (pixelY < 0){ pixelY = 0; }
 
-	if(!this.windVelocityMap)
+	if (!this.windVelocityMap)
 	{
 		var gl = magoManager.getGl();
 
@@ -523,7 +524,7 @@ WindLayer.prototype.getVelocityVector2d = function(pixelX, pixelY, resultPoint2d
 		// attach the WINDMAP texture to the framebuffer.
 		gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.windMapTexture.texId, 0);
 		var canRead = (gl.checkFramebufferStatus(gl.FRAMEBUFFER) === gl.FRAMEBUFFER_COMPLETE);
-		if(canRead)
+		if (canRead)
 		{
 			var totalPixelsCount = texWidth*texHeight;
 			this.windVelocityMap = new Uint8Array(4 * totalPixelsCount); // 1 pixels select.***
@@ -558,15 +559,15 @@ WindLayer.prototype.getVelocityVector2d = function(pixelX, pixelY, resultPoint2d
 
 WindLayer.prototype.getAltitude = function()
 {
-	if(!this.windMapJson)
-	return undefined;
+	if (!this.windMapJson)
+	{ return undefined; }
 
 	return this.windMapJson.bbox[2];
 };
 
 WindLayer.prototype.deleteObjects = function(magoManager)
 {
-	if(this.windMapTexture)
+	if (this.windMapTexture)
 	{
 		var gl = magoManager.getGl();
 		this.windMapTexture.deleteObjects(gl);
@@ -581,13 +582,13 @@ WindLayer.prototype.deleteObjects = function(magoManager)
 	this.currWindMap = undefined;
 	this.currWindMapIdx = undefined;
 	
-	if(this.geoExtent)
+	if (this.geoExtent)
 	{
 		this.geoExtent.deleteObjects();
 	}
 	this.geoExtent = undefined;
 
-	if(this.geoLocDataManager)
+	if (this.geoLocDataManager)
 	{
 		this.geoLocDataManager.deleteObjects();
 	}
@@ -596,7 +597,7 @@ WindLayer.prototype.deleteObjects = function(magoManager)
 	this.flipTexCoordsY_windMap = undefined;
 	this.externalAlpha = undefined;
 
-	if(this.windVelocityMap)
+	if (this.windVelocityMap)
 	{
 		delete this.windVelocityMap;
 	}
@@ -606,7 +607,7 @@ WindLayer.prototype.deleteObjects = function(magoManager)
 WindLayer.prototype.getVelocityVector3d = function (pixelX, pixelY, resultPoint3d, magoManager)
 {
 	// Note: to call this function MUST BE BINDED the windTexture.
-	if(this.windMapTexture.fileLoadState !== CODE.fileLoadState.BINDING_FINISHED)
+	if (this.windMapTexture.fileLoadState !== CODE.fileLoadState.BINDING_FINISHED)
 	{
 		if (resultPoint3d === undefined)
 		{ resultPoint3d = new Point3D(); }
@@ -622,7 +623,7 @@ WindLayer.prototype.getVelocityVector3d = function (pixelX, pixelY, resultPoint3
 	if (pixelX < 0){ pixelX = 0; }
 	if (pixelY < 0){ pixelY = 0; }
 
-	if(!this.windVelocityMap)
+	if (!this.windVelocityMap)
 	{
 		var gl = magoManager.getGl();
 
@@ -634,7 +635,7 @@ WindLayer.prototype.getVelocityVector3d = function (pixelX, pixelY, resultPoint3
 		// attach the WINDMAP texture to the framebuffer.
 		gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.windMapTexture.texId, 0);
 		var canRead = (gl.checkFramebufferStatus(gl.FRAMEBUFFER) === gl.FRAMEBUFFER_COMPLETE);
-		if(canRead)
+		if (canRead)
 		{
 			var totalPixelsCount = texWidth*texHeight;
 			this.windVelocityMap = new Uint8Array(4 * totalPixelsCount); // 1 pixels select.***
@@ -727,8 +728,8 @@ WindLayer.prototype.getVelocityVector2d_biLinearInterpolation = function(s, t, r
 	var vel_t = Point2D.mix(vel_tl, vel_tr, fx, undefined);
 	var vel_b = Point2D.mix(vel_bl, vel_br, fx, undefined);
 
-	if(!resultPoint2d)
-	resultPoint2d = new Point2D();
+	if (!resultPoint2d)
+	{ resultPoint2d = new Point2D(); }
 
 	resultPoint2d = Point2D.mix(vel_t, vel_b, fy, resultPoint2d);
 	
@@ -775,8 +776,8 @@ WindLayer.prototype.getVelocityVector3d_biLinearInterpolation = function (s, t, 
 	var vel_t = Point3D.mix(vel_tl, vel_tr, fx, undefined);
 	var vel_b = Point3D.mix(vel_bl, vel_br, fx, undefined);
 
-	if(!resultPoint3d)
-	resultPoint3d = new Point3D();
+	if (!resultPoint3d)
+	{ resultPoint3d = new Point3D(); }
 
 	resultPoint3d = Point3D.mix(vel_t, vel_b, fy, resultPoint3d);
 	
@@ -871,7 +872,7 @@ WindLayer.prototype.getTrajectoryInLocalCoordinates = function(startGeoCoord, ma
 		currLon += offsetXinMeters * meterToLon;
 		currLat += offsetYinMeters * meterToLat;
 
-		if(Math.abs(velocity2d.x) + Math.abs(velocity2d.y) < 0.02)
+		if (Math.abs(velocity2d.x) + Math.abs(velocity2d.y) < 0.02)
 		{
 			return resultPointsLCArray;
 		}
@@ -883,14 +884,14 @@ WindLayer.prototype.getTrajectoryInLocalCoordinates = function(startGeoCoord, ma
 
 WindLayer.prototype.getWindPlaneFBO = function(magoManager)
 {
-	if(!this.windPlaneFBO)
+	if (!this.windPlaneFBO)
 	{
 		var gl = magoManager.getGl();
 		var sceneState = magoManager.sceneState;
 		var bufferWidth = sceneState.drawingBufferWidth[0];
 		var bufferHeight = sceneState.drawingBufferHeight[0];
 		var bUseMultiRenderTarget = magoManager.postFxShadersManager.bUseMultiRenderTarget;
-		this.windPlaneFBO = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 4}); 
+		this.windPlaneFBO = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget: bUseMultiRenderTarget, numColorBuffers: 4}); 
 	}
 
 	return this.windPlaneFBO;
@@ -930,12 +931,12 @@ WindLayer.prototype.renderWindPlaneDepth = function (magoManager)
 
 
 	// Now, render the windPlane.
-	if(!this.visibleObjControler)
+	if (!this.visibleObjControler)
 	{
 		this.visibleObjControler = new VisibleObjectsController();
 	}
 
-	if(this.windDisplayPlane)
+	if (this.windDisplayPlane)
 	{ this.visibleObjControler.currentVisibleNativeObjects.opaquesArray[0] = this.windDisplayPlane; }
 
 	var renderType = 1;
@@ -958,12 +959,12 @@ WindLayer.prototype.renderWindPlaneDepth = function (magoManager)
 		extbuffers.NONE, // gl_FragData[1]
 		extbuffers.NONE, // gl_FragData[2]
 		extbuffers.NONE, // gl_FragData[3]
-		]);
+	]);
 };
 
 WindLayer.prototype.getModelViewProjectionRelToEye = function(magoManager)
 {
-	if(!this.modelViewProjectionRelToEye)
+	if (!this.modelViewProjectionRelToEye)
 	{
 		var sceneState = magoManager.sceneState;
 		var camera = sceneState.camera;
@@ -994,8 +995,8 @@ WindLayer.prototype.renderMode3D = function(magoManager)
 	if (this.windDisplayPlane === undefined)
 	{ return; }
 
-	if(magoManager.currentFrustumIdx > 2)
-	return;
+	if (magoManager.currentFrustumIdx > 2)
+	{ return; }
 
 	
 	
@@ -1211,8 +1212,8 @@ WindLayer.prototype.renderParticles = function()
 
 WindLayer.prototype.updateParticlesPositions = function(magoManager) 
 {
-	if(!this.windPlaneFBO) // the "windPlaneFBO" is created in renderMode3D.
-	return;
+	if (!this.windPlaneFBO) // the "windPlaneFBO" is created in renderMode3D.
+	{ return; }
 	
 	var gl = magoManager.getGl();
 	var layersToUpdateCount = 6;
@@ -1316,7 +1317,7 @@ WindLayer.prototype.updateParticlesPositionsForInterpolation = function(magoMana
 	gl.uniform1i(program.u_flipTexCoordY_windMap, this.flipTexCoordsY_windMap);
 	gl.uniform2fv(program.uNearFarArray_loc, magoManager.frustumVolumeControl.nearFarArray);
 
-	if(!this.flipTexCoordsY_windMap)
+	if (!this.flipTexCoordsY_windMap)
 	{
 		var hola = 0;
 	}

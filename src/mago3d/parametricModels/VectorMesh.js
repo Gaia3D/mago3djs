@@ -86,7 +86,7 @@ VectorMesh.prototype.render = function (magoManager, shader, renderType, glPrimi
 	if (this.vboKeysContainer === undefined)
 	{ return; }
 
-	if(renderType === 2)
+	if (renderType === 2)
 	{
 		var hola = 0;
 	}
@@ -114,7 +114,7 @@ VectorMesh.prototype.render = function (magoManager, shader, renderType, glPrimi
 	{ this.thickness = 2.0; }
 	
 	//gl.uniform4fv(shader.oneColor4_loc, [0.5, 0.7, 0.9, 1.0]);
-	if(renderType === 1)
+	if (renderType === 1)
 	{ gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, this.color4.a]); } 
 	gl.uniform2fv(shader.viewport_loc, [drawingBufferWidth[0], drawingBufferHeight[0]]);
 	gl.uniform1f(shader.thickness_loc, this.thickness);

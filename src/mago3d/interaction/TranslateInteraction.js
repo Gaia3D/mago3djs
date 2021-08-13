@@ -35,12 +35,12 @@ TranslateInteraction.prototype = Object.create(AbsPointerInteraction.prototype);
 TranslateInteraction.prototype.constructor = TranslateInteraction;
 
 TranslateInteraction.EVENT_TYPE = {
-	'ACTIVE'  	: 'active',
-	'DEACTIVE'	: 'deactive',
-	'MOVING_F4D' : 'movingf4d',
-	'MOVING_NATIVE' : 'movingNative',
-	'MOVING_OBJECT' : 'movingObject',
-	'MOVE_END_F4D' : 'moveEndf4d',
+	'ACTIVE'         	: 'active',
+	'DEACTIVE'       	: 'deactive',
+	'MOVING_F4D'      : 'movingf4d',
+	'MOVING_NATIVE'   : 'movingNative',
+	'MOVING_OBJECT'   : 'movingObject',
+	'MOVE_END_F4D'    : 'moveEndf4d',
 	'MOVE_END_NATIVE' : 'moveEndNative',
 	'MOVE_END_OBJECT' : 'moveEndObject'
 };
@@ -124,13 +124,16 @@ TranslateInteraction.prototype.handleDownEvent = function(browserEvent)
 	
 	if (!isEmpty(filterProvisional) && (filterProvisional.hasOwnProperty(this.targetType) || this.targetType === DataType.ALL))
 	{
-		if(this.targetType !== DataType.ALL) {
+		if (this.targetType !== DataType.ALL) 
+		{
 			this.target = filterProvisional[this.targetType][0];
 			if (this.targetType === DataType.OBJECT)
 			{
 				this.parentNode = filterProvisional[DataType.F4D][0];
 			}
-		} else {
+		}
+		else 
+		{
 			this.target = filterProvisional[Object.keys(filterProvisional)[0]][0];
 		}
 		
@@ -161,9 +164,12 @@ TranslateInteraction.prototype.handleDragEvent = function(browserEvent)
 			break;
 		}
 		case DataType.ALL : {
-			if(this.target instanceof Node) {
+			if (this.target instanceof Node) 
+			{
 				this.handleF4dDrag(browserEvent);
-			} else if(this.target instanceof MagoRenderable) {
+			}
+			else if (this.target instanceof MagoRenderable) 
+			{
 				this.handleNativeDrag(browserEvent);
 			}
 			break;
@@ -239,9 +245,9 @@ TranslateInteraction.prototype.handleF4dDrag = function (browserEvent)
 	}
 
 	this.emit(TranslateInteraction.EVENT_TYPE.MOVING_F4D, {
-		type   : TranslateInteraction.EVENT_TYPE.MOVING_F4D,
-		result : this.target,
-		timestamp: new Date()
+		type      : TranslateInteraction.EVENT_TYPE.MOVING_F4D,
+		result    : this.target,
+		timestamp : new Date()
 	});
 };
 
@@ -449,14 +455,16 @@ TranslateInteraction.prototype.handleNativeDrag = function (browserEvent)
 	{
 		geoLocationData = ManagerUtils.calculateGeoLocationData(difX, difY, undefined, undefined, undefined, undefined, geoLocationData, this);
 
-		if(object.localCoordListArray && object.geographicCoordListsArray) {
+		if (object.localCoordListArray && object.geographicCoordListsArray) 
+		{
 			var geographicCoordListsArray = [];
 			var tmat = geoLocationData.tMatrix;
-			for(var i=0,len=object.localCoordListArray.length; i<len; i++)
+			for (var i=0, len=object.localCoordListArray.length; i<len; i++)
 			{
 				var localCoordList = object.localCoordListArray[i];
 				var geographicCoordArray = [];
-				for(var j=0,localCoordListLen=localCoordList.length; j<localCoordListLen;j++) {
+				for (var j=0, localCoordListLen=localCoordList.length; j<localCoordListLen;j++) 
+				{
 					var lc = localCoordList[j];
 					var wc = tmat.transformPoint3D(lc);
 					var gc = ManagerUtils.pointToGeographicCoord(wc);
@@ -466,16 +474,16 @@ TranslateInteraction.prototype.handleNativeDrag = function (browserEvent)
 			}
 			object.geographicCoordListsArray = geographicCoordListsArray;
 		}
-		if(object.options && object.options.limitationGeographicCoords)
+		if (object.options && object.options.limitationGeographicCoords)
 		{
 			object.makeUniformPoints2dArray();
 		}
 	}
 
 	this.emit(TranslateInteraction.EVENT_TYPE.MOVING_NATIVE, {
-		type   : TranslateInteraction.EVENT_TYPE.MOVING_NATIVE,
-		result : this.target,
-		timestamp: new Date()
+		type      : TranslateInteraction.EVENT_TYPE.MOVING_NATIVE,
+		result    : this.target,
+		timestamp : new Date()
 	});
 
 	object.moved();
@@ -490,18 +498,23 @@ TranslateInteraction.prototype.handleMoveEvent = function()
 TranslateInteraction.prototype.handleUpEvent = function()
 {
 	var endEvent;
-	if(this.target instanceof Node) {
+	if (this.target instanceof Node) 
+	{
 		endEvent = TranslateInteraction.EVENT_TYPE.MOVE_END_F4D;
-	} else if(this.target instanceof MagoRenderable) {
+	}
+	else if (this.target instanceof MagoRenderable) 
+	{
 		endEvent = TranslateInteraction.EVENT_TYPE.MOVE_END_NATIVE;
-	} else {
+	}
+	else 
+	{
 		endEvent = TranslateInteraction.EVENT_TYPE.MOVE_END_OBJECT;
 	}
 
 	this.emit(endEvent, {
-		type   : endEvent,
-		result : this.target,
-		timestamp: new Date()
+		type      : endEvent,
+		result    : this.target,
+		timestamp : new Date()
 	});
 	
 	this.init();

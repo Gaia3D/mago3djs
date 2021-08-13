@@ -5,7 +5,7 @@
  * 
  * @class
  */
-var Surface = function(options)
+var Surface = function(options) 
 {
 	if (!(this instanceof Surface))
 	{
@@ -584,7 +584,8 @@ Surface.prototype.getBoundingBox = function()
 	if (this.bbox === undefined)
 	{
 		this.bbox = new BoundingBox();
-		if(!this.localVertexList) {
+		if (!this.localVertexList) 
+		{
 			this.localVertexList = new VertexList();
 			this.localVertexList.vertexArray = this.getNoRepeatedVerticesArray(this.vertexList.vertexArray);
 		}

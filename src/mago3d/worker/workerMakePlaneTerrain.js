@@ -4,22 +4,22 @@ var worker = self;
 
 worker.onmessage = function (e) 
 {
-    // WEB_MERCATOR.
+	// WEB_MERCATOR.
 	// This function makes an ellipsoidal mesh for tiles that has no elevation data.
-    var degToRadFactor = Math.PI/180.0;
-    var data = e.data;
-    var minLon = data.info.minGeographicLongitude * degToRadFactor;
+	var degToRadFactor = Math.PI/180.0;
+	var data = e.data;
+	var minLon = data.info.minGeographicLongitude * degToRadFactor;
 	var minLat = data.info.minGeographicLatitude * degToRadFactor;
 	var maxLon = data.info.maxGeographicLongitude * degToRadFactor;
 	var maxLat = data.info.maxGeographicLatitude * degToRadFactor;
 	var lonRange = maxLon - minLon;
 	var latRange = maxLat - minLat;
 
-    var lonSegments = data.info.lonSegments;
-    var latSegments = data.info.latSegments;
-    var altitude = data.info.altitude;
+	var lonSegments = data.info.lonSegments;
+	var latSegments = data.info.latSegments;
+	var altitude = data.info.altitude;
 
-    var texCorrectionFactor = data.info.texCorrectionFactor;
+	var texCorrectionFactor = data.info.texCorrectionFactor;
 	
 	var minHeight = new Float32Array([0]); 
 	var maxHeight = new Float32Array([0]);
@@ -27,7 +27,7 @@ worker.onmessage = function (e)
 	var lonRange = maxLon - minLon;
 	var latRange = maxLat - minLat;
 	var depth = data.info.z;
-    var bMakeNormals = data.info.bMakeNormals;
+	var bMakeNormals = data.info.bMakeNormals;
 	var imageryType = data.info.imageryType;
 	
 	var lonIncreDeg = lonRange/lonSegments;
@@ -65,7 +65,7 @@ worker.onmessage = function (e)
 	minT = 1.0 - minT;
 	maxT = 1.0 - maxT;
 
-    var altitudesSlice = undefined; // for future use.
+	var altitudesSlice = undefined; // for future use.
 	
 	for (var currLatSeg = 0; currLatSeg < latSegments + 1; currLatSeg++)
 	{
@@ -140,11 +140,11 @@ worker.onmessage = function (e)
 		}
 	}
 
-    // Calculate the center position.***
-    var centerX;
-    var centerY;
-    var centerZ;
-    if (depth === 0)
+	// Calculate the center position.***
+	var centerX;
+	var centerY;
+	var centerZ;
+	if (depth === 0)
 	{
 		centerX = new Float64Array([0]);
 		centerY = new Float64Array([0]);
@@ -152,13 +152,13 @@ worker.onmessage = function (e)
 	}
 	else
 	{
-        // Calculate the midGeoCoord of the tile.***
-        var centerLon = (maxLon + minLon)/2.0;
+		// Calculate the midGeoCoord of the tile.***
+		var centerLon = (maxLon + minLon)/2.0;
 		var centerLat = (maxLat + minLat)/2.0;
 		
 		var resultCartesian;
 		//resultCartesian = Globe.geographicToCartesianWgs84(centerLon, centerLat, altitude, resultCartesian);
-        resultCartesian = geographicRadianArrayToFloat32ArrayWgs84([centerLon*degToRadFactor], [centerLat*degToRadFactor], [altitude], undefined, 0, 0, 0)
+		resultCartesian = geographicRadianArrayToFloat32ArrayWgs84([centerLon*degToRadFactor], [centerLat*degToRadFactor], [altitude], undefined, 0, 0, 0);
 		
 		// Float64Array.
 		centerX = new Float64Array([resultCartesian[0]]);
@@ -172,22 +172,22 @@ worker.onmessage = function (e)
 	if (bMakeNormals)
 	{	
 		// Make normals using the cartesians.***
-        normalsArray = new Int8Array(vertexCount*3);
-        var point = new Point3D_();
-        for (var i=0; i<vertexCount; i++)
-        {
-            point.set(cartesiansArray[i*3], cartesiansArray[i*3+1], cartesiansArray[i*3+2]);
-            point.unitary();
+		normalsArray = new Int8Array(vertexCount*3);
+		var point = new Point3D_();
+		for (var i=0; i<vertexCount; i++)
+		{
+			point.set(cartesiansArray[i*3], cartesiansArray[i*3+1], cartesiansArray[i*3+2]);
+			point.unitary();
             
-            normalsArray[i*3] = point.x*126;
-            normalsArray[i*3+1] = point.y*126;
-            normalsArray[i*3+2] = point.z*126;
-        }
+			normalsArray[i*3] = point.x*126;
+			normalsArray[i*3+1] = point.y*126;
+			normalsArray[i*3+2] = point.z*126;
+		}
 	}
 
-    // After calculate normals, convert cartesian rel to center.***
+	// After calculate normals, convert cartesian rel to center.***
 	var cartesiansCount = cartesiansArray.length/3;
-	for(var i=0; i<cartesiansCount; i++)
+	for (var i=0; i<cartesiansCount; i++)
 	{
 		cartesiansArray[i*3] -= centerX[0];
 		cartesiansArray[i*3+1] -= centerY[0];
@@ -222,10 +222,10 @@ worker.onmessage = function (e)
 	var skirtResultObject = getSkirtTrianglesStrip(lonArray, latArray, altArray, texCoordsArray, southIndices, eastIndices, northIndices, westIndices, options);
 	var skirtCartesiansArray = skirtResultObject.skirtCartesiansArray;
 	var skirtTexCoordsArray = skirtResultObject.skirtTexCoordsArray;
-    var skirtAltitudesArray = skirtResultObject.skirtAltitudesArray;
+	var skirtAltitudesArray = skirtResultObject.skirtAltitudesArray;
 
 	var cartesiansCount = skirtCartesiansArray.length/3;
-	for(var i=0; i<cartesiansCount; i++)
+	for (var i=0; i<cartesiansCount; i++)
 	{
 		skirtCartesiansArray[i*3] -= centerX;
 		skirtCartesiansArray[i*3+1] -= centerY;
@@ -235,25 +235,25 @@ worker.onmessage = function (e)
 	var boundingSphereCenterX = centerX; 
 	var boundingSphereCenterY = centerY; 
 	var boundingSphereCenterZ = centerZ;
-    var boundingSphereRadius = 1000.0;
+	var boundingSphereRadius = 1000.0;
 
-    var horizonOcclusionPointX = 0; // provisionally.
+	var horizonOcclusionPointX = 0; // provisionally.
 	var horizonOcclusionPointY = 0; // provisionally.
 	var horizonOcclusionPointZ = 0; // provisionally.
 
-    var extensionId = undefined;
-    var extensionLength = 0;
+	var extensionId = undefined;
+	var extensionLength = 0;
 
-    worker.postMessage({parsedTerrain: {
-		texCoordsArray       : texCoordsArray,   
-		cartesiansArray      : cartesiansArray,
-		skirtCartesiansArray : skirtCartesiansArray,
-		skirtTexCoordsArray  : skirtTexCoordsArray, 
-		skirtAltitudesArray  : skirtAltitudesArray,
-		altArray             : altArray,
-		normalsArray         : normalsArray,
-		longitudesArray      : lonArray,
-		latitudesArray       : latArray,
+	worker.postMessage({parsedTerrain: {
+		texCoordsArray         : texCoordsArray,   
+		cartesiansArray        : cartesiansArray,
+		skirtCartesiansArray   : skirtCartesiansArray,
+		skirtTexCoordsArray    : skirtTexCoordsArray, 
+		skirtAltitudesArray    : skirtAltitudesArray,
+		altArray               : altArray,
+		normalsArray           : normalsArray,
+		longitudesArray        : lonArray,
+		latitudesArray         : latArray,
 		centerX                : centerX,   
 		centerY                : centerY,
 		centerZ                : centerZ,
@@ -307,9 +307,9 @@ function geographicRadianArrayToFloat32ArrayWgs84(lonArray, latArray, altArray, 
 		resultCartesianArray = new Float32Array(coordsCount*3);
 	}
 
-    if(!centerX) centerX = 0.0;
-    if(!centerY) centerY = 0.0;
-    if(!centerZ) centerZ = 0.0;
+	if (!centerX) { centerX = 0.0; }
+	if (!centerY) { centerY = 0.0; }
+	if (!centerZ) { centerZ = 0.0; }
 
 	for (var i=0; i<coordsCount; i++)
 	{

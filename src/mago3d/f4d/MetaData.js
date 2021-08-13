@@ -209,7 +209,7 @@ MetaData.prototype.deleteObjects = function()
 MetaData.prototype.getProjectDataType = function() 
 {
 	return this.projectDataType;
-}
+};
 
 /**
  * HeaderAsimetric.hed 파일을 불러와서 metadata 부분을 파싱.

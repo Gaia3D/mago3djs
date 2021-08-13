@@ -11,18 +11,18 @@ var LegendColorRamp = function(options)
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
     
-    options = options? options : {};
+	options = options? options : {};
 
 	this.width = options.width;
-    this.height = options.height;
-    this.position; // screenSpacePosition.***
-    this.minValue = options.minValue;
-    this.maxValue = options.maxValue;
-    this.colorRampType = options.colorRampType; // for example RGBCMY
+	this.height = options.height;
+	this.position; // screenSpacePosition.***
+	this.minValue = options.minValue;
+	this.maxValue = options.maxValue;
+	this.colorRampType = options.colorRampType; // for example RGBCMY
 
 	this.geoLocDataManager;
-    this.vboKeysContainer;
-    this.dirty = true;
+	this.vboKeysContainer;
+	this.dirty = true;
 };
 
 /**
@@ -31,16 +31,16 @@ var LegendColorRamp = function(options)
  */
 LegendColorRamp.prototype.makeMesh = function(magoManager)
 {
-    // Make a rectangle.***
-    if(!this.vboKeysContainer)
-    this.vboKeysContainer = new VBOVertexIdxCacheKeysContainer();
+	// Make a rectangle.***
+	if (!this.vboKeysContainer)
+	{ this.vboKeysContainer = new VBOVertexIdxCacheKeysContainer(); }
 
-    var posDataArray = new Float32Array([0, 0,   this.width, 0,   0, this.height,   0, this.height,   this.width, 0,   this.width, this.height]);
+	var posDataArray = new Float32Array([0, 0,   this.width, 0,   0, this.height,   0, this.height,   this.width, 0,   this.width, this.height]);
 	var vboCacheKey = this.vboKeysContainer.newVBOVertexIdxCacheKey();
 	var dimensions = 2;
-    vboCacheKey.setDataArrayPos(posDataArray, vboMemManager, dimensions);
+	vboCacheKey.setDataArrayPos(posDataArray, vboMemManager, dimensions);
     
-    this.dirty = false;
+	this.dirty = false;
 };
 
 /**
@@ -49,10 +49,10 @@ LegendColorRamp.prototype.makeMesh = function(magoManager)
  */
 LegendColorRamp.prototype.render = function(magoManager)
 {
-    if(this.dirty)
-    this.makeMesh(magoManager);
+	if (this.dirty)
+	{ this.makeMesh(magoManager); }
 
-    var shader = magoManager.postFxShadersManager.getShader("modelRefDepth"); 
+	var shader = magoManager.postFxShadersManager.getShader("modelRefDepth"); 
 
 };
 

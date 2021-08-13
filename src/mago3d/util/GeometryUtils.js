@@ -127,15 +127,15 @@ GeometryUtils.getIndicesTrianglesRegularNet = function(numCols, numRows, resultI
 		if (options.bTrianglesSenseCCW !== undefined)
 		{ bTrianglesSenseCCW = options.bTrianglesSenseCCW; }
 
-		if(options.indicesByteSize)
+		if (options.indicesByteSize)
 		{ indicesByteSize = options.indicesByteSize; }
 	}
 
 	if (resultIndicesArray === undefined)
 	{ 
-		if(indicesByteSize === 2)
+		if (indicesByteSize === 2)
 		{ resultIndicesArray = new Uint16Array(trianglesCount * 3); }
-		else if(indicesByteSize === 4)
+		else if (indicesByteSize === 4)
 		{ resultIndicesArray = new Uint32Array(trianglesCount * 3); }
 	}
 	
@@ -196,9 +196,9 @@ GeometryUtils.getIndicesTrianglesRegularNet = function(numCols, numRows, resultI
 		if (!resultSouthIndices)
 		{ 
 			//resultSouthIndices = new Uint16Array(numCols); // original.***
-			if(indicesByteSize === 2)
+			if (indicesByteSize === 2)
 			{ resultSouthIndices = new Uint16Array(numCols); }
-			else if(indicesByteSize === 4)
+			else if (indicesByteSize === 4)
 			{ resultSouthIndices = new Uint32Array(numCols); }
 		}
 		
@@ -214,9 +214,9 @@ GeometryUtils.getIndicesTrianglesRegularNet = function(numCols, numRows, resultI
 		if (!resultEastIndices)
 		{ 
 			//resultEastIndices = new Uint16Array(numRows); 
-			if(indicesByteSize === 2)
+			if (indicesByteSize === 2)
 			{ resultEastIndices = new Uint16Array(numRows); }
-			else if(indicesByteSize === 4)
+			else if (indicesByteSize === 4)
 			{ resultEastIndices = new Uint32Array(numRows); }
 		}
 		
@@ -232,9 +232,9 @@ GeometryUtils.getIndicesTrianglesRegularNet = function(numCols, numRows, resultI
 		if (!resultNorthIndices)
 		{ 
 			//resultNorthIndices = new Uint16Array(numCols);
-			if(indicesByteSize === 2)
+			if (indicesByteSize === 2)
 			{ resultNorthIndices = new Uint16Array(numCols); }
-			else if(indicesByteSize === 4)
+			else if (indicesByteSize === 4)
 			{ resultNorthIndices = new Uint32Array(numCols); } 
 		}
 		
@@ -252,9 +252,9 @@ GeometryUtils.getIndicesTrianglesRegularNet = function(numCols, numRows, resultI
 		if (!resultWestIndices)
 		{ 
 			//resultWestIndices = new Uint16Array(numRows);
-			if(indicesByteSize === 2)
+			if (indicesByteSize === 2)
 			{ resultWestIndices = new Uint16Array(numRows); }
-			else if(indicesByteSize === 4)
+			else if (indicesByteSize === 4)
 			{ resultWestIndices = new Uint32Array(numRows); }  
 		}
 		

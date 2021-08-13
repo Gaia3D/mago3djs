@@ -80,6 +80,16 @@ Triangle_.prototype.getCrossProduct = function(idxVertex, resultCrossProduct)
 	return resultCrossProduct;
 };
 
+Triangle_.prototype.assignVerticesIdx = function() 
+{
+	if (this.vertex0 === undefined || this.vertex1 === undefined || this.vertex2 === undefined)
+	{ return; }
+	
+	this.vtxIdx0 = this.vertex0.getIdxInList();
+	this.vtxIdx1 = this.vertex1.getIdxInList();
+	this.vtxIdx2 = this.vertex2.getIdxInList();
+};
+
 Triangle_.prototype.hasVertex = function(vertex) 
 {
 	// this function returns true if "vertex" is the same vertex of the triangle.

@@ -20,6 +20,27 @@ var Point3D_ = function(x, y, z)
 	this.pointType; // 1 = important point.
 };
 
+Point3D_.add = function(left, right) 
+{
+	var x = left.x + right.x;
+	var y = left.y + right.y;
+	var z = left.z + right.z;
+	
+	return new Point3D_(x, y, z);
+};
+
+Point3D_.prototype.copyFrom = function(point3d) 
+{
+	this.x = point3d.x;
+	this.y = point3d.y;
+	this.z = point3d.z;
+};
+
+Point3D_.prototype.add = function(x, y, z) 
+{
+	this.x += x; this.y += y; this.z += z;
+};
+
 Point3D_.prototype.set = function(x, y, z) 
 {
 	this.x = x; this.y = y; this.z = z;
@@ -48,6 +69,27 @@ Point3D_.prototype.getVectorToPoint = function(targetPoint, resultVector)
 	resultVector.set(targetPoint.x - this.x, targetPoint.y - this.y, targetPoint.z - this.z);
 	
 	return resultVector;
+};
+
+Point3D_.prototype.scalarProduct = function(point) 
+{
+	var scalarProd = this.x*point.x + this.y*point.y + this.z*point.z;
+	return scalarProd;
+};
+
+Point3D_.prototype.isNAN = function() 
+{
+	if (isNaN(this.x) || isNaN(this.y) || isNaN(this.z) )
+	{ return true; }
+	else
+	{ return false; }
+};
+
+Point3D_.prototype.deleteObjects = function() 
+{
+	this.x = undefined;
+	this.y = undefined;
+	this.z = undefined;
 };
 
 Point3D_.prototype.unitary = function() 

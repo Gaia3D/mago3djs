@@ -94,7 +94,7 @@ SunSystem.prototype._getDaysCountFrom22December = function()
 	var daysCountFrom22December = 0.0;
 	var lastYear;
 
-	if(currMonth === 12 && currDay >= 22)
+	if (currMonth === 12 && currDay >= 22)
 	{
 		lastYear = currYear;
 	}
@@ -241,17 +241,17 @@ SunSystem.prototype.getDayNightLightingFactorOfPosition = function(posWC)
 	var maxVal = 0.2;
 	var t = (lightFactor - minVal)/(maxVal-minVal);
 	// clamp = min(max(x, minVal), maxVal).
-	if(t<0.0)
-	t = 0.0;
-	if(t>1.0)
-	t = 1.0;
+	if (t<0.0)
+	{ t = 0.0; }
+	if (t>1.0)
+	{ t = 1.0; }
 	var t2 = t*t*(3.0 - 2*t);
 	// End smoothStep.-----------------------------------
 
 	lightFactor = t2;
 
-	if(lightFactor < 0.15)
-	lightFactor = 0.15;
+	if (lightFactor < 0.15)
+	{ lightFactor = 0.15; }
 
 	return lightFactor;
 };
@@ -421,7 +421,7 @@ SunSystem.prototype.calculateSunGeographicCoords = function()
 SunSystem.prototype.updateSun = function(magoManager, options) 
 {
 	var date = this.getDate();
-	if(this.lastUpdateTime !== date.getTime())
+	if (this.lastUpdateTime !== date.getTime())
 	{
 		this.calculateSunGeographicCoords(); 
 
@@ -487,7 +487,7 @@ SunSystem.prototype.updateSun = function(magoManager, options)
 	var dist0 = minDist + distRange0;
 	if (dist0 < 1.0){ dist0 = 1.0; }
 
-	if(dist0 > camTargetDist)
+	if (dist0 > camTargetDist)
 	{
 		dist0 = camTargetDist;
 	}

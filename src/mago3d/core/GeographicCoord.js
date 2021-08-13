@@ -285,22 +285,22 @@ GeographicCoord.getMidPoint = function(geographicCoordA, geographicCoordB, resul
  */
 GeographicCoord.prototype.isCoincidentToGeoCoord = function(geographicCoord, error, errorForAltitude) 
 {
-	if(!error)
-	error = 1E-8;
+	if (!error)
+	{ error = 1E-8; }
 
-	if(!errorForAltitude)
-	errorForAltitude = 1E-6;
+	if (!errorForAltitude)
+	{ errorForAltitude = 1E-6; }
 
-	if(Math.abs(this.longitude - geographicCoord.longitude) > error)
-	return false;
+	if (Math.abs(this.longitude - geographicCoord.longitude) > error)
+	{ return false; }
 
-	if(Math.abs(this.latitude - geographicCoord.latitude) > error)
-	return false;
+	if (Math.abs(this.latitude - geographicCoord.latitude) > error)
+	{ return false; }
 
-	if(this.altitude && geographicCoord.altitude)
+	if (this.altitude && geographicCoord.altitude)
 	{
-		if(Math.abs(this.altitude - geographicCoord.altitude) > errorForAltitude)
-		return false;
+		if (Math.abs(this.altitude - geographicCoord.altitude) > errorForAltitude)
+		{ return false; }
 	}
 
 	return true;

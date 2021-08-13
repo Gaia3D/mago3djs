@@ -50,21 +50,24 @@ PointSelectInteraction.prototype.init = function()
 	this.endPoint = undefined;
 };
 
-PointSelectInteraction.prototype._initFilter = function() {
+PointSelectInteraction.prototype._initFilter = function() 
+{
 	this.filter = {};
 
-	for(var type in DataType) {
-		if(DataType.hasOwnProperty(type))
+	for (var type in DataType) 
+	{
+		if (DataType.hasOwnProperty(type))
 		{
 			var dataType = DataType[type];
 
-			if( dataType !== DataType.ALL 
-				&& typeof dataType !== 'function') {
+			if ( dataType !== DataType.ALL 
+				&& typeof dataType !== 'function') 
+			{
 				this.filter[dataType] = TRUE;
 			}
 		}
 	}
-}
+};
 /**
  * set TargetType
  * @param {boolean} type 
@@ -77,7 +80,7 @@ PointSelectInteraction.prototype.setTargetType = function (type)
 		this.init();
 		this.selected = undefined;
 		this.manager.isCameraMoved = true;
-		if(this.manager.selectionManager) this.manager.selectionManager.clearCurrents();
+		if (this.manager.selectionManager) { this.manager.selectionManager.clearCurrents(); }
 		this._initFilter();
 	}
 	this.targetType = type;
@@ -99,11 +102,12 @@ PointSelectInteraction.prototype.getTargetType = function()
  */
 PointSelectInteraction.prototype.setFilter = function(dataType, filterFunction)
 {
-	if(!dataType || !DataType.hasOwnProperty(DataType.getKey(dataType))) {
+	if (!dataType || !DataType.hasOwnProperty(DataType.getKey(dataType))) 
+	{
 		throw new Error('dataType is required.'); 
 	}
 
-	if(!filterFunction || typeof filterFunction !== 'function') filterFunction = TRUE;
+	if (!filterFunction || typeof filterFunction !== 'function') { filterFunction = TRUE; }
 
 	this.filter[dataType] = filterFunction;
 };
@@ -127,7 +131,7 @@ PointSelectInteraction.prototype.setTargetHighlight = function(highlight)
 	if (!highlight)
 	{
 		this.init();
-		if(this.manager.selectionManager) this.manager.selectionManager.clearCurrents();
+		if (this.manager.selectionManager) { this.manager.selectionManager.clearCurrents(); }
 	}
 	this.targetHighlight = highlight;
 };
@@ -201,11 +205,12 @@ PointSelectInteraction.prototype.emitEvent = function (selectedObj, selected, sc
 		var type = PointSelectInteraction.getEventType(this.targetType, selected, selectedObj);
 		var eventObj = {
 			type      : type,
-			pixel : screenCoord,
+			pixel     : screenCoord,
 			timestamp : new Date()
 		};
 		selected ? eventObj.selected = selectedObj : eventObj.deselected = selectedObj;
-		if(this.targetType === DataType.OBJECT) {
+		if (this.targetType === DataType.OBJECT) 
+		{
 			eventObj.f4d = this.manager.selectionManager.getSelectedF4dNode();
 		}
 		
@@ -265,10 +270,13 @@ PointSelectInteraction.prototype.select = function (screenCoordinate)
 	var gl = manager.getGl();
 	selectManager.selectProvisionalObjectByPixel(gl, screenCoordinate.x, screenCoordinate.y);
 
-	if(this.targetType === DataType.ALL) {
+	if (this.targetType === DataType.ALL) 
+	{
 		selectManager.provisionalToCurrent(DataType.F4D, this.filter[DataType.F4D]);
 		selectManager.provisionalToCurrent(DataType.NATIVE, this.filter[DataType.NATIVE], true);
-	} else {
+	}
+	else 
+	{
 		selectManager.provisionalToCurrent(this.targetType, this.filter[this.targetType]);
 	}
 };
@@ -279,11 +287,12 @@ PointSelectInteraction.prototype.select = function (screenCoordinate)
  */
 PointSelectInteraction.prototype.clear = function(silence)
 {
-	if(!silence) {
+	if (!silence) 
+	{
 		this.emitEvent(this.selected, false);
 	}
 	
-	if(this.manager.selectionManager) this.manager.selectionManager.clearCurrents();
+	if (this.manager.selectionManager) { this.manager.selectionManager.clearCurrents(); }
 	this.init();
 	this.selected = undefined;
 };

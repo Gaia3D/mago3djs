@@ -194,24 +194,29 @@ FrustumVolumeControl.prototype.getAllVisiblesObjectArrays = function()
  * @param {*} type 
  * @param {*} filter 
  */
-FrustumVolumeControl.prototype.selectionByPolygon2D = function(polygon2D, type, filter) {
+FrustumVolumeControl.prototype.selectionByPolygon2D = function(polygon2D, type, filter) 
+{
 	var allVisible = this.getAllVisiblesObject();
 	
 	var result = [];
 	var dataMap = (type === DataType.F4D) ? allVisible.nodeMap : allVisible.nativeMap;
 
-	for(var k in dataMap) {
-		if(dataMap.hasOwnProperty(k)) {
+	for (var k in dataMap) 
+	{
+		if (dataMap.hasOwnProperty(k)) 
+		{
 			var data = dataMap[k];
-			if(filter && typeof filter === 'function') {
-				if(filter.call(this, data)) continue;
+			if (filter && typeof filter === 'function') 
+			{
+				if (filter.call(this, data)) { continue; }
 			}
 
-			if(data.intersectionWithPolygon2D(polygon2D)) {
+			if (data.intersectionWithPolygon2D(polygon2D)) 
+			{
 				result.push(data);
 			}
 		}
 	}
 
 	return result;
-}
+};

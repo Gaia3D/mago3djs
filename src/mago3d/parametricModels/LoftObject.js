@@ -12,10 +12,11 @@ var LoftObject = function(geographicCoordList, height, options)
 	if (!(this instanceof LoftObject)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
-    }
+	}
     
-    if(!geographicCoordList) {
-        throw new Error(Messages.REQUIRED_EMPTY_ERROR('geographicCoordList'));
+	if (!geographicCoordList) 
+	{
+		throw new Error(Messages.REQUIRED_EMPTY_ERROR('geographicCoordList'));
 	}
 
 

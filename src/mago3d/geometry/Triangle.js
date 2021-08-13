@@ -167,7 +167,7 @@ Triangle.prototype.getIndicesArray = function(indicesArray)
 Triangle.prototype.hasVertex = function(vertex) 
 {
 	// this function returns true if "vertex" is the same vertex of the triangle.
-	if(this.vertex0 === vertex || this.vertex1 === vertex || this.vertex2 === vertex)
+	if (this.vertex0 === vertex || this.vertex1 === vertex || this.vertex2 === vertex)
 	{
 		return true;
 	}
@@ -246,12 +246,12 @@ Triangle.prototype.getIntersectionByPlaneReport = function(plane, resultIntersec
 	var bbox = this.getBoundingBox();
 	var bSphere = bbox.getBoundingSphere();
 
-	if(plane.intersectionSphere(bSphere) !== Constant.INTERSECTION_INTERSECT)
+	if (plane.intersectionSphere(bSphere) !== Constant.INTERSECTION_INTERSECT)
 	{
 		return resultIntersectionReportsArray;
 	}
 
-	if(error === undefined)
+	if (error === undefined)
 	{ error = 1e-8; }
 
 	// Now, for each edge, intersect with plane.
@@ -270,85 +270,85 @@ Triangle.prototype.getIntersectionByPlaneReport = function(plane, resultIntersec
 	var seg0 = this.getSegment(0);
 	var relPosSeg0ToPlane = plane.getRelativePositionOfTheSegment(seg0, error);
 
-	if(relPosSeg0ToPlane === CODE.relativePositionSegment3DWithPlane2D.INTERSECTION)
+	if (relPosSeg0ToPlane === CODE.relativePositionSegment3DWithPlane2D.INTERSECTION)
 	{
 		// calculate the intersection point.
 		var line = seg0.getLine();
 		var intersectPoint = plane.intersectionLine(line, undefined);
 		// Now, must check if the "intersectPoint" is inside of the segment.
-		if(seg0.intersectionWithPoint(intersectPoint, error))
+		if (seg0.intersectionWithPoint(intersectPoint, error))
 		{
 			intersectedPointsArray.push({
 				intersectionType : "segmentIntersection",
-				idx : 0,
-				intesectPoint : intersectPoint});
+				idx              : 0,
+				intesectPoint    : intersectPoint});
 		}
 	}
-	else if(relPosSeg0ToPlane === CODE.relativePositionSegment3DWithPlane2D.START_POINT_COINCIDENT)
+	else if (relPosSeg0ToPlane === CODE.relativePositionSegment3DWithPlane2D.START_POINT_COINCIDENT)
 	{
 		var startPoint = seg0.startPoint3d;
 		intersectedPointsArray.push({
 			intersectionType : "startPointIntersection",
-			idx : 0,
-			intesectPoint : startPoint});
+			idx              : 0,
+			intesectPoint    : startPoint});
 	}
 
 	// Segment 1.*********************************************************************
 	var seg1 = this.getSegment(1);
 	var relPosSeg1ToPlane = plane.getRelativePositionOfTheSegment(seg1, error);
 
-	if(relPosSeg1ToPlane === CODE.relativePositionSegment3DWithPlane2D.INTERSECTION)
+	if (relPosSeg1ToPlane === CODE.relativePositionSegment3DWithPlane2D.INTERSECTION)
 	{
 		// calculate the intersection point.
 		var line = seg1.getLine();
 		var intersectPoint = plane.intersectionLine(line, undefined);
-		if(seg1.intersectionWithPoint(intersectPoint, error))
+		if (seg1.intersectionWithPoint(intersectPoint, error))
 		{
 			intersectedPointsArray.push({
 				intersectionType : "segmentIntersection",
-				idx : 1,
-				intesectPoint : intersectPoint});
+				idx              : 1,
+				intesectPoint    : intersectPoint});
 		}
 	}
-	else if(relPosSeg1ToPlane === CODE.relativePositionSegment3DWithPlane2D.START_POINT_COINCIDENT)
+	else if (relPosSeg1ToPlane === CODE.relativePositionSegment3DWithPlane2D.START_POINT_COINCIDENT)
 	{
 		var startPoint = seg1.startPoint3d;
 		intersectedPointsArray.push({
 			intersectionType : "startPointIntersection",
-			idx : 1,
-			intesectPoint : startPoint});
+			idx              : 1,
+			intesectPoint    : startPoint});
 	}
 
-	if(intersectedPointsArray.length < 2)
+	if (intersectedPointsArray.length < 2)
 	{
 		// Segment 2.*********************************************************************
 		var seg2 = this.getSegment(2);
 		var relPosSeg2ToPlane = plane.getRelativePositionOfTheSegment(seg2, error);
 
-		if(relPosSeg2ToPlane === CODE.relativePositionSegment3DWithPlane2D.INTERSECTION)
+		if (relPosSeg2ToPlane === CODE.relativePositionSegment3DWithPlane2D.INTERSECTION)
 		{
 			// calculate the intersection point.
 			var line = seg2.getLine();
 			var intersectPoint = plane.intersectionLine(line, undefined);
-			if(seg2.intersectionWithPoint(intersectPoint, error))
+			if (seg2.intersectionWithPoint(intersectPoint, error))
 			{
 				intersectedPointsArray.push({
 					intersectionType : "segmentIntersection",
-					idx : 2,
-					intesectPoint : intersectPoint});
+					idx              : 2,
+					intesectPoint    : intersectPoint});
 			}
 		}
-		else if(relPosSeg2ToPlane === CODE.relativePositionSegment3DWithPlane2D.START_POINT_COINCIDENT)
+		else if (relPosSeg2ToPlane === CODE.relativePositionSegment3DWithPlane2D.START_POINT_COINCIDENT)
 		{
 			var startPoint = seg2.startPoint3d;
 			intersectedPointsArray.push({
 				intersectionType : "startPointIntersection",
-				idx : 2,
-				intesectPoint : startPoint});
+				idx              : 2,
+				intesectPoint    : startPoint});
 		}
 	}
 	
-	if(!resultIntersectionReportsArray)
+	if (!resultIntersectionReportsArray)
 	{
 		resultIntersectionReportsArray = [];
 	}
@@ -436,7 +436,7 @@ Triangle.prototype.getPlane = function(resultPlane)
 
 Triangle.prototype.getCenterPoint = function(resultCenterPoint) 
 {
-	if(!resultCenterPoint)
+	if (!resultCenterPoint)
 	{
 		resultCenterPoint = new Point3D();
 	}

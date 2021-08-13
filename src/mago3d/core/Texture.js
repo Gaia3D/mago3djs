@@ -111,13 +111,15 @@ Texture.prototype.deleteObjects = function(gl)
  * @param width the width of the texture image
  * @param height the height of the texture image
  */
- Texture.resetTexture = function(texture, gl, filter, texWrap, width, height) 
- {
-	if(filter === undefined) {
+Texture.resetTexture = function(texture, gl, filter, texWrap, width, height) 
+{
+	if (filter === undefined) 
+	{
 		filter = gl.LINEAR;
 	}
 
-	if(texWrap === undefined) {
+	if (texWrap === undefined) 
+	{
 		texWrap = gl.CLAMP_TO_EDGE;
 	}
 
@@ -129,7 +131,7 @@ Texture.prototype.deleteObjects = function(gl)
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filter);
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
 	gl.bindTexture(gl.TEXTURE_2D, null);
- };
+};
 
 /**
  * Create the instance of texture
@@ -143,17 +145,17 @@ Texture.createTexture = function(gl, filter, data, width, height, texWrap)
 {
 	// static function.
 	// example of filter: gl.NEAREST
-	if(!texWrap)
+	if (!texWrap)
 	{
 		texWrap = gl.CLAMP_TO_EDGE;
 	}
 
-	if(!filter)
+	if (!filter)
 	{
 		filter = gl.NEAREST;
 	}
 
-	if(data === undefined)
+	if (data === undefined)
 	{
 		data = null;
 	}

@@ -25,7 +25,7 @@ SpeechBubble.prototype.makeDefault = function(imageSize)
 	//                        |<------------ width -------------->|
 	//                        |                                   |
 	//
-    //                          [6]                          [5]                                
+	//                          [6]                          [5]                                
 	//                            *---------------------------*                   --------       --------
 	//                          /                               \                      ^              ^
 	//                         /                                 \                     |              |
@@ -117,7 +117,7 @@ SpeechBubble.getImage = function(options, magoManager)
  */
 SpeechBubble.getTextAreaSize = function (text, ctx)
 {
-	if(!text || !ctx)
+	if (!text || !ctx)
 	{ return false; }
 
 	// The text can have one or more lines.
@@ -133,10 +133,10 @@ SpeechBubble.getTextAreaSize = function (text, ctx)
 		if (tVal.length > 0)
 		{
 			var mt = ctx.measureText(tVal);
-			if(!fontHeight)
+			if (!fontHeight)
 			{ fontHeight = (mt.fontBoundingBoxAscent + mt.fontBoundingBoxDescent); }
 
-			if(mt.width > textAreaWidth)
+			if (mt.width > textAreaWidth)
 			{
 				textAreaWidth = mt.width;
 			}
@@ -194,13 +194,13 @@ SpeechBubble.prototype.getPng = function (imageSize, color, textOption)
 	var textAreaSize = SpeechBubble.getTextAreaSize(textValue, ctx);
 
 	// Check the imageSize.
-	if(imageSize[0] < textAreaSize[0])
+	if (imageSize[0] < textAreaSize[0])
 	{
 		imageSize[0] = textAreaSize[0] * 1.15;
 	}
 
 	var realImageHeight = textAreaSize[1]/this.bubbleHeightRatio;
-	if(imageSize[1] < realImageHeight)
+	if (imageSize[1] < realImageHeight)
 	{
 		imageSize[1] = realImageHeight;
 	}
@@ -212,7 +212,7 @@ SpeechBubble.prototype.getPng = function (imageSize, color, textOption)
 
 	function makeCanvas(size, bubbleHeightRatio, hex, tOption, p2dArray)
 	{
-		if(!c)
+		if (!c)
 		{ c = document.createElement("canvas"); }
 
 		var w = size[0];

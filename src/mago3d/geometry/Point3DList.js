@@ -323,11 +323,11 @@ Point3DList.prototype.getBisectionPlane = function(idx, resultBisectionPlane, bL
  */
 Point3DList.getBoundingBoxOfPoints3DArray = function(point3dArray, resultBBox)
 {
-	if(!point3dArray || point3dArray.length === 0)
-	return resultBBox;
+	if (!point3dArray || point3dArray.length === 0)
+	{ return resultBBox; }
 
-	if(!resultBBox)
-	resultBBox = new BoundingBox();
+	if (!resultBBox)
+	{ resultBBox = new BoundingBox(); }
 
 	resultBBox.addPointsArray(point3dArray);
 	return resultBBox;
@@ -673,7 +673,7 @@ Point3DList.getRenderableObjectOfPoints3DArray = function(points3dLCArray, magoM
 	{ options.thickness = 2.0; }
 
 	if (options.color === undefined)
-		{ options.color = new Color(1.0, 0.3, 0.3, 1.0); }
+	{ options.color = new Color(1.0, 0.3, 0.3, 1.0); }
 
 	var vectorMesh = new VectorMesh(options);
 	
@@ -713,7 +713,7 @@ Point3DList.getThickLinesPositionDataArray = function(point3dArray, resultPosVbo
 	var pointDimension = 4;
 	var posByteSize = pointsCount * pointDimension * repeats;
 
-	if(!resultPosVboDataArray || resultPosVboDataArray.length < posByteSize)
+	if (!resultPosVboDataArray || resultPosVboDataArray.length < posByteSize)
 	{
 		resultPosVboDataArray = new Float32Array(posByteSize);
 	}
@@ -722,13 +722,13 @@ Point3DList.getThickLinesPositionDataArray = function(point3dArray, resultPosVbo
 	var startIdx = 0;
 	var endIdx = pointsCount;
 
-	if(options)
+	if (options)
 	{
 		// startIdx & endIdx exists for updatingData for modified curves.
-		if(options.startIdx)
+		if (options.startIdx)
 		{ startIdx = options.startIdx; }
 
-		if(options.endIdx)
+		if (options.endIdx)
 		{ endIdx = options.endIdx; }
 	}
 
@@ -806,7 +806,7 @@ Point3DList.getVboThickLines = function(magoManager, point3dArray, resultVboKeys
 	}
 
 	// Check if exist colorsArray.***
-	if(options.colorsArray)
+	if (options.colorsArray)
 	{
 		var colArray = options.colorsArray;
 		// use colorsArray.***
@@ -821,7 +821,7 @@ Point3DList.getVboThickLines = function(magoManager, point3dArray, resultVboKeys
 			//currColor4 = Color.mix(strColor4, endColor4, w);
 			currColor4 = colArray[i];
 
-			if(!currColor4)
+			if (!currColor4)
 			{
 				var hola = 0;
 			}

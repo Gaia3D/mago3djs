@@ -32,7 +32,8 @@ var loadWithXhr = function (url, xhr, timeOut, responseType, method)
 			xhr.open(method, url, true);
 			xhr.responseType = responseType ? responseType : 'arraybuffer';
 
-			if (url.endsWith('.geojson') || url.endsWith('layer.json')) {
+			if (url.endsWith('.geojson') || url.endsWith('layer.json')) 
+			{
 				xhr.overrideMimeType("application/json");
 				  //xhr.setRequestHeader("Accept-Encoding", "gzip");
 			}

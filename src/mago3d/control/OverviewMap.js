@@ -43,7 +43,7 @@ OverviewMap.prototype.setControl = function(magoManager)
 {
 	this.magoManager = magoManager;
 
-	if(!this.magoManager.scene)
+	if (!this.magoManager.scene)
 	{
 		return;
 	}
@@ -57,41 +57,48 @@ OverviewMap.prototype.setControl = function(magoManager)
 	});
 
 	var imageryLayers = this.magoManager.scene.globe.imageryLayers;
-	var baseLayerIndex = imageryLayers._layers.findIndex(function(l){return l.isBaseLayer()});
+	var baseLayerIndex = imageryLayers._layers.findIndex(function(l){ return l.isBaseLayer(); });
 	var baseLayer = imageryLayers.get(baseLayerIndex);
 	var provider = baseLayer.imageryProvider;
 
 	var source;
 	var minZoom = 0;
-	if(provider instanceof Cesium.WebMapServiceImageryProvider) {
+	if (provider instanceof Cesium.WebMapServiceImageryProvider) 
+	{
 		var resource = provider._resource;
 		//var queryParam = JSON.parse(JSON.stringify(resource.queryParameters));
 		var queryParam = {};
-		queryParam['TILED'] = true;
-		for(var key in resource.queryParameters) {
-			if(key !== 'bbox' && key !== 'height' && key !== 'width') {
+		queryParam.TILED = true;
+		for (var key in resource.queryParameters) 
+		{
+			if (key !== 'bbox' && key !== 'height' && key !== 'width') 
+			{
 				queryParam[key.toUpperCase()] = resource.queryParameters[key]; 
 			}
 		}
 
 		source = new OlMago3d.source.TileWMS({
-			url : provider.url,
+			url        : provider.url,
 			serverType : 'geoserver',
-			params : queryParam
+			params     : queryParam
 		});
 		minZoom = 1;
-	} else if(provider instanceof Cesium.ArcGisMapServerImageryProvider) {
+	}
+	else if (provider instanceof Cesium.ArcGisMapServerImageryProvider) 
+	{
 		source = new OlMago3d.source.XYZ({
-			url : 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+			url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
 		});
-	} else if(provider instanceof Cesium.UrlTemplateImageryProvider) {
+	}
+	else if (provider instanceof Cesium.UrlTemplateImageryProvider) 
+	{
 		source = new OlMago3d.source.XYZ({
-			url : provider.url
+			url: provider.url
 		});
 	}
     
 	var tilelayer = new OlMago3d.layer.TileLayer({
-		source: source,
+		source  : source,
 		minZoom : minZoom
 	});
     

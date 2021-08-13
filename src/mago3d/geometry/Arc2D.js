@@ -152,7 +152,7 @@ Arc2D.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 		strVector.set(this.startPoint.x - this.centerPoint.x, this.startPoint.y - this.centerPoint.y);
 
 		// calculate angle with xAxis.
-		var xAxis = new Point3D(1,0);
+		var xAxis = new Point3D(1, 0);
 		var angRad = strVector.angleRadToVector(xAxis);
 		strVectorModul = strVector.getModul();
 		
@@ -194,7 +194,7 @@ Arc2D.prototype.getPoints = function(resultPointsArray, pointsCountFor360Deg)
 		endVector = new Point2D();
 		endVector.set(this.endPoint.x - this.centerPoint.x, this.endPoint.y - this.endPoint.y);
 
-		var xAxis = new Point3D(1,0);
+		var xAxis = new Point3D(1, 0);
 		var angRad = endVector.angleRadToVector(xAxis);
 
 		if (this.endPoint.y < 0)

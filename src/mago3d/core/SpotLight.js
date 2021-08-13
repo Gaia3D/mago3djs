@@ -46,21 +46,22 @@ var SpotLight = function(options)
 	
 	this.options = options ? options : {};
 
-	if(this.options.localWC) {
+	if (this.options.localWC) 
+	{
 		this.localWC = this.options.localWC;
 	}
 
-	if(this.options.hotspotDeg)
-	this.hotspotDeg = this.options.hotspotDeg;
+	if (this.options.hotspotDeg)
+	{ this.hotspotDeg = this.options.hotspotDeg; }
 
-	if(this.options.falloffDeg)
-	this.falloffDeg = this.options.falloffDeg;
+	if (this.options.falloffDeg)
+	{ this.falloffDeg = this.options.falloffDeg; }
 
-	if(this.options.hotDistance)
-	this.hotDistance = this.options.hotDistance;
+	if (this.options.hotDistance)
+	{ this.hotDistance = this.options.hotDistance; }
 
-	if(this.options.falloffDistance)
-	this.falloffDistance = this.options.falloffDistance;
+	if (this.options.falloffDistance)
+	{ this.falloffDistance = this.options.falloffDistance; }
 	
 	//this.attributes.heightReference = HeightReference.CLAMP_TO_GROUND;
 	this.setObjectType(MagoRenderable.OBJECT_TYPE.LIGHTSOURCE);
@@ -74,7 +75,7 @@ SpotLight.prototype.constructor = SpotLight;
  */
 SpotLight.prototype.setColorRGB = function(red, green, blue)
 {
-	if(!this.color)
+	if (!this.color)
 	{
 		this.color = new Color(1.0, 1.0, 1.0, 1.0);
 	}
@@ -103,9 +104,9 @@ SpotLight.prototype.makeMesh = function()
 	var height = this.falloffDistance * Math.cos(angRad) * 0.98;
 	var color = new Mago3D.Color(0.95, 0.95, 0.95, 0.4);
 	var options = {
-			baseType : 2, // 0= NONE. 1= PLANE. 2= SPHERICAL.
-			color : color,
-			originType : 1 // 0= ATBASE, 1= ATVERTEX
+		baseType   : 2, // 0= NONE. 1= PLANE. 2= SPHERICAL.
+		color      : color,
+		originType : 1 // 0= ATBASE, 1= ATVERTEX
 	};
 	var cone = new Cone(radius, height, options);
 	this.objectsArray.push(cone);
@@ -125,7 +126,7 @@ SpotLight.prototype.setCullingUpdatedTime = function(time)
  */
 SpotLight.prototype.getLightDirectionWC = function()
 {
-	if(!this.directionWC)
+	if (!this.directionWC)
 	{
 		// calculate light direction in world coord.
 		var geoLocDataManager = this.getGeoLocDataManager();
@@ -141,7 +142,7 @@ SpotLight.prototype.getLightDirectionWC = function()
  */
 SpotLight.prototype.getLightParameters = function()
 {
-	if(!this.lightParameters)
+	if (!this.lightParameters)
 	{
 		this.setLightParameters();
 	}
@@ -185,7 +186,7 @@ SpotLight.prototype.getLightFallOffDistance = function()
  */
 SpotLight.prototype.getMaxSpotDot = function()
 {
-	if(!this._maxSpotDot)
+	if (!this._maxSpotDot)
 	{
 		// calculate the dotProd of lightDir and the max-spotLightDir.
 		this._setMaxSpotDot();
@@ -197,16 +198,17 @@ SpotLight.prototype.getMaxSpotDot = function()
 /**
  * set the maxSpotDot.
  */
-SpotLight.prototype._setMaxSpotDot = function() {
+SpotLight.prototype._setMaxSpotDot = function() 
+{
 	this._maxSpotDot = Math.cos(this.hotspotDeg * Math.PI/180.0);
-}
+};
 
 /**
  * Returns the lightDistance.
  */
 SpotLight.prototype.getFalloffSpotDot = function()
 {
-	if(!this._falloffSpotDot)
+	if (!this._falloffSpotDot)
 	{
 		// calculate the dotProd of lightDir and the max-spotLightDir.
 		this._setFalloffSpotDot();
@@ -218,57 +220,62 @@ SpotLight.prototype.getFalloffSpotDot = function()
 /**
  * set the falloffSpotDot.
  */
-SpotLight.prototype._setFalloffSpotDot = function() {
+SpotLight.prototype._setFalloffSpotDot = function() 
+{
 	this._falloffSpotDot = Math.cos(this.falloffDeg * Math.PI/180.0);
-}
+};
 
 
 /**
  * set the hotDistance.
  * @param {number}
  */
-SpotLight.prototype.setHotDistance = function(hotDistance) {
+SpotLight.prototype.setHotDistance = function(hotDistance) 
+{
 	this.hotDistance = hotDistance;
 	this.setLightParameters();
-}
+};
 
 /**
  * set the falloffDistance.
  * @param {number}
  */
-SpotLight.prototype.setFalloffDistance = function(falloffDistance) {
+SpotLight.prototype.setFalloffDistance = function(falloffDistance) 
+{
 	this.falloffDistance = falloffDistance;
 	this.setDirty(true);
 	this.setLightParameters();
-}
+};
 
 /**
  * set the hotspotDeg.
  * @param {number}
  */
-SpotLight.prototype.setHotspotDeg = function(hotspotDeg) {
+SpotLight.prototype.setHotspotDeg = function(hotspotDeg) 
+{
 	this.hotspotDeg = hotspotDeg;
 	this._setMaxSpotDot();
 	this.setLightParameters();
-}
+};
 
 /**
  * set the falloffDeg.
  * @param {number}
  */
-SpotLight.prototype.setFalloffDeg = function(falloffDeg) {
+SpotLight.prototype.setFalloffDeg = function(falloffDeg) 
+{
 	this.falloffDeg = falloffDeg;
 	this._setFalloffSpotDot();
 	this.setDirty(true);
 	this.setLightParameters();
-}
+};
 
 /**
  * Makes a objectsArray influenced by this light.
  */
 SpotLight.prototype.clearIntersectedObjects = function()
 {
-	if(!this.visibleObjectsControler)
+	if (!this.visibleObjectsControler)
 	{
 		return;
 	}
@@ -283,24 +290,24 @@ SpotLight.prototype.doIntersectedObjectsCulling = function(visiblesArray, native
 {
 	// this function does a frustumCulling-like process.
 	// This function collects all objects inside of "this.distance" of this light position.
-	if(!this.cullingUpdatedTime)
-	this.cullingUpdatedTime = 0;
+	if (!this.cullingUpdatedTime)
+	{ this.cullingUpdatedTime = 0; }
 
 	var visiblesCount = 0;
 	var nativeVisiblesCount = 0;
 
-	if(visiblesArray)
-	visiblesCount = visiblesArray.length;
+	if (visiblesArray)
+	{ visiblesCount = visiblesArray.length; }
 
-	if(nativeVisiblesArray)
-	nativeVisiblesCount = nativeVisiblesArray.length;
+	if (nativeVisiblesArray)
+	{ nativeVisiblesCount = nativeVisiblesArray.length; }
 
 	//if(visiblesCount === 0 && nativeVisiblesCount === 0)
 	//return;
 
 	var myBSphereWC = this.getBoundingSphereWC(undefined);
 
-	if(!this.visibleObjectsControler)
+	if (!this.visibleObjectsControler)
 	{
 		// create a visible objects controler.
 		this.visibleObjectsControler = new VisibleObjectsController();
@@ -309,12 +316,12 @@ SpotLight.prototype.doIntersectedObjectsCulling = function(visiblesArray, native
 	// visiblesObjects (nodes).
 	var node;
 	var bSphereWC;
-	for(var i=0; i<visiblesCount; i++)
+	for (var i=0; i<visiblesCount; i++)
 	{
 		node = visiblesArray[i];
 		bSphereWC = node.getBoundingSphereWC(bSphereWC);
 
-		if(myBSphereWC.intersectsWithBSphere(bSphereWC) !== Constant.INTERSECTION_OUTSIDE)
+		if (myBSphereWC.intersectsWithBSphere(bSphereWC) !== Constant.INTERSECTION_OUTSIDE)
 		{
 			this.visibleObjectsControler.currentVisibles0.push(node);
 		}
@@ -322,12 +329,12 @@ SpotLight.prototype.doIntersectedObjectsCulling = function(visiblesArray, native
 
 	// nativeVisiblesObjects.
 	var native;
-	for(var i=0; i<nativeVisiblesCount; i++)
+	for (var i=0; i<nativeVisiblesCount; i++)
 	{
 		native = nativeVisiblesArray[i];
 		bSphereWC = native.getBoundingSphereWC(bSphereWC);
 
-		if(myBSphereWC.intersectsWithBSphere(bSphereWC) !== Constant.INTERSECTION_OUTSIDE)
+		if (myBSphereWC.intersectsWithBSphere(bSphereWC) !== Constant.INTERSECTION_OUTSIDE)
 		{
 			this.visibleObjectsControler.currentVisibleNativeObjects.opaquesArray.push(native);
 		}
@@ -351,7 +358,7 @@ SpotLight.prototype.getBoundingSphereWC = function(resultBoundingSphere)
 	
 	var geoLoc = this.geoLocDataManager.getCurrentGeoLocationData();
 	
-	var posWC = geoLoc.tMatrix.transformPoint3D(new Point3D(0,0,0), undefined);
+	var posWC = geoLoc.tMatrix.transformPoint3D(new Point3D(0, 0, 0), undefined);
 	var radius = this.hotDistance;
 	
 	resultBoundingSphere.setCenterPoint(posWC.x, posWC.y, posWC.z);
@@ -368,7 +375,7 @@ SpotLight.prototype.render = function(magoManager, shader, renderType, glPrimiti
 
 SpotLight.prototype._getCubeMapFrameBuffer = function(gl) 
 {
-	if(!this.cubeMapFbo)
+	if (!this.cubeMapFbo)
 	{
 		var bufferWidth = 256;
 		var bUseMultiRenderTarget = false;
@@ -467,11 +474,11 @@ SpotLight.prototype._createModelViewProjectionMatrixRelToEyes = function()
 
 
 	// Create modelViewMatrix-relativeToEye of 6 faces.
-	if(!this.mvMatRelToEyeArray)
-	this.mvMatRelToEyeArray = new Array(6);
+	if (!this.mvMatRelToEyeArray)
+	{ this.mvMatRelToEyeArray = new Array(6); }
 
-	if(!this.mvpMatRelToEyeArray)
-	this.mvpMatRelToEyeArray = new Array(6);
+	if (!this.mvpMatRelToEyeArray)
+	{ this.mvpMatRelToEyeArray = new Array(6); }
 	/*
 	// Positive_X. Face_0.
 	this._createCubeMatrix(0,   1.0, 0.0, 0.0,   0.0, -1.0, 0.0,  projMat, rotMat);
@@ -514,9 +521,9 @@ SpotLight.prototype._createModelViewProjectionMatrixRelToEyes = function()
 
 SpotLight.prototype.getModelViewProjectionMatrixRelToEye = function(faceIdx) 
 {
-	if(!this.mvpMatRelToEyeArray)
-    {
-        this._createModelViewProjectionMatrixRelToEyes();
+	if (!this.mvpMatRelToEyeArray)
+	{
+		this._createModelViewProjectionMatrixRelToEyes();
 	}
 	
 	return this.mvpMatRelToEyeArray[faceIdx];
@@ -524,9 +531,9 @@ SpotLight.prototype.getModelViewProjectionMatrixRelToEye = function(faceIdx)
 
 SpotLight.prototype.getModelViewMatrixRelToEye = function(faceIdx) 
 {
-	if(!this.mvMatRelToEyeArray)
-    {
-        this._createModelViewProjectionMatrixRelToEyes();
+	if (!this.mvMatRelToEyeArray)
+	{
+		this._createModelViewProjectionMatrixRelToEyes();
 	}
 	
 	return this.mvMatRelToEyeArray[faceIdx];

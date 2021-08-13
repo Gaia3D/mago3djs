@@ -4,6 +4,6 @@
  * Interaction target type enum
  */
 var InteractionActiveType = {
-	'ACTIVE'    : 'active',
+	'ACTIVE'   : 'active',
 	'DEACTIVE' : 'deactive'
 };

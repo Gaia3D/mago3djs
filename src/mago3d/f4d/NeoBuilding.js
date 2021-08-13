@@ -1168,11 +1168,12 @@ NeoBuilding.prototype.parseTexturesList = function(arrayBuffer, bytesReaded)
 			texture.textureTypeName = textureTypeName;
 			texture.textureImageFileName = textureImageFileName;
 			var fileExtension = textureImageFileName.split('.').pop();
-			if(fileExtension === "PNG" || fileExtension === "png")
+			if (fileExtension === "PNG" || fileExtension === "png")
 			{
 				texture.textureImageFileExtension = "PNG";
 			}
-			else{
+			else 
+			{
 				texture.textureImageFileExtension = fileExtension;
 			}
 			
@@ -1498,7 +1499,7 @@ NeoBuilding.prototype.parseLodBuildingData = function (arrayBuffer, bytesReaded)
 
 NeoBuilding.prototype._parseLegoByWorker = function (dataArrayBuffer, legoMesh, magoManager) 
 {
-	if(dataArrayBuffer)
+	if (dataArrayBuffer)
 	{
 		if (!magoManager.workerParseLego) 
 		{ 
@@ -1508,7 +1509,7 @@ NeoBuilding.prototype._parseLegoByWorker = function (dataArrayBuffer, legoMesh, 
 				var info = e.data.info;
 				var result = e.data;
 
-				if(!magoManager.legoParsedMap){ magoManager.legoParsedMap = {}; };
+				if (!magoManager.legoParsedMap){ magoManager.legoParsedMap = {}; };
 				var legoParsedMap = magoManager.legoParsedMap;
 				if (!legoParsedMap[info.smartTileDepth]) { legoParsedMap[info.smartTileDepth] = {}; }
 				if (!legoParsedMap[info.smartTileDepth][info.smartTileX]) { legoParsedMap[info.smartTileDepth][info.smartTileX] = {}; }
@@ -1524,13 +1525,13 @@ NeoBuilding.prototype._parseLegoByWorker = function (dataArrayBuffer, legoMesh, 
 		var smartTileDepth = smartTileOwner.depth;
 		var legoKey = legoMesh.legoKey;
 		var data = {
-			dataArrayBuffer: dataArrayBuffer,
-			info: {
-				smartTileX : smartTileX,
-				smartTileY : smartTileY,
+			dataArrayBuffer : dataArrayBuffer,
+			info            : {
+				smartTileX     : smartTileX,
+				smartTileY     : smartTileY,
 				smartTileDepth : smartTileDepth,
-				buildingId : this.buildingId,
-				legoKey : legoKey
+				buildingId     : this.buildingId,
+				legoKey        : legoKey
 			}
 		};
 		magoManager.workerParseLego.postMessage(data, [data.dataArrayBuffer]);// send to worker by reference (transfer).
@@ -1660,7 +1661,7 @@ NeoBuilding.prototype.prepareSkin = function (magoManager)
 		var legoKey = lowLodMesh.legoKey;
 
 		var legoParsedMap = magoManager.legoParsedMap;
-		if(!legoParsedMap){ return; }
+		if (!legoParsedMap){ return; }
 		if (!legoParsedMap[smartTileDepth]) { return; }
 		if (!legoParsedMap[smartTileDepth][smartTileX]) { return; }
 		if (!legoParsedMap[smartTileDepth][smartTileX][smartTileY]) { return; }
@@ -1763,20 +1764,25 @@ NeoBuilding.prototype.render = function (magoManager, shader, renderType, refMat
 		// Tree-data-type has no lods.***
 		//var octreesRenderedCount = this.renderDetailed(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord);
 		var renderTexture = false;	
-		if (renderType === 0) {
+		if (renderType === 0) 
+		{
 			renderTexture = false;
 		}
-		else if (renderType === 1) {
-			if (this.texturesLoaded && this.texturesLoaded.length > 0) {
+		else if (renderType === 1) 
+		{
+			if (this.texturesLoaded && this.texturesLoaded.length > 0) 
+			{
 				renderTexture = true;
 			}
-			else { 
+			else 
+			{ 
 				renderTexture = false; 
 			}
 		}
 		var minSize = 0;
 		var octree = this.octree;
-		if (octree.neoReferencesMotherAndIndices) {
+		if (octree.neoReferencesMotherAndIndices) 
+		{
 			// no occludeCulling mode.
 			octree.neoReferencesMotherAndIndices.currentVisibleIndices = octree.neoReferencesMotherAndIndices.neoRefsIndices; // no occludeCulling mode.
 			octree.renderContent(magoManager, this, renderType, renderTexture, shader, minSize, refMatrixIdxKey, flipYTexCoord);
@@ -1787,20 +1793,25 @@ NeoBuilding.prototype.render = function (magoManager, shader, renderType, refMat
 	// Check "lodBuildingData".***
 	// In models as "trees" is possible that there are no lodMesh. 20200919.***
 	var lodBuildingData = this.getLodBuildingData(this.currentLod);
-	if (this.currentLod <= 2) {
+	if (this.currentLod <= 2) 
+	{
 		// There are buildings that are only skin, so check projectType of the building.
 		
-		if (lodBuildingData && !lodBuildingData.isModelRef) {
+		if (lodBuildingData && !lodBuildingData.isModelRef) 
+		{
 			// This building is skinType data.
 			this.renderSkin(magoManager, shader, renderType);
 		}
-		else {
+		else 
+		{
 			var octreesRenderedCount = this.renderDetailed(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord);
 			
-			if (this.currentVisibleOctreesControler === undefined) {
+			if (this.currentVisibleOctreesControler === undefined) 
+			{
 				this.renderSkin(magoManager, shader, renderType);
 			}
-			else {
+			else 
+			{
 				var lowestOctreesCount0 = this.currentVisibleOctreesControler.currentVisibles0.length;
 				var lowestOctreesCount1 = this.currentVisibleOctreesControler.currentVisibles1.length;
 				var lowestOctreesCount2 = this.currentVisibleOctreesControler.currentVisibles2.length;
@@ -1813,13 +1824,17 @@ NeoBuilding.prototype.render = function (magoManager, shader, renderType, refMat
 				// 4 = pointsCloud data type.
 				// 5 = pointsCloud data type pyramidOctree test.
 
-				if (this.metaData.projectDataType === 2) {
-					if (octreesRenderedCount <= 0 ) { 
+				if (this.metaData.projectDataType === 2) 
+				{
+					if (octreesRenderedCount <= 0 ) 
+					{ 
 						this.renderSkin(magoManager, shader, renderType); 
 					}
 				}
-				else  {
-					if (octreesRenderedCount < (lowestOctreesCount0 + lowestOctreesCount1 + lowestOctreesCount2)*0.1) { 
+				else  
+				{
+					if (octreesRenderedCount < (lowestOctreesCount0 + lowestOctreesCount1 + lowestOctreesCount2)*0.1) 
+					{ 
 						this.renderSkin(magoManager, shader, renderType); 
 					}
 				}
@@ -1830,16 +1845,19 @@ NeoBuilding.prototype.render = function (magoManager, shader, renderType, refMat
 		// Now, check how many octrees are rendered. If rendered only a few, then render the buildingSkin.
 		
 	}
-	else if (this.currentLod > 2) {
+	else if (this.currentLod > 2) 
+	{
 		this.renderSkin(magoManager, shader, renderType);
 	}
 	
 	// test.
-	if (this.collisionCheckOctree !== undefined && this.collisionCheckOctree.currentVisibleOctreesArray !== undefined) {
+	if (this.collisionCheckOctree !== undefined && this.collisionCheckOctree.currentVisibleOctreesArray !== undefined) 
+	{
 		gl.uniform1i(shader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.
 		var collisionOctreesArray = this.collisionCheckOctree.currentVisibleOctreesArray;
 		var visibleCollisionOctreesCount = collisionOctreesArray.length;
-		for (var i=0; i<visibleCollisionOctreesCount; i++) {
+		for (var i=0; i<visibleCollisionOctreesCount; i++) 
+		{
 			collisionOctreesArray[i].render(magoManager, shader, renderType, undefined);
 		}
 	}
@@ -1906,7 +1924,7 @@ NeoBuilding.prototype.renderSkin = function (magoManager, shader, renderType)
 	
 	var renderTexture = true;
 
-	if(!skinLego.attributes.hasTexture)
+	if (!skinLego.attributes.hasTexture)
 	{
 		renderTexture = false;
 	}
@@ -2121,4 +2139,4 @@ NeoBuilding.prototype.deleteChangeColor = function(magoManager, objectId)
 		}
 	}
 	magoManager.config.deleteColorHistory(projectId, dataKey, objectId);
-}
+};

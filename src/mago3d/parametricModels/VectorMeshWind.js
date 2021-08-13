@@ -90,9 +90,9 @@ VectorMeshWind.prototype.render = function(magoManager, shader, options)
 	var gl = magoManager.getGl();
 	var animationState = 1; // 0= paused, 1= play.
 
-	if(options)
+	if (options)
 	{
-		if(options.animationState !== undefined)
+		if (options.animationState !== undefined)
 		{ animationState = options.animationState; }
 	}
 	
@@ -136,7 +136,7 @@ VectorMeshWind.prototype.render = function(magoManager, shader, options)
 	//this.lastTime = time;
 	//var diffTime = time - this.lastTime;
 
-	if(this.phase === undefined)
+	if (this.phase === undefined)
 	{
 		this.phase = vbo.vertexCount-4;
 		this.currElemIdx = vbo.vertexCount-4;
@@ -154,9 +154,9 @@ VectorMeshWind.prototype.render = function(magoManager, shader, options)
 	//gl.drawArrays(gl.TRIANGLE_STRIP, 0, vbo.vertexCount-4);
 	var maxVertexDrawCount = vbo.vertexCount-4 < 400 ? vbo.vertexCount-4 : 400;
 
-	if(animationState === 1)
+	if (animationState === 1)
 	{
-		if(this.phase < 0)
+		if (this.phase < 0)
 		{
 			this.currElemIdx = 0;
 			this.vertexToDrawCount = maxVertexDrawCount + this.phase;
@@ -165,7 +165,7 @@ VectorMeshWind.prototype.render = function(magoManager, shader, options)
 		{
 			this.currElemIdx = this.phase;
 			var remanentVertexCount = (vbo.vertexCount-4) - this.currElemIdx;
-			if(remanentVertexCount > maxVertexDrawCount)
+			if (remanentVertexCount > maxVertexDrawCount)
 			{
 				this.vertexToDrawCount = maxVertexDrawCount;
 			}
@@ -176,10 +176,10 @@ VectorMeshWind.prototype.render = function(magoManager, shader, options)
 		}
 	}
 
-	if(this.vertexToDrawCount < 4)
+	if (this.vertexToDrawCount < 4)
 	{
 		this.phase -= 1;
-		if(this.phase <= -maxVertexDrawCount + 1)
+		if (this.phase <= -maxVertexDrawCount + 1)
 		{
 			this.finished = true;
 		}
@@ -189,10 +189,10 @@ VectorMeshWind.prototype.render = function(magoManager, shader, options)
 	gl.uniform1i(shader.uTotalPointsCount_loc, this.vertexToDrawCount);
 	gl.drawArrays(gl.TRIANGLE_STRIP, this.currElemIdx, this.vertexToDrawCount);
 
-	if(animationState === 1)
+	if (animationState === 1)
 	{
 		this.phase -= 1;
-		if(this.phase <= -maxVertexDrawCount + 1)
+		if (this.phase <= -maxVertexDrawCount + 1)
 		{
 			this.finished = true;
 		}
@@ -214,13 +214,13 @@ VectorMeshWind.prototype.deleteObjects = function(vboMemManager)
 	this.name = undefined;
 	this.id = undefined;
 	this.thickness = undefined;
-	if(this.color4)
+	if (this.color4)
 	{
 		this.color4.deleteObjects();
 		this.color4 = undefined;
 	}
 	
-	if(this.vertexList)
+	if (this.vertexList)
 	{
 		this.vertexList.deleteObjects();
 		this.vertexList = undefined;

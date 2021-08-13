@@ -146,7 +146,7 @@ Point2D.prototype.isParallelToPoint = function(point, err)
  */
 Point2D.prototype.squareDistToPoint = function(point) 
 {
-	if(!point) return;
+	if (!point) { return; }
 	var dx = this.x - point.x;
 	var dy = this.y - point.y;
 
@@ -257,8 +257,8 @@ Point2D.prototype.scalarProduct = function(point)
  */
 Point2D.mix = function(point_a, point_b, factor, resultPoint) 
 {
-	if(!resultPoint)
-	resultPoint = new Point2D();
+	if (!resultPoint)
+	{ resultPoint = new Point2D(); }
 
 	var xVal = point_a.x * (1.0 - factor) + point_b.x * factor;
 	var yVal = point_a.y * (1.0 - factor) + point_b.y * factor;

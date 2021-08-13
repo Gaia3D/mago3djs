@@ -58,9 +58,9 @@ var Camera = function(options)
 	
 	// movement.
 	this.lastMovement = {
-		currLinearVelocity : 0,
+		currLinearVelocity  : 0,
 		currAngularVelocity : 0,
-		movementType : CODE.movementType.NO_MOVEMENT
+		movementType        : CODE.movementType.NO_MOVEMENT
 	}; // class Movement.
 
 	/**
@@ -387,7 +387,7 @@ Camera.prototype.calculateSpeed = function (newPosX, newPosY, newPosZ, currTime 
 {
 	// Function called when globe is Cesium. MagoWorld calculates the velocity in mouseMove.
 	var difTime = (currTime - this.updatedTime)/1000;
-	if(difTime < 1E-12)
+	if (difTime < 1E-12)
 	{
 		// speed unknown.
 		return;
@@ -396,11 +396,11 @@ Camera.prototype.calculateSpeed = function (newPosX, newPosY, newPosZ, currTime 
 	this.speed3d.set((newPosX - pos.x)/difTime, (newPosY - pos.y)/difTime, (newPosZ - pos.z)/difTime);
 	this.updatedTime = currTime;
 
-	if(!this.lastMovement)
+	if (!this.lastMovement)
 	{ this.lastMovement = {}; }
 	this.lastMovement.currLinearVelocity = this.speed3d.getModul();
 
-	if(this.lastMovement.currLinearVelocity < 1E-4)
+	if (this.lastMovement.currLinearVelocity < 1E-4)
 	{
 		this.lastMovement.movementType = CODE.movementType.NO_MOVEMENT;
 	}
@@ -820,20 +820,20 @@ Camera.prototype.getPosition = function()
  */
 Camera.prototype.getEncodedCameraPosition = function()
 {
-	if(!this._lastPosition)
+	if (!this._lastPosition)
 	{
 		// auxiliar position to campare with the current position.
-		this._lastPosition = new Point3D(0,0,0);
+		this._lastPosition = new Point3D(0, 0, 0);
 	}
 
-	if(!this.encodedCamPosHigh || !this.encodedCamPosLow)
+	if (!this.encodedCamPosHigh || !this.encodedCamPosLow)
 	{
 		this.encodedCamPosHigh = new Float32Array(3);
 		this.encodedCamPosLow = new Float32Array(3);
 	}
 
 	// only calculate if camera moved.
-	if(this.position.x !== this._lastPosition.x || this.position.y !== this._lastPosition.y || this.position.z !== this._lastPosition.z )
+	if (this.position.x !== this._lastPosition.x || this.position.y !== this._lastPosition.y || this.position.z !== this._lastPosition.z )
 	{
 		ManagerUtils.calculateSplited3fv([this.position.x, this.position.y, this.position.z], this.encodedCamPosHigh, this.encodedCamPosLow);
 		this._lastPosition.set(this.position.x, this.position.y, this.position.z);
@@ -841,8 +841,8 @@ Camera.prototype.getEncodedCameraPosition = function()
 
 	var camEncodedPositions = {
 		high : this.encodedCamPosHigh,
-		low : this.encodedCamPosLow
-	}
+		low  : this.encodedCamPosLow
+	};
 	
 	return camEncodedPositions;
 };
@@ -912,7 +912,7 @@ Camera.setByPositionAndTarget = function (camera, camTarget, camPos, aproxCamUp)
 	direction.unitary();
 
 	// now, check if exist "aproxCamUp".
-	if(!aproxCamUp)
+	if (!aproxCamUp)
 	{
 		// take the earthNormal at cameraPosition.
 		var earthNormal = Globe.normalAtCartesianPointWgs84(camPos.x, camPos.y, camPos.z, undefined);
@@ -943,7 +943,7 @@ Camera.setByPositionAndTargetCesiumCamera = function (camera, camTarget, camPos,
 	direction.unitary();
 
 	// now, check if exist "aproxCamUp".
-	if(!aproxCamUp)
+	if (!aproxCamUp)
 	{
 		// take the earthNormal at cameraPosition.
 		var earthNormal = Globe.normalAtCartesianPointWgs84(camPos.x, camPos.y, camPos.z, undefined);
@@ -999,7 +999,7 @@ Camera.setOrientation = function (camera, heading, pitch, roll)
  */
 Camera.prototype.getDepthBufferFBO = function(magoManager, options) 
 {
-	if(!this.depthBufferFBO)
+	if (!this.depthBufferFBO)
 	{
 		var gl = magoManager.getGl();
 		//var bufferWidth = 512;
@@ -1007,18 +1007,18 @@ Camera.prototype.getDepthBufferFBO = function(magoManager, options)
 		var bufferWidth = magoManager.sceneState.drawingBufferWidth[0];
 		var bufferHeight = magoManager.sceneState.drawingBufferHeight[0];
 
-		if(options)
+		if (options)
 		{
-			if(options.bufferWidth)
-			bufferWidth = options.bufferWidth;
+			if (options.bufferWidth)
+			{ bufferWidth = options.bufferWidth; }
 
-			if(options.bufferHeight)
-			bufferHeight = options.bufferHeight;
+			if (options.bufferHeight)
+			{ bufferHeight = options.bufferHeight; }
 		}
 		
 		var bUseMultiRenderTarget = false;
 		var bMatchCanvasSize = false;
-		this.depthBufferFBO = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: bMatchCanvasSize, multiRenderTarget : bUseMultiRenderTarget}); 
+		this.depthBufferFBO = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: bMatchCanvasSize, multiRenderTarget: bUseMultiRenderTarget}); 
 	}
 
 	return this.depthBufferFBO;
@@ -1298,13 +1298,13 @@ Camera.prototype.finishedAnimation__original = function(magoManager)
  */
 Camera.intersectPointByLaser = function(startGeoCoord, endGeoCoord, laserCam, resultImpactPointWC, magoManager, options) 
 {
-	if(!laserCam)
+	if (!laserCam)
 	{
 		laserCam = new Camera();
 	}
 
-	if(!resultImpactPointWC)
-	resultImpactPointWC = new Point3D();
+	if (!resultImpactPointWC)
+	{ resultImpactPointWC = new Point3D(); }
 
 	options = options ? options : {};
 
@@ -1317,7 +1317,7 @@ Camera.intersectPointByLaser = function(startGeoCoord, endGeoCoord, laserCam, re
 	Camera.setByPositionAndTarget(laserCam, endWC, startWC, aproxCamUp);
 
 	var optionsFBO = {
-		bufferWidth : 64,
+		bufferWidth  : 64,
 		bufferHeight : 64
 	};
 	var camDepthBufferFBO = laserCam.getDepthBufferFBO(magoManager, optionsFBO);
@@ -1332,10 +1332,11 @@ Camera.intersectPointByLaser = function(startGeoCoord, endGeoCoord, laserCam, re
 
 	// Now, check if the impactPoint is inside of the segment startGeoCoord-endGeoCoord;
 	var distImpact = startWC.distToPoint(resultImpactPointWC);
-	if(distImpact > dist)
-	return undefined;
+	if (distImpact > dist)
+	{ return undefined; }
 
-	if(startWC.distToPoint(resultImpactPointWC) < error || endWC.distToPoint(resultImpactPointWC) < error) {
+	if (startWC.distToPoint(resultImpactPointWC) < error || endWC.distToPoint(resultImpactPointWC) < error) 
+	{
 		//return undefined;
 		var a;
 	}
@@ -1350,7 +1351,7 @@ Camera.shootLaser = function(laserCam, resultImpactPointWC, magoManager, options
 {
 	options = options ? options : {};
 	var optionsFBO = {
-		bufferWidth : 64,
+		bufferWidth  : 64,
 		bufferHeight : 64
 	};
 	var camDepthBufferFBO = laserCam.getDepthBufferFBO(magoManager, optionsFBO);
@@ -1395,8 +1396,8 @@ Camera.shootLaser = function(laserCam, resultImpactPointWC, magoManager, options
 	var realDist = linearDepth * bigFrustum.far[0];
 
 	// Now, create a point in the intersection pos.
-	if(!resultImpactPointWC)
-	resultImpactPointWC = new Point3D();
+	if (!resultImpactPointWC)
+	{ resultImpactPointWC = new Point3D(); }
 
 	resultImpactPointWC = laserCam.getTargetPositionAtDistance(realDist, resultImpactPointWC);
 

@@ -12,70 +12,75 @@ var ExtrusionBuilding = function(geographicCoordList, height, options)
 	if (!(this instanceof ExtrusionBuilding)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);
-    }
+	}
     
-    if(!geographicCoordList) {
-        throw new Error(Messages.REQUIRED_EMPTY_ERROR('geographicCoordList'));
+	if (!geographicCoordList) 
+	{
+		throw new Error(Messages.REQUIRED_EMPTY_ERROR('geographicCoordList'));
 	}
 
 	this.geographicCoordListsArray = [];
 	
-	if(geographicCoordList instanceof GeographicCoordsList) {
+	if (geographicCoordList instanceof GeographicCoordsList) 
+	{
 		this.geographicCoordListsArray.push(geographicCoordList);
 	}
-	else if(geographicCoordList instanceof Array)
+	else if (geographicCoordList instanceof Array)
 	{
 		this.geographicCoordListsArray = geographicCoordList;
 	}
 
-    if(height === undefined || height === null) {
-        throw new Error(Messages.REQUIRED_EMPTY_ERROR('height'));
-    }
+	if (height === undefined || height === null) 
+	{
+		throw new Error(Messages.REQUIRED_EMPTY_ERROR('height'));
+	}
 
-    if(height === 0) {
-        throw new Error('height must higher than 0');
-    }
+	if (height === 0) 
+	{
+		throw new Error('height must higher than 0');
+	}
 
 	MagoRenderable.call(this, options);
-    options = options? options : {};
+	options = options? options : {};
 
 	var geoCoordsList = this.geographicCoordListsArray[0]; // take the 1rst geoCoordsList.***
 	this.setGeographicPosition(geoCoordsList.getMiddleGeographicCoords());
 
 	this.localCoordListArray = makeLocalCooldList(this.geographicCoordListsArray, this.geoLocDataManager.getCurrentGeoLocationData());
 
-    this.height = height;
-    this.color4 = defaultValue(options.color, new Color(1,1,1,1));
+	this.height = height;
+	this.color4 = defaultValue(options.color, new Color(1, 1, 1, 1));
 
-    this.attributes.isMovable = defaultValue(options.isMovable, true);
+	this.attributes.isMovable = defaultValue(options.isMovable, true);
 	this.attributes.isSelectable = defaultValue(options.isSelectable, true);
-	this.attributes.selectedColor4 = defaultValue(options.selectedColor, new Color(1,1,0,1));
+	this.attributes.selectedColor4 = defaultValue(options.selectedColor, new Color(1, 1, 0, 1));
 	this.attributes.heightReference = defaultValue(options.heightReference, HeightReference.NONE);
 	this.divideLevel = defaultValue(options.divideLevel, false);
 
-	if(!this.options)
-    this.options = {};
+	if (!this.options)
+	{ this.options = {}; }
 
-    this.options.renderWireframe = defaultValue(options.renderWireframe, true);
-    this.options.renderShaded = defaultValue(options.renderShaded, true);
+	this.options.renderWireframe = defaultValue(options.renderWireframe, true);
+	this.options.renderShaded = defaultValue(options.renderShaded, true);
 	this.options.depthMask = defaultValue(options.depthMask, true);
 	this.options.limitationGeographicCoords = defaultValue(options.limitationGeographicCoords, undefined);
 	this.limitationConvexPolygon2dArray;
 
 	
-	function makeLocalCooldList ( gcLists, geoLocData) {
+	function makeLocalCooldList ( gcLists, geoLocData) 
+	{
 		var tMatInv = geoLocData.getTMatrixInv();
 		var error = 1E-7;
 		var lcListArray = [];
-		for(var j=0,gcLen=gcLists.length; j < gcLen; j++) 
+		for (var j=0, gcLen=gcLists.length; j < gcLen; j++) 
 		{
 			var gcList = gcLists[j];
 			GeographicCoordsList.solveDegeneratedPoints(gcList.geographicCoordsArray, error);
 			var lcList = [];
-			for(var i=0,len=gcList.geographicCoordsArray.length;i<len;i++)
+			for (var i=0, len=gcList.geographicCoordsArray.length;i<len;i++)
 			{
 				var gc = gcList.geographicCoordsArray[i];
-				var wc = ManagerUtils.geographicCoordToWorldPoint(gc.longitude,gc.latitude,gc.altitude);
+				var wc = ManagerUtils.geographicCoordToWorldPoint(gc.longitude, gc.latitude, gc.altitude);
 				var lc = tMatInv.transformPoint3D(wc);
 				lcList.push(lc);
 			}
@@ -88,19 +93,23 @@ var ExtrusionBuilding = function(geographicCoordList, height, options)
 ExtrusionBuilding.prototype = Object.create(MagoRenderable.prototype);
 ExtrusionBuilding.prototype.constructor = ExtrusionBuilding;
 
-ExtrusionBuilding.prototype.makeMesh = function() {
-	if(!this.dirty) return;
+ExtrusionBuilding.prototype.makeMesh = function() 
+{
+	if (!this.dirty) { return; }
 	
-	if(!this.geoLocDataManager) {
-        return;
-    }
+	if (!this.geoLocDataManager) 
+	{
+		return;
+	}
 	var geoLocData = this.geoLocDataManager.getCurrentGeoLocationData();
     
-    if(!geoLocData) {
-        return;
+	if (!geoLocData) 
+	{
+		return;
 	}
-	if(this.attributes.heightReference !== HeightReference.NONE) {
-		geoLocData = ManagerUtils.calculateGeoLocationData(undefined,undefined, 0, undefined, undefined, undefined, geoLocData);
+	if (this.attributes.heightReference !== HeightReference.NONE) 
+	{
+		geoLocData = ManagerUtils.calculateGeoLocationData(undefined, undefined, 0, undefined, undefined, undefined, geoLocData);
 	}
 	
 	// Try to solve degeneratedPoints.***
@@ -108,7 +117,7 @@ ExtrusionBuilding.prototype.makeMesh = function() {
 
 	this.objectsArray = [];
 	var geoCoordsListsCount = this.geographicCoordListsArray.length;
-	for(var i=0; i<geoCoordsListsCount; i++)
+	for (var i=0; i<geoCoordsListsCount; i++)
 	{
 		var geographicCoordList = this.geographicCoordListsArray[i];
 		
@@ -169,12 +178,14 @@ ExtrusionBuilding.prototype.makeMesh = function() {
 
 			surfIndepMesh.calculateTexCoordsByHeight(this.floorHeight ? this.floorHeight+0.01 : 3.31);
 			var topSurfaces = surfIndepMesh.getSurfaceByName('top');
-			if(topSurfaces.length > 0)
+			if (topSurfaces.length > 0)
 			{
-				for(var j=0,surLen=topSurfaces.length;j<surLen;j++) {
+				for (var j=0, surLen=topSurfaces.length;j<surLen;j++) 
+				{
 					var ts = topSurfaces[j];
 					var vertexArray = ts.localVertexList.vertexArray;
-					for(var k=0,verLength=vertexArray.length;k<verLength;k++) {
+					for (var k=0, verLength=vertexArray.length;k<verLength;k++) 
+					{
 						var vtx = vertexArray[k];
 						vtx.texCoord.x = 2 / c.width;
 						vtx.texCoord.y = 2 / c.height;
@@ -189,16 +200,17 @@ ExtrusionBuilding.prototype.makeMesh = function() {
 	this.setDirty(false);
 
 	// Check if exist limitation polygons.***
-	if(this.options.limitationGeographicCoords)
+	if (this.options.limitationGeographicCoords)
 	{
 		this.makeUniformPoints2dArray();
 	}
-	if(this.attributes.heightReference !== HeightReference.NONE) {
-		if(this.terrainHeight) this.setTerrainHeight(this.terrainHeight);
+	if (this.attributes.heightReference !== HeightReference.NONE) 
+	{
+		if (this.terrainHeight) { this.setTerrainHeight(this.terrainHeight); }
 	}
 	
 	//this.validTerrainHeight();
-}
+};
 
 /**
  * Set the unique one color of the box
@@ -220,23 +232,26 @@ ExtrusionBuilding.prototype.setOneColor = function(r, g, b, a)
 		this.setOpaque(false);
 	}
 
-	if(this.divideLevel) {
+	if (this.divideLevel) 
+	{
 		this.setDirty(true);
 	}
 };
 
 ExtrusionBuilding.prototype.makeUniformPoints2dArray = function() 
 {
-	if(!this.geoLocDataManager) {
-        return;
-    }
+	if (!this.geoLocDataManager) 
+	{
+		return;
+	}
 	var geoLocData = this.geoLocDataManager.getCurrentGeoLocationData();
     
-    if(!geoLocData) {
-        return;
+	if (!geoLocData) 
+	{
+		return;
 	}
 
-	if(!this.options.limitationGeographicCoords)
+	if (!this.options.limitationGeographicCoords)
 	{
 		return;
 	}
@@ -252,7 +267,7 @@ ExtrusionBuilding.prototype.makeUniformPoints2dArray = function()
 	polygon2d.point2dList = new Point2DList();
 
 	var points3dCount = basePoints3dArray.length;
-	for(var i=0; i<points3dCount; i++)
+	for (var i=0; i<points3dCount; i++)
 	{
 		var point3d = basePoints3dArray[i];
 		var point2d = polygon2d.point2dList.newPoint(point3d.x, point3d.y);
@@ -260,7 +275,7 @@ ExtrusionBuilding.prototype.makeUniformPoints2dArray = function()
 
 	// make the polygon by geoCoordsArray.***
 	var resultConcavePointsIdxArray = polygon2d.calculateNormal(undefined);
-	if(polygon2d.normal < 0)
+	if (polygon2d.normal < 0)
 	{
 		polygon2d.reverseSense();
 		resultConcavePointsIdxArray = polygon2d.calculateNormal(undefined);
@@ -271,18 +286,18 @@ ExtrusionBuilding.prototype.makeUniformPoints2dArray = function()
 	var uniformPoints2dArray = new Float32Array(512);
 	var uniformPolygonPointsIdx = new Int32Array(256);
 	// set initially idx = -1.***
-	for(var i=0; i<256; i++)
+	for (var i=0; i<256; i++)
 	{
 		uniformPolygonPointsIdx[i] = -1;
 	}
 	var currentIdx = 0;
 	var convexPolygon2dCount = limitationConvexPolygon2dArray.length;
-	for(var i=0; i<convexPolygon2dCount; i++)
+	for (var i=0; i<convexPolygon2dCount; i++)
 	{
 		var convexPolygon2d = limitationConvexPolygon2dArray[i];
 		var pointsCount = convexPolygon2d.point2dList.getPointsCount();
 		uniformPolygonPointsIdx[i*2] = currentIdx;
-		for(var j=0; j<pointsCount; j++)
+		for (var j=0; j<pointsCount; j++)
 		{
 			var point2d = convexPolygon2d.point2dList.getPoint(j);
 			uniformPoints2dArray[2*currentIdx] = point2d.x;
@@ -302,70 +317,81 @@ ExtrusionBuilding.prototype.makeUniformPoints2dArray = function()
  * @param {number} height
  * @param {object} options
  */
-ExtrusionBuilding.makeExtrusionBuildingByCartesian3Array = function(cartesian3Array, height, options) {
-    var geographicCoordList = GeographicCoordsList.fromCartesians(cartesian3Array);
-    var eb = new ExtrusionBuilding(geographicCoordList, height, options);
+ExtrusionBuilding.makeExtrusionBuildingByCartesian3Array = function(cartesian3Array, height, options) 
+{
+	var geographicCoordList = GeographicCoordsList.fromCartesians(cartesian3Array);
+	var eb = new ExtrusionBuilding(geographicCoordList, height, options);
 
-    return eb;
-}
+	return eb;
+};
 
 /**
  * @param {number} height
  */
-ExtrusionBuilding.prototype.setHeight = function(height) {
-	if(height === undefined || height === null) {
+ExtrusionBuilding.prototype.setHeight = function(height) 
+{
+	if (height === undefined || height === null) 
+	{
 		throw new Error(Messages.REQUIRED_EMPTY_ERROR('height'));
 	}
 	this.height = height;
 	this.setDirty(true);
-}
+};
 
 /**
  * @param {Array<GeographicCoord>} limitationGeographicCoords
  */
-ExtrusionBuilding.prototype.setLimitationGeographicCoords = function(limitationGeographicCoords) {
+ExtrusionBuilding.prototype.setLimitationGeographicCoords = function(limitationGeographicCoords) 
+{
 	this.options.limitationGeographicCoords = limitationGeographicCoords;
 	this.setDirty(true);
-}
+};
 
 /**
  * @param {number>} limitationHeight
  */
-ExtrusionBuilding.prototype.setLimitationHeight = function(limitationHeight) {
+ExtrusionBuilding.prototype.setLimitationHeight = function(limitationHeight) 
+{
 	this.options.limitationHeights = limitationHeight ? new Float32Array([0, limitationHeight]) : undefined;
-}
+};
 
 /**
  * @return {number}
  */
-ExtrusionBuilding.prototype.getHeight = function() {
+ExtrusionBuilding.prototype.getHeight = function() 
+{
 	return this.height;
-}
+};
 
 /**
  * @return {number}
  */
-ExtrusionBuilding.prototype.getRealHeight = function() {
+ExtrusionBuilding.prototype.getRealHeight = function() 
+{
 	return this.height + this.terrainHeight;
-}
+};
 
 /**
  * @return {number}
  */
-ExtrusionBuilding.prototype.getLevel = function() {
-	if(!this.floorHeight) {
+ExtrusionBuilding.prototype.getLevel = function() 
+{
+	if (!this.floorHeight) 
+	{
 		return 0;
 	}
 	return parseInt(this.height / this.floorHeight, 10);
-}
+};
 
 /**
  * @return {number}
  */
-ExtrusionBuilding.prototype.getCenter = function() {
+ExtrusionBuilding.prototype.getCenter = function() 
+{
 	var listLength = this.geographicCoordListsArray.length;
 	var arr = [];
-	for(var i=0;i<listLength;i++) {
+	for (var i=0;i<listLength;i++) 
+	{
 		var geographicCoordList = this.geographicCoordListsArray[i];
 		var extent = geographicCoordList.getGeographicExtent();
 		arr.push(new GeographicCoord(extent.getCenterLongitude(), extent.getCenterLatitude(), extent.getCenterAltitude()));
@@ -375,12 +401,13 @@ ExtrusionBuilding.prototype.getCenter = function() {
 	var totalExtent = extentGcList.getGeographicExtent();
 
 	return new GeographicCoord(totalExtent.getCenterLongitude(), totalExtent.getCenterLatitude(), totalExtent.getCenterAltitude());
-}
+};
 /**
  * 
  * @param {Point3D} cameraPosition 
  */
-ExtrusionBuilding.prototype.getDistToCamera = function(cameraPosition) {
+ExtrusionBuilding.prototype.getDistToCamera = function(cameraPosition) 
+{
 	var mesh = this.objectsArray[0];
 	var bb = mesh.getBoundingBox();
 	var radius = bb.getRadiusAprox();
@@ -389,13 +416,14 @@ ExtrusionBuilding.prototype.getDistToCamera = function(cameraPosition) {
 	var auxBs = new BoundingSphere(bsAbsoluteCenterPos.x, bsAbsoluteCenterPos.y, bsAbsoluteCenterPos.z, radius);
 
 	return cameraPosition.distToSphere(auxBs);
-}
+};
 
-ExtrusionBuilding.prototype.getBBoxCenterPositionWorldCoord = function() {
+ExtrusionBuilding.prototype.getBBoxCenterPositionWorldCoord = function() 
+{
 	var geoLocData = this.getCurrentGeoLocationData();
 	var mesh = this.objectsArray[0];
 	var bs = mesh.getBoundingSphere();
 	var bsLocalCenter = bs.centerPoint;
 	
 	return geoLocData.tMatrix.transformPoint3D(bsLocalCenter);
-}
+};

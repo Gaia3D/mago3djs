@@ -117,7 +117,7 @@ VboBuffer.prototype.setDataArray = function(dataArray, dimensions, normalized, v
 		this.dataArray = dataArray;
 	}
 
-	if(this.dataGlType !== 5126)
+	if (this.dataGlType !== 5126)
 	{
 		normalized = true;// Test.
 	}

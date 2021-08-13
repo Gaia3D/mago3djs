@@ -66,11 +66,11 @@ Color.prototype.deleteObjects = function()
  */
 Color.getInterpolatedColorsArray = function(colorA, colorB, numColors, resultColorsArray ) 
 {
-	if(!resultColorsArray)
-	resultColorsArray = [];
+	if (!resultColorsArray)
+	{ resultColorsArray = []; }
 	var increWeight = 1/(numColors-1);
 	var weight = 0.0;
-	for(var i=0; i<numColors; i++)
+	for (var i=0; i<numColors; i++)
 	{
 		var color = Color.mix(colorA, colorB, weight, undefined );
 		resultColorsArray.push(color);
@@ -168,7 +168,7 @@ Color.prototype.getRGB = function()
 	var g = this.g;
 	var b = this.b;
 
-	var rgb = 'rgb('
+	var rgb = 'rgb(';
 	rgb += r*255 + ', ';
 	rgb += g*255 + ', ';
 	rgb += b*255;
@@ -187,7 +187,7 @@ Color.prototype.getRGBA = function()
 	var b = this.b;
 	var a = this.a;
 
-	var rgba = 'rgba('
+	var rgba = 'rgba(';
 	rgba += r*255 + ', ';
 	rgba += g*255 + ', ';
 	rgba += b*255 + ', ';

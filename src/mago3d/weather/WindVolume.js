@@ -37,19 +37,19 @@ var WindVolume = function (options)
 	// Particles generator.
 	this._particlesGeneratorBoxesArray;
 
-	if(options)
+	if (options)
 	{
-		if(options.geoJsonFile)
+		if (options.geoJsonFile)
 		{
 			this.setWindGeoJson(options.geoJsonFile);
 		}
 
-		if(options.geoJsonFilePath)
+		if (options.geoJsonFilePath)
 		{
 			this._geoJsonFilePath = options.geoJsonFilePath;
 		}
 
-		if(options.geoJsonFileFolderPath)
+		if (options.geoJsonFileFolderPath)
 		{
 			this._geoJsonFileFolderPath = options.geoJsonFileFolderPath;
 		}
@@ -58,10 +58,10 @@ var WindVolume = function (options)
 
 WindVolume.prototype.switchAnimationState = function()
 {
-	if(this._animationState === 0)
-	this._animationState = 1;
-	else if(this._animationState ===1)
-	this._animationState = 0;
+	if (this._animationState === 0)
+	{ this._animationState = 1; }
+	else if (this._animationState ===1)
+	{ this._animationState = 0; }
 };
 
 WindVolume.prototype.getWindLayersCount = function()
@@ -82,10 +82,10 @@ WindVolume.prototype.getWindLayer = function(idx)
 
 WindVolume.prototype.deleteObjects = function(magoManager)
 {
-	if(this.windLayersArray)
+	if (this.windLayersArray)
 	{
 		var windlayersCount = this.windLayersArray.length;
-		for(var i=0; i<windlayersCount; i++)
+		for (var i=0; i<windlayersCount; i++)
 		{
 			this.windLayersArray[i].deleteObjects(magoManager);
 			this.windLayersArray[i] = undefined;
@@ -100,7 +100,7 @@ WindVolume.prototype.deleteObjects = function(magoManager)
 	
 	// Box & plane.
 	var vboMemManager = magoManager.vboMemoryManager;
-	if(this.windDisplayBox)
+	if (this.windDisplayBox)
 	{
 		this.windDisplayBox.deleteObjects(vboMemManager);
 
@@ -110,10 +110,10 @@ WindVolume.prototype.deleteObjects = function(magoManager)
 	this.windDisplayBox = undefined;
 
 	this.windDisplayPlane = undefined;
-	if(this.windDisplayPlanesArray)
+	if (this.windDisplayPlanesArray)
 	{
 		var displayPlanesCount = this.windDisplayPlanesArray.length;
-		for(var i=0; i<displayPlanesCount; i++)
+		for (var i=0; i<displayPlanesCount; i++)
 		{
 			this.windDisplayPlanesArray[i].deleteObjects(vboMemManager);
 
@@ -132,10 +132,10 @@ WindVolume.prototype.deleteObjects = function(magoManager)
 	this._geoJsonFileFolderPath = undefined;
 
 	// streamLines.***
-	if(this.streamLinesArray)
+	if (this.streamLinesArray)
 	{
 		var linesCount = this.streamLinesArray.length;
-		for(var i=0; i<linesCount; i++)
+		for (var i=0; i<linesCount; i++)
 		{
 			this.streamLinesArray[i].deleteObjects(vboMemManager);
 			this.streamLinesArray[i] = undefined;
@@ -148,10 +148,10 @@ WindVolume.prototype.deleteObjects = function(magoManager)
 	this._particesGenerationType = undefined; // 0= no generation. 1= inside frustum. 2= particlesGeneratorBox. 3= altitudePlane
 
 	// Particles generator.
-	if(this._particlesGeneratorBoxesArray)
+	if (this._particlesGeneratorBoxesArray)
 	{
 		var boxesCount = this._particlesGeneratorBoxesArray.length;
-		for(var i=0; i<boxesCount; i++)
+		for (var i=0; i<boxesCount; i++)
 		{
 			this._particlesGeneratorBoxesArray[i].deleteObjects(vboMemManager);
 
@@ -207,8 +207,8 @@ WindVolume.prototype.createWindParticlesCreatorBox = function(magoManager)
 	var depth = 6;
 	magoManager.modeler.addObject(box, depth);
 
-	if(!this._particlesGeneratorBoxesArray)
-	this._particlesGeneratorBoxesArray = [];
+	if (!this._particlesGeneratorBoxesArray)
+	{ this._particlesGeneratorBoxesArray = []; }
 
 	this._particlesGeneratorBoxesArray.push(box);
 	
@@ -282,18 +282,18 @@ WindVolume.prototype.createWindDisplayPlane = function(magoManager)
 
 WindVolume.prototype.getGeographicExtent = function()
 {
-	if(!this.geoExtent)
+	if (!this.geoExtent)
 	{
 		// use geoJson to calculate the geoExtent.
 		var features = this._geoJsonFile.features;
 		var layersCount = features.length;
-		if(layersCount > 0)
+		if (layersCount > 0)
 		{
 			var layer;
 			layer = features[0]; // take the first layer, to set the bbox.
 			var bbox = new BoundingBox();
 			bbox.initXYZData(layer.bbox[0], layer.bbox[1], layer.bbox[2]);
-			for(var i=0; i<layersCount; i++)
+			for (var i=0; i<layersCount; i++)
 			{
 				layer = features[i];
 
@@ -380,7 +380,7 @@ WindVolume.prototype._createdElemsForDisplayBox = function(magoManager)
 
 WindVolume.prototype.setWindGeoJson = function (windGeoJson)
 {
-	if(!windGeoJson)
+	if (!windGeoJson)
 	{
 		return;
 	}
@@ -388,7 +388,7 @@ WindVolume.prototype.setWindGeoJson = function (windGeoJson)
 	this._geoJsonFile = windGeoJson;
 	this._geoJsonFileLoadState = CODE.fileLoadState.LOADING_FINISHED;
 
-	if(this._geoJsonFile.style && this._geoJsonFile.style.colorRamp)
+	if (this._geoJsonFile.style && this._geoJsonFile.style.colorRamp)
 	{
 		// make a colorRamp.
 		this.colorRamp = new ColorRamp(this._geoJsonFile.style.colorRamp);
@@ -398,7 +398,7 @@ WindVolume.prototype.setWindGeoJson = function (windGeoJson)
 WindVolume.prototype.loadWindGeoJson = function ()
 {
 	// This is the geoJson version. 2021.
-	if(this._geoJsonFileLoadState === CODE.fileLoadState.READY)
+	if (this._geoJsonFileLoadState === CODE.fileLoadState.READY)
 	{
 		this._geoJsonFileLoadState = CODE.fileLoadState.LOADING_STARTED;
 		var that = this;
@@ -416,13 +416,13 @@ WindVolume.prototype.prepareVolume = function(magoManager)
 	// 2- wind-layers.
 	//-------------------------------------------
 	// 1rst, check if the geoJson is loaded.***
-	if(!this._prepareWindGeoJson())
+	if (!this._prepareWindGeoJson())
 	{
 		return false;
 	}
 
 	// Now, check if windLayers are prepared.***
-	if(!this._prepareWindLayers())
+	if (!this._prepareWindLayers())
 	{
 		return false;
 	}
@@ -439,7 +439,7 @@ WindVolume.prototype.prepareVolume = function(magoManager)
 WindVolume.prototype.getMaxAltitude = function()
 {
 	var geoExtent = this.getGeographicExtent();
-	if(geoExtent)
+	if (geoExtent)
 	{
 		return geoExtent.maxGeographicCoord.altitude;
 	} 
@@ -450,7 +450,7 @@ WindVolume.prototype.getMaxAltitude = function()
 WindVolume.prototype.getMinAltitude = function()
 {
 	var geoExtent = this.getGeographicExtent();
-	if(geoExtent)
+	if (geoExtent)
 	{
 		return geoExtent.minGeographicCoord.altitude;
 	} 
@@ -460,7 +460,7 @@ WindVolume.prototype.getMinAltitude = function()
 
 WindVolume.prototype.getNearestWindLayerByAltitude = function(altitude)
 {
-	if(!this._windLayersAltitudesArray)
+	if (!this._windLayersAltitudesArray)
 	{
 		// Make windLayersAltitudesArray to find the nearest windLayer.
 		return;
@@ -485,7 +485,7 @@ WindVolume.prototype._getRayIntersectionWithVolume = function(screenX, screenY, 
 	var depthTex = windVolumeRearFBO.colorBuffersArray[1];
 	var normalTex = windVolumeRearFBO.colorBuffersArray[2];
 	var resultObject = ManagerUtils.calculatePixelLinearDepthV2(gl, screenX, screenY, depthTex, normalTex, magoManager);
-	if(resultObject.frustumIdx < magoManager.numFrustums)
+	if (resultObject.frustumIdx < magoManager.numFrustums)
 	{
 		linearDepth = resultObject.linearDepth;
 		frustumFar = resultObject.far;
@@ -494,7 +494,7 @@ WindVolume.prototype._getRayIntersectionWithVolume = function(screenX, screenY, 
 	}
 
 	// check if the ray intersects the volume:
-	if(normal4[0] + normal4[1] + normal4[2] < 0.1)
+	if (normal4[0] + normal4[1] + normal4[2] < 0.1)
 	{
 		// if there are no intersection with the rear face, then ther are no intersection.
 		return undefined;
@@ -510,7 +510,7 @@ WindVolume.prototype._getRayIntersectionWithVolume = function(screenX, screenY, 
 	depthTex = windVolumeFrontFBO.colorBuffersArray[1];
 	normalTex = windVolumeFrontFBO.colorBuffersArray[2];
 	resultObject = ManagerUtils.calculatePixelLinearDepthV2(gl, screenX, screenY, depthTex, normalTex, magoManager);
-	if(resultObject.frustumIdx < magoManager.numFrustums)
+	if (resultObject.frustumIdx < magoManager.numFrustums)
 	{
 		linearDepth = resultObject.linearDepth;
 		frustumFar = resultObject.far;
@@ -519,11 +519,11 @@ WindVolume.prototype._getRayIntersectionWithVolume = function(screenX, screenY, 
 	}
 
 	var posCC_front;
-	if(normal4[0] + normal4[1] + normal4[2] < 0.1)
+	if (normal4[0] + normal4[1] + normal4[2] < 0.1)
 	{
 		// The camera is inside of the volume, so there are no intersection with front face.
 		// Considere posCC_front = (0, 0, 0) = cameraPosCC.
-		posCC_front = new Point3D(0,0,0); 
+		posCC_front = new Point3D(0, 0, 0); 
 	}
 	else
 	{
@@ -578,7 +578,7 @@ WindVolume.prototype.newWindStreamLine = function (magoManager)
 	else if (this._particesGenerationType === 2) // 0= no generation. 1= inside frustum. 2= particlesGeneratorBox.
 	{
 		// Check if exist particlesGeneratorBoxes.
-		if(this._particlesGeneratorBoxesArray && this._particlesGeneratorBoxesArray.length > 0)
+		if (this._particlesGeneratorBoxesArray && this._particlesGeneratorBoxesArray.length > 0)
 		{
 			// Provisionally take the 1rst.
 			var pGeneratorBox = this._particlesGeneratorBoxesArray[0];
@@ -636,7 +636,7 @@ WindVolume.prototype.newWindStreamLine_oneLayer = function(magoManager)
 	
 	// Obtain the velocity in this geoCoord.
 	var windLayer = this.getNearestWindLayerByAltitude(altitude);
-	if(!windLayer)// || !windLayer.windPlaneFBO)
+	if (!windLayer)// || !windLayer.windPlaneFBO)
 	{
 		return;
 	}
@@ -682,7 +682,7 @@ WindVolume.prototype.newWindStreamLine_oneLayer = function(magoManager)
 
 	var linearDepth;
 	var frustumFar, frustumNear;
-	if(resultObject.frustumIdx < magoManager.numFrustums)
+	if (resultObject.frustumIdx < magoManager.numFrustums)
 	{
 		linearDepth = resultObject.linearDepth;
 		frustumFar = resultObject.far;
@@ -710,7 +710,7 @@ WindVolume.prototype.newWindStreamLine_oneLayer = function(magoManager)
 	geoCoord.altitude = altitude;
 
 	// Check if intersects with the geoExtent.
-	if(geoExtent.intersects2dWithGeoCoord(geoCoord))
+	if (geoExtent.intersects2dWithGeoCoord(geoCoord))
 	{
 		var renderableObject = this._getWindStreamLine_oneLayer(geoCoord, windLayer, magoManager, optionsThickLine);
 		return renderableObject;
@@ -721,12 +721,12 @@ WindVolume.prototype.newWindStreamLine_oneLayer = function(magoManager)
 
 WindVolume.prototype._prepareWindGeoJson = function()
 {
-	if(this._geoJsonFileLoadState === CODE.fileLoadState.READY)
+	if (this._geoJsonFileLoadState === CODE.fileLoadState.READY)
 	{
 		this.loadWindGeoJson();
 		return false;
 	}
-	else if(this._geoJsonFileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
+	else if (this._geoJsonFileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
 	{
 		return false;
 	}
@@ -736,7 +736,7 @@ WindVolume.prototype._prepareWindGeoJson = function()
 
 WindVolume.prototype._prepareWindLayers = function()
 {
-	if(!this._geoJsonFile)
+	if (!this._geoJsonFile)
 	{
 		return false;
 	}
@@ -748,18 +748,18 @@ WindVolume.prototype._prepareWindLayers = function()
 		var geoJsonFileFolderPath = this._geoJsonFileFolderPath;
 		var features = this._geoJsonFile.features;
 		var layersCount = features.length;
-		if(layersCount > 0)
+		if (layersCount > 0)
 		{
 			this._windLayersAltitudesArray = new Array(layersCount);
 			var layer;
 			layer = features[0]; // take the frist layer, to set the bbox.
 			var bbox = new BoundingBox();
 			bbox.initXYZData(layer.bbox[0], layer.bbox[1], layer.bbox[2]);
-			for(var i=0; i<layersCount; i++)
+			for (var i=0; i<layersCount; i++)
 			{
 				layer = features[i];
 				var options = {
-					geoJsonFile : layer,
+					geoJsonFile           : layer,
 					geoJsonFileFolderPath : geoJsonFileFolderPath
 				};
 				var windLayer = this.newWindLayer(options);
@@ -774,7 +774,7 @@ WindVolume.prototype._prepareWindLayers = function()
 			}
 
 			// calculate the geoExtent of the windVolume.
-			if(!this.geoExtent)
+			if (!this.geoExtent)
 			{
 				// use geoJson to calculate the geoExtent.
 				this.geoExtent = new GeographicExtent(bbox.minX, bbox.minY, bbox.minZ,  bbox.maxX, bbox.maxY, bbox.maxZ);
@@ -788,21 +788,21 @@ WindVolume.prototype._prepareWindLayers = function()
 		return false;
 	}
 
-	if(!this._allWindLayersPrepared)
+	if (!this._allWindLayersPrepared)
 	{
 		var allLayersPrepared = true;
 		var layersCount = this.windLayersArray.length;
-		for(var i=0; i<layersCount; i++)
+		for (var i=0; i<layersCount; i++)
 		{
 			var windLayer = this.windLayersArray[i];
 
-			if(!windLayer.prepareWindLayer())
+			if (!windLayer.prepareWindLayer())
 			{
 				allLayersPrepared = false;
 			}
 		}
 		
-		if(allLayersPrepared)
+		if (allLayersPrepared)
 		{
 			this._allWindLayersPrepared = true;
 		}
@@ -815,14 +815,14 @@ WindVolume.prototype._prepareWindLayers = function()
 
 WindVolume.prototype._getVolumeFrontFBO = function(magoManager)
 {
-	if(!this.volumeFrontFBO)
+	if (!this.volumeFrontFBO)
 	{
 		var gl = magoManager.getGl();
 		var sceneState = magoManager.sceneState;
 		var bufferWidth = sceneState.drawingBufferWidth[0];
 		var bufferHeight = sceneState.drawingBufferHeight[0];
 		var bUseMultiRenderTarget = magoManager.postFxShadersManager.bUseMultiRenderTarget;
-		this.volumeFrontFBO = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 4}); 
+		this.volumeFrontFBO = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget: bUseMultiRenderTarget, numColorBuffers: 4}); 
 	}
 
 	return this.volumeFrontFBO;
@@ -830,14 +830,14 @@ WindVolume.prototype._getVolumeFrontFBO = function(magoManager)
 
 WindVolume.prototype._getVolumeRearFBO = function(magoManager)
 {
-	if(!this.volumeRearFBO)
+	if (!this.volumeRearFBO)
 	{
 		var gl = magoManager.getGl();
 		var sceneState = magoManager.sceneState;
 		var bufferWidth = sceneState.drawingBufferWidth[0];
 		var bufferHeight = sceneState.drawingBufferHeight[0];
 		var bUseMultiRenderTarget = magoManager.postFxShadersManager.bUseMultiRenderTarget;
-		this.volumeRearFBO = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 4}); 
+		this.volumeRearFBO = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget: bUseMultiRenderTarget, numColorBuffers: 4}); 
 	}
 
 	return this.volumeRearFBO;
@@ -858,16 +858,16 @@ WindVolume.prototype.renderDepthWindVolume = function(magoManager)
 	var extbuffers = magoManager.extbuffers;
 
 	// Now, render the windPlane.
-	if(!this.visibleObjControler)
+	if (!this.visibleObjControler)
 	{
 		this.visibleObjControler = new VisibleObjectsController();
 	}
 
-	if(this.windDisplayBox)
+	if (this.windDisplayBox)
 	{ this.visibleObjControler.currentVisibleNativeObjects.opaquesArray[0] = this.windDisplayBox; }
 
 	// When render rear, add the lowestWindLayer.***
-	if(this.windDisplayPlanesArray && this.windDisplayPlanesArray.length > 0)
+	if (this.windDisplayPlanesArray && this.windDisplayPlanesArray.length > 0)
 	{
 		var windDisplayPlane = this.windDisplayPlanesArray[0];
 		this.visibleObjControler.currentVisibleNativeObjects.opaquesArray[1] = windDisplayPlane;
@@ -953,7 +953,7 @@ WindVolume.prototype.renderDepthWindVolume = function(magoManager)
 		extbuffers.NONE, // gl_FragData[1]
 		extbuffers.NONE, // gl_FragData[2]
 		extbuffers.NONE, // gl_FragData[3]
-		]);
+	]);
 };
 
 WindVolume.prototype.renderMode3DThickLines = function (magoManager)
@@ -961,7 +961,7 @@ WindVolume.prototype.renderMode3DThickLines = function (magoManager)
 	if (!this.prepareVolume(magoManager))
 	{ return; }
 
-	if(!this.streamLinesArray)
+	if (!this.streamLinesArray)
 	{ this.streamLinesArray = []; }
 
 	var currStreamLinesCount = this.streamLinesArray.length;
@@ -971,10 +971,10 @@ WindVolume.prototype.renderMode3DThickLines = function (magoManager)
 	
 	if (currStreamLinesCount < this.weatherStation.WIND_MAXPARTICLES_INSCREEN && magoManager.currentFrustumIdx === 0)// && this.counterAux > 5)
 	{
-		for(var i=0; i<3; i++)
+		for (var i=0; i<3; i++)
 		{
 			var streamLine = this.newWindStreamLine(magoManager);
-			if(streamLine)
+			if (streamLine)
 			{
 				this.streamLinesArray.push(streamLine);	
 			}
@@ -993,7 +993,7 @@ WindVolume.prototype.renderMode3DThickLines = function (magoManager)
 		extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - depthTex
 		extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - normalTex
 		extbuffers.COLOR_ATTACHMENT3_WEBGL // gl_FragData[3] - albedoTex
-		]);
+	]);
 	//-------------------------------------------------------------------------------------------------------------
 			  
 	var gl = magoManager.getGl();
@@ -1030,7 +1030,7 @@ WindVolume.prototype.renderMode3DThickLines = function (magoManager)
 	var streamLinesArrayAux = [];
 
 	var options = {
-		animationState : this._animationState
+		animationState: this._animationState
 	};
 
 	for (var i=0; i<vectorTypeObjectsCount; i++)
@@ -1040,7 +1040,7 @@ WindVolume.prototype.renderMode3DThickLines = function (magoManager)
 		geoLocData.bindGeoLocationUniforms(gl, thickLineShader);
 		streamLine.render(magoManager, thickLineShader, options);
 
-		if(streamLine.finished)
+		if (streamLine.finished)
 		{
 			// this stream line finished.
 			streamLine.deleteObjects(magoManager.vboMemoryManager);
@@ -1178,18 +1178,18 @@ WindVolume.prototype.renderMode3DThickLines_oneLayer = function(magoManager)
 	//----------------------------------------------------------------------------------------------------------------------------
 	//----------------------------------------------------------------------------------------------------------------------------
 
-	if(!this.streamLinesArray)
+	if (!this.streamLinesArray)
 	{
 		this.streamLinesArray = [];
 	}
 	
 
-	if(this.streamLinesArray.length < 1000 && magoManager.currentFrustumIdx === 0)// && this.counterAux > 5)
+	if (this.streamLinesArray.length < 1000 && magoManager.currentFrustumIdx === 0)// && this.counterAux > 5)
 	{
-		for(var i=0; i<3; i++)
+		for (var i=0; i<3; i++)
 		{
 			var streamLine = this.newWindStreamLine(magoManager);
-			if(streamLine)
+			if (streamLine)
 			{
 				this.streamLinesArray.push(streamLine);	
 			}
@@ -1198,18 +1198,18 @@ WindVolume.prototype.renderMode3DThickLines_oneLayer = function(magoManager)
 
 	
 	var extbuffers = magoManager.extbuffers;
-		magoManager.scene._context._currentFramebuffer._bind();
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, magoManager.depthTex, 0);
-			gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, magoManager.normalTex, 0);
-			gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, magoManager.albedoTex, 0);
+	magoManager.scene._context._currentFramebuffer._bind();
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, magoManager.depthTex, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, magoManager.normalTex, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, magoManager.albedoTex, 0);
 
-			extbuffers.drawBuffersWEBGL([
-				extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
-				extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - depthTex
-				extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - normalTex
-				extbuffers.COLOR_ATTACHMENT3_WEBGL // gl_FragData[3] - albedoTex
+	extbuffers.drawBuffersWEBGL([
+		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
+		extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - depthTex
+		extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - normalTex
+		extbuffers.COLOR_ATTACHMENT3_WEBGL // gl_FragData[3] - albedoTex
 			  ]);
-		/*
+	/*
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // depthTex.
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // normalTex.
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0); // albedoTex.
@@ -1264,7 +1264,7 @@ WindVolume.prototype.renderMode3DThickLines_oneLayer = function(magoManager)
 		geoLocData.bindGeoLocationUniforms(gl, thickLineShader);
 		streamLine.render(magoManager, thickLineShader);
 
-		if(streamLine.finished)
+		if (streamLine.finished)
 		{
 			// this stream line finished.
 			streamLine.deleteObjects(magoManager.vboMemoryManager);
@@ -1355,7 +1355,7 @@ WindVolume.prototype._getTrajectoryInLocalCoordinates = function(startGeoCoord, 
 		var s = (currLon - minLonRad)/lonRadRange;
 		var t = (currLat - minLatRad)/latRadRange;
 
-		if(s > 1.0 || t > 1.0 || s < 0.0 || t < 0.0)
+		if (s > 1.0 || t > 1.0 || s < 0.0 || t < 0.0)
 		{
 			// Considere process finished.***
 			return resultPointsLCArray;
@@ -1363,9 +1363,9 @@ WindVolume.prototype._getTrajectoryInLocalCoordinates = function(startGeoCoord, 
 		
 		// now, with "currAlt" find the 2 windLayers.
 		var idxUp = WeatherStation.binarySearch_layersByAltitude(this._windLayersAltitudesArray, currAlt);
-		if(idxUp >= windLayersCount)
+		if (idxUp >= windLayersCount)
 		{ idxUp = windLayersCount - 1; }
-		else if(idxUp < 0)
+		else if (idxUp < 0)
 		{ idxUp = 0; }
 		var idxDown = (idxUp - 1) < 0 ? 0 : idxUp - 1;
 
@@ -1411,7 +1411,7 @@ WindVolume.prototype._getTrajectoryInLocalCoordinates = function(startGeoCoord, 
 		var pointLC = new Point3D(curXinMeters, curYinMeters, curZinMeters);
 		resultPointsLCArray.push(pointLC); // push the 1rst pointLC.
 
-		if(options.velocitiesArray)
+		if (options.velocitiesArray)
 		{
 			options.velocitiesArray.push(velocity3d);
 		}
@@ -1421,7 +1421,7 @@ WindVolume.prototype._getTrajectoryInLocalCoordinates = function(startGeoCoord, 
 		currLat += offsetYinMeters * meterToLat;
 		currAlt += offsetZinMeters;
 
-		if(Math.abs(velocity3d.x) + Math.abs(velocity3d.y) + Math.abs(velocity3d.z) < 0.002)
+		if (Math.abs(velocity3d.x) + Math.abs(velocity3d.y) + Math.abs(velocity3d.z) < 0.002)
 		{
 			return resultPointsLCArray;
 		}
@@ -1447,10 +1447,10 @@ WindVolume.prototype._getWindStreamLine = function (startGeoCoord, magoManager, 
 	{ options.color = new Color(1.0, 0.3, 0.3, 1.0); }
 
 	// check the colorRamp.***
-	if(this.colorRamp)
+	if (this.colorRamp)
 	{
 		// need velocities array.
-		if(options.velocitiesArray === undefined)
+		if (options.velocitiesArray === undefined)
 		{ options.velocitiesArray = []; }
 	}
 	
@@ -1458,7 +1458,7 @@ WindVolume.prototype._getWindStreamLine = function (startGeoCoord, magoManager, 
 	// Make pointsLC rel to startGeoCoord.
 	var points3dLCArray = this._getTrajectoryInLocalCoordinates(startGeoCoord, magoManager, options);
 
-	if(!points3dLCArray || points3dLCArray.length < 2)
+	if (!points3dLCArray || points3dLCArray.length < 2)
 	{
 		return undefined;
 	}
@@ -1474,7 +1474,7 @@ WindVolume.prototype._getWindStreamLine = function (startGeoCoord, magoManager, 
 	};
 
 	// If exist this.colorRamp, then create colorsArray.*****************************************************************************
-	if(this.colorRamp)
+	if (this.colorRamp)
 	{
 		options.colorsArray = []; // create colors array.***
 
@@ -1483,18 +1483,18 @@ WindVolume.prototype._getWindStreamLine = function (startGeoCoord, magoManager, 
 		var vel, speed;
 		var minSpeed = 1000000.0;
 		var maxSpeed = -100.0;
-		for(var i=0; i<valuesCount; i++)
+		for (var i=0; i<valuesCount; i++)
 		{
 			vel = options.velocitiesArray[i];
 			speed = vel.getModul();
 			color = this.colorRamp.getInterpolatedColor(speed);
 			options.colorsArray.push(color);
 
-			if(speed > maxSpeed)
+			if (speed > maxSpeed)
 			{
 				maxSpeed = speed;
 			}
-			else if(speed < minSpeed)
+			else if (speed < minSpeed)
 			{
 				minSpeed = speed;
 			}
@@ -1511,7 +1511,7 @@ WindVolume.prototype._getWindStreamLine = function (startGeoCoord, magoManager, 
 	// Now, create a customVbo.
 	var pointsCount = points3dLCArray.length;
 	var indicesDataArray = new Float32Array(pointsCount*4);
-	for(var i=0; i<pointsCount*4; i++)
+	for (var i=0; i<pointsCount*4; i++)
 	{
 		indicesDataArray[i] = i.toFixed(0);
 	}
@@ -1551,7 +1551,7 @@ WindVolume.prototype._getWindStreamLine_oneLayer = function(geoCoordsArray, mago
 	var geoCoordsCount = geoCoordsArray.length;
 	var pointsWCArray = new Array(geoCoordsCount);
 	
-	for(var i=0; i<geoCoordsCount; i++)
+	for (var i=0; i<geoCoordsCount; i++)
 	{
 		var cartesian = Globe.geographicToCartesianWgs84(geoCoordsArray[i].longitude, geoCoordsArray[i].latitude, geoCoordsArray[i].altitude, undefined);
 		var posWC = new Point3D(cartesian[0], cartesian[1], cartesian[2]);
@@ -1560,7 +1560,7 @@ WindVolume.prototype._getWindStreamLine_oneLayer = function(geoCoordsArray, mago
 
 	// now, convert posWC to posLC.
 	var points3dLCArray = new Array(geoCoordsCount);
-	for(var i=0; i<geoCoordsCount; i++)
+	for (var i=0; i<geoCoordsCount; i++)
 	{
 		points3dLCArray[i] = geoLoc.getTransformedRelativePosition(pointsWCArray[i], points3dLCArray[i]);
 	}
@@ -1595,7 +1595,7 @@ WindVolume.prototype._getWindStreamLine_oneLayer = function(geoCoordsArray, mago
 	// Now, create a customVbo.
 	var pointsCount = points3dLCArray.length;
 	var indicesDataArray = new Float32Array(pointsCount*4);
-	for(var i=0; i<pointsCount*4; i++)
+	for (var i=0; i<pointsCount*4; i++)
 	{
 		indicesDataArray[i] = i.toFixed(0);
 	}

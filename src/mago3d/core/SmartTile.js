@@ -41,19 +41,19 @@ var SmartTile = function(smartTileName, options)
 	
 	this.nativeObjects = {
 		generalObjectsArray : [], // opaques & transparent objects.
-		excavationsArray  : [],
-		vectorTypeArray   : [],
-		lightSourcesArray : [],
-		nativeSeedArray : []
+		excavationsArray    : [],
+		vectorTypeArray     : [],
+		lightSourcesArray   : [],
+		nativeSeedArray     : []
 	};
 	
 	this.isVisible; // var to manage the frustumCulling and delete buildings if necessary.
 	this.distToCamera;
 
-	if(options)
+	if (options)
 	{
-		if(options.smartTileManager)
-		this.smartTileManager = options.smartTileManager;
+		if (options.smartTileManager)
+		{ this.smartTileManager = options.smartTileManager; }
 	}
 };
 
@@ -134,7 +134,7 @@ SmartTile.prototype.newSubTile = function(parentTile)
 	subTile.depth = parentTile.depth + 1;
 	subTile.targetDepth = parentTile.targetDepth;
 
-	if(this.smartTileManager)
+	if (this.smartTileManager)
 	{ subTile.smartTileManager = this.smartTileManager; }
 
 	this.subTiles.push(subTile);
@@ -501,10 +501,10 @@ SmartTile._deleteObjectFromArrayByGuid = function(objectGuid, objectsArray, mago
 {
 	var object;
 	var objectsCount = objectsArray.length;
-	for(var i=0; i<objectsCount; i++)
+	for (var i=0; i<objectsCount; i++)
 	{
 		object = objectsArray[i];
-		if(object._guid === objectGuid)
+		if (object._guid === objectGuid)
 		{
 			// Delete the object.
 			object.deleteObjects(magoManager.vboMemoryManager);
@@ -524,13 +524,13 @@ SmartTile.prototype.deleteNativeObjectByGuid = function(objectGuid, magoManager)
 {
 	var natives = this.nativeObjects;
 	var bDeleted = false;
-	if(SmartTile._deleteObjectFromArrayByGuid(objectGuid, natives.generalObjectsArray, magoManager))
+	if (SmartTile._deleteObjectFromArrayByGuid(objectGuid, natives.generalObjectsArray, magoManager))
 	{ bDeleted = true; }
-	if(SmartTile._deleteObjectFromArrayByGuid(objectGuid, natives.excavationsArray, magoManager))
+	if (SmartTile._deleteObjectFromArrayByGuid(objectGuid, natives.excavationsArray, magoManager))
 	{ bDeleted = true; }
-	if(SmartTile._deleteObjectFromArrayByGuid(objectGuid, natives.vectorTypeArray, magoManager))
+	if (SmartTile._deleteObjectFromArrayByGuid(objectGuid, natives.vectorTypeArray, magoManager))
 	{ bDeleted = true; }
-	if(SmartTile._deleteObjectFromArrayByGuid(objectGuid, natives.lightSourcesArray, magoManager))
+	if (SmartTile._deleteObjectFromArrayByGuid(objectGuid, natives.lightSourcesArray, magoManager))
 	{ bDeleted = true; }
 	return false;
 };
@@ -561,10 +561,13 @@ SmartTile.prototype.putObject = function(targetDepth, object, magoManager)
 
 		// intercept buildingSeeds for each subTiles.
 		var geoCoord;
-		if(object.geoLocDataManager) {
+		if (object.geoLocDataManager) 
+		{
 			var geoLocData = object.geoLocDataManager.getCurrentGeoLocationData();
 			geoCoord = geoLocData.getGeographicCoords();
-		} else if(object.geographicCoord) {
+		}
+		else if (object.geographicCoord) 
+		{
 			geoCoord = object.geographicCoord;
 		}
 		
@@ -903,8 +906,8 @@ SmartTile.prototype.getFrustumIntersectedTiles = function(camera, frustum, resul
 		} 
 			
 		var maxDepth = 30;
-		if(this.smartTileManager)
-		maxDepth = this.smartTileManager.maxDepth;
+		if (this.smartTileManager)
+		{ maxDepth = this.smartTileManager.maxDepth; }
 
 		if (this.subTiles && this.subTiles.length > 0 && this.depth < maxDepth) 
 		{
@@ -1199,9 +1202,9 @@ SmartTile.prototype.createGeometriesFromSeeds = function (magoManager)
 			if (smartTileF4dSeed.fileLoadState === CODE.fileLoadState.READY)
 			{
 				if (smartTileF4dSeed.smartTile_parsedFromWorker)
-					{
-						var hola = 0;
-					}
+				{
+					var hola = 0;
+				}
 				//this.smartTileF4dSeedMap[name] = {
 				//"L"                 : L,
 				//"X"                 : X,
@@ -1494,8 +1497,8 @@ SmartTile.prototype._workerParseSmartTile = function (smartTileF4dSeed, magoMana
 	}
 	
 	var data = { 
-		info: {x: this.X, y: this.Y, z: this.depth, tileName : smartTileF4dSeed.tileName},
-		dataArrayBuffer: dataArrayBuffer};
+		info            : {x: this.X, y: this.Y, z: this.depth, tileName: smartTileF4dSeed.tileName},
+		dataArrayBuffer : dataArrayBuffer};
 	smartTileManager.workerParseSmartTile.postMessage(data, [data.dataArrayBuffer]); // send to worker by reference (transfer).
 	//smartTileManager.workerParseSmartTile.postMessage(data); // send to worker by copy. this is slower.
 };
@@ -1544,8 +1547,8 @@ SmartTile.prototype._parseSmartTileF4d = function (parsedResult, magoManager)
 		//	"heightReference" : HeightReference.CLAMP_TO_GROUND
 		//};
 		var attributes = {
-			"isPhysical"      : true,
-			"objectType"      : "basicF4d"
+			"isPhysical" : true,
+			"objectType" : "basicF4d"
 		};
 		if (projectFolderName.indexOf('-tree') > 0) 
 		{
@@ -1661,7 +1664,7 @@ SmartTile.prototype._parseSmartTileF4d = function (parsedResult, magoManager)
 
 		parsedBuildingData = undefined; // delete from map to save memory.
 
-		if(externInfo.heightReference) 
+		if (externInfo.heightReference) 
 		{
 			var charValue = externInfo.heightReference;
 			charValue = HeightReference.getValueByOrdinal(charValue);
@@ -1674,7 +1677,7 @@ SmartTile.prototype._parseSmartTileF4d = function (parsedResult, magoManager)
 			var lowLodMesh = neoBuilding.getOrNewLodMesh(lodName);
 			
 			// Note : "lowLodMeshes" can be shared in a building, so, lodMesh_5 can be used for lod 4 or lod 3. So if the lodMesh exist, then dont touch it.**********
-			if(lowLodMesh.fileLoadState === CODE.fileLoadState.READY)
+			if (lowLodMesh.fileLoadState === CODE.fileLoadState.READY)
 			{
 				// Only set "LOADING_FINISHED" when fileLoadState = "READY".
 				lowLodMesh.fileLoadState = CODE.fileLoadState.LOADING_FINISHED;
@@ -1704,9 +1707,12 @@ SmartTile.prototype._parseSmartTileF4d = function (parsedResult, magoManager)
 				}
 			}
 
-			if(attributes.heightReference === HeightReference.RELATIVE_TO_GROUND) {
+			if (attributes.heightReference === HeightReference.RELATIVE_TO_GROUND) 
+			{
 				node.data.relativeHeight = geoCoord.altitude;
-			} else {
+			}
+			else 
+			{
 				node.data.relativeHeight = 0;
 			}
 
@@ -1719,14 +1725,14 @@ SmartTile.prototype._parseSmartTileF4d = function (parsedResult, magoManager)
 			var lat = geoCoord.latitude;
 			var alt = geoCoord.altitude;
 			magoManager.instantiateStaticModel({
-				projectId  : savedProjectId,
-				instanceId : buildingId,
-				longitude  : lon,
-				latitude   : lat,
-				height     : alt,
-				heading    : eulerAngDeg.z,
-				pitch      : eulerAngDeg.x,
-				roll       : eulerAngDeg.y,
+				projectId       : savedProjectId,
+				instanceId      : buildingId,
+				longitude       : lon,
+				latitude        : lat,
+				height          : alt,
+				heading         : eulerAngDeg.z,
+				pitch           : eulerAngDeg.x,
+				roll            : eulerAngDeg.y,
 				heightReference : HeightReference.CLAMP_TO_GROUND
 			});
 
@@ -1809,8 +1815,8 @@ SmartTile.prototype.parseSmartTileF4d = function (dataArrayBuffer, magoManager)
 		//	"heightReference" : HeightReference.CLAMP_TO_GROUND
 		//};
 		var attributes = {
-			"isPhysical"      : true,
-			"objectType"      : "basicF4d"
+			"isPhysical" : true,
+			"objectType" : "basicF4d"
 		};
 		if (projectFolderName.indexOf('-tree') > 0) 
 		{
@@ -1939,7 +1945,7 @@ SmartTile.prototype.parseSmartTileF4d = function (dataArrayBuffer, magoManager)
 		// read data_name.
 		var dataName;
 		var endMark = (new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
-		if(endMark > 0)
+		if (endMark > 0)
 		{
 			var dataKeyLength = (new Uint16Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+2)))[0]; bytesReaded += 2;
 			var dataKey = enc.decode(new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+ dataKeyLength))) ;bytesReaded += dataKeyLength;
@@ -2024,7 +2030,7 @@ SmartTile.prototype.parseSmartTileF4d = function (dataArrayBuffer, magoManager)
 			endMark = (new Int8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
 		}
 
-		if(externInfo.heightReference) 
+		if (externInfo.heightReference) 
 		{
 			var charValue = externInfo.heightReference;
 			charValue = HeightReference.getValueByOrdinal(charValue);
@@ -2059,9 +2065,12 @@ SmartTile.prototype.parseSmartTileF4d = function (dataArrayBuffer, magoManager)
 				}
 			}
 
-			if(attributes.heightReference === HeightReference.RELATIVE_TO_GROUND) {
+			if (attributes.heightReference === HeightReference.RELATIVE_TO_GROUND) 
+			{
 				node.data.relativeHeight = geoCoord.altitude;
-			} else {
+			}
+			else 
+			{
 				node.data.relativeHeight = 0;
 			}
 
@@ -2074,14 +2083,14 @@ SmartTile.prototype.parseSmartTileF4d = function (dataArrayBuffer, magoManager)
 			var lat = geoCoord.latitude;
 			var alt = geoCoord.altitude;
 			magoManager.instantiateStaticModel({
-				projectId  : savedProjectId,
-				instanceId : buildingId,
-				longitude  : lon,
-				latitude   : lat,
-				height     : alt,
-				heading    : eulerAngDeg.z,
-				pitch      : eulerAngDeg.x,
-				roll       : eulerAngDeg.y,
+				projectId       : savedProjectId,
+				instanceId      : buildingId,
+				longitude       : lon,
+				latitude        : lat,
+				height          : alt,
+				heading         : eulerAngDeg.z,
+				pitch           : eulerAngDeg.x,
+				roll            : eulerAngDeg.y,
 				heightReference : HeightReference.CLAMP_TO_GROUND
 			});
 
@@ -2188,7 +2197,7 @@ SmartTile.selectTileIndices = function(depth, longitude, latitude, resultTileInd
 	var xIndex = Math.floor((longitude - xMin)/angRange);
 	var yIndex = Math.floor((yMin - latitude)/angRange);
 
-	if(resultTileIndices === undefined)
+	if (resultTileIndices === undefined)
 	{
 		resultTileIndices = {};
 	}
@@ -2214,14 +2223,14 @@ SmartTile.selectTileIndicesArray = function(depth, minLon, minLat, maxLon, maxLa
 	var maxY = leftDownTileName.Y; // origin is left-up.
 	var minY = rightUpTileName.Y;
 
-	if(!resultTileIndicesArray)
+	if (!resultTileIndicesArray)
 	{
 		resultTileIndicesArray = [];
 	}
 
-	for(var x = minX; x <= maxX; x++)
+	for (var x = minX; x <= maxX; x++)
 	{
-		for(var y = minY; y <= maxY; y++)
+		for (var y = minY; y <= maxY; y++)
 		{
 			var tileIndices = {
 				L : depth, X : x, Y : y
@@ -2240,7 +2249,7 @@ SmartTile.selectTileIndicesArray = function(depth, minLon, minLat, maxLon, maxLa
  */
 SmartTile.getParentTileOfTileLXY = function(L, X, Y, resultParent, imageryType) 
 {
-	if(!resultParent)
+	if (!resultParent)
 	{
 		resultParent = {L : 0, 
 			X : 0, 

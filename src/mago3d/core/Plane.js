@@ -167,7 +167,7 @@ Plane.prototype.getProjectedPoint = function(point, resultProjectedPoint)
 
 Plane.prototype.isCoincidentLine = function(line, error) 
 {
-	if(error === undefined)
+	if (error === undefined)
 	{
 		error = 1e-8;
 	}
@@ -175,14 +175,14 @@ Plane.prototype.isCoincidentLine = function(line, error)
 	// take 2 points of the line and check if there are coincidents with the plane.
 	var linePoint = line.point;
 
-	if(this.isCoincidentPoint(linePoint, error))
+	if (this.isCoincidentPoint(linePoint, error))
 	{
 		// take a 2nd point and check if is coincident with the plane.
 		var dist = 1000.0;
 		var lineDir = line.direction;
 		var linePoint2 = new Point2D(linePoint.x + lineDir.x * dist, linePoint.y + lineDir.y * dist, linePoint.z + lineDir.z * dist);
 
-		if(this.isCoincidentPoint(linePoint2, error))
+		if (this.isCoincidentPoint(linePoint2, error))
 		{
 			return true;
 		}
@@ -196,12 +196,12 @@ Plane.prototype.isCoincidentPoint = function(point, error)
 	// check the plane equation.
 	var val = this.a * point.x + this.b * point.y + this.c * point.z + this.d;
 
-	if(error === undefined)
+	if (error === undefined)
 	{
 		error = 1e-8;
 	}
 
-	if(Math.abs(val) < error)
+	if (Math.abs(val) < error)
 	{
 		return true;
 	}
@@ -247,7 +247,7 @@ Plane.prototype.getRelativePositionOfTheSegment = function(segment, error)
 	// 4) one point is coincident with the plane.
 	// 5) two points is coincident with the plane (segement is in plane).
 	//-----------------------------------------------------------------------
-	if(error === undefined)
+	if (error === undefined)
 	{
 		error = 1e-8;
 	}
@@ -269,58 +269,58 @@ Plane.prototype.getRelativePositionOfTheSegment = function(segment, error)
 	var relPosEndPoint = this.getRelativePositionOfThePoint(endPoint, error);
 	var resultRelPos = CODE.relativePositionSegment3DWithPlane2D.UNKNOWN;
 
-	if(relPosStartPoint === Constant.INTERSECTION_INSIDE)
+	if (relPosStartPoint === Constant.INTERSECTION_INSIDE)
 	{
 		// startPoint is in front of the plane.
-		if(relPosEndPoint === Constant.INTERSECTION_INSIDE)
+		if (relPosEndPoint === Constant.INTERSECTION_INSIDE)
 		{
 			// endPoint is in front of the plane.
 			resultRelPos = CODE.relativePositionSegment3DWithPlane2D.NO_INTERSECTION;
 		}
-		else if(relPosEndPoint === Constant.INTERSECTION_OUTSIDE)
+		else if (relPosEndPoint === Constant.INTERSECTION_OUTSIDE)
 		{
 			// endPoint is rear of the plane.
 			resultRelPos = CODE.relativePositionSegment3DWithPlane2D.INTERSECTION;
 		}
-		else if(relPosEndPoint === Constant.INTERSECTION_INTERSECT)
+		else if (relPosEndPoint === Constant.INTERSECTION_INTERSECT)
 		{
 			// endPoint is coincident with the plane.
 			resultRelPos = CODE.relativePositionSegment3DWithPlane2D.END_POINT_COINCIDENT;
 		}
 	}
-	else if(relPosStartPoint === Constant.INTERSECTION_OUTSIDE)
+	else if (relPosStartPoint === Constant.INTERSECTION_OUTSIDE)
 	{
 		// startPoint is rear of the plane.
-		if(relPosEndPoint === Constant.INTERSECTION_INSIDE)
+		if (relPosEndPoint === Constant.INTERSECTION_INSIDE)
 		{
 			// endPoint is in front of the plane.
 			resultRelPos = CODE.relativePositionSegment3DWithPlane2D.INTERSECTION;
 		}
-		else if(relPosEndPoint === Constant.INTERSECTION_OUTSIDE)
+		else if (relPosEndPoint === Constant.INTERSECTION_OUTSIDE)
 		{
 			// endPoint is rear of the plane.
 			resultRelPos = CODE.relativePositionSegment3DWithPlane2D.NO_INTERSECTION;
 		}
-		else if(relPosEndPoint === Constant.INTERSECTION_INTERSECT)
+		else if (relPosEndPoint === Constant.INTERSECTION_INTERSECT)
 		{
 			// endPoint is coincident with the plane.
 			resultRelPos = CODE.relativePositionSegment3DWithPlane2D.END_POINT_COINCIDENT;
 		}
 	}
-	else if(relPosStartPoint === Constant.INTERSECTION_INTERSECT)
+	else if (relPosStartPoint === Constant.INTERSECTION_INTERSECT)
 	{
 		// startPoint is coincident with the plane.
-		if(relPosEndPoint === Constant.INTERSECTION_INSIDE)
+		if (relPosEndPoint === Constant.INTERSECTION_INSIDE)
 		{
 			// endPoint is in front of the plane.
 			resultRelPos = CODE.relativePositionSegment3DWithPlane2D.START_POINT_COINCIDENT;
 		}
-		else if(relPosEndPoint === Constant.INTERSECTION_OUTSIDE)
+		else if (relPosEndPoint === Constant.INTERSECTION_OUTSIDE)
 		{
 			// endPoint is rear of the plane.
 			resultRelPos = CODE.relativePositionSegment3DWithPlane2D.START_POINT_COINCIDENT;
 		}
-		else if(relPosEndPoint === Constant.INTERSECTION_INTERSECT)
+		else if (relPosEndPoint === Constant.INTERSECTION_INTERSECT)
 		{
 			// endPoint is coincident with the plane.
 			resultRelPos = CODE.relativePositionSegment3DWithPlane2D.TWO_POINTS_COINCIDENT;
@@ -332,7 +332,7 @@ Plane.prototype.getRelativePositionOfTheSegment = function(segment, error)
 
 Plane.prototype.getRelativePositionOfThePoint = function(point, error) 
 {
-	if(error === undefined)
+	if (error === undefined)
 	{
 		error = 1e-8;
 	}

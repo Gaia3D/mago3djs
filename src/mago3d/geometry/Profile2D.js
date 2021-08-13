@@ -19,9 +19,11 @@ var Profile2D = function()
 /**
  * @param {Array<Point2D>} point2dArray
  */
-Profile2D.fromPoint2DArray = function(point2dArray) {
-	if(!point2dArray || !Array.isArray(point2dArray)) {
-		throw new Error(Messages.REQUIRED_EMPTY_ERROR('Point2D Array'))
+Profile2D.fromPoint2DArray = function(point2dArray) 
+{
+	if (!point2dArray || !Array.isArray(point2dArray)) 
+	{
+		throw new Error(Messages.REQUIRED_EMPTY_ERROR('Point2D Array'));
 	}
 
 	var profile2d = new Profile2D();
@@ -29,12 +31,13 @@ Profile2D.fromPoint2DArray = function(point2dArray) {
 	var polyline = outerRing.newElement("POLYLINE");
 
 	var pointCount = point2dArray.length;
-	for(var i=0;i<pointCount;i++) {
+	for (var i=0;i<pointCount;i++) 
+	{
 		polyline.addPoint2d(point2dArray[i]);
 	}
 
 	return profile2d;
-}
+};
 
 /**
  * Set new outer border of this polygon as outerRing

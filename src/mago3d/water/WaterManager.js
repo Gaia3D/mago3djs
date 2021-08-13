@@ -10,11 +10,11 @@ var WaterManager = function (magoManager, options)
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-    // https://github.com/LanLou123/Webgl-Erosion
+	// https://github.com/LanLou123/Webgl-Erosion
 	// https://cgg.mff.cuni.cz/~jaroslav/papers/2008-sca-erosim/2008-sca-erosiom-fin.pdf
 
-    this.waterLayersArray = [];
-    this.magoManager = magoManager;
+	this.waterLayersArray = [];
+	this.magoManager = magoManager;
 
 	// Simulation extension.***************************************************************************
 	this.simulationGeoExtent;
@@ -55,46 +55,46 @@ var WaterManager = function (magoManager, options)
 	//-------------------------------------------------------------------------------------------------
 
 	// Check options.***
-	if(options)
+	if (options)
 	{
-		if(options.simulationGeographicExtent)
+		if (options.simulationGeographicExtent)
 		{
 			this.simulationGeoExtent = options.simulationGeographicExtent;
 		}
 
-		if(options.terrainDemSourceType)
+		if (options.terrainDemSourceType)
 		{
 			this.terrainDemSourceType = options.terrainDemSourceType;
 		}
 
-		if(options.terrainProvider)
+		if (options.terrainProvider)
 		{
 			this.terrainProvider = options.terrainProvider;
 		}
 
-		if(options.renderParticles !== undefined)
+		if (options.renderParticles !== undefined)
 		{
 			this.bRenderParticles = options.renderParticles;
 		}
 
-		if(options.existRain !== undefined)
+		if (options.existRain !== undefined)
 		{
 			this.bExistRain = options.existRain;
 		}
 
-		if(options.waterSourceUrl !== undefined)
+		if (options.waterSourceUrl !== undefined)
 		{
 			this.waterSourceUrl = options.waterSourceUrl;
 		}
 
-		if(options.maxSimulationTextureSize !== undefined)
+		if (options.maxSimulationTextureSize !== undefined)
 		{
 			this.maxSimulationSize = options.maxSimulationTextureSize;
 		}
 	}
 
 
-    this.createDefaultShaders();
+	this.createDefaultShaders();
 	this.init();
 };
 
@@ -128,7 +128,7 @@ WaterManager.prototype.init = function ()
 
 
 	var maxTexSize = this.maxSimulationSize;
-	if(lonArcDist > latArcDist)
+	if (lonArcDist > latArcDist)
 	{
 		// longitude texture size is 1024.
 		this.simulationTextureSize[0] = maxTexSize;
@@ -147,25 +147,25 @@ WaterManager.prototype.init = function ()
 	var gl = this.magoManager.getGl();
 	// create frame buffer object.
 	
-	if(!this.fbo) // simulation fbo (512 x 512).
+	if (!this.fbo) // simulation fbo (512 x 512).
 	{
 		var bufferWidth = this.simulationTextureSize[0];
 		var bufferHeight = this.simulationTextureSize[1];
 		var bUseMultiRenderTarget = this.magoManager.postFxShadersManager.bUseMultiRenderTarget;
 
-		this.fbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: false, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 3}); 
+		this.fbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: false, multiRenderTarget: bUseMultiRenderTarget, numColorBuffers: 3}); 
 	}
 
-	if(!this.terrainTexFbo) // simulation fbo (512 x 512).
+	if (!this.terrainTexFbo) // simulation fbo (512 x 512).
 	{
 		var bufferWidth = this.terrainTextureSize[0];
 		var bufferHeight = this.terrainTextureSize[1];
 		var bUseMultiRenderTarget = this.magoManager.postFxShadersManager.bUseMultiRenderTarget;
 
-		this.terrainTexFbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: false, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 3}); 
+		this.terrainTexFbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: false, multiRenderTarget: bUseMultiRenderTarget, numColorBuffers: 3}); 
 	}
 
-	if(!this.depthFbo) // screen size fbo.
+	if (!this.depthFbo) // screen size fbo.
 	{
 		var magoManager = this.magoManager;
 		var sceneState = magoManager.sceneState;
@@ -173,7 +173,7 @@ WaterManager.prototype.init = function ()
 		var bufferHeight = sceneState.drawingBufferHeight[0];
 		var bUseMultiRenderTarget = magoManager.postFxShadersManager.bUseMultiRenderTarget;
 
-		this.depthFbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 3}); 
+		this.depthFbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget: bUseMultiRenderTarget, numColorBuffers: 3}); 
 	}
 
 	// Water particles.**************************************************************************************************************************************************
@@ -187,32 +187,32 @@ WaterManager.prototype.init = function ()
 	this.particlesRenderTexWidth = 2048;
 	this.particlesRenderTexHeight = 2048;
 
-	if(!this.windParticlesPosFbo) // simulation fbo (windRes x windRes).
+	if (!this.windParticlesPosFbo) // simulation fbo (windRes x windRes).
 	{
 		var bufferWidth = this.windRes;
 		var bufferHeight = this.windRes;
 		var bUseMultiRenderTarget = this.magoManager.postFxShadersManager.bUseMultiRenderTarget;
 
-		this.windParticlesPosFbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: false, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 1}); 
+		this.windParticlesPosFbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: false, multiRenderTarget: bUseMultiRenderTarget, numColorBuffers: 1}); 
 	}
 
-	if(!this.windParticlesRenderingFbo) // simulation fbo (windRes x windRes).
+	if (!this.windParticlesRenderingFbo) // simulation fbo (windRes x windRes).
 	{
 		var bufferWidth = this.particlesRenderTexWidth;
 		var bufferHeight = this.particlesRenderTexHeight;
 		var bUseMultiRenderTarget = this.magoManager.postFxShadersManager.bUseMultiRenderTarget;
 
-		this.windParticlesRenderingFbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: false, multiRenderTarget : bUseMultiRenderTarget, numColorBuffers : 3}); 
+		this.windParticlesRenderingFbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: false, multiRenderTarget: bUseMultiRenderTarget, numColorBuffers: 3}); 
 	}
 	//------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 	// create only one water layer.******************************************************************************************************************************************
 	var geoExtent = this.simulationGeoExtent;
 	var options = {
-		geographicExtent : geoExtent
+		geographicExtent: geoExtent
 	};
 
-	if(this.waterSourceUrl)
+	if (this.waterSourceUrl)
 	{
 		options.waterSourceUrl = this.waterSourceUrl;
 	}
@@ -220,16 +220,16 @@ WaterManager.prototype.init = function ()
 	var waterLayer = this.newWater(options);
 };
 
- /**
+/**
  * render
  */
 WaterManager.prototype.createDefaultShaders = function ()
 {
-    // the water render shader.
-    var magoManager = this.magoManager;
-    var gl = magoManager.getGl();
+	// the water render shader.
+	var magoManager = this.magoManager;
+	var gl = magoManager.getGl();
 
-    var use_linearOrLogarithmicDepth = "USE_LINEAR_DEPTH";
+	var use_linearOrLogarithmicDepth = "USE_LINEAR_DEPTH";
 	var use_multi_render_target = "NO_USE_MULTI_RENDER_TARGET";
 	var glVersion = gl.getParameter(gl.VERSION);
 	
@@ -663,14 +663,14 @@ WaterManager.prototype.createDefaultShaders = function ()
 
 WaterManager.prototype.getQuadBuffer = function ()
 {
-	if(!this.screenQuad)
+	if (!this.screenQuad)
 	{
 		var gl = this.magoManager.getGl();
 		var posData = new Float32Array([0, 0,   1, 0,   0, 1,   0, 1,   1, 0,   1, 1]); // total screen.
 		var webglposBuffer = FBO.createBuffer(gl, posData);
 
 		this.screenQuad = {
-			posBuffer : webglposBuffer
+			posBuffer: webglposBuffer
 		};
 	}
 
@@ -697,26 +697,26 @@ WaterManager.prototype.doIntersectedObjectsCulling = function (visiblesArray, na
 	var isFarestFrustum = this.magoManager.isFarestFrustum();
 	//if(!this.bObjectsCulling)
 	//{
-		var waterLayersCount = this.waterLayersArray.length;
-		var waterLayer;
+	var waterLayersCount = this.waterLayersArray.length;
+	var waterLayer;
 
-		if(isFarestFrustum)
-		{
-			for(var i=0; i<waterLayersCount; i++)
-			{
-				waterLayer = this.waterLayersArray[i];
-				if(waterLayer.visibleObjectsControler)
-				{ waterLayer.visibleObjectsControler.clear(); }
-			}
-		}
-
-		for(var i=0; i<waterLayersCount; i++)
+	if (isFarestFrustum)
+	{
+		for (var i=0; i<waterLayersCount; i++)
 		{
 			waterLayer = this.waterLayersArray[i];
-			waterLayer.doIntersectedObjectsCulling(visiblesArray, nativeVisiblesArray);
+			if (waterLayer.visibleObjectsControler)
+			{ waterLayer.visibleObjectsControler.clear(); }
 		}
+	}
 
-		this.bObjectsCulling = true;
+	for (var i=0; i<waterLayersCount; i++)
+	{
+		waterLayer = this.waterLayersArray[i];
+		waterLayer.doIntersectedObjectsCulling(visiblesArray, nativeVisiblesArray);
+	}
+
+	this.bObjectsCulling = true;
 	//}
 };
 
@@ -726,7 +726,7 @@ WaterManager.prototype.makeWaterAndContaminationSourceTex = function ()
 	var waterLayer;
 	var magoManager = this.magoManager;
 
-	for(var i=0; i<waterLayersCount; i++)
+	for (var i=0; i<waterLayersCount; i++)
 	{
 		waterLayer = this.waterLayersArray[i];
 		waterLayer.makeWaterAndContaminationSourceTex(magoManager);
@@ -740,7 +740,7 @@ WaterManager.prototype.doExcavationDEM = function ()
 	var shader;
 	var magoManager = this.magoManager;
 
-	for(var i=0; i<waterLayersCount; i++)
+	for (var i=0; i<waterLayersCount; i++)
 	{
 		waterLayer = this.waterLayersArray[i];
 		waterLayer.excavationDEM(shader, magoManager);
@@ -754,7 +754,7 @@ WaterManager.prototype.overWriteDEMWithObjects = function ()
 	var shader;
 	var magoManager = this.magoManager;
 
-	for(var i=0; i<waterLayersCount; i++)
+	for (var i=0; i<waterLayersCount; i++)
 	{
 		waterLayer = this.waterLayersArray[i];
 		waterLayer.overWriteDEMWithObjects(shader, magoManager);
@@ -775,7 +775,7 @@ WaterManager.prototype.renderTerrain = function ()
 	var shader = magoManager.postFxShadersManager.getShader("terrainRender");
 	magoManager.postFxShadersManager.useProgram(shader);
 	shader.bindUniformGenerals();
-	for(var i=0; i<waterLayersCount; i++)
+	for (var i=0; i<waterLayersCount; i++)
 	{
 		waterLayer = this.waterLayersArray[i];
 		waterLayer.renderTerrain(shader, magoManager);
@@ -796,7 +796,7 @@ WaterManager.prototype._TEST_renderQMesh = function ()
 	//var shader = magoManager.postFxShadersManager.getShader("terrainRender");
 	//magoManager.postFxShadersManager.useProgram(shader);
 	//shader.bindUniformGenerals();
-	for(var i=0; i<waterLayersCount; i++)
+	for (var i=0; i<waterLayersCount; i++)
 	{
 		waterLayer = this.waterLayersArray[i];
 		waterLayer._renderQMesh(magoManager);
@@ -814,7 +814,7 @@ WaterManager.prototype.setTrrainDiffuseTextureIdx = function (terrainDiffTexIdx)
 	// provisionally there are only 2 textures, so swap its.
 	var waterLayersCount = this.waterLayersArray.length;
 	var waterLayer;
-	for(var i=0; i<waterLayersCount; i++)
+	for (var i=0; i<waterLayersCount; i++)
 	{
 		waterLayer = this.waterLayersArray[i];
 		Water._swapTextures(waterLayer.terrainDiffTex, waterLayer.terrainDiffTex2);
@@ -829,11 +829,11 @@ WaterManager.prototype.render = function ()
 	var gl = magoManager.getGl();
 
 	// 1rst, check if exist excavations.*********************************************************************
-	if(this.bExistPendentExcavation)
+	if (this.bExistPendentExcavation)
 	{
 		// do excavations only one time for all frustums.
 		this.doExcavationDEM();
-		if(this.magoManager.currentFrustumIdx === 0)
+		if (this.magoManager.currentFrustumIdx === 0)
 		{
 			this.bExistPendentExcavation = false;
 		}
@@ -841,14 +841,14 @@ WaterManager.prototype.render = function ()
 	//-------------------------------------------------------------------------------------------------------
 
 	// 2nd, check if simulate water.************************************************************************
-	if(this.bSsimulateWater)
+	if (this.bSsimulateWater)
 	{
 		//if(!this.magoManager.isCameraMoving)
 
 		this.overWriteDEMWithObjects();
 		this.makeWaterAndContaminationSourceTex();
 
-		if(this.magoManager.currentFrustumIdx === 0)
+		if (this.magoManager.currentFrustumIdx === 0)
 		{ 
 			// do simulation in "currentFrustumIdx" == 0 (nearestFrustum).
 			// in nearestFrustum we have overWriteDEM data ready & updated.
@@ -928,7 +928,7 @@ WaterManager.prototype.render = function ()
 
 		gl.enable(gl.DEPTH_TEST);
 
-		for(var i=0; i<waterLayersCount; i++)
+		for (var i=0; i<waterLayersCount; i++)
 		{
 			waterLayer = this.waterLayersArray[i];
 			waterLayer.renderWater(shader, magoManager);
@@ -938,16 +938,16 @@ WaterManager.prototype.render = function ()
 
 WaterManager.prototype.getContaminationObjectsArray = function ()
 {
-	if(!this._contaminationBoxesArray)
-	this._contaminationBoxesArray = [];
+	if (!this._contaminationBoxesArray)
+	{ this._contaminationBoxesArray = []; }
 	
 	return this._contaminationBoxesArray;
 };
 
 WaterManager.prototype.getWaterSourceObjectsArray = function ()
 {
-	if(!this._waterSourceObjectsArray)
-	this._waterSourceObjectsArray = [];
+	if (!this._waterSourceObjectsArray)
+	{ this._waterSourceObjectsArray = []; }
 	
 	return this._waterSourceObjectsArray;
 };
@@ -958,68 +958,76 @@ WaterManager.prototype.getWaterSourceObjectsArray = function ()
  */
 WaterManager.prototype.addObject = function (object, depth) 
 {
-	if(!(object instanceof MagoRenderable)) {
+	if (!(object instanceof MagoRenderable)) 
+	{
 		return false;
 	}
 	
 	var permitNames = ['waterGenerator', 'contaminationGenerator'];
 	var nameType = permitNames.indexOf(object.name);
-	if(!object.name || nameType < 0) {
+	if (!object.name || nameType < 0) 
+	{
 		return false;
 	}
 	var objectArray = (nameType === 0) ? this.getWaterSourceObjectsArray() : this.getContaminationObjectsArray();
 	objectArray.push(object);
 	depth = depth ? depth : 5;
 	this.magoManager.modeler.addObject(object, depth);
-}
+};
 
 /**
  * @param {MagoRenderable} object
  */
- WaterManager.prototype.removeObject = function (object) 
- {
-	 var _remove = function(item){
+WaterManager.prototype.removeObject = function (object) 
+{
+	 var _remove = function(item)
+	{
 		return item !== object;
-	}
-	 if(!(object instanceof MagoRenderable)) {
+	};
+	 if (!(object instanceof MagoRenderable)) 
+	{
 		 return false;
 	 }
 	 
 	 var permitNames = ['waterGenerator', 'contaminationGenerator'];
 	 var nameType = permitNames.indexOf(object.name);
-	 if(!object.name || nameType < 0) {
+	 if (!object.name || nameType < 0) 
+	{
 		 return false;
 	 }
 
-	 if(nameType === 0) {
+	 if (nameType === 0) 
+	{
 		this._waterSourceObjectsArray = this._waterSourceObjectsArray.filter(_remove);
-	 } else {
+	 }
+	else 
+	{
 		this._contaminationBoxesArray = this._contaminationBoxesArray.filter(_remove);
 	 }
 	 
 	 this.magoManager.modeler.removeObject(object);
- }
+};
 
 WaterManager.prototype.getExcavationObjectsArray = function ()
 {
-	if(!this._excavationObjectsArray)
-	this._excavationObjectsArray = [];
+	if (!this._excavationObjectsArray)
+	{ this._excavationObjectsArray = []; }
 	
 	return this._excavationObjectsArray;
 };
 
 WaterManager.prototype._loadQuantizedMesh = function (L, X, Y, waterLayer)
 {
-	if(!this.qMeshesPromisesMap)
+	if (!this.qMeshesPromisesMap)
 	{
 		this.qMeshesPromisesMap = {};
 	}
 
-	if(this.qMeshesPromisesMap[L])
+	if (this.qMeshesPromisesMap[L])
 	{
-		if(this.qMeshesPromisesMap[L][X])
+		if (this.qMeshesPromisesMap[L][X])
 		{
-			if(this.qMeshesPromisesMap[L][X][Y])
+			if (this.qMeshesPromisesMap[L][X][Y])
 			{
 				// Exist the qMeshPromise, so wait.
 				return false;
@@ -1028,16 +1036,16 @@ WaterManager.prototype._loadQuantizedMesh = function (L, X, Y, waterLayer)
 	}
 
 	// if no exist qMeshPromise, then request.
-	if(!this.qMeshesPromisesMap[L]){this.qMeshesPromisesMap[L] = {}};
-	if(!this.qMeshesPromisesMap[L][X]){this.qMeshesPromisesMap[L][X] = {}};
-	if(!this.qMeshesPromisesMap[L][X][Y]){this.qMeshesPromisesMap[L][X][Y] = {}};
+	if (!this.qMeshesPromisesMap[L]){ this.qMeshesPromisesMap[L] = {}; };
+	if (!this.qMeshesPromisesMap[L][X]){ this.qMeshesPromisesMap[L][X] = {}; };
+	if (!this.qMeshesPromisesMap[L][X][Y]){ this.qMeshesPromisesMap[L][X][Y] = {}; };
 
 	this.qMeshesPromisesMap[L][X][Y] = this.terrainProvider.requestTileGeometry(X, Y, L);
 	this.qMeshesPromisesMap[L][X][Y].then((value) =>
 	{
-		if(!this.qMeshesMap[L]){this.qMeshesMap[L] = {}};
-		if(!this.qMeshesMap[L][X]){this.qMeshesMap[L][X] = {}};
-		if(!this.qMeshesMap[L][X][Y]){this.qMeshesMap[L][X][Y] = {}};
+		if (!this.qMeshesMap[L]){ this.qMeshesMap[L] = {}; };
+		if (!this.qMeshesMap[L][X]){ this.qMeshesMap[L][X] = {}; };
+		if (!this.qMeshesMap[L][X][Y]){ this.qMeshesMap[L][X][Y] = {}; };
 
 		this.qMeshesMap[L][X][Y] = value;
 		this.qMeshesMap[L][X][Y].tileIndices = {
@@ -1048,18 +1056,18 @@ WaterManager.prototype._loadQuantizedMesh = function (L, X, Y, waterLayer)
 
 WaterManager.prototype.getQuantizedMesh = function (L, X, Y, waterLayer)
 {
-	if(!this.qMeshesMap)
+	if (!this.qMeshesMap)
 	{
 		this.qMeshesMap = {};
 	}
 
 	var existQMeshVbo = false;
 
-	if(this.qMeshesMap[L])
+	if (this.qMeshesMap[L])
 	{
-		if(this.qMeshesMap[L][X])
+		if (this.qMeshesMap[L][X])
 		{
-			if(this.qMeshesMap[L][X][Y])
+			if (this.qMeshesMap[L][X][Y])
 			{
 				// return the qMeshVbo.
 				return this.qMeshesMap[L][X][Y];
@@ -1279,7 +1287,7 @@ WaterManager.prototype.deleteObjects = function ()
 {
 	var waterLayersCount = this.waterLayersArray.length;
 	var waterLayer;
-	for(var i=0; i<waterLayersCount; i++)
+	for (var i=0; i<waterLayersCount; i++)
 	{
 		waterLayer = this.waterLayersArray[i];
 		waterLayer.deleteObjects();
@@ -1294,7 +1302,7 @@ WaterManager.prototype.resetSimulation = function ()
 {
 	var waterLayersCount = this.waterLayersArray.length;
 	var waterLayer;
-	for(var i=0; i<waterLayersCount; i++)
+	for (var i=0; i<waterLayersCount; i++)
 	{
 		waterLayer = this.waterLayersArray[i];
 		waterLayer.resetSimulation();
@@ -1306,11 +1314,11 @@ WaterManager.prototype.objectDeleted = function (objectId)
 	// An object of the scene was moved, so must reMake demWihtBuildings of water simulation.****
 	var waterLayersCount = this.waterLayersArray.length;
 	var waterLayer;
-	for(var i=0; i<waterLayersCount; i++)
+	for (var i=0; i<waterLayersCount; i++)
 	{
 		waterLayer = this.waterLayersArray[i];
 
-		if(waterLayer._isObjectIdDemOverWrited(objectId))
+		if (waterLayer._isObjectIdDemOverWrited(objectId))
 		{
 			waterLayer.resetObjectIdDemOverWrited();
 		}
@@ -1322,11 +1330,11 @@ WaterManager.prototype.objectMoved = function (object)
 	// An object of the scene was moved, so must reMake demWihtBuildings of water simulation.****
 	var waterLayersCount = this.waterLayersArray.length;
 	var waterLayer;
-	for(var i=0; i<waterLayersCount; i++)
+	for (var i=0; i<waterLayersCount; i++)
 	{
 		waterLayer = this.waterLayersArray[i];
 
-		if(waterLayer._isObjectIdDemOverWrited(object._guid))
+		if (waterLayer._isObjectIdDemOverWrited(object._guid))
 		{
 			waterLayer.resetObjectIdDemOverWrited();
 		}
@@ -1336,7 +1344,7 @@ WaterManager.prototype.objectMoved = function (object)
 			var waterBSphereWC = waterLayer.getBoundingSphereWC();
 			var objectBSphereWC = object.getBoundingSphereWC(undefined);
 
-			if(waterBSphereWC.intersectionSphere(objectBSphereWC) !== Constant.INTERSECTION_OUTSIDE)
+			if (waterBSphereWC.intersectionSphere(objectBSphereWC) !== Constant.INTERSECTION_OUTSIDE)
 			{
 				waterLayer.resetObjectIdDemOverWrited();
 			}
@@ -1352,36 +1360,36 @@ WaterManager.prototype.doSimulation = function ()
 	// bind frameBuffer.
 	var waterLayersCount = this.waterLayersArray.length;
 	var waterLayer;
-	for(var i=0; i<waterLayersCount; i++)
+	for (var i=0; i<waterLayersCount; i++)
 	{
 		waterLayer = this.waterLayersArray[i];
 		waterLayer.doSimulationSteps(this.magoManager);
 	}
 };
 
- /**
+/**
  */
 WaterManager.prototype._test_water = function()
 {
-    // 127.1966787369999992,35.5972825200000003 : 127.2283140579999952,35.6277023940000035 // original from BBC.
+	// 127.1966787369999992,35.5972825200000003 : 127.2283140579999952,35.6277023940000035 // original from BBC.
 	var increLon = 5.0;
 	var increLat = 25.0;
 
 	increLon = 0.0;
 	increLat = 0.0;
 
-    var minLon = 127.1966787369999992 + increLon;
-    var minLat = 35.5972825200000003 + increLat;
-    var minAlt = 0;
-    var maxLon = 127.2283140579999952 + increLon;
-    var maxLat = 35.6277023940000035 + increLat;
-    var maxAlt = 0;
-    var geographicExtent = new GeographicExtent(minLon, minLat, minAlt, maxLon, maxLat, maxAlt);
-    var options = {
-        geographicExtent : geographicExtent
-    };
-    var water = this.newWater(options);
+	var minLon = 127.1966787369999992 + increLon;
+	var minLat = 35.5972825200000003 + increLat;
+	var minAlt = 0;
+	var maxLon = 127.2283140579999952 + increLon;
+	var maxLat = 35.6277023940000035 + increLat;
+	var maxAlt = 0;
+	var geographicExtent = new GeographicExtent(minLon, minLat, minAlt, maxLon, maxLat, maxAlt);
+	var options = {
+		geographicExtent: geographicExtent
+	};
+	var water = this.newWater(options);
 
 	//----------------------------------------------
-    this.testStarted = true;
+	this.testStarted = true;
 };

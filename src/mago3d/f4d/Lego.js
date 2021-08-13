@@ -510,7 +510,7 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader,
 	var gl = magoManager.sceneState.gl;
 
 	if (owner === undefined)
-		{ return; }
+	{ return; }
 	
 	if (this.vbo_vicks_container.vboCacheKeysArray.length === 0) 
 	{
@@ -570,14 +570,14 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader,
 		shader.disableVertexAttribArray(shader.texCoord2_loc);
 		shader.enableVertexAttribArray(shader.normal3_loc);
 		shader.disableVertexAttribArray(shader.color4_loc);
-		gl.uniform1i(shader.bHasTexture_loc , false); // textures like png with alpha component.***
+		gl.uniform1i(shader.bHasTexture_loc, false); // textures like png with alpha component.***
 		
 		// 1) Position.
 		if (!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
 		{ return false; }
 
 		// 2) Normal.
-		if(shader.normal3_loc >= 0) // check if shader has normal attributte.***
+		if (shader.normal3_loc >= 0) // check if shader has normal attributte.***
 		{
 			// There are depth renders that needs normal or not.
 			// General depth render needs normals if MRT, but sunDepthOfView-shader no has normal attributtes.
@@ -594,7 +594,7 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader,
 		shader.disableVertexAttribArray(shader.texCoord2_loc);
 		shader.disableVertexAttribArray(shader.normal3_loc);
 		shader.disableVertexAttribArray(shader.color4_loc);
-		gl.uniform1i(shader.bHasTexture_loc , false); // textures like png with alpha component.***
+		gl.uniform1i(shader.bHasTexture_loc, false); // textures like png with alpha component.***
 		
 		// 1) Position.
 		if (!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))

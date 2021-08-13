@@ -248,11 +248,12 @@ SelectionManager.prototype.existSelectedObjects = function()
 	var nodes = this.getSelectedF4dNodeArray();
 	var selectedRefs = this.getSelectedF4dObjectArray();
 
-	if(nativeSelectedArray.length > 0 || nodes.length > 0 || selectedRefs.length > 0)
+	if (nativeSelectedArray.length > 0 || nodes.length > 0 || selectedRefs.length > 0)
 	{
 		return true;
 	}
-	else{
+	else 
+	{
 		return false;
 	}
 };
@@ -685,7 +686,8 @@ SelectionManager.prototype.provisionalToCurrent = function (type, filter, mainta
 {
 	var validProvision = this.filterProvisional(type, filter);
 
-	if(!maintain) {
+	if (!maintain) 
+	{
 		this.clearCurrents();
 	}
 	
@@ -735,13 +737,15 @@ SelectionManager.prototype.provisionalToCurrent = function (type, filter, mainta
  * @param {string} type find type
  * @return {Array<object>}
  */
-SelectionManager.prototype.selectionByPolygon2D = function(polygon2D, type) {
+SelectionManager.prototype.selectionByPolygon2D = function(polygon2D, type) 
+{
 	this.clearCurrents();
 	var frustumVolumeControl = this.magoManager.frustumVolumeControl;
 	
 	var selectedArray;
 
-	if(type === DataType.ALL) {
+	if (type === DataType.ALL) 
+	{
 		var selectedNodeArray = frustumVolumeControl.selectionByPolygon2D(polygon2D, DataType.F4D);
 		this.currentNodeSelectedArray = selectedNodeArray;
 		this.currentNodeSelected = selectedNodeArray[0];
@@ -751,18 +755,23 @@ SelectionManager.prototype.selectionByPolygon2D = function(polygon2D, type) {
 		this.currentGeneralObjectSelected = selectedNativeArray[0];
 
 		selectedArray = [].concat(selectedNodeArray, selectedNativeArray);
-	} else {
+	}
+	else 
+	{
 		selectedArray = frustumVolumeControl.selectionByPolygon2D(polygon2D, type);
-		if(type === DataType.F4D) {
+		if (type === DataType.F4D) 
+		{
 			this.currentNodeSelectedArray = selectedArray;
 			this.currentNodeSelected = selectedArray[0];
-		} else if(type === DataType.NATIVE) {
+		}
+		else if (type === DataType.NATIVE) 
+		{
 			this.currentGeneralObjectSelectedArray = selectedArray;
 			this.currentGeneralObjectSelected = selectedArray[0];
 		}
 	}
 	return selectedArray;
-}
+};
 
 /**
  * native 객체 개별 삭제
@@ -772,11 +781,12 @@ SelectionManager.prototype.removeNative = function(native)
 {
 	var arr = this.getSelectedGeneralArray();
 
-	this.currentGeneralObjectSelectedArray = arr.filter(function(model) {
+	this.currentGeneralObjectSelectedArray = arr.filter(function(model) 
+	{
 		return model !== native;
 	});
 	this.currentGeneralObjectSelected = this.currentGeneralObjectSelectedArray[0];
-}
+};
 
 /**
  * f4d 객체 개별 삭제
@@ -786,11 +796,12 @@ SelectionManager.prototype.removeF4d = function(f4d)
 {
 	var arr = this.getSelectedF4dNodeArray();
 
-	this.currentNodeSelectedArray = arr.filter(function(model) {
+	this.currentNodeSelectedArray = arr.filter(function(model) 
+	{
 		return model !== f4d;
 	});
 	this.currentNodeSelected = this.currentNodeSelectedArray[0];
-}
+};
 
 /**
  * f4d 객체 개별 선택
@@ -800,10 +811,11 @@ SelectionManager.prototype.selectF4d = function(f4d)
 {
 	var arr = this.getSelectedF4dNodeArray();
 
-	var has = arr.filter(function(model) {
+	var has = arr.filter(function(model) 
+	{
 		return model === f4d;
 	})[0];
 
-	if(!has) this.currentNodeSelectedArray.push(f4d);
-	if(!this.currentNodeSelected) this.currentNodeSelected = f4d;
-}
+	if (!has) { this.currentNodeSelectedArray.push(f4d); }
+	if (!this.currentNodeSelected) { this.currentNodeSelected = f4d; }
+};

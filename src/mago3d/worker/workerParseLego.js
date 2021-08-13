@@ -7,13 +7,13 @@ var worker = self;
 
 worker.onmessage = function (e) 
 {
-    var dataArrayBuffer = e.data.dataArrayBuffer;
+	var dataArrayBuffer = e.data.dataArrayBuffer;
 	var bytesReaded = 0;
 
-    // BoundingBox.
+	// BoundingBox.
 	//bytesReaded = bbox.readData(buffer, bytesReaded);
-    var bboxSize = new Float32Array(6);
-    bboxSize[0] = (new Float32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
+	var bboxSize = new Float32Array(6);
+	bboxSize[0] = (new Float32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 	bboxSize[1] = (new Float32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 	bboxSize[2] = (new Float32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
 	bboxSize[3] = (new Float32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;
@@ -30,7 +30,7 @@ worker.onmessage = function (e)
 	bytesReaded = bytesReaded + byteSize * numPositions * 3; // updating data.
 	
 	// VBO(Normal Buffer) - i,j,k
-    var norDataArray;
+	var norDataArray;
 	var hasNormals = (new Uint8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
 	if (hasNormals)
 	{
@@ -43,7 +43,7 @@ worker.onmessage = function (e)
 	}
 
 	// VBO(Color Buffer) - r,g,b,a
-    var colDataArray;
+	var colDataArray;
 	var hasColors = (new Uint8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
 	if (hasColors)
 	{
@@ -56,7 +56,7 @@ worker.onmessage = function (e)
 	}
 
 	// VBO(TextureCoord Buffer) - u,v
-    var texCoordDataArray;
+	var texCoordDataArray;
 	var hasTexCoords = (new Uint8Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+1)))[0]; bytesReaded += 1;
 	if (hasTexCoords)
 	{
@@ -70,35 +70,35 @@ worker.onmessage = function (e)
 	}
 
 	var parsedLego = {
-		texCoordsArray       : texCoordDataArray,   
-		posDataArray      : posDataArray,
-		norDataArray : norDataArray,
-		colDataArray  : colDataArray,
-		info: e.data.info,
-		bboxSize : bboxSize
+		texCoordsArray : texCoordDataArray,   
+		posDataArray   : posDataArray,
+		norDataArray   : norDataArray,
+		colDataArray   : colDataArray,
+		info           : e.data.info,
+		bboxSize       : bboxSize
 	};
 
 	var transferBuffers = [];
 
-	if(parsedLego.texCoordsArray)
+	if (parsedLego.texCoordsArray)
 	{
 		transferBuffers.push(parsedLego.texCoordsArray.buffer);
 	}
 
-	if(parsedLego.posDataArray)
+	if (parsedLego.posDataArray)
 	{
 		transferBuffers.push(parsedLego.posDataArray.buffer);
 	}
 
-	if(parsedLego.norDataArray)
+	if (parsedLego.norDataArray)
 	{
 		transferBuffers.push(parsedLego.norDataArray.buffer);
 	}
 
-	if(parsedLego.colDataArray)
+	if (parsedLego.colDataArray)
 	{
 		transferBuffers.push(parsedLego.colDataArray.buffer);
 	}
 
-    worker.postMessage(parsedLego, transferBuffers);
+	worker.postMessage(parsedLego, transferBuffers);
 };

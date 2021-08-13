@@ -308,16 +308,16 @@ NeoReference.prototype.solveReferencePngTextureForDepthRender = function(magoMan
 {
 	var gl = magoManager.getGl();
 
-	if(!this.texture)// || this.texture.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
+	if (!this.texture)// || this.texture.fileLoadState !== CODE.fileLoadState.LOADING_FINISHED)
 	{
 		// set into shader : bHasTexture = false.***
-		gl.uniform1i(shader.bHasTexture_loc , false);
+		gl.uniform1i(shader.bHasTexture_loc, false);
 		return false;
 	}
 	
-	if(this.texture.textureImageFileExtension === "PNG")// && this.texture.texId)
+	if (this.texture.textureImageFileExtension === "PNG")// && this.texture.texId)
 	{
-		gl.uniform1i(shader.bHasTexture_loc , true);
+		gl.uniform1i(shader.bHasTexture_loc, true);
 		if (shader.last_tex_id !== this.texture.texId) 
 		{
 			gl.activeTexture(gl.TEXTURE2);
@@ -327,8 +327,9 @@ NeoReference.prototype.solveReferencePngTextureForDepthRender = function(magoMan
 
 		return true;
 	}
-	else{
-		gl.uniform1i(shader.bHasTexture_loc , false);
+	else 
+	{
+		gl.uniform1i(shader.bHasTexture_loc, false);
 		return false;
 	}
 	return false;
@@ -624,7 +625,7 @@ NeoReference.prototype.render = function (magoManager, neoBuilding, renderType, 
 		neoReference.solveReferenceColorOrTexture(magoManager, neoBuilding, shader, currentObjectsRendering);
 		// seletionColor4.***
 		
-		if(magoManager.isCameraMoved && !magoManager.isCameraMoving )
+		if (magoManager.isCameraMoved && !magoManager.isCameraMoving )
 		{
 			//var selCandidates = magoManager.selectionManager;
 			//var selectionColor = magoManager.selectionColor;
@@ -671,10 +672,12 @@ NeoReference.prototype.render = function (magoManager, neoBuilding, renderType, 
 
 	gl.uniform1i(shader.refMatrixType_loc, neoReference.refMatrixType);
 
-	if (neoReference.refMatrixType === 1) { 
+	if (neoReference.refMatrixType === 1) 
+	{ 
 		gl.uniform3fv(shader.refTranslationVec_loc, neoReference.refTranslationVec); 
 	}
-	else if (neoReference.refMatrixType === 2) { 
+	else if (neoReference.refMatrixType === 2) 
+	{ 
 		gl.uniformMatrix4fv(shader.refMatrix_loc, false, neoReference.tMatrixAuxArray[refMatrixIdxKey]._floatArrays); 
 	}
 	
@@ -708,7 +711,7 @@ NeoReference.prototype.render = function (magoManager, neoBuilding, renderType, 
 		if (renderType === 0)
 		{
 			// Normals.
-			if(shader.normal3_loc >= 0) // check if shader has normal attributte.***
+			if (shader.normal3_loc >= 0) // check if shader has normal attributte.***
 			{
 				// There are depth renders that needs normal or not.
 				// General depth render needs normals if MRT, but sunDepthOfView-shader no has normal attributtes.
@@ -716,7 +719,7 @@ NeoReference.prototype.render = function (magoManager, neoBuilding, renderType, 
 				{ return false; }
 			}
 
-			if(bDepthRenderWithTexture && neoReference.vBOVertexIdxCacheKeysContainer)
+			if (bDepthRenderWithTexture && neoReference.vBOVertexIdxCacheKeysContainer)
 			{
 				shader.enableVertexAttribArray(shader.texCoord2_loc); 
 

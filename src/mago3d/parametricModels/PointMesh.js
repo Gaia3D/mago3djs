@@ -95,7 +95,7 @@ PointMesh.prototype.renderAsChild = function (magoManager, shader, renderType, g
 	gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, this.color4.a]); //.
 	gl.uniform1f(shader.fixPointSize_loc, this.size);
 
-	if(isSelected)
+	if (isSelected)
 	{
 		gl.uniform1f(shader.fixPointSize_loc, this.size*2);
 	}
@@ -112,7 +112,7 @@ PointMesh.prototype.renderAsChild = function (magoManager, shader, renderType, g
 		var selColor = selectionColor.getAvailableColor(undefined); 
 		var idxKey = selectionColor.decodeColor3(selColor.r, selColor.g, selColor.b);
 		var owner = this;
-		if(this.owner)
+		if (this.owner)
 		{
 			owner = this.owner;
 		}
@@ -122,7 +122,7 @@ PointMesh.prototype.renderAsChild = function (magoManager, shader, renderType, g
 	}
 
 	// seletionColor4.***
-	if(magoManager.isCameraMoved && !magoManager.isCameraMoving )
+	if (magoManager.isCameraMoved && !magoManager.isCameraMoving )
 	{
 		var selectionManager = magoManager.selectionManager;
 		var selectionColor = magoManager.selectionColor;
@@ -130,7 +130,7 @@ PointMesh.prototype.renderAsChild = function (magoManager, shader, renderType, g
 		var selColor = selectionColor.getAvailableColor(undefined); 
 		var idxKey = selectionColor.decodeColor3(selColor.r, selColor.g, selColor.b);
 		var owner = this;
-		if(this.owner)
+		if (this.owner)
 		{ owner = this.owner; }
 		selectionManager.setCandidateGeneral(idxKey, owner);
 		gl.uniform4fv(shader.uSelColor4_loc, [selColor.r/255.0, selColor.g/255.0, selColor.b/255.0, 1.0]);

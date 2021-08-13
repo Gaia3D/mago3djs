@@ -238,17 +238,25 @@ ManagerUtils.calculateTransformMatrixAtWorldPosition = function(worldPosition, h
  */
 ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, heading, pitch, roll, resultGeoLocationData) 
 {
-	if (resultGeoLocationData === undefined)
-	{ resultGeoLocationData = new GeoLocationData(); }
+	if (resultGeoLocationData === undefined) 
+	{ 
+		resultGeoLocationData = new GeoLocationData(); 
+	}
 
 	// 0) Position.**
-	if (resultGeoLocationData.geographicCoord === undefined)
-	{ resultGeoLocationData.geographicCoord = new GeographicCoord(); }
+	if (resultGeoLocationData.geographicCoord === undefined) 
+	{ 
+		resultGeoLocationData.geographicCoord = new GeographicCoord(); 
+	}
 
-	if (longitude !== undefined)
-	{ resultGeoLocationData.geographicCoord.longitude = longitude; }
+	if (longitude !== undefined) 
+	{ 
+		resultGeoLocationData.geographicCoord.longitude = longitude; 
+	}
 	else 
-	{ longitude = resultGeoLocationData.geographicCoord.longitude; }
+	{ 
+		longitude = resultGeoLocationData.geographicCoord.longitude; 
+	}
 
 	if (latitude !== undefined)
 	{ resultGeoLocationData.geographicCoord.latitude = latitude; }
@@ -756,8 +764,8 @@ ManagerUtils.calculatePixelLinearDepth = function(gl, pixelX, pixelY, depthFbo, 
  * @param {MagoManager} magoManager Mago3D main manager.
  * @returns {Number} linearDepth Returns the linear depth [0.0, 1.0] ranged value.
  */
- ManagerUtils.calculatePixelLinearDepthV2 = function (gl, pixelX, pixelY, depthTex, normalTex, magoManager) 
- {
+ManagerUtils.calculatePixelLinearDepthV2 = function (gl, pixelX, pixelY, depthTex, normalTex, magoManager) 
+{
 	var depthPixels = new Uint8Array(4 * 1 * 1); // 4 x 1x1 pixel.
  
 	// 1rst, read normal & currentFrustum.***
@@ -779,14 +787,14 @@ ManagerUtils.calculatePixelLinearDepth = function(gl, pixelX, pixelY, depthFbo, 
 	var frustumIdx = Math.floor(floatNormalPixels[3]*100);
  
 	// check frustumIdx. There are 2 type of frustumsIdx :  (geometry)0, 1, 2, 3 or (tinTerrain)10, 11, 12, 13 or (pointsCloud)20, 21, 22, 23.***
-	while(frustumIdx >= 10)
-	frustumIdx -= 10;
+	while (frustumIdx >= 10)
+	{ frustumIdx -= 10; }
  
 	magoManager.framebufferAux.unbind();
  
 	var near;
 	var far;
-	if(frustumIdx < magoManager.numFrustums)
+	if (frustumIdx < magoManager.numFrustums)
 	{
 		near = magoManager.frustumVolumeControl.nearFarArray[frustumIdx*2];
 		far = magoManager.frustumVolumeControl.nearFarArray[frustumIdx*2 + 1];
@@ -804,11 +812,11 @@ ManagerUtils.calculatePixelLinearDepth = function(gl, pixelX, pixelY, depthFbo, 
 	}
  
 	return {linearDepth : linearDepth,
-			normal4 : floatNormalPixels,
-			frustumIdx : frustumIdx,
-			near : near,
-			far : far };
- };
+		normal4     : floatNormalPixels,
+		frustumIdx  : frustumIdx,
+		near        : near,
+		far         : far };
+};
 
 /**
  * Calculates the pixel position in camera coordinates.
@@ -855,7 +863,7 @@ ManagerUtils.calculatePixelPositionCamCoord = function (gl, pixelX, pixelY, resu
 
 		var resultObject = ManagerUtils.calculatePixelLinearDepthV2(gl, pixelX, pixelY, depthTex, normalTex, magoManager);
 
-		if(resultObject.frustumIdx < magoManager.numFrustums)
+		if (resultObject.frustumIdx < magoManager.numFrustums)
 		{
 			linearDepth = resultObject.linearDepth;
 			frustumFar = resultObject.far;
@@ -915,7 +923,8 @@ ManagerUtils.cameraCoordPositionToWorldCoord = function(camCoordPos, resultWorld
  * @param {MagoManager} magoManager Mago3D main manager.
  * @returns {boolean}
  */
-ManagerUtils.detectedDepth = function(pixelX, pixelY, magoManager) {
+ManagerUtils.detectedDepth = function(pixelX, pixelY, magoManager) 
+{
 	var gl = magoManager.getGl();
 
 	// Test the new method: depth + normal + frustumIdx.************************************************************************
@@ -925,7 +934,7 @@ ManagerUtils.detectedDepth = function(pixelX, pixelY, magoManager) {
 	var resultObject = ManagerUtils.calculatePixelLinearDepthV2(gl, pixelX, pixelY, depthTex, normalTex, magoManager);
 	
 	return (resultObject.frustumIdx < magoManager.numFrustums) ? true : false;
-}
+};
 
 /**
  * Calculates the world coordinates in pixel position check gl's depth buffer.
@@ -950,8 +959,8 @@ ManagerUtils.screenCoordToWorldCoordUseDepthCheck = function(pixelX, pixelY, mag
 	var depthDetected = true;
 	var normal = new Point3D(resultObject.normal4[0], resultObject.normal4[1], resultObject.normal4[2]);
 	var normalSquaredLength = normal.getSquaredModul();
-	if(normalSquaredLength < 0.5)
-	depthDetected = false;
+	if (normalSquaredLength < 0.5)
+	{ depthDetected = false; }
 
 	if (!depthDetected && magoManager.isCesiumGlobe())
 	{
@@ -994,7 +1003,7 @@ ManagerUtils.screenCoordToWorldCoordUseDepthCheck = function(pixelX, pixelY, mag
 		var endGeoCoord = ManagerUtils.pointToGeographicCoord(endWC, undefined);
 		var highPrecisionPositionWC = Camera.intersectPointByLaser(startGeoCoord, endGeoCoord, undefined, undefined, magoManager, undefined) ;
 
-		if(highPrecisionPositionWC)
+		if (highPrecisionPositionWC)
 		{
 			worldCoordinate = highPrecisionPositionWC;
 		}
@@ -1140,8 +1149,8 @@ ManagerUtils.getRayCamSpace = function(pixelX, pixelY, resultRay, magoManager, f
 	var frustum = sceneState.camera.frustum;
 	var frustum_far = 1.0;//frustum.far[0]; // unitary frustum far.
 
-	if(frustumFar)
-	frustum_far = frustumFar;
+	if (frustumFar)
+	{ frustum_far = frustumFar; }
 
 	var aspectRatio = frustum.aspectRatio[0];
 	var tangentOfHalfFovy = frustum.tangentOfHalfFovy[0]; 

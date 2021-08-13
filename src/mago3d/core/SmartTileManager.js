@@ -41,9 +41,9 @@ var SmartTileManager = function(options)
 	// Optional vars.
 	
 
-	if(options)
+	if (options)
 	{
-		if(options.magoManager)
+		if (options.magoManager)
 		{ this.magoManager = options.magoManager; }
 	}
 };
@@ -112,8 +112,8 @@ SmartTileManager.getDepthByBoundingBoxMaxSize = function(bboxMaxLength)
 	}
 
 	// Debug test.***
-	if(smartTileDepth >10)
-	smartTileDepth = 10;
+	if (smartTileDepth >10)
+	{ smartTileDepth = 10; }
 	
 	return smartTileDepth;
 };
@@ -402,7 +402,7 @@ SmartTileManager.prototype.newSmartTile = function(smartTileName)
 	{ this.tilesArray = []; }
 	
 	var options = {
-		smartTileManager : this
+		smartTileManager: this
 	};
 	var smartTile = new SmartTile(smartTileName, options);
 	this.tilesArray.push(smartTile);

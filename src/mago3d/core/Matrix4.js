@@ -728,8 +728,8 @@ Matrix4.perspective = function(fieldOfViewInRadians, aspect, near, far)
  */
 Matrix4.getNearFromPerspectiveMatrix = function(perspectiveMatrix) 
 {
-	var C = perspectiveMatrix.get(2,2);//matrix[2][2] = (-f - n) / ( f - n);
-	var D = perspectiveMatrix.get(3,2); //matrix[2][3] = (-2 f n ) / ( f - n)
+	var C = perspectiveMatrix.get(2, 2);//matrix[2][2] = (-f - n) / ( f - n);
+	var D = perspectiveMatrix.get(3, 2); //matrix[2][3] = (-2 f n ) / ( f - n)
 
 	//The near clip planes are calculated:
 	var n = D / (C - 1.0);
@@ -740,8 +740,8 @@ Matrix4.getNearFromPerspectiveMatrix = function(perspectiveMatrix)
  */
 Matrix4.getFarFromPerspectiveMatrix = function(perspectiveMatrix) 
 {
-	var C = perspectiveMatrix.get(2,2);//matrix[2][2] = (-f - n) / ( f - n);
-	var D = perspectiveMatrix.get(3,2); //matrix[2][3] = (-2 f n ) / ( f - n)
+	var C = perspectiveMatrix.get(2, 2);//matrix[2][2] = (-f - n) / ( f - n);
+	var D = perspectiveMatrix.get(3, 2); //matrix[2][3] = (-2 f n ) / ( f - n)
 
 	//The far clip planes are calculated:
 	var f = D / (C + 1.0);

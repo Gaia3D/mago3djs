@@ -399,7 +399,7 @@ MagoWorld.prototype.mousewheel = function(event)
 	
 	var camHeght = camera.getCameraElevation();
 	var camHeightAbs = Math.abs(camHeght);
-		if (isNaN(camHeght))
+	if (isNaN(camHeght))
 	{ return; }
 
 	// Lineal increment.
@@ -515,8 +515,8 @@ MagoWorld.prototype.mousemove = function (event)
 	// End check if is dragging.---
 	var mouseAction = magoManager.sceneState.mouseAction;
 
-	if(!mouseAction.strCamCoordPoint)
-	return;
+	if (!mouseAction.strCamCoordPoint)
+	{ return; }
 	
 	var camera = this.magoManager.sceneState.camera;
 	
@@ -814,7 +814,7 @@ MagoWorld.screenToCamCoord = function(mouseX, mouseY, magoManager, resultPointCa
 		}
 	}
 
-	if(!currentLinearDepth)
+	if (!currentLinearDepth)
 	{
 		// calculate the linearDepth.***
 		var texturesMergerFbo = magoManager.texturesManager.texturesMergerFbo; // gBuffer.
@@ -822,7 +822,7 @@ MagoWorld.screenToCamCoord = function(mouseX, mouseY, magoManager, resultPointCa
 		var normalTex = texturesMergerFbo.colorBuffersArray[1];
 		var resultObject = ManagerUtils.calculatePixelLinearDepthV2(gl, mouseX, mouseY, depthTex, normalTex, magoManager);
 
-		if(resultObject.frustumIdx < magoManager.numFrustums)
+		if (resultObject.frustumIdx < magoManager.numFrustums)
 		{
 			currentLinearDepth = resultObject.linearDepth;
 			currentFrustumFar = resultObject.far;
@@ -833,8 +833,8 @@ MagoWorld.screenToCamCoord = function(mouseX, mouseY, magoManager, resultPointCa
 	if (!magoManager.isCesiumGlobe())
 	{ currentFrustumNear = 0.0; }
 	
-	if(!options)
-		options = {};
+	if (!options)
+	{ options = {}; }
 		
 	options.linearDepth = currentLinearDepth; // optionally, use the pre calculated linearDepth.
 
@@ -908,7 +908,7 @@ MagoWorld.updateMouseStartClick = function (mouseX, mouseY, magoManager)
 	var normalTex = texturesMergerFbo.colorBuffer1;
 	var resultObject = ManagerUtils.calculatePixelLinearDepthV2(gl, mouseX, mouseY, depthTex, normalTex, magoManager);
 
-	if(resultObject.frustumIdx < magoManager.numFrustums)
+	if (resultObject.frustumIdx < magoManager.numFrustums)
 	{
 		currentLinearDepth = resultObject.linearDepth;
 		currentFrustumFar = resultObject.far;

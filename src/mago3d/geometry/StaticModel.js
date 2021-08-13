@@ -81,21 +81,24 @@ StaticModelsManager.prototype.getStaticModel = function(guid)
 	return staticModel;
 };
 
-StaticModelsManager.manageStaticModel = function(node, magoManager) {
+StaticModelsManager.manageStaticModel = function(node, magoManager) 
+{
 	// Check if the node is a referenceNode.***
 	var attributes = node.data.attributes;
-	if (attributes === undefined) { 
+	if (attributes === undefined) 
+	{ 
 		return; 
 	}
 
 	var neoBuilding = node.data.neoBuilding;
 		
-	if (attributes.projectId !== undefined && attributes.isReference !== undefined && attributes.isReference === true) {
+	if (attributes.projectId !== undefined && attributes.isReference !== undefined && attributes.isReference === true) 
+	{
 		var projectFolderName;
 		var neoBuildingFolderName;
 	
 		// check if has neoBuilding.***
-		if(neoBuilding || neoBuilding instanceof NeoBuilding) return;
+		if (neoBuilding || neoBuilding instanceof NeoBuilding) { return; }
 
 		var neoBuildingFolderName = attributes.buildingFolderName;
 		projectFolderName = attributes.projectFolderName;
@@ -150,7 +153,9 @@ StaticModelsManager.manageStaticModel = function(node, magoManager) {
 			if (neoBuilding.bbox === undefined)
 			{ neoBuilding.bbox = new BoundingBox(); }
 			neoBuilding.bbox.copyFrom(buildingSeed.bBox);
-		} else {
+		}
+		else 
+		{
 			neoBuilding.bbox = neoBuilding.metaData.bbox;
 			if (node.isNeedValidHeight(magoManager)) { magoManager._needValidHeightNodeArray.push(node); }
 		}
