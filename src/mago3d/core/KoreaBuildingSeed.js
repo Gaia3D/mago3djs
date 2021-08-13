@@ -73,6 +73,7 @@ KoreaBuildingSeed.getDividedFeaturesArray = function(features, maxFeaturesCount)
 	var resultFeaturesArrayArray = [];
 	var currentFeaturesArray = [];
 	var counter = 0;
+	var started = false;
 	for (var i=0; i<featuresCount; i++)
 	{
 		currentFeaturesArray.push(features[i]);
@@ -82,9 +83,19 @@ KoreaBuildingSeed.getDividedFeaturesArray = function(features, maxFeaturesCount)
 			resultFeaturesArrayArray.push(currentFeaturesArray);
 			currentFeaturesArray = [];
 			counter = 0;
+			started = true;
 		}
 
 		counter++;
+	}
+
+	if (!started)
+	{
+		resultFeaturesArrayArray.push(currentFeaturesArray);
+	}
+	else if (currentFeaturesArray.length > 0)
+	{
+		resultFeaturesArrayArray.push(currentFeaturesArray);
 	}
 
 	return resultFeaturesArrayArray;
@@ -103,7 +114,7 @@ KoreaBuildingSeed.prototype.mergeFeatureCollection = function(featureCollection)
 
 	var features = featureCollection.features;
 
-	var maxFeaturesCount = 50;
+	var maxFeaturesCount = 200;
 	var featuresArray =  KoreaBuildingSeed.getDividedFeaturesArray(features, maxFeaturesCount);
 	var featuresCount = featuresArray.length;
 	for (var k=0; k<featuresCount; k++)
@@ -116,6 +127,7 @@ KoreaBuildingSeed.prototype.mergeFeatureCollection = function(featureCollection)
 		}
 
 		var merged = new MergedObject(this.magoManager);
+		merged.attributes.isDeletableByFrustumCulling = true;
 
 		var self = this;
 		merged.initialize(renderables).then(function(a, b, c) 

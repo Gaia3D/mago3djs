@@ -95,6 +95,10 @@ worker.onmessage = function (e)
 			var solidMesh = vtxProfilesList.getMesh(undefined, bIncludeBottomCap, bIncludeTopCap);
 			var surfIndepMesh = solidMesh.getCopySurfaceIndependentMesh();
 			surfIndepMesh.calculateVerticesNormals();
+
+			// test color.***
+			var color = Color_.getRandomPastelColor();
+			surfIndepMesh.setColor(color.r, color.g, color.b, 1.0);
             
 			if (i===0 && j===0) 
 			{
@@ -103,7 +107,7 @@ worker.onmessage = function (e)
 			}
 			mergedMesh.mergeMesh(surfIndepMesh);
 
-			var vbosArray = mergedMesh.getVbo();
+			
 
 			//resultVbo.posVboDataArray = posVboDataArray;
 			//resultVbo.norVboDataArray = norVboDataArray;
@@ -116,6 +120,8 @@ worker.onmessage = function (e)
 
 		var hola = 0;
 	}
+
+	var vbosArray = mergedMesh.getVbo();
 
 	worker.postMessage({result: 
         {

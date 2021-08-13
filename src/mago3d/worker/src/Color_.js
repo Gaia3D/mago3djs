@@ -35,6 +35,11 @@ Color_.prototype.setRGB = function(red, green, blue)
 	this.g = green; 
 	this.b = blue;
 };
+
+Color_.getRandomPastelColor = function() 
+{
+	return new Color_(Math.random()*0.5 + 0.5, Math.random()*0.5 + 0.5, Math.random()*0.5 + 0.5, 1.0);
+};
   
 Color_.prototype.setRGBA = function(red, green, blue, alpha) 
 {

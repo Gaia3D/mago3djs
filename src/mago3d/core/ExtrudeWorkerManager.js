@@ -16,7 +16,7 @@ var ExtrudeWorkerManager = function(workersManager)
 
 	this.workersManager = workersManager;
 	this.finishedMap = {};
-	this.maxWorkers = 8;
+	this.maxWorkers = 2; // the best threads count is 2.***
 	this.storeType = 0; // 0= delete efter give. 1= keep.
 };
 
@@ -93,7 +93,7 @@ ExtrudeWorkerManager.prototype.doExtrude = function (data)
 			var result = e.data.result;
 			var info = result.info;
 			var resultGuid = info.guid;
-			console.log('work complete ' + resultGuid);
+			//console.log('work complete ' + resultGuid);
 			//var excavatedQuantizedMeshMap = qMeshManager.excavatedQuantizedMeshMap;
 			//var Z = tileInfo.L;
 			//var X = tileInfo.X;

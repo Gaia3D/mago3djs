@@ -371,12 +371,13 @@ ProcessQueue.prototype.deleteNeoBuilding = function(gl, neoBuilding, magoManager
 	
 };
 
-ProcessQueue.prototype.deleteSmartTiles = function(magoManager)
+ProcessQueue.prototype.deleteSmartTiles = function (magoManager)
 {
 	var deletedCount = 0;
 	var gl = magoManager.sceneState.gl;
 	var node;
 	var neoBuilding;
+	var vboMemManager = magoManager.vboMemoryManager;
 
 	for (var key in this.smartTilesToDeleteMap)
 	{
@@ -421,6 +422,33 @@ ProcessQueue.prototype.deleteSmartTiles = function(magoManager)
 					{
 						smartTile.smartTileF4dSeedArray[i].fileLoadState = CODE.fileLoadState.READY;
 					}
+				}
+
+				// delete natives that "isDeletableByFrustumCulling".***
+				//if (smartTile.nativeObjects && smartTile.nativeObjects.generalObjectsArray) 
+				{
+					var nativesArray = smartTile.nativeObjects.generalObjectsArray;
+					var nativeSeedArray = smartTile.nativeObjects.nativeSeedArray;
+					var nativesCount = nativesArray.length;
+					var nativesArrayAux = [];
+					for (var i=0; i<nativesCount; i++)
+					{
+						var native = nativesArray[i];
+						if (native.attributes.isDeletableByFrustumCulling) 
+						{
+							
+							// delete this native.***
+							native.deleteObjects(vboMemManager);
+						}
+						else 
+						{
+							nativesArrayAux.push(native);
+						}
+					}
+
+					smartTile.nativeObjects.generalObjectsArray = nativesArrayAux;
+
+					nativeSeedArray[0].status = KoreaBuildingSeed.STATUS.UNLOAD;
 				}
 				
 				deletedCount++;

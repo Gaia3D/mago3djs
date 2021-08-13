@@ -187,6 +187,18 @@ Mesh_.prototype.getTrianglesListsArrayBy2ByteSize = function(trianglesArray, res
 	return resultTrianglesListsArray;
 };
 
+Mesh_.prototype.setColor = function(r, g, b, a)
+{
+	// This function sets vertices colors.***
+	var surface;
+	var surfacesCount = this.getSurfacesCount();
+	for (var i=0; i<surfacesCount; i++)
+	{
+		surface = this.getSurface(i);
+		surface.setColor(r, g, b, a);
+	}
+};
+
 Mesh_.prototype.getVbo = function(resultVboContainer)
 {
 	if (resultVboContainer === undefined)

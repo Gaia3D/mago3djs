@@ -186,6 +186,18 @@ VertexList_.getVboDataArrays = function(vertexArray, resultVbo)
 	return resultVbo;
 };
 
+VertexList_.prototype.getBoundingBox = function(resultBox) 
+{
+	if (resultBox === undefined) { resultBox = new BoundingBox_(); }
+
+	for (var i = 0, vertexCount = this.vertexArray.length; i < vertexCount; i++) 
+	{
+		if (i === 0) { resultBox.init(this.vertexArray[i].point3d); }
+		else { resultBox.addPoint(this.vertexArray[i].point3d); }
+	}
+	return resultBox;
+};
+
 VertexList_.getProjectedPoints2DArray = function(vertexArray, normal, resultPoints2dArray)
 {
 	// This function projects the vertices on to planes xy, yz or xz.

@@ -10,7 +10,8 @@ var MagoRenderable = function (options)
 	this.owner;
 
 	this.attributes = {
-		isVisible: true
+		isVisible                   : true,
+		isDeletableByFrustumCulling : false // if frustum culled, then this is deleted.
 	};
 	// Use this matrix if this is child.
 	this.tMat;
