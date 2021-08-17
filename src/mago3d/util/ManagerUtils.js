@@ -948,6 +948,8 @@ ManagerUtils.screenCoordToWorldCoordUseDepthCheck = function(pixelX, pixelY, mag
 	var worldCoordinate;
 	var gl = magoManager.getGl();
 
+	if (!gl) { return; }
+
 	// Test the new method: depth + normal + frustumIdx.************************************************************************
 	var texturesMergerFbo = magoManager.texturesManager.texturesMergerFbo;
 	var depthTex = texturesMergerFbo.colorBuffer;
