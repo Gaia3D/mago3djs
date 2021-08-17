@@ -7039,7 +7039,7 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function (intersectedLo
 	
 	if (tilesCount === 0) 
 	{ 
-		return; 
+		return; //
 	}
 	
 	var distToCamera;
