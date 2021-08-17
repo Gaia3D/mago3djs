@@ -140,13 +140,77 @@ MagoRenderable.prototype.deleteObjects = function(vboMemManager)
 {
 	if (this.texture) { this.texture.deleteObjects(vboMemManager.gl); } 
 	
-	var objectsCount = this.objectsArray.length;
-	for (var i=0; i<objectsCount; i++)
+	if (this.objectsArray) 
 	{
-		this.objectsArray[i].deleteObjects(vboMemManager);
-		this.objectsArray[i] = undefined;
+		var objectsCount = this.objectsArray.length;
+		for (var i=0; i<objectsCount; i++)
+		{
+			this.objectsArray[i].deleteObjects(vboMemManager);
+			this.objectsArray[i] = undefined;
+		}
+		delete this.objectsArray;
 	}
-	this.objectsArray.length = 0;
+
+	// Now delete the general objects.***
+	delete this._guid;
+	delete this.id;
+	delete this.name;
+	this.owner = undefined;
+
+	delete this.attributes;
+	if (this.tMat) 
+	{
+		this.tMat.deleteObjects();
+		this.tMat = undefined;
+	}
+
+	if (this.tMatOriginal) 
+	{
+		this.tMatOriginal.deleteObjects();
+		this.tMatOriginal = undefined;
+	}
+
+	if (this.geoLocDataManager) 
+	{
+		this.geoLocDataManager.deleteObjects();
+		this.geoLocDataManager = undefined;
+	}
+	
+	delete this.dirty;
+	if (this.color4) 
+	{
+		this.color4.deleteObjects();
+		this.color4 = undefined;
+	}
+
+	if (this.orgColor4) 
+	{
+		this.orgColor4.deleteObjects();
+		this.orgColor4 = undefined;
+	}
+
+	if (this.wireframeColor4)
+	{
+		this.wireframeColor4.deleteObjects();
+		delete this.wireframeColor4;
+	}
+
+	if (this.selectedColor4) 
+	{
+		this.selectedColor4.deleteObjects();
+		this.selectedColor4 = undefined;
+	}
+
+	delete this.objectType; // Init as mesh type.
+
+	delete this.terrainHeight;
+	delete this.eventObject;
+
+	delete this.fromDate;
+	delete this.toDate;
+	
+	delete this.options;
+
 };
 
 MagoRenderable.prototype.getRootOwner = function() 

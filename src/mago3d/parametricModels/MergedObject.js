@@ -153,39 +153,7 @@ MergedObject.prototype.makeMesh = function ()
 		for (var i=0; i<geoCoordsListsCount; i++) 
 		{
 			var geographicCoordList = magoRenderable.geographicCoordListsArray[i];
-
 			geoCoordsListsArray.push(geographicCoordList); // ***
-			/*
-			// Make the topGeoCoordsList.
-			var topGeoCoordsList = geographicCoordList.getCopy();
-			// Reassign the altitude on the geoCoordsListCopy.
-			//geographicCoordList.setAltitude(0);
-			topGeoCoordsList.addAltitude(magoRenderable.height);
-            
-			var basePoints3dArray = GeographicCoordsList.getPointsRelativeToGeoLocation(geoLocData, geographicCoordList.geographicCoordsArray, undefined);
-			var topPoints3dArray = GeographicCoordsList.getPointsRelativeToGeoLocation(geoLocData, topGeoCoordsList.geographicCoordsArray, undefined);
-            
-			// Now, with basePoints3dArray & topPoints3dArray make a mesh.
-			// Create a VtxProfilesList.
-			var vtxProfilesList = new VtxProfilesList();
-			var baseVtxProfile = vtxProfilesList.newVtxProfile();
-			baseVtxProfile.makeByPoints3DArray(basePoints3dArray, undefined); 
-			var topVtxProfile = vtxProfilesList.newVtxProfile();
-			topVtxProfile.makeByPoints3DArray(topPoints3dArray, undefined); 
-            
-			var bIncludeBottomCap = true;
-			var bIncludeTopCap = true;
-			var solidMesh = vtxProfilesList.getMesh(undefined, bIncludeBottomCap, bIncludeTopCap);
-			var surfIndepMesh = solidMesh.getCopySurfaceIndependentMesh();
-			surfIndepMesh.calculateVerticesNormals();
-            
-			if (i===0 && j===0) 
-			{
-				mergedMesh = surfIndepMesh;
-				continue;
-			}
-			mergedMesh.mergeMesh(surfIndepMesh);
-			*/
 		}
 
 		objectToExtrude.geographicCoordsListsArray = geoCoordsListsArray; // ***
@@ -206,8 +174,29 @@ MergedObject.prototype.makeMesh = function ()
 
 	mergedMesh = new Mesh();
 	this.objectsArray.push(mergedMesh);
+
+	var vboMemManager = this.magoManager.vboMemoryManager;
     
-	//this.magoRenderables[i].deleteObjects();
+	var magoRenderablesCount = this.magoRenderables.length;
+	for (var i=0; i<magoRenderablesCount; i++) 
+	{
+		// delete koreaBuildings.
+		if (magoRenderable.geographicCoordListsArray) 
+		{
+			var geoCoordsListsCount = magoRenderable.geographicCoordListsArray.length;
+			for (var i=0; i<geoCoordsListsCount; i++) 
+			{
+				var geographicCoordList = magoRenderable.geographicCoordListsArray[i];
+				geographicCoordList.deleteObjects(vboMemManager); // ***
+				delete magoRenderable.geographicCoordListsArray[i];
+			}
+			delete magoRenderable.geographicCoordListsArray;
+		}
+
+		// delete magoRenderable.
+		this.magoRenderables[i].deleteObjects();
+		delete this.magoRenderables[i];
+	}
 	delete this.magoRenderables;
 
 	this.setDirty(false);

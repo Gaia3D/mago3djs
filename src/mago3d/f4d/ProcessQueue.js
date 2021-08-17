@@ -21,6 +21,9 @@ var ProcessQueue = function()
 	this.nodesToDeleteLodMeshMap = {}; // no used.
 	this.tinTerrainsToDeleteMap = {};
 	this.smartTilesToDeleteMap = {};
+
+	// slow delete arrays.***
+	this.nativeSlowDeleteArray = [];
 	
 	// Test.
 	this.octreeToDeletePCloudsMap = {};
@@ -371,6 +374,21 @@ ProcessQueue.prototype.deleteNeoBuilding = function(gl, neoBuilding, magoManager
 	
 };
 
+ProcessQueue.prototype._slowDeleteNatives = function (magoManager)
+{
+	var slowDeletesCount = this.nativeSlowDeleteArray.length;
+	if (slowDeletesCount > 0) 
+	{
+		var maxDeletesCount = 1;
+		var vboMemManager = magoManager.vboMemoryManager;
+		for (var i=0; i<maxDeletesCount; i++)
+		{
+			var native = this.nativeSlowDeleteArray.pop();
+			native.deleteObjects(vboMemManager);
+		}
+	}
+};
+
 ProcessQueue.prototype.deleteSmartTiles = function (magoManager)
 {
 	var deletedCount = 0;
@@ -438,7 +456,8 @@ ProcessQueue.prototype.deleteSmartTiles = function (magoManager)
 						{
 							
 							// delete this native.***
-							native.deleteObjects(vboMemManager);
+							//native.deleteObjects(vboMemManager);
+							this.nativeSlowDeleteArray.push(native);
 						}
 						else 
 						{
@@ -459,7 +478,7 @@ ProcessQueue.prototype.deleteSmartTiles = function (magoManager)
 	}
 };
 
-ProcessQueue.prototype.manageDeleteQueue = function(magoManager)
+ProcessQueue.prototype.manageDeleteQueue = function (magoManager)
 {
 	var gl = magoManager.sceneState.gl;
 	var maxDeleteNodesCount = 8;
@@ -483,6 +502,7 @@ ProcessQueue.prototype.manageDeleteQueue = function(magoManager)
 	//}
 	
 	this.deleteSmartTiles(magoManager);
+	this._slowDeleteNatives(magoManager);
 	
 
 	for (var key in this.nodesToDeleteMap)

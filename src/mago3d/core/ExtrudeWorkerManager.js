@@ -93,14 +93,7 @@ ExtrudeWorkerManager.prototype.doExtrude = function (data)
 			var result = e.data.result;
 			var info = result.info;
 			var resultGuid = info.guid;
-			//console.log('work complete ' + resultGuid);
-			//var excavatedQuantizedMeshMap = qMeshManager.excavatedQuantizedMeshMap;
-			//var Z = tileInfo.L;
-			//var X = tileInfo.X;
-			//var Y = tileInfo.Y;
-			//if (!excavatedQuantizedMeshMap[Z]) { excavatedQuantizedMeshMap[Z] = {}; }
-			//if (!excavatedQuantizedMeshMap[Z][X]) { excavatedQuantizedMeshMap[Z][X] = {}; }
-			//excavatedQuantizedMeshMap[Z][X][Y] = result;
+
 			if (!extrudeWorkerManager.finishedMap) 
 			{
 				extrudeWorkerManager.finishedMap = {};

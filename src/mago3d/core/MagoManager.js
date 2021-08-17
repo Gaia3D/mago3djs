@@ -7037,8 +7037,10 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function (intersectedLo
 {
 	var tilesCount = intersectedLowestTilesArray.length;
 	
-	if (tilesCount === 0)
-	{ return; }
+	if (tilesCount === 0) 
+	{ 
+		return; 
+	}
 	
 	var distToCamera;
 	var magoPolicy = this.magoPolicy;

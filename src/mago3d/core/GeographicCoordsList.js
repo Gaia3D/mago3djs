@@ -467,7 +467,7 @@ GeographicCoordsList.prototype.deleteObjects = function(vboMemManager)
 		
 		for (var i=0; i<geoPointsCount; i++)
 		{
-			this.geographicCoordsArray[i].deleteGlObjects(vboMemManager);
+			this.geographicCoordsArray[i].deleteObjects(vboMemManager);
 			this.geographicCoordsArray[i] = undefined;
 		}
 		this.geographicCoordsArray = undefined;

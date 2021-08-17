@@ -63,6 +63,23 @@ KoreaBuildingSeed.prototype.load = function()
 	});
 };
 
+KoreaBuildingSeed.prototype.deleteObjects = function() 
+{
+	delete this.status;
+	delete this._scheme;
+
+	delete this.url;
+	delete this.format;
+	delete this.x;
+	delete this.y;
+	delete this.z;
+	this.magoManager = undefined;
+	delete this.masterId;
+
+	this.geographicCoord.deleteObjects();
+	delete this.geographicCoord;
+};
+
 /**
  * Load Korea Building Master's FeatureCollection.
  * @param {object} featureCollection 한국건물 마스터 geojson
