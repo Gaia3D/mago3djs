@@ -466,8 +466,10 @@ ProcessQueue.prototype.deleteSmartTiles = function (magoManager)
 					}
 
 					smartTile.nativeObjects.generalObjectsArray = nativesArrayAux;
-
-					nativeSeedArray[0].status = KoreaBuildingSeed.STATUS.UNLOAD;
+					if (nativeSeedArray[0]) 
+					{
+						nativeSeedArray[0].status = KoreaBuildingSeed.STATUS.UNLOAD;
+					}
 				}
 				
 				deletedCount++;

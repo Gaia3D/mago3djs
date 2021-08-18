@@ -199,6 +199,86 @@ Mesh_.prototype.setColor = function(r, g, b, a)
 	}
 };
 
+Mesh_.prototype.getBoundingBox = function()
+{
+	if (this.bbox === undefined)
+	{
+		this.bbox = new BoundingBox_();
+		if (!this.vertexList) 
+		{
+			this.vertexList = new VertexList_();
+			this.vertexList.vertexArray = this.getNoRepeatedVerticesArray(this.vertexList.vertexArray);
+		}
+
+		this.bbox = this.vertexList.getBoundingBox(this.bbox);
+	}
+	
+	return this.bbox;
+};
+
+Mesh_.prototype.getNoRepeatedVerticesArray = function(resultVerticesArray) 
+{
+	if (resultVerticesArray === undefined)
+	{ resultVerticesArray = []; }
+	
+	// 1rst, assign vertex-IdxInList for all used vertices.
+	var facesCount;
+	var face;
+	var surface;
+	var idxAux = 0;
+	var vtx;
+	var verticesCount;
+	var surfacesCount = this.getSurfacesCount();
+	for (var i=0; i<surfacesCount; i++)
+	{
+		surface = this.getSurface(i);
+		facesCount = surface.getFacesCount();
+		for (var j=0; j<facesCount; j++)
+		{
+			face = surface.getFace(j);
+			verticesCount = face.getVerticesCount();
+			for (var k=0; k<verticesCount; k++)
+			{
+				vtx = face.getVertex(k);
+				vtx.setIdxInList(idxAux);
+				idxAux++;
+			}
+		}
+	}
+	
+	// now, make a map of unique vertices map using "idxInList" of vertices.
+	var verticesMap = {};
+	var surfacesCount = this.getSurfacesCount();
+	for (var i=0; i<surfacesCount; i++)
+	{
+		surface = this.getSurface(i);
+		facesCount = surface.getFacesCount();
+		for (var j=0; j<facesCount; j++)
+		{
+			face = surface.getFace(j);
+			verticesCount = face.getVerticesCount();
+			for (var k=0; k<verticesCount; k++)
+			{
+				vtx = face.getVertex(k);
+				verticesMap[vtx.getIdxInList().toString()] = vtx;
+			}
+		}
+	}
+	
+	// finally make the unique vertices array.
+	var vertex;
+	for (var key in verticesMap)
+	{
+		if (Object.prototype.hasOwnProperty.call(verticesMap, key))
+		{
+			vertex = verticesMap[key];
+			resultVerticesArray.push(vertex);
+		}
+	}
+	
+	return resultVerticesArray;
+};
+
 Mesh_.prototype.getVbo = function(resultVboContainer)
 {
 	if (resultVboContainer === undefined)

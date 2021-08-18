@@ -8,6 +8,8 @@ importScripts('./src/Rectangle2D_.js');
 importScripts('./src/Star2D_.js');
 
 // General objects.
+importScripts('./src/BoundingBox_.js');
+importScripts('./src/BoundingSphere_.js');
 importScripts('./src/CODE_.js');
 importScripts('./src/Color_.js');
 importScripts('./src/Constant_.js');
@@ -106,27 +108,24 @@ worker.onmessage = function (e)
 				continue;
 			}
 			mergedMesh.mergeMesh(surfIndepMesh);
-
-			
-
-			//resultVbo.posVboDataArray = posVboDataArray;
-			//resultVbo.norVboDataArray = norVboDataArray;
-			//resultVbo.colVboDataArray = colVboDataArray;
-			//resultVbo.tcoordVboDataArray = tcoordVboDataArray;
-			//resultVbo.indicesArray = indicesArray
-
-			var hola = 0;
 		}
-
-		var hola = 0;
 	}
 
 	var vbosArray = mergedMesh.getVbo();
 
+	// Now, calculate the boundingBox.***
+	var bSphere;
+	if (data.calculateBoundingSphere)
+	{
+		var bbox = mergedMesh.getBoundingBox(undefined);
+		bSphere = bbox.getBoundingSphere(undefined);
+	}
+
 	worker.postMessage({result: 
         {
         	info      : info,
-        	vbosArray : vbosArray
+        	vbosArray : vbosArray,
+        	bSphere   : bSphere
         }
 	});
 };

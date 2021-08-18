@@ -948,7 +948,7 @@ Modeler.getExtrudedMesh = function(profile2d, extrusionDist, extrudeSegmentsCoun
  * @param {GeographicCoordsList} geographicCoordsList 
  * @param {Array<Point2D>} point2dArray 
  */
-Modeler.getLoftMesh = function(geographicCoordsList, point2dArray) 
+Modeler.getLoftMesh = function (geographicCoordsList, point2dArray) 
 {
 	if (!geographicCoordsList || !(geographicCoordsList instanceof GeographicCoordsList))
 	{ return undefined; }

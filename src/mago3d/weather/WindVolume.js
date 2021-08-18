@@ -1015,8 +1015,10 @@ WindVolume.prototype.renderMode3DThickLines = function (magoManager)
 	gl.uniform1i(thickLineShader.bUseMultiRenderTarget_loc, magoManager.postFxShadersManager.bUseMultiRenderTarget);
 	gl.uniform1i(thickLineShader.uFrustumIdx_loc, magoManager.currentFrustumIdx);
 
-	//gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
-	//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+	gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
+	gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+	//gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
+	//gl.blendFunc( gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
 	gl.disable(gl.CULL_FACE);
 	gl.enable(gl.BLEND);
 
@@ -1287,7 +1289,7 @@ WindVolume.prototype.renderMode3DThickLines_oneLayer = function(magoManager)
 
 };
 
-WindVolume.prototype._getTrajectoryInLocalCoordinates = function(startGeoCoord, magoManager, options)
+WindVolume.prototype._getTrajectoryInLocalCoordinates = function (startGeoCoord, magoManager, options)
 {
 	// Obtain the velocity in this geoCoord.
 	var geoExtent = this.getGeographicExtent();

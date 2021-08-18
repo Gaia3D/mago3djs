@@ -313,10 +313,7 @@ void main()
     int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);
 
     // If the data is no generalGeomtry or pointsCloud, then discard.
-    if(dataType != 0 && dataType != 2)
-    discard;
-
-    //if(currFrustumIdx > 3)
+    //if(dataType != 0 && dataType != 2)
     //discard;
 
     vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);
@@ -332,6 +329,10 @@ void main()
     float radius_B = 5.0;
     float radius_C = 12.0;
     float radius_D = 20.0;
+
+    // Test. Variate the radius in function of "origin_zDist".***
+
+    // End test.-------------------------------------------------
 
     float factorByDist = 1.0;
     float realDist = -origin_real.z;
@@ -354,8 +355,7 @@ void main()
     discard;
 
     // General data type.*************************************************************************************
-    //if((dataType == 0 || dataType == 2) && bApplySsao) // ssao including pointClouds.
-    if(dataType == 0 && bApplySsao)
+    if(dataType != 2 && bApplySsao)
 	{        
         vec3 origin = origin_real;
         //vec3 origin = reconstructPosition(screenPos, linearDepth); // used when there are no normal-texture.

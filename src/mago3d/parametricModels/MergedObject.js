@@ -38,7 +38,7 @@ MergedObject.prototype.constructor = MergedObject;
  * @param {Array<MagoRenderable>} magoRenderables
  * @return {Promise}
  */
-MergedObject.prototype.initialize = function(magoRenderables) 
+MergedObject.prototype.initialize = function (magoRenderables) 
 {
 	var terrainProvider = this.magoManager.scene.globe.terrainProvider;
 	var tilingScheme = terrainProvider.tilingScheme;
@@ -175,6 +175,7 @@ MergedObject.prototype.makeMesh = function ()
 	mergedMesh = new Mesh();
 	this.objectsArray.push(mergedMesh);
 
+	// Now, delete data.***
 	var vboMemManager = this.magoManager.vboMemoryManager;
     
 	var magoRenderablesCount = this.magoRenderables.length;
