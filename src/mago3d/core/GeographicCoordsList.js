@@ -664,6 +664,30 @@ GeographicCoordsList.solveDegeneratedPoints = function(geographicCoordsArray, er
 };
 
 /**
+ * @param {Array<geographicCoord>} geographicCoordsArray
+ * @return {boolean}
+ */
+GeographicCoordsList.isClockwise = function(geographicCoordsArray) 
+{
+	 // This function deletes degenerated points.***
+	 if (!geographicCoordsArray && geographicCoordsArray.length < 3)
+	 { return; }
+
+	 var geoCoordsCount = geographicCoordsArray.length;
+	 var area = 0;
+	 for (var i0=geoCoordsCount-1, i1=0; i1<geoCoordsCount; i0 = i1++)
+	 {
+		var v0 = geographicCoordsArray[i0];
+		var v1 = geographicCoordsArray[i1];
+
+		area += v0.longitude * v1.latitude - v1.longitude * v0.latitude;
+	 }
+	 area *= 0.5;
+
+	 return area < 0;
+};
+
+/**
  * 
  */
 GeographicCoordsList.prototype.getExtrudedMeshRenderableObject = function(height, bLoop, resultRenderableObject, magoManager, extrudeDirWC, textureInfo) 
