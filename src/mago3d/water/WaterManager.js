@@ -21,10 +21,10 @@ var WaterManager = function (magoManager, options)
 	this.simulationTileDepth; // The water simulation runs over terrain of the some tile depth.
 
 	// The DEM can be from highMapTextures files, or from quantizedMesh.*******************************
-	this.terrainDemSourceType = "HIGHMAP"; // from HighMap or from QuantizedMesh.
+	this.terrainDemSourceType = "QUANTIZEDMESH"; // from HighMap or from QuantizedMesh.
 	// if this.terrainDemSourceType === "HIGHMAP", then load from files.
 	// if this.terrainDemSourceType === "QUANTIZEDMESH", then load the quantizedMesh & make the highMap.
-	this.terrainProvider; // if this.terrainDemSourceType === "QUANTIZEDMESH", then use terrain provider to load quantizedMeshes.
+	this.terrainProvider = this.magoManager.scene.globe.terrainProvider; // if this.terrainDemSourceType === "QUANTIZEDMESH", then use terrain provider to load quantizedMeshes.
 
 	this.fbo;
 
@@ -218,6 +218,22 @@ WaterManager.prototype.init = function ()
 	}
 
 	var waterLayer = this.newWater(options);
+};
+
+/**
+ * start water simulation
+ */
+WaterManager.prototype.start = function() 
+{
+	this.bSsimulateWater = true;
+};
+
+/**
+ * stop water simulation
+ */
+WaterManager.prototype.stop = function() 
+{
+	 this.bSsimulateWater = false;
 };
 
 /**

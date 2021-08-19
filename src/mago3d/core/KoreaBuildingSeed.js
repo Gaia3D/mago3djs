@@ -53,7 +53,7 @@ KoreaBuildingSeed.prototype.load = function()
 		var geojson = res;
 		if (that.format === 'pbf') 
 		{
-			geojson = geobuf.geobuf.decode(new Pbf(res));
+			geojson = geobufDecoder(res);
 		}
         
 		that.mergeFeatureCollection(geojson);
