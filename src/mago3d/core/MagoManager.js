@@ -2071,13 +2071,13 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		// Debug component.******************************************
 		/*
 		var lightAux;
-		if(lightsArray)
+		if (lightsArray)
 		{
 			var lightsCount = lightsArray.length;
 			lightAux = lightsArray[lightsCount - 1];
 		}
 		var options = {
-			lightSource : lightAux
+			lightSource: lightAux
 		};
 		
 		this.renderer.renderScreenRectangle(gl, options); // debug component.
@@ -5412,63 +5412,6 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function (gl)
 			this.moveSelectedObjectGeneral(gl, generalObjectSelected);
 		}
 	}
-};
-
-MagoManager.prototype.test_renderDepth_objectSelected = function(currObjectSelected) 
-{
-	// Test function. Provisional.***
-	// Test function. Provisional.***
-	// Test function. Provisional.***
-	// Test. Render depth only for the selected object.***************************
-	var gl = this.sceneState.gl;
-	
-	if (this.depthFboAux === undefined)
-	{
-		this.depthFboAux = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true});
-	}
-
-	this.depthFboAux.bind(); 
-	
-	if (this.isFarestFrustum())
-	{
-		gl.clearColor(0, 0, 0, 1);
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	}
-	gl.disable(gl.BLEND);
-	
-	gl.frontFace(gl.CCW);	
-	gl.enable(gl.DEPTH_TEST);
-	gl.depthFunc(gl.LEQUAL);
-	gl.enable(gl.CULL_FACE);
-	
-	// Now, renderDepth the selected object. Fix the frustumFar for adequate precision on depthPacking.***
-	var shader = this.postFxShadersManager.getShader("modelRefDepth"); 
-	if (!shader.uniformsMapGeneral.frustumFar)
-	{ return; }
-
-	shader.useProgram();
-	shader.bindUniformGenerals();
-	shader.enableVertexAttribArray(shader.position3_loc);
-		
-	var geoLocDataManager = currObjectSelected.geoLocDataManager;
-	var geoLocationData = geoLocDataManager.getCurrentGeoLocationData();
-		
-	// test: in depth, set frustumFar = 1000000000(100M).***
-	
-	
-	var frustumFarLoc = shader.uniformsMapGeneral.frustumFar.uniformLocation;
-	gl.uniform1f(frustumFarLoc, new Float32Array([100000000.0]));
-			
-	var renderType = 0;
-	//this.weatherStation.test_renderCuttingPlanes(this, renderType);
-			
-	geoLocationData.bindGeoLocationUniforms(gl, shader);
-	gl.uniform3fv(shader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
-	currObjectSelected.render(this, shader, renderType);
-			
-	
-	this.depthFboAux.unbind(); 
-	// End test.------------------------------------------------------------------
 };
 
 
@@ -9224,45 +9167,6 @@ MagoManager.prototype.checkCollision = function (position, direction)
 	}
 
 	return true;
-};
-MagoManager.prototype.renderBasicGl_test = function()
-{
-	var gl = this.getGl();
-	if (!this.testShader) 
-	{
-		var fragCode =
-            'void main(void) {' +
-               'gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);' +
-			'}';
-		var vertCode =
-            'attribute vec3 coordinates;' +
-            'void main(void) {' +
-               ' gl_Position = vec4(coordinates, 1.0);' +
-            '}';
-
-		// 5) Test Quad shader.****************************************************************************************
-	
-		var shaderName = "renderBasicGl_test"; // used by temperatura layer.***
-		var shader = this.postFxShadersManager.createShaderProgram(gl, vertCode, fragCode, shaderName, this);
-
-		this.testShader = shader;
-	}
-	
-
-	var positions = new Float32Array([0.0, 0.0, 0,
-		0.5, 0.5, 0,
-		1.0, 1.0, 0]);
-	var vboCacheKey = new VBOVertexIdxCacheKey();
-	vboCacheKey.setDataArrayPos(positions, this.vboMemoryManager, 3);
-	vboCacheKey.vboBufferPos.isReady(gl, this.vboMemoryManager);
-	
-	this.testShader.useProgram();
-	//vboCacheKey.bindDataPosition(shader,this.vboMemoryManager);
-	gl.bindBuffer(vboCacheKey.vboBufferPos.dataTarget, vboCacheKey.vboBufferPos.key);
-	gl.vertexAttribPointer(0, vboCacheKey.vboBufferPos.dataDimensions, vboCacheKey.vboBufferPos.dataGlType, vboCacheKey.vboBufferPos.normalized, vboCacheKey.vboBufferPos.dataStride, vboCacheKey.vboBufferPos.dataOffSet);
-	gl.disable(gl.CULL_FACE);
-	gl.drawArrays(gl.LINE_STRIP, 0, vboCacheKey.vertexCount);
-
 };
 
 

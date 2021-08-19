@@ -556,10 +556,6 @@ NeoReference.prototype.render = function (magoManager, neoBuilding, renderType, 
 	if (!neoReference.isReadyToRender())
 	{ return false; }
 
-
-	//if(neoReference.vBOVertexIdxCacheKeysContainer === undefined) return false;
-
-
 	// Check if the texture is loaded.
 	//if (neoReference.texture !== undefined || neoReference.materialId != -1)
 	if (neoReference.hasTexture)// && neoReference.texture !== undefined)
@@ -581,15 +577,6 @@ NeoReference.prototype.render = function (magoManager, neoBuilding, renderType, 
 	var selectionColor;
 	var currentNode;
 	var currentOctree;
-	
-	if (renderType === 2)
-	{
-		selectionManager = magoManager.selectionManager;
-		selectionColor = magoManager.selectionColor;
-		renderTexture = false; // reassign value for this var.
-		currentNode = currentObjectsRendering.curNode;
-		currentOctree = currentObjectsRendering.curOctree;
-	}
 	
 	var gl = magoManager.sceneState.gl;
 	
@@ -642,17 +629,6 @@ NeoReference.prototype.render = function (magoManager, neoBuilding, renderType, 
 		}
 		
 	}
-	else if (renderType === 2)
-	{
-		neoReference.selColor4 = selectionColor.getAvailableColor(neoReference.selColor4); 
-		var idxKey = selectionColor.decodeColor3(neoReference.selColor4.r, neoReference.selColor4.g, neoReference.selColor4.b);
-
-		selectionManager.setCandidates(idxKey, neoReference, currentOctree, neoBuilding, currentNode);
-		if (neoReference.selColor4) 
-		{
-			gl.uniform4fv(shader.oneColor4_loc, [neoReference.selColor4.r/255.0, neoReference.selColor4.g/255.0, neoReference.selColor4.b/255.0, 1.0]);
-		}
-	}
 	// End check color or texture of reference object.-----------------------------------------------------------------------------
 	
 	//Now erase the aditional information (aditionalColor & moveVector).
@@ -701,7 +677,6 @@ NeoReference.prototype.render = function (magoManager, neoBuilding, renderType, 
 	var vboKey;
 	for (var n=0; n<cacheKeys_count; n++) // Original.
 	{
-		//var mesh_array = block.viArraysContainer._meshaderrays[n];
 		vboKey = block.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray[n];
 		
 		// Positions.

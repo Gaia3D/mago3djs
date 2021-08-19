@@ -54,6 +54,7 @@ varying float flogz;
 varying float Fcoef_half;
 varying float depth;
 
+
 vec4 packDepth( float v ) {
   vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;
   enc = fract(enc);

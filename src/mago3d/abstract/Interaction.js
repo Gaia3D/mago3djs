@@ -8,7 +8,7 @@
  * @abstract
  * @param {object} layer layer object.
  */
-var Interaction = function() 
+var Interaction = function () 
 {
 	if (!(this instanceof Interaction)) 
 	{

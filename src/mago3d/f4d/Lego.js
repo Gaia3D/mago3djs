@@ -589,21 +589,6 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader,
 		rendered = true;
 		
 	}
-	if (renderType === 2) // depth or colorSelection.
-	{
-		shader.disableVertexAttribArray(shader.texCoord2_loc);
-		shader.disableVertexAttribArray(shader.normal3_loc);
-		shader.disableVertexAttribArray(shader.color4_loc);
-		gl.uniform1i(shader.bHasTexture_loc, false); // textures like png with alpha component.***
-		
-		// 1) Position.
-		if (!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
-		{ return false; }
-
-		gl.drawArrays(gl.TRIANGLES, 0, vertices_count);
-		rendered = true;
-		
-	}
 	else if (renderType === 1) // color.
 	{
 		// Test external alpha.

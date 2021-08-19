@@ -118,18 +118,6 @@ PolyLine3D.prototype.renderLines = function(magoManager, shader, renderType, bLo
 	var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
 	buildingGeoLocation.bindGeoLocationUniforms(gl, shader);
 	
-	if (renderType === 2)
-	{
-		var selectionManager = magoManager.selectionManager;
-		var selectionColor = magoManager.selectionColor;
-
-		var selColor = selectionColor.getAvailableColor(undefined); 
-		var idxKey = selectionColor.decodeColor3(selColor.r, selColor.g, selColor.b);
-
-		selectionManager.setCandidateGeneral(idxKey, this);
-		gl.uniform4fv(shader.oneColor4_loc, [selColor.r/255.0, selColor.g/255.0, selColor.b/255.0, 1.0]);
-	}
-	
 	var vbo_vicky = this.vboKeysContainer.vboCacheKeysArray[0]; // there are only one.
 	if (!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
 	{ return false; }

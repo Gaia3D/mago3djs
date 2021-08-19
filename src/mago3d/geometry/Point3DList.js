@@ -991,18 +991,6 @@ Point3DList.prototype.render = function(magoManager, shader, renderType, glPrimi
 	var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
 	buildingGeoLocation.bindGeoLocationUniforms(gl, shader);
 	
-	if (renderType === 2)
-	{
-		var selectionManager = magoManager.selectionManager;
-		var selectionColor = magoManager.selectionColor;
-
-		var selColor = selectionColor.getAvailableColor(undefined); 
-		var idxKey = selectionColor.decodeColor3(selColor.r, selColor.g, selColor.b);
-
-		selectionManager.setCandidateGeneral(idxKey, this);
-		gl.uniform4fv(shader.oneColor4_loc, [selColor.r/255.0, selColor.g/255.0, selColor.b/255.0, 1.0]);
-	}
-	
 	var vbo_vicky = this.vboKeysContainer.vboCacheKeysArray[0]; // there are only one.
 	if (!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
 	{ return false; }
@@ -1054,18 +1042,6 @@ Point3DList.prototype.renderAsChild = function(magoManager, shader, renderType, 
 	gl.uniform1i(shader.hasAditionalMov_loc, false);
 	gl.uniform1i(shader.refMatrixType_loc, refMatrixType);
 	gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
-	
-	if (renderType === 2)
-	{
-		var selectionManager = magoManager.selectionManager;
-		var selectionColor = magoManager.selectionColor;
-
-		var selColor = selectionColor.getAvailableColor(undefined); 
-		var idxKey = selectionColor.decodeColor3(selColor.r, selColor.g, selColor.b);
-
-		selectionManager.setCandidateGeneral(idxKey, this);
-		gl.uniform4fv(shader.oneColor4_loc, [selColor.r/255.0, selColor.g/255.0, selColor.b/255.0, 1.0]);
-	}
 	
 	var vbo_vicky = this.vboKeysContainer.vboCacheKeysArray[0]; // there are only one.
 	if (!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
@@ -1288,18 +1264,6 @@ Point3DList.prototype.renderLines = function(magoManager, shader, renderType, bL
 	var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
 	buildingGeoLocation.bindGeoLocationUniforms(gl, shader);
 	
-	if (renderType === 2)
-	{
-		var selectionManager = magoManager.selectionManager;
-		var selectionColor = magoManager.selectionColor;
-
-		var selColor = selectionColor.getAvailableColor(undefined); 
-		var idxKey = selectionColor.decodeColor3(selColor.r, selColor.g, selColor.b);
-
-		selectionManager.setCandidateGeneral(idxKey, this);
-		gl.uniform4fv(shader.oneColor4_loc, [selColor.r/255.0, selColor.g/255.0, selColor.b/255.0, 1.0]);
-	}
-	
 	var vbo_vicky = this.vboKeysContainer.vboCacheKeysArray[0]; // there are only one.
 	if (!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
 	{ return false; }
@@ -1353,18 +1317,6 @@ Point3DList.prototype.renderPoints = function(magoManager, shader, renderType, b
 	var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
 	buildingGeoLocation.bindGeoLocationUniforms(gl, shader);
 	
-	if (renderType === 2)
-	{
-		var selectionManager = magoManager.selectionManager;
-		var selectionColor = magoManager.selectionColor;
-
-		var selColor = selectionColor.getAvailableColor(undefined); 
-		var idxKey = selectionColor.decodeColor3(selColor.r, selColor.g, selColor.b);
-
-		selectionManager.setCandidateGeneral(idxKey, this);
-		gl.uniform4fv(shader.oneColor4_loc, [selColor.r/255.0, selColor.g/255.0, selColor.b/255.0, 1.0]);
-	}
-	
 	var vbo_vicky = this.vboKeysContainer.vboCacheKeysArray[0]; // there are only one.
 	if (!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
 	{ return false; }
@@ -1415,39 +1367,14 @@ Point3DList.prototype.renderPointsIndividually = function(magoManager, shader, r
 	var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
 	buildingGeoLocation.bindGeoLocationUniforms(gl, shader);
 	
-	if (renderType === 2)
-	{
-		var selectionManager = magoManager.selectionManager;
-		var selectionColor = magoManager.selectionColor;
-
-		var selColor = selectionColor.getAvailableColor(undefined); 
-		var idxKey = selectionColor.decodeColor3(selColor.r, selColor.g, selColor.b);
-
-		selectionManager.setCandidateGeneral(idxKey, this);
-		gl.uniform4fv(shader.oneColor4_loc, [selColor.r/255.0, selColor.g/255.0, selColor.b/255.0, 1.0]);
-	}
-	
 	var vbo_vicky = this.vboKeysContainer.vboCacheKeysArray[0]; // there are only one.
 	if (!vbo_vicky.bindDataPosition(shader, magoManager.vboMemoryManager))
 	{ return false; }
 
-	var selectionManager = magoManager.selectionManager;
-	var selectionColor = magoManager.selectionColor;
-
 	var pointsCount = this.pointsArray.length;
 	for (var i=0; i<pointsCount; i++)
 	{
-		if (renderType === 2)
-		{
-			var selColor = selectionColor.getAvailableColor(undefined); 
-			var idxKey = selectionColor.decodeColor3(selColor.r, selColor.g, selColor.b);
-
-			selectionManager.setCandidateGeneral(idxKey, this.pointsArray[i]);
-			gl.uniform4fv(shader.oneColor4_loc, [selColor.r/255.0, selColor.g/255.0, selColor.b/255.0, 1.0]);
-		}
-
 		gl.drawArrays(gl.POINTS, i, 1);
-
 	}
 	
 	gl.enable(gl.DEPTH_TEST);

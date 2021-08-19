@@ -140,7 +140,7 @@ PointSelectInteraction.prototype.setTargetHighlight = function(highlight)
  * get selected object
  * @return {Object}
  */
-PointSelectInteraction.prototype.getSelected = function()
+PointSelectInteraction.prototype.getSelected = function ()
 {
 	return this.selected;
 };

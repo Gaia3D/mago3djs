@@ -437,9 +437,6 @@ BSplineCubic3D.prototype.render = function (magoManager, shader, renderType)
 	
 	var bLoop = false, bEnableDepth = false;
 	this._renderControlPointsArms(magoManager, shader, renderType);
-	
-	if (renderType === 2)
-	{ return; }
 
 	var gl = magoManager.sceneState.gl;
 	

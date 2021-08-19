@@ -423,6 +423,18 @@ void main()\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
 }\n\
 ";
+ShaderSource.depthBufferUtils = "\n\
+vec4 packDepth( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+  return enc;\n\
+}\n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+} ";
 ShaderSource.depthTexturesMergerFS = "#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\
@@ -1868,6 +1880,7 @@ varying vec3 vertexPosLC;\n\
 varying float flogz;\n\
 varying float Fcoef_half;\n\
 varying float depth;\n\
+\n\
 \n\
 vec4 packDepth( float v ) {\n\
   vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
@@ -6554,6 +6567,8 @@ void main()\n\
     }\n\
 \n\
 	vec4 shadedColor = texture2D(shadedColorTex, screenPos);\n\
+\n\
+    // Calculate if isEdge by sobel.***\n\
 	bool bIsEdge = false;\n\
 \n\
 	vec4 n[9];\n\
@@ -7769,9 +7784,7 @@ void main()\n\
     float radius_C = 12.0;\n\
     float radius_D = 20.0;\n\
 \n\
-    // Test. Variate the radius in function of \"origin_zDist\".***\n\
-\n\
-    // End test.-------------------------------------------------\n\
+    \n\
 \n\
     float factorByDist = 1.0;\n\
     float realDist = -origin_real.z;\n\
@@ -7781,6 +7794,13 @@ void main()\n\
     {\n\
         factorByDist = smoothstep(0.0, 1.0, realDist/(aux));\n\
     }\n\
+\n\
+    // Test. Variate the radius in function of \"origin_zDist\".***\n\
+    //radius_A *= factorByDist;\n\
+    //radius_B *= factorByDist;\n\
+    //radius_C *= factorByDist;\n\
+    //radius_D *= factorByDist;\n\
+    // End test.-------------------------------------------------\n\
 \n\
     // Now, factorByFarDist. When object are in far, no apply ssao.\n\
     float factorByFarDist = 1.0;\n\
@@ -7794,8 +7814,6 @@ void main()\n\
     discard;\n\
 \n\
     // General data type.*************************************************************************************\n\
-    //if((dataType == 0 || dataType == 2) && bApplySsao) // ssao including pointClouds.\n\
-    //if(dataType == 0 && bApplySsao)\n\
     if(dataType != 2 && bApplySsao)\n\
 	{        \n\
         vec3 origin = origin_real;\n\
@@ -7821,11 +7839,16 @@ void main()\n\
 		{    	\n\
             vec3 rotatedKernel = tbn * vec3(kernel[i].x*1.0, kernel[i].y*1.0, kernel[i].z);\n\
 \n\
-            occlusion_A += getOcclusion(origin, rotatedKernel, radius_A) * factorByDist;\n\
-            occlusion_B += getOcclusion(origin, rotatedKernel, radius_B) * factorByDist;\n\
-            occlusion_C += getOcclusion(origin, rotatedKernel, radius_C) * factorByDist;\n\
-            occlusion_D += getOcclusion(origin, rotatedKernel, radius_D) * factorByDist;\n\
+            occlusion_A += getOcclusion(origin, rotatedKernel, radius_A);\n\
+            occlusion_B += getOcclusion(origin, rotatedKernel, radius_B);\n\
+            occlusion_C += getOcclusion(origin, rotatedKernel, radius_C);\n\
+            occlusion_D += getOcclusion(origin, rotatedKernel, radius_D);\n\
 		} \n\
+\n\
+        occlusion_A *= factorByDist;\n\
+        occlusion_B *= factorByDist;\n\
+        occlusion_C *= factorByDist;\n\
+        occlusion_D *= factorByDist;\n\
 \n\
         float fKernelSize = float(kernelSize);\n\
 \n\

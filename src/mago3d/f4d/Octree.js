@@ -790,19 +790,6 @@ Octree.prototype.renderSkin = function(magoManager, neoBuilding, renderType, ren
 		}
 		
 	}
-	else if (renderType === 2)
-	{
-		// Color selction mode.
-		var colorAux;
-		colorAux = magoManager.selectionColor.getAvailableColor(colorAux);
-		var idxKey = magoManager.selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
-		var currentObjectsRendering = magoManager.renderer.currentObjectsRendering;
-		var currentNode = currentObjectsRendering.curNode;
-		magoManager.selectionManager.setCandidates(idxKey, undefined, this, neoBuilding, currentNode);
-		
-		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
-		gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
-	}
 	
 	return this.lego.render(magoManager, renderType, renderTexture, shader, neoBuilding);
 };

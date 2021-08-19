@@ -120,17 +120,6 @@ Pipe.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 		}
 		
 	}
-	else if (renderType === 2)
-	{
-		// Selection render.***
-		var selectionColor = magoManager.selectionColor;
-		var colorAux = magoManager.selectionColor.getAvailableColor(undefined);
-		var idxKey = magoManager.selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
-		magoManager.selectionManager.setCandidateGeneral(idxKey, this);
-		
-		gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
-		gl.disable(gl.BLEND);
-	}
 
 	this.mesh.render(magoManager, shader, renderType, glPrimitive);
 

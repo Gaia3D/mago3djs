@@ -86,25 +86,7 @@ CuttingPlane.prototype.render = function(magoManager, shader, renderType)
 {
 	var gl = magoManager.sceneState.gl;
 	var glPrimitive;
-	if (renderType === 2)
-	{
-		// colorCoding selection.
-		var selectionColor = magoManager.selectionColor;
-		var selFamilyName = "general";
-		var selManager = magoManager.selectionManager;
-		var selCandidateNodes = selManager.getSelectionCandidatesFamily(selFamilyName);
-		if (selCandidateNodes === undefined)
-		{
-			selCandidateNodes = selManager.newCandidatesFamily(selFamilyName);
-		}
-		
-		var selColor4 = selectionColor.getAvailableColor(undefined); // new.
-		var idxKey = selectionColor.decodeColor3(selColor4.r, selColor4.g, selColor4.b);
-		selManager.setCandidateCustom(idxKey, selFamilyName, this);
-		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
-		gl.uniform4fv(shader.oneColor4_loc, [selColor4.r/255.0, selColor4.g/255.0, selColor4.b/255.0, 1.0]);
-	}
-	else if (renderType === 1)
+	if (renderType === 1)
 	{
 		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
 		gl.uniform4fv(shader.oneColor4_loc, [1.0, 1.0, 0.0, 1.0]);

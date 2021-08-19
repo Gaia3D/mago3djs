@@ -459,7 +459,7 @@ SelectionManager.prototype.TEST__CurrGeneralObjSel = function()
  * @private
  * @deprecated
  */
-SelectionManager.prototype.selectObjectByPixel = function(gl, mouseX, mouseY, bSelectObjects) 
+SelectionManager.prototype.selectObjectByPixel = function (gl, mouseX, mouseY, bSelectObjects) 
 {
 	if (bSelectObjects === undefined)
 	{ bSelectObjects = false; }

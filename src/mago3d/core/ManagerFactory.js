@@ -14,7 +14,7 @@
  * @param options View 생성을 위한 기타 옵션
  * @returns api
  */
-var ManagerFactory = function(viewer, containerId, serverPolicy, projectIdArray, projectDataArray, projectDataFolderArray, imagePath, options) 
+var ManagerFactory = function (viewer, containerId, serverPolicy, projectIdArray, projectDataArray, projectDataFolderArray, imagePath, options) 
 {
 	if (!(this instanceof ManagerFactory)) 
 	{

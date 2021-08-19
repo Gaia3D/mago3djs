@@ -130,18 +130,6 @@ Wheel.prototype.render = function(magoManager, shader, renderType, glPrimitive)
 	gl.uniform1i(shader.refMatrixType_loc, 0); // in magoManager case, there are not referencesMatrix.***
 	gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.***
 	
-	if (renderType === 2)
-	{
-		// Selection render.***
-		var selectionColor = magoManager.selectionColor;
-		var colorAux = magoManager.selectionColor.getAvailableColor(undefined);
-		var idxKey = magoManager.selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
-		magoManager.selectionManager.setCandidateGeneral(idxKey, this);
-		
-		gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
-		gl.disable(gl.BLEND);
-	}
-	
 	this.mesh.render(magoManager, shader, renderType, glPrimitive);
 
 	gl.disable(gl.BLEND);
@@ -198,17 +186,6 @@ Wheel.prototype.renderAsChild = function(magoManager, shader, renderType, glPrim
 			}
 		}
 		
-	}
-	else if (renderType === 2)
-	{
-		// Selection render.***
-		var selectionColor = magoManager.selectionColor;
-		var colorAux = magoManager.selectionColor.getAvailableColor(undefined);
-		var idxKey = magoManager.selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
-		magoManager.selectionManager.setCandidateGeneral(idxKey, this);
-		
-		gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
-		gl.disable(gl.BLEND);
 	}
 
 	if (this.tMat) 

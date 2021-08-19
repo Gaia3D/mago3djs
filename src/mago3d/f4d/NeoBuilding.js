@@ -1129,13 +1129,13 @@ NeoBuilding.prototype.getShaderName = function(lod, projectType, renderType)
 			shaderName = "modelRefSsao";
 		}
 	}
-	else if (renderType === 2)
-	{
-		if (lod <= 1)
-		{
-			shaderName = "modelRefSsao";
-		}
-	}
+	//else if (renderType === 2)
+	//{
+	//	if (lod <= 1)
+	//	{
+	//		shaderName = "modelRefSsao";
+	//	}
+	//}
 
 	return shaderName;
 };
@@ -1913,15 +1913,6 @@ NeoBuilding.prototype.renderSkin = function (magoManager, shader, renderType)
 	var currentNode;
 	var currentOctree;
 	
-	if (renderType === 2)
-	{
-		selCandidates = magoManager.selectionManager;
-		selectionColor = magoManager.selectionColor;
-		renderTexture = false; // reassign value for this var.
-		currentNode = currentObjectsRendering.curNode;
-		currentOctree = currentObjectsRendering.curOctree;
-	}
-	
 	var renderTexture = true;
 
 	if (!skinLego.attributes.hasTexture)
@@ -1997,17 +1988,6 @@ NeoBuilding.prototype.renderSkin = function (magoManager, shader, renderType)
 		}
 		
 	}
-	else if (renderType === 2)
-	{
-		// Color selction mode.
-		var colorAux;
-		colorAux = magoManager.selectionColor.getAvailableColor(colorAux);
-		var idxKey = magoManager.selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
-		magoManager.selectionManager.setCandidates(idxKey, undefined, undefined, this, currentNode);
-		
-		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
-		gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
-	}
 	else if (renderType === 3)
 	{
 		gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
@@ -2043,7 +2023,6 @@ NeoBuilding.prototype.renderDetailed = function(magoManager, shader, renderType,
 		}
 		else { renderTexture = false; }
 	}
-	//else if (renderType === 2) // No need to do any function.
 	
 	// set the currentObjectsRendering.
 	magoManager.renderer.currentObjectsRendering.curBuilding = this;

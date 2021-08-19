@@ -1696,17 +1696,17 @@ TinTerrain.prototype.renderForward = function(currentShader, magoManager, bDepth
 		}
 
 		var gl = magoManager.getGl();
-		if (renderType === 2)
-		{
-			var colorAux;
-			colorAux = magoManager.selectionColor.getAvailableColor(colorAux);
-			var idxKey = magoManager.selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
-			magoManager.selectionManager.setCandidateGeneral(idxKey, this);
-				
-			gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
-			gl.uniform4fv(currentShader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
-		}
-		else if (renderType === 1)
+		//if (renderType === 2)
+		//{
+		//	var colorAux;
+		//	colorAux = magoManager.selectionColor.getAvailableColor(colorAux);
+		//	var idxKey = magoManager.selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
+		//	magoManager.selectionManager.setCandidateGeneral(idxKey, this);
+		//		
+		//	gl.uniform1i(currentShader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
+		//	gl.uniform4fv(currentShader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
+		//}
+		if (renderType === 1)
 		{
 			var sceneState = magoManager.sceneState;
 			if (sceneState.applySunShadows)

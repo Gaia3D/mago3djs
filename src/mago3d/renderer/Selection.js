@@ -29,7 +29,7 @@ var Selection = function()
  * @param drawingBufferWidth 변수
  * @param drawingBufferHeight 변수
  */
-Selection.prototype.init = function(gl, drawingBufferWidth, drawingBufferHeight) 
+Selection.prototype.init = function (gl, drawingBufferWidth, drawingBufferHeight) 
 {
 	// http://www.webglacademy.com/courses.php?courses=0|1|20|2|3|4|23|5|6|7|10#10
 	this.drawing_height = drawingBufferHeight;

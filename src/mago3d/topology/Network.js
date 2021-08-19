@@ -346,12 +346,6 @@ Network.prototype.renderColorCoding = function(magoManager, shader, renderType)
  */
 Network.prototype.render = function(magoManager, shader, renderType)
 {
-	if (renderType === 2)
-	{
-		this.renderColorCoding(magoManager, shader, renderType);
-		return;
-	}
-	
 	// Check if ready smallBox and bigBox.
 	var selectionColor = magoManager.selectionColor;
 	selectionColor.init(); 

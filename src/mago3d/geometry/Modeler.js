@@ -1230,7 +1230,7 @@ Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive
 		this.tunnel.renderPoints(magoManager, shader, renderType);
 	}
 		
-	if (renderType === 1 || renderType === 2)
+	if (renderType === 1)// || renderType === 2)
 	{
 		if (this.clippingBox !== undefined)
 		{

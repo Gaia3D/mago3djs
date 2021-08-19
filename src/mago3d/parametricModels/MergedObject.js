@@ -376,7 +376,7 @@ MergedObject.prototype.render = function (magoManager, shader, renderType, glPri
 		this.vboFromWorker = true;
 	}
 	
-	if (this.objectsArray.length === 0)
+	if (!this.objectsArray || this.objectsArray.length === 0)
 	{ return false; }
 
 	var gl = magoManager.getGl();

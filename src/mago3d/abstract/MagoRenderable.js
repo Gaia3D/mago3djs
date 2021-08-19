@@ -242,14 +242,6 @@ MagoRenderable.prototype.render = function (magoManager, shader, renderType, glP
 		{
 			return;
 		}
-		
-		if (renderType === 2)
-		{
-			if (this.attributes.isSelectable !== undefined && this.attributes.isSelectable === false) 
-			{
-				return;
-			}
-		}
 	}
 
 	if (this.dirty)
@@ -474,6 +466,7 @@ MagoRenderable.prototype.renderAsChild = function (magoManager, shader, renderTy
 
 		if (magoManager.isCameraMoved && !magoManager.isCameraMoving )
 		{
+			//if (this.attributes.isSelectable !== undefined && this.attributes.isSelectable === false) 
 			// Selection render.***
 			var selectionColor = magoManager.selectionColor;
 			var colorAux = selectionColor.getAvailableColor(undefined);
@@ -482,16 +475,6 @@ MagoRenderable.prototype.renderAsChild = function (magoManager, shader, renderTy
 			gl.uniform4fv(shader.uSelColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
 		}
 
-	}
-	else if (renderType === 2)
-	{
-		// Selection render.***
-		var selectionColor = magoManager.selectionColor;
-		var colorAux = selectionColor.getAvailableColor(undefined);
-		var idxKey = selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
-		magoManager.selectionManager.setCandidateGeneral(idxKey, this);
-		
-		gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
 	}
 
 	if (this.tMat) 
@@ -512,7 +495,7 @@ MagoRenderable.prototype.renderAsChild = function (magoManager, shader, renderTy
 				// do not renderDepth for thickLine objects.
 				continue;
 			}
-			else if (renderType === 1 || renderType === 2)
+			else if (renderType === 1)
 			{
 				var shaderName = "thickLine";
 				if (object instanceof VectorExtrudedMesh)
@@ -561,7 +544,7 @@ MagoRenderable.prototype.renderAsChild = function (magoManager, shader, renderTy
 			{
 				shaderLocal = magoManager.postFxShadersManager.getShader("pointsCloudDepth"); 
 			}
-			else if (renderType === 1 || renderType === 2)
+			else if (renderType === 1)
 			{
 				shaderLocal = magoManager.postFxShadersManager.getShader("pointsCloudSsao"); 
 			}

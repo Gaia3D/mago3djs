@@ -1001,18 +1001,8 @@ NeoReferencesMotherAndIndices.prototype.render = function(magoManager, neoBuildi
 	if (!this.isReadyToRender())
 	{ return false; }
 	
-	if (renderType === 2)
-	{
-		renderTexture = false; // reassign value for this var.
-	}
-	
 	var gl = magoManager.sceneState.gl;
 	
-	if (renderType === 2)
-	{
-		shader.disableVertexAttribArray(shader.texCoord2_loc);
-		shader.disableVertexAttribArray(shader.normal3_loc);
-	}
 	if (renderType === 0)
 	{
 		shader.disableVertexAttribArray(shader.texCoord2_loc);

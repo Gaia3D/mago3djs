@@ -578,66 +578,6 @@ ObjectMarkerManager.prototype.render = function(magoManager, renderType)
 				gl.uniform3fv(shader.aditionalOffset_loc, [0.0, 0.0, 0.0]); // init referencesMatrix.
 			}
 		}
-		else if (renderType === 2)
-		{
-			// Selection render.***
-			var selectionColor = magoManager.selectionColor;
-			gl.disable(gl.BLEND);
-			gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
-			
-			for (var i=0; i<objectsMarkersCount; i++)
-			{
-				var objMarker = magoManager.objMarkerManager.objectMarkerArray[i];
-
-				var currentTexture = this.pin.getTexture(objMarker.imageFilePath);
-				if (!currentTexture)
-				{
-					this.pin.loadImage(objMarker.imageFilePath, magoManager);
-					continue;
-				}
-
-				var objMarkerGeoLocation = objMarker.getGeoLocationData(magoManager);
-				if (objMarkerGeoLocation === undefined)
-				{ continue; }
-
-				if (currentTexture.texId !== lastTexId)
-				{
-					gl.bindTexture(gl.TEXTURE_2D, currentTexture.texId);
-					lastTexId = currentTexture.texId;
-				}
-
-				if (selectionManager.isObjectSelected(objMarker))
-				{
-					gl.uniform2fv(shader.scale2d_loc, new Float32Array([1.5, 1.5]));
-					if (objMarker.imageFilePathSelected)
-					{
-						var selectedTexture = this.pin.getTexture(objMarker.imageFilePathSelected);
-						if (selectedTexture)
-						{ currentTexture = selectedTexture; }
-						else 
-						{
-							this.pin.loadImage(objMarker.imageFilePathSelected, magoManager);
-							continue;
-						}
-					}
-				}
-				else
-				{
-					gl.uniform2fv(shader.scale2d_loc, new Float32Array([1.0, 1.0]));
-				}
-				
-				var colorAux = selectionColor.getAvailableColor(undefined);
-				var idxKey = selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
-				selectionManager.setCandidateGeneral(idxKey, objMarker);
-			
-				gl.uniform4fv(shader.oneColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
-			
-				gl.uniform3fv(shader.buildingPosHIGH_loc, objMarkerGeoLocation.positionHIGH);
-				gl.uniform3fv(shader.buildingPosLOW_loc, objMarkerGeoLocation.positionLOW);
-
-				gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-			}
-		}
 		
 		gl.disable(gl.BLEND);
 		gl.depthRange(0, 1);

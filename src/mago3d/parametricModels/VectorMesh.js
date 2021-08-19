@@ -86,10 +86,6 @@ VectorMesh.prototype.render = function (magoManager, shader, renderType, glPrimi
 	if (this.vboKeysContainer === undefined)
 	{ return; }
 
-	if (renderType === 2)
-	{
-		var hola = 0;
-	}
 	
 	var vbo = this.vboKeysContainer.getVboKey(0);
 	var gl = magoManager.getGl();

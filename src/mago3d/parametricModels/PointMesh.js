@@ -104,23 +104,6 @@ PointMesh.prototype.renderAsChild = function (magoManager, shader, renderType, g
 	if (strokeColor)
 	{ gl.uniform4fv(shader.uStrokeColor_loc, new Float32Array([strokeColor.r, strokeColor.g, strokeColor.b, strokeColor.a])); }
 
-	if (renderType === 2)
-	{
-		var selectionManager = magoManager.selectionManager;
-		var selectionColor = magoManager.selectionColor;
-
-		var selColor = selectionColor.getAvailableColor(undefined); 
-		var idxKey = selectionColor.decodeColor3(selColor.r, selColor.g, selColor.b);
-		var owner = this;
-		if (this.owner)
-		{
-			owner = this.owner;
-		}
-		selectionManager.setCandidateGeneral(idxKey, owner);
-		// Note: in setCandidateGeneral put "this". Later, use getOwner to know the generalObject. TODO:.
-		gl.uniform4fv(shader.oneColor4_loc, [selColor.r/255.0, selColor.g/255.0, selColor.b/255.0, 1.0]);
-	}
-
 	// seletionColor4.***
 	if (magoManager.isCameraMoved && !magoManager.isCameraMoving )
 	{

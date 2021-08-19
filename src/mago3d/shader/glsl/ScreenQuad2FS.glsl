@@ -341,6 +341,8 @@ void main()
     }
 
 	vec4 shadedColor = texture2D(shadedColorTex, screenPos);
+
+    // Calculate if isEdge by sobel.***
 	bool bIsEdge = false;
 
 	vec4 n[9];

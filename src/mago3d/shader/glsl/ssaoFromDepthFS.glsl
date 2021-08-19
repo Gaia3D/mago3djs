@@ -330,9 +330,7 @@ void main()
     float radius_C = 12.0;
     float radius_D = 20.0;
 
-    // Test. Variate the radius in function of "origin_zDist".***
-
-    // End test.-------------------------------------------------
+    
 
     float factorByDist = 1.0;
     float realDist = -origin_real.z;
@@ -342,6 +340,13 @@ void main()
     {
         factorByDist = smoothstep(0.0, 1.0, realDist/(aux));
     }
+
+    // Test. Variate the radius in function of "origin_zDist".***
+    //radius_A *= factorByDist;
+    //radius_B *= factorByDist;
+    //radius_C *= factorByDist;
+    //radius_D *= factorByDist;
+    // End test.-------------------------------------------------
 
     // Now, factorByFarDist. When object are in far, no apply ssao.
     float factorByFarDist = 1.0;
@@ -380,11 +385,16 @@ void main()
 		{    	
             vec3 rotatedKernel = tbn * vec3(kernel[i].x*1.0, kernel[i].y*1.0, kernel[i].z);
 
-            occlusion_A += getOcclusion(origin, rotatedKernel, radius_A) * factorByDist;
-            occlusion_B += getOcclusion(origin, rotatedKernel, radius_B) * factorByDist;
-            occlusion_C += getOcclusion(origin, rotatedKernel, radius_C) * factorByDist;
-            occlusion_D += getOcclusion(origin, rotatedKernel, radius_D) * factorByDist;
+            occlusion_A += getOcclusion(origin, rotatedKernel, radius_A);
+            occlusion_B += getOcclusion(origin, rotatedKernel, radius_B);
+            occlusion_C += getOcclusion(origin, rotatedKernel, radius_C);
+            occlusion_D += getOcclusion(origin, rotatedKernel, radius_D);
 		} 
+
+        occlusion_A *= factorByDist;
+        occlusion_B *= factorByDist;
+        occlusion_C *= factorByDist;
+        occlusion_D *= factorByDist;
 
         float fKernelSize = float(kernelSize);
 

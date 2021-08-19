@@ -970,10 +970,6 @@ Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive, i
 			}
 		}
 	}
-	else if (renderType === 2)
-	{
-		// Selection render.***
-	}
 	
 	var vboKeysCount = this.vboKeysContainer.vboCacheKeysArray.length;
 	for (var i=0; i<vboKeysCount; i++)
@@ -1138,10 +1134,6 @@ Mesh.prototype.renderWireframe = function(magoManager, shader, renderType, glPri
 				gl.uniform4fv(shader.oneColor4_loc, [this.color4.r, this.color4.g, this.color4.b, this.color4.a]); 
 			}
 		}
-	}
-	else if (renderType === 2)
-	{
-		// Selection render.***
 	}
 	
 	var vbo = this.edgesVboKeysContainer.getVboKey(0);

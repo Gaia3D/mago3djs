@@ -831,11 +831,11 @@ TinTerrainManager.prototype.render = function (magoManager, bDepth, renderType, 
 		
 		gl.activeTexture(gl.TEXTURE2); // difusseTex.
 	}
-	else if (renderType === 2)
-	{
-		gl.uniform1i(currentShader.bApplySpecularLighting_loc, false);
-		gl.uniform1i(currentShader.uRenderType_loc, 2);
-	}
+	//else if (renderType === 2)
+	//{
+	//	gl.uniform1i(currentShader.bApplySpecularLighting_loc, false);
+	//	gl.uniform1i(currentShader.uRenderType_loc, 2);
+	//}
 
 	
 	var succesfullyRenderedTilesArray = [];
