@@ -479,33 +479,6 @@ PostFxShadersManager.prototype._createShader_testQuad = function()
 	return shader;
 };
 
-PostFxShadersManager.prototype._createShader_pointsCloudDepth = function() 
-{
-	var use_linearOrLogarithmicDepth = this._get_useLinearOrLogarithmicDepth_string();
-	var use_multi_render_target = this._get_useMultiRenderTarget_string();
-	var gl = this.gl;
-
-	var shaderName = "pointsCloudDepth";
-	var ssao_vs_source = ShaderSource.PointCloudDepthVS;
-	var ssao_fs_source = ShaderSource.PointCloudDepthFS;
-	ssao_fs_source = ssao_fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
-	ssao_fs_source = ssao_fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
-	var shader = this.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this.magoManager);
-	// pointsCloud shader locals.***
-	shader.bPositionCompressed_loc = gl.getUniformLocation(shader.program, "bPositionCompressed");
-	shader.minPosition_loc = gl.getUniformLocation(shader.program, "minPosition");
-	shader.bboxSize_loc = gl.getUniformLocation(shader.program, "bboxSize");
-	shader.maxPointSize_loc = gl.getUniformLocation(shader.program, "maxPointSize");
-	shader.minPointSize_loc = gl.getUniformLocation(shader.program, "minPointSize");
-	shader.pendentPointSize_loc = gl.getUniformLocation(shader.program, "pendentPointSize");
-	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
-	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
-	shader.uFrustumIdx_loc = gl.getUniformLocation(shader.program, "uFrustumIdx");
-
-	this.shadersMap[shaderName] = shader;
-	return shader;
-};
-
 PostFxShadersManager.prototype._createShader_pointsCloudSsao = function() 
 {
 	var use_linearOrLogarithmicDepth = this._get_useLinearOrLogarithmicDepth_string();
@@ -940,9 +913,6 @@ PostFxShadersManager.prototype._createShaderByName = function(shaderName)
 		break;
 	case  "testQuad":
 		this._createShader_testQuad();
-		break;
-	case  "pointsCloudDepth":
-		this._createShader_pointsCloudDepth();
 		break;
 	case  "pointsCloudSsao":
 		this._createShader_pointsCloudSsao();

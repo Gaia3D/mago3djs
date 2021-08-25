@@ -4445,202 +4445,6 @@ void main()\n\
 \n\
 \n\
 ";
-ShaderSource.PointCloudDepthFS = "#ifdef GL_ES\n\
-precision highp float;\n\
-#endif\n\
-\n\
-#define %USE_LOGARITHMIC_DEPTH%\n\
-#ifdef USE_LOGARITHMIC_DEPTH\n\
-#extension GL_EXT_frag_depth : enable\n\
-#endif\n\
-\n\
-#define %USE_MULTI_RENDER_TARGET%\n\
-#ifdef USE_MULTI_RENDER_TARGET\n\
-#extension GL_EXT_draw_buffers : require\n\
-#endif\n\
-\n\
-\n\
-uniform float near;\n\
-uniform float far;\n\
-uniform int uFrustumIdx;\n\
-\n\
-uniform bool bUseLogarithmicDepth;\n\
-\n\
-varying float flogz;\n\
-varying float Fcoef_half;\n\
-\n\
-// clipping planes.***\n\
-uniform bool bApplyClippingPlanes;\n\
-uniform int clippingPlanesCount;\n\
-uniform vec4 clippingPlanes[6];\n\
-\n\
-varying float depth;  \n\
-/*\n\
-vec4 packDepth(const in float depth)\n\
-{\n\
-    // mago packDepth.***\n\
-    const vec4 bit_shift = vec4(16777216.0, 65536.0, 256.0, 1.0);\n\
-    const vec4 bit_mask  = vec4(0.0, 0.00390625, 0.00390625, 0.00390625); \n\
-    vec4 res = fract(depth * bit_shift);\n\
-    res -= res.xxyz * bit_mask;\n\
-    return res;  \n\
-}\n\
-*/\n\
-\n\
-\n\
-vec4 packDepth( float v ) {\n\
-  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
-  enc = fract(enc);\n\
-  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
-  return enc;\n\
-}\n\
-\n\
-\n\
-vec4 PackDepth32( in float depth )\n\
-{\n\
-    depth *= (16777216.0 - 1.0) / (16777216.0);\n\
-    vec4 encode = fract( depth * vec4(1.0, 256.0, 256.0*256.0, 16777216.0) );// 256.0*256.0*256.0 = 16777216.0\n\
-    return vec4( encode.xyz - encode.yzw / 256.0, encode.w ) + 1.0/512.0;\n\
-}\n\
-\n\
-vec3 encodeNormal(in vec3 normal)\n\
-{\n\
-	return normal*0.5 + 0.5;\n\
-}\n\
-\n\
-vec3 decodeNormal(in vec3 normal)\n\
-{\n\
-	return normal * 2.0 - 1.0;\n\
-}\n\
-\n\
-void main()\n\
-{     \n\
-    vec2 pt = gl_PointCoord - vec2(0.5);\n\
-	float distSquared = pt.x*pt.x+pt.y*pt.y;\n\
-	if(distSquared > 0.25)\n\
-		discard;\n\
-        \n\
-    if(!bUseLogarithmicDepth)\n\
-	{\n\
-    	gl_FragData[0] = packDepth(-depth);\n\
-	}\n\
-\n\
-	// Note: points cloud data has frustumIdx 20 .. 23.********\n\
-    float frustumIdx = 0.1; // realFrustumIdx = 0.1 * 100 = 10. \n\
-	if(uFrustumIdx == 0)\n\
-	frustumIdx = 0.205; // frustumIdx = 20.***\n\
-	else if(uFrustumIdx == 1)\n\
-	frustumIdx = 0.215; // frustumIdx = 21.***\n\
-	else if(uFrustumIdx == 2)\n\
-	frustumIdx = 0.225; // frustumIdx = 22.***\n\
-	else if(uFrustumIdx == 3)\n\
-	frustumIdx = 0.235; // frustumIdx = 23.***\n\
-\n\
-    // use frustumIdx from 10 to 13, instead from 0 to 3.***\n\
-\n\
-\n\
-    #ifdef USE_MULTI_RENDER_TARGET\n\
-	vec3 normal = encodeNormal(vec3(0.0, 0.0, 1.0));\n\
-	gl_FragData[1] = vec4(normal, frustumIdx); // save normal.***\n\
-	#endif\n\
-\n\
-    #ifdef USE_LOGARITHMIC_DEPTH\n\
-	if(bUseLogarithmicDepth)\n\
-	{\n\
-		gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
-        gl_FragData[0] = packDepth(gl_FragDepthEXT);\n\
-	}\n\
-	#endif\n\
-}";
-ShaderSource.PointCloudDepthVS = "attribute vec3 position;\n\
-uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-uniform mat4 modelViewMatrixRelToEye; \n\
-uniform vec3 buildingPosHIGH;\n\
-uniform vec3 buildingPosLOW;\n\
-uniform mat4 buildingRotMatrix;\n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
-uniform float near;\n\
-uniform float far;\n\
-uniform bool bPositionCompressed;\n\
-uniform vec3 minPosition;\n\
-uniform vec3 bboxSize;\n\
-attribute vec4 color4;\n\
-uniform bool bUse1Color;\n\
-uniform vec4 oneColor4;\n\
-uniform float fixPointSize;\n\
-uniform float maxPointSize;\n\
-uniform float minPointSize;\n\
-uniform float pendentPointSize;\n\
-uniform bool bUseFixPointSize;\n\
-\n\
-uniform bool bUseLogarithmicDepth;\n\
-uniform float uFCoef_logDepth;\n\
-\n\
-varying float flogz;\n\
-varying float Fcoef_half;\n\
-\n\
-varying vec4 vColor;\n\
-//varying float glPointSize;\n\
-varying float depth;  \n\
-\n\
-void main()\n\
-{\n\
-	vec3 realPos;\n\
-	vec4 rotatedPos;\n\
-	if(bPositionCompressed)\n\
-	{\n\
-		//float maxShort = 65535.0;\n\
-		//maxShort = 1.0;\n\
-		//realPos = vec3(float(position.x)/maxShort*bboxSize.x + minPosition.x, float(position.y)/maxShort*bboxSize.y + minPosition.y, float(position.z)/maxShort*bboxSize.z + minPosition.z);\n\
-		realPos = vec3(position.x * bboxSize.x + minPosition.x, position.y * bboxSize.y + minPosition.y, position.z * bboxSize.z + minPosition.z);\n\
-	}\n\
-	else\n\
-	{\n\
-		realPos = position;\n\
-	}\n\
-	rotatedPos = buildingRotMatrix * vec4(realPos.xyz, 1.0);\n\
-    vec3 objPosHigh = buildingPosHIGH;\n\
-    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
-    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-    vec4 pos = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-	\n\
-    if(bUse1Color)\n\
-	{\n\
-		vColor=oneColor4;\n\
-	}\n\
-	else\n\
-		vColor=color4;\n\
-	\n\
-    gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
-	float z_b = gl_Position.z/gl_Position.w;\n\
-	float z_n = 2.0 * z_b - 1.0;\n\
-    float z_e = 2.0 * near * far / (far + near - z_n * (far - near));\n\
-	gl_PointSize = minPointSize + pendentPointSize/z_e; // Original.***\n\
-    if(gl_PointSize > maxPointSize)\n\
-        gl_PointSize = maxPointSize;\n\
-	if(gl_PointSize < 2.0)\n\
-		gl_PointSize = 2.0;\n\
-		\n\
-	vec4 orthoPos = modelViewMatrixRelToEye * pos;\n\
-	depth = orthoPos.z/far; // original.***\n\
-	//depth = (orthoPos.z-near)/(far-near); // correct.***\n\
-\n\
-	if(bUseLogarithmicDepth)\n\
-	{\n\
-		// logarithmic zBuffer:\n\
-		// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
-		// float Fcoef = 2.0 / log2(far + 1.0);\n\
-		// gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * uFCoef_logDepth - 1.0;\n\
-		// flogz = 1.0 + gl_Position.w;\n\
-		//-----------------------------------------------------------------------------------\n\
-		//float C = 0.0001;\n\
-		flogz = 1.0 + gl_Position.z; // use \"z\" instead \"w\" for fast decoding.***\n\
-		Fcoef_half = 0.5 * uFCoef_logDepth;\n\
-	}\n\
-}\n\
-";
 ShaderSource.PointCloudFS = "precision lowp float;\n\
 \n\
 #define %USE_LOGARITHMIC_DEPTH%\n\
@@ -4758,7 +4562,6 @@ void main()\n\
 	{\n\
 		discard;\n\
 	}\n\
-		\n\
 	\n\
 	float occlusion = 1.0;\n\
 	float lighting = 0.0;\n\
@@ -4773,17 +4576,10 @@ void main()\n\
 	vec3 finalFogColor = mix(vColor.xyz, fogColor, 0.0);\n\
 \n\
     vec4 finalColor;\n\
-	//finalColor = vec4((vColor.xyz) * occlusion, externalAlpha); // original.***\n\
 	finalColor = vec4(finalFogColor * occlusion, externalAlpha);\n\
 \n\
     gl_FragData[0] = finalColor; // original.***\n\
-	//gl_FragData[0] = colorAux;\n\
-	//gl_FragData[0] = vec4(occlusion, occlusion, occlusion, 1.0);\n\
 \n\
-	//if(testBool)\n\
-	//{\n\
-	//	gl_FragData[0] = vec4(1.0, 0.0, 0.0, 1.0); \n\
-	//}\n\
 	#ifdef USE_MULTI_RENDER_TARGET\n\
 	if(bUseMultiRenderTarget)\n\
 	{\n\
@@ -4803,16 +4599,6 @@ void main()\n\
 		frustumIdx = 0.225; // frustumIdx = 22.***\n\
 		else if(uFrustumIdx == 3)\n\
 		frustumIdx = 0.235; // frustumIdx = 23.***\n\
-		/*\n\
-		if(uFrustumIdx == 0)\n\
-		frustumIdx = 0.005;\n\
-		else if(uFrustumIdx == 1)\n\
-		frustumIdx = 0.015;\n\
-		else if(uFrustumIdx == 2)\n\
-		frustumIdx = 0.025;\n\
-		else if(uFrustumIdx == 3)\n\
-		frustumIdx = 0.035;\n\
-		*/\n\
 \n\
 		vec3 normal = encodeNormal(vec3(0.0, 0.0, 1.0));\n\
 		gl_FragData[2] = vec4(normal, frustumIdx); // save normal.***\n\

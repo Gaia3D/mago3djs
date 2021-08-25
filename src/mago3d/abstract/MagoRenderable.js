@@ -542,7 +542,7 @@ MagoRenderable.prototype.renderAsChild = function (magoManager, shader, renderTy
 			var shaderLocal; 
 			if (renderType === 0)
 			{
-				shaderLocal = magoManager.postFxShadersManager.getShader("pointsCloudDepth"); 
+				shaderLocal = magoManager.postFxShadersManager.getShader("pointsCloudSsao"); 
 			}
 			else if (renderType === 1)
 			{

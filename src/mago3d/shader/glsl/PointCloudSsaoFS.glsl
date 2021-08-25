@@ -70,7 +70,6 @@ void main()
 	{
 		discard;
 	}
-		
 	
 	float occlusion = 1.0;
 	float lighting = 0.0;
@@ -85,17 +84,10 @@ void main()
 	vec3 finalFogColor = mix(vColor.xyz, fogColor, 0.0);
 
     vec4 finalColor;
-	//finalColor = vec4((vColor.xyz) * occlusion, externalAlpha); // original.***
 	finalColor = vec4(finalFogColor * occlusion, externalAlpha);
 
     gl_FragData[0] = finalColor; // original.***
-	//gl_FragData[0] = colorAux;
-	//gl_FragData[0] = vec4(occlusion, occlusion, occlusion, 1.0);
 
-	//if(testBool)
-	//{
-	//	gl_FragData[0] = vec4(1.0, 0.0, 0.0, 1.0); 
-	//}
 	#ifdef USE_MULTI_RENDER_TARGET
 	if(bUseMultiRenderTarget)
 	{
@@ -115,16 +107,6 @@ void main()
 		frustumIdx = 0.225; // frustumIdx = 22.***
 		else if(uFrustumIdx == 3)
 		frustumIdx = 0.235; // frustumIdx = 23.***
-		/*
-		if(uFrustumIdx == 0)
-		frustumIdx = 0.005;
-		else if(uFrustumIdx == 1)
-		frustumIdx = 0.015;
-		else if(uFrustumIdx == 2)
-		frustumIdx = 0.025;
-		else if(uFrustumIdx == 3)
-		frustumIdx = 0.035;
-		*/
 
 		vec3 normal = encodeNormal(vec3(0.0, 0.0, 1.0));
 		gl_FragData[2] = vec4(normal, frustumIdx); // save normal.***

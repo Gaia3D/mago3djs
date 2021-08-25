@@ -100,6 +100,7 @@ worker.onmessage = function (e)
 			// test color.***
 			var color = Color_.getRandomPastelColor();
 			surfIndepMesh.setColor(color.r, color.g, color.b, 1.0);
+			surfIndepMesh.setColor(0.6, 0.6, 0.6, 1.0); // test.
             
 			if (i===0 && j===0) 
 			{
