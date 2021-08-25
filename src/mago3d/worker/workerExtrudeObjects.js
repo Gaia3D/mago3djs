@@ -76,7 +76,6 @@ worker.onmessage = function (e)
 
 			// convert numbers array to geoCoords array.***
 			var geoCoordsArray = GeographicCoordsList_.getGeoCoordsArrayFromNumbersArray(geoCoordsNumbersArray);
-
             
 			// create a geoCoordsList.***
 			var geographicCoordList = new GeographicCoordsList_(geoCoordsArray);

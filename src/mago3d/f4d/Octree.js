@@ -958,7 +958,7 @@ Octree.prototype.preparePCloudData = function(magoManager)
  * @param intNumber 변수
  * @returns numDigits
  */
-Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderType, shader, relativeCam, bPrepareData) 
+Octree.prototype.test__renderPCloud = function (magoManager, neoBuilding, renderType, shader, relativeCam, bPrepareData) 
 {
 	// Test function to render octreePyramid-pointsCloud.
 	// 1rst, check the number of partitions of data.
@@ -1013,8 +1013,8 @@ Octree.prototype.test__renderPCloud = function(magoManager, neoBuilding, renderT
 				var posCompressed = pCloudPartition.bPositionsCompressed;
 				gl.uniform1i(shader.bPositionCompressed_loc, posCompressed);
 				var bbox = pCloudPartition.bbox;
-				gl.uniform3fv(shader.bboxSize_loc, [bbox.getXLength(), bbox.getYLength(), bbox.getZLength()]); //.
-				gl.uniform3fv(shader.minPosition_loc, [bbox.minX, bbox.minY, bbox.minZ]); //.
+				gl.uniform3fv(shader.bboxSize_loc, new Float32Array([bbox.getXLength(), bbox.getYLength(), bbox.getZLength()])); //.
+				gl.uniform3fv(shader.minPosition_loc, new Float32Array([bbox.minX, bbox.minY, bbox.minZ])); //.
 				
 				magoManager.renderer.renderPCloud(gl, pCloudPartition, magoManager, shader, renderType, distToCamera, this.lod);
 			}

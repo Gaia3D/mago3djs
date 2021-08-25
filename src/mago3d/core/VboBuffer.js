@@ -184,7 +184,7 @@ VboBuffer.prototype.isReady = function(gl, vboMemManager)
 /**
  * 어떤 일을 하고 있습니까?
  */
-VboBuffer.getGlTypeOfArray = function(dataArray) 
+VboBuffer.getGlTypeOfArray = function (dataArray) 
 {
 	var glType = -1;
 	if (dataArray.constructor === Float32Array)

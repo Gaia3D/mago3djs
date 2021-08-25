@@ -30,8 +30,10 @@ void main()
 	vec4 rotatedPos;
 	if(bPositionCompressed)
 	{
-		float maxShort = 65535.0;
-		realPos = vec3(float(position.x)/maxShort*bboxSize.x + minPosition.x, float(position.y)/maxShort*bboxSize.y + minPosition.y, float(position.z)/maxShort*bboxSize.z + minPosition.z);
+		//float maxShort = 65535.0;
+		//maxShort = 1.0;
+		//realPos = vec3(float(position.x)/maxShort*bboxSize.x + minPosition.x, float(position.y)/maxShort*bboxSize.y + minPosition.y, float(position.z)/maxShort*bboxSize.z + minPosition.z);
+		realPos = vec3(position.x * bboxSize.x + minPosition.x, position.y * bboxSize.y + minPosition.y, position.z * bboxSize.z + minPosition.z);
 	}
 	else
 	{

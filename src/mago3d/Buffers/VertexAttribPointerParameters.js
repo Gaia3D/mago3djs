@@ -4,7 +4,7 @@
  * @class VertexAttribPointerParameters
  * @constructor 
  */
-var VertexAttribPointerParameters = function (index, size, type, normalized, stride, offset) 
+var VertexAttribPointerParameters = function ({index, size, type, normalized, stride, offset}) 
 {
 	// void gl.vertexAttribPointer(index, size, type, normalized, stride, offset);
 	//-------------------------------------------------------------------------------

@@ -120,66 +120,6 @@ void main()\n\
 	alpha *= alphaPlusPerDist;\n\
 	vcolor4 = vec4(alpha*0.75, alpha*0.88 + extra*0.4 + extraPerDist*0.1, alpha + extra*2.5 + extraPerDist*0.8, alpha);\n\
 }";
-ShaderSource.BlendingCubeFS = "	precision lowp float;\n\
-	varying vec4 vColor;\n\
-\n\
-	void main()\n\
-    {\n\
-		gl_FragColor = vColor;\n\
-	}";
-ShaderSource.BlendingCubeVS = "attribute vec3 position;\n\
-uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
-attribute vec4 color;\n\
-varying vec4 vColor;\n\
-\n\
-void main()\n\
-{\n\
-    vec3 highDifference = -encodedCameraPositionMCHigh.xyz;\n\
-    vec3 lowDifference = position.xyz - encodedCameraPositionMCLow.xyz;\n\
-    vec4 pos = vec4(position.xyz, 1.0);\n\
-\n\
-    vColor=color;\n\
-\n\
-    gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
-}";
-ShaderSource.BlurFS = "#ifdef GL_ES\n\
-    precision highp float;\n\
-    #endif\n\
-uniform sampler2D colorTex;\n\
-uniform vec2 texelSize;\n\
-varying vec2 vTexCoord; 	 	\n\
-\n\
-void main()\n\
-{\n\
-    vec3 result = vec3(0.0);\n\
-    for (int i = 0; i < 4; ++i) {\n\
-        for (int j = 0; j < 4; ++j) {\n\
-            vec2 offset = vec2(texelSize.x * float(j), texelSize.y * float(i));\n\
-            result += texture2D(colorTex, vTexCoord + offset).rgb;\n\
-        }\n\
-    }\n\
-            \n\
-    gl_FragColor.rgb = vec3(result * 0.0625); \n\
-    gl_FragColor.a = 1.0;\n\
-}\n\
-";
-ShaderSource.BlurVS = "attribute vec4 position;\n\
-attribute vec2 texCoord;\n\
-\n\
-uniform mat4 projectionMatrix;\n\
-uniform mat4 modelViewMatrix;  \n\
-\n\
-varying vec2 vTexCoord;\n\
-\n\
-void main()\n\
-{	\n\
-    vTexCoord = texCoord;\n\
-    \n\
-    gl_Position = projectionMatrix * modelViewMatrix * position;\n\
-}\n\
-";
 ShaderSource.BoxSsaoFS = "#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\
@@ -314,113 +254,6 @@ void main()\n\
     }\n\
 \n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
-}\n\
-";
-ShaderSource.CloudFS = "precision lowp float;\n\
-varying vec3 vColor;\n\
-\n\
-void main()\n\
-{\n\
-    gl_FragColor = vec4(vColor, 1.);\n\
-}";
-ShaderSource.CloudVS = "attribute vec3 position;\n\
-uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-uniform vec3 cloudPosHIGH;\n\
-uniform vec3 cloudPosLOW;\n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
-attribute vec3 color;\n\
-varying vec3 vColor;\n\
-\n\
-void main()\n\
-{\n\
-    vec3 objPosHigh = cloudPosHIGH;\n\
-    vec3 objPosLow = cloudPosLOW.xyz + position.xyz;\n\
-    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-    vec4 pos = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-\n\
-    vColor=color;\n\
-\n\
-    gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
-}";
-ShaderSource.ColorFS = "precision mediump float;\n\
-uniform int byteColor_r;\n\
-uniform int byteColor_g;\n\
-uniform int byteColor_b;\n\
-\n\
-void main()\n\
-{\n\
-    float byteMaxValue = 255.0;\n\
-\n\
-    gl_FragColor = vec4(float(byteColor_r)/byteMaxValue, float(byteColor_g)/byteMaxValue, float(byteColor_b)/byteMaxValue, 1);\n\
-}\n\
-";
-ShaderSource.ColorSelectionSsaoFS = "precision highp float;\n\
-uniform vec4 oneColor4;\n\
-\n\
-void main()\n\
-{          \n\
-    gl_FragColor = oneColor4;\n\
-}\n\
-";
-ShaderSource.ColorSelectionSsaoVS = "attribute vec3 position;\n\
-\n\
-uniform mat4 buildingRotMatrix;\n\
-uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-uniform mat4 RefTransfMatrix;\n\
-uniform vec3 buildingPosHIGH;\n\
-uniform vec3 buildingPosLOW;\n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
-uniform vec3 aditionalPosition;\n\
-uniform vec3 refTranslationVec;\n\
-uniform int refMatrixType; // 0= identity, 1= translate, 2= transform\n\
-\n\
-void main()\n\
-{\n\
-    vec4 rotatedPos;\n\
-	if(refMatrixType == 0)\n\
-	{\n\
-		rotatedPos = buildingRotMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
-	}\n\
-	else if(refMatrixType == 1)\n\
-	{\n\
-		rotatedPos = buildingRotMatrix * vec4(position.xyz + refTranslationVec.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
-	}\n\
-	else if(refMatrixType == 2)\n\
-	{\n\
-		rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
-	}\n\
-\n\
-    vec3 objPosHigh = buildingPosHIGH;\n\
-    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
-    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-    \n\
-    gl_PointSize = 10.0;\n\
-    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
-}\n\
-";
-ShaderSource.ColorVS = "attribute vec3 position;\n\
-uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-uniform vec3 buildingPosHIGH;\n\
-uniform vec3 buildingPosLOW;\n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
-uniform mat4 RefTransfMatrix;\n\
-\n\
-void main()\n\
-{\n\
-    vec4 rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0);\n\
-    vec3 objPosHigh = buildingPosHIGH;\n\
-    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
-    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-    vec4 pos = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-    \n\
-    gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
 }\n\
 ";
 ShaderSource.depthBufferUtils = "\n\
@@ -1732,99 +1565,6 @@ void main()\n\
 			Fcoef_half = 0.5 * uFCoef_logDepth;\n\
 	}\n\
 }";
-ShaderSource.filterSilhouetteFS = "precision mediump float;\n\
-\n\
-uniform sampler2D depthTex;\n\
-uniform sampler2D noiseTex;  \n\
-uniform mat4 projectionMatrix;\n\
-uniform vec2 noiseScale;\n\
-uniform float near;\n\
-uniform float far;            \n\
-uniform float fov;\n\
-uniform float aspectRatio;    \n\
-uniform float screenWidth;    \n\
-uniform float screenHeight;    \n\
-uniform vec3 kernel[16];   \n\
-\n\
-\n\
-const int kernelSize = 16;  \n\
-uniform float radius;      \n\
-\n\
-uniform bool bApplySsao;\n\
-\n\
-float unpackDepth(const in vec4 rgba_depth)\n\
-{\n\
-    const vec4 bit_shift = vec4(0.000000059605, 0.000015258789, 0.00390625, 1.0);\n\
-    float depth = dot(rgba_depth, bit_shift);\n\
-    return depth;\n\
-}                \n\
-\n\
-vec3 getViewRay(vec2 tc)\n\
-{\n\
-    float hfar = 2.0 * tan(fov/2.0) * far;\n\
-    float wfar = hfar * aspectRatio;    \n\
-    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -far);    \n\
-    return ray;                      \n\
-}         \n\
-            \n\
-//linear view space depth\n\
-float getDepth(vec2 coord)\n\
-{\n\
-    return unpackDepth(texture2D(depthTex, coord.xy));\n\
-}    \n\
-\n\
-void main()\n\
-{\n\
-	float occlusion = 0.0;\n\
-	vec3 normal2 = vec3(0.0, 0.0, 1.0);\n\
-	float radiusAux = radius * 5.0;\n\
-	if(bApplySsao)\n\
-	{          \n\
-		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);		                 \n\
-		float linearDepth = getDepth(screenPos); \n\
-		vec3 origin = getViewRay(screenPos) * linearDepth;   \n\
-\n\
-		vec3 rvec = texture2D(noiseTex, screenPos.xy * noiseScale).xyz * 2.0 - 1.0;\n\
-		vec3 tangent = normalize(rvec - normal2 * dot(rvec, normal2));\n\
-		vec3 bitangent = cross(normal2, tangent);\n\
-		mat3 tbn = mat3(tangent, bitangent, normal2);        \n\
-		\n\
-		for(int i = 0; i < kernelSize; ++i)\n\
-		{    	 \n\
-			//vec3 sample = origin + (tbn * kernel[i]) * radiusAux;\n\
-			vec3 sample = origin + (kernel[i]) * radiusAux;\n\
-			vec4 offset = projectionMatrix * vec4(sample, 1.0);		\n\
-			offset.xy /= offset.w;\n\
-			offset.xy = offset.xy * 0.5 + 0.5;        \n\
-			float sampleDepth = -sample.z/far;\n\
-			if(sampleDepth > 0.49)\n\
-				continue;\n\
-			float depthBufferValue = getDepth(offset.xy);\n\
-			float range_check = abs(linearDepth - depthBufferValue)+radiusAux*0.998;\n\
-			if (range_check > radius*1.001 && depthBufferValue <= sampleDepth)\n\
-			{\n\
-				occlusion +=  1.0;\n\
-			}\n\
-		}   \n\
-		\n\
-		if(occlusion > float(kernelSize)*0.4)\n\
-		{\n\
-			occlusion = occlusion / float(kernelSize);\n\
-		}\n\
-		else{\n\
-			occlusion = 0.0;\n\
-		}\n\
-		//occlusion = 1.0 - occlusion / float(kernelSize);\n\
-	}\n\
-	else{\n\
-		occlusion = 0.0;\n\
-	}\n\
-\n\
-    vec4 finalColor;\n\
-	finalColor = vec4(1.0, 1.0, 1.0, occlusion*0.9);\n\
-    gl_FragColor = finalColor; \n\
-}\n\
-";
 ShaderSource.GBufferFS = "#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\
@@ -4850,8 +4590,10 @@ void main()\n\
 	vec4 rotatedPos;\n\
 	if(bPositionCompressed)\n\
 	{\n\
-		float maxShort = 65535.0;\n\
-		realPos = vec3(float(position.x)/maxShort*bboxSize.x + minPosition.x, float(position.y)/maxShort*bboxSize.y + minPosition.y, float(position.z)/maxShort*bboxSize.z + minPosition.z);\n\
+		//float maxShort = 65535.0;\n\
+		//maxShort = 1.0;\n\
+		//realPos = vec3(float(position.x)/maxShort*bboxSize.x + minPosition.x, float(position.y)/maxShort*bboxSize.y + minPosition.y, float(position.z)/maxShort*bboxSize.z + minPosition.z);\n\
+		realPos = vec3(position.x * bboxSize.x + minPosition.x, position.y * bboxSize.y + minPosition.y, position.z * bboxSize.z + minPosition.z);\n\
 	}\n\
 	else\n\
 	{\n\
@@ -4992,92 +4734,6 @@ varying float flogz;\n\
 varying float Fcoef_half;\n\
 varying float depth;\n\
 \n\
-/*\n\
-float unpackDepth(vec4 packedDepth)\n\
-{\n\
-	// See Aras Pranckevičius' post Encoding Floats to RGBA\n\
-	// http://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/\n\
-	//vec4 packDepth( float v ) // function to packDepth.***\n\
-	//{\n\
-	//	vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
-	//	enc = fract(enc);\n\
-	//	enc -= enc.yzww * vec4(1.0/255.0,1.0/255.0,1.0/255.0,0.0);\n\
-	//	return enc;\n\
-	//}\n\
-	return dot(packedDepth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
-}\n\
-\n\
-float getDepth(vec2 coord)\n\
-{\n\
-	if(bUseLogarithmicDepth)\n\
-	{\n\
-		float linearDepth = unpackDepth(texture2D(depthTex, coord.xy));\n\
-		// gl_FragDepthEXT = linearDepth = log2(flogz) * Fcoef_half;\n\
-		// flogz = 1.0 + gl_Position.z;\n\
-\n\
-		float flogzAux = pow(2.0, linearDepth/Fcoef_half);\n\
-		float z = flogzAux - 1.0;\n\
-		linearDepth = z/(far);\n\
-		return linearDepth;\n\
-	}\n\
-	else{\n\
-		return unpackDepth(texture2D(depthTex, coord.xy));\n\
-	}\n\
-}\n\
-\n\
-vec4 decodeNormal(in vec4 normal)\n\
-{\n\
-	return vec4(normal.xyz * 2.0 - 1.0, normal.w);\n\
-}\n\
-\n\
-vec4 getNormal(in vec2 texCoord)\n\
-{\n\
-    vec4 encodedNormal = texture2D(normalTex, texCoord);\n\
-    return decodeNormal(encodedNormal);\n\
-}\n\
-\n\
-\n\
-vec3 getViewRay(vec2 tc, in float relFar)\n\
-{\n\
-	float hfar = 2.0 * tangentOfHalfFovy * relFar;\n\
-    float wfar = hfar * aspectRatio;    \n\
-    vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -relFar);    \n\
-	\n\
-    return ray;                      \n\
-} \n\
-\n\
-vec2 getNearFar_byFrustumIdx(in int frustumIdx)\n\
-{\n\
-    vec2 nearFar;\n\
-    if(frustumIdx == 0)\n\
-    {\n\
-        nearFar = uNearFarArray[0];\n\
-    }\n\
-    else if(frustumIdx == 1)\n\
-    {\n\
-        nearFar = uNearFarArray[1];\n\
-    }\n\
-    else if(frustumIdx == 2)\n\
-    {\n\
-        nearFar = uNearFarArray[2];\n\
-    }\n\
-    else if(frustumIdx == 3)\n\
-    {\n\
-        nearFar = uNearFarArray[3];\n\
-    }\n\
-\n\
-    return nearFar;\n\
-}\n\
-*/\n\
-            \n\
-//linear view space depth\n\
-/*\n\
-float getDepth(vec2 coord)\n\
-{\n\
-    return unpackDepth(texture2D(depthTex, coord.xy));\n\
-} \n\
-*/   \n\
-\n\
 vec3 encodeNormal(in vec3 normal)\n\
 {\n\
 	return normal*0.5 + 0.5;\n\
@@ -5108,124 +4764,6 @@ void main()\n\
 	float lighting = 0.0;\n\
 	bool testBool = false;\n\
 	vec4 colorAux = vec4(1.0, 1.0, 1.0, 1.0);\n\
-	/*\n\
-	bool auxBool = false;\n\
-	//if(bApplySsao)\n\
-	if(auxBool)\n\
-	{          \n\
-		vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
-		//float linearDepth = getDepth(screenPos);\n\
-		float linearDepth = -depth;\n\
-		//vec3 origin = getViewRay(screenPos) * linearDepth;\n\
-\n\
-\n\
-		vec4 normalRGBA = getNormal(screenPos);\n\
-		int currFrustumIdx = int(floor(100.0*normalRGBA.w));\n\
-\n\
-		if(currFrustumIdx >= 10)\n\
-		currFrustumIdx -= 20;\n\
-\n\
-		vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);\n\
-		float currNear = nearFar.x;\n\
-		float currFar = nearFar.y;\n\
-\n\
-\n\
-		colorAux = vec4(linearDepth, linearDepth, linearDepth, 1.0);\n\
-		float myZDist = currNear + linearDepth * currFar;\n\
-\n\
-		float radiusAux = glPointSize/1.9; // radius in pixels.\n\
-		float radiusFog = glPointSize*3.0; // radius in pixels.\n\
-		vec2 screenPosAdjacent;\n\
-\n\
-		\n\
-		////vec3 sample = origin + rotatedKernel * radius;\n\
-		////vec4 offset = projectionMatrix * vec4(sample, 1.0);	\n\
-		////vec3 offsetCoord = vec3(offset.xyz);				\n\
-		////offsetCoord.xyz /= offset.w;\n\
-		////offsetCoord.xyz = offsetCoord.xyz * 0.5 + 0.5; \n\
-		\n\
-\n\
-		// calculate the pixelSize in the screenPos.***\n\
-		float h = 2.0 * tangentOfHalfFovy * currFar * linearDepth; // height in meters of the screen in the current pixelDepth\n\
-    	float w = h * aspectRatio;     							   // width in meters of the screen in the current pixelDepth\n\
-		// vec3 ray = vec3(wfar * (tc.x - 0.5), hfar * (tc.y - 0.5), -relFar);   \n\
-\n\
-		float pixelSize_x = w/screenWidth; // the pixelSize in meters in the x axis.\n\
-		float pixelSize_y = h/screenHeight;  // the pixelSize in meters in the y axis.\n\
-		\n\
-		float radiusInMeters = 0.20;\n\
-		radiusAux = radiusInMeters / pixelSize_x;\n\
-		float radiusFogInMeters = 1.0;\n\
-		radiusFog = radiusFogInMeters / pixelSize_x;\n\
-\n\
-		//radiusAux = 6.0;\n\
-		float farFactor = 0.1*sqrt(myZDist);\n\
-		\n\
-		for(int j = 0; j < 1; ++j)\n\
-		{\n\
-			//radiusAux = 1.5 *(float(j)+1.0);\n\
-			for(int i = 0; i < 8; ++i)\n\
-			{  \n\
-				// Find occlussion.***  	 \n\
-				if(i == 0)\n\
-					screenPosAdjacent = vec2((gl_FragCoord.x - radiusAux)/ screenWidth, (gl_FragCoord.y - radiusAux) / screenHeight);\n\
-				else if(i == 1)\n\
-					screenPosAdjacent = vec2((gl_FragCoord.x)/ screenWidth, (gl_FragCoord.y - radiusAux) / screenHeight);\n\
-				else if(i == 2)\n\
-					screenPosAdjacent = vec2((gl_FragCoord.x + radiusAux)/ screenWidth, (gl_FragCoord.y - radiusAux) / screenHeight);\n\
-				else if(i == 3)\n\
-					screenPosAdjacent = vec2((gl_FragCoord.x + radiusAux)/ screenWidth, (gl_FragCoord.y) / screenHeight);\n\
-				else if(i == 4)\n\
-					screenPosAdjacent = vec2((gl_FragCoord.x + radiusAux)/ screenWidth, (gl_FragCoord.y + radiusAux) / screenHeight);\n\
-				else if(i == 5)\n\
-					screenPosAdjacent = vec2((gl_FragCoord.x)/ screenWidth, (gl_FragCoord.y + radiusAux) / screenHeight);\n\
-				else if(i == 6)\n\
-					screenPosAdjacent = vec2((gl_FragCoord.x - radiusAux)/ screenWidth, (gl_FragCoord.y + radiusAux) / screenHeight);\n\
-				else if(i == 7)\n\
-					screenPosAdjacent = vec2((gl_FragCoord.x - radiusAux)/ screenWidth, (gl_FragCoord.y) / screenHeight);\n\
-\n\
-				vec4 normalRGBA_adjacent = getNormal(screenPosAdjacent);\n\
-				int adjacentFrustumIdx = int(floor(100.0*normalRGBA_adjacent.w));\n\
-\n\
-				if(adjacentFrustumIdx >= 10)\n\
-				adjacentFrustumIdx -= 20;\n\
-\n\
-				vec2 nearFar_adjacent = getNearFar_byFrustumIdx(adjacentFrustumIdx);\n\
-				float currNear_adjacent = nearFar_adjacent.x;\n\
-				float currFar_adjacent = nearFar_adjacent.y;\n\
-\n\
-				float depthBufferValue = getDepth(screenPosAdjacent);\n\
-				float zDist = currNear_adjacent + depthBufferValue * currFar_adjacent;\n\
-				float zDistDiff = abs(myZDist - zDist);\n\
-\n\
-				if(myZDist > zDist)\n\
-				{\n\
-					// My pixel is rear\n\
-					if(zDistDiff > farFactor  &&  zDistDiff < 100.0)\n\
-					occlusion +=  1.0;\n\
-				}\n\
-			}   \n\
-		}   \n\
-			\n\
-		if(occlusion > 4.0)\n\
-		{\n\
-			occlusion -= 4.0;\n\
-			occlusion = 1.0 - occlusion / 4.0;\n\
-		}\n\
-		else\n\
-		{\n\
-			occlusion = 1.0;\n\
-		}\n\
-		\n\
-\n\
-		if(occlusion < 0.0)\n\
-		occlusion = 0.0;\n\
-\n\
-		if(lighting > 6.0)\n\
-			lighting = 8.0;\n\
-		lighting = lighting / 8.0;\n\
-	}\n\
-	*/\n\
 \n\
 	if(lighting < 0.5)\n\
 	lighting = 0.0;\n\
@@ -5530,8 +5068,10 @@ void main()\n\
 	vec4 rotatedPos;\n\
 	if(bPositionCompressed)\n\
 	{\n\
-		float maxShort = 65535.0;\n\
-		realPos = vec3(float(position.x)/maxShort*bboxSize.x + minPosition.x, float(position.y)/maxShort*bboxSize.y + minPosition.y, float(position.z)/maxShort*bboxSize.z + minPosition.z);\n\
+		//float maxShort = 65535.0;\n\
+		//maxShort = 1.0;\n\
+		//realPos = vec3(float(position.x)/maxShort*bboxSize.x + minPosition.x, float(position.y)/maxShort*bboxSize.y + minPosition.y, float(position.z)/maxShort*bboxSize.z + minPosition.z);\n\
+		realPos = vec3(position.x * bboxSize.x + minPosition.x, position.y * bboxSize.y + minPosition.y, position.z * bboxSize.z + minPosition.z);\n\
 	}\n\
 	else\n\
 	{\n\
@@ -5614,8 +5154,10 @@ void main()\n\
 	vec4 rotatedPos;\n\
 	if(bPositionCompressed)\n\
 	{\n\
-		float maxShort = 65535.0;\n\
-		realPos = vec3(float(position.x)/maxShort*bboxSize.x + minPosition.x, float(position.y)/maxShort*bboxSize.y + minPosition.y, float(position.z)/maxShort*bboxSize.z + minPosition.z);\n\
+		//float maxShort = 65535.0;\n\
+		//maxShort = 1.0;\n\
+		//realPos = vec3(float(position.x)/maxShort*bboxSize.x + minPosition.x, float(position.y)/maxShort*bboxSize.y + minPosition.y, float(position.z)/maxShort*bboxSize.z + minPosition.z);\n\
+		realPos = vec3(position.x * bboxSize.x + minPosition.x, position.y * bboxSize.y + minPosition.y, position.z * bboxSize.z + minPosition.z);\n\
 	}\n\
 	else\n\
 	{\n\
@@ -6855,6 +6397,11 @@ float getDepth(vec2 coord)\n\
 	}\n\
 }\n\
 \n\
+float getRealDepth(in vec2 coord, in float far)\n\
+{\n\
+	return getDepth(coord) * far;\n\
+}\n\
+\n\
 bool isEdge(vec2 screenPos, vec3 normal, float pixelSize_x, float pixelSize_y)\n\
 {\n\
 	bool bIsEdge = false;\n\
@@ -6978,6 +6525,17 @@ vec3 brightnessContrast(vec3 value, float brightness, float contrast)\n\
 vec3 Gamma(vec3 value, float param)\n\
 {\n\
     return vec3(pow(abs(value.r), param),pow(abs(value.g), param),pow(abs(value.b), param));\n\
+}\n\
+\n\
+void getNormal_dataType_andFar(in vec2 coord, inout vec3 normal, inout int dataType, inout float far)\n\
+{\n\
+	vec4 normal4 = getNormal(coord);\n\
+	normal = normal4.xyz;\n\
+	int estimatedFrustumIdx = int(floor(normal4.w * 100.0));\n\
+	dataType = -1;// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.\n\
+	int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);\n\
+	vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);\n\
+	far = nearFar.y;\n\
 }\n\
 \n\
 void main()\n\
@@ -7276,8 +6834,53 @@ void main()\n\
 			float myLinearDepth = getDepth(screenPos);\n\
 \n\
 			float myDepth = myLinearDepth * currFar_origin;\n\
+			float log2Deoth = log2(myDepth);\n\
+			// Apply Eye-Dom-Lighting (EDL).***\n\
+			\n\
+			float coordScale = 1.5;\n\
 \n\
+			// top.***\n\
+			vec2 texCoord_top = vec2(screenPos.x, screenPos.y + pixelSize_y*coordScale);\n\
+			vec3 normal_top;\n\
+			int dataType_top;\n\
+			float far_top;\n\
+			getNormal_dataType_andFar(texCoord_top, normal_top, dataType_top, far_top);\n\
+			float realDepth_top = getRealDepth(texCoord_top, far_top);\n\
 \n\
+			// left.***\n\
+			vec2 texCoord_left = vec2(screenPos.x - pixelSize_x * coordScale, screenPos.y);\n\
+			vec3 normal_left;\n\
+			int dataType_left;\n\
+			float far_left;\n\
+			getNormal_dataType_andFar(texCoord_left, normal_left, dataType_left, far_left);\n\
+			float realDepth_left = getRealDepth(texCoord_left, far_left);\n\
+\n\
+			// bottom.***\n\
+			vec2 texCoord_bottom = vec2(screenPos.x, screenPos.y - pixelSize_y*coordScale);\n\
+			vec3 normal_bottom;\n\
+			int dataType_bottom;\n\
+			float far_bottom;\n\
+			getNormal_dataType_andFar(texCoord_bottom, normal_bottom, dataType_bottom, far_bottom);\n\
+			float realDepth_bottom = getRealDepth(texCoord_bottom, far_bottom);\n\
+\n\
+			// right.***\n\
+			vec2 texCoord_right = vec2(screenPos.x + pixelSize_x * coordScale, screenPos.y);\n\
+			vec3 normal_right;\n\
+			int dataType_right;\n\
+			float far_right;\n\
+			getNormal_dataType_andFar(texCoord_right, normal_right, dataType_right, far_right);\n\
+			float realDepth_right = getRealDepth(texCoord_right, far_right);\n\
+\n\
+			float response = (max(0.0, log2Deoth - log2(realDepth_top)) + max(0.0, log2Deoth - log2(realDepth_left)) + max(0.0, log2Deoth - log2(realDepth_bottom)) + max(0.0, log2Deoth - log2(realDepth_right))) / 4.0;\n\
+			float edlStrength = 2.0;\n\
+			float shade = exp(-response * 300.0 * edlStrength);\n\
+\n\
+			vec4 finalColorPC = vec4(albedo.rgb * shade, albedo.a);\n\
+			//finalColorPC = vec4(1.0, 0.0, 0.0, albedo.a);\n\
+\n\
+			gl_FragColor = finalColorPC;\n\
+\n\
+			/*\n\
 			float radius = 3.0;\n\
 			float occ = 0.0;\n\
 			for(int i=0; i<3; i++)\n\
@@ -7322,60 +6925,9 @@ void main()\n\
 				gl_FragColor = vec4(1.0, 1.0, 1.0, alpha);\n\
 				return;\n\
 			}\n\
+			*/\n\
 		}\n\
 		\n\
-\n\
-\n\
-		// render edges for points cloud.\n\
-		/*\n\
-		if(dataType == 2)\n\
-		{\n\
-			// this is point cloud.\n\
-			float linearDepth_origin  = unpackDepth(texture2D(depthTex, screenPos)); // z_window  is [0.0, 1.0] range depth.\n\
-			float myZDist = linearDepth_origin * currFar_origin;\n\
-			float increAngRad = (2.0*M_PI)/16.0;\n\
-			float edgeColor = 0.0;\n\
-			for(int i=0; i<16; i++)\n\
-			{\n\
-				float s = cos(float(i)*increAngRad) * pixelSize_x * 4.0;\n\
-				float t = sin(float(i)*increAngRad) * pixelSize_y * 4.0;\n\
-				vec2 screenPosAdjacent = vec2(screenPos.x+s, screenPos.y+t);\n\
-				vec4 normal4_adjacent = getNormal(screenPosAdjacent);\n\
-				int estimatedFrustumIdx_adjacent = int(floor(normal4_adjacent.w * 100.0));\n\
-				int dataType_adjacent = -1;\n\
-				int currFrustumIdx_adjacent = getRealFrustumIdx(estimatedFrustumIdx_adjacent, dataType_adjacent);\n\
-				vec2 nearFar_adjacent = getNearFar_byFrustumIdx(currFrustumIdx_adjacent);\n\
-				float currNear_adjacent = nearFar_adjacent.x;\n\
-				float currFar_adjacent = nearFar_adjacent.y;\n\
-				float linearDepth_adjacent  = unpackDepth(texture2D(depthTex, screenPosAdjacent)); // z_window  is [0.0, 1.0] range depth.\n\
-				float zDistAdjacent = linearDepth_adjacent * currFar_adjacent;\n\
-\n\
-				float zDepthDiff = abs(myZDist - zDistAdjacent);\n\
-				if(linearDepth_origin < linearDepth_adjacent)\n\
-				{\n\
-					if(zDepthDiff > 2.0)\n\
-					{\n\
-						edgeColor += 1.0;\n\
-					}\n\
-				}\n\
-			}\n\
-			if(edgeColor > 4.0)\n\
-			{\n\
-				edgeColor -= 4.0;\n\
-				edgeColor /= 12.0;\n\
-\n\
-				if(edgeColor > 0.01)\n\
-				edgeColor = 1.0;\n\
-\n\
-				//gl_FragColor = vec4(0.0, 0.0, 0.0, edgeColor);//+occlusion);\n\
-				gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);//+occlusion);\n\
-				return;\n\
-				// Test.***\n\
-				\n\
-			}\n\
-			\n\
-		}\n\
-		*/\n\
 	}\n\
 }";
 ShaderSource.ScreenQuadVS = "precision mediump float;\n\
@@ -8005,36 +7557,6 @@ void main()\n\
 	gl_FragColor = vec4(occlusion_A, occlusion_B, occlusion_C, occlusion_D);\n\
     //gl_FragColor = vec4(normal.xyz, 1.0);\n\
 }";
-ShaderSource.StandardFS = "precision lowp float;\n\
-varying vec3 vColor;\n\
-\n\
-void main()\n\
-{\n\
-    gl_FragColor = vec4(vColor, 1.);\n\
-}";
-ShaderSource.StandardVS = "attribute vec3 position;\n\
-uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-uniform vec3 buildingPosHIGH;\n\
-uniform vec3 buildingPosLOW;\n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
-uniform mat4 RefTransfMatrix;\n\
-attribute vec3 color;\n\
-varying vec3 vColor;\n\
-\n\
-void main()\n\
-{\n\
-    vec4 rotatedPos = RefTransfMatrix * vec4(position.xyz, 1.0);\n\
-    vec3 objPosHigh = buildingPosHIGH;\n\
-    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
-    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-    vec4 pos = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
- \n\
-    vColor=color;\n\
-\n\
-    gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
-}";
 ShaderSource.Test_QuadFS = "#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\
@@ -8079,40 +7601,6 @@ void main()\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 }\n\
 ";
-ShaderSource.TextureA1FS = "precision mediump float;\n\
-varying vec4 vColor;\n\
-varying vec2 vTextureCoord;\n\
-uniform sampler2D uSampler;\n\
-\n\
-void main()\n\
-{\n\
-    gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));\n\
-}\n\
-";
-ShaderSource.TextureA1VS = "attribute vec3 position;\n\
-attribute vec4 aVertexColor;\n\
-attribute vec2 aTextureCoord;\n\
-uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-uniform vec3 buildingPosHIGH;\n\
-uniform vec3 buildingPosLOW;\n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
-varying vec4 vColor;\n\
-varying vec2 vTextureCoord;\n\
-\n\
-void main()\n\
-{\n\
-    vec3 objPosHigh = buildingPosHIGH;\n\
-    vec3 objPosLow = buildingPosLOW.xyz + position.xyz;\n\
-    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-    vec4 pos = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
- \n\
-    vColor=aVertexColor;\n\
-    vTextureCoord = aTextureCoord;\n\
-\n\
-    gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
-}";
 ShaderSource.TextureFS = "precision mediump float;\n\
 varying vec4 vColor;\n\
 varying vec2 vTextureCoord;\n\
@@ -8122,56 +7610,6 @@ void main()\n\
 {\n\
     gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));\n\
 }";
-ShaderSource.TextureNormalFS = "	precision mediump float;\n\
-	varying vec4 vColor;\n\
-	varying vec2 vTextureCoord;\n\
-	uniform sampler2D uSampler;\n\
-	varying vec3 vLightWeighting;\n\
-\n\
-	void main()\n\
-    {\n\
-		vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));\n\
-        \n\
-		gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a);\n\
-	}\n\
-";
-ShaderSource.TextureNormalVS = "attribute vec3 position;\n\
-attribute vec4 aVertexColor;\n\
-attribute vec2 aTextureCoord;\n\
-uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-uniform vec3 buildingPosHIGH;\n\
-uniform vec3 buildingPosLOW;\n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
-varying vec4 vColor;\n\
-varying vec2 vTextureCoord;\n\
-attribute vec3 aVertexNormal;\n\
-varying vec3 uAmbientColor;\n\
-varying vec3 vLightWeighting;\n\
-uniform mat3 uNMatrix;\n\
-\n\
-void main()\n\
-{\n\
-    vec3 objPosHigh = buildingPosHIGH;\n\
-    vec3 objPosLow = buildingPosLOW.xyz + position.xyz;\n\
-    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-    vec4 pos = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-    \n\
-    vColor = aVertexColor;\n\
-    vTextureCoord = aTextureCoord;\n\
-    \n\
-    vLightWeighting = vec3(1.0, 1.0, 1.0);\n\
-    uAmbientColor = vec3(0.7, 0.7, 0.7);\n\
-    vec3 uLightingDirection = vec3(0.8, 0.2, -0.9);\n\
-    vec3 directionalLightColor = vec3(0.4, 0.4, 0.4);\n\
-    vec3 transformedNormal = uNMatrix * aVertexNormal;\n\
-    float directionalLightWeighting = max(dot(transformedNormal, uLightingDirection), 0.0);\n\
-    vLightWeighting = uAmbientColor + directionalLightColor * directionalLightWeighting;\n\
-\n\
-    gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
-}\n\
-";
 ShaderSource.texturesMergerFS = "#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\
@@ -8870,160 +8308,6 @@ void main()\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos;\n\
     \n\
 }";
-ShaderSource.thickLineDepthVS = "\n\
-attribute vec4 prev;\n\
-attribute vec4 current;\n\
-attribute vec4 next;\n\
-attribute vec4 color4;\n\
-\n\
-uniform float thickness;\n\
-uniform mat4 buildingRotMatrix;\n\
-uniform mat4 projectionMatrix;\n\
-uniform mat4 modelViewMatrix;\n\
-uniform mat4 modelViewMatrixRelToEye; \n\
-uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-uniform vec2 viewport;\n\
-uniform vec3 buildingPosHIGH;\n\
-uniform vec3 buildingPosLOW;\n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
-uniform vec4 oneColor4;\n\
-uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
-\n\
-uniform float near;\n\
-uniform float far;\n\
-uniform bool bUseLogarithmicDepth;\n\
-uniform float uFCoef_logDepth;\n\
-\n\
-varying vec4 vColor;\n\
-varying float depth;\n\
-varying float flogz;\n\
-varying float Fcoef_half;\n\
-\n\
-const float error = 0.001;\n\
-\n\
-// see https://weekly-geekly.github.io/articles/331164/index.html\n\
-// see too https://github.com/ridiculousfish/wavefiz/blob/master/ts/polyline.ts#L306\n\
-\n\
-vec2 project(vec4 p){\n\
-	return (0.5 * p.xyz / p.w + 0.5).xy * viewport;\n\
-}\n\
-\n\
-bool isEqual(float value, float valueToCompare)\n\
-{\n\
-	if(value + error > valueToCompare && value - error < valueToCompare)\n\
-	return true;\n\
-	\n\
-	return false;\n\
-}\n\
-\n\
-vec4 getPointRelToEye(in vec4 point)\n\
-{\n\
-	vec4 rotatedCurrent = buildingRotMatrix * vec4(point.xyz, 1.0);\n\
-	vec3 objPosHigh = buildingPosHIGH;\n\
-	vec3 objPosLow = buildingPosLOW.xyz + rotatedCurrent.xyz;\n\
-	vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-	vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-	return vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-}\n\
-\n\
-void main(){\n\
-	// current, prev & next.***\n\
-	vec4 vCurrent = getPointRelToEye(vec4(current.xyz, 1.0));\n\
-	vec4 vPrev = getPointRelToEye(vec4(prev.xyz, 1.0));\n\
-	vec4 vNext = getPointRelToEye(vec4(next.xyz, 1.0));\n\
-	\n\
-	float order_w = current.w;\n\
-	//float order_w = float(order);\n\
-	float sense = 1.0;\n\
-	int orderInt = 0;\n\
-	if(order_w > 0.0)\n\
-	{\n\
-		sense = -1.0;\n\
-		if(order_w < 1.5)\n\
-		{\n\
-			orderInt = 1;\n\
-		}\n\
-		else{\n\
-			orderInt = 2;\n\
-		}\n\
-	}\n\
-	else\n\
-	{\n\
-		sense = 1.0;\n\
-		if(order_w > -1.5)\n\
-		{\n\
-			orderInt = -1;\n\
-		}\n\
-		else{\n\
-			orderInt = -2;\n\
-		}\n\
-	}\n\
-	\n\
-	float aspect = viewport.x / viewport.y;\n\
-	vec2 aspectVec = vec2(aspect, 1.0);\n\
-	\n\
-	vec4 previousProjected = ModelViewProjectionMatrixRelToEye * vPrev;\n\
-	vec4 currentProjected = ModelViewProjectionMatrixRelToEye * vCurrent;\n\
-	vec4 nextProjected = ModelViewProjectionMatrixRelToEye * vNext;\n\
-	\n\
-	float projectedDepth = currentProjected.w;                \n\
-	// Get 2D screen space with W divide and aspect correction\n\
-	vec2 currentScreen = currentProjected.xy / currentProjected.w * aspectVec;\n\
-	vec2 previousScreen = previousProjected.xy / previousProjected.w * aspectVec;\n\
-	vec2 nextScreen = nextProjected.xy / nextProjected.w * aspectVec;\n\
-					\n\
-	// This helps us handle 90 degree turns correctly\n\
-	vec2 tangentNext = normalize(nextScreen - currentScreen);\n\
-	vec2 tangentPrev = normalize(currentScreen - previousScreen);\n\
-	vec2 normal; \n\
-	if(orderInt == 1 || orderInt == -1)\n\
-	{\n\
-		normal = vec2(-tangentPrev.y, tangentPrev.x);\n\
-	}\n\
-	else{\n\
-		normal = vec2(-tangentNext.y, tangentNext.x);\n\
-	}\n\
-	normal *= thickness/2.0;\n\
-	normal.x /= aspect;\n\
-	float direction = (thickness*sense*projectedDepth)/1000.0;\n\
-	// Offset our position along the normal\n\
-	vec4 offset = vec4(normal * direction, 0.0, 1.0);\n\
-	gl_Position = currentProjected + offset; \n\
-	if(bUseLogarithmicDepth)\n\
-	{\n\
-		// logarithmic zBuffer:\n\
-			// https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html\n\
-			float Fcoef = 2.0 / log2(far + 1.0);\n\
-			gl_Position.z = log2(max(1e-6, 1.0 + gl_Position.w)) * Fcoef - 1.0;\n\
-\n\
-			flogz = 1.0 + gl_Position.w;\n\
-			Fcoef_half = 0.5 * Fcoef;\n\
-	}\n\
-\n\
-    depth = (modelViewMatrixRelToEye * current).z/far; // original.***\n\
-\n\
-	\n\
-	if(colorType == 0)\n\
-		vColor = oneColor4;\n\
-	else if(colorType == 1)\n\
-		vColor = color4; //vec4(color4.r+0.8, color4.g+0.8, color4.b+0.8, color4.a+0.8);\n\
-	else\n\
-		vColor = oneColor4;\n\
-}\n\
-\n\
-\n\
-\n\
-\n\
-\n\
-\n\
-\n\
-\n\
-\n\
-\n\
-\n\
-\n\
-";
 ShaderSource.thickLineExtrudedVS = "\n\
 attribute vec4 prev;\n\
 attribute vec4 current;\n\
@@ -11246,242 +10530,6 @@ void main(){\n\
 \n\
 \n\
 ";
-ShaderSource.vol_fs = "#ifdef GL_ES\n\
-precision highp float;\n\
-#endif\n\
-\n\
-//---------------------------------------------------------\n\
-// MACROS\n\
-//---------------------------------------------------------\n\
-\n\
-#define EPS       0.0001\n\
-#define PI        3.14159265\n\
-#define HALFPI    1.57079633\n\
-#define ROOTTHREE 1.73205081\n\
-\n\
-#define EQUALS(A,B) ( abs((A)-(B)) < EPS )\n\
-#define EQUALSZERO(A) ( ((A)<EPS) && ((A)>-EPS) )\n\
-\n\
-\n\
-//---------------------------------------------------------\n\
-// CONSTANTS\n\
-//---------------------------------------------------------\n\
-\n\
-// 32 48 64 96 128\n\
-#define MAX_STEPS 64\n\
-\n\
-#define LIGHT_NUM 2\n\
-//#define uTMK 20.0\n\
-#define TM_MIN 0.05\n\
-\n\
-\n\
-//---------------------------------------------------------\n\
-// SHADER VARS\n\
-//---------------------------------------------------------\n\
-\n\
-varying vec2 vUv;\n\
-varying vec3 vPos0; // position in world coords\n\
-varying vec3 vPos1; // position in object coords\n\
-varying vec3 vPos1n; // normalized 0 to 1, for texture lookup\n\
-\n\
-uniform vec3 uOffset; // TESTDEBUG\n\
-\n\
-uniform vec3 uCamPos;\n\
-\n\
-uniform vec3 uLightP[LIGHT_NUM];  // point lights\n\
-uniform vec3 uLightC[LIGHT_NUM];\n\
-\n\
-uniform vec3 uColor;      // color of volume\n\
-uniform sampler2D uTex;   // 3D(2D) volume texture\n\
-uniform vec3 uTexDim;     // dimensions of texture\n\
-\n\
-uniform float uTMK;\n\
-\n\
-float gStepSize;\n\
-float gStepFactor;\n\
-\n\
-\n\
-//---------------------------------------------------------\n\
-// PROGRAM\n\
-//---------------------------------------------------------\n\
-\n\
-// TODO: convert world to local volume space\n\
-vec3 toLocal(vec3 p) {\n\
-  return p + vec3(0.5);\n\
-}\n\
-\n\
-float sampleVolTex(vec3 pos) {\n\
-  pos = pos + uOffset; // TESTDEBUG\n\
-  \n\
-  // note: z is up in 3D tex coords, pos.z is tex.y, pos.y is zSlice\n\
-  float zSlice = (1.0-pos.y)*(uTexDim.z-1.0);   // float value of slice number, slice 0th to 63rd\n\
-  \n\
-  // calc pixels from top of texture\n\
-  float fromTopPixels =\n\
-    floor(zSlice)*uTexDim.y +   // offset pix from top of tex, from upper slice  \n\
-    pos.z*(uTexDim.y-1.0) +     // y pos in pixels, range 0th to 63rd pix\n\
-    0.5;  // offset to center of cell\n\
-    \n\
-  // calc y tex coords of two slices\n\
-  float y0 = min( (fromTopPixels)/(uTexDim.y*uTexDim.z), 1.0);\n\
-  float y1 = min( (fromTopPixels+uTexDim.y)/(uTexDim.y*uTexDim.z), 1.0);\n\
-    \n\
-  // get (bi)linear interped texture reads at two slices\n\
-  float z0 = texture2D(uTex, vec2(pos.x, y0)).g;\n\
-  float z1 = texture2D(uTex, vec2(pos.x, y1)).g;\n\
-  \n\
-  // lerp them again (thus trilinear), using remaining fraction of zSlice\n\
-  return mix(z0, z1, fract(zSlice));\n\
-}\n\
-\n\
-// accumulate density by ray marching\n\
-float getDensity(vec3 ro, vec3 rd) {\n\
-  vec3 step = rd*gStepSize;\n\
-  vec3 pos = ro;\n\
-  \n\
-  float density = 0.0;\n\
-  \n\
-  for (int i=0; i<MAX_STEPS; ++i) {\n\
-    density += (1.0-density) * sampleVolTex(pos) * gStepFactor;\n\
-    //density += sampleVolTex(pos);\n\
-    \n\
-    pos += step;\n\
-    \n\
-    if (density > 0.95 ||\n\
-      pos.x > 1.0 || pos.x < 0.0 ||\n\
-      pos.y > 1.0 || pos.y < 0.0 ||\n\
-      pos.z > 1.0 || pos.z < 0.0)\n\
-      break;\n\
-  }\n\
-  \n\
-  return density;\n\
-}\n\
-\n\
-// calc transmittance\n\
-float getTransmittance(vec3 ro, vec3 rd) {\n\
-  vec3 step = rd*gStepSize;\n\
-  vec3 pos = ro;\n\
-  \n\
-  float tm = 1.0;\n\
-  \n\
-  for (int i=0; i<MAX_STEPS; ++i) {\n\
-    tm *= exp( -uTMK*gStepSize*sampleVolTex(pos) );\n\
-    \n\
-    pos += step;\n\
-    \n\
-    if (tm < TM_MIN ||\n\
-      pos.x > 1.0 || pos.x < 0.0 ||\n\
-      pos.y > 1.0 || pos.y < 0.0 ||\n\
-      pos.z > 1.0 || pos.z < 0.0)\n\
-      break;\n\
-  }\n\
-  \n\
-  return tm;\n\
-}\n\
-\n\
-vec4 raymarchNoLight(vec3 ro, vec3 rd) {\n\
-  vec3 step = rd*gStepSize;\n\
-  vec3 pos = ro;\n\
-  \n\
-  vec3 col = vec3(0.0);\n\
-  float tm = 1.0;\n\
-  \n\
-  for (int i=0; i<MAX_STEPS; ++i) {\n\
-    float dtm = exp( -uTMK*gStepSize*sampleVolTex(pos) );\n\
-    tm *= dtm;\n\
-    \n\
-    col += (1.0-dtm) * uColor * tm;\n\
-    \n\
-    pos += step;\n\
-    \n\
-    if (tm < TM_MIN ||\n\
-      pos.x > 1.0 || pos.x < 0.0 ||\n\
-      pos.y > 1.0 || pos.y < 0.0 ||\n\
-      pos.z > 1.0 || pos.z < 0.0)\n\
-      break;\n\
-  }\n\
-  \n\
-  float alpha = 1.0-tm;\n\
-  return vec4(col/alpha, alpha);\n\
-}\n\
-\n\
-vec4 raymarchLight(vec3 ro, vec3 rd) {\n\
-  vec3 step = rd*gStepSize;\n\
-  vec3 pos = ro;\n\
-  \n\
-  \n\
-  vec3 col = vec3(0.0);   // accumulated color\n\
-  float tm = 1.0;         // accumulated transmittance\n\
-  \n\
-  for (int i=0; i<MAX_STEPS; ++i) {\n\
-    // delta transmittance \n\
-    float dtm = exp( -uTMK*gStepSize*sampleVolTex(pos) );\n\
-    tm *= dtm;\n\
-    \n\
-    // get contribution per light\n\
-    for (int k=0; k<LIGHT_NUM; ++k) {\n\
-      vec3 ld = normalize( toLocal(uLightP[k])-pos );\n\
-      float ltm = getTransmittance(pos,ld);\n\
-      \n\
-      col += (1.0-dtm) * uColor*uLightC[k] * tm * ltm;\n\
-    }\n\
-    \n\
-    pos += step;\n\
-    \n\
-    if (tm < TM_MIN ||\n\
-      pos.x > 1.0 || pos.x < 0.0 ||\n\
-      pos.y > 1.0 || pos.y < 0.0 ||\n\
-      pos.z > 1.0 || pos.z < 0.0)\n\
-      break;\n\
-  }\n\
-  \n\
-  float alpha = 1.0-tm;\n\
-  return vec4(col/alpha, alpha);\n\
-}\n\
-\n\
-void main() {\n\
-  // in world coords, just for now\n\
-  vec3 ro = vPos1n;\n\
-  vec3 rd = normalize( ro - toLocal(uCamPos) );\n\
-  //vec3 rd = normalize(ro-uCamPos);\n\
-  \n\
-  // step_size = root_three / max_steps ; to get through diagonal  \n\
-  gStepSize = ROOTTHREE / float(MAX_STEPS);\n\
-  gStepFactor = 32.0 * gStepSize;\n\
-  \n\
-  gl_FragColor = raymarchLight(ro, rd);\n\
-  //gl_FragColor = vec4(uColor, getDensity(ro,rd));\n\
-  //gl_FragColor = vec4(vec3(sampleVolTex(pos)), 1.0);\n\
-  //gl_FragColor = vec4(vPos1n, 1.0);\n\
-  //gl_FragColor = vec4(uLightP[0], 1.0);\n\
-}";
-ShaderSource.vol_vs = "attribute vec3 aPosition;\n\
-\n\
-uniform sampler2D diffuseTex;\n\
-uniform mat4 projectionMatrix;  \n\
-uniform mat4 modelViewMatrix;\n\
-uniform mat4 modelViewMatrixRelToEye; \n\
-uniform mat4 ModelViewProjectionMatrixRelToEye;\n\
-uniform vec3 encodedCameraPositionMCHigh;\n\
-uniform vec3 encodedCameraPositionMCLow;\n\
-\n\
-varying vec3 vNormal;\n\
-varying vec3 vPosObjectCoord;\n\
-varying vec3 vPosCameraCoord;\n\
-varying vec3 vPosWorldCoord;\n\
-\n\
-// Render a fullScreen quad (2 triangles).***\n\
-void main()\n\
-{\n\
-	vec4 rotatedPos = buildingRotMatrix * vec4(position.xyz + aditionalPosition.xyz, 1.0);\n\
-    vec3 objPosHigh = buildingPosHIGH;\n\
-    vec3 objPosLow = buildingPosLOW.xyz + rotatedPos.xyz;\n\
-    vec3 highDifference = objPosHigh.xyz - encodedCameraPositionMCHigh.xyz;\n\
-    vec3 lowDifference = objPosLow.xyz - encodedCameraPositionMCLow.xyz;\n\
-    vec4 pos4 = vec4(highDifference.xyz + lowDifference.xyz, 1.0);\n\
-	\n\
-    gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
-}";
 ShaderSource.waterCalculateContaminationFS = "#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\

@@ -244,6 +244,11 @@ float getDepth(vec2 coord)
 	}
 }
 
+float getRealDepth(in vec2 coord, in float far)
+{
+	return getDepth(coord) * far;
+}
+
 bool isEdge(vec2 screenPos, vec3 normal, float pixelSize_x, float pixelSize_y)
 {
 	bool bIsEdge = false;
@@ -367,6 +372,17 @@ vec3 brightnessContrast(vec3 value, float brightness, float contrast)
 vec3 Gamma(vec3 value, float param)
 {
     return vec3(pow(abs(value.r), param),pow(abs(value.g), param),pow(abs(value.b), param));
+}
+
+void getNormal_dataType_andFar(in vec2 coord, inout vec3 normal, inout int dataType, inout float far)
+{
+	vec4 normal4 = getNormal(coord);
+	normal = normal4.xyz;
+	int estimatedFrustumIdx = int(floor(normal4.w * 100.0));
+	dataType = -1;// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.
+	int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);
+	vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);
+	far = nearFar.y;
 }
 
 void main()
@@ -665,8 +681,53 @@ void main()
 			float myLinearDepth = getDepth(screenPos);
 
 			float myDepth = myLinearDepth * currFar_origin;
+			float log2Deoth = log2(myDepth);
+			// Apply Eye-Dom-Lighting (EDL).***
+			
+			float coordScale = 1.5;
 
+			// top.***
+			vec2 texCoord_top = vec2(screenPos.x, screenPos.y + pixelSize_y*coordScale);
+			vec3 normal_top;
+			int dataType_top;
+			float far_top;
+			getNormal_dataType_andFar(texCoord_top, normal_top, dataType_top, far_top);
+			float realDepth_top = getRealDepth(texCoord_top, far_top);
 
+			// left.***
+			vec2 texCoord_left = vec2(screenPos.x - pixelSize_x * coordScale, screenPos.y);
+			vec3 normal_left;
+			int dataType_left;
+			float far_left;
+			getNormal_dataType_andFar(texCoord_left, normal_left, dataType_left, far_left);
+			float realDepth_left = getRealDepth(texCoord_left, far_left);
+
+			// bottom.***
+			vec2 texCoord_bottom = vec2(screenPos.x, screenPos.y - pixelSize_y*coordScale);
+			vec3 normal_bottom;
+			int dataType_bottom;
+			float far_bottom;
+			getNormal_dataType_andFar(texCoord_bottom, normal_bottom, dataType_bottom, far_bottom);
+			float realDepth_bottom = getRealDepth(texCoord_bottom, far_bottom);
+
+			// right.***
+			vec2 texCoord_right = vec2(screenPos.x + pixelSize_x * coordScale, screenPos.y);
+			vec3 normal_right;
+			int dataType_right;
+			float far_right;
+			getNormal_dataType_andFar(texCoord_right, normal_right, dataType_right, far_right);
+			float realDepth_right = getRealDepth(texCoord_right, far_right);
+
+			float response = (max(0.0, log2Deoth - log2(realDepth_top)) + max(0.0, log2Deoth - log2(realDepth_left)) + max(0.0, log2Deoth - log2(realDepth_bottom)) + max(0.0, log2Deoth - log2(realDepth_right))) / 4.0;
+			float edlStrength = 2.0;
+			float shade = exp(-response * 300.0 * edlStrength);
+
+			vec4 finalColorPC = vec4(albedo.rgb * shade, albedo.a);
+			//finalColorPC = vec4(1.0, 0.0, 0.0, albedo.a);
+
+			gl_FragColor = finalColorPC;
+
+			/*
 			float radius = 3.0;
 			float occ = 0.0;
 			for(int i=0; i<3; i++)
@@ -711,59 +772,8 @@ void main()
 				gl_FragColor = vec4(1.0, 1.0, 1.0, alpha);
 				return;
 			}
+			*/
 		}
 		
-
-
-		// render edges for points cloud.
-		/*
-		if(dataType == 2)
-		{
-			// this is point cloud.
-			float linearDepth_origin  = unpackDepth(texture2D(depthTex, screenPos)); // z_window  is [0.0, 1.0] range depth.
-			float myZDist = linearDepth_origin * currFar_origin;
-			float increAngRad = (2.0*M_PI)/16.0;
-			float edgeColor = 0.0;
-			for(int i=0; i<16; i++)
-			{
-				float s = cos(float(i)*increAngRad) * pixelSize_x * 4.0;
-				float t = sin(float(i)*increAngRad) * pixelSize_y * 4.0;
-				vec2 screenPosAdjacent = vec2(screenPos.x+s, screenPos.y+t);
-				vec4 normal4_adjacent = getNormal(screenPosAdjacent);
-				int estimatedFrustumIdx_adjacent = int(floor(normal4_adjacent.w * 100.0));
-				int dataType_adjacent = -1;
-				int currFrustumIdx_adjacent = getRealFrustumIdx(estimatedFrustumIdx_adjacent, dataType_adjacent);
-				vec2 nearFar_adjacent = getNearFar_byFrustumIdx(currFrustumIdx_adjacent);
-				float currNear_adjacent = nearFar_adjacent.x;
-				float currFar_adjacent = nearFar_adjacent.y;
-				float linearDepth_adjacent  = unpackDepth(texture2D(depthTex, screenPosAdjacent)); // z_window  is [0.0, 1.0] range depth.
-				float zDistAdjacent = linearDepth_adjacent * currFar_adjacent;
-
-				float zDepthDiff = abs(myZDist - zDistAdjacent);
-				if(linearDepth_origin < linearDepth_adjacent)
-				{
-					if(zDepthDiff > 2.0)
-					{
-						edgeColor += 1.0;
-					}
-				}
-			}
-			if(edgeColor > 4.0)
-			{
-				edgeColor -= 4.0;
-				edgeColor /= 12.0;
-
-				if(edgeColor > 0.01)
-				edgeColor = 1.0;
-
-				//gl_FragColor = vec4(0.0, 0.0, 0.0, edgeColor);//+occlusion);
-				gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);//+occlusion);
-				return;
-				// Test.***
-				
-			}
-			
-		}
-		*/
 	}
 }

@@ -211,7 +211,7 @@ Renderer.prototype.getPointsCountForDistance = function(distToCam, realPointsCou
  * @param {Number} renderType If renderType = 0 (depth render), renderType = 1 (color render), renderType = 2 (colorCoding render).
  * @param {Number} distToCam The current distance to camera.
  */
-Renderer.prototype.renderPCloud = function(gl, pCloud, magoManager, shader, renderType, distToCam) 
+Renderer.prototype.renderPCloud = function (gl, pCloud, magoManager, shader, renderType, distToCam) 
 {
 	// Note: "pCloud" is "Lego" class.
 	if (pCloud.vbo_vicks_container.vboCacheKeysArray.length === 0) 
@@ -2559,8 +2559,8 @@ Renderer.prototype.renderGeometryBuffer = function (gl, renderType, visibleObjCo
 		}
 		*/
 		
-		// PointsCloud.****************************************************************************************
-		// PointsCloud.****************************************************************************************
+		// PointsCloud opaque.****************************************************************************************
+		// PointsCloud opaque.****************************************************************************************
 		var nodesPCloudCount = magoManager.visibleObjControlerNodes.currentVisiblesAux.length;
 		if (nodesPCloudCount > 0)
 		{
@@ -2674,7 +2674,7 @@ Renderer.prototype.renderGeometryBuffer = function (gl, renderType, visibleObjCo
  * @param {Number} renderType If renderType = 0 (depth render), renderType = 1 (color render), renderType = 2 (colorCoding render).
  * @param {VisibleObjectsController} visibleObjControlerNodes This object contains visible objects for the camera frustum.
  */
-Renderer.prototype.renderGeometryBufferTransparents = function(gl, renderType, visibleObjControlerNodes) 
+Renderer.prototype.renderGeometryBufferTransparents = function (gl, renderType, visibleObjControlerNodes) 
 {
 	gl.enable(gl.DEPTH_TEST);
 	gl.depthFunc(gl.LEQUAL);
@@ -2887,6 +2887,7 @@ Renderer.prototype.renderGeometryBufferTransparents = function(gl, renderType, v
 		
 		// PointsCloud.****************************************************************************************
 		// PointsCloud.****************************************************************************************
+		/*
 		var nodesPCloudCount = magoManager.visibleObjControlerNodes.currentVisiblesAux.length;
 		if (nodesPCloudCount > 0)
 		{
@@ -2955,6 +2956,8 @@ Renderer.prototype.renderGeometryBufferTransparents = function(gl, renderType, v
 			//gl.bindTexture(gl.TEXTURE_2D, magoManager.depthFboNeo.colorBuffer);
 			gl.bindTexture(gl.TEXTURE_2D, normalTex);
 			*/
+
+		/*
 			// Test to load pCloud.***
 			if (magoManager.visibleObjControlerPCloudOctrees === undefined)
 			{ magoManager.visibleObjControlerPCloudOctrees = new VisibleObjectsController(); }
@@ -2987,8 +2990,10 @@ Renderer.prototype.renderGeometryBufferTransparents = function(gl, renderType, v
 					}
 			  }
 			}
+			
 
 		}
+		*/
 	}
 	gl.disable(gl.BLEND);
 	gl.depthRange(0.0, 1.0);	
