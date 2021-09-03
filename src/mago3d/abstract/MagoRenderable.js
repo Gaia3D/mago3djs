@@ -247,7 +247,7 @@ MagoRenderable.prototype.render = function (magoManager, shader, renderType, glP
 	if (this.dirty)
 	{ this.makeMesh(magoManager); }
 	
-	if (this.objectsArray.length === 0)
+	if (!this.objectsArray || this.objectsArray.length === 0)
 	{ return false; }
 
 	var gl = magoManager.getGl();
