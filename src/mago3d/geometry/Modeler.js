@@ -1263,6 +1263,221 @@ Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive
 	//this.__TEST__bSpline();
 };
 
+Modeler.prototype.__TEST = function () 
+{
+	this.__TEST__convertF4D_to_MagoNode();
+};
+
+Modeler.prototype.__TEST__convertF4D_to_MagoNode = function () 
+{
+	// test function.***
+	// Convert the f4d data to a MagoNode.
+
+	// texture repeat at texture atlas:
+	// https://community.khronos.org/t/repeat-tile-from-texture-atlas/104500
+	// https://community.khronos.org/t/texture-atlas-and-repeating-textures/52706/4
+
+	// 1rst, take the smartTile owner.
+	var magoManager = this.magoManager;
+	var selectionManager = magoManager.selectionManager;
+	var nodeSelected = selectionManager.getSelectedF4dNode();
+
+	if (!nodeSelected)
+	{
+		return;
+	}
+
+	var data = nodeSelected.data;
+	var smartTile = data.smartTileOwner;
+	var neoBuilding = data.neoBuilding;
+
+	if (!this.__loadedAllReferences)
+	{
+		neoBuilding.forceToLoadModelsAndReferences(magoManager);
+		this.__loadedAllReferences = true;
+		return;
+	}
+
+	if (!neoBuilding.allModelsAndReferencesAreParsed(magoManager))
+	{
+		var hola = 0;
+		return;
+	}
+
+	if (!this.bPrimitivesCreated)
+	{
+
+		// now, try to join refereces, 1rst by references with the same texture, and then join refereces.***
+		var motherNeoReferencesArray = neoBuilding.motherNeoReferencesArray;
+		var motherBlocksArray = neoBuilding.motherBlocksArray;
+		var map_matId_references = {};
+
+		var referencesCount = motherNeoReferencesArray.length;
+		for (var i=0; i<referencesCount; i++)
+		{
+			var ref = motherNeoReferencesArray[i];
+			var blockIdx = ref._block_idx;
+			var block = motherBlocksArray[blockIdx];
+			var materialId = ref.materialId;
+
+			if (map_matId_references[materialId] === undefined)
+			{
+				map_matId_references[materialId] = [];
+			}
+			map_matId_references[materialId].push(ref);
+			var hola = 0;
+		}
+
+	
+		// now, for all references with the same texture, join its in a unique object.
+		// each reference is a primitive.
+		var mgNode = new MgNode();
+		for (var key in map_matId_references)
+		{
+			if (map_matId_references.hasOwnProperty(key)) 
+			{
+				var referencesArray = map_matId_references[key];
+				mgNode = this.__TEST__convertF4D_to_MagoNode__createPrimitives(referencesArray, neoBuilding, mgNode);
+
+				var hola = 0;
+			}
+		}
+
+		if (!smartTile.mgSetArray)
+		{
+			smartTile.mgSetArray = [];
+		}
+
+		// Now, insert mgData into smartTile.***
+		var mgSet = MgSet.makeMgSetFromMgNodesArray([mgNode]);
+		smartTile.mgSetArray.push(mgSet);
+
+		// Test finished.************************************
+		this.bPrimitivesCreated = true;
+	}
+
+	var hola = 0;
+};
+
+Modeler.prototype.__TEST__convertF4D_to_MagoNode__createPrimitives = function (referencesArray, neoBuilding, mgNode) 
+{
+	// For each reference, create a mesh. Inside the mesh create a primitive.
+	var motherNeoReferencesArray = neoBuilding.motherNeoReferencesArray;
+	var motherBlocksArray = neoBuilding.motherBlocksArray;
+
+	// each reference is a mgNode with a primitive.
+	var refCount = referencesArray.length;
+	for (var i=0; i<refCount; i++)
+	{
+		var ref = referencesArray[i];
+		var refMatrixType = ref.refMatrixType;
+		var blockIdx = ref._block_idx;
+		var block = motherBlocksArray[blockIdx];
+		var refTranslationVec;
+		var ref_tMat = ref._originalMatrix4;
+		var block_vBOVertexIdxCacheKeysContainer = block.vBOVertexIdxCacheKeysContainer;
+		var ref_vBOVertexIdxCacheKeysContainer = ref.vBOVertexIdxCacheKeysContainer;
+
+		if (refMatrixType === 0)
+		{
+			// identity matrix.
+			var hola = 0;
+		}
+		else if (refMatrixType === 1)
+		{
+			// translation matrix.
+			refTranslationVec = ref.refTranslationVec;
+
+			var hola = 0;
+		}
+		else if (refMatrixType === 2)
+		{
+			// transform matrix.
+			var hola = 0;
+		}
+
+		var mgBufferDataSet;
+		
+		var vboKeysCount = ref_vBOVertexIdxCacheKeysContainer.vboCacheKeysArray.length;
+		for (var j=0; j<vboKeysCount; j++)
+		{
+			if (vboKeysCount > 1)
+			{
+				var hola = 0;
+			}
+
+			var ref_vboKey = ref_vBOVertexIdxCacheKeysContainer.vboCacheKeysArray[j];
+			var block_vboKey = block_vBOVertexIdxCacheKeysContainer.vboCacheKeysArray[j];
+
+			var color4 = ref.color4;
+
+			var vboBufferIdx = block_vboKey.vboBufferIdx;
+			var vboBufferPos = block_vboKey.vboBufferPos; // affected by tMatrix or translationVector.
+			var vboBufferNor = block_vboKey.vboBufferNor; // affected by tMatrix.
+			var vboBufferCol = ref_vboKey.vboBufferCol;
+			var vboBufferTCoord = ref_vboKey.vboBufferTCoord;
+
+			var mgBufferViewSet = new MgBufferViewSet();
+
+			if (block_vboKey.vboBufferPos)
+			{
+				mgBufferViewSet.setAuxBufferData(block_vboKey.vboBufferPos.dataArray, "POSITION3");
+			}
+			if (block_vboKey.vboBufferNor)
+			{
+				mgBufferViewSet.setAuxBufferData(block_vboKey.vboBufferNor.dataArray, "NORMAL3");
+			}
+			if (ref_vboKey.vboBufferCol)
+			{
+				mgBufferViewSet.setAuxBufferData(ref_vboKey.vboBufferCol.dataArray, "COLOR4");
+			}
+			if (ref_vboKey.vboBufferTCoord)
+			{
+				mgBufferViewSet.setAuxBufferData(ref_vboKey.vboBufferTCoord.dataArray, "TEXCOORD2");
+			}
+			if (block_vboKey.vboBufferIdx)
+			{
+				mgBufferViewSet.setAuxBufferData(block_vboKey.vboBufferIdx.dataArray, "INDICE");
+			}
+
+			if (refMatrixType === 1)
+			{
+				// positionData must be translated.***
+				var hola = 0;
+			}
+			else if (refMatrixType === 2)
+			{
+				// positionData must be transformed & normalData must be rotated.***
+
+				var hola = 0;
+			}
+
+			var mgMesh = new MgMesh({mgOwner: mgNode});
+			var mgPrimitive = new MgPrimitive({mgOwner: mgMesh});
+			
+			mgPrimitive.mgBufferViewSet = mgBufferViewSet;
+			mgPrimitive.hasTexture = ref.hasTexture;
+			mgPrimitive.materialId = ref.materialId;
+			mgPrimitive.objectId = ref.objectId;
+
+			mgBufferViewSet.mgOwner = mgPrimitive; // set owner.***
+			
+			mgMesh.primitives.push(mgPrimitive);
+			mgNode.mgMeshArray.push(mgMesh);
+
+			var hola = 0;
+		}
+
+		var hola = 0;
+	}
+
+
+	var hola = 0;
+	return mgNode;
+};
+
+
+
 Modeler.prototype.__TEST__bSpline = function() 
 {
 	// draw a bSpline.

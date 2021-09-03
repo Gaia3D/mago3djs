@@ -3,7 +3,7 @@
 // Elementary objects.
 importScripts('./src/Arc2D_.js');
 importScripts('./src/Circle2D_.js');
-importScripts('./src/Polyline2D_.js');
+importScripts('./src/PolyLine2D_.js');
 importScripts('./src/Rectangle2D_.js');
 importScripts('./src/Star2D_.js');
 

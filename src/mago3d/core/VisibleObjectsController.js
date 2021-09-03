@@ -34,11 +34,15 @@ var VisibleObjectsController = function()
 		lightSourcesArray : []
 	};
 	this.currentVisiblesToPrepare = [];
+
+	// MgSets.***
+	this.mgSetsArray = [];
 	
 	this.bSphere;
 	this.bFrustumNear;
 	this.bFrustumFar;
 };
+
 VisibleObjectsController.prototype.initArrays = function() 
 {
 	this.currentVisibles0 = [];
@@ -62,6 +66,8 @@ VisibleObjectsController.prototype.initArrays = function()
 		lightSourcesArray : []
 	};
 	this.currentVisiblesToPrepare = [];
+
+	this.mgSetsArray = [];
 	
 	this.bSphere = undefined;
 	this.bFrustumNear = undefined;
@@ -90,6 +96,7 @@ VisibleObjectsController.prototype.clear = function()
 	this.currentVisibleNativeObjects.pointTypeArray.length = 0;
 	this.currentVisibleNativeObjects.lightSourcesArray.length = 0;
 	this.currentVisiblesToPrepare.length = 0;
+	this.mgSetsArray.length = 0;
 	
 	
 	this.bSphere = undefined;
@@ -156,7 +163,8 @@ VisibleObjectsController.prototype.hasRenderables = function()
 		this.currentVisibleNativeObjects.excavationsArray.length > 0 ||
 		this.currentVisibleNativeObjects.vectorTypeArray.length > 0||
 		this.currentVisibleNativeObjects.pointTypeArray.length > 0 ||
-		this.currentVisibleNativeObjects.lightSourcesArray.length > 0)
+		this.currentVisibleNativeObjects.lightSourcesArray.length > 0 ||
+		this.mgSetsArray.length > 0)
 	{ return true; }
 	else
 	{ return false; }

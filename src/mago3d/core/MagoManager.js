@@ -1807,6 +1807,13 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		]);
 		
 		this.renderer.renderTerrainCopy();
+
+		// Webgl android problems: GL_EXT_draw_buffers is not supported.:
+		// https://github.com/ptitSeb/gl4es/issues/278
+		// https://support.corellium.com/hc/en-us/articles/360017449974-Introduction-to-Android-Devices
+		// https://community.cesium.com/t/after-updating-the-last-chrome-version-75-i-cannot-use-cesium/8350 // About Cesium.***
+		// https://github.com/CesiumGS/cesium/issues/2448  // About Cesium.***
+		// https://stackoverflow.com/questions/68573364/enable-extension-and-fwidth-in-glsl // **************************************
 		// end test.---------------------------------------------------------------------------------------------------
 
 		if (scene && scene._context && scene._context._currentFramebuffer) 
@@ -2069,6 +2076,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		}
 
 		// Debug component.******************************************
+		//this.modeler.__TEST();
 		/*
 		var lightAux;
 		if (lightsArray)
@@ -6231,6 +6239,13 @@ MagoManager.prototype.createDefaultShaders = function (gl)
 		this.postFxShadersManager.bUseLogarithmicDepth = false;	
 	}
 
+	this.postFxShadersManager.bUseUint32ForIndices = false;
+	var uints_for_indices = gl.getExtension("OES_element_index_uint");
+	if (uints_for_indices)
+	{
+		this.postFxShadersManager.bUseUint32ForIndices = true;
+	}
+	var hola = 0;
 };
 
 /**
@@ -6574,14 +6589,21 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function (intersectedLo
 			}
 		}
 		
-		//Array.prototype.push.apply(currVisibleNativeObjects.opaquesArray, nativeObjects.opaquesArray);
-		//Array.prototype.push.apply(currVisibleNativeObjects.transparentsArray, nativeObjects.transparentsArray);
-		//Array.prototype.push.apply(currVisibleNativeObjects.excavationsArray, nativeObjects.excavationsArray);
-		//Array.prototype.push.apply(currVisibleNativeObjects.vectorTypeArray, nativeObjects.vectorTypeArray);
+		// MgSets.***
+		var mgSetsArray = lowestTile.mgSetArray;
+		if (mgSetsArray)
+		{
+			var mgSetsCount = mgSetsArray.length;
+			for (var j=0; j<mgSetsCount; j++)
+			{
+				visibleNodes.mgSetsArray.push(mgSetsArray[j]);
+			}
+		}
+
 		if (nativeObjects.pointTypeArray)
 		{ Array.prototype.push.apply(currVisibleNativeObjects.pointTypeArray, nativeObjects.pointTypeArray); }
 
-		// native lightSources.
+		// native nativeSeeds.
 		nativeObjectsCount = nativeObjects.nativeSeedArray.length;
 		for (var j=0; j<nativeObjectsCount; j++)
 		{

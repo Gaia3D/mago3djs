@@ -50,6 +50,8 @@ var SmartTile = function(smartTileName, options)
 	this.isVisible; // var to manage the frustumCulling and delete buildings if necessary.
 	this.distToCamera;
 
+	this.mgSetArray; // collection of mgSets if exists.
+
 	if (options)
 	{
 		if (options.smartTileManager)

@@ -86,6 +86,18 @@ var Renderer = function(manoManager)
 	this._screenRectangleRenderType = 0; // test var.***
 };
 
+Renderer.prototype.renderMgSets = function (mgSetsArray, shader, renderTexture, renderType, maxSizeToRender) 
+{
+	// This function renders the MgSets.***
+	var gl = this.magoManager.getGl();
+	var mgSetsCount = mgSetsArray.length;
+	for (var i=0; i<mgSetsCount; i++)
+	{
+		var mgSet = mgSetsArray[i];
+		mgSet.render(gl, shader);
+	}
+};
+
 /**
  * This function renders all nodes of "visibleNodesArray".
  * @param {WebGLRenderingContext} gl WebGL Rendering Context.
@@ -2537,6 +2549,12 @@ Renderer.prototype.renderGeometryBuffer = function (gl, renderType, visibleObjCo
 			
 			this.renderNativeObjects(gl, currentShader, renderType, visibleObjControlerNodes, options);
 			gl.uniform1i(currentShader.clippingType_loc, 0); // 0= no clipping.***
+
+			// MgSets.***
+			if (visibleObjControlerNodes.mgSetsArray.length > 0)
+			{
+				this.renderMgSets(visibleObjControlerNodes.mgSetsArray, currentShader, renderTexture, renderType, minSizeToRender);
+			}
 			
 			currentShader.disableVertexAttribArrayAll();
 			magoManager.postFxShadersManager.useProgram(null);
@@ -2568,6 +2586,7 @@ Renderer.prototype.renderGeometryBuffer = function (gl, renderType, visibleObjCo
 		
 		// PointsCloud opaque.****************************************************************************************
 		// PointsCloud opaque.****************************************************************************************
+		// https://publik.tuwien.ac.at/files/publik_252607.pdf
 		var nodesPCloudCount = magoManager.visibleObjControlerNodes.currentVisiblesAux.length;
 		if (nodesPCloudCount > 0)
 		{
