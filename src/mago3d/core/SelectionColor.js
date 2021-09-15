@@ -25,7 +25,7 @@ SelectionColor.prototype.init = function ()
 {
 	this.color.r = 0;
 	this.color.g = 0;
-	this.color.b = 0;
+	this.color.b = 1; // this must be 1.
 	this.cycle = 0;
 };
 

@@ -1587,16 +1587,11 @@ uniform vec4 oneColor4;\n\
 //uniform bool bApplyScpecularLighting;\n\
 uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
 \n\
-uniform float externalAlpha;\n\
-uniform vec4 colorMultiplier;\n\
 uniform bool bUseLogarithmicDepth;\n\
 uniform bool bUseMultiRenderTarget;\n\
 uniform int uFrustumIdx;\n\
 \n\
 // clipping planes.***\n\
-uniform mat4 clippingPlanesRotMatrix; \n\
-uniform vec3 clippingPlanesPosHIGH;\n\
-uniform vec3 clippingPlanesPosLOW;\n\
 uniform bool bApplyClippingPlanes; // old. deprecated.***\n\
 uniform int clippingType; // 0= no clipping. 1= clipping by planes. 2= clipping by localCoord polyline. 3= clip by heights, 4= clip by (2, 3)\n\
 uniform int clippingPlanesCount;\n\
@@ -1976,6 +1971,407 @@ void main()\n\
 	#endif\n\
 \n\
 \n\
+	\n\
+}";
+ShaderSource.GBufferORTFS = "#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+ \n\
+uniform sampler2D diffuseTex;\n\
+uniform bool textureFlipYAxis;  \n\
+uniform vec4 oneColor4;\n\
+\n\
+//uniform bool bApplyScpecularLighting;\n\
+uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
+\n\
+uniform bool bUseLogarithmicDepth;\n\
+uniform bool bUseMultiRenderTarget;\n\
+uniform int uFrustumIdx;\n\
+uniform int u_outputTarget; // 0 = depth, 1= normal, 2= albedo, 3= selColor.***\n\
+\n\
+// clipping planes.***\n\
+uniform bool bApplyClippingPlanes; // old. deprecated.***\n\
+uniform int clippingType; // 0= no clipping. 1= clipping by planes. 2= clipping by localCoord polyline. 3= clip by heights, 4= clip by (2, 3)\n\
+uniform int clippingPlanesCount;\n\
+uniform vec4 clippingPlanes[6];\n\
+uniform vec2 clippingPolygon2dPoints[64];\n\
+uniform int clippingConvexPolygon2dPointsIndices[64];\n\
+uniform vec4 limitationInfringedColor4;\n\
+uniform vec2 limitationHeights;\n\
+\n\
+// Code color for selection:\n\
+uniform vec4 uSelColor4;\n\
+\n\
+varying vec3 vNormal;\n\
+varying vec4 vColor4; // color from attributes\n\
+varying vec2 vTexCoord;   \n\
+\n\
+varying vec3 vertexPos; // this is the orthoPos.***\n\
+varying vec3 vertexPosLC;\n\
+\n\
+\n\
+varying float flogz;\n\
+varying float Fcoef_half;\n\
+varying float depth;\n\
+\n\
+\n\
+vec4 packDepth( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+  return enc;\n\
+}\n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+} \n\
+\n\
+vec3 encodeNormal(in vec3 normal)\n\
+{\n\
+	return normal*0.5 + 0.5;\n\
+}            \n\
+\n\
+\n\
+bool clipVertexByPlane(in vec4 plane, in vec3 point)\n\
+{\n\
+	float dist = plane.x * point.x + plane.y * point.y + plane.z * point.z + plane.w;\n\
+	\n\
+	if(dist < 0.0)\n\
+	return true;\n\
+	else return false;\n\
+}\n\
+\n\
+vec2 getDirection2d(in vec2 startPoint, in vec2 endPoint)\n\
+{\n\
+	//vec2 vector = endPoint - startPoint;\n\
+	//float length = length( vector);\n\
+	//vec2 dir = vec2(vector.x/length, vector.y/length);\n\
+	vec2 dir = normalize(endPoint - startPoint);\n\
+	return dir;\n\
+}\n\
+\n\
+bool intersectionLineToLine(in vec2 line_1_pos, in vec2 line_1_dir,in vec2 line_2_pos, in vec2 line_2_dir, out vec2 intersectionPoint2d)\n\
+{\n\
+	bool bIntersection = false;\n\
+\n\
+	float zero = 10E-8;\n\
+	float intersectX;\n\
+	float intersectY;\n\
+\n\
+	// check if 2 lines are parallel.***\n\
+	float dotProd = abs(dot(line_1_dir, line_2_dir));\n\
+	if(abs(dotProd-1.0) < zero)\n\
+	return false;\n\
+\n\
+	if (abs(line_1_dir.x) < zero)\n\
+	{\n\
+		// this is a vertical line.\n\
+		float slope = line_2_dir.y / line_2_dir.x;\n\
+		float b = line_2_pos.y - slope * line_2_pos.x;\n\
+		\n\
+		intersectX = line_1_pos.x;\n\
+		intersectY = slope * line_1_pos.x + b;\n\
+		bIntersection = true;\n\
+	}\n\
+	else if (abs(line_1_dir.y) < zero)\n\
+	{\n\
+		// this is a horizontal line.\n\
+		// must check if the \"line\" is vertical.\n\
+		if (abs(line_2_dir.x) < zero)\n\
+		{\n\
+			// \"line\" is vertical.\n\
+			intersectX = line_2_pos.x;\n\
+			intersectY = line_1_pos.y;\n\
+			bIntersection = true;\n\
+		}\n\
+		else \n\
+		{\n\
+			float slope = line_2_dir.y / line_2_dir.x;\n\
+			float b = line_2_pos.y - slope * line_2_pos.x;\n\
+			\n\
+			intersectX = (line_1_pos.y - b)/slope;\n\
+			intersectY = line_1_pos.y;\n\
+			bIntersection = true;\n\
+		}	\n\
+	}\n\
+	else \n\
+	{\n\
+		// this is oblique.\n\
+		if (abs(line_2_dir.x) < zero)\n\
+		{\n\
+			// \"line\" is vertical.\n\
+			float mySlope = line_1_dir.y / line_1_dir.x;\n\
+			float myB = line_1_pos.y - mySlope * line_1_pos.x;\n\
+			intersectX = line_2_pos.x;\n\
+			intersectY = intersectX * mySlope + myB;\n\
+			bIntersection = true;\n\
+		}\n\
+		else \n\
+		{\n\
+			float mySlope = line_1_dir.y / line_1_dir.x;\n\
+			float myB = line_1_pos.y - mySlope * line_1_pos.x;\n\
+			\n\
+			float slope = line_2_dir.y / line_2_dir.x;\n\
+			float b = line_2_pos.y - slope * line_2_pos.x;\n\
+			\n\
+			intersectX = (myB - b)/ (slope - mySlope);\n\
+			intersectY = slope * intersectX + b;\n\
+			bIntersection = true;\n\
+		}\n\
+	}\n\
+\n\
+	intersectionPoint2d.x = intersectX;\n\
+	intersectionPoint2d.y = intersectY;\n\
+\n\
+	return bIntersection;\n\
+}\n\
+\n\
+vec2 getProjectedPoint2dToLine(in vec2 line_point, in vec2 line_dir, in vec2 point)\n\
+{\n\
+	bool intersection = false;\n\
+\n\
+	// create a perpendicular left line.***\n\
+	vec2 lineLeft_dir = vec2(-line_dir.y, line_dir.x);\n\
+	vec2 lineLeft_point = vec2(point.x, point.y);\n\
+	vec2 projectedPoint = vec2(0);\n\
+	intersection = intersectionLineToLine(line_point, line_dir, lineLeft_point, lineLeft_dir, projectedPoint);\n\
+\n\
+	return projectedPoint;\n\
+}\n\
+\n\
+int getRelativePositionOfPointToLine(in vec2 line_pos, in vec2 line_dir, vec2 point)\n\
+{\n\
+	// 0 = coincident. 1= left side. 2= right side.***\n\
+	int relPos = -1;\n\
+\n\
+	vec2 projectedPoint = getProjectedPoint2dToLine(line_pos, line_dir, point );\n\
+	float dist = length(point - projectedPoint);\n\
+\n\
+	if(dist < 1E-8)\n\
+	{\n\
+		relPos = 0; // the point is coincident to line.***\n\
+		return relPos;\n\
+	}\n\
+\n\
+	vec2 myVector = normalize(point - projectedPoint);\n\
+	vec2 lineLeft_dir = vec2(-line_dir.y, line_dir.x);\n\
+\n\
+	float dotProd = dot(lineLeft_dir, myVector);\n\
+\n\
+	if(dotProd > 0.0)\n\
+	{\n\
+		relPos = 1; // is in left side of the line.***\n\
+	}\n\
+	else\n\
+	{\n\
+		relPos = 2; // is in right side of the line.***\n\
+	}\n\
+\n\
+	return relPos;\n\
+}\n\
+\n\
+bool isPointInsideLimitationConvexPolygon(in vec2 point2d)\n\
+{\n\
+	bool isInside = true;\n\
+\n\
+	// Check polygons.***\n\
+	int startIdx = -1;\n\
+	int endIdx = -1;\n\
+	for(int i=0; i<32; i++)\n\
+	{\n\
+		startIdx = clippingConvexPolygon2dPointsIndices[2*i];  // 0\n\
+		endIdx = clippingConvexPolygon2dPointsIndices[2*i+1];	 // 3\n\
+\n\
+		if(startIdx < 0 || endIdx < 0)\n\
+		break;\n\
+\n\
+		isInside  = true;\n\
+		\n\
+		isInside = true;\n\
+		vec2 pointStart = clippingPolygon2dPoints[0];\n\
+		for(int j=0; j<32; j++)\n\
+		{\n\
+			if(j > endIdx)\n\
+			break;\n\
+\n\
+			if(j == startIdx)\n\
+				pointStart = clippingPolygon2dPoints[j];\n\
+\n\
+			if(j >= startIdx && j<endIdx)\n\
+			{\n\
+				vec2 point0;\n\
+				vec2 point1;\n\
+				\n\
+				if(j == endIdx)\n\
+				{\n\
+					point0 = clippingPolygon2dPoints[j];\n\
+					point1 = pointStart;\n\
+				}\n\
+				else\n\
+				{\n\
+					point0 = clippingPolygon2dPoints[j];\n\
+					point1 = clippingPolygon2dPoints[j+1];\n\
+				}\n\
+\n\
+				// create the line of the segment.***\n\
+				vec2 dir = getDirection2d(point0, point1);\n\
+\n\
+				// now, check the relative position of the point with the edge line.***\n\
+				int relPos = getRelativePositionOfPointToLine(point0, dir, point2d);\n\
+				if(relPos == 2)\n\
+				{\n\
+					// the point is in the right side of the edge line, so is out of the polygon.***\n\
+					isInside = false;\n\
+					break;\n\
+				}\n\
+			}\n\
+\n\
+		}\n\
+		\n\
+\n\
+		if(isInside)\n\
+		return true;\n\
+\n\
+	}\n\
+\n\
+	return isInside;\n\
+}\n\
+\n\
+\n\
+void main()\n\
+{\n\
+	if(clippingType == 2)\n\
+	{\n\
+		// clip by limitationPolygon.***\n\
+		vec2 pointLC = vec2(vertexPosLC.x, vertexPosLC.y);\n\
+		if(!isPointInsideLimitationConvexPolygon(pointLC))\n\
+		{\n\
+			gl_FragData[0] = limitationInfringedColor4; \n\
+			return;\n\
+		}\n\
+	}\n\
+	else if(clippingType == 3)\n\
+	{\n\
+		// check limitation heights.***\n\
+		if(vertexPosLC.z < limitationHeights.x || vertexPosLC.z > limitationHeights.y)\n\
+		{\n\
+			gl_FragData[0] = limitationInfringedColor4; \n\
+			return;\n\
+		}\n\
+	}\n\
+	else if(clippingType == 4)\n\
+	{\n\
+		// clip by limitationPolygon & heights.***\n\
+		vec2 pointLC = vec2(vertexPosLC.x, vertexPosLC.y);\n\
+		if(!isPointInsideLimitationConvexPolygon(pointLC))\n\
+		{\n\
+			gl_FragData[0] = limitationInfringedColor4; \n\
+			return;\n\
+		}\n\
+		if(vertexPosLC.z < limitationHeights.x || vertexPosLC.z > limitationHeights.y)\n\
+		{\n\
+			gl_FragData[0] = limitationInfringedColor4; \n\
+			return;\n\
+		}\n\
+	}\n\
+\n\
+	// Check if clipping.********************************************\n\
+	\n\
+	if(bApplyClippingPlanes)\n\
+	{\n\
+		bool discardFrag = false;\n\
+		for(int i=0; i<6; i++)\n\
+		{\n\
+			vec4 plane = clippingPlanes[i];\n\
+			\n\
+			// calculate any point of the plane.\n\
+			if(!clipVertexByPlane(plane, vertexPos))\n\
+			{\n\
+				discardFrag = false; // false.\n\
+				break;\n\
+			}\n\
+			if(i >= clippingPlanesCount)\n\
+			break;\n\
+		}\n\
+		\n\
+	}\n\
+	\n\
+	//----------------------------------------------------------------\n\
+	\n\
+	float depthAux = depth;\n\
+\n\
+	#ifdef USE_LOGARITHMIC_DEPTH\n\
+	if(bUseLogarithmicDepth)\n\
+	{\n\
+		gl_FragDepthEXT = log2(flogz) * Fcoef_half;\n\
+		depthAux = gl_FragDepthEXT; \n\
+	}\n\
+	#endif\n\
+\n\
+	//u_outputTarget; // 0 = depth, 1= normal, 2= albedo, 3= selColor.***\n\
+	if(u_outputTarget == 0)\n\
+	{\n\
+		gl_FragData[0] = packDepth(depthAux); \n\
+	}\n\
+	else if(u_outputTarget == 1)\n\
+	{\n\
+		float frustumIdx = 1.0;\n\
+		if(uFrustumIdx == 0)\n\
+		frustumIdx = 0.005;\n\
+		else if(uFrustumIdx == 1)\n\
+		frustumIdx = 0.015;\n\
+		else if(uFrustumIdx == 2)\n\
+		frustumIdx = 0.025;\n\
+		else if(uFrustumIdx == 3)\n\
+		frustumIdx = 0.035;\n\
+\n\
+		vec3 normal = vNormal;\n\
+\n\
+		vec3 encodedNormal = encodeNormal(normal);\n\
+		gl_FragData[0] = vec4(encodedNormal, frustumIdx); // save normal.***\n\
+	}\n\
+	else if(u_outputTarget == 2)\n\
+	{\n\
+		vec4 textureColor;\n\
+		if(colorType == 2)\n\
+		{\n\
+			if(textureFlipYAxis)\n\
+			{\n\
+				textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));\n\
+				\n\
+			}\n\
+			else{\n\
+				textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));\n\
+			}\n\
+			\n\
+			if(textureColor.w == 0.0)\n\
+			{\n\
+				discard;\n\
+			}\n\
+		}\n\
+		else if(colorType == 0)\n\
+		{\n\
+			textureColor = oneColor4;\n\
+		}\n\
+		else if(colorType == 1)\n\
+		{\n\
+			textureColor = vColor4;\n\
+		}\n\
+\n\
+		vec4 albedo4 = vec4(textureColor.xyz, 1.0);\n\
+		gl_FragData[0] = albedo4; // anything.\n\
+	}\n\
+	else if(u_outputTarget == 3)\n\
+	{\n\
+		gl_FragData[0] = uSelColor4; \n\
+	}\n\
 	\n\
 }";
 ShaderSource.GBufferVS = "\n\
@@ -3266,8 +3662,7 @@ ShaderSource.ModelRefSsaoFS = "#ifdef GL_ES\n\
 #endif\n\
 \n\
 \n\
-uniform sampler2D depthTex;\n\
-uniform sampler2D noiseTex;  \n\
+uniform sampler2D depthTex; \n\
 uniform sampler2D diffuseTex;\n\
 uniform sampler2D shadowMapTex;\n\
 uniform sampler2D shadowMapTex2;\n\
@@ -3891,7 +4286,6 @@ void main()\n\
     gl_FragData[0] = finalColor; \n\
 \n\
 	#ifdef USE_MULTI_RENDER_TARGET\n\
-	//if(bUseMultiRenderTarget)\n\
 	{\n\
 		// save depth, normal, albedo.\n\
 		float depthAux = vDepth;\n\
@@ -5151,8 +5545,8 @@ void main()\n\
     }\n\
     else if(uTextureType == 1)\n\
     {\n\
-         textureColor = textureCube(texture_cube, v_normal);\n\
-         float linearDepth = unpackDepth(textureColor); // original.\n\
+        textureColor = textureCube(texture_cube, v_normal);\n\
+        float linearDepth = unpackDepth(textureColor); // original.\n\
         textureColor = vec4(linearDepth, linearDepth, linearDepth, 1.0);\n\
     }\n\
     \n\
@@ -5408,9 +5802,7 @@ void main()\n\
 		vTexCoord = texCoord;\n\
 	}\n\
 }";
-ShaderSource.ScreenCopyQuadFS = "#ifdef GL_ES\n\
-    precision highp float;\n\
-#endif\n\
+ShaderSource.ScreenCopyQuadFS = "\n\
 \n\
 #define M_PI 3.1415926535897932384626433832795\n\
 \n\
@@ -5423,6 +5815,10 @@ ShaderSource.ScreenCopyQuadFS = "#ifdef GL_ES\n\
 #ifdef USE_MULTI_RENDER_TARGET\n\
 #extension GL_EXT_draw_buffers : require\n\
 #endif\n\
+\n\
+//#ifdef GL_ES\n\
+    precision highp float;\n\
+//#endif\n\
 \n\
 uniform sampler2D depthTex; // 0\n\
 uniform sampler2D normalTex; // 1\n\
@@ -5440,6 +5836,12 @@ uniform float far; \n\
 uniform float screenWidth;    \n\
 uniform float screenHeight;  \n\
 uniform int uFrustumIdx;\n\
+\n\
+// This shader is used only to copy depth, normal  or albedo of Cesium.***\n\
+// A uniform to use if is NO MRT.***************************************************\n\
+// If we are in NO MRT, then, must choose what type of texture we are going to copy:\n\
+uniform int u_textureTypeToCopy; // 0 = depth. 1 = normal. 2 = color.\n\
+//----------------------------------------------------------------------------------\n\
 \n\
 vec4 packDepth( float v ) {\n\
   vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
@@ -5472,38 +5874,16 @@ vec3 encodeNormal(in vec3 normal)\n\
 	return normal*0.5 + 0.5;\n\
 } \n\
 \n\
-\n\
-\n\
-void main()\n\
+float getDepthFrom_ZWindow(float zWindow, vec2 screenPos, inout vec4 posWC)\n\
 {\n\
-	vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
-	vec4 albedo = texture2D(albedoTex, screenPos.xy);\n\
-	// in this case, do not other process.\n\
-	// 1rst, calculate the pixelPosWC.\n\
-	vec4 depthColor4 = texture2D(depthTex, screenPos.xy);\n\
-	float z_window  = unpackDepth(depthColor4); // z_window  is [-1.0, 1.0] range depth.\n\
-\n\
-\n\
-	if(z_window >= 1.0)\n\
-	{\n\
-		discard;\n\
-	}\n\
-\n\
-	if(z_window <= 0.0 && uFrustumIdx < 2)\n\
-	{\n\
-		// frustum =2 & 3 -> renders sky, so dont discard.\n\
-		discard;\n\
-	}\n\
-	\n\
 	float depth = 0.0;\n\
-	vec4 posWC = vec4(1.0, 1.0, 1.0, 1.0);\n\
 \n\
 	// https://stackoverflow.com/questions/11277501/how-to-recover-view-space-position-given-view-space-depth-value-and-ndc-xy\n\
 	float depthRange_near = 0.0;\n\
 	float depthRange_far = 1.0;\n\
 	float x_ndc = 2.0 * screenPos.x - 1.0;\n\
 	float y_ndc = 2.0 * screenPos.y - 1.0;\n\
-	float z_ndc = (2.0 * z_window - depthRange_near - depthRange_far) / (depthRange_far - depthRange_near);\n\
+	float z_ndc = (2.0 * zWindow - depthRange_near - depthRange_far) / (depthRange_far - depthRange_near);\n\
 	// Note: NDC range = (-1,-1,-1) to (1,1,1).***\n\
 	\n\
 	vec4 viewPosH = projectionMatrixInv * vec4(x_ndc, y_ndc, z_ndc, 1.0);\n\
@@ -5512,16 +5892,39 @@ void main()\n\
 	//------------------------------------------------------------------------------------------------------------------------------\n\
 \n\
 	depth = -posCC.z/far;\n\
-	gl_FragData[0] = packDepth(depth); // depth.\n\
-	\n\
 \n\
-	#ifdef USE_GL_EXT_FRAGDEPTH\n\
-		//gl_FragDepthEXT = z_window;\n\
-	#endif\n\
+	return depth;\n\
+}\n\
 \n\
-	// Now, save the albedo.\n\
+void main()\n\
+{\n\
+	vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
+\n\
 	#ifdef USE_MULTI_RENDER_TARGET\n\
 \n\
+		vec4 albedo = texture2D(albedoTex, screenPos.xy);\n\
+		// in this case, do not other process.\n\
+		// 1rst, calculate the pixelPosWC.\n\
+		vec4 depthColor4 = texture2D(depthTex, screenPos.xy);\n\
+		float z_window  = unpackDepth(depthColor4); // z_window  is [-1.0, 1.0] range depth.\n\
+\n\
+		if(z_window >= 1.0) {\n\
+			discard;\n\
+		}\n\
+\n\
+		if(z_window <= 0.0 && uFrustumIdx < 2) {\n\
+			// frustum =2 & 3 -> renders sky, so dont discard.\n\
+			discard;\n\
+		}\n\
+\n\
+		vec4 posWC;\n\
+		float depth = getDepthFrom_ZWindow(z_window, screenPos, posWC);\n\
+		gl_FragData[0] = packDepth(depth); // depth.\n\
+		\n\
+\n\
+		//#ifdef USE_GL_EXT_FRAGDEPTH\n\
+			//gl_FragDepthEXT = z_window;\n\
+		//#endif\n\
 		float frustumIdx = 1.0;\n\
 		if(uFrustumIdx == 0)\n\
 		frustumIdx = 0.105;\n\
@@ -5545,7 +5948,77 @@ void main()\n\
 			gl_FragData[1] = vec4(encodedNormal, frustumIdx); // save normal.***\n\
 		}\n\
 \n\
+		// Now, save the albedo.\n\
 		gl_FragData[2] = albedo; // copy albedo.\n\
+	\n\
+	#else\n\
+		// We are in ORT (one rendering target).\n\
+		if(u_textureTypeToCopy == 0)\n\
+		{\n\
+			// Depth.***\n\
+			vec4 depthColor4 = texture2D(depthTex, screenPos.xy);\n\
+			float z_window  = unpackDepth(depthColor4); // z_window  is [-1.0, 1.0] range depth.\n\
+\n\
+			if(z_window >= 1.0) {\n\
+				discard;\n\
+			}\n\
+\n\
+			if(z_window <= 0.0 && uFrustumIdx < 2) {\n\
+				// frustum =2 & 3 -> renders sky, so dont discard.\n\
+				discard;\n\
+			}\n\
+\n\
+			vec4 posWC;\n\
+			float depth = getDepthFrom_ZWindow(z_window, screenPos, posWC);\n\
+			gl_FragData[0] = packDepth(depth); // depth.\n\
+		}\n\
+		else if ( u_textureTypeToCopy == 1)\n\
+		{\n\
+			vec4 depthColor4 = texture2D(depthTex, screenPos.xy);\n\
+			float z_window  = unpackDepth(depthColor4); // z_window  is [-1.0, 1.0] range depth.\n\
+\n\
+			if(z_window >= 1.0) {\n\
+				discard;\n\
+			}\n\
+\n\
+			if(z_window <= 0.0 && uFrustumIdx < 2) {\n\
+				// frustum =2 & 3 -> renders sky, so dont discard.\n\
+				discard;\n\
+			}\n\
+\n\
+			vec4 posWC;\n\
+			float depth = getDepthFrom_ZWindow(z_window, screenPos, posWC);\n\
+			\n\
+			// Normal.***\n\
+			float frustumIdx = 1.0;\n\
+			if(uFrustumIdx == 0)\n\
+			frustumIdx = 0.105;\n\
+			else if(uFrustumIdx == 1)\n\
+			frustumIdx = 0.115;\n\
+			else if(uFrustumIdx == 2)\n\
+			frustumIdx = 0.125;\n\
+			else if(uFrustumIdx == 3)\n\
+			frustumIdx = 0.135;\n\
+\n\
+			if(z_window > 0.0)\n\
+			{\n\
+				vec4 normal4WC = vec4(normalize(posWC.xyz), 1.0);\n\
+				vec4 normal4 = normalMatrix4 * normal4WC;\n\
+				vec3 encodedNormal = encodeNormal(normal4.xyz);\n\
+				gl_FragData[0] = vec4(encodedNormal, frustumIdx); // save normal.***\n\
+			}\n\
+			else\n\
+			{\n\
+				vec3 encodedNormal = encodeNormal(vec3(0.0, 0.0, 1.0));\n\
+				gl_FragData[0] = vec4(encodedNormal, frustumIdx); // save normal.***\n\
+			}\n\
+		}\n\
+		else if(u_textureTypeToCopy == 2)\n\
+		{\n\
+			// Albedo.***\n\
+			vec4 albedo = texture2D(albedoTex, screenPos.xy);\n\
+			gl_FragData[0] = albedo;\n\
+		}\n\
 		\n\
 	#endif\n\
 \n\
@@ -5933,7 +6406,7 @@ void main()\n\
         alpha = 0.6;\n\
         \n\
         vec4 finalColor = mix(shadedColor, lightFog4, alpha);\n\
-        gl_FragColor = finalColor;\n\
+        gl_FragColor = finalColor; // original.***\n\
     }\n\
     \n\
 }";
@@ -6716,7 +7189,7 @@ void main()\n\
 		\n\
 	}\n\
 }";
-ShaderSource.ScreenQuadVS = "precision mediump float;\n\
+ShaderSource.ScreenQuadVS = "//precision mediump float;\n\
 \n\
 attribute vec2 position;\n\
 varying vec4 vColor; \n\
@@ -7387,6 +7860,66 @@ void main()\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 }\n\
 ";
+ShaderSource.textureCopyFS = "//#version 300 es\n\
+\n\
+#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+uniform sampler2D texToCopy;\n\
+uniform bool u_textureFlipXAxis;\n\
+uniform bool u_textureFlipYAxis;\n\
+varying vec2 v_tex_pos;\n\
+\n\
+void main()\n\
+{\n\
+    vec4 finalCol4;\n\
+    float texCoordX, texCoordY;\n\
+    if(u_textureFlipYAxis)\n\
+    {\n\
+        texCoordY =  1.0 - v_tex_pos.y;\n\
+    }\n\
+    else\n\
+    {\n\
+        texCoordY =  v_tex_pos.y;\n\
+    }\n\
+\n\
+    if(u_textureFlipXAxis)\n\
+    {\n\
+        texCoordX =  1.0 - v_tex_pos.x;\n\
+    }\n\
+    else\n\
+    {\n\
+        texCoordX =  v_tex_pos.x;\n\
+    }\n\
+    \n\
+    finalCol4 = texture2D(texToCopy, vec2(texCoordX, texCoordY));\n\
+    gl_FragData[0] = finalCol4;  // anything.\n\
+\n\
+    #ifdef USE_MULTI_RENDER_TARGET\n\
+        gl_FragData[1] = finalCol4; // depth\n\
+        gl_FragData[2] = finalCol4; // normal\n\
+        gl_FragData[3] = finalCol4; // albedo\n\
+        gl_FragData[4] = finalCol4; // selection color\n\
+    #endif\n\
+\n\
+}";
+ShaderSource.textureCopyVS = "//precision mediump float;\n\
+\n\
+attribute vec2 position;\n\
+varying vec4 vColor; \n\
+varying vec2 v_tex_pos;\n\
+\n\
+void main() {\n\
+	vColor = vec4(0.2, 0.2, 0.2, 0.5);\n\
+    gl_Position = vec4(1.0 - 2.0 * position, 0.0, 1.0);\n\
+    v_tex_pos = position;\n\
+}";
 ShaderSource.TextureFS = "precision mediump float;\n\
 varying vec4 vColor;\n\
 varying vec2 vTextureCoord;\n\

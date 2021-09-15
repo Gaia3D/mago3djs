@@ -503,7 +503,7 @@ WeatherStation.prototype.renderDust3D = function(magoManager)
 	return;
 };
 
-WeatherStation.prototype.renderWind3D = function(magoManager)
+WeatherStation.prototype.renderWind3D = function (magoManager)
 {
 	// StreamLines wind version.***
 	if (magoManager.currentFrustumIdx > 2)

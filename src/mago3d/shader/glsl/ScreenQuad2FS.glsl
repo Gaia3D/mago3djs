@@ -379,7 +379,7 @@ void main()
         alpha = 0.6;
         
         vec4 finalColor = mix(shadedColor, lightFog4, alpha);
-        gl_FragColor = finalColor;
+        gl_FragColor = finalColor; // original.***
     }
     
 }

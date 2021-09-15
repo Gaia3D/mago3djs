@@ -108,7 +108,7 @@ PostFxShadersManager.prototype._get_useLinearOrLogarithmicDepth_string = functio
 	return "USE_LINEAR_DEPTH";
 };
 
-PostFxShadersManager.prototype._createShader_gBuffer = function() 
+PostFxShadersManager.prototype._createShader_gBuffer = function () 
 {
 	var use_linearOrLogarithmicDepth = this._get_useLinearOrLogarithmicDepth_string();
 	var use_multi_render_target = this._get_useMultiRenderTarget_string();
@@ -126,6 +126,29 @@ PostFxShadersManager.prototype._createShader_gBuffer = function()
 	shader.uFrustumIdx_loc = gl.getUniformLocation(shader.program, "uFrustumIdx");
 	shader.bUseMultiRenderTarget_loc = gl.getUniformLocation(shader.program, "bUseMultiRenderTarget");
 	shader.uSelColor4_loc = gl.getUniformLocation(shader.program, "uSelColor4");
+
+	this.shadersMap[shaderName] = shader;
+	return shader;
+};
+
+PostFxShadersManager.prototype._createShader_gBufferORT = function () 
+{
+	var use_linearOrLogarithmicDepth = this._get_useLinearOrLogarithmicDepth_string();
+	// Note : here, there is no multi render target.***
+	var gl = this.gl;
+
+	// Hard code.***
+	var shaderName = "gBufferORT";
+	var ssao_vs_source = ShaderSource.GBufferVS;
+	var ssao_fs_source = ShaderSource.GBufferORTFS;
+	ssao_fs_source = ssao_fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
+	var shader = this.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this.magoManager);
+	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
+	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
+	shader.uFrustumIdx_loc = gl.getUniformLocation(shader.program, "uFrustumIdx");
+	shader.bUseMultiRenderTarget_loc = gl.getUniformLocation(shader.program, "bUseMultiRenderTarget");
+	shader.uSelColor4_loc = gl.getUniformLocation(shader.program, "uSelColor4");
+	shader.u_outputTarget_loc = gl.getUniformLocation(shader.program, "u_outputTarget");
 
 	this.shadersMap[shaderName] = shader;
 	return shader;
@@ -204,7 +227,7 @@ PostFxShadersManager.prototype._createShader_screenQuad = function()
 	return shader;
 };
 
-PostFxShadersManager.prototype._createShader_screenCopyQuad = function() 
+PostFxShadersManager.prototype._createShader_screenCopyQuad = function () 
 {
 	var use_linearOrLogarithmicDepth = this._get_useLinearOrLogarithmicDepth_string();
 	var use_multi_render_target = this._get_useMultiRenderTarget_string();
@@ -216,22 +239,13 @@ PostFxShadersManager.prototype._createShader_screenCopyQuad = function()
 	ssao_fs_source = ssao_fs_source.replace(/%USE_GL_EXT_FRAGDEPTH%/g, "USE_GL_EXT_FRAGDEPTH"); // only in this shader use extension GL_EXT_frag_depth.
 	ssao_fs_source = ssao_fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
 	var shader = this.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this.magoManager);
-	shader.ssaoTex_loc = gl.getUniformLocation(shader.program, "ssaoTex");
-	shader.normalTex_loc = gl.getUniformLocation(shader.program, "normalTex");
-	shader.albedoTex_loc = gl.getUniformLocation(shader.program, "albedoTex");
-	shader.silhouetteDepthTex_loc = gl.getUniformLocation(shader.program, "silhouetteDepthTex");
-	shader.diffuseLightTex_loc = gl.getUniformLocation(shader.program, "diffuseLightTex");
-	shader.specularLightTex_loc = gl.getUniformLocation(shader.program, "specularLightTex");
-	//diffuseLightTex; 
-	//specularLightTex; 
-	//albedoTex
+	shader.albedoTex_loc = gl.getUniformLocation(shader.program, "albedoTex");//
+	shader.u_textureTypeToCopy_loc = gl.getUniformLocation(shader.program, "u_textureTypeToCopy");
+
 	this.useProgram(shader);
-	gl.uniform1i(shader.ssaoTex_loc, 5);
 	gl.uniform1i(shader.normalTex_loc, 1);
 	gl.uniform1i(shader.albedoTex_loc, 2);
-	gl.uniform1i(shader.diffuseLightTex_loc, 6);
-	gl.uniform1i(shader.specularLightTex_loc, 7);
-	gl.uniform1i(shader.silhouetteDepthTex_loc, 8);
+
 	shader.uNearFarArray_loc = gl.getUniformLocation(shader.program, "uNearFarArray");
 	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
 	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
@@ -770,6 +784,28 @@ PostFxShadersManager.prototype._createShader_texturesMerger = function()
 	return shader;
 };
 
+PostFxShadersManager.prototype._createShader_copyTexture = function() 
+{
+	var use_multi_render_target = this._get_useMultiRenderTarget_string();
+	var gl = this.gl;
+
+	var shaderName = "textureCopy";
+	var ssao_vs_source = ShaderSource.textureCopyVS;
+	var ssao_fs_source = ShaderSource.textureCopyFS;
+	ssao_fs_source = ssao_fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
+	var shader = this.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this.magoManager);
+	shader.position2_loc = gl.getAttribLocation(shader.program, "position");
+	shader.texToCopy_loc = gl.getUniformLocation(shader.program, "texToCopy");
+	shader.u_textureFlipYAxis_loc = gl.getUniformLocation(shader.program, "u_textureFlipYAxis");
+	shader.u_textureFlipXAxis_loc = gl.getUniformLocation(shader.program, "u_textureFlipXAxis");
+
+	this.useProgram(shader);
+	gl.uniform1i(shader.texToCopy_loc, 0);
+
+	this.shadersMap[shaderName] = shader;
+	return shader;
+};
+
 PostFxShadersManager.prototype._createShader_rectangleScreen = function() 
 {
 	var use_linearOrLogarithmicDepth = this._get_useLinearOrLogarithmicDepth_string();
@@ -870,7 +906,7 @@ PostFxShadersManager.prototype._createShader_groundStencilPrimitives = function(
 	return shader;
 };
 
-PostFxShadersManager.prototype._createShaderByName = function(shaderName) 
+PostFxShadersManager.prototype._createShaderByName = function (shaderName) 
 {
 	// Hard code.***
 	switch (shaderName)
@@ -878,8 +914,8 @@ PostFxShadersManager.prototype._createShaderByName = function(shaderName)
 	case "gBuffer":
 		this._createShader_gBuffer();
 		break;
-	case  "gBuffer":
-		this._createShader_gBuffer();
+	case  "gBufferORT":
+		this._createShader_gBufferORT();
 		break;
 	case  "lBuffer":
 		this._createShader_lBuffer();
@@ -955,6 +991,9 @@ PostFxShadersManager.prototype._createShaderByName = function(shaderName)
 		break;
 	case  "groundStencilPrimitives":
 		this._createShader_groundStencilPrimitives();
+		break;
+	case "textureCopy":
+		this._createShader_copyTexture();
 		break;
 	}
 
@@ -1144,9 +1183,12 @@ PostFxShadersManager.prototype.createSilhouetteShaderModelRef = function(gl)
  */
 PostFxShadersManager.prototype.createDustParticlesShader = function (gl) 
 {
-	var use_multi_render_target = "NO_USE_MULTI_RENDER_TARGET";
-	this.bUseMultiRenderTarget = true;
-	use_multi_render_target = "USE_MULTI_RENDER_TARGET";
+	//var use_multi_render_target = "NO_USE_MULTI_RENDER_TARGET";
+	//this.bUseMultiRenderTarget = true;
+	//use_multi_render_target = "USE_MULTI_RENDER_TARGET";
+
+	//var use_linearOrLogarithmicDepth = this._get_useLinearOrLogarithmicDepth_string();
+	var use_multi_render_target = this._get_useMultiRenderTarget_string();
 
 	var supportEXT = gl.getSupportedExtensions().indexOf("WEBGL_draw_buffers");
 	if (supportEXT > -1)
@@ -1234,9 +1276,11 @@ PostFxShadersManager.prototype.createDustParticlesShader = function (gl)
  */
 PostFxShadersManager.prototype.createDustTextureModeShader = function (gl) 
 {
-	var use_multi_render_target = "NO_USE_MULTI_RENDER_TARGET";
-	this.bUseMultiRenderTarget = true;
-	use_multi_render_target = "USE_MULTI_RENDER_TARGET";
+	//var use_multi_render_target = "NO_USE_MULTI_RENDER_TARGET";
+	//this.bUseMultiRenderTarget = true;
+	//use_multi_render_target = "USE_MULTI_RENDER_TARGET";
+
+	var use_multi_render_target = this._get_useMultiRenderTarget_string();
 
 	var supportEXT = gl.getSupportedExtensions().indexOf("WEBGL_draw_buffers");
 	if (supportEXT > -1)

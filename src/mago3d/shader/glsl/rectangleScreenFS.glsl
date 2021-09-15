@@ -161,8 +161,8 @@ void main()
     }
     else if(uTextureType == 1)
     {
-         textureColor = textureCube(texture_cube, v_normal);
-         float linearDepth = unpackDepth(textureColor); // original.
+        textureColor = textureCube(texture_cube, v_normal);
+        float linearDepth = unpackDepth(textureColor); // original.
         textureColor = vec4(linearDepth, linearDepth, linearDepth, 1.0);
     }
     

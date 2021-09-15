@@ -1627,32 +1627,29 @@ MagoManager.prototype.getTexturesManager = function ()
 	{
 		var gl = this.getGl();
 
+		var bufferWidth = this.sceneState.drawingBufferWidth[0];
+		var bufferHeight = this.sceneState.drawingBufferHeight[0];
+
 		// 1rst, Create a simpleFramebufferAux.***
-		if (this.framebufferAux === undefined) { this.framebufferAux = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
+		if (this.framebufferAux === undefined) { this.framebufferAux = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true}); }
 
 		// Now, create the texturesMerger.***
 		this.texturesManager = new TexturesManager(this);
-		var bufferWidth = this.sceneState.drawingBufferWidth[0];
-		var bufferHeight = this.sceneState.drawingBufferHeight[0];
 		var bUseMultiRenderTarget = this.postFxShadersManager.bUseMultiRenderTarget;
 		this.texturesManager.texturesMergerFbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget: bUseMultiRenderTarget, numColorBuffers: 5}); 
+
+		this.depthTex = this.texturesManager.texturesMergerFbo.colorBuffersArray[0];
+		this.normalTex = this.texturesManager.texturesMergerFbo.colorBuffersArray[1];
+		this.albedoTex = this.texturesManager.texturesMergerFbo.colorBuffersArray[2];
+		this.selColorTex = this.texturesManager.texturesMergerFbo.colorBuffersArray[3];
 	}
 
 	return this.texturesManager;
 };
 
-/**
- * Main rendering function.
- * @private
- */
-MagoManager.prototype.doRender = function (frustumVolumenObject) 
+MagoManager.prototype.doRenderORT = function (frustumVolumenObject) 
 {
-	if (!this.isCesiumGlobe())
-	{
-		this.doRenderMagoWorld(frustumVolumenObject);
-		return;
-	}
-	
+	// This function render in ORT (one rendering target), for android devices.
 	var gl = this.getGl();
 	
 	// 1) The depth render.**********************************************************************************************************************
@@ -1709,7 +1706,340 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 	var selectionManager = this.selectionManager;
 	if (selectionManager.existSelectedObjects())
 	{
-		this.renderer.renderSilhouetteDepth(); // note: integrate this in the gBuffer. TODO:
+		// Render into "silhouetteDepthFbo".***
+		this.renderer.renderSilhouetteDepth(); 
+	}
+	
+	// Take the depFrameBufferObject of the current frustumVolume.***
+	// Create a simpleFramebufferAux.***
+	if (this.framebufferAux === undefined) { this.framebufferAux = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
+	if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
+	if (this.shadedColorFbo === undefined) { this.shadedColorFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
+	
+	
+	var texturesManager = this.getTexturesManager();
+	this.depthFboNeo = texturesManager.texturesMergerFbo;
+
+	this.depthTex = this.depthFboNeo.colorBuffersArray[0];
+	this.normalTex = this.depthFboNeo.colorBuffersArray[1];
+	this.albedoTex = this.depthFboNeo.colorBuffersArray[2];
+	this.selColorTex = this.depthFboNeo.colorBuffersArray[3];
+
+	var selFBO = this.getSelectionFBO();
+
+	// prev 2) ready to color frame buffer
+	this.postFxShadersManager.useProgram(null); // init current bind shader.***
+
+	var bApplyShadow = false;
+	if (this.sceneState.sunSystem !== undefined && this.sceneState.applySunShadows)
+	{ bApplyShadow = true; }
+
+	if (this.isCesiumGlobe())
+	{
+		var scene = this.scene;
+
+		// Test to copy terrain.******************************************************************************************
+		// Take cesium colorBuffer.**********************
+		scene._context._currentFramebuffer._bind();
+		this.cesiumColorBuffer = gl.getFramebufferAttachmentParameter(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.FRAMEBUFFER_ATTACHMENT_OBJECT_NAME);
+		// End taking cesium colorBuffer.-------------------
+
+		this.renderer.renderTerrainCopy(); // Here renders Depth, Normal & Albedo (renders 3 times).***
+	}
+	
+	
+	// 2) gBuffer render.*****************************************************************************************************************
+	renderType = 1;
+	this.renderType = 1;
+	gl.frontFace(gl.CCW);
+	this.renderer.renderGeometryBufferORT(gl, renderType, this.visibleObjControlerNodes);
+
+	if (this.weatherStation)
+	{
+		this.weatherStation.renderWeather(this);
+		
+	}
+
+	//if (this.waterManager) // OpaquesPass.***
+	//{
+	// Render terrain.***
+	//this.waterManager.renderTerrain();
+	//this.waterManager._TEST_renderQMesh();
+	//}
+
+	
+	// Render transparents.****************************************************************************************************************
+	if (this.isCesiumGlobe())
+	{
+		this.bindMainFramebuffer();
+	}
+
+	renderType = 1;
+	this.renderType = 1;
+	this.renderer.renderGeometryBufferTransparents(gl, renderType, this.visibleObjControlerNodes);
+
+	if (this.weatherStation)
+	{
+		this.weatherStation.renderWeatherTransparents(this);
+	}
+
+	if (this.waterManager) // TransparentPass.***
+	{
+		// 1rst, do objects intersection culling.
+		var visiblesArray = this.visibleObjControlerNodes.getAllVisibles();
+		var nativeVisiblesArray = this.visibleObjControlerNodes.getAllNatives();
+		this.waterManager.doIntersectedObjectsCulling(visiblesArray, nativeVisiblesArray);
+		this.waterManager.render();
+	}
+
+	if (this.soundManager) // TransparentPass.***
+	{
+		// do sound simulation.
+		this.soundManager.render();
+	};
+
+	// check if must render boundingBoxes.
+	if (this.magoPolicy.getShowBoundingBox())
+	{
+		var bRenderLines = true;
+		//var currentVisiblesArray = visibleObjControlerNodes.currentVisibles0.concat(visibleObjControlerNodes.currentVisibles2,);
+		var visibles0 = this.visibleObjControlerNodes.getOpaquesTransparentsByLod(0);
+		var visibles2 = this.visibleObjControlerNodes.getOpaquesTransparentsByLod(2);
+		var visibles3 = this.visibleObjControlerNodes.getOpaquesTransparentsByLod(3);
+		this.renderer.renderBoundingBoxesNodes(visibles0, undefined, bRenderLines);
+		this.renderer.renderBoundingBoxesNodes(visibles2, undefined, bRenderLines);
+		this.renderer.renderBoundingBoxesNodes(visibles3, undefined, bRenderLines);
+		this.renderer.renderBoundingBoxesNodes(this.visibleObjControlerNodes.currentVisiblesAux, undefined, bRenderLines);
+	}
+
+	// Once all frustums was rendered, then set the camera moved = false.*****************************
+	if (this.currentFrustumIdx === 0)
+	{
+		this.isCameraMoved = false;
+	}
+	//------------------------------------------------------------------------------------------------
+
+	// Finally do screenSpaceObjects render.
+	//this.renderer.renderScreenSpaceObjects(gl);
+
+	if (this.isCesiumGlobe())
+	{
+		this.bindMainFramebuffer();
+
+	}
+
+	// DEBUG.Render fisically lights sources.*************************************************************************
+	//this.renderer.renderNativeLightSources(renderType, this.visibleObjControlerNodes) ; // debug component.
+	//------------------------------------------------------------------------------------------------------
+	// End rendering transparents.----------------------------------------------------------------------------------------------------------
+
+	if (sceneState.applyLightsShadows)
+	{
+		// if exist lightSources, the store all lightSources of all frustums.
+		var lightSourcesArray = this.visibleObjControlerNodes.currentVisibleNativeObjects.lightSourcesArray;
+		if (!this.lightSourcesMap)
+		{ this.lightSourcesMap = {}; }
+
+		var lightCount = lightSourcesArray.length;
+		for (var i=0; i<lightCount; i++)
+		{
+			var light = lightSourcesArray[i];
+			var lightGuid = light._guid;
+			this.lightSourcesMap[lightGuid] = light;
+		}
+
+		if (this.currentFrustumIdx === 0) 
+		{
+			// now, make the lightSourcesArray.
+			if (!this.lightSourcesArray)
+			{ this.lightSourcesArray = []; }
+
+			// 1rst, init the array.
+			this.lightSourcesArray.length = 0;
+
+			for (var key in this.lightSourcesMap)
+			{
+				if (this.lightSourcesMap.hasOwnProperty(key))
+				{
+					this.lightSourcesArray.push(this.lightSourcesMap[key]);
+				}
+			}
+
+			// finally init the lightSourcesMap.
+			this.lightSourcesMap = {};
+		}
+	}
+	
+	// 1.1) ssao and other effects from depthBuffer render.*****************************************************************************
+	if (this.currentFrustumIdx === 0) 
+	{
+		// Render the lightBuffer.*****************************************
+		if (sceneState.applyLightsShadows)
+		{
+			// Create lightBufferFBO if no exist.
+			if (!this.texturesManager.lBuffer)
+			{
+				// create a lBuffer with 2 colorTextures : diffuseLighting & specularLighting.
+				var bufferWidth = this.sceneState.drawingBufferWidth[0];
+				var bufferHeight = this.sceneState.drawingBufferHeight[0];
+				var bUseMultiRenderTarget = this.postFxShadersManager.bUseMultiRenderTarget;
+				this.texturesManager.lBuffer = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget: bUseMultiRenderTarget, numColorBuffers: 3}); 
+			}
+
+			this.lBuffer = this.texturesManager.lBuffer;
+			this.diffuseLightTex = this.lBuffer.colorBuffersArray[0];
+			this.specularLightTex = this.lBuffer.colorBuffersArray[1];
+			this.LightFogTex = this.lBuffer.colorBuffersArray[2];
+			
+			// Render the lightBuffer.
+			this.renderer.renderLightDepthCubeMaps(this.lightSourcesArray); // active this code for shadows.
+			this.renderer.renderLightBuffer(this.lightSourcesArray);
+			// End rendering lightBuffer.--------------------------------------------
+		}
+
+		// In ORT, must copy cesiumColorBuffer into this.albedoTex.***
+		var bTexFlipYAxis = true;
+		var bTexFlipXAxis = true;
+		this.renderer.copyTexture(this.cesiumColorBuffer, this.albedoTex, bTexFlipXAxis, bTexFlipYAxis);
+
+		// Do ssaoFromDepth render. Renders in ssaoFrameBuffer.***
+		this.renderer.renderSsaoFromDepth(gl);
+
+		// Final render output.**************************************************************
+		this.renderer.renderScreenQuad(gl); // 1rst screenQuad. (ssao, lighting, shadows) // this must be rendered in a framebuffer.***
+
+		if (this.isCesiumGlobe()) 
+		{
+			this.bindMainFramebuffer();
+		}
+		this.renderer.renderScreenQuad2(gl); // 2nd screenQuad. (lightFog)
+
+		this.renderCluster();
+
+		if (this.selectionManager)
+		{
+			if (this.selectionManager.existSelectedObjects())
+			{
+				this.renderer.renderSilhouette();
+			}
+		}
+
+	} 
+	
+	// Debug component.******************************************
+	/*
+	if (this.currentFrustumIdx === 0) 
+	{
+		if (scene && scene._context && scene._context._currentFramebuffer) 
+		{
+			this.bindMainFramebuffer();
+		}
+			
+		var lightAux;
+		if (lightsArray)
+		{
+			var lightsCount = lightsArray.length;
+			lightAux = lightsArray[lightsCount - 1];
+		}
+		var options = {
+			lightSource: lightAux
+		};
+			
+		this.renderer.renderScreenRectangle(gl, options); // debug component.
+	}
+	*/
+	//-----------------------------------------------------------
+
+	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
+		
+	this.swapRenderingFase();
+	/*
+	// Delete after test!!!!!!!!!!!!!!
+	if(!this.test_speechBubble)
+	{
+		this.objMarkerManager.TEST__ObjectMarker_toNeoReference();
+		this.test_speechBubble = true;
+	}
+	*/
+};
+
+/**
+ * Main rendering function.
+ * @private
+ */
+MagoManager.prototype.doRender = function (frustumVolumenObject) 
+{
+	if (!this.isCesiumGlobe())
+	{
+		this.doRenderMagoWorld(frustumVolumenObject);
+		return;
+	}
+
+	var bUseMultiRenderTarget = this.postFxShadersManager.bUseMultiRenderTarget;
+	if (!bUseMultiRenderTarget)
+	{
+		this.doRenderORT(frustumVolumenObject);
+		return;
+	}
+
+	var gl = this.getGl();
+	
+	// 1) The depth render.**********************************************************************************************************************
+	var renderType = 0; // 0= depth. 1= color.***
+	this.renderType = 0;
+	var sceneState = this.sceneState;
+
+	// 1.1) render sunDepth.
+	if (sceneState.applySunShadows && !this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
+	{
+		this.renderer.renderDepthSunSystem(this.visibleObjControlerNodes);
+		this.swapRenderingFase();
+	}
+	
+	var lightsArray = this.visibleObjControlerNodes.currentVisibleNativeObjects.lightSourcesArray;
+	var lightCount = lightsArray.length;
+	var currentTime = this.getCurrentTime();
+	if (lightCount > 0 && sceneState.applyLightsShadows && !this.isCameraMoving && !this.mouseLeftDown && !this.mouseMiddleDown)
+	{
+		// for each visible lightSources, make cubeMap depthTextures if no exist.
+		var visiblesArray = this.visibleObjControlerNodes.getAllVisibles();
+		var nativeVisiblesArray = this.visibleObjControlerNodes.getAllNatives();
+		var lightCullingsCount = 0;
+		for (var i=0; i<lightCount; i++)
+		{
+			var light = lightsArray[i];
+
+			if (!light.cullingUpdatedTime)
+			{ light.cullingUpdatedTime = 0; }
+			
+			if (currentTime !== light.cullingUpdatedTime) 
+			{
+				var timeDiffSec = (currentTime - light.cullingUpdatedTime)/1000.0;
+				if (timeDiffSec < 3)
+				{ continue; }
+
+				light.clearIntersectedObjects();
+			}
+
+			// In one frame, do only one intersectionCulling for lights.
+			if (light.doIntersectedObjectsCulling(visiblesArray, nativeVisiblesArray))
+			{
+				light.cullingUpdatedTime = currentTime;
+				lightCullingsCount ++;
+			}
+
+			if (lightCullingsCount > 0)
+			{ break; }
+		}
+	}
+	
+
+	// 1.2) render selected silhouetteDepth.
+	var selectionManager = this.selectionManager;
+	if (selectionManager.existSelectedObjects())
+	{
+		// Render into "silhouetteDepthFbo".***
+		this.renderer.renderSilhouetteDepth(); 
 	}
 	
 	// Take the depFrameBufferObject of the current frustumVolume.***
@@ -1718,7 +2048,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 	if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
 	if (this.shadedColorFbo === undefined) { this.shadedColorFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
 
-	var bUseMultiRenderTarget = this.postFxShadersManager.bUseMultiRenderTarget;
+	
 	
 	var texturesManager = this.getTexturesManager();
 	this.depthFboNeo = texturesManager.texturesMergerFbo;
@@ -1750,114 +2080,45 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		this.cesiumColorBuffer = gl.getFramebufferAttachmentParameter(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.FRAMEBUFFER_ATTACHMENT_OBJECT_NAME);
 		// End taking cesium colorBuffer.-------------------
 
-		this.texturesManager.texturesMergerFbo.bind();
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.depthTex, 0);
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.normalTex, 0);
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, this.albedoTex, 0);
-		
-
-		if (this.isCameraMoved || this.bPicking)
-		{
-			gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, this.selColorTex, 0);
-
-			this.extbuffers.drawBuffersWEBGL([
-				this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - depth
-				this.extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - normal
-				this.extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - albedo
-				this.extbuffers.COLOR_ATTACHMENT3_WEBGL  // gl_FragData[4] - selColor4
-			]);
-
-			if (this.isFarestFrustum()) 
-			{
-				this.selectionManager.clearCandidates();
-			}
-				
-		}
-		else
-		{
-			gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0);
-			this.extbuffers.drawBuffersWEBGL([
-				this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - depth
-				this.extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - normal
-				this.extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - albedo
-				this.extbuffers.NONE  // gl_FragData[4] - selColor4
-			]);
-		}
-
-		
-		if (this.isFarestFrustum())
-		{
-			gl.clearColor(1.0, 1.0, 1.0, 1.0);
-			gl.clearDepth(1.0);
-			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-			gl.clearColor(0, 0, 0, 1);
-
-			//this.selectionManager.clearCandidates();
-		}
-		else
-		{
-			gl.clear(gl.DEPTH_BUFFER_BIT);
-		}
-
-		this.extbuffers.drawBuffersWEBGL([
-			this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - depth
-			this.extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - normal
-			this.extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - albedo
-			this.extbuffers.NONE  // gl_FragData[4] - selColor4
-		]);
-		
 		this.renderer.renderTerrainCopy();
-
-		// Webgl android problems: GL_EXT_draw_buffers is not supported.:
-		// https://github.com/ptitSeb/gl4es/issues/278
-		// https://support.corellium.com/hc/en-us/articles/360017449974-Introduction-to-Android-Devices
-		// https://community.cesium.com/t/after-updating-the-last-chrome-version-75-i-cannot-use-cesium/8350 // About Cesium.***
-		// https://github.com/CesiumGS/cesium/issues/2448  // About Cesium.***
-		// https://stackoverflow.com/questions/68573364/enable-extension-and-fwidth-in-glsl // **************************************
-		// end test.---------------------------------------------------------------------------------------------------
 
 		if (scene && scene._context && scene._context._currentFramebuffer) 
 		{
 			this.bindMainFramebuffer();
-			
 			// MRT on cesium.**************************************************
 			if (!this.extbuffers)
 			{ this.extbuffers = gl.getExtension("WEBGL_draw_buffers"); }
 
+			var extbuffers = this.extbuffers;
+
+			gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.depthTex, 0);
+			gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, this.normalTex, 0);
+			gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, this.albedoTex, 0);
+			gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT4_WEBGL, gl.TEXTURE_2D, this.selColorTex, 0);
+
 			if (this.isCameraMoved)
 			{
 				// Attach the selColorBuffer.***
-				gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.depthTex, 0);
-				gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, this.normalTex, 0);
-				gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, this.albedoTex, 0);
-				gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT4_WEBGL, gl.TEXTURE_2D, this.selColorTex, 0);
-
-				this.extbuffers.drawBuffersWEBGL([
-					this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
-					this.extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - depthTex
-					this.extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - normalTex
-					this.extbuffers.COLOR_ATTACHMENT3_WEBGL, // gl_FragData[3] - albedoTex
-					this.extbuffers.COLOR_ATTACHMENT4_WEBGL // gl_FragData[4] - selColor4
+				extbuffers.drawBuffersWEBGL([
+					extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
+					extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - depthTex
+					extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - normalTex
+					extbuffers.COLOR_ATTACHMENT3_WEBGL, // gl_FragData[3] - albedoTex
+					extbuffers.COLOR_ATTACHMENT4_WEBGL // gl_FragData[4] - selColor4
 				]);
 			}
 			else
 			{
-				gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.depthTex, 0);
-				gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, this.normalTex, 0);
-				gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, this.albedoTex, 0);
-				gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT4_WEBGL, gl.TEXTURE_2D, null, 0);
-
-				this.extbuffers.drawBuffersWEBGL([
-					this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
-					this.extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - depthTex
-					this.extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - normalTex
-					this.extbuffers.COLOR_ATTACHMENT3_WEBGL, // gl_FragData[3] - albedoTex
-					this.extbuffers.NONE // gl_FragData[3] - albedoTex
+				extbuffers.drawBuffersWEBGL([
+					extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
+					extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - depthTex
+					extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - normalTex
+					extbuffers.COLOR_ATTACHMENT3_WEBGL, // gl_FragData[3] - albedoTex
+					extbuffers.NONE // gl_FragData[3] - albedoTex
 				]);
 			}
 			
 			// End mrt.---------------------------------------------------------------------------------------------------------------
-			
 		}
 	}
 
@@ -1871,6 +2132,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 	if (this.weatherStation)
 	{
 		this.weatherStation.renderWeather(this);
+		
 	}
 
 	if (this.waterManager) // OpaquesPass.***
@@ -1888,7 +2150,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		// Deactive depth & normals for transparent pass.
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // depthTex.
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // normalTex.
-		//gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0); // albedoTex.
+
 		this.extbuffers.drawBuffersWEBGL([
 			this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
 			this.extbuffers.NONE, // gl_FragData[1] - depthTex
@@ -1968,7 +2230,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 	//------------------------------------------------------------------------------------------------------
 	// End rendering transparents.----------------------------------------------------------------------------------------------------------
 
-	if (sceneState.applyLightsShadows)
+	if (sceneState.applyLightsShadows) // LightShadows in MRT.***
 	{
 		// if exist lightSources, the store all lightSources of all frustums.
 		var lightSourcesArray = this.visibleObjControlerNodes.currentVisibleNativeObjects.lightSourcesArray;
@@ -2028,33 +2290,11 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 			// Render the lightBuffer.
 			this.renderer.renderLightDepthCubeMaps(this.lightSourcesArray); // active this code for shadows.
 			this.renderer.renderLightBuffer(this.lightSourcesArray);
-
-			if (this.isCesiumGlobe())
-			{
-				this.bindMainFramebuffer();
-				// unbind mago colorTextures:
-				
-				gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // depthTex.
-				gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // normalTex.
-				gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0); // albedoTex.
-				this.extbuffers.drawBuffersWEBGL([
-					this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
-					this.extbuffers.NONE, // gl_FragData[1]
-					this.extbuffers.NONE, // gl_FragData[2]
-					this.extbuffers.NONE, // gl_FragData[3]
-				]);
-					
-			}
-
 			// End rendering lightBuffer.--------------------------------------------
 		}
 
 		// Do ssaoFromDepth render. Renders in ssaoFrameBuffer.***
 		this.renderer.renderSsaoFromDepth(gl);
-
-		//if (this.isCesiumGlobe()) {
-		//	this.bindMainFramebuffer();
-		//}
 
 		// Final render output.**************************************************************
 		this.renderer.renderScreenQuad(gl); // 1rst screenQuad. (ssao, lighting, shadows) // this must be rendered in a framebuffer.***
@@ -6225,12 +6465,15 @@ MagoManager.prototype.createDefaultShaders = function (gl)
 	}
 
 	this.postFxShadersManager.bUseMultiRenderTarget = false;
+	
+	// Test to ORT.***
 	var supportEXT = gl.getSupportedExtensions().indexOf("WEBGL_draw_buffers");
 	if (supportEXT > -1)
 	{
-		var extbuffers = gl.getExtension("WEBGL_draw_buffers");
+		this.extbuffers = gl.getExtension("WEBGL_draw_buffers");
 		this.postFxShadersManager.bUseMultiRenderTarget = true;
 	}
+	
 
 	var userAgent = window.navigator.userAgent;
 	var isIE = userAgent.indexOf('Trident') > -1;
@@ -6245,7 +6488,6 @@ MagoManager.prototype.createDefaultShaders = function (gl)
 	{
 		this.postFxShadersManager.bUseUint32ForIndices = true;
 	}
-	var hola = 0;
 };
 
 /**

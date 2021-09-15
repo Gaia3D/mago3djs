@@ -854,7 +854,8 @@ ManagerUtils.calculatePixelPositionCamCoord = function (gl, pixelX, pixelY, resu
 		//if (!linearDepth) 
 		//{ return; }
 
-		var texturesMergerFbo = magoManager.texturesManager.texturesMergerFbo;
+		var texturesManager = magoManager.getTexturesManager();
+		var texturesMergerFbo = texturesManager.texturesMergerFbo;
 		var depthTex = texturesMergerFbo.colorBuffersArray[0];
 		var normalTex = texturesMergerFbo.colorBuffersArray[1];
 
@@ -928,9 +929,10 @@ ManagerUtils.detectedDepth = function(pixelX, pixelY, magoManager)
 	var gl = magoManager.getGl();
 
 	// Test the new method: depth + normal + frustumIdx.************************************************************************
-	var texturesMergerFbo = magoManager.texturesManager.texturesMergerFbo;
-	var depthTex = texturesMergerFbo.colorBuffer;
-	var normalTex = texturesMergerFbo.colorBuffer1;
+	var texturesManager = magoManager.getTexturesManager();
+	var texturesMergerFbo = texturesManager.texturesMergerFbo;
+	var depthTex = texturesMergerFbo.colorBuffersArray[0];
+	var normalTex = texturesMergerFbo.colorBuffersArray[1];
 	var resultObject = ManagerUtils.calculatePixelLinearDepthV2(gl, pixelX, pixelY, depthTex, normalTex, magoManager);
 	
 	return (resultObject.frustumIdx < magoManager.numFrustums) ? true : false;
@@ -951,9 +953,10 @@ ManagerUtils.screenCoordToWorldCoordUseDepthCheck = function(pixelX, pixelY, mag
 	if (!gl) { return; }
 
 	// Test the new method: depth + normal + frustumIdx.************************************************************************
-	var texturesMergerFbo = magoManager.texturesManager.texturesMergerFbo;
-	var depthTex = texturesMergerFbo.colorBuffer;
-	var normalTex = texturesMergerFbo.colorBuffer1;
+	var texturesManager = magoManager.getTexturesManager();
+	var texturesMergerFbo = texturesManager.texturesMergerFbo;
+	var depthTex = texturesMergerFbo.colorBuffersArray[0];
+	var normalTex = texturesMergerFbo.colorBuffersArray[1];
 	
 	var resultObject = ManagerUtils.calculatePixelLinearDepthV2(gl, pixelX, pixelY, depthTex, normalTex, magoManager);
 	

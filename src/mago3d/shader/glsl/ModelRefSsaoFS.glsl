@@ -13,8 +13,7 @@
 #endif
 
 
-uniform sampler2D depthTex;
-uniform sampler2D noiseTex;  
+uniform sampler2D depthTex; 
 uniform sampler2D diffuseTex;
 uniform sampler2D shadowMapTex;
 uniform sampler2D shadowMapTex2;
@@ -638,7 +637,6 @@ void main()
     gl_FragData[0] = finalColor; 
 
 	#ifdef USE_MULTI_RENDER_TARGET
-	//if(bUseMultiRenderTarget)
 	{
 		// save depth, normal, albedo.
 		float depthAux = vDepth;

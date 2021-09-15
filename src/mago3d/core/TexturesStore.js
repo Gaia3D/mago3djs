@@ -128,6 +128,28 @@ TexturesStore.prototype.getTextureAux1x1 = function()
 	return this._textureAux_1x1;
 };
 
+TexturesStore.prototype.getCubeMapAux1x1 = function() 
+{
+	if (!this._cubeMapAux_1x1)
+	{
+		//**********************************************************************************************
+		// Note : this "if" is creted only for openGl ES (smartPhone devices).
+		// In openGl ES, must bind all sampler2d of the shader, even if the sampler2d is NOT used.
+		// So, created a very small cubeMap and bind it.
+		//----------------------------------------------------------------------------------------------
+		var gl = this.getGl();
+		this._cubeMapAux_1x1 = gl.createTexture();
+  		gl.bindTexture(gl.TEXTURE_CUBE_MAP, this._cubeMapAux_1x1); 
+		for (var face = 0; face < 6; face++) 
+		{
+			gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X + face, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+		}
+
+	}
+
+	return this._cubeMapAux_1x1;
+};
+
 
 
 

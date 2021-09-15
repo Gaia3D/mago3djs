@@ -894,7 +894,7 @@ Mesh.prototype.renderAsChild = function (magoManager, shader, renderType, glPrim
  * @param glPrimitive
  * @TODO : 누가 이 gl primitive의 type 정체를 안다면 좀 달아주세요ㅠㅠ 세슘 쪽인거 같은데ㅠㅠ
  */
-Mesh.prototype.render = function(magoManager, shader, renderType, glPrimitive, isSelected)
+Mesh.prototype.render = function (magoManager, shader, renderType, glPrimitive, isSelected)
 {
 	var vboMemManager = magoManager.vboMemoryManager;
 	

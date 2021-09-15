@@ -124,25 +124,76 @@ FBO.prototype.init = function()
 	this.fbo = gl.createFramebuffer();
 	this.depthBuffer = gl.createRenderbuffer();
 
-	if (this.options.colorBuffer)
-	{ this.colorBuffer = this.options.colorBuffer; }
-	else
-	{ this.colorBuffer = gl.createTexture(); }
+	for (var i=0; i<this.numColorBuffers; i++)
+	{
+		var colorBuffer = gl.createTexture();
+		this.colorBuffersArray[i] = colorBuffer;
 
-	gl.activeTexture(gl.TEXTURE0);
-	gl.bindTexture(gl.TEXTURE_2D, this.colorBuffer);    
+		gl.activeTexture(gl.TEXTURE0);
+		gl.bindTexture(gl.TEXTURE_2D, colorBuffer);    
+		
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); //LINEAR_MIPMAP_LINEAR
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.width[0], this.height[0], 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
 	
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); //LINEAR_MIPMAP_LINEAR
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.width[0], this.height[0], 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
-  
-	gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo);
-	gl.bindRenderbuffer(gl.RENDERBUFFER, this.depthBuffer);
-	gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, this.width[0], this.height[0]);
-	gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.depthBuffer);
+		gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo);
+		gl.bindRenderbuffer(gl.RENDERBUFFER, this.depthBuffer);
+		gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, this.width[0], this.height[0]);
+		gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.depthBuffer);
+
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, colorBuffer, 0);
+	}
+
+	this.colorBuffer = this.colorBuffersArray[0];
+
+	// Finally bind the 1rst colorBuffer.***
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.colorBuffer, 0);
+		
+	if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) 
+	{
+		throw "Incomplete frame buffer object.";
+	}
+
+	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+};
+
+FBO.prototype.init_original = function() 
+{
+	var gl = this.gl;
+	this.fbo = gl.createFramebuffer();
+	this.depthBuffer = gl.createRenderbuffer();
+
+	for (var i=0; i<this.numColorBuffers; i++)
+	{
+		if (this.options.colorBuffer)
+		{ this.colorBuffer = this.options.colorBuffer; }
+		else
+		{ this.colorBuffer = gl.createTexture(); }
+
+		var colorBuffer = gl.createTexture();
+
+		gl.activeTexture(gl.TEXTURE0);
+		gl.bindTexture(gl.TEXTURE_2D, this.colorBuffer);    
+		
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); //LINEAR_MIPMAP_LINEAR
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.width[0], this.height[0], 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
+	
+		gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo);
+		gl.bindRenderbuffer(gl.RENDERBUFFER, this.depthBuffer);
+		gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, this.width[0], this.height[0]);
+		gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.depthBuffer);
+	
+		var colorBuffer = this.colorBuffersArray[i];
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.TEXTURE_2D, this.colorBuffer, 0);
+	}
+	
+
+	this.colorBuffersArray[0] = this.colorBuffer;
 		
 	if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) 
 	{

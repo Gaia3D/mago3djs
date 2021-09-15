@@ -316,7 +316,7 @@ SelectionManager.prototype.setCandidates = function (idxKey, reference, octree, 
  * @alias SelectionManager
  * @class SelectionManager
  */
-SelectionManager.prototype.clearCandidates = function()
+SelectionManager.prototype.clearCandidates = function ()
 {
 	this.referencesMap = {};
 	this.octreesMap = {};

@@ -7,11 +7,6 @@
 #extension GL_EXT_frag_depth : enable
 #endif
 
-#define %USE_MULTI_RENDER_TARGET%
-#ifdef USE_MULTI_RENDER_TARGET
-#extension GL_EXT_draw_buffers : require
-#endif
-
  
 uniform sampler2D diffuseTex;
 uniform bool textureFlipYAxis;  
@@ -23,6 +18,7 @@ uniform highp int colorType; // 0= oneColor, 1= attribColor, 2= texture.
 uniform bool bUseLogarithmicDepth;
 uniform bool bUseMultiRenderTarget;
 uniform int uFrustumIdx;
+uniform int u_outputTarget; // 0 = depth, 1= normal, 2= albedo, 3= selColor.***
 
 // clipping planes.***
 uniform bool bApplyClippingPlanes; // old. deprecated.***
@@ -333,32 +329,6 @@ void main()
 	}
 	
 	//----------------------------------------------------------------
-
-	vec4 textureColor;
-    if(colorType == 2)
-    {
-        if(textureFlipYAxis)
-        {
-            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));
-			 
-        }
-        else{
-            textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));
-        }
-		
-        if(textureColor.w == 0.0)
-        {
-            discard;
-        }
-    }
-    else if(colorType == 0)
-	{
-        textureColor = oneColor4;
-    }
-	else if(colorType == 1)
-	{
-        textureColor = vColor4;
-    }
 	
 	float depthAux = depth;
 
@@ -370,16 +340,13 @@ void main()
 	}
 	#endif
 
-	vec4 albedo4 = vec4(textureColor.xyz, 1.0);
-	gl_FragData[0] = albedo4; // anything.
-
-	#ifdef USE_MULTI_RENDER_TARGET
-	if(bUseMultiRenderTarget)
+	//u_outputTarget; // 0 = depth, 1= normal, 2= albedo, 3= selColor.***
+	if(u_outputTarget == 0)
 	{
-		// save depth, normal, albedo.
-		gl_FragData[1] = packDepth(depthAux); 
-
-		// When render with cull_face disabled, must correct the faces normal.
+		gl_FragData[0] = packDepth(depthAux); 
+	}
+	else if(u_outputTarget == 1)
+	{
 		float frustumIdx = 1.0;
 		if(uFrustumIdx == 0)
 		frustumIdx = 0.005;
@@ -393,16 +360,42 @@ void main()
 		vec3 normal = vNormal;
 
 		vec3 encodedNormal = encodeNormal(normal);
-		gl_FragData[2] = vec4(encodedNormal, frustumIdx); // save normal.***
-
-		// albedo.
-		gl_FragData[3] = albedo4; 
-
-		// selColor4 (if necessary).
-		gl_FragData[4] = uSelColor4; 
+		gl_FragData[0] = vec4(encodedNormal, frustumIdx); // save normal.***
 	}
-	#endif
+	else if(u_outputTarget == 2)
+	{
+		vec4 textureColor;
+		if(colorType == 2)
+		{
+			if(textureFlipYAxis)
+			{
+				textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, 1.0 - vTexCoord.t));
+				
+			}
+			else{
+				textureColor = texture2D(diffuseTex, vec2(vTexCoord.s, vTexCoord.t));
+			}
+			
+			if(textureColor.w == 0.0)
+			{
+				discard;
+			}
+		}
+		else if(colorType == 0)
+		{
+			textureColor = oneColor4;
+		}
+		else if(colorType == 1)
+		{
+			textureColor = vColor4;
+		}
 
-
+		vec4 albedo4 = vec4(textureColor.xyz, 1.0);
+		gl_FragData[0] = albedo4; // anything.
+	}
+	else if(u_outputTarget == 3)
+	{
+		gl_FragData[0] = uSelColor4; 
+	}
 	
 }
