@@ -504,7 +504,7 @@ Renderer.prototype.endRenderSilhouetteDepth = function(silhouetteDepthFbo)
 
 Renderer.prototype.renderSilhouetteDepth = function ()
 {
-// Depth for silhouette.***************************************************************************************
+	// Depth for silhouette.***************************************************************************************
 	// Check if there are node selected.***********************************************************
 	//if (magoManager.nodeSelected && magoManager.magoPolicy.getObjectMoveMode() === CODE.moveMode.ALL && magoManager.buildingSelected)
 	//{
@@ -537,12 +537,9 @@ Renderer.prototype.renderSilhouetteDepth = function ()
 		var silhouetteDepthFbo = magoManager.getSilhouetteDepthFbo();
 		var gl = magoManager.getGl();
 
-		//var textureAux1x1 = magoManager.texturesStore.getTextureAux1x1();
-		//for (var i=0; i<8; i++)
-		//{
-		//	gl.activeTexture(gl.TEXTURE0+i);
-		//	gl.bindTexture(gl.TEXTURE_2D, textureAux1x1); // necessary for mobile devices.***
-		//}
+		var textureAux1x1 = magoManager.texturesStore.getTextureAux1x1();
+		gl.activeTexture(gl.TEXTURE2);
+		gl.bindTexture(gl.TEXTURE_2D, textureAux1x1); // necessary for mobile devices.***
 
 		
 		var nodes = selectionManager.getSelectedF4dNodeArray();
@@ -587,7 +584,6 @@ Renderer.prototype.renderSilhouetteDepth = function ()
 				gl.disable(gl.CULL_FACE);
 				
 				selectionManager.getSelectedF4dObject().render(magoManager, neoBuilding, localRenderType, renderTexture, currentShader, refMatrixIdxKey, minSizeToRender);
-				//silhouetteDepthFbo.unbind(); 
 				
 				gl.enable(gl.CULL_FACE);
 			}
@@ -1228,6 +1224,8 @@ Renderer.prototype.renderSilhouette = function ()
 	
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, silhouetteDepthFbo.colorBuffer);  // silhouette depth texture.***
+	gl.activeTexture(gl.TEXTURE2); 
+	gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
 	gl.activeTexture(gl.TEXTURE3); 
 	gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
 	gl.activeTexture(gl.TEXTURE4); 
