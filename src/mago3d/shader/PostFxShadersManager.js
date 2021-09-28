@@ -127,6 +127,9 @@ PostFxShadersManager.prototype._createShader_gBuffer = function ()
 	shader.bUseMultiRenderTarget_loc = gl.getUniformLocation(shader.program, "bUseMultiRenderTarget");
 	shader.uSelColor4_loc = gl.getUniformLocation(shader.program, "uSelColor4");
 
+	// create an attributes locations map.***
+
+
 	this.shadersMap[shaderName] = shader;
 	return shader;
 };
@@ -1042,17 +1045,26 @@ PostFxShadersManager.prototype.createShaderProgram = function(gl, vertexSource, 
 	
 	
 	// keep shader locations.
+	if (!shader.attribLocations)
+	{
+		shader.attribLocations = {};
+	}
 	var numAttributes = gl.getProgramParameter(shader.program, gl.ACTIVE_ATTRIBUTES);
 	for (var i = 0; i < numAttributes; i++) 
 	{
 		var attribute = gl.getActiveAttrib(shader.program, i);
-		shader[attribute.name] = gl.getAttribLocation(shader.program, attribute.name);
+		shader.attribLocations[attribute.name] = gl.getAttribLocation(shader.program, attribute.name);
+	}
+
+	if (!shader.uniformsLocations)
+	{
+		shader.uniformsLocations = {};
 	}
 	var numUniforms = gl.getProgramParameter(shader.program, gl.ACTIVE_UNIFORMS);
 	for (var i = 0; i < numUniforms; i++) 
 	{
 		var uniform = gl.getActiveUniform(shader.program, i);
-		shader[uniform.name] = gl.getUniformLocation(shader.program, uniform.name);
+		shader.uniformsLocations[uniform.name] = gl.getUniformLocation(shader.program, uniform.name);
 	}
 
 	return shader;

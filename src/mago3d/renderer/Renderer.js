@@ -3107,7 +3107,7 @@ Renderer.prototype.renderGeometryBuffer = function (gl, renderType, visibleObjCo
 		// ssao render.************************************************************************************************************
 		var visibleObjectControllerHasRenderables = visibleObjControlerNodes.hasRenderables();
 		var mgSetsArray = visibleObjControlerNodes.mgSetsArray;
-		if (mgSetsArray)
+		if (mgSetsArray && mgSetsArray.length > 0)
 		{
 			var hola = 0;
 		}

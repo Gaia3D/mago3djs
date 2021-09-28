@@ -118,9 +118,23 @@ MgBufferDataSet.prototype.bindBuffers = function (gl, shader)
 			var mgBufferView = mgBufferViewSetTotal.getMgBufferView(key);
 			var mgBuffer = mgBufferView.mgBuffer;
 
+			// 1rst, check if exist "glBuffer" of the mgBuffer.
+			if(!mgBuffer.glBuffer)
+			{
+				// create a webglBuffer.***
+				mgBuffer.glBuffer = FBO.createBuffer(gl, mgBuffer.bufferData);
+				//FBO.createBuffer = function (gl, data) {
+				//	var buffer = gl.createBuffer();
+				//	gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+				//	gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+				//	return buffer;
+				//  };
+			}
+
 			// Now, bind buffer.***
 			// need the attribute location of the shader.***
-			//gl.bindBuffer(this.dataTarget, this.key);
+			var attribLocation = shader.getAttribLocation(key);
+			//gl.bindBuffer(this.dataTarget, this.key); // data target = gl.ARRAY_BUFFER.
 			//gl.vertexAttribPointer(vertexAttribIndex, this.dataDimensions, this.dataGlType, this.normalized, this.dataStride, this.dataOffSet);
 			var hola = 0;
 		}

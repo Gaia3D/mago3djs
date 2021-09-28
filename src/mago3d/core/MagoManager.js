@@ -1926,7 +1926,7 @@ MagoManager.prototype.doRenderORT = function (frustumVolumenObject)
 	} 
 	
 	// Debug component.******************************************
-	
+	/*
 	if (this.currentFrustumIdx === 0) 
 	{
 		if (scene && scene._context && scene._context._currentFramebuffer) 
@@ -1946,7 +1946,7 @@ MagoManager.prototype.doRenderORT = function (frustumVolumenObject)
 			
 		this.renderer.renderScreenRectangle(gl, options); // debug component.
 	}
-	
+	*/
 	//-----------------------------------------------------------
 
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);
@@ -2315,7 +2315,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		}
 
 		// Debug component.******************************************
-		//this.modeler.__TEST();
+		this.modeler.__TEST();
 		/*
 		var lightAux;
 		if (lightsArray)
