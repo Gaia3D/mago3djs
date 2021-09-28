@@ -34,7 +34,31 @@ F4dController.prototype.constructor = F4dController;
  */
 F4dController.prototype.addSmartTileGroup = function(f4dObject) 
 {
-	var magoManager = this.magoManager;
+	var f4dGroups = [];
+	if (!Array.isArray(f4dObject)) 
+	{
+		if (!(f4dObject.tiling && f4dObject.tilePath)) { return; }
+		f4dObject.smartTileIndexPath = f4dObject.tilePath;
+
+		f4dGroups.push(f4dObject);
+	}
+	else 
+	{
+		for (var i=0, len=f4dObject.length;i<len;i++) 
+		{
+			var obj = f4dObject[i];
+			if (!(obj.tiling && obj.tilePath)) { continue; }
+
+			if (i === len-1) { obj.smartTileIndexPath = obj.tilePath; }
+
+			f4dGroups.push(obj);
+		}
+	}
+
+	addSmartTileGroup(this, f4dGroups);
+};
+function addSmartTileGroup(thisArgs, f4dObject) 
+{
 	if (Array.isArray(f4dObject)) 
 	{
 		for (var i=0, len=f4dObject.length;i<len;i++) 
@@ -44,13 +68,14 @@ F4dController.prototype.addSmartTileGroup = function(f4dObject)
 
 			if (i === len-1) { obj.smartTileIndexPath = obj.tilePath; }
 
-			this.addSmartTileGroup(f4dObject[i]);
+			addSmartTileGroup(thisArgs, obj);
 		}
 	} 
 	else 
 	{
 		if (!(f4dObject.tiling && f4dObject.tilePath)) { return; }
 
+		var magoManager = thisArgs.magoManager;
 		var groupId = f4dObject.data_key || f4dObject.dataGroupId;
 		var groupDataFolder;
 		var groupKey;
@@ -75,14 +100,14 @@ F4dController.prototype.addSmartTileGroup = function(f4dObject)
 			groupKey = f4dObject.dataGroupKey;
 		}
 
-		if (!this.smartTilePathInfo[groupKey])
+		if (!thisArgs.smartTilePathInfo[groupKey])
 		{
-			this.smartTilePathInfo[groupKey] = {};
+			thisArgs.smartTilePathInfo[groupKey] = {};
 		}
 
-		this.smartTilePathInfo[groupKey].attributes = f4dObject.attributes || metaInfo;
-		this.smartTilePathInfo[groupKey].projectId = groupId;
-		this.smartTilePathInfo[groupKey].projectFolderPath = groupDataFolder;
+		thisArgs.smartTilePathInfo[groupKey].attributes = f4dObject.attributes || metaInfo;
+		thisArgs.smartTilePathInfo[groupKey].projectId = groupId;
+		thisArgs.smartTilePathInfo[groupKey].projectFolderPath = groupDataFolder;
 		//this.smartTilePathInfo[groupKey].smartTileIndexPath = groupDataFolder + '/' + groupKey + '_TILE';
 
 		if (f4dObject.smartTileIndexPath) 
@@ -91,6 +116,7 @@ F4dController.prototype.addSmartTileGroup = function(f4dObject)
 		}
 	}
 };
+
 /**
  * Object literal with config options for f4d layer.
  * @typedef {Object} f4dLayerObject
