@@ -843,6 +843,163 @@ WindVolume.prototype._getVolumeRearFBO = function(magoManager)
 	return this.volumeRearFBO;
 };
 
+WindVolume.prototype.renderDepthWindVolumeORT = function(magoManager)
+{
+	// Render depth 2 times:
+	// 1- render the rear faces.
+	// 2- render the front faces.
+	//-------------------------------
+
+	// This function renders the wind-layer depth texture.
+	// Provisionally wind-layer is a rectangle3d.
+	// renderDepth of the "this.windDisplayPlane".
+	var sceneState = magoManager.sceneState;
+	var gl = magoManager.getGl();
+
+	// Now, render the windPlane.
+	if (!this.visibleObjControler)
+	{
+		this.visibleObjControler = new VisibleObjectsController();
+	}
+
+	if (this.windDisplayBox)
+	{ this.visibleObjControler.currentVisibleNativeObjects.opaquesArray[0] = this.windDisplayBox; }
+
+	// When render rear, add the lowestWindLayer.***
+	if (this.windDisplayPlanesArray && this.windDisplayPlanesArray.length > 0)
+	{
+		var windDisplayPlane = this.windDisplayPlanesArray[0];
+		this.visibleObjControler.currentVisibleNativeObjects.opaquesArray[1] = windDisplayPlane;
+	}
+
+	// Front Face.***************************************************************************************************************************
+	var windVolumeFrontFBO = this._getVolumeFrontFBO(magoManager);
+	windVolumeFrontFBO.bind();
+
+	// Render depth & normal only.
+	// Depth.***
+	var options = {
+		bRenderDepth     : true,
+		bRenderNormal    : false,
+		bRenderAlbedo    : false,
+		bRenderSelColor  : false,
+		ouputDepthTex    : windVolumeFrontFBO.colorBuffersArray[1],
+		ouputNormalTex   : undefined,
+		ouputAlbedoTex   : undefined,
+		ouputSelColorTex : undefined
+	};
+
+	if (magoManager.currentFrustumIdx === 2)
+	{
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, windVolumeFrontFBO.colorBuffersArray[1], 0);
+		gl.clearColor(0, 0, 0, 1);
+		gl.clearDepth(1);
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		gl.clearColor(0, 0, 0, 1);
+	}
+
+	var renderType = 1;
+	gl.frontFace(gl.CCW);
+	magoManager.renderer.renderGeometryBufferORT(gl, renderType, this.visibleObjControler, options);
+
+	// Normal.***
+	var options = {
+		bRenderDepth     : false,
+		bRenderNormal    : true,
+		bRenderAlbedo    : false,
+		bRenderSelColor  : false,
+		ouputDepthTex    : undefined,
+		ouputNormalTex   : windVolumeFrontFBO.colorBuffersArray[2],
+		ouputAlbedoTex   : undefined,
+		ouputSelColorTex : undefined
+	};
+
+	if (magoManager.currentFrustumIdx === 2)
+	{
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, windVolumeFrontFBO.colorBuffersArray[2], 0);
+		gl.clearColor(0, 0, 0, 1);
+		gl.clearDepth(1);
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		gl.clearColor(0, 0, 0, 1);
+	}
+
+	var renderType = 1;
+	gl.frontFace(gl.CCW);
+	magoManager.renderer.renderGeometryBufferORT(gl, renderType, this.visibleObjControler, options);
+
+	// Test:
+	magoManager.windVolumeFrontDepthTex = windVolumeFrontFBO.colorBuffersArray[1];
+	magoManager.windVolumeFrontNormalTex = windVolumeFrontFBO.colorBuffersArray[2];
+	// End front face.---------------------------------------------------------------------------------------------------------------------------
+	
+	// Rear Face.***************************************************************************************************************************
+	var windVolumeRearFBO = this._getVolumeRearFBO(magoManager);
+	windVolumeRearFBO.bind();
+
+	// Depth.***
+	var options = {
+		bRenderDepth     : true,
+		bRenderNormal    : false,
+		bRenderAlbedo    : false,
+		bRenderSelColor  : false,
+		ouputDepthTex    : windVolumeRearFBO.colorBuffersArray[1],
+		ouputNormalTex   : undefined,
+		ouputAlbedoTex   : undefined,
+		ouputSelColorTex : undefined
+	};
+
+	if (magoManager.currentFrustumIdx === 2)
+	{
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, windVolumeRearFBO.colorBuffersArray[1], 0);
+		gl.clearColor(0, 0, 0, 1);
+		gl.clearDepth(1);
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		gl.clearColor(0, 0, 0, 1);
+	}
+
+	var renderType = 1;
+	gl.frontFace(gl.CW);
+	magoManager.renderer.renderGeometryBufferORT(gl, renderType, this.visibleObjControler, options);
+
+	// Normal.***
+	var options = {
+		bRenderDepth     : false,
+		bRenderNormal    : true,
+		bRenderAlbedo    : false,
+		bRenderSelColor  : false,
+		ouputDepthTex    : undefined,
+		ouputNormalTex   : windVolumeRearFBO.colorBuffersArray[2],
+		ouputAlbedoTex   : undefined,
+		ouputSelColorTex : undefined
+	};
+	
+	if (magoManager.currentFrustumIdx === 2)
+	{
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, windVolumeRearFBO.colorBuffersArray[2], 0);
+		gl.clearColor(0, 0, 0, 1);
+		gl.clearDepth(1);
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		gl.clearColor(0, 0, 0, 1);
+	}
+
+	var renderType = 1;
+	gl.frontFace(gl.CW);
+	magoManager.renderer.renderGeometryBufferORT(gl, renderType, this.visibleObjControler, options);
+
+	// Test:
+	magoManager.windVolumeRearDepthTex = windVolumeRearFBO.colorBuffersArray[1];
+	magoManager.windVolumeRearNormalTex = windVolumeRearFBO.colorBuffersArray[2];
+
+	// End rear face.---------------------------------------------------------------------------------------------------------------------------
+
+	// Return to main framebuffer.************************
+	// return default values:
+	gl.frontFace(gl.CCW);
+
+	//magoManager.bindMainFramebuffer();
+	//gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, magoManager.cesiumColorBuffer, 0);
+};
+
 WindVolume.prototype.renderDepthWindVolume = function(magoManager)
 {
 	// Render depth 2 times:
@@ -1061,6 +1218,111 @@ WindVolume.prototype.renderMode3DThickLines = function (magoManager)
 	gl.useProgram(null);
 	gl.enable(gl.CULL_FACE);
 	gl.disable(gl.BLEND);
+	
+};
+
+WindVolume.prototype.renderMode3DThickLinesORT = function (magoManager)
+{
+	if (!this.prepareVolume(magoManager))
+	{ return; }
+
+	if (!this.streamLinesArray)
+	{ this.streamLinesArray = []; }
+
+	var currStreamLinesCount = this.streamLinesArray.length;
+
+	// Render the windVolume-depth (rear & front).***
+	this.renderDepthWindVolumeORT(magoManager);
+	
+	if (currStreamLinesCount < this.weatherStation.WIND_MAXPARTICLES_INSCREEN && magoManager.currentFrustumIdx === 0)// && this.counterAux > 5)
+	{
+		for (var i=0; i<3; i++)
+		{
+			var streamLine = this.newWindStreamLine(magoManager);
+			if (streamLine)
+			{
+				this.streamLinesArray.push(streamLine);	
+			}
+		}
+	}
+	
+	var gl = magoManager.getGl();
+	magoManager.bindMainFramebuffer();
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, magoManager.cesiumColorBuffer, 0); // original.***
+	//-------------------------------------------------------------------------------------------------------------
+			  
+	var gl = magoManager.getGl();
+	var renderType = 1;
+	var sceneState = magoManager.sceneState;
+
+	// Now render the streamLines (thickLines).
+	// change shader. use "thickLines" shader.
+	var thickLineShader = magoManager.postFxShadersManager.getShader("windStreamThickLine"); 
+	thickLineShader.useProgram();
+	thickLineShader.bindUniformGenerals();
+	
+	gl.uniform4fv(thickLineShader.oneColor4_loc, [0.3, 0.9, 0.5, 1.0]);
+	gl.uniform1i(thickLineShader.colorType_loc, 0);
+	gl.uniform2fv(thickLineShader.viewport_loc, [sceneState.drawingBufferWidth[0], sceneState.drawingBufferHeight[0]]);
+	gl.uniform1f(thickLineShader.thickness_loc, this.weatherStation.windThickness);
+	//var auxThickness = new Float32Array([50.0]);
+	//gl.uniform1f(thickLineShader.thickness_loc, auxThickness[0]);
+
+	gl.uniform1i(thickLineShader.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
+	gl.uniform1i(thickLineShader.bUseMultiRenderTarget_loc, magoManager.postFxShadersManager.bUseMultiRenderTarget);
+	gl.uniform1i(thickLineShader.uFrustumIdx_loc, magoManager.currentFrustumIdx);
+
+	gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
+	gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+	//gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
+	//gl.blendFunc( gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
+	gl.disable(gl.CULL_FACE);
+	//gl.enable(gl.BLEND);
+	gl.disable(gl.BLEND);
+
+	// Test debug:::
+	gl.disable(gl.DEPTH_TEST); // delete this.
+
+	gl.enableVertexAttribArray(thickLineShader.prev_loc);
+	gl.enableVertexAttribArray(thickLineShader.current_loc);
+	gl.enableVertexAttribArray(thickLineShader.next_loc);
+	
+	
+	var vectorTypeObjectsCount = this.streamLinesArray.length;
+	var streamLine;
+	var streamLinesArrayAux = [];
+
+	var options = {
+		animationState: this._animationState
+	};
+
+	for (var i=0; i<vectorTypeObjectsCount; i++)
+	{
+		streamLine = this.streamLinesArray[i];
+		var geoLocData = streamLine.geoLocDataManager.getCurrentGeoLocationData();
+		geoLocData.bindGeoLocationUniforms(gl, thickLineShader);
+		streamLine.render(magoManager, thickLineShader, options); // render.***
+
+		if (streamLine.finished)
+		{
+			// this stream line finished.
+			streamLine.deleteObjects(magoManager.vboMemoryManager);
+			streamLine = undefined;
+			
+		}
+		else
+		{
+			streamLinesArrayAux.push(streamLine);
+		}
+	}
+
+	this.streamLinesArray = streamLinesArrayAux;
+	
+	// return to the current shader.
+	gl.useProgram(null);
+	gl.enable(gl.CULL_FACE);
+	gl.disable(gl.BLEND);
+	gl.enable(gl.DEPTH_TEST); // delete this.
 	
 };
 

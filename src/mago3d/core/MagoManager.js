@@ -1756,8 +1756,7 @@ MagoManager.prototype.doRenderORT = function (frustumVolumenObject)
 
 	if (this.weatherStation)
 	{
-		this.weatherStation.renderWeather(this);
-		
+		this.weatherStation.renderWeatherORT(this);
 	}
 
 	//if (this.waterManager) // OpaquesPass.***
@@ -1773,14 +1772,14 @@ MagoManager.prototype.doRenderORT = function (frustumVolumenObject)
 	{
 		this.bindMainFramebuffer();
 	}
-
+	
 	renderType = 1;
 	this.renderType = 1;
 	this.renderer.renderGeometryBufferTransparents(gl, renderType, this.visibleObjControlerNodes);
 
 	if (this.weatherStation)
 	{
-		this.weatherStation.renderWeatherTransparents(this);
+		this.weatherStation.renderWeatherTransparentsORT(this);
 	}
 
 	if (this.waterManager) // TransparentPass.***
@@ -1927,7 +1926,7 @@ MagoManager.prototype.doRenderORT = function (frustumVolumenObject)
 	} 
 	
 	// Debug component.******************************************
-	/*
+	
 	if (this.currentFrustumIdx === 0) 
 	{
 		if (scene && scene._context && scene._context._currentFramebuffer) 
@@ -1947,7 +1946,7 @@ MagoManager.prototype.doRenderORT = function (frustumVolumenObject)
 			
 		this.renderer.renderScreenRectangle(gl, options); // debug component.
 	}
-	*/
+	
 	//-----------------------------------------------------------
 
 	gl.viewport(0, 0, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0]);

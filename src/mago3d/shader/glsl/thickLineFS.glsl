@@ -41,13 +41,7 @@ void main() {
 	#ifdef USE_MULTI_RENDER_TARGET
 	if(bUseMultiRenderTarget)
 	{
-		//gl_FragData[1] = vec4(0.0);
-		//gl_FragData[2] = vec4(0.0);
-		//gl_FragData[3] = vec4(0.0);
-		
-
 		gl_FragData[1] = packDepth(vDepth);
-		
 
 		// Note: points cloud data has frustumIdx 20 .. 23.********
 		float frustumIdx = 0.1; // realFrustumIdx = 0.1 * 100 = 10. 

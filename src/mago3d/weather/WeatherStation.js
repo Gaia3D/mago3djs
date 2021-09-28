@@ -467,7 +467,32 @@ WeatherStation.prototype.renderWeather = function(magoManager)
 	
 };
 
+WeatherStation.prototype.renderWeatherORT = function(magoManager)
+{
+	//if (this.dustVolumesArray)
+	//{
+	//	// render dust layers.
+	//	this.renderDust3D(magoManager);
+	//}
+
+	if (this.windVolumesArray)
+	{
+		this.renderWind3D(magoManager);
+		//this.renderWindLayerDisplayPlanes(magoManager); // old.
+	}
+
+};
+
 WeatherStation.prototype.renderWeatherTransparents = function(magoManager)
+{
+	// Render all active weather type.
+
+	// provisionally render test.
+	
+	
+};
+
+WeatherStation.prototype.renderWeatherTransparentsORT = function(magoManager)
 {
 	// Render all active weather type.
 
@@ -512,7 +537,9 @@ WeatherStation.prototype.renderWind3D = function (magoManager)
 	// DisplayVolumeBox.***
 	if (this.windVolumesArray === undefined || this.windVolumesArray.length === 0)
 	{ return; }
-	
+
+	var bUseMultiRenderTarget = magoManager.postFxShadersManager.bUseMultiRenderTarget;
+
 	var windVolumesCount = this.windVolumesArray.length;
 	for (var i=0; i<windVolumesCount; i++)
 	{
@@ -524,7 +551,15 @@ WeatherStation.prototype.renderWind3D = function (magoManager)
 				this.windVolumesArray[i].windDisplayBox.setOneColor(0.2, 0.7, 0.8, 0.0);
 			}
 		}
-		this.windVolumesArray[i].renderMode3DThickLines(magoManager);
+
+		if (bUseMultiRenderTarget)
+		{
+			this.windVolumesArray[i].renderMode3DThickLines(magoManager);
+		}
+		else 
+		{
+			this.windVolumesArray[i].renderMode3DThickLinesORT(magoManager);
+		}
 	}
 	return;
 };

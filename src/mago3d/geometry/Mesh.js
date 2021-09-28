@@ -1175,9 +1175,11 @@ Mesh.prototype.renderWireframe = function(magoManager, shader, renderType, glPri
 	}
 	gl.bindBuffer(gl.ARRAY_BUFFER, vboPos.key);
 	gl.vertexAttribPointer(shader.prev_loc, dim, gl.FLOAT, false, 16, 0);
-	gl.vertexAttribPointer(shader.current_loc, dim, gl.FLOAT, false, 16, 64-32);
-	gl.vertexAttribPointer(shader.next_loc, dim, gl.FLOAT, false, 16, 128-32);
-	gl.drawArrays(gl.TRIANGLE_STRIP, 0, vbo.vertexCount-(4));
+	gl.vertexAttribPointer(shader.current_loc, dim, gl.FLOAT, false, 16, 32);
+	gl.vertexAttribPointer(shader.next_loc, dim, gl.FLOAT, false, 16, 64);
+	//gl.vertexAttribPointer(shader.next_loc, dim, gl.FLOAT, false, 16, 128-32); // original.***
+	//gl.drawArrays(gl.TRIANGLE_STRIP, 0, vbo.vertexCount-(4)); // original.***
+	gl.drawArrays(gl.TRIANGLE_STRIP, 0, vbo.vertexCount-(6));
 
 };
 

@@ -121,6 +121,7 @@ void main(){
 	normal *= thickness/2.0;
 	normal.x /= aspect;
 	float realThickness = (thickness*sense*projectedDepth)/1000.0;
+	
 	// Offset our position along the normal
 	vec4 offset = vec4(normal * realThickness, 0.0, 0.0);
 	gl_Position = currentProjected + offset; 

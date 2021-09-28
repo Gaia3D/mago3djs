@@ -9314,13 +9314,7 @@ void main() {\n\
 	#ifdef USE_MULTI_RENDER_TARGET\n\
 	if(bUseMultiRenderTarget)\n\
 	{\n\
-		//gl_FragData[1] = vec4(0.0);\n\
-		//gl_FragData[2] = vec4(0.0);\n\
-		//gl_FragData[3] = vec4(0.0);\n\
-		\n\
-\n\
 		gl_FragData[1] = packDepth(vDepth);\n\
-		\n\
 \n\
 		// Note: points cloud data has frustumIdx 20 .. 23.********\n\
 		float frustumIdx = 0.1; // realFrustumIdx = 0.1 * 100 = 10. \n\
@@ -9469,6 +9463,7 @@ void main(){\n\
 	normal *= thickness/2.0;\n\
 	normal.x /= aspect;\n\
 	float direction = (thickness*sense*projectedDepth)/1000.0;\n\
+\n\
 	// Offset our position along the normal\n\
 	vec4 offset = vec4(normal * direction, 0.0, 0.0);\n\
 	gl_Position = currentProjected + offset; \n\
@@ -15619,6 +15614,7 @@ void main(){\n\
 	normal *= thickness/2.0;\n\
 	normal.x /= aspect;\n\
 	float realThickness = (thickness*sense*projectedDepth)/1000.0;\n\
+	\n\
 	// Offset our position along the normal\n\
 	vec4 offset = vec4(normal * realThickness, 0.0, 0.0);\n\
 	gl_Position = currentProjected + offset; \n\

@@ -385,13 +385,13 @@ MagoRenderable.prototype.render = function (magoManager, shader, renderType, glP
 			geoLocData.bindGeoLocationUniforms(gl, shaderThickLine);
 
 			var sceneState = magoManager.sceneState;
-			var drawingBufferWidth = sceneState.drawingBufferWidth;
-			var drawingBufferHeight = sceneState.drawingBufferHeight;
+			var drawingBufferWidth = new Float32Array([sceneState.drawingBufferWidth[0]]);
+			var drawingBufferHeight = new Float32Array([sceneState.drawingBufferHeight[0]]);
 			if (this.wireframeColor4)
 			{ gl.uniform4fv(shaderThickLine.oneColor4_loc, [this.wireframeColor4.r, this.wireframeColor4.g, this.wireframeColor4.b, this.wireframeColor4.a]); }
 			else
 			{ gl.uniform4fv(shaderThickLine.oneColor4_loc, [0.6, 0.8, 0.9, 1.0]); }
-			gl.uniform2fv(shaderThickLine.viewport_loc, [drawingBufferWidth[0], drawingBufferHeight[0]]);
+			gl.uniform2fv(shaderThickLine.viewport_loc, new Float32Array([drawingBufferWidth[0], drawingBufferHeight[0]]));
 			
 			var bWireframe = true;
 			this.renderAsChild(magoManager, shaderThickLine, renderType, glPrimitive, bIsSelected, this.options, bWireframe);

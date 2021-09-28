@@ -997,7 +997,7 @@ Renderer.prototype.renderNativeLightSources = function(renderType, visibleObjCon
  * @param {Number} renderType If renderType = 0 (depth render), renderType = 1 (color render), renderType = 2 (colorCoding render).
  * @param {VisibleObjectsController} visibleObjControlerNodes This object contains visible objects for the camera frustum.
  */
-Renderer.prototype.renderNativeObjects = function(gl, shader, renderType, visibleObjControlerNodes, options) 
+Renderer.prototype.renderNativeObjects = function (gl, shader, renderType, visibleObjControlerNodes, options) 
 {
 	var magoManager = this.magoManager;
 	var sceneState = magoManager.sceneState;
@@ -2047,6 +2047,11 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 		texture = magoManager.depthTex;
 	}
 
+	if (magoManager.cesiumColorBuffer)
+	{
+		//texture = magoManager.cesiumColorBuffer;
+	}
+
 	
 	var depthFboNeo = magoManager.depthFboNeo;
 	if (depthFboNeo.colorBuffer)
@@ -2054,9 +2059,9 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 		//texture = depthFboNeo.colorBuffer;
 	}
 	
-	if (magoManager.shadedColorFbo.colorBuffer)
+	if (magoManager.framebufferAux.colorBuffer)
 	{
-		//texture = magoManager.shadedColorFbo.colorBuffer;
+		//texture = magoManager.framebufferAux.colorBuffer;
 	}
 
 	if (magoManager.normalTex)
@@ -2116,7 +2121,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 	if (magoManager.selColorTex)
 	{
-		texture = magoManager.selColorTex;
+		//texture = magoManager.selColorTex;
 	}
 
 	if (magoManager.ssaoFromDepthFbo)
@@ -2124,6 +2129,42 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 		//texture = magoManager.ssaoFromDepthFbo.colorBuffer;
 	}
 
+	// weatherStation.*** weatherStation.*** weatherStation.*** weatherStation.*** weatherStation.*** weatherStation.*** weatherStation.*** weatherStation.*** 
+	if (magoManager.weatherStation)
+	{
+		var weatherStation = magoManager.weatherStation;
+		if (weatherStation.windVolumesArray && weatherStation.windVolumesArray.length > 0)
+		{
+			var windVolume = weatherStation.windVolumesArray[0];
+			
+			// Front.***
+			var windVolumeFrontFBO = windVolume._getVolumeFrontFBO(magoManager);
+			if (windVolumeFrontFBO)
+			{
+				var depthTex = windVolumeFrontFBO.colorBuffersArray[2];
+				if (depthTex)
+				{
+					texture = depthTex;
+				}
+			}
+			
+
+			// Rear.***
+			var windVolumeRearFBO = windVolume._getVolumeRearFBO(magoManager);
+			if (windVolumeRearFBO)
+			{
+				var depthTex = windVolumeRearFBO.colorBuffersArray[2]; // [1] = depth, [2] = normal
+				if (depthTex)
+				{
+					//texture = depthTex;
+				}
+			}
+
+		}
+		
+	}
+
+	// waterManager.*** waterManager.*** waterManager.*** waterManager.*** waterManager.*** waterManager.*** waterManager.*** waterManager.*** waterManager.***
 	if (magoManager.waterManager)
 	{
 		if (magoManager.waterManager.waterLayersArray.length > 0)
@@ -2626,7 +2667,7 @@ Renderer.prototype.renderLightBuffer = function (lightSourcesArray)
 	lBuffer.unbind();
 };
 
-Renderer.prototype.renderGeometryBufferORT = function (gl, renderType, visibleObjControlerNodes) 
+Renderer.prototype.renderGeometryBufferORT = function (gl, renderType, visibleObjControlerNodes, options) 
 {
 	var magoManager = this.magoManager;
 	var sceneState = magoManager.sceneState;
@@ -2746,29 +2787,100 @@ Renderer.prototype.renderGeometryBufferORT = function (gl, renderType, visibleOb
 			//magoManager.texturesManager.texturesMergerFbo.bind();
 			magoManager.bindMainFramebuffer();
 			// Render depth, normal & albedo separately.***
+			// check options:
+			var bRenderDepth = true;
+			var bRenderNormal = true;
+			var bRenderAlbedo = true;
+			var bRenderSelColor = true;
+
+			// Ouput textures.***
+			var depthTex = magoManager.depthTex;
+			var normalTex = magoManager.normalTex;
+			var albedoTex = magoManager.cesiumColorBuffer;
+			var selColorTex = magoManager.selColorTex;
+
+			if (options)
+			{
+				if (options.bRenderDepth !== undefined)
+				{
+					bRenderDepth = options.bRenderDepth;
+				}
+
+				if (options.bRenderNormal !== undefined)
+				{
+					bRenderNormal = options.bRenderNormal;
+				}
+
+				if (options.bRenderAlbedo !== undefined)
+				{
+					bRenderAlbedo = options.bRenderAlbedo;
+				}
+
+				if (options.bRenderSelColor !== undefined)
+				{
+					bRenderSelColor = options.bRenderSelColor;
+				}
+
+				// Check for textures.***
+				if (options.ouputDepthTex !== undefined)
+				{
+					depthTex = options.ouputDepthTex;
+				}
+
+				if (options.ouputNormalTex !== undefined)
+				{
+					normalTex = options.ouputNormalTex;
+				}
+
+				if (options.ouputAlbedoTex !== undefined)
+				{
+					albedoTex = options.ouputAlbedoTex;
+				}
+
+				if (options.ouputSelColorTex !== undefined)
+				{
+					selColorTex = options.ouputSelColorTex;
+				}
+			}
+
 			for (var i=0; i<4; i++)
 			{
 				if (i === 0)
 				{
 					// depth.***
-					gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, magoManager.depthTex, 0);
+					if (!bRenderDepth)
+					{
+						continue;
+					}
+					gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, depthTex, 0);
 				}
 				else if (i === 1)
 				{
 					// normal.***
-					gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, magoManager.normalTex, 0);
+					if (!bRenderNormal)
+					{
+						continue;
+					}
+					gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, normalTex, 0);
 				}
 				else if (i === 2)
 				{
 					// albedo.***
+					if (!bRenderAlbedo)
+					{
+						continue;
+					}
 					// In ORT mode, the albedoTex = cesiumColorBuffer.***
-					//gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, magoManager.albedoTex, 0);
-					gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, magoManager.cesiumColorBuffer, 0);
+					gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, albedoTex, 0);
 				}
 				else if (i === 3)
 				{
 					// selColorTex.***
-					gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, magoManager.selColorTex, 0);
+					if (!bRenderSelColor)
+					{
+						continue;
+					}
+					gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, selColorTex, 0);
 					if (magoManager.isFarestFrustum())
 					{
 						gl.clearColor(1, 1, 1, 1);
@@ -2783,8 +2895,6 @@ Renderer.prototype.renderGeometryBufferORT = function (gl, renderType, visibleOb
 					}
 				}
 				gl.uniform1i(currentShader.u_outputTarget_loc, i); 
-
-
 			
 				//this.renderExcavationObjects(gl, currentShader, renderType, visibleObjControlerNodes);
 				this.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
@@ -2996,6 +3106,12 @@ Renderer.prototype.renderGeometryBuffer = function (gl, renderType, visibleObjCo
 			
 		// ssao render.************************************************************************************************************
 		var visibleObjectControllerHasRenderables = visibleObjControlerNodes.hasRenderables();
+		var mgSetsArray = visibleObjControlerNodes.mgSetsArray;
+		if (mgSetsArray)
+		{
+			var hola = 0;
+		}
+
 		if (visibleObjectControllerHasRenderables || magoManager.modeler !== undefined)
 		{
 			var shaderManager = magoManager.postFxShadersManager;
@@ -3338,8 +3454,6 @@ Renderer.prototype.renderGeometryBufferTransparents = function (gl, renderType, 
 
 			gl.activeTexture(gl.TEXTURE2); 
 			gl.bindTexture(gl.TEXTURE_2D, textureAux1x1);
-
-			currentShader.last_tex_id = textureAux1x1;
 			
 			gl.activeTexture(gl.TEXTURE3); 
 			if (bApplyShadow && sunLight.depthFbo)
