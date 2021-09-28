@@ -39,11 +39,18 @@ F4dController.prototype.addSmartTileGroup = function(f4dObject)
 	{
 		for (var i=0, len=f4dObject.length;i<len;i++) 
 		{
+			var obj = f4dObject[i];
+			if (!(obj.tiling && obj.tilePath)) { continue; }
+
+			if (i === len-1) { obj.smartTileIndexPath = obj.tilePath; }
+
 			this.addSmartTileGroup(f4dObject[i]);
 		}
 	} 
 	else 
 	{
+		if (!(f4dObject.tiling && f4dObject.tilePath)) { return; }
+
 		var groupId = f4dObject.data_key || f4dObject.dataGroupId;
 		var groupDataFolder;
 		var groupKey;

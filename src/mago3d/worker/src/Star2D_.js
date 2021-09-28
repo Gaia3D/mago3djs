@@ -46,7 +46,7 @@ Star2D_.prototype.setCenterPosition = function(cx, cy)
  * star의 interior radius 설정
  * @param {number} radius
  */
- Star2D_.prototype.setInteriorRadius = function(radius)
+Star2D_.prototype.setInteriorRadius = function(radius)
 {
 	this.interiorRadius = radius;
 };
@@ -55,7 +55,7 @@ Star2D_.prototype.setCenterPosition = function(cx, cy)
  * star의 exterior radius 설정
  * @param {number} radius
  */
- Star2D_.prototype.setExteriorRadius = function(radius)
+Star2D_.prototype.setExteriorRadius = function(radius)
 {
 	this.exteriorRadius = radius;
 };
@@ -64,7 +64,7 @@ Star2D_.prototype.setCenterPosition = function(cx, cy)
  * star의 꼭지점 갯수 설정
  * @param {number} radiusCount
  */
- Star2D_.prototype.setRadiusCount = function(radiusCount)
+Star2D_.prototype.setRadiusCount = function(radiusCount)
 {
 	this.radiusCount = radiusCount;
 };
@@ -74,7 +74,7 @@ Star2D_.prototype.setCenterPosition = function(cx, cy)
  * @param {Array.<Point2D>} resultPointsArray
  * @returns {Array.<Point2D>} 
  */
- Star2D_.prototype.getPoints = function(resultPointsArray)
+Star2D_.prototype.getPoints = function(resultPointsArray)
 {
 	// star has an arrow to up.
 	var increAngDeg = 360 / this.radiusCount;

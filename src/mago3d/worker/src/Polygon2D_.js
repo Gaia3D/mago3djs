@@ -8,13 +8,13 @@ var Polygon2D_ = function(options)
 	this.convexPolygonsArray; // tessellation result.
 	this.bRect; // boundary rectangle.
 
-    if(options)
-    {
-        if(options.point2dList)
-        {
-            this.point2dList = options.point2dList;
-        }
-    }
+	if (options)
+	{
+		if (options.point2dList)
+		{
+			this.point2dList = options.point2dList;
+		}
+	}
 };
 
 
@@ -219,7 +219,7 @@ Polygon2D_.prototype.getIndexToInsertBySquaredDist = function(objectsArray, obje
 Polygon2D_.prototype.getPointsIdxSortedByDistToPoint = function(thePoint, resultSortedPointsIdxArray)
 {
 
-    if (resultSortedPointsIdxArray === undefined)
+	if (resultSortedPointsIdxArray === undefined)
 	{ resultSortedPointsIdxArray = []; }
 	
 	resultSortedPointsIdxArray = this.point2dList.getPointsIdxSortedByDistToPoint(thePoint, resultSortedPointsIdxArray);
@@ -286,7 +286,7 @@ Polygon2D_.prototype.tessellate = function(concaveVerticesIndices, convexPolygon
 	var find = false;
 	var idx_B;
 	var i=0;
-    var pointsCount = this.point2dList.getPointsCount();
+	var pointsCount = this.point2dList.getPointsCount();
 	
 	while (!find && i<concaveVerticesCount)
 	{
@@ -304,8 +304,8 @@ Polygon2D_.prototype.tessellate = function(concaveVerticesIndices, convexPolygon
 			idx_B = resultSortedPointsIdxArray[j];
 			
 			// skip adjacent vertices.
-            var prevIdx = getPrevIdx(idx, pointsCount);
-            var nextIdx = getNextIdx(idx, pointsCount);
+			var prevIdx = getPrevIdx(idx, pointsCount);
+			var nextIdx = getNextIdx(idx, pointsCount);
 			if (prevIdx === idx_B || nextIdx === idx_B)
 			{
 				j++;

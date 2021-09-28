@@ -113,10 +113,8 @@ TexturesManager.loadTexture = function(imagePath, texture, magoManager, flip_y_t
 	{
 		texture.fileLoadState = CODE.fileLoadState.LOAD_FAILED;
 	};
-
+	imageToLoad.crossOrigin = "Anonymous";
 	imageToLoad.src = imagePath;
-
-
 };
 
 TexturesManager.newWebGlTextureByBlob = function(gl, blob, texture)
@@ -131,6 +129,7 @@ TexturesManager.newWebGlTextureByBlob = function(gl, blob, texture)
 		texture.texId = TexturesManager.handleTextureLoaded(gl, img);
 		texture.fileLoadState = CODE.fileLoadState.BINDING_FINISHED; // file load finished.***
 	};
+	img.crossOrigin = "Anonymous";
 	img.src = url;
 };
 

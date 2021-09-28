@@ -86,7 +86,7 @@ ExtrudeWorkerManager.prototype.doExtrude = function (data)
 	if (!this.workerExtrudeObjects)
 	{
 		var extrudeWorkerManager = this;
-		this.workerExtrudeObjects = new Worker(magoManager.config.scriptRootPath + 'Worker/workerExtrudeObjects.js');
+		this.workerExtrudeObjects = createWorker(magoManager.config.scriptRootPath + 'Worker/workerExtrudeObjects.js');
 		this.workerExtrudeObjects.onmessage = function(e)
 		{
 			

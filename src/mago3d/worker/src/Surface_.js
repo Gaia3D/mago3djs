@@ -5,7 +5,8 @@
  * 
  * @class
  */
-var Surface_ = function(options) {
+var Surface_ = function(options) 
+{
 	this._guid = Utils_.createGuid();
 	this.id;
 	this.name;

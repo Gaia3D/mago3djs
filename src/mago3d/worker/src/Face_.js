@@ -12,7 +12,8 @@
  * @class Face
  * @constructor
  */
-var Face_ = function() {
+var Face_ = function() 
+{
 
 	this._guid = Utils_.createGuid();
 	/**
@@ -118,30 +119,30 @@ Face_.getProjectedPolygon2D = function(vertexArray, normal, resultProjectedPolyg
  * @param {Array.<Triangle>} resultTrianglesArray undefined일 때, 배열로 초기화.
  * @returns {Array.<Triangle>|undefined} 기존 버텍스 배열이 undefined거나 비어있으면 매개변수 resultTrianglesArray 상태 그대로 반환.
  */
- Face_.prototype.getTrianglesConvex = function(resultTrianglesArray)
- {
-     // To call this method, the face MUST be convex.
-     // To call this method, the face MUST be convex.
-     if (this.vertexArray === undefined || this.vertexArray.length === 0)
-     { return resultTrianglesArray; }
+Face_.prototype.getTrianglesConvex = function(resultTrianglesArray)
+{
+	// To call this method, the face MUST be convex.
+	// To call this method, the face MUST be convex.
+	if (this.vertexArray === undefined || this.vertexArray.length === 0)
+	{ return resultTrianglesArray; }
      
-     if (resultTrianglesArray === undefined)
-     { resultTrianglesArray = []; }
+	if (resultTrianglesArray === undefined)
+	{ resultTrianglesArray = []; }
      
-     var vertex0, vertex1, vertex2;
-     var triangle;
-     vertex0 = this.getVertex(0);
-     var verticesCount = this.getVerticesCount();
-     for (var i=1; i<verticesCount-1; i++)
-     {
-         vertex1 = this.getVertex(i);
-         vertex2 = this.getVertex(i+1);
-         triangle = new Triangle_(vertex0, vertex1, vertex2);
-         resultTrianglesArray.push(triangle);
-     }
+	var vertex0, vertex1, vertex2;
+	var triangle;
+	vertex0 = this.getVertex(0);
+	var verticesCount = this.getVerticesCount();
+	for (var i=1; i<verticesCount-1; i++)
+	{
+		vertex1 = this.getVertex(i);
+		vertex2 = this.getVertex(i+1);
+		triangle = new Triangle_(vertex0, vertex1, vertex2);
+		resultTrianglesArray.push(triangle);
+	}
      
-     return resultTrianglesArray;
- };
+	return resultTrianglesArray;
+};
 
 Face_.prototype.getTessellatedTriangles = function(resultTrianglesArray)
 {

@@ -1485,7 +1485,7 @@ SmartTile.prototype._workerParseSmartTile = function (smartTileF4dSeed, magoMana
 	var smartTileManager = this.smartTileManager;
 	if (!smartTileManager.workerParseSmartTile) 
 	{ 
-		smartTileManager.workerParseSmartTile = new Worker(this.smartTileManager.magoManager.config.scriptRootPath + 'Worker/workerParseSmartTile.js'); 
+		smartTileManager.workerParseSmartTile = createWorker(this.smartTileManager.magoManager.config.scriptRootPath + 'Worker/workerParseSmartTile.js'); 
 		smartTileManager.workerParseSmartTile.onmessage = function(e)
 		{
 			var tileInfo = e.data.info;

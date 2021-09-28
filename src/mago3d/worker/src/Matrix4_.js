@@ -6,7 +6,8 @@
  * @class Matrix4
  * @constructor
  */
-var Matrix4_ = function() {
+var Matrix4_ = function() 
+{
 	/**
 	 * @type {Float32Array}
 	 */
@@ -57,13 +58,16 @@ Matrix4_.prototype.get = function(col, row)
 	return this._floatArrays[this.getIndexOfArray(col, row)];
 };
 
-Matrix4_.prototype.setByFloat32Array = function(float32array) {
-	for (var i=0; i<16; i++) {
+Matrix4_.prototype.setByFloat32Array = function(float32array) 
+{
+	for (var i=0; i<16; i++) 
+	{
 		this._floatArrays[i] = float32array[i];
 	}
 };
 
-Matrix4_.prototype.transformPoint3D = function(point3d, result) {
+Matrix4_.prototype.transformPoint3D = function(point3d, result) 
+{
 	if (!point3d) 
 	{
 		return result;
@@ -81,17 +85,20 @@ Matrix4_.prototype.transformPoint3D = function(point3d, result) {
 	return result;
 };
 
-Matrix4_.prototype.copyFromMatrix4 = function(matrix) {
+Matrix4_.prototype.copyFromMatrix4 = function(matrix) 
+{
 	for (var i=0; i<16; i++)
 	{
 		this._floatArrays[i] = matrix._floatArrays[i];
 	}
 };
 
-Matrix4_.prototype.getMultipliedByMatrix = function(matrix, result) {
-	if (result === undefined) { 
-        result = new Matrix4_(); 
-    }
+Matrix4_.prototype.getMultipliedByMatrix = function(matrix, result) 
+{
+	if (result === undefined) 
+	{ 
+		result = new Matrix4_(); 
+	}
 
 	for (var i=0; i<4; i++) 
 	{

@@ -26,8 +26,10 @@ var VtxProfilesList_ = function(x, y)
 	this.convexFacesIndicesData;
 };
 
-VtxProfilesList_.prototype.newVtxProfile = function(){
-	if (this.vtxProfilesArray === undefined) { 
+VtxProfilesList_.prototype.newVtxProfile = function()
+{
+	if (this.vtxProfilesArray === undefined) 
+	{ 
 		this.vtxProfilesArray = []; 
 	}
 	
@@ -48,7 +50,7 @@ VtxProfilesList_.prototype.getVtxProfilesCount = function()
  * 인덱스에 해당하는 vtxProfile 반환
  * @returns {VtxProfile}
  */
- VtxProfilesList_.prototype.getVtxProfile = function(idx)
+VtxProfilesList_.prototype.getVtxProfile = function(idx)
 {
 	if (this.vtxProfilesArray === undefined)
 	{ return undefined; }
@@ -121,7 +123,8 @@ VtxProfilesList_.getLateralFaces = function(bottomVtxRing, topVtxRing, resultFac
 	return resultFacesArray;
 };
 
-VtxProfilesList_.prototype.getMesh = function (resultMesh, bIncludeBottomCap, bIncludeTopCap, bLoop) {
+VtxProfilesList_.prototype.getMesh = function (resultMesh, bIncludeBottomCap, bIncludeTopCap, bLoop) 
+{
 	// face's vertex order.
 	// 3-------2
 	// |       |

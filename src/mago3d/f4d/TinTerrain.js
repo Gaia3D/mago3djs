@@ -3509,7 +3509,7 @@ TinTerrain.prototype.decodeData_FUNCTION_NO_USED = function(imageryType)
 	var tinTerrainManager = this.tinTerrainManager;
 	if (!this.tinTerrainManager.workerDecodedTerrain) 
 	{ 
-		this.tinTerrainManager.workerDecodedTerrain = new Worker(this.tinTerrainManager.magoManager.config.scriptRootPath + 'Worker/workerDecodeTerrain.js'); 
+		this.tinTerrainManager.workerDecodedTerrain = createWorker(this.tinTerrainManager.magoManager.config.scriptRootPath + 'Worker/workerDecodeTerrain.js'); 
 		this.tinTerrainManager.workerDecodedTerrain.onmessage = function(e)
 		{
 			var tileInfo = e.data.info;
@@ -3562,7 +3562,7 @@ TinTerrain.prototype.parseData = function (dataArrayBuffer)
 	{
 		if (!this.tinTerrainManager.workerParseTerrain) 
 		{ 
-			this.tinTerrainManager.workerParseTerrain = new Worker(this.tinTerrainManager.magoManager.config.scriptRootPath + 'Worker/workerParseTerrain.js'); 
+			this.tinTerrainManager.workerParseTerrain = createWorker(this.tinTerrainManager.magoManager.config.scriptRootPath + 'Worker/workerParseTerrain.js'); 
 			this.tinTerrainManager.workerParseTerrain.onmessage = function(e)
 			{
 				var tileInfo = e.data.info;
@@ -3595,7 +3595,7 @@ TinTerrain.prototype.parseData = function (dataArrayBuffer)
 		// make mesh virtually.***
 		if (!this.tinTerrainManager.workerMakePlaneTerrain) 
 		{ 
-			this.tinTerrainManager.workerMakePlaneTerrain = new Worker(this.tinTerrainManager.magoManager.config.scriptRootPath + 'Worker/workerMakePlaneTerrain.js'); 
+			this.tinTerrainManager.workerMakePlaneTerrain = createWorker(this.tinTerrainManager.magoManager.config.scriptRootPath + 'Worker/workerMakePlaneTerrain.js'); 
 			this.tinTerrainManager.workerMakePlaneTerrain.onmessage = function(e)
 			{
 				var tileInfo = e.data.info;

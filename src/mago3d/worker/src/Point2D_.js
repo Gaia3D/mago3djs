@@ -74,7 +74,7 @@ Point2D_.prototype.scalarProduct = function(point)
 
 Point2D_.prototype.squareDistToPoint = function(point) 
 {
-	if(!point) return;
+	if (!point) { return; }
 	var dx = this.x - point.x;
 	var dy = this.y - point.y;
 

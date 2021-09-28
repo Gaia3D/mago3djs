@@ -27,7 +27,7 @@ Line2D_.prototype.isParallelToLine = function(line)
 	if (angRad < zero || Math.abs(angRad - Math.PI) < zero)
 	{ return true; }
 	
-/*
+	/*
 	// Method 2.***
 	// Another way is using the dot product.***
 	var dotProd = this.direction.scalarProduct(line.direction);

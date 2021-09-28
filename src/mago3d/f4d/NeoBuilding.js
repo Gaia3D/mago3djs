@@ -1503,7 +1503,7 @@ NeoBuilding.prototype._parseLegoByWorker = function (dataArrayBuffer, legoMesh, 
 	{
 		if (!magoManager.workerParseLego) 
 		{ 
-			magoManager.workerParseLego = new Worker(magoManager.config.scriptRootPath + 'Worker/workerParseLego.js'); 
+			magoManager.workerParseLego = createWorker(magoManager.config.scriptRootPath + 'Worker/workerParseLego.js'); 
 			magoManager.workerParseLego.onmessage = function(e)
 			{
 				var info = e.data.info;

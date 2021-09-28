@@ -26,13 +26,15 @@ function getNextIdx (idx, pointsCount)
 	return nextIdx;
 };
 
-Utils_.createGuid = function createGuid() {
-	return 'xxxxxxxx-xxxx-xxxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+Utils_.createGuid = function createGuid() 
+{
+	return 'xxxxxxxx-xxxx-xxxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) 
+	{
 	  var r = Math.random() * 16 | 0,
 		  v = c === 'x' ? r : r & 0x3 | 0x8;
 	  return v.toString(16);
 	});
-  };
+};
 
 Utils_.calculateSplitedValues = function(value, resultSplitValue)
 {
@@ -137,7 +139,8 @@ Utils_.calculateTransformMatrixAtWorldPosition = function(worldPosition, heading
 	return resultTransformMatrix;
 };
 
-Utils_.calculateGeoLocationData = function(longitude, latitude, altitude, heading, pitch, roll, resultGeoLocationData) {
+Utils_.calculateGeoLocationData = function(longitude, latitude, altitude, heading, pitch, roll, resultGeoLocationData) 
+{
 	if (resultGeoLocationData === undefined) { resultGeoLocationData = new GeoLocationData_(); }
 
 	// 0) Position.**

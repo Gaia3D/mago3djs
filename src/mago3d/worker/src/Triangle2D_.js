@@ -27,15 +27,15 @@ Triangle2D_.prototype.getSegment2D = function(idx)
 {
 	var seg2d = new Segment2D_();
 
-	if(idx === 0)
+	if (idx === 0)
 	{
 		seg2d.setPoints(this.point2d0, this.point2d1);
 	}
-	else if(idx === 1)
+	else if (idx === 1)
 	{
 		seg2d.setPoints(this.point2d1, this.point2d2);
 	}
-	else if(idx === 2)
+	else if (idx === 2)
 	{
 		seg2d.setPoints(this.point2d2, this.point2d0);
 	}
@@ -68,7 +68,7 @@ Triangle2D_.prototype.getRelativePositionOfPoint2DReport = function(point2d, res
 	//-------------------------------------------------------------
 
 	// 1rst, check if the point is coincident with any point of the triangle.
-	if(error === undefined)
+	if (error === undefined)
 	{ error = 1e-8; }
 
 	/*
@@ -81,27 +81,27 @@ Triangle2D_.prototype.getRelativePositionOfPoint2DReport = function(point2d, res
 	}
 	*/
 
-	if(resultReport === undefined)
+	if (resultReport === undefined)
 	{
 		resultReport = {};
 	}
 	resultReport.relPos = CODE_.relativePositionPoint2DWithTriangle2D.UNKNOWN;
 
-	if(this.point2d0.isCoincidentToPoint(point2d, error))
+	if (this.point2d0.isCoincidentToPoint(point2d, error))
 	{
 		resultReport.relPos = CODE_.relativePositionPoint2DWithTriangle2D.COINCIDENT_WITH_TRIANGLE_POINT;
 		resultReport.pointIdx = 0;
 		return resultReport;
 	}
 
-	if(this.point2d1.isCoincidentToPoint(point2d, error))
+	if (this.point2d1.isCoincidentToPoint(point2d, error))
 	{
 		resultReport.relPos = CODE_.relativePositionPoint2DWithTriangle2D.COINCIDENT_WITH_TRIANGLE_POINT;
 		resultReport.pointIdx = 1;
 		return resultReport;
 	}
 
-	if(this.point2d2.isCoincidentToPoint(point2d, error))
+	if (this.point2d2.isCoincidentToPoint(point2d, error))
 	{
 		resultReport.relPos = CODE_.relativePositionPoint2DWithTriangle2D.COINCIDENT_WITH_TRIANGLE_POINT;
 		resultReport.pointIdx = 2;
@@ -116,7 +116,7 @@ Triangle2D_.prototype.getRelativePositionOfPoint2DReport = function(point2d, res
 
 	var segmentIdx = 0;
 	var seg2d = this.getSegment2D(segmentIdx);
-	if(seg2d.intersectionWithPointByDistances(point2d, error) === Constant_.INTERSECTION_INSIDE)
+	if (seg2d.intersectionWithPointByDistances(point2d, error) === Constant_.INTERSECTION_INSIDE)
 	{
 		resultReport.relPos = CODE_.relativePositionPoint2DWithTriangle2D.COINCIDENT_WITH_TRIANGLE_EDGE;
 		resultReport.segmentIdx = segmentIdx;
@@ -125,7 +125,7 @@ Triangle2D_.prototype.getRelativePositionOfPoint2DReport = function(point2d, res
 
 	segmentIdx = 1;
 	seg2d = this.getSegment2D(segmentIdx);
-	if(seg2d.intersectionWithPointByDistances(point2d, error) === Constant_.INTERSECTION_INSIDE)
+	if (seg2d.intersectionWithPointByDistances(point2d, error) === Constant_.INTERSECTION_INSIDE)
 	{
 		resultReport.relPos = CODE_.relativePositionPoint2DWithTriangle2D.COINCIDENT_WITH_TRIANGLE_EDGE;
 		resultReport.segmentIdx = segmentIdx;
@@ -134,7 +134,7 @@ Triangle2D_.prototype.getRelativePositionOfPoint2DReport = function(point2d, res
 
 	segmentIdx = 2;
 	seg2d = this.getSegment2D(segmentIdx);
-	if(seg2d.intersectionWithPointByDistances(point2d, error) === Constant_.INTERSECTION_INSIDE)
+	if (seg2d.intersectionWithPointByDistances(point2d, error) === Constant_.INTERSECTION_INSIDE)
 	{
 		resultReport.relPos = CODE_.relativePositionPoint2DWithTriangle2D.COINCIDENT_WITH_TRIANGLE_EDGE;
 		resultReport.segmentIdx = segmentIdx;
@@ -142,7 +142,7 @@ Triangle2D_.prototype.getRelativePositionOfPoint2DReport = function(point2d, res
 	}
 	
 	// Now, check if the point2d is inside or outside of the triangle.
-	if(this.isPoint2dInside(point2d))
+	if (this.isPoint2dInside(point2d))
 	{
 		resultReport.relPos = CODE_.relativePositionPoint2DWithTriangle2D.INSIDE;
 		return resultReport;

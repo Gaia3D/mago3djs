@@ -63,7 +63,7 @@ worker.onmessage = function (e)
 	{
 		var qMeshExcavationWorker = this;
 		qMeshExcavationWorker.polygon2DTessellated;
-		workerPolygon2DTessellate = new Worker('workerPolygon2DTessellate.js');
+		workerPolygon2DTessellate = createWorker('workerPolygon2DTessellate.js');
         
 		workerPolygon2DTessellate.onmessage = function(a)
 		{

@@ -5,7 +5,7 @@ var Segment2D_ = function(strPoint2D, endPoint2D)
 	this.startPoint2d;
 	this.endPoint2d;
 
-    this.setPoints(strPoint2D, endPoint2D);
+	this.setPoints(strPoint2D, endPoint2D);
 };
 
 Segment2D_.prototype.setPoints = function(strPoint2D, endPoint2D)
@@ -67,7 +67,7 @@ Segment2D_.prototype.getSquaredLength = function()
 	return this.startPoint2d.squareDistToPoint(this.endPoint2d);
 };
 
- Segment2D_.prototype.getLength = function()
+Segment2D_.prototype.getLength = function()
 {
 	return Math.sqrt(this.getSquaredLength());
 };
@@ -168,14 +168,16 @@ Segment2D_.prototype.intersectionWithSegment = function(segment, error, resultIn
 		return Constant_.INTERSECTION_OUTSIDE;
 	}
 	
-	if(resultIntersectedPoint2d)
-	resultIntersectedPoint2d.set(intersectionPoint.x, intersectionPoint.y);
+	if (resultIntersectedPoint2d)
+	{ resultIntersectedPoint2d.set(intersectionPoint.x, intersectionPoint.y); }
 
 	return Constant_.INTERSECTION_INTERSECT;
 };
 
-Segment2D_.prototype.getBoundingRectangle = function(result) {
-	if (result === undefined) {
+Segment2D_.prototype.getBoundingRectangle = function(result) 
+{
+	if (result === undefined) 
+	{
 		result = new BoundingRectangle_();
 	}
 	
@@ -233,31 +235,33 @@ Segment2D_.prototype.getRelativePositionOfPoint2DReport = function (point2d, res
 		"COINCIDENT_WITH_END_POINT" : 4
 	}
 	*/
-	if(resultReport === undefined) {
+	if (resultReport === undefined) 
+	{
 		resultReport = {};
 	}
 	resultReport.relPos = CODE_.relativePositionPoint2DWithSegment2D.UNKNOWN;
 
 	// check by boundingRectangle.***
 	var boundingRect = this.getBoundingRectangle();
-	if(!boundingRect.intersectsWithPoint2D(point2d))
+	if (!boundingRect.intersectsWithPoint2D(point2d))
 	{
 		resultReport.relPos = CODE_.relativePositionPoint2DWithSegment2D.OUTSIDE;
 		return resultReport;
 	}
 
-	if(error === undefined) { 
+	if (error === undefined) 
+	{ 
 		error = 1e-8; 
 	}
 
 	// check if point2d is coincident with startPoint.
-	if(point2d.isCoincidentToPoint(this.startPoint2d, error))
+	if (point2d.isCoincidentToPoint(this.startPoint2d, error))
 	{
 		resultReport.relPos = CODE_.relativePositionPoint2DWithSegment2D.COINCIDENT_WITH_START_POINT;
 		return resultReport;
 	}
 
-	if(point2d.isCoincidentToPoint(this.endPoint2d, error))
+	if (point2d.isCoincidentToPoint(this.endPoint2d, error))
 	{
 		resultReport.relPos = CODE_.relativePositionPoint2DWithSegment2D.COINCIDENT_WITH_END_POINT;
 		return resultReport;
@@ -280,22 +284,22 @@ Segment2D_.prototype.getRelativePositionOfPoint2DReport = function (point2d, res
 		return Constant_.INTERSECTION_INSIDE;
 		*/
 		var intersectionType = this.intersectionWithPointByDistances(point2d, error);
-		if(intersectionType === Constant_.INTERSECTION_POINT_A)
+		if (intersectionType === Constant_.INTERSECTION_POINT_A)
 		{
 			resultReport.relPos = CODE_.relativePositionPoint2DWithSegment2D.COINCIDENT_WITH_START_POINT;
 			return resultReport;
 		}
-		else if(intersectionType === Constant_.INTERSECTION_POINT_B)
+		else if (intersectionType === Constant_.INTERSECTION_POINT_B)
 		{
 			resultReport.relPos = CODE_.relativePositionPoint2DWithSegment2D.COINCIDENT_WITH_END_POINT;
 			return resultReport;
 		}
-		else if(intersectionType === Constant_.INTERSECTION_OUTSIDE)
+		else if (intersectionType === Constant_.INTERSECTION_OUTSIDE)
 		{
 			resultReport.relPos = CODE_.relativePositionPoint2DWithSegment2D.OUTSIDE;
 			return resultReport;
 		}
-		else if(intersectionType === Constant_.INTERSECTION_INSIDE)
+		else if (intersectionType === Constant_.INTERSECTION_INSIDE)
 		{
 			resultReport.relPos = CODE_.relativePositionPoint2DWithSegment2D.INSIDE;
 			return resultReport;

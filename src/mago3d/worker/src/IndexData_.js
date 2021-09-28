@@ -29,7 +29,7 @@ var IndexData_ = function()
 /**
  * delete the value of owner and idx.
  */
- IndexData_.prototype.deleteObjects = function() 
+IndexData_.prototype.deleteObjects = function() 
 {
 	// Don't delete objects. Only assign as undefined.
 	this.owner = undefined;

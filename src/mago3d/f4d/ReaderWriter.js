@@ -1181,6 +1181,7 @@ ReaderWriter.prototype.readTexture = function(gl, filePath_inServer, f4dTex, mag
 		return;
 	};
 
+	f4dTex.texImage.crossOrigin = "Anonymous";
 	f4dTex.texImage.src = filePath_inServer;
 };
 
@@ -1392,6 +1393,7 @@ ReaderWriter.prototype.readNeoReferenceTexture = function(gl, filePath_inServer,
 			// doesn't exist or error loading
 			return;
 		};
+		neoRefImage.crossOrigin = "Anonymous";
 		neoRefImage.src = filePath_inServer;
 	}	
 };
@@ -1486,8 +1488,8 @@ ReaderWriter.loadImage = function (gl, filePath_inServer, texture)
 		// doesn't exist or error loading
 		return;
 	};
+	image.crossOrigin = "Anonymous";
 	image.src = filePath_inServer;
-		
 };
 
 
@@ -1538,7 +1540,7 @@ ReaderWriter.prototype.readLegoSimpleBuildingTexture = function(gl, filePath_inS
 		magoManager.fileRequestControler.lowLodImagesRequestedCount -= 1;
 		if (magoManager.fileRequestControler.lowLodImagesRequestedCount < 0) { magoManager.fileRequestControler.lowLodImagesRequestedCount = 0; }
 	};
-
+	neoRefImage.crossOrigin = "Anonymous";
 	neoRefImage.src = filePath_inServer;
 };
 
@@ -1659,7 +1661,7 @@ ReaderWriter.prototype.imageFromArrayBuffer = function(gl, imageArrayBuffer, tex
 	{
 		return;
 	};
-
+	imageFromArray.crossOrigin = "Anonymous";
 	imageFromArray.src = imagenUrl;
 };
 
@@ -1711,7 +1713,7 @@ ReaderWriter.prototype.loadWMSImage = function(gl, filePath_inServer, texture, m
 			{
 				return;
 			};
-
+			imageFromArray.crossOrigin = "Anonymous";
 			imageFromArray.src = imagenUrl;
 		}
 		

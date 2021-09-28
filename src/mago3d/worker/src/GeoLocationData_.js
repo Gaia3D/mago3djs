@@ -139,7 +139,8 @@ var GeoLocationData_ = function(geoLocationDataName)
 	this.rotMatrixLC; 
 };
 
-GeoLocationData_.prototype.getRotMatrixInv = function() {
+GeoLocationData_.prototype.getRotMatrixInv = function() 
+{
 	if (this.rotMatrixInv === undefined) 
 	{
 		var rotMatrixInv = glMatrix.mat4.create();
@@ -152,7 +153,8 @@ GeoLocationData_.prototype.getRotMatrixInv = function() {
 	return this.rotMatrixInv;
 };
 
-GeoLocationData_.prototype.getTransformedRelativePosition = function(absolutePosition, resultRelativePosition) {
+GeoLocationData_.prototype.getTransformedRelativePosition = function(absolutePosition, resultRelativePosition) 
+{
 	// Note : "absolutePosition" is worldCoord position.
 	if (resultRelativePosition === undefined)
 	{ resultRelativePosition = new Point3D_(); }

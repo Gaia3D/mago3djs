@@ -14,7 +14,7 @@ BoundingRectangle_.prototype.setInitXY = function(x, y)
 	this.minY = y;
 	this.maxX = x;
 	this.maxY = y;
-}
+};
 
 BoundingRectangle_.prototype.setInit = function(point)
 {

@@ -28,21 +28,21 @@ var IndexRange_ = function()
  * make indexRange copy from another indexRange.
  * @param {IndexRange} indexRange 
  */
- IndexRange_.prototype.copyFrom = function(indexRange)
- {
-     if (indexRange === undefined)
-     { return; }
+IndexRange_.prototype.copyFrom = function(indexRange)
+{
+	if (indexRange === undefined)
+	{ return; }
      
-     this.strIdx = indexRange.strIdx;
-     this.endIdx = indexRange.endIdx;
- };
+	this.strIdx = indexRange.strIdx;
+	this.endIdx = indexRange.endIdx;
+};
  
- /**
+/**
   * indexRange init.
   * all member set undifined;
   */
-  IndexRange_.prototype.deleteObjects = function()
- {
-     this.strIdx = undefined;
-     this.endIdx = undefined;
- };
+IndexRange_.prototype.deleteObjects = function()
+{
+	this.strIdx = undefined;
+	this.endIdx = undefined;
+};

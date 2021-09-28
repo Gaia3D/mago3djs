@@ -81,7 +81,7 @@ TrianglesList_.prototype.assignVerticesIdx = function()
  * 
  * @param {Triangle[]} triangles 삼각형 클래스 배열
  */
- TrianglesList_.assignVerticesIdx = function(triangles) 
+TrianglesList_.assignVerticesIdx = function(triangles) 
 {
 	if (triangles === undefined)
 	{ return; }

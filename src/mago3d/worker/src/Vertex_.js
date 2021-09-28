@@ -40,7 +40,8 @@ Vertex_.prototype.deleteObjects = function()
 	this.color4 = undefined;
 };
 
-Vertex_.prototype.setVertexType = function (vertexType) {
+Vertex_.prototype.setVertexType = function (vertexType) 
+{
 	this.vertexType = vertexType;
 };
 

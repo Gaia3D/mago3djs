@@ -64,7 +64,7 @@ QuantizedMeshManager.prototype.doExcavation = function (qMesh, excavationGeoCoor
 	if (!this.workerQuantizedMeshExcavation)
 	{
 		var qMeshManager = this;
-		this.workerQuantizedMeshExcavation = new Worker(magoManager.config.scriptRootPath + 'Worker/workerQuantizedMeshExcavation.js');
+		this.workerQuantizedMeshExcavation = createWorker(magoManager.config.scriptRootPath + 'Worker/workerQuantizedMeshExcavation.js');
 		this.workerQuantizedMeshExcavation.onmessage = function(e)
 		{
 			var tileInfo = e.data.info;

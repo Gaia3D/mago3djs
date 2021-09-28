@@ -11,7 +11,8 @@
  * @class HalfEdge
  * @constructor
  */
-var HalfEdge_ = function () {
+var HalfEdge_ = function () 
+{
 
 	/**
 	 * start vertex of this edge.
@@ -50,7 +51,7 @@ HalfEdge_.prototype.deleteObjects = function()
  * set start vertex. this vertex's outingHedge set this edge.
  * @param {Vetex}
  */
- HalfEdge_.prototype.setStartVertex = function(vertex)
+HalfEdge_.prototype.setStartVertex = function(vertex)
 {
 	this.startVertex = vertex;
 	vertex.outingHedge = this;
@@ -60,7 +61,7 @@ HalfEdge_.prototype.deleteObjects = function()
  * set next hedge
  * @param {HalfEdge}
  */
- HalfEdge_.prototype.setNext = function(hedge)
+HalfEdge_.prototype.setNext = function(hedge)
 {
 	this.next = hedge;
 };
@@ -72,7 +73,7 @@ HalfEdge_.prototype.deleteObjects = function()
  * 
  * @see HalfEdge#areTwinables
  */
- HalfEdge_.prototype.setTwin = function(hedge)
+HalfEdge_.prototype.setTwin = function(hedge)
 {
 	var isTwinable = HalfEdge_.areTwinables(hedge, this);
 	if (isTwinable)
@@ -107,7 +108,7 @@ HalfEdge_.prototype.getEndVertex = function()
  * set Face.
  * @param {Face}
  */
- HalfEdge_.prototype.setFace = function(face)
+HalfEdge_.prototype.setFace = function(face)
 {
 	this.face = face;
 	this.face.hEdge = this;
