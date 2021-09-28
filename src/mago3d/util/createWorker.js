@@ -22,6 +22,8 @@ var createWorker = function (url)
 		worker = createWorkerFallback(url);
 	}
 
+	return worker;
+
 	function createWorkerFallback (workerUrl) 
 	{
 		var _worker = null;
