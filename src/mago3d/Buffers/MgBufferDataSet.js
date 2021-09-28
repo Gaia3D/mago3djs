@@ -119,7 +119,7 @@ MgBufferDataSet.prototype.bindBuffers = function (gl, shader)
 			var mgBuffer = mgBufferView.mgBuffer;
 
 			// 1rst, check if exist "glBuffer" of the mgBuffer.
-			if(!mgBuffer.glBuffer)
+			if (!mgBuffer.glBuffer)
 			{
 				// create a webglBuffer.***
 				mgBuffer.glBuffer = FBO.createBuffer(gl, mgBuffer.bufferData);

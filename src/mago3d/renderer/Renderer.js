@@ -2897,6 +2897,10 @@ Renderer.prototype.renderGeometryBufferORT = function (gl, renderType, visibleOb
 				gl.uniform1i(currentShader.u_outputTarget_loc, i); 
 			
 				//this.renderExcavationObjects(gl, currentShader, renderType, visibleObjControlerNodes);
+				if (i === 2 && visibleObjControlerNodes.currentVisibles0.length > 0)
+				{
+					var hola = 0;
+				}
 				this.renderNodes(gl, visibleObjControlerNodes.currentVisibles0, magoManager, currentShader, renderTexture, renderType, minSizeToRender, refTMatrixIdxKey);
 				
 				gl.uniform1i(currentShader.bApplySsao_loc, bApplySsao); 
@@ -2915,13 +2919,15 @@ Renderer.prototype.renderGeometryBufferORT = function (gl, renderType, visibleOb
 				gl.uniform1i(currentShader.clippingType_loc, 0); // 0= no clipping.***
 
 				// MgSets.***
-				if (visibleObjControlerNodes.mgSetsArray.length > 0)
-				{
-					this.renderMgSets(visibleObjControlerNodes.mgSetsArray, currentShader, renderTexture, renderType, minSizeToRender);
-				}
+				//if (visibleObjControlerNodes.mgSetsArray.length > 0)
+				//{
+				//	this.renderMgSets(visibleObjControlerNodes.mgSetsArray, currentShader, renderTexture, renderType, minSizeToRender);
+				//}
+
+				magoManager.swapRenderingFase();
 			}
 			
-			currentShader.disableVertexAttribArrayAll();
+			//currentShader.disableVertexAttribArrayAll();
 			shaderManager.useProgram(null);
 		}
 
@@ -2931,24 +2937,7 @@ Renderer.prototype.renderGeometryBufferORT = function (gl, renderType, visibleOb
 		//	this.renderAxisNodes(visibleObjControlerNodes.getAllVisibles(), renderType);
 		//}
 		
-		
 
-		// test renders.***
-		// render cctv.***
-		/*
-		magoManager.test_cctv();
-		var cctvsCount = 0;
-		if (magoManager.cctvList !== undefined)
-		{
-			cctvsCount = magoManager.cctvList.getCCTVCount();
-		}
-		if (cctvsCount > 0)
-		{
-			currentShader = magoManager.postFxShadersManager.getShader("modelRefSsao"); 
-			magoManager.cctvList.render(magoManager, currentShader );
-		}
-		*/
-		
 		// PointsCloud opaque.****************************************************************************************
 		// PointsCloud opaque.****************************************************************************************
 		// https://publik.tuwien.ac.at/files/publik_252607.pdf
