@@ -178,8 +178,8 @@ function createMago3D(minify, minifyStateFilePath)
 	var assignments = [];
 	var list = paths.source_js.slice(0);
 	list.push('!./src/mago3d/api/APIGateway.js');
-	list.push('!./src/mago3d/domain/Callback.js');
 	list.push('!./src/mago3d/worker/*');
+	list.push('!./src/mago3d/worker/src/*');
 	globby.sync(list).forEach(function(file)
 	{
 		file = path.relative('src/mago3d', file);
@@ -231,7 +231,6 @@ gulp.task('merge:js', gulp.series( 'clean', 'build', function()
 {
 	var list = paths.source_js.slice(0);
 	list.push('!./src/mago3d/api/APIGateway.js');
-	list.push('!./src/mago3d/domain/Callback.js');
 	list.push('!./src/mago3d/worker/*');
 	return gulp.src(list)
 		.pipe(babel({
@@ -248,7 +247,6 @@ gulp.task('combine:js', gulp.series( 'merge:js', function()
 
 	var list = [];
 	list.push('./src/mago3d/api/APIGateway.js');
-	list.push('./src/mago3d/domain/Callback.js');
 	list.push('./src/mago3d/extern/*.js');
 	list.push(path.join(path.normalize(paths.dest_js), 'mago3d.js'));
 
@@ -299,10 +297,11 @@ gulp.task('karma', function (done)
 gulp.task('lint', function() 
 {
     var list = paths.source_js.slice(0);
+	list.push('!./src/mago3d/worker/src/*.js');
+	
     list = list.concat(paths.test);
     return gulp.src(list)
-        .pipe(eslint({fix: true}))
-        .pipe(eslint({fix: true, quiet: isError}))
+        .pipe(eslint({fix: true, quiet: isError, envs: [{ "es6": true }]}))
         .pipe(eslint.format())
         .pipe(gulpIf(isFixed, gulp.dest(function(file)
         {
