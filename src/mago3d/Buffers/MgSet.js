@@ -18,6 +18,8 @@ var MgSet = function (options)
 
 	this.mgBufferDataSetArray = [];
 
+	this.geoLocDataManager;
+
 	if (options)
 	{
 		if (options.magoManager)
@@ -29,7 +31,6 @@ var MgSet = function (options)
 
 MgSet.makeMgSetFromMgNodesArray = function (mgNodesArray, resultMgSet)
 {
-	// 1rst, make a map [attribName : array[mgBuffer]].***
 	var map_attrib_mgBuffersArray = {};
 	var mgBufferViewSetsArray = [];
 
@@ -38,22 +39,26 @@ MgSet.makeMgSetFromMgNodesArray = function (mgNodesArray, resultMgSet)
 		resultMgSet = new MgSet();
 	}
 
+	var shortSize = 65535;
+	var currTotalElemsCount = 0;
 	var mgNodesCount = mgNodesArray.length;
 	for (var i=0; i<mgNodesCount; i++)
 	{
 		var mgNode = mgNodesArray[i];
-		var meshesArray = mgNode.mgMeshArray;
-		var meshesCount = meshesArray.length;
-		for (var j=0; j<meshesCount; j++)
+		mgNode._map_matId_mgPrimitivesArray = MgNode._makeMap_matId_mgPrimitivesArray(mgNode.mgMeshArray);
+		mgNode._map_matId_mgBufferDataSetArray = MgNode._makeMap_matId_mgBufferDataSetArray(mgNode._map_matId_mgPrimitivesArray);
+		var map_matId_mgBufferDataSetArray = mgNode._map_matId_mgBufferDataSetArray;
+		for (var key in map_matId_mgBufferDataSetArray)
 		{
-			var mgMesh = meshesArray[j];
-			var primitivesArray = mgMesh.primitives;
-			var primitivesCount = primitivesArray.length;
-			for (var k=0; k<primitivesCount; k++)
+			if (map_matId_mgBufferDataSetArray.hasOwnProperty(key)) 
 			{
-				var mgPrimitive = primitivesArray[k];
-				var mgBufferViewSet = mgPrimitive.mgBufferViewSet;
-				mgBufferViewSetsArray.push(mgBufferViewSet);
+				var mgBufferDataSetArray = map_matId_mgBufferDataSetArray[key];
+				var mgBufferDataSetsCount = mgBufferDataSetArray.length;
+				for (var j=0; j<mgBufferDataSetsCount; j++)
+				{
+					resultMgSet.mgBufferDataSetArray.push(mgBufferDataSetArray[j]);
+				}
+				
 			}
 		}
 
@@ -61,19 +66,25 @@ MgSet.makeMgSetFromMgNodesArray = function (mgNodesArray, resultMgSet)
 	}
 
 	
-	var masterMgBufferDataSet = MgBufferDataSet.makeMgBufferDataSetFromMgBufferViewSetArray(mgBufferViewSetsArray, undefined);
-
-	resultMgSet.mgBufferDataSetArray.push(masterMgBufferDataSet);
 	return resultMgSet;
 };
 
+
 MgSet.prototype.render = function (gl, shader)
 {
+	// provisionally bind geoLocData.***
+	var geoLocData = this.geoLocDataManager.getCurrentGeoLocationData();
+	geoLocData.bindGeoLocationUniforms(gl, shader);
+
 	var mgBufferDataSetsCount = this.mgBufferDataSetArray.length;
 	for (var i=0; i<mgBufferDataSetsCount; i++)
 	{
+		// 1rst, bind buffers.
 		var mgBufferDataSet = this.mgBufferDataSetArray[i];
 		mgBufferDataSet.bindBuffers(gl, shader);
+
+		// 2nd, draw by buffersViewers.***
+		
 	}
 };
 

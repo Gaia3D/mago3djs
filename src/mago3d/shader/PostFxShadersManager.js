@@ -128,6 +128,18 @@ PostFxShadersManager.prototype._createShader_gBuffer = function ()
 	shader.uSelColor4_loc = gl.getUniformLocation(shader.program, "uSelColor4");
 
 	// create an attributes locations map.***
+	// Attributtes.*************************************************************************************************
+	//shader.position3_loc = gl.getAttribLocation(shader.program, "position");
+	//shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
+	//shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
+	//shader.color4_loc = gl.getAttribLocation(shader.program, "color4");
+	// End attributes.----------------------------------------------------------------------------------------------
+	shader._attribLocMap = {
+		POSITION3 : gl.getAttribLocation(shader.program, "position"),
+		NORMAL3   : gl.getAttribLocation(shader.program, "normal"),
+		COLOR4    : gl.getAttribLocation(shader.program, "color4"),
+		TEXCOORD2 : gl.getAttribLocation(shader.program, "texCoord")
+	};
 
 
 	this.shadersMap[shaderName] = shader;
@@ -1044,7 +1056,7 @@ PostFxShadersManager.prototype.createShaderProgram = function(gl, vertexSource, 
 	shader.createUniformLocals(gl, shader, magoManager.sceneState);
 	
 	
-	// keep shader locations.
+	// keep shader locations. NO USED YET.***
 	if (!shader.attribLocations)
 	{
 		shader.attribLocations = {};

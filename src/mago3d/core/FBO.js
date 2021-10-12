@@ -327,11 +327,15 @@ FBO.prototype.deleteObjects = function(gl)
  * @param {TypedArray} data Data array to bind.
  * @returns {WebGLBuffer} WebGL Buffer.
  */
-FBO.createBuffer = function(gl, data) 
+FBO.createBuffer = function(gl, data, dataTarget) 
 {
+	if (dataTarget === undefined)
+	{
+		dataTarget = gl.ARRAY_BUFFER;
+	}
 	var buffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-	gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+	gl.bindBuffer(dataTarget, buffer);
+	gl.bufferData(dataTarget, data, gl.STATIC_DRAW);
 	return buffer;
 };
 

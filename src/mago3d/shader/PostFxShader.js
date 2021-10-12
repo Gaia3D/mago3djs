@@ -626,6 +626,18 @@ PostFxShader.prototype.createUniformGenerals = function(gl, shader, sceneState)
 	this.camera = sceneState.camera;
 };
 
+PostFxShader.prototype.getAttribLocation = function(attribName)
+{
+	if (this._attribLocMap)
+	{
+		return this._attribLocMap[attribName];
+	}
+	else 
+	{
+		return -1;
+	}
+};
+
 /**
  * 어떤 일을 하고 있습니까?
  * @param shaderName 변수
@@ -674,11 +686,12 @@ PostFxShader.prototype.createUniformLocals = function(gl, shader, sceneState)
 	shader.sunDirCC_loc = gl.getUniformLocation(shader.program, "sunDirCC");
 	shader.sunIdx_loc = gl.getUniformLocation(shader.program, "sunIdx");
 	
-	// Attributtes.*
+	// Attributtes.*************************************************************************************************
 	shader.position3_loc = gl.getAttribLocation(shader.program, "position");
 	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "texCoord");
 	shader.normal3_loc = gl.getAttribLocation(shader.program, "normal");
 	shader.color4_loc = gl.getAttribLocation(shader.program, "color4");
+	// End attributes.----------------------------------------------------------------------------------------------
 	
 	
 	shader.bUse1Color_loc = gl.getUniformLocation(shader.program, "bUse1Color");

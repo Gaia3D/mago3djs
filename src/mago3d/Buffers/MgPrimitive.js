@@ -14,7 +14,8 @@ var MgPrimitive = function (options)
 	//this.glAttributes = [];
 	this.mgOwner;
 	this.mgBufferViewSet;
-	this.mgBufferDataSet; // Old. delete this.!!!
+	this.materialId = -1;
+	//this.mgBufferDataSet; // Old. delete this.!!!
 
 	if (options)
 	{

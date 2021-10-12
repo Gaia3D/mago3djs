@@ -482,6 +482,12 @@ SunSystem.prototype.updateSun = function(magoManager, options)
 	var camTarget = ManagerUtils.calculatePixelPositionCamCoord(gl, pixelX, pixelY, undefined, undefined, undefined, undefined, magoManager, undefined);
 	var camTargetDist = Math.abs(camTarget.z);
 
+	if (camTargetDist < 100.0)
+	{
+		// Some times the "camTargetDist" is lower than 10m, so the shadows far than 10m are very poor.***
+		camTargetDist = 100.0;
+	}
+
 	// light 0 (nearest).*******************************************************************************************************
 	var distRange0 = distRange; // test debug.:
 	var dist0 = minDist + distRange0;
@@ -494,7 +500,7 @@ SunSystem.prototype.updateSun = function(magoManager, options)
 	
 	var light = this.lightSourcesArray[0];
 	
-	var newRadius = Math.abs(tangentOfHalfFovy*dist0)*4.0;
+	var newRadius = Math.abs(tangentOfHalfFovy*dist0)*6.0;
 
 	var newPoint = new Point3D(camPos.x + camDir.x * dist0, camPos.y + camDir.y * dist0, camPos.z + camDir.z * dist0);
 	if (light.bSphere === undefined)

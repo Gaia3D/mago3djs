@@ -16,11 +16,12 @@ var MgBufferView = function ()
 	this.byteLength = undefined;
 	this.byteStride = 0;
 	this.target = undefined; // GL.ARRAY_BUFFER, GL.ELEMENT_ARRAY_BUFFER.
+
 	this.name = undefined;
 
 	// auxiliar vars. Used before to create the MgBuffer.***
 	// Temporarily, the mgBufferView can have the bufferData.***
-	this.aux_bufferData;
+	this.aux_auxMgBuffer;
     
 };
 
@@ -39,7 +40,7 @@ MgBufferView.prototype.setByteLength = function (byteLength)
 	this.byteLength = byteLength;
 };
 
-MgBufferView.prototype.setAuxBufferData = function (bufferData)
+MgBufferView.prototype.setAuxMgBuffer = function (auxMgBuffer)
 {
-	this.aux_bufferData = bufferData;
+	this.aux_auxMgBuffer = auxMgBuffer;
 };

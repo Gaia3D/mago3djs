@@ -14,6 +14,9 @@ var MgBuffer = function (options)
 	this.dataLength = undefined;
 	this.name = undefined;
 	this.glType = undefined;
+	this.dataDimensions;
+	this.dataTarget;
+
 	this.mgOwner;
 
 	if (options)
@@ -92,6 +95,15 @@ MgBuffer.getByteSizeByGlType = function(glType)
 	return undefined;
 };
 
+MgBuffer.getCopyTypedArray = function(originalArray) 
+{
+	//var glType = MgBuffer.getGlTypeOfArray(originalArray);
+	//var destinationArray = MgBuffer.newTypedArray(originalArray.length, glType);
+	//destinationArray.set(originalArray);
+	//return destinationArray;
+	return originalArray.slice();
+};
+
 MgBuffer._newTypedArray = function (length, glType)
 {
 	var newArray;
@@ -126,7 +138,16 @@ MgBuffer.prototype.setBufferData = function (bufferData)
 	this.dataLength = bufferData.length;
 };
 
-MgBuffer.makeMgBufferFromMgBufferViewsArray = function (mgBufferViewsArray, resultMgBuffer)
+MgBuffer.prototype.getElementsCount = function ()
+{
+	if (this.dataLength === undefined)
+	{
+		this.dataLength = this.bufferData.length;
+	}
+	return this.dataLength / this.dataDimensions;
+};
+
+MgBuffer.makeMgBufferFromMgBufferViewsArray = function (mgBufferViewsArray, resultMgBuffer, elemsCountsArray)
 {
 	var mgBufferViewsCount = mgBufferViewsArray.length;
 	if (mgBufferViewsCount === 0)
@@ -145,42 +166,92 @@ MgBuffer.makeMgBufferFromMgBufferViewsArray = function (mgBufferViewsArray, resu
 		resultMgBuffer.bufferData = [];
 	}
 	var totalLength = 0;
-	var glType = MgBuffer.getGlTypeOfArray(mgBufferViewsArray[0].aux_bufferData); // take the "glType" from the 1rst mgBufferView.
+	var mgBufferAux = mgBufferViewsArray[0].aux_auxMgBuffer;
+
+	var glType = MgBuffer.getGlTypeOfArray(mgBufferAux.bufferData); // take the "glType" from the 1rst mgBufferView.
 	var byteSize = MgBuffer.getByteSizeByGlType(glType);
+	var dataTarget = mgBufferAux.dataTarget;
 	for (var i=0; i<mgBufferViewsCount; i++)
 	{
-		totalLength += mgBufferViewsArray[i].aux_bufferData.length;
+		var mgBufferAux = mgBufferViewsArray[i].aux_auxMgBuffer;
+		totalLength += mgBufferAux.bufferData.length;
 	}
 
 	var newArray = MgBuffer._newTypedArray(totalLength, glType);
 	var currentLength = 0;
+	var posOffset = 0; // must calculate the positionOffset. // use elemsCountsArray.***
 
 	for (var i=0; i<mgBufferViewsCount; i++)
 	{
 		var mgBufferView = mgBufferViewsArray[i];
-
+		var mgBufferAux = mgBufferView.aux_auxMgBuffer;
+		var attribName = mgBufferAux.name;
 		// Now set the bufferViewParameters.***
 		mgBufferView.setMgBuffer(resultMgBuffer);
 		mgBufferView.setByteOffset(currentLength * byteSize);
-		mgBufferView.setByteLength(mgBufferView.aux_bufferData.length * byteSize);
+		mgBufferView.setByteLength(mgBufferAux.bufferData.length * byteSize);
 
 		// Now, set the newArray.***
-		newArray.set(mgBufferView.aux_bufferData, currentLength);
-		currentLength += mgBufferView.aux_bufferData.length;
+		if (attribName === "INDICE")
+		{
+			// Must recalculate indices.***
+			// Must know the mgBufferViewOwner.***
+			
+			var dataArray = mgBufferAux.bufferData;
+			var dataLength = dataArray.length;
+			var glType = MgBuffer.getGlTypeOfArray(dataArray);
+			var recalculatedIndices = MgBuffer.newTypedArray(dataLength, glType);
+			
+			if (i > 0)
+			{ posOffset += elemsCountsArray[i-1]; }
+			for (var j=0; j<dataLength; j++)
+			{
+				if (dataArray[j] + posOffset >= 65535)
+				{
+					var hola = 0;
+				}
+				recalculatedIndices[j] = dataArray[j] + posOffset;
+			}
+			newArray.set(recalculatedIndices, currentLength);
+		}
+		else
+		{
+			newArray.set(mgBufferAux.bufferData, currentLength);
+		}
+		
+		currentLength += mgBufferAux.bufferData.length;
 
 		// now, delete the aux_bufferData.***
-		delete mgBufferView.aux_bufferData;
+		delete mgBufferAux.bufferData;
 	}
 
 	resultMgBuffer.bufferData = newArray;
 	resultMgBuffer.dataLength = totalLength;
 	resultMgBuffer.glType = glType;
+	resultMgBuffer.dataTarget = dataTarget;
 	return resultMgBuffer;
 };
 
-MgBuffer.prototype.bindBuffer = function (gl, shader)
+MgBuffer.bindBuffer = function (gl, dataTarget, glBuffer, vertexAttribLocation, dataDimensions, dataGlType, bNormalized, dataStride, dataOffSet)
 {
-	// Need know the location of the attribute.***
-	//gl.bindBuffer(this.dataTarget, this.key);
-	//gl.vertexAttribPointer(vertexAttribIndex, this.dataDimensions, this.dataGlType, this.normalized, this.dataStride, this.dataOffSet);
+	if (vertexAttribLocation < 0)
+	{
+		gl.disableVertexAttribArray(vertexAttribLocation);
+		return false;
+	}
+
+	if (dataStride === undefined)
+	{
+		dataStride = 0;
+	}
+
+	if (dataOffSet === undefined)
+	{
+		dataOffSet = 0;
+	}
+
+	gl.enableVertexAttribArray(vertexAttribLocation);
+	gl.bindBuffer(dataTarget, glBuffer);
+	gl.vertexAttribPointer(vertexAttribLocation, dataDimensions, dataGlType, bNormalized, dataStride, dataOffSet);
+	return true;
 };

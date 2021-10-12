@@ -1290,6 +1290,8 @@ Modeler.prototype.__TEST__convertF4D_to_MagoNode = function ()
 	var data = nodeSelected.data;
 	var smartTile = data.smartTileOwner;
 	var neoBuilding = data.neoBuilding;
+	var geoLocDataManager = data.geoLocDataManager;
+	var selectedGeoLocData = geoLocDataManager.getCurrentGeoLocationData();
 
 	if (!this.__loadedAllReferences)
 	{
@@ -1316,6 +1318,10 @@ Modeler.prototype.__TEST__convertF4D_to_MagoNode = function ()
 		for (var i=0; i<referencesCount; i++)
 		{
 			var ref = motherNeoReferencesArray[i];
+			if (!ref)
+			{
+				continue;
+			}
 			var blockIdx = ref._block_idx;
 			var block = motherBlocksArray[blockIdx];
 			var materialId = ref.materialId;
@@ -1338,8 +1344,6 @@ Modeler.prototype.__TEST__convertF4D_to_MagoNode = function ()
 			{
 				var referencesArray = map_matId_references[key];
 				mgNode = this.__TEST__convertF4D_to_MagoNode__createPrimitives(referencesArray, neoBuilding, mgNode);
-
-				var hola = 0;
 			}
 		}
 
@@ -1349,7 +1353,11 @@ Modeler.prototype.__TEST__convertF4D_to_MagoNode = function ()
 		}
 
 		// Now, insert mgData into smartTile.***
+		// In each "mgNode", there are mgMeshes array = references array.***
 		var mgSet = MgSet.makeMgSetFromMgNodesArray([mgNode]);
+		mgSet.geoLocDataManager = new GeoLocationDataManager();
+		var geoLocData = mgSet.geoLocDataManager.newGeoLocationData();
+		geoLocData.copyFrom(selectedGeoLocData);
 		smartTile.mgSetArray.push(mgSet);
 
 		// Test finished.************************************
@@ -1364,37 +1372,23 @@ Modeler.prototype.__TEST__convertF4D_to_MagoNode__createPrimitives = function (r
 	// For each reference, create a mesh. Inside the mesh create a primitive.
 	var motherNeoReferencesArray = neoBuilding.motherNeoReferencesArray;
 	var motherBlocksArray = neoBuilding.motherBlocksArray;
+	var magoManager = this.magoManager;
+	var gl = magoManager.getGl();
 
-	// each reference is a mgNode with a primitive.
+	// each reference is a mgMesh with a primitive.
 	var refCount = referencesArray.length;
+
 	for (var i=0; i<refCount; i++)
 	{
 		var ref = referencesArray[i];
 		var refMatrixType = ref.refMatrixType;
 		var blockIdx = ref._block_idx;
 		var block = motherBlocksArray[blockIdx];
-		var refTranslationVec;
-		var ref_tMat = ref._originalMatrix4;
+		var refTranslationVec = ref.refTranslationVec;
 		var block_vBOVertexIdxCacheKeysContainer = block.vBOVertexIdxCacheKeysContainer;
 		var ref_vBOVertexIdxCacheKeysContainer = ref.vBOVertexIdxCacheKeysContainer;
-
-		if (refMatrixType === 0)
-		{
-			// identity matrix.
-			var hola = 0;
-		}
-		else if (refMatrixType === 1)
-		{
-			// translation matrix.
-			refTranslationVec = ref.refTranslationVec;
-
-			var hola = 0;
-		}
-		else if (refMatrixType === 2)
-		{
-			// transform matrix.
-			var hola = 0;
-		}
+		var _originalMatrix4 = ref._originalMatrix4;
+		//var _originalMatrix4 = ref._matrix4;
 
 		var mgBufferDataSet;
 		
@@ -1413,44 +1407,95 @@ Modeler.prototype.__TEST__convertF4D_to_MagoNode__createPrimitives = function (r
 
 			var vboBufferIdx = block_vboKey.vboBufferIdx;
 			var vboBufferPos = block_vboKey.vboBufferPos; // affected by tMatrix or translationVector.
-			var vboBufferNor = block_vboKey.vboBufferNor; // affected by tMatrix.
+			var vboBufferNor = block_vboKey.vboBufferNor; // affected by rotMatrix.
 			var vboBufferCol = ref_vboKey.vboBufferCol;
 			var vboBufferTCoord = ref_vboKey.vboBufferTCoord;
 
 			var mgBufferViewSet = new MgBufferViewSet();
+			
+			var attribName;
 
 			if (block_vboKey.vboBufferPos)
 			{
-				mgBufferViewSet.setAuxBufferData(block_vboKey.vboBufferPos.dataArray, "POSITION3");
+				var dataArray = MgBuffer.getCopyTypedArray(block_vboKey.vboBufferPos.dataArray);
+				if (refMatrixType === 1)
+				{
+					// positionData must be translated.***
+					var dataLength = dataArray.length;
+					var vertexCount = dataLength / 3;
+					for (var k=0; k<vertexCount; k++)
+					{
+						dataArray[3*k] += refTranslationVec[0];
+						dataArray[3*k+1] += refTranslationVec[1];
+						dataArray[3*k+2] += refTranslationVec[2];
+					}
+				}
+				else if (refMatrixType === 2)
+				{
+					// positionData must be transformed & normalData must be rotated.***
+					var transformedDataArray = _originalMatrix4.transformDataArray3D(dataArray);
+					dataArray = transformedDataArray;
+				}
+				var mgBufferAux = new MgBuffer();
+				mgBufferAux.setBufferData(dataArray);
+				mgBufferAux.dataDimensions = 3;
+				mgBufferAux.dataTarget = gl.ARRAY_BUFFER;
+				mgBufferAux.name = "POSITION3";
+				var mgBufferView = mgBufferViewSet.getOrNewMgBufferView("POSITION3");
+				mgBufferView.setAuxMgBuffer(mgBufferAux);
 			}
 			if (block_vboKey.vboBufferNor)
 			{
-				mgBufferViewSet.setAuxBufferData(block_vboKey.vboBufferNor.dataArray, "NORMAL3");
+				var dataArray = MgBuffer.getCopyTypedArray(block_vboKey.vboBufferNor.dataArray);
+				if (refMatrixType === 2)
+				{
+					// positionData must be transformed & normalData must be rotated.***
+					var transformedDataArray = _originalMatrix4.rotateDataArray3D(dataArray);
+					dataArray = transformedDataArray;
+				}
+				var mgBufferAux = new MgBuffer();
+				mgBufferAux.setBufferData(dataArray);
+				mgBufferAux.dataDimensions = 3;
+				mgBufferAux.dataTarget = gl.ARRAY_BUFFER;
+				mgBufferAux.name = "NORMAL3";
+				var mgBufferView = mgBufferViewSet.getOrNewMgBufferView("NORMAL3");
+				mgBufferView.setAuxMgBuffer(mgBufferAux);
 			}
 			if (ref_vboKey.vboBufferCol)
 			{
-				mgBufferViewSet.setAuxBufferData(ref_vboKey.vboBufferCol.dataArray, "COLOR4");
+				var mgBufferAux = new MgBuffer();
+				var dataArray = MgBuffer.getCopyTypedArray(ref_vboKey.vboBufferCol.dataArray);
+				mgBufferAux.setBufferData(dataArray);
+				mgBufferAux.dataDimensions = 4;
+				mgBufferAux.dataTarget = gl.ARRAY_BUFFER;
+				mgBufferAux.name = "COLOR4";
+				var mgBufferView = mgBufferViewSet.getOrNewMgBufferView("COLOR4");
+				mgBufferView.setAuxMgBuffer(mgBufferAux);
 			}
 			if (ref_vboKey.vboBufferTCoord)
 			{
-				mgBufferViewSet.setAuxBufferData(ref_vboKey.vboBufferTCoord.dataArray, "TEXCOORD2");
+				var mgBufferAux = new MgBuffer();
+				var dataArray = MgBuffer.getCopyTypedArray(ref_vboKey.vboBufferTCoord.dataArray);
+				mgBufferAux.setBufferData(dataArray);
+				mgBufferAux.dataDimensions = 2;
+				mgBufferAux.dataTarget = gl.ARRAY_BUFFER;
+				mgBufferAux.name = "TEXCOORD2";
+				var mgBufferView = mgBufferViewSet.getOrNewMgBufferView("TEXCOORD2");
+				mgBufferView.setAuxMgBuffer(mgBufferAux);
 			}
 			if (block_vboKey.vboBufferIdx)
 			{
-				mgBufferViewSet.setAuxBufferData(block_vboKey.vboBufferIdx.dataArray, "INDICE");
+				var mgBufferAux = new MgBuffer();
+				var dataArray = MgBuffer.getCopyTypedArray(block_vboKey.vboBufferIdx.dataArray);
+				mgBufferAux.setBufferData(dataArray);
+				mgBufferAux.dataDimensions = 1;
+				mgBufferAux.dataTarget = gl.ELEMENT_ARRAY_BUFFER;
+				mgBufferAux.name = "INDICE";
+				var mgBufferView = mgBufferViewSet.getOrNewMgBufferView("INDICE");
+				mgBufferView.setAuxMgBuffer(mgBufferAux);
 			}
 
-			if (refMatrixType === 1)
-			{
-				// positionData must be translated.***
-				var hola = 0;
-			}
-			else if (refMatrixType === 2)
-			{
-				// positionData must be transformed & normalData must be rotated.***
-
-				var hola = 0;
-			}
+			
 
 			var mgMesh = new MgMesh({mgOwner: mgNode});
 			var mgPrimitive = new MgPrimitive({mgOwner: mgMesh});

@@ -13,6 +13,7 @@ var MgBufferViewSet = function (options)
 
 	this.mgOwner;
 	this.bufferViewsMap = {};
+	this.materialId;
 
 	if (options)
 	{
@@ -39,9 +40,3 @@ MgBufferViewSet.prototype.getOrNewMgBufferView = function(attributeName)
 	return this.bufferViewsMap[attributeName];
 };
 
-MgBufferViewSet.prototype.setAuxBufferData = function(bufferData, attributeName)
-{
-	var mgBufferView = this.getOrNewMgBufferView(attributeName);
-	mgBufferView.setAuxBufferData(bufferData);
-
-};

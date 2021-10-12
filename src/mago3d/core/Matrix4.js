@@ -345,6 +345,88 @@ Matrix4.prototype.getInverse = function(resultInverseMat)
 	return resultInverseMat;
 };
 
+Matrix4.prototype.transformDataArray3D = function(dataArray, result) 
+{
+	var dataLength = dataArray.length;
+	var pointsCount = dataLength/3;
+	if (!result)
+	{
+		var glType = MgBuffer.getGlTypeOfArray(dataArray);
+		result = MgBuffer.newTypedArray(dataArray.length, glType);
+	}
+	var m_0_0 = this.get(0, 0);
+	var m_0_1 = this.get(0, 1);
+	var m_0_2 = this.get(0, 2);
+	//var m_0_3 = this.get(0, 3);
+
+	var m_1_0 = this.get(1, 0);
+	var m_1_1 = this.get(1, 1);
+	var m_1_2 = this.get(1, 2);
+	//var m_1_3 = this.get(1, 3);
+
+	var m_2_0 = this.get(2, 0);
+	var m_2_1 = this.get(2, 1);
+	var m_2_2 = this.get(2, 2);
+	//var m_2_3 = this.get(2, 3);
+
+	var m_3_0 = this.get(3, 0);
+	var m_3_1 = this.get(3, 1);
+	var m_3_2 = this.get(3, 2);
+	//var m_3_3 = this.get(3, 3);
+
+	for (var i=0; i<pointsCount; i++)
+	{
+		var x = dataArray[3*i];
+		var y = dataArray[3*i+1];
+		var z = dataArray[3*i+2];
+
+		result[3*i] =   x*m_0_0 + y*m_1_0 + z*m_2_0 + m_3_0; // result x.
+		result[3*i+1] = x*m_0_1 + y*m_1_1 + z*m_2_1 + m_3_1; // result y.
+		result[3*i+2] = x*m_0_2 + y*m_1_2 + z*m_2_2 + m_3_2; // result z.
+	}
+
+	return result;
+};
+
+Matrix4.prototype.rotateDataArray3D = function(dataArray, result) 
+{
+	var dataLength = dataArray.length;
+	var pointsCount = dataLength/3;
+	if (!result)
+	{
+		var glType = MgBuffer.getGlTypeOfArray(dataArray);
+		result = MgBuffer.newTypedArray(dataArray.length, glType);
+	}
+	var m_0_0 = this.get(0, 0);
+	var m_0_1 = this.get(0, 1);
+	var m_0_2 = this.get(0, 2);
+	//var m_0_3 = this.get(0, 3);
+
+	var m_1_0 = this.get(1, 0);
+	var m_1_1 = this.get(1, 1);
+	var m_1_2 = this.get(1, 2);
+	//var m_1_3 = this.get(1, 3);
+
+	var m_2_0 = this.get(2, 0);
+	var m_2_1 = this.get(2, 1);
+	var m_2_2 = this.get(2, 2);
+	//var m_2_3 = this.get(2, 3);
+
+
+	for (var i=0; i<pointsCount; i++)
+	{
+		var x = dataArray[3*i];
+		var y = dataArray[3*i+1];
+		var z = dataArray[3*i+2];
+
+		result[3*i] =   x*m_0_0 + y*m_1_0 + z*m_2_0; // result x.
+		result[3*i+1] = x*m_0_1 + y*m_1_1 + z*m_2_1; // result y.
+		result[3*i+2] = x*m_0_2 + y*m_1_2 + z*m_2_2; // result z.
+	}
+
+	return result;
+};
+
 /**
  * 행렬연산을 통해 주어진 포인트를 이동한다.
  *
