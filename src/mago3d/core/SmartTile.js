@@ -1843,6 +1843,11 @@ SmartTile.prototype.parseSmartTileF4d = function (dataArrayBuffer, magoManager)
 
 		// Now, must check if the node exists.
 		var node = hierarchyManager.getNodeByDataKey(savedProjectId, buildingId);
+		if(node)
+		{
+			attributes = node.data.attributes; // added with jaehyun 20211026, when reloaded smartTile, referenceHeight problem solving.***
+		}
+
 		var neoBuilding;
 		var data;
 		var metadataByteSize = (new Int32Array(dataArrayBuffer.slice(bytesReaded, bytesReaded+4)))[0]; bytesReaded += 4;

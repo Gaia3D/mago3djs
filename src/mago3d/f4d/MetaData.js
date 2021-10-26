@@ -206,7 +206,7 @@ MetaData.prototype.deleteObjects = function()
 /**
  * Returns the projectDataType.
  */
-MetaData.prototype.getProjectDataType = function() 
+MetaData.prototype.getProjectDataType = function () 
 {
 	return this.projectDataType;
 };
@@ -216,7 +216,7 @@ MetaData.prototype.getProjectDataType = function()
  * @param {ArrayBuffer} arrayBuffer
  * @param {ReaderWriter} readWriter 
  */
-MetaData.prototype.parseFileHeaderAsimetricVersion = function(arrayBuffer, bytesReaded) 
+MetaData.prototype.parseFileHeaderAsimetricVersion = function (arrayBuffer, bytesReaded) 
 {
 	var version_string_length = 5;
 	var intAux_scratch = 0;

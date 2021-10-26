@@ -2315,7 +2315,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		}
 
 		// Debug component.******************************************
-		//this.modeler.__TEST();
+		this.modeler.__TEST();
 		/*
 		var lightAux;
 		if (lightsArray)
