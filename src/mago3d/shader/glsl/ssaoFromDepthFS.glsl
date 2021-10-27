@@ -187,6 +187,10 @@ float getOcclusion(vec3 origin, vec3 rotatedKernel, float radius)
     offsetCoord.xyz /= offset.w;
     offsetCoord.xyz = offsetCoord.xyz * 0.5 + 0.5;  	
 
+    if(abs(offsetCoord.x) > 1.0 || abs(offsetCoord.y) > 1.0)
+    {
+        return result_occlusion;
+    }
     vec4 normalRGBA = getNormal(offsetCoord.xy);
     int currFrustumIdx = int(floor(100.0*normalRGBA.w));
     vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);
