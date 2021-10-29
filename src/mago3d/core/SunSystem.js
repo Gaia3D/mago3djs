@@ -480,6 +480,8 @@ SunSystem.prototype.updateSun = function(magoManager, options)
 
 	// Calculate camTarget distance:
 	var camTarget = ManagerUtils.calculatePixelPositionCamCoord(gl, pixelX, pixelY, undefined, undefined, undefined, undefined, magoManager, undefined);
+	if (!camTarget) { return; }
+	
 	var camTargetDist = Math.abs(camTarget.z);
 
 	if (camTargetDist < 100.0)

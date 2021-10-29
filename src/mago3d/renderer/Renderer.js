@@ -613,6 +613,9 @@ Renderer.prototype.renderSilhouetteDepth = function ()
 Renderer.prototype.renderDepthSunSystem = function(visibleObjControlerNodes) 
 {
 	var magoManager = this.magoManager;
+
+	if (!magoManager.depthFboNeo) { return; }
+	
 	var gl = magoManager.getGl();
 	var sceneState = magoManager.sceneState;
 

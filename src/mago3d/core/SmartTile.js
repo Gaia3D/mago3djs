@@ -1565,6 +1565,12 @@ SmartTile.prototype._parseSmartTileF4d = function (parsedResult, magoManager)
 				});
 			}
 		}
+		// Now, must check if the node exists.
+		var node = hierarchyManager.getNodeByDataKey(savedProjectId, buildingId);
+
+		if(node) {
+		attributes = node.data.attributes;
+		}
 
 		var commonAttr = smartTilePathInfo[projectId].attributes;
 		if (commonAttr) 
@@ -1572,8 +1578,6 @@ SmartTile.prototype._parseSmartTileF4d = function (parsedResult, magoManager)
 			attributes.isVisible = commonAttr.isVisible;
 		}
 
-		// Now, must check if the node exists.
-		var node = hierarchyManager.getNodeByDataKey(savedProjectId, buildingId);
 		var neoBuilding;
 		var data;
 		var neoBuildingHeaderData = parsedBuildingData.neoBuildingHeaderData;
@@ -1593,7 +1597,7 @@ SmartTile.prototype._parseSmartTileF4d = function (parsedResult, magoManager)
 				data.attributes.fromSmartTile = true;
 				data.attributes.fromDate = new Date();
 				data.attributes.toDate = new Date();
-				data.mapping_type = "boundingboxcenter";
+				data.mapping_type = "origin";
 			
 				neoBuilding = new NeoBuilding();
 				data.neoBuilding = neoBuilding;

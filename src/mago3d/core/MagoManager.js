@@ -8696,12 +8696,6 @@ MagoManager.prototype.callAPI = function(api)
 		//this.rootNodeSelected = this.nodeSelected.getRoot();
 
 		this.selectionManager.selectF4d(node);
-
-		this.emit(MagoManager.EVENT_TYPE.SELECTEDF4D, {
-			type      : MagoManager.EVENT_TYPE.SELECTEDF4D, 
-			f4d       : node, 
-			timestamp : new Date()
-		});
 	}
 };
 

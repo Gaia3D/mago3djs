@@ -809,6 +809,8 @@ SelectionManager.prototype.removeF4d = function(f4d)
  */
 SelectionManager.prototype.selectF4d = function(f4d)
 {
+	if (!f4d) { return; }
+	
 	var arr = this.getSelectedF4dNodeArray();
 
 	var has = arr.filter(function(model) 
@@ -816,6 +818,16 @@ SelectionManager.prototype.selectF4d = function(f4d)
 		return model === f4d;
 	})[0];
 
-	if (!has) { this.currentNodeSelectedArray.push(f4d); }
+	if (!has) 
+	{ 
+		this.currentNodeSelectedArray.push(f4d); 
+		
+		this.magoManager.emit(MagoManager.EVENT_TYPE.SELECTEDF4D, {
+			type      : MagoManager.EVENT_TYPE.SELECTEDF4D, 
+			selected  : f4d, 
+			f4d       : f4d,
+			timestamp : new Date()
+		});
+	}
 	if (!this.currentNodeSelected) { this.currentNodeSelected = f4d; }
 };

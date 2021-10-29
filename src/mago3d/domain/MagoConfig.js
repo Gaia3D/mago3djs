@@ -179,6 +179,17 @@ MagoConfig.prototype.init = function(serverPolicy, projectIdArray, projectDataAr
 				magoScriptPath = result[1];
 			}
 		}
+
+		var base  = document.getElementsByTagName('base');
+		if (base.length === 1) 
+		{
+			var baseHref = base[0].getAttribute('href');
+			if (baseHref !== '/' && baseHref !== './') 
+			{
+				magoScriptPath = baseHref + magoScriptPath;
+			}
+		}
+
 		return magoScriptPath;
 	}
 };
