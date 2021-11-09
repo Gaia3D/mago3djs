@@ -32,6 +32,7 @@ uniform float u_contaminantMaxHeigh; // if "u_contaminantMaxHeigh" < 0.0 -> no e
 
 uniform vec2 u_simulationTextureSize;
 uniform vec2 u_terrainTextureSize;
+uniform int u_terrainHeightEncodingBytes;
 
 float decodeRG(in vec2 waterColorRG)
 {
@@ -109,9 +110,28 @@ void encodeWaterFlux(vec4 flux, inout vec4 flux_high, inout vec4 flux_low)
 
 float getTerrainHeight(in vec2 texCoord)
 {
-    float terainHeight = texture2D(terrainHeightTex, texCoord).r;
-    terainHeight = u_heightMap_MinMax.x + terainHeight * (u_heightMap_MinMax.y - u_heightMap_MinMax.x);
-    return terainHeight;
+    if(u_terrainHeightEncodingBytes == 1)
+    {
+        float terainHeight = texture2D(terrainHeightTex, texCoord).r;
+        terainHeight = u_heightMap_MinMax.x + terainHeight * (u_heightMap_MinMax.y - u_heightMap_MinMax.x);
+        return terainHeight;
+    }
+    else if(u_terrainHeightEncodingBytes == 2)
+    {
+        // 4byte mode.***
+        vec4 terrainEncoded = texture2D(terrainHeightTex, texCoord);
+        float terainHeight = decodeRG(terrainEncoded.rg);
+        terainHeight = u_heightMap_MinMax.x + terainHeight * (u_heightMap_MinMax.y - u_heightMap_MinMax.x);
+        return terainHeight;
+    }
+    else if(u_terrainHeightEncodingBytes == 4)
+    {
+        // 4byte mode.***
+        vec4 terrainEncoded = texture2D(terrainHeightTex, texCoord);
+        float terainHeight = unpackDepth(terrainEncoded);
+        terainHeight = u_heightMap_MinMax.x + terainHeight * (u_heightMap_MinMax.y - u_heightMap_MinMax.x);
+        return terainHeight;
+    }
 }
 
 void main()

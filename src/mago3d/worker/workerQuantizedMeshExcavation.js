@@ -24,6 +24,8 @@ importScripts('./src/Utils_.js');
 importScripts('./src/Vertex_.js');
 importScripts('./src/VertexList_.js');
 
+importScripts('../../../src/mago3d/util/createWorker.js');
+
 var worker = self;
 
 worker.onmessage = function (e) 

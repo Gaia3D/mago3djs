@@ -72,6 +72,7 @@ void main() {
     vec3 pos = a_pos * 2.0; // quantizedMeshes uses the positive parts of the signed short, so must multiply by 2.
     
 	pos = vec3(pos.xy * 2000.0, pos.z * 500.0 + 500.0);
+	//pos = vec3(pos.xy * 20.0, pos.z + 500.0);
     //----------------------------------------------------------------------------------------------------
 	vec4 rotatedPos = buildingRotMatrix * vec4(pos.xyz, 1.0);
     vec3 objPosHigh = buildingPosHIGH;

@@ -160,22 +160,30 @@ vec3 getRainbowColor_byHeight(float height, in float maxi, in float mini)
 void main()
 {
     float minWaterHeightToRender = 0.001; // 1mm.
-    minWaterHeightToRender = 0.01; // test. delete.
-    if(vWaterHeight + vContaminantHeight < minWaterHeightToRender)// original = 0.0001
+    //minWaterHeightToRender = 0.01; // 1cm.
+    minWaterHeightToRender = 0.005; // 0.5cm.
+    //if(vWaterHeight + vContaminantHeight < minWaterHeightToRender)// original = 0.0001
+    //{
+    //    discard;
+    //}
+    float totalH = vWaterHeight + vContaminantHeight;
+    float alpha = vColorAuxTest.a;
+    if(totalH < 0.1)// original = 0.0001
     {
-        discard;
+        alpha = min(totalH/0.1, alpha); // original.***
+        //alpha = totalH; // test.***
     }
 
-    float alpha = vColorAuxTest.a;
+    
     vec4 finalCol4 = vec4(vColorAuxTest);
-    if(vWaterHeight + vContaminantHeight < minWaterHeightToRender)// + 0.01)
-    {
-        alpha = 0.9;
-        finalCol4 = vec4(vColorAuxTest * 0.4);
-    }
+    //if(vWaterHeight + vContaminantHeight < minWaterHeightToRender)// + 0.01)
+    //{
+    //   alpha = 0.9;
+    //   finalCol4 = vec4(vColorAuxTest * 0.4);
+    //}
 
     // calculate contaminationConcentration;
-    float contaminConcentration = vContaminantHeight / (vWaterHeight + vContaminantHeight);
+    float contaminConcentration = vContaminantHeight / (totalH);
 
     //vec2 screenPos = vec2(gl_FragCoord.x / u_screenSize.x, gl_FragCoord.y / u_screenSize.y);
 

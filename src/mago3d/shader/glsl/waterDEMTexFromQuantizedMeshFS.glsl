@@ -17,6 +17,7 @@
 uniform vec2 u_minMaxHeights;
 uniform int colorType; // 0= oneColor, 1= attribColor, 2= texture.
 uniform vec4 u_oneColor4;
+uniform int u_terrainHeightEncodingBytes;
 
 varying vec3 vPos;
 varying vec4 vColor4;
@@ -33,11 +34,37 @@ float unpackDepth(const in vec4 rgba_depth)
 	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));
 }
 
+float decodeRG(in vec2 waterColorRG)
+{
+    // https://titanwolf.org/Network/Articles/Article?AID=666e7443-0511-4210-b39c-db0bb6738246#gsc.tab=0
+    return dot(waterColorRG, vec2(1.0, 1.0 / 255.0));
+}
 
+vec2 encodeRG(in float wh)
+{
+    // https://titanwolf.org/Network/Articles/Article?AID=666e7443-0511-4210-b39c-db0bb6738246#gsc.tab=0
+    float encodedBit = 1.0/255.0;
+    vec2 enc = vec2(1.0, 255.0) * wh;
+    enc = fract(enc);
+    enc.x -= enc.y * encodedBit;
+    return enc; // R = HIGH, G = LOW.***
+}
 
 void main()
 {
     vec4 finalCol4 = vec4(vPos.z, vPos.z, vPos.z, 1.0); // original.***
+    if(u_terrainHeightEncodingBytes == 1)
+    {
+        finalCol4 = vec4(vPos.z, vPos.z, vPos.z, 1.0); 
+    }
+    else if(u_terrainHeightEncodingBytes == 2)
+    {
+        finalCol4 = vec4(encodeRG(vPos.z), 0.0, 1.0); // 2byte height.
+    }
+    else if(u_terrainHeightEncodingBytes == 4)
+    {
+        finalCol4 = packDepth(vPos.z); 
+    }
 
     if(colorType == 1)
     {

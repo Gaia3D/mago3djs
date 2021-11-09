@@ -76,6 +76,7 @@ var Water = function(waterManager, options)
 	// Shader log textures.********************************************
 	this.shaderLogTexA; // auxiliar tex to debug shaders.***
 	this.shaderLogTexB; // auxiliar tex to debug shaders.***
+	this.shaderLogParticlesPos_TexA; // auxiliar tex to debug shaders.***
 
 	this.shaderLogTex_Flux_A; // auxiliar tex to debug shaders.***
 	this.shaderLogTex_Flux_B; // auxiliar tex to debug shaders.***
@@ -86,16 +87,19 @@ var Water = function(waterManager, options)
 	// simulation parameters.******************************************
 	this.terrainMinMaxHeights = new Float32Array([180.0, 540.0]);
 	this.waterMaxHeight = 500.0; // ok.
-	//this.waterMaxHeight = 1000.0; // ok.
 	this.waterMaxFlux = 100000.0; // ok. (4000 is no enought).
 	this.waterMaxVelocity = 40.0;
 	this.waterMaxVelocity = 400.0;
 	this.contaminantMaxheight = -1.0; // value when there are no exist contaminant.
 	this.contaminantMaxheight = 50.0;
-
 	this.simulationTimeStep = 0.08; // ok.
 
 	// The "simulationTimeStep" must be calculated by simulation cell size.***
+
+	// Settings for only rain.***************************************************************************
+	this.waterMaxFlux = 4000.0; // setting for only rain.***
+	//this.waterMaxHeight = 10.0; // test.***
+	// End Settings for only rain.----------------------------------------------------------------------- 
 
 
 	// The water renderable surface.
@@ -398,6 +402,7 @@ Water.prototype.init = function ()
 	this.cellArea = this.cellSize_x * this.cellSize_y;
 
 	this.simulationTimeStep = 0.08;
+	this.simulationTimeStep = 0.06;
 
 	this._bIsPrepared = true;
 };
@@ -435,6 +440,7 @@ Water.prototype._makeTextures = function ()
 	// Shade Log textures.**********************************************************************************************************************
 	this.shaderLogTexA = waterManager._newTexture(gl, texWidth, texHeight); // auxiliar tex to debug shaders. delete after use.
 	this.shaderLogTexB = waterManager._newTexture(gl, texWidth, texHeight); // auxiliar tex to debug shaders. delete after use.
+	
 
 	this.shaderLogTex_Flux_A = waterManager._newTexture(gl, texWidth, texHeight); // auxiliar tex to debug shaders. delete after use.
 	this.shaderLogTex_Flux_B = waterManager._newTexture(gl, texWidth, texHeight); // auxiliar tex to debug shaders. delete after use.
@@ -455,6 +461,7 @@ Water.prototype._makeTextures = function ()
 	this.particlesPosTex_B = new Texture();
 	this.particlesPosTex_A.texId = Texture.createTexture(gl, gl.NEAREST, particleState, this.windRes, this.windRes);
 	this.particlesPosTex_B.texId = Texture.createTexture(gl, gl.NEAREST, particleState, this.windRes, this.windRes);
+	this.shaderLogParticlesPos_TexA = waterManager._newTexture(gl, this.windRes, this.windRes);
 
 	// Contamination texture.*********************************************************************************************************************
 	this.contaminationTex_A = waterManager._newTexture(gl, texWidth, texHeight);
@@ -576,6 +583,7 @@ Water.prototype.makeDEMTextureByQuantizedMeshes = function ()
 
 	//gl.uniform2fv(shader.u_minMaxHeights_loc, [this.qMesh._minimumHeight, this.qMesh._maximumHeight]);
 	gl.uniform1i(shader.colorType_loc_loc, 0);
+	gl.uniform1i(shader.u_terrainHeightEncodingBytes_loc, waterManager.terrainHeightEncodingBytes);
 
 	//gl.disable(gl.CULL_FACE);
 	gl.clear(gl.DEPTH_BUFFER_BIT);
@@ -612,7 +620,7 @@ Water.prototype.makeDEMTextureByQuantizedMeshes = function ()
 		var vertices_count = vbo_vicky.vertexCount;
 
 		// Bind positions.
-		vbo_vicky.vboBufferPos.bindData(shader, shader.a_pos, vboMemManager);
+		vbo_vicky.vboBufferPos.bindData(shader, shader.position3_loc, vboMemManager);
 		
 		//if (!vbo_vicky.bindDataNormal(shader, magoManager.vboMemoryManager))
 		//{ return false; }
@@ -1218,7 +1226,7 @@ Water.prototype.prepareTextures = function ()
 			var waterManager = this.waterManager;
 			waterManager.simulationTileDepth = targetDepth;
 			var simulationTileDepth = waterManager.simulationTileDepth;
-			this._targetDepth = simulationTileDepth + 3;
+			this._targetDepth = simulationTileDepth + 6; // default = +4.***
 
 			var maxDepthAvailable = MagoManager.getMaximumLevelOfTerrainProvider(this.waterManager.terrainProvider);
 			if (this._targetDepth > maxDepthAvailable)
@@ -1375,8 +1383,6 @@ Water.prototype.test__doQuantizedSurfaceExcavation = function (magoManager)
 	{
 		return;
 	}
-
-	
 
 	// Test.*** delete this.*** Test.*** delete this.*** Test.*** delete this.*** Test.*** delete this.*** Test.*** delete this.*** Test.*** 
 	if (!this.testQMesh) 
@@ -1628,9 +1634,14 @@ Water.prototype.doSimulationSteps = function (magoManager)
 	var screenQuad = waterManager.getQuadBuffer();
 	shader = magoManager.postFxShadersManager.getShader("waterCalculateHeight");
 	magoManager.postFxShadersManager.useProgram(shader);
-	gl.uniform1i(shader.u_existRain_loc, waterManager.bExistRain);
+	var increTimeSeconds = waterManager.getIncrementTimeSeconds() * 1;
+
+	//gl.uniform1i(shader.u_existRain_loc, waterManager.bExistRain);
 	gl.uniform1f(shader.u_waterMaxHeigh_loc, this.waterMaxHeight);
 	gl.uniform1f(shader.u_contaminantMaxHeigh_loc, this.contaminantMaxheight); // negative value -> no exist contaminat.
+	gl.uniform1f(shader.u_increTimeSeconds_loc, increTimeSeconds); // set the increment of the time.***
+	gl.uniform1i(shader.u_rainType_loc, waterManager.rainType); // 0= rain by a value (mm/h). 1= rain by a texture.***
+	gl.uniform1f(shader.u_rainValue_mmHour_loc, waterManager.rainValue_mmHour); // 200 mm/hour.***
 
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, this.waterSourceTex.texId); // water source.
@@ -1656,7 +1667,7 @@ Water.prototype.doSimulationSteps = function (magoManager)
 	gl.bindTexture(gl.TEXTURE_2D, this.waterAditionTex.texId);
 
 	// bind screenQuad positions.
-	FBO.bindAttribute(gl, screenQuad.posBuffer, shader.a_pos, 2);
+	FBO.bindAttribute(gl, screenQuad.posBuffer, shader.attribLocations.a_pos, 2);
 	//FBO.bindAttribute(gl, this.texCoordBuffer, shader.texCoord2_loc, 2);
 
 	// Draw screenQuad:
@@ -1693,6 +1704,7 @@ Water.prototype.doSimulationSteps = function (magoManager)
 	gl.uniform1f(shader.u_waterMaxFlux_loc, this.waterMaxFlux);
 	gl.uniform2fv(shader.u_tileSize_loc, [this.tileSizeMeters_x, this.tileSizeMeters_y]);
 	gl.uniform1f(shader.u_contaminantMaxHeigh_loc, this.contaminantMaxheight); // negative value -> no exist contaminat.
+	gl.uniform1i(shader.u_terrainHeightEncodingBytes_loc, waterManager.terrainHeightEncodingBytes);
 
 	gl.activeTexture(gl.TEXTURE0); // water height tex.
 	gl.bindTexture(gl.TEXTURE_2D, this.waterHeightTexB.texId);
@@ -1713,7 +1725,7 @@ Water.prototype.doSimulationSteps = function (magoManager)
 	}
 
 	// bind screenQuad positions.
-	FBO.bindAttribute(gl, screenQuad.posBuffer, shader.a_pos, 2);
+	FBO.bindAttribute(gl, screenQuad.posBuffer, shader.attribLocations.a_pos, 2);
 
 	// Draw screenQuad:
 	gl.drawArrays(gl.TRIANGLES, 0, 6);
@@ -1773,7 +1785,7 @@ Water.prototype.doSimulationSteps = function (magoManager)
 	}
 
 	// bind screenQuad positions.
-	FBO.bindAttribute(gl, screenQuad.posBuffer, shader.a_pos, 2);
+	FBO.bindAttribute(gl, screenQuad.posBuffer, shader.attribLocations.a_pos, 2);
 
 	// Draw screenQuad:
 	gl.drawArrays(gl.TRIANGLES, 0, 6);
@@ -1987,13 +1999,14 @@ Water.prototype.doSimulationSteps_particles = function (magoManager)
 	fbo.bind();
 	gl.viewport(0, 0, fbo.width[0], fbo.height[0]);
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.particlesPosTex_A.texId, 0); // waterHeight
-	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // waterVelocity.
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.shaderLogParticlesPos_TexA.texId, 0); // waterVelocity.
+	//gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // waterVelocity.
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0);  // debug. delete after use.
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0); // 
 	
 	extbuffers.drawBuffersWEBGL([
 		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
-		extbuffers.NONE, // gl_FragData[1]
+		extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1]
 		extbuffers.NONE, // gl_FragData[2]
 		extbuffers.NONE, // gl_FragData[3]
 	]);
@@ -2015,7 +2028,7 @@ Water.prototype.doSimulationSteps_particles = function (magoManager)
 	gl.uniform3fv(shader.u_geoCoordRadiansMax_loc, [maxGeoCoord.getLongitudeRad(), maxGeoCoord.getLatitudeRad(), 0.0]); 
 	gl.uniform3fv(shader.u_geoCoordRadiansMin_loc, [minGeoCoord.getLongitudeRad(), minGeoCoord.getLatitudeRad(), 0.0]); 
 	//gl.uniform1f(shader.u_speed_factor_loc, 0.2); // original.***
-	gl.uniform1f(shader.u_speed_factor_loc, 0.1); // ok.
+	gl.uniform1f(shader.u_speed_factor_loc, 0.6); // ok.
 	gl.uniform1f(shader.u_drop_rate_loc, this.waterManager.dropRate);
 	gl.uniform1f(shader.u_drop_rate_bump_loc, this.waterManager.dropRateBump);
 	var randomSeed = Math.random();
@@ -2028,8 +2041,8 @@ Water.prototype.doSimulationSteps_particles = function (magoManager)
 	gl.bindTexture(gl.TEXTURE_2D,  this.waterVelocityTexB.texId);
 
 	// bind screenQuad positions.
-	gl.enableVertexAttribArray(shader.a_pos);
-	FBO.bindAttribute(gl, screenQuad.posBuffer, shader.a_pos, 2);
+	gl.enableVertexAttribArray(shader.attribLocations.a_pos);
+	FBO.bindAttribute(gl, screenQuad.posBuffer, shader.attribLocations.a_pos, 2);
 
 	// Draw screenQuad:
 	gl.drawArrays(gl.TRIANGLES, 0, 6);
@@ -2064,8 +2077,8 @@ Water.prototype.doSimulationSteps_particles = function (magoManager)
 	gl.bindTexture(gl.TEXTURE_2D, this.particlesTex_B.texId);
 
 	// bind screenQuad positions.
-	gl.enableVertexAttribArray(shader.a_pos);
-	FBO.bindAttribute(gl, screenQuad.posBuffer, shader.a_pos, 2);
+	gl.enableVertexAttribArray(shader.attribLocations.a_pos);
+	FBO.bindAttribute(gl, screenQuad.posBuffer, shader.attribLocations.a_pos, 2);
 
 	// Draw screenQuad:
 	gl.drawArrays(gl.TRIANGLES, 0, 6);
@@ -2101,15 +2114,17 @@ Water.prototype.doSimulationSteps_particles = function (magoManager)
 	gl.activeTexture(gl.TEXTURE1); // "u_wind"
 	gl.bindTexture(gl.TEXTURE_2D,  this.waterVelocityTexB.texId);
 
+
+
 	// bind screenQuad positions.
-	gl.enableVertexAttribArray(shader.a_index);
-	FBO.bindAttribute(gl, this.waterManager.particleIndexBuffer, shader.a_index, 1);
-	gl.uniform1i(shader.u_colorScale, false);
+	gl.enableVertexAttribArray(shader.attribLocations.a_index);
+	FBO.bindAttribute(gl, this.waterManager.particleIndexBuffer, shader.attribLocations.a_index, 1);
+	gl.uniform1i(shader.u_colorScale_loc, false);
 	
-	gl.uniform1f(shader.u_particles_res, this.waterManager.windRes);
+	gl.uniform1f(shader.u_particles_res_loc, this.waterManager.windRes);
 	gl.uniform2fv(shader.u_wind_min_loc, [0.0, 0.0]); // provisional value.
 	gl.uniform2fv(shader.u_wind_max_loc, [40.0, 40.0]); // provisional value.
-	gl.uniform1i(shader.u_flipTexCoordY_windMap, this.flipTexCoordsY_windMap);
+	gl.uniform1i(shader.u_flipTexCoordY_windMap_loc, this.flipTexCoordsY_windMap);
 
 	gl.drawArrays(gl.POINTS, 0, this.waterManager.numParticles);
 		
@@ -2315,7 +2330,7 @@ Water.prototype.doIntersectedObjectsCulling = function (visiblesArray, nativeVis
 		node = visiblesArray[i];
 		if (this._isObjectIdDemOverWrited(node._guid)) 
 		{
-			continue;
+			//continue;
 		}
 		bSphereWC = node.getBoundingSphereWC(bSphereWC);
 
@@ -2330,10 +2345,10 @@ Water.prototype.doIntersectedObjectsCulling = function (visiblesArray, nativeVis
 	{
 		this.buildingsId_OverWritedOnDemMap = {};
 	}
-	if (Object.keys(this.buildingsId_OverWritedOnDemMap).length === 0)
-	{
-		var hola = 0;
-	}
+	//if (Object.keys(this.buildingsId_OverWritedOnDemMap).length === 0)
+	//{
+	//	var hola = 0;
+	//}
 
 	// nativeVisiblesObjects.
 	var native;
@@ -2347,7 +2362,7 @@ Water.prototype.doIntersectedObjectsCulling = function (visiblesArray, nativeVis
 
 		if (this._isObjectIdDemOverWrited(native._guid)) 
 		{
-			continue;
+			//continue;
 		}
 
 		bSphereWC = native.getBoundingSphereWC(bSphereWC);
@@ -2576,7 +2591,7 @@ Water.prototype.copyTexture = function (originalTexture, dstTexturesArray, bFlip
 	gl.uniform1i(shader.u_textureFlipYAxis_loc, bFlipTexcoordY);
 
 	// bind screenQuad positions.
-	FBO.bindAttribute(gl, screenQuad.posBuffer, shader.a_pos, 2);
+	FBO.bindAttribute(gl, screenQuad.posBuffer, shader.attribLocations.a_pos, 2);
 
 	// Draw screenQuad:
 	gl.drawArrays(gl.TRIANGLES, 0, 6);
@@ -2737,7 +2752,7 @@ Water.prototype.overWriteDEMWithObjects = function (shader, magoManager)
 
 	if (visibleNodesCount + visibleNativesOpaquesCount + visibleNativesTransparentsCount === 0)
 	{
-		return;
+		//return;
 	}
 
 	var modelViewProjMatrix = this.getTileOrthographic_mvpMat();
@@ -2749,15 +2764,15 @@ Water.prototype.overWriteDEMWithObjects = function (shader, magoManager)
 	var shader;
 
 	// 1rst, copy the terrain depth into "this.demWithBuildingsTex".************************************************************************************
-	//if (magoManager.isFarestFrustum())
-	//{ 
-	// We must copy "dem_texture" into "demWithBuildingsTex" to preserve the "dem_texture".
-	// There are the original tile DEM texture named : "dem_texture".
-	// In this function we copy the "dem_texture" into "demWithBuildingsTex".
-	// Note : "dem_texture" can have excavations.
-	//var bFlipTexcoordY = false;
-	//this.copyTexture(this.dem_texture_A, [this.demWithBuildingsTex], bFlipTexcoordY);
-	//}
+	if (magoManager.isFarestFrustum())
+	{ 
+		// We must copy "dem_texture" into "demWithBuildingsTex" to preserve the "dem_texture".
+		// There are the original tile DEM texture named : "dem_texture".
+		// In this function we copy the "dem_texture" into "demWithBuildingsTex".
+		// Note : "dem_texture" can have excavations.
+		var bFlipTexcoordY = false;
+		this.copyTexture(this.dem_texture_A, [this.demWithBuildingsTex], bFlipTexcoordY);
+	}
 
 	
 
@@ -2795,6 +2810,7 @@ Water.prototype.overWriteDEMWithObjects = function (shader, magoManager)
 	gl.uniform4fv(shader.u_color4_loc, [1.0, 0.0, 0.0, 1.0]); //.***
 	gl.uniform2fv(shader.u_heightMap_MinMax_loc, this.terrainMinMaxHeights);
 	gl.uniform2fv(shader.u_simulationTextureSize_loc, waterManager.simulationTextureSize);
+	gl.uniform1i(shader.u_terrainHeightEncodingBytes_loc, waterManager.terrainHeightEncodingBytes);
 	//gl.uniform2fv(shader.u_terrainTextureSize_loc, waterManager.terrainTextureSize);
 
 	gl.uniform1i(shader.u_processType_loc, 0); // 0 = overWriteDEM, 1 = excavation.
@@ -2896,7 +2912,7 @@ Water.prototype._renderQMesh = function (magoManager)
 	var vertices_count = vbo_vicky.vertexCount;
 
 	// Bind positions.
-	vbo_vicky.vboBufferPos.bindData(shader, shader.a_pos, vboMemManager);
+	vbo_vicky.vboBufferPos.bindData(shader, shader.attribLocations.a_pos, vboMemManager);
 	
 	//if (!vbo_vicky.bindDataNormal(shader, magoManager.vboMemoryManager))
 	//{ return false; }
@@ -2948,7 +2964,7 @@ Water.prototype._renderQMesh = function (magoManager)
 	var vertices_count = vbo_vicky.vertexCount;
 
 	// Bind positions.
-	vbo_vicky.vboBufferPos.bindData(shader, shader.a_pos, vboMemManager);
+	vbo_vicky.vboBufferPos.bindData(shader, shader.attribLocations.a_pos, vboMemManager);
 
 	gl.drawArrays(gl.TRIANGLE_STRIP, 0, vertices_count);
 };

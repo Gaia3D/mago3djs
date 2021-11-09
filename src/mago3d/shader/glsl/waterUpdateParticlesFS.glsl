@@ -107,14 +107,28 @@ void main()
     vec2 pos = vec2(
         color.r / 255.0 + color.b,
         color.g / 255.0 + color.a); // decode particle position from pixel RGBA
+
 	vec2 windMapTexCoord = pos;
 	if(u_flipTexCoordY_windMap)
 	{
 		windMapTexCoord.y = 1.0 - windMapTexCoord.y;
 	}
+	// Test debug:::::::::::::::::::::::::::::::::::
+	//vec2 velColor = vec2(1.0, 0.0);
+	vec2 velColor = lookup_wind(windMapTexCoord);
+	vec2 decodedVel = decodeVelocity(velColor);
+	// End test.------------------------------------
 
     vec2 velocity = mix(u_wind_min, u_wind_max, decodeVelocity(lookup_wind(windMapTexCoord)));
     float speed_t = length(velocity) / length(u_wind_max);
+
+	if(abs(decodedVel.x) < 0.004 && abs(decodedVel.y) < 0.004) // 1/255 = 0.0039...
+	{
+		speed_t = 0.0;
+		velocity = vec2(0.0);
+	}
+
+
 
     // Calculate pixelSizes.**************************************************************************************************
 	//vec3 buildingPos = buildingPosHIGH + buildingPosLOW;
@@ -143,7 +157,6 @@ void main()
 	vec2 offset = vec2(velocity.x / distortion * xSpeedFactor, -velocity.y * ySpeedFactor);
 
     // update particle position, wrapping around the date line
-    vec2 auxVec2 = vec2(pos.x, pos.y);
     pos = fract(1.0 + pos + offset);
 	// End ******************************************************************************************************************
 
@@ -154,12 +167,24 @@ void main()
     float drop_rate = u_drop_rate + speed_t * u_drop_rate_bump;
     drop = step(1.0 - drop_rate, rand(seed));
 
-    vec4 vel = texture2D(u_wind, v_tex_pos);
+    //vec4 vel = texture2D(u_wind, v_tex_pos);
 
-    if(drop > 0.1 || speed_t < 0.01) // 0.01
+    if(drop > 0.1 || speed_t < 0.0006) // 0.01
 	{
 		vec2 random_pos = vec2( rand(pos), rand(v_tex_pos) );
 		pos = random_pos;
+		
+		// check the velocity in the new position.***
+		decodedVel = decodeVelocity(lookup_wind(random_pos));
+		if(abs(decodedVel.x) < 0.004 && abs(decodedVel.y) < 0.004) // 1/255 = 0.0039...
+		{
+			//pos = vec2( 0.0, 0.0);
+
+			vec2 random_pos = vec2( rand(pos), rand(v_tex_pos) );
+			pos = random_pos;
+		}
+		
+		
 	}
     
     // encode the new particle position back into RGBA
@@ -168,7 +193,7 @@ void main()
         floor(pos * 255.0) / 255.0);
 
     #ifdef USE_MULTI_RENDER_TARGET
-        gl_FragData[1] = vec4(0.0); //
+        gl_FragData[1] = vec4(velColor, 0.0, 0.0); //
         gl_FragData[2] = vec4(0.0); // 
         gl_FragData[3] = vec4(0.0); // 
         gl_FragData[4] = vec4(0.0); // 

@@ -23,8 +23,11 @@ uniform sampler2D contaminantSourceTex;
 uniform sampler2D waterAditionTex;
 
 uniform bool u_existRain;
+uniform int u_rainType; // 0= rain value (mm/h), 1= rain texture.
+uniform float u_rainValue_mmHour;
 uniform float u_waterMaxHeigh;
 uniform float u_contaminantMaxHeigh;
+uniform float u_increTimeSeconds;
 
 varying vec2 v_tex_pos;
 
@@ -78,12 +81,18 @@ void main()
 
 
     // add rain.
-    
     if(u_existRain)
     {
+        // rain : mm/h.***
         vec4 rain = texture2D(rainTex, vec2(v_tex_pos.x, 1.0 - v_tex_pos.y));
         float rainHeight = unpackDepth(rain) * u_waterMaxHeigh;
         finalWaterHeight += rainHeight;
+    }
+
+    if(u_rainType == 0)
+    {
+        float rain_mm = (u_rainValue_mmHour/ 3600.0) * u_increTimeSeconds;
+        finalWaterHeight += rain_mm / 1000.0;
     }
 
     vec4 waterAdition = texture2D(waterAditionTex, vec2(v_tex_pos.x, v_tex_pos.y));

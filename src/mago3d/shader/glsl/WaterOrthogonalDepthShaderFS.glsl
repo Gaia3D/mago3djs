@@ -17,6 +17,7 @@ uniform sampler2D currDEMTex;
 uniform vec2 u_heightMap_MinMax; // terrain min max heights. 
 uniform vec2 u_simulationTextureSize; // for example 512 x 512.
 uniform vec2 u_quantizedVolume_MinMax;
+uniform int u_terrainHeightEncodingBytes;
 
 //******************************************
 // u_processType = 0 -> overWriteDEM.
@@ -38,6 +39,22 @@ vec4 packDepth( float v ) {
 float unpackDepth(const in vec4 rgba_depth)
 {
 	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));
+}
+
+float decodeRG(in vec2 waterColorRG)
+{
+    // https://titanwolf.org/Network/Articles/Article?AID=666e7443-0511-4210-b39c-db0bb6738246#gsc.tab=0
+    return dot(waterColorRG, vec2(1.0, 1.0 / 255.0));
+}
+
+vec2 encodeRG(in float wh)
+{
+    // https://titanwolf.org/Network/Articles/Article?AID=666e7443-0511-4210-b39c-db0bb6738246#gsc.tab=0
+    float encodedBit = 1.0/255.0;
+    vec2 enc = vec2(1.0, 255.0) * wh;
+    enc = fract(enc);
+    enc.x -= enc.y * encodedBit;
+    return enc; // R = HIGH, G = LOW.***
 }
 
 float getTerrainHeight(in vec2 texCoord)
@@ -78,7 +95,20 @@ void main()
         }
     }
     
-    vec4 depthColor4 = vec4(newTerrainHeght, newTerrainHeght, newTerrainHeght, 1.0);
+    vec4 depthColor4 = vec4(newTerrainHeght, newTerrainHeght, newTerrainHeght, 1.0); // 1byte height.
+    if(u_terrainHeightEncodingBytes == 1)
+    {
+        depthColor4 = vec4(newTerrainHeght, newTerrainHeght, newTerrainHeght, 1.0); // 1byte height.
+    }
+    else if(u_terrainHeightEncodingBytes == 2)
+    {
+        depthColor4 = vec4(encodeRG(newTerrainHeght), 0.0, 1.0); // 2byte height.
+    }
+    else if(u_terrainHeightEncodingBytes == 4)
+    {
+        depthColor4 = packDepth(newTerrainHeght); // 4byte height.
+    }
+
     gl_FragData[0] = depthColor4;
 
     vec4 shaderLogColor4 = vec4(0.0);

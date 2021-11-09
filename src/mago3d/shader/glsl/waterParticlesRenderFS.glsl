@@ -18,6 +18,11 @@ uniform bool u_colorScale;
 
 varying vec2 v_particle_pos;
 
+vec2 decodeVelocity(in vec2 encodedVel)
+{
+	return vec2(encodedVel.xy * 2.0 - 1.0);
+}
+
 void main() {
 	vec2 pt = gl_PointCoord - vec2(0.5);
 	if(pt.x*pt.x+pt.y*pt.y > 0.25)
@@ -30,8 +35,14 @@ void main() {
 	{
 		windMapTexCoord.y = 1.0 - windMapTexCoord.y;
 	}
+	vec2 velociCol = mix(u_wind_min, u_wind_max, decodeVelocity(texture2D(u_wind, windMapTexCoord).rg));
     vec2 velocity = mix(u_wind_min, u_wind_max, texture2D(u_wind, windMapTexCoord).rg);
     float speed_t = length(velocity) / length(u_wind_max);
+
+	if(length(velociCol) < 0.205) 
+	{
+		discard;
+	}
 
 	if(u_colorScale)
 	{

@@ -129,7 +129,13 @@ float getContaminantHeight(in vec2 texCoord)
 
 float getTerrainHeight(in vec2 texCoord)
 {
-    float terainHeight = texture2D(terrainmap, texCoord).r;
+    //float terainHeight = texture2D(terrainmap, texCoord).r;
+    //terainHeight = u_heightMap_MinMax.x + terainHeight * (u_heightMap_MinMax.y - u_heightMap_MinMax.x);
+    //return terainHeight;
+
+	// 4byte mode.***
+    vec4 terrainEncoded = texture2D(terrainmap, texCoord);
+    float terainHeight = unpackDepth(terrainEncoded);
     terainHeight = u_heightMap_MinMax.x + terainHeight * (u_heightMap_MinMax.y - u_heightMap_MinMax.x);
     return terainHeight;
 }

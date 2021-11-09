@@ -11134,6 +11134,7 @@ uniform float u_contaminantMaxHeigh; // if \"u_contaminantMaxHeigh\" < 0.0 -> no
 \n\
 uniform vec2 u_simulationTextureSize;\n\
 uniform vec2 u_terrainTextureSize;\n\
+uniform int u_terrainHeightEncodingBytes;\n\
 \n\
 float decodeRG(in vec2 waterColorRG)\n\
 {\n\
@@ -11211,9 +11212,28 @@ void encodeWaterFlux(vec4 flux, inout vec4 flux_high, inout vec4 flux_low)\n\
 \n\
 float getTerrainHeight(in vec2 texCoord)\n\
 {\n\
-    float terainHeight = texture2D(terrainHeightTex, texCoord).r;\n\
-    terainHeight = u_heightMap_MinMax.x + terainHeight * (u_heightMap_MinMax.y - u_heightMap_MinMax.x);\n\
-    return terainHeight;\n\
+    if(u_terrainHeightEncodingBytes == 1)\n\
+    {\n\
+        float terainHeight = texture2D(terrainHeightTex, texCoord).r;\n\
+        terainHeight = u_heightMap_MinMax.x + terainHeight * (u_heightMap_MinMax.y - u_heightMap_MinMax.x);\n\
+        return terainHeight;\n\
+    }\n\
+    else if(u_terrainHeightEncodingBytes == 2)\n\
+    {\n\
+        // 4byte mode.***\n\
+        vec4 terrainEncoded = texture2D(terrainHeightTex, texCoord);\n\
+        float terainHeight = decodeRG(terrainEncoded.rg);\n\
+        terainHeight = u_heightMap_MinMax.x + terainHeight * (u_heightMap_MinMax.y - u_heightMap_MinMax.x);\n\
+        return terainHeight;\n\
+    }\n\
+    else if(u_terrainHeightEncodingBytes == 4)\n\
+    {\n\
+        // 4byte mode.***\n\
+        vec4 terrainEncoded = texture2D(terrainHeightTex, texCoord);\n\
+        float terainHeight = unpackDepth(terrainEncoded);\n\
+        terainHeight = u_heightMap_MinMax.x + terainHeight * (u_heightMap_MinMax.y - u_heightMap_MinMax.x);\n\
+        return terainHeight;\n\
+    }\n\
 }\n\
 \n\
 void main()\n\
@@ -11436,8 +11456,11 @@ uniform sampler2D contaminantSourceTex;\n\
 uniform sampler2D waterAditionTex;\n\
 \n\
 uniform bool u_existRain;\n\
+uniform int u_rainType; // 0= rain value (mm/h), 1= rain texture.\n\
+uniform float u_rainValue_mmHour;\n\
 uniform float u_waterMaxHeigh;\n\
 uniform float u_contaminantMaxHeigh;\n\
+uniform float u_increTimeSeconds;\n\
 \n\
 varying vec2 v_tex_pos;\n\
 \n\
@@ -11491,12 +11514,18 @@ void main()\n\
 \n\
 \n\
     // add rain.\n\
-    \n\
     if(u_existRain)\n\
     {\n\
+        // rain : mm/h.***\n\
         vec4 rain = texture2D(rainTex, vec2(v_tex_pos.x, 1.0 - v_tex_pos.y));\n\
         float rainHeight = unpackDepth(rain) * u_waterMaxHeigh;\n\
         finalWaterHeight += rainHeight;\n\
+    }\n\
+\n\
+    if(u_rainType == 0)\n\
+    {\n\
+        float rain_mm = (u_rainValue_mmHour/ 3600.0) * u_increTimeSeconds;\n\
+        finalWaterHeight += rain_mm / 1000.0;\n\
     }\n\
 \n\
     vec4 waterAdition = texture2D(waterAditionTex, vec2(v_tex_pos.x, v_tex_pos.y));\n\
@@ -12180,6 +12209,7 @@ void main()\n\
 \n\
     // Now, calculate the contamination trasference.**************************************************\n\
     // read water heights.\n\
+\n\
     float topWH = getWaterHeight(curuv + vec2(0.0, divY));\n\
     float rightWH = getWaterHeight(curuv + vec2(divX, 0.0));\n\
     float bottomWH = getWaterHeight(curuv + vec2(0.0, -divY));\n\
@@ -12257,14 +12287,15 @@ void main()\n\
 \n\
     vec4 shaderLogColor4 = vec4(0.0);\n\
 \n\
-    if(da <= 1e-8) \n\
+    //if(da <= 1e-8) // original.***\n\
+    if(da <= 1e-8) //\n\
     {\n\
         veloci = vec2(0.0);\n\
     }\n\
     else\n\
     {\n\
-        //veloci = veloci/(da * u_PipeLen);\n\
-        veloci = veloci/(da * vec2(cellSize_y, cellSize_x));\n\
+        ////veloci = veloci/(da * u_PipeLen);\n\
+        veloci = veloci/(da * vec2(cellSize_y, cellSize_x)); // original.***\n\
     }\n\
 \n\
     if(curuv.x <= divX) \n\
@@ -12305,6 +12336,8 @@ void main()\n\
     //  }\n\
 \n\
     \n\
+    // test debug::::::::::::::\n\
+    //veloci = vec2(0.0); // delete this.***\n\
 \n\
     vec2 encodedVelocity = encodeVelocity(veloci/u_waterMaxVelocity);\n\
     vec4 writeVel = vec4(encodedVelocity, 0.0, 1.0);\n\
@@ -12334,6 +12367,8 @@ void main()\n\
         gl_FragData[3] = vec4(0.0); // \n\
         gl_FragData[4] = vec4(0.0); // \n\
     #endif\n\
+\n\
+    \n\
 \n\
 }";
 ShaderSource.waterCopyFS = "//#version 300 es\n\
@@ -12397,6 +12432,7 @@ ShaderSource.waterDEMTexFromQuantizedMeshFS = "//#version 300 es\n\
 uniform vec2 u_minMaxHeights;\n\
 uniform int colorType; // 0= oneColor, 1= attribColor, 2= texture.\n\
 uniform vec4 u_oneColor4;\n\
+uniform int u_terrainHeightEncodingBytes;\n\
 \n\
 varying vec3 vPos;\n\
 varying vec4 vColor4;\n\
@@ -12413,11 +12449,37 @@ float unpackDepth(const in vec4 rgba_depth)\n\
 	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
 }\n\
 \n\
+float decodeRG(in vec2 waterColorRG)\n\
+{\n\
+    // https://titanwolf.org/Network/Articles/Article?AID=666e7443-0511-4210-b39c-db0bb6738246#gsc.tab=0\n\
+    return dot(waterColorRG, vec2(1.0, 1.0 / 255.0));\n\
+}\n\
 \n\
+vec2 encodeRG(in float wh)\n\
+{\n\
+    // https://titanwolf.org/Network/Articles/Article?AID=666e7443-0511-4210-b39c-db0bb6738246#gsc.tab=0\n\
+    float encodedBit = 1.0/255.0;\n\
+    vec2 enc = vec2(1.0, 255.0) * wh;\n\
+    enc = fract(enc);\n\
+    enc.x -= enc.y * encodedBit;\n\
+    return enc; // R = HIGH, G = LOW.***\n\
+}\n\
 \n\
 void main()\n\
 {\n\
     vec4 finalCol4 = vec4(vPos.z, vPos.z, vPos.z, 1.0); // original.***\n\
+    if(u_terrainHeightEncodingBytes == 1)\n\
+    {\n\
+        finalCol4 = vec4(vPos.z, vPos.z, vPos.z, 1.0); \n\
+    }\n\
+    else if(u_terrainHeightEncodingBytes == 2)\n\
+    {\n\
+        finalCol4 = vec4(encodeRG(vPos.z), 0.0, 1.0); // 2byte height.\n\
+    }\n\
+    else if(u_terrainHeightEncodingBytes == 4)\n\
+    {\n\
+        finalCol4 = packDepth(vPos.z); \n\
+    }\n\
 \n\
     if(colorType == 1)\n\
     {\n\
@@ -12754,6 +12816,7 @@ uniform sampler2D currDEMTex;\n\
 uniform vec2 u_heightMap_MinMax; // terrain min max heights. \n\
 uniform vec2 u_simulationTextureSize; // for example 512 x 512.\n\
 uniform vec2 u_quantizedVolume_MinMax;\n\
+uniform int u_terrainHeightEncodingBytes;\n\
 \n\
 //******************************************\n\
 // u_processType = 0 -> overWriteDEM.\n\
@@ -12775,6 +12838,22 @@ vec4 packDepth( float v ) {\n\
 float unpackDepth(const in vec4 rgba_depth)\n\
 {\n\
 	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+}\n\
+\n\
+float decodeRG(in vec2 waterColorRG)\n\
+{\n\
+    // https://titanwolf.org/Network/Articles/Article?AID=666e7443-0511-4210-b39c-db0bb6738246#gsc.tab=0\n\
+    return dot(waterColorRG, vec2(1.0, 1.0 / 255.0));\n\
+}\n\
+\n\
+vec2 encodeRG(in float wh)\n\
+{\n\
+    // https://titanwolf.org/Network/Articles/Article?AID=666e7443-0511-4210-b39c-db0bb6738246#gsc.tab=0\n\
+    float encodedBit = 1.0/255.0;\n\
+    vec2 enc = vec2(1.0, 255.0) * wh;\n\
+    enc = fract(enc);\n\
+    enc.x -= enc.y * encodedBit;\n\
+    return enc; // R = HIGH, G = LOW.***\n\
 }\n\
 \n\
 float getTerrainHeight(in vec2 texCoord)\n\
@@ -12815,7 +12894,20 @@ void main()\n\
         }\n\
     }\n\
     \n\
-    vec4 depthColor4 = vec4(newTerrainHeght, newTerrainHeght, newTerrainHeght, 1.0);\n\
+    vec4 depthColor4 = vec4(newTerrainHeght, newTerrainHeght, newTerrainHeght, 1.0); // 1byte height.\n\
+    if(u_terrainHeightEncodingBytes == 1)\n\
+    {\n\
+        depthColor4 = vec4(newTerrainHeght, newTerrainHeght, newTerrainHeght, 1.0); // 1byte height.\n\
+    }\n\
+    else if(u_terrainHeightEncodingBytes == 2)\n\
+    {\n\
+        depthColor4 = vec4(encodeRG(newTerrainHeght), 0.0, 1.0); // 2byte height.\n\
+    }\n\
+    else if(u_terrainHeightEncodingBytes == 4)\n\
+    {\n\
+        depthColor4 = packDepth(newTerrainHeght); // 4byte height.\n\
+    }\n\
+\n\
     gl_FragData[0] = depthColor4;\n\
 \n\
     vec4 shaderLogColor4 = vec4(0.0);\n\
@@ -13341,6 +13433,11 @@ uniform bool u_colorScale;\n\
 \n\
 varying vec2 v_particle_pos;\n\
 \n\
+vec2 decodeVelocity(in vec2 encodedVel)\n\
+{\n\
+	return vec2(encodedVel.xy * 2.0 - 1.0);\n\
+}\n\
+\n\
 void main() {\n\
 	vec2 pt = gl_PointCoord - vec2(0.5);\n\
 	if(pt.x*pt.x+pt.y*pt.y > 0.25)\n\
@@ -13353,8 +13450,14 @@ void main() {\n\
 	{\n\
 		windMapTexCoord.y = 1.0 - windMapTexCoord.y;\n\
 	}\n\
+	vec2 velociCol = mix(u_wind_min, u_wind_max, decodeVelocity(texture2D(u_wind, windMapTexCoord).rg));\n\
     vec2 velocity = mix(u_wind_min, u_wind_max, texture2D(u_wind, windMapTexCoord).rg);\n\
     float speed_t = length(velocity) / length(u_wind_max);\n\
+\n\
+	if(length(velociCol) < 0.205) \n\
+	{\n\
+		discard;\n\
+	}\n\
 \n\
 	if(u_colorScale)\n\
 	{\n\
@@ -13599,6 +13702,7 @@ void main() {\n\
     vec3 pos = a_pos * 2.0; // quantizedMeshes uses the positive parts of the signed short, so must multiply by 2.\n\
     \n\
 	pos = vec3(pos.xy * 2000.0, pos.z * 500.0 + 500.0);\n\
+	//pos = vec3(pos.xy * 20.0, pos.z + 500.0);\n\
     //----------------------------------------------------------------------------------------------------\n\
 	vec4 rotatedPos = buildingRotMatrix * vec4(pos.xyz, 1.0);\n\
     vec3 objPosHigh = buildingPosHIGH;\n\
@@ -13777,22 +13881,30 @@ vec3 getRainbowColor_byHeight(float height, in float maxi, in float mini)\n\
 void main()\n\
 {\n\
     float minWaterHeightToRender = 0.001; // 1mm.\n\
-    minWaterHeightToRender = 0.01; // test. delete.\n\
-    if(vWaterHeight + vContaminantHeight < minWaterHeightToRender)// original = 0.0001\n\
+    //minWaterHeightToRender = 0.01; // 1cm.\n\
+    minWaterHeightToRender = 0.005; // 0.5cm.\n\
+    //if(vWaterHeight + vContaminantHeight < minWaterHeightToRender)// original = 0.0001\n\
+    //{\n\
+    //    discard;\n\
+    //}\n\
+    float totalH = vWaterHeight + vContaminantHeight;\n\
+    float alpha = vColorAuxTest.a;\n\
+    if(totalH < 0.1)// original = 0.0001\n\
     {\n\
-        discard;\n\
+        alpha = min(totalH/0.1, alpha); // original.***\n\
+        //alpha = totalH; // test.***\n\
     }\n\
 \n\
-    float alpha = vColorAuxTest.a;\n\
+    \n\
     vec4 finalCol4 = vec4(vColorAuxTest);\n\
-    if(vWaterHeight + vContaminantHeight < minWaterHeightToRender)// + 0.01)\n\
-    {\n\
-        alpha = 0.9;\n\
-        finalCol4 = vec4(vColorAuxTest * 0.4);\n\
-    }\n\
+    //if(vWaterHeight + vContaminantHeight < minWaterHeightToRender)// + 0.01)\n\
+    //{\n\
+    //   alpha = 0.9;\n\
+    //   finalCol4 = vec4(vColorAuxTest * 0.4);\n\
+    //}\n\
 \n\
     // calculate contaminationConcentration;\n\
-    float contaminConcentration = vContaminantHeight / (vWaterHeight + vContaminantHeight);\n\
+    float contaminConcentration = vContaminantHeight / (totalH);\n\
 \n\
     //vec2 screenPos = vec2(gl_FragCoord.x / u_screenSize.x, gl_FragCoord.y / u_screenSize.y);\n\
 \n\
@@ -14084,7 +14196,13 @@ float getContaminantHeight(in vec2 texCoord)\n\
 \n\
 float getTerrainHeight(in vec2 texCoord)\n\
 {\n\
-    float terainHeight = texture2D(terrainmap, texCoord).r;\n\
+    //float terainHeight = texture2D(terrainmap, texCoord).r;\n\
+    //terainHeight = u_heightMap_MinMax.x + terainHeight * (u_heightMap_MinMax.y - u_heightMap_MinMax.x);\n\
+    //return terainHeight;\n\
+\n\
+	// 4byte mode.***\n\
+    vec4 terrainEncoded = texture2D(terrainmap, texCoord);\n\
+    float terainHeight = unpackDepth(terrainEncoded);\n\
     terainHeight = u_heightMap_MinMax.x + terainHeight * (u_heightMap_MinMax.y - u_heightMap_MinMax.x);\n\
     return terainHeight;\n\
 }\n\
@@ -14832,14 +14950,28 @@ void main() \n\
     vec2 pos = vec2(\n\
         color.r / 255.0 + color.b,\n\
         color.g / 255.0 + color.a); // decode particle position from pixel RGBA\n\
+\n\
 	vec2 windMapTexCoord = pos;\n\
 	if(u_flipTexCoordY_windMap)\n\
 	{\n\
 		windMapTexCoord.y = 1.0 - windMapTexCoord.y;\n\
 	}\n\
+	// Test debug:::::::::::::::::::::::::::::::::::\n\
+	//vec2 velColor = vec2(1.0, 0.0);\n\
+	vec2 velColor = lookup_wind(windMapTexCoord);\n\
+	vec2 decodedVel = decodeVelocity(velColor);\n\
+	// End test.------------------------------------\n\
 \n\
     vec2 velocity = mix(u_wind_min, u_wind_max, decodeVelocity(lookup_wind(windMapTexCoord)));\n\
     float speed_t = length(velocity) / length(u_wind_max);\n\
+\n\
+	if(abs(decodedVel.x) < 0.004 && abs(decodedVel.y) < 0.004) // 1/255 = 0.0039...\n\
+	{\n\
+		speed_t = 0.0;\n\
+		velocity = vec2(0.0);\n\
+	}\n\
+\n\
+\n\
 \n\
     // Calculate pixelSizes.**************************************************************************************************\n\
 	//vec3 buildingPos = buildingPosHIGH + buildingPosLOW;\n\
@@ -14868,7 +15000,6 @@ void main() \n\
 	vec2 offset = vec2(velocity.x / distortion * xSpeedFactor, -velocity.y * ySpeedFactor);\n\
 \n\
     // update particle position, wrapping around the date line\n\
-    vec2 auxVec2 = vec2(pos.x, pos.y);\n\
     pos = fract(1.0 + pos + offset);\n\
 	// End ******************************************************************************************************************\n\
 \n\
@@ -14879,12 +15010,24 @@ void main() \n\
     float drop_rate = u_drop_rate + speed_t * u_drop_rate_bump;\n\
     drop = step(1.0 - drop_rate, rand(seed));\n\
 \n\
-    vec4 vel = texture2D(u_wind, v_tex_pos);\n\
+    //vec4 vel = texture2D(u_wind, v_tex_pos);\n\
 \n\
-    if(drop > 0.1 || speed_t < 0.01) // 0.01\n\
+    if(drop > 0.1 || speed_t < 0.0006) // 0.01\n\
 	{\n\
 		vec2 random_pos = vec2( rand(pos), rand(v_tex_pos) );\n\
 		pos = random_pos;\n\
+		\n\
+		// check the velocity in the new position.***\n\
+		decodedVel = decodeVelocity(lookup_wind(random_pos));\n\
+		if(abs(decodedVel.x) < 0.004 && abs(decodedVel.y) < 0.004) // 1/255 = 0.0039...\n\
+		{\n\
+			//pos = vec2( 0.0, 0.0);\n\
+\n\
+			vec2 random_pos = vec2( rand(pos), rand(v_tex_pos) );\n\
+			pos = random_pos;\n\
+		}\n\
+		\n\
+		\n\
 	}\n\
     \n\
     // encode the new particle position back into RGBA\n\
@@ -14893,7 +15036,7 @@ void main() \n\
         floor(pos * 255.0) / 255.0);\n\
 \n\
     #ifdef USE_MULTI_RENDER_TARGET\n\
-        gl_FragData[1] = vec4(0.0); //\n\
+        gl_FragData[1] = vec4(velColor, 0.0, 0.0); //\n\
         gl_FragData[2] = vec4(0.0); // \n\
         gl_FragData[3] = vec4(0.0); // \n\
         gl_FragData[4] = vec4(0.0); // \n\

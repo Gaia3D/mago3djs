@@ -2175,7 +2175,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 			var waterLayer = magoManager.waterManager.waterLayersArray[0];
 			if (waterLayer.waterHeightTexA && waterLayer.waterHeightTexA.texId)
 			{
-				//texture = waterLayer.waterHeightTexA.texId;
+				texture = waterLayer.waterHeightTexA.texId;
 			}
 
 			if (waterLayer.waterSourceTex && waterLayer.waterSourceTex.texId)
@@ -2211,6 +2211,11 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 			if (waterLayer.shaderLogTexA && waterLayer.shaderLogTexA.texId)
 			{
 				//texture = waterLayer.shaderLogTexA.texId;
+			}
+
+			if (waterLayer.shaderLogParticlesPos_TexA && waterLayer.shaderLogParticlesPos_TexA.texId)
+			{
+				//texture = waterLayer.shaderLogParticlesPos_TexA.texId;
 			}
 
 			if (waterLayer.shaderLogTex_Flux_A && waterLayer.shaderLogTex_Flux_A.texId)

@@ -29,10 +29,14 @@ var WaterManager = function (magoManager, options)
 	this.fbo;
 
 	// Simulation parameters.**************************************************************************
-	this.maxSimulationSize = 1024;
+	this.currTimeSeconds; // time in current frame.***
+	this.lastTimeSeconds; // time in last frame.***
+	this.timeScale = 1.0;
+	this.maxSimulationSize = 2048;
 	this.simulationTextureSize = new Float32Array([this.maxSimulationSize, this.maxSimulationSize]);
 	this.bSsimulateWater = false;
 	this.terrainTextureSize = new Float32Array([this.maxSimulationSize, this.maxSimulationSize]);
+	this.terrainHeightEncodingBytes = 1; // default 1byte.***
 
 	// Water wind.*************************************************************************************
 	this.bRenderParticles = true;
@@ -43,7 +47,9 @@ var WaterManager = function (magoManager, options)
 	//-------------------------------------------------------------------------------------------------
 
 	// Rain.*******************************************************************************************
-	this.bExistRain = false;
+	//this.bExistRain = false; // delete this.
+	this.rainType = 0; // -1 = NO rain. 0= rain by a value (mm/h). 1= rain by a texture.***
+	this.rainValue_mmHour = 300.0;
 
 	// Terrain slippage.*******************************************************************************
 	this.bSimulateTerrainSlippage = false;
@@ -77,9 +83,14 @@ var WaterManager = function (magoManager, options)
 			this.bRenderParticles = options.renderParticles;
 		}
 
-		if (options.existRain !== undefined)
+		if (options.rainType !== undefined)//
 		{
-			this.bExistRain = options.existRain;
+			this.rainType = options.rainType;
+		}
+
+		if (options.rainValue_mmHour !== undefined)//
+		{
+			this.rainValue_mmHour = options.rainValue_mmHour;
 		}
 
 		if (options.waterSourceUrl !== undefined)
@@ -91,11 +102,32 @@ var WaterManager = function (magoManager, options)
 		{
 			this.maxSimulationSize = options.maxSimulationTextureSize;
 		}
+
+		if (options.terrainHeightEncodingBytes !== undefined)
+		{
+			this.terrainHeightEncodingBytes = options.terrainHeightEncodingBytes;
+		}
+
+		if (options.maxSimulationSize !== undefined)
+		{
+			this.maxSimulationSize = options.maxSimulationSize;
+		}
 	}
 
 
 	this.createDefaultShaders();
 	this.init();
+};
+
+WaterManager.prototype.setCurrentTimeSeconds = function (currTimeSeconds)
+{
+	this.lastTimeSeconds = this.currTimeSeconds;
+	this.currTimeSeconds = currTimeSeconds;
+};
+
+WaterManager.prototype.getIncrementTimeSeconds = function ()
+{
+	return (this.currTimeSeconds - this.lastTimeSeconds) * this.timeScale;
 };
 
 WaterManager.prototype.setDoLandSlideSimulation = function (bDoLandSlideSimulation)
@@ -360,7 +392,10 @@ WaterManager.prototype.createDefaultShaders = function ()
 	shader = magoManager.postFxShadersManager.createShaderProgram(gl, vs_source, fs_source, shaderName, this.magoManager);
 	shader.u_existRain_loc = gl.getUniformLocation(shader.program, "u_existRain"); // change this by rainMaxHeight
 	shader.u_waterMaxHeigh_loc = gl.getUniformLocation(shader.program, "u_waterMaxHeigh");
-	shader.u_contaminantMaxHeigh_loc = gl.getUniformLocation(shader.program, "u_contaminantMaxHeigh");
+	shader.u_contaminantMaxHeigh_loc = gl.getUniformLocation(shader.program, "u_contaminantMaxHeigh"); 
+	shader.u_increTimeSeconds_loc = gl.getUniformLocation(shader.program, "u_increTimeSeconds");
+	shader.u_rainType_loc = gl.getUniformLocation(shader.program, "u_rainType");
+	shader.u_rainValue_mmHour_loc = gl.getUniformLocation(shader.program, "u_rainValue_mmHour");
 
 	shader.waterSourceTex_loc = gl.getUniformLocation(shader.program, "waterSourceTex");
 	shader.contaminantSourceTex_loc = gl.getUniformLocation(shader.program, "contaminantSourceTex");
@@ -389,6 +424,7 @@ WaterManager.prototype.createDefaultShaders = function ()
 	shader.u_waterMaxHeigh_loc = gl.getUniformLocation(shader.program, "u_waterMaxHeigh");
 	shader.u_waterMaxFlux_loc = gl.getUniformLocation(shader.program, "u_waterMaxFlux");
 	shader.u_tileSize_loc = gl.getUniformLocation(shader.program, "u_tileSize");
+	shader.u_terrainHeightEncodingBytes_loc = gl.getUniformLocation(shader.program, "u_terrainHeightEncodingBytes");
 
 	shader.u_simulationTextureSize_loc = gl.getUniformLocation(shader.program, "u_simulationTextureSize");
 	shader.u_terrainTextureSize_loc = gl.getUniformLocation(shader.program, "u_terrainTextureSize");
@@ -553,6 +589,7 @@ WaterManager.prototype.createDefaultShaders = function ()
 	shader.u_color4_loc = gl.getUniformLocation(shader.program, "u_color4");
 	shader.u_heightMap_MinMax_loc = gl.getUniformLocation(shader.program, "u_heightMap_MinMax");
 	shader.u_simulationTextureSize_loc = gl.getUniformLocation(shader.program, "u_simulationTextureSize");
+	shader.u_terrainHeightEncodingBytes_loc = gl.getUniformLocation(shader.program, "u_terrainHeightEncodingBytes");
 	shader.u_processType_loc = gl.getUniformLocation(shader.program, "u_processType");
 	shader.currDEMTex_loc = gl.getUniformLocation(shader.program, "currDEMTex");
 	magoManager.postFxShadersManager.useProgram(shader);
@@ -653,7 +690,8 @@ WaterManager.prototype.createDefaultShaders = function ()
 	shader.color4_loc = gl.getAttribLocation(shader.program, "color4");//
 	shader.u_minMaxHeights_loc = gl.getUniformLocation(shader.program, "u_minMaxHeights"); // change this by rainMaxHeight//
 	shader.colorType_loc = gl.getUniformLocation(shader.program, "colorType");//
-	shader.u_oneColor4_loc = gl.getUniformLocation(shader.program, "u_oneColor4");
+	shader.u_oneColor4_loc = gl.getUniformLocation(shader.program, "u_oneColor4"); //
+	shader.u_terrainHeightEncodingBytes_loc = gl.getUniformLocation(shader.program, "u_terrainHeightEncodingBytes");
 
 	shader.u_totalMinGeoCoord_loc = gl.getUniformLocation(shader.program, "u_totalMinGeoCoord");
 	shader.u_totalMaxGeoCoord_loc = gl.getUniformLocation(shader.program, "u_totalMaxGeoCoord");
@@ -844,7 +882,13 @@ WaterManager.prototype.render = function ()
 	var sceneState = magoManager.sceneState;
 	var gl = magoManager.getGl();
 
-	// 1rst, check if exist excavations.*********************************************************************
+	// Set current time in seconds.***
+	if (magoManager.isFarestFrustum())
+	{
+		this.setCurrentTimeSeconds(magoManager.getCurrentTime()/1000.0);
+	}
+
+	// Check if exist excavations.*********************************************************************
 	if (this.bExistPendentExcavation)
 	{
 		// do excavations only one time for all frustums.
@@ -868,7 +912,9 @@ WaterManager.prototype.render = function ()
 		{ 
 			// do simulation in "currentFrustumIdx" == 0 (nearestFrustum).
 			// in nearestFrustum we have overWriteDEM data ready & updated.
+			//var increTime = this.getIncrementTimeSeconds();
 			this.doSimulation(); 
+			//var hola = 0;
 		}
 		
 	}
@@ -1374,12 +1420,17 @@ WaterManager.prototype.objectMoved = function (object)
 WaterManager.prototype.doSimulation = function ()
 {
 	// bind frameBuffer.
+	// this.simulationTimeStep = 0.08; // ok.
 	var waterLayersCount = this.waterLayersArray.length;
 	var waterLayer;
 	for (var i=0; i<waterLayersCount; i++)
 	{
 		waterLayer = this.waterLayersArray[i];
-		waterLayer.doSimulationSteps(this.magoManager);
+
+		for (var c = 0; c < 1; c++)
+		{
+			waterLayer.doSimulationSteps(this.magoManager);
+		}
 	}
 };
 

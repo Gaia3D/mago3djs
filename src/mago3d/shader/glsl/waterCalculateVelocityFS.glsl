@@ -146,6 +146,7 @@ void main()
 
     // Now, calculate the contamination trasference.**************************************************
     // read water heights.
+
     float topWH = getWaterHeight(curuv + vec2(0.0, divY));
     float rightWH = getWaterHeight(curuv + vec2(divX, 0.0));
     float bottomWH = getWaterHeight(curuv + vec2(0.0, -divY));
@@ -223,14 +224,15 @@ void main()
 
     vec4 shaderLogColor4 = vec4(0.0);
 
-    if(da <= 1e-8) 
+    //if(da <= 1e-8) // original.***
+    if(da <= 1e-8) //
     {
         veloci = vec2(0.0);
     }
     else
     {
-        //veloci = veloci/(da * u_PipeLen);
-        veloci = veloci/(da * vec2(cellSize_y, cellSize_x));
+        ////veloci = veloci/(da * u_PipeLen);
+        veloci = veloci/(da * vec2(cellSize_y, cellSize_x)); // original.***
     }
 
     if(curuv.x <= divX) 
@@ -271,6 +273,8 @@ void main()
     //  }
 
     
+    // test debug::::::::::::::
+    //veloci = vec2(0.0); // delete this.***
 
     vec2 encodedVelocity = encodeVelocity(veloci/u_waterMaxVelocity);
     vec4 writeVel = vec4(encodedVelocity, 0.0, 1.0);
@@ -300,5 +304,7 @@ void main()
         gl_FragData[3] = vec4(0.0); // 
         gl_FragData[4] = vec4(0.0); // 
     #endif
+
+    
 
 }
