@@ -2134,12 +2134,12 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		
 	}
 
-	//if (this.waterManager) // OpaquesPass.***
-	//{
+	if (this.waterManager) // OpaquesPass.***
+	{
 	//	// Render terrain.***
 	//	//this.waterManager.renderTerrain();
-	//	this.waterManager._TEST_renderQMesh();
-	//}
+		//this.waterManager._TEST_renderQMesh();
+	}
 
 
 	// Render transparents.****************************************************************************************************************

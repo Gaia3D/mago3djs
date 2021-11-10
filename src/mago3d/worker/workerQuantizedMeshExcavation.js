@@ -23,8 +23,7 @@ importScripts('./src/CODE_.js');
 importScripts('./src/Utils_.js');
 importScripts('./src/Vertex_.js');
 importScripts('./src/VertexList_.js');
-
-importScripts('../../../src/mago3d/util/createWorker.js');
+importScripts('./src/createWorker.js');
 
 var worker = self;
 
@@ -224,18 +223,35 @@ function continueProcess(e, qMeshExcavationWorker, qMesh)
     };
     */
 
+	// Make uvhValuesArray.***
+	var vertexCount = qMesh.uValues.length;
+	var uvhValuesArray = new Uint16Array(vertexCount * 3);
+	uvhValuesArray.set(qMesh.uValues);
+	uvhValuesArray.set(qMesh.vValues, qMesh.uValues.length);
+	uvhValuesArray.set(qMesh.hValues, qMesh.uValues.length + qMesh.vValues);
+
 	qMeshExcavationWorker.postMessage({result: 
         {
-        	uValues      : qMesh.uValues, 
-        	vValues      : qMesh.vValues,
-        	hValues      : qMesh.hValues,
-        	indices      : qMesh.indices,
-        	minHeight    : qMesh.minHeight,
-        	maxHeight    : qMesh.maxHeight,
-        	southIndices : qMesh.southIndices,
-        	eastIndices  : qMesh.eastIndices,
-        	northIndices : qMesh.northIndices,
-        	westIndices  : qMesh.westIndices,
+        	uvhValues        : uvhValuesArray,
+        	uValues          : qMesh.uValues, 
+        	vValues          : qMesh.vValues,
+        	hValues          : qMesh.hValues,
+        	indices          : qMesh.indices,
+        	minHeight        : qMesh.minHeight,
+        	maxHeight        : qMesh.maxHeight,
+        	southIndices     : qMesh.southIndices,
+        	eastIndices      : qMesh.eastIndices,
+        	northIndices     : qMesh.northIndices,
+        	westIndices      : qMesh.westIndices,
+        	southSkirtHeight : qMesh.southSkirtHeight, // Same value that the original quantized mesh.***
+        	eastSkirtHeight  : qMesh.eastSkirtHeight, // Same value that the original quantized mesh.***
+        	northSkirtHeight : qMesh.northSkirtHeight, // Same value that the original quantized mesh.***
+        	westSkirtHeight  : qMesh.westSkirtHeight, // Same value that the original quantized mesh.***
+        	boundingSphere   : {
+        		center : qMesh.boundingSphere.center, // Same value that the original quantized mesh.***
+        		radius : qMesh.boundingSphere.radius // Same value that the original quantized mesh.***
+        	},
+        	horizonOcclusionPoint: qMesh.horizonOcclusionPoint // Same value that the original quantized mesh.***
         },
 	info: e.data.info});
 };

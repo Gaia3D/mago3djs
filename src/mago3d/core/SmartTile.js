@@ -1568,8 +1568,9 @@ SmartTile.prototype._parseSmartTileF4d = function (parsedResult, magoManager)
 		// Now, must check if the node exists.
 		var node = hierarchyManager.getNodeByDataKey(savedProjectId, buildingId);
 
-		if(node) {
-		attributes = node.data.attributes;
+		if (node) 
+		{
+			attributes = node.data.attributes;
 		}
 
 		var commonAttr = smartTilePathInfo[projectId].attributes;

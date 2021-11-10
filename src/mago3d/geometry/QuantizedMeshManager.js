@@ -89,18 +89,27 @@ QuantizedMeshManager.prototype.doExcavation = function (qMesh, excavationGeoCoor
 	var geoExtent = SmartTile.getGeographicExtentOfTileLXY(L, X, Y, undefined, imageryType);
 
 	var data = {
-		info         : {X: X, Y: Y, L: L},
-		uValues      : qMesh._uValues,
-		vValues      : qMesh._vValues,
-		hValues      : qMesh._heightValues,
-		indices      : qMesh._indices,
-		minHeight    : qMesh._minimumHeight,
-		maxHeight    : qMesh._maximumHeight,
-		southIndices : qMesh._southIndices,
-		eastIndices  : qMesh._eastIndices,
-		northIndices : qMesh._northIndices,
-		westIndices  : qMesh._westIndices,
-		geoExtent    : {
+		info             : {X: X, Y: Y, L: L},
+		uValues          : qMesh._uValues,
+		vValues          : qMesh._vValues,
+		hValues          : qMesh._heightValues,
+		indices          : qMesh._indices,
+		minHeight        : qMesh._minimumHeight,
+		maxHeight        : qMesh._maximumHeight,
+		southIndices     : qMesh._southIndices,
+		eastIndices      : qMesh._eastIndices,
+		northIndices     : qMesh._northIndices,
+		westIndices      : qMesh._westIndices,
+		southSkirtHeight : qMesh._southSkirtHeight,
+		eastSkirtHeight  : qMesh._eastSkirtHeight,
+		northSkirtHeight : qMesh._northSkirtHeight,
+		westSkirtHeight  : qMesh._westSkirtHeight,
+		boundingSphere   : {
+			center : qMesh._boundingSphere.center,
+			radius : qMesh._boundingSphere.radius
+		},
+		horizonOcclusionPoint : qMesh._horizonOcclusionPoint,
+		geoExtent             : {
 			minLongitude : geoExtent.minGeographicCoord.longitude,
 			minLatitude  : geoExtent.minGeographicCoord.latitude,
 			maxLongitude : geoExtent.maxGeographicCoord.longitude,
