@@ -1601,7 +1601,7 @@ Water.prototype.doSimulationSteps = function (magoManager)
 	
 	
 	// test qmesh excavation.***
-	this.test__doQuantizedSurfaceExcavation(magoManager);
+	//this.test__doQuantizedSurfaceExcavation(magoManager);
 
 	//---------------------------------------------------------------------------------------------------------------------------------
 	// Check if simulate landSlides.
