@@ -366,7 +366,7 @@ var MagoManager = function (config)
 		this.weatherStation = new Mago3D.WeatherStation(this);
 	}
 
-	this.quantizedMeshManager;
+	this.quantizedMeshManager = new QuantizedMeshManager(this);
 	this.workersManager = new WorkersManager(this);
 };
 MagoManager.prototype = Object.create(Emitter.prototype);
@@ -403,7 +403,51 @@ MagoManager.EVENT_TYPE = {
 	'ANIMATIONING'            : 'animationing',
 	'VALIDHEIGHTEND'          : 'validHeightEnd'
 };
+MagoManager.prototype.testExcavation = function() 
+{
+	var array = [
+		[
+			127.18867778778076,
+			37.615659186587635
+		],
+		[
+			127.18434333801268,
+			37.612055711412815
+		],
+		[
+			127.18932151794434,
+			37.608758038672185
+		],
+		[
+			127.19541549682617,
+			37.60865604646256
+		],
+		[
+			127.19653129577637,
+			37.613109575992404
+		],
+		[
+			127.19537258148193,
+			37.61613510421666
+		],
+		[
+			127.19357013702391,
+			37.617324884962706
+		],
+		[
+			127.1918535232544,
+			37.61766481882189
+		],
+		[
+			127.18867778778076,
+			37.615659186587635
+		]
+	];
+	var geoCoordsArray = array.map(function(item){ return new GeographicCoord(item[0], item[1], 0); });
 
+	this.quantizedMeshManager.setQuantizedMeshExcavationSet(geoCoordsArray, -30);
+	console.info(this.quantizedMeshManager);
+};
 /**
  * object 를 그리는 두가지 종류의 function을 호출
  * @private

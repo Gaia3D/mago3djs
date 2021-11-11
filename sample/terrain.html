@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width">
+	<title>Cesium</title>
+	<link rel="stylesheet" href="./demo.css" />
+	<link rel="stylesheet" href="../src/engine/cesium/Widgets/widgets.css" />
+	<link rel="stylesheet" href="../externlib/jquery-ui/jquery-ui.css" />
+	<script type="text/javascript" src="../externlib/jquery/jquery.js"></script>
+	<script type="text/javascript" src="../externlib/jquery-i18next/jquery-i18next.min.js"></script>
+	<script type="text/javascript" src="../externlib/polyfill/decodeTextAlternative/encoding-indexes.js"></script>
+	<script type="text/javascript" src="../externlib/polyfill/decodeTextAlternative/encoding.js"></script>
+</head>
+
+<body>
+	<input type="hidden" id="now_latitude" name="now_latitude" value="" />
+	<input type="hidden" id="now_longitude" name="now_longitude" value=""  />
+<ul class="nav i18n">
+	<li id="homeMenu" class="home">
+		<img src="/images/ko/homepage/home-icon.png" style="width: 35px; height: 35px; padding-right: 2px;" title="Home" />
+	</li>
+	<li onclick="gotopage();">
+		Guide
+	</li>
+</ul>
+<div id="magoContainer" class="mapWrap"></div>
+
+<script type="text/javascript" src="../src/engine/cesium/Cesium.js"></script>
+<script type="text/javascript" src="../build/mago3d/mago3d.js"></script>
+<script>
+
+	var MAGO3D_INSTANCE;
+	var imagePath = "/images/ko";
+	var dataInformationUrl = "/sample/persistence/json/";
+	magoStart(null, "magoContainer", imagePath);
+
+    // mago3d 시작, 정책 데이터 파일을 로딩
+	function magoStart(viewer, renderDivId, imagePath) {
+		$.ajax({
+			url: dataInformationUrl + "geopolicy.json",
+			type: "GET",
+			dataType: "json",
+			success: function(serverPolicy){
+				serverPolicy.basicGlobe = 'cesium';
+
+				var cesiumViewerOption = {};
+				cesiumViewerOption.infoBox = false;
+				cesiumViewerOption.navigationHelpButton = false;
+				cesiumViewerOption.selectionIndicator = false;
+				cesiumViewerOption.homeButton = false;
+				cesiumViewerOption.fullscreenButton = false;
+				cesiumViewerOption.geocoder = false;
+				cesiumViewerOption.baseLayerPicker = false;
+				cesiumViewerOption.sceneModePicker = false;
+
+				serverPolicy.terrainType = 'cesium-customer';
+				serverPolicy.terrainValue = 'https://terrain.cdn.ntruss.com/tilesets/ws2/';
+				serverPolicy.initLatitude = 37.612480658604696;
+				serverPolicy.initLongitude = 127.18741178512572;
+				serverPolicy.initAltitude = 8000;
+				
+				MAGO3D_INSTANCE = new Mago3D.Mago3d(renderDivId, serverPolicy, {loadend : loadend}, cesiumViewerOption);
+			},
+			error: function(e){
+				alert(e.responseText);
+			}
+		});
+	}
+	function loadend(e) {
+		console.info('Complete construct mago3d instance. Enjoy!');
+		
+		var magoInstance = e;
+		
+		var viewer = magoInstance.getViewer();
+		viewer.scene.globe.depthTestAgainstTerrain = true;
+	}
+
+	function randomNumber(min, max) { 
+		return parseInt(Math.random() * (max - min) + min);
+	}
+
+	function gotopage() {
+		window.open(
+			'https://gaia3d.atlassian.net/wiki/spaces/education/pages/79429666/mago3D+JS',
+			'_blank'
+		);
+	}
+</script>
+</body>
+</html>

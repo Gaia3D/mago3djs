@@ -4,11 +4,12 @@
     "node" : true,
     "jasmine": true,
     "mocha": true,
-    "amd": true
+    "amd": true,
+    "es6": true
   },
   "globals": {},
   "parserOptions": {
-    "ecmaVersion": 6,
+    "ecmaVersion": 8,
     "sourceType": "script"
   },
   "rules": {

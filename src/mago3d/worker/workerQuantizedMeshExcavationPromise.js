@@ -24,69 +24,82 @@ importScripts('./src/Utils_.js');
 importScripts('./src/Vertex_.js');
 importScripts('./src/VertexList_.js');
 importScripts('./src/createWorker.js');
+importScripts('./src/register-worker.js');
+importScripts('./src/promise-worker_.js');
 
-var worker = self;
-
-worker.onmessage = function (e) 
+registerPromiseWorker(function (e) 
 {
-	var value_A = 3.0;
-	var value_B = 5.0;
-	var value_C = 0.0;
-
-	var qMesh = e.data;
-	/*
-    var data = {
-        info : {X: X, Y: Y, L: L},
-        uValues : qMesh._uValues,
-        vValues : qMesh._vValues,
-        hValues : qMesh._heightValues,
-        indices : qMesh._indices,
-        minHeight : qMesh._minimumHeight,
-        maxHeight : qMesh._maximumHeight,
-        southIndices : qMesh._southIndices,
-        eastIndices : qMesh._eastIndices,
-        northIndices : qMesh._northIndices,
-        westIndices : qMesh._westIndices,
-        geoExtent : {
-            minLongitude : geoExtent.minGeographicCoord.longitude,
-            minLatitude : geoExtent.minGeographicCoord.latitude,
-            maxLongitude : geoExtent.maxGeographicCoord.longitude,
-            maxLatitude : geoExtent.maxGeographicCoord.latitude
-        },
-        excavationGeoCoords : excavationGeoCoords,
-		excavationAltitude : excavationAltitude
-    };
-    */
-
-	var workerPolygon2DTessellate;
-
-	if (!workerPolygon2DTessellate)
-	{
-		var qMeshExcavationWorker = this;
-		qMeshExcavationWorker.polygon2DTessellated;
-		workerPolygon2DTessellate = createWorker('workerPolygon2DTessellate.js');
-        
-		workerPolygon2DTessellate.onmessage = function(a)
-		{
-			var result = a.data.result;
-
-			qMeshExcavationWorker.polygon2DTessellated = result;
-			continueProcess(e, qMeshExcavationWorker, qMesh);
-		};
-        
-	}
-
-	var data = {
+	var qMesh = e;
+	var excavationPositions = {
 		positions: qMesh.excavationGeoCoords
 	};
 
-	workerPolygon2DTessellate.postMessage(data); // send to worker by copy.
-};
+	var tessellated = polygon2DTessellate(excavationPositions);
+	var excavatedQuantizedMesh = continueProcess(tessellated, qMesh);
+	return Promise.resolve().then(function () 
+	{
+		return excavatedQuantizedMesh;
+	});
 
+	/* var workerPolygon2DTessellate = new PromiseWorker(createWorker('workerPolygon2DTessellatePromise.js'));
+	return workerPolygon2DTessellate.postMessage(positions).then(function (res) 
+	{
+		return continueProcess(res, qMesh);
+	}); */
+});
 
-function continueProcess(e, qMeshExcavationWorker, qMesh)
+function polygon2DTessellate(excavation) 
 {
-	var convexPolygon2dObject = qMeshExcavationWorker.polygon2DTessellated;
+	var cartesiansArray = excavation.positions;
+	var point2dList = new Point2DList_();
+	//var point2dArray = [];
+	var pointsCount = cartesiansArray.length / 2.0;
+	var point2d;
+	var x, y;
+	for (var i=0; i<pointsCount; i++)
+	{
+		x = cartesiansArray[i * 2];
+		y = cartesiansArray[i * 2 + 1];
+		point2d = new Point2D_(x, y);
+		point2dList.addPoint(point2d);
+	}
+
+	var polygon2d = new Polygon2D_({point2dList: point2dList});
+	var concaveVerticesIndices = polygon2d.calculateNormal(undefined);
+    
+	// Now tessellate.***
+	var convexPolygonsArray = [];
+	convexPolygonsArray = polygon2d.tessellate(concaveVerticesIndices, convexPolygonsArray);
+
+	// now, make convexPolygonsIndicesArray.***
+	var convexPolygonIndicesArray = [];
+    
+	polygon2d.setIdxInList();
+	var convexPolygonsCount = convexPolygonsArray.length;
+	for (var i=0; i<convexPolygonsCount; i++)
+	{
+		var convexPolygonIndices = [];
+		var convexPolygon = convexPolygonsArray[i];
+		var pointsCount = convexPolygon.point2dList.getPointsCount();
+		for (var j=0; j<pointsCount; j++)
+		{
+			var point2d = convexPolygon.point2dList.getPoint(j);
+			convexPolygonIndices.push(point2d.idxInList);
+		}
+
+		// finally put the indices into result "convexPolygonIndicesArray".***
+		convexPolygonIndicesArray.push(convexPolygonIndices);
+	}
+
+	return {
+		convexPolygonIndicesArray : convexPolygonIndicesArray,
+		concaveVerticesIndices    : concaveVerticesIndices
+	};
+}
+
+function continueProcess(tessellated, qMesh)
+{
+	var convexPolygon2dObject = tessellated;//qMeshExcavationWorker.polygon2DTessellated;
 
 	// Now, do excavation.***
 	// Make trianglesArray.***
@@ -206,7 +219,7 @@ function continueProcess(e, qMeshExcavationWorker, qMesh)
 	uvhValuesArray.set(qMesh.vValues, vertexCount);
 	uvhValuesArray.set(qMesh.hValues, vertexCount * 2);
 
-	qMeshExcavationWorker.postMessage({
+	return {
 		result: 
         {
         	uvhValues        : uvhValuesArray,
@@ -230,11 +243,6 @@ function continueProcess(e, qMeshExcavationWorker, qMesh)
         	},
         	horizonOcclusionPoint: qMesh.horizonOcclusionPoint // Same value that the original quantized mesh.***
         },
-		info: e.data.info});
+	    info: qMesh.info
+	};
 };
-
-
-
-
-
-

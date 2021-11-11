@@ -86,34 +86,6 @@ CesiumViewerInit.prototype.providerBuild = function()
 	if (!this.options.terrainProvider) 
 	{
 		this.options.terrainProvider = CesiumViewerInit.makeTerrainProvider(terrainType, terrainValue, policy, policy.geoserverTerrainproviderLayerName, policy.geoserverTerrainproviderStyleName);
-		/*this.options.terrainProvider = new Cesium.EllipsoidTerrainProvider();
-		switch (terrainType) 
-		{
-		case CODE.cesiumTerrainType.CESIUM_ION_DEFAULT :{
-			if (policy.cesiumIonToken && policy.cesiumIonToken.length > 0) 
-			{
-				this.options.terrainProvider = new Cesium.CesiumTerrainProvider({
-					url: Cesium.IonResource.fromAssetId(1)
-				});
-			}
-			break;
-		}
-		case CODE.cesiumTerrainType.CESIUM_ION_CDN :{
-			if (policy.cesiumIonToken || policy.cesiumIonToken.length > 0) 
-			{
-				this.options.terrainProvider = new Cesium.CesiumTerrainProvider({
-					url: Cesium.IonResource.fromAssetId(parseInt(terrainValue))
-				});
-			}
-			break;
-		}
-		case CODE.cesiumTerrainType.CESIUM_CUSTOMER :{
-			this.options.terrainProvider = new Cesium.CesiumTerrainProvider({
-				url: terrainValue
-			});
-			break;
-		}
-		}*/
 	}
 	
 	if (!this.options.imageryProvider) 
@@ -148,7 +120,7 @@ CesiumViewerInit.makeTerrainProvider = function(type, value, policy, layerName, 
 		break;
 	}
 	case CODE.cesiumTerrainType.CESIUM_CUSTOMER :{
-		terrainProvider = new Cesium.CesiumTerrainProvider({
+		terrainProvider = new Cesium.EditableCesiumTerrainProvider({
 			url: value
 		});
 		break;
@@ -396,6 +368,12 @@ CesiumViewerInit.prototype.initMagoManager = function()
 	this.viewer.scene.globe.depthTestAgainstTerrain = false;
 	this.viewer.scene.logarithmicDepthBuffer = false; //do not use logarithmic buffer
 	this.viewer.scene.highDynamicRange = false; //do not use high dynamic range
+
+	console.info(this.viewer.terrainProvider);
+	if (this.viewer.terrainProvider instanceof Cesium.EditableCesiumTerrainProvider) 
+	{
+		this.viewer.terrainProvider.magoManager = magoManager;
+	}
 
 	scene.globe.terrainProviderChanged.addEventListener(function(e)
 	{
