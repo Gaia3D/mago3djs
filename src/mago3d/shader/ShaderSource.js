@@ -13889,7 +13889,7 @@ void main()\n\
     //}\n\
     float totalH = vWaterHeight + vContaminantHeight;\n\
     float alpha = vColorAuxTest.a;\n\
-    if(totalH < 0.1)// original = 0.0001\n\
+    if(totalH < 0.1)\n\
     {\n\
         alpha = min(totalH/0.1, alpha); // original.***\n\
         //alpha = totalH; // test.***\n\

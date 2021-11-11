@@ -5,8 +5,12 @@
  * @class QuantizedSurface
  * 
  */
-var QuantizedSurface = function(qMesh) 
+var QuantizedSurface = function (qMesh) 
 {
+	//**************************************************************
+	// Note : NO USE this class. This class was created to debug.***
+	// USE "Worker/workerQuantizedMeshExcavation.js" instead.***
+	//--------------------------------------------------------------
 	if (!(this instanceof QuantizedSurface)) 
 	{
 		throw new Error(Messages.CONSTRUCT_ERROR);

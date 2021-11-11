@@ -57,18 +57,27 @@ QuantizedMeshExcavationSet.prototype.getIntersectedTiles = function ()
 		for (var i = this.minDepth; i<= this.maxDepth; i++)
 		{
 			var tilesArray = SmartTile.selectTileIndicesArray(i, minLon, minLat, maxLon, maxLat, undefined);
-
-			this.intersectedTilesMap[i] = {};
-			for (var j=0, len=tilesArray.length;j<len;j++) 
+			
+			// test debug::::::::::::
+			//if (i === 17)
 			{
-				var tile = tilesArray[j];
-
-				if (!this.intersectedTilesMap[i][tile.X]) 
+				this.intersectedTilesMap[i] = {};
+				for (var j=0, len=tilesArray.length;j<len;j++) 
 				{
-					this.intersectedTilesMap[i][tile.X] = [];
+					var tile = tilesArray[j];
+					// test debug::::::::::::
+					//if (tile.X === 223686 && tile.Y === 38146) // no intersected X: 223684, 223685
+					{
+						
+						if (!this.intersectedTilesMap[i][tile.X]) 
+						{
+							this.intersectedTilesMap[i][tile.X] = [];
+						}
+						this.intersectedTilesMap[i][tile.X].push(tile.Y);
+					}
 				}
-				this.intersectedTilesMap[i][tile.X].push(tile.Y);
 			}
+			
 		}
 
 	}

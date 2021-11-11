@@ -2129,7 +2129,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 	if (magoManager.ssaoFromDepthFbo)
 	{
-		//texture = magoManager.ssaoFromDepthFbo.colorBuffer;
+		texture = magoManager.ssaoFromDepthFbo.colorBuffer;
 	}
 
 	// weatherStation.*** weatherStation.*** weatherStation.*** weatherStation.*** weatherStation.*** weatherStation.*** weatherStation.*** weatherStation.*** 
@@ -2175,7 +2175,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 			var waterLayer = magoManager.waterManager.waterLayersArray[0];
 			if (waterLayer.waterHeightTexA && waterLayer.waterHeightTexA.texId)
 			{
-				texture = waterLayer.waterHeightTexA.texId;
+				//texture = waterLayer.waterHeightTexA.texId;
 			}
 
 			if (waterLayer.waterSourceTex && waterLayer.waterSourceTex.texId)
@@ -2315,7 +2315,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 	gl.activeTexture(gl.TEXTURE0 + 0); 
 	gl.bindTexture(gl.TEXTURE_2D, texture);
 
-	gl.uniform1i(shader.uTextureType_loc, 0); // 2dTexture.
+	gl.uniform1i(shader.uTextureType_loc, 0); // 0= texture tal qual. 1= decoding depth 4 bytes.***
 
 	if (!this.auxCubeMap)
 	{

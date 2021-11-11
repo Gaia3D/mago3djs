@@ -402,7 +402,8 @@ Water.prototype.init = function ()
 	this.cellArea = this.cellSize_x * this.cellSize_y;
 
 	this.simulationTimeStep = 0.08;
-	this.simulationTimeStep = 0.06;
+	this.simulationTimeStep = 0.06; // this value depends of the pixel size.***
+
 
 	this._bIsPrepared = true;
 };
@@ -1385,16 +1386,31 @@ Water.prototype.test__doQuantizedSurfaceExcavation = function (magoManager)
 	}
 
 	// Test.*** delete this.*** Test.*** delete this.*** Test.*** delete this.*** Test.*** delete this.*** Test.*** delete this.*** Test.*** 
-	if (!this.testQMesh) 
+	if (!this.requestedTile) 
 	{
+		// test debug:::
+		//var X = 13979;
+		//var Y = 2385;
+		//var L = 13;
+		//var resultGeoExtend  = SmartTile.getGeographicExtentOfTileLXY(L, X, Y, resultGeoExtend, CODE.imageryType.CRS84);
+		// end test debug.----------
 		var X = 27934;
 		var Y = 4791;
 		var L = 14;
 
+		// kwon jae hyun L:17, X:223686, Y:38146
+		var X = 223686;
+		var Y = 38146;
+		var L = 17;
+
 		// 126.77975, 37.36228
-		var tileIndices = SmartTile.selectTileIndices(L, 126.77975, 37.36228, undefined);
-		X = tileIndices.X;
-		Y = tileIndices.Y;
+		var tileIndices = {
+			L : L,
+			X : X,
+			Y : Y
+		};
+
+		this.requestedTile = true;
 
 		this.qMeshPromise = magoManager.scene.globe.terrainProvider.requestTileGeometry(X, Y, L);
 		this.qMeshPromise.then((value) =>
@@ -1453,14 +1469,14 @@ Water.prototype.test__doQuantizedSurfaceExcavation = function (magoManager)
 		*/
 
 		// make a irregular "L" shape.**************************************************************************************
-		
+		/*
 		excavationGeoCoords.push((minLon + 0.1 * lonRange + lonOffset), (minLat + 0.1 * latRange + latOffset));
 		excavationGeoCoords.push((minLon + 0.8 * lonRange + lonOffset), (minLat + 0.15 * latRange + latOffset));
 		excavationGeoCoords.push((minLon + 0.75 * lonRange + lonOffset), (minLat + 0.4 * latRange + latOffset));
 		excavationGeoCoords.push((minLon + 0.4 * lonRange + lonOffset), (minLat + 0.32 * latRange + latOffset));
 		excavationGeoCoords.push((minLon + 0.5 * lonRange + lonOffset), (minLat + 0.9 * latRange + latOffset));
 		excavationGeoCoords.push((minLon + 0.3 * lonRange + lonOffset), (minLat + 0.7 * latRange + latOffset));
-		
+		*/
 
 		// small rectangle.*************************************************************************************************
 		/*
@@ -1470,6 +1486,56 @@ Water.prototype.test__doQuantizedSurfaceExcavation = function (magoManager)
 		excavationGeoCoords.push((minLon + 0.2 * lonRange), (minLat + 0.21 * latRange));
 			*/
 		// make a circle.***************************************************************************************************
+
+		// Make kwon jae hyun shape.****************************************************************************************
+		excavationGeoCoords.push(127.18867778778076, 37.615659186587635); // 0
+		excavationGeoCoords.push(127.18434333801268, 37.612055711412815); // 1
+		excavationGeoCoords.push(127.18932151794434, 37.608758038672185); // 2
+		excavationGeoCoords.push(127.19541549682617, 37.60865604646256); // 3
+		excavationGeoCoords.push(127.19653129577637, 37.613109575992404); // 4
+		excavationGeoCoords.push(127.19537258148193, 37.61613510421666); // 5
+		excavationGeoCoords.push(127.19357013702391, 37.617324884962706); // 6
+		excavationGeoCoords.push(127.1918535232544, 37.61766481882189); // 7
+		excavationGeoCoords.push(127.18867778778076, 37.615659186587635); // 8
+
+		// Make geoCoords to render.***
+		var geoCoordsList = magoManager.modeler.getGeographicCoordsList();
+		var geoCoord = new GeographicCoord(127.18867778778076, 37.615659186587635, 50.0);
+		geoCoord.makeDefaultGeoLocationData();
+		geoCoordsList.addGeoCoord(geoCoord);
+
+		var geoCoord = new GeographicCoord(127.18434333801268, 37.612055711412815, 50.0);
+		geoCoord.makeDefaultGeoLocationData();
+		geoCoordsList.addGeoCoord(geoCoord);
+
+		var geoCoord = new GeographicCoord(127.18932151794434, 37.608758038672185, 50.0);
+		geoCoord.makeDefaultGeoLocationData();
+		geoCoordsList.addGeoCoord(geoCoord);
+
+		var geoCoord = new GeographicCoord(127.19541549682617, 37.60865604646256, 50.0);
+		geoCoord.makeDefaultGeoLocationData();
+		geoCoordsList.addGeoCoord(geoCoord);
+
+		var geoCoord = new GeographicCoord(127.19653129577637, 37.613109575992404, 50.0);
+		geoCoord.makeDefaultGeoLocationData();
+		geoCoordsList.addGeoCoord(geoCoord);
+
+		var geoCoord = new GeographicCoord(127.19537258148193, 37.61613510421666, 50.0);
+		geoCoord.makeDefaultGeoLocationData();
+		geoCoordsList.addGeoCoord(geoCoord);
+
+		var geoCoord = new GeographicCoord(127.19357013702391, 37.617324884962706, 50.0);
+		geoCoord.makeDefaultGeoLocationData();
+		geoCoordsList.addGeoCoord(geoCoord);
+
+		var geoCoord = new GeographicCoord(127.1918535232544, 37.61766481882189, 50.0);
+		geoCoord.makeDefaultGeoLocationData();
+		geoCoordsList.addGeoCoord(geoCoord);
+
+		var geoCoord = new GeographicCoord(127.18867778778076, 37.615659186587635, 50.0);
+		geoCoord.makeDefaultGeoLocationData();
+		geoCoordsList.addGeoCoord(geoCoord);
+		//--------------------------------------------------------------------------------------------------------------
 		/*
 		var angRad = 0.0;
 		var interpolation = 128;
@@ -1494,7 +1560,7 @@ Water.prototype.test__doQuantizedSurfaceExcavation = function (magoManager)
 		var qMeshManager = magoManager.quantizedMeshManager;
 		if (qMeshManager)
 		{
-			var excavationAltitude = 180.0;
+			var excavationAltitude = -30;
 			qMeshManager.doExcavation(this.testQMesh, excavationGeoCoords, excavationAltitude);
 
 			// another test.****
@@ -1579,6 +1645,9 @@ Water.prototype.test__doQuantizedSurfaceExcavation = function (magoManager)
  */
 Water.prototype.doSimulationSteps = function (magoManager) 
 {
+	// test qmesh excavation.***
+	//this.test__doQuantizedSurfaceExcavation(magoManager);
+
 	if (!this.isPrepared()) 
 	{ 
 		return; 
@@ -1598,10 +1667,6 @@ Water.prototype.doSimulationSteps = function (magoManager)
 	var fbo = waterManager.fbo;
 	var extbuffers = fbo.extbuffers;
 	var shader;
-	
-	
-	// test qmesh excavation.***
-	//this.test__doQuantizedSurfaceExcavation(magoManager);
 
 	//---------------------------------------------------------------------------------------------------------------------------------
 	// Check if simulate landSlides.
@@ -2868,8 +2933,8 @@ Water.prototype._renderQMesh = function (magoManager)
 	// Test function to render qSurface in excavation.***
 	// Test function to render qSurface in excavation.***
 	// Test function to render qSurface in excavation.***
-	if (!this.isPrepared())
-	{ return; }
+	//if (!this.isPrepared())
+	//{ return; }
 
 	if (!this.qMeshVboKeyContainer)
 	{

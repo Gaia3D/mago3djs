@@ -192,7 +192,7 @@ QuantizedSurface_._getSkirtVertices = function (cardinal, startVertex, resultVer
 	var i = 0;
 	while (!finished && i<maxIterations)
 	{
-		var report = QuantizedSurface_._getNextSkirtVertexReport(currVertex, currTriangle, cardinal);
+		var report = QuantizedSurface_._getNextSkirtVertexReport(currVertex, currTriangle, cardinal, i);
 
 		if (report)
 		{
@@ -211,7 +211,7 @@ QuantizedSurface_._getSkirtVertices = function (cardinal, startVertex, resultVer
 	return resultVertexArray;
 };
 
-QuantizedSurface_._getNextSkirtVertexReport = function (vertex, triangleMaster, cardinal)
+QuantizedSurface_._getNextSkirtVertexReport = function (vertex, triangleMaster, cardinal, currIteration)
 {
 	var trianglesArray = vertex.trianglesArray;
 	if (!trianglesArray)
@@ -227,7 +227,20 @@ QuantizedSurface_._getNextSkirtVertexReport = function (vertex, triangleMaster, 
 		for (var i=0; i<triCount; i++)
 		{
 			tri = trianglesArray[i];
-			if (tri !== triangleMaster && tri.getStatus() !== CODE_.status.DELETED)
+			var triangleIsCandidate = false;
+			if(currIteration === 0)
+			{
+				// In the 1rst iteration "tri" can to be equal to "triangleMaster".***
+				triangleIsCandidate = true;
+			}
+			else
+			{
+				if (tri !== triangleMaster)
+				{
+					triangleIsCandidate = true;
+				}
+			}
+			if (triangleIsCandidate && tri.getStatus() !== CODE_.status.DELETED)
 			{
 				// now, check if this triangle has another south-vertex.***
 				if (tri.vertex0 !== vertex && tri.vertex0.bSouth)
@@ -256,7 +269,20 @@ QuantizedSurface_._getNextSkirtVertexReport = function (vertex, triangleMaster, 
 		for (var i=0; i<triCount; i++)
 		{
 			tri = trianglesArray[i];
-			if (tri !== triangleMaster && tri.getStatus() !== CODE_.status.DELETED)
+			var triangleIsCandidate = false;
+			if(currIteration === 0)
+			{
+				// In the 1rst iteration "tri" can to be equal to "triangleMaster".***
+				triangleIsCandidate = true;
+			}
+			else
+			{
+				if (tri !== triangleMaster)
+				{
+					triangleIsCandidate = true;
+				}
+			}
+			if (triangleIsCandidate && tri.getStatus() !== CODE_.status.DELETED)
 			{
 				// now, check if this triangle has another south-vertex.***
 				if (tri.vertex0 !== vertex && tri.vertex0.bEast)
@@ -285,7 +311,20 @@ QuantizedSurface_._getNextSkirtVertexReport = function (vertex, triangleMaster, 
 		for (var i=0; i<triCount; i++)
 		{
 			tri = trianglesArray[i];
-			if (tri !== triangleMaster && tri.getStatus() !== CODE_.status.DELETED)
+			var triangleIsCandidate = false;
+			if(currIteration === 0)
+			{
+				// In the 1rst iteration "tri" can to be equal to "triangleMaster".***
+				triangleIsCandidate = true;
+			}
+			else
+			{
+				if (tri !== triangleMaster)
+				{
+					triangleIsCandidate = true;
+				}
+			}
+			if (triangleIsCandidate && tri.getStatus() !== CODE_.status.DELETED)
 			{
 				// now, check if this triangle has another south-vertex.***
 				if (tri.vertex0 !== vertex && tri.vertex0.bNorth)
@@ -314,7 +353,20 @@ QuantizedSurface_._getNextSkirtVertexReport = function (vertex, triangleMaster, 
 		for (var i=0; i<triCount; i++)
 		{
 			tri = trianglesArray[i];
-			if (tri !== triangleMaster && tri.getStatus() !== CODE_.status.DELETED)
+			var triangleIsCandidate = false;
+			if(currIteration === 0)
+			{
+				// In the 1rst iteration "tri" can to be equal to "triangleMaster".***
+				triangleIsCandidate = true;
+			}
+			else
+			{
+				if (tri !== triangleMaster)
+				{
+					triangleIsCandidate = true;
+				}
+			}
+			if (triangleIsCandidate && tri.getStatus() !== CODE_.status.DELETED)
 			{
 				// now, check if this triangle has another south-vertex.***
 				if (tri.vertex0 !== vertex && tri.vertex0.bWest)
@@ -697,9 +749,9 @@ QuantizedSurface_._cutTrianglesWithPlane = function (triList, plane, segment2d, 
 			// Test debug : Now, for new triangles created in cutting process, set as cutted type, for the future use.
 			if (resultNewTriangles.length > 0)
 			{
-				for (var i=0; i<resultNewTriangles.length; i++)
+				for (var q=0; q<resultNewTriangles.length; q++)
 				{
-					resultNewTriangles[i].bCutted = true; // test debug.***
+					resultNewTriangles[q].bCutted = true; // test debug.***
 				}
 			}
 		}
@@ -826,21 +878,21 @@ QuantizedSurface_._getCardinalOfEdge = function (vertex_A, vertex_B)
 			return CODE_.cardinal.SOUTH;
 		}
 	}
-	else if (vertex_A.bEast)
+	if (vertex_A.bEast)
 	{
 		if (vertex_B.bEast)
 		{
 			return CODE_.cardinal.EAST;
 		}
 	}
-	else if (vertex_A.bNorth)
+	if (vertex_A.bNorth)
 	{
 		if (vertex_B.bNorth)
 		{
 			return CODE_.cardinal.NORTH;
 		}
 	}
-	else if (vertex_A.bWest)
+	if (vertex_A.bWest)
 	{
 		if (vertex_B.bWest)
 		{

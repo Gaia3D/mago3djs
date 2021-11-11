@@ -219,6 +219,12 @@ function continueProcess(tessellated, qMesh)
 	uvhValuesArray.set(qMesh.vValues, vertexCount);
 	uvhValuesArray.set(qMesh.hValues, vertexCount * 2);
 
+	// test::::::::::
+	qMesh.boundingSphere.radius *= 20.0; // delete this.!!!
+	//qMesh.horizonOcclusionPoint.x *= 50.1;// delete this.!!!
+	//qMesh.horizonOcclusionPoint.y *= 50.1;// delete this.!!!
+	//qMesh.horizonOcclusionPoint.z *= 50.1;// delete this.!!!
+
 	return {
 		result: 
         {
