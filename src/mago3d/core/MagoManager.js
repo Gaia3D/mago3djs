@@ -445,8 +445,8 @@ MagoManager.prototype.testExcavation = function()
 	];
 	var geoCoordsArray = array.map(function(item){ return new GeographicCoord(item[0], item[1], 0); });
 
-	this.quantizedMeshManager.setQuantizedMeshExcavationSet(geoCoordsArray, -30);
-	console.info(this.quantizedMeshManager);
+	this.quantizedMeshManager.setQuantizedMeshExcavationSet(geoCoordsArray, -20);
+	
 };
 /**
  * object 를 그리는 두가지 종류의 function을 호출
@@ -2925,6 +2925,11 @@ MagoManager.prototype.startRender = function (isLastFrustum, frustumIdx, numFrus
 		{ this.stadisticsDisplayed = 0; }
 	
 		this.canvasDirty = true;
+	}
+
+	if (this.quantizedMeshManager.status) 
+	{
+		this.quantizedMeshManager.excavate();
 	}
 };
 

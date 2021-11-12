@@ -23,6 +23,12 @@
 	<li onclick="gotopage();">
 		Guide
 	</li>
+	<li onclick="apply();">
+		땅파기
+	</li>
+	<li onclick="restore();">
+		원복
+	</li>
 </ul>
 <div id="magoContainer" class="mapWrap"></div>
 
@@ -74,6 +80,15 @@
 		
 		var viewer = magoInstance.getViewer();
 		viewer.scene.globe.depthTestAgainstTerrain = true;
+		e.getMagoManager().testExcavation();
+	}
+
+	function apply() {
+		MAGO3D_INSTANCE.getMagoManager().quantizedMeshManager.applyQuantizedMeshExcavation();
+	}
+
+	function restore() {
+		MAGO3D_INSTANCE.getMagoManager().quantizedMeshManager.stopQuantizedMeshExcavation();
 	}
 
 	function randomNumber(min, max) { 
