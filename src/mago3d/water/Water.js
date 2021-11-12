@@ -919,7 +919,7 @@ Water.prototype._makeQuantizedMeshVbo__testQSurfaceMesh = function (qMesh)
 	// 1rst, make skirt cartesians array (use by TRIANGLES_STRIP).***
 	var cartesian;
 	var skirtCartesians = [];
-	var zAux = 0.0;
+	var zAux = 10000.0;
 	for (var i=0; i<indicesCount; i++)
 	{
 		idx = indicesArray[i];
@@ -1399,8 +1399,8 @@ Water.prototype.test__doQuantizedSurfaceExcavation = function (magoManager)
 		var L = 14;
 
 		// kwon jae hyun L:17, X:223686, Y:38146
-		var X = 223686;
-		var Y = 38146;
+		var X = 223685;
+		var Y = 38147;
 		var L = 17;
 
 		// 126.77975, 37.36228

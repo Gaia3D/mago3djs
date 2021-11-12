@@ -59,6 +59,19 @@ QuantizedMeshExcavationSet.prototype.getIntersectedTiles = function ()
 			var tilesArray = SmartTile.selectTileIndicesArray(i, minLon, minLat, maxLon, maxLat, undefined);
 			
 			// test debug::::::::::::
+			/*
+			// Depth 17:
+			223684: (8) [38143, 38144, 38145, 38146, 38147, 38148, 38149, 38150]
+			223685: (8) [38143, 38144, 38145, 38146, 38147, 38148, 38149, 38150]
+			223686: (8) [38143, 38144, 38145, 38146, 38147, 38148, 38149, 38150]
+			223687: (8) [38143, 38144, 38145, 38146, 38147, 38148, 38149, 38150]
+			223688: (8) [38143, 38144, 38145, 38146, 38147, 38148, 38149, 38150]
+			223689: (8) [38143, 38144, 38145, 38146, 38147, 38148, 38149, 38150]
+			223690: (8) [38143, 38144, 38145, 38146, 38147, 38148, 38149, 38150]
+			223691: (8) [38143, 38144, 38145, 38146, 38147, 38148, 38149, 38150]
+			223692: (8) [38143, 38144, 38145, 38146, 38147, 38148, 38149, 38150]
+			223693: (8) [38143, 38144, 38145, 38146, 38147, 38148, 38149, 38150]
+			*/
 			//if (i === 17)
 			{
 				this.intersectedTilesMap[i] = {};
@@ -66,7 +79,7 @@ QuantizedMeshExcavationSet.prototype.getIntersectedTiles = function ()
 				{
 					var tile = tilesArray[j];
 					// test debug::::::::::::
-					//if (tile.X === 223686 && tile.Y === 38146) // no intersected X: 223684, 223685
+					//if (tile.X === 223685 && tile.Y === 38147) // no intersected X: 223684, 223685
 					{
 						
 						if (!this.intersectedTilesMap[i][tile.X]) 

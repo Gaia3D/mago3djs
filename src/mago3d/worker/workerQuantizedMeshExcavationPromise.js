@@ -219,12 +219,6 @@ function continueProcess(tessellated, qMesh)
 	uvhValuesArray.set(qMesh.vValues, vertexCount);
 	uvhValuesArray.set(qMesh.hValues, vertexCount * 2);
 
-	// test::::::::::
-	qMesh.boundingSphere.radius *= 20.0; // delete this.!!!
-	//qMesh.horizonOcclusionPoint.x *= 50.1;// delete this.!!!
-	//qMesh.horizonOcclusionPoint.y *= 50.1;// delete this.!!!
-	//qMesh.horizonOcclusionPoint.z *= 50.1;// delete this.!!!
-
 	return {
 		result: 
         {
@@ -239,10 +233,10 @@ function continueProcess(tessellated, qMesh)
         	eastIndices      : qMesh.eastIndices,
         	northIndices     : qMesh.northIndices,
         	westIndices      : qMesh.westIndices,
-        	southSkirtHeight : qMesh.southSkirtHeight, // Same value that the original quantized mesh.***
-        	eastSkirtHeight  : qMesh.eastSkirtHeight, // Same value that the original quantized mesh.***
-        	northSkirtHeight : qMesh.northSkirtHeight, // Same value that the original quantized mesh.***
-        	westSkirtHeight  : qMesh.westSkirtHeight, // Same value that the original quantized mesh.***
+        	southSkirtHeight : qMesh.southSkirtHeight*0.0, // Zero.***
+        	eastSkirtHeight  : qMesh.eastSkirtHeight*0.0, // Zero.***
+        	northSkirtHeight : qMesh.northSkirtHeight*0.0, // Zero.***
+        	westSkirtHeight  : qMesh.westSkirtHeight*0.0, // Zero.***
         	boundingSphere   : {
         		center : qMesh.boundingSphere.center, // Same value that the original quantized mesh.***
         		radius : qMesh.boundingSphere.radius // Same value that the original quantized mesh.***
