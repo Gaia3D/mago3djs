@@ -18,8 +18,9 @@ var QuantizedMeshManager = function(magoManager)
 
 	this.quantizedMeshExcavationSet;
 	this.workerQuantizedMeshExcavation;
-	this._status = false;
+	this._status = true;
 	this.excavatedTilesMap = {};
+	this.tilesMap = {};
 };
 
 Object.defineProperties(QuantizedMeshManager.prototype, {
@@ -82,13 +83,11 @@ QuantizedMeshManager.prototype.excavate = function()
 	var terrainProvider = this.magoManager.scene.terrainProvider;
 
 	if (!(terrainProvider instanceof Cesium.EditableCesiumTerrainProvider)) { return false; }
-	if (!terrainProvider.target) { return false; }
-
 	//this.excavating = false;
 
-	var tilesMap = terrainProvider.target.tilesMap;
+	//var tilesMap = terrainProvider.target.tilesMap;
 	//terrainProvider.target = undefined;
-	this.testAndReproductionTerrain(tilesMap);
+	this.testAndReproductionTerrain();
 };
 
 QuantizedMeshManager.prototype.applyQuantizedMeshExcavation = function()
@@ -97,7 +96,7 @@ QuantizedMeshManager.prototype.applyQuantizedMeshExcavation = function()
 	var terrainProvider = scene.terrainProvider;
 	if (terrainProvider instanceof Cesium.EditableCesiumTerrainProvider) 
 	{
-		var tilesMap = this.quantizedMeshExcavationSet.getIntersectedTiles();
+		var tilesMap = this.tilesMap = this.quantizedMeshExcavationSet.getIntersectedTiles();
 		var excavationAltitude = this.quantizedMeshExcavationSet.excavationAltitude;
 
 		var excavationGeoCoords = this.quantizedMeshExcavationSet.geoCoordsArray.reduce(function(accum, item)
@@ -113,9 +112,7 @@ QuantizedMeshManager.prototype.applyQuantizedMeshExcavation = function()
 			excavationGeoCoords
 		};
 
-		this.status = true;
-
-		//this.testAndReproductionTerrain(tilesMap);
+		this.excavatedTilesMap = {};
 	}
 };
 
@@ -128,30 +125,61 @@ QuantizedMeshManager.prototype.stopQuantizedMeshExcavation = function()
 
 	//this.excavating = false;
 
-	var tilesMap = terrainProvider.target.tilesMap;
+	//var tilesMap = terrainProvider.target.tilesMap;
 	terrainProvider.target = undefined;
-	this.testAndReproductionTerrain(tilesMap);
+	this.excavatedTilesMap = {};
+	//this.testAndReproductionTerrain(tilesMap);
 };
 
-function test_doExcavateTile(tile, tilesMap, excavatedTilesMap, scene)
+function test_doExcavateTile(tile, childTile, tilesMap, excavatedTilesMap, scene)
 {
 	// 1rst, check if tile is candidate.***
 	//내 자신이 대상지역인지 체크, 아닐시 패스
-	
-
 	if (!targetCheck(tilesMap, tile)) 
 	{
-		return 0;
+		return false;
 	}
 
 	if (targetCheck(excavatedTilesMap, tile)) 
 	{
-		return 1;
+		if (childTile) 
+		{
+			if (!targetCheck(tilesMap, childTile))
+			{
+				return false;
+			}
+
+			if (targetCheck(excavatedTilesMap, childTile))
+			{
+				return false;
+			}
+
+			initializeGlobeSurfaceTile(childTile, scene);
+		
+			if (!excavatedTilesMap[childTile.level]) 
+			{
+				excavatedTilesMap[childTile.level] = {};
+			}
+
+			if (!excavatedTilesMap[childTile.level][childTile.x]) 
+			{
+				excavatedTilesMap[childTile.level][childTile.x] = [];
+			}
+
+			if (excavatedTilesMap[childTile.level][childTile.x].indexOf(childTile.y) < 0) 
+			{
+				excavatedTilesMap[childTile.level][childTile.x].push(childTile.y);
+			}
+			return true;
+		}
+
+		return false;
 	}
 
 	// Now, check parendet.***
 	var parent = tile.parent;
-	if (tile.level === 13 || test_doExcavateTile(parent, tilesMap, excavatedTilesMap, scene))
+	var tieLevel = tile.level;
+	if (tieLevel === 13 || test_doExcavateTile(parent, tile, tilesMap, excavatedTilesMap, scene))
 	{
 		// My parent is total ready, so excavete me if necesary.***
 		// Excavate tile.***
@@ -172,137 +200,32 @@ function test_doExcavateTile(tile, tilesMap, excavatedTilesMap, scene)
 		if (excavatedTilesMap[tile.level][tile.x].indexOf(tile.y) < 0) 
 		{
 			excavatedTilesMap[tile.level][tile.x].push(tile.y);
-		}
-			
-		return 2;
+		}		
+		return true;
 	}
 
-	return 0;
+	return false;
 }
 
-QuantizedMeshManager.prototype.testAndReproductionTerrain = function(tilesMap) 
+QuantizedMeshManager.prototype.testAndReproductionTerrain = function() 
 {
 	var scene = this.magoManager.scene;
 	var globe = scene.globe;
 	var surface = globe._surface;
 	var index = 0;
 	var tilesRendered = surface._tilesToRender;
+	var tilesMap = this.tilesMap;
 	for (var i = 0, len = tilesRendered.length; i < len; ++i) 
 	{
 
 		if (index > 10) { break; }
 		var tile = tilesRendered[i];
-		var asdf = test_doExcavateTile(tile, tilesMap, this.excavatedTilesMap, scene);
-		if (asdf === 2) 
+		var test = test_doExcavateTile(tile, undefined, tilesMap, this.excavatedTilesMap, scene);
+		if (test) 
 		{ 
-			console.info(tile.x, tile.y, tile.level);
 			index++; 
-		} else if( asdf === 1) {
-
-		} else if( asdf === 0) {
-			continue;
 		}
-
-		/* //내 자신이 대상지역인지 체크, 아닐시 패스
-		if (!targetCheck(tilesMap, tile)) 
-		{
-			continue;
-		}
-
-		//내 자신이 캐싱되었는지 체크, 되었을 경우 패스
-		if (targetCheck(this.excavatedTilesMap, tile)) 
-		{
-			continue;
-		}
-
-		var parent = tile.parent;
-		if (targetCheck(this.excavatedTilesMap, parent)) 
-		{
-
-		} else {
-
-		}
-		
-		if (!targetCheck(this.excavatedTilesMap, parent)) { continue; }
-		if (testAndReproductionTerrain(tile, tilesMap, scene)) 
-		{
-			if (!this.excavatedTilesMap[tile.level]) 
-			{
-				this.excavatedTilesMap[tile.level] = {};
-			}
-
-			if (!this.excavatedTilesMap[tile.level][tile.x]) 
-			{
-				this.excavatedTilesMap[tile.level][tile.x] = [];
-			}
-
-			if (this.excavatedTilesMap[tile.level][tile.x].indexOf(tile.y) < 0) 
-			{
-				this.excavatedTilesMap[tile.level][tile.x].push(tile.y);
-			}
-			index ++ ;
-		} */
 	}
-	/* surface.forEachRenderedTile((tile)=>
-	{
-		if (index > 10) { return; }
-		if (targetCheck(this.excavatedTilesMap, tile)) 
-		{
-			return;
-		}
-
-		if (testAndReproductionTerrain(tile, tilesMap, scene)) 
-		{
-			if (!this.excavatedTilesMap[tile.level]) 
-			{
-				this.excavatedTilesMap[tile.level] = {};
-			}
-
-			if (!this.excavatedTilesMap[tile.level][tile.x]) 
-			{
-				this.excavatedTilesMap[tile.level][tile.x] = [];
-			}
-
-			if (this.excavatedTilesMap[tile.level][tile.x].indexOf(tile.y) < 0) 
-			{
-				this.excavatedTilesMap[tile.level][tile.x].push(tile.y);
-			}
-			index ++ ;
-		}
-
-		/* while (test) 
-		{
-			tile = tile.parent;
-			if (!tile) 
-			{
-				test = false;
-				break;
-			}
-			if (targetCheck(this.excavatedTilesMap, tile)) 
-			{
-				continue;
-			}
-
-			test = testAndReproductionTerrain(tile, tilesMap, scene);
-			if (test) 
-			{
-				if (!this.excavatedTilesMap[tile.level]) 
-				{
-					this.excavatedTilesMap[tile.level] = {};
-				}
-
-				if (!this.excavatedTilesMap[tile.level][tile.x]) 
-				{
-					this.excavatedTilesMap[tile.level][tile.x] = [];
-				}
-
-				if (this.excavatedTilesMap[tile.level][tile.x].indexOf(tile.y) < 0) 
-				{
-					this.excavatedTilesMap[tile.level][tile.x].push(tile.y);
-				}
-			}
-		} 
-	}); */
 };
 
 function reproductionTerrain(tileForTest, refTilesMap, scene) 
@@ -333,7 +256,6 @@ function initializeGlobeSurfaceTile (globeSurfaceTile, scene)
 
 	var globe = scene.globe;
 	var tileProvider = globe._surface.tileProvider;
-
 	Cesium.GlobeSurfaceTile.initialize(globeSurfaceTile, scene.terrainProvider, tileProvider._imageryLayers);
 }
 function targetCheck(ref, tile) 

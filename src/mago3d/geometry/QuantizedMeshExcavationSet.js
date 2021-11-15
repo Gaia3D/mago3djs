@@ -18,7 +18,7 @@ var QuantizedMeshExcavationSet = function(quantizedMeshManager, geoCoordsArray, 
 	this.excavationAltitude = excavationAltitude;
 	this.geoExtent;
 	this.minDepth = 10;
-	this.maxDepth = 18;
+	this.maxDepth = 23;
 	this.intersectedTilesMap;
     
 };

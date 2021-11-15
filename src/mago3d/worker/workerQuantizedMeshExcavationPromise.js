@@ -40,12 +40,6 @@ registerPromiseWorker(function (e)
 	{
 		return excavatedQuantizedMesh;
 	});
-
-	/* var workerPolygon2DTessellate = new PromiseWorker(createWorker('workerPolygon2DTessellatePromise.js'));
-	return workerPolygon2DTessellate.postMessage(positions).then(function (res) 
-	{
-		return continueProcess(res, qMesh);
-	}); */
 });
 
 function polygon2DTessellate(excavation) 
@@ -176,7 +170,6 @@ function continueProcess(tessellated, qMesh)
 		convexPolygons2dArray.push(polygon2d);
 	}
     
-    
 	// Now, for each triangle, check if it is inside of the polygon2d.
 	QuantizedSurface_._classifyTrianglesAsInteriorOrExteriorOfPolygon(trianglesList, convexPolygons2dArray);
 
@@ -239,7 +232,7 @@ function continueProcess(tessellated, qMesh)
         	westSkirtHeight  : qMesh.westSkirtHeight*0.0, // Zero.***
         	boundingSphere   : {
         		center : qMesh.boundingSphere.center, // Same value that the original quantized mesh.***
-        		radius : qMesh.boundingSphere.radius // Same value that the original quantized mesh.***
+        		radius : qMesh.boundingSphere.radius// Same value that the original quantized mesh.***
         	},
         	horizonOcclusionPoint: qMesh.horizonOcclusionPoint // Same value that the original quantized mesh.***
         },

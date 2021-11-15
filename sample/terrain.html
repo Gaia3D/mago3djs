@@ -81,10 +81,126 @@
 		var viewer = magoInstance.getViewer();
 		viewer.scene.globe.depthTestAgainstTerrain = true;
 		e.getMagoManager().testExcavation();
+		
+		var entities = [];
+		viewer.camera.percentageChanged = 0.01;
+		viewer.camera.changed.addEventListener(function() {
+			//return;
+			for(var i=0;i<entities.length;i++) {
+				viewer.entities.remove(entities[i]);	
+			}
+			entities.length = 0;
+
+			MAGO3D_INSTANCE.getViewer().scene.globe._surface.forEachRenderedTile(function(tile){
+				return;
+				var rec = tile.rectangle;
+				var center = Cesium.Rectangle.center(rec);
+				
+				var viewer = MAGO3D_INSTANCE.getViewer();
+				var entity = viewer.entities.add({
+					position : Cesium.Cartesian3.fromRadians(center.longitude, center.latitude),
+					rectangle: {
+						coordinates : tile.rectangle,
+						fill : true,
+						material: Cesium.Color.fromRandom().withAlpha(0.4),
+						outline: true, // height must be set for outline to display
+						outlineColor: Cesium.Color.BLACK,
+						outlineWidth : 10,
+						heightReference : 1,
+						height : 1
+					},
+					label : {
+						text : tile.x + ' ' +tile.y + ' ' +tile.level,
+						font : '14pt monospace',
+						style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+						outlineWidth : 2,
+						heightReference : 1
+					}
+				});
+				entities.push(entity);
+			});
+		});
 	}
 
 	function apply() {
 		MAGO3D_INSTANCE.getMagoManager().quantizedMeshManager.applyQuantizedMeshExcavation();
+
+		var array = [
+			[
+				127.18867778778076,
+				37.615659186587635
+			],
+			[
+				127.18434333801268,
+				37.612055711412815
+			],
+			[
+				127.18932151794434,
+				37.608758038672185
+			],
+			[
+				127.19541549682617,
+				37.60865604646256
+			],
+			[
+				127.19653129577637,
+				37.613109575992404
+			],
+			[
+				127.19537258148193,
+				37.61613510421666
+			],
+			[
+				127.19357013702391,
+				37.617324884962706
+			],
+			[
+				127.1918535232544,
+				37.61766481882189
+			],
+			[
+				127.18867778778076,
+				37.615659186587635
+			]
+		]
+
+		var polygon = array.map(function(item){ return new Cesium.Cartesian3.fromDegrees(item[0], item[1], 0); });
+		var rec = Cesium.Rectangle.fromCartesianArray(polygon);
+		console.info(MAGO3D_INSTANCE.getViewer());
+		//MAGO3D_INSTANCE.getViewer().imagerys.add
+		var prov = new Cesium.SingleTileImageryProvider({
+			url : '../images/mil4.png',
+			rectangle : rec
+		});
+		console.info(prov);
+		MAGO3D_INSTANCE.getViewer().imageryLayers.addImageryProvider(prov);
+		return;
+		var entity = MAGO3D_INSTANCE.getViewer().entities.add({
+			polygon: {
+				hierarchy : new Cesium.PolygonHierarchy(polygon),
+				fill : true,
+				material: new Cesium.ImageMaterialProperty({
+					image : '../images/mil4.png',
+					repeat : new Cesium.Cartesian2(20.0, 20.0)
+				}),
+				/* 
+				outline: true, // height must be set for outline to display
+				outlineColor: Cesium.Color.BLACK,
+				outlineWidth : 10, */
+				heightReference : 2,
+				height : 0.5
+			}/* ,
+			polyline : {
+				positions : polygon,
+				width : 5,
+				clampToGround : true,
+				material : new Cesium.PolylineOutlineMaterialProperty({
+					color : Cesium.Color.BROWN,
+					outlineWidth : 1,
+					outlineColor : Cesium.Color.BLACK
+				})
+			} */
+		});
 	}
 
 	function restore() {
