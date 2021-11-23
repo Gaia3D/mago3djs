@@ -129,7 +129,7 @@ QuantizedSurface_.recalculateSkirtIndices = function (triList, vertexList, qMesh
 
 	// East vertex array.***
 	cardinal = CODE_.cardinal.EAST;
-	var eastVertexArray = QuantizedSurface_._getSkirtVertices(cardinal, vertexSouthEast, undefined, vertexCount);
+	var eastVertexArray = QuantizedSurface_._getSkirtVertices(cardinal, vertexSouthEast, undefined, vertexCount); 
 
 	// North vertex array.***
 	cardinal = CODE_.cardinal.NORTH;
@@ -137,7 +137,7 @@ QuantizedSurface_.recalculateSkirtIndices = function (triList, vertexList, qMesh
 
 	// West vertex array.***
 	cardinal = CODE_.cardinal.WEST;
-	var westVertexArray = QuantizedSurface_._getSkirtVertices(cardinal, vertexSouthWest, undefined, vertexCount);
+	var westVertexArray = QuantizedSurface_._getSkirtVertices(cardinal, vertexSouthWest, undefined, vertexCount); 
 
 	vertexList.setIdxInList();
 
