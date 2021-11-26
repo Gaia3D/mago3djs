@@ -57,6 +57,8 @@ ExtrudeWorkerManager.prototype.doExtrude = function (data)
 
 	var objectsToExtrudeArray = data.objectsToExtrudeArray;
 	var guid = data.guid;
+	var color = data.color;
+	if (color) { color = [241/255, 231/255, 200/255, 1]; }
 	var objectsCount = objectsToExtrudeArray.length;
 	var objectsToExtrudeArrayWorker = new Array(objectsCount);
 	for (var i=0; i<objectsCount; i++)
@@ -75,7 +77,7 @@ ExtrudeWorkerManager.prototype.doExtrude = function (data)
 		var objectToExtrudeWorker = {
 			geoCoordsNumbersArrayArray : numbersArrayArray,
 			height                     : objectToExtrude.height,
-			color                      : [0.9, 0.9, 0.9, 1.0]
+			color                      : color
 		};
 
 		objectsToExtrudeArrayWorker[i] = objectToExtrudeWorker;

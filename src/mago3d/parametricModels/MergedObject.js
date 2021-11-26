@@ -163,6 +163,7 @@ MergedObject.prototype.makeMesh = function ()
 	var data = {
 		guid                  : guid,
 		objectsToExtrudeArray : objectsToExtrudeArray,
+		color                 : this.color4,
 		geoLocation           : {longitude : geoLocData.geographicCoord.longitude,
 			latitude  : geoLocData.geographicCoord.latitude,
 			altitude  : geoLocData.geographicCoord.altitude},
