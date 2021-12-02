@@ -37,6 +37,11 @@ void main()
     }
     
     finalCol4 = texture2D(texToCopy, vec2(texCoordX, texCoordY));
+
+    if(finalCol4.a == 0.0)
+    {
+        discard;
+    }
     gl_FragData[0] = finalCol4;  // anything.
 
     #ifdef USE_MULTI_RENDER_TARGET

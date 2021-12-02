@@ -370,6 +370,8 @@ void main()
 		//---------------------------------------------------------------------------------------------------------------
 	}
 
+    vec4 finalColor = shadedColor;
+
     // Check for light fog.
     if(u_activeTex[0])
     {
@@ -377,9 +379,8 @@ void main()
         float alpha = lightFog4.w;
         if(alpha > 0.6)
         alpha = 0.6;
-        
-        vec4 finalColor = mix(shadedColor, lightFog4, alpha);
-        gl_FragColor = finalColor; // original.***
+        finalColor = mix(shadedColor, lightFog4, alpha);
     }
     
+    gl_FragColor = finalColor; // original.***
 }

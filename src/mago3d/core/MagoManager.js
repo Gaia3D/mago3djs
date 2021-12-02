@@ -2012,6 +2012,8 @@ MagoManager.prototype.doRenderORT = function (frustumVolumenObject)
  */
 MagoManager.prototype.doRender = function (frustumVolumenObject) 
 {
+	var gl = this.getGl();
+
 	if (!this.isCesiumGlobe())
 	{
 		this.doRenderMagoWorld(frustumVolumenObject);
@@ -2024,8 +2026,6 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		this.doRenderORT(frustumVolumenObject);
 		return;
 	}
-
-	var gl = this.getGl();
 	
 	// 1) The depth render.**********************************************************************************************************************
 	var renderType = 0; // 0= depth. 1= color.***
@@ -2110,6 +2110,8 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 	if (this.sceneState.sunSystem !== undefined && this.sceneState.applySunShadows)
 	{ bApplyShadow = true; }
 
+	
+
 	if (this.isCesiumGlobe())
 	{
 		var scene = this.scene;
@@ -2124,6 +2126,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		// End taking cesium colorBuffer.-------------------
 
 		this.renderer.renderTerrainCopy();
+
 
 		if (scene && scene._context && scene._context._currentFramebuffer) 
 		{
@@ -2165,7 +2168,8 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		}
 	}
 
-
+	
+	
 	// 2) gBuffer render.*****************************************************************************************************************
 	renderType = 1;
 	this.renderType = 1;
@@ -2185,7 +2189,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		//this.waterManager._TEST_renderQMesh();
 	}
 
-
+	
 	// Render transparents.****************************************************************************************************************
 	if (this.isCesiumGlobe())
 	{
@@ -2206,6 +2210,8 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 	renderType = 1;
 	this.renderType = 1;
 	this.renderer.renderGeometryBufferTransparents(gl, renderType, this.visibleObjControlerNodes);
+
+	
 
 	if (this.weatherStation)
 	{
@@ -2241,6 +2247,8 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		this.renderer.renderBoundingBoxesNodes(this.visibleObjControlerNodes.currentVisiblesAux, undefined, bRenderLines);
 	}
 
+	
+
 	// Once all frustums was rendered, then set the camera moved = false.*****************************
 	if (this.currentFrustumIdx === 0)
 	{
@@ -2250,6 +2258,8 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 
 	// Finally do screenSpaceObjects render.
 	this.renderer.renderScreenSpaceObjects(gl);
+
+	
 
 	if (this.isCesiumGlobe())
 	{
@@ -2267,6 +2277,8 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 			this.extbuffers.NONE, // gl_FragData[4]
 		]);
 	}
+
+	
 
 	// DEBUG.Render fisically lights sources.*************************************************************************
 	//this.renderer.renderNativeLightSources(renderType, this.visibleObjControlerNodes) ; // debug component.
@@ -2310,6 +2322,8 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		}
 	}
 
+	
+
 	// 1.1) ssao and other effects from depthBuffer render.*****************************************************************************
 	if (this.currentFrustumIdx === 0) 
 	{
@@ -2346,6 +2360,9 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		{
 			this.bindMainFramebuffer();
 		}
+
+		//gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.cesiumColorBuffer, 0); // depthTex.
+
 		this.renderer.renderScreenQuad2(gl); // 2nd screenQuad. (lightFog)
 
 		this.renderCluster();
@@ -2816,6 +2833,14 @@ MagoManager.prototype.startRender = function (isLastFrustum, frustumIdx, numFrus
 	var camera = this.sceneState.camera;
 	
 	var gl = this.getGl();
+
+	//var colorMask = gl.getParameter(gl.COLOR_WRITEMASK);
+	//var depthMask = gl.getParameter(gl.DEPTH_WRITEMASK);
+	//var arrayBufferBinding = gl.getParameter(gl.ARRAY_BUFFER_BINDING);
+	//var blend = gl.getParameter(gl.BLEND);
+	//var cullFace = gl.getParameter(gl.CULL_FACE);
+	//var frontFace = gl.getParameter(gl.FRONT_FACE);
+
 	this.upDateSceneStateMatrices(this.sceneState);
 	
 	if (this.isFarestFrustum())
@@ -2881,7 +2906,6 @@ MagoManager.prototype.startRender = function (isLastFrustum, frustumIdx, numFrus
 		this.loadAndPrepareData();
 	}
 
-	
 	// Render process.***
 	this.doRender(frustumVolumenObject);
 

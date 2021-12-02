@@ -670,6 +670,23 @@ void main()
 				gl_FragColor = vec4(edgeColor.rgb, 1.0);
 				
 			}
+
+			// Test : shade terrain.***
+			if(dataType == 1)
+			{
+				// Calculate normal by depth texture.***
+				//vec4 normal4 = getNormal(screenPos);
+				//vec3 normal = normal4.xyz;
+				//int estimatedFrustumIdx = int(floor(normal4.w * 100.0));
+				//int dataType = -1;// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.
+				//int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);
+				//vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);
+				//float currNear = nearFar.x;
+				//float currFar = nearFar.y;
+				//float realDepth = getRealDepth(screenPos, currFar);
+				//---------------------------------------------------------
+				
+			}
 			
 		}
 		else if(dataType == 2)// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.

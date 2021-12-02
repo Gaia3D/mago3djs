@@ -6397,6 +6397,8 @@ void main()\n\
 		//---------------------------------------------------------------------------------------------------------------\n\
 	}\n\
 \n\
+    vec4 finalColor = shadedColor;\n\
+\n\
     // Check for light fog.\n\
     if(u_activeTex[0])\n\
     {\n\
@@ -6404,11 +6406,10 @@ void main()\n\
         float alpha = lightFog4.w;\n\
         if(alpha > 0.6)\n\
         alpha = 0.6;\n\
-        \n\
-        vec4 finalColor = mix(shadedColor, lightFog4, alpha);\n\
-        gl_FragColor = finalColor; // original.***\n\
+        finalColor = mix(shadedColor, lightFog4, alpha);\n\
     }\n\
     \n\
+    gl_FragColor = finalColor; // original.***\n\
 }";
 ShaderSource.ScreenQuadFS = "#ifdef GL_ES\n\
     precision highp float;\n\
@@ -7080,6 +7081,23 @@ void main()\n\
 					edgeColor *= 1.5;\n\
 \n\
 				gl_FragColor = vec4(edgeColor.rgb, 1.0);\n\
+				\n\
+			}\n\
+\n\
+			// Test : shade terrain.***\n\
+			if(dataType == 1)\n\
+			{\n\
+				// Calculate normal by depth texture.***\n\
+				//vec4 normal4 = getNormal(screenPos);\n\
+				//vec3 normal = normal4.xyz;\n\
+				//int estimatedFrustumIdx = int(floor(normal4.w * 100.0));\n\
+				//int dataType = -1;// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.\n\
+				//int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);\n\
+				//vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);\n\
+				//float currNear = nearFar.x;\n\
+				//float currFar = nearFar.y;\n\
+				//float realDepth = getRealDepth(screenPos, currFar);\n\
+				//---------------------------------------------------------\n\
 				\n\
 			}\n\
 			\n\
@@ -7903,6 +7921,11 @@ void main()\n\
     }\n\
     \n\
     finalCol4 = texture2D(texToCopy, vec2(texCoordX, texCoordY));\n\
+\n\
+    if(finalCol4.a == 0.0)\n\
+    {\n\
+        discard;\n\
+    }\n\
     gl_FragData[0] = finalCol4;  // anything.\n\
 \n\
     #ifdef USE_MULTI_RENDER_TARGET\n\

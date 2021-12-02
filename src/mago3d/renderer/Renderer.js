@@ -1611,11 +1611,20 @@ Renderer.prototype.renderScreenQuad2 = function (gl)
 	gl.bindTexture(gl.TEXTURE_2D, shadedColorFbo.colorBuffer);
 
 	gl.uniform1iv(currentShader.u_activeTex_loc, [bLightFogTex, bScreenSpaceObjectsTex, 0, 0, 0, 0, 0, 0]);
+
+	// Get current parameters.***
+	//var colorMask = gl.getParameter(gl.COLOR_WRITEMASK);
+	//var depthMask = gl.getParameter(gl.DEPTH_WRITEMASK);
+	//var arrayBufferBinding = gl.getParameter(gl.ARRAY_BUFFER_BINDING);
+	//var blend = gl.getParameter(gl.BLEND);
+	//var cullFace = gl.getParameter(gl.CULL_FACE);
+	//var frontFace = gl.getParameter(gl.FRONT_FACE);
 	
 	gl.depthMask(false);
-	gl.disable(gl.DEPTH_TEST);
+	//gl.disable(gl.DEPTH_TEST);
 	gl.enable(gl.BLEND);
 	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); // Original.***
+	gl.enable(gl.CULL_FACE);
 
 	if (this.screenQuad === undefined) 
 	{
@@ -1628,7 +1637,7 @@ Renderer.prototype.renderScreenQuad2 = function (gl)
 	gl.depthMask(true);
 	gl.disable(gl.BLEND);
 	gl.enable(gl.DEPTH_TEST);
-	//gl.enable(gl.POLYGON_OFFSET_FILL);
+	gl.enable(gl.CULL_FACE);
 	
 	//for (var i=0; i<8; i++)
 	//{
@@ -2074,7 +2083,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 	if (magoManager.albedoTex)
 	{
-		//texture = magoManager.albedoTex;
+		texture = magoManager.albedoTex;
 	}
 
 	if (magoManager.diffuseLightTex)
@@ -2129,7 +2138,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 	if (magoManager.ssaoFromDepthFbo)
 	{
-		texture = magoManager.ssaoFromDepthFbo.colorBuffer;
+		//texture = magoManager.ssaoFromDepthFbo.colorBuffer;
 	}
 
 	// weatherStation.*** weatherStation.*** weatherStation.*** weatherStation.*** weatherStation.*** weatherStation.*** weatherStation.*** weatherStation.*** 
@@ -2190,7 +2199,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 			if (waterLayer.waterFluxTexA_LOW && waterLayer.waterFluxTexA_LOW.texId)
 			{
-				//texture = waterLayer.waterFluxTexA_LOW.texId;
+				texture = waterLayer.waterFluxTexA_LOW.texId;
 			}
 
 			if (waterLayer.waterVelocityTexA && waterLayer.waterVelocityTexA.texId)
