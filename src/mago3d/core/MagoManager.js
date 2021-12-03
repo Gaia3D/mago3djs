@@ -2125,8 +2125,8 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		this.cesiumColorBuffer = gl.getFramebufferAttachmentParameter(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.FRAMEBUFFER_ATTACHMENT_OBJECT_NAME);
 		// End taking cesium colorBuffer.-------------------
 
-		this.renderer.renderTerrainCopy();
-
+		// Note : in "renderTerrainCopy()" does NO copy the albedo (only copies depth & normal). The albedo is copied when frustumIdx = 0, at final of this function.
+		this.renderer.renderTerrainCopy(); 
 
 		if (scene && scene._context && scene._context._currentFramebuffer) 
 		{
@@ -2327,6 +2327,12 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 	// 1.1) ssao and other effects from depthBuffer render.*****************************************************************************
 	if (this.currentFrustumIdx === 0) 
 	{
+		// Copy here the cesium albedo.***
+		var bTexFlipYAxis = true;
+		var bTexFlipXAxis = true;
+		this.renderer.copyTexture(this.cesiumColorBuffer, this.albedoTex, bTexFlipXAxis, bTexFlipYAxis);
+
+
 		// Render the lightBuffer.*****************************************
 		if (sceneState.applyLightsShadows)
 		{
@@ -2359,9 +2365,10 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		if (this.isCesiumGlobe()) 
 		{
 			this.bindMainFramebuffer();
+			//gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.cesiumColorBuffer, 0); 
 		}
 
-		//gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.cesiumColorBuffer, 0); // depthTex.
+		
 
 		this.renderer.renderScreenQuad2(gl); // 2nd screenQuad. (lightFog)
 

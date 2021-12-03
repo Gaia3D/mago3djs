@@ -1780,13 +1780,35 @@ Renderer.prototype.copyTexture = function (webGlTextureOriginal, webGlTextureDes
 	// If we are in ORT (one rendering target), then must set the "u_textureTypeToCopy" uniform.***
 	//gl.uniform1i(currentShader.u_textureTypeToCopy_loc, i); // if MRT, then this var has NO effect.
 	
-	gl.clearColor(1.0, 1.0, 1.0, 1.0);
-	gl.clearDepth(1.0);
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	gl.clearColor(0, 0, 0, 1);
+	//gl.clearColor(1.0, 1.0, 1.0, 1.0);
+	//gl.clearDepth(1.0);
+	//gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	//gl.clearColor(0, 0, 0, 1);
+
+	var extbuffers = magoManager.extbuffers;
+
+	if (extbuffers)
+	{
+		extbuffers.drawBuffersWEBGL([
+			extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - depth
+			extbuffers.NONE, // gl_FragData[1] - normal
+			extbuffers.NONE, // gl_FragData[2] - albedo
+			extbuffers.NONE, // gl_FragData[3] - selColor4
+			extbuffers.NONE  // gl_FragData[4] - any
+		]);
+	}
+	
+
+
+
+	gl.disable(gl.DEPTH_TEST);
+	gl.depthMask(false);
 
 	// Now render.***
 	this.screenQuad.render(magoManager, currentShader);
+
+	gl.enable(gl.DEPTH_TEST);
+	gl.depthMask(true);
 	
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, null);
@@ -1851,7 +1873,8 @@ Renderer.prototype.renderTerrainCopy = function ()
 		magoManager.texturesManager.texturesMergerFbo.bind();
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, magoManager.depthTex, 0);
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, magoManager.normalTex, 0);
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, magoManager.albedoTex, 0);
+		//gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, magoManager.albedoTex, 0); // original.***
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // NO copy albedo here.***
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, magoManager.selColorTex, 0);
 
 		if (magoManager.isCameraMoved || magoManager.bPicking)
@@ -1859,7 +1882,7 @@ Renderer.prototype.renderTerrainCopy = function ()
 			extbuffers.drawBuffersWEBGL([
 				extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - depth
 				extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - normal
-				extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - albedo
+				extbuffers.NONE, // gl_FragData[2] - albedo
 				extbuffers.COLOR_ATTACHMENT3_WEBGL  // gl_FragData[3] - selColor4
 			]);	
 		}
@@ -1868,7 +1891,7 @@ Renderer.prototype.renderTerrainCopy = function ()
 			extbuffers.drawBuffersWEBGL([
 				extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - depth
 				extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - normal
-				extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - albedo
+				extbuffers.NONE, // gl_FragData[2] - albedo
 				extbuffers.NONE  // gl_FragData[3] - selColor4
 			]);
 		}
@@ -2078,12 +2101,12 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 	if (magoManager.normalTex)
 	{
-		//texture = magoManager.normalTex;
+		texture = magoManager.normalTex;
 	}
 
 	if (magoManager.albedoTex)
 	{
-		texture = magoManager.albedoTex;
+		//texture = magoManager.albedoTex;
 	}
 
 	if (magoManager.diffuseLightTex)

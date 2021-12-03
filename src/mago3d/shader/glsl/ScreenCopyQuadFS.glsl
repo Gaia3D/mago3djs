@@ -99,28 +99,19 @@ void main()
 	#ifdef USE_MULTI_RENDER_TARGET
 
 		vec4 albedo = texture2D(albedoTex, screenPos.xy);
+
 		// in this case, do not other process.
 		// 1rst, calculate the pixelPosWC.
 		vec4 depthColor4 = texture2D(depthTex, screenPos.xy);
-		float z_window  = unpackDepth(depthColor4); // z_window  is [-1.0, 1.0] range depth.
-
-		if(z_window >= 1.0) {
-			discard;
-		}
-
-		if(z_window <= 0.0 && uFrustumIdx < 2) {
-			// frustum =2 & 3 -> renders sky, so dont discard.
-			discard;
-		}
+		float z_window  = unpackDepth(depthColor4); // z_window  is [-1.0, 1.0] range depth, but only uses [0.0, 1.0] range.***
 
 		vec4 posWC;
 		float depth = getDepthFrom_ZWindow(z_window, screenPos, posWC);
-		gl_FragData[0] = packDepth(depth); // depth.
-		
 
-		//#ifdef USE_GL_EXT_FRAGDEPTH
-			//gl_FragDepthEXT = z_window;
-		//#endif
+		//if(z_window >= 1.0) {
+		//	discard;
+		//}
+
 		float frustumIdx = 1.0;
 		if(uFrustumIdx == 0)
 		frustumIdx = 0.105;
@@ -130,6 +121,26 @@ void main()
 		frustumIdx = 0.125;
 		else if(uFrustumIdx == 3)
 		frustumIdx = 0.135;
+
+		bool bDiscard = false;
+
+		//************************
+		// z_window = 1.0 -> near
+		// z_window = 0.0 -> far
+		//------------------------
+
+		if(z_window <= 0.0 && uFrustumIdx < 2) {
+			// frustum =2 & 3 -> renders sky, so dont discard.
+			discard;
+		}
+
+		gl_FragData[0] = packDepth(depth); // depth.
+					
+
+		//#ifdef USE_GL_EXT_FRAGDEPTH
+			//gl_FragDepthEXT = z_window;
+		//#endif
+		
 
 		if(z_window > 0.0)
 		{
@@ -146,6 +157,7 @@ void main()
 
 		// Now, save the albedo.
 		gl_FragData[2] = albedo; // copy albedo.
+
 	
 	#else
 		// We are in ORT (one rendering target).

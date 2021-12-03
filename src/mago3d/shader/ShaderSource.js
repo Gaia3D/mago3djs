@@ -5903,28 +5903,19 @@ void main()\n\
 	#ifdef USE_MULTI_RENDER_TARGET\n\
 \n\
 		vec4 albedo = texture2D(albedoTex, screenPos.xy);\n\
+\n\
 		// in this case, do not other process.\n\
 		// 1rst, calculate the pixelPosWC.\n\
 		vec4 depthColor4 = texture2D(depthTex, screenPos.xy);\n\
-		float z_window  = unpackDepth(depthColor4); // z_window  is [-1.0, 1.0] range depth.\n\
-\n\
-		if(z_window >= 1.0) {\n\
-			discard;\n\
-		}\n\
-\n\
-		if(z_window <= 0.0 && uFrustumIdx < 2) {\n\
-			// frustum =2 & 3 -> renders sky, so dont discard.\n\
-			discard;\n\
-		}\n\
+		float z_window  = unpackDepth(depthColor4); // z_window  is [-1.0, 1.0] range depth, but only uses [0.0, 1.0] range.***\n\
 \n\
 		vec4 posWC;\n\
 		float depth = getDepthFrom_ZWindow(z_window, screenPos, posWC);\n\
-		gl_FragData[0] = packDepth(depth); // depth.\n\
-		\n\
 \n\
-		//#ifdef USE_GL_EXT_FRAGDEPTH\n\
-			//gl_FragDepthEXT = z_window;\n\
-		//#endif\n\
+		//if(z_window >= 1.0) {\n\
+		//	discard;\n\
+		//}\n\
+\n\
 		float frustumIdx = 1.0;\n\
 		if(uFrustumIdx == 0)\n\
 		frustumIdx = 0.105;\n\
@@ -5934,6 +5925,26 @@ void main()\n\
 		frustumIdx = 0.125;\n\
 		else if(uFrustumIdx == 3)\n\
 		frustumIdx = 0.135;\n\
+\n\
+		bool bDiscard = false;\n\
+\n\
+		//************************\n\
+		// z_window = 1.0 -> near\n\
+		// z_window = 0.0 -> far\n\
+		//------------------------\n\
+\n\
+		if(z_window <= 0.0 && uFrustumIdx < 2) {\n\
+			// frustum =2 & 3 -> renders sky, so dont discard.\n\
+			discard;\n\
+		}\n\
+\n\
+		gl_FragData[0] = packDepth(depth); // depth.\n\
+					\n\
+\n\
+		//#ifdef USE_GL_EXT_FRAGDEPTH\n\
+			//gl_FragDepthEXT = z_window;\n\
+		//#endif\n\
+		\n\
 \n\
 		if(z_window > 0.0)\n\
 		{\n\
@@ -5950,6 +5961,7 @@ void main()\n\
 \n\
 		// Now, save the albedo.\n\
 		gl_FragData[2] = albedo; // copy albedo.\n\
+\n\
 	\n\
 	#else\n\
 		// We are in ORT (one rendering target).\n\
@@ -7922,10 +7934,6 @@ void main()\n\
     \n\
     finalCol4 = texture2D(texToCopy, vec2(texCoordX, texCoordY));\n\
 \n\
-    if(finalCol4.a == 0.0)\n\
-    {\n\
-        discard;\n\
-    }\n\
     gl_FragData[0] = finalCol4;  // anything.\n\
 \n\
     #ifdef USE_MULTI_RENDER_TARGET\n\
