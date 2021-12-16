@@ -735,24 +735,28 @@ Point3DList.getThickLinesPositionDataArray = function(point3dArray, resultPosVbo
 	for (var i=0; i<pointsCount; i++)
 	{
 		point3d = point3dArray[i];
-		resultPosVboDataArray[i*16] = point3d.x;
-		resultPosVboDataArray[i*16+1] = point3d.y;
-		resultPosVboDataArray[i*16+2] = point3d.z;
+		var x = point3d.x;
+		var y = point3d.y;
+		var z = point3d.z;
+
+		resultPosVboDataArray[i*16] = x;
+		resultPosVboDataArray[i*16+1] = y;
+		resultPosVboDataArray[i*16+2] = z;
 		resultPosVboDataArray[i*16+3] = 1; // order.
 		
-		resultPosVboDataArray[i*16+4] = point3d.x;
-		resultPosVboDataArray[i*16+5] = point3d.y;
-		resultPosVboDataArray[i*16+6] = point3d.z;
+		resultPosVboDataArray[i*16+4] = x;
+		resultPosVboDataArray[i*16+5] = y;
+		resultPosVboDataArray[i*16+6] = z;
 		resultPosVboDataArray[i*16+7] = -1; // order.
 		
-		resultPosVboDataArray[i*16+8] = point3d.x;
-		resultPosVboDataArray[i*16+9] = point3d.y;
-		resultPosVboDataArray[i*16+10] = point3d.z;
+		resultPosVboDataArray[i*16+8] = x;
+		resultPosVboDataArray[i*16+9] = y;
+		resultPosVboDataArray[i*16+10] = z;
 		resultPosVboDataArray[i*16+11] = 2; // order.
 		
-		resultPosVboDataArray[i*16+12] = point3d.x;
-		resultPosVboDataArray[i*16+13] = point3d.y;
-		resultPosVboDataArray[i*16+14] = point3d.z;
+		resultPosVboDataArray[i*16+12] = x;
+		resultPosVboDataArray[i*16+13] = y;
+		resultPosVboDataArray[i*16+14] = z;
 		resultPosVboDataArray[i*16+15] = -2; // order.
 	}
 
@@ -784,24 +788,28 @@ Point3DList.getVboThickLines = function(magoManager, point3dArray, resultVboKeys
 	for (var i=0; i<pointsCount; i++)
 	{
 		point3d = point3dArray[i];
-		posVboDataArray[i*16] = point3d.x;
-		posVboDataArray[i*16+1] = point3d.y;
-		posVboDataArray[i*16+2] = point3d.z;
+		var x = point3d.x;
+		var y = point3d.y;
+		var z = point3d.z;
+
+		posVboDataArray[i*16] = x;
+		posVboDataArray[i*16+1] = y;
+		posVboDataArray[i*16+2] = z;
 		posVboDataArray[i*16+3] = 1; // order.
 		
-		posVboDataArray[i*16+4] = point3d.x;
-		posVboDataArray[i*16+5] = point3d.y;
-		posVboDataArray[i*16+6] = point3d.z;
+		posVboDataArray[i*16+4] = x;
+		posVboDataArray[i*16+5] = y;
+		posVboDataArray[i*16+6] = z;
 		posVboDataArray[i*16+7] = -1; // order.
 		
-		posVboDataArray[i*16+8] = point3d.x;
-		posVboDataArray[i*16+9] = point3d.y;
-		posVboDataArray[i*16+10] = point3d.z;
+		posVboDataArray[i*16+8] = x;
+		posVboDataArray[i*16+9] = y;
+		posVboDataArray[i*16+10] = z;
 		posVboDataArray[i*16+11] = 2; // order.
 		
-		posVboDataArray[i*16+12] = point3d.x;
-		posVboDataArray[i*16+13] = point3d.y;
-		posVboDataArray[i*16+14] = point3d.z;
+		posVboDataArray[i*16+12] = x;
+		posVboDataArray[i*16+13] = y;
+		posVboDataArray[i*16+14] = z;
 		posVboDataArray[i*16+15] = -2; // order.
 	}
 
@@ -817,34 +825,34 @@ Point3DList.getVboThickLines = function(magoManager, point3dArray, resultVboKeys
 		var r, g, b, a;
 		for (var i=0; i<pointsCount; i++)
 		{
-			w = 1.0 - (i/(pointsCount-1));
+			//w = 1.0 - (i/(pointsCount-1));
 			//currColor4 = Color.mix(strColor4, endColor4, w);
 			currColor4 = colArray[i];
 
-			if (!currColor4)
-			{
-				var hola = 0;
-			}
+			var r = Math.floor(currColor4.r*255);
+			var g = Math.floor(currColor4.g*255);
+			var b = Math.floor(currColor4.b*255);
+			var a = Math.floor(currColor4.a*255);
 			
-			colVboDataArray[i*16] = Math.floor(currColor4.r*255);
-			colVboDataArray[i*16+1] = Math.floor(currColor4.g*255);
-			colVboDataArray[i*16+2] = Math.floor(currColor4.b*255);
-			colVboDataArray[i*16+3] = Math.floor(currColor4.a*255);
+			colVboDataArray[i*16] = r;
+			colVboDataArray[i*16+1] = g;
+			colVboDataArray[i*16+2] = b;
+			colVboDataArray[i*16+3] = a;
 			
-			colVboDataArray[i*16+4] = Math.floor(currColor4.r*255);
-			colVboDataArray[i*16+5] = Math.floor(currColor4.g*255);
-			colVboDataArray[i*16+6] = Math.floor(currColor4.b*255);
-			colVboDataArray[i*16+7] = Math.floor(currColor4.a*255);
+			colVboDataArray[i*16+4] = r;
+			colVboDataArray[i*16+5] = g;
+			colVboDataArray[i*16+6] = b;
+			colVboDataArray[i*16+7] = a;
 			
-			colVboDataArray[i*16+8] = Math.floor(currColor4.r*255);
-			colVboDataArray[i*16+9] = Math.floor(currColor4.g*255);
-			colVboDataArray[i*16+10] = Math.floor(currColor4.b*255);
-			colVboDataArray[i*16+11] = Math.floor(currColor4.a*255);
+			colVboDataArray[i*16+8] = r;
+			colVboDataArray[i*16+9] = g;
+			colVboDataArray[i*16+10] = b;
+			colVboDataArray[i*16+11] = a;
 			
-			colVboDataArray[i*16+12] = Math.floor(currColor4.r*255);
-			colVboDataArray[i*16+13] = Math.floor(currColor4.g*255);
-			colVboDataArray[i*16+14] = Math.floor(currColor4.b*255);
-			colVboDataArray[i*16+15] = Math.floor(currColor4.a*255);
+			colVboDataArray[i*16+12] = r;
+			colVboDataArray[i*16+13] = g;
+			colVboDataArray[i*16+14] = b;
+			colVboDataArray[i*16+15] = a;
 		}
 	}
 	else
@@ -889,26 +897,31 @@ Point3DList.getVboThickLines = function(magoManager, point3dArray, resultVboKeys
 			{
 				w = 1.0 - (i/(pointsCount-1));
 				currColor4 = Color.mix(strColor4, endColor4, w);
+
+				var r = Math.floor(currColor4.r*255);
+				var g = Math.floor(currColor4.g*255);
+				var b = Math.floor(currColor4.b*255);
+				var a = Math.floor(currColor4.a*255);
 				
-				colVboDataArray[i*16] = Math.floor(currColor4.r*255);
-				colVboDataArray[i*16+1] = Math.floor(currColor4.g*255);
-				colVboDataArray[i*16+2] = Math.floor(currColor4.b*255);
-				colVboDataArray[i*16+3] = Math.floor(currColor4.a*255);
+				colVboDataArray[i*16] = r;
+				colVboDataArray[i*16+1] = g;
+				colVboDataArray[i*16+2] = b;
+				colVboDataArray[i*16+3] = a;
 				
-				colVboDataArray[i*16+4] = Math.floor(currColor4.r*255);
-				colVboDataArray[i*16+5] = Math.floor(currColor4.g*255);
-				colVboDataArray[i*16+6] = Math.floor(currColor4.b*255);
-				colVboDataArray[i*16+7] = Math.floor(currColor4.a*255);
+				colVboDataArray[i*16+4] = r;
+				colVboDataArray[i*16+5] = g;
+				colVboDataArray[i*16+6] = b;
+				colVboDataArray[i*16+7] = a;
 				
-				colVboDataArray[i*16+8] = Math.floor(currColor4.r*255);
-				colVboDataArray[i*16+9] = Math.floor(currColor4.g*255);
-				colVboDataArray[i*16+10] = Math.floor(currColor4.b*255);
-				colVboDataArray[i*16+11] = Math.floor(currColor4.a*255);
+				colVboDataArray[i*16+8] = r;
+				colVboDataArray[i*16+9] = g;
+				colVboDataArray[i*16+10] = b;
+				colVboDataArray[i*16+11] = a;
 				
-				colVboDataArray[i*16+12] = Math.floor(currColor4.r*255);
-				colVboDataArray[i*16+13] = Math.floor(currColor4.g*255);
-				colVboDataArray[i*16+14] = Math.floor(currColor4.b*255);
-				colVboDataArray[i*16+15] = Math.floor(currColor4.a*255);
+				colVboDataArray[i*16+12] = r;
+				colVboDataArray[i*16+13] = g;
+				colVboDataArray[i*16+14] = b;
+				colVboDataArray[i*16+15] = a;
 			}
 		}
 	}

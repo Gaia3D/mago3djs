@@ -215,7 +215,7 @@ WindVolume.prototype.createWindParticlesCreatorBox = function(magoManager)
 	return true;
 };
 
-WindVolume.prototype.createWindDisplayPlane = function(magoManager)
+WindVolume.prototype.createWindDisplayPlane = function (magoManager)
 {
 	// 1rst, create a geoCoordsList.
 	var geoExtent = this.getGeographicExtent();
@@ -235,7 +235,7 @@ WindVolume.prototype.createWindDisplayPlane = function(magoManager)
 	var minAlt = minGeoCoord.altitude;
 	var maxAlt = maxGeoCoord.altitude;
 
-	minAlt = 35.0;
+	
 	
 	
 	var geoCoordsList = new GeographicCoordsList();
@@ -280,7 +280,7 @@ WindVolume.prototype.createWindDisplayPlane = function(magoManager)
 	return true;
 };
 
-WindVolume.prototype.getGeographicExtent = function()
+WindVolume.prototype.getGeographicExtent = function ()
 {
 	if (!this.geoExtent)
 	{
@@ -311,7 +311,7 @@ WindVolume.prototype.getGeographicExtent = function()
 	return this.geoExtent;
 };
 
-WindVolume.prototype.createWindDisplayBox = function(magoManager)
+WindVolume.prototype.createWindDisplayBox = function (magoManager)
 {
 	// 1rst, create a geoCoordsList.
 	//var windLayerLowest = this.windLayersArray[0];
@@ -535,6 +535,109 @@ WindVolume.prototype._getRayIntersectionWithVolume = function(screenX, screenY, 
 
 	// Now, return the result segment.
 	return new Segment3D(posCC_front, posCC_rear);
+};
+
+WindVolume.prototype.newWindStreamLine_overTerrain = function (magoManager, optionsThickLine)
+{
+	if (!optionsThickLine)
+	{
+		optionsThickLine = {};
+	}
+
+	if (!optionsThickLine.startColor)
+	{
+		optionsThickLine.startColor = new Color(0.8, 1.0, 1.0, 1.0);
+	}
+
+	if (!optionsThickLine.endColor)
+	{
+		optionsThickLine.endColor = new Color(0.8, 1.0, 1.0, 1.0);
+	}
+
+	if (optionsThickLine.numPoints === undefined)
+	{
+		optionsThickLine.numPoints = this.weatherStation.WIND_STREAMLINES_NUMPOINTS;
+	}
+	
+	var sceneState = magoManager.sceneState;
+	var screenWidth = sceneState.drawingBufferWidth[0];
+	var screenHeight = sceneState.drawingBufferHeight[0];
+
+	if (this._particesGenerationType === 1) // 0= no generation. 1= inside frustum. 2= particlesGeneratorBox. 3= altitudePlane
+	{
+		var screenX = Math.floor(Math.random() * screenWidth);
+		var screenY = Math.floor(Math.random() * screenHeight);
+
+		var segment = this._getRayIntersectionWithVolume(screenX, screenY, magoManager);
+		if (segment)
+		{
+			var farRandom = Math.random();
+			var dir = segment.getDirection();
+			var lengthRandom = segment.getLength() * farRandom;
+			var strP = segment.startPoint3d;
+
+			// posCC = startPoint + dir * farRandom * length.
+			var posCC = new Point3D(strP.x + dir.x * lengthRandom, strP.y + dir.y * lengthRandom, strP.z + dir.z * lengthRandom );// Original.***
+			//var posCC = new Point3D(segment.endPoint3d.x, segment.endPoint3d.y, segment.endPoint3d.z );
+			
+			// now, convert posCC to posWC.
+			var posWC = ManagerUtils.cameraCoordPositionToWorldCoord(posCC, undefined, magoManager);
+
+			// now calculate geoCoord of posWC.
+			var geoCoord = ManagerUtils.pointToGeographicCoord(posWC, undefined);
+
+			var renderableObject = this._getWindStreamLine_overTerrain(geoCoord, magoManager, optionsThickLine);
+			return renderableObject;
+		}
+	}
+	else if (this._particesGenerationType === 2) // 0= no generation. 1= inside frustum. 2= particlesGeneratorBox.
+	{
+		// Check if exist particlesGeneratorBoxes.
+		if (this._particlesGeneratorBoxesArray && this._particlesGeneratorBoxesArray.length > 0)
+		{
+			// Provisionally take the 1rst.
+			var pGeneratorBox = this._particlesGeneratorBoxesArray[0];
+			var geoLocData = pGeneratorBox.geoLocDataManager.getCurrentGeoLocationData();
+
+			var geoCoord = geoLocData.geographicCoord;
+			var randomLon = (0.5 - Math.random()) * 0.001;
+			var randomLat = (0.5 - Math.random()) * 0.001;
+			var randomAlt = (Math.random()) * 50.0;
+			var geoCoordSemiRandom = new GeographicCoord(geoCoord.longitude + randomLon, geoCoord.latitude + randomLat, geoCoord.altitude + randomAlt);
+
+			var renderableObject = this._getWindStreamLine_overTerrain(geoCoordSemiRandom, magoManager, optionsThickLine);
+			return renderableObject;
+		}
+	}
+	if (this._particesGenerationType === 3) // 0= no generation. 1= inside frustum. 2= particlesGeneratorBox. 3= altitudePlane
+	{
+		var screenX = Math.floor(Math.random() * screenWidth);
+		var screenY = Math.floor(Math.random() * screenHeight);
+
+		var segment = this._getRayIntersectionWithVolume(screenX, screenY, magoManager);
+		if (segment)
+		{
+			var farRandom = Math.random();
+			var dir = segment.getDirection();
+			var lengthRandom = segment.getLength() * farRandom;
+			var strP = segment.startPoint3d;
+
+			// posCC = startPoint + dir * farRandom * length.
+			//var posCC = new Point3D(strP.x + dir.x * lengthRandom, strP.y + dir.y * lengthRandom, strP.z + dir.z * lengthRandom );// Original.***
+			var posCC = new Point3D(segment.endPoint3d.x, segment.endPoint3d.y, segment.endPoint3d.z );
+			
+			// now, convert posCC to posWC.
+			var posWC = ManagerUtils.cameraCoordPositionToWorldCoord(posCC, undefined, magoManager);
+
+			// now calculate geoCoord of posWC.
+			var geoCoord = ManagerUtils.pointToGeographicCoord(posWC, undefined);
+
+			var renderableObject = this._getWindStreamLine_overTerrain(geoCoord, magoManager, optionsThickLine);
+			return renderableObject;
+		}
+	}
+
+	return undefined;
 };
 
 WindVolume.prototype.newWindStreamLine = function (magoManager)
@@ -986,9 +1089,10 @@ WindVolume.prototype.renderDepthWindVolumeORT = function(magoManager)
 	gl.frontFace(gl.CW);
 	magoManager.renderer.renderGeometryBufferORT(gl, renderType, this.visibleObjControler, options);
 
-	// Test:
-	magoManager.windVolumeRearDepthTex = windVolumeRearFBO.colorBuffersArray[1];
+	// Test: Test: Test: Test: Test: Test: Test: Test: Test: Test: Test: Test: Test: Test:
+	magoManager.windVolumeRearDepthTex = windVolumeRearFBO.colorBuffersArray[1]; 
 	magoManager.windVolumeRearNormalTex = windVolumeRearFBO.colorBuffersArray[2];
+	magoManager.windVolumeFrontDepthTex = windVolumeFrontFBO.colorBuffersArray[1];
 
 	// End rear face.---------------------------------------------------------------------------------------------------------------------------
 
@@ -1128,13 +1232,78 @@ WindVolume.prototype.renderMode3DThickLines = function (magoManager)
 	
 	if (currStreamLinesCount < this.weatherStation.WIND_MAXPARTICLES_INSCREEN && magoManager.currentFrustumIdx === 0)// && this.counterAux > 5)
 	{
-		for (var i=0; i<3; i++)
+		if (this.weatherStation.windDisplayMode === "NORMAL")
 		{
-			var streamLine = this.newWindStreamLine(magoManager);
-			if (streamLine)
+			for (var i=0; i<3; i++)
 			{
-				this.streamLinesArray.push(streamLine);	
+				var streamLine = this.newWindStreamLine(magoManager);
+				if (streamLine)
+				{
+					this.streamLinesArray.push(streamLine);	
+				}
 			}
+		}
+		else if (this.weatherStation.windDisplayMode === "OVERTERRAIN")
+		{
+			// Then, is asincronous bcos must use Cesium.sampleTerrain() function that is asincronous.***
+			if (!this._updatedCartographicArray)
+			{ 
+				this._updatedCartographicArray = [];
+			}
+			if (!this._pointsLCArrayArray)
+			{ 
+				this._pointsLCArrayArray = [];
+			}
+
+			if (!this._optionThickLinesArray)
+			{ 
+				this._optionThickLinesArray = [];
+			}
+
+			var optionsThickLine = {};
+			optionsThickLine.startColor = new Color(0.8, 1.0, 1.0, 1.0);
+			optionsThickLine.endColor = new Color(0.8, 1.0, 1.0, 1.0);
+			optionsThickLine.numPoints = this.weatherStation.WIND_STREAMLINES_NUMPOINTS;
+
+			if (this._updatedCartographicArray.length < 1)
+			{
+				for (var i=0; i<2; i++)
+				{
+					this.newWindStreamLine_overTerrain(magoManager, optionsThickLine);
+				}
+			}
+
+			// Check if exist updatedCartographics.***
+			var updatedCartographicsCount = this._updatedCartographicArray.length;
+			if (updatedCartographicsCount > 2)
+			{
+				updatedCartographicsCount = 2;
+			}
+
+			
+			for (var i=0; i<updatedCartographicsCount; i++)
+			{
+				var updatedCartographics = this._updatedCartographicArray.shift();
+				var pointsLCArray = this._pointsLCArrayArray.shift();
+				var options = this._optionThickLinesArray.shift();
+
+				var startCartographic = updatedCartographics[0];
+				var pointsCount = updatedCartographics.length;
+				for (var j=0; j<pointsCount; j++)
+				{
+					pointsLCArray[j].z = updatedCartographics[j].height + 10.0; // 10m over terrain.***
+				}
+
+				//var geoLoc = ManagerUtils.calculateGeoLocationData(startCartographic.longitude *180/Math.PI, startCartographic.latitude *180/Math.PI, startCartographic.height + 10.0, 0, 0, 0, undefined);
+				var geoLoc = ManagerUtils.calculateGeoLocationData(startCartographic.longitude *180/Math.PI, startCartographic.latitude *180/Math.PI, 20.0, 0, 0, 0, undefined);
+				var vectorMesh = this._getVectorMeshFromPoints3dLCArray(pointsLCArray, geoLoc, magoManager, options);
+				if (vectorMesh)
+				{
+					this.streamLinesArray.push(vectorMesh);	
+				}
+			}	
+
+			
 		}
 	}
 	
@@ -1616,6 +1785,7 @@ WindVolume.prototype._getTrajectoryInLocalCoordinates = function (startGeoCoord,
 	var zFactor;
 	for (var i=0; i<numPoints; i++)
 	{
+		// Calculate texCoord (s, t). The (s, t) texCoord is used to read the windTexture.*** 
 		var s = (currLon - minLonRad)/lonRadRange;
 		var t = (currLat - minLatRad)/latRadRange;
 
@@ -1633,8 +1803,6 @@ WindVolume.prototype._getTrajectoryInLocalCoordinates = function (startGeoCoord,
 		{ idxUp = 0; }
 		var idxDown = (idxUp - 1) < 0 ? 0 : idxUp - 1;
 
-		//idxDown = 7;
-		//idxUp = 7;
 		var windLayerDown = this.windLayersArray[idxDown];
 		var windLayerUp = this.windLayersArray[idxUp];
 
@@ -1656,7 +1824,7 @@ WindVolume.prototype._getTrajectoryInLocalCoordinates = function (startGeoCoord,
 		speedUp = windLayerUp.getVelocityVector3d_biLinearInterpolation(s, t, speedUp, magoManager);
 
 		// now, do weight-interpolation.
-		velocity3d = Point3D.mix(speedDown, speedUp, zFactor, velocity3d);
+		velocity3d = Point3D.mix(speedDown, speedUp, zFactor, undefined); // Note : MUST be "undefined".***
 		//velocity3d = windLayerDown.getVelocityVector3d_biLinearInterpolation(s, t, velocity3d, magoManager);
 
 		
@@ -1696,6 +1864,279 @@ WindVolume.prototype._getTrajectoryInLocalCoordinates = function (startGeoCoord,
 	return resultPointsLCArray;
 };
 
+WindVolume.prototype._getTrajectoryInLocalCoordinates_overTerrain = function (startGeoCoord, magoManager, options)
+{
+	// Obtain the velocity in this geoCoord.
+	var geoExtent = this.getGeographicExtent();
+
+	// 1rst, check if the geoCoord is inside of this windLayer range.
+	if (!geoExtent.intersects2dWithGeoCoord(startGeoCoord))
+	{ return undefined; }
+
+	var minLonRad = geoExtent.getMinLongitudeRad();
+	var minLatRad = geoExtent.getMinLatitudeRad();
+	var maxLonRad = geoExtent.getMaxLongitudeRad();
+	var maxLatRad = geoExtent.getMaxLatitudeRad();
+	var lonRadRange = maxLonRad - minLonRad;
+	var latRadRange = maxLatRad - minLatRad;
+
+	// Calculate the texCoord of the "geoCoord".
+	var currLon = startGeoCoord.getLongitudeRad();
+	var currLat = startGeoCoord.getLatitudeRad();
+	var currAlt = startGeoCoord.getAltitude();
+
+	var DEG_TO_RAD = Math.PI/180;
+	var RAD_TO_DEG = 180/Math.PI;
+
+	// Test to calculate speedFactor by globeRadius.**********************************************************
+	var midLat = geoExtent.getCenterLatitude();
+	var radius = Globe.radiusAtLatitudeDeg(midLat);
+	var distortion = Math.cos(midLat * DEG_TO_RAD);
+	var meterToLon = 1.0 / (radius * distortion);
+	var meterToLat = 1.0 / radius;
+
+	var speedFactor = magoManager.weatherStation.speedFactor;
+	var xSpeedFactor = speedFactor;
+	var ySpeedFactor = speedFactor;
+	var zSpeedFactor = speedFactor;
+	//---------------------------------------------------------------------------------------------------
+	
+	var numPoints = 20;
+	
+	if (options)
+	{
+		//if (options.speedFactor !== undefined)
+		//{ speedFactor = options.speedFactor; }
+		
+		if (options.numPoints !== undefined)
+		{ numPoints = options.numPoints; }
+	}
+
+	var resultPointsLCArray = []; 
+
+	var pointLC = new Point3D();
+	//resultPointsLCArray.push(pointLC); // push the 1rst pointLC.***
+
+	var curXinMeters = 0.0;
+	var curYinMeters = 0.0;
+	var curZinMeters = 0.0;
+	var offsetXinMeters;
+	var offsetYinMeters;
+	var offsetZinMeters;
+	
+	// Create a lineString with numPoints.***
+	var windLayersCount = this.windLayersArray.length;
+	var speedDown;
+	var speedUp;
+	var velocity3d;
+	var zFactor;
+
+	// 1rst, find all geoCoords of the trajectorie.***
+	var cartographicArray = [];
+	for (var i=0; i<numPoints; i++)
+	{
+		// Calculate texCoord (s, t). The (s, t) texCoord is used to read the windTexture.*** 
+		var s = (currLon - minLonRad)/lonRadRange;
+		var t = (currLat - minLatRad)/latRadRange;
+
+		if (s > 1.0 || t > 1.0 || s < 0.0 || t < 0.0)
+		{
+			// Considere process finished.***
+			break;
+		}
+
+		var cartographic = new Cesium.Cartographic(currLon, currLat, 0.0);
+		cartographicArray.push(cartographic);
+		
+		// now, with "currAlt" find the 2 windLayers.
+		var idxUp = WeatherStation.binarySearch_layersByAltitude(this._windLayersAltitudesArray, currAlt);
+		if (idxUp >= windLayersCount)
+		{ idxUp = windLayersCount - 1; }
+		else if (idxUp < 0)
+		{ idxUp = 0; }
+		var idxDown = (idxUp - 1) < 0 ? 0 : idxUp - 1;
+
+		var windLayerDown = this.windLayersArray[idxDown];
+		var windLayerUp = this.windLayersArray[idxUp];
+
+		// calculate the altDiff of "currAlt" with "windLayerDown".
+		var downLayerAltitude = windLayerDown.getAltitude();
+		var upLayerAltitude = windLayerUp.getAltitude();
+		var altDiffLayers = upLayerAltitude - downLayerAltitude;
+		var altDiffRelToDownLayer = currAlt - downLayerAltitude;
+		if (idxUp === idxDown)
+		{
+			zFactor = 1.0;
+		}
+		else
+		{
+			zFactor = altDiffRelToDownLayer / altDiffLayers;
+		}
+
+		speedDown = windLayerDown.getVelocityVector3d_biLinearInterpolation(s, t, speedDown, magoManager);
+		speedUp = windLayerUp.getVelocityVector3d_biLinearInterpolation(s, t, speedUp, magoManager);
+
+		// now, do weight-interpolation.
+		velocity3d = Point3D.mix(speedDown, speedUp, zFactor, undefined); // Note : MUST be "undefined".***
+		//velocity3d = windLayerDown.getVelocityVector3d_biLinearInterpolation(s, t, velocity3d, magoManager);
+
+		// calculate currLon & currLat.
+		var distortion = Math.cos((minLatRad + currLat * latRadRange ));
+
+		offsetXinMeters = velocity3d.x / distortion * xSpeedFactor;
+		offsetYinMeters = velocity3d.y * ySpeedFactor;
+		offsetZinMeters = velocity3d.z * zSpeedFactor;
+
+		curXinMeters += offsetXinMeters;
+		curYinMeters += offsetYinMeters;
+		curZinMeters += offsetZinMeters;
+
+		var pointLC = new Point3D(curXinMeters, curYinMeters, curZinMeters);
+		resultPointsLCArray.push(pointLC); // push the 1rst pointLC.
+
+		if (options.velocitiesArray)
+		{
+			options.velocitiesArray.push(velocity3d);
+		}
+
+		// Now, calculate geoCoord for next point.
+		currLon += offsetXinMeters * meterToLon;
+		currLat += offsetYinMeters * meterToLat;
+		currAlt += offsetZinMeters;
+
+		if (Math.abs(velocity3d.x) + Math.abs(velocity3d.y) + Math.abs(velocity3d.z) < 0.002)
+		{
+			break;
+		}
+		
+	}
+
+	// Now, for each point, calculate the terrain elevation.***
+	if (resultPointsLCArray.length > 0) 
+	{
+		var terrainProvider = magoManager.scene.globe.terrainProvider;
+		var maxZoom = MagoManager.getMaximumLevelOfTerrainProvider(terrainProvider);
+		if (maxZoom > 11)
+		{
+			maxZoom = 11;
+		}
+		var promise = Cesium.sampleTerrain(terrainProvider, maxZoom, cartographicArray);
+		Cesium.when(promise, function(updatedCartographic) 
+		{
+			var updatedCartographicsCount = updatedCartographic.length;
+			var weatherStation = magoManager.weatherStation;
+			var windVolume = weatherStation.windVolumesArray[0];
+			
+			windVolume._updatedCartographicArray.push(updatedCartographic);
+			windVolume._pointsLCArrayArray.push(resultPointsLCArray);
+			windVolume._optionThickLinesArray.push(options);
+
+		});
+	}
+};
+
+WindVolume.prototype._getVectorMeshFromPoints3dLCArray = function (points3dLCArray, geoLoc, magoManager, options)
+{	
+	if (!points3dLCArray || points3dLCArray.length < 2)
+	{
+		return undefined;
+	}
+
+	if (options === undefined)
+	{
+		options = {};
+	}
+
+	if (options.thickness === undefined)
+	{ options.thickness = 2.0; }
+
+	if (options.color === undefined)
+	{ options.color = new Color(0.8, 1.0, 1.0, 1.0); }
+
+	// check the colorRamp.***
+	if (this.colorRamp)
+	{
+		// need velocities array.
+		if (options.velocitiesArray === undefined)
+		{ options.velocitiesArray = []; }
+	}
+
+	points3dLCArray.reverse();
+
+	var vectorMesh = new VectorMeshWind(options);
+	
+	var optionsThickLine = {
+		colorType: "alphaGradient"
+	};
+
+	// If exist this.colorRamp, then create colorsArray.*****************************************************************************
+	// test debug:
+	var bThereAre_R = false;
+	var bThereAre_B = false;
+	if (this.colorRamp)
+	{
+		options.colorsArray = []; // create colors array.***
+
+		var valuesCount = options.velocitiesArray.length;
+		var color; 
+		var vel, speed;
+		var minSpeed = 1000000.0;
+		var maxSpeed = -100.0;
+		for (var i=0; i<valuesCount; i++)
+		{
+			vel = options.velocitiesArray[i];
+			speed = vel.getModul();
+			color = this.colorRamp.getInterpolatedColor(speed);
+
+			if (speed > 22)
+			{
+				bThereAre_R = true;
+			}
+
+			options.colorsArray.push(color);
+
+			if (speed > maxSpeed)
+			{
+				maxSpeed = speed;
+			}
+			else if (speed < minSpeed)
+			{
+				minSpeed = speed;
+			}
+		}
+	}
+
+	vectorMesh.vboKeysContainer = Point3DList.getVboThickLines(magoManager, points3dLCArray, vectorMesh.vboKeysContainer, options);
+	vectorMesh.geoLocDataManager = new GeoLocationDataManager();
+	vectorMesh.geoLocDataManager.addGeoLocationData(geoLoc);
+	vectorMesh.objectType = MagoRenderable.OBJECT_TYPE.VECTORMESH;
+
+	// Now, create a customVbo.
+	var pointsCount = points3dLCArray.length;
+	var indicesDataArray = new Float32Array(pointsCount*4);
+	for (var i=0; i<pointsCount*4; i++)
+	{
+		indicesDataArray[i] = i.toFixed(0);
+	}
+
+	var vbo = vectorMesh.vboKeysContainer.getVboKey(0);
+	var vboMemManager = magoManager.vboMemoryManager;
+	var dimensions = 1;
+	var name = "indices";
+	var attribLoc = 4;
+	vbo.setDataArrayCustom(indicesDataArray, vboMemManager, dimensions, name, attribLoc);
+
+	// calculate vectorMesh "BoundingSphereWC".***********************************************
+	////vectorMesh.boundingSphereWC = new BoundingSphere();
+	////var positionWC = geoLoc.position;
+	////var bboxLC = Point3DList.getBoundingBoxOfPoints3DArray(points3dLCArray, undefined);
+	////var radiusAprox = bboxLC.getRadiusAprox();
+	////vectorMesh.boundingSphereWC.setCenterPoint(positionWC.x, positionWC.y, positionWC.z);
+	////vectorMesh.boundingSphereWC.setRadius(radiusAprox);
+	// End calculating boundingSphereWC.------------------------------------------------------
+	return vectorMesh;
+};
+
 WindVolume.prototype._getWindStreamLine = function (startGeoCoord, magoManager, options)
 {	
 	// 1rst, make points3dList relative to the 1rst_geoCoord.
@@ -1730,77 +2171,38 @@ WindVolume.prototype._getWindStreamLine = function (startGeoCoord, magoManager, 
 	points3dLCArray.reverse();
 
 	var geoLoc = ManagerUtils.calculateGeoLocationData(startGeoCoord.longitude, startGeoCoord.latitude, startGeoCoord.altitude, 0, 0, 0, undefined);
-
-	var vectorMesh = new VectorMeshWind(options);
-	
-	var optionsThickLine = {
-		colorType: "alphaGradient"
-	};
-
-	// If exist this.colorRamp, then create colorsArray.*****************************************************************************
-	if (this.colorRamp)
-	{
-		options.colorsArray = []; // create colors array.***
-
-		var valuesCount = options.velocitiesArray.length;
-		var color; 
-		var vel, speed;
-		var minSpeed = 1000000.0;
-		var maxSpeed = -100.0;
-		for (var i=0; i<valuesCount; i++)
-		{
-			vel = options.velocitiesArray[i];
-			speed = vel.getModul();
-			color = this.colorRamp.getInterpolatedColor(speed);
-			options.colorsArray.push(color);
-
-			if (speed > maxSpeed)
-			{
-				maxSpeed = speed;
-			}
-			else if (speed < minSpeed)
-			{
-				minSpeed = speed;
-			}
-		}
-	}
-
-
-
-	vectorMesh.vboKeysContainer = Point3DList.getVboThickLines(magoManager, points3dLCArray, vectorMesh.vboKeysContainer, options);
-	vectorMesh.geoLocDataManager = new GeoLocationDataManager();
-	vectorMesh.geoLocDataManager.addGeoLocationData(geoLoc);
-	vectorMesh.objectType = MagoRenderable.OBJECT_TYPE.VECTORMESH;
-
-	// Now, create a customVbo.
-	var pointsCount = points3dLCArray.length;
-	var indicesDataArray = new Float32Array(pointsCount*4);
-	for (var i=0; i<pointsCount*4; i++)
-	{
-		indicesDataArray[i] = i.toFixed(0);
-	}
-
-	var vbo = vectorMesh.vboKeysContainer.getVboKey(0);
-	var vboMemManager = magoManager.vboMemoryManager;
-	var dimensions = 1;
-	var name = "indices";
-	var attribLoc = 4;
-	vbo.setDataArrayCustom(indicesDataArray, vboMemManager, dimensions, name, attribLoc);
-
-	// calculate vectorMesh "BoundingSphereWC".***********************************************
-	/*
-	vectorMesh.boundingSphereWC = new BoundingSphere();
-	var positionWC = geoLoc.position;
-	var bboxLC = Point3DList.getBoundingBoxOfPoints3DArray(points3dLCArray, undefined);
-	var radiusAprox = bboxLC.getRadiusAprox();
-	vectorMesh.boundingSphereWC.setCenterPoint(positionWC.x, positionWC.y, positionWC.z);
-	vectorMesh.boundingSphereWC.setRadius(radiusAprox);
-	*/
-	// End calculating boundingSphereWC.------------------------------------------------------
-	return vectorMesh;
+	return this._getVectorMeshFromPoints3dLCArray(points3dLCArray, geoLoc, magoManager, options);
 };
 
-WindVolume.prototype._getWindStreamLine_oneLayer = function(geoCoordsArray, magoManager, options)
+WindVolume.prototype._getWindStreamLine_overTerrain = function (startGeoCoord, magoManager, options)
+{	
+	// 1rst, make points3dList relative to the 1rst_geoCoord.
+	if (options === undefined)
+	{
+		options = {};
+	}
+
+	if (options.thickness === undefined)
+	{ options.thickness = 2.0; }
+
+	if (options.color === undefined)
+	{ options.color = new Color(1.0, 0.3, 0.3, 1.0); }
+
+	// check the colorRamp.***
+	if (this.colorRamp)
+	{
+		// need velocities array.
+		if (options.velocitiesArray === undefined)
+		{ options.velocitiesArray = []; }
+	}
+	
+
+	// Make pointsLC rel to startGeoCoord.
+	// Note : Here uses Cesium.sampleTerrain that is a promise.***
+	this._getTrajectoryInLocalCoordinates_overTerrain(startGeoCoord, magoManager, options);
+};
+
+WindVolume.prototype._getWindStreamLine_oneLayer = function (geoCoordsArray, magoManager, options)
 {
 	if (geoCoordsArray === undefined || geoCoordsArray.length === 0)
 	{ return undefined; }

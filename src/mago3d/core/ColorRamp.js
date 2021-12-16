@@ -75,7 +75,11 @@ ColorRamp.prototype.getIdx = function(value)
 
 	if (value < this.elementsArray[0].value)
 	{
-		return -1;
+		return 0;
+	}
+	else if (value > this.elementsArray[elemsCount-1].value)
+	{
+		return elemsCount-1;
 	}
 
 	for (var i=0; i<elemsCount; i++)

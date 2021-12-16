@@ -2101,7 +2101,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 	if (magoManager.normalTex)
 	{
-		texture = magoManager.normalTex;
+		//texture = magoManager.normalTex;
 	}
 
 	if (magoManager.albedoTex)
@@ -2139,10 +2139,6 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 		//texture = magoManager.windPlaneNormalTex;
 	}
 
-	if (magoManager.windVolumeRearDepthTex)
-	{
-		//texture = magoManager.windVolumeRearDepthTex;
-	}
 	
 	if (magoManager.windVolumeRearNormalTex)
 	{
@@ -2176,7 +2172,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 			var windVolumeFrontFBO = windVolume._getVolumeFrontFBO(magoManager);
 			if (windVolumeFrontFBO)
 			{
-				var depthTex = windVolumeFrontFBO.colorBuffersArray[2];
+				var depthTex = windVolumeFrontFBO.colorBuffersArray[1]; // [1] = depth, [2] = normal
 				if (depthTex)
 				{
 					texture = depthTex;
@@ -2188,7 +2184,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 			var windVolumeRearFBO = windVolume._getVolumeRearFBO(magoManager);
 			if (windVolumeRearFBO)
 			{
-				var depthTex = windVolumeRearFBO.colorBuffersArray[2]; // [1] = depth, [2] = normal
+				var depthTex = windVolumeRearFBO.colorBuffersArray[1]; // [1] = depth, [2] = normal
 				if (depthTex)
 				{
 					//texture = depthTex;

@@ -27,9 +27,34 @@ var WeatherStation = function (magoManager, options)
 	// Enumerations.
 	this.WIND_MAXPARTICLES_INSCREEN = 1500;
 	this.WIND_STREAMLINES_NUMPOINTS = 250;
+	this.windDisplayMode = "NORMAL"; // "NORMAL", "OVERTERRAIN"
+	this.speedFactor = 1;
 
 	// wind params.
 	this.windThickness = 2.5;
+
+	if (options)
+	{
+		if (options.windDisplayMode)
+		{
+			this.windDisplayMode = options.windDisplayMode;
+		}
+
+		if (options.WIND_MAXPARTICLES_INSCREEN)
+		{
+			this.WIND_MAXPARTICLES_INSCREEN = options.WIND_MAXPARTICLES_INSCREEN;
+		}
+
+		if (options.WIND_STREAMLINES_NUMPOINTS)
+		{
+			this.WIND_STREAMLINES_NUMPOINTS = options.WIND_STREAMLINES_NUMPOINTS;
+		}
+
+		if (options.speedFactor)
+		{
+			this.speedFactor = options.speedFactor;
+		}
+	}
 };
 
 WeatherStation.prototype.setWindThickness = function(windThickness)

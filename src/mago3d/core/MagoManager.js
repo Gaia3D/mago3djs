@@ -3001,7 +3001,7 @@ MagoManager.prototype.validateHeight = function(frustumObject)
 		var maxZoom = MagoManager.getMaximumLevelOfTerrainProvider(terrainProvider);
 		var process = [];
 		var next = [];
-		for (var i=this._needValidHeightNodeArray.length - 1;i>=0;i--) 
+		for (var i = this._needValidHeightNodeArray.length - 1; i >= 0; i--) 
 		{
 			var needValidHeightNode = this._needValidHeightNodeArray[i];
 			
@@ -3045,7 +3045,7 @@ MagoManager.prototype.validateHeight = function(frustumObject)
 				{
 					if (samplePositions.length === nArrayLength) 
 					{
-						for (var k=0, slen=samplePositions.length;k<slen;k++) 
+						for (var k=0, slen=samplePositions.length; k < slen; k++) 
 						{
 							var n = nArray[k];
 							var currentGeoLocationData = n.getCurrentGeoLocationData();
