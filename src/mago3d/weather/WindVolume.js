@@ -1281,7 +1281,7 @@ WindVolume.prototype.renderMode3DThickLines = function (magoManager)
 
 			if (this._updatedCartographicArray.length < 1)
 			{
-				//for (var i=0; i<2; i++)
+				for (var i=0; i<2; i++)
 				{
 					this.newWindStreamLine_overTerrain(magoManager, optionsThickLine);
 				}
