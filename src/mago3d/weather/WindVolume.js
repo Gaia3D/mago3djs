@@ -727,13 +727,6 @@ WindVolume.prototype.newWindStreamLine = function (magoManager)
 			// now calculate geoCoord of posWC.
 			var geoCoord = ManagerUtils.pointToGeographicCoord(posWC, undefined);
 
-			// Test debug:::
-			//var randomLon = (Math.random() - 0.5)*2;
-			//var randomLat = (Math.random() - 0.5)*2;
-			//randomLon *= 0.001;
-			//randomLat *= 0.001;
-			//geoCoord.setLonLatAlt(127.65540 + randomLon, 35.31311 + randomLat, 1787.0418657544487);
-
 			var renderableObject = this._getWindStreamLine(geoCoord, magoManager, optionsThickLine);
 			return renderableObject;
 		}
@@ -1274,8 +1267,6 @@ WindVolume.prototype.renderMode3DThickLines = function (magoManager)
 				this._optionThickLinesArray = [];
 			}
 
-			
-
 			if (this._updatedCartographicArray.length < 1)
 			{
 				for (var i=0; i<2; i++)
@@ -1320,8 +1311,6 @@ WindVolume.prototype.renderMode3DThickLines = function (magoManager)
 					this.streamLinesArray.push(vectorMesh);	
 				}
 			}	
-
-			
 		}
 	}
 	
@@ -2035,9 +2024,9 @@ WindVolume.prototype._getTrajectoryInLocalCoordinates_overTerrain = function (st
 	{
 		var terrainProvider = magoManager.scene.globe.terrainProvider;
 		var maxZoom = MagoManager.getMaximumLevelOfTerrainProvider(terrainProvider);
-		if (maxZoom > 11)
+		if (maxZoom > 14)
 		{
-			maxZoom = 11;
+			maxZoom = 14;
 		}
 		var promise = Cesium.sampleTerrain(terrainProvider, maxZoom, cartographicArray);
 		Cesium.when(promise, function(updatedCartographic) 
