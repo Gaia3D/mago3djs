@@ -103,6 +103,8 @@ MergedObject.prototype.initialize = function (magoRenderables)
 
 		self.setGeographicPosition(new GeographicCoord(centroid.longitude/magoRenderablesCount, centroid.latitude/magoRenderablesCount, centroid.altitude/magoRenderablesCount));
 		self.addMagoRenderables(models);
+
+		return self;
 	};
 
 	return Cesium.sampleTerrain(terrainProvider, maxZoom, centerGeographicCoordsArray).then(_init);

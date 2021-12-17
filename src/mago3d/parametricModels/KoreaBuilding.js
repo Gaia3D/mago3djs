@@ -60,7 +60,7 @@ KoreaBuilding.prototype.initialize = function(feature)
 	this.setGeographicPosition(centerGeographicCoords);
 	this.centerGeographicCoords = centerGeographicCoords;
 
-	var height = feature.properties.HEIGHT;
+	var height = feature.properties.HEIGHT || feature.properties.BLDH_BV;
 	if (height !== 0) { this.height = height; }
 };
 

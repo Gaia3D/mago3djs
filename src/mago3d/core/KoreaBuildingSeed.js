@@ -43,7 +43,7 @@ KoreaBuildingSeed.STATUS = {
 	LOADEND : 2
 };
 
-KoreaBuildingSeed.prototype.load = function() 
+KoreaBuildingSeed.prototype.load = function () 
 {
 	var that = this;
 	that.status = KoreaBuildingSeed.STATUS.LOADING;
@@ -105,7 +105,14 @@ KoreaBuildingSeed.getDividedFeaturesArray = function(features, maxFeaturesCount)
 
 		counter++;
 	}
+	
 
+	if (currentFeaturesArray.length > 0)
+	{
+		resultFeaturesArrayArray.push(currentFeaturesArray);
+	}
+
+	/*
 	if (!started)
 	{
 		resultFeaturesArrayArray.push(currentFeaturesArray);
@@ -114,7 +121,7 @@ KoreaBuildingSeed.getDividedFeaturesArray = function(features, maxFeaturesCount)
 	{
 		resultFeaturesArrayArray.push(currentFeaturesArray);
 	}
-
+	*/
 	return resultFeaturesArrayArray;
 };
 
@@ -122,7 +129,7 @@ KoreaBuildingSeed.getDividedFeaturesArray = function(features, maxFeaturesCount)
  * Load Korea Building Master's FeatureCollection.
  * @param {object} featureCollection 한국건물 마스터 geojson
  */
-KoreaBuildingSeed.prototype.mergeFeatureCollection = function(featureCollection) 
+KoreaBuildingSeed.prototype.mergeFeatureCollection = function (featureCollection) 
 {
 	if (!validateWithScheme(featureCollection, this._scheme)) 
 	{
@@ -130,6 +137,7 @@ KoreaBuildingSeed.prototype.mergeFeatureCollection = function(featureCollection)
 	}
 
 	var features = featureCollection.features;
+	var self = this;
 
 	var maxFeaturesCount = 200;
 	var featuresArray =  KoreaBuildingSeed.getDividedFeaturesArray(features, maxFeaturesCount);
@@ -137,7 +145,7 @@ KoreaBuildingSeed.prototype.mergeFeatureCollection = function(featureCollection)
 	for (var k=0; k<featuresCount; k++)
 	{
 		var dividedFeatures = featuresArray[k];
-		var renderables = [];
+		var renderables = new Array();
 		for (var i=0, len=dividedFeatures.length; i<len; i++) 
 		{
 			renderables.push(new KoreaBuilding(dividedFeatures[i]));
@@ -145,13 +153,11 @@ KoreaBuildingSeed.prototype.mergeFeatureCollection = function(featureCollection)
 
 		var merged = new MergedObject(this.magoManager);
 		merged.attributes.isDeletableByFrustumCulling = true;
-
-		var self = this;
-		merged.initialize(renderables).then(function(a, b, c) 
+		merged.initialize(renderables).then(function(mergedObject) 
 		{
-			merged.masterId = self.masterId;
+			mergedObject.masterId = self.masterId;
 
-			self.magoManager.modeler.addObject(merged, 15);
+			self.magoManager.modeler.addObject(mergedObject, 15);
 			self.status = KoreaBuildingSeed.STATUS.LOADEND;
 		});
 	}
@@ -161,7 +167,7 @@ KoreaBuildingSeed.prototype.mergeFeatureCollection = function(featureCollection)
  * Load Korea Building Master's FeatureCollection.
  * @param {object} featureCollection 한국건물 마스터 geojson
  */
-KoreaBuildingSeed.prototype.mergeFeatureCollection_original = function(featureCollection) 
+KoreaBuildingSeed.prototype.mergeFeatureCollection_original = function (featureCollection) 
 {
 	 if (!validateWithScheme(featureCollection, this._scheme)) 
 	 {
