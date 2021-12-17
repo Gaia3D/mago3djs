@@ -1274,15 +1274,17 @@ WindVolume.prototype.renderMode3DThickLines = function (magoManager)
 				this._optionThickLinesArray = [];
 			}
 
-			var optionsThickLine = {};
-			optionsThickLine.startColor = new Color(0.8, 1.0, 1.0, 1.0);
-			optionsThickLine.endColor = new Color(0.8, 1.0, 1.0, 1.0);
-			optionsThickLine.numPoints = this.weatherStation.WIND_STREAMLINES_NUMPOINTS;
+			
 
 			if (this._updatedCartographicArray.length < 1)
 			{
 				for (var i=0; i<2; i++)
 				{
+					var optionsThickLine = {};
+					optionsThickLine.startColor = new Color(0.8, 1.0, 1.0, 1.0);
+					optionsThickLine.endColor = new Color(0.8, 1.0, 1.0, 1.0);
+					optionsThickLine.numPoints = this.weatherStation.WIND_STREAMLINES_NUMPOINTS;
+
 					this.newWindStreamLine_overTerrain(magoManager, optionsThickLine);
 				}
 			}
