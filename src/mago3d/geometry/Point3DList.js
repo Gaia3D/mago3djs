@@ -825,15 +825,16 @@ Point3DList.getVboThickLines = function(magoManager, point3dArray, resultVboKeys
 		var r, g, b, a;
 		for (var i=0; i<pointsCount; i++)
 		{
-			//w = 1.0 - (i/(pointsCount-1));
-			//currColor4 = Color.mix(strColor4, endColor4, w);
 			currColor4 = colArray[i];
 
-			var r = Math.floor(currColor4.r*255);
-			var g = Math.floor(currColor4.g*255);
-			var b = Math.floor(currColor4.b*255);
-			var a = Math.floor(currColor4.a*255);
-			
+			if (currColor4)
+			{
+				r = Math.floor(currColor4.r*255);
+				g = Math.floor(currColor4.g*255);
+				b = Math.floor(currColor4.b*255);
+				a = Math.floor(currColor4.a*255);
+			}
+
 			colVboDataArray[i*16] = r;
 			colVboDataArray[i*16+1] = g;
 			colVboDataArray[i*16+2] = b;

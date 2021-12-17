@@ -632,6 +632,13 @@ WindVolume.prototype.newWindStreamLine_overTerrain = function (magoManager, opti
 			// now calculate geoCoord of posWC.
 			var geoCoord = ManagerUtils.pointToGeographicCoord(posWC, undefined);
 
+			// Test debug:::
+			//var randomLon = (Math.random() - 0.5)*2;
+			//var randomLat = (Math.random() - 0.5)*2;
+			//randomLon *= 0.001;
+			//randomLat *= 0.001;
+			//geoCoord.setLonLatAlt(127.65540 + randomLon, 35.31311 + randomLat, 1787.0418657544487);
+
 			var renderableObject = this._getWindStreamLine_overTerrain(geoCoord, magoManager, optionsThickLine);
 			return renderableObject;
 		}
@@ -719,6 +726,13 @@ WindVolume.prototype.newWindStreamLine = function (magoManager)
 
 			// now calculate geoCoord of posWC.
 			var geoCoord = ManagerUtils.pointToGeographicCoord(posWC, undefined);
+
+			// Test debug:::
+			//var randomLon = (Math.random() - 0.5)*2;
+			//var randomLat = (Math.random() - 0.5)*2;
+			//randomLon *= 0.001;
+			//randomLat *= 0.001;
+			//geoCoord.setLonLatAlt(127.65540 + randomLon, 35.31311 + randomLat, 1787.0418657544487);
 
 			var renderableObject = this._getWindStreamLine(geoCoord, magoManager, optionsThickLine);
 			return renderableObject;
@@ -1267,7 +1281,7 @@ WindVolume.prototype.renderMode3DThickLines = function (magoManager)
 
 			if (this._updatedCartographicArray.length < 1)
 			{
-				for (var i=0; i<2; i++)
+				//for (var i=0; i<2; i++)
 				{
 					this.newWindStreamLine_overTerrain(magoManager, optionsThickLine);
 				}
@@ -1279,7 +1293,6 @@ WindVolume.prototype.renderMode3DThickLines = function (magoManager)
 			{
 				updatedCartographicsCount = 2;
 			}
-
 			
 			for (var i=0; i<updatedCartographicsCount; i++)
 			{
@@ -1289,10 +1302,13 @@ WindVolume.prototype.renderMode3DThickLines = function (magoManager)
 
 				var startCartographic = updatedCartographics[0];
 				var pointsCount = updatedCartographics.length;
+				
 				for (var j=0; j<pointsCount; j++)
 				{
 					pointsLCArray[j].z = updatedCartographics[j].height + 10.0; // 10m over terrain.***
 				}
+
+				pointsLCArray.reverse();
 
 				//var geoLoc = ManagerUtils.calculateGeoLocationData(startCartographic.longitude *180/Math.PI, startCartographic.latitude *180/Math.PI, startCartographic.height + 10.0, 0, 0, 0, undefined);
 				var geoLoc = ManagerUtils.calculateGeoLocationData(startCartographic.longitude *180/Math.PI, startCartographic.latitude *180/Math.PI, 20.0, 0, 0, 0, undefined);
@@ -1933,6 +1949,7 @@ WindVolume.prototype._getTrajectoryInLocalCoordinates_overTerrain = function (st
 
 	// 1rst, find all geoCoords of the trajectorie.***
 	var cartographicArray = [];
+	options.velocitiesArray = [];
 	for (var i=0; i<numPoints; i++)
 	{
 		// Calculate texCoord (s, t). The (s, t) texCoord is used to read the windTexture.*** 
@@ -2070,9 +2087,6 @@ WindVolume.prototype._getVectorMeshFromPoints3dLCArray = function (points3dLCArr
 	};
 
 	// If exist this.colorRamp, then create colorsArray.*****************************************************************************
-	// test debug:
-	var bThereAre_R = false;
-	var bThereAre_B = false;
 	if (this.colorRamp)
 	{
 		options.colorsArray = []; // create colors array.***
@@ -2087,11 +2101,6 @@ WindVolume.prototype._getVectorMeshFromPoints3dLCArray = function (points3dLCArr
 			vel = options.velocitiesArray[i];
 			speed = vel.getModul();
 			color = this.colorRamp.getInterpolatedColor(speed);
-
-			if (speed > 22)
-			{
-				bThereAre_R = true;
-			}
 
 			options.colorsArray.push(color);
 
