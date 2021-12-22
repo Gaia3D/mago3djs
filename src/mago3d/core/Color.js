@@ -61,6 +61,17 @@ Color.prototype.deleteObjects = function()
 };
 
 /**
+ * copy of the value of RGB instance
+ * @param {Color} color
+ * 
+ * @return {Array<number>}
+ */
+Color.toArray = function(color) 
+{
+	return [color.r, color.g, color.b, color.a];
+};
+
+/**
  * Linear interpolation between colorA & colorB/
  * In the resultColorsArray, the 1rst color = colorA & the last color = colorB.
  */

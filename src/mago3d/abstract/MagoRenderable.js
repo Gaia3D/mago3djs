@@ -40,6 +40,15 @@ var MagoRenderable = function (options)
 		{
 			this.color4 = defaultValue(options.color, new Color(1, 1, 1, 1));
 			this.orgColor4 = new Color(this.color4.r, this.color4.g, this.color4.b, this.color4.a);
+
+			if (this.color4.a < 1) 
+			{
+				this.setOpaque(false);
+			}
+			else 
+			{
+				this.setOpaque(true);
+			}
 		}
 
 		if (options.wireframeColor4 && options.wireframeColor4 instanceof Color) 
@@ -652,6 +661,10 @@ MagoRenderable.prototype.setOneColor = function(r, g, b, a)
 	{
 		this.setOpaque(false);
 	}
+	else 
+	{
+		this.setOpaque(true);
+	}
 };
 /**
  * restore color
@@ -659,6 +672,14 @@ MagoRenderable.prototype.setOneColor = function(r, g, b, a)
 MagoRenderable.prototype.restoreColor = function()
 {
 	this.setOneColor(this.orgColor4.r, this.orgColor4.g, this.orgColor4.b, this.orgColor4.a);
+	if (this.orgColor4.a < 1) 
+	{
+		this.setOpaque(false);
+	}
+	else 
+	{
+		this.setOpaque(true);
+	}
 };
 /**
  * Set the unique one color of the box
@@ -679,6 +700,10 @@ MagoRenderable.prototype.setWireframeColor = function(r, g, b, a)
 	if (a < 1) 
 	{
 		this.setOpaque(false);
+	}
+	else 
+	{
+		this.setOpaque(true);
 	}
 };
 

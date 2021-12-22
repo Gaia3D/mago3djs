@@ -623,24 +623,32 @@ WeatherStation.prototype.loadWindGeoJson = function (geoJsonFilePath)
 
 	// calculate the geoJsonFileFolderPath.***
 	var geoJsonFileFolderPath = "";
-	var splitted = geoJsonFilePath.split('\\');
-	var spilttedsCount = splitted.length;
-	for (var i=0; i<spilttedsCount-1; i++)
-	{
-		var word = splitted[i];
-		if (word.length > 0)
+	try 
+	{ 
+		var urlInstance = new URL(geoJsonFilePath, self.location.href);
+		var splitted = urlInstance.pathname.split('/');
+		var spilttedsCount = splitted.length;
+		for (var i=0; i<spilttedsCount-1; i++)
 		{
-			geoJsonFileFolderPath += "\\";
-			geoJsonFileFolderPath += word;
+			var word = splitted[i];
+			if (word.length > 0)
+			{
+				geoJsonFileFolderPath += "/";
+				geoJsonFileFolderPath += word;
 
+			}
 		}
-	}
 
-	var options = {
-		geoJsonFilePath       : geoJsonFilePath,
-		geoJsonFileFolderPath : geoJsonFileFolderPath
-	};
-	var windVolume = this.newWindVolume(options);
+		var options = {
+			geoJsonFilePath       : geoJsonFilePath,
+			geoJsonFileFolderPath : geoJsonFileFolderPath
+		};
+		var windVolume = this.newWindVolume(options);
+	}
+	catch (err) 
+	{
+		throw new Error(err);
+	}
 };
 
 /**
@@ -675,24 +683,32 @@ WeatherStation.prototype.loadDustGeoJson = function(geoJsonFilePath)
 
 	// calculate the geoJsonFileFolderPath.***
 	var geoJsonFileFolderPath = "";
-	var splitted = geoJsonFilePath.split('\\');
-	var spilttedsCount = splitted.length;
-	for (var i=0; i<spilttedsCount-1; i++)
+	try 
 	{
-		var word = splitted[i];
-		if (word.length > 0)
+		var urlInstance = new URL(geoJsonFilePath, self.location.href);
+		var splitted = urlInstance.pathname.split('/');
+		var spilttedsCount = splitted.length;
+		for (var i=0; i<spilttedsCount-1; i++)
 		{
-			geoJsonFileFolderPath += "\\";
-			geoJsonFileFolderPath += word;
+			var word = splitted[i];
+			if (word.length > 0)
+			{
+				geoJsonFileFolderPath += "/";
+				geoJsonFileFolderPath += word;
 
+			}
 		}
-	}
 
-	var options = {
-		geoJsonFilePath       : geoJsonFilePath,
-		geoJsonFileFolderPath : geoJsonFileFolderPath
-	};
-	var dustVolume = this.newDustVolume(options);
+		var options = {
+			geoJsonFilePath       : geoJsonFilePath,
+			geoJsonFileFolderPath : geoJsonFileFolderPath
+		};
+		var dustVolume = this.newDustVolume(options);
+	}
+	catch (err) 
+	{
+		throw new Error(err);
+	}
 };
 
 /**

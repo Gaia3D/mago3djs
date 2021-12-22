@@ -162,34 +162,3 @@ KoreaBuildingSeed.prototype.mergeFeatureCollection = function (featureCollection
 		});
 	}
 };
-
-/**
- * Load Korea Building Master's FeatureCollection.
- * @param {object} featureCollection 한국건물 마스터 geojson
- */
-KoreaBuildingSeed.prototype.mergeFeatureCollection_original = function (featureCollection) 
-{
-	 if (!validateWithScheme(featureCollection, this._scheme)) 
-	 {
-		 throw Error("Invalid data.");
-	 }
- 
-	 var features = featureCollection.features;
-	 var renderables = [];
-	 for (var i=0, len=features.length; i<len; i++) 
-	 {
-		 renderables.push(new KoreaBuilding(features[i]));
-	 }
- 
-	 var merged = new MergedObject(this.magoManager);
- 
-	 var self = this;
-	 merged.initialize(renderables).then(function(a, b, c) 
-	 {
-		 merged.masterId = self.masterId;
- 
-		 self.magoManager.modeler.addObject(merged, 15);
-		 self.status = KoreaBuildingSeed.STATUS.LOADEND;
-	 });
-};
-

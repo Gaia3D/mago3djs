@@ -28,6 +28,53 @@ var F4dController = function(magoManager)
 F4dController.prototype = Object.create(Emitter.prototype);
 F4dController.prototype.constructor = F4dController;
 
+
+/**
+ * 
+ * @param {number} dataGroupId data group id
+ * @param {boolean} show 
+ */
+F4dController.prototype.showSmartTileGroup = function(dataGroupId, show)
+{
+	if (dataGroupId === undefined || dataGroupId === null) { return; }
+
+	dataGroupId = parseInt(dataGroupId);
+    
+	let nodeMap = this.magoManager.hierarchyManager.getNodesMap(dataGroupId);
+	let smartTilePathInfo = this.magoManager.f4dController.smartTilePathInfo;
+	for (let i in smartTilePathInfo) 
+	{
+		if (!smartTilePathInfo.hasOwnProperty(i)) { continue; }
+		
+		let smartTileInfo = smartTilePathInfo[i];
+		if (smartTileInfo.projectId === dataGroupId) 
+		{
+			smartTileInfo.attributes.isVisible = show;
+			break;
+		}
+	}
+
+	let keys = Object.keys(nodeMap);
+
+	for (let i=0; i<keys.length; i++)
+	{
+		let key =keys[i];
+		let node = nodeMap[key];
+
+		if (key === 'attributes') 
+		{
+			node.isVisible = show;
+			continue;
+		}
+
+		let nodeData = node.data;
+		if (nodeData && nodeData.attributes && nodeData.attributes.isPhysical === true)
+		{
+			nodeData.attributes.isVisible = show;
+		}
+	}
+};
+
 /**
  * f4d smarttile data group 등록
  * @param {Array<object> | object} f4dObject f4d smarttile data group

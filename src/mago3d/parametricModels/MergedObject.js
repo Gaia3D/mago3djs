@@ -162,10 +162,11 @@ MergedObject.prototype.makeMesh = function ()
 		objectsToExtrudeArray[j] = objectToExtrude; // ***
 	}
 	var guid = this._guid;
+	var color = Color.toArray(this.color4);
 	var data = {
 		guid                  : guid,
 		objectsToExtrudeArray : objectsToExtrudeArray,
-		color                 : this.color4,
+		color                 : color,
 		geoLocation           : {longitude : geoLocData.geographicCoord.longitude,
 			latitude  : geoLocData.geographicCoord.latitude,
 			altitude  : geoLocData.geographicCoord.altitude},
@@ -320,11 +321,13 @@ MergedObject.prototype.render = function (magoManager, shader, renderType, glPri
 	{
 		return;
 	}
-
-	this.color4 = master.color;
+	
+	
 
 	if (this.dirty) 
 	{ 
+		this.color4 = new Color();
+		this.color4.copyFrom(master.color);
 		this.makeMesh(magoManager); 
 	}
 

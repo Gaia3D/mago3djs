@@ -58,7 +58,11 @@ ExtrudeWorkerManager.prototype.doExtrude = function (data)
 	var objectsToExtrudeArray = data.objectsToExtrudeArray;
 	var guid = data.guid;
 	var color = data.color;
-	if (color) { color = [241/255, 231/255, 200/255, 1]; }
+	
+	if (!color) 
+	{ 
+		color = [241/255, 231/255, 200/255, 1]; 
+	}
 	var objectsCount = objectsToExtrudeArray.length;
 	var objectsToExtrudeArrayWorker = new Array(objectsCount);
 	for (var i=0; i<objectsCount; i++)
