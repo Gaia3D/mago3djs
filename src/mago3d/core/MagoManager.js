@@ -1680,12 +1680,14 @@ MagoManager.prototype.getTexturesManager = function ()
 		// Now, create the texturesMerger.***
 		this.texturesManager = new TexturesManager(this);
 		var bUseMultiRenderTarget = this.postFxShadersManager.bUseMultiRenderTarget;
-		this.texturesManager.texturesMergerFbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget: bUseMultiRenderTarget, numColorBuffers: 5}); 
+		this.texturesManager.texturesMergerFbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget: bUseMultiRenderTarget, numColorBuffers: 6}); 
 
 		this.depthTex = this.texturesManager.texturesMergerFbo.colorBuffersArray[0];
 		this.normalTex = this.texturesManager.texturesMergerFbo.colorBuffersArray[1];
 		this.albedoTex = this.texturesManager.texturesMergerFbo.colorBuffersArray[2];
 		this.selColorTex = this.texturesManager.texturesMergerFbo.colorBuffersArray[3];
+		// MagoEarthShadedColTex = this.texturesManager.texturesMergerFbo.colorBuffersArray[4];
+		this.brightColorTex = this.texturesManager.texturesMergerFbo.colorBuffersArray[5]; // For bloom effect, if exist.***
 	}
 
 	return this.texturesManager;
@@ -2100,6 +2102,25 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 	this.normalTex = this.depthFboNeo.colorBuffersArray[1];
 	this.albedoTex = this.depthFboNeo.colorBuffersArray[2];
 	this.selColorTex = this.depthFboNeo.colorBuffersArray[3];
+	// MagoEarthShadedColTex = this.depthFboNeo.colorBuffersArray[4];
+	this.brightColorTex = this.depthFboNeo.colorBuffersArray[5]; // Texture.createTexture = function(gl, filter, data, width, height, texWrap) // usualy texWrap = gl.CLAMP_TO_EDGE.***
+	// Create bloomBufferFBO if no exist.
+	if (!texturesManager.bloomBufferFBO)
+	{
+		// create a lBuffer with 2 colorTextures : diffuseLighting & specularLighting.
+		var bufferWidth = this.sceneState.drawingBufferWidth[0];
+		var bufferHeight = this.sceneState.drawingBufferHeight[0];
+		var bUseMultiRenderTarget = this.postFxShadersManager.bUseMultiRenderTarget;
+		texturesManager.bloomBufferFBO = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize   : true, 
+			multiRenderTarget : bUseMultiRenderTarget, 
+			numColorBuffers   : 2,
+			widthScale        : 0.25,
+			heightScale       : 0.25
+		}); 
+		this.brightColorTex_A = texturesManager.bloomBufferFBO.colorBuffersArray[1];
+		this.brightColorTex_B = texturesManager.bloomBufferFBO.colorBuffersArray[0];
+	}
+
 
 	var selFBO = this.getSelectionFBO();
 
@@ -2360,15 +2381,19 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		this.renderer.renderSsaoFromDepth(gl);
 
 		// Final render output.**************************************************************
-		this.renderer.renderScreenQuad(gl); // 1rst screenQuad. (ssao, lighting, shadows) // this must be rendered in a framebuffer.***
+		this.renderer.renderScreenQuad(gl); // 1rst screenQuad. (ssao, lighting, shadows) // this must be rendered in "shadedColorFbo" framebuffer.***
+
+		// Gaussian blur for the brightColorTexture (used to bloom effect).***
+		if (sceneState.applyBloomEffect)
+		{
+			this.renderer.renderScreenQuadGaussianBlur(gl);
+		}
 
 		if (this.isCesiumGlobe()) 
 		{
 			this.bindMainFramebuffer();
-			//gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.cesiumColorBuffer, 0); 
+			////gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.cesiumColorBuffer, 0); 
 		}
-
-		
 
 		this.renderer.renderScreenQuad2(gl); // 2nd screenQuad. (lightFog)
 

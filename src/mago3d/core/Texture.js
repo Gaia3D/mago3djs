@@ -180,3 +180,10 @@ Texture.createTexture = function(gl, filter, data, width, height, texWrap)
 	gl.bindTexture(gl.TEXTURE_2D, null);
 	return texture;
 };
+
+Texture._swapTextures = function (texA, texB)
+{
+	var texAux = texA.texId;
+	texA.texId = texB.texId;
+	texB.texId = texAux;
+};

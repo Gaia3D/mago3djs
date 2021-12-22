@@ -56,6 +56,7 @@ var SceneState = function(config)
 	this.applySunShadows = false;
 	this.bApplySsao = true;
 	this.applyLightsShadows = true;
+	this.applyBloomEffect = false; // default false.***
 	
 	// lighting & ssao.
 	this.ambientReflectionCoef = new Float32Array([0.5]); // 0.7.

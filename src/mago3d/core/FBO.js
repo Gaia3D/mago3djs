@@ -37,6 +37,20 @@ var FBO = function(gl, width, height, options)
 	 * @default 0
 	 */
 	this.height = new Int32Array(1);
+
+	/**
+	 * Framebuffer width scale.
+	 * @type {Number}
+	 * @default 1
+	 */
+	 this.widthScale = 1.0;
+	
+	 /**
+	  * Framebuffer height scale.
+	  * @type {Number}
+	  * @default 1
+	  */
+	 this.heightScale = 1.0;
 	
 	/**
 	 * WebGL Framebuffer.
@@ -108,6 +122,16 @@ var FBO = function(gl, width, height, options)
 		}, false);
 	}
 
+	if (options.widthScale !== undefined)
+	{
+		this.widthScale = options.widthScale;
+	}
+
+	if (options.heightScale !== undefined)
+	{
+		this.heightScale = options.heightScale;
+	}
+
 	if (this.multiRenderTarget)
 	{
 		this.initMRT();
@@ -116,7 +140,17 @@ var FBO = function(gl, width, height, options)
 	{
 		this.init();
 	}
-};   
+};  
+
+FBO.prototype.getWidth = function() 
+{
+	return Math.floor(this.width[0] * this.widthScale);
+};
+
+FBO.prototype.getHeight = function() 
+{
+	return Math.floor(this.height[0] * this.heightScale);
+};
 
 FBO.prototype.init = function() 
 {
@@ -136,11 +170,11 @@ FBO.prototype.init = function()
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); //LINEAR_MIPMAP_LINEAR
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.width[0], this.height[0], 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.getWidth(), this.getHeight(), 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
 	
 		gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo);
 		gl.bindRenderbuffer(gl.RENDERBUFFER, this.depthBuffer);
-		gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, this.width[0], this.height[0]);
+		gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, this.getWidth(), this.getHeight());
 		gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.depthBuffer);
 
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, colorBuffer, 0);
@@ -181,11 +215,11 @@ FBO.prototype.init_original = function()
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); //LINEAR_MIPMAP_LINEAR
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.width[0], this.height[0], 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.getWidth(), this.getHeight(), 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
 	
 		gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo);
 		gl.bindRenderbuffer(gl.RENDERBUFFER, this.depthBuffer);
-		gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, this.width[0], this.height[0]);
+		gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, this.getWidth(), this.getHeight());
 		gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.depthBuffer);
 	
 		var colorBuffer = this.colorBuffersArray[i];
@@ -220,7 +254,7 @@ FBO.prototype.initMRT = function()
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); //LINEAR_MIPMAP_LINEAR
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.width[0], this.height[0], 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.getWidth(), this.getHeight(), 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
 		this.colorBuffersArray.push(colorBuffer);
 	}
 
@@ -231,7 +265,7 @@ FBO.prototype.initMRT = function()
   
 	gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo);
 	gl.bindRenderbuffer(gl.RENDERBUFFER, this.depthBuffer);
-	gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, this.width[0], this.height[0]);
+	gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, this.getWidth(), this.getHeight());
 	gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.depthBuffer);
 
 	for (var i=0; i<this.numColorBuffers; i++)
@@ -266,11 +300,11 @@ FBO.prototype.setColorBuffer = function(colorBuffer)
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); //LINEAR_MIPMAP_LINEAR
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.width[0], this.height[0], 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.getWidth(), this.getHeight(), 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
   
 	gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo);
 	gl.bindRenderbuffer(gl.RENDERBUFFER, this.depthBuffer);
-	gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, this.width[0], this.height[0]);
+	gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, this.getWidth(), this.getHeight());
 	gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.depthBuffer);
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, colorBuffer, 0);
 	if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) 
@@ -290,7 +324,7 @@ FBO.prototype.bind = function()
 	gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.fbo);
 
 	//gl.bindRenderbuffer(gl.RENDERBUFFER, this.depthBuffer);
-	//gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, this.width[0], this.height[0]);
+	//gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, this.getWidth(), this.getHeight());
 	//gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.depthBuffer);
 };
 
@@ -392,19 +426,10 @@ FBO.bindTexture = function(gl, texture, unit)
 	gl.bindTexture(gl.TEXTURE_2D, texture);
 };
 
-FBO.prototype.getWidth = function()
-{
-	return this.width;
-};
-
-FBO.prototype.getHeight = function()
-{
-	return this.height;
-};
 
 FBO.prototype.getAspectRatio = function()
 {
-	return this.width / this.height;
+	return this.getWidth() / this.getHeight();
 };
 
 

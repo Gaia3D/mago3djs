@@ -2,6 +2,11 @@
     precision highp float;
 #endif
 
+#define %USE_MULTI_RENDER_TARGET%
+#ifdef USE_MULTI_RENDER_TARGET
+#extension GL_EXT_draw_buffers : require
+#endif
+
 #define M_PI 3.1415926535897932384626433832795
 
 uniform sampler2D depthTex; // 0
@@ -428,7 +433,7 @@ void main()
 					//if(backgroundDepthCount > 0 && objectDepthCount > 0)
 					//{
 						// is silhouette.
-						//gl_FragColor = vec4(0.2, 1.0, 0.3, 1.0);
+						//gl_FragData[0] = vec4(0.2, 1.0, 0.3, 1.0);
 						//return;
 					//}
 					
@@ -439,7 +444,7 @@ void main()
 			{
 				// is silhouette.
 				float countsDif = abs(float(objectDepthCount)/16.0);
-				gl_FragColor = vec4(0.2, 1.0, 0.3, countsDif);
+				gl_FragData[0] = vec4(0.2, 1.0, 0.3, countsDif);
 				return;
 			}
 		}
@@ -568,6 +573,8 @@ void main()
 		// This is terrain. provisionally do nothing.
 		//albedo *= vec4(lightWeighting, 1.0);
 	}
+
+	finalColor = albedo;
 	
 	if(bApplySsao)
 	{
@@ -615,11 +622,11 @@ void main()
 			occlInv = 1.0;
 		}
 
-		vec4 finalColor = vec4(albedo.r * occlInv * diffuseLight3.x, 
+		finalColor = vec4(albedo.r * occlInv * diffuseLight3.x, 
 							albedo.g * occlInv * diffuseLight3.y, 
 							albedo.b * occlInv * diffuseLight3.z, albedo.a);
 
-		gl_FragColor = finalColor;
+		gl_FragData[0] = finalColor;
 
 		// fog.*****************************************************************
 		//float myLinearDepth2 = getDepth(screenPos);
@@ -627,7 +634,7 @@ void main()
 		//if(myDepth > 1.0)
 		//myDepth = 1.0;
 		//vec4 finalColor2 = mix(finalColor, vec4(1.0, 1.0, 1.0, 1.0), myDepth);
-		//gl_FragColor = vec4(finalColor2);
+		//gl_FragData[0] = vec4(finalColor2);
 		// End fog.---------------------------------------------------------------
 
 		//float finalColorLightLevel = finalColor.r + finalColor.g + finalColor.b;
@@ -667,7 +674,7 @@ void main()
 				if(isTransparentObject)
 					edgeColor *= 1.5;
 
-				gl_FragColor = vec4(edgeColor.rgb, 1.0);
+				gl_FragData[0] = vec4(edgeColor.rgb, 1.0);
 				
 			}
 
@@ -742,55 +749,19 @@ void main()
 			vec4 finalColorPC = vec4(albedo.rgb * shade, albedo.a);
 			//finalColorPC = vec4(1.0, 0.0, 0.0, albedo.a);
 
-			gl_FragColor = finalColorPC;
+			gl_FragData[0] = finalColorPC;
 
-			/*
-			float radius = 3.0;
-			float occ = 0.0;
-			for(int i=0; i<3; i++)
-			{
-				for(int j=0; j<3; j++)
-				{
-					vec2 texCoord = vec2(screenPos.x + pixelSize_x*float(i-1), screenPos.y + pixelSize_y*float(j-1));
-
-					// calculate current frustum idx.
-					vec4 normal4 = getNormal(texCoord);
-					int estimatedFrustumIdx = int(floor(normal4.w * 100.0));
-					int dataType = -1;// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.
-					int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);
-
-					if(dataType == 1)
-					continue;
-
-					vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);
-					float currNear = nearFar.x;
-					float currFar = nearFar.y;
-					float linearDepth = getDepth(texCoord);
-					float depth = linearDepth * currFar;
-					if(depth > myDepth + radius)
-					{
-						occ += 1.0;
-					}
-				}
-			}
-
-			if(occ > 0.0)
-			{
-				float alpha = occ/8.0;
-				float distLimit = 150.0;
-				if(myDepth < distLimit)
-				{
-					alpha = smoothstep(1.0, 0.0, myDepth/distLimit);
-				}
-				else{
-					alpha = 0.0;
-				}
-
-				gl_FragColor = vec4(1.0, 1.0, 1.0, alpha);
-				return;
-			}
-			*/
 		}
 		
 	}
+
+	// Finally check for brightColor (for bloom effect, if exist).***
+	float brightness = dot(finalColor.rgb, vec3(0.2126, 0.7152, 0.0722));
+	vec4 brightColor;
+    //if(brightness > 1.0)
+	if(brightness > 1.0)
+        brightColor = vec4(finalColor.rgb, 1.0);
+    else
+        brightColor = vec4(0.0, 0.0, 0.0, 1.0);
+	gl_FragData[1] = brightColor;
 }

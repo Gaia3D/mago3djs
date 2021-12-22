@@ -215,6 +215,7 @@ PostFxShadersManager.prototype._createShader_screenQuad = function()
 	var shaderName = "screenQuad";
 	var ssao_vs_source = ShaderSource.ScreenQuadVS;
 	var ssao_fs_source = ShaderSource.ScreenQuadFS;
+	ssao_fs_source = ssao_fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
 	var shader = this.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this.magoManager);
 	shader.ssaoTex_loc = gl.getUniformLocation(shader.program, "ssaoTex");
 	shader.normalTex_loc = gl.getUniformLocation(shader.program, "normalTex");
@@ -284,6 +285,7 @@ PostFxShadersManager.prototype._createShader_screenQuad2 = function()
 	shader.normalTex_loc = gl.getUniformLocation(shader.program, "normalTex");
 	shader.lightFogTex_loc = gl.getUniformLocation(shader.program, "lightFogTex");//
 	shader.shadedColorTex_loc = gl.getUniformLocation(shader.program, "shadedColorTex");//
+	shader.brightColorTex_loc = gl.getUniformLocation(shader.program, "brightColorTex");//
 	shader.screenSpaceObjectsTex_loc = gl.getUniformLocation(shader.program, "screenSpaceObjectsTex");
 	shader.uAmbientLight_loc = gl.getUniformLocation(shader.program, "uAmbientLight");
 	this.useProgram(shader);
@@ -292,12 +294,35 @@ PostFxShadersManager.prototype._createShader_screenQuad2 = function()
 	gl.uniform1i(shader.lightFogTex_loc, 2);
 	gl.uniform1i(shader.screenSpaceObjectsTex_loc, 3);
 	gl.uniform1i(shader.shadedColorTex_loc, 4);
+	gl.uniform1i(shader.brightColorTex_loc, 5);
 
 	shader.uNearFarArray_loc = gl.getUniformLocation(shader.program, "uNearFarArray");
 	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");
 	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
 	shader.uSceneDayNightLightingFactor_loc = gl.getUniformLocation(shader.program, "uSceneDayNightLightingFactor");
 	shader.u_activeTex_loc = gl.getUniformLocation(shader.program, "u_activeTex");
+
+	this.shadersMap[shaderName] = shader;
+	return shader;
+};
+
+PostFxShadersManager.prototype._createShader_gaussianBlur = function() 
+{
+	var use_linearOrLogarithmicDepth = this._get_useLinearOrLogarithmicDepth_string();
+	var use_multi_render_target = this._get_useMultiRenderTarget_string();
+	var gl = this.gl;
+
+	var shaderName = "gaussianBlur";
+	var ssao_vs_source = ShaderSource.ScreenQuadVS;
+	var ssao_fs_source = ShaderSource.ScreenQuadGaussianBlurFS;
+	var shader = this.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this.magoManager);
+	shader.u_bHorizontal_loc = gl.getUniformLocation(shader.program, "u_bHorizontal");
+	shader.screenWidth_loc = gl.getUniformLocation(shader.program, "screenWidth");
+	shader.screenHeight_loc = gl.getUniformLocation(shader.program, "screenHeight");
+	shader.uImageSize_loc = gl.getUniformLocation(shader.program, "uImageSize");
+	shader.imageTex_loc = gl.getUniformLocation(shader.program, "image");
+	this.useProgram(shader);
+	gl.uniform1i(shader.imageTex_loc, 0);
 
 	this.shadersMap[shaderName] = shader;
 	return shader;
@@ -1009,6 +1034,9 @@ PostFxShadersManager.prototype._createShaderByName = function (shaderName)
 		break;
 	case "textureCopy":
 		this._createShader_copyTexture();
+		break;
+	case "gaussianBlur":
+		this._createShader_gaussianBlur();
 		break;
 	}
 

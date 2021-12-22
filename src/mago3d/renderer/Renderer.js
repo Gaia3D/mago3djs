@@ -1247,12 +1247,8 @@ Renderer.prototype.renderSilhouette = function ()
 	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); // Original.***
 	//gl.cullFace(gl.FRONT);
 
-	if (this.screenQuad === undefined)
-	{
-		this.screenQuad = new ScreenQuad(magoManager.vboMemoryManager);
-	}
-	
-	this.screenQuad.render(magoManager, currentShader);
+	var screenQuad = this.getScreenQuad();
+	screenQuad.render(magoManager, currentShader);
 
 	// Restore settings.***
 	gl.colorMask(true, true, true, true);
@@ -1295,6 +1291,23 @@ Renderer.prototype.renderScreenQuad = function (gl)
 
 	// bind ssaoFromDepthBuffer.***
 	shadedColorFbo.bind(); 
+
+	// If exist bloom, then bind the brightColotTex.***
+	//var texturesManager = magoManager.getTexturesManager();
+	//magoManager.brightColorTex_A = texturesManager.bloomBufferFBO.colorBuffersArray[1];
+	//magoManager.brightColorTex_B = texturesManager.bloomBufferFBO.colorBuffersArray[0];
+	var extbuffers = magoManager.extbuffers;
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, magoManager.brightColorTex, 0);
+
+	// Attach the brightColorBuffer.***
+	extbuffers.drawBuffersWEBGL([
+		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
+		extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - brightColorBuffer
+		extbuffers.NONE, // gl_FragData[2] - 
+		extbuffers.NONE, // gl_FragData[3] - 
+		extbuffers.NONE // gl_FragData[4] - 
+	]);
+
 
 	//if (magoManager.isFarestFrustum())
 	{
@@ -1457,18 +1470,23 @@ Renderer.prototype.renderScreenQuad = function (gl)
 	//gl.disable(gl.BLEND);
 	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); // Original.***
 
-	if (this.screenQuad === undefined)
-	{
-		this.screenQuad = new ScreenQuad(magoManager.vboMemoryManager);
-	}
-	
-	this.screenQuad.render(magoManager, currentShader);
+	var screenQuad = this.getScreenQuad();
+	screenQuad.render(magoManager, currentShader);
 
 	// Restore settings.***
 	gl.depthMask(true);
 	gl.disable(gl.BLEND);
 	gl.enable(gl.DEPTH_TEST);
 	//gl.enable(gl.POLYGON_OFFSET_FILL);
+
+	//gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0);
+	//extbuffers.drawBuffersWEBGL([
+	//	extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
+	//	extbuffers.NONE, // gl_FragData[1] - brightColorBuffer
+	//	extbuffers.NONE, // gl_FragData[2] - 
+	//	extbuffers.NONE, // gl_FragData[3] - 
+	//	extbuffers.NONE // gl_FragData[4] - 
+	//]);
 
 	shadedColorFbo.unbind(); 
 	
@@ -1607,8 +1625,19 @@ Renderer.prototype.renderScreenQuad2 = function (gl)
 	}
 
 	var shadedColorFbo = magoManager.shadedColorFbo;
-	gl.activeTexture(gl.TEXTURE4); // ssaoTex.***
+	gl.activeTexture(gl.TEXTURE4); // shadedTex.***
 	gl.bindTexture(gl.TEXTURE_2D, shadedColorFbo.colorBuffer);
+
+	// Now, the brightColorTex.***
+	gl.activeTexture(gl.TEXTURE5); // shadedTex.***
+	if (sceneState.applyBloomEffect && magoManager.brightColorTex_A)
+	{
+		gl.bindTexture(gl.TEXTURE_2D, magoManager.brightColorTex_A);
+	}
+	else
+	{
+		gl.bindTexture(gl.TEXTURE_2D, null);
+	}
 
 	gl.uniform1iv(currentShader.u_activeTex_loc, [bLightFogTex, bScreenSpaceObjectsTex, 0, 0, 0, 0, 0, 0]);
 
@@ -1626,12 +1655,8 @@ Renderer.prototype.renderScreenQuad2 = function (gl)
 	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); // Original.***
 	gl.enable(gl.CULL_FACE);
 
-	if (this.screenQuad === undefined) 
-	{
-		this.screenQuad = new ScreenQuad(magoManager.vboMemoryManager);
-	}
-	
-	this.screenQuad.render(magoManager, currentShader);
+	var screenQuad = this.getScreenQuad();
+	screenQuad.render(magoManager, currentShader);
 
 	// Restore settings.***
 	gl.depthMask(true);
@@ -1645,6 +1670,107 @@ Renderer.prototype.renderScreenQuad2 = function (gl)
 	//	gl.bindTexture(gl.TEXTURE_2D, null);
 	//}
 	
+};
+
+Renderer.prototype.getScreenQuad = function () 
+{
+	if (this.screenQuad === undefined) 
+	{
+		this.screenQuad = new ScreenQuad(this.magoManager.vboMemoryManager);
+	}
+
+	return this.screenQuad;
+};
+
+/**
+ * This function renders the gaussian blur for the brightColorBuffer
+ * @param {WebGLRenderingContext} gl WebGL Rendering Context.
+ */
+Renderer.prototype.renderScreenQuadGaussianBlur = function (gl) 
+{
+	// This function makes the bloom effect texture (glow effect).***
+	// We are using a quadScreen.***
+	var currentShader;
+	var magoManager = this.magoManager;
+	var texturesManager = magoManager.getTexturesManager();
+	var sceneState = magoManager.sceneState;
+	var camera = sceneState.camera;
+	var bufferWidth = sceneState.drawingBufferWidth[0];
+	var bufferHeight = sceneState.drawingBufferHeight[0];
+
+	magoManager.brightColorTex_A = texturesManager.bloomBufferFBO.colorBuffersArray[1];
+	magoManager.brightColorTex_B = texturesManager.bloomBufferFBO.colorBuffersArray[0];
+
+	var tex_A = magoManager.brightColorTex_A; // reduced size texture.***
+	var tex_B = magoManager.brightColorTex_B; // reduced size texture.***
+	var brightColorTex = magoManager.brightColorTex; // screen size texture.***
+
+	var postFxShadersManager = magoManager.postFxShadersManager;
+	currentShader = postFxShadersManager.getShader("gaussianBlur"); 
+	postFxShadersManager.useProgram(currentShader);
+	currentShader.bindUniformGenerals();
+
+	var bloomBufferFBO = texturesManager.bloomBufferFBO;
+
+	// bind ssaoFromDepthBuffer.***
+	bloomBufferFBO.bind(); 
+
+	var extbuffers = magoManager.extbuffers;
+	extbuffers.drawBuffersWEBGL([
+		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
+		extbuffers.NONE, // gl_FragData[1] - depthTex
+		extbuffers.NONE, // gl_FragData[2] - normalTex
+		extbuffers.NONE, // gl_FragData[3] - albedoTex
+		extbuffers.NONE // gl_FragData[4] - selColor4
+	]);
+	
+	gl.disable(gl.DEPTH_TEST);
+
+	var screenQuad = this.getScreenQuad();
+
+	gl.activeTexture(gl.TEXTURE0);
+
+	var iterationsCount = 10;
+	var bHorizontal = true;
+	var imageWidth = bloomBufferFBO.getWidth();
+	var imageHeight = bloomBufferFBO.getHeight();
+
+	gl.uniform2fv(currentShader.uImageSize_loc, new Float32Array([imageWidth, imageHeight]));
+	for (var i=0; i<iterationsCount; i++)
+	{
+		// Set texture output.***
+		gl.uniform1i(currentShader.u_bHorizontal_loc, bHorizontal);
+		if (i === 0)
+		{
+			gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, tex_A, 0); 
+			gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); 
+			gl.bindTexture(gl.TEXTURE_2D, brightColorTex); 
+		}
+		else
+		{
+			if (bHorizontal)
+			{
+				gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, tex_A, 0); 
+				gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); 
+				gl.bindTexture(gl.TEXTURE_2D, tex_B);  
+			}
+			else
+			{
+				gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, tex_B, 0); 
+				gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); 
+				gl.bindTexture(gl.TEXTURE_2D, tex_A);  
+			}
+		}
+		
+		
+		screenQuad.render(magoManager, currentShader);
+
+		bHorizontal = !bHorizontal;
+	}
+	
+	gl.enable(gl.DEPTH_TEST);
+	//gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, null, 0); 
+	bloomBufferFBO.unbind();
 };
 
 /**
@@ -1715,17 +1841,11 @@ Renderer.prototype.renderSsaoFromDepth = function(gl)
 	gl.bindTexture(gl.TEXTURE_2D, noiseTexture);
 	gl.activeTexture(gl.TEXTURE3);
 	gl.bindTexture(gl.TEXTURE_2D, normalTex);
-	
-
-	if (this.screenQuad === undefined)
-	{
-		this.screenQuad = new ScreenQuad(magoManager.vboMemoryManager);
-	}
 
 	gl.depthMask(false);
 	gl.disable(gl.DEPTH_TEST);
-	
-	this.screenQuad.render(magoManager, currentShader);
+	var screenQuad = this.getScreenQuad();
+	screenQuad.render(magoManager, currentShader);
 
 	// unbind the ssaoFromDepthBuffer.***
 	ssaoFromDepthFbo.unbind(); 
@@ -1767,11 +1887,6 @@ Renderer.prototype.copyTexture = function (webGlTextureOriginal, webGlTextureDes
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, webGlTextureOriginal);  // cesium globeDepthTexture.***
 
-	if (this.screenQuad === undefined)
-	{
-		this.screenQuad = new ScreenQuad(magoManager.vboMemoryManager);
-	}
-
 	// we are in ORT (one rendering target).*********************************************************************************
 	magoManager.texturesManager.texturesMergerFbo.bind();
 
@@ -1805,7 +1920,8 @@ Renderer.prototype.copyTexture = function (webGlTextureOriginal, webGlTextureDes
 	gl.depthMask(false);
 
 	// Now render.***
-	this.screenQuad.render(magoManager, currentShader);
+	var screenQuad = this.getScreenQuad();
+	screenQuad.render(magoManager, currentShader);
 
 	gl.enable(gl.DEPTH_TEST);
 	gl.depthMask(true);
@@ -1820,8 +1936,14 @@ Renderer.prototype.copyTexture = function (webGlTextureOriginal, webGlTextureDes
  */
 Renderer.prototype.renderTerrainCopy = function () 
 {
-	var currentShader;
 	var magoManager = this.magoManager;
+	if (!magoManager.depthTex || !magoManager.normalTex)
+	{
+		return;
+	}
+
+	var currentShader;
+	
 	var sceneState = magoManager.sceneState;
 	var gl = magoManager.getGl();
 
@@ -1851,11 +1973,7 @@ Renderer.prototype.renderTerrainCopy = function ()
 	gl.activeTexture(gl.TEXTURE2);
 	gl.bindTexture(gl.TEXTURE_2D, magoManager.cesiumColorBuffer); 
 	
-
-	if (this.screenQuad === undefined)
-	{
-		this.screenQuad = new ScreenQuad(magoManager.vboMemoryManager);
-	}
+	var screenQuad = this.getScreenQuad();
 
 	if (magoManager.isCameraMoved || magoManager.bPicking)
 	{
@@ -1910,7 +2028,7 @@ Renderer.prototype.renderTerrainCopy = function ()
 		// End binding frameBuffer.----------------------------------------------------------------------------
 
 		// Now render.***
-		this.screenQuad.render(magoManager, currentShader);
+		screenQuad.render(magoManager, currentShader);
 	}
 	else
 	{
@@ -1956,7 +2074,7 @@ Renderer.prototype.renderTerrainCopy = function ()
 			}
 
 			// Now render.***
-			this.screenQuad.render(magoManager, currentShader);
+			screenQuad.render(magoManager, currentShader);
 		}
 	}
 
@@ -2087,7 +2205,10 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 		//texture = magoManager.cesiumColorBuffer;
 	}
 
-	
+	if (magoManager.brightColorTex_A)
+	{
+		texture = magoManager.brightColorTex_A;
+	}
 	var depthFboNeo = magoManager.depthFboNeo;
 	if (depthFboNeo.colorBuffer)
 	{
@@ -2175,7 +2296,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 				var depthTex = windVolumeFrontFBO.colorBuffersArray[1]; // [1] = depth, [2] = normal
 				if (depthTex)
 				{
-					texture = depthTex;
+					//texture = depthTex;
 				}
 			}
 			

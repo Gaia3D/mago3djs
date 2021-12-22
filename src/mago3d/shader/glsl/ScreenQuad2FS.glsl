@@ -9,6 +9,7 @@ uniform sampler2D normalTex; // 1
 uniform sampler2D lightFogTex; // 2
 uniform sampler2D screenSpaceObjectsTex; // 3
 uniform sampler2D shadedColorTex; // 4
+uniform sampler2D brightColorTex; // 5
 
 uniform float near;
 uniform float far; 
@@ -35,6 +36,8 @@ uniform bool u_activeTex[8];
 #ifndef FXAA_SPAN_MAX
     #define FXAA_SPAN_MAX     8.0
 #endif
+
+// Tutorial for bloom effect : https://learnopengl.com/Advanced-Lighting/Bloom
 
 
 float unpackDepth(vec4 packedDepth)
@@ -369,6 +372,43 @@ void main()
 		shadedColor = colorFxaa;
 		//---------------------------------------------------------------------------------------------------------------
 	}
+
+    // Do bloom effect if exist.************************************
+    // https://www.nutty.ca/?page_id=352&link=glow
+    int BlendMode = 1;
+    vec4 brightColor = texture2D(brightColorTex, screenPos);
+    vec4 src = vec4(brightColor.rgba);
+    vec4 dst = vec4(shadedColor.rgba);
+    if ( BlendMode == 0 )
+	{
+		// Additive blending (strong result, high overexposure)
+		shadedColor = min(src + dst, 1.0);
+	}
+	else if ( BlendMode == 1 )
+	{
+		// Screen blending (mild result, medium overexposure)
+		shadedColor = clamp((src + dst) - (src * dst), 0.0, 1.0);
+		shadedColor.w = 1.0;
+	}
+	else if ( BlendMode == 2 )
+	{
+		// Softlight blending (light result, no overexposure)
+		// Due to the nature of soft lighting, we need to bump the black region of the glowmap
+		// to 0.5, otherwise the blended result will be dark (black soft lighting will darken
+		// the image).
+		src = (src * 0.5) + 0.5;
+		
+		shadedColor.xyz = vec3((src.x <= 0.5) ? (dst.x - (1.0 - 2.0 * src.x) * dst.x * (1.0 - dst.x)) : (((src.x > 0.5) && (dst.x <= 0.25)) ? (dst.x + (2.0 * src.x - 1.0) * (4.0 * dst.x * (4.0 * dst.x + 1.0) * (dst.x - 1.0) + 7.0 * dst.x)) : (dst.x + (2.0 * src.x - 1.0) * (sqrt(dst.x) - dst.x))),
+					(src.y <= 0.5) ? (dst.y - (1.0 - 2.0 * src.y) * dst.y * (1.0 - dst.y)) : (((src.y > 0.5) && (dst.y <= 0.25)) ? (dst.y + (2.0 * src.y - 1.0) * (4.0 * dst.y * (4.0 * dst.y + 1.0) * (dst.y - 1.0) + 7.0 * dst.y)) : (dst.y + (2.0 * src.y - 1.0) * (sqrt(dst.y) - dst.y))),
+					(src.z <= 0.5) ? (dst.z - (1.0 - 2.0 * src.z) * dst.z * (1.0 - dst.z)) : (((src.z > 0.5) && (dst.z <= 0.25)) ? (dst.z + (2.0 * src.z - 1.0) * (4.0 * dst.z * (4.0 * dst.z + 1.0) * (dst.z - 1.0) + 7.0 * dst.z)) : (dst.z + (2.0 * src.z - 1.0) * (sqrt(dst.z) - dst.z))));
+		shadedColor.w = 1.0;
+	}
+	else
+	{
+		// Show just the glow map
+		shadedColor = src;
+	}
+    // End bloom effect.--------------------------------------------
 
     vec4 finalColor = shadedColor;
 

@@ -6048,6 +6048,7 @@ uniform sampler2D normalTex; // 1\n\
 uniform sampler2D lightFogTex; // 2\n\
 uniform sampler2D screenSpaceObjectsTex; // 3\n\
 uniform sampler2D shadedColorTex; // 4\n\
+uniform sampler2D brightColorTex; // 5\n\
 \n\
 uniform float near;\n\
 uniform float far; \n\
@@ -6074,6 +6075,8 @@ uniform bool u_activeTex[8];\n\
 #ifndef FXAA_SPAN_MAX\n\
     #define FXAA_SPAN_MAX     8.0\n\
 #endif\n\
+\n\
+// Tutorial for bloom effect : https://learnopengl.com/Advanced-Lighting/Bloom\n\
 \n\
 \n\
 float unpackDepth(vec4 packedDepth)\n\
@@ -6409,6 +6412,43 @@ void main()\n\
 		//---------------------------------------------------------------------------------------------------------------\n\
 	}\n\
 \n\
+    // Do bloom effect if exist.************************************\n\
+    // https://www.nutty.ca/?page_id=352&link=glow\n\
+    int BlendMode = 1;\n\
+    vec4 brightColor = texture2D(brightColorTex, screenPos);\n\
+    vec4 src = vec4(brightColor.rgba);\n\
+    vec4 dst = vec4(shadedColor.rgba);\n\
+    if ( BlendMode == 0 )\n\
+	{\n\
+		// Additive blending (strong result, high overexposure)\n\
+		shadedColor = min(src + dst, 1.0);\n\
+	}\n\
+	else if ( BlendMode == 1 )\n\
+	{\n\
+		// Screen blending (mild result, medium overexposure)\n\
+		shadedColor = clamp((src + dst) - (src * dst), 0.0, 1.0);\n\
+		shadedColor.w = 1.0;\n\
+	}\n\
+	else if ( BlendMode == 2 )\n\
+	{\n\
+		// Softlight blending (light result, no overexposure)\n\
+		// Due to the nature of soft lighting, we need to bump the black region of the glowmap\n\
+		// to 0.5, otherwise the blended result will be dark (black soft lighting will darken\n\
+		// the image).\n\
+		src = (src * 0.5) + 0.5;\n\
+		\n\
+		shadedColor.xyz = vec3((src.x <= 0.5) ? (dst.x - (1.0 - 2.0 * src.x) * dst.x * (1.0 - dst.x)) : (((src.x > 0.5) && (dst.x <= 0.25)) ? (dst.x + (2.0 * src.x - 1.0) * (4.0 * dst.x * (4.0 * dst.x + 1.0) * (dst.x - 1.0) + 7.0 * dst.x)) : (dst.x + (2.0 * src.x - 1.0) * (sqrt(dst.x) - dst.x))),\n\
+					(src.y <= 0.5) ? (dst.y - (1.0 - 2.0 * src.y) * dst.y * (1.0 - dst.y)) : (((src.y > 0.5) && (dst.y <= 0.25)) ? (dst.y + (2.0 * src.y - 1.0) * (4.0 * dst.y * (4.0 * dst.y + 1.0) * (dst.y - 1.0) + 7.0 * dst.y)) : (dst.y + (2.0 * src.y - 1.0) * (sqrt(dst.y) - dst.y))),\n\
+					(src.z <= 0.5) ? (dst.z - (1.0 - 2.0 * src.z) * dst.z * (1.0 - dst.z)) : (((src.z > 0.5) && (dst.z <= 0.25)) ? (dst.z + (2.0 * src.z - 1.0) * (4.0 * dst.z * (4.0 * dst.z + 1.0) * (dst.z - 1.0) + 7.0 * dst.z)) : (dst.z + (2.0 * src.z - 1.0) * (sqrt(dst.z) - dst.z))));\n\
+		shadedColor.w = 1.0;\n\
+	}\n\
+	else\n\
+	{\n\
+		// Show just the glow map\n\
+		shadedColor = src;\n\
+	}\n\
+    // End bloom effect.--------------------------------------------\n\
+\n\
     vec4 finalColor = shadedColor;\n\
 \n\
     // Check for light fog.\n\
@@ -6425,6 +6465,11 @@ void main()\n\
 }";
 ShaderSource.ScreenQuadFS = "#ifdef GL_ES\n\
     precision highp float;\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
 #endif\n\
 \n\
 #define M_PI 3.1415926535897932384626433832795\n\
@@ -6853,7 +6898,7 @@ void main()\n\
 					//if(backgroundDepthCount > 0 && objectDepthCount > 0)\n\
 					//{\n\
 						// is silhouette.\n\
-						//gl_FragColor = vec4(0.2, 1.0, 0.3, 1.0);\n\
+						//gl_FragData[0] = vec4(0.2, 1.0, 0.3, 1.0);\n\
 						//return;\n\
 					//}\n\
 					\n\
@@ -6864,7 +6909,7 @@ void main()\n\
 			{\n\
 				// is silhouette.\n\
 				float countsDif = abs(float(objectDepthCount)/16.0);\n\
-				gl_FragColor = vec4(0.2, 1.0, 0.3, countsDif);\n\
+				gl_FragData[0] = vec4(0.2, 1.0, 0.3, countsDif);\n\
 				return;\n\
 			}\n\
 		}\n\
@@ -6993,6 +7038,8 @@ void main()\n\
 		// This is terrain. provisionally do nothing.\n\
 		//albedo *= vec4(lightWeighting, 1.0);\n\
 	}\n\
+\n\
+	finalColor = albedo;\n\
 	\n\
 	if(bApplySsao)\n\
 	{\n\
@@ -7040,11 +7087,11 @@ void main()\n\
 			occlInv = 1.0;\n\
 		}\n\
 \n\
-		vec4 finalColor = vec4(albedo.r * occlInv * diffuseLight3.x, \n\
+		finalColor = vec4(albedo.r * occlInv * diffuseLight3.x, \n\
 							albedo.g * occlInv * diffuseLight3.y, \n\
 							albedo.b * occlInv * diffuseLight3.z, albedo.a);\n\
 \n\
-		gl_FragColor = finalColor;\n\
+		gl_FragData[0] = finalColor;\n\
 \n\
 		// fog.*****************************************************************\n\
 		//float myLinearDepth2 = getDepth(screenPos);\n\
@@ -7052,7 +7099,7 @@ void main()\n\
 		//if(myDepth > 1.0)\n\
 		//myDepth = 1.0;\n\
 		//vec4 finalColor2 = mix(finalColor, vec4(1.0, 1.0, 1.0, 1.0), myDepth);\n\
-		//gl_FragColor = vec4(finalColor2);\n\
+		//gl_FragData[0] = vec4(finalColor2);\n\
 		// End fog.---------------------------------------------------------------\n\
 \n\
 		//float finalColorLightLevel = finalColor.r + finalColor.g + finalColor.b;\n\
@@ -7092,7 +7139,7 @@ void main()\n\
 				if(isTransparentObject)\n\
 					edgeColor *= 1.5;\n\
 \n\
-				gl_FragColor = vec4(edgeColor.rgb, 1.0);\n\
+				gl_FragData[0] = vec4(edgeColor.rgb, 1.0);\n\
 				\n\
 			}\n\
 \n\
@@ -7167,66 +7214,84 @@ void main()\n\
 			vec4 finalColorPC = vec4(albedo.rgb * shade, albedo.a);\n\
 			//finalColorPC = vec4(1.0, 0.0, 0.0, albedo.a);\n\
 \n\
-			gl_FragColor = finalColorPC;\n\
+			gl_FragData[0] = finalColorPC;\n\
 \n\
-			/*\n\
-			float radius = 3.0;\n\
-			float occ = 0.0;\n\
-			for(int i=0; i<3; i++)\n\
-			{\n\
-				for(int j=0; j<3; j++)\n\
-				{\n\
-					vec2 texCoord = vec2(screenPos.x + pixelSize_x*float(i-1), screenPos.y + pixelSize_y*float(j-1));\n\
-\n\
-					// calculate current frustum idx.\n\
-					vec4 normal4 = getNormal(texCoord);\n\
-					int estimatedFrustumIdx = int(floor(normal4.w * 100.0));\n\
-					int dataType = -1;// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.\n\
-					int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);\n\
-\n\
-					if(dataType == 1)\n\
-					continue;\n\
-\n\
-					vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);\n\
-					float currNear = nearFar.x;\n\
-					float currFar = nearFar.y;\n\
-					float linearDepth = getDepth(texCoord);\n\
-					float depth = linearDepth * currFar;\n\
-					if(depth > myDepth + radius)\n\
-					{\n\
-						occ += 1.0;\n\
-					}\n\
-				}\n\
-			}\n\
-\n\
-			if(occ > 0.0)\n\
-			{\n\
-				float alpha = occ/8.0;\n\
-				float distLimit = 150.0;\n\
-				if(myDepth < distLimit)\n\
-				{\n\
-					alpha = smoothstep(1.0, 0.0, myDepth/distLimit);\n\
-				}\n\
-				else{\n\
-					alpha = 0.0;\n\
-				}\n\
-\n\
-				gl_FragColor = vec4(1.0, 1.0, 1.0, alpha);\n\
-				return;\n\
-			}\n\
-			*/\n\
 		}\n\
 		\n\
 	}\n\
+\n\
+	// Finally check for brightColor (for bloom effect, if exist).***\n\
+	float brightness = dot(finalColor.rgb, vec3(0.2126, 0.7152, 0.0722));\n\
+	vec4 brightColor;\n\
+    //if(brightness > 1.0)\n\
+	if(brightness > 1.0)\n\
+        brightColor = vec4(finalColor.rgb, 1.0);\n\
+    else\n\
+        brightColor = vec4(0.0, 0.0, 0.0, 1.0);\n\
+	gl_FragData[1] = brightColor;\n\
+}";
+ShaderSource.ScreenQuadGaussianBlurFS = "#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+uniform sampler2D image; // 0\n\
+\n\
+uniform bool u_bHorizontal;\n\
+//uniform float weight[5] = float[] (0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216);   \n\
+\n\
+uniform float screenWidth;  // this is the image width.***  \n\
+uniform float screenHeight;  // this is the image height.***\n\
+uniform vec2 uImageSize;\n\
+\n\
+\n\
+// Tutorial for bloom effect : https://learnopengl.com/Advanced-Lighting/Bloom\n\
+\n\
+void main()\n\
+{\n\
+    //float weight[5] = float[5] (0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216);   \n\
+    float weight[5];   \n\
+    weight[0] = 0.227027;\n\
+    weight[1] = 0.1945946;\n\
+    weight[2] = 0.1216216;\n\
+    weight[3] = 0.054054;\n\
+    weight[4] = 0.016216;\n\
+	//vec2 TexCoords = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);\n\
+    //float pixelSize_x = 1.0/screenWidth;\n\
+	//float pixelSize_y = 1.0/screenHeight;\n\
+\n\
+    vec2 TexCoords = vec2(gl_FragCoord.x / uImageSize.x, gl_FragCoord.y / uImageSize.y);\n\
+    float pixelSize_x = 1.0/uImageSize.x;\n\
+	float pixelSize_y = 1.0/uImageSize.y;\n\
+\n\
+    vec3 result = texture2D(image, TexCoords).rgb * weight[0]; // current fragment's contribution\n\
+    if(u_bHorizontal)\n\
+    {\n\
+        for(int i = 1; i < 5; ++i)\n\
+        {\n\
+            result += texture2D(image, TexCoords + vec2(pixelSize_x * float(i), 0.0)).rgb * weight[i];\n\
+            result += texture2D(image, TexCoords - vec2(pixelSize_x * float(i), 0.0)).rgb * weight[i];\n\
+        }\n\
+    }\n\
+    else\n\
+    {\n\
+        for(int i = 1; i < 5; ++i)\n\
+        {\n\
+            result += texture2D(image, TexCoords + vec2(0.0, pixelSize_y * float(i))).rgb * weight[i];\n\
+            result += texture2D(image, TexCoords - vec2(0.0, pixelSize_y * float(i))).rgb * weight[i];\n\
+        }\n\
+    }\n\
+    gl_FragData[0] = vec4(result, 1.0);\n\
 }";
 ShaderSource.ScreenQuadVS = "//precision mediump float;\n\
 \n\
 attribute vec2 position;\n\
 varying vec4 vColor; \n\
+varying vec2 vTexCoord;\n\
 \n\
 void main() {\n\
 	vColor = vec4(0.2, 0.2, 0.2, 0.5);\n\
     gl_Position = vec4(1.0 - 2.0 * position, 0.0, 1.0);\n\
+    vTexCoord = gl_Position.xy;\n\
 }";
 ShaderSource.screen_frag = "precision mediump float;\n\
 \n\
