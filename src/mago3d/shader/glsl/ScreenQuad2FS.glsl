@@ -262,6 +262,68 @@ vec4 getShadedAlbedo(vec2 screenPos)
 	return texture2D(shadedColorTex, screenPos);
 }
 
+float getDepth(vec2 coord)
+{
+	if(bUseLogarithmicDepth)
+	{
+		float linearDepth = unpackDepth(texture2D(depthTex, coord.xy));
+		// gl_FragDepthEXT = linearDepth = log2(flogz) * Fcoef_half;
+		// flogz = 1.0 + gl_Position.z*0.0001;
+        float Fcoef_half = uFCoef_logDepth/2.0;
+		float flogzAux = pow(2.0, linearDepth/Fcoef_half);
+		float z = (flogzAux - 1.0);
+		linearDepth = z/(far);
+		return linearDepth;
+	}
+	else{
+		return unpackDepth(texture2D(depthTex, coord.xy));
+	}
+}
+
+float getRealDepth(in vec2 coord, in float far)
+{
+	return getDepth(coord) * far;
+}
+
+float getZDist(in vec2 coord)
+{
+	// This function is equivalent to "getRealDepth", but this is used when unknown the "far".***
+	vec4 normal4 = getNormal(coord);
+	int estimatedFrustumIdx = int(floor(normal4.w * 100.0));
+	int dataType = -1;// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.
+	int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);
+	vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);
+	float currFar = nearFar.y;
+	return getRealDepth(coord, currFar);
+}
+
+bool isEdge_byDepth(vec2 screenPos, float pixelSize_x, float pixelSize_y)
+{
+	bool bIsEdge = false;
+	// Now, check by depth.***
+	float minDist = 1.0;
+	float curZDist = getZDist(screenPos);
+	float curZDist_up = getZDist(vec2(screenPos.x, screenPos.y + pixelSize_y*1.0));
+
+	float diff = abs(curZDist - curZDist_up);
+	if(diff / curZDist < 0.01)
+	{ return false; }
+
+	if(diff > minDist)
+	{ return true; }
+
+    float curZDist_right = getZDist(vec2(screenPos.x + pixelSize_x*1.0, screenPos.y));
+
+	diff = abs(curZDist - curZDist_right);
+	if(diff / curZDist < 0.01)
+	{ return false; }
+
+	if(diff > minDist)
+	{ return true; }
+
+	return bIsEdge;
+}
+
 void make_kernel(inout vec4 n[9], vec2 coord)
 {
 	float w = 1.0 / screenWidth;
@@ -359,6 +421,11 @@ void main()
 	{
 		bIsEdge = true;
 	}
+    else
+    {
+        // check if edge by depth range.***
+        bIsEdge = isEdge_byDepth(screenPos, pixelSize_x, pixelSize_y);
+    }
 
 	if(bIsEdge)
 	{

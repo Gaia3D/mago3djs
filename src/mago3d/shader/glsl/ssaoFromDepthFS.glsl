@@ -178,7 +178,41 @@ vec3 normal_from_depth(float depth, vec2 texCoord, inout bool isValid) {
     return normalize(normal);
 }
 
-float getOcclusion(vec3 origin, vec3 rotatedKernel, float radius)
+int getRealFrustumIdx(in int estimatedFrustumIdx, inout int dataType)
+{
+    // Check the type of the data.******************
+    // frustumIdx 0 .. 3 -> general geometry data.
+    // frustumIdx 10 .. 13 -> tinTerrain data.
+    // frustumIdx 20 .. 23 -> points cloud data.
+    //----------------------------------------------
+    int realFrustumIdx = -1;
+    
+     if(estimatedFrustumIdx >= 10)
+    {
+        estimatedFrustumIdx -= 10;
+        if(estimatedFrustumIdx >= 10)
+        {
+            // points cloud data.
+            estimatedFrustumIdx -= 10;
+            dataType = 2;
+        }
+        else
+        {
+            // tinTerrain data.
+            dataType = 1;
+        }
+    }
+    else
+    {
+        // general geomtry.
+        dataType = 0;
+    }
+
+    realFrustumIdx = estimatedFrustumIdx;
+    return realFrustumIdx;
+}
+
+float getOcclusion(vec3 origin, vec3 rotatedKernel, float radius, int originFrustumIdx)
 {
     float result_occlusion = 0.0;
     vec3 sample = origin + rotatedKernel * radius;
@@ -192,15 +226,30 @@ float getOcclusion(vec3 origin, vec3 rotatedKernel, float radius)
         return result_occlusion;
     }
     vec4 normalRGBA = getNormal(offsetCoord.xy);
-    int currFrustumIdx = int(floor(100.0*normalRGBA.w));
-    vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);
+    int estimatedFrustumIdx = int(floor(100.0*normalRGBA.w));
+
+    // Test.***************************************************************
+
+    // check the data type of the pixel.
+    /*
+    int dataType = -1;
+    int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);
+    if(originFrustumIdx != currFrustumIdx)// test "if".***
+    {
+        //if(radius < 6.0)
+        //return result_occlusion; // test "if".***
+    }
+    */
+    // End test.-----------------------------------------------------------
+
+    vec2 nearFar = getNearFar_byFrustumIdx(estimatedFrustumIdx);
     float currNear = nearFar.x;
     float currFar = nearFar.y;
     float depthBufferValue = getDepth(offsetCoord.xy);
     //------------------------------------
     
     float sampleZ = -sample.z;
-   // float bufferZ = currNear + depthBufferValue * (currFar - currNear);
+    //float bufferZ = currNear + depthBufferValue * (currFar - currNear);
     float bufferZ = depthBufferValue * currFar;
     float zDiff = abs(bufferZ - sampleZ);
     if(zDiff < radius)
@@ -236,39 +285,7 @@ float getFactorByDist(in float radius, in float realDist)
     return factorByDist;
 }
 
-int getRealFrustumIdx(in int estimatedFrustumIdx, inout int dataType)
-{
-    // Check the type of the data.******************
-    // frustumIdx 0 .. 3 -> general geometry data.
-    // frustumIdx 10 .. 13 -> tinTerrain data.
-    // frustumIdx 20 .. 23 -> points cloud data.
-    //----------------------------------------------
-    int realFrustumIdx = -1;
-    
-     if(estimatedFrustumIdx >= 10)
-    {
-        estimatedFrustumIdx -= 10;
-        if(estimatedFrustumIdx >= 10)
-        {
-            // points cloud data.
-            estimatedFrustumIdx -= 10;
-            dataType = 2;
-        }
-        else
-        {
-            // tinTerrain data.
-            dataType = 1;
-        }
-    }
-    else
-    {
-        // general geomtry.
-        dataType = 0;
-    }
 
-    realFrustumIdx = estimatedFrustumIdx;
-    return realFrustumIdx;
-}
 
 float getOcclusion_pointsCloud(vec2 screenPosAdjacent)
 {
@@ -306,6 +323,8 @@ void main()
     vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
     vec4 normalRGBA = getNormal(screenPos);
     vec3 normal2 = normalRGBA.xyz; // original.***
+
+    // test check.
     int estimatedFrustumIdx = int(floor(100.0*normalRGBA.w));
     int dataType = 0; // 0= general geometry. 1= tinTerrain. 2= PointsCloud.
 
@@ -320,7 +339,7 @@ void main()
     //if(dataType != 0 && dataType != 2)
     //discard;
 
-    vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);
+    vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx); 
     float currNear = nearFar.x;
     float currFar = nearFar.y;
     float linearDepth = getDepth(screenPos);
@@ -333,8 +352,6 @@ void main()
     float radius_B = 5.0;
     float radius_C = 12.0;
     float radius_D = 20.0;
-
-    
 
     float factorByDist = 1.0;
     float realDist = -origin_real.z;
@@ -389,10 +406,10 @@ void main()
 		{    	
             vec3 rotatedKernel = tbn * vec3(kernel[i].x*1.0, kernel[i].y*1.0, kernel[i].z);
 
-            occlusion_A += getOcclusion(origin, rotatedKernel, radius_A);
-            occlusion_B += getOcclusion(origin, rotatedKernel, radius_B);
-            occlusion_C += getOcclusion(origin, rotatedKernel, radius_C);
-            occlusion_D += getOcclusion(origin, rotatedKernel, radius_D);
+            occlusion_A += getOcclusion(origin, rotatedKernel, radius_A, currFrustumIdx);
+            occlusion_B += getOcclusion(origin, rotatedKernel, radius_B, currFrustumIdx);
+            occlusion_C += getOcclusion(origin, rotatedKernel, radius_C, currFrustumIdx);
+            occlusion_D += getOcclusion(origin, rotatedKernel, radius_D, currFrustumIdx);
 		} 
 
         occlusion_A *= factorByDist;

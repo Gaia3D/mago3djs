@@ -41,6 +41,7 @@ uniform vec3 sunDirCC;
 uniform vec3 sunDirWC;
 uniform float screenWidth;    
 uniform float screenHeight;  
+uniform vec2 ussaoTexSize;
 uniform vec2 uNearFarArray[4];
 uniform bool bUseLogarithmicDepth;
 uniform float uFCoef_logDepth;
@@ -156,9 +157,11 @@ bool isInShadow(vec4 pointCC, int currSunIdx, inout bool isUnderSun)
 	return inShadow;
 }
 
-
+/*
 void make_kernel(inout vec4 n[9], vec2 coord)
 {
+	// We cannot use depthTex bcos there are multiple frustums.***
+	//------------------------------------------------------------
 	float w = 1.0 / screenWidth;
 	float h = 1.0 / screenHeight;
 
@@ -171,6 +174,23 @@ void make_kernel(inout vec4 n[9], vec2 coord)
 	n[6] = texture2D(depthTex, coord + vec2( -w, h));
 	n[7] = texture2D(depthTex, coord + vec2(0.0, h));
 	n[8] = texture2D(depthTex, coord + vec2(  w, h));
+}
+*/
+
+void make_kernel(inout vec4 n[9], vec2 coord)
+{
+	float w = 1.0 / screenWidth;
+	float h = 1.0 / screenHeight;
+
+	n[0] = texture2D(normalTex, coord + vec2( -w, -h));
+	n[1] = texture2D(normalTex, coord + vec2(0.0, -h));
+	n[2] = texture2D(normalTex, coord + vec2(  w, -h));
+	n[3] = texture2D(normalTex, coord + vec2( -w, 0.0));
+	n[4] = texture2D(normalTex, coord);
+	n[5] = texture2D(normalTex, coord + vec2(  w, 0.0));
+	n[6] = texture2D(normalTex, coord + vec2( -w, h));
+	n[7] = texture2D(normalTex, coord + vec2(0.0, h));
+	n[8] = texture2D(normalTex, coord + vec2(  w, h));
 }
 
 
@@ -254,6 +274,18 @@ float getRealDepth(in vec2 coord, in float far)
 	return getDepth(coord) * far;
 }
 
+float getZDist(in vec2 coord)
+{
+	// This function is equivalent to "getRealDepth", but this is used when unknown the "far".***
+	vec4 normal4 = getNormal(coord);
+	int estimatedFrustumIdx = int(floor(normal4.w * 100.0));
+	int dataType = -1;// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.
+	int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);
+	vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);
+	float currFar = nearFar.y;
+	return getRealDepth(coord, currFar);
+}
+
 bool isEdge(vec2 screenPos, vec3 normal, float pixelSize_x, float pixelSize_y)
 {
 	bool bIsEdge = false;
@@ -284,28 +316,51 @@ bool isEdge(vec2 screenPos, vec3 normal, float pixelSize_x, float pixelSize_y)
 	return bIsEdge;
 }
 
-bool isEdge_original(vec2 screenPos, vec3 normal, float pixelSize_x, float pixelSize_y)
+bool isEdge_byNormals(vec2 screenPos, vec3 normal, float pixelSize_x, float pixelSize_y)
 {
 	bool bIsEdge = false;
 
-	// 1rst, check by normals.***
-	vec3 normal_up = getNormal(vec2(screenPos.x, screenPos.y + pixelSize_y*1.0)).xyz;
-	vec3 normal_right = getNormal(vec2(screenPos.x + pixelSize_x*1.0, screenPos.y)).xyz;
-	vec3 normal_upRight = getNormal(vec2(screenPos.x + pixelSize_x, screenPos.y + pixelSize_y)).xyz;
-
 	float minDot = 0.3;
 
+	// 1rst, check by normals.***
+	vec3 normal_up = getNormal(vec2(screenPos.x, screenPos.y + pixelSize_y*1.0)).xyz;
 	if(dot(normal, normal_up) < minDot)
 	{ return true; }
 
+	vec3 normal_right = getNormal(vec2(screenPos.x + pixelSize_x*1.0, screenPos.y)).xyz;
 	if(dot(normal, normal_right) < minDot)
 	{ return true; }
 
+	vec3 normal_upRight = getNormal(vec2(screenPos.x + pixelSize_x, screenPos.y + pixelSize_y)).xyz;
 	if(dot(normal, normal_upRight) < minDot)
 	{ return true; }
 
-	// Now, check by depth.***
+	return bIsEdge;
+}
 
+bool isEdge_byDepth(vec2 screenPos, float pixelSize_x, float pixelSize_y)
+{
+	bool bIsEdge = false;
+	// Now, check by depth.***
+	float minDist = 1.0;
+	float curZDist = getZDist(screenPos);
+	float curZDist_up = getZDist(vec2(screenPos.x, screenPos.y + pixelSize_y*1.0));
+
+	float diff = abs(curZDist - curZDist_up);
+	if(diff / curZDist < 0.01)
+	{ return false; }
+
+	if(diff > minDist)
+	{ return true; }
+
+	float curZDist_right = getZDist(vec2(screenPos.x + pixelSize_x*1.0, screenPos.y));
+
+	diff = abs(curZDist - curZDist_right);
+	if(diff / curZDist < 0.01)
+	{ return false; }
+
+	if(diff > minDist)
+	{ return true; }
 
 	return bIsEdge;
 }
@@ -389,6 +444,7 @@ void getNormal_dataType_andFar(in vec2 coord, inout vec3 normal, inout int dataT
 	vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);
 	far = nearFar.y;
 }
+
 
 void main()
 {
@@ -583,26 +639,37 @@ void main()
 		//ssaoFromDepthTex
 		float pixelSize_x = 1.0/screenWidth;
 		float pixelSize_y = 1.0/screenHeight;
+		float pixelSizeSsaoTex_x = 1.0/ussaoTexSize.x;
+		float pixelSizeSsaoTex_y = 1.0/ussaoTexSize.y;
 		vec4 occlFromDepth = vec4(0.0);
+		
 		for(int i=0; i<4; i++)
 		{
 			for(int j=0; j<4; j++)
 			{
-				vec2 texCoord = vec2(screenPos.x + pixelSize_x*float(i-2), screenPos.y + pixelSize_y*float(j-2));
+				vec2 texCoord = vec2(screenPos.x + pixelSizeSsaoTex_x*float(i-2), screenPos.y + pixelSizeSsaoTex_y*float(j-2)); 
 				vec4 color = texture2D(ssaoTex, texCoord);
 				occlFromDepth += color;
 			}
 		}
-
 		occlFromDepth /= 16.0;
-		occlFromDepth *= 0.45;
+		
 
-		float occlusion = occlFromDepth.r + occlFromDepth.g + occlFromDepth.b + occlFromDepth.a; // original.***
+		float attenuation = 0.45;
+		//vec4 color = texture2D(ssaoTex, screenPos);
+		//occlFromDepth = color;
 
-		if(occlusion < 0.0)// original.***
-		occlusion = 0.0;// original.***
+		// Aditive methode.***************************
+		//occlFromDepth *= attenuation; // attenuation.
+		//float occlusionInverseAdd = (1.0 - occlFromDepth.r) + (1.0 -  occlFromDepth.g) + (1.0 - occlFromDepth.b) + (1.0 - occlFromDepth.a); // original.***
 
-		float occlInv = 1.0 - occlusion;
+		// Multiplicative methode.********************
+		attenuation = 0.6;
+		occlFromDepth *= attenuation; // attenuation.
+		float occlusionInverseMult = (1.0 - occlFromDepth.r) * (1.0 -  occlFromDepth.g) * (1.0 - occlFromDepth.b) * (1.0 - occlFromDepth.a); // original.***
+
+		float occlInv = occlusionInverseMult;
+
 		//float lightFactorAux = uSceneDayNightLightingFactor + diffuseLightModul;
 		vec3 diffuseLight3 = diffuseLight.xyz + vec3(uSceneDayNightLightingFactor);
 
@@ -666,7 +733,13 @@ void main()
 		if(dataType == 0 || dataType == 1)// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.
 		{
 			
-			bool bIsEdge = isEdge_original(screenPos, normal, pixelSize_x, pixelSize_y);
+			bool bIsEdge = isEdge_byNormals(screenPos, normal, pixelSize_x, pixelSize_y); // original.***
+
+			if(!bIsEdge && dataType == 0)
+			{
+				// Check if is edge by depth range.***
+				bIsEdge = isEdge_byDepth(screenPos, pixelSize_x, pixelSize_y);
+			}
 			
 			if(bIsEdge)
 			{				

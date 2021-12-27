@@ -2090,7 +2090,13 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 	// Take the depFrameBufferObject of the current frustumVolume.***
 	// Create a simpleFramebufferAux.***
 	if (this.framebufferAux === undefined) { this.framebufferAux = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
-	if (this.ssaoFromDepthFbo === undefined) { this.ssaoFromDepthFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
+	if (this.ssaoFromDepthFbo === undefined) 
+	{
+		this.ssaoFromDepthFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize : true,
+			numColorBuffers : 2,
+			widthScale      : 1,
+			heightScale     : 1}); 
+	}
 	if (this.shadedColorFbo === undefined) { this.shadedColorFbo = new FBO(gl, this.sceneState.drawingBufferWidth[0], this.sceneState.drawingBufferHeight[0], {matchCanvasSize: true}); }
 
 	
@@ -2379,6 +2385,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 
 		// Do ssaoFromDepth render. Renders in ssaoFrameBuffer.***
 		this.renderer.renderSsaoFromDepth(gl);
+		//this.renderer.renderScreenQuadBlur_ssaoTex(gl);
 
 		// Final render output.**************************************************************
 		this.renderer.renderScreenQuad(gl); // 1rst screenQuad. (ssao, lighting, shadows) // this must be rendered in "shadedColorFbo" framebuffer.***

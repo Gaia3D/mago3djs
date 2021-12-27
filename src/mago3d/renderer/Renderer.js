@@ -1436,7 +1436,9 @@ Renderer.prototype.renderScreenQuad = function (gl)
 
 		var ssaoFromDepthFbo = magoManager.ssaoFromDepthFbo;
 		gl.activeTexture(gl.TEXTURE5); // ssaoTex.***
-		gl.bindTexture(gl.TEXTURE_2D, ssaoFromDepthFbo.colorBuffer);
+		//gl.bindTexture(gl.TEXTURE_2D, ssaoFromDepthFbo.colorBuffersArray[1]); // active this if apply blur for ssao.***
+		gl.bindTexture(gl.TEXTURE_2D, ssaoFromDepthFbo.colorBuffersArray[0]);
+		gl.uniform2fv(currentShader.ussaoTexSize_loc, new Float32Array([ssaoFromDepthFbo.getWidth(), ssaoFromDepthFbo.getHeight()]));
 
 		gl.activeTexture(gl.TEXTURE1); // normalTex.***
 		gl.bindTexture(gl.TEXTURE_2D, normalTex);
@@ -1688,6 +1690,97 @@ Renderer.prototype.getScreenQuad = function ()
  */
 Renderer.prototype.renderScreenQuadGaussianBlur = function (gl) 
 {
+	 // This function makes the bloom effect texture (glow effect).***
+	 // We are using a quadScreen.***
+	 var currentShader;
+	 var magoManager = this.magoManager;
+	 var texturesManager = magoManager.getTexturesManager();
+	 var sceneState = magoManager.sceneState;
+	 var camera = sceneState.camera;
+	 var bufferWidth = sceneState.drawingBufferWidth[0];
+	 var bufferHeight = sceneState.drawingBufferHeight[0];
+ 
+	 magoManager.brightColorTex_A = texturesManager.bloomBufferFBO.colorBuffersArray[1];
+	 magoManager.brightColorTex_B = texturesManager.bloomBufferFBO.colorBuffersArray[0];
+ 
+	 var tex_A = magoManager.brightColorTex_A; // reduced size texture.***
+	 var tex_B = magoManager.brightColorTex_B; // reduced size texture.***
+	 var brightColorTex = magoManager.brightColorTex; // screen size texture.***
+ 
+	 var postFxShadersManager = magoManager.postFxShadersManager;
+	 currentShader = postFxShadersManager.getShader("gaussianBlur"); 
+	 postFxShadersManager.useProgram(currentShader);
+	 currentShader.bindUniformGenerals();
+ 
+	 var bloomBufferFBO = texturesManager.bloomBufferFBO;
+ 
+	 // bind ssaoFromDepthBuffer.***
+	 bloomBufferFBO.bind(); 
+ 
+	 var extbuffers = magoManager.extbuffers;
+	 extbuffers.drawBuffersWEBGL([
+		 extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
+		 extbuffers.NONE, // gl_FragData[1] - depthTex
+		 extbuffers.NONE, // gl_FragData[2] - normalTex
+		 extbuffers.NONE, // gl_FragData[3] - albedoTex
+		 extbuffers.NONE // gl_FragData[4] - selColor4
+	 ]);
+	 
+	 gl.disable(gl.DEPTH_TEST);
+ 
+	 var screenQuad = this.getScreenQuad();
+ 
+	 gl.activeTexture(gl.TEXTURE0);
+ 
+	 var iterationsCount = 8;
+	 var bHorizontal = true;
+	 var imageWidth = bloomBufferFBO.getWidth();
+	 var imageHeight = bloomBufferFBO.getHeight();
+ 
+	 gl.uniform2fv(currentShader.uImageSize_loc, new Float32Array([imageWidth, imageHeight]));
+	 for (var i=0; i<iterationsCount; i++)
+	 {
+		 // Set texture output.***
+		 gl.uniform1i(currentShader.u_bHorizontal_loc, bHorizontal);
+		 if (i === 0)
+		 {
+			 gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, tex_A, 0); 
+			 gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); 
+			 gl.bindTexture(gl.TEXTURE_2D, brightColorTex); 
+		 }
+		 else
+		 {
+			 if (bHorizontal)
+			 {
+				 gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, tex_A, 0); 
+				 gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); 
+				 gl.bindTexture(gl.TEXTURE_2D, tex_B);  
+			 }
+			 else
+			 {
+				 gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, tex_B, 0); 
+				 gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); 
+				 gl.bindTexture(gl.TEXTURE_2D, tex_A);  
+			 }
+		 }
+		 
+		 
+		 screenQuad.render(magoManager, currentShader);
+ 
+		 bHorizontal = !bHorizontal;
+	 }
+	 
+	 gl.enable(gl.DEPTH_TEST);
+	 //gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, null, 0); 
+	 bloomBufferFBO.unbind();
+};
+
+/**
+ * This function renders the blur for the brightColorBuffer
+ * @param {WebGLRenderingContext} gl WebGL Rendering Context.
+ */
+Renderer.prototype.renderScreenQuadBlur_ssaoTex = function (gl) 
+{
 	// This function makes the bloom effect texture (glow effect).***
 	// We are using a quadScreen.***
 	var currentShader;
@@ -1698,24 +1791,29 @@ Renderer.prototype.renderScreenQuadGaussianBlur = function (gl)
 	var bufferWidth = sceneState.drawingBufferWidth[0];
 	var bufferHeight = sceneState.drawingBufferHeight[0];
 
-	magoManager.brightColorTex_A = texturesManager.bloomBufferFBO.colorBuffersArray[1];
-	magoManager.brightColorTex_B = texturesManager.bloomBufferFBO.colorBuffersArray[0];
+	var ssaoFromDepthFbo = magoManager.ssaoFromDepthFbo;
 
-	var tex_A = magoManager.brightColorTex_A; // reduced size texture.***
-	var tex_B = magoManager.brightColorTex_B; // reduced size texture.***
-	var brightColorTex = magoManager.brightColorTex; // screen size texture.***
+	var tex_A = ssaoFromDepthFbo.colorBuffersArray[1]; // possibily reduced size texture.***
+	var tex_B = ssaoFromDepthFbo.colorBuffersArray[0]; // possibily reduced size texture.***
 
 	var postFxShadersManager = magoManager.postFxShadersManager;
-	currentShader = postFxShadersManager.getShader("gaussianBlur"); 
+
+	var bGaussianBlur = true;
+	var shaderName = "screenQuadBlur";
+	if (bGaussianBlur)
+	{
+		shaderName = "gaussianBlur";
+	}
+
+	currentShader = postFxShadersManager.getShader(shaderName); 
 	postFxShadersManager.useProgram(currentShader);
 	currentShader.bindUniformGenerals();
 
-	var bloomBufferFBO = texturesManager.bloomBufferFBO;
-
 	// bind ssaoFromDepthBuffer.***
-	bloomBufferFBO.bind(); 
+	ssaoFromDepthFbo.bind(); 
 
 	var extbuffers = magoManager.extbuffers;
+	
 	extbuffers.drawBuffersWEBGL([
 		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
 		extbuffers.NONE, // gl_FragData[1] - depthTex
@@ -1724,30 +1822,28 @@ Renderer.prototype.renderScreenQuadGaussianBlur = function (gl)
 		extbuffers.NONE // gl_FragData[4] - selColor4
 	]);
 	
+	
 	gl.disable(gl.DEPTH_TEST);
 
 	var screenQuad = this.getScreenQuad();
 
 	gl.activeTexture(gl.TEXTURE0);
 
-	var iterationsCount = 10;
-	var bHorizontal = true;
-	var imageWidth = bloomBufferFBO.getWidth();
-	var imageHeight = bloomBufferFBO.getHeight();
-
+	var imageWidth = ssaoFromDepthFbo.getWidth();
+	var imageHeight = ssaoFromDepthFbo.getHeight();
 	gl.uniform2fv(currentShader.uImageSize_loc, new Float32Array([imageWidth, imageHeight]));
-	for (var i=0; i<iterationsCount; i++)
+
+	
+	if (bGaussianBlur)
 	{
-		// Set texture output.***
-		gl.uniform1i(currentShader.u_bHorizontal_loc, bHorizontal);
-		if (i === 0)
+		var iterationsCount = 3;
+	 	var bHorizontal = true;
+
+		for (var i=0; i<iterationsCount; i++)
 		{
-			gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, tex_A, 0); 
-			gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); 
-			gl.bindTexture(gl.TEXTURE_2D, brightColorTex); 
-		}
-		else
-		{
+			// Set texture output.***
+			gl.uniform1i(currentShader.u_bHorizontal_loc, bHorizontal);
+
 			if (bHorizontal)
 			{
 				gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, tex_A, 0); 
@@ -1760,17 +1856,26 @@ Renderer.prototype.renderScreenQuadGaussianBlur = function (gl)
 				gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); 
 				gl.bindTexture(gl.TEXTURE_2D, tex_A);  
 			}
-		}
-		
-		
-		screenQuad.render(magoManager, currentShader);
 
-		bHorizontal = !bHorizontal;
+			screenQuad.render(magoManager, currentShader);
+			bHorizontal = !bHorizontal;
+		}
+	}
+	else
+	{
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, tex_A, 0); 
+		gl.bindTexture(gl.TEXTURE_2D, tex_B);  
+		screenQuad.render(magoManager, currentShader);
 	}
 	
+
+
 	gl.enable(gl.DEPTH_TEST);
-	//gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, null, 0); 
-	bloomBufferFBO.unbind();
+	gl.bindTexture(gl.TEXTURE_2D, null); 
+
+	// Now, return the default framebuffer attachment0.***
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, tex_B, 0);
+	ssaoFromDepthFbo.unbind();
 };
 
 /**
@@ -1822,6 +1927,10 @@ Renderer.prototype.renderSsaoFromDepth = function(gl)
 	gl.uniform1i(currentShader.bUseLogarithmicDepth_loc, magoManager.postFxShadersManager.bUseLogarithmicDepth);
 	gl.uniform1f(currentShader.uFCoef_logDepth_loc, sceneState.fCoef_logDepth[0]);
 	gl.uniform2fv(currentShader.uNearFarArray_loc, magoManager.frustumVolumeControl.nearFarArray);
+
+	// Must set screenWidth & screenHeight bcos usually ssaoTex are smaller than screen.***
+	gl.uniform1f(currentShader.screenWidth_loc, ssaoFromDepthFbo.getWidth());
+	gl.uniform1f(currentShader.screenHeight_loc, ssaoFromDepthFbo.getHeight());
 
 	var texManager = magoManager.texturesManager;
 	var texturesMergerFbo = texManager.texturesMergerFbo;
@@ -2207,7 +2316,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 	if (magoManager.brightColorTex_A)
 	{
-		texture = magoManager.brightColorTex_A;
+		//texture = magoManager.brightColorTex_A;
 	}
 	var depthFboNeo = magoManager.depthFboNeo;
 	if (depthFboNeo.colorBuffer)
@@ -2278,7 +2387,8 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 	if (magoManager.ssaoFromDepthFbo)
 	{
-		//texture = magoManager.ssaoFromDepthFbo.colorBuffer;
+		//texture = magoManager.ssaoFromDepthFbo.colorBuffersArray[0]; // ssao (with noise).***
+		texture = magoManager.ssaoFromDepthFbo.colorBuffersArray[1]; // ssao with blur.***
 	}
 
 	// weatherStation.*** weatherStation.*** weatherStation.*** weatherStation.*** weatherStation.*** weatherStation.*** weatherStation.*** weatherStation.*** 

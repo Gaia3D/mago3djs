@@ -225,6 +225,7 @@ PostFxShadersManager.prototype._createShader_screenQuad = function()
 	shader.specularLightTex_loc = gl.getUniformLocation(shader.program, "specularLightTex");
 	shader.uBrightnessContrastSaturation_loc = gl.getUniformLocation(shader.program, "uBrightnessContrastSaturation");
 	shader.uBrightnessContrastType_loc = gl.getUniformLocation(shader.program, "uBrightnessContrastType");
+	shader.ussaoTexSize_loc = gl.getUniformLocation(shader.program, "ussaoTexSize");
 
 	this.useProgram(shader);
 	gl.uniform1i(shader.ssaoTex_loc, 5);
@@ -319,6 +320,28 @@ PostFxShadersManager.prototype._createShader_gaussianBlur = function()
 	shader.u_bHorizontal_loc = gl.getUniformLocation(shader.program, "u_bHorizontal");
 	shader.screenWidth_loc = gl.getUniformLocation(shader.program, "screenWidth");
 	shader.screenHeight_loc = gl.getUniformLocation(shader.program, "screenHeight");
+	shader.uImageSize_loc = gl.getUniformLocation(shader.program, "uImageSize");
+	shader.imageTex_loc = gl.getUniformLocation(shader.program, "image");
+	this.useProgram(shader);
+	gl.uniform1i(shader.imageTex_loc, 0);
+
+	this.shadersMap[shaderName] = shader;
+	return shader;
+};
+
+PostFxShadersManager.prototype._createShader_screenQuadBlur = function() 
+{
+	var use_linearOrLogarithmicDepth = this._get_useLinearOrLogarithmicDepth_string();
+	var use_multi_render_target = this._get_useMultiRenderTarget_string();
+	var gl = this.gl;
+
+	var shaderName = "screenQuadBlur";
+	var ssao_vs_source = ShaderSource.ScreenQuadVS;
+	var ssao_fs_source = ShaderSource.ScreenQuadBlurFS;
+	var shader = this.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this.magoManager);
+	shader.u_bHorizontal_loc = gl.getUniformLocation(shader.program, "u_bHorizontal");
+	//shader.screenWidth_loc = gl.getUniformLocation(shader.program, "screenWidth");
+	//shader.screenHeight_loc = gl.getUniformLocation(shader.program, "screenHeight");
 	shader.uImageSize_loc = gl.getUniformLocation(shader.program, "uImageSize");
 	shader.imageTex_loc = gl.getUniformLocation(shader.program, "image");
 	this.useProgram(shader);
@@ -884,6 +907,8 @@ PostFxShadersManager.prototype._createShader_ssaoFromDepth = function()
 	shader.uFCoef_logDepth_loc = gl.getUniformLocation(shader.program, "uFCoef_logDepth");
 	shader.uNumFrustums_loc = gl.getUniformLocation(shader.program, "uNumFrustums");
 	shader.uNearFarArray_loc = gl.getUniformLocation(shader.program, "uNearFarArray");
+	shader.screenWidth_loc = gl.getUniformLocation(shader.program, "screenWidth");
+	shader.screenHeight_loc = gl.getUniformLocation(shader.program, "screenHeight");
 
 	shader.depthTex_loc = gl.getUniformLocation(shader.program, "depthTex");
 	shader.noiseTex_loc = gl.getUniformLocation(shader.program, "noiseTex");
@@ -1037,6 +1062,9 @@ PostFxShadersManager.prototype._createShaderByName = function (shaderName)
 		break;
 	case "gaussianBlur":
 		this._createShader_gaussianBlur();
+		break;
+	case "screenQuadBlur":
+		this._createShader_screenQuadBlur();
 		break;
 	}
 
