@@ -35,6 +35,7 @@
 	varying float flogz;
 	varying float Fcoef_half;
 	varying float depth;
+	//varying vec3 depthDebug;
 
 	
 	void main()
@@ -74,6 +75,10 @@
 		vec4 orthoPos = modelViewMatrixRelToEye * pos4;
 		vertexPos = orthoPos.xyz;
 		depth = (-orthoPos.z)/(far); // the correct value.
+
+		// Test:::
+		//depth = 2.0 * ((orthoPos.z - near)/(far - near)) - 1.0;
+		//depthDebug = (-orthoPos.xyz)/(far) ;
 
 		if(bUseLogarithmicDepth)
 		{

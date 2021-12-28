@@ -280,9 +280,9 @@ float getDepth(vec2 coord)
 	}
 }
 
-float getRealDepth(in vec2 coord, in float far)
+float getRealDepth(in vec2 coord, in vec2 nearFar)
 {
-	return getDepth(coord) * far;
+	return getDepth(coord) * nearFar.y;
 }
 
 float getZDist(in vec2 coord)
@@ -293,16 +293,16 @@ float getZDist(in vec2 coord)
 	int dataType = -1;// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.
 	int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);
 	vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);
-	float currFar = nearFar.y;
-	return getRealDepth(coord, currFar);
+	//float currFar = nearFar.y;
+	return getRealDepth(coord, nearFar);
 }
 
 bool _isEdge_byDepth(in float curZDist, vec2 screenPos)
 {
-    float minDist = 2.0;
+    float minDist = 5.0;
     float adjacentZDist = getZDist(screenPos);
 	float diff = abs(curZDist - adjacentZDist);
-	if(diff / curZDist > 0.1 && diff > minDist)
+	if(diff / curZDist > 0.2 && diff > minDist)
 	{ return true; }
     else{
         return false;

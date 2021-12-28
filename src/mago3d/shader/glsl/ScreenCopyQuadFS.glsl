@@ -157,6 +157,7 @@ void main()
 
 		// Now, save the albedo.
 		gl_FragData[2] = albedo; // copy albedo.
+		
 
 	
 	#else

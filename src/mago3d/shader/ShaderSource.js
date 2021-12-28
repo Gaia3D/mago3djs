@@ -1615,6 +1615,7 @@ varying vec3 vertexPosLC;\n\
 varying float flogz;\n\
 varying float Fcoef_half;\n\
 varying float depth;\n\
+//varying vec3 depthDebug;\n\
 \n\
 \n\
 vec4 packDepth( float v ) {\n\
@@ -1967,6 +1968,9 @@ void main()\n\
 \n\
 		// selColor4 (if necessary).\n\
 		gl_FragData[4] = uSelColor4; \n\
+\n\
+		// debugTex.***\n\
+		//gl_FragData[5] = vec4(0.0, 0.0, depthDebug.z, 1.0); \n\
 	}\n\
 	#endif\n\
 \n\
@@ -2411,6 +2415,7 @@ ShaderSource.GBufferVS = "\n\
 	varying float flogz;\n\
 	varying float Fcoef_half;\n\
 	varying float depth;\n\
+	//varying vec3 depthDebug;\n\
 \n\
 	\n\
 	void main()\n\
@@ -2450,6 +2455,10 @@ ShaderSource.GBufferVS = "\n\
 		vec4 orthoPos = modelViewMatrixRelToEye * pos4;\n\
 		vertexPos = orthoPos.xyz;\n\
 		depth = (-orthoPos.z)/(far); // the correct value.\n\
+\n\
+		// Test:::\n\
+		//depth = 2.0 * ((orthoPos.z - near)/(far - near)) - 1.0;\n\
+		//depthDebug = (-orthoPos.xyz)/(far) ;\n\
 \n\
 		if(bUseLogarithmicDepth)\n\
 		{\n\
@@ -5961,6 +5970,7 @@ void main()\n\
 \n\
 		// Now, save the albedo.\n\
 		gl_FragData[2] = albedo; // copy albedo.\n\
+		\n\
 \n\
 	\n\
 	#else\n\
@@ -6319,9 +6329,9 @@ float getDepth(vec2 coord)\n\
 	}\n\
 }\n\
 \n\
-float getRealDepth(in vec2 coord, in float far)\n\
+float getRealDepth(in vec2 coord, in vec2 nearFar)\n\
 {\n\
-	return getDepth(coord) * far;\n\
+	return getDepth(coord) * nearFar.y;\n\
 }\n\
 \n\
 float getZDist(in vec2 coord)\n\
@@ -6332,16 +6342,16 @@ float getZDist(in vec2 coord)\n\
 	int dataType = -1;// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.\n\
 	int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);\n\
 	vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);\n\
-	float currFar = nearFar.y;\n\
-	return getRealDepth(coord, currFar);\n\
+	//float currFar = nearFar.y;\n\
+	return getRealDepth(coord, nearFar);\n\
 }\n\
 \n\
 bool _isEdge_byDepth(in float curZDist, vec2 screenPos)\n\
 {\n\
-    float minDist = 2.0;\n\
+    float minDist = 5.0;\n\
     float adjacentZDist = getZDist(screenPos);\n\
 	float diff = abs(curZDist - adjacentZDist);\n\
-	if(diff / curZDist > 0.1 && diff > minDist)\n\
+	if(diff / curZDist > 0.2 && diff > minDist)\n\
 	{ return true; }\n\
     else{\n\
         return false;\n\
@@ -6909,9 +6919,9 @@ float getDepth(vec2 coord)\n\
 	}\n\
 }\n\
 \n\
-float getRealDepth(in vec2 coord, in float far)\n\
+float getRealDepth(in vec2 coord, in vec2 nearFar)\n\
 {\n\
-	return getDepth(coord) * far;\n\
+	return getDepth(coord) * (nearFar.y);\n\
 }\n\
 \n\
 float getZDist(in vec2 coord)\n\
@@ -6922,8 +6932,8 @@ float getZDist(in vec2 coord)\n\
 	int dataType = -1;// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.\n\
 	int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);\n\
 	vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);\n\
-	float currFar = nearFar.y;\n\
-	return getRealDepth(coord, currFar);\n\
+	//float currFar = nearFar.y;\n\
+	return getRealDepth(coord, nearFar);\n\
 }\n\
 \n\
 bool isEdge(vec2 screenPos, vec3 normal, float pixelSize_x, float pixelSize_y)\n\
@@ -6980,10 +6990,10 @@ bool isEdge_byNormals(vec2 screenPos, vec3 normal, float pixelSize_x, float pixe
 \n\
 bool _isEdge_byDepth(in float curZDist, vec2 screenPos)\n\
 {\n\
-	float minDist = 2.0;\n\
+	float minDist = 5.0;\n\
     float adjacentZDist = getZDist(screenPos);\n\
 	float diff = abs(curZDist - adjacentZDist);\n\
-	if(diff / curZDist > 0.1 && diff > minDist)\n\
+	if(diff / curZDist > 0.2 && diff > minDist)\n\
 	{ return true; }\n\
     else{\n\
         return false;\n\
@@ -7093,15 +7103,14 @@ vec3 Gamma(vec3 value, float param)\n\
     return vec3(pow(abs(value.r), param),pow(abs(value.g), param),pow(abs(value.b), param));\n\
 }\n\
 \n\
-void getNormal_dataType_andFar(in vec2 coord, inout vec3 normal, inout int dataType, inout float far)\n\
+void getNormal_dataType_andFar(in vec2 coord, inout vec3 normal, inout int dataType, inout vec2 nearFar)\n\
 {\n\
 	vec4 normal4 = getNormal(coord);\n\
 	normal = normal4.xyz;\n\
 	int estimatedFrustumIdx = int(floor(normal4.w * 100.0));\n\
 	dataType = -1;// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.\n\
 	int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);\n\
-	vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);\n\
-	far = nearFar.y;\n\
+	nearFar = getNearFar_byFrustumIdx(currFrustumIdx);\n\
 }\n\
 \n\
 \n\
@@ -7397,7 +7406,7 @@ void main()\n\
 			if(!bIsEdge && dataType == 0)\n\
 			{\n\
 				// Check if is edge by depth range.***\n\
-				bIsEdge = isEdge_byDepth(screenPos, pixelSize_x, pixelSize_y);\n\
+				//bIsEdge = isEdge_byDepth(screenPos, pixelSize_x, pixelSize_y);\n\
 			}\n\
 			\n\
 			if(bIsEdge)\n\
@@ -7446,33 +7455,33 @@ void main()\n\
 			vec2 texCoord_top = vec2(screenPos.x, screenPos.y + pixelSize_y*coordScale);\n\
 			vec3 normal_top;\n\
 			int dataType_top;\n\
-			float far_top;\n\
-			getNormal_dataType_andFar(texCoord_top, normal_top, dataType_top, far_top);\n\
-			float realDepth_top = getRealDepth(texCoord_top, far_top);\n\
+			vec2 nearfar_top;\n\
+			getNormal_dataType_andFar(texCoord_top, normal_top, dataType_top, nearfar_top);\n\
+			float realDepth_top = getRealDepth(texCoord_top, nearfar_top);\n\
 \n\
 			// left.***\n\
 			vec2 texCoord_left = vec2(screenPos.x - pixelSize_x * coordScale, screenPos.y);\n\
 			vec3 normal_left;\n\
 			int dataType_left;\n\
-			float far_left;\n\
-			getNormal_dataType_andFar(texCoord_left, normal_left, dataType_left, far_left);\n\
-			float realDepth_left = getRealDepth(texCoord_left, far_left);\n\
+			vec2 nearfar_left;\n\
+			getNormal_dataType_andFar(texCoord_left, normal_left, dataType_left, nearfar_left);\n\
+			float realDepth_left = getRealDepth(texCoord_left, nearfar_left);\n\
 \n\
 			// bottom.***\n\
 			vec2 texCoord_bottom = vec2(screenPos.x, screenPos.y - pixelSize_y*coordScale);\n\
 			vec3 normal_bottom;\n\
 			int dataType_bottom;\n\
-			float far_bottom;\n\
-			getNormal_dataType_andFar(texCoord_bottom, normal_bottom, dataType_bottom, far_bottom);\n\
-			float realDepth_bottom = getRealDepth(texCoord_bottom, far_bottom);\n\
+			vec2 nearfar_bottom;\n\
+			getNormal_dataType_andFar(texCoord_bottom, normal_bottom, dataType_bottom, nearfar_bottom);\n\
+			float realDepth_bottom = getRealDepth(texCoord_bottom, nearfar_bottom);\n\
 \n\
 			// right.***\n\
 			vec2 texCoord_right = vec2(screenPos.x + pixelSize_x * coordScale, screenPos.y);\n\
 			vec3 normal_right;\n\
 			int dataType_right;\n\
-			float far_right;\n\
-			getNormal_dataType_andFar(texCoord_right, normal_right, dataType_right, far_right);\n\
-			float realDepth_right = getRealDepth(texCoord_right, far_right);\n\
+			vec2 nearfar_right;\n\
+			getNormal_dataType_andFar(texCoord_right, normal_right, dataType_right, nearfar_right);\n\
+			float realDepth_right = getRealDepth(texCoord_right, nearfar_right);\n\
 \n\
 			float response = (max(0.0, log2Deoth - log2(realDepth_top)) + max(0.0, log2Deoth - log2(realDepth_left)) + max(0.0, log2Deoth - log2(realDepth_bottom)) + max(0.0, log2Deoth - log2(realDepth_right))) / 4.0;\n\
 			float edlStrength = 2.0;\n\
@@ -7496,6 +7505,18 @@ void main()\n\
     else\n\
         brightColor = vec4(0.0, 0.0, 0.0, 1.0);\n\
 	gl_FragData[1] = brightColor;\n\
+\n\
+	// debugTex.***\n\
+	float pixelSize_x_ = 1.0/screenWidth;\n\
+	float pixelSize_y_ = 1.0/screenHeight;\n\
+	float zDist = getZDist(screenPos);// - nearFar_origin.x);\n\
+	bool isEdgeTest = _isEdge_byDepth(zDist, screenPos);\n\
+	float zDist_top = getZDist(vec2(screenPos.x, screenPos.y + pixelSize_y_));// - nearFar_origin.x);\n\
+	if(isEdgeTest)\n\
+	{\n\
+		gl_FragData[2] = vec4(1.0, 0.0, 0.0, 1.0);\n\
+	}\n\
+	else gl_FragData[2] = vec4(zDist/1000.0, zDist/1000.0, zDist/1000.0, 1.0);\n\
 }";
 ShaderSource.ScreenQuadGaussianBlurFS = "#ifdef GL_ES\n\
     precision highp float;\n\

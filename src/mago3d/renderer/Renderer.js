@@ -1298,12 +1298,13 @@ Renderer.prototype.renderScreenQuad = function (gl)
 	//magoManager.brightColorTex_B = texturesManager.bloomBufferFBO.colorBuffersArray[0];
 	var extbuffers = magoManager.extbuffers;
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, magoManager.brightColorTex, 0);
+	//gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, magoManager.debugTex, 0);
 
 	// Attach the brightColorBuffer.***
 	extbuffers.drawBuffersWEBGL([
 		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
 		extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - brightColorBuffer
-		extbuffers.NONE, // gl_FragData[2] - 
+		extbuffers.NONE, // gl_FragData[2] - debugTex
 		extbuffers.NONE, // gl_FragData[3] - 
 		extbuffers.NONE // gl_FragData[4] - 
 	]);
@@ -2110,7 +2111,7 @@ Renderer.prototype.renderTerrainCopy = function ()
 				extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - depth
 				extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - normal
 				extbuffers.NONE, // gl_FragData[2] - albedo
-				extbuffers.COLOR_ATTACHMENT3_WEBGL  // gl_FragData[3] - selColor4
+				extbuffers.COLOR_ATTACHMENT3_WEBGL,  // gl_FragData[3] - selColor4
 			]);	
 		}
 		else
@@ -2119,7 +2120,7 @@ Renderer.prototype.renderTerrainCopy = function ()
 				extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - depth
 				extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - normal
 				extbuffers.NONE, // gl_FragData[2] - albedo
-				extbuffers.NONE  // gl_FragData[3] - selColor4
+				extbuffers.NONE,  // gl_FragData[3] - selColor4
 			]);
 		}
 
@@ -2354,6 +2355,11 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 		//texture = magoManager.LightFogTex;
 	}
 
+	if (magoManager.debugTex)
+	{
+		texture = magoManager.debugTex;
+	}
+
 	if (magoManager.windPlaneDepthTex)
 	{
 		//texture = magoManager.windPlaneDepthTex;
@@ -2387,7 +2393,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 	if (magoManager.ssaoFromDepthFbo)
 	{
-		texture = magoManager.ssaoFromDepthFbo.colorBuffersArray[0]; // ssao (with noise).***
+		//texture = magoManager.ssaoFromDepthFbo.colorBuffersArray[0]; // ssao (with noise).***
 		//texture = magoManager.ssaoFromDepthFbo.colorBuffersArray[1]; // ssao with blur.***
 	}
 

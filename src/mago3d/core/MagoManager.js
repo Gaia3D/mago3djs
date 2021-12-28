@@ -1680,7 +1680,7 @@ MagoManager.prototype.getTexturesManager = function ()
 		// Now, create the texturesMerger.***
 		this.texturesManager = new TexturesManager(this);
 		var bUseMultiRenderTarget = this.postFxShadersManager.bUseMultiRenderTarget;
-		this.texturesManager.texturesMergerFbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget: bUseMultiRenderTarget, numColorBuffers: 6}); 
+		this.texturesManager.texturesMergerFbo = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget: bUseMultiRenderTarget, numColorBuffers: 7}); 
 
 		this.depthTex = this.texturesManager.texturesMergerFbo.colorBuffersArray[0];
 		this.normalTex = this.texturesManager.texturesMergerFbo.colorBuffersArray[1];
@@ -1688,6 +1688,7 @@ MagoManager.prototype.getTexturesManager = function ()
 		this.selColorTex = this.texturesManager.texturesMergerFbo.colorBuffersArray[3];
 		// MagoEarthShadedColTex = this.texturesManager.texturesMergerFbo.colorBuffersArray[4];
 		this.brightColorTex = this.texturesManager.texturesMergerFbo.colorBuffersArray[5]; // For bloom effect, if exist.***
+		this.debugTex = this.texturesManager.texturesMergerFbo.colorBuffersArray[6]; // For debug gpu process.***
 	}
 
 	return this.texturesManager;
@@ -2110,6 +2111,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 	this.selColorTex = this.depthFboNeo.colorBuffersArray[3];
 	// MagoEarthShadedColTex = this.depthFboNeo.colorBuffersArray[4];
 	this.brightColorTex = this.depthFboNeo.colorBuffersArray[5]; // Texture.createTexture = function(gl, filter, data, width, height, texWrap) // usualy texWrap = gl.CLAMP_TO_EDGE.***
+	this.debugTex = this.depthFboNeo.colorBuffersArray[6];
 	// Create bloomBufferFBO if no exist.
 	if (!texturesManager.bloomBufferFBO)
 	{
@@ -2168,6 +2170,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 			gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, this.normalTex, 0);
 			gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, this.albedoTex, 0);
 			gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT4_WEBGL, gl.TEXTURE_2D, this.selColorTex, 0);
+			//gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT5_WEBGL, gl.TEXTURE_2D, this.debugTex, 0);
 
 			if (this.isCameraMoved)
 			{
@@ -2177,7 +2180,8 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 					extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - depthTex
 					extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - normalTex
 					extbuffers.COLOR_ATTACHMENT3_WEBGL, // gl_FragData[3] - albedoTex
-					extbuffers.COLOR_ATTACHMENT4_WEBGL // gl_FragData[4] - selColor4
+					extbuffers.COLOR_ATTACHMENT4_WEBGL, // gl_FragData[4] - selColor4
+					//extbuffers.COLOR_ATTACHMENT5_WEBGL // gl_FragData[4] - debugTex
 				]);
 			}
 			else
@@ -2187,7 +2191,8 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 					extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - depthTex
 					extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - normalTex
 					extbuffers.COLOR_ATTACHMENT3_WEBGL, // gl_FragData[3] - albedoTex
-					extbuffers.NONE // gl_FragData[3] - albedoTex
+					extbuffers.NONE, // gl_FragData[3] - albedoTex
+					//extbuffers.COLOR_ATTACHMENT5_WEBGL // gl_FragData[4] - debugTex
 				]);
 			}
 			
@@ -2224,13 +2229,15 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		// Deactive depth & normals for transparent pass.
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // depthTex.
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // normalTex.
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT5_WEBGL, gl.TEXTURE_2D, null, 0); // debugTex.
 
 		this.extbuffers.drawBuffersWEBGL([
 			this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
 			this.extbuffers.NONE, // gl_FragData[1] - depthTex
 			this.extbuffers.NONE, // gl_FragData[2] - normalTex
 			this.extbuffers.COLOR_ATTACHMENT3_WEBGL, // gl_FragData[3] - albedoTex
-			this.extbuffers.COLOR_ATTACHMENT4_WEBGL // gl_FragData[4] - selColor4
+			this.extbuffers.COLOR_ATTACHMENT4_WEBGL, // gl_FragData[4] - selColor4
+			this.extbuffers.NONE // [5]debugTex (if exist).***
 		]);
 	}
 

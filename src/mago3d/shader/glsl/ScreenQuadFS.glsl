@@ -269,9 +269,9 @@ float getDepth(vec2 coord)
 	}
 }
 
-float getRealDepth(in vec2 coord, in float far)
+float getRealDepth(in vec2 coord, in vec2 nearFar)
 {
-	return getDepth(coord) * far;
+	return getDepth(coord) * (nearFar.y);
 }
 
 float getZDist(in vec2 coord)
@@ -282,8 +282,8 @@ float getZDist(in vec2 coord)
 	int dataType = -1;// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.
 	int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);
 	vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);
-	float currFar = nearFar.y;
-	return getRealDepth(coord, currFar);
+	//float currFar = nearFar.y;
+	return getRealDepth(coord, nearFar);
 }
 
 bool isEdge(vec2 screenPos, vec3 normal, float pixelSize_x, float pixelSize_y)
@@ -340,10 +340,10 @@ bool isEdge_byNormals(vec2 screenPos, vec3 normal, float pixelSize_x, float pixe
 
 bool _isEdge_byDepth(in float curZDist, vec2 screenPos)
 {
-	float minDist = 2.0;
+	float minDist = 5.0;
     float adjacentZDist = getZDist(screenPos);
 	float diff = abs(curZDist - adjacentZDist);
-	if(diff / curZDist > 0.1 && diff > minDist)
+	if(diff / curZDist > 0.2 && diff > minDist)
 	{ return true; }
     else{
         return false;
@@ -453,15 +453,14 @@ vec3 Gamma(vec3 value, float param)
     return vec3(pow(abs(value.r), param),pow(abs(value.g), param),pow(abs(value.b), param));
 }
 
-void getNormal_dataType_andFar(in vec2 coord, inout vec3 normal, inout int dataType, inout float far)
+void getNormal_dataType_andFar(in vec2 coord, inout vec3 normal, inout int dataType, inout vec2 nearFar)
 {
 	vec4 normal4 = getNormal(coord);
 	normal = normal4.xyz;
 	int estimatedFrustumIdx = int(floor(normal4.w * 100.0));
 	dataType = -1;// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.
 	int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);
-	vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);
-	far = nearFar.y;
+	nearFar = getNearFar_byFrustumIdx(currFrustumIdx);
 }
 
 
@@ -757,7 +756,7 @@ void main()
 			if(!bIsEdge && dataType == 0)
 			{
 				// Check if is edge by depth range.***
-				bIsEdge = isEdge_byDepth(screenPos, pixelSize_x, pixelSize_y);
+				//bIsEdge = isEdge_byDepth(screenPos, pixelSize_x, pixelSize_y);
 			}
 			
 			if(bIsEdge)
@@ -806,33 +805,33 @@ void main()
 			vec2 texCoord_top = vec2(screenPos.x, screenPos.y + pixelSize_y*coordScale);
 			vec3 normal_top;
 			int dataType_top;
-			float far_top;
-			getNormal_dataType_andFar(texCoord_top, normal_top, dataType_top, far_top);
-			float realDepth_top = getRealDepth(texCoord_top, far_top);
+			vec2 nearfar_top;
+			getNormal_dataType_andFar(texCoord_top, normal_top, dataType_top, nearfar_top);
+			float realDepth_top = getRealDepth(texCoord_top, nearfar_top);
 
 			// left.***
 			vec2 texCoord_left = vec2(screenPos.x - pixelSize_x * coordScale, screenPos.y);
 			vec3 normal_left;
 			int dataType_left;
-			float far_left;
-			getNormal_dataType_andFar(texCoord_left, normal_left, dataType_left, far_left);
-			float realDepth_left = getRealDepth(texCoord_left, far_left);
+			vec2 nearfar_left;
+			getNormal_dataType_andFar(texCoord_left, normal_left, dataType_left, nearfar_left);
+			float realDepth_left = getRealDepth(texCoord_left, nearfar_left);
 
 			// bottom.***
 			vec2 texCoord_bottom = vec2(screenPos.x, screenPos.y - pixelSize_y*coordScale);
 			vec3 normal_bottom;
 			int dataType_bottom;
-			float far_bottom;
-			getNormal_dataType_andFar(texCoord_bottom, normal_bottom, dataType_bottom, far_bottom);
-			float realDepth_bottom = getRealDepth(texCoord_bottom, far_bottom);
+			vec2 nearfar_bottom;
+			getNormal_dataType_andFar(texCoord_bottom, normal_bottom, dataType_bottom, nearfar_bottom);
+			float realDepth_bottom = getRealDepth(texCoord_bottom, nearfar_bottom);
 
 			// right.***
 			vec2 texCoord_right = vec2(screenPos.x + pixelSize_x * coordScale, screenPos.y);
 			vec3 normal_right;
 			int dataType_right;
-			float far_right;
-			getNormal_dataType_andFar(texCoord_right, normal_right, dataType_right, far_right);
-			float realDepth_right = getRealDepth(texCoord_right, far_right);
+			vec2 nearfar_right;
+			getNormal_dataType_andFar(texCoord_right, normal_right, dataType_right, nearfar_right);
+			float realDepth_right = getRealDepth(texCoord_right, nearfar_right);
 
 			float response = (max(0.0, log2Deoth - log2(realDepth_top)) + max(0.0, log2Deoth - log2(realDepth_left)) + max(0.0, log2Deoth - log2(realDepth_bottom)) + max(0.0, log2Deoth - log2(realDepth_right))) / 4.0;
 			float edlStrength = 2.0;
@@ -856,4 +855,16 @@ void main()
     else
         brightColor = vec4(0.0, 0.0, 0.0, 1.0);
 	gl_FragData[1] = brightColor;
+
+	// debugTex.***
+	float pixelSize_x_ = 1.0/screenWidth;
+	float pixelSize_y_ = 1.0/screenHeight;
+	float zDist = getZDist(screenPos);// - nearFar_origin.x);
+	bool isEdgeTest = _isEdge_byDepth(zDist, screenPos);
+	float zDist_top = getZDist(vec2(screenPos.x, screenPos.y + pixelSize_y_));// - nearFar_origin.x);
+	if(isEdgeTest)
+	{
+		gl_FragData[2] = vec4(1.0, 0.0, 0.0, 1.0);
+	}
+	else gl_FragData[2] = vec4(zDist/1000.0, zDist/1000.0, zDist/1000.0, 1.0);
 }

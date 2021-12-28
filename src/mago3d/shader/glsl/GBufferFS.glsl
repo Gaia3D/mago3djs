@@ -48,6 +48,7 @@ varying vec3 vertexPosLC;
 varying float flogz;
 varying float Fcoef_half;
 varying float depth;
+//varying vec3 depthDebug;
 
 
 vec4 packDepth( float v ) {
@@ -400,6 +401,9 @@ void main()
 
 		// selColor4 (if necessary).
 		gl_FragData[4] = uSelColor4; 
+
+		// debugTex.***
+		//gl_FragData[5] = vec4(0.0, 0.0, depthDebug.z, 1.0); 
 	}
 	#endif
 
