@@ -6336,14 +6336,52 @@ float getZDist(in vec2 coord)\n\
 	return getRealDepth(coord, currFar);\n\
 }\n\
 \n\
+bool _isEdge_byDepth(in float curZDist, vec2 screenPos)\n\
+{\n\
+    float minDist = 2.0;\n\
+    float adjacentZDist = getZDist(screenPos);\n\
+	float diff = abs(curZDist - adjacentZDist);\n\
+	if(diff / curZDist > 0.1 && diff > minDist)\n\
+	{ return true; }\n\
+    else{\n\
+        return false;\n\
+    }\n\
+}\n\
+\n\
 bool isEdge_byDepth(vec2 screenPos, float pixelSize_x, float pixelSize_y)\n\
 {\n\
 	bool bIsEdge = false;\n\
 	// Now, check by depth.***\n\
 	float minDist = 1.0;\n\
 	float curZDist = getZDist(screenPos);\n\
-	float curZDist_up = getZDist(vec2(screenPos.x, screenPos.y + pixelSize_y*1.0));\n\
 \n\
+    if(_isEdge_byDepth(curZDist, vec2(screenPos.x, screenPos.y + pixelSize_y*1.0)))\n\
+    { return true; }\n\
+\n\
+    if(_isEdge_byDepth(curZDist, vec2(screenPos.x + pixelSize_x, screenPos.y + pixelSize_y*1.0)))\n\
+    { return true; }\n\
+\n\
+    if(_isEdge_byDepth(curZDist, vec2(screenPos.x + pixelSize_x, screenPos.y)))\n\
+    { return true; }\n\
+\n\
+    if(_isEdge_byDepth(curZDist, vec2(screenPos.x + pixelSize_x, screenPos.y - pixelSize_y*1.0)))\n\
+    { return true; }\n\
+\n\
+    if(_isEdge_byDepth(curZDist, vec2(screenPos.x, screenPos.y - pixelSize_y*1.0)))\n\
+    { return true; }\n\
+\n\
+    if(_isEdge_byDepth(curZDist, vec2(screenPos.x - pixelSize_x, screenPos.y - pixelSize_y*1.0)))\n\
+    { return true; }\n\
+\n\
+    if(_isEdge_byDepth(curZDist, vec2(screenPos.x - pixelSize_x, screenPos.y)))\n\
+    { return true; }\n\
+\n\
+    if(_isEdge_byDepth(curZDist, vec2(screenPos.x - pixelSize_x, screenPos.y + pixelSize_y*1.0)))\n\
+    { return true; }\n\
+\n\
+    return false;\n\
+    /*\n\
+	float curZDist_up = getZDist(vec2(screenPos.x, screenPos.y + pixelSize_y*1.0));\n\
 	float diff = abs(curZDist - curZDist_up);\n\
 	if(diff / curZDist < 0.01)\n\
 	{ return false; }\n\
@@ -6351,8 +6389,15 @@ bool isEdge_byDepth(vec2 screenPos, float pixelSize_x, float pixelSize_y)\n\
 	if(diff > minDist)\n\
 	{ return true; }\n\
 \n\
-    float curZDist_right = getZDist(vec2(screenPos.x + pixelSize_x*1.0, screenPos.y));\n\
+    float curZDist_down = getZDist(vec2(screenPos.x, screenPos.y - pixelSize_y*1.0));\n\
+	diff = abs(curZDist - curZDist_down);\n\
+	if(diff / curZDist < 0.01)\n\
+	{ return false; }\n\
 \n\
+	if(diff > minDist)\n\
+	{ return true; }\n\
+\n\
+	float curZDist_right = getZDist(vec2(screenPos.x + pixelSize_x*1.0, screenPos.y));\n\
 	diff = abs(curZDist - curZDist_right);\n\
 	if(diff / curZDist < 0.01)\n\
 	{ return false; }\n\
@@ -6360,7 +6405,48 @@ bool isEdge_byDepth(vec2 screenPos, float pixelSize_x, float pixelSize_y)\n\
 	if(diff > minDist)\n\
 	{ return true; }\n\
 \n\
+	float curZDist_Left = getZDist(vec2(screenPos.x - pixelSize_x*1.0, screenPos.y));\n\
+	diff = abs(curZDist - curZDist_Left);\n\
+	if(diff / curZDist < 0.01)\n\
+	{ return false; }\n\
+\n\
+	if(diff > minDist)\n\
+	{ return true; }\n\
+\n\
+	float curZDist_rightUp = getZDist(vec2(screenPos.x + pixelSize_x*1.0, screenPos.y + pixelSize_y*1.0));\n\
+	diff = abs(curZDist - curZDist_rightUp);\n\
+	if(diff / curZDist < 0.01)\n\
+	{ return false; }\n\
+\n\
+	if(diff > minDist)\n\
+	{ return true; }\n\
+\n\
+	float curZDist_rightDown = getZDist(vec2(screenPos.x + pixelSize_x*1.0, screenPos.y - pixelSize_y*1.0));\n\
+	diff = abs(curZDist - curZDist_rightDown);\n\
+	if(diff / curZDist < 0.01)\n\
+	{ return false; }\n\
+\n\
+	if(diff > minDist)\n\
+	{ return true; }\n\
+\n\
+	float curZDist_downLeft = getZDist(vec2(screenPos.x - pixelSize_x*1.0, screenPos.y - pixelSize_y*1.0));\n\
+	diff = abs(curZDist - curZDist_downLeft);\n\
+	if(diff / curZDist < 0.01)\n\
+	{ return false; }\n\
+\n\
+	if(diff > minDist)\n\
+	{ return true; }\n\
+\n\
+    float curZDist_upLeft = getZDist(vec2(screenPos.x - pixelSize_x*1.0, screenPos.y + pixelSize_y*1.0));\n\
+	diff = abs(curZDist - curZDist_upLeft);\n\
+	if(diff / curZDist < 0.01)\n\
+	{ return false; }\n\
+\n\
+	if(diff > minDist)\n\
+	{ return true; }\n\
+\n\
 	return bIsEdge;\n\
+    */\n\
 }\n\
 \n\
 void make_kernel(inout vec4 n[9], vec2 coord)\n\
@@ -6892,31 +6978,50 @@ bool isEdge_byNormals(vec2 screenPos, vec3 normal, float pixelSize_x, float pixe
 	return bIsEdge;\n\
 }\n\
 \n\
+bool _isEdge_byDepth(in float curZDist, vec2 screenPos)\n\
+{\n\
+	float minDist = 2.0;\n\
+    float adjacentZDist = getZDist(screenPos);\n\
+	float diff = abs(curZDist - adjacentZDist);\n\
+	if(diff / curZDist > 0.1 && diff > minDist)\n\
+	{ return true; }\n\
+    else{\n\
+        return false;\n\
+    }\n\
+}\n\
+\n\
 bool isEdge_byDepth(vec2 screenPos, float pixelSize_x, float pixelSize_y)\n\
 {\n\
 	bool bIsEdge = false;\n\
 	// Now, check by depth.***\n\
 	float minDist = 1.0;\n\
 	float curZDist = getZDist(screenPos);\n\
-	float curZDist_up = getZDist(vec2(screenPos.x, screenPos.y + pixelSize_y*1.0));\n\
 \n\
-	float diff = abs(curZDist - curZDist_up);\n\
-	if(diff / curZDist < 0.01)\n\
-	{ return false; }\n\
+    if(_isEdge_byDepth(curZDist, vec2(screenPos.x, screenPos.y + pixelSize_y*1.0)))\n\
+    { return true; }\n\
 \n\
-	if(diff > minDist)\n\
-	{ return true; }\n\
+    if(_isEdge_byDepth(curZDist, vec2(screenPos.x + pixelSize_x, screenPos.y + pixelSize_y*1.0)))\n\
+    { return true; }\n\
 \n\
-	float curZDist_right = getZDist(vec2(screenPos.x + pixelSize_x*1.0, screenPos.y));\n\
+    if(_isEdge_byDepth(curZDist, vec2(screenPos.x + pixelSize_x, screenPos.y)))\n\
+    { return true; }\n\
 \n\
-	diff = abs(curZDist - curZDist_right);\n\
-	if(diff / curZDist < 0.01)\n\
-	{ return false; }\n\
+    if(_isEdge_byDepth(curZDist, vec2(screenPos.x + pixelSize_x, screenPos.y - pixelSize_y*1.0)))\n\
+    { return true; }\n\
 \n\
-	if(diff > minDist)\n\
-	{ return true; }\n\
+    if(_isEdge_byDepth(curZDist, vec2(screenPos.x, screenPos.y - pixelSize_y*1.0)))\n\
+    { return true; }\n\
 \n\
-	return bIsEdge;\n\
+    if(_isEdge_byDepth(curZDist, vec2(screenPos.x - pixelSize_x, screenPos.y - pixelSize_y*1.0)))\n\
+    { return true; }\n\
+\n\
+    if(_isEdge_byDepth(curZDist, vec2(screenPos.x - pixelSize_x, screenPos.y)))\n\
+    { return true; }\n\
+\n\
+    if(_isEdge_byDepth(curZDist, vec2(screenPos.x - pixelSize_x, screenPos.y + pixelSize_y*1.0)))\n\
+    { return true; }\n\
+\n\
+    return false;\n\
 }\n\
 \n\
 vec4 getShadedAlbedo(vec2 screenPos, vec3 lightingDirection, vec3 ambientColor, vec3 directionalLightColor)\n\
@@ -6998,6 +7103,7 @@ void getNormal_dataType_andFar(in vec2 coord, inout vec3 normal, inout int dataT
 	vec2 nearFar = getNearFar_byFrustumIdx(currFrustumIdx);\n\
 	far = nearFar.y;\n\
 }\n\
+\n\
 \n\
 void main()\n\
 {\n\

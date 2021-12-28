@@ -5,7 +5,7 @@
  * @class KoreaBuilding
  * @param {object} geojson
  */
-var KoreaBuilding = function(geojson) 
+var KoreaBuilding = function (geojson) 
 {
 	if (!(this instanceof KoreaBuilding)) 
 	{

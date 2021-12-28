@@ -338,31 +338,50 @@ bool isEdge_byNormals(vec2 screenPos, vec3 normal, float pixelSize_x, float pixe
 	return bIsEdge;
 }
 
+bool _isEdge_byDepth(in float curZDist, vec2 screenPos)
+{
+	float minDist = 2.0;
+    float adjacentZDist = getZDist(screenPos);
+	float diff = abs(curZDist - adjacentZDist);
+	if(diff / curZDist > 0.1 && diff > minDist)
+	{ return true; }
+    else{
+        return false;
+    }
+}
+
 bool isEdge_byDepth(vec2 screenPos, float pixelSize_x, float pixelSize_y)
 {
 	bool bIsEdge = false;
 	// Now, check by depth.***
 	float minDist = 1.0;
 	float curZDist = getZDist(screenPos);
-	float curZDist_up = getZDist(vec2(screenPos.x, screenPos.y + pixelSize_y*1.0));
 
-	float diff = abs(curZDist - curZDist_up);
-	if(diff / curZDist < 0.01)
-	{ return false; }
+    if(_isEdge_byDepth(curZDist, vec2(screenPos.x, screenPos.y + pixelSize_y*1.0)))
+    { return true; }
 
-	if(diff > minDist)
-	{ return true; }
+    if(_isEdge_byDepth(curZDist, vec2(screenPos.x + pixelSize_x, screenPos.y + pixelSize_y*1.0)))
+    { return true; }
 
-	float curZDist_right = getZDist(vec2(screenPos.x + pixelSize_x*1.0, screenPos.y));
+    if(_isEdge_byDepth(curZDist, vec2(screenPos.x + pixelSize_x, screenPos.y)))
+    { return true; }
 
-	diff = abs(curZDist - curZDist_right);
-	if(diff / curZDist < 0.01)
-	{ return false; }
+    if(_isEdge_byDepth(curZDist, vec2(screenPos.x + pixelSize_x, screenPos.y - pixelSize_y*1.0)))
+    { return true; }
 
-	if(diff > minDist)
-	{ return true; }
+    if(_isEdge_byDepth(curZDist, vec2(screenPos.x, screenPos.y - pixelSize_y*1.0)))
+    { return true; }
 
-	return bIsEdge;
+    if(_isEdge_byDepth(curZDist, vec2(screenPos.x - pixelSize_x, screenPos.y - pixelSize_y*1.0)))
+    { return true; }
+
+    if(_isEdge_byDepth(curZDist, vec2(screenPos.x - pixelSize_x, screenPos.y)))
+    { return true; }
+
+    if(_isEdge_byDepth(curZDist, vec2(screenPos.x - pixelSize_x, screenPos.y + pixelSize_y*1.0)))
+    { return true; }
+
+    return false;
 }
 
 vec4 getShadedAlbedo(vec2 screenPos, vec3 lightingDirection, vec3 ambientColor, vec3 directionalLightColor)

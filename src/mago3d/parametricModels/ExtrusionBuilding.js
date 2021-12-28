@@ -7,7 +7,7 @@
  * @param {number} height
  * @param {object} options
  */
-var ExtrusionBuilding = function(geographicCoordList, height, options) 
+var ExtrusionBuilding = function (geographicCoordList, height, options) 
 {
 	if (!(this instanceof ExtrusionBuilding)) 
 	{

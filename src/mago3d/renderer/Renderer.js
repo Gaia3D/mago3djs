@@ -2387,8 +2387,8 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 	if (magoManager.ssaoFromDepthFbo)
 	{
-		//texture = magoManager.ssaoFromDepthFbo.colorBuffersArray[0]; // ssao (with noise).***
-		texture = magoManager.ssaoFromDepthFbo.colorBuffersArray[1]; // ssao with blur.***
+		texture = magoManager.ssaoFromDepthFbo.colorBuffersArray[0]; // ssao (with noise).***
+		//texture = magoManager.ssaoFromDepthFbo.colorBuffersArray[1]; // ssao with blur.***
 	}
 
 	// weatherStation.*** weatherStation.*** weatherStation.*** weatherStation.*** weatherStation.*** weatherStation.*** weatherStation.*** weatherStation.*** 
