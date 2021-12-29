@@ -739,7 +739,7 @@ MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visible
  * @param {SceneState} sceneState
  * @private
  */
-MagoManager.prototype.upDateSceneStateMatrices = function(sceneState) 
+MagoManager.prototype.upDateSceneStateMatrices = function (sceneState) 
 {
 	if (this.myCameraSCX === undefined) 
 	{ this.myCameraSCX = new Camera({name: "cameraSCX"}); }
@@ -2111,7 +2111,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 	this.selColorTex = this.depthFboNeo.colorBuffersArray[3];
 	// MagoEarthShadedColTex = this.depthFboNeo.colorBuffersArray[4];
 	this.brightColorTex = this.depthFboNeo.colorBuffersArray[5]; // Texture.createTexture = function(gl, filter, data, width, height, texWrap) // usualy texWrap = gl.CLAMP_TO_EDGE.***
-	this.debugTex = this.depthFboNeo.colorBuffersArray[6];
+	//this.debugTex = this.depthFboNeo.colorBuffersArray[6];
 	// Create bloomBufferFBO if no exist.
 	if (!texturesManager.bloomBufferFBO)
 	{
@@ -2365,6 +2365,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		var bTexFlipYAxis = true;
 		var bTexFlipXAxis = true;
 		this.renderer.copyTexture(this.cesiumColorBuffer, this.albedoTex, bTexFlipXAxis, bTexFlipYAxis);
+		// this.renderer.copyTexture(this.scene._context._us.globeDepthTexture._texture, this.debugTex, bTexFlipXAxis, bTexFlipYAxis);
 
 
 		// Render the lightBuffer.*****************************************

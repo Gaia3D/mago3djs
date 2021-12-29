@@ -866,5 +866,5 @@ void main()
 	{
 		gl_FragData[2] = vec4(1.0, 0.0, 0.0, 1.0);
 	}
-	else gl_FragData[2] = vec4(zDist/1000.0, zDist/1000.0, zDist/1000.0, 1.0);
+	else gl_FragData[2] = vec4(zDist/1200.0, zDist/1200.0, zDist/1200.0, 1.0);
 }

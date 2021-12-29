@@ -216,10 +216,10 @@ float getOcclusion(vec3 origin, vec3 rotatedKernel, float radius, int originFrus
 {
     float result_occlusion = 0.0;
     vec3 sample = origin + rotatedKernel * radius;
-    vec4 offset = projectionMatrix * vec4(sample, 1.0);	
+    vec4 offset = projectionMatrix * vec4(sample, 1.0);	// from view to clip-space
     vec3 offsetCoord = vec3(offset.xyz);				
-    offsetCoord.xyz /= offset.w;
-    offsetCoord.xyz = offsetCoord.xyz * 0.5 + 0.5;  	
+    offsetCoord.xyz /= offset.w; // perspective divide
+    offsetCoord.xyz = offsetCoord.xyz * 0.5 + 0.5;  // transform to range 0.0 - 1.0  	
 
     if(abs(offsetCoord.x) > 1.0 || abs(offsetCoord.y) > 1.0)
     {
@@ -227,29 +227,17 @@ float getOcclusion(vec3 origin, vec3 rotatedKernel, float radius, int originFrus
     }
     vec4 normalRGBA = getNormal(offsetCoord.xy);
     int estimatedFrustumIdx = int(floor(100.0*normalRGBA.w));
-
-    // Test.***************************************************************
-
-    // check the data type of the pixel.
-    /*
-    int dataType = -1;
-    int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);
-    if(originFrustumIdx != currFrustumIdx)// test "if".***
-    {
-        //if(radius < 6.0)
-        //return result_occlusion; // test "if".***
-    }
-    */
-    // End test.-----------------------------------------------------------
+    //int dataType = 0;
+    //int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);
 
     vec2 nearFar = getNearFar_byFrustumIdx(estimatedFrustumIdx);
     float currNear = nearFar.x;
     float currFar = nearFar.y;
     float depthBufferValue = getDepth(offsetCoord.xy);
-    //------------------------------------
-    
+    //--------------------------------------------------------
+    // Objective : to compare "sampleZ" with "bufferZ".***
+    //--------------------------------------------------------
     float sampleZ = -sample.z;
-    //float bufferZ = currNear + depthBufferValue * (currFar - currNear);
     float bufferZ = depthBufferValue * currFar;
     float zDiff = abs(bufferZ - sampleZ);
     if(zDiff < radius)
@@ -260,18 +248,6 @@ float getOcclusion(vec3 origin, vec3 rotatedKernel, float radius, int originFrus
             result_occlusion = 1.0;// * rangeCheck;
         }
     }
-    
-    /*
-    float depthDiff = abs(depthBufferValue - sampleDepth);
-    if(depthDiff < radius/currFar)
-    {
-        float rangeCheck = smoothstep(0.0, 1.0, radius / (depthDiff*currFar));
-        if (depthBufferValue < sampleDepth)
-        {
-            result_occlusion = 1.0 * rangeCheck;
-        }
-    }
-    */
     return result_occlusion;
 }
 

@@ -7516,7 +7516,7 @@ void main()\n\
 	{\n\
 		gl_FragData[2] = vec4(1.0, 0.0, 0.0, 1.0);\n\
 	}\n\
-	else gl_FragData[2] = vec4(zDist/1000.0, zDist/1000.0, zDist/1000.0, 1.0);\n\
+	else gl_FragData[2] = vec4(zDist/1200.0, zDist/1200.0, zDist/1200.0, 1.0);\n\
 }";
 ShaderSource.ScreenQuadGaussianBlurFS = "#ifdef GL_ES\n\
     precision highp float;\n\
@@ -7857,10 +7857,10 @@ float getOcclusion(vec3 origin, vec3 rotatedKernel, float radius, int originFrus
 {\n\
     float result_occlusion = 0.0;\n\
     vec3 sample = origin + rotatedKernel * radius;\n\
-    vec4 offset = projectionMatrix * vec4(sample, 1.0);	\n\
+    vec4 offset = projectionMatrix * vec4(sample, 1.0);	// from view to clip-space\n\
     vec3 offsetCoord = vec3(offset.xyz);				\n\
-    offsetCoord.xyz /= offset.w;\n\
-    offsetCoord.xyz = offsetCoord.xyz * 0.5 + 0.5;  	\n\
+    offsetCoord.xyz /= offset.w; // perspective divide\n\
+    offsetCoord.xyz = offsetCoord.xyz * 0.5 + 0.5;  // transform to range 0.0 - 1.0  	\n\
 \n\
     if(abs(offsetCoord.x) > 1.0 || abs(offsetCoord.y) > 1.0)\n\
     {\n\
@@ -7868,7 +7868,8 @@ float getOcclusion(vec3 origin, vec3 rotatedKernel, float radius, int originFrus
     }\n\
     vec4 normalRGBA = getNormal(offsetCoord.xy);\n\
     int estimatedFrustumIdx = int(floor(100.0*normalRGBA.w));\n\
-\n\
+    //int dataType = 0;\n\
+    //int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);\n\
     // Test.***************************************************************\n\
 \n\
     // check the data type of the pixel.\n\
@@ -7887,8 +7888,9 @@ float getOcclusion(vec3 origin, vec3 rotatedKernel, float radius, int originFrus
     float currNear = nearFar.x;\n\
     float currFar = nearFar.y;\n\
     float depthBufferValue = getDepth(offsetCoord.xy);\n\
-    //------------------------------------\n\
-    \n\
+    //--------------------------------------------------------\n\
+    // Objective : to compare \"sampleZ\" with \"bufferZ\".***\n\
+    //--------------------------------------------------------\n\
     float sampleZ = -sample.z;\n\
     //float bufferZ = currNear + depthBufferValue * (currFar - currNear);\n\
     float bufferZ = depthBufferValue * currFar;\n\

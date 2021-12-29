@@ -1883,7 +1883,7 @@ Renderer.prototype.renderScreenQuadBlur_ssaoTex = function (gl)
  * This function renders the ssao by depthBuffer.
  * @param {WebGLRenderingContext} gl WebGL Rendering Context.
  */
-Renderer.prototype.renderSsaoFromDepth = function(gl) 
+Renderer.prototype.renderSsaoFromDepth = function (gl) 
 {
 	// render the ssao to texture, and then apply blur.
 	var magoManager = this.magoManager;
@@ -1916,7 +1916,7 @@ Renderer.prototype.renderSsaoFromDepth = function(gl)
 	gl.viewport(0, 0, bufferWidth, bufferHeight);
 	if (magoManager.isCesiumGlobe())
 	{
-		gl.uniform1f(currentShader.frustumFar_loc, 40000.0); // only in cesium.***
+		//gl.uniform1f(currentShader.frustumFar_loc, 40000.0); // only in cesium.***
 	}
 
 	var bApplySsao = true;
@@ -2000,7 +2000,13 @@ Renderer.prototype.copyTexture = function (webGlTextureOriginal, webGlTextureDes
 	// we are in ORT (one rendering target).*********************************************************************************
 	magoManager.texturesManager.texturesMergerFbo.bind();
 
-	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, webGlTextureDest, 0);
+	var extbuffers = magoManager.extbuffers;
+
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, webGlTextureDest, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT4_WEBGL, gl.TEXTURE_2D, null, 0);
 
 	// If we are in ORT (one rendering target), then must set the "u_textureTypeToCopy" uniform.***
 	//gl.uniform1i(currentShader.u_textureTypeToCopy_loc, i); // if MRT, then this var has NO effect.
@@ -2010,7 +2016,7 @@ Renderer.prototype.copyTexture = function (webGlTextureOriginal, webGlTextureDes
 	//gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	//gl.clearColor(0, 0, 0, 1);
 
-	var extbuffers = magoManager.extbuffers;
+	
 
 	if (extbuffers)
 	{
