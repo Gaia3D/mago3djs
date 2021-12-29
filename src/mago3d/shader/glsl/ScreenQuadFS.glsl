@@ -340,10 +340,10 @@ bool isEdge_byNormals(vec2 screenPos, vec3 normal, float pixelSize_x, float pixe
 
 bool _isEdge_byDepth(in float curZDist, vec2 screenPos)
 {
-	float minDist = 5.0;
+	float minDist = 1.0;
     float adjacentZDist = getZDist(screenPos);
 	float diff = abs(curZDist - adjacentZDist);
-	if(diff / curZDist > 0.2 && diff > minDist)
+	if(diff / curZDist > 0.01 && diff > minDist)
 	{ return true; }
     else{
         return false;
@@ -352,20 +352,17 @@ bool _isEdge_byDepth(in float curZDist, vec2 screenPos)
 
 bool isEdge_byDepth(vec2 screenPos, float pixelSize_x, float pixelSize_y)
 {
-	bool bIsEdge = false;
-	// Now, check by depth.***
-	float minDist = 1.0;
 	float curZDist = getZDist(screenPos);
 
-    if(_isEdge_byDepth(curZDist, vec2(screenPos.x, screenPos.y + pixelSize_y*1.0)))
+    if(_isEdge_byDepth(curZDist, vec2(screenPos.x, screenPos.y + pixelSize_y*1.0))) // up.
     { return true; }
 
-    if(_isEdge_byDepth(curZDist, vec2(screenPos.x + pixelSize_x, screenPos.y + pixelSize_y*1.0)))
+    if(_isEdge_byDepth(curZDist, vec2(screenPos.x + pixelSize_x, screenPos.y + pixelSize_y*1.0))) // up-right.
     { return true; }
 
-    if(_isEdge_byDepth(curZDist, vec2(screenPos.x + pixelSize_x, screenPos.y)))
+    if(_isEdge_byDepth(curZDist, vec2(screenPos.x + pixelSize_x, screenPos.y))) // right.
     { return true; }
-
+	/*
     if(_isEdge_byDepth(curZDist, vec2(screenPos.x + pixelSize_x, screenPos.y - pixelSize_y*1.0)))
     { return true; }
 
@@ -380,7 +377,7 @@ bool isEdge_byDepth(vec2 screenPos, float pixelSize_x, float pixelSize_y)
 
     if(_isEdge_byDepth(curZDist, vec2(screenPos.x - pixelSize_x, screenPos.y + pixelSize_y*1.0)))
     { return true; }
-
+	*/
     return false;
 }
 
@@ -713,41 +710,7 @@ void main()
 
 		gl_FragData[0] = finalColor;
 
-		// fog.*****************************************************************
-		//float myLinearDepth2 = getDepth(screenPos);
-		//float myDepth = (myLinearDepth2 * currFar_origin)/500.0;
-		//if(myDepth > 1.0)
-		//myDepth = 1.0;
-		//vec4 finalColor2 = mix(finalColor, vec4(1.0, 1.0, 1.0, 1.0), myDepth);
-		//gl_FragData[0] = vec4(finalColor2);
-		// End fog.---------------------------------------------------------------
-
-		//float finalColorLightLevel = finalColor.r + finalColor.g + finalColor.b;
-		//if(finalColorLightLevel < 0.9)
-		//return;
-
-		// Provisionally render Aura by depth.************************************************************
-		/*
-		if(dataType == 0)
-		{
-			// check depth by xCross pixel samples.***
-			// PixelRadius = 7;
-			// South 3 pixels.***
-			float pixelSize_x = 1.0/screenWidth;
-			float pixelSize_y = 1.0/screenHeight;
-			float counter = 1.0;
-			for(int i=0; i<3; i++)
-			{
-				vec2 screePos_south = vec2(screenPos.x, screenPos.y - counter*pixelSize_y);
-
-
-				counter += 1.0;
-			}
-
-		}
-		*/
-		// Provisionally render edges here.****************************************************************
-		// EDGES.***
+		// EDGES.****************************************************************
 		if(dataType == 0 || dataType == 1)// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.
 		{
 			
@@ -756,7 +719,7 @@ void main()
 			if(!bIsEdge && dataType == 0)
 			{
 				// Check if is edge by depth range.***
-				//bIsEdge = isEdge_byDepth(screenPos, pixelSize_x, pixelSize_y);
+				bIsEdge = isEdge_byDepth(screenPos, pixelSize_x, pixelSize_y);
 			}
 			
 			if(bIsEdge)
@@ -765,13 +728,16 @@ void main()
 				if(isTransparentObject)
 					edgeColor *= 1.5;
 
-				gl_FragData[0] = vec4(edgeColor.rgb, 1.0);
+				finalColor = vec4(edgeColor.rgb, 1.0);
+
+				gl_FragData[0] = finalColor;
 				
 			}
 
-			// Test : shade terrain.***
+			// shade terrain : TODO.***
 			if(dataType == 1)
 			{
+				// TODO :
 				// Calculate normal by depth texture.***
 				//vec4 normal4 = getNormal(screenPos);
 				//vec3 normal = normal4.xyz;
@@ -846,10 +812,21 @@ void main()
 		
 	}
 
+	// fog.*****************************************************************
+	//bool bApplyFog = true;
+	//if(bApplyFog)
+	//{
+	//	float zDist = getZDist(screenPos);
+	//	float fogFactor = min(zDist / 2000.0, 0.4);
+	//	vec4 finalColor2 = mix(finalColor, vec4(1.0, 1.0, 1.0, 1.0), fogFactor);
+	//	gl_FragData[0] = vec4(finalColor2);
+	//}
+	
+	// End fog.---------------------------------------------------------------
+
 	// Finally check for brightColor (for bloom effect, if exist).***
 	float brightness = dot(finalColor.rgb, vec3(0.2126, 0.7152, 0.0722));
 	vec4 brightColor;
-    //if(brightness > 1.0)
 	if(brightness > 1.0)
         brightColor = vec4(finalColor.rgb, 1.0);
     else
@@ -857,14 +834,14 @@ void main()
 	gl_FragData[1] = brightColor;
 
 	// debugTex.***
-	float pixelSize_x_ = 1.0/screenWidth;
-	float pixelSize_y_ = 1.0/screenHeight;
-	float zDist = getZDist(screenPos);// - nearFar_origin.x);
-	bool isEdgeTest = _isEdge_byDepth(zDist, screenPos);
-	float zDist_top = getZDist(vec2(screenPos.x, screenPos.y + pixelSize_y_));// - nearFar_origin.x);
-	if(isEdgeTest)
-	{
-		gl_FragData[2] = vec4(1.0, 0.0, 0.0, 1.0);
-	}
-	else gl_FragData[2] = vec4(zDist/1200.0, zDist/1200.0, zDist/1200.0, 1.0);
+	//float pixelSize_x_ = 1.0/screenWidth;
+	//float pixelSize_y_ = 1.0/screenHeight;
+	//float zDist = getZDist(screenPos);// - nearFar_origin.x);
+	//bool isEdgeTest = _isEdge_byDepth(zDist, screenPos);
+	//float zDist_top = getZDist(vec2(screenPos.x, screenPos.y + pixelSize_y_));// - nearFar_origin.x);
+	//if(isEdgeTest)
+	//{
+	//	gl_FragData[2] = vec4(1.0, 0.0, 0.0, 1.0);
+	//}
+	//else gl_FragData[2] = vec4(zDist/1200.0, zDist/1200.0, zDist/1200.0, 1.0);
 }

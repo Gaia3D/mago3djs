@@ -2456,10 +2456,6 @@ ShaderSource.GBufferVS = "\n\
 		vertexPos = orthoPos.xyz;\n\
 		depth = (-orthoPos.z)/(far); // the correct value.\n\
 \n\
-		// Test:::\n\
-		//depth = 2.0 * ((orthoPos.z - near)/(far - near)) - 1.0;\n\
-		//depthDebug = (-orthoPos.xyz)/(far) ;\n\
-\n\
 		if(bUseLogarithmicDepth)\n\
 		{\n\
 			// logarithmic zBuffer:\n\
@@ -6348,10 +6344,10 @@ float getZDist(in vec2 coord)\n\
 \n\
 bool _isEdge_byDepth(in float curZDist, vec2 screenPos)\n\
 {\n\
-    float minDist = 5.0;\n\
+    float minDist = 1.0;\n\
     float adjacentZDist = getZDist(screenPos);\n\
 	float diff = abs(curZDist - adjacentZDist);\n\
-	if(diff / curZDist > 0.2 && diff > minDist)\n\
+	if(diff / curZDist > 0.01 && diff > minDist)\n\
 	{ return true; }\n\
     else{\n\
         return false;\n\
@@ -6360,9 +6356,6 @@ bool _isEdge_byDepth(in float curZDist, vec2 screenPos)\n\
 \n\
 bool isEdge_byDepth(vec2 screenPos, float pixelSize_x, float pixelSize_y)\n\
 {\n\
-	bool bIsEdge = false;\n\
-	// Now, check by depth.***\n\
-	float minDist = 1.0;\n\
 	float curZDist = getZDist(screenPos);\n\
 \n\
     if(_isEdge_byDepth(curZDist, vec2(screenPos.x, screenPos.y + pixelSize_y*1.0)))\n\
@@ -6390,73 +6383,6 @@ bool isEdge_byDepth(vec2 screenPos, float pixelSize_x, float pixelSize_y)\n\
     { return true; }\n\
 \n\
     return false;\n\
-    /*\n\
-	float curZDist_up = getZDist(vec2(screenPos.x, screenPos.y + pixelSize_y*1.0));\n\
-	float diff = abs(curZDist - curZDist_up);\n\
-	if(diff / curZDist < 0.01)\n\
-	{ return false; }\n\
-\n\
-	if(diff > minDist)\n\
-	{ return true; }\n\
-\n\
-    float curZDist_down = getZDist(vec2(screenPos.x, screenPos.y - pixelSize_y*1.0));\n\
-	diff = abs(curZDist - curZDist_down);\n\
-	if(diff / curZDist < 0.01)\n\
-	{ return false; }\n\
-\n\
-	if(diff > minDist)\n\
-	{ return true; }\n\
-\n\
-	float curZDist_right = getZDist(vec2(screenPos.x + pixelSize_x*1.0, screenPos.y));\n\
-	diff = abs(curZDist - curZDist_right);\n\
-	if(diff / curZDist < 0.01)\n\
-	{ return false; }\n\
-\n\
-	if(diff > minDist)\n\
-	{ return true; }\n\
-\n\
-	float curZDist_Left = getZDist(vec2(screenPos.x - pixelSize_x*1.0, screenPos.y));\n\
-	diff = abs(curZDist - curZDist_Left);\n\
-	if(diff / curZDist < 0.01)\n\
-	{ return false; }\n\
-\n\
-	if(diff > minDist)\n\
-	{ return true; }\n\
-\n\
-	float curZDist_rightUp = getZDist(vec2(screenPos.x + pixelSize_x*1.0, screenPos.y + pixelSize_y*1.0));\n\
-	diff = abs(curZDist - curZDist_rightUp);\n\
-	if(diff / curZDist < 0.01)\n\
-	{ return false; }\n\
-\n\
-	if(diff > minDist)\n\
-	{ return true; }\n\
-\n\
-	float curZDist_rightDown = getZDist(vec2(screenPos.x + pixelSize_x*1.0, screenPos.y - pixelSize_y*1.0));\n\
-	diff = abs(curZDist - curZDist_rightDown);\n\
-	if(diff / curZDist < 0.01)\n\
-	{ return false; }\n\
-\n\
-	if(diff > minDist)\n\
-	{ return true; }\n\
-\n\
-	float curZDist_downLeft = getZDist(vec2(screenPos.x - pixelSize_x*1.0, screenPos.y - pixelSize_y*1.0));\n\
-	diff = abs(curZDist - curZDist_downLeft);\n\
-	if(diff / curZDist < 0.01)\n\
-	{ return false; }\n\
-\n\
-	if(diff > minDist)\n\
-	{ return true; }\n\
-\n\
-    float curZDist_upLeft = getZDist(vec2(screenPos.x - pixelSize_x*1.0, screenPos.y + pixelSize_y*1.0));\n\
-	diff = abs(curZDist - curZDist_upLeft);\n\
-	if(diff / curZDist < 0.01)\n\
-	{ return false; }\n\
-\n\
-	if(diff > minDist)\n\
-	{ return true; }\n\
-\n\
-	return bIsEdge;\n\
-    */\n\
 }\n\
 \n\
 void make_kernel(inout vec4 n[9], vec2 coord)\n\
@@ -6990,10 +6916,10 @@ bool isEdge_byNormals(vec2 screenPos, vec3 normal, float pixelSize_x, float pixe
 \n\
 bool _isEdge_byDepth(in float curZDist, vec2 screenPos)\n\
 {\n\
-	float minDist = 5.0;\n\
+	float minDist = 1.0;\n\
     float adjacentZDist = getZDist(screenPos);\n\
 	float diff = abs(curZDist - adjacentZDist);\n\
-	if(diff / curZDist > 0.2 && diff > minDist)\n\
+	if(diff / curZDist > 0.01 && diff > minDist)\n\
 	{ return true; }\n\
     else{\n\
         return false;\n\
@@ -7002,20 +6928,17 @@ bool _isEdge_byDepth(in float curZDist, vec2 screenPos)\n\
 \n\
 bool isEdge_byDepth(vec2 screenPos, float pixelSize_x, float pixelSize_y)\n\
 {\n\
-	bool bIsEdge = false;\n\
-	// Now, check by depth.***\n\
-	float minDist = 1.0;\n\
 	float curZDist = getZDist(screenPos);\n\
 \n\
-    if(_isEdge_byDepth(curZDist, vec2(screenPos.x, screenPos.y + pixelSize_y*1.0)))\n\
+    if(_isEdge_byDepth(curZDist, vec2(screenPos.x, screenPos.y + pixelSize_y*1.0))) // up.\n\
     { return true; }\n\
 \n\
-    if(_isEdge_byDepth(curZDist, vec2(screenPos.x + pixelSize_x, screenPos.y + pixelSize_y*1.0)))\n\
+    if(_isEdge_byDepth(curZDist, vec2(screenPos.x + pixelSize_x, screenPos.y + pixelSize_y*1.0))) // up-right.\n\
     { return true; }\n\
 \n\
-    if(_isEdge_byDepth(curZDist, vec2(screenPos.x + pixelSize_x, screenPos.y)))\n\
+    if(_isEdge_byDepth(curZDist, vec2(screenPos.x + pixelSize_x, screenPos.y))) // right.\n\
     { return true; }\n\
-\n\
+	/*\n\
     if(_isEdge_byDepth(curZDist, vec2(screenPos.x + pixelSize_x, screenPos.y - pixelSize_y*1.0)))\n\
     { return true; }\n\
 \n\
@@ -7030,7 +6953,7 @@ bool isEdge_byDepth(vec2 screenPos, float pixelSize_x, float pixelSize_y)\n\
 \n\
     if(_isEdge_byDepth(curZDist, vec2(screenPos.x - pixelSize_x, screenPos.y + pixelSize_y*1.0)))\n\
     { return true; }\n\
-\n\
+	*/\n\
     return false;\n\
 }\n\
 \n\
@@ -7363,41 +7286,7 @@ void main()\n\
 \n\
 		gl_FragData[0] = finalColor;\n\
 \n\
-		// fog.*****************************************************************\n\
-		//float myLinearDepth2 = getDepth(screenPos);\n\
-		//float myDepth = (myLinearDepth2 * currFar_origin)/500.0;\n\
-		//if(myDepth > 1.0)\n\
-		//myDepth = 1.0;\n\
-		//vec4 finalColor2 = mix(finalColor, vec4(1.0, 1.0, 1.0, 1.0), myDepth);\n\
-		//gl_FragData[0] = vec4(finalColor2);\n\
-		// End fog.---------------------------------------------------------------\n\
-\n\
-		//float finalColorLightLevel = finalColor.r + finalColor.g + finalColor.b;\n\
-		//if(finalColorLightLevel < 0.9)\n\
-		//return;\n\
-\n\
-		// Provisionally render Aura by depth.************************************************************\n\
-		/*\n\
-		if(dataType == 0)\n\
-		{\n\
-			// check depth by xCross pixel samples.***\n\
-			// PixelRadius = 7;\n\
-			// South 3 pixels.***\n\
-			float pixelSize_x = 1.0/screenWidth;\n\
-			float pixelSize_y = 1.0/screenHeight;\n\
-			float counter = 1.0;\n\
-			for(int i=0; i<3; i++)\n\
-			{\n\
-				vec2 screePos_south = vec2(screenPos.x, screenPos.y - counter*pixelSize_y);\n\
-\n\
-\n\
-				counter += 1.0;\n\
-			}\n\
-\n\
-		}\n\
-		*/\n\
-		// Provisionally render edges here.****************************************************************\n\
-		// EDGES.***\n\
+		// EDGES.****************************************************************\n\
 		if(dataType == 0 || dataType == 1)// DATATYPE 0 = objects. 1 = terrain. 2 = pointsCloud.\n\
 		{\n\
 			\n\
@@ -7406,7 +7295,7 @@ void main()\n\
 			if(!bIsEdge && dataType == 0)\n\
 			{\n\
 				// Check if is edge by depth range.***\n\
-				//bIsEdge = isEdge_byDepth(screenPos, pixelSize_x, pixelSize_y);\n\
+				bIsEdge = isEdge_byDepth(screenPos, pixelSize_x, pixelSize_y);\n\
 			}\n\
 			\n\
 			if(bIsEdge)\n\
@@ -7415,13 +7304,16 @@ void main()\n\
 				if(isTransparentObject)\n\
 					edgeColor *= 1.5;\n\
 \n\
-				gl_FragData[0] = vec4(edgeColor.rgb, 1.0);\n\
+				finalColor = vec4(edgeColor.rgb, 1.0);\n\
+\n\
+				gl_FragData[0] = finalColor;\n\
 				\n\
 			}\n\
 \n\
-			// Test : shade terrain.***\n\
+			// shade terrain : TODO.***\n\
 			if(dataType == 1)\n\
 			{\n\
+				// TODO :\n\
 				// Calculate normal by depth texture.***\n\
 				//vec4 normal4 = getNormal(screenPos);\n\
 				//vec3 normal = normal4.xyz;\n\
@@ -7496,10 +7388,21 @@ void main()\n\
 		\n\
 	}\n\
 \n\
+	// fog.*****************************************************************\n\
+	//bool bApplyFog = true;\n\
+	//if(bApplyFog)\n\
+	//{\n\
+	//	float zDist = getZDist(screenPos);\n\
+	//	float fogFactor = min(zDist / 2000.0, 0.4);\n\
+	//	vec4 finalColor2 = mix(finalColor, vec4(1.0, 1.0, 1.0, 1.0), fogFactor);\n\
+	//	gl_FragData[0] = vec4(finalColor2);\n\
+	//}\n\
+	\n\
+	// End fog.---------------------------------------------------------------\n\
+\n\
 	// Finally check for brightColor (for bloom effect, if exist).***\n\
 	float brightness = dot(finalColor.rgb, vec3(0.2126, 0.7152, 0.0722));\n\
 	vec4 brightColor;\n\
-    //if(brightness > 1.0)\n\
 	if(brightness > 1.0)\n\
         brightColor = vec4(finalColor.rgb, 1.0);\n\
     else\n\
@@ -7507,16 +7410,16 @@ void main()\n\
 	gl_FragData[1] = brightColor;\n\
 \n\
 	// debugTex.***\n\
-	float pixelSize_x_ = 1.0/screenWidth;\n\
-	float pixelSize_y_ = 1.0/screenHeight;\n\
-	float zDist = getZDist(screenPos);// - nearFar_origin.x);\n\
-	bool isEdgeTest = _isEdge_byDepth(zDist, screenPos);\n\
-	float zDist_top = getZDist(vec2(screenPos.x, screenPos.y + pixelSize_y_));// - nearFar_origin.x);\n\
-	if(isEdgeTest)\n\
-	{\n\
-		gl_FragData[2] = vec4(1.0, 0.0, 0.0, 1.0);\n\
-	}\n\
-	else gl_FragData[2] = vec4(zDist/1200.0, zDist/1200.0, zDist/1200.0, 1.0);\n\
+	//float pixelSize_x_ = 1.0/screenWidth;\n\
+	//float pixelSize_y_ = 1.0/screenHeight;\n\
+	//float zDist = getZDist(screenPos);// - nearFar_origin.x);\n\
+	//bool isEdgeTest = _isEdge_byDepth(zDist, screenPos);\n\
+	//float zDist_top = getZDist(vec2(screenPos.x, screenPos.y + pixelSize_y_));// - nearFar_origin.x);\n\
+	//if(isEdgeTest)\n\
+	//{\n\
+	//	gl_FragData[2] = vec4(1.0, 0.0, 0.0, 1.0);\n\
+	//}\n\
+	//else gl_FragData[2] = vec4(zDist/1200.0, zDist/1200.0, zDist/1200.0, 1.0);\n\
 }";
 ShaderSource.ScreenQuadGaussianBlurFS = "#ifdef GL_ES\n\
     precision highp float;\n\
@@ -7870,19 +7773,6 @@ float getOcclusion(vec3 origin, vec3 rotatedKernel, float radius, int originFrus
     int estimatedFrustumIdx = int(floor(100.0*normalRGBA.w));\n\
     //int dataType = 0;\n\
     //int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);\n\
-    // Test.***************************************************************\n\
-\n\
-    // check the data type of the pixel.\n\
-    /*\n\
-    int dataType = -1;\n\
-    int currFrustumIdx = getRealFrustumIdx(estimatedFrustumIdx, dataType);\n\
-    if(originFrustumIdx != currFrustumIdx)// test \"if\".***\n\
-    {\n\
-        //if(radius < 6.0)\n\
-        //return result_occlusion; // test \"if\".***\n\
-    }\n\
-    */\n\
-    // End test.-----------------------------------------------------------\n\
 \n\
     vec2 nearFar = getNearFar_byFrustumIdx(estimatedFrustumIdx);\n\
     float currNear = nearFar.x;\n\
@@ -7892,7 +7782,6 @@ float getOcclusion(vec3 origin, vec3 rotatedKernel, float radius, int originFrus
     // Objective : to compare \"sampleZ\" with \"bufferZ\".***\n\
     //--------------------------------------------------------\n\
     float sampleZ = -sample.z;\n\
-    //float bufferZ = currNear + depthBufferValue * (currFar - currNear);\n\
     float bufferZ = depthBufferValue * currFar;\n\
     float zDiff = abs(bufferZ - sampleZ);\n\
     if(zDiff < radius)\n\
@@ -7903,18 +7792,6 @@ float getOcclusion(vec3 origin, vec3 rotatedKernel, float radius, int originFrus
             result_occlusion = 1.0;// * rangeCheck;\n\
         }\n\
     }\n\
-    \n\
-    /*\n\
-    float depthDiff = abs(depthBufferValue - sampleDepth);\n\
-    if(depthDiff < radius/currFar)\n\
-    {\n\
-        float rangeCheck = smoothstep(0.0, 1.0, radius / (depthDiff*currFar));\n\
-        if (depthBufferValue < sampleDepth)\n\
-        {\n\
-            result_occlusion = 1.0 * rangeCheck;\n\
-        }\n\
-    }\n\
-    */\n\
     return result_occlusion;\n\
 }\n\
 \n\

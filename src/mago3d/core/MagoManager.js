@@ -2123,14 +2123,16 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 			multiRenderTarget : bUseMultiRenderTarget, 
 			numColorBuffers   : 2,
 			widthScale        : 0.25,
-			heightScale       : 0.25
+			heightScale       : 0.25,
+			textureMagFilter  : gl.LINEAR,
+			textureMinFilter  : gl.LINEAR
 		}); 
 		this.brightColorTex_A = texturesManager.bloomBufferFBO.colorBuffersArray[1];
 		this.brightColorTex_B = texturesManager.bloomBufferFBO.colorBuffersArray[0];
 	}
 
 
-	var selFBO = this.getSelectionFBO();
+	//var selFBO = this.getSelectionFBO();
 
 	// prev 2) ready to color frame buffer
 	this.postFxShadersManager.useProgram(null); // init current bind shader.***
@@ -2393,7 +2395,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 
 		// Do ssaoFromDepth render. Renders in ssaoFrameBuffer.***
 		this.renderer.renderSsaoFromDepth(gl);
-		//this.renderer.renderScreenQuadBlur_ssaoTex(gl);
+		//this.renderer.renderScreenQuadBlur_ssaoTex(gl); // Expensive.***
 
 		// Final render output.**************************************************************
 		this.renderer.renderScreenQuad(gl); // 1rst screenQuad. (ssao, lighting, shadows) // this must be rendered in "shadedColorFbo" framebuffer.***

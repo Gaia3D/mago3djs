@@ -299,10 +299,10 @@ float getZDist(in vec2 coord)
 
 bool _isEdge_byDepth(in float curZDist, vec2 screenPos)
 {
-    float minDist = 5.0;
+    float minDist = 1.0;
     float adjacentZDist = getZDist(screenPos);
 	float diff = abs(curZDist - adjacentZDist);
-	if(diff / curZDist > 0.2 && diff > minDist)
+	if(diff / curZDist > 0.01 && diff > minDist)
 	{ return true; }
     else{
         return false;
@@ -311,9 +311,6 @@ bool _isEdge_byDepth(in float curZDist, vec2 screenPos)
 
 bool isEdge_byDepth(vec2 screenPos, float pixelSize_x, float pixelSize_y)
 {
-	bool bIsEdge = false;
-	// Now, check by depth.***
-	float minDist = 1.0;
 	float curZDist = getZDist(screenPos);
 
     if(_isEdge_byDepth(curZDist, vec2(screenPos.x, screenPos.y + pixelSize_y*1.0)))
@@ -341,73 +338,6 @@ bool isEdge_byDepth(vec2 screenPos, float pixelSize_x, float pixelSize_y)
     { return true; }
 
     return false;
-    /*
-	float curZDist_up = getZDist(vec2(screenPos.x, screenPos.y + pixelSize_y*1.0));
-	float diff = abs(curZDist - curZDist_up);
-	if(diff / curZDist < 0.01)
-	{ return false; }
-
-	if(diff > minDist)
-	{ return true; }
-
-    float curZDist_down = getZDist(vec2(screenPos.x, screenPos.y - pixelSize_y*1.0));
-	diff = abs(curZDist - curZDist_down);
-	if(diff / curZDist < 0.01)
-	{ return false; }
-
-	if(diff > minDist)
-	{ return true; }
-
-	float curZDist_right = getZDist(vec2(screenPos.x + pixelSize_x*1.0, screenPos.y));
-	diff = abs(curZDist - curZDist_right);
-	if(diff / curZDist < 0.01)
-	{ return false; }
-
-	if(diff > minDist)
-	{ return true; }
-
-	float curZDist_Left = getZDist(vec2(screenPos.x - pixelSize_x*1.0, screenPos.y));
-	diff = abs(curZDist - curZDist_Left);
-	if(diff / curZDist < 0.01)
-	{ return false; }
-
-	if(diff > minDist)
-	{ return true; }
-
-	float curZDist_rightUp = getZDist(vec2(screenPos.x + pixelSize_x*1.0, screenPos.y + pixelSize_y*1.0));
-	diff = abs(curZDist - curZDist_rightUp);
-	if(diff / curZDist < 0.01)
-	{ return false; }
-
-	if(diff > minDist)
-	{ return true; }
-
-	float curZDist_rightDown = getZDist(vec2(screenPos.x + pixelSize_x*1.0, screenPos.y - pixelSize_y*1.0));
-	diff = abs(curZDist - curZDist_rightDown);
-	if(diff / curZDist < 0.01)
-	{ return false; }
-
-	if(diff > minDist)
-	{ return true; }
-
-	float curZDist_downLeft = getZDist(vec2(screenPos.x - pixelSize_x*1.0, screenPos.y - pixelSize_y*1.0));
-	diff = abs(curZDist - curZDist_downLeft);
-	if(diff / curZDist < 0.01)
-	{ return false; }
-
-	if(diff > minDist)
-	{ return true; }
-
-    float curZDist_upLeft = getZDist(vec2(screenPos.x - pixelSize_x*1.0, screenPos.y + pixelSize_y*1.0));
-	diff = abs(curZDist - curZDist_upLeft);
-	if(diff / curZDist < 0.01)
-	{ return false; }
-
-	if(diff > minDist)
-	{ return true; }
-
-	return bIsEdge;
-    */
 }
 
 void make_kernel(inout vec4 n[9], vec2 coord)

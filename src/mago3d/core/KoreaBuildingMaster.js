@@ -10,7 +10,7 @@
  * @param {object} option 
  * @param {MagoManager} magoManager magoManager.
  */
-var KoreaBuildingMaster = function(url, format, option, magoManager)
+var KoreaBuildingMaster = function (url, format, option, magoManager)
 {
 	if (!(this instanceof KoreaBuildingMaster)) 
 	{

@@ -64,7 +64,7 @@ KoreaBuilding.prototype.initialize = function(feature)
 	if (height !== 0) { this.height = height; }
 };
 
-KoreaBuilding.prototype.makeMesh = function() 
+KoreaBuilding.prototype.makeMesh = function () 
 {
 	if (!this.dirty) { return; }
 	

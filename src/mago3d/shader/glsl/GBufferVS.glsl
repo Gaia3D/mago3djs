@@ -76,10 +76,6 @@
 		vertexPos = orthoPos.xyz;
 		depth = (-orthoPos.z)/(far); // the correct value.
 
-		// Test:::
-		//depth = 2.0 * ((orthoPos.z - near)/(far - near)) - 1.0;
-		//depthDebug = (-orthoPos.xyz)/(far) ;
-
 		if(bUseLogarithmicDepth)
 		{
 			// logarithmic zBuffer:

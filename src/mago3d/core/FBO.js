@@ -55,30 +55,44 @@ var FBO = function(gl, width, height, options)
 	/**
 	 * WebGL Framebuffer.
 	 * @type {WebGLFramebuffer}
-	 * @default WebGLFramebuffer
+	 * @default undefined
 	 */
 	this.fbo = undefined;
 	
 	/**
 	 * WebGL Renderbuffer.
 	 * @type {WebGLRenderbuffer}
-	 * @default WebGLRenderbuffer
+	 * @default undefined
 	 */
 	this.depthBuffer = undefined;
 	
 	/**
 	 * WebGL texture.
 	 * @type {WebGLTexture}
-	 * @default WebGLTexture
+	 * @default undefined
 	 */
 	this.colorBuffer = undefined;
 
 	/**
 	 * WebGL texture.
 	 * @type {WebGLTexture}
-	 * @default WebGLTexture
+	 * @default undefined
 	 */
 	this.colorBuffer2 = undefined;
+
+	/**
+	 * WebGL texParameteri.
+	 * @type {GLint}
+	 * @default gl.NEAREST
+	 */
+	this.textureMagFilter = gl.NEAREST; // default.
+
+	/**
+	 * WebGL texParameteri.
+	 * @type {GLint}
+	 * @default gl.NEAREST
+	 */
+	this.textureMinFilter = gl.NEAREST; // default.
 	
 	/**
 	 * Boolean var that indicates that the parameters must be updated.
@@ -132,6 +146,16 @@ var FBO = function(gl, width, height, options)
 		this.heightScale = options.heightScale;
 	}
 
+	if (options.textureMagFilter !== undefined)
+	{
+		this.textureMagFilter = options.textureMagFilter;
+	}
+
+	if (options.textureMinFilter !== undefined)
+	{
+		this.textureMinFilter = options.textureMinFilter;
+	}
+
 	if (this.multiRenderTarget)
 	{
 		this.initMRT();
@@ -166,8 +190,8 @@ FBO.prototype.init = function()
 		gl.activeTexture(gl.TEXTURE0);
 		gl.bindTexture(gl.TEXTURE_2D, colorBuffer);    
 		
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST); //LINEAR_MIPMAP_LINEAR
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, this.textureMagFilter);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, this.textureMinFilter); //LINEAR_MIPMAP_LINEAR
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.getWidth(), this.getHeight(), 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
@@ -211,8 +235,8 @@ FBO.prototype.init_original = function()
 		gl.activeTexture(gl.TEXTURE0);
 		gl.bindTexture(gl.TEXTURE_2D, this.colorBuffer);    
 		
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST); //LINEAR_MIPMAP_LINEAR
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, this.textureMagFilter);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, this.textureMinFilter); //LINEAR_MIPMAP_LINEAR
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.getWidth(), this.getHeight(), 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
@@ -250,8 +274,8 @@ FBO.prototype.initMRT = function()
 	{
 		var colorBuffer = gl.createTexture();
 		gl.bindTexture(gl.TEXTURE_2D, colorBuffer);  // depthTex.
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST); //LINEAR_MIPMAP_LINEAR
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, this.textureMagFilter);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, this.textureMinFilter); //LINEAR_MIPMAP_LINEAR
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.getWidth(), this.getHeight(), 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
@@ -296,8 +320,8 @@ FBO.prototype.setColorBuffer = function(colorBuffer)
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, colorBuffer);  
 	
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); //LINEAR_MIPMAP_LINEAR
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, this.textureMagFilter);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, this.textureMinFilter); //LINEAR_MIPMAP_LINEAR
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.getWidth(), this.getHeight(), 0, gl.RGBA, gl.UNSIGNED_BYTE, null); 
