@@ -122,9 +122,82 @@ ExtrusionBuilding.prototype.makeMesh = function()
 		var geographicCoordList = this.geographicCoordListsArray[i];
 		
 		//GeographicCoordsList.solveDegeneratedPoints(geographicCoordList.geographicCoordsArray, error);
+		var accum = 0;
+		var index = 1;
+		var floorHeight = this.floorHeight ? this.floorHeight : 3.3;
+		var auxArray = [];
+		while (accum < this.height) 
+		{
+			var bottomGeocoordsList = geographicCoordList.getCopy();
+			var topGeocoordsList = geographicCoordList.getCopy();
+			bottomGeocoordsList.setAltitude(floorHeight * (index-1));
+			topGeocoordsList.setAltitude(floorHeight * (index));
+
+			var bottomPoint3dArray = GeographicCoordsList.getPointsRelativeToGeoLocation(geoLocData, bottomGeocoordsList.geographicCoordsArray, undefined);
+			var topPoint3dArray = GeographicCoordsList.getPointsRelativeToGeoLocation(geoLocData, topGeocoordsList.geographicCoordsArray, undefined);
+
+			var vtxProfilesList = new VtxProfilesList();
+			var baseVtxProfile = vtxProfilesList.newVtxProfile();
+			baseVtxProfile.makeByPoints3DArray(bottomPoint3dArray, undefined); 
+			var topVtxProfile = vtxProfilesList.newVtxProfile();
+			topVtxProfile.makeByPoints3DArray(topPoint3dArray, undefined);
+
+			var solidMesh = vtxProfilesList.getMesh(undefined, true, true);
+			var surfIndepMesh = solidMesh.getCopySurfaceIndependentMesh();
+			surfIndepMesh.calculateVerticesNormals();
+			
+			if (this.divideLevel)
+			{
+				var c = document.createElement("canvas");
+				var ctx = c.getContext("2d");
+
+				c.width = 8;
+				c.height = 32;
+				ctx.beginPath();
+				ctx.fillStyle = "#262626";
+				ctx.rect(0, 0, 8, 1);
+				ctx.fill();
+				ctx.closePath();
+
+				ctx.beginPath();
+				ctx.fillStyle = this.color4.getRGBA();
+				ctx.rect(0, 1, 8, 31);
+				ctx.fill();
+				ctx.closePath();
+				surfIndepMesh.material = new Material('test');
+				surfIndepMesh.material.setDiffuseTextureUrl(c.toDataURL());
+
+				surfIndepMesh.calculateTexCoordsByHeight(this.floorHeight ? this.floorHeight+0.01 : 3.31);
+				var topSurfaces = surfIndepMesh.getSurfaceByName('top');
+				if (topSurfaces.length > 0)
+				{
+					for (var j=0, surLen=topSurfaces.length;j<surLen;j++) 
+					{
+						var ts = topSurfaces[j];
+						var vertexArray = ts.localVertexList.vertexArray;
+						for (var k=0, verLength=vertexArray.length;k<verLength;k++) 
+						{
+							var vtx = vertexArray[k];
+							vtx.texCoord.x = 2 / c.width;
+							vtx.texCoord.y = 2 / c.height;
+						}
+					}
+				}
+			}
+			this.objectsArray.push(surfIndepMesh);
+			//auxArray.push(surfIndepMesh);
+
+			accum = accum + floorHeight;
+			index++;
+		}
+		/* var mesh = new Mesh();
+		for (var j=0;j<auxArray.length;j++) 
+		{
+			mesh.mergeMesh(auxArray[j]);
+		} */
 		
 		// Make the topGeoCoordsList.
-		var topGeoCoordsList = geographicCoordList.getCopy();
+		/* var topGeoCoordsList = geographicCoordList.getCopy();
 		// Reassign the altitude on the geoCoordsListCopy.
 		geographicCoordList.setAltitude(0);
 		topGeoCoordsList.setAltitude(this.height);
@@ -138,64 +211,9 @@ ExtrusionBuilding.prototype.makeMesh = function()
 		var baseVtxProfile = vtxProfilesList.newVtxProfile();
 		baseVtxProfile.makeByPoints3DArray(basePoints3dArray, undefined); 
 		var topVtxProfile = vtxProfilesList.newVtxProfile();
-		topVtxProfile.makeByPoints3DArray(topPoints3dArray, undefined); 
+		topVtxProfile.makeByPoints3DArray(topPoints3dArray, undefined); */ 
 		
-		var bIncludeBottomCap = true;
-		var bIncludeTopCap = true;
-		var solidMesh = vtxProfilesList.getMesh(undefined, bIncludeBottomCap, bIncludeTopCap);
-		var surfIndepMesh = solidMesh.getCopySurfaceIndependentMesh();
-		surfIndepMesh.calculateVerticesNormals();
-
 		
-		if (this.divideLevel)
-		{
-			var c = document.createElement("canvas");
-			var ctx = c.getContext("2d");
-
-			c.width = 8;
-			c.height = 32;
-			ctx.beginPath();
-			ctx.fillStyle = "#262626";
-			ctx.rect(0, 0, 8, 1);
-			ctx.fill();
-			ctx.closePath();
-
-			ctx.beginPath();
-			ctx.fillStyle = this.color4.getRGBA();
-			ctx.rect(0, 1, 8, 31);
-			ctx.fill();
-			ctx.closePath();
-
-			/*ctx.beginPath();
-			ctx.fillStyle = "#0000ff";
-			ctx.rect(2, 8, 4, 8);
-			ctx.fill();
-			ctx.stroke();
-			ctx.closePath();*/
-
-			surfIndepMesh.material = new Material('test');
-			surfIndepMesh.material.setDiffuseTextureUrl(c.toDataURL());
-
-			surfIndepMesh.calculateTexCoordsByHeight(this.floorHeight ? this.floorHeight+0.01 : 3.31);
-			var topSurfaces = surfIndepMesh.getSurfaceByName('top');
-			if (topSurfaces.length > 0)
-			{
-				for (var j=0, surLen=topSurfaces.length;j<surLen;j++) 
-				{
-					var ts = topSurfaces[j];
-					var vertexArray = ts.localVertexList.vertexArray;
-					for (var k=0, verLength=vertexArray.length;k<verLength;k++) 
-					{
-						var vtx = vertexArray[k];
-						vtx.texCoord.x = 2 / c.width;
-						vtx.texCoord.y = 2 / c.height;
-					}
-				}
-			}
-			
-		}
-		
-		this.objectsArray.push(surfIndepMesh);
 	}
 	this.setDirty(false);
 
@@ -353,6 +371,37 @@ ExtrusionBuilding.prototype.setLimitationGeographicCoords = function(limitationG
 ExtrusionBuilding.prototype.setLimitationHeight = function(limitationHeight) 
 {
 	this.options.limitationHeights = limitationHeight ? new Float32Array([0, limitationHeight]) : undefined;
+};
+
+/**
+ * 
+ * @param {number} min 
+ * @param {number} max 
+ */
+ExtrusionBuilding.prototype.setSplitHeight = function(min, max) 
+{
+	if (isNaN(min) || isNaN(max)) 
+	{
+		throw new Error('value must number');
+	}
+	if (min > max) 
+	{
+		throw new Error('min value must lower than max value');
+	}
+
+	this.options.limitationHeights = new Float32Array([min, max]);
+};
+
+/**
+ * 
+ * @param {Color | DynamicColor} color 
+ */
+ExtrusionBuilding.prototype.setLimitationColor = function(color) 
+{
+	if (!color || !(color instanceof Color || color instanceof DynamicColor)) { throw new Error('invalid parameter'); }
+
+	if (!this.options) { this.options = {}; }
+	this.options.limitationInfringingDynamicColor4 = color;
 };
 
 /**

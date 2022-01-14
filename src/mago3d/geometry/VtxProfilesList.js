@@ -228,7 +228,7 @@ VtxProfilesList.prototype.getMesh = function(resultMesh, bIncludeBottomCap, bInc
 
 	if (bLoop === undefined)
 	{ bLoop = false; }
-	
+
 	if (bLoop === true)
 	{
 		// To make a safe mesh, if loop, then there are no caps in the extrems.

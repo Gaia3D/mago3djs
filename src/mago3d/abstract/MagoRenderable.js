@@ -306,7 +306,7 @@ MagoRenderable.prototype.render = function (magoManager, shader, renderType, glP
 			var dynCol4 = this.options.limitationInfringingDynamicColor4;
 			if (dynCol4)
 			{
-				dynCol4.updateColorAlarm(magoManager.getCurrentTime());
+				if (dynCol4 instanceof DynamicColor) { dynCol4.updateColorAlarm(magoManager.getCurrentTime()); }
 				gl.uniform4fv(shader.limitationInfringedColor4_loc, new Float32Array([dynCol4.r, dynCol4.g, dynCol4.b, dynCol4.a]));
 			}
 			else
@@ -323,7 +323,7 @@ MagoRenderable.prototype.render = function (magoManager, shader, renderType, glP
 				var dynCol4 = this.options.limitationInfringingDynamicColor4;
 				if (dynCol4)
 				{
-					dynCol4.updateColorAlarm(magoManager.getCurrentTime());
+					if (dynCol4 instanceof DynamicColor) { dynCol4.updateColorAlarm(magoManager.getCurrentTime()); }
 					gl.uniform4fv(shader.limitationInfringedColor4_loc, new Float32Array([dynCol4.r, dynCol4.g, dynCol4.b, dynCol4.a]));
 				}
 				else 
@@ -344,8 +344,17 @@ MagoRenderable.prototype.render = function (magoManager, shader, renderType, glP
 		renderShaded = false;
 	}
 	gl.uniform1i(shader.bApplySpecularLighting_loc, false);
+
+
 	if (renderShaded)
-	{ this.renderAsChild(magoManager, shader, renderType, glPrimitive, bIsSelected, this.options); }
+	{ 
+		gl.frontFace(gl.CW);
+		this.renderAsChild(magoManager, shader, renderType, glPrimitive, bIsSelected, this.options); 
+
+		gl.frontFace(gl.CCW);
+		this.renderAsChild(magoManager, shader, renderType, glPrimitive, bIsSelected, this.options); 
+	}
+
 
 	// Return the opacity to 1.
 	gl.uniform1f(shader.externalAlpha_loc, 1.0);
