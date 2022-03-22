@@ -2890,7 +2890,7 @@ Water.prototype.overWriteDEMWithObjects = function (shader, magoManager)
 
 	var renderType = 0;
 	var refMatrixIdxKey = 0;
-	var glPrimitive = undefined;
+	var glPrimitive = undefined; // 
 
 	if (!this.buildingsId_OverWritedOnDemMap)
 	{

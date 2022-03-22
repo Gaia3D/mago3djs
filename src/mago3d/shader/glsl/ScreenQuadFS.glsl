@@ -53,6 +53,8 @@ uniform vec3 uAmbientLight;
 
 const float Epsilon = 1e-10;
 
+// https://ndotl.wordpress.com/2018/08/29/baking-artifact-free-lightmaps/
+// voxel ilum : https://publications.lib.chalmers.se/records/fulltext/256137/256137.pdf
 
 float unpackDepth(vec4 packedDepth)
 {
@@ -546,13 +548,16 @@ void main()
 	vec3 ambientColor = vec3(0.0);
 	vec3 directionalLightColor = vec3(0.9, 0.9, 0.9);
 	float directionalLightWeighting = 1.0;
-	
+
+	// sunShadow vars.***
+	bool pointIsinShadow = false;
+	bool isUnderSun = false;
+	bool sunInAntipodas = false;
 	if(bApplyMagoShadow)
 	{
 		// 1rst, check normal vs sunDirCC.
-		bool sunInAntipodas = false;
 		float dotAux = dot(sunDirCC, normal);
-		if(dotAux > 0.0)
+		if(dotAux > -0.1)
 		{
 			sunInAntipodas = true;
 			shadow_occlusion = 0.5;
@@ -569,8 +574,8 @@ void main()
 			//------------------------------------------------------------------------------------------------------------------------------
 			// 2nd, calculate the vertex relative to light.***
 			// 1rst, try with the closest sun. sunIdx = 0.
-			bool isUnderSun = false;
-			bool pointIsinShadow = isInShadow(posWCRelToEye, 0, isUnderSun);
+			
+			pointIsinShadow = isInShadow(posWCRelToEye, 0, isUnderSun);
 			if(!isUnderSun)
 			{
 				pointIsinShadow = isInShadow(posWCRelToEye, 1, isUnderSun);
@@ -592,8 +597,9 @@ void main()
 	}
 	
 	ambientColor = uAmbientLight;
-	// uAmbientLight
+	// https://learnopengl.com/Lighting/Basic-Lighting
 	vec3 lightingDirection = normalize(vec3(0.6, 0.6, 0.6));
+	//vec3 lightingDirection = normalize(vec3(0.0, 0.0, 1.0)); // lightDir = camDir.***
 	directionalLightWeighting = max(dot(normal, lightingDirection), 0.0);
 	
 	// 1rst, take the albedo.
@@ -702,6 +708,15 @@ void main()
 			occlInv *= 3.0;
 			if(occlInv > 1.0)
 			occlInv = 1.0;
+		}
+
+		if(bApplyMagoShadow && !pointIsinShadow && !sunInAntipodas)
+		{
+			if(occlInv < 1.0)
+			{
+				occlInv = min(occlInv * 1.5, 1.0);
+			}
+			
 		}
 
 		finalColor = vec4(albedo.r * occlInv * diffuseLight3.x, 

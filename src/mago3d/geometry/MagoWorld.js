@@ -677,7 +677,7 @@ MagoWorld.prototype.mousemove = function (event)
 			// calculate angular velocity.
 			var angRadVelocity = (angRad/deltaTime)*0.25;
 			
-			camera.lastMovement.movementType = CODE.movementType.ROTATION;
+			camera.lastMovement.movementType = CODE.movementType.ROTATION; // orbit globe.
 			camera.lastMovement.currAngularVelocity = angRadVelocity;
 			camera.lastMovement.rotationAxis = rotAxis;
 			camera.lastMovement.rotationPoint = undefined;
@@ -838,7 +838,8 @@ MagoWorld.screenToCamCoord = function(mouseX, mouseY, magoManager, resultPointCa
 		
 	options.linearDepth = currentLinearDepth; // optionally, use the pre calculated linearDepth.
 
-	resultPointCamCoord = ManagerUtils.calculatePixelPositionCamCoord(gl, mouseX, mouseY, resultPointCamCoord, currentDepthFbo, currentFrustumNear, currentFrustumFar, magoManager, options);
+	resultPointCamCoord = ManagerUtils.calculatePixelPositionCamCoord(gl, mouseX, mouseY, resultPointCamCoord, currentDepthFbo, 
+	currentFrustumNear, currentFrustumFar, magoManager, options);
 
 	// test.***
 	//var projMat = sceneState.getProjectionMatrixInv();

@@ -563,12 +563,12 @@ Camera.prototype.calculateFrustumsPlanes = function()
 	
 	// far plane points.
 	this.farLeftBottomPoint.set(this.farCenterPoint.x - this.right.x*farWidht*0.5 - this.up.x*farHeight*0.5, 
-		this.farCenterPoint.y - this.right.y*farWidht*0.5 - this.up.y*farHeight*0.5, 
-		this.farCenterPoint.z - this.right.z*farWidht*0.5 - this.up.z*farHeight*0.5);
+								this.farCenterPoint.y - this.right.y*farWidht*0.5 - this.up.y*farHeight*0.5, 
+								this.farCenterPoint.z - this.right.z*farWidht*0.5 - this.up.z*farHeight*0.5);
 								
 	this.farRightTopPoint.set(this.farLeftBottomPoint.x + this.right.x*farWidht + this.up.x*farHeight, 
-		this.farLeftBottomPoint.y + this.right.y*farWidht + this.up.y*farHeight, 
-		this.farLeftBottomPoint.z + this.right.z*farWidht + this.up.z*farHeight);				
+								this.farLeftBottomPoint.y + this.right.y*farWidht + this.up.y*farHeight, 
+								this.farLeftBottomPoint.z + this.right.z*farWidht + this.up.z*farHeight);				
 	
 	// calculate directions.
 	this.leftBottomDir.set(this.farLeftBottomPoint.x - px, this.farLeftBottomPoint.y - py, this.farLeftBottomPoint.z - pz);

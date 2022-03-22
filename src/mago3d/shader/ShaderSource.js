@@ -6629,6 +6629,8 @@ uniform vec3 uAmbientLight;\n\
 \n\
 const float Epsilon = 1e-10;\n\
 \n\
+// https://ndotl.wordpress.com/2018/08/29/baking-artifact-free-lightmaps/\n\
+// voxel ilum : https://publications.lib.chalmers.se/records/fulltext/256137/256137.pdf\n\
 \n\
 float unpackDepth(vec4 packedDepth)\n\
 {\n\
@@ -7122,13 +7124,16 @@ void main()\n\
 	vec3 ambientColor = vec3(0.0);\n\
 	vec3 directionalLightColor = vec3(0.9, 0.9, 0.9);\n\
 	float directionalLightWeighting = 1.0;\n\
-	\n\
+\n\
+	// sunShadow vars.***\n\
+	bool pointIsinShadow = false;\n\
+	bool isUnderSun = false;\n\
+	bool sunInAntipodas = false;\n\
 	if(bApplyMagoShadow)\n\
 	{\n\
 		// 1rst, check normal vs sunDirCC.\n\
-		bool sunInAntipodas = false;\n\
 		float dotAux = dot(sunDirCC, normal);\n\
-		if(dotAux > 0.0)\n\
+		if(dotAux > -0.1)\n\
 		{\n\
 			sunInAntipodas = true;\n\
 			shadow_occlusion = 0.5;\n\
@@ -7145,8 +7150,8 @@ void main()\n\
 			//------------------------------------------------------------------------------------------------------------------------------\n\
 			// 2nd, calculate the vertex relative to light.***\n\
 			// 1rst, try with the closest sun. sunIdx = 0.\n\
-			bool isUnderSun = false;\n\
-			bool pointIsinShadow = isInShadow(posWCRelToEye, 0, isUnderSun);\n\
+			\n\
+			pointIsinShadow = isInShadow(posWCRelToEye, 0, isUnderSun);\n\
 			if(!isUnderSun)\n\
 			{\n\
 				pointIsinShadow = isInShadow(posWCRelToEye, 1, isUnderSun);\n\
@@ -7168,8 +7173,9 @@ void main()\n\
 	}\n\
 	\n\
 	ambientColor = uAmbientLight;\n\
-	// uAmbientLight\n\
+	// https://learnopengl.com/Lighting/Basic-Lighting\n\
 	vec3 lightingDirection = normalize(vec3(0.6, 0.6, 0.6));\n\
+	//vec3 lightingDirection = normalize(vec3(0.0, 0.0, 1.0)); // lightDir = camDir.***\n\
 	directionalLightWeighting = max(dot(normal, lightingDirection), 0.0);\n\
 	\n\
 	// 1rst, take the albedo.\n\
@@ -7278,6 +7284,15 @@ void main()\n\
 			occlInv *= 3.0;\n\
 			if(occlInv > 1.0)\n\
 			occlInv = 1.0;\n\
+		}\n\
+\n\
+		if(bApplyMagoShadow && !pointIsinShadow && !sunInAntipodas)\n\
+		{\n\
+			if(occlInv < 1.0)\n\
+			{\n\
+				occlInv = min(occlInv * 1.5, 1.0);\n\
+			}\n\
+			\n\
 		}\n\
 \n\
 		finalColor = vec4(albedo.r * occlInv * diffuseLight3.x, \n\

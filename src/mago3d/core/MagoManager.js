@@ -368,6 +368,10 @@ var MagoManager = function (config)
 
 	this.quantizedMeshManager = new QuantizedMeshManager(this);
 	this.workersManager = new WorkersManager(this);
+	this.voxelizer = new Voxelizer(this, undefined);
+
+	//https://rustwasm.github.io/book/game-of-life/hello-world.html
+	//https://rustwasm.github.io/wasm-bindgen/examples/wasm2js.html
 };
 MagoManager.prototype = Object.create(Emitter.prototype);
 MagoManager.prototype.constructor = MagoManager;
@@ -2112,6 +2116,7 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 	// MagoEarthShadedColTex = this.depthFboNeo.colorBuffersArray[4];
 	this.brightColorTex = this.depthFboNeo.colorBuffersArray[5]; // Texture.createTexture = function(gl, filter, data, width, height, texWrap) // usualy texWrap = gl.CLAMP_TO_EDGE.***
 	//this.debugTex = this.depthFboNeo.colorBuffersArray[6];
+
 	// Create bloomBufferFBO if no exist.
 	if (!texturesManager.bloomBufferFBO)
 	{
@@ -2369,6 +2374,8 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		this.renderer.copyTexture(this.cesiumColorBuffer, this.albedoTex, bTexFlipXAxis, bTexFlipYAxis);
 		// this.renderer.copyTexture(this.scene._context._us.globeDepthTexture._texture, this.debugTex, bTexFlipXAxis, bTexFlipYAxis);
 
+		// Test voxelization of a region.***
+		
 
 		// Render the lightBuffer.*****************************************
 		if (sceneState.applyLightsShadows)
