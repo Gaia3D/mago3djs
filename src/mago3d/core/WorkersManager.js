@@ -15,6 +15,7 @@ var WorkersManager = function(magoManager)
 	}
 	this.magoManager = magoManager;
 	this.workerExtrudeManager;
+	this.tenelevenExtrudeWorkerManager;
 };
 
 WorkersManager.prototype.getExtrudeWorkerManager = function () 
@@ -24,4 +25,13 @@ WorkersManager.prototype.getExtrudeWorkerManager = function ()
 		this.workerExtrudeManager = new ExtrudeWorkerManager(this);
 	}
 	return this.workerExtrudeManager;
+};
+
+WorkersManager.prototype.getTenElevenExtrudeWorkerManager = function () 
+{
+	if (!this.tenelevenExtrudeWorkerManager) 
+	{
+		this.tenelevenExtrudeWorkerManager = new TenelevenExtrudeWorkerManager(this);
+	}
+	return this.tenelevenExtrudeWorkerManager;
 };

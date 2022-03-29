@@ -39,3 +39,33 @@ GeographicCoord_.prototype.setLonLatAlt = function(longitude, latitude, altitude
 		this.altitude = altitude; 
 	}
 };
+
+/**
+ * Returns if the geographicCoord is coincident to this.
+ * @param {GeographicCoord} geographicCoord
+ * @param {Number} error
+ * @returns {Boolean}
+ */
+ GeographicCoord_.prototype.isCoincidentToGeoCoord = function(geographicCoord, error, errorForAltitude) 
+ {
+	 if (!error)
+	 { error = 1E-8; }
+ 
+	 if (!errorForAltitude)
+	 { errorForAltitude = 1E-6; }
+ 
+	 if (Math.abs(this.longitude - geographicCoord.longitude) > error)
+	 { return false; }
+ 
+	 if (Math.abs(this.latitude - geographicCoord.latitude) > error)
+	 { return false; }
+ 
+	 if (this.altitude && geographicCoord.altitude)
+	 {
+		 if (Math.abs(this.altitude - geographicCoord.altitude) > errorForAltitude)
+		 { return false; }
+	 }
+ 
+	 return true;
+ };
+ 

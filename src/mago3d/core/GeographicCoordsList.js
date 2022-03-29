@@ -140,6 +140,38 @@ GeographicCoordsList.prototype.getGeoCoordSegment = function(idx, resultGeoCoord
 	return resultGeoCoordSegment;
 };
 
+GeographicCoordsList.getCrossProduct2D = function(geographicCoordsArray, idx) 
+{
+
+	var geoCoordsCount = geographicCoordsArray.length;
+
+	var nextIdx;
+	var prevIdx;
+
+	if (idx === geoCoordsCount - 1)
+	{ nextIdx = 0; }
+	else
+	{ nextIdx = idx + 1; }
+
+	if (idx === 0) 
+	{
+		prevIdx = geoCoordsCount - 1;
+	}
+	else
+	{ prevIdx = idx - 1; }
+
+	var prevGeoCoord = geographicCoordsArray[prevIdx];
+	var geoCoord = geographicCoordsArray[idx];
+	var nextGeoCoord = geographicCoordsArray[nextIdx];
+
+	var vec1 = new Point2D(geoCoord.longitude - prevGeoCoord.longitude, geoCoord.latitude - prevGeoCoord.latitude);
+	var vec2 = new Point2D(nextGeoCoord.longitude - geoCoord.longitude, nextGeoCoord.latitude - geoCoord.latitude);
+	vec1.unitary();
+	vec2.unitary();
+
+	return vec1.crossProduct(vec2);
+};
+
 /**
  * 
  * 
