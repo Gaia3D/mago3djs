@@ -44,7 +44,7 @@
 		vec4 scaledPos = vec4(position.x * scaleLC.x, position.y * scaleLC.y, position.z * scaleLC.z, 1.0);
 		vec4 rotatedPos;
 		mat3 currentTMat;
-		if(refMatrixType == 0)
+		if(refMatrixType == 0) // 0= identity, 1= translate, 2= transform
 		{
 			rotatedPos = buildingRotMatrix * vec4(scaledPos.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);
 			currentTMat = mat3(buildingRotMatrix);

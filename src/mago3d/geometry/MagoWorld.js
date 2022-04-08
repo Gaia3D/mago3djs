@@ -839,7 +839,7 @@ MagoWorld.screenToCamCoord = function(mouseX, mouseY, magoManager, resultPointCa
 	options.linearDepth = currentLinearDepth; // optionally, use the pre calculated linearDepth.
 
 	resultPointCamCoord = ManagerUtils.calculatePixelPositionCamCoord(gl, mouseX, mouseY, resultPointCamCoord, currentDepthFbo, 
-	currentFrustumNear, currentFrustumFar, magoManager, options);
+		currentFrustumNear, currentFrustumFar, magoManager, options);
 
 	// test.***
 	//var projMat = sceneState.getProjectionMatrixInv();

@@ -833,7 +833,7 @@ Modeler.prototype.getObjectByGuid = function(guid)
  * @param {string} value
  * @return {Array<MagoRenderable>}
  */
-Modeler.prototype.getObjectByKV = function(key, value) 
+Modeler.prototype.getObjectByKV = function (key, value) 
 {
 	var model = this.objectsArray.filter(function(object)
 	{
@@ -843,7 +843,7 @@ Modeler.prototype.getObjectByKV = function(key, value)
 	return model;
 };
 
-Modeler.prototype.newPerson = function(options) 
+Modeler.prototype.newPerson = function (options) 
 {
 	if (this.testObjectsArray === undefined)
 	{ this.testObjectsArray = []; }
@@ -853,14 +853,58 @@ Modeler.prototype.newPerson = function(options)
 	return person;
 };
 
-Modeler.prototype.newCone = function(radius, height, options) 
+Modeler.prototype.newCone = function (radius, height, options) 
 {
 	var cone = new Cone(radius, height, options);
-
 	return cone;
 };
 
-Modeler.prototype.newBasicFactory = function(factoryWidth, factoryLength, factoryHeight, options) 
+Modeler.prototype.newClippingBox_by2geographicCoords = function (geoCoord1, geoCoord2, altitude, extrudeQuantity)
+{
+	// The 2 geoCoords are a side of the base.
+	// 1rst, find the 4 geoCoords of the base.
+	// Take the 1rst geoCoord as origin.***
+	geoCoord1.altitude = altitude;
+	geoCoord2.altitude = altitude;
+
+	var geoLocDataManager = new GeoLocationDataManager();
+	
+	var geoLoc = new GeoLocationData();
+	geoLoc = ManagerUtils.calculateGeoLocationData(geoCoord1.longitude, geoCoord1.latitude, geoCoord1.altitude, 0.0, 0.0, 0.0, geoLoc);
+	geoLocDataManager.addGeoLocationData(geoLoc);
+
+	var pointsArray = GeographicCoordsList.getPointsRelativeToGeoLocation(geoLoc, [geoCoord1, geoCoord2], undefined);
+
+	// Now, calculate the 2 offset points in 2D.***
+	var point3d_0 = pointsArray[0];
+	var point3d_1 = pointsArray[1];
+
+	var point2d_0 = new Point2D(point3d_0.x, point3d_0.y);
+	var point2d_1 = new Point2D(point3d_1.x, point3d_1.y);
+	var dist = point2d_0.distToPoint(point2d_1);
+	var dir = point2d_0.getVectorToPoint(point2d_1);
+	dir.unitary();
+	var dirRight = dir.getRight();
+
+	var point2d_0_right = new Point2D(point2d_0.x + dirRight.x * dist, point2d_0.y + dirRight.y * dist);
+	var point2d_1_right = new Point2D(point2d_1.x + dirRight.x * dist, point2d_1.y + dirRight.y * dist);
+
+	// Now, with the 4 points make a extruded object.
+	var point3d_0_right = new Point3D(point2d_0_right.x, point2d_0_right.y, point3d_0.z);
+	var point3d_1_right = new Point3D(point2d_1_right.x, point2d_1_right.y, point3d_1.z);
+	var extrudeDirection = new Point3D(0.0, 0.0, 1.0);
+	//var extrudeQuantity = dist; // provisionally.***
+	var clippingBox = new ClippingBox();
+	clippingBox.create_byExtrude([point3d_0, point3d_1, point3d_1_right, point3d_0_right], extrudeDirection, extrudeQuantity);
+	clippingBox.geoLocDataManager = geoLocDataManager;
+
+	this.clippingBox = clippingBox;
+
+	var hola = 0;
+	return clippingBox;
+};
+
+Modeler.prototype.newBasicFactory = function (factoryWidth, factoryLength, factoryHeight, options) 
 {
 	// set material for the roof of the factory.
 	var magoManager = this.magoManager;
@@ -1172,7 +1216,7 @@ Modeler.prototype.addPointToPolyline = function(point2d)
 };
 
 
-Modeler.prototype.render = function(magoManager, shader, renderType, glPrimitive) 
+Modeler.prototype.render = function (magoManager, shader, renderType, glPrimitive) 
 {
 	// Generic objects.***
 	// The generic objects are into smartTiles, so is rendered when smartTile is visible on camera.

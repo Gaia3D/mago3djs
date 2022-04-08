@@ -2282,7 +2282,7 @@ TinTerrain.prototype.getSphereExtent = function(magoManager)
 };
 
 TinTerrain.prototype.getFrustumIntersectedTinTerrainsQuadTree = function (frustum, maxDepth, camPos, magoManager, visibleTilesArrayMap, 
-noVisibleTilesArray)
+	noVisibleTilesArray)
 {
 	// Note: this is NO frustum intersection. Select tiles by distance to camera. Function name must to be change.
 	if (this.geographicExtent === undefined || this.geographicExtent.minGeographicCoord === undefined || this.geographicExtent.maxGeographicCoord === undefined)

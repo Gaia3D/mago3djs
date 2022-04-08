@@ -267,6 +267,38 @@ SmartTileManager.prototype.createMainTiles = function()
 	tile2.maxGeographicCoord.setLonLatAlt(180, 90, 0);
 };
 
+SmartTileManager.prototype.removeSmartTileF4dSeed = function (projectFolderName, L, X, Y) 
+{
+	// search in smartTiles
+	var tileFullPath = [];
+	tileFullPath[L] = {X, Y};
+	tileFullPath = SmartTile.getTileFullPath_fromLXY(L, X, Y, tileFullPath);
+	if (this.tilesArray)
+	{
+		var tilesCount = this.tilesArray.length; // allways tilesCount = 2. (Asia & America sides).
+		for (var i=0; i<tilesCount; i++)
+		{
+			var tile = this.tilesArray[i].getTileByTileFullPath(tileFullPath);
+
+			if (tile)
+			{
+				var smartTileF4dSeedArray = tile.smartTileF4dSeedArray;
+				var seedsCount = smartTileF4dSeedArray.length;
+				for ( var j=0; j<seedsCount; j++)
+				{
+					var seed = smartTileF4dSeedArray[j];
+					if (seed.projectFolderName === projectFolderName)
+					{
+						smartTileF4dSeedArray.splice(j, 1);
+						break;
+					}
+				}
+				break;
+			}
+		}
+	}
+};
+
 /**
  */
 SmartTileManager.prototype.parseSmartTilesF4dIndexFile = function (dataBuffer, projectFolderName, magoManager) 

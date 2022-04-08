@@ -193,7 +193,6 @@ var MagoManager = function (config)
 	// Vars.****************************************************************
 	this.sceneState = new SceneState(this.config); // this contains all scene mtrices and camera position.***
 	this.sceneState.setApplySunShadows(false);
-
 	
 
 	this.magoPolicy.objectMoveMode = CODE.moveMode.NONE;

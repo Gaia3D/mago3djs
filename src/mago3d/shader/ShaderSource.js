@@ -1591,11 +1591,20 @@ uniform bool bUseLogarithmicDepth;\n\
 uniform bool bUseMultiRenderTarget;\n\
 uniform int uFrustumIdx;\n\
 \n\
+uniform mat4 modelViewMatrixRelToEye;\n\
+\n\
+uniform vec3 encodedCameraPositionMCHigh;\n\
+uniform vec3 encodedCameraPositionMCLow;\n\
+\n\
 // clipping planes.***\n\
 uniform bool bApplyClippingPlanes; // old. deprecated.***\n\
 uniform int clippingType; // 0= no clipping. 1= clipping by planes. 2= clipping by localCoord polyline. 3= clip by heights, 4= clip by (2, 3)\n\
 uniform int clippingPlanesCount;\n\
-uniform vec4 clippingPlanes[6];\n\
+uniform vec3 clippingBoxSplittedPos[2]; // Box position. posHIGH.xyz & posLOW.xyz.***\n\
+uniform vec3 clippingBoxPlanesPosLC[6]; // planes local position (relative to box).***\n\
+uniform vec3 clippingBoxPlanesNorLC[6]; // planes local normals (relative to box).***\n\
+uniform mat4 clippingBoxRotMatrix;\n\
+uniform vec4 clippingPlanes[6]; // old.\n\
 uniform vec2 clippingPolygon2dPoints[64];\n\
 uniform int clippingConvexPolygon2dPointsIndices[64];\n\
 uniform vec4 limitationInfringedColor4;\n\
@@ -1615,7 +1624,7 @@ varying vec3 vertexPosLC;\n\
 varying float flogz;\n\
 varying float Fcoef_half;\n\
 varying float depth;\n\
-//varying vec3 depthDebug;\n\
+\n\
 \n\
 \n\
 vec4 packDepth( float v ) {\n\
@@ -1636,13 +1645,14 @@ vec3 encodeNormal(in vec3 normal)\n\
 }            \n\
 \n\
 \n\
-bool clipVertexByPlane(in vec4 plane, in vec3 point)\n\
+float clipVertexByPlane(in vec3 planePos, in vec3 planeNor, in vec3 point)\n\
 {\n\
-	float dist = plane.x * point.x + plane.y * point.y + plane.z * point.z + plane.w;\n\
-	\n\
-	if(dist < 0.0)\n\
-	return true;\n\
-	else return false;\n\
+	float coef_d = -planeNor.x * planePos.x - planeNor.y * planePos.y - planeNor.z * planePos.z;\n\
+	float dist = planeNor.x * point.x + planeNor.y * point.y + planeNor.z * point.z + coef_d;\n\
+	return dist;\n\
+	//if(dist < 0.0)\n\
+	//return true;\n\
+	//else return false;\n\
 }\n\
 \n\
 vec2 getDirection2d(in vec2 startPoint, in vec2 endPoint)\n\
@@ -1880,24 +1890,52 @@ void main()\n\
 	}\n\
 \n\
 	// Check if clipping.********************************************\n\
-	\n\
+	bool discardFrag = false;\n\
 	if(bApplyClippingPlanes)\n\
 	{\n\
-		bool discardFrag = false;\n\
+		// check gl_FrontFacing. todo.\n\
+		discardFrag = true;\n\
+\n\
+		vec3 boxPosHIGH = clippingBoxSplittedPos[0];\n\
+		vec3 boxPosLOW = clippingBoxSplittedPos[1];\n\
+\n\
 		for(int i=0; i<6; i++)\n\
 		{\n\
-			vec4 plane = clippingPlanes[i];\n\
-			\n\
-			// calculate any point of the plane.\n\
-			if(!clipVertexByPlane(plane, vertexPos))\n\
-			{\n\
-				discardFrag = false; // false.\n\
-				break;\n\
-			}\n\
 			if(i >= clippingPlanesCount)\n\
 			break;\n\
+\n\
+			//vec4 plane = clippingPlanes[i]; // old. delete this.\n\
+			vec3 planePosLC = clippingBoxPlanesPosLC[i];\n\
+			vec3 planeNorLC = clippingBoxPlanesNorLC[i];\n\
+\n\
+			// 1rst, rotate the posLC.***\n\
+			vec3 rotatedPos = (clippingBoxRotMatrix * vec4(planePosLC, 1.0)).xyz;\n\
+			vec3 planePosHIGH = boxPosHIGH;\n\
+			vec3 planePosLOW = boxPosLOW + rotatedPos;\n\
+			vec3 highDifference = planePosHIGH.xyz - encodedCameraPositionMCHigh.xyz;\n\
+			vec3 lowDifference = planePosLOW.xyz - encodedCameraPositionMCLow.xyz;\n\
+\n\
+			vec3 planePosWC = highDifference.xyz + lowDifference.xyz;\n\
+			vec4 planePosCC = modelViewMatrixRelToEye * vec4(planePosWC, 1.0);\n\
+\n\
+			mat3 rotMat = mat3(clippingBoxRotMatrix);\n\
+			vec3 planeNorWC = rotMat * planeNorLC;\n\
+			vec4 planeNorCC = modelViewMatrixRelToEye * vec4(planeNorWC, 1.0);\n\
+\n\
+			// now check if vertexPos is in front of plane or rear of the plane.\n\
+			float dist = clipVertexByPlane(planePosCC.xyz, planeNorCC.xyz, vertexPos);\n\
+			if(dist > 0.0)\n\
+			{\n\
+				discardFrag = false; \n\
+				break;\n\
+			}\n\
+\n\
 		}\n\
-		\n\
+\n\
+		if(discardFrag)\n\
+		{\n\
+			discard;\n\
+		}\n\
 	}\n\
 	\n\
 	//----------------------------------------------------------------\n\
@@ -2424,7 +2462,7 @@ ShaderSource.GBufferVS = "\n\
 		vec4 scaledPos = vec4(position.x * scaleLC.x, position.y * scaleLC.y, position.z * scaleLC.z, 1.0);\n\
 		vec4 rotatedPos;\n\
 		mat3 currentTMat;\n\
-		if(refMatrixType == 0)\n\
+		if(refMatrixType == 0) // 0= identity, 1= translate, 2= transform\n\
 		{\n\
 			rotatedPos = buildingRotMatrix * vec4(scaledPos.xyz, 1.0) + vec4(aditionalPosition.xyz, 0.0);\n\
 			currentTMat = mat3(buildingRotMatrix);\n\

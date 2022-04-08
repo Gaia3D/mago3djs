@@ -353,30 +353,6 @@ SmartTile.prototype.putSmartTileF4dSeed = function(targetDepth, smartTileF4dSeed
 		// set the sizes to subTiles (The minLongitude, MaxLongitude, etc. is constant, but the minAlt & maxAlt can will be modified every time that insert new buildingSeeds).
 		this.setSizesToSubTiles();
 
-		/*
-		// debug.***********************************
-		if (this.depth === 18)
-		{ var hola = 0; }
-		else if (this.depth === 17)
-		{ var hola = 0; }
-		else if (this.depth === 16)
-		{ var hola = 0; }
-		else if (this.depth === 15)
-		{ var hola = 0; }
-		else if (this.depth === 14)
-		{ var hola = 0; }
-		else if (this.depth === 13)
-		{ var hola = 0; }
-		else if (this.depth === 12)
-		{ var hola = 0; }
-		else if (this.depth === 11)
-		{ var hola = 0; }
-
-		var size = this.calculateRectangleSize(magoManager);
-		var hola = 0;
-		// End debug.--------------------------------------
-		*/
-
 		// intercept buildingSeeds for each subTiles.
 		var geoCoord = smartTileF4dSeed.geographicCoord;
 		var subSmartTile;
@@ -2493,6 +2469,71 @@ SmartTile.getFrustumIntersectedTilesNamesForGeographicExtent = function(frustum,
 		}
 	}
 	
+};
+
+SmartTile.prototype.getTileByTileFullPath = function(tileFullPath)
+{
+	// In the tileFullPath there are the tile X, Y indices for each depth.
+	// tileFullPath[depth] = { X : x, Y : y}
+
+	var curr_depth = this.depth;
+
+	// check if in tileFullPath [ curr_depth + 1] !== undefined.
+	if ( tileFullPath[curr_depth + 1] === undefined )
+	{
+		return this;
+	}
+	else
+	{
+		var child_x = tileFullPath[curr_depth + 1].X;
+		var child_y = tileFullPath[curr_depth + 1].Y;
+		var candidateTile = undefined;
+		for (var i=0; i<4; i++)
+		{
+			var subTile = this.subTiles[i];
+			if (subTile.X === child_x && subTile.Y === child_y)
+			{
+				candidateTile = subTile;
+				break;
+			}
+		}
+
+		if (candidateTile)
+		{
+			return candidateTile.getTileByTileFullPath(tileFullPath);
+		}
+		else
+		{
+			return undefined;
+		}
+	}
+};
+
+SmartTile.getTileFullPath_fromLXY = function(L, X, Y, resultTileFullPath)
+{
+	// find the owner tile indices.
+	if (L === 0)
+	{
+		return resultTileFullPath;
+	}
+
+	// In the resultIndicesArray put the owner indice.
+	// resultIndicesArray[depth] = { X : x, Y : y}
+
+	if (resultTileFullPath === undefined)
+	{
+		resultTileFullPath = [];
+	}
+
+	var owner_L = L - 1;
+	var owner_X = Math.floor(X/2);
+	var owner_Y = Math.floor(Y/2);
+	resultTileFullPath[owner_L] = {
+		X : owner_X,
+		Y : owner_Y
+	};
+
+	return SmartTile.getTileFullPath_fromLXY(owner_L, owner_X, owner_Y, resultTileFullPath);
 };
 
 /**

@@ -12,7 +12,12 @@ var ClippingPlane = function(options)
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 
-	this.plane; // the plane equation.***
+	this.position;
+	this.normal;
+	this._pointsArray; // Coplanar points of the plane. Is optional.***
+
+	//oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooold
+	this.plane; // OLD.***
 
 	if (!options)
 	{ options = {}; }
@@ -54,6 +59,24 @@ var ClippingPlane = function(options)
 
 ClippingPlane.prototype = Object.create(MagoRenderable.prototype);
 ClippingPlane.prototype.constructor = ClippingPlane;
+
+ClippingPlane.prototype.setPosition = function(x, y, z)
+{
+	if (this.position === undefined)
+	{
+		this.position = new Point3D();
+	}
+	this.position.set(x, y, z);
+};
+
+ClippingPlane.prototype.setNormal = function(x, y, z)
+{
+	if (this.normal === undefined)
+	{
+		this.normal = new Point3D();
+	}
+	this.normal.set(x, y, z);
+};
 
 ClippingPlane.prototype.makeMesh = function()
 {

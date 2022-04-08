@@ -292,6 +292,15 @@ ManagerUtils.calculateGeoLocationData = function(longitude, latitude, altitude, 
 	{ resultGeoLocationData.positionLOW = new Float32Array([0.0, 0.0, 0.0]); }
 	ManagerUtils.calculateSplited3fv([resultGeoLocationData.position.x, resultGeoLocationData.position.y, resultGeoLocationData.position.z], resultGeoLocationData.positionHIGH, resultGeoLocationData.positionLOW);
 
+	if (resultGeoLocationData.positionSplitted === undefined)
+	{ resultGeoLocationData.positionSplitted = new Float32Array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0]); }
+	resultGeoLocationData.positionSplitted[0] = resultGeoLocationData.positionHIGH[0]; // high x.
+	resultGeoLocationData.positionSplitted[1] = resultGeoLocationData.positionHIGH[1]; // high y.
+	resultGeoLocationData.positionSplitted[2] = resultGeoLocationData.positionHIGH[2]; // high z.
+	resultGeoLocationData.positionSplitted[3] = resultGeoLocationData.positionLOW[0]; // low x.
+	resultGeoLocationData.positionSplitted[4] = resultGeoLocationData.positionLOW[1]; // low y.
+	resultGeoLocationData.positionSplitted[5] = resultGeoLocationData.positionLOW[2]; // low z.
+
 	// Determine the elevation of the position.**
 	//var cartographic = Cesium.Ellipsoid.WGS84.cartesianToCartographic(position);
 	//var height = cartographic.height;

@@ -24,11 +24,20 @@ uniform bool bUseLogarithmicDepth;
 uniform bool bUseMultiRenderTarget;
 uniform int uFrustumIdx;
 
+uniform mat4 modelViewMatrixRelToEye;
+
+uniform vec3 encodedCameraPositionMCHigh;
+uniform vec3 encodedCameraPositionMCLow;
+
 // clipping planes.***
 uniform bool bApplyClippingPlanes; // old. deprecated.***
 uniform int clippingType; // 0= no clipping. 1= clipping by planes. 2= clipping by localCoord polyline. 3= clip by heights, 4= clip by (2, 3)
 uniform int clippingPlanesCount;
-uniform vec4 clippingPlanes[6];
+uniform vec3 clippingBoxSplittedPos[2]; // Box position. posHIGH.xyz & posLOW.xyz.***
+uniform vec3 clippingBoxPlanesPosLC[6]; // planes local position (relative to box).***
+uniform vec3 clippingBoxPlanesNorLC[6]; // planes local normals (relative to box).***
+uniform mat4 clippingBoxRotMatrix;
+uniform vec4 clippingPlanes[6]; // old.
 uniform vec2 clippingPolygon2dPoints[64];
 uniform int clippingConvexPolygon2dPointsIndices[64];
 uniform vec4 limitationInfringedColor4;
@@ -48,7 +57,7 @@ varying vec3 vertexPosLC;
 varying float flogz;
 varying float Fcoef_half;
 varying float depth;
-//varying vec3 depthDebug;
+
 
 
 vec4 packDepth( float v ) {
@@ -69,13 +78,14 @@ vec3 encodeNormal(in vec3 normal)
 }            
 
 
-bool clipVertexByPlane(in vec4 plane, in vec3 point)
+float clipVertexByPlane(in vec3 planePos, in vec3 planeNor, in vec3 point)
 {
-	float dist = plane.x * point.x + plane.y * point.y + plane.z * point.z + plane.w;
-	
-	if(dist < 0.0)
-	return true;
-	else return false;
+	float coef_d = -planeNor.x * planePos.x - planeNor.y * planePos.y - planeNor.z * planePos.z;
+	float dist = planeNor.x * point.x + planeNor.y * point.y + planeNor.z * point.z + coef_d;
+	return dist;
+	//if(dist < 0.0)
+	//return true;
+	//else return false;
 }
 
 vec2 getDirection2d(in vec2 startPoint, in vec2 endPoint)
@@ -313,24 +323,52 @@ void main()
 	}
 
 	// Check if clipping.********************************************
-	
+	bool discardFrag = false;
 	if(bApplyClippingPlanes)
 	{
-		bool discardFrag = false;
+		// check gl_FrontFacing. todo.
+		discardFrag = true;
+
+		vec3 boxPosHIGH = clippingBoxSplittedPos[0];
+		vec3 boxPosLOW = clippingBoxSplittedPos[1];
+
 		for(int i=0; i<6; i++)
 		{
-			vec4 plane = clippingPlanes[i];
-			
-			// calculate any point of the plane.
-			if(!clipVertexByPlane(plane, vertexPos))
-			{
-				discardFrag = false; // false.
-				break;
-			}
 			if(i >= clippingPlanesCount)
 			break;
+
+			//vec4 plane = clippingPlanes[i]; // old. delete this.
+			vec3 planePosLC = clippingBoxPlanesPosLC[i];
+			vec3 planeNorLC = clippingBoxPlanesNorLC[i];
+
+			// 1rst, rotate the posLC.***
+			vec3 rotatedPos = (clippingBoxRotMatrix * vec4(planePosLC, 1.0)).xyz;
+			vec3 planePosHIGH = boxPosHIGH;
+			vec3 planePosLOW = boxPosLOW + rotatedPos;
+			vec3 highDifference = planePosHIGH.xyz - encodedCameraPositionMCHigh.xyz;
+			vec3 lowDifference = planePosLOW.xyz - encodedCameraPositionMCLow.xyz;
+
+			vec3 planePosWC = highDifference.xyz + lowDifference.xyz;
+			vec4 planePosCC = modelViewMatrixRelToEye * vec4(planePosWC, 1.0);
+
+			mat3 rotMat = mat3(clippingBoxRotMatrix);
+			vec3 planeNorWC = rotMat * planeNorLC;
+			vec4 planeNorCC = modelViewMatrixRelToEye * vec4(planeNorWC, 1.0);
+
+			// now check if vertexPos is in front of plane or rear of the plane.
+			float dist = clipVertexByPlane(planePosCC.xyz, planeNorCC.xyz, vertexPos);
+			if(dist > 0.0)
+			{
+				discardFrag = false; 
+				break;
+			}
+
 		}
-		
+
+		if(discardFrag)
+		{
+			discard;
+		}
 	}
 	
 	//----------------------------------------------------------------

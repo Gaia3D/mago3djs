@@ -78,6 +78,13 @@ var GeoLocationData = function(geoLocationDataName)
 	 * @default [0,0,0]
 	 */
 	this.positionLOW; 
+
+	/**
+	 * The high part & low part of the splitted position in same array.
+	 * @type {Float32Array(6)}
+	 * @default [0,0,0,0,0,0]
+	 */
+	 this.positionSplitted; 
 	
 	/**
 	 * The effective absoluteCoord (x, y, z) of this geoLocationData.
@@ -238,10 +245,11 @@ GeoLocationData.prototype.deleteObjects = function(vboMemManager)
 	this.pivotPointTraslationLC = undefined;
 };
 
+
 /**
  * Adds the translation vector into position.
  */
-GeoLocationData.prototype.doEffectivePivotPointTranslation = function() 
+GeoLocationData.prototype.doEffectivePivotPointTranslation = function () 
 {
 	// this function adds the "pivotPointTraslation" to the positions.
 	// this function is not for move the building on the globe. This function is only for translate the pivot point of the building.

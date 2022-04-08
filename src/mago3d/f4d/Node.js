@@ -562,8 +562,9 @@ Node.prototype.renderContent = function (magoManager, shader, renderType, refMat
 	var isTrailRender = this.data.isTrailRender;
 	if (isTrailRender !== undefined && isTrailRender === true && renderType === 1)
 	{
+		var webglController = new WebGlController(gl);
 		magoManager.isTrailRender = true;
-		gl.depthRange(0.1, 1); // reduce depthRange to minimize blending flickling.
+		webglController.depthRange(0.1, 1); // reduce depthRange to minimize blending flickling.
 		var geoLocDatasCount = geoLocDataManager.getGeoLocationDatasCount();
 		//for(var i=geoLocDatasCount - 1; i>0; i--)
 		for (var i=1; i<geoLocDatasCount; i++ )
@@ -579,7 +580,7 @@ Node.prototype.renderContent = function (magoManager, shader, renderType, refMat
 			neoBuilding.render(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord, data.currentLod);
 
 		}
-		gl.depthRange(0, 1);
+		webglController.restoreAllParameters();
 		magoManager.isTrailRender = false;
 	}
 	//--------------------------------------------------------------------------------------------------------------------

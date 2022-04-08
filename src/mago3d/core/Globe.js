@@ -30,6 +30,109 @@ var Globe = function()
 };
 
 /**
+ * function used by "MagoWorld" to paning & rotate the globe by dragging mouse.
+ * @param {Line} line
+ * @param {Float32Array} resultCartesian
+ * @param {Number} radius
+ * @returns {Float32Array} resultCartesian
+ */
+Globe.prototype.intersectionLineWgs84 = function (line, resultCartesian, radius)
+{
+	 // 
+	 // line: (x, y, z) = x1 + t(x2 - x1), y1 + t(y2 - y1), z1 + t(z2 - z1)
+	 // sphere: (x - x3)^2 + (y - y3)^2 + (z - z3)^2 = r^2, where x3, y3, z3 is the center of the sphere.
+	 
+	 // line:
+	 var p1 = line.point;
+	 var lineDir = line.direction;
+	 var dist = 1000.0;// any value is ok.
+	 var p2 = new Point3D(p1.x + lineDir.x * dist, p1.y + lineDir.y * dist, p1.z + lineDir.z * dist);
+	 var x1 = p1.x;
+	 var y1 = p1.y;
+	 var z1 = p1.z;
+	 var x2 = p2.x;
+	 var y2 = p2.y;
+	 var z2 = p2.z;
+ 
+	 // sphere:
+	 var x3 = 0;
+	 var y3 = 0;
+	 var z3 = 0;
+	 var r = this.equatorialRadius; // provisionally.
+	 if (radius !== undefined)
+	 { r = radius; }
+	 
+	 // resolve:
+	 var x21 = (x2-x1);
+	 var y21 = (y2-y1);
+	 var z21 = (z2-z1);
+	 
+	 var a = x21*x21 + y21*y21 + z21*z21;
+	 
+	 var x13 = (x1-x3);
+	 var y13 = (y1-y3);
+	 var z13 = (z1-z3);
+	 
+	 var b = 2*(x21 * x13 + y21 * y13 + z21 * z13);
+	 
+	 var c = x3*x3 + y3*y3 + z3*z3 + x1*x1 + y1*y1 + z1*z1 - 2*(x3*x1 + y3*y1+ z3*z1) - r*r;
+	 
+	 var discriminant = b*b - 4*a*c;
+	 
+	 if (discriminant < 0)
+	 {
+		 // no intersection.
+		 return undefined;
+	 }
+	 else if (discriminant === 0)
+	 {
+		 // this is tangent.
+		 if (resultCartesian === undefined)
+		 { resultCartesian = []; } // Float32Array has no enough precision.
+		 
+		 var t1 = (-b)/(2*a);
+		 var intersectPoint1 = new Point3D(x1 + (x2 - x1)*t1, y1 + (y2 - y1)*t1, z1 + (z2 - z1)*t1);
+		 resultCartesian[0] = intersectPoint1.x;
+		 resultCartesian[1] = intersectPoint1.y;
+		 resultCartesian[2] = intersectPoint1.z;
+		 
+	 }
+	 else
+	 {
+		 // find the nearest to p1.
+		 var sqrtDiscriminant = Math.sqrt(discriminant);
+		 var t1 = (-b + sqrtDiscriminant)/(2*a);
+		 var t2 = (-b - sqrtDiscriminant)/(2*a);
+		 
+		 // solution 1.
+		 var intersectPoint1 = new Point3D(x1 + (x2 - x1)*t1, y1 + (y2 - y1)*t1, z1 + (z2 - z1)*t1);
+		 var intersectPoint2 = new Point3D(x1 + (x2 - x1)*t2, y1 + (y2 - y1)*t2, z1 + (z2 - z1)*t2);
+		 
+		 var dist1 = p1.squareDistToPoint(intersectPoint1);
+		 var dist2 = p1.squareDistToPoint(intersectPoint2);
+		 
+		 if (resultCartesian === undefined)
+		 { resultCartesian = []; } // Float32Array has no enough precision.
+		 
+		 if (dist1 < dist2)
+		 {
+			 resultCartesian[0] = intersectPoint1.x;
+			 resultCartesian[1] = intersectPoint1.y;
+			 resultCartesian[2] = intersectPoint1.z;
+		 }
+		 else
+		 {
+			 resultCartesian[0] = intersectPoint2.x;
+			 resultCartesian[1] = intersectPoint2.y;
+			 resultCartesian[2] = intersectPoint2.z;
+		 }
+	 }
+	 
+	 return resultCartesian;
+	 
+};
+
+/**
  * @returns {Number} equatorial Radius
  */
 Globe.equatorialRadius = function()
@@ -106,6 +209,8 @@ Globe.normalizeCartesian = function(cartesian)
 	
 	return cartesian;
 };
+
+
 
 /**
  * Change cartesian point to WGS84 and normalize that.
@@ -308,108 +413,8 @@ Globe.prototype.transformMatrixAtCartesianPointWgs84 = function(x, y, z, float32
 	
 	return float32Array;
 };
-/**
- * function used by "MagoWorld" to paning & rotate the globe by dragging mouse.
- * @param {Line} line
- * @param {Float32Array} resultCartesian
- * @param {Number} radius
- * @returns {Float32Array} resultCartesian
- */
-Globe.prototype.intersectionLineWgs84 = function(line, resultCartesian, radius)
-{
-	// 
-	// line: (x, y, z) = x1 + t(x2 - x1), y1 + t(y2 - y1), z1 + t(z2 - z1)
-	// sphere: (x - x3)^2 + (y - y3)^2 + (z - z3)^2 = r^2, where x3, y3, z3 is the center of the sphere.
-	
-	// line:
-	var p1 = line.point;
-	var lineDir = line.direction;
-	var dist = 1000.0;// any value is ok.
-	var p2 = new Point3D(p1.x + lineDir.x * dist, p1.y + lineDir.y * dist, p1.z + lineDir.z * dist);
-	var x1 = p1.x;
-	var y1 = p1.y;
-	var z1 = p1.z;
-	var x2 = p2.x;
-	var y2 = p2.y;
-	var z2 = p2.z;
 
-	// sphere:
-	var x3 = 0;
-	var y3 = 0;
-	var z3 = 0;
-	var r = this.equatorialRadius; // provisionally.
-	if (radius !== undefined)
-	{ r = radius; }
-	
-	// resolve:
-	var x21 = (x2-x1);
-	var y21 = (y2-y1);
-	var z21 = (z2-z1);
-	
-	var a = x21*x21 + y21*y21 + z21*z21;
-	
-	var x13 = (x1-x3);
-	var y13 = (y1-y3);
-	var z13 = (z1-z3);
-	
-	var b = 2*(x21 * x13 + y21 * y13 + z21 * z13);
-	
-	var c = x3*x3 + y3*y3 + z3*z3 + x1*x1 + y1*y1 + z1*z1 - 2*(x3*x1 + y3*y1+ z3*z1) - r*r;
-	
-	var discriminant = b*b - 4*a*c;
-	
-	if (discriminant < 0)
-	{
-		// no intersection.
-		return undefined;
-	}
-	else if (discriminant === 0)
-	{
-		// this is tangent.
-		if (resultCartesian === undefined)
-		{ resultCartesian = []; } // Float32Array has no enough precision.
-		
-		var t1 = (-b)/(2*a);
-		var intersectPoint1 = new Point3D(x1 + (x2 - x1)*t1, y1 + (y2 - y1)*t1, z1 + (z2 - z1)*t1);
-		resultCartesian[0] = intersectPoint1.x;
-		resultCartesian[1] = intersectPoint1.y;
-		resultCartesian[2] = intersectPoint1.z;
-		
-	}
-	else
-	{
-		// find the nearest to p1.
-		var sqrtDiscriminant = Math.sqrt(discriminant);
-		var t1 = (-b + sqrtDiscriminant)/(2*a);
-		var t2 = (-b - sqrtDiscriminant)/(2*a);
-		
-		// solution 1.
-		var intersectPoint1 = new Point3D(x1 + (x2 - x1)*t1, y1 + (y2 - y1)*t1, z1 + (z2 - z1)*t1);
-		var intersectPoint2 = new Point3D(x1 + (x2 - x1)*t2, y1 + (y2 - y1)*t2, z1 + (z2 - z1)*t2);
-		
-		var dist1 = p1.squareDistToPoint(intersectPoint1);
-		var dist2 = p1.squareDistToPoint(intersectPoint2);
-		
-		if (resultCartesian === undefined)
-		{ resultCartesian = []; } // Float32Array has no enough precision.
-		
-		if (dist1 < dist2)
-		{
-			resultCartesian[0] = intersectPoint1.x;
-			resultCartesian[1] = intersectPoint1.y;
-			resultCartesian[2] = intersectPoint1.z;
-		}
-		else
-		{
-			resultCartesian[0] = intersectPoint2.x;
-			resultCartesian[1] = intersectPoint2.y;
-			resultCartesian[2] = intersectPoint2.z;
-		}
-	}
-	
-	return resultCartesian;
-	
-};
+
 
 
 /**

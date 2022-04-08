@@ -594,6 +594,9 @@ NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferencesVersioned = fu
  */
 NeoReferencesMotherAndIndices.prototype.parseArrayBufferReferences = function(arrayBuffer, readWriter, neoBuilding, tMatrix4, magoManager) 
 {
+	// Function no used. delete this.***
+	// Function no used. delete this.***
+	// Function no used. delete this.***
 	this.fileLoadState = CODE.fileLoadState.PARSE_STARTED;
 	
 	var gl = magoManager.getGl();

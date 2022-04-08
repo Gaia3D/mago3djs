@@ -219,7 +219,7 @@ Point2D.prototype.isCoincidentToPoint = function(point, errorDist)
  * @param {Point3D} resultVector the "resultVector" has the direction from "this" to "targetPoint", but is NOT normalized.
  * @returns {Point3D} resultVector
  */
-Point2D.prototype.getVectorToPoint = function(targetPoint, resultVector) 
+Point2D.prototype.getVectorToPoint = function (targetPoint, resultVector) 
 {
 	if (targetPoint === undefined)
 	{ return undefined; }
@@ -237,7 +237,7 @@ Point2D.prototype.getVectorToPoint = function(targetPoint, resultVector)
  * @param {Point2D} point the point which will be used at this calculate.
  * @returns {Number} calculated result
  */
-Point2D.prototype.crossProduct = function(point) 
+Point2D.prototype.crossProduct = function (point) 
 {
 	return this.x * point.y - point.x * this.y;
 };
@@ -247,7 +247,7 @@ Point2D.prototype.crossProduct = function(point)
  * @param {Point2D} point the point which will be used at this calculate.
  * @returns {Number} calculated result
  */
-Point2D.prototype.scalarProduct = function(point) 
+Point2D.prototype.scalarProduct = function (point) 
 {
 	var scalarProd = this.x*point.x + this.y*point.y;
 	return scalarProd;
@@ -255,7 +255,7 @@ Point2D.prototype.scalarProduct = function(point)
 
 /**
  */
-Point2D.mix = function(point_a, point_b, factor, resultPoint) 
+Point2D.mix = function (point_a, point_b, factor, resultPoint) 
 {
 	if (!resultPoint)
 	{ resultPoint = new Point2D(); }

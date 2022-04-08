@@ -13,6 +13,7 @@ var PostFxShader = function(gl)
 	}
 	this.gl = gl;
 	this.name;
+	this.map_name_location = {}; // contains attribs & uniforms.
 	this.attribLocationCacheObj = {}; // old.
 	this.uniformsArrayGeneral = []; // this array has the same uniforms that "uniformsCacheObj".
 	this.uniformsMapGeneral = {}; // this object has the same uniforms that "uniformsArray".
@@ -77,22 +78,22 @@ PostFxShader.createProgram = function(gl, vertexSource, fragmentSource)
 		throw new Error(gl.getProgramInfoLog(program));
 	}
 
-	var wrapper = {program: program};
+	var map_name_location = {program: program};
 
 	var numAttributes = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES);
 	for (var i = 0; i < numAttributes; i++) 
 	{
 		var attribute = gl.getActiveAttrib(program, i);
-		wrapper[attribute.name] = gl.getAttribLocation(program, attribute.name);
+		map_name_location[attribute.name] = gl.getAttribLocation(program, attribute.name);
 	}
 	var numUniforms = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
 	for (var i = 0; i < numUniforms; i++) 
 	{
 		var uniform = gl.getActiveUniform(program, i);
-		wrapper[uniform.name] = gl.getUniformLocation(program, uniform.name);
+		map_name_location[uniform.name] = gl.getUniformLocation(program, uniform.name);
 	}
 
-	return wrapper;
+	return map_name_locationper;
 };
 
 /**
@@ -642,7 +643,7 @@ PostFxShader.prototype.getAttribLocation = function(attribName)
  * 어떤 일을 하고 있습니까?
  * @param shaderName 변수
  */
-PostFxShader.prototype.bindAttribLocations = function(gl, shader)
+PostFxShader.prototype.bindAttribLocations = function (gl, shader)
 {
 	gl.bindAttribLocation(shader.program, 0, "position");
 	gl.bindAttribLocation(shader.program, 1, "normal");
@@ -654,7 +655,7 @@ PostFxShader.prototype.bindAttribLocations = function(gl, shader)
  * 어떤 일을 하고 있습니까?
  * @param shaderName 변수
  */
-PostFxShader.prototype.createUniformLocals = function(gl, shader, sceneState)
+PostFxShader.prototype.createUniformLocals = function (gl, shader, sceneState)
 {
 	// Here create all local uniforms, if exist, of the shader.
 	var uniformDataPair;
@@ -704,6 +705,9 @@ PostFxShader.prototype.createUniformLocals = function(gl, shader, sceneState)
 	shader.bScreenCopy_loc = gl.getUniformLocation(shader.program, "bScreenCopy");
 	
 	// clippingPlanes.
+	//shader.clippingBoxSplittedPos_loc = gl.getUniformLocation(shader.program, "clippingBoxSplittedPos");
+	//clippingBoxPlanesPosLC
+	//clippingBoxPlanesNorLC
 	shader.bApplyClippingPlanes_loc = gl.getUniformLocation(shader.program, "bApplyClippingPlanes");
 	shader.clippingPlanesCount_loc = gl.getUniformLocation(shader.program, "clippingPlanesCount");
 	shader.clippingPlanes_loc = gl.getUniformLocation(shader.program, "clippingPlanes");
