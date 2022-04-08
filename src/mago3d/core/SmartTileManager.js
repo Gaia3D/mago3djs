@@ -195,6 +195,43 @@ SmartTileManager.maxDistToCameraByDepth = function(depth)
 	return 10;
 };
 
+SmartTileManager.prototype.removeSmartTileF4dSeed = function (projectFolderName, L, X, Y) 
+{
+	// search in smartTiles
+	var tileFullPath = [];
+	tileFullPath[L] = {
+		X,
+		Y
+	};
+	tileFullPath = SmartTile.getTileFullPath_fromLXY(L, X, Y, tileFullPath);
+	if (this.tilesArray)
+	{
+		var tilesCount = this.tilesArray.length; // allways tilesCount = 2. (Asia & America sides).
+		for (var i=0; i<tilesCount; i++)
+		{
+			var tile = this.tilesArray[i].getTileByTileFullPath(tileFullPath);
+
+			if (tile)
+			{
+				var smartTileF4dSeedArray = tile.smartTileF4dSeedArray;
+				if (!smartTileF4dSeedArray) { continue; }
+				
+				var seedsCount = smartTileF4dSeedArray.length;
+				for ( var j=0; j<seedsCount; j++)
+				{
+					var seed = smartTileF4dSeedArray[j];
+					if (seed.projectFolderName === projectFolderName)
+					{
+						smartTileF4dSeedArray.splice(j, 1);
+						break;
+					}
+				}
+				break;
+			}
+		}
+	}
+};
+
 /**
  * 아메리카쪽 아시아쪽으로 구분하여 두개의 mother 타일 생성
  */
@@ -279,6 +316,31 @@ SmartTileManager.prototype.parseSmartTilesF4dIndexFile = function (dataBuffer, p
 	}
 	
 	return this.smartTileF4dSeedMap;
+};
+
+/**
+ */
+SmartTileManager.prototype.parseSmartTilesF4dIndexFileAndDeleteSmartTileF4dSeed = function (dataBuffer, projectFolderName, magoManager) 
+{
+	 var bytes_readed = 0;
+	 var readWriter = magoManager.readerWriter;
+
+	 var smartTilesMBCount = readWriter.readInt32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+	 for (var i=0; i<smartTilesMBCount; i++)
+	 {
+		 var nameLength = readWriter.readInt16(dataBuffer, bytes_readed, bytes_readed+2); bytes_readed += 2;
+		 var name = "";
+		 for (var j=0; j<nameLength; j++)
+		 {
+			 name += String.fromCharCode(new Int8Array(dataBuffer.slice(bytes_readed, bytes_readed+ 1))[0]);bytes_readed += 1;
+		 }
+		 var L = readWriter.readUInt8(dataBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+		 var X = readWriter.readInt32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		 var Y = readWriter.readInt32(dataBuffer, bytes_readed, bytes_readed+4); bytes_readed += 4;
+		 var smartTileType = readWriter.readUInt8(dataBuffer, bytes_readed, bytes_readed+1); bytes_readed += 1;
+		 
+		 this.removeSmartTileF4dSeed(projectFolderName, L, X, Y);
+	 }
 };
 
 /**

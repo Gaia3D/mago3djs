@@ -165,6 +165,69 @@ function addSmartTileGroup(thisArgs, f4dObject)
 };
 
 /**
+ * f4d smarttile data group 삭제
+ * @param {Array<object> | object} f4dObject f4d smarttile data group
+ */
+F4dController.prototype.deleteSmartTileGroup = function(f4dObject) 
+{
+	 var f4dGroups = [];
+	 if (!Array.isArray(f4dObject)) 
+	 {
+		 if (!(f4dObject.tiling && f4dObject.tilePath)) { return; }
+		 f4dObject.smartTileIndexPath = f4dObject.tilePath;
+ 
+		 f4dGroups.push(f4dObject);
+	 }
+	 else 
+	 {
+		 for (var i=0, len=f4dObject.length;i<len;i++) 
+		 {
+			 var obj = f4dObject[i];
+			 if (!(obj.tiling && obj.tilePath)) { continue; }
+ 
+			 if (i === len-1) { obj.smartTileIndexPath = obj.tilePath; }
+ 
+			 f4dGroups.push(obj);
+		 }
+	 }
+ 
+	 deleteSmartTileGroup(this, f4dGroups);
+};
+
+function deleteSmartTileGroup(thisArgs, f4dObject) 
+{
+	if (Array.isArray(f4dObject)) 
+	{
+		for (var i=0, len=f4dObject.length;i<len;i++) 
+		{
+			var obj = f4dObject[i];
+			if (!(obj.tiling && obj.tilePath)) { continue; }
+
+			if (i === len-1) { obj.smartTileIndexPath = obj.tilePath; }
+
+			deleteSmartTileGroup(thisArgs, obj);
+		}
+	} 
+	else 
+	{
+		if (!(f4dObject.tiling && f4dObject.tilePath)) { return; }
+
+		var magoManager = thisArgs.magoManager;
+		var groupKey = f4dObject.data_key?(f4dObject.data_key || f4dObject.dataGroupId):f4dObject.dataGroupKey;
+
+		if (f4dObject.smartTileIndexPath) 
+		{
+			magoManager.getObjectIndexFileSmartTileF4dAndDeleteTile(f4dObject.smartTileIndexPath);
+
+			if (thisArgs.smartTilePathInfo[groupKey])
+			{
+				delete thisArgs.smartTilePathInfo[groupKey];
+			}
+		}
+	}
+};
+
+/**
  * Object literal with config options for f4d layer.
  * @typedef {Object} f4dLayerObject
  * @property {string} dataGroupId Required. f4d 레이어의 고유 아이디.

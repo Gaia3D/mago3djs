@@ -791,6 +791,42 @@ ReaderWriter.prototype.getObjectIndexFileSmartTileF4d = function(fileName, proje
 	});
 };
 
+
+/**
+ * object index 파일을 읽어서 타일 내의 smart tile seed 삭제
+ * @param {string} fileName 파일명
+ * @param {MagoManager} magoManager 파일 처리를 담당
+ */
+ReaderWriter.prototype.getObjectIndexFileSmartTileF4dAndDeleteTile = function(fileName, projectFolderName, magoManager) 
+{
+	 loadWithXhr(fileName).then(function(response) 
+	 {	
+		 var arrayBuffer = response;
+		 if (arrayBuffer) 
+		 {
+			 if (magoManager.smartTileManager === undefined)
+			 {
+				 magoManager.smartTileManager = new SmartTileManager();
+			 }
+			 var smartTileManager = magoManager.smartTileManager;
+			 smartTileManager.parseSmartTilesF4dIndexFileAndDeleteSmartTileF4dSeed(arrayBuffer, projectFolderName, magoManager);
+			 
+			 arrayBuffer = undefined;
+		 }
+		 else 
+		 {
+			 // Error.***
+		 }
+	 },
+	 function(status) 
+	 {
+		 console.log("xhr status = " + status);
+	 }).finally(function() 
+	 {
+		 //	For the moment, do nothing.***
+	 });
+};
+
 /**
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
  * @param {string} fileName 파일명

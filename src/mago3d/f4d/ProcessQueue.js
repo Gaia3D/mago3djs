@@ -415,18 +415,19 @@ ProcessQueue.prototype.deleteSmartTiles = function (magoManager)
 					for (var i=0; i<nodesCount; i++)
 					{
 						node = smartTile.nodesArray[i];
+
+						if (!node.data) { continue; }
+
 						neoBuilding = node.data.neoBuilding;
-						//if (this.eraseNodeToDelete(node))
-						{
-							if (neoBuilding === undefined)
-							{ continue; }
-						
-							this.deleteNeoBuilding(gl, neoBuilding, magoManager);
-							node.data.neoBuilding = undefined;
-							//deletedCount++;
-							//if (deletedCount >= 10)
-							//{ break; }
-						}
+
+						if (neoBuilding === undefined)
+						{ continue; }
+					
+						this.deleteNeoBuilding(gl, neoBuilding, magoManager);
+						node.data.neoBuilding = undefined;
+						//deletedCount++;
+						//if (deletedCount >= 10)
+						//{ break; }
 					}
 				}
 				else

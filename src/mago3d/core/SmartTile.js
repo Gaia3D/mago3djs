@@ -2679,3 +2679,69 @@ SmartTile.prototype.eraseObjectByComparision = function(object, comparision)
 		}
 	}
 };
+
+
+SmartTile.prototype.getTileByTileFullPath = function(tileFullPath)
+{
+	// In the tileFullPath there are the tile X, Y indices for each depth.
+	// tileFullPath[depth] = { X : x, Y : y}
+
+	var curr_depth = this.depth;
+
+	// check if in tileFullPath [ curr_depth + 1] !== undefined.
+	if ( tileFullPath[curr_depth + 1] === undefined )
+	{
+		return this;
+	}
+	else
+	{
+		var child_x = tileFullPath[curr_depth + 1].X;
+		var child_y = tileFullPath[curr_depth + 1].Y;
+		var candidateTile = undefined;
+		for (var i=0; i<4; i++)
+		{
+			var subTile = this.subTiles[i];
+			if (subTile.X === child_x && subTile.Y === child_y)
+			{
+				candidateTile = subTile;
+				break;
+			}
+		}
+
+		if (candidateTile)
+		{
+			return candidateTile.getTileByTileFullPath(tileFullPath);
+		}
+		else
+		{
+			return undefined;
+		}
+	}
+};
+
+SmartTile.getTileFullPath_fromLXY = function(L, X, Y, resultTileFullPath)
+{
+	// find the owner tile indices.
+	if (L === 0)
+	{
+		return resultTileFullPath;
+	}
+
+	// In the resultIndicesArray put the owner indice.
+	// resultIndicesArray[depth] = { X : x, Y : y}
+
+	if (resultTileFullPath === undefined)
+	{
+		resultTileFullPath = [];
+	}
+
+	var owner_L = L - 1;
+	var owner_X = Math.floor(X/2);
+	var owner_Y = Math.floor(Y/2);
+	resultTileFullPath[owner_L] = {
+		X : owner_X,
+		Y : owner_Y
+	};
+
+	return SmartTile.getTileFullPath_fromLXY(owner_L, owner_X, owner_Y, resultTileFullPath);
+};

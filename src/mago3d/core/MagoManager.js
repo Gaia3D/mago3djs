@@ -368,7 +368,7 @@ var MagoManager = function (config)
 
 	this.quantizedMeshManager = new QuantizedMeshManager(this);
 	this.workersManager = new WorkersManager(this);
-	this.voxelizer = new Voxelizer(this, undefined);
+	//this.voxelizer = new Voxelizer(this, undefined);
 
 	//https://rustwasm.github.io/book/game-of-life/hello-world.html
 	//https://rustwasm.github.io/wasm-bindgen/examples/wasm2js.html
@@ -6787,7 +6787,9 @@ MagoManager.prototype.tilesMultiFrustumCullingFinished = function (intersectedLo
 				node = lowestTile.nodesArray[j];
 				nodeRoot = node.getRoot();
 
-				var data = node.data;				
+				var data = node.data;
+				if (!data) { continue; }
+				
 				neoBuilding = node.data.neoBuilding;
 				if (neoBuilding === undefined) // attributes.isReference === true
 				{
@@ -7333,6 +7335,40 @@ MagoManager.prototype.getObjectIndexFileSmartTileF4d = function(projectDataFolde
 	var geometrySubDataPath = projectDataFolder;
 	var fileName = this.readerWriter.geometryDataPath + "/" + geometrySubDataPath + Constant.TILE_INDEX_FILE;
 	this.readerWriter.getObjectIndexFileSmartTileF4d(fileName, geometrySubDataPath, this);
+};
+
+/**
+ * smartTile 의 object index 파일을 읽은 후 타일 삭제
+ * @param {string} projectId 프로젝트 고유번호
+ * @param {string} projectDataFolder smartTile 의 위치
+ */
+MagoManager.prototype.getObjectIndexFileSmartTileF4dAndDeleteTile = function(projectDataFolder) 
+{
+	 if (this.configInformation === undefined)
+	 {
+		 this.configInformation = this.config.getPolicy();
+	 }
+ 
+	 var geometrySubDataPath = projectDataFolder;
+	 var fileName = this.readerWriter.geometryDataPath + "/" + geometrySubDataPath + Constant.TILE_INDEX_FILE;
+	 this.readerWriter.getObjectIndexFileSmartTileF4dAndDeleteTile(fileName, geometrySubDataPath, this);
+};
+
+/**
+ * smartTile 의 object index 파일을 읽음
+ * @param {string} projectId 프로젝트 고유번호
+ * @param {string} projectDataFolder smartTile 의 위치
+ */
+MagoManager.prototype.getObjectIndexFileSmartTileF4d = function(projectDataFolder) 
+{
+	 if (this.configInformation === undefined)
+	 {
+		 this.configInformation = this.config.getPolicy();
+	 }
+ 
+	 var geometrySubDataPath = projectDataFolder;
+	 var fileName = this.readerWriter.geometryDataPath + "/" + geometrySubDataPath + Constant.TILE_INDEX_FILE;
+	 this.readerWriter.getObjectIndexFileSmartTileF4d(fileName, geometrySubDataPath, this);
 };
 
 /**
