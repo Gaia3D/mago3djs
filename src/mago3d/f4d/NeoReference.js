@@ -733,15 +733,22 @@ NeoReference.prototype.render = function (magoManager, neoBuilding, renderType, 
 			}
 
 			// colors.
-			if (neoReference.vBOVertexIdxCacheKeysContainer) 
+			if ((!neoReference.hasTexture) && neoReference.vBOVertexIdxCacheKeysContainer) 
 			{
 				var refVboData = neoReference.vBOVertexIdxCacheKeysContainer.vboCacheKeysArray[n];
-				if (!refVboData.bindDataColor(shader, magoManager.vboMemoryManager))
-				{ shader.disableVertexAttribArray(shader.color4_loc);  }
+				if (refVboData.vboBufferCol)
+				{
+					if (!refVboData.bindDataColor(shader, magoManager.vboMemoryManager))
+					{ shader.disableVertexAttribArray(shader.color4_loc);  }
+					else 
+					{
+						gl.uniform1i(shader.colorType_loc, 1);
+						//shader.enableVertexAttribArray(shader.color4_loc);
+					}
+				}
 				else 
 				{
-					gl.uniform1i(shader.colorType_loc, 1);
-					//shader.enableVertexAttribArray(shader.color4_loc);
+					gl.uniform1i(shader.colorType_loc, 0);
 				}
 			}
 		}
