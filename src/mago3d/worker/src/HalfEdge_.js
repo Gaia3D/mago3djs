@@ -137,3 +137,24 @@ HalfEdge_.getHalfEdgesLoop = function(hedge, resultHedgesArray)
 	
 	return resultHedgesArray;
 };
+
+/**
+ * get start vertex.
+ * @returns {Vertex|undefined} .
+ */
+ HalfEdge_.prototype.getStartVertex = function()
+ {
+	 return this.startVertex;
+ };
+ 
+/**
+ * get end vertex.
+ * @returns {Vertex|undefined} if this next is undefined, can't get end vertex. so return undefined.
+ */
+HalfEdge_.prototype.getEndVertex = function()
+{
+	if (this.next === undefined)
+	{ return undefined; }
+	
+	return this.next.startVertex;
+};

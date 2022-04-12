@@ -14,8 +14,11 @@ var WorkersManager = function(magoManager)
 		throw new Error(Messages.CONSTRUCT_ERROR);
 	}
 	this.magoManager = magoManager;
+	//mergedObject
 	this.workerExtrudeManager;
 	this.tenelevenExtrudeWorkerManager;
+	//ExtrusionBuilding
+	this.extrusionWorkerManager;
 };
 
 WorkersManager.prototype.getExtrudeWorkerManager = function () 
@@ -35,3 +38,13 @@ WorkersManager.prototype.getTenElevenExtrudeWorkerManager = function ()
 	}
 	return this.tenelevenExtrudeWorkerManager;
 };
+
+WorkersManager.prototype.getExtrusionWorkerManager = function () 
+{
+	if (!this.extrusionWorkerManager) 
+	{
+		this.extrusionWorkerManager = new ExtrusionWorkerManager(this);
+	}
+	return this.extrusionWorkerManager;
+};
+

@@ -235,3 +235,17 @@ Surface_.prototype.getCopyIndependentSurface = function(result)
 
 	return result;
 };
+
+/**
+ * Get the texture coordinate by box projection
+ */
+ Surface_.prototype.calculateTexCoordsByHeight = function(height)
+ {
+	 var face;
+	 var facesCount = this.getFacesCount();
+	 for (var i=0; i<facesCount; i++)
+	 {
+		 face = this.getFace(i);
+		 face.calculateTexCoordsByHeight(height);
+	 }
+ };

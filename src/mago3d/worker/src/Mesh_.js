@@ -309,3 +309,36 @@ Mesh_.prototype.getVbo = function(resultVboContainer)
 
 	return resultVboContainer;
 };
+
+/**
+ * Get the texture coordinate by box projection
+ */
+Mesh_.prototype.calculateTexCoordsByHeight = function(height)
+{
+	var surface;
+	var surfacesCount = this.getSurfacesCount();
+	for (var i=0; i<surfacesCount; i++)
+	{
+		surface = this.getSurface(i);
+		surface.calculateTexCoordsByHeight(height);
+	}
+};
+
+
+/**
+ * Get the specific surface of this mesh by name
+ * @param {string} idx 
+ * @returns {Array<Surface>}
+ */
+Mesh_.prototype.getSurfaceByName = function(name)
+{
+	if (this.surfacesArray === undefined)
+	{ return undefined; }
+
+	var filteredSurfaceArray = this.surfacesArray.filter(function(surface)
+	{
+		return surface.name === name;
+	});
+	
+	return filteredSurfaceArray;
+}; 

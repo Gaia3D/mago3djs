@@ -50,6 +50,26 @@ Color_.prototype.setRGBA = function(red, green, blue, alpha)
 	this.r = red; this.g = green; this.b = blue; this.a = alpha;
 };
 
+/**
+ * return hexCode
+ * @return {string}
+ */
+Color_.prototype.getRGBA = function() 
+{
+	var r = this.r;
+	var g = this.g;
+	var b = this.b;
+	var a = this.a;
+
+	var rgba = 'rgba(';
+	rgba += r*255 + ', ';
+	rgba += g*255 + ', ';
+	rgba += b*255 + ', ';
+	rgba += a;
+	rgba += ')';
+	return rgba;
+};
+
 Color_.prototype.copyFrom = function(color) 
 {
 	this.r = color.r;

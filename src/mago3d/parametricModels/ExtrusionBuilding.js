@@ -96,7 +96,15 @@ ExtrusionBuilding.prototype.constructor = ExtrusionBuilding;
 ExtrusionBuilding.prototype.makeMesh = function() 
 {
 	if (!this.dirty) { return; }
-	
+
+	var workersManager = this.magoManager.workersManager;
+	var extrudeWorkerManager = workersManager.getExtrusionWorkerManager();
+
+	if (extrudeWorkerManager.isBusy())
+	{
+		return;
+	}
+
 	if (!this.geoLocDataManager) 
 	{
 		return;
@@ -117,104 +125,40 @@ ExtrusionBuilding.prototype.makeMesh = function()
 
 	this.objectsArray = [];
 	var geoCoordsListsCount = this.geographicCoordListsArray.length;
+	var objectsToExtrudeArray = new Array(geoCoordsListsCount);
 	for (var i=0; i<geoCoordsListsCount; i++)
 	{
 		var geographicCoordList = this.geographicCoordListsArray[i];
-		
-		//GeographicCoordsList.solveDegeneratedPoints(geographicCoordList.geographicCoordsArray, error);
-		var accum = 0;
-		var index = 1;
 		var floorHeight = this.floorHeight ? this.floorHeight : 3.3;
-		var auxArray = [];
-		while (accum < this.height) 
-		{
-			var bottomGeocoordsList = geographicCoordList.getCopy();
-			var topGeocoordsList = geographicCoordList.getCopy();
-			bottomGeocoordsList.setAltitude(floorHeight * (index-1));
-			topGeocoordsList.setAltitude(floorHeight * (index));
+		var height = this.height;
+		var divideLevel = this.divideLevel;
 
-			var bottomPoint3dArray = GeographicCoordsList.getPointsRelativeToGeoLocation(geoLocData, bottomGeocoordsList.geographicCoordsArray, undefined);
-			var topPoint3dArray = GeographicCoordsList.getPointsRelativeToGeoLocation(geoLocData, topGeocoordsList.geographicCoordsArray, undefined);
-
-			var vtxProfilesList = new VtxProfilesList();
-			var baseVtxProfile = vtxProfilesList.newVtxProfile();
-			baseVtxProfile.makeByPoints3DArray(bottomPoint3dArray, undefined); 
-			var topVtxProfile = vtxProfilesList.newVtxProfile();
-			topVtxProfile.makeByPoints3DArray(topPoint3dArray, undefined);
-
-			var solidMesh = vtxProfilesList.getMesh(undefined, true, true);
-			var surfIndepMesh = solidMesh.getCopySurfaceIndependentMesh();
-			surfIndepMesh.calculateVerticesNormals();
-			
-			if (this.divideLevel)
-			{
-				var c = document.createElement("canvas");
-				var ctx = c.getContext("2d");
-
-				c.width = 8;
-				c.height = 32;
-				ctx.beginPath();
-				ctx.fillStyle = "#262626";
-				ctx.rect(0, 0, 8, 1);
-				ctx.fill();
-				ctx.closePath();
-
-				ctx.beginPath();
-				ctx.fillStyle = this.color4.getRGBA();
-				ctx.rect(0, 1, 8, 31);
-				ctx.fill();
-				ctx.closePath();
-				surfIndepMesh.material = new Material('test');
-				surfIndepMesh.material.setDiffuseTextureUrl(c.toDataURL());
-
-				surfIndepMesh.calculateTexCoordsByHeight(this.floorHeight ? this.floorHeight+0.01 : 3.31);
-				var topSurfaces = surfIndepMesh.getSurfaceByName('top');
-				if (topSurfaces.length > 0)
-				{
-					for (var j=0, surLen=topSurfaces.length;j<surLen;j++) 
-					{
-						var ts = topSurfaces[j];
-						var vertexArray = ts.localVertexList.vertexArray;
-						for (var k=0, verLength=vertexArray.length;k<verLength;k++) 
-						{
-							var vtx = vertexArray[k];
-							vtx.texCoord.x = 2 / c.width;
-							vtx.texCoord.y = 2 / c.height;
-						}
-					}
-				}
-			}
-			this.objectsArray.push(surfIndepMesh);
-			//auxArray.push(surfIndepMesh);
-
-			accum = accum + floorHeight;
-			index++;
-		}
-		/* var mesh = new Mesh();
-		for (var j=0;j<auxArray.length;j++) 
-		{
-			mesh.mergeMesh(auxArray[j]);
-		} */
-		
-		// Make the topGeoCoordsList.
-		/* var topGeoCoordsList = geographicCoordList.getCopy();
-		// Reassign the altitude on the geoCoordsListCopy.
-		geographicCoordList.setAltitude(0);
-		topGeoCoordsList.setAltitude(this.height);
-		
-		var basePoints3dArray = GeographicCoordsList.getPointsRelativeToGeoLocation(geoLocData, geographicCoordList.geographicCoordsArray, undefined);
-		var topPoints3dArray = GeographicCoordsList.getPointsRelativeToGeoLocation(geoLocData, topGeoCoordsList.geographicCoordsArray, undefined);
-		
-		// Now, with basePoints3dArray & topPoints3dArray make a mesh.
-		// Create a VtxProfilesList.
-		var vtxProfilesList = new VtxProfilesList();
-		var baseVtxProfile = vtxProfilesList.newVtxProfile();
-		baseVtxProfile.makeByPoints3DArray(basePoints3dArray, undefined); 
-		var topVtxProfile = vtxProfilesList.newVtxProfile();
-		topVtxProfile.makeByPoints3DArray(topPoints3dArray, undefined); */ 
-		
-		
+		var objectToExtrude = {
+			floorHeight,
+			height,
+			divideLevel,
+			geographicCoordsListsArray: [geographicCoordList]
+		};
+		objectsToExtrudeArray[i] = objectToExtrude;
 	}
+
+	var guid = this._guid;
+	var color = Color.toArray(this.color4);
+	var data = {
+		guid                  : guid,
+		objectsToExtrudeArray : objectsToExtrudeArray,
+		color                 : color,
+		geoLocation           : {longitude : geoLocData.geographicCoord.longitude,
+			latitude  : geoLocData.geographicCoord.latitude,
+			altitude  : geoLocData.geographicCoord.altitude},
+		rotation: {heading : geoLocData.heading,
+			pitch   : geoLocData.pitch,
+			roll    : geoLocData.roll}
+	};
+	extrudeWorkerManager.doExtrude(data); // ***
+	
+	this.objectsArray.push(new Mesh());
+	
 	this.setDirty(false);
 
 	// Check if exist limitation polygons.***
@@ -228,6 +172,108 @@ ExtrusionBuilding.prototype.makeMesh = function()
 	}
 	
 	//this.validTerrainHeight();
+};
+
+ExtrusionBuilding.prototype.render = function (magoManager, shader, renderType, glPrimitive, bIsSelected) 
+{
+	if (this.attributes) 
+	{
+		if (this.attributes.isVisible !== undefined && this.attributes.isVisible === false)
+		{
+			return;
+		}
+	}
+	
+	if (this.dirty) 
+	{ 
+		this.makeMesh(magoManager); 
+	}
+
+	// Check if  vbo arrived from workers.***
+	if (!this.vboFromWorker) 
+	{
+		var workersManager = magoManager.workersManager;
+		var extrudeWorkerManager = workersManager.getExtrusionWorkerManager();
+
+		var result = extrudeWorkerManager.getResult(this._guid);
+		if (!result) 
+		{
+			return false;
+		}
+
+		var vboData = result.vbosArray[0];
+		var vboKeyContainer = new VBOVertexIdxCacheKeysContainer();
+
+		var vboMemManager = magoManager.vboMemoryManager;
+		
+		var vboKey = vboKeyContainer.newVBOVertexIdxCacheKey();
+		vboKey.setDataArrayPos((vboData.posVboDataArray), vboMemManager); // Normals.
+
+		if (vboData.norVboDataArray) 
+		{
+			vboKey.setDataArrayNor((vboData.norVboDataArray), vboMemManager);
+		} 
+
+		if (vboData.tcoordVboDataArray) 
+		{
+			vboKey.setDataArrayTexCoord((vboData.tcoordVboDataArray), vboMemManager);
+		} 
+
+		if (vboData.colVboDataArray) 
+		{
+			vboKey.setDataArrayCol((vboData.colVboDataArray), vboMemManager);
+		} 
+
+		vboKey.setDataArrayIdx((vboData.indicesArray), vboMemManager);
+
+		// now, assign the vboContainer to our mesh.
+		var mesh = this.objectsArray[0];
+		mesh.vboKeysContainer = vboKeyContainer;
+
+		this.vboFromWorker = true;
+	}
+	
+	if (!this.objectsArray || this.objectsArray.length === 0)
+	{ return false; }
+
+	var gl = magoManager.getGl();
+	if (this.attributes.opacity !== undefined)
+	{
+		gl.uniform1f(shader.externalAlpha_loc, this.attributes.opacity);
+	}
+
+	// Set geoLocation uniforms.***
+	
+	var buildingGeoLocation = this.geoLocDataManager.getCurrentGeoLocationData();
+	buildingGeoLocation.bindGeoLocationUniforms(gl, shader); // rotMatrix, positionHIGH, positionLOW.
+
+	//shader.clippingPolygon2dPoints_loc = gl.getUniformLocation(shader.program, "clippingPolygon2dPoints");
+	//shader.clippingConvexPolygon2dPointsIndices_loc = gl.getUniformLocation(shader.program, "clippingConvexPolygon2dPointsIndices");
+
+	if (this.attributes.doubleFace)
+	{
+		gl.disable(gl.CULL_FACE);
+	}
+	else 
+	{
+		gl.enable(gl.CULL_FACE);
+	}
+
+	var renderShaded = true;
+	if (this.options && this.options.renderShaded === false)
+	{
+		renderShaded = false;
+	}
+	gl.uniform1i(shader.bApplySpecularLighting_loc, false);
+	if (renderShaded)
+	{ this.renderAsChild(magoManager, shader, renderType, glPrimitive, bIsSelected, this.options); }
+
+	// Return the opacity to 1.
+	gl.uniform1f(shader.externalAlpha_loc, 1.0);
+	// delete specularLighting
+	gl.uniform1i(shader.bApplySpecularLighting_loc, false);
+	// return clippingType to 0 (0= no clipping).***
+	gl.uniform1i(shader.clippingType_loc, 0);
 };
 
 /**

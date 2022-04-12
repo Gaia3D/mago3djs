@@ -109,3 +109,15 @@ Vertex_.prototype.copyFrom = function(vertex)
 	
 	this.vertexType = vertex.vertexType;
 };
+
+
+/**
+ * get this vertex normal
+ * @returns {Point2D} normal
+ */
+ Vertex_.prototype.getTexCoord = function() 
+ {
+	 if (this.texCoord === undefined) { this.texCoord = new Point2D_(); }
+	 
+	 return this.texCoord;
+ };

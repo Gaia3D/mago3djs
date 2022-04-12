@@ -136,7 +136,7 @@ Modeler.prototype.addObject = function (object, depth)
 	{
 		var hola = 0;
 	}
-
+	object.magoManager = this.magoManager;
 	this.objectsArray.push(object);
 	
 	var smartTileManager = this.magoManager.smartTileManager;
