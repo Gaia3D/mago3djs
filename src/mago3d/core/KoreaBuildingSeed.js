@@ -148,7 +148,26 @@ KoreaBuildingSeed.prototype.mergeFeatureCollection = function (featureCollection
 		var renderables = new Array();
 		for (var i=0, len=dividedFeatures.length; i<len; i++) 
 		{
-			renderables.push(new KoreaBuilding(dividedFeatures[i]));
+			var koreaBuilding = new KoreaBuilding(dividedFeatures[i]);
+			var master = this.magoManager.koreaBuildingMaster[this.masterId];
+			var renderable = true;
+
+			if (master.masks) 
+			{
+				var maskCount = master.masks.length;
+				for (var j=0; j<maskCount; j++ ) 
+				{
+					var mask = master.masks[j];
+					var center = [koreaBuilding.centerGeographicCoords.longitude, koreaBuilding.centerGeographicCoords.latitude];
+					if (pointInPolygon(center, mask)) 
+					{
+						renderable = false;
+						break;
+					}
+				}
+			}
+
+			if (renderable) { renderables.push(koreaBuilding); }
 		}
 
 		var merged = new MergedObject(this.magoManager);

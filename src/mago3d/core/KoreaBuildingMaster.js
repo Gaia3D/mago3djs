@@ -33,6 +33,7 @@ var KoreaBuildingMaster = function (url, format, option, magoManager)
 	this._show = false;
 	this.show = option.show;
 	this._color = defaultValue(option.color, new Color(0.35294, 0.43921, 0.47843, 1));
+	this.masks = defaultValue(option.masks, undefined);
 };
 
 KoreaBuildingMaster.prototype = Object.create(Emitter.prototype);
@@ -106,6 +107,17 @@ Object.defineProperties(KoreaBuildingMaster.prototype, {
 		set: function(color) 
 		{
 			this._color = color;
+		}
+	},
+	masks: {
+		get: function() 
+		{
+			return this._masks;
+		},
+		set: function(masks) 
+		{	
+			if (!masks || !masks.features) { return; }
+			this._masks = masks.features.map(feature=>feature.geometry.coordinates);
 		}
 	}
 });
