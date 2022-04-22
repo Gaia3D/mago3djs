@@ -35,6 +35,30 @@ registerPromiseWorker(function (e)
 	var error = 10e-8;
 	Point2DList_.checkUroborusCartesiansArray(qMesh.excavationGeoCoords, error);
 
+	// Check points sense: must be CCW.***
+	var point2DList = new Point2DList_();
+	var pointsCount = qMesh.excavationGeoCoords.length / 2;
+	for (var i=0; i<pointsCount; i++)
+	{
+		var point2d = new Point2D_(qMesh.excavationGeoCoords[i*2], qMesh.excavationGeoCoords[i*2+1]);
+		point2DList.addPoint(point2d);
+	}
+	var op = {point2dList: point2DList};
+
+	var polygon2d = new Polygon2D_(op);
+	polygon2d.calculateNormal(undefined);
+
+	if (polygon2d.normal < 0)
+	{
+		var reversedArray = [];
+		for (var i=pointsCount-1; i>=0; i--)
+		{
+			reversedArray.push(qMesh.excavationGeoCoords[i*2], qMesh.excavationGeoCoords[i*2+1]);
+		}
+		qMesh.excavationGeoCoords = reversedArray;
+	}
+	// End checking the CCW or CW.---
+
 	var excavationPositions = {
 		positions: qMesh.excavationGeoCoords
 	};
