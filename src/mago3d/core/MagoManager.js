@@ -652,7 +652,7 @@ MagoManager.prototype.swapRenderingFase = function()
  * @param {gl} gl
  * @private
  */
-MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function(gl, visibleObjControlerNodes) 
+MagoManager.prototype.prepareNeoBuildingsAsimetricVersion = function (gl, visibleObjControlerNodes) 
 {
 	// for all renderables, prepare data.***
 	var neoBuilding;
@@ -1262,7 +1262,7 @@ MagoManager.prototype.getGl = function()
  * Loads necessary data.
  * @private
  */
-MagoManager.prototype.loadAndPrepareData = function() 
+MagoManager.prototype.loadAndPrepareData = function () 
 {
 	var gl = this.getGl();
 	
@@ -2227,6 +2227,12 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		//this.waterManager._TEST_renderQMesh();
 	}
 
+	// Test qMesh terrain excavation.***
+	//if (this.quantizedMeshManager)
+	//{
+	//	this.quantizedMeshManager.test__doQuantizedSurfaceExcavation(this);
+	//}
+
 	
 	// Render transparents.****************************************************************************************************************
 	if (this.isCesiumGlobe())
@@ -2460,6 +2466,8 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		this.test_speechBubble = true;
 	}
 	*/
+
+	
 };
 
 /**
@@ -5801,7 +5809,7 @@ MagoManager.prototype.moveSelectedObjectAsimetricMode = function (gl)
  * 
  * @private
  */
-MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = function(gl, node, globalVisibleObjControlerOctrees, lod) 
+MagoManager.prototype.getRenderablesDetailedNeoBuildingAsimetricVersion = function (gl, node, globalVisibleObjControlerOctrees, lod) 
 {
 	var data = node.data;
 	var neoBuilding = data.neoBuilding;
@@ -7249,7 +7257,7 @@ MagoManager.prototype.changeLocationAndRotationNode = function(node, latitude, l
  * @param {string} projectId policy 사용 시 geo_data_default_projects 배열에 있는 값.
  * @param {string} projectDataFolder 해당 프로젝트의 data_key를 의미.
  */
-MagoManager.prototype.getObjectIndexFile = function(projectId, projectDataFolder) 
+MagoManager.prototype.getObjectIndexFile = function (projectId, projectDataFolder) 
 {
 	if (this.configInformation === undefined)
 	{
@@ -7268,7 +7276,7 @@ MagoManager.prototype.getObjectIndexFile = function(projectId, projectDataFolder
  * @param {string} projectId policy 사용 시 geo_data_default_projects 배열에 있는 값.
  * @param {Array<object> | object} f4dObject f4d data definition object
  */
-MagoManager.prototype.getObjectIndexFileForData = function(projectId, f4dObject) 
+MagoManager.prototype.getObjectIndexFileForData = function (projectId, f4dObject) 
 {
 	if (this.configInformation === undefined)
 	{
@@ -7766,7 +7774,7 @@ MagoManager.prototype.calculateBoundingBoxesNodes = function(projectId)
  * object index 파일을 읽어서 빌딩 개수, 포지션, 크기 정보를 배열에 저장
  * @private
  */
-MagoManager.prototype.makeSmartTile = function(buildingSeedMap, projectId, f4dObjectJson, seedMap) 
+MagoManager.prototype.makeSmartTile = function (buildingSeedMap, projectId, f4dObjectJson, seedMap) 
 {
 	if (!buildingSeedMap && !seedMap) 
 	{
@@ -7802,7 +7810,7 @@ MagoManager.prototype.makeSmartTile = function(buildingSeedMap, projectId, f4dOb
 	}
 	else 
 	{
-		for (var i=0, len=realTimeLocBlocksList.length;i<len;i++) 
+		for (var i=0, len = realTimeLocBlocksList.length; i<len; i++) 
 		{
 			var blocks = realTimeLocBlocksList[i];
 			this.makeNode(blocks, physicalNodesArray, buildingSeedMap, projectFolderName, projectId);
