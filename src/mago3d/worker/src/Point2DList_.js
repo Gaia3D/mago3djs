@@ -189,3 +189,31 @@ Point2DList_.prototype.setIdxInList = function()
 		this.pointsArray[i].idxInList = i;
 	}
 };
+
+Point2DList_.checkUroborusCartesiansArray = function(cartesian2dArray, error)
+{
+	if (!cartesian2dArray)
+	 { return false; }
+ 
+	 if (!error)
+	 { error = 1E-8; }
+ 
+	 var points2dCount = cartesian2dArray.length / 2;
+ 
+	 if (points2dCount < 3)
+	 { return false; }
+ 
+	 var pointStart = [cartesian2dArray[0*2], cartesian2dArray[0*2+1]];
+	 var lastPointIdx = points2dCount - 1;
+	 var pointEnd = [cartesian2dArray[lastPointIdx*2], cartesian2dArray[lastPointIdx*2+1]];
+
+	 if (Math.abs(pointStart[0] - pointEnd[0]) < error && Math.abs(pointStart[1] - pointEnd[1]) < error )
+	 {
+		 // delete the last point.***
+		 cartesian2dArray.pop();
+		 cartesian2dArray.pop();
+		 return true;
+	 }
+ 
+	 return false;
+};

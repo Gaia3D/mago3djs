@@ -249,7 +249,7 @@ Triangle_.prototype.getIntersectionByPlaneReport = function(plane, resultInterse
 				intesectPoint    : intersectPoint});
 		}
 	}
-	else if (relPosSeg0ToPlane === CODE_.relativePositionSegment3DWithPlane2D.START_POINT_COINCIDENT)
+	else if (relPosSeg0ToPlane === CODE_.relativePositionSegment3DWithPlane2D.START_POINT_COINCIDENT || relPosSeg0ToPlane === CODE_.relativePositionSegment3DWithPlane2D.TWO_POINTS_COINCIDENT)
 	{
 		var startPoint = seg0.startPoint3d;
 		intersectedPointsArray.push({
@@ -275,7 +275,7 @@ Triangle_.prototype.getIntersectionByPlaneReport = function(plane, resultInterse
 				intesectPoint    : intersectPoint});
 		}
 	}
-	else if (relPosSeg1ToPlane === CODE_.relativePositionSegment3DWithPlane2D.START_POINT_COINCIDENT)
+	else if (relPosSeg1ToPlane === CODE_.relativePositionSegment3DWithPlane2D.START_POINT_COINCIDENT || relPosSeg1ToPlane === CODE_.relativePositionSegment3DWithPlane2D.TWO_POINTS_COINCIDENT)
 	{
 		var startPoint = seg1.startPoint3d;
 		intersectedPointsArray.push({
@@ -303,7 +303,7 @@ Triangle_.prototype.getIntersectionByPlaneReport = function(plane, resultInterse
 					intesectPoint    : intersectPoint});
 			}
 		}
-		else if (relPosSeg2ToPlane === CODE_.relativePositionSegment3DWithPlane2D.START_POINT_COINCIDENT)
+		else if (relPosSeg2ToPlane === CODE_.relativePositionSegment3DWithPlane2D.START_POINT_COINCIDENT || relPosSeg2ToPlane === CODE_.relativePositionSegment3DWithPlane2D.TWO_POINTS_COINCIDENT)
 		{
 			var startPoint = seg2.startPoint3d;
 			intersectedPointsArray.push({

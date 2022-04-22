@@ -505,11 +505,34 @@ PostFxShadersManager.prototype._createShader_tinTerrainAltitudes = function()
 	shaderName = "tinTerrainAltitudes";
 	ssao_vs_source = ShaderSource.TinTerrainAltitudesVS;
 	ssao_fs_source = ShaderSource.TinTerrainAltitudesFS;
-	shader = this.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this.magoManager);
+	var shader = this.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this.magoManager);
 
 	//shader.bIsMakingDepth_loc = gl.getUniformLocation(shader.program, "bIsMakingDepth");
 	//shader.bExistAltitudes_loc = gl.getUniformLocation(shader.program, "bExistAltitudes");
 	//shader.altitude_loc = gl.getAttribLocation(shader.program, "altitude");
+
+	this.shadersMap[shaderName] = shader;
+	return shader;
+};
+
+PostFxShadersManager.prototype._createShader_qMeshRenderTEST = function() 
+{
+	var use_linearOrLogarithmicDepth = this._get_useLinearOrLogarithmicDepth_string();
+	var use_multi_render_target = this._get_useMultiRenderTarget_string();
+	var gl = this.gl;
+
+	var shaderName = "qMeshRenderTEST";
+	var vs_source = ShaderSource.waterQuantizedMeshVS_3D_TEST;
+	var fs_source = ShaderSource.waterQuantizedMeshFS_3D_TEST;
+	fs_source = fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
+	fs_source = fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
+	var shader = this.createShaderProgram(gl, vs_source, fs_source, shaderName, this.magoManager);
+	shader.u_screen_loc = gl.getUniformLocation(shader.program, "u_screen"); // smple2d.
+	shader.u_opacity_loc = gl.getUniformLocation(shader.program, "u_opacity");
+	shader.colorType_loc = gl.getUniformLocation(shader.program, "colorType");//
+	shader.u_oneColor4_loc = gl.getUniformLocation(shader.program, "u_oneColor4");
+	this.useProgram(shader);
+	gl.uniform1i(shader.u_screen_loc, 0);
 
 	this.shadersMap[shaderName] = shader;
 	return shader;
@@ -1066,8 +1089,12 @@ PostFxShadersManager.prototype._createShaderByName = function (shaderName)
 	case "screenQuadBlur":
 		this._createShader_screenQuadBlur();
 		break;
+	case "qMeshRenderTEST":
+		this._createShader_qMeshRenderTEST();
+		break;
+		
 	}
-
+	
 };
 
 /**

@@ -30,6 +30,11 @@ importScripts('./src/promise-worker_.js');
 registerPromiseWorker(function (e) 
 {
 	var qMesh = e;
+
+	// 1rst, must validate the "qMesh.excavationGeoCoords": Check uroborus & degenerated points.***
+	var error = 10e-8;
+	Point2DList_.checkUroborusCartesiansArray(qMesh.excavationGeoCoords, error);
+
 	var excavationPositions = {
 		positions: qMesh.excavationGeoCoords
 	};

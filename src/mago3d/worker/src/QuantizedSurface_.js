@@ -452,8 +452,11 @@ QuantizedSurface_.createLateralTrianglesOfExcavation = function (triList, vertex
 			for (var j=0; j<normalTriCount; j++)
 			{
 				var normalTri = normalTrianglesArray[j];
-				QuantizedSurface_._swapTriangleVertex(normalTri, vertex, newVertex);
-
+				var changedVertex_idx = QuantizedSurface_._swapTriangleVertex(normalTri, vertex, newVertex);
+				if(changedVertex_idx < 0)
+				{
+					var hola = 0;
+				}
 			}
 		}
 	}
@@ -465,6 +468,7 @@ QuantizedSurface_.createLateralTrianglesOfExcavation = function (triList, vertex
 	var tri;
 	var status;
 	var pos;
+	var lateralWallsCreated_totalCount = 0; // test debug:::
 
 	for (var i=0; i<triCount; i++)
 	{
@@ -478,7 +482,14 @@ QuantizedSurface_.createLateralTrianglesOfExcavation = function (triList, vertex
 
 		if (status === CODE_.status.NORMAL)
 		{
-			QuantizedSurface_._createLateralTrianglesOfTriangle(tri, triList);
+			var lateralWallsCreatedCount = QuantizedSurface_._createLateralTrianglesOfTriangle(tri, triList);
+
+			if(lateralWallsCreatedCount === 0) // test debug:::
+			{
+				var hola = 0;
+			}
+
+			lateralWallsCreated_totalCount += lateralWallsCreatedCount; // test debug:::
 		}
 	}
 
@@ -554,25 +565,30 @@ QuantizedSurface_._createLateralTrianglesOfTriangle = function (tri, triList)
 	twinVertexB = tri.vertex1.twinVertex;
 	twinVertexC = tri.vertex2.twinVertex;
 
+	var lateralTrianglesCreatedCount = 0;
+
 
 	if (twinVertexA && twinVertexB)
 	{
 		QuantizedSurface_._createLateralTrianglesOfEdge(tri.vertex0, tri.vertex1, twinVertexA, twinVertexB, triList);
+		lateralTrianglesCreatedCount += 1;
 	}
 
 	if (twinVertexB && twinVertexC)
 	{
 		QuantizedSurface_._createLateralTrianglesOfEdge(tri.vertex1, tri.vertex2, twinVertexB, twinVertexC, triList);
+		lateralTrianglesCreatedCount += 1;
 	}
 
 	if (twinVertexC && twinVertexA)
 	{
 		QuantizedSurface_._createLateralTrianglesOfEdge(tri.vertex2, tri.vertex0, twinVertexC, twinVertexA, triList);
+		lateralTrianglesCreatedCount += 1;
 	}
 
     
 
-	return false;
+	return lateralTrianglesCreatedCount;
 };
 
 QuantizedSurface_._recalculateTrianglesStoredInVertices = function (triList, vertexList)
@@ -742,7 +758,8 @@ QuantizedSurface_._cutTrianglesWithPlane = function (triList, plane, segment2d, 
 				}
 				else if (intersect_2.intersectionType === "startPointIntersection")
 				{
-					// This is a tangent case. Do not splitt the triangle.
+					// This is a tangent case. Do not splitt the triangle, but set as citted.
+					tri.bCutted = true; 
 				}
 			}
 
