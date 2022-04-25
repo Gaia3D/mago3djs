@@ -264,7 +264,7 @@ function deleteSmartTileGroup(thisArgs, f4dObject)
  * f4d data group 등록
  * @param {Array<f4dLayerObject> | f4dLayerObject} f4dLayerObject f4d data definition object
  */
-F4dController.prototype.addF4dGroup = function(f4dLayerObject) 
+F4dController.prototype.addF4dGroup = function (f4dLayerObject) 
 {
 	// TODO : validate f4dObject.
 	//F4dController.f4dObjectValidate()

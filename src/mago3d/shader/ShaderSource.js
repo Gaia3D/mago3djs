@@ -6590,6 +6590,28 @@ void main()\n\
     \n\
     gl_FragColor = finalColor; // original.***\n\
 }";
+ShaderSource.ScreenQuadBlurFS = "#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+uniform sampler2D image; // 0\n\
+uniform vec2 uImageSize;\n\
+\n\
+void main()\n\
+{\n\
+    vec2 TexCoords = vec2(gl_FragCoord.x / uImageSize.x, gl_FragCoord.y / uImageSize.y);\n\
+    vec2 texelSize = 1.0 / uImageSize;\n\
+    vec4 result = vec4(0.0);\n\
+    for (int x = -2; x < 2; ++x) \n\
+    {\n\
+        for (int y = -2; y < 2; ++y) \n\
+        {\n\
+            vec2 offset = vec2(float(x), float(y)) * texelSize;\n\
+            result += texture2D(image, TexCoords + offset);\n\
+        }\n\
+    }\n\
+    gl_FragData[0] = result / (4.0 * 4.0);\n\
+}";
 ShaderSource.ScreenQuadFS = "#ifdef GL_ES\n\
     precision highp float;\n\
 #endif\n\

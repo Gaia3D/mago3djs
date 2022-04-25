@@ -556,7 +556,7 @@ Octree.prototype.prepareSkinData = function(magoManager)
 /**
  * 어떤 일을 하고 있습니까?
  */
-Octree.prototype.prepareModelReferencesListData = function(magoManager) 
+Octree.prototype.prepareModelReferencesListData = function (magoManager) 
 {
 	var neoBuilding = this.neoBuildingOwner;
 		
@@ -730,7 +730,7 @@ Octree.prototype.renderSkin = function(magoManager, neoBuilding, renderType, ren
 	{ return false; }
 
 	// if the building is highlighted, the use highlight oneColor4.
-	renderTexture = true;
+	//renderTexture = true;
 	gl.uniform1i(shader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.
 	if (renderType === 1)
 	{
@@ -749,28 +749,31 @@ Octree.prototype.renderSkin = function(magoManager, neoBuilding, renderType, ren
 		}
 
 		//----------------------------------------------------------------------------------
-		
-		if (neoBuilding.simpleBuilding3x3Texture !== undefined && neoBuilding.simpleBuilding3x3Texture.texId && renderTexture)
+		if (this.lego.hasTexCoords)
 		{
-			gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
-			if (shader.last_tex_id !== neoBuilding.simpleBuilding3x3Texture.texId)
+			if (neoBuilding.simpleBuilding3x3Texture !== undefined && neoBuilding.simpleBuilding3x3Texture.texId && renderTexture)
 			{
-				gl.activeTexture(gl.TEXTURE2); 
-				gl.bindTexture(gl.TEXTURE_2D, neoBuilding.simpleBuilding3x3Texture.texId);
-				shader.last_tex_id = neoBuilding.simpleBuilding3x3Texture.texId;
+				gl.uniform1i(shader.colorType_loc, 2); // 0= oneColor, 1= attribColor, 2= texture.
+				if (shader.last_tex_id !== neoBuilding.simpleBuilding3x3Texture.texId)
+				{
+					gl.activeTexture(gl.TEXTURE2); 
+					gl.bindTexture(gl.TEXTURE_2D, neoBuilding.simpleBuilding3x3Texture.texId);
+					shader.last_tex_id = neoBuilding.simpleBuilding3x3Texture.texId;
+				}
+			}
+			else 
+			{
+				// Todo: If this building lod2 has no texture, then render with colors.
+				//gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
+				//shader.disableVertexAttribArray(shader.texCoord2_loc);
+				//renderTexture = false;
+				//-------------------------------------------------------------------------
+				
+				// If texture is no ready then return.
+				return false;
 			}
 		}
-		else 
-		{
-			// Todo: If this building lod2 has no texture, then render with colors.
-			//gl.uniform1i(shader.colorType_loc, 0); // 0= oneColor, 1= attribColor, 2= texture.
-			//shader.disableVertexAttribArray(shader.texCoord2_loc);
-			//renderTexture = false;
-			//-------------------------------------------------------------------------
-			
-			// If texture is no ready then return.
-			return false;
-		}
+		
 
 		// seletionColor4.***
 		

@@ -1411,35 +1411,44 @@ NeoBuilding.prototype.parseHeader = function (arrayBuffer, bytesReaded)
 	var metaData = this.metaData;
 	bytesReaded = metaData.parseFileHeaderAsimetricVersion(arrayBuffer, bytesReaded);
 	
+	var projectDataType = metaData.projectDataType;
 	
-	// Now, make the neoBuilding's octree.***
-	if (this.octree === undefined) { this.octree = new Octree(undefined); }
-	var octree = this.octree;
-	octree.neoBuildingOwnerId = this.buildingId;
-	octree.octreeKey = this.buildingId + "_" + octree.octree_number_name;
-	
-	// now, parse octreeAsimetric or octreePyramid (check metadata.projectDataType).***
-	if (metaData.projectDataType === 5)
-	{ bytesReaded = octree.parsePyramidVersion(arrayBuffer, bytesReaded, this); }
-	else
-	{ bytesReaded = octree.parseAsimetricVersion(arrayBuffer, bytesReaded, this); }
+	if (projectDataType !== 20)
+	{
+		// Now, make the neoBuilding's octree.***
+		if (this.octree === undefined) { this.octree = new Octree(undefined); }
+		var octree = this.octree;
+		octree.neoBuildingOwnerId = this.buildingId;
+		octree.octreeKey = this.buildingId + "_" + octree.octree_number_name;
+		
+		// now, parse octreeAsimetric or octreePyramid (check metadata.projectDataType).***
+		if (metaData.projectDataType === 5)
+		{ bytesReaded = octree.parsePyramidVersion(arrayBuffer, bytesReaded, this); }
+		else
+		{ bytesReaded = octree.parseAsimetricVersion(arrayBuffer, bytesReaded, this); }
 
-	var centerPos = octree.centerPos;
-	metaData.oct_min_x = centerPos.x - octree.half_dx;
-	metaData.oct_max_x = centerPos.x + octree.half_dx;
-	metaData.oct_min_y = centerPos.y - octree.half_dy;
-	metaData.oct_max_y = centerPos.y + octree.half_dy;
-	metaData.oct_min_z = centerPos.z - octree.half_dz;
-	metaData.oct_max_z = centerPos.z + octree.half_dz;
+		var centerPos = octree.centerPos;
+		metaData.oct_min_x = centerPos.x - octree.half_dx;
+		metaData.oct_max_x = centerPos.x + octree.half_dx;
+		metaData.oct_min_y = centerPos.y - octree.half_dy;
+		metaData.oct_max_y = centerPos.y + octree.half_dy;
+		metaData.oct_min_z = centerPos.z - octree.half_dz;
+		metaData.oct_max_z = centerPos.z + octree.half_dz;
 
-	
-	if (metaData.version === "0.0.1" || metaData.version === "0.0.2")
+		
+		if (metaData.version === "0.0.1" || metaData.version === "0.0.2")
+		{
+			// read materials list.
+			bytesReaded = this.parseTexturesList(arrayBuffer, bytesReaded);
+
+			// read geometry type data.***
+			bytesReaded = this.parseLodBuildingData(arrayBuffer, bytesReaded);
+		}
+	}
+	else 
 	{
 		// read materials list.
 		bytesReaded = this.parseTexturesList(arrayBuffer, bytesReaded);
-
-		// read geometry type data.***
-		bytesReaded = this.parseLodBuildingData(arrayBuffer, bytesReaded);
 	}
 
 	metaData.fileLoadState = CODE.fileLoadState.PARSE_FINISHED;

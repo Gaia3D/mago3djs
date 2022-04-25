@@ -541,7 +541,7 @@ GeographicCoordsList.prototype.getGeographicExtent = function(resultGeographicEx
 	return GeographicCoordsList.getGeographicExtent(this.geographicCoordsArray, resultGeographicExtent);
 };
 
-GeographicCoordsList.getNumbersArrayOfGeoCoordsArray = function(geographicCoordsArray) 
+GeographicCoordsList.getNumbersArrayOfGeoCoordsArray = function (geographicCoordsArray) 
 {
 	// this function returns [lon, lat, alt, lon, lat, alt, ...].
 	var geoCoordsCount = geographicCoordsArray.length;
