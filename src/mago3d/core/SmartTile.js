@@ -1029,6 +1029,8 @@ SmartTile.prototype.setNodesAttribute = function(nodesArray, attributeName, attr
 		for (var i=0; i<nodesCount; i++)
 		{
 			var node = nodesArray[i];
+			if (!node.data) { continue; }
+
 			if (node.data.attributes === undefined)
 			{ node.data.attributes = {}; }
 			

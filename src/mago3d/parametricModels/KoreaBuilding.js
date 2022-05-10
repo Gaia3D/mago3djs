@@ -37,6 +37,7 @@ var KoreaBuilding = function (geojson)
 	this.centerGeographicCoords;
 	this.geographicCoordListsArray = [];
 	this.height = 3;
+	this.groundHeight = 0;
 
 	var options = {};
 	this.color4 = defaultValue(options.color, new Color(1, 0.98823529, 0.8, 1));
@@ -61,7 +62,10 @@ KoreaBuilding.prototype.initialize = function(feature)
 	this.centerGeographicCoords = centerGeographicCoords;
 
 	var height = feature.properties.HEIGHT || feature.properties.BLDH_BV;
+	var groundHeight = feature.properties.BLDH_MN;
+	
 	if (height !== 0) { this.height = height; }
+	if (groundHeight !== 0) { this.groundHeight = groundHeight; }
 };
 
 KoreaBuilding.prototype.makeMesh = function () 

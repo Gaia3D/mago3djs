@@ -91,7 +91,7 @@ MergedObject.prototype.initialize = function (magoRenderables)
 			for (var k=0;k<magoRenderableGeographicCoordListsArrayCnt;k++) 
 			{
 				var magoRenderableGeographicCoordsList = magoRenderable.geographicCoordListsArray[k];
-				magoRenderableGeographicCoordsList.setAltitude(height);
+				magoRenderableGeographicCoordsList.setAltitude(magoRenderable.groundHeight);
 			}
 
 			centroid.longitude = centroid.longitude + position.longitude * 180 / Math.PI;
