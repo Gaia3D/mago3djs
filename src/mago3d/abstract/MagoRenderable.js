@@ -488,7 +488,7 @@ MagoRenderable.prototype.renderAsChild = function (magoManager, shader, renderTy
 			}
 		}
 
-		if (magoManager.isCameraMoved && !magoManager.isCameraMoving )
+		if (magoManager.isCameraMoved && !this.mouseLeftDown && !this.mouseMiddleDown )
 		{
 			//if (this.attributes.isSelectable !== undefined && this.attributes.isSelectable === false) 
 			// Selection render.***

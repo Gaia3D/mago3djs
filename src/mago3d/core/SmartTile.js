@@ -837,6 +837,135 @@ SmartTile.prototype.extractLowestTiles = function(camera, resultLowestTilesArray
 	}
 };
 
+SmartTile.prototype.getGeographicExtent = function(resultGeoExtent) 
+{
+	var minLon = this.minGeographicCoord.longitude;
+	var minLat = this.minGeographicCoord.latitude; 
+	var minAlt = this.minGeographicCoord.altitude; 
+	var maxLon = this.maxGeographicCoord.longitude; 
+	var maxLat = this.maxGeographicCoord.latitude; 
+	var maxAlt = this.maxGeographicCoord.altitude;
+	if (resultGeoExtent === undefined)
+	{
+		resultGeoExtent = new GeographicExtent(minLon, minLat, minAlt, maxLon, maxLat, maxAlt);
+	}
+	resultGeoExtent.setExtent(minLon, minLat, minAlt, maxLon, maxLat, maxAlt);
+	return resultGeoExtent;
+};
+
+SmartTile.prototype.getRenderableObjects = function(resultVisibleObjectsController) 
+{
+	/*
+	this.nodesArray; 
+	this.objectsArray; // parametric objects.
+	this.vectorTypeObjectsArray;
+	
+	this.nativeObjects = {
+		generalObjectsArray : [], // opaques & transparent objects.
+		excavationsArray    : [],
+		vectorTypeArray     : [],
+		lightSourcesArray   : [],
+		nativeSeedArray     : []
+	};
+	*/
+
+	if (this.nodesArray)
+	{
+		Array.prototype.push.apply(resultVisibleObjectsController.currentVisibles0, this.nodesArray);
+	}
+
+	if (this.nativeObjects)
+	{
+		Array.prototype.push.apply(resultVisibleObjectsController.currentVisibleNativeObjects.opaquesArray, this.nativeObjects.generalObjectsArray);
+	}
+};
+
+SmartTile.prototype.extractRenderableObjects = function(bDescend, resultVisibleObjectsController) 
+{
+	// If "bDescend" is false, then only check "this" tile.***
+	// If "bDescend" is true, then check "this" tile & this children too.***
+	if (this.hasRenderables())
+	{
+		this.getRenderableObjects(resultVisibleObjectsController);
+	}
+		
+	if (bDescend)
+	{
+		if (this.subTiles === undefined || this.subTiles.length === 0)
+		{
+			return;
+		}
+
+		var subTilesCount = this.subTiles.length;
+		for (var i=0; i<subTilesCount; i++)
+		{
+			this.subTiles[i].extractRenderableObjects(bDescend, resultVisibleObjectsController);
+		}
+	}
+};
+
+SmartTile.prototype.getIntersectedRenderableObjectsByGeographicExtent = function(geoExtent, resultVisibleObjectsController) 
+{
+	var resultFullyIntersectedTilesArray = [];
+	var resultPartiallyIntersectedTilesArray = [];
+	this.getIntersectedTilesByGeographicExtent(geoExtent, resultFullyIntersectedTilesArray, resultPartiallyIntersectedTilesArray);
+
+	var fulltIntersectedTilesCount = resultFullyIntersectedTilesArray.length;
+	var bDescend = true;
+	for (var i=0; i<fulltIntersectedTilesCount; i++)
+	{
+		var tile = resultFullyIntersectedTilesArray[i];
+		tile.extractRenderableObjects(bDescend, resultVisibleObjectsController);
+	}
+
+	var partiallyIntersectedTilesCount = resultPartiallyIntersectedTilesArray.length;
+	bDescend = false;
+	for (var i=0; i<partiallyIntersectedTilesCount; i++)
+	{
+		var tile = resultPartiallyIntersectedTilesArray[i];
+		tile.extractRenderableObjects(bDescend, resultVisibleObjectsController);
+	}
+};
+
+SmartTile.prototype.getIntersectedTilesByGeographicExtent = function(geoExtent, resultFullyIntersectedTilesArray, resultPartiallyIntersectedTilesArray) 
+{
+	// 1rst, determine the intersection type:
+	//------------------------------------------
+	//Constant.INTERSECTION_OUTSIDE
+	//Constant.INTERSECTION_INTERSECT
+	//Constant.INTERSECTION_A_CONTAINS_B
+	//Constant.INTERSECTION_B_CONTAINS_A
+	//------------------------------------------
+	var geoExtent_A = this.getGeographicExtent();
+	var intersectionType = geoExtent_A.getIntersectionTypeWithGeoExtent2d(geoExtent);
+
+	if (intersectionType === Constant.INTERSECTION_B_CONTAINS_A)
+	{
+		// "this" tile is entirely contained inside of the "geoExtent".***
+		resultFullyIntersectedTilesArray.push(this);
+	}
+	else if (intersectionType !== Constant.INTERSECTION_OUTSIDE)
+	{
+		if (this.hasRenderables())
+		{ 
+			resultPartiallyIntersectedTilesArray.push(this);
+		} 
+			
+		var maxDepth = 30;
+		if (this.smartTileManager)
+		{ maxDepth = this.smartTileManager.maxDepth; }
+
+		if (this.subTiles && this.subTiles.length > 0 && this.depth < maxDepth) 
+		{
+			for (var i=0; i<this.subTiles.length; i++)
+			{
+				if (this.subTiles[i].sphereExtent)
+				{ this.subTiles[i].getIntersectedTilesByGeographicExtent(geoExtent, resultFullyIntersectedTilesArray, resultPartiallyIntersectedTilesArray); }
+			}
+		}
+	}
+};
+
 /**
  * 어떤 일을 하고 있습니까?
  * @param frustum 변수

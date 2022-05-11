@@ -537,6 +537,23 @@ SmartTileManager.prototype.getBuildingSeedById = function(buildingType, building
 	return resultNeoBuilding;
 };
 
+SmartTileManager.prototype.getRenderableObjectsInGeographicExtent = function(geoExtent, visibleObjectsControler) 
+{
+	// This function returns the objects (f4d nodes or/and native objects) intersected by the "geoExtent".***
+	// This function is used for water simulation or sound simulation that requires the presence of objects that are no loaded yet.***
+	//--------------------------------------------------------------------------------------------------------------------------------
+
+	// 1rst, cull smartTiles.***
+	var smartTile1 = this.tilesArray[0]; // America side tile.
+	var smartTile2 = this.tilesArray[1]; // Asia side tile.
+	smartTile1.getIntersectedRenderableObjectsByGeographicExtent(geoExtent, visibleObjectsControler);
+	smartTile2.getIntersectedRenderableObjectsByGeographicExtent(geoExtent, visibleObjectsControler);
+
+	// now, extract all renderables of culled smartTiles.***
+	
+	var hola = 0;
+};
+
 SmartTileManager.prototype.doPendentProcess = function(magoManager) 
 {
 	// This function does pendent process.

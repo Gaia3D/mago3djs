@@ -369,6 +369,18 @@ FBO.prototype.deleteObjects = function(gl)
 	if (this.depthBuffer)
 	{ gl.deleteRenderbuffer(this.depthBuffer); }
 	this.depthBuffer = undefined;
+
+	if (this.colorBuffersArray)
+	{
+		var colorBuffersCount = this.colorBuffersArray.length;
+		for (var i = 0; i<colorBuffersCount; i++)
+		{
+			gl.deleteTexture(this.colorBuffersArray[i]);
+		}
+
+		this.colorBuffersArray.length = 0;
+	}
+	
 	
 	if (this.colorBuffer)
 	{ gl.deleteTexture(this.colorBuffer); }

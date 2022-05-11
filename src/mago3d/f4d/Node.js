@@ -522,6 +522,11 @@ Node.prototype.renderContent = function (magoManager, shader, renderType, refMat
 	var rootNode = this.getRoot();
 	var geoLocDataManager = rootNode.data.geoLocDataManager;
 
+	if (geoLocDataManager === undefined)
+	{
+		return;
+	}
+
 	// 1rst, determine the shader.
 	var gl = magoManager.sceneState.gl;
 
@@ -633,7 +638,7 @@ Node.prototype.renderContent = function (magoManager, shader, renderType, refMat
 	gl.uniform1f(shader.externalAlpha_loc, 1.0);
 	gl.uniform1f(shader.uModelOpacity_loc, opacity);
 	neoBuilding.currentLod = data.currentLod; // update currentLod.
-	neoBuilding.render(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord, data.currentLod);
+	var lodRendered = neoBuilding.render(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord, data.currentLod);
 	
 	magoManager.renderingFase = currRenderingFase; // Return to current renderingFase.
 	
@@ -695,6 +700,7 @@ Node.prototype.renderContent = function (magoManager, shader, renderType, refMat
 
 	// restore uniforms.
 	gl.uniform1f(shader.uModelOpacity_loc, 1.0);
+	return lodRendered;
 };
 
 /**

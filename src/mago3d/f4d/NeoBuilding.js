@@ -1759,12 +1759,13 @@ NeoBuilding.prototype.render = function (magoManager, shader, renderType, refMat
 	{ this.currentLod = currentLod; }
 
 	var projectDataType = this.metaData.getProjectDataType();
+	var lodRendered = -1;
 	
 	// Check metaData.projectDataType.
 	if (projectDataType === 5)
 	{
 		// Render pointsCloud pyramidMode.
-		return;
+		return lodRendered;
 	}
 
 	if (projectDataType === 10)
@@ -1794,9 +1795,12 @@ NeoBuilding.prototype.render = function (magoManager, shader, renderType, refMat
 		{
 			// no occludeCulling mode.
 			octree.neoReferencesMotherAndIndices.currentVisibleIndices = octree.neoReferencesMotherAndIndices.neoRefsIndices; // no occludeCulling mode.
-			octree.renderContent(magoManager, this, renderType, renderTexture, shader, minSize, refMatrixIdxKey, flipYTexCoord);
+			if (octree.renderContent(magoManager, this, renderType, renderTexture, shader, minSize, refMatrixIdxKey, flipYTexCoord))
+			{
+				lodRendered = 0;
+			}
 		}
-		return;
+		return lodRendered;
 	}
 	
 	// Check "lodBuildingData".***
@@ -1809,15 +1813,25 @@ NeoBuilding.prototype.render = function (magoManager, shader, renderType, refMat
 		if (lodBuildingData && !lodBuildingData.isModelRef) 
 		{
 			// This building is skinType data.
-			this.renderSkin(magoManager, shader, renderType);
+			if (this.renderSkin(magoManager, shader, renderType))
+			{
+				lodRendered = 3;
+			}
 		}
 		else 
 		{
 			var octreesRenderedCount = this.renderDetailed(magoManager, shader, renderType, refMatrixIdxKey, flipYTexCoord);
+			if (octreesRenderedCount > 0)
+			{
+				lodRendered = 0;
+			}
 			
 			if (this.currentVisibleOctreesControler === undefined) 
 			{
-				this.renderSkin(magoManager, shader, renderType);
+				if (this.renderSkin(magoManager, shader, renderType))
+				{
+					lodRendered = 3;
+				}
 			}
 			else 
 			{
@@ -1832,19 +1846,26 @@ NeoBuilding.prototype.render = function (magoManager, shader, renderType, refMat
 				// 3 = multi building skin data type (as Shibuya & Odaiba data).
 				// 4 = pointsCloud data type.
 				// 5 = pointsCloud data type pyramidOctree test.
+				// 10 = Tree-data-type.
 
 				if (this.metaData.projectDataType === 2) 
 				{
 					if (octreesRenderedCount <= 0 ) 
 					{ 
-						this.renderSkin(magoManager, shader, renderType); 
+						if (this.renderSkin(magoManager, shader, renderType))
+						{
+							lodRendered = 3;
+						}
 					}
 				}
 				else  
 				{
 					if (octreesRenderedCount < (lowestOctreesCount0 + lowestOctreesCount1 + lowestOctreesCount2)*0.1) 
 					{ 
-						this.renderSkin(magoManager, shader, renderType); 
+						if (this.renderSkin(magoManager, shader, renderType))
+						{
+							lodRendered = 3;
+						}
 					}
 				}
 			}
@@ -1856,7 +1877,10 @@ NeoBuilding.prototype.render = function (magoManager, shader, renderType, refMat
 	}
 	else if (this.currentLod > 2) 
 	{
-		this.renderSkin(magoManager, shader, renderType);
+		if (this.renderSkin(magoManager, shader, renderType))
+		{
+			lodRendered = 3;
+		}
 	}
 	
 	// test.
@@ -1870,6 +1894,8 @@ NeoBuilding.prototype.render = function (magoManager, shader, renderType, refMat
 			collisionOctreesArray[i].render(magoManager, shader, renderType, undefined);
 		}
 	}
+
+	return lodRendered;
 };
 
 /**
@@ -1982,7 +2008,8 @@ NeoBuilding.prototype.renderSkin = function (magoManager, shader, renderType)
 		}
 		
 		// seletionColor4.***
-		if (magoManager.isCameraMoved && !magoManager.isCameraMoving )
+		//if (magoManager.isCameraMoved && !magoManager.isCameraMoving )
+		if (magoManager.isCameraMoved && !this.mouseLeftDown && !this.mouseMiddleDown )
 		{
 			selCandidates = magoManager.selectionManager;
 			selectionColor = magoManager.selectionColor;
@@ -2005,7 +2032,7 @@ NeoBuilding.prototype.renderSkin = function (magoManager, shader, renderType)
 	}
 	
 	gl.uniform1i(shader.refMatrixType_loc, 0); // in this case, there are not referencesMatrix.
-	skinLego.render(magoManager, renderType, renderTexture, shader, this);
+	return skinLego.render(magoManager, renderType, renderTexture, shader, this);
 };
 
 /**

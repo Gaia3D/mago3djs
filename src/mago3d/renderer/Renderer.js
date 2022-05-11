@@ -2303,7 +2303,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 	if (magoManager.debugTex)
 	{
-		texture = magoManager.debugTex;
+		//texture = magoManager.debugTex;
 	}
 
 	if (magoManager.windPlaneDepthTex)
@@ -2329,7 +2329,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 	if (magoManager.selectionFbo)
 	{
-		//texture = magoManager.selectionFbo.colorBuffer;
+		texture = magoManager.selectionFbo.colorBuffer;
 	}
 
 	if (magoManager.selColorTex)
@@ -2376,6 +2376,35 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 
 		}
 		
+	}
+
+	// soundManager.*** soundManager.*** soundManager.***soundManager.*** soundManager.*** soundManager.***soundManager.*** soundManager.*** soundManager.***
+	if (magoManager.soundManager)
+	{
+		if (magoManager.soundManager.soundLayersArray.length > 0)
+		{
+			var soundLayer = magoManager.soundManager.soundLayersArray[0];
+			if (soundLayer.demWithBuildingsTex && soundLayer.demWithBuildingsTex.texId)
+			{
+				//texture = soundLayer.demWithBuildingsTex.texId;
+			}
+
+			if (soundLayer.sceneVoxelizedTexture3d)
+			{
+				if (soundLayer.sceneVoxelizedTexture3d.texturesArray.length > 0)
+				{
+					//texture = soundLayer.sceneVoxelizedTexture3d.texturesArray[1];
+				}
+			}
+
+			if (soundLayer.soundSourceMosaicTexture3d)
+			{
+				if (soundLayer.soundSourceMosaicTexture3d.texturesArray.length > 0)
+				{
+					//texture = soundLayer.soundSourceMosaicTexture3d.texturesArray[1];
+				}
+			}
+		}
 	}
 
 	// waterManager.*** waterManager.*** waterManager.*** waterManager.*** waterManager.*** waterManager.*** waterManager.*** waterManager.*** waterManager.***
@@ -2482,18 +2511,6 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 			if (waterLayer.qSurfaceMesh_dem_texture && waterLayer.qSurfaceMesh_dem_texture.texId)
 			{
 				//texture = waterLayer.qSurfaceMesh_dem_texture.texId;
-			}
-		}
-	}
-
-	if (magoManager.soundManager)
-	{
-		if (magoManager.soundManager.soundLayersArray.length > 0)
-		{
-			var soundLayer = magoManager.soundManager.soundLayersArray[0];
-			if (soundLayer.demTex && soundLayer.demTex.texId)
-			{
-				//texture = soundLayer.demTex.texId;
 			}
 		}
 	}

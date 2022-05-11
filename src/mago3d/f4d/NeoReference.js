@@ -612,7 +612,7 @@ NeoReference.prototype.render = function (magoManager, neoBuilding, renderType, 
 		neoReference.solveReferenceColorOrTexture(magoManager, neoBuilding, shader, currentObjectsRendering);
 		// seletionColor4.***
 		
-		if (magoManager.isCameraMoved && !magoManager.isCameraMoving )
+		if (magoManager.isCameraMoved && !this.mouseLeftDown && !this.mouseMiddleDown )
 		{
 			//var selCandidates = magoManager.selectionManager;
 			//var selectionColor = magoManager.selectionColor;

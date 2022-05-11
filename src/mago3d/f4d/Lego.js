@@ -510,7 +510,7 @@ Lego.prototype.render = function(magoManager, renderType, renderTexture, shader,
 	var gl = magoManager.sceneState.gl;
 
 	if (owner === undefined)
-	{ return; }
+	{ return false; }
 	
 	if (this.vbo_vicks_container.vboCacheKeysArray.length === 0) 
 	{

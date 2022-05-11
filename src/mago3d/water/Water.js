@@ -551,10 +551,7 @@ Water.prototype.makeDEMTextureByQuantizedMeshes = function ()
 	var shader;
 
 
-	gl.disable(gl.BLEND);
-	gl.disable(gl.CULL_FACE);
-	gl.clearColor(1.0, 0.0, 0.0, 0.0);
-	gl.clearDepth(1.0);
+	
 
 	if (!this.original_dem_texture)
 	{
@@ -577,6 +574,11 @@ Water.prototype.makeDEMTextureByQuantizedMeshes = function ()
 		extbuffers.NONE, // gl_FragData[2]
 		extbuffers.NONE, // gl_FragData[3]
 	]);
+
+	gl.disable(gl.BLEND);
+	gl.disable(gl.CULL_FACE);
+	gl.clearColor(1.0, 0.0, 0.0, 0.0);
+	gl.clearDepth(1.0);
 
 	shader = magoManager.postFxShadersManager.getShader("depthTexFromQuantizedMesh");
 	magoManager.postFxShadersManager.useProgram(shader);
@@ -2846,9 +2848,7 @@ Water.prototype.overWriteDEMWithObjects = function (shader, magoManager)
 
 	
 
-	gl.disable(gl.BLEND);
-	gl.clearColor(1.0, 0.0, 0.0, 0.0);
-	gl.clearDepth(1.0);
+	
 	
 
 	// 2n, make building depth over terrain depth.******************************************************************************************************
@@ -2864,6 +2864,10 @@ Water.prototype.overWriteDEMWithObjects = function (shader, magoManager)
 		extbuffers.NONE, // gl_FragData[2]
 		extbuffers.NONE, // gl_FragData[3]
 	]);
+
+	gl.disable(gl.BLEND);
+	gl.clearColor(1.0, 0.0, 0.0, 0.0);
+	gl.clearDepth(1.0);
 
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, this.dem_texture_A.texId);  // original.***

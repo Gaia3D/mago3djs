@@ -5414,6 +5414,17 @@ void main()\n\
     glPointSize = gl_PointSize;\n\
 }\n\
 ";
+ShaderSource.quadVertTexCoordVS = "//precision mediump float;\n\
+\n\
+attribute vec2 a_pos;\n\
+attribute vec2 a_texcoord;\n\
+\n\
+varying vec2 vTexCoord;\n\
+\n\
+void main() {\n\
+    vTexCoord = a_texcoord;\n\
+    gl_Position = vec4(-1.0 + 2.0 * a_pos, 0.0, 1.0);\n\
+}";
 ShaderSource.quad_vert = "precision mediump float;\n\
 \n\
 attribute vec2 a_pos;\n\
@@ -7594,6 +7605,48 @@ void main()\n\
 \n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
     gl_Position += translationVec;  \n\
+}";
+ShaderSource.soundCopyFS = "//#version 300 es\n\
+\n\
+#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+uniform sampler2D texToCopy;\n\
+uniform bool u_textureFlipYAxis;\n\
+varying vec2 vTexCoord;\n\
+\n\
+void main()\n\
+{\n\
+    vec4 finalCol4;\n\
+    if(u_textureFlipYAxis)\n\
+    {\n\
+        finalCol4 = texture2D(texToCopy, vec2(vTexCoord.x, 1.0 - vTexCoord.y));\n\
+    }\n\
+    else\n\
+    {\n\
+        finalCol4 = texture2D(texToCopy, vec2(vTexCoord.x, vTexCoord.y));\n\
+    }\n\
+    \n\
+    gl_FragData[0] = finalCol4;  // anything.\n\
+\n\
+    #ifdef USE_MULTI_RENDER_TARGET\n\
+        gl_FragData[1] = finalCol4; // depth\n\
+        gl_FragData[2] = finalCol4; // normal\n\
+        gl_FragData[3] = finalCol4; // albedo\n\
+        gl_FragData[4] = finalCol4; // selection color\n\
+    #endif\n\
+\n\
 }";
 ShaderSource.ssaoFromDepthFS = "\n\
 #ifdef GL_ES\n\
@@ -13732,6 +13785,7 @@ void main()\n\
 \n\
 	////gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 	gl_Position = modelViewProjectionMatrix * vec4(geoCoord, 1.0);\n\
+	gl_PointSize = 550.0;\n\
 \n\
 	vDepth = gl_Position.z * 0.5 + 0.5;\n\
 	vAltitude = geoCoord.z;\n\
@@ -13739,6 +13793,110 @@ void main()\n\
 \n\
 }\n\
 ";
+ShaderSource.WaterOrthogonalMagoTexture3DFS = "#ifdef GL_ES\n\
+precision highp float;\n\
+#endif\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+uniform sampler2D currDEMTex;\n\
+\n\
+uniform vec2 u_heightMap_MinMax; // terrain min max heights. \n\
+uniform vec2 u_simulationTextureSize; // for example 512 x 512.\n\
+uniform vec2 u_quantizedVolume_MinMax;\n\
+uniform int u_texSize[3]; // The original texture3D size.***\n\
+uniform int u_lowestTex3DSliceIndex;\n\
+\n\
+\n\
+varying float vDepth;\n\
+varying float vAltitude;\n\
+\n\
+\n\
+void main()\n\
+{     \n\
+    //vec2 screenPos = vec2(gl_FragCoord.x / u_texSize[0], gl_FragCoord.y / u_texSize[1]);\n\
+    \n\
+    // Now, must determine in what slice must render.***\n\
+    float onePixelSize = 1.0 / float(u_texSize[2]); // here can use u_texSize[0] or u_texSize[1] too.***\n\
+    float halfPixelSize = onePixelSize / 2.0;\n\
+    halfPixelSize = onePixelSize;\n\
+\n\
+    // slice 0.***\n\
+    vec4 color = vec4(0.0);\n\
+    float slice_altitude = float(u_lowestTex3DSliceIndex) / float(u_texSize[2]);\n\
+    if(abs(slice_altitude - vDepth) < halfPixelSize)\n\
+    {\n\
+        color = vec4(1.0);\n\
+    }\n\
+\n\
+    gl_FragData[0] = color;\n\
+\n\
+    #ifdef USE_MULTI_RENDER_TARGET\n\
+        color = vec4(0.0);\n\
+        slice_altitude = float(u_lowestTex3DSliceIndex + 1) / float(u_texSize[2]);\n\
+        if(abs(slice_altitude - vDepth) < halfPixelSize)\n\
+        {\n\
+            color = vec4(1.0);\n\
+        }\n\
+        gl_FragData[1] = color; \n\
+\n\
+         color = vec4(0.0);\n\
+        slice_altitude = float(u_lowestTex3DSliceIndex + 2) / float(u_texSize[2]);\n\
+        if(abs(slice_altitude - vDepth) < halfPixelSize)\n\
+        {\n\
+            color = vec4(1.0);\n\
+        }\n\
+        gl_FragData[2] = color; \n\
+\n\
+         color = vec4(0.0);\n\
+        slice_altitude = float(u_lowestTex3DSliceIndex + 3) / float(u_texSize[2]);\n\
+        if(abs(slice_altitude - vDepth) < halfPixelSize)\n\
+        {\n\
+            color = vec4(1.0);\n\
+        }\n\
+        gl_FragData[3] = color; \n\
+\n\
+         color = vec4(0.0);\n\
+        slice_altitude = float(u_lowestTex3DSliceIndex + 4) / float(u_texSize[2]);\n\
+        if(abs(slice_altitude - vDepth) < halfPixelSize)\n\
+        {\n\
+            color = vec4(1.0);\n\
+        }\n\
+        gl_FragData[4] = color; \n\
+\n\
+         color = vec4(0.0);\n\
+        slice_altitude = float(u_lowestTex3DSliceIndex + 5) / float(u_texSize[2]);\n\
+        if(abs(slice_altitude - vDepth) < halfPixelSize)\n\
+        {\n\
+            color = vec4(1.0);\n\
+        }\n\
+        gl_FragData[5] = color; \n\
+\n\
+         color = vec4(0.0);\n\
+        slice_altitude = float(u_lowestTex3DSliceIndex + 6) / float(u_texSize[2]);\n\
+        if(abs(slice_altitude - vDepth) < halfPixelSize)\n\
+        {\n\
+            color = vec4(1.0);\n\
+        }\n\
+        gl_FragData[6] = color; \n\
+\n\
+         color = vec4(0.0);\n\
+        slice_altitude = float(u_lowestTex3DSliceIndex + 7) / float(u_texSize[2]);\n\
+        if(abs(slice_altitude - vDepth) < halfPixelSize)\n\
+        {\n\
+            color = vec4(1.0);\n\
+        }\n\
+        gl_FragData[7] = color; \n\
+    #endif\n\
+}";
 ShaderSource.waterParticlesRenderFS = "precision mediump float;\n\
 \n\
 #define %USE_LOGARITHMIC_DEPTH%\n\
@@ -15367,6 +15525,211 @@ void main() \n\
         gl_FragData[3] = vec4(0.0); // \n\
         gl_FragData[4] = vec4(0.0); // \n\
     #endif\n\
+}";
+ShaderSource.waterVoxelizeFromDepthTexFS = "//#version 300 es\n\
+\n\
+#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+uniform sampler2D depthTex;\n\
+\n\
+uniform bool u_textureFlipYAxis;\n\
+uniform int u_texSize[3]; // The original texture3D size.***\n\
+uniform int u_mosaicTexSize[3]; // The mosaic texture size.***\n\
+uniform int u_mosaicSize[3]; // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***\n\
+uniform int u_lowestMosaicSliceIndex;\n\
+varying vec2 v_tex_pos;\n\
+\n\
+	//       Sample of a slice of the mosaic texture.***\n\
+	//\n\
+	//      +-----------+-----------+-----------+-----------+-----------+\n\
+	//      |           |           |           |           |           |           \n\
+	//      |   tex_15  |   tex_16  |   tex_17  |   tex_18  |   tex_19  |      row 3  \n\
+	//      |           |           |           |           |           |     \n\
+	//      +-----------+-----------+-----------+-----------+-----------+\n\
+	//      |           |           |           |           |           |           \n\
+	//      |   tex_10  |   tex_11  |   tex_12  |   tex_13  |   tex_14  |      row 2   \n\
+	//      |           |           |           |           |           |     \n\
+	//      +-----------+-----------+-----------+-----------+-----------+\n\
+	//      |           |           |           |           |           |           \n\
+	//      |   tex_5   |   tex_6   |   tex_7   |   tex_8   |   tex_9   |      row 1    \n\
+	//      |           |           |           |           |           |     \n\
+	//      +-----------+-----------+-----------+-----------+-----------+\n\
+	//      |           |           |           |           |           |           \n\
+	//      |   tex_0   |   tex_1   |   tex_2   |   tex_3   |   tex_4   |      row 0     \n\
+	//      |           |           |           |           |           |  \n\
+	//      +-----------+-----------+-----------+-----------+-----------+   \n\
+    //\n\
+    //          col 0       col 1       col 2       col 3       col 4\n\
+int getSliceIdx_ofTexture3D(int col, int row, int currMosaicSliceIdx)\n\
+{\n\
+    int subTexCount_inAMosaicSlice = u_mosaicSize[0] * u_mosaicSize[1]; // total textures count in a mosaic slice.***\n\
+    int currentSlicesAmount = (row * u_mosaicSize[0]) + col; // the textures count under the texture[col, row] in a mosaic slice.***\n\
+    int tex3DSliceIdx = subTexCount_inAMosaicSlice * currMosaicSliceIdx + currentSlicesAmount;\n\
+\n\
+    return tex3DSliceIdx;\n\
+}\n\
+\n\
+float getSliceAltitude_ofTexture3D(int col, int row, int currMosaicSliceIdx)\n\
+{\n\
+    int sliceIdx = getSliceIdx_ofTexture3D(col, row, currMosaicSliceIdx);\n\
+    float slice_altitude = float(sliceIdx) / float(u_texSize[2]);\n\
+    return slice_altitude;\n\
+}\n\
+void main()\n\
+{\n\
+    // By tex-coord, must know the column & row of the mosaic texture.***\n\
+    // Note : The rendering process uses a FBO with (u_mosaicTexSize[0] X u_mosaicTexSize[1]) as screen size.***\n\
+\n\
+    float sRange = 1.0 / float(u_mosaicSize[0]);\n\
+    float tRange = 1.0 / float(u_mosaicSize[1]);\n\
+\n\
+    // Determine the [col, row] of the mosaic.***\n\
+    float col = floor(v_tex_pos.x / sRange);\n\
+    float row = floor(v_tex_pos.y / tRange);\n\
+\n\
+    // Now determine the texCoord of the sub-texture[col, row].***\n\
+    float col_mod = v_tex_pos.x - col * sRange;\n\
+    float row_mod = v_tex_pos.y - row * tRange;\n\
+    float s = col_mod / sRange;\n\
+    float t = row_mod / tRange;\n\
+    vec2 texCoord = vec2(s, t);\n\
+\n\
+    vec4 depth;\n\
+    if(u_textureFlipYAxis)\n\
+    {\n\
+        depth = texture2D(depthTex, vec2(texCoord.x, 1.0 - texCoord.y));\n\
+    }\n\
+    else\n\
+    {\n\
+        depth = texture2D(depthTex, vec2(texCoord.x, texCoord.y));\n\
+    }\n\
+\n\
+    // Now, for each slice, must determine if the \"depth\" value is bigger or lower than the slice altitude (the slice altitude in a range [0 to 1]).***\n\
+    int col_int = int(col);\n\
+    int row_int = int(row);\n\
+    // slice 0.\n\
+    // must determine the altitude of the sub-texture[col, row].\n\
+    float slice_altitude = getSliceAltitude_ofTexture3D(col_int, row_int, u_lowestMosaicSliceIndex);\n\
+    float r = col / float(u_mosaicSize[0]);\n\
+    float g = row / float(u_mosaicSize[1]);\n\
+    vec4 slice_color = vec4(0.0);\n\
+\n\
+    if(depth.r > slice_altitude)\n\
+    {\n\
+        slice_color = vec4(1.0, 1.0, 1.0, 1.0);\n\
+    }\n\
+    gl_FragData[0] = slice_color;  \n\
+\n\
+    #ifdef USE_MULTI_RENDER_TARGET\n\
+        // slice 1.\n\
+        slice_altitude = getSliceAltitude_ofTexture3D(col_int, row_int, u_lowestMosaicSliceIndex+1);\n\
+        slice_color = vec4(0.0);\n\
+        if(depth.r > slice_altitude)\n\
+        {\n\
+            slice_color = vec4(1.0, 1.0, 1.0, 1.0);\n\
+        }\n\
+        gl_FragData[1] = slice_color;\n\
+\n\
+        // slice 2.\n\
+        slice_altitude = getSliceAltitude_ofTexture3D(col_int, row_int, u_lowestMosaicSliceIndex+2);\n\
+        slice_color = vec4(0.0);\n\
+        if(depth.r > slice_altitude)\n\
+        {\n\
+            slice_color = vec4(1.0, 1.0, 1.0, 1.0);\n\
+        }\n\
+        gl_FragData[2] = slice_color;\n\
+\n\
+        // slice 3.\n\
+        slice_altitude = getSliceAltitude_ofTexture3D(col_int, row_int, u_lowestMosaicSliceIndex+3);\n\
+        slice_color = vec4(0.0);\n\
+        if(depth.r > slice_altitude)\n\
+        {\n\
+            slice_color = vec4(1.0, 1.0, 1.0, 1.0);\n\
+        }\n\
+        gl_FragData[3] = slice_color; \n\
+\n\
+        // slice 4.\n\
+        slice_altitude = getSliceAltitude_ofTexture3D(col_int, row_int, u_lowestMosaicSliceIndex+4);\n\
+        slice_color = vec4(0.0);\n\
+        if(depth.r > slice_altitude)\n\
+        {\n\
+            slice_color = vec4(1.0, 1.0, 1.0, 1.0);\n\
+        }\n\
+        gl_FragData[4] = slice_color;\n\
+\n\
+        // slice 5.\n\
+        slice_altitude = getSliceAltitude_ofTexture3D(col_int, row_int, u_lowestMosaicSliceIndex+5);\n\
+        slice_color = vec4(0.0);\n\
+        if(depth.r > slice_altitude)\n\
+        {\n\
+            slice_color = vec4(1.0, 1.0, 1.0, 1.0);\n\
+        }\n\
+        gl_FragData[5] = slice_color; \n\
+\n\
+        // slice 6.\n\
+        slice_altitude = getSliceAltitude_ofTexture3D(col_int, row_int, u_lowestMosaicSliceIndex+6);\n\
+        slice_color = vec4(0.0);\n\
+        if(depth.r > slice_altitude)\n\
+        {\n\
+            slice_color = vec4(1.0, 1.0, 1.0, 1.0);\n\
+        }\n\
+        gl_FragData[6] = slice_color; \n\
+\n\
+        // slice 7.\n\
+        slice_altitude = getSliceAltitude_ofTexture3D(col_int, row_int, u_lowestMosaicSliceIndex+7);\n\
+        slice_color = vec4(0.0);\n\
+        if(depth.r > slice_altitude)\n\
+        {\n\
+            slice_color = vec4(1.0, 1.0, 1.0, 1.0);\n\
+        }\n\
+        gl_FragData[7] = slice_color;\n\
+    #endif\n\
+\n\
+}";
+ShaderSource.waterVoxelizeFS = "//#version 300 es\n\
+\n\
+#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+uniform sampler2D tex_0;\n\
+\n\
+uniform bool u_textureFlipYAxis;\n\
+varying vec2 v_tex_pos;\n\
+\n\
+void main()\n\
+{\n\
+    vec4 finalCol4;\n\
+    if(u_textureFlipYAxis)\n\
+    {\n\
+        finalCol4 = texture2D(texToCopy, vec2(v_tex_pos.x, 1.0 - v_tex_pos.y));\n\
+    }\n\
+    else\n\
+    {\n\
+        finalCol4 = texture2D(texToCopy, vec2(v_tex_pos.x, v_tex_pos.y));\n\
+    }\n\
+    \n\
+    gl_FragData[0] = finalCol4;  // anything.\n\
+\n\
+    #ifdef USE_MULTI_RENDER_TARGET\n\
+        gl_FragData[1] = finalCol4; // depth\n\
+        gl_FragData[2] = finalCol4; // normal\n\
+        gl_FragData[3] = finalCol4; // albedo\n\
+        gl_FragData[4] = finalCol4; // selection color\n\
+    #endif\n\
+\n\
 }";
 ShaderSource.wgs84_volumFS = "precision mediump float;\n\
 \n\

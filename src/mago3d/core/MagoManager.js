@@ -857,7 +857,7 @@ MagoManager.prototype.upDateSceneStateMatrices = function (sceneState)
 		if (frustumCommandsList === undefined)
 		{ frustumCommandsList = this.scene.frustumCommandsList; }
 
-		if (this.isFarestFrustum())
+		if (!this.isCameraMoved)
 		{
 			var camPosX = this.scene.camera.positionWC.x;
 			var camPosY = this.scene.camera.positionWC.y;
@@ -871,10 +871,16 @@ MagoManager.prototype.upDateSceneStateMatrices = function (sceneState)
 			if (sceneState.camera.isCameraMoved(camPosX, camPosY, camPosZ, camDirX, camDirY, camDirZ, camUpX, camUpY, camUpZ ))
 			{
 				this.isCameraMoved = true;
+			}
+		}
+
+		if (this.isCameraMoved)
+		{
+			if (this.isFarestFrustum())
+			{
+				sceneState.camera.calculateSpeed(camPosX, camPosY, camPosZ, this.getCurrentTime());
 				this.emit('isCameraMoved');
 			}
-
-			sceneState.camera.calculateSpeed(camPosX, camPosY, camPosZ, this.getCurrentTime());
 		}
 		
 		// Update sceneState camera.***
@@ -2222,8 +2228,8 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 
 	if (this.waterManager) // OpaquesPass.***
 	{
-	//	// Render terrain.***
-	//	//this.waterManager.renderTerrain();
+		// Render terrain.***
+		//this.waterManager.renderTerrain();
 		//this.waterManager._TEST_renderQMesh();
 	}
 
@@ -2276,6 +2282,10 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 	if (this.soundManager) // TransparentPass.***
 	{
 		// do sound simulation.
+		// Note : This is different to water simulation. Here, do not IntersectedObjectsCulling if the simulation was started. TODO.***
+		var visiblesArray = this.visibleObjControlerNodes.getAllVisibles();
+		var nativeVisiblesArray = this.visibleObjControlerNodes.getAllNatives();
+		this.soundManager.doIntersectedObjectsCulling(visiblesArray, nativeVisiblesArray);
 		this.soundManager.render();
 	};
 

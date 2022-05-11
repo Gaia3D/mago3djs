@@ -57,6 +57,11 @@ var BuildingSeed = function()
 	 * @type {SmartTile}
 	 */
 	this.smartTileOwner;
+
+	/**
+	 * @type {string}
+	 */
+	 this.dataType = "F4D"; // F4D, MGSET. There 2 data types.
 };
 
 /**
@@ -78,6 +83,7 @@ BuildingSeed.prototype.deleteObjects = function()
 	this.rotationsDegree = undefined;
 	this.bBox = undefined;           
 	this.geographicCoordOfBBox = undefined; 
+	this.dataType = undefined; 
 };
 
 

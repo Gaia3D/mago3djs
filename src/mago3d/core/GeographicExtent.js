@@ -313,6 +313,51 @@ GeographicExtent.prototype.intersects2dWithGeoCoord = function(geoCoord)
 	return false;
 };
 
+GeographicExtent.prototype.containsEntirelyGeoExtent2d = function(geoExtent_B) 
+{
+	// This function returs true if the geoExtent_B is entirely inside of this.***
+	var minGeoCoord = geoExtent_B.minGeographicCoord;
+	var maxGeoCoord = geoExtent_B.maxGeographicCoord;
+
+	if (this.intersects2dWithGeoCoord(minGeoCoord) && this.intersects2dWithGeoCoord(maxGeoCoord))
+	{
+		return true;
+	}
+
+	return false;
+};
+
+GeographicExtent.prototype.getIntersectionTypeWithGeoExtent2d = function(geoExtent_B) 
+{
+	// Note : "this" is the geoExtent_A.***
+	//------------------------------------------
+	//Constant.INTERSECTION_OUTSIDE = 0;
+	//Constant.INTERSECTION_INTERSECT= 1;
+	//Constant.INTERSECTION_A_CONTAINS_B = 5;
+	//Constant.INTERSECTION_B_CONTAINS_A = 6;
+	//------------------------------------------
+
+	if (this.intersects2dWithGeoExtent(geoExtent_B))
+	{
+		if (this.containsEntirelyGeoExtent2d(geoExtent_B))
+		{
+			return Constant.INTERSECTION_A_CONTAINS_B;
+		}
+		else if (geoExtent_B.containsEntirelyGeoExtent2d(this))
+		{
+			return Constant.INTERSECTION_B_CONTAINS_A;
+		}
+		else 
+		{
+			return Constant.INTERSECTION_INTERSECT;
+		}
+	}
+	else
+	{
+		return Constant.INTERSECTION_OUTSIDE;
+	}
+};
+
 GeographicExtent.prototype.intersects2dWithGeoExtent = function(geoExtent) 
 {
 	// In 2D intersection do not considere "altitude".
