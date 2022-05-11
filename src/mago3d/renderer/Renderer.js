@@ -2901,14 +2901,8 @@ Renderer.prototype.renderGeometryBufferORT = function (gl, renderType, visibleOb
 	
 		
 		// check changesHistory.
-		magoManager.checkChangesHistoryMovements(visibleObjControlerNodes.currentVisibles0);
-		magoManager.checkChangesHistoryColors(visibleObjControlerNodes.currentVisibles0);
-		
-		magoManager.checkChangesHistoryMovements(visibleObjControlerNodes.currentVisibles2);
-		magoManager.checkChangesHistoryColors(visibleObjControlerNodes.currentVisibles2);
-		
-		magoManager.checkChangesHistoryMovements(visibleObjControlerNodes.currentVisibles3);
-		magoManager.checkChangesHistoryColors(visibleObjControlerNodes.currentVisibles3);
+		magoManager.checkChangesHistoryMovements(visibleObjControlerNodes);
+		magoManager.checkChangesHistoryColors(visibleObjControlerNodes);
 			
 		// ssao render.************************************************************************************************************
 		var visibleObjectControllerHasRenderables = visibleObjControlerNodes.hasRenderables();
@@ -3285,14 +3279,8 @@ Renderer.prototype.renderGeometryBuffer = function (gl, renderType, visibleObjCo
 	
 		
 		// check changesHistory.
-		magoManager.checkChangesHistoryMovements(visibleObjControlerNodes.currentVisibles0);
-		magoManager.checkChangesHistoryColors(visibleObjControlerNodes.currentVisibles0);
-		
-		magoManager.checkChangesHistoryMovements(visibleObjControlerNodes.currentVisibles2);
-		magoManager.checkChangesHistoryColors(visibleObjControlerNodes.currentVisibles2);
-		
-		magoManager.checkChangesHistoryMovements(visibleObjControlerNodes.currentVisibles3);
-		magoManager.checkChangesHistoryColors(visibleObjControlerNodes.currentVisibles3);
+		magoManager.checkChangesHistoryMovements(visibleObjControlerNodes);
+		magoManager.checkChangesHistoryColors(visibleObjControlerNodes);
 			
 		// ssao render.************************************************************************************************************
 		var visibleObjectControllerHasRenderables = visibleObjControlerNodes.hasRenderables();
@@ -3567,14 +3555,8 @@ Renderer.prototype.renderGeometryBufferTransparents = function (gl, renderType, 
 		{ bApplyShadow = true; }
 
 		// check changesHistory.
-		magoManager.checkChangesHistoryMovements(visibleObjControlerNodes.currentVisibles0);
-		magoManager.checkChangesHistoryColors(visibleObjControlerNodes.currentVisibles0);
-		
-		magoManager.checkChangesHistoryMovements(visibleObjControlerNodes.currentVisibles2);
-		magoManager.checkChangesHistoryColors(visibleObjControlerNodes.currentVisibles2);
-		
-		magoManager.checkChangesHistoryMovements(visibleObjControlerNodes.currentVisibles3);
-		magoManager.checkChangesHistoryColors(visibleObjControlerNodes.currentVisibles3);
+		magoManager.checkChangesHistoryMovements(visibleObjControlerNodes);
+		magoManager.checkChangesHistoryColors(visibleObjControlerNodes);
 			
 		// ssao render.************************************************************************************************************
 		var visibleObjectControllerHasRenderables = visibleObjControlerNodes.hasRenderables();

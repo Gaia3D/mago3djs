@@ -1746,8 +1746,8 @@ MagoManager.prototype.doRenderORT = function (frustumVolumenObject)
 				lightCullingsCount ++;
 			}
 
-			if (lightCullingsCount > 0)
-			{ break; }
+			/* if (lightCullingsCount > 0)
+			{ break; } */
 		}
 	}
 	
@@ -2077,8 +2077,8 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 				lightCullingsCount ++;
 			}
 
-			if (lightCullingsCount > 0)
-			{ break; }
+			/* if (lightCullingsCount > 0)
+			{ break; } */
 		}
 	}
 	
@@ -6160,6 +6160,9 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistanceLOD2 = function(gl, c
 	} 
 };
 
+var visiblesKeys = ['currentVisibles0', 'currentVisibles2', 'currentVisibles3',
+	'currentVisibles0Transparents', 'currentVisibles1Transparents',
+	'currentVisibles2Transparents', 'currentVisibles3Transparents'];
 /**
  * 어떤 일을 하고 있습니까?
  * @param gl 변수
@@ -6172,74 +6175,168 @@ MagoManager.prototype.prepareVisibleOctreesSortedByDistanceLOD2 = function(gl, c
  * 
  * @private
  */
-MagoManager.prototype.checkChangesHistoryMovements = function(nodesArray) 
+MagoManager.prototype.checkChangesHistoryMovements = function(visibleNodesArray) 
 {
-	var nodesCount = nodesArray.length;
-	var node;
-	var rootNode;	
-	var projectId;
-	var dataKey;
-	var moveHistoryMap;
-	var colorChangedHistoryMap;
-	var objectIndexOrder;
-	var neoBuilding;
-	var refObject;
-	var moveVector;
-	var moveVectorRelToBuilding;
-	var geoLocdataManager;
-	var geoLoc;
-	
-	// check movement of objects.
-	for (var i=0; i<nodesCount; i++)
+	for (var keyIdx = 0; keyIdx < visiblesKeys.length;keyIdx++) 
 	{
-		node = nodesArray[i];
-		rootNode = node.getRoot();
-		if (rootNode === undefined)
-		{ continue; }
+		var key = visiblesKeys[keyIdx];
+		var nodesArray = visibleNodesArray[key];
+		var nodesCount = nodesArray.length;
+		var node;
+		var rootNode;	
+		var projectId;
+		var dataKey;
+		var moveHistoryMap;
+		var geoLocdataManager;
+		var geoLoc;
 		
-		geoLocdataManager = rootNode.getNodeGeoLocDataManager();
-		geoLoc = geoLocdataManager.getCurrentGeoLocationData();
-		projectId = node.data.projectId;
-		dataKey = node.data.nodeId;
-		
-		// objects movement.
-		moveHistoryMap = this.config.getMovingHistoryObjects(projectId, dataKey);
-		if (moveHistoryMap)
+		// check movement of objects.
+		for (var i=0; i<nodesCount; i++)
 		{
-			node.data.moveHistoryMap = moveHistoryMap;
-			/*
-			neoBuilding = node.data.neoBuilding;
-			///for (var changeHistory of moveHistoryMap.values()) 
-			for (var key in moveHistoryMap)
+			node = nodesArray[i];
+			rootNode = node.getRoot();
+			if (rootNode === undefined)
+			{ continue; }
+			
+			geoLocdataManager = rootNode.getNodeGeoLocDataManager();
+			geoLoc = geoLocdataManager.getCurrentGeoLocationData();
+			projectId = node.data.projectId;
+			dataKey = node.data.nodeId;
+			
+			// objects movement.
+			moveHistoryMap = this.config.getMovingHistoryObjects(projectId, dataKey);
+			if (moveHistoryMap)
 			{
-				if (Object.prototype.hasOwnProperty.call(moveHistoryMap, key)) 
+				node.data.moveHistoryMap = moveHistoryMap;
+			}
+		}
+	}
+};
+
+/**
+ * 어떤 일을 하고 있습니까?
+ * @private
+ */
+MagoManager.prototype.checkChangesHistoryColors = function(visibleNodesArray) 
+{
+	for (var keyIdx = 0; keyIdx < visiblesKeys.length;keyIdx++) 
+	{
+		var key = visiblesKeys[keyIdx];
+		var nodesArray = visibleNodesArray[key];
+		var nodesCount = nodesArray.length;
+		var node;
+		var rootNode;	
+		var projectId;
+		var dataKey;
+		var colorChangedHistoryMap;
+		
+		// check movement of objects.
+		for (var i=0; i<nodesCount; i++)
+		{
+			node = nodesArray[i];
+			rootNode = node.getRoot();
+			if (rootNode === undefined)
+			{ continue; }
+			
+			projectId = node.data.projectId;
+			dataKey = node.data.nodeId;
+	
+			colorChangedHistoryMap = this.config.getColorHistorys(projectId, dataKey);
+			if (colorChangedHistoryMap)
+			{
+				var data = node.data;
+				
+				// Set the colorChangedHistoryMap into data of the node.***
+				data.colorChangedHistoryMap = colorChangedHistoryMap;
+			}
+		}
+		
+		var allColorHistoryMap = this.config.getAllColorHistory();
+		if (allColorHistoryMap)
+		{
+			for (var key in allColorHistoryMap) 
+			{
+				if (Object.prototype.hasOwnProperty.call(allColorHistoryMap, key))
 				{
-					var changeHistory = moveHistoryMap[key];
-					objectIndexOrder = changeHistory.getObjectIndexOrder();
-					refObject = neoBuilding.getReferenceObject(objectIndexOrder);
-					if (refObject === undefined)
-					{ continue; }
-					
-					if (refObject.moveVector === undefined)
-					{ refObject.moveVector = new Point3D(); }
-					
-					if (refObject.moveVectorRelToBuilding === undefined)
-					{ refObject.moveVectorRelToBuilding = new Point3D(); }
-					
-					moveVector = changeHistory.getReferenceObjectAditionalMovement();
-					moveVectorRelToBuilding = changeHistory.getReferenceObjectAditionalMovementRelToBuilding();
-					refObject.moveVectorRelToBuilding.set(moveVectorRelToBuilding.x, moveVectorRelToBuilding.y, moveVectorRelToBuilding.z);
-					refObject.moveVector.set(moveVector.x, moveVector.y, moveVector.z);
-					
-					// now check if the building was rotated.
-					// if was rotated then recalculate the move vector.
-					refObject.moveVector = geoLoc.tMatrix.rotatePoint3D(refObject.moveVectorRelToBuilding, refObject.moveVector); 
-					
-					// if was no rotated, then set the moveVector of the changeHistory.
-					//refObject.moveVectorRelToBuilding.set(moveVectorRelToBuilding.x, moveVectorRelToBuilding.y, moveVectorRelToBuilding.z);	
+					var colorChangedHistoryMap = allColorHistoryMap[key];
+					//for (var colorChangedHistoryMap of allColorHistoryMap.values()) 
+					//{
+					// now check nodes that is no physical.
+					for (var key2 in colorChangedHistoryMap) 
+					{
+						if (Object.prototype.hasOwnProperty.call(colorChangedHistoryMap, key2))
+						{
+							var changeHistoryMap = colorChangedHistoryMap[key2];
+							//for (var changeHistoryMap of colorChangedHistoryMap.values()) 
+							//{
+							for (var key3 in changeHistoryMap) 
+							{
+								if (Object.prototype.hasOwnProperty.call(changeHistoryMap, key3))
+								{
+									var changeHistory = changeHistoryMap[key3];
+									//for (var changeHistory of changeHistoryMap.values()) 
+									//{
+									var projectId = changeHistory.projectId;
+									var nodesMap = this.hierarchyManager.getNodesMap(projectId);
+									var aNode = nodesMap[changeHistory.dataKey];
+									if (aNode && aNode.data.attributes.isPhysical !== undefined && aNode.data.attributes.isPhysical === false)
+									{
+										// must check if there are filters.
+										if (changeHistory.property === null || changeHistory.property === undefined || changeHistory.property === "" )
+										{
+											// this is a no physical node, so must check children.
+											var nodesArray = [];
+											aNode.extractNodes(nodesArray);
+											var nodesCount = nodesArray.length;
+											for (var i=0; i<nodesCount; i++)
+											{
+												var aNode2 = nodesArray[i];
+												var data = aNode2.data;
+												//neoBuilding = aNode2.data.neoBuilding;
+												if (data)
+												{
+													data.isColorChanged = true;
+													if (data.aditionalColor === undefined)
+													{ data.aditionalColor = new Color(); }
+													
+													data.aditionalColor.setRGBA(changeHistory.color[0], changeHistory.color[1], changeHistory.color[2], changeHistory.color[3]);
+												}
+											}
+										}
+										else 
+										{
+											var propertyKey = changeHistory.propertyKey;
+											var propertyValue = changeHistory.propertyValue;
+												
+											// this is a no physical node, so must check children.
+											var nodesArray = [];
+											aNode.extractNodes(nodesArray);
+											var nodesCount = nodesArray.length;
+											for (var i=0; i<nodesCount; i++)
+											{
+												var aNode2 = nodesArray[i];
+												var data = aNode2.data;
+												//neoBuilding = aNode2.data.neoBuilding;
+												if (data)
+												{
+													if (aNode2.data.attributes[propertyKey] !== undefined && aNode2.data.attributes[propertyKey].toString() === propertyValue)
+													{
+														data.isColorChanged = true;
+														if (data.aditionalColor === undefined)
+														{ data.aditionalColor = new Color(); }
+														
+														data.aditionalColor.setRGBA(changeHistory.color[0], changeHistory.color[1], changeHistory.color[2], changeHistory.color[3]);
+													}
+												}
+											}
+										}
+									}	
+								}
+							}	
+						}
+					}	
 				}
 			}
-			*/
 		}
 	}
 };
@@ -6301,134 +6398,6 @@ MagoManager.prototype.checkPropertyFilters = function(nodesArray)
 		}
 	}
 };
-
-/**
- * 어떤 일을 하고 있습니까?
- * @private
- */
-MagoManager.prototype.checkChangesHistoryColors = function(nodesArray) 
-{
-	var nodesCount = nodesArray.length;
-	var node;
-	var rootNode;	
-	var projectId;
-	var dataKey;
-	var moveHistoryMap;
-	var colorChangedHistoryMap;
-	var objectIndexOrder;
-	var neoBuilding;
-	var refObject;
-	
-	// check movement of objects.
-	for (var i=0; i<nodesCount; i++)
-	{
-		node = nodesArray[i];
-		rootNode = node.getRoot();
-		if (rootNode === undefined)
-		{ continue; }
-		
-		projectId = node.data.projectId;
-		dataKey = node.data.nodeId;
-
-		colorChangedHistoryMap = this.config.getColorHistorys(projectId, dataKey);
-		if (colorChangedHistoryMap)
-		{
-			var data = node.data;
-			
-			// Set the colorChangedHistoryMap into data of the node.***
-			data.colorChangedHistoryMap = colorChangedHistoryMap;
-		}
-	}
-	
-	var allColorHistoryMap = this.config.getAllColorHistory();
-	if (allColorHistoryMap)
-	{
-		for (var key in allColorHistoryMap) 
-		{
-			if (Object.prototype.hasOwnProperty.call(allColorHistoryMap, key))
-			{
-				var colorChangedHistoryMap = allColorHistoryMap[key];
-				//for (var colorChangedHistoryMap of allColorHistoryMap.values()) 
-				//{
-				// now check nodes that is no physical.
-				for (var key2 in colorChangedHistoryMap) 
-				{
-					if (Object.prototype.hasOwnProperty.call(colorChangedHistoryMap, key2))
-					{
-						var changeHistoryMap = colorChangedHistoryMap[key2];
-						//for (var changeHistoryMap of colorChangedHistoryMap.values()) 
-						//{
-						for (var key3 in changeHistoryMap) 
-						{
-							if (Object.prototype.hasOwnProperty.call(changeHistoryMap, key3))
-							{
-								var changeHistory = changeHistoryMap[key3];
-								//for (var changeHistory of changeHistoryMap.values()) 
-								//{
-								var projectId = changeHistory.projectId;
-								var nodesMap = this.hierarchyManager.getNodesMap(projectId);
-								var aNode = nodesMap[changeHistory.dataKey];
-								if (aNode && aNode.data.attributes.isPhysical !== undefined && aNode.data.attributes.isPhysical === false)
-								{
-									// must check if there are filters.
-									if (changeHistory.property === null || changeHistory.property === undefined || changeHistory.property === "" )
-									{
-										// this is a no physical node, so must check children.
-										var nodesArray = [];
-										aNode.extractNodes(nodesArray);
-										var nodesCount = nodesArray.length;
-										for (var i=0; i<nodesCount; i++)
-										{
-											var aNode2 = nodesArray[i];
-											var data = aNode2.data;
-											//neoBuilding = aNode2.data.neoBuilding;
-											if (data)
-											{
-												data.isColorChanged = true;
-												if (data.aditionalColor === undefined)
-												{ data.aditionalColor = new Color(); }
-												
-												data.aditionalColor.setRGBA(changeHistory.color[0], changeHistory.color[1], changeHistory.color[2], changeHistory.color[3]);
-											}
-										}
-									}
-									else 
-									{
-										var propertyKey = changeHistory.propertyKey;
-										var propertyValue = changeHistory.propertyValue;
-											
-										// this is a no physical node, so must check children.
-										var nodesArray = [];
-										aNode.extractNodes(nodesArray);
-										var nodesCount = nodesArray.length;
-										for (var i=0; i<nodesCount; i++)
-										{
-											var aNode2 = nodesArray[i];
-											var data = aNode2.data;
-											//neoBuilding = aNode2.data.neoBuilding;
-											if (data)
-											{
-												if (aNode2.data.attributes[propertyKey] !== undefined && aNode2.data.attributes[propertyKey].toString() === propertyValue)
-												{
-													data.isColorChanged = true;
-													if (data.aditionalColor === undefined)
-													{ data.aditionalColor = new Color(); }
-													
-													data.aditionalColor.setRGBA(changeHistory.color[0], changeHistory.color[1], changeHistory.color[2], changeHistory.color[3]);
-												}
-											}
-										}
-									}
-								}	
-							}
-						}	
-					}
-				}	
-			}
-		}
-	}
-};
-
 
 /**
  * Draw building names on scene.

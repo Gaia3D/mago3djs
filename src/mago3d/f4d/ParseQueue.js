@@ -358,6 +358,9 @@ ParseQueue.prototype.parseArrayOctreesLod2Legos = function (octreesArray, magoMa
 			{
 				if (lowestOctree.lego === undefined)
 				{ continue; }
+
+				if (!lowestOctree.lego.dataArrayBuffer 
+				|| lowestOctree.lego.dataArrayBuffer.byteLength === 0) { continue; }
 				
 				// parse by worker:
 				var neoBuilding = lowestOctree.neoBuildingOwner;
