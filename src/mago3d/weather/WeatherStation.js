@@ -655,7 +655,7 @@ WeatherStation.prototype.loadWindGeoJson = function (geoJsonFilePath)
  * add wind 
  * @param {object} geoJson geojson type object
  */
-WeatherStation.prototype.addWind = function(geoJson)
+WeatherStation.prototype.addWind = function(geoJson, options)
 {
 	// This is the geoJson version. 2021.
 	// Create a windVolume
@@ -667,10 +667,12 @@ WeatherStation.prototype.addWind = function(geoJson)
 	 */
 
 	 //validationGeosjon();
+	 if (!options)
+	 {
+		options = {};
+	 }
+	 options.geoJsonFile = geoJson;
 
-	var options = {
-		geoJsonFile: geoJson
-	};
 	var windVolume = this.newWindVolume(options);
 };
 

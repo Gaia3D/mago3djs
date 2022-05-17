@@ -53,6 +53,11 @@ var WindVolume = function (options)
 		{
 			this._geoJsonFileFolderPath = options.geoJsonFileFolderPath;
 		}
+
+		if (options.particesGenerationType)
+		{
+			this._particesGenerationType = options.particesGenerationType;
+		}
 	}
 };
 
