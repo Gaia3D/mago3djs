@@ -491,12 +491,25 @@ MagoRenderable.prototype.renderAsChild = function (magoManager, shader, renderTy
 		if (magoManager.isCameraMoved && !this.mouseLeftDown && !this.mouseMiddleDown )
 		{
 			//if (this.attributes.isSelectable !== undefined && this.attributes.isSelectable === false) 
-			// Selection render.***
-			var selectionColor = magoManager.selectionColor;
-			var colorAux = selectionColor.getAvailableColor(undefined);
-			var idxKey = selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
-			magoManager.selectionManager.setCandidateGeneral(idxKey, this);
-			gl.uniform4fv(shader.uSelColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
+			var doSelectionColor = false;
+			if (this.attributes.isSelectable === undefined)
+			{
+				doSelectionColor = true;
+			}
+			if (this.attributes.isSelectable && this.attributes.isSelectable === true) 
+			{
+				doSelectionColor = true;
+			}
+			if (doSelectionColor) 
+			{
+				// Selection render.***
+				var selectionColor = magoManager.selectionColor;
+				var colorAux = selectionColor.getAvailableColor(undefined);
+				var idxKey = selectionColor.decodeColor3(colorAux.r, colorAux.g, colorAux.b);
+				magoManager.selectionManager.setCandidateGeneral(idxKey, this);
+				gl.uniform4fv(shader.uSelColor4_loc, [colorAux.r/255.0, colorAux.g/255.0, colorAux.b/255.0, 1.0]);
+			}
+			
 		}
 
 	}
@@ -711,6 +724,8 @@ MagoRenderable.prototype.setWireframeColor = function(r, g, b, a)
 	this.wireframeColor4.setRGBA(r, g, b, a);
 
 	//TODO : 좀 더 정교한 근사값 구하기로 변경
+	/*
+	// Note : the wireframe color no determine if a object is transparent.***
 	if (a < 1) 
 	{
 		this.setOpaque(false);
@@ -719,6 +734,7 @@ MagoRenderable.prototype.setWireframeColor = function(r, g, b, a)
 	{
 		this.setOpaque(true);
 	}
+	*/
 };
 
 MagoRenderable.prototype.setOpaque = function(opaque)
@@ -755,19 +771,42 @@ MagoRenderable.prototype.getCurrentGeoLocationData = function()
 	return geoLoDataManager.getCurrentGeoLocationData();
 };
 
-MagoRenderable.prototype.getBoundingSphereWC = function(resultBSphereWC)
+MagoRenderable.prototype.getBoundingSphereWC = function (resultBSphereWC)
 {
 	if (!this.boundingSphereWC)
 	{
+		var objectsCount = this.objectsArray.length;
 		this.boundingSphereWC = new BoundingSphere();
+		var firstBSphereCopied = false;
+		for (var i=0; i<objectsCount; i++)
+		{
+			var bsphere = this.objectsArray[i].boundingSphereWC;
+			
+			if (bsphere)
+			{
+				if (!firstBSphereCopied)
+				{
+					this.boundingSphereWC.copyFrom(bsphere);
+					firstBSphereCopied = true;
+				}
+				else 
+				{
+					this.boundingSphereWC.addBSphere(bsphere);
+				}
+				
+			}
+		}
+		
+		if (this.boundingSphereWC.r === 0.0)
+		{
+			// provisionally return an aproximate bsphere.***
+			var geoLocationData = this.getCurrentGeoLocationData();
+			var positionWC = geoLocationData.position;
 
-		// provisionally return an aproximate bsphere.***
-		var geoLocationData = this.getCurrentGeoLocationData();
-		var positionWC = geoLocationData.position;
-
-		var radiusAprox = 200.0; // calculate it : TODO.
-		this.boundingSphereWC.setCenterPoint(positionWC.x, positionWC.y, positionWC.z);
-		this.boundingSphereWC.setRadius(radiusAprox);
+			var radiusAprox = 2000.0; // calculate it : TODO.
+			this.boundingSphereWC.setCenterPoint(positionWC.x, positionWC.y, positionWC.z);
+			this.boundingSphereWC.setRadius(radiusAprox);
+		}
 	}
 
 	if (!resultBSphereWC)

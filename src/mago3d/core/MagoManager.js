@@ -2265,10 +2265,11 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 
 	
 
-	if (this.weatherStation)
-	{
-		this.weatherStation.renderWeatherTransparents(this);
-	}
+	//if (this.weatherStation)
+	//{
+	// Note : the transparent foe weatherStation is not prepared yet.***
+	//	this.weatherStation.renderWeatherTransparents(this);
+	//}
 
 	if (this.waterManager) // TransparentPass.***
 	{

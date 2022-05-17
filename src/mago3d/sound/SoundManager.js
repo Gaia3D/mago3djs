@@ -17,11 +17,15 @@ var SoundManager = function(magoManager)
 	this.magoManager = magoManager;
 
 	// Simulation parameters.**************************************************************************
-	this.maxSimulationSize = 1400;
+	this.maxSimulationSize = 500;
 	this.simulationTextureSize = new Float32Array([this.maxSimulationSize, this.maxSimulationSize]);
 	this.bSsimulateSound = false;
 	this.terrainTextureSize = new Float32Array([this.maxSimulationSize, this.maxSimulationSize]);
 	this.terrainHeightEncodingBytes = 1; // default 1byte.***
+
+	this.airMaxPressure = 1.0;
+	this.maxFlux = 1.0;
+	this.airMaxVelocity = 1.0;
 
 	// The DEM can be from highMapTextures files, or from quantizedMesh.*******************************
 	this.terrainDemSourceType = "QUANTIZEDMESH"; // from HighMap or from QuantizedMesh.
@@ -160,7 +164,7 @@ SoundManager.prototype.doIntersectedObjectsCulling = function (visiblesArray, na
 SoundManager.prototype._test_sound = function ()
 {
 	//var minLon = 127.23049, minLat = 36.50861, minAlt = 0.0, maxLon = 127.24178, maxLat = 36.51691, maxAlt = 400.0; // big
-	var minLon = 127.23596, minLat = 36.50977, minAlt = 50.0, maxLon = 127.23915, maxLat = 36.51229, maxAlt = 130.0; // small
+	var minLon = 127.23596, minLat = 36.50977, minAlt = 50.0, maxLon = 127.23915, maxLat = 36.51229, maxAlt = 100.0; // small
 	var geographicExtent = new GeographicExtent(minLon, minLat, minAlt, maxLon, maxLat, maxAlt);
 	var options = {
 		geographicExtent: geographicExtent
@@ -325,6 +329,8 @@ SoundManager.prototype.createDefaultShaders = function ()
 	shader.u_simulationTextureSize_loc = gl.getUniformLocation(shader.program, "u_simulationTextureSize");
 	shader.u_texSize_loc = gl.getUniformLocation(shader.program, "u_texSize");
 	shader.u_lowestTex3DSliceIndex_loc = gl.getUniformLocation(shader.program, "u_lowestTex3DSliceIndex");
+	shader.u_airMaxPressure_loc = gl.getUniformLocation(shader.program, "u_airMaxPressure");
+	shader.u_currAirPressure_loc = gl.getUniformLocation(shader.program, "u_currAirPressure");
 	magoManager.postFxShadersManager.useProgram(shader);
 	gl.uniform1i(shader.currDEMTex_loc, 0);
 
@@ -341,4 +347,128 @@ SoundManager.prototype.createDefaultShaders = function ()
 	shader.u_textureFlipYAxis_loc = gl.getUniformLocation(shader.program, "u_textureFlipYAxis");
 	magoManager.postFxShadersManager.useProgram(shader);
 	gl.uniform1i(shader.texToCopy_loc, 0);
+
+	// 2) calculate air pressure from sound source.******************************************************************************
+	shaderName = "soundCalculateAirPressure";
+	vs_source = ShaderSource.waterQuadVertVS;
+	fs_source = ShaderSource.soundCalculatePressureFS;
+	fs_source = fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
+	fs_source = fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
+	shader = magoManager.postFxShadersManager.createShaderProgram(gl, vs_source, fs_source, shaderName, this.magoManager);
+	shader.a_pos = gl.getAttribLocation(shader.program, "a_pos");
+	shader.u_airMaxPressure_loc = gl.getUniformLocation(shader.program, "u_airMaxPressure");
+
+	shader.soundSourceTex_0_loc = gl.getUniformLocation(shader.program, "soundSourceTex_0");
+	shader.soundSourceTex_1_loc = gl.getUniformLocation(shader.program, "soundSourceTex_1");
+	shader.soundSourceTex_2_loc = gl.getUniformLocation(shader.program, "soundSourceTex_2");
+	shader.soundSourceTex_3_loc = gl.getUniformLocation(shader.program, "soundSourceTex_3");
+	shader.currAirPressureTex_0_loc = gl.getUniformLocation(shader.program, "currAirPressureTex_0");
+	shader.currAirPressureTex_1_loc = gl.getUniformLocation(shader.program, "currAirPressureTex_1");
+	shader.currAirPressureTex_2_loc = gl.getUniformLocation(shader.program, "currAirPressureTex_2");
+	shader.currAirPressureTex_3_loc = gl.getUniformLocation(shader.program, "currAirPressureTex_3");
+	magoManager.postFxShadersManager.useProgram(shader);
+
+	gl.uniform1i(shader.soundSourceTex_0_loc, 0);
+	gl.uniform1i(shader.soundSourceTex_1_loc, 1);
+	gl.uniform1i(shader.soundSourceTex_2_loc, 2);
+	gl.uniform1i(shader.soundSourceTex_3_loc, 3);
+	gl.uniform1i(shader.currAirPressureTex_0_loc, 4);
+	gl.uniform1i(shader.currAirPressureTex_1_loc, 5);
+	gl.uniform1i(shader.currAirPressureTex_2_loc, 6);
+	gl.uniform1i(shader.currAirPressureTex_3_loc, 7);
+
+	// 6) simple texture copy Shader.*********************************************************************************************
+	shaderName = "copyTexturePartially";
+	vs_source = ShaderSource.quadVertTexCoordVS;
+	fs_source = ShaderSource.soundCopyPartiallyFS;
+	fs_source = fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
+	fs_source = fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
+	shader = magoManager.postFxShadersManager.createShaderProgram(gl, vs_source, fs_source, shaderName, this.magoManager);
+	shader.texToCopy_0_loc = gl.getUniformLocation(shader.program, "texToCopy_0");
+	shader.texToCopy_1_loc = gl.getUniformLocation(shader.program, "texToCopy_1");
+	shader.texToCopy_2_loc = gl.getUniformLocation(shader.program, "texToCopy_2");
+	shader.texToCopy_3_loc = gl.getUniformLocation(shader.program, "texToCopy_3");
+	shader.texToCopy_4_loc = gl.getUniformLocation(shader.program, "texToCopy_4");
+	shader.texToCopy_5_loc = gl.getUniformLocation(shader.program, "texToCopy_5");
+	shader.texToCopy_6_loc = gl.getUniformLocation(shader.program, "texToCopy_6");
+	shader.texToCopy_7_loc = gl.getUniformLocation(shader.program, "texToCopy_7");
+
+	shader.a_pos_loc = gl.getAttribLocation(shader.program, "a_pos");//
+	shader.a_texcoord_loc = gl.getAttribLocation(shader.program, "a_texcoord");//
+	shader.u_textureFlipYAxis_loc = gl.getUniformLocation(shader.program, "u_textureFlipYAxis");
+	magoManager.postFxShadersManager.useProgram(shader);
+	gl.uniform1i(shader.texToCopy_0_loc, 0);
+	gl.uniform1i(shader.texToCopy_1_loc, 0);
+	gl.uniform1i(shader.texToCopy_2_loc, 1);
+	gl.uniform1i(shader.texToCopy_3_loc, 2);
+	gl.uniform1i(shader.texToCopy_4_loc, 3);
+	gl.uniform1i(shader.texToCopy_5_loc, 4);
+	gl.uniform1i(shader.texToCopy_6_loc, 5);
+	gl.uniform1i(shader.texToCopy_7_loc, 6);
+	gl.uniform1i(shader.texToCopy_8_loc, 7);
+	
+	// 3) calculateFlux Shader.*********************************************************************************************
+	shaderName = "soundCalculateFlux";
+	vs_source = ShaderSource.waterQuadVertVS;
+	fs_source = ShaderSource.soundCalculateFluxFS;
+	fs_source = fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
+	fs_source = fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
+	shader = magoManager.postFxShadersManager.createShaderProgram(gl, vs_source, fs_source, shaderName, this.magoManager);
+
+	shader.airPressureMosaicTex_loc = gl.getUniformLocation(shader.program, "airPressureMosaicTex");
+	shader.flux_RFU_MosaicTex_HIGH_loc = gl.getUniformLocation(shader.program, "flux_RFU_MosaicTex_HIGH");
+	shader.flux_RFU_MosaicTex_LOW_loc = gl.getUniformLocation(shader.program, "flux_RFU_MosaicTex_LOW");
+	shader.flux_LBD_MosaicTex_HIGH_loc = gl.getUniformLocation(shader.program, "flux_LBD_MosaicTex_HIGH");
+	shader.flux_LBD_MosaicTex_LOW_loc = gl.getUniformLocation(shader.program, "flux_LBD_MosaicTex_LOW");
+	shader.auxMosaicTex_loc = gl.getUniformLocation(shader.program, "auxMosaicTex");
+
+	shader.a_pos_loc = gl.getAttribLocation(shader.program, "a_pos");//
+	shader.u_airMaxPressure_loc = gl.getUniformLocation(shader.program, "u_airMaxPressure");//
+	shader.u_maxFlux_loc = gl.getUniformLocation(shader.program, "u_maxFlux");
+	shader.u_mosaicSize_loc = gl.getUniformLocation(shader.program, "u_mosaicSize"); // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***
+	shader.u_texSize_loc = gl.getUniformLocation(shader.program, "u_texSize"); // The original texture3D size.***
+	shader.u_voxelSizeMeters_loc = gl.getUniformLocation(shader.program, "u_voxelSizeMeters");
+	shader.u_timestep_loc = gl.getUniformLocation(shader.program, "u_timestep");
+
+	magoManager.postFxShadersManager.useProgram(shader);
+	gl.uniform1i(shader.airPressureMosaicTex_loc, 0);
+	gl.uniform1i(shader.flux_RFU_MosaicTex_HIGH_loc, 1);
+	gl.uniform1i(shader.flux_RFU_MosaicTex_LOW_loc, 2);
+	gl.uniform1i(shader.flux_LBD_MosaicTex_HIGH_loc, 3);
+	gl.uniform1i(shader.flux_LBD_MosaicTex_LOW_loc, 4);
+	gl.uniform1i(shader.auxMosaicTex_loc, 5);
+
+	// 3) calculateVelocity Shader.*********************************************************************************************
+	shaderName = "soundCalculateVelocity";
+	vs_source = ShaderSource.waterQuadVertVS;
+	fs_source = ShaderSource.soundCalculateVelocityFS;
+	fs_source = fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
+	fs_source = fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
+	shader = magoManager.postFxShadersManager.createShaderProgram(gl, vs_source, fs_source, shaderName, this.magoManager);
+
+	shader.airPressureMosaicTex_loc = gl.getUniformLocation(shader.program, "airPressureMosaicTex");
+	shader.flux_RFU_MosaicTex_HIGH_loc = gl.getUniformLocation(shader.program, "flux_RFU_MosaicTex_HIGH");
+	shader.flux_RFU_MosaicTex_LOW_loc = gl.getUniformLocation(shader.program, "flux_RFU_MosaicTex_LOW");
+	shader.flux_LBD_MosaicTex_HIGH_loc = gl.getUniformLocation(shader.program, "flux_LBD_MosaicTex_HIGH");
+	shader.flux_LBD_MosaicTex_LOW_loc = gl.getUniformLocation(shader.program, "flux_LBD_MosaicTex_LOW");
+	shader.auxMosaicTex_loc = gl.getUniformLocation(shader.program, "auxMosaicTex");
+
+	shader.a_pos_loc = gl.getAttribLocation(shader.program, "a_pos");//
+	shader.u_airMaxPressure_loc = gl.getUniformLocation(shader.program, "u_airMaxPressure");//
+	shader.u_maxFlux_loc = gl.getUniformLocation(shader.program, "u_maxFlux");
+	shader.u_mosaicSize_loc = gl.getUniformLocation(shader.program, "u_mosaicSize"); // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***
+	shader.u_texSize_loc = gl.getUniformLocation(shader.program, "u_texSize"); // The original texture3D size.***
+	shader.u_voxelSizeMeters_loc = gl.getUniformLocation(shader.program, "u_voxelSizeMeters");
+	shader.u_timestep_loc = gl.getUniformLocation(shader.program, "u_timestep");
+	shader.u_maxVelocity_loc = gl.getUniformLocation(shader.program, "u_maxVelocity");
+
+	magoManager.postFxShadersManager.useProgram(shader);
+	gl.uniform1i(shader.airPressureMosaicTex_loc, 0);
+	gl.uniform1i(shader.flux_RFU_MosaicTex_HIGH_loc, 1);
+	gl.uniform1i(shader.flux_RFU_MosaicTex_LOW_loc, 2);
+	gl.uniform1i(shader.flux_LBD_MosaicTex_HIGH_loc, 3);
+	gl.uniform1i(shader.flux_LBD_MosaicTex_LOW_loc, 4);
+	gl.uniform1i(shader.auxMosaicTex_loc, 5);
+	
+	
 };

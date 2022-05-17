@@ -5603,6 +5603,23 @@ void main()\n\
         float linearDepth = unpackDepth(textureColor); // original.\n\
         textureColor = vec4(linearDepth, linearDepth, linearDepth, 1.0);\n\
     }\n\
+    else if(uTextureType == 2)\n\
+    {\n\
+        vec4 textureColorAux = texture2D(texture_0, texCoord);\n\
+        textureColor = vec4(textureColorAux.a, 0.0, 0.0, textureColorAux.a);\n\
+    }\n\
+    else if(uTextureType == 3)\n\
+    {\n\
+        vec4 textureColorAux = texture2D(texture_0, texCoord);\n\
+        if(textureColorAux.r + textureColorAux.g + textureColorAux.b > 0.0)\n\
+        {\n\
+            textureColor = vec4(0.2, 0.5, 1.0, 1.0);\n\
+        }\n\
+        else\n\
+        {\n\
+            textureColor = textureColorAux;\n\
+        }\n\
+    }\n\
     \n\
     gl_FragColor = textureColor;\n\
 	\n\
@@ -7606,6 +7623,1352 @@ void main()\n\
     gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
     gl_Position += translationVec;  \n\
 }";
+ShaderSource.soundCalculateFluxFS = "//#version 300 es\n\
+\n\
+#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+    //*********************************************************\n\
+    // R= right, F= front, U= up, L= left, B= back, D= down.\n\
+    // RFU = x, y, z.\n\
+    // LBD = -x, -y, -z.\n\
+    //*********************************************************\n\
+\n\
+uniform sampler2D airPressureMosaicTex;\n\
+uniform sampler2D flux_RFU_MosaicTex_HIGH; // Inside here, there are the voxelization of the scene (in alpha channel).***\n\
+uniform sampler2D flux_RFU_MosaicTex_LOW;\n\
+uniform sampler2D flux_LBD_MosaicTex_HIGH;\n\
+uniform sampler2D flux_LBD_MosaicTex_LOW;\n\
+uniform sampler2D auxMosaicTex; // here, contains :\n\
+	// tex_0 = prev airPressureTex\n\
+	// tex_1 = next airPressureTex\n\
+	// tex_2 = prev flux_RFU_HIGH\n\
+	// tex_3 = next flux_RFU_HIGH\n\
+	// tex_4 = prev flux_RFU_LOW\n\
+	// tex_5 = next flux_RFU_LOW\n\
+	// tex_6 = prev flux_LBD_HIGH\n\
+	// tex_7 = next flux_LBD_HIGH\n\
+	// tex_8 = prev flux_LBD_LOW\n\
+	// tex_9 = next flux_LBD_LOW\n\
+\n\
+	//  \n\
+	//      +-----------+-----------+-----------+-----------+\n\
+	//      |           |           |           |           |     \n\
+	//      |   tex_8   |   tex_9   |  nothing  |  nothing  |\n\
+	//      |           |           |           |           | \n\
+	//      +-----------+-----------+-----------+-----------+\n\
+	//      |           |           |           |           | \n\
+	//      |   tex_4   |   tex_5   |   tex_6   |   tex_7   |\n\
+	//      |           |           |           |           |\n\
+	//      +-----------+-----------+-----------+-----------+\n\
+	//      |           |           |           |           |    \n\
+	//      |   tex_0   |   tex_1   |   tex_2   |   tex_3   | \n\
+	//      |           |           |           |           |\n\
+	//      +-----------+-----------+-----------+-----------+\n\
+\n\
+uniform int u_texSize[3]; // The original texture3D size.***\n\
+uniform int u_mosaicTexSize[3]; // The mosaic texture size.***\n\
+uniform int u_mosaicSize[3]; // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***\n\
+uniform int u_lowestMosaicSliceIndex;\n\
+\n\
+varying vec2 v_tex_pos;\n\
+\n\
+uniform float u_timestep;\n\
+\n\
+//uniform vec2 u_tileSize; // tile size in meters.\n\
+uniform vec3 u_voxelSizeMeters;\n\
+uniform float u_airMaxPressure;\n\
+uniform float u_maxFlux;\n\
+//uniform vec2 u_heightMap_MinMax;\n\
+\n\
+//uniform vec2 u_simulationTextureSize;\n\
+//uniform vec2 u_terrainTextureSize;\n\
+//uniform int u_terrainHeightEncodingBytes;\n\
+\n\
+float decodeRG(in vec2 waterColorRG)\n\
+{\n\
+    // https://titanwolf.org/Network/Articles/Article?AID=666e7443-0511-4210-b39c-db0bb6738246#gsc.tab=0\n\
+    return dot(waterColorRG, vec2(1.0, 1.0 / 255.0));\n\
+}\n\
+\n\
+vec2 encodeRG(in float wh)\n\
+{\n\
+    // https://titanwolf.org/Network/Articles/Article?AID=666e7443-0511-4210-b39c-db0bb6738246#gsc.tab=0\n\
+    float encodedBit = 1.0/255.0;\n\
+    vec2 enc = vec2(1.0, 255.0) * wh;\n\
+    enc = fract(enc);\n\
+    enc.x -= enc.y * encodedBit;\n\
+    return enc; // R = HIGH, G = LOW.***\n\
+}\n\
+\n\
+vec4 packDepth( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+  return enc;\n\
+}\n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+}\n\
+\n\
+vec2 subTexCoord_to_texCoord(in vec2 subTexCoord, in int col, in int row)\n\
+{\n\
+    // given col, row & subTexCoord, this function returns the texCoord into mosaic texture.***\n\
+    // The \"subTexCoord\" is the texCoord of the subTexture[col, row].***\n\
+    // u_mosaicSize =  The mosaic composition (xTexCount X yTexCount X zSlicesCount).***\n\
+    float sRange = 1.0 / float(u_mosaicSize[0]);\n\
+    float tRange = 1.0 / float(u_mosaicSize[1]);\n\
+\n\
+    float s = float(col) * sRange + subTexCoord.x * sRange;\n\
+    float t = float(row) * tRange + subTexCoord.x * tRange;\n\
+\n\
+    vec2 resultTexCoord = vec2(s, t);\n\
+    return resultTexCoord;\n\
+}\n\
+\n\
+vec2 getColRow_and_subTexCoord(in vec2 texCoord, inout vec2 subTexCoord)\n\
+{\n\
+    // The \"subTexCoord\" is the texCoord of the subTexture[col, row].***\n\
+    // u_mosaicSize =  The mosaic composition (xTexCount X yTexCount X zSlicesCount).***\n\
+    float sRange = 1.0 / float(u_mosaicSize[0]);\n\
+    float tRange = 1.0 / float(u_mosaicSize[1]);\n\
+\n\
+    // Determine the [col, row] of the mosaic.***\n\
+    vec2 resultColRow = vec2(floor(texCoord.x / sRange), floor(texCoord.y / tRange));\n\
+\n\
+    // determine the subTexCoord.***\n\
+    float col_mod = texCoord.x - resultColRow.x * sRange;\n\
+    float row_mod = texCoord.y - resultColRow.y * tRange;\n\
+    float s = col_mod / sRange;\n\
+    float t = row_mod / tRange;\n\
+    subTexCoord = vec2(s, t);\n\
+\n\
+    return resultColRow;\n\
+}\n\
+\n\
+float getAirPressure_inMosaicTexture(in vec2 texCoord)\n\
+{\n\
+    vec4 color4 = texture2D(airPressureMosaicTex, texCoord);\n\
+    float decoded = unpackDepth(color4); // 32bit.\n\
+    float airPressure = decoded * u_airMaxPressure;\n\
+\n\
+    return airPressure;\n\
+}\n\
+\n\
+float getAirPressure_inAuxMosaicTexture(in vec2 texCoord)\n\
+{\n\
+    vec4 color4 = texture2D(auxMosaicTex, texCoord);\n\
+    float decoded = unpackDepth(color4); // 32bit.\n\
+    float airPressure = decoded * u_airMaxPressure;\n\
+\n\
+    return airPressure;\n\
+}\n\
+\n\
+bool getPrevSubTextureColRow(in int col, in int row, inout int prev_col, inout int prev_row)\n\
+{\n\
+    // u_mosaicSize[3]; // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***\n\
+    prev_row = row;\n\
+    if(col == 0)\n\
+    {\n\
+        prev_col = u_mosaicSize[0] - 1;\n\
+        prev_row = row - 1;\n\
+\n\
+        // now, check if the prev_row is inside of the boundary.***\n\
+        if(prev_row < 0)\n\
+        {\n\
+            // we are outside of the tex3d boundary.***\n\
+            return false;\n\
+        }\n\
+    }\n\
+    else\n\
+    {\n\
+        prev_col = col - 1;\n\
+    }\n\
+    return true;\n\
+}\n\
+\n\
+bool getNextSubTextureColRow(in int col, in int row, inout int next_col, inout int next_row)\n\
+{\n\
+    // u_mosaicSize[3]; // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***\n\
+    next_row = row;\n\
+    if(col == u_mosaicSize[0] - 1)\n\
+    {\n\
+        next_col = 0;\n\
+        next_row = row + 1;\n\
+\n\
+        // now, check if the next_row is inside of the boundary.***\n\
+        if(next_row > u_mosaicSize[1] - 1)\n\
+        {\n\
+            // we are outside of the tex3d boundary.***\n\
+            return false;\n\
+        }\n\
+    }\n\
+    else\n\
+    {\n\
+        next_col = col + 1;\n\
+    }\n\
+    return true;\n\
+}\n\
+\n\
+float getAirPressure(in vec2 texCoord, inout vec3 airPressure_RFU, inout vec3 airPressure_LBD)\n\
+{\n\
+    // Note : this function returns the airPressure of all 6 Neighbor too.***\n\
+    vec2 subTexCoord;\n\
+    vec2 colRow = getColRow_and_subTexCoord(texCoord, subTexCoord);\n\
+\n\
+    float col = colRow.x;\n\
+    float row = colRow.y;\n\
+    int col_int = int(col);\n\
+    int row_int = int(row);\n\
+\n\
+    float divSubX = 1.0 / float(u_texSize[0]); // divX for subTexture.***\n\
+    float divSubY = 1.0 / float(u_texSize[1]); // divX for subTexture.***\n\
+\n\
+    // airPressure_curr.*********************************************************************\n\
+    float airPressure_curr = getAirPressure_inMosaicTexture(texCoord);\n\
+\n\
+    // airPressure_R.************************************************************************\n\
+    // calculate the subTexCoord to check boundary conditions.***\n\
+    vec2 subTexCoord_R = subTexCoord + vec2(divSubX, 0.0);\n\
+    if(subTexCoord_R.x > 1.0)\n\
+    {\n\
+        // is out of simulation boundary.***\n\
+        airPressure_RFU.x = 0.0;\n\
+    }\n\
+    else\n\
+    {\n\
+        // calculate the mosaicTexCoord of the subTexCoord_R:\n\
+        vec2 mosaicTexCoord_R = subTexCoord_to_texCoord(subTexCoord_R, col_int, row_int);\n\
+        airPressure_RFU.x = getAirPressure_inMosaicTexture(mosaicTexCoord_R);\n\
+    }\n\
+\n\
+    // airPressure_F.************************************************************************\n\
+    // calculate the subTexCoord to check boundary conditions.***\n\
+    vec2 subTexCoord_F = subTexCoord + vec2(0.0, divSubY);\n\
+    if(subTexCoord_F.y > 1.0)\n\
+    {\n\
+        // is out of simulation boundary.***\n\
+        airPressure_RFU.y = 0.0;\n\
+    }\n\
+    else\n\
+    {\n\
+        // calculate the mosaicTexCoord of the subTexCoord_F:\n\
+        vec2 mosaicTexCoord_F = subTexCoord_to_texCoord(subTexCoord_F, col_int, row_int);\n\
+        airPressure_RFU.y = getAirPressure_inMosaicTexture(mosaicTexCoord_F);\n\
+    }\n\
+\n\
+    // airPressure_U.************************************************************************\n\
+    // To calculate the airPressure_U, must know the UP_subTexrure (NEXT subTexure).***\n\
+    // But, if the current subTexture is in right_up_corner, then must use the \"auxMosaicTex\".***\n\
+    // use the next subTexture.***\n\
+    int next_col;\n\
+    int next_row;\n\
+    if(getNextSubTextureColRow(col_int, row_int, next_col, next_row))\n\
+    {\n\
+        // must recalcuate the mosaicTexCoord.***\n\
+        vec2 newMosaicTexCoord = subTexCoord_to_texCoord(subTexCoord, next_col, next_row);\n\
+        airPressure_RFU.z = getAirPressure_inMosaicTexture(newMosaicTexCoord); \n\
+    }\n\
+    else\n\
+    {\n\
+        // Is out of simulation boundary.***\n\
+        // Must use the \"auxMosaicTex\". This is a [4, 3] mosaic texture.***\n\
+        // tex_1 = next airPressureTex. this in [col 1, row 0] into \"auxMosaicTex\".***\n\
+        // Must calculate the texCoords of auxMosaicTex.***\n\
+\n\
+        float sRange_aux = 1.0 / 4.0;\n\
+        float tRange_aux = 1.0 / 3.0;\n\
+\n\
+        float col_aux = 1.0;\n\
+        float row_aux = 0.0;\n\
+\n\
+        float s = col_aux * sRange_aux + subTexCoord.x * sRange_aux;\n\
+        float t = row_aux * tRange_aux + subTexCoord.x * tRange_aux;\n\
+\n\
+        vec2 texCoord_auxMosaicTex = vec2(s, t);\n\
+        airPressure_RFU.z = getAirPressure_inAuxMosaicTexture(texCoord_auxMosaicTex);\n\
+    }\n\
+    //--------------------------------------------------------------------------------------------------------------\n\
+    //--------------------------------------------------------------------------------------------------------------\n\
+\n\
+    // airPressure_L.************************************************************************\n\
+    // calculate the subTexCoord to check boundary conditions.***\n\
+    vec2 subTexCoord_L = subTexCoord + vec2(-divSubX, 0.0);\n\
+    if(subTexCoord_L.x < 0.0)\n\
+    {\n\
+        // is out of simulation boundary.***\n\
+        airPressure_LBD.x = 0.0;\n\
+    }\n\
+    else\n\
+    {\n\
+        // calculate the mosaicTexCoord of the subTexCoord_L:\n\
+        vec2 mosaicTexCoord_L = subTexCoord_to_texCoord(subTexCoord_L, col_int, row_int);\n\
+        airPressure_LBD.x = getAirPressure_inMosaicTexture(mosaicTexCoord_L);\n\
+    }\n\
+\n\
+    // airPressure_B.************************************************************************\n\
+    // calculate the subTexCoord to check boundary conditions.***\n\
+    vec2 subTexCoord_B = subTexCoord + vec2(0.0, -divSubY);\n\
+    if(subTexCoord_B.y < 0.0)\n\
+    {\n\
+        // is out of simulation boundary.***\n\
+        airPressure_LBD.y = 0.0;\n\
+    }\n\
+    else\n\
+    {\n\
+        // calculate the mosaicTexCoord of the subTexCoord_B:\n\
+        vec2 mosaicTexCoord_B = subTexCoord_to_texCoord(subTexCoord_B, col_int, row_int);\n\
+        airPressure_LBD.y = getAirPressure_inMosaicTexture(mosaicTexCoord_B);\n\
+    }\n\
+\n\
+    // airPressure_D.************************************************************************\n\
+    // To calculate the airPressure_D, must know the UP_subTexrure (PREV subTexure).***\n\
+    // But, if the current subTexture is in left_down_corner, then must use the \"auxMosaicTex\".***\n\
+    // use the next subTexture.***\n\
+    int prev_col;\n\
+    int prev_row;\n\
+    if(getPrevSubTextureColRow(col_int, row_int, prev_col, prev_row))\n\
+    {\n\
+        // must recalcuate the mosaicTexCoord.***\n\
+        vec2 newMosaicTexCoord = subTexCoord_to_texCoord(subTexCoord, prev_col, prev_row);\n\
+        airPressure_LBD.z = getAirPressure_inMosaicTexture(newMosaicTexCoord); \n\
+    }\n\
+    else\n\
+    {\n\
+        // Is out of simulation boundary.***\n\
+        // Must use the \"auxMosaicTex\". This is a [4, 3] mosaic texture.***\n\
+        // tex_1 = next airPressureTex. this in [col 0, row 0] into \"auxMosaicTex\".***\n\
+        // Must calculate the texCoords of auxMosaicTex.***\n\
+\n\
+        float sRange_aux = 1.0 / 4.0;\n\
+        float tRange_aux = 1.0 / 3.0;\n\
+\n\
+        float col_aux = 0.0;\n\
+        float row_aux = 0.0;\n\
+\n\
+        float s = col_aux * sRange_aux + subTexCoord.x * sRange_aux;\n\
+        float t = row_aux * tRange_aux + subTexCoord.x * tRange_aux;\n\
+\n\
+        vec2 texCoord_auxMosaicTex = vec2(s, t);\n\
+        airPressure_RFU.z = getAirPressure_inAuxMosaicTexture(texCoord_auxMosaicTex);\n\
+    }\n\
+    //--------------------------------------------------------------------------------------------------------------\n\
+    //--------------------------------------------------------------------------------------------------------------\n\
+\n\
+    return airPressure_curr;\n\
+}\n\
+\n\
+void encodeFlux(in vec3 flux, inout vec3 flux_HIGH, inout vec3 flux_LOW)\n\
+{\n\
+    vec2 encoded_a_flux = encodeRG(flux.x);\n\
+    vec2 encoded_b_flux = encodeRG(flux.y);\n\
+    vec2 encoded_c_flux = encodeRG(flux.z);\n\
+\n\
+    flux_HIGH = vec3(encoded_a_flux.x, encoded_b_flux.x, encoded_c_flux.x);\n\
+    flux_LOW = vec3(encoded_a_flux.y, encoded_b_flux.y, encoded_c_flux.y);\n\
+}\n\
+\n\
+void getFlux(in vec2 texCoord, inout vec3 flux_RFU, inout vec3 flux_LBD)\n\
+{\n\
+    // This function returns Outing flux.***\n\
+    vec4 color4_RFU_HIGH = texture2D(flux_RFU_MosaicTex_HIGH, texCoord);\n\
+    vec4 color4_RFU_LOW = texture2D(flux_RFU_MosaicTex_LOW, texCoord);\n\
+    vec4 color4_LBD_HIGH = texture2D(flux_LBD_MosaicTex_HIGH, texCoord);\n\
+    vec4 color4_LBD_LOW = texture2D(flux_LBD_MosaicTex_LOW, texCoord);\n\
+\n\
+    // now, decode all fluxes.***\n\
+    flux_RFU.r = decodeRG(vec2(color4_RFU_HIGH.r, color4_RFU_LOW.r)) * u_maxFlux; // flux_R.\n\
+    flux_RFU.g = decodeRG(vec2(color4_RFU_HIGH.g, color4_RFU_LOW.g)) * u_maxFlux; // flux_F.\n\
+    flux_RFU.b = decodeRG(vec2(color4_RFU_HIGH.b, color4_RFU_LOW.b)) * u_maxFlux; // flux_U.\n\
+\n\
+    flux_LBD.r = decodeRG(vec2(color4_LBD_HIGH.r, color4_LBD_LOW.r)) * u_maxFlux; // flux_L.\n\
+    flux_LBD.g = decodeRG(vec2(color4_LBD_HIGH.g, color4_LBD_LOW.g)) * u_maxFlux; // flux_B.\n\
+    flux_LBD.b = decodeRG(vec2(color4_LBD_HIGH.b, color4_LBD_LOW.b)) * u_maxFlux; // flux_D.\n\
+}\n\
+\n\
+float getVoxelSpaceValue(in vec2 texCoord)\n\
+{\n\
+    // The scene voxelMatrix is into flux_RFU_MosaicTex_HIGH, in alpha channel.***\n\
+    vec4 color4_RFU_HIGH = texture2D(flux_RFU_MosaicTex_HIGH, texCoord);\n\
+    return color4_RFU_HIGH.a;\n\
+}\n\
+\n\
+void main()\n\
+{\n\
+    // The objective is to determine the outFlux of the current fragment.***\n\
+    // There are 6 directions outFluxing (R, F, U, L, B, D) = (x, y, z, -x, -y, -z) = (Right, Front, Up, Left, Back, Down)\n\
+    //-----------------------------------------------------------------------\n\
+    float voxelSpaceValue = getVoxelSpaceValue(v_tex_pos);\n\
+    if(voxelSpaceValue > 0.0)\n\
+    {\n\
+        // This is a solid space, so, do nothing. All values are zero.***\n\
+        // TODO : \n\
+    }\n\
+\n\
+    // Determine the airPressure of the 6 fragment that is around of current fragment.***\n\
+    vec3 airPressure_RFU;\n\
+    vec3 airPressure_LBD;\n\
+    float airPressure_curr = getAirPressure(v_tex_pos, airPressure_RFU, airPressure_LBD);\n\
+\n\
+    vec3 currFlux_RFU;\n\
+    vec3 currFlux_LBD;\n\
+    getFlux(v_tex_pos, currFlux_RFU, currFlux_LBD);\n\
+\n\
+    // Calculate deltaPressure.***\n\
+    // Check the pressure difference with the neighbor voxels.***\n\
+    float R_out = airPressure_curr - airPressure_RFU.x;\n\
+    float F_out = airPressure_curr - airPressure_RFU.y;\n\
+    float U_out = airPressure_curr - airPressure_RFU.z;\n\
+    float L_out = airPressure_curr - airPressure_LBD.x;\n\
+    float B_out = airPressure_curr - airPressure_LBD.y;\n\
+    float D_out = airPressure_curr - airPressure_LBD.z;\n\
+\n\
+    vec3 deltaP_RFU = vec3(R_out, F_out, U_out);\n\
+    vec3 deltaP_LBD = vec3(L_out, B_out, D_out);\n\
+\n\
+    // At 101.325 kPa (abs) and 15 °C, air has a density of approximately 1.225 kg/m3\n\
+    float airDensity = 1.225; // provisionally.***\n\
+    vec3 airAccel_RFU = vec3(R_out / (airDensity * u_voxelSizeMeters.x), F_out / (airDensity * u_voxelSizeMeters.y), U_out / (airDensity * u_voxelSizeMeters.z));\n\
+    vec3 airAccel_LBD = vec3(L_out / (airDensity * u_voxelSizeMeters.x), B_out / (airDensity * u_voxelSizeMeters.y), D_out / (airDensity * u_voxelSizeMeters.z));\n\
+\n\
+    // calculate the new flux.\n\
+    //float pipeArea = 2.0 * u_voxelSizeMeters.x * u_voxelSizeMeters.y * u_voxelSizeMeters.z;\n\
+    float pipeArea = u_voxelSizeMeters.x * u_voxelSizeMeters.y;\n\
+    vec3 newFlux_RFU = u_timestep * pipeArea * airAccel_RFU;\n\
+    vec3 newFlux_LBD = u_timestep * pipeArea * airAccel_LBD;\n\
+\n\
+    // total outFlux.\n\
+    float cushionFactor = 0.9999; // esmorteiment.\n\
+    float output_R = max(0.0, currFlux_RFU.x + newFlux_RFU.x) * cushionFactor;\n\
+    float output_F = max(0.0, currFlux_RFU.y + newFlux_RFU.y) * cushionFactor;\n\
+    float output_U = max(0.0, currFlux_RFU.z + newFlux_RFU.z) * cushionFactor;\n\
+\n\
+    float output_L = max(0.0, currFlux_LBD.x + newFlux_LBD.x) * cushionFactor;\n\
+    float output_B = max(0.0, currFlux_LBD.y + newFlux_LBD.y) * cushionFactor;\n\
+    float output_D = max(0.0, currFlux_LBD.z + newFlux_LBD.z) * cushionFactor;\n\
+\n\
+    // calculate vOut & currVolum.\n\
+    float vOut = u_timestep * (output_R + output_F + output_U + output_L + output_B + output_D); \n\
+    float currAirVol = airPressure_curr * pipeArea;\n\
+\n\
+    if(vOut > currAirVol)\n\
+    {\n\
+        //rescale outflow readFlux so that outflow don't exceed current water volume\n\
+        float factor = (currAirVol / vOut);\n\
+        //output_R *= factor;\n\
+        //output_F *= factor;\n\
+        //output_U *= factor;\n\
+\n\
+        //output_L *= factor;\n\
+        //output_B *= factor;\n\
+        //output_D *= factor;\n\
+    }\n\
+\n\
+    vec3 outFlux_RFU = vec3(output_R, output_F, output_U) / u_airMaxPressure;\n\
+    vec3 outFlux_LBD = vec3(output_L, output_B, output_D) / u_airMaxPressure;\n\
+\n\
+    vec3 encodedOutFlux_RFU_HIGH;\n\
+    vec3 encodedOutFlux_RFU_LOW;\n\
+    vec3 encodedOutFlux_LBD_HIGH;\n\
+    vec3 encodedOutFlux_LBD_LOW;\n\
+    encodeFlux(outFlux_RFU, encodedOutFlux_RFU_HIGH, encodedOutFlux_RFU_LOW);\n\
+    encodeFlux(outFlux_LBD, encodedOutFlux_LBD_HIGH, encodedOutFlux_LBD_LOW);\n\
+\n\
+\n\
+    gl_FragData[0] = vec4(encodedOutFlux_RFU_HIGH, voxelSpaceValue);  // RFU flux high.\n\
+\n\
+    #ifdef USE_MULTI_RENDER_TARGET\n\
+        gl_FragData[1] = vec4(encodedOutFlux_RFU_LOW, voxelSpaceValue); // RFU flux low.\n\
+        gl_FragData[2] = vec4(encodedOutFlux_LBD_HIGH, voxelSpaceValue);  // LBD flux high.\n\
+        gl_FragData[3] = vec4(encodedOutFlux_LBD_LOW, voxelSpaceValue);  // LBD flux low.\n\
+        gl_FragData[4] = vec4(abs(newFlux_RFU.r), abs(newFlux_RFU.g), abs(newFlux_RFU.b), 1.0);  // shader log.\n\
+    #endif\n\
+\n\
+}";
+ShaderSource.soundCalculatePressureFS = "//#version 300 es\n\
+\n\
+#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+\n\
+uniform sampler2D soundSourceTex_0;\n\
+uniform sampler2D soundSourceTex_1;\n\
+uniform sampler2D soundSourceTex_2;\n\
+uniform sampler2D soundSourceTex_3;\n\
+uniform sampler2D currAirPressureTex_0;\n\
+uniform sampler2D currAirPressureTex_1;\n\
+uniform sampler2D currAirPressureTex_2;\n\
+uniform sampler2D currAirPressureTex_3;\n\
+\n\
+uniform float u_airMaxPressure;\n\
+\n\
+varying vec2 v_tex_pos;\n\
+\n\
+vec4 packDepth( float v ) {\n\
+    vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+    enc = fract(enc);\n\
+    enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+    return enc;\n\
+}\n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+}\n\
+\n\
+vec4 getFinalAirPressureEncoded(vec4 encodedCurrAirPressure, vec4 encodedSoundSource)\n\
+{\n\
+    float decodedCurrAirPressure = unpackDepth(encodedCurrAirPressure) * u_airMaxPressure;\n\
+    float decodedSourceAirPressure = unpackDepth(encodedSoundSource) * u_airMaxPressure;\n\
+    float finalAirPressure = decodedSourceAirPressure; // init value.***\n\
+    if(finalAirPressure < decodedCurrAirPressure)\n\
+    {\n\
+        finalAirPressure = decodedCurrAirPressure;\n\
+    }\n\
+    vec4 finalAirPressureEncoded = packDepth(finalAirPressure / u_airMaxPressure);\n\
+\n\
+    return finalAirPressureEncoded;\n\
+}\n\
+\n\
+void main()\n\
+{\n\
+    // 1rst, take the water source.\n\
+    vec4 currAirPressure = texture2D(currAirPressureTex_0, v_tex_pos);\n\
+    vec4 soundSource = texture2D(soundSourceTex_0, v_tex_pos);\n\
+    gl_FragData[0] = getFinalAirPressureEncoded(currAirPressure, soundSource);\n\
+\n\
+    #ifdef USE_MULTI_RENDER_TARGET\n\
+        currAirPressure = texture2D(currAirPressureTex_1, v_tex_pos);\n\
+        soundSource = texture2D(soundSourceTex_1, v_tex_pos);\n\
+        gl_FragData[1] = getFinalAirPressureEncoded(currAirPressure, soundSource);\n\
+\n\
+        currAirPressure = texture2D(currAirPressureTex_2, v_tex_pos);\n\
+        soundSource = texture2D(soundSourceTex_2, v_tex_pos);\n\
+        gl_FragData[2] = getFinalAirPressureEncoded(currAirPressure, soundSource);\n\
+\n\
+        currAirPressure = texture2D(currAirPressureTex_3, v_tex_pos);\n\
+        soundSource = texture2D(soundSourceTex_3, v_tex_pos);\n\
+        gl_FragData[3] = getFinalAirPressureEncoded(currAirPressure, soundSource);\n\
+    #endif\n\
+}";
+ShaderSource.soundCalculateVelocityFS = "#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+uniform sampler2D airPressureMosaicTex;\n\
+uniform sampler2D flux_RFU_MosaicTex_HIGH; // Inside here, there are the voxelization of the scene (in alpha channel).***\n\
+uniform sampler2D flux_RFU_MosaicTex_LOW;\n\
+uniform sampler2D flux_LBD_MosaicTex_HIGH;\n\
+uniform sampler2D flux_LBD_MosaicTex_LOW;\n\
+uniform sampler2D auxMosaicTex; // here, contains :\n\
+	// tex_0 = prev airPressureTex\n\
+	// tex_1 = next airPressureTex\n\
+	// tex_2 = prev flux_RFU_HIGH\n\
+	// tex_3 = next flux_RFU_HIGH\n\
+	// tex_4 = prev flux_RFU_LOW\n\
+	// tex_5 = next flux_RFU_LOW\n\
+	// tex_6 = prev flux_LBD_HIGH\n\
+	// tex_7 = next flux_LBD_HIGH\n\
+	// tex_8 = prev flux_LBD_LOW\n\
+	// tex_9 = next flux_LBD_LOW\n\
+\n\
+	//  \n\
+	//      +-----------+-----------+-----------+-----------+\n\
+	//      |           |           |           |           |     \n\
+	//      |   tex_8   |   tex_9   |  nothing  |  nothing  |\n\
+	//      |           |           |           |           | \n\
+	//      +-----------+-----------+-----------+-----------+\n\
+	//      |           |           |           |           | \n\
+	//      |   tex_4   |   tex_5   |   tex_6   |   tex_7   |\n\
+	//      |           |           |           |           |\n\
+	//      +-----------+-----------+-----------+-----------+\n\
+	//      |           |           |           |           |    \n\
+	//      |   tex_0   |   tex_1   |   tex_2   |   tex_3   | \n\
+	//      |           |           |           |           |\n\
+	//      +-----------+-----------+-----------+-----------+\n\
+\n\
+uniform int u_texSize[3]; // The original texture3D size.***\n\
+uniform int u_mosaicTexSize[3]; // The mosaic texture size.***\n\
+uniform int u_mosaicSize[3]; // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***\n\
+uniform int u_lowestMosaicSliceIndex;\n\
+\n\
+varying vec2 v_tex_pos;\n\
+\n\
+uniform float u_timestep;\n\
+\n\
+//uniform vec2 u_tileSize; // tile size in meters.\n\
+uniform vec3 u_voxelSizeMeters;\n\
+uniform float u_airMaxPressure;\n\
+uniform float u_maxFlux;\n\
+uniform float u_maxVelocity;\n\
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////\n\
+\n\
+\n\
+vec3 encodeVelocity(in vec3 vel)\n\
+{\n\
+	return vel*0.5 + 0.5;\n\
+}\n\
+\n\
+vec3 decodeVelocity(in vec3 encodedVel)\n\
+{\n\
+	return vec3(encodedVel * 2.0 - 1.0);\n\
+}\n\
+\n\
+float decodeRG(in vec2 waterColorRG)\n\
+{\n\
+    // https://titanwolf.org/Network/Articles/Article?AID=666e7443-0511-4210-b39c-db0bb6738246#gsc.tab=0\n\
+    return dot(waterColorRG, vec2(1.0, 1.0 / 255.0));\n\
+}\n\
+\n\
+vec2 encodeRG(in float wh)\n\
+{\n\
+    float encodedBit = 1.0/255.0;\n\
+    vec2 enc = vec2(1.0, 255.0) * wh;\n\
+    enc = fract(enc);\n\
+    enc.x -= enc.y * encodedBit;\n\
+    return enc; // R = HIGH, G = LOW.***\n\
+}\n\
+\n\
+vec4 packDepth( float v ) {\n\
+  vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+  enc = fract(enc);\n\
+  enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+  return enc;\n\
+}\n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+}\n\
+\n\
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////\n\
+\n\
+vec2 subTexCoord_to_texCoord(in vec2 subTexCoord, in int col, in int row)\n\
+{\n\
+    // given col, row & subTexCoord, this function returns the texCoord into mosaic texture.***\n\
+    // The \"subTexCoord\" is the texCoord of the subTexture[col, row].***\n\
+    // u_mosaicSize =  The mosaic composition (xTexCount X yTexCount X zSlicesCount).***\n\
+    float sRange = 1.0 / float(u_mosaicSize[0]);\n\
+    float tRange = 1.0 / float(u_mosaicSize[1]);\n\
+\n\
+    float s = float(col) * sRange + subTexCoord.x * sRange;\n\
+    float t = float(row) * tRange + subTexCoord.x * tRange;\n\
+\n\
+    vec2 resultTexCoord = vec2(s, t);\n\
+    return resultTexCoord;\n\
+}\n\
+\n\
+vec2 getColRow_and_subTexCoord(in vec2 texCoord, inout vec2 subTexCoord)\n\
+{\n\
+    // The \"subTexCoord\" is the texCoord of the subTexture[col, row].***\n\
+    // u_mosaicSize =  The mosaic composition (xTexCount X yTexCount X zSlicesCount).***\n\
+    float sRange = 1.0 / float(u_mosaicSize[0]);\n\
+    float tRange = 1.0 / float(u_mosaicSize[1]);\n\
+\n\
+    // Determine the [col, row] of the mosaic.***\n\
+    vec2 resultColRow = vec2(floor(texCoord.x / sRange), floor(texCoord.y / tRange));\n\
+\n\
+    // determine the subTexCoord.***\n\
+    float col_mod = texCoord.x - resultColRow.x * sRange;\n\
+    float row_mod = texCoord.y - resultColRow.y * tRange;\n\
+    float s = col_mod / sRange;\n\
+    float t = row_mod / tRange;\n\
+    subTexCoord = vec2(s, t);\n\
+\n\
+    return resultColRow;\n\
+}\n\
+\n\
+float getAirPressure_inMosaicTexture(in vec2 texCoord)\n\
+{\n\
+    vec4 color4 = texture2D(airPressureMosaicTex, texCoord);\n\
+    float decoded = unpackDepth(color4); // 32bit.\n\
+    float airPressure = decoded * u_airMaxPressure;\n\
+\n\
+    return airPressure;\n\
+}\n\
+\n\
+float getAirPressure_inAuxMosaicTexture(in vec2 texCoord)\n\
+{\n\
+    vec4 color4 = texture2D(auxMosaicTex, texCoord);\n\
+    float decoded = unpackDepth(color4); // 32bit.\n\
+    float airPressure = decoded * u_airMaxPressure;\n\
+\n\
+    return airPressure;\n\
+}\n\
+\n\
+bool getPrevSubTextureColRow(in int col, in int row, inout int prev_col, inout int prev_row)\n\
+{\n\
+    // u_mosaicSize[3]; // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***\n\
+    prev_row = row;\n\
+    if(col == 0)\n\
+    {\n\
+        prev_col = u_mosaicSize[0] - 1;\n\
+        prev_row = row - 1;\n\
+\n\
+        // now, check if the prev_row is inside of the boundary.***\n\
+        if(prev_row < 0)\n\
+        {\n\
+            // we are outside of the tex3d boundary.***\n\
+            return false;\n\
+        }\n\
+    }\n\
+    else\n\
+    {\n\
+        prev_col = col - 1;\n\
+    }\n\
+    return true;\n\
+}\n\
+\n\
+bool getNextSubTextureColRow(in int col, in int row, inout int next_col, inout int next_row)\n\
+{\n\
+    // u_mosaicSize[3]; // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***\n\
+    next_row = row;\n\
+    if(col == u_mosaicSize[0] - 1)\n\
+    {\n\
+        next_col = 0;\n\
+        next_row = row + 1;\n\
+\n\
+        // now, check if the next_row is inside of the boundary.***\n\
+        if(next_row > u_mosaicSize[1] - 1)\n\
+        {\n\
+            // we are outside of the tex3d boundary.***\n\
+            return false;\n\
+        }\n\
+    }\n\
+    else\n\
+    {\n\
+        next_col = col + 1;\n\
+    }\n\
+    return true;\n\
+}\n\
+\n\
+float getAirPressure(in vec2 texCoord, inout vec3 airPressure_RFU, inout vec3 airPressure_LBD)\n\
+{\n\
+    // Note : this function returns the airPressure of all 6 Neighbor too.***\n\
+    vec2 subTexCoord;\n\
+    vec2 colRow = getColRow_and_subTexCoord(texCoord, subTexCoord);\n\
+\n\
+    float col = colRow.x;\n\
+    float row = colRow.y;\n\
+    int col_int = int(col);\n\
+    int row_int = int(row);\n\
+\n\
+    float divSubX = 1.0 / float(u_texSize[0]); // divX for subTexture.***\n\
+    float divSubY = 1.0 / float(u_texSize[1]); // divX for subTexture.***\n\
+\n\
+    // airPressure_curr.*********************************************************************\n\
+    float airPressure_curr = getAirPressure_inMosaicTexture(texCoord);\n\
+\n\
+    // airPressure_R.************************************************************************\n\
+    // calculate the subTexCoord to check boundary conditions.***\n\
+    vec2 subTexCoord_R = subTexCoord + vec2(divSubX, 0.0);\n\
+    if(subTexCoord_R.x > 1.0)\n\
+    {\n\
+        // is out of simulation boundary.***\n\
+        airPressure_RFU.x = 0.0;\n\
+    }\n\
+    else\n\
+    {\n\
+        // calculate the mosaicTexCoord of the subTexCoord_R:\n\
+        vec2 mosaicTexCoord_R = subTexCoord_to_texCoord(subTexCoord_R, col_int, row_int);\n\
+        airPressure_RFU.x = getAirPressure_inMosaicTexture(mosaicTexCoord_R);\n\
+    }\n\
+\n\
+    // airPressure_F.************************************************************************\n\
+    // calculate the subTexCoord to check boundary conditions.***\n\
+    vec2 subTexCoord_F = subTexCoord + vec2(0.0, divSubY);\n\
+    if(subTexCoord_F.y > 1.0)\n\
+    {\n\
+        // is out of simulation boundary.***\n\
+        airPressure_RFU.y = 0.0;\n\
+    }\n\
+    else\n\
+    {\n\
+        // calculate the mosaicTexCoord of the subTexCoord_F:\n\
+        vec2 mosaicTexCoord_F = subTexCoord_to_texCoord(subTexCoord_F, col_int, row_int);\n\
+        airPressure_RFU.y = getAirPressure_inMosaicTexture(mosaicTexCoord_F);\n\
+    }\n\
+\n\
+    // airPressure_U.************************************************************************\n\
+    // To calculate the airPressure_U, must know the UP_subTexrure (NEXT subTexure).***\n\
+    // But, if the current subTexture is in right_up_corner, then must use the \"auxMosaicTex\".***\n\
+    // use the next subTexture.***\n\
+    int next_col;\n\
+    int next_row;\n\
+    if(getNextSubTextureColRow(col_int, row_int, next_col, next_row))\n\
+    {\n\
+        // must recalcuate the mosaicTexCoord.***\n\
+        vec2 newMosaicTexCoord = subTexCoord_to_texCoord(subTexCoord, next_col, next_row);\n\
+        airPressure_RFU.z = getAirPressure_inMosaicTexture(newMosaicTexCoord); \n\
+    }\n\
+    else\n\
+    {\n\
+        // Is out of simulation boundary.***\n\
+        // Must use the \"auxMosaicTex\". This is a [4, 3] mosaic texture.***\n\
+        // tex_1 = next airPressureTex. this in [col 1, row 0] into \"auxMosaicTex\".***\n\
+        // Must calculate the texCoords of auxMosaicTex.***\n\
+\n\
+        float sRange_aux = 1.0 / 4.0;\n\
+        float tRange_aux = 1.0 / 3.0;\n\
+\n\
+        float col_aux = 1.0;\n\
+        float row_aux = 0.0;\n\
+\n\
+        float s = col_aux * sRange_aux + subTexCoord.x * sRange_aux;\n\
+        float t = row_aux * tRange_aux + subTexCoord.x * tRange_aux;\n\
+\n\
+        vec2 texCoord_auxMosaicTex = vec2(s, t);\n\
+        airPressure_RFU.z = getAirPressure_inAuxMosaicTexture(texCoord_auxMosaicTex);\n\
+    }\n\
+    //--------------------------------------------------------------------------------------------------------------\n\
+    //--------------------------------------------------------------------------------------------------------------\n\
+\n\
+    // airPressure_L.************************************************************************\n\
+    // calculate the subTexCoord to check boundary conditions.***\n\
+    vec2 subTexCoord_L = subTexCoord + vec2(-divSubX, 0.0);\n\
+    if(subTexCoord_L.x < 0.0)\n\
+    {\n\
+        // is out of simulation boundary.***\n\
+        airPressure_LBD.x = 0.0;\n\
+    }\n\
+    else\n\
+    {\n\
+        // calculate the mosaicTexCoord of the subTexCoord_L:\n\
+        vec2 mosaicTexCoord_L = subTexCoord_to_texCoord(subTexCoord_L, col_int, row_int);\n\
+        airPressure_LBD.x = getAirPressure_inMosaicTexture(mosaicTexCoord_L);\n\
+    }\n\
+\n\
+    // airPressure_B.************************************************************************\n\
+    // calculate the subTexCoord to check boundary conditions.***\n\
+    vec2 subTexCoord_B = subTexCoord + vec2(0.0, -divSubY);\n\
+    if(subTexCoord_B.y < 0.0)\n\
+    {\n\
+        // is out of simulation boundary.***\n\
+        airPressure_LBD.y = 0.0;\n\
+    }\n\
+    else\n\
+    {\n\
+        // calculate the mosaicTexCoord of the subTexCoord_B:\n\
+        vec2 mosaicTexCoord_B = subTexCoord_to_texCoord(subTexCoord_B, col_int, row_int);\n\
+        airPressure_LBD.y = getAirPressure_inMosaicTexture(mosaicTexCoord_B);\n\
+    }\n\
+\n\
+    // airPressure_D.************************************************************************\n\
+    // To calculate the airPressure_D, must know the UP_subTexrure (PREV subTexure).***\n\
+    // But, if the current subTexture is in left_down_corner, then must use the \"auxMosaicTex\".***\n\
+    // use the next subTexture.***\n\
+    int prev_col;\n\
+    int prev_row;\n\
+    if(getPrevSubTextureColRow(col_int, row_int, prev_col, prev_row))\n\
+    {\n\
+        // must recalcuate the mosaicTexCoord.***\n\
+        vec2 newMosaicTexCoord = subTexCoord_to_texCoord(subTexCoord, prev_col, prev_row);\n\
+        airPressure_LBD.z = getAirPressure_inMosaicTexture(newMosaicTexCoord); \n\
+    }\n\
+    else\n\
+    {\n\
+        // Is out of simulation boundary.***\n\
+        // Must use the \"auxMosaicTex\". This is a [4, 3] mosaic texture.***\n\
+        // tex_1 = next airPressureTex. this in [col 0, row 0] into \"auxMosaicTex\".***\n\
+        // Must calculate the texCoords of auxMosaicTex.***\n\
+\n\
+        float sRange_aux = 1.0 / 4.0;\n\
+        float tRange_aux = 1.0 / 3.0;\n\
+\n\
+        float col_aux = 0.0;\n\
+        float row_aux = 0.0;\n\
+\n\
+        float s = col_aux * sRange_aux + subTexCoord.x * sRange_aux;\n\
+        float t = row_aux * tRange_aux + subTexCoord.x * tRange_aux;\n\
+\n\
+        vec2 texCoord_auxMosaicTex = vec2(s, t);\n\
+        airPressure_RFU.z = getAirPressure_inAuxMosaicTexture(texCoord_auxMosaicTex);\n\
+    }\n\
+    //--------------------------------------------------------------------------------------------------------------\n\
+    //--------------------------------------------------------------------------------------------------------------\n\
+\n\
+    return airPressure_curr;\n\
+}\n\
+\n\
+void encodeFlux(in vec3 flux, inout vec3 flux_HIGH, inout vec3 flux_LOW)\n\
+{\n\
+    vec2 encoded_a_flux = encodeRG(flux.x);\n\
+    vec2 encoded_b_flux = encodeRG(flux.x);\n\
+    vec2 encoded_c_flux = encodeRG(flux.x);\n\
+\n\
+    flux_HIGH = vec3(encoded_a_flux.x, encoded_b_flux.x, encoded_c_flux.x);\n\
+    flux_LOW = vec3(encoded_a_flux.y, encoded_b_flux.y, encoded_c_flux.y);\n\
+}\n\
+\n\
+void getFlux(in vec2 texCoord, inout vec3 flux_RFU, inout vec3 flux_LBD)\n\
+{\n\
+    // This function returns Outing flux.***\n\
+    vec4 color4_RFU_HIGH = texture2D(flux_RFU_MosaicTex_HIGH, texCoord);\n\
+    vec4 color4_RFU_LOW = texture2D(flux_RFU_MosaicTex_LOW, texCoord);\n\
+    vec4 color4_LBD_HIGH = texture2D(flux_LBD_MosaicTex_HIGH, texCoord);\n\
+    vec4 color4_LBD_LOW = texture2D(flux_LBD_MosaicTex_LOW, texCoord);\n\
+\n\
+    // now, decode all fluxes.***\n\
+    flux_RFU.r = decodeRG(vec2(color4_RFU_HIGH.r, color4_RFU_LOW.r)) * u_maxFlux; // flux_R.\n\
+    flux_RFU.g = decodeRG(vec2(color4_RFU_HIGH.g, color4_RFU_LOW.g)) * u_maxFlux; // flux_F.\n\
+    flux_RFU.b = decodeRG(vec2(color4_RFU_HIGH.b, color4_RFU_LOW.b)) * u_maxFlux; // flux_U.\n\
+\n\
+    flux_LBD.r = decodeRG(vec2(color4_LBD_HIGH.r, color4_LBD_LOW.r)) * u_maxFlux; // flux_L.\n\
+    flux_LBD.g = decodeRG(vec2(color4_LBD_HIGH.g, color4_LBD_LOW.g)) * u_maxFlux; // flux_B.\n\
+    flux_LBD.b = decodeRG(vec2(color4_LBD_HIGH.b, color4_LBD_LOW.b)) * u_maxFlux; // flux_D.\n\
+}\n\
+\n\
+void getFlux_ofAll6Neighbor(in vec2 texCoord, inout vec3 flux_neighbor_R_RFU, inout vec3 flux_neighbor_R_LBD, \n\
+                                                inout vec3 flux_neighbor_F_RFU, inout vec3 flux_neighbor_F_LBD, \n\
+                                                inout vec3 flux_neighbor_U_RFU, inout vec3 flux_neighbor_U_LBD,\n\
+\n\
+                                                inout vec3 flux_neighbor_L_RFU, inout vec3 flux_neighbor_L_LBD, \n\
+                                                inout vec3 flux_neighbor_B_RFU, inout vec3 flux_neighbor_B_LBD, \n\
+                                                inout vec3 flux_neighbor_D_RFU, inout vec3 flux_neighbor_D_LBD)\n\
+{\n\
+    // this function returns the flux of all 6 neighbor pixels.****\n\
+    vec2 subTexCoord;\n\
+    vec2 colRow = getColRow_and_subTexCoord(texCoord, subTexCoord);\n\
+\n\
+    float col = colRow.x;\n\
+    float row = colRow.y;\n\
+    int col_int = int(col);\n\
+    int row_int = int(row);\n\
+\n\
+    float divSubX = 1.0 / float(u_texSize[0]); // divX for subTexture.***\n\
+    float divSubY = 1.0 / float(u_texSize[1]); // divX for subTexture.***\n\
+    //----------------------------------------------------------------------------------\n\
+\n\
+    // flux_R. This is the flux of the right pixel.***********************************\n\
+    // calculate the subTexCoord to check boundary conditions.***\n\
+    vec2 subTexCoord_R = subTexCoord + vec2(divSubX, 0.0);\n\
+    if(subTexCoord_R.x > 1.0)\n\
+    {\n\
+        // is out of simulation boundary.***\n\
+        flux_neighbor_R_RFU = vec3(0.0);\n\
+        flux_neighbor_R_LBD = vec3(0.0);\n\
+    }\n\
+    else\n\
+    {\n\
+        // calculate the mosaicTexCoord of the subTexCoord_R:\n\
+        vec2 mosaicTexCoord_R = subTexCoord_to_texCoord(subTexCoord_R, col_int, row_int);\n\
+        getFlux(mosaicTexCoord_R, flux_neighbor_R_RFU, flux_neighbor_R_LBD);\n\
+    }\n\
+\n\
+    // flux_F. This is the flux of the front pixel.************************************\n\
+    // calculate the subTexCoord to check boundary conditions.***\n\
+    vec2 subTexCoord_F = subTexCoord + vec2(0.0, divSubY);\n\
+    if(subTexCoord_F.y > 1.0)\n\
+    {\n\
+        // is out of simulation boundary.***\n\
+        flux_neighbor_F_RFU = vec3(0.0);\n\
+        flux_neighbor_F_LBD = vec3(0.0);\n\
+    }\n\
+    else\n\
+    {\n\
+        // calculate the mosaicTexCoord of the subTexCoord_F:\n\
+        vec2 mosaicTexCoord_F = subTexCoord_to_texCoord(subTexCoord_F, col_int, row_int);\n\
+        getFlux(mosaicTexCoord_F, flux_neighbor_F_RFU, flux_neighbor_F_LBD);\n\
+    }\n\
+\n\
+    // flux_U. This is the flux of the up pixel.****************************************\n\
+    // To calculate the flux_U, must know the UP_subTexrure (NEXT subTexure).***\n\
+    // But, if the current subTexture is in right_up_corner, then must use the \"auxMosaicTex\".***\n\
+    // use the next subTexture.***\n\
+    int next_col;\n\
+    int next_row;\n\
+    if(getNextSubTextureColRow(col_int, row_int, next_col, next_row))\n\
+    {\n\
+        // must recalcuate the mosaicTexCoord.***\n\
+        vec2 newMosaicTexCoord = subTexCoord_to_texCoord(subTexCoord, next_col, next_row);\n\
+        getFlux(newMosaicTexCoord, flux_neighbor_U_RFU, flux_neighbor_U_LBD);\n\
+    }\n\
+    else\n\
+    {\n\
+        	// tex_0 = prev airPressureTex\n\
+            // tex_1 = next airPressureTex\n\
+            // tex_2 = prev flux_RFU_HIGH\n\
+            // tex_3 = next flux_RFU_HIGH\n\
+            // tex_4 = prev flux_RFU_LOW\n\
+            // tex_5 = next flux_RFU_LOW\n\
+            // tex_6 = prev flux_LBD_HIGH\n\
+            // tex_7 = next flux_LBD_HIGH\n\
+            // tex_8 = prev flux_LBD_LOW\n\
+            // tex_9 = next flux_LBD_LOW\n\
+\n\
+            //  \n\
+            //      +-----------+-----------+-----------+-----------+\n\
+            //      |           |           |           |           |     \n\
+            //      |   tex_8   |   tex_9   |  nothing  |  nothing  |\n\
+            //      |           |           |           |           | \n\
+            //      +-----------+-----------+-----------+-----------+\n\
+            //      |           |           |           |           | \n\
+            //      |   tex_4   |   tex_5   |   tex_6   |   tex_7   |\n\
+            //      |           |           |           |           |\n\
+            //      +-----------+-----------+-----------+-----------+\n\
+            //      |           |           |           |           |    \n\
+            //      |   tex_0   |   tex_1   |   tex_2   |   tex_3   | \n\
+            //      |           |           |           |           |\n\
+            //      +-----------+-----------+-----------+-----------+\n\
+\n\
+        // Is out of simulation boundary.***\n\
+        // Must use the \"auxMosaicTex\". This is a [4, 3] mosaic texture.***\n\
+        // tex_3 = next flux_RFU_HIGH. this in [col 3, row 0] into \"auxMosaicTex\".***\n\
+        // tex_5 = next flux_RFU_LOW. this in [col 1, row 1] into \"auxMosaicTex\".***\n\
+        // tex_7 = next flux_LBD_HIGH. this in [col 3, row 1] into \"auxMosaicTex\".***\n\
+        // tex_9 = next flux_LBD_LOW. this in [col 1, row 2] into \"auxMosaicTex\".***\n\
+        // Must calculate the texCoords of auxMosaicTex.***\n\
+\n\
+        float sRange_aux = 1.0 / 4.0;\n\
+        float tRange_aux = 1.0 / 3.0;\n\
+\n\
+        // tex_3 = next flux_RFU_HIGH.***\n\
+        float col_aux = 3.0;\n\
+        float row_aux = 0.0;\n\
+\n\
+        float s = col_aux * sRange_aux + subTexCoord.x * sRange_aux;\n\
+        float t = row_aux * tRange_aux + subTexCoord.x * tRange_aux;\n\
+\n\
+        vec2 texCoord_auxMosaicTex = vec2(s, t);\n\
+        vec4 color4_RFU_HIGH = texture2D(auxMosaicTex, texCoord_auxMosaicTex);\n\
+\n\
+        // tex_5 = next flux_RFU_LOW.***\n\
+        col_aux = 1.0;\n\
+        row_aux = 1.0;\n\
+\n\
+        s = col_aux * sRange_aux + subTexCoord.x * sRange_aux;\n\
+        t = row_aux * tRange_aux + subTexCoord.x * tRange_aux;\n\
+\n\
+        texCoord_auxMosaicTex = vec2(s, t);\n\
+        vec4 color4_RFU_LOW = texture2D(auxMosaicTex, texCoord_auxMosaicTex);\n\
+        \n\
+        // tex_7 = next flux_LBD_HIGH.***\n\
+        col_aux = 3.0;\n\
+        row_aux = 1.0;\n\
+\n\
+        s = col_aux * sRange_aux + subTexCoord.x * sRange_aux;\n\
+        t = row_aux * tRange_aux + subTexCoord.x * tRange_aux;\n\
+\n\
+        texCoord_auxMosaicTex = vec2(s, t);\n\
+        vec4 color4_LBD_HIGH = texture2D(auxMosaicTex, texCoord_auxMosaicTex);\n\
+\n\
+        // tex_9 = next flux_LBD_LOW.***\n\
+        col_aux = 1.0;\n\
+        row_aux = 2.0;\n\
+\n\
+        s = col_aux * sRange_aux + subTexCoord.x * sRange_aux;\n\
+        t = row_aux * tRange_aux + subTexCoord.x * tRange_aux;\n\
+\n\
+        texCoord_auxMosaicTex = vec2(s, t);\n\
+        vec4 color4_LBD_LOW = texture2D(auxMosaicTex, texCoord_auxMosaicTex);\n\
+\n\
+        // Now, with the 4 color4, decode the flux.***\n\
+        flux_neighbor_U_RFU.r = decodeRG(vec2(color4_RFU_HIGH.r, color4_RFU_LOW.r)) * u_maxFlux; // flux_R.\n\
+        flux_neighbor_U_RFU.g = decodeRG(vec2(color4_RFU_HIGH.g, color4_RFU_LOW.g)) * u_maxFlux; // flux_F.\n\
+        flux_neighbor_U_RFU.b = decodeRG(vec2(color4_RFU_HIGH.b, color4_RFU_LOW.b)) * u_maxFlux; // flux_U.\n\
+\n\
+        flux_neighbor_U_LBD.r = decodeRG(vec2(color4_LBD_HIGH.r, color4_LBD_LOW.r)) * u_maxFlux; // flux_L.\n\
+        flux_neighbor_U_LBD.g = decodeRG(vec2(color4_LBD_HIGH.g, color4_LBD_LOW.g)) * u_maxFlux; // flux_B.\n\
+        flux_neighbor_U_LBD.b = decodeRG(vec2(color4_LBD_HIGH.b, color4_LBD_LOW.b)) * u_maxFlux; // flux_D.\n\
+    }\n\
+    //--------------------------------------------------------------------------------------------------------------\n\
+    //--------------------------------------------------------------------------------------------------------------\n\
+\n\
+    // flux_L. This is the flux of the left pixel**********************************\n\
+    // calculate the subTexCoord to check boundary conditions.***\n\
+    vec2 subTexCoord_L = subTexCoord + vec2(-divSubX, 0.0);\n\
+    if(subTexCoord_L.x < 0.0)\n\
+    {\n\
+        // is out of simulation boundary.***\n\
+        flux_neighbor_L_RFU = vec3(0.0);\n\
+        flux_neighbor_L_LBD = vec3(0.0);\n\
+    }\n\
+    else\n\
+    {\n\
+        // calculate the mosaicTexCoord of the subTexCoord_L:\n\
+        vec2 mosaicTexCoord_L = subTexCoord_to_texCoord(subTexCoord_L, col_int, row_int);\n\
+        getFlux(mosaicTexCoord_L, flux_neighbor_L_RFU, flux_neighbor_L_LBD);\n\
+    }\n\
+\n\
+    // flux_B. This is the flux of the back pixel.********************************\n\
+    // calculate the subTexCoord to check boundary conditions.***\n\
+    vec2 subTexCoord_B = subTexCoord + vec2(0.0, -divSubY);\n\
+    if(subTexCoord_B.y < 0.0)\n\
+    {\n\
+        // is out of simulation boundary.***\n\
+        flux_neighbor_B_RFU = vec3(0.0);\n\
+        flux_neighbor_B_LBD = vec3(0.0);\n\
+        \n\
+    }\n\
+    else\n\
+    {\n\
+        // calculate the mosaicTexCoord of the subTexCoord_B:\n\
+        vec2 mosaicTexCoord_B = subTexCoord_to_texCoord(subTexCoord_B, col_int, row_int);\n\
+        getFlux(mosaicTexCoord_B, flux_neighbor_B_RFU, flux_neighbor_B_LBD);\n\
+    }\n\
+\n\
+    // flux_D. This is the flux of the down pixel.*************************************\n\
+    // To calculate the flux_D, must know the UP_subTexrure (PREV subTexure).***\n\
+    // But, if the current subTexture is in left_down_corner, then must use the \"auxMosaicTex\".***\n\
+    // use the next subTexture.***\n\
+    int prev_col;\n\
+    int prev_row;\n\
+    if(getPrevSubTextureColRow(col_int, row_int, prev_col, prev_row))\n\
+    {\n\
+        // must recalcuate the mosaicTexCoord.***\n\
+        vec2 newMosaicTexCoord = subTexCoord_to_texCoord(subTexCoord, prev_col, prev_row);\n\
+        getFlux(newMosaicTexCoord, flux_neighbor_D_RFU, flux_neighbor_D_LBD);\n\
+    }\n\
+    else\n\
+    {\n\
+        // tex_0 = prev airPressureTex\n\
+        // tex_1 = next airPressureTex\n\
+        // tex_2 = prev flux_RFU_HIGH\n\
+        // tex_3 = next flux_RFU_HIGH\n\
+        // tex_4 = prev flux_RFU_LOW\n\
+        // tex_5 = next flux_RFU_LOW\n\
+        // tex_6 = prev flux_LBD_HIGH\n\
+        // tex_7 = next flux_LBD_HIGH\n\
+        // tex_8 = prev flux_LBD_LOW\n\
+        // tex_9 = next flux_LBD_LOW\n\
+\n\
+        //  \n\
+        //      +-----------+-----------+-----------+-----------+\n\
+        //      |           |           |           |           |     \n\
+        //      |   tex_8   |   tex_9   |  nothing  |  nothing  |\n\
+        //      |           |           |           |           | \n\
+        //      +-----------+-----------+-----------+-----------+\n\
+        //      |           |           |           |           | \n\
+        //      |   tex_4   |   tex_5   |   tex_6   |   tex_7   |\n\
+        //      |           |           |           |           |\n\
+        //      +-----------+-----------+-----------+-----------+\n\
+        //      |           |           |           |           |    \n\
+        //      |   tex_0   |   tex_1   |   tex_2   |   tex_3   | \n\
+        //      |           |           |           |           |\n\
+        //      +-----------+-----------+-----------+-----------+\n\
+\n\
+        // Is out of simulation boundary.***\n\
+        // Must use the \"auxMosaicTex\". This is a [4, 3] mosaic texture.***\n\
+        // tex_2 = prev flux_RFU_HIGH. this in [col 2, row 0] into \"auxMosaicTex\".***\n\
+        // tex_4 = prev flux_RFU_LOW. this in [col 0, row 1] into \"auxMosaicTex\".***\n\
+        // tex_6 = prev flux_LBD_HIGH. this in [col 2, row 1] into \"auxMosaicTex\".***\n\
+        // tex_8 = prev flux_LBD_LOW. this in [col 0, row 2] into \"auxMosaicTex\".***\n\
+        // Must calculate the texCoords of auxMosaicTex.***\n\
+\n\
+        float sRange_aux = 1.0 / 4.0;\n\
+        float tRange_aux = 1.0 / 3.0;\n\
+\n\
+        // tex_2 = prev flux_RFU_HIGH.***\n\
+        float col_aux = 2.0;\n\
+        float row_aux = 0.0;\n\
+\n\
+        float s = col_aux * sRange_aux + subTexCoord.x * sRange_aux;\n\
+        float t = row_aux * tRange_aux + subTexCoord.x * tRange_aux;\n\
+\n\
+        vec2 texCoord_auxMosaicTex = vec2(s, t);\n\
+        vec4 color4_RFU_HIGH = texture2D(auxMosaicTex, texCoord_auxMosaicTex);\n\
+\n\
+        // tex_4 = prev flux_RFU_LOW.***\n\
+        col_aux = 0.0;\n\
+        row_aux = 1.0;\n\
+\n\
+        s = col_aux * sRange_aux + subTexCoord.x * sRange_aux;\n\
+        t = row_aux * tRange_aux + subTexCoord.x * tRange_aux;\n\
+\n\
+        texCoord_auxMosaicTex = vec2(s, t);\n\
+        vec4 color4_RFU_LOW = texture2D(auxMosaicTex, texCoord_auxMosaicTex);\n\
+        \n\
+        // tex_6 = prev flux_LBD_HIGH.***\n\
+        col_aux = 2.0;\n\
+        row_aux = 1.0;\n\
+\n\
+        s = col_aux * sRange_aux + subTexCoord.x * sRange_aux;\n\
+        t = row_aux * tRange_aux + subTexCoord.x * tRange_aux;\n\
+\n\
+        texCoord_auxMosaicTex = vec2(s, t);\n\
+        vec4 color4_LBD_HIGH = texture2D(auxMosaicTex, texCoord_auxMosaicTex);\n\
+\n\
+        // tex_8 = prev flux_LBD_LOW.***\n\
+        col_aux = 0.0;\n\
+        row_aux = 2.0;\n\
+\n\
+        s = col_aux * sRange_aux + subTexCoord.x * sRange_aux;\n\
+        t = row_aux * tRange_aux + subTexCoord.x * tRange_aux;\n\
+\n\
+        texCoord_auxMosaicTex = vec2(s, t);\n\
+        vec4 color4_LBD_LOW = texture2D(auxMosaicTex, texCoord_auxMosaicTex);\n\
+\n\
+        // Now, with the 4 color4, decode the flux.***\n\
+        flux_neighbor_D_RFU.r = decodeRG(vec2(color4_RFU_HIGH.r, color4_RFU_LOW.r)) * u_maxFlux; // flux_R.\n\
+        flux_neighbor_D_RFU.g = decodeRG(vec2(color4_RFU_HIGH.g, color4_RFU_LOW.g)) * u_maxFlux; // flux_F.\n\
+        flux_neighbor_D_RFU.b = decodeRG(vec2(color4_RFU_HIGH.b, color4_RFU_LOW.b)) * u_maxFlux; // flux_U.\n\
+\n\
+        flux_neighbor_D_LBD.r = decodeRG(vec2(color4_LBD_HIGH.r, color4_LBD_LOW.r)) * u_maxFlux; // flux_L.\n\
+        flux_neighbor_D_LBD.g = decodeRG(vec2(color4_LBD_HIGH.g, color4_LBD_LOW.g)) * u_maxFlux; // flux_B.\n\
+        flux_neighbor_D_LBD.b = decodeRG(vec2(color4_LBD_HIGH.b, color4_LBD_LOW.b)) * u_maxFlux; // flux_D.\n\
+    }\n\
+    //--------------------------------------------------------------------------------------------------------------\n\
+    //--------------------------------------------------------------------------------------------------------------\n\
+}\n\
+\n\
+void getInputFlux(in vec2 texCoord, inout vec3 input_flux_RFU, inout vec3 input_flux_LBD)\n\
+{\n\
+    // 1rst, must find all 6 neighbor fluxes.***\n\
+    vec3 flux_neighbor_R_RFU, flux_neighbor_R_LBD;\n\
+    vec3 flux_neighbor_F_RFU, flux_neighbor_F_LBD; \n\
+    vec3 flux_neighbor_U_RFU, flux_neighbor_U_LBD;\n\
+\n\
+    vec3 flux_neighbor_L_RFU, flux_neighbor_L_LBD; \n\
+    vec3 flux_neighbor_B_RFU, flux_neighbor_B_LBD; \n\
+    vec3 flux_neighbor_D_RFU, flux_neighbor_D_LBD;\n\
+\n\
+    getFlux_ofAll6Neighbor(texCoord, flux_neighbor_R_RFU, flux_neighbor_R_LBD, \n\
+                                    flux_neighbor_F_RFU, flux_neighbor_F_LBD, \n\
+                                    flux_neighbor_U_RFU, flux_neighbor_U_LBD,\n\
+\n\
+                                    flux_neighbor_L_RFU, flux_neighbor_L_LBD, \n\
+                                    flux_neighbor_B_RFU, flux_neighbor_B_LBD, \n\
+                                    flux_neighbor_D_RFU, flux_neighbor_D_LBD);\n\
+\n\
+    // Now, for each flux, take only the flux that incomes to me.***\n\
+    // From the pixel_R, only the flux in L direction is incoming to me.***\n\
+    input_flux_LBD.x = flux_neighbor_R_LBD.x;\n\
+\n\
+    // From the pixel_F, only the flux in B direction is incoming to me.***\n\
+    input_flux_LBD.y = flux_neighbor_F_LBD.y;\n\
+\n\
+    // From the pixel_U, only the flux in D direction is incoming to me.***\n\
+    input_flux_LBD.z = flux_neighbor_U_LBD.z;\n\
+\n\
+    // From the pixel_L, only the flux in R direction is incoming to me.***\n\
+    input_flux_RFU.x = flux_neighbor_L_RFU.x;\n\
+\n\
+    // From the pixel_B, only the flux in F direction is incoming to me.***\n\
+    input_flux_RFU.y = flux_neighbor_B_RFU.y;\n\
+\n\
+    // From the pixel_D, only the flux in U direction is incoming to me.***\n\
+    input_flux_RFU.z = flux_neighbor_D_RFU.z;\n\
+\n\
+}\n\
+\n\
+float getVoxelSpaceValue(in vec2 texCoord)\n\
+{\n\
+    // The scene voxelMatrix is into flux_RFU_MosaicTex_HIGH, in alpha channel.***\n\
+    vec4 color4_RFU_HIGH = texture2D(flux_RFU_MosaicTex_HIGH, texCoord);\n\
+    return color4_RFU_HIGH.a;\n\
+}\n\
+\n\
+void main()\n\
+{\n\
+    vec2 curuv = v_tex_pos;\n\
+\n\
+     // Determine the airPressure of the 6 fragment that is around of current fragment.***\n\
+    vec3 airPressure_RFU;\n\
+    vec3 airPressure_LBD;\n\
+    float airPressure_curr = getAirPressure(v_tex_pos, airPressure_RFU, airPressure_LBD);\n\
+\n\
+    vec3 currFlux_RFU;\n\
+    vec3 currFlux_LBD;\n\
+    getFlux(v_tex_pos, currFlux_RFU, currFlux_LBD); // this is output flux.***\n\
+\n\
+    float flux_R = currFlux_RFU.x;\n\
+    float flux_F = currFlux_RFU.y;\n\
+    float flux_U = currFlux_RFU.z;\n\
+\n\
+    // calculate the input flux.***\n\
+    vec3 input_flux_RFU, input_flux_LBD;\n\
+    getInputFlux(v_tex_pos, input_flux_RFU, input_flux_LBD);\n\
+\n\
+    // Now, calculate the input pressure.***\n\
+    float voxelFaceArea = u_voxelSizeMeters.x * u_voxelSizeMeters.y;\n\
+    float timeStep_divCellArea = u_timestep / voxelFaceArea;\n\
+\n\
+    vec3 input_air_RFU = input_flux_RFU * timeStep_divCellArea;\n\
+    vec3 input_air_LBD = input_flux_LBD * timeStep_divCellArea;\n\
+\n\
+    vec3 output_air_RFU = currFlux_RFU * timeStep_divCellArea;\n\
+    vec3 output_air_LBD = currFlux_LBD * timeStep_divCellArea;\n\
+\n\
+    // calculate inputTotal & outputTotal.***\n\
+    float outputTotal_air = output_air_RFU.x + output_air_RFU.y + output_air_RFU.z + output_air_LBD.x + output_air_LBD.y + output_air_LBD.z;\n\
+    float inputTotal_air = input_air_RFU.x + input_air_RFU.y + input_air_RFU.z + input_air_LBD.x + input_air_LBD.y + input_air_LBD.z;\n\
+\n\
+    // calculate delta_air.***\n\
+    float delta_air = inputTotal_air - outputTotal_air;\n\
+\n\
+    // calculate velocity.*****************************************************************************************************************************\n\
+    float d1 = airPressure_curr;\n\
+    float d2 = d1 + delta_air;\n\
+    float da = (d1 + d2)/2.0;\n\
+\n\
+    vec3 velocity = vec3(input_flux_RFU.x + input_flux_LBD.x - currFlux_RFU.x - currFlux_LBD.x, \n\
+                            input_flux_RFU.y + input_flux_LBD.y - currFlux_RFU.y - currFlux_LBD.y, \n\
+                            input_flux_RFU.z + input_flux_LBD.z - currFlux_RFU.z - currFlux_LBD.z) / 2.0;\n\
+\n\
+    //vec2 veloci = vec2(inputflux.w - outputflux.w + outputflux.y - inputflux.y, inputflux.z - outputflux.z + outputflux.x - inputflux.x) / 2.0;\n\
+\n\
+    if(da <= 1e-8) //\n\
+    {\n\
+        velocity = vec3(0.0);\n\
+    }\n\
+    else\n\
+    {\n\
+        ////veloci = veloci/(da * u_PipeLen);\n\
+        //veloci = veloci/(da * vec2(cellSize_y, cellSize_x)); // original.***\n\
+        velocity = velocity / (da * u_voxelSizeMeters);\n\
+    }\n\
+    // End calculating velocity.-------------------------------------------------------------------------------------------------------------------------\n\
+\n\
+    vec3 encodedVelocity = encodeVelocity(velocity/u_maxVelocity);\n\
+    vec4 writeVel = vec4(encodedVelocity, 1.0);\n\
+\n\
+    float airPressure = max(airPressure_curr + delta_air, 0.0);\n\
+    vec4 encodedAirPressure = packDepth(airPressure / u_airMaxPressure);\n\
+\n\
+    gl_FragData[0] = encodedAirPressure;  // air pressure.\n\
+\n\
+\n\
+    #ifdef USE_MULTI_RENDER_TARGET\n\
+        gl_FragData[1] = writeVel; // velocity\n\
+    #endif\n\
+\n\
+    \n\
+\n\
+}";
 ShaderSource.soundCopyFS = "//#version 300 es\n\
 \n\
 #ifdef GL_ES\n\
@@ -7645,6 +9008,71 @@ void main()\n\
         gl_FragData[2] = finalCol4; // normal\n\
         gl_FragData[3] = finalCol4; // albedo\n\
         gl_FragData[4] = finalCol4; // selection color\n\
+    #endif\n\
+\n\
+}";
+ShaderSource.soundCopyPartiallyFS = "//#version 300 es\n\
+\n\
+#ifdef GL_ES\n\
+    precision highp float;\n\
+#endif\n\
+\n\
+#define %USE_LOGARITHMIC_DEPTH%\n\
+#ifdef USE_LOGARITHMIC_DEPTH\n\
+#extension GL_EXT_frag_depth : enable\n\
+#endif\n\
+\n\
+#define %USE_MULTI_RENDER_TARGET%\n\
+#ifdef USE_MULTI_RENDER_TARGET\n\
+#extension GL_EXT_draw_buffers : require\n\
+#endif\n\
+\n\
+uniform sampler2D texToCopy_0;\n\
+uniform sampler2D texToCopy_1;\n\
+uniform sampler2D texToCopy_2;\n\
+uniform sampler2D texToCopy_3;\n\
+uniform sampler2D texToCopy_4;\n\
+uniform sampler2D texToCopy_5;\n\
+uniform sampler2D texToCopy_6;\n\
+uniform sampler2D texToCopy_7;\n\
+\n\
+uniform bool u_textureFlipYAxis;\n\
+varying vec2 vTexCoord;\n\
+\n\
+void main()\n\
+{\n\
+    vec4 finalCol4;\n\
+    vec2 finalTexCoord = vTexCoord;\n\
+    if(u_textureFlipYAxis)\n\
+    {\n\
+        finalTexCoord = vec2(vTexCoord.x, 1.0 - vTexCoord.y);\n\
+    }\n\
+\n\
+    finalCol4 = texture2D(texToCopy_0, finalTexCoord);\n\
+    gl_FragData[0] = finalCol4;  \n\
+\n\
+    #ifdef USE_MULTI_RENDER_TARGET\n\
+        finalCol4 = texture2D(texToCopy_1, finalTexCoord);\n\
+        gl_FragData[1] = finalCol4; \n\
+\n\
+        finalCol4 = texture2D(texToCopy_2, finalTexCoord);\n\
+        gl_FragData[2] = finalCol4; \n\
+\n\
+        finalCol4 = texture2D(texToCopy_3, finalTexCoord);\n\
+        gl_FragData[3] = finalCol4; \n\
+\n\
+        finalCol4 = texture2D(texToCopy_4, finalTexCoord);\n\
+        gl_FragData[4] = finalCol4; \n\
+\n\
+        finalCol4 = texture2D(texToCopy_5, finalTexCoord);\n\
+        gl_FragData[5] = finalCol4; \n\
+\n\
+        finalCol4 = texture2D(texToCopy_6, finalTexCoord);\n\
+        gl_FragData[6] = finalCol4; \n\
+\n\
+        finalCol4 = texture2D(texToCopy_7, finalTexCoord);\n\
+        gl_FragData[7] = finalCol4; \n\
+\n\
     #endif\n\
 \n\
 }";
@@ -13785,7 +15213,7 @@ void main()\n\
 \n\
 	////gl_Position = ModelViewProjectionMatrixRelToEye * pos4;\n\
 	gl_Position = modelViewProjectionMatrix * vec4(geoCoord, 1.0);\n\
-	gl_PointSize = 550.0;\n\
+	gl_PointSize = 50.0;\n\
 \n\
 	vDepth = gl_Position.z * 0.5 + 0.5;\n\
 	vAltitude = geoCoord.z;\n\
@@ -13814,11 +15242,24 @@ uniform vec2 u_simulationTextureSize; // for example 512 x 512.\n\
 uniform vec2 u_quantizedVolume_MinMax;\n\
 uniform int u_texSize[3]; // The original texture3D size.***\n\
 uniform int u_lowestTex3DSliceIndex;\n\
+uniform float u_airMaxPressure; // use if rendering soundSource.***\n\
+uniform float u_currAirPressure; // use if rendering soundSource.***\n\
 \n\
 \n\
 varying float vDepth;\n\
 varying float vAltitude;\n\
 \n\
+vec4 packDepth( float v ) {\n\
+    vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;\n\
+    enc = fract(enc);\n\
+    enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);\n\
+    return enc;\n\
+}\n\
+\n\
+float unpackDepth(const in vec4 rgba_depth)\n\
+{\n\
+	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));\n\
+}\n\
 \n\
 void main()\n\
 {     \n\
@@ -13834,7 +15275,7 @@ void main()\n\
     float slice_altitude = float(u_lowestTex3DSliceIndex) / float(u_texSize[2]);\n\
     if(abs(slice_altitude - vDepth) < halfPixelSize)\n\
     {\n\
-        color = vec4(1.0);\n\
+        color = packDepth(u_currAirPressure/u_airMaxPressure);\n\
     }\n\
 \n\
     gl_FragData[0] = color;\n\
@@ -13844,55 +15285,61 @@ void main()\n\
         slice_altitude = float(u_lowestTex3DSliceIndex + 1) / float(u_texSize[2]);\n\
         if(abs(slice_altitude - vDepth) < halfPixelSize)\n\
         {\n\
-            color = vec4(1.0);\n\
+            color = packDepth(u_currAirPressure/u_airMaxPressure);\n\
         }\n\
+\n\
         gl_FragData[1] = color; \n\
 \n\
          color = vec4(0.0);\n\
         slice_altitude = float(u_lowestTex3DSliceIndex + 2) / float(u_texSize[2]);\n\
         if(abs(slice_altitude - vDepth) < halfPixelSize)\n\
         {\n\
-            color = vec4(1.0);\n\
+            color = packDepth(u_currAirPressure/u_airMaxPressure);\n\
         }\n\
+\n\
         gl_FragData[2] = color; \n\
 \n\
          color = vec4(0.0);\n\
         slice_altitude = float(u_lowestTex3DSliceIndex + 3) / float(u_texSize[2]);\n\
         if(abs(slice_altitude - vDepth) < halfPixelSize)\n\
         {\n\
-            color = vec4(1.0);\n\
+            color = packDepth(u_currAirPressure/u_airMaxPressure);\n\
         }\n\
+\n\
         gl_FragData[3] = color; \n\
 \n\
          color = vec4(0.0);\n\
         slice_altitude = float(u_lowestTex3DSliceIndex + 4) / float(u_texSize[2]);\n\
         if(abs(slice_altitude - vDepth) < halfPixelSize)\n\
         {\n\
-            color = vec4(1.0);\n\
+            color = packDepth(u_currAirPressure/u_airMaxPressure);\n\
         }\n\
+\n\
         gl_FragData[4] = color; \n\
 \n\
          color = vec4(0.0);\n\
         slice_altitude = float(u_lowestTex3DSliceIndex + 5) / float(u_texSize[2]);\n\
         if(abs(slice_altitude - vDepth) < halfPixelSize)\n\
         {\n\
-            color = vec4(1.0);\n\
+            color = packDepth(u_currAirPressure/u_airMaxPressure);\n\
         }\n\
+\n\
         gl_FragData[5] = color; \n\
 \n\
          color = vec4(0.0);\n\
         slice_altitude = float(u_lowestTex3DSliceIndex + 6) / float(u_texSize[2]);\n\
         if(abs(slice_altitude - vDepth) < halfPixelSize)\n\
         {\n\
-            color = vec4(1.0);\n\
+            color = packDepth(u_currAirPressure/u_airMaxPressure);\n\
         }\n\
+\n\
         gl_FragData[6] = color; \n\
 \n\
          color = vec4(0.0);\n\
         slice_altitude = float(u_lowestTex3DSliceIndex + 7) / float(u_texSize[2]);\n\
         if(abs(slice_altitude - vDepth) < halfPixelSize)\n\
         {\n\
-            color = vec4(1.0);\n\
+            color = packDepth(u_currAirPressure/u_airMaxPressure);\n\
         }\n\
         gl_FragData[7] = color; \n\
     #endif\n\
@@ -15582,36 +17029,46 @@ float getSliceAltitude_ofTexture3D(int col, int row, int currMosaicSliceIdx)\n\
     float slice_altitude = float(sliceIdx) / float(u_texSize[2]);\n\
     return slice_altitude;\n\
 }\n\
-void main()\n\
-{\n\
-    // By tex-coord, must know the column & row of the mosaic texture.***\n\
-    // Note : The rendering process uses a FBO with (u_mosaicTexSize[0] X u_mosaicTexSize[1]) as screen size.***\n\
 \n\
+vec2 getColRow_and_subTexCoord(in vec2 texCoord, inout vec2 subTexCoord)\n\
+{\n\
+    // The \"subTexCoord\" is the texCoord of the subTexture[col, row].***\n\
     float sRange = 1.0 / float(u_mosaicSize[0]);\n\
     float tRange = 1.0 / float(u_mosaicSize[1]);\n\
 \n\
     // Determine the [col, row] of the mosaic.***\n\
-    float col = floor(v_tex_pos.x / sRange);\n\
-    float row = floor(v_tex_pos.y / tRange);\n\
+    vec2 resultColRow = vec2(floor(texCoord.x / sRange), floor(texCoord.y / tRange));\n\
 \n\
-    // Now determine the texCoord of the sub-texture[col, row].***\n\
-    float col_mod = v_tex_pos.x - col * sRange;\n\
-    float row_mod = v_tex_pos.y - row * tRange;\n\
+    // determine the subTexCoord.***\n\
+    float col_mod = texCoord.x - resultColRow.x * sRange;\n\
+    float row_mod = texCoord.y - resultColRow.y * tRange;\n\
     float s = col_mod / sRange;\n\
     float t = row_mod / tRange;\n\
-    vec2 texCoord = vec2(s, t);\n\
+    subTexCoord = vec2(s, t);\n\
+\n\
+    return resultColRow;\n\
+}\n\
+\n\
+void main()\n\
+{\n\
+    // By tex-coord, must know the column & row of the mosaic texture.***\n\
+    // Note : The rendering process uses a FBO with (u_mosaicTexSize[0] X u_mosaicTexSize[1]) as screen size.***\n\
+    vec2 subTexCoord;\n\
+    vec2 colRow = getColRow_and_subTexCoord(v_tex_pos, subTexCoord);\n\
 \n\
     vec4 depth;\n\
     if(u_textureFlipYAxis)\n\
     {\n\
-        depth = texture2D(depthTex, vec2(texCoord.x, 1.0 - texCoord.y));\n\
+        depth = texture2D(depthTex, vec2(subTexCoord.x, 1.0 - subTexCoord.y));\n\
     }\n\
     else\n\
     {\n\
-        depth = texture2D(depthTex, vec2(texCoord.x, texCoord.y));\n\
+        depth = texture2D(depthTex, vec2(subTexCoord.x, subTexCoord.y));\n\
     }\n\
 \n\
     // Now, for each slice, must determine if the \"depth\" value is bigger or lower than the slice altitude (the slice altitude in a range [0 to 1]).***\n\
+    float col = colRow.x;\n\
+    float row = colRow.y;\n\
     int col_int = int(col);\n\
     int row_int = int(row);\n\
     // slice 0.\n\
@@ -15623,7 +17080,7 @@ void main()\n\
 \n\
     if(depth.r > slice_altitude)\n\
     {\n\
-        slice_color = vec4(1.0, 1.0, 1.0, 1.0);\n\
+        slice_color = vec4(0.0, 0.0, 0.0, 1.0);\n\
     }\n\
     gl_FragData[0] = slice_color;  \n\
 \n\
@@ -15633,7 +17090,7 @@ void main()\n\
         slice_color = vec4(0.0);\n\
         if(depth.r > slice_altitude)\n\
         {\n\
-            slice_color = vec4(1.0, 1.0, 1.0, 1.0);\n\
+            slice_color = vec4(0.0, 0.0, 0.0, 1.0);\n\
         }\n\
         gl_FragData[1] = slice_color;\n\
 \n\
@@ -15642,7 +17099,7 @@ void main()\n\
         slice_color = vec4(0.0);\n\
         if(depth.r > slice_altitude)\n\
         {\n\
-            slice_color = vec4(1.0, 1.0, 1.0, 1.0);\n\
+            slice_color = vec4(0.0, 0.0, 0.0, 1.0);\n\
         }\n\
         gl_FragData[2] = slice_color;\n\
 \n\
@@ -15651,7 +17108,7 @@ void main()\n\
         slice_color = vec4(0.0);\n\
         if(depth.r > slice_altitude)\n\
         {\n\
-            slice_color = vec4(1.0, 1.0, 1.0, 1.0);\n\
+            slice_color = vec4(0.0, 0.0, 0.0, 1.0);\n\
         }\n\
         gl_FragData[3] = slice_color; \n\
 \n\
@@ -15660,7 +17117,7 @@ void main()\n\
         slice_color = vec4(0.0);\n\
         if(depth.r > slice_altitude)\n\
         {\n\
-            slice_color = vec4(1.0, 1.0, 1.0, 1.0);\n\
+            slice_color = vec4(0.0, 0.0, 0.0, 1.0);\n\
         }\n\
         gl_FragData[4] = slice_color;\n\
 \n\
@@ -15669,7 +17126,7 @@ void main()\n\
         slice_color = vec4(0.0);\n\
         if(depth.r > slice_altitude)\n\
         {\n\
-            slice_color = vec4(1.0, 1.0, 1.0, 1.0);\n\
+            slice_color = vec4(0.0, 0.0, 0.0, 1.0);\n\
         }\n\
         gl_FragData[5] = slice_color; \n\
 \n\
@@ -15678,7 +17135,7 @@ void main()\n\
         slice_color = vec4(0.0);\n\
         if(depth.r > slice_altitude)\n\
         {\n\
-            slice_color = vec4(1.0, 1.0, 1.0, 1.0);\n\
+            slice_color = vec4(0.0, 0.0, 0.0, 1.0);\n\
         }\n\
         gl_FragData[6] = slice_color; \n\
 \n\
@@ -15687,7 +17144,7 @@ void main()\n\
         slice_color = vec4(0.0);\n\
         if(depth.r > slice_altitude)\n\
         {\n\
-            slice_color = vec4(1.0, 1.0, 1.0, 1.0);\n\
+            slice_color = vec4(0.0, 0.0, 0.0, 1.0);\n\
         }\n\
         gl_FragData[7] = slice_color;\n\
     #endif\n\

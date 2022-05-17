@@ -165,6 +165,23 @@ void main()
         float linearDepth = unpackDepth(textureColor); // original.
         textureColor = vec4(linearDepth, linearDepth, linearDepth, 1.0);
     }
+    else if(uTextureType == 2)
+    {
+        vec4 textureColorAux = texture2D(texture_0, texCoord);
+        textureColor = vec4(textureColorAux.a, 0.0, 0.0, textureColorAux.a);
+    }
+    else if(uTextureType == 3)
+    {
+        vec4 textureColorAux = texture2D(texture_0, texCoord);
+        if(textureColorAux.r + textureColorAux.g + textureColorAux.b > 0.0)
+        {
+            textureColor = vec4(0.2, 0.5, 1.0, 1.0);
+        }
+        else
+        {
+            textureColor = textureColorAux;
+        }
+    }
     
     gl_FragColor = textureColor;
 	

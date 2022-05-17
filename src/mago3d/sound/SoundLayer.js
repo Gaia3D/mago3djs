@@ -12,7 +12,6 @@ var SoundLayer = function(soundManager, options)
 
 	this.soundManager = soundManager;
 	this.geographicExtent;
-	this.sceneVoxelizedTexture3d; // MagoTexture3D.***
 
 	this._bIsPrepared = false;
 
@@ -22,11 +21,18 @@ var SoundLayer = function(soundManager, options)
 	this.texturesNumSlices = 1; // by default.***
 	this.terrainTextureSize = new Float32Array([soundManager.maxSimulationSize, soundManager.maxSimulationSize]);
 
+	this.simulationTimeStep = 0.08; // ok.
+	this.simulationTimeStep = 0.02;
+
 	// The buildings & objects intersected by this waterTile.
 	this.visibleObjectsControler;
 
 	// Textures.******************************************************
 	this.demWithBuildingsTex;
+
+	// PingPong textures.*********************************************
+	this.pressureMosaicTexture3d_A;
+	this.pressureMosaicTexture3d_B;
 
 	if (options)
 	{
@@ -236,6 +242,12 @@ SoundLayer.prototype.init = function ()
 	this.terrainTextureSize[0] = this.simulationTextureSize[0];
 	this.terrainTextureSize[1] = this.simulationTextureSize[1];
 
+	// Now, calculate the one voxel size in meters.***
+	var oneVoxelSizeMeters_x = lonArcDist / this.simulationTextureSize[0];
+	var oneVoxelSizeMeters_y = latArcDist / this.simulationTextureSize[1];
+	var oneVoxelSizeMeters_z = altRange / this.texturesNumSlices;
+	this.oneVoxelSizeInMeters = [oneVoxelSizeMeters_x, oneVoxelSizeMeters_y, oneVoxelSizeMeters_z];
+
 	var magoManager = this.soundManager.magoManager;
 	var gl = magoManager.getGl();
 
@@ -293,24 +305,73 @@ SoundLayer.prototype.doSimulationSteps = function (magoManager)
 	var magoManager = soundManager.magoManager;
 	var gl = magoManager.getGl();
 
-	// now, make the voxelization of the scene(geoExtent).************************************************************************************
-	if (!this.sceneVoxelizedTexture3d)
-	{
-		if (!this.voxelizer)
-		{
-			var options = {};
-			options.voxelXSize = this.simulationTextureSize[0];
-			options.voxelYSize = this.simulationTextureSize[1];
-			options.voxelZSize = this.texturesNumSlices;
-			this.voxelizer = new Voxelizer(options);
-		}
+	var maxTextures = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
 
-		this.sceneVoxelizedTexture3d = this.voxelizer.voxelizeByDepthTexture(magoManager, this.demWithBuildingsTex, this.simulationTextureSize[0], this.simulationTextureSize[1], this.texturesNumSlices, undefined);
+	// now, make the voxelization of the scene(geoExtent).************************************************************************************
+	// Note : to save memory & limited by MAX_TEXTURE_IMAGE_UNITS = 8, we make the voxelization into fluxRFUMosaicTexture3d_HIGH_A alpha channel.***
+	// ***************************************************************************************************************************************
+	if (!this.voxelizer)
+	{
+		var options = {};
+		options.voxelXSize = this.simulationTextureSize[0];
+		options.voxelYSize = this.simulationTextureSize[1];
+		options.voxelZSize = this.texturesNumSlices;
+		this.voxelizer = new Voxelizer(options);
 	}
 
-	if (!this.sceneVoxelizedTexture3d)
+	if (!this.bSceneVoxelized)
 	{
-		return false;
+		// do voxelization process.***
+		this.fluxRFUMosaicTexture3d_HIGH_B = this.voxelizer.voxelizeByDepthTexture(magoManager, this.demWithBuildingsTex, this.simulationTextureSize[0], this.simulationTextureSize[1], this.texturesNumSlices, undefined);
+		this.bSceneVoxelized = true;
+	}
+
+	// create the fluxTextures.***
+	if (!this.fluxRFUMosaicTexture3d_HIGH_A)
+	{
+		//*********************************************************
+		// R= right, F= front, U= up, L= left, B= back, D= down.
+		// RFU = x, y, z.
+		// LBD = -x, -y, -z.
+		//*********************************************************
+		// HIGH.***
+		//this.fluxRFUMosaicTexture3d_HIGH_B : this texture is created 1rst.
+
+		var refTex3D = this.fluxRFUMosaicTexture3d_HIGH_B;
+
+		this.fluxRFUMosaicTexture3d_HIGH_A = new MagoTexture3D();
+		this.fluxRFUMosaicTexture3d_HIGH_A.copyParametersFrom(refTex3D);
+		this.fluxRFUMosaicTexture3d_HIGH_A.createTextures(gl);
+
+		this.fluxLBDMosaicTexture3d_HIGH_A = new MagoTexture3D();
+		this.fluxLBDMosaicTexture3d_HIGH_A.copyParametersFrom(refTex3D);
+		this.fluxLBDMosaicTexture3d_HIGH_A.createTextures(gl);
+
+		this.fluxLBDMosaicTexture3d_HIGH_B = new MagoTexture3D();
+		this.fluxLBDMosaicTexture3d_HIGH_B.copyParametersFrom(refTex3D);
+		this.fluxLBDMosaicTexture3d_HIGH_B.createTextures(gl);
+
+		// LOW.***
+		this.fluxRFUMosaicTexture3d_LOW_A = new MagoTexture3D();
+		this.fluxRFUMosaicTexture3d_LOW_A.copyParametersFrom(refTex3D);
+		this.fluxRFUMosaicTexture3d_LOW_A.createTextures(gl);
+
+		this.fluxRFUMosaicTexture3d_LOW_B = new MagoTexture3D();
+		this.fluxRFUMosaicTexture3d_LOW_B.copyParametersFrom(refTex3D);
+		this.fluxRFUMosaicTexture3d_LOW_B.createTextures(gl);
+
+		this.fluxLBDMosaicTexture3d_LOW_A = new MagoTexture3D();
+		this.fluxLBDMosaicTexture3d_LOW_A.copyParametersFrom(refTex3D);
+		this.fluxLBDMosaicTexture3d_LOW_A.createTextures(gl);
+
+		this.fluxLBDMosaicTexture3d_LOW_B = new MagoTexture3D();
+		this.fluxLBDMosaicTexture3d_LOW_B.copyParametersFrom(refTex3D);
+		this.fluxLBDMosaicTexture3d_LOW_B.createTextures(gl);
+
+		// shaderLog texture. delete after debug.***
+		this.shaderLogTexture = new MagoTexture3D();
+		this.shaderLogTexture.copyParametersFrom(refTex3D);
+		this.shaderLogTexture.createTextures(gl);
 	}
 
 	// Now, make the sound source texture3d.***************************************************************************************************
@@ -318,9 +379,9 @@ SoundLayer.prototype.doSimulationSteps = function (magoManager)
 	{
 		// Create a real magoTexture3D, not a mosaic, to render the sources in it.***
 		this.soundSourceRealTexture3d = new MagoTexture3D();
-		this.soundSourceRealTexture3d.texture3DXSize = this.sceneVoxelizedTexture3d.texture3DXSize;
-		this.soundSourceRealTexture3d.texture3DYSize = this.sceneVoxelizedTexture3d.texture3DYSize;
-		this.soundSourceRealTexture3d.texture3DZSize = this.sceneVoxelizedTexture3d.texture3DZSize;
+		this.soundSourceRealTexture3d.texture3DXSize = this.fluxRFUMosaicTexture3d_HIGH_A.texture3DXSize;
+		this.soundSourceRealTexture3d.texture3DYSize = this.fluxRFUMosaicTexture3d_HIGH_A.texture3DYSize;
+		this.soundSourceRealTexture3d.texture3DZSize = this.fluxRFUMosaicTexture3d_HIGH_A.texture3DZSize;
 
 		// The 3D texture into a mosaic texture matrix params.***
 		this.soundSourceRealTexture3d.mosaicXCount = 1; 
@@ -336,7 +397,7 @@ SoundLayer.prototype.doSimulationSteps = function (magoManager)
 		}
 
 		var modelViewProjMatrix = this.getTileOrthographic_mvpMat();
-		this.voxelizer.renderToMagoTexture3D(magoManager, this.soundSourceRealTexture3d, this.geographicExtent, modelViewProjMatrix, [this._testGeoCoord]);
+		this.voxelizer.renderToMagoTexture3D(this.soundManager, this.soundSourceRealTexture3d, this.geographicExtent, modelViewProjMatrix, [this._testGeoCoord]);
 
 		// Now, with the "soundSourceRealTexture3d" make the soundSourceMosaicTexture.***
 	}
@@ -350,11 +411,881 @@ SoundLayer.prototype.doSimulationSteps = function (magoManager)
 	{
 		// make the mosaic texture 3d from the "this.soundSourceRealTexture3d".***
 		this.soundSourceMosaicTexture3d = this.voxelizer.makeMosaicTexture3DFromRealTexture3D(magoManager, this.soundSourceRealTexture3d, undefined);
+
+		// Once made the "soundSourceMosaicTexture3d", delete the "soundSourceRealTexture3d" to save memory.***
+		//this.soundSourceRealTexture3d.deleteTextures(gl);
+	}
+
+	if (!this.soundSourceMosaicTexture3d)
+	{
+		return false;
+	}
+
+	// Now, calculate the the air pressure (equivalent to water height).***
+	if (!this.pressureMosaicTexture3d_A)
+	{
+		// create the mosaic texture 3d.***
+		this.pressureMosaicTexture3d_A = new MagoTexture3D();
+		this.pressureMosaicTexture3d_A.copyParametersFrom(this.fluxRFUMosaicTexture3d_HIGH_A);
+		this.pressureMosaicTexture3d_A.createTextures(gl);
+
+		this.pressureMosaicTexture3d_B = new MagoTexture3D();
+		this.pressureMosaicTexture3d_B.copyParametersFrom(this.fluxRFUMosaicTexture3d_HIGH_A);
+		this.pressureMosaicTexture3d_B.createTextures(gl);
+	}
+
+	if (!this.airVelocity_A)
+	{
+		// create the mosaic texture 3d.***
+		this.airVelocity_A = new MagoTexture3D();
+		this.airVelocity_A.copyParametersFrom(this.fluxRFUMosaicTexture3d_HIGH_A);
+		this.airVelocity_A.createTextures(gl);
+
+		this.airVelocity_B = new MagoTexture3D();
+		this.airVelocity_B.copyParametersFrom(this.fluxRFUMosaicTexture3d_HIGH_A);
+		this.airVelocity_B.createTextures(gl);
+	}
+
+	if (!this.auxMosaicTexture3d_forFluxCalculation)
+	{
+		// *********************************************************************************************************************************
+		// Here makes a auxiliar mosaic texture to bind in sound flux calculation.
+		// We make this auxMosaicTex bcos in the flux calculation fragment shader, there are only 8 tex channels, & 6 is occupied, and
+		// there are 10 more textures to bind. So, join the 10 textures in a 4 X 3 mosaic tex.***
+		// There are one auxMosaicTex3d for each simulationMosaicTex3D slices.***
+		// *********************************************************************************************************************************
+		this.auxMosaicTexture3d_forFluxCalculation = new MagoTexture3D();
+		this.auxMosaicTexture3d_forFluxCalculation.texture3DXSize = this.fluxRFUMosaicTexture3d_HIGH_A.texture3DXSize; // other textures is possible bcos are equals.***
+		this.auxMosaicTexture3d_forFluxCalculation.texture3DYSize = this.fluxRFUMosaicTexture3d_HIGH_A.texture3DYSize; // other textures is possible bcos are equals.***
+		this.auxMosaicTexture3d_forFluxCalculation.texture3DZSize = 12; // 4 X 3.***
+
+		// The 3D texture into a mosaic texture matrix params.***
+		this.auxMosaicTexture3d_forFluxCalculation.mosaicXCount = 4; 
+		this.auxMosaicTexture3d_forFluxCalculation.mosaicYCount = 3; 
+		this.auxMosaicTexture3d_forFluxCalculation.finalSlicesCount = this.fluxRFUMosaicTexture3d_HIGH_A.finalSlicesCount;
+
+		var filter = gl.NEAREST;
+		var texWrap = gl.CLAMP_TO_EDGE;
+		var data = undefined;
+
+		// 1rst, find the finally used texture size.***
+		this.auxMosaicTexture3d_forFluxCalculation.finalTextureXSize = this.auxMosaicTexture3d_forFluxCalculation.mosaicXCount * this.auxMosaicTexture3d_forFluxCalculation.texture3DXSize;
+		this.auxMosaicTexture3d_forFluxCalculation.finalTextureYSize = this.auxMosaicTexture3d_forFluxCalculation.mosaicYCount * this.auxMosaicTexture3d_forFluxCalculation.texture3DYSize;
+
+		for (var i=0; i<this.auxMosaicTexture3d_forFluxCalculation.finalSlicesCount; i++)
+		{
+			var webglTex = Texture.createTexture(gl, filter, data, this.auxMosaicTexture3d_forFluxCalculation.finalTextureXSize, this.auxMosaicTexture3d_forFluxCalculation.finalTextureYSize, texWrap);
+			this.auxMosaicTexture3d_forFluxCalculation.texturesArray.push(webglTex);
+		}
+	}
+
+	if (!this.auxMosaicTexture3d_forFluxCalculation)
+	{ 
+		return false; 
+	}
+
+	// Start the simulation steps.***
+	this._calculateAirPressureFromSoundSource();
+	
+
+	this._makeAuxMosaicTexture3D_forFluxCalculation();
+
+	this._calculateFlux();
+	this._makeAuxMosaicTexture3D_forFluxCalculation(); // must recalculate the auxMosaicTexture3D bcos flux was modified.***
+
+	this._calculateVelocity();
+	
+	
+	var hola = 0;
+	// https://www.animations.physics.unsw.edu.au/jw/sound-wave-equation.htm#sub1
+};
+
+SoundLayer.prototype._calculateVelocity = function ()
+{
+	if (!this.voxelizer)
+	{
+		return false;
+	}
+
+	var soundManager = this.soundManager;
+	var magoManager = soundManager.magoManager;
+	var gl = magoManager.getGl();
+
+	var fbo = this.voxelizer.fbo; // this if mosaicTextureSize.***
+	var extbuffers = fbo.extbuffers;
+
+	fbo.bind();
+	
+	extbuffers.drawBuffersWEBGL([
+		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
+		extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1]
+		extbuffers.NONE, // gl_FragData[2]
+		extbuffers.NONE, // gl_FragData[3]
+		extbuffers.NONE, // gl_FragData[3]
+		extbuffers.NONE, // gl_FragData[3]
+		extbuffers.NONE, // gl_FragData[3]
+		extbuffers.NONE, // gl_FragData[3]
+	]);
+
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT4_WEBGL, gl.TEXTURE_2D, null, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT5_WEBGL, gl.TEXTURE_2D, null, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT6_WEBGL, gl.TEXTURE_2D, null, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT7_WEBGL, gl.TEXTURE_2D, null, 0);
+
+	var shader = magoManager.postFxShadersManager.getShader("soundCalculateVelocity");
+	magoManager.postFxShadersManager.useProgram(shader);
+	var screenQuad = soundManager.getQuadBuffer();
+	var webglController = new WebGlController(gl);
+
+	var refTex3D = this.fluxRFUMosaicTexture3d_HIGH_A; // we can take any other texture3D.***
+
+	gl.uniform1f(shader.u_airMaxPressure_loc, soundManager.airMaxPressure);
+	gl.uniform1f(shader.u_maxFlux_loc, soundManager.maxFlux);
+	gl.uniform1iv(shader.u_mosaicSize_loc, [refTex3D.mosaicXCount, refTex3D.mosaicYCount, refTex3D.finalSlicesCount]); // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***
+	gl.uniform1iv(shader.u_texSize_loc, [refTex3D.texture3DXSize, refTex3D.texture3DYSize, refTex3D.texture3DZSize]); // The original texture3D size.***
+	gl.uniform3fv(shader.u_voxelSizeMeters_loc, [this.oneVoxelSizeInMeters[0], this.oneVoxelSizeInMeters[1], this.oneVoxelSizeInMeters[2]]); // The one voxel size in meters.***
+	gl.uniform1f(shader.u_timestep_loc, this.simulationTimeStep);//u_maxVelocity_loc, airMaxVelocity
+	gl.uniform1f(shader.u_maxVelocity_loc, soundManager.airMaxVelocity);
+
+	// bind screenQuad positions.
+	FBO.bindAttribute(gl, screenQuad.posBuffer, shader.a_pos_loc, 2);
+
+	webglController.clearColor(0.0, 0.0, 0.0, 0.0);
+
+	var finalSlicesCount = this.pressureMosaicTexture3d_A.finalSlicesCount;
+	for (var i=0; i<finalSlicesCount; i++)
+	{
+		// Bind the 8 output textures:
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.pressureMosaicTexture3d_A.getTexture( i ), 0); // airPressure
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.airVelocity_A.getTexture( i ), 0); // airVelocity.
+		
+
+		//gl.uniform1i(shader.u_lowestMosaicSliceIndex_loc,  i*8);
+		// bind sound source.***
+		gl.activeTexture(gl.TEXTURE0);
+		gl.bindTexture(gl.TEXTURE_2D, this.pressureMosaicTexture3d_B.getTexture( i )); // sound source.
+
+		gl.activeTexture(gl.TEXTURE1);
+		gl.bindTexture(gl.TEXTURE_2D, this.fluxRFUMosaicTexture3d_HIGH_B.getTexture( i )); // sound source.
+
+		gl.activeTexture(gl.TEXTURE2);
+		gl.bindTexture(gl.TEXTURE_2D, this.fluxRFUMosaicTexture3d_LOW_B.getTexture( i )); // sound source.
+
+		gl.activeTexture(gl.TEXTURE3);
+		gl.bindTexture(gl.TEXTURE_2D, this.fluxLBDMosaicTexture3d_HIGH_B.getTexture( i )); // sound source.
+
+		gl.activeTexture(gl.TEXTURE4);
+		gl.bindTexture(gl.TEXTURE_2D, this.fluxLBDMosaicTexture3d_LOW_B.getTexture( i ));
+
+		gl.activeTexture(gl.TEXTURE5);
+		gl.bindTexture(gl.TEXTURE_2D, this.auxMosaicTexture3d_forFluxCalculation.getTexture( i ));
+
+
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		// Draw screenQuad:
+		gl.drawArrays(gl.TRIANGLES, 0, 6);
+	}
+
+	for (var i=0; i<8; i++)
+	{
+		gl.activeTexture(gl.TEXTURE0+i);
+		gl.bindTexture(gl.TEXTURE_2D, null);
+	}
+
+	fbo.unbind();
+	webglController.restoreAllParameters();
+
+	// now, swap waterHeightTextures:
+	SoundLayer._swapTextures3D(this.pressureMosaicTexture3d_A, this.pressureMosaicTexture3d_B);
+	SoundLayer._swapTextures3D(this.airVelocity_A, this.airVelocity_B);
+};
+
+SoundLayer.prototype._makeAuxMosaicTexture3D_forFluxCalculation = function ()
+{
+	// *********************************************************************************************************************************
+	// Here makes a auxiliar mosaic texture to bind in sound flux calculation.
+	// We make this auxMosaicTex bcos in the flux calculation fragment shader, there are only 8 tex channels, & 6 is occupied, and
+	// there are 10 more textures to bind. So, join the 10 textures in a 4 X 3 mosaic tex.***
+	// There are one auxMosaicTex3d for each simulationMosaicTex3D slices.***
+	// *********************************************************************************************************************************
+
+	// tex_0 = prev airPressureTex
+	// tex_1 = next airPressureTex
+	// tex_2 = prev flux_RFU_HIGH
+	// tex_3 = next flux_RFU_HIGH
+	// tex_4 = prev flux_RFU_LOW
+	// tex_5 = next flux_RFU_LOW
+	// tex_6 = prev flux_LBD_HIGH
+	// tex_7 = next flux_LBD_HIGH
+	// tex_8 = prev flux_LBD_LOW
+	// tex_9 = next flux_LBD_LOW
+
+	//  
+	//      +-----------+-----------+-----------+-----------+
+	//      |           |           |           |           |     
+	//      |   tex_8   |   tex_9   |  nothing  |  nothing  |
+	//      |           |           |           |           | 
+	//      +-----------+-----------+-----------+-----------+
+	//      |           |           |           |           | 
+	//      |   tex_4   |   tex_5   |   tex_6   |   tex_7   |
+	//      |           |           |           |           |
+	//      +-----------+-----------+-----------+-----------+
+	//      |           |           |           |           |    
+	//      |   tex_0   |   tex_1   |   tex_2   |   tex_3   | 
+	//      |           |           |           |           |
+	//      +-----------+-----------+-----------+-----------+
+	//
+
+	// Note : Take the "this.fluxRFUMosaicTexture3d_HIGH_A" as areference, bcos all mosaicTex3D are equals to "this.fluxRFUMosaicTexture3d_HIGH_A".***
+	var soundManager = this.soundManager;
+	var magoManager = soundManager.magoManager;
+	var gl = magoManager.getGl();
+
+	if (!this.fbo_auxMosaicFlux)
+	{
+		// create the frame buffer object.***
+		var bufferWidth = this.fluxRFUMosaicTexture3d_HIGH_A.texture3DXSize * 4;
+		var bufferHeight = this.fluxRFUMosaicTexture3d_HIGH_A.texture3DYSize * 3;
+		var bUseMultiRenderTarget = magoManager.postFxShadersManager.bUseMultiRenderTarget;
+
+		this.fbo_auxMosaicFlux = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: false, multiRenderTarget: bUseMultiRenderTarget, numColorBuffers: 1}); 
+	}
+
+	var fbo = this.fbo_auxMosaicFlux;
+	var extbuffers = fbo.extbuffers;
+	var shader;
+	fbo.bind();
+	gl.viewport(0, 0, fbo.width[0], fbo.height[0]);
+	
+	extbuffers.drawBuffersWEBGL([
+		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
+		extbuffers.NONE, // gl_FragData[1]
+		extbuffers.NONE, // gl_FragData[2]
+		extbuffers.NONE, // gl_FragData[3]
+		extbuffers.NONE, // gl_FragData[4]
+		extbuffers.NONE, // gl_FragData[5]
+		extbuffers.NONE, // gl_FragData[6]
+		extbuffers.NONE, // gl_FragData[7]
+	]);
+
+	shader = magoManager.postFxShadersManager.getShader("copyTexturePartially");
+	magoManager.postFxShadersManager.useProgram(shader);
+	shader.bindUniformGenerals();
+	gl.uniform1i(shader.u_textureFlipYAxis_loc, false);
+
+	//gl.uniformMatrix4fv(shader.u_modelViewProjectionMatrix_loc, false, modelViewProjMatrix._floatArrays);
+	//gl.uniform3fv(shader.aditionalMov_loc, [0.0, 0.0, 0.0]); //.***
+	//gl.uniform4fv(shader.u_color4_loc, [1.0, 0.0, 0.0, 1.0]); //.***
+	//gl.uniform2fv(shader.u_heightMap_MinMax_loc, [geoExtent.minGeographicCoord.altitude, geoExtent.maxGeographicCoord.altitude]);
+	//gl.uniform2fv(shader.u_simulationTextureSize_loc, [magoTex3d.finalTextureXSize, magoTex3d.finalTextureYSize]);
+	//gl.uniform1iv(shader.u_texSize_loc, [magoTex3d.texture3DXSize, magoTex3d.texture3DYSize, magoTex3d.texture3DZSize]);
+	
+	gl.disable(gl.CULL_FACE);
+	gl.disable(gl.DEPTH_TEST);
+
+	gl.activeTexture(gl.TEXTURE1);
+	gl.bindTexture(gl.TEXTURE_2D, null); 
+
+	gl.activeTexture(gl.TEXTURE2);
+	gl.bindTexture(gl.TEXTURE_2D, null); 
+
+	gl.activeTexture(gl.TEXTURE3);
+	gl.bindTexture(gl.TEXTURE_2D, null); 
+
+	gl.activeTexture(gl.TEXTURE4);
+	gl.bindTexture(gl.TEXTURE_2D, null); 
+
+	gl.activeTexture(gl.TEXTURE5);
+	gl.bindTexture(gl.TEXTURE_2D, null); 
+
+	gl.activeTexture(gl.TEXTURE6);
+	gl.bindTexture(gl.TEXTURE_2D, null); 
+
+	gl.activeTexture(gl.TEXTURE7);
+	gl.bindTexture(gl.TEXTURE_2D, null); 
+
+
+	gl.frontFace(gl.CCW);
+
+	var subTexWidth = this.fluxRFUMosaicTexture3d_HIGH_A.texture3DXSize;
+	var subTexHeight = this.fluxRFUMosaicTexture3d_HIGH_A.texture3DYSize;
+
+	var mosaicXCount = this.fluxRFUMosaicTexture3d_HIGH_A.mosaicXCount;
+	var mosaicYCount = this.fluxRFUMosaicTexture3d_HIGH_A.mosaicYCount;
+	var unitaryXRange = 1.0 / mosaicXCount;
+	var unitaryYRange = 1.0 / mosaicYCount;
+
+	var finalSlicesCount = this.auxMosaicTexture3d_forFluxCalculation.finalSlicesCount;
+	//var rendersCount = Math.ceil(finalSlicesCount / 8);
+	for (var i=0; i<finalSlicesCount; i++)
+	{
+		// Bind the 8 output textures:
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.auxMosaicTexture3d_forFluxCalculation.getTexture( i ), 0);
+		//gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.auxMosaicTexture3d_forFluxCalculation.getTexture( i*8 + 1 ), 0);
+		//gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, this.auxMosaicTexture3d_forFluxCalculation.getTexture( i*8 + 2 ), 0);
+		//gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, this.auxMosaicTexture3d_forFluxCalculation.getTexture( i*8 + 3 ), 0);
+		//gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT4_WEBGL, gl.TEXTURE_2D, this.auxMosaicTexture3d_forFluxCalculation.getTexture( i*8 + 4 ), 0);
+		//gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT5_WEBGL, gl.TEXTURE_2D, this.auxMosaicTexture3d_forFluxCalculation.getTexture( i*8 + 5 ), 0);
+		//gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT6_WEBGL, gl.TEXTURE_2D, this.auxMosaicTexture3d_forFluxCalculation.getTexture( i*8 + 6 ), 0);
+		//gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT7_WEBGL, gl.TEXTURE_2D, this.auxMosaicTexture3d_forFluxCalculation.getTexture( i*8 + 7 ), 0);
+
+		//gl.uniform1i(shader.u_lowestTex3DSliceIndex_loc,  i*8);
+
+		// Now, render the 10 auxiliar textures :
+		for (var j=0; j<10; j++)
+		{
+			if (j === 0)
+			{
+				// Destination :
+				// copy PREV airPressure tex in col = 0, row = 0.***
+				var destCol = 0;
+				var destRow = 0;
+				gl.viewport(destCol, destRow, subTexWidth, subTexHeight);
+
+				// Origin : 
+				// calculate the coord of the screenQuad.***
+				var originCol = mosaicXCount - 1;
+				var originRow = mosaicYCount - 1;
+				var minX = originCol * unitaryXRange;
+				var minY = originRow * unitaryYRange;
+				var maxX = minX + unitaryXRange;
+				var maxY = minY + unitaryYRange;
+
+				var posData = new Float32Array([minX, minY,   maxX, minY,   minX, maxY,   minX, maxY,   maxX, minY,   maxX, maxY]); 
+				var texcoordData = new Float32Array([minX, minY,   maxX, minY,   minX, maxY,   minX, maxY,   maxX, minY,   maxX, maxY]); // origin texCoords.***
+				var webglposBuffer = FBO.createBuffer(gl, posData);
+				var webgltexcoordBuffer = FBO.createBuffer(gl, texcoordData);
+				FBO.bindAttribute(gl, webglposBuffer, shader.a_pos_loc, 2);
+				FBO.bindAttribute(gl, webgltexcoordBuffer, shader.a_texcoord_loc, 2);
+
+				// Now, bind the textures.***
+				var prevIdx = i-1;
+				gl.activeTexture(gl.TEXTURE0);
+				gl.bindTexture(gl.TEXTURE_2D, this.pressureMosaicTexture3d_A.getTexture(prevIdx)); 
+
+				// Draw screenQuad:
+				gl.drawArrays(gl.TRIANGLES, 0, 6);
+			}
+			else if (j === 1)
+			{
+				// Destination :
+				// copy NEXT airPressure tex in col = 1, row = 0.***
+				var destCol = 1;
+				var destRow = 0;
+				gl.viewport(destCol, destRow, subTexWidth, subTexHeight);
+
+				// Origin : 
+				// calculate the coord of the screenQuad.***
+				var originCol = 0;
+				var originRow = 0;
+				var minX = originCol * unitaryXRange;
+				var minY = originRow * unitaryYRange;
+				var maxX = minX + unitaryXRange;
+				var maxY = minY + unitaryYRange;
+
+				var posData = new Float32Array([minX, minY,   maxX, minY,   minX, maxY,   minX, maxY,   maxX, minY,   maxX, maxY]); 
+				var texcoordData = new Float32Array([minX, minY,   maxX, minY,   minX, maxY,   minX, maxY,   maxX, minY,   maxX, maxY]); // origin texCoords.***
+				var webglposBuffer = FBO.createBuffer(gl, posData);
+				var webgltexcoordBuffer = FBO.createBuffer(gl, texcoordData);
+				FBO.bindAttribute(gl, webglposBuffer, shader.a_pos_loc, 2);
+				FBO.bindAttribute(gl, webgltexcoordBuffer, shader.a_texcoord_loc, 2);
+
+				// Now, bind the textures.***
+				var nextIdx = i+1;
+				gl.activeTexture(gl.TEXTURE0);
+				gl.bindTexture(gl.TEXTURE_2D, this.pressureMosaicTexture3d_A.getTexture(nextIdx)); 
+
+				// Draw screenQuad:
+				gl.drawArrays(gl.TRIANGLES, 0, 6);
+			}
+			else if (j === 2)
+			{
+				// Destination :
+				// copy PREV flux_RFU_HIGH tex in col = 2, row = 0.***
+				var destCol = 2;
+				var destRow = 0;
+				gl.viewport(destCol, destRow, subTexWidth, subTexHeight);
+
+				// Origin : 
+				// calculate the coord of the screenQuad.***
+				var originCol = mosaicXCount - 1;
+				var originRow = mosaicYCount - 1;
+				var minX = originCol * unitaryXRange;
+				var minY = originRow * unitaryYRange;
+				var maxX = minX + unitaryXRange;
+				var maxY = minY + unitaryYRange;
+
+				var posData = new Float32Array([minX, minY,   maxX, minY,   minX, maxY,   minX, maxY,   maxX, minY,   maxX, maxY]); 
+				var texcoordData = new Float32Array([minX, minY,   maxX, minY,   minX, maxY,   minX, maxY,   maxX, minY,   maxX, maxY]); // origin texCoords.***
+				var webglposBuffer = FBO.createBuffer(gl, posData);
+				var webgltexcoordBuffer = FBO.createBuffer(gl, texcoordData);
+				FBO.bindAttribute(gl, webglposBuffer, shader.a_pos_loc, 2);
+				FBO.bindAttribute(gl, webgltexcoordBuffer, shader.a_texcoord_loc, 2);
+
+				// Now, bind the textures.***
+				var prevIdx = i-1;
+				gl.activeTexture(gl.TEXTURE0);
+				gl.bindTexture(gl.TEXTURE_2D, this.fluxRFUMosaicTexture3d_HIGH_A.getTexture(prevIdx)); 
+
+				// Draw screenQuad:
+				gl.drawArrays(gl.TRIANGLES, 0, 6);
+			}
+			else if (j === 3)
+			{
+				// Destination :
+				// copy next flux_RFU_HIGH tex in col = 3, row = 0.***
+				var destCol = 3;
+				var destRow = 0;
+				gl.viewport(destCol, destRow, subTexWidth, subTexHeight);
+
+				// Origin : 
+				// calculate the coord of the screenQuad.***
+				var originCol = 0;
+				var originRow = 0;
+				var minX = originCol * unitaryXRange;
+				var minY = originRow * unitaryYRange;
+				var maxX = minX + unitaryXRange;
+				var maxY = minY + unitaryYRange;
+
+				var posData = new Float32Array([minX, minY,   maxX, minY,   minX, maxY,   minX, maxY,   maxX, minY,   maxX, maxY]); 
+				var texcoordData = new Float32Array([minX, minY,   maxX, minY,   minX, maxY,   minX, maxY,   maxX, minY,   maxX, maxY]); // origin texCoords.***
+				var webglposBuffer = FBO.createBuffer(gl, posData);
+				var webgltexcoordBuffer = FBO.createBuffer(gl, texcoordData);
+				FBO.bindAttribute(gl, webglposBuffer, shader.a_pos_loc, 2);
+				FBO.bindAttribute(gl, webgltexcoordBuffer, shader.a_texcoord_loc, 2);
+
+				// Now, bind the textures.***
+				var nextIdx = i+1;
+				gl.activeTexture(gl.TEXTURE0);
+				gl.bindTexture(gl.TEXTURE_2D, this.fluxRFUMosaicTexture3d_HIGH_A.getTexture(nextIdx)); 
+
+				// Draw screenQuad:
+				gl.drawArrays(gl.TRIANGLES, 0, 6);
+			}
+			else if (j === 4)
+			{
+				// Destination :
+				// copy prev flux_RFU_LOW tex in col = 0, row = 1.***
+				var destCol = 0;
+				var destRow = 1;
+				gl.viewport(destCol, destRow, subTexWidth, subTexHeight);
+
+				// Origin : 
+				// calculate the coord of the screenQuad.***
+				var originCol = mosaicXCount - 1;
+				var originRow = mosaicYCount - 1;
+				var minX = originCol * unitaryXRange;
+				var minY = originRow * unitaryYRange;
+				var maxX = minX + unitaryXRange;
+				var maxY = minY + unitaryYRange;
+
+				var posData = new Float32Array([minX, minY,   maxX, minY,   minX, maxY,   minX, maxY,   maxX, minY,   maxX, maxY]); 
+				var texcoordData = new Float32Array([minX, minY,   maxX, minY,   minX, maxY,   minX, maxY,   maxX, minY,   maxX, maxY]); // origin texCoords.***
+				var webglposBuffer = FBO.createBuffer(gl, posData);
+				var webgltexcoordBuffer = FBO.createBuffer(gl, texcoordData);
+				FBO.bindAttribute(gl, webglposBuffer, shader.a_pos_loc, 2);
+				FBO.bindAttribute(gl, webgltexcoordBuffer, shader.a_texcoord_loc, 2);
+
+				// Now, bind the textures.***
+				var prevIdx = i-1;
+				gl.activeTexture(gl.TEXTURE0);
+				gl.bindTexture(gl.TEXTURE_2D, this.fluxRFUMosaicTexture3d_LOW_A.getTexture(prevIdx)); 
+
+				// Draw screenQuad:
+				gl.drawArrays(gl.TRIANGLES, 0, 6);
+			}
+			else if (j === 5)
+			{
+				// Destination :
+				// copy next flux_RFU_LOW tex in col = 1, row = 1.***
+				var destCol = 1;
+				var destRow = 1;
+				gl.viewport(destCol, destRow, subTexWidth, subTexHeight);
+
+				// Origin : 
+				// calculate the coord of the screenQuad.***
+				var originCol = 0;
+				var originRow = 0;
+				var minX = originCol * unitaryXRange;
+				var minY = originRow * unitaryYRange;
+				var maxX = minX + unitaryXRange;
+				var maxY = minY + unitaryYRange;
+
+				var posData = new Float32Array([minX, minY,   maxX, minY,   minX, maxY,   minX, maxY,   maxX, minY,   maxX, maxY]); 
+				var texcoordData = new Float32Array([minX, minY,   maxX, minY,   minX, maxY,   minX, maxY,   maxX, minY,   maxX, maxY]); // origin texCoords.***
+				var webglposBuffer = FBO.createBuffer(gl, posData);
+				var webgltexcoordBuffer = FBO.createBuffer(gl, texcoordData);
+				FBO.bindAttribute(gl, webglposBuffer, shader.a_pos_loc, 2);
+				FBO.bindAttribute(gl, webgltexcoordBuffer, shader.a_texcoord_loc, 2);
+
+				// Now, bind the textures.***
+				var nextIdx = i+1;
+				gl.activeTexture(gl.TEXTURE0);
+				gl.bindTexture(gl.TEXTURE_2D, this.fluxRFUMosaicTexture3d_LOW_A.getTexture(nextIdx)); 
+
+				// Draw screenQuad:
+				gl.drawArrays(gl.TRIANGLES, 0, 6);
+			}
+			else if (j === 6)
+			{
+				// Destination :
+				// copy prev flux_LBD_HIGH tex in col = 0, row = 1.***
+				var destCol = 2;
+				var destRow = 1;
+				gl.viewport(destCol, destRow, subTexWidth, subTexHeight);
+
+				// Origin : 
+				// calculate the coord of the screenQuad.***
+				var originCol = mosaicXCount - 1;
+				var originRow = mosaicYCount - 1;
+				var minX = originCol * unitaryXRange;
+				var minY = originRow * unitaryYRange;
+				var maxX = minX + unitaryXRange;
+				var maxY = minY + unitaryYRange;
+
+				var posData = new Float32Array([minX, minY,   maxX, minY,   minX, maxY,   minX, maxY,   maxX, minY,   maxX, maxY]); 
+				var texcoordData = new Float32Array([minX, minY,   maxX, minY,   minX, maxY,   minX, maxY,   maxX, minY,   maxX, maxY]); // origin texCoords.***
+				var webglposBuffer = FBO.createBuffer(gl, posData);
+				var webgltexcoordBuffer = FBO.createBuffer(gl, texcoordData);
+				FBO.bindAttribute(gl, webglposBuffer, shader.a_pos_loc, 2);
+				FBO.bindAttribute(gl, webgltexcoordBuffer, shader.a_texcoord_loc, 2);
+
+				// Now, bind the textures.***
+				var prevIdx = i-1;
+				gl.activeTexture(gl.TEXTURE0);
+				gl.bindTexture(gl.TEXTURE_2D, this.fluxLBDMosaicTexture3d_HIGH_A.getTexture(prevIdx)); 
+
+				// Draw screenQuad:
+				gl.drawArrays(gl.TRIANGLES, 0, 6);
+			}
+			else if (j === 7)
+			{
+				// Destination :
+				// copy next flux_LBD_HIGH tex in col = 1, row = 1.***
+				var destCol = 3;
+				var destRow = 1;
+				gl.viewport(destCol, destRow, subTexWidth, subTexHeight);
+
+				// Origin : 
+				// calculate the coord of the screenQuad.***
+				var originCol = 0;
+				var originRow = 0;
+				var minX = originCol * unitaryXRange;
+				var minY = originRow * unitaryYRange;
+				var maxX = minX + unitaryXRange;
+				var maxY = minY + unitaryYRange;
+
+				var posData = new Float32Array([minX, minY,   maxX, minY,   minX, maxY,   minX, maxY,   maxX, minY,   maxX, maxY]); 
+				var texcoordData = new Float32Array([minX, minY,   maxX, minY,   minX, maxY,   minX, maxY,   maxX, minY,   maxX, maxY]); // origin texCoords.***
+				var webglposBuffer = FBO.createBuffer(gl, posData);
+				var webgltexcoordBuffer = FBO.createBuffer(gl, texcoordData);
+				FBO.bindAttribute(gl, webglposBuffer, shader.a_pos_loc, 2);
+				FBO.bindAttribute(gl, webgltexcoordBuffer, shader.a_texcoord_loc, 2);
+
+				// Now, bind the textures.***
+				var nextIdx = i+1;
+				gl.activeTexture(gl.TEXTURE0);
+				gl.bindTexture(gl.TEXTURE_2D, this.fluxLBDMosaicTexture3d_HIGH_A.getTexture(nextIdx)); 
+
+				// Draw screenQuad:
+				gl.drawArrays(gl.TRIANGLES, 0, 6);
+			}
+			else if (j === 8)
+			{
+				// Destination :
+				// copy prev flux_LBD_LOW tex in col = 0, row = 1.***
+				var destCol = 0;
+				var destRow = 2;
+				gl.viewport(destCol, destRow, subTexWidth, subTexHeight);
+
+				// Origin : 
+				// calculate the coord of the screenQuad.***
+				var originCol = mosaicXCount - 1;
+				var originRow = mosaicYCount - 1;
+				var minX = originCol * unitaryXRange;
+				var minY = originRow * unitaryYRange;
+				var maxX = minX + unitaryXRange;
+				var maxY = minY + unitaryYRange;
+
+				var posData = new Float32Array([minX, minY,   maxX, minY,   minX, maxY,   minX, maxY,   maxX, minY,   maxX, maxY]); 
+				var texcoordData = new Float32Array([minX, minY,   maxX, minY,   minX, maxY,   minX, maxY,   maxX, minY,   maxX, maxY]); // origin texCoords.***
+				var webglposBuffer = FBO.createBuffer(gl, posData);
+				var webgltexcoordBuffer = FBO.createBuffer(gl, texcoordData);
+				FBO.bindAttribute(gl, webglposBuffer, shader.a_pos_loc, 2);
+				FBO.bindAttribute(gl, webgltexcoordBuffer, shader.a_texcoord_loc, 2);
+
+				// Now, bind the textures.***
+				var prevIdx = i-1;
+				gl.activeTexture(gl.TEXTURE0);
+				gl.bindTexture(gl.TEXTURE_2D, this.fluxLBDMosaicTexture3d_LOW_A.getTexture(prevIdx)); 
+
+				// Draw screenQuad:
+				gl.drawArrays(gl.TRIANGLES, 0, 6);
+			}
+			else if (j === 9)
+			{
+				// Destination :
+				// copy next flux_LBD_LOW tex in col = 1, row = 1.***
+				var destCol = 1;
+				var destRow = 2;
+				gl.viewport(destCol, destRow, subTexWidth, subTexHeight);
+
+				// Origin : 
+				// calculate the coord of the screenQuad.***
+				var originCol = 0;
+				var originRow = 0;
+				var minX = originCol * unitaryXRange;
+				var minY = originRow * unitaryYRange;
+				var maxX = minX + unitaryXRange;
+				var maxY = minY + unitaryYRange;
+
+				var posData = new Float32Array([minX, minY,   maxX, minY,   minX, maxY,   minX, maxY,   maxX, minY,   maxX, maxY]); 
+				var texcoordData = new Float32Array([minX, minY,   maxX, minY,   minX, maxY,   minX, maxY,   maxX, minY,   maxX, maxY]); // origin texCoords.***
+				var webglposBuffer = FBO.createBuffer(gl, posData);
+				var webgltexcoordBuffer = FBO.createBuffer(gl, texcoordData);
+				FBO.bindAttribute(gl, webglposBuffer, shader.a_pos_loc, 2);
+				FBO.bindAttribute(gl, webgltexcoordBuffer, shader.a_texcoord_loc, 2);
+
+				// Now, bind the textures.***
+				var nextIdx = i+1;
+				gl.activeTexture(gl.TEXTURE0);
+				gl.bindTexture(gl.TEXTURE_2D, this.fluxLBDMosaicTexture3d_LOW_A.getTexture(nextIdx)); 
+
+				// Draw screenQuad:
+				gl.drawArrays(gl.TRIANGLES, 0, 6);
+			}
+		}
+		
 	}
 
 
-	
-	var hola = 0;
+	fbo.unbind();
+	gl.enable(gl.DEPTH_TEST);
+	gl.enable(gl.CULL_FACE);
+};
+
+SoundLayer.prototype._calculateFlux = function ()
+{
+	if (!this.voxelizer)
+	{
+		return false;
+	}
+
+	var soundManager = this.soundManager;
+	var magoManager = soundManager.magoManager;
+	var gl = magoManager.getGl();
+
+	var fbo = this.voxelizer.fbo; // this if mosaicTextureSize.***
+	var extbuffers = fbo.extbuffers;
+
+	fbo.bind();
+	gl.viewport(0, 0, fbo.width[0], fbo.height[0]);
+	var webglController = new WebGlController(gl);
+
+	var screenQuad = soundManager.getQuadBuffer();
+	var shader = magoManager.postFxShadersManager.getShader("soundCalculateFlux");
+	magoManager.postFxShadersManager.useProgram(shader);
+	//var increTimeSeconds = waterManager.getIncrementTimeSeconds() * 1;
+
+	var refTex3D = this.fluxRFUMosaicTexture3d_HIGH_A; // we can take any other texture3D.***
+
+	gl.uniform1f(shader.u_airMaxPressure_loc, soundManager.airMaxPressure);
+	gl.uniform1f(shader.u_maxFlux_loc, soundManager.maxFlux);
+	gl.uniform1iv(shader.u_mosaicSize_loc, [refTex3D.mosaicXCount, refTex3D.mosaicYCount, refTex3D.finalSlicesCount]); // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***
+	gl.uniform1iv(shader.u_texSize_loc, [refTex3D.texture3DXSize, refTex3D.texture3DYSize, refTex3D.texture3DZSize]); // The original texture3D size.***
+	gl.uniform3fv(shader.u_voxelSizeMeters_loc, [this.oneVoxelSizeInMeters[0], this.oneVoxelSizeInMeters[1], this.oneVoxelSizeInMeters[2]]); // The one voxel size in meters.***
+	gl.uniform1f(shader.u_timestep_loc, this.simulationTimeStep);
+
+	// bind screenQuad positions.
+	FBO.bindAttribute(gl, screenQuad.posBuffer, shader.a_pos_loc, 2);
+
+	//********************************************************************************************************
+	// Note : MRT with 4 channels.
+	//********************************************************************************************************
+	extbuffers.drawBuffersWEBGL([
+		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
+		extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1]
+		extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2]
+		extbuffers.COLOR_ATTACHMENT3_WEBGL, // gl_FragData[3]
+		extbuffers.COLOR_ATTACHMENT4_WEBGL, // gl_FragData[3]
+		extbuffers.NONE, // gl_FragData[3]
+		extbuffers.NONE, // gl_FragData[3]
+		extbuffers.NONE, // gl_FragData[3]
+	]);
+
+	//gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT4_WEBGL, gl.TEXTURE_2D, null, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT5_WEBGL, gl.TEXTURE_2D, null, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT6_WEBGL, gl.TEXTURE_2D, null, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT7_WEBGL, gl.TEXTURE_2D, null, 0);
+
+	webglController.clearColor(0.0, 0.0, 0.0, 0.0);
+
+	var finalSlicesCount = this.pressureMosaicTexture3d_A.finalSlicesCount;
+	for (var i=0; i<finalSlicesCount; i++)
+	{
+		// Bind the 8 output textures:
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.fluxRFUMosaicTexture3d_HIGH_A.getTexture( i ), 0);
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.fluxRFUMosaicTexture3d_LOW_A.getTexture( i ), 0);
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, this.fluxLBDMosaicTexture3d_HIGH_A.getTexture( i ), 0);
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, this.fluxLBDMosaicTexture3d_LOW_A.getTexture( i ), 0);
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT4_WEBGL, gl.TEXTURE_2D, this.shaderLogTexture.getTexture( i ), 0);
+
+		gl.activeTexture(gl.TEXTURE0);
+		gl.bindTexture(gl.TEXTURE_2D, this.pressureMosaicTexture3d_B.getTexture( i )); // sound source.
+
+		gl.activeTexture(gl.TEXTURE1);
+		gl.bindTexture(gl.TEXTURE_2D, this.fluxRFUMosaicTexture3d_HIGH_B.getTexture( i )); // sound source.
+
+		gl.activeTexture(gl.TEXTURE2);
+		gl.bindTexture(gl.TEXTURE_2D, this.fluxRFUMosaicTexture3d_LOW_B.getTexture( i )); // sound source.
+
+		gl.activeTexture(gl.TEXTURE3);
+		gl.bindTexture(gl.TEXTURE_2D, this.fluxLBDMosaicTexture3d_HIGH_B.getTexture( i )); // sound source.
+
+		gl.activeTexture(gl.TEXTURE4);
+		gl.bindTexture(gl.TEXTURE_2D, this.fluxLBDMosaicTexture3d_LOW_B.getTexture( i ));
+
+		gl.activeTexture(gl.TEXTURE5);
+		gl.bindTexture(gl.TEXTURE_2D, this.auxMosaicTexture3d_forFluxCalculation.getTexture( i ));
+
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		// Draw screenQuad:
+		gl.drawArrays(gl.TRIANGLES, 0, 6);
+	}
+
+	for (var i=0; i<8; i++)
+	{
+		gl.activeTexture(gl.TEXTURE0+i);
+		gl.bindTexture(gl.TEXTURE_2D, null);
+	}
+
+	fbo.unbind();
+	webglController.restoreAllParameters();
+
+	// now, swap waterHeightTextures:
+	SoundLayer._swapTextures3D(this.fluxRFUMosaicTexture3d_HIGH_A, this.fluxRFUMosaicTexture3d_HIGH_B);
+	SoundLayer._swapTextures3D(this.fluxRFUMosaicTexture3d_LOW_A, this.fluxRFUMosaicTexture3d_LOW_B);
+	SoundLayer._swapTextures3D(this.fluxLBDMosaicTexture3d_HIGH_A, this.fluxLBDMosaicTexture3d_HIGH_B);
+	SoundLayer._swapTextures3D(this.fluxLBDMosaicTexture3d_LOW_A, this.fluxLBDMosaicTexture3d_LOW_B);
+};
+
+SoundLayer.prototype._calculateAirPressureFromSoundSource = function ()
+{
+	if (!this.voxelizer)
+	{
+		return false;
+	}
+
+	var soundManager = this.soundManager;
+	var magoManager = soundManager.magoManager;
+	var gl = magoManager.getGl();
+
+	var fbo = this.voxelizer.fbo; // this if mosaicTextureSize.***
+	var extbuffers = fbo.extbuffers;
+
+	fbo.bind();
+	gl.viewport(0, 0, fbo.width[0], fbo.height[0]);
+	var webglController = new WebGlController(gl);
+
+	var screenQuad = soundManager.getQuadBuffer();
+	var shader = magoManager.postFxShadersManager.getShader("soundCalculateAirPressure");
+	magoManager.postFxShadersManager.useProgram(shader);
+	//var increTimeSeconds = waterManager.getIncrementTimeSeconds() * 1;
+
+	gl.uniform1f(shader.u_airMaxPressure_loc, soundManager.airMaxPressure);
+
+	// bind screenQuad positions.
+	FBO.bindAttribute(gl, screenQuad.posBuffer, shader.a_pos, 2);
+
+	//********************************************************************************************************
+	// Note : MRT with 4 channels, because we need bind 4 source textures & 4 current airPressure textures.***
+	//********************************************************************************************************
+	extbuffers.drawBuffersWEBGL([
+		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
+		extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1]
+		extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2]
+		extbuffers.COLOR_ATTACHMENT3_WEBGL, // gl_FragData[3]
+		extbuffers.NONE, // gl_FragData[3]
+		extbuffers.NONE, // gl_FragData[3]
+		extbuffers.NONE, // gl_FragData[3]
+		extbuffers.NONE, // gl_FragData[3]
+	]);
+
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT4_WEBGL, gl.TEXTURE_2D, null, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT5_WEBGL, gl.TEXTURE_2D, null, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT6_WEBGL, gl.TEXTURE_2D, null, 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT7_WEBGL, gl.TEXTURE_2D, null, 0);
+
+	webglController.clearColor(0.0, 0.0, 0.0, 0.0);
+
+	var finalSlicesCount = this.pressureMosaicTexture3d_A.finalSlicesCount;
+	var rendersCount = Math.ceil(finalSlicesCount / 4);
+	for (var i=0; i<rendersCount; i++)
+	{
+		// Bind the 8 output textures:
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.pressureMosaicTexture3d_A.getTexture( i*4 + 0 ), 0);
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.pressureMosaicTexture3d_A.getTexture( i*4 + 1 ), 0);
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, this.pressureMosaicTexture3d_A.getTexture( i*4 + 2 ), 0);
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, this.pressureMosaicTexture3d_A.getTexture( i*4 + 3 ), 0);
+
+		//gl.uniform1i(shader.u_lowestMosaicSliceIndex_loc,  i*8);
+		// bind sound source.***
+		gl.activeTexture(gl.TEXTURE0);
+		gl.bindTexture(gl.TEXTURE_2D, this.soundSourceMosaicTexture3d.getTexture( i*4 + 0 )); // sound source.
+
+		gl.activeTexture(gl.TEXTURE1);
+		gl.bindTexture(gl.TEXTURE_2D, this.soundSourceMosaicTexture3d.getTexture( i*4 + 1 )); // sound source.
+
+		gl.activeTexture(gl.TEXTURE2);
+		gl.bindTexture(gl.TEXTURE_2D, this.soundSourceMosaicTexture3d.getTexture( i*4 + 2 )); // sound source.
+
+		gl.activeTexture(gl.TEXTURE3);
+		gl.bindTexture(gl.TEXTURE_2D, this.soundSourceMosaicTexture3d.getTexture( i*4 + 3 )); // sound source.
+
+		// bind current air pressure.***
+		gl.activeTexture(gl.TEXTURE4);
+		gl.bindTexture(gl.TEXTURE_2D, this.pressureMosaicTexture3d_B.getTexture( i*4 + 0 ));
+
+		gl.activeTexture(gl.TEXTURE5);
+		gl.bindTexture(gl.TEXTURE_2D, this.pressureMosaicTexture3d_B.getTexture( i*4 + 1 ));
+
+		gl.activeTexture(gl.TEXTURE6);
+		gl.bindTexture(gl.TEXTURE_2D, this.pressureMosaicTexture3d_B.getTexture( i*4 + 2 ));
+
+		gl.activeTexture(gl.TEXTURE7);
+		gl.bindTexture(gl.TEXTURE_2D, this.pressureMosaicTexture3d_B.getTexture( i*4 + 3 ));
+
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		// Draw screenQuad:
+		gl.drawArrays(gl.TRIANGLES, 0, 6);
+	}
+
+	for (var i=0; i<8; i++)
+	{
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL+i, gl.TEXTURE_2D, null, 0);
+	}
+
+	for (var i=0; i<8; i++)
+	{
+		gl.activeTexture(gl.TEXTURE0+i);
+		gl.bindTexture(gl.TEXTURE_2D, null);
+	}
+
+	fbo.unbind();
+	webglController.restoreAllParameters();
+
+	// now, swap waterHeightTextures:
+	SoundLayer._swapTextures3D(this.pressureMosaicTexture3d_A, this.pressureMosaicTexture3d_B);
+};
+
+SoundLayer._swapTextures3D = function (magoTexture3D_A, magoTexture3D_B)
+{
+	// swap the texturesArray.***
+	var texturesArrayAux = magoTexture3D_A.texturesArray;
+	magoTexture3D_A.texturesArray = magoTexture3D_B.texturesArray;
+	magoTexture3D_B.texturesArray = texturesArrayAux;
 };
 
 SoundLayer.prototype._makeQuantizedMeshVbo = function (tile)

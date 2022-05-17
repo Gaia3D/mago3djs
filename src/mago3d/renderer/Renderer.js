@@ -2249,7 +2249,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 	//	texture = laserCamDepthFBO.colorBuffer;
 	//}
 
-	
+	gl.uniform1i(shader.uTextureType_loc, 0);
 
 	if (magoManager.depthTex)
 	{
@@ -2381,6 +2381,11 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 	// soundManager.*** soundManager.*** soundManager.***soundManager.*** soundManager.*** soundManager.***soundManager.*** soundManager.*** soundManager.***
 	if (magoManager.soundManager)
 	{
+		if (this.lastIdx === undefined)
+		{
+			this.lastIdx = 0;
+		}
+
 		if (magoManager.soundManager.soundLayersArray.length > 0)
 		{
 			var soundLayer = magoManager.soundManager.soundLayersArray[0];
@@ -2389,11 +2394,51 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 				//texture = soundLayer.demWithBuildingsTex.texId;
 			}
 
-			if (soundLayer.sceneVoxelizedTexture3d)
+			if (soundLayer.soundSourceRealTexture3d)
 			{
-				if (soundLayer.sceneVoxelizedTexture3d.texturesArray.length > 0)
+				if (soundLayer.soundSourceRealTexture3d.texturesArray.length > 0)
 				{
-					//texture = soundLayer.sceneVoxelizedTexture3d.texturesArray[1];
+					if (this.lastIdx >= soundLayer.soundSourceRealTexture3d.texturesArray.length)
+					{
+						this.lastIdx = 0;
+					}
+					//texture = soundLayer.soundSourceRealTexture3d.texturesArray[this.lastIdx];
+					this.lastIdx += 1;
+				}
+			}
+
+			if (soundLayer.pressureMosaicTexture3d_A)
+			{
+				if (soundLayer.pressureMosaicTexture3d_A.texturesArray.length > 0)
+				{
+					//texture = soundLayer.pressureMosaicTexture3d_A.texturesArray[0];
+				}
+			}
+
+			if (soundLayer.fluxRFUMosaicTexture3d_HIGH_A)
+			{
+				if (soundLayer.fluxRFUMosaicTexture3d_HIGH_A.texturesArray.length > 0)
+				{
+					//texture = soundLayer.fluxRFUMosaicTexture3d_HIGH_A.texturesArray[0];
+					//gl.uniform1i(shader.uTextureType_loc, 2); // if want to see scene voxelization.***
+				}
+			}
+
+			if (soundLayer.fluxRFUMosaicTexture3d_LOW_A)
+			{
+				if (soundLayer.fluxRFUMosaicTexture3d_LOW_A.texturesArray.length > 0)
+				{
+					//texture = soundLayer.fluxRFUMosaicTexture3d_LOW_A.texturesArray[0];
+					//gl.uniform1i(shader.uTextureType_loc, 3); // 
+				}
+			}
+
+			if (soundLayer.fluxLBDMosaicTexture3d_LOW_A)
+			{
+				if (soundLayer.fluxLBDMosaicTexture3d_LOW_A.texturesArray.length > 0)
+				{
+					//texture = soundLayer.fluxLBDMosaicTexture3d_LOW_A.texturesArray[0];
+					//gl.uniform1i(shader.uTextureType_loc, 2); // if want to see scene voxelization.***
 				}
 			}
 
@@ -2401,7 +2446,31 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 			{
 				if (soundLayer.soundSourceMosaicTexture3d.texturesArray.length > 0)
 				{
-					//texture = soundLayer.soundSourceMosaicTexture3d.texturesArray[1];
+					//texture = soundLayer.soundSourceMosaicTexture3d.texturesArray[0];
+				}
+			}
+
+			if (soundLayer.auxMosaicTexture3d_forFluxCalculation)
+			{
+				if (soundLayer.auxMosaicTexture3d_forFluxCalculation.texturesArray.length > 0)
+				{
+					//texture = soundLayer.auxMosaicTexture3d_forFluxCalculation.texturesArray[0];
+				}
+			}
+
+			if (soundLayer.airVelocity_B)
+			{
+				if (soundLayer.airVelocity_B.texturesArray.length > 0)
+				{
+					//texture = soundLayer.airVelocity_B.texturesArray[0];
+				}
+			}
+
+			if (soundLayer.shaderLogTexture)
+			{
+				if (soundLayer.shaderLogTexture.texturesArray.length > 0)
+				{
+					texture = soundLayer.shaderLogTexture.texturesArray[0];
 				}
 			}
 		}
@@ -2543,7 +2612,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 	gl.activeTexture(gl.TEXTURE0 + 0); 
 	gl.bindTexture(gl.TEXTURE_2D, texture);
 
-	gl.uniform1i(shader.uTextureType_loc, 0); // 0= texture tal qual. 1= decoding depth 4 bytes.***
+	 // 0= texture tal qual. 1= decoding depth 4 bytes.***
 
 	if (!this.auxCubeMap)
 	{

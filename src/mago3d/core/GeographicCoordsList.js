@@ -764,6 +764,16 @@ GeographicCoordsList.prototype.getExtrudedMeshRenderableObject = function(height
 	var surfIndepMesh = solidMesh.getCopySurfaceIndependentMesh();
 	surfIndepMesh.calculateVerticesNormals();
 
+	if (!surfIndepMesh.boundingSphereWC)
+	{
+		surfIndepMesh.boundingSphereWC = new BoundingSphere();
+		var positionWC = geoLocData.position;
+		var bbox = solidMesh.getBoundingBox();
+		var radiusAprox = bbox.getRadiusAprox(); // calculate it : TODO.
+		surfIndepMesh.boundingSphereWC.setCenterPoint(positionWC.x, positionWC.y, positionWC.z);
+		surfIndepMesh.boundingSphereWC.setRadius(radiusAprox);
+	}
+
 	if (textureInfo)
 	{
 		var c = document.createElement("canvas");

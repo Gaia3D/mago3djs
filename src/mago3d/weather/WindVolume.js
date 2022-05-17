@@ -255,7 +255,7 @@ WindVolume.prototype.createWindDisplayPlane = function (magoManager)
 		windDisplayPlane.setWireframeColor(0.2, 0.3, 0.4, 1.0);
 		windDisplayPlane.attributes.isMovable = true;
 		windDisplayPlane.attributes.movementInAxisZ = true;
-
+		windDisplayPlane.attributes.isSelectable = true;
 		windDisplayPlane.attributes.minAltitude = this.getMinAltitude();
 		windDisplayPlane.attributes.maxAltitude = this.getMaxAltitude();
 
