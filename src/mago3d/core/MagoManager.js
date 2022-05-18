@@ -2390,9 +2390,6 @@ MagoManager.prototype.doRender = function (frustumVolumenObject)
 		this.renderer.copyTexture(this.cesiumColorBuffer, this.albedoTex, bTexFlipXAxis, bTexFlipYAxis);
 		// this.renderer.copyTexture(this.scene._context._us.globeDepthTexture._texture, this.debugTex, bTexFlipXAxis, bTexFlipYAxis);
 
-		// Test voxelization of a region.***
-		
-
 		// Render the lightBuffer.*****************************************
 		if (sceneState.applyLightsShadows)
 		{

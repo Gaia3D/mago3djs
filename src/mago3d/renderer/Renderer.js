@@ -2358,7 +2358,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 				var depthTex = windVolumeFrontFBO.colorBuffersArray[1]; // [1] = depth, [2] = normal
 				if (depthTex)
 				{
-					texture = depthTex;
+					//texture = depthTex;
 				}
 			}
 			
@@ -2831,9 +2831,6 @@ Renderer.prototype.renderLightBuffer = function (lightSourcesArray)
 	var magoManager = this.magoManager;
 	var lightSourcesCount = lightSourcesArray.length;
 
-	if (lightSourcesCount === 0)
-	{ return; }
-
 	var gl = magoManager.getGl();
 	var sceneState = magoManager.sceneState;
 	var webglController = new WebGlController(gl);
@@ -2860,6 +2857,9 @@ Renderer.prototype.renderLightBuffer = function (lightSourcesArray)
 	webglController.clearDepth(1);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	webglController.clearColor(0, 0, 0, 1);
+
+	if (lightSourcesCount === 0)
+	{ return; }
 
 	// bind LBuffer shader.
 	var bApplySsao = false;
