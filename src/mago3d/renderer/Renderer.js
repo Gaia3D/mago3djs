@@ -2358,7 +2358,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 				var depthTex = windVolumeFrontFBO.colorBuffersArray[1]; // [1] = depth, [2] = normal
 				if (depthTex)
 				{
-					//texture = depthTex;
+					texture = depthTex;
 				}
 			}
 			
@@ -3467,6 +3467,7 @@ Renderer.prototype.renderGeometryBuffer = function (gl, renderType, visibleObjCo
 	 			bRenderTransparents : false
 			};
 
+			
 			
 			this.renderNativeObjects(gl, currentShader, renderType, visibleObjControlerNodes, options);
 			gl.uniform1i(currentShader.clippingType_loc, 0); // 0= no clipping.***

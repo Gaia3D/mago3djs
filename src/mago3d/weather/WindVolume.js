@@ -32,7 +32,7 @@ var WindVolume = function (options)
 
 	// Animation state controls.
 	this._animationState = 1; // 0= paused. 1= play.
-	this._particesGenerationType = 3; // 0= no generation. 1= inside frustum. 2= particlesGeneratorBox. 3= altitudePlane
+	this._particesGenerationType = 1; // 0= no generation. 1= inside frustum. 2= particlesGeneratorBox. 3= altitudePlane
 
 	// Particles generator.
 	this._particlesGeneratorBoxesArray;
@@ -1116,7 +1116,7 @@ WindVolume.prototype.renderDepthWindVolumeORT = function(magoManager)
 	//gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, magoManager.cesiumColorBuffer, 0);
 };
 
-WindVolume.prototype.renderDepthWindVolume = function(magoManager)
+WindVolume.prototype.renderDepthWindVolume = function (magoManager)
 {
 	// Render depth 2 times:
 	// 1- render the rear faces.
@@ -1146,6 +1146,21 @@ WindVolume.prototype.renderDepthWindVolume = function(magoManager)
 		this.visibleObjControler.currentVisibleNativeObjects.opaquesArray[1] = windDisplayPlane;
 	}
 
+	//this._particesGenerationType = 1; // 0= no generation. 1= inside frustum. 2= particlesGeneratorBox. 3= altitudePlane
+	if (this._particesGenerationType === 1)
+	{
+		// The windDisplayBox & plane are objects that in the scene, must dont have depth effect, so usually its has "options.depthMask = false",
+		// but, when need to do depth render, then, must set "options.depthMask = true" to render depth correctly. After depth render, we return to "options.depthMask = false".
+		this.windDisplayBox.options.depthMask = true;
+		var windDisplayPlanesCount = this.windDisplayPlanesArray.length;
+		for (var i=0; i<windDisplayPlanesCount; i++)
+		{
+			var plane = this.windDisplayPlanesArray[i];
+			plane.options.depthMask = true;
+		}
+	}
+	
+
 	// Front Face.***************************************************************************************************************************
 	var windVolumeFrontFBO = this._getVolumeFrontFBO(magoManager);
 	windVolumeFrontFBO.bind();
@@ -1161,6 +1176,7 @@ WindVolume.prototype.renderDepthWindVolume = function(magoManager)
 		extbuffers.COLOR_ATTACHMENT3_WEBGL // gl_FragData[3] - albedoTex
 	  ]);
 
+	//if (magoManager.isFarestFrustum())// === 2)
 	if (magoManager.currentFrustumIdx === 2)
 	{
 		gl.clearColor(0, 0, 0, 1);
@@ -1168,6 +1184,10 @@ WindVolume.prototype.renderDepthWindVolume = function(magoManager)
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		gl.clearColor(0, 0, 0, 1);
 	}
+
+	// Test debug::::::::
+	//if (this.visibleObjControler.currentVisibleNativeObjects.opaquesArray.length > 1)
+	//{ this.visibleObjControler.currentVisibleNativeObjects.opaquesArray.length = 1; }
 
 	var renderType = 1;
 	gl.frontFace(gl.CCW);
@@ -1193,6 +1213,7 @@ WindVolume.prototype.renderDepthWindVolume = function(magoManager)
 		extbuffers.COLOR_ATTACHMENT3_WEBGL // gl_FragData[3] - albedoTex
 	  ]);
 
+	//if (magoManager.isFarestFrustum())// === 2)
 	if (magoManager.currentFrustumIdx === 2)
 	{
 		gl.clearColor(0, 0, 0, 1);
@@ -1214,6 +1235,20 @@ WindVolume.prototype.renderDepthWindVolume = function(magoManager)
 	// Return to main framebuffer.************************
 	// return default values:
 	gl.frontFace(gl.CCW);
+
+	//this._particesGenerationType = 1; // 0= no generation. 1= inside frustum. 2= particlesGeneratorBox. 3= altitudePlane
+	if (this._particesGenerationType === 1)
+	{
+		// The windDisplayBox & plane are objects that in the scene, must dont have depth effect, so usually its has "options.depthMask = false",
+		// but, when need to do depth render, then, must set "options.depthMask = true" to render depth correctly. After depth render, we return to "options.depthMask = false".
+		this.windDisplayBox.options.depthMask = false;
+		var windDisplayPlanesCount = this.windDisplayPlanesArray.length;
+		for (var i=0; i<windDisplayPlanesCount; i++)
+		{
+			var plane = this.windDisplayPlanesArray[i];
+			plane.options.depthMask = false;
+		}
+	}
 
 	magoManager.bindMainFramebuffer();
 

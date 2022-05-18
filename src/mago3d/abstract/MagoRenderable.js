@@ -350,10 +350,6 @@ MagoRenderable.prototype.render = function (magoManager, shader, renderType, glP
 
 	if (renderShaded)
 	{ 
-		webglController.frontFace(gl.CW);
-		this.renderAsChild(magoManager, shader, renderType, glPrimitive, bIsSelected, this.options); 
-
-		webglController.frontFace(gl.CCW);
 		this.renderAsChild(magoManager, shader, renderType, glPrimitive, bIsSelected, this.options); 
 	}
 
@@ -415,6 +411,7 @@ MagoRenderable.prototype.render = function (magoManager, shader, renderType, glP
 			
 			var bWireframe = true;
 			this.renderAsChild(magoManager, shaderThickLine, renderType, glPrimitive, bIsSelected, this.options, bWireframe);
+			webglController.enable_GL_CULL_FACE();
 			
 			// Return to the currentShader.
 			magoManager.postFxShadersManager.useProgram(shader);
