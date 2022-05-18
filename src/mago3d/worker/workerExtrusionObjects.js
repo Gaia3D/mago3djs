@@ -44,7 +44,7 @@ importScripts('./src/VertexList_.js');
 importScripts('./src/VtxProfile_.js');
 importScripts('./src/VtxProfilesList_.js');
 importScripts('./src/VtxRing_.js');
-
+importScripts('./src/Quaternion_.js');
 
 var worker = self;
 

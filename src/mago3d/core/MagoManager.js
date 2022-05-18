@@ -568,21 +568,6 @@ MagoManager.prototype.handleBrowserEvent = function(browserEvent)
 		interaction.handle(browserEvent);
 	}
 	this.setMouseStatus(browserEvent.type);
-	
-	/*if (browserEvent.type === 'click')
-	{
-		//
-		var infoPromise = loadWithXhr('./persistence/json/mago3d-building_4326');
-
-		infoPromise.done(function(e)
-		{
-			
-			var pbf = new Pbf(e);
-			console.info(pbf);
-			var c = MBTile.read(pbf);
-			console.info(c);
-		});
-	}*/
 };
 
 /**

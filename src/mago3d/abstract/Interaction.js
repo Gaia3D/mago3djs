@@ -18,6 +18,7 @@ var Interaction = function ()
 
 	this.manager;
 	this.active = false;
+	this.stop = false;
 };
 Interaction.prototype = Object.create(Emitter.prototype);
 Interaction.prototype.constructor = Interaction;
@@ -39,6 +40,25 @@ Interaction.prototype.setActive = function(active)
 Interaction.prototype.getActive = function() 
 {
 	return this.active;
+};
+
+/**
+ * set stop. set true, this interaction temporary action not working.
+ * @param {boolean} active
+ * @abstract
+ */
+Interaction.prototype.setStop = function(stop) 
+{
+	this.stop = stop;
+};
+ 
+/**
+  * get stop status.
+  * @param {boolean} active
+  */
+Interaction.prototype.getStop = function() 
+{
+	 return this.stop;
 };
 
 /**

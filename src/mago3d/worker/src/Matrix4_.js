@@ -129,3 +129,56 @@ Matrix4_.prototype.rotatePoint3D = function(point3d, result)
 
 	return result;
 };
+
+/**
+ * 좌표값과 회전양을 통해 회전된 4차원 행렬을 구한다.
+ *
+ * @param {Number} angDeg 회전양(Degree)
+ * @param {Number} axis_x X축 좌표
+ * @param {Number} axis_y Y축 좌표
+ * @param {Number} axis_z Z축 좌표
+ * 
+ * @see Quaternion
+ * @see Quaternion#rotationAngDeg
+ * @see Matrix4#rotationByQuaternion
+ */
+ Matrix4_.prototype.rotationAxisAngDeg = function(angDeg, axis_x, axis_y, axis_z) 
+ {
+	 var quaternion = new Quaternion_();
+	 quaternion.rotationAngDeg(angDeg, axis_x, axis_y, axis_z);
+	 this.rotationByQuaternion(quaternion);
+	 quaternion = undefined;
+ };
+
+ /**
+ * 쿼터니언(사원수)을 통한 회전된 4차원 행렬을 구한다.
+ *
+ * @param {Quaternion} quaternion 사원수
+ */
+Matrix4_.prototype.rotationByQuaternion = function(quaternion) 
+{
+	var x = quaternion.x;
+	var y = quaternion.y;
+	var z = quaternion.z;
+	var w = quaternion.w;
+
+	this._floatArrays[this.getIndexOfArray(0, 0)] = 1 - 2*y*y - 2*z*z;
+	this._floatArrays[this.getIndexOfArray(0, 1)] = 2*x*y + 2*z*w;
+	this._floatArrays[this.getIndexOfArray(0, 2)] = 2*x*z - 2*y*w;
+	this._floatArrays[this.getIndexOfArray(0, 3)] = 0.0;
+
+	this._floatArrays[this.getIndexOfArray(1, 0)] = 2*x*y - 2*z*w;
+	this._floatArrays[this.getIndexOfArray(1, 1)] = 1 - 2*x*x - 2*z*z;
+	this._floatArrays[this.getIndexOfArray(1, 2)] = 2*y*z + 2*x*w;
+	this._floatArrays[this.getIndexOfArray(1, 3)] = 0.0;
+
+	this._floatArrays[this.getIndexOfArray(2, 0)] = 2*x*z + 2*y*w;
+	this._floatArrays[this.getIndexOfArray(2, 1)] = 2*y*z - 2*x*w;
+	this._floatArrays[this.getIndexOfArray(2, 2)] = 1 - 2*x*x - 2*y*y;
+	this._floatArrays[this.getIndexOfArray(2, 3)] = 0.0;
+
+	this._floatArrays[this.getIndexOfArray(3, 0)] = 0.0;
+	this._floatArrays[this.getIndexOfArray(3, 1)] = 0.0;
+	this._floatArrays[this.getIndexOfArray(3, 2)] = 0.0;
+	this._floatArrays[this.getIndexOfArray(3, 3)] = 1.0;
+};

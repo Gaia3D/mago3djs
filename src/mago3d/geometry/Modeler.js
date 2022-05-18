@@ -804,6 +804,14 @@ Modeler.prototype.removeObject = function(target)
 				return obj !== target;
 			});
 		}
+
+		if (tile.nativeObjects.lightSourcesArray) 
+		{
+			tile.nativeObjects.lightSourcesArray = tile.nativeObjects.lightSourcesArray.filter(function(obj)
+			{
+				return obj !== target;
+			});
+		}
 	}
 	
 	this.objectsArray = this.objectsArray.filter(function(object)

@@ -148,12 +148,16 @@ ExtrusionBuilding.prototype.makeMesh = function()
 		guid                  : guid,
 		objectsToExtrudeArray : objectsToExtrudeArray,
 		color                 : color,
-		geoLocation           : {longitude : geoLocData.geographicCoord.longitude,
+		geoLocation           : {
+			longitude : geoLocData.geographicCoord.longitude,
 			latitude  : geoLocData.geographicCoord.latitude,
-			altitude  : geoLocData.geographicCoord.altitude},
-		rotation: {heading : geoLocData.heading,
-			pitch   : geoLocData.pitch,
-			roll    : geoLocData.roll}
+			altitude  : geoLocData.geographicCoord.altitude
+		},
+		rotation: {
+			heading : 0,
+			pitch   : 0,
+			roll    : 0
+		}
 	};
 	extrudeWorkerManager.doExtrude(data); // ***
 	

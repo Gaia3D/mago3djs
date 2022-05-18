@@ -674,6 +674,7 @@ WeatherStation.prototype.addWind = function(geoJson, options)
 	 options.geoJsonFile = geoJson;
 
 	var windVolume = this.newWindVolume(options);
+	return windVolume;
 };
 
 WeatherStation.prototype.loadDustGeoJson = function(geoJsonFilePath)

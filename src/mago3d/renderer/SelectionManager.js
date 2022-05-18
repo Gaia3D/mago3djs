@@ -732,6 +732,68 @@ SelectionManager.prototype.provisionalToCurrent = function (type, filter, mainta
 };
 
 /**
+ * 
+ * @param {string} type required.
+ * @param {function} filter option.
+ */
+SelectionManager.prototype.provisionalAddToCurrent = function (type, filter) 
+{
+	var validProvision = this.filterProvisional(type, filter);
+	if (isEmpty(validProvision)){ return; }
+
+	for (var i in validProvision)
+	{
+		if (validProvision.hasOwnProperty(i))
+		{
+			var variableName = getVariableName(i);
+			var provisions = validProvision[i];
+			for (var j=0, len=provisions.length;j<len;j++) 
+			{
+				var provision = provisions[j];
+				var index = this[variableName.currentMember].indexOf(provision);
+				if (index > -1) 
+				{
+					this[variableName.currentMember].splice(index, 1);
+				}
+				else 
+				{
+					this[variableName.currentMember].push(provision);
+				}
+			}
+			//this[variableName.currentMember].push(...validProvision[i]);
+			//this[variableName.auxMember] = validProvision[i][0];
+		}
+	}
+
+	this.clearProvisionals();
+
+	function getVariableName(t)
+	{
+		switch (t)
+		{
+		case DataType.F4D : {
+			return {
+				currentMember : 'currentNodeSelectedArray',
+				auxMember     : 'currentNodeSelected',
+			};
+		}
+		case DataType.OBJECT : {
+			return {
+				currentMember : 'currentReferenceSelectedArray',
+				auxMember     : 'currentReferenceSelected',
+			};
+		}
+		case DataType.NATIVE : {
+			return {
+				currentMember : 'currentGeneralObjectSelectedArray',
+				auxMember     : 'currentGeneralObjectSelected',
+			};
+		}
+		}
+	}
+};
+
+/**
  * select object by polygon 2d
  * @param {Polygon2D} polygon2D polygon2d for find object
  * @param {string} type find type

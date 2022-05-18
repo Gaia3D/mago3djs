@@ -85,6 +85,8 @@ AbsClickInteraction.prototype.setActive = function(active)
  */
 AbsClickInteraction.prototype.handle = function(browserEvent) 
 {
+	if (this.stop) { return; }
+	
 	var type = browserEvent.type;
 	if (!(type === MagoManager.EVENT_TYPE.MOUSEMOVE || type === MagoManager.EVENT_TYPE.LEFTDOWN || type === MagoManager.EVENT_TYPE.RIGHTDOWN || type === MagoManager.EVENT_TYPE.MIDDLEDOWN || type === MagoManager.EVENT_TYPE.LEFTUP || type === MagoManager.EVENT_TYPE.RIGHTUP || type === MagoManager.EVENT_TYPE.MIDDLEUP))
 	{

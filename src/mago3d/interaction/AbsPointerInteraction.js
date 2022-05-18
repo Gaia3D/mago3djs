@@ -93,6 +93,8 @@ AbsPointerInteraction.prototype.setActive = function(active)
  */
 AbsPointerInteraction.prototype.handle = function(browserEvent) 
 {
+	if (this.stop) { return; }
+	
 	var type = browserEvent.type;
 
 	if (this.dragging)

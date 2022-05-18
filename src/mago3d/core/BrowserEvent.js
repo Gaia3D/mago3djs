@@ -6,7 +6,7 @@
  * @param {object} position is screen coord, if mousemove has startPosition and endPositon, otherwise one position
  * @param {MagoManager} magoManager 
  */
-var BrowserEvent = function(type, position, magoManager) 
+var BrowserEvent = function(type, position, modifier, magoManager) 
 {
 
 	if (!(this instanceof BrowserEvent)) 
@@ -20,6 +20,7 @@ var BrowserEvent = function(type, position, magoManager)
 	}
 
 	this.type = type;
+	this.modifier = modifier;
 	this.timestamp = new Date();
 	if (position && typeof position === 'object') 
 	{

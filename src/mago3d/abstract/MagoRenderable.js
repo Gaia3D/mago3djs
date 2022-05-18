@@ -664,6 +664,10 @@ MagoRenderable.prototype.setDeleted = function(bDeleted)
 MagoRenderable.prototype.setDirty = function(dirty) 
 {
 	this.dirty = dirty;
+	if (this.dirty) 
+	{
+		this.vboFromWorker = false;
+	}
 };
 /**
  * Set the unique one color of the box
