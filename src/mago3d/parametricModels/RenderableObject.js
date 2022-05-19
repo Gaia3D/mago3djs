@@ -18,3 +18,8 @@ var RenderableObject = function(options)
 };
 RenderableObject.prototype = Object.create(MagoRenderable.prototype);
 RenderableObject.prototype.constructor = RenderableObject;
+
+RenderableObject.prototype.makeMesh = function() 
+{
+	return;
+};

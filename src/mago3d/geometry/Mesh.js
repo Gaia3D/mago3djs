@@ -970,6 +970,7 @@ Mesh.prototype.render = function (magoManager, shader, renderType, glPrimitive, 
 			}
 		}
 	}
+	if (!this.vboKeysContainer || !this.vboKeysContainer.vboCacheKeysArray) { return; }
 	
 	var vboKeysCount = this.vboKeysContainer.vboCacheKeysArray.length;
 	for (var i=0; i<vboKeysCount; i++)
@@ -1196,6 +1197,8 @@ Mesh.prototype.getVbo = function(resultVboContainer, vboMemManager)
 
 	// make global triangles array.
 	var trianglesArray = this.getTriangles(undefined);
+	if (!trianglesArray) { return; }
+	
 	var trianglesCount = trianglesArray.length;
 	
 	// If vertices count > shortSize(65535), then must split the mesh.
