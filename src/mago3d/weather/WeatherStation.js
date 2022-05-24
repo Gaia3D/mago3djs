@@ -735,6 +735,7 @@ WeatherStation.prototype.addDust = function(geoJson)
 		geoJsonFile: geoJson
 	};
 	var windVolume = this.newDustVolume(options);
+	return windVolume;
 };
 
 WeatherStation.prototype.test_loadDustData3d = function(magoManager, dustMapFileNamesArray, dustMapFilesFolderPath)
