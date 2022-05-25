@@ -288,6 +288,7 @@ PostFxShadersManager.prototype._createShader_screenQuad2 = function()
 	shader.shadedColorTex_loc = gl.getUniformLocation(shader.program, "shadedColorTex");//
 	shader.brightColorTex_loc = gl.getUniformLocation(shader.program, "brightColorTex");//
 	shader.screenSpaceObjectsTex_loc = gl.getUniformLocation(shader.program, "screenSpaceObjectsTex");
+	shader.volumetricTex_loc = gl.getUniformLocation(shader.program, "volumetricTex");
 	shader.uAmbientLight_loc = gl.getUniformLocation(shader.program, "uAmbientLight");
 	this.useProgram(shader);
 	gl.uniform1i(shader.depthTex_loc, 0);
@@ -296,6 +297,7 @@ PostFxShadersManager.prototype._createShader_screenQuad2 = function()
 	gl.uniform1i(shader.screenSpaceObjectsTex_loc, 3);
 	gl.uniform1i(shader.shadedColorTex_loc, 4);
 	gl.uniform1i(shader.brightColorTex_loc, 5);
+	gl.uniform1i(shader.volumetricTex_loc, 6);
 
 	shader.uNearFarArray_loc = gl.getUniformLocation(shader.program, "uNearFarArray");
 	shader.bUseLogarithmicDepth_loc = gl.getUniformLocation(shader.program, "bUseLogarithmicDepth");

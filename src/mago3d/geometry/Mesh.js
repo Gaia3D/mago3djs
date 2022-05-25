@@ -334,6 +334,11 @@ Mesh.prototype.getCopySurfaceIndependentMesh = function(resultMesh)
 		surfaceCopy = resultMesh.newSurface();
 		surfaceCopy = surface.getCopyIndependentSurface(surfaceCopy);
 	}
+
+	if (this.bbox)
+	{
+		resultMesh.bbox = this.bbox;
+	}
 	
 	return resultMesh;
 };
@@ -1165,7 +1170,10 @@ Mesh.prototype.renderWireframe = function(magoManager, shader, renderType, glPri
 	gl.uniform2fv(shader.viewport_loc, [drawingBufferWidth[0], drawingBufferHeight[0]]);
 	*/
 	
-	this.thickness = 2.0;
+	if (this.thickness === undefined)
+	{
+		this.thickness = 2.0;
+	}
 	gl.uniform1f(shader.thickness_loc, this.thickness);
 
 	var vboPos = vbo.vboBufferPos;

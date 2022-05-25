@@ -10,6 +10,7 @@ uniform sampler2D lightFogTex; // 2
 uniform sampler2D screenSpaceObjectsTex; // 3
 uniform sampler2D shadedColorTex; // 4
 uniform sampler2D brightColorTex; // 5
+uniform sampler2D volumetricTex; // 6
 
 uniform float near;
 uniform float far; 
@@ -503,6 +504,16 @@ void main()
         if(alpha > 0.6)
         alpha = 0.6;
         finalColor = mix(shadedColor, lightFog4, alpha);
+    }
+
+    // Check for volumetricTex.***
+    if(u_activeTex[6])
+    {
+        vec4 volumCol4 = texture2D(volumetricTex, screenPos);
+        float alpha = volumCol4.w;
+        //if(alpha > 0.6)
+        //alpha = 0.6;
+        finalColor = mix(shadedColor, volumCol4, alpha);
     }
     
     gl_FragColor = finalColor; // original.***

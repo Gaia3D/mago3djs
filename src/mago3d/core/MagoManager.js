@@ -1835,7 +1835,7 @@ MagoManager.prototype.doRenderORT = function (frustumVolumenObject)
 	if (this.soundManager) // TransparentPass.***
 	{
 		// do sound simulation.
-		this.soundManager.render();
+		//this.soundManager.render();
 	};
 
 	// check if must render boundingBoxes.

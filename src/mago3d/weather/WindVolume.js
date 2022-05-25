@@ -257,7 +257,7 @@ WindVolume.prototype.createWindDisplayPlane = function (magoManager)
 	{
 		var windDisplayPlane = geoCoordsList.getExtrudedMeshRenderableObject(extrusionHeight, bLoop, undefined, magoManager, undefined);
 		windDisplayPlane.setOneColor(0.8, 0.7, 0.2, 0.0);
-		windDisplayPlane.setWireframeColor(0.2, 0.3, 0.4, 1.0);
+		//windDisplayPlane.setWireframeColor(0.2, 0.3, 0.4, 1.0);
 		windDisplayPlane.attributes.isMovable = true;
 		windDisplayPlane.attributes.movementInAxisZ = true;
 		windDisplayPlane.attributes.isSelectable = true;
@@ -348,19 +348,37 @@ WindVolume.prototype.createWindDisplayBox = function (magoManager)
 
 	//var extrusionHeight = windLayerHighest.windData.height_above_ground - windLayerLowest.windData.height_above_ground;
 	var extrusionHeight = maxAlt - minAlt;
-
 	
 	var bLoop = true;
 	this.windDisplayBox = geoCoordsList.getExtrudedMeshRenderableObject(extrusionHeight, bLoop, undefined, magoManager, undefined);
-	this.windDisplayBox.setOneColor(0.2, 0.7, 0.8, 0.05);
+	//this.windDisplayBox.setOneColor(0.2, 0.7, 0.8, 0.05); // original.***
+	this.windDisplayBox.setOneColor(0, 146/255, 203/255, 0.3); // kim seon young 20220523.***
 	this.windDisplayBox.attributes.isMovable = false;
 	this.windDisplayBox.attributes.isSelectable = false;
 	this.windDisplayBox.attributes.name = "windDisplayBox";
+	this.windDisplayBox.attributes.doubleFace = true;
 	this.windDisplayBox.attributes.selectedColor4 = new Color(1.0, 0.0, 0.0, 0.0); // selectedColor fully transparent.
 	if (this.windDisplayBox.options === undefined)
 	{ this.windDisplayBox.options = {}; }
 	
+	// set wireframe parameters.***
 	this.windDisplayBox.options.renderWireframe = true;
+	if (this.windDisplayBox.objectsArray && this.windDisplayBox.objectsArray.length > 0)
+	{
+		var object = this.windDisplayBox.objectsArray[0];
+		object.thickness = 2.5;
+
+		var surfacesCount = object.getSurfacesCount();
+		object.setColor(0, 146/255, 203/255, 0.3); // sets color for all surfaces.***
+
+		// now, set colors for caps:
+		var surface = object.getSurface(surfacesCount - 2); // top cap surface.***
+		surface.setColor(0, 146/255, 203/255, 0.0);
+
+		var surface = object.getSurface(surfacesCount - 1); // down cap surface.***
+		surface.setColor(0, 146/255, 203/255, 0.0);
+	}
+
 	this.windDisplayBox.options.renderShaded = true;
 	this.windDisplayBox.options.depthMask = false;
 	var depth = 4;
@@ -1137,7 +1155,10 @@ WindVolume.prototype.renderDepthWindVolume = function (magoManager)
 	}
 
 	if (this.windDisplayBox)
-	{ this.visibleObjControler.currentVisibleNativeObjects.opaquesArray[0] = this.windDisplayBox; }
+	{ 
+		this.windDisplayBox.attributes.doubleFace = false; // deactive double face for depthRender.***
+		this.visibleObjControler.currentVisibleNativeObjects.opaquesArray[0] = this.windDisplayBox; 
+	}
 
 	// When render rear, add the lowestWindLayer.***
 	if (this.windDisplayPlanesArray && this.windDisplayPlanesArray.length > 0)
@@ -1231,6 +1252,8 @@ WindVolume.prototype.renderDepthWindVolume = function (magoManager)
 	magoManager.windVolumeRearNormalTex = windVolumeRearFBO.colorBuffersArray[2];
 
 	// End rear face.---------------------------------------------------------------------------------------------------------------------------
+
+	this.windDisplayBox.attributes.doubleFace = true; // return to double face for normal rendering.***
 
 	// Return to main framebuffer.************************
 	// return default values:

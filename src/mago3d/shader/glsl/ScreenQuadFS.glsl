@@ -517,7 +517,9 @@ void main()
 			{
 				// is silhouette.
 				float countsDif = abs(float(objectDepthCount)/16.0);
-				gl_FragData[0] = vec4(0.2, 1.0, 0.3, countsDif);
+				//gl_FragData[0] = vec4(0.2, 1.0, 0.3, countsDif);
+				vec3 silhouetteCol3 = vec3(51.0/255.0, 206.0/255.0, 255.0/255.0);
+				gl_FragData[0] = vec4(silhouetteCol3, countsDif);
 				return;
 			}
 		}

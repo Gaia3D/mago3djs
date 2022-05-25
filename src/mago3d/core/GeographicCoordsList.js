@@ -762,13 +762,15 @@ GeographicCoordsList.prototype.getExtrudedMeshRenderableObject = function(height
 	var bIncludeTopCap = true;
 	var solidMesh = vtxProfilesList.getMesh(undefined, bIncludeBottomCap, bIncludeTopCap);
 	var surfIndepMesh = solidMesh.getCopySurfaceIndependentMesh();
+	var bbox = solidMesh.getBoundingBox();
 	surfIndepMesh.calculateVerticesNormals();
+	surfIndepMesh.bbox = bbox;
+	
 
 	if (!surfIndepMesh.boundingSphereWC)
 	{
 		surfIndepMesh.boundingSphereWC = new BoundingSphere();
 		var positionWC = geoLocData.position;
-		var bbox = solidMesh.getBoundingBox();
 		var radiusAprox = bbox.getRadiusAprox(); // calculate it : TODO.
 		surfIndepMesh.boundingSphereWC.setCenterPoint(positionWC.x, positionWC.y, positionWC.z);
 		surfIndepMesh.boundingSphereWC.setRadius(radiusAprox);

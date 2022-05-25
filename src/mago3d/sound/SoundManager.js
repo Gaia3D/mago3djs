@@ -99,6 +99,22 @@ SoundManager.prototype.overWriteDEMWithObjects = function ()
 	}
 };
 
+SoundManager.prototype._renderSoundLayers = function ()
+{
+	var magoManager = this.magoManager;
+	var soundLayersCount = this.soundLayersArray.length;
+	var layer;
+	//if (this.magoManager.currentFrustumIdx === 0)
+	{
+		// Simulate in the last frustum only.
+		for (var i=0; i<soundLayersCount; i++)
+		{
+			layer = this.soundLayersArray[i];
+			layer.renderWave(magoManager);
+		}
+	}
+};
+
 SoundManager.prototype.render = function ()
 {
 	if (!this.testStarted)
@@ -113,6 +129,11 @@ SoundManager.prototype.render = function ()
 
 	// Now, do the simulation steps.***
 	this.doSimulation();
+
+	// Now, render the wave.***
+	this._renderSoundLayers();
+
+	
 
 	// ************.MAIN-FRAMEBUFFER.************************************.MAIN-FRAMEBUFFER.************************
 	// Once finished simulation, bind the current framebuffer. 
@@ -164,7 +185,7 @@ SoundManager.prototype.doIntersectedObjectsCulling = function (visiblesArray, na
 SoundManager.prototype._test_sound = function ()
 {
 	//var minLon = 127.23049, minLat = 36.50861, minAlt = 0.0, maxLon = 127.24178, maxLat = 36.51691, maxAlt = 400.0; // big
-	var minLon = 127.23596, minLat = 36.50977, minAlt = 50.0, maxLon = 127.23915, maxLat = 36.51229, maxAlt = 100.0; // small
+	var minLon = 127.23596, minLat = 36.50977, minAlt = 50.0, maxLon = 127.23915, maxLat = 36.51229, maxAlt = 110.0; // small
 	var geographicExtent = new GeographicExtent(minLon, minLat, minAlt, maxLon, maxLat, maxAlt);
 	var options = {
 		geographicExtent: geographicExtent
@@ -470,5 +491,47 @@ SoundManager.prototype.createDefaultShaders = function ()
 	gl.uniform1i(shader.flux_LBD_MosaicTex_LOW_loc, 4);
 	gl.uniform1i(shader.auxMosaicTex_loc, 5);
 	
+	// 3) calculateVelocity Shader.*********************************************************************************************
+	shaderName = "volumetricWaves";
+	vs_source = ShaderSource.waterQuadVertVS;
+	fs_source = ShaderSource.soundVolumetricFS;
 	
+	fs_source = fs_source.replace(/%USE_LOGARITHMIC_DEPTH%/g, use_linearOrLogarithmicDepth);
+	fs_source = fs_source.replace(/%USE_MULTI_RENDER_TARGET%/g, use_multi_render_target);
+	shader = magoManager.postFxShadersManager.createShaderProgram(gl, vs_source, fs_source, shaderName, this.magoManager);
+	
+	shader.simulationBoxDoubleDepthTex_loc = gl.getUniformLocation(shader.program, "simulationBoxDoubleDepthTex");
+	shader.simulationBoxDoubleNormalTex_loc = gl.getUniformLocation(shader.program, "simulationBoxDoubleNormalTex");
+	shader.airPressureMosaicTex_loc = gl.getUniformLocation(shader.program, "airPressureMosaicTex");
+	shader.depthTex_loc = gl.getUniformLocation(shader.program, "depthTex"); // scene depth tex.***
+	shader.normalTex_loc = gl.getUniformLocation(shader.program, "normalTex"); // scene normal tex.***
+	shader.airVelocityTex_loc = gl.getUniformLocation(shader.program, "airVelocityTex");
+
+	shader.a_pos_loc = gl.getAttribLocation(shader.program, "a_pos");
+	shader.u_screenSize_loc = gl.getUniformLocation(shader.program, "u_screenSize");
+	shader.uNearFarArray_loc = gl.getUniformLocation(shader.program, "uNearFarArray");
+	shader.tangentOfHalfFovy_loc = gl.getUniformLocation(shader.program, "tangentOfHalfFovy");
+	shader.aspectRatio_loc = gl.getUniformLocation(shader.program, "aspectRatio");
+	shader.modelViewMatrixRelToEyeInv_loc = gl.getUniformLocation(shader.program, "modelViewMatrixRelToEyeInv");
+
+	shader.u_texSize_loc = gl.getUniformLocation(shader.program, "u_texSize"); // The original texture3D size.***
+	shader.u_mosaicTexSize_loc = gl.getUniformLocation(shader.program, "u_mosaicTexSize"); // The mosaic texture size.***
+	shader.u_mosaicSize_loc = gl.getUniformLocation(shader.program, "u_mosaicSize"); // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***
+	shader.u_airMaxPressure_loc = gl.getUniformLocation(shader.program, "u_airMaxPressure");
+
+	shader.u_simulBoxTMatInv_loc = gl.getUniformLocation(shader.program, "u_simulBoxTMatInv");
+	shader.u_simulBoxPosHigh_loc = gl.getUniformLocation(shader.program, "u_simulBoxPosHigh");
+	shader.u_simulBoxPosLow_loc = gl.getUniformLocation(shader.program, "u_simulBoxPosLow");
+	shader.u_simulBoxMinPosLC_loc = gl.getUniformLocation(shader.program, "u_simulBoxMinPosLC");
+	shader.u_simulBoxMaxPosLC_loc = gl.getUniformLocation(shader.program, "u_simulBoxMaxPosLC");
+	
+	magoManager.postFxShadersManager.useProgram(shader);
+	gl.uniform1i(shader.simulationBoxDoubleDepthTex_loc, 0);
+	gl.uniform1i(shader.simulationBoxDoubleNormalTex_loc, 1);
+	gl.uniform1i(shader.airPressureMosaicTex_loc, 2);
+	gl.uniform1i(shader.depthTex_loc, 3);
+	gl.uniform1i(shader.normalTex_loc, 4);
+	gl.uniform1i(shader.airVelocityTex_loc, 5);
+
+	magoManager.postFxShadersManager.useProgram(null);
 };

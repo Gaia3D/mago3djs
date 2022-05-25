@@ -417,6 +417,47 @@ GeographicExtent.prototype.getQuantizedPoints = function(geoCoordsArray, resultQ
 	return resultQPointsArray;
 };
 
+GeographicExtent.prototype.getRenderableObject = function(magoManager) 
+{
+	// 1rst, create a geoCoordsList.
+	var minGeoCoord = this.minGeographicCoord;
+	var maxGeoCoord = this.maxGeographicCoord;
+	
+	var minLon = minGeoCoord.longitude;
+	var maxLon = maxGeoCoord.longitude;
+	var minLat = minGeoCoord.latitude;
+	var maxLat = maxGeoCoord.latitude;
+	var minAlt = minGeoCoord.altitude;
+	var maxAlt = maxGeoCoord.altitude;
+
+	var geoCoordsList = new GeographicCoordsList();
+	geoCoordsList.newGeoCoord(minLon, minLat, minAlt);
+	geoCoordsList.newGeoCoord(maxLon, minLat, minAlt);
+	geoCoordsList.newGeoCoord(maxLon, maxLat, minAlt);
+	geoCoordsList.newGeoCoord(minLon, maxLat, minAlt);
+
+	var extrusionHeight = maxAlt - minAlt;
+	var bLoop = true;
+
+	var renderableObject = geoCoordsList.getExtrudedMeshRenderableObject(extrusionHeight, bLoop, undefined, magoManager, undefined);
+	/*
+	// Example of attributes that can to be setted after created.***************************************************************
+	renderableObject.setOneColor(0.2, 0.7, 0.8, 0.05);
+	renderableObject.attributes.isMovable = false;
+	renderableObject.attributes.isSelectable = false;
+	renderableObject.attributes.name = "extrudedObject";
+	renderableObject.attributes.selectedColor4 = new Color(1.0, 0.0, 0.0, 0.0); // selectedColor fully transparent.
+	if (renderableObject.options === undefined)
+	{ renderableObject.options = {}; }
+	
+	renderableObject.options.renderWireframe = true;
+	renderableObject.options.renderShaded = true;
+	renderableObject.options.depthMask = false;
+	// ***************************************************************************************************************************
+	*/
+	return renderableObject;
+};
+
 
 
 

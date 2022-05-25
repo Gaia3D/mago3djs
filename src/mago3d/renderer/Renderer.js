@@ -1614,7 +1614,7 @@ Renderer.prototype.renderScreenQuad2 = function (gl)
 	gl.bindTexture(gl.TEXTURE_2D, shadedColorFbo.colorBuffer);
 
 	// Now, the brightColorTex.***
-	gl.activeTexture(gl.TEXTURE5); // shadedTex.***
+	gl.activeTexture(gl.TEXTURE5); 
 	if (sceneState.applyBloomEffect && magoManager.brightColorTex_A)
 	{
 		gl.bindTexture(gl.TEXTURE_2D, magoManager.brightColorTex_A);
@@ -1624,7 +1624,26 @@ Renderer.prototype.renderScreenQuad2 = function (gl)
 		gl.bindTexture(gl.TEXTURE_2D, null);
 	}
 
-	gl.uniform1iv(currentShader.u_activeTex_loc, [bLightFogTex, bScreenSpaceObjectsTex, 0, 0, 0, 0, 0, 0]);
+	// Now, volumetric renderTex if exist.***
+	gl.activeTexture(gl.TEXTURE6);
+	//gl.bindTexture(gl.TEXTURE_2D, null);
+
+	var bSoundVolumetricTex = false;
+	if (magoManager.soundManager)
+	{
+		// check if exist soundVolumetricTex.***
+		if (magoManager.soundManager.soundLayersArray.length > 0)
+		{
+			var soundLayer = magoManager.soundManager.soundLayersArray[0];
+			if (soundLayer.volumRenderTex)
+			{
+				gl.bindTexture(gl.TEXTURE_2D, soundLayer.volumRenderTex);
+				bSoundVolumetricTex = true;
+			}
+		}
+	}
+
+	gl.uniform1iv(currentShader.u_activeTex_loc, [bLightFogTex, bScreenSpaceObjectsTex, 0, 0, 0, 0, bSoundVolumetricTex, 0]);
 
 	webglController.depthMask(false);
 	webglController.enable_GL_BLEND();
@@ -2407,11 +2426,27 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 				}
 			}
 
+			if (soundLayer.soundSourceMosaicTexture3d)
+			{
+				if (soundLayer.soundSourceMosaicTexture3d.texturesArray.length > 0)
+				{
+					//texture = soundLayer.soundSourceMosaicTexture3d.texturesArray[0];
+				}
+			}
+
 			if (soundLayer.pressureMosaicTexture3d_A)
 			{
 				if (soundLayer.pressureMosaicTexture3d_A.texturesArray.length > 0)
 				{
 					//texture = soundLayer.pressureMosaicTexture3d_A.texturesArray[0];
+				}
+			}
+
+			if (soundLayer.pressureMosaicTexture3d_B)
+			{
+				if (soundLayer.pressureMosaicTexture3d_B.texturesArray.length > 0)
+				{
+					//texture = soundLayer.pressureMosaicTexture3d_B.texturesArray[0];
 				}
 			}
 
@@ -2428,7 +2463,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 			{
 				if (soundLayer.fluxRFUMosaicTexture3d_LOW_A.texturesArray.length > 0)
 				{
-					//texture = soundLayer.fluxRFUMosaicTexture3d_LOW_A.texturesArray[0];
+					texture = soundLayer.fluxRFUMosaicTexture3d_LOW_A.texturesArray[0];
 					//gl.uniform1i(shader.uTextureType_loc, 3); // 
 				}
 			}
@@ -2439,14 +2474,6 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 				{
 					//texture = soundLayer.fluxLBDMosaicTexture3d_LOW_A.texturesArray[0];
 					//gl.uniform1i(shader.uTextureType_loc, 2); // if want to see scene voxelization.***
-				}
-			}
-
-			if (soundLayer.soundSourceMosaicTexture3d)
-			{
-				if (soundLayer.soundSourceMosaicTexture3d.texturesArray.length > 0)
-				{
-					//texture = soundLayer.soundSourceMosaicTexture3d.texturesArray[0];
 				}
 			}
 
@@ -2470,8 +2497,31 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 			{
 				if (soundLayer.shaderLogTexture.texturesArray.length > 0)
 				{
-					texture = soundLayer.shaderLogTexture.texturesArray[0];
+					//texture = soundLayer.shaderLogTexture.texturesArray[0];
 				}
+			}
+
+			if (soundLayer.shaderLogTexture_vel)
+			{
+				if (soundLayer.shaderLogTexture_vel.texturesArray.length > 0)
+				{
+					//texture = soundLayer.shaderLogTexture_vel.texturesArray[0];
+				}
+			}
+
+			if (soundLayer.simulBoxdoubleDepthTex)
+			{
+				//texture = soundLayer.simulBoxdoubleDepthTex;
+			}
+
+			if (soundLayer.simulBoxDoubleNormalTex)
+			{
+				//texture = soundLayer.simulBoxDoubleNormalTex;
+			}
+
+			if (soundLayer.volumRenderTex)
+			{
+				//texture = soundLayer.volumRenderTex;
 			}
 		}
 	}

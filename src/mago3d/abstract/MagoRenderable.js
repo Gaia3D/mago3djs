@@ -772,6 +772,36 @@ MagoRenderable.prototype.getCurrentGeoLocationData = function()
 	return geoLoDataManager.getCurrentGeoLocationData();
 };
 
+MagoRenderable.prototype.getBoundingBoxLC = function ()
+{
+	if (!this.bboxLC)
+	{
+		var objectsCount = this.objectsArray.length;
+		this.bboxLC = new BoundingBox();
+		var firstBBoxCopied = false;
+		for (var i=0; i<objectsCount; i++)
+		{
+			var bbox = this.objectsArray[i].bbox;
+			
+			if (bbox)
+			{
+				if (!firstBBoxCopied)
+				{
+					this.bboxLC.copyFrom(bbox);
+					firstBBoxCopied = true;
+				}
+				else 
+				{
+					this.bboxLC.addBox(bbox);
+				}
+				
+			}
+		}
+		
+	}
+	return this.bboxLC;
+};
+
 MagoRenderable.prototype.getBoundingSphereWC = function (resultBSphereWC)
 {
 	if (!this.boundingSphereWC)

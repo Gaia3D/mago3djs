@@ -21,8 +21,8 @@ var SoundLayer = function(soundManager, options)
 	this.texturesNumSlices = 1; // by default.***
 	this.terrainTextureSize = new Float32Array([soundManager.maxSimulationSize, soundManager.maxSimulationSize]);
 
-	this.simulationTimeStep = 0.08; // ok.
-	this.simulationTimeStep = 0.02;
+	this.simulationTimeStep = 0.08; // 
+	this.simulationTimeStep = 0.1;
 
 	// The buildings & objects intersected by this waterTile.
 	this.visibleObjectsControler;
@@ -288,6 +288,291 @@ SoundLayer.prototype._makeTextures = function ()
 	this.demWithBuildingsTex = soundManager._newTexture(gl, texWidth, texHeight);
 };
 
+SoundLayer.prototype._getSimulationBox = function (magoManager)
+{
+	if (!this.simulationBox)
+	{
+		this.simulationBox = this.geographicExtent.getRenderableObject(magoManager);
+		this.simulationBox.setOneColor(0.2, 0.7, 0.8, 0.05);
+		this.simulationBox.attributes.isMovable = false;
+		this.simulationBox.attributes.isSelectable = false;
+		this.simulationBox.attributes.name = "simulationBox";
+		this.simulationBox.attributes.selectedColor4 = new Color(1.0, 0.0, 0.0, 0.0); // selectedColor fully transparent.
+		if (this.simulationBox.options === undefined)
+		{ this.simulationBox.options = {}; }
+		
+		this.simulationBox.options.renderWireframe = false;
+		this.simulationBox.options.renderShaded = true;
+		this.simulationBox.options.depthMask = false;
+		var bbox = this.simulationBox.getBoundingBoxLC();
+		var depth = 4;
+		//magoManager.modeler.addObject(this.simulationBox, depth);
+	}
+	
+	return this.simulationBox;
+};
+
+SoundLayer.prototype._getVolumeDepthFBO = function(magoManager)
+{
+	//      +-----------+-----------+
+	//      |           |           | 
+	//      |   tex_0   |   tex_1   |
+	//      |           |           |
+	//      +-----------+-----------+
+	// Note : the width of fbo must be the double of the screen width.***
+	if (!this.volumeDepthFBO)
+	{
+		var gl = magoManager.getGl();
+		var sceneState = magoManager.sceneState;
+		var bufferWidth = sceneState.drawingBufferWidth[0] * 2; // double of the screen width.***
+		var bufferHeight = sceneState.drawingBufferHeight[0];
+		var bUseMultiRenderTarget = magoManager.postFxShadersManager.bUseMultiRenderTarget;
+		this.volumeDepthFBO = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget: bUseMultiRenderTarget, numColorBuffers: 4}); 
+	}
+
+	return this.volumeDepthFBO;
+};
+
+SoundLayer.prototype._getScreenFBO = function(magoManager)
+{
+	// This is a screen size FBO.***
+	if (!this.screenFBO)
+	{
+		var gl = magoManager.getGl();
+		var sceneState = magoManager.sceneState;
+		var bufferWidth = sceneState.drawingBufferWidth[0]; 
+		var bufferHeight = sceneState.drawingBufferHeight[0];
+		var bUseMultiRenderTarget = magoManager.postFxShadersManager.bUseMultiRenderTarget;
+		this.screenFBO = new FBO(gl, bufferWidth, bufferHeight, {matchCanvasSize: true, multiRenderTarget: bUseMultiRenderTarget, numColorBuffers: 4}); 
+	}
+
+	return this.screenFBO;
+};
+
+SoundLayer.prototype._renderDepthVolume = function (magoManager)
+{
+	// Render depth 2 times:
+	// 1- render the rear faces.
+	// 2- render the front faces.
+	//-------------------------------
+	var sceneState = magoManager.sceneState;
+	var gl = magoManager.getGl();
+	var extbuffers = magoManager.extbuffers;
+
+	// Now, render the windPlane.
+	if (!this.visibleObjControler)
+	{
+		this.visibleObjControler = new VisibleObjectsController();
+	}
+
+	this.simulationBox = this._getSimulationBox(magoManager);
+
+	if (this.simulationBox)
+	{ this.visibleObjControler.currentVisibleNativeObjects.opaquesArray[0] = this.simulationBox; }
+
+	// Bind FBO.***
+	//      +-----------------+----------------+
+	//      |                 |                | 
+	//      |   front depth   |   rear depth   |
+	//      |                 |                |
+	//      +-----------------+----------------+
+	// Note : the width of fbo must be the double of the screen width.***
+
+	// Front Face.***************************************************************************************************************************
+	var doubleFBO = this._getVolumeDepthFBO(magoManager);
+	doubleFBO.bind();
+	gl.viewport(0, 0, doubleFBO.width[0]/2, doubleFBO.height[0]);
+
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, doubleFBO.colorBuffersArray[0], 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, doubleFBO.colorBuffersArray[1], 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, doubleFBO.colorBuffersArray[2], 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, doubleFBO.colorBuffersArray[3], 0);
+
+	extbuffers.drawBuffersWEBGL([
+		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0] - colorBuffer
+		extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] - depthTex (front).
+		extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2] - normalTex
+		extbuffers.COLOR_ATTACHMENT3_WEBGL // gl_FragData[3] - albedoTex
+	  ]);
+
+	//if (magoManager.isFarestFrustum())// === 2)
+	if (magoManager.currentFrustumIdx === 2)
+	{
+		gl.clearColor(0, 0, 0, 0);
+		gl.clearDepth(1);
+		gl.clear(gl.COLOR_BUFFER_BIT);
+		gl.clearColor(0, 0, 0, 1);
+	}
+
+	gl.clear(gl.DEPTH_BUFFER_BIT);
+
+	var renderType = 1;
+	gl.frontFace(gl.CCW);
+	magoManager.renderer.renderGeometryBuffer(gl, renderType, this.visibleObjControler);
+
+	// Test:
+	this.simulBoxdoubleDepthTex = doubleFBO.colorBuffersArray[1];
+	this.simulBoxDoubleNormalTex = doubleFBO.colorBuffersArray[2];
+
+	// End front face.---------------------------------------------------------------------------------------------------------------------------
+
+	// Rear Face.***************************************************************************************************************************
+	gl.viewport(doubleFBO.width[0]/2, 0, doubleFBO.width[0]/2, doubleFBO.height[0]);
+
+
+	var renderType = 1;
+	gl.frontFace(gl.CW);
+	magoManager.renderer.renderGeometryBuffer(gl, renderType, this.visibleObjControler);
+	// End rear face.---------------------------------------------------------------------------------------------------------------------------
+
+	// unbind fbo.***
+	//gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, null, 0);
+	//gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0);
+	//gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0);
+	//gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0);
+	doubleFBO.unbind();
+
+	// Return to main framebuffer.************************
+	// return default values:
+	gl.frontFace(gl.CCW);
+	/*
+	magoManager.bindMainFramebuffer();
+
+	// unbind mago colorTextures:
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, null, 0); // depthTex.
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0); // normalTex.
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0); // albedoTex.
+	extbuffers.drawBuffersWEBGL([
+		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
+		extbuffers.NONE, // gl_FragData[1]
+		extbuffers.NONE, // gl_FragData[2]
+		extbuffers.NONE, // gl_FragData[3]
+	]);
+	*/
+};
+
+SoundLayer.prototype.renderWave = function (magoManager) 
+{
+	// check if exist textures:
+	if (!this.pressureMosaicTexture3d_A || !this.pressureMosaicTexture3d_A.texturesArray || this.pressureMosaicTexture3d_A.texturesArray.length === 0)
+	{
+		return;
+	}
+
+	// render volumetrically the texture3d.***
+	// 1rst, need the box depth 2 textures : frontFace depth texture & backFace depth texture.***
+	this._renderDepthVolume(magoManager);
+
+	// Now, do volumetric render with the mosaic textures 3d.***
+	var soundManager = this.soundManager;
+	var sceneState = magoManager.sceneState;
+	var gl = magoManager.getGl();
+	var fbo = this._getScreenFBO(magoManager);
+	var extbuffers = fbo.extbuffers;
+
+	fbo.bind();
+	gl.viewport(0, 0, fbo.width[0], fbo.height[0]);
+	var webglController = new WebGlController(gl);
+
+	var screenQuad = soundManager.getQuadBuffer();
+	var shader = magoManager.postFxShadersManager.getShader("volumetricWaves");
+	magoManager.postFxShadersManager.useProgram(shader);
+
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, fbo.colorBuffersArray[0], 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, fbo.colorBuffersArray[1], 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, fbo.colorBuffersArray[2], 0);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, fbo.colorBuffersArray[3], 0);
+
+	// Test:
+	this.volumRenderTex = fbo.colorBuffersArray[0];
+
+	extbuffers.drawBuffersWEBGL([
+		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
+		extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1] 
+		extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2]
+		extbuffers.COLOR_ATTACHMENT3_WEBGL // gl_FragData[3]
+	  ]);
+
+	//if (magoManager.isFarestFrustum())// === 2)
+	if (magoManager.currentFrustumIdx === 2)
+	{
+		gl.clearColor(0, 0, 0, 0);
+		gl.clearDepth(1);
+		gl.clear(gl.COLOR_BUFFER_BIT);
+		gl.clearColor(0, 0, 0, 1);
+	}
+
+	gl.clear(gl.DEPTH_BUFFER_BIT);
+
+	// bind screenQuad positions.
+	FBO.bindAttribute(gl, screenQuad.posBuffer, shader.a_pos_loc, 2);
+
+	gl.disable(gl.BLEND);
+
+	var refTex3D = this.fluxRFUMosaicTexture3d_HIGH_A; // we can take any other texture3D.***
+
+	// bind uniforms.***
+	shader.bindUniformGenerals();
+	gl.uniform1iv(shader.u_texSize_loc, [refTex3D.texture3DXSize, refTex3D.texture3DYSize, refTex3D.texture3DZSize]); // The original texture3D size.***
+	gl.uniform1iv(shader.u_mosaicSize_loc, [refTex3D.mosaicXCount, refTex3D.mosaicYCount, refTex3D.finalSlicesCount]); // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***
+	var modelViewMatrixRelToEyeInv = sceneState.getModelViewRelToEyeMatrixInv();
+	gl.uniformMatrix4fv(shader.modelViewMatrixRelToEyeInv_loc, false, modelViewMatrixRelToEyeInv._floatArrays);
+	gl.uniform1f(shader.u_airMaxPressure_loc, soundManager.airMaxPressure);
+	gl.uniform2fv(shader.u_screenSize_loc, [sceneState.drawingBufferWidth[0], sceneState.drawingBufferHeight[0]]);
+	gl.uniform2fv(shader.uNearFarArray_loc, magoManager.frustumVolumeControl.nearFarArray);
+
+	this.simulationBox = this._getSimulationBox(magoManager);
+	var geoLocDataManager = this.simulationBox.geoLocDataManager;
+	var geoLocData = geoLocDataManager.getCurrentGeoLocationData();
+	var simulBoxMatInv = geoLocData.getRotMatrixInv();
+	gl.uniformMatrix4fv(shader.u_simulBoxTMatInv_loc, false, simulBoxMatInv._floatArrays);//positionHIGH
+	gl.uniform3fv(shader.u_simulBoxPosHigh_loc, geoLocData.positionHIGH);
+	gl.uniform3fv(shader.u_simulBoxPosLow_loc, geoLocData.positionLOW);
+
+	var bboxLC = this.simulationBox.getBoundingBoxLC();
+	gl.uniform3fv(shader.u_simulBoxMinPosLC_loc, [bboxLC.minX, bboxLC.minY, bboxLC.minZ]);
+	gl.uniform3fv(shader.u_simulBoxMaxPosLC_loc, [bboxLC.maxX, bboxLC.maxY, bboxLC.maxZ]);
+
+	// bind textures.***
+	gl.activeTexture(gl.TEXTURE0);
+	gl.bindTexture(gl.TEXTURE_2D, this.simulBoxdoubleDepthTex); 
+
+	gl.activeTexture(gl.TEXTURE1);
+	gl.bindTexture(gl.TEXTURE_2D, this.simulBoxDoubleNormalTex); 
+
+	gl.activeTexture(gl.TEXTURE2);
+	gl.bindTexture(gl.TEXTURE_2D, this.pressureMosaicTexture3d_A.getTexture( 0 )); 
+
+	gl.activeTexture(gl.TEXTURE3);
+	gl.bindTexture(gl.TEXTURE_2D, magoManager.depthTex); 
+
+	gl.activeTexture(gl.TEXTURE4);
+	gl.bindTexture(gl.TEXTURE_2D, magoManager.normalTex); 
+
+	gl.activeTexture(gl.TEXTURE5);
+	gl.bindTexture(gl.TEXTURE_2D, this.airVelocity_B.getTexture( 0 )); 
+
+	// Draw screenQuad:
+	gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+	fbo.unbind();
+
+	/*
+	uniform sampler2D simulationBoxDoubleDepthTex;
+	uniform sampler2D simulationBoxDoubleNormalTex; // used to calculate the current frustum idx.***
+	uniform sampler2D airPressureMosaicTex;
+
+	////uniform vec3 encodedCameraPositionMCHigh;
+	////uniform vec3 encodedCameraPositionMCLow;
+	////uniform float tangentOfHalfFovy;
+	////uniform float aspectRatio;
+	*/
+
+	
+	
+
+};
+
 SoundLayer.prototype.doSimulationSteps = function (magoManager) 
 {
 	// 1rst, must check if all textures are prepared.***
@@ -372,6 +657,10 @@ SoundLayer.prototype.doSimulationSteps = function (magoManager)
 		this.shaderLogTexture = new MagoTexture3D();
 		this.shaderLogTexture.copyParametersFrom(refTex3D);
 		this.shaderLogTexture.createTextures(gl);
+
+		this.shaderLogTexture_vel = new MagoTexture3D();
+		this.shaderLogTexture_vel.copyParametersFrom(refTex3D);
+		this.shaderLogTexture_vel.createTextures(gl);
 	}
 
 	// Now, make the sound source texture3d.***************************************************************************************************
@@ -392,7 +681,7 @@ SoundLayer.prototype.doSimulationSteps = function (magoManager)
 		// render a point (127.23761, 36.51072, 50.0).***
 		if (!this._testGeoCoord)
 		{
-			this._testGeoCoord = new GeographicCoord(127.23761, 36.51072, 50.0);
+			this._testGeoCoord = new GeographicCoord(127.23761, 36.51072, 49.9);
 			this._testGeoCoord.makeDefaultGeoLocationData();
 		}
 
@@ -484,18 +773,36 @@ SoundLayer.prototype.doSimulationSteps = function (magoManager)
 		return false; 
 	}
 
-	// Start the simulation steps.***
-	this._calculateAirPressureFromSoundSource();
-	
+	if (!this.oneSimulationStep) // test debug "if". Delete after debug.!!!
+	{
+		// Start the simulation steps.***
+		if (!this.airPresureFromSource) // test debug "if". Delete after debug.!!!
+		{
+			if (this.timeStepAccum >= 10.0)
+			{
+				//this.airPresureFromSource = true;
+			}
+			this._calculateAirPressureFromSoundSource();
+			//this.airPresureFromSource = true;
 
-	this._makeAuxMosaicTexture3D_forFluxCalculation();
+			if (!this.timeStepAccum)
+			{
+				this.timeStepAccum = 0.0;
+			}
 
-	this._calculateFlux();
-	this._makeAuxMosaicTexture3D_forFluxCalculation(); // must recalculate the auxMosaicTexture3D bcos flux was modified.***
+			this.timeStepAccum += this.simulationTimeStep;
+		}
+		
+		this._makeAuxMosaicTexture3D_forFluxCalculation();
 
-	this._calculateVelocity();
-	
-	
+		this._calculateFlux();
+		this._makeAuxMosaicTexture3D_forFluxCalculation(); // must recalculate the auxMosaicTexture3D bcos flux was modified.***
+
+		this._calculateVelocity();
+		
+		//this.oneSimulationStep = true;
+	}
+
 	var hola = 0;
 	// https://www.animations.physics.unsw.edu.au/jw/sound-wave-equation.htm#sub1
 };
@@ -515,11 +822,12 @@ SoundLayer.prototype._calculateVelocity = function ()
 	var extbuffers = fbo.extbuffers;
 
 	fbo.bind();
+	gl.viewport(0, 0, fbo.width[0], fbo.height[0]);
 	
 	extbuffers.drawBuffersWEBGL([
 		extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
 		extbuffers.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1]
-		extbuffers.NONE, // gl_FragData[2]
+		extbuffers.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2]
 		extbuffers.NONE, // gl_FragData[3]
 		extbuffers.NONE, // gl_FragData[3]
 		extbuffers.NONE, // gl_FragData[3]
@@ -527,7 +835,7 @@ SoundLayer.prototype._calculateVelocity = function ()
 		extbuffers.NONE, // gl_FragData[3]
 	]);
 
-	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0);
+	//gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, null, 0);
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT3_WEBGL, gl.TEXTURE_2D, null, 0);
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT4_WEBGL, gl.TEXTURE_2D, null, 0);
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT5_WEBGL, gl.TEXTURE_2D, null, 0);
@@ -560,6 +868,7 @@ SoundLayer.prototype._calculateVelocity = function ()
 		// Bind the 8 output textures:
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, this.pressureMosaicTexture3d_A.getTexture( i ), 0); // airPressure
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, this.airVelocity_A.getTexture( i ), 0); // airVelocity.
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, this.shaderLogTexture_vel.getTexture( i ), 0); // airVelocity.
 		
 
 		//gl.uniform1i(shader.u_lowestMosaicSliceIndex_loc,  i*8);

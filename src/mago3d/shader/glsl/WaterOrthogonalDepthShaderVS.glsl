@@ -481,7 +481,7 @@ void main()
 
 	////gl_Position = ModelViewProjectionMatrixRelToEye * pos4;
 	gl_Position = modelViewProjectionMatrix * vec4(geoCoord, 1.0);
-	gl_PointSize = 50.0;
+	gl_PointSize = 2.0;
 
 	vDepth = gl_Position.z * 0.5 + 0.5;
 	vAltitude = geoCoord.z;
