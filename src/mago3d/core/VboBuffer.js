@@ -77,12 +77,14 @@ VboBuffer.prototype.deleteGlObjects = function(vboMemManager)
 {
 	if (this.key !== undefined)
 	{
-		var gl = vboMemManager.gl;
-		
-		if (this.dataTarget === gl.ARRAY_BUFFER)
-		{ vboMemManager.storeClassifiedBufferKey(gl, this.key, this.dataLength); }
-		else if (this.dataTarget === gl.ELEMENT_ARRAY_BUFFER)
-		{ vboMemManager.storeClassifiedElementKey(gl, this.key, this.dataLength); }
+		if (vboMemManager && vboMemManager.gl) 
+		{
+			var gl = vboMemManager.gl;
+			if (this.dataTarget === gl.ARRAY_BUFFER)
+			{ vboMemManager.storeClassifiedBufferKey(gl, this.key, this.dataLength); }
+			else if (this.dataTarget === gl.ELEMENT_ARRAY_BUFFER)
+			{ vboMemManager.storeClassifiedElementKey(gl, this.key, this.dataLength); }
+		}
 	}
 	
 	this.dataArray = undefined;

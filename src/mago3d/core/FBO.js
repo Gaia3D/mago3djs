@@ -211,7 +211,7 @@ FBO.prototype.init = function()
 		
 	if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) 
 	{
-		throw "Incomplete frame buffer object.";
+		return;
 	}
 
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -297,17 +297,10 @@ FBO.prototype.initMRT = function()
 		var colorBuffer = this.colorBuffersArray[i];
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, this.extbuffers.COLOR_ATTACHMENT0_WEBGL + i, gl.TEXTURE_2D, colorBuffer, 0);
 	}
-	
-	//this.extbuffers.drawBuffersWEBGL(
-	//	[
-	//		this.extbuffers.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
-	//		this.extbuffers.COLOR_ATTACHMENT1_WEBGL  // gl_FragData[1]
-	//	]);
-		
 
 	if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) 
 	{
-		throw "Incomplete frame buffer object.";
+		return;
 	}
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 };
