@@ -25,6 +25,8 @@ uniform sampler2D currAirPressureTex_2;
 uniform sampler2D currAirPressureTex_3;
 
 uniform float u_airMaxPressure;
+uniform float u_airEnvirontmentPressure;
+uniform int u_processType; // 0= pressure from pressure soyrce. 1= setting air environtment pressure.***
 
 varying vec2 v_tex_pos;
 
@@ -57,21 +59,38 @@ vec4 getFinalAirPressureEncoded(vec4 encodedCurrAirPressure, vec4 encodedSoundSo
 void main()
 {
     // 1rst, take the water source.
-    vec4 currAirPressure = texture2D(currAirPressureTex_0, v_tex_pos);
-    vec4 soundSource = texture2D(soundSourceTex_0, v_tex_pos);
-    gl_FragData[0] = getFinalAirPressureEncoded(currAirPressure, soundSource);
+    // u_processType == 0= pressure from pressure soyrce. 
+    // u_processType == 1= setting air environtment pressure.***
+    if(u_processType == 0)
+    {
+        vec4 currAirPressure = texture2D(currAirPressureTex_0, v_tex_pos);
+        vec4 soundSource = texture2D(soundSourceTex_0, v_tex_pos);
+        gl_FragData[0] = getFinalAirPressureEncoded(currAirPressure, soundSource);
 
-    #ifdef USE_MULTI_RENDER_TARGET
-        currAirPressure = texture2D(currAirPressureTex_1, v_tex_pos);
-        soundSource = texture2D(soundSourceTex_1, v_tex_pos);
-        gl_FragData[1] = getFinalAirPressureEncoded(currAirPressure, soundSource);
+        #ifdef USE_MULTI_RENDER_TARGET
+            currAirPressure = texture2D(currAirPressureTex_1, v_tex_pos);
+            soundSource = texture2D(soundSourceTex_1, v_tex_pos);
+            gl_FragData[1] = getFinalAirPressureEncoded(currAirPressure, soundSource);
 
-        currAirPressure = texture2D(currAirPressureTex_2, v_tex_pos);
-        soundSource = texture2D(soundSourceTex_2, v_tex_pos);
-        gl_FragData[2] = getFinalAirPressureEncoded(currAirPressure, soundSource);
+            currAirPressure = texture2D(currAirPressureTex_2, v_tex_pos);
+            soundSource = texture2D(soundSourceTex_2, v_tex_pos);
+            gl_FragData[2] = getFinalAirPressureEncoded(currAirPressure, soundSource);
 
-        currAirPressure = texture2D(currAirPressureTex_3, v_tex_pos);
-        soundSource = texture2D(soundSourceTex_3, v_tex_pos);
-        gl_FragData[3] = getFinalAirPressureEncoded(currAirPressure, soundSource);
-    #endif
+            currAirPressure = texture2D(currAirPressureTex_3, v_tex_pos);
+            soundSource = texture2D(soundSourceTex_3, v_tex_pos);
+            gl_FragData[3] = getFinalAirPressureEncoded(currAirPressure, soundSource);
+        #endif
+    }
+    else
+    {
+        vec4 finalAirPressureEncoded = packDepth(u_airEnvirontmentPressure / u_airMaxPressure);
+        gl_FragData[0] = finalAirPressureEncoded;
+
+        #ifdef USE_MULTI_RENDER_TARGET
+            gl_FragData[1] = finalAirPressureEncoded;
+            gl_FragData[2] = finalAirPressureEncoded;
+            gl_FragData[3] = finalAirPressureEncoded;
+        #endif
+    }
+    
 }

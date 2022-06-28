@@ -759,7 +759,7 @@ Renderer.prototype.renderDepthCameraPointOfView = function(camera, visibleObjCon
 	var sceneState = magoManager.sceneState;
 
 	// Do the depth render.***
-	var currentShader = magoManager.postFxShadersManager.getShader("modelRefDepth"); 
+	var currentShader = magoManager.postFxShadersManager.getShader("modelRefDepth"); // (RenderShowDepthVS, RenderShowDepthFS)
 	currentShader.resetLastBuffersBinded();
 
 	currentShader.useProgram();
@@ -784,9 +784,10 @@ Renderer.prototype.renderDepthCameraPointOfView = function(camera, visibleObjCon
 	var mvpMatRelToEye_loc = gl.getUniformLocation(currentShader.program, "ModelViewProjectionMatrixRelToEye");
 
 	gl.uniformMatrix4fv(mvpMatRelToEye_loc, false, modelViewProjMatrix._floatArrays);
-	gl.uniformMatrix4fv(currentShader.modelViewMatrixRelToEye, false, camMVRelToEyeMat._floatArrays);
-	gl.uniform3fv(currentShader.encodedCameraPositionMCHigh, encodedCamPos.high);
-	gl.uniform3fv(currentShader.encodedCameraPositionMCLow, encodedCamPos.low);
+	gl.uniformMatrix4fv(currentShader.mvRelToEyeMatrix_loc, false, camMVRelToEyeMat._floatArrays);//
+	//gl.uniformMatrix4fv(currentShader.mvMat4RelToEye, false, camMVRelToEyeMat._floatArrays);
+	gl.uniform3fv(currentShader.encodedCameraPositionMCHigh_loc, encodedCamPos.high);
+	gl.uniform3fv(currentShader.encodedCameraPositionMCLow_loc, encodedCamPos.low);
 	gl.uniform3fv(currentShader.scaleLC_loc, [1.0, 1.0, 1.0]); // init referencesMatrix.
 	gl.uniform1f(currentShader.frustumFar_loc, bigFrustum.far[0]);
 
@@ -2161,10 +2162,6 @@ Renderer.prototype.renderTerrainCopy = function ()
 	webglController.restoreAllParameters();
 };
 
-/**
- * This function is debug function
- * @param {WebGLRenderingContext} gl WebGL Rendering Context.
- */
 Renderer.prototype.renderScreenRectangle = function (gl, options) 
 {
 	var magoManager = this.magoManager;
@@ -2237,7 +2234,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 	{ return; }
 	
 	var currShader = postFxShadersManager.getCurrentShader(); // to restore current active shader.
-	var shader =  postFxShadersManager.getShader("rectangleScreen"); // very simple shader.
+	var shader =  postFxShadersManager.getShader("rectangleScreen"); // (rectangleScreenVS, rectangleScreenFS)very simple shader.
 	postFxShadersManager.useProgram(shader);
 
 	var textureAux1x1 = magoManager.texturesStore.getTextureAux1x1();
@@ -2431,6 +2428,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 				if (soundLayer.soundSourceMosaicTexture3d.texturesArray.length > 0)
 				{
 					//texture = soundLayer.soundSourceMosaicTexture3d.texturesArray[0];
+					//gl.uniform1i(shader.uTextureType_loc, 4); // This decodes 4byte color4.***
 				}
 			}
 
@@ -2439,6 +2437,7 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 				if (soundLayer.pressureMosaicTexture3d_A.texturesArray.length > 0)
 				{
 					//texture = soundLayer.pressureMosaicTexture3d_A.texturesArray[0];
+					//gl.uniform1i(shader.uTextureType_loc, 4); // This decodes 4byte color4.***
 				}
 			}
 
@@ -2459,12 +2458,30 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 				}
 			}
 
+			if (soundLayer.fluxRFUMosaicTexture3d_HIGH_B)
+			{
+				if (soundLayer.fluxRFUMosaicTexture3d_HIGH_B.texturesArray.length > 0)
+				{
+					//texture = soundLayer.fluxRFUMosaicTexture3d_HIGH_B.texturesArray[0];
+					//gl.uniform1i(shader.uTextureType_loc, 2); // if want to see scene voxelization.***
+				}
+			}
+
 			if (soundLayer.fluxRFUMosaicTexture3d_LOW_A)
 			{
 				if (soundLayer.fluxRFUMosaicTexture3d_LOW_A.texturesArray.length > 0)
 				{
-					texture = soundLayer.fluxRFUMosaicTexture3d_LOW_A.texturesArray[0];
-					//gl.uniform1i(shader.uTextureType_loc, 3); // 
+					//texture = soundLayer.fluxRFUMosaicTexture3d_LOW_A.texturesArray[0];
+					//gl.uniform1i(shader.uTextureType_loc, 2); // 
+				}
+			}
+
+			if (soundLayer.fluxLBDMosaicTexture3d_HIGH_B)
+			{
+				if (soundLayer.fluxLBDMosaicTexture3d_HIGH_B.texturesArray.length > 0)
+				{
+					//texture = soundLayer.fluxLBDMosaicTexture3d_HIGH_B.texturesArray[0];
+					//gl.uniform1i(shader.uTextureType_loc, 2); // if want to see scene voxelization.***
 				}
 			}
 
@@ -2489,7 +2506,8 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 			{
 				if (soundLayer.airVelocity_B.texturesArray.length > 0)
 				{
-					//texture = soundLayer.airVelocity_B.texturesArray[0];
+					texture = soundLayer.airVelocity_B.texturesArray[0];
+					//gl.uniform1i(shader.uTextureType_loc, 5); // if want to see velocity.***
 				}
 			}
 
@@ -2522,6 +2540,24 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 			if (soundLayer.volumRenderTex)
 			{
 				//texture = soundLayer.volumRenderTex;
+			}
+
+			if (soundLayer.auxTex3d_yDirection)
+			{
+				if (soundLayer.auxTex3d_yDirection.texturesArray || soundLayer.auxTex3d_yDirection.texturesArray.length > 0)
+				{
+					//texture = soundLayer.auxTex3d_yDirection.texturesArray[1];
+				}
+				
+			}
+
+			if (soundLayer.mosaic_partial_ydirection)
+			{
+				if (soundLayer.mosaic_partial_ydirection.texturesArray || soundLayer.mosaic_partial_ydirection.texturesArray.length > 0)
+				{
+					//texture = soundLayer.mosaic_partial_ydirection.texturesArray[0];
+				}
+				
 			}
 		}
 	}
@@ -2695,6 +2731,335 @@ Renderer.prototype.renderScreenRectangle = function (gl, options)
 	};
 	*/
 	///////////////////////////////////////////////////////////////////////////
+	var webglController = new WebGlController(gl);
+
+	webglController.frontFace(gl.CCW);
+	webglController.depthMask(false);
+	webglController.disable_GL_DEPTH_TEST();
+
+	gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+	postFxShadersManager.useProgram(null);
+	webglController.restoreAllParameters();
+
+	gl.activeTexture(gl.TEXTURE0 + 0); 
+	gl.bindTexture(gl.TEXTURE_2D, null);
+	gl.activeTexture(gl.TEXTURE0 + 1);
+	gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
+
+};
+
+/**
+ * This function is debug function
+ * @param {WebGLRenderingContext} gl WebGL Rendering Context.
+ */
+Renderer.prototype.renderScreenRectangleMosaic = function (gl, options) 
+{
+	var magoManager = this.magoManager;
+	var sceneState = magoManager.sceneState;
+	var screenWidth = sceneState.drawingBufferWidth[0];
+	var screenHeight = sceneState.drawingBufferHeight[0];
+	var aspectRatio = screenWidth / screenHeight;
+
+	if (this.quadBuffer === undefined)
+	{
+
+		//var data = new Float32Array([0, 0,   1, 0,   0, 1,   0, 1,   1, 0,   1,  1]); // total screen.
+		//-----------------------------------------------------------------------------------------------------------------
+		var data = new Float32Array([0, 0,   0.5, 0,   0, 0.5,       0, 0.5,   0.5, 0,   0.5, 0.5]); // rightUp screen.
+		//-----------------------------------------------------------------------------------------------------------------
+		//var data = new Float32Array([0, 0,   0.5, 0,   0, 1,       0, 1,   0.5, 0,   0.5, 1]); // right half screen.
+		//-----------------------------------------------------------------------------------------------------------------
+		this.quadBuffer = FBO.createBuffer(gl, data);
+
+		// create texCoords.
+		var texCoords = new Float32Array([0, 0,   1, 0,   0, 1,   0, 1,   1, 0,   1,  1]); // total screen.
+		//var texCoords = new Float32Array([0, 0,   0.5, 0,   0, 0.5,       0, 0.5,   0.5, 0,   0.5, 0.5]); // rightUp screen.
+		this.texCoordBuffer = FBO.createBuffer(gl, texCoords);
+
+		// now, create normalBuffer for use with cubeMaps.
+		// zNegative face = 5.
+		var normal_3 = new Point3D(1, -1, -1);
+		normal_3.unitary();
+		var normal_2 = new Point3D(-1, -1, -1);
+		normal_2.unitary();
+		var normal_1 = new Point3D(-1, 1, -1);
+		normal_1.unitary();
+		var normal_0 = new Point3D(1, 1, -1);
+		normal_0.unitary();
+		//--------------------------------------------
+
+		// yPositive face = 2.
+		normal_3 = new Point3D(1, 1, 1);
+		normal_3.unitary();
+		normal_2 = new Point3D(-1, 1, 1);
+		normal_2.unitary();
+		normal_1 = new Point3D(-1, 1, -1);
+		normal_1.unitary();
+		normal_0 = new Point3D(1, 1, -1);
+		normal_0.unitary();
+		//------------------------------------------
+
+
+		var nor = new Float32Array([normal_0.x, normal_0.y, normal_0.z,   normal_1.x, normal_1.y, normal_1.z,   normal_3.x, normal_3.y, normal_3.z,
+			normal_3.x, normal_3.y, normal_3.z,   normal_1.x, normal_1.y, normal_1.z,   normal_2.x, normal_2.y, normal_2.z]);
+		this.normalBuffer = FBO.createBuffer(gl, nor);
+	}
+
+	// use a simple shader.
+	
+	var postFxShadersManager = magoManager.postFxShadersManager;
+
+	if (postFxShadersManager === undefined)
+	{ return; }
+	
+	var currShader = postFxShadersManager.getCurrentShader(); // to restore current active shader.
+	var shader =  postFxShadersManager.getShader("rectangleScreenMosaic"); // (rectangleScreenVS, rectangleScreenMosaicFS)very simple shader.
+	postFxShadersManager.useProgram(shader);
+
+	var textureAux1x1 = magoManager.texturesStore.getTextureAux1x1();
+
+	gl.enableVertexAttribArray(shader.position2_loc);
+	FBO.bindAttribute(gl, this.quadBuffer, shader.position2_loc, 2);
+
+	if (shader.normal3_loc !== -1)
+	{
+		gl.enableVertexAttribArray(shader.normal3_loc); // only for cubeMaps.***
+		FBO.bindAttribute(gl, this.normalBuffer, shader.normal3_loc, 3);
+	}
+
+	gl.enableVertexAttribArray(shader.texCoord2_loc);
+	FBO.bindAttribute(gl, this.texCoordBuffer, shader.texCoord2_loc, 2);
+
+	// If you want to see selectionBuffer.
+	//var texture = magoManager.selectionFbo.colorBuffer; // framebuffer for color selection.***
+
+	// If you want to see silhouetteDepthBuffer.
+	var silhouetteDepthFbo = magoManager.getSilhouetteDepthFbo();
+	var texture = silhouetteDepthFbo.colorBuffer;
+	var tex3d;
+
+	//if(magoManager.laserCamera)
+	//{
+	//	var options = {};
+	//	var laserCamDepthFBO = magoManager.laserCamera.getDepthBufferFBO(magoManager, options);
+	//	texture = laserCamDepthFBO.colorBuffer;
+	//}
+
+	gl.uniform1i(shader.uTextureType_loc, 0);
+	gl.uniform1i(shader.uSliceIdx_loc, 47);
+	//gl.uniform1i(shader.uSliceIdx_loc, 50); 
+	//gl.uniform1i(shader.uSliceIdx_loc, 67); 
+	 
+
+	// soundManager.*** soundManager.*** soundManager.***soundManager.*** soundManager.*** soundManager.***soundManager.*** soundManager.*** soundManager.***
+	if (magoManager.soundManager)
+	{
+		if (this.lastIdx === undefined)
+		{
+			this.lastIdx = 0;
+		}
+
+		if (magoManager.soundManager.soundLayersArray.length > 0)
+		{
+			var soundLayer = magoManager.soundManager.soundLayersArray[0];
+			if (soundLayer.demWithBuildingsTex && soundLayer.demWithBuildingsTex.texId)
+			{
+				//texture = soundLayer.demWithBuildingsTex.texId;
+			}
+
+			if (soundLayer.soundSourceRealTexture3d)
+			{
+				if (soundLayer.soundSourceRealTexture3d.texturesArray.length > 0)
+				{
+					if (this.lastIdx >= soundLayer.soundSourceRealTexture3d.texturesArray.length)
+					{
+						this.lastIdx = 0;
+					}
+					//texture = soundLayer.soundSourceRealTexture3d.texturesArray[this.lastIdx];
+					this.lastIdx += 1;
+				}
+			}
+
+			if (soundLayer.soundSourceMosaicTexture3d)
+			{
+				if (soundLayer.soundSourceMosaicTexture3d.texturesArray.length > 0)
+				{
+					//texture = soundLayer.soundSourceMosaicTexture3d.texturesArray[0];
+					//gl.uniform1i(shader.uTextureType_loc, 4); // This decodes 4byte color4.***
+				}
+			}
+
+			if (soundLayer.pressureMosaicTexture3d_A)
+			{
+				if (soundLayer.pressureMosaicTexture3d_A.texturesArray.length > 0)
+				{
+					//tex3d = soundLayer.pressureMosaicTexture3d_A;
+					//gl.uniform1i(shader.uTextureType_loc, 4); 
+				}
+			}
+
+			if (soundLayer.pressureMosaicTexture3d_B)
+			{
+				if (soundLayer.pressureMosaicTexture3d_B.texturesArray.length > 0)
+				{
+					//tex3d = soundLayer.pressureMosaicTexture3d_B;
+					//gl.uniform1i(shader.uTextureType_loc, 4); 
+				}
+			}
+
+			if (soundLayer.fluxRFUMosaicTexture3d_HIGH_A && soundLayer.fluxRFUMosaicTexture3d_LOW_A && soundLayer.fluxLBDMosaicTexture3d_HIGH_A && soundLayer.fluxLBDMosaicTexture3d_LOW_A)
+			{
+				
+				if (soundLayer.fluxRFUMosaicTexture3d_HIGH_A.texturesArray.length > 0 && soundLayer.fluxRFUMosaicTexture3d_LOW_A.texturesArray.length > 0 &&
+					soundLayer.fluxLBDMosaicTexture3d_HIGH_A.texturesArray.length > 0 && soundLayer.fluxLBDMosaicTexture3d_LOW_A.texturesArray.length > 0)
+				{
+					tex3d = soundLayer.fluxRFUMosaicTexture3d_HIGH_A; // this texture is binded at avobe.***
+					gl.uniform1f(shader.u_maxFlux_loc, soundLayer.soundManager.maxFlux);
+					gl.uniform1i(shader.uTextureType_loc, 1); // To see flux (encoded in 4 textures).***
+
+					var texture_RFU_LOW_A = soundLayer.fluxRFUMosaicTexture3d_LOW_A.texturesArray[0];
+					gl.activeTexture(gl.TEXTURE0 + 1); 
+					gl.bindTexture(gl.TEXTURE_2D, texture_RFU_LOW_A);
+
+					var texture_LBD_HIGH_A = soundLayer.fluxLBDMosaicTexture3d_HIGH_A.texturesArray[0];
+					gl.activeTexture(gl.TEXTURE0 + 2); 
+					gl.bindTexture(gl.TEXTURE_2D, texture_LBD_HIGH_A);
+
+					var texture_LBD_LOW_A = soundLayer.fluxLBDMosaicTexture3d_LOW_A.texturesArray[0];
+					gl.activeTexture(gl.TEXTURE0 + 3); 
+					gl.bindTexture(gl.TEXTURE_2D, texture_LBD_LOW_A);
+				}
+				
+			}
+
+			if (soundLayer.fluxRFUMosaicTexture3d_HIGH_A)
+			{
+				if (soundLayer.fluxRFUMosaicTexture3d_HIGH_A.texturesArray.length > 0)
+				{
+					//tex3d = soundLayer.fluxRFUMosaicTexture3d_LOW_A;
+					//gl.uniform1i(shader.uTextureType_loc, 0); 
+				}
+			}
+
+			if (soundLayer.fluxRFUMosaicTexture3d_HIGH_B)
+			{
+				if (soundLayer.fluxRFUMosaicTexture3d_HIGH_B.texturesArray.length > 0)
+				{
+					//texture = soundLayer.fluxRFUMosaicTexture3d_HIGH_B.texturesArray[0];
+					//gl.uniform1i(shader.uTextureType_loc, 2); // if want to see scene voxelization.***
+				}
+			}
+
+			if (soundLayer.fluxRFUMosaicTexture3d_LOW_A)
+			{
+				if (soundLayer.fluxRFUMosaicTexture3d_LOW_A.texturesArray.length > 0)
+				{
+					//tex3d = soundLayer.fluxRFUMosaicTexture3d_LOW_A;
+					//gl.uniform1i(shader.uTextureType_loc, 0); 
+				}
+			}
+
+			if (soundLayer.fluxLBDMosaicTexture3d_HIGH_B)
+			{
+				if (soundLayer.fluxLBDMosaicTexture3d_HIGH_B.texturesArray.length > 0)
+				{
+					//texture = soundLayer.fluxLBDMosaicTexture3d_HIGH_B.texturesArray[0];
+					//gl.uniform1i(shader.uTextureType_loc, 2); // if want to see scene voxelization.***
+				}
+			}
+
+			if (soundLayer.fluxLBDMosaicTexture3d_LOW_A)
+			{
+				if (soundLayer.fluxLBDMosaicTexture3d_LOW_A.texturesArray.length > 0)
+				{
+					//texture = soundLayer.fluxLBDMosaicTexture3d_LOW_A.texturesArray[0];
+					//gl.uniform1i(shader.uTextureType_loc, 2); // if want to see scene voxelization.***
+				}
+			}
+
+			if (soundLayer.auxMosaicTexture3d_forFluxCalculation)
+			{
+				if (soundLayer.auxMosaicTexture3d_forFluxCalculation.texturesArray.length > 0)
+				{
+					//texture = soundLayer.auxMosaicTexture3d_forFluxCalculation.texturesArray[0];
+				}
+			}
+
+			if (soundLayer.airVelocity_B)
+			{
+				if (soundLayer.airVelocity_B.texturesArray.length > 0)
+				{
+					//tex3d = soundLayer.airVelocity_B;
+					//gl.uniform1i(shader.uTextureType_loc, 5); 
+				}
+			}
+
+			if (soundLayer.shaderLogTexture)
+			{
+				if (soundLayer.shaderLogTexture.texturesArray.length > 0)
+				{
+					//texture = soundLayer.shaderLogTexture.texturesArray[0];
+				}
+			}
+
+			if (soundLayer.shaderLogTexture_vel)
+			{
+				if (soundLayer.shaderLogTexture_vel.texturesArray.length > 0)
+				{
+					//texture = soundLayer.shaderLogTexture_vel.texturesArray[0];
+				}
+			}
+
+			if (soundLayer.simulBoxdoubleDepthTex)
+			{
+				//texture = soundLayer.simulBoxdoubleDepthTex;
+			}
+
+			if (soundLayer.simulBoxDoubleNormalTex)
+			{
+				//texture = soundLayer.simulBoxDoubleNormalTex;
+			}
+
+			if (soundLayer.volumRenderTex)
+			{
+				//texture = soundLayer.volumRenderTex;
+			}
+
+			if (soundLayer.auxTex3d_yDirection)
+			{
+				if (soundLayer.auxTex3d_yDirection.texturesArray || soundLayer.auxTex3d_yDirection.texturesArray.length > 0)
+				{
+					//texture = soundLayer.auxTex3d_yDirection.texturesArray[1];
+				}
+				
+			}
+
+			if (soundLayer.mosaic_partial_ydirection)
+			{
+				if (soundLayer.mosaic_partial_ydirection.texturesArray || soundLayer.mosaic_partial_ydirection.texturesArray.length > 0)
+				{
+					//texture = soundLayer.mosaic_partial_ydirection.texturesArray[0];
+				}
+				
+			}
+		}
+	}
+
+	if (tex3d === undefined)
+	{
+		return;
+	}
+
+	texture = tex3d.texturesArray[0];
+	gl.uniform1iv(shader.u_mosaicSize_loc, [tex3d.mosaicXCount, tex3d.mosaicYCount, tex3d.finalSlicesCount]); // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***
+
+	if (texture === undefined)
+	{ return; }
+
+	gl.activeTexture(gl.TEXTURE0 + 0); 
+	gl.bindTexture(gl.TEXTURE_2D, texture);
+
 	var webglController = new WebGlController(gl);
 
 	webglController.frontFace(gl.CCW);

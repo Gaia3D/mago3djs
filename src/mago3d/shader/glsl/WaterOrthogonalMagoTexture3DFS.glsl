@@ -40,14 +40,14 @@ float unpackDepth(const in vec4 rgba_depth)
 
 void main()
 {     
-    //vec2 screenPos = vec2(gl_FragCoord.x / u_texSize[0], gl_FragCoord.y / u_texSize[1]);
-    
     // Now, must determine in what slice must render.***
     float onePixelSize = 1.0 / float(u_texSize[2]); // here can use u_texSize[0] or u_texSize[1] too.***
-    float halfPixelSize = onePixelSize / 2.0;
-    halfPixelSize = onePixelSize;
+    float halfPixelSize = onePixelSize / 2.0 * 1.5;
+    //halfPixelSize = onePixelSize;
 
-    float vDepthsAbs = abs(vDepth);
+    // Now, must invert vDepth, bcos vDepth is up-to-down value (up is zero & down is 1).***
+    float vDepthsAbs = 1.0 - abs(vDepth);
+    //float vDepthsAbs = vDepth;
 
     // slice 0.***
     vec4 color = vec4(0.0);

@@ -918,6 +918,37 @@ PostFxShadersManager.prototype._createShader_rectangleScreen = function()
 	return shader;
 };
 
+PostFxShadersManager.prototype._createShader_rectangleScreenMosaic = function() 
+{
+	var use_linearOrLogarithmicDepth = this._get_useLinearOrLogarithmicDepth_string();
+	var use_multi_render_target = this._get_useMultiRenderTarget_string();
+	var gl = this.gl;
+
+	var shaderName = "rectangleScreenMosaic";
+	var ssao_vs_source = ShaderSource.rectangleScreenVS;
+	var ssao_fs_source = ShaderSource.rectangleScreenMosaicFS;
+	var shader = this.createShaderProgram(gl, ssao_vs_source, ssao_fs_source, shaderName, this.magoManager);
+	shader.position2_loc = gl.getAttribLocation(shader.program, "a_pos");
+	shader.normal3_loc = gl.getAttribLocation(shader.program, "a_nor");
+	shader.texCoord2_loc = gl.getAttribLocation(shader.program, "a_tex");
+	shader.tex_0_loc = gl.getUniformLocation(shader.program, "texture_0");
+	shader.tex_1_loc = gl.getUniformLocation(shader.program, "texture_1");
+	shader.tex_0_loc = gl.getUniformLocation(shader.program, "texture_2");
+	shader.tex_1_loc = gl.getUniformLocation(shader.program, "texture_3");
+	shader.uTextureType_loc = gl.getUniformLocation(shader.program, "uTextureType");
+	shader.uSliceIdx_loc = gl.getUniformLocation(shader.program, "uSliceIdx");
+	shader.u_mosaicSize_loc = gl.getUniformLocation(shader.program, "u_mosaicSize");
+	shader.u_maxFlux_loc = gl.getUniformLocation(shader.program, "u_maxFlux");
+	this.useProgram(shader);
+	gl.uniform1i(shader.tex_0_loc, 0);
+	gl.uniform1i(shader.tex_1_loc, 1);
+	gl.uniform1i(shader.tex_2_loc, 2);
+	gl.uniform1i(shader.tex_3_loc, 3);
+
+	this.shadersMap[shaderName] = shader;
+	return shader;
+};
+
 PostFxShadersManager.prototype._createShader_ssaoFromDepth = function() 
 {
 	var use_linearOrLogarithmicDepth = this._get_useLinearOrLogarithmicDepth_string();
@@ -1094,7 +1125,9 @@ PostFxShadersManager.prototype._createShaderByName = function (shaderName)
 	case "qMeshRenderTEST":
 		this._createShader_qMeshRenderTEST();
 		break;
-		
+	case "rectangleScreenMosaic":
+		this._createShader_rectangleScreenMosaic();
+		break;
 	}
 	
 };

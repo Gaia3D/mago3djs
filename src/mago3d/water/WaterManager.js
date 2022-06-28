@@ -692,6 +692,7 @@ WaterManager.prototype.createDefaultShaders = function ()
 	shader.colorType_loc = gl.getUniformLocation(shader.program, "colorType");//
 	shader.u_oneColor4_loc = gl.getUniformLocation(shader.program, "u_oneColor4"); //
 	shader.u_terrainHeightEncodingBytes_loc = gl.getUniformLocation(shader.program, "u_terrainHeightEncodingBytes");
+	shader.u_flipTexCoordY_loc = gl.getUniformLocation(shader.program, "u_flipTexCoordY");
 
 	shader.u_totalMinGeoCoord_loc = gl.getUniformLocation(shader.program, "u_totalMinGeoCoord");
 	shader.u_totalMaxGeoCoord_loc = gl.getUniformLocation(shader.program, "u_totalMaxGeoCoord");

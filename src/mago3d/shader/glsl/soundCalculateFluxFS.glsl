@@ -65,6 +65,7 @@ uniform float u_timestep;
 uniform vec3 u_voxelSizeMeters;
 uniform float u_airMaxPressure;
 uniform float u_maxFlux;
+uniform float u_airEnvirontmentPressure;
 //uniform vec2 u_heightMap_MinMax;
 
 //uniform vec2 u_simulationTextureSize;
@@ -198,9 +199,11 @@ bool getNextSubTextureColRow(in int col, in int row, inout int next_col, inout i
     return true;
 }
 
-float getAirPressure(in vec2 texCoord, inout vec3 airPressure_RFU, inout vec3 airPressure_LBD)
+float getAirPressure(in vec2 texCoord, inout vec3 airPressure_RFU, inout vec3 airPressure_LBD, inout vec3 voxelSpaceType_RFU, inout vec3 voxelSpaceType_LBD)
 {
+    // **********************************************************************
     // Note : this function returns the airPressure of all 6 Neighbor too.***
+    // **********************************************************************
     vec2 subTexCoord;
     vec2 colRow = getColRow_and_subTexCoord(texCoord, subTexCoord);
 
@@ -221,13 +224,20 @@ float getAirPressure(in vec2 texCoord, inout vec3 airPressure_RFU, inout vec3 ai
     if(subTexCoord_R.x > 1.0)
     {
         // is out of simulation boundary.***
-        airPressure_RFU.x = 0.0;
+        airPressure_RFU.x = u_airEnvirontmentPressure;
+
+        // the voxelSpaceType is 0 (void).***
+        voxelSpaceType_RFU.x = 0.0;
     }
     else
     {
         // calculate the mosaicTexCoord of the subTexCoord_R:
         vec2 mosaicTexCoord_R = subTexCoord_to_texCoord(subTexCoord_R, col_int, row_int);
         airPressure_RFU.x = getAirPressure_inMosaicTexture(mosaicTexCoord_R);
+
+        // Now, read flux_RFU_HIGH to calculate the voxelSpaceType.***
+        vec4 color4_RFU_HIGH = texture2D(flux_RFU_MosaicTex_HIGH, mosaicTexCoord_R);
+        voxelSpaceType_RFU.x = color4_RFU_HIGH.a;
     }
 
     // airPressure_F.************************************************************************
@@ -236,13 +246,20 @@ float getAirPressure(in vec2 texCoord, inout vec3 airPressure_RFU, inout vec3 ai
     if(subTexCoord_F.y > 1.0)
     {
         // is out of simulation boundary.***
-        airPressure_RFU.y = 0.0;
+        airPressure_RFU.y = u_airEnvirontmentPressure;
+
+        // the voxelSpaceType is 0 (void).***
+        voxelSpaceType_RFU.y = 0.0;
     }
     else
     {
         // calculate the mosaicTexCoord of the subTexCoord_F:
         vec2 mosaicTexCoord_F = subTexCoord_to_texCoord(subTexCoord_F, col_int, row_int);
         airPressure_RFU.y = getAirPressure_inMosaicTexture(mosaicTexCoord_F);
+
+        // Now, read flux_RFU_HIGH to calculate the voxelSpaceType.***
+        vec4 color4_RFU_HIGH = texture2D(flux_RFU_MosaicTex_HIGH, mosaicTexCoord_F);
+        voxelSpaceType_RFU.y = color4_RFU_HIGH.a;
     }
 
     // airPressure_U.************************************************************************
@@ -256,6 +273,10 @@ float getAirPressure(in vec2 texCoord, inout vec3 airPressure_RFU, inout vec3 ai
         // must recalcuate the mosaicTexCoord.***
         vec2 newMosaicTexCoord = subTexCoord_to_texCoord(subTexCoord, next_col, next_row);
         airPressure_RFU.z = getAirPressure_inMosaicTexture(newMosaicTexCoord); 
+
+        // Now, read flux_RFU_HIGH to calculate the voxelSpaceType.***
+        vec4 color4_RFU_HIGH = texture2D(flux_RFU_MosaicTex_HIGH, newMosaicTexCoord);
+        voxelSpaceType_RFU.z = color4_RFU_HIGH.a;
     }
     else
     {
@@ -274,8 +295,13 @@ float getAirPressure(in vec2 texCoord, inout vec3 airPressure_RFU, inout vec3 ai
         float t = row_aux * tRange_aux + subTexCoord.y * tRange_aux;
 
         vec2 texCoord_auxMosaicTex = vec2(s, t);
-        //airPressure_RFU.z = getAirPressure_inAuxMosaicTexture(texCoord_auxMosaicTex);
-        airPressure_RFU.z = 0.0; // test:::::::::
+        airPressure_RFU.z = getAirPressure_inAuxMosaicTexture(texCoord_auxMosaicTex);
+        airPressure_RFU.z = u_airEnvirontmentPressure; // test delete.***
+
+        // Now, read flux_RFU_HIGH to calculate the voxelSpaceType.***
+        vec4 color4_RFU_HIGH = texture2D(flux_RFU_MosaicTex_HIGH, texCoord_auxMosaicTex);
+        voxelSpaceType_RFU.z = color4_RFU_HIGH.a;
+        
     }
     //--------------------------------------------------------------------------------------------------------------
     //--------------------------------------------------------------------------------------------------------------
@@ -286,13 +312,20 @@ float getAirPressure(in vec2 texCoord, inout vec3 airPressure_RFU, inout vec3 ai
     if(subTexCoord_L.x < 0.0)
     {
         // is out of simulation boundary.***
-        airPressure_LBD.x = 0.0;
+        airPressure_LBD.x = u_airEnvirontmentPressure;
+
+        // the voxelSpaceType is 0 (void).***
+        voxelSpaceType_LBD.x = 0.0;
     }
     else
     {
         // calculate the mosaicTexCoord of the subTexCoord_L:
         vec2 mosaicTexCoord_L = subTexCoord_to_texCoord(subTexCoord_L, col_int, row_int);
         airPressure_LBD.x = getAirPressure_inMosaicTexture(mosaicTexCoord_L);
+
+        // Now, read flux_RFU_HIGH to calculate the voxelSpaceType.***
+        vec4 color4_RFU_HIGH = texture2D(flux_RFU_MosaicTex_HIGH, mosaicTexCoord_L);
+        voxelSpaceType_LBD.x = color4_RFU_HIGH.a;
     }
 
     // airPressure_B.************************************************************************
@@ -301,13 +334,20 @@ float getAirPressure(in vec2 texCoord, inout vec3 airPressure_RFU, inout vec3 ai
     if(subTexCoord_B.y < 0.0)
     {
         // is out of simulation boundary.***
-        airPressure_LBD.y = 0.0;
+        airPressure_LBD.y = u_airEnvirontmentPressure;
+
+        // the voxelSpaceType is 0 (void).***
+        voxelSpaceType_LBD.y = 0.0;
     }
     else
     {
         // calculate the mosaicTexCoord of the subTexCoord_B:
         vec2 mosaicTexCoord_B = subTexCoord_to_texCoord(subTexCoord_B, col_int, row_int);
         airPressure_LBD.y = getAirPressure_inMosaicTexture(mosaicTexCoord_B);
+
+        // Now, read flux_RFU_HIGH to calculate the voxelSpaceType.***
+        vec4 color4_RFU_HIGH = texture2D(flux_RFU_MosaicTex_HIGH, mosaicTexCoord_B);
+        voxelSpaceType_LBD.y = color4_RFU_HIGH.a;
     }
 
     // airPressure_D.************************************************************************
@@ -321,6 +361,10 @@ float getAirPressure(in vec2 texCoord, inout vec3 airPressure_RFU, inout vec3 ai
         // must recalcuate the mosaicTexCoord.***
         vec2 newMosaicTexCoord = subTexCoord_to_texCoord(subTexCoord, prev_col, prev_row);
         airPressure_LBD.z = getAirPressure_inMosaicTexture(newMosaicTexCoord); 
+
+        // Now, read flux_RFU_HIGH to calculate the voxelSpaceType.***
+        vec4 color4_RFU_HIGH = texture2D(flux_RFU_MosaicTex_HIGH, newMosaicTexCoord);
+        voxelSpaceType_LBD.z = color4_RFU_HIGH.a;
     }
     else
     {
@@ -339,8 +383,13 @@ float getAirPressure(in vec2 texCoord, inout vec3 airPressure_RFU, inout vec3 ai
         float t = row_aux * tRange_aux + subTexCoord.y * tRange_aux;
 
         vec2 texCoord_auxMosaicTex = vec2(s, t);
-        //airPressure_LBD.z = getAirPressure_inAuxMosaicTexture(texCoord_auxMosaicTex);
-        airPressure_LBD.z = 0.0;
+        airPressure_LBD.z = getAirPressure_inAuxMosaicTexture(texCoord_auxMosaicTex);
+        airPressure_LBD.z = u_airEnvirontmentPressure; // test delete.***
+
+        // Now, read flux_RFU_HIGH to calculate the voxelSpaceType.***
+        vec4 color4_RFU_HIGH = texture2D(flux_RFU_MosaicTex_HIGH, texCoord_auxMosaicTex);
+        voxelSpaceType_LBD.z = color4_RFU_HIGH.a;
+        
     }
     //--------------------------------------------------------------------------------------------------------------
     //--------------------------------------------------------------------------------------------------------------
@@ -383,6 +432,33 @@ float getVoxelSpaceValue(in vec2 texCoord)
     return color4_RFU_HIGH.a;
 }
 
+float getAirMass_kg(in float P_Atm, in float V_m3, in float T_Kelvin)
+{
+    // Remembering.*************************************************************************************************************************
+    // "ecuacion propagacion sonido" => https://openstax.org/books/f%C3%ADsica-universitaria-volumen-1/pages/17-2-velocidad-del-sonido
+    // https://en.wikipedia.org/wiki/Density_of_air#:~:text=At%20101.325%20kPa%20(abs)%20and,International%20Standard%20Atmosphere%20(ISA).
+    // P1 * V1 = P2 * V2.***
+    // airDensity ro = ρ = 1.225 [kg/m3]
+    // airMolarMass = 0.02897 [Kg/mol]
+    // universalGasConstant R = 8.31446261815324 [J/(K*mol)], [m3*Pa/(K*mol)], [Kg*m2/(s2*K*mol)]
+    // airPressure at sea level = 101325 Pa = 101.325 kPa = 1013.25 hPa ≈ 1 bar
+    // Standard temperature at sea level is T = 288.15K
+    // Number of Avogadro n = 6.022 * 10E23
+    // Masa molar air = 29kg/kmol
+    // -------------------------------------------------------------------------------------------------------------------------------------
+
+    // P = pressure(Atm), V = volume (m3), T = temperature (K).***
+    float atmToPa = 101325.0;// 1 atm = 101325 Pa.***
+    float P_Pa = P_Atm * atmToPa; 
+    float R = 8.31446261815324;
+    float n = P_Pa * V_m3 / (R * T_Kelvin); // number of air mols.***
+    float molarMassAir = 29.0; // kg/kmol.
+    float airMass = n/1000.0 * molarMassAir; // kg.***
+    return airMass;
+}
+
+
+
 void main()
 {
     // The objective is to determine the outFlux of the current fragment.***
@@ -392,13 +468,38 @@ void main()
     if(voxelSpaceValue > 0.0)
     {
         // This is a solid space, so, do nothing. All values are zero.***
-        // TODO : 
+        // Do NOT discard bcos must write the voxelSpaceValue.***
+        /*
+        vec3 outFlux_RFU = vec3(0.0);
+        vec3 outFlux_LBD = vec3(0.0);
+
+        vec3 encodedOutFlux_RFU_HIGH;
+        vec3 encodedOutFlux_RFU_LOW;
+        vec3 encodedOutFlux_LBD_HIGH;
+        vec3 encodedOutFlux_LBD_LOW;
+        encodeFlux(outFlux_RFU, encodedOutFlux_RFU_HIGH, encodedOutFlux_RFU_LOW);
+        encodeFlux(outFlux_LBD, encodedOutFlux_LBD_HIGH, encodedOutFlux_LBD_LOW);
+        */
+        vec3 zerovec = vec3(0.0);
+        gl_FragData[0] = vec4(zerovec, voxelSpaceValue);  // RFU flux high.
+
+        #ifdef USE_MULTI_RENDER_TARGET
+            gl_FragData[1] = vec4(zerovec, voxelSpaceValue); // RFU flux low.
+            gl_FragData[2] = vec4(zerovec, voxelSpaceValue);  // LBD flux high.
+            gl_FragData[3] = vec4(zerovec, voxelSpaceValue);  // LBD flux low.
+            gl_FragData[4] = vec4(0.0, 1.0, 0.0, 1.0);  // shader log.
+        #endif
+        return;
+        
     }
 
     // Determine the airPressure of the 6 fragment that is around of current fragment.***
+    // pressure unit [Atm].***
     vec3 airPressure_RFU;
     vec3 airPressure_LBD;
-    float airPressure_curr = getAirPressure(v_tex_pos, airPressure_RFU, airPressure_LBD);
+    vec3 voxelSpaceType_RFU;
+    vec3 voxelSpaceType_LBD;
+    float airPressure_curr = getAirPressure(v_tex_pos, airPressure_RFU, airPressure_LBD, voxelSpaceType_RFU, voxelSpaceType_LBD); // pressure unit [Atm].***
 
     vec3 currFlux_RFU;
     vec3 currFlux_LBD;
@@ -412,26 +513,87 @@ void main()
     float L_out = airPressure_curr - airPressure_LBD.x;
     float B_out = airPressure_curr - airPressure_LBD.y;
     float D_out = airPressure_curr - airPressure_LBD.z;
+    
+    if(voxelSpaceType_RFU.x > 0.0)
+    {
+        R_out = 0.0;
+        currFlux_RFU.x = 0.0;
+    }
+
+    if(voxelSpaceType_RFU.y > 0.0)
+    {
+        F_out = 0.0;
+        currFlux_RFU.y = 0.0;
+    }
+
+    if(voxelSpaceType_RFU.z > 0.0)
+    {
+        U_out = 0.0;
+        currFlux_RFU.z = 0.0;
+    }
+
+    if(voxelSpaceType_LBD.x > 0.0)
+    {
+        L_out = 0.0;
+        currFlux_LBD.x = 0.0;
+    }
+
+    if(voxelSpaceType_LBD.y > 0.0)
+    {
+        B_out = 0.0;
+        currFlux_LBD.y = 0.0;
+    }
+
+    if(voxelSpaceType_LBD.z > 0.0)
+    {
+        D_out = 0.0;
+        currFlux_LBD.z = 0.0;
+    }
+    
 
     vec3 deltaP_RFU = vec3(R_out, F_out, U_out);
     vec3 deltaP_LBD = vec3(L_out, B_out, D_out);
 
     // At 101.325 kPa (abs) and 15 °C, air has a density of approximately 1.225 kg/m3
-    float airDensity = 1.225; // provisionally.***
+
     //vec3 airAccel_RFU = vec3(R_out / (airDensity * u_voxelSizeMeters.x), F_out / (airDensity * u_voxelSizeMeters.y), U_out / (airDensity * u_voxelSizeMeters.z)); // original.***
     //vec3 airAccel_LBD = vec3(L_out / (airDensity * u_voxelSizeMeters.x), B_out / (airDensity * u_voxelSizeMeters.y), D_out / (airDensity * u_voxelSizeMeters.z)); // original.***
 
-    vec3 airAccel_RFU = deltaP_RFU;
-    vec3 airAccel_LBD = deltaP_LBD;
-
-    // calculate the new flux.
+    // calculate the new flux (m3/s).***
     float timeStep = u_timestep;
 
     //float pipeArea = 2.0 * u_voxelSizeMeters.x * u_voxelSizeMeters.y * u_voxelSizeMeters.z;
     float pipeArea = u_voxelSizeMeters.x * u_voxelSizeMeters.y;
-    pipeArea = 1.0;
-    vec3 newFlux_RFU = timeStep * pipeArea * airAccel_RFU;
-    vec3 newFlux_LBD = timeStep * pipeArea * airAccel_LBD;
+    float cellVolume = u_voxelSizeMeters.x * u_voxelSizeMeters.y * u_voxelSizeMeters.z ;
+
+    // Now, calculate acceleration.***
+    // Example in "x" direction : 
+    // m = ρ*V = ρ*dx*dy*dz
+    // m*a = -dp*dy*dz
+    // a = -(dp*dy*dz)/m = -(dp*dy*dz)/(ρ*dx*dy*dz) = -dp/(ρ*dx)
+    // -------------------------------------------------------------
+
+    // Calculate the air density.
+    float T = 288.15; // Kelvins.***
+    float P_Atm = airPressure_curr;
+    float curr_airMass_kg = getAirMass_kg(P_Atm, cellVolume, T);
+
+    float atmToPa = 101325.0;// 1 atm = 101325 Pa.***
+
+    float ro = curr_airMass_kg / cellVolume; // air density.***
+    vec3 airAccel_RFU = deltaP_RFU * atmToPa / (ro * u_voxelSizeMeters); // m/s2. 
+    vec3 airAccel_LBD = deltaP_LBD * atmToPa / (ro * u_voxelSizeMeters); // m/s2.
+
+
+    ////vec3 airAccel_RFU = deltaP_RFU / (ro * u_voxelSizeMeters); // m/s2. 
+    ////vec3 airAccel_LBD = deltaP_LBD / (ro * u_voxelSizeMeters); // m/s2.
+
+    vec3 newFlux_RFU = timeStep * pipeArea * airAccel_RFU; // m3/s
+    vec3 newFlux_LBD = timeStep * pipeArea * airAccel_LBD; // m3/s
+
+    // Now, calculate massFlux.***
+    //vec3 currMassFlux_RFU = currFlux_RFU * ro; // kg/s
+    //vec3 currMassFlux_LBD = currFlux_LBD * ro; // kg/s
 
     // total outFlux.
     float cushionFactor = 0.9999; // esmorteiment.
@@ -445,13 +607,18 @@ void main()
 
     // calculate vOut & currVolum.
     float vOut = timeStep * (output_R + output_F + output_U + output_L + output_B + output_D); 
-    float currAirVol = airPressure_curr * pipeArea;
+    float massOut = vOut * ro;
+
+    float currAirVol = cellVolume; 
+    float currMass = currAirVol * ro;
 
     vec4 shaderLog = vec4(0.0);
     if(vOut > currAirVol)
+    //if(massOut > currMass)
     {
         //rescale outflow readFlux so that outflow don't exceed current water volume
         float factor = (currAirVol / vOut);
+        //float factor = (currMass / massOut);
         output_R *= factor;
         output_F *= factor;
         output_U *= factor;
@@ -459,25 +626,26 @@ void main()
         output_L *= factor;
         output_B *= factor;
         output_D *= factor;
-        shaderLog = vec4(1.0);
+        shaderLog = vec4(1.0, 0.0, 0.0, 1.0);
     }
 
     // Test debug:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    if(newFlux_RFU.x + newFlux_RFU.y + newFlux_RFU.z > 0.0)
+    if(output_R > u_maxFlux || output_F > u_maxFlux || output_U > u_maxFlux || output_L > u_maxFlux || output_B > u_maxFlux || output_D > u_maxFlux )
     {
-        shaderLog = vec4(0.0, 1.0, 0.0, 1.0);
+        shaderLog = vec4(0.0, 0.0, 1.0, 1.0);
     }
+    //shaderLog = vec4(1.0, 0.0, 0.0, 1.0);
 
-    if(newFlux_LBD.x + newFlux_LBD.y + newFlux_LBD.z > 0.0)
-    {
-        shaderLog = vec4(0.0, 0.5, 1.0, 1.0);
-    }
+    //shaderLog = vec4(voxelSpaceValue*100.0, voxelSpaceValue*100.0, voxelSpaceValue*100.0, 1.0);
 
-    shaderLog = vec4(normalize(newFlux_LBD), 1.0);
+    //shaderLog = vec4(normalize(newFlux_LBD), 1.0);
+
+    
+    
     // End test debug.-------------------------------------------------------------------------------------------------------------------------------------------
 
-    vec3 outFlux_RFU = vec3(output_R, output_F, output_U) / u_airMaxPressure;
-    vec3 outFlux_LBD = vec3(output_L, output_B, output_D) / u_airMaxPressure;
+    vec3 outFlux_RFU = vec3(output_R, output_F, output_U) / u_maxFlux;
+    vec3 outFlux_LBD = vec3(output_L, output_B, output_D) / u_maxFlux;
 
     vec3 encodedOutFlux_RFU_HIGH;
     vec3 encodedOutFlux_RFU_LOW;
@@ -485,6 +653,30 @@ void main()
     vec3 encodedOutFlux_LBD_LOW;
     encodeFlux(outFlux_RFU, encodedOutFlux_RFU_HIGH, encodedOutFlux_RFU_LOW);
     encodeFlux(outFlux_LBD, encodedOutFlux_LBD_HIGH, encodedOutFlux_LBD_LOW);
+
+    // shaderLog:
+    //shaderLog = vec4((outFlux_RFU.x + outFlux_LBD.x)*2.0, (outFlux_RFU.y + outFlux_LBD.y)*2.0, (outFlux_RFU.z + outFlux_LBD.z)*2.0, 1.0);
+    float valueAux = newFlux_RFU.x;
+    if(valueAux < 0.5)
+    {
+        shaderLog = vec4(1.0, 0.0, 0.0, 1.0);
+    }
+    else if(valueAux > 0.5 && valueAux < 1.0)
+    {
+        shaderLog = vec4(0.0, 1.0, 0.0, 1.0);
+    }
+    else if(valueAux > 1.0 && valueAux < 1.5)
+    {
+        shaderLog = vec4(0.0, 0.0, 1.0, 1.0);
+    }
+    else if(valueAux > 1.5)// && ro < 1.5)
+    {
+        shaderLog = vec4(1.0, 1.0, 0.0, 1.0);
+    }
+    else
+    {
+        shaderLog = vec4(1.0, 0.0, 1.0, 1.0);
+    }
 
 
     gl_FragData[0] = vec4(encodedOutFlux_RFU_HIGH, voxelSpaceValue);  // RFU flux high.

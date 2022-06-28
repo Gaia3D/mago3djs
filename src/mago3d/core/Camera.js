@@ -1392,6 +1392,11 @@ Camera.shootLaser = function(laserCam, resultImpactPointWC, magoManager, options
 	var floatDepthPixels = new Float32Array(([depthPixels[0]/255.0, depthPixels[1]/255.0, depthPixels[2]/255.0, depthPixels[3]/255.0]));
 	var linearDepth = ManagerUtils.unpackDepth(floatDepthPixels); // 0 to 256 range depth.
 
+	if (linearDepth > 1.0)
+	{
+		linearDepth = 1.0;
+	}
+
 	var bigFrustum = laserCam.getBigFrustum();
 	var realDist = linearDepth * bigFrustum.far[0];
 

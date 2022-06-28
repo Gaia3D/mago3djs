@@ -16,18 +16,22 @@ uniform sampler2D currDEMTex;
 
 uniform vec2 u_heightMap_MinMax; // terrain min max heights. 
 uniform vec2 u_simulationTextureSize; // for example 512 x 512.
-uniform vec2 u_quantizedVolume_MinMax;
+uniform vec3 u_quantizedVolume_MinMax[2]; // the minimum is [0,0,0], and the maximum is [1,1,1].***
 uniform int u_terrainHeightEncodingBytes;
 
 //******************************************
 // u_processType = 0 -> overWriteDEM.
 // u_processType = 1 -> excavation.
+// u_processType = 2 -> overWrite but only partially, limited by "u_quantizedVolume_MinMax".
+//                      if a fragment is out of "u_quantizedVolume_MinMax", then discard.***
+//                      This mode is developed to use when render in sound simulation, with camera in yAxis direction.***
 uniform int u_processType;
 //------------------------------------------
 
 
 varying float vDepth;
 varying float vAltitude;
+varying vec4 glPos;
 
 vec4 packDepth( float v ) {
   vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;
@@ -90,6 +94,27 @@ void main()
         // if u_processType = 1 -> excavation.
         // in this process, the meshses must be rendered in frontFace = CW.***
         if(newTerrainHeght > curTerrainHeght)
+        {
+            discard;
+        }
+    }
+    else if(u_processType == 2)
+    {
+        // if u_processType = 1 ->  overWrite but only partially, limited by "u_quantizedVolume_MinMax".
+        // Check if the current fragment is inside of the u_quantizedVolume_MinMax.***
+        vec3 quantizedVolumeMin = u_quantizedVolume_MinMax[0];
+        vec3 quantizedVolumeMax = u_quantizedVolume_MinMax[1];
+        vec3 quantizedPos = glPos.xyz * 0.5 + 0.5;
+
+        if(quantizedPos.x < quantizedVolumeMin.x || quantizedPos.x > quantizedVolumeMax.x)
+        {
+            discard;
+        }
+        else if(quantizedPos.y < quantizedVolumeMin.y || quantizedPos.y > quantizedVolumeMax.y)
+        {
+            discard;
+        }
+        else if(quantizedPos.z < quantizedVolumeMin.z || quantizedPos.z > quantizedVolumeMax.z)
         {
             discard;
         }

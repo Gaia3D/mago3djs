@@ -38,30 +38,36 @@
 uniform sampler2D simulationBoxDoubleDepthTex;
 uniform sampler2D simulationBoxDoubleNormalTex; // used to calculate the current frustum idx.***
 uniform sampler2D airPressureMosaicTex;
-uniform sampler2D depthTex; // scene depth texture.***
-uniform sampler2D normalTex; // scene depth texture.***
+uniform sampler2D sceneDepthTex; // scene depth texture.***
+uniform sampler2D sceneNormalTex; // scene depth texture.***
 uniform sampler2D airVelocityTex; 
 
 uniform int u_texSize[3]; // The original texture3D size.***
 //uniform int u_mosaicTexSize[3]; // The mosaic texture size.***
 uniform int u_mosaicSize[3]; // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***
+uniform vec3 u_voxelSizeMeters;
 
 varying vec2 v_tex_pos;
 
+uniform mat4 modelViewMatrixRelToEye;
 uniform mat4 modelViewMatrixRelToEyeInv;
 uniform vec3 encodedCameraPositionMCHigh;
 uniform vec3 encodedCameraPositionMCLow;
 uniform float u_airMaxPressure;
+uniform float u_airEnvirontmentPressure;
 uniform vec2 u_screenSize;
 uniform vec2 uNearFarArray[4];
 uniform float tangentOfHalfFovy;
 uniform float aspectRatio;
 
+uniform mat4 u_simulBoxTMat;
 uniform mat4 u_simulBoxTMatInv;
 uniform vec3 u_simulBoxPosHigh;
 uniform vec3 u_simulBoxPosLow;
 uniform vec3 u_simulBoxMinPosLC;
 uniform vec3 u_simulBoxMaxPosLC;
+
+
 
 float unpackDepth(const in vec4 rgba_depth)
 {
@@ -82,7 +88,7 @@ float getDepth(vec2 coord)
 	//	return linearDepth;
 	//}
 	//else{
-		return unpackDepth(texture2D(depthTex, coord.xy));
+		return unpackDepth(texture2D(sceneDepthTex, coord.xy));
 	//}
 }
 
@@ -111,7 +117,7 @@ vec4 decodeNormal(in vec4 normal)
 
 vec4 getNormal(in vec2 texCoord)
 {
-    vec4 encodedNormal = texture2D(normalTex, texCoord);
+    vec4 encodedNormal = texture2D(sceneNormalTex, texCoord);
     return decodeNormal(encodedNormal);
 }
 
@@ -128,7 +134,7 @@ vec3 decodeVelocity(in vec3 encodedVel)
 vec3 getVelocity(in vec2 texCoord)
 {
     vec4 encodedVel = texture2D(airVelocityTex, texCoord);
-    return encodeVelocity(encodedVel.xyz);
+    return decodeVelocity(encodedVel.xyz);
 }
 
 vec4 getNormal_simulationBox(in vec2 texCoord)
@@ -207,8 +213,13 @@ void get_FrontAndRear_depthTexCoords(in vec2 texCoord, inout vec2 frontTexCoord,
 	//      |                 |                |
 	//      +-----------------+----------------+
     vec2 normalTexSize = vec2(u_screenSize.x * 2.0, u_screenSize.y); // the normal tex width is double of the screen size width.***
-    vec2 frontNormalFragCoord = vec2(gl_FragCoord.x, gl_FragCoord.y);
-    vec2 rearNormalFragCoord = vec2(gl_FragCoord.x + u_screenSize.x, gl_FragCoord.y);
+    //vec2 frontNormalFragCoord = vec2(gl_FragCoord.x, gl_FragCoord.y);
+    //vec2 rearNormalFragCoord = vec2(gl_FragCoord.x + u_screenSize.x, gl_FragCoord.y);
+    float windows_x = texCoord.x * u_screenSize.x;
+    float windows_y = texCoord.y * u_screenSize.y;
+    vec2 frontNormalFragCoord = vec2(windows_x, windows_y);
+    vec2 rearNormalFragCoord = vec2(windows_x + u_screenSize.x, windows_y);
+
     frontTexCoord = vec2(frontNormalFragCoord.x / normalTexSize.x, frontNormalFragCoord.y / normalTexSize.y);
     rearTexCoord = vec2(rearNormalFragCoord.x / normalTexSize.x, rearNormalFragCoord.y / normalTexSize.y);
 }
@@ -384,8 +395,72 @@ bool get_airPressure_fromTexture3d(in vec3 texCoord3d, inout float airPressure, 
 
 
     airPressure = mix(airPressure_down, airPressure_up, remain);
+    //airPressure = airPressure_down; // test delete.***
     return true;
 }
+
+vec3 getRainbowColor_byHeight(in float height, in float minHeight_rainbow, in float maxHeight_rainbow)
+{
+	float gray = (height - minHeight_rainbow)/(maxHeight_rainbow - minHeight_rainbow);
+	if (gray > 1.0){ gray = 1.0; }
+	else if (gray<0.0){ gray = 0.0; }
+	
+	float r, g, b;
+	
+	if(gray < 0.16666)
+	{
+		b = 0.0;
+		g = gray*6.0;
+		r = 1.0;
+	}
+	else if(gray >= 0.16666 && gray < 0.33333)
+	{
+		b = 0.0;
+		g = 1.0;
+		r = 2.0 - gray*6.0;
+	}
+	else if(gray >= 0.33333 && gray < 0.5)
+	{
+		b = -2.0 + gray*6.0;
+		g = 1.0;
+		r = 0.0;
+	}
+	else if(gray >= 0.5 && gray < 0.66666)
+	{
+		b = 1.0;
+		g = 4.0 - gray*6.0;
+		r = 0.0;
+	}
+	else if(gray >= 0.66666 && gray < 0.83333)
+	{
+		b = 1.0;
+		g = 0.0;
+		r = -4.0 + gray*6.0;
+	}
+	else if(gray >= 0.83333)
+	{
+		b = 6.0 - gray*6.0;
+		g = 0.0;
+		r = 1.0;
+	}
+	
+	float aux = r;
+	r = b;
+	b = aux;
+	
+	//b = -gray + 1.0;
+	//if (gray > 0.5)
+	//{
+	//	g = -gray*2.0 + 2.0; 
+	//}
+	//else 
+	//{
+	//	g = gray*2.0;
+	//}
+	//r = gray;
+	vec3 resultColor = vec3(r, g, b);
+    return resultColor;
+} 
 
 void main(){
 
@@ -412,9 +487,9 @@ void main(){
     vec4 normal4front = getNormal_simulationBox(frontTexCoord);
 	vec3 normal = normal4rear.xyz;
     
-	if(length(normal) < 0.1)
+	//if(length(normal) < 0.1)
     {
-        discard;
+        //discard;
         /*
         vec4 color4discard = vec4(0.0, 0.5, 0.8, 1.0);
         gl_FragData[0] = color4discard;
@@ -444,6 +519,7 @@ void main(){
 	float currFar_scene = nearFar_scene.y;
     float sceneLinearDepth = getDepth(v_tex_pos);
     float distToCam = sceneLinearDepth * currFar_scene;
+    vec3 sceneDepthPosCC = getViewRay(v_tex_pos, distToCam);
 
     // Now, calculate the positions with the simulation box, front & rear.***
     // rear.***
@@ -470,51 +546,100 @@ void main(){
     // Now, calculate frontPosWC & rearPosWC.***
     vec4 frontPosWCRelToEye = modelViewMatrixRelToEyeInv * vec4(frontPosCC.xyz, 1.0);
     vec4 rearPosWCRelToEye = modelViewMatrixRelToEyeInv * vec4(rearPosCC.xyz, 1.0);
+    vec4 scenePosWCRelToEye = modelViewMatrixRelToEyeInv * vec4(sceneDepthPosCC.xyz, 1.0);
 
     // Now, calculate frontPosLC & rearPosLC.***
     vec3 frontPosLC;
     vec3 rearPosLC;
+    vec3 scenePosLC;
     posWCRelToEye_to_posLC(frontPosWCRelToEye, u_simulBoxTMatInv, u_simulBoxPosHigh, u_simulBoxPosLow, frontPosLC);
     posWCRelToEye_to_posLC(rearPosWCRelToEye, u_simulBoxTMatInv, u_simulBoxPosHigh, u_simulBoxPosLow, rearPosLC);
-
-    //if(abs(frontPosLC.z) > distToCam)
-    //{
-    //    discard;
-    //}
+    posWCRelToEye_to_posLC(scenePosWCRelToEye, u_simulBoxTMatInv, u_simulBoxPosHigh, u_simulBoxPosLow, scenePosLC);
 
     // Now, with "frontPosLC" & "rearPosLC", calculate the frontTexCoord3d & rearTexCoord3d.***
     vec3 simulBoxRange = vec3(u_simulBoxMaxPosLC.x - u_simulBoxMinPosLC.x, u_simulBoxMaxPosLC.y - u_simulBoxMinPosLC.y, u_simulBoxMaxPosLC.z - u_simulBoxMinPosLC.z);
     vec3 frontTexCoord3d = vec3((frontPosLC.x - u_simulBoxMinPosLC.x)/simulBoxRange.x, (frontPosLC.y - u_simulBoxMinPosLC.y)/simulBoxRange.y, (frontPosLC.z - u_simulBoxMinPosLC.z)/simulBoxRange.z);
     vec3 rearTexCoord3d = vec3((rearPosLC.x - u_simulBoxMinPosLC.x)/simulBoxRange.x, (rearPosLC.y - u_simulBoxMinPosLC.y)/simulBoxRange.y, (rearPosLC.z - u_simulBoxMinPosLC.z)/simulBoxRange.z);
-
+    vec3 scenePosTexCoord3d = vec3((scenePosLC.x - u_simulBoxMinPosLC.x)/simulBoxRange.x, (scenePosLC.y - u_simulBoxMinPosLC.y)/simulBoxRange.y, (scenePosLC.z - u_simulBoxMinPosLC.z)/simulBoxRange.z);
+    //float sceneAirPressure;
+    //vec3 sceneVel;
+   // if(!get_airPressure_fromTexture3d(scenePosTexCoord3d, sceneAirPressure, sceneVel))
+    //{
+    //    discard;
+    //}
     
     bool testBool = false;
 
     float totalAirPressure = 0.0;
+    vec3 totalVelocity = vec3(0.0);
     float airPressure = 0.0;
     float smplingCount = 0.0;
     float currMaxPressure = 0.0;
-    int col = 0;
-    int row = 0;
-    vec3 samplingDir = normalize(rearTexCoord3d - frontTexCoord3d);
-    float increLength = 0.02;
+    float segmentLength = length(rearPosLC - frontPosLC);
+    //vec3 samplingDir = normalize(rearTexCoord3d - frontTexCoord3d); // original.***
+    vec3 samplingDir = normalize(rearPosLC - frontPosLC);
+    vec3 samplingDirCC = normalize(rearPosCC - frontPosCC);
+    //float increLength = 0.02; // original.***
+    float increLength = segmentLength / 50.0;
+    if(increLength < u_voxelSizeMeters[0])
+    {
+        increLength = u_voxelSizeMeters[0];
+    }
     vec3 velocity;
 
     vec3 camRay = normalize(getViewRay(v_tex_pos, 1.0));
+    float dotProdAccum = 0.0;
     
     for(int i=0; i<50; i++)
     {
-        if(get_airPressure_fromTexture3d(frontTexCoord3d + samplingDir * increLength * float(i), airPressure, velocity))
+        // Note : for each smple, must depth check with the scene depthTexure.***
+        vec3 samplePosLC = frontPosLC + samplingDir * increLength * float(i);
+
+        vec3 samplePosCC = frontPosCC + samplingDirCC * increLength * float(i);
+        if(abs(samplePosCC.z) > distToCam)
         {
+            break;
+        }
+
+        airPressure = 0.0;
+        vec3 sampleTexCoord3d = vec3((samplePosLC.x - u_simulBoxMinPosLC.x)/simulBoxRange.x, (samplePosLC.y - u_simulBoxMinPosLC.y)/simulBoxRange.y, (samplePosLC.z - u_simulBoxMinPosLC.z)/simulBoxRange.z);
+        //sampleTexCoord3d.y = 1.0 - sampleTexCoord3d.y;
+        
+        //if(get_airPressure_fromTexture3d(frontTexCoord3d + samplingDir * increLength * float(i), airPressure, velocity)) // original.***
+        if(get_airPressure_fromTexture3d(sampleTexCoord3d, airPressure, velocity))
+        {
+            // u_airEnvirontmentPressure
+
             // Now, compare the velocity direction with the camRay.***
-            vec3 normalizedVel = normalize(velocity);
-            float dotProd = abs(dot(camRay, normalizedVel));
-            totalAirPressure += airPressure * (1.0 - dotProd) * 100.0;
-            smplingCount += 1.0;
-            if(airPressure > currMaxPressure)
+            // The velocity must be multiplied by mvMatrix.***
+            float speed = length(velocity);
+            vec3 velocityDir = normalize(velocity);
+
+            // Now, calculate the velocityCC.***
+            vec4 velocityDirCC = modelViewMatrixRelToEye * vec4(velocityDir, 1.0);
+            
+            
+
+            if(airPressure > u_airEnvirontmentPressure)
             {
-                currMaxPressure = airPressure;
+                float dotProd = dot(camRay, velocityDirCC.xyz);
+                //if(dotProd < 0.0)
+                {
+                    totalVelocity += velocity;
+                    totalAirPressure += airPressure * (1.0 - abs(dotProd)) * 3.0;
+                    smplingCount += 1.0;
+                    //break;
+
+                    dotProdAccum += abs(dotProd);
+                }
+
+                if(airPressure > currMaxPressure)
+                {
+                    currMaxPressure = airPressure;
+                }
             }
+
+            
         }
         else
         {
@@ -526,25 +651,82 @@ void main(){
         
     }
 
-    float averageAirPressure = totalAirPressure / smplingCount;
-
-    if(averageAirPressure < 1e-8)
+    if(smplingCount < 1.0)
     {
-        discard;
+        smplingCount = 1.0;
     }
-
+    
+    float averageAirPressure = totalAirPressure / smplingCount;
     float unitaryAirPressure = averageAirPressure / u_airMaxPressure;
+    vec3 averageVelocity = totalVelocity / smplingCount;
+    float averageDotProd = dotProdAccum / smplingCount;
 
-    vec4 color4Aux = vec4(totalAirPressure*100.0, 0.5, 0.3, 1.0);
-    float f = 1.0;
-    color4Aux = vec4(totalAirPressure*f, totalAirPressure*f, totalAirPressure*f, totalAirPressure*1.0);
+    vec4 color4Aux;
+    float f = 10.0;
+    float deltaP = averageAirPressure - u_airEnvirontmentPressure;
+    float maxPressure_reference = u_airMaxPressure;
+    vec3 rainbowCol3 = getRainbowColor_byHeight(averageAirPressure * f, 0.0, maxPressure_reference);//
+    //vec3 rainbowCol3 = getRainbowColor_byHeight(sceneAirPressure * f, 0.0, maxPressure_reference);
 
-    //if(currMaxPressure > 0.01)
+    float alpha;
+    //if(deltaP > 0.0)
+    {
+        alpha = deltaP * 40000.0 / u_airMaxPressure;
+        //alpha = deltaP * 4.0 / u_airMaxPressure;
+        color4Aux = vec4(rainbowCol3, alpha);
+        vec3 velocityDir = normalize(averageVelocity);
+        vec4 velocityDirCC = modelViewMatrixRelToEye * vec4(velocityDir, 1.0);
+        color4Aux = vec4(normalize(velocityDirCC.xyz), alpha);
+
+        //color4Aux = vec4(averageDotProd, averageDotProd, averageDotProd, alpha);
+        color4Aux = vec4(smplingCount/50.0, smplingCount/50.0, smplingCount/50.0, alpha);
+    }
+    //else
     //{
-    //    currMaxPressure = 0.9;
+   //     alpha = 0.0;
+   //     color4Aux = vec4(0.25, 0.4, 0.8, alpha);
     //}
-    //color4Aux = vec4(currMaxPressure, currMaxPressure, currMaxPressure, currMaxPressure);
-
+    
+    /*
+    float fAux = 1e-5;
+    float valueAux = smplingCount;
+    if(valueAux == 1.0)
+    {
+        color4Aux = vec4(1.0, 0.0, 0.0, 1.0);
+    }
+    else if(valueAux >= 1.0 && valueAux < 4.0)
+    {
+        color4Aux = vec4(0.0, 1.0, 0.0, 1.0);
+    }
+    else if(valueAux >= 4.0 && valueAux < 8.0)
+    {
+        color4Aux = vec4(0.0, 0.0, 1.0, 1.0);
+    }
+    else if(valueAux >= 8.0 && valueAux < 15.0)
+    {
+        color4Aux = vec4(1.0, 1.0, 0.0, 1.0);
+    }
+    else if(valueAux >= 15.0 && valueAux < 20.0)
+    {
+        color4Aux = vec4(1.0, 0.0, 1.0, 1.0);
+    }
+    else if(valueAux >= 20.0 && valueAux < 30.0)
+    {
+        color4Aux = vec4(0.0, 1.0, 1.0, 1.0);
+    }
+    else if(valueAux >= 30.0 && valueAux < 40.0)
+    {
+        color4Aux = vec4(1.0, 0.7, 0.4, 1.0);
+    }
+    else if(valueAux >= 40.0)
+    {
+        color4Aux = vec4(0.5, 0.3, 0.99, 1.0);
+    }
+    else
+    {
+        color4Aux = vec4(0.2, 0.2, 0.2, 0.9);
+    }
+    */
 
     gl_FragData[0] = color4Aux;
 

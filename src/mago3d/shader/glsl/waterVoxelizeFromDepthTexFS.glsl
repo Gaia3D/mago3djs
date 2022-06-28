@@ -16,6 +16,9 @@ uniform int u_texSize[3]; // The original texture3D size.***
 uniform int u_mosaicTexSize[3]; // The mosaic texture size.***
 uniform int u_mosaicSize[3]; // The mosaic composition (xTexCount X yTexCount X zSlicesCount).***
 uniform int u_lowestMosaicSliceIndex;
+uniform vec2 u_heightMap_MinMax; // dem of terrain (buildings included) min max heights. 
+uniform vec2 u_realTex3d_minMaxAltitudes; // min max of tex3d slices altitudes.***
+
 varying vec2 v_tex_pos;
 
 	//       Sample of a slice of the mosaic texture.***
@@ -51,7 +54,9 @@ int getSliceIdx_ofTexture3D(int col, int row, int currMosaicSliceIdx)
 float getSliceAltitude_ofTexture3D(int col, int row, int currMosaicSliceIdx)
 {
     int sliceIdx = getSliceIdx_ofTexture3D(col, row, currMosaicSliceIdx);
-    float slice_altitude = float(sliceIdx) / float(u_texSize[2]);
+    //float slice_altitude = float(sliceIdx) / float(u_texSize[2]); // original.***
+    float unitary_alt = float(sliceIdx) / float(u_texSize[2]);
+    float slice_altitude = u_realTex3d_minMaxAltitudes.x + unitary_alt * (u_realTex3d_minMaxAltitudes.y - u_realTex3d_minMaxAltitudes.x);
     return slice_altitude;
 }
 
@@ -103,71 +108,75 @@ void main()
     float g = row / float(u_mosaicSize[1]);
     vec4 slice_color = vec4(0.0);
 
-    if(depth.r > slice_altitude)
+    float depthTex_altitude = u_heightMap_MinMax.x + depth.r * (u_heightMap_MinMax.y - u_heightMap_MinMax.x);
+
+    //if(depth.r > slice_altitude)
+    if(depthTex_altitude > slice_altitude)
     {
         slice_color = vec4(0.0, 0.0, 0.0, 1.0);
     }
+
     gl_FragData[0] = slice_color;  
 
     #ifdef USE_MULTI_RENDER_TARGET
         // slice 1.
-        slice_altitude = getSliceAltitude_ofTexture3D(col_int, row_int, u_lowestMosaicSliceIndex+1);
+        slice_altitude = getSliceAltitude_ofTexture3D(col_int, row_int, u_lowestMosaicSliceIndex + 1);
         slice_color = vec4(0.0);
-        if(depth.r > slice_altitude)
+        if(depthTex_altitude > slice_altitude)
         {
             slice_color = vec4(0.0, 0.0, 0.0, 1.0);
         }
         gl_FragData[1] = slice_color;
 
         // slice 2.
-        slice_altitude = getSliceAltitude_ofTexture3D(col_int, row_int, u_lowestMosaicSliceIndex+2);
+        slice_altitude = getSliceAltitude_ofTexture3D(col_int, row_int, u_lowestMosaicSliceIndex + 2);
         slice_color = vec4(0.0);
-        if(depth.r > slice_altitude)
+        if(depthTex_altitude > slice_altitude)
         {
             slice_color = vec4(0.0, 0.0, 0.0, 1.0);
         }
         gl_FragData[2] = slice_color;
 
         // slice 3.
-        slice_altitude = getSliceAltitude_ofTexture3D(col_int, row_int, u_lowestMosaicSliceIndex+3);
+        slice_altitude = getSliceAltitude_ofTexture3D(col_int, row_int, u_lowestMosaicSliceIndex + 3);
         slice_color = vec4(0.0);
-        if(depth.r > slice_altitude)
+        if(depthTex_altitude > slice_altitude)
         {
             slice_color = vec4(0.0, 0.0, 0.0, 1.0);
         }
         gl_FragData[3] = slice_color; 
 
         // slice 4.
-        slice_altitude = getSliceAltitude_ofTexture3D(col_int, row_int, u_lowestMosaicSliceIndex+4);
+        slice_altitude = getSliceAltitude_ofTexture3D(col_int, row_int, u_lowestMosaicSliceIndex + 4);
         slice_color = vec4(0.0);
-        if(depth.r > slice_altitude)
+        if(depthTex_altitude > slice_altitude)
         {
             slice_color = vec4(0.0, 0.0, 0.0, 1.0);
         }
         gl_FragData[4] = slice_color;
 
         // slice 5.
-        slice_altitude = getSliceAltitude_ofTexture3D(col_int, row_int, u_lowestMosaicSliceIndex+5);
+        slice_altitude = getSliceAltitude_ofTexture3D(col_int, row_int, u_lowestMosaicSliceIndex + 5);
         slice_color = vec4(0.0);
-        if(depth.r > slice_altitude)
+        if(depthTex_altitude > slice_altitude)
         {
             slice_color = vec4(0.0, 0.0, 0.0, 1.0);
         }
         gl_FragData[5] = slice_color; 
 
         // slice 6.
-        slice_altitude = getSliceAltitude_ofTexture3D(col_int, row_int, u_lowestMosaicSliceIndex+6);
+        slice_altitude = getSliceAltitude_ofTexture3D(col_int, row_int, u_lowestMosaicSliceIndex + 6);
         slice_color = vec4(0.0);
-        if(depth.r > slice_altitude)
+        if(depthTex_altitude > slice_altitude)
         {
             slice_color = vec4(0.0, 0.0, 0.0, 1.0);
         }
         gl_FragData[6] = slice_color; 
 
         // slice 7.
-        slice_altitude = getSliceAltitude_ofTexture3D(col_int, row_int, u_lowestMosaicSliceIndex+7);
+        slice_altitude = getSliceAltitude_ofTexture3D(col_int, row_int, u_lowestMosaicSliceIndex + 7);
         slice_color = vec4(0.0);
-        if(depth.r > slice_altitude)
+        if(depthTex_altitude > slice_altitude)
         {
             slice_color = vec4(0.0, 0.0, 0.0, 1.0);
         }

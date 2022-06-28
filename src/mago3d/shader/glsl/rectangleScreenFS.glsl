@@ -143,6 +143,11 @@ float unpackDepth(const in vec4 rgba_depth)
 	return dot(rgba_depth, vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 16581375.0));
 } 
 
+vec3 decodeVelocity(in vec3 encodedVel)
+{
+	return vec3(encodedVel * 2.0 - 1.0);
+}
+
 void main()
 {           
     vec2 texCoord = vec2(1.0 - v_tex_pos.x, 1.0 - v_tex_pos.y); // original.
@@ -161,17 +166,21 @@ void main()
     }
     else if(uTextureType == 1)
     {
+        // CUBE_TEXTURE.***
+        // To see the value of 4byte encoded color4.***
         textureColor = textureCube(texture_cube, v_normal);
         float linearDepth = unpackDepth(textureColor); // original.
         textureColor = vec4(linearDepth, linearDepth, linearDepth, 1.0);
     }
     else if(uTextureType == 2)
     {
+        // To see only alpha component.***
         vec4 textureColorAux = texture2D(texture_0, texCoord);
         textureColor = vec4(textureColorAux.a, 0.0, 0.0, textureColorAux.a);
     }
     else if(uTextureType == 3)
     {
+        // Test debug:
         vec4 textureColorAux = texture2D(texture_0, texCoord);
         if(textureColorAux.r + textureColorAux.g + textureColorAux.b > 0.0)
         {
@@ -181,6 +190,21 @@ void main()
         {
             textureColor = textureColorAux;
         }
+    }
+    else if(uTextureType == 4)
+    {
+        // To see the value of 4byte encoded color4.***
+        textureColor = texture2D(texture_0, texCoord);
+        float linearDepth = unpackDepth(textureColor); // original.
+        textureColor = vec4(linearDepth, linearDepth, linearDepth, 1.0);
+    }
+    else if(uTextureType == 5)
+    {
+        // To see velocity.***
+        textureColor = texture2D(texture_0, texCoord);
+        vec3 vel = decodeVelocity(textureColor.rgb);
+        vec3 normalizedVel = normalize(vel);
+        textureColor = vec4(normalizedVel.rgb, 1.0);
     }
     
     gl_FragColor = textureColor;

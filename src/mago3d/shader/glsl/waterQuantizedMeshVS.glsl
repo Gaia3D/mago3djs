@@ -5,12 +5,15 @@ attribute vec4 color4;
 
 uniform vec3 u_totalMinGeoCoord; // (lon, lat, alt).
 uniform vec3 u_totalMaxGeoCoord;
-uniform vec3 u_currentMinGeoCoord;
-uniform vec3 u_currentMaxGeoCoord;
+uniform vec3 u_currentMinGeoCoord; // min geoCoord of the current quantizedMesh.***
+uniform vec3 u_currentMaxGeoCoord; // max geoCoord of the current quantizedMesh.***
+
+uniform bool u_flipTexCoordY;
 
 varying vec2 v_tex_pos;
 varying vec3 vPos;
 varying vec4 vColor4;
+varying float v_altitude;
 
 void main() {
     // Note: the position attributte is initially (in javascript) unsignedInt16 (0 to 32,767) (quantizedMesh).
@@ -29,8 +32,17 @@ void main() {
     float u = (alt - u_totalMinGeoCoord.z) / (u_totalMaxGeoCoord.z - u_totalMinGeoCoord.z);
 
     //pos = vec3(pos.x, 1.0 - pos.y, pos.z); // flip y coords. // original.***
-    pos = vec3(s, 1.0 - t, u); // flip y coords.
+    if(u_flipTexCoordY)
+    {
+        pos = vec3(s, 1.0 - t, u); // flip y coords.
+    }
+    else{
+        pos = vec3(s, t, u);
+    }
+    
     vPos = pos;
+
+
     v_tex_pos = pos.xy;
 
     gl_Position = vec4(-1.0 + 2.0 * pos, 1.0);

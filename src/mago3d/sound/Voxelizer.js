@@ -144,7 +144,7 @@ Voxelizer.prototype.makeMosaicTexture3DFromRealTexture3D = function (magoManager
 	var finalSlicesCount = resultMosaicTexture3d.finalSlicesCount;
 	for (var i=0; i<finalSlicesCount; i++)
 	{
-		// Bind the 8 output textures:
+		// Bind the  output textures:
 		gl.framebufferTexture2D(gl.FRAMEBUFFER, extbuffers.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, resultMosaicTexture3d.getTexture( i ), 0);
 
 		//gl.uniform1i(shader.u_lowestMosaicSliceIndex_loc,  i*8);
@@ -180,6 +180,10 @@ Voxelizer.prototype.makeMosaicTexture3DFromRealTexture3D = function (magoManager
 
 	fbo.unbind();
 	gl.enable(gl.DEPTH_TEST);
+
+	// finally delete fbo.***
+	this.fbo.deleteObjects(gl);
+	this.fbo = undefined;
 	
 
 	return resultMosaicTexture3d;
@@ -231,7 +235,9 @@ Voxelizer.prototype.renderToMagoTexture3D = function (soundManager, magoTex3d, g
 	//gl.uniform2fv(shader.u_simulationTextureSize_loc, [magoTex3d.finalTextureXSize, magoTex3d.finalTextureYSize]);
 	gl.uniform1iv(shader.u_texSize_loc, [magoTex3d.texture3DXSize, magoTex3d.texture3DYSize, magoTex3d.texture3DZSize]);
 	gl.uniform1f(shader.u_airMaxPressure_loc, soundManager.airMaxPressure);
-	gl.uniform1f(shader.u_currAirPressure_loc, 0.8);
+	var soundPressureAtm = 1.0001; 
+	soundPressureAtm = 4.0; 
+	gl.uniform1f(shader.u_currAirPressure_loc, soundPressureAtm);
 	
 	gl.disable(gl.CULL_FACE);
 	gl.disable(gl.DEPTH_TEST);
@@ -282,7 +288,28 @@ Voxelizer.prototype.renderToMagoTexture3D = function (soundManager, magoTex3d, g
 	this.fboRealTex3d = undefined;
 };
 
-Voxelizer.prototype.voxelizeByDepthTexture = function (magoManager, depthTex, texWidth, texHeight, texNumSlices, resultDepthTex3D)
+Voxelizer.getMosaicColumnsAndRows = function (texWidth, texHeight, texNumSlices)
+{
+	// Given texWidth, texHeight, texNumSlices, this function returns the num columns & num rows for a mosaic composition.***
+	var TEXTURE_MAX_SIZE = 16000;
+
+	var mosaicXCount = Math.floor( TEXTURE_MAX_SIZE/texWidth );
+	var mosaicYCount = Math.floor( TEXTURE_MAX_SIZE/texHeight );
+
+	// Now, must check if the (mosaicXCount X mosaicYCount) is lower than all subTextures needed(texNumSlices).***
+	var totalSubTexCount = mosaicXCount * mosaicYCount;
+	if (totalSubTexCount > texNumSlices)
+	{
+		// in this case, must adjust the "mosaicXCount" & "mosaicYCount" values, to save memory.***
+		mosaicXCount = Math.ceil(Math.sqrt(texNumSlices));
+		mosaicYCount = Math.ceil(texNumSlices / mosaicXCount);
+	}
+
+	return {numColumns : mosaicXCount,
+		numRows    : mosaicYCount};
+};
+
+Voxelizer.prototype.voxelizeByDepthTexture = function (magoManager, depthTex, texWidth, texHeight, texNumSlices, soundLayer, resultDepthTex3D)
 {
 	// In this case, use the depth texture to make the magoTexture3D.***
 	// 1rst, create the texture3d.***
@@ -310,21 +337,12 @@ Voxelizer.prototype.voxelizeByDepthTexture = function (magoManager, depthTex, te
 	//      +-----------+-----------+-----------+-----------+-----------+   
 	//
 	
-	var TEXTURE_MAX_SIZE = 16000;
 	var gl = magoManager.getGl();
 	if (!resultDepthTex3D)
 	{
-		var mosaicXCount = Math.floor( TEXTURE_MAX_SIZE/texWidth );
-		var mosaicYCount = Math.floor( TEXTURE_MAX_SIZE/texHeight );
-
-		// Now, must check if the (mosaicXCount X mosaicYCount) is lower than all subTextures needed(texNumSlices).***
-		var totalSubTexCount = mosaicXCount * mosaicYCount;
-		if (totalSubTexCount > texNumSlices)
-		{
-			// in this case, must adjust the "mosaicXCount" & "mosaicYCount" values, to save memory.***
-			mosaicXCount = Math.ceil(Math.sqrt(texNumSlices));
-			mosaicYCount = Math.ceil(texNumSlices / mosaicXCount);
-		}
+		var result = Voxelizer.getMosaicColumnsAndRows(texWidth, texHeight, texNumSlices);
+		var mosaicXCount = result.numColumns;
+		var mosaicYCount = result.numRows;
 
 		var options = {
 			texture3DXSize : texWidth,
@@ -354,8 +372,13 @@ Voxelizer.prototype.voxelizeByDepthTexture = function (magoManager, depthTex, te
 	}
 
 	// Now, bind fbo and render N times to fill all textures slices.***
-
 	// 2n, make building depth over terrain depth.******************************************************************************************************
+	// Now, for each realTex3D slilces, set the altitude value.***
+	var geoExtent = soundLayer.geographicExtent;
+	var minAltitude = geoExtent.getMinAltitude();
+	var maxAltitude = geoExtent.getMaxAltitude();
+	//-----------------------------------------------------------------------------
+
 	var fbo = this.fbo;
 	var extbuffers = fbo.extbuffers;
 	var shader;
@@ -374,7 +397,7 @@ Voxelizer.prototype.voxelizeByDepthTexture = function (magoManager, depthTex, te
 		extbuffers.COLOR_ATTACHMENT7_WEBGL, // gl_FragData[7]
 	]);
 
-	shader = magoManager.postFxShadersManager.getShader("voxelize");
+	shader = magoManager.postFxShadersManager.getShader("voxelize"); // (waterQuadVertVS, waterVoxelizeFromDepthTexFS)
 	magoManager.postFxShadersManager.useProgram(shader);
 	shader.bindUniformGenerals();
 	gl.uniform1i(shader.u_textureFlipYAxis_loc, false);
@@ -404,6 +427,9 @@ Voxelizer.prototype.voxelizeByDepthTexture = function (magoManager, depthTex, te
 	// Set the mosaic composition.***
 	gl.uniform1iv(shader.u_mosaicSize_loc, [resultDepthTex3D.mosaicXCount, resultDepthTex3D.mosaicYCount, resultDepthTex3D.finalSlicesCount]);
 
+	// Depth texture min-max altitudes.***
+	gl.uniform2fv(shader.u_heightMap_MinMax_loc, [minAltitude, maxAltitude]);
+
 	gl.disable(gl.DEPTH_TEST);
 
 	var finalSlicesCount = resultDepthTex3D.finalSlicesCount;
@@ -422,6 +448,9 @@ Voxelizer.prototype.voxelizeByDepthTexture = function (magoManager, depthTex, te
 
 		gl.uniform1i(shader.u_lowestMosaicSliceIndex_loc,  i*8);
 
+		// real tex3d slices altitudes.***
+		gl.uniform2fv(shader.u_realTex3d_minMaxAltitudes_loc, [minAltitude, maxAltitude]); // can to be coincident with depthTex-minMax altitudes.***
+
 		// Draw screenQuad:
 		gl.drawArrays(gl.TRIANGLES, 0, 6);
 	}
@@ -433,6 +462,10 @@ Voxelizer.prototype.voxelizeByDepthTexture = function (magoManager, depthTex, te
 
 	fbo.unbind();
 	gl.enable(gl.DEPTH_TEST);
+
+	// finally delete fbo.***
+	this.fbo.deleteObjects(gl);
+	this.fbo = undefined;
 	
 
 	return resultDepthTex3D;

@@ -15,7 +15,7 @@ var MagoTexture3D = function(options)
 	this.texture3DYSize = 1024;
 	this.texture3DZSize = 128;
 
-	// The 3D texture into a mosaic texture matrix params.***
+	// The 3D texture into a mosaic texture matrix params. No special meaning var.***
 	this.mosaicXCount = 1; // by default.
 	this.mosaicYCount = 1; // by default.
 
@@ -23,6 +23,9 @@ var MagoTexture3D = function(options)
 	this.finalTextureXSize;
 	this.finalTextureZSize;
 	this.finalSlicesCount = 1; // by default.***
+
+	// Geometric params.***
+	this.minMaxAltitudes = [0.0, 0.0]; // if exist.***
 
 	this.texturesArray = [];
 
@@ -91,6 +94,16 @@ MagoTexture3D.prototype.createTextures = function (gl)
 		var webglTex = Texture.createTexture(gl, filter, data, this.finalTextureXSize, this.finalTextureYSize, texWrap);
 		this.texturesArray.push(webglTex);
 	}
+};
+
+MagoTexture3D.prototype.getTexturesCount = function ()
+{
+	if (!this.texturesArray)
+	{
+		return 0;
+	}
+
+	return this.texturesArray.length;
 };
 
 MagoTexture3D.prototype.getTexture = function (idx)

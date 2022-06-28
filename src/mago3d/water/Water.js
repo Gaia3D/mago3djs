@@ -587,6 +587,7 @@ Water.prototype.makeDEMTextureByQuantizedMeshes = function ()
 	//gl.uniform2fv(shader.u_minMaxHeights_loc, [this.qMesh._minimumHeight, this.qMesh._maximumHeight]);
 	gl.uniform1i(shader.colorType_loc_loc, 0);
 	gl.uniform1i(shader.u_terrainHeightEncodingBytes_loc, waterManager.terrainHeightEncodingBytes);
+	gl.uniform1i(shader.u_flipTexCoordY_loc, true);
 
 	//gl.disable(gl.CULL_FACE);
 	gl.clear(gl.DEPTH_BUFFER_BIT);
@@ -720,6 +721,7 @@ Water.prototype.makeDEMTextureByQuantizedMesh__testQSurfaceMesh = function (qMes
 	shader.bindUniformGenerals();
 
 	gl.uniform4fv(shader.u_oneColor4_loc, [1.0, 0.5, 0.25, 1.0]);
+	gl.uniform1i(shader.u_flipTexCoordY_loc, true);
 	
 
 	// Now, set the waterSimGeoExtent & the qMeshGeoExtent.

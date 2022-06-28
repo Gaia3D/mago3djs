@@ -1,6 +1,7 @@
 precision highp float;
 
 attribute vec3 position;
+attribute vec3 normal;
 attribute vec2 texCoord;
 
 uniform mat4 buildingRotMatrix;  
@@ -18,6 +19,7 @@ uniform vec4 u_color4;
 varying float vDepth;
 varying float vAltitude;
 varying vec4 vColor4;
+varying vec3 vNormal3;
 varying vec4 glPos;
 
 #define M_PI 3.1415926535897932384626433832795
